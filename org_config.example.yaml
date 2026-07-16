@@ -1,0 +1,29 @@
+# Copy this file to org_config.yaml and fill in your org-specific values.
+# org_config.yaml is gitignored — never commit real connection details.
+
+org:
+  name: "Example Health System"
+
+# Fabric lakehouse paths for Delta tables
+lakehouse:
+  # Source tables (read by the graph builder)
+  dict_tables: "Tables/dict_tables"
+  dict_columns: "Tables/dict_columns"
+  sql_sources: "Tables/sql_sources"
+
+  # Graph output tables (written by the graph builder)
+  graph_nodes: "Tables/graph_nodes"
+  graph_edges: "Tables/graph_edges"
+
+# Data dictionary source (optional overrides)
+dictionary:
+  # If your org uses a non-standard schema for dict_tables / dict_columns,
+  # map column names here.
+  table_name_col: "TABLE_NAME"
+  column_name_col: "COLUMN_NAME"
+  description_col: "DESCRIPTION"
+
+# Certified metrics catalog
+metrics:
+  # Path to the canonical metrics definitions (YAML or Delta)
+  catalog_path: "Tables/metric_catalog"

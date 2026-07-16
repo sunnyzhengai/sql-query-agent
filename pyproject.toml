@@ -1,0 +1,33 @@
+[project]
+name = "sql-query-agent"
+version = "0.1.0"
+description = "Three-layer graph RAG system for SQL business logic, targeting Microsoft Fabric"
+requires-python = ">=3.9"
+dependencies = [
+    "pyyaml>=6.0",
+    "pydantic>=2.0",
+    "sqlglot>=23.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-cov>=5.0",
+    "ruff>=0.4",
+]
+fabric = [
+    # Fabric notebooks provide these; listed for documentation only
+    # "pyspark",
+    # "delta-spark",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[tool.ruff]
+target-version = "py39"
+line-length = 120
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W"]
