@@ -27,3 +27,18 @@ dictionary:
 metrics:
   # Path to the canonical metrics definitions (YAML or Delta)
   catalog_path: "Tables/metric_catalog"
+
+# View extractor (optional — only needed for automated SQL Server extraction)
+# extractor:
+#   sql_server:
+#     host: "your-sql-server.corp.local"
+#     port: 1433
+#     database: "YourDatabase"
+#     gateway_connection_name: "OnPremSQLGateway"  # Fabric gateway name
+#     driver: "ODBC Driver 17 for SQL Server"       # local dev only
+#     trusted_connection: true                       # local dev only
+#   domain:
+#     schemas: ["dbo", "reporting"]
+#     base_tables: ["encounter", "patient"]
+#     object_types: ["VIEW"]
+#   tracking_table: "extraction_tracking"
