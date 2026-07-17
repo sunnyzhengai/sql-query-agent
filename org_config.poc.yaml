@@ -1,0 +1,18 @@
+# POC config — upload this to your Lakehouse as org_config.yaml
+org:
+  name: "POC Workspace"
+
+lakehouse:
+  dict_tables: "dict_tables"
+  dict_columns: "dict_columns"
+  sql_sources: "sql_sources"
+  graph_nodes: "graph_nodes"
+  graph_edges: "graph_edges"
+
+dictionary:
+  table_name_col: "TABLE_NAME"
+  column_name_col: "COLUMN_NAME"
+  description_col: "DESCRIPTION"
+
+metrics:
+  catalog_path: "metric_catalog"
