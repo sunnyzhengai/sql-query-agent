@@ -1,17 +1,19 @@
 """Fabric Notebook: Scan .sql files to find views/procs that reference target tables.
 
-Upload your .sql files to your Lakehouse Files folder, then run this notebook
-to discover which ones belong to the surgery domain (or any domain you define).
+Supports reading from the attached Lakehouse (local path) or from a different
+workspace's Lakehouse via ABFS path using mssparkutils.
 
-In Fabric: create a new Notebook, copy each cell, attach to your Lakehouse, run all.
+In Fabric: create a new Notebook, copy each cell, attach to your POC Lakehouse, run all.
 """
 
 # %% Cell 1: Configuration — edit these values
-import os
 import re
 
-# Where your .sql files are stored in the Lakehouse
-SQL_FILES_FOLDER = "/lakehouse/default/Files/sql_files"
+# Where your .sql files are stored.
+# Option A: Local Lakehouse path (same workspace):
+#   SQL_FILES_FOLDER = "/lakehouse/default/Files/sql_files"
+# Option B: ABFS path (cross-workspace — right-click folder in source Lakehouse → Properties → copy ABFS path):
+SQL_FILES_FOLDER = "abfss://your-workspace@onelake.dfs.fabric.microsoft.com/your-lakehouse.Lakehouse/Files/sql_files"
 
 # Tables that define the surgery domain (case-insensitive matching)
 TARGET_TABLES = ["OR_LOG", "OR_CASE"]
@@ -19,13 +21,24 @@ TARGET_TABLES = ["OR_LOG", "OR_CASE"]
 # %% Cell 2: Scan all .sql files for target table references
 
 def find_sql_files(folder):
-    """Recursively find all .sql files in a folder."""
+    """Recursively find all .sql files using mssparkutils (works with ABFS and local paths)."""
     sql_files = []
-    for root, dirs, files in os.walk(folder):
-        for f in files:
-            if f.lower().endswith(".sql"):
-                sql_files.append(os.path.join(root, f))
+    try:
+        items = mssparkutils.fs.ls(folder)  # noqa: F821
+    except Exception as e:
+        print(f"ERROR: Cannot list {folder}: {e}")
+        return []
+    for item in items:
+        if item.isDir:
+            sql_files.extend(find_sql_files(item.path))
+        elif item.name.lower().endswith(".sql"):
+            sql_files.append(item.path)
     return sorted(sql_files)
+
+
+def read_file_content(file_path):
+    """Read file content using mssparkutils (works with ABFS and local paths)."""
+    return mssparkutils.fs.head(file_path, 10_000_000)  # noqa: F821 — up to 10MB
 
 
 def search_file_for_tables(file_path, target_tables):
@@ -34,18 +47,21 @@ def search_file_for_tables(file_path, target_tables):
     Uses word-boundary matching to avoid false positives
     (e.g. 'OR_LOG' won't match 'FLOOR_LOGGING').
     """
-    with open(file_path, "r", encoding="utf-8", errors="replace") as f:
-        content = f.read()
+    content = read_file_content(file_path)
 
     content_upper = content.upper()
     matches = []
     for table in target_tables:
-        # Word boundary match: table name not surrounded by other word chars
         pattern = r'\b' + re.escape(table.upper()) + r'\b'
         if re.search(pattern, content_upper):
             matches.append(table)
 
     return matches, content
+
+
+def get_filename(path):
+    """Extract filename from a local or ABFS path."""
+    return path.rstrip("/").split("/")[-1]
 
 
 # Scan
@@ -56,7 +72,7 @@ results = []
 for filepath in sql_files:
     matches, content = search_file_for_tables(filepath, TARGET_TABLES)
     if matches:
-        filename = os.path.basename(filepath)
+        filename = get_filename(filepath)
         results.append({
             "file": filename,
             "path": filepath,
