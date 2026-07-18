@@ -93,7 +93,14 @@ Open `orchestrator.ipynb` and run all cells. It will:
 4. Write nodes and edges to Delta tables
 5. Print a summary
 
-### 7. Connect Data Agent
+### 7. Run Metadata Sync (optional)
+
+If you have Purview and/or Collibra configured in `org_config.yaml`:
+1. Open `metadata_sync.ipynb`
+2. Run all cells — it reads the graph, generates metadata, and pushes to configured catalogs
+3. Check the `sync_log` table for results
+
+### 8. Connect Data Agent
 
 Point the Fabric Data Agent at `graph_nodes` and `graph_edges`:
 1. Create a new Data Agent in your workspace
@@ -119,6 +126,23 @@ Point the Fabric Data Agent at `graph_nodes` and `graph_edges`:
 | target_id | string | Target node ID |
 | edge_type | string | Edge type enum value |
 | properties | string | JSON blob of edge properties |
+
+### sync_log
+| Column | Type | Description |
+|--------|------|-------------|
+| synced_at | string | ISO timestamp of the sync |
+| adapter | string | Which catalog (purview / collibra) |
+| asset_id | string | The asset that was synced |
+| status | string | success / skipped / failed |
+| message | string | Details or error message |
+
+## Notebooks
+
+| Notebook | Component | Purpose |
+|----------|-----------|---------|
+| `orchestrator.ipynb` | GraphRAG Engine | Build knowledge graph from SQL sources |
+| `metadata_sync.ipynb` | Metadata Sync | Push metadata to Purview/Collibra |
+| `extract_views.ipynb` | Extractor | Discover SQL views from SQL Server |
 
 ## Environment Promotion (Dev → Test → Prod)
 

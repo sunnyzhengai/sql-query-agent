@@ -1,7 +1,16 @@
 # Product Roadmap
 
-Phased plan for taking sql-query-agent from internal tool to Microsoft Marketplace product.
+Phased plan for taking the **Data Empowerment Suite** from internal tool to Microsoft Marketplace product.
 No fixed dates — phases have exit criteria, not deadlines. Update this as you go.
+
+## Product Components
+
+| Component | Short Name | Description | Tier |
+|-----------|-----------|-------------|------|
+| **Metadata Sync** | "sync" | Generate and push metadata to Purview/Collibra. Bulk, incremental, or triggered by report changes. | Basic |
+| **GraphRAG Engine** | "engine" | Knowledge graph + Data Agent grounding for certified, traceable answers. | Pro |
+
+Both components live in a single repo (`sql-query-agent`) and ship as one `.whl` package.
 
 ---
 
@@ -46,24 +55,27 @@ Core library, graph model, and adapter scaffolding.
 
 ---
 
-## Phase 1: Wedge MVP
-**Status: NOT STARTED**
+## Phase 1: Metadata Sync MVP (Wedge)
+**Status: IN PROGRESS**
 
-Get the Bulk Loader working end-to-end with real data against at least one catalog.
+Get Metadata Sync working end-to-end with real data against Purview.
+
+### Code quality (DONE)
+- [x] Add Python `logging` module throughout library (12 modules)
+- [x] Pin all dependency versions in pyproject.toml (`~=` compatible release)
+- [x] Run `pip-audit` — no vulnerabilities in direct dependencies
+- [x] Audit for print statements — zero in `src/`, all in scripts/notebooks where they belong
 
 ### Build
-- [ ] Pick first adapter target (Purview or Collibra) based on which you can test at work
-- [ ] Wire adapter to real API (requires `azure-identity` and `requests`)
+- [x] Pick first adapter target: **Purview** (available at work)
+- [x] Scaffold Metadata Sync notebook (`notebooks/metadata_sync.py`)
+- [ ] Wire Purview adapter to real API (requires `azure-identity` and `requests`)
 - [ ] Test metadata push with real data from work POC
 - [ ] Handle API errors gracefully (rate limits, auth failures, missing permissions)
 - [ ] Add PBI report description updates (Fabric REST API PATCH)
 - [ ] Validate with 50+ real SQL queries from work environment
 - [ ] Fix parser edge cases discovered from real-world SQL (nested CTEs, temp tables, vendor quirks)
-
-### Code quality
-- [ ] Add Python `logging` module throughout library (replace any print statements)
-- [ ] Pin all dependency versions in pyproject.toml
-- [ ] Run `pip-audit` for vulnerability scanning
+- [ ] Add sync_log tracking (which records were pushed, when, to which catalog)
 
 ### Test
 - [ ] Add adapter integration tests (with real API or recorded responses)
@@ -72,12 +84,12 @@ Get the Bulk Loader working end-to-end with real data against at least one catal
 
 ### Exit criteria
 - [ ] Can parse 50+ real SQL queries from work environment without errors
-- [ ] Can push metadata to at least one catalog (Purview or Collibra) via API
+- [ ] Can push metadata to Purview via API
 - [ ] PBI report descriptions can be updated programmatically
 - [ ] All tests pass, no print statements in library code
 
 ### Checklist items satisfied
-- MARKETPLACE_CHECKLIST §2: Code Standards (logging, deps)
+- MARKETPLACE_CHECKLIST §2: Code Standards (logging, deps) — DONE
 - MARKETPLACE_CHECKLIST §2: Testing (golden files)
 
 ---
