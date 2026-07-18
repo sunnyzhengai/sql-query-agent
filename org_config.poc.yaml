@@ -1,4 +1,4 @@
-# POC config — upload this to your Lakehouse as org_config.yaml
+# POC config — rename to org_config.yaml and upload to your Lakehouse Files/sql-query-agent/
 org:
   name: "POC Workspace"
 
@@ -16,3 +16,12 @@ dictionary:
 
 metrics:
   catalog_path: "metric_catalog"
+
+# Catalog adapters — fill in your Collibra credentials below
+adapters:
+  collibra:
+    base_url: "REPLACE_WITH_YOUR_COLLIBRA_DEV_URL/rest/2.0"
+    username: "REPLACE_WITH_YOUR_USERNAME"
+    password: "REPLACE_WITH_YOUR_PASSWORD"
+    domain_id: "REPLACE_WITH_CLINICAL_GLOSSARY_DOMAIN_ID"
+    asset_type_id: "REPLACE_WITH_BUSINESS_TERM_TYPE_ID"
