@@ -9,6 +9,7 @@ Uses sqlglot to parse SQL and extract:
 from __future__ import annotations
 
 import logging
+import re
 from dataclasses import dataclass, field
 
 import sqlglot
@@ -43,8 +44,71 @@ class ParsedSQL:
     final_select_columns: list[ColumnRef] = field(default_factory=list)
 
 
+def _preprocess_tsql(sql: str) -> str:
+    """Clean T-SQL-specific syntax that sqlglot can't handle directly.
+
+    Handles:
+    - GO batch separators
+    - SET statements (NOCOUNT, ANSI_NULLS, QUOTED_IDENTIFIER, TRANSACTION ISOLATION)
+    - DECLARE @variable statements
+    - Leading semicolons before WITH
+    - CREATE/ALTER PROCEDURE wrappers (with or without parameters)
+    - USE [database] statements
+    - DROP TABLE IF EXISTS statements
+    - SELECT ... INTO #temp_table -> SELECT ... (strips INTO clause)
+    - Comment blocks
+    """
+    # Remove GO batch separators (standalone on a line)
+    sql = re.sub(r'^\s*GO\s*$', '', sql, flags=re.MULTILINE | re.IGNORECASE)
+
+    # Remove USE [database] statements
+    sql = re.sub(r'^\s*USE\s+\[?\w+\]?\s*;?\s*$', '', sql, flags=re.MULTILINE | re.IGNORECASE)
+
+    # Remove SET statements (handles multi-word like SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED)
+    sql = re.sub(r'^\s*SET\s+[\w\s]+(?:ON|OFF|UNCOMMITTED|COMMITTED)\s*;?\s*$',
+                 '', sql, flags=re.MULTILINE | re.IGNORECASE)
+
+    # Remove DROP TABLE IF EXISTS statements
+    sql = re.sub(r'^\s*DROP\s+TABLE\s+IF\s+EXISTS\s+#?\w+\s*;?\s*$',
+                 '', sql, flags=re.MULTILINE | re.IGNORECASE)
+
+    # Remove CREATE/ALTER PROCEDURE ... AS wrapper (with optional multi-line parameter block)
+    # MUST run before @variable replacement
+    sql = re.sub(
+        r'CREATE\s+(?:OR\s+ALTER\s+)?PROCEDURE\s+[\[\]\w.]+\s*(?:\([\s\S]*?\))?\s*AS\b',
+        '', sql, flags=re.IGNORECASE
+    )
+
+    # Remove DECLARE @variable blocks (everything from DECLARE to the line before WITH/SELECT/DROP)
+    # MUST run before @variable replacement
+    sql = re.sub(
+        r'\bDECLARE\s+@\w+[\s\S]*?(?=\bWITH\b|\bSELECT\b|\bDROP\b)',
+        '', sql, flags=re.IGNORECASE
+    )
+
+    # Replace @variables with placeholder literals so parser doesn't choke
+    sql = re.sub(r'@(\w+)', r"'__var_\1__'", sql)
+
+    # Remove leading semicolon before WITH (T-SQL style ;WITH)
+    sql = re.sub(r';\s*WITH\b', 'WITH', sql, flags=re.IGNORECASE)
+
+    # Strip INTO #temp_table clauses (SELECT ... INTO #foo FROM -> SELECT ... FROM)
+    sql = re.sub(r'\bINTO\s+#\w+\s*\n?', '', sql, flags=re.IGNORECASE)
+
+    # Replace #temp_table references with regular table names (strip the #)
+    sql = re.sub(r'#(\w+)', r'__temp_\1', sql)
+
+    # Strip leading/trailing whitespace
+    sql = sql.strip()
+
+    return sql
+
+
 def parse_sql(sql: str, dialect: str = "tsql") -> ParsedSQL:
     """Parse a SQL statement and extract structure.
+
+    Handles real-world T-SQL including stored procedures, DECLARE statements,
+    GO separators, and @variables.
 
     Args:
         sql: The SQL statement to parse.
@@ -53,6 +117,9 @@ def parse_sql(sql: str, dialect: str = "tsql") -> ParsedSQL:
     Returns:
         ParsedSQL with extracted CTEs, tables, and columns.
     """
+    sql = _preprocess_tsql(sql)
+    logger.info("Preprocessed SQL (%d chars)", len(sql))
+
     try:
         parsed = sqlglot.parse_one(sql, dialect=dialect)
     except sqlglot.errors.ParseError as e:
