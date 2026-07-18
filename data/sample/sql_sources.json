@@ -1,0 +1,9 @@
+[
+  {
+    "metric_id": "ER_LOS",
+    "name": "ER Length of Stay",
+    "sql": "\nWITH er_visits AS (\n    SELECT\n        e.encounter_id,\n        e.patient_id,\n        e.admit_dt,\n        e.discharge_dt,\n        e.department_id\n    FROM encounter e\n    INNER JOIN department d ON e.department_id = d.department_id\n    WHERE d.department_name = 'Emergency'\n),\nlos_calc AS (\n    SELECT\n        encounter_id,\n        patient_id,\n        department_id,\n        DATEDIFF(MINUTE, admit_dt, discharge_dt) / 60.0 AS los_hours\n    FROM er_visits\n)\nSELECT\n    AVG(los_hours) AS avg_er_los_hours\nFROM los_calc\n",
+    "steward": "Dr. Smith",
+    "developer": "jane.doe"
+  }
+]

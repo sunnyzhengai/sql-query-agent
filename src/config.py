@@ -48,6 +48,27 @@ class ExtractorConfig(BaseModel):
     tracking_table: str = "extraction_tracking"
 
 
+class PurviewAdapterConfig(BaseModel):
+    account_name: str
+    collection_name: str = ""
+    custom_type_name: str = "ai_business_term"
+
+
+class CollibraAdapterConfig(BaseModel):
+    base_url: str
+    username: str = ""
+    password: str = ""
+    api_key: str = ""
+    domain_id: str = ""
+    community_id: str = ""
+    asset_type_id: str = ""
+
+
+class AdaptersConfig(BaseModel):
+    purview: Optional[PurviewAdapterConfig] = None
+    collibra: Optional[CollibraAdapterConfig] = None
+
+
 class OrgConfig(BaseModel):
     name: str
 
@@ -58,6 +79,7 @@ class Config(BaseModel):
     dictionary: DictionaryConfig = DictionaryConfig()
     metrics: MetricsConfig
     extractor: Optional[ExtractorConfig] = None
+    adapters: Optional[AdaptersConfig] = None
 
 
 def load_config(path: Path | str | None = None) -> Config:

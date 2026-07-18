@@ -1,0 +1,14 @@
+[
+  {
+    "TABLE_NAME": "encounter",
+    "DESCRIPTION": "Patient encounter/visit records"
+  },
+  {
+    "TABLE_NAME": "patient",
+    "DESCRIPTION": "Patient demographics"
+  },
+  {
+    "TABLE_NAME": "department",
+    "DESCRIPTION": "Hospital departments and units"
+  }
+]

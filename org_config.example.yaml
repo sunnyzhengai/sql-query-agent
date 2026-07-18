@@ -42,3 +42,18 @@ metrics:
 #     base_tables: ["encounter", "patient"]
 #     object_types: ["VIEW"]
 #   tracking_table: "extraction_tracking"
+
+# Catalog adapters (optional — enable one or both to publish metadata)
+# adapters:
+#   purview:
+#     account_name: "your-purview-account"
+#     collection_name: "default"              # target Purview collection
+#     custom_type_name: "ai_business_term"     # custom type for AI-generated terms
+#   collibra:
+#     base_url: "https://your-org.collibra.com/rest/2.0"
+#     api_key: ""                              # or use username/password below
+#     username: ""
+#     password: ""
+#     domain_id: ""                            # target Collibra domain
+#     community_id: ""
+#     asset_type_id: ""                        # Collibra type ID for business terms

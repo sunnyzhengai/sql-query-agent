@@ -1,0 +1,47 @@
+[
+  {
+    "TABLE_NAME": "encounter",
+    "COLUMN_NAME": "encounter_id",
+    "DESCRIPTION": "Unique encounter identifier"
+  },
+  {
+    "TABLE_NAME": "encounter",
+    "COLUMN_NAME": "patient_id",
+    "DESCRIPTION": "FK to patient table"
+  },
+  {
+    "TABLE_NAME": "encounter",
+    "COLUMN_NAME": "admit_dt",
+    "DESCRIPTION": "Admission date/time"
+  },
+  {
+    "TABLE_NAME": "encounter",
+    "COLUMN_NAME": "discharge_dt",
+    "DESCRIPTION": "Discharge date/time"
+  },
+  {
+    "TABLE_NAME": "encounter",
+    "COLUMN_NAME": "department_id",
+    "DESCRIPTION": "FK to department table"
+  },
+  {
+    "TABLE_NAME": "patient",
+    "COLUMN_NAME": "patient_id",
+    "DESCRIPTION": "Unique patient identifier"
+  },
+  {
+    "TABLE_NAME": "patient",
+    "COLUMN_NAME": "birth_date",
+    "DESCRIPTION": "Patient date of birth"
+  },
+  {
+    "TABLE_NAME": "department",
+    "COLUMN_NAME": "department_id",
+    "DESCRIPTION": "Unique department identifier"
+  },
+  {
+    "TABLE_NAME": "department",
+    "COLUMN_NAME": "department_name",
+    "DESCRIPTION": "Department display name"
+  }
+]
