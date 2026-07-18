@@ -6,9 +6,12 @@ Descriptions are cached as node properties at graph build time.
 
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass
 
 from src.config import Config
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass

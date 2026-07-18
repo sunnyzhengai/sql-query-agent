@@ -8,7 +8,11 @@ Given a canonical metric, traverse the graph to collect:
 
 from __future__ import annotations
 
+import logging
+
 from src.models import EdgeType, GraphEdge, GraphNode, NodeLayer
+
+logger = logging.getLogger(__name__)
 
 
 class GraphTraverser:

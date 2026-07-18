@@ -10,8 +10,12 @@ Flow:
 
 from __future__ import annotations
 
+import logging
+
 from src.models import EdgeType, GraphEdge, GraphNode, NodeLayer
 from src.parser.sql_parser import ParsedSQL
+
+logger = logging.getLogger(__name__)
 
 
 class GraphBuilder:

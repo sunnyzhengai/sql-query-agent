@@ -8,10 +8,13 @@ Uses sqlglot to parse SQL and extract:
 
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass, field
 
 import sqlglot
 from sqlglot import exp
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -53,6 +56,7 @@ def parse_sql(sql: str, dialect: str = "tsql") -> ParsedSQL:
     try:
         parsed = sqlglot.parse_one(sql, dialect=dialect)
     except sqlglot.errors.ParseError as e:
+        logger.error("Failed to parse SQL: %s", e)
         raise ValueError(f"Failed to parse SQL: {e}") from e
 
     result = ParsedSQL()

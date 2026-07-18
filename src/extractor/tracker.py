@@ -7,11 +7,14 @@ using SHA-256 hashes of normalized SQL definitions.
 from __future__ import annotations
 
 import hashlib
+import logging
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Any
 
 from src.extractor.discovery import DiscoveredObject
+
+logger = logging.getLogger(__name__)
 
 
 def compute_sql_hash(sql_definition: str) -> str:

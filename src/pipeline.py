@@ -6,11 +6,14 @@ and returns a fully wired GraphBuilder.
 
 from __future__ import annotations
 
+import logging
 from typing import Any
 
 from src.dictionary import DataDictionary
 from src.graph.builder import GraphBuilder
 from src.parser.sql_parser import parse_sql
+
+logger = logging.getLogger(__name__)
 
 
 def build_graph(
@@ -42,12 +45,14 @@ def build_graph(
         dictionary.add_table(row[table_name_col], row.get(description_col, ""))
     for row in dict_columns:
         dictionary.add_column(row[table_name_col], row[column_name_col], row.get(description_col, ""))
+    logger.info("Loaded data dictionary: %d tables, %d column entries", len(dictionary.tables), len(dict_columns))
 
     # Step 2: Create technical nodes from dictionary
     for table_name, table_info in dictionary.tables.items():
         builder.add_technical_node(table_name, description=table_info.description)
         for col_info in dictionary.get_columns_for_table(table_name):
             builder.add_technical_node(table_name, col_info.column_name, description=col_info.description)
+    logger.info("Created technical nodes from dictionary")
 
     # Step 3: Process each SQL source
     for source in sql_sources:
@@ -63,5 +68,7 @@ def build_graph(
         # Parse SQL and wire transformation + technical edges
         parsed = parse_sql(sql)
         builder.build_from_parsed_sql(metric_id, parsed)
+        logger.info("Processed metric: %s (%s) — %d CTEs", metric_id, name, len(parsed.ctes))
 
+    logger.info("Graph build complete: %d nodes, %d edges", len(builder.nodes), len(builder.edges))
     return builder

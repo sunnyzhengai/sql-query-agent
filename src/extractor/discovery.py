@@ -6,6 +6,7 @@ and sys.sql_expression_dependencies to filter by referenced base tables.
 
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass
 from typing import Any
 
@@ -13,6 +14,8 @@ import sqlglot
 from sqlglot import exp
 
 from src.config import DomainFilterConfig
+
+logger = logging.getLogger(__name__)
 from src.extractor.connection import SqlConnection
 
 

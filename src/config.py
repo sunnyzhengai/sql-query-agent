@@ -2,11 +2,14 @@
 
 from __future__ import annotations
 
+import logging
 from pathlib import Path
 from typing import Optional
 
 import yaml
 from pydantic import BaseModel
+
+logger = logging.getLogger(__name__)
 
 
 class LakehouseConfig(BaseModel):
@@ -103,4 +106,6 @@ def load_config(path: Path | str | None = None) -> Config:
     with open(path) as f:
         raw = yaml.safe_load(f)
 
-    return Config(**raw)
+    config = Config(**raw)
+    logger.info("Loaded config for org: %s", config.org.name)
+    return config

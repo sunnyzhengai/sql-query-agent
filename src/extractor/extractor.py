@@ -6,6 +6,7 @@ sql_sources records ready for build_graph().
 
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass
 from typing import Any
 
@@ -13,6 +14,8 @@ from src.config import DomainFilterConfig
 from src.extractor.connection import SqlConnection
 from src.extractor.discovery import DiscoveredObject, discover_objects, strip_create_prefix
 from src.extractor.tracker import ExtractionDelta, ExtractionTracker
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -59,10 +62,15 @@ class ViewExtractor:
         """
         # Step 1: Discover objects from SQL Server
         discovered = discover_objects(self.conn, self.domain)
+        logger.info("Discovered %d objects from SQL Server", len(discovered))
 
         # Step 2: Compute delta against tracking
         tracker = ExtractionTracker(existing_tracking)
         delta = tracker.compute_delta(discovered)
+        logger.info(
+            "Delta: %d new, %d changed, %d unchanged, %d deleted",
+            len(delta.new), len(delta.changed), len(delta.unchanged), len(delta.deleted),
+        )
 
         # Step 3: Produce sql_sources for new + changed objects
         sql_sources = []
