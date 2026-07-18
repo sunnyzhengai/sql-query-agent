@@ -4,6 +4,9 @@ Uses sqlglot to parse SQL and extract:
 - CTE structure (transformation nodes)
 - Table/column references (technical nodes)
 - SQL fragments (minimal logic snippets, NOT full SQL blobs)
+
+For multi-statement stored procedures (temp tables, multiple SELECTs),
+uses proc_normalize to convert to a single CTE-based SELECT first.
 """
 
 from __future__ import annotations
@@ -42,101 +45,109 @@ class ParsedSQL:
     ctes: list[CTEInfo] = field(default_factory=list)
     final_select_tables: list[str] = field(default_factory=list)
     final_select_columns: list[ColumnRef] = field(default_factory=list)
+    normalized_sql: str = ""  # the SQL after normalization (for debugging/review)
 
 
-def _preprocess_tsql(sql: str) -> str:
-    """Clean T-SQL-specific syntax that sqlglot can't handle directly.
+def _is_multi_statement(sql: str) -> bool:
+    """Heuristic: does this SQL look like a multi-statement stored procedure?
 
-    Handles:
-    - GO batch separators
-    - SET statements (NOCOUNT, ANSI_NULLS, QUOTED_IDENTIFIER, TRANSACTION ISOLATION)
-    - DECLARE @variable statements
-    - Leading semicolons before WITH
-    - CREATE/ALTER PROCEDURE wrappers (with or without parameters)
-    - USE [database] statements
-    - DROP TABLE IF EXISTS statements
-    - SELECT ... INTO #temp_table -> SELECT ... (strips INTO clause)
-    - Comment blocks
+    Checks for temp table patterns (SELECT INTO #, #table references,
+    DROP TABLE #) which indicate multi-statement staging.
     """
-    # Remove GO batch separators (standalone on a line)
+    return bool(re.search(r'(?:INTO\s+#|FROM\s+#|JOIN\s+#|DROP\s+TABLE\s+.*#)\w+', sql, re.IGNORECASE))
+
+
+def _preprocess_simple(sql: str) -> str:
+    """Lightweight preprocessing for simple single-statement queries.
+
+    Handles: GO, USE, SET, CREATE PROCEDURE (no params or simple params),
+    DECLARE blocks, @variables, ;WITH, DROP TABLE IF EXISTS.
+    """
+    # Remove GO batch separators
     sql = re.sub(r'^\s*GO\s*$', '', sql, flags=re.MULTILINE | re.IGNORECASE)
 
-    # Remove USE [database] statements
+    # Remove USE [database]
     sql = re.sub(r'^\s*USE\s+\[?\w+\]?\s*;?\s*$', '', sql, flags=re.MULTILINE | re.IGNORECASE)
 
-    # Remove SET statements (handles multi-word like SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED)
+    # Remove SET statements
     sql = re.sub(r'^\s*SET\s+[\w\s]+(?:ON|OFF|UNCOMMITTED|COMMITTED)\s*;?\s*$',
                  '', sql, flags=re.MULTILINE | re.IGNORECASE)
 
-    # Remove DROP TABLE IF EXISTS statements
+    # Remove DROP TABLE IF EXISTS
     sql = re.sub(r'^\s*DROP\s+TABLE\s+IF\s+EXISTS\s+#?\w+\s*;?\s*$',
                  '', sql, flags=re.MULTILINE | re.IGNORECASE)
 
-    # Remove CREATE/ALTER PROCEDURE ... AS wrapper (with optional multi-line parameter block)
-    # MUST run before @variable replacement
+    # Remove CREATE PROCEDURE ... AS (with optional multi-line params)
     sql = re.sub(
         r'CREATE\s+(?:OR\s+ALTER\s+)?PROCEDURE\s+[\[\]\w.]+\s*(?:\([\s\S]*?\))?\s*AS\b',
         '', sql, flags=re.IGNORECASE
     )
 
-    # Remove DECLARE @variable blocks (everything from DECLARE to the line before WITH/SELECT/DROP)
-    # MUST run before @variable replacement
+    # Remove DECLARE blocks (before @variable replacement)
     sql = re.sub(
         r'\bDECLARE\s+@\w+[\s\S]*?(?=\bWITH\b|\bSELECT\b|\bDROP\b)',
         '', sql, flags=re.IGNORECASE
     )
 
-    # Replace @variables with placeholder literals so parser doesn't choke
+    # Replace @variables with placeholders
     sql = re.sub(r'@(\w+)', r"'__var_\1__'", sql)
 
-    # Remove leading semicolon before WITH (T-SQL style ;WITH)
+    # ;WITH -> WITH
     sql = re.sub(r';\s*WITH\b', 'WITH', sql, flags=re.IGNORECASE)
 
-    # Strip INTO #temp_table clauses (SELECT ... INTO #foo FROM -> SELECT ... FROM)
-    sql = re.sub(r'\bINTO\s+#\w+\s*\n?', '', sql, flags=re.IGNORECASE)
-
-    # Replace #temp_table references with regular table names (strip the #)
-    sql = re.sub(r'#(\w+)', r'__temp_\1', sql)
-
-    # Strip leading/trailing whitespace
-    sql = sql.strip()
-
-    return sql
+    return sql.strip()
 
 
 def parse_sql(sql: str, dialect: str = "tsql") -> ParsedSQL:
     """Parse a SQL statement and extract structure.
 
-    Handles real-world T-SQL including stored procedures, DECLARE statements,
-    GO separators, and @variables.
+    For multi-statement stored procedures (with temp tables), uses
+    proc_normalize to convert to a single CTE-based SELECT first.
+    For simple queries, uses lightweight preprocessing.
 
     Args:
-        sql: The SQL statement to parse.
+        sql: The SQL statement to parse (can be a full stored procedure).
         dialect: SQL dialect (default: tsql for SQL Server / Fabric).
 
     Returns:
         ParsedSQL with extracted CTEs, tables, and columns.
     """
-    sql = _preprocess_tsql(sql)
-    logger.info("Preprocessed SQL (%d chars)", len(sql))
+    normalized_sql = ""
 
+    if _is_multi_statement(sql):
+        # Multi-statement procedure: use proc_normalize to convert temp tables to CTEs
+        logger.info("Detected multi-statement procedure, using proc_normalize")
+        from src.parser.proc_normalize import select_into_to_cte, ProcNotViewShaped
+        try:
+            normalized_sql = select_into_to_cte(sql, dialect=dialect, emit_create_view=False)
+            logger.info("proc_normalize succeeded (%d chars)", len(normalized_sql))
+        except ProcNotViewShaped as e:
+            logger.warning("Proc not view-shaped (%s: %s), falling back to simple parse", e.reason, e.detail)
+            normalized_sql = _preprocess_simple(sql)
+        except Exception as e:
+            logger.warning("proc_normalize failed (%s), falling back to simple parse", e)
+            normalized_sql = _preprocess_simple(sql)
+    else:
+        # Simple query: lightweight preprocessing
+        normalized_sql = _preprocess_simple(sql)
+        logger.info("Simple query, preprocessed (%d chars)", len(normalized_sql))
+
+    # Parse the normalized SQL
     try:
-        parsed = sqlglot.parse_one(sql, dialect=dialect)
+        parsed = sqlglot.parse_one(normalized_sql, dialect=dialect)
     except sqlglot.errors.ParseError as e:
         logger.error("Failed to parse SQL: %s", e)
         raise ValueError(f"Failed to parse SQL: {e}") from e
 
-    result = ParsedSQL()
+    result = ParsedSQL(normalized_sql=normalized_sql)
 
     # Extract CTEs
     for cte in parsed.find_all(exp.CTE):
         cte_name = cte.alias
         cte_body = cte.this
 
-        # Extract column references from the CTE body
         col_refs = _extract_column_refs(cte_body)
 
-        # Find dependencies on other CTEs and actual table references
         all_table_refs = [t.name for t in cte_body.find_all(exp.Table)]
         cte_names = [c.alias for c in parsed.find_all(exp.CTE)]
         depends_on = [t for t in all_table_refs if t in cte_names]
@@ -153,10 +164,8 @@ def parse_sql(sql: str, dialect: str = "tsql") -> ParsedSQL:
         )
 
     # Extract final SELECT table/column references
-    # (the main query after all CTEs)
     main_select = parsed.find(exp.Select)
     if main_select:
-        # Get tables from the final select (excluding CTE-defined tables)
         for table in parsed.find_all(exp.Table):
             if table.name not in [c.name for c in result.ctes]:
                 if table.name not in result.final_select_tables:
