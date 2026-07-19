@@ -22,8 +22,10 @@ class LakehouseConfig(BaseModel):
 
 class DictionaryConfig(BaseModel):
     table_name_col: str = "TABLE_NAME"
+    table_id_col: str = ""                     # if dict_columns uses an ID instead of name, set this
+    table_description_col: str = "DESCRIPTION" # description column in dict_tables (may differ from dict_columns)
     column_name_col: str = "COLUMN_NAME"
-    description_col: str = "DESCRIPTION"
+    description_col: str = "DESCRIPTION"       # description column in dict_columns
 
 
 class MetricsConfig(BaseModel):

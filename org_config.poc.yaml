@@ -3,16 +3,26 @@ org:
   name: "POC Workspace"
 
 lakehouse:
-  dict_tables: "dict_tables"
-  dict_columns: "dict_columns"
+  # Data dictionary — update paths to your ABFS location or managed table names
+  # For CSV files in another workspace, use the full ABFS path:
+  #   abfss://BI-POC@onelake.dfs.fabric.microsoft.com/SZ_SQL_Logic.Lakehouse/Files/data/dictionaries/CLARITY_TBL.csv
+  dict_tables: "REPLACE_WITH_PATH_TO_CLARITY_TBL"
+  dict_columns: "REPLACE_WITH_PATH_TO_CLARITY_COL"
+
+  # SQL sources (your extracted stored procedures)
   sql_sources: "sql_sources"
+
+  # Graph output tables (written by the orchestrator)
   graph_nodes: "graph_nodes"
   graph_edges: "graph_edges"
 
+# Clarity data dictionary column mapping
 dictionary:
   table_name_col: "TABLE_NAME"
+  table_id_col: "TABLE_ID"                   # dict_columns uses TABLE_ID, not TABLE_NAME — joined automatically
+  table_description_col: "TABLE_INTRODUCTION" # description column in CLARITY_TBL
   column_name_col: "COLUMN_NAME"
-  description_col: "DESCRIPTION"
+  description_col: "DESCRIPTION"              # description column in CLARITY_COL
 
 metrics:
   catalog_path: "metric_catalog"
