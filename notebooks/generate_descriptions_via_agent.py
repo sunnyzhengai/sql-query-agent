@@ -33,7 +33,14 @@ from src.models import GraphNode, NodeLayer
 WORKSPACE_ID = "REPLACE_WITH_YOUR_WORKSPACE_ID"   # the fxxxxx-xxxxx from the URL
 AGENT_ID = "REPLACE_WITH_YOUR_AGENT_ID"            # the dxxxxx-xxxxx from the URL
 
-client = FabricAgentClient(workspace_id=WORKSPACE_ID, agent_id=AGENT_ID)
+# Get token from Fabric (mssparkutils is a global in Fabric notebooks)
+access_token = mssparkutils.credentials.getToken("https://api.fabric.microsoft.com")
+
+client = FabricAgentClient(
+    workspace_id=WORKSPACE_ID,
+    agent_id=AGENT_ID,
+    access_token=access_token,
+)
 
 # Discover the tool name automatically
 print("Discovering Data Agent tool name...")
