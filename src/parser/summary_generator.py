@@ -184,6 +184,154 @@ def generate_canonical_summaries(
     return summaries
 
 
+COMBINED_PROMPT = """You are summarizing a healthcare report/metric for business users.
+
+Analyze the following SQL logic and produce TWO types of summaries:
+
+1. METRIC SUMMARY: A 3-5 sentence description of what the entire metric measures,
+   what criteria filter the data, and what the output represents.
+   Write in plain English — no SQL, no table names, no technical jargon.
+
+2. STEP SUMMARIES: For each named logic step listed below, write a 1-2 sentence
+   description of what that specific step does. Focus on what data it selects,
+   what filters it applies, and what it calculates.
+
+Metric name: {metric_name}
+
+Logic steps:
+{steps}
+
+Source tables and their purposes:
+{tables}
+
+Respond ONLY in this exact JSON format (no markdown, no code fences):
+{{
+  "metric_summary": "Your 3-5 sentence metric summary here",
+  "step_summaries": {{
+    "step_name_1": "What this step does",
+    "step_name_2": "What this step does"
+  }}
+}}"""
+
+
+def generate_all_summaries_combined(
+    builder: GraphBuilder,
+    llm_backend: Any,
+    batch_log_interval: int = 10,
+) -> tuple[dict[str, str], dict[str, str]]:
+    """Generate all summaries in one pass — one LLM call per metric.
+
+    Produces both canonical-level and transformation-level summaries
+    in a single call, roughly 3x faster than separate passes.
+
+    Args:
+        builder: The graph builder with nodes and edges populated.
+        llm_backend: An object with generate(prompt) -> str method.
+        batch_log_interval: Log progress every N metrics.
+
+    Returns:
+        Tuple of (canonical_summaries, transform_summaries) where each
+        is a dict of node_id -> summary text.
+    """
+    import json as _json
+
+    traverser = GraphTraverser(builder.nodes, builder.edges)
+
+    canonical_summaries: dict[str, str] = {}
+    transform_summaries: dict[str, str] = {}
+
+    canonical_nodes = [
+        n for n in builder.nodes.values()
+        if n.layer == NodeLayer.CANONICAL
+    ]
+
+    logger.info("Generating combined summaries for %d canonical nodes", len(canonical_nodes))
+    skipped = 0
+
+    for i, node in enumerate(canonical_nodes):
+        metric_id = node.node_id.replace("canonical:", "")
+        subgraph = traverser.get_metric_subgraph(metric_id)
+
+        if not subgraph:
+            skipped += 1
+            continue
+
+        transforms = [
+            t for t in subgraph.get("transformations", [])
+            if t.name != "__final_select__"
+        ]
+
+        if not transforms and not subgraph.get("technical"):
+            skipped += 1
+            continue
+
+        # Build steps text
+        steps_parts = []
+        for t_node in transforms:
+            fragment = t_node.properties.get("sql_fragment", "")
+            if len(fragment) > 800:
+                fragment = fragment[:800] + "... (truncated)"
+            steps_parts.append(f"Step '{t_node.name}':\n{fragment}")
+
+        # Build tables text
+        tables_parts = []
+        for t_node in subgraph.get("technical", []):
+            if t_node.properties.get("column") is None:
+                desc = t_node.description or "No description available"
+                tables_parts.append(f"- {t_node.name}: {desc}")
+
+        steps_text = "\n\n".join(steps_parts) if steps_parts else "No named logic steps"
+        tables_text = "\n".join(tables_parts[:15]) if tables_parts else "No source tables identified"
+        if len(tables_parts) > 15:
+            tables_text += f"\n- ... and {len(tables_parts) - 15} more tables"
+
+        prompt = COMBINED_PROMPT.format(
+            metric_name=node.name,
+            steps=steps_text,
+            tables=tables_text,
+        )
+
+        try:
+            response = llm_backend.generate(prompt)
+
+            # Clean up markdown code fences
+            response = response.strip()
+            if response.startswith("```"):
+                lines = response.split("\n")
+                lines = [l for l in lines if not l.strip().startswith("```")]
+                response = "\n".join(lines).strip()
+
+            parsed_response = _json.loads(response)
+
+            # Extract canonical summary
+            metric_summary = parsed_response.get("metric_summary", "")
+            if metric_summary:
+                canonical_summaries[node.node_id] = metric_summary
+
+            # Extract per-step summaries
+            step_sums = parsed_response.get("step_summaries", {})
+            for t_node in transforms:
+                if t_node.name in step_sums:
+                    transform_summaries[t_node.node_id] = step_sums[t_node.name]
+
+        except _json.JSONDecodeError as e:
+            logger.warning("Failed to parse JSON response for %s: %s", metric_id, e)
+            if response and len(response) > 20:
+                canonical_summaries[node.node_id] = response[:500]
+        except Exception as e:
+            logger.warning("Failed to summarize %s: %s", metric_id, e)
+
+        if (i + 1) % batch_log_interval == 0:
+            logger.info("  Processed %d/%d metrics (%d skipped)",
+                       i + 1, len(canonical_nodes), skipped)
+
+    logger.info(
+        "Generated %d canonical summaries, %d transform summaries (%d metrics skipped)",
+        len(canonical_summaries), len(transform_summaries), skipped,
+    )
+    return canonical_summaries, transform_summaries
+
+
 def apply_summaries(builder: GraphBuilder, summaries: dict[str, str]) -> int:
     """Apply generated summaries back to graph nodes.
 
