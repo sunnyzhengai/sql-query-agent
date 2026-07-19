@@ -57,21 +57,34 @@ else:
     print(f"Error: {test_response.error}")
     print("Check your workspace_id and agent_id. Make sure the agent is published.")
 
-# %% Cell 4: Load canonical metrics from graph
+# %% Cell 4: Load canonical metrics and filter to traversable only
 nodes_df = spark.table("graph_nodes")
+edges_df = spark.table("graph_edges")
+
+# Find metrics that have edges (traversable by the agent)
+canonical_edges = edges_df.filter("edge_type = 'canonical_to_transform'")
+traversable_ids = set(row.source_id for row in canonical_edges.select("source_id").distinct().collect())
 
 canonical_metrics = []
+skipped_metrics = []
 for row in nodes_df.filter("layer = 'canonical'").collect():
-    canonical_metrics.append(row.asDict())
+    row_dict = row.asDict()
+    if f"canonical:{row_dict['name']}" in traversable_ids:
+        canonical_metrics.append(row_dict)
+    else:
+        skipped_metrics.append(row_dict)
 
-print(f"Found {len(canonical_metrics)} canonical metrics")
+print(f"Total canonical metrics: {len(canonical_metrics) + len(skipped_metrics)}")
+print(f"Traversable (have edges): {len(canonical_metrics)}")
+print(f"Skipped (no edges): {len(skipped_metrics)}")
+print(f"\nFirst 5 traversable metrics:")
 for m in canonical_metrics[:5]:
     print(f"  {m['name']}")
 
 # %% Cell 5: Generate descriptions for a small test batch
-TEST_BATCH_SIZE = 3
+TEST_BATCH_SIZE = 5
 
-print(f"Testing with first {TEST_BATCH_SIZE} metrics...\n")
+print(f"Testing with first {TEST_BATCH_SIZE} traversable metrics...\n")
 test_names = [m["name"] for m in canonical_metrics[:TEST_BATCH_SIZE]]
 test_results = client.generate_descriptions_bulk(test_names)
 
@@ -84,17 +97,18 @@ for name, response in test_results.items():
     else:
         print(f"Error: {response.error}")
 
-# %% Cell 6: Generate descriptions for ALL metrics
-# WARNING: This sends one API call per metric. May take a while.
-# Estimated time: ~2-5 seconds per metric
-print(f"Generating descriptions for all {len(canonical_metrics)} metrics...")
+# %% Cell 6: Generate descriptions for ALL traversable metrics
+# Sends one API call per metric. ~2-5 seconds each.
+# Estimated time: ~10-25 minutes for ~300 metrics
+print(f"Generating descriptions for {len(canonical_metrics)} traversable metrics...")
+print(f"Estimated time: {len(canonical_metrics) * 3 // 60} - {len(canonical_metrics) * 5 // 60} minutes\n")
 
 all_names = [m["name"] for m in canonical_metrics]
 all_results = client.generate_descriptions_bulk(all_names, batch_log_interval=20)
 
 succeeded = sum(1 for r in all_results.values() if r.status == "success")
 failed = sum(1 for r in all_results.values() if r.status == "failed")
-print(f"\nDone: {succeeded} succeeded, {failed} failed")
+print(f"\nDone: {succeeded} succeeded, {failed} failed out of {len(canonical_metrics)}")
 
 # %% Cell 7: Write descriptions back to graph_nodes
 from pyspark.sql.types import StringType, StructField, StructType
@@ -150,8 +164,14 @@ print("\n=== Sample Descriptions ===")
 count = 0
 for node in builder.nodes.values():
     if node.layer == NodeLayer.CANONICAL and node.description and count < 3:
-        print(f"\nMetric: {node.name}")
-        print(f"Description: {node.description[:300]}...")
+        print(f"\n{'='*60}")
+        print(f"Metric: {node.name}")
+        print(f"Description:\n{node.description}")
         count += 1
 
-print(f"\nDone! Descriptions ready for Collibra/Purview/PBI sync.")
+total_with_desc = sum(1 for n in builder.nodes.values()
+                      if n.layer == NodeLayer.CANONICAL and n.description)
+total_canonical = sum(1 for n in builder.nodes.values()
+                      if n.layer == NodeLayer.CANONICAL)
+print(f"\n{total_with_desc}/{total_canonical} canonical metrics have descriptions")
+print(f"Descriptions ready for Collibra/Purview/PBI sync.")
