@@ -1,0 +1,16 @@
+[
+  {
+    "metric_id": "PTA_CensusDashboard",
+    "name": "PTA Census Dashboard",
+    "sql_file": "real_census_dashboard.sql",
+    "steward": "Adam Smith",
+    "developer": "Adam Smith"
+  },
+  {
+    "metric_id": "LOTE_Census_Interpreter",
+    "name": "LOTE Census Interpreter Services Detail",
+    "sql_file": "real_lote_census.sql",
+    "steward": "Snow White",
+    "developer": "Snow White"
+  }
+]
