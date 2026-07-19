@@ -140,7 +140,30 @@ for table_name, table_info in dictionary.tables.items():
 
 print(f"Created {len(builder.nodes)} technical nodes from dictionary")
 
-# Step 2: Parse each SQL source and build the graph
+# Step 2: Pre-process ALL SQL through LLM to extract clean SQL
+# This removes all procedural T-SQL (DECLARE, IF, GOTO, etc.) and returns
+# only the SELECT/WITH/UNION statements — works for any dialect.
+if llm_backend:
+    print("Step 2a: LLM extracting clean SQL from all procs...")
+    from src.parser.llm_extractor import extract_sql
+    llm_errors = []
+    for i, source in enumerate(sql_sources):
+        try:
+            clean_sql = extract_sql(source["sql"], llm_backend)
+            source["sql"] = clean_sql  # replace raw proc with clean SQL
+        except Exception as e:
+            llm_errors.append((source["metric_id"], str(e)))
+        if (i + 1) % 50 == 0:
+            print(f"    LLM extracted {i + 1}/{len(sql_sources)}...")
+    print(f"  LLM extraction complete: {len(sql_sources) - len(llm_errors)} succeeded, {len(llm_errors)} failed")
+    if llm_errors:
+        for mid, err in llm_errors[:5]:
+            print(f"    LLM error: {mid}: {err[:80]}")
+else:
+    print("Step 2a: LLM extraction disabled (no API key). Using deterministic parsing only.")
+
+# Step 2b: Parse the (now clean) SQL and build the graph
+print("Step 2b: Parsing SQL and building graph...")
 parse_errors = []
 for source in sql_sources:
     metric_id = source["metric_id"]
@@ -152,7 +175,7 @@ for source in sql_sources:
     builder.add_canonical_node(metric_id, name, steward=steward, developer=developer)
 
     try:
-        parsed = parse_sql(sql, llm_backend=llm_backend)
+        parsed = parse_sql(sql)
         builder.build_from_parsed_sql(metric_id, parsed)
         print(f"  Parsed: {metric_id} ({name}) — {len(parsed.ctes)} CTEs, {len(parsed.final_select_tables)} tables")
     except Exception as e:
