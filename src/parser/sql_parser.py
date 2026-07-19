@@ -117,21 +117,26 @@ def _preprocess_simple(sql: str) -> str:
     return sql.strip()
 
 
-def parse_sql(sql: str, dialect: str = "tsql") -> ParsedSQL:
+def parse_sql(sql: str, dialect: str = "tsql", llm_backend=None) -> ParsedSQL:
     """Parse a SQL statement and extract structure.
 
-    For multi-statement stored procedures (with temp tables), uses
-    proc_normalize to convert to a single CTE-based SELECT first.
-    For simple queries, uses lightweight preprocessing.
+    Extraction strategy (in order):
+    1. proc_normalize — deterministic, handles temp tables → CTEs
+    2. Simple regex preprocessing — lightweight fallback
+    3. LLM extraction — if llm_backend provided, uses LLM to extract clean SQL
+       when both deterministic methods fail
 
     Args:
         sql: The SQL statement to parse (can be a full stored procedure).
         dialect: SQL dialect (default: tsql for SQL Server / Fabric).
+        llm_backend: Optional LLM backend for extraction fallback.
+            Pass an object that implements generate(prompt) -> str.
 
     Returns:
         ParsedSQL with extracted CTEs, tables, and columns.
     """
     normalized_sql = ""
+    parse_error = None
 
     if _is_multi_statement(sql):
         # Multi-statement procedure: use proc_normalize to convert temp tables to CTEs
@@ -155,8 +160,25 @@ def parse_sql(sql: str, dialect: str = "tsql") -> ParsedSQL:
     try:
         parsed = sqlglot.parse_one(normalized_sql, dialect=dialect)
     except sqlglot.errors.ParseError as e:
-        logger.error("Failed to parse SQL: %s", e)
-        raise ValueError(f"Failed to parse SQL: {e}") from e
+        parse_error = e
+        parsed = None
+
+    # If deterministic parsing failed and we have an LLM backend, try LLM extraction
+    if parsed is None and llm_backend is not None:
+        logger.info("Deterministic parse failed, trying LLM extraction")
+        try:
+            from src.parser.llm_extractor import extract_sql
+            llm_sql = extract_sql(sql, llm_backend)
+            normalized_sql = llm_sql
+            parsed = sqlglot.parse_one(llm_sql, dialect=dialect)
+            logger.info("LLM extraction succeeded (%d chars)", len(llm_sql))
+        except Exception as llm_e:
+            logger.error("LLM extraction also failed: %s", llm_e)
+            # Fall through to raise the original error
+
+    if parsed is None:
+        logger.error("Failed to parse SQL: %s", parse_error)
+        raise ValueError(f"Failed to parse SQL: {parse_error}") from parse_error
 
     result = ParsedSQL(normalized_sql=normalized_sql)
 
