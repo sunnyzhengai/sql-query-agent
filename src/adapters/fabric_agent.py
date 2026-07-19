@@ -1,7 +1,8 @@
 """Fabric Data Agent programmatic client.
 
-Calls the Fabric Data Agent via REST API to generate business descriptions
-by leveraging the agent's graph traversal and persona instructions.
+Calls the Fabric Data Agent via the MCP (Model Context Protocol) endpoint
+to generate business descriptions by leveraging the agent's graph traversal
+and persona instructions.
 
 The agent produces better descriptions than direct LLM calls because it:
 - Traverses the knowledge graph to find relevant sql_fragments
@@ -9,8 +10,8 @@ The agent produces better descriptions than direct LLM calls because it:
 - Uses the SQL-to-business translation table
 - Produces structured, criteria-focused output
 
-API endpoint:
-  POST https://api.fabric.microsoft.com/v1/workspaces/{workspaceId}/items/{agentId}/chat/completions
+Protocol: JSON-RPC over the MCP endpoint
+Endpoint: POST https://api.fabric.microsoft.com/v1/mcp/workspaces/{workspaceId}/dataagents/{agentId}/agent
 """
 
 from __future__ import annotations
@@ -32,10 +33,10 @@ class AgentResponse:
 
 
 class FabricAgentClient:
-    """Programmatic client for the Fabric Data Agent.
+    """Programmatic client for the Fabric Data Agent via MCP protocol.
 
-    Sends natural language questions and captures the agent's responses
-    for use as metadata descriptions.
+    Sends natural language questions using JSON-RPC format and captures
+    the agent's responses for use as metadata descriptions.
 
     Authentication: uses mssparkutils.credentials.getToken() in Fabric,
     or an explicit access token for testing.
@@ -43,10 +44,21 @@ class FabricAgentClient:
 
     BASE_URL = "https://api.fabric.microsoft.com/v1"
 
-    def __init__(self, workspace_id: str, agent_id: str, access_token: str = "") -> None:
+    def __init__(
+        self,
+        workspace_id: str,
+        agent_id: str,
+        tool_name: str = "",
+        access_token: str = "",
+    ) -> None:
         self.workspace_id = workspace_id
         self.agent_id = agent_id
+        self.tool_name = tool_name  # discovered via tools/list
         self._access_token = access_token
+        self._endpoint = (
+            f"{self.BASE_URL}/mcp/workspaces/{workspace_id}"
+            f"/dataagents/{agent_id}/agent"
+        )
 
     def _get_token(self) -> str:
         if self._access_token:
@@ -66,6 +78,45 @@ class FabricAgentClient:
             "Content-Type": "application/json",
         }
 
+    def _mcp_call(self, method: str, params: dict[str, Any], request_id: str = "1") -> dict[str, Any]:
+        """Send a JSON-RPC request to the MCP endpoint."""
+        import requests
+
+        payload = {
+            "jsonrpc": "2.0",
+            "method": method,
+            "params": params,
+            "id": request_id,
+        }
+
+        resp = requests.post(
+            self._endpoint,
+            headers=self._get_headers(),
+            json=payload,
+            timeout=120,
+        )
+
+        if resp.status_code != 200:
+            raise RuntimeError(f"MCP endpoint returned {resp.status_code}: {resp.text[:200]}")
+
+        return resp.json()
+
+    def discover_tool_name(self) -> str:
+        """Discover the Data Agent's tool name via tools/list.
+
+        The tool name is auto-generated from the agent's display name
+        (e.g., "DataAgent_SQL_Query_Agent") and is needed for tools/call.
+        """
+        result = self._mcp_call("tools/list", {})
+
+        tools = result.get("result", {}).get("tools", [])
+        if tools:
+            self.tool_name = tools[0]["name"]
+            logger.info("Discovered tool name: %s", self.tool_name)
+            return self.tool_name
+
+        raise RuntimeError("No tools found on the Data Agent")
+
     def query(self, question: str) -> AgentResponse:
         """Send a question to the Data Agent and return the response.
 
@@ -75,89 +126,66 @@ class FabricAgentClient:
         Returns:
             AgentResponse with the agent's answer.
         """
-        import requests
+        if not self.tool_name:
+            self.discover_tool_name()
 
-        # Try multiple endpoint patterns (Fabric API has evolved)
-        endpoints = [
-            # Current public API
-            f"{self.BASE_URL}/workspaces/{self.workspace_id}/items/{self.agent_id}/chat/completions",
-            # Alternative paths
-            f"{self.BASE_URL}/workspaces/{self.workspace_id}/dataagents/{self.agent_id}/chat/completions",
-            f"{self.BASE_URL}/workspaces/{self.workspace_id}/aiskills/{self.agent_id}/chat/completions",
-            # MCP endpoint
-            f"{self.BASE_URL}/mcp/workspaces/{self.workspace_id}/dataagents/{self.agent_id}/agent",
-        ]
+        try:
+            result = self._mcp_call(
+                "tools/call",
+                {
+                    "name": self.tool_name,
+                    "arguments": {"userQuestion": question},
+                },
+                request_id="q",
+            )
 
-        payload = {
-            "messages": [
-                {"role": "user", "content": question}
-            ]
-        }
+            # Extract answer from MCP response
+            answer = self._extract_answer(result)
 
-        for endpoint in endpoints:
-            try:
-                resp = requests.post(
-                    endpoint,
-                    headers=self._get_headers(),
-                    json=payload,
-                    timeout=120,  # agent may take time on complex queries
+            if answer:
+                return AgentResponse(
+                    question=question,
+                    answer=answer,
+                    status="success",
+                )
+            else:
+                return AgentResponse(
+                    question=question,
+                    answer="",
+                    status="failed",
+                    error="Empty response from agent",
                 )
 
-                if resp.status_code == 200:
-                    result = resp.json()
-                    # Extract answer from response (format may vary)
-                    answer = self._extract_answer(result)
-                    logger.info("Agent responded via %s", endpoint.split("/")[-2])
-                    return AgentResponse(
-                        question=question,
-                        answer=answer,
-                        status="success",
-                    )
-                elif resp.status_code == 404:
-                    continue  # try next endpoint
-                else:
-                    logger.warning("Agent endpoint %s returned %s: %s",
-                                 endpoint, resp.status_code, resp.text[:200])
-                    continue
-
-            except Exception as e:
-                logger.warning("Agent endpoint %s failed: %s", endpoint, e)
-                continue
-
-        return AgentResponse(
-            question=question,
-            answer="",
-            status="failed",
-            error="All agent endpoints failed. Check workspace_id and agent_id.",
-        )
+        except Exception as e:
+            return AgentResponse(
+                question=question,
+                answer="",
+                status="failed",
+                error=str(e),
+            )
 
     def _extract_answer(self, response: dict[str, Any]) -> str:
-        """Extract the answer text from the agent's API response."""
-        # OpenAI-compatible format
-        if "choices" in response:
-            choices = response["choices"]
-            if choices:
-                message = choices[0].get("message", {})
-                return message.get("content", "")
+        """Extract the answer text from the MCP JSON-RPC response."""
+        result = response.get("result", {})
 
-        # Fabric-specific format
-        if "result" in response:
-            return response["result"]
+        # MCP tools/call format: result.content[0].text
+        content = result.get("content", [])
+        if isinstance(content, list) and content:
+            first = content[0]
+            if isinstance(first, dict):
+                return first.get("text", "")
+            return str(first)
 
-        if "answer" in response:
-            return response["answer"]
+        # Fallback
+        if isinstance(result, str):
+            return result
 
-        if "content" in response:
-            return response["content"]
-
-        # Fallback: return the whole response as string
-        return str(response)
+        return str(result) if result else ""
 
     def generate_metric_description(self, metric_name: str) -> AgentResponse:
         """Generate a business description for a metric using the Data Agent.
 
-        Asks the agent a structured question that produces the same
-        high-quality output as the interactive chat.
+        Uses a question format that produces structured, criteria-focused output.
         """
         question = (
             f"Describe what the metric '{metric_name}' measures. "
@@ -183,6 +211,10 @@ class FabricAgentClient:
         results: dict[str, AgentResponse] = {}
         succeeded = 0
         failed = 0
+
+        # Discover tool name once
+        if not self.tool_name:
+            self.discover_tool_name()
 
         logger.info("Generating descriptions for %d metrics via Data Agent", len(metric_names))
 

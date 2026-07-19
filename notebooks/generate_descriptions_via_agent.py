@@ -35,12 +35,17 @@ AGENT_ID = "REPLACE_WITH_YOUR_AGENT_ID"            # the dxxxxx-xxxxx from the U
 
 client = FabricAgentClient(workspace_id=WORKSPACE_ID, agent_id=AGENT_ID)
 
+# Discover the tool name automatically
+print("Discovering Data Agent tool name...")
+tool_name = client.discover_tool_name()
+print(f"Tool name: {tool_name}")
+
 # Quick test
-print("Testing Data Agent connection...")
-test_response = client.query("What metrics are available? List the first 3.")
+print("\nTesting Data Agent connection...")
+test_response = client.query("SELECT name FROM graph_nodes WHERE layer = 'canonical' LIMIT 3")
 print(f"Status: {test_response.status}")
 if test_response.status == "success":
-    print(f"Response preview: {test_response.answer[:200]}...")
+    print(f"Response preview: {test_response.answer[:300]}...")
 else:
     print(f"Error: {test_response.error}")
     print("Check your workspace_id and agent_id. Make sure the agent is published.")
