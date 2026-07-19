@@ -187,12 +187,66 @@ for source in sql_sources[:5]:  # test first 5
     else:
         print(f"\n{metric_id} — no graph path found")
 
-# %% Cell 9: Summary
+# %% Cell 9: Save build summary to Delta table
 from collections import Counter
+from datetime import datetime, timezone
 
 layer_counts = Counter(n.layer.value for n in builder.nodes.values())
 edge_type_counts = Counter(e.edge_type.value for e in builder.edges)
 
+now = datetime.now(timezone.utc).isoformat()
+
+summary_rows = []
+
+# Overall stats
+summary_rows.append((now, "total_nodes", str(len(builder.nodes)), ""))
+summary_rows.append((now, "total_edges", str(len(builder.edges)), ""))
+summary_rows.append((now, "total_metrics", str(len(sql_sources)), ""))
+summary_rows.append((now, "parse_errors", str(len(parse_errors)), ""))
+
+# Nodes by layer
+for layer, count in sorted(layer_counts.items()):
+    summary_rows.append((now, f"nodes_{layer}", str(count), ""))
+
+# Edges by type
+for etype, count in sorted(edge_type_counts.items()):
+    summary_rows.append((now, f"edges_{etype}", str(count), ""))
+
+# Per-metric summary
+traverser_summary = GraphTraverser(builder.nodes, builder.edges)
+for source in sql_sources:
+    metric_id = source["metric_id"]
+    subgraph = traverser_summary.get_metric_subgraph(metric_id)
+    if subgraph:
+        tables = [t.name for t in subgraph["technical"] if t.properties.get("column") is None]
+        summary_rows.append((now, f"metric_{metric_id}", str(len(tables)),
+                            f"transforms={len(subgraph['transformations'])}, tables={len(tables)}"))
+
+# Parse errors
+for mid, err in parse_errors:
+    summary_rows.append((now, f"error_{mid}", "parse_failed", err[:200]))
+
+from pyspark.sql.types import StringType, StructField, StructType
+
+summary_schema = StructType([
+    StructField("build_time", StringType(), False),
+    StructField("metric_key", StringType(), False),
+    StructField("value", StringType(), False),
+    StructField("detail", StringType(), True),
+])
+
+summary_df = spark.createDataFrame(summary_rows, schema=summary_schema)
+
+# Append to build_summary (keep history of each run)
+try:
+    existing = spark.table("build_summary")
+    summary_df.write.format("delta").mode("append").saveAsTable("build_summary")
+except Exception:
+    summary_df.write.format("delta").mode("overwrite").saveAsTable("build_summary")
+
+print(f"Saved {len(summary_rows)} summary records to build_summary")
+
+# %% Cell 10: Print summary
 print("\n=== Graph Summary ===")
 print(f"Total nodes: {len(builder.nodes)}")
 print(f"Nodes by layer:")
@@ -204,4 +258,8 @@ for etype, count in sorted(edge_type_counts.items()):
     print(f"  {etype}: {count}")
 if parse_errors:
     print(f"\nParse errors: {len(parse_errors)} (see Cell 6 output)")
+print(f"\nOutput tables:")
+print(f"  {config.lakehouse.graph_nodes} — nodes for Data Agent")
+print(f"  {config.lakehouse.graph_edges} — edges for Data Agent")
+print(f"  build_summary — build history (append-only)")
 print(f"\nNext step: Point your Fabric Data Agent at '{config.lakehouse.graph_nodes}' and '{config.lakehouse.graph_edges}'")
