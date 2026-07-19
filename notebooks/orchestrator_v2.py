@@ -15,7 +15,7 @@ To use in Fabric:
 
 # %% Cell 1: Install dependencies
 # Run this cell once per session. Fabric doesn't have these pre-installed.
-%pip install pydantic pyyaml sqlglot
+%pip install pydantic pyyaml sqlglot openai
 
 # %% Cell 2: Setup
 import json
@@ -33,6 +33,44 @@ from src.dictionary import DataDictionary
 # %% Cell 3: Load config
 config = load_config("/lakehouse/default/Files/sql-query-agent/org_config.yaml")
 print(f"Loaded config for: {config.org.name}")
+
+# %% Cell 3b: Configure LLM fallback for parse failures (optional)
+# Set OPENAI_API_KEY to enable LLM extraction for procs that fail deterministic parsing.
+# Set to "" or None to disable (deterministic only).
+import openai
+
+OPENAI_API_KEY = "REPLACE_WITH_YOUR_OPENAI_API_KEY"  # set to "" to disable
+
+llm_backend = None
+if OPENAI_API_KEY:
+    class OpenAIBackend:
+        def __init__(self, api_key, model="gpt-4o-mini", max_tokens=4096):
+            self.client = openai.OpenAI(api_key=api_key)
+            self.model = model
+            self.max_tokens = max_tokens
+
+        def generate(self, prompt):
+            response = self.client.chat.completions.create(
+                model=self.model,
+                messages=[
+                    {"role": "system", "content": "You are a SQL extraction tool. Return only SQL, no explanations."},
+                    {"role": "user", "content": prompt},
+                ],
+                max_tokens=self.max_tokens,
+                temperature=0,
+            )
+            return response.choices[0].message.content.strip()
+
+    llm_backend = OpenAIBackend(api_key=OPENAI_API_KEY)
+    # Quick test
+    try:
+        test = llm_backend.generate("Say OK")
+        print(f"LLM backend ready (model: gpt-4o-mini, test: {test})")
+    except Exception as e:
+        print(f"LLM backend failed: {e} — falling back to deterministic only")
+        llm_backend = None
+else:
+    print("LLM fallback disabled (no API key). Using deterministic parsing only.")
 
 # %% Cell 4: Load data dictionary
 # Supports: managed tables, Delta paths, ABFS cross-workspace paths, and CSV files.
@@ -114,7 +152,7 @@ for source in sql_sources:
     builder.add_canonical_node(metric_id, name, steward=steward, developer=developer)
 
     try:
-        parsed = parse_sql(sql)
+        parsed = parse_sql(sql, llm_backend=llm_backend)
         builder.build_from_parsed_sql(metric_id, parsed)
         print(f"  Parsed: {metric_id} ({name}) — {len(parsed.ctes)} CTEs, {len(parsed.final_select_tables)} tables")
     except Exception as e:
