@@ -91,6 +91,27 @@ _LABEL_RE = re.compile(
     re.MULTILINE,
 )
 
+# OPTION(...) query hints — optimizer directives, no business logic.
+# Matches OPTION (MAXDOP n), OPTION (FORCE_LEGACY_CARDINALITY_ESTIMATION), etc.
+_OPTION_HINT_RE = re.compile(
+    r"\bOPTION\s*\([^)]*\)\s*;?",
+    re.IGNORECASE,
+)
+
+# INSERT INTO #temp VALUES(...) — seed data / lookup table inserts.
+# Matches single or multiple VALUES rows. No business logic.
+_INSERT_VALUES_RE = re.compile(
+    r"\bINSERT\s+INTO\s+#\w+\s+VALUES\s*\([^)]*\)\s*;?",
+    re.IGNORECASE,
+)
+
+# IF ... BEGIN ... END blocks — parameter defaulting, not real branching.
+# Strip the entire IF block including its contents when it's simple.
+_IF_BLOCK_RE = re.compile(
+    r"\bIF\b[\s\S]*?\bEND\s*;?",
+    re.IGNORECASE,
+)
+
 
 def _strip_bare_header(sql: str) -> str:
     """Strip bare-text headers above the CREATE PROCEDURE line."""
@@ -132,8 +153,10 @@ def _strip_proc_wrapper(sql: str) -> tuple[str | None, str]:
 
 
 def _strip_temp_guards(body: str) -> str:
-    """Remove temp table guards, CREATE INDEX on temps, PRINT, GOTO/labels.
+    """Remove non-logic statements that break sqlglot parsing.
 
+    Strips: temp table guards, CREATE INDEX, PRINT, GOTO/labels,
+    OPTION hints, INSERT INTO #temp VALUES, and simple IF blocks.
     Replaces with `;` to preserve statement boundaries.
     """
     body = _TEMP_GUARD_RE.sub(";\n", body)
@@ -142,6 +165,8 @@ def _strip_temp_guards(body: str) -> str:
     body = _PRINT_RE.sub(";\n", body)
     body = _GOTO_RE.sub(";\n", body)
     body = _LABEL_RE.sub(";\n", body)
+    body = _OPTION_HINT_RE.sub(";\n", body)
+    body = _INSERT_VALUES_RE.sub(";\n", body)
     return body
 
 

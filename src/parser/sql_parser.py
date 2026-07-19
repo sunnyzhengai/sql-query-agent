@@ -96,6 +96,24 @@ def _preprocess_simple(sql: str) -> str:
     # ;WITH -> WITH
     sql = re.sub(r';\s*WITH\b', 'WITH', sql, flags=re.IGNORECASE)
 
+    # Remove OPTION(...) query hints
+    sql = re.sub(r'\bOPTION\s*\([^)]*\)\s*;?', '', sql, flags=re.IGNORECASE)
+
+    # Remove INSERT INTO #temp VALUES(...)
+    sql = re.sub(r'\bINSERT\s+INTO\s+#\w+\s+VALUES\s*\([^)]*\)\s*;?', '', sql, flags=re.IGNORECASE)
+
+    # Remove CREATE INDEX on temp tables
+    sql = re.sub(
+        r'\bCREATE\s+(?:UNIQUE\s+)?(?:CLUSTERED\s+|NONCLUSTERED\s+)?INDEX\s+\w+\s+ON\s+#\w+\s*\([^)]*\)\s*;?',
+        '', sql, flags=re.IGNORECASE
+    )
+
+    # Remove PRINT statements
+    sql = re.sub(r'\bPRINT\s*\([^)]*\)\s*;?', '', sql, flags=re.IGNORECASE)
+
+    # Remove IF ... BEGIN ... END blocks (parameter defaulting)
+    sql = re.sub(r'\bIF\b[^;]*\bBEGIN\b[\s\S]*?\bEND\s*;?', '', sql, flags=re.IGNORECASE)
+
     return sql.strip()
 
 
