@@ -91,9 +91,15 @@ class GraphBuilder:
         self.edges.append(GraphEdge(source_id=source_id, target_id=target_id, edge_type=edge_type))
 
     def build_from_parsed_sql(self, metric_id: str, parsed: ParsedSQL) -> None:
-        """Wire up transformation and technical nodes from a parsed SQL result."""
+        """Wire up transformation and technical nodes from a parsed SQL result.
+
+        Handles both simple (single CTE) and complex (multi-CTE from
+        proc_normalize) queries. Wires the full dependency chain so
+        traversal reaches all tables.
+        """
+        cte_names = {cte.name for cte in parsed.ctes}
+
         # Create transformation nodes for each CTE
-        prev_transform_id = None
         for cte in parsed.ctes:
             transform_id = self.add_transformation_node(metric_id, cte.name, cte.sql_fragment)
 
@@ -109,10 +115,39 @@ class GraphBuilder:
                 if tech_id in self.nodes:
                     self.add_edge(transform_id, tech_id, EdgeType.TRANSFORM_TO_TECHNICAL)
 
-            prev_transform_id = transform_id
+        # Find physical tables in the final SELECT that are NOT already
+        # referenced by any CTE (those are already reachable via the CTE chain)
+        cte_covered_tables = set()
+        for cte in parsed.ctes:
+            cte_covered_tables.update(cte.table_refs)
+        final_only_tables = [t for t in parsed.final_select_tables
+                             if t not in cte_names and t not in cte_covered_tables]
 
-        # Wire canonical -> last transformation (the pipeline output)
+        # Wire these final-only tables via a synthetic transform node
+        if final_only_tables:
+            final_id = self.add_transformation_node(metric_id, "__final_select__", "")
+            for table_name in final_only_tables:
+                tech_id = f"tech:{table_name}"
+                if tech_id in self.nodes:
+                    self.add_edge(final_id, tech_id, EdgeType.TRANSFORM_TO_TECHNICAL)
+
+        # Wire canonical -> entry point transform nodes
         canonical_id = f"canonical:{metric_id}"
-        if canonical_id in self.nodes and parsed.ctes:
+        if canonical_id not in self.nodes:
+            return
+
+        if parsed.final_select_cte_refs:
+            # Connect canonical to each CTE referenced by the final SELECT
+            for cte_name in parsed.final_select_cte_refs:
+                transform_id = f"transform:{metric_id}:{cte_name}"
+                if transform_id in self.nodes:
+                    self.add_edge(canonical_id, transform_id, EdgeType.CANONICAL_TO_TRANSFORM)
+        elif parsed.ctes:
+            # Fallback: connect to the last CTE (simple case)
             last_transform = f"transform:{metric_id}:{parsed.ctes[-1].name}"
             self.add_edge(canonical_id, last_transform, EdgeType.CANONICAL_TO_TRANSFORM)
+
+        # Connect canonical to the final SELECT's physical tables node
+        if final_only_tables:
+            final_id = f"transform:{metric_id}:__final_select__"
+            self.add_edge(canonical_id, final_id, EdgeType.CANONICAL_TO_TRANSFORM)

@@ -43,7 +43,8 @@ class ParsedSQL:
     """Result of parsing a SQL statement."""
 
     ctes: list[CTEInfo] = field(default_factory=list)
-    final_select_tables: list[str] = field(default_factory=list)
+    final_select_tables: list[str] = field(default_factory=list)    # physical tables only
+    final_select_cte_refs: list[str] = field(default_factory=list)  # CTEs referenced by final SELECT
     final_select_columns: list[ColumnRef] = field(default_factory=list)
     normalized_sql: str = ""  # the SQL after normalization (for debugging/review)
 
@@ -164,10 +165,14 @@ def parse_sql(sql: str, dialect: str = "tsql") -> ParsedSQL:
         )
 
     # Extract final SELECT table/column references
+    cte_name_set = {c.name for c in result.ctes}
     main_select = parsed.find(exp.Select)
     if main_select:
         for table in parsed.find_all(exp.Table):
-            if table.name not in [c.name for c in result.ctes]:
+            if table.name in cte_name_set:
+                if table.name not in result.final_select_cte_refs:
+                    result.final_select_cte_refs.append(table.name)
+            else:
                 if table.name not in result.final_select_tables:
                     result.final_select_tables.append(table.name)
 
