@@ -1,8 +1,12 @@
 [project]
 name = "sql-query-agent"
 version = "0.1.0"
-description = "Three-layer graph RAG system for SQL business logic, targeting Microsoft Fabric"
+description = "Extract business logic from SQL, build knowledge graphs, and generate metadata — for Microsoft Fabric"
 requires-python = ">=3.9"
+license = {text = "MIT"}
+authors = [
+    {name = "Sunny Zheng"},
+]
 dependencies = [
     "pyyaml~=6.0",
     "pydantic~=2.5",
@@ -19,11 +23,17 @@ adapters = [
     "requests>=2.31",
     "azure-identity>=1.15",
 ]
+llm = [
+    "openai>=1.0",
+]
 fabric = [
     # Fabric notebooks provide these; listed for documentation only
     # "pyspark",
     # "delta-spark",
 ]
+
+[project.urls]
+Repository = "https://github.com/sunnyzhengai/sql-query-agent"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
