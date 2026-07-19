@@ -185,12 +185,13 @@ class FabricAgentClient:
     def generate_metric_description(self, metric_name: str) -> AgentResponse:
         """Generate a business description for a metric using the Data Agent.
 
-        Uses a question format that produces structured, criteria-focused output.
+        Uses a question format that triggers the agent to read sql_fragments
+        and produce structured, criteria-focused output.
         """
         question = (
-            f"Describe what the metric '{metric_name}' measures. "
-            f"Include: what data it tracks, what criteria and filters are applied, "
-            f"and what the output represents. Be specific about the business rules."
+            f"How is {metric_name} calculated? "
+            f"What filters and criteria does it apply? "
+            f"What tables does it use and what does the output represent?"
         )
         return self.query(question)
 
