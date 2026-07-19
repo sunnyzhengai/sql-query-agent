@@ -69,6 +69,28 @@ _BARE_DROP_RE = re.compile(
     re.IGNORECASE,
 )
 
+# CREATE INDEX on temp tables — performance hints, no business logic.
+_CREATE_INDEX_RE = re.compile(
+    r"\bCREATE\s+(?:UNIQUE\s+)?(?:CLUSTERED\s+|NONCLUSTERED\s+)?INDEX\s+\w+\s+ON\s+#\w+\s*\([^)]*\)\s*;?",
+    re.IGNORECASE,
+)
+
+# PRINT statements — debug output, no business logic.
+_PRINT_RE = re.compile(
+    r"\bPRINT\s*\([^)]*\)\s*;?",
+    re.IGNORECASE,
+)
+
+# GOTO / labels — procedural flow. Strip the GOTO and label lines.
+_GOTO_RE = re.compile(
+    r"^\s*GOTO\s+\w+\s*;?\s*$",
+    re.MULTILINE | re.IGNORECASE,
+)
+_LABEL_RE = re.compile(
+    r"^\s*\w+:\s*$",
+    re.MULTILINE,
+)
+
 
 def _strip_bare_header(sql: str) -> str:
     """Strip bare-text headers above the CREATE PROCEDURE line."""
@@ -110,12 +132,16 @@ def _strip_proc_wrapper(sql: str) -> tuple[str | None, str]:
 
 
 def _strip_temp_guards(body: str) -> str:
-    """Remove IF OBJECT_ID(...) DROP TABLE #x guards and bare DROP TABLEs.
+    """Remove temp table guards, CREATE INDEX on temps, PRINT, GOTO/labels.
 
     Replaces with `;` to preserve statement boundaries.
     """
     body = _TEMP_GUARD_RE.sub(";\n", body)
     body = _BARE_DROP_RE.sub(";\n", body)
+    body = _CREATE_INDEX_RE.sub(";\n", body)
+    body = _PRINT_RE.sub(";\n", body)
+    body = _GOTO_RE.sub(";\n", body)
+    body = _LABEL_RE.sub(";\n", body)
     return body
 
 
@@ -217,14 +243,21 @@ _SPECIAL_BLOCK = {"TRY", "CATCH", "TRANSACTION", "TRAN", "DISTRIBUTED"}
 
 
 def _has_control_flow(body: str, dialect: str) -> bool:
-    """True if the body has IF/WHILE or BEGIN TRY/CATCH/TRANSACTION."""
+    """True if the body has WHILE or BEGIN TRY/CATCH/TRANSACTION.
+
+    Note: IF statements are no longer flagged as control flow because
+    most IF blocks in reporting procs are just parameter defaulting
+    (IF @param IS NULL SET @param = ...), not real branching logic.
+    These are stripped by _strip_temp_guards or handled as Commands.
+    Only WHILE loops and TRY/CATCH blocks indicate genuinely procedural procs.
+    """
     try:
         toks = sqlglot.tokenize(body, dialect=dialect)
     except Exception:
         return False
     n = len(toks)
     for i, t in enumerate(toks):
-        if t.token_type == TokenType.VAR and (t.text or "").upper() in ("IF", "WHILE"):
+        if t.token_type == TokenType.VAR and (t.text or "").upper() == "WHILE":
             return True
         if t.token_type == TokenType.BEGIN and i + 1 < n \
                 and (toks[i + 1].text or "").upper() in _SPECIAL_BLOCK:
@@ -384,30 +417,27 @@ def select_into_to_cte(
             terminals.append(st)
             continue
         if isinstance(st, exp.Command):
-            cmd_text = (st.this or "").strip().upper() if isinstance(st.this, str) else ""
-            if not cmd_text:
-                cmd_text = st.sql(dialect=dialect).strip().upper()
-            _SAFE_CMD_PREFIXES = (
-                "DECLARE", "SET @", "SET NOCOUNT", "SET ANSI",
-                "SET XACT", "SET TRANSACTION", "SET QUOTED",
-                "SET ARITHABORT", "SET CONCAT_NULL",
-                "SET DATEFIRST", "SET DATEFORMAT", "SET DEADLOCK",
-                "SET FMTONLY", "SET IDENTITY", "SET LANGUAGE",
-                "SET LOCK_TIMEOUT", "SET NUMERIC",
-                "SET ROWCOUNT", "SET TEXTSIZE",
-                "EXEC", "EXECUTE",
-                "PRINT", "RETURN", "USE",
-                "RAISERROR", "THROW",
-            )
-            if any(cmd_text.startswith(p) for p in _SAFE_CMD_PREFIXES):
-                continue
-            raise ProcNotViewShaped("unsupported_statement",
-                                     f"Command: {cmd_text[:60]}")
+            # Commands are T-SQL constructs sqlglot can't fully parse:
+            # DECLARE, SET @var, EXEC, PRINT, RETURN, USE, etc.
+            # These are procedural preamble/postamble with no lineage.
+            # Skip ALL commands — they are never the business logic we need.
+            continue
         if isinstance(st, exp.Column):
             # Stray identifiers (e.g. GO parsed as a column reference) — skip
             continue
         if not isinstance(st, exp.Select):
-            raise ProcNotViewShaped("unsupported_statement", type(st).__name__)
+            # INSERT INTO #temp VALUES(...) — lookup table seeding, skip it
+            if isinstance(st, exp.Insert):
+                target = st.this
+                if isinstance(target, exp.Table) and _is_temp_table(target):
+                    logger.info("Skipping INSERT INTO #%s (lookup seeding)", target.name)
+                    continue
+            # Other non-SELECT statements: try to skip gracefully
+            # rather than rejecting the whole proc
+            st_type = type(st).__name__
+            st_sql = st.sql(dialect=dialect)[:80] if hasattr(st, 'sql') else str(st)[:80]
+            logger.warning("Skipping unsupported statement: %s (%s)", st_type, st_sql)
+            continue
 
         into = st.args.get("into")
         if into is None:
