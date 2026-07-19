@@ -42,7 +42,7 @@ print(f"Tool name: {tool_name}")
 
 # Quick test
 print("\nTesting Data Agent connection...")
-test_response = client.query("SELECT name FROM graph_nodes WHERE layer = 'canonical' LIMIT 3")
+test_response = client.query("List 3 business metrics that are available in the system")
 print(f"Status: {test_response.status}")
 if test_response.status == "success":
     print(f"Response preview: {test_response.answer[:300]}...")
