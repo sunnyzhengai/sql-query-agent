@@ -58,7 +58,7 @@ Core library, graph model, and adapter scaffolding.
 ## Phase 1: Metadata Sync MVP (Wedge)
 **Status: IN PROGRESS**
 
-Get Metadata Sync working end-to-end with real data against Purview.
+Get Metadata Sync working end-to-end with real data against Purview/Collibra.
 
 ### Code quality (DONE)
 - [x] Add Python `logging` module throughout library (12 modules)
@@ -66,31 +66,54 @@ Get Metadata Sync working end-to-end with real data against Purview.
 - [x] Run `pip-audit` — no vulnerabilities in direct dependencies
 - [x] Audit for print statements — zero in `src/`, all in scripts/notebooks where they belong
 
-### Build
-- [x] Pick first adapter target: **Purview** (available at work)
+### Parser hardening (DONE)
+- [x] Port `proc_normalize` from sql-business-logic-extractor (multi-statement temp table → CTE conversion)
+- [x] Port `parsing_rules/` registry (6 T-SQL preprocessing rules + AST rules)
+- [x] Handle CREATE PROCEDURE with multi-line parameter blocks
+- [x] Handle DECLARE @variable, GO, SET, DROP TABLE IF EXISTS, ;WITH, SELECT INTO #temp
+- [x] Auto-detect multi-statement procedures and route through proc_normalize
+- [x] Validated against 2 real Epic Clarity stored procedures (simple + complex)
+- [x] Simple: usp_PTA_CensusDashboard_PBI — 1 CTE, 11 tables, 59 columns
+- [x] Complex: USP_BookMedical_LOTE_Census — 7 CTEs from 6 temp tables, 30 tables, 240 columns
+
+### Graph & traversal (DONE)
+- [x] Fix traversal gap for multi-CTE dependency chains
+- [x] Track which CTEs the final SELECT references (`final_select_cte_refs`)
+- [x] Canonical node connects to all entry-point CTEs (not just last one)
+- [x] `__final_select__` synthetic node for tables only in the final SELECT
+- [x] Full pipeline tested: parse → graph → traverse → metadata records (run_full_pipeline.py)
+- [x] Output: 49 nodes, 59 edges, 39 metadata records from 2 real queries
+
+### Catalog integration (IN PROGRESS)
+- [x] Pick first adapter target: **Collibra** (Purview needs Data Curator role — requested)
 - [x] Scaffold Metadata Sync notebook (`notebooks/metadata_sync.py`)
-- [ ] Wire Purview adapter to real API (requires `azure-identity` and `requests`)
+- [x] Scaffold Collibra connection test notebook (`notebooks/test_collibra.py`)
+- [x] Created OAuth Integration app in Collibra dev
+- [ ] Get Collibra service account from admin (requested, waiting — ETA Monday)
+- [ ] Wire Collibra adapter to real API and test connection
 - [ ] Test metadata push with real data from work POC
 - [ ] Handle API errors gracefully (rate limits, auth failures, missing permissions)
+- [ ] Get Purview Data Curator role (requested, waiting)
+- [ ] Wire Purview adapter to real API
 - [ ] Add PBI report description updates (Fabric REST API PATCH)
-- [ ] Validate with 50+ real SQL queries from work environment
-- [ ] Fix parser edge cases discovered from real-world SQL (nested CTEs, temp tables, vendor quirks)
 - [ ] Add sync_log tracking (which records were pushed, when, to which catalog)
 
-### Test
+### Scale testing (NOT STARTED)
+- [ ] Validate with 50+ real SQL queries from work environment
 - [ ] Add adapter integration tests (with real API or recorded responses)
 - [ ] Golden file tests for 3-5 critical real-world queries
 - [ ] Test bulk publish with 50+ records
 
 ### Exit criteria
 - [ ] Can parse 50+ real SQL queries from work environment without errors
-- [ ] Can push metadata to Purview via API
+- [x] Full pipeline works end-to-end locally (parse → graph → traverse → metadata)
+- [ ] Can push metadata to at least one catalog (Purview or Collibra) via API
 - [ ] PBI report descriptions can be updated programmatically
-- [ ] All tests pass, no print statements in library code
+- [x] All tests pass (45/45), no print statements in library code
 
 ### Checklist items satisfied
 - MARKETPLACE_CHECKLIST §2: Code Standards (logging, deps) — DONE
-- MARKETPLACE_CHECKLIST §2: Testing (golden files)
+- MARKETPLACE_CHECKLIST §2: Testing (golden files) — PARTIAL
 
 ---
 
