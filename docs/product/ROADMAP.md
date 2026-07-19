@@ -244,6 +244,18 @@ Expand the product after the Basic tier is live and generating feedback.
 - [ ] Row-level security for personalized access (surgeon-sees-own-data pattern)
 - [ ] Add Pro plan to Marketplace listing
 
+### Entra ID Security & Access Control
+- [ ] Integrate with Microsoft Entra ID to identify the user asking questions
+- [ ] Add `security_groups` property to canonical nodes (which AD groups can access)
+- [ ] Agent checks user's AD group membership before answering
+- [ ] Access denied response: "You don't have access to this data. Request sent to [owner] for approval."
+- [ ] Access request workflow: denied requests logged, sent to metric owner (steward) for approval
+- [ ] Approved requests expand the access list automatically
+- [ ] Row-level security (RLS): same metric, different data based on user identity
+  - Example: surgeon sees only their own FCOTS; Medical Director sees department-wide
+- [ ] Access request patterns feed the flywheel: demand signals for cross-department data sharing
+- [ ] Audit trail: who asked, what was denied/approved, when
+
 ### AI support bot
 - [ ] Build knowledge graph of product documentation
 - [ ] Deploy self-service support agent (eat your own dogfood)
