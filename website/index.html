@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIVIA — Data Empowerment Suite</title>
+    <meta name="description" content="Turn SQL chaos into self-service analytics. Extract business logic, build knowledge graphs, and empower users with AI-powered data governance.">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --navy: #1B2A4A;
+            --teal: #009688;
+            --light-teal: #4DB6AC;
+            --orange: #FF7A2F;
+            --white: #FFFFFF;
+            --light-gray: #F5F7FA;
+            --medium-gray: #6B7280;
+            --dark-text: #1F2937;
+        }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--dark-text);
+            line-height: 1.6;
+        }
+
+        /* Navigation */
+        nav {
+            background: var(--navy);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            color: var(--white);
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-decoration: none;
+            letter-spacing: 2px;
+        }
+
+        .logo span { color: var(--teal); }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 2rem;
+        }
+
+        nav ul a {
+            color: var(--light-teal);
+            text-decoration: none;
+            font-size: 0.95rem;
+        }
+
+        nav ul a:hover { color: var(--white); }
+
+        /* Hero */
+        .hero {
+            background: linear-gradient(135deg, var(--navy) 0%, #0D1B2A 100%);
+            color: var(--white);
+            padding: 10rem 2rem 6rem;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero h1 span { color: var(--teal); }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--light-teal);
+            max-width: 600px;
+            margin: 0 auto 2.5rem;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: var(--teal);
+            color: var(--white);
+            padding: 0.9rem 2.5rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+
+        .cta-button:hover { background: var(--light-teal); }
+
+        .hero-subtitle {
+            margin-top: 1.5rem;
+            font-size: 0.95rem;
+            color: var(--medium-gray);
+        }
+
+        /* Problem Section */
+        .problem {
+            padding: 5rem 2rem;
+            background: var(--white);
+            text-align: center;
+        }
+
+        .problem h2 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--navy);
+        }
+
+        .problem .subtitle {
+            color: var(--medium-gray);
+            max-width: 600px;
+            margin: 0 auto 3rem;
+            font-size: 1.1rem;
+        }
+
+        .pain-points {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .pain-point {
+            background: var(--light-gray);
+            padding: 2rem;
+            border-radius: 10px;
+            text-align: left;
+        }
+
+        .pain-point h3 {
+            color: var(--orange);
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .pain-point p {
+            color: var(--medium-gray);
+            font-size: 0.95rem;
+        }
+
+        /* How It Works */
+        .how-it-works {
+            padding: 5rem 2rem;
+            background: var(--light-gray);
+            text-align: center;
+        }
+
+        .how-it-works h2 {
+            font-size: 2rem;
+            margin-bottom: 3rem;
+            color: var(--navy);
+        }
+
+        .pipeline {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            max-width: 1100px;
+            margin: 0 auto 3rem;
+        }
+
+        .pipeline-step {
+            background: var(--white);
+            border: 2px solid var(--teal);
+            border-radius: 10px;
+            padding: 1.5rem;
+            width: 200px;
+            text-align: center;
+        }
+
+        .pipeline-step .step-number {
+            background: var(--teal);
+            color: var(--white);
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+        }
+
+        .pipeline-step h4 {
+            color: var(--navy);
+            margin-bottom: 0.5rem;
+        }
+
+        .pipeline-step p {
+            color: var(--medium-gray);
+            font-size: 0.85rem;
+        }
+
+        .pipeline-arrow {
+            color: var(--teal);
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        /* Features */
+        .features {
+            padding: 5rem 2rem;
+            background: var(--white);
+            text-align: center;
+        }
+
+        .features h2 {
+            font-size: 2rem;
+            margin-bottom: 3rem;
+            color: var(--navy);
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .feature {
+            text-align: left;
+            padding: 2rem;
+            border-radius: 10px;
+            border: 1px solid #E5E7EB;
+        }
+
+        .feature h3 {
+            color: var(--teal);
+            margin-bottom: 0.75rem;
+            font-size: 1.15rem;
+        }
+
+        .feature p {
+            color: var(--medium-gray);
+            font-size: 0.95rem;
+        }
+
+        /* Built On */
+        .built-on {
+            padding: 4rem 2rem;
+            background: var(--navy);
+            text-align: center;
+            color: var(--white);
+        }
+
+        .built-on h2 {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            color: var(--light-teal);
+        }
+
+        .tech-stack {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            flex-wrap: wrap;
+        }
+
+        .tech-item {
+            color: var(--white);
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            padding: 5rem 2rem;
+            background: linear-gradient(135deg, var(--teal) 0%, #00796B 100%);
+            text-align: center;
+            color: var(--white);
+        }
+
+        .cta-section h2 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .cta-section p {
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        .cta-button-light {
+            display: inline-block;
+            background: var(--white);
+            color: var(--teal);
+            padding: 0.9rem 2.5rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: opacity 0.3s;
+        }
+
+        .cta-button-light:hover { opacity: 0.9; }
+
+        /* Footer */
+        footer {
+            background: var(--navy);
+            color: var(--medium-gray);
+            padding: 2rem;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        footer a {
+            color: var(--light-teal);
+            text-decoration: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2rem; }
+            .pipeline { flex-direction: column; }
+            .pipeline-arrow { transform: rotate(90deg); }
+            nav ul { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <a href="#" class="logo">AIVIA<span>.</span></a>
+    <ul>
+        <li><a href="#problem">Problem</a></li>
+        <li><a href="#how-it-works">How It Works</a></li>
+        <li><a href="#features">Features</a></li>
+        <li><a href="#contact">Contact</a></li>
+    </ul>
+</nav>
+
+<section class="hero">
+    <h1>From SQL Chaos to <span>Self-Service Intelligence</span></h1>
+    <p>Automatically extract business logic from your SQL, build a certified knowledge graph, and let your team ask questions in plain English.</p>
+    <a href="#contact" class="cta-button">Get Early Access</a>
+    <p class="hero-subtitle">Built natively on Microsoft Fabric. Runs in your tenant.</p>
+</section>
+
+<section class="problem" id="problem">
+    <h2>The Problem Every Data Team Faces</h2>
+    <p class="subtitle">Business logic is buried in SQL code that nobody reads. Governance is a separate, manual process. Your team deserves better.</p>
+    <div class="pain-points">
+        <div class="pain-point">
+            <h3>SQL Chaos</h3>
+            <p>Hundreds of stored procedures with business logic buried in WHERE clauses and CTEs. Same metric, different definitions across reports.</p>
+        </div>
+        <div class="pain-point">
+            <h3>Governance Tax</h3>
+            <p>Manual term creation is slow — 50 definitions per year at best. Committees meet monthly while data trust erodes.</p>
+        </div>
+        <div class="pain-point">
+            <h3>Report Backlog</h3>
+            <p>Users wait weeks for answers. Three analysts run the same metric and get three different numbers. Leadership loses trust in data.</p>
+        </div>
+    </div>
+</section>
+
+<section class="how-it-works" id="how-it-works">
+    <h2>How AIVIA Works</h2>
+    <div class="pipeline">
+        <div class="pipeline-step">
+            <div class="step-number">1</div>
+            <h4>Extract</h4>
+            <p>Parse your existing SQL stored procedures automatically</p>
+        </div>
+        <span class="pipeline-arrow">&rarr;</span>
+        <div class="pipeline-step">
+            <div class="step-number">2</div>
+            <h4>Build Graph</h4>
+            <p>Create a three-layer knowledge graph in Delta tables</p>
+        </div>
+        <span class="pipeline-arrow">&rarr;</span>
+        <div class="pipeline-step">
+            <div class="step-number">3</div>
+            <h4>Ask Questions</h4>
+            <p>Users ask a Fabric Data Agent in plain English</p>
+        </div>
+        <span class="pipeline-arrow">&rarr;</span>
+        <div class="pipeline-step">
+            <div class="step-number">4</div>
+            <h4>Govern</h4>
+            <p>Push certified descriptions to Purview, Collibra, or Power BI</p>
+        </div>
+    </div>
+</section>
+
+<section class="features" id="features">
+    <h2>What Makes AIVIA Different</h2>
+    <div class="feature-grid">
+        <div class="feature">
+            <h3>Fabric-Native</h3>
+            <p>Runs entirely in your Microsoft Fabric tenant. Delta tables, Data Agent, Notebooks — no external infrastructure. Your data never leaves.</p>
+        </div>
+        <div class="feature">
+            <h3>Real-World SQL Parsing</h3>
+            <p>Handles complex multi-statement T-SQL with temp tables, CTEs, and procedural code. Designed for enterprise SQL, not toy examples.</p>
+        </div>
+        <div class="feature">
+            <h3>Business Language, Not SQL</h3>
+            <p>The Data Agent translates SQL logic into plain-English business criteria. Users understand what each metric measures without reading code.</p>
+        </div>
+        <div class="feature">
+            <h3>Certified Knowledge Graph</h3>
+            <p>Three layers — Business Metrics, Calculation Logic, Source Data — with full traceability from question to source table.</p>
+        </div>
+        <div class="feature">
+            <h3>Human-in-the-Loop</h3>
+            <p>Data stewards validate every definition before it enters the certified catalog. The AI suggests, humans certify.</p>
+        </div>
+        <div class="feature">
+            <h3>The Flywheel</h3>
+            <p>Every question either reinforces known metrics or surfaces unknown ones. Governance grows from usage, not committees.</p>
+        </div>
+    </div>
+</section>
+
+<section class="built-on">
+    <h2>Built on the Microsoft Ecosystem</h2>
+    <div class="tech-stack">
+        <div class="tech-item">Microsoft Fabric</div>
+        <div class="tech-item">Delta Tables</div>
+        <div class="tech-item">Fabric Data Agent</div>
+        <div class="tech-item">Microsoft Purview</div>
+        <div class="tech-item">Power BI</div>
+        <div class="tech-item">Azure AI</div>
+    </div>
+</section>
+
+<section class="cta-section" id="contact">
+    <h2>Ready to Turn SQL Chaos Into Self-Service Intelligence?</h2>
+    <p>AIVIA is currently in early access. Join the waitlist to be among the first to experience automated data governance.</p>
+    <a href="mailto:sunny@aiviaapp.com" class="cta-button-light">Contact Us</a>
+</section>
+
+<footer>
+    <p>&copy; 2026 AIVIA. All rights reserved. | <a href="mailto:sunny@aiviaapp.com">sunny@aiviaapp.com</a></p>
+</footer>
+
+</body>
+</html>
