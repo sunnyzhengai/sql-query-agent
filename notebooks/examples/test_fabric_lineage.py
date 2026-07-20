@@ -16,7 +16,9 @@ from src.adapters.fabric_lineage import FabricLineageClient
 # UPDATE with a workspace ID that contains PBI reports
 PBI_WORKSPACE_ID = "REPLACE_WITH_PBI_WORKSPACE_ID"
 
-client = FabricLineageClient()
+# Get token from Fabric (mssparkutils is a global in Fabric notebooks)
+access_token = mssparkutils.credentials.getToken("https://api.fabric.microsoft.com")
+client = FabricLineageClient(access_token=access_token)
 
 # Get raw lineage data
 print("Fetching workspace lineage...")
