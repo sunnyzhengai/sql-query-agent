@@ -35,6 +35,8 @@ https://www.microsoft.com/en-us/startups
 | **Level 2** | $5K | + LLC incorporation docs | **Ready (LLC exists)** |
 | **Level 3** | $25K+ | + Verified domain, business email, demo video | Need domain + video |
 
+**Status: SUBMITTED (2026-07-20).** Awaiting review (~3 business days).
+
 **Strategy:** Set up your own environment first. Apply for Level 1. Upload LLC docs and demo video to level up. Microsoft prefers seeing your product in your own tenant.
 
 ---
