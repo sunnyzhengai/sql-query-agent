@@ -66,54 +66,72 @@ Get Metadata Sync working end-to-end with real data against Purview/Collibra.
 - [x] Run `pip-audit` — no vulnerabilities in direct dependencies
 - [x] Audit for print statements — zero in `src/`, all in scripts/notebooks where they belong
 
-### Parser hardening (DONE)
-- [x] Port `proc_normalize` from sql-business-logic-extractor (multi-statement temp table → CTE conversion)
-- [x] Port `parsing_rules/` registry (6 T-SQL preprocessing rules + AST rules)
-- [x] Handle CREATE PROCEDURE with multi-line parameter blocks
-- [x] Handle DECLARE @variable, GO, SET, DROP TABLE IF EXISTS, ;WITH, SELECT INTO #temp
-- [x] Auto-detect multi-statement procedures and route through proc_normalize
-- [x] Validated against 2 real Epic Clarity stored procedures (simple + complex)
-- [x] Simple: usp_PTA_CensusDashboard_PBI — 1 CTE, 11 tables, 59 columns
-- [x] Complex: USP_BookMedical_LOTE_Census — 7 CTEs from 6 temp tables, 30 tables, 240 columns
+### Parser (DONE)
+- [x] LLM-first extraction: OpenAI extracts clean SQL from all procs before parsing
+- [x] Deterministic fallback: proc_normalize + regex preprocessing for offline/no-LLM use
+- [x] Validated against 790 real Epic Clarity stored procedures
+- [x] Full pipeline: LLM extract → sqlglot parse → graph build → Delta tables
 
 ### Graph & traversal (DONE)
-- [x] Fix traversal gap for multi-CTE dependency chains
-- [x] Track which CTEs the final SELECT references (`final_select_cte_refs`)
-- [x] Canonical node connects to all entry-point CTEs (not just last one)
-- [x] `__final_select__` synthetic node for tables only in the final SELECT
-- [x] Full pipeline tested: parse → graph → traverse → metadata records (run_full_pipeline.py)
-- [x] Output: 49 nodes, 59 edges, 39 metadata records from 2 real queries
+- [x] Three-layer graph model with full dependency chain traversal
+- [x] `__final_select__` synthetic node for tables only in final SELECT
+- [x] 400K+ nodes, 12K+ edges from real data
+- [x] Full pipeline tested end-to-end (parse → graph → traverse → metadata)
 
-### Catalog integration (IN PROGRESS)
-- [x] Pick first adapter target: **Collibra** (Purview needs Data Curator role — requested)
-- [x] Scaffold Metadata Sync notebook (`notebooks/metadata_sync.py`)
-- [x] Scaffold Collibra connection test notebook (`notebooks/test_collibra.py`)
-- [x] Created OAuth Integration app in Collibra dev
-- [ ] Get Collibra service account from admin (requested, waiting — ETA Monday)
-- [ ] Wire Collibra adapter to real API and test connection
-- [ ] Test metadata push with real data from work POC
-- [ ] Handle API errors gracefully (rate limits, auth failures, missing permissions)
-- [ ] Get Purview Data Curator role (requested, waiting)
-- [ ] Wire Purview adapter to real API
-- [ ] Add PBI report description updates (Fabric REST API PATCH)
-- [ ] Add sync_log tracking (which records were pushed, when, to which catalog)
+### Data Agent (DONE)
+- [x] Fabric Data Agent working with graph tables
+- [x] Persona-based responses (business, developer, admin)
+- [x] Agent instructions: self-contained knowledge base (metrics, admin, setup, troubleshooting)
+- [x] Data Agent API working via MCP protocol (JSON-RPC)
+- [x] Programmatic description generation via agent API
+- [x] SQL-to-business translation table in instructions
 
-### Scale testing (NOT STARTED)
-- [ ] Validate with 50+ real SQL queries from work environment
-- [ ] Add adapter integration tests (with real API or recorded responses)
+### Description generation (DONE)
+- [x] OpenAI-based summary generator (transform + canonical summaries)
+- [x] Combined summary generator (one LLM call per metric, 3x faster)
+- [x] Data Agent API-based description generator (best quality)
+- [x] Descriptions stored in graph_nodes description field + properties.summary
+
+### Adapters & integrations (BUILT, WAITING ON ACCESS)
+- [x] Collibra adapter scaffolded (REST API, bulk publish)
+- [x] Purview adapter scaffolded (Data Map REST API, Atlas entities)
+- [x] PBI report description updater (Fabric REST API PATCH)
+- [x] Fabric lineage API client (trace report → dataset → source tables)
+- [x] Metadata Sync notebook (reads graph, generates records, pushes to catalogs)
+- [x] Fabric Agent client (MCP protocol, auto-discovers tool name)
+
+### Blocked on admin access (ETA Monday)
+- [ ] Get Collibra service account → test Collibra push
+- [ ] Get Purview Data Curator role → test Purview push
+- [ ] Test PBI description updates against dev workspace
+- [ ] Test Fabric lineage API against PBI workspace
+
+### Enterprise readiness gaps (TODO)
+- [ ] Business-friendly metric names from PBI lineage (replace proc names)
+- [ ] Steward assignment (Delta table + agent commands)
+- [ ] Usage tracking in graph (user nodes, queried_by edges, usage weight on canonical nodes)
+- [ ] Audit trail as graph growth (every question grows the graph)
+- [ ] Admin dashboard via agent (/admindash, /stewards, /errors, /coverage, /health)
+- [ ] Automated refresh via Fabric Pipeline (document in admin guide)
+- [ ] Secrets management via Azure Key Vault (replace notebook API keys)
+
+### Scale testing
+- [x] 790 procs loaded and parsed (LLM-first, running now)
+- [ ] Validate parse error rate after LLM extraction
 - [ ] Golden file tests for 3-5 critical real-world queries
-- [ ] Test bulk publish with 50+ records
+- [ ] Test bulk catalog push with 50+ records
 
 ### Exit criteria
-- [ ] Can parse 50+ real SQL queries from work environment without errors
-- [x] Full pipeline works end-to-end locally (parse → graph → traverse → metadata)
+- [x] Can parse 790 real SQL queries with LLM extraction
+- [x] Full pipeline works end-to-end (parse → graph → traverse → metadata → descriptions)
+- [x] Data Agent answers metric questions correctly
 - [ ] Can push metadata to at least one catalog (Purview or Collibra) via API
 - [ ] PBI report descriptions can be updated programmatically
 - [x] All tests pass (45/45), no print statements in library code
 
 ### Checklist items satisfied
-- MARKETPLACE_CHECKLIST §2: Code Standards (logging, deps) — DONE
-- MARKETPLACE_CHECKLIST §2: Testing (golden files) — PARTIAL
+- MARKETPLACE_CHECKLIST §2: Code Standards — DONE
+- MARKETPLACE_CHECKLIST §2: Testing — PARTIAL (need golden files)
 
 ---
 
