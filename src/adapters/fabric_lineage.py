@@ -144,7 +144,6 @@ class FabricLineageClient:
         Returns:
             List of ReportLineage objects with the full upstream chain.
         """
-        import requests
 
         lineage_data = self.get_workspace_lineage(workspace_id)
         if not lineage_data:

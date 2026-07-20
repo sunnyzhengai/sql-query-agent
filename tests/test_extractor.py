@@ -9,7 +9,6 @@ from src.extractor.discovery import DiscoveredObject, build_discovery_query, str
 from src.extractor.extractor import ViewExtractor
 from src.extractor.tracker import ExtractionTracker, compute_sql_hash
 
-
 # --- Hash tests ---
 
 

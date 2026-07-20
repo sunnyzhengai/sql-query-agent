@@ -8,15 +8,14 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from typing import Any
 
 import sqlglot
 from sqlglot import exp
 
 from src.config import DomainFilterConfig
+from src.extractor.connection import SqlConnection
 
 logger = logging.getLogger(__name__)
-from src.extractor.connection import SqlConnection
 
 
 @dataclass

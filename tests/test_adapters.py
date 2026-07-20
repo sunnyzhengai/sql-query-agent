@@ -19,7 +19,6 @@ from src.adapters.metadata_generator import (
 from src.adapters.publisher import Publisher
 from src.pipeline import build_graph
 
-
 # -- Fixtures --
 
 SAMPLE_DICT_TABLES = [

@@ -16,7 +16,6 @@ from typing import Any
 
 from src.adapters.base import (
     BulkPublishResult,
-    CatalogAdapter,
     MetadataRecord,
     PublishResult,
     PublishStatus,

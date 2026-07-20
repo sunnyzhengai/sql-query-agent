@@ -298,7 +298,7 @@ def generate_all_summaries_combined(
             response = response.strip()
             if response.startswith("```"):
                 lines = response.split("\n")
-                lines = [l for l in lines if not l.strip().startswith("```")]
+                lines = [line for line in lines if not line.strip().startswith("```")]
                 response = "\n".join(lines).strip()
 
             parsed_response = _json.loads(response)

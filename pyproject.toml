@@ -45,3 +45,4 @@ line-length = 120
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "N", "W"]
+ignore = ["N818", "N806"]  # Allow exception names without Error suffix and uppercase vars in functions

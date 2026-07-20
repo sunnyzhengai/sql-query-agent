@@ -18,12 +18,12 @@ Usage data answers:
 from __future__ import annotations
 
 import logging
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Any
 
 from src.graph.builder import GraphBuilder
-from src.models import GraphNode, GraphEdge, NodeLayer, EdgeType
+from src.models import EdgeType, GraphEdge, GraphNode, NodeLayer
 
 logger = logging.getLogger(__name__)
 
@@ -254,11 +254,11 @@ class UsageTracker:
         top = self.get_top_metrics(5)
 
         lines = [
-            f"Usage Summary:",
+            "Usage Summary:",
             f"  Total queries: {total_events}",
             f"  Unique users: {unique_users}",
             f"  Unique metrics queried: {unique_metrics}",
-            f"  Top 5 metrics:",
+            "  Top 5 metrics:",
         ]
         for name, weight in top:
             lines.append(f"    {name}: {weight} queries")

@@ -141,7 +141,7 @@ def parse_sql(sql: str, dialect: str = "tsql", llm_backend=None) -> ParsedSQL:
     if _is_multi_statement(sql):
         # Multi-statement procedure: use proc_normalize to convert temp tables to CTEs
         logger.info("Detected multi-statement procedure, using proc_normalize")
-        from src.parser.proc_normalize import select_into_to_cte, ProcNotViewShaped
+        from src.parser.proc_normalize import ProcNotViewShaped, select_into_to_cte
         try:
             normalized_sql = select_into_to_cte(sql, dialect=dialect, emit_create_view=False)
             logger.info("proc_normalize succeeded (%d chars)", len(normalized_sql))

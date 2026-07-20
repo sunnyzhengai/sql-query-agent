@@ -11,7 +11,6 @@ import re
 
 from .rule import Rule
 
-
 PARSING_RULES: list[Rule] = [
     Rule(
         id="strip_ssms_preamble",

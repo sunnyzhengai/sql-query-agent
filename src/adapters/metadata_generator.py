@@ -13,7 +13,7 @@ from __future__ import annotations
 from src.adapters.base import MetadataRecord
 from src.graph.builder import GraphBuilder
 from src.graph.traversal import GraphTraverser
-from src.models import GraphNode, NodeLayer
+from src.models import NodeLayer
 
 
 def generate_metric_records(builder: GraphBuilder) -> list[MetadataRecord]:

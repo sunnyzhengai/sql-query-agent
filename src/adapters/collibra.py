@@ -9,14 +9,12 @@ API: https://developer.collibra.com/rest/
 
 from __future__ import annotations
 
-import json
 import logging
 from dataclasses import dataclass
 from typing import Any
 
 from src.adapters.base import (
     BulkPublishResult,
-    CatalogAdapter,
     MetadataRecord,
     PublishResult,
     PublishStatus,

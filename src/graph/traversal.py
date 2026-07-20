@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import logging
 
-from src.models import EdgeType, GraphEdge, GraphNode, NodeLayer
+from src.models import GraphEdge, GraphNode, NodeLayer
 
 logger = logging.getLogger(__name__)
 

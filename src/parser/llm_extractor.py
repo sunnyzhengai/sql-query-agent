@@ -17,7 +17,8 @@ from typing import Protocol, runtime_checkable
 logger = logging.getLogger(__name__)
 
 
-EXTRACTION_PROMPT = """You are a SQL extraction tool. Your job is to extract ONLY the data query logic from a stored procedure or script.
+EXTRACTION_PROMPT = """You are a SQL extraction tool. \
+Your job is to extract ONLY the data query logic from a stored procedure or script.
 
 RULES:
 1. Return ONLY the SELECT, WITH (CTE), and UNION/EXCEPT/INTERSECT statements
@@ -46,7 +47,7 @@ RULES:
 6. Do NOT modify, reformat, or "improve" the SQL — return it EXACTLY as written
 7. Do NOT add any explanation — return ONLY the extracted SQL
 8. Separate multiple statements with a semicolon (;)
-9. If @variables appear in WHERE clauses or expressions, replace them with placeholder strings like '__param_VariableName__'
+9. If @variables appear in WHERE clauses or expressions, replace them with placeholders like '__param_VarName__'
 
 INPUT:
 {sql}
@@ -187,7 +188,7 @@ def extract_sql(raw_sql: str, backend: LLMBackend) -> str:
     if result.startswith("```"):
         lines = result.split("\n")
         # Remove first line (```sql) and last line (```)
-        lines = [l for l in lines if not l.strip().startswith("```")]
+        lines = [line for line in lines if not line.strip().startswith("```")]
         result = "\n".join(lines)
 
     logger.info("LLM returned %d chars of extracted SQL", len(result))
@@ -218,7 +219,7 @@ def fabric_extract_sql(raw_sql: str, spark_session=None) -> str:
         df = spark_session.createDataFrame([(prompt,)], ["prompt"])
         result_df = df.withColumn(
             "response",
-            expr(f"ai.generate_text(prompt)")
+            expr("ai.generate_text(prompt)")
         )
         result = result_df.collect()[0]["response"]
         return result.strip()
@@ -227,8 +228,8 @@ def fabric_extract_sql(raw_sql: str, spark_session=None) -> str:
 
     try:
         # Method 2: SynapseML OpenAI
-        from synapse.ml.services.openai import OpenAIChatCompletion
         from pyspark.sql import Row
+        from synapse.ml.services.openai import OpenAIChatCompletion
 
         df = spark_session.createDataFrame([
             Row(messages=[
