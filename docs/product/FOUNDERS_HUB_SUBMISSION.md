@@ -5,35 +5,74 @@ https://www.microsoft.com/en-us/startups
 
 ---
 
-## Tiered Approach — Start Today, Level Up Later
+## Critical: Build in Your Own Environment
 
-You don't need everything ready to apply. Microsoft scales requirements by benefit tier:
+**Do NOT demo or submit using your work Fabric tenant.** Rebuild the POC in your own startup-owned Azure/Fabric environment. This is required for:
 
-| Tier | Credits | What You Need | Status |
-|---|---|---|---|
-| **Level 1** | $1K | LinkedIn profile + solution description | **Ready now** |
-| **Level 2** | $5K | + Business entity (LLC incorporation docs) | Need LLC |
-| **Level 3** | $25K+ | + Verified domain, business email, demo video, incorporation | Need LLC + video |
+- **IP ownership** — undisputed ownership of your code and demo
+- **Data security** — no risk of accidentally showing employer data
+- **Investor readiness** — due diligence requires code built on your own infrastructure
+- **Clean application** — Microsoft evaluators trust startup-owned environments
+- **Use a NEW personal Microsoft Account** — if you previously cancelled an Azure environment, use a fresh MSA to avoid flags
 
-**Strategy:** Apply today for Level 1 with LinkedIn only. Upload LLC and demo video later to unlock higher tiers. You get platform access immediately.
+### Environment Setup Checklist
+- [ ] Register business domain (e.g., `dataempowerment.io`)
+- [ ] Create business email matching domain (e.g., `sunny@dataempowerment.io`)
+- [ ] Create NEW personal Microsoft Account (not work, not old cancelled one)
+- [ ] Create new Azure account under this MSA
+- [ ] Provision Fabric capacity (free trial or paid)
+- [ ] Deploy your code to this environment
+- [ ] Load synthetic/sample data (NOT employer data)
+- [ ] Verify Data Agent works in this clean environment
 
 ---
 
-## Step 1: Apply Today (Level 1 — 30 minutes)
+## Tiered Approach — Apply Now, Level Up Later
+
+| Tier | Credits | What You Need | Status |
+|---|---|---|---|
+| **Level 1** | $1K | LinkedIn profile + solution description | Ready after environment setup |
+| **Level 2** | $5K | + LLC incorporation docs | Need LLC |
+| **Level 3** | $25K+ | + Verified domain, business email, demo video | Need domain + video |
+
+**Strategy:** Set up your own environment first. Apply for Level 1. Upload LLC docs and demo video to level up. Microsoft prefers seeing your product in your own tenant.
+
+---
+
+## Step 1: Infrastructure Setup (Do First)
+
+### Business Identity
+- [ ] **Register LLC** — online in your state (~$50-200, 1-2 hours)
+- [ ] **Register domain** — e.g., `dataempowerment.io` ($10-15/year)
+- [ ] **Business email** — set up email matching domain (Google Workspace ~$6/mo or Outlook)
+- [ ] **LinkedIn** — update profile with startup, founder title
+
+### Azure/Fabric Environment
+- [ ] **New personal MSA** — create fresh Microsoft Account with personal email
+- [ ] **Azure subscription** — create under the new MSA
+- [ ] **Fabric capacity** — provision Fabric trial or paid tier
+- [ ] **Lakehouse** — create lakehouse, upload sql-query-agent code
+- [ ] **Sample data** — load synthetic Clarity-like data (NOT employer data)
+- [ ] **Data Agent** — create and configure with graph tables + instructions
+- [ ] **Test end-to-end** — verify the agent answers questions in this environment
+
+---
+
+## Step 2: Apply for Level 1 (30 minutes)
 
 ### Prerequisites
-- [ ] **LinkedIn account** — up-to-date profile with career history (Microsoft verifies identity through this)
-- [ ] **Personal Microsoft account** — use personal email (@outlook.com or @gmail.com), NOT work/school email
-- [ ] **Azure account** — create new if needed (free)
+- [ ] LinkedIn account up-to-date
+- [ ] New personal Microsoft Account (not work email)
+- [ ] Azure account under this MSA
 
 ### Application Form
-- [ ] Company name: [your LLC name, or personal name if LLC not yet formed]
+- [ ] Company name: [your LLC name]
 - [ ] Stage: Pre-revenue / MVP
 - [ ] Industry: Healthcare Data Analytics / Data Governance
 - [ ] Technology: Microsoft Fabric, Azure AI, Power BI, Purview
 - [ ] Solution description (see below)
 
-### Solution Description (for Level 1)
+### Solution Description
 
 > **One-liner:** Turn SQL chaos into self-service analytics — extract business logic from stored procedures, build a certified knowledge graph, and let users ask questions through a Fabric Data Agent.
 >
@@ -45,30 +84,28 @@ You don't need everything ready to apply. Microsoft scales requirements by benef
 
 ---
 
-## Step 2: Level Up to Level 2 ($5K credits)
+## Step 3: Level Up to Level 2 ($5K)
 
-### What You Need
-- [ ] **Register LLC** — can do online in your state (~$50-200, 1-2 hours)
-- [ ] **Upload incorporation documents** to Founders Hub portal
-- [ ] That's it — the solution description from Level 1 carries over
+- [ ] Upload LLC incorporation documents to Founders Hub portal
 
 ---
 
-## Step 3: Level Up to Level 3 ($25K+ credits)
+## Step 4: Level Up to Level 3 ($25K+)
 
-### What You Need
-- [ ] **Business domain** — register a domain (e.g., dataempowerment.io)
-- [ ] **Business email** — email matching your domain (e.g., sunny@dataempowerment.io)
-- [ ] **Demo video** (5-10 minutes) — see script below
-- [ ] **Incorporation papers** — from Step 2
+- [ ] Verified domain (registered in Step 1)
+- [ ] Business email matching domain
+- [ ] Demo video (see script below)
+- [ ] Incorporation papers (from Step 3)
 
 ### Demo Video Script (5 minutes)
+
+Record in YOUR OWN Fabric environment with synthetic data. Not your employer's.
 
 **Slide 1 (30 sec): The Problem**
 "Organizations have hundreds of SQL stored procedures with business logic buried in code. Nobody documents them. New analysts spend weeks reverse-engineering queries. Governance falls behind."
 
 **Live Demo (2.5 min): The Magic**
-- Open Fabric Data Agent
+- Open your Fabric Data Agent
 - Ask: "How is the Census Dashboard calculated?"
 - Show the structured business criteria response
 - Ask: "What tables does it use?"
@@ -81,11 +118,11 @@ You don't need everything ready to apply. Microsoft scales requirements by benef
 - Show: Purview/Collibra adapters for metadata sync
 
 **Slide 3 (1 min): Roadmap & Ask**
-- Current: Working MVP with 687 parsed metrics
-- Next: Purview integration, steward certification workflow, marketplace listing
+- Current: Working MVP with parsed metrics and Data Agent
+- Next: Purview integration, steward certification workflow, Marketplace listing
 - Ask: "Looking for Azure credits and technical advisory to accelerate our Marketplace launch"
 
-**Do NOT show:** File uploads, notebook cells, raw Python code, parse errors
+**Do NOT show:** File uploads, notebook cells, raw Python code, parse errors, employer data
 
 ---
 
@@ -94,7 +131,7 @@ You don't need everything ready to apply. Microsoft scales requirements by benef
 ### Core Intelligence (the "brain")
 - SQL-to-knowledge-graph parsing engine (sqlparse + sqlglot)
 - Three-layer graph model (Business Metrics → Calculation Logic → Source Data)
-- 87% parse success rate on 790 real Epic Clarity stored procedures
+- 87% parse success rate on 790 real stored procedures
 - Deterministic, instant, zero-cost extraction
 
 ### Fabric-Native Integration (the "Golden Path")
@@ -105,7 +142,7 @@ You don't need everything ready to apply. Microsoft scales requirements by benef
 - No external infrastructure — runs entirely in customer's Fabric tenant (BYOT)
 
 ### Working POC
-- 687 metrics with full graph traversal
+- Full graph traversal on parsed metrics
 - Data Agent correctly explains "how is X calculated?" with business-friendly criteria
 - PBI report description updater via Fabric REST API
 - Collibra + Purview adapters scaffolded
@@ -120,9 +157,10 @@ You don't need everything ready to apply. Microsoft scales requirements by benef
 |---|---|
 | Manual file upload | "Governance-First Staging Workflow — ensures vetted, high-quality query definitions enter the system" |
 | Notebook-based orchestration | "Developer-persona tooling for data engineers — GUI planned for v2" |
-| 87% parse rate | "Handles 687 real-world healthcare stored procedures with full graph traversal" |
-| No Purview push yet | "Purview adapter architected and scaffolded — pending access role assignment" |
+| 87% parse rate | "Handles real-world healthcare stored procedures with full graph traversal" |
+| No Purview push yet | "Purview adapter architected and scaffolded — integration testing in progress" |
 | No GUI for stewards | "Steward workflow designed with HITL certification — Power App interface on roadmap" |
+| Rebuilding in new environment | "Clean-room development with full IP ownership — enterprise-grade separation of concerns" |
 
 ---
 
@@ -152,15 +190,47 @@ You don't need everything ready to apply. Microsoft scales requirements by benef
 
 ## Key Talking Points
 
-1. **"We built the brain, not just the plumbing."** The SQL parsing engine is the hard part. The transport (API vs manual) is a detail that evolves.
+### For the Application
+1. **"We built the brain, not just the plumbing."** The SQL parsing engine is the hard part — it handles real-world multi-statement stored procedures with temp tables, CTEs, and complex joins. The transport layer (API vs manual) is a detail that evolves.
 
-2. **"Fabric-native, BYOT."** Everything runs in the customer's tenant. No data leaves. No external infrastructure.
+2. **"Fabric-native, BYOT."** Everything runs in the customer's tenant. No data leaves. No external infrastructure. This is the architecture Microsoft wants to see.
 
 3. **"Healthcare demands 100% accuracy."** Our HITL certification workflow ensures data stewards validate every metric definition. The agent refuses to guess — "I don't know" is better than a wrong answer.
 
 4. **"The flywheel."** Every user question either reinforces known metrics (adds weight) or surfaces unknown ones (triggers steward review). Governance grows from usage, not committees.
 
-5. **"Purview is paid for but empty."** Most Fabric customers have Purview but nobody uses it. We fill it automatically. Same for Collibra's bulk loading gap.
+5. **"Purview is paid for but empty."** Most Fabric customers have Purview but nobody uses it. We fill it automatically. Same for Collibra's bulk loading gap that Collibra itself won't build.
+
+### For Conversations with Microsoft
+6. **"We're co-developing with the platform."** We use Fabric Data Agent, Delta tables, MCP protocol, Fabric REST APIs, Purview Data Map APIs. We're building deeper into the Microsoft stack, not around it.
+
+7. **"Clean-room IP."** Built entirely on personal infrastructure with synthetic data. No employer IP conflicts. Ready for investor due diligence.
+
+8. **"We need advisory, not just credits."** The 1:1 technical consultations are what will accelerate us most — architecture reviews, Marketplace submission guidance, and Purview integration best practices.
+
+### For Investor Conversations (Future)
+9. **"87% automated, 13% human-reviewed."** The parse rate demonstrates the engine works at scale. The 13% failures are logged for developer review — transparent, auditable, honest.
+
+10. **"One customer, 790 stored procedures, 687 metrics."** Real validation with real healthcare SQL. Not a toy demo — a production-grade POC.
+
+---
+
+## Sample Data for Demo Environment
+
+To demo without employer data, create synthetic sample data that mirrors the structure:
+
+### Synthetic sql_sources
+- Use the two sample procs already in the repo (`real_census_dashboard.sql`, `real_lote_census.sql`)
+- Scrub any org-specific identifiers (already done)
+- Add 3-5 more synthetic procs with different patterns (simple views, CTE chains, temp tables)
+
+### Synthetic Dictionary
+- Use `clarity_dict_tables.json` already in the repo (generic Clarity table descriptions)
+- Add a few more tables for variety
+
+### Synthetic Graph
+- Run the pipeline against synthetic data
+- The agent should be able to answer questions about these synthetic metrics
 
 ---
 
@@ -168,10 +238,14 @@ You don't need everything ready to apply. Microsoft scales requirements by benef
 
 | Action | When | Effort |
 |---|---|---|
-| Apply Level 1 (LinkedIn + description) | **Today** | 30 min |
 | Register LLC | This week | 1-2 hours |
-| Upload LLC docs → Level 2 | This week | 10 min |
-| Create architecture diagram | This week | 30 min |
-| Record demo video | This week | 2-3 hours |
-| Upload video → Level 3 | This week | 10 min |
+| Register domain | This week | 30 min |
+| Set up business email | This week | 30 min |
+| Create new MSA + Azure | This week | 30 min |
+| Provision Fabric | This week | 1 hour |
+| Deploy code + synthetic data | This week | 2-3 hours |
+| Apply Level 1 | This week | 30 min |
+| Upload LLC → Level 2 | When LLC ready | 10 min |
+| Record demo video | This week or next | 2-3 hours |
+| Upload video → Level 3 | After video | 10 min |
 | Hear back | ~3 business days | Wait |
