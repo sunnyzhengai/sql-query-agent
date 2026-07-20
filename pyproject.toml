@@ -11,6 +11,7 @@ dependencies = [
     "pyyaml~=6.0",
     "pydantic~=2.5",
     "sqlglot~=19.7",
+    "sqlparse>=0.5",
 ]
 
 [project.optional-dependencies]
