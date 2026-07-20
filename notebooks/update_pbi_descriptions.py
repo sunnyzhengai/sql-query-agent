@@ -33,7 +33,10 @@ from src.models import GraphNode, NodeLayer
 # https://app.fabric.microsoft.com/groups/YOUR-WORKSPACE-ID-HERE/...
 WORKSPACE_ID = "REPLACE_WITH_YOUR_WORKSPACE_ID"
 
-updater = FabricPBIUpdater(workspace_id=WORKSPACE_ID)
+# Get token from Fabric (mssparkutils is a global in Fabric notebooks)
+access_token = mssparkutils.credentials.getToken("https://api.fabric.microsoft.com")
+
+updater = FabricPBIUpdater(workspace_id=WORKSPACE_ID, access_token=access_token)
 
 # %% Cell 4: List reports in the workspace
 reports = updater.list_reports()
