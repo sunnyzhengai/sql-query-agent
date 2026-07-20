@@ -15,7 +15,7 @@ To use in Fabric:
 
 # %% Cell 1: Install dependencies
 # Run this cell once per session. Fabric doesn't have these pre-installed.
-%pip install pydantic pyyaml sqlglot openai
+%pip install pydantic pyyaml sqlglot sqlparse
 
 # %% Cell 2: Setup
 import json
@@ -34,43 +34,9 @@ from src.dictionary import DataDictionary
 config = load_config("/lakehouse/default/Files/sql-query-agent/org_config.yaml")
 print(f"Loaded config for: {config.org.name}")
 
-# %% Cell 3b: Configure LLM fallback for parse failures (optional)
-# Set OPENAI_API_KEY to enable LLM extraction for procs that fail deterministic parsing.
-# Set to "" or None to disable (deterministic only).
-import openai
-
-OPENAI_API_KEY = "REPLACE_WITH_YOUR_OPENAI_API_KEY"  # set to "" to disable
-
-llm_backend = None
-if OPENAI_API_KEY:
-    class OpenAIBackend:
-        def __init__(self, api_key, model="gpt-4o-mini", max_tokens=4096):
-            self.client = openai.OpenAI(api_key=api_key)
-            self.model = model
-            self.max_tokens = max_tokens
-
-        def generate(self, prompt):
-            response = self.client.chat.completions.create(
-                model=self.model,
-                messages=[
-                    {"role": "system", "content": "You are a SQL extraction tool. Return only SQL, no explanations."},
-                    {"role": "user", "content": prompt},
-                ],
-                max_tokens=self.max_tokens,
-                temperature=0,
-            )
-            return response.choices[0].message.content.strip()
-
-    llm_backend = OpenAIBackend(api_key=OPENAI_API_KEY)
-    # Quick test
-    try:
-        test = llm_backend.generate("Say OK")
-        print(f"LLM backend ready (model: gpt-4o-mini, test: {test})")
-    except Exception as e:
-        print(f"LLM backend failed: {e} — falling back to deterministic only")
-        llm_backend = None
-else:
-    print("LLM fallback disabled (no API key). Using deterministic parsing only.")
+# %% Cell 3b: Import SQL extractor
+from src.parser.sql_extractor import extract_select_statements
+print("SQL extractor ready (sqlparse-based, deterministic)")
 
 # %% Cell 4: Load data dictionary
 # Supports: managed tables, Delta paths, ABFS cross-workspace paths, and CSV files.
@@ -140,32 +106,14 @@ for table_name, table_info in dictionary.tables.items():
 
 print(f"Created {len(builder.nodes)} technical nodes from dictionary")
 
-# Step 2: Pre-process ALL SQL through LLM to extract clean SQL
-# This removes all procedural T-SQL (DECLARE, IF, GOTO, etc.) and returns
-# only the SELECT/WITH/UNION statements — works for any dialect.
-if llm_backend:
-    print("Step 2a: LLM extracting clean SQL from all procs...")
-    from src.parser.llm_extractor import extract_sql
-    llm_errors = []
-    for i, source in enumerate(sql_sources):
-        try:
-            clean_sql = extract_sql(source["sql"], llm_backend)
-            source["sql"] = clean_sql  # replace raw proc with clean SQL
-        except Exception as e:
-            llm_errors.append((source["metric_id"], str(e)))
-        if (i + 1) % 50 == 0:
-            print(f"    LLM extracted {i + 1}/{len(sql_sources)}...")
-    print(f"  LLM extraction complete: {len(sql_sources) - len(llm_errors)} succeeded, {len(llm_errors)} failed")
-    if llm_errors:
-        for mid, err in llm_errors[:5]:
-            print(f"    LLM error: {mid}: {err[:80]}")
-else:
-    print("Step 2a: LLM extraction disabled (no API key). Using deterministic parsing only.")
-
-# Step 2b: Parse the (now clean) SQL and build the graph
-print("Step 2b: Parsing SQL and building graph...")
+# Step 2: Extract clean SQL and parse into graph
+# Uses sqlparse to extract SELECT/WITH statements (deterministic, instant, free)
+# then sqlglot to parse the structure.
+print("Step 2: Extracting and parsing SQL...")
 parse_errors = []
-for source in sql_sources:
+parse_successes = []
+
+for i, source in enumerate(sql_sources):
     metric_id = source["metric_id"]
     name = source["name"]
     sql = source["sql"]
@@ -175,18 +123,69 @@ for source in sql_sources:
     builder.add_canonical_node(metric_id, name, steward=steward, developer=developer)
 
     try:
-        parsed = parse_sql(sql)
+        # Extract clean SQL using sqlparse
+        clean_sql = extract_select_statements(sql)
+        # Parse the clean SQL using sqlglot
+        parsed = parse_sql(clean_sql)
         builder.build_from_parsed_sql(metric_id, parsed)
+        parse_successes.append({
+            "metric_id": metric_id,
+            "name": name,
+            "cte_count": len(parsed.ctes),
+            "table_count": len(parsed.final_select_tables),
+            "line_count": sql.count("\n") + 1,
+        })
         print(f"  Parsed: {metric_id} ({name}) — {len(parsed.ctes)} CTEs, {len(parsed.final_select_tables)} tables")
     except Exception as e:
-        parse_errors.append((metric_id, str(e)))
+        parse_errors.append({
+            "metric_id": metric_id,
+            "name": name,
+            "error": str(e)[:200],
+            "line_count": sql.count("\n") + 1,
+        })
         print(f"  ERROR parsing {metric_id}: {e}")
 
+    if (i + 1) % 100 == 0:
+        print(f"  Progress: {i + 1}/{len(sql_sources)} ({len(parse_successes)} ok, {len(parse_errors)} errors)")
+
 print(f"\nBuilt graph: {len(builder.nodes)} nodes, {len(builder.edges)} edges")
+print(f"Parsed: {len(parse_successes)}/{len(sql_sources)} ({100 * len(parse_successes) // len(sql_sources)}%)")
+print(f"Errors: {len(parse_errors)}")
+
+# %% Cell 6b: Save parse errors for HITL review
+# Developers are notified to manually review/fix these failed SQL sources.
+from pyspark.sql.types import StringType, StructField, StructType, IntegerType
+
 if parse_errors:
-    print(f"Parse errors: {len(parse_errors)}")
-    for mid, err in parse_errors:
-        print(f"  {mid}: {err[:80]}")
+    errors_schema = StructType([
+        StructField("metric_id", StringType(), False),
+        StructField("name", StringType(), False),
+        StructField("error", StringType(), True),
+        StructField("line_count", IntegerType(), True),
+    ])
+    errors_rows = [(e["metric_id"], e["name"], e["error"], e["line_count"]) for e in parse_errors]
+    errors_df = spark.createDataFrame(errors_rows, schema=errors_schema)
+    errors_df.write.format("delta").mode("overwrite").saveAsTable("parse_errors")
+    print(f"Saved {len(parse_errors)} parse errors to 'parse_errors' table")
+    print("→ Developers: review this table and fix the source SQL for these procs")
+    print("\nTop errors by line count (largest procs):")
+    for e in sorted(parse_errors, key=lambda x: x["line_count"], reverse=True)[:5]:
+        print(f"  {e['metric_id']} ({e['line_count']} lines): {e['error'][:80]}")
+
+# Save parse successes for validation
+if parse_successes:
+    success_schema = StructType([
+        StructField("metric_id", StringType(), False),
+        StructField("name", StringType(), False),
+        StructField("cte_count", IntegerType(), True),
+        StructField("table_count", IntegerType(), True),
+        StructField("line_count", IntegerType(), True),
+    ])
+    success_rows = [(s["metric_id"], s["name"], s["cte_count"], s["table_count"], s["line_count"])
+                    for s in parse_successes]
+    success_df = spark.createDataFrame(success_rows, schema=success_schema)
+    success_df.write.format("delta").mode("overwrite").saveAsTable("parse_successes")
+    print(f"Saved {len(parse_successes)} parse successes to 'parse_successes' table")
 
 # %% Cell 7: Write graph to Delta tables
 from pyspark.sql.types import StringType, StructField, StructType
@@ -323,4 +322,5 @@ print(f"\nOutput tables:")
 print(f"  {config.lakehouse.graph_nodes} — nodes for Data Agent")
 print(f"  {config.lakehouse.graph_edges} — edges for Data Agent")
 print(f"  build_summary — build history (append-only)")
-print(f"\nNext step: Point your Fabric Data Agent at '{config.lakehouse.graph_nodes}' and '{config.lakehouse.graph_edges}'")
+print(f"\nNext step: Point your Fabric Data Agent at '{config.lakehouse.graph_nodes}' "
+      f"and '{config.lakehouse.graph_edges}'")
