@@ -31,8 +31,8 @@ https://www.microsoft.com/en-us/startups
 
 | Tier | Credits | What You Need | Status |
 |---|---|---|---|
-| **Level 1** | $1K | LinkedIn profile + solution description | Ready after environment setup |
-| **Level 2** | $5K | + LLC incorporation docs | Need LLC |
+| **Level 1** | $1K | LinkedIn profile + solution description | **Ready now** |
+| **Level 2** | $5K | + LLC incorporation docs | **Ready (LLC exists)** |
 | **Level 3** | $25K+ | + Verified domain, business email, demo video | Need domain + video |
 
 **Strategy:** Set up your own environment first. Apply for Level 1. Upload LLC docs and demo video to level up. Microsoft prefers seeing your product in your own tenant.
@@ -42,19 +42,38 @@ https://www.microsoft.com/en-us/startups
 ## Step 1: Infrastructure Setup (Do First)
 
 ### Business Identity
-- [ ] **Register LLC** — online in your state (~$50-200, 1-2 hours)
+- [x] **LLC registered** — already exists
 - [ ] **Register domain** — e.g., `dataempowerment.io` ($10-15/year)
 - [ ] **Business email** — set up email matching domain (Google Workspace ~$6/mo or Outlook)
 - [ ] **LinkedIn** — update profile with startup, founder title
 
 ### Azure/Fabric Environment
-- [ ] **New personal MSA** — create fresh Microsoft Account with personal email
-- [ ] **Azure subscription** — create under the new MSA
-- [ ] **Fabric capacity** — provision Fabric trial or paid tier
+
+**IMPORTANT:** Personal Microsoft Accounts (@outlook.com, @gmail.com) CANNOT use Fabric.
+You need a Microsoft 365 Business account to activate Fabric.
+
+- [ ] **M365 Business account** — sign up for M365 Business trial (this creates your work/school identity)
+- [ ] **Azure subscription** — create under the M365 Business account
+- [ ] **Fabric capacity** — activate Fabric (trial available with M365 Business)
+- [ ] **You are now Fabric Admin + Global Admin** — full control, no IT gatekeepers
+- [ ] **Assign yourself all roles** — Purview Data Curator, PBI Admin API, audit logs
 - [ ] **Lakehouse** — create lakehouse, upload sql-query-agent code
 - [ ] **Sample data** — load synthetic Clarity-like data (NOT employer data)
 - [ ] **Data Agent** — create and configure with graph tables + instructions
-- [ ] **Test end-to-end** — verify the agent answers questions in this environment
+- [ ] **Test Purview push** — you have Data Curator role, test the adapter
+- [ ] **Test PBI lineage API** — you have admin access, test the lineage client
+- [ ] **Test audit logs API** — you have admin access, test usage tracking
+- [ ] **Test end-to-end** — verify the full pipeline in your own environment
+
+### Why Your Own Tenant Unblocks Everything
+
+| What was blocked at work | In your own tenant |
+|---|---|
+| Purview Data Curator role | You assign it to yourself |
+| Fabric Audit Logs API | You're the admin |
+| PBI Admin API (lineage) | You're the admin |
+| Service principal creation | You control Entra ID |
+| Data Agent publishing | You're the workspace admin |
 
 ---
 
@@ -86,7 +105,7 @@ https://www.microsoft.com/en-us/startups
 
 ## Step 3: Level Up to Level 2 ($5K)
 
-- [ ] Upload LLC incorporation documents to Founders Hub portal
+- [ ] Upload LLC incorporation documents to Founders Hub portal (LLC already registered)
 
 ---
 
@@ -238,7 +257,7 @@ To demo without employer data, create synthetic sample data that mirrors the str
 
 | Action | When | Effort |
 |---|---|---|
-| Register LLC | This week | 1-2 hours |
+| ~~Register LLC~~ | ~~Done~~ | **Already exists** |
 | Register domain | This week | 30 min |
 | Set up business email | This week | 30 min |
 | Create new MSA + Azure | This week | 30 min |
