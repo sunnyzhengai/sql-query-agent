@@ -47,8 +47,13 @@ def extract_with_scriptdom(raw_sql):
     """Parse T-SQL with ScriptDom and extract SELECT statements."""
     parser = TSql160Parser(True)
     reader = StringReader(raw_sql)
-    errors = None
-    fragment = parser.Parse(reader, errors)
+    parse_result = parser.Parse(reader, None)
+
+    # pythonnet may return a tuple (fragment, errors) or just the fragment
+    if isinstance(parse_result, tuple):
+        fragment = parse_result[0]
+    else:
+        fragment = parse_result
 
     queries = []
     _walk_for_selects(fragment, queries)
