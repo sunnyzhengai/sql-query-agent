@@ -117,76 +117,22 @@ def _preprocess_simple(sql: str) -> str:
     return sql.strip()
 
 
-def parse_sql(sql: str, dialect: str = "tsql", llm_backend=None) -> ParsedSQL:
-    """Parse a SQL statement and extract structure.
+def _parse_single_statement(sql: str, dialect: str) -> ParsedSQL | None:
+    """Parse a single SQL statement and extract structure.
 
-    Extraction strategy (in order):
-    1. proc_normalize — deterministic, handles temp tables → CTEs
-    2. Simple regex preprocessing — lightweight fallback
-    3. LLM extraction — if llm_backend provided, uses LLM to extract clean SQL
-       when both deterministic methods fail
-
-    Args:
-        sql: The SQL statement to parse (can be a full stored procedure).
-        dialect: SQL dialect (default: tsql for SQL Server / Fabric).
-        llm_backend: Optional LLM backend for extraction fallback.
-            Pass an object that implements generate(prompt) -> str.
-
-    Returns:
-        ParsedSQL with extracted CTEs, tables, and columns.
+    Returns ParsedSQL or None if parsing fails.
     """
-    normalized_sql = ""
-    parse_error = None
-
-    if _is_multi_statement(sql):
-        # Multi-statement procedure: use proc_normalize to convert temp tables to CTEs
-        logger.info("Detected multi-statement procedure, using proc_normalize")
-        from src.parser.proc_normalize import ProcNotViewShaped, select_into_to_cte
-        try:
-            normalized_sql = select_into_to_cte(sql, dialect=dialect, emit_create_view=False)
-            logger.info("proc_normalize succeeded (%d chars)", len(normalized_sql))
-        except ProcNotViewShaped as e:
-            logger.warning("Proc not view-shaped (%s: %s), falling back to simple parse", e.reason, e.detail)
-            normalized_sql = _preprocess_simple(sql)
-        except Exception as e:
-            logger.warning("proc_normalize failed (%s), falling back to simple parse", e)
-            normalized_sql = _preprocess_simple(sql)
-    else:
-        # Simple query: lightweight preprocessing
-        normalized_sql = _preprocess_simple(sql)
-        logger.info("Simple query, preprocessed (%d chars)", len(normalized_sql))
-
-    # Parse the normalized SQL
     try:
-        parsed = sqlglot.parse_one(normalized_sql, dialect=dialect)
-    except sqlglot.errors.ParseError as e:
-        parse_error = e
-        parsed = None
+        parsed = sqlglot.parse_one(sql, dialect=dialect)
+    except sqlglot.errors.ParseError:
+        return None
 
-    # If deterministic parsing failed and we have an LLM backend, try LLM extraction
-    if parsed is None and llm_backend is not None:
-        logger.info("Deterministic parse failed, trying LLM extraction")
-        try:
-            from src.parser.llm_extractor import extract_sql
-            llm_sql = extract_sql(sql, llm_backend)
-            normalized_sql = llm_sql
-            parsed = sqlglot.parse_one(llm_sql, dialect=dialect)
-            logger.info("LLM extraction succeeded (%d chars)", len(llm_sql))
-        except Exception as llm_e:
-            logger.error("LLM extraction also failed: %s", llm_e)
-            # Fall through to raise the original error
-
-    if parsed is None:
-        logger.error("Failed to parse SQL: %s", parse_error)
-        raise ValueError(f"Failed to parse SQL: {parse_error}") from parse_error
-
-    result = ParsedSQL(normalized_sql=normalized_sql)
+    result = ParsedSQL(normalized_sql=sql)
 
     # Extract CTEs
     for cte in parsed.find_all(exp.CTE):
         cte_name = cte.alias
         cte_body = cte.this
-
         col_refs = _extract_column_refs(cte_body)
 
         all_table_refs = [t.name for t in cte_body.find_all(exp.Table)]
@@ -194,15 +140,13 @@ def parse_sql(sql: str, dialect: str = "tsql", llm_backend=None) -> ParsedSQL:
         depends_on = [t for t in all_table_refs if t in cte_names]
         physical_tables = [t for t in all_table_refs if t not in cte_names]
 
-        result.ctes.append(
-            CTEInfo(
-                name=cte_name,
-                sql_fragment=cte_body.sql(dialect=dialect),
-                column_refs=col_refs,
-                table_refs=physical_tables,
-                depends_on=depends_on,
-            )
-        )
+        result.ctes.append(CTEInfo(
+            name=cte_name,
+            sql_fragment=cte_body.sql(dialect=dialect),
+            column_refs=col_refs,
+            table_refs=physical_tables,
+            depends_on=depends_on,
+        ))
 
     # Extract final SELECT table/column references
     cte_name_set = {c.name for c in result.ctes}
@@ -215,10 +159,134 @@ def parse_sql(sql: str, dialect: str = "tsql", llm_backend=None) -> ParsedSQL:
             else:
                 if table.name not in result.final_select_tables:
                     result.final_select_tables.append(table.name)
-
         result.final_select_columns = _extract_column_refs(main_select)
 
     return result
+
+
+def _extract_temp_table_name(sql: str) -> str | None:
+    """Extract the #temp table name from a SELECT...INTO #temp statement."""
+    match = re.search(r"\bINTO\s+#(\w+)", sql, re.IGNORECASE)
+    if match:
+        return match.group(1)
+    return None
+
+
+def parse_sql(sql: str, dialect: str = "tsql", llm_backend=None) -> ParsedSQL:
+    """Parse SQL and extract structure. Handles single and multi-statement input.
+
+    Uses the inclusion-based extractor to find SQL queries, then parses
+    each one individually. For multi-statement procs, tracks temp table
+    dependencies across statements.
+
+    Args:
+        sql: The SQL statement or stored procedure to parse.
+        dialect: SQL dialect (default: tsql for SQL Server / Fabric).
+        llm_backend: Optional LLM backend (not used in current architecture).
+
+    Returns:
+        ParsedSQL with extracted CTEs, tables, and columns.
+    """
+    from src.parser.sql_extractor import extract_queries
+
+    # Step 1: Extract individual queries using inclusion-based extractor
+    queries = extract_queries(sql)
+
+    if not queries:
+        logger.warning("No queries extracted from input")
+        raise ValueError("Failed to parse SQL: no SQL queries found in input")
+
+    # Step 2: If only one query, parse it directly
+    if len(queries) == 1:
+        result = _parse_single_statement(queries[0], dialect)
+        if result:
+            return result
+        raise ValueError(f"Failed to parse SQL: {queries[0][:100]}...")
+
+    # Step 3: Multiple queries — parse each individually, merge results
+    logger.info("Parsing %d extracted queries individually", len(queries))
+
+    all_ctes: list[CTEInfo] = []
+    all_final_tables: list[str] = []
+    all_final_cte_refs: list[str] = []
+    all_final_columns: list[ColumnRef] = []
+    temp_table_names: set[str] = set()  # track #temp tables defined in this proc
+    parsed_count = 0
+
+    for i, query in enumerate(queries):
+        # Check if this query writes to a temp table
+        temp_name = _extract_temp_table_name(query)
+        if temp_name:
+            temp_table_names.add(temp_name)
+
+        # Parse the individual query
+        result = _parse_single_statement(query, dialect)
+        if result is None:
+            logger.warning("Failed to parse query %d/%d: %s...", i + 1, len(queries), query[:60])
+            continue
+
+        parsed_count += 1
+
+        # If this query writes to a temp table, treat it as a CTE definition
+        if temp_name:
+            # Create a CTE entry for this temp table staging query
+            fragment = query[:500] if len(query) > 500 else query
+            # Collect table refs from this query (exclude temp tables and CTE names)
+            all_table_refs = list(result.final_select_tables)
+            cte_table_refs = [t for t in all_table_refs if t not in temp_table_names]
+            cte_depends = [t for t in all_table_refs if t in temp_table_names]
+
+            all_ctes.append(CTEInfo(
+                name=temp_name,
+                sql_fragment=fragment,
+                column_refs=result.final_select_columns,
+                table_refs=cte_table_refs,
+                depends_on=cte_depends,
+            ))
+
+            # Also include any CTEs from within this query (WITH...SELECT INTO #temp)
+            for cte in result.ctes:
+                all_ctes.append(cte)
+        else:
+            # This is a terminal SELECT (no INTO #temp)
+            # Include its CTEs
+            for cte in result.ctes:
+                all_ctes.append(cte)
+
+            # Track its table references
+            for t in result.final_select_tables:
+                if t not in all_final_tables:
+                    all_final_tables.append(t)
+            for t in result.final_select_cte_refs:
+                if t not in all_final_cte_refs:
+                    all_final_cte_refs.append(t)
+            all_final_columns.extend(result.final_select_columns)
+
+    if parsed_count == 0:
+        raise ValueError(f"Failed to parse SQL: none of {len(queries)} extracted queries parsed successfully")
+
+    # Build the merged result
+    # Add temp table references to final_cte_refs (the final SELECT reads from temps)
+    for t in all_final_tables[:]:
+        if t in temp_table_names:
+            all_final_tables.remove(t)
+            if t not in all_final_cte_refs:
+                all_final_cte_refs.append(t)
+
+    merged = ParsedSQL(
+        ctes=all_ctes,
+        final_select_tables=all_final_tables,
+        final_select_cte_refs=all_final_cte_refs,
+        final_select_columns=all_final_columns,
+        normalized_sql=";\n".join(queries),
+    )
+
+    logger.info(
+        "Merged %d/%d queries: %d CTEs, %d final tables, %d CTE refs",
+        parsed_count, len(queries),
+        len(merged.ctes), len(merged.final_select_tables), len(merged.final_select_cte_refs),
+    )
+    return merged
 
 
 def _extract_column_refs(node: exp.Expression) -> list[ColumnRef]:
