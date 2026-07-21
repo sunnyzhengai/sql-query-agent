@@ -88,10 +88,124 @@ def _get_statement_type(stmt: Statement) -> str | None:
     return stmt.get_type()
 
 
+def _deep_clean(body: str) -> str:
+    """Remove all non-query constructs that sqlparse splitting may miss."""
+
+    # Remove SSMS boilerplate before CREATE PROC
+    body = re.sub(
+        r"\A.*?(?=CREATE\s+(?:OR\s+(?:ALTER|REPLACE)\s+)?(?:PROCEDURE|PROC|VIEW|FUNCTION)\b)",
+        "", body, flags=re.IGNORECASE | re.DOTALL,
+    )
+
+    # Remove USE [database]
+    body = re.sub(r"^\s*USE\s+\[?\w+\]?\s*;?\s*$", "", body, flags=re.MULTILINE | re.IGNORECASE)
+
+    # Remove GO batch separators
+    body = re.sub(r"^\s*GO\s*$", "", body, flags=re.MULTILINE | re.IGNORECASE)
+
+    # Remove all SET statements (multi-word variants)
+    body = re.sub(
+        r"^\s*SET\s+(?:NOCOUNT|ANSI_NULLS|ANSI_PADDING|ANSI_WARNINGS|ARITHABORT|"
+        r"CONCAT_NULL_YIELDS_NULL|QUOTED_IDENTIFIER|NUMERIC_ROUNDABORT|"
+        r"XACT_ABORT|DATEFIRST|DATEFORMAT|DEADLOCK_PRIORITY|FMTONLY|"
+        r"IDENTITY_INSERT|LANGUAGE|LOCK_TIMEOUT|ROWCOUNT|TEXTSIZE|"
+        r"TRANSACTION\s+ISOLATION\s+LEVEL)\s+[\w\s]+;?\s*$",
+        "", body, flags=re.MULTILINE | re.IGNORECASE,
+    )
+
+    # Remove SET @variable = ... (single line)
+    body = re.sub(r"^\s*SET\s+@\w+\s*=.*?;?\s*$", "", body, flags=re.MULTILINE | re.IGNORECASE)
+
+    # Remove all DECLARE blocks (single and multi-line with commas)
+    body = re.sub(
+        r"\bDECLARE\s+@[\s\S]*?(?=\b(?:SELECT|WITH|INSERT|IF|BEGIN|DROP|CREATE\s+INDEX|;)\b)",
+        "", body, flags=re.IGNORECASE,
+    )
+    # Catch remaining single-line DECLARE
+    body = re.sub(r"^\s*DECLARE\s+.*$", "", body, flags=re.MULTILINE | re.IGNORECASE)
+
+    # Remove DROP TABLE statements
+    body = re.sub(r"\bDROP\s+TABLE\s+(?:IF\s+EXISTS\s+)?#?\w+\s*;?", "", body, flags=re.IGNORECASE)
+
+    # Remove IF OBJECT_ID(...) DROP TABLE guards
+    body = re.sub(
+        r"IF\s+OBJECT_ID\s*\([^)]*\)\s+IS\s+NOT\s+NULL\s+"
+        r"(?:BEGIN\s+)?DROP\s+TABLE\s+#\w+\s*;?(?:\s+END)?\s*;?",
+        "", body, flags=re.IGNORECASE,
+    )
+
+    # Remove CREATE INDEX on temp or regular tables
+    body = re.sub(
+        r"\bCREATE\s+(?:UNIQUE\s+)?(?:CLUSTERED\s+|NONCLUSTERED\s+)?INDEX\s+\w+\s+ON\s+#?\w+\s*\([^)]*\)\s*;?",
+        "", body, flags=re.IGNORECASE,
+    )
+
+    # Remove PRINT statements (with parens or without)
+    body = re.sub(r"\bPRINT\s*\(.*?\)\s*;?", "", body, flags=re.IGNORECASE)
+    body = re.sub(r"\bPRINT\s+'[^']*'\s*;?", "", body, flags=re.IGNORECASE)
+
+    # Remove GOTO / labels
+    body = re.sub(r"^\s*GOTO\s+\w+\s*;?\s*$", "", body, flags=re.MULTILINE | re.IGNORECASE)
+    body = re.sub(r"^\s*\w+:\s*$", "", body, flags=re.MULTILINE)
+
+    # Remove RETURN statements
+    body = re.sub(r"^\s*RETURN\b.*$", "", body, flags=re.MULTILINE | re.IGNORECASE)
+
+    # Remove EXEC/EXECUTE statements
+    body = re.sub(r"^\s*EXEC(?:UTE)?\s+.*$", "", body, flags=re.MULTILINE | re.IGNORECASE)
+
+    # Remove RAISERROR / THROW
+    body = re.sub(r"^\s*RAISERROR\b.*$", "", body, flags=re.MULTILINE | re.IGNORECASE)
+    body = re.sub(r"^\s*THROW\b.*$", "", body, flags=re.MULTILINE | re.IGNORECASE)
+
+    # Remove OPTION(...) query hints
+    body = re.sub(r"\bOPTION\s*\([^)]*\)\s*;?", "", body, flags=re.IGNORECASE)
+
+    # Remove INSERT INTO #temp VALUES(...) — seed data (multi-line aware)
+    body = re.sub(
+        r"\bINSERT\s+INTO\s+#\w+\s*(?:\([^)]*\))?\s*VALUES\s*\([^)]*\)\s*;?",
+        "", body, flags=re.IGNORECASE,
+    )
+
+    # Remove simple IF blocks (IF ... BEGIN ... END)
+    # Non-greedy to avoid eating nested structures
+    body = re.sub(
+        r"\bIF\b[^;]*?\bBEGIN\b[\s\S]*?\bEND\s*;?",
+        "", body, flags=re.IGNORECASE,
+    )
+
+    # Remove standalone IF (single line, no BEGIN)
+    body = re.sub(r"^\s*IF\s+.*$", "", body, flags=re.MULTILINE | re.IGNORECASE)
+
+    # Remove WHILE loops
+    body = re.sub(
+        r"\bWHILE\b[\s\S]*?\bBEGIN\b[\s\S]*?\bEND\s*;?",
+        "", body, flags=re.IGNORECASE,
+    )
+
+    # Remove BEGIN TRY / BEGIN CATCH blocks
+    body = re.sub(
+        r"\bBEGIN\s+TRY\b[\s\S]*?\bEND\s+TRY\b\s*\bBEGIN\s+CATCH\b[\s\S]*?\bEND\s+CATCH\b\s*;?",
+        "", body, flags=re.IGNORECASE,
+    )
+
+    # Remove standalone BEGIN/END (outer wrapper)
+    body = re.sub(r"^\s*BEGIN\s*$", "", body, flags=re.MULTILINE | re.IGNORECASE)
+    body = re.sub(r"^\s*END\s*;?\s*$", "", body, flags=re.MULTILINE | re.IGNORECASE)
+
+    # Remove comment-only lines that look like SQL (e.g., "--SELECT * FROM #temp")
+    body = re.sub(r"^\s*--.*$", "", body, flags=re.MULTILINE)
+
+    # Remove block comments that span multiple lines
+    body = re.sub(r"/\*[\s\S]*?\*/", "", body)
+
+    return body.strip()
+
+
 def extract_select_statements(sql: str) -> str:
     """Extract only SELECT/WITH/UNION statements from a stored procedure.
 
-    Uses sqlparse to split into statements and filter by type.
+    Uses aggressive stripping + sqlparse splitting + type filtering.
     Deterministic, instant, zero-cost.
 
     Args:
@@ -103,10 +217,10 @@ def extract_select_statements(sql: str) -> str:
     # Step 1: Strip the proc wrapper
     body = _strip_proc_wrapper(sql)
 
-    # Step 2: Strip procedural preamble
-    body = _strip_preamble(body)
+    # Step 2: Deep clean — remove all non-query constructs
+    body = _deep_clean(body)
 
-    # Step 3: Replace @variables with placeholders (sqlparse handles them better than sqlglot)
+    # Step 3: Replace @variables with placeholders
     body = re.sub(r"@(\w+)", r"__param_\1__", body)
 
     # Step 4: Split into individual statements using sqlparse
@@ -118,7 +232,11 @@ def extract_select_statements(sql: str) -> str:
 
     for stmt_text in statements:
         stmt_text = stmt_text.strip()
-        if not stmt_text or stmt_text == ";":
+        if not stmt_text or stmt_text == ";" or len(stmt_text) < 5:
+            continue
+
+        # Skip if it's just a comment remnant or whitespace
+        if all(line.strip().startswith("--") or not line.strip() for line in stmt_text.split("\n")):
             continue
 
         parsed = sqlparse.parse(stmt_text)
@@ -128,29 +246,33 @@ def extract_select_statements(sql: str) -> str:
         stmt = parsed[0]
         stmt_type = _get_statement_type(stmt)
 
-        # Keep SELECT statements (includes WITH...SELECT, UNION, etc.)
-        if stmt_type == "SELECT":
+        # Get the first meaningful token (skip whitespace/comments)
+        first_word = ""
+        for line in stmt_text.split("\n"):
+            stripped = line.strip()
+            if stripped and not stripped.startswith("--") and not stripped.startswith("/*"):
+                first_word = stripped.split()[0].upper() if stripped.split() else ""
+                break
+
+        # Keep SELECT statements
+        if stmt_type == "SELECT" or first_word == "SELECT":
             kept.append(stmt_text)
             continue
 
-        # Keep statements that start with WITH (CTEs) — sqlparse may type these as None
-        first_token = stmt_text.strip().split()[0].upper() if stmt_text.strip() else ""
-        if first_token in ("WITH", "SELECT"):
+        # Keep WITH (CTE) statements
+        if first_word == "WITH":
             kept.append(stmt_text)
             continue
 
-        # Keep INSERT...SELECT INTO #temp (staging queries with business logic)
-        if stmt_type == "INSERT" and re.search(r"\bSELECT\b", stmt_text, re.IGNORECASE):
-            kept.append(stmt_text)
-            continue
+        # Keep INSERT...SELECT (staging queries with business logic)
+        if (stmt_type == "INSERT" or first_word == "INSERT") and re.search(r"\bSELECT\b", stmt_text, re.IGNORECASE):
+            # But NOT INSERT INTO #temp VALUES (seed data without SELECT)
+            if not re.search(r"\bVALUES\s*\(", stmt_text, re.IGNORECASE):
+                kept.append(stmt_text)
+                continue
 
-        # Keep SELECT...INTO #temp (staging queries)
-        if "INTO" in stmt_text.upper() and "SELECT" in stmt_text.upper():
-            kept.append(stmt_text)
-            continue
-
-        # Drop everything else (SET, DECLARE, DROP, CREATE INDEX, PRINT, IF, etc.)
-        dropped.append((stmt_type or "UNKNOWN", stmt_text[:60]))
+        # Drop everything else
+        dropped.append((stmt_type or first_word or "UNKNOWN", stmt_text[:60]))
 
     if dropped:
         logger.info("Dropped %d non-query statements: %s",
@@ -159,7 +281,6 @@ def extract_select_statements(sql: str) -> str:
 
     if not kept:
         logger.warning("No SELECT statements found after filtering")
-        # Return the body as-is and let sqlglot try
         return body
 
     result = ";\n".join(kept)
