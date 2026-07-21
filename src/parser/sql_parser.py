@@ -117,11 +117,42 @@ def _preprocess_simple(sql: str) -> str:
     return sql.strip()
 
 
+def _clean_extracted_query(sql: str) -> str:
+    """Light cleanup on an individual extracted query before sqlglot parsing.
+
+    Unlike the old _preprocess_simple which tried to clean entire procs,
+    this only cleans individual query statements that the extractor already
+    isolated. Much safer because the SQL is already a single SELECT/WITH.
+    """
+    # Remove OPTION(...) query hints
+    sql = re.sub(r"\bOPTION\s*\([^)]*\)\s*;?", "", sql, flags=re.IGNORECASE)
+
+    # Remove trailing semicolons
+    sql = sql.rstrip().rstrip(";").rstrip()
+
+    # Remove inline comments that break parsing (but keep block comments)
+    # Only remove single-line comments at the END of lines, not comment-only lines
+    sql = re.sub(r"--[^\n]*$", "", sql, flags=re.MULTILINE)
+
+    # Remove block comments
+    sql = re.sub(r"/\*[\s\S]*?\*/", "", sql)
+
+    # Strip #temp table names to plain names (sqlglot may not handle # prefix)
+    sql = re.sub(r"#(\w+)", r"__temp_\1__", sql)
+
+    return sql.strip()
+
+
 def _parse_single_statement(sql: str, dialect: str) -> ParsedSQL | None:
     """Parse a single SQL statement and extract structure.
 
-    Returns ParsedSQL or None if parsing fails.
+    Applies light cleanup before parsing. Returns ParsedSQL or None if parsing fails.
     """
+    sql = _clean_extracted_query(sql)
+
+    if not sql:
+        return None
+
     try:
         parsed = sqlglot.parse_one(sql, dialect=dialect)
     except sqlglot.errors.ParseError:
