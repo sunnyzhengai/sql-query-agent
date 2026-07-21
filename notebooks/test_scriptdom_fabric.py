@@ -41,69 +41,88 @@ from System.IO import StringReader
 
 print("ScriptDom loaded successfully!")
 
-# %% Cell 3: Build the extractor
-class SelectExtractor(TSqlFragmentVisitor):
-    """Visits the ScriptDom AST and collects SELECT statements."""
+# %% Cell 3: Build the extractor (manual AST walk, no visitor subclass)
 
-    def __init__(self):
-        super().__init__()
-        self.queries = []
+def extract_with_scriptdom(raw_sql):
+    """Parse T-SQL with ScriptDom and extract SELECT statements."""
+    parser = TSql160Parser(True)
+    reader = StringReader(raw_sql)
+    errors = None
+    fragment = parser.Parse(reader, errors)
 
-    def Visit(self, node):
-        if isinstance(node, SelectStatement):
-            sql = self._get_text(node)
+    queries = []
+    _walk_for_selects(fragment, queries)
+    return queries
+
+
+def _walk_for_selects(node, queries):
+    """Recursively walk the AST and collect SELECT/INSERT...SELECT nodes."""
+    if node is None:
+        return
+
+    node_type = node.GetType().Name
+
+    if node_type == "SelectStatement":
+        sql = _get_fragment_text(node)
+        if sql:
+            queries.append({
+                "type": "SELECT",
+                "start_line": node.StartLine,
+                "sql": sql,
+            })
+        return  # Don't walk into children (subqueries are part of this SQL)
+
+    if node_type == "InsertStatement":
+        spec = node.InsertSpecification
+        if spec and spec.InsertSource and spec.InsertSource.GetType().Name == "SelectInsertSource":
+            sql = _get_fragment_text(node)
             if sql:
-                self.queries.append({
-                    "type": "SELECT",
+                queries.append({
+                    "type": "INSERT_SELECT",
                     "start_line": node.StartLine,
                     "sql": sql,
                 })
-        elif isinstance(node, InsertStatement):
-            # Keep INSERT...SELECT (has business logic)
-            spec = node.InsertSpecification
-            if spec and isinstance(spec.InsertSource, SelectInsertSource):
-                sql = self._get_text(node)
-                if sql:
-                    self.queries.append({
-                        "type": "INSERT_SELECT",
-                        "start_line": node.StartLine,
-                        "sql": sql,
-                    })
-        # Continue visiting children
-        super().Visit(node)
+            return
 
-    def _get_text(self, fragment):
-        """Extract the original SQL text from the token stream."""
-        tokens = fragment.ScriptTokenStream
-        if tokens is None:
-            return ""
-        start = fragment.FirstTokenIndex
-        end = fragment.LastTokenIndex
-        if start < 0 or end < 0:
-            return ""
-        parts = []
-        for i in range(start, end + 1):
-            if i < tokens.Count:
-                parts.append(tokens[i].Text)
-        return "".join(parts)
+    # Walk children using reflection
+    try:
+        for prop in node.GetType().GetProperties():
+            try:
+                value = prop.GetValue(node)
+                if value is None:
+                    continue
+
+                # If it's a TSqlFragment, recurse
+                if hasattr(value, "StartLine"):
+                    _walk_for_selects(value, queries)
+
+                # If it's a collection, iterate
+                elif hasattr(value, "Count"):
+                    for j in range(value.Count):
+                        item = value[j]
+                        if hasattr(item, "StartLine"):
+                            _walk_for_selects(item, queries)
+            except Exception:
+                continue
+    except Exception:
+        pass
 
 
-def extract_with_scriptdom(raw_sql):
-    """Parse T-SQL with ScriptDom and extract SELECT statements.
+def _get_fragment_text(fragment):
+    """Extract original SQL text from the token stream."""
+    tokens = fragment.ScriptTokenStream
+    if tokens is None:
+        return ""
+    start = fragment.FirstTokenIndex
+    end = fragment.LastTokenIndex
+    if start < 0 or end < 0:
+        return ""
+    parts = []
+    for i in range(start, end + 1):
+        if i < tokens.Count:
+            parts.append(tokens[i].Text)
+    return "".join(parts)
 
-    Returns a list of dicts with 'type', 'start_line', 'sql'.
-    """
-    parser = TSql160Parser(True)
-    reader = StringReader(raw_sql)
-    fragment, errors = parser.Parse(reader, None)
-
-    if errors and errors.Count > 0:
-        for err in errors:
-            print(f"  ScriptDom warning: Line {err.Line}, Col {err.Column}: {err.Message}")
-
-    extractor = SelectExtractor()
-    fragment.Accept(extractor)
-    return extractor.queries
 
 print("Extractor ready!")
 
