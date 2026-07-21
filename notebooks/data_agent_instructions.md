@@ -126,22 +126,88 @@ Show the current system status:
 - "Who is the steward for [metric]?" → read from canonical node properties
 
 ### /errors — Parse Error Report
-- Show metrics that failed to parse in the latest build
-- Query build_summary for error details
-- Suggest: "These metrics need manual review or the source SQL needs cleanup"
+When asked about errors, query the `extraction_inspection` and `error_log` tables:
+
+**Overview:**
+```sql
+SELECT
+  COUNT(*) as total,
+  SUM(CASE WHEN parse_ok = true THEN 1 ELSE 0 END) as passed,
+  SUM(CASE WHEN parse_ok = false THEN 1 ELSE 0 END) as failed
+FROM extraction_inspection
+```
+
+**List specific failures:**
+```sql
+SELECT metric_id, line_count, query_count, parse_error
+FROM extraction_inspection
+WHERE parse_ok = false
+ORDER BY line_count DESC
+```
+
+**Show details for a specific error (e.g., "/errors USP_IPSO_SEVERE_SEPSIS"):**
+```sql
+SELECT metric_id, line_count, query_count, parse_error, clean_sql
+FROM extraction_inspection
+WHERE metric_id = 'USP_IPSO_SEVERE_SEPSIS'
+```
+Show the user: the proc name, how many lines it has, what error occurred, and a preview of the extracted SQL so they can see exactly what broke.
+
+**Error history across runs:**
+```sql
+SELECT run_timestamp, metric_id, error_type, status, error_message
+FROM error_log
+ORDER BY run_timestamp DESC
+```
+Status values: "new" (first time failing), "known" (failed before, still failing), "regressed" (was passing, now failing), "resolved" (was failing, now passing).
+
+### /regressions — Regression Detection
+```sql
+SELECT metric_id, error_message
+FROM error_log
+WHERE status = 'regressed'
+AND run_id = (SELECT MAX(run_id) FROM error_log)
+```
+If any results: "WARNING: These metrics previously passed but now fail. This may indicate a bug in the latest update."
+If no results: "No regressions detected. All previously-passing metrics still pass."
+
+### /resolved — Recently Fixed
+```sql
+SELECT DISTINCT metric_id
+FROM error_log e1
+WHERE NOT EXISTS (
+  SELECT 1 FROM error_log e2
+  WHERE e2.metric_id = e1.metric_id
+  AND e2.run_id = (SELECT MAX(run_id) FROM error_log)
+)
+AND e1.run_id = (SELECT MAX(run_id) FROM error_log WHERE run_id < (SELECT MAX(run_id) FROM error_log))
+```
+Show metrics that failed in the previous run but are no longer in the latest error log.
 
 ### /coverage — Coverage Report
-Show how complete the knowledge graph is:
-- Total SQL sources loaded
-- Successfully parsed (with edges)
-- Failed to parse (no edges)
-- Metrics with descriptions vs without
-- Metrics with stewards vs without
+```sql
+SELECT
+  (SELECT COUNT(*) FROM graph_nodes WHERE layer = 'canonical') as total_metrics,
+  (SELECT COUNT(DISTINCT source_id) FROM graph_edges WHERE edge_type = 'canonical_to_transform') as with_edges,
+  (SELECT COUNT(*) FROM graph_nodes WHERE layer = 'canonical' AND description IS NOT NULL AND description != '') as with_descriptions,
+  (SELECT COUNT(*) FROM graph_nodes WHERE layer = 'canonical' AND properties LIKE '%"steward"%' AND properties NOT LIKE '%"steward": null%') as with_stewards
+```
+Report:
+- Total metrics: X
+- With graph edges (traversable): Y (Z%)
+- With descriptions: A (B%)
+- With stewards assigned: C (D%)
 
 ### /health — System Health Check
-- Confirm graph_nodes and graph_edges tables exist and have data
-- Check last build timestamp
-- Report any anomalies (empty tables, missing edges, etc.)
+1. Confirm tables exist and have data:
+```sql
+SELECT 'graph_nodes' as tbl, COUNT(*) as rows FROM graph_nodes
+UNION ALL SELECT 'graph_edges', COUNT(*) FROM graph_edges
+UNION ALL SELECT 'extraction_inspection', COUNT(*) FROM extraction_inspection
+UNION ALL SELECT 'error_log', COUNT(*) FROM error_log
+```
+2. Check last build: `SELECT MAX(run_timestamp) FROM error_log`
+3. Report any anomalies (zero rows, missing tables)
 
 ---
 
