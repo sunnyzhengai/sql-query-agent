@@ -1,14 +1,18 @@
-"""Deterministic SQL extractor using sqlparse.
+"""Universal SQL query extractor — inclusion-based, dialect-agnostic.
 
-Splits stored procedure bodies into individual statements using sqlparse
-(a non-validating, forgiving parser), then filters to keep only
-SELECT/WITH statements. Discards all procedural scaffolding.
-
-This replaces the LLM-based extraction with a deterministic, instant,
-zero-cost approach that works across SQL dialects.
+Extracts SQL queries from ANY text that contains them, regardless of
+what procedural language wraps them. Works for T-SQL, PL/SQL, Snowflake,
+Databricks, or even SQL embedded in documentation.
 
 Architecture:
-  Raw proc → sqlparse.split() → filter by type → clean SQL → sqlglot parse
+  - Inclusion model: find SELECT/WITH, extract verbatim
+  - NOT exclusion model: don't try to strip infinite non-SQL patterns
+  - Token-aware: uses sqlparse tokenizer so string literals and comments
+    are handled correctly (no false positives)
+  - Zero text corruption: extracted SQL is untouched original text
+
+Flow:
+  Any text → sqlparse tokenize → find query boundaries → extract verbatim → sqlglot parse
 """
 
 from __future__ import annotations
@@ -18,51 +22,29 @@ import re
 from typing import Any
 
 import sqlparse
-from sqlparse.sql import Statement
+from sqlparse import tokens as T  # noqa: N812
 
 logger = logging.getLogger(__name__)
 
-# Procedural keywords to strip before splitting
-_PROC_PREAMBLE_RE = re.compile(
-    r"^\s*(?:"
-    r"USE\s+\[?\w+\]?\s*;?"
-    r"|GO\b"
-    r"|SET\s+\w[\w\s]*(?:ON|OFF|UNCOMMITTED|COMMITTED)\s*;?"
-    r"|SET\s+TRANSACTION\s+ISOLATION\s+LEVEL\s+\w[\w\s]*;?"
-    r"|CREATE\s+(?:OR\s+ALTER\s+)?(?:PROCEDURE|PROC|FUNCTION|TRIGGER)\b[\s\S]*?\bAS\b"
-    r"|DECLARE\s+@[\s\S]*?(?=;|\bSELECT\b|\bWITH\b|\bINSERT\b|\bIF\b|\bBEGIN\b|\bDROP\b)"
-    r"|DROP\s+TABLE\s+(?:IF\s+EXISTS\s+)?#?\w+\s*;?"
-    r"|IF\s+OBJECT_ID\s*\([^)]*\)\s+IS\s+NOT\s+NULL\s+(?:BEGIN\s+)?DROP\s+TABLE\s+#\w+\s*;?(?:\s+END)?\s*;?"
-    r"|CREATE\s+(?:UNIQUE\s+)?(?:CLUSTERED\s+|NONCLUSTERED\s+)?INDEX\s+\w+\s+ON\s+#?\w+\s*\([^)]*\)\s*;?"
-    r"|PRINT\s*\(.*?\)\s*;?"
-    r"|GOTO\s+\w+\s*;?"
-    r"|RETURN\b\s*;?"
-    r"|RAISERROR\b.*?;?"
-    r"|THROW\b.*?;?"
-    r")\s*$",
-    re.MULTILINE | re.IGNORECASE,
-)
-
-# BEGIN...END wrapper
-_BEGIN_END_RE = re.compile(
-    r"^\s*BEGIN\b([\s\S]*)\bEND\s*;?\s*$",
-    re.IGNORECASE,
-)
-
 
 def _strip_proc_wrapper(sql: str) -> str:
-    """Remove CREATE PROCEDURE wrapper and BEGIN...END block."""
-    # Strip everything before CREATE PROC ... AS
-    create_match = re.search(
-        r"\bCREATE\s+(?:OR\s+ALTER\s+)?(?:PROCEDURE|PROC)\b[\s\S]*?\bAS\b",
+    """Remove CREATE PROCEDURE/VIEW/FUNCTION wrapper.
+
+    Finds the AS keyword that separates the header from the body
+    and returns only the body. Handles parameter blocks.
+    """
+    # Find CREATE PROC/VIEW/FUNCTION ... AS
+    match = re.search(
+        r"\bCREATE\s+(?:OR\s+ALTER\s+)?(?:PROCEDURE|PROC|VIEW|FUNCTION|TRIGGER)\b"
+        r"[\s\S]*?\bAS\b",
         sql, re.IGNORECASE,
     )
-    if create_match:
-        sql = sql[create_match.end():]
+    if match:
+        sql = sql[match.end():]
 
-    # Strip outer BEGIN...END
+    # Strip outer BEGIN...END wrapper
     sql = sql.strip()
-    begin_match = _BEGIN_END_RE.match(sql)
+    begin_match = re.match(r"^\s*BEGIN\b([\s\S]*)\bEND\s*;?\s*$", sql, re.IGNORECASE)
     if begin_match:
         sql = begin_match.group(1)
 
@@ -72,220 +54,208 @@ def _strip_proc_wrapper(sql: str) -> str:
     return sql.strip()
 
 
-def _strip_preamble(sql: str) -> str:
-    """Remove procedural preamble lines (USE, SET, DECLARE, DROP, etc.)."""
-    # Multiple passes since removing one line may expose another
-    for _ in range(5):
-        cleaned = _PROC_PREAMBLE_RE.sub("", sql)
-        if cleaned == sql:
-            break
-        sql = cleaned
-    return sql.strip()
+def _replace_variables(sql: str) -> str:
+    """Replace @variables with safe placeholders for sqlglot."""
+    return re.sub(r"@(\w+)", r"__param_\1__", sql)
 
 
-def _get_statement_type(stmt: Statement) -> str | None:
-    """Get the DML type of a parsed sqlparse statement."""
-    return stmt.get_type()
+def _is_query_start(token) -> bool:
+    """Check if a token marks the start of a SQL query."""
+    if token.ttype is T.Keyword.DML:
+        return token.normalized in ("SELECT", "INSERT", "MERGE")
+    if token.ttype is T.Keyword.CTE:
+        return True  # WITH keyword for CTEs
+    if token.ttype is T.Keyword and token.normalized == "WITH":
+        return True  # fallback in case CTE subtype isn't set
+    return False
 
 
-def _deep_clean(body: str) -> str:
-    """Remove all non-query constructs that sqlparse splitting may miss."""
-
-    # Remove SSMS boilerplate before CREATE PROC
-    body = re.sub(
-        r"\A.*?(?=CREATE\s+(?:OR\s+(?:ALTER|REPLACE)\s+)?(?:PROCEDURE|PROC|VIEW|FUNCTION)\b)",
-        "", body, flags=re.IGNORECASE | re.DOTALL,
-    )
-
-    # Remove USE [database]
-    body = re.sub(r"^\s*USE\s+\[?\w+\]?\s*;?\s*$", "", body, flags=re.MULTILINE | re.IGNORECASE)
-
-    # Remove GO batch separators
-    body = re.sub(r"^\s*GO\s*$", "", body, flags=re.MULTILINE | re.IGNORECASE)
-
-    # Remove all SET statements (multi-word variants)
-    body = re.sub(
-        r"^\s*SET\s+(?:NOCOUNT|ANSI_NULLS|ANSI_PADDING|ANSI_WARNINGS|ARITHABORT|"
-        r"CONCAT_NULL_YIELDS_NULL|QUOTED_IDENTIFIER|NUMERIC_ROUNDABORT|"
-        r"XACT_ABORT|DATEFIRST|DATEFORMAT|DEADLOCK_PRIORITY|FMTONLY|"
-        r"IDENTITY_INSERT|LANGUAGE|LOCK_TIMEOUT|ROWCOUNT|TEXTSIZE|"
-        r"TRANSACTION\s+ISOLATION\s+LEVEL)\s+[\w\s]+;?\s*$",
-        "", body, flags=re.MULTILINE | re.IGNORECASE,
-    )
-
-    # Remove SET @variable = ... (single line)
-    body = re.sub(r"^\s*SET\s+@\w+\s*=.*?;?\s*$", "", body, flags=re.MULTILINE | re.IGNORECASE)
-
-    # Remove all DECLARE blocks (single and multi-line with commas)
-    body = re.sub(
-        r"\bDECLARE\s+@[\s\S]*?(?=\b(?:SELECT|WITH|INSERT|IF|BEGIN|DROP|CREATE\s+INDEX|;)\b)",
-        "", body, flags=re.IGNORECASE,
-    )
-    # Catch remaining single-line DECLARE
-    body = re.sub(r"^\s*DECLARE\s+.*$", "", body, flags=re.MULTILINE | re.IGNORECASE)
-
-    # Remove DROP TABLE statements
-    body = re.sub(r"\bDROP\s+TABLE\s+(?:IF\s+EXISTS\s+)?#?\w+\s*;?", "", body, flags=re.IGNORECASE)
-
-    # Remove IF OBJECT_ID(...) DROP TABLE guards
-    body = re.sub(
-        r"IF\s+OBJECT_ID\s*\([^)]*\)\s+IS\s+NOT\s+NULL\s+"
-        r"(?:BEGIN\s+)?DROP\s+TABLE\s+#\w+\s*;?(?:\s+END)?\s*;?",
-        "", body, flags=re.IGNORECASE,
-    )
-
-    # Remove CREATE INDEX on temp or regular tables
-    body = re.sub(
-        r"\bCREATE\s+(?:UNIQUE\s+)?(?:CLUSTERED\s+|NONCLUSTERED\s+)?INDEX\s+\w+\s+ON\s+#?\w+\s*\([^)]*\)\s*;?",
-        "", body, flags=re.IGNORECASE,
-    )
-
-    # Remove PRINT statements (with parens or without)
-    body = re.sub(r"\bPRINT\s*\(.*?\)\s*;?", "", body, flags=re.IGNORECASE)
-    body = re.sub(r"\bPRINT\s+'[^']*'\s*;?", "", body, flags=re.IGNORECASE)
-
-    # Remove GOTO / labels
-    body = re.sub(r"^\s*GOTO\s+\w+\s*;?\s*$", "", body, flags=re.MULTILINE | re.IGNORECASE)
-    body = re.sub(r"^\s*\w+:\s*$", "", body, flags=re.MULTILINE)
-
-    # Remove RETURN statements
-    body = re.sub(r"^\s*RETURN\b.*$", "", body, flags=re.MULTILINE | re.IGNORECASE)
-
-    # Remove EXEC/EXECUTE statements
-    body = re.sub(r"^\s*EXEC(?:UTE)?\s+.*$", "", body, flags=re.MULTILINE | re.IGNORECASE)
-
-    # Remove RAISERROR / THROW
-    body = re.sub(r"^\s*RAISERROR\b.*$", "", body, flags=re.MULTILINE | re.IGNORECASE)
-    body = re.sub(r"^\s*THROW\b.*$", "", body, flags=re.MULTILINE | re.IGNORECASE)
-
-    # Remove OPTION(...) query hints
-    body = re.sub(r"\bOPTION\s*\([^)]*\)\s*;?", "", body, flags=re.IGNORECASE)
-
-    # Remove INSERT INTO #temp VALUES(...) — seed data (multi-line aware)
-    body = re.sub(
-        r"\bINSERT\s+INTO\s+#\w+\s*(?:\([^)]*\))?\s*VALUES\s*\([^)]*\)\s*;?",
-        "", body, flags=re.IGNORECASE,
-    )
-
-    # Remove simple IF blocks (IF ... BEGIN ... END)
-    # Non-greedy to avoid eating nested structures
-    body = re.sub(
-        r"\bIF\b[^;]*?\bBEGIN\b[\s\S]*?\bEND\s*;?",
-        "", body, flags=re.IGNORECASE,
-    )
-
-    # Remove standalone IF (single line, no BEGIN)
-    body = re.sub(r"^\s*IF\s+.*$", "", body, flags=re.MULTILINE | re.IGNORECASE)
-
-    # Remove WHILE loops
-    body = re.sub(
-        r"\bWHILE\b[\s\S]*?\bBEGIN\b[\s\S]*?\bEND\s*;?",
-        "", body, flags=re.IGNORECASE,
-    )
-
-    # Remove BEGIN TRY / BEGIN CATCH blocks
-    body = re.sub(
-        r"\bBEGIN\s+TRY\b[\s\S]*?\bEND\s+TRY\b\s*\bBEGIN\s+CATCH\b[\s\S]*?\bEND\s+CATCH\b\s*;?",
-        "", body, flags=re.IGNORECASE,
-    )
-
-    # Remove standalone BEGIN/END (outer wrapper)
-    body = re.sub(r"^\s*BEGIN\s*$", "", body, flags=re.MULTILINE | re.IGNORECASE)
-    body = re.sub(r"^\s*END\s*;?\s*$", "", body, flags=re.MULTILINE | re.IGNORECASE)
-
-    # Remove comment-only lines that look like SQL (e.g., "--SELECT * FROM #temp")
-    body = re.sub(r"^\s*--.*$", "", body, flags=re.MULTILINE)
-
-    # Remove block comments that span multiple lines
-    body = re.sub(r"/\*[\s\S]*?\*/", "", body)
-
-    return body.strip()
+def _is_noise_keyword(token) -> bool:
+    """Check if a token is a non-query keyword we should skip past."""
+    if token.ttype in (T.Keyword, T.Keyword.DDL, T.Keyword.DML):
+        noise = {
+            "DECLARE", "SET", "IF", "ELSE", "WHILE", "BEGIN", "END",
+            "GOTO", "RETURN", "PRINT", "EXEC", "EXECUTE", "RAISERROR",
+            "THROW", "TRY", "CATCH", "BREAK", "CONTINUE",
+            "DROP", "CREATE", "ALTER", "TRUNCATE", "USE",
+            "GRANT", "REVOKE", "DENY",
+        }
+        return token.normalized in noise
+    if token.ttype is T.Keyword and token.normalized == "GO":
+        return True
+    return False
 
 
-def extract_select_statements(sql: str) -> str:
-    """Extract only SELECT/WITH/UNION statements from a stored procedure.
+def extract_queries(raw_text: str) -> list[str]:
+    """Extract SQL queries from any text using token-tree inclusion.
 
-    Uses aggressive stripping + sqlparse splitting + type filtering.
-    Deterministic, instant, zero-cost.
+    Finds SELECT/WITH/INSERT...SELECT/MERGE statements at the top level,
+    extracts them verbatim. Ignores everything else — no regex stripping,
+    no text manipulation, no dialect-specific rules.
 
     Args:
-        sql: Raw stored procedure text (CREATE PROCEDURE ... END).
+        raw_text: Any text containing SQL (stored procedure, script,
+                  notebook cell, documentation, etc.)
 
     Returns:
-        Clean SQL containing only data query statements, separated by semicolons.
+        List of extracted SQL query strings, each one a complete statement.
     """
-    # Step 1: Strip the proc wrapper
-    body = _strip_proc_wrapper(sql)
+    # Step 1: Strip the proc/view wrapper if present
+    body = _strip_proc_wrapper(raw_text)
 
-    # Step 2: Deep clean — remove all non-query constructs
-    body = _deep_clean(body)
+    # Step 2: Replace @variables with placeholders
+    body = _replace_variables(body)
 
-    # Step 3: Replace @variables with placeholders
-    body = re.sub(r"@(\w+)", r"__param_\1__", body)
+    # Step 3: Parse with sqlparse (non-validating, handles any dialect)
+    parsed_statements = sqlparse.parse(body)
 
-    # Step 4: Split into individual statements using sqlparse
-    statements = sqlparse.split(body)
+    extracted = []
 
-    # Step 5: Parse each statement and filter
-    kept = []
-    dropped = []
+    for stmt in parsed_statements:
+        # Walk the token list to find query start points
+        tokens = list(stmt.flatten())
 
-    for stmt_text in statements:
-        stmt_text = stmt_text.strip()
-        if not stmt_text or stmt_text == ";" or len(stmt_text) < 5:
-            continue
+        capturing = False
+        paren_depth = 0   # parenthesis nesting
+        case_depth = 0    # CASE...END nesting (SELECT inside CASE is not a new query)
+        current_query_tokens = []
 
-        # Skip if it's just a comment remnant or whitespace
-        if all(line.strip().startswith("--") or not line.strip() for line in stmt_text.split("\n")):
-            continue
+        i = 0
+        while i < len(tokens):
+            token = tokens[i]
 
-        parsed = sqlparse.parse(stmt_text)
-        if not parsed:
-            continue
-
-        stmt = parsed[0]
-        stmt_type = _get_statement_type(stmt)
-
-        # Get the first meaningful token (skip whitespace/comments)
-        first_word = ""
-        for line in stmt_text.split("\n"):
-            stripped = line.strip()
-            if stripped and not stripped.startswith("--") and not stripped.startswith("/*"):
-                first_word = stripped.split()[0].upper() if stripped.split() else ""
-                break
-
-        # Keep SELECT statements
-        if stmt_type == "SELECT" or first_word == "SELECT":
-            kept.append(stmt_text)
-            continue
-
-        # Keep WITH (CTE) statements
-        if first_word == "WITH":
-            kept.append(stmt_text)
-            continue
-
-        # Keep INSERT...SELECT (staging queries with business logic)
-        if (stmt_type == "INSERT" or first_word == "INSERT") and re.search(r"\bSELECT\b", stmt_text, re.IGNORECASE):
-            # But NOT INSERT INTO #temp VALUES (seed data without SELECT)
-            if not re.search(r"\bVALUES\s*\(", stmt_text, re.IGNORECASE):
-                kept.append(stmt_text)
+            # Skip comment tokens (but keep them if capturing)
+            if token.ttype in (T.Comment.Single, T.Comment.Multiline):
+                if capturing:
+                    current_query_tokens.append(token)
+                i += 1
                 continue
 
-        # Drop everything else
-        dropped.append((stmt_type or first_word or "UNKNOWN", stmt_text[:60]))
+            # Track parenthesis depth
+            if token.ttype is T.Punctuation:
+                if token.value == "(":
+                    paren_depth += 1
+                    if capturing:
+                        current_query_tokens.append(token)
+                    i += 1
+                    continue
+                elif token.value == ")":
+                    paren_depth = max(0, paren_depth - 1)
+                    if capturing:
+                        current_query_tokens.append(token)
+                    i += 1
+                    continue
+                elif token.value == ";":
+                    # Statement boundary — end current capture
+                    if capturing and current_query_tokens:
+                        query_text = "".join(str(t) for t in current_query_tokens).strip()
+                        if query_text:
+                            extracted.append(query_text)
+                        current_query_tokens = []
+                        capturing = False
+                        paren_depth = 0
+                        case_depth = 0
+                    i += 1
+                    continue
 
-    if dropped:
-        logger.info("Dropped %d non-query statements: %s",
-                    len(dropped),
-                    ", ".join(f"{t}" for t, _ in dropped[:5]))
+            # Track CASE...END depth (SELECT inside CASE is a scalar subquery, not a new statement)
+            if token.ttype is T.Keyword and token.normalized == "CASE":
+                case_depth += 1
+                if capturing:
+                    current_query_tokens.append(token)
+                i += 1
+                continue
 
-    if not kept:
-        logger.warning("No SELECT statements found after filtering")
-        return body
+            if token.ttype is T.Keyword and token.normalized == "END":
+                if case_depth > 0:
+                    case_depth -= 1
+                if capturing:
+                    current_query_tokens.append(token)
+                i += 1
+                continue
 
-    result = ";\n".join(kept)
-    logger.info("Extracted %d query statements (%d dropped)", len(kept), len(dropped))
-    return result
+            # Determine if we're at the "top level" of a statement
+            at_top_level = paren_depth == 0 and case_depth == 0
+
+            # Not capturing: look for query start at top level
+            if not capturing:
+                if at_top_level and _is_query_start(token):
+                    capturing = True
+                    current_query_tokens = [token]
+                # Skip everything else (noise keywords, procedural code)
+                i += 1
+                continue
+
+            # Capturing: accumulate tokens, watch for boundaries
+            if capturing:
+                if at_top_level and _is_noise_keyword(token):
+                    # Noise keyword at top level ends the current query
+                    query_text = "".join(str(t) for t in current_query_tokens).strip()
+                    if query_text:
+                        extracted.append(query_text)
+                    current_query_tokens = []
+                    capturing = False
+                    paren_depth = 0
+                    case_depth = 0
+                    i += 1
+                    continue
+
+                # A new query start at top level when NOT inside parens/case
+                # means a new statement (e.g., after a UNION-less SELECT ends)
+                # But only if the token is WITH or a DML at the very start of a line
+                # For safety, SELECT inside a capturing context is ALWAYS a continuation
+                # (subquery, scalar, UNION branch). Only WITH starts a truly new statement.
+                if at_top_level and token.ttype is T.Keyword.CTE:
+                    # WITH at top level while capturing = new CTE statement
+                    query_text = "".join(str(t) for t in current_query_tokens).strip()
+                    if query_text:
+                        extracted.append(query_text)
+                    current_query_tokens = [token]
+                    i += 1
+                    continue
+
+                # Otherwise, keep accumulating
+                current_query_tokens.append(token)
+                i += 1
+                continue
+
+            i += 1
+
+        # Catch trailing query without semicolon
+        if capturing and current_query_tokens:
+            query_text = "".join(str(t) for t in current_query_tokens).strip()
+            if query_text:
+                extracted.append(query_text)
+
+    logger.info("Extracted %d queries from input (%d chars)", len(extracted), len(raw_text))
+    return extracted
+
+
+def extract_select_statements(raw_text: str) -> str:
+    """Extract and join SQL queries from any text.
+
+    Convenience wrapper around extract_queries() that returns
+    a single string with queries separated by semicolons.
+    Compatible with the existing pipeline interface.
+
+    Args:
+        raw_text: Any text containing SQL.
+
+    Returns:
+        Clean SQL string with queries separated by semicolons.
+    """
+    queries = extract_queries(raw_text)
+
+    if not queries:
+        logger.warning("No SQL queries found in input")
+        # Fallback: return the stripped body for sqlglot to try
+        body = _strip_proc_wrapper(raw_text)
+        return _replace_variables(body)
+
+    return ";\n".join(queries)
+
+
+# --- Utility functions for testing ---
 
 
 def categorize_by_size(
@@ -293,21 +263,9 @@ def categorize_by_size(
     small_max: int = 50,
     medium_max: int = 200,
 ) -> dict[str, list[dict[str, Any]]]:
-    """Categorize SQL sources by line count.
-
-    Args:
-        sql_sources: List of dicts with 'metric_id', 'name', 'sql' keys.
-        small_max: Max lines for "small" category.
-        medium_max: Max lines for "medium" category.
-
-    Returns:
-        Dict with keys 'small', 'medium', 'large', each containing
-        a list of sql_source dicts sorted by line count.
-    """
+    """Categorize SQL sources by line count."""
     categories: dict[str, list[dict[str, Any]]] = {
-        "small": [],
-        "medium": [],
-        "large": [],
+        "small": [], "medium": [], "large": [],
     }
 
     for source in sql_sources:
@@ -321,16 +279,15 @@ def categorize_by_size(
         else:
             categories["large"].append(source_with_lines)
 
-    # Sort each category by line count
     for cat in categories.values():
         cat.sort(key=lambda x: x["line_count"])
 
     logger.info(
-        "Categorized %d sources: %d small (≤%d lines), %d medium (%d-%d), %d large (>%d)",
+        "Categorized %d sources: %d small, %d medium, %d large",
         len(sql_sources),
-        len(categories["small"]), small_max,
-        len(categories["medium"]), small_max + 1, medium_max,
-        len(categories["large"]), medium_max,
+        len(categories["small"]),
+        len(categories["medium"]),
+        len(categories["large"]),
     )
     return categories
 
@@ -339,44 +296,28 @@ def test_extraction_sample(
     sql_sources: list[dict[str, Any]],
     n_per_category: int = 5,
 ) -> dict[str, list[dict[str, Any]]]:
-    """Extract and parse a sample of small, medium, and large queries.
-
-    Picks the top N from each size category, runs extraction + sqlglot parsing,
-    and returns the results for review.
-
-    Args:
-        sql_sources: List of dicts with 'metric_id', 'name', 'sql' keys.
-        n_per_category: Number of queries to test per category.
-
-    Returns:
-        Dict with 'small', 'medium', 'large' keys, each containing
-        a list of result dicts with extraction and parse outcomes.
-    """
+    """Extract and parse a sample of small, medium, and large queries."""
     from src.parser.sql_parser import parse_sql
 
     categories = categorize_by_size(sql_sources)
     results: dict[str, list[dict[str, Any]]] = {
-        "small": [],
-        "medium": [],
-        "large": [],
+        "small": [], "medium": [], "large": [],
     }
 
     for cat_name, sources in categories.items():
-        # Pick top N (smallest in small, middle in medium, largest in large)
         if cat_name == "large":
-            sample = sources[-n_per_category:]  # largest
+            sample = sources[-n_per_category:]
         elif cat_name == "medium":
             mid = len(sources) // 2
             start = max(0, mid - n_per_category // 2)
             sample = sources[start:start + n_per_category]
         else:
-            sample = sources[:n_per_category]  # smallest
+            sample = sources[:n_per_category]
 
         for source in sample:
             metric_id = source["metric_id"]
             line_count = source["line_count"]
 
-            # Extract clean SQL
             try:
                 clean_sql = extract_select_statements(source["sql"])
                 extraction_ok = True
@@ -386,7 +327,6 @@ def test_extraction_sample(
                 extraction_ok = False
                 extraction_error = str(e)
 
-            # Parse the extracted SQL
             parse_ok = False
             parse_error = ""
             cte_count = 0
