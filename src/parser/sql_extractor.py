@@ -87,11 +87,12 @@ def _is_noise_keyword(token) -> bool:
 
 
 def extract_queries(raw_text: str) -> list[str]:
-    """Extract SQL queries from any text using token-tree inclusion.
+    """Extract SQL queries from any text using a two-phase approach.
 
-    Finds SELECT/WITH/INSERT...SELECT/MERGE statements at the top level,
-    extracts them verbatim. Ignores everything else — no regex stripping,
-    no text manipulation, no dialect-specific rules.
+    Phase 1: sqlparse.split() to find statement boundaries
+             (handles missing semicolons in T-SQL)
+    Phase 2: Token-walk each statement to keep only query statements
+             (SELECT, WITH, INSERT...SELECT), drop procedural noise
 
     Args:
         raw_text: Any text containing SQL (stored procedure, script,
@@ -106,126 +107,124 @@ def extract_queries(raw_text: str) -> list[str]:
     # Step 2: Replace @variables with placeholders
     body = _replace_variables(body)
 
-    # Step 3: Parse with sqlparse (non-validating, handles any dialect)
-    parsed_statements = sqlparse.parse(body)
+    # Step 3: Split into individual statements using sqlparse
+    # sqlparse handles missing semicolons, BEGIN...END blocks, etc.
+    split_statements = sqlparse.split(body)
 
+    # Step 4: Filter each statement — keep only queries
     extracted = []
 
-    for stmt in parsed_statements:
-        # Walk the token list to find query start points
-        tokens = list(stmt.flatten())
+    for stmt_text in split_statements:
+        stmt_text = stmt_text.strip()
+        if not stmt_text or stmt_text == ";" or len(stmt_text) < 5:
+            continue
 
-        capturing = False
-        paren_depth = 0   # parenthesis nesting
-        case_depth = 0    # CASE...END nesting (SELECT inside CASE is not a new query)
-        current_query_tokens = []
+        # Parse the statement to check its type
+        parsed = sqlparse.parse(stmt_text)
+        if not parsed:
+            continue
 
-        i = 0
-        while i < len(tokens):
-            token = tokens[i]
+        stmt = parsed[0]
 
-            # Skip comment tokens (but keep them if capturing)
-            if token.ttype in (T.Comment.Single, T.Comment.Multiline):
-                if capturing:
-                    current_query_tokens.append(token)
-                i += 1
-                continue
+        # Check if this statement is a query
+        if _is_query_statement(stmt, stmt_text):
+            extracted.append(stmt_text)
+            continue
 
-            # Track parenthesis depth
-            if token.ttype is T.Punctuation:
-                if token.value == "(":
-                    paren_depth += 1
-                    if capturing:
-                        current_query_tokens.append(token)
-                    i += 1
-                    continue
-                elif token.value == ")":
-                    paren_depth = max(0, paren_depth - 1)
-                    if capturing:
-                        current_query_tokens.append(token)
-                    i += 1
-                    continue
-                elif token.value == ";":
-                    # Statement boundary — end current capture
-                    if capturing and current_query_tokens:
-                        query_text = "".join(str(t) for t in current_query_tokens).strip()
-                        if query_text:
-                            extracted.append(query_text)
-                        current_query_tokens = []
-                        capturing = False
-                        paren_depth = 0
-                        case_depth = 0
-                    i += 1
-                    continue
+        # If not a direct query, check if it contains embedded queries
+        # (e.g., IF...BEGIN...END wrapping a SELECT)
+        # Try re-splitting the statement body
+        if "SELECT" in stmt_text.upper() or "WITH" in stmt_text.upper():
+            inner_queries = _extract_inner_queries(stmt_text)
+            extracted.extend(inner_queries)
 
-            # Track CASE...END depth (SELECT inside CASE is a scalar subquery, not a new statement)
-            if token.ttype is T.Keyword and token.normalized == "CASE":
-                case_depth += 1
-                if capturing:
-                    current_query_tokens.append(token)
-                i += 1
-                continue
+    logger.info("Extracted %d queries from %d statements (%d chars input)",
+                len(extracted), len(split_statements), len(raw_text))
+    return extracted
 
-            if token.ttype is T.Keyword and token.normalized == "END":
-                if case_depth > 0:
-                    case_depth -= 1
-                if capturing:
-                    current_query_tokens.append(token)
-                i += 1
-                continue
 
-            # Determine if we're at the "top level" of a statement
-            at_top_level = paren_depth == 0 and case_depth == 0
+def _extract_inner_queries(stmt_text: str) -> list[str]:
+    """Extract SELECT/WITH queries embedded inside non-query blocks.
 
-            # Not capturing: look for query start at top level
-            if not capturing:
-                if at_top_level and _is_query_start(token):
-                    capturing = True
-                    current_query_tokens = [token]
-                # Skip everything else (noise keywords, procedural code)
-                i += 1
-                continue
+    Handles cases like IF...BEGIN SELECT...END where sqlparse groups
+    the entire IF block as one statement but there's a valid SELECT inside.
+    """
+    inner = []
+    # Try to find SELECT/WITH statements by re-parsing the inner content
+    # Strip common wrappers
+    cleaned = re.sub(r"\bIF\b[\s\S]*?\bBEGIN\b", "", stmt_text, flags=re.IGNORECASE)
+    cleaned = re.sub(r"\bEND\b", "", cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r"\bBEGIN\b", "", cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r"\bELSE\b", "", cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r"\bPRINT\b.*", "", cleaned, flags=re.IGNORECASE)
+    cleaned = cleaned.strip()
 
-            # Capturing: accumulate tokens, watch for boundaries
-            if capturing:
-                if at_top_level and _is_noise_keyword(token):
-                    # Noise keyword at top level ends the current query
-                    query_text = "".join(str(t) for t in current_query_tokens).strip()
-                    if query_text:
-                        extracted.append(query_text)
-                    current_query_tokens = []
-                    capturing = False
-                    paren_depth = 0
-                    case_depth = 0
-                    i += 1
-                    continue
+    if not cleaned:
+        return inner
 
-                # A new query start at top level when NOT inside parens/case
-                # means a new statement (e.g., after a UNION-less SELECT ends)
-                # But only if the token is WITH or a DML at the very start of a line
-                # For safety, SELECT inside a capturing context is ALWAYS a continuation
-                # (subquery, scalar, UNION branch). Only WITH starts a truly new statement.
-                if at_top_level and token.ttype is T.Keyword.CTE:
-                    # WITH at top level while capturing = new CTE statement
-                    query_text = "".join(str(t) for t in current_query_tokens).strip()
-                    if query_text:
-                        extracted.append(query_text)
-                    current_query_tokens = [token]
-                    i += 1
-                    continue
+    # Re-split the cleaned content
+    sub_statements = sqlparse.split(cleaned)
+    for sub in sub_statements:
+        sub = sub.strip()
+        if not sub or len(sub) < 5:
+            continue
+        parsed = sqlparse.parse(sub)
+        if parsed and _is_query_statement(parsed[0], sub):
+            inner.append(sub)
 
-                # Otherwise, keep accumulating
-                current_query_tokens.append(token)
-                i += 1
-                continue
+    return inner
 
-            i += 1
 
-        # Catch trailing query without semicolon
-        if capturing and current_query_tokens:
-            query_text = "".join(str(t) for t in current_query_tokens).strip()
-            if query_text:
-                extracted.append(query_text)
+def _is_query_statement(stmt: Statement, stmt_text: str) -> bool:
+    """Determine if a sqlparse Statement is a data query we should keep.
+
+    Uses both the statement type and token inspection to decide.
+    """
+    stmt_type = stmt.get_type()
+
+    # Definite keeps
+    if stmt_type == "SELECT":
+        return True
+
+    # Check the first meaningful token (skip comments and whitespace)
+    first_word = ""
+    for token in stmt.flatten():
+        if token.ttype in (T.Comment.Single, T.Comment.Multiline,
+                           T.Whitespace, T.Newline):
+            continue
+        first_word = token.normalized or token.value.upper()
+        break
+
+    # WITH (CTE) — sqlparse may not type these as SELECT
+    if first_word == "WITH":
+        return True
+
+    # SELECT that sqlparse didn't type (happens with complex queries)
+    if first_word == "SELECT":
+        return True
+
+    # INSERT...SELECT (has business logic, not just INSERT VALUES)
+    if first_word == "INSERT" or stmt_type == "INSERT":
+        upper = stmt_text.upper()
+        if "SELECT" in upper and "VALUES" not in upper:
+            return True
+        if "SELECT" in upper:
+            return True
+        return False
+
+    # MERGE (some procs use MERGE for upserts)
+    if first_word == "MERGE":
+        return True
+
+    # Statement typed as None but contains SELECT (common for complex T-SQL)
+    if stmt_type is None and "SELECT" in stmt_text.upper():
+        # Check that SELECT is an actual keyword, not in a comment
+        for token in stmt.flatten():
+            if token.ttype is T.Keyword.DML and token.normalized == "SELECT":
+                return True
+
+    # Everything else is noise
+    return False
 
     logger.info("Extracted %d queries from input (%d chars)", len(extracted), len(raw_text))
     return extracted
