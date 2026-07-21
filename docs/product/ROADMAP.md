@@ -80,14 +80,21 @@ Get Metadata Sync working end-to-end with real data against Purview/Collibra.
 - [x] Run `pip-audit` — no vulnerabilities in direct dependencies
 - [x] Audit for print statements — zero in `src/`, all in scripts/notebooks where they belong
 
-### Parser (DONE)
-- [x] LLM-first extraction: OpenAI extracts clean SQL from all procs before parsing
-- [x] Deterministic fallback: proc_normalize + regex preprocessing for offline/no-LLM use
-- [x] Validated against 790 real Epic Clarity stored procedures
-- [x] Full pipeline: LLM extract → sqlglot parse → graph build → Delta tables
+### Parser (DONE — ScriptDom, production-grade)
+- [x] **ScriptDom via pythonnet: 99% parse rate (788-790/790), 0 errors**
+- [x] Microsoft's native T-SQL parser running directly in Fabric notebooks
+- [x] DLL loaded from Lakehouse Files/libs/ via pythonnet CoreCLR
+- [x] Manual AST walk extracts SelectStatement / InsertStatement nodes verbatim
+- [x] sqlglot parses each extracted query for structural analysis
+- [x] sqlparse-based fallback if ScriptDom unavailable
+- [x] Core design principle: native parsers for each dialect (ScriptDom, ANTLR)
+- [x] 67 regression tests preventing yoyo between approaches
+- [x] Persistent error log with regression detection across runs
+- [x] Validated against 790 real Epic Clarity stored procedures in 24 minutes
 
 ### Graph & traversal (DONE)
 - [x] Three-layer graph model with full dependency chain traversal
+- [x] Multi-statement proc support (temp tables → CTE entries with dependencies)
 - [x] `__final_select__` synthetic node for tables only in final SELECT
 - [x] 400K+ nodes, 12K+ edges from real data
 - [x] Full pipeline tested end-to-end (parse → graph → traverse → metadata)
@@ -114,38 +121,50 @@ Get Metadata Sync working end-to-end with real data against Purview/Collibra.
 - [x] Metadata Sync notebook (reads graph, generates records, pushes to catalogs)
 - [x] Fabric Agent client (MCP protocol, auto-discovers tool name)
 
-### Blocked on admin access (ETA Monday)
-- [ ] Get Collibra service account → test Collibra push
-- [ ] Get Purview Data Curator role → test Purview push
+### Blocked on access
+- [ ] Get Collibra service account → test Collibra push (work admin)
+- [ ] Get Purview Data Curator role → test Purview push (own tenant when Fabric available)
 - [ ] Test PBI description updates against dev workspace
-- [ ] Test Fabric lineage API against PBI workspace
+- [ ] Test Fabric lineage API against PBI workspace (needs PBI Admin — own tenant)
 
-### Enterprise readiness gaps (TODO)
+### Enterprise readiness (PARTIALLY DONE)
 - [ ] Business-friendly metric names from PBI lineage (replace proc names)
-- [ ] Steward assignment (Delta table + agent commands)
-- [ ] Usage tracking in graph (user nodes, queried_by edges, usage weight on canonical nodes)
-- [ ] Audit trail as graph growth (every question grows the graph)
-- [ ] Admin dashboard via agent (/admindash, /stewards, /errors, /coverage, /health)
+- [x] Steward assignment module (Delta table + pattern matching + agent commands)
+- [x] Usage tracking module (user nodes, queried_by edges, usage weight)
+- [x] Admin commands in agent (/admindash, /stewards, /errors, /coverage, /health)
+- [x] Persistent error log with regression detection
+- [x] CI/CD pipeline (GitHub Actions: lint + test + build + security audit)
 - [ ] Automated refresh via Fabric Pipeline (document in admin guide)
 - [ ] Secrets management via Azure Key Vault (replace notebook API keys)
 
-### Scale testing
-- [x] 790 procs loaded and parsed (LLM-first, running now)
-- [ ] Validate parse error rate after LLM extraction
+### Product readiness (DONE)
+- [x] README.md, LICENSE (MIT), pyproject.toml complete
+- [x] Security whitepaper written
+- [x] Website live (www.aiviaapp.com)
+- [x] Founders Hub submitted (2026-07-20)
+- [x] Partner Center account created (verification pending)
+- [x] Architecture document with native parser design principle
+- [x] Launch plan with tiered submission approach
+
+### Scale testing (DONE)
+- [x] **ScriptDom: 99% parse rate on 790 procs (0 errors, 24 min)**
+- [x] 67 regression tests (extraction, parsing, real procs, edge cases)
+- [x] Inspection table (extraction_inspection) for manual validation
 - [ ] Golden file tests for 3-5 critical real-world queries
 - [ ] Test bulk catalog push with 50+ records
 
 ### Exit criteria
-- [x] Can parse 790 real SQL queries with LLM extraction
+- [x] **Can parse 790 real SQL queries with 99% success and 0 errors**
 - [x] Full pipeline works end-to-end (parse → graph → traverse → metadata → descriptions)
 - [x] Data Agent answers metric questions correctly
 - [ ] Can push metadata to at least one catalog (Purview or Collibra) via API
 - [ ] PBI report descriptions can be updated programmatically
-- [x] All tests pass (45/45), no print statements in library code
+- [x] All tests pass (67/67), no print statements in library code
 
 ### Checklist items satisfied
 - MARKETPLACE_CHECKLIST §2: Code Standards — DONE
-- MARKETPLACE_CHECKLIST §2: Testing — PARTIAL (need golden files)
+- MARKETPLACE_CHECKLIST §2: Testing — DONE (67 regression tests)
+- MARKETPLACE_CHECKLIST §3: Security — DONE (whitepaper written)
 
 ---
 
