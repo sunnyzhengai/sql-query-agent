@@ -1,0 +1,17 @@
+{
+  "version": 2,
+  "dgSpecHash": "EWU1dtZm7VA=",
+  "success": true,
+  "projectFilePath": "/Users/sunnyzheng/sql-query-agent/services/sql-extractor/SqlExtractor/SqlExtractor.csproj",
+  "expectedPackageFiles": [
+    "/Users/sunnyzheng/.nuget/packages/microsoft.aspnetcore.openapi/8.0.29/microsoft.aspnetcore.openapi.8.0.29.nupkg.sha512",
+    "/Users/sunnyzheng/.nuget/packages/microsoft.extensions.apidescription.server/6.0.5/microsoft.extensions.apidescription.server.6.0.5.nupkg.sha512",
+    "/Users/sunnyzheng/.nuget/packages/microsoft.openapi/1.6.14/microsoft.openapi.1.6.14.nupkg.sha512",
+    "/Users/sunnyzheng/.nuget/packages/microsoft.sqlserver.transactsql.scriptdom/180.37.3/microsoft.sqlserver.transactsql.scriptdom.180.37.3.nupkg.sha512",
+    "/Users/sunnyzheng/.nuget/packages/swashbuckle.aspnetcore/6.6.2/swashbuckle.aspnetcore.6.6.2.nupkg.sha512",
+    "/Users/sunnyzheng/.nuget/packages/swashbuckle.aspnetcore.swagger/6.6.2/swashbuckle.aspnetcore.swagger.6.6.2.nupkg.sha512",
+    "/Users/sunnyzheng/.nuget/packages/swashbuckle.aspnetcore.swaggergen/6.6.2/swashbuckle.aspnetcore.swaggergen.6.6.2.nupkg.sha512",
+    "/Users/sunnyzheng/.nuget/packages/swashbuckle.aspnetcore.swaggerui/6.6.2/swashbuckle.aspnetcore.swaggerui.6.6.2.nupkg.sha512"
+  ],
+  "logs": []
+}

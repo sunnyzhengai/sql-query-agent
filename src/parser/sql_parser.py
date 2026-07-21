@@ -203,25 +203,42 @@ def _extract_temp_table_name(sql: str) -> str | None:
     return None
 
 
-def parse_sql(sql: str, dialect: str = "tsql", llm_backend=None) -> ParsedSQL:
+def parse_sql(sql: str, dialect: str = "tsql", llm_backend=None,
+              scriptdom_url: str = "") -> ParsedSQL:
     """Parse SQL and extract structure. Handles single and multi-statement input.
 
-    Uses the inclusion-based extractor to find SQL queries, then parses
-    each one individually. For multi-statement procs, tracks temp table
-    dependencies across statements.
+    Extraction strategy:
+    1. ScriptDom (if service is running) — 100% accurate T-SQL parsing
+    2. sqlparse-based extractor — fallback if ScriptDom unavailable
 
     Args:
         sql: The SQL statement or stored procedure to parse.
         dialect: SQL dialect (default: tsql for SQL Server / Fabric).
         llm_backend: Optional LLM backend (not used in current architecture).
+        scriptdom_url: URL of ScriptDom microservice (default: tries localhost:5111).
 
     Returns:
         ParsedSQL with extracted CTEs, tables, and columns.
     """
-    from src.parser.sql_extractor import extract_queries
+    queries = None
 
-    # Step 1: Extract individual queries using inclusion-based extractor
-    queries = extract_queries(sql)
+    # Try ScriptDom first (production-grade, 100% accurate for T-SQL)
+    if scriptdom_url or dialect == "tsql":
+        try:
+            from src.parser.scriptdom_extractor import ScriptDomExtractor
+            url = scriptdom_url or "http://localhost:5111"
+            extractor = ScriptDomExtractor(url)
+            if extractor.is_healthy():
+                queries = extractor.extract_sql_strings(sql)
+                logger.info("ScriptDom extracted %d queries", len(queries))
+        except Exception as e:
+            logger.info("ScriptDom not available (%s), falling back to sqlparse", e)
+
+    # Fallback to sqlparse-based extractor
+    if queries is None:
+        from src.parser.sql_extractor import extract_queries as sqlparse_extract
+        queries = sqlparse_extract(sql)
+        logger.info("sqlparse extracted %d queries", len(queries))
 
     if not queries:
         logger.warning("No queries extracted from input")
