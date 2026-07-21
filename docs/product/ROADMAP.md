@@ -12,6 +12,20 @@ No fixed dates — phases have exit criteria, not deadlines. Update this as you 
 
 Both components live in a single repo (`sql-query-agent`) and ship as one `.whl` package.
 
+## Data Source Tiers (validated by coworker feedback 2026-07-21)
+
+| Tier | Data Source | Parser | Market |
+|------|------------|--------|--------|
+| **Tier 1** | Fabric-native (semantic models, lakehouses, SQL endpoints) | ScriptDom (T-SQL) | Fabric-first customers, greenfield |
+| **Tier 2** | On-prem SQL Server (stored procs, views) | ScriptDom (T-SQL) | Healthcare, finance, legacy enterprise |
+| **Tier 3** | On-prem Oracle (PL/SQL packages, views) | ANTLR PL/SQL grammar | Large enterprise, government |
+
+**Tier 1 is the priority.** Coworkers asked: "Can we use this against native Fabric reports and data models?" — this is the first use case. No on-prem gateway needed, everything stays in Fabric.
+
+**Tier 2 shares the same parser** (ScriptDom) as Tier 1 since Fabric SQL is T-SQL. The difference is the data source connection (Fabric gateway to on-prem SQL Server).
+
+**Tier 3 requires a separate grammar** (ANTLR PL/SQL or Oracle's own parser). This is a future expansion, not Phase 1.
+
 ---
 
 ## Phase 0: Foundation

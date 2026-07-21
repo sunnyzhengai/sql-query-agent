@@ -242,6 +242,9 @@
 | 2026-07-20 | Own Azure tenant for product | IP ownership, admin access, clean demo |
 | 2026-07-20 | Founders Hub before Marketplace | Credits, advisory, ISV Success path |
 | 2026-07-20 | Plan B: develop locally, deploy when ready | Don't wait for Fabric trial, keep building |
+| 2026-07-21 | ScriptDom via pythonnet in Fabric | 100% accurate T-SQL parsing, no microservice, no data leaves tenant |
+| 2026-07-21 | Tier 1: Fabric-native first | Coworker validation: "can we use this against Fabric reports?" |
+| 2026-07-21 | Tier 2: on-prem SQL Server, Tier 3: Oracle | Same ScriptDom for T-SQL; ANTLR PL/SQL grammar for Oracle |
 
 ---
 
