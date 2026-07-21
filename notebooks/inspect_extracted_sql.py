@@ -164,3 +164,94 @@ for r in successes[:5]:
 #   FROM extraction_inspection WHERE metric_id = 'USP_PTA_CensusDashboard_PBI'
 print("Inspection table ready. Query 'extraction_inspection' in Fabric SQL or notebook.")
 print("Columns: metric_id, line_count, query_count, extraction_ok, parse_ok, parse_error, raw_sql, clean_sql")
+
+# %% Cell 9: Persistent error log — tracks errors across runs
+from src.governance.error_log import ErrorLog
+
+error_log = ErrorLog()
+
+# Load history from previous runs
+try:
+    history_df = spark.table("error_log")
+    history_records = [row.asDict() for row in history_df.collect()]
+    error_log.load_history(history_records)
+
+    # Set previous successes (metrics that passed in the last run)
+    last_run = max(r["run_id"] for r in history_records) if history_records else ""
+    last_failures = {r["metric_id"] for r in history_records if r["run_id"] == last_run}
+    all_ids = {r["metric_id"] for r in results}
+    error_log.set_previous_successes(list(all_ids - last_failures))
+except Exception:
+    print("No previous error_log table — starting fresh")
+
+# Start new run
+error_log.start_run()
+
+# Record all errors from this run
+for r in results:
+    if not r["parse_ok"]:
+        error_type = "extraction" if not r["extraction_ok"] else "parse"
+        error_msg = r["extraction_error"] if not r["extraction_ok"] else r["parse_error"]
+        error_log.record_error(
+            metric_id=r["metric_id"],
+            metric_name=r["metric_id"],
+            error_type=error_type,
+            error_message=error_msg,
+            line_count=r["line_count"],
+            query_count=r["query_count"],
+            clean_sql_preview=r["clean_sql"][:300] if r["clean_sql"] else "",
+        )
+
+# Finish run and detect regressions
+all_metric_ids = [r["metric_id"] for r in results]
+summary = error_log.finish_run(all_metric_ids)
+
+print(f"\n=== Error Log Summary ===")
+print(f"Total metrics: {summary['total_metrics']}")
+print(f"Success rate: {summary['success_rate']}%")
+print(f"New errors: {summary['new_errors']}")
+print(f"Known errors: {summary['known_errors']}")
+print(f"Regressions: {summary['regressions']}")
+print(f"Resolved: {summary['resolved']}")
+
+if summary["regressions"] > 0:
+    print(f"\n*** REGRESSIONS DETECTED ***")
+    print(f"These metrics previously passed but now fail:")
+    for mid in summary.get("regressed_metrics", [])[:10]:
+        print(f"  - {mid}")
+
+if summary["resolved"] > 0:
+    print(f"\nResolved (previously failed, now passing):")
+    for mid in summary["resolved_metrics"][:10]:
+        print(f"  + {mid}")
+
+# Save error log to Delta table (append, preserves history)
+error_schema = StructType([
+    StructField("run_id", StringType(), False),
+    StructField("run_timestamp", StringType(), False),
+    StructField("metric_id", StringType(), False),
+    StructField("metric_name", StringType(), True),
+    StructField("error_type", StringType(), True),
+    StructField("error_message", StringType(), True),
+    StructField("line_count", IntegerType(), True),
+    StructField("query_count", IntegerType(), True),
+    StructField("clean_sql_preview", StringType(), True),
+    StructField("status", StringType(), True),
+])
+
+error_records = error_log.to_records()
+if error_records:
+    error_df = spark.createDataFrame(
+        [(r["run_id"], r["run_timestamp"], r["metric_id"], r["metric_name"],
+          r["error_type"], r["error_message"], r["line_count"], r["query_count"],
+          r["clean_sql_preview"], r["status"])
+         for r in error_records],
+        schema=error_schema,
+    )
+    try:
+        error_df.write.format("delta").mode("append").saveAsTable("error_log")
+    except Exception:
+        error_df.write.format("delta").mode("overwrite").saveAsTable("error_log")
+    print(f"\nSaved {len(error_records)} error entries to error_log table")
+
+print(f"\n{error_log.summary_text()}")
