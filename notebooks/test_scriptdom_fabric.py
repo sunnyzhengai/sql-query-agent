@@ -15,6 +15,10 @@ Prerequisites:
 %pip install pythonnet
 
 # %% Cell 2: Load ScriptDom DLL
+# Must load CoreCLR before importing clr (Fabric Linux uses .NET Core, not Mono)
+from pythonnet import load
+load("coreclr")
+
 import clr
 import sys
 
@@ -34,7 +38,6 @@ from Microsoft.SqlServer.TransactSql.ScriptDom import (
     SelectInsertSource,
 )
 from System.IO import StringReader
-from System.Collections.Generic import List
 
 print("ScriptDom loaded successfully!")
 
