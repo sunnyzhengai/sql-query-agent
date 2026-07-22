@@ -1,8 +1,8 @@
 # Product Demo Script — 5 Minutes
 
-**Target audience:** Microsoft Founders Hub reviewers, potential investors, enterprise prospects
+**Target audience:** Microsoft Founders Hub reviewers, investors, enterprise prospects
 **Recording environment:** Work Fabric (crop URLs, scrub org names in voiceover)
-**Tone:** Confident, concise, problem-focused
+**Tone:** Confident, commercially sharp, problem-first
 
 ---
 
@@ -11,50 +11,48 @@
 **Setup checklist:**
 - [ ] Fabric Data Agent open in browser (crop the URL bar)
 - [ ] Agent instructions updated with latest version
-- [ ] Graph tables loaded with latest ScriptDom-parsed data
-- [ ] Architecture slide ready (screenshot or PDF)
+- [ ] Graph tables loaded with latest ScriptDom-parsed data (all 4 folders)
+- [ ] Architecture slide ready
+- [ ] Knowledge graph visual ready (node/edge diagram or lineage view)
 - [ ] www.aiviaapp.com open in another tab
 - [ ] Screen recording tool ready (crop to just the agent chat window)
-
-**Voiceover tips:**
-- Say "a healthcare organization" not your employer's name
-- Say "a reporting stored procedure" not specific proc names in voiceover
-- The agent's text responses are safe to show — they're business logic descriptions
-- Don't show the workspace name or lakehouse sidebar
+- [ ] Practice run completed
 
 ---
 
-## Minute 0:00–1:00 — The Problem & Architecture
+## Minute 0:00–1:00 — The Pain & The Breakthrough
 
-**[SLIDE: The Problem]**
-
-*Voiceover:*
-"Every healthcare organization has hundreds — sometimes thousands — of SQL stored procedures that power their reports. Inside each one is critical business logic: how metrics are calculated, what filters apply, which tables are used.
-
-But nobody documents them. New analysts spend weeks reverse-engineering queries. Three people run the same metric and get three different numbers. And governance? It's a spreadsheet nobody reads.
-
-We built AIVIA to solve this."
-
-**[SLIDE: Architecture Diagram]**
+**[SLIDE: The Problem — show a wall of SQL code, messy and intimidating]**
 
 *Voiceover:*
-"AIVIA uses Microsoft's own ScriptDom parser — the same engine that powers SQL Server Management Studio — to parse every stored procedure with 99% accuracy. It builds a three-layer knowledge graph: business metrics at the top, calculation logic in the middle, source tables at the bottom. All stored in Fabric Delta tables.
+"Every healthcare organization is sitting on millions of dollars of ungoverned business logic trapped inside thousands of legacy SQL scripts.
 
-Then a Fabric Data Agent, grounded in this graph, lets anyone ask questions in plain English."
+New analysts spend three weeks figuring out how a single metric is calculated. Executives sit in meetings staring at dashboards, wondering why three different reports show three different numbers. And data governance? It's a spreadsheet that nobody reads and everyone ignores.
 
-**[SHOW: Cell 6 output screenshot showing 99% parse rate, or the number 788/790]**
+The cost isn't just frustration — it's duplicated work, failed audits, and decisions made on numbers nobody trusts."
+
+**[SLIDE: Architecture Diagram — clean, professional]**
 
 *Voiceover:*
-"We tested this against 790 real enterprise stored procedures. 99% parsed with zero errors. In 24 minutes."
+"We built AIVIA to solve this. AIVIA reads your existing SQL — stored procedures, views, scripts — and automatically extracts the business logic using Microsoft's own ScriptDom parser.
+
+But here's what makes AIVIA different: we don't just parse code. We build an intelligent, multi-layer knowledge graph — a certified map of your organization's business logic. Business metrics at the top, calculation logic in the middle, source tables at the bottom. Every connection traced, every filter documented."
+
+**[SHOW: Cell 6 output or screenshot — linger on 99% / 788 out of 790 for 4 full seconds]**
+
+*Voiceover:*
+"We tested this against 790 real enterprise stored procedures. Ninety-nine percent parsed. Zero errors. Twenty-four minutes."
+
+*[Pause — let the number land]*
 
 ---
 
 ## Minute 1:00–3:00 — The Core Magic (Live Demo)
 
-**[SWITCH TO: Fabric Data Agent chat window]**
+**[SWITCH TO: Fabric Data Agent chat window — cropped, no URLs visible]**
 
 *Voiceover:*
-"Let me show you what this looks like for an end user."
+"Let me show you what this means for an actual end user."
 
 **Question 1: Business user question**
 
@@ -62,18 +60,23 @@ Then a Fabric Data Agent, grounded in this graph, lets anyone ask questions in p
 > How is the Census Dashboard calculated?
 
 *Wait for response. Voiceover while it loads:*
-"The user asks a plain English question. The agent traverses the knowledge graph, reads the SQL logic, and translates it into business language."
+"A business user asks a plain English question. No SQL knowledge required."
 
-*When response appears, read the key points:*
-"It tells us exactly what the metric measures, what filters are applied — census events only, valid patients, specific service areas — and which data sources it uses. All extracted automatically from the stored procedure."
+*When response appears:*
+"The agent instantly explains what the metric measures, what business rules filter the data — census events only, valid patients, specific service areas — and traces the logic back to the source. All of this was extracted automatically from a stored procedure that nobody had documented."
 
 **Question 2: Criteria deep-dive**
 
 *Type in the agent:*
-> What filters does it apply?
+> What specific filters does it apply?
 
 *Voiceover:*
-"The user can dig deeper. Every filter condition from the SQL is translated into a business rule. No SQL knowledge required."
+"The user digs deeper. Every WHERE clause, every JOIN condition, translated into a business rule. This is the kind of detail that used to take a developer three days to reverse-engineer."
+
+**[VISUAL BREAK: Flash the three-layer knowledge graph diagram for 3-4 seconds]**
+
+*Voiceover:*
+"Behind the scenes, the agent is traversing this knowledge graph — business metrics connected to calculation logic, connected to source tables. Every answer is traceable. Every metric is auditable."
 
 **Question 3: A different metric**
 
@@ -81,7 +84,7 @@ Then a Fabric Data Agent, grounded in this graph, lets anyone ask questions in p
 > How is the ED Dashboard calculated?
 
 *Voiceover:*
-"This works for any metric in the system. Different proc, different logic, same experience."
+"This works across the entire organization's SQL library. Different procedure, different logic, same instant clarity."
 
 ---
 
@@ -93,7 +96,7 @@ Then a Fabric Data Agent, grounded in this graph, lets anyone ask questions in p
 > Show me the technical details for the Census Dashboard
 
 *Voiceover:*
-"For developers who need the full picture, the agent switches to technical mode — showing SQL fragments, source tables with descriptions, and the transformation chain."
+"For developers and data engineers, the agent switches to technical mode — SQL fragments, source tables with data dictionary descriptions, the full transformation chain. Same knowledge graph, different lens."
 
 **Question 5: Admin view**
 
@@ -101,52 +104,56 @@ Then a Fabric Data Agent, grounded in this graph, lets anyone ask questions in p
 > /coverage
 
 *Voiceover:*
-"Administrators get system health through the same interface. How many metrics are in the system, how many have stewards assigned, how many have descriptions. One agent, multiple personas — business users, developers, and admins."
+"Administrators manage the system through the same interface. How many metrics are documented, how many have stewards assigned, system health — all through natural language. One agent, three personas: business users, developers, and administrators."
 
 ---
 
-## Minute 4:00–5:00 — Roadmap & Close
+## Minute 4:00–5:00 — Vision & Close
 
-**[SLIDE: Roadmap]**
-
-*Voiceover:*
-"What you just saw is the core intelligence layer — extracting business logic and making it queryable. On the roadmap:
-
-First, automated metadata sync to Microsoft Purview and Power BI — so report descriptions are always up to date.
-
-Second, a governance flywheel where every user question strengthens the knowledge base. High-demand metrics get promoted to dashboards. Unknown questions trigger steward review.
-
-Third, expanding beyond T-SQL to support Oracle PL/SQL and Snowflake — using native parsers for each dialect."
-
-**[SHOW: www.aiviaapp.com in browser]**
+**[SLIDE: Roadmap — clean, three items only]**
 
 *Voiceover:*
-"AIVIA is built entirely on Microsoft Fabric. It runs in the customer's own tenant — no data ever leaves. We're currently in the Microsoft for Startups Founders Hub program, building toward a Marketplace launch.
+"What you just saw is the intelligence layer — the hardest technical problem. On the roadmap:
 
-Learn more at aiviaapp.com. Thank you."
+Automated metadata sync to Microsoft Purview and Power BI — so every report is self-documenting, updated automatically when the SQL changes.
+
+A governance flywheel where every user question strengthens the knowledge base. The more people use it, the more complete and accurate it becomes.
+
+And multi-dialect support — Oracle PL/SQL, Snowflake — using native parsers for each platform. We don't do text guessing. We use each database vendor's own parser for 100% accuracy."
+
+**[SHOW: www.aiviaapp.com]**
+
+*Voiceover:*
+"We take a process that traditionally takes months of manual data cataloging and enterprise documentation, and we automate it down to minutes — entirely inside the customer's secure Microsoft Fabric tenant. No data ever leaves.
+
+AIVIA is live, scalable, and ready for deployment. Learn more at aiviaapp.com."
+
+*[Hold on website for 3 seconds — end]*
 
 ---
 
-## Backup Questions (if doing a live demo with Q&A)
-
-If someone asks follow-up questions, these are strong ones to show:
+## Backup Questions (if doing a live demo)
 
 | Question | What it demonstrates |
 |---|---|
 | "Which metrics use the PATIENT table?" | Reverse lineage — trace from table to metrics |
-| "Who owns the Census Dashboard?" | Steward assignment (if populated) |
-| "What metrics are available?" | Full catalog browsable via agent |
-| "How do I set up automated refresh?" | Agent knows about itself (self-service support) |
-| "/health" | System health check via admin command |
+| "Who owns the Census Dashboard?" | Steward assignment |
+| "What metrics are available?" | Full catalog via agent |
+| "How do I set up automated refresh?" | Agent knows about itself |
+| "/health" | System health check |
+| "/errors" | Parse error transparency |
 
 ---
 
 ## Recording Tips
 
-1. **Crop the browser** to show only the agent chat — no URL bar, no sidebar
-2. **Use a clean browser** with no bookmarks or tabs visible
-3. **Type slowly** so viewers can read what you're typing
-4. **Pause 2-3 seconds** after each agent response before moving on
-5. **Don't rush** — 5 minutes is plenty for 5 questions + slides
-6. **Record in a quiet room** with a good microphone
-7. **Do a practice run** before the real recording
+1. **Crop the browser** — show only the agent chat, no URL bar, no sidebar, no workspace name
+2. **Linger on the 99% stat** — hold it on screen for at least 4 full seconds
+3. **Type at a natural pace** — not too fast, not too slow. Viewers need to read what you type
+4. **Pause 2-3 seconds** after each agent response before continuing voiceover
+5. **Use the visual break** — flash the knowledge graph diagram between Questions 2 and 3
+6. **End strong** — the last words the viewer hears should be "live, scalable, and ready for deployment"
+7. **Keep it under 5 minutes** — respect the reviewer's time
+8. **Record in a quiet room** with a good microphone
+9. **Do a practice run** before the real recording — time it
+10. **Don't mention your employer** — say "a healthcare organization" or "an enterprise customer"
