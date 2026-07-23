@@ -22,10 +22,9 @@ SQL_FOLDERS = [
     {"path": f"{ABFS_BASE}/views_reporting",   "source_type": "view",             "schema": "reporting"},
 ]
 
-# Output table name
 SQL_SOURCES_OUTPUT = "sql_sources"
 
-# %% Cell 2: Read SQL files from all folders
+# %% Cell 2: Read SQL files from all folders, combine, and save
 from pyspark.sql.functions import input_file_name, regexp_extract, lit
 from functools import reduce
 from pyspark.sql import DataFrame
@@ -64,23 +63,20 @@ for folder in SQL_FOLDERS:
     except Exception as e:
         print(f"  {path.split('/')[-1]}: ERROR — {e}")
 
-# Combine all folders
+# Combine all folders and save
 if all_dfs:
-    sql_sources_df = reduce(DataFrame.unionAll, all_dfs)
-    total = sql_sources_df.count()
+    combined_df = reduce(DataFrame.unionAll, all_dfs)
+    total = combined_df.count()
     print(f"\nTotal: {total} SQL files from {len(all_dfs)} folders")
+
+    # Save to Delta table
+    combined_df.write.format("delta").mode("overwrite").saveAsTable(SQL_SOURCES_OUTPUT)
+    print(f"Saved {total} records to {SQL_SOURCES_OUTPUT}")
 else:
     print("ERROR: No SQL files found in any folder")
 
-# %% Cell 3: Summary by source type and schema
-print("\n=== Summary ===")
-sql_sources_df.groupBy("source_type", "source_schema").count().orderBy("source_type", "source_schema").show()
-
-# %% Cell 4: Save as Delta table
-sql_sources_df.write.format("delta").mode("overwrite").saveAsTable(SQL_SOURCES_OUTPUT)
-print(f"Saved {sql_sources_df.count()} records to {SQL_SOURCES_OUTPUT}")
-
-# %% Cell 5: Verify
-print(f"=== {SQL_SOURCES_OUTPUT} ===")
-spark.table(SQL_SOURCES_OUTPUT).groupBy("source_type", "source_schema").count().show()
-print(f"Total: {spark.table(SQL_SOURCES_OUTPUT).count()} SQL sources")
+# %% Cell 3: Verify
+print(f"\n=== {SQL_SOURCES_OUTPUT} ===")
+verify_df = spark.table(SQL_SOURCES_OUTPUT)
+verify_df.groupBy("source_type", "source_schema").count().orderBy("source_type", "source_schema").show()
+print(f"Total: {verify_df.count()} SQL sources")
