@@ -195,6 +195,82 @@
 
 ---
 
+## Feature: Business Logic Extraction & Persistence
+
+*Extract the MEANING of SQL, not just the structure.*
+
+### What we have now
+- SQL fragments stored on transformation nodes (raw SQL snippets)
+- Data Agent translates SQL to business language live (via instructions)
+- LLM-generated descriptions on canonical nodes
+
+### What's missing
+- [ ] **Business logic layer in the graph** — structured business rules as nodes
+  - Map SQL patterns to business concepts (e.g., `DATEDIFF(HOUR, admit, discharge)` → "Length of Stay in hours")
+  - Each rule has: pattern, business name, business description, category
+  - Rules are reusable across metrics (same pattern in different procs = same business concept)
+- [ ] **Persist agent-generated descriptions** — when the Data Agent explains a metric via API, save the explanation as the certified description
+- [ ] **Business glossary integration** — map extracted concepts to Collibra/Purview glossary terms automatically
+- [ ] **HITL certification of business logic** — steward approves the business interpretation, not just the SQL correctness
+
+### Architecture
+```
+SQL fragment: "DATEDIFF(HOUR, admit_dt, discharge_dt)"
+    ↓
+Business Logic Node: {
+  pattern: "DATEDIFF(HOUR, *, *)",
+  business_name: "Length of Stay (Hours)",
+  business_description: "Time between admission and discharge in hours",
+  category: "Clinical Metric"
+}
+    ↓
+Connected to all metrics that use this pattern
+```
+
+---
+
+## Feature: Self-Service Support Agent (Knowledge Graph for Troubleshooting)
+
+*Train the agent to handle customer support — every error becomes a documented solution.*
+
+### Concept
+Instead of a separate knowledge base or documentation site, bake ALL installation guides, error solutions, and troubleshooting steps into a **documentation knowledge graph** that the same Data Agent traverses.
+
+### What to capture
+- [ ] **Installation errors** — every error we encountered during development:
+  - `mssparkutils not importable` → pass token explicitly
+  - `Schema mismatch` → use overwriteSchema option
+  - `DLL not found` → check Files/libs/ path
+  - `CoreCLR vs Mono` → use `from pythonnet import load; load("coreclr")`
+  - `Fabric trial not available` → cancel PBI trial first, or use Founders Hub credits
+  - `Cannot subclass TSqlFragmentVisitor` → use manual AST walk via reflection
+  - `Parse returns tuple` → handle with isinstance check
+- [ ] **Configuration guide** — step-by-step for each setup task
+- [ ] **FAQ** — common questions from coworkers and early users
+- [ ] **Error codes** — map error messages to solutions
+
+### Architecture
+```
+docs_nodes Delta table:
+  node_id: "error:mssparkutils_import"
+  category: "installation"
+  symptom: "no module named mssparkutils"
+  solution: "mssparkutils is a global in Fabric notebooks, don't import it. Use: token = mssparkutils.credentials.getToken(...)"
+  related_errors: ["error:token_auth", "error:fabric_session"]
+
+Agent instructions:
+  "If the user asks about an error or troubleshooting,
+   query the docs_nodes table for matching symptoms."
+```
+
+### Benefits
+- **Zero customer support burden** — agent handles 80%+ of common issues
+- **Grows from experience** — every support interaction adds to the knowledge graph
+- **Same interface** — customer uses the same agent for metrics AND support
+- **Eating our own dogfood** — we use our own product to support our own product
+
+---
+
 ## Founders Hub: How It Helps at Each Phase
 
 | Phase | Founders Hub Benefit |
