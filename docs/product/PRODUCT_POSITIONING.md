@@ -110,6 +110,53 @@ Build an AI support tool that handles 80%+ of common user questions about the pr
 
 ---
 
+## Microsoft Ecosystem Alignment (Build 2026)
+
+Microsoft's "Agentic Analytics Stack" has four layers:
+1. Data Foundation (data engineering)
+2. Serving Layer (warehouse)
+3. Semantic Layer (Power BI)
+4. **Conversational Analytics Layer** (Data Agents, Copilot)
+
+**AIVIA sits between layers 3 and 4** — we provide the governed knowledge graph that makes the conversational layer trustworthy. Microsoft builds the platform and interface. AIVIA builds the intelligence content.
+
+### Why Microsoft Won't Replace AIVIA
+
+| What Microsoft provides | What's missing | What AIVIA fills |
+|---|---|---|
+| Data Agent (empty chat interface) | No knowledge of your SQL logic | Builds the knowledge graph that grounds the agent |
+| Purview (empty catalog) | No business term definitions | Extracts definitions from SQL, pushes to Purview |
+| Power BI (empty descriptions) | No report documentation | Auto-generates descriptions from SQL logic |
+| Copilot (generic AI) | Doesn't understand your org's metrics | Provides org-specific certified definitions |
+| ScriptDom (parser library) | Just a parser — no graph, no governance | Uses ScriptDom as infrastructure, builds intelligence on top |
+
+**The analogy:** Microsoft built the highway (Fabric). They built the car (Data Agent / Copilot). AIVIA builds the **GPS map** — the knowledge of where everything is, what it means, and how to get there. Without the map, the car drives blind.
+
+### Why Microsoft Won't Build This Themselves
+
+1. **It's org-specific.** Every organization's SQL is different. Microsoft can't ship a product that understands YOUR stored procedures. That requires parsing YOUR code and building YOUR knowledge graph.
+
+2. **It requires domain expertise.** Understanding that `EVENT_TYPE_C = 6` means "Census" in Epic Clarity is healthcare-specific knowledge. Microsoft builds horizontal platforms, not vertical solutions.
+
+3. **It's a partner opportunity by design.** Microsoft explicitly builds platforms for ISV partners to extend. The ISV Success program, Marketplace, and co-sell all exist because Microsoft WANTS companies like AIVIA to fill these gaps.
+
+4. **The governance content problem is hard.** Microsoft tried to make Purview self-populating with automated scanning. But scanning finds table names — it doesn't explain business logic. Understanding the SQL requires what AIVIA does: parse the code, build the graph, certify the definitions.
+
+### The Platform Risk (Honest Assessment)
+
+**Risk:** Microsoft could add "auto-generate report descriptions" as a Copilot feature using generic LLM summarization.
+
+**Why it wouldn't threaten AIVIA:**
+- Generic LLM summarization is non-deterministic and produces different output each time (we proved this — 79% accuracy, garbled results)
+- It wouldn't have ScriptDom-based parsing (99% accuracy vs. LLM's 79%)
+- It wouldn't have the certified knowledge graph with steward-reviewed, traceable definitions
+- It wouldn't have the HITL governance workflow enterprise customers require
+- It wouldn't track usage patterns (the flywheel) that surface governance priorities
+
+**Our moat is the certified knowledge graph.** Microsoft provides the empty containers. AIVIA fills them with trusted, traceable, steward-certified business logic.
+
+---
+
 ## Competitive Positioning
 
 ### What We're NOT
@@ -117,13 +164,16 @@ Build an AI support tool that handles 80%+ of common user questions about the pr
 - Not a BI tool (we make existing BI tools smarter)
 - Not a generic AI chatbot (we're grounded in certified logic — no hallucination)
 - Not a data catalog (we're the engine that makes catalogs useful)
+- Not competing with Microsoft (we're extending their platform)
 
 ### What Makes This Different
 1. **Starts from existing SQL** — most governance tools require manual input. We extract logic that already exists.
-2. **Usage-driven governance** — governance grows from demand, not committees. The flywheel.
-3. **Certified accuracy** — two-stage HITL (developer + steward). "I don't know" over guessing.
-4. **Fabric-native** — not a bolt-on. Runs inside the customer's tenant using their existing infrastructure.
-5. **The Collibra gap** — Collibra customers have been asking for bulk report metadata loading. Collibra said no. We said yes.
+2. **99% parsing accuracy** — ScriptDom (Microsoft's own parser), not regex or LLM guessing.
+3. **Certified knowledge graph** — three-layer graph with HITL steward certification. Not generic AI summaries.
+4. **Usage-driven governance** — governance grows from demand, not committees. The flywheel.
+5. **Fabric-native** — not a bolt-on. Runs inside the customer's tenant using their existing infrastructure.
+6. **Multi-dialect roadmap** — ScriptDom for T-SQL, ANTLR for PL/SQL, native parsers per vendor. 100% accuracy for each.
+7. **The Collibra gap** — Collibra customers have been asking for bulk report metadata loading. Collibra said no. We said yes.
 
 ---
 
