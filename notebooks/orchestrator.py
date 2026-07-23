@@ -25,7 +25,7 @@ import sys
 sys.path.insert(0, "/lakehouse/default/Files/sql-query-agent")
 
 from src.config import load_config
-from src.parser.sql_parser import parse_sql
+from src.parser.sql_parser import parse_sql, CTEInfo
 from src.graph.builder import GraphBuilder
 from src.graph.traversal import GraphTraverser
 from src.dictionary import DataDictionary
@@ -227,8 +227,65 @@ for i, source in enumerate(sql_sources):
             queries = extract_with_scriptdom(sql)
             if not queries:
                 raise ValueError("ScriptDom found no SELECT statements")
-            # Parse each extracted query with sqlglot
-            parsed = parse_sql(";\n".join(queries))
+            # Parse each extracted query directly with sqlglot
+            # (bypass parse_sql's internal extractor — queries are already clean)
+            from src.parser.sql_parser import _parse_single_statement, _extract_temp_table_name
+            all_ctes = []
+            all_final_tables = []
+            all_final_cte_refs = []
+            all_final_columns = []
+            temp_table_names = set()
+            parsed_count = 0
+
+            for qi, q in enumerate(queries):
+                temp_name = _extract_temp_table_name(q)
+                if temp_name:
+                    temp_table_names.add(temp_name)
+                result = _parse_single_statement(q, "tsql")
+                if result is None:
+                    continue
+                parsed_count += 1
+
+                if temp_name:
+                    fragment = q[:500] if len(q) > 500 else q
+                    cte_table_refs = [t for t in result.final_select_tables if t not in temp_table_names]
+                    cte_depends = [t for t in result.final_select_tables if t in temp_table_names]
+                    all_ctes.append(CTEInfo(
+                        name=temp_name, sql_fragment=fragment,
+                        column_refs=result.final_select_columns,
+                        table_refs=cte_table_refs, depends_on=cte_depends,
+                    ))
+                    for cte in result.ctes:
+                        all_ctes.append(cte)
+                else:
+                    for cte in result.ctes:
+                        all_ctes.append(cte)
+                    for t in result.final_select_tables:
+                        if t not in all_final_tables:
+                            all_final_tables.append(t)
+                    for t in result.final_select_cte_refs:
+                        if t not in all_final_cte_refs:
+                            all_final_cte_refs.append(t)
+                    all_final_columns.extend(result.final_select_columns)
+
+            if parsed_count == 0:
+                raise ValueError(f"Failed to parse SQL: none of {len(queries)} extracted queries parsed successfully")
+
+            # Reclassify temp table refs in final tables
+            for t in all_final_tables[:]:
+                if t in temp_table_names:
+                    all_final_tables.remove(t)
+                    if t not in all_final_cte_refs:
+                        all_final_cte_refs.append(t)
+
+            from src.parser.sql_parser import ParsedSQL
+            parsed = ParsedSQL(
+                ctes=all_ctes,
+                final_select_tables=all_final_tables,
+                final_select_cte_refs=all_final_cte_refs,
+                final_select_columns=all_final_columns,
+                normalized_sql=";\n".join(queries),
+            )
         else:
             # Fallback: sqlparse extraction
             clean_sql = extract_select_statements(sql)
@@ -391,8 +448,8 @@ for source in sql_sources:
                             f"transforms={len(subgraph['transformations'])}, tables={len(tables)}"))
 
 # Parse errors
-for mid, err in parse_errors:
-    summary_rows.append((now, f"error_{mid}", "parse_failed", err[:200]))
+for e in parse_errors:
+    summary_rows.append((now, f"error_{e['metric_id']}", "parse_failed", e["error"][:200]))
 
 from pyspark.sql.types import StringType, StructField, StructType
 
