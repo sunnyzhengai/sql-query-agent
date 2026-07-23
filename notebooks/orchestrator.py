@@ -164,9 +164,18 @@ print(f"Column columns: {list(dict_columns[0].keys()) if dict_columns else 'empt
 
 # %% Cell 5: Load SQL sources
 sql_sources_df = read_source(config.lakehouse.sql_sources)
+
+# Ensure steward and developer columns exist (may be missing after schema changes)
+from pyspark.sql.functions import lit as _lit
+for col_name in ["steward", "developer"]:
+    if col_name not in sql_sources_df.columns:
+        sql_sources_df = sql_sources_df.withColumn(col_name, _lit(None))
+
 sql_sources = [row.asDict() for row in sql_sources_df.collect()]
 
 print(f"Loaded {len(sql_sources)} SQL sources")
+if sql_sources:
+    print(f"Columns: {list(sql_sources[0].keys())}")
 if sql_sources:
     print(f"SQL source keys: {list(sql_sources[0].keys())}")
 
