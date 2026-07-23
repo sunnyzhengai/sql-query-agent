@@ -70,7 +70,7 @@ if all_dfs:
     print(f"\nTotal: {total} SQL files from {len(all_dfs)} folders")
 
     # Save to Delta table
-    combined_df.write.format("delta").mode("overwrite").saveAsTable(SQL_SOURCES_OUTPUT)
+    combined_df.write.format("delta").mode("overwrite").option("overwriteSchema", "true").saveAsTable(SQL_SOURCES_OUTPUT)
     print(f"Saved {total} records to {SQL_SOURCES_OUTPUT}")
 else:
     print("ERROR: No SQL files found in any folder")
