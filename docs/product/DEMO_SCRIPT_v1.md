@@ -20,34 +20,28 @@
 
 ---
 
-## Minute 0:00–1:30 — The Problem & The Breakthrough
+## Minute 0:00–1:00 — The Pain & The Breakthrough
 
-**[SLIDE: The Problem — show a sprawling list of report names, or a cluttered BI portal]**
+**[SLIDE: The Problem — show a wall of SQL code, messy and intimidating]**
 
 *Voiceover:*
-"Every healthcare organization is sitting on millions of dollars of ungoverned technical debt — that can be turned into their strongest foundation for self-service analytics.
+"Every healthcare organization is sitting on millions of dollars of ungoverned business logic trapped inside thousands of legacy SQL scripts.
 
-Thousands of SQL-based reports are the hidden treasure of business logic definitions. These reports were requested by clinicians based on real clinical needs. They were built by highly skilled BI developers. They were validated and put into production.
+New analysts spend three weeks figuring out how a single metric is calculated. Executives sit in meetings staring at dashboards, wondering why three different reports show three different numbers. And data governance? It's a spreadsheet that nobody reads and everyone ignores.
 
-But here's the problem: these thousands of reports are not governed. There is no visibility into the logic behind each report name. Some are outdated. Some are conflicting duplicates of the same metric with different numbers.
-
-So when a clinician needs to make a decision, they search through different BI tools, staring at multiple report names and the different numbers in them — unable to know which one to trust. Their cognitive load skyrockets.
-
-And what do they do? They submit yet another request to create a new report they can trust. That process takes weeks, sometimes months. Clinicians end up frustrated, and further distrust the Analytics team's products.
-
-This is the cycle we break."
+The cost isn't just frustration — it's duplicated work, failed audits, and decisions made on numbers nobody trusts."
 
 **[SLIDE: Architecture Diagram — clean, professional]**
 
 *Voiceover:*
-"AIVIA takes those thousands of existing reports — the ones your organization already invested in — and automatically extracts the business logic from the SQL behind them. Using Microsoft's own ScriptDom parser, the same engine that powers SQL Server Management Studio.
+"We built AIVIA to solve this. AIVIA reads your existing SQL — stored procedures, views, scripts — and automatically extracts the business logic using Microsoft's own ScriptDom parser.
 
-But we don't just parse code. We build an intelligent, multi-layer knowledge graph — a certified map of your organization's business logic. Business metrics at the top, calculation logic in the middle, source tables at the bottom. Every connection traced, every filter documented. Every report finally visible and understood."
+But here's what makes AIVIA different: we don't just parse code. We build an intelligent, multi-layer knowledge graph — a certified map of your organization's business logic. Business metrics at the top, calculation logic in the middle, source tables at the bottom. Every connection traced, every filter documented."
 
-**[SHOW: ScriptDom results — linger on 99% parse rate for 4 full seconds]**
+**[SHOW: Cell 6 output or screenshot — linger on 99% / 788 out of 790 for 4 full seconds]**
 
 *Voiceover:*
-"We tested this against over 1,300 real enterprise SQL sources — stored procedures and views. Ninety-nine percent parsed. Zero errors."
+"We tested this against 790 real enterprise stored procedures. Ninety-nine percent parsed. Zero errors. Twenty-four minutes."
 
 *[Pause — let the number land]*
 
