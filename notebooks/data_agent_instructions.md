@@ -47,15 +47,23 @@ Edges connect the layers top-down:
 ## Section 3: Answering Metric Questions
 
 ### "What is [metric]?" or "What does [metric] measure?"
-1. Find the canonical node: `SELECT * FROM graph_nodes WHERE layer = 'canonical' AND name LIKE '%keyword%'`
-2. Follow edges to transformation nodes to get the SQL fragments
-3. Read the SQL fragments to understand the business logic
-4. **For business users:** Explain in plain English what the metric measures, what criteria filter the data, and what the output represents. Do NOT show SQL or table names.
-5. **For developers:** Show the full transformation chain with SQL fragments and source tables.
+1. Query the `metric_logic` table first — it has everything pre-joined:
+   ```sql
+   SELECT metric_id, metric_name, description, calculation_logic, source_tables, table_descriptions, steward, developer
+   FROM metric_logic
+   WHERE metric_name LIKE '%keyword%' OR metric_id LIKE '%keyword%'
+   ```
+2. Read the `calculation_logic` column to understand the business logic (contains SQL fragments from each transformation step).
+3. **For business users:** Translate the calculation_logic into plain English — what the metric measures, what criteria filter the data, and what the output represents. Do NOT show SQL or table names.
+4. **For developers:** Show the full calculation_logic, source_tables, and table_descriptions.
+5. **Fallback:** If `metric_logic` has no results, try querying `graph_nodes` directly:
+   `SELECT * FROM graph_nodes WHERE layer = 'canonical' AND name LIKE '%keyword%'`
+   Then follow edges in `graph_edges` to find transformation nodes.
 
 ### "What criteria does [metric] use?" or "What filters are applied?"
-1. Find the transformation nodes for this metric
-2. Read the WHERE clauses and JOIN conditions from sql_fragments
+1. Query `metric_logic` for this metric:
+   `SELECT calculation_logic FROM metric_logic WHERE metric_name LIKE '%keyword%' OR metric_id LIKE '%keyword%'`
+2. Read the WHERE clauses and JOIN conditions from the calculation_logic column
 3. **Translate each filter to business language:**
    - `EVENT_TYPE_C = 6` → "Census events only"
    - `EVENT_SUBTYPE_C <> 2` → "Excluding cancelled events"
@@ -65,12 +73,11 @@ Edges connect the layers top-down:
 4. List each criterion as a clear business rule
 
 ### "Who owns [metric]?"
-1. Find the canonical node
-2. Read `steward` and `developer` from the `properties` JSON
-3. If steward is null, say "No steward has been assigned yet. An administrator can assign one."
+1. Query: `SELECT steward, developer FROM metric_logic WHERE metric_name LIKE '%keyword%' OR metric_id LIKE '%keyword%'`
+2. If steward is null, say "No steward has been assigned yet. An administrator can assign one."
 
 ### "What tables are used for [metric]?" (developer question)
-1. Traverse edges from canonical → transformation → technical nodes
+1. Query: `SELECT source_tables, table_descriptions FROM metric_logic WHERE metric_name LIKE '%keyword%' OR metric_id LIKE '%keyword%'`
 2. List the tables with their data dictionary descriptions
 
 ### "Which metrics use [table name]?"
@@ -187,16 +194,19 @@ Show metrics that failed in the previous run but are no longer in the latest err
 ### /coverage — Coverage Report
 ```sql
 SELECT
-  (SELECT COUNT(*) FROM graph_nodes WHERE layer = 'canonical') as total_metrics,
-  (SELECT COUNT(DISTINCT source_id) FROM graph_edges WHERE edge_type = 'canonical_to_transform') as with_edges,
-  (SELECT COUNT(*) FROM graph_nodes WHERE layer = 'canonical' AND description IS NOT NULL AND description != '') as with_descriptions,
-  (SELECT COUNT(*) FROM graph_nodes WHERE layer = 'canonical' AND properties LIKE '%"steward"%' AND properties NOT LIKE '%"steward": null%') as with_stewards
+  COUNT(*) as total_metrics,
+  SUM(CASE WHEN calculation_logic IS NOT NULL THEN 1 ELSE 0 END) as with_logic,
+  SUM(CASE WHEN description IS NOT NULL AND description != '' THEN 1 ELSE 0 END) as with_descriptions,
+  SUM(CASE WHEN steward IS NOT NULL THEN 1 ELSE 0 END) as with_stewards,
+  SUM(CASE WHEN source_tables IS NOT NULL THEN 1 ELSE 0 END) as with_tables
+FROM metric_logic
 ```
 Report:
 - Total metrics: X
-- With graph edges (traversable): Y (Z%)
+- With calculation logic: Y (Z%)
 - With descriptions: A (B%)
 - With stewards assigned: C (D%)
+- With source tables mapped: E (F%)
 
 ### /health — System Health Check
 1. Confirm tables exist and have data:
@@ -247,7 +257,8 @@ To add new stored procedures or views to the knowledge graph:
 - **Stale data** — Set up an automated pipeline to refresh the graph on a schedule.
 
 ### System Architecture
-- **Knowledge Graph:** Stored in `graph_nodes` and `graph_edges` Delta tables
+- **Metric Logic:** Pre-joined table `metric_logic` — primary table for answering metric questions (one row per metric, with calculation logic, source tables, and descriptions)
+- **Knowledge Graph:** Stored in `graph_nodes` and `graph_edges` Delta tables — for advanced traversal and reverse lineage queries
 - **Build History:** Stored in `build_summary` Delta table
 - **Data Dictionary:** Loaded from Clarity data dictionary tables
 - **SQL Sources:** Loaded from .sql files in the Fabric lakehouse
@@ -296,45 +307,42 @@ Every time you ask a question, the system learns:
 
 ---
 
-## Example Queries for the Graph
+## Example Queries
 
-To find all available metrics:
+### Primary table: metric_logic (use this first for metric questions)
+
+Find all available metrics:
 ```sql
-SELECT node_id, name, description, properties FROM graph_nodes WHERE layer = 'canonical'
+SELECT metric_id, metric_name, description FROM metric_logic ORDER BY metric_name
 ```
 
-To find a specific metric:
+Find a specific metric and its calculation logic:
 ```sql
-SELECT node_id, name, properties FROM graph_nodes WHERE layer = 'canonical' AND name LIKE '%census%'
+SELECT metric_id, metric_name, description, calculation_logic, source_tables, table_descriptions
+FROM metric_logic WHERE metric_name LIKE '%census%' OR metric_id LIKE '%census%'
 ```
 
-To trace a metric's transformation chain:
+Find metrics with no steward:
 ```sql
-SELECT e.source_id, e.target_id, e.edge_type, n.name, n.layer, n.properties
-FROM graph_edges e
-JOIN graph_nodes n ON e.target_id = n.node_id
-WHERE e.source_id LIKE 'canonical:%census%'
+SELECT metric_name FROM metric_logic WHERE steward IS NULL
 ```
 
-To get source tables for a metric:
+### Graph tables: graph_nodes + graph_edges (use for advanced traversal)
+
+Reverse lineage — find all metrics that use a specific table:
 ```sql
-SELECT DISTINCT n.name, n.description
-FROM graph_edges e1
-JOIN graph_edges e2 ON e1.target_id = e2.source_id
-JOIN graph_nodes n ON e2.target_id = n.node_id
-WHERE e1.source_id LIKE 'canonical:%census%'
-AND n.layer = 'technical'
-AND n.properties NOT LIKE '%"column"%'
+SELECT DISTINCT n.name FROM graph_edges e1
+JOIN graph_edges e2 ON e1.source_id = e2.target_id
+JOIN graph_nodes n ON e2.source_id = n.node_id
+WHERE e1.target_id LIKE '%TABLE_NAME%' AND n.layer = 'canonical'
 ```
 
-To find metrics with no steward:
+Count nodes by layer:
 ```sql
-SELECT name, properties FROM graph_nodes
-WHERE layer = 'canonical'
-AND (properties NOT LIKE '%steward%' OR properties LIKE '%"steward": null%')
+SELECT layer, COUNT(*) as cnt FROM graph_nodes GROUP BY layer
 ```
 
-To get build summary:
+### Build history
 ```sql
 SELECT * FROM build_summary ORDER BY build_time DESC LIMIT 20
 ```

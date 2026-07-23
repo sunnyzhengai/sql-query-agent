@@ -489,3 +489,71 @@ print(f"  {config.lakehouse.graph_edges} — edges for Data Agent")
 print(f"  build_summary — build history (append-only)")
 print(f"\nNext step: Point your Fabric Data Agent at '{config.lakehouse.graph_nodes}' "
       f"and '{config.lakehouse.graph_edges}'")
+
+# %% Cell 11: Create flattened metric_logic table for the Data Agent
+# The Data Agent struggles with multi-hop graph traversal (canonical → edges → transform → edges → technical).
+# This table pre-joins everything so the agent can answer "how is X calculated?" with a single query.
+print("\n=== Building metric_logic table ===")
+
+metric_logic_rows = []
+for source in sql_sources:
+    metric_id = source["metric_id"]
+    name = source["name"]
+    subgraph = traverser_summary.get_metric_subgraph(metric_id)
+    if not subgraph:
+        continue
+
+    canonical = subgraph["canonical"]
+    steward = canonical.properties.get("steward")
+    developer = canonical.properties.get("developer")
+
+    # Collect transformation logic
+    transforms = subgraph.get("transformations", [])
+    sql_fragments = []
+    for t in transforms:
+        frag = t.properties.get("sql_fragment", "")
+        if frag:
+            sql_fragments.append(f"-- {t.name}\n{frag}")
+
+    combined_logic = "\n\n".join(sql_fragments) if sql_fragments else None
+
+    # Collect source tables
+    tech_nodes = subgraph.get("technical", [])
+    tables = sorted(set(
+        t.name for t in tech_nodes if t.properties.get("column") is None
+    ))
+    tables_str = ", ".join(tables) if tables else None
+
+    # Collect table descriptions
+    table_descs = []
+    for t in tech_nodes:
+        if t.properties.get("column") is None and t.description:
+            table_descs.append(f"{t.name}: {t.description}")
+    table_descs_str = "; ".join(table_descs) if table_descs else None
+
+    metric_logic_rows.append((
+        metric_id, name, canonical.description,
+        steward, developer,
+        len(transforms), combined_logic,
+        tables_str, table_descs_str,
+    ))
+
+from pyspark.sql.types import StringType, StructField, StructType, IntegerType
+
+ml_schema = StructType([
+    StructField("metric_id", StringType(), False),
+    StructField("metric_name", StringType(), False),
+    StructField("description", StringType(), True),
+    StructField("steward", StringType(), True),
+    StructField("developer", StringType(), True),
+    StructField("transform_count", IntegerType(), True),
+    StructField("calculation_logic", StringType(), True),
+    StructField("source_tables", StringType(), True),
+    StructField("table_descriptions", StringType(), True),
+])
+
+ml_df = spark.createDataFrame(metric_logic_rows, schema=ml_schema)
+ml_df.write.format("delta").mode("overwrite").option("overwriteSchema", "true").saveAsTable("metric_logic")
+print(f"Saved {len(metric_logic_rows)} rows to metric_logic table")
+print("→ Add 'metric_logic' as a data source in your Fabric Data Agent")
+print("→ This table gives the agent single-query access to all metric calculation logic")
