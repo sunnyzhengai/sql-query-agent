@@ -121,9 +121,14 @@ def normalize_sql_whitespace(sql: str) -> str:
     """Normalize whitespace in SQL text for clean storage and readability.
 
     Raw SQL from ScriptDom extraction preserves original formatting with
-    \\r\\n\\t characters. This normalizes to clean, readable SQL.
+    \\r\\n\\t characters. Also handles non-breaking spaces (\\xa0) from
+    copy-paste in SSMS or web editors.
     """
+    # Replace non-breaking spaces with regular spaces
+    sql = sql.replace('\xa0', ' ')
+    # Normalize all line ending variants (\r\r\n, \r\n, \r) to \n
     sql = sql.replace('\r\n', '\n').replace('\r', '\n')
+    # Collapse multiple spaces/tabs to single space
     sql = re.sub(r'[ \t]+', ' ', sql)
     sql = '\n'.join(line.strip() for line in sql.split('\n') if line.strip())
     return sql
