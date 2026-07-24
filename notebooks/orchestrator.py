@@ -229,7 +229,7 @@ for i, source in enumerate(sql_sources):
                 raise ValueError("ScriptDom found no SELECT statements")
             # Parse each extracted query directly with sqlglot
             # (bypass parse_sql's internal extractor — queries are already clean)
-            from src.parser.sql_parser import _parse_single_statement, _extract_temp_table_name
+            from src.parser.sql_parser import _parse_single_statement, _extract_temp_table_name, normalize_sql_whitespace
             all_ctes = []
             all_final_tables = []
             all_final_cte_refs = []
@@ -247,10 +247,7 @@ for i, source in enumerate(sql_sources):
                 parsed_count += 1
 
                 if temp_name:
-                    # Normalize whitespace so stored SQL is clean and readable
-                    import re as _re
-                    _clean = _re.sub(r'[ \t]+', ' ', q.replace('\r\n', '\n').replace('\r', '\n'))
-                    _clean = '\n'.join(line.strip() for line in _clean.split('\n') if line.strip())
+                    _clean = normalize_sql_whitespace(q)
                     fragment = _clean[:500] if len(_clean) > 500 else _clean
                     cte_table_refs = [t for t in result.final_select_tables if t not in temp_table_names]
                     cte_depends = [t for t in result.final_select_tables if t in temp_table_names]
@@ -517,10 +514,7 @@ for source in sql_sources:
     for t in transforms:
         frag = t.properties.get("sql_fragment", "")
         if frag:
-            # Normalize whitespace in case raw SQL was stored with \r\n\t
-            import re as _re
-            frag = _re.sub(r'[ \t]+', ' ', frag.replace('\r\n', '\n').replace('\r', '\n'))
-            frag = '\n'.join(line.strip() for line in frag.split('\n') if line.strip())
+            frag = normalize_sql_whitespace(frag)
             sql_fragments.append(f"-- {t.name}\n{frag}")
 
     combined_logic = "\n\n".join(sql_fragments) if sql_fragments else None

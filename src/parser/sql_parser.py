@@ -117,6 +117,18 @@ def _preprocess_simple(sql: str) -> str:
     return sql.strip()
 
 
+def normalize_sql_whitespace(sql: str) -> str:
+    """Normalize whitespace in SQL text for clean storage and readability.
+
+    Raw SQL from ScriptDom extraction preserves original formatting with
+    \\r\\n\\t characters. This normalizes to clean, readable SQL.
+    """
+    sql = sql.replace('\r\n', '\n').replace('\r', '\n')
+    sql = re.sub(r'[ \t]+', ' ', sql)
+    sql = '\n'.join(line.strip() for line in sql.split('\n') if line.strip())
+    return sql
+
+
 def _clean_extracted_query(sql: str) -> str:
     """Light cleanup on an individual extracted query before sqlglot parsing.
 
