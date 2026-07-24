@@ -136,6 +136,10 @@ def _clean_extracted_query(sql: str) -> str:
     this only cleans individual query statements that the extractor already
     isolated. Much safer because the SQL is already a single SELECT/WITH.
     """
+    # Normalize line endings FIRST — ScriptDom preserves \r\r\n from Windows SQL files.
+    # Comment stripping relies on $ matching at \n, so this must come before.
+    sql = sql.replace('\r\n', '\n').replace('\r', '\n')
+
     # Remove OPTION(...) query hints
     sql = re.sub(r"\bOPTION\s*\([^)]*\)\s*;?", "", sql, flags=re.IGNORECASE)
 
