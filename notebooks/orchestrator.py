@@ -273,9 +273,9 @@ from src.schemas import PARSE_ERRORS, PARSE_SUCCESSES, GRAPH_NODES, GRAPH_EDGES
 from src.schemas import BUILD_SUMMARY, METRIC_LOGIC, to_spark_schema
 
 if parse_errors:
-    errors_rows = [(e["metric_id"], e["name"], e["error"], e["line_count"]) for e in parse_errors]
+    errors_rows = [(e["metric_id"], e["name"], e["error"], e.get("error_category"), e.get("user_explanation"), e.get("suggested_action"), e["line_count"]) for e in parse_errors]
     errors_df = spark.createDataFrame(errors_rows, schema=to_spark_schema(PARSE_ERRORS))
-    errors_df.write.format("delta").mode("overwrite").saveAsTable("parse_errors")
+    errors_df.write.format("delta").mode("overwrite").option("overwriteSchema", "true").saveAsTable("parse_errors")
     print(f"Saved {len(parse_errors)} parse errors to 'parse_errors' table")
     print("→ Developers: review this table and fix the source SQL for these procs")
     print("\nTop errors by line count (largest procs):")
