@@ -3,12 +3,21 @@
 Reads from: all Delta tables (sql_sources, parse_*, graph_*, metric_logic)
 Writes to:  pipeline_validation, build_summary (Delta tables)
 
-Prerequisite: Run 01_setup.py first (same session).
-              Run 02-04 at least once.
-
+Run 02-04 at least once before this.
 Validates every step of the pipeline per metric and saves a summary.
-Run after any pipeline notebook to verify end-to-end health.
 """
+
+# %% Cell 0: Setup (run once per session)
+%pip install pydantic pyyaml
+
+import json
+import sys
+sys.path.insert(0, "/lakehouse/default/Files/sql-query-agent")
+
+from src.config import load_config
+from src.schemas import to_spark_schema
+
+config = load_config("/lakehouse/default/Files/sql-query-agent/org_config.yaml")
 
 # %% Cell 1: Load all data
 sql_sources = [r.asDict() for r in spark.table(config.lakehouse.sql_sources).selectExpr(

@@ -3,11 +3,38 @@
 Reads from: sql_sources (Delta table)
 Writes to:  parse_results, parse_errors, parse_successes (Delta tables)
 
-Prerequisite: Run 01_setup.py first (same session).
-
 parse_results stores the full parsed output (CTEs as JSON) so
 03_build_graph.py can rebuild the graph without re-parsing.
 """
+
+# %% Cell 0: Setup (run once per session)
+%pip install pydantic pyyaml sqlglot sqlparse pythonnet
+
+import json
+import sys
+sys.path.insert(0, "/lakehouse/default/Files/sql-query-agent")
+
+from src.config import load_config
+from src.schemas import to_spark_schema
+from src.parser.scriptdom_fabric import load_scriptdom
+
+config = load_config("/lakehouse/default/Files/sql-query-agent/org_config.yaml")
+scriptdom_available, extract_with_scriptdom = load_scriptdom()
+
+if scriptdom_available:
+    print("ScriptDom loaded!")
+else:
+    print("ScriptDom not available, using sqlparse fallback")
+    from src.parser.sql_extractor import extract_select_statements
+
+def read_source(name_or_path):
+    """Read a data source by name or path."""
+    if name_or_path.endswith(".csv"):
+        return spark.read.option("header", "true").option("inferSchema", "true").csv(name_or_path)
+    elif "abfss://" in name_or_path or "/" in name_or_path:
+        return spark.read.format("delta").load(name_or_path)
+    else:
+        return spark.table(name_or_path)
 
 # %% Cell 1: Load SQL sources
 sql_sources_df = read_source(config.lakehouse.sql_sources)

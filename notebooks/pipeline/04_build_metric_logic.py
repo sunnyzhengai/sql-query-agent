@@ -3,13 +3,22 @@
 Reads from: graph_nodes, graph_edges (Delta tables)
 Writes to:  metric_logic (Delta table)
 
-Prerequisite: Run 01_setup.py first (same session).
-              Run 03_build_graph.py at least once (writes graph tables).
-
+Run 03_build_graph.py at least once before this (writes graph tables).
 Flattens the graph into a single table the Data Agent can query
-without multi-hop traversal. One row per metric with calculation
-logic, source tables, and descriptions pre-joined.
+without multi-hop traversal.
 """
+
+# %% Cell 0: Setup (run once per session)
+%pip install pydantic pyyaml sqlglot
+
+import json
+import sys
+sys.path.insert(0, "/lakehouse/default/Files/sql-query-agent")
+
+from src.config import load_config
+from src.schemas import to_spark_schema
+
+config = load_config("/lakehouse/default/Files/sql-query-agent/org_config.yaml")
 
 # %% Cell 1: Load graph from Delta
 from src.graph.builder import GraphBuilder

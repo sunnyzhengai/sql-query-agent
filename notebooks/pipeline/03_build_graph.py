@@ -1,14 +1,32 @@
 """Fabric Notebook: Build Knowledge Graph
 
-Reads from: parse_results, sql_sources, dict_tables, dict_columns (Delta tables)
+Reads from: parse_results, dict_tables, dict_columns (Delta tables)
 Writes to:  graph_nodes, graph_edges (Delta tables)
 
-Prerequisite: Run 01_setup.py first (same session).
-              Run 02_parse.py at least once (writes parse_results).
-
-Rebuilds the three-layer graph from parse results and data dictionary.
+Run 02_parse.py at least once before this (writes parse_results).
 Does NOT re-parse SQL — reads pre-parsed CTEs from parse_results table.
 """
+
+# %% Cell 0: Setup (run once per session)
+%pip install pydantic pyyaml sqlglot sqlparse
+
+import json
+import sys
+sys.path.insert(0, "/lakehouse/default/Files/sql-query-agent")
+
+from src.config import load_config
+from src.schemas import to_spark_schema
+
+config = load_config("/lakehouse/default/Files/sql-query-agent/org_config.yaml")
+
+def read_source(name_or_path):
+    """Read a data source by name or path."""
+    if name_or_path.endswith(".csv"):
+        return spark.read.option("header", "true").option("inferSchema", "true").csv(name_or_path)
+    elif "abfss://" in name_or_path or "/" in name_or_path:
+        return spark.read.format("delta").load(name_or_path)
+    else:
+        return spark.table(name_or_path)
 
 # %% Cell 1: Load parse results from Delta
 parse_results_df = spark.table("parse_results")
