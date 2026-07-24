@@ -25,7 +25,7 @@ import sys
 sys.path.insert(0, "/lakehouse/default/Files/sql-query-agent")
 
 from src.config import load_config
-from src.parser.sql_parser import parse_sql, CTEInfo
+from src.parser.sql_parser import parse_sql
 from src.graph.builder import GraphBuilder
 from src.graph.traversal import GraphTraverser
 from src.dictionary import DataDictionary
@@ -227,66 +227,9 @@ for i, source in enumerate(sql_sources):
             queries = extract_with_scriptdom(sql)
             if not queries:
                 raise ValueError("ScriptDom found no SELECT statements")
-            # Parse each extracted query directly with sqlglot
-            # (bypass parse_sql's internal extractor — queries are already clean)
-            from src.parser.sql_parser import _parse_single_statement, _extract_temp_table_name, normalize_sql_whitespace
-            all_ctes = []
-            all_final_tables = []
-            all_final_cte_refs = []
-            all_final_columns = []
-            temp_table_names = set()
-            parsed_count = 0
-
-            for qi, q in enumerate(queries):
-                temp_name = _extract_temp_table_name(q)
-                if temp_name:
-                    temp_table_names.add(temp_name)
-                result = _parse_single_statement(q, "tsql")
-                if result is None:
-                    continue
-                parsed_count += 1
-
-                if temp_name:
-                    _clean = normalize_sql_whitespace(q)
-                    fragment = _clean[:500] if len(_clean) > 500 else _clean
-                    cte_table_refs = [t for t in result.final_select_tables if t not in temp_table_names]
-                    cte_depends = [t for t in result.final_select_tables if t in temp_table_names]
-                    all_ctes.append(CTEInfo(
-                        name=temp_name, sql_fragment=fragment,
-                        column_refs=result.final_select_columns,
-                        table_refs=cte_table_refs, depends_on=cte_depends,
-                    ))
-                    for cte in result.ctes:
-                        all_ctes.append(cte)
-                else:
-                    for cte in result.ctes:
-                        all_ctes.append(cte)
-                    for t in result.final_select_tables:
-                        if t not in all_final_tables:
-                            all_final_tables.append(t)
-                    for t in result.final_select_cte_refs:
-                        if t not in all_final_cte_refs:
-                            all_final_cte_refs.append(t)
-                    all_final_columns.extend(result.final_select_columns)
-
-            if parsed_count == 0:
-                raise ValueError(f"Failed to parse SQL: none of {len(queries)} extracted queries parsed successfully")
-
-            # Reclassify temp table refs in final tables
-            for t in all_final_tables[:]:
-                if t in temp_table_names:
-                    all_final_tables.remove(t)
-                    if t not in all_final_cte_refs:
-                        all_final_cte_refs.append(t)
-
-            from src.parser.sql_parser import ParsedSQL
-            parsed = ParsedSQL(
-                ctes=all_ctes,
-                final_select_tables=all_final_tables,
-                final_select_cte_refs=all_final_cte_refs,
-                final_select_columns=all_final_columns,
-                normalized_sql=";\n".join(queries),
-            )
+            # Parse pre-extracted queries (single function, no duplication)
+            from src.parser.sql_parser import parse_extracted_queries
+            parsed = parse_extracted_queries(queries, dialect="tsql")
         else:
             # Fallback: sqlparse extraction
             clean_sql = extract_select_statements(sql)
@@ -320,17 +263,12 @@ print(f"Errors: {len(parse_errors)}")
 
 # %% Cell 6b: Save parse errors for HITL review
 # Developers are notified to manually review/fix these failed SQL sources.
-from pyspark.sql.types import StringType, StructField, StructType, IntegerType
+from src.schemas import PARSE_ERRORS, PARSE_SUCCESSES, GRAPH_NODES, GRAPH_EDGES
+from src.schemas import BUILD_SUMMARY, METRIC_LOGIC, to_spark_schema
 
 if parse_errors:
-    errors_schema = StructType([
-        StructField("metric_id", StringType(), False),
-        StructField("name", StringType(), False),
-        StructField("error", StringType(), True),
-        StructField("line_count", IntegerType(), True),
-    ])
     errors_rows = [(e["metric_id"], e["name"], e["error"], e["line_count"]) for e in parse_errors]
-    errors_df = spark.createDataFrame(errors_rows, schema=errors_schema)
+    errors_df = spark.createDataFrame(errors_rows, schema=to_spark_schema(PARSE_ERRORS))
     errors_df.write.format("delta").mode("overwrite").saveAsTable("parse_errors")
     print(f"Saved {len(parse_errors)} parse errors to 'parse_errors' table")
     print("→ Developers: review this table and fix the source SQL for these procs")
@@ -340,36 +278,13 @@ if parse_errors:
 
 # Save parse successes for validation
 if parse_successes:
-    success_schema = StructType([
-        StructField("metric_id", StringType(), False),
-        StructField("name", StringType(), False),
-        StructField("cte_count", IntegerType(), True),
-        StructField("table_count", IntegerType(), True),
-        StructField("line_count", IntegerType(), True),
-    ])
     success_rows = [(s["metric_id"], s["name"], s["cte_count"], s["table_count"], s["line_count"])
                     for s in parse_successes]
-    success_df = spark.createDataFrame(success_rows, schema=success_schema)
+    success_df = spark.createDataFrame(success_rows, schema=to_spark_schema(PARSE_SUCCESSES))
     success_df.write.format("delta").mode("overwrite").saveAsTable("parse_successes")
     print(f"Saved {len(parse_successes)} parse successes to 'parse_successes' table")
 
 # %% Cell 7: Write graph to Delta tables
-from pyspark.sql.types import StringType, StructField, StructType
-
-nodes_schema = StructType([
-    StructField("node_id", StringType(), False),
-    StructField("layer", StringType(), False),
-    StructField("name", StringType(), False),
-    StructField("description", StringType(), True),
-    StructField("properties", StringType(), True),
-])
-
-edges_schema = StructType([
-    StructField("source_id", StringType(), False),
-    StructField("target_id", StringType(), False),
-    StructField("edge_type", StringType(), False),
-    StructField("properties", StringType(), True),
-])
 
 nodes_rows = [
     (n.node_id, n.layer.value, n.name, n.description, json.dumps(n.properties))
@@ -381,8 +296,8 @@ edges_rows = [
     for e in builder.edges
 ]
 
-nodes_df = spark.createDataFrame(nodes_rows, schema=nodes_schema)
-edges_df = spark.createDataFrame(edges_rows, schema=edges_schema)
+nodes_df = spark.createDataFrame(nodes_rows, schema=to_spark_schema(GRAPH_NODES))
+edges_df = spark.createDataFrame(edges_rows, schema=to_spark_schema(GRAPH_EDGES))
 
 def write_table(df, name):
     if "/" in name:
@@ -452,16 +367,7 @@ for source in sql_sources:
 for e in parse_errors:
     summary_rows.append((now, f"error_{e['metric_id']}", "parse_failed", e["error"][:200]))
 
-from pyspark.sql.types import StringType, StructField, StructType
-
-summary_schema = StructType([
-    StructField("build_time", StringType(), False),
-    StructField("metric_key", StringType(), False),
-    StructField("value", StringType(), False),
-    StructField("detail", StringType(), True),
-])
-
-summary_df = spark.createDataFrame(summary_rows, schema=summary_schema)
+summary_df = spark.createDataFrame(summary_rows, schema=to_spark_schema(BUILD_SUMMARY))
 
 # Append to build_summary (keep history of each run)
 try:
@@ -540,21 +446,7 @@ for source in sql_sources:
         tables_str, table_descs_str,
     ))
 
-from pyspark.sql.types import StringType, StructField, StructType, IntegerType
-
-ml_schema = StructType([
-    StructField("metric_id", StringType(), False),
-    StructField("metric_name", StringType(), False),
-    StructField("description", StringType(), True),
-    StructField("steward", StringType(), True),
-    StructField("developer", StringType(), True),
-    StructField("transform_count", IntegerType(), True),
-    StructField("calculation_logic", StringType(), True),
-    StructField("source_tables", StringType(), True),
-    StructField("table_descriptions", StringType(), True),
-])
-
-ml_df = spark.createDataFrame(metric_logic_rows, schema=ml_schema)
+ml_df = spark.createDataFrame(metric_logic_rows, schema=to_spark_schema(METRIC_LOGIC))
 ml_df.write.format("delta").mode("overwrite").option("overwriteSchema", "true").saveAsTable("metric_logic")
 print(f"Saved {len(metric_logic_rows)} rows to metric_logic table")
 print("→ Add 'metric_logic' as a data source in your Fabric Data Agent")

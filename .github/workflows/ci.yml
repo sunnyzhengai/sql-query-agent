@@ -34,6 +34,10 @@ jobs:
         run: |
           pytest tests/ -v --tb=short
 
+      - name: Detect dead code
+        run: |
+          python scripts/detect_dead_code.py
+
       - name: Check packaging
         run: |
           pip install build twine

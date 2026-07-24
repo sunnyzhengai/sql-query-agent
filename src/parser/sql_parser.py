@@ -215,16 +215,125 @@ def _extract_temp_table_name(sql: str) -> str | None:
     return None
 
 
-def parse_sql(sql: str, dialect: str = "tsql", llm_backend=None,
-              scriptdom_url: str = "") -> ParsedSQL:
-    """Parse SQL and extract structure. Handles single and multi-statement input.
+def parse_extracted_queries(queries: list[str], dialect: str = "tsql") -> ParsedSQL:
+    """Parse pre-extracted SQL queries and merge into a single ParsedSQL.
 
-    Extraction strategy:
-    1. ScriptDom (if service is running) — 100% accurate T-SQL parsing
-    2. sqlparse-based extractor — fallback if ScriptDom unavailable
+    This is the core multi-statement merging logic. Call this when you already
+    have individual SQL queries (e.g., from ScriptDom via pythonnet or the
+    microservice). Handles:
+    - Single query: parse directly
+    - Multiple queries: merge CTEs, track temp table dependencies
 
     Args:
-        sql: The SQL statement or stored procedure to parse.
+        queries: List of individual SQL queries (already extracted).
+        dialect: SQL dialect for sqlglot parsing.
+
+    Returns:
+        ParsedSQL with merged CTEs, tables, and columns.
+
+    Raises:
+        ValueError: If no queries provided or none parse successfully.
+    """
+    if not queries:
+        raise ValueError("Failed to parse SQL: no SQL queries found in input")
+
+    # Single query — parse directly
+    if len(queries) == 1:
+        result = _parse_single_statement(queries[0], dialect)
+        if result:
+            return result
+        raise ValueError(f"Failed to parse SQL: {queries[0][:100]}...")
+
+    # Multiple queries — parse each individually, merge results
+    logger.info("Parsing %d extracted queries individually", len(queries))
+
+    all_ctes: list[CTEInfo] = []
+    all_final_tables: list[str] = []
+    all_final_cte_refs: list[str] = []
+    all_final_columns: list[ColumnRef] = []
+    temp_table_names: set[str] = set()
+    parsed_count = 0
+
+    for i, query in enumerate(queries):
+        temp_name = _extract_temp_table_name(query)
+        if temp_name:
+            temp_table_names.add(temp_name)
+
+        result = _parse_single_statement(query, dialect)
+        if result is None:
+            logger.warning("Failed to parse query %d/%d: %s...", i + 1, len(queries), query[:60])
+            continue
+
+        parsed_count += 1
+
+        if temp_name:
+            # Temp table query → treat as CTE definition
+            clean_fragment = normalize_sql_whitespace(query)
+            fragment = clean_fragment[:500] if len(clean_fragment) > 500 else clean_fragment
+            all_table_refs = list(result.final_select_tables)
+            cte_table_refs = [t for t in all_table_refs if t not in temp_table_names]
+            cte_depends = [t for t in all_table_refs if t in temp_table_names]
+
+            all_ctes.append(CTEInfo(
+                name=temp_name,
+                sql_fragment=fragment,
+                column_refs=result.final_select_columns,
+                table_refs=cte_table_refs,
+                depends_on=cte_depends,
+            ))
+            for cte in result.ctes:
+                all_ctes.append(cte)
+        else:
+            # Terminal SELECT
+            for cte in result.ctes:
+                all_ctes.append(cte)
+            for t in result.final_select_tables:
+                if t not in all_final_tables:
+                    all_final_tables.append(t)
+            for t in result.final_select_cte_refs:
+                if t not in all_final_cte_refs:
+                    all_final_cte_refs.append(t)
+            all_final_columns.extend(result.final_select_columns)
+
+    if parsed_count == 0:
+        raise ValueError(f"Failed to parse SQL: none of {len(queries)} extracted queries parsed successfully")
+
+    # Reclassify temp table refs in final tables
+    for t in all_final_tables[:]:
+        if t in temp_table_names:
+            all_final_tables.remove(t)
+            if t not in all_final_cte_refs:
+                all_final_cte_refs.append(t)
+
+    merged = ParsedSQL(
+        ctes=all_ctes,
+        final_select_tables=all_final_tables,
+        final_select_cte_refs=all_final_cte_refs,
+        final_select_columns=all_final_columns,
+        normalized_sql=";\n".join(queries),
+    )
+
+    logger.info(
+        "Merged %d/%d queries: %d CTEs, %d final tables, %d CTE refs",
+        parsed_count, len(queries),
+        len(merged.ctes), len(merged.final_select_tables), len(merged.final_select_cte_refs),
+    )
+    return merged
+
+
+def parse_sql(sql: str, dialect: str = "tsql", llm_backend=None,
+              scriptdom_url: str = "") -> ParsedSQL:
+    """Parse raw SQL and extract structure. Handles extraction + parsing.
+
+    Extraction strategy:
+    1. ScriptDom (if microservice is running) — 100% accurate T-SQL parsing
+    2. sqlparse-based extractor — fallback if ScriptDom unavailable
+
+    For pre-extracted queries (e.g., from ScriptDom via pythonnet in Fabric),
+    use parse_extracted_queries() directly instead.
+
+    Args:
+        sql: The raw SQL statement or stored procedure to parse.
         dialect: SQL dialect (default: tsql for SQL Server / Fabric).
         llm_backend: Optional LLM backend (not used in current architecture).
         scriptdom_url: URL of ScriptDom microservice (default: tries localhost:5111).
@@ -252,101 +361,7 @@ def parse_sql(sql: str, dialect: str = "tsql", llm_backend=None,
         queries = sqlparse_extract(sql)
         logger.info("sqlparse extracted %d queries", len(queries))
 
-    if not queries:
-        logger.warning("No queries extracted from input")
-        raise ValueError("Failed to parse SQL: no SQL queries found in input")
-
-    # Step 2: If only one query, parse it directly
-    if len(queries) == 1:
-        result = _parse_single_statement(queries[0], dialect)
-        if result:
-            return result
-        raise ValueError(f"Failed to parse SQL: {queries[0][:100]}...")
-
-    # Step 3: Multiple queries — parse each individually, merge results
-    logger.info("Parsing %d extracted queries individually", len(queries))
-
-    all_ctes: list[CTEInfo] = []
-    all_final_tables: list[str] = []
-    all_final_cte_refs: list[str] = []
-    all_final_columns: list[ColumnRef] = []
-    temp_table_names: set[str] = set()  # track #temp tables defined in this proc
-    parsed_count = 0
-
-    for i, query in enumerate(queries):
-        # Check if this query writes to a temp table
-        temp_name = _extract_temp_table_name(query)
-        if temp_name:
-            temp_table_names.add(temp_name)
-
-        # Parse the individual query
-        result = _parse_single_statement(query, dialect)
-        if result is None:
-            logger.warning("Failed to parse query %d/%d: %s...", i + 1, len(queries), query[:60])
-            continue
-
-        parsed_count += 1
-
-        # If this query writes to a temp table, treat it as a CTE definition
-        if temp_name:
-            # Create a CTE entry for this temp table staging query
-            fragment = query[:500] if len(query) > 500 else query
-            # Collect table refs from this query (exclude temp tables and CTE names)
-            all_table_refs = list(result.final_select_tables)
-            cte_table_refs = [t for t in all_table_refs if t not in temp_table_names]
-            cte_depends = [t for t in all_table_refs if t in temp_table_names]
-
-            all_ctes.append(CTEInfo(
-                name=temp_name,
-                sql_fragment=fragment,
-                column_refs=result.final_select_columns,
-                table_refs=cte_table_refs,
-                depends_on=cte_depends,
-            ))
-
-            # Also include any CTEs from within this query (WITH...SELECT INTO #temp)
-            for cte in result.ctes:
-                all_ctes.append(cte)
-        else:
-            # This is a terminal SELECT (no INTO #temp)
-            # Include its CTEs
-            for cte in result.ctes:
-                all_ctes.append(cte)
-
-            # Track its table references
-            for t in result.final_select_tables:
-                if t not in all_final_tables:
-                    all_final_tables.append(t)
-            for t in result.final_select_cte_refs:
-                if t not in all_final_cte_refs:
-                    all_final_cte_refs.append(t)
-            all_final_columns.extend(result.final_select_columns)
-
-    if parsed_count == 0:
-        raise ValueError(f"Failed to parse SQL: none of {len(queries)} extracted queries parsed successfully")
-
-    # Build the merged result
-    # Add temp table references to final_cte_refs (the final SELECT reads from temps)
-    for t in all_final_tables[:]:
-        if t in temp_table_names:
-            all_final_tables.remove(t)
-            if t not in all_final_cte_refs:
-                all_final_cte_refs.append(t)
-
-    merged = ParsedSQL(
-        ctes=all_ctes,
-        final_select_tables=all_final_tables,
-        final_select_cte_refs=all_final_cte_refs,
-        final_select_columns=all_final_columns,
-        normalized_sql=";\n".join(queries),
-    )
-
-    logger.info(
-        "Merged %d/%d queries: %d CTEs, %d final tables, %d CTE refs",
-        parsed_count, len(queries),
-        len(merged.ctes), len(merged.final_select_tables), len(merged.final_select_cte_refs),
-    )
-    return merged
+    return parse_extracted_queries(queries, dialect)
 
 
 def _extract_column_refs(node: exp.Expression) -> list[ColumnRef]:
