@@ -124,8 +124,13 @@ def normalize_sql_whitespace(sql: str) -> str:
     \\r\\n\\t characters. Also handles non-breaking spaces (\\xa0) from
     copy-paste in SSMS or web editors.
     """
-    # Replace non-breaking spaces with regular spaces
-    sql = sql.replace('\xa0', ' ')
+    # Replace all Unicode whitespace variants with ASCII equivalents
+    # Sources: copy-paste from web/Word/PDF, BOM markers, SSMS quirks
+    sql = sql.replace('\ufeff', '')      # BOM (byte order mark)
+    sql = sql.replace('\u200b', '')      # zero-width space
+    sql = sql.replace('\xa0', ' ')       # non-breaking space
+    sql = sql.replace('\x0b', '\n')      # vertical tab
+    sql = sql.replace('\x0c', '\n')      # form feed
     # Normalize all line ending variants (\r\r\n, \r\n, \r) to \n
     sql = sql.replace('\r\n', '\n').replace('\r', '\n')
     # Collapse multiple spaces/tabs to single space
