@@ -87,14 +87,17 @@ _SKIP_PROPERTIES = frozenset({
 })
 
 
-def _walk_children(node, visitor_fn, depth=0, max_depth=15):
-    """Generic AST walker that calls visitor_fn on each node.
-
-    Skips known scalar properties to avoid expensive reflection calls.
-    """
-    if node is None or depth > max_depth:
+def _walk_for_tables_only(node, tables, depth=0):
+    """Walk AST node and collect only table references. Fast path — no columns."""
+    if node is None or depth > 15:
         return
-    visitor_fn(node)
+    nt = node.GetType().Name
+    if nt == "NamedTableReference":
+        try:
+            tables.append(node.SchemaObject.BaseIdentifier.Value)
+        except Exception:
+            pass
+        return  # no need to descend into table reference children
     try:
         for prop in node.GetType().GetProperties():
             if prop.Name in _SKIP_PROPERTIES:
@@ -104,43 +107,16 @@ def _walk_children(node, visitor_fn, depth=0, max_depth=15):
                 if value is None:
                     continue
                 if hasattr(value, "GetType") and hasattr(value, "StartLine"):
-                    _walk_children(value, visitor_fn, depth + 1, max_depth)
+                    _walk_for_tables_only(value, tables, depth + 1)
                 elif hasattr(value, "Count"):
                     for k in range(value.Count):
                         item = value[k]
                         if hasattr(item, "StartLine"):
-                            _walk_children(item, visitor_fn, depth + 1, max_depth)
+                            _walk_for_tables_only(item, tables, depth + 1)
             except Exception:
                 continue
     except Exception:
         pass
-
-
-def _walk_for_refs(node, tables, columns, depth=0):
-    """Walk AST node and collect table and column references."""
-    def visitor(n):
-        nt = n.GetType().Name
-        if nt == "NamedTableReference":
-            try:
-                tables.append(n.SchemaObject.BaseIdentifier.Value)
-            except Exception:
-                pass
-        elif nt == "ColumnReferenceExpression":
-            try:
-                multi = n.MultiPartIdentifier
-                if multi and multi.Identifiers:
-                    count = multi.Identifiers.Count
-                    if count == 1:
-                        columns.append((None, multi.Identifiers[0].Value))
-                    elif count >= 2:
-                        columns.append((
-                            multi.Identifiers[count - 2].Value,
-                            multi.Identifiers[count - 1].Value,
-                        ))
-            except Exception:
-                pass
-
-    _walk_children(node, visitor)
 
 
 def _get_into_target(stmt):
@@ -262,27 +238,25 @@ def load_scriptdom(dll_path: str = "/lakehouse/default/Files/sql-query-agent/lib
                         if len(cte_sql) > 500:
                             cte_sql = cte_sql[:500]
                         cte_tables = []
-                        cte_cols = []
-                        _walk_for_refs(cte_body, cte_tables, cte_cols)
-                        raw_entries.append((cte_name_val, cte_sql, cte_tables, cte_cols, True))
+                        _walk_for_tables_only(cte_body, cte_tables)
+                        raw_entries.append((cte_name_val, cte_sql, cte_tables, [], True))
 
-                # Get refs from the statement body
+                # Get table refs from the statement body (tables only, no columns — fast)
                 tables = []
-                columns = []
                 if stmt_type == "SelectStatement":
-                    _walk_for_refs(stmt.QueryExpression, tables, columns)
+                    _walk_for_tables_only(stmt.QueryExpression, tables)
                 elif stmt_type == "InsertStatement":
                     spec = stmt.InsertSpecification
                     if spec.InsertSource:
-                        _walk_for_refs(spec.InsertSource, tables, columns)
+                        _walk_for_tables_only(spec.InsertSource, tables)
 
                 if temp_name:
                     sql_text = normalize_sql_whitespace(_get_fragment_text(stmt))
                     if len(sql_text) > 500:
                         sql_text = sql_text[:500]
-                    raw_entries.append((temp_name, sql_text, tables, columns, False))
+                    raw_entries.append((temp_name, sql_text, tables, [], False))
                 else:
-                    raw_entries.append((None, "", tables, columns, False))
+                    raw_entries.append((None, "", tables, [], False))
 
             # Second pass: classify table refs as physical vs CTE/temp dependency
             all_internal_names = cte_names | temp_table_names
