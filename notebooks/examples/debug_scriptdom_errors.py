@@ -125,3 +125,36 @@ nodes_df.filter("layer = 'transformation'").select("node_id", "name").show(5, tr
 # Show first 5 edges
 print("Sample edges:")
 edges_df.show(5, truncate=80)
+
+# %% Cell 7: Debug a specific parse error — see what ScriptDom extracted and what sqlglot rejects
+# Change METRIC_ID to the proc that failed
+METRIC_ID = "USP_CCHCS_Controlled_Substance_Waste_PBI"
+
+from src.parser.sql_parser import _parse_single_statement, _extract_temp_table_name, _clean_extracted_query
+
+raw_sql = spark.sql(f"SELECT sql FROM sql_sources WHERE metric_id = '{METRIC_ID}'").collect()[0]["sql"]
+print(f"=== Debug Parse Error: {METRIC_ID} ===")
+print(f"Raw SQL: {len(raw_sql)} chars\n")
+
+# Extract with ScriptDom
+queries = extract_with_scriptdom(raw_sql)
+print(f"ScriptDom extracted: {len(queries)} queries\n")
+
+# Try parsing each one individually
+for i, q in enumerate(queries):
+    print(f"--- Query {i+1} ({len(q)} chars) ---")
+    print(f"Preview: {q[:150]}...")
+    temp_name = _extract_temp_table_name(q)
+    if temp_name:
+        print(f"  Temp table: #{temp_name}")
+    cleaned = _clean_extracted_query(q)
+    try:
+        result = _parse_single_statement(q, "tsql")
+        if result:
+            print(f"  OK: {len(result.ctes)} CTEs, {len(result.final_select_tables)} tables")
+        else:
+            print(f"  SKIPPED (returned None)")
+    except Exception as e:
+        print(f"  FAILED: {str(e)[:200]}")
+        print(f"  Cleaned SQL preview: {cleaned[:300]}")
+    print()
