@@ -167,7 +167,7 @@ def _parse_single_statement(sql: str, dialect: str) -> ParsedSQL | None:
 
     try:
         parsed = sqlglot.parse_one(sql, dialect=dialect)
-    except sqlglot.errors.ParseError:
+    except (sqlglot.errors.ParseError, sqlglot.errors.TokenError):
         return None
 
     result = ParsedSQL(normalized_sql=sql)
