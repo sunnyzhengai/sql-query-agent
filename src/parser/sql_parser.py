@@ -136,10 +136,6 @@ def _clean_extracted_query(sql: str) -> str:
     this only cleans individual query statements that the extractor already
     isolated. Much safer because the SQL is already a single SELECT/WITH.
     """
-    # Normalize line endings FIRST — ScriptDom preserves \r\r\n from Windows SQL files.
-    # Comment stripping relies on $ matching at \n, so this must come before.
-    sql = sql.replace('\r\n', '\n').replace('\r', '\n')
-
     # Remove OPTION(...) query hints
     sql = re.sub(r"\bOPTION\s*\([^)]*\)\s*;?", "", sql, flags=re.IGNORECASE)
 
@@ -241,6 +237,11 @@ def parse_extracted_queries(queries: list[str], dialect: str = "tsql") -> Parsed
     if not queries:
         raise ValueError("Failed to parse SQL: no SQL queries found in input")
 
+    # Normalize all queries upfront — Windows SQL files have \r\n or \r\r\n
+    # line endings that break comment stripping, tokenization, and storage.
+    # Do this once here so no downstream function needs to worry about it.
+    queries = [normalize_sql_whitespace(q) for q in queries]
+
     # Single query — parse directly
     if len(queries) == 1:
         result = _parse_single_statement(queries[0], dialect)
@@ -290,8 +291,8 @@ def parse_extracted_queries(queries: list[str], dialect: str = "tsql") -> Parsed
 
         if temp_name:
             # Temp table query → treat as CTE definition
-            clean_fragment = normalize_sql_whitespace(query)
-            fragment = clean_fragment[:500] if len(clean_fragment) > 500 else clean_fragment
+            # query is already normalized at the entry point
+            fragment = query[:500] if len(query) > 500 else query
             all_table_refs = list(result.final_select_tables)
             # Filter out self-reference (INTO #X creates __temp_X__ as a table ref)
             self_variants = {temp_name, f"__temp_{temp_name}__"}
