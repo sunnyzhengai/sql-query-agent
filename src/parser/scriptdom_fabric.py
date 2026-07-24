@@ -25,13 +25,17 @@ import sys
 
 
 def _walk_for_selects(node, results, _get_text_fn):
-    """Recursively walk the AST and collect SelectStatement/InsertStatement nodes."""
+    """Recursively walk the AST and collect SelectStatement/InsertStatement nodes.
+
+    Stops descending into a branch once a SELECT/INSERT is found (they're
+    leaf nodes for our purposes — we don't want nested subquery SELECTs).
+    """
     if node is None:
         return
     node_type = node.GetType().Name
     if node_type == "SelectStatement":
         results.append(node)
-        return
+        return  # don't descend into subqueries
     if node_type == "InsertStatement":
         spec = node.InsertSpecification
         if spec and spec.InsertSource and spec.InsertSource.GetType().Name == "SelectInsertSource":
@@ -39,11 +43,13 @@ def _walk_for_selects(node, results, _get_text_fn):
             return
     try:
         for prop in node.GetType().GetProperties():
+            if prop.Name in _SKIP_PROPERTIES:
+                continue
             try:
                 value = prop.GetValue(node)
                 if value is None:
                     continue
-                if hasattr(value, "StartLine"):
+                if hasattr(value, "GetType") and hasattr(value, "StartLine"):
                     _walk_for_selects(value, results, _get_text_fn)
                 elif hasattr(value, "Count"):
                     for j in range(value.Count):
@@ -72,48 +78,69 @@ def _get_fragment_text(fragment):
     return "".join(parts)
 
 
-def _walk_for_refs(node, tables, columns, depth=0):
-    """Walk AST node and collect table and column references."""
-    if node is None or depth > 15:
+# Properties that never contain AST children — skip these during walks
+_SKIP_PROPERTIES = frozenset({
+    "StartLine", "StartColumn", "StartOffset", "FragmentLength",
+    "FirstTokenIndex", "LastTokenIndex", "ScriptTokenStream",
+    "Value", "LargeValue", "IsNot", "IsPrimaryExpression",
+    "Collation", "Alias",
+})
+
+
+def _walk_children(node, visitor_fn, depth=0, max_depth=15):
+    """Generic AST walker that calls visitor_fn on each node.
+
+    Skips known scalar properties to avoid expensive reflection calls.
+    """
+    if node is None or depth > max_depth:
         return
-    nt = node.GetType().Name
-    if nt == "NamedTableReference":
-        try:
-            tables.append(node.SchemaObject.BaseIdentifier.Value)
-        except Exception:
-            pass
-    elif nt == "ColumnReferenceExpression":
-        try:
-            multi = node.MultiPartIdentifier
-            if multi and multi.Identifiers:
-                count = multi.Identifiers.Count
-                if count == 1:
-                    columns.append((None, multi.Identifiers[0].Value))
-                elif count >= 2:
-                    # Last part is column, second-to-last is table/alias
-                    columns.append((
-                        multi.Identifiers[count - 2].Value,
-                        multi.Identifiers[count - 1].Value,
-                    ))
-        except Exception:
-            pass
+    visitor_fn(node)
     try:
         for prop in node.GetType().GetProperties():
+            if prop.Name in _SKIP_PROPERTIES:
+                continue
             try:
                 value = prop.GetValue(node)
                 if value is None:
                     continue
-                if hasattr(value, "StartLine"):
-                    _walk_for_refs(value, tables, columns, depth + 1)
+                if hasattr(value, "GetType") and hasattr(value, "StartLine"):
+                    _walk_children(value, visitor_fn, depth + 1, max_depth)
                 elif hasattr(value, "Count"):
                     for k in range(value.Count):
                         item = value[k]
                         if hasattr(item, "StartLine"):
-                            _walk_for_refs(item, tables, columns, depth + 1)
+                            _walk_children(item, visitor_fn, depth + 1, max_depth)
             except Exception:
                 continue
     except Exception:
         pass
+
+
+def _walk_for_refs(node, tables, columns, depth=0):
+    """Walk AST node and collect table and column references."""
+    def visitor(n):
+        nt = n.GetType().Name
+        if nt == "NamedTableReference":
+            try:
+                tables.append(n.SchemaObject.BaseIdentifier.Value)
+            except Exception:
+                pass
+        elif nt == "ColumnReferenceExpression":
+            try:
+                multi = n.MultiPartIdentifier
+                if multi and multi.Identifiers:
+                    count = multi.Identifiers.Count
+                    if count == 1:
+                        columns.append((None, multi.Identifiers[0].Value))
+                    elif count >= 2:
+                        columns.append((
+                            multi.Identifiers[count - 2].Value,
+                            multi.Identifiers[count - 1].Value,
+                        ))
+            except Exception:
+                pass
+
+    _walk_children(node, visitor)
 
 
 def _get_into_target(stmt):
