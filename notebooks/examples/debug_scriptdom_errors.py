@@ -157,4 +157,17 @@ for i, q in enumerate(queries):
     except Exception as e:
         print(f"  FAILED: {str(e)[:200]}")
         print(f"  Cleaned SQL preview: {cleaned[:300]}")
+        # Dump raw bytes around the failing area for root cause analysis
+        err_text = str(e)
+        # Try to find the failing token in the query
+        for search_term in ["121676", "122129", "122131"]:
+            idx = q.find(search_term)
+            if idx > 0:
+                chunk = q[idx-30:idx+30]
+                print(f"  Raw bytes around '{search_term}': {repr(chunk)}")
+                break
+        # Also show the last IN clause
+        idx = q.rfind(' IN ')
+        if idx > 0:
+            print(f"  Last IN clause: {repr(q[idx:idx+300])}")
     print()
