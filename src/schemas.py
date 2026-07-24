@@ -74,6 +74,9 @@ PARSE_ERRORS = {
         ("metric_id", "string", False),
         ("name", "string", False),
         ("error", "string", True),
+        ("error_category", "string", True),
+        ("user_explanation", "string", True),
+        ("suggested_action", "string", True),
         ("line_count", "integer", True),
     ],
 }

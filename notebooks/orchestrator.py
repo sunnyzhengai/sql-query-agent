@@ -245,13 +245,19 @@ for i, source in enumerate(sql_sources):
         })
         print(f"  Parsed: {metric_id} ({name}) — {len(parsed.ctes)} CTEs, {len(parsed.final_select_tables)} tables")
     except Exception as e:
+        from src.parser.error_classifier import classify_parse_error
+        lc = sql.count("\n") + 1
+        classification = classify_parse_error(str(e), metric_id, lc)
         parse_errors.append({
             "metric_id": metric_id,
             "name": name,
             "error": str(e)[:200],
-            "line_count": sql.count("\n") + 1,
+            "error_category": classification["error_category"],
+            "user_explanation": classification["user_explanation"],
+            "suggested_action": classification["suggested_action"],
+            "line_count": lc,
         })
-        print(f"  ERROR parsing {metric_id}: {e}")
+        print(f"  ERROR parsing {metric_id}: [{classification['error_category']}] {e}")
 
     if (i + 1) % 100 == 0:
         elapsed = _time.time() - start_time

@@ -133,32 +133,35 @@ Show the current system status:
 - "Who is the steward for [metric]?" → read from canonical node properties
 
 ### /errors — Parse Error Report
-When asked about errors, query the `extraction_inspection` and `error_log` tables:
+When asked about errors, query the `parse_errors` table:
 
 **Overview:**
 ```sql
-SELECT
-  COUNT(*) as total,
-  SUM(CASE WHEN parse_ok = true THEN 1 ELSE 0 END) as passed,
-  SUM(CASE WHEN parse_ok = false THEN 1 ELSE 0 END) as failed
-FROM extraction_inspection
+SELECT error_category, COUNT(*) as count
+FROM parse_errors
+GROUP BY error_category
+ORDER BY count DESC
 ```
 
 **List specific failures:**
 ```sql
-SELECT metric_id, line_count, query_count, parse_error
-FROM extraction_inspection
-WHERE parse_ok = false
+SELECT metric_id, error_category, user_explanation, line_count
+FROM parse_errors
 ORDER BY line_count DESC
 ```
 
-**Show details for a specific error (e.g., "/errors USP_IPSO_SEVERE_SEPSIS"):**
+**Show details for a specific error (e.g., "/errors USP_SOME_PROC"):**
 ```sql
-SELECT metric_id, line_count, query_count, parse_error, clean_sql
-FROM extraction_inspection
-WHERE metric_id = 'USP_IPSO_SEVERE_SEPSIS'
+SELECT metric_id, user_explanation, suggested_action, error, line_count
+FROM parse_errors
+WHERE metric_id = 'USP_SOME_PROC'
 ```
-Show the user: the proc name, how many lines it has, what error occurred, and a preview of the extracted SQL so they can see exactly what broke.
+
+**How to explain errors to users:**
+- Use the `user_explanation` column — it's already in plain English
+- Use the `suggested_action` column to tell admins/developers what to do
+- The `error` column has the raw technical error (show only to developers)
+- The `error_category` values are: `no_query`, `complex_sql`, `all_queries_failed`, `parse_failure`, `extraction_failure`, `unknown`
 
 **Error history across runs:**
 ```sql
