@@ -1,5 +1,6 @@
 # Paste this as a new cell at the bottom of 02_parse.py
 # Run after Cell 0 (ScriptDom is already loaded)
+# Change METRIC_ID to test different procs
 
 from Microsoft.SqlServer.TransactSql.ScriptDom import TSql160Parser
 from System.IO import StringReader
@@ -13,8 +14,33 @@ reader = StringReader(raw_sql)
 parse_result = parser.Parse(reader, None)
 fragment = parse_result[0] if isinstance(parse_result, tuple) else parse_result
 
+def find_statements(node, results, depth=0):
+    if node is None or depth > 20:
+        return
+    nt = node.GetType().Name
+    if nt in ("SelectStatement", "InsertStatement"):
+        results.append(node)
+        return
+    try:
+        for prop in node.GetType().GetProperties():
+            try:
+                value = prop.GetValue(node)
+                if value is None:
+                    continue
+                if hasattr(value, "StartLine"):
+                    find_statements(value, results, depth + 1)
+                elif hasattr(value, "Count"):
+                    for j in range(value.Count):
+                        item = value[j]
+                        if hasattr(item, "StartLine"):
+                            find_statements(item, results, depth + 1)
+            except Exception:
+                continue
+    except Exception:
+        pass
+
 def walk_refs(node, tables, columns, depth=0):
-    if node is None or depth > 10:
+    if node is None or depth > 15:
         return
     nt = node.GetType().Name
     if nt == "NamedTableReference":
@@ -48,44 +74,35 @@ def walk_refs(node, tables, columns, depth=0):
     except Exception:
         pass
 
-batch = fragment.Batches[0]
-for i in range(batch.Statements.Count):
-    stmt = batch.Statements[i]
-    stmt_type = stmt.GetType().Name
-    print(f"\nStatement {i+1}: {stmt_type}")
+stmts = []
+find_statements(fragment, stmts)
+print(f"Found {len(stmts)} statements\n")
 
-    if stmt_type == "SelectStatement" and stmt.WithCtesAndXmlNamespaces:
+for i, stmt in enumerate(stmts):
+    nt = stmt.GetType().Name
+    sql_preview = _get_fragment_text(stmt)[:100]
+    print(f"--- Statement {i+1}: {nt} ({len(_get_fragment_text(stmt))} chars) ---")
+    print(f"Preview: {sql_preview}...")
+
+    if nt == "SelectStatement" and stmt.WithCtesAndXmlNamespaces:
         ctes = stmt.WithCtesAndXmlNamespaces.CommonTableExpressions
-        print(f"  CTEs: {ctes.Count}")
+        print(f"CTEs: {ctes.Count}")
         for j in range(ctes.Count):
             cte = ctes[j]
             cte_name = cte.ExpressionName.Value
-            cte_sql = _get_fragment_text(cte.QueryExpression)
-            tables = []
-            columns = []
-            walk_refs(cte.QueryExpression, tables, columns)
-            print(f"  CTE '{cte_name}': tables={tables}, columns(first 5)={columns[:5]}")
-            print(f"    SQL: {cte_sql[:100]}...")
+            t = []
+            c = []
+            walk_refs(cte.QueryExpression, t, c)
+            print(f"  '{cte_name}': tables={t}, cols(5)={c[:5]}")
 
-        tables = []
-        columns = []
-        walk_refs(stmt.QueryExpression, tables, columns)
-        print(f"  Final SELECT: tables={tables}, columns(first 5)={columns[:5]}")
-
-    elif stmt_type == "InsertStatement":
+    if nt == "InsertStatement":
         spec = stmt.InsertSpecification
-        target = spec.Target
-        if target.GetType().Name == "NamedTableReference":
-            print(f"  INTO: {target.SchemaObject.BaseIdentifier.Value}")
-        tables = []
-        columns = []
-        walk_refs(spec.InsertSource, tables, columns)
-        print(f"  FROM tables: {tables}")
-        print(f"  Columns(first 5): {columns[:5]}")
+        if spec.Target and spec.Target.GetType().Name == "NamedTableReference":
+            print(f"INTO: {spec.Target.SchemaObject.BaseIdentifier.Value}")
 
-    elif stmt_type == "SelectStatement":
-        tables = []
-        columns = []
-        walk_refs(stmt, tables, columns)
-        print(f"  Tables: {tables}")
-        print(f"  Columns(first 5): {columns[:5]}")
+    tables = []
+    columns = []
+    walk_refs(stmt, tables, columns)
+    print(f"All tables: {tables}")
+    print(f"All columns (first 10): {columns[:10]}")
+    print()
