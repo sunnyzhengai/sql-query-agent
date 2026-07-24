@@ -37,10 +37,10 @@ print(f"Loaded config for: {config.org.name}")
 # %% Cell 3b: Load ScriptDom parser
 from src.parser.scriptdom_fabric import load_scriptdom
 
-scriptdom_available, extract_with_scriptdom = load_scriptdom()
+scriptdom_available, extract_with_scriptdom, parse_with_scriptdom = load_scriptdom()
 
 if scriptdom_available:
-    print("ScriptDom loaded! (Microsoft's native T-SQL parser via pythonnet)")
+    print("ScriptDom loaded! (Option B: direct AST extraction)")
 else:
     print("ScriptDom not available, falling back to sqlparse extractor")
     from src.parser.sql_extractor import extract_select_statements

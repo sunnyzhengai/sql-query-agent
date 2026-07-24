@@ -1,18 +1,21 @@
-"""ScriptDom extraction via pythonnet — for use in Fabric notebooks.
+"""ScriptDom-based SQL parsing via pythonnet — for use in Fabric notebooks.
 
-Loads Microsoft's ScriptDom DLL using pythonnet's CoreCLR runtime and
-provides extract_with_scriptdom() to parse T-SQL and extract SELECT
-statements from stored procedures.
+Provides two modes:
+1. extract_with_scriptdom() — extracts raw SQL strings (legacy, for sqlglot path)
+2. parse_with_scriptdom() — extracts full ParsedSQL structure directly from AST
+
+Mode 2 (Option B) eliminates sqlglot entirely for T-SQL. ScriptDom handles
+both extraction AND structural analysis: CTEs, table refs, column refs,
+temp table dependencies. 100% T-SQL compatibility, no whack-a-mole.
 
 This module only works in Fabric notebooks where pythonnet and the
-ScriptDom DLL are available. Import will succeed anywhere, but
-load_scriptdom() will raise if the DLL is not found.
+ScriptDom DLL are available.
 
-Usage in Fabric notebooks:
+Usage:
     from src.parser.scriptdom_fabric import load_scriptdom
-    scriptdom_available, extract_fn = load_scriptdom()
-    if scriptdom_available:
-        queries = extract_fn(raw_sql)
+    ok, extract_fn, parse_fn = load_scriptdom()
+    if ok:
+        parsed = parse_fn(raw_sql)  # returns ParsedSQL directly
 """
 
 from __future__ import annotations
@@ -21,22 +24,18 @@ import re
 import sys
 
 
-def _walk_for_selects(node, queries, _get_text_fn):
-    """Recursively walk the ScriptDom AST and collect SELECT/INSERT...SELECT nodes."""
+def _walk_for_selects(node, results, _get_text_fn):
+    """Recursively walk the AST and collect SelectStatement/InsertStatement nodes."""
     if node is None:
         return
     node_type = node.GetType().Name
     if node_type == "SelectStatement":
-        sql = _get_text_fn(node)
-        if sql:
-            queries.append(sql)
+        results.append(node)
         return
     if node_type == "InsertStatement":
         spec = node.InsertSpecification
         if spec and spec.InsertSource and spec.InsertSource.GetType().Name == "SelectInsertSource":
-            sql = _get_text_fn(node)
-            if sql:
-                queries.append(sql)
+            results.append(node)
             return
     try:
         for prop in node.GetType().GetProperties():
@@ -45,12 +44,12 @@ def _walk_for_selects(node, queries, _get_text_fn):
                 if value is None:
                     continue
                 if hasattr(value, "StartLine"):
-                    _walk_for_selects(value, queries, _get_text_fn)
+                    _walk_for_selects(value, results, _get_text_fn)
                 elif hasattr(value, "Count"):
                     for j in range(value.Count):
                         item = value[j]
                         if hasattr(item, "StartLine"):
-                            _walk_for_selects(item, queries, _get_text_fn)
+                            _walk_for_selects(item, results, _get_text_fn)
             except Exception:
                 continue
     except Exception:
@@ -73,15 +72,83 @@ def _get_fragment_text(fragment):
     return "".join(parts)
 
 
-def load_scriptdom(dll_path: str = "/lakehouse/default/Files/sql-query-agent/libs") -> tuple:
-    """Load ScriptDom via pythonnet and return (success, extract_function).
+def _walk_for_refs(node, tables, columns, depth=0):
+    """Walk AST node and collect table and column references."""
+    if node is None or depth > 15:
+        return
+    nt = node.GetType().Name
+    if nt == "NamedTableReference":
+        try:
+            tables.append(node.SchemaObject.BaseIdentifier.Value)
+        except Exception:
+            pass
+    elif nt == "ColumnReferenceExpression":
+        try:
+            multi = node.MultiPartIdentifier
+            if multi and multi.Identifiers:
+                count = multi.Identifiers.Count
+                if count == 1:
+                    columns.append((None, multi.Identifiers[0].Value))
+                elif count >= 2:
+                    # Last part is column, second-to-last is table/alias
+                    columns.append((
+                        multi.Identifiers[count - 2].Value,
+                        multi.Identifiers[count - 1].Value,
+                    ))
+        except Exception:
+            pass
+    try:
+        for prop in node.GetType().GetProperties():
+            try:
+                value = prop.GetValue(node)
+                if value is None:
+                    continue
+                if hasattr(value, "StartLine"):
+                    _walk_for_refs(value, tables, columns, depth + 1)
+                elif hasattr(value, "Count"):
+                    for k in range(value.Count):
+                        item = value[k]
+                        if hasattr(item, "StartLine"):
+                            _walk_for_refs(item, tables, columns, depth + 1)
+            except Exception:
+                continue
+    except Exception:
+        pass
 
-    Args:
-        dll_path: Path to the directory containing the ScriptDom DLL.
+
+def _get_into_target(stmt):
+    """Get the #temp table name from a SELECT...INTO statement.
+
+    ScriptDom represents SELECT...INTO as a SelectStatement with an
+    Into property of type SchemaObjectName (not NamedTableReference).
+    """
+    try:
+        into = getattr(stmt, 'Into', None)
+        if into is not None:
+            return into.BaseIdentifier.Value
+    except Exception:
+        pass
+    return None
+
+
+def _get_insert_target(stmt):
+    """Get the #temp table name from an INSERT INTO statement."""
+    try:
+        spec = stmt.InsertSpecification
+        if spec and spec.Target:
+            if spec.Target.GetType().Name == "NamedTableReference":
+                return spec.Target.SchemaObject.BaseIdentifier.Value
+    except Exception:
+        pass
+    return None
+
+
+def load_scriptdom(dll_path: str = "/lakehouse/default/Files/sql-query-agent/libs") -> tuple:
+    """Load ScriptDom via pythonnet and return (success, extract_fn, parse_fn).
 
     Returns:
-        (True, extract_with_scriptdom) if loaded successfully.
-        (False, None) if ScriptDom is not available.
+        (True, extract_with_scriptdom, parse_with_scriptdom) if loaded.
+        (False, None, None) if ScriptDom is not available.
     """
     try:
         from pythonnet import load
@@ -96,23 +163,159 @@ def load_scriptdom(dll_path: str = "/lakehouse/default/Files/sql-query-agent/lib
         from Microsoft.SqlServer.TransactSql.ScriptDom import TSql160Parser
         from System.IO import StringReader
 
-        def extract_with_scriptdom(raw_sql: str) -> list[str]:
-            """Parse T-SQL with ScriptDom and extract SELECT statements.
-
-            Returns a list of individual SQL query strings with @variables
-            replaced by __param_X__ placeholders for sqlglot compatibility.
-            """
+        def _parse_raw(raw_sql: str):
+            """Parse raw SQL and return the AST fragment."""
             parser = TSql160Parser(True)
             reader = StringReader(raw_sql)
             parse_result = parser.Parse(reader, None)
-            fragment = parse_result[0] if isinstance(parse_result, tuple) else parse_result
-            queries = []
-            _walk_for_selects(fragment, queries, _get_fragment_text)
+            return parse_result[0] if isinstance(parse_result, tuple) else parse_result
+
+        def extract_with_scriptdom(raw_sql: str) -> list[str]:
+            """Legacy: extract raw SQL strings for the sqlglot path."""
+            fragment = _parse_raw(raw_sql)
+            stmt_nodes = []
+            _walk_for_selects(fragment, stmt_nodes, _get_fragment_text)
+            # Convert nodes back to SQL text
+            queries = [_get_fragment_text(n) for n in stmt_nodes]
             # Replace @variables with placeholders for sqlglot
             cleaned = [re.sub(r"@(\w+)", r"__param_\1__", q) for q in queries]
             return cleaned
 
-        return True, extract_with_scriptdom
+        def parse_with_scriptdom(raw_sql: str):
+            """Parse T-SQL and extract full structure from ScriptDom AST.
+
+            Returns ParsedSQL with CTEs, table refs, column refs, and
+            temp table dependencies — no sqlglot involved.
+            """
+            from src.parser.sql_parser import ParsedSQL, CTEInfo, ColumnRef
+            from src.parser.sql_parser import normalize_sql_whitespace
+
+            fragment = _parse_raw(raw_sql)
+
+            # Find all SELECT and INSERT...SELECT statements
+            stmt_nodes = []
+            _walk_for_selects(fragment, stmt_nodes, _get_fragment_text)
+
+            if not stmt_nodes:
+                raise ValueError("ScriptDom found no SELECT statements")
+
+            # First pass: collect all statements with their raw table/column refs
+            # and identify temp table names + CTE names
+            raw_entries = []  # list of (name_or_none, sql_fragment, raw_tables, col_refs, is_cte)
+            temp_table_names = set()
+            cte_names = set()
+
+            for stmt in stmt_nodes:
+                stmt_type = stmt.GetType().Name
+
+                # Determine INTO target (temp table)
+                if stmt_type == "SelectStatement":
+                    into_target = _get_into_target(stmt)
+                elif stmt_type == "InsertStatement":
+                    into_target = _get_insert_target(stmt)
+                else:
+                    into_target = None
+
+                # Normalize temp name (strip #)
+                temp_name = None
+                if into_target:
+                    temp_name = into_target.lstrip("#")
+                    temp_table_names.add(temp_name)
+                    temp_table_names.add(into_target)
+
+                # Extract CTEs from WITH clause
+                if stmt_type == "SelectStatement" and stmt.WithCtesAndXmlNamespaces:
+                    cte_list = stmt.WithCtesAndXmlNamespaces.CommonTableExpressions
+                    for j in range(cte_list.Count):
+                        cte_node = cte_list[j]
+                        cte_name_val = cte_node.ExpressionName.Value
+                        cte_names.add(cte_name_val)
+                        cte_body = cte_node.QueryExpression
+                        cte_sql = normalize_sql_whitespace(_get_fragment_text(cte_body))
+                        if len(cte_sql) > 500:
+                            cte_sql = cte_sql[:500]
+                        cte_tables = []
+                        cte_cols = []
+                        _walk_for_refs(cte_body, cte_tables, cte_cols)
+                        raw_entries.append((cte_name_val, cte_sql, cte_tables, cte_cols, True))
+
+                # Get refs from the statement body
+                tables = []
+                columns = []
+                if stmt_type == "SelectStatement":
+                    _walk_for_refs(stmt.QueryExpression, tables, columns)
+                elif stmt_type == "InsertStatement":
+                    spec = stmt.InsertSpecification
+                    if spec.InsertSource:
+                        _walk_for_refs(spec.InsertSource, tables, columns)
+
+                if temp_name:
+                    sql_text = normalize_sql_whitespace(_get_fragment_text(stmt))
+                    if len(sql_text) > 500:
+                        sql_text = sql_text[:500]
+                    raw_entries.append((temp_name, sql_text, tables, columns, False))
+                else:
+                    raw_entries.append((None, "", tables, columns, False))
+
+            # Second pass: classify table refs as physical vs CTE/temp dependency
+            all_internal_names = cte_names | temp_table_names
+            stripped_temps = {tn.lstrip("#") for tn in temp_table_names}
+            all_internal_names |= stripped_temps
+
+            all_ctes = []
+            all_final_tables = []
+            all_final_cte_refs = []
+            all_final_columns = []
+
+            for entry_name, sql_frag, raw_tables, raw_cols, is_cte_entry in raw_entries:
+                col_refs = [ColumnRef(table=t, column=c) for t, c in raw_cols]
+
+                if entry_name is not None:
+                    # This is a CTE or temp table definition
+                    physical = []
+                    depends = []
+                    seen_p = set()
+                    seen_d = set()
+                    for t in raw_tables:
+                        canonical = t.lstrip("#")
+                        if canonical == entry_name:
+                            continue  # skip self-reference
+                        if canonical in stripped_temps or t in cte_names:
+                            if canonical not in seen_d:
+                                depends.append(canonical)
+                                seen_d.add(canonical)
+                        else:
+                            if t not in seen_p:
+                                physical.append(t)
+                                seen_p.add(t)
+                    all_ctes.append(CTEInfo(
+                        name=entry_name,
+                        sql_fragment=sql_frag,
+                        column_refs=col_refs,
+                        table_refs=physical,
+                        depends_on=depends,
+                    ))
+                else:
+                    # Terminal SELECT (no INTO)
+                    for t in raw_tables:
+                        canonical = t.lstrip("#")
+                        if canonical in stripped_temps or t in cte_names:
+                            if canonical not in [r for r in all_final_cte_refs]:
+                                all_final_cte_refs.append(canonical)
+                        else:
+                            if t not in all_final_tables:
+                                all_final_tables.append(t)
+                    all_final_columns.extend(col_refs)
+
+            return ParsedSQL(
+                ctes=all_ctes,
+                final_select_tables=all_final_tables,
+                final_select_cte_refs=all_final_cte_refs,
+                final_select_columns=all_final_columns,
+                normalized_sql="",
+            )
+
+        return True, extract_with_scriptdom, parse_with_scriptdom
 
     except Exception as e:
-        return False, None
+        return False, None, None

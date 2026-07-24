@@ -19,12 +19,12 @@ from src.schemas import to_spark_schema
 from src.parser.scriptdom_fabric import load_scriptdom
 
 config = load_config("/lakehouse/default/Files/sql-query-agent/org_config.yaml")
-scriptdom_available, extract_with_scriptdom = load_scriptdom()
+scriptdom_available, extract_with_scriptdom, parse_with_scriptdom = load_scriptdom()
 
 if scriptdom_available:
-    print("ScriptDom loaded!")
+    print("ScriptDom loaded! (Option B: direct AST extraction, no sqlglot)")
 else:
-    print("ScriptDom not available, using sqlparse fallback")
+    print("ScriptDom not available, using sqlparse + sqlglot fallback")
     from src.parser.sql_extractor import extract_select_statements
 
 def read_source(name_or_path):
@@ -52,11 +52,11 @@ print(f"Loaded {len(sql_sources)} SQL sources")
 
 # %% Cell 2: Extract and parse each SQL source
 import time as _time
-from src.parser.sql_parser import parse_sql, parse_extracted_queries
+from src.parser.sql_parser import parse_sql
 from src.parser.error_classifier import classify_parse_error
 
-extractor_name = "ScriptDom" if scriptdom_available else "sqlparse"
-print(f"Extracting and parsing SQL with {extractor_name}...")
+extractor_name = "ScriptDom (Option B)" if scriptdom_available else "sqlparse + sqlglot"
+print(f"Parsing SQL with {extractor_name}...")
 
 parse_errors = []
 parse_successes = []
@@ -70,13 +70,12 @@ for i, source in enumerate(sql_sources):
 
     try:
         if scriptdom_available:
-            queries = extract_with_scriptdom(sql)
-            if not queries:
-                raise ValueError("ScriptDom found no SELECT statements")
-            parsed = parse_extracted_queries(queries, dialect="tsql")
+            # Option B: ScriptDom extracts structure directly from AST
+            # No sqlglot, no cleanup rules, 100% T-SQL compatibility
+            parsed = parse_with_scriptdom(sql)
         else:
-            clean_sql = extract_select_statements(sql)
-            parsed = parse_sql(clean_sql)
+            # Fallback: sqlparse extraction + sqlglot parsing
+            parsed = parse_sql(sql)
 
         # Store parse result as JSON for downstream notebooks
         ctes_json = json.dumps([{
@@ -84,6 +83,7 @@ for i, source in enumerate(sql_sources):
             "sql_fragment": c.sql_fragment,
             "table_refs": c.table_refs,
             "depends_on": c.depends_on,
+            "column_refs": [{"table": cr.table, "column": cr.column} for cr in c.column_refs],
         } for c in parsed.ctes])
 
         parse_results_data.append({
