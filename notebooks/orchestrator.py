@@ -174,7 +174,7 @@ sql_sources_df = sql_sources_df.selectExpr(
     "cast(null as string) as developer",
 )
 
-sql_sources = [row.asDict() for row in sql_sources_df.collect()]
+sql_sources = [row.asDict() for row in sql_sources_df.limit(50).collect()]  # Remove .limit(50) for full run
 print(f"Loaded {len(sql_sources)} SQL sources")
 if sql_sources:
     print(f"SQL source keys: {list(sql_sources[0].keys())}")
