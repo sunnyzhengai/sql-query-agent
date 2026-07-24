@@ -39,6 +39,15 @@ EXCLUDED_FILES = {
 }
 
 
+def _strip_notebook_magic(source: str) -> str:
+    """Remove Fabric notebook magic lines (e.g., %pip) so ast.parse() works."""
+    lines = source.split("\n")
+    return "\n".join(
+        "" if line.lstrip().startswith("%") else line
+        for line in lines
+    )
+
+
 def get_module_name(file_path: Path) -> str:
     """Convert file path to Python module name relative to project root."""
     rel = file_path.relative_to(PROJECT_ROOT)
@@ -62,7 +71,7 @@ def get_src_modules() -> dict[str, Path]:
 def get_public_names(file_path: Path) -> list[str]:
     """Extract public function and class names from a Python file."""
     try:
-        tree = ast.parse(file_path.read_text())
+        tree = ast.parse(_strip_notebook_magic(file_path.read_text()))
     except SyntaxError:
         return []
 
@@ -81,7 +90,7 @@ def extract_imports(file_path: Path) -> set[str]:
     and individual names imported (e.g., 'parse_sql').
     """
     try:
-        tree = ast.parse(file_path.read_text())
+        tree = ast.parse(_strip_notebook_magic(file_path.read_text()))
     except SyntaxError:
         return set()
 
@@ -103,7 +112,7 @@ def extract_imports(file_path: Path) -> set[str]:
 def extract_all_references(file_path: Path) -> set[str]:
     """Extract all Name references from a Python file (for function usage detection)."""
     try:
-        tree = ast.parse(file_path.read_text())
+        tree = ast.parse(_strip_notebook_magic(file_path.read_text()))
     except SyntaxError:
         return set()
 
