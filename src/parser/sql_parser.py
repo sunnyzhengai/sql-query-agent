@@ -139,8 +139,8 @@ def _clean_extracted_query(sql: str) -> str:
     # Remove OPTION(...) query hints
     sql = re.sub(r"\bOPTION\s*\([^)]*\)\s*;?", "", sql, flags=re.IGNORECASE)
 
-    # Remove trailing semicolons
-    sql = sql.rstrip().rstrip(";").rstrip()
+    # Remove leading and trailing semicolons
+    sql = sql.strip().strip(";").strip()
 
     # Remove inline comments that break parsing (but keep block comments)
     # Only remove single-line comments at the END of lines, not comment-only lines
@@ -151,6 +151,12 @@ def _clean_extracted_query(sql: str) -> str:
 
     # Strip #temp table names to plain names (sqlglot may not handle # prefix)
     sql = re.sub(r"#(\w+)", r"__temp_\1__", sql)
+
+    # Rewrite ODBC {escape '\'} -> ESCAPE '\' (sqlglot doesn't handle ODBC syntax)
+    sql = re.sub(r"\{\s*escape\s+('[^']*')\s*\}", r"ESCAPE \1", sql, flags=re.IGNORECASE)
+
+    # Rewrite TRY_PARSE(x AS type) -> TRY_CAST(x AS type) (sqlglot doesn't support TRY_PARSE)
+    sql = re.sub(r"\bTRY_PARSE\s*\(", "TRY_CAST(", sql, flags=re.IGNORECASE)
 
     return sql.strip()
 
