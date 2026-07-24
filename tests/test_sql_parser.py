@@ -86,6 +86,58 @@ class TestParseExtractedQueries:
         with pytest.raises(ValueError, match="none of"):
             parse_extracted_queries(["GARBAGE !!!", "MORE GARBAGE !!!"])
 
+    def test_complex_temp_table_chain(self):
+        """Regression: USP_CCHCS_ScanningSummaryReports_PBI pattern.
+
+        9 temp tables in a dependency chain. Must produce:
+        - 9 CTEs with correct depends_on
+        - Physical tables in leaf CTEs only
+        - Final CTE refs pointing to the two summary tables
+        - No __temp_X__ pollution in table_refs or depends_on
+        """
+        queries = [
+            "SELECT col1, col2 into #lab FROM ORDER_PROC_3 LEFT JOIN CLARITY_DEP dep ON dep.ID = 1",
+            "SELECT ORDER_ID, min(SCANNED) as Compliant into #lab_compliant_by_dept from #lab group by ORDER_ID",
+            "SELECT ORDER_ID, USER_ID into #lab_compliant_by_user from #lab group by ORDER_ID, USER_ID",
+            "SELECT med.ID, dep.NAME into #blood_and_meds FROM HEP_SUM_MED_ADMIN med LEFT JOIN CLARITY_DEP dep ON med.DEPT_ID = dep.ID",
+            "SELECT ID as Order_ID, case when SCANNED=1 then 1 else 0 end as Compliant into #blood_meds_compliant from #blood_and_meds",
+            "SELECT Order_ID, Compliant into #blood_meds_compliant_by_dept from #blood_meds_compliant",
+            "SELECT Order_ID, Compliant into #blood_meds_compliant_by_user from #blood_meds_compliant",
+            "SELECT AREA, COUNT(*) as cnt into #dep_summary from (select * from #lab_compliant_by_dept union all select * from #blood_meds_compliant_by_dept) a group by AREA",
+            "SELECT USER_ID, COUNT(*) as cnt into #user_summary from (select * from #lab_compliant_by_user union all select * from #blood_meds_compliant_by_user) a group by USER_ID",
+            "select * From #dep_summary",
+            "select * from #user_summary",
+        ]
+        result = parse_extracted_queries(queries)
+
+        # Should have 9 CTEs (one per temp table)
+        assert len(result.ctes) == 9
+        cte_map = {c.name: c for c in result.ctes}
+
+        # Leaf CTEs should have physical tables
+        assert "ORDER_PROC_3" in cte_map["lab"].table_refs
+        assert "HEP_SUM_MED_ADMIN" in cte_map["blood_and_meds"].table_refs
+
+        # Mid-chain CTEs should depend on upstream temp tables
+        assert "lab" in cte_map["lab_compliant_by_dept"].depends_on
+        assert "blood_and_meds" in cte_map["blood_meds_compliant"].depends_on
+
+        # Summary CTEs should depend on dept/user CTEs
+        assert "lab_compliant_by_dept" in cte_map["dep_summary"].depends_on
+        assert "blood_meds_compliant_by_dept" in cte_map["dep_summary"].depends_on
+
+        # Final refs should point to the two summaries
+        assert "dep_summary" in result.final_select_cte_refs
+        assert "user_summary" in result.final_select_cte_refs
+        assert len(result.final_select_tables) == 0
+
+        # No __temp_X__ pollution anywhere
+        for c in result.ctes:
+            for t in c.table_refs:
+                assert not t.startswith("__temp_"), f"__temp_ in table_refs: {t}"
+            for d in c.depends_on:
+                assert not d.startswith("__temp_"), f"__temp_ in depends_on: {d}"
+
     def test_whitespace_normalized_in_fragments(self):
         queries = [
             "SELECT\r\n\t\tcol_a,\r\n\t\tcol_b\r\n\tINTO #stage\r\n\tFROM table1",

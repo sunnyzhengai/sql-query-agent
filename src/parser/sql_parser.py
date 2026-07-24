@@ -266,13 +266,34 @@ def parse_extracted_queries(queries: list[str], dialect: str = "tsql") -> Parsed
 
         parsed_count += 1
 
+        # Build lookup for temp table matching: both raw name and __temp_X__ form
+        # _clean_extracted_query() converts #name → __temp_name__, so sqlglot sees
+        # __temp_name__ in table refs. We need to match both forms.
+        temp_name_variants = set()
+        for tn in temp_table_names:
+            temp_name_variants.add(tn)
+            temp_name_variants.add(f"__temp_{tn}__")
+
+        def _is_temp_ref(table_name: str) -> bool:
+            """Check if a table reference is actually a temp table."""
+            return table_name in temp_name_variants
+
+        def _temp_canonical(table_name: str) -> str:
+            """Get the canonical temp table name (without __temp_ prefix)."""
+            if table_name.startswith("__temp_") and table_name.endswith("__"):
+                return table_name[7:-2]
+            return table_name
+
         if temp_name:
             # Temp table query → treat as CTE definition
             clean_fragment = normalize_sql_whitespace(query)
             fragment = clean_fragment[:500] if len(clean_fragment) > 500 else clean_fragment
             all_table_refs = list(result.final_select_tables)
-            cte_table_refs = [t for t in all_table_refs if t not in temp_table_names]
-            cte_depends = [t for t in all_table_refs if t in temp_table_names]
+            # Filter out self-reference (INTO #X creates __temp_X__ as a table ref)
+            self_variants = {temp_name, f"__temp_{temp_name}__"}
+            all_table_refs = [t for t in all_table_refs if t not in self_variants]
+            cte_table_refs = [t for t in all_table_refs if not _is_temp_ref(t)]
+            cte_depends = [_temp_canonical(t) for t in all_table_refs if _is_temp_ref(t)]
 
             all_ctes.append(CTEInfo(
                 name=temp_name,
@@ -299,11 +320,20 @@ def parse_extracted_queries(queries: list[str], dialect: str = "tsql") -> Parsed
         raise ValueError(f"Failed to parse SQL: none of {len(queries)} extracted queries parsed successfully")
 
     # Reclassify temp table refs in final tables
+    # Check both raw name and __temp_X__ form since _clean_extracted_query
+    # converts #name → __temp_name__
+    temp_final_variants = set()
+    for tn in temp_table_names:
+        temp_final_variants.add(tn)
+        temp_final_variants.add(f"__temp_{tn}__")
+
     for t in all_final_tables[:]:
-        if t in temp_table_names:
+        if t in temp_final_variants:
             all_final_tables.remove(t)
-            if t not in all_final_cte_refs:
-                all_final_cte_refs.append(t)
+            # Store canonical name (without __temp_ prefix) in cte_refs
+            canonical = t[7:-2] if t.startswith("__temp_") and t.endswith("__") else t
+            if canonical not in all_final_cte_refs:
+                all_final_cte_refs.append(canonical)
 
     merged = ParsedSQL(
         ctes=all_ctes,
