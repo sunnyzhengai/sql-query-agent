@@ -6,18 +6,23 @@
 
 ---
 
-## Current Status
+## Current Status (Updated 2026-07-25)
 
 | Milestone | Status |
 |---|---|
-| Core product (parser, graph, agent) | **87% done** |
+| Core product (parser, graph, agent) | **Done — 99%+ parse rate (1337/1344), Option B (ScriptDom-only, no sqlglot)** |
+| Data Agent answering questions | **Working — tested with multiple metrics** |
+| Pipeline split into independent notebooks | **Done — 02_parse, 03_build_graph, 04_build_metric_logic, 05_validate** |
 | Website (aiviaapp.com) | **Live** |
 | LLC | **Registered (AIVIA LLC)** |
-| Founders Hub application | **Submitted 2026-07-20, awaiting review** |
+| Founders Hub application | **Submitted 2026-07-20 (deprioritized — going direct to Marketplace)** |
+| ISV registration | **Done** |
 | Own Azure/Fabric tenant | **Azure ready, Fabric capacity pending** |
-| Partner Center publisher account | Not started |
+| Partner Center publisher account | **Verifying status** |
 | Marketplace listing | Not started |
 | Certification | Not started |
+
+**Key pivot (2026-07-25):** See `MARKETPLACE_PIVOT.md` for decisions and project plan.
 
 ---
 
