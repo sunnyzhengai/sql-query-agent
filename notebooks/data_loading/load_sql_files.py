@@ -20,6 +20,8 @@ SQL_FOLDERS = [
     {"path": f"{ABFS_BASE}/procs_reporting",   "source_type": "stored_procedure", "schema": "reporting"},
     {"path": f"{ABFS_BASE}/views_cookrpt",     "source_type": "view",             "schema": "cookrpt"},
     {"path": f"{ABFS_BASE}/views_reporting",   "source_type": "view",             "schema": "reporting"},
+    {"path": f"{ABFS_BASE}/procs_caboodle",    "source_type": "stored_procedure", "schema": "caboodle"},
+    {"path": f"{ABFS_BASE}/views_caboodle",    "source_type": "view",             "schema": "caboodle"},
 ]
 
 SQL_SOURCES_OUTPUT = "sql_sources"
