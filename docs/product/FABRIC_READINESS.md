@@ -33,7 +33,7 @@
 - [ ] Pin exact dependency versions in pyproject.toml
 - [ ] Add `LICENSE` file (MIT or Apache 2.0)
 - [ ] Update version to `1.0.0` in pyproject.toml
-- [ ] Remove dead code (5 unreachable modules identified by detect_dead_code.py)
+- [x] Remove dead code (38 files removed, 0 unreachable modules, 0 dead lines)
 - [ ] Verify `twine check` passes on built wheel
 
 ### Documentation (To Do)
@@ -41,6 +41,21 @@
 - [ ] Write `REVIEWER_GUIDE.md` — step-by-step for Microsoft certification testers
 - [ ] Update `README.md` with product overview, not dev notes
 - [ ] Create `org_config.example.yaml` with all options documented and commented
+
+### Security & Authentication (To Do)
+- [ ] Document authentication flow: Service Principal vs delegated user permissions
+- [ ] Document required Fabric workspace permissions (Contributor, not Admin)
+- [ ] Document required API permissions for connectors (Collibra, Purview, PBI)
+- [ ] Ensure zero hardcoded credentials — all via org_config.yaml or Azure Key Vault
+- [ ] Document data residency: all processing in-tenant, no external calls
+
+### Operational Readiness (To Do)
+- [ ] Build prerequisite validation script (`scripts/validate_deployment.py`)
+  - Checks: workspace exists, lakehouse exists, required tables exist, DLL present
+  - Checks: permissions sufficient for Data Agent creation
+  - Outputs: pass/fail with specific remediation steps
+- [ ] Document Fabric API rate limits and how the product handles them
+- [ ] Add Fabric/API error codes to error_classifier (403, 404, 429 → resolution steps)
 
 ---
 
