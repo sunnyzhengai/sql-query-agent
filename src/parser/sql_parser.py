@@ -28,14 +28,53 @@ class ColumnRef:
 
 
 @dataclass
+class TableRef:
+    """A fully qualified table reference: database.schema.table.
+
+    SQL Server forms: table, schema.table, db.schema.table, db..table
+    Default schema is 'dbo' when omitted.
+    """
+
+    table: str
+    schema: str = "dbo"
+    database: str | None = None
+
+    @property
+    def qualified_name(self) -> str:
+        """schema.table (e.g., 'dbo.PATIENT')."""
+        return f"{self.schema}.{self.table}"
+
+    @property
+    def full_name(self) -> str:
+        """database.schema.table if database known, else schema.table."""
+        if self.database:
+            return f"{self.database}.{self.schema}.{self.table}"
+        return self.qualified_name
+
+    def __str__(self) -> str:
+        return self.qualified_name
+
+    def __eq__(self, other) -> bool:
+        if isinstance(other, TableRef):
+            return self.table == other.table and self.schema == other.schema
+        if isinstance(other, str):
+            # Allow string comparison for backward compatibility
+            return self.table == other or self.qualified_name == other
+        return NotImplemented
+
+    def __hash__(self) -> int:
+        return hash((self.schema, self.table))
+
+
+@dataclass
 class CTEInfo:
     """A single CTE extracted from a SQL statement."""
 
     name: str
     sql_fragment: str
     column_refs: list[ColumnRef] = field(default_factory=list)
-    table_refs: list[str] = field(default_factory=list)  # actual table names (not aliases, not CTEs)
-    depends_on: list[str] = field(default_factory=list)  # other CTE names
+    table_refs: list[TableRef] = field(default_factory=list)  # physical tables (fully qualified)
+    depends_on: list[str] = field(default_factory=list)  # other CTE/temp table names
 
 
 @dataclass
@@ -43,7 +82,7 @@ class ParsedSQL:
     """Result of parsing a SQL statement."""
 
     ctes: list[CTEInfo] = field(default_factory=list)
-    final_select_tables: list[str] = field(default_factory=list)    # physical tables only
+    final_select_tables: list[TableRef] = field(default_factory=list)    # physical tables only
     final_select_cte_refs: list[str] = field(default_factory=list)  # CTEs referenced by final SELECT
     final_select_columns: list[ColumnRef] = field(default_factory=list)
     normalized_sql: str = ""  # the SQL after normalization (for debugging/review)
@@ -171,6 +210,14 @@ def _clean_extracted_query(sql: str) -> str:
     return sql.strip()
 
 
+def _sqlglot_table_to_ref(table_node) -> TableRef:
+    """Convert a sqlglot Table node to a TableRef with full qualification."""
+    db = table_node.catalog or None  # sqlglot: catalog = database
+    schema = table_node.db or "dbo"  # sqlglot: db = schema
+    table_name = table_node.name
+    return TableRef(table=table_name, schema=schema, database=db)
+
+
 def _parse_single_statement(sql: str, dialect: str) -> ParsedSQL | None:
     """Parse a single SQL statement and extract structure.
 
@@ -189,26 +236,27 @@ def _parse_single_statement(sql: str, dialect: str) -> ParsedSQL | None:
     result = ParsedSQL(normalized_sql=sql)
 
     # Extract CTEs
+    cte_names = [c.alias for c in parsed.find_all(exp.CTE)]
     for cte in parsed.find_all(exp.CTE):
         cte_name = cte.alias
         cte_body = cte.this
         col_refs = _extract_column_refs(cte_body)
 
-        all_table_refs = [t.name for t in cte_body.find_all(exp.Table)]
-        cte_names = [c.alias for c in parsed.find_all(exp.CTE)]
-        depends_on = [t for t in all_table_refs if t in cte_names]
-        physical_tables = [t for t in all_table_refs if t not in cte_names]
+        all_table_names = [t.name for t in cte_body.find_all(exp.Table)]
+        depends_on = [t for t in all_table_names if t in cte_names]
+        physical_refs = [_sqlglot_table_to_ref(t) for t in cte_body.find_all(exp.Table)
+                         if t.name not in cte_names]
 
         result.ctes.append(CTEInfo(
             name=cte_name,
             sql_fragment=cte_body.sql(dialect=dialect),
             column_refs=col_refs,
-            table_refs=physical_tables,
+            table_refs=physical_refs,
             depends_on=depends_on,
         ))
 
     # Extract final SELECT table/column references
-    cte_name_set = {c.name for c in result.ctes}
+    cte_name_set = set(cte_names)
     main_select = parsed.find(exp.Select)
     if main_select:
         for table in parsed.find_all(exp.Table):
@@ -216,8 +264,9 @@ def _parse_single_statement(sql: str, dialect: str) -> ParsedSQL | None:
                 if table.name not in result.final_select_cte_refs:
                     result.final_select_cte_refs.append(table.name)
             else:
-                if table.name not in result.final_select_tables:
-                    result.final_select_tables.append(table.name)
+                ref = _sqlglot_table_to_ref(table)
+                if ref not in result.final_select_tables:
+                    result.final_select_tables.append(ref)
         result.final_select_columns = _extract_column_refs(main_select)
 
     return result
@@ -269,7 +318,7 @@ def parse_extracted_queries(queries: list[str], dialect: str = "tsql") -> Parsed
     logger.info("Parsing %d extracted queries individually", len(queries))
 
     all_ctes: list[CTEInfo] = []
-    all_final_tables: list[str] = []
+    all_final_tables: list[TableRef] = []
     all_final_cte_refs: list[str] = []
     all_final_columns: list[ColumnRef] = []
     temp_table_names: set[str] = set()
@@ -295,24 +344,24 @@ def parse_extracted_queries(queries: list[str], dialect: str = "tsql") -> Parsed
             temp_name_variants.add(tn)
             temp_name_variants.add(f"__temp_{tn}__")
 
-        def _is_temp_ref(table_name: str) -> bool:
+        def _is_temp_ref(table_ref: TableRef) -> bool:
             """Check if a table reference is actually a temp table."""
-            return table_name in temp_name_variants
+            return table_ref.table in temp_name_variants
 
-        def _temp_canonical(table_name: str) -> str:
+        def _temp_canonical(table_ref: TableRef) -> str:
             """Get the canonical temp table name (without __temp_ prefix)."""
-            if table_name.startswith("__temp_") and table_name.endswith("__"):
-                return table_name[7:-2]
-            return table_name
+            name = table_ref.table
+            if name.startswith("__temp_") and name.endswith("__"):
+                return name[7:-2]
+            return name
 
         if temp_name:
             # Temp table query → treat as CTE definition
-            # query is already normalized at the entry point
             fragment = query[:500] if len(query) > 500 else query
             all_table_refs = list(result.final_select_tables)
             # Filter out self-reference (INTO #X creates __temp_X__ as a table ref)
             self_variants = {temp_name, f"__temp_{temp_name}__"}
-            all_table_refs = [t for t in all_table_refs if t not in self_variants]
+            all_table_refs = [t for t in all_table_refs if t.table not in self_variants]
             cte_table_refs = [t for t in all_table_refs if not _is_temp_ref(t)]
             cte_depends = [_temp_canonical(t) for t in all_table_refs if _is_temp_ref(t)]
 
@@ -341,18 +390,15 @@ def parse_extracted_queries(queries: list[str], dialect: str = "tsql") -> Parsed
         raise ValueError(f"Failed to parse SQL: none of {len(queries)} extracted queries parsed successfully")
 
     # Reclassify temp table refs in final tables
-    # Check both raw name and __temp_X__ form since _clean_extracted_query
-    # converts #name → __temp_name__
     temp_final_variants = set()
     for tn in temp_table_names:
         temp_final_variants.add(tn)
         temp_final_variants.add(f"__temp_{tn}__")
 
     for t in all_final_tables[:]:
-        if t in temp_final_variants:
+        if t.table in temp_final_variants:
             all_final_tables.remove(t)
-            # Store canonical name (without __temp_ prefix) in cte_refs
-            canonical = t[7:-2] if t.startswith("__temp_") and t.endswith("__") else t
+            canonical = t.table[7:-2] if t.table.startswith("__temp_") and t.table.endswith("__") else t.table
             if canonical not in all_final_cte_refs:
                 all_final_cte_refs.append(canonical)
 

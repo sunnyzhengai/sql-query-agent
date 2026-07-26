@@ -134,7 +134,7 @@ class TestParseExtractedQueries:
         # No __temp_X__ pollution anywhere
         for c in result.ctes:
             for t in c.table_refs:
-                assert not t.startswith("__temp_"), f"__temp_ in table_refs: {t}"
+                assert not t.table.startswith("__temp_"), f"__temp_ in table_refs: {t}"
             for d in c.depends_on:
                 assert not d.startswith("__temp_"), f"__temp_ in depends_on: {d}"
 

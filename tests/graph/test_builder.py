@@ -9,8 +9,15 @@ class TestGraphBuilder:
     def test_add_technical_node(self):
         gb = GraphBuilder()
         node_id = gb.add_technical_node("encounter", "admit_dt", "Admission date")
-        assert node_id == "tech:encounter.admit_dt"
+        assert node_id == "tech:dbo.encounter.admit_dt"
         assert gb.nodes[node_id].layer == NodeLayer.TECHNICAL
+        assert gb.nodes[node_id].properties["schema"] == "dbo"
+
+    def test_add_technical_node_with_schema(self):
+        gb = GraphBuilder()
+        node_id = gb.add_technical_node("encounter", schema="reporting", description="Encounters")
+        assert node_id == "tech:reporting.encounter"
+        assert gb.nodes[node_id].properties["schema"] == "reporting"
 
     def test_add_canonical_node(self):
         gb = GraphBuilder()

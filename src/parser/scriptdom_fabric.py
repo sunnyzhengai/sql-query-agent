@@ -116,15 +116,52 @@ def _walk_children(node, visitor_fn, depth=0, max_depth=15):
         pass
 
 
+def _extract_table_ref(schema_object):
+    """Extract a (database, schema, table) tuple from a ScriptDom SchemaObject.
+
+    ScriptDom's SchemaObjectName has:
+    - ServerIdentifier (linked server)
+    - DatabaseIdentifier (database name)
+    - SchemaIdentifier (schema name)
+    - BaseIdentifier (table name)
+
+    Returns (database, schema, table). Fills in 'dbo' when schema is omitted.
+    """
+    try:
+        table = schema_object.BaseIdentifier.Value
+    except Exception:
+        return None
+
+    database = None
+    schema = "dbo"  # SQL Server default
+
+    try:
+        if schema_object.DatabaseIdentifier:
+            database = schema_object.DatabaseIdentifier.Value
+    except Exception:
+        pass
+
+    try:
+        if schema_object.SchemaIdentifier:
+            schema = schema_object.SchemaIdentifier.Value
+    except Exception:
+        pass
+
+    return (database, schema, table)
+
+
 def _walk_for_refs(node, tables, columns, depth=0):
-    """Walk AST node and collect table and column references."""
+    """Walk AST node and collect table and column references.
+
+    tables: list of (database, schema, table) tuples
+    columns: list of (table_or_alias, column) tuples
+    """
     def visitor(n):
         nt = n.GetType().Name
         if nt == "NamedTableReference":
-            try:
-                tables.append(n.SchemaObject.BaseIdentifier.Value)
-            except Exception:
-                pass
+            ref = _extract_table_ref(n.SchemaObject)
+            if ref:
+                tables.append(ref)
         elif nt == "ColumnReferenceExpression":
             try:
                 multi = n.MultiPartIdentifier
@@ -214,7 +251,7 @@ def load_scriptdom(dll_path: str = "/lakehouse/default/Files/sql-query-agent/lib
             Returns ParsedSQL with CTEs, table refs, column refs, and
             temp table dependencies — no sqlglot involved.
             """
-            from src.parser.sql_parser import ParsedSQL, CTEInfo, ColumnRef
+            from src.parser.sql_parser import ParsedSQL, CTEInfo, ColumnRef, TableRef
             from src.parser.sql_parser import normalize_sql_whitespace
 
             fragment = _parse_raw(raw_sql)
@@ -285,9 +322,8 @@ def load_scriptdom(dll_path: str = "/lakehouse/default/Files/sql-query-agent/lib
                     raw_entries.append((None, "", tables, columns, False))
 
             # Second pass: classify table refs as physical vs CTE/temp dependency
-            all_internal_names = cte_names | temp_table_names
+            # raw_tables are now (database, schema, table) tuples
             stripped_temps = {tn.lstrip("#") for tn in temp_table_names}
-            all_internal_names |= stripped_temps
 
             all_ctes = []
             all_final_tables = []
@@ -303,18 +339,19 @@ def load_scriptdom(dll_path: str = "/lakehouse/default/Files/sql-query-agent/lib
                     depends = []
                     seen_p = set()
                     seen_d = set()
-                    for t in raw_tables:
-                        canonical = t.lstrip("#")
+                    for db, sch, tbl in raw_tables:
+                        canonical = tbl.lstrip("#")
                         if canonical == entry_name:
                             continue  # skip self-reference
-                        if canonical in stripped_temps or t in cte_names:
+                        if canonical in stripped_temps or tbl in cte_names:
                             if canonical not in seen_d:
                                 depends.append(canonical)
                                 seen_d.add(canonical)
                         else:
-                            if t not in seen_p:
-                                physical.append(t)
-                                seen_p.add(t)
+                            ref = TableRef(table=tbl, schema=sch, database=db)
+                            if ref not in seen_p:
+                                physical.append(ref)
+                                seen_p.add(ref)
                     all_ctes.append(CTEInfo(
                         name=entry_name,
                         sql_fragment=sql_frag,
@@ -324,14 +361,15 @@ def load_scriptdom(dll_path: str = "/lakehouse/default/Files/sql-query-agent/lib
                     ))
                 else:
                     # Terminal SELECT (no INTO)
-                    for t in raw_tables:
-                        canonical = t.lstrip("#")
-                        if canonical in stripped_temps or t in cte_names:
-                            if canonical not in [r for r in all_final_cte_refs]:
+                    for db, sch, tbl in raw_tables:
+                        canonical = tbl.lstrip("#")
+                        if canonical in stripped_temps or tbl in cte_names:
+                            if canonical not in all_final_cte_refs:
                                 all_final_cte_refs.append(canonical)
                         else:
-                            if t not in all_final_tables:
-                                all_final_tables.append(t)
+                            ref = TableRef(table=tbl, schema=sch, database=db)
+                            if ref not in all_final_tables:
+                                all_final_tables.append(ref)
                     all_final_columns.extend(col_refs)
 
             return ParsedSQL(

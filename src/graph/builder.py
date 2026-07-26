@@ -13,7 +13,7 @@ from __future__ import annotations
 import logging
 
 from src.models import EdgeType, GraphEdge, GraphNode, NodeLayer
-from src.parser.sql_parser import ParsedSQL
+from src.parser.sql_parser import ParsedSQL, TableRef
 
 logger = logging.getLogger(__name__)
 
@@ -24,19 +24,64 @@ class GraphBuilder:
     def __init__(self) -> None:
         self.nodes: dict[str, GraphNode] = {}
         self.edges: list[GraphEdge] = []
+        # Lookup: simple table name → set of qualified node IDs
+        # Used to match parsed table refs (which may lack schema) to dictionary nodes
+        self._table_name_index: dict[str, set[str]] = {}
 
-    def add_technical_node(self, table: str, column: str | None = None, description: str = "") -> str:
-        """Add a technical-layer node (table or column)."""
-        node_id = f"tech:{table}" if column is None else f"tech:{table}.{column}"
+    def add_technical_node(
+        self, table: str, column: str | None = None, description: str = "",
+        schema: str = "dbo", database: str | None = None,
+    ) -> str:
+        """Add a technical-layer node (table or column).
+
+        Node ID uses schema.table format: tech:dbo.PATIENT
+        Column nodes: tech:dbo.PATIENT.PAT_ID
+        """
+        qualified = f"{schema}.{table}"
+        node_id = f"tech:{qualified}" if column is None else f"tech:{qualified}.{column}"
         if node_id not in self.nodes:
             self.nodes[node_id] = GraphNode(
                 node_id=node_id,
                 layer=NodeLayer.TECHNICAL,
                 name=column or table,
                 description=description,
-                properties={"table": table, "column": column},
+                properties={
+                    "table": table,
+                    "schema": schema,
+                    "database": database,
+                    "column": column,
+                },
             )
+            # Index by simple table name for fuzzy matching
+            if column is None:
+                self._table_name_index.setdefault(table, set()).add(node_id)
+                self._table_name_index.setdefault(table.upper(), set()).add(node_id)
         return node_id
+
+    def _find_tech_node_id(self, table_ref: TableRef) -> str | None:
+        """Find a technical node ID matching a TableRef.
+
+        Tries exact match first (schema.table), then falls back to
+        simple table name match (for SQL that omits schema).
+        """
+        # Exact match: tech:schema.table
+        exact_id = f"tech:{table_ref.qualified_name}"
+        if exact_id in self.nodes:
+            return exact_id
+
+        # Case-insensitive exact match
+        exact_upper = f"tech:{table_ref.schema}.{table_ref.table.upper()}"
+        if exact_upper in self.nodes:
+            return exact_upper
+
+        # Fuzzy match: any node with this table name (regardless of schema)
+        candidates = self._table_name_index.get(table_ref.table, set())
+        if not candidates:
+            candidates = self._table_name_index.get(table_ref.table.upper(), set())
+        if candidates:
+            return next(iter(candidates))  # return first match
+
+        return None
 
     def add_transformation_node(self, metric_id: str, cte_name: str, sql_fragment: str) -> str:
         """Add a transformation-layer node (CTE step)."""
@@ -110,9 +155,9 @@ class GraphBuilder:
                     self.add_edge(transform_id, dep_id, EdgeType.TRANSFORM_TO_TRANSFORM)
 
             # Wire to technical nodes for referenced physical tables
-            for table_name in cte.table_refs:
-                tech_id = f"tech:{table_name}"
-                if tech_id in self.nodes:
+            for table_ref in cte.table_refs:
+                tech_id = self._find_tech_node_id(table_ref) if isinstance(table_ref, TableRef) else f"tech:{table_ref}"
+                if tech_id and tech_id in self.nodes:
                     self.add_edge(transform_id, tech_id, EdgeType.TRANSFORM_TO_TECHNICAL)
 
         # Find physical tables in the final SELECT that are NOT already
@@ -121,14 +166,15 @@ class GraphBuilder:
         for cte in parsed.ctes:
             cte_covered_tables.update(cte.table_refs)
         final_only_tables = [t for t in parsed.final_select_tables
-                             if t not in cte_names and t not in cte_covered_tables]
+                             if (t.table if isinstance(t, TableRef) else t) not in cte_names
+                             and t not in cte_covered_tables]
 
         # Wire these final-only tables via a synthetic transform node
         if final_only_tables:
             final_id = self.add_transformation_node(metric_id, "__final_select__", "")
-            for table_name in final_only_tables:
-                tech_id = f"tech:{table_name}"
-                if tech_id in self.nodes:
+            for table_ref in final_only_tables:
+                tech_id = self._find_tech_node_id(table_ref) if isinstance(table_ref, TableRef) else f"tech:{table_ref}"
+                if tech_id and tech_id in self.nodes:
                     self.add_edge(final_id, tech_id, EdgeType.TRANSFORM_TO_TECHNICAL)
 
         # Wire canonical -> entry point transform nodes
