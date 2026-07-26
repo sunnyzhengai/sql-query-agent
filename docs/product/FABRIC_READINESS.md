@@ -57,6 +57,23 @@
 - [ ] Document Fabric API rate limits and how the product handles them
 - [ ] Add Fabric/API error codes to error_classifier (403, 404, 429 → resolution steps)
 
+### Support & SLA (To Do)
+- [ ] Define support hours (e.g., business hours M-F, US Central Time)
+- [ ] Define response time SLA (e.g., 24-hour response for critical, 48-hour for general)
+- [ ] Document escalation path: support@ email → founder review → resolution
+- [ ] Create standard intake questionnaire for inbound leads from Marketplace
+- [ ] Create deployment package (zip or GitHub link) to send after qualifying a lead
+- [ ] Set up scheduling link (Calendly or Bookings) for onboarding calls
+
+### Compliance Attestations (To Do)
+- [ ] Complete Microsoft Publisher Attestation questionnaire in Partner Center
+  - Data handling: all processing in-tenant, no external transmission
+  - Encryption: at rest (Delta tables via Fabric) and in transit (HTTPS)
+  - Multi-tenant isolation: BYOT model, each customer is fully isolated
+  - No customer data accessed by AIVIA
+- [ ] Review CSA STAR registry requirements — determine if self-attestation needed for v1
+- [ ] Prepare data flow diagram showing security boundaries
+
 ---
 
 ## 2. Fabric Capacity (Blocker)
@@ -93,6 +110,13 @@ Get Fabric capacity through one of these:
 - [ ] Run 03_build_graph.py → verify graph_nodes, graph_edges
 - [ ] Run 04_build_metric_logic.py → verify metric_logic
 - [ ] Run 05_validate.py → verify pipeline health (should be 100%)
+
+### Backup & Rollback Strategy
+- [ ] Version all notebooks and config in git (already done — sql-query-agent repo)
+- [ ] Before each demo/test run, note current Delta table versions (DESCRIBE HISTORY)
+- [ ] If workspace corrupts: delete lakehouse, recreate, re-upload from git, rerun pipeline
+- [ ] Keep a clean "golden" lakehouse snapshot after successful full pipeline run
+- [ ] Document rollback steps in DEPLOYMENT_GUIDE.md
 
 ### Configure Data Agent
 - [ ] Create Fabric Data Agent in workspace
