@@ -42,10 +42,9 @@ Ask questions like "How is this report calculated?" or "What filters does this m
 
 AIVIA runs entirely within your Microsoft Fabric tenant. Delta tables, Fabric Data Agent, Spark notebooks — no external infrastructure. Your data never leaves your environment. No BAA required.
 
-**Plans**
+**Pricing**
 
-- **Core Agent** ($1,500/month): SQL parsing, knowledge graph, Data Agent, error reporting, pipeline validation. 30-day free trial.
-- **Core + Connector** ($2,000/month): Everything in Core, plus automated sync to Collibra, Microsoft Purview, or Power BI report descriptions. 30-day free trial.
+$2,000/month — everything included. SQL parsing, knowledge graph, Data Agent, error reporting, pipeline validation, and automated sync to Collibra, Microsoft Purview, and Power BI. 30-day free trial. 10% discount on annual commitment.
 
 ## Search Keywords
 1. business logic extraction
@@ -56,14 +55,11 @@ AIVIA runs entirely within your Microsoft Fabric tenant. Delta tables, Fabric Da
 - Primary: Data & Analytics > Data Governance
 - Secondary: AI + Machine Learning > AI Services
 
-## Plans
+## Plan
 
-| Plan | Price | Billing | Free Trial |
+| Plan | Monthly | Annual | Free Trial |
 |---|---|---|---|
-| Core Agent | $1,500/month | Monthly or annual | 30 days |
-| Core + Connector | $2,000/month | Monthly or annual | 30 days |
-
-Annual discount: 10% off ($16,200/yr and $21,600/yr respectively)
+| AIVIA SQL Intelligence Agent | $2,000/month | $21,600/year (10% off) | 30 days |
 
 ## Visual Assets Needed
 - [ ] Logo: 48x48, 90x90, 216x216, 255x115 (PNG, transparent background)
