@@ -58,7 +58,7 @@ All data is stored in **Microsoft Fabric Delta tables** within the customer's la
 
 | Table | Contents | Sensitivity |
 |---|---|---|
-| `graph_nodes` | Business metric names, descriptions, SQL fragments | Business logic (no PHI/PII) |
+| `graph_nodes` | Business metric names, descriptions, SQL fragments | Business logic (may contain hardcoded names from SQL — see HIPAA section) |
 | `graph_edges` | Relationships between metrics, logic steps, and tables | Structural metadata only |
 | `build_summary` | Parse statistics, error counts, timestamps | Operational metadata |
 | `parse_errors` | Names of SQL sources that failed to parse | File names only |
@@ -76,22 +76,14 @@ All communication within the customer's Fabric environment uses Microsoft's buil
 
 ### Data Processing
 
-AIVIA processes SQL stored procedures through the following pipeline:
-1. **Read:** SQL text is read from the customer's `sql_sources` table
-2. **Parse:** SQL is parsed locally using `sqlparse` and `sqlglot` (Python libraries running in the customer's notebook)
-3. **Build:** A knowledge graph is constructed in memory
+AIVIA processes SQL files through the following pipeline:
+1. **Read:** SQL text is read from the customer's `sql_sources` Delta table
+2. **Parse:** SQL is parsed using Microsoft's ScriptDom parser (loaded locally via pythonnet — no external calls) and Python libraries running in the customer's Fabric notebook
+3. **Build:** A knowledge graph is constructed in memory from the parsed structure
 4. **Write:** The graph is written to Delta tables in the customer's lakehouse
-5. **Optional:** Descriptions are pushed to customer's Purview or Collibra via their APIs
+5. **Optional:** Metadata is pushed to customer's Purview or Collibra via their own APIs
 
-**All processing occurs within the customer's Fabric compute resources.** No data is sent to external services during the parse-and-build pipeline.
-
-### External Service Calls (Optional)
-
-If the customer enables the LLM-based SQL extraction feature:
-- SQL text may be sent to **Azure OpenAI** (within the customer's Azure tenant) or the customer's configured LLM endpoint
-- This is optional and configurable
-- The customer controls which LLM service is used and where it's hosted
-- AIVIA does not provide or manage LLM endpoints
+**All processing occurs within the customer's Fabric compute resources.** No data is sent to external services during the parse-and-build pipeline. No LLM or AI service is called during parsing — the pipeline is entirely deterministic.
 
 ---
 
@@ -176,12 +168,29 @@ AIVIA's configuration file contains:
 
 ### HIPAA
 
-AIVIA does not process, store, or transmit Protected Health Information (PHI):
-- SQL fragments contain query *structure* (column names, filter conditions), not patient data
-- No clinical records, patient identifiers, or health data pass through AIVIA
-- The knowledge graph stores metadata about queries, not query results
+AIVIA processes SQL query **definitions** (the structure of queries), not query **results** (the data those queries return). The knowledge graph stores metadata about how reports are calculated, not clinical or patient data.
 
-Customers in healthcare should review their own SQL sources to confirm that stored procedure *definitions* (not execution results) do not contain embedded PHI.
+**PHI in SQL Definitions:**
+While SQL definitions are primarily structural, they may contain embedded PHI in certain cases:
+- Hardcoded provider names in WHERE clauses (e.g., `WHERE provider = 'Dr. Smith'`)
+- Department or clinic names that identify specific facilities
+- Procedure/report names that contain provider names (e.g., `USP_DrSmith_Clinic_Report`)
+- Hardcoded patient IDs or MRNs used as test values in SQL comments
+
+**AIVIA's PHI Protection Mechanisms:**
+
+| Layer | Protection | Implementation |
+|---|---|---|
+| **Data Agent (runtime)** | PHI redaction in responses | Agent instructions include a mandatory PHI protection rule: never output personal names, MRNs, patient IDs, addresses, or facility names. Provider names in SQL fragments are replaced with generic labels like "[Provider]" in the agent's response. |
+| **Knowledge graph (storage)** | SQL fragments only, no data values | The graph stores SQL logic (column names, filter conditions, JOINs) — not the data those queries return. No patient records enter the graph. |
+| **BYOT (architecture)** | Customer-controlled environment | All data stays in the customer's Fabric tenant. AIVIA has no access to the data. The customer's existing HIPAA controls (encryption, access control, audit logging) remain fully in effect. |
+| **Synthetic demo data** | No real data in demos | AIVIA's demo environment uses synthetic SQL files with anonymized names. No real patient, provider, or organizational data is used in marketing, demos, or reviewer sandboxes. |
+
+**Customer Responsibility:**
+Customers should review their SQL source files for embedded PHI before loading them into the system. While AIVIA's agent redacts PHI from responses, the underlying SQL fragments stored in Delta tables may still contain hardcoded values from the original SQL. Customers should apply their standard data classification policies to the `graph_nodes` table's `properties` column, which contains SQL fragments.
+
+**No BAA Required:**
+Because AIVIA operates entirely within the customer's tenant and does not access, transmit, or store PHI on the customer's behalf, a Business Associate Agreement (BAA) between AIVIA and the customer is not required. The customer's existing BAA with Microsoft (covering Fabric, Azure, and related services) provides the necessary compliance coverage.
 
 ### GDPR
 
