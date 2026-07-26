@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms of Service — AIVIA</title>
+    <meta name="description" content="AIVIA Terms of Service for the Data Empowerment Suite.">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --navy: #1B2A4A;
+            --teal: #009688;
+            --white: #FFFFFF;
+            --light-gray: #F5F7FA;
+            --dark-text: #1F2937;
+            --medium-gray: #6B7280;
+        }
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--dark-text);
+            line-height: 1.8;
+        }
+        nav {
+            background: var(--navy);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            color: var(--white);
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-decoration: none;
+            letter-spacing: 2px;
+        }
+        .logo span { color: var(--teal); }
+        .nav-links a {
+            color: var(--white);
+            text-decoration: none;
+            margin-left: 1.5rem;
+            font-size: 0.95rem;
+            opacity: 0.85;
+        }
+        .nav-links a:hover { opacity: 1; }
+        .content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+        }
+        h1 {
+            font-size: 2rem;
+            color: var(--navy);
+            margin-bottom: 0.5rem;
+        }
+        .effective-date {
+            color: var(--medium-gray);
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+        }
+        h2 {
+            font-size: 1.3rem;
+            color: var(--navy);
+            margin-top: 2.5rem;
+            margin-bottom: 0.75rem;
+            border-bottom: 2px solid var(--light-gray);
+            padding-bottom: 0.5rem;
+        }
+        h3 {
+            font-size: 1.1rem;
+            color: var(--dark-text);
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        p, li {
+            margin-bottom: 0.75rem;
+            color: #374151;
+        }
+        ul {
+            padding-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        strong { color: var(--dark-text); }
+        .legal-caps {
+            text-transform: uppercase;
+            font-size: 0.9rem;
+        }
+        footer {
+            background: var(--navy);
+            color: rgba(255,255,255,0.7);
+            text-align: center;
+            padding: 2rem;
+            margin-top: 3rem;
+            font-size: 0.85rem;
+        }
+        footer a { color: var(--teal); text-decoration: none; }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="/" class="logo">AI<span>VIA</span></a>
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="/privacy">Privacy</a>
+            <a href="/terms">Terms</a>
+        </div>
+    </nav>
+
+    <div class="content">
+        <h1>Terms of Service</h1>
+        <p class="effective-date">Effective Date: July 25, 2026 &nbsp;|&nbsp; Last Updated: July 25, 2026</p>
+
+        <h2>1. Agreement</h2>
+        <p>These Terms of Service ("Terms") govern your use of the AIVIA Data Empowerment Suite (the "Product") provided by AIVIA LLC ("AIVIA," "we," "us," or "our"). By subscribing to or using the Product, you ("Customer," "you," or "your") agree to these Terms.</p>
+        <p>If you are using the Product on behalf of an organization, you represent that you have the authority to bind that organization to these Terms.</p>
+
+        <h2>2. Product Description</h2>
+        <p>The AIVIA Data Empowerment Suite is a software solution that:</p>
+        <ul>
+            <li>Extracts business logic from SQL stored procedures and views</li>
+            <li>Builds a certified knowledge graph for data governance</li>
+            <li>Enables self-service analytics through a Microsoft Fabric Data Agent</li>
+            <li>Optionally syncs metadata to data governance tools (Collibra, Microsoft Purview, etc.)</li>
+        </ul>
+        <p>The Product operates entirely within your Microsoft Fabric tenant using the Bring Your Own Tenant (BYOT) model.</p>
+
+        <h2>3. Subscription and Access</h2>
+        <h3>3.1 Marketplace Subscription</h3>
+        <p>The Product is available through the Microsoft Commercial Marketplace. Subscription terms, pricing, and billing are managed through Microsoft Partner Center and are subject to the Microsoft Marketplace Terms of Use.</p>
+
+        <h3>3.2 License Grant</h3>
+        <p>Subject to these Terms and your active subscription, we grant you a non-exclusive, non-transferable, revocable license to use the Product within your Microsoft Fabric tenant for your internal business purposes.</p>
+
+        <h3>3.3 Restrictions</h3>
+        <p>You may not:</p>
+        <ul>
+            <li>Sublicense, resell, or distribute the Product to third parties</li>
+            <li>Reverse engineer, decompile, or disassemble the Product</li>
+            <li>Remove or alter any proprietary notices or labels</li>
+            <li>Use the Product to build a competing product or service</li>
+            <li>Share your subscription credentials with unauthorized users</li>
+        </ul>
+
+        <h2>4. Customer Responsibilities</h2>
+        <h3>4.1 Your Data</h3>
+        <p>You are solely responsible for:</p>
+        <ul>
+            <li>The data processed by the Product within your tenant</li>
+            <li>Compliance with applicable data protection laws (HIPAA, GDPR, etc.)</li>
+            <li>Maintaining appropriate access controls and security within your Fabric environment</li>
+            <li>The accuracy and legality of your SQL source code and data</li>
+        </ul>
+
+        <h3>4.2 Your Environment</h3>
+        <p>You are responsible for:</p>
+        <ul>
+            <li>Maintaining a valid Microsoft Fabric subscription with adequate capacity</li>
+            <li>Providing the necessary permissions for the Product to function (as documented in the Deployment Guide)</li>
+            <li>Ensuring your environment meets the Product's system requirements</li>
+        </ul>
+
+        <h2>5. AIVIA Responsibilities</h2>
+        <h3>5.1 Product Availability</h3>
+        <p>We will make commercially reasonable efforts to keep the Product available and functioning. However, the Product runs within your Fabric tenant, and availability depends on your Microsoft Fabric subscription and infrastructure.</p>
+
+        <h3>5.2 Updates</h3>
+        <p>We may release updates, patches, or new versions of the Product. We will communicate material changes through the Marketplace listing or via email.</p>
+
+        <h3>5.3 Support</h3>
+        <p>Support is available via email at <a href="mailto:support@aiviaapp.com">support@aiviaapp.com</a>. Response times and support scope depend on your subscription plan.</p>
+
+        <h2>6. Data Handling</h2>
+        <h3>6.1 BYOT Model</h3>
+        <p>The Product processes data exclusively within your Microsoft Fabric tenant. AIVIA does not access, store, transmit, or process your data outside of your environment.</p>
+
+        <h3>6.2 No Data Collection</h3>
+        <p>AIVIA does not collect, store, or analyze your SQL source code, database contents, knowledge graph data, or user queries. See our <a href="/privacy">Privacy Policy</a> for details.</p>
+
+        <h3>6.3 No AI Training</h3>
+        <p>Your data is never used to train AI models, machine learning systems, or any algorithms outside of your tenant.</p>
+
+        <h2>7. Intellectual Property</h2>
+        <h3>7.1 AIVIA IP</h3>
+        <p>The Product, including its source code, algorithms, documentation, and design, is the intellectual property of AIVIA LLC. Your subscription grants you a license to use the Product, not ownership.</p>
+
+        <h3>7.2 Customer IP</h3>
+        <p>You retain all rights to your data, SQL source code, and any content generated by the Product within your tenant (including knowledge graph data, metric descriptions, and governance metadata). AIVIA claims no ownership of your data or outputs.</p>
+
+        <h2>8. Confidentiality</h2>
+        <p>Each party agrees to protect the other's confidential information with the same degree of care it uses for its own confidential information, but no less than reasonable care. Confidential information includes business plans, technical data, and product features not yet publicly released.</p>
+
+        <h2>9. Warranties and Disclaimers</h2>
+        <h3>9.1 Product Warranty</h3>
+        <p>AIVIA warrants that the Product will perform materially in accordance with its documentation during the subscription period.</p>
+
+        <h3>9.2 Disclaimer</h3>
+        <p class="legal-caps">EXCEPT AS EXPRESSLY STATED IN SECTION 9.1, THE PRODUCT IS PROVIDED "AS IS" AND "AS AVAILABLE." AIVIA DISCLAIMS ALL OTHER WARRANTIES, EXPRESS OR IMPLIED, INCLUDING WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT.</p>
+
+        <h3>9.3 Data Accuracy</h3>
+        <p>AIVIA does not warrant the accuracy, completeness, or reliability of the metadata, descriptions, or governance information generated by the Product. The Product extracts and organizes information from your SQL sources — the accuracy of the output depends on the quality of your input data.</p>
+
+        <h2>10. Limitation of Liability</h2>
+        <p class="legal-caps">TO THE MAXIMUM EXTENT PERMITTED BY LAW:</p>
+        <ul>
+            <li class="legal-caps">AIVIA'S TOTAL LIABILITY FOR ALL CLAIMS ARISING FROM OR RELATED TO THESE TERMS SHALL NOT EXCEED THE TOTAL AMOUNT PAID BY CUSTOMER IN THE TWELVE (12) MONTHS PRECEDING THE CLAIM.</li>
+            <li class="legal-caps">IN NO EVENT SHALL AIVIA BE LIABLE FOR INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, INCLUDING LOSS OF DATA, REVENUE, OR BUSINESS OPPORTUNITIES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.</li>
+        </ul>
+
+        <h2>11. Indemnification</h2>
+        <h3>11.1 AIVIA Indemnification</h3>
+        <p>AIVIA will defend and indemnify Customer against third-party claims alleging that the Product infringes a valid patent, copyright, or trademark, provided Customer promptly notifies AIVIA and cooperates in the defense.</p>
+
+        <h3>11.2 Customer Indemnification</h3>
+        <p>Customer will defend and indemnify AIVIA against third-party claims arising from Customer's data, use of the Product in violation of these Terms, or violation of applicable laws.</p>
+
+        <h2>12. Term and Termination</h2>
+        <h3>12.1 Term</h3>
+        <p>These Terms are effective from the date you subscribe and continue for the duration of your subscription.</p>
+
+        <h3>12.2 Termination</h3>
+        <p>Either party may terminate these Terms:</p>
+        <ul>
+            <li>Upon 30 days' written notice for convenience</li>
+            <li>Immediately if the other party materially breaches these Terms and fails to cure within 30 days of written notice</li>
+        </ul>
+
+        <h3>12.3 Effect of Termination</h3>
+        <p>Upon termination:</p>
+        <ul>
+            <li>Your license to use the Product ends</li>
+            <li>All data generated by the Product remains in your tenant — AIVIA does not delete your data</li>
+            <li>Sections 6 (Data Handling), 7 (IP), 9 (Disclaimers), 10 (Liability), and 11 (Indemnification) survive termination</li>
+        </ul>
+
+        <h2>13. General</h2>
+        <h3>13.1 Governing Law</h3>
+        <p>These Terms are governed by the laws of the State of Texas, without regard to conflict of law principles.</p>
+
+        <h3>13.2 Dispute Resolution</h3>
+        <p>Any disputes arising from these Terms shall be resolved through binding arbitration in Tarrant County, Texas, under the rules of the American Arbitration Association.</p>
+
+        <h3>13.3 Entire Agreement</h3>
+        <p>These Terms, together with the <a href="/privacy">Privacy Policy</a> and any applicable Marketplace terms, constitute the entire agreement between the parties.</p>
+
+        <h3>13.4 Amendments</h3>
+        <p>We may update these Terms from time to time. Material changes will be communicated via the Marketplace listing or email at least 30 days before taking effect.</p>
+
+        <h3>13.5 Severability</h3>
+        <p>If any provision of these Terms is found unenforceable, the remaining provisions remain in full effect.</p>
+
+        <h3>13.6 Assignment</h3>
+        <p>You may not assign these Terms without our written consent. We may assign these Terms in connection with a merger, acquisition, or sale of assets.</p>
+
+        <h2>Contact Us</h2>
+        <p>If you have questions about these Terms, contact us at:</p>
+        <p><strong>AIVIA LLC</strong><br>
+        Email: <a href="mailto:legal@aiviaapp.com">legal@aiviaapp.com</a><br>
+        Website: <a href="https://www.aiviaapp.com">www.aiviaapp.com</a></p>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 AIVIA LLC. All rights reserved. &nbsp;|&nbsp; <a href="/privacy">Privacy Policy</a> &nbsp;|&nbsp; <a href="/terms">Terms of Service</a></p>
+    </footer>
+</body>
+</html>
