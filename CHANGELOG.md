@@ -8,13 +8,30 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+---
+
+## [1.1.0] - 2026-07-26
+
 ### Added
-- Full qualified table names (database.schema.table) in parsed output and graph nodes
-- Default schema population (`dbo`) when schema is omitted in SQL
+- `TableRef` data class: `database`, `schema`, `table` with `qualified_name` and `full_name` properties
+- Default schema population: `dbo` when schema omitted (e.g., `Clarity..PATIENT` → `Clarity.dbo.PATIENT`)
+- `_find_tech_node_id()` in graph builder: exact match then fuzzy match by table name
+- `_table_name_index` for fast table lookup regardless of schema
+- `_extract_table_ref()` in ScriptDom: reads all 4 parts from SchemaObject
+- PHI protection rule in Data Agent instructions
+- Broad search across all columns for topic-based agent queries
+- CHANGELOG.md with full release history
 
 ### Changed
-- Technical node IDs use `schema.table` format (e.g., `tech:dbo.PATIENT`)
-- `TableRef` data class replaces plain strings for table references
+- Technical node IDs use `schema.table` format (e.g., `tech:dbo.PATIENT` instead of `tech:PATIENT`)
+- `CTEInfo.table_refs` and `ParsedSQL.final_select_tables` are now `list[TableRef]` instead of `list[str]`
+- `TableRef.__eq__` supports string comparison for backward compatibility
+- Graph builder `add_technical_node()` accepts `schema` and `database` parameters
+- HIPAA section in security whitepaper expanded with 4 protection layers
+
+### Breaking Changes
+- Graph node IDs changed: `tech:PATIENT` → `tech:dbo.PATIENT`. Existing graph data must be rebuilt.
+- `add_technical_node()` signature changed: new `schema` and `database` parameters (with defaults)
 
 ---
 

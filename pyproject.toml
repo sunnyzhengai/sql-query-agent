@@ -1,6 +1,6 @@
 [project]
 name = "aivia-sql-intelligence"
-version = "1.0.0"
+version = "1.1.0"
 description = "AIVIA — SQL Intelligence Agent for Microsoft Fabric. Extract business logic from SQL, build knowledge graphs, answer questions in plain English."
 readme = "README.md"
 requires-python = ">=3.9"
