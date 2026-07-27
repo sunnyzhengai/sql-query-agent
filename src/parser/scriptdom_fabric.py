@@ -216,7 +216,10 @@ def load_scriptdom(dll_path: str = "/lakehouse/default/Files/sql-query-agent/lib
     """
     try:
         from pythonnet import load
-        load("coreclr")
+        try:
+            load("coreclr")
+        except Exception:
+            pass  # Already initialized — safe to continue
 
         import clr
         if dll_path not in sys.path:
