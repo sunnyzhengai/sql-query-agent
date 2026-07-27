@@ -224,15 +224,12 @@ def load_scriptdom(dll_path: str = "/lakehouse/default/Files/sql-query-agent/lib
             pass  # Already initialized — safe to continue
 
         import clr
-        if dll_path not in sys.path:
-            sys.path.append(dll_path)
 
-        # Use full file path — assembly name lookup fails after kernel restart
+        # Use Assembly.LoadFrom for reliable loading — clr.AddReference fails
+        # in some Fabric environments after kernel restart
+        from System.Reflection import Assembly
         dll_file = _os.path.join(dll_path, "Microsoft.SqlServer.TransactSql.ScriptDom.dll")
-        if _os.path.exists(dll_file):
-            clr.AddReference(dll_file)
-        else:
-            clr.AddReference("Microsoft.SqlServer.TransactSql.ScriptDom")
+        Assembly.LoadFrom(dll_file)
 
         from Microsoft.SqlServer.TransactSql.ScriptDom import TSql160Parser
         from System.IO import StringReader
