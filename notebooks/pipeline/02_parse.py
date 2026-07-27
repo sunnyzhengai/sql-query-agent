@@ -7,10 +7,10 @@ parse_results stores the full parsed output (CTEs as JSON) so
 03_build_graph.py can rebuild the graph without re-parsing.
 """
 
-# %% Cell 0: Install dependencies (triggers kernel restart — nothing else here)
-%pip install pydantic pyyaml sqlglot sqlparse pythonnet
-
-# %% Cell 1: Setup (run after kernel restart)
+# %% Cell 0: Setup — NO %pip install (kills pythonnet)
+# Packages are pre-installed via Fabric Environment or previous %pip session.
+# If you need to install packages, run %pip in a SEPARATE notebook first,
+# then close it and open this notebook in a fresh session.
 import os
 os.environ["PYTHONNET_RUNTIME"] = "coreclr"
 
@@ -18,6 +18,20 @@ import json
 import sys
 sys.path.insert(0, "/lakehouse/default/Files/sql-query-agent")
 
+# Load pythonnet BEFORE any src.* imports
+from pythonnet import load
+try:
+    load("coreclr")
+except Exception:
+    pass  # Already initialized
+
+import clr
+dll = "/lakehouse/default/Files/sql-query-agent/libs/Microsoft.SqlServer.TransactSql.ScriptDom.dll"
+clr.AddReference(dll)
+from Microsoft.SqlServer.TransactSql.ScriptDom import TSql160Parser
+print("ScriptDom loaded!")
+
+# Now safe to import src modules
 from src.config import load_config
 from src.schemas import to_spark_schema
 from src.parser.scriptdom_fabric import load_scriptdom
@@ -26,7 +40,7 @@ config = load_config("/lakehouse/default/Files/sql-query-agent/org_config.yaml")
 scriptdom_available, extract_with_scriptdom, parse_with_scriptdom = load_scriptdom()
 
 if scriptdom_available:
-    print("ScriptDom loaded! (Option B: direct AST extraction, no sqlglot)")
+    print("ScriptDom ready (Option B: direct AST extraction)")
 else:
     print("ScriptDom not available, using sqlparse + sqlglot fallback")
     from src.parser.sql_extractor import extract_select_statements
