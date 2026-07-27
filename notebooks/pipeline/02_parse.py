@@ -7,18 +7,15 @@ parse_results stores the full parsed output (CTEs as JSON) so
 03_build_graph.py can rebuild the graph without re-parsing.
 """
 
-# %% Cell 0: Setup — NO %pip install (kills pythonnet)
-# Packages are pre-installed via Fabric Environment or previous %pip session.
-# If you need to install packages, run %pip in a SEPARATE notebook first,
-# then close it and open this notebook in a fresh session.
-import os
+# %% Cell 0: Setup — install packages via subprocess (no kernel restart)
+# %pip restarts the kernel which permanently breaks pythonnet.
+# subprocess.check_call installs in-process without restart.
+import subprocess, sys, os
+subprocess.check_call([sys.executable, "-m", "pip", "install", "-q",
+    "pydantic", "pyyaml", "sqlglot", "sqlparse", "pythonnet"])
+
 os.environ["PYTHONNET_RUNTIME"] = "coreclr"
 
-import json
-import sys
-sys.path.insert(0, "/lakehouse/default/Files/sql-query-agent")
-
-# Load pythonnet BEFORE any src.* imports
 from pythonnet import load
 try:
     load("coreclr")
@@ -31,7 +28,9 @@ clr.AddReference(dll)
 from Microsoft.SqlServer.TransactSql.ScriptDom import TSql160Parser
 print("ScriptDom loaded!")
 
-# Now safe to import src modules
+import json
+sys.path.insert(0, "/lakehouse/default/Files/sql-query-agent")
+
 from src.config import load_config
 from src.schemas import to_spark_schema
 from src.parser.scriptdom_fabric import load_scriptdom
