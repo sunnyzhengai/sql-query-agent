@@ -8,12 +8,14 @@ Flattens the graph into a single table the Data Agent can query
 without multi-hop traversal.
 """
 
-# %% Cell 0: Setup (run once per session)
-%pip install pydantic pyyaml sqlglot
-
+# %% Cell 0: Setup
+# Prerequisites: Attach 'aivia-env' Fabric Environment. No %pip install.
 import json
 import sys
 sys.path.insert(0, "/lakehouse/default/Files/sql-query-agent")
+
+import src
+print(f"AIVIA v{src.__version__}")
 
 from src.config import load_config
 from src.schemas import to_spark_schema

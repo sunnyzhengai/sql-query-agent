@@ -173,6 +173,18 @@ SYNC_LOG = {
     ],
 }
 
+INSTALLATION_ERRORS = {
+    "table_name": "installation_errors",
+    "columns": [
+        ("error_signature", "string", False),
+        ("error_category", "string", False),
+        ("root_cause", "string", True),
+        ("fix", "string", True),
+        ("prevention", "string", True),
+        ("first_seen", "string", True),
+    ],
+}
+
 TRACKING = {
     "table_name": "extraction_tracking",
     "columns": [
@@ -192,7 +204,7 @@ TABLE_REGISTRY = {
         GRAPH_NODES, GRAPH_EDGES, METRIC_LOGIC, SQL_SOURCES,
         PARSE_ERRORS, PARSE_SUCCESSES, BUILD_SUMMARY,
         EXTRACTION_INSPECTION, ERROR_LOG, PIPELINE_VALIDATION,
-        STEWARD_ASSIGNMENTS, SYNC_LOG, TRACKING,
+        STEWARD_ASSIGNMENTS, SYNC_LOG, TRACKING, INSTALLATION_ERRORS,
     ]
 }
 

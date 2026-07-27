@@ -8,11 +8,13 @@ Validates every step of the pipeline per metric and saves a summary.
 """
 
 # %% Cell 0: Setup (run once per session)
-%pip install pydantic pyyaml
-
+# Prerequisites: Attach 'aivia-env' Fabric Environment. No %pip install.
 import json
 import sys
 sys.path.insert(0, "/lakehouse/default/Files/sql-query-agent")
+
+import src
+print(f"AIVIA v{src.__version__}")
 
 from src.config import load_config
 from src.schemas import to_spark_schema

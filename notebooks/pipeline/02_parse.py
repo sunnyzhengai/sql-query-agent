@@ -7,13 +7,16 @@ parse_results stores the full parsed output (CTEs as JSON) so
 03_build_graph.py can rebuild the graph without re-parsing.
 """
 
-# %% Cell 0: Install pinned dependencies (no restart if already installed)
-%pip install pydantic==2.5.0 pyyaml==6.0.1 sqlglot==19.7.0 sqlparse==0.5.3 pythonnet==3.0.1
-
-# %% Cell 1: Setup
+# %% Cell 0: Setup
+# Prerequisites: Attach the 'aivia-env' Fabric Environment to this notebook.
+# See environment/README.md for setup instructions.
+# DO NOT use %pip install — it breaks pythonnet.
 import json
 import sys
 sys.path.insert(0, "/lakehouse/default/Files/sql-query-agent")
+
+import src
+print(f"AIVIA v{src.__version__}")
 
 from src.config import load_config
 from src.schemas import to_spark_schema

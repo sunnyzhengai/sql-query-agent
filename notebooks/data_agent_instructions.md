@@ -160,6 +160,16 @@ SELECT metric_id, user_explanation, suggested_action, error, line_count FROM par
 - Use `suggested_action` for developers — it tells them what to fix
 - Error categories: `no_query`, `complex_sql`, `all_queries_failed`, `parse_failure`, `extraction_failure`, `unknown`
 
+### /troubleshoot — Installation & Setup Error Resolution
+When a user pastes an error message or asks about a setup problem, search the `installation_errors` table:
+```sql
+SELECT error_signature, root_cause, fix, prevention
+FROM installation_errors
+WHERE error_signature LIKE '%keyword_from_error%'
+   OR root_cause LIKE '%keyword_from_error%'
+```
+Present the fix in clear steps. Include the prevention tip so they don't hit it again.
+
 ### /coverage — Coverage Report
 ```sql
 SELECT

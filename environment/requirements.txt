@@ -1,0 +1,5 @@
+pydantic==2.5.0
+pyyaml==6.0.1
+sqlglot==19.7.0
+sqlparse==0.5.3
+pythonnet==3.0.1

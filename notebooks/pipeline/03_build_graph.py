@@ -8,11 +8,13 @@ Does NOT re-parse SQL — reads pre-parsed CTEs from parse_results table.
 """
 
 # %% Cell 0: Setup (run once per session)
-%pip install pydantic pyyaml sqlglot sqlparse
-
+# Prerequisites: Attach 'aivia-env' Fabric Environment. No %pip install.
 import json
 import sys
 sys.path.insert(0, "/lakehouse/default/Files/sql-query-agent")
+
+import src
+print(f"AIVIA v{src.__version__}")
 
 from src.config import load_config
 from src.schemas import to_spark_schema
