@@ -7,9 +7,10 @@ parse_results stores the full parsed output (CTEs as JSON) so
 03_build_graph.py can rebuild the graph without re-parsing.
 """
 
-# %% Cell 0: Setup (run once per session)
+# %% Cell 0: Install dependencies (triggers kernel restart — nothing else in this cell)
 %pip install pydantic pyyaml sqlglot sqlparse pythonnet
 
+# %% Cell 1: Setup (run after kernel restart)
 import json
 import sys
 sys.path.insert(0, "/lakehouse/default/Files/sql-query-agent")
