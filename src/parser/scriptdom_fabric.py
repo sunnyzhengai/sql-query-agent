@@ -215,6 +215,8 @@ def load_scriptdom(dll_path: str = "/lakehouse/default/Files/sql-query-agent/lib
         (False, None, None) if ScriptDom is not available.
     """
     try:
+        import os as _os
+
         from pythonnet import load
         try:
             load("coreclr")
@@ -225,7 +227,12 @@ def load_scriptdom(dll_path: str = "/lakehouse/default/Files/sql-query-agent/lib
         if dll_path not in sys.path:
             sys.path.append(dll_path)
 
-        clr.AddReference("Microsoft.SqlServer.TransactSql.ScriptDom")
+        # Use full file path — assembly name lookup fails after kernel restart
+        dll_file = _os.path.join(dll_path, "Microsoft.SqlServer.TransactSql.ScriptDom.dll")
+        if _os.path.exists(dll_file):
+            clr.AddReference(dll_file)
+        else:
+            clr.AddReference("Microsoft.SqlServer.TransactSql.ScriptDom")
 
         from Microsoft.SqlServer.TransactSql.ScriptDom import TSql160Parser
         from System.IO import StringReader
