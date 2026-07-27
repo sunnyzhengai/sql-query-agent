@@ -81,7 +81,9 @@ for i, source in enumerate(sql_sources):
         ctes_json = json.dumps([{
             "name": c.name,
             "sql_fragment": c.sql_fragment,
-            "table_refs": c.table_refs,
+            "table_refs": [{"table": t.table, "schema": t.schema, "database": t.database}
+                           if hasattr(t, 'schema') else {"table": t, "schema": "dbo", "database": None}
+                           for t in c.table_refs],
             "depends_on": c.depends_on,
             "column_refs": [{"table": cr.table, "column": cr.column} for cr in c.column_refs],
         } for c in parsed.ctes])
@@ -90,7 +92,11 @@ for i, source in enumerate(sql_sources):
             "metric_id": metric_id,
             "name": name,
             "ctes_json": ctes_json,
-            "final_select_tables": json.dumps(parsed.final_select_tables),
+            "final_select_tables": json.dumps([
+                {"table": t.table, "schema": t.schema, "database": t.database}
+                if hasattr(t, 'schema') else {"table": t, "schema": "dbo", "database": None}
+                for t in parsed.final_select_tables
+            ]),
             "final_select_cte_refs": json.dumps(parsed.final_select_cte_refs),
             "cte_count": len(parsed.ctes),
             "table_count": len(parsed.final_select_tables),

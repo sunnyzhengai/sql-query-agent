@@ -52,7 +52,7 @@ print(f"Loaded {len(dict_tables)} tables, {len(dict_columns)} columns from dicti
 
 # %% Cell 3: Build graph
 from src.graph.builder import GraphBuilder
-from src.parser.sql_parser import ParsedSQL, CTEInfo
+from src.parser.sql_parser import ParsedSQL, CTEInfo, TableRef
 
 builder = GraphBuilder()
 
@@ -85,16 +85,32 @@ for pr in parse_results:
     # Reconstruct ParsedSQL from stored JSON
     ctes = []
     for c in json.loads(pr["ctes_json"]):
+        # Deserialize table_refs back to TableRef objects
+        table_refs = []
+        for t in c["table_refs"]:
+            if isinstance(t, dict):
+                table_refs.append(TableRef(table=t["table"], schema=t.get("schema", "dbo"), database=t.get("database")))
+            else:
+                table_refs.append(TableRef(table=t))
         ctes.append(CTEInfo(
             name=c["name"],
             sql_fragment=c["sql_fragment"],
-            table_refs=c["table_refs"],
+            table_refs=table_refs,
             depends_on=c["depends_on"],
         ))
 
+    # Deserialize final_select_tables
+    raw_final = json.loads(pr["final_select_tables"])
+    final_tables = []
+    for t in raw_final:
+        if isinstance(t, dict):
+            final_tables.append(TableRef(table=t["table"], schema=t.get("schema", "dbo"), database=t.get("database")))
+        else:
+            final_tables.append(TableRef(table=t))
+
     parsed = ParsedSQL(
         ctes=ctes,
-        final_select_tables=json.loads(pr["final_select_tables"]),
+        final_select_tables=final_tables,
         final_select_cte_refs=json.loads(pr["final_select_cte_refs"]),
     )
 
