@@ -7,14 +7,30 @@ parse_results stores the full parsed output (CTEs as JSON) so
 03_build_graph.py can rebuild the graph without re-parsing.
 """
 
-# %% Cell 0: Install dependencies (triggers kernel restart)
-import os
-os.environ["PYTHONNET_RUNTIME"] = "coreclr"
+# %% Cell 0: Install dependencies (triggers kernel restart — nothing else here)
 %pip install pydantic pyyaml sqlglot sqlparse pythonnet
 
-# %% Cell 1: Setup (run after kernel restart)
-import json
+# %% Cell 1: Setup (run after kernel restart — pythonnet FIRST, before any Spark)
+import os
+os.environ["PYTHONNET_RUNTIME"] = "coreclr"
+
+from pythonnet import load
+try:
+    load("coreclr")
+    print("coreclr loaded")
+except Exception as e:
+    print(f"load caught: {e}")
+
+import clr
 import sys
+dll_path = "/lakehouse/default/Files/sql-query-agent/libs"
+if dll_path not in sys.path:
+    sys.path.append(dll_path)
+clr.AddReference("Microsoft.SqlServer.TransactSql.ScriptDom")
+print("ScriptDom loaded!")
+
+# Now safe to import everything else
+import json
 sys.path.insert(0, "/lakehouse/default/Files/sql-query-agent")
 
 from src.config import load_config
