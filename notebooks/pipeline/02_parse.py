@@ -7,7 +7,9 @@ parse_results stores the full parsed output (CTEs as JSON) so
 03_build_graph.py can rebuild the graph without re-parsing.
 """
 
-# %% Cell 0: Install dependencies (triggers kernel restart — nothing else in this cell)
+# %% Cell 0: Install dependencies (triggers kernel restart)
+import os
+os.environ["PYTHONNET_RUNTIME"] = "coreclr"
 %pip install pydantic pyyaml sqlglot sqlparse pythonnet
 
 # %% Cell 1: Setup (run after kernel restart)
