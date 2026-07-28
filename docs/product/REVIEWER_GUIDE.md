@@ -31,10 +31,12 @@ The pipeline has already been executed and results are loaded. If you want to se
 
 | Question | What it demonstrates |
 |---|---|
-| "What metrics are available?" | Lists all parsed metrics from the knowledge graph |
-| "How is the Daily Census calculated?" | Translates SQL logic to plain English — business user view |
-| "Show me the technical details for Daily Census" | Shows SQL fragments, source tables, transformation chain — developer view |
-| "Which reports use the PATIENT table?" | Reverse lineage — traces from source table back to metrics |
+| "What metrics are available?" | Lists all 28 parsed metrics from the knowledge graph |
+| "How is the Sepsis 3-Hour Bundle calculated?" | Translates complex multi-criteria SQL logic to plain English |
+| "What tables feed into the sepsis bundle compliance?" | Traces upstream dependencies through the graph |
+| "Show me the technical details for Sepsis Screening" | Shows SQL fragments, source tables, transformation chain |
+| "Which reports use the LabResultsFact table?" | Reverse lineage — traces from source table back to metrics |
+| "How does the system handle missing lactate values?" | Deep business logic extraction from COALESCE/ISNULL patterns |
 | "/errors" | Shows parse errors with user-friendly explanations and suggested fixes |
 | "/coverage" | Shows system health: how many metrics have logic, tables, stewards |
 
@@ -54,31 +56,40 @@ The SQL Intelligence Agent automatically:
 
 ## Sample Data Overview
 
-The demo environment contains **20 synthetic SQL files** representing a realistic hospital data warehouse:
+The demo environment contains **28 synthetic SQL files** representing a realistic **clinical quality metrics** domain — specifically, sepsis bundle compliance reporting from a hospital data warehouse.
 
-### SQL File Categories
+### Why Sepsis Metrics
 
-| Category | Count | Patterns Demonstrated |
+Sepsis quality reporting is one of the most complex analytics challenges in healthcare. It involves tracking multiple criteria over time — vitals (heart rate, blood pressure), lab results (white blood cell count, lactate), nursing interventions, and antibiotic administration — all across different source tables with temporal dependencies. This gives the parser a realistic stress test against production-grade SQL complexity.
+
+All files use **anonymized, synthetic schema names** (e.g., `PatientDim`, `VitalSignsFact`, `LabResultsFact`). No real patient data, provider names, or protected health information is included.
+
+### SQL File Organization
+
+Files are grouped into sequential processing stages:
+
+| Stage | Folder | Count | What it contains |
+|---|---|---|---|
+| 1. Staging views | `01_staging_views/` | 8 | Base views that read from source tables — patient demographics, encounters, vitals, labs, medications |
+| 2. Transformations | `02_transformations/` | 12 | Temp table procedures that stage, filter, join, and transform data — time-window calculations, threshold comparisons, missing-value handling |
+| 3. Metrics & reports | `03_sepsis_metrics/` | 8 | Final reporting procedures that calculate bundle compliance rates, dashboard rollups, trend analysis |
+
+### SQL Complexity Patterns Demonstrated
+
+| Pattern | Example | Why it matters |
 |---|---|---|
-| Simple views (SELECT FROM) | 4 | Direct table queries, WHERE filters, JOINs |
-| CTE-based reports | 6 | WITH...AS patterns, multi-CTE chains, dependencies |
-| Temp table procedures | 5 | SELECT INTO #temp, multi-statement staging, temp chains |
-| Complex procedures | 3 | UNION ALL, CASE expressions, nested subqueries |
-| Edge cases | 2 | PIVOT, TRY_PARSE, long IN lists, inline comments |
-
-### Intentional Complexity
-
-The sample SQL files include real-world patterns that standard tools cannot parse:
-
-- **Inconsistent formatting:** Mixed casing, varied whitespace, tab vs space indentation
-- **Multi-statement procedures:** 5-10 temp tables feeding into a final SELECT
-- **Nested CTE dependencies:** CTE A depends on CTE B which depends on CTE C
-- **SQL Server-specific syntax:** CROSS APPLY, STRING_AGG, COALESCE chains, window functions
-- **Comments and documentation headers:** Block comments, inline comments, revision history
+| Multi-CTE chains | 6+ CTEs feeding into a final SELECT | Tests dependency tracking and graph wiring |
+| Temp table staging | SELECT INTO #screening → #eligible → #compliant | Tests temp table → CTE conversion and chain resolution |
+| Complex CASE logic | CASE WHEN lactate > 4.0 AND antibiotics_within_3hr = 1 THEN 'Compliant' | Tests business rule extraction |
+| UNION ALL rollups | Department + facility + system-level aggregations | Tests multi-query merging |
+| Temporal JOINs | Events within 3-hour or 6-hour windows | Tests complex WHERE clause extraction |
+| PIVOT / aggregation | Compliance rates by department, month, bundle element | Tests advanced T-SQL parsing |
+| Missing value handling | COALESCE, ISNULL, LEFT JOIN with NULL checks | Tests real-world data quality patterns |
+| Inconsistent formatting | Mixed casing, varied whitespace, inline comments, revision headers | Tests whitespace normalization |
 
 ### Data Dictionary
 
-A synthetic data dictionary provides table and column descriptions for ~50 tables, enabling the graph to show human-readable descriptions alongside SQL logic.
+A synthetic data dictionary provides table and column descriptions for ~50 tables covering the clinical domain (patient demographics, encounters, vital signs, lab results, medications, flowsheets). This enables the knowledge graph to show human-readable descriptions alongside the SQL logic.
 
 ---
 
@@ -118,31 +129,30 @@ A synthetic data dictionary provides table and column descriptions for ~50 table
 
 ## The Golden Path (3 Test Scenarios)
 
-### Scenario 1: Business User Asks About a Metric
+### Scenario 1: Business User Asks About a Complex Metric
 
 **Type in the agent:**
-> How is the Daily Census calculated?
+> How is the Sepsis 3-Hour Bundle compliance calculated?
 
-**Expected result:** The agent reads the `metric_logic` table and translates the SQL logic into plain English:
-- What the metric measures
-- What filters are applied (e.g., "active patients only", "excludes cancelled events")
-- What time period it covers
-- What departments/locations are included
+**Expected result:** The agent reads the `metric_logic` table and translates complex multi-criteria SQL logic into plain English:
+- What the metric measures (compliance with sepsis treatment protocols)
+- What criteria are evaluated (blood cultures, antibiotics, lactate measurement — each within time windows)
+- How missing values are handled (e.g., "if lactate is not available, the criterion is marked incomplete")
+- How compliance is calculated (percentage of encounters meeting all bundle elements)
 
-**What it proves:** The product automatically extracts business logic from SQL and makes it accessible to non-technical users.
+**What it proves:** The product automatically extracts deeply nested business logic from SQL and makes it accessible to non-technical users — even for clinically complex, multi-criteria calculations.
 
-### Scenario 2: Developer Asks for Technical Details
+### Scenario 2: Developer Traces Upstream Dependencies
 
 **Type in the agent:**
-> Show me the technical details for the Daily Census
+> Which upstream tables feed into the Sepsis 3-Hour Bundle, and what logic handles missing lactate values?
 
-**Expected result:** The agent shows:
-- Full SQL fragments from each transformation step
-- Source tables with data dictionary descriptions
-- The CTE dependency chain
-- Table and column references
+**Expected result:** The agent traces through the knowledge graph and shows:
+- Source tables: `LabResultsFact`, `VitalSignsFact`, `MedicationAdminFact`, `PatientDim`, `EncounterFact`
+- The transformation chain: staging views → screening procedure → eligibility → bundle compliance
+- The specific SQL logic handling missing lactate (COALESCE, LEFT JOIN with NULL checks)
 
-**What it proves:** The same knowledge graph serves both business users and developers with appropriate detail levels.
+**What it proves:** The product doesn't just list tables — it traces the full lineage chain and explains the transformation logic at each step. A developer can understand the entire data pipeline in seconds.
 
 ### Scenario 3: Admin Checks System Health
 
@@ -150,12 +160,12 @@ A synthetic data dictionary provides table and column descriptions for ~50 table
 > /coverage
 
 **Expected result:** The agent queries `metric_logic` and reports:
-- Total metrics in the system
-- How many have calculation logic extracted
-- How many have source tables mapped
-- How many have stewards assigned
+- Total metrics: 28
+- With calculation logic: 26+ (93%+)
+- With source tables mapped: 25+ (89%+)
+- With stewards assigned: 0 (not yet configured)
 
-**What it proves:** The product provides operational visibility into data governance coverage.
+**What it proves:** The product provides operational visibility into data governance coverage — administrators can instantly see how much of their SQL library has been documented.
 
 ---
 
@@ -164,38 +174,59 @@ A synthetic data dictionary provides table and column descriptions for ~50 table
 ### Before: Raw SQL File (what developers see)
 
 ```sql
-CREATE PROCEDURE [Reporting].[USP_Daily_Census] (
-    @StartDate DATE = NULL,
-    @EndDate DATE = NULL
+CREATE PROCEDURE [dbo].[USP_Sepsis_3Hr_Bundle] (
+    @StartDate DATE, @EndDate DATE
 )
 AS
 BEGIN
-    DECLARE @dStart DATE = COALESCE(@StartDate, DATEADD(DAY, -30, GETDATE()))
-    
-    SELECT 
-        adt.EFFECTIVE_TIME AS CensusDate,
-        dep.DEPARTMENT_NAME,
-        COUNT(DISTINCT adt.PAT_ID) AS PatientCount
-    FROM dbo.ADMISSIONS adt
-    INNER JOIN dbo.DEPARTMENTS dep ON adt.DEPT_ID = dep.DEPT_ID
-    WHERE adt.EVENT_TYPE = 'Census'
-        AND adt.EFFECTIVE_TIME BETWEEN @dStart AND @EndDate
-        AND adt.STATUS <> 'Cancelled'
-    GROUP BY adt.EFFECTIVE_TIME, dep.DEPARTMENT_NAME
+    SELECT enc.PAT_ID, enc.ENCOUNTER_ID, enc.ADMIT_TIME,
+        CASE WHEN bc.CULTURE_TIME IS NOT NULL 
+             AND DATEDIFF(HOUR, enc.ADMIT_TIME, bc.CULTURE_TIME) <= 3
+             THEN 1 ELSE 0 END AS BloodCultureCompliant,
+        CASE WHEN abx.ADMIN_TIME IS NOT NULL
+             AND DATEDIFF(HOUR, enc.ADMIT_TIME, abx.ADMIN_TIME) <= 3
+             THEN 1 ELSE 0 END AS AntibioticCompliant,
+        CASE WHEN COALESCE(lab.LACTATE_VALUE, -1) >= 0
+             AND DATEDIFF(HOUR, enc.ADMIT_TIME, lab.COLLECT_TIME) <= 3
+             THEN 1 ELSE 0 END AS LactateCompliant
+    INTO #bundle_elements
+    FROM dbo.EncounterFact enc
+    LEFT JOIN dbo.LabResultsFact lab ON enc.ENCOUNTER_ID = lab.ENCOUNTER_ID
+        AND lab.LAB_TYPE = 'LACTATE'
+    LEFT JOIN dbo.MedicationAdminFact abx ON enc.ENCOUNTER_ID = abx.ENCOUNTER_ID
+        AND abx.MED_CATEGORY = 'ANTIBIOTIC'
+    LEFT JOIN dbo.LabResultsFact bc ON enc.ENCOUNTER_ID = bc.ENCOUNTER_ID
+        AND bc.LAB_TYPE = 'BLOOD_CULTURE'
+    WHERE enc.ADMIT_TIME BETWEEN @StartDate AND @EndDate
+        AND enc.SEPSIS_FLAG = 1;
+
+    SELECT DEPARTMENT_NAME,
+        COUNT(*) AS TotalEncounters,
+        SUM(CASE WHEN BloodCultureCompliant = 1 
+             AND AntibioticCompliant = 1 
+             AND LactateCompliant = 1 THEN 1 ELSE 0 END) AS FullyCompliant
+    FROM #bundle_elements b
+    INNER JOIN dbo.DepartmentDim d ON b.DEPT_ID = d.DEPT_ID
+    GROUP BY DEPARTMENT_NAME
 END
 ```
 
 ### After: Knowledge Graph (what the agent answers)
 
-**Business user asks:** "How is the Daily Census calculated?"
+**Business user asks:** "How is the Sepsis 3-Hour Bundle calculated?"
 
 **Agent responds:**
-> The Daily Census counts the number of unique patients present in each department on a given date. It:
-> - Filters to census events only (excludes other event types)
-> - Excludes cancelled events
-> - Covers the selected date range (default: last 30 days)
-> - Groups results by date and department
-> - Sources data from the Admissions and Departments tables
+> The Sepsis 3-Hour Bundle measures compliance with three time-sensitive treatment requirements for sepsis patients:
+>
+> 1. **Blood cultures** — collected within 3 hours of admission
+> 2. **Antibiotics** — administered within 3 hours of admission
+> 3. **Lactate measurement** — drawn within 3 hours of admission (if lactate is not available, the criterion is marked incomplete using a default value check)
+>
+> A patient is **fully compliant** only if all three criteria are met within the time window.
+>
+> Results are grouped by department, showing total encounters and the number meeting full compliance. The report covers sepsis-flagged encounters within the selected date range.
+>
+> Source data comes from: encounter records, lab results, and medication administration records.
 
 ---
 
