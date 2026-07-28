@@ -80,7 +80,7 @@ Date			Who						Description
 
 USAGE: 
 
-	exec [reportingDB].[reports].[USP_MAIN_ED_Sepsis] 'MB-1', 'ME-1' 
+	exec [reportingDB].[reports].[USP_ED_Sepsis] 'MB-1', 'ME-1' 
 
 **********************************************************************************************************/ 
 

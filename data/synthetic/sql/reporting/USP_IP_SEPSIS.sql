@@ -14,17 +14,17 @@ Description: Used by PBI IP Sepsis Dashboard
 
 Revision Detail 
 
-Created From: [USP_MAIN_IP_SEPSIS]
+Created From: [USP_IP_SEPSIS]
 
 Date			Who					Description 
 
 ----------------------------------------------------------------------------------- 
 
-2022/03/22		Developer B			TKT-004 PBI Conversion. SP created from [USP_MAIN_IP_SEPSIS]
+2022/03/22		Developer B			TKT-004 PBI Conversion. SP created from [USP_IP_SEPSIS]
 
 2022/05/22		V_DEV001			Expansion Phase III Location update
 
-2023/04/19	    Developer C        Merged 3 stored procedures into one: reports.USP_IP_Sepsis_PBI, reports.USP_IP_Sepsis_COMPLIANCE_PBI, reports.USP_IP_Sepsis_COMPLIANCE_BY_SHIFT_NURSES_PBI
+2023/04/19	    Developer C        Merged 3 stored procedures into one: reports.USP_IP_SEPSIS_REPORT, reports.USP_IP_SEPSIS_COMPLIANCE, reports.USP_IP_SEPSIS_COMPLIANCE_BY_SHIFT_NURSES
 
 2023/12/12		Developer C		Subqueries to get Shift RN/CN was throwing an error due to value in DB being varchar and not int
 

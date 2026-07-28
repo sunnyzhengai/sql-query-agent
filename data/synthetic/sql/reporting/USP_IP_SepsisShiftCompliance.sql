@@ -12,7 +12,7 @@ Description: Used by PBI IP Sepsis Dashboard
 
 Revision Detail 
 
-Created From: [USP_MAIN_IP_SEPSIS]
+Created From: [USP_IP_SEPSIS]
 
 Date			Who					Description 
 

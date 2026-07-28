@@ -33,7 +33,19 @@
     "USP_IPSO_SEVERE_SEPSIS": "USP_Severe_Sepsis",
     "USP_IPSO_Severe_Sepsis": "USP_Severe_Sepsis",
     "USP_IPSO_NON_Severe_Sepsis": "USP_NonSevere_Sepsis",
-    "IPSO Sepsis": "Sepsis ETL"
+    "IPSO Sepsis": "Sepsis ETL",
+    "ZD#-1112931": "TKT-014",
+    "USP_CCMC_ED_Sepsis": "USP_ED_Sepsis",
+    "USP_CCMC_ED_SEPSIS": "USP_ED_Sepsis",
+    "USP_CCMC_IP_SEPSIS": "USP_IP_SEPSIS",
+    "USP_CCMC_IP_Sepsis": "USP_IP_Sepsis",
+    "teams/epic/pmo": "teams/bi/pmo",
+    "USP_CCMC_IP_SEPSIS_COMPLIANCE_BY_SHIFT_NURSES_PBI": "USP_IP_SEPSIS_COMPLIANCE_BY_SHIFT_NURSES",
+    "USP_CCMC_IP_SEPSIS_COMPLIANCE_PBI": "USP_IP_SEPSIS_COMPLIANCE",
+    "USP_CCMC_IP_SEPSIS_PBI": "USP_IP_SEPSIS_REPORT",
+    "USP_IP_SEPSIS_PBI": "USP_IP_SEPSIS_REPORT",
+    "USP_IP_SEPSIS_COMPLIANCE_PBI": "USP_IP_SEPSIS_COMPLIANCE",
+    "USP_IP_SEPSIS_COMPLIANCE_BY_SHIFT_NURSES_PBI": "USP_IP_SEPSIS_COMPLIANCE_BY_SHIFT_NURSES"
   },
 
   "procedures": {
@@ -292,6 +304,7 @@
     "Heidi Dammen": "Developer C",
     "GHANASHYAM NAYAKAM": "Developer D",
     "V_OGSP8451": "V_DEV001",
+    "v_ogsp8451": "V_DEV001",
     "V_TSET8589": "V_DEV002",
     "VODBP1980": "V_DEV003",
     "Ma020294": "V_DEV004",

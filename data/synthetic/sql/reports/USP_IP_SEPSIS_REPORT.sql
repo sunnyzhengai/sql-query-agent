@@ -32,13 +32,13 @@ Description: Used by PBI IP Sepsis Dashboard
 
 Revision Detail 
 
-Created From: [USP_MAIN_IP_SEPSIS]
+Created From: [USP_IP_SEPSIS]
 
 Date			Who					Description 
 
 ------------------------------------------------------------------------------------- 
 
-2022/3/2		Developer B			TKT-004 PBI Conversion. SP created from [USP_MAIN_IP_SEPSIS]
+2022/3/2		Developer B			TKT-004 PBI Conversion. SP created from [USP_IP_SEPSIS]
 
 2022/05/22		V_DEV001			Expansion Phase III Location update
 

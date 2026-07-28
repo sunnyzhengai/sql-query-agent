@@ -10,7 +10,7 @@
 
 /*********************************************************************************
 
-	TITLE:		 [USP_MAIN_IP_SEPSIS_COMPLIANCE_BY_SHIFT_NURSES_PBI]
+	TITLE:		 [USP_IP_SEPSIS_COMPLIANCE_BY_SHIFT_NURSES]
 
 	PURPOSE:	 Report to Sepsis Score documentation compliance by shift Nurses
 

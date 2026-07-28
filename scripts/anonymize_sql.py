@@ -204,7 +204,6 @@ def scan_for_missed(sql: str, crosswalk: dict) -> list[str]:
 
 def process_file(
     input_path: Path,
-    output_path: Path,
     replacements: list[tuple[str, str, str]],
     crosswalk: dict,
     dry_run: bool = False,
@@ -214,6 +213,7 @@ def process_file(
     sql = input_path.read_text(encoding="utf-8-sig")
 
     anonymized, log = apply_replacements(sql, replacements, verbose)
+    output_path = get_output_path(input_path, crosswalk, anonymized)
     warnings = scan_for_missed(anonymized, crosswalk)
 
     stats = {
@@ -231,18 +231,26 @@ def process_file(
     return stats
 
 
-def get_output_path(input_path: Path, crosswalk: dict) -> Path:
-    """Determine output path for a file based on its schema folder."""
+def get_output_path(input_path: Path, crosswalk: dict, anonymized_sql: str) -> Path:
+    """Determine output path based on the anonymized CREATE PROCEDURE name."""
     rel = input_path.relative_to(INPUT_DIR)
-    parts = list(rel.parts)  # e.g., ['reporting', 'USP_IP_SepsisDetails']
+    schema_folder = rel.parts[0]  # 'reporting' or 'reports'
 
-    # Add .sql extension if missing
-    filename = parts[-1]
+    # Extract proc name from the anonymized SQL
+    m = re.search(
+        r"CREATE\s+(?:OR\s+ALTER\s+)?PROCEDURE\s+"
+        r"(?:\[?\w+\]?\.)?\[?(\w+)\]?",
+        anonymized_sql, re.IGNORECASE,
+    )
+    if m:
+        proc_name = m.group(1)
+        return OUTPUT_DIR / schema_folder / f"{proc_name}.sql"
+
+    # Fallback: use input filename
+    filename = rel.parts[-1]
     if not filename.endswith(".sql"):
         filename += ".sql"
-    parts[-1] = filename
-
-    return OUTPUT_DIR / Path(*parts)
+    return OUTPUT_DIR / schema_folder / filename
 
 
 def main():
@@ -272,13 +280,11 @@ def main():
     all_warnings = []
 
     for input_path in input_files:
-        output_path = get_output_path(input_path, crosswalk)
-
         if verbose:
             print(f"\n--- {input_path.relative_to(INPUT_DIR)} ---")
 
         stats = process_file(
-            input_path, output_path, replacements, crosswalk,
+            input_path, replacements, crosswalk,
             dry_run=dry_run, verbose=verbose,
         )
 

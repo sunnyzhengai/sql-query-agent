@@ -80,7 +80,7 @@ MODIFICATION: TKT-001 -- add Sepsis Score day/night shift
 
 MODIFICATION DATE:03.01.2021
 
-MODIFIED BY: v_ogsp8451
+MODIFIED BY: V_DEV001
 
 MODIFICATION: Change Hudlle time from -30 to 120 TO -30 to 180
 
@@ -110,11 +110,11 @@ MODIFICATION: Address transfers due to NEW_UNIT
 
 */
 
---EXEC [reports].[USP_MAIN_IP_Sepsis]'MB-3','ME-3'
+--EXEC [reports].[USP_IP_Sepsis]'MB-3','ME-3'
 
 
 
-CREATE   PROCEDURE [reports].[USP_IP_Sepsis]
+CREATE   PROCEDURE [reports].[USP_IP_SEPSIS]
 
 @StartDate VARCHAR(20) = NULL,
 

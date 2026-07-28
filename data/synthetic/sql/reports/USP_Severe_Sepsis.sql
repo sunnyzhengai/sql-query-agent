@@ -76,7 +76,7 @@ Change log:
 
  	CODE CHANGES		N:\BusinessIntelligenceTeam\Project Documentation\Quality Initiatives\Sepsis ETL\TKT-012\Code\IPSO CHANGES.DOCX
 
- 	CODE CHANGES		http://extranet.samplehealth.org/teams/epic/pmo/QualityInitiatives/Shared%20Documents/Report%20Requirements/2-%20Sepsis-Severe/IPSO%20Changes.docx
+ 	CODE CHANGES		http://extranet.samplehealth.org/teams/bi/pmo/QualityInitiatives/Shared%20Documents/Report%20Requirements/2-%20Sepsis-Severe/IPSO%20Changes.docx
 
  	10.01.2019			V_DEV001					Added new ED Sepsis Score -R HS IP SEPSIS SCORE 2019 [9000002613]  and New Organ Dysfunction Score - R HS IP SEPSIS ODS 2019 [9000002644] 
 
@@ -4884,7 +4884,7 @@ FROM #COHORT C
 
 	OUTER APPLY
 
-	(--HUDDLE TIME FROM NOTES ZD#-1112931
+	(--HUDDLE TIME FROM NOTES TKT-014
 
 		SELECT MIN(HNO.CRT_INST_LOCAL_DTTM) AS HuddleNoteTime
 

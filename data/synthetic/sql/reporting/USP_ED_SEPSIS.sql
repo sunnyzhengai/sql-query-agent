@@ -94,7 +94,7 @@ USAGE:
 
 
 
-CREATE         PROCEDURE [reporting].[USP_MAIN_ED_SEPSIS] (
+CREATE         PROCEDURE [reporting].[USP_ED_Sepsis] (
 
 	@StartDate VARCHAR(20) = NULL,
 
