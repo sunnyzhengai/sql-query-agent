@@ -38,3 +38,7 @@ htmlcov/
 .coverage
 data/output/
 presentation/
+
+# Pre-anonymization source files (contain proprietary SQL/metadata)
+data/synthetic/sepsis_sql/
+data/Collibra*

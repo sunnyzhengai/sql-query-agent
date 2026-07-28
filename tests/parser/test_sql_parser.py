@@ -87,7 +87,7 @@ class TestParseExtractedQueries:
             parse_extracted_queries(["GARBAGE !!!", "MORE GARBAGE !!!"])
 
     def test_complex_temp_table_chain(self):
-        """Regression: USP_CCHCS_ScanningSummaryReports_PBI pattern.
+        """Regression: complex temp table chain pattern.
 
         9 temp tables in a dependency chain. Must produce:
         - 9 CTEs with correct depends_on

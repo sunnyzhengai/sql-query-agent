@@ -180,22 +180,6 @@ class TestParseSql:
         cte_names = [c.name for c in result.ctes]
         assert "stage" in cte_names or len(result.ctes) >= 1
 
-    def test_real_census_dashboard(self):
-        """Regression test against the real Census Dashboard proc."""
-        with open("data/sample/real_census_dashboard.sql") as f:
-            sql = f.read()
-        result = parse_sql(sql)
-        assert len(result.ctes) >= 1
-        assert len(result.final_select_tables) >= 5
-
-    def test_real_lote_census(self):
-        """Regression test against the real LOTE Census proc."""
-        with open("data/sample/real_lote_census.sql") as f:
-            sql = f.read()
-        result = parse_sql(sql)
-        assert len(result.ctes) >= 5
-        assert len(result.final_select_tables) >= 5
-
     def test_proc_with_declare_and_set(self):
         """DECLARE and SET should be stripped, SELECT should parse."""
         sql = """
