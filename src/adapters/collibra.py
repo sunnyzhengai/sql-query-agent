@@ -172,6 +172,128 @@ class CollibraAdapter:
 
         return result
 
+    # Collibra's well-known attribute type ID for Description
+    DESCRIPTION_ATTR_TYPE_ID = "00000000-0000-0000-0000-000000003114"
+
+    def update_description(
+        self,
+        asset_name: str,
+        description: str,
+        asset_type_id: str | None = None,
+    ) -> PublishResult:
+        """Update the Description attribute on an existing Collibra asset.
+
+        Finds the asset by name, then creates or updates the Description
+        attribute. Use this to enrich existing assets (e.g., Power BI Reports
+        ingested by Collibra's integration) without recreating them.
+
+        Args:
+            asset_name: Exact name of the asset in Collibra.
+            description: The description text to set.
+            asset_type_id: Optional type ID filter to narrow the search.
+        """
+        session = self._get_session()
+        type_id = asset_type_id or self.config.asset_type_id
+
+        # 1. Find the asset
+        try:
+            params: dict[str, Any] = {
+                "name": asset_name,
+                "nameMatchMode": "EXACT",
+                "limit": 1,
+            }
+            if type_id:
+                params["typeId"] = type_id
+            resp = session.get(
+                f"{self.config.base_url}/assets",
+                params=params,
+                timeout=10,
+            )
+            resp.raise_for_status()
+            assets = resp.json().get("results", [])
+            if not assets:
+                return PublishResult(
+                    asset_id=asset_name,
+                    status=PublishStatus.FAILED,
+                    message=f"Asset not found: {asset_name}",
+                )
+            collibra_asset_id = assets[0]["id"]
+        except Exception as e:
+            return PublishResult(
+                asset_id=asset_name,
+                status=PublishStatus.FAILED,
+                message=f"Asset lookup failed: {e}",
+            )
+
+        # 2. Check for existing Description attribute
+        try:
+            resp = session.get(
+                f"{self.config.base_url}/attributes",
+                params={
+                    "assetId": collibra_asset_id,
+                    "typeId": self.DESCRIPTION_ATTR_TYPE_ID,
+                    "limit": 1,
+                },
+                timeout=10,
+            )
+            resp.raise_for_status()
+            existing_attrs = resp.json().get("results", [])
+        except Exception as e:
+            return PublishResult(
+                asset_id=asset_name,
+                status=PublishStatus.FAILED,
+                message=f"Attribute lookup failed: {e}",
+            )
+
+        # 3. Update or create the Description attribute
+        try:
+            if existing_attrs:
+                attr_id = existing_attrs[0]["id"]
+                resp = session.patch(
+                    f"{self.config.base_url}/attributes/{attr_id}",
+                    json={"value": description},
+                    timeout=30,
+                )
+            else:
+                resp = session.post(
+                    f"{self.config.base_url}/attributes",
+                    json={
+                        "assetId": collibra_asset_id,
+                        "typeId": self.DESCRIPTION_ATTR_TYPE_ID,
+                        "value": description,
+                    },
+                    timeout=30,
+                )
+            resp.raise_for_status()
+
+            action = "Updated" if existing_attrs else "Created"
+            return PublishResult(
+                asset_id=asset_name,
+                status=PublishStatus.SUCCESS,
+                message=f"{action} description on asset {collibra_asset_id}",
+            )
+        except Exception as e:
+            return PublishResult(
+                asset_id=asset_name,
+                status=PublishStatus.FAILED,
+                message=f"Attribute write failed: {e}",
+            )
+
+    def update_descriptions_bulk(
+        self,
+        records: list[MetadataRecord],
+    ) -> BulkPublishResult:
+        """Update Description attributes on multiple existing assets.
+
+        Args:
+            records: List of MetadataRecords — uses name and description fields.
+        """
+        result = BulkPublishResult()
+        for record in records:
+            r = self.update_description(record.name, record.description)
+            result.add(r)
+        return result
+
     def _find_asset(self, asset_id: str) -> str | None:
         """Look up an existing Collibra asset by qualified name."""
         session = self._get_session()
