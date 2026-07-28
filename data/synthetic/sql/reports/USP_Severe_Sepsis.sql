@@ -4094,7 +4094,7 @@ FROM
 
 				OR
 
-				(FTZ.FTZ BETWEEN VPALH.IN_DTTM AND VPALH.OUT_DTTM)--modified by shiva on 07.30.2019				
+				(FTZ.FTZ BETWEEN VPALH.IN_DTTM AND VPALH.OUT_DTTM)--modified by Developer A on 07.30.2019				
 
 				
 
@@ -4532,7 +4532,7 @@ SELECT DISTINCT
 
 	, COALESCE(#TSSC.PROC_DATE, '1900‐01‐03 00:00:00') AS TimeSurgicalSourceControl_V39			
 
-	, CASE --if time zero is 24 hours after arrival, Outside Hospital should be reported as zero. Shiva updated this on 08.01.2019			
+	, CASE --if time zero is 24 hours after arrival, Outside Hospital should be reported as zero. Developer A updated this on 08.01.2019			
 
 		WHEN PEH.ADMIT_SOURCE_C IS NULL THEN 99		
 
