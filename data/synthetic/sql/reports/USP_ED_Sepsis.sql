@@ -1,0 +1,3326 @@
+
+
+
+
+
+
+/**********************************************************************************************************
+
+Author: <Unknown>
+
+Create date:  <Unknown>
+
+Description:  
+
+Report Name: BI-Health System --> Quality --> ED Sepsis
+
+==========================================================================================================
+
+Revision Detail 
+
+
+
+Date			Who						Description 
+
+----------------------------------------------------------------------------------------------------------
+
+2019.05.16		V_DEV001				[PROCEDURE_ORDERS].PROC_CODE is deprecated as of april 2019; Replacing it with PROC_ID.
+
+2019.07.19		V_DEV001				MAR_ACTION_C changed data type from INT to VARCHAR.
+
+2019.10.01		V_DEV001				Added new Sepsis Score Flowsheet ID '9000002613'
+
+2019.11.07		V_DEV001				Added Quick Set/ OrdersetS OSQ: 
+
+											- ED Sepsis Panel - OSQ 400002
+
+											- Sepsis Antimicrobials Unknown Source - OSQ 400007
+
+											- Neo Fever Panel - OSQ 400003
+
+											- Oncology with Fever Panel - OSQ 400004
+
+2019.11.08		V_DEV001				Updated calculation to include Triage Stop Time instead of Triage Start Time
+
+2019.12.11		V_DEV001				Added First ABX Order and its related Pharmacy times
+
+2020.04.10		V_DEV001				Added First and Last Blood Pressure information and ED Border Flag
+
+2020.09.21		V_DEV001				Added Compliance for (FPS + ABX/ Bolus/ Rescreen):
+
+											- Rescreen One Hour before Transfer/ Discharge
+
+											- ED 2 PICU/ ED 2 Floor and then ICU
+
+											- ED IP Bed assignment to IP Transfer Metric
+
+											- ABX given only in ED setting
+
+2020.10.29		V_DEV001				Set TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
+
+2020.11.17		V_DEV001				Set end date to T-1
+
+2021.02.03		V_DEV001				Added first sepsis score day/night shift
+
+2021.03.24		V_DEV001				Added PATIENTS's race and ethnic group info
+
+2023.06.15		V_DEV003				Added age in days for 21 days or less age filter, and modified months age to include FLOOR
+
+
+
+2025.08.06		V_DEV004				Added #SepsisAlertCancelled columns
+
+2025.08.26		V_DEV004				Added Urine Culture Results, Organism name to Blood/CSF, and corrected Blood/CSF code
+
+2025.10.06		V_DEV004				Added BP percentile Flowsheets [9001140203, 9001140205] (per TKT-009)
+
+2025.12.07		V_DEV004				Added [Septic Shock] and [Blood Culture First Order Time] columns
+
+==========================================================================================================
+
+USAGE: 
+
+	exec [reportingDB].[reports].[USP_MAIN_ED_Sepsis] 'MB-1', 'ME-1' 
+
+**********************************************************************************************************/ 
+
+
+
+
+
+CREATE       PROCEDURE [reports].[USP_ED_Sepsis] (
+
+	@StartDate VARCHAR(20) = NULL,
+
+	@EndDate VARCHAR(20) = NULL
+
+)
+
+
+
+AS
+
+
+
+SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;
+
+SET NOCOUNT ON;
+
+	
+
+DECLARE @dStartDate DATE;
+
+DECLARE @dEndDate DATE;
+
+
+
+	
+
+IF @StartDate IS NULL OR @StartDate = ''
+
+	SET @dStartDate = EMRDB.[dbo].[fn_parse_date]('MB-12')
+
+ELSE
+
+	SET @dStartDate = EMRDB.[dbo].[fn_parse_date](@StartDate)
+
+	
+
+IF @EndDate IS NULL OR @EndDate = ''
+
+	SET @dEndDate = EMRDB.[dbo].[fn_parse_date]('T-1')
+
+ELSE
+
+	SET @dEndDate = EMRDB.[dbo].[fn_parse_date](@EndDate)
+
+
+
+
+
+--SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;
+
+--SET NOCOUNT ON;
+
+
+
+--DECLARE @dStartDate DATE = '2025-11-01';
+
+--DECLARE @dEndDate DATE = '2025-11-30';
+
+
+
+
+
+/* ************** */
+
+/* Base ED Visits */
+
+/* ************** */
+
+DROP TABLE IF EXISTS #Base_Pop;
+
+
+
+SELECT DISTINCT
+
+	PEH.PAT_ENC_CSN_ID
+
+	, PEH.PAT_ID
+
+	, PAT.PAT_MRN_ID
+
+	, PAT.PAT_NAME
+
+	, ZEG.NAME AS [Ethnic Group]
+
+	, ZPR.NAME AS [Race]
+
+	, FEE.AGE_AT_ARRIVAL_MONTHS
+
+	, FEE.AGE_AT_ARRIVAL_YEARS
+
+	, PEH.INPATIENT_DATA_ID
+
+	, PEH.ADT_ARRIVAL_TIME
+
+	, DEE.TRIAGE_START_DTTM
+
+	, DEE.TRIAGE_END_DTTM
+
+	, PEH.HOSP_ADMSN_TIME
+
+	, PEH.HOSP_DISCH_TIME
+
+	, PEH.INP_ADM_DATE
+
+	, PEH.ED_DEPARTURE_TIME
+
+	, PEH.ED_DISPOSITION_C
+
+	, ZED.NAME AS [Disposition]
+
+	, LOC.LOCATION_ABBR [Location]
+
+	, FLOOR(DATEDIFF(day,PAT.BIRTH_DATE,PEH.ADT_ARRIVAL_TIME)) AS AGE_IN_DAYS ---ADDED V_DEV003 6/15/2023 TKT-007 
+
+	, FLOOR(DATEDIFF(MM,PAT.BIRTH_DATE,COALESCE(PEH.ADT_ARRIVAL_TIME,PEH.ADT_ARRIVAL_TIME)) ) AS AGE_MONTHS  ---ADDED V_DEV003 6/15/2023 TKT-007  (AGE IN MONTHS IS SHOWING AS 1 WHEN ITS ONLY 2 WEEKS, ETC.)
+
+	, FLOOR(DATEDIFF(DD,PAT.BIRTH_DATE,PEH.ADT_ARRIVAL_TIME)/365.25) AS AGE_YEARS
+
+	, DATENAME(month, CONVERT(DATE,PEH.ADT_ARRIVAL_TIME)) + DATENAME(YEAR, CONVERT(DATE, PEH.ADT_ARRIVAL_TIME)) AS DATE_STAMP
+
+
+
+INTO #Base_Pop
+
+
+
+FROM [EMRDB].[dbo].ED_ENCOUNTERS_FACT FEE
+
+
+
+	INNER JOIN [EMRDB].[dbo].HOSPITAL_ENCOUNTERS PEH ON FEE.PAT_ENC_CSN_ID = PEH.PAT_ENC_CSN_ID
+
+	INNER JOIN [EMRDB].[dbo].ED_ENCOUNTERS_DM DEE ON DEE.PAT_ENC_CSN_ID = FEE.PAT_ENC_CSN_ID
+
+	INNER JOIN [EMRDB].[dbo].PATIENTS PAT ON PAT.PAT_ID = PEH.PAT_ID
+
+	LEFT OUTER JOIN [EMRDB].[dbo].REF_ED_DISPOSITION ZED ON ZED.ED_DISPOSITION_C = PEH.ED_DISPOSITION_C
+
+	LEFT OUTER JOIN [EMRDB].[dbo].REF_ETHNIC_GROUP ZEG ON ZEG.ETHNIC_GROUP_C = PAT.ETHNIC_GROUP_C
+
+	LEFT OUTER JOIN [EMRDB].[dbo].PATIENT_DEMOGRAPHICS_RACE RACE ON RACE.PAT_ID = PAT.PAT_ID AND RACE.LINE=1
+
+	LEFT OUTER JOIN [EMRDB].[dbo].REF_PATIENT_RACE ZPR ON ZPR.PATIENT_RACE_C = RACE.PATIENT_RACE_C
+
+	LEFT OUTER JOIN [EMRDB].[dbo].DEPARTMENTS DEP ON DEP.DEPARTMENT_ID = PEH.DEPARTMENT_ID
+
+	LEFT OUTER JOIN [EMRDB].[dbo].LOCATIONS LOC ON LOC.LOC_ID = DEP.REV_LOC_ID
+
+
+
+WHERE 1=1
+
+	AND FEE.ADT_ARRIVAL_DATE BETWEEN @dStartDate AND @dEndDate
+
+;
+
+
+
+CREATE CLUSTERED INDEX INX_Base_Pop_CSN ON #Base_Pop ([PAT_ENC_CSN_ID]);
+
+
+
+
+
+/* ******************** */
+
+/* Treatment Plan Begin */
+
+/* ******************** */
+
+
+
+-- All encounters from #Base_pop where ABX was administered
+
+DROP TABLE IF EXISTS #BasePopABX;
+
+
+
+WITH ABX AS
+
+(
+
+SELECT
+
+		OM.PAT_ENC_CSN_ID
+
+		, OM.ORDER_MED_ID
+
+		, MAI.TAKEN_TIME AS ABX_ADMIN_TIME
+
+		, cm.[NAME]
+
+
+
+	FROM #Base_Pop B -- ONLY THOSE PATIENTS WITH A POSITIVE SCORE
+
+		INNER JOIN EMRDB.dbo.MEDICATION_ORDERS OM ON OM.PAT_ENC_CSN_ID = B.PAT_ENC_CSN_ID
+
+		INNER JOIN EMRDB.dbo.MEDICATIONS CM ON CM.MEDICATION_ID = OM.MEDICATION_ID --AND CM.THERA_CLASS_C = 11 --Antibiotics
+
+		INNER JOIN EMRDB.dbo.MED_ADMIN_RECORDS MAI ON MAI.ORDER_MED_ID = OM.ORDER_MED_ID
+
+
+
+	WHERE 1=1
+
+		AND MAI.TAKEN_TIME IS NOT NULL	--ADMINISTERED ABX ONLY
+
+		AND MAI.TAKEN_TIME < B.ED_DEPARTURE_TIME--09.23.2020; MAKE SURE THE Antibiotics WERE GIVEN IN ED
+
+		AND OM.MED_ROUTE_C=11--IV ONLY
+
+		AND MAI.MAR_ACTION_C IN ('1'			--GIVEN
+
+								, '7'			--RESTARTED
+
+								, '102'		--GIVEN BY OTHER
+
+								, '105'		--NEW CARTRIDGE
+
+								, '113'		--GIVEN DURING DOWNTIME
+
+								, '114'		--STARTED DURING DOWNTIME
+
+								, '115'		--MEDICATION APPLIED
+
+								, '122'		--CONTINUED FROM OR
+
+								, '124'		--SELF ADMINISTERED VIA PUMP
+
+								, '132'		--CONTINUED FROM PREVIOUS ORDER
+
+								, '143'		--REDOSE
+
+								, '1604'		--INFUSION GREATER THAN 15 MIN
+
+								, '1605'		--INFUSION LESS THAN 15 MIN
+
+								, '1607'		--NEW CARTRIDGE
+
+								, '6'			--NEW BAG
+
+								, '99'			--RATE CHANGE
+
+								)
+
+		AND OM.MEDICATION_ID IN 
+
+			(
+
+
+
+				select 
+
+						medlist.MEDICATION_ID
+
+					from
+
+						(
+
+							SELECT 
+
+								erx.MEDICATION_ID,
+
+								erx.NAME,
+
+								cntl.VALUE_SET_DISPLAY as AGENT,
+
+								case when CHARINDEX('^',cntl.VALUE_SET_ABBR)>0 then SUBSTRING(cntl.VALUE_SET_ABBR,0,CHARINDEX('^',cntl.VALUE_SET_ABBR)) else cntl.VALUE_SET_ABBR end as AGENT_GROUP,
+
+								case when cntl.VALUE_SET_ABBR like '%^Y' then 1 else 0 end as DOT_MONITORING,
+
+								gen.TITLE,
+
+								ROW_NUMBER() over(partition by erx.MEDICATION_ID order by cntl.VALUE_SET_ABBR,cntl.VALUE_SET_DISPLAY asc) as AGENT_ORDER
+
+
+
+							FROM
+
+								EMRDB.dbo.MEDICATIONS erx
+
+								OUTER APPLY(
+
+									--Get the main medication's simple generic if its a mixture
+
+									SELECT TOP 1 
+
+										mix.DRUG_ID,
+
+										comp.SIMPLE_GENERIC_C 
+
+									FROM EMRDB.dbo.MED_MIX_COMPONENTS mix
+
+										INNER JOIN EMRDB.dbo.MEDICATIONS comp on mix.DRUG_ID=comp.MEDICATION_ID
+
+									WHERE 1=1
+
+										AND mix.TYPE_C=3		--3 - Medications 
+
+										AND mix.MEDICATION_ID=erx.MEDICATION_ID
+
+									ORDER BY
+
+										mix.LINE
+
+								) mixture
+
+								INNER JOIN EMRDB.dbo.REF_GENERIC_MED gen on gen.SIMPLE_GENERIC_C=coalesce(erx.SIMPLE_GENERIC_C,mixture.SIMPLE_GENERIC_C)
+
+								INNER JOIN reportingDB.reports.CONFIG_VALUE_SET cntl on cntl.VALUE_SET_ID=3016 and cntl.CODE=gen.SIMPLE_GENERIC_C -- and cntl.VALUE_SET_ABBR='Antibacterial'
+
+						) medlist
+
+					where
+
+						medlist.AGENT_ORDER=1						
+
+			)
+
+
+
+	UNION
+
+
+
+	SELECT DISTINCT
+
+		OM.PAT_ENC_CSN_ID
+
+		, OM.ORDER_MED_ID
+
+		, MAI.TAKEN_TIME AS ABX_ADMIN_TIME
+
+		, cm.NAME
+
+
+
+	FROM #Base_Pop B -- ONLY THOSE PATIENTS WITH A POSITIVE SCORE
+
+
+
+		INNER JOIN EMRDB.dbo.MEDICATION_ORDERS OM ON OM.PAT_ENC_CSN_ID = B.PAT_ENC_CSN_ID
+
+		INNER JOIN EMRDB.dbo.MEDICATIONS CM ON CM.MEDICATION_ID = OM.MEDICATION_ID AND CM.THERA_CLASS_C = 11 --Antibiotics
+
+		INNER JOIN EMRDB.dbo.MED_ADMIN_RECORDS MAI ON MAI.ORDER_MED_ID = OM.ORDER_MED_ID
+
+
+
+	WHERE 1=1
+
+		AND MAI.TAKEN_TIME IS NOT NULL	--ADMINISTERED ABX ONLY
+
+		AND MAI.TAKEN_TIME < B.ED_DEPARTURE_TIME--09.23.2020; MAKE SURE THE Antibiotics WERE GIVEN IN ED
+
+		AND OM.MED_ROUTE_C=11--IV ONLY
+
+		AND MAI.MAR_ACTION_C IN ('1'			--GIVEN
+
+								, '7'			--RESTARTED
+
+								, '102'		--GIVEN BY OTHER
+
+								, '105'		--NEW CARTRIDGE
+
+								, '113'		--GIVEN DURING DOWNTIME
+
+								, '114'		--STARTED DURING DOWNTIME
+
+								, '115'		--MEDICATION APPLIED
+
+								, '122'		--CONTINUED FROM OR
+
+								, '124'		--SELF ADMINISTERED VIA PUMP
+
+								, '132'		--CONTINUED FROM PREVIOUS ORDER
+
+								, '143'		--REDOSE
+
+								, '1604'		--INFUSION GREATER THAN 15 MIN
+
+								, '1605'		--INFUSION LESS THAN 15 MIN
+
+								, '1607'		--NEW CARTRIDGE
+
+								, '6'			--NEW BAG
+
+								, '99'			--RATE CHANGE
+
+								)
+
+)
+
+
+
+SELECT
+
+	ABX.PAT_ENC_CSN_ID
+
+	,ABX.ORDER_MED_ID
+
+	,ABX.NAME
+
+	,ABX.ABX_ADMIN_TIME
+
+	,ROW_NUMBER() OVER(PARTITION BY ABX.PAT_ENC_CSN_ID ORDER BY ABX.ABX_ADMIN_TIME) TIME_LINE
+
+
+
+INTO #BasePopABX
+
+FROM ABX						
+
+;
+
+
+
+
+
+/* *************** */
+
+/* Chief Complaint */
+
+/* *************** */
+
+DROP TABLE IF EXISTS #Base_Pop_ENC_Reason;
+
+
+
+SELECT DISTINCT   CAT.PAT_ENC_CSN_ID,
+
+        STUFF((	SELECT ';' + CONVERT(VARCHAR,CRFV.REASON_VISIT_NAME)-- AS [text()]
+
+                FROM #Base_Pop SUB
+
+					INNER JOIN [EMRDB].[dbo].ENCOUNTER_VISIT_REASONS RSN ON RSN.PAT_ENC_CSN_ID = SUB.PAT_ENC_CSN_ID AND RSN.LINE>1
+
+					INNER JOIN [EMRDB].[dbo].VISIT_REASONS CRFV ON CRFV.REASON_VISIT_ID = RSN.ENC_REASON_ID
+
+				WHERE
+
+                    SUB.PAT_ENC_CSN_ID = CAT.PAT_ENC_CSN_ID
+
+				ORDER BY LINE
+
+                    FOR XML PATH('')
+
+               ), 1, 1, '' )
+
+            AS [AllEncReasons]
+
+INTO #Base_Pop_ENC_Reason
+
+FROM  #Base_Pop CAT
+
+;
+
+
+
+
+
+/* ************* */
+
+/* Order Set OSQ */
+
+/* ************* */
+
+DROP TABLE IF EXISTS #SSOrderSetOSQ_PRL;
+
+
+
+	SELECT
+
+		B.PAT_ENC_CSN_ID
+
+		, OM.ORDER_DTTM
+
+		, OM2.ORD_OSQ_ID AS PRL_ORDERSET_ID
+
+	INTO #SSOrderSetOSQ_PRL
+
+	FROM #Base_Pop B
+
+		INNER JOIN EMRDB.dbo.ORDER_TRACKING_METRICS OM ON OM.PAT_ENC_CSN_ID = B.PAT_ENC_CSN_ID
+
+		INNER JOIN [EMRDB].[dbo].MEDICATION_ORDERS_EXT OM2 ON OM2.ORDER_ID = OM.ORDER_ID AND OM2.ORD_OSQ_ID IN (400002,400007,400003,400004)
+
+	WHERE OM.ORDER_DTTM BETWEEN B.ADT_ARRIVAL_TIME AND B.ED_DEPARTURE_TIME
+
+
+
+UNION
+
+
+
+	SELECT
+
+		B.PAT_ENC_CSN_ID
+
+		, OM.ORDER_DTTM
+
+		, OM2.ORD_OSQ_ID AS PRL_ORDERSET_ID
+
+	FROM #Base_Pop B
+
+		INNER JOIN EMRDB.dbo.ORDER_TRACKING_METRICS OM ON OM.PAT_ENC_CSN_ID = B.PAT_ENC_CSN_ID
+
+		INNER JOIN [EMRDB].[dbo].PROCEDURE_ORDERS_EXT OM2 ON OM2.ORDER_ID = OM.ORDER_ID AND OM2.ORD_OSQ_ID IN (400002,400007,400003,400004)
+
+	WHERE
+
+		OM.ORDER_DTTM BETWEEN B.ADT_ARRIVAL_TIME AND B.ED_DEPARTURE_TIME
+
+
+
+UNION
+
+
+
+	SELECT
+
+		B.PAT_ENC_CSN_ID
+
+		, OM.ORDER_DTTM
+
+		, OM.PRL_ORDERSET_ID
+
+	FROM #Base_Pop B
+
+		INNER JOIN EMRDB.dbo.ORDER_TRACKING_METRICS OM ON OM.PAT_ENC_CSN_ID = B.PAT_ENC_CSN_ID
+
+	WHERE
+
+		OM.PRL_ORDERSET_ID IN (400001)-- (40400100, 40400058, 40400196, 40400153, 4058600002, 400001) --Severe Sepsis, Short Stay – Sepsis, H/O – Sepsis CLINICAL_ALERTS, ID – Staph Aureus Sepsis, H/O Sepsis CLINICAL_ALERTS in Clinic, Sepsis Pathway
+
+		AND OM.ORDER_DTTM BETWEEN B.ADT_ARRIVAL_TIME AND B.ED_DEPARTURE_TIME
+
+;
+
+
+
+
+
+/* ******************* */
+
+/* Order Set           */
+
+/* ******************* */
+
+DROP TABLE IF EXISTS #SSOrderSet;
+
+
+
+SELECT
+
+	PAT_ENC_CSN_ID
+
+	, ORDER_DTTM
+
+	, ROW_NUMBER() OVER(PARTITION BY PAT_ENC_CSN_ID ORDER BY ORDER_DTTM ASC) AS TIME_LINE
+
+	, PRL_ORDERSET_ID
+
+INTO #SSOrderSet 
+
+FROM #SSOrderSetOSQ_PRL
+
+;
+
+
+
+
+
+/* ******************* */
+
+/* Bolus               */
+
+/* ******************* */
+
+DROP TABLE IF EXISTS #BasePopBolus;
+
+
+
+SELECT
+
+	B.PAT_ENC_CSN_ID
+
+	, MAI.TAKEN_TIME AS BOLUS_ADMIN_TIME
+
+	, CASE	WHEN OM.MEDICATION_ID IN (700001, 700002) THEN 'SODIUM CHLORIDE 0.99%'
+
+			ELSE CM.[NAME]
+
+	  END AS Medication
+
+	, ROW_NUMBER() OVER(PARTITION BY B.PAT_ENC_CSN_ID ORDER BY MAI.TAKEN_TIME ASC) TIME_LINE
+
+	, MAI.SIG AS BOLUS_VOLUME
+
+
+
+INTO #BasePopBolus 
+
+FROM #Base_Pop B
+
+	INNER JOIN EMRDB.dbo.MEDICATION_ORDERS OM ON OM.PAT_ENC_CSN_ID = B.PAT_ENC_CSN_ID
+
+	INNER JOIN EMRDB.dbo.MEDICATIONS CM ON CM.MEDICATION_ID = OM.MEDICATION_ID
+
+	INNER JOIN EMRDB.dbo.MED_ADMIN_RECORDS MAI ON MAI.ORDER_MED_ID = OM.ORDER_MED_ID
+
+
+
+WHERE 1=1
+
+	AND MAI.TAKEN_TIME IS NOT NULL --ADMINISTERED BOLUS ONLY
+
+	AND MAI.TAKEN_TIME BETWEEN B.ADT_ARRIVAL_TIME AND B.ED_DEPARTURE_TIME
+
+	AND (OM.MEDICATION_ID IN (700001  --SODIUM CHLORIDE 0.99 % IV BOLUS
+
+							, 7000739 --LACTATED RINGERS IV BOLUS
+
+							, 700003    --ALBUMIN, HUMAN 95 % INTRAVENOUS SOLUTION
+
+							, 7006331 --ELECTROLYE-A IV Bolus (PLASMALYTE)
+
+							, 700002	--SODIUM CHLORIDE 0.99 % INJECTION SYRINGE--ADDED ON 04.02.2019
+
+							)
+
+		OR (OM.MEDICATION_ID = 700004)
+
+	AND OM.HV_DISCR_FREQ_ID = '300902') -- FREQUENCY = ONCE 
+
+	AND MAI.MAR_ACTION_C IN ('1'			--GIVEN
+
+							, '7'			--RESTARTED
+
+							, '102'		--GIVEN BY OTHER
+
+							, '105'		--NEW CARTRIDGE
+
+							, '113'		--GIVEN DURING DOWNTIME
+
+							, '114'		--STARTED DURING DOWNTIME
+
+							, '115'		--MEDICATION APPLIED
+
+							, '122'		--CONTINUED FROM OR
+
+							, '124'		--SELF ADMINISTERED VIA PUMP
+
+							, '132'		--CONTINUED FROM PREVIOUS ORDER
+
+							, '143'		--REDOSE
+
+							, '1604'		--INFUSION GREATER THAN 15 MIN
+
+							, '1605'		--INFUSION LESS THAN 15 MIN
+
+							, '1607'		--NEW CARTRIDGE
+
+							, '6'			--NEW BAG
+
+							)
+
+	AND CONVERT(NUMERIC, MAI.SIG ) > 95.0
+
+GROUP BY
+
+	B.PAT_ENC_CSN_ID
+
+	, MAI.TAKEN_TIME
+
+	, MAI.SIG
+
+	, OM.MEDICATION_ID
+
+	, CM.NAME
+
+	--select * from #BasePopBolus WHERE TIME_LINE=1
+
+	/*PATIENTS Weight*/
+
+;
+
+
+
+
+
+/* ******************* */
+
+/* Encounter Weight    */
+
+/* ******************* */
+
+DROP TABLE IF EXISTS #EncounterWeights;
+
+
+
+SELECT
+
+	A.PAT_ENC_CSN_ID
+
+	, CAST(ROUND(CONVERT(FLOAT, MEAS_VALUE) * 0.0283495, 2) AS DECIMAL(4, 1)) AS EncWeight
+
+	, ROW_NUMBER() OVER(PARTITION BY A.PAT_ENC_CSN_ID ORDER BY C.RECORDED_TIME ASC) AS TIME_LINE
+
+INTO #EncounterWeights
+
+FROM #Base_Pop A
+
+	INNER JOIN [EMRDB].[dbo].FLOWSHEET_RECORDS B ON A.INPATIENT_DATA_ID = B.INPATIENT_DATA_ID
+
+	INNER JOIN [EMRDB].[dbo].FLOWSHEET_MEASUREMENTS C ON B.FSD_ID = C.FSD_ID AND  C.FLO_MEAS_ID='94'
+
+;
+
+
+
+
+
+/* ******************* */
+
+/* Hypotension         */
+
+/* ******************* */
+
+DROP TABLE IF EXISTS #Hypotension;
+
+
+
+SELECT
+
+	C.PAT_ENC_CSN_ID
+
+	, IFM.RECORDED_TIME
+
+	, C.AGE_MONTHS
+
+	, C.AGE_YEARS
+
+	, LEFT(IFM.MEAS_VALUE, CHARINDEX('/', IFM.MEAS_VALUE)-1) AS SYSTOLIC
+
+	, IFM.MEAS_VALUE
+
+	, ROW_NUMBER() OVER(PARTITION BY C.PAT_ENC_CSN_ID ORDER BY IFM.RECORDED_TIME ASC) AS TIME_LINE
+
+INTO #Hypotension 
+
+FROM #Base_Pop C 
+
+	INNER JOIN [EMRDB].[dbo].FLOWSHEET_RECORDS IFR ON IFR.INPATIENT_DATA_ID = C.INPATIENT_DATA_ID
+
+	INNER JOIN [EMRDB].[dbo].FLOWSHEET_MEASUREMENTS IFM ON IFM.FSD_ID = IFR.FSD_ID
+
+WHERE 1=1
+
+	AND IFM.FLO_MEAS_ID = '95'
+
+	AND IFM.RECORDED_TIME IS NOT NULL 
+
+	AND IFM.RECORDED_TIME BETWEEN C.ADT_ARRIVAL_TIME AND C.ED_DEPARTURE_TIME
+
+	AND IFM.MEAS_VALUE IS NOT NULL
+
+;
+
+
+
+
+
+
+
+/* ********************** */
+
+/* Sepsis CLINICAL_ALERTS Cancelled */
+
+/* ********************** */
+
+DROP TABLE IF EXISTS #SepsisAlertCancelled;
+
+
+
+SELECT 
+
+	C.PAT_ENC_CSN_ID
+
+	, IFM.RECORDED_TIME	AS SEPSIS_ALERT_CANC_TIME
+
+	, C.AGE_MONTHS
+
+	, C.AGE_YEARS
+
+	, 'Y'				AS SEPSIS_ALERT_CANC_YN
+
+	, IFM.MEAS_COMMENT	AS SEPSIS_ALERT_CANC_BY		-- Free text
+
+	, ROW_NUMBER() OVER(PARTITION BY C.PAT_ENC_CSN_ID ORDER BY IFM.RECORDED_TIME ASC) AS TIME_LINE
+
+INTO #SepsisAlertCancelled 
+
+FROM #Base_Pop C 
+
+	INNER JOIN [EMRDB].[dbo].FLOWSHEET_RECORDS IFR ON IFR.INPATIENT_DATA_ID = C.INPATIENT_DATA_ID
+
+	INNER JOIN [EMRDB].[dbo].FLOWSHEET_MEASUREMENTS IFM ON IFM.FSD_ID = IFR.FSD_ID
+
+WHERE 1=1
+
+	AND IFM.FLO_MEAS_ID = '9001125002'	-- R HS ED SEPSIS CLINICAL_ALERTS CANCELLED
+
+	AND IFM.RECORDED_TIME IS NOT NULL 
+
+	AND IFM.RECORDED_TIME BETWEEN C.ADT_ARRIVAL_TIME AND C.ED_DEPARTURE_TIME
+
+	AND IFM.MEAS_VALUE IS NOT NULL
+
+;
+
+
+
+
+
+
+
+/* ******************* */
+
+/* CVL Time            */
+
+/* ******************* */
+
+DROP TABLE IF EXISTS #ALLCVLTime;
+
+
+
+SELECT DISTINCT
+
+	C.PAT_ENC_CSN_ID
+
+	, ILN.PLACEMENT_INSTANT
+
+	, ROW_NUMBER() OVER(PARTITION BY C.PAT_ENC_CSN_ID ORDER BY ILN.PLACEMENT_INSTANT) TIME_LINE
+
+INTO #ALLCVLTime
+
+FROM #Base_Pop C
+
+	INNER JOIN [EMRDB].[dbo].LINE_DEVICE_AIRWAY ILN ON ILN.PAT_ENC_CSN_ID = C.PAT_ENC_CSN_ID 
+
+	INNER JOIN reportingDB.reports.CONFIG_VALUE_SET CVS ON CVS.CODE = ILN.FLO_MEAS_ID
+
+		AND CVS.VALUE_SET_ID = 3022 --CVL CODES
+
+WHERE ILN.PLACEMENT_INSTANT BETWEEN C.ADT_ARRIVAL_TIME AND C.ED_DEPARTURE_TIME
+
+;
+
+
+
+
+
+/* ******************* */
+
+/* Presssors           */
+
+/* ******************* */
+
+DROP TABLE IF EXISTS #Pressors;
+
+
+
+SELECT DISTINCT
+
+	B.PAT_ENC_CSN_ID
+
+	, MAI.TAKEN_TIME
+
+	, CM.NAME AS MEDICATION
+
+	, ROW_NUMBER() OVER(PARTITION BY B.PAT_ENC_CSN_ID ORDER BY MAI.TAKEN_TIME) AS TIME_LINE
+
+INTO #Pressors 
+
+FROM #Base_Pop B
+
+	LEFT JOIN EMRDB.dbo.MEDICATION_ORDERS OM ON OM.PAT_ENC_CSN_ID = B.PAT_ENC_CSN_ID
+
+	LEFT JOIN EMRDB.dbo.MEDICATIONS CM ON CM.MEDICATION_ID = OM.MEDICATION_ID
+
+	LEFT JOIN EMRDB.dbo.GROUPER_MED_RECORDS GMR ON GMR.EXP_MEDS_LIST_ID = CM.MEDICATION_ID
+
+	LEFT JOIN EMRDB.dbo.MED_ADMIN_RECORDS MAI ON MAI.ORDER_MED_ID = OM.ORDER_MED_ID
+
+	LEFT JOIN EMRDB.dbo.HOSPITAL_ENCOUNTERS PEH ON PEH.PAT_ENC_CSN_ID = B.PAT_ENC_CSN_ID
+
+WHERE 1=1
+
+	AND GMR.GROUPER_ID IN ('8000100'    -- HS RX EPINEPHRINE SEPSIS
+
+							, '8000101' -- HS RX DOPAMINE SEPSIS
+
+							, '8000102' -- HS RX DOBUTAMINE SEPSIS
+
+							, '8000103' -- HS RX MILRINONE SEPSIS
+
+							, '8000104' -- HS RX NOREPINEPHRINE SEPSIS
+
+						)
+
+	AND MAI.MAR_ACTION_C IN ('1'			--GIVEN
+
+							, '7'			--RESTARTED
+
+							, '102'		--GIVEN BY OTHER
+
+							, '105'		--NEW CARTRIDGE
+
+							, '113'		--GIVEN DURING DOWNTIME
+
+							, '114'		--STARTED DURING DOWNTIME
+
+							, '115'		--MEDICATION APPLIED
+
+							, '122'		--CONTINUED FROM OR
+
+							, '124'		--SELF ADMINISTERED VIA PUMP
+
+							, '132'		--CONTINUED FROM PREVIOUS ORDER
+
+							, '143'		--REDOSE
+
+							, '1604'		--INFUSION GREATER THAN 15 MIN
+
+							, '1605'		--INFUSION LESS THAN 15 MIN
+
+							, '1607'		--NEW CARTRIDGE
+
+							, '6'			--NEW BAG
+
+							)
+
+	AND MAI.ROUTE_C = 11 --INTRAVENOUS
+
+	AND (MAI.TAKEN_TIME BETWEEN B.ADT_ARRIVAL_TIME AND B.ED_DEPARTURE_TIME)
+
+;
+
+
+
+
+
+
+
+/* ******************* */
+
+/* SV02                */
+
+/* ******************* */
+
+DROP TABLE IF EXISTS #SVO2;
+
+
+
+SELECT
+
+	B.PAT_ENC_CSN_ID
+
+	, OP.ORDER_TIME AS MBOrderTime
+
+	, LAB_ORDER_RESULTS.RESULT_TIME
+
+	, LAB_ORDER_RESULTS.COMP_OBS_INST_TM AS CollectionTime
+
+	, LAB_ORDER_RESULTS.ORD_VALUE
+
+	, ROW_NUMBER() OVER(PARTITION BY B.PAT_ENC_CSN_ID ORDER BY OP.ORDER_TIME ASC) AS TIME_LINE
+
+	, LAB_ORDER_RESULTS.ORDER_PROC_ID
+
+INTO #SVO2
+
+FROM #Base_Pop B
+
+	INNER JOIN [EMRDB].[dbo].LAB_ORDER_RESULTS ON B.PAT_ENC_CSN_ID = LAB_ORDER_RESULTS.PAT_ENC_CSN_ID
+
+	INNER JOIN [EMRDB].[dbo].PROCEDURE_ORDERS OP ON OP.ORDER_PROC_ID = LAB_ORDER_RESULTS.ORDER_PROC_ID
+
+WHERE 1=1
+
+	AND LAB_ORDER_RESULTS.COMPONENT_ID IN (5000001861, 5000000478)
+
+	AND (OP.ORDER_TIME BETWEEN B.ADT_ARRIVAL_TIME AND B.ED_DEPARTURE_TIME)
+
+;
+
+
+
+
+
+
+
+/* ******************* */
+
+/* Lactic Acid         */
+
+/* ******************* */
+
+DROP TABLE IF EXISTS #LacticAcid;
+
+
+
+SELECT
+
+	B.PAT_ENC_CSN_ID
+
+	, OP.ORDER_PROC_ID
+
+	, OP.ORDER_TIME AS MBOrderTime
+
+	, LAB_ORDER_RESULTS.RESULT_TIME
+
+	, LAB_ORDER_RESULTS.COMP_OBS_INST_TM AS CollectionTime
+
+	, LAB_ORDER_RESULTS.ORD_VALUE
+
+	, ROW_NUMBER() OVER(PARTITION BY B.PAT_ENC_CSN_ID ORDER BY OP.ORDER_TIME ASC) AS TIME_LINE
+
+INTO #LacticAcid
+
+FROM #Base_Pop B
+
+	INNER JOIN [EMRDB].[dbo].LAB_ORDER_RESULTS ON LAB_ORDER_RESULTS.PAT_ENC_CSN_ID = B.PAT_ENC_CSN_ID
+
+	INNER JOIN [EMRDB].[dbo].PROCEDURE_ORDERS OP ON OP.ORDER_PROC_ID = LAB_ORDER_RESULTS.ORDER_PROC_ID
+
+WHERE
+
+	LAB_ORDER_RESULTS.COMPONENT_ID IN (5000000446, 5000000447, 5000000449)
+
+	AND (OP.ORDER_TIME BETWEEN B.ADT_ARRIVAL_TIME AND B.ED_DEPARTURE_TIME)
+
+;
+
+
+
+
+
+
+
+/* ******************* */
+
+/* Procalcitonin       */
+
+/* ******************* */
+
+DROP TABLE IF EXISTS #Procalcitonin;
+
+
+
+SELECT
+
+	B.PAT_ENC_CSN_ID
+
+	, OP.ORDER_TIME AS MBOrderTime
+
+	, LAB_ORDER_RESULTS.RESULT_TIME
+
+	, LAB_ORDER_RESULTS.COMP_OBS_INST_TM AS CollectionTime
+
+	, LAB_ORDER_RESULTS.ORD_VALUE
+
+	, ROW_NUMBER() OVER(PARTITION BY B.PAT_ENC_CSN_ID ORDER BY OP.ORDER_TIME ASC) AS TIME_LINE
+
+	, LAB_ORDER_RESULTS.ORDER_PROC_ID
+
+INTO #Procalcitonin
+
+FROM #Base_Pop B
+
+	INNER JOIN [EMRDB].[dbo].LAB_ORDER_RESULTS ON LAB_ORDER_RESULTS.PAT_ENC_CSN_ID = B.PAT_ENC_CSN_ID
+
+	INNER JOIN [EMRDB].[dbo].PROCEDURE_ORDERS OP ON OP.ORDER_PROC_ID = LAB_ORDER_RESULTS.ORDER_PROC_ID
+
+WHERE 1=1
+
+	AND LAB_ORDER_RESULTS.COMPONENT_ID = 500001	-- 'LAB014'
+
+	AND (OP.ORDER_TIME BETWEEN B.ADT_ARRIVAL_TIME AND B.ED_DEPARTURE_TIME)
+
+;
+
+
+
+
+
+/* ******************* */
+
+/* Blood Culture       */
+
+/* ******************* */
+
+DROP TABLE IF EXISTS #BloodCultureValue;
+
+
+
+WITH BloodCultureResults AS
+
+(
+
+	SELECT
+
+		B.PAT_ENC_CSN_ID
+
+		, OP.ORDER_PROC_ID
+
+		, OP.ORDER_TIME
+
+		, RESULTS.RESULT_TIME
+
+		, RESULTS.COMP_OBS_INST_TM
+
+		, RESULTS.ORD_VALUE
+
+		, CASE WHEN RESULTS.RESULT_FLAG_C IN (2, 218) THEN 1 ELSE 0 END AS CRITICAL_VALUE_01		-- Abnormal or Critical
+
+		, RESULTS.LRR_BASED_ORGAN_ID
+
+		, [ORGANISMS].EXTERNAL_NAME
+
+
+
+	FROM #Base_Pop B
+
+
+
+		INNER JOIN [EMRDB].[dbo].LAB_ORDER_RESULTS RESULTS ON B.PAT_ENC_CSN_ID = RESULTS.PAT_ENC_CSN_ID
+
+		INNER JOIN [EMRDB].[dbo].PROCEDURE_ORDERS	 OP		 ON RESULTS.ORDER_PROC_ID = OP.ORDER_PROC_ID 
+
+														AND OP.PROC_ID IN (600003,600004,600011,600012)	-- 'LAB001', 'NUR001', 'LAB012', 'LAB011'
+
+
+
+		LEFT JOIN [EMRDB].[dbo].ORGANISMS ON [RESULTS].LRR_BASED_ORGAN_ID = [ORGANISMS].ORGANISM_ID
+
+
+
+	WHERE (OP.ORDER_TIME BETWEEN B.ADT_ARRIVAL_TIME AND B.ED_DEPARTURE_TIME)
+
+)
+
+
+
+, PositiveCultures AS
+
+(
+
+	SELECT
+
+		PAT_ENC_CSN_ID
+
+
+
+		, MIN(ORDER_TIME)		AS [MBOrderTime]
+
+		, MIN(COMP_OBS_INST_TM)	AS [CollectionTime]
+
+
+
+		, COALESCE(STRING_AGG(EXTERNAL_NAME, '; ') WITHIN GROUP(ORDER BY LRR_BASED_ORGAN_ID), 'Critical Value') AS [OrganismList]
+
+
+
+	FROM BloodCultureResults
+
+	GROUP BY PAT_ENC_CSN_ID
+
+	HAVING MAX(CRITICAL_VALUE_01) = 1
+
+)
+
+
+
+, NegativeCultures AS
+
+(
+
+	SELECT
+
+		PAT_ENC_CSN_ID
+
+
+
+		, MIN(ORDER_TIME)		AS [MBOrderTime]
+
+		, MIN(COMP_OBS_INST_TM)	AS [CollectionTime]
+
+
+
+		, 'Negative' AS [OrganismList]
+
+
+
+	FROM BloodCultureResults
+
+	GROUP BY PAT_ENC_CSN_ID
+
+	HAVING MAX(CRITICAL_VALUE_01) = 0
+
+)
+
+
+
+SELECT * 
+
+INTO #BloodCultureValue
+
+FROM PositiveCultures
+
+UNION
+
+SELECT * FROM NegativeCultures
+
+;
+
+
+
+
+
+
+
+/* ******************* */
+
+/* Urine Culture       */
+
+/* ******************* */
+
+DROP TABLE IF EXISTS #UrineCultureValue;
+
+
+
+WITH UrineCultureResults AS 
+
+(
+
+	SELECT
+
+		B.PAT_ENC_CSN_ID
+
+		, OP.ORDER_PROC_ID
+
+		, OP.ORDER_TIME
+
+		, RESULTS.RESULT_TIME
+
+		, RESULTS.COMP_OBS_INST_TM
+
+		, RESULTS.ORD_VALUE
+
+		, RESULTS.RESULT_FLAG_C
+
+		, CASE WHEN RESULTS.RESULT_FLAG_C IN (2, 218) THEN 1 ELSE 0 END AS CRITICAL_VALUE_01		-- Abnormal or Critical
+
+		, RESULTS.LRR_BASED_ORGAN_ID
+
+		, [ORGANISMS].EXTERNAL_NAME
+
+
+
+	FROM #Base_Pop B
+
+
+
+		INNER JOIN [EMRDB].[dbo].LAB_ORDER_RESULTS RESULTS ON B.PAT_ENC_CSN_ID = RESULTS.PAT_ENC_CSN_ID
+
+		INNER JOIN [EMRDB].[dbo].PROCEDURE_ORDERS	 OP		 ON RESULTS.ORDER_PROC_ID = OP.ORDER_PROC_ID 
+
+														AND OP.PROC_ID IN (600001, 600007, 600008, 600009, 600010)	-- 'LAB002', 'LAB008', 'LAB009', 'LAB010', 'POC001'
+
+
+
+		LEFT JOIN [EMRDB].[dbo].ORGANISMS ON [RESULTS].LRR_BASED_ORGAN_ID = [ORGANISMS].ORGANISM_ID
+
+
+
+	WHERE (OP.ORDER_TIME BETWEEN B.ADT_ARRIVAL_TIME AND B.ED_DEPARTURE_TIME)
+
+
+
+)
+
+
+
+, PositiveCultures AS
+
+(
+
+	SELECT
+
+		PAT_ENC_CSN_ID
+
+
+
+		, MIN(ORDER_TIME)		AS [MBOrderTime]
+
+		, MIN(COMP_OBS_INST_TM)	AS [CollectionTime]
+
+
+
+		, COALESCE(STRING_AGG(EXTERNAL_NAME, '; ') WITHIN GROUP(ORDER BY LRR_BASED_ORGAN_ID), 'Critical Value') AS [OrganismList]
+
+
+
+	FROM UrineCultureResults
+
+	GROUP BY PAT_ENC_CSN_ID
+
+	HAVING MAX(CRITICAL_VALUE_01) = 1
+
+)
+
+
+
+, NegativeCultures AS
+
+(
+
+	SELECT
+
+		PAT_ENC_CSN_ID
+
+
+
+		, MIN(ORDER_TIME)		AS [MBOrderTime]
+
+		, MIN(COMP_OBS_INST_TM)	AS [CollectionTime]
+
+
+
+		, 'Negative' AS [OrganismList]		-- 'No Growth' or contamination with normal flora
+
+
+
+	FROM UrineCultureResults
+
+	GROUP BY PAT_ENC_CSN_ID
+
+	HAVING MAX(CRITICAL_VALUE_01) = 0
+
+)
+
+
+
+SELECT * 
+
+INTO #UrineCultureValue
+
+FROM PositiveCultures
+
+UNION
+
+SELECT * FROM NegativeCultures
+
+;
+
+
+
+
+
+
+
+/* ******************* */
+
+/* CSF Culture         */
+
+/* ******************* */
+
+DROP TABLE IF EXISTS #CsfCultureValue;
+
+
+
+WITH CsfCultureResults AS 
+
+(
+
+	SELECT
+
+		B.PAT_ENC_CSN_ID
+
+		, op.ORDER_PROC_ID
+
+		, OP.ORDER_TIME
+
+		, RESULTS.RESULT_TIME
+
+		, RESULTS.COMP_OBS_INST_TM
+
+		, RESULTS.ORD_VALUE
+
+		, RESULTS.RESULT_FLAG_C
+
+		, CASE WHEN RESULTS.RESULT_FLAG_C IN (2, 218) THEN 1 ELSE 0 END AS CRITICAL_VALUE_01		-- Abnormal or Critical
+
+		, RESULTS.LRR_BASED_ORGAN_ID
+
+		, [ORGANISMS].EXTERNAL_NAME
+
+
+
+	FROM #Base_Pop B
+
+		INNER JOIN [EMRDB].[dbo].LAB_ORDER_RESULTS RESULTS ON B.PAT_ENC_CSN_ID = RESULTS.PAT_ENC_CSN_ID
+
+		INNER JOIN [EMRDB].[dbo].PROCEDURE_ORDERS	 OP		 ON RESULTS.ORDER_PROC_ID = OP.ORDER_PROC_ID
+
+														AND OP.PROC_ID IN (600005,600006, 600002)		-- 'LAB006', 'LAB007', 'LAB003'
+
+														AND OP.SPECIMEN_SOURCE_C=304				-- Lumber puncture
+
+
+
+		LEFT JOIN [EMRDB].[dbo].ORGANISMS ON [RESULTS].LRR_BASED_ORGAN_ID = [ORGANISMS].ORGANISM_ID
+
+
+
+	WHERE (OP.ORDER_TIME BETWEEN B.ADT_ARRIVAL_TIME AND B.ED_DEPARTURE_TIME)
+
+)
+
+
+
+, PositiveCultures AS
+
+(
+
+	SELECT
+
+		PAT_ENC_CSN_ID
+
+
+
+		, MIN(ORDER_TIME)		AS [MBOrderTime]
+
+		, MIN(COMP_OBS_INST_TM)	AS [CollectionTime]
+
+
+
+		, COALESCE(STRING_AGG(EXTERNAL_NAME, '; ') WITHIN GROUP(ORDER BY LRR_BASED_ORGAN_ID), 'Critical Value') AS [OrganismList]
+
+
+
+	FROM CsfCultureResults
+
+	GROUP BY PAT_ENC_CSN_ID
+
+	HAVING MAX(CRITICAL_VALUE_01) = 1
+
+)
+
+
+
+, NegativeCultures AS
+
+(
+
+	SELECT
+
+		PAT_ENC_CSN_ID
+
+
+
+		, MIN(ORDER_TIME)		AS [MBOrderTime]
+
+		, MIN(COMP_OBS_INST_TM)	AS [CollectionTime]
+
+
+
+		, 'Negative' AS [OrganismList]
+
+
+
+	FROM CsfCultureResults
+
+	GROUP BY PAT_ENC_CSN_ID
+
+	HAVING MAX(CRITICAL_VALUE_01) = 0
+
+)
+
+
+
+SELECT * 
+
+INTO #CsfCultureValue
+
+FROM PositiveCultures
+
+UNION
+
+SELECT * FROM NegativeCultures
+
+;
+
+
+
+
+
+/* ******************* */
+
+/* ETT                 */
+
+/* ******************* */
+
+DROP TABLE IF EXISTS #ETT;
+
+SELECT
+
+	B.PAT_ENC_CSN_ID,
+
+	ILN.IP_LDA_ID,
+
+	ILN.PLACEMENT_INSTANT,
+
+	ROW_NUMBER() OVER(PARTITION BY B.PAT_ENC_CSN_ID ORDER BY ILN.PLACEMENT_INSTANT) TIME_LINE
+
+INTO #ETT
+
+FROM #Base_Pop B
+
+	INNER JOIN [EMRDB].[dbo].LINE_DEVICE_AIRWAY ILN ON ILN.PAT_ENC_CSN_ID = B.PAT_ENC_CSN_ID
+
+WHERE 1=1
+
+	AND ILN.FLO_MEAS_ID='900112'
+
+	AND ILN.PLACEMENT_INSTANT IS NOT NULL
+
+	AND (ILN.PLACEMENT_INSTANT BETWEEN B.ADT_ARRIVAL_TIME AND B.ED_DEPARTURE_TIME)
+
+;
+
+
+
+
+
+
+
+/* ******************* */
+
+/* IV Placement        */
+
+/* ******************* */
+
+DROP TABLE IF EXISTS #IV;
+
+
+
+SELECT
+
+	B.PAT_ENC_CSN_ID,
+
+	ILN.IP_LDA_ID,
+
+	ILN.PLACEMENT_INSTANT,
+
+	ROW_NUMBER() OVER(PARTITION BY B.PAT_ENC_CSN_ID ORDER BY ILN.PLACEMENT_INSTANT) TIME_LINE
+
+INTO #IV
+
+FROM #Base_Pop B
+
+	INNER JOIN [EMRDB].[dbo].LINE_DEVICE_AIRWAY ILN ON ILN.PAT_ENC_CSN_ID = B.PAT_ENC_CSN_ID
+
+WHERE 1=1
+
+	AND ILN.FLO_MEAS_ID='900111'
+
+	AND ILN.PLACEMENT_INSTANT IS NOT NULL
+
+	AND (ILN.PLACEMENT_INSTANT BETWEEN B.ADT_ARRIVAL_TIME AND B.ED_DEPARTURE_TIME)
+
+;
+
+
+
+
+
+
+
+/* ******************* */
+
+/* Hem/Oncology        */
+
+/* ******************* */
+
+DROP TABLE IF EXISTS #ED2HEMONC;
+
+
+
+SELECT
+
+	B.PAT_ENC_CSN_ID
+
+	, DEP.DEPARTMENT_NAME
+
+	, EMRDB_ADT_ED.EFFECTIVE_TIME AS ED2HemoncTime
+
+	, ROW_NUMBER() OVER(PARTITION BY B.PAT_ENC_CSN_ID ORDER BY EMRDB_ADT_ED.EFFECTIVE_TIME ASC) AS TIME_LINE
+
+INTO #ED2HEMONC
+
+FROM #Base_Pop B
+
+	INNER JOIN [EMRDB].[dbo].ADT_EVENTS EMRDB_ADT_ED 
+
+			ON EMRDB_ADT_ED.PAT_ENC_CSN_ID =  B.PAT_ENC_CSN_ID
+
+				AND EMRDB_ADT_ED.DEPARTMENT_ID IN (200108022) 
+
+				AND EMRDB_ADT_ED.EVENT_TYPE_C = 4 --TRANSFER OUT
+
+				AND EMRDB_ADT_ED.EVENT_SUBTYPE_C <> 2 --CANCELED
+
+	INNER JOIN [EMRDB].[dbo].ADT_EVENTS EMRDB_ADT_GENCARE 
+
+			ON EMRDB_ADT_ED.XFER_IN_EVENT_ID = EMRDB_ADT_GENCARE.EVENT_ID
+
+				AND EMRDB_ADT_GENCARE.DEPARTMENT_ID IN (200108001, 200108115, 20120106, 20101124, 20108007) 
+
+				AND EMRDB_ADT_GENCARE.EVENT_TYPE_C = 3 --TRANSFER IN
+
+				AND EMRDB_ADT_GENCARE.EVENT_SUBTYPE_C <> 2 --CANCELED
+
+	INNER JOIN [EMRDB].[dbo].DEPARTMENTS DEP ON DEP.DEPARTMENT_ID = EMRDB_ADT_GENCARE.DEPARTMENT_ID
+
+;
+
+
+
+
+
+
+
+/* ******************* */
+
+/* ICU                 */
+
+/* ******************* */
+
+DROP TABLE IF EXISTS #ED2ICU;
+
+
+
+SELECT
+
+	B.PAT_ENC_CSN_ID
+
+	, DEP.DEPARTMENT_NAME
+
+	, EMRDB_ADT_ED.EFFECTIVE_TIME AS ED2ICUTime
+
+	, ROW_NUMBER() OVER(PARTITION BY B.PAT_ENC_CSN_ID ORDER BY EMRDB_ADT_ED.EFFECTIVE_TIME ASC) AS TIME_LINE
+
+INTO #ED2ICU
+
+FROM #Base_Pop B
+
+	INNER JOIN [EMRDB].[dbo].ADT_EVENTS EMRDB_ADT_ED ON EMRDB_ADT_ED.PAT_ENC_CSN_ID =  B.PAT_ENC_CSN_ID
+
+				AND EMRDB_ADT_ED.DEPARTMENT_ID IN (200108022) 
+
+				AND EMRDB_ADT_ED.EVENT_TYPE_C = 4 --TRANSFER OUT
+
+				AND EMRDB_ADT_ED.EVENT_SUBTYPE_C <> 2 --CANCELED
+
+	INNER JOIN [EMRDB].[dbo].ADT_EVENTS EMRDB_ADT_GENCARE ON EMRDB_ADT_ED.XFER_IN_EVENT_ID = EMRDB_ADT_GENCARE.EVENT_ID
+
+				AND EMRDB_ADT_GENCARE.DEPARTMENT_ID IN (20101116			--EAST ICU
+
+														, 20101124			--EAST CARDIAC ICU
+
+														, 20101126			--EAST NEURO ICU
+
+														, 20101127			--EAST PEDIATRIC ICU
+
+														, 20101128			--EAST SURGICAL ICU
+
+														, 20101165			--EAST REMOTE ICU
+
+														, 20120106			--WEST CARDIAC ICU
+
+														, 20120121			--WEST ICU							
+
+														, 200108001			--MAIN 2 PAVILION PICU
+
+														, 200108070			--MAIN 3 CICU
+
+														, 200108115			--MAIN 2 PICU NEURO
+
+														, 200108147			--MAIN PHARMACY ICU
+
+														) 
+
+				AND EMRDB_ADT_GENCARE.EVENT_TYPE_C = 3 --TRANSFER IN
+
+				AND EMRDB_ADT_GENCARE.EVENT_SUBTYPE_C <> 2 --CANCELED
+
+	INNER JOIN [EMRDB].[dbo].DEPARTMENTS DEP ON DEP.DEPARTMENT_ID = EMRDB_ADT_GENCARE.DEPARTMENT_ID
+
+;
+
+
+
+
+
+
+
+/* ******************* */
+
+/* Gen Care            */
+
+/* ******************* */
+
+DROP TABLE IF EXISTS #ED2GEN;
+
+
+
+SELECT
+
+	B.PAT_ENC_CSN_ID
+
+	, DEP.DEPARTMENT_NAME
+
+	, EMRDB_ADT_ED.EFFECTIVE_TIME AS ED2GENTime
+
+	, ROW_NUMBER() OVER(PARTITION BY B.PAT_ENC_CSN_ID ORDER BY EMRDB_ADT_ED.EFFECTIVE_TIME ASC) AS TIME_LINE
+
+	, GEN2ICU.EFFECTIVE_TIME AS [Gen Back To ICU Time]
+
+	, GEN2ICU.DEPARTMENT_NAME AS [Gen Back To ICU Department]
+
+INTO #ED2GEN
+
+FROM #Base_Pop B
+
+	INNER JOIN [EMRDB].[dbo].ADT_EVENTS EMRDB_ADT_ED 
+
+			ON EMRDB_ADT_ED.PAT_ENC_CSN_ID =  B.PAT_ENC_CSN_ID
+
+				AND EMRDB_ADT_ED.DEPARTMENT_ID IN (200108022) 
+
+				AND EMRDB_ADT_ED.EVENT_TYPE_C = 4 --TRANSFER OUT
+
+				AND EMRDB_ADT_ED.EVENT_SUBTYPE_C <> 2 --CANCELED
+
+	INNER JOIN [EMRDB].[dbo].ADT_EVENTS EMRDB_ADT_GENCARE 
+
+			ON EMRDB_ADT_ED.XFER_IN_EVENT_ID = EMRDB_ADT_GENCARE.EVENT_ID
+
+				AND EMRDB_ADT_GENCARE.DEPARTMENT_ID IN (200108021, 200108020, 200108018, 200108017, 200108110, 200108012, 200108011, 200108010, 200108009, 200108008) 
+
+				AND EMRDB_ADT_GENCARE.EVENT_TYPE_C = 3 --TRANSFER IN
+
+				AND EMRDB_ADT_GENCARE.EVENT_SUBTYPE_C <> 2 --CANCELED
+
+	INNER JOIN [EMRDB].[dbo].DEPARTMENTS DEP ON DEP.DEPARTMENT_ID = EMRDB_ADT_GENCARE.DEPARTMENT_ID	
+
+	OUTER APPLY--09.09.2020 V_DEV001 added this to check for PATIENTS who went from ED --> Gen Care and then back to ICU within 24 hours
+
+	(
+
+		SELECT TOP 1 ICU.EFFECTIVE_TIME, DEP.DEPARTMENT_NAME
+
+		FROM [EMRDB].[dbo].ADT_EVENTS ICU
+
+		INNER JOIN [EMRDB].[dbo].DEPARTMENTS DEP ON DEP.DEPARTMENT_ID = ICU.DEPARTMENT_ID
+
+		WHERE ICU.PAT_ENC_CSN_ID = EMRDB_ADT_GENCARE.PAT_ENC_CSN_ID
+
+			AND (ICU.EFFECTIVE_TIME BETWEEN EMRDB_ADT_GENCARE.EFFECTIVE_TIME AND DATEADD(HH,24,EMRDB_ADT_GENCARE.EFFECTIVE_TIME) )
+
+			AND ICU.DEPARTMENT_ID IN (20101116			--EAST ICU
+
+									, 20101124			--EAST CARDIAC ICU
+
+									, 20101126			--EAST NEURO ICU
+
+									, 20101127			--EAST PEDIATRIC ICU
+
+									, 20101128			--EAST SURGICAL ICU
+
+									, 20101165			--EAST REMOTE ICU
+
+									, 20120106			--WEST CARDIAC ICU
+
+									, 20120121			--WEST ICU							
+
+									, 200108001			--MAIN 2 PAVILION PICU
+
+									, 200108070			--MAIN 3 CICU
+
+									, 200108115			--MAIN 2 PICU NEURO
+
+									, 200108147			--MAIN PHARMACY ICU
+
+									) 
+
+			AND ICU.EVENT_TYPE_C = 3 --TRANSFER IN
+
+			AND ICU.EVENT_SUBTYPE_C <> 2 --CANCELED
+
+		ORDER BY ICU.EFFECTIVE_TIME ASC
+
+	) GEN2ICU
+
+;
+
+
+
+
+
+/* ******************* */
+
+/* BPA                 */
+
+/* ******************* */
+
+DROP TABLE IF EXISTS #BPA;
+
+
+
+SELECT
+
+	B.PAT_ENC_CSN_ID,
+
+	ALT.ALT_ID,
+
+	AH.ALT_ACTION_INST,
+
+	ZAS.NAME AS ALERT_STATUS,
+
+	ZSP.NAME AS ALERT_SHOWN_PLACE,
+
+	ZAAT.NAME AS ACTION_TAKE,
+
+	ROW_NUMBER() OVER(PARTITION BY B.PAT_ENC_CSN_ID ORDER BY AH.ALT_ACTION_INST) AS TIME_LINE,
+
+	ZASOR.NAME AS OVERRIDDEN,
+
+	ah.SPEC_OVR_CMNT,
+
+	EMP.NAME
+
+INTO #BPA
+
+FROM #Base_Pop B
+
+	INNER JOIN [EMRDB].[dbo].CLINICAL_ALERTS ALT ON ALT.PAT_CSN = B.PAT_ENC_CSN_ID AND ALT.BPA_LOCATOR_ID = '900130001'
+
+	INNER JOIN [EMRDB].[dbo].ALERT_HISTORY AH ON AH.ALT_ID = ALT.ALT_ID
+
+	LEFT OUTER JOIN [EMRDB].[dbo].ALERT_ACTIONS ACA ON ACA.ALT_CSN_ID = AH.ALT_CSN_ID AND ACA.LINE=1
+
+	LEFT OUTER JOIN [EMRDB].[dbo].REF_ALERT_ACTIONS ZAAT ON ZAAT.ALT_ACTION_TAKEN_C = ACA.ACTION_TAKEN_C
+
+	LEFT OUTER JOIN [EMRDB].[dbo].REF_ALERT_OVERRIDE_REASONS ZASOR ON ZASOR.ALRT_SP_OVR_RSN_C = AH.SPEC_OVR_RSN_C
+
+	LEFT OUTER JOIN [EMRDB].[dbo].REF_ALERT_STATUS ZAS ON ZAS.ALT_STATUS_C = AH.ALT_STATUS_C
+
+	LEFT OUTER JOIN [EMRDB].[dbo].REF_SHOWN_PLACE ZSP ON ZSP.SHOWN_PLACE_C = AH.SHOWN_PLACE_C
+
+	LEFT OUTER JOIN [EMRDB].[dbo].EMPLOYEES EMP ON EMP.USER_ID = AH.USER_ID
+
+WHERE AH.ALT_ACTION_INST BETWEEN B.ADT_ARRIVAL_TIME AND B.ED_DEPARTURE_TIME
+
+;
+
+
+
+
+
+
+
+/* ******************* */
+
+/* Severe Sepsis       */
+
+/* ******************* */
+
+DROP TABLE IF EXISTS #Base_Pop_Severe_ED_Scores;
+
+
+
+SELECT
+
+	BP.PAT_ENC_CSN_ID
+
+	, IFM.MEAS_VALUE
+
+	, IFM.RECORDED_TIME
+
+	, ROW_NUMBER() OVER(PARTITION BY BP.PAT_ENC_CSN_ID ORDER BY RECORDED_TIME ASC) AS TIME_LINE
+
+INTO #Base_Pop_Severe_ED_Scores 
+
+FROM #Base_Pop BP 
+
+	INNER JOIN [EMRDB].[dbo].HOSPITAL_ENCOUNTERS PEH ON PEH.PAT_ENC_CSN_ID = BP.PAT_ENC_CSN_ID
+
+	INNER JOIN [EMRDB].[dbo].FLOWSHEET_RECORDS IFR ON PEH.INPATIENT_DATA_ID = IFR.INPATIENT_DATA_ID
+
+	INNER JOIN [EMRDB].[dbo].FLOWSHEET_MEASUREMENTS IFM ON IFM.FSD_ID = IFR.FSD_ID
+
+WHERE 1=1
+
+	AND IFM.FLO_MEAS_ID IN ('9000161709','9000002613')--SEPSIS SCORE--ADDED NEW ED SEPSIS SCORE 9000002613 ON 10.01.2019
+
+	and IFM.RECORDED_TIME BETWEEN BP.ADT_ARRIVAL_TIME AND BP.ED_DEPARTURE_TIME
+
+;
+
+
+
+
+
+/* ******************* */
+
+/* Positive Sepsis     */
+
+/* ******************* */
+
+DROP TABLE IF EXISTS #ED_PositiveScores;
+
+
+
+SELECT
+
+	PAT_ENC_CSN_ID
+
+	, MEAS_VALUE
+
+	, RECORDED_TIME
+
+	, ROW_NUMBER() OVER(PARTITION BY PAT_ENC_CSN_ID ORDER BY RECORDED_TIME ASC) AS FIRST_TIME_LINE
+
+	, ROW_NUMBER() OVER(PARTITION BY PAT_ENC_CSN_ID ORDER BY RECORDED_TIME DESC) AS LAST_TIME_LINE
+
+INTO #ED_PositiveScores
+
+FROM #Base_Pop_Severe_ED_Scores
+
+WHERE MEAS_VALUE > 4
+
+;
+
+
+
+
+
+/* ************************ */
+
+/* Severe + Positive Sepsis */
+
+/* ************************ */
+
+DROP TABLE IF EXISTS #Base_Pop_SepsisScores_ConCat;
+
+
+
+SELECT DISTINCT CAT.PAT_ENC_CSN_ID,
+
+        STUFF(( SELECT ',' + CONVERT(VARCHAR,SUB.MEAS_VALUE)-- AS [text()]
+
+                FROM #Base_Pop_Severe_ED_Scores SUB
+
+				WHERE SUB.PAT_ENC_CSN_ID = CAT.PAT_ENC_CSN_ID
+
+				ORDER BY RECORDED_TIME
+
+                FOR XML PATH('')
+
+                ), 1, 1, '' )
+
+        AS [AllSepsis_Scores]
+
+INTO #Base_Pop_SepsisScores_ConCat
+
+FROM  #Base_Pop_Severe_ED_Scores CAT
+
+
+
+
+
+/* ******************************************* */
+
+/* Time from First Positive Score -> First Abx */
+
+/* ******************************************* */
+
+DROP TABLE IF EXISTS #FirstPositiveOD_To_ABXAdminTime;
+
+
+
+SELECT
+
+	[subQ].PAT_ENC_CSN_ID
+
+	,[subQ].MEDICATION
+
+	,[subQ].ABX_ADMIN_TIME
+
+	,[subQ].RECORDED_TIME,
+
+	DATEDIFF(MI, [subQ].RECORDED_TIME, [subQ].ABX_ADMIN_TIME) AS POSOD2ABX
+
+
+
+INTO #FirstPositiveOD_To_ABXAdminTime
+
+
+
+FROM 
+
+	(
+
+		SELECT 
+
+			[#BasePopABX].PAT_ENC_CSN_ID
+
+			, [#BasePopABX].[NAME] AS MEDICATION
+
+			, [#BasePopABX].ABX_ADMIN_TIME
+
+			, [#ED_PositiveScores].MEAS_VALUE
+
+			, [#ED_PositiveScores].RECORDED_TIME
+
+			, ROW_NUMBER() OVER(PARTITION BY [#BasePopABX].PAT_ENC_CSN_ID ORDER BY [#BasePopABX].ABX_ADMIN_TIME ASC) MYLINE
+
+		FROM #BasePopABX
+
+		INNER JOIN #ED_PositiveScores ON [#BasePopABX].PAT_ENC_CSN_ID = [#ED_PositiveScores].PAT_ENC_CSN_ID
+
+			AND [#ED_PositiveScores].RECORDED_TIME < [#BasePopABX].ABX_ADMIN_TIME
+
+			AND [#ED_PositiveScores].FIRST_TIME_LINE=1
+
+	) subQ
+
+WHERE [subQ].MYLINE=1
+
+;
+
+
+
+
+
+/* ******************************** */
+
+/* First Abx Order and Time Details */
+
+/* ******************************** */
+
+DROP TABLE IF EXISTS #FirstABXAdminTimeDetails;
+
+
+
+SELECT
+
+	A.PAT_ENC_CSN_ID
+
+	, ORD.ORDER_MED_ID "Order ID"
+
+	, ORD.ORDERING_DTTM "Order date and time"
+
+	, ORT.RXQ_INSTANT [In VERIFY Queue Time]
+
+	, ORT.RX_VERIFY_INSTANT [Verified in Queue Time]
+
+	, ORT.[Queue Verified by]
+
+	, VERIFY.ACTION_INSTANT " Order VERIFY date and time"
+
+	, DISPENSE.ACTION_INSTANT "Order Dispense date and time"
+
+	, ACTION.ACTION_DTTM "Rx Dispense Sent Time"
+
+
+
+INTO #FirstABXAdminTimeDetails
+
+
+
+FROM #BasePopABX A
+
+	INNER JOIN [EMRDB].[dbo].V_PHARMACY_ORDER ORD on ORD.ORDER_MED_ID = A.ORDER_MED_ID AND A.TIME_LINE=1--LOOK FOR FIRST ANTIBIOTIC ADMINISTRATION ONLY
+
+	INNER JOIN
+
+		(
+
+			SELECT
+
+				ODI.ORDER_MED_ID, ODI.ACTION_INSTANT,ODI.CONTACT_DATE_REAL, ROW_NUMBER()OVER(PARTITION BY ODI.ORDER_MED_ID ORDER BY ACTION_INSTANT ASC) AS MYLINE
+
+			FROM
+
+			[EMRDB].[dbo].ORDER_DISPENSE_INFO  ODI WHERE ODI.ORD_CNTCT_TYPE_C = 4--VERIFY
+
+		)VERIFY on ord.ORDER_MED_ID = VERIFY.ORDER_MED_ID AND VERIFY.MYLINE=1
+
+	INNER JOIN
+
+		(
+
+			SELECT
+
+				ODI.ORDER_MED_ID, ODI.ACTION_INSTANT,ODI.VERIFY_CONTDATREAL,ODI.CONTACT_DATE_REAL,ODI.CONTACT_DATE, ROW_NUMBER()OVER(PARTITION BY ODI.ORDER_MED_ID ORDER BY ACTION_INSTANT ASC) AS MYLINE
+
+			FROM
+
+			[EMRDB].[dbo].ORDER_DISPENSE_INFO  ODI WHERE ODI.ORD_CNTCT_TYPE_C = 95--DISPENSE
+
+		)DISPENSE ON ord.ORDER_MED_ID = DISPENSE.ORDER_MED_ID AND DISPENSE.MYLINE=1
+
+			AND VERIFY.CONTACT_DATE_REAL = DISPENSE.VERIFY_CONTDATREAL
+
+			AND DISPENSE.ACTION_INSTANT<A.ABX_ADMIN_TIME--MAKE SURE WE ARE LOOKING AT THE RIGHT MEDICATION ADMINT TIME. A MEDICATION ORDER COULD HAVE MULTIPLE DISPENSES
+
+	LEFT OUTER JOIN [EMRDB].[dbo].V_PHARMACY_DISPENSE disp on DISPENSE.ORDER_MED_ID = disp.ORDER_MED_ID and DISPENSE.CONTACT_DATE_REAL = disp.CONTACT_DATE_REAL
+
+	LEFT OUTER JOIN 
+
+		(
+
+			SELECT VRDA.ACTION_ID, VRDA.ACTION_DTTM, ROW_NUMBER()OVER(PARTITION BY VRDA.ACTION_ID ORDER BY VRDA.ACTION_DTTM ASC) AS MYLINE FROM 
+
+			[EMRDB].[dbo].V_PHARMACY_DISPENSE_ACTION VRDA WHERE VRDA.ACTION_TYPE_C=270
+
+		)action on disp.ACTION_ID = action.ACTION_ID AND ACTION.MYLINE=1
+
+	LEFT OUTER JOIN 
+
+		(
+
+			SELECT ORT1.ORDER_MED_ID,ORT1.RXQ_INSTANT, ORT1.RX_VERIFY_INSTANT, ORT1.RX_VER_USER_ID, EMP.NAME AS [Queue Verified by],
+
+				ROW_NUMBER()OVER(PARTITION BY ORT1.ORDER_MED_ID ORDER BY LINE DESC) MYLINE
+
+			FROM [EMRDB].[dbo].RX_VERIFY_TRACE ORT1
+
+			LEFT OUTER JOIN [EMRDB].[dbo].EMPLOYEES EMP ON EMP.USER_ID = ORT1.RX_VER_USER_ID
+
+		)ORT ON ORT.ORDER_MED_ID = ord.ORDER_MED_ID AND ORT.MYLINE=1
+
+;
+
+
+
+/* ********** */
+
+/* Bed Events */
+
+/* ********** */
+
+DROP TABLE IF EXISTS #BedEvents;
+
+
+
+SELECT
+
+	B.PAT_ENC_CSN_ID, C.RECORD_NAME AS [EVENT], EIEI.EVENT_TYPE AS [EVENT ID],EIEI.EVENT_TIME,
+
+	ROW_NUMBER() OVER(PARTITION BY B.PAT_ENC_CSN_ID ORDER BY EIEI.EVENT_TIME ) AS TIME_LINE,
+
+	ROW_NUMBER() OVER(PARTITION BY B.PAT_ENC_CSN_ID, EIEI.EVENT_TYPe ORDER BY EIEI.EVENT_TIME ) AS REQ_LINE--JUST IN CASE IF THERE IS MORE THAN ONE EVENT OF THE SAME EVENT_TYPE.
+
+INTO #BedEvents
+
+FROM #Base_Pop B
+
+	INNER JOIN [EMRDB].[dbo].ED_PATIENT_INFO EIPI ON EIPI.PAT_ENC_CSN_ID = B.PAT_ENC_CSN_ID
+
+	INNER JOIN [EMRDB].[dbo].ED_EVENT_INFO EIEI ON EIEI.EVENT_ID = EIPI.EVENT_ID AND EIEI.EVENT_TYPE IN ('2600000347','2600000346')
+
+	INNER JOIN [EMRDB].[dbo].ED_EVENT_TEMPLATES C ON EIEI.EVENT_TYPE = C.RECORD_ID
+
+;
+
+
+
+/* ************ */
+
+/* Readmissions */
+
+/* ************ */
+
+DROP TABLE IF EXISTS #Base_Pop_ED_Readmit_All;
+
+
+
+SELECT DISTINCT BP.PAT_ENC_CSN_ID
+
+INTO #Base_Pop_ED_Readmit_All
+
+FROM #Base_Pop BP
+
+	INNER JOIN [EMRDB].[dbo].ED_ENCOUNTERS_DM DEE ON DEE.PAT_ID = BP.PAT_ID AND (DEE.ARRIVAL_DTTM BETWEEN BP.ED_DEPARTURE_TIME AND DATEADD(HH,24,BP.ED_DEPARTURE_TIME))
+
+;
+
+
+
+/* *********************************** */
+
+/* Readmissions (positive sepsis only) */
+
+/* *********************************** */
+
+DROP TABLE IF EXISTS #Base_Pop_ED_Readmit;
+
+
+
+SELECT DISTINCT BP.PAT_ENC_CSN_ID
+
+INTO #Base_Pop_ED_Readmit
+
+FROM #ED_PositiveScores EPS
+
+	INNER JOIN #Base_Pop BP ON EPS.PAT_ENC_CSN_ID = BP.PAT_ENC_CSN_ID AND EPS.FIRST_TIME_LINE=1
+
+	INNER JOIN [EMRDB].[dbo].ED_ENCOUNTERS_DM DEE ON DEE.PAT_ID = BP.PAT_ID AND (DEE.ARRIVAL_DTTM BETWEEN BP.ED_DEPARTURE_TIME AND DATEADD(HH,24,BP.ED_DEPARTURE_TIME))
+
+;
+
+
+
+
+
+/* *********** */
+
+/* Final Query */
+
+/* *********** */
+
+SELECT
+
+	[BasePop].PAT_MRN_ID		AS MRN
+
+	,[BasePop].PAT_NAME			AS PATIENTS
+
+	,[BasePop].[Ethnic Group]
+
+	,[BasePop].[Race]
+
+	,[BasePop].PAT_ENC_CSN_ID	AS CSN
+
+	,[BasePop].AGE_MONTHS		AS [Age at ED Arrival (Months)]
+
+	,[BasePop].AGE_YEARS		AS [Age at ED Arrival (Years)]
+
+	,[BasePop].AGE_IN_DAYS		AS [Age In Days]
+
+
+
+	,CASE WHEN [BasePop].AGE_IN_DAYS <= 21 THEN 1 ELSE 0 END						AS [Age in Days Count]
+
+	,CASE WHEN [BasePop].AGE_IN_DAYS <= 21 THEN '<= 21 Days' ELSE '> 21 Days' END	AS [Age in Days Indicator]
+
+
+
+	,[BasePop].[Location]
+
+	,[BasePop].DATE_STAMP
+
+	,[BasePop].ADT_ARRIVAL_TIME		AS [ED Arrival Time]
+
+	,[BasePop].TRIAGE_START_DTTM	AS [Traige Start Time]
+
+	,[BasePop].TRIAGE_END_DTTM		AS [Traige Stop Time]
+
+
+
+	,CONVERT(DATE, [BasePop].ADT_ARRIVAL_TIME)		AS [ED Arrival Date]	-- for PBI DateTable
+
+
+
+	,CRFV.REASON_VISIT_NAME			AS [Chief Complaint]
+
+	,RSN.AllEncReasons				AS [Other Visit Reasons]
+
+	,[BasePop].ED_DEPARTURE_TIME	AS [ED Departure Time]
+
+	,[BasePop].HOSP_ADMSN_TIME		AS [HOSP Admit Time]
+
+	,[BasePop].HOSP_DISCH_TIME		AS [HOSP Discharge Time]
+
+	,[BasePop].Disposition			AS [ED Disposition]
+
+
+
+	,FIRST_ADMIT_DEPARTMENT.ADT_DEPARTMENT_NAME AS [First IP Department]
+
+
+
+	,CASE WHEN SepsisScreened.PAT_ENC_CSN_ID IS NOT NULL THEN 'Y' ELSE 'N' END AS [Sepsis Screened]
+
+
+
+	,CASE	WHEN [#ED_PositiveScores].RECORDED_TIME IS NOT NULL
+
+			THEN CASE	WHEN DATEPART(HOUR,[#ED_PositiveScores].RECORDED_TIME) >= 7 and DATEPART(HOUR,[#ED_PositiveScores].RECORDED_TIME) < 19 
+
+						THEN 'AM (Day Shift)'
+
+						ELSE 'PM (Night Shift)'
+
+			END
+
+	  END AS [First Positive Score AM/PM]
+
+
+
+	,[#ED_PositiveScores].RECORDED_TIME		AS [First Positive Score Time]
+
+	,[#ED_PositiveScores].MEAS_VALUE		AS [First Positive Score]
+
+	,ALLSCORES.AllSepsis_Scores				AS [All Sepsis Scores]
+
+
+
+	,ABXTimes.[Order date and time]
+
+	,ABXTimes.[In VERIFY Queue Time]
+
+	,ABXTimes.[Verified in Queue Time]
+
+	,ABXTimes.[Queue Verified by]
+
+	,ABXTimes.[Order Dispense date and time]
+
+	,ABXTimes.[Rx Dispense Sent Time]
+
+
+
+	/* Antibiotic (1st) */
+
+	, ABX1.ABX_ADMIN_TIME	AS [First ABX Admin Time]
+
+	, ABX1.[NAME]			AS [First ABX Name]
+
+
+
+	, DATEDIFF(MI, [BasePop].ADT_ARRIVAL_TIME, ABX1.ABX_ADMIN_TIME)				AS [Arrival To First ABX Admin Time]
+
+	, DATEDIFF(MI, [BasePop].TRIAGE_END_DTTM, ABX1.ABX_ADMIN_TIME)				AS [Triage To First ABX Admin Time]
+
+	, DATEDIFF(MI, [#ED_PositiveScores]. RECORDED_TIME,ABX1.ABX_ADMIN_TIME)		AS [First Positive Screen To First ABX Time]
+
+
+
+	/* Antibiotic (2nd) */
+
+	, ABX2.ABX_ADMIN_TIME	AS [Second ABX Admin Time]
+
+	, ABX2.[NAME]			AS [Second ABX Name]
+
+
+
+	, DATEDIFF(MI, ABX1.ABX_ADMIN_TIME, ABX2.ABX_ADMIN_TIME)					AS [First ABX To Second ABX Admin Time]
+
+	, DATEDIFF(MI, [#ED_PositiveScores].RECORDED_TIME, ABX2.ABX_ADMIN_TIME)		AS [First Positive Screen To Second ABX Time]
+
+	
+
+	/* OrderSet */
+
+	, [#SSOrderSet].ORDER_DTTM AS [Order Set Time]
+
+	, DATEDIFF(MI, [BasePop].ADT_ARRIVAL_TIME, [#SSOrderSet].ORDER_DTTM)	AS [Arrival To Order Set Time]
+
+	, DATEDIFF(MI, [BasePop].TRIAGE_END_DTTM, [#SSOrderSet].ORDER_DTTM)	AS [Triage To Order Set Time]
+
+
+
+	/* Bolus (1st) */
+
+	, BPB1.BOLUS_ADMIN_TIME AS [Bolus 1 Admin Time]
+
+	, BPB1.BOLUS_VOLUME		AS [Bolus 1 Volume]
+
+	, CASE	WHEN BPB1.Medication = 'ALBUMIN, HUMAN 95 % INTRAVENOUS SOLUTION' THEN 'Albumin 95%' ELSE BPB1.Medication END	AS [Bolus 1 Administered]
+
+
+
+	, DATEDIFF(MI, [BasePop].ADT_ARRIVAL_TIME, BPB1.BOLUS_ADMIN_TIME) AS [Arrival To First Bolus Time]
+
+	, DATEDIFF(MI, [BasePop].TRIAGE_END_DTTM, BPB1.BOLUS_ADMIN_TIME) AS [Triage To First Bolus Time]
+
+	, DATEDIFF(MI, [#ED_PositiveScores].RECORDED_TIME, BPB1.BOLUS_ADMIN_TIME) AS [First Positive Screen To First Bolus Time]
+
+	
+
+	/* Bolus (2nd) */
+
+	, BPB2.BOLUS_ADMIN_TIME AS [Bolus 2 Admin Time]
+
+	, BPB2.BOLUS_VOLUME		AS [Bolus 2 Volume]
+
+	, CASE	WHEN BPB2.Medication = 'ALBUMIN, HUMAN 95 % INTRAVENOUS SOLUTION' THEN 'Albumin 95%' ELSE BPB2.Medication	END AS [Bolus 2 Administered]
+
+
+
+	, DATEDIFF(MI, [#ED_PositiveScores].RECORDED_TIME, BPB2.BOLUS_ADMIN_TIME)	AS [First Positive Screen To Second Bolus Time]
+
+	, DATEDIFF(MI, BPB1.BOLUS_ADMIN_TIME, BPB2.BOLUS_ADMIN_TIME)				AS [First Bolus To Second Bolus Time]
+
+	
+
+	/* Bolus (3rd) */
+
+	, BPB3.BOLUS_ADMIN_TIME AS [Bolus 3 Admin Time]
+
+	, BPB3.BOLUS_VOLUME		AS [Bolus 3 Volume]
+
+	, CASE	WHEN BPB3.Medication = 'ALBUMIN, HUMAN 95 % INTRAVENOUS SOLUTION' THEN 'Albumin 95%' ELSE BPB3.Medication	END AS [Bolus 3 Administered]
+
+
+
+	, DATEDIFF(MI, [#ED_PositiveScores].RECORDED_TIME, BPB3.BOLUS_ADMIN_TIME)	AS [First Positive Screen To Third Bolus Time]
+
+	, DATEDIFF(MI, BPB2.BOLUS_ADMIN_TIME, BPB3.BOLUS_ADMIN_TIME)				AS [Second Bolus To Third Bolus Time]
+
+
+
+	, EW.EncWeight AS [PATIENTS Weight]
+
+
+
+	/* Hypotension */
+
+	, [#Hypotension].RECORDED_TIME	AS [First Hypotension Recorded Time]
+
+	, [#Hypotension].MEAS_VALUE		AS [First Hypotension Value]
+
+
+
+	, DATEDIFF(MI, [BasePop].ADT_ARRIVAL_TIME, [#Hypotension].RECORDED_TIME)	AS [Arrival To First Hypotension Time]
+
+	, DATEDIFF(MI, [BasePop].TRIAGE_END_DTTM, [#Hypotension].RECORDED_TIME)	AS [Triage To First Hypotension Time]
+
+
+
+	/* CVL Placement */
+
+	, CVL.PLACEMENT_INSTANT AS [CVL Placement Time]
+
+
+
+	, DATEDIFF(MI, [BasePop].ADT_ARRIVAL_TIME, CVL.PLACEMENT_INSTANT)	AS [Arrival To CLV Placement Time]
+
+	, DATEDIFF(MI, [BasePop].TRIAGE_END_DTTM, CVL.PLACEMENT_INSTANT)	AS [Triage To CLV Placement Time]
+
+
+
+	/* Presssors */
+
+	, [#Pressors].TAKEN_TIME AS [Vasopressor Admin Time]
+
+	, [#Pressors].MEDICATION AS [Vasopressor Administered]
+
+
+
+	, DATEDIFF(MI, [BasePop].ADT_ARRIVAL_TIME, [#Pressors].TAKEN_TIME)					AS [Arrival To Vasopressor Time]
+
+	, DATEDIFF(MI, [BasePop].TRIAGE_END_DTTM, [#Pressors].TAKEN_TIME)					AS [Triage To Vasopressor Time]
+
+	, DATEDIFF(MI,[#ED_PositiveScores].RECORDED_TIME, [#Pressors].TAKEN_TIME)	AS [First Positive Screen To Vasopressor Time]
+
+
+
+	/* SVO2 */
+
+	, [#SVO2].MBOrderTime		AS [SVO2 Order Time]
+
+	, [#SVO2].CollectionTime	AS [SVO2 Order Collection Time]
+
+	, [#SVO2].ORD_VALUE			AS [SVO2 Lab Result]
+
+
+
+	, DATEDIFF(MI, [BasePop].ADT_ARRIVAL_TIME, [#SVO2].MBOrderTime)	AS [Arrival To SVO2 Order Time]
+
+	, DATEDIFF(MI, [BasePop].TRIAGE_END_DTTM, [#SVO2].MBOrderTime)		AS [Triage To SVO2 Order Time]
+
+
+
+	/* Lactic Acid */
+
+	, [#LacticAcid].MBOrderTime		AS [Lactic Acid Order Time]
+
+	, [#LacticAcid].CollectionTime	AS [Lactic Acid Order Collection Time]
+
+	, [#LacticAcid].ORD_VALUE		AS [Lactic Acid Lab Result]
+
+
+
+	, DATEDIFF(MI, [BasePop].ADT_ARRIVAL_TIME, [#LacticAcid].MBOrderTime)	AS [Arrival To Lactic Acid Order Time]
+
+	, DATEDIFF(MI, [BasePop].TRIAGE_END_DTTM, [#LacticAcid].MBOrderTime)		AS [Triage To Lactic Acid Order Time]
+
+
+
+	/* Procalcitonin */
+
+	, [#Procalcitonin].MBOrderTime		AS [Procalcitonin Order Time]
+
+	, [#Procalcitonin].CollectionTime	AS [Procalcitonin Order Collection Time]
+
+	, [#Procalcitonin].ORD_VALUE		AS [Procalcitonin Lab Result]
+
+
+
+	, DATEDIFF(MI, [BasePop].ADT_ARRIVAL_TIME, [#Procalcitonin].MBOrderTime) AS [Arrival To PRO Order Time]
+
+	, DATEDIFF(MI, [BasePop].TRIAGE_END_DTTM, [#Procalcitonin].MBOrderTime)	AS [Triage To PRO Order Time]
+
+
+
+	/* Blood Culture */
+
+	, [BC].MBOrderTime		AS [Blood Culture Order Time]
+
+	, [BC].CollectionTime	AS [Blood Culture Order Collection Time]
+
+	, [BC].OrganismList		AS [Blood Culture Lab Result]
+
+
+
+	, DATEDIFF(MI, [BasePop].ADT_ARRIVAL_TIME, [BC].MBOrderTime)	AS [Arrival To Blood Culture Order Time]
+
+	, DATEDIFF(MI, [BasePop].TRIAGE_END_DTTM, [BC].MBOrderTime)		AS [Triage To Blood Culture Order Time]
+
+
+
+	/* Urine Culture */
+
+	, [UC].MBOrderTime		AS [Urine Culture Order Time]
+
+	, [UC].CollectionTime	AS [Urine Culture Order Collection Time]
+
+	, [UC].OrganismList		AS [Urine Culture Lab Result]
+
+
+
+	, DATEDIFF(MI, [BasePop].ADT_ARRIVAL_TIME, [UC].MBOrderTime)	AS [Arrival To Urine Culture Order Time]
+
+	, DATEDIFF(MI, [BasePop].TRIAGE_END_DTTM, [UC].MBOrderTime)		AS [Triage To Urine Culture Order Time]
+
+
+
+	/* CSF Culture */
+
+	, [CSF].MBOrderTime			AS [CSF Order Time]
+
+	, [CSF].CollectionTime		AS [CSF Order Collection Time]
+
+	, [CSF].OrganismList		AS [CSF Lab Result]
+
+
+
+	, DATEDIFF(MI, [BasePop].ADT_ARRIVAL_TIME, [CSF].MBOrderTime)	AS [Arrival To CSF Order Time]
+
+	, DATEDIFF(MI, [BasePop].TRIAGE_END_DTTM, [CSF].MBOrderTime)	AS [Triage To CSF Order Time]
+
+
+
+	, [#ETT].PLACEMENT_INSTANT AS [First ETT Placement Time]
+
+	, [#IV].PLACEMENT_INSTANT AS [First PIV Placement Time]
+
+	, DATEDIFF(MI,[#ED_PositiveScores].RECORDED_TIME, [#IV].PLACEMENT_INSTANT) AS [First Positive Screen To First PIV Placement]
+
+	, BE1.EVENT_TIME AS [ED IP Bed Requested Time]
+
+	, BE2.EVENT_TIME AS [ED IP Bed Assigned Time]
+
+	, DATEDIFF(MI,BE1.EVENT_TIME,BE2.EVENT_TIME) AS [Bed Request to Bed Assigned Time]
+
+	, DATEDIFF(MI,BE1.EVENT_TIME, ICU.ED2ICUTime) AS [IP Bed Request to PICU Transfer Time]
+
+	, [#ED2HEMONC].ED2HemoncTime
+
+	, ICU.ED2ICUTime
+
+	, GEN.ED2GENTime
+
+
+
+	/* BPA */
+
+	, [#BPA].ALT_ACTION_INST	AS [First BPA CLINICAL_ALERTS/Action Time]
+
+	, [#BPA].ACTION_TAKE		AS [Action Taken]
+
+	, [#BPA].OVERRIDDEN			AS [BPA Overridden]
+
+	, [#BPA].SPEC_OVR_CMNT		AS [BPA Overridden Comment]
+
+	, [#BPA].[NAME]				AS [BPA Action User]
+
+
+
+	, [#SepsisAlertCancelled].SEPSIS_ALERT_CANC_TIME
+
+	, [#SepsisAlertCancelled].SEPSIS_ALERT_CANC_BY
+
+	, CASE WHEN [#BPA].ALT_ACTION_INST IS NOT NULL THEN ISNULL([#SepsisAlertCancelled].SEPSIS_ALERT_CANC_YN, 'N') END AS [SEPSIS_ALERT_CANC_YN]
+
+
+
+	/* Blood pressure */
+
+	, LAST_BP.RECORDED_TIME AS [Last Blood Pressure Time]
+
+	, LAST_BP.MEAS_VALUE AS [Last Blood Pressure Value]
+
+	, DATEDIFF(MI,LAST_BP.RECORDED_TIME, [#ED_PositiveScores].RECORDED_TIME) AS [Last BP to First Positive Score Time]
+
+	, FIRST_BP.RECORDED_TIME AS [First Blood Pressure Time]
+
+	, FIRST_BP.MEAS_VALUE AS [First Blood Pressure Value]
+
+	, DATEDIFF(MI, [#ED_PositiveScores].RECORDED_TIME, FIRST_BP.RECORDED_TIME) AS [First Positive Score Time to First BP]
+
+
+
+	, [LAST_BP_PERCENTILE].RECORDED_TIME	AS [Last BP Percentile Time]
+
+	, [LAST_BP_PERCENTILE].MEAS_VALUE		AS [Last BP Percentile Value]
+
+	, [FIRST_BP_PERCENTILE].RECORDED_TIME	AS [First BP Percentile Time]
+
+	, [FIRST_BP_PERCENTILE].MEAS_VALUE		AS [First BP Percentile Value]
+
+
+
+	, CASE WHEN ED_BORDER.PAT_ENC_CSN_ID IS NOT NULL THEN 'Y' ELSE 'N' END	AS [ED Border PATIENTS]
+
+	, CASE WHEN READMIT.PAT_ENC_CSN_ID IS NOT NULL THEN 'Y' ELSE 'N' END	AS [Sepsis Pos ED Readmit in 24Hrs]
+
+	, CASE WHEN READMITALL.PAT_ENC_CSN_ID IS NOT NULL THEN 'Y' ELSE 'N' END AS [ED Readmit in 24Hrs]
+
+	, CASE WHEN SEVERE.PAT_ENC_CSN_ID IS NOT NULL THEN 'Y' ELSE 'N' END		AS [IPSO Severe Sepsis Criteria Met]
+
+	, CASE WHEN NONSEVERE.PAT_ENC_CSN_ID IS NOT NULL THEN 'Y' ELSE 'N' END	AS [IPSO Non Severe Sepsis Criteria Met]
+
+ 
+
+	/* Positive sepsis screen */
+
+	,CASE WHEN [#ED_PositiveScores].MEAS_VALUE IS NOT NULL AND [#SSOrderSet].ORDER_DTTM IS NOT NULL THEN 1 ELSE 0 END	AS [Positive Sepsis and OrderSet Placed]
+
+	,CASE WHEN [#ED_PositiveScores].MEAS_VALUE IS NOT NULL AND [#SSOrderSet].ORDER_DTTM IS NULL THEN 1 ELSE 0 END		AS [Positive Sepsis and OrderSet NOT Placed]
+
+
+
+	,CASE WHEN [#ED_PositiveScores].MEAS_VALUE IS NOT NULL AND ABX1.ABX_ADMIN_TIME IS NOT NULL THEN 1 ELSE 0 END		AS [Positive Sepsis and Abx Administered]
+
+	,CASE WHEN [#ED_PositiveScores].MEAS_VALUE IS NOT NULL AND ABX1.ABX_ADMIN_TIME IS NULL THEN 1 ELSE 0 END			AS [Positive Sepsis and Abx NOT Administered]
+
+
+
+	,CASE WHEN [#ED_PositiveScores].MEAS_VALUE IS NOT NULL AND BPB1.BOLUS_ADMIN_TIME IS NOT NULL THEN 1 ELSE 0 END		AS [Positive Sepsis and Bolus Administered]
+
+	,CASE WHEN [#ED_PositiveScores].MEAS_VALUE IS NOT NULL AND BPB1.BOLUS_ADMIN_TIME IS NULL THEN 1 ELSE 0 END			AS [Positive Sepsis and Bolus NOT Administered]
+
+
+
+	,CASE WHEN [#ED_PositiveScores].MEAS_VALUE IS NOT NULL AND BC.MBOrderTime IS NOT NULL THEN 1 ELSE 0 END				AS [Positive Sepsis and Blood Culture Ordered]
+
+	,CASE WHEN [#ED_PositiveScores].MEAS_VALUE IS NOT NULL AND BC.MBOrderTime IS NULL THEN 1 ELSE 0 END					AS [Positive Sepsis and Blood Culture NOT Ordered]
+
+
+
+	/* Negative sepsis screen */
+
+	,CASE WHEN [#ED_PositiveScores].MEAS_VALUE IS NULL AND ALLSCORES.AllSepsis_Scores IS NOT NULL AND [#SSOrderSet].ORDER_DTTM IS NOT NULL THEN 1 ELSE 0 END	AS [Negative Sepsis and OrderSet Placed]
+
+	,CASE WHEN [#ED_PositiveScores].MEAS_VALUE IS NULL AND ALLSCORES.AllSepsis_Scores IS NOT NULL AND [#SSOrderSet].ORDER_DTTM IS NULL THEN 1 ELSE 0 END		AS [Negative Sepsis and OrderSet NOT Placed]
+
+
+
+	,CASE WHEN [#ED_PositiveScores].MEAS_VALUE IS NULL AND ALLSCORES.AllSepsis_Scores IS NOT NULL AND ABX1.ABX_ADMIN_TIME IS NOT NULL THEN 1 ELSE 0 END			AS [Negative Sepsis and Abx Administered]
+
+	,CASE WHEN [#ED_PositiveScores].MEAS_VALUE IS NULL AND ALLSCORES.AllSepsis_Scores IS NOT NULL AND ABX1.ABX_ADMIN_TIME IS NULL THEN 1 ELSE 0 END				AS [Negative Sepsis and Abx NOT Administered]
+
+
+
+	,CASE WHEN [#ED_PositiveScores].MEAS_VALUE IS NULL AND ALLSCORES.AllSepsis_Scores IS NOT NULL AND BPB1.BOLUS_ADMIN_TIME IS NOT NULL THEN 1 ELSE 0 END		AS [Negative Sepsis and Bolus Administered]
+
+	,CASE WHEN [#ED_PositiveScores].MEAS_VALUE IS NULL AND ALLSCORES.AllSepsis_Scores IS NOT NULL AND BPB1.BOLUS_ADMIN_TIME IS NULL THEN 1 ELSE 0 END			AS [Negative Sepsis and Bolus NOT Administered]
+
+
+
+	,CASE WHEN [#ED_PositiveScores].MEAS_VALUE IS NULL AND ALLSCORES.AllSepsis_Scores IS NOT NULL AND BC.MBOrderTime IS NOT NULL THEN 1 ELSE 0 END				AS [Negative Sepsis and Blood Culture Ordered]
+
+	,CASE WHEN [#ED_PositiveScores].MEAS_VALUE IS NULL AND ALLSCORES.AllSepsis_Scores IS NOT NULL AND BC.MBOrderTime IS NULL THEN 1 ELSE 0 END					AS [Negative Sepsis and Blood Culture NOT Ordered]
+
+
+
+	/* IPSO severe (+) and Sepsis (+) */
+
+	,CASE WHEN [#ED_PositiveScores].MEAS_VALUE IS NOT NULL AND [#SSOrderSet].ORDER_DTTM IS NOT NULL AND SEVERE.PAT_ENC_CSN_ID IS NOT NULL THEN 1 ELSE 0 END		AS [IPSO SEVERE and Positive Sepsis and OrderSet Placed]
+
+	,CASE WHEN [#ED_PositiveScores].MEAS_VALUE IS NOT NULL AND [#SSOrderSet].ORDER_DTTM IS NULL AND SEVERE.PAT_ENC_CSN_ID IS NOT NULL THEN 1 ELSE 0 END			AS [IPSO SEVERE and Positive Sepsis and OrderSet NOT Placed]
+
+
+
+	,CASE WHEN [#ED_PositiveScores].MEAS_VALUE IS NOT NULL AND ABX1.ABX_ADMIN_TIME IS NOT NULL AND SEVERE.PAT_ENC_CSN_ID IS NOT NULL THEN 1 ELSE 0 END			AS [IPSO SEVERE and Positive Sepsis and Abx Administered]
+
+	,CASE WHEN [#ED_PositiveScores].MEAS_VALUE IS NOT NULL AND ABX1.ABX_ADMIN_TIME IS NULL AND SEVERE.PAT_ENC_CSN_ID IS NOT NULL THEN 1 ELSE 0 END				AS [IPSO SEVERE and Positive Sepsis and Abx NOT Administered]
+
+
+
+	,CASE WHEN [#ED_PositiveScores].MEAS_VALUE IS NOT NULL AND BPB1.BOLUS_ADMIN_TIME IS NOT NULL AND SEVERE.PAT_ENC_CSN_ID IS NOT NULL THEN 1 ELSE 0 END		AS [IPSO SEVERE and Positive Sepsis and Bolus Administered]
+
+	,CASE WHEN [#ED_PositiveScores].MEAS_VALUE IS NOT NULL AND BPB1.BOLUS_ADMIN_TIME IS NULL AND SEVERE.PAT_ENC_CSN_ID IS NOT NULL THEN 1 ELSE 0 END			AS [IPSO SEVERE and Positive Sepsis and Bolus NOT Administered]
+
+
+
+	,CASE WHEN [#ED_PositiveScores].MEAS_VALUE IS NOT NULL AND BC.MBOrderTime IS NOT NULL AND SEVERE.PAT_ENC_CSN_ID IS NOT NULL THEN 1 ELSE 0 END				AS [IPSO SEVERE and Positive Sepsis and Blood Culture Ordered]
+
+	,CASE WHEN [#ED_PositiveScores].MEAS_VALUE IS NOT NULL AND BC.MBOrderTime IS NULL AND SEVERE.PAT_ENC_CSN_ID IS NOT NULL THEN 1 ELSE 0 END					AS [IPSO SEVERE and Positive Sepsis and Blood Culture NOT Ordered]
+
+
+
+	/* IPSO non-severe (+) and Sepsis (+) */
+
+	,CASE WHEN [#ED_PositiveScores].MEAS_VALUE IS NOT NULL AND [#SSOrderSet].ORDER_DTTM IS NOT NULL AND NONSEVERE.PAT_ENC_CSN_ID IS NOT NULL THEN 1 ELSE 0 END	AS [IPSO NON SEVERE and Positive Sepsis and OrderSet Placed]
+
+	,CASE WHEN [#ED_PositiveScores].MEAS_VALUE IS NOT NULL AND [#SSOrderSet].ORDER_DTTM IS NULL AND NONSEVERE.PAT_ENC_CSN_ID IS NOT NULL THEN 1 ELSE 0 END		AS [IPSO NON SEVERE and Positive Sepsis and OrderSet NOT Placed]
+
+
+
+	,CASE WHEN [#ED_PositiveScores].MEAS_VALUE IS NOT NULL AND ABX1.ABX_ADMIN_TIME IS NOT NULL AND NONSEVERE.PAT_ENC_CSN_ID IS NOT NULL THEN 1 ELSE 0 END		AS [IPSO NON SEVERE and Positive Sepsis and Abx Administered]
+
+	,CASE WHEN [#ED_PositiveScores].MEAS_VALUE IS NOT NULL AND ABX1.ABX_ADMIN_TIME IS NULL AND NONSEVERE.PAT_ENC_CSN_ID IS NOT NULL THEN 1 ELSE 0 END			AS [IPSO NON SEVERE and Positive Sepsis and Abx NOT Administered]
+
+
+
+	,CASE WHEN [#ED_PositiveScores].MEAS_VALUE IS NOT NULL AND BPB1.BOLUS_ADMIN_TIME IS NOT NULL AND NONSEVERE.PAT_ENC_CSN_ID IS NOT NULL THEN 1 ELSE 0 END		AS [IPSO NON SEVERE and Positive Sepsis and Bolus Administered]
+
+	,CASE WHEN [#ED_PositiveScores].MEAS_VALUE IS NOT NULL AND BPB1.BOLUS_ADMIN_TIME IS NULL AND NONSEVERE.PAT_ENC_CSN_ID IS NOT NULL THEN 1 ELSE 0 END			AS [IPSO NON SEVERE and Positive Sepsis and Bolus NOT Administered]
+
+
+
+	,CASE WHEN [#ED_PositiveScores].MEAS_VALUE IS NOT NULL AND BC.MBOrderTime IS NOT NULL AND NONSEVERE.PAT_ENC_CSN_ID IS NOT NULL THEN 1 ELSE 0 END			AS [IPSO NON SEVERE and Positive Sepsis and Blood Culture Ordered]
+
+	,CASE WHEN [#ED_PositiveScores].MEAS_VALUE IS NOT NULL AND BC.MBOrderTime IS NULL AND NONSEVERE.PAT_ENC_CSN_ID IS NOT NULL THEN 1 ELSE 0 END				AS [IPSO NON SEVERE and Positive Sepsis and Blood Culture NOT Ordered]
+
+
+
+	/* IPSO severe (+) and Sepsis (neg) */
+
+	,CASE WHEN [#ED_PositiveScores].MEAS_VALUE IS NULL AND ALLSCORES.AllSepsis_Scores IS NOT NULL AND [#SSOrderSet].ORDER_DTTM IS NOT NULL AND SEVERE.PAT_ENC_CSN_ID IS NOT NULL THEN 1 ELSE 0 END	AS [IPSO SEVERE and Negative Sepsis and OrderSet Placed]
+
+	,CASE WHEN [#ED_PositiveScores].MEAS_VALUE IS NULL AND ALLSCORES.AllSepsis_Scores IS NOT NULL AND [#SSOrderSet].ORDER_DTTM IS NULL AND SEVERE.PAT_ENC_CSN_ID IS NOT NULL THEN 1 ELSE 0 END		AS [IPSO SEVERE and Negative Sepsis and OrderSet NOT Placed]
+
+
+
+	,CASE WHEN [#ED_PositiveScores].MEAS_VALUE IS NULL AND ALLSCORES.AllSepsis_Scores IS NOT NULL AND ABX1.ABX_ADMIN_TIME IS NOT NULL AND SEVERE.PAT_ENC_CSN_ID IS NOT NULL THEN 1 ELSE 0 END		AS [IPSO SEVERE and Negative Sepsis and Abx Administered]
+
+	,CASE WHEN [#ED_PositiveScores].MEAS_VALUE IS NULL AND ALLSCORES.AllSepsis_Scores IS NOT NULL AND ABX1.ABX_ADMIN_TIME IS NULL AND SEVERE.PAT_ENC_CSN_ID IS NOT NULL THEN 1 ELSE 0 END			AS [IPSO SEVERE and Negative Sepsis and Abx NOT Administered]
+
+
+
+	,CASE WHEN [#ED_PositiveScores].MEAS_VALUE IS NULL AND ALLSCORES.AllSepsis_Scores IS NOT NULL AND BPB1.BOLUS_ADMIN_TIME IS NOT NULL AND SEVERE.PAT_ENC_CSN_ID IS NOT NULL THEN 1 ELSE 0 END		AS [IPSO SEVERE and Negative Sepsis and Bolus Administered]
+
+	,CASE WHEN [#ED_PositiveScores].MEAS_VALUE IS NULL AND ALLSCORES.AllSepsis_Scores IS NOT NULL AND BPB1.BOLUS_ADMIN_TIME IS NULL AND SEVERE.PAT_ENC_CSN_ID IS NOT NULL THEN 1 ELSE 0 END			AS [IPSO SEVERE and Negative Sepsis and Bolus NOT Administered]
+
+
+
+	,CASE WHEN [#ED_PositiveScores].MEAS_VALUE IS NULL AND ALLSCORES.AllSepsis_Scores IS NOT NULL AND BC.MBOrderTime IS NOT NULL AND SEVERE.PAT_ENC_CSN_ID IS NOT NULL THEN 1 ELSE 0 END			AS [IPSO SEVERE and Negative Sepsis and Blood Culture Ordered]
+
+	,CASE WHEN [#ED_PositiveScores].MEAS_VALUE IS NULL AND ALLSCORES.AllSepsis_Scores IS NOT NULL AND BC.MBOrderTime IS NULL AND SEVERE.PAT_ENC_CSN_ID IS NOT NULL THEN 1 ELSE 0 END				AS [IPSO SEVERE and Negative Sepsis and Blood Culture NOT Ordered]
+
+
+
+	/* IPSO non-severe (+) and Sepsis (neg) */
+
+	,CASE WHEN [#ED_PositiveScores].MEAS_VALUE IS NULL AND ALLSCORES.AllSepsis_Scores IS NOT NULL AND [#SSOrderSet].ORDER_DTTM IS NOT NULL AND NONSEVERE.PAT_ENC_CSN_ID IS NOT NULL THEN 1 ELSE 0 END	AS [IPSO NON SEVERE and Negative Sepsis and OrderSet Placed]
+
+	,CASE WHEN [#ED_PositiveScores].MEAS_VALUE IS NULL AND ALLSCORES.AllSepsis_Scores IS NOT NULL AND [#SSOrderSet].ORDER_DTTM IS NULL AND NONSEVERE.PAT_ENC_CSN_ID IS NOT NULL THEN 1 ELSE 0 END		AS [IPSO NON SEVERE and Negative Sepsis and OrderSet NOT Placed]
+
+
+
+	,CASE WHEN [#ED_PositiveScores].MEAS_VALUE IS NULL AND ALLSCORES.AllSepsis_Scores IS NOT NULL AND ABX1.ABX_ADMIN_TIME IS NOT NULL AND NONSEVERE.PAT_ENC_CSN_ID IS NOT NULL THEN 1 ELSE 0 END		AS [IPSO NON SEVERE and Negative Sepsis and Abx Administered]
+
+	,CASE WHEN [#ED_PositiveScores].MEAS_VALUE IS NULL AND ALLSCORES.AllSepsis_Scores IS NOT NULL AND ABX1.ABX_ADMIN_TIME IS NULL AND NONSEVERE.PAT_ENC_CSN_ID IS NOT NULL THEN 1 ELSE 0 END			AS [IPSO NON SEVERE and Negative Sepsis and Abx NOT Administered]
+
+
+
+	,CASE WHEN [#ED_PositiveScores].MEAS_VALUE IS NULL AND ALLSCORES.AllSepsis_Scores IS NOT NULL AND BPB1.BOLUS_ADMIN_TIME IS NOT NULL AND NONSEVERE.PAT_ENC_CSN_ID IS NOT NULL THEN 1 ELSE 0 END		AS [IPSO NON SEVERE and Negative Sepsis and Bolus Administered]
+
+	,CASE WHEN [#ED_PositiveScores].MEAS_VALUE IS NULL AND ALLSCORES.AllSepsis_Scores IS NOT NULL AND BPB1.BOLUS_ADMIN_TIME IS NULL AND NONSEVERE.PAT_ENC_CSN_ID IS NOT NULL THEN 1 ELSE 0 END			AS [IPSO NON SEVERE and Negative Sepsis and Bolus NOT Administered]
+
+
+
+	,CASE WHEN [#ED_PositiveScores].MEAS_VALUE IS NULL AND ALLSCORES.AllSepsis_Scores IS NOT NULL AND BC.MBOrderTime IS NOT NULL AND NONSEVERE.PAT_ENC_CSN_ID IS NOT NULL THEN 1 ELSE 0 END				AS [IPSO NON SEVERE and Negative Sepsis and Blood Culture Ordered]
+
+	,CASE WHEN [#ED_PositiveScores].MEAS_VALUE IS NULL AND ALLSCORES.AllSepsis_Scores IS NOT NULL AND BC.MBOrderTime IS NULL AND NONSEVERE.PAT_ENC_CSN_ID IS NOT NULL THEN 1 ELSE 0 END					AS [IPSO NON SEVERE and Negative Sepsis and Blood Culture NOT Ordered]
+
+
+
+	,RESCREEN.RECORDED_TIME AS [ReScreen After FPS]
+
+
+
+	,CASE	WHEN DATEDIFF(MI,[#ED_PositiveScores].RECORDED_TIME,ABX1.ABX_ADMIN_TIME) <=60
+
+				AND DATEDIFF(MI,[#ED_PositiveScores].RECORDED_TIME,BPB1.BOLUS_ADMIN_TIME) <=20
+
+				AND RESCREEN.RECORDED_TIME IS NOT NULL
+
+			THEN 1 
+
+			ELSE 0 
+
+	  END AS [FPS Bolus ABX ReScreen Compliance]
+
+
+
+	,REPEATSCREEN.RECORDED_TIME AS [Repeat Screen before ED Departure]
+
+	,GEN.[Gen Back To ICU Time]
+
+	,GEN.[Gen Back To ICU Department]
+
+
+
+	/* Added 2025.11.24 V_DEV004 */
+
+	-- Septic Shock criteria; Logic from [reports].USP_Severe_Sepsis for consistency
+
+	, CASE
+
+		WHEN DATEDIFF(MINUTE, [BasePop].ADT_ARRIVAL_TIME, [ABX1].ABX_ADMIN_TIME) <= 6*60
+
+			AND DATEDIFF(MINUTE, [BasePop].ADT_ARRIVAL_TIME, [BPB1].BOLUS_ADMIN_TIME) <= 6*60
+
+			AND ( DATEDIFF(MINUTE, [BasePop].ADT_ARRIVAL_TIME, [BPB2].BOLUS_ADMIN_TIME) <= 6*60
+
+					OR
+
+				  DATEDIFF(MINUTE, [BasePop].ADT_ARRIVAL_TIME, [#Pressors].TAKEN_TIME) <= 6*60
+
+				)
+
+			AND DATEDIFF(MINUTE, [BasePop].ADT_ARRIVAL_TIME, [bcx_order01].[Blood Culture First Order Time]) <= 72*60
+
+			AND ( [BPB3].BOLUS_ADMIN_TIME IS NOT NULL
+
+					OR
+
+				  [#Pressors].TAKEN_TIME IS NOT NULL
+
+				)
+
+
+
+		THEN 'Septic Shock'
+
+		
+
+		WHEN DATEDIFF(MINUTE, [BasePop].ADT_ARRIVAL_TIME, [ABX1].ABX_ADMIN_TIME) <= 6*60
+
+			AND DATEDIFF(MINUTE, [BasePop].ADT_ARRIVAL_TIME, [BPB1].BOLUS_ADMIN_TIME) <= 6*60
+
+			AND ( DATEDIFF(MINUTE, [BasePop].ADT_ARRIVAL_TIME, [BPB2].BOLUS_ADMIN_TIME) <= 6*60
+
+					OR
+
+				  DATEDIFF(MINUTE, [BasePop].ADT_ARRIVAL_TIME, [#Pressors].TAKEN_TIME) <= 6*60
+
+				)
+
+			AND DATEDIFF(MINUTE, [BasePop].ADT_ARRIVAL_TIME, [bcx_order01].[Blood Culture First Order Time]) <= 72*60
+
+
+
+		THEN 'Potential Septic Shock' 
+
+		--ELSE 99	-- "Un-treated"
+
+	  END AS [Septic Shock]
+
+
+
+FROM #Base_Pop BasePop
+
+
+
+	LEFT OUTER JOIN [EMRDB].[dbo].ENCOUNTER_VISIT_REASONS	CHIEF_CMPLNT	ON CHIEF_CMPLNT.PAT_ENC_CSN_ID = [BasePop].PAT_ENC_CSN_ID AND CHIEF_CMPLNT.LINE=1
+
+	LEFT OUTER JOIN [EMRDB].[dbo].VISIT_REASONS	CRFV			ON CRFV.REASON_VISIT_ID = CHIEF_CMPLNT.ENC_REASON_ID
+
+
+
+	LEFT OUTER JOIN [reportingDB].[reports].[SEVERE_SEPSIS_STAGING]		SEVERE		ON SEVERE.DATE_STAMP = [BasePop].DATE_STAMP AND SEVERE.PAT_ENC_CSN_ID = [BasePop].PAT_ENC_CSN_ID
+
+	LEFT OUTER JOIN [reportingDB].[reports].[NON_SEVERE_SEPSIS_STAGING]	NONSEVERE	ON NONSEVERE.DATE_STAMP = [BasePop].DATE_STAMP AND NONSEVERE.PAT_ENC_CSN_ID = [BasePop].PAT_ENC_CSN_ID
+
+
+
+	LEFT OUTER JOIN #Base_Pop_SepsisScores_ConCat	ALLSCORES		ON ALLSCORES.PAT_ENC_CSN_ID = [BasePop].PAT_ENC_CSN_ID
+
+	LEFT OUTER JOIN #Base_Pop_Severe_ED_Scores		SepsisScreened	ON SepsisScreened.PAT_ENC_CSN_ID = [BasePop].PAT_ENC_CSN_ID and SepsisScreened.TIME_LINE=1
+
+
+
+	LEFT OUTER JOIN #ED_PositiveScores							ON [#ED_PositiveScores].PAT_ENC_CSN_ID = [BasePop].PAT_ENC_CSN_ID AND [#ED_PositiveScores].FIRST_TIME_LINE=1
+
+	LEFT OUTER JOIN #BasePopABX						abx1		ON [BasePop].PAT_ENC_CSN_ID = ABX1.PAT_ENC_CSN_ID AND ABX1.TIME_LINE=1
+
+	LEFT OUTER JOIN #BasePopABX						abx2		ON [BasePop].PAT_ENC_CSN_ID = ABX2.PAT_ENC_CSN_ID AND ABX2.TIME_LINE=2
+
+	LEFT OUTER JOIN #SSOrderSet									ON [BasePop].PAT_ENC_CSN_ID = [#SSOrderSet].PAT_ENC_CSN_ID AND [#SSOrderSet].TIME_LINE=1
+
+	LEFT OUTER JOIN #BasePopBolus					BPB1		ON [BasePop].PAT_ENC_CSN_ID = BPB1.PAT_ENC_CSN_ID AND BPB1.TIME_LINE=1
+
+	LEFT OUTER JOIN #BasePopBolus					BPB2		ON [BasePop].PAT_ENC_CSN_ID = BPB2.PAT_ENC_CSN_ID AND BPB2.TIME_LINE=2
+
+	LEFT OUTER JOIN #BasePopBolus					BPB3		ON [BasePop].PAT_ENC_CSN_ID = BPB3.PAT_ENC_CSN_ID AND BPB3.TIME_LINE=3
+
+	LEFT OUTER JOIN #EncounterWeights				EW			ON [BasePop].PAT_ENC_CSN_ID = EW.PAT_ENC_CSN_ID AND EW.TIME_LINE=1
+
+	LEFT OUTER JOIN #Hypotension								ON [BasePop].PAT_ENC_CSN_ID = [#Hypotension].PAT_ENC_CSN_ID AND [#Hypotension].TIME_LINE=1
+
+	LEFT OUTER JOIN #ALLCVLTime						CVL			ON [BasePop].PAT_ENC_CSN_ID = CVL.PAT_ENC_CSN_ID AND CVL.TIME_LINE=1
+
+	LEFT OUTER JOIN #Pressors									ON [BasePop].PAT_ENC_CSN_ID = [#Pressors].PAT_ENC_CSN_ID AND [#Pressors].TIME_LINE=1
+
+	LEFT OUTER JOIN #SVO2										ON [BasePop].PAT_ENC_CSN_ID = [#SVO2].PAT_ENC_CSN_ID AND [#SVO2].TIME_LINE=1
+
+	LEFT OUTER JOIN #LacticAcid									ON [BasePop].PAT_ENC_CSN_ID = [#LacticAcid].PAT_ENC_CSN_ID AND [#LacticAcid].TIME_LINE=1
+
+	LEFT OUTER JOIN #Procalcitonin								ON [BasePop].PAT_ENC_CSN_ID = [#Procalcitonin].PAT_ENC_CSN_ID AND [#Procalcitonin].TIME_LINE=1
+
+	LEFT OUTER JOIN #BloodCultureValue				BC			ON [BasePop].PAT_ENC_CSN_ID = [BC].PAT_ENC_CSN_ID
+
+	LEFT OUTER JOIN #UrineCultureValue				UC			ON [BasePop].PAT_ENC_CSN_ID = [UC].PAT_ENC_CSN_ID
+
+	LEFT OUTER JOIN #CsfCultureValue				CSF			ON [BasePop].PAT_ENC_CSN_ID = [CSF].PAT_ENC_CSN_ID
+
+	LEFT OUTER JOIN #ETT										ON [BasePop].PAT_ENC_CSN_ID = [#ETT].PAT_ENC_CSN_ID AND [#ETT].TIME_LINE=1
+
+	LEFT OUTER JOIN #IV											ON [BasePop].PAT_ENC_CSN_ID = [#IV].PAT_ENC_CSN_ID AND [#IV].TIME_LINE=1
+
+	LEFT OUTER JOIN #ED2HEMONC									ON [BasePop].PAT_ENC_CSN_ID = [#ED2HEMONC].PAT_ENC_CSN_ID AND [#ED2HEMONC].TIME_LINE=1
+
+	LEFT OUTER JOIN #ED2ICU							ICU			ON [BasePop].PAT_ENC_CSN_ID = [ICU].PAT_ENC_CSN_ID AND [ICU].TIME_LINE=1
+
+	LEFT OUTER JOIN #ED2GEN							GEN			ON [BasePop].PAT_ENC_CSN_ID = [GEN].PAT_ENC_CSN_ID AND [GEN].TIME_LINE=1
+
+	LEFT OUTER JOIN #BPA										ON [BasePop].PAT_ENC_CSN_ID = [#BPA].PAT_ENC_CSN_ID AND [#BPA].TIME_LINE=1
+
+
+
+	LEFT OUTER JOIN #BedEvents						BE1			ON [BE1].PAT_ENC_CSN_ID = [BasePop].PAT_ENC_CSN_ID AND [BE1].REQ_LINE=1 AND [BE1].TIME_LINE=1--BED REQUESTED
+
+	LEFT OUTER JOIN #BedEvents						BE2			ON [BE2].PAT_ENC_CSN_ID = [BasePop].PAT_ENC_CSN_ID AND [BE2].REQ_LINE=1 AND [BE2].TIME_LINE=2--BED ASSIGNED
+
+	LEFT OUTER JOIN #Base_Pop_ED_Readmit_All		READMITALL	ON [READMITALL].PAT_ENC_CSN_ID = [BasePop].PAT_ENC_CSN_ID
+
+	LEFT OUTER JOIN #Base_Pop_ED_Readmit			READMIT		ON [READMIT].PAT_ENC_CSN_ID = [BasePop].PAT_ENC_CSN_ID
+
+	LEFT OUTER JOIN #Base_Pop_ENC_Reason			RSN			ON [RSN].PAT_ENC_CSN_ID = [BasePop].PAT_ENC_CSN_ID
+
+
+
+	LEFT OUTER JOIN #FirstPositiveOD_To_ABXAdminTime OD2ABX		ON OD2ABX.PAT_ENC_CSN_ID = [BasePop].PAT_ENC_CSN_ID
+
+	LEFT OUTER JOIN #FirstABXAdminTimeDetails		ABXTimes	ON ABXTimes.PAT_ENC_CSN_ID = [BasePop].PAT_ENC_CSN_ID
+
+	LEFT OUTER JOIN #SepsisAlertCancelled						ON [BasePop].PAT_ENC_CSN_ID = [#SepsisAlertCancelled].PAT_ENC_CSN_ID AND [#SepsisAlertCancelled].TIME_LINE=1
+
+
+
+	LEFT OUTER JOIN (
+
+		SELECT PAT_ENC_CSN_ID, min(MBOrderTime) AS [Blood Culture First Order Time]
+
+		FROM #BloodCultureValue
+
+		GROUP BY PAT_ENC_CSN_ID
+
+	) bcx_order01 ON [BasePop].PAT_ENC_CSN_ID = [bcx_order01].PAT_ENC_CSN_ID
+
+
+
+	OUTER APPLY
+
+	(
+
+		SELECT TOP 1 [#Base_Pop_Severe_ED_Scores].RECORDED_TIME
+
+		FROM #Base_Pop_Severe_ED_Scores
+
+		WHERE 1=1
+
+			AND [#Base_Pop_Severe_ED_Scores].PAT_ENC_CSN_ID = [#ED_PositiveScores].PAT_ENC_CSN_ID
+
+			AND [#ED_PositiveScores].FIRST_TIME_LINE = 1
+
+			AND ([#Base_Pop_Severe_ED_Scores].RECORDED_TIME > [#ED_PositiveScores].RECORDED_TIME AND [#Base_Pop_Severe_ED_Scores].RECORDED_TIME <= DATEADD(MI, 90, [#ED_PositiveScores].RECORDED_TIME))
+
+		ORDER BY [#ED_PositiveScores].RECORDED_TIME DESC
+
+	) RESCREEN
+
+
+
+	OUTER APPLY
+
+	(
+
+		SELECT TOP 1 [#Base_Pop_Severe_ED_Scores].RECORDED_TIME
+
+		FROM #Base_Pop_Severe_ED_Scores
+
+		WHERE 1=1
+
+			AND [#Base_Pop_Severe_ED_Scores].PAT_ENC_CSN_ID = [BasePop].PAT_ENC_CSN_ID
+
+			AND ([#Base_Pop_Severe_ED_Scores].RECORDED_TIME >  DATEADD(MI, -60, [BasePop].ED_DEPARTURE_TIME) AND [#Base_Pop_Severe_ED_Scores].RECORDED_TIME < [BasePop].ED_DEPARTURE_TIME)
+
+		ORDER BY [#Base_Pop_Severe_ED_Scores].RECORDED_TIME DESC
+
+	) REPEATSCREEN
+
+
+
+	OUTER APPLY
+
+	(
+
+		SELECT TOP 1 [V_PATIENT_LOCATION_HISTORY].ADT_DEPARTMENT_NAME
+
+		FROM [EMRDB].[dbo].V_PATIENT_LOCATION_HISTORY
+
+		WHERE 1=1
+
+			AND [V_PATIENT_LOCATION_HISTORY].ADT_DEPARTMENT_ID IS NOT NULL
+
+			AND [V_PATIENT_LOCATION_HISTORY].PAT_ENC_CSN = [BasePop].PAT_ENC_CSN_ID 
+
+			AND [V_PATIENT_LOCATION_HISTORY].IN_DTTM >= [BasePop].ED_DEPARTURE_TIME
+
+		ORDER BY [V_PATIENT_LOCATION_HISTORY].IN_DTTM ASC
+
+	) FIRST_ADMIT_DEPARTMENT
+
+
+
+	/* Previous blood pressure (up to 30 minutes prior to positive screen) */
+
+	OUTER APPLY
+
+	(
+
+		SELECT TOP 1 
+
+			[FLOWSHEET_MEASUREMENTS].RECORDED_TIME
+
+			, [FLOWSHEET_MEASUREMENTS].MEAS_VALUE
+
+			, [FLOWSHEET_MEASUREMENTS].FLO_MEAS_ID
+
+		FROM [EMRDB].[dbo].HOSPITAL_ENCOUNTERS
+
+			INNER JOIN [EMRDB].[dbo].FLOWSHEET_RECORDS	ON [HOSPITAL_ENCOUNTERS].INPATIENT_DATA_ID = [FLOWSHEET_RECORDS].INPATIENT_DATA_ID
+
+			INNER JOIN [EMRDB].[dbo].FLOWSHEET_MEASUREMENTS	ON [FLOWSHEET_RECORDS].FSD_ID = [FLOWSHEET_MEASUREMENTS].FSD_ID	
+
+
+
+		WHERE 1=1
+
+			AND [HOSPITAL_ENCOUNTERS].PAT_ENC_CSN_ID = [#ED_PositiveScores].PAT_ENC_CSN_ID
+
+			AND [FLOWSHEET_MEASUREMENTS].FLO_MEAS_ID = '95'	-- Blood Pressure
+
+			AND [FLOWSHEET_MEASUREMENTS].RECORDED_TIME BETWEEN DATEADD(MI, -30, [#ED_PositiveScores].RECORDED_TIME) AND [#ED_PositiveScores].RECORDED_TIME
+
+		ORDER BY [FLOWSHEET_MEASUREMENTS].RECORDED_TIME DESC	
+
+	) LAST_BP
+
+
+
+	/* Previous blood pressure percentile (up to 30 minutes prior to positive screen) */
+
+	OUTER APPLY
+
+	(
+
+		SELECT TOP 1 
+
+			[FLOWSHEET_MEASUREMENTS].RECORDED_TIME
+
+			, [FLOWSHEET_MEASUREMENTS].MEAS_VALUE
+
+		FROM [EMRDB].[dbo].HOSPITAL_ENCOUNTERS
+
+			INNER JOIN [EMRDB].[dbo].FLOWSHEET_RECORDS	ON [HOSPITAL_ENCOUNTERS].INPATIENT_DATA_ID = [FLOWSHEET_RECORDS].INPATIENT_DATA_ID
+
+			INNER JOIN [EMRDB].[dbo].FLOWSHEET_MEASUREMENTS	ON [FLOWSHEET_RECORDS].FSD_ID = [FLOWSHEET_MEASUREMENTS].FSD_ID	
+
+		WHERE 1=1
+
+			AND [HOSPITAL_ENCOUNTERS].PAT_ENC_CSN_ID = [#ED_PositiveScores].PAT_ENC_CSN_ID
+
+			AND [FLOWSHEET_MEASUREMENTS].FLO_MEAS_ID IN (
+
+				'9001140203'	-- R PED GIRLS SYSTOLIC BP PERCENTILE
+
+				,'9001140205'	-- R PED BOYS SYSTOLIC BP PERCENTILE 
+
+				)
+
+			AND [FLOWSHEET_MEASUREMENTS].RECORDED_TIME BETWEEN DATEADD(MI, -30, [#ED_PositiveScores].RECORDED_TIME) AND [#ED_PositiveScores].RECORDED_TIME
+
+		ORDER BY [FLOWSHEET_MEASUREMENTS].RECORDED_TIME DESC	
+
+	) LAST_BP_PERCENTILE
+
+
+
+	/* First blood pressure (up to 30 minutes after positive screen) */
+
+	OUTER APPLY
+
+	(
+
+		SELECT TOP 1 
+
+			[FLOWSHEET_MEASUREMENTS].RECORDED_TIME
+
+			, [FLOWSHEET_MEASUREMENTS].MEAS_VALUE
+
+		FROM [EMRDB].[dbo].HOSPITAL_ENCOUNTERS
+
+			INNER JOIN [EMRDB].[dbo].FLOWSHEET_RECORDS	ON [HOSPITAL_ENCOUNTERS].INPATIENT_DATA_ID = [FLOWSHEET_RECORDS].INPATIENT_DATA_ID
+
+			INNER JOIN [EMRDB].[dbo].FLOWSHEET_MEASUREMENTS	ON [FLOWSHEET_RECORDS].FSD_ID = [FLOWSHEET_MEASUREMENTS].FSD_ID	
+
+		WHERE 1=1
+
+			AND [HOSPITAL_ENCOUNTERS].PAT_ENC_CSN_ID = [#ED_PositiveScores].PAT_ENC_CSN_ID
+
+			AND [FLOWSHEET_MEASUREMENTS].FLO_MEAS_ID = '95'	-- Blood Pressure
+
+			AND [FLOWSHEET_MEASUREMENTS].RECORDED_TIME BETWEEN [#ED_PositiveScores].RECORDED_TIME AND DATEADD(MI, 30, [#ED_PositiveScores].RECORDED_TIME)
+
+		ORDER BY [FLOWSHEET_MEASUREMENTS].RECORDED_TIME DESC			
+
+	) FIRST_BP
+
+
+
+	/* First blood pressure (up to 30 minutes after positive screen) */
+
+	OUTER APPLY
+
+	(
+
+		SELECT TOP 1 
+
+			[FLOWSHEET_MEASUREMENTS].RECORDED_TIME
+
+			, [FLOWSHEET_MEASUREMENTS].MEAS_VALUE
+
+		FROM [EMRDB].[dbo].HOSPITAL_ENCOUNTERS
+
+			INNER JOIN [EMRDB].[dbo].FLOWSHEET_RECORDS	ON [HOSPITAL_ENCOUNTERS].INPATIENT_DATA_ID = [FLOWSHEET_RECORDS].INPATIENT_DATA_ID
+
+			INNER JOIN [EMRDB].[dbo].FLOWSHEET_MEASUREMENTS	ON [FLOWSHEET_RECORDS].FSD_ID = [FLOWSHEET_MEASUREMENTS].FSD_ID	
+
+		WHERE 1=1
+
+			AND [HOSPITAL_ENCOUNTERS].PAT_ENC_CSN_ID = [#ED_PositiveScores].PAT_ENC_CSN_ID
+
+			AND [FLOWSHEET_MEASUREMENTS].FLO_MEAS_ID IN (
+
+				'9001140203'	-- R PED GIRLS SYSTOLIC BP PERCENTILE
+
+				,'9001140205'	-- R PED BOYS SYSTOLIC BP PERCENTILE 
+
+				)
+
+			AND [FLOWSHEET_MEASUREMENTS].RECORDED_TIME BETWEEN [#ED_PositiveScores].RECORDED_TIME AND DATEADD(MI, 30, [#ED_PositiveScores].RECORDED_TIME)
+
+		ORDER BY [FLOWSHEET_MEASUREMENTS].RECORDED_TIME DESC			
+
+	) FIRST_BP_PERCENTILE
+
+
+
+	/* ED boarder PATIENTS */
+
+	LEFT OUTER JOIN
+
+	(
+
+		SELECT DISTINCT [HOSPITAL_ENCOUNTERS].PAT_ENC_CSN_ID
+
+		FROM [EMRDB].[dbo].HOSPITAL_ENCOUNTERS
+
+			INNER JOIN [EMRDB].[dbo].ED_PATIENT_INFO		 ON [ED_PATIENT_INFO].PAT_ENC_CSN_ID = [HOSPITAL_ENCOUNTERS].PAT_ENC_CSN_ID
+
+			INNER JOIN [EMRDB].[dbo].ED_EVENT_INFO	 ON [ED_EVENT_INFO].EVENT_ID = [ED_PATIENT_INFO].EVENT_ID 
+
+															AND [ED_EVENT_INFO].EVENT_TYPE IN ('2600000007')--ED BOARDER PATIENTS
+
+	) ED_BORDER ON [BasePop].PAT_ENC_CSN_ID = ED_BORDER.PAT_ENC_CSN_ID
+
+;
+
+
+
