@@ -70,7 +70,7 @@ INSTALLATION_ERRORS = [
         "error_signature": "ScriptDom not available, using sqlparse",
         "error_category": "pythonnet_initialization",
         "root_cause": "pythonnet failed to load, falling back to sqlparse extractor. This results in ~50% parse rate instead of 99%+. Usually caused by %pip install restarting the kernel.",
-        "fix": "Use Fabric Environment instead of %pip install. Stop the session, attach the aivia-env Environment, and rerun the notebook.",
+        "fix": "Use Fabric Environment instead of %pip install. Stop the session, attach the sql-logic-env Environment, and rerun the notebook.",
         "prevention": "Never use %pip install in pipeline notebooks. Use Fabric Environments exclusively.",
         "first_seen": "2026-07-26",
     },

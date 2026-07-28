@@ -1,12 +1,12 @@
 [project]
-name = "aivia-sql-intelligence"
+name = "sql-query-agent"
 version = "1.1.0"
-description = "AIVIA — SQL Intelligence Agent for Microsoft Fabric. Extract business logic from SQL, build knowledge graphs, answer questions in plain English."
+description = "SQL Intelligence Agent for Microsoft Fabric. Extract business logic from SQL, build knowledge graphs, answer questions in plain English."
 readme = "README.md"
 requires-python = ">=3.9"
 license = {text = "MIT"}
 authors = [
-    {name = "AIVIA LLC", email = "founder@aiviaapp.com"},
+    {name = "Sunny Zheng"},
 ]
 dependencies = [
     "pyyaml==6.0.1",
@@ -35,9 +35,7 @@ fabric = [
 ]
 
 [project.urls]
-Homepage = "https://www.aiviaapp.com"
 Repository = "https://github.com/sunnyzhengai/sql-query-agent"
-Documentation = "https://www.aiviaapp.com"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

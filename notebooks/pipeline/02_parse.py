@@ -8,7 +8,7 @@ parse_results stores the full parsed output (CTEs as JSON) so
 """
 
 # %% Cell 0: Setup
-# Prerequisites: Attach 'aivia-env' Fabric Environment. DO NOT use %pip install.
+# Prerequisites: Attach 'sql-logic-env' Fabric Environment. DO NOT use %pip install.
 import json
 import sys
 import os
@@ -16,7 +16,7 @@ import os
 sys.path.insert(0, "/lakehouse/default/Files/sql-query-agent")
 
 import src
-print(f"AIVIA v{src.__version__}")
+print(f"v{src.__version__}")
 
 # Load pythonnet + ScriptDom directly (do not call load_scriptdom — it re-triggers init)
 from pythonnet import load

@@ -12,7 +12,7 @@ import sys
 
 sys.path.insert(0, "/lakehouse/default/Files/sql-query-agent")
 
-# Prerequisites: Attach 'aivia-env' Fabric Environment. No %pip install.
+# Prerequisites: Attach 'sql-logic-env' Fabric Environment. No %pip install.
 
 from src.config import load_config
 from src.extractor.connection import create_connection

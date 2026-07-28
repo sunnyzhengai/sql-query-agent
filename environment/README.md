@@ -12,7 +12,7 @@ at the workspace level before any notebook starts, eliminating this issue.
 
 1. Open your Fabric workspace
 2. Click **+ New** → **Environment**
-3. Name it: `aivia-env`
+3. Name it: `sql-logic-env`
 
 ### 2. Add Python Dependencies
 
@@ -24,7 +24,7 @@ In the Environment settings → **Public libraries**:
 ### 3. Upload Custom Library (optional)
 
 In the Environment settings → **Custom libraries**:
-1. Upload `aivia_sql_intelligence-1.1.0-py3-none-any.whl` from `dist/`
+1. Upload `sql_query_agent-1.1.0-py3-none-any.whl` from `dist/`
 2. This makes `from src.* import ...` available without `sys.path.insert`
 
 ### 4. Publish
@@ -36,7 +36,7 @@ Click **Publish** — Fabric builds the environment. Takes 2-5 minutes.
 For each notebook:
 1. Open the notebook
 2. In the toolbar, click **Environment** dropdown
-3. Select `aivia-env`
+3. Select `sql-logic-env`
 4. The notebook now uses the pre-installed packages
 
 ## Verification
@@ -57,7 +57,7 @@ print(f"pydantic={pydantic.__version__}, sqlglot={sqlglot.__version__}")
 
 ## Updating Packages
 
-When AIVIA releases a new version:
+When a new version is released:
 1. Update `requirements.txt` with new versions
 2. Build new `.whl`: `python -m build --wheel`
 3. Upload both to the Environment
