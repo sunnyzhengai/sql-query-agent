@@ -203,7 +203,7 @@ TRACKING = {
 GRAPH_CANONICAL = {
     "table_name": "graph_canonical",
     "columns": [
-        ("node_id", "string", False),
+        ("nodeId", "string", False),
         ("name", "string", False),
         ("description", "string", True),
         ("steward", "string", True),
@@ -214,66 +214,66 @@ GRAPH_CANONICAL = {
 GRAPH_TRANSFORMATION = {
     "table_name": "graph_transformation",
     "columns": [
-        ("node_id", "string", False),
+        ("nodeId", "string", False),
         ("name", "string", False),
-        ("metric_id", "string", False),
-        ("sql_fragment", "string", True),
+        ("metricId", "string", False),
+        ("sqlFragment", "string", True),
     ],
 }
 
 GRAPH_TECHNICAL = {
     "table_name": "graph_technical",
     "columns": [
-        ("node_id", "string", False),
+        ("nodeId", "string", False),
         ("name", "string", False),
         ("description", "string", True),
-        ("table_name", "string", False),
-        ("schema_name", "string", True),
-        ("database_name", "string", True),
-        ("column_name", "string", True),
+        ("tableName", "string", False),
+        ("schemaName", "string", True),
+        ("databaseName", "string", True),
+        ("columnName", "string", True),
     ],
 }
 
 GRAPH_DIMENSION = {
     "table_name": "graph_dimension",
     "columns": [
-        ("node_id", "string", False),
+        ("nodeId", "string", False),
         ("name", "string", False),
         ("description", "string", True),
-        ("table_name", "string", False),
-        ("column_name", "string", False),
+        ("tableName", "string", False),
+        ("columnName", "string", False),
     ],
 }
 
 GRAPH_EDGE_C2T = {
     "table_name": "graph_edge_c2t",
     "columns": [
-        ("source_id", "string", False),
-        ("target_id", "string", False),
+        ("sourceId", "string", False),
+        ("targetId", "string", False),
     ],
 }
 
 GRAPH_EDGE_T2T = {
     "table_name": "graph_edge_t2t",
     "columns": [
-        ("source_id", "string", False),
-        ("target_id", "string", False),
+        ("sourceId", "string", False),
+        ("targetId", "string", False),
     ],
 }
 
 GRAPH_EDGE_T2TECH = {
     "table_name": "graph_edge_t2tech",
     "columns": [
-        ("source_id", "string", False),
-        ("target_id", "string", False),
+        ("sourceId", "string", False),
+        ("targetId", "string", False),
     ],
 }
 
 GRAPH_EDGE_TECH2DIM = {
     "table_name": "graph_edge_tech2dim",
     "columns": [
-        ("source_id", "string", False),
-        ("target_id", "string", False),
+        ("sourceId", "string", False),
+        ("targetId", "string", False),
     ],
 }
 

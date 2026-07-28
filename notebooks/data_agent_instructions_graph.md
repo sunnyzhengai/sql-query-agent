@@ -31,8 +31,8 @@ Adjust your response based on who is asking:
 The graph has three layers, represented as node types:
 
 - **Canonical** nodes: Business metrics. Each has properties: `name`, `description`, `steward` (business owner), `developer` (technical owner).
-- **Transformation** nodes: SQL logic steps. Each has properties: `name`, `sql_fragment` (the SQL for that step), `metric_id` (which metric it belongs to). These show HOW a metric is calculated.
-- **Technical** nodes: Physical tables and columns from the data warehouse. Each has properties: `name`, `description` (from the data dictionary), `table_name`, `schema_name`, `column_name`.
+- **Transformation** nodes: SQL logic steps. Each has properties: `name`, `sqlFragment` (the SQL for that step), `metricId` (which metric it belongs to). These show HOW a metric is calculated.
+- **Technical** nodes: Physical tables and columns from the data warehouse. Each has properties: `name`, `description` (from the data dictionary), `tableName`, `schemaName`, `columnName`.
 
 Edges connect the layers top-down:
 - `CANONICAL_TO_TRANSFORM`: metric → its transformation steps
@@ -50,7 +50,7 @@ To trace a metric end-to-end: start at a Canonical node, follow CANONICAL_TO_TRA
    ```gql
    MATCH (c:Canonical)
    WHERE c.name CONTAINS 'keyword'
-   RETURN c.node_id, c.name, c.description, c.steward, c.developer
+   RETURN c.nodeId, c.name, c.description, c.steward, c.developer
    ```
 2. Get its calculation logic (SQL fragments) and source tables:
    ```gql
@@ -58,7 +58,7 @@ To trace a metric end-to-end: start at a Canonical node, follow CANONICAL_TO_TRA
    WHERE c.name CONTAINS 'keyword'
    OPTIONAL MATCH (t)-[:TRANSFORM_TO_TRANSFORM*0..6]->(t2:Transformation)
    OPTIONAL MATCH (t2)-[:TRANSFORM_TO_TECHNICAL]->(tech:Technical)
-   RETURN c.name, t.name AS step_name, t.sql_fragment, t2.name AS dep_name, t2.sql_fragment AS dep_fragment, tech.name AS table_name, tech.description AS table_desc
+   RETURN c.name, t.name AS stepName, t.sqlFragment, t2.name AS depName, t2.sqlFragment AS depFragment, tech.name AS tableName, tech.description AS tableDesc
    ```
 3. **For business users:** Read the sql_fragment values from each transformation step. Translate the SQL logic into plain English — describe what the metric measures, what filters it applies, and what the output represents. Do NOT show SQL or table names.
 4. **For developers:** Show the full transformation chain with sql_fragments and source tables.
@@ -69,7 +69,7 @@ To trace a metric end-to-end: start at a Canonical node, follow CANONICAL_TO_TRA
    MATCH (c:Canonical)-[:CANONICAL_TO_TRANSFORM]->(t:Transformation)
    WHERE c.name CONTAINS 'keyword'
    OPTIONAL MATCH (t)-[:TRANSFORM_TO_TRANSFORM*0..6]->(t2:Transformation)
-   RETURN t.name, t.sql_fragment, t2.name AS dep_name, t2.sql_fragment AS dep_fragment
+   RETURN t.name, t.sqlFragment, t2.name AS depName, t2.sqlFragment AS depFragment
    ```
 2. Read the WHERE clauses and JOIN conditions from the sql_fragment values
 3. **Translate each filter to business language** — describe what is being filtered, not the SQL
@@ -87,15 +87,15 @@ If steward is null, say "No steward has been assigned yet. An administrator can 
 MATCH (c:Canonical)-[:CANONICAL_TO_TRANSFORM]->(t:Transformation)-[:TRANSFORM_TO_TECHNICAL]->(tech:Technical)
 WHERE c.name CONTAINS 'keyword'
 OPTIONAL MATCH (t)-[:TRANSFORM_TO_TRANSFORM*0..6]->(t2:Transformation)-[:TRANSFORM_TO_TECHNICAL]->(tech2:Technical)
-RETURN DISTINCT tech.name AS table_name, tech.description, tech2.name AS table_name_2, tech2.description AS desc_2
+RETURN DISTINCT tech.name AS tableName, tech.description, tech2.name AS tableName2, tech2.description AS desc2
 ```
 
 ### "Which metrics use [table name]?"
 ```gql
 MATCH (c:Canonical)-[:CANONICAL_TO_TRANSFORM]->(t:Transformation)-[:TRANSFORM_TO_TECHNICAL]->(tech:Technical)
-WHERE tech.table_name CONTAINS 'TABLE_NAME'
+WHERE tech.tableName CONTAINS 'TABLE_NAME'
 OPTIONAL MATCH (t)-[:TRANSFORM_TO_TRANSFORM*0..6]->(t2:Transformation)-[:TRANSFORM_TO_TECHNICAL]->(tech2:Technical)
-WHERE tech2.table_name CONTAINS 'TABLE_NAME'
+WHERE tech2.tableName CONTAINS 'TABLE_NAME'
 RETURN DISTINCT c.name, c.steward
 ```
 
@@ -109,13 +109,13 @@ RETURN DISTINCT c.name, c.steward
 2. Also search in transformation SQL fragments:
    ```gql
    MATCH (c:Canonical)-[:CANONICAL_TO_TRANSFORM]->(t:Transformation)
-   WHERE t.sql_fragment CONTAINS 'keyword'
+   WHERE t.sqlFragment CONTAINS 'keyword'
    RETURN DISTINCT c.name, c.description
    ```
 3. And in source table names:
    ```gql
    MATCH (c:Canonical)-[:CANONICAL_TO_TRANSFORM]->(t:Transformation)-[:TRANSFORM_TO_TECHNICAL]->(tech:Technical)
-   WHERE tech.name CONTAINS 'keyword' OR tech.table_name CONTAINS 'keyword'
+   WHERE tech.name CONTAINS 'keyword' OR tech.tableName CONTAINS 'keyword'
    RETURN DISTINCT c.name, c.description
    ```
 4. Combine results and list matching metrics with a brief note on why they matched
@@ -280,7 +280,7 @@ ORDER BY c.name
 MATCH (c:Canonical)-[:CANONICAL_TO_TRANSFORM]->(t:Transformation)
 WHERE c.name CONTAINS 'keyword'
 OPTIONAL MATCH (t)-[:TRANSFORM_TO_TECHNICAL]->(tech:Technical)
-RETURN c.name, c.description, c.steward, c.developer, t.name AS step, t.sql_fragment, tech.name AS source_table, tech.description AS table_desc
+RETURN c.name, c.description, c.steward, c.developer, t.name AS step, t.sqlFragment, tech.name AS source_table, tech.description AS table_desc
 ```
 
 ### Find metrics by topic (broad search)
@@ -291,14 +291,14 @@ RETURN c.name, c.description
 ```
 ```gql
 MATCH (c:Canonical)-[:CANONICAL_TO_TRANSFORM]->(t:Transformation)
-WHERE t.sql_fragment CONTAINS 'keyword'
+WHERE t.sqlFragment CONTAINS 'keyword'
 RETURN DISTINCT c.name, c.description
 ```
 
 ### Reverse lineage — find metrics that use a table
 ```gql
 MATCH (c:Canonical)-[:CANONICAL_TO_TRANSFORM]->(t:Transformation)-[:TRANSFORM_TO_TECHNICAL]->(tech:Technical)
-WHERE tech.table_name CONTAINS 'TABLE_NAME'
+WHERE tech.tableName CONTAINS 'TABLE_NAME'
 RETURN DISTINCT c.name, c.steward
 ```
 

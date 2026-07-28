@@ -63,12 +63,12 @@ class FabricGraphBackend:
     def list_canonical_metrics(self) -> list[str]:
         """Query all canonical metric IDs from the graph."""
         result = self._client.execute(
-            "MATCH (c:Canonical) RETURN c.node_id AS node_id"
+            "MATCH (c:Canonical) RETURN c.nodeId AS nodeId"
         )
         return [
-            row["node_id"].removeprefix("canonical:")
+            row["nodeId"].removeprefix("canonical:")
             for row in result.data
-            if row.get("node_id")
+            if row.get("nodeId")
         ]
 
     def _query_canonical_and_transforms(
@@ -82,15 +82,15 @@ class FabricGraphBackend:
         """
         # Try variable-length path first
         gql = (
-            f"MATCH (c:Canonical {{node_id: '{canonical_id}'}})"
+            f"MATCH (c:Canonical {{nodeId: '{canonical_id}'}})"
             f"-[:CANONICAL_TO_TRANSFORM]->(t1:Transformation) "
             f"OPTIONAL MATCH (t1)-[:TRANSFORM_TO_TRANSFORM*0..6]->(t_deep:Transformation) "
-            f"RETURN c.node_id AS c_id, c.name AS c_name, c.description AS c_desc, "
+            f"RETURN c.nodeId AS c_id, c.name AS c_name, c.description AS c_desc, "
             f"c.steward AS c_steward, c.developer AS c_developer, "
-            f"t1.node_id AS t1_id, t1.name AS t1_name, "
-            f"t1.metric_id AS t1_metric_id, t1.sql_fragment AS t1_fragment, "
-            f"t_deep.node_id AS td_id, t_deep.name AS td_name, "
-            f"t_deep.metric_id AS td_metric_id, t_deep.sql_fragment AS td_fragment"
+            f"t1.nodeId AS t1_id, t1.name AS t1_name, "
+            f"t1.metricId AS t1_metric_id, t1.sqlFragment AS t1_fragment, "
+            f"t_deep.nodeId AS td_id, t_deep.name AS td_name, "
+            f"t_deep.metricId AS td_metric_id, t_deep.sqlFragment AS td_fragment"
         )
 
         try:
@@ -138,15 +138,15 @@ class FabricGraphBackend:
     ) -> tuple[GraphNode | None, list[GraphNode]]:
         """Explicit two-level fallback if variable-length paths aren't supported."""
         gql = (
-            f"MATCH (c:Canonical {{node_id: '{canonical_id}'}})"
+            f"MATCH (c:Canonical {{nodeId: '{canonical_id}'}})"
             f"-[:CANONICAL_TO_TRANSFORM]->(t1:Transformation) "
             f"OPTIONAL MATCH (t1)-[:TRANSFORM_TO_TRANSFORM]->(t2:Transformation) "
-            f"RETURN c.node_id AS c_id, c.name AS c_name, c.description AS c_desc, "
+            f"RETURN c.nodeId AS c_id, c.name AS c_name, c.description AS c_desc, "
             f"c.steward AS c_steward, c.developer AS c_developer, "
-            f"t1.node_id AS t1_id, t1.name AS t1_name, "
-            f"t1.metric_id AS t1_metric_id, t1.sql_fragment AS t1_fragment, "
-            f"t2.node_id AS t2_id, t2.name AS t2_name, "
-            f"t2.metric_id AS t2_metric_id, t2.sql_fragment AS t2_fragment"
+            f"t1.nodeId AS t1_id, t1.name AS t1_name, "
+            f"t1.metricId AS t1_metric_id, t1.sqlFragment AS t1_fragment, "
+            f"t2.nodeId AS t2_id, t2.name AS t2_name, "
+            f"t2.metricId AS t2_metric_id, t2.sqlFragment AS t2_fragment"
         )
 
         result = self._client.execute(gql)
@@ -187,17 +187,17 @@ class FabricGraphBackend:
         id_list = ", ".join(f"'{tid}'" for tid in transform_ids)
         gql = (
             f"MATCH (t:Transformation)-[:TRANSFORM_TO_TECHNICAL]->(tech:Technical) "
-            f"WHERE t.node_id IN [{id_list}] "
-            f"RETURN DISTINCT tech.node_id AS node_id, tech.name AS name, "
-            f"tech.description AS description, tech.table_name AS table_name, "
-            f"tech.schema_name AS schema_name, tech.database_name AS database_name, "
-            f"tech.column_name AS column_name"
+            f"WHERE t.nodeId IN [{id_list}] "
+            f"RETURN DISTINCT tech.nodeId AS nodeId, tech.name AS name, "
+            f"tech.description AS description, tech.tableName AS tableName, "
+            f"tech.schemaName AS schemaName, tech.databaseName AS databaseName, "
+            f"tech.columnName AS columnName"
         )
 
         result = self._client.execute(gql)
         nodes: dict[str, GraphNode] = {}
         for row in result.data:
-            nid = row.get("node_id")
+            nid = row.get("nodeId")
             if nid and nid not in nodes:
                 nodes[nid] = GraphNode(
                     node_id=nid,
@@ -205,10 +205,10 @@ class FabricGraphBackend:
                     name=row.get("name", ""),
                     description=row.get("description", ""),
                     properties={
-                        "table": row.get("table_name", ""),
-                        "schema": row.get("schema_name", ""),
-                        "database": row.get("database_name") or None,
-                        "column": row.get("column_name") or None,
+                        "table": row.get("tableName", ""),
+                        "schema": row.get("schemaName", ""),
+                        "database": row.get("databaseName") or None,
+                        "column": row.get("columnName") or None,
                     },
                 )
 
@@ -219,16 +219,16 @@ class FabricGraphBackend:
         id_list = ", ".join(f"'{tid}'" for tid in tech_ids)
         gql = (
             f"MATCH (tech:Technical)-[:TECHNICAL_TO_DIMENSION]->(d:Dimension) "
-            f"WHERE tech.node_id IN [{id_list}] "
-            f"RETURN DISTINCT d.node_id AS node_id, d.name AS name, "
-            f"d.description AS description, d.table_name AS table_name, "
-            f"d.column_name AS column_name"
+            f"WHERE tech.nodeId IN [{id_list}] "
+            f"RETURN DISTINCT d.nodeId AS nodeId, d.name AS name, "
+            f"d.description AS description, d.tableName AS tableName, "
+            f"d.columnName AS columnName"
         )
 
         result = self._client.execute(gql)
         nodes: dict[str, GraphNode] = {}
         for row in result.data:
-            nid = row.get("node_id")
+            nid = row.get("nodeId")
             if nid and nid not in nodes:
                 nodes[nid] = GraphNode(
                     node_id=nid,
@@ -236,8 +236,8 @@ class FabricGraphBackend:
                     name=row.get("name", ""),
                     description=row.get("description", ""),
                     properties={
-                        "table": row.get("table_name", ""),
-                        "column": row.get("column_name", ""),
+                        "table": row.get("tableName", ""),
+                        "column": row.get("columnName", ""),
                     },
                 )
 

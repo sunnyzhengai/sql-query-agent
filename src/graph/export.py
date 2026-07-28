@@ -30,7 +30,7 @@ def export_node_tables(nodes: dict[str, GraphNode]) -> dict[str, list[dict]]:
     for node in nodes.values():
         if node.layer == NodeLayer.CANONICAL:
             canonical.append({
-                "node_id": node.node_id,
+                "nodeId": node.node_id,
                 "name": node.name,
                 "description": node.description,
                 "steward": node.properties.get("steward", ""),
@@ -38,28 +38,28 @@ def export_node_tables(nodes: dict[str, GraphNode]) -> dict[str, list[dict]]:
             })
         elif node.layer == NodeLayer.TRANSFORMATION:
             transformation.append({
-                "node_id": node.node_id,
+                "nodeId": node.node_id,
                 "name": node.name,
-                "metric_id": node.properties.get("metric_id", ""),
-                "sql_fragment": node.properties.get("sql_fragment", ""),
+                "metricId": node.properties.get("metric_id", ""),
+                "sqlFragment": node.properties.get("sql_fragment", ""),
             })
         elif node.layer == NodeLayer.TECHNICAL:
             technical.append({
-                "node_id": node.node_id,
+                "nodeId": node.node_id,
                 "name": node.name,
                 "description": node.description,
-                "table_name": node.properties.get("table", ""),
-                "schema_name": node.properties.get("schema", ""),
-                "database_name": node.properties.get("database") or "",
-                "column_name": node.properties.get("column") or "",
+                "tableName": node.properties.get("table", ""),
+                "schemaName": node.properties.get("schema", ""),
+                "databaseName": node.properties.get("database") or "",
+                "columnName": node.properties.get("column") or "",
             })
         elif node.layer == NodeLayer.DIMENSION:
             dimension.append({
-                "node_id": node.node_id,
+                "nodeId": node.node_id,
                 "name": node.name,
                 "description": node.description,
-                "table_name": node.properties.get("table", ""),
-                "column_name": node.properties.get("column", ""),
+                "tableName": node.properties.get("table", ""),
+                "columnName": node.properties.get("column", ""),
             })
 
     return {
@@ -93,8 +93,8 @@ def export_edge_tables(edges: list[GraphEdge]) -> dict[str, list[dict]]:
     for edge in edges:
         table_name = table_map[edge.edge_type]
         result[table_name].append({
-            "source_id": edge.source_id,
-            "target_id": edge.target_id,
+            "sourceId": edge.source_id,
+            "targetId": edge.target_id,
         })
 
     return result

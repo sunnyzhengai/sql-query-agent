@@ -61,6 +61,8 @@ def build_er_los_mock() -> MockGQLClient:
                 {"name": "td_metric_id", "gqlType": "STRING"},
                 {"name": "td_fragment", "gqlType": "STRING"},
             ],
+            # Note: response aliases (c_id, t1_id, etc.) are set by our GQL queries,
+            # not by the column names in the source tables. No camelCase change needed here.
             data=[
                 {
                     "c_id": "canonical:ER_LOS",
@@ -94,32 +96,32 @@ def build_er_los_mock() -> MockGQLClient:
         # Query 2: Technical nodes from transforms
         "TRANSFORM_TO_TECHNICAL": GQLResult(
             columns=[
-                {"name": "node_id", "gqlType": "STRING"},
+                {"name": "nodeId", "gqlType": "STRING"},
                 {"name": "name", "gqlType": "STRING"},
                 {"name": "description", "gqlType": "STRING"},
-                {"name": "table_name", "gqlType": "STRING"},
-                {"name": "schema_name", "gqlType": "STRING"},
-                {"name": "database_name", "gqlType": "STRING"},
-                {"name": "column_name", "gqlType": "STRING"},
+                {"name": "tableName", "gqlType": "STRING"},
+                {"name": "schemaName", "gqlType": "STRING"},
+                {"name": "databaseName", "gqlType": "STRING"},
+                {"name": "columnName", "gqlType": "STRING"},
             ],
             data=[
                 {
-                    "node_id": "tech:dbo.encounter",
+                    "nodeId": "tech:dbo.encounter",
                     "name": "encounter",
                     "description": "Patient encounter/visit records",
-                    "table_name": "encounter",
-                    "schema_name": "dbo",
-                    "database_name": "",
-                    "column_name": "",
+                    "tableName": "encounter",
+                    "schemaName": "dbo",
+                    "databaseName": "",
+                    "columnName": "",
                 },
                 {
-                    "node_id": "tech:dbo.department",
+                    "nodeId": "tech:dbo.department",
                     "name": "department",
                     "description": "Hospital departments and units",
-                    "table_name": "department",
-                    "schema_name": "dbo",
-                    "database_name": "",
-                    "column_name": "",
+                    "tableName": "department",
+                    "schemaName": "dbo",
+                    "databaseName": "",
+                    "columnName": "",
                 },
             ],
             status_code="00000",
@@ -128,11 +130,11 @@ def build_er_los_mock() -> MockGQLClient:
         # Query 3: Dimension nodes (none for ER_LOS sample)
         "TECHNICAL_TO_DIMENSION": GQLResult(
             columns=[
-                {"name": "node_id", "gqlType": "STRING"},
+                {"name": "nodeId", "gqlType": "STRING"},
                 {"name": "name", "gqlType": "STRING"},
                 {"name": "description", "gqlType": "STRING"},
-                {"name": "table_name", "gqlType": "STRING"},
-                {"name": "column_name", "gqlType": "STRING"},
+                {"name": "tableName", "gqlType": "STRING"},
+                {"name": "columnName", "gqlType": "STRING"},
             ],
             data=[],
             status_code="00000",
@@ -140,8 +142,8 @@ def build_er_los_mock() -> MockGQLClient:
 
         # list_canonical_metrics
         "MATCH (c:Canonical)": GQLResult(
-            columns=[{"name": "node_id", "gqlType": "STRING"}],
-            data=[{"node_id": "canonical:ER_LOS"}],
+            columns=[{"name": "nodeId", "gqlType": "STRING"}],
+            data=[{"nodeId": "canonical:ER_LOS"}],
             status_code="00000",
         ),
     }
