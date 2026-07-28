@@ -74,6 +74,12 @@ class AdaptersConfig(BaseModel):
     collibra: Optional[CollibraAdapterConfig] = None
 
 
+class FabricGraphConfig(BaseModel):
+    workspace_id: str
+    graph_model_id: str
+    enabled: bool = False  # opt-in during parallel testing
+
+
 class OrgConfig(BaseModel):
     name: str
 
@@ -85,6 +91,7 @@ class Config(BaseModel):
     metrics: MetricsConfig
     extractor: Optional[ExtractorConfig] = None
     adapters: Optional[AdaptersConfig] = None
+    fabric_graph: Optional[FabricGraphConfig] = None
 
 
 def load_config(path: Path | str | None = None) -> Config:

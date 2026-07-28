@@ -43,6 +43,12 @@ metrics:
 #     object_types: ["VIEW"]
 #   tracking_table: "extraction_tracking"
 
+# Fabric Graph (optional — enable to use native graph backend alongside Delta)
+# fabric_graph:
+#   workspace_id: "your-workspace-id"
+#   graph_model_id: "your-graph-model-id"
+#   enabled: false  # set to true after creating the Graph Model in Fabric UI
+
 # Catalog adapters (optional — enable one or both to publish metadata)
 # adapters:
 #   purview:

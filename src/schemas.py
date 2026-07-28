@@ -197,6 +197,86 @@ TRACKING = {
     ],
 }
 
+# --- Fabric Graph typed source tables ---
+# One table per node/edge type with flattened columns for Graph Model ingestion.
+
+GRAPH_CANONICAL = {
+    "table_name": "graph_canonical",
+    "columns": [
+        ("node_id", "string", False),
+        ("name", "string", False),
+        ("description", "string", True),
+        ("steward", "string", True),
+        ("developer", "string", True),
+    ],
+}
+
+GRAPH_TRANSFORMATION = {
+    "table_name": "graph_transformation",
+    "columns": [
+        ("node_id", "string", False),
+        ("name", "string", False),
+        ("metric_id", "string", False),
+        ("sql_fragment", "string", True),
+    ],
+}
+
+GRAPH_TECHNICAL = {
+    "table_name": "graph_technical",
+    "columns": [
+        ("node_id", "string", False),
+        ("name", "string", False),
+        ("description", "string", True),
+        ("table_name", "string", False),
+        ("schema_name", "string", True),
+        ("database_name", "string", True),
+        ("column_name", "string", True),
+    ],
+}
+
+GRAPH_DIMENSION = {
+    "table_name": "graph_dimension",
+    "columns": [
+        ("node_id", "string", False),
+        ("name", "string", False),
+        ("description", "string", True),
+        ("table_name", "string", False),
+        ("column_name", "string", False),
+    ],
+}
+
+GRAPH_EDGE_C2T = {
+    "table_name": "graph_edge_c2t",
+    "columns": [
+        ("source_id", "string", False),
+        ("target_id", "string", False),
+    ],
+}
+
+GRAPH_EDGE_T2T = {
+    "table_name": "graph_edge_t2t",
+    "columns": [
+        ("source_id", "string", False),
+        ("target_id", "string", False),
+    ],
+}
+
+GRAPH_EDGE_T2TECH = {
+    "table_name": "graph_edge_t2tech",
+    "columns": [
+        ("source_id", "string", False),
+        ("target_id", "string", False),
+    ],
+}
+
+GRAPH_EDGE_TECH2DIM = {
+    "table_name": "graph_edge_tech2dim",
+    "columns": [
+        ("source_id", "string", False),
+        ("target_id", "string", False),
+    ],
+}
+
 # Registry of all tables — use for validation and health checks
 TABLE_REGISTRY = {
     s["table_name"]: s
@@ -205,6 +285,8 @@ TABLE_REGISTRY = {
         PARSE_ERRORS, PARSE_SUCCESSES, BUILD_SUMMARY,
         EXTRACTION_INSPECTION, ERROR_LOG, PIPELINE_VALIDATION,
         STEWARD_ASSIGNMENTS, SYNC_LOG, TRACKING, INSTALLATION_ERRORS,
+        GRAPH_CANONICAL, GRAPH_TRANSFORMATION, GRAPH_TECHNICAL, GRAPH_DIMENSION,
+        GRAPH_EDGE_C2T, GRAPH_EDGE_T2T, GRAPH_EDGE_T2TECH, GRAPH_EDGE_TECH2DIM,
     ]
 }
 
