@@ -182,7 +182,16 @@ class CollibraClient:
         print(f"   Found: {sample['name']} (ID: {sample['id']})")
         print(f"   Type: {sample['type']['name']} (ID: {sample['type']['id']})")
         if sample.get("domain"):
-            print(f"   Domain: {sample['domain'].get('name', 'N/A')}")
+            domain_id = sample["domain"].get("id", "N/A")
+            domain_name = sample["domain"].get("name", "N/A")
+            print(f"   Domain: {domain_name} (ID: {domain_id})")
+            # Look up community from domain
+            try:
+                domain_info = self._get(f"domains/{domain_id}")
+                community = domain_info.get("community", {})
+                print(f"   Community: {community.get('name', 'N/A')} (ID: {community.get('id', 'N/A')})")
+            except Exception:
+                print("   Community: could not resolve from domain")
 
         # 5. List relations on this asset
         print(f"\n5. Relations for '{sample['name']}':")
