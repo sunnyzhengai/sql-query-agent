@@ -196,12 +196,11 @@ class FabricAgentClient:
         and produce structured, criteria-focused output.
         """
         question = (
-            f"For the report {metric_name}, describe: "
-            f"1) What does this report measure or produce? "
-            f"2) What filters, criteria, and business rules does it apply? "
-            f"Write in plain business English. No greetings, no preamble, no headers, "
-            f"no markdown formatting. Do not start with 'Here is' or 'This metric'. "
-            f"Start directly with what the report does."
+            f"For the report {metric_name}: "
+            f"What does it produce and what key filters or criteria does it apply? "
+            f"Answer in one paragraph, maximum 100 words. "
+            f"Plain business English. No bullet points, no headers, no markdown, "
+            f"no greetings, no preamble. Start directly with what the report does."
         )
         return self.query(question)
 
