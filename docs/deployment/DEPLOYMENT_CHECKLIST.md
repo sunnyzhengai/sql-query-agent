@@ -8,16 +8,28 @@
 
 ---
 
+## Architecture Decisions (Finalized)
+
+| Decision | Choice | Rationale |
+|---|---|---|
+| Storage layer | Both Delta + LPG | Build both; ship Delta for Data Agent, LPG tables populated for future self-service report generation |
+| Data Agent grounding | `metric_logic` (Delta flat table) | Simpler, proven, no Graph Model setup for customer |
+| LPG tables | Exported automatically by pipeline | 8 typed tables populated silently — no customer action |
+| Data dictionary | **Mandatory** | Without it, agent gives incomplete/misleading answers |
+| Collibra integration | Optional add-on (Phase 7) | For customers with Collibra — publishes AI-generated descriptions to PBI report assets |
+
+---
+
 ## Pre-Deployment: What We Ship vs. What Customer Provides
 
 ### We Ship (packaged, no customer action)
 
 - [ ] `src/` — Core Python library (parser, graph builder, traversal, adapters)
-- [ ] Pipeline notebooks (01-06) — pre-configured, numbered for run order
+- [ ] Pipeline notebooks (01-07) — pre-configured, numbered for run order
 - [ ] `libs/` — ScriptDom DLL (Microsoft.SqlServer.TransactSql.ScriptDom.dll)
 - [ ] `environment/requirements.txt` — pinned dependency list for Fabric Environment
 - [ ] `config/org_config.yaml` — pre-filled with defaults, customer overrides org name only
-- [ ] Data Agent instructions — baked into setup, not a separate copy-paste step
+- [ ] Data Agent instructions — shipped with product, customer does not modify
 - [ ] `installation_errors` knowledge base — pre-seeded error signatures for `/troubleshoot`
 - [ ] This checklist and the Data Dictionary Requirements doc
 
@@ -25,8 +37,9 @@
 
 - [ ] Fabric workspace with F2+ capacity
 - [ ] SQL files (.sql) — stored procedures and/or views from their data warehouse
-- [ ] Data dictionary CSVs — `dict_tables.csv` and `dict_columns.csv` (see DATA_DICTIONARY_REQUIREMENTS.md)
+- [ ] Data dictionary CSVs — `dict_tables.csv` and `dict_columns.csv` (**mandatory** — see DATA_DICTIONARY_REQUIREMENTS.md)
 - [ ] Contributor-level workspace access for the deployment account
+- [ ] *(Optional, Phase 7)* Collibra API credentials and domain ID
 
 ---
 
@@ -63,7 +76,7 @@ Upload the product package to `Files/sql-query-agent/`:
 Demo_Lakehouse/Files/
 └── sql-query-agent/
     ├── src/                    ← Core library (all .py files)
-    ├── notebooks/pipeline/     ← Pipeline notebooks (01-06)
+    ├── notebooks/pipeline/     ← Pipeline notebooks (01-07)
     ├── libs/                   ← ScriptDom DLL
     ├── config/                 ← org_config.yaml
     └── dictionary/             ← (empty — customer fills this)
@@ -72,7 +85,7 @@ Demo_Lakehouse/Files/
 - [ ] `src/` uploaded with all subpackages (parser/, graph/, extractor/, adapters/, governance/)
 - [ ] `libs/Microsoft.SqlServer.TransactSql.ScriptDom.dll` uploaded (from NuGet, netstandard2.0)
 - [ ] `config/org_config.yaml` uploaded with defaults
-- [ ] Verify: File count matches expected (`src/` = ~30 files, `notebooks/` = 6 files)
+- [ ] Verify: File count matches expected (`src/` = ~30 files, `notebooks/` = 7 files)
 
 ### 1.4 Import Notebooks
 
@@ -106,7 +119,7 @@ Demo_Lakehouse/Files/
 - [ ] Files are T-SQL stored procedures or views with CREATE/ALTER PROCEDURE|VIEW statements
 - [ ] Verify: At least 1 file is present
 
-### 2.2 Upload Data Dictionary
+### 2.2 Upload Data Dictionary (Mandatory)
 
 Customer uploads their dictionary CSVs to:
 
@@ -123,6 +136,7 @@ Demo_Lakehouse/Files/
 - [ ] Both files are UTF-8 encoded
 - [ ] TABLE_NAME values match table names in the SQL files (case-sensitive)
 - [ ] Verify: Open each CSV in the Lakehouse file browser, confirm headers are correct
+- [ ] Refer customer to DATA_DICTIONARY_REQUIREMENTS.md for format details and extraction queries
 
 ### 2.3 Configure org_config.yaml
 
@@ -155,9 +169,18 @@ This notebook does everything:
   - `parse_results` — parsed CTE/table/column extractions
   - `parse_errors` — failed parses with explanations
   - `parse_successes` — successful parse summaries
-  - `graph_nodes` — knowledge graph nodes (or typed LPG tables — TBD)
-  - `graph_edges` — knowledge graph edges (or typed LPG tables — TBD)
+  - `graph_nodes` — knowledge graph nodes
+  - `graph_edges` — knowledge graph edges
+  - `graph_canonical` — LPG: canonical metric nodes
+  - `graph_transformation` — LPG: transformation nodes
+  - `graph_technical` — LPG: technical table/column nodes
+  - `graph_dimension` — LPG: dimension nodes
+  - `graph_edge_c2t` — LPG: canonical-to-transform edges
+  - `graph_edge_t2t` — LPG: transform-to-transform edges
+  - `graph_edge_t2tech` — LPG: transform-to-technical edges
+  - `graph_edge_tech2dim` — LPG: technical-to-dimension edges
   - `metric_logic` — flattened view for Data Agent
+  - `agent_descriptions` — AI-generated descriptions (for Collibra publish)
   - `pipeline_validation` — per-metric health check
   - `build_summary` — pipeline run history
   - `installation_errors` — known error signatures
@@ -197,9 +220,9 @@ Run in order:
 2. [ ] `03_build_graph` — builds knowledge graph from parse results + dictionary
    - Verify: `graph_nodes` and `graph_edges` have rows
 3. [ ] `04_build_metric_logic` — flattens graph for Data Agent
-   - Verify: `metric_logic` has rows with calculation_logic and source_tables populated
-4. [ ] **(If LPG) `05_export_graph_tables`** — exports typed tables for Graph Model
-   - Verify: 8 graph tables have rows
+   - Verify: `metric_logic` has rows with `calculation_logic` and `source_tables` populated
+4. [ ] `05_export_graph_tables` — exports typed tables for LPG (automatic, no config needed)
+   - Verify: 8 graph tables have rows (4 node tables, 4 edge tables)
 5. [ ] `06_validate` — validates pipeline health
    - Verify: `pipeline_validation` shows coverage percentages
 
@@ -228,11 +251,11 @@ After pipeline completes, verify in `06_validate` output:
 
 ### 5.2 Configure Agent Instructions
 
-- [ ] Paste agent instructions (from `notebooks/data_agent_instructions.md` or generated by setup)
+- [ ] Paste agent instructions (shipped with product in `notebooks/data_agent_instructions.md`)
 - [ ] Verify instructions include:
   - [ ] Rule: "ALWAYS query the data" (never hardcode answers)
-  - [ ] Rule: PHI protection (#7)
-  - [ ] Rule: Broad search (#8)
+  - [ ] Rule: PHI protection
+  - [ ] Rule: Broad search (case-insensitive, partial match)
   - [ ] Commands: `/errors`, `/coverage`, `/troubleshoot`
   - [ ] No metric-specific examples (teaches HOW to query, not specific answers)
 
@@ -254,42 +277,124 @@ Run the golden path test scenarios:
 
 ---
 
-## Phase 6: Graph Backend (TBD — pending LPG validation)
+## Phase 6: Graph Export (Automatic)
 
-> **This section will be filled in after the LPG vs. Delta decision is made.**
+**Goal:** LPG tables are populated for future use. No customer action required.
 
-### If Delta Only (current)
-- [ ] No additional steps — metric_logic table is the agent's data source
+The pipeline step `05_export_graph_tables` automatically populates 8 typed Delta tables from the knowledge graph. These tables are structured for future Fabric Graph Model ingestion when the self-service report generation feature is released.
 
-### If LPG (Fabric Graph)
-- [ ] Create Graph Model in Fabric workspace
-- [ ] Map 8 source tables to node/edge types in Graph Model editor
-- [ ] Configure FabricGraphBackend connection in org_config.yaml
-- [ ] Run comparison script to validate LPG matches Delta results
-- [ ] Switch Data Agent to use Graph-backed traversal
+**Tables created:**
+
+| Table | Contents |
+|---|---|
+| `graph_canonical` | Business metric nodes (name, description, steward) |
+| `graph_transformation` | SQL transformation nodes (metric_id, sql_fragment) |
+| `graph_technical` | Source table/column nodes (schema, database, description) |
+| `graph_dimension` | Dimension nodes (table, column, description) |
+| `graph_edge_c2t` | Canonical → Transformation edges |
+| `graph_edge_t2t` | Transformation → Transformation edges |
+| `graph_edge_t2tech` | Transformation → Technical edges |
+| `graph_edge_tech2dim` | Technical → Dimension edges |
+
+- [ ] Verify: All 8 tables exist and have rows after pipeline run
+- [ ] No customer configuration needed — this is fully automated
 
 ---
 
-## Phase 7: Handoff & Validation
+## Phase 7: Collibra Integration (Optional)
+
+**Goal:** AI-generated report descriptions published to Collibra PBI report assets.
+
+> **Skip this phase** if the customer does not use Collibra. This is a premium add-on feature.
+
+### Prerequisites
+
+- [ ] Phases 1-5 are complete and Data Agent is working
+- [ ] Customer has Collibra with Power BI integration (reports ingested as assets)
+- [ ] Customer's SQL procs/views follow the `_PBI` naming convention (procs that feed Power BI end in `_PBI`)
+- [ ] Customer provides Collibra API credentials (API key or username/password)
+- [ ] Customer provides Collibra domain ID and community ID
+
+### 7.1 Configure Collibra in org_config.yaml
+
+```yaml
+adapters:
+  collibra:
+    base_url: "https://customer-org.collibra.com/rest/2.0"
+    api_key: "their-api-key"        # or use username/password
+    domain_id: "their-domain-id"
+    community_id: "their-community-id"
+
+fabric_graph:
+  workspace_id: "their-workspace-id"
+  data_agent_id: "their-agent-id"
+```
+
+- [ ] Collibra base URL is correct and accessible
+- [ ] API credentials have write access to the target domain
+- [ ] Fabric workspace and Data Agent IDs are set
+
+### 7.2 Run Discovery (Optional — First-Time Only)
+
+Run `notebooks/utilities/collibra_discovery.py` to verify Collibra connectivity:
+
+- [ ] Successfully connects to Collibra API
+- [ ] Finds PBI Report assets in the target domain
+- [ ] Shows asset type IDs and relation types
+
+### 7.3 Run `07_publish_collibra` Notebook
+
+This notebook orchestrates the full flow:
+
+1. **Loads knowledge graph** from Delta tables
+2. **Identifies `_PBI` metrics** — filters canonical nodes with `_PBI` suffix
+3. **Generates descriptions** via Data Agent — sends each metric to the agent, which translates SQL logic into business language. Descriptions are persisted to `agent_descriptions` Delta table.
+4. **Matches to Collibra** — fuzzy-matches metric names to PBI Report assets in Collibra
+5. **Review step** — prints matched and unmatched items for human review before publishing
+6. **Publishes** — writes AI-generated descriptions to Collibra Report assets' Description attribute
+7. **Summary** — prints counts (total, matched, published, failed, unmatched)
+
+### 7.4 Verify Results
+
+- [ ] Review the match summary — confirm matches are correct before publishing
+- [ ] After publish: check 2-3 reports in Collibra UI to verify descriptions appeared
+- [ ] Verify descriptions are accurate (correct SQL logic translation, no hallucinations)
+- [ ] Check for unmatched reports — may need manual review or naming convention adjustment
+
+### 7.5 Collibra Troubleshooting
+
+| Symptom | Likely cause | Fix |
+|---|---|---|
+| 0 matches found | Procs don't follow `_PBI` naming convention | Rename procs or adjust match threshold |
+| 401/403 from Collibra API | API key lacks write permissions | Get write access to the target domain |
+| Description is wrong/hallucinated | Agent instructions need tuning | Review and update agent persona instructions |
+| Report matched to wrong proc | Fuzzy match scored wrong candidate | Review matches in step 5, exclude false matches |
+| "Asset not found" on publish | Report name in Collibra doesn't match expected format | Run discovery notebook, check exact asset names |
+
+---
+
+## Phase 8: Handoff & Validation
 
 **Goal:** Customer is self-sufficient.
 
-### 7.1 Documentation Handoff
+### 8.1 Documentation Handoff
 
-- [ ] DATA_DICTIONARY_REQUIREMENTS.md — how to update their dictionary
+- [ ] DATA_DICTIONARY_REQUIREMENTS.md — how to prepare and update their dictionary
 - [ ] REVIEWER_GUIDE.md — how to use the agent (test scenarios)
 - [ ] DEPLOYMENT_GUIDE.md — how to re-run the pipeline after SQL changes
 
-### 7.2 Final Validation
+### 8.2 Final Validation
 
 - [ ] Customer can independently ask the agent a question and get a correct answer
 - [ ] Customer knows how to re-run the pipeline when they update SQL files
-- [ ] Customer knows how to update the data dictionary
+- [ ] Customer knows how to update the data dictionary when tables change
 - [ ] `/troubleshoot` command works and returns relevant help for common errors
+- [ ] *(If Collibra)* Customer can re-run `07_publish_collibra` after pipeline updates
 
-### 7.3 Sign-Off
+### 8.3 Sign-Off
 
-- [ ] All Phase 1-6 checkboxes are checked
+- [ ] All required phase checkboxes are checked (Phases 1-6, Phase 8)
+- [ ] Optional phases (7) completed if applicable
 - [ ] Customer confirms agent answers are accurate for their domain
 - [ ] No open issues or workarounds documented
 
@@ -305,18 +410,22 @@ Run the golden path test scenarios:
 | pythonnet initialization fails | `%pip install` was used in a notebook | Remove %pip, use Fabric Environment only |
 | Agent gives wrong table names | Dictionary TABLE_NAME doesn't match SQL | Fix casing in dict_tables.csv |
 | Pipeline runs but metric_logic is empty | No parse_results (parse step failed) | Check parse_errors, run 02_parse with verbose |
+| Collibra publish fails | API credentials or permissions | Verify with collibra_discovery notebook |
+| Agent description is wrong | Agent instructions need tuning | Update data_agent_instructions.md, re-run 07 |
 
 ---
 
 ## Timing Estimates
 
-| Phase | Duration | Who |
-|---|---|---|
-| 1. Environment Setup | 10-15 min | Deployment team |
-| 2. Customer Data Loading | 5-10 min | Customer (with guidance) |
-| 3. Setup Notebook | 2-3 min | Automated |
-| 4. Run Pipeline | 1-5 min | Automated |
-| 5. Data Agent Config | 5-10 min | Deployment team |
-| 6. Graph Backend | TBD | TBD |
-| 7. Handoff | 15-20 min | Deployment team + customer |
-| **Total** | **~45-60 min** | |
+| Phase | Duration | Who | Required? |
+|---|---|---|---|
+| 1. Environment Setup | 10-15 min | Deployment team | Yes |
+| 2. Customer Data Loading | 5-10 min | Customer (with guidance) | Yes |
+| 3. Setup Notebook | 2-3 min | Automated | Yes |
+| 4. Run Pipeline | 1-5 min | Automated | Yes |
+| 5. Data Agent Config | 5-10 min | Deployment team | Yes |
+| 6. Graph Export | Automatic | Automated (part of pipeline) | Yes (no action) |
+| 7. Collibra Integration | 15-30 min | Deployment team + customer | Optional |
+| 8. Handoff | 15-20 min | Deployment team + customer | Yes |
+| **Total (without Collibra)** | **~40-60 min** | | |
+| **Total (with Collibra)** | **~60-90 min** | | |
