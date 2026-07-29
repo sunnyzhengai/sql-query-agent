@@ -97,10 +97,15 @@ succeeded = sum(1 for r in agent_results.values() if r.status == "success")
 failed = sum(1 for r in agent_results.values() if r.status == "failed")
 print(f"\nGenerated {succeeded} descriptions ({failed} failed)")
 
-# Build description lookup
+# Build description lookup — filter out non-answers
+REJECT_PHRASES = ["wasn't able to find", "couldn't find", "not found", "hasn't been", "I'm happy to help"]
+
 desc_lookup = {}
 for name, resp in agent_results.items():
     if resp.status == "success" and resp.answer:
+        if any(phrase in resp.answer.lower() for phrase in REJECT_PHRASES):
+            print(f"  REJECTED {name} — agent returned a non-answer")
+            continue
         desc_lookup[name] = resp.answer
 
 # Show samples
