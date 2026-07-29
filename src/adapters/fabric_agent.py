@@ -196,9 +196,9 @@ class FabricAgentClient:
         and produce structured, criteria-focused output.
         """
         question = (
-            f"How is {metric_name} calculated? "
-            f"What filters and criteria does it apply? "
-            f"What tables does it use and what does the output represent?"
+            f"Write a concise, formal catalog description for the report {metric_name}. "
+            f"State its purpose, key data sources, filters/criteria applied, and output in 2-4 sentences. "
+            f"Do not use conversational language, greetings, or preamble. Start directly with the description."
         )
         return self.query(question)
 
