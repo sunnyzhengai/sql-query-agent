@@ -203,6 +203,10 @@ class FabricAgentClient:
             f"Then a blank line, then 'Filtered by:' followed by a bulleted list "
             f"of the key filters, criteria, and business rules the report applies "
             f"(e.g., diagnosis codes, date ranges, patient populations, encounter types).\n"
+            f"If the report uses CTEs or subqueries to build intermediate cohorts, "
+            f"add a blank line then 'Data flow:' followed by a bulleted list describing "
+            f"each cohort or step and what it produces (e.g., 'Stroke cohort — identifies "
+            f"patients with qualifying ICD-10 codes and earliest diagnosis date').\n"
             f"No greetings, no preamble, no markdown headers, no bold text. "
             f"Start directly with the purpose sentence."
         )
