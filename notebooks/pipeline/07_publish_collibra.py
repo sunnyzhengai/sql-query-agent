@@ -140,16 +140,23 @@ if match_result.unmatched_objects:
         print(f"  {name}  (key: '{extract_match_key(name)}')")
 
 # %% Cell 6: Publish descriptions to Collibra
-# Uncomment the lines below to actually write. Review cell 5 output first!
+# Review cell 5 output first!
+# To publish only specific reports, add names to PUBLISH_ONLY.
+# Leave empty [] to publish all matched reports.
+
+PUBLISH_ONLY = []  # e.g., ["CCHP Executive Dashboard", "Another Report"]
 
 publish_results = []
 for m in match_result.matched:
+    # Filter to specific reports if set
+    if PUBLISH_ONLY and not any(name.lower() in m.report_name.lower() for name in PUBLISH_ONLY):
+        continue
+
     desc = desc_lookup.get(m.object_name, "")
     if not desc:
         print(f"  SKIP {m.object_name} — no description generated")
         continue
 
-    # Use the Collibra asset ID directly (already resolved by matcher)
     result = adapter.update_description(
         asset_name=m.report_name,
         description=desc,
