@@ -4,9 +4,10 @@ Reads from: graph_nodes, graph_edges (Delta tables)
 Writes to:  Collibra Dev (REST API)
 
 Wires together:
-1. Graph traversal → generates descriptions from source tables + transform steps
-2. Lineage matching → maps _PBI procs/views to Collibra PBI report assets
-3. Collibra adapter → updates Description attribute on matched reports
+1. Graph traversal → identifies _PBI metrics and their graph context
+2. Fabric Data Agent → generates business descriptions from SQL logic
+3. Lineage matching → maps _PBI procs/views to Collibra PBI report assets
+4. Collibra adapter → updates Description attribute on matched reports
 
 Run 03_build_graph.py at least once before this.
 """
@@ -22,6 +23,10 @@ print(f"v{src.__version__}")
 from src.config import load_config
 
 config = load_config("/lakehouse/default/Files/sql-query-agent/org_config.yaml")
+
+# Data Agent config — find agent_id in the Fabric portal URL when viewing your agent
+AGENT_ID = ""  # TODO: fill in your Data Agent ID
+WORKSPACE_ID = config.fabric_graph.workspace_id  # reuse from config
 
 # %% Cell 1: Load graph from Delta
 from src.models import GraphNode, NodeLayer, GraphEdge, EdgeType
@@ -54,32 +59,60 @@ for row in edges_df.collect():
 
 print(f"Loaded {len(nodes)} nodes, {len(edges)} edges from Delta")
 
-# %% Cell 2: Generate descriptions from graph
-from src.graph.builder import GraphBuilder
-from src.graph.traversal import GraphTraverser
-from src.adapters.metadata_generator import generate_metric_records
+# %% Cell 2: Identify _PBI metrics
+from src.adapters.collibra_lineage_match import extract_match_key
 
-# Reconstruct builder from loaded data
-builder = GraphBuilder()
-builder.nodes = nodes
-builder.edges = edges
+# Find canonical nodes with _PBI suffix
+pbi_metrics = []
+for node in nodes.values():
+    if node.layer == NodeLayer.CANONICAL and extract_match_key(node.name) is not None:
+        pbi_metrics.append(node)
 
-records = generate_metric_records(builder)
-print(f"Generated {len(records)} metric records with descriptions")
+print(f"Found {len(pbi_metrics)} _PBI-suffixed canonical metrics")
+for m in pbi_metrics[:5]:
+    print(f"  {m.name} (key: '{extract_match_key(m.name)}')")
+if len(pbi_metrics) > 5:
+    print(f"  ... and {len(pbi_metrics) - 5} more")
 
-# Show a sample
-for r in records[:3]:
-    print(f"\n  {r.name}:")
-    print(f"    {r.description[:120]}..." if len(r.description) > 120 else f"    {r.description}")
+# %% Cell 3: Generate business descriptions via Data Agent
+from src.adapters.fabric_agent import FabricAgentClient
 
-# %% Cell 3: Connect to Collibra and match procs/views to PBI reports
+agent = FabricAgentClient(
+    workspace_id=WORKSPACE_ID,
+    agent_id=AGENT_ID,
+)
+
+# Discover the agent's tool name
+tool_name = agent.discover_tool_name()
+print(f"Data Agent tool: {tool_name}")
+
+# Generate descriptions for each _PBI metric
+metric_names = [m.name for m in pbi_metrics]
+agent_results = agent.generate_descriptions_bulk(metric_names)
+
+succeeded = sum(1 for r in agent_results.values() if r.status == "success")
+failed = sum(1 for r in agent_results.values() if r.status == "failed")
+print(f"\nGenerated {succeeded} descriptions ({failed} failed)")
+
+# Build description lookup
+desc_lookup = {}
+for name, resp in agent_results.items():
+    if resp.status == "success" and resp.answer:
+        desc_lookup[name] = resp.answer
+
+# Show samples
+for name in list(desc_lookup.keys())[:3]:
+    desc = desc_lookup[name]
+    print(f"\n  {name}:")
+    print(f"    {desc[:150]}..." if len(desc) > 150 else f"    {desc}")
+
+# %% Cell 4: Connect to Collibra and match to PBI reports
 from src.adapters.collibra import CollibraAdapter, CollibraConfig
 from src.adapters.collibra_lineage import CollibraClient
-from src.adapters.collibra_lineage_match import CollibraLineageMatcher, extract_match_key
+from src.adapters.collibra_lineage_match import CollibraLineageMatcher
 
 collibra_cfg = config.adapters.collibra
 
-# Adapter for writing descriptions
 adapter = CollibraAdapter(CollibraConfig(
     base_url=collibra_cfg.base_url,
     username=collibra_cfg.username,
@@ -90,7 +123,6 @@ adapter = CollibraAdapter(CollibraConfig(
     asset_type_id=collibra_cfg.asset_type_id,
 ))
 
-# Client for lineage matching (needs base URL without /rest/2.0)
 base = collibra_cfg.base_url.replace("/rest/2.0", "")
 client = CollibraClient(base, collibra_cfg.username, collibra_cfg.password)
 
@@ -100,19 +132,8 @@ if adapter.test_connection():
 else:
     print("Connection failed. Check org_config.yaml")
 
-# %% Cell 4: Match metrics to Collibra PBI reports
-# Build the list of _PBI objects from canonical node names
-objects = []
-for r in records:
-    key = extract_match_key(r.name)
-    if key is not None:
-        objects.append({
-            "object_name": r.name,
-            "object_type": "SQL_STORED_PROCEDURE",
-        })
-
-print(f"Found {len(objects)} _PBI-suffixed metrics out of {len(records)} total")
-
+# Match _PBI metrics to Collibra reports
+objects = [{"object_name": name, "object_type": "SQL_STORED_PROCEDURE"} for name in desc_lookup]
 matcher = CollibraLineageMatcher(client, min_score=0.5)
 match_result = matcher.match_objects(objects)
 print(f"\n{match_result}")
@@ -122,15 +143,12 @@ print(f"{'='*80}")
 print(f"MATCHED — will update descriptions ({len(match_result.matched)})")
 print(f"{'='*80}")
 
-# Build lookup: metric name → description
-desc_lookup = {r.name: r.description for r in records}
-
 for m in match_result.matched:
     desc = desc_lookup.get(m.object_name, "")
     print(f"\n  Proc/View: {m.object_name}")
     print(f"  Collibra:  {m.report_name}")
     print(f"  Score:     {m.score:.2f}")
-    print(f"  Description: {desc[:100]}..." if len(desc) > 100 else f"  Description: {desc}")
+    print(f"  Description: {desc[:150]}..." if len(desc) > 150 else f"  Description: {desc}")
 
 if match_result.unmatched_objects:
     print(f"\n{'='*80}")
@@ -148,7 +166,6 @@ PUBLISH_ONLY = []  # e.g., ["CCHP Executive Dashboard", "Another Report"]
 
 publish_results = []
 for m in match_result.matched:
-    # Filter to specific reports if set
     if PUBLISH_ONLY and not any(name.lower() in m.report_name.lower() for name in PUBLISH_ONLY):
         continue
 
@@ -173,10 +190,11 @@ skipped = len(match_result.matched) - len(publish_results)
 print(f"\n{'='*80}")
 print(f"PUBLISH SUMMARY")
 print(f"{'='*80}")
-print(f"  Total metrics:     {len(records)}")
-print(f"  _PBI suffixed:     {len(objects)}")
-print(f"  Matched to report: {len(match_result.matched)}")
-print(f"  Published:         {succeeded}")
-print(f"  Failed:            {failed}")
-print(f"  Skipped (no desc): {skipped}")
-print(f"  Unmatched:         {len(match_result.unmatched_objects)}")
+print(f"  Total canonical metrics: {len([n for n in nodes.values() if n.layer == NodeLayer.CANONICAL])}")
+print(f"  _PBI suffixed:           {len(pbi_metrics)}")
+print(f"  Agent descriptions:      {len(desc_lookup)}")
+print(f"  Matched to Collibra:     {len(match_result.matched)}")
+print(f"  Published:               {succeeded}")
+print(f"  Failed:                  {failed}")
+print(f"  Skipped (no desc):       {skipped}")
+print(f"  Unmatched:               {len(match_result.unmatched_objects)}")
