@@ -109,6 +109,24 @@ for name in list(desc_lookup.keys())[:3]:
     print(f"\n  {name}:")
     print(f"    {desc[:150]}..." if len(desc) > 150 else f"    {desc}")
 
+# %% Cell 3b: Save descriptions to Delta (so you don't regenerate on restart)
+from pyspark.sql.types import StructType, StructField, StringType
+
+desc_rows = [(name, desc) for name, desc in desc_lookup.items()]
+desc_schema = StructType([
+    StructField("metric_name", StringType(), False),
+    StructField("description", StringType(), False),
+])
+desc_df = spark.createDataFrame(desc_rows, schema=desc_schema)
+desc_df.write.format("delta").mode("overwrite").option("overwriteSchema", "true").saveAsTable("agent_descriptions")
+print(f"Saved {len(desc_rows)} descriptions to agent_descriptions table")
+
+# %% Cell 3c: Load descriptions from Delta (use this instead of cell 3 + 3b on restart)
+# Uncomment this cell and skip cells 3 + 3b if descriptions are already generated.
+# desc_df = spark.table("agent_descriptions")
+# desc_lookup = {row.metric_name: row.description for row in desc_df.collect()}
+# print(f"Loaded {len(desc_lookup)} descriptions from Delta")
+
 # %% Cell 4: Connect to Collibra and match to PBI reports
 from src.adapters.collibra import CollibraAdapter, CollibraConfig
 from src.adapters.collibra_lineage import CollibraClient
