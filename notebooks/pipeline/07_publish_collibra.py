@@ -24,9 +24,8 @@ from src.config import load_config
 
 config = load_config("/lakehouse/default/Files/sql-query-agent/org_config.yaml")
 
-# Data Agent config — find agent_id in the Fabric portal URL when viewing your agent
-AGENT_ID = ""  # TODO: fill in your Data Agent ID
-WORKSPACE_ID = config.fabric_graph.workspace_id  # reuse from config
+WORKSPACE_ID = config.fabric_graph.workspace_id
+AGENT_ID = config.fabric_graph.data_agent_id
 
 # %% Cell 1: Load graph from Delta
 from src.models import GraphNode, NodeLayer, GraphEdge, EdgeType

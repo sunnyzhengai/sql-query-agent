@@ -47,6 +47,7 @@ metrics:
 # fabric_graph:
 #   workspace_id: "your-workspace-id"
 #   graph_model_id: "your-graph-model-id"
+#   data_agent_id: "your-data-agent-id"  # Fabric Data Agent for description generation
 #   enabled: false  # set to true after creating the Graph Model in Fabric UI
 
 # Catalog adapters (optional — enable one or both to publish metadata)

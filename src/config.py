@@ -77,6 +77,7 @@ class AdaptersConfig(BaseModel):
 class FabricGraphConfig(BaseModel):
     workspace_id: str
     graph_model_id: str
+    data_agent_id: str = ""  # Fabric Data Agent ID for description generation
     enabled: bool = False  # opt-in during parallel testing
 
 
