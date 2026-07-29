@@ -195,7 +195,7 @@ class CollibraAdapter:
         session = self._get_session()
         type_id = asset_type_id or self.config.asset_type_id
 
-        # 1. Find the asset
+        # 1. Find the asset — try EXACT first, then CONTAINS
         try:
             params: dict[str, Any] = {
                 "name": asset_name,
@@ -211,13 +211,30 @@ class CollibraAdapter:
             )
             resp.raise_for_status()
             assets = resp.json().get("results", [])
+
+            # Fallback to CONTAINS if EXACT found nothing
+            # (Collibra report names often include bracketed UUIDs)
+            if not assets:
+                params["nameMatchMode"] = "CONTAINS"
+                params["limit"] = 5
+                resp = session.get(
+                    f"{self.config.base_url}/assets",
+                    params=params,
+                    timeout=10,
+                )
+                resp.raise_for_status()
+                assets = resp.json().get("results", [])
+
             if not assets:
                 return PublishResult(
                     asset_id=asset_name,
                     status=PublishStatus.FAILED,
                     message=f"Asset not found: {asset_name}",
                 )
-            collibra_asset_id = assets[0]["id"]
+            matched_asset = assets[0]
+            collibra_asset_id = matched_asset["id"]
+            matched_name = matched_asset.get("name", "")
+            logger.info("Matched '%s' → '%s' (ID: %s)", asset_name, matched_name, collibra_asset_id)
         except Exception as e:
             return PublishResult(
                 asset_id=asset_name,
@@ -270,7 +287,7 @@ class CollibraAdapter:
             return PublishResult(
                 asset_id=asset_name,
                 status=PublishStatus.SUCCESS,
-                message=f"{action} description on asset {collibra_asset_id}",
+                message=f"{action} description on '{matched_name}' (ID: {collibra_asset_id})",
             )
         except Exception as e:
             return PublishResult(
