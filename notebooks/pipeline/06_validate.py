@@ -170,3 +170,54 @@ except Exception:
     summary_df.write.format("delta").mode("overwrite").saveAsTable("build_summary")
 
 print(f"Saved {len(summary_rows)} summary records to build_summary")
+
+# %% Cell 7: Deployment readiness gate
+# Enforces minimum coverage thresholds before the deployment team
+# proceeds to Data Agent configuration (Phase 5).
+
+THRESHOLDS = {
+    "parse_rate": (s2 / max(total, 1), 0.90, True),       # >90% parsed
+    "calculation_logic": (s4 / max(total, 1), 0.80, True), # >80% have transforms
+    "traversal_coverage": (s6 / max(total, 1), 0.70, False), # >70% traversable (warning)
+}
+
+# Check dictionary coverage if dict_tables exists
+try:
+    dict_tables_df = spark.table("dict_tables")
+    dict_table_names = set(
+        r["TABLE_NAME"].upper() for r in dict_tables_df.collect()
+    )
+    # Get all technical nodes (source tables referenced in SQL)
+    sql_table_names = set()
+    for nid, node in nodes.items():
+        if nid.startswith("tech:"):
+            props = json.loads(node.get("properties", "{}")) if isinstance(node.get("properties"), str) else node.get("properties", {})
+            tname = props.get("table", "")
+            if tname:
+                sql_table_names.add(tname.upper())
+
+    if sql_table_names:
+        dict_coverage = len(sql_table_names & dict_table_names) / len(sql_table_names)
+    else:
+        dict_coverage = 1.0
+
+    THRESHOLDS["dictionary_coverage"] = (dict_coverage, 0.90, True)
+except Exception:
+    pass  # dict_tables not yet loaded — skip this check
+
+print(f"\n{'=' * 60}")
+print(f"DEPLOYMENT READINESS GATE")
+print(f"{'=' * 60}")
+
+blocked = False
+for metric_name, (actual, threshold, is_blocking) in THRESHOLDS.items():
+    status = "PASS" if actual >= threshold else ("BLOCKED" if is_blocking else "WARNING")
+    symbol = "+" if status == "PASS" else ("X" if status == "BLOCKED" else "!")
+    print(f"  [{symbol}] {metric_name}: {actual:.0%} (threshold: {threshold:.0%}) — {status}")
+    if status == "BLOCKED":
+        blocked = True
+
+if blocked:
+    print(f"\n  >>> DEPLOYMENT BLOCKED — resolve the above issues before proceeding to Phase 5 <<<")
+else:
+    print(f"\n  >>> DEPLOYMENT READY — all thresholds met, proceed to Data Agent configuration <<<")

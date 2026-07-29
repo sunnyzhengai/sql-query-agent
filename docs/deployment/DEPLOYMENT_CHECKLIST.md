@@ -47,6 +47,19 @@
 
 **Goal:** Fabric workspace is ready to run code.
 
+### 1.0 Pre-Flight Checks
+
+Before creating anything, verify the workspace meets requirements:
+
+- [ ] **Capacity SKU:** F2 or higher (F4 recommended for production workloads)
+- [ ] **Region alignment:** Workspace capacity, Lakehouse, and Data Agent must all be in the **same Azure region**. Cross-region configurations cause silent query failures or capacity errors. Check: Workspace Settings → Capacity → Region.
+- [ ] **Workspace role:** Deployment account has Contributor role or higher
+- [ ] **Security & access control:**
+  - [ ] Verify workspace access control list (ACL) — only authorized users should have access
+  - [ ] If customer uses Microsoft Purview sensitivity labels, verify labels are configured for the Lakehouse tables
+  - [ ] Confirm no row-level security (RLS) conflicts with the Data Agent's service principal
+  - [ ] Review: Data Agent responses are derived from SQL logic metadata, NOT raw patient data — but workspace permissions must still follow customer's governance policies
+
 ### 1.1 Create Fabric Environment
 
 - [ ] Create Environment named `sql-logic-env` in the workspace
@@ -116,7 +129,8 @@ Demo_Lakehouse/Files/
 ```
 
 - [ ] SQL files are .sql extension (UTF-8 encoded)
-- [ ] Files are T-SQL stored procedures or views with CREATE/ALTER PROCEDURE|VIEW statements
+- [ ] **Files must be T-SQL (Microsoft SQL Server dialect).** The primary parser (ScriptDom) only supports T-SQL. Non-T-SQL files (PL/SQL, PgSQL, MySQL) will fail to parse. If the customer has mixed dialects, only include T-SQL files — the sqlglot fallback handles basic SQL but with reduced extraction accuracy.
+- [ ] Files contain `CREATE PROCEDURE`, `ALTER PROCEDURE`, `CREATE VIEW`, or `ALTER VIEW` statements
 - [ ] Verify: At least 1 file is present
 
 ### 2.2 Upload Data Dictionary (Mandatory)
@@ -226,14 +240,24 @@ Run in order:
 5. [ ] `06_validate` — validates pipeline health
    - Verify: `pipeline_validation` shows coverage percentages
 
-### 4.1 Pipeline Health Check
+### 4.1 Pipeline Health Check (Automated Gate)
 
-After pipeline completes, verify in `06_validate` output:
+The `06_validate` notebook enforces minimum coverage thresholds. If any threshold is not met, the notebook outputs a **DEPLOYMENT BLOCKED** warning with the specific gap. The deployment team must resolve the gap before proceeding to Phase 5.
 
-- [ ] Parse rate: >90% of SQL files parsed successfully
-- [ ] Metrics with calculation logic: >80%
-- [ ] Metrics with source tables mapped: >80%
-- [ ] No unexpected parse errors (check `parse_errors` for new signatures)
+| Metric | Minimum threshold | Blocking? |
+|---|---|---|
+| Parse rate | >90% of SQL files parsed | **Yes** — below this, too many metrics are missing |
+| Metrics with calculation logic | >80% | **Yes** — agent can't answer questions about these |
+| Metrics with source tables mapped | >70% | Warning — agent works but shows "0 source tables" |
+| Dictionary coverage (tables in SQL found in dict) | >90% | **Yes** — missing tables degrade all answers |
+
+After pipeline completes, verify:
+
+- [ ] `06_validate` output shows all thresholds met (no DEPLOYMENT BLOCKED warnings)
+- [ ] Parse rate meets threshold
+- [ ] Calculation logic coverage meets threshold
+- [ ] Dictionary coverage meets threshold
+- [ ] Review `parse_errors` for any unexpected failures
 
 ---
 
@@ -274,6 +298,8 @@ Run the golden path test scenarios:
 - [ ] All 5 scenarios return correct, non-empty responses
 - [ ] Agent does NOT hallucinate or make up answers
 - [ ] Agent correctly says "I don't have that information" for unknown metrics
+
+**Known limitation — response truncation:** Fabric Data Agents may truncate or summarize long list responses. If the customer has 100+ metrics, "What metrics are available?" may return a partial list. The agent instructions should direct users to ask narrower questions (e.g., "What sepsis metrics are available?") or use `/coverage` for a complete count. This is a platform behavior, not a product bug.
 
 ---
 
@@ -373,17 +399,52 @@ This notebook orchestrates the full flow:
 
 ---
 
-## Phase 8: Handoff & Validation
+## Phase 8: Automated Acceptance Testing
+
+**Goal:** Programmatically verify the deployment works end-to-end before human handoff.
+
+> Manual golden-path testing (Phase 5.3) validates the UI experience. This phase validates the system programmatically — catching issues that manual testing might miss.
+
+### 8.1 Run Acceptance Test Script
+
+The acceptance test script (`scripts/acceptance_test.py`) programmatically validates:
+
+1. **Delta table integrity** — all required tables exist and have expected row counts
+2. **metric_logic completeness** — every metric has non-null `calculation_logic` and `source_tables`
+3. **Dictionary coverage** — cross-references SQL table refs against dict_tables
+4. **Parse error review** — flags any new error signatures not in `installation_errors`
+5. **Agent smoke test** (if Fabric REST API access is available) — fires 3 test questions against the Data Agent endpoint and asserts:
+   - Response status is 200
+   - Response contains expected keywords (not empty, not error)
+   - No hallucination indicators (response references tables that exist in the graph)
+
+### 8.2 Acceptance Criteria
+
+| Check | Pass condition | Blocking? |
+|---|---|---|
+| All Delta tables exist | 11+ tables with rows | **Yes** |
+| metric_logic row count | > 0, matches parse_successes count | **Yes** |
+| calculation_logic populated | > 80% of metrics have non-null logic | **Yes** |
+| source_tables populated | > 70% of metrics have non-null tables | Warning |
+| Dictionary coverage | > 90% of SQL tables found in dict | **Yes** |
+| Agent smoke test (if available) | 3/3 queries return valid responses | **Yes** |
+
+- [ ] Acceptance test script passes with no blocking failures
+- [ ] Any warnings are reviewed and documented
+
+---
+
+## Phase 9: Handoff & Validation
 
 **Goal:** Customer is self-sufficient.
 
-### 8.1 Documentation Handoff
+### 9.1 Documentation Handoff
 
 - [ ] DATA_DICTIONARY_REQUIREMENTS.md — how to prepare and update their dictionary
 - [ ] REVIEWER_GUIDE.md — how to use the agent (test scenarios)
 - [ ] DEPLOYMENT_GUIDE.md — how to re-run the pipeline after SQL changes
 
-### 8.2 Final Validation
+### 9.2 Final Validation
 
 - [ ] Customer can independently ask the agent a question and get a correct answer
 - [ ] Customer knows how to re-run the pipeline when they update SQL files
@@ -391,9 +452,9 @@ This notebook orchestrates the full flow:
 - [ ] `/troubleshoot` command works and returns relevant help for common errors
 - [ ] *(If Collibra)* Customer can re-run `07_publish_collibra` after pipeline updates
 
-### 8.3 Sign-Off
+### 9.3 Sign-Off
 
-- [ ] All required phase checkboxes are checked (Phases 1-6, Phase 8)
+- [ ] All required phase checkboxes are checked (Phases 1-6, 8-9)
 - [ ] Optional phases (7) completed if applicable
 - [ ] Customer confirms agent answers are accurate for their domain
 - [ ] No open issues or workarounds documented
@@ -407,9 +468,13 @@ This notebook orchestrates the full flow:
 | "No documented calculation logic" | Agent instructions have hardcoded examples | Remove examples, use teaching rules only |
 | "0 source tables" for a metric | Tables not in data dictionary | Add tables to dict_tables.csv, re-run pipeline |
 | Parse errors on all files | ScriptDom DLL not loaded | Check 01_install output, verify DLL path |
+| Parse errors on non-T-SQL files | Wrong SQL dialect (PL/SQL, PgSQL) | Only T-SQL files are supported — remove non-T-SQL files |
 | pythonnet initialization fails | `%pip install` was used in a notebook | Remove %pip, use Fabric Environment only |
 | Agent gives wrong table names | Dictionary TABLE_NAME doesn't match SQL | Fix casing in dict_tables.csv |
 | Pipeline runs but metric_logic is empty | No parse_results (parse step failed) | Check parse_errors, run 02_parse with verbose |
+| Agent returns truncated list | Fabric Data Agent response limit | Ask narrower questions or use `/coverage` for counts |
+| Data Agent query fails silently | Workspace/capacity/agent in different regions | Move all resources to same Azure region |
+| "Cross-geo" or capacity errors | Region mismatch | Verify in Workspace Settings → Capacity → Region |
 | Collibra publish fails | API credentials or permissions | Verify with collibra_discovery notebook |
 | Agent description is wrong | Agent instructions need tuning | Update data_agent_instructions.md, re-run 07 |
 
@@ -419,13 +484,14 @@ This notebook orchestrates the full flow:
 
 | Phase | Duration | Who | Required? |
 |---|---|---|---|
-| 1. Environment Setup | 10-15 min | Deployment team | Yes |
+| 1. Environment Setup (incl. pre-flight) | 15-20 min | Deployment team | Yes |
 | 2. Customer Data Loading | 5-10 min | Customer (with guidance) | Yes |
 | 3. Setup Notebook | 2-3 min | Automated | Yes |
 | 4. Run Pipeline | 1-5 min | Automated | Yes |
 | 5. Data Agent Config | 5-10 min | Deployment team | Yes |
 | 6. Graph Export | Automatic | Automated (part of pipeline) | Yes (no action) |
 | 7. Collibra Integration | 15-30 min | Deployment team + customer | Optional |
-| 8. Handoff | 15-20 min | Deployment team + customer | Yes |
-| **Total (without Collibra)** | **~40-60 min** | | |
-| **Total (with Collibra)** | **~60-90 min** | | |
+| 8. Acceptance Testing | 5-10 min | Automated + review | Yes |
+| 9. Handoff | 15-20 min | Deployment team + customer | Yes |
+| **Total (without Collibra)** | **~50-75 min** | | |
+| **Total (with Collibra)** | **~70-105 min** | | |

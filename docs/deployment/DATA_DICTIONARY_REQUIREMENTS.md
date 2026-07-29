@@ -50,6 +50,7 @@ DEPARTMENTS,"Contains department master file records with department names and l
 
 - **Header row is required** — first row must be `TABLE_NAME,DESCRIPTION`
 - **TABLE_NAME must match your SQL exactly** — if your SQL says `FROM PATIENT`, the dictionary must have `PATIENT` (not `Patients` or `patient_table`)
+- **Case sensitivity:** The pipeline performs **case-insensitive matching** when looking up table descriptions, so `PATIENT` and `Patient` will both match. However, the stored TABLE_NAME is used as-is in agent responses. For consistency, use the same casing as your SQL files. If your EMR metadata exports in mixed case (e.g., Epic Clarity exports as `PATIENT` but your SQL uses `Patient`), either case will work — but pick one and be consistent.
 - **One row per table** — duplicates will cause the last row to win
 - **Descriptions should be meaningful** — "Patient table" is not helpful. "Contains demographic information for all patients including name, date of birth, and medical record number" is.
 - **UTF-8 encoding** — save as UTF-8 (not ANSI or Latin-1)
@@ -92,7 +93,7 @@ ORDER_MED,ORDER_DTTM,The date and time the medication order was placed.
 
 - **Header row is required** — first row must be `TABLE_NAME,COLUMN_NAME,DESCRIPTION`
 - **TABLE_NAME must match dict_tables.csv** — every TABLE_NAME here should exist in dict_tables.csv
-- **COLUMN_NAME must match your SQL exactly** — if your SQL says `SELECT PAT_MRN_ID`, the dictionary must have `PAT_MRN_ID`
+- **COLUMN_NAME must match your SQL exactly** — if your SQL says `SELECT PAT_MRN_ID`, the dictionary must have `PAT_MRN_ID`. Same case-insensitive matching rules as table names apply (see dict_tables rules above).
 - **You don't need every column** — only include columns that appear in your SQL files. The agent will still work if some columns are missing, but it won't be able to describe those columns.
 - **One row per table+column combination** — duplicates will cause the last row to win
 
@@ -162,6 +163,13 @@ This is better than nothing, but the agent's answers will be proportionally less
 | All tables + key columns only | Good — agent can answer most questions, some column details missing |
 | Most tables + no columns | Partial — agent can trace lineage but can't describe column-level logic |
 | Missing tables | Broken — agent will say "0 source tables" for metrics that use those tables |
+
+**Warning — dictionary bloat:** Do NOT upload your entire enterprise data dictionary if only a subset of tables are referenced by your SQL files. A dictionary with 50,000 columns from 2,000 tables when your SQL only uses 50 tables will:
+- Slow down the graph build step unnecessarily
+- Add noise to the agent's context window, potentially degrading answer quality
+- Make validation harder (thousands of "unused table" warnings)
+
+**Best practice:** Filter your dictionary export to only include tables and columns referenced by your target SQL files. The helper script `scripts/extract_clarity_dictionary.sql` generates a filtered query based on your exact table list. After the first pipeline run, check `parse_results` to see which tables were actually referenced, then refine your dictionary accordingly.
 
 ---
 
