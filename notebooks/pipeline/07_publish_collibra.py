@@ -76,9 +76,13 @@ if len(pbi_metrics) > 5:
 # %% Cell 3: Generate business descriptions via Data Agent
 from src.adapters.fabric_agent import FabricAgentClient
 
+# mssparkutils is injected into notebook scope but not importable from modules
+token = mssparkutils.credentials.getToken("https://api.fabric.microsoft.com")
+
 agent = FabricAgentClient(
     workspace_id=WORKSPACE_ID,
     agent_id=AGENT_ID,
+    access_token=token,
 )
 
 # Discover the agent's tool name
