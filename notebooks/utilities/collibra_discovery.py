@@ -1,20 +1,20 @@
 # Collibra API Discovery
 # Run this locally or in Fabric to explore the Collibra data model.
-# Fill in your credentials below.
+# Uses credentials from org_config.yaml.
 
 # %% Cell 1: Connect and discover
 import sys
 sys.path.insert(0, "/lakehouse/default/Files/sql-query-agent")
 # For local: sys.path.insert(0, ".")
 
+from src.config import load_config
 from src.adapters.collibra_lineage import CollibraClient
 
-# ── Fill in your credentials ──
-COLLIBRA_URL = "https://YOUR_INSTANCE.collibra.com"  # TODO: fill in
-USERNAME = "YOUR_USERNAME"  # TODO: fill in
-PASSWORD = "YOUR_PASSWORD"  # TODO: fill in
+config = load_config()
+collibra_cfg = config.adapters.collibra
 
-client = CollibraClient(COLLIBRA_URL, USERNAME, PASSWORD)
+base = collibra_cfg.base_url.replace("/rest/2.0", "")
+client = CollibraClient(base, collibra_cfg.username, collibra_cfg.password)
 
 # Run discovery — optionally pass a report name you know exists
 client.discover()
