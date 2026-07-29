@@ -73,7 +73,8 @@ for m in pbi_metrics[:5]:
 if len(pbi_metrics) > 5:
     print(f"  ... and {len(pbi_metrics) - 5} more")
 
-# %% Cell 3: Generate business descriptions via Data Agent
+# %% Cell 3: Generate business descriptions via Data Agent (incremental)
+import hashlib
 from src.adapters.fabric_agent import FabricAgentClient
 
 # mssparkutils is injected into notebook scope but not importable from modules
@@ -85,49 +86,106 @@ agent = FabricAgentClient(
     access_token=token,
 )
 
-# Discover the agent's tool name
 tool_name = agent.discover_tool_name()
 print(f"Data Agent tool: {tool_name}")
 
-# Generate descriptions for each _PBI metric
-metric_names = [m.name for m in pbi_metrics]
-agent_results = agent.generate_descriptions_bulk(metric_names)
+# Compute SQL hash for each _PBI metric from metric_logic
+sql_hashes = {}
+try:
+    ml_df = spark.table("metric_logic")
+    for row in ml_df.collect():
+        r = row.asDict()
+        logic = r.get("calculation_logic") or ""
+        sql_hashes[r["metric_name"]] = hashlib.sha256(logic.encode()).hexdigest()[:16]
+except Exception:
+    print("  metric_logic table not found — will generate all descriptions")
 
-succeeded = sum(1 for r in agent_results.values() if r.status == "success")
-failed = sum(1 for r in agent_results.values() if r.status == "failed")
-print(f"\nGenerated {succeeded} descriptions ({failed} failed)")
+# Load existing descriptions (if any)
+existing_descs = {}
+existing_hashes = {}
+try:
+    existing_df = spark.table("agent_descriptions")
+    for row in existing_df.collect():
+        r = row.asDict()
+        existing_descs[r["metric_name"]] = r["description"]
+        existing_hashes[r["metric_name"]] = r.get("sql_hash", "")
+except Exception:
+    print("  No existing agent_descriptions table — will generate all")
 
-# Build description lookup — filter out non-answers
+# Determine which metrics need (re)generation
+needs_generation = []
+for m in pbi_metrics:
+    current_hash = sql_hashes.get(m.name, "")
+    prev_hash = existing_hashes.get(m.name, "")
+
+    if m.name not in existing_descs:
+        needs_generation.append(m.name)  # new metric
+    elif current_hash and current_hash != prev_hash:
+        needs_generation.append(m.name)  # SQL changed
+    # else: description exists and SQL unchanged — skip
+
+reused = len(pbi_metrics) - len(needs_generation)
+print(f"\n{len(pbi_metrics)} _PBI metrics total")
+print(f"  {reused} already have current descriptions (skipped)")
+print(f"  {len(needs_generation)} need generation")
+
+# Generate only for new/changed metrics
 REJECT_PHRASES = ["wasn't able to find", "couldn't find", "not found", "hasn't been", "I'm happy to help"]
 
-desc_lookup = {}
-for name, resp in agent_results.items():
-    if resp.status == "success" and resp.answer:
-        if any(phrase in resp.answer.lower() for phrase in REJECT_PHRASES):
-            print(f"  REJECTED {name} — agent returned a non-answer")
-            continue
-        desc_lookup[name] = resp.answer
+new_descs = {}
+if needs_generation:
+    agent_results = agent.generate_descriptions_bulk(needs_generation)
 
-# Show samples
-for name in list(desc_lookup.keys())[:3]:
-    desc = desc_lookup[name]
-    print(f"\n  {name}:")
+    succeeded = 0
+    failed = 0
+    for name, resp in agent_results.items():
+        if resp.status == "success" and resp.answer:
+            if any(phrase in resp.answer.lower() for phrase in REJECT_PHRASES):
+                print(f"  REJECTED {name} — agent returned a non-answer")
+                failed += 1
+                continue
+            new_descs[name] = resp.answer
+            succeeded += 1
+        else:
+            failed += 1
+
+    print(f"\nGenerated {succeeded} new descriptions ({failed} failed)")
+
+# Merge: existing (unchanged) + newly generated
+desc_lookup = {}
+for name, desc in existing_descs.items():
+    if name not in needs_generation:
+        desc_lookup[name] = desc  # keep existing
+for name, desc in new_descs.items():
+    desc_lookup[name] = desc  # add/replace with new
+
+# Show newly generated samples
+for name in list(new_descs.keys())[:3]:
+    desc = new_descs[name]
+    print(f"\n  NEW: {name}:")
     print(f"    {desc[:150]}..." if len(desc) > 150 else f"    {desc}")
 
-# %% Cell 3b: Save descriptions to Delta (so you don't regenerate on restart)
+if not needs_generation:
+    print("\nAll descriptions are current — nothing to generate.")
+
+# %% Cell 3b: Save descriptions to Delta
 from pyspark.sql.types import StructType, StructField, StringType
 
-desc_rows = [(name, desc) for name, desc in desc_lookup.items()]
+desc_rows = [
+    (name, desc, sql_hashes.get(name, ""))
+    for name, desc in desc_lookup.items()
+]
 desc_schema = StructType([
     StructField("metric_name", StringType(), False),
     StructField("description", StringType(), False),
+    StructField("sql_hash", StringType(), True),
 ])
 desc_df = spark.createDataFrame(desc_rows, schema=desc_schema)
 desc_df.write.format("delta").mode("overwrite").option("overwriteSchema", "true").saveAsTable("agent_descriptions")
 print(f"Saved {len(desc_rows)} descriptions to agent_descriptions table")
 
-# %% Cell 3c: Load descriptions from Delta (use this instead of cell 3 + 3b on restart)
-# Uncomment this cell and skip cells 3 + 3b if descriptions are already generated.
+# %% Cell 3c: Load descriptions from Delta (use instead of cell 3 + 3b on restart)
+# Uncomment this cell and skip cells 3 + 3b if no regeneration needed.
 # desc_df = spark.table("agent_descriptions")
 # desc_lookup = {row.metric_name: row.description for row in desc_df.collect()}
 # print(f"Loaded {len(desc_lookup)} descriptions from Delta")
