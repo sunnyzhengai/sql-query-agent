@@ -164,12 +164,9 @@ This is better than nothing, but the agent's answers will be proportionally less
 | Most tables + no columns | Partial — agent can trace lineage but can't describe column-level logic |
 | Missing tables | Broken — agent will say "0 source tables" for metrics that use those tables |
 
-**Warning — dictionary bloat:** Do NOT upload your entire enterprise data dictionary if only a subset of tables are referenced by your SQL files. A dictionary with 50,000 columns from 2,000 tables when your SQL only uses 50 tables will:
-- Slow down the graph build step unnecessarily
-- Add noise to the agent's context window, potentially degrading answer quality
-- Make validation harder (thousands of "unused table" warnings)
+**Note on dictionary size:** It is safe to upload a large dictionary, even if it contains tables and columns not referenced by your SQL files. The dictionary is stored in Delta tables and queried dynamically by the Data Agent at runtime (RAG pattern) — unused entries sit passively and do not degrade agent performance or clutter its context window. The agent only retrieves descriptions for tables it finds in the parsed metric logic.
 
-**Best practice:** Filter your dictionary export to only include tables and columns referenced by your target SQL files. The helper script `scripts/extract_clarity_dictionary.sql` generates a filtered query based on your exact table list. After the first pipeline run, check `parse_results` to see which tables were actually referenced, then refine your dictionary accordingly.
+That said, a **filtered dictionary is easier to validate**. If you want a clean validation report with no "unused table" noise, use the helper script `scripts/extract_clarity_dictionary.sql` to generate a targeted export based on your exact table list.
 
 ---
 

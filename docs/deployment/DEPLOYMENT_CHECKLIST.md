@@ -129,7 +129,7 @@ Demo_Lakehouse/Files/
 ```
 
 - [ ] SQL files are .sql extension (UTF-8 encoded)
-- [ ] **Files must be T-SQL (Microsoft SQL Server dialect).** The primary parser (ScriptDom) only supports T-SQL. Non-T-SQL files (PL/SQL, PgSQL, MySQL) will fail to parse. If the customer has mixed dialects, only include T-SQL files — the sqlglot fallback handles basic SQL but with reduced extraction accuracy.
+- [ ] **This release supports T-SQL (Microsoft SQL Server) only.** The primary parser (ScriptDom) is a native T-SQL parser. Non-T-SQL files (PL/SQL, PgSQL, Snowflake SQL) are not supported in this version. Future releases will add multi-dialect support via a dialect adapter layer — the pipeline architecture is designed for this, but only the T-SQL adapter is implemented today.
 - [ ] Files contain `CREATE PROCEDURE`, `ALTER PROCEDURE`, `CREATE VIEW`, or `ALTER VIEW` statements
 - [ ] Verify: At least 1 file is present
 
@@ -468,7 +468,7 @@ The acceptance test script (`scripts/acceptance_test.py`) programmatically valid
 | "No documented calculation logic" | Agent instructions have hardcoded examples | Remove examples, use teaching rules only |
 | "0 source tables" for a metric | Tables not in data dictionary | Add tables to dict_tables.csv, re-run pipeline |
 | Parse errors on all files | ScriptDom DLL not loaded | Check 01_install output, verify DLL path |
-| Parse errors on non-T-SQL files | Wrong SQL dialect (PL/SQL, PgSQL) | Only T-SQL files are supported — remove non-T-SQL files |
+| Parse errors on non-T-SQL files | Wrong SQL dialect (PL/SQL, PgSQL) | This release supports T-SQL only — remove non-T-SQL files |
 | pythonnet initialization fails | `%pip install` was used in a notebook | Remove %pip, use Fabric Environment only |
 | Agent gives wrong table names | Dictionary TABLE_NAME doesn't match SQL | Fix casing in dict_tables.csv |
 | Pipeline runs but metric_logic is empty | No parse_results (parse step failed) | Check parse_errors, run 02_parse with verbose |
