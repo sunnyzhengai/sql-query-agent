@@ -196,9 +196,12 @@ class FabricAgentClient:
         and produce structured, criteria-focused output.
         """
         question = (
-            f"Write a concise, formal catalog description for the report {metric_name}. "
-            f"State its purpose, key data sources, filters/criteria applied, and output in 2-4 sentences. "
-            f"Do not use conversational language, greetings, or preamble. Start directly with the description."
+            f"For the report {metric_name}, describe: "
+            f"1) What does this report measure or produce? "
+            f"2) What filters, criteria, and business rules does it apply? "
+            f"Write in plain business English. No greetings, no preamble, no headers, "
+            f"no markdown formatting. Do not start with 'Here is' or 'This metric'. "
+            f"Start directly with what the report does."
         )
         return self.query(question)
 
