@@ -196,11 +196,15 @@ class FabricAgentClient:
         and produce structured, criteria-focused output.
         """
         question = (
-            f"For the report {metric_name}: "
-            f"What does it produce and what key filters or criteria does it apply? "
-            f"Answer in one paragraph, maximum 100 words. "
-            f"Plain business English. No bullet points, no headers, no markdown, "
-            f"no greetings, no preamble. Start directly with what the report does."
+            f"For the report {metric_name}, write a catalog description in this exact format:\n"
+            f"First, one sentence stating the business purpose of the report "
+            f"(why it exists, who uses it, what decisions it supports — "
+            f"do NOT list columns or fields the report contains).\n"
+            f"Then a blank line, then 'Filtered by:' followed by a bulleted list "
+            f"of the key filters, criteria, and business rules the report applies "
+            f"(e.g., diagnosis codes, date ranges, patient populations, encounter types).\n"
+            f"No greetings, no preamble, no markdown headers, no bold text. "
+            f"Start directly with the purpose sentence."
         )
         return self.query(question)
 
