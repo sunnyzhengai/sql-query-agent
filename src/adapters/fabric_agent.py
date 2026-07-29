@@ -63,14 +63,21 @@ class FabricAgentClient:
     def _get_token(self) -> str:
         if self._access_token:
             return self._access_token
-        try:
-            import mssparkutils  # type: ignore
-            return mssparkutils.credentials.getToken("https://api.fabric.microsoft.com")
-        except ImportError:
+        # In Fabric notebooks, mssparkutils is injected as a global,
+        # not an importable module. Try the global first, then import.
+        import builtins
+        _mssparkutils = getattr(builtins, "mssparkutils", None)
+        if _mssparkutils is None:
+            try:
+                import mssparkutils as _mssparkutils  # type: ignore
+            except ImportError:
+                _mssparkutils = None
+        if _mssparkutils is None:
             raise RuntimeError(
                 "mssparkutils not available. Run in a Fabric Notebook "
                 "or pass access_token explicitly."
             )
+        return _mssparkutils.credentials.getToken("https://api.fabric.microsoft.com")
 
     def _get_headers(self) -> dict[str, str]:
         return {
