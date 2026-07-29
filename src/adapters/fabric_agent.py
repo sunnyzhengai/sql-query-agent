@@ -77,7 +77,7 @@ class FabricAgentClient:
                 "mssparkutils not available. Run in a Fabric Notebook "
                 "or pass access_token explicitly."
             )
-        return _mssparkutils.credentials.getToken("https://api.fabric.microsoft.com")
+        return _mssparkutils.credentials.getToken("https://analysis.windows.net/powerbi/api")
 
     def _get_headers(self) -> dict[str, str]:
         return {
