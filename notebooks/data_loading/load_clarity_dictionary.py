@@ -20,8 +20,8 @@ config = load_config("/lakehouse/default/Files/sql-query-agent/org_config.yaml")
 CLARITY_TBL_PATH = "abfss://BI-POC@onelake.dfs.fabric.microsoft.com/SZ_SQL_Logic.Lakehouse/Files/data/dictionaries/CLARITY_TBL.csv"
 CLARITY_COL_PATH = "abfss://BI-POC@onelake.dfs.fabric.microsoft.com/SZ_SQL_Logic.Lakehouse/Files/data/dictionaries/CLARITY_COL.csv"
 
-DICT_TABLES_OUTPUT = "dict_tables"
-DICT_COLUMNS_OUTPUT = "dict_columns"
+DICT_TABLES_OUTPUT = "input_dict_tables"
+DICT_COLUMNS_OUTPUT = "input_dict_columns"
 
 # %% Cell 2: Load CLARITY_TBL
 # CSV format: TABLE_NAME, TABLE_ID, TABLE_INTRODUCTION

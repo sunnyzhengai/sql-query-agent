@@ -22,17 +22,17 @@ from __future__ import annotations
 
 # Required Delta tables and their minimum expected row counts
 REQUIRED_TABLES = {
-    "sql_sources": 1,
-    "dict_tables": 1,
-    "dict_columns": 1,
-    "parse_results": 0,      # may be 0 if all procs fail (caught by other checks)
-    "parse_successes": 1,
-    "parse_errors": 0,        # 0 errors is fine
+    "input_sql_sources": 1,
+    "input_dict_tables": 1,
+    "input_dict_columns": 1,
+    "ops_parse_results": 0,      # may be 0 if all procs fail (caught by other checks)
+    "ops_parse_successes": 1,
+    "ops_parse_errors": 0,        # 0 errors is fine
     "graph_nodes": 1,
     "graph_edges": 1,
-    "metric_logic": 1,
-    "pipeline_validation": 1,
-    "build_summary": 1,
+    "output_metric_logic": 1,
+    "ops_pipeline_validation": 1,
+    "ops_build_summary": 1,
 }
 
 # Deployment thresholds
@@ -119,7 +119,7 @@ def run_acceptance_test(spark) -> AcceptanceResult:
 
     # --- Check 2: metric_logic completeness ---
     try:
-        ml_df = spark.table("metric_logic")
+        ml_df = spark.table("output_metric_logic")
         total = ml_df.count()
         if total == 0:
             result.add(
@@ -157,7 +157,7 @@ def run_acceptance_test(spark) -> AcceptanceResult:
     try:
         dict_tables = set(
             r["TABLE_NAME"].upper()
-            for r in spark.table("dict_tables").collect()
+            for r in spark.table("input_dict_tables").collect()
         )
         # Get unique table names from graph_nodes (technical layer)
         import json as _json
@@ -199,9 +199,9 @@ def run_acceptance_test(spark) -> AcceptanceResult:
 
     # --- Check 4: Parse error review ---
     try:
-        parse_errors = spark.table("parse_errors")
+        parse_errors = spark.table("ops_parse_errors")
         error_count = parse_errors.count()
-        parse_successes = spark.table("parse_successes")
+        parse_successes = spark.table("ops_parse_successes")
         success_count = parse_successes.count()
 
         total_parsed = error_count + success_count

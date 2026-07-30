@@ -38,14 +38,14 @@ for r in spark.table(config.lakehouse.graph_edges).collect():
 
 parse_ok_set = set()
 try:
-    for r in spark.table("parse_successes").collect():
+    for r in spark.table("ops_parse_successes").collect():
         parse_ok_set.add(r.asDict()["metric_id"])
 except Exception:
     pass
 
 parse_error_set = set()
 try:
-    for r in spark.table("parse_errors").collect():
+    for r in spark.table("ops_parse_errors").collect():
         parse_error_set.add(r.asDict()["metric_id"])
 except Exception:
     pass
@@ -142,7 +142,7 @@ rows = [(r["metric_id"], r["step1_loaded"], r["step2_parsed"], r["step3_canonica
         for r in results]
 
 validation_df = spark.createDataFrame(rows, schema=schema)
-validation_df.write.format("delta").mode("overwrite").option("overwriteSchema", "true").saveAsTable("pipeline_validation")
+validation_df.write.format("delta").mode("overwrite").option("overwriteSchema", "true").saveAsTable("ops_pipeline_validation")
 print(f"\nSaved {len(rows)} validation results to pipeline_validation table")
 
 # %% Cell 6: Build summary (append-only history)
@@ -165,9 +165,9 @@ summary_rows = [
 
 summary_df = spark.createDataFrame(summary_rows, schema=to_spark_schema(BUILD_SUMMARY))
 try:
-    summary_df.write.format("delta").mode("append").saveAsTable("build_summary")
+    summary_df.write.format("delta").mode("append").saveAsTable("ops_build_summary")
 except Exception:
-    summary_df.write.format("delta").mode("overwrite").saveAsTable("build_summary")
+    summary_df.write.format("delta").mode("overwrite").saveAsTable("ops_build_summary")
 
 print(f"Saved {len(summary_rows)} summary records to build_summary")
 
@@ -183,7 +183,7 @@ THRESHOLDS = {
 
 # Check dictionary coverage if dict_tables exists
 try:
-    dict_tables_df = spark.table("dict_tables")
+    dict_tables_df = spark.table("input_dict_tables")
     dict_table_names = set(
         r["TABLE_NAME"].upper() for r in dict_tables_df.collect()
     )

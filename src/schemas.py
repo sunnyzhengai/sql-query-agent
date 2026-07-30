@@ -41,7 +41,7 @@ GRAPH_EDGES = {
 }
 
 METRIC_LOGIC = {
-    "table_name": "metric_logic",
+    "table_name": "output_metric_logic",
     "columns": [
         ("metric_id", "string", False),
         ("metric_name", "string", False),
@@ -56,7 +56,7 @@ METRIC_LOGIC = {
 }
 
 SQL_SOURCES = {
-    "table_name": "sql_sources",
+    "table_name": "input_sql_sources",
     "columns": [
         ("metric_id", "string", False),
         ("name", "string", False),
@@ -69,7 +69,7 @@ SQL_SOURCES = {
 }
 
 PARSE_ERRORS = {
-    "table_name": "parse_errors",
+    "table_name": "ops_parse_errors",
     "columns": [
         ("metric_id", "string", False),
         ("name", "string", False),
@@ -82,7 +82,7 @@ PARSE_ERRORS = {
 }
 
 PARSE_SUCCESSES = {
-    "table_name": "parse_successes",
+    "table_name": "ops_parse_successes",
     "columns": [
         ("metric_id", "string", False),
         ("name", "string", False),
@@ -93,7 +93,7 @@ PARSE_SUCCESSES = {
 }
 
 BUILD_SUMMARY = {
-    "table_name": "build_summary",
+    "table_name": "ops_build_summary",
     "columns": [
         ("build_time", "string", False),
         ("metric_key", "string", False),
@@ -103,7 +103,7 @@ BUILD_SUMMARY = {
 }
 
 EXTRACTION_INSPECTION = {
-    "table_name": "extraction_inspection",
+    "table_name": "ops_extraction_inspection",
     "columns": [
         ("metric_id", "string", False),
         ("line_count", "integer", True),
@@ -120,7 +120,7 @@ EXTRACTION_INSPECTION = {
 }
 
 ERROR_LOG = {
-    "table_name": "error_log",
+    "table_name": "ops_error_log",
     "columns": [
         ("run_id", "string", False),
         ("run_timestamp", "string", False),
@@ -136,7 +136,7 @@ ERROR_LOG = {
 }
 
 PIPELINE_VALIDATION = {
-    "table_name": "pipeline_validation",
+    "table_name": "ops_pipeline_validation",
     "columns": [
         ("metric_id", "string", False),
         ("step1_loaded", "boolean", True),
@@ -152,7 +152,7 @@ PIPELINE_VALIDATION = {
 }
 
 STEWARD_ASSIGNMENTS = {
-    "table_name": "steward_assignments",
+    "table_name": "gov_steward_assignments",
     "columns": [
         ("metric_id", "string", False),
         ("steward", "string", True),
@@ -163,7 +163,7 @@ STEWARD_ASSIGNMENTS = {
 }
 
 SYNC_LOG = {
-    "table_name": "sync_log",
+    "table_name": "ops_sync_log",
     "columns": [
         ("synced_at", "string", False),
         ("adapter", "string", False),
@@ -174,7 +174,7 @@ SYNC_LOG = {
 }
 
 INSTALLATION_ERRORS = {
-    "table_name": "installation_errors",
+    "table_name": "ops_installation_errors",
     "columns": [
         ("error_signature", "string", False),
         ("error_category", "string", False),
@@ -186,7 +186,7 @@ INSTALLATION_ERRORS = {
 }
 
 TRACKING = {
-    "table_name": "extraction_tracking",
+    "table_name": "ops_extraction_tracking",
     "columns": [
         ("object_name", "string", False),
         ("object_type", "string", False),

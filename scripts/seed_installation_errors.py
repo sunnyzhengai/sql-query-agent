@@ -117,7 +117,7 @@ def seed_to_delta(spark):
              e["fix"], e["prevention"], e["first_seen"])
             for e in INSTALLATION_ERRORS]
     df = spark.createDataFrame(rows, schema=schema)
-    df.write.format("delta").mode("overwrite").option("overwriteSchema", "true").saveAsTable("installation_errors")
+    df.write.format("delta").mode("overwrite").option("overwriteSchema", "true").saveAsTable("ops_installation_errors")
     print(f"Seeded {len(rows)} installation errors to 'installation_errors' table")
 
 

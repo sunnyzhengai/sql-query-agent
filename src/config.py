@@ -13,11 +13,11 @@ logger = logging.getLogger(__name__)
 
 
 class LakehouseConfig(BaseModel):
-    dict_tables: str
-    dict_columns: str
-    sql_sources: str
-    graph_nodes: str
-    graph_edges: str
+    dict_tables: str = "input_dict_tables"
+    dict_columns: str = "input_dict_columns"
+    sql_sources: str = "input_sql_sources"
+    graph_nodes: str = "graph_nodes"
+    graph_edges: str = "graph_edges"
 
 
 class DictionaryConfig(BaseModel):
@@ -50,7 +50,7 @@ class DomainFilterConfig(BaseModel):
 class ExtractorConfig(BaseModel):
     sql_server: SqlServerConfig
     domain: DomainFilterConfig = DomainFilterConfig()
-    tracking_table: str = "extraction_tracking"
+    tracking_table: str = "ops_extraction_tracking"
 
 
 class PurviewAdapterConfig(BaseModel):

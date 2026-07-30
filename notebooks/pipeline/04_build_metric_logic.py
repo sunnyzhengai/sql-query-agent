@@ -112,7 +112,7 @@ print(f"Built {len(metric_logic_rows)} metric logic rows")
 from src.schemas import METRIC_LOGIC, to_spark_schema
 
 ml_df = spark.createDataFrame(metric_logic_rows, schema=to_spark_schema(METRIC_LOGIC))
-ml_df.write.format("delta").mode("overwrite").option("overwriteSchema", "true").saveAsTable("metric_logic")
+ml_df.write.format("delta").mode("overwrite").option("overwriteSchema", "true").saveAsTable("output_metric_logic")
 print(f"Saved {len(metric_logic_rows)} rows to metric_logic table")
 print("→ Add 'metric_logic' as a data source in your Fabric Data Agent")
 

@@ -31,7 +31,7 @@ def read_source(name_or_path):
         return spark.table(name_or_path)
 
 # %% Cell 1: Load parse results from Delta
-parse_results_df = spark.table("parse_results")
+parse_results_df = spark.table("ops_parse_results")
 parse_results = [row.asDict() for row in parse_results_df.collect()]
 print(f"Loaded {len(parse_results)} parse results")
 

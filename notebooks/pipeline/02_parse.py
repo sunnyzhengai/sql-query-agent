@@ -247,7 +247,7 @@ if parse_results_data:
                 r["final_select_cte_refs"], r["cte_count"], r["table_count"], r["line_count"])
                for r in parse_results_data]
     pr_df = spark.createDataFrame(pr_rows, schema=pr_schema)
-    pr_df.write.format("delta").mode("overwrite").option("overwriteSchema", "true").saveAsTable("parse_results")
+    pr_df.write.format("delta").mode("overwrite").option("overwriteSchema", "true").saveAsTable("ops_parse_results")
     print(f"Saved {len(parse_results_data)} parse results to 'parse_results' table")
 
 # Save parse errors
@@ -256,7 +256,7 @@ if parse_errors:
                     e.get("user_explanation"), e.get("suggested_action"), e["line_count"])
                    for e in parse_errors]
     errors_df = spark.createDataFrame(errors_rows, schema=to_spark_schema(PARSE_ERRORS))
-    errors_df.write.format("delta").mode("overwrite").option("overwriteSchema", "true").saveAsTable("parse_errors")
+    errors_df.write.format("delta").mode("overwrite").option("overwriteSchema", "true").saveAsTable("ops_parse_errors")
     print(f"Saved {len(parse_errors)} parse errors to 'parse_errors' table")
     print("\nTop errors:")
     for e in sorted(parse_errors, key=lambda x: x["line_count"], reverse=True)[:5]:
@@ -267,7 +267,7 @@ if parse_successes:
     success_rows = [(s["metric_id"], s["name"], s["cte_count"], s["table_count"], s["line_count"])
                     for s in parse_successes]
     success_df = spark.createDataFrame(success_rows, schema=to_spark_schema(PARSE_SUCCESSES))
-    success_df.write.format("delta").mode("overwrite").saveAsTable("parse_successes")
+    success_df.write.format("delta").mode("overwrite").saveAsTable("ops_parse_successes")
     print(f"Saved {len(parse_successes)} parse successes to 'parse_successes' table")
 
 print("\n→ Next: run 03_build_graph.py (no need to rerun this unless SQL sources changed)")

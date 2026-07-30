@@ -24,7 +24,7 @@ SQL_FOLDERS = [
     {"path": f"{ABFS_BASE}/views_caboodle",    "source_type": "view",             "schema": "caboodle"},
 ]
 
-SQL_SOURCES_OUTPUT = "sql_sources"
+SQL_SOURCES_OUTPUT = "input_sql_sources"
 
 # %% Cell 2: Read SQL files from all folders, combine, and save
 from pyspark.sql.functions import input_file_name, regexp_extract, lit

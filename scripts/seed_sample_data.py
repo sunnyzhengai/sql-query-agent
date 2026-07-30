@@ -70,9 +70,9 @@ def main() -> None:
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
     for name, data in [
-        ("dict_tables", SAMPLE_DICT_TABLES),
-        ("dict_columns", SAMPLE_DICT_COLUMNS),
-        ("sql_sources", SAMPLE_SQL_SOURCES),
+        ("input_dict_tables", SAMPLE_DICT_TABLES),
+        ("input_dict_columns", SAMPLE_DICT_COLUMNS),
+        ("input_sql_sources", SAMPLE_SQL_SOURCES),
     ]:
         path = OUTPUT_DIR / f"{name}.json"
         with open(path, "w") as f:

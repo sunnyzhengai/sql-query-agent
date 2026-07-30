@@ -75,13 +75,13 @@ print(f"No edges: {total_canonical - len(metrics_with_edges)}")
 # %% Cell 5: Check parse results tables
 print("\n=== Parse Results ===")
 try:
-    success_count = spark.table("parse_successes").count()
-    error_count = spark.table("parse_errors").count()
+    success_count = spark.table("ops_parse_successes").count()
+    error_count = spark.table("ops_parse_errors").count()
     print(f"Successes: {success_count}")
     print(f"Errors: {error_count}")
     print(f"Success rate: {100 * success_count // (success_count + error_count)}%")
 
     print("\nTop 5 errors by proc size:")
-    spark.table("parse_errors").orderBy("line_count", ascending=False).show(5, truncate=80)
+    spark.table("ops_parse_errors").orderBy("line_count", ascending=False).show(5, truncate=80)
 except Exception as e:
     print(f"Parse results tables not found: {e}")

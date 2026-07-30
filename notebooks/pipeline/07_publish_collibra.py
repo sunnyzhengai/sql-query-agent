@@ -92,7 +92,7 @@ print(f"Data Agent tool: {tool_name}")
 # Compute SQL hash for each _PBI metric from metric_logic
 sql_hashes = {}
 try:
-    ml_df = spark.table("metric_logic")
+    ml_df = spark.table("output_metric_logic")
     for row in ml_df.collect():
         r = row.asDict()
         logic = r.get("calculation_logic") or ""
@@ -104,7 +104,7 @@ except Exception:
 existing_descs = {}
 existing_hashes = {}
 try:
-    existing_df = spark.table("agent_descriptions")
+    existing_df = spark.table("ops_agent_descriptions")
     for row in existing_df.collect():
         r = row.asDict()
         existing_descs[r["metric_name"]] = r["description"]
@@ -150,7 +150,7 @@ def _save_all_descriptions(desc_lookup, sql_hashes):
         for name, desc in desc_lookup.items()
     ]
     df = spark.createDataFrame(rows, schema=desc_schema)
-    df.write.format("delta").mode("overwrite").option("overwriteSchema", "true").saveAsTable("agent_descriptions")
+    df.write.format("delta").mode("overwrite").option("overwriteSchema", "true").saveAsTable("ops_agent_descriptions")
     return len(rows)
 
 # Start with existing descriptions
@@ -208,7 +208,7 @@ for name in list(new_descs.keys())[:3]:
 
 # %% Cell 3c: Load descriptions from Delta (use instead of cell 3 + 3b on restart)
 # Uncomment this cell and skip cells 3 + 3b if no regeneration needed.
-# desc_df = spark.table("agent_descriptions")
+# desc_df = spark.table("ops_agent_descriptions")
 # desc_lookup = {row.metric_name: row.description for row in desc_df.collect()}
 # print(f"Loaded {len(desc_lookup)} descriptions from Delta")
 

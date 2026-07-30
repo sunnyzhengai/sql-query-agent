@@ -50,8 +50,8 @@ print(f"Normalized tables: {cab_tbl_normalized.count()}")
 # %% Cell 3: Merge with existing dictionary and save
 # Load existing dictionary (Clarity or previous run)
 try:
-    existing_tbl = spark.table("dict_tables")
-    existing_col = spark.table("dict_columns")
+    existing_tbl = spark.table("input_dict_tables")
+    existing_col = spark.table("input_dict_columns")
     print(f"Existing dict_tables: {existing_tbl.count()}")
     print(f"Existing dict_columns: {existing_col.count()}")
     merged_tbl = existing_tbl.unionByName(cab_tbl_normalized).dropDuplicates(["TABLE_NAME"])
@@ -62,8 +62,8 @@ except Exception as e:
     merged_col = cab_col_resolved
 
 # Write merged dictionary
-merged_tbl.write.format("delta").mode("overwrite").option("overwriteSchema", "true").saveAsTable("dict_tables")
-merged_col.write.format("delta").mode("overwrite").option("overwriteSchema", "true").saveAsTable("dict_columns")
+merged_tbl.write.format("delta").mode("overwrite").option("overwriteSchema", "true").saveAsTable("input_dict_tables")
+merged_col.write.format("delta").mode("overwrite").option("overwriteSchema", "true").saveAsTable("input_dict_columns")
 
 print(f"\nSaved dict_tables: {merged_tbl.count()} tables")
 print(f"Saved dict_columns: {merged_col.count()} columns")

@@ -23,7 +23,7 @@ OUTPUT_DIR = Path(__file__).resolve().parent.parent / "data" / "output"
 
 def main() -> None:
     # Load seed data
-    for name in ["dict_tables", "dict_columns", "sql_sources"]:
+    for name in ["input_dict_tables", "input_dict_columns", "input_sql_sources"]:
         path = SAMPLE_DIR / f"{name}.json"
         if not path.exists():
             print(f"ERROR: {path} not found. Run 'python scripts/seed_sample_data.py' first.", file=sys.stderr)
