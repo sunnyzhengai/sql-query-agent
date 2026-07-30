@@ -5,6 +5,7 @@ __pycache__/
 *.egg-info/
 src/*.egg-info/
 dist/
+!dist/*.whl
 build/
 *.egg
 .eggs/

@@ -12,9 +12,13 @@ parse_results stores the full parsed output (CTEs as JSON) so
 import json
 import sys
 
-sys.path.insert(0, "/lakehouse/default/Files/sql-query-agent")
-
-import src
+# If the wheel is installed via Fabric Environment, src is already importable.
+# Fallback to sys.path for dev mode or non-wheel deployments.
+try:
+    import src
+except ImportError:
+    sys.path.insert(0, "/lakehouse/default/Files/sql-query-agent")
+    import src
 print(f"v{src.__version__}")
 
 # Load pythonnet + ScriptDom directly (do not call load_scriptdom — it re-triggers init)

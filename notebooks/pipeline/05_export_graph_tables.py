@@ -24,9 +24,13 @@ After running, create a Graph Model in the Fabric UI:
 # %% Cell 0: Setup
 import json
 import sys
-sys.path.insert(0, "/lakehouse/default/Files/sql-query-agent")
-
-import src
+# If the wheel is installed via Fabric Environment, src is already importable.
+# Fallback to sys.path for dev mode or non-wheel deployments.
+try:
+    import src
+except ImportError:
+    sys.path.insert(0, "/lakehouse/default/Files/sql-query-agent")
+    import src
 print(f"v{src.__version__}")
 
 from src.config import load_config
