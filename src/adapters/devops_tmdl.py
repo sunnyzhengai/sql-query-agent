@@ -85,10 +85,11 @@ def parse_tmdl_partition(tmdl_content: str, table_name: str) -> SqlSource | None
         Sql.Database("server", "database", [Query="EXEC dbo.USP_..."])
     """
     # Find partition blocks with M expressions
+    # Partition names can be bare or quoted: partition Name = m  OR  partition 'Name' = m
     partition_pattern = re.compile(
-        r'partition\s+.+?\s*=\s*m\s*\n'
-        r'\s+mode:\s*\w+\s*\n'
-        r'\s+source\s*=\s*\n(.*?)(?=\n\s*\n|\n\s+annotation|\Z)',
+        r"""partition\s+[^\n]+=\s*m\s*\n"""
+        r"""\s+mode:\s*\w+\s*\n"""
+        r"""\s+source\s*=\s*\n(.*?)(?=\n\s*\n|\n\s+annotation|\Z)""",
         re.DOTALL
     )
 
@@ -125,12 +126,15 @@ def parse_tmdl_partition(tmdl_content: str, table_name: str) -> SqlSource | None
         source.server = dsn_match.group(1)
 
     # Pattern 2: Odbc.Query("dsn", "exec [db].[schema].[proc]")
+    # Query string may contain #(lf) (Power Query line feed escape)
     odbc_query_match = re.search(r'Odbc\.Query\(\s*"([^"]+)"\s*,\s*"([^"]+)"', m_expr)
     if odbc_query_match:
         source.server = odbc_query_match.group(1)
         query = odbc_query_match.group(2)
+        # Clean Power Query escape sequences
+        query = query.replace("#(lf)", " ").replace("#(cr)", " ").replace("#(tab)", " ")
         # Parse "exec [CookClarity].[COOK_RPT].[USP_CCMC_ANESTHESIA_CRNA_PBI]"
-        # or "exec dbo.USP_Something"
+        # or "exec dbo.USP_Something" or "exec db.schema.proc"
         exec_match = re.search(
             r'exec\s+'
             r'(?:\[?(\w+)\]?\.)?' # optional database
@@ -148,6 +152,7 @@ def parse_tmdl_partition(tmdl_content: str, table_name: str) -> SqlSource | None
                 source.database = parts[-3]
 
     # Pattern 3: Sql.Database("server", "database", [Query="..."])
+    # Server can be a string literal or a variable/parameter name
     sql_db_match = re.search(
         r'Sql\.Database\(\s*"([^"]+)"\s*,\s*"([^"]+)"', m_expr
     )
@@ -155,18 +160,38 @@ def parse_tmdl_partition(tmdl_content: str, table_name: str) -> SqlSource | None
         source.server = sql_db_match.group(1)
         source.database = sql_db_match.group(2)
 
-    # Extract stored proc from Query parameter
-    query_match = re.search(r'\[Query\s*=\s*"([^"]+)"\]', m_expr)
-    if query_match:
+    # Sql.Database with variable server: Sql.Database(ServerParam, "database", ...)
+    if not sql_db_match:
+        sql_db_var_match = re.search(
+            r'Sql\.Database\(\s*(\w+)\s*,\s*"([^"]+)"', m_expr
+        )
+        if sql_db_var_match:
+            source.server = sql_db_var_match.group(1)  # parameter name
+            source.database = sql_db_var_match.group(2)
+
+    # Extract stored proc or inline SQL from Query parameter
+    # Query value may span multiple lines with #(lf) escapes
+    query_match = re.search(r'\[Query\s*=\s*"((?:[^"\\]|\\.)*)"\s*\]', m_expr, re.DOTALL)
+    if query_match and not source.sql_object:
         query = query_match.group(1)
-        # Extract proc name from "EXEC dbo.USP_..."
-        proc_match = re.search(r'EXEC\s+(?:(\w+)\.)?(\w+)', query, re.IGNORECASE)
+        query = query.replace("#(lf)", " ").replace("#(cr)", " ").replace("#(tab)", " ")
+        # Try to extract proc name from "EXEC [schema].[proc]" or "EXEC schema.proc"
+        proc_match = re.search(
+            r'EXEC\s+'
+            r'(?:\[?(\w+)\]?\.)?' # optional schema
+            r'\[?(\w+)\]?',       # proc name
+            query, re.IGNORECASE
+        )
         if proc_match:
             source.schema = proc_match.group(1) or ""
             source.sql_object = proc_match.group(2)
             source.sql_object_type = "StoredProcedure"
+        else:
+            # Inline SQL — mark as InlineQuery with a summary
+            source.sql_object = "InlineQuery"
+            source.sql_object_type = "InlineSQL"
 
-    # Pattern 3: Sql.Databases("server") with navigation
+    # Pattern 4: Sql.Databases("server") with navigation
     sql_dbs_match = re.search(r'Sql\.Databases\(\s*"([^"]+)"', m_expr)
     if sql_dbs_match and not source.server:
         source.server = sql_dbs_match.group(1)

@@ -58,6 +58,48 @@ ODBC_QUERY_TMDL = """table Anesthesia
     annotation PBI_ResultType = Table
 """
 
+ODBC_QUERY_LF_TMDL = """table EmployeeInfo
+    lineageTag: abc123
+
+    partition 'Employee Info-0f78c2fc' = m
+        mode: import
+        source =
+                let
+                    Source = Odbc.Query("dsn=EmployeeCare", "exec employeecare.cook_rpt.usp_employee_info#(lf)")
+                in
+                    Source
+
+    annotation PBI_ResultType = Table
+"""
+
+SQL_DATABASE_VAR_TMDL = """table AdmitDischarge
+    lineageTag: abc123
+
+    partition AdmitDischarge = m
+        mode: import
+        source =
+                let
+                    Source = Sql.Database(CaboodleServer, "CookCDW", [Query="SET NOCOUNT ON;#(lf)EXEC dbo.USP_AdmitDischarge_PBI"])
+                in
+                    Source
+
+    annotation PBI_ResultType = Table
+"""
+
+SQL_INLINE_TMDL = """table Membership
+    lineageTag: abc123
+
+    partition Membership = m
+        mode: import
+        source =
+                let
+                    Source = Sql.Database(CaboodleServer, "cookcdw", [Query="SELECT DISTINCT MemberNo, MemberName FROM Members"])
+                in
+                    Source
+
+    annotation PBI_ResultType = Table
+"""
+
 SQL_DATABASE_TMDL = """table PatientData
     lineageTag: abc123
 
@@ -126,6 +168,30 @@ class TestParseTmdlPartition:
         assert result.sql_object == "USP_CCMC_ANESTHESIA_CRNA_PBI"
         assert result.sql_object_type == "StoredProcedure"
         assert result.server == "dsn=Clarity"
+
+    def test_odbc_query_with_lf_escape(self):
+        result = parse_tmdl_partition(ODBC_QUERY_LF_TMDL, "EmployeeInfo")
+        assert result is not None
+        assert result.sql_object == "usp_employee_info"
+        assert result.schema == "cook_rpt"
+        assert result.database == "employeecare"
+        assert result.sql_object_type == "StoredProcedure"
+
+    def test_sql_database_variable_server(self):
+        result = parse_tmdl_partition(SQL_DATABASE_VAR_TMDL, "AdmitDischarge")
+        assert result is not None
+        assert result.server == "CaboodleServer"
+        assert result.database == "CookCDW"
+        assert result.sql_object == "USP_AdmitDischarge_PBI"
+        assert result.sql_object_type == "StoredProcedure"
+        assert result.schema == "dbo"
+
+    def test_inline_sql_marked(self):
+        result = parse_tmdl_partition(SQL_INLINE_TMDL, "Membership")
+        assert result is not None
+        assert result.sql_object == "InlineQuery"
+        assert result.sql_object_type == "InlineSQL"
+        assert result.database == "cookcdw"
 
 
 class TestParseTmdlDax:
