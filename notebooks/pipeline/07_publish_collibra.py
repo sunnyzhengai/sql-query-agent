@@ -129,60 +129,82 @@ print(f"\n{len(pbi_metrics)} _PBI metrics total")
 print(f"  {reused} already have current descriptions (skipped)")
 print(f"  {len(needs_generation)} need generation")
 
-# Generate only for new/changed metrics
+# Generate only for new/changed metrics, saving incrementally to Delta.
+# This ensures descriptions survive token expiry — just restart kernel
+# and re-run; already-generated descriptions will be skipped.
+from pyspark.sql.types import StructType, StructField, StringType
+
 REJECT_PHRASES = ["wasn't able to find", "couldn't find", "not found", "hasn't been", "I'm happy to help"]
+SAVE_EVERY = 25  # persist to Delta every N successful generations
+
+desc_schema = StructType([
+    StructField("metric_name", StringType(), False),
+    StructField("description", StringType(), False),
+    StructField("sql_hash", StringType(), True),
+])
+
+def _save_all_descriptions(desc_lookup, sql_hashes):
+    """Persist all descriptions (existing + new) to Delta."""
+    rows = [
+        (name, desc, sql_hashes.get(name, ""))
+        for name, desc in desc_lookup.items()
+    ]
+    df = spark.createDataFrame(rows, schema=desc_schema)
+    df.write.format("delta").mode("overwrite").option("overwriteSchema", "true").saveAsTable("agent_descriptions")
+    return len(rows)
+
+# Start with existing descriptions
+desc_lookup = {}
+for name, desc in existing_descs.items():
+    if name not in needs_generation:
+        desc_lookup[name] = desc
 
 new_descs = {}
 if needs_generation:
-    agent_results = agent.generate_descriptions_bulk(needs_generation)
-
     succeeded = 0
     failed = 0
-    for name, resp in agent_results.items():
+    unsaved_count = 0
+
+    for i, name in enumerate(needs_generation):
+        resp = agent.generate_metric_description(name)
+
         if resp.status == "success" and resp.answer:
             if any(phrase in resp.answer.lower() for phrase in REJECT_PHRASES):
                 print(f"  REJECTED {name} — agent returned a non-answer")
                 failed += 1
                 continue
             new_descs[name] = resp.answer
+            desc_lookup[name] = resp.answer
             succeeded += 1
+            unsaved_count += 1
         else:
             failed += 1
+            print(f"Failed for {name}: {resp.error}")
+
+        # Incremental save every SAVE_EVERY successes
+        if unsaved_count >= SAVE_EVERY:
+            saved = _save_all_descriptions(desc_lookup, sql_hashes)
+            print(f"  [{i+1}/{len(needs_generation)}] Saved {saved} total descriptions ({succeeded} new, {failed} failed)")
+            unsaved_count = 0
+
+        # Progress log
+        elif (i + 1) % 10 == 0:
+            print(f"  [{i+1}/{len(needs_generation)}] {succeeded} succeeded, {failed} failed")
+
+    # Final save
+    if unsaved_count > 0:
+        saved = _save_all_descriptions(desc_lookup, sql_hashes)
+        print(f"  Final save: {saved} total descriptions")
 
     print(f"\nGenerated {succeeded} new descriptions ({failed} failed)")
-
-# Merge: existing (unchanged) + newly generated
-desc_lookup = {}
-for name, desc in existing_descs.items():
-    if name not in needs_generation:
-        desc_lookup[name] = desc  # keep existing
-for name, desc in new_descs.items():
-    desc_lookup[name] = desc  # add/replace with new
+else:
+    print("\nAll descriptions are current — nothing to generate.")
 
 # Show newly generated samples
 for name in list(new_descs.keys())[:3]:
     desc = new_descs[name]
     print(f"\n  NEW: {name}:")
     print(f"    {desc[:150]}..." if len(desc) > 150 else f"    {desc}")
-
-if not needs_generation:
-    print("\nAll descriptions are current — nothing to generate.")
-
-# %% Cell 3b: Save descriptions to Delta
-from pyspark.sql.types import StructType, StructField, StringType
-
-desc_rows = [
-    (name, desc, sql_hashes.get(name, ""))
-    for name, desc in desc_lookup.items()
-]
-desc_schema = StructType([
-    StructField("metric_name", StringType(), False),
-    StructField("description", StringType(), False),
-    StructField("sql_hash", StringType(), True),
-])
-desc_df = spark.createDataFrame(desc_rows, schema=desc_schema)
-desc_df.write.format("delta").mode("overwrite").option("overwriteSchema", "true").saveAsTable("agent_descriptions")
-print(f"Saved {len(desc_rows)} descriptions to agent_descriptions table")
 
 # %% Cell 3c: Load descriptions from Delta (use instead of cell 3 + 3b on restart)
 # Uncomment this cell and skip cells 3 + 3b if no regeneration needed.
