@@ -207,6 +207,144 @@ def _get_insert_target(stmt):
     return None
 
 
+def parse_from_fragment(fragment) -> "ParsedSQL":
+    """Parse a ScriptDom AST fragment into a ParsedSQL structure.
+
+    This function contains the core AST-walking logic, separated from
+    ScriptDom initialization. The notebook handles loading pythonnet and
+    parsing raw SQL into a fragment; this function handles the structural
+    extraction.
+
+    Args:
+        fragment: A ScriptDom TSqlFragment (output of TSql160Parser.Parse())
+
+    Returns:
+        ParsedSQL with CTEs, table refs, column refs, and temp table dependencies.
+    """
+    from src.parser.sql_parser import ParsedSQL, CTEInfo, ColumnRef, TableRef
+    from src.parser.sql_parser import normalize_sql_whitespace
+
+    # Find all SELECT and INSERT...SELECT statements
+    stmt_nodes = []
+    _walk_for_selects(fragment, stmt_nodes, _get_fragment_text)
+
+    if not stmt_nodes:
+        raise ValueError("ScriptDom found no SELECT statements")
+
+    raw_entries = []
+    temp_table_names = set()
+    cte_names = set()
+
+    for stmt in stmt_nodes:
+        stmt_type = stmt.GetType().Name
+
+        if stmt_type == "SelectStatement":
+            into_target = _get_into_target(stmt)
+        elif stmt_type == "InsertStatement":
+            into_target = _get_insert_target(stmt)
+        else:
+            into_target = None
+
+        temp_name = None
+        if into_target:
+            temp_name = into_target.lstrip("#")
+            temp_table_names.add(temp_name)
+            temp_table_names.add(into_target)
+
+        if stmt_type == "SelectStatement" and stmt.WithCtesAndXmlNamespaces:
+            cte_list = stmt.WithCtesAndXmlNamespaces.CommonTableExpressions
+            for j in range(cte_list.Count):
+                cte_node = cte_list[j]
+                cte_name_val = cte_node.ExpressionName.Value
+                cte_names.add(cte_name_val)
+                cte_body = cte_node.QueryExpression
+                cte_sql = normalize_sql_whitespace(_get_fragment_text(cte_body))[:500]
+                cte_tables, cte_cols = [], []
+                _walk_for_refs(cte_body, cte_tables, cte_cols)
+                raw_entries.append((cte_name_val, cte_sql, cte_tables, cte_cols, True))
+
+        tables, columns = [], []
+        if stmt_type == "SelectStatement":
+            _walk_for_refs(stmt.QueryExpression, tables, columns)
+        elif stmt_type == "InsertStatement":
+            spec = stmt.InsertSpecification
+            if spec.InsertSource:
+                _walk_for_refs(spec.InsertSource, tables, columns)
+
+        if temp_name:
+            sql_text = normalize_sql_whitespace(_get_fragment_text(stmt))[:500]
+            raw_entries.append((temp_name, sql_text, tables, columns, False))
+        else:
+            raw_entries.append((None, "", tables, columns, False))
+
+    stripped_temps = {tn.lstrip("#") for tn in temp_table_names}
+
+    all_ctes = []
+    all_final_tables = []
+    all_final_cte_refs = []
+    all_final_columns = []
+
+    for entry_name, sql_frag, raw_tables, raw_cols, _ in raw_entries:
+        col_refs = [ColumnRef(table=t, column=c) for t, c in raw_cols]
+
+        if entry_name is not None:
+            physical, depends = [], []
+            seen_p, seen_d = set(), set()
+            for db, sch, tbl in raw_tables:
+                canonical = tbl.lstrip("#")
+                if canonical == entry_name:
+                    continue
+                if canonical in stripped_temps or tbl in cte_names:
+                    if canonical not in seen_d:
+                        depends.append(canonical)
+                        seen_d.add(canonical)
+                else:
+                    ref = TableRef(table=tbl, schema=sch, database=db)
+                    if ref not in seen_p:
+                        physical.append(ref)
+                        seen_p.add(ref)
+            all_ctes.append(CTEInfo(
+                name=entry_name, sql_fragment=sql_frag,
+                column_refs=col_refs, table_refs=physical, depends_on=depends,
+            ))
+        else:
+            for db, sch, tbl in raw_tables:
+                canonical = tbl.lstrip("#")
+                if canonical in stripped_temps or tbl in cte_names:
+                    if canonical not in all_final_cte_refs:
+                        all_final_cte_refs.append(canonical)
+                else:
+                    ref = TableRef(table=tbl, schema=sch, database=db)
+                    if ref not in all_final_tables:
+                        all_final_tables.append(ref)
+            all_final_columns.extend(col_refs)
+
+    return ParsedSQL(
+        ctes=all_ctes,
+        final_select_tables=all_final_tables,
+        final_select_cte_refs=all_final_cte_refs,
+        final_select_columns=all_final_columns,
+        normalized_sql="",
+    )
+
+
+def extract_from_fragment(fragment) -> list:
+    """Extract raw SQL query strings from a ScriptDom AST fragment.
+
+    Legacy function for the sqlglot fallback path. Replaces @parameters
+    with __param_X__ placeholders for sqlglot compatibility.
+
+    Args:
+        fragment: A ScriptDom TSqlFragment
+
+    Returns:
+        List of SQL query strings with parameter placeholders.
+    """
+    stmt_nodes = []
+    _walk_for_selects(fragment, stmt_nodes, _get_fragment_text)
+    return [re.sub(r"@(\w+)", r"__param_\1__", _get_fragment_text(s)) for s in stmt_nodes]
+
+
 def load_scriptdom(dll_path: str = "/lakehouse/default/Files/sql-query-agent/libs") -> tuple:
     """Load ScriptDom via pythonnet and return (success, extract_fn, parse_fn).
 

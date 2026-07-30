@@ -7,7 +7,7 @@ to extract:
 3. DAX calculated columns — transformations defined in the PBI layer
 
 Usage:
-    from src.adapters.devops_tmdl import DevOpsTmdlClient
+    from src.extractor.devops_tmdl import DevOpsTmdlClient
     client = DevOpsTmdlClient(org, project, pat)
     reports = client.extract_all_reports(repo_name)
 """

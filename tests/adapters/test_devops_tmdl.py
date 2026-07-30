@@ -2,7 +2,7 @@
 
 import pytest
 
-from src.adapters.devops_tmdl import (
+from src.extractor.devops_tmdl import (
     parse_tmdl_partition,
     parse_tmdl_dax,
 )

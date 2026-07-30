@@ -8,7 +8,7 @@ import sys
 sys.path.insert(0, "/lakehouse/default/Files/sql-query-agent")
 # For local: sys.path.insert(0, ".")
 
-from src.adapters.devops_tmdl import DevOpsTmdlClient
+from src.extractor.devops_tmdl import DevOpsTmdlClient
 
 # ── DevOps credentials ──
 ORG = "CookChildrens"
