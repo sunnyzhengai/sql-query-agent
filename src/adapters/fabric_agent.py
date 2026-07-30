@@ -17,10 +17,14 @@ Endpoint: POST https://api.fabric.microsoft.com/v1/mcp/workspaces/{workspaceId}/
 from __future__ import annotations
 
 import logging
+import time
 from dataclasses import dataclass
 from typing import Any
 
 logger = logging.getLogger(__name__)
+
+# AAD tokens expire after ~1 hour. Refresh proactively before expiry.
+TOKEN_REFRESH_INTERVAL_SECONDS = 45 * 60  # refresh every 45 minutes
 
 
 @dataclass
@@ -54,15 +58,23 @@ class FabricAgentClient:
         self.workspace_id = workspace_id
         self.agent_id = agent_id
         self.tool_name = tool_name  # discovered via tools/list
-        self._access_token = access_token
+        self._explicit_token = access_token  # explicitly passed token (no refresh)
+        self._cached_token = ""
+        self._token_fetched_at = 0.0
         self._endpoint = (
             f"{self.BASE_URL}/mcp/workspaces/{workspace_id}"
             f"/dataagents/{agent_id}/agent"
         )
 
     def _get_token(self) -> str:
-        if self._access_token:
-            return self._access_token
+        if self._explicit_token:
+            return self._explicit_token
+
+        # Refresh cached token if it's older than the refresh interval
+        elapsed = time.time() - self._token_fetched_at
+        if self._cached_token and elapsed < TOKEN_REFRESH_INTERVAL_SECONDS:
+            return self._cached_token
+
         # In Fabric notebooks, mssparkutils is injected as a global,
         # not an importable module. Try the global first, then import.
         import builtins
@@ -77,7 +89,11 @@ class FabricAgentClient:
                 "mssparkutils not available. Run in a Fabric Notebook "
                 "or pass access_token explicitly."
             )
-        return _mssparkutils.credentials.getToken("https://api.fabric.microsoft.com")
+        self._cached_token = _mssparkutils.credentials.getToken("https://api.fabric.microsoft.com")
+        self._token_fetched_at = time.time()
+        if elapsed > 0:
+            logger.info("Refreshed AAD token (previous was %.0f minutes old)", elapsed / 60)
+        return self._cached_token
 
     def _get_headers(self) -> dict[str, str]:
         return {
