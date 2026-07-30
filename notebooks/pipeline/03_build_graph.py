@@ -1,13 +1,12 @@
 """Fabric Notebook: Build Knowledge Graph
 
-Reads from: parse_results, dict_tables, dict_columns (Delta tables)
-Writes to:  graph_nodes, graph_edges (Delta tables)
+Reads from: ops_parse_results, input_dict_tables, input_dict_columns (Delta)
+Writes to:  graph_nodes, graph_edges (Delta)
 
-Run 02_parse.py at least once before this (writes parse_results).
-Does NOT re-parse SQL — reads pre-parsed CTEs from parse_results table.
+Run 02_parse.py at least once before this.
 """
 
-# %% Cell 0: Setup (run once per session)
+# %% Cell 0: Setup
 # Prerequisites: Attach 'sql-logic-env' Fabric Environment. No %pip install.
 import json
 import sys
@@ -17,152 +16,66 @@ import src
 print(f"v{src.__version__}")
 
 from src.config import load_config
-from src.schemas import to_spark_schema
+from src.schemas import GRAPH_NODES, GRAPH_EDGES, to_spark_schema
 
 config = load_config("/lakehouse/default/Files/sql-query-agent/org_config.yaml")
 
-def read_source(name_or_path):
-    """Read a data source by name or path."""
-    if name_or_path.endswith(".csv"):
-        return spark.read.option("header", "true").option("inferSchema", "true").csv(name_or_path)
-    elif "abfss://" in name_or_path or "/" in name_or_path:
-        return spark.read.format("delta").load(name_or_path)
-    else:
-        return spark.table(name_or_path)
+# %% Cell 1: Load parse results + dictionary from Delta
+parse_results = [r.asDict() for r in spark.table("ops_parse_results").collect()]
 
-# %% Cell 1: Load parse results from Delta
-parse_results_df = spark.table("ops_parse_results")
-parse_results = [row.asDict() for row in parse_results_df.collect()]
-print(f"Loaded {len(parse_results)} parse results")
+dict_tables_rows = [r.asDict() for r in spark.table(config.lakehouse.dict_tables).collect()]
+dict_columns_rows = [r.asDict() for r in spark.table(config.lakehouse.dict_columns).collect()]
 
-# %% Cell 2: Load data dictionary
+print(f"Loaded {len(parse_results)} parse results, {len(dict_tables_rows)} tables, {len(dict_columns_rows)} columns")
+
+# %% Cell 2: Build graph (all logic in src/)
 from src.dictionary import DataDictionary
-
-dict_tables_df = read_source(config.lakehouse.dict_tables)
-dict_columns_df = read_source(config.lakehouse.dict_columns)
-
-table_id_col = config.dictionary.table_id_col
-if table_id_col:
-    print(f"Joining dict_columns on {table_id_col} to resolve table names...")
-    table_name_col = config.dictionary.table_name_col
-    tbl_lookup = dict_tables_df.select(table_id_col, table_name_col)
-    dict_columns_df = dict_columns_df.join(tbl_lookup, on=table_id_col, how="left")
-
-dict_tables = [row.asDict() for row in dict_tables_df.collect()]
-dict_columns = [row.asDict() for row in dict_columns_df.collect()]
-print(f"Loaded {len(dict_tables)} tables, {len(dict_columns)} columns from dictionary")
-
-# %% Cell 3: Build graph
 from src.graph.builder import GraphBuilder
-from src.parser.sql_parser import ParsedSQL, CTEInfo, TableRef
+from src.graph.serialization import parse_result_to_parsed_sql, nodes_to_rows, edges_to_rows
 
 builder = GraphBuilder()
 
-# Step 1: Technical nodes from dictionary
+# Load dictionary
 dictionary = DataDictionary()
 table_name_col = config.dictionary.table_name_col
 column_name_col = config.dictionary.column_name_col
 description_col = config.dictionary.description_col
 table_description_col = config.dictionary.table_description_col
 
-for row in dict_tables:
+for row in dict_tables_rows:
     dictionary.add_table(row[table_name_col], row.get(table_description_col, ""))
-for row in dict_columns:
+for row in dict_columns_rows:
     dictionary.add_column(row[table_name_col], row[column_name_col], row.get(description_col, ""))
 
+# Technical nodes from dictionary
 for table_name, table_info in dictionary.tables.items():
     builder.add_technical_node(table_name, description=table_info.description)
     for col_info in dictionary.get_columns_for_table(table_name):
         builder.add_technical_node(table_name, col_info.column_name, description=col_info.description)
 
-print(f"Created {len(builder.nodes)} technical nodes from dictionary")
-
-# Step 2: Canonical + transformation nodes from parse results
+# Canonical + transformation nodes from parse results
 for pr in parse_results:
-    metric_id = pr["metric_id"]
-    name = pr["name"]
-
-    builder.add_canonical_node(metric_id, name)
-
-    # Reconstruct ParsedSQL from stored JSON
-    ctes = []
-    for c in json.loads(pr["ctes_json"]):
-        # Deserialize table_refs back to TableRef objects
-        table_refs = []
-        for t in c["table_refs"]:
-            if isinstance(t, dict):
-                table_refs.append(TableRef(table=t["table"], schema=t.get("schema", "dbo"), database=t.get("database")))
-            else:
-                table_refs.append(TableRef(table=t))
-        ctes.append(CTEInfo(
-            name=c["name"],
-            sql_fragment=c["sql_fragment"],
-            table_refs=table_refs,
-            depends_on=c["depends_on"],
-        ))
-
-    # Deserialize final_select_tables
-    raw_final = json.loads(pr["final_select_tables"])
-    final_tables = []
-    for t in raw_final:
-        if isinstance(t, dict):
-            final_tables.append(TableRef(table=t["table"], schema=t.get("schema", "dbo"), database=t.get("database")))
-        else:
-            final_tables.append(TableRef(table=t))
-
-    parsed = ParsedSQL(
-        ctes=ctes,
-        final_select_tables=final_tables,
-        final_select_cte_refs=json.loads(pr["final_select_cte_refs"]),
-    )
-
-    builder.build_from_parsed_sql(metric_id, parsed)
+    builder.add_canonical_node(pr["metric_id"], pr["name"])
+    parsed = parse_result_to_parsed_sql(pr)
+    builder.build_from_parsed_sql(pr["metric_id"], parsed)
 
 print(f"Built graph: {len(builder.nodes)} nodes, {len(builder.edges)} edges")
 
-# %% Cell 4: Write graph to Delta
-from src.schemas import GRAPH_NODES, GRAPH_EDGES, to_spark_schema
+# %% Cell 3: Write to Delta
+nodes_df = spark.createDataFrame(nodes_to_rows(builder.nodes), schema=to_spark_schema(GRAPH_NODES))
+edges_df = spark.createDataFrame(edges_to_rows(builder.edges), schema=to_spark_schema(GRAPH_EDGES))
 
-nodes_rows = [
-    (n.node_id, n.layer.value, n.name, n.description, json.dumps(n.properties))
-    for n in builder.nodes.values()
-]
-edges_rows = [
-    (e.source_id, e.target_id, e.edge_type.value, json.dumps(e.properties))
-    for e in builder.edges
-]
+nodes_df.write.format("delta").mode("overwrite").option("overwriteSchema", "true").saveAsTable(config.lakehouse.graph_nodes)
+edges_df.write.format("delta").mode("overwrite").option("overwriteSchema", "true").saveAsTable(config.lakehouse.graph_edges)
 
-nodes_df = spark.createDataFrame(nodes_rows, schema=to_spark_schema(GRAPH_NODES))
-edges_df = spark.createDataFrame(edges_rows, schema=to_spark_schema(GRAPH_EDGES))
+print(f"Wrote {nodes_df.count()} nodes, {edges_df.count()} edges")
 
-def write_table(df, name):
-    if "/" in name:
-        df.write.format("delta").mode("overwrite").save(name)
-    else:
-        df.write.format("delta").mode("overwrite").saveAsTable(name)
-
-write_table(nodes_df, config.lakehouse.graph_nodes)
-write_table(edges_df, config.lakehouse.graph_edges)
-
-print(f"Wrote {nodes_df.count()} nodes to {config.lakehouse.graph_nodes}")
-print(f"Wrote {edges_df.count()} edges to {config.lakehouse.graph_edges}")
-
-# %% Cell 5: Quick traversal test
+# %% Cell 4: Quick traversal test
 from src.graph.traversal import GraphTraverser
 
 traverser = GraphTraverser(builder.nodes, builder.edges)
-
-print("\n=== Traversal Test (first 5) ===")
-for pr in parse_results[:5]:
-    metric_id = pr["metric_id"]
-    subgraph = traverser.get_metric_subgraph(metric_id)
+for pr in parse_results[:3]:
+    subgraph = traverser.get_metric_subgraph(pr["metric_id"])
     if subgraph:
-        canonical = subgraph["canonical"]
         tables = [t.name for t in subgraph["technical"] if t.properties.get("column") is None]
-        print(f"\n{canonical.name} ({metric_id})")
-        print(f"  Transforms: {len(subgraph['transformations'])}")
-        print(f"  Tables: {len(tables)} — {tables[:5]}{'...' if len(tables) > 5 else ''}")
-    else:
-        print(f"\n{metric_id} — no graph path found")
-
-print("\n→ Next: run 04_build_metric_logic.py")
+        print(f"  {subgraph['canonical'].name}: {len(subgraph['transformations'])} transforms, {len(tables)} tables")
