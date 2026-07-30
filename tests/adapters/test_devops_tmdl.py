@@ -40,6 +40,24 @@ ODBC_TMDL = """table Claims
     annotation PBI_ResultType = Exception
 """
 
+ODBC_QUERY_TMDL = """table Anesthesia
+    lineageTag: abc123
+
+    column SurgeonName
+        dataType: string
+        sourceColumn: SurgeonName
+
+    partition Anesthesia-566cedeb = m
+        mode: import
+        source =
+                let
+                    Source = Odbc.Query("dsn=Clarity", "exec [CookClarity].[COOK_RPT].[USP_CCMC_ANESTHESIA_CRNA_PBI]")
+                in
+                    Source
+
+    annotation PBI_ResultType = Table
+"""
+
 SQL_DATABASE_TMDL = """table PatientData
     lineageTag: abc123
 
@@ -97,6 +115,16 @@ class TestParseTmdlPartition:
 
     def test_dsn_extracted(self):
         result = parse_tmdl_partition(ODBC_TMDL, "Claims")
+        assert result.server == "dsn=Clarity"
+
+    def test_odbc_query_with_exec(self):
+        result = parse_tmdl_partition(ODBC_QUERY_TMDL, "Anesthesia")
+        assert result is not None
+        assert result.table_name == "Anesthesia"
+        assert result.database == "CookClarity"
+        assert result.schema == "COOK_RPT"
+        assert result.sql_object == "USP_CCMC_ANESTHESIA_CRNA_PBI"
+        assert result.sql_object_type == "StoredProcedure"
         assert result.server == "dsn=Clarity"
 
 

@@ -80,8 +80,9 @@ def parse_tmdl_partition(tmdl_content: str, table_name: str) -> SqlSource | None
                 in
                     View
 
-    Also handles Sql.Database() sources:
-        Source = Sql.Database("server", "database", [Query="EXEC dbo.USP_..."])
+    Also handles:
+        Odbc.Query("dsn=Clarity", "exec [DB].[Schema].[USP_Proc]")
+        Sql.Database("server", "database", [Query="EXEC dbo.USP_..."])
     """
     # Find partition blocks with M expressions
     partition_pattern = re.compile(
@@ -123,7 +124,30 @@ def parse_tmdl_partition(tmdl_content: str, table_name: str) -> SqlSource | None
     if dsn_match:
         source.server = dsn_match.group(1)
 
-    # Pattern 2: Sql.Database("server", "database", [Query="..."])
+    # Pattern 2: Odbc.Query("dsn", "exec [db].[schema].[proc]")
+    odbc_query_match = re.search(r'Odbc\.Query\(\s*"([^"]+)"\s*,\s*"([^"]+)"', m_expr)
+    if odbc_query_match:
+        source.server = odbc_query_match.group(1)
+        query = odbc_query_match.group(2)
+        # Parse "exec [CookClarity].[COOK_RPT].[USP_CCMC_ANESTHESIA_CRNA_PBI]"
+        # or "exec dbo.USP_Something"
+        exec_match = re.search(
+            r'exec\s+'
+            r'(?:\[?(\w+)\]?\.)?' # optional database
+            r'(?:\[?(\w+)\]?\.)?' # optional schema
+            r'\[?(\w+)\]?',       # object name
+            query, re.IGNORECASE
+        )
+        if exec_match:
+            parts = [p for p in exec_match.groups() if p]
+            source.sql_object = parts[-1]  # last part is always the object
+            source.sql_object_type = "StoredProcedure"
+            if len(parts) >= 2:
+                source.schema = parts[-2]
+            if len(parts) >= 3:
+                source.database = parts[-3]
+
+    # Pattern 3: Sql.Database("server", "database", [Query="..."])
     sql_db_match = re.search(
         r'Sql\.Database\(\s*"([^"]+)"\s*,\s*"([^"]+)"', m_expr
     )
