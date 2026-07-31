@@ -86,7 +86,6 @@ Right-click **Files/** → **New subfolder** → `sql-query-agent`
 
 Then right-click `sql-query-agent` → **New subfolder** for each:
 - `libs`
-- `config`
 - `sql_input`
 - `dictionary`
 
@@ -94,10 +93,10 @@ Then right-click `sql-query-agent` → **New subfolder** for each:
 ```
 Files/
 └── sql-query-agent/
-    ├── libs/
-    ├── config/
-    ├── sql_input/
-    └── dictionary/
+    ├── libs/                  ← ScriptDom DLL
+    ├── sql_input/             ← your .sql files
+    ├── dictionary/            ← dict_tables.csv + dict_columns.csv
+    └── org_config.yaml        ← config file (NOT in a subfolder)
 ```
 
 ### 3b: Upload the ScriptDom DLL
@@ -109,13 +108,15 @@ Files/
 
 ### 3c: Upload configuration
 
-1. Navigate to `Files/sql-query-agent/config/`
+1. Navigate to `Files/sql-query-agent/` (the root, NOT a subfolder)
 2. Upload `org_config.yaml`
 3. Edit the file and set your organization name:
    ```yaml
    org:
      name: "Your Health System Name"
    ```
+
+> **Common mistake:** Do NOT put `org_config.yaml` inside a `config/` subfolder. The notebooks look for it at `Files/sql-query-agent/org_config.yaml` directly.
 
 ### 3d: Upload SQL files
 
