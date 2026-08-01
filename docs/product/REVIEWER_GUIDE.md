@@ -2,7 +2,6 @@
 
 **Product:** SQL Intelligence Agent for Microsoft Fabric
 **Version:** 1.1.0
-**Reviewer Sandbox:** [workspace URL to be filled]
 
 ---
 
@@ -11,34 +10,41 @@
 ### Step 1: Open the Workspace
 
 1. Log in to [Microsoft Fabric](https://app.fabric.microsoft.com)
-2. Navigate to workspace: **[WORKSPACE_NAME]**
-3. Open the Lakehouse: **Demo_Lakehouse**
+2. Navigate to the workspace shared with you
+3. Open the **SQL Intelligence Agent** Data Agent
 
-### Step 2: Run the Pipeline (optional — already pre-run)
+### Step 2: Test the Data Agent
 
-The pipeline has already been executed and results are loaded. If you want to see it run:
+The pipeline has already been executed — 28 SQL stored procedures have been parsed, a knowledge graph has been built, and business descriptions have been generated. You can start asking questions immediately.
 
-1. Open notebook **02_parse**
-2. Click **Run all** — parses 20 SQL files in ~30 seconds
-3. Open notebook **03_build_graph** → Run all — builds knowledge graph
-4. Open notebook **04_build_metric_logic** → Run all — flattens for agent
-5. Open notebook **05_validate** → Run all — shows pipeline health
+Try these questions:
 
-### Step 3: Test the Data Agent
+| # | Question | What it demonstrates |
+|---|---|---|
+| 1 | "What metrics are available?" | Lists all 28 parsed metrics from the knowledge graph |
+| 2 | "What is USP_Severe_Sepsis?" | Returns a pre-generated business description with purpose and business logic |
+| 3 | "How is USP_IP_SEPSIS calculated?" | Translates complex multi-criteria SQL logic to plain English |
+| 4 | "What tables feed into USP_ED_Sepsis?" | Traces upstream dependencies — shows source tables with descriptions |
+| 5 | "Which reports use the FLOWSHEET_MEASUREMENTS table?" | Reverse lineage — finds all metrics that read from a specific source table |
+| 6 | "Show me the technical details for USP_IP_SepsisShiftCompliance" | Shows SQL fragments, source tables, and transformation chain (developer view) |
+| 7 | "How does the system handle missing lactate values?" | Deep business logic extraction — finds COALESCE/ISNULL patterns across metrics |
+| 8 | "/coverage" | System health: 28/28 metrics parsed, 28/28 with descriptions, source tables mapped |
+| 9 | "/errors" | Parse errors (should show 0 — all 28 files parsed successfully) |
+| 10 | "What metrics are in the reports schema?" | Finds metrics grouped by database schema |
 
-1. Open the **SQL Query Agent** Data Agent
-2. Try these questions:
+### Step 3: Explore the Pipeline (optional)
 
-| Question | What it demonstrates |
-|---|---|
-| "What metrics are available?" | Lists all 28 parsed metrics from the knowledge graph |
-| "How is the Sepsis 3-Hour Bundle calculated?" | Translates complex multi-criteria SQL logic to plain English |
-| "What tables feed into the sepsis bundle compliance?" | Traces upstream dependencies through the graph |
-| "Show me the technical details for Sepsis Screening" | Shows SQL fragments, source tables, transformation chain |
-| "Which reports use the LabResultsFact table?" | Reverse lineage — traces from source table back to metrics |
-| "How does the system handle missing lactate values?" | Deep business logic extraction from COALESCE/ISNULL patterns |
-| "/errors" | Shows parse errors with user-friendly explanations and suggested fixes |
-| "/coverage" | Shows system health: how many metrics have logic, tables, stewards |
+If you want to see the pipeline run from scratch:
+
+1. Open notebook **01_install** → Run all — validates environment, loads SQL files and dictionary
+2. Open notebook **02_parse** → Run all — parses 28 SQL files with Microsoft ScriptDom (~1 minute)
+3. Open notebook **03_build_graph** → Run all — builds the three-layer knowledge graph
+4. Open notebook **04_build_metric_logic** → Run all — flattens graph for the Data Agent
+5. Open notebook **05_export_graph_tables** → Run all — exports typed tables for future graph model
+6. Open notebook **06_validate** → Run all — validates pipeline health (should show DEPLOYMENT READY)
+7. Open notebook **07_generate_descriptions** → Run all — generates AI descriptions for each metric
+
+> **Note:** On F2 capacity, only one notebook can run at a time. Stop each session before starting the next.
 
 ---
 
@@ -46,11 +52,12 @@ The pipeline has already been executed and results are loaded. If you want to se
 
 The SQL Intelligence Agent automatically:
 
-1. **Parses** SQL stored procedures and views using Microsoft's native ScriptDom parser (99%+ accuracy on enterprise T-SQL)
+1. **Parses** SQL stored procedures and views using Microsoft's native ScriptDom parser (100% accuracy on T-SQL)
 2. **Builds** a three-layer knowledge graph in Delta tables: Business Metrics → Calculation Logic → Source Tables
-3. **Enables** a Fabric Data Agent to answer natural language questions about any metric's business logic
+3. **Generates** AI-powered business descriptions for each metric
+4. **Enables** a Fabric Data Agent to answer natural language questions about any metric's business logic, data lineage, and governance status
 
-**The problem it solves:** Organizations have thousands of SQL-based reports with business logic buried in code. Nobody documents them. Analysts wait weeks for answers. This product extracts and organizes that knowledge automatically.
+**The problem it solves:** Organizations have thousands of SQL-based reports with business logic buried in code. Nobody documents them. Analysts wait weeks for answers. This product extracts, organizes, and describes that knowledge automatically.
 
 ---
 
@@ -60,112 +67,93 @@ The demo environment contains **28 synthetic SQL files** representing a realisti
 
 ### Why Sepsis Metrics
 
-Sepsis quality reporting is one of the most complex analytics challenges in healthcare. It involves tracking multiple criteria over time — vitals (heart rate, blood pressure), lab results (white blood cell count, lactate), nursing interventions, and antibiotic administration — all across different source tables with temporal dependencies. This gives the parser a realistic stress test against production-grade SQL complexity.
+Sepsis quality reporting is one of the most complex analytics challenges in healthcare. It involves tracking multiple criteria over time — vitals, lab results, nursing interventions, and medication administration — all across different source tables with temporal dependencies. This gives the parser a realistic stress test against production-grade SQL complexity.
 
-All files use **anonymized, synthetic schema names** (e.g., `PatientDim`, `VitalSignsFact`, `LabResultsFact`). No real patient data, provider names, or protected health information is included.
+All files use **anonymized, synthetic schema names** (e.g., `PATIENTS`, `MEDICATION_ORDERS`, `FLOWSHEET_MEASUREMENTS`). No real patient data, provider names, or protected health information is included.
 
 ### SQL File Organization
 
-Files are grouped into sequential processing stages:
+The 28 files come from two database schemas, demonstrating how the product handles same-name procedures in different schemas:
 
-| Stage | Folder | Count | What it contains |
-|---|---|---|---|
-| 1. Staging views | `01_staging_views/` | 8 | Base views that read from source tables — patient demographics, encounters, vitals, labs, medications |
-| 2. Transformations | `02_transformations/` | 12 | Temp table procedures that stage, filter, join, and transform data — time-window calculations, threshold comparisons, missing-value handling |
-| 3. Metrics & reports | `03_sepsis_metrics/` | 8 | Final reporting procedures that calculate bundle compliance rates, dashboard rollups, trend analysis |
+| Schema | Count | What it contains |
+|---|---|---|
+| `reporting` | 21 | Reporting-layer procedures — staging views, transformations, compliance dashboards |
+| `reports` | 7 | ETL-layer procedures — core sepsis identification, bundle compliance calculation |
 
 ### SQL Complexity Patterns Demonstrated
 
 | Pattern | Example | Why it matters |
 |---|---|---|
-| Multi-CTE chains | 6+ CTEs feeding into a final SELECT | Tests dependency tracking and graph wiring |
-| Temp table staging | SELECT INTO #screening → #eligible → #compliant | Tests temp table → CTE conversion and chain resolution |
-| Complex CASE logic | CASE WHEN lactate > 4.0 AND antibiotics_within_3hr = 1 THEN 'Compliant' | Tests business rule extraction |
+| Multi-temp-table chains | 27+ temp tables feeding into final INSERT | Tests dependency tracking and graph wiring |
+| Complex CASE logic | CASE WHEN lactate > threshold AND antibiotics_within_3hr = 1 | Tests business rule extraction |
 | UNION ALL rollups | Department + facility + system-level aggregations | Tests multi-query merging |
 | Temporal JOINs | Events within 3-hour or 6-hour windows | Tests complex WHERE clause extraction |
-| PIVOT / aggregation | Compliance rates by department, month, bundle element | Tests advanced T-SQL parsing |
 | Missing value handling | COALESCE, ISNULL, LEFT JOIN with NULL checks | Tests real-world data quality patterns |
-| Inconsistent formatting | Mixed casing, varied whitespace, inline comments, revision headers | Tests whitespace normalization |
+| Grouper/config lookups | Dynamic category lookups from config tables | Tests indirect reference resolution |
+| Cross-schema references | Procs in `reporting` reading from `reports` staging tables | Tests schema-aware identity |
+| Simple reporting views | Single SELECT with column aliases and CASE | Tests that even simple procs get descriptions |
 
 ### Data Dictionary
 
-A synthetic data dictionary provides table and column descriptions for ~50 tables covering the clinical domain (patient demographics, encounters, vital signs, lab results, medications, flowsheets). This enables the knowledge graph to show human-readable descriptions alongside the SQL logic.
+A synthetic data dictionary provides table and column descriptions for 83 tables and 4,123 columns covering the clinical domain (patients, encounters, vital signs, lab results, medications, flowsheets, alerts, clinical notes). This enables the knowledge graph to show human-readable descriptions alongside the SQL logic.
 
 ---
 
-## Workspace Structure
+## The Golden Path (5 Test Scenarios)
 
-```
-[WORKSPACE_NAME]
-├── Demo_Lakehouse
-│   ├── Files/
-│   │   └── sql-query-agent/          ← Product code + config
-│   │       ├── src/                   ← Core library
-│   │       ├── notebooks/pipeline/    ← Pipeline notebooks (02-05)
-│   │       ├── libs/                  ← ScriptDom DLL
-│   │       └── org_config.yaml        ← Configuration
-│   └── Tables/
-│       ├── sql_sources                ← Input: raw SQL files
-│       ├── dict_tables                ← Input: table descriptions
-│       ├── dict_columns               ← Input: column descriptions
-│       ├── parse_results              ← Intermediate: parsed CTEs + tables
-│       ├── parse_errors               ← Output: failed parses with explanations
-│       ├── parse_successes            ← Output: successful parses
-│       ├── graph_nodes                ← Output: knowledge graph nodes
-│       ├── graph_edges                ← Output: knowledge graph edges
-│       ├── metric_logic               ← Output: flattened view for agent
-│       ├── pipeline_validation        ← Output: per-metric health check
-│       └── build_summary              ← Output: pipeline run history
-├── Environment: sql-logic-env         ← Pre-installed dependencies
-├── Notebooks
-│   ├── 02_parse                       ← Parse SQL files
-│   ├── 03_build_graph                 ← Build knowledge graph
-│   ├── 04_build_metric_logic          ← Flatten for agent
-│   └── 05_validate                    ← Validate pipeline health
-└── SQL Query Agent                    ← Fabric Data Agent
-```
-
----
-
-## The Golden Path (3 Test Scenarios)
-
-### Scenario 1: Business User Asks About a Complex Metric
+### Scenario 1: Business User Asks About a Metric
 
 **Type in the agent:**
-> How is the Sepsis 3-Hour Bundle compliance calculated?
+> What is USP_Severe_Sepsis?
 
-**Expected result:** The agent reads the `metric_logic` table and translates complex multi-criteria SQL logic into plain English:
-- What the metric measures (compliance with sepsis treatment protocols)
-- What criteria are evaluated (blood cultures, antibiotics, lactate measurement — each within time windows)
-- How missing values are handled (e.g., "if lactate is not available, the criterion is marked incomplete")
-- How compliance is calculated (percentage of encounters meeting all bundle elements)
+**Expected result:** The agent returns a pre-generated business description that includes:
+- A purpose statement (what the report does, who uses it)
+- Business logic bullets (inclusion criteria, time windows, clinical thresholds, compliance calculations)
 
-**What it proves:** The product automatically extracts deeply nested business logic from SQL and makes it accessible to non-technical users — even for clinically complex, multi-criteria calculations.
+**What it proves:** The product automatically generates human-readable business descriptions from raw SQL — no manual documentation required.
 
-### Scenario 2: Developer Traces Upstream Dependencies
+### Scenario 2: Developer Traces Data Lineage
 
 **Type in the agent:**
-> Which upstream tables feed into the Sepsis 3-Hour Bundle, and what logic handles missing lactate values?
+> What tables feed into USP_IP_SEPSIS and what does each table contain?
 
-**Expected result:** The agent traces through the knowledge graph and shows:
-- Source tables: `LabResultsFact`, `VitalSignsFact`, `MedicationAdminFact`, `PatientDim`, `EncounterFact`
-- The transformation chain: staging views → screening procedure → eligibility → bundle compliance
-- The specific SQL logic handling missing lactate (COALESCE, LEFT JOIN with NULL checks)
+**Expected result:** The agent shows source tables with their data dictionary descriptions:
+- Physical table names from the SQL (e.g., HOSPITAL_TRANSACTIONS, FLOWSHEET_MEASUREMENTS, MED_ADMIN_RECORDS)
+- Dictionary descriptions explaining what each table contains
 
-**What it proves:** The product doesn't just list tables — it traces the full lineage chain and explains the transformation logic at each step. A developer can understand the entire data pipeline in seconds.
+**What it proves:** The product doesn't just list tables — it enriches them with dictionary descriptions, giving developers instant context about unfamiliar data sources.
 
-### Scenario 3: Admin Checks System Health
+### Scenario 3: Reverse Lineage Query
+
+**Type in the agent:**
+> Which metrics use the FLOWSHEET_MEASUREMENTS table?
+
+**Expected result:** The agent traces from a source table back to all metrics that reference it, showing which reports depend on flowsheet data.
+
+**What it proves:** Impact analysis — when a source table changes, you instantly know which reports are affected.
+
+### Scenario 4: Deep Business Logic Extraction
+
+**Type in the agent:**
+> Show me the technical details for USP_IP_SepsisShiftCompliance
+
+**Expected result:** The agent shows the full transformation chain: SQL fragments from each CTE/temp table step, showing how raw data flows from source tables through screening criteria into shift-level compliance calculations.
+
+**What it proves:** Developers can understand the entire data pipeline in seconds — every transformation step, every filter, every join condition.
+
+### Scenario 5: System Health Check
 
 **Type in the agent:**
 > /coverage
 
-**Expected result:** The agent queries `metric_logic` and reports:
+**Expected result:**
 - Total metrics: 28
-- With calculation logic: 26+ (93%+)
-- With source tables mapped: 25+ (89%+)
-- With stewards assigned: 0 (not yet configured)
+- With calculation logic: 28 (100%)
+- With descriptions: 28 (100%)
+- With source tables: 28 (100%)
+- With stewards: 0 (not yet configured)
 
-**What it proves:** The product provides operational visibility into data governance coverage — administrators can instantly see how much of their SQL library has been documented.
+**What it proves:** The product provides operational visibility into documentation coverage — administrators can see exactly how much of their SQL library has been automatically documented.
 
 ---
 
@@ -174,67 +162,77 @@ A synthetic data dictionary provides table and column descriptions for ~50 table
 ### Before: Raw SQL File (what developers see)
 
 ```sql
-CREATE PROCEDURE [dbo].[USP_Sepsis_3Hr_Bundle] (
-    @StartDate DATE, @EndDate DATE
+CREATE PROCEDURE [reports].[USP_Severe_Sepsis] (
+    @StartDate VARCHAR(20) = NULL,
+    @EndDate VARCHAR(20) = NULL,
+    @Hospitals INT = 1
 )
 AS
 BEGIN
-    SELECT enc.PAT_ID, enc.ENCOUNTER_ID, enc.ADMIT_TIME,
-        CASE WHEN bc.CULTURE_TIME IS NOT NULL 
-             AND DATEDIFF(HOUR, enc.ADMIT_TIME, bc.CULTURE_TIME) <= 3
-             THEN 1 ELSE 0 END AS BloodCultureCompliant,
-        CASE WHEN abx.ADMIN_TIME IS NOT NULL
-             AND DATEDIFF(HOUR, enc.ADMIT_TIME, abx.ADMIN_TIME) <= 3
-             THEN 1 ELSE 0 END AS AntibioticCompliant,
-        CASE WHEN COALESCE(lab.LACTATE_VALUE, -1) >= 0
-             AND DATEDIFF(HOUR, enc.ADMIT_TIME, lab.COLLECT_TIME) <= 3
-             THEN 1 ELSE 0 END AS LactateCompliant
-    INTO #bundle_elements
-    FROM dbo.EncounterFact enc
-    LEFT JOIN dbo.LabResultsFact lab ON enc.ENCOUNTER_ID = lab.ENCOUNTER_ID
-        AND lab.LAB_TYPE = 'LACTATE'
-    LEFT JOIN dbo.MedicationAdminFact abx ON enc.ENCOUNTER_ID = abx.ENCOUNTER_ID
-        AND abx.MED_CATEGORY = 'ANTIBIOTIC'
-    LEFT JOIN dbo.LabResultsFact bc ON enc.ENCOUNTER_ID = bc.ENCOUNTER_ID
-        AND bc.LAB_TYPE = 'BLOOD_CULTURE'
-    WHERE enc.ADMIT_TIME BETWEEN @StartDate AND @EndDate
-        AND enc.SEPSIS_FLAG = 1;
-
-    SELECT DEPARTMENT_NAME,
-        COUNT(*) AS TotalEncounters,
-        SUM(CASE WHEN BloodCultureCompliant = 1 
-             AND AntibioticCompliant = 1 
-             AND LactateCompliant = 1 THEN 1 ELSE 0 END) AS FullyCompliant
-    FROM #bundle_elements b
-    INNER JOIN dbo.DepartmentDim d ON b.DEPT_ID = d.DEPT_ID
-    GROUP BY DEPARTMENT_NAME
+    -- 5,400 lines of complex T-SQL with 27 temp tables,
+    -- 60+ JOINs, clinical threshold comparisons,
+    -- temporal window calculations, and nested CASE logic
+    ...
 END
 ```
 
 ### After: Knowledge Graph (what the agent answers)
 
-**Business user asks:** "How is the Sepsis 3-Hour Bundle calculated?"
+**Business user asks:** "What is USP_Severe_Sepsis?"
 
-**Agent responds:**
-> The Sepsis 3-Hour Bundle measures compliance with three time-sensitive treatment requirements for sepsis patients:
+**Agent responds with a pre-generated description:**
+> This report identifies patients meeting severe sepsis criteria for clinical quality reporting and outcome tracking. It supports quality improvement teams in monitoring sepsis bundle compliance across facilities.
 >
-> 1. **Blood cultures** — collected within 3 hours of admission
-> 2. **Antibiotics** — administered within 3 hours of admission
-> 3. **Lactate measurement** — drawn within 3 hours of admission (if lactate is not available, the criterion is marked incomplete using a default value check)
->
-> A patient is **fully compliant** only if all three criteria are met within the time window.
->
-> Results are grouped by department, showing total encounters and the number meeting full compliance. The report covers sepsis-flagged encounters within the selected date range.
->
-> Source data comes from: encounter records, lab results, and medication administration records.
+> Business logic:
+> - Identifies inpatient encounters with sepsis indicators within the reporting period
+> - Applies clinical thresholds for organ dysfunction scoring
+> - Tracks 3-hour and 6-hour bundle element compliance (blood cultures, antibiotics, lactate, fluid resuscitation)
+> - Calculates compliance rates by department and shift
+> - Handles missing values with fallback logic for incomplete lab results
+> - Groups results by facility for multi-site comparison
+
+---
+
+## Workspace Structure
+
+```
+Workspace
+├── sql_query_lh (Lakehouse)
+│   ├── Files/
+│   │   └── sql-query-agent/
+│   │       ├── libs/               ← ScriptDom DLL
+│   │       ├── sql_input/          ← 28 SQL files
+│   │       ├── dictionary/         ← dict_tables.csv + dict_columns.csv
+│   │       └── org_config.yaml     ← Configuration
+│   └── Tables/
+│       ├── input_sql_sources       ← Loaded SQL files
+│       ├── input_dict_tables       ← Table descriptions (83 tables)
+│       ├── input_dict_columns      ← Column descriptions (4,123 columns)
+│       ├── ops_parse_results       ← Parsed SQL structure (JSON)
+│       ├── ops_parse_errors        ← Failed parses (0 for demo)
+│       ├── ops_parse_successes     ← Successful parses (28)
+│       ├── graph_nodes             ← Knowledge graph nodes (~4,700)
+│       ├── graph_edges             ← Knowledge graph edges (~1,400)
+│       ├── graph_canonical         ← LPG: business metric nodes
+│       ├── graph_transformation    ← LPG: SQL transformation nodes
+│       ├── graph_technical         ← LPG: source table/column nodes
+│       ├── graph_dimension         ← LPG: dimension nodes
+│       ├── output_metric_logic     ← Flattened view for Data Agent
+│       ├── ops_pipeline_validation ← Pipeline health check
+│       └── ops_build_summary       ← Pipeline run history
+├── sql-logic-env (Environment)     ← Pre-installed dependencies + .whl
+├── SQL Intelligence Agent          ← Fabric Data Agent
+└── Notebooks (01-07)               ← Pipeline notebooks
+```
 
 ---
 
 ## Known Limitations
 
-- **Parse errors:** Some SQL files may fail to parse if they contain no SELECT statements (utility procedures, DDL-only scripts). These are logged in `parse_errors` with user-friendly explanations.
-- **Data dictionary coverage:** Metrics that reference tables not in the data dictionary will show "0 source tables" in the graph but still have their SQL logic extracted.
+- **T-SQL only:** This version supports Microsoft SQL Server T-SQL. Other SQL dialects (PL/SQL, PostgreSQL) are planned for future releases.
+- **Parse complexity:** Some highly dynamic SQL (EXEC with string concatenation, dynamic pivots) may not fully parse. These are logged in `ops_parse_errors` with explanations.
 - **No real-time data:** The agent explains HOW metrics are calculated, not current data values.
+- **F2 capacity:** On F2 capacity, only one Spark session runs at a time. Stop each notebook session before starting the next.
 
 ---
 
@@ -244,7 +242,7 @@ END
 |---|---|
 | Microsoft Fabric | F2 capacity or higher |
 | Workspace role | Contributor or higher |
-| Environment | `sql-logic-env` attached to all notebooks |
+| Environment | `sql-logic-env` with .whl and pythonnet installed |
 | ScriptDom DLL | Pre-uploaded to Files/sql-query-agent/libs/ |
 
 ---
@@ -253,6 +251,8 @@ END
 
 If you encounter issues during testing:
 
-- Check the `/troubleshoot` command in the Data Agent — it queries known installation errors
+- Check the `/errors` command in the Data Agent for parse issues
+- Check the `/coverage` command for system health
+- Check `ops_installation_errors` table for known setup issues and fixes
 - Email: support@aiviaapp.com
 - Response time: within 24 hours
