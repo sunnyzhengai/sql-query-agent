@@ -254,6 +254,7 @@ def parse_from_fragment(fragment) -> "ParsedSQL":
         elif into_target:
             # Persistent table: INSERT INTO schema.table — treat as final SELECT
             # (don't set temp_name, so it falls into the "final" branch below)
+            pass
 
         if stmt_type == "SelectStatement" and stmt.WithCtesAndXmlNamespaces:
             cte_list = stmt.WithCtesAndXmlNamespaces.CommonTableExpressions
