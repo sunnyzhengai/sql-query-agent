@@ -101,6 +101,17 @@ def read_source(name_or_path):
     else:
         return spark.table(name_or_path)
 
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+
 # %% Cell 1: Load SQL sources
 sql_sources_df = read_source(config.lakehouse.sql_sources)
 
@@ -114,6 +125,17 @@ sql_sources_df = sql_sources_df.selectExpr(
 
 sql_sources = [row.asDict() for row in sql_sources_df.limit(50).collect()]  # Remove .limit(50) for full run
 print(f"Loaded {len(sql_sources)} SQL sources")
+
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
 
 # %% Cell 2: Extract and parse each SQL source
 import time as _time
@@ -199,6 +221,17 @@ elapsed = _time.time() - start_time
 print(f"\nDone in {elapsed:.0f}s")
 print(f"Parsed: {len(parse_successes)}/{len(sql_sources)} ({100 * len(parse_successes) // max(len(sql_sources), 1)}%)")
 print(f"Errors: {len(parse_errors)}")
+
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
 
 # %% Cell 3: Save results to Delta tables
 from src.schemas import PARSE_ERRORS, PARSE_SUCCESSES, to_spark_schema

@@ -52,6 +52,17 @@ from src.schemas import GRAPH_NODES, GRAPH_EDGES, to_spark_schema
 
 config = load_config("/lakehouse/default/Files/sql-query-agent/org_config.yaml")
 
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+
 # %% Cell 1: Load parse results + dictionary from Delta
 parse_results = [r.asDict() for r in spark.table("ops_parse_results").collect()]
 
@@ -59,6 +70,17 @@ dict_tables_rows = [r.asDict() for r in spark.table(config.lakehouse.dict_tables
 dict_columns_rows = [r.asDict() for r in spark.table(config.lakehouse.dict_columns).collect()]
 
 print(f"Loaded {len(parse_results)} parse results, {len(dict_tables_rows)} tables, {len(dict_columns_rows)} columns")
+
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
 
 # %% Cell 2: Build graph (all logic in src/)
 from src.dictionary import DataDictionary
@@ -93,6 +115,17 @@ for pr in parse_results:
 
 print(f"Built graph: {len(builder.nodes)} nodes, {len(builder.edges)} edges")
 
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+
 # %% Cell 3: Write to Delta
 nodes_df = spark.createDataFrame(nodes_to_rows(builder.nodes), schema=to_spark_schema(GRAPH_NODES))
 edges_df = spark.createDataFrame(edges_to_rows(builder.edges), schema=to_spark_schema(GRAPH_EDGES))
@@ -101,6 +134,17 @@ nodes_df.write.format("delta").mode("overwrite").option("overwriteSchema", "true
 edges_df.write.format("delta").mode("overwrite").option("overwriteSchema", "true").saveAsTable(config.lakehouse.graph_edges)
 
 print(f"Wrote {nodes_df.count()} nodes, {edges_df.count()} edges")
+
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
 
 # %% Cell 4: Quick traversal test
 from src.graph.traversal import GraphTraverser

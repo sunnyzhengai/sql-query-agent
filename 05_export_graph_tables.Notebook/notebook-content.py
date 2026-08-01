@@ -70,6 +70,17 @@ from src.schemas import (
 
 config = load_config("/lakehouse/default/Files/sql-query-agent/org_config.yaml")
 
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+
 # %% Cell 1: Load graph nodes and edges from Delta
 from src.models import EdgeType, GraphEdge, GraphNode, NodeLayer
 
@@ -100,6 +111,17 @@ for row in edges_df.collect():
 
 print(f"Loaded {len(nodes)} nodes, {len(edges)} edges from Delta")
 
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+
 # %% Cell 2: Export typed tables
 from src.graph.export import export_edge_tables, export_node_tables
 
@@ -113,6 +135,17 @@ for name, rows in node_tables.items():
 print("\nEdge tables:")
 for name, rows in edge_tables.items():
     print(f"  {name}: {len(rows)} rows")
+
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
 
 # %% Cell 3: Write typed tables to Delta
 schema_map = {

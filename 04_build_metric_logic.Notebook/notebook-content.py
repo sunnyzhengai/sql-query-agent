@@ -52,6 +52,17 @@ from src.schemas import METRIC_LOGIC, to_spark_schema
 
 config = load_config("/lakehouse/default/Files/sql-query-agent/org_config.yaml")
 
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+
 # %% Cell 1: Load graph and build metric_logic (all logic in src/)
 from src.graph.serialization import rows_to_nodes, rows_to_edges
 from src.graph.metric_logic import build_metric_logic_rows
@@ -62,6 +73,17 @@ print(f"Loaded {len(nodes)} nodes, {len(edges)} edges")
 
 metric_logic_rows = build_metric_logic_rows(nodes, edges)
 print(f"Built {len(metric_logic_rows)} metric logic rows")
+
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
 
 # %% Cell 2: Save to Delta
 ml_df = spark.createDataFrame(metric_logic_rows, schema=to_spark_schema(METRIC_LOGIC))

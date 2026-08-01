@@ -29,32 +29,6 @@
 
 # CELL ********************
 
-import os                                                 
-path = "/lakehouse/default/Files/sql-query-agent/dictionary/"                                                                
-print(os.listdir(path)) 
-
-# METADATA ********************
-
-# META {
-# META   "language": "python",
-# META   "language_group": "synapse_pyspark"
-# META }
-
-# CELL ********************
-
-dict_tables_df = spark.read.option("header", "true").csv("file:///lakehouse/default/Files/sql-query-agent/dictionary/dict_tables.csv")                                    
-print(dict_tables_df.count())                             
-dict_tables_df.show(3)    
-
-# METADATA ********************
-
-# META {
-# META   "language": "python",
-# META   "language_group": "synapse_pyspark"
-# META }
-
-# CELL ********************
-
 """Fabric Notebook: One-Click Installation & Setup
 
 Run this FIRST before any other notebook. It:
@@ -257,7 +231,7 @@ DICT_DIR = "/lakehouse/default/Files/sql-query-agent/dictionary/"
 # Tables
 tables_path = os.path.join(DICT_DIR, "dict_tables.csv")
 if os.path.exists(tables_path):
-    dict_tables_df = spark.read.option("header", "true").csv(tables_path)
+    dict_tables_df = spark.read.option("header", "true").csv("file://" + tables_path)
 
     # Validate required columns
     cols = [c.upper() for c in dict_tables_df.columns]
@@ -283,7 +257,7 @@ else:
 # Columns
 columns_path = os.path.join(DICT_DIR, "dict_columns.csv")
 if os.path.exists(columns_path):
-    dict_columns_df = spark.read.option("header", "true").csv(columns_path)
+    dict_columns_df = spark.read.option("header", "true").csv("file://" + columns_path)
 
     cols = [c.upper() for c in dict_columns_df.columns]
     if "TABLE_NAME" not in cols or "COLUMN_NAME" not in cols:

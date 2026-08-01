@@ -52,6 +52,17 @@ from src.schemas import PIPELINE_VALIDATION, BUILD_SUMMARY, to_spark_schema
 
 config = load_config("/lakehouse/default/Files/sql-query-agent/org_config.yaml")
 
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+
 # %% Cell 1: Load all data from Delta
 sql_source_ids = [r.asDict()["metric_id"] for r in spark.table(config.lakehouse.sql_sources).collect()]
 
@@ -81,6 +92,17 @@ except Exception:
 
 print(f"Loaded: {len(sql_source_ids)} sources, {len(nodes)} nodes, {sum(len(v) for v in edges_by_source.values())} edges")
 
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+
 # %% Cell 2: Validate (all logic in src/)
 from src.governance.validation import validate_pipeline_per_metric, summarize_validation
 
@@ -94,6 +116,17 @@ for step_key in ["s1_loaded", "s2_parsed", "s3_canonical", "s4_transforms", "s5_
     count = summary[step_key]
     print(f"  {label}: {count}/{total} ({100*count//max(total,1)}%)")
 
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+
 # %% Cell 3: Show failures
 print("\n=== Parsed but NO Transforms ===")
 for r in results:
@@ -104,6 +137,17 @@ print("\n=== Transforms but NO Edges ===")
 for r in results:
     if r["step4_transforms"] and not r["step5_edges"]:
         print(f"  {r['metric_id']}")
+
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
 
 # %% Cell 4: Save validation + build summary to Delta
 from datetime import datetime, timezone
@@ -135,6 +179,17 @@ try:
 except Exception:
     summary_df.write.format("delta").mode("overwrite").saveAsTable("ops_build_summary")
 print(f"Saved build summary")
+
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
 
 # %% Cell 5: Deployment readiness gate
 s2 = summary["s2_parsed"]
