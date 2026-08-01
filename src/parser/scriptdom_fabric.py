@@ -246,10 +246,14 @@ def parse_from_fragment(fragment) -> "ParsedSQL":
             into_target = None
 
         temp_name = None
-        if into_target:
+        if into_target and into_target.startswith("#"):
+            # Temp table: SELECT INTO #temp or INSERT INTO #temp
             temp_name = into_target.lstrip("#")
             temp_table_names.add(temp_name)
             temp_table_names.add(into_target)
+        elif into_target:
+            # Persistent table: INSERT INTO schema.table — treat as final SELECT
+            # (don't set temp_name, so it falls into the "final" branch below)
 
         if stmt_type == "SelectStatement" and stmt.WithCtesAndXmlNamespaces:
             cte_list = stmt.WithCtesAndXmlNamespaces.CommonTableExpressions
@@ -425,9 +429,9 @@ def load_scriptdom(dll_path: str = "/lakehouse/default/Files/sql-query-agent/lib
                 else:
                     into_target = None
 
-                # Normalize temp name (strip #)
+                # Only treat #temp tables as named entries, not persistent table INSERTs
                 temp_name = None
-                if into_target:
+                if into_target and into_target.startswith("#"):
                     temp_name = into_target.lstrip("#")
                     temp_table_names.add(temp_name)
                     temp_table_names.add(into_target)
