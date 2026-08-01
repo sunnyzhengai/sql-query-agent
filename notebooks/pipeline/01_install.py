@@ -132,9 +132,39 @@ print("=" * 60)
 # %% Cell 1: Load SQL files into Delta table
 print("\n--- Loading SQL files ---")
 
+import re as _re
+
 SQL_DIR = "/lakehouse/default/Files/sql-query-agent/sql_input/"
 sql_rows = []
 skipped = []
+
+def _extract_proc_identity(sql_content):
+    """Extract schema.proc_name from CREATE PROCEDURE statement.
+
+    Parses: CREATE PROCEDURE [schema].[proc_name]
+            CREATE OR ALTER PROCEDURE schema.proc_name
+            ALTER PROCEDURE [schema].[proc_name]
+
+    Returns (schema, proc_name) or (None, None) if not found.
+    """
+    m = _re.search(
+        r'(?:CREATE|ALTER)\s+(?:OR\s+ALTER\s+)?PROCEDURE\s+'
+        r'\[?(\w+)\]?\.\[?(\w+)\]?',
+        sql_content, _re.IGNORECASE,
+    )
+    if m:
+        return m.group(1), m.group(2)
+
+    # Fallback: proc name without schema (e.g., CREATE PROCEDURE [proc_name])
+    m = _re.search(
+        r'(?:CREATE|ALTER)\s+(?:OR\s+ALTER\s+)?PROCEDURE\s+'
+        r'\[?(\w+)\]?',
+        sql_content, _re.IGNORECASE,
+    )
+    if m:
+        return "dbo", m.group(1)
+
+    return None, None
 
 for root, dirs, files in os.walk(SQL_DIR):
     for fname in sorted(files):
@@ -144,8 +174,21 @@ for root, dirs, files in os.walk(SQL_DIR):
         try:
             with open(filepath, encoding="utf-8-sig") as f:
                 sql_content = f.read()
-            metric_id = fname.replace(".sql", "")
-            sql_rows.append((metric_id, metric_id, sql_content, None, None, None, None))
+
+            # Extract identity from SQL content — schema.proc_name is the true identity
+            schema, proc_name = _extract_proc_identity(sql_content)
+            if schema and proc_name:
+                metric_id = f"{schema}.{proc_name}"
+                display_name = proc_name
+                source_schema = schema
+            else:
+                # Fallback to filename if no CREATE PROCEDURE found
+                metric_id = fname.replace(".sql", "")
+                display_name = metric_id
+                source_schema = None
+                print(f"  [!] No CREATE PROCEDURE found in {fname} — using filename as metric_id")
+
+            sql_rows.append((metric_id, display_name, sql_content, None, None, None, source_schema))
         except Exception as e:
             skipped.append((fname, str(e)))
 
@@ -153,22 +196,32 @@ if not sql_rows:
     print("[X] FATAL: No .sql files found in sql_input/")
     raise SystemExit("Installation cannot proceed — upload your SQL files first.")
 
-# Check for duplicate metric_ids
+# Check for duplicate metric_ids (same schema.proc_name from different files)
 metric_ids = [r[0] for r in sql_rows]
 dupes = set(m for m in metric_ids if metric_ids.count(m) > 1)
 if dupes:
-    print(f"[!] WARNING: Duplicate filenames detected: {', '.join(sorted(dupes))}")
-    print("    Files from different schemas with the same name will overwrite each other.")
-    print("    Fix: Add a prefix to distinguish them (e.g., RPT_USP_xxx.sql, ETL_USP_xxx.sql)")
+    print(f"[!] WARNING: Duplicate proc identities detected: {', '.join(sorted(dupes))}")
+    print("    Two files define the same [schema].[proc_name] — the last one loaded wins.")
+    print("    Check if these are truly different procs or duplicate copies.")
 
 from src.schemas import SQL_SOURCES, to_spark_schema
 sql_df = spark.createDataFrame(sql_rows, schema=to_spark_schema(SQL_SOURCES))
 sql_df.write.format("delta").mode("overwrite").option("overwriteSchema", "true") \
     .saveAsTable("input_sql_sources")
 
-print(f"[+] Loaded {len(sql_rows)} SQL files into input_sql_sources")
+# Show what was extracted
+print(f"\n[+] Loaded {len(sql_rows)} SQL files into input_sql_sources")
+schemas_found = set(r[6] for r in sql_rows if r[6])
+print(f"    Schemas found: {', '.join(sorted(schemas_found)) if schemas_found else 'none'}")
 if skipped:
     print(f"[!] Skipped {len(skipped)} files: {', '.join(f[0] for f in skipped)}")
+
+# Show sample metric_ids
+print(f"\n    Sample metric IDs:")
+for row in sql_rows[:5]:
+    print(f"      {row[0]} (name: {row[1]})")
+if len(sql_rows) > 5:
+    print(f"      ... and {len(sql_rows) - 5} more")
 
 # %% Cell 2: Load dictionary CSVs into Delta tables
 print("\n--- Loading data dictionary ---")
@@ -231,14 +284,63 @@ print("\n--- Seeding installation errors knowledge base ---")
 
 from src.schemas import INSTALLATION_ERRORS, to_spark_schema
 
-# Import seed data
-sys.path.insert(0, "/lakehouse/default/Files/sql-query-agent")
+# Seed data is embedded here — no external script dependency.
+# These are known error signatures from real deployments.
+ERROR_SEEDS = [
+    ("This property must be set before runtime is initialized", "pythonnet_initialization",
+     "%pip install restarts the kernel, breaking pythonnet CLR init.",
+     "Use Fabric Environment with pre-installed packages instead of %pip install.",
+     "Never use %pip install in notebooks that use pythonnet/ScriptDom.", "2026-07-26"),
+    ("No module named 'Microsoft.SqlServer'", "dll_not_found",
+     "ScriptDom DLL missing from libs/ folder or wrong filename.",
+     "Upload Microsoft.SqlServer.TransactSql.ScriptDom.dll to Files/sql-query-agent/libs/. Use lib/netstandard2.0/ version from NuGet.",
+     "Verify DLL path during deployment.", "2026-07-26"),
+    ("Could not load file or assembly", "dll_load_failure",
+     "Wrong DLL version (e.g., net462 instead of netstandard2.0) or corrupted file.",
+     "Re-download from NuGet, use lib/netstandard2.0/ version only.",
+     "Always use netstandard2.0 build.", "2026-07-26"),
+    ("Config not found at", "config_not_found",
+     "org_config.yaml is missing or in the wrong location.",
+     "Upload org_config.yaml to Files/sql-query-agent/ (NOT in a config/ subfolder).",
+     "Verify file path during 01_install.", "2026-07-30"),
+    ("Bad Request.*400.*csv", "spark_csv_read_failure",
+     "Spark CSV reader fails with OneLake HTTP path in some Fabric configurations.",
+     "Add file:// prefix to CSV paths: spark.read.csv('file://' + path).",
+     "Use file:// prefix for all local CSV reads.", "2026-07-31"),
+    ("TooManyRequestsForCapacity.*430", "capacity_limit",
+     "F2 capacity only supports one Spark session at a time.",
+     "Wait 2-3 minutes for the previous session to release, then retry. Check Monitoring hub for active sessions.",
+     "Cancel unused sessions. Consider F4 capacity for concurrent workloads.", "2026-07-30"),
+    ("TABLE_OR_VIEW_NOT_FOUND", "table_not_found",
+     "Delta table doesn't exist yet, or org_config.yaml has old table names.",
+     "Run 01_install first to create all tables. Verify org_config.yaml uses domain-prefixed names (input_sql_sources, not sql_sources).",
+     "Always run 01_install before other notebooks.", "2026-07-30"),
+    ("User Aad Token is expired", "token_expired",
+     "AAD token expires after ~1 hour. mssparkutils caches the token and won't refresh within the same session.",
+     "Restart the kernel and re-run. For long batch runs, results are saved incrementally so you pick up where you left off.",
+     "Design batch operations to save progress incrementally.", "2026-07-30"),
+    ("Git_GitProviderCredentialsNotAuthorizedError", "git_auth_failure",
+     "Fabric GitHub OAuth doesn't have write access to the repository.",
+     "Revoke and re-authorize: GitHub Settings → Applications → find Microsoft Fabric → grant repo access. Or use a GitHub Personal Access Token with repo scope.",
+     "Verify Git write access before connecting workspace.", "2026-07-31"),
+    ("duplicate filenames", "duplicate_sql_files",
+     "SQL files from different schemas have the same filename, causing overwrites in flat upload folder.",
+     "Add a prefix to distinguish files from different schemas (e.g., RPT_USP_xxx.sql, ETL_USP_xxx.sql).",
+     "Check for duplicate filenames before uploading.", "2026-07-30"),
+    ("Cannot import 'src' package", "wheel_not_installed",
+     "The .whl file is not uploaded to the Fabric Environment, or Environment not published.",
+     "Upload sql_query_agent-1.1.0-py3-none-any.whl to Environment → Custom libraries → Publish.",
+     "Verify Environment has .whl and is published before running notebooks.", "2026-07-31"),
+    ("Set as default lakehouse.*grayed out", "lakehouse_default_issue",
+     "Lakehouse moved from another workspace retains stale metadata.",
+     "Create a new Lakehouse in the current workspace instead of moving one from another workspace.",
+     "Always create Lakehouses in the target workspace.", "2026-07-31"),
+]
+
 try:
-    from scripts.seed_installation_errors import INSTALLATION_ERRORS as ERROR_SEEDS
     error_rows = [
-        (e["error_signature"], e["error_category"], e.get("root_cause", ""),
-         e.get("fix", ""), e.get("prevention", ""), e.get("first_seen", ""))
-        for e in ERROR_SEEDS
+        (sig, cat, cause, fix, prevent, seen)
+        for sig, cat, cause, fix, prevent, seen in ERROR_SEEDS
     ]
     errors_df = spark.createDataFrame(error_rows, schema=to_spark_schema(INSTALLATION_ERRORS))
     errors_df.write.format("delta").mode("overwrite").option("overwriteSchema", "true") \
