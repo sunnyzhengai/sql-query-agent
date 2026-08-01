@@ -106,4 +106,5 @@ def parse_result_to_parsed_sql(pr: dict) -> ParsedSQL:
         ctes=ctes,
         final_select_tables=final_tables,
         final_select_cte_refs=json.loads(pr["final_select_cte_refs"]),
+        normalized_sql=pr.get("normalized_sql", ""),
     )

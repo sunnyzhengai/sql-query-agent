@@ -185,6 +185,7 @@ for i, source in enumerate(sql_sources):
                 for t in parsed.final_select_tables
             ]),
             "final_select_cte_refs": json.dumps(parsed.final_select_cte_refs),
+            "normalized_sql": parsed.normalized_sql or "",
             "cte_count": len(parsed.ctes),
             "table_count": len(parsed.final_select_tables),
             "line_count": sql.count("\n") + 1,
@@ -245,12 +246,13 @@ if parse_results_data:
         StructField("ctes_json", StringType(), True),
         StructField("final_select_tables", StringType(), True),
         StructField("final_select_cte_refs", StringType(), True),
+        StructField("normalized_sql", StringType(), True),
         StructField("cte_count", IntegerType(), True),
         StructField("table_count", IntegerType(), True),
         StructField("line_count", IntegerType(), True),
     ])
     pr_rows = [(r["metric_id"], r["name"], r["ctes_json"], r["final_select_tables"],
-                r["final_select_cte_refs"], r["cte_count"], r["table_count"], r["line_count"])
+                r["final_select_cte_refs"], r["normalized_sql"], r["cte_count"], r["table_count"], r["line_count"])
                for r in parse_results_data]
     pr_df = spark.createDataFrame(pr_rows, schema=pr_schema)
     pr_df.write.format("delta").mode("overwrite").option("overwriteSchema", "true").saveAsTable("ops_parse_results")

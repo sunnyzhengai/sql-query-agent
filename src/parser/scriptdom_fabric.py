@@ -279,7 +279,9 @@ def parse_from_fragment(fragment) -> "ParsedSQL":
             sql_text = normalize_sql_whitespace(_get_fragment_text(stmt))[:500]
             raw_entries.append((temp_name, sql_text, tables, columns, False))
         else:
-            raw_entries.append((None, "", tables, columns, False))
+            # Final SELECT or INSERT INTO persistent table — capture SQL text
+            final_sql_text = normalize_sql_whitespace(_get_fragment_text(stmt))[:2000]
+            raw_entries.append((None, final_sql_text, tables, columns, False))
 
     stripped_temps = {tn.lstrip("#") for tn in temp_table_names}
 
@@ -287,6 +289,7 @@ def parse_from_fragment(fragment) -> "ParsedSQL":
     all_final_tables = []
     all_final_cte_refs = []
     all_final_columns = []
+    all_final_sql_parts = []  # Collect SQL text from final SELECTs
 
     for entry_name, sql_frag, raw_tables, raw_cols, _ in raw_entries:
         col_refs = [ColumnRef(table=t, column=c) for t, c in raw_cols]
@@ -322,13 +325,19 @@ def parse_from_fragment(fragment) -> "ParsedSQL":
                     if ref not in all_final_tables:
                         all_final_tables.append(ref)
             all_final_columns.extend(col_refs)
+            if sql_frag:
+                all_final_sql_parts.append(sql_frag)
+
+    # For procs with no CTEs, normalized_sql captures the full SELECT text
+    # so the graph builder can use it as the __final_select__ fragment
+    final_sql = "\n\n".join(all_final_sql_parts) if all_final_sql_parts else ""
 
     return ParsedSQL(
         ctes=all_ctes,
         final_select_tables=all_final_tables,
         final_select_cte_refs=all_final_cte_refs,
         final_select_columns=all_final_columns,
-        normalized_sql="",
+        normalized_sql=final_sql,
     )
 
 

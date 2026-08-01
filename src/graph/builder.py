@@ -170,8 +170,11 @@ class GraphBuilder:
                              and t not in cte_covered_tables]
 
         # Wire these final-only tables via a synthetic transform node
+        # For procs with no CTEs, use the normalized_sql as the fragment
+        # so the agent can still explain what the SELECT does
+        final_fragment = parsed.normalized_sql if not parsed.ctes else ""
         if final_only_tables:
-            final_id = self.add_transformation_node(metric_id, "__final_select__", "")
+            final_id = self.add_transformation_node(metric_id, "__final_select__", final_fragment)
             for table_ref in final_only_tables:
                 tech_id = self._find_tech_node_id(table_ref) if isinstance(table_ref, TableRef) else f"tech:{table_ref}"
                 if tech_id and tech_id in self.nodes:
