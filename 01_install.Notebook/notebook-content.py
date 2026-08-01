@@ -1,5 +1,57 @@
 # Fabric notebook source
 
+# METADATA ********************
+
+# META {
+# META   "kernel_info": {
+# META     "name": "synapse_pyspark"
+# META   },
+# META   "dependencies": {
+# META     "lakehouse": {
+# META       "default_lakehouse": "f7c297eb-4659-4600-ab89-0e860638fb6c",
+# META       "default_lakehouse_name": "sql_query_lh",
+# META       "default_lakehouse_workspace_id": "1f55e1c1-b660-4715-9b56-4140edce3940",
+# META       "known_lakehouses": [
+# META         {
+# META           "id": "f7c297eb-4659-4600-ab89-0e860638fb6c"
+# META         }
+# META       ]
+# META     },
+# META     "environment": {
+# META       "environmentId": "0776fc8d-1451-838d-47e6-f5c7a0bd174b",
+# META       "workspaceId": "00000000-0000-0000-0000-000000000000"
+# META     },
+# META     "warehouse": {
+# META       "known_warehouses": []
+# META     }
+# META   }
+# META }
+
+# CELL ********************
+
+import os                                                 
+path = "/lakehouse/default/Files/sql-query-agent/dictionary/"                                                                
+print(os.listdir(path)) 
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+dict_tables_df = spark.read.option("header", "true").csv("file:///lakehouse/default/Files/sql-query-agent/dictionary/dict_tables.csv")                                    
+print(dict_tables_df.count())                             
+dict_tables_df.show(3)    
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
 
 # CELL ********************
 
@@ -134,6 +186,17 @@ print("\n" + "=" * 60)
 print("Environment validation PASSED — proceeding to data loading")
 print("=" * 60)
 
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+
 # %% Cell 1: Load SQL files into Delta table
 print("\n--- Loading SQL files ---")
 
@@ -174,6 +237,17 @@ sql_df.write.format("delta").mode("overwrite").option("overwriteSchema", "true")
 print(f"[+] Loaded {len(sql_rows)} SQL files into input_sql_sources")
 if skipped:
     print(f"[!] Skipped {len(skipped)} files: {', '.join(f[0] for f in skipped)}")
+
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
 
 # %% Cell 2: Load dictionary CSVs into Delta tables
 print("\n--- Loading data dictionary ---")
@@ -231,6 +305,17 @@ else:
     print("    See DATA_DICTIONARY_REQUIREMENTS.md for format specification.")
     raise SystemExit("Installation cannot proceed — upload dict_columns.csv first.")
 
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+
 # %% Cell 3: Seed installation errors knowledge base
 print("\n--- Seeding installation errors knowledge base ---")
 
@@ -252,6 +337,17 @@ try:
 except Exception as e:
     print(f"[!] WARNING: Could not seed installation errors: {e}")
     print("    The /troubleshoot command may not work. Non-blocking.")
+
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
 
 # %% Cell 4: Validate dictionary coverage
 print("\n--- Validating dictionary coverage ---")
@@ -301,6 +397,17 @@ if sql_table_refs:
 else:
     print("[!] Could not extract table references — skipping coverage check")
 
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+
 # %% Cell 5: Final summary
 print("\n" + "=" * 60)
 print("INSTALLATION SUMMARY")
@@ -335,3 +442,10 @@ else:
         print(f"  [X] No dictionary tables — check dictionary/dict_tables.csv")
     if dict_c_count == 0:
         print(f"  [X] No dictionary columns — check dictionary/dict_columns.csv")
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
