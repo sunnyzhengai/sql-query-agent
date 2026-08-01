@@ -121,9 +121,16 @@ Files/
 ### 3d: Upload SQL files
 
 1. Navigate to `Files/sql-query-agent/sql_input/`
-2. Upload all your `.sql` files
+2. Upload all your `.sql` files — flat or in subfolders, either works
 
-> **IMPORTANT — Filename conflicts:** If your SQL files come from multiple schemas or databases and have the same filename (e.g., two different `USP_ED_Sepsis.sql`), they will overwrite each other when uploaded to a flat folder. **Fix:** Add a prefix to distinguish them before uploading (e.g., `RPT_USP_ED_Sepsis.sql` vs `ETL_USP_ED_Sepsis.sql`). The pipeline reads the filename as the metric name, so unique names are required.
+> **How metric identity works:** The pipeline does NOT use the filename as the metric identity. Instead, it reads the `CREATE PROCEDURE [schema].[proc_name]` statement inside each SQL file and extracts the **schema + proc name** as the unique identifier (e.g., `reporting.USP_IP_SEPSIS`). This means:
+> - You do NOT need to rename files or follow any naming convention
+> - Two procs with the same name in different schemas (e.g., `[reporting].[USP_ED_Sepsis]` and `[reports].[USP_ED_Sepsis]`) are tracked as separate metrics automatically
+> - The identity always comes from the SQL content, not the filename
+
+> **IMPORTANT — Upload conflicts:** Even though the pipeline handles identity correctly, the **file upload itself** can have conflicts. If two files have the same filename (e.g., two different `USP_ED_Sepsis.sql` from different schemas), uploading them to a flat folder will overwrite one. **Fix:** Either:
+> - **Preserve subfolders** — upload into `sql_input/reporting/` and `sql_input/reports/` to keep them separate
+> - **Or rename one file** — add any prefix (e.g., `RPT_USP_ED_Sepsis.sql`). The filename doesn't matter — the identity comes from the SQL content inside.
 
 **Checklist for SQL files:**
 - [ ] All files have `.sql` extension
