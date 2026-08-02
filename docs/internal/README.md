@@ -25,6 +25,23 @@ Always build customer packages with that script — never by zipping the repo.
 | [DEMO_SCRIPT.md](DEMO_SCRIPT.md) | Script for recording the Marketplace demo video |
 | [DEPLOYMENT_CHECKLIST.md](DEPLOYMENT_CHECKLIST.md) | Internal deployment-team runbook (customer-facing guide is `docs/deployment/INSTALLATION_GUIDE.md`) |
 
+## The 5-Rule Gate
+
+Every deliverable — code, docs, packaging — passes this gate before it's done:
+
+1. **Enterprise-grade** — production quality; tested, fails loudly, deterministic paths, no dev shortcuts
+2. **Industry standard** — follow the established pattern; if ours isn't standard, find the standard first
+3. **Turn-key ready when deployed** — works first time for a customer admin with no author present; docs never contradict code reality
+4. **Mechanically enforced** — every guarantee is backed by a test, CI gate, or script; convention-only guarantees decay
+5. **Supportable at a distance** — failures are diagnosable from the customer's error output alone (classified errors, actionable messages, validation gates that name the fix)
+
+Docs corollary: customer-facing docs are succinct, step-by-step, lead with a
+prerequisites checklist, and every step has a verification check.
+
+Enforcement in this repo: `tests/test_docs_consistency.py` (docs pinned to code
+ground truth), `tests/test_build_deployment_package.py` (package contract +
+leak guard), CI (lint + test + build + audit), `06_validate` (deployment gate).
+
 ## Status ownership rule
 
 **ROADMAP.md owns all status tracking.** No other document — internal or public —

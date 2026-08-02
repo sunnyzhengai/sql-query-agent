@@ -25,10 +25,10 @@
 ### We Ship (packaged, no customer action)
 
 - [ ] `src/` — Core Python library (parser, graph builder, traversal, adapters)
-- [ ] Pipeline notebooks (01-07) — pre-configured, numbered for run order
+- [ ] Pipeline notebooks (01-09) — pre-configured, numbered for run order
 - [ ] `libs/` — ScriptDom DLL (Microsoft.SqlServer.TransactSql.ScriptDom.dll)
 - [ ] `environment/requirements.txt` — pinned dependency list for Fabric Environment
-- [ ] `config/org_config.yaml` — pre-filled with defaults, customer overrides org name only
+- [ ] `org_config.yaml` (at package root) — pre-filled with defaults, customer overrides org name only
 - [ ] Data Agent instructions — shipped with product, customer does not modify
 - [ ] `installation_errors` knowledge base — pre-seeded error signatures for `/troubleshoot`
 - [ ] This checklist and the Data Dictionary Requirements doc
@@ -89,15 +89,15 @@ Upload the product package to `Files/sql-query-agent/`:
 Demo_Lakehouse/Files/
 └── sql-query-agent/
     ├── src/                    ← Core library (all .py files)
-    ├── notebooks/pipeline/     ← Pipeline notebooks (01-07)
+    ├── notebooks/pipeline/     ← Pipeline notebooks (01-09)
     ├── libs/                   ← ScriptDom DLL
-    ├── config/                 ← org_config.yaml
+    ├── org_config.yaml         ← config (at the root, NOT a subfolder)
     └── dictionary/             ← (empty — customer fills this)
 ```
 
 - [ ] `src/` uploaded with all subpackages (parser/, graph/, extractor/, adapters/, governance/)
 - [ ] `libs/Microsoft.SqlServer.TransactSql.ScriptDom.dll` uploaded (from NuGet, netstandard2.0)
-- [ ] `config/org_config.yaml` uploaded with defaults
+- [ ] `org_config.yaml` uploaded to `Files/sql-query-agent/` (root) with defaults
 - [ ] Verify: File count matches expected (`src/` = ~30 files, `notebooks/` = 7 files)
 
 ### 1.4 Import Notebooks
@@ -368,7 +368,7 @@ Run `notebooks/utilities/collibra_discovery.py` to verify Collibra connectivity:
 - [ ] Finds PBI Report assets in the target domain
 - [ ] Shows asset type IDs and relation types
 
-### 7.3 Run `07_publish_collibra` Notebook
+### 7.3 Run `08_publish_collibra` Notebook
 
 This notebook orchestrates the full flow:
 
@@ -450,7 +450,7 @@ The acceptance test script (`scripts/acceptance_test.py`) programmatically valid
 - [ ] Customer knows how to re-run the pipeline when they update SQL files
 - [ ] Customer knows how to update the data dictionary when tables change
 - [ ] `/troubleshoot` command works and returns relevant help for common errors
-- [ ] *(If Collibra)* Customer can re-run `07_publish_collibra` after pipeline updates
+- [ ] *(If Collibra)* Customer can re-run `08_publish_collibra` after pipeline updates
 
 ### 9.3 Sign-Off
 

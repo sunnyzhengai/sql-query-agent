@@ -1,0 +1,70 @@
+"""Docs-vs-reality consistency checks.
+
+Documentation drift is a turn-key killer: the install guide once referenced
+deleted files, a superseded notebook numbering, and a config path the code
+never reads. These tests pin the docs to repo ground truth so drift fails CI
+instead of reaching a customer.
+"""
+
+import re
+from pathlib import Path
+
+REPO_ROOT = Path(__file__).resolve().parent.parent
+DOCS = sorted((REPO_ROOT / "docs").rglob("*.md")) + [REPO_ROOT / "README.md"]
+INSTALL_GUIDE = REPO_ROOT / "docs" / "deployment" / "INSTALLATION_GUIDE.md"
+
+LINK = re.compile(r"\]\(([^)#\s]+\.md)\)")
+
+
+def test_every_relative_doc_link_resolves():
+    broken = []
+    for doc in DOCS:
+        for match in LINK.finditer(doc.read_text()):
+            target = match.group(1)
+            if target.startswith("http"):
+                continue
+            if not (doc.parent / target).resolve().exists():
+                broken.append(f"{doc.relative_to(REPO_ROOT)} -> {target}")
+    assert not broken, "broken doc links:\n  " + "\n  ".join(broken)
+
+
+def test_install_guide_covers_every_pipeline_notebook():
+    guide = INSTALL_GUIDE.read_text()
+    stems = [
+        p.name.removesuffix(".Notebook")
+        for p in sorted(REPO_ROOT.glob("[0-9][0-9]_*.Notebook"))
+    ]
+    assert stems, "no pipeline notebooks found at repo root"
+    missing = [s for s in stems if s not in guide]
+    assert not missing, f"INSTALLATION_GUIDE.md never mentions: {missing}"
+
+
+def test_install_guide_references_no_ghost_notebooks():
+    guide = INSTALL_GUIDE.read_text()
+    stems = {
+        p.name.removesuffix(".Notebook")
+        for p in REPO_ROOT.glob("[0-9][0-9]_*.Notebook")
+    }
+    referenced = set(re.findall(r"\b(\d{2}_[a-z_]+)\b", guide))
+    ghosts = {r for r in referenced if r not in stems}
+    assert not ghosts, f"INSTALLATION_GUIDE.md references nonexistent notebooks: {ghosts}"
+
+
+def test_docs_agree_with_code_on_config_location():
+    """src/config.py reads org_config.yaml from the project root — no doc may
+    claim it lives in a config/ subfolder."""
+    offenders = []
+    for doc in DOCS:
+        if "internal/MARKETPLACE_PIVOT" in str(doc):  # frozen snapshot
+            continue
+        if re.search(r"config/org_config\.yaml", doc.read_text()):
+            offenders.append(str(doc.relative_to(REPO_ROOT)))
+    assert not offenders, f"docs claim config/ subfolder location: {offenders}"
+
+
+def test_install_guide_does_not_hardcode_package_version():
+    guide = INSTALL_GUIDE.read_text()
+    assert not re.search(r"sql_query_agent-\d+\.\d+\.\d+", guide), (
+        "INSTALLATION_GUIDE.md hardcodes a wheel version; use "
+        "sql_query_agent-<version>-py3-none-any.whl so releases don't stale it"
+    )

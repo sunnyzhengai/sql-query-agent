@@ -16,10 +16,10 @@ Before starting, confirm you have:
 - [ ] Microsoft Fabric workspace with **F2+ capacity** (F4 recommended for production)
 - [ ] **Contributor** role or higher in the workspace
 - [ ] The deployment package (provided by your vendor), containing:
-  - `sql_query_agent-1.1.0-py3-none-any.whl` — the product library
+  - `sql_query_agent-<version>-py3-none-any.whl` — the product library
   - `org_config.yaml` — configuration file
   - `Microsoft.SqlServer.TransactSql.ScriptDom.dll` — SQL parser engine
-  - Pipeline notebooks (02-07)
+  - Pipeline notebooks (01-09)
   - Data Agent instructions file
 - [ ] Your organization's SQL files (`.sql` stored procedures and/or views)
 - [ ] Your data dictionary CSVs (`dict_tables.csv`, `dict_columns.csv`) — see DATA_DICTIONARY_REQUIREMENTS.md
@@ -51,7 +51,7 @@ The Environment pre-installs all required Python packages so notebooks don't nee
 
 6. Go to **Custom** (left sidebar)
 7. Click **Upload**
-8. Select `sql_query_agent-1.1.0-py3-none-any.whl` from the deployment package
+8. Select `sql_query_agent-<version>-py3-none-any.whl` from the deployment package
    - **Note:** Navigate to the correct folder — the file picker only shows `.whl`, `.jar`, and `.tar.gz` files. Text files like `requirements.txt` will be grayed out. That's expected.
 
 ### 1c: Publish
@@ -155,9 +155,9 @@ Files/
 - [ ] See DATA_DICTIONARY_REQUIREMENTS.md for complete format specification
 
 **Verification:**
-- [ ] All 4 subfolders exist under `sql-query-agent/`
+- [ ] All 3 subfolders (`libs/`, `sql_input/`, `dictionary/`) exist under `sql-query-agent/`
 - [ ] `libs/` contains exactly 1 DLL file
-- [ ] `config/` contains `org_config.yaml` with your org name
+- [ ] `org_config.yaml` is at the `sql-query-agent/` root (NOT in a subfolder) with your org name
 - [ ] `sql_input/` contains your `.sql` files (check count)
 - [ ] `dictionary/` contains both CSV files
 
@@ -166,7 +166,7 @@ Files/
 ## Step 4: Import Notebooks
 
 1. Go to your workspace
-2. For each notebook file (02_parse through 07_publish_collibra):
+2. For each notebook file (01_install through 09_publish_purview):
    a. Click **+ New** → **Import notebook**
    b. Upload the notebook `.py` file
 3. For each imported notebook:
@@ -174,10 +174,10 @@ Files/
    b. In the toolbar, click the **Environment** dropdown → select `sql-logic-env`
    c. In the left sidebar, click **Lakehouses** → **Add** → select your Lakehouse
 
-> **Note:** The notebooks are numbered 02-07 for run order. Notebook 01 (install/setup) is not yet automated — the upload steps above replace it.
+> **Note:** The notebooks are numbered for run order. 01-06 are required; 07-09 are optional (description generation and catalog publishing).
 
 **Verification:**
-- [ ] All 6 pipeline notebooks imported (02 through 07)
+- [ ] All 9 pipeline notebooks imported (01 through 09)
 - [ ] Each notebook shows `sql-logic-env` as its Environment
 - [ ] Each notebook shows your Lakehouse in the left sidebar
 
@@ -187,7 +187,21 @@ Files/
 
 Run notebooks in order. **Wait for each to complete before starting the next.**
 
-### 5a: Parse SQL files
+### 5a: Install & validate setup
+
+1. Open `01_install`
+2. Click **Run all**
+
+This one notebook validates the Environment and DLL, creates all Delta tables,
+loads your SQL files and dictionary CSVs, and prints a PASS/FAIL summary.
+It is idempotent — safe to re-run; it will not destroy existing data.
+
+**Verification:**
+- [ ] PASS summary with no errors (any FAIL line names the exact file or setting to fix)
+- [ ] `input_sql_sources` row count matches your .sql file count
+- [ ] `input_dict_tables` / `input_dict_columns` row counts match your CSVs
+
+### 5b: Parse SQL files
 
 1. Open `02_parse`
 2. Click **Run all**
@@ -199,7 +213,7 @@ Run notebooks in order. **Wait for each to complete before starting the next.**
 - [ ] `ops_parse_errors` count is 0 or contains only known issues
 - [ ] No `%pip install` errors (if you see kernel restart errors, the Environment is not attached)
 
-### 5b: Build knowledge graph
+### 5c: Build knowledge graph
 
 1. Open `03_build_graph`
 2. Click **Run all**
@@ -209,7 +223,7 @@ Run notebooks in order. **Wait for each to complete before starting the next.**
 - [ ] `graph_nodes` table exists in the Lakehouse Tables section
 - [ ] `graph_edges` table exists
 
-### 5c: Build metric logic
+### 5d: Build metric logic
 
 1. Open `04_build_metric_logic`
 2. Click **Run all**
@@ -218,7 +232,7 @@ Run notebooks in order. **Wait for each to complete before starting the next.**
 - [ ] `output_metric_logic` table exists with rows
 - [ ] "With calculation logic" count > 80% of total
 
-### 5d: Export graph tables
+### 5e: Export graph tables
 
 1. Open `05_export_graph_tables`
 2. Click **Run all**
@@ -226,7 +240,7 @@ Run notebooks in order. **Wait for each to complete before starting the next.**
 **Verification:**
 - [ ] 8 graph tables created (graph_canonical, graph_transformation, etc.)
 
-### 5e: Validate pipeline
+### 5f: Validate pipeline
 
 1. Open `06_validate`
 2. Click **Run all**
@@ -237,6 +251,12 @@ Run notebooks in order. **Wait for each to complete before starting the next.**
 - [ ] Calculation logic > 80%
 - [ ] Dictionary coverage > 90%
 - [ ] If DEPLOYMENT BLOCKED: resolve the listed issues before proceeding
+
+### Optional notebooks (after the agent is working)
+
+- `07_generate_descriptions` — LLM-generated business descriptions for metrics
+- `08_publish_collibra` / `09_publish_purview` — push metadata to your catalog
+  (requires adapter credentials in `org_config.yaml`)
 
 ---
 
@@ -286,7 +306,7 @@ Ask these questions to verify it's working:
 | Duplicate SQL filenames | Only one file loaded, missing metrics | Add a prefix to filenames from different schemas (e.g., `RPT_`, `ETL_`) |
 | Dictionary TABLE_NAME mismatch | "0 source tables" for metrics | TABLE_NAME in CSV must match the table names in your SQL files |
 | Dictionary not UTF-8 | Garbled characters in descriptions | Re-save CSV as UTF-8 (not ANSI/Latin-1) |
-| `org_config.yaml` not found | `FileNotFoundError` at notebook start | Must be at `Files/sql-query-agent/config/org_config.yaml` |
+| `org_config.yaml` not found | `FileNotFoundError` at notebook start | Must be at `Files/sql-query-agent/org_config.yaml` (the root, not a subfolder) |
 | Environment publish failed | Red error during publish | Check for version conflicts — try removing one package at a time to isolate |
 | Token expired during long run | `401: User Aad Token is expired` | Restart kernel and re-run — results are saved incrementally |
 | Cross-region capacity error | Silent query failures from Data Agent | Workspace capacity, Lakehouse, and Data Agent must all be in the same Azure region |
@@ -331,7 +351,7 @@ If you encounter issues not covered in this guide:
 | File | Location in Lakehouse | Purpose |
 |---|---|---|
 | ScriptDom DLL | `Files/sql-query-agent/libs/` | SQL parser engine |
-| org_config.yaml | `Files/sql-query-agent/config/` | Configuration |
+| org_config.yaml | `Files/sql-query-agent/` | Configuration |
 | *.sql files | `Files/sql-query-agent/sql_input/` | Your SQL stored procedures/views |
 | dict_tables.csv | `Files/sql-query-agent/dictionary/` | Table descriptions |
 | dict_columns.csv | `Files/sql-query-agent/dictionary/` | Column descriptions |

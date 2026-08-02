@@ -222,7 +222,7 @@ Workspace
 │       └── ops_build_summary       ← Pipeline run history
 ├── sql-logic-env (Environment)     ← Pre-installed dependencies + .whl
 ├── SQL Intelligence Agent          ← Fabric Data Agent
-└── Notebooks (01-07)               ← Pipeline notebooks
+└── Notebooks (01-09)               ← Pipeline notebooks
 ```
 
 ---
