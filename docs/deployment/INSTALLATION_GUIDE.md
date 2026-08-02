@@ -126,10 +126,11 @@ Files/
 1. Navigate to `Files/sql-query-agent/sql_input/`
 2. Upload all your `.sql` files — flat or in subfolders, either works
 
-> **How metric identity works:** The pipeline does NOT use the filename as the metric identity. Instead, it reads the `CREATE PROCEDURE [schema].[proc_name]` statement inside each SQL file and extracts the **schema + proc name** as the unique identifier (e.g., `reporting.USP_IP_SEPSIS`). This means:
+> **How metric identity works:** The pipeline does NOT use the filename as the metric identity. Instead, it reads the `CREATE PROCEDURE` or `CREATE VIEW` statement (`[schema].[object_name]`) inside each SQL file and extracts the **schema + object name** as the unique identifier (e.g., `reporting.USP_IP_SEPSIS`). This means:
 > - You do NOT need to rename files or follow any naming convention
-> - Two procs with the same name in different schemas (e.g., `[reporting].[USP_ED_Sepsis]` and `[reports].[USP_ED_Sepsis]`) are tracked as separate metrics automatically
+> - Two objects with the same name in different schemas (e.g., `[reporting].[USP_ED_Sepsis]` and `[reports].[USP_ED_Sepsis]`) are tracked as separate metrics automatically
 > - The identity always comes from the SQL content, not the filename
+> - If two files define the **same** `[schema].[object]`, the installer stops and lists the colliding files — each metric must have exactly one definition. Remove or rename the extra file before re-running.
 
 > **IMPORTANT — Upload conflicts:** Even though the pipeline handles identity correctly, the **file upload itself** can have conflicts. If two files have the same filename (e.g., two different `USP_ED_Sepsis.sql` from different schemas), uploading them to a flat folder will overwrite one. **Fix:** Either:
 > - **Preserve subfolders** — upload into `sql_input/reporting/` and `sql_input/reports/` to keep them separate

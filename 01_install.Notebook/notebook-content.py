@@ -174,29 +174,16 @@ print("=" * 60)
 # %% Cell 1: Load SQL files into Delta table
 print("\n--- Loading SQL files ---")
 
-import re as _re
+from src.parser.identity import (
+    extract_object_identity,
+    find_duplicate_identities,
+    normalize_sql_text,
+)
 
 SQL_DIR = "/lakehouse/default/Files/sql-query-agent/sql_input/"
 sql_rows = []
+identity_files = []
 skipped = []
-
-def _extract_proc_identity(sql_content):
-    """Extract schema.proc_name from CREATE PROCEDURE statement."""
-    m = _re.search(
-        r'(?:CREATE|ALTER)\s+(?:OR\s+ALTER\s+)?PROCEDURE\s+'
-        r'\[?(\w+)\]?\.\[?(\w+)\]?',
-        sql_content, _re.IGNORECASE,
-    )
-    if m:
-        return m.group(1), m.group(2)
-    m = _re.search(
-        r'(?:CREATE|ALTER)\s+(?:OR\s+ALTER\s+)?PROCEDURE\s+'
-        r'\[?(\w+)\]?',
-        sql_content, _re.IGNORECASE,
-    )
-    if m:
-        return "dbo", m.group(1)
-    return None, None
 
 for root, dirs, files in os.walk(SQL_DIR):
     for fname in sorted(files):
@@ -205,18 +192,19 @@ for root, dirs, files in os.walk(SQL_DIR):
         filepath = os.path.join(root, fname)
         try:
             with open(filepath, encoding="utf-8-sig") as f:
-                sql_content = f.read()
-            schema, proc_name = _extract_proc_identity(sql_content)
-            if schema and proc_name:
-                metric_id = f"{schema}.{proc_name}"
-                display_name = proc_name
+                sql_content = normalize_sql_text(f.read())
+            schema, obj_name, source_type = extract_object_identity(sql_content)
+            if schema and obj_name:
+                metric_id = f"{schema}.{obj_name}"
+                display_name = obj_name
                 source_schema = schema
             else:
                 metric_id = fname.replace(".sql", "")
                 display_name = metric_id
                 source_schema = None
-                print(f"  [!] No CREATE PROCEDURE found in {fname} — using filename as metric_id")
-            sql_rows.append((metric_id, display_name, sql_content, None, None, None, source_schema))
+                print(f"  [!] No CREATE PROCEDURE/VIEW found in {fname} — using filename as metric_id")
+            sql_rows.append((metric_id, display_name, sql_content, None, None, source_type, source_schema))
+            identity_files.append((metric_id, os.path.relpath(filepath, SQL_DIR)))
         except Exception as e:
             skipped.append((fname, str(e)))
 
@@ -224,11 +212,19 @@ if not sql_rows:
     print("[X] FATAL: No .sql files found in sql_input/")
     raise SystemExit("Installation cannot proceed — upload your SQL files first.")
 
-metric_ids = [r[0] for r in sql_rows]
-dupes = set(m for m in metric_ids if metric_ids.count(m) > 1)
-if dupes:
-    print(f"[!] WARNING: Duplicate proc identities detected: {', '.join(sorted(dupes))}")
-    print("    Two files define the same [schema].[proc_name] — the last one loaded wins.")
+# Contract gate: unique(metric_id). Two definitions of the same
+# [schema].[object] is a governance decision, not something to guess at.
+collisions = find_duplicate_identities(identity_files)
+if collisions:
+    print(f"[X] FATAL: {len(collisions)} duplicate metric identities detected:")
+    for metric_id, files in sorted(collisions.items()):
+        print(f"    {metric_id} is defined by {len(files)} files:")
+        for f in files:
+            print(f"      - {f}")
+    print("    Each [schema].[object] may be defined by exactly one file.")
+    print("    Remove or rename the extra file(s). If both versions are real,")
+    print("    they are different metrics and need different object names.")
+    raise SystemExit("Installation cannot proceed — resolve duplicate identities first.")
 
 from src.schemas import SQL_SOURCES, to_spark_schema
 sql_df = spark.createDataFrame(sql_rows, schema=to_spark_schema(SQL_SOURCES))
@@ -370,6 +366,10 @@ ERROR_SEEDS = [
      "SQL files from different schemas have the same filename, causing overwrites in flat upload folder.",
      "Add a prefix to distinguish files from different schemas (e.g., RPT_USP_xxx.sql, ETL_USP_xxx.sql). Or use subfolders.",
      "Check for duplicate filenames before uploading.", "2026-07-30"),
+    ("duplicate metric identities", "duplicate_metric_identity",
+     "Two or more SQL files define the same [schema].[object]. The installer blocks because each metric must have exactly one certified definition.",
+     "Remove or rename the extra file(s) listed in the installer output. If both versions are genuinely needed, they are different metrics and need different object names.",
+     "Ensure each [schema].[procedure or view] is defined by exactly one file before uploading.", "2026-08-02"),
     ("Cannot import 'src' package", "wheel_not_installed",
      "The .whl file is not uploaded to the Fabric Environment, or Environment not published.",
      "Upload sql_query_agent-1.1.0-py3-none-any.whl to Environment → Custom libraries → Publish.",

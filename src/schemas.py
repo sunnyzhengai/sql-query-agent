@@ -66,16 +66,17 @@ SQL_SOURCES = {
         ("source_schema", "string", True),
     ],
     "column_descriptions": {
-        "metric_id": "Unique identifier: schema.proc_name extracted from the SQL",
+        "metric_id": "Unique identifier: schema.object_name extracted from the CREATE/ALTER statement",
         "name": "Object name (proc or view) without schema",
-        "sql": "Full original SQL text, normalized to \\n line endings",
+        "sql": "Full original SQL text, normalized to \\n line endings at load",
         "steward": "Business steward, if assigned at load time",
         "developer": "Developer owner, if assigned at load time",
-        "source_type": "Object type: procedure or view",
+        "source_type": "Object type: procedure or view (null when identity fell back to filename)",
         "source_schema": "Database schema the object belongs to (e.g. reporting)",
     },
     "invariants": [
         {"kind": "unique", "columns": ["metric_id"]},
+        {"kind": "allowed_values", "column": "source_type", "values": ["procedure", "view"]},
     ],
 }
 
