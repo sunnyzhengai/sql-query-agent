@@ -8,6 +8,12 @@ receives** — deployment packages, Lakehouse uploads, reviewer sandboxes, or pu
 repo mirrors. The customer-facing documentation lives in `docs/architecture/`,
 `docs/deployment/`, `docs/product/`, and `docs/legal/`.
 
+This is enforced mechanically for deployment packages:
+`scripts/build_deployment_package.py` assembles the customer zip from a strict
+allowlist and re-scans the finished archive for internal content, and
+`tests/test_build_deployment_package.py` fails CI if anything internal leaks.
+Always build customer packages with that script — never by zipping the repo.
+
 ## Contents
 
 | Document | Purpose |

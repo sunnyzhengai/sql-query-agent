@@ -211,6 +211,8 @@ Make the codebase enterprise-ready for Marketplace certification.
 - [x] [INSTALLATION_GUIDE.md](../deployment/INSTALLATION_GUIDE.md) — canonical customer install guide
 - [x] [DATA_DICTIONARY_REQUIREMENTS.md](../deployment/DATA_DICTIONARY_REQUIREMENTS.md)
 - [x] [REVIEWER_GUIDE.md](../product/REVIEWER_GUIDE.md) — for Microsoft certification testers
+- [x] Deployment packaging script (`scripts/build_deployment_package.py`) —
+      allowlist build of the customer zip with internal-content leak guard (tested)
 - [ ] Prerequisite validation script (`scripts/validate_deployment.py`)
 - [ ] Document Fabric API rate limits and handling
 - [ ] Add Fabric/API error codes to error_classifier (403, 404, 429 → resolution steps)
