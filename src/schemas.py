@@ -228,7 +228,11 @@ PARSE_ERRORS = {
 
 PARSE_SUCCESSES = {
     "table_name": "ops_parse_successes",
-    "description": "SQL sources that parsed successfully, with extraction counts.",
+    "description": (
+        "SQL sources that parsed successfully, with extraction counts. The "
+        "cte/table/line counts are deliberate derived copies of the same "
+        "facts in ops_parse_results, denormalized for the validation gate."
+    ),
     "domain": "operations",
     "status": "active",
     "owner": {"notebook": "02_parse", "module": "src/parser/sql_parser.py"},
@@ -698,6 +702,26 @@ GRAPH_EDGE_T2TECH = {
     ],
 }
 
+GRAPH_EDGE_TAB2COL = {
+    "table_name": "graph_edge_tab2col",
+    "description": "LPG export: technical table -> technical column edges (columns reachable by traversal).",
+    "domain": "lpg_export",
+    "status": "active",
+    "owner": {"notebook": "05_export_graph_tables", "module": None},
+    "write_mode": "overwrite",
+    "enrichers": [],
+    "consumers": ["fabric_graph_model (planned)"],
+    "columns": [
+        ("sourceId", "string", False),
+        ("targetId", "string", False),
+    ],
+    "column_descriptions": dict(_LPG_EDGE_COLUMN_DESCRIPTIONS),
+    "invariants": [
+        {"kind": "reference", "column": "sourceId", "references": "graph_technical.nodeId"},
+        {"kind": "reference", "column": "targetId", "references": "graph_technical.nodeId"},
+    ],
+}
+
 GRAPH_EDGE_TECH2DIM = {
     "table_name": "graph_edge_tech2dim",
     "description": "LPG export: technical -> dimension edges (table to its filterable columns).",
@@ -922,6 +946,7 @@ TABLE_REGISTRY = {
         # lpg_export
         GRAPH_CANONICAL, GRAPH_TRANSFORMATION, GRAPH_TECHNICAL, GRAPH_DIMENSION,
         GRAPH_EDGE_C2T, GRAPH_EDGE_T2T, GRAPH_EDGE_T2TECH, GRAPH_EDGE_TECH2DIM,
+        GRAPH_EDGE_TAB2COL,
         # planned (no current writer — see notes on each)
         ERROR_LOG, EXTRACTION_INSPECTION, TRACKING, SYNC_LOG, STEWARD_ASSIGNMENTS,
     ]

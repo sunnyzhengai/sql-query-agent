@@ -19,6 +19,18 @@ class TestGraphBuilder:
         assert node_id == "tech:REPORTING.ENCOUNTER"
         assert gb.nodes[node_id].properties["schema"] == "reporting"
 
+    def test_column_nodes_are_wired_to_their_table(self):
+        """Column nodes must be reachable by traversal, not just by name."""
+        gb = GraphBuilder()
+        col_id = gb.add_technical_node("encounter", "admit_dt", "Admission date")
+        edge_pairs = [(e.source_id, e.target_id, e.edge_type.value) for e in gb.edges]
+        assert ("tech:DBO.ENCOUNTER", col_id, "table_to_column") in edge_pairs
+        # Parent table node was auto-created
+        assert "tech:DBO.ENCOUNTER" in gb.nodes
+        # Re-adding the column must not duplicate the edge
+        gb.add_technical_node("encounter", "admit_dt")
+        assert len(gb.edges) == 1
+
     def test_case_variants_resolve_to_one_node(self):
         """Dictionary case and SQL case must meet at the same node (ADR 0016)."""
         gb = GraphBuilder()

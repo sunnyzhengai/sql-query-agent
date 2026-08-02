@@ -58,9 +58,16 @@ class GraphBuilder:
                     "column": column,
                 },
             )
-            # Index by folded simple table name for schema-agnostic matching
             if column is None:
+                # Index by folded simple table name for schema-agnostic matching
                 self._table_name_index.setdefault(fold_identifier(table), set()).add(node_id)
+            else:
+                # Column nodes hang off their table so they are reachable by
+                # traversal, not just by naming convention.
+                table_node_id = self.add_technical_node(
+                    table, schema=schema, database=database
+                )
+                self.add_edge(table_node_id, node_id, EdgeType.TABLE_TO_COLUMN)
         return node_id
 
     def _find_tech_node_id(self, table_ref: TableRef) -> str | None:

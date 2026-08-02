@@ -86,6 +86,7 @@ def export_edge_tables(edges: list[GraphEdge]) -> dict[str, list[dict]]:
         EdgeType.TRANSFORM_TO_TRANSFORM: "graph_edge_t2t",
         EdgeType.TRANSFORM_TO_TECHNICAL: "graph_edge_t2tech",
         EdgeType.TECHNICAL_TO_DIMENSION: "graph_edge_tech2dim",
+        EdgeType.TABLE_TO_COLUMN: "graph_edge_tab2col",
     }
 
     result: dict[str, list[dict]] = {name: [] for name in table_map.values()}

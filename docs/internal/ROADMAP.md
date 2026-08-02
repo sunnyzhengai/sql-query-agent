@@ -89,7 +89,7 @@ Get Metadata Sync working end-to-end with real data against Purview/Collibra.
 - [x] Three-layer graph with full dependency chain traversal
 - [x] Multi-statement proc support (temp tables → CTE entries with dependencies)
 - [x] `__final_select__` synthetic node; 400K+ nodes, 12K+ edges from real data
-- [x] LPG export: 8 typed tables (see [ADR 0014](../decisions/0014-metric-logic-grounding-mandatory-dictionary.md))
+- [x] LPG export: 9 typed tables (see [ADR 0014](../decisions/0014-metric-logic-grounding-mandatory-dictionary.md))
 
 ### Data Agent (DONE)
 - [x] Fabric Data Agent grounded in `metric_logic` + graph tables
@@ -286,6 +286,20 @@ needed, a design pass. Do not resolve casually — these are product decisions.
       (manage_stewards), but the certify/reject lifecycle (ADR 0004,
       CertificationStatus enum, Path B queue) has no tables, transitions, or
       notification wiring. Biggest remaining product gap.
+- [ ] **Dimension-layer activation (design pass)** — column_refs now survive
+      the 02→03 boundary, but wiring add_dimension_node needs two decisions:
+      which columns qualify as dimensions (WHERE/GROUP BY filters?), and
+      alias resolution (refs carry aliases like 'e', not table names).
+- [ ] **Delta vs Graph rematch** — rerun the backend comparison once
+      contracts are enforced in production and the dimension layer is live;
+      the original experiment compared curated Delta (metric_logic) against
+      a structurally impoverished graph (case-split nodes, empty dimension
+      layer, floating column nodes). Hypothesis to test (Sunny, 2026-08-02):
+      SQL is set theory and LLMs get "creative" transforming NL into it,
+      while graph traversal is semantically closer to NL — given a quality
+      graph structure and good grounding rules, NL-to-traversal should be
+      easier and more accurate. Measure: answer accuracy + refusal
+      correctness on the same question set via GraphBackend protocol.
 
 ---
 

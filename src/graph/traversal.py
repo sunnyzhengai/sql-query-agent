@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import logging
 
-from src.models import GraphEdge, GraphNode, NodeLayer
+from src.models import EdgeType, GraphEdge, GraphNode, NodeLayer
 
 logger = logging.getLogger(__name__)
 
@@ -81,4 +81,10 @@ class GraphTraverser:
             dimensions.append(node)
 
         for edge in self._adjacency.get(node_id, []):
+            # Metric subgraphs describe lineage (which TABLES feed the
+            # metric). Table->column structure edges are for graph
+            # exploration, not lineage — following them would pollute
+            # source_tables with every column of every table.
+            if edge.edge_type == EdgeType.TABLE_TO_COLUMN:
+                continue
             self._traverse(edge.target_id, visited, transformations, technical, dimensions)

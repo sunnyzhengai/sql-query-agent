@@ -42,6 +42,7 @@ class EdgeType(str, Enum):
     TRANSFORM_TO_TRANSFORM = "transform_to_transform"
     TRANSFORM_TO_TECHNICAL = "transform_to_technical"
     TECHNICAL_TO_DIMENSION = "technical_to_dimension"
+    TABLE_TO_COLUMN = "table_to_column"
 
 
 class GraphEdge(BaseModel):

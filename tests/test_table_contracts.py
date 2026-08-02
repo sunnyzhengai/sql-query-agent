@@ -23,7 +23,7 @@ NOTEBOOK_INDIRECT_WRITES = {
     "05_export_graph_tables": [
         "graph_canonical", "graph_transformation", "graph_technical",
         "graph_dimension", "graph_edge_c2t", "graph_edge_t2t",
-        "graph_edge_t2tech", "graph_edge_tech2dim",
+        "graph_edge_t2tech", "graph_edge_tech2dim", "graph_edge_tab2col",
     ],
     "load_clarity_dictionary": ["input_dict_tables", "input_dict_columns"],
     "load_sql_files": ["input_sql_sources"],

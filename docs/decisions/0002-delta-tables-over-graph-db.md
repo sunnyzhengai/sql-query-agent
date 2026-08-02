@@ -12,7 +12,7 @@ would sit outside the customer's Microsoft Fabric tenant.
 ## Decision
 
 Store the graph as Delta tables (`graph_nodes`, `graph_edges`) in the customer's
-Fabric Lakehouse. Additionally export 8 typed LPG tables (4 node tables, 4 edge
+Fabric Lakehouse. Additionally export typed LPG tables (4 node tables, 5 edge
 tables) so a native Fabric Graph backend can be adopted later without re-parsing.
 
 ## Consequences

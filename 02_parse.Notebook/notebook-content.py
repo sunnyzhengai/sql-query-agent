@@ -147,6 +147,8 @@ print(f"Parsing SQL with {extractor_name}...")
 
 parse_errors = []
 parse_successes = []
+from src.graph.serialization import parsed_sql_to_parse_result_row
+
 parse_results_data = []
 start_time = _time.time()
 
@@ -164,32 +166,14 @@ for i, source in enumerate(sql_sources):
             # Fallback: sqlparse extraction + sqlglot parsing
             parsed = parse_sql(sql)
 
-        # Store parse result as JSON for downstream notebooks
-        ctes_json = json.dumps([{
-            "name": c.name,
-            "sql_fragment": c.sql_fragment,
-            "table_refs": [{"table": t.table, "schema": t.schema, "database": t.database}
-                           if hasattr(t, 'schema') else {"table": t, "schema": "dbo", "database": None}
-                           for t in c.table_refs],
-            "depends_on": c.depends_on,
-            "column_refs": [{"table": cr.table, "column": cr.column} for cr in c.column_refs],
-        } for c in parsed.ctes])
-
-        parse_results_data.append({
-            "metric_id": metric_id,
-            "name": name,
-            "ctes_json": ctes_json,
-            "final_select_tables": json.dumps([
-                {"table": t.table, "schema": t.schema, "database": t.database}
-                if hasattr(t, 'schema') else {"table": t, "schema": "dbo", "database": None}
-                for t in parsed.final_select_tables
-            ]),
-            "final_select_cte_refs": json.dumps(parsed.final_select_cte_refs),
-            "normalized_sql": parsed.normalized_sql or "",
-            "cte_count": len(parsed.ctes),
-            "table_count": len(parsed.final_select_tables),
-            "line_count": sql.count("\n") + 1,
-        })
+        # Store parse result via the payload contract — writer and reader
+        # live together in src/graph/serialization.py, pinned by a
+        # round-trip test. Never construct this row shape inline.
+        parse_results_data.append(
+            parsed_sql_to_parse_result_row(
+                metric_id, name, parsed, line_count=sql.count("\n") + 1
+            )
+        )
 
         parse_successes.append({
             "metric_id": metric_id,
@@ -253,23 +237,10 @@ error_log.start_run()
 
 # Save parse results (intermediate table for 03_build_graph)
 if parse_results_data:
-    pr_schema = StructType([
-        StructField("metric_id", StringType(), False),
-        StructField("name", StringType(), False),
-        StructField("ctes_json", StringType(), True),
-        StructField("final_select_tables", StringType(), True),
-        StructField("final_select_cte_refs", StringType(), True),
-        StructField("normalized_sql", StringType(), True),
-        StructField("cte_count", IntegerType(), True),
-        StructField("table_count", IntegerType(), True),
-        StructField("line_count", IntegerType(), True),
-    ])
-    pr_rows = [(r["metric_id"], r["name"], r["ctes_json"], r["final_select_tables"],
-                r["final_select_cte_refs"], r["normalized_sql"], r["cte_count"], r["table_count"], r["line_count"])
-               for r in parse_results_data]
-    pr_df = spark.createDataFrame(pr_rows, schema=pr_schema)
+    from src.schemas import PARSE_RESULTS
+    pr_df = spark.createDataFrame(parse_results_data, schema=to_spark_schema(PARSE_RESULTS))
     pr_df.write.format("delta").mode("overwrite").option("overwriteSchema", "true").saveAsTable("ops_parse_results")
-    print(f"Saved {len(parse_results_data)} parse results to 'parse_results' table")
+    print(f"Saved {len(parse_results_data)} parse results to ops_parse_results")
 
 # Save parse errors
 if parse_errors:

@@ -45,6 +45,7 @@ After running, create a Graph Model in the Fabric UI:
    - graph_edge_c2t      -> CANONICAL_TO_TRANSFORM (source_id -> Canonical, target_id -> Transformation)
    - graph_edge_t2t      -> TRANSFORM_TO_TRANSFORM (source_id -> Transformation, target_id -> Transformation)
    - graph_edge_t2tech   -> TRANSFORM_TO_TECHNICAL (source_id -> Transformation, target_id -> Technical)
+   - graph_edge_tab2col  -> TABLE_TO_COLUMN (source_id -> Technical table, target_id -> Technical column)
    - graph_edge_tech2dim -> TECHNICAL_TO_DIMENSION (source_id -> Technical, target_id -> Dimension)
 4. Save the model to ingest data and build the queryable graph
 """

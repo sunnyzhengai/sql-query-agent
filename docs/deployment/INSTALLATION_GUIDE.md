@@ -239,7 +239,7 @@ It is idempotent — safe to re-run; it will not destroy existing data.
 2. Click **Run all**
 
 **Verification:**
-- [ ] 8 graph tables created (graph_canonical, graph_transformation, etc.)
+- [ ] 9 graph tables created (graph_canonical, graph_transformation, etc.)
 
 ### 5f: Validate pipeline
 
@@ -378,6 +378,7 @@ If you encounter issues not covered in this guide:
 | `graph_edge_c2t` | Graph (LPG) | Canonical → Transform edges |
 | `graph_edge_t2t` | Graph (LPG) | Transform → Transform edges |
 | `graph_edge_t2tech` | Graph (LPG) | Transform → Technical edges |
+| `graph_edge_tab2col` | Graph (LPG) | Technical table → column edges |
 | `graph_edge_tech2dim` | Graph (LPG) | Technical → Dimension edges |
 | `output_metric_logic` | Output | Flattened table for Data Agent |
 | `gov_steward_assignments` | Governance | Metric ownership |

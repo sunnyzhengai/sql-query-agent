@@ -14,7 +14,7 @@ dictionary was originally optional input.
 1. Ground the Data Agent in `metric_logic` — a flattened, pre-joined Delta table
    (one row per metric: calculation logic, source tables, descriptions). The
    graph tables remain sources for traversal and the LPG export.
-2. The 8 typed LPG tables are exported automatically by the pipeline (no
+2. The typed LPG tables (9 as of ADR 0016-era additions) are exported automatically by the pipeline (no
    customer action) for future Fabric Graph / self-service report generation.
 3. The data dictionary (`dict_tables.csv`, `dict_columns.csv`) is **mandatory**:
    without it the agent gives incomplete or misleading answers, and the

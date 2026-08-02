@@ -14,7 +14,7 @@
 |---|---|---|
 | Storage layer | Both Delta + LPG | Build both; ship Delta for Data Agent, LPG tables populated for future self-service report generation |
 | Data Agent grounding | `metric_logic` (Delta flat table) | Simpler, proven, no Graph Model setup for customer |
-| LPG tables | Exported automatically by pipeline | 8 typed tables populated silently — no customer action |
+| LPG tables | Exported automatically by pipeline | 9 typed tables populated silently — no customer action |
 | Data dictionary | **Mandatory** | Without it, agent gives incomplete/misleading answers |
 | Collibra integration | Optional add-on (Phase 7) | For customers with Collibra — publishes AI-generated descriptions to PBI report assets |
 
@@ -236,7 +236,7 @@ Run in order:
 3. [ ] `04_build_metric_logic` — flattens graph for Data Agent
    - Verify: `metric_logic` has rows with `calculation_logic` and `source_tables` populated
 4. [ ] `05_export_graph_tables` — exports typed tables for LPG (automatic, no config needed)
-   - Verify: 8 graph tables have rows (4 node tables, 4 edge tables)
+   - Verify: 9 graph tables have rows (4 node tables, 5 edge tables)
 5. [ ] `06_validate` — validates pipeline health
    - Verify: `pipeline_validation` shows coverage percentages
 
@@ -307,7 +307,7 @@ Run the golden path test scenarios:
 
 **Goal:** LPG tables are populated for future use. No customer action required.
 
-The pipeline step `05_export_graph_tables` automatically populates 8 typed Delta tables from the knowledge graph. These tables are structured for future Fabric Graph Model ingestion when the self-service report generation feature is released.
+The pipeline step `05_export_graph_tables` automatically populates 9 typed Delta tables from the knowledge graph. These tables are structured for future Fabric Graph Model ingestion when the self-service report generation feature is released.
 
 **Tables created:**
 
@@ -320,6 +320,7 @@ The pipeline step `05_export_graph_tables` automatically populates 8 typed Delta
 | `graph_edge_c2t` | Canonical → Transformation edges |
 | `graph_edge_t2t` | Transformation → Transformation edges |
 | `graph_edge_t2tech` | Transformation → Technical edges |
+| `graph_edge_tab2col` | Technical table → column edges |
 | `graph_edge_tech2dim` | Technical → Dimension edges |
 
 - [ ] Verify: All 8 tables exist and have rows after pipeline run
