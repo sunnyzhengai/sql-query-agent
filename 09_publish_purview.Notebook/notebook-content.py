@@ -61,11 +61,18 @@ print(f"Collection: {purview_cfg.collection_name or '(default)'}")
 # %% Cell 1: Test Purview connection
 from src.adapters.purview import PurviewAdapter, PurviewConfig
 
-adapter = PurviewAdapter(PurviewConfig(
-    account_name=purview_cfg.account_name,
-    collection_name=purview_cfg.collection_name,
-    custom_type_name=purview_cfg.custom_type_name,
-))
+# Get Purview token via mssparkutils (Fabric notebook auth)
+purview_token = mssparkutils.credentials.getToken("https://purview.azure.net")
+print(f"Purview token acquired: {len(purview_token)} chars")
+
+adapter = PurviewAdapter(
+    PurviewConfig(
+        account_name=purview_cfg.account_name,
+        collection_name=purview_cfg.collection_name,
+        custom_type_name=purview_cfg.custom_type_name,
+    ),
+    access_token=purview_token,
+)
 
 print("Testing connection to Purview...")
 if adapter.test_connection():
@@ -74,7 +81,7 @@ else:
     print("[X] Connection failed. Check:")
     print("    1. Purview account name is correct")
     print("    2. Your identity has Data Curator role")
-    print("    3. azure-identity is installed in the Environment")
+    print("    3. org_config.yaml has correct purview account_name")
     raise SystemExit("Cannot proceed without Purview connection.")
 
 # METADATA ********************

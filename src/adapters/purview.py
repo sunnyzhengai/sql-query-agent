@@ -42,14 +42,24 @@ class PurviewAdapter:
         pip install azure-identity requests
     """
 
-    def __init__(self, config: PurviewConfig) -> None:
+    def __init__(self, config: PurviewConfig, access_token: str = "") -> None:
         self.config = config
         self.base_url = f"https://{config.account_name}.purview.azure.com"
+        self._explicit_token = access_token
         self._credential = None
-        self._token = None
 
     def _get_headers(self) -> dict[str, str]:
-        """Get auth headers using DefaultAzureCredential."""
+        """Get auth headers.
+
+        Uses explicit access_token if provided (Fabric notebooks),
+        otherwise falls back to DefaultAzureCredential (local dev).
+        """
+        if self._explicit_token:
+            return {
+                "Authorization": f"Bearer {self._explicit_token}",
+                "Content-Type": "application/json",
+            }
+
         if self._credential is None:
             try:
                 from azure.identity import DefaultAzureCredential
