@@ -173,32 +173,58 @@ decision. Summary:
 
 ```
 src/
-├── config.py              # Load org_config.yaml (gitignored)
-├── models.py              # Pydantic models: GraphNode, GraphEdge, enums
-├── dictionary.py          # Data dictionary loader
-├── pipeline.py            # End-to-end graph build orchestration
+├── config.py              # Load org_config.yaml (pydantic models, gitignored file)
+├── models.py              # GraphNode/GraphEdge, NodeLayer/EdgeType/CertificationStatus enums
+├── schemas.py             # DATA CONTRACTS: TABLE_REGISTRY — shape, semantics,
+│                          #   ownership, consumers, invariants for every Delta table
+├── invariants.py          # Generic invariant checker (unique/allowed_values/reference)
+├── dictionary.py          # Data dictionary (case-insensitive matching, ADR 0016)
+├── pipeline.py            # Local end-to-end graph build (dev/demo entry point)
+├── steps/                 # PURE PIPELINE STEPS — notebooks are thin callers
+│   ├── parse.py               # 02: sources -> parse results/errors/successes
+│   ├── build_graph.py         # 03: parse results + dictionary -> nodes/edges
+│   ├── metric_logic.py        # 04: graph -> agent's flattened metric_logic
+│   ├── export.py              # 05: graph -> 9 typed LPG tables
+│   ├── readiness.py           # 06: deployment gate decision (pure)
+│   └── gates.py               # Registry-driven postcondition gate per notebook
 ├── parser/
-│   ├── sql_parser.py          # SQL -> ParsedSQL (CTEs, table/column refs)
-│   ├── scriptdom_extractor.py # ScriptDom client (microservice or pythonnet)
+│   ├── sql_parser.py          # SQL -> ParsedSQL (CTEs, table/column refs; sqlglot)
+│   ├── scriptdom_fabric.py    # ScriptDom via pythonnet in Fabric (primary parser)
+│   ├── scriptdom_extractor.py # ScriptDom client wrapper
 │   ├── sql_extractor.py       # sqlparse-based fallback extractor
-│   ├── proc_normalize.py      # Temp table -> CTE conversion (legacy)
-│   ├── llm_extractor.py       # LLM-based extraction (optional fallback)
-│   ├── summary_generator.py   # LLM summary generation for nodes
-│   └── parsing_rules/         # Regex preprocessing rules (legacy)
+│   ├── identity.py            # metric_id extraction, case folding, dup detection
+│   └── error_classifier.py    # Parse errors -> user-facing categories/fixes
 ├── graph/
-│   ├── builder.py         # Build graph from parsed SQL + dictionary
-│   └── traversal.py       # Traverse graph to answer metric questions
-├── extractor/
-│   ├── connection.py      # SQL Server connection (Fabric JDBC / local pyodbc)
-│   ├── discovery.py       # Discover views/procs from sys catalogs
-│   ├── extractor.py       # Orchestrator: discover -> diff -> produce sql_sources
-│   └── tracker.py         # Change detection via SHA-256 hashing
+│   ├── builder.py             # Build the three-layer graph (folded node IDs)
+│   ├── traversal.py           # Metric subgraph traversal (lineage semantics)
+│   ├── serialization.py       # Rows <-> objects; 02->03 payload contract (both halves)
+│   ├── metric_logic.py        # Flatten graph -> metric_logic rows
+│   ├── export.py              # Split graph -> typed LPG tables
+│   ├── backend.py             # GraphBackend protocol (Delta vs Fabric Graph)
+│   ├── delta_backend.py       # Delta implementation
+│   ├── fabric_graph_backend.py# Fabric Graph implementation (rematch candidate)
+│   └── gql_client.py          # GQL query client for Fabric Graph
+├── governance/
+│   ├── validation.py          # Per-metric six-step pipeline validation
+│   ├── error_log.py           # Cross-run error log with regression detection
+│   ├── steward.py             # Steward assignment management
+│   └── installation_errors.py # Error KB seeds (one home; powers /troubleshoot)
+├── extractor/                 # Tier 2 on-prem SQL Server extraction
+│   ├── connection.py          # SQL Server connection (Fabric JDBC / local pyodbc)
+│   ├── discovery.py           # Discover views/procs from sys catalogs
+│   ├── extractor.py           # Orchestrator: discover -> diff -> sql_sources
+│   ├── tracker.py             # Change detection via SHA-256 hashing
+│   └── devops_tmdl.py         # TMDL lineage from DevOps repos (PBI)
 └── adapters/
-    ├── base.py            # CatalogAdapter protocol + MetadataRecord models
+    ├── base.py                # CatalogAdapter protocol + MetadataRecord models
     ├── metadata_generator.py  # Graph nodes -> catalog-agnostic MetadataRecords
-    ├── publisher.py       # Orchestrate publishing to multiple catalogs
-    ├── purview.py         # Microsoft Purview Data Map adapter
-    └── collibra.py        # Collibra REST API adapter
+    ├── publisher.py           # Orchestrate publishing to multiple catalogs
+    ├── purview.py             # Microsoft Purview Data Map adapter
+    ├── collibra.py            # Collibra REST API adapter
+    ├── collibra_lineage.py    # Collibra lineage retrieval
+    ├── collibra_lineage_match.py # Fuzzy-match metrics to Collibra assets
+    ├── fabric_agent.py        # Fabric Data Agent client (MCP protocol)
+    └── fabric_pbi.py          # Power BI report description updater
 ```
 
 ## Data Flow

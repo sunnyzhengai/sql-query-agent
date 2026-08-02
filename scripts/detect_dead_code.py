@@ -24,12 +24,17 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 SRC_DIR = PROJECT_ROOT / "src"
 
-# Directories to scan for imports (consumers of src/)
+# Directories to scan for imports (consumers of src/).
+# CRITICAL: the pipeline notebooks live in NN_*.Notebook/ folders at the
+# repo ROOT (Fabric git format), not under notebooks/. Missing them here is
+# how the governance modules were wrongly purged as "orphans" in July 2026 —
+# their only consumers were notebooks this scan never saw.
 CONSUMER_DIRS = [
     PROJECT_ROOT / "src",
     PROJECT_ROOT / "tests",
     PROJECT_ROOT / "notebooks",
     PROJECT_ROOT / "scripts",
+    *sorted(PROJECT_ROOT.glob("*.Notebook")),
 ]
 
 # Files to exclude from dead code analysis (infrastructure, not logic)

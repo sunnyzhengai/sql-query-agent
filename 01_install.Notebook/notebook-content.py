@@ -345,68 +345,10 @@ else:
 print("\n--- Seeding installation errors knowledge base ---")
 
 from src.schemas import INSTALLATION_ERRORS, to_spark_schema
-
-ERROR_SEEDS = [
-    ("This property must be set before runtime is initialized", "pythonnet_initialization",
-     "%pip install restarts the kernel, breaking pythonnet CLR init.",
-     "Use Fabric Environment with pre-installed packages instead of %pip install.",
-     "Never use %pip install in notebooks that use pythonnet/ScriptDom.", "2026-07-26"),
-    ("No module named 'Microsoft.SqlServer'", "dll_not_found",
-     "ScriptDom DLL missing from libs/ folder or wrong filename.",
-     "Upload Microsoft.SqlServer.TransactSql.ScriptDom.dll to Files/sql-query-agent/libs/. Use lib/netstandard2.0/ version from NuGet.",
-     "Verify DLL path during deployment.", "2026-07-26"),
-    ("Could not load file or assembly", "dll_load_failure",
-     "Wrong DLL version (e.g., net462 instead of netstandard2.0) or corrupted file.",
-     "Re-download from NuGet, use lib/netstandard2.0/ version only.",
-     "Always use netstandard2.0 build.", "2026-07-26"),
-    ("Config not found at", "config_not_found",
-     "org_config.yaml is missing or in the wrong location.",
-     "Upload org_config.yaml to Files/sql-query-agent/ (NOT in a config/ subfolder).",
-     "Verify file path during 01_install.", "2026-07-30"),
-    ("Bad Request.*400.*csv", "spark_csv_read_failure",
-     "Spark CSV reader fails with OneLake HTTP path in some Fabric configurations.",
-     "Add file:// prefix to CSV paths: spark.read.csv('file://' + path).",
-     "Use file:// prefix for all local CSV reads.", "2026-07-31"),
-    ("TooManyRequestsForCapacity.*430", "capacity_limit",
-     "F2 capacity only supports one Spark session at a time.",
-     "Wait 2-3 minutes for the previous session to release, then retry. Check Monitoring hub for active sessions.",
-     "Cancel unused sessions. Consider F4 capacity for concurrent workloads.", "2026-07-30"),
-    ("TABLE_OR_VIEW_NOT_FOUND", "table_not_found",
-     "Delta table doesn't exist yet, or org_config.yaml has old table names.",
-     "Run 01_install first to create all tables. Verify org_config.yaml uses domain-prefixed names (input_sql_sources, not sql_sources).",
-     "Always run 01_install before other notebooks.", "2026-07-30"),
-    ("User Aad Token is expired", "token_expired",
-     "AAD token expires after ~1 hour. mssparkutils caches the token and won't refresh within the same session.",
-     "Restart the kernel and re-run. For long batch runs, results are saved incrementally so you pick up where you left off.",
-     "Design batch operations to save progress incrementally.", "2026-07-30"),
-    ("Git_GitProviderCredentialsNotAuthorizedError", "git_auth_failure",
-     "Fabric GitHub OAuth doesn't have write access to the repository.",
-     "Revoke and re-authorize: GitHub Settings → Applications → find Microsoft Fabric → grant repo access. Or use a GitHub Personal Access Token with repo scope.",
-     "Verify Git write access before connecting workspace.", "2026-07-31"),
-    ("duplicate filenames", "duplicate_sql_files",
-     "SQL files from different schemas have the same filename, causing overwrites in flat upload folder.",
-     "Add a prefix to distinguish files from different schemas (e.g., RPT_USP_xxx.sql, ETL_USP_xxx.sql). Or use subfolders.",
-     "Check for duplicate filenames before uploading.", "2026-07-30"),
-    ("duplicate metric identities", "duplicate_metric_identity",
-     "Two or more SQL files define the same [schema].[object]. The installer blocks because each metric must have exactly one certified definition.",
-     "Remove or rename the extra file(s) listed in the installer output. If both versions are genuinely needed, they are different metrics and need different object names.",
-     "Ensure each [schema].[procedure or view] is defined by exactly one file before uploading.", "2026-08-02"),
-    ("Cannot import 'src' package", "wheel_not_installed",
-     "The .whl file is not uploaded to the Fabric Environment, or Environment not published.",
-     "Upload sql_query_agent-1.1.0-py3-none-any.whl to Environment → Custom libraries → Publish.",
-     "Verify Environment has .whl and is published before running notebooks.", "2026-07-31"),
-    ("Set as default lakehouse.*grayed out", "lakehouse_default_issue",
-     "Lakehouse moved from another workspace retains stale metadata.",
-     "Create a new Lakehouse in the current workspace instead of moving one from another workspace.",
-     "Always create Lakehouses in the target workspace.", "2026-07-31"),
-]
+from src.governance.installation_errors import ERROR_SEEDS
 
 try:
-    error_rows = [
-        (sig, cat, cause, fix, prevent, seen)
-        for sig, cat, cause, fix, prevent, seen in ERROR_SEEDS
-    ]
-    errors_df = spark.createDataFrame(error_rows, schema=to_spark_schema(INSTALLATION_ERRORS))
+    errors_df = spark.createDataFrame(ERROR_SEEDS, schema=to_spark_schema(INSTALLATION_ERRORS))
     errors_df.write.format("delta").mode("overwrite").option("overwriteSchema", "true") \
         .saveAsTable("ops_installation_errors")
     print(f"[+] Seeded {len(error_rows)} known error signatures into ops_installation_errors")
