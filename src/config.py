@@ -56,7 +56,10 @@ class ExtractorConfig(BaseModel):
 class PurviewAdapterConfig(BaseModel):
     account_name: str
     collection_name: str = ""
-    custom_type_name: str = "ai_business_term"
+    custom_type_name: str = "DataSet"
+    tenant_id: str = ""
+    client_id: str = ""
+    client_secret: str = ""
 
 
 class CollibraAdapterConfig(BaseModel):

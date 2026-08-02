@@ -29,7 +29,10 @@ class PurviewConfig:
     """Configuration for Purview adapter."""
     account_name: str                          # e.g., "myorg-purview"
     collection_name: str = ""                  # target collection for new assets
-    custom_type_name: str = "ai_business_term" # custom type for AI-generated terms
+    custom_type_name: str = "DataSet"          # Purview entity type for metrics
+    tenant_id: str = ""                        # Azure AD tenant ID (for service principal auth)
+    client_id: str = ""                        # App registration client ID
+    client_secret: str = ""                    # App registration client secret
 
 
 class PurviewAdapter:
@@ -46,13 +49,30 @@ class PurviewAdapter:
         self.config = config
         self.base_url = f"https://{config.account_name}.purview.azure.com"
         self._explicit_token = access_token
-        self._credential = None
+        self._cached_token = ""
+
+    def _get_token_via_service_principal(self) -> str:
+        """Get token using client credentials (service principal)."""
+        import requests as _requests
+
+        token_url = f"https://login.microsoftonline.com/{self.config.tenant_id}/oauth2/v2.0/token"
+        resp = _requests.post(token_url, data={
+            "grant_type": "client_credentials",
+            "client_id": self.config.client_id,
+            "client_secret": self.config.client_secret,
+            "scope": "https://purview.azure.net/.default",
+        })
+        if resp.status_code != 200:
+            raise RuntimeError(f"Token request failed: {resp.status_code} {resp.text[:200]}")
+        return resp.json()["access_token"]
 
     def _get_headers(self) -> dict[str, str]:
         """Get auth headers.
 
-        Uses explicit access_token if provided (Fabric notebooks),
-        otherwise falls back to DefaultAzureCredential (local dev).
+        Priority:
+        1. Explicit access_token (passed directly)
+        2. Service principal credentials (tenant_id + client_id + client_secret)
+        3. DefaultAzureCredential fallback (local dev)
         """
         if self._explicit_token:
             return {
@@ -60,21 +80,28 @@ class PurviewAdapter:
                 "Content-Type": "application/json",
             }
 
-        if self._credential is None:
-            try:
-                from azure.identity import DefaultAzureCredential
-                self._credential = DefaultAzureCredential()
-            except ImportError:
-                raise ImportError(
-                    "azure-identity is required for Purview integration. "
-                    "Install with: pip install azure-identity"
-                )
+        if self.config.tenant_id and self.config.client_id and self.config.client_secret:
+            if not self._cached_token:
+                self._cached_token = self._get_token_via_service_principal()
+            return {
+                "Authorization": f"Bearer {self._cached_token}",
+                "Content-Type": "application/json",
+            }
 
-        token = self._credential.get_token("https://purview.azure.net/.default")
-        return {
-            "Authorization": f"Bearer {token.token}",
-            "Content-Type": "application/json",
-        }
+        # Fallback to DefaultAzureCredential (local dev only)
+        try:
+            from azure.identity import DefaultAzureCredential
+            cred = DefaultAzureCredential()
+            token = cred.get_token("https://purview.azure.net/.default")
+            return {
+                "Authorization": f"Bearer {token.token}",
+                "Content-Type": "application/json",
+            }
+        except Exception as e:
+            raise RuntimeError(
+                f"No auth method available for Purview. Provide access_token, "
+                f"service principal credentials, or install azure-identity. Error: {e}"
+            )
 
     def test_connection(self) -> bool:
         """Verify connectivity to the Purview account."""

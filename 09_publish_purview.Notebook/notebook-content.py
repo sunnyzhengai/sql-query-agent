@@ -61,27 +61,24 @@ print(f"Collection: {purview_cfg.collection_name or '(default)'}")
 # %% Cell 1: Test Purview connection
 from src.adapters.purview import PurviewAdapter, PurviewConfig
 
-# Get Purview token via mssparkutils (Fabric notebook auth)
-purview_token = mssparkutils.credentials.getToken("https://purview.azure.net")
-print(f"Purview token acquired: {len(purview_token)} chars")
-
-adapter = PurviewAdapter(
-    PurviewConfig(
-        account_name=purview_cfg.account_name,
-        collection_name=purview_cfg.collection_name,
-        custom_type_name=purview_cfg.custom_type_name,
-    ),
-    access_token=purview_token,
-)
+# Auth via service principal (tenant_id + client_id + client_secret in org_config.yaml)
+adapter = PurviewAdapter(PurviewConfig(
+    account_name=purview_cfg.account_name,
+    collection_name=purview_cfg.collection_name,
+    custom_type_name=purview_cfg.custom_type_name,
+    tenant_id=purview_cfg.tenant_id,
+    client_id=purview_cfg.client_id,
+    client_secret=purview_cfg.client_secret,
+))
 
 print("Testing connection to Purview...")
 if adapter.test_connection():
     print("[+] Connected to Purview successfully!")
 else:
     print("[X] Connection failed. Check:")
-    print("    1. Purview account name is correct")
-    print("    2. Your identity has Data Curator role")
-    print("    3. org_config.yaml has correct purview account_name")
+    print("    1. Purview account_name is correct in org_config.yaml")
+    print("    2. Service principal has Data Curator role on the Purview collection")
+    print("    3. tenant_id, client_id, client_secret are set in org_config.yaml")
     raise SystemExit("Cannot proceed without Purview connection.")
 
 # METADATA ********************
