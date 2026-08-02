@@ -243,42 +243,19 @@ def _table_exists(table_name):
 
 invariant_violations = check_all_invariants(_fetch, _table_exists)
 
+# The readiness decision is a pure function (src/steps/readiness.py) —
+# identical logic wherever the pipeline runs, testable in CI.
+from src.steps.readiness import readiness_gate
+
+gate = readiness_gate(THRESHOLDS, invariant_violations, schema_ambiguities, ambiguity_acknowledged)
+
 print(f"\n{'=' * 60}")
 print(f"DEPLOYMENT READINESS GATE")
 print(f"{'=' * 60}")
-blocked = False
-for name, (actual, threshold, is_blocking) in THRESHOLDS.items():
-    status = "PASS" if actual >= threshold else ("BLOCKED" if is_blocking else "WARNING")
-    symbol = "+" if status == "PASS" else ("X" if status == "BLOCKED" else "!")
-    print(f"  [{symbol}] {name}: {actual:.0%} (threshold: {threshold:.0%}) — {status}")
-    if status == "BLOCKED":
-        blocked = True
+for line in gate.lines:
+    print(f"  {line}")
 
-if invariant_violations:
-    blocked = True
-    total_v = sum(len(v) for v in invariant_violations.values())
-    print(f"  [X] data_contract_invariants: {total_v} violation(s) — BLOCKED")
-    for table, messages in sorted(invariant_violations.items()):
-        for msg in messages:
-            print(f"        {msg}")
-else:
-    print(f"  [+] data_contract_invariants: all declared invariants hold — PASS")
-
-if schema_ambiguities:
-    status = "WARNING (acknowledged)" if ambiguity_acknowledged else "BLOCKED"
-    symbol = "!" if ambiguity_acknowledged else "X"
-    print(f"  [{symbol}] dictionary_schema_ambiguity: {len(schema_ambiguities)} table name(s) exist in multiple schemas — {status}")
-    for table, schemas in sorted(schema_ambiguities.items()):
-        print(f"        {table} appears in schemas: {', '.join(schemas)} — dictionary description attaches to ALL of them")
-    if not ambiguity_acknowledged:
-        blocked = True
-        print(f"        The dictionary has no schema column, so these matches are ambiguous.")
-        print(f"        If the tables are genuinely the same (or the shared description is acceptable),")
-        print(f"        set dictionary.accept_schema_ambiguity: true in org_config.yaml to acknowledge.")
-else:
-    print(f"  [+] dictionary_schema_ambiguity: none — every table name maps to one schema")
-
-if blocked:
+if gate.blocked:
     print(f"\n  >>> DEPLOYMENT BLOCKED <<<")
 else:
     print(f"\n  >>> DEPLOYMENT READY <<<")

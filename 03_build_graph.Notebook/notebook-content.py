@@ -82,53 +82,25 @@ print(f"Loaded {len(parse_results)} parse results, {len(dict_tables_rows)} table
 # CELL ********************
 
 
-# %% Cell 2: Build graph (all logic in src/)
-from src.dictionary import DataDictionary
-from src.graph.builder import GraphBuilder
-from src.graph.serialization import parse_result_to_parsed_sql, nodes_to_rows, edges_to_rows
+# %% Cell 2: Build graph (all logic in src/steps/build_graph.py)
+from src.steps.build_graph import build_graph_step
 
-builder = GraphBuilder()
-
-# Load dictionary
-dictionary = DataDictionary()
-table_name_col = config.dictionary.table_name_col
-column_name_col = config.dictionary.column_name_col
-description_col = config.dictionary.description_col
-table_description_col = config.dictionary.table_description_col
-
-for row in dict_tables_rows:
-    dictionary.add_table(row[table_name_col], row.get(table_description_col, ""))
-for row in dict_columns_rows:
-    dictionary.add_column(row[table_name_col], row[column_name_col], row.get(description_col, ""))
-
-# Technical nodes from dictionary
-for table_name, table_info in dictionary.tables.items():
-    builder.add_technical_node(table_name, description=table_info.description)
-    for col_info in dictionary.get_columns_for_table(table_name):
-        builder.add_technical_node(table_name, col_info.column_name, description=col_info.description)
-
-# Canonical + transformation nodes from parse results
-for pr in parse_results:
-    builder.add_canonical_node(pr["metric_id"], pr["name"])
-    parsed = parse_result_to_parsed_sql(pr)
-    builder.build_from_parsed_sql(pr["metric_id"], parsed)
-
-print(f"Built graph: {len(builder.nodes)} nodes, {len(builder.edges)} edges")
-
-# Apply steward assignments (gov_steward_assignments) to canonical nodes.
-# Assignments are managed by the manage_stewards utility notebook; this is
-# where they flow into the graph — and from there into output_metric_logic.
-from src.governance.steward import StewardManager
-
-steward_manager = StewardManager()
+steward_records = []
 try:
-    steward_manager.load_from_records(
-        [r.asDict() for r in spark.table("gov_steward_assignments").collect()]
-    )
-    applied = steward_manager.apply_to_graph(builder)
-    print(f"Applied {applied} steward assignments to canonical nodes")
+    steward_records = [r.asDict() for r in spark.table("gov_steward_assignments").collect()]
 except Exception:
     print("No gov_steward_assignments table — run notebooks/utilities/manage_stewards to assign")
+
+out = build_graph_step(
+    parse_results, dict_tables_rows, dict_columns_rows, steward_records,
+    table_name_col=config.dictionary.table_name_col,
+    column_name_col=config.dictionary.column_name_col,
+    description_col=config.dictionary.description_col,
+    table_description_col=config.dictionary.table_description_col,
+)
+print(f"Built graph: {out.node_count} nodes, {out.edge_count} edges")
+if steward_records:
+    print(f"Applied {out.stewards_applied} steward assignments to canonical nodes")
 
 
 # METADATA ********************
@@ -141,14 +113,23 @@ except Exception:
 # CELL ********************
 
 
-# %% Cell 3: Write to Delta
-nodes_df = spark.createDataFrame(nodes_to_rows(builder.nodes), schema=to_spark_schema(GRAPH_NODES))
-edges_df = spark.createDataFrame(edges_to_rows(builder.edges), schema=to_spark_schema(GRAPH_EDGES))
+# %% Cell 3: Write to Delta and run the postcondition gate
+from src.steps.gates import postcondition_gate
+
+nodes_df = spark.createDataFrame(out.nodes_rows, schema=to_spark_schema(GRAPH_NODES))
+edges_df = spark.createDataFrame(out.edges_rows, schema=to_spark_schema(GRAPH_EDGES))
 
 nodes_df.write.format("delta").mode("overwrite").option("overwriteSchema", "true").saveAsTable(config.lakehouse.graph_nodes)
 edges_df.write.format("delta").mode("overwrite").option("overwriteSchema", "true").saveAsTable(config.lakehouse.graph_edges)
 
 print(f"Wrote {nodes_df.count()} nodes, {edges_df.count()} edges")
+
+checked = postcondition_gate(
+    "03_build_graph",
+    fetch=lambda t, cols: [r.asDict() for r in spark.table(t).select(*cols).collect()],
+    table_exists=spark.catalog.tableExists,
+)
+print(f"[+] Postcondition gate passed for: {', '.join(checked)}")
 
 
 # METADATA ********************
@@ -162,9 +143,10 @@ print(f"Wrote {nodes_df.count()} nodes, {edges_df.count()} edges")
 
 
 # %% Cell 4: Quick traversal test
+from src.graph.serialization import rows_to_edges, rows_to_nodes
 from src.graph.traversal import GraphTraverser
 
-traverser = GraphTraverser(builder.nodes, builder.edges)
+traverser = GraphTraverser(rows_to_nodes(out.nodes_rows), rows_to_edges(out.edges_rows))
 for pr in parse_results[:3]:
     subgraph = traverser.get_metric_subgraph(pr["metric_id"])
     if subgraph:

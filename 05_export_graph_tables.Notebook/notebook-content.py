@@ -83,34 +83,9 @@ config = load_config("/lakehouse/default/Files/sql-query-agent/org_config.yaml")
 
 
 # %% Cell 1: Load graph nodes and edges from Delta
-from src.models import EdgeType, GraphEdge, GraphNode, NodeLayer
-
-nodes_df = spark.table(config.lakehouse.graph_nodes)
-edges_df = spark.table(config.lakehouse.graph_edges)
-
-# Reconstruct in-memory nodes/edges
-nodes = {}
-for row in nodes_df.collect():
-    r = row.asDict()
-    nodes[r["node_id"]] = GraphNode(
-        node_id=r["node_id"],
-        layer=NodeLayer(r["layer"]),
-        name=r["name"],
-        description=r.get("description", ""),
-        properties=json.loads(r["properties"]) if r.get("properties") else {},
-    )
-
-edges = []
-for row in edges_df.collect():
-    r = row.asDict()
-    edges.append(GraphEdge(
-        source_id=r["source_id"],
-        target_id=r["target_id"],
-        edge_type=EdgeType(r["edge_type"]),
-        properties=json.loads(r["properties"]) if r.get("properties") else {},
-    ))
-
-print(f"Loaded {len(nodes)} nodes, {len(edges)} edges from Delta")
+nodes_rows = [r.asDict() for r in spark.table(config.lakehouse.graph_nodes).collect()]
+edges_rows = [r.asDict() for r in spark.table(config.lakehouse.graph_edges).collect()]
+print(f"Loaded {len(nodes_rows)} nodes, {len(edges_rows)} edges from Delta")
 
 
 # METADATA ********************
@@ -123,18 +98,12 @@ print(f"Loaded {len(nodes)} nodes, {len(edges)} edges from Delta")
 # CELL ********************
 
 
-# %% Cell 2: Export typed tables
-from src.graph.export import export_edge_tables, export_node_tables
+# %% Cell 2: Export typed tables (logic in src/steps/export.py)
+from src.steps.export import export_step
 
-node_tables = export_node_tables(nodes)
-edge_tables = export_edge_tables(edges)
+export_tables = export_step(nodes_rows, edges_rows)
 
-print("\nNode tables:")
-for name, rows in node_tables.items():
-    print(f"  {name}: {len(rows)} rows")
-
-print("\nEdge tables:")
-for name, rows in edge_tables.items():
+for name, rows in export_tables.items():
     print(f"  {name}: {len(rows)} rows")
 
 
@@ -148,29 +117,26 @@ for name, rows in edge_tables.items():
 # CELL ********************
 
 
-# %% Cell 3: Write typed tables to Delta
-schema_map = {
-    "graph_canonical": GRAPH_CANONICAL,
-    "graph_transformation": GRAPH_TRANSFORMATION,
-    "graph_technical": GRAPH_TECHNICAL,
-    "graph_dimension": GRAPH_DIMENSION,
-    "graph_edge_c2t": GRAPH_EDGE_C2T,
-    "graph_edge_t2t": GRAPH_EDGE_T2T,
-    "graph_edge_t2tech": GRAPH_EDGE_T2TECH,
-    "graph_edge_tech2dim": GRAPH_EDGE_TECH2DIM,
-}
+# %% Cell 3: Write typed tables to Delta and run the postcondition gate
+from src.schemas import TABLE_REGISTRY
+from src.steps.gates import postcondition_gate
 
-all_tables = {**node_tables, **edge_tables}
-
-for table_name, rows in all_tables.items():
+for table_name, rows in export_tables.items():
     if not rows:
         print(f"  {table_name}: 0 rows (skipped)")
         continue
 
-    schema = to_spark_schema(schema_map[table_name])
+    schema = to_spark_schema(TABLE_REGISTRY[table_name])
     df = spark.createDataFrame(rows, schema=schema)
     df.write.format("delta").mode("overwrite").saveAsTable(table_name)
     print(f"  {table_name}: {df.count()} rows written")
+
+checked = postcondition_gate(
+    "05_export_graph_tables",
+    fetch=lambda t, cols: [r.asDict() for r in spark.table(t).select(*cols).collect()],
+    table_exists=spark.catalog.tableExists,
+)
+print(f"[+] Postcondition gate passed for: {', '.join(checked)}")
 
 print("\n=== Export complete ===")
 print("Next: Create a Graph Model in the Fabric UI and map these tables.")

@@ -113,9 +113,17 @@ Get Metadata Sync working end-to-end with real data against Purview/Collibra.
 - [ ] Test Fabric lineage API against PBI workspace (needs PBI Admin — own tenant)
 
 ### Enterprise readiness (PARTIALLY DONE)
-- [x] Data contracts for all 26 Delta tables (`src/schemas.py`): shape, semantics,
+- [x] Data contracts for all Delta tables (`src/schemas.py`): shape, semantics,
       single-writer ownership, consumers, invariants — enforced against code
       ground truth by `tests/test_table_contracts.py` (2026-08-02)
+- [x] Offline-executable pipeline, slice 1 (2026-08-02): pure step functions in
+      `src/steps/` (parse, build_graph, metric_logic, export, readiness) with
+      logic relations asserted inside; notebooks are thin callers ending in a
+      registry-driven postcondition gate; full 02→05 pipeline runs in CI with
+      zero Fabric cost (`tests/steps/`)
+- [ ] Offline slices 2-4: verified DAG (read-scanner + relations field +
+      generated pipeline map), recorded ScriptDom fixtures (export→anonymize→
+      validate→download), LLM stand-in via AgentBackend protocol
 - [x] Recovered from dead-code purge (2026-08-02): ops_error_log (regression
       detection, appended by 02_parse) and gov_steward_assignments
       (manage_stewards utility → applied to graph by 03 → agent-visible via

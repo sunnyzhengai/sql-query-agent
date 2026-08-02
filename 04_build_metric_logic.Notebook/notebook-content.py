@@ -63,15 +63,14 @@ config = load_config("/lakehouse/default/Files/sql-query-agent/org_config.yaml")
 # CELL ********************
 
 
-# %% Cell 1: Load graph and build metric_logic (all logic in src/)
-from src.graph.serialization import rows_to_nodes, rows_to_edges
-from src.graph.metric_logic import build_metric_logic_rows
+# %% Cell 1: Load graph and build metric_logic (logic in src/steps/metric_logic.py)
+from src.steps.metric_logic import metric_logic_step
 
-nodes = rows_to_nodes([r.asDict() for r in spark.table(config.lakehouse.graph_nodes).collect()])
-edges = rows_to_edges([r.asDict() for r in spark.table(config.lakehouse.graph_edges).collect()])
-print(f"Loaded {len(nodes)} nodes, {len(edges)} edges")
+nodes_rows = [r.asDict() for r in spark.table(config.lakehouse.graph_nodes).collect()]
+edges_rows = [r.asDict() for r in spark.table(config.lakehouse.graph_edges).collect()]
+print(f"Loaded {len(nodes_rows)} nodes, {len(edges_rows)} edges")
 
-metric_logic_rows = build_metric_logic_rows(nodes, edges)
+metric_logic_rows = metric_logic_step(nodes_rows, edges_rows)
 print(f"Built {len(metric_logic_rows)} metric logic rows")
 
 
@@ -85,13 +84,22 @@ print(f"Built {len(metric_logic_rows)} metric logic rows")
 # CELL ********************
 
 
-# %% Cell 2: Save to Delta
+# %% Cell 2: Save to Delta and run the postcondition gate
+from src.steps.gates import postcondition_gate
+
 ml_df = spark.createDataFrame(metric_logic_rows, schema=to_spark_schema(METRIC_LOGIC))
 ml_df.write.format("delta").mode("overwrite").option("overwriteSchema", "true").saveAsTable("output_metric_logic")
 
-with_logic = sum(1 for r in metric_logic_rows if r[6] is not None)
-with_tables = sum(1 for r in metric_logic_rows if r[7] is not None)
+with_logic = sum(1 for r in metric_logic_rows if r["calculation_logic"] is not None)
+with_tables = sum(1 for r in metric_logic_rows if r["source_tables"] is not None)
 print(f"Saved {len(metric_logic_rows)} rows. Logic: {with_logic}, Tables: {with_tables}")
+
+checked = postcondition_gate(
+    "04_build_metric_logic",
+    fetch=lambda t, cols: [r.asDict() for r in spark.table(t).select(*cols).collect()],
+    table_exists=spark.catalog.tableExists,
+)
+print(f"[+] Postcondition gate passed for: {', '.join(checked)}")
 
 # METADATA ********************
 

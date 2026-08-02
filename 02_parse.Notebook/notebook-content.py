@@ -137,75 +137,36 @@ print(f"Loaded {len(sql_sources)} SQL sources")
 # CELL ********************
 
 
-# %% Cell 2: Extract and parse each SQL source
+# %% Cell 2: Parse all sources (logic in src/steps/parse.py)
 import time as _time
 from src.parser.sql_parser import parse_sql
-from src.parser.error_classifier import classify_parse_error
+from src.steps.parse import parse_step
 
 extractor_name = "ScriptDom (Option B)" if scriptdom_available else "sqlparse + sqlglot"
 print(f"Parsing SQL with {extractor_name}...")
+parse_fn = parse_with_scriptdom if scriptdom_available else parse_sql
 
-parse_errors = []
-parse_successes = []
-from src.graph.serialization import parsed_sql_to_parse_result_row
+# Previous run state (read BEFORE any writes) for regression detection
+previous_error_records, previous_success_ids = [], []
+try:
+    previous_error_records = [r.asDict() for r in spark.table("ops_error_log").collect()]
+    previous_success_ids = [r["metric_id"] for r in spark.table("ops_parse_successes").collect()]
+except Exception:
+    print("No previous run history — regression detection starts next run")
 
-parse_results_data = []
 start_time = _time.time()
-
-for i, source in enumerate(sql_sources):
-    metric_id = source["metric_id"]
-    name = source["name"]
-    sql = source["sql"]
-
-    try:
-        if scriptdom_available:
-            # Option B: ScriptDom extracts structure directly from AST
-            # No sqlglot, no cleanup rules, 100% T-SQL compatibility
-            parsed = parse_with_scriptdom(sql)
-        else:
-            # Fallback: sqlparse extraction + sqlglot parsing
-            parsed = parse_sql(sql)
-
-        # Store parse result via the payload contract — writer and reader
-        # live together in src/graph/serialization.py, pinned by a
-        # round-trip test. Never construct this row shape inline.
-        parse_results_data.append(
-            parsed_sql_to_parse_result_row(
-                metric_id, name, parsed, line_count=sql.count("\n") + 1
-            )
-        )
-
-        parse_successes.append({
-            "metric_id": metric_id,
-            "name": name,
-            "cte_count": len(parsed.ctes),
-            "table_count": len(parsed.final_select_tables),
-            "line_count": sql.count("\n") + 1,
-        })
-        print(f"  Parsed: {metric_id} — {len(parsed.ctes)} CTEs, {len(parsed.final_select_tables)} tables")
-
-    except Exception as e:
-        lc = sql.count("\n") + 1
-        classification = classify_parse_error(str(e), metric_id, lc)
-        parse_errors.append({
-            "metric_id": metric_id,
-            "name": name,
-            "error": str(e)[:200],
-            "error_category": classification["error_category"],
-            "user_explanation": classification["user_explanation"],
-            "suggested_action": classification["suggested_action"],
-            "line_count": lc,
-        })
-        print(f"  ERROR: {metric_id} [{classification['error_category']}] {str(e)[:100]}")
-
-    if (i + 1) % 100 == 0:
-        elapsed = _time.time() - start_time
-        print(f"  Progress: {i + 1}/{len(sql_sources)} ({len(parse_successes)} ok, {len(parse_errors)} errors, {elapsed:.0f}s)")
-
+out = parse_step(
+    sql_sources, parse_fn,
+    previous_error_records=previous_error_records,
+    previous_success_ids=previous_success_ids,
+    progress=lambda done, total: print(f"  Progress: {done}/{total}") if done % 100 == 0 else None,
+)
 elapsed = _time.time() - start_time
+
 print(f"\nDone in {elapsed:.0f}s")
-print(f"Parsed: {len(parse_successes)}/{len(sql_sources)} ({100 * len(parse_successes) // max(len(sql_sources), 1)}%)")
-print(f"Errors: {len(parse_errors)}")
+print(f"Parsed: {len(out.parse_successes)}/{len(sql_sources)} "
+      f"({100 * len(out.parse_successes) // max(len(sql_sources), 1)}%)")
+print(f"Errors: {len(out.parse_errors)}")
 
 
 # METADATA ********************
@@ -218,69 +179,47 @@ print(f"Errors: {len(parse_errors)}")
 # CELL ********************
 
 
-# %% Cell 3: Save results to Delta tables
-from src.governance.error_log import ErrorLog
-from src.schemas import ERROR_LOG, PARSE_ERRORS, PARSE_SUCCESSES, to_spark_schema
-from pyspark.sql.types import StringType, StructField, StructType, IntegerType
+# %% Cell 3: Save results to Delta and run the postcondition gate
+from src.schemas import ERROR_LOG, PARSE_ERRORS, PARSE_RESULTS, PARSE_SUCCESSES, to_spark_schema
+from src.steps.gates import postcondition_gate
 
-# Read previous run state BEFORE overwriting, so the error log can detect
-# regressions (passed last run, fails now) and resolutions.
-error_log = ErrorLog()
-try:
-    error_log.load_history([r.asDict() for r in spark.table("ops_error_log").collect()])
-    error_log.set_previous_successes(
-        [r["metric_id"] for r in spark.table("ops_parse_successes").collect()]
-    )
-except Exception:
-    print("No previous run history — regression detection starts next run")
-error_log.start_run()
+if out.parse_results:
+    spark.createDataFrame(out.parse_results, schema=to_spark_schema(PARSE_RESULTS)) \
+        .write.format("delta").mode("overwrite").option("overwriteSchema", "true") \
+        .saveAsTable("ops_parse_results")
+    print(f"Saved {len(out.parse_results)} parse results to ops_parse_results")
 
-# Save parse results (intermediate table for 03_build_graph)
-if parse_results_data:
-    from src.schemas import PARSE_RESULTS
-    pr_df = spark.createDataFrame(parse_results_data, schema=to_spark_schema(PARSE_RESULTS))
-    pr_df.write.format("delta").mode("overwrite").option("overwriteSchema", "true").saveAsTable("ops_parse_results")
-    print(f"Saved {len(parse_results_data)} parse results to ops_parse_results")
-
-# Save parse errors
-if parse_errors:
-    errors_rows = [(e["metric_id"], e["name"], e["error"], e.get("error_category"),
-                    e.get("user_explanation"), e.get("suggested_action"), e["line_count"])
-                   for e in parse_errors]
-    errors_df = spark.createDataFrame(errors_rows, schema=to_spark_schema(PARSE_ERRORS))
-    errors_df.write.format("delta").mode("overwrite").option("overwriteSchema", "true").saveAsTable("ops_parse_errors")
-    print(f"Saved {len(parse_errors)} parse errors to 'parse_errors' table")
+if out.parse_errors:
+    spark.createDataFrame(out.parse_errors, schema=to_spark_schema(PARSE_ERRORS)) \
+        .write.format("delta").mode("overwrite").option("overwriteSchema", "true") \
+        .saveAsTable("ops_parse_errors")
+    print(f"Saved {len(out.parse_errors)} parse errors to ops_parse_errors")
     print("\nTop errors:")
-    for e in sorted(parse_errors, key=lambda x: x["line_count"], reverse=True)[:5]:
+    for e in sorted(out.parse_errors, key=lambda x: x["line_count"], reverse=True)[:5]:
         print(f"  {e['metric_id']} ({e['line_count']} lines): [{e['error_category']}] {e['error'][:80]}")
 
-# Save parse successes
-if parse_successes:
-    success_rows = [(s["metric_id"], s["name"], s["cte_count"], s["table_count"], s["line_count"])
-                    for s in parse_successes]
-    success_df = spark.createDataFrame(success_rows, schema=to_spark_schema(PARSE_SUCCESSES))
-    success_df.write.format("delta").mode("overwrite").saveAsTable("ops_parse_successes")
-    print(f"Saved {len(parse_successes)} parse successes to 'parse_successes' table")
+if out.parse_successes:
+    spark.createDataFrame(out.parse_successes, schema=to_spark_schema(PARSE_SUCCESSES)) \
+        .write.format("delta").mode("overwrite").saveAsTable("ops_parse_successes")
+    print(f"Saved {len(out.parse_successes)} parse successes to ops_parse_successes")
 
-# Append this run's errors to the persistent error log (ops_error_log)
-for e in parse_errors:
-    error_log.record_error(
-        metric_id=e["metric_id"],
-        metric_name=e["name"],
-        error_type="parse",
-        error_message=e["error"],
-        line_count=e["line_count"],
-    )
-run_summary = error_log.finish_run([s["metric_id"] for s in sql_sources])
-if error_log.current_run:
-    el_df = spark.createDataFrame(error_log.to_records(), schema=to_spark_schema(ERROR_LOG))
-    el_df.write.format("delta").mode("append").saveAsTable("ops_error_log")
-    print(f"Appended {len(error_log.current_run)} entries to ops_error_log")
-    print(error_log.summary_text())
-if run_summary.get("regressions"):
-    print(f"[!] REGRESSIONS — previously passing, now failing: {run_summary['regressed_metrics']}")
-if run_summary.get("resolved"):
-    print(f"[+] Resolved since last run: {run_summary['resolved_metrics']}")
+if out.error_log.current_run:
+    spark.createDataFrame(out.error_log.to_records(), schema=to_spark_schema(ERROR_LOG)) \
+        .write.format("delta").mode("append").saveAsTable("ops_error_log")
+    print(f"Appended {len(out.error_log.current_run)} entries to ops_error_log")
+    print(out.error_log.summary_text())
+if out.run_summary.get("regressions"):
+    print(f"[!] REGRESSIONS — previously passing, now failing: {out.run_summary['regressed_metrics']}")
+if out.run_summary.get("resolved"):
+    print(f"[+] Resolved since last run: {out.run_summary['resolved_metrics']}")
+
+# Postcondition gate: prove the persisted state honors this step's contracts
+checked = postcondition_gate(
+    "02_parse",
+    fetch=lambda t, cols: [r.asDict() for r in spark.table(t).select(*cols).collect()],
+    table_exists=spark.catalog.tableExists,
+)
+print(f"[+] Postcondition gate passed for: {', '.join(checked)}")
 
 print("\n→ Next: run 03_build_graph.py (no need to rerun this unless SQL sources changed)")
 

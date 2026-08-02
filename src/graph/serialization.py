@@ -65,6 +65,33 @@ def edges_to_rows(edges: list[GraphEdge]) -> list[tuple]:
     ]
 
 
+def nodes_to_row_dicts(nodes: "dict[str, GraphNode]") -> "list[dict]":
+    """GraphNodes -> graph_nodes contract-keyed dict rows."""
+    return [
+        {
+            "node_id": n.node_id,
+            "layer": n.layer.value,
+            "name": n.name,
+            "description": n.description,
+            "properties": json.dumps(n.properties),
+        }
+        for n in nodes.values()
+    ]
+
+
+def edges_to_row_dicts(edges: "list[GraphEdge]") -> "list[dict]":
+    """GraphEdges -> graph_edges contract-keyed dict rows."""
+    return [
+        {
+            "source_id": e.source_id,
+            "target_id": e.target_id,
+            "edge_type": e.edge_type.value,
+            "properties": json.dumps(e.properties),
+        }
+        for e in edges
+    ]
+
+
 def parsed_sql_to_parse_result_row(
     metric_id: str, name: str, parsed: ParsedSQL, line_count: int = 0
 ) -> dict:
