@@ -156,50 +156,14 @@ class PurviewAdapter:
             )
 
     def publish_bulk(self, records: list[MetadataRecord]) -> BulkPublishResult:
-        """Publish multiple records using the bulk entity API."""
-        try:
-            import requests
-        except ImportError:
-            raise ImportError("requests is required for Purview integration.")
+        """Publish multiple records using individual entity calls.
 
+        Uses the single entity API (not bulk) because the Atlas v2 bulk
+        API has issues with collectionId and entity routing in Purview.
+        """
         result = BulkPublishResult()
-
-        # Purview bulk API accepts up to ~50 entities per call
-        batch_size = 50
-        for i in range(0, len(records), batch_size):
-            batch = records[i : i + batch_size]
-            entities = [self._to_atlas_entity(r) for r in batch]
-            payload = {"entities": entities}
-
-            try:
-                resp = requests.post(
-                    f"{self.base_url}/catalog/api/atlas/v2/entity/bulk",
-                    headers=self._get_headers(),
-                    json=payload,
-                    timeout=60,
-                )
-
-                if resp.status_code in (200, 201):
-                    for r in batch:
-                        result.add(PublishResult(
-                            asset_id=r.asset_id,
-                            status=PublishStatus.SUCCESS,
-                        ))
-                else:
-                    for r in batch:
-                        result.add(PublishResult(
-                            asset_id=r.asset_id,
-                            status=PublishStatus.FAILED,
-                            message=f"HTTP {resp.status_code}: {resp.text[:200]}",
-                        ))
-            except Exception as e:
-                for r in batch:
-                    result.add(PublishResult(
-                        asset_id=r.asset_id,
-                        status=PublishStatus.FAILED,
-                        message=str(e),
-                    ))
-
+        for record in records:
+            result.add(self.publish(record))
         return result
 
     def _to_atlas_entity(self, record: MetadataRecord) -> dict[str, Any]:
@@ -222,8 +186,10 @@ class PurviewAdapter:
             "status": "ACTIVE",
         }
 
-        if self.config.collection_name:
-            entity["collectionId"] = self.config.collection_name
+        # Note: collectionId in the entity payload causes 404 errors
+        # with the Atlas v2 API. Purview assigns to the default collection
+        # automatically. If collection routing is needed, use the Purview
+        # collections API separately.
 
         return entity
 
