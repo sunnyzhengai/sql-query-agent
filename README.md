@@ -34,14 +34,20 @@ python scripts/run_local.py  # test with sample data
 
 ### Microsoft Fabric
 
-1. Download this repo and upload to your Lakehouse `Files/sql-query-agent/`
-2. Copy `org_config.example.yaml` to `org_config.yaml` and fill in your values
-3. Run notebooks in order:
-   - `load_clarity_dictionary.py` — load data dictionary (one-time)
-   - `load_sql_files.py` — load SQL source files
-   - `orchestrator.py` — parse SQL → build graph → write Delta tables
-   - `generate_summaries.py` — LLM-generate business descriptions
-4. Point a Fabric Data Agent at `graph_nodes` and `graph_edges` tables
+Follow the step-by-step [Installation Guide](docs/deployment/INSTALLATION_GUIDE.md). In short:
+
+1. Create a Fabric Environment (`sql-logic-env`) with the pinned packages and the product wheel
+2. Create a Lakehouse; upload the ScriptDom DLL, your `.sql` files, data dictionary CSVs, and `org_config.yaml`
+3. Run the numbered pipeline notebooks in order:
+   - `01_install` — create Delta tables, load SQL files and dictionary
+   - `02_parse` — parse SQL with ScriptDom
+   - `03_build_graph` — build the three-layer knowledge graph
+   - `04_build_metric_logic` — flatten the graph for the Data Agent
+   - `05_export_graph_tables` — export typed LPG tables (automatic)
+   - `06_validate` — pipeline health gate (DEPLOYMENT READY / BLOCKED)
+   - `07_generate_descriptions` — LLM business descriptions (optional)
+   - `08_publish_collibra` / `09_publish_purview` — catalog sync (optional add-ons)
+4. Create a Fabric Data Agent and add `output_metric_logic` plus the graph tables as data sources
 5. Paste `notebooks/data_agent_instructions.md` into the agent's instructions
 
 ## Configuration
@@ -81,13 +87,13 @@ SQL Sources → Parser → Graph Builder → Delta Tables → Data Agent
 
 ## Documentation
 
-- [Architecture](docs/architecture/ARCHITECTURE.md) — three-layer graph model, design decisions
+- [Documentation Index](docs/README.md) — all documentation, organized by audience
+- [Architecture](docs/architecture/ARCHITECTURE.md) — three-layer graph model, data flow
+- [Decision Records](docs/decisions/README.md) — one ADR per architectural/product decision
 - [User Flow](docs/architecture/USER_FLOW.md) — how questions move through the system
+- [Installation Guide](docs/deployment/INSTALLATION_GUIDE.md) — deploying to Microsoft Fabric
 - [Setup](docs/development/SETUP.md) — local development
-- [Fabric Setup](docs/development/FABRIC_SETUP.md) — deploying to Microsoft Fabric
 - [Testing](docs/development/TESTING.md) — test strategy
-- [Roadmap](docs/product/ROADMAP.md) — product phases
-- [Marketplace Checklist](docs/product/MARKETPLACE_CHECKLIST.md) — Microsoft Marketplace readiness
 
 ## License
 

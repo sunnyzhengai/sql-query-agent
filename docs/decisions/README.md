@@ -1,0 +1,27 @@
+# Architecture Decision Records
+
+One file per decision, numbered in rough chronological order. ADRs are the
+**canonical home for rationale** — other documents (ARCHITECTURE.md, positioning,
+guides) summarize and link here rather than restating the reasoning.
+
+Format: Status / Date / Context / Decision / Consequences. A superseded ADR is
+never deleted — its status changes and it links to its replacement.
+
+## Index
+
+| # | Decision | Status |
+|---|---|---|
+| [0001](0001-native-parsers-per-dialect.md) | Native parsers per SQL dialect (ScriptDom for T-SQL) | Accepted |
+| [0002](0002-delta-tables-over-graph-db.md) | Delta tables over an external graph database | Accepted |
+| [0003](0003-sql-fragments-not-full-sql.md) | Store sql_fragments, not full SQL blobs | Accepted |
+| [0004](0004-two-stage-hitl-certification.md) | Two-stage human-in-the-loop certification | Accepted |
+| [0005](0005-refuse-over-guess.md) | Agent refuses when no certified path exists | Accepted |
+| [0006](0006-graph-answers-purview-discovery.md) | Knowledge graph answers; Purview discovers reports | Accepted |
+| [0007](0007-byot-library-deployment.md) | BYOT deployment as a Python library (.whl) | Accepted |
+| [0008](0008-ship-tier-1-first.md) | Ship Tier 1 (Core Agent) first | Accepted |
+| [0009](0009-decouple-catalog-adapters.md) | Catalog integrations are optional adapters | Accepted |
+| [0010](0010-skip-founders-hub-level-3.md) | Skip Founders Hub Level 3, go direct to Partner Center | Accepted |
+| [0011](0011-static-guide-v1-copilot-v2.md) | Static install guide for v1; AI co-pilot deferred to v2 | Accepted |
+| [0012](0012-stay-in-current-repo.md) | Build the product on the existing repo, no rewrite | Accepted |
+| [0013](0013-transactable-saas-on-marketplace.md) | List as transactable SaaS on Microsoft Marketplace | Accepted |
+| [0014](0014-metric-logic-grounding-mandatory-dictionary.md) | Ground the agent in `metric_logic`; data dictionary mandatory | Accepted |

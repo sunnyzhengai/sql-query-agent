@@ -442,7 +442,7 @@ The acceptance test script (`scripts/acceptance_test.py`) programmatically valid
 
 - [ ] DATA_DICTIONARY_REQUIREMENTS.md — how to prepare and update their dictionary
 - [ ] REVIEWER_GUIDE.md — how to use the agent (test scenarios)
-- [ ] DEPLOYMENT_GUIDE.md — how to re-run the pipeline after SQL changes
+- [ ] INSTALLATION_GUIDE.md (docs/deployment/) — installation and how to re-run the pipeline after SQL changes
 
 ### 9.2 Final Validation
 

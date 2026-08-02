@@ -101,6 +101,7 @@ But Purview excels at discovery: "Does a report already exist that answers this?
 ## Core Design Principle: Native Parsers for Each Dialect
 
 **Use the dialect's own parser. Never try to build a universal text-based SQL extractor.**
+(Recorded as [ADR 0001](../decisions/0001-native-parsers-per-dialect.md).)
 
 Enterprise SQL stored procedures are not just SQL — they are programs written in a specific procedural language (T-SQL, PL/SQL, Snowflake SQL) with SQL queries embedded inside. Generic SQL parsers (sqlglot, sqlparse) understand the SQL parts but choke on the procedural parts. Text-based approaches (regex, LLM extraction) are inherently unreliable because developers write code in unpredictable ways.
 
@@ -154,20 +155,19 @@ Graph builder: wire nodes and edges
 
 ## Design Decisions
 
-### Why Delta tables over Neo4j?
-Stay in the Microsoft Fabric ecosystem. No external graph DB to manage, no additional auth/networking. Delta tables are queryable from Notebooks, Data Agent, and Power BI natively.
+Full rationale lives in [docs/decisions/](../decisions/README.md) — one ADR per
+decision. Summary:
 
-### Why sql_fragments, not full SQL blobs?
-Full SQL is brittle and hard to version. Fragments are minimal logic snippets tied to individual CTE steps. The LLM assembles complete queries from fragments + templates at query time. This makes the graph composable and auditable.
-
-### Why two-stage HITL certification?
-Healthcare requires 100% accuracy. Developer certifies technical correctness (does the SQL compute the right thing?). Steward certifies business correctness (is this the right metric definition?). Both must pass before a metric enters the certified graph.
-
-### Why "I don't know" over guessing?
-If no certified graph path exists for a question, the agent refuses. In healthcare, a wrong answer is worse than no answer. The graph is the guardrail — and "I don't know" triggers the certification process that fills the gap.
-
-### Why Knowledge Graph grounds answers, not Purview?
-Purview is a metadata catalog — it knows *about* data but can't compute answers. The knowledge graph stores composable sql_fragments, transformation chains, and dimension filters that the agent needs to actually assemble and execute queries. Purview's role is report discovery: surfacing existing dashboards that already cover a user's question.
+| Decision | Summary | ADR |
+|---|---|---|
+| Native parsers per dialect | ScriptDom for T-SQL; never text-based extraction | [0001](../decisions/0001-native-parsers-per-dialect.md) |
+| Delta tables over Neo4j | Stay in the Fabric ecosystem; no external graph DB | [0002](../decisions/0002-delta-tables-over-graph-db.md) |
+| sql_fragments, not full SQL | Composable, auditable per-step logic; LLM assembles at query time | [0003](../decisions/0003-sql-fragments-not-full-sql.md) |
+| Two-stage HITL certification | Developer certifies technical, steward certifies business correctness | [0004](../decisions/0004-two-stage-hitl-certification.md) |
+| "I don't know" over guessing | Refusal is the guardrail and triggers the certification flywheel | [0005](../decisions/0005-refuse-over-guess.md) |
+| Graph answers, Purview discovers | Purview can't compute answers; it surfaces existing reports | [0006](../decisions/0006-graph-answers-purview-discovery.md) |
+| BYOT .whl deployment | All processing in the customer's tenant; no AIVIA infrastructure | [0007](../decisions/0007-byot-library-deployment.md) |
+| `metric_logic` grounding, mandatory dictionary | Flat pre-joined table for the agent; dictionary gates deployment | [0014](../decisions/0014-metric-logic-grounding-mandatory-dictionary.md) |
 
 ## Module Map
 

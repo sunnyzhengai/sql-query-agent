@@ -26,4 +26,4 @@ pytest
 
 ## Fabric Setup
 
-See [FABRIC_SETUP.md](FABRIC_SETUP.md) for deploying to Microsoft Fabric.
+See [INSTALLATION_GUIDE.md](../deployment/INSTALLATION_GUIDE.md) for deploying to Microsoft Fabric.

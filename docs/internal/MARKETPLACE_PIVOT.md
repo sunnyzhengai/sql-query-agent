@@ -1,5 +1,12 @@
 # Marketplace Pivot: Decision Record & Project Plan
 
+> **FROZEN SNAPSHOT (2026-07-25) — do not update.** This document records the
+> POC-to-product pivot as it stood on that date. Checkbox state and "already
+> done" claims below are historical. Current status lives in
+> [ROADMAP.md](ROADMAP.md); decisions D1–D7 are extracted as ADRs
+> [0008](../decisions/0008-ship-tier-1-first.md)–[0013](../decisions/0013-transactable-saas-on-marketplace.md)
+> in [docs/decisions/](../decisions/README.md).
+
 **Date:** 2026-07-25
 **Context:** POC validated (99%+ parse rate, 1337/1344 procs, Data Agent working). Pivoting from POC to commercial Marketplace product.
 

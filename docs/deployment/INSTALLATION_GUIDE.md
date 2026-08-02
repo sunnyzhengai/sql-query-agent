@@ -2,6 +2,9 @@
 
 **Purpose:** Step-by-step installation instructions for the customer's IT or data team. Follow every step in order. Each step includes a verification check — do not proceed until the check passes.
 
+> This is the **canonical installation document**. If any other document
+> disagrees with it about installation steps, this one wins.
+
 **Time:** ~30 minutes (plus Environment publish time)
 
 ---
@@ -302,6 +305,24 @@ When your data dictionary changes:
 
 1. Upload updated CSVs to `Files/sql-query-agent/dictionary/`
 2. Re-run notebooks 03 → 04 → 05 → 06 (skip 02 — no need to re-parse)
+
+### Automated refresh (optional)
+
+To keep the knowledge graph up to date without manual runs:
+
+1. In your workspace, create a **Data Pipeline**
+2. Add **Notebook Activities** in order: 02_parse → 03_build_graph → 04_build_metric_logic → 05_export_graph_tables → 06_validate
+3. Set a **Schedule Trigger** (recommended: weekly, or after SQL deployments)
+4. The Data Agent automatically uses the refreshed tables
+
+---
+
+## Support
+
+If you encounter issues not covered in this guide:
+
+- Email: support@aiviaapp.com
+- Include: the error message, which notebook and cell it occurred in, and a screenshot if possible
 
 ---
 
