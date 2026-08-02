@@ -25,6 +25,7 @@ dev = [
     "pytest-cov>=4.1.0",
     "ruff>=0.1.9",
     "build",
+    "requests>=2.31.0",  # tests/adapters imports the adapters; keep in sync with [adapters]
 ]
 adapters = [
     "requests>=2.31.0",

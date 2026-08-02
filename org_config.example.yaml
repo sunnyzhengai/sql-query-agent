@@ -13,7 +13,7 @@ lakehouse:
 
   # Graph tables (built by pipeline)
   graph_nodes: "graph_nodes"
-  graph_edges: "Tables/graph_edges"
+  graph_edges: "graph_edges"
 
 # Data dictionary source (optional overrides)
 dictionary:

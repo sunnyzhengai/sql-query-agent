@@ -59,9 +59,9 @@ org:
   name: "Your Organization"
 
 lakehouse:
-  dict_tables: "dict_tables"
-  dict_columns: "dict_columns"
-  sql_sources: "sql_sources"
+  dict_tables: "input_dict_tables"
+  dict_columns: "input_dict_columns"
+  sql_sources: "input_sql_sources"
   graph_nodes: "graph_nodes"
   graph_edges: "graph_edges"
 
