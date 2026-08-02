@@ -216,6 +216,18 @@ try:
 except Exception:
     pass
 
+# Data-contract invariants: enforce unique / allowed_values / reference
+# rules declared in TABLE_REGISTRY against the actual Delta tables.
+from src.invariants import check_all_invariants
+
+def _fetch(table_name, columns):
+    return [r.asDict() for r in spark.table(table_name).select(*columns).collect()]
+
+def _table_exists(table_name):
+    return spark.catalog.tableExists(table_name)
+
+invariant_violations = check_all_invariants(_fetch, _table_exists)
+
 print(f"\n{'=' * 60}")
 print(f"DEPLOYMENT READINESS GATE")
 print(f"{'=' * 60}")
@@ -226,6 +238,16 @@ for name, (actual, threshold, is_blocking) in THRESHOLDS.items():
     print(f"  [{symbol}] {name}: {actual:.0%} (threshold: {threshold:.0%}) — {status}")
     if status == "BLOCKED":
         blocked = True
+
+if invariant_violations:
+    blocked = True
+    total_v = sum(len(v) for v in invariant_violations.values())
+    print(f"  [X] data_contract_invariants: {total_v} violation(s) — BLOCKED")
+    for table, messages in sorted(invariant_violations.items()):
+        for msg in messages:
+            print(f"        {msg}")
+else:
+    print(f"  [+] data_contract_invariants: all declared invariants hold — PASS")
 
 if blocked:
     print(f"\n  >>> DEPLOYMENT BLOCKED <<<")

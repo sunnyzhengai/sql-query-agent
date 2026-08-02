@@ -251,6 +251,7 @@ It is idempotent — safe to re-run; it will not destroy existing data.
 - [ ] Parse rate > 90%
 - [ ] Calculation logic > 80%
 - [ ] Dictionary coverage > 90%
+- [ ] Data contract invariants: 0 violations (uniqueness, allowed values, references)
 - [ ] If DEPLOYMENT BLOCKED: resolve the listed issues before proceeding
 
 ### Optional notebooks (after the agent is working)
