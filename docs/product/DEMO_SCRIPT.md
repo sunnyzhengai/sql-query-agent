@@ -1,169 +1,114 @@
-# Product Demo Script — 5 Minutes
+# Demo Video Script (5 minutes)
 
-**Target audience:** Microsoft Founders Hub reviewers, investors, enterprise prospects
-**Recording environment:** Work Fabric (crop URLs, scrub org names in voiceover)
-**Tone:** Confident, commercially sharp, problem-first
-
----
-
-## Before Recording
-
-**Setup checklist:**
-- [ ] Fabric Data Agent open in browser (crop the URL bar)
-- [ ] Agent instructions updated with latest version
-- [ ] Graph tables loaded with latest ScriptDom-parsed data (all 4 folders)
-- [ ] Architecture slide ready
-- [ ] Knowledge graph visual ready (node/edge diagram or lineage view)
-- [ ] www.aiviaapp.com open in another tab
-- [ ] Screen recording tool ready (crop to just the agent chat window)
-- [ ] Practice run completed
+**Target audience:** Microsoft Marketplace reviewers, prospective customers
+**Tone:** Professional, concise, focused on value — not technical internals
 
 ---
 
-## Minute 0:00–1:30 — The Problem & The Breakthrough
+## Opening (30 seconds)
 
-**[SLIDE 1: The Problem — show a sprawling list of report names, or a cluttered BI portal]**
+**[Screen: Fabric workspace showing the SQL Intelligence Agent]**
 
-*Voiceover:*
-"Every healthcare organization is sitting on millions of dollars of ungoverned technical debt — that can be turned into their strongest foundation for self-service analytics.
+"Every health system has hundreds of SQL stored procedures powering their reports. The business logic inside those procedures — the filters, the clinical criteria, the compliance calculations — is undocumented. When an analyst asks 'How is this metric calculated?', the answer takes days or weeks.
 
-Thousands of SQL-based reports are the hidden treasure of business logic definitions. These reports were requested by clinicians based on real clinical needs. They were built by highly skilled BI developers. They were validated and put into production."
-
-*[Delivery cue: Shift tone to highlight the friction]*
-
-"But here's the problem: these thousands of reports are not governed. There is no visibility into the logic behind each report name. Some are outdated. Some are conflicting duplicates of the same metric with different numbers.
-
-So when a clinician needs to make a decision, they search through different BI tools, staring at multiple report names and the different numbers in them — unable to know which one to trust. Their cognitive load skyrockets.
-
-And what do they do? They submit yet another request to create a new report they can trust. That process takes weeks, sometimes months. Clinicians end up frustrated, and further distrust the Analytics team's products."
-
-*[Delivery cue: Pause briefly, then deliver firmly]*
-
-"This is the cycle we break."
-
-**[SLIDE 2: Architecture Diagram — clean, professional]**
-
-*Voiceover:*
-"AIVIA takes those thousands of existing reports — the ones your organization already invested in — and automatically extracts the business logic from the SQL behind them. Using Microsoft's own ScriptDom parser, the same engine that powers SQL Server Management Studio.
-
-But we don't just parse code. We build an intelligent, multi-layer knowledge graph — a certified map of your organization's business logic. Business metrics at the top, calculation logic in the middle, source tables at the bottom. Every connection traced, every filter documented. Every report finally visible and understood."
-
-**[SLIDE 3: ScriptDom results — linger on 99% parse rate for 4 full seconds]**
-
-*Voiceover:*
-"We tested this against over 1,300 real enterprise SQL sources — stored procedures and views. Ninety-nine percent parsed. Zero errors."
-
-*[Pause — let the number land]*
+The SQL Intelligence Agent solves this automatically. It reads your SQL, extracts the business logic, and lets anyone ask questions in plain English."
 
 ---
 
-## Minute 1:00–3:00 — The Core Magic (Live Demo)
+## Part 1: Show the Problem (30 seconds)
 
-**[SWITCH TO: Fabric Data Agent chat window — cropped, no URLs visible]**
+**[Screen: Open one of the SQL files — USP_Severe_Sepsis — scroll through it]**
 
-*Voiceover:*
-"Let me show you what this means for an actual end user."
+"Here's a real-world example — a sepsis compliance procedure. It's over 5,000 lines of T-SQL with 27 temp tables, complex clinical criteria, and temporal window calculations. No one has time to read this. No one documents it. When it breaks, the team scrambles to understand what it does."
 
-**Question 1: Business user question**
-
-*Type in the agent:*
-> How is the Census Dashboard calculated?
-
-*Wait for response. Voiceover while it loads:*
-"A business user asks a plain English question. No SQL knowledge required."
-
-*When response appears:*
-"The agent instantly explains what the metric measures, what business rules filter the data — census events only, valid patients, specific service areas — and traces the logic back to the source. All of this was extracted automatically from a stored procedure that nobody had documented."
-
-**Question 2: Criteria deep-dive**
-
-*Type in the agent:*
-> What specific filters does it apply?
-
-*Voiceover:*
-"The user digs deeper. Every WHERE clause, every JOIN condition, translated into a business rule. This is the kind of detail that used to take a developer three days to reverse-engineer."
-
-**[VISUAL BREAK: Flash the three-layer knowledge graph diagram for 3-4 seconds]**
-
-*Voiceover:*
-"Behind the scenes, the agent is traversing this knowledge graph — business metrics connected to calculation logic, connected to source tables. Every answer is traceable. Every metric is auditable."
-
-**Question 3: A different metric**
-
-*Type in the agent:*
-> How is the ED Dashboard calculated?
-
-*Voiceover:*
-"This works across the entire organization's SQL library. Different procedure, different logic, same instant clarity."
+**[Scroll to show the complexity — temp tables, CASE statements, JOINs]**
 
 ---
 
-## Minute 3:00–4:00 — Persona Flexibility
+## Part 2: Run the Pipeline (1 minute)
 
-**Question 4: Developer view**
+**[Screen: Open 01_install notebook]**
 
-*Type in the agent:*
-> Show me the technical details for the Census Dashboard
+"Setup takes one click. The install notebook validates the environment, loads your SQL files and data dictionary, and confirms everything is ready."
 
-*Voiceover:*
-"For developers and data engineers, the agent switches to technical mode — SQL fragments, source tables with data dictionary descriptions, the full transformation chain. Same knowledge graph, different lens."
+**[Show the output: 28 SQL files loaded, 83 tables, 4,123 columns, INSTALLATION COMPLETE]**
 
-**Question 5: Admin view**
+"Next, the pipeline parses every SQL file using Microsoft's ScriptDom parser — the same engine SQL Server uses internally. 100% parse rate on all 28 files."
 
-*Type in the agent:*
-> /coverage
+**[Show 02_parse output: 28/28 parsed, 0 errors]**
 
-*Voiceover:*
-"Administrators manage the system through the same interface. How many metrics are documented, how many have stewards assigned, system health — all through natural language. One agent, three personas: business users, developers, and administrators."
+"The parser extracts the structure — every CTE, temp table chain, table reference, and SQL fragment — and builds it into a three-layer knowledge graph."
+
+**[Show 06_validate output: DEPLOYMENT READY, 100% parse rate, 100% calculation logic]**
 
 ---
 
-## Minute 4:00–5:00 — Vision & Close
+## Part 3: Ask the Agent (2 minutes)
 
-**[SLIDE: Roadmap — clean, three items only]**
+**[Screen: Open the SQL Intelligence Agent chat]**
 
-*Voiceover:*
-"What you just saw is the intelligence layer — the hardest technical problem. On the roadmap:
+### Question 1: What metrics are available?
 
-Automated metadata sync to Microsoft Purview and Power BI — so every report is self-documenting, updated automatically when the SQL changes.
+**[Type: "What metrics are available?"]**
 
-A governance flywheel where every user question strengthens the knowledge base. The more people use it, the more complete and accurate it becomes.
+"The agent sees all 28 metrics organized by their database schema. Each metric is identified by its CREATE PROCEDURE statement — not the filename."
 
-And multi-dialect support — Oracle PL/SQL, Snowflake — using native parsers for each platform. We don't do text guessing. We use each database vendor's own parser for 100% accuracy."
+### Question 2: Business description
 
-**[SHOW: www.aiviaapp.com]**
+**[Type: "What is USP_Severe_Sepsis?"]**
 
-*Voiceover:*
-"We take a process that traditionally takes months of manual data cataloging and enterprise documentation, and we automate it down to minutes — entirely inside the customer's secure Microsoft Fabric tenant. No data ever leaves.
+"When you ask about a metric, the agent returns a pre-generated business description — not a guess. This description was automatically generated by reading the actual SQL logic and translating it into business language.
 
-AIVIA is live, scalable, and ready for deployment. Learn more at aiviaapp.com."
+Notice it includes the purpose — who uses this report and why — plus the business logic: what patients are included, what clinical criteria are checked, how compliance is calculated."
 
-*[Hold on website for 3 seconds — end]*
+### Question 3: Data lineage
+
+**[Type: "What tables feed into USP_IP_SEPSIS?"]**
+
+"For developers, the agent traces data lineage — which source tables feed into each metric, with descriptions from the data dictionary."
+
+### Question 4: Reverse lineage
+
+**[Type: "Which metrics use the FLOWSHEET_MEASUREMENTS table?"]**
+
+"Reverse lineage works too. If a source table changes, you instantly know which reports are affected. This is critical for impact analysis."
+
+### Question 5: System health
+
+**[Type: "/coverage"]**
+
+"Administrators get a coverage dashboard — how many metrics are documented, how many have assigned owners, where the gaps are."
 
 ---
 
-## Backup Questions (if doing a live demo)
+## Part 4: The Value (30 seconds)
 
-| Question | What it demonstrates |
-|---|---|
-| "Which metrics use the PATIENT table?" | Reverse lineage — trace from table to metrics |
-| "Who owns the Census Dashboard?" | Steward assignment |
-| "What metrics are available?" | Full catalog via agent |
-| "How do I set up automated refresh?" | Agent knows about itself |
-| "/health" | System health check |
-| "/errors" | Parse error transparency |
+**[Screen: Split view — raw SQL on left, agent answer on right]**
+
+"What used to take a developer hours of reading SQL now takes anyone 10 seconds with a question. The SQL Intelligence Agent turns your undocumented SQL library into a searchable, queryable knowledge base — automatically.
+
+It works with any T-SQL stored procedures. Bring your own SQL, bring your own data dictionary, and the agent does the rest."
 
 ---
 
-## Recording Tips
+## Closing (30 seconds)
 
-1. **Crop the browser** — show only the agent chat, no URL bar, no sidebar, no workspace name
-2. **Linger on the 99% stat** — hold it on screen for at least 4 full seconds
-3. **Type at a natural pace** — not too fast, not too slow. Viewers need to read what you type
-4. **Pause 2-3 seconds** after each agent response before continuing voiceover
-5. **Use the visual break** — flash the knowledge graph diagram between Questions 2 and 3
-6. **End strong** — the last words the viewer hears should be "live, scalable, and ready for deployment"
-7. **Keep it under 5 minutes** — respect the reviewer's time
-8. **Record in a quiet room** with a good microphone
-9. **Do a practice run** before the real recording — time it
-10. **Don't mention your employer** — say "a healthcare organization" or "an enterprise customer"
+**[Screen: Workspace overview showing all components]**
+
+"The SQL Intelligence Agent runs entirely inside your Microsoft Fabric workspace. Your SQL never leaves your environment. It integrates with your existing data dictionary, and the knowledge graph is stored in Delta tables you control.
+
+Available now on the Microsoft Marketplace. Try it with a 30-day free trial."
+
+**[End screen: Product name, website, contact email]**
+
+---
+
+## Recording Notes
+
+- **Resolution:** 1920x1080
+- **Browser:** Full screen, clean tabs (no personal bookmarks visible)
+- **Data:** Use the anonymized demo data — no real patient data or org names
+- **Agent responses:** Clear chat before each question so responses are clean
+- **Pacing:** Pause 2-3 seconds after each agent response so viewers can read
+- **Audio:** Record voiceover separately for clean audio, or use captions
+- **Length target:** 4-5 minutes — cut ruthlessly, every second must demonstrate value
