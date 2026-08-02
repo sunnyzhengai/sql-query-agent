@@ -266,6 +266,29 @@ Get capacity through one of:
 
 ---
 
+## Open Questions (steward backlog, raised 2026-08-02)
+
+Raised during the contract review; each gets a ground-truth answer and, where
+needed, a design pass. Do not resolve casually — these are product decisions.
+
+- [ ] **PHI/hardcoded-value scanning at ingestion** — agent-level redaction is
+      documented (whitepaper) and demo anonymization exists, but no
+      ingestion-time PHI scan of customer SQL appears to be implemented.
+      Healthcare-critical.
+- [ ] **Usage-weight flywheel + answer feedback** — `src/governance/usage.py`
+      was deleted in the dead-code purge and not yet recovered; no usage
+      columns/tables in the registry; no certify/reject interaction for agent
+      answers.
+- [ ] **Error-to-data lineage** — parse/error tables carry metric_id but most
+      lack declared reference invariants back to input_sql_sources;
+      installation errors don't record affected objects.
+- [ ] **Steward creation + certification workflow** — assignment exists
+      (manage_stewards), but the certify/reject lifecycle (ADR 0004,
+      CertificationStatus enum, Path B queue) has no tables, transitions, or
+      notification wiring. Biggest remaining product gap.
+
+---
+
 ## Phase 5: Post-Launch & Pro Tier
 **Status: NOT STARTED**
 
