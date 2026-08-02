@@ -128,7 +128,11 @@ for m in with_desc:
 
     records.append(MetadataRecord(
         asset_id=m["metric_id"],
-        name=m["metric_name"],
+        # Display name is the schema-qualified identity (ADR 0015): bare
+        # object names collide across schemas and become indistinguishable
+        # in the Purview browse view. Business-friendly display names come
+        # later from PBI lineage, which supplies genuinely distinct names.
+        name=m["metric_id"],
         asset_type="metric",
         description=description,
         owner=m.get("steward") or "",

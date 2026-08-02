@@ -14,6 +14,12 @@ pipeline notebooks so declared ownership can never drift from actual code.
 Docs, agent instructions, and validation gates are projections of this file —
 never author a table fact anywhere else.
 
+Identity obligation (ADR 0015): metric_id ("<schema>.<object_name>") is the
+only durable metric identity. Every consumer that projects metrics into
+another system must use metric_id as its durable key, and any display name
+it shows must be traceable to metric_id at a glance — bare object names
+collide across schemas.
+
 Adding a new table (contract-first):
     1. Author the full contract here (shape, semantics, ownership, lineage,
        invariants) and add it to TABLE_REGISTRY

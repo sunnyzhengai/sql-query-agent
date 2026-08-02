@@ -25,3 +25,4 @@ never deleted — its status changes and it links to its replacement.
 | [0012](0012-stay-in-current-repo.md) | Build the product on the existing repo, no rewrite | Accepted |
 | [0013](0013-transactable-saas-on-marketplace.md) | List as transactable SaaS on Microsoft Marketplace | Accepted |
 | [0014](0014-metric-logic-grounding-mandatory-dictionary.md) | Ground the agent in `metric_logic`; data dictionary mandatory | Accepted |
+| [0015](0015-metric-id-identity-propagation.md) | `metric_id` is the universal identity; consumers must propagate it | Accepted |
