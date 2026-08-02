@@ -26,12 +26,12 @@ class TestPipeline:
     def test_technical_nodes_from_dictionary(self):
         builder = self._build()
         # Table nodes (now with schema prefix)
-        assert "tech:dbo.encounter" in builder.nodes
-        assert "tech:dbo.department" in builder.nodes
-        assert "tech:dbo.patient" in builder.nodes
+        assert "tech:DBO.ENCOUNTER" in builder.nodes
+        assert "tech:DBO.DEPARTMENT" in builder.nodes
+        assert "tech:DBO.PATIENT" in builder.nodes
         # Column nodes
-        assert "tech:dbo.encounter.admit_dt" in builder.nodes
-        assert builder.nodes["tech:dbo.encounter.admit_dt"].description == "Admission date/time"
+        assert "tech:DBO.ENCOUNTER.ADMIT_DT" in builder.nodes
+        assert builder.nodes["tech:DBO.ENCOUNTER.ADMIT_DT"].description == "Admission date/time"
 
     def test_transformation_nodes_from_sql(self):
         builder = self._build()
@@ -52,8 +52,8 @@ class TestPipeline:
         assert ("transform:ER_LOS:los_calc", "transform:ER_LOS:er_visits") in edge_pairs
 
         # Transformation -> technical (er_visits references encounter and department)
-        assert ("transform:ER_LOS:er_visits", "tech:dbo.encounter") in edge_pairs
-        assert ("transform:ER_LOS:er_visits", "tech:dbo.department") in edge_pairs
+        assert ("transform:ER_LOS:er_visits", "tech:DBO.ENCOUNTER") in edge_pairs
+        assert ("transform:ER_LOS:er_visits", "tech:DBO.DEPARTMENT") in edge_pairs
 
     def test_node_layer_counts(self):
         builder = self._build()

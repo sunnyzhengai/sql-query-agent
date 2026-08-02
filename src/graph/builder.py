@@ -13,6 +13,7 @@ from __future__ import annotations
 import logging
 
 from src.models import EdgeType, GraphEdge, GraphNode, NodeLayer
+from src.parser.identity import fold_identifier
 from src.parser.sql_parser import ParsedSQL, TableRef
 
 logger = logging.getLogger(__name__)
@@ -34,11 +35,16 @@ class GraphBuilder:
     ) -> str:
         """Add a technical-layer node (table or column).
 
-        Node ID uses schema.table format: tech:dbo.PATIENT
-        Column nodes: tech:dbo.PATIENT.PAT_ID
+        Node IDs are case-folded (ADR 0016) so dictionary case and SQL case
+        always meet at the same node: tech:DBO.PATIENT / tech:DBO.PATIENT.PAT_ID.
+        Display casing is preserved in `name` and properties.
         """
-        qualified = f"{schema}.{table}"
-        node_id = f"tech:{qualified}" if column is None else f"tech:{qualified}.{column}"
+        qualified = f"{fold_identifier(schema)}.{fold_identifier(table)}"
+        node_id = (
+            f"tech:{qualified}"
+            if column is None
+            else f"tech:{qualified}.{fold_identifier(column)}"
+        )
         if node_id not in self.nodes:
             self.nodes[node_id] = GraphNode(
                 node_id=node_id,
@@ -52,32 +58,23 @@ class GraphBuilder:
                     "column": column,
                 },
             )
-            # Index by simple table name for fuzzy matching
+            # Index by folded simple table name for schema-agnostic matching
             if column is None:
-                self._table_name_index.setdefault(table, set()).add(node_id)
-                self._table_name_index.setdefault(table.upper(), set()).add(node_id)
+                self._table_name_index.setdefault(fold_identifier(table), set()).add(node_id)
         return node_id
 
     def _find_tech_node_id(self, table_ref: TableRef) -> str | None:
         """Find a technical node ID matching a TableRef.
 
-        Tries exact match first (schema.table), then falls back to
-        simple table name match (for SQL that omits schema).
+        Matching is case-insensitive (ADR 0016): exact folded schema.table
+        first, then schema-agnostic fallback by folded table name (for SQL
+        that omits or differs on schema — the dictionary has no schema).
         """
-        # Exact match: tech:schema.table
-        exact_id = f"tech:{table_ref.qualified_name}"
+        exact_id = f"tech:{fold_identifier(table_ref.schema)}.{fold_identifier(table_ref.table)}"
         if exact_id in self.nodes:
             return exact_id
 
-        # Case-insensitive exact match
-        exact_upper = f"tech:{table_ref.schema}.{table_ref.table.upper()}"
-        if exact_upper in self.nodes:
-            return exact_upper
-
-        # Fuzzy match: any node with this table name (regardless of schema)
-        candidates = self._table_name_index.get(table_ref.table, set())
-        if not candidates:
-            candidates = self._table_name_index.get(table_ref.table.upper(), set())
+        candidates = self._table_name_index.get(fold_identifier(table_ref.table), set())
         if candidates:
             return next(iter(candidates))  # return first match
 

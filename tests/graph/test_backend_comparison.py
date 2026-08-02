@@ -101,8 +101,8 @@ class TestBackendContract:
         backend = request.getfixturevalue(backend_name)
         result = backend.get_metric_subgraph("ER_LOS")
         tech_ids = {t.node_id for t in result["technical"]}
-        assert "tech:dbo.encounter" in tech_ids
-        assert "tech:dbo.department" in tech_ids
+        assert "tech:DBO.ENCOUNTER" in tech_ids
+        assert "tech:DBO.DEPARTMENT" in tech_ids
 
     @pytest.mark.parametrize("backend_name", ["delta_backend", "gql_backend"])
     def test_unknown_metric_returns_empty(self, backend_name, request):

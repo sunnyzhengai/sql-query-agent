@@ -26,6 +26,10 @@ class DictionaryConfig(BaseModel):
     table_description_col: str = "DESCRIPTION" # description column in dict_tables (may differ from dict_columns)
     column_name_col: str = "COLUMN_NAME"
     description_col: str = "DESCRIPTION"       # description column in dict_columns
+    # Dictionary matching is schema-agnostic (ADR 0016). When 06_validate
+    # detects the same bare table name in multiple schemas, deployment blocks
+    # unless the admin acknowledges the ambiguity by setting this to true.
+    accept_schema_ambiguity: bool = False
 
 
 class MetricsConfig(BaseModel):

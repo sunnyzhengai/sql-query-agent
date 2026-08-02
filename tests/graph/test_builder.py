@@ -9,15 +9,25 @@ class TestGraphBuilder:
     def test_add_technical_node(self):
         gb = GraphBuilder()
         node_id = gb.add_technical_node("encounter", "admit_dt", "Admission date")
-        assert node_id == "tech:dbo.encounter.admit_dt"
+        assert node_id == "tech:DBO.ENCOUNTER.ADMIT_DT"
         assert gb.nodes[node_id].layer == NodeLayer.TECHNICAL
         assert gb.nodes[node_id].properties["schema"] == "dbo"
 
     def test_add_technical_node_with_schema(self):
         gb = GraphBuilder()
         node_id = gb.add_technical_node("encounter", schema="reporting", description="Encounters")
-        assert node_id == "tech:reporting.encounter"
+        assert node_id == "tech:REPORTING.ENCOUNTER"
         assert gb.nodes[node_id].properties["schema"] == "reporting"
+
+    def test_case_variants_resolve_to_one_node(self):
+        """Dictionary case and SQL case must meet at the same node (ADR 0016)."""
+        gb = GraphBuilder()
+        dict_id = gb.add_technical_node("ENCOUNTER", description="Patient encounters")
+        sql_id = gb.add_technical_node("encounter")
+        assert dict_id == sql_id == "tech:DBO.ENCOUNTER"
+        # First writer's description survives; display name preserved
+        assert gb.nodes[dict_id].description == "Patient encounters"
+        assert gb.nodes[dict_id].name == "ENCOUNTER"
 
     def test_add_canonical_node(self):
         gb = GraphBuilder()

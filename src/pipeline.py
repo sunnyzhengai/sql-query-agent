@@ -48,7 +48,8 @@ def build_graph(
     logger.info("Loaded data dictionary: %d tables, %d column entries", len(dictionary.tables), len(dict_columns))
 
     # Step 2: Create technical nodes from dictionary
-    for table_name, table_info in dictionary.tables.items():
+    for table_info in dictionary.tables.values():
+        table_name = table_info.table_name  # original casing for display
         builder.add_technical_node(table_name, description=table_info.description)
         for col_info in dictionary.get_columns_for_table(table_name):
             builder.add_technical_node(table_name, col_info.column_name, description=col_info.description)

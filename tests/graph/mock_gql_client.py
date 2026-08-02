@@ -106,7 +106,7 @@ def build_er_los_mock() -> MockGQLClient:
             ],
             data=[
                 {
-                    "nodeId": "tech:dbo.encounter",
+                    "nodeId": "tech:DBO.ENCOUNTER",
                     "name": "encounter",
                     "description": "Patient encounter/visit records",
                     "tableName": "encounter",
@@ -115,7 +115,7 @@ def build_er_los_mock() -> MockGQLClient:
                     "columnName": "",
                 },
                 {
-                    "nodeId": "tech:dbo.department",
+                    "nodeId": "tech:DBO.DEPARTMENT",
                     "name": "department",
                     "description": "Hospital departments and units",
                     "tableName": "department",

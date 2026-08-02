@@ -26,3 +26,4 @@ never deleted — its status changes and it links to its replacement.
 | [0013](0013-transactable-saas-on-marketplace.md) | List as transactable SaaS on Microsoft Marketplace | Accepted |
 | [0014](0014-metric-logic-grounding-mandatory-dictionary.md) | Ground the agent in `metric_logic`; data dictionary mandatory | Accepted |
 | [0015](0015-metric-id-identity-propagation.md) | `metric_id` is the universal identity; consumers must propagate it | Accepted |
+| [0016](0016-case-insensitive-identifier-matching.md) | Case-insensitive identifier matching, folded to uppercase | Accepted |

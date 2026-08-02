@@ -77,6 +77,23 @@ def test_composite_unique_uses_all_columns():
     assert len(violations) == 1 and "('x', '2')" in violations[0]
 
 
+def test_fold_case_unique_catches_case_variant_duplicates():
+    registry = {
+        "t": {
+            "table_name": "t", "status": "active",
+            "columns": [("name", "string", False)],
+            "invariants": [{"kind": "unique", "columns": ["name"], "fold_case": True}],
+        }
+    }
+    data = {"t": [{"name": "Encounter"}, {"name": "ENCOUNTER"}]}
+    violations = check_table_invariants("t", _fetch(data), registry=registry)
+    assert len(violations) == 1 and "ENCOUNTER" in violations[0]
+
+    # Without folding, the same data passes
+    registry["t"]["invariants"] = [{"kind": "unique", "columns": ["name"]}]
+    assert check_table_invariants("t", _fetch(data), registry=registry) == []
+
+
 def test_allowed_values_violation_reports_bad_value():
     data = {**CLEAN_DATA, "graph_nodes": [
         {"node_id": "c:1", "layer": "canonical"},

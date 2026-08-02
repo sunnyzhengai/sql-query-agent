@@ -216,6 +216,21 @@ try:
 except Exception:
     pass
 
+# Schema-ambiguity gate (ADR 0016): the dictionary matches tables by bare
+# name (it has no schema column). If the SQL references the same bare name
+# in multiple schemas, description attachment is ambiguous — block unless
+# the admin acknowledged it via dictionary.accept_schema_ambiguity.
+from src.dictionary import find_cross_schema_collisions
+
+schema_table_pairs = []
+for nid, node in nodes.items():
+    if nid.startswith("tech:"):
+        props = json.loads(node.get("properties", "{}")) if isinstance(node.get("properties"), str) else node.get("properties", {})
+        if props.get("table") and not props.get("column"):
+            schema_table_pairs.append((props.get("schema") or "dbo", props["table"]))
+schema_ambiguities = find_cross_schema_collisions(schema_table_pairs)
+ambiguity_acknowledged = bool(getattr(config.dictionary, "accept_schema_ambiguity", False))
+
 # Data-contract invariants: enforce unique / allowed_values / reference
 # rules declared in TABLE_REGISTRY against the actual Delta tables.
 from src.invariants import check_all_invariants
@@ -248,6 +263,20 @@ if invariant_violations:
             print(f"        {msg}")
 else:
     print(f"  [+] data_contract_invariants: all declared invariants hold — PASS")
+
+if schema_ambiguities:
+    status = "WARNING (acknowledged)" if ambiguity_acknowledged else "BLOCKED"
+    symbol = "!" if ambiguity_acknowledged else "X"
+    print(f"  [{symbol}] dictionary_schema_ambiguity: {len(schema_ambiguities)} table name(s) exist in multiple schemas — {status}")
+    for table, schemas in sorted(schema_ambiguities.items()):
+        print(f"        {table} appears in schemas: {', '.join(schemas)} — dictionary description attaches to ALL of them")
+    if not ambiguity_acknowledged:
+        blocked = True
+        print(f"        The dictionary has no schema column, so these matches are ambiguous.")
+        print(f"        If the tables are genuinely the same (or the shared description is acceptable),")
+        print(f"        set dictionary.accept_schema_ambiguity: true in org_config.yaml to acknowledge.")
+else:
+    print(f"  [+] dictionary_schema_ambiguity: none — every table name maps to one schema")
 
 if blocked:
     print(f"\n  >>> DEPLOYMENT BLOCKED <<<")

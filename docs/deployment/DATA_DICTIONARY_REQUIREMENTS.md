@@ -50,7 +50,8 @@ DEPARTMENTS,"Contains department master file records with department names and l
 
 - **Header row is required** — first row must be `TABLE_NAME,DESCRIPTION`
 - **TABLE_NAME must match your SQL exactly** — if your SQL says `FROM PATIENT`, the dictionary must have `PATIENT` (not `Patients` or `patient_table`)
-- **Case sensitivity:** The pipeline performs **case-insensitive matching** when looking up table descriptions, so `PATIENT` and `Patient` will both match. However, the stored TABLE_NAME is used as-is in agent responses. For consistency, use the same casing as your SQL files. If your EMR metadata exports in mixed case (e.g., Epic Clarity exports as `PATIENT` but your SQL uses `Patient`), either case will work — but pick one and be consistent.
+- **Case sensitivity:** The pipeline performs **case-insensitive matching** when looking up table descriptions, so `PATIENT` and `Patient` will both match — mirroring SQL Server's default collation. The stored TABLE_NAME is used as-is in agent responses, so use the casing you want users to see. Two rows whose names differ only by case are the *same table* and will be rejected as duplicates at install.
+- **Schema matching:** The dictionary has no schema column, so descriptions are matched by bare table name **across all schemas**. If your SQL references the same table name in more than one schema (e.g., `reporting.Encounter` and `staging.Encounter`), the validation step detects this and blocks deployment until you either resolve it or acknowledge it by setting `dictionary.accept_schema_ambiguity: true` in `org_config.yaml` (the shared description then applies to every schema's table with that name).
 - **One row per table** — duplicates will cause the last row to win
 - **Descriptions should be meaningful** — "Patient table" is not helpful. "Contains demographic information for all patients including name, date of birth, and medical record number" is.
 - **UTF-8 encoding** — save as UTF-8 (not ANSI or Latin-1)
@@ -208,7 +209,9 @@ Before running the pipeline, verify:
 - [ ] `dict_tables.csv` has a header row: `TABLE_NAME,DESCRIPTION`
 - [ ] `dict_columns.csv` has a header row: `TABLE_NAME,COLUMN_NAME,DESCRIPTION`
 - [ ] Both files are UTF-8 encoded
-- [ ] TABLE_NAME values match your SQL exactly (case-sensitive)
+- [ ] TABLE_NAME values match the table names in your SQL (matching is case-insensitive; original casing is kept for display)
+- [ ] One row per table — two rows whose names differ only by case are rejected as duplicates
+- [ ] If the same table name exists in multiple schemas of your warehouse, be aware matching is schema-agnostic — the validation step will detect this and ask you to acknowledge it (see `dictionary.accept_schema_ambiguity`)
 - [ ] Every table referenced in your SQL has an entry in dict_tables.csv
 - [ ] Descriptions are meaningful (not just the table/column name repeated)
 - [ ] No proprietary/internal references that shouldn't be visible to end users

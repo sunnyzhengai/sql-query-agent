@@ -276,6 +276,17 @@ if os.path.exists(tables_path):
         dict_tables_df = dict_tables_df.withColumn("DESCRIPTION", lit(""))
 
     dict_tables_df = dict_tables_df.select("TABLE_NAME", "DESCRIPTION")
+
+    # Contract gate: unique(TABLE_NAME), case-insensitive (ADR 0016) —
+    # in a CI-collation database, Encounter and ENCOUNTER are the same table.
+    _names = [r["TABLE_NAME"] for r in dict_tables_df.collect()]
+    _dupes = find_duplicate_identities([(n, n) for n in _names])
+    if _dupes:
+        print("[X] FATAL: dict_tables.csv has duplicate table names (matching is case-insensitive):")
+        for folded, originals in sorted(_dupes.items()):
+            print(f"    {folded}: {originals}")
+        raise SystemExit("Fix dict_tables.csv (one row per table) and re-run.")
+
     dict_tables_df.write.format("delta").mode("overwrite").option("overwriteSchema", "true") \
         .saveAsTable("input_dict_tables")
     print(f"[+] Loaded {dict_tables_df.count()} table descriptions into input_dict_tables")
@@ -301,6 +312,16 @@ if os.path.exists(columns_path):
         dict_columns_df = dict_columns_df.withColumn("DESCRIPTION", lit(""))
 
     dict_columns_df = dict_columns_df.select("TABLE_NAME", "COLUMN_NAME", "DESCRIPTION")
+
+    # Contract gate: unique(TABLE_NAME, COLUMN_NAME), case-insensitive (ADR 0016)
+    _pairs = [f'{r["TABLE_NAME"]}.{r["COLUMN_NAME"]}' for r in dict_columns_df.collect()]
+    _dupes = find_duplicate_identities([(p, p) for p in _pairs])
+    if _dupes:
+        print("[X] FATAL: dict_columns.csv has duplicate columns (matching is case-insensitive):")
+        for folded, originals in sorted(_dupes.items()):
+            print(f"    {folded}: {originals}")
+        raise SystemExit("Fix dict_columns.csv (one row per table+column) and re-run.")
+
     dict_columns_df.write.format("delta").mode("overwrite").option("overwriteSchema", "true") \
         .saveAsTable("input_dict_columns")
     print(f"[+] Loaded {dict_columns_df.count()} column descriptions into input_dict_columns")

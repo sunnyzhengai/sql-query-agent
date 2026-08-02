@@ -49,9 +49,13 @@ def check_table_invariants(
 
         if kind == "unique":
             cols = inv["columns"]
+            fold = inv.get("fold_case", False)
             seen: "dict[tuple, int]" = {}
             for row in fetch(table_name, cols):
-                key = tuple(row[c] for c in cols)
+                key = tuple(
+                    v.upper() if fold and isinstance(v, str) else v
+                    for v in (row[c] for c in cols)
+                )
                 seen[key] = seen.get(key, 0) + 1
             dupes = {k for k, n in seen.items() if n > 1}
             if dupes:

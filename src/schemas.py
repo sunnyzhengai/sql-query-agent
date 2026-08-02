@@ -81,7 +81,7 @@ SQL_SOURCES = {
         "source_schema": "Database schema the object belongs to (e.g. reporting)",
     },
     "invariants": [
-        {"kind": "unique", "columns": ["metric_id"]},
+        {"kind": "unique", "columns": ["metric_id"], "fold_case": True},
         {"kind": "allowed_values", "column": "source_type", "values": ["procedure", "view"]},
     ],
 }
@@ -105,11 +105,14 @@ DICT_TABLES = {
         ("DESCRIPTION", "string", True),
     ],
     "column_descriptions": {
-        "TABLE_NAME": "Warehouse table name; must match names referenced in the SQL files",
+        "TABLE_NAME": (
+            "Warehouse table name; matched to SQL references case-insensitively "
+            "and schema-agnostically (ADR 0016). Original casing preserved for display."
+        ),
         "DESCRIPTION": "Business description of the table from the customer's dictionary",
     },
     "invariants": [
-        {"kind": "unique", "columns": ["TABLE_NAME"]},
+        {"kind": "unique", "columns": ["TABLE_NAME"], "fold_case": True},
     ],
 }
 
@@ -137,7 +140,7 @@ DICT_COLUMNS = {
         "DESCRIPTION": "Business description of the column",
     },
     "invariants": [
-        {"kind": "unique", "columns": ["TABLE_NAME", "COLUMN_NAME"]},
+        {"kind": "unique", "columns": ["TABLE_NAME", "COLUMN_NAME"], "fold_case": True},
     ],
 }
 

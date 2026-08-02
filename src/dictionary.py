@@ -2,12 +2,18 @@
 
 The data dictionary is the source of truth for table/column descriptions.
 Descriptions are cached as node properties at graph build time.
+
+Matching is case-insensitive (ADR 0016): lookups fold identifiers to the
+canonical uppercase form, mirroring SQL Server's default collation. Stored
+TableInfo/ColumnInfo keep the customer's original casing for display.
 """
 
 from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
+
+from src.parser.identity import fold_identifier
 
 logger = logging.getLogger(__name__)
 
@@ -37,22 +43,47 @@ class DataDictionary:
         self.columns: dict[str, list[ColumnInfo]] = {}  # keyed by table_name
 
     def add_table(self, table_name: str, description: str) -> None:
-        self.tables[table_name] = TableInfo(table_name=table_name, description=description)
+        self.tables[fold_identifier(table_name)] = TableInfo(
+            table_name=table_name, description=description
+        )
 
     def add_column(self, table_name: str, column_name: str, description: str) -> None:
-        self.columns.setdefault(table_name, []).append(
+        self.columns.setdefault(fold_identifier(table_name), []).append(
             ColumnInfo(table_name=table_name, column_name=column_name, description=description)
         )
 
     def get_table_description(self, table_name: str) -> str:
-        info = self.tables.get(table_name)
+        info = self.tables.get(fold_identifier(table_name))
         return info.description if info else ""
 
     def get_column_description(self, table_name: str, column_name: str) -> str:
-        for col in self.columns.get(table_name, []):
-            if col.column_name == column_name:
+        folded_column = fold_identifier(column_name)
+        for col in self.columns.get(fold_identifier(table_name), []):
+            if fold_identifier(col.column_name) == folded_column:
                 return col.description
         return ""
 
     def get_columns_for_table(self, table_name: str) -> list[ColumnInfo]:
-        return self.columns.get(table_name, [])
+        return self.columns.get(fold_identifier(table_name), [])
+
+
+def find_cross_schema_collisions(
+    schema_table_pairs: "list[tuple[str, str]]",
+) -> "dict[str, list[str]]":
+    """Detect bare table names claimed by more than one schema.
+
+    The dictionary matches tables schema-agnostically (it has no schema
+    column), so a bare name appearing in multiple schemas makes description
+    attachment ambiguous. Returns {folded_table_name: sorted folded schemas}
+    for each ambiguous name. Used by the 06_validate gate (ADR 0016).
+    """
+    schemas_by_table: "dict[str, set[str]]" = {}
+    for schema, table in schema_table_pairs:
+        schemas_by_table.setdefault(fold_identifier(table), set()).add(
+            fold_identifier(schema)
+        )
+    return {
+        table: sorted(schemas)
+        for table, schemas in schemas_by_table.items()
+        if len(schemas) > 1
+    }

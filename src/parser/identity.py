@@ -32,6 +32,17 @@ def normalize_sql_text(text: str) -> str:
     return text.replace("\r\n", "\n")
 
 
+def fold_identifier(identifier: str) -> str:
+    """Case-fold an identifier for matching (ADR 0016).
+
+    SQL Server's default collation is case-insensitive, and Oracle/Snowflake
+    fold unquoted identifiers to uppercase — so UPPER is the canonical match
+    form. Stored/display values keep their original case; only match keys
+    and node IDs are folded.
+    """
+    return identifier.upper()
+
+
 def extract_object_identity(sql: str) -> "tuple[str | None, str | None, str | None]":
     """Extract (schema, name, source_type) from a SQL object definition.
 
@@ -51,9 +62,10 @@ def extract_object_identity(sql: str) -> "tuple[str | None, str | None, str | No
 def find_duplicate_identities(
     identities: "list[tuple[str, str]]",
 ) -> "dict[str, list[str]]":
-    """Given (metric_id, filename) pairs, return {metric_id: [files]} for
-    every identity defined by more than one file."""
+    """Given (identity, label) pairs, return {folded_identity: [labels]} for
+    every identity defined more than once. Comparison is case-insensitive
+    (fold_identifier), mirroring SQL Server collation semantics."""
     by_id: "dict[str, list[str]]" = {}
-    for metric_id, filename in identities:
-        by_id.setdefault(metric_id, []).append(filename)
-    return {mid: files for mid, files in by_id.items() if len(files) > 1}
+    for identity, label in identities:
+        by_id.setdefault(fold_identifier(identity), []).append(label)
+    return {mid: labels for mid, labels in by_id.items() if len(labels) > 1}

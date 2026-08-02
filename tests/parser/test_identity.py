@@ -59,4 +59,14 @@ def test_find_duplicate_identities_reports_colliding_files():
         ("reporting.USP_ED", "c/USP_ED_v2.sql"),
         ("dbo.USP_OK", "USP_OK.sql"),
     ])
-    assert dupes == {"reporting.USP_ED": ["a/USP_ED.sql", "c/USP_ED_v2.sql"]}
+    assert dupes == {"REPORTING.USP_ED": ["a/USP_ED.sql", "c/USP_ED_v2.sql"]}
+
+
+def test_duplicate_detection_is_case_insensitive():
+    """SQL Server identifiers are case-insensitive (default collation) —
+    [Reporting].[USP_X] and [reporting].[USP_X] are the same object."""
+    dupes = find_duplicate_identities([
+        ("Reporting.USP_X", "a.sql"),
+        ("reporting.USP_X", "b.sql"),
+    ])
+    assert dupes == {"REPORTING.USP_X": ["a.sql", "b.sql"]}

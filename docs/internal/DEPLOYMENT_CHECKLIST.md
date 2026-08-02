@@ -148,7 +148,7 @@ Demo_Lakehouse/Files/
 - [ ] `dict_tables.csv` has header: `TABLE_NAME,DESCRIPTION`
 - [ ] `dict_columns.csv` has header: `TABLE_NAME,COLUMN_NAME,DESCRIPTION`
 - [ ] Both files are UTF-8 encoded
-- [ ] TABLE_NAME values match table names in the SQL files (case-sensitive)
+- [ ] TABLE_NAME values match table names in the SQL files (matching is case-insensitive, mirroring SQL Server collation — ADR 0016)
 - [ ] Verify: Open each CSV in the Lakehouse file browser, confirm headers are correct
 - [ ] Refer customer to DATA_DICTIONARY_REQUIREMENTS.md for format details and extraction queries
 
@@ -470,7 +470,7 @@ The acceptance test script (`scripts/acceptance_test.py`) programmatically valid
 | Parse errors on all files | ScriptDom DLL not loaded | Check 01_install output, verify DLL path |
 | Parse errors on non-T-SQL files | Wrong SQL dialect (PL/SQL, PgSQL) | This release supports T-SQL only — remove non-T-SQL files |
 | pythonnet initialization fails | `%pip install` was used in a notebook | Remove %pip, use Fabric Environment only |
-| Agent gives wrong table names | Dictionary TABLE_NAME doesn't match SQL | Fix casing in dict_tables.csv |
+| Agent gives wrong table names | Table missing from dictionary | Add the table to dict_tables.csv (matching is case-insensitive) |
 | Pipeline runs but metric_logic is empty | No parse_results (parse step failed) | Check parse_errors, run 02_parse with verbose |
 | Agent returns truncated list | Fabric Data Agent response limit | Ask narrower questions or use `/coverage` for counts |
 | Data Agent query fails silently | Workspace/capacity/agent in different regions | Move all resources to same Azure region |

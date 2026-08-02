@@ -22,6 +22,11 @@ dictionary:
   table_name_col: "TABLE_NAME"
   column_name_col: "COLUMN_NAME"
   description_col: "DESCRIPTION"
+  # Dictionary matching is schema-agnostic. If 06_validate detects the same
+  # bare table name in multiple schemas, deployment blocks until you either
+  # resolve it or acknowledge it here (the shared description then attaches
+  # to every schema's table with that name).
+  accept_schema_ambiguity: false
 
 # Certified metrics catalog
 metrics:
