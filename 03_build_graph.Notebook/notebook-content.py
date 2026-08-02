@@ -115,6 +115,21 @@ for pr in parse_results:
 
 print(f"Built graph: {len(builder.nodes)} nodes, {len(builder.edges)} edges")
 
+# Apply steward assignments (gov_steward_assignments) to canonical nodes.
+# Assignments are managed by the manage_stewards utility notebook; this is
+# where they flow into the graph — and from there into output_metric_logic.
+from src.governance.steward import StewardManager
+
+steward_manager = StewardManager()
+try:
+    steward_manager.load_from_records(
+        [r.asDict() for r in spark.table("gov_steward_assignments").collect()]
+    )
+    applied = steward_manager.apply_to_graph(builder)
+    print(f"Applied {applied} steward assignments to canonical nodes")
+except Exception:
+    print("No gov_steward_assignments table — run notebooks/utilities/manage_stewards to assign")
+
 
 # METADATA ********************
 

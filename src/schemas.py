@@ -52,6 +52,7 @@ SQL_SOURCES = {
     "domain": "input",
     "status": "active",
     "owner": {"notebook": "01_install", "module": None},
+    "utility_writers": ["load_sql_files", "extract_views"],
     "write_mode": "overwrite",
     "enrichers": [],
     "consumers": ["02_parse", "06_validate"],
@@ -88,6 +89,7 @@ DICT_TABLES = {
     "domain": "input",
     "status": "active",
     "owner": {"notebook": "01_install", "module": None},
+    "utility_writers": ["load_clarity_dictionary", "load_caboodle_dictionary"],
     "write_mode": "overwrite",
     "enrichers": [],
     "consumers": ["01_install", "03_build_graph", "06_validate"],
@@ -113,6 +115,7 @@ DICT_COLUMNS = {
     "domain": "input",
     "status": "active",
     "owner": {"notebook": "01_install", "module": None},
+    "utility_writers": ["load_clarity_dictionary", "load_caboodle_dictionary"],
     "write_mode": "overwrite",
     "enrichers": [],
     "consumers": ["03_build_graph"],
@@ -707,25 +710,26 @@ GRAPH_EDGE_TECH2DIM = {
 
 
 # =====================================================================
-# PLANNED tables — contracts without current writers.
-# Orphaned by the 2026-07 dead-code cleanup or awaiting their phase.
-# The single-writer test enforces that nothing writes these until their
-# status flips to active.
+# GOVERNANCE / OPERATIONS extras — error log and steward assignments
+# (recovered 2026-08-02 from the dead-code purge), Tier 2 extraction
+# tracking, and the remaining PLANNED contracts (no writer yet; the
+# single-writer test enforces nothing writes those until activated).
 # =====================================================================
 
 ERROR_LOG = {
     "table_name": "ops_error_log",
     "description": (
-        "Persistent cross-run error log with regression detection (errors "
-        "that reappear across runs)."
+        "Persistent append-only error log across pipeline runs with "
+        "regression detection: new (first failure), known (still failing), "
+        "regressed (passed last run, fails now). Resolutions are computed "
+        "per run and reported in the build summary."
     ),
     "domain": "operations",
-    "status": "planned",
-    "notes": (
-        "Writer removed in the 2026-07 dead-code cleanup; ROADMAP Phase 1 "
-        "lists the feature as built. Reconcile: reinstate a writer in "
-        "02_parse/06_validate or drop the contract."
-    ),
+    "status": "active",
+    "owner": {"notebook": "02_parse", "module": "src/governance/error_log.py"},
+    "write_mode": "append",
+    "enrichers": [],
+    "consumers": ["admin"],
     "columns": [
         ("run_id", "string", False),
         ("run_timestamp", "string", False),
@@ -748,9 +752,11 @@ ERROR_LOG = {
         "line_count": "Source SQL line count",
         "query_count": "Queries extracted before failure",
         "clean_sql_preview": "Preview of the cleaned SQL",
-        "status": "new | recurring | resolved",
+        "status": "new | known | regressed",
     },
-    "invariants": [],
+    "invariants": [
+        {"kind": "allowed_values", "column": "status", "values": ["new", "known", "regressed"]},
+    ],
 }
 
 EXTRACTION_INSPECTION = {
@@ -798,14 +804,15 @@ TRACKING = {
     "table_name": "ops_extraction_tracking",
     "description": (
         "Change tracking for SQL objects extracted from a live SQL Server "
-        "(hash-based diff detection), for Tier 2 on-prem extraction."
+        "(hash-based diff detection), for Tier 2 on-prem extraction. Written "
+        "by the extract_views utility notebook, not the core pipeline."
     ),
     "domain": "operations",
-    "status": "planned",
-    "notes": (
-        "Belongs to the Tier 2 on-prem extractor (src/extractor/); the "
-        "extractor is not wired into the current Fabric pipeline."
-    ),
+    "status": "active",
+    "owner": {"notebook": "extract_views", "module": "src/extractor/tracker.py"},
+    "write_mode": "overwrite",
+    "enrichers": [],
+    "consumers": ["extract_views (change detection on next run)"],
     "columns": [
         ("object_name", "string", False),
         ("object_type", "string", False),
@@ -853,26 +860,34 @@ SYNC_LOG = {
 
 STEWARD_ASSIGNMENTS = {
     "table_name": "gov_steward_assignments",
-    "description": "Steward/developer ownership per metric, assignable via agent admin commands.",
-    "domain": "governance",
-    "status": "planned",
-    "notes": (
-        "ROADMAP Phase 1 lists the steward module as built, but no writer "
-        "exists in the current repo (likely removed in dead-code cleanup). "
-        "Reconcile before Pro tier."
+    "description": (
+        "Steward ownership per metric — assigned individually, in bulk, or "
+        "by name pattern via the manage_stewards utility notebook. Applied "
+        "to canonical graph nodes by 03_build_graph, from where "
+        "output_metric_logic and the agent pick them up."
     ),
+    "domain": "governance",
+    "status": "active",
+    "owner": {"notebook": "manage_stewards", "module": "src/governance/steward.py"},
+    "write_mode": "overwrite",
+    "enrichers": [],
+    "consumers": ["03_build_graph"],
     "columns": [
         ("metric_id", "string", False),
-        ("steward", "string", True),
-        ("developer", "string", True),
-        ("assigned_at", "string", True),
+        ("metric_name", "string", False),
+        ("steward_name", "string", False),
+        ("steward_email", "string", True),
+        ("department", "string", True),
+        ("assigned_date", "string", True),
         ("assigned_by", "string", True),
     ],
     "column_descriptions": {
-        "metric_id": "Metric being assigned",
-        "steward": "Business steward",
-        "developer": "Developer owner",
-        "assigned_at": "Assignment timestamp",
+        "metric_id": "Metric being assigned (input_sql_sources.metric_id)",
+        "metric_name": "Display name of the metric",
+        "steward_name": "Business steward accountable for the definition",
+        "steward_email": "Steward contact email",
+        "department": "Steward's department",
+        "assigned_date": "Assignment timestamp (ISO)",
         "assigned_by": "Who made the assignment",
     },
     "invariants": [

@@ -116,9 +116,12 @@ Get Metadata Sync working end-to-end with real data against Purview/Collibra.
 - [x] Data contracts for all 26 Delta tables (`src/schemas.py`): shape, semantics,
       single-writer ownership, consumers, invariants — enforced against code
       ground truth by `tests/test_table_contracts.py` (2026-08-02)
-- [ ] Reconcile 5 "planned" table contracts with no current writer (ops_error_log,
-      ops_extraction_inspection, ops_extraction_tracking, ops_sync_log,
-      gov_steward_assignments) — reinstate writers or drop
+- [x] Recovered from dead-code purge (2026-08-02): ops_error_log (regression
+      detection, appended by 02_parse) and gov_steward_assignments
+      (manage_stewards utility → applied to graph by 03 → agent-visible via
+      metric_logic); ops_extraction_tracking reactivated (extract_views writer)
+- [ ] Reconcile remaining 2 "planned" contracts: ops_extraction_inspection,
+      ops_sync_log — reinstate writers or drop
 - [ ] Business-friendly metric names from PBI lineage (replace proc names)
 - [x] Steward assignment module; usage tracking module
 - [x] Admin commands in agent (/admindash, /stewards, /errors, /coverage, /health)

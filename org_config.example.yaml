@@ -41,7 +41,7 @@ metrics:
 #     schemas: ["dbo", "reporting"]
 #     base_tables: ["encounter", "patient"]
 #     object_types: ["VIEW"]
-#   tracking_table: "extraction_tracking"
+#   tracking_table: "ops_extraction_tracking"
 
 # Fabric Graph (optional — enable to use native graph backend alongside Delta)
 # fabric_graph:

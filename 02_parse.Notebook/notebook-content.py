@@ -235,8 +235,21 @@ print(f"Errors: {len(parse_errors)}")
 
 
 # %% Cell 3: Save results to Delta tables
-from src.schemas import PARSE_ERRORS, PARSE_SUCCESSES, to_spark_schema
+from src.governance.error_log import ErrorLog
+from src.schemas import ERROR_LOG, PARSE_ERRORS, PARSE_SUCCESSES, to_spark_schema
 from pyspark.sql.types import StringType, StructField, StructType, IntegerType
+
+# Read previous run state BEFORE overwriting, so the error log can detect
+# regressions (passed last run, fails now) and resolutions.
+error_log = ErrorLog()
+try:
+    error_log.load_history([r.asDict() for r in spark.table("ops_error_log").collect()])
+    error_log.set_previous_successes(
+        [r["metric_id"] for r in spark.table("ops_parse_successes").collect()]
+    )
+except Exception:
+    print("No previous run history — regression detection starts next run")
+error_log.start_run()
 
 # Save parse results (intermediate table for 03_build_graph)
 if parse_results_data:
@@ -277,6 +290,26 @@ if parse_successes:
     success_df = spark.createDataFrame(success_rows, schema=to_spark_schema(PARSE_SUCCESSES))
     success_df.write.format("delta").mode("overwrite").saveAsTable("ops_parse_successes")
     print(f"Saved {len(parse_successes)} parse successes to 'parse_successes' table")
+
+# Append this run's errors to the persistent error log (ops_error_log)
+for e in parse_errors:
+    error_log.record_error(
+        metric_id=e["metric_id"],
+        metric_name=e["name"],
+        error_type="parse",
+        error_message=e["error"],
+        line_count=e["line_count"],
+    )
+run_summary = error_log.finish_run([s["metric_id"] for s in sql_sources])
+if error_log.current_run:
+    el_df = spark.createDataFrame(error_log.to_records(), schema=to_spark_schema(ERROR_LOG))
+    el_df.write.format("delta").mode("append").saveAsTable("ops_error_log")
+    print(f"Appended {len(error_log.current_run)} entries to ops_error_log")
+    print(error_log.summary_text())
+if run_summary.get("regressions"):
+    print(f"[!] REGRESSIONS — previously passing, now failing: {run_summary['regressed_metrics']}")
+if run_summary.get("resolved"):
+    print(f"[+] Resolved since last run: {run_summary['resolved_metrics']}")
 
 print("\n→ Next: run 03_build_graph.py (no need to rerun this unless SQL sources changed)")
 
