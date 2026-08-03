@@ -1,0 +1,318 @@
+[
+ {
+  "DESCRIPTION": "The ADT_EVENTS table is the master table for ADT event history information. This table contains several foreign keys for other ADT tables.",
+  "TABLE_NAME": "ADT_EVENTS"
+ },
+ {
+  "DESCRIPTION": "Actions which the user has taken upon alerts.",
+  "TABLE_NAME": "ALERT_ACTIONS"
+ },
+ {
+  "DESCRIPTION": "This table contains general history information for each type of medication warning or advisory. Since each warning could be triggered in different activities at different times, it contains general warning information for each time the warning was triggered. To get PATIENTS information, link this table to the CLINICAL_ALERTS table and then link the CLINICAL_ALERTS table to the PATIENTS or PATIENT_ENCOUNTERS table. To get order related information for each medication warning or advisory, link this table to ALT_ORDINFO. To get specific medication or condition information for each medication warning type, link this table to specific medication warning related tables, such as the ALT_DRUG_ALLERGY table for drug-allergy warnings; the ALT_DRUG_DFALC table for drug-drug, drug-food, and drug-alcohol warnings; the ALT_DRUG_DUPTHERPY and ALT_DRUG_DUPTHYMED tables for duplicate therapy warnings; the ALT_DRUG_IV and ALT_DRUG_IVMED tables for IV warnings; and the ALT_DRUG_PREGNANCY and ALT_DRUG_PREGMED tables for pregnancy warnings.",
+  "TABLE_NAME": "ALERT_HISTORY"
+ },
+ {
+  "DESCRIPTION": "This table reflects the data in the Hospital Beds (BED) master file.",
+  "TABLE_NAME": "BED_CONFIG"
+ },
+ {
+  "DESCRIPTION": "\"This table is similar to a typical Data Warehouse \"\"Date Dimension\"\". Link your dates to this table to avoid processing date functions on the reporting server. When you use your reporting tool's date functions to do filtering",
+  "TABLE_NAME": "CALENDAR_DATES"
+ },
+ {
+  "DESCRIPTION": "The CLINICAL_ALERTS table contains one record for every CLINICAL_ALERTS that was created in the clinical application. Each record is based on the CLINICAL_ALERTS ID and contains key information about the CLINICAL_ALERTS such as the PATIENTS, PATIENTS CSN, CLINICAL_ALERTS type, and whether it was seen by a user.",
+  "TABLE_NAME": "CLINICAL_ALERTS"
+ },
+ {
+  "DESCRIPTION": "This table contains common information from General Use Notes items. This table focuses on time-insensitive, once-per-record data while other HNO tables (e.g., NOTES_ACCT, CODING_CLA_NOTES) contain the data for different note types.",
+  "TABLE_NAME": "CLINICAL_NOTES"
+ },
+ {
+  "DESCRIPTION": "This table contains data about groupers of category values.",
+  "TABLE_NAME": "CONFIG_GROUPER_CATEGORIES"
+ },
+ {
+  "DESCRIPTION": "Configuration lookup table containing value sets used for department rollups, location groupings, and other reporting categorizations.",
+  "TABLE_NAME": "CONFIG_VALUE_SET"
+ },
+ {
+  "DESCRIPTION": "The DEPARTMENTS table contains high-level information about departments.",
+  "TABLE_NAME": "DEPARTMENTS"
+ },
+ {
+  "DESCRIPTION": "The DIAGNOSES table contains basic information about diagnoses.",
+  "TABLE_NAME": "DIAGNOSES"
+ },
+ {
+  "DESCRIPTION": "ED_ENCOUNTERS_DM is a data mart table that contains key pieces of information about the PATIENTS's ED stay. This table consolidates date and time columns to be used for the calculation of turnaround times. In order for the data in this table to be filled out, the ED Encounters registry (R HFR 49003) must be activated. Only PATIENTS encounters that meet the inclusion criteria for the registry have information stored in this table. Important Note: This table has special staging override code. This code is only used in incremental extracts. DO NOT RUN A FULL EXTRACT FOR THIS TABLE; it will delete the historic data from the table, possibly irrevocably.",
+  "TABLE_NAME": "ED_ENCOUNTERS_DM"
+ },
+ {
+  "DESCRIPTION": "The ED_ENCOUNTERS_FACT table stores commonly used information for ED encounters. Each emergency department encounter has a single row in this table. Encounters that are pending or cancelled are not included in this table.",
+  "TABLE_NAME": "ED_ENCOUNTERS_FACT"
+ },
+ {
+  "DESCRIPTION": "This table contains information about the current event records.",
+  "TABLE_NAME": "ED_EVENT_INFO"
+ },
+ {
+  "DESCRIPTION": "This table contains the noadd single items (name, ID, record state\u2026) for a given event template.",
+  "TABLE_NAME": "ED_EVENT_TEMPLATES"
+ },
+ {
+  "DESCRIPTION": "This table contains information that is useful for linking records (PATIENTS, department, etc.) to their appropriate events.",
+  "TABLE_NAME": "ED_PATIENT_INFO"
+ },
+ {
+  "DESCRIPTION": "This table contains high-level information about user records from the User master file.",
+  "TABLE_NAME": "EMPLOYEES"
+ },
+ {
+  "DESCRIPTION": "The PATIENTS encounter diagnosis table contains one record for each diagnosis associated with each encounter level of service. This table will contain all diagnoses specified on the Order Summary screen.",
+  "TABLE_NAME": "ENCOUNTER_DIAGNOSES"
+ },
+ {
+  "DESCRIPTION": "The ENCOUNTER_VISIT_REASONS contains the data entered as the Reason for Visit for a clinical system encounter. Each row in this table is one reason for visit associated with a PATIENTS encounter. One PATIENTS encounter may have multiple reasons for visit; therefore, the item LINE is used to identify each reason for visit within an encounter.",
+  "TABLE_NAME": "ENCOUNTER_VISIT_REASONS"
+ },
+ {
+  "DESCRIPTION": "This table contains the PATIENTS-specific measurements from flowsheets.",
+  "TABLE_NAME": "FLOWSHEET_MEASUREMENTS"
+ },
+ {
+  "DESCRIPTION": "This table contains linking information associated with flowsheet records.",
+  "TABLE_NAME": "FLOWSHEET_RECORDS"
+ },
+ {
+  "DESCRIPTION": "Fiscal year date dimension table with fiscal year number, month, and calendar date mappings for reporting period alignment.",
+  "TABLE_NAME": "FY_DATE_DIMENSION"
+ },
+ {
+  "DESCRIPTION": "Contains the compiled list of records for a grouper.",
+  "TABLE_NAME": "GROUPER_COMPILED_LIST"
+ },
+ {
+  "DESCRIPTION": "This table contains the list of grouper records included in a particular grouper record.",
+  "TABLE_NAME": "GROUPER_GROUPS"
+ },
+ {
+  "DESCRIPTION": "This table contains the compiled list of medication records in a grouper that are either listed directly in the grouper or expanded from simple generic medications, pharmaceutical class, pharmaceutical subclass, AHFS code, RxNorm code, or ATC code, potentially limited by route.  The sole purpose of this view is to ensure old queries would not break after grouper's data model changed. All new queries should not use this table. They should use GROUPER_COMPILED_LIST instead.",
+  "TABLE_NAME": "GROUPER_MED_RECORDS"
+ },
+ {
+  "DESCRIPTION": "Contains the terminology codes for Terminology-type groupers.",
+  "TABLE_NAME": "GROUPER_TERMINOLOGY"
+ },
+ {
+  "DESCRIPTION": "This table contains hospital account information from the Hospital Account (HAR) and Claim (CLM) master files. It will exclude professional billing hospital accounts created by visit filing order in non-single billing office service areas.",
+  "TABLE_NAME": "HOSPITAL_ACCOUNTS"
+ },
+ {
+  "DESCRIPTION": "This table contains hospital account information from the Hospital Accounts Receivable (HAR) master file. This fifth hospital account table has the same basic structure as HOSPITAL_ACCOUNTS, HSP_ACCOUNT_2, HSP_ACCOUNT_3, and HSP_ACCOUNT_4, but was created as a fifth table to prevent the other tables from getting any larger. It excludes Professional Billing accounts in classic PB self-pay service areas.",
+  "TABLE_NAME": "HOSPITAL_ACCOUNTS_EXT"
+ },
+ {
+  "DESCRIPTION": "This table contains hospital account final diagnosis list information from the Hospital Accounts Receivable (HAR) master file.",
+  "TABLE_NAME": "HOSPITAL_ACCT_DIAGNOSES"
+ },
+ {
+  "DESCRIPTION": "This table is the primary table for hospital encounter information. A hospital encounter is a contact in the PATIENTS record created through an ADT workflow such as preadmission, admission, ED Arrival, discharge, and hospital outpatient visit (HOV) contacts. These contact types have the ADT flag (I EPT 10101) set to 1. This table excludes all other contacts.",
+  "TABLE_NAME": "HOSPITAL_ENCOUNTERS"
+ },
+ {
+  "DESCRIPTION": "This table contains hospital account transaction information from the Hospital Permanent Transactions (HTR) master file.",
+  "TABLE_NAME": "HOSPITAL_TRANSACTIONS"
+ },
+ {
+  "DESCRIPTION": "Staging table containing inpatient sepsis screening results, encounter details, compliance metrics, and clinical observations for sepsis-flagged patients.",
+  "TABLE_NAME": "IP_SEPSIS"
+ },
+ {
+  "DESCRIPTION": "Detailed clinical data for sepsis encounters including vitals, lab results, medication administration times, and organ dysfunction scores.",
+  "TABLE_NAME": "IP_SepsisDetails"
+ },
+ {
+  "DESCRIPTION": "Base encounter records for inpatient sepsis patients including demographics, admission/discharge times, and diagnosis codes.",
+  "TABLE_NAME": "IP_SepsisEncounters"
+ },
+ {
+  "DESCRIPTION": "Sepsis encounter records enriched with ADT location history showing department transfers and timestamps during the encounter.",
+  "TABLE_NAME": "IP_SepsisEncountersWLocations"
+ },
+ {
+  "DESCRIPTION": "Date-indexed view of sepsis PATIENTS encounters with department rollup information for trend and compliance reporting.",
+  "TABLE_NAME": "IP_SepsisPatientDates"
+ },
+ {
+  "DESCRIPTION": "Audit trail of sepsis screening activities including organ dysfunction scores, huddle documentation, CLINICAL_ALERTS responses, and nursing assessments.",
+  "TABLE_NAME": "IP_SepsisScreeningAudit"
+ },
+ {
+  "DESCRIPTION": "Shift-level sepsis screening compliance data with AM/PM shift breakdowns, compliance rates, and responsible nursing staff.",
+  "TABLE_NAME": "IP_SepsisShiftCompliance"
+ },
+ {
+  "DESCRIPTION": "The LAB_COMPONENTS table contains basic information about the standard result components that can constitute your procedures. For example, the components of a lab panel are usually the tests performed on a single specimen.",
+  "TABLE_NAME": "LAB_COMPONENTS"
+ },
+ {
+  "DESCRIPTION": "This table contains information on results from clinical system orders. This table extracts only the last Orders (ORD) contact for each ORD record.",
+  "TABLE_NAME": "LAB_ORDER_RESULTS"
+ },
+ {
+  "DESCRIPTION": "This table stores LDA information for a PATIENTS. A record is created in LDA for insertion of every line, drain, airway, or wound for a PATIENTS, as well as entering a trip into a PATIENTS's travel history. The no-add information for this LDA is stored in the table.",
+  "TABLE_NAME": "LINE_DEVICE_AIRWAY"
+ },
+ {
+  "DESCRIPTION": "This table contains information about your location records. These include revenue locations and patients' primary clinics/locations. The records included in this table are Facility Profile (EAF) records that are designated as facility, service area, and location records. That is, Type of Location (I EAF 27) has a value of 1, 2, or 4.",
+  "TABLE_NAME": "LOCATIONS"
+ },
+ {
+  "DESCRIPTION": "The MEDICATIONS table contains high-level information from all the medications for use in your facility.",
+  "TABLE_NAME": "MEDICATIONS"
+ },
+ {
+  "DESCRIPTION": "The MEDICATION_ORDERS table enables you to report on medications ordered in the clinical system (prescriptions). We have also included PATIENTS and contact identification information for each record.",
+  "TABLE_NAME": "MEDICATION_ORDERS"
+ },
+ {
+  "DESCRIPTION": "This table enables you to report on medications ordered in the clinical system or Ambulatory Pharmacy (Prescriptions). This table should be used with MEDICATION_ORDERS.",
+  "TABLE_NAME": "MEDICATION_ORDERS_EXT"
+ },
+ {
+  "DESCRIPTION": "This table contains the currently active medication administration data. This includes all scheduled and acted upon administrations currently showing on the MAR.",
+  "TABLE_NAME": "MED_ADMIN_RECORDS"
+ },
+ {
+  "DESCRIPTION": "This table contains medications' information.",
+  "TABLE_NAME": "MED_DETAILS_EXT"
+ },
+ {
+  "DESCRIPTION": "ETL staging table for non-severe sepsis case identification. Stores patients with suspected sepsis who do not meet severe sepsis criteria.",
+  "TABLE_NAME": "NON_SEVERE_SEPSIS_STAGING"
+ },
+ {
+  "DESCRIPTION": "This table contains information from overtime single-response items about General Use Notes (HNO) records. Contact creation logic for clinical notes is as follows: 1. If a note doesn't exist, a new note is created. This represents the first contact on that note. 2. If a revision is filed by the incoming transcription interface, a new contact is created on the note being revised regardless of note status.",
+  "TABLE_NAME": "NOTE_ENCOUNTER_INFO"
+ },
+ {
+  "DESCRIPTION": "This table stores the SmartList IDs used by the notes.",
+  "TABLE_NAME": "NOTE_TEMPLATE_LIST_IDS"
+ },
+ {
+  "DESCRIPTION": "This table stores the SmartText IDs used by the notes.",
+  "TABLE_NAME": "NOTE_TEMPLATE_TEXT_IDS"
+ },
+ {
+  "DESCRIPTION": "This table contains dispense information for orders.",
+  "TABLE_NAME": "ORDER_DISPENSE_INFO"
+ },
+ {
+  "DESCRIPTION": "This table is designed to extract the information necessary to determine where and how orders are being placed in the system. It can also give an indication of what percentage of orders are being placed in the system where the ordering provider is the same as the ordering user. It also details what type of orders and if the orders were modified and/or reordered. Included orders are parent orders; not pended; not created from an interface; not created by an Instant Order OurPractice Advisory action; not a cabinet override; not a historical order; not a bulk dispense order; not created by referral; not external; and either have a procedure associated or do not have an appointment request system status.",
+  "TABLE_NAME": "ORDER_TRACKING_METRICS"
+ },
+ {
+  "DESCRIPTION": "The ORGANISMS table contains basic information about the organisms used in clinical systems.",
+  "TABLE_NAME": "ORGANISMS"
+ },
+ {
+  "DESCRIPTION": "The PATIENTS table contains one record for each PATIENTS in your system. The data contained in each record consists of demographics, PCP and primary location information, registration information, and other information.",
+  "TABLE_NAME": "PATIENTS"
+ },
+ {
+  "DESCRIPTION": "This table contains information on a PATIENTS's race.",
+  "TABLE_NAME": "PATIENT_DEMOGRAPHICS_RACE"
+ },
+ {
+  "DESCRIPTION": "The PATIENTS encounter table contains one record for each PATIENTS encounter in your system. By default, this table does not contain Registration or PCP/Clinic Change contacts (encounter types 1 and 31). It does contain all appointments, office visits, telephone encounters, and other types of encounters. The primary key for the PATIENTS encounter table is PAT_ENC_CSN_ID. Note that there is an index named EIX_FILT_PAT_ENC_RFL on the REFERRAL_ID column in Oracle that does not appear in the index list. The index is created by EFN_FAUX_RFL_FILT_INX.",
+  "TABLE_NAME": "PATIENT_ENCOUNTERS"
+ },
+ {
+  "DESCRIPTION": "The PROCEDURES_CATALOG table contains basic information about the procedure records in your system. This does include both A/R and clinical procedures.",
+  "TABLE_NAME": "PROCEDURES_CATALOG"
+ },
+ {
+  "DESCRIPTION": "The PROCEDURE_ORDERS table enables you to report on the procedures ordered in the clinical system. We have also included PATIENTS and contact identification information for each record.",
+  "TABLE_NAME": "PROCEDURE_ORDERS"
+ },
+ {
+  "DESCRIPTION": "The PROCEDURE_ORDERS_EXT table enables you to report on the procedures ordered in the clinical system. This procedure table has the same basic structure as PROCEDURE_ORDERS, but was created as a third table to prevent ORDER_PROC_2 from getting any larger.",
+  "TABLE_NAME": "PROCEDURE_ORDERS_EXT"
+ },
+ {
+  "DESCRIPTION": "The PROVIDERS table contains high-level information about your provider records. These records may be caregivers, resources, classes, devices, and modalities.",
+  "TABLE_NAME": "PROVIDERS"
+ },
+ {
+  "DESCRIPTION": "This table contains values of the actions user can take upon alerts.",
+  "TABLE_NAME": "REF_ALERT_ACTIONS"
+ },
+ {
+  "DESCRIPTION": "NULL",
+  "TABLE_NAME": "REF_ALERT_OVERRIDE_REASONS"
+ },
+ {
+  "DESCRIPTION": "This table holds the CLINICAL_ALERTS status categories. The CLINICAL_ALERTS status is a description of what happened to an interaction CLINICAL_ALERTS when it was viewed by an end user. Possible statuses are: overridden, removed, filtered or cancelled.",
+  "TABLE_NAME": "REF_ALERT_STATUS"
+ },
+ {
+  "DESCRIPTION": "NULL",
+  "TABLE_NAME": "REF_DISCHARGE_DISPOSITION"
+ },
+ {
+  "DESCRIPTION": "NULL",
+  "TABLE_NAME": "REF_ED_DISPOSITION"
+ },
+ {
+  "DESCRIPTION": "This table contains the category information for PATIENTS ethnic groups.",
+  "TABLE_NAME": "REF_ETHNIC_GROUP"
+ },
+ {
+  "DESCRIPTION": "NULL",
+  "TABLE_NAME": "REF_GENERIC_MED"
+ },
+ {
+  "DESCRIPTION": "This table contains the category information for PATIENTS race.",
+  "TABLE_NAME": "REF_PATIENT_RACE"
+ },
+ {
+  "DESCRIPTION": "This table holds the categories for the possible places where alerts can be show in the clinical application.",
+  "TABLE_NAME": "REF_SHOWN_PLACE"
+ },
+ {
+  "DESCRIPTION": "This table traces medication orders in the pharmacy verify queue.",
+  "TABLE_NAME": "RX_VERIFY_TRACE"
+ },
+ {
+  "DESCRIPTION": "ETL staging table for severe sepsis case identification. Stores patients meeting severe sepsis criteria with bundle element compliance tracking.",
+  "TABLE_NAME": "SEVERE_SEPSIS_STAGING"
+ },
+ {
+  "DESCRIPTION": "The TREATMENT_TEAMS table contains information on inpatient treatment teams. Each record in this table is based on PAT_ENC_CSN_ID.",
+  "TABLE_NAME": "TREATMENT_TEAMS"
+ },
+ {
+  "DESCRIPTION": "This table contains basic information for records in the Reason for Visit (HRV) master file.",
+  "TABLE_NAME": "VISIT_REASONS"
+ },
+ {
+  "DESCRIPTION": "This view is to make charge homing reporting easier. It filters out non-home charges once they have been re-homed, and re-points HAR IDs so they point to the correct HAR record for reporting. It contains hospital account transaction detail information from the HTR master file.",
+  "TABLE_NAME": "V_HOSPITAL_TRANSACTIONS"
+ },
+ {
+  "DESCRIPTION": "A dimensional view used to find a PATIENTS's department, room and/or bed at a given datetime. The view contains one row for each admission, transfer in, or leave of absence return ADT event and contains columns for in and out times. By equal joining to this view on an inpatient CSN and theta joining on a given instant, you can find one row with the PATIENTS's department, room and bed at the given instant. Please note that this view was tested on ADT from the EMR system's ADT application. If you are using interfaces to capture ADT data, you may experience odd behavior.",
+  "TABLE_NAME": "V_PATIENT_LOCATION_HISTORY"
+ },
+ {
+  "DESCRIPTION": "The V_PHARMACY_DISPENSE view contains information about medication order dispenses from inpatient pharmacies. There is one row per medication dispense.",
+  "TABLE_NAME": "V_PHARMACY_DISPENSE"
+ },
+ {
+  "DESCRIPTION": "This view contains all inpatient medication order dispense preparation and dispense tracking actions.",
+  "TABLE_NAME": "V_PHARMACY_DISPENSE_ACTION"
+ },
+ {
+  "DESCRIPTION": "The V_PHARMACY_ORDER view contains information about medication orders prepared or supplied by inpatient pharmacies that is typically used in reports. Orders must be signed and released or signed and held to be included in the view.",
+  "TABLE_NAME": "V_PHARMACY_ORDER"
+ }
+]
