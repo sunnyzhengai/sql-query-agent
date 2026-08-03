@@ -107,6 +107,14 @@ ERROR_SEEDS = [
         "first_seen": "2026-07-31",
     },
     {
+        "error_signature": "No module named 'src.",
+        "error_category": "stale_wheel_version",
+        "root_cause": "The Spark session is running an older product wheel: either an old .whl is still in the Environment, the notebook is attached to a different Environment, or the session started before the new wheel finished publishing. (src imports but a newer submodule is missing.)",
+        "fix": "Verify the Environment's Custom libraries show exactly one sql_query_agent wheel at the expected version and status is Published; verify the notebook's Environment dropdown selects it; then STOP the Spark session and re-run — sessions bind the Environment at start. Check with: importlib.metadata.version('sql-query-agent').",
+        "prevention": "After every wheel update: remove the old wheel, publish, confirm the version, and restart any running sessions before re-running notebooks.",
+        "first_seen": "2026-08-02",
+    },
+    {
         "error_signature": "Set as default lakehouse.*grayed out",
         "error_category": "lakehouse_default_issue",
         "root_cause": "Lakehouse moved from another workspace retains stale metadata.",
