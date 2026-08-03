@@ -121,9 +121,20 @@ Get Metadata Sync working end-to-end with real data against Purview/Collibra.
       logic relations asserted inside; notebooks are thin callers ending in a
       registry-driven postcondition gate; full 02→05 pipeline runs in CI with
       zero Fabric cost (`tests/steps/`)
-- [ ] Offline slices 2-4: verified DAG (read-scanner + relations field +
-      generated pipeline map), recorded ScriptDom fixtures (export→anonymize→
-      validate→download), LLM stand-in via AgentBackend protocol
+- [x] Offline slice 2 (2026-08-02): verified DAG — read-side scanner (consumers
+      code-verified both directions), relations field (cross-table flow
+      contracts, gate-enforced), generated PIPELINE_MAP.md with freshness test;
+      CI now runs on dev
+- [x] Offline slice 3 (2026-08-02): record-replay infrastructure — anonymization
+      engine lifted to src/ (crosswalk-driven, org terms parameterized),
+      export_test_fixtures notebook (select→anonymize→leak-gate→export),
+      run_pipeline_local.py replays 03→06 pure-python with full gates,
+      recorded-pipeline tests skip until fixtures land
+- [ ] **ACTION (Sunny): run export_test_fixtures on Fabric once**, download to
+      tests/fixtures/recorded/, run pytest, commit — CI then replays ScriptDom
+      truth on every push
+- [ ] Offline slice 4: LLM stand-in via AgentBackend protocol (record-replay
+      for descriptions + grounding evals; wheel-excluded)
 - [x] Recovered from dead-code purge (2026-08-02): ops_error_log (regression
       detection, appended by 02_parse) and gov_steward_assignments
       (manage_stewards utility → applied to graph by 03 → agent-visible via

@@ -99,7 +99,7 @@ DICT_TABLES = {
     "utility_writers": ["load_clarity_dictionary", "load_caboodle_dictionary"],
     "write_mode": "overwrite",
     "enrichers": [],
-    "consumers": ["01_install", "03_build_graph", "06_validate", "load_caboodle_dictionary"],
+    "consumers": ["01_install", "03_build_graph", "06_validate", "load_caboodle_dictionary", "export_test_fixtures"],
     "columns": [
         ("TABLE_NAME", "string", False),
         ("DESCRIPTION", "string", True),
@@ -128,7 +128,7 @@ DICT_COLUMNS = {
     "utility_writers": ["load_clarity_dictionary", "load_caboodle_dictionary"],
     "write_mode": "overwrite",
     "enrichers": [],
-    "consumers": ["01_install", "03_build_graph", "load_caboodle_dictionary"],
+    "consumers": ["01_install", "03_build_graph", "load_caboodle_dictionary", "export_test_fixtures"],
     "columns": [
         ("TABLE_NAME", "string", False),
         ("COLUMN_NAME", "string", False),
@@ -161,7 +161,7 @@ PARSE_RESULTS = {
     "owner": {"notebook": "02_parse", "module": "src/parser/sql_parser.py"},
     "write_mode": "overwrite",
     "enrichers": [],
-    "consumers": ["03_build_graph"],
+    "consumers": ["03_build_graph", "export_test_fixtures"],
     "columns": [
         ("metric_id", "string", False),
         ("name", "string", False),

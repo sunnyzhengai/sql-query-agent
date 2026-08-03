@@ -21,185 +21,28 @@ INPUT_DIR = PROJECT_ROOT / "data" / "synthetic" / "sepsis_sql" / "procs"
 OUTPUT_DIR = PROJECT_ROOT / "data" / "synthetic" / "sql"
 CROSSWALK_PATH = PROJECT_ROOT / "data" / "synthetic" / "crosswalk.json"
 
+sys.path.insert(0, str(PROJECT_ROOT))
+
+
+from src.anonymization import (  # noqa: E402
+    apply_replacements,
+    build_replacements,
+    get_scan_terms,
+    scan_for_missed,
+)
+
 
 def load_crosswalk() -> dict:
     with open(CROSSWALK_PATH) as f:
         return json.load(f)
 
 
-def build_replacements(crosswalk: dict) -> list[tuple[str, str, str]]:
-    """Build ordered list of (pattern, replacement, category) tuples.
-
-    Order matters — longer/more-specific patterns first to avoid
-    partial matches (e.g., 'CookClarity' before 'Clarity').
-    """
-    replacements: list[tuple[str, str, str]] = []
-
-    # --- 1. Vendor functions (most specific, multi-part names) ---
-    for orig, anon in crosswalk.get("vendor_functions", {}).items():
-        replacements.append((orig, anon, "vendor_function"))
-
-    # --- 2. Procedure CREATE statements (schema.proc_name) ---
-    for key, entry in crosswalk.get("procedures", {}).items():
-        if isinstance(entry, dict) and "original" in entry:
-            replacements.append((entry["original"], entry["anonymized"], "procedure"))
-            # Also handle without brackets and with varied casing
-            orig_bare = entry["original"].replace("[", "").replace("]", "")
-            anon_bare = entry["anonymized"].replace("[", "").replace("]", "")
-            if orig_bare != entry["original"]:
-                replacements.append((orig_bare, anon_bare, "procedure_bare"))
-
-    # --- 3. Department names (before prefix patterns — more specific) ---
-    for orig, anon in crosswalk.get("org_references_to_remove", {}).get("department_names", {}).items():
-        replacements.append((orig, anon, "department_name"))
-
-    # --- 4. File paths ---
-    for orig, anon in crosswalk.get("org_references_to_remove", {}).get("file_paths", {}).items():
-        replacements.append((orig, anon, "file_path"))
-
-    # --- 5. Report paths ---
-    for orig, anon in crosswalk.get("org_references_to_remove", {}).get("report_paths", {}).items():
-        replacements.append((orig, anon, "report_path"))
-
-    # --- 6. Org-specific tables (before databases/schemas — contain org prefixes) ---
-    # Mark with ~ci suffix for case-insensitive matching
-    for orig, anon in crosswalk.get("tables", {}).get("_org_specific_tables", {}).items():
-        replacements.append((orig, anon, "org_table~ci"))
-
-    # --- 7. EMR tables ---
-    for orig, anon in crosswalk.get("tables", {}).get("_emr_tables", {}).items():
-        if orig != anon:
-            replacements.append((orig, anon, "emr_table~ci"))
-
-    # --- 8. Databases (longer names first) ---
-    db_items = sorted(crosswalk.get("databases", {}).items(), key=lambda x: -len(x[0]))
-    for orig, anon in db_items:
-        if orig != anon:
-            replacements.append((orig, anon, "database"))
-
-    # --- 9. Schemas (longer names first) ---
-    schema_items = sorted(crosswalk.get("schemas", {}).items(), key=lambda x: -len(x[0]))
-    for orig, anon in schema_items:
-        if orig != anon:
-            replacements.append((orig, anon, "schema"))
-
-    # --- 10. Author names (longer names first to avoid partial) ---
-    author_items = sorted(crosswalk.get("author_names", {}).items(), key=lambda x: -len(x[0]))
-    for orig, anon in author_items:
-        replacements.append((orig, anon, "author"))
-
-    # --- 11. Ticket numbers ---
-    for orig, anon in crosswalk.get("ticket_numbers", {}).items():
-        replacements.append((orig, anon, "ticket"))
-
-    # --- 12. String literals ---
-    lit_items = sorted(
-        crosswalk.get("org_references_to_remove", {}).get("string_literals", {}).items(),
-        key=lambda x: -len(x[0]),
-    )
-    for orig, anon in lit_items:
-        replacements.append((orig, anon, "string_literal"))
-
-    # --- 13. Grouper name prefixes ---
-    for orig, anon in crosswalk.get("org_references_to_remove", {}).get("grouper_name_prefixes", {}).items():
-        replacements.append((orig, anon, "grouper_prefix"))
-
-    # --- 14. Prefix patterns (shorter, more generic — last among text) ---
-    prefix_items = sorted(
-        crosswalk.get("org_references_to_remove", {}).get("prefix_patterns", {}).items(),
-        key=lambda x: -len(x[0]),
-    )
-    for orig, anon in prefix_items:
-        replacements.append((orig, anon, "prefix_pattern"))
-
-    # --- 15. COOK_FY column renames ---
-    for orig, anon in crosswalk.get("cook_fy_columns_to_rename", {}).items():
-        replacements.append((orig, anon, "cook_fy_column"))
-
-    # --- 16. Proc codes ---
-    proc_code_items = sorted(crosswalk.get("proc_codes", {}).items(), key=lambda x: -len(x[0]))
-    for orig, anon in proc_code_items:
-        replacements.append((orig, anon, "proc_code"))
-
-    # --- 17. Hardcoded IDs (all categories) ---
-    for id_category, mapping in crosswalk.get("hardcoded_ids", {}).items():
-        if not isinstance(mapping, dict) or id_category.startswith("_"):
-            continue
-        # Sort by length descending to avoid partial matches (e.g., '100108' before '1001')
-        id_items = sorted(mapping.items(), key=lambda x: -len(x[0]))
-        for orig, anon in id_items:
-            if orig != anon:
-                replacements.append((orig, anon, f"id:{id_category}"))
-
-    return replacements
-
-
-def apply_replacements(
-    sql: str,
-    replacements: list[tuple[str, str, str]],
-    verbose: bool = False,
-) -> tuple[str, list[str]]:
-    """Apply all replacements to SQL text. Returns (anonymized_sql, log_entries)."""
-    log = []
-
-    for orig, anon, category in replacements:
-        use_ci = category.endswith("~ci")
-        use_word_boundary = category.startswith("id:")
-        base_category = category.removesuffix("~ci")
-
-        if use_ci:
-            # Case-insensitive regex replacement with word boundaries
-            # Use \b to avoid replacing inside other words (e.g., "patients" for "PATIENT")
-            pattern = re.compile(r"\b" + re.escape(orig) + r"\b", re.IGNORECASE)
-            matches = pattern.findall(sql)
-            if not matches:
-                continue
-            count = len(matches)
-            sql = pattern.sub(anon, sql)
-        elif use_word_boundary:
-            # Word-boundary matching for numeric IDs to avoid partial matches
-            # Use lookahead/lookbehind for non-digit boundaries
-            pattern = re.compile(r"(?<!\d)" + re.escape(orig) + r"(?!\d)")
-            matches = pattern.findall(sql)
-            if not matches:
-                continue
-            count = len(matches)
-            sql = pattern.sub(anon, sql)
-        else:
-            if orig not in sql:
-                continue
-            count = sql.count(orig)
-            sql = sql.replace(orig, anon)
-
-        entry = f"  [{base_category}] {orig!r} -> {anon!r} ({count}x)"
-        log.append(entry)
-        if verbose:
-            print(entry)
-
-    return sql, log
-
-
-def scan_for_missed(sql: str, crosswalk: dict) -> list[str]:
-    """Check anonymized SQL for any remaining proprietary terms."""
-    warnings = []
-
-    # Check for remaining org references
-    org_terms = [
-        "Cook", "CCMC", "PCCMC", "CCHCS", "CCHP",
-        "Clarity", "CookClarity", "COOK_RPT", "EPIC_UTIL",
-        "EFN_DIN", "IPSO_",
-    ]
-    for term in org_terms:
-        # Case-insensitive search, but skip if it's inside an anonymized name
-        matches = [m for m in re.finditer(re.escape(term), sql, re.IGNORECASE)]
-        for m in matches:
-            # Get surrounding context
-            start = max(0, m.start() - 30)
-            end = min(len(sql), m.end() + 30)
-            context = sql[start:end].replace("\n", " ").strip()
-            warnings.append(f"  MISSED: '{term}' found in: ...{context}...")
-
-    return warnings
+# Dev-only scan list (this script is not shipped); crosswalk _scan_terms wins.
+LEGACY_SCAN_TERMS = [
+    "Cook", "CCMC", "PCCMC", "CCHCS", "CCHP",
+    "Clarity", "CookClarity", "COOK_RPT", "EPIC_UTIL",
+    "EFN_DIN", "IPSO_",
+]
 
 
 def process_file(
@@ -214,7 +57,7 @@ def process_file(
 
     anonymized, log = apply_replacements(sql, replacements, verbose)
     output_path = get_output_path(input_path, crosswalk, anonymized)
-    warnings = scan_for_missed(anonymized, crosswalk)
+    warnings = scan_for_missed(anonymized, get_scan_terms(crosswalk, LEGACY_SCAN_TERMS))
 
     stats = {
         "file": str(input_path.relative_to(INPUT_DIR)),

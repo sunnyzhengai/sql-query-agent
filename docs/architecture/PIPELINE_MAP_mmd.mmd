@@ -1,16 +1,3 @@
-<!-- GENERATED FILE — do not edit.
-     Source: TABLE_REGISTRY in src/schemas.py
-     Regenerate: python scripts/generate_docs.py
-     CI fails if this file differs from regeneration. -->
-
-# Pipeline Dataflow Map
-
-Every edge below is a declared, code-verified fact from the data contracts:
-solid arrows into a table are its owner/enricher writes, dashed arrows are
-sanctioned utility writers, and arrows out of a table are its declared
-consumers (notebook reads are verified against code by the contract tests).
-
-```mermaid
 flowchart LR
   01_install["01_install"]:::notebook
   02_parse["02_parse"]:::notebook
@@ -21,7 +8,6 @@ flowchart LR
   07_generate_descriptions["07_generate_descriptions"]:::notebook
   08_publish_collibra["08_publish_collibra"]:::notebook
   09_publish_purview["09_publish_purview"]:::notebook
-  export_test_fixtures["export_test_fixtures"]:::notebook
   extract_views["extract_views"]:::notebook
   load_caboodle_dictionary["load_caboodle_dictionary"]:::notebook
   load_clarity_dictionary["load_clarity_dictionary"]:::notebook
@@ -83,12 +69,10 @@ flowchart LR
   graph_nodes --> verify_graph
   input_dict_columns --> 01_install
   input_dict_columns --> 03_build_graph
-  input_dict_columns --> export_test_fixtures
   input_dict_columns --> load_caboodle_dictionary
   input_dict_tables --> 01_install
   input_dict_tables --> 03_build_graph
   input_dict_tables --> 06_validate
-  input_dict_tables --> export_test_fixtures
   input_dict_tables --> load_caboodle_dictionary
   input_sql_sources --> 01_install
   input_sql_sources --> 02_parse
@@ -110,7 +94,6 @@ flowchart LR
   ops_parse_errors --> data_agent
   ops_parse_errors --> verify_graph
   ops_parse_results --> 03_build_graph
-  ops_parse_results --> export_test_fixtures
   ops_parse_successes --> 02_parse
   ops_parse_successes --> 06_validate
   ops_parse_successes --> verify_graph
@@ -123,7 +106,3 @@ flowchart LR
   classDef notebook fill:#e8f0fe,stroke:#4285f4
   classDef table fill:#fef7e0,stroke:#f9ab00
   classDef actor fill:#e6f4ea,stroke:#34a853
-```
-
-Planned tables (contracts without writers) and per-table details — columns,
-invariants, relations — live in `src/schemas.py`.
