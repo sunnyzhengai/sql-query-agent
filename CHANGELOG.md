@@ -10,6 +10,51 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.2.0] - 2026-08-02
+
+### Added
+- Data contracts for all Delta tables (`src/schemas.py` TABLE_REGISTRY): shape,
+  semantics, single-writer ownership, consumers, invariants, cross-table
+  relations — enforced against code ground truth by contract tests
+- Generic invariant/relation checker (`src/invariants.py`); wired into the
+  06_validate deployment gate and per-notebook postcondition gates
+- Pure pipeline step functions (`src/steps/`): parse, build_graph,
+  metric_logic, export, readiness — full 02→05 pipeline runs offline with
+  no Spark/Fabric; notebooks reduced to thin callers
+- SQL object identity module (`src/parser/identity.py`): CREATE PROCEDURE and
+  CREATE VIEW identity, case folding (ADR 0016), duplicate detection
+- Recovered governance modules: cross-run error log with regression detection
+  (ops_error_log, appended by 02_parse) and steward assignments
+  (gov_steward_assignments via manage_stewards utility, applied by 03)
+- Crosswalk anonymization engine (`src/anonymization.py`) + export_test_fixtures
+  utility notebook with proprietary-term leak gate (record-replay fixtures)
+- AgentBackend protocol (`src/agent_backend.py`): Fabric agent + replay
+  cassette backends, one-home description prompt and refusal vocabulary
+- New TABLE_TO_COLUMN edges (columns reachable by traversal) exported to
+  graph_edge_tab2col (9th LPG table)
+- Local pipeline runner (`scripts/run_pipeline_local.py`) and grounding-eval
+  harness (devtools/, never shipped)
+
+### Changed
+- Technical node IDs and all identifier matching case-folded to uppercase
+  (ADR 0016) — Caboodle PascalCase dictionaries now match; graph rebuilds on
+  next pipeline run
+- Purview display names use schema-qualified metric_id (ADR 0015)
+- 01_install: duplicate metric identities and case-variant dictionary
+  duplicates now BLOCK with per-file listings (was silent last-wins)
+- 06_validate: readiness decision extracted to a pure function; gains data
+  contract invariants and dictionary schema-ambiguity gates
+- 02→03 payload contract unified in src/graph/serialization.py (round-trip
+  tested); column_refs now survive the boundary
+
+### Fixed
+- org_config.example.yaml: graph_edges was "Tables/graph_edges" (broken
+  write for any customer copying the example); stale tracking_table name
+- Dead-code detector now scans root *.Notebook folders — the blind spot that
+  wrongly purged working governance modules in July
+
+---
+
 ## [1.1.0] - 2026-07-26
 
 ### Added

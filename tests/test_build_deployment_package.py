@@ -96,6 +96,14 @@ def test_verify_rejects_zip_with_internal_content(tmp_path):
         bdp.verify_package(bad_zip)
 
 
+def test_devtools_can_never_ship():
+    """The wheel packages src/* only; devtools (local LLM stand-in, evals)
+    must stay out of both the wheel config and the deployment package."""
+    pyproject = (REPO_ROOT / "pyproject.toml").read_text()
+    assert 'include = ["src", "src.*"]' in pyproject
+    assert "devtools" not in pyproject
+
+
 def test_missing_wheel_fails_loudly(tmp_path):
     skeleton = tmp_path / "repo"
     (skeleton / "dist").mkdir(parents=True)
