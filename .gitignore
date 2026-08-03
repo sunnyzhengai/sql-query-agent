@@ -44,3 +44,6 @@ presentation/
 # Pre-anonymization source files (contain proprietary SQL/metadata)
 data/synthetic/sepsis_sql/
 data/Collibra*
+
+# Local secrets (API keys for dev tooling) — never commit
+.env
