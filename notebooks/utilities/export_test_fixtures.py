@@ -32,17 +32,27 @@ from src.anonymization import (
 )
 from src.parser.identity import fold_identifier
 
-CROSSWALK_PATH = "/lakehouse/default/Files/sql-query-agent/data/synthetic/crosswalk.json"
+# The crosswalk can live either next to org_config.yaml (clean wheel-based
+# deployments) or at its repo path (full-repo-upload deployments).
+CROSSWALK_CANDIDATES = [
+    "/lakehouse/default/Files/sql-query-agent/crosswalk.json",
+    "/lakehouse/default/Files/sql-query-agent/data/synthetic/crosswalk.json",
+]
 EXPORT_DIR = "/lakehouse/default/Files/sql-query-agent/fixtures_export"
 
 # How many metrics to record. Selection is spread across the complexity
 # range (by cte_count) so hard cases are represented, not just easy ones.
 MAX_METRICS = 40
 
-if not os.path.exists(CROSSWALK_PATH):
-    print(f"[X] FATAL: crosswalk not found at {CROSSWALK_PATH}")
-    print("    Upload data/synthetic/crosswalk.json from the repo first.")
+CROSSWALK_PATH = next((p for p in CROSSWALK_CANDIDATES if os.path.exists(p)), None)
+if CROSSWALK_PATH is None:
+    print("[X] FATAL: crosswalk.json not found. Looked in:")
+    for p in CROSSWALK_CANDIDATES:
+        print(f"    {p}")
+    print("    Upload data/synthetic/crosswalk.json from the repo to")
+    print("    Files/sql-query-agent/ (next to org_config.yaml).")
     raise SystemExit("Cannot export without the anonymization crosswalk.")
+print(f"Crosswalk file: {CROSSWALK_PATH}")
 
 crosswalk = load_crosswalk(CROSSWALK_PATH)
 replacements = build_replacements(crosswalk)
