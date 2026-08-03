@@ -1,6 +1,10 @@
 """Tests for the generic data-invariant checker (enforcement half of contracts)."""
 
-from src.invariants import check_all_invariants, check_table_invariants
+from src.invariants import (
+    check_all_invariants,
+    check_table_invariants,
+    check_table_relations,
+)
 
 # A miniature registry exercising every invariant kind.
 REGISTRY = {
@@ -124,6 +128,67 @@ def test_reference_violation_reports_missing_target():
     violations = check_table_invariants("graph_edges", _fetch(data), registry=REGISTRY)
     assert len(violations) == 1
     assert "ghost:1" in violations[0] and "graph_nodes.node_id" in violations[0]
+
+
+RELATION_REGISTRY = {
+    "output_metric_logic": {
+        "table_name": "output_metric_logic",
+        "status": "active",
+        "columns": [("metric_id", "string", False)],
+        "invariants": [],
+        "relations": [
+            {"kind": "count_equals", "other_table": "graph_nodes",
+             "other_where": {"layer": "canonical"}},
+        ],
+    },
+    "graph_nodes": {
+        "table_name": "graph_nodes",
+        "status": "active",
+        "columns": [("node_id", "string", False), ("layer", "string", False)],
+        "invariants": [],
+    },
+}
+
+
+def test_count_equals_relation_passes_when_counts_match():
+    data = {
+        "output_metric_logic": [{"metric_id": "a"}, {"metric_id": "b"}],
+        "graph_nodes": [
+            {"node_id": "c:a", "layer": "canonical"},
+            {"node_id": "c:b", "layer": "canonical"},
+            {"node_id": "t:x", "layer": "technical"},
+        ],
+    }
+    violations = check_table_relations(
+        "output_metric_logic", _fetch(data), lambda t: t in data,
+        registry=RELATION_REGISTRY,
+    )
+    assert violations == []
+
+
+def test_count_equals_relation_reports_mismatch():
+    data = {
+        "output_metric_logic": [{"metric_id": "a"}],
+        "graph_nodes": [
+            {"node_id": "c:a", "layer": "canonical"},
+            {"node_id": "c:b", "layer": "canonical"},
+        ],
+    }
+    violations = check_table_relations(
+        "output_metric_logic", _fetch(data), lambda t: t in data,
+        registry=RELATION_REGISTRY,
+    )
+    assert len(violations) == 1
+    assert "1" in violations[0] and "2" in violations[0]
+
+
+def test_relation_skipped_when_other_table_missing():
+    data = {"output_metric_logic": [{"metric_id": "a"}]}
+    violations = check_table_relations(
+        "output_metric_logic", _fetch(data), lambda t: t in data,
+        registry=RELATION_REGISTRY,
+    )
+    assert violations == []
 
 
 def test_check_all_skips_planned_and_missing_tables():

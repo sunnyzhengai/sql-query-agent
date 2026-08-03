@@ -35,6 +35,11 @@ NOTEBOOK_INDIRECT_WRITES = {
 # connection arguments to instantiate.
 CONFIG_EXTRACTOR_DEFAULTS = {"tracking_table": "ops_extraction_tracking"}
 
+# Notebooks that read via a helper/variable instead of a literal table name.
+NOTEBOOK_INDIRECT_READS = {
+    "02_parse": ["input_sql_sources"],  # via a load helper taking name_or_path
+}
+
 DOMAIN_PREFIXES = {
     "input": ("input_",),
     "operations": ("ops_",),
@@ -87,6 +92,32 @@ def _observed_writers():
 
         for table in tables:
             observed.setdefault(table, set()).add(stem)
+    return observed
+
+
+def _observed_readers():
+    """Scan notebook code for Delta reads: {table_name: set(reader_stems)}.
+
+    Only literal and config-resolved reads are attributed. Variable reads
+    (postcondition-gate fetch lambdas, 06's invariant checker) are
+    cross-cutting validation, not dataflow consumers, and are ignored.
+    """
+    lakehouse_defaults = LakehouseConfig()
+    observed = {}
+    for path in _notebook_files():
+        stem = _stem(path)
+        text = path.read_text()
+
+        tables = re.findall(r'spark\.table\("([A-Za-z_]+)"\)', text)
+        for attr in re.findall(r"spark\.table\(config\.lakehouse\.(\w+)\)", text):
+            tables.append(getattr(lakehouse_defaults, attr))
+        for attr in re.findall(r"spark\.table\(config\.extractor\.(\w+)\)", text):
+            tables.append(CONFIG_EXTRACTOR_DEFAULTS[attr])
+        tables.extend(NOTEBOOK_INDIRECT_READS.get(stem, []))
+
+        for table in tables:
+            if table in TABLE_REGISTRY:
+                observed.setdefault(table, set()).add(stem)
     return observed
 
 
@@ -196,6 +227,40 @@ def test_declared_writers_match_code_ground_truth():
         assert name not in observed, (
             f"{name}: marked 'planned' but notebooks write it — set status active"
         )
+
+
+def test_declared_consumers_match_code_ground_truth():
+    """The read side of the dataflow DAG: every literal/config-resolved read
+    in notebook code must be a declared consumer, and every declared
+    notebook consumer must actually read. Non-notebook consumers
+    (data_agent, admin, adapters) are declared on trust."""
+    observed = _observed_readers()
+    stems = {_stem(p) for p in _notebook_files()}
+
+    for name, contract in _active().items():
+        declared = set(contract.get("consumers", []))
+        declared_stems = {c for c in declared if c in stems}
+        actual = observed.get(name, set())
+        assert actual == declared_stems, (
+            f"{name}: contract declares notebook consumers {sorted(declared_stems)} "
+            f"but code shows readers {sorted(actual)}"
+        )
+
+
+def test_relations_are_well_formed():
+    for name, contract in TABLE_REGISTRY.items():
+        columns = {c[0] for c in contract["columns"]}
+        for rel in contract.get("relations", []):
+            assert rel["kind"] == "count_equals", f"{name}: unknown relation kind"
+            other = rel["other_table"]
+            assert other in TABLE_REGISTRY, f"{name}: relation to unregistered {other}"
+            if rel.get("where"):
+                assert set(rel["where"]) <= columns, f"{name}: relation where on unknown columns"
+            if rel.get("other_where"):
+                other_cols = {c[0] for c in TABLE_REGISTRY[other]["columns"]}
+                assert set(rel["other_where"]) <= other_cols, (
+                    f"{name}: relation other_where on unknown columns of {other}"
+                )
 
 
 def test_column_types_are_convertible():

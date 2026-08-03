@@ -101,6 +101,61 @@ def check_table_invariants(
     return violations
 
 
+def _count(rows: "list[dict]", where: "dict | None") -> int:
+    if not where:
+        return len(rows)
+    return sum(
+        1 for row in rows
+        if all(row.get(col) == val for col, val in where.items())
+    )
+
+
+def check_table_relations(
+    table_name: str,
+    fetch: Fetch,
+    table_exists: Callable[[str], bool],
+    registry: "dict | None" = None,
+) -> "list[str]":
+    """Check a table's declared cross-table relations (flow contracts at the
+    state level). Relations whose counterpart table is absent are skipped —
+    the postcondition gate runs mid-pipeline, before some tables exist.
+
+    Supported kinds:
+      count_equals: rows here (filtered by optional `where`) must equal rows
+        in `other_table` (filtered by optional `other_where`).
+    """
+    registry = registry if registry is not None else TABLE_REGISTRY
+    contract = registry[table_name]
+    violations: "list[str]" = []
+
+    for rel in contract.get("relations", []):
+        if rel["kind"] != "count_equals":
+            violations.append(f"{table_name}: unknown relation kind '{rel['kind']}'")
+            continue
+        other = rel["other_table"]
+        if not table_exists(other):
+            continue
+
+        where = rel.get("where")
+        other_where = rel.get("other_where")
+        self_cols = list(where) if where else [contract["columns"][0][0]]
+        other_cols = (
+            list(other_where) if other_where
+            else [registry[other]["columns"][0][0]]
+        )
+        self_count = _count(fetch(table_name, self_cols), where)
+        other_count = _count(fetch(other, other_cols), other_where)
+        if self_count != other_count:
+            self_desc = f"{table_name}{f' where {where}' if where else ''}"
+            other_desc = f"{other}{f' where {other_where}' if other_where else ''}"
+            violations.append(
+                f"{table_name}: relation violated — {self_desc} has "
+                f"{self_count} rows but {other_desc} has {other_count}"
+            )
+
+    return violations
+
+
 def check_all_invariants(
     fetch: Fetch,
     table_exists: Callable[[str], bool],

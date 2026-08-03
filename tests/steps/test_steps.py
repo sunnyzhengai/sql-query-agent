@@ -94,6 +94,30 @@ class TestPostconditionGate:
         checked = postcondition_gate("02_parse", fetch, lambda t: t in state)
         assert checked == ["ops_parse_successes"]
 
+    def test_gate_enforces_cross_table_relations(self):
+        """04's gate must catch metric_logic drifting from the canonical count."""
+        state = {
+            "output_metric_logic": [
+                {"metric_id": "dbo.A", "metric_name": "A", "description": None,
+                 "steward": None, "developer": None, "transform_count": 1,
+                 "calculation_logic": "x", "source_tables": "t",
+                 "table_descriptions": None},
+            ],
+            "graph_nodes": [
+                {"node_id": "canonical:dbo.A", "layer": "canonical", "name": "A",
+                 "description": None, "properties": "{}"},
+                {"node_id": "canonical:dbo.B", "layer": "canonical", "name": "B",
+                 "description": None, "properties": "{}"},
+            ],
+            "input_sql_sources": [
+                {"metric_id": "dbo.A", "name": "A", "sql": "s", "steward": None,
+                 "developer": None, "source_type": "procedure", "source_schema": "dbo"},
+            ],
+        }
+        fetch = lambda t, cols: [{c: r.get(c) for c in cols} for r in state[t]]
+        with pytest.raises(StepPostconditionError, match="relation violated"):
+            postcondition_gate("04_build_metric_logic", fetch, lambda t: t in state)
+
     def test_gate_raises_on_contract_violation(self):
         state = {"ops_parse_successes": [
             {"metric_id": "a", "name": "a", "cte_count": 1, "table_count": 1, "line_count": 1},

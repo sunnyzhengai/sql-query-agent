@@ -61,7 +61,7 @@ SQL_SOURCES = {
     "utility_writers": ["load_sql_files", "extract_views"],
     "write_mode": "overwrite",
     "enrichers": [],
-    "consumers": ["02_parse", "06_validate"],
+    "consumers": ["01_install", "02_parse", "06_validate"],
     "columns": [
         ("metric_id", "string", False),
         ("name", "string", False),
@@ -99,7 +99,7 @@ DICT_TABLES = {
     "utility_writers": ["load_clarity_dictionary", "load_caboodle_dictionary"],
     "write_mode": "overwrite",
     "enrichers": [],
-    "consumers": ["01_install", "03_build_graph", "06_validate"],
+    "consumers": ["01_install", "03_build_graph", "06_validate", "load_caboodle_dictionary"],
     "columns": [
         ("TABLE_NAME", "string", False),
         ("DESCRIPTION", "string", True),
@@ -128,7 +128,7 @@ DICT_COLUMNS = {
     "utility_writers": ["load_clarity_dictionary", "load_caboodle_dictionary"],
     "write_mode": "overwrite",
     "enrichers": [],
-    "consumers": ["03_build_graph"],
+    "consumers": ["01_install", "03_build_graph", "load_caboodle_dictionary"],
     "columns": [
         ("TABLE_NAME", "string", False),
         ("COLUMN_NAME", "string", False),
@@ -202,7 +202,7 @@ PARSE_ERRORS = {
     "owner": {"notebook": "02_parse", "module": "src/parser/error_classifier.py"},
     "write_mode": "overwrite",
     "enrichers": [],
-    "consumers": ["06_validate", "data_agent"],
+    "consumers": ["06_validate", "verify_graph", "data_agent"],
     "columns": [
         ("metric_id", "string", False),
         ("name", "string", False),
@@ -238,7 +238,7 @@ PARSE_SUCCESSES = {
     "owner": {"notebook": "02_parse", "module": "src/parser/sql_parser.py"},
     "write_mode": "overwrite",
     "enrichers": [],
-    "consumers": ["06_validate"],
+    "consumers": ["02_parse", "06_validate", "verify_graph"],
     "columns": [
         ("metric_id", "string", False),
         ("name", "string", False),
@@ -410,7 +410,7 @@ GRAPH_NODES = {
     "enrichers": [],
     "consumers": [
         "04_build_metric_logic", "05_export_graph_tables", "06_validate",
-        "08_publish_collibra", "data_agent",
+        "08_publish_collibra", "manage_stewards", "verify_graph", "data_agent",
     ],
     "columns": [
         ("node_id", "string", False),
@@ -430,6 +430,11 @@ GRAPH_NODES = {
         {"kind": "unique", "columns": ["node_id"]},
         {"kind": "allowed_values", "column": "layer", "values": NODE_LAYERS},
     ],
+    "relations": [
+        # Every parsed metric becomes exactly one canonical node (03's flow contract)
+        {"kind": "count_equals", "where": {"layer": "canonical"},
+         "other_table": "ops_parse_results"},
+    ],
 }
 
 GRAPH_EDGES = {
@@ -446,7 +451,7 @@ GRAPH_EDGES = {
     "enrichers": [],
     "consumers": [
         "04_build_metric_logic", "05_export_graph_tables", "06_validate",
-        "08_publish_collibra", "data_agent",
+        "08_publish_collibra", "verify_graph", "data_agent",
     ],
     "columns": [
         ("source_id", "string", False),
@@ -515,6 +520,11 @@ METRIC_LOGIC = {
         {"kind": "unique", "columns": ["metric_id"]},
         {"kind": "reference", "column": "metric_id", "references": "input_sql_sources.metric_id"},
     ],
+    "relations": [
+        # One agent-facing row per canonical node (04's flow contract)
+        {"kind": "count_equals",
+         "other_table": "graph_nodes", "other_where": {"layer": "canonical"}},
+    ],
 }
 
 
@@ -548,6 +558,11 @@ GRAPH_CANONICAL = {
     },
     "invariants": [
         {"kind": "unique", "columns": ["nodeId"]},
+    ],
+    "relations": [
+        # LPG export must carry every canonical node (05's flow contract)
+        {"kind": "count_equals",
+         "other_table": "graph_nodes", "other_where": {"layer": "canonical"}},
     ],
 }
 
@@ -763,7 +778,7 @@ ERROR_LOG = {
     "owner": {"notebook": "02_parse", "module": "src/governance/error_log.py"},
     "write_mode": "append",
     "enrichers": [],
-    "consumers": ["admin"],
+    "consumers": ["02_parse", "admin"],
     "columns": [
         ("run_id", "string", False),
         ("run_timestamp", "string", False),
@@ -846,7 +861,7 @@ TRACKING = {
     "owner": {"notebook": "extract_views", "module": "src/extractor/tracker.py"},
     "write_mode": "overwrite",
     "enrichers": [],
-    "consumers": ["extract_views (change detection on next run)"],
+    "consumers": ["extract_views"],
     "columns": [
         ("object_name", "string", False),
         ("object_type", "string", False),
@@ -905,7 +920,7 @@ STEWARD_ASSIGNMENTS = {
     "owner": {"notebook": "manage_stewards", "module": "src/governance/steward.py"},
     "write_mode": "overwrite",
     "enrichers": [],
-    "consumers": ["03_build_graph"],
+    "consumers": ["03_build_graph", "manage_stewards"],
     "columns": [
         ("metric_id", "string", False),
         ("metric_name", "string", False),

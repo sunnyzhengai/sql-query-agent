@@ -6,6 +6,7 @@ sandboxes.** Everything else is safe to share.
 
 ## Architecture (public)
 - [ARCHITECTURE.md](architecture/ARCHITECTURE.md) — Three-layer graph model, module map, data flow, deployment models
+- [PIPELINE_MAP.md](architecture/PIPELINE_MAP.md) — **Generated** dataflow DAG projected from the data contracts (do not edit; `python scripts/generate_docs.py`)
 - [USER_FLOW.md](architecture/USER_FLOW.md) — End-to-end question flow (Path A/B, flywheel, row-level security, dual delivery)
 
 ## Decision Records (public)

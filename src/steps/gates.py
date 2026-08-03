@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from typing import Callable
 
-from src.invariants import Fetch, check_table_invariants
+from src.invariants import Fetch, check_table_invariants, check_table_relations
 from src.schemas import TABLE_REGISTRY
 
 
@@ -55,6 +55,9 @@ def postcondition_gate(
             continue
         checked.append(table)
         violations.extend(check_table_invariants(table, fetch, registry=registry))
+        violations.extend(
+            check_table_relations(table, fetch, table_exists, registry=registry)
+        )
 
     if violations:
         raise StepPostconditionError(

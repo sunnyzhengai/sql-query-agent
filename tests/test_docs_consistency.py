@@ -62,6 +62,23 @@ def test_docs_agree_with_code_on_config_location():
     assert not offenders, f"docs claim config/ subfolder location: {offenders}"
 
 
+def test_pipeline_map_is_freshly_generated():
+    """The generated-tier check: regenerating must produce zero diff.
+    If this fails, run: python scripts/generate_docs.py"""
+    import importlib.util
+
+    spec = importlib.util.spec_from_file_location(
+        "generate_docs", REPO_ROOT / "scripts" / "generate_docs.py"
+    )
+    gen = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(gen)
+
+    on_disk = (REPO_ROOT / "docs" / "architecture" / "PIPELINE_MAP.md").read_text()
+    assert on_disk == gen.build_pipeline_map(), (
+        "PIPELINE_MAP.md is stale — run: python scripts/generate_docs.py"
+    )
+
+
 def test_install_guide_does_not_hardcode_package_version():
     guide = INSTALL_GUIDE.read_text()
     assert not re.search(r"sql_query_agent-\d+\.\d+\.\d+", guide), (
