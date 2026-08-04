@@ -315,6 +315,12 @@ needed, a design pass. Do not resolve casually — these are product decisions.
       CREATE INDEX; 0/56 queries then parse). Discovered on first dev CI run
       2026-08-03. Fallback goldens are local-only until diagnosed; production
       parsing (ScriptDom) is unaffected and CI-covered via recorded fixtures.
+- [ ] **Count-oracle agent evals** — extend devtools/grounding_evals.py with
+      count-assertion cases generated from certified fixtures (readers-of-table,
+      tables-of-metric, columns-of-table counts) and run against the published
+      agents via FabricAgentBackend. Counts are cheap oracles: they catch
+      silent-undercount defects (e.g. the 2026-08-04 shallow-traversal bug,
+      5/13 readers) that prose-level evals cannot see.
 - [ ] **Delta vs Graph rematch** — rerun the backend comparison once
       contracts are enforced in production and the dimension layer is live;
       the original experiment compared curated Delta (metric_logic) against
