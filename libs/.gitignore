@@ -1,1 +1,5 @@
+# ScriptDom DLL is deliberately tracked: MIT-licensed (github.com/microsoft/SqlScriptDOM)
+# and this exact binary is the one the parse validation and recorded fixtures came from.
+!Microsoft.SqlServer.TransactSql.ScriptDom.dll
 *.dll
+!Microsoft.SqlServer.TransactSql.ScriptDom.dll
