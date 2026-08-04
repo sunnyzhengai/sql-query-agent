@@ -53,7 +53,7 @@ Corpus: 28 metrics across two schemas; bare names COLLIDE for 2 pairs
 
 **Round 2 defect log (live):**
 - Case-sensitive keyword match — both agents, identical — patched in both instruction files ✓
-- Silent truncation presented as complete — graph agent, twice (11/29 tables; 5/13 metrics) — completeness rule added; tool-layer cap under diagnosis
+- Silent undercount presented as complete — graph agent, twice (11/29 tables; 5/13 metrics) — ROOT CAUSE FOUND by local reproduction: instructions taught single-hop CALCULATED_BY->READS_FROM, but CALCULATED_BY reaches only root CTEs; full calculation is the DEPENDS_ON transitive closure. Shallow pattern reproduces the agent's answers exactly (5==5 readers, 12~=11 tables). Fix: depth-semantics rules + variable-length DEPENDS_ON{0,50} patterns in instructions. Writeup insight: schema descriptions for NL2GQL must teach which edges are TRANSITIVE, or LLMs default to shallow patterns
 - Same-name-two-schemas collapse — graph agent listings — metricId added to LPG export (1.2.2, pending re-Load)
 - Vocabulary refusal on real Epic names (PAT_ENC_HSP) — CORRECT behavior; dev graph speaks anonymized names
 
