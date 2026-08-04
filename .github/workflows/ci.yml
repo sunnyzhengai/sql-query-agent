@@ -32,27 +32,6 @@ jobs:
         run: |
           ruff check src/ tests/
 
-      - name: TEMP debug golden parse divergence
-        run: |
-          python -c "
-          import logging
-          logging.basicConfig(level=logging.INFO)
-          sql = open('data/synthetic/sql/reporting/USP_IP_SEPSIS.sql', encoding='utf-8-sig').read()
-          from src.parser.sql_extractor import extract_queries
-          queries = extract_queries(sql)
-          print('SPLIT: extract_queries ->', len(queries), 'queries')
-          for q in queries[:3]:
-              print('  q:', repr(q[:70]))
-          import importlib.util
-          print('sqlglotrs installed:', importlib.util.find_spec('sqlglotrs') is not None)
-          import sqlglot
-          try:
-              sqlglot.parse_one(queries[0], read='tsql')
-              print('q0 parses OK')
-          except Exception as e:
-              print('q0 FAILS:', type(e).__name__, repr(str(e)[:200]))
-          "
-
       - name: Run tests
         run: |
           pytest tests/ -v --tb=short
