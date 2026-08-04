@@ -30,6 +30,33 @@ good grounding rules, NL-to-traversal should be easier and more accurate.
   - `MATCH ()-[r:HAS_COLUMN]->() RETURN count(r) AS column_edges` == 05
 - [ ] Both agents draft-published with current instructions
 
+## Round 2 — Dev-corpus answer key (ANONYMIZED names — the graph does not know Epic names like PAT_ENC_HSP!)
+
+Certified truth computed from tests/fixtures/recorded/ on 2026-08-04.
+Corpus: 28 metrics across two schemas; bare names COLLIDE for 2 pairs
+(USP_ED_Sepsis, USP_IP_SEPSIS exist in both `reporting.` and `reports.`).
+
+| # | Question (paste verbatim) | Expected answer |
+|---|---|---|
+| 1 | How is reports.USP_Severe_Sepsis calculated, and which tables does it use? | 32 tables, incl. ADT_EVENTS, CLINICAL_NOTES, DIAGNOSES, HOSPITAL_ENCOUNTERS… |
+| 2 | How is reporting.USP_IP_SepsisDetails calculated, and which tables does it use? | 19 tables, incl. FLOWSHEET_RECORDS, GROUPER_COMPILED_LIST, HOSPITAL_ENCOUNTERS… |
+| 3 | Which tables does USP_ED_Sepsis use? | AMBIGUITY TRAP: two metrics! reports.=29 tables, reporting.=38. A good answer flags both or asks which |
+| 4 | Which metrics read from the HOSPITAL_ENCOUNTERS table? | **13**: reporting.{USP_ED_Sepsis, USP_IP_SEPSIS, USP_IP_SepsisDetails, USP_IP_SepsisEncounters, USP_IP_SepsisScreeningAudit, USP_IP_SepsisShiftCompliance} + reports.{USP_ED_Sepsis, USP_IP_SEPSIS, USP_IP_SEPSIS_COMPLIANCE, USP_IP_SEPSIS_COMPLIANCE_BY_SHIFT_NURSES, USP_IP_SEPSIS_REPORT, USP_NonSevere_Sepsis, USP_Severe_Sepsis} |
+| 4b | Which metrics read from the MEDICATION_ORDERS table? | **7** (both ED_Sepsis, reporting.USP_IP_SepsisDetails, reports.{USP_IP_SEPSIS, USP_IP_SEPSIS_REPORT, USP_NonSevere_Sepsis, USP_Severe_Sepsis}) |
+| 5 | What other metrics share source tables with reports.USP_ED_Sepsis? | **14** metrics share ≥1 table; top: reporting.USP_ED_Sepsis (24 shared), reports.USP_IP_SEPSIS_REPORT (17), reports.USP_IP_SEPSIS (15), reports.USP_Severe_Sepsis (12) |
+| 6 | Which columns of the HOSPITAL_ENCOUNTERS table are in our dictionary? | **133** columns (ACCOMMODATION_C, ACUITY_LEVEL_C, ADMISSION_PROV_ID, …) — expect count + sample, not a wall |
+| 7 | Which metric reads the most tables? | reporting.USP_ED_Sepsis (**38**), then reports.USP_Severe_Sepsis (32), reports.USP_ED_Sepsis (29) |
+| 8 | How is the metric FAKE_METRIC_XYZ calculated? | Refusal |
+| 9 | What is the average unicorn readmission velocity? | Refusal |
+
+**Diagnostic probe (truncation):** "How many metrics read from HOSPITAL_ENCOUNTERS? Exact count first, then the full list." Count=13 but short list ⇒ tool-layer row cap (platform); count=5 ⇒ LIMIT in generated query (instruction-fixable).
+
+**Round 2 defect log (live):**
+- Case-sensitive keyword match — both agents, identical — patched in both instruction files ✓
+- Silent truncation presented as complete — graph agent, twice (11/29 tables; 5/13 metrics) — completeness rule added; tool-layer cap under diagnosis
+- Same-name-two-schemas collapse — graph agent listings — metricId added to LPG export (1.2.2, pending re-Load)
+- Vocabulary refusal on real Epic names (PAT_ENC_HSP) — CORRECT behavior; dev graph speaks anonymized names
+
 ## Question set — ask both agents, same order, same wording
 
 | # | Question | Type |
