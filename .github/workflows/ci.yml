@@ -43,9 +43,14 @@ jobs:
           print('SPLIT: extract_queries ->', len(queries), 'queries')
           for q in queries[:3]:
               print('  q:', repr(q[:70]))
-          from src.parser.sql_parser import parse_sql
-          parsed = parse_sql(sql)
-          print('FULL: parse_sql ->', len(parsed.ctes), 'CTEs')
+          import importlib.util
+          print('sqlglotrs installed:', importlib.util.find_spec('sqlglotrs') is not None)
+          import sqlglot
+          try:
+              sqlglot.parse_one(queries[0], read='tsql')
+              print('q0 parses OK')
+          except Exception as e:
+              print('q0 FAILS:', type(e).__name__, repr(str(e)[:200]))
           "
 
       - name: Run tests
