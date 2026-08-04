@@ -35,15 +35,17 @@ jobs:
       - name: TEMP debug golden parse divergence
         run: |
           python -c "
-          import sqlglot, sqlparse, sys
-          print('py', sys.version)
-          print('sqlglot', sqlglot.__version__, 'sqlparse', sqlparse.__version__)
-          raw = open('data/synthetic/sql/reporting/USP_IP_SEPSIS.sql', 'rb').read()
-          print('bytes', len(raw), 'CR count', raw.count(b'\r'), 'first60', raw[:60])
+          import logging
+          logging.basicConfig(level=logging.INFO)
+          sql = open('data/synthetic/sql/reporting/USP_IP_SEPSIS.sql', encoding='utf-8-sig').read()
+          from src.parser.sql_extractor import extract_queries
+          queries = extract_queries(sql)
+          print('SPLIT: extract_queries ->', len(queries), 'queries')
+          for q in queries[:3]:
+              print('  q:', repr(q[:70]))
           from src.parser.sql_parser import parse_sql
-          parsed = parse_sql(raw.decode('utf-8-sig'))
-          print('CTE count:', len(parsed.ctes))
-          print('cte names first 5:', [c.name for c in parsed.ctes[:5]])
+          parsed = parse_sql(sql)
+          print('FULL: parse_sql ->', len(parsed.ctes), 'CTEs')
           "
 
       - name: Run tests
