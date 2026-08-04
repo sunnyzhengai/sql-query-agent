@@ -309,6 +309,12 @@ needed, a design pass. Do not resolve casually — these are product decisions.
       the 02→03 boundary, but wiring add_dimension_node needs two decisions:
       which columns qualify as dimensions (WHERE/GROUP BY filters?), and
       alias resolution (refs carry aliases like 'e', not table names).
+- [ ] **Fallback splitter environment divergence** — identical bytes, Python
+      version, sqlparse and sqlglot versions produce different statement
+      boundaries on GitHub runners vs macOS (SELECT INTO absorbs a following
+      CREATE INDEX; 0/56 queries then parse). Discovered on first dev CI run
+      2026-08-03. Fallback goldens are local-only until diagnosed; production
+      parsing (ScriptDom) is unaffected and CI-covered via recorded fixtures.
 - [ ] **Delta vs Graph rematch** — rerun the backend comparison once
       contracts are enforced in production and the dimension layer is live;
       the original experiment compared curated Delta (metric_logic) against
