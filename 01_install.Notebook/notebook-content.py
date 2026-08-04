@@ -351,7 +351,7 @@ try:
     errors_df = spark.createDataFrame(ERROR_SEEDS, schema=to_spark_schema(INSTALLATION_ERRORS))
     errors_df.write.format("delta").mode("overwrite").option("overwriteSchema", "true") \
         .saveAsTable("ops_installation_errors")
-    print(f"[+] Seeded {len(error_rows)} known error signatures into ops_installation_errors")
+    print(f"[+] Seeded {len(ERROR_SEEDS)} known error signatures into ops_installation_errors")
 except Exception as e:
     print(f"[!] WARNING: Could not seed installation errors: {e}")
     print("    The /troubleshoot command may not work. Non-blocking.")
