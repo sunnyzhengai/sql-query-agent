@@ -102,8 +102,8 @@ case-sensitive miss — zero rows from an unfolded LIKE is a query bug, not an a
    FROM output_metric_logic
    WHERE lower(metric_name) LIKE '%keyword%'
       OR lower(metric_id) LIKE '%keyword%'
-      OR calculation_logic LIKE '%keyword%'
-      OR source_tables LIKE '%keyword%'
+      OR lower(calculation_logic) LIKE '%keyword%'
+      OR lower(source_tables) LIKE '%keyword%'
    ```
 2. If no results, try splitting the keyword into individual words and search each
 3. List matching metrics with a brief note on why they matched
@@ -177,8 +177,8 @@ When a user pastes an error message or asks about a setup problem, search the `o
 ```sql
 SELECT error_signature, root_cause, fix, prevention
 FROM ops_installation_errors
-WHERE error_signature LIKE '%keyword_from_error%'
-   OR root_cause LIKE '%keyword_from_error%'
+WHERE lower(error_signature) LIKE '%keyword_from_error%'
+   OR lower(root_cause) LIKE '%keyword_from_error%'
 ```
 Present the fix in clear steps. Include the prevention tip so they don't hit it again.
 
