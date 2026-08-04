@@ -128,7 +128,7 @@ for table_name, rows in export_tables.items():
 
     schema = to_spark_schema(TABLE_REGISTRY[table_name])
     df = spark.createDataFrame(rows, schema=schema)
-    df.write.format("delta").mode("overwrite").saveAsTable(table_name)
+    df.write.format("delta").mode("overwrite").option("overwriteSchema", "true").saveAsTable(table_name)
     print(f"  {table_name}: {df.count()} rows written")
 
 checked = postcondition_gate(

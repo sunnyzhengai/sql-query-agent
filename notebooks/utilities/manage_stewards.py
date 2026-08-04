@@ -77,7 +77,8 @@ if len(unassigned) > 15:
 records = manager.to_records()
 if records:
     df = spark.createDataFrame(records, schema=to_spark_schema(STEWARD_ASSIGNMENTS))
-    df.write.format("delta").mode("overwrite").saveAsTable("gov_steward_assignments")
+    df.write.format("delta").mode("overwrite").option("overwriteSchema", "true") \
+        .saveAsTable("gov_steward_assignments")
     print(f"Saved {len(records)} assignments to gov_steward_assignments")
     print("\nRe-run 03_build_graph → 04_build_metric_logic to apply them to the")
     print("graph and the agent's metric_logic table.")

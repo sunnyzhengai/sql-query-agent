@@ -177,7 +177,8 @@ summary_df = spark.createDataFrame(summary_rows, schema=to_spark_schema(BUILD_SU
 try:
     summary_df.write.format("delta").mode("append").saveAsTable("ops_build_summary")
 except Exception:
-    summary_df.write.format("delta").mode("overwrite").saveAsTable("ops_build_summary")
+    summary_df.write.format("delta").mode("overwrite").option("overwriteSchema", "true") \
+        .saveAsTable("ops_build_summary")
 print(f"Saved build summary")
 
 

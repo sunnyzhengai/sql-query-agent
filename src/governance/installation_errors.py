@@ -177,6 +177,25 @@ ERROR_SEEDS = [
         "first_seen": "2026-08-02",
     },
     {
+        "error_signature": "A schema mismatch detected when writing to the Delta table",
+        "error_category": "delta_schema_mismatch_on_upgrade",
+        "root_cause": (
+            "A product upgrade evolved a table contract (e.g. 1.2.2 added metricId to "
+            "graph_canonical), but the existing Delta table still has the old schema and "
+            "the notebook write lacked overwriteSchema."
+        ),
+        "fix": (
+            "Snapshot tables are fully regenerated each run, so schema follows the contract: "
+            "add .option('overwriteSchema', 'true') to the overwrite write and re-run the "
+            "notebook (fixed in all pipeline notebooks as of 1.2.2)."
+        ),
+        "prevention": (
+            "Every mode('overwrite') write of a registry-schema'd table carries "
+            "overwriteSchema so contract evolution applies cleanly on upgrade."
+        ),
+        "first_seen": "2026-08-04",
+    },
+    {
         "error_signature": "Set as default lakehouse.*grayed out",
         "error_category": "lakehouse_default_issue",
         "root_cause": "Lakehouse moved from another workspace retains stale metadata.",

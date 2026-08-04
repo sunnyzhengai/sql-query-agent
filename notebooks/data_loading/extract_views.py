@@ -124,7 +124,8 @@ tracking_rows = [
 ]
 
 tracking_df = spark.createDataFrame(tracking_rows, schema=tracking_schema)  # noqa: F821
-tracking_df.write.format("delta").mode("overwrite").saveAsTable(config.extractor.tracking_table)
+tracking_df.write.format("delta").mode("overwrite").option("overwriteSchema", "true") \
+    .saveAsTable(config.extractor.tracking_table)
 print(f"Updated tracking table: {len(result.tracking_records)} records")
 
 # %% Cell 8: Summary

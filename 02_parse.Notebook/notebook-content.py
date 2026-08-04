@@ -200,7 +200,8 @@ if out.parse_errors:
 
 if out.parse_successes:
     spark.createDataFrame(out.parse_successes, schema=to_spark_schema(PARSE_SUCCESSES)) \
-        .write.format("delta").mode("overwrite").saveAsTable("ops_parse_successes")
+        .write.format("delta").mode("overwrite").option("overwriteSchema", "true") \
+        .saveAsTable("ops_parse_successes")
     print(f"Saved {len(out.parse_successes)} parse successes to ops_parse_successes")
 
 if out.error_log.current_run:
