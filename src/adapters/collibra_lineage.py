@@ -13,7 +13,6 @@ Usage:
 from __future__ import annotations
 
 import requests
-from typing import Any
 
 
 class CollibraClient:
@@ -204,7 +203,7 @@ class CollibraClient:
                 direction = "→" if source.get("id") == sample["id"] else "←"
                 other = target if direction == "→" else source
                 print(f"   {direction} {rel_type.get('role', 'unknown')} "
-                      f"[{rel_type.get('sourceType', {}).get('name', '?')} → {rel_type.get('targetType', {}).get('name', '?')}]")
+                      f"[{rel_type.get('sourceType', {}).get('name', '?')} → {rel_type.get('targetType', {}).get('name', '?')}]")  # noqa: E501
                 print(f"     Other asset: {other.get('name', '?')} (Type: {other.get('type', {}).get('name', '?')})")
         else:
             print("   No relations found")

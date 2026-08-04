@@ -4,7 +4,7 @@ __pycache__/
 *$py.class
 *.egg-info/
 src/*.egg-info/
-dist/
+dist/*
 !dist/*.whl
 build/
 *.egg

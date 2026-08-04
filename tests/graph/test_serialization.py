@@ -3,10 +3,14 @@
 import json
 
 from src.graph.serialization import (
-    rows_to_nodes, rows_to_edges, nodes_to_rows, edges_to_rows,
-    parse_result_to_parsed_sql, parsed_sql_to_parse_result_row,
+    edges_to_rows,
+    nodes_to_rows,
+    parse_result_to_parsed_sql,
+    parsed_sql_to_parse_result_row,
+    rows_to_edges,
+    rows_to_nodes,
 )
-from src.models import NodeLayer, EdgeType
+from src.models import EdgeType, NodeLayer
 from src.parser.sql_parser import parse_sql
 from src.schemas import PARSE_RESULTS
 

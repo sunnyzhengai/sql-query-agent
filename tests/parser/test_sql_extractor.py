@@ -11,9 +11,8 @@ Test categories:
 - Edge cases: CASE expressions, subqueries, string literals, comments
 """
 
-import pytest
 
-from src.parser.sql_extractor import extract_queries, extract_select_statements
+from src.parser.sql_extractor import extract_queries
 from src.parser.sql_parser import parse_sql
 
 

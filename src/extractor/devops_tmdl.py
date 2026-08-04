@@ -112,7 +112,6 @@ def parse_tmdl_partition(tmdl_content: str, table_name: str) -> SqlSource | None
         source.schema = schema_match.group(1)
 
     # Extract object name and type
-    obj_match = re.search(r'\[Name="([^"]+)",\s*Kind="(\w+)"\](?!\[Data\]\s*,)', m_expr)
     # Get the LAST Kind match (the actual object, not intermediate navigation)
     obj_matches = re.findall(r'\[Name="([^"]+)",\s*Kind="(\w+)"\]', m_expr)
     if obj_matches:

@@ -1,6 +1,5 @@
 """Tests for Collibra lineage matching — proc/view → PBI report."""
 
-import pytest
 
 from src.adapters.collibra_lineage_match import (
     extract_match_key,

@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from devtools.grounding_evals import EvalCase, build_eval_cases, run_evals
+from devtools.grounding_evals import build_eval_cases, run_evals
 from src.agent_backend import ReplayBackend
 
 REPO_ROOT = Path(__file__).resolve().parent.parent

@@ -12,7 +12,6 @@ Run with: pytest tests/golden/test_parse_goldens.py -v
 """
 
 import json
-import os
 from pathlib import Path
 
 import pytest

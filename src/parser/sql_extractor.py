@@ -23,6 +23,7 @@ from typing import Any
 
 import sqlparse
 from sqlparse import tokens as T  # noqa: N812
+from sqlparse.sql import Statement
 
 logger = logging.getLogger(__name__)
 
@@ -225,9 +226,6 @@ def _is_query_statement(stmt: Statement, stmt_text: str) -> bool:
 
     # Everything else is noise
     return False
-
-    logger.info("Extracted %d queries from input (%d chars)", len(extracted), len(raw_text))
-    return extracted
 
 
 def extract_select_statements(raw_text: str) -> str:

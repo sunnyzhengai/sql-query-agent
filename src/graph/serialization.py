@@ -8,7 +8,6 @@ need to serialize them back to Delta-compatible rows.
 from __future__ import annotations
 
 import json
-from typing import Any
 
 from src.models import EdgeType, GraphEdge, GraphNode, NodeLayer
 from src.parser.sql_parser import ColumnRef, CTEInfo, ParsedSQL, TableRef

@@ -1,12 +1,10 @@
 """Tests for TMDL parser — extracts SQL sources and DAX expressions."""
 
-import pytest
 
 from src.extractor.devops_tmdl import (
-    parse_tmdl_partition,
     parse_tmdl_dax,
+    parse_tmdl_partition,
 )
-
 
 ODBC_TMDL = """table Claims
     lineageTag: abc123

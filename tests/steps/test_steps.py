@@ -7,7 +7,9 @@ sample data — the offline execution slice 1 exists to enable.
 import pytest
 
 from scripts.seed_sample_data import (
-    SAMPLE_DICT_COLUMNS, SAMPLE_DICT_TABLES, SAMPLE_SQL_SOURCES,
+    SAMPLE_DICT_COLUMNS,
+    SAMPLE_DICT_TABLES,
+    SAMPLE_SQL_SOURCES,
 )
 from src.parser.sql_parser import parse_sql
 from src.steps.build_graph import build_graph_step
@@ -90,7 +92,8 @@ class TestPostconditionGate:
         state = {"ops_parse_successes": [{"metric_id": "a", "name": "a",
                                           "cte_count": 1, "table_count": 1,
                                           "line_count": 1}]}
-        fetch = lambda t, cols: [{c: r.get(c) for c in cols} for r in state[t]]
+        def fetch(t, cols):
+            return [{c: r.get(c) for c in cols} for r in state[t]]
         checked = postcondition_gate("02_parse", fetch, lambda t: t in state)
         assert checked == ["ops_parse_successes"]
 
@@ -114,7 +117,8 @@ class TestPostconditionGate:
                  "developer": None, "source_type": "procedure", "source_schema": "dbo"},
             ],
         }
-        fetch = lambda t, cols: [{c: r.get(c) for c in cols} for r in state[t]]
+        def fetch(t, cols):
+            return [{c: r.get(c) for c in cols} for r in state[t]]
         with pytest.raises(StepPostconditionError, match="relation violated"):
             postcondition_gate("04_build_metric_logic", fetch, lambda t: t in state)
 
@@ -123,7 +127,8 @@ class TestPostconditionGate:
             {"metric_id": "a", "name": "a", "cte_count": 1, "table_count": 1, "line_count": 1},
             {"metric_id": "a", "name": "a", "cte_count": 1, "table_count": 1, "line_count": 1},
         ]}
-        fetch = lambda t, cols: [{c: r.get(c) for c in cols} for r in state[t]]
+        def fetch(t, cols):
+            return [{c: r.get(c) for c in cols} for r in state[t]]
         with pytest.raises(StepPostconditionError, match="unique"):
             postcondition_gate("02_parse", fetch, lambda t: t in state)
 
@@ -132,7 +137,7 @@ class TestReadinessGate:
     def test_blocking_threshold_blocks(self):
         result = readiness_gate(
             {"parse_rate": (0.5, 0.9, True)}, {}, {}, False)
-        assert result.blocked and any("BLOCKED" in l for l in result.lines)
+        assert result.blocked and any("BLOCKED" in line for line in result.lines)
 
     def test_ambiguity_blocks_unless_acknowledged(self):
         ambiguous = {"ENCOUNTER": ["REPORTING", "STAGING"]}

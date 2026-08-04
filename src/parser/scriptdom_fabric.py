@@ -20,8 +20,12 @@ Usage:
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from src.parser.sql_parser import ParsedSQL
+
 import re
-import sys
 
 
 def _walk_for_selects(node, results, _get_text_fn):
@@ -221,8 +225,7 @@ def parse_from_fragment(fragment) -> "ParsedSQL":
     Returns:
         ParsedSQL with CTEs, table refs, column refs, and temp table dependencies.
     """
-    from src.parser.sql_parser import ParsedSQL, CTEInfo, ColumnRef, TableRef
-    from src.parser.sql_parser import normalize_sql_whitespace
+    from src.parser.sql_parser import ColumnRef, CTEInfo, ParsedSQL, TableRef, normalize_sql_whitespace
 
     # Find all SELECT and INSERT...SELECT statements
     stmt_nodes = []
@@ -375,7 +378,6 @@ def load_scriptdom(dll_path: str = "/lakehouse/default/Files/sql-query-agent/lib
         except Exception:
             pass  # Already initialized — safe to continue
 
-        import clr
 
         # Use Assembly.LoadFrom for reliable loading — clr.AddReference fails
         # in some Fabric environments after kernel restart
@@ -410,8 +412,7 @@ def load_scriptdom(dll_path: str = "/lakehouse/default/Files/sql-query-agent/lib
             Returns ParsedSQL with CTEs, table refs, column refs, and
             temp table dependencies — no sqlglot involved.
             """
-            from src.parser.sql_parser import ParsedSQL, CTEInfo, ColumnRef, TableRef
-            from src.parser.sql_parser import normalize_sql_whitespace
+            from src.parser.sql_parser import ColumnRef, CTEInfo, ParsedSQL, TableRef, normalize_sql_whitespace
 
             fragment = _parse_raw(raw_sql)
 
@@ -541,5 +542,5 @@ def load_scriptdom(dll_path: str = "/lakehouse/default/Files/sql-query-agent/lib
 
         return True, extract_with_scriptdom, parse_with_scriptdom
 
-    except Exception as e:
+    except Exception:
         return False, None, None

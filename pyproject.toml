@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "sql-query-agent"
-version = "1.2.0"
+version = "1.2.1"
 description = "SQL Intelligence Agent for Microsoft Fabric. Extract business logic from SQL, build knowledge graphs, answer questions in plain English."
 readme = "README.md"
 requires-python = ">=3.9"
@@ -50,3 +50,7 @@ line-length = 120
 [tool.ruff.lint]
 select = ["E", "F", "I", "N", "W"]
 ignore = ["N818", "N806"]
+
+[tool.ruff.lint.per-file-ignores]
+# TMDL fixture strings must stay byte-exact; long lines are the fixtures
+"tests/adapters/test_devops_tmdl.py" = ["E501"]

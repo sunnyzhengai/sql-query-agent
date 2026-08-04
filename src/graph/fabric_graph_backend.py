@@ -16,7 +16,7 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from src.graph.gql_client import GQLClient, GQLResult
+from src.graph.gql_client import GQLClient
 from src.models import GraphNode, NodeLayer
 
 logger = logging.getLogger(__name__)

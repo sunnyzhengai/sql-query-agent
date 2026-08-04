@@ -10,6 +10,22 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.2.1] - 2026-08-03
+
+### Added
+- Error KB: stale_wheel_version signature (src imports but newer submodule
+  missing — verify wheel version/attachment, restart the session)
+- devtools: local agent stand-in (ask.py), grounding evals with recorded
+  cassette (12/12), .env support — none shipped in the wheel
+- Recorded ScriptDom fixtures (28 metrics) replayed in CI
+
+### Fixed
+- Dead unreachable code in sql_extractor (leftover after refactor)
+- Unused variable in devops_tmdl TMDL parsing
+- Lint clean across src/ and tests/ (ruff)
+
+---
+
 ## [1.2.0] - 2026-08-02
 
 ### Added

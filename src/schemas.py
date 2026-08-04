@@ -34,7 +34,12 @@ Usage in Fabric notebooks:
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from src.models import EdgeType, NodeLayer
+
+if TYPE_CHECKING:
+    from pyspark.sql.types import StructType
 
 # Contract vocabulary — meta-tests validate against these.
 DOMAINS = ("input", "operations", "graph", "lpg_export", "output", "governance")

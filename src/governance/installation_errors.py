@@ -22,7 +22,10 @@ ERROR_SEEDS = [
         "error_signature": "No module named 'Microsoft.SqlServer'",
         "error_category": "dll_not_found",
         "root_cause": "ScriptDom DLL missing from libs/ folder or wrong filename.",
-        "fix": "Upload Microsoft.SqlServer.TransactSql.ScriptDom.dll to Files/sql-query-agent/libs/. Use lib/netstandard2.0/ version from NuGet.",
+        "fix": (
+            "Upload Microsoft.SqlServer.TransactSql.ScriptDom.dll to Files/sql-query-agent/libs/. Use "
+            "lib/netstandard2.0/ version from NuGet."
+        ),
         "prevention": "Verify DLL path during deployment.",
         "first_seen": "2026-07-26",
     },
@@ -54,7 +57,10 @@ ERROR_SEEDS = [
         "error_signature": "TooManyRequestsForCapacity.*430",
         "error_category": "capacity_limit",
         "root_cause": "F2 capacity only supports one Spark session at a time.",
-        "fix": "Wait 2-3 minutes for the previous session to release, then retry. Check Monitoring hub for active sessions.",
+        "fix": (
+            "Wait 2-3 minutes for the previous session to release, then retry. Check Monitoring hub for "
+            "active sessions."
+        ),
         "prevention": "Cancel unused sessions. Consider F4 capacity for concurrent workloads.",
         "first_seen": "2026-07-30",
     },
@@ -62,15 +68,24 @@ ERROR_SEEDS = [
         "error_signature": "TABLE_OR_VIEW_NOT_FOUND",
         "error_category": "table_not_found",
         "root_cause": "Delta table doesn't exist yet, or org_config.yaml has old table names.",
-        "fix": "Run 01_install first to create all tables. Verify org_config.yaml uses domain-prefixed names (input_sql_sources, not sql_sources).",
+        "fix": (
+            "Run 01_install first to create all tables. Verify org_config.yaml uses domain-prefixed "
+            "names (input_sql_sources, not sql_sources)."
+        ),
         "prevention": "Always run 01_install before other notebooks.",
         "first_seen": "2026-07-30",
     },
     {
         "error_signature": "User Aad Token is expired",
         "error_category": "token_expired",
-        "root_cause": "AAD token expires after ~1 hour. mssparkutils caches the token and won't refresh within the same session.",
-        "fix": "Restart the kernel and re-run. For long batch runs, results are saved incrementally so you pick up where you left off.",
+        "root_cause": (
+            "AAD token expires after ~1 hour. mssparkutils caches the token and won't refresh within "
+            "the same session."
+        ),
+        "fix": (
+            "Restart the kernel and re-run. For long batch runs, results are saved incrementally so you "
+            "pick up where you left off."
+        ),
         "prevention": "Design batch operations to save progress incrementally.",
         "first_seen": "2026-07-30",
     },
@@ -78,23 +93,38 @@ ERROR_SEEDS = [
         "error_signature": "Git_GitProviderCredentialsNotAuthorizedError",
         "error_category": "git_auth_failure",
         "root_cause": "Fabric GitHub OAuth doesn't have write access to the repository.",
-        "fix": "Revoke and re-authorize: GitHub Settings -> Applications -> find Microsoft Fabric -> grant repo access. Or use a GitHub Personal Access Token with repo scope.",
+        "fix": (
+            "Revoke and re-authorize: GitHub Settings -> Applications -> find Microsoft Fabric -> grant "
+            "repo access. Or use a GitHub Personal Access Token with repo scope."
+        ),
         "prevention": "Verify Git write access before connecting workspace.",
         "first_seen": "2026-07-31",
     },
     {
         "error_signature": "duplicate filenames",
         "error_category": "duplicate_sql_files",
-        "root_cause": "SQL files from different schemas have the same filename, causing overwrites in flat upload folder.",
-        "fix": "Add a prefix to distinguish files from different schemas (e.g., RPT_USP_xxx.sql, ETL_USP_xxx.sql). Or use subfolders.",
+        "root_cause": (
+            "SQL files from different schemas have the same filename, causing overwrites in flat upload "
+            "folder."
+        ),
+        "fix": (
+            "Add a prefix to distinguish files from different schemas (e.g., RPT_USP_xxx.sql, "
+            "ETL_USP_xxx.sql). Or use subfolders."
+        ),
         "prevention": "Check for duplicate filenames before uploading.",
         "first_seen": "2026-07-30",
     },
     {
         "error_signature": "duplicate metric identities",
         "error_category": "duplicate_metric_identity",
-        "root_cause": "Two or more SQL files define the same [schema].[object]. The installer blocks because each metric must have exactly one certified definition.",
-        "fix": "Remove or rename the extra file(s) listed in the installer output. If both versions are genuinely needed, they are different metrics and need different object names.",
+        "root_cause": (
+            "Two or more SQL files define the same [schema].[object]. The installer blocks because each "
+            "metric must have exactly one certified definition."
+        ),
+        "fix": (
+            "Remove or rename the extra file(s) listed in the installer output. If both versions are "
+            "genuinely needed, they are different metrics and need different object names."
+        ),
         "prevention": "Ensure each [schema].[procedure or view] is defined by exactly one file before uploading.",
         "first_seen": "2026-08-02",
     },
@@ -109,9 +139,21 @@ ERROR_SEEDS = [
     {
         "error_signature": "No module named 'src.",
         "error_category": "stale_wheel_version",
-        "root_cause": "The Spark session is running an older product wheel: either an old .whl is still in the Environment, the notebook is attached to a different Environment, or the session started before the new wheel finished publishing. (src imports but a newer submodule is missing.)",
-        "fix": "Verify the Environment's Custom libraries show exactly one sql_query_agent wheel at the expected version and status is Published; verify the notebook's Environment dropdown selects it; then STOP the Spark session and re-run — sessions bind the Environment at start. Check with: importlib.metadata.version('sql-query-agent').",
-        "prevention": "After every wheel update: remove the old wheel, publish, confirm the version, and restart any running sessions before re-running notebooks.",
+        "root_cause": (
+            "The Spark session is running an older product wheel: either an old .whl is still in the "
+            "Environment, the notebook is attached to a different Environment, or the session started "
+            "before the new wheel finished publishing. (src imports but a newer submodule is missing.)"
+        ),
+        "fix": (
+            "Verify the Environment's Custom libraries show exactly one sql_query_agent wheel at the "
+            "expected version and status is Published; verify the notebook's Environment dropdown "
+            "selects it; then STOP the Spark session and re-run — sessions bind the Environment at "
+            "start. Check with: importlib.metadata.version('sql-query-agent')."
+        ),
+        "prevention": (
+            "After every wheel update: remove the old wheel, publish, confirm the version, and restart "
+            "any running sessions before re-running notebooks."
+        ),
         "first_seen": "2026-08-02",
     },
     {

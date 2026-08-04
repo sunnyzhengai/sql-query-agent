@@ -1,6 +1,6 @@
 """Unit tests for SQL parser — deterministic: SQL in -> structured output."""
 
-from src.parser.sql_parser import parse_sql, parse_extracted_queries
+from src.parser.sql_parser import parse_extracted_queries, parse_sql
 
 
 class TestParseCTEs:
@@ -99,12 +99,12 @@ class TestParseExtractedQueries:
             "SELECT col1, col2 into #lab FROM ORDER_PROC_3 LEFT JOIN CLARITY_DEP dep ON dep.ID = 1",
             "SELECT ORDER_ID, min(SCANNED) as Compliant into #lab_compliant_by_dept from #lab group by ORDER_ID",
             "SELECT ORDER_ID, USER_ID into #lab_compliant_by_user from #lab group by ORDER_ID, USER_ID",
-            "SELECT med.ID, dep.NAME into #blood_and_meds FROM HEP_SUM_MED_ADMIN med LEFT JOIN CLARITY_DEP dep ON med.DEPT_ID = dep.ID",
-            "SELECT ID as Order_ID, case when SCANNED=1 then 1 else 0 end as Compliant into #blood_meds_compliant from #blood_and_meds",
+            "SELECT med.ID, dep.NAME into #blood_and_meds FROM HEP_SUM_MED_ADMIN med LEFT JOIN CLARITY_DEP dep ON med.DEPT_ID = dep.ID",  # noqa: E501
+            "SELECT ID as Order_ID, case when SCANNED=1 then 1 else 0 end as Compliant into #blood_meds_compliant from #blood_and_meds",  # noqa: E501
             "SELECT Order_ID, Compliant into #blood_meds_compliant_by_dept from #blood_meds_compliant",
             "SELECT Order_ID, Compliant into #blood_meds_compliant_by_user from #blood_meds_compliant",
-            "SELECT AREA, COUNT(*) as cnt into #dep_summary from (select * from #lab_compliant_by_dept union all select * from #blood_meds_compliant_by_dept) a group by AREA",
-            "SELECT USER_ID, COUNT(*) as cnt into #user_summary from (select * from #lab_compliant_by_user union all select * from #blood_meds_compliant_by_user) a group by USER_ID",
+            "SELECT AREA, COUNT(*) as cnt into #dep_summary from (select * from #lab_compliant_by_dept union all select * from #blood_meds_compliant_by_dept) a group by AREA",  # noqa: E501
+            "SELECT USER_ID, COUNT(*) as cnt into #user_summary from (select * from #lab_compliant_by_user union all select * from #blood_meds_compliant_by_user) a group by USER_ID",  # noqa: E501
             "select * From #dep_summary",
             "select * from #user_summary",
         ]
