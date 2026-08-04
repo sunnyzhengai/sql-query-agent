@@ -32,6 +32,20 @@ jobs:
         run: |
           ruff check src/ tests/
 
+      - name: TEMP debug golden parse divergence
+        run: |
+          python -c "
+          import sqlglot, sqlparse, sys
+          print('py', sys.version)
+          print('sqlglot', sqlglot.__version__, 'sqlparse', sqlparse.__version__)
+          raw = open('data/synthetic/sql/reporting/USP_IP_SEPSIS.sql', 'rb').read()
+          print('bytes', len(raw), 'CR count', raw.count(b'\r'), 'first60', raw[:60])
+          from src.parser.sql_parser import parse_sql
+          parsed = parse_sql(raw.decode('utf-8-sig'))
+          print('CTE count:', len(parsed.ctes))
+          print('cte names first 5:', [c.name for c in parsed.ctes[:5]])
+          "
+
       - name: Run tests
         run: |
           pytest tests/ -v --tb=short
