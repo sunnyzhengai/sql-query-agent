@@ -21,7 +21,7 @@ notebooks/
 │   ├── collibra_discovery.py   — Discover Collibra API data model
 │   └── verify_graph.py         — Verify graph integrity
 │
-└── data_agent_instructions.md  ← System prompt for the Fabric Data Agent
+└── delta_agent_instructions.md  ← System prompt for the Delta Agent (production)
 ```
 
 ## How to Use

@@ -275,7 +275,7 @@ It is idempotent — safe to re-run; it will not destroy existing data.
    - `graph_nodes`
    - `graph_edges`
 5. Open the Agent's **Instructions** panel
-6. Paste the contents of `data_agent_instructions.md`
+6. Paste the contents of `delta_agent_instructions.md`
 7. Click **Publish**
 
 ### Test the Agent

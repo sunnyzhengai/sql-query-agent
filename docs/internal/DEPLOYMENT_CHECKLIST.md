@@ -275,7 +275,7 @@ After pipeline completes, verify:
 
 ### 5.2 Configure Agent Instructions
 
-- [ ] Paste agent instructions (shipped with product in `notebooks/data_agent_instructions.md`)
+- [ ] Paste agent instructions (shipped with product in `notebooks/delta_agent_instructions.md`)
 - [ ] Verify instructions include:
   - [ ] Rule: "ALWAYS query the data" (never hardcode answers)
   - [ ] Rule: PHI protection
@@ -477,7 +477,7 @@ The acceptance test script (`scripts/acceptance_test.py`) programmatically valid
 | Data Agent query fails silently | Workspace/capacity/agent in different regions | Move all resources to same Azure region |
 | "Cross-geo" or capacity errors | Region mismatch | Verify in Workspace Settings → Capacity → Region |
 | Collibra publish fails | API credentials or permissions | Verify with collibra_discovery notebook |
-| Agent description is wrong | Agent instructions need tuning | Update data_agent_instructions.md, re-run 07 |
+| Agent description is wrong | Agent instructions need tuning | Update delta_agent_instructions.md, re-run 07 |
 
 ---
 

@@ -48,7 +48,7 @@ Follow the step-by-step [Installation Guide](docs/deployment/INSTALLATION_GUIDE.
    - `07_generate_descriptions` — LLM business descriptions (optional)
    - `08_publish_collibra` / `09_publish_purview` — catalog sync (optional add-ons)
 4. Create a Fabric Data Agent and add `output_metric_logic` plus the graph tables as data sources
-5. Paste `notebooks/data_agent_instructions.md` into the agent's instructions
+5. Paste `notebooks/delta_agent_instructions.md` into the agent's instructions
 
 ## Configuration
 

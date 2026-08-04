@@ -47,7 +47,7 @@ def test_ships_everything_installation_guide_promises(zip_names, built_zip):
         "org_config.yaml",
         "libs/Microsoft.SqlServer.TransactSql.ScriptDom.dll",
         "environment/requirements.txt",
-        "notebooks/data_agent_instructions.md",
+        "notebooks/delta_agent_instructions.md",
         "docs/INSTALLATION_GUIDE.md",
         "docs/DATA_DICTIONARY_REQUIREMENTS.md",
         "docs/SECURITY_WHITEPAPER.md",

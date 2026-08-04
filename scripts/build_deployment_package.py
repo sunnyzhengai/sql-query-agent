@@ -79,8 +79,8 @@ def collect_contents(repo_root: Path, version: str) -> "dict[str, Path]":
             repo_root / "libs" / "Microsoft.SqlServer.TransactSql.ScriptDom.dll"
         ),
         "environment/requirements.txt": repo_root / "environment" / "requirements.txt",
-        "notebooks/data_agent_instructions.md": (
-            repo_root / "notebooks" / "data_agent_instructions.md"
+        "notebooks/delta_agent_instructions.md": (
+            repo_root / "notebooks" / "delta_agent_instructions.md"
         ),
     }
 
