@@ -549,6 +549,7 @@ GRAPH_CANONICAL = {
     "consumers": ["fabric_graph_model (planned)"],
     "columns": [
         ("nodeId", "string", False),
+        ("metricId", "string", False),
         ("name", "string", False),
         ("description", "string", True),
         ("steward", "string", True),
@@ -556,6 +557,7 @@ GRAPH_CANONICAL = {
     ],
     "column_descriptions": {
         "nodeId": "Canonical node id (graph_nodes.node_id)",
+        "metricId": "Schema-qualified metric identity (ADR 0015) — bare names collide across schemas",
         "name": "Metric name",
         "description": "Business description of the metric",
         "steward": "Business steward",

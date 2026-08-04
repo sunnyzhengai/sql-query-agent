@@ -31,6 +31,7 @@ def export_node_tables(nodes: dict[str, GraphNode]) -> dict[str, list[dict]]:
         if node.layer == NodeLayer.CANONICAL:
             canonical.append({
                 "nodeId": node.node_id,
+                "metricId": node.node_id.replace("canonical:", ""),
                 "name": node.name,
                 "description": node.description,
                 "steward": node.properties.get("steward", ""),
