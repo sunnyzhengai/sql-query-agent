@@ -41,6 +41,12 @@ Edges connect the layers top-down:
 
 ---
 
+**CASE RULE (critical):** String comparison in this lakehouse is CASE-SENSITIVE,
+but metric names are mixed-case (`USP_IP_SepsisDetails`, `USP_IP_SEPSIS`) and user
+keywords arrive in any case. ALWAYS fold both sides: `lower(column) LIKE '%keyword%'`
+with the keyword lowercased. Never conclude something does not exist from a
+case-sensitive miss — zero rows from an unfolded LIKE is a query bug, not an answer.
+
 ## Section 3: Answering Metric Questions
 
 ### "What is [metric]?" or "What does [metric] measure?"
@@ -48,22 +54,22 @@ Edges connect the layers top-down:
    ```sql
    SELECT metric_id, metric_name, description, source_tables, table_descriptions
    FROM output_metric_logic
-   WHERE metric_name LIKE '%keyword%' OR metric_id LIKE '%keyword%'
+   WHERE lower(metric_name) LIKE '%keyword%' OR lower(metric_id) LIKE '%keyword%'
    ```
    If `description` is not null, use it as your answer. These are pre-generated business descriptions that include purpose and business logic. Present them as-is for business users — do NOT regenerate or rephrase.
 2. **Only if `description` is null,** fall back to interpreting `calculation_logic`:
    ```sql
    SELECT calculation_logic FROM output_metric_logic
-   WHERE metric_name LIKE '%keyword%' OR metric_id LIKE '%keyword%'
+   WHERE lower(metric_name) LIKE '%keyword%' OR lower(metric_id) LIKE '%keyword%'
    ```
    Read the SQL fragments and translate to plain English.
 3. **For business users:** Present the description directly. Do NOT show SQL or table names.
 4. **For developers:** When they ask for technical details, show `calculation_logic`, `source_tables`, and `table_descriptions` in addition to the description.
 5. **Fallback:** If `output_metric_logic` has no results, try:
-   `SELECT * FROM graph_nodes WHERE layer = 'canonical' AND name LIKE '%keyword%'`
+   `SELECT * FROM graph_nodes WHERE layer = 'canonical' AND lower(name) LIKE '%keyword%'`
 
 ### "What criteria does [metric] use?" or "What filters are applied?"
-1. Query: `SELECT calculation_logic FROM output_metric_logic WHERE metric_name LIKE '%keyword%' OR metric_id LIKE '%keyword%'`
+1. Query: `SELECT calculation_logic FROM output_metric_logic WHERE lower(metric_name) LIKE '%keyword%' OR lower(metric_id) LIKE '%keyword%'`
 2. Read the WHERE clauses and JOIN conditions from the calculation_logic column
 3. **Translate each filter to business language.** Read the actual SQL and interpret it:
    - Column comparisons (e.g., `column = value`) → describe what is being filtered
@@ -73,11 +79,11 @@ Edges connect the layers top-down:
 4. List each criterion as a clear business rule
 
 ### "Who owns [metric]?"
-1. Query: `SELECT steward, developer FROM output_metric_logic WHERE metric_name LIKE '%keyword%' OR metric_id LIKE '%keyword%'`
+1. Query: `SELECT steward, developer FROM output_metric_logic WHERE lower(metric_name) LIKE '%keyword%' OR lower(metric_id) LIKE '%keyword%'`
 2. If steward is null, say "No steward has been assigned yet. An administrator can assign one."
 
 ### "What tables are used for [metric]?" (developer question)
-1. Query: `SELECT source_tables, table_descriptions FROM output_metric_logic WHERE metric_name LIKE '%keyword%' OR metric_id LIKE '%keyword%'`
+1. Query: `SELECT source_tables, table_descriptions FROM output_metric_logic WHERE lower(metric_name) LIKE '%keyword%' OR lower(metric_id) LIKE '%keyword%'`
 2. List the tables with their data dictionary descriptions
 
 ### "Which metrics use [table name]?"
@@ -86,7 +92,7 @@ Edges connect the layers top-down:
    SELECT DISTINCT n.name FROM graph_edges e1
    JOIN graph_edges e2 ON e1.source_id = e2.target_id
    JOIN graph_nodes n ON e2.source_id = n.node_id
-   WHERE e1.target_id LIKE '%TABLE_NAME%' AND n.layer = 'canonical'
+   WHERE lower(e1.target_id) LIKE '%table_name%' AND n.layer = 'canonical'
    ```
 
 ### "Which reports are about [topic]?" or "Find metrics related to [topic]"
@@ -94,8 +100,8 @@ Edges connect the layers top-down:
    ```sql
    SELECT metric_id, metric_name, source_tables
    FROM output_metric_logic
-   WHERE metric_name LIKE '%keyword%'
-      OR metric_id LIKE '%keyword%'
+   WHERE lower(metric_name) LIKE '%keyword%'
+      OR lower(metric_id) LIKE '%keyword%'
       OR calculation_logic LIKE '%keyword%'
       OR source_tables LIKE '%keyword%'
    ```
@@ -271,7 +277,7 @@ SELECT metric_id, metric_name, description FROM output_metric_logic ORDER BY met
 Find a specific metric:
 ```sql
 SELECT metric_id, metric_name, description, calculation_logic, source_tables, table_descriptions
-FROM output_metric_logic WHERE metric_name LIKE '%keyword%' OR metric_id LIKE '%keyword%'
+FROM output_metric_logic WHERE lower(metric_name) LIKE '%keyword%' OR lower(metric_id) LIKE '%keyword%'
 ```
 
 Find metrics with no steward:
@@ -286,7 +292,7 @@ Reverse lineage — find all metrics that use a specific table:
 SELECT DISTINCT n.name FROM graph_edges e1
 JOIN graph_edges e2 ON e1.source_id = e2.target_id
 JOIN graph_nodes n ON e2.source_id = n.node_id
-WHERE e1.target_id LIKE '%TABLE_NAME%' AND n.layer = 'canonical'
+WHERE lower(e1.target_id) LIKE '%table_name%' AND n.layer = 'canonical'
 ```
 
 ### Build history
