@@ -1,0 +1,68 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/dataAgent/definition/dataSource/1.0.0/schema.json",
+  "artifactId": "fb57a0d3-c064-9424-4ba8-14bca5939679",
+  "workspaceId": "00000000-0000-0000-0000-000000000000",
+  "dataSourceInstructions": null,
+  "displayName": "SQL Model",
+  "type": "graph",
+  "userDescription": null,
+  "metadata": {},
+  "elements": [
+    {
+      "id": "10c38402-039b-4465-a90a-399e28b13f8e",
+      "is_selected": true,
+      "display_name": "Metric",
+      "type": "graph.nodeType",
+      "description": "Metric",
+      "children": []
+    },
+    {
+      "id": "bfa6593b-5ed4-432d-8aba-e79373fd5d26",
+      "is_selected": true,
+      "display_name": "Transformation",
+      "type": "graph.nodeType",
+      "description": "Transformation",
+      "children": []
+    },
+    {
+      "id": "f03774b6-fa65-46b9-bf0c-85ca532014ed",
+      "is_selected": true,
+      "display_name": "Technical",
+      "type": "graph.nodeType",
+      "description": "Technical",
+      "children": []
+    },
+    {
+      "id": "f4f7b2de-c295-4779-b81d-0af77e5eb6de",
+      "is_selected": true,
+      "display_name": "CALCULATED_BY",
+      "type": "graph.edgeType",
+      "description": "CALCULATED_BY",
+      "children": []
+    },
+    {
+      "id": "ed2e612f-e632-4231-a6d0-705ebcc7568c",
+      "is_selected": true,
+      "display_name": "DEPENDS_ON",
+      "type": "graph.edgeType",
+      "description": "DEPENDS_ON",
+      "children": []
+    },
+    {
+      "id": "f71e6111-cb28-41c5-a964-0d5f074fc806",
+      "is_selected": true,
+      "display_name": "READS_FROM",
+      "type": "graph.edgeType",
+      "description": "READS_FROM",
+      "children": []
+    },
+    {
+      "id": "94129eae-b2ef-489e-9bf8-c08702553690",
+      "is_selected": true,
+      "display_name": "HAS_COLUMN",
+      "type": "graph.edgeType",
+      "description": "HAS_COLUMN",
+      "children": []
+    }
+  ]
+}
