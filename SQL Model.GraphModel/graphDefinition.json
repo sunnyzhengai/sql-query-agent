@@ -1,0 +1,144 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/graphIndex/definition/graphDefinition/1.0.0/schema.json",
+  "nodeTables": [
+    {
+      "nodeTypeAlias": "10c38402-039b-4465-a90a-399e28b13f8e",
+      "id": "4f84c41f-3db3-42eb-aec5-f55a5f8efecf",
+      "dataSourceName": "graph_canonical",
+      "propertyMappings": [
+        {
+          "propertyName": "nodeId",
+          "sourceColumn": "nodeId"
+        },
+        {
+          "propertyName": "description",
+          "sourceColumn": "description"
+        },
+        {
+          "propertyName": "developer",
+          "sourceColumn": "developer"
+        },
+        {
+          "propertyName": "name",
+          "sourceColumn": "name"
+        },
+        {
+          "propertyName": "steward",
+          "sourceColumn": "steward"
+        }
+      ]
+    },
+    {
+      "nodeTypeAlias": "bfa6593b-5ed4-432d-8aba-e79373fd5d26",
+      "id": "2ca530a4-75e3-4fa5-8949-fab6d4c01814",
+      "dataSourceName": "graph_transformation",
+      "propertyMappings": [
+        {
+          "propertyName": "nodeId",
+          "sourceColumn": "nodeId"
+        },
+        {
+          "propertyName": "metricId",
+          "sourceColumn": "metricId"
+        },
+        {
+          "propertyName": "name",
+          "sourceColumn": "name"
+        },
+        {
+          "propertyName": "sqlFragment",
+          "sourceColumn": "sqlFragment"
+        }
+      ]
+    },
+    {
+      "nodeTypeAlias": "f03774b6-fa65-46b9-bf0c-85ca532014ed",
+      "id": "8583b81a-abfd-4d0f-b9bf-2979d94c928c",
+      "dataSourceName": "graph_technical",
+      "propertyMappings": [
+        {
+          "propertyName": "nodeId",
+          "sourceColumn": "nodeId"
+        },
+        {
+          "propertyName": "columnName",
+          "sourceColumn": "columnName"
+        },
+        {
+          "propertyName": "databaseName",
+          "sourceColumn": "databaseName"
+        },
+        {
+          "propertyName": "description",
+          "sourceColumn": "description"
+        },
+        {
+          "propertyName": "name",
+          "sourceColumn": "name"
+        },
+        {
+          "propertyName": "schemaName",
+          "sourceColumn": "schemaName"
+        },
+        {
+          "propertyName": "tableName",
+          "sourceColumn": "tableName"
+        }
+      ]
+    }
+  ],
+  "edgeTables": [
+    {
+      "edgeTypeAlias": "f4f7b2de-c295-4779-b81d-0af77e5eb6de",
+      "id": "9ed220a0-93d5-42c9-b807-4eda4aeeb4cd",
+      "edgeIdMapping": null,
+      "dataSourceName": "graph_edge_c2t",
+      "sourceNodeKeyColumns": [
+        "sourceId"
+      ],
+      "propertyMappings": [],
+      "destinationNodeKeyColumns": [
+        "targetId"
+      ]
+    },
+    {
+      "edgeTypeAlias": "ed2e612f-e632-4231-a6d0-705ebcc7568c",
+      "id": "02e9f33e-c6bb-4359-9904-9877ec1057aa",
+      "edgeIdMapping": null,
+      "dataSourceName": "graph_edge_t2t",
+      "sourceNodeKeyColumns": [
+        "sourceId"
+      ],
+      "propertyMappings": [],
+      "destinationNodeKeyColumns": [
+        "targetId"
+      ]
+    },
+    {
+      "edgeTypeAlias": "f71e6111-cb28-41c5-a964-0d5f074fc806",
+      "id": "8f8205f0-ef2b-431c-aee1-8a87288d87c1",
+      "edgeIdMapping": null,
+      "dataSourceName": "graph_edge_t2tech",
+      "sourceNodeKeyColumns": [
+        "sourceId"
+      ],
+      "propertyMappings": [],
+      "destinationNodeKeyColumns": [
+        "targetId"
+      ]
+    },
+    {
+      "edgeTypeAlias": "94129eae-b2ef-489e-9bf8-c08702553690",
+      "id": "defd196c-6784-46d9-b46a-4a46e9793214",
+      "edgeIdMapping": null,
+      "dataSourceName": "graph_edge_tab2col",
+      "sourceNodeKeyColumns": [
+        "sourceId"
+      ],
+      "propertyMappings": [],
+      "destinationNodeKeyColumns": [
+        "targetId"
+      ]
+    }
+  ]
+}

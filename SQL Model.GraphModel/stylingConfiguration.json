@@ -1,0 +1,28 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/graphIndex/definition/stylingConfiguration/1.0.0/schema.json",
+  "modelLayout": {
+    "layoutType": "Preset",
+    "positions": {
+      "f03774b6-fa65-46b9-bf0c-85ca532014ed": {
+        "x": 55.333332,
+        "y": 122.333336
+      },
+      "bfa6593b-5ed4-432d-8aba-e79373fd5d26": {
+        "x": 132.66667,
+        "y": 184.66667
+      },
+      "10c38402-039b-4465-a90a-399e28b13f8e": {
+        "x": 184.0,
+        "y": 103.0
+      }
+    },
+    "styles": {},
+    "pan": {
+      "x": 0.0,
+      "y": 0.0
+    },
+    "zoomLevel": 3.0
+  },
+  "visualFormat": {},
+  "scenario": "GraphClient"
+}
