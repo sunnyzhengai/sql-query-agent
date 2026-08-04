@@ -74,6 +74,18 @@ FIXTURES = REPO_ROOT / "tests" / "fixtures" / "recorded"
 
 
 @pytest.mark.skipif(
+    not CASSETTE.exists(),
+    reason="no recorded agent cassette yet",
+)
+def test_cassette_contains_no_proprietary_terms():
+    from src.anonymization import get_scan_terms, load_crosswalk, scan_for_missed
+
+    crosswalk_path = REPO_ROOT / "data" / "synthetic" / "crosswalk.json"
+    leaks = scan_for_missed(CASSETTE.read_text(), get_scan_terms(load_crosswalk(crosswalk_path)))
+    assert not leaks, "agent cassette leaked proprietary terms:\n" + "\n".join(leaks[:5])
+
+
+@pytest.mark.skipif(
     not CASSETTE.exists() or not (FIXTURES / "parse_results.json").exists(),
     reason="no recorded agent cassette/fixtures yet",
 )
