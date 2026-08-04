@@ -10,6 +10,18 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.2.2] - 2026-08-04
+
+### Added
+- graph_canonical LPG export carries schema-qualified metricId (ADR 0015) —
+  bare metric names collide across schemas and were silently collapsing in
+  Graph Model metric listings
+- Error KB: CapacityLimitExceeded (Fabric smoothing/throttling triage)
+- Agent instructions (both): case-insensitive keyword matching rules;
+  graph agent gains completeness rule (no partial lists presented as complete)
+
+---
+
 ## [1.2.1] - 2026-08-03
 
 ### Added
