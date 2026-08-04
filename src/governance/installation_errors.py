@@ -54,6 +54,26 @@ ERROR_SEEDS = [
         "first_seen": "2026-07-31",
     },
     {
+        "error_signature": "CapacityLimitExceeded",
+        "error_category": "capacity_throttled",
+        "root_cause": (
+            "Sustained usage above the capacity SKU triggered Fabric smoothing/throttling — "
+            "interactive operations (agent queries, publishes) are rejected until the "
+            "carried-forward overage burns down. Agent Q&A is CU-intensive on small SKUs."
+        ),
+        "fix": (
+            "Fastest: pause then resume the Fabric capacity in the Azure portal — pausing "
+            "settles the smoothed debt immediately. Otherwise stop idle Spark sessions and "
+            "wait for the overage to burn down (minutes to hours). For sustained agent "
+            "testing, temporarily resize to a larger SKU (e.g. F2 -> F4) for the session."
+        ),
+        "prevention": (
+            "Batch heavy operations with gaps on small SKUs; stop Spark sessions when done; "
+            "size capacity to the workload during test sessions."
+        ),
+        "first_seen": "2026-08-04",
+    },
+    {
         "error_signature": "TooManyRequestsForCapacity.*430",
         "error_category": "capacity_limit",
         "root_cause": "F2 capacity only supports one Spark session at a time.",
