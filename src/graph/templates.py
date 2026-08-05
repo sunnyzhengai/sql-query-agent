@@ -37,7 +37,7 @@ class GraphView:
     def metric_catalog(self) -> "list[dict]":
         return sorted(
             (
-                {k: r.get(k) for k in ("metricId", "name", "description")}
+                {k: r.get(k) for k in ("metricId", "name", "bareName", "description")}
                 for r in self._canonical
             ),
             key=lambda r: _fold(r["metricId"]),
@@ -65,13 +65,13 @@ class GraphView:
     # ---- resolution helpers (fold-exact; semantic matching is the LLM's job) ----
 
     def find_metrics(self, reference: str) -> "list[dict]":
-        """All catalog rows whose metricId OR bare name fold-matches the
-        reference. A qualified reference hits one row; a bare name may hit
-        several schemas — the caller surfaces ambiguity, never guesses."""
+        """All catalog rows whose metricId, name, or bareName fold-matches
+        the reference. A qualified reference hits one row; a bare name may
+        hit several schemas — the caller surfaces ambiguity, never guesses."""
         folded = _fold(reference)
         return [
             r for r in self.metric_catalog()
-            if _fold(r["metricId"]) == folded or _fold(r["name"]) == folded
+            if folded in (_fold(r["metricId"]), _fold(r["name"]), _fold(r.get("bareName")))
         ]
 
     def _metric_node_id(self, metric_id: str) -> "str | None":

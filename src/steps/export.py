@@ -2,13 +2,16 @@
 
 Logic relations asserted here: node tables partition the nodes by layer;
 edge tables partition the edges by type — nothing lost, nothing invented.
-graph_edge_uses_table is DERIVED (ADR 0018: precomputed metric->table
-closure), so it sits outside the partition and asserts its own shape.
+Two edge tables are DERIVED closures and sit outside the partition:
+graph_edge_uses_table (ADR 0018, metric->table) and graph_edge_c2t
+(ADR 0020, metric->every step — the raw roots-only edges stay in
+graph_edges; the export is shaped for the NL2GQL generator's habits).
 """
 
 from __future__ import annotations
 
 from src.graph.export import (
+    derive_calculated_by_rows,
     derive_uses_table_rows,
     export_edge_tables,
     export_node_tables,
@@ -47,4 +50,12 @@ def export_step(nodes_rows: "list[dict]", edges_rows: "list[dict]") -> "dict[str
         "export_step: uses_table targetId not a technical TABLE node"
     )
     tables["graph_edge_uses_table"] = uses_table
+
+    calculated_by = derive_calculated_by_rows(nodes, edges)
+    raw_roots = {(r["sourceId"], r["targetId"]) for r in tables["graph_edge_c2t"]}
+    closure_pairs = {(r["sourceId"], r["targetId"]) for r in calculated_by}
+    assert raw_roots <= closure_pairs, (
+        "export_step: CALCULATED_BY closure must contain every root edge"
+    )
+    tables["graph_edge_c2t"] = calculated_by
     return tables

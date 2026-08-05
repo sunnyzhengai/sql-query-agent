@@ -30,10 +30,15 @@ def export_node_tables(nodes: dict[str, GraphNode]) -> dict[str, list[dict]]:
 
     for node in nodes.values():
         if node.layer == NodeLayer.CANONICAL:
+            metric_id = node.node_id.replace("canonical:", "")
             canonical.append({
                 "nodeId": node.node_id,
-                "metricId": node.node_id.replace("canonical:", ""),
-                "name": node.name,
+                "metricId": metric_id,
+                # ADR 0020: name is schema-qualified (== metricId) because the
+                # NL2GQL generator habitually filters name with the user's
+                # qualified reference; the bare object name lives in bareName.
+                "name": metric_id,
+                "bareName": node.name,
                 "description": node.description,
                 "steward": node.properties.get("steward", ""),
                 "developer": node.properties.get("developer", ""),
@@ -101,6 +106,32 @@ def export_edge_tables(edges: list[GraphEdge]) -> dict[str, list[dict]]:
         })
 
     return result
+
+
+def derive_calculated_by_rows(
+    nodes: dict[str, GraphNode], edges: list[GraphEdge]
+) -> list[dict]:
+    """Materialize metric -> EVERY calculation step (ADR 0020).
+
+    The NL2GQL generator habitually walks CALCULATED_BY as a single hop;
+    with root-only edges that silently truncates the calculation. The LPG
+    export therefore carries the full closure (roots + every DEPENDS_ON
+    descendant); root-only edges remain in the raw graph_edges table.
+    """
+    traverser = GraphTraverser(nodes, edges)
+    rows: list[dict] = []
+    for node in nodes.values():
+        if node.layer != NodeLayer.CANONICAL:
+            continue
+        metric_id = node.node_id.replace("canonical:", "")
+        subgraph = traverser.get_metric_subgraph(metric_id)
+        seen: set[str] = set()
+        for step in subgraph.get("transformations", []):
+            if step.node_id in seen:
+                continue
+            seen.add(step.node_id)
+            rows.append({"sourceId": node.node_id, "targetId": step.node_id})
+    return rows
 
 
 def derive_uses_table_rows(

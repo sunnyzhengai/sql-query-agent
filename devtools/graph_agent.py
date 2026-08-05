@@ -100,9 +100,10 @@ def _lexical_hits(view: GraphView, question: str) -> "list[dict]":
     hits = []
     tokens = {t.upper() for t in re.findall(r"[A-Za-z_][A-Za-z0-9_.]{3,}", question)}
     for m in view.metric_catalog():
-        if m["metricId"].upper() in tokens or m["name"].upper() in tokens:
+        names = {m["metricId"].upper(), m["name"].upper(), (m.get("bareName") or "").upper()}
+        if names & tokens:
             hits.append({"type": "metric", "key": m["metricId"],
-                         "label": f"metric {m['metricId']} (name: {m['name']})"})
+                         "label": f"metric {m['metricId']} (name: {m.get('bareName') or m['name']})"})
     for t in view.table_catalog():
         if t["tableName"].upper() in tokens:
             hits.append({"type": "table", "key": t["tableName"],
@@ -112,7 +113,7 @@ def _lexical_hits(view: GraphView, question: str) -> "list[dict]":
 
 def _catalog_payload(view: GraphView, question: str) -> str:
     metrics = "\n".join(
-        f"- metricId: {m['metricId']} | name: {m['name']} | {m.get('description') or ''}"
+        f"- metricId: {m['metricId']} | name: {m.get('bareName') or m['name']} | {m.get('description') or ''}"
         for m in view.metric_catalog()
     )
     tables = "\n".join(

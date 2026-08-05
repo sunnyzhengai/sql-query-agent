@@ -93,3 +93,9 @@ def test_uses_table_closure_matches_certified_answer_key():
     assert len(tables_of("reports.USP_Severe_Sepsis")) == 32
     assert len(tables_of("reporting.USP_ED_Sepsis")) == 38
     assert len(tables_of("reports.USP_ED_Sepsis")) == 29
+
+    # ADR 0020: CALCULATED_BY is the full step closure — the generator's
+    # single-hop chain must see all 88 steps of Severe_Sepsis, not 1 root
+    c2t = exported["graph_edge_c2t"]
+    severe = "canonical:reports.USP_Severe_Sepsis"
+    assert len({e["targetId"] for e in c2t if e["sourceId"] == severe}) == 88

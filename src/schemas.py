@@ -551,6 +551,7 @@ GRAPH_CANONICAL = {
         ("nodeId", "string", False),
         ("metricId", "string", False),
         ("name", "string", False),
+        ("bareName", "string", False),
         ("description", "string", True),
         ("steward", "string", True),
         ("developer", "string", True),
@@ -558,7 +559,11 @@ GRAPH_CANONICAL = {
     "column_descriptions": {
         "nodeId": "Canonical node id (graph_nodes.node_id)",
         "metricId": "Schema-qualified metric identity (ADR 0015) — bare names collide across schemas",
-        "name": "Metric name",
+        "name": (
+            "Schema-qualified name, identical to metricId (ADR 0020: the NL2GQL "
+            "generator filters name with the user's qualified reference)"
+        ),
+        "bareName": "Bare object name (no schema); repeats across schemas",
         "description": "Business description of the metric",
         "steward": "Business steward",
         "developer": "Developer owner",
@@ -666,7 +671,12 @@ _LPG_EDGE_COLUMN_DESCRIPTIONS = {
 
 GRAPH_EDGE_C2T = {
     "table_name": "graph_edge_c2t",
-    "description": "LPG export: canonical -> transformation edges (metric to its logic steps).",
+    "description": (
+        "LPG export: DERIVED canonical -> transformation closure — metric to "
+        "EVERY calculation step (ADR 0020; raw roots-only edges stay in "
+        "graph_edges). Shaped so the generator's single-hop CALCULATED_BY "
+        "chain is complete."
+    ),
     "domain": "lpg_export",
     "status": "active",
     "owner": {"notebook": "05_export_graph_tables", "module": None},

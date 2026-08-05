@@ -82,6 +82,30 @@ class TestExportStep:
         assert len(exported["graph_canonical"]) == len(parse_out.parse_results)
         assert exported["graph_edge_tab2col"], "column edges must be exported"
 
+    def test_generator_compat_shape(self):
+        """ADR 0020: name is schema-qualified (== metricId), bareName carries
+        the object name, and CALCULATED_BY is the full step closure."""
+        parse_out = parse_step(SAMPLE_SQL_SOURCES, parse_sql)
+        tables, columns = _dict_rows()
+        graph = build_graph_step(parse_out.parse_results, tables, columns)
+        exported = export_step(graph.nodes_rows, graph.edges_rows)
+
+        for row in exported["graph_canonical"]:
+            assert row["name"] == row["metricId"]
+            assert row["bareName"] and "." not in row["bareName"]
+
+        c2t = exported["graph_edge_c2t"]
+        transforms_by_metric: dict = {}
+        for t in exported["graph_transformation"]:
+            if t["metricId"]:
+                transforms_by_metric.setdefault(t["metricId"], set()).add(t["nodeId"])
+        for m in exported["graph_canonical"]:
+            targets = {e["targetId"] for e in c2t if e["sourceId"] == m["nodeId"]}
+            expected = transforms_by_metric.get(m["metricId"], set())
+            assert expected <= targets, (
+                f"{m['metricId']}: CALCULATED_BY closure missing steps"
+            )
+
     def test_uses_table_closure_reaches_beyond_root_steps(self):
         """ADR 0018: the derived closure must cover the FULL DEPENDS_ON chain —
         a root-steps-only derivation is the exact silent-undercount defect."""

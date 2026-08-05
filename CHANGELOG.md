@@ -10,6 +10,19 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.3.1] - 2026-08-05
+
+### Changed
+- **Generator-compatibility export (ADR 0020):** the Fabric NL2GQL generator
+  proved non-deterministic against instructions (filtered bare `name` with a
+  qualified reference; always single-hop CALCULATED_BY chains), so the LPG
+  export now targets its habits: `Metric.name` is schema-qualified (==
+  metricId, bare name moved to `bareName`), and `graph_edge_c2t` carries the
+  full metric→step closure (raw roots stay in graph_edges). The generator's
+  habitual query is now the correct query.
+
+---
+
 ## [1.3.0] - 2026-08-04
 
 ### Added

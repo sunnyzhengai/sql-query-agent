@@ -30,3 +30,4 @@ never deleted — its status changes and it links to its replacement.
 | [0017](0017-resolve-then-traverse-agent-retrieval.md) | Resolve-then-traverse: anchor resolution before any graph query | Accepted |
 | [0018](0018-materialized-closure-edges.md) | Materialize the metric→table closure as USES_TABLE edges | Accepted |
 | [0019](0019-cte-descriptions-bottom-up.md) | CTE descriptions, generated bottom-up, before metric descriptions | Accepted |
+| [0020](0020-generator-compatibility-export.md) | Shape the LPG export to the query generator's habits | Accepted |
