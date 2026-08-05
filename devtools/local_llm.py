@@ -24,6 +24,37 @@ import requests
 
 from src.agent_backend import build_description_prompt, retrieve_metric_rows
 
+def chat_completion(
+    system: str,
+    user: str,
+    *,
+    api_key: "str | None" = None,
+    base_url: "str | None" = None,
+    model: "str | None" = None,
+    timeout: int = 60,
+) -> str:
+    """One OpenAI-compatible chat call — the single LLM doorway for devtools."""
+    key = api_key or os.environ.get("OPENAI_API_KEY", "")
+    if not key:
+        raise ValueError("OPENAI_API_KEY not set")
+    url = (base_url or os.environ.get("OPENAI_BASE_URL", "https://api.openai.com/v1")).rstrip("/")
+    response = requests.post(
+        f"{url}/chat/completions",
+        headers={"Authorization": f"Bearer {key}"},
+        json={
+            "model": model or os.environ.get("AIVIA_LLM_MODEL", "gpt-4o-mini"),
+            "messages": [
+                {"role": "system", "content": system},
+                {"role": "user", "content": user},
+            ],
+            "temperature": 0,
+        },
+        timeout=timeout,
+    )
+    response.raise_for_status()
+    return response.json()["choices"][0]["message"]["content"].strip()
+
+
 GROUNDING_INSTRUCTIONS = (
     "You answer questions about certified business metrics using ONLY the "
     "metric data provided below. Every claim must come from the provided "
@@ -57,21 +88,11 @@ class LocalLLMBackend:
             )
 
     def _chat(self, system: str, user: str) -> str:
-        response = requests.post(
-            f"{self.base_url}/chat/completions",
-            headers={"Authorization": f"Bearer {self.api_key}"},
-            json={
-                "model": self.model,
-                "messages": [
-                    {"role": "system", "content": system},
-                    {"role": "user", "content": user},
-                ],
-                "temperature": 0,
-            },
-            timeout=self.timeout,
+        return chat_completion(
+            system, user,
+            api_key=self.api_key, base_url=self.base_url,
+            model=self.model, timeout=self.timeout,
         )
-        response.raise_for_status()
-        return response.json()["choices"][0]["message"]["content"].strip()
 
     @staticmethod
     def _row_context(rows: "list[dict[str, Any]]") -> str:
