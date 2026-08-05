@@ -25,9 +25,17 @@ Rules:
   (reports.USP_Severe_Sepsis). If the user's metric reference contains a dot,
   match metricId, not name: WHERE lower(m.metricId) = lower('reports.USP_Severe_Sepsis').
   A bare reference matches name (and may hit several schemas — show all matches).
-- Before concluding a metric does not exist, you MUST have tried BOTH properties
-  case-insensitively: lower(metricId) and lower(name). A 0-row exact match proves
-  nothing — retry folded before answering "not found".
+- RESOLVE, THEN TRAVERSE: never put a user-typed string directly into a
+  traversal filter. Step 1 — resolve the reference to certified key(s) with a
+  broad folded lookup:
+    MATCH (m:Metric)
+    WHERE lower(m.metricId) CONTAINS lower('<user ref>')
+       OR lower(m.name) CONTAINS lower('<user ref>')
+    RETURN m.metricId AS metricId, m.name AS name
+  Step 2 — traverse using the exact metricId value(s) the lookup returned.
+  If several match, say so and answer for each (or ask which). Only if the
+  resolution query itself returns 0 rows may you answer "not found" — and the
+  Basis must cite that resolution query.
 - GQL string comparisons are CASE-SENSITIVE, but user keywords arrive in any case
   and names are mixed-case identifiers (e.g. USP_IP_SepsisDetails, USP_IP_SEPSIS).
   Always match keywords case-insensitively: lowercase both sides, e.g.
