@@ -62,6 +62,17 @@ Corpus: 28 metrics across two schemas; bare names COLLIDE for 2 pairs
   prior listing, then matched against bare name -> same 0 rows. Fix: IDENTITY
   rule in instructions (dot => lower(metricId), bare => lower(name), try both
   folded before "not found")
+- Generator non-determinism (2026-08-05 morning): same instructions, same
+  question as the prior evening — filter property flipped back from metricId
+  to bare name; single step; footer again described a query never run.
+  Verdict: instruction steering of NL2GQL is stochastic -> ADR 0020
+  (compatibility export: name := qualified, CALCULATED_BY := step closure)
+- Probe traces (pre-1.3.1 graph): "Which tables does reports.USP_Severe_Sepsis
+  use?" -> generator CHOSE USES_TABLE single-hop unprompted (correct shape!)
+  but filtered bare name -> 0 rows. "Which metrics read HOSPITAL_ENCOUNTERS?"
+  -> shallow CALCULATED_BY chain -> 5/13 undercount. Both exact queries become
+  correct under the 1.3.1 export — the shim covers the generator's whole
+  observed behavior space
 - FABRICATED Basis footer — graph agent claimed
   "Metric->CALCULATED_BY->DEPENDS_ON{0,50}->READS_FROM" while the executed GQL
   was a single-hop exact-match on name. The footer echoed the INSTRUCTED shape,
