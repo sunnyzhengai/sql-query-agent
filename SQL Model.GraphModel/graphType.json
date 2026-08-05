@@ -29,6 +29,10 @@
         {
           "name": "steward",
           "type": "STRING"
+        },
+        {
+          "name": "metricId",
+          "type": "STRING"
         }
       ]
     },

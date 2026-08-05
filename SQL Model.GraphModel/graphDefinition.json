@@ -25,6 +25,10 @@
         {
           "propertyName": "steward",
           "sourceColumn": "steward"
+        },
+        {
+          "propertyName": "metricId",
+          "sourceColumn": "metricId"
         }
       ]
     },
