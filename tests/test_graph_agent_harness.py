@@ -84,11 +84,24 @@ def test_refusal_when_resolution_finds_nothing(view):
     assert "0 anchors" in result["basis"]
 
 
-def test_basis_reports_zero_rows_honestly(view):
+def test_validator_blocks_keys_not_in_catalog(view):
+    """A hallucinated key must die at validation, never reach traversal."""
     agent = LocalGraphAgent(view, scripted({
         "intent": "metrics_of_table",
         "anchors": [{"type": "table", "key": "NO_SUCH_TABLE"}],
     }))
     result = agent.answer("Which metrics read NO_SUCH_TABLE?")
-    assert "nothing found" in result["text"]
-    assert "-> 0 rows" in result["basis"]
+    assert "Resolution failed validation" in result["text"]
+    assert "not a tableName" in result["basis"]
+
+
+def test_validator_blocks_answer_shaped_anchors(view):
+    """The observed live failure: metric anchors on a metrics_of_table
+    intent (the resolver 'answering' instead of anchoring)."""
+    agent = LocalGraphAgent(view, scripted({
+        "intent": "metrics_of_table",
+        "anchors": [{"type": "metric", "key": "reporting.USP_IP_SepsisEncounters"}],
+    }))
+    result = agent.answer("Which metrics read from the HOSPITAL_ENCOUNTERS table?")
+    assert "Resolution failed validation" in result["text"]
+    assert "INPUTS" in result["basis"]

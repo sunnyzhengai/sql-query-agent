@@ -18,6 +18,7 @@ fault attribution for the rematch writeup.
 from __future__ import annotations
 
 import json
+import re
 from typing import Any, Callable
 
 from src.graph.templates import GraphView
@@ -33,24 +34,80 @@ INTENTS = (
     "refuse",              # nothing in the catalogs relates
 )
 
+INTENT_GUIDE = """\
+- tables_of_metric: "which tables does metric M use/read?" -> ONE anchor {type: metric}
+- metrics_of_table: "which metrics use/read table T?" -> ONE anchor {type: table}
+- explain_metric: "how is metric M calculated?" -> ONE anchor {type: metric}
+- shared_sources: "what shares source tables with metric M?" -> ONE anchor {type: metric}
+- columns_of_table: "which columns does table T have?" -> ONE anchor {type: table}
+- list_metrics: "which metrics are about <topic>?" -> anchors: ALL matching metrics
+- most_read: "which metric reads the most tables?" -> no anchors
+- refuse: nothing in the catalogs relates -> no anchors
+Direction check before answering: the anchor is the entity NAMED in the
+question; the intent's output is the OTHER side. If the question names a
+metric and asks about tables, that is tables_of_metric, never metrics_of_table."""
+
 RESOLUTION_INSTRUCTIONS = (
     "You are the resolution step of a metrics agent. You receive certified "
     "catalogs and a user question. Match the question's words to catalog "
     "entries SEMANTICALLY — typos, case differences, synonyms, and topic "
     "phrases must still match; a metric reference containing a dot matches "
     "metricId, a bare one matches name (possibly in several schemas — return "
-    "all of them). Reply with STRICT JSON only, no prose, no code fences:\n"
+    "all of them).\n\nIntents:\n" + INTENT_GUIDE + "\n\n"
+    "Reply with STRICT JSON only, no prose, no code fences:\n"
     '{"intent": "<one of: ' + ", ".join(INTENTS) + '>",\n'
     ' "anchors": [{"type": "metric"|"table", "key": "<EXACT value copied from '
     'the catalog: metricId for metrics, tableName for tables>"}],\n'
     ' "note": "<one short sentence: why these anchors>"}\n'
+    "CRITICAL — anchors are the entities the question is ABOUT (the traversal "
+    "INPUTS), never your guess at the answer. 'Which metrics read table T?' "
+    "has exactly ONE anchor: {type: table, key: T}. The traversal engine finds "
+    "the metrics — you do not. 'Which tables does metric M use?' has ONE "
+    "anchor: {type: metric, key: M}.\n"
     "Rules: keys MUST be copied verbatim from catalog rows, never from the "
-    "user's text. If several catalog entries match, include them all. If "
-    "nothing in the catalogs relates to the question, use intent refuse with "
-    "no anchors."
+    "user's text. Include several anchors ONLY when the question's reference "
+    "itself is ambiguous (same bare name in two schemas) or names several "
+    "entities. If nothing in the catalogs relates, use intent refuse with no "
+    "anchors."
 )
 
+# Deterministic guardrails around the LLM boundary: each intent takes
+# anchors of exactly one type, and every key must exist in its catalog.
+ANCHOR_TYPE_BY_INTENT = {
+    "list_metrics": "metric",
+    "explain_metric": "metric",
+    "tables_of_metric": "metric",
+    "shared_sources": "metric",
+    "metrics_of_table": "table",
+    "columns_of_table": "table",
+    "most_read": None,
+    "refuse": None,
+}
+
 REFUSAL = "I don't have that in the certified knowledge base."
+
+
+def _parse_plan(raw: str) -> dict:
+    return json.loads(
+        raw.strip().removeprefix("```json").removeprefix("```").removesuffix("```")
+    )
+
+
+def _lexical_hits(view: GraphView, question: str) -> "list[dict]":
+    """Deterministic recall pass (ADR 0017): exact fold-matches of question
+    tokens against catalog names. Identifier-shaped references get found by
+    code; the LLM only arbitrates — it cannot wander past an exact hit."""
+    hits = []
+    tokens = {t.upper() for t in re.findall(r"[A-Za-z_][A-Za-z0-9_.]{3,}", question)}
+    for m in view.metric_catalog():
+        if m["metricId"].upper() in tokens or m["name"].upper() in tokens:
+            hits.append({"type": "metric", "key": m["metricId"],
+                         "label": f"metric {m['metricId']} (name: {m['name']})"})
+    for t in view.table_catalog():
+        if t["tableName"].upper() in tokens:
+            hits.append({"type": "table", "key": t["tableName"],
+                         "label": f"table {t['tableName']}"})
+    return hits
 
 
 def _catalog_payload(view: GraphView, question: str) -> str:
@@ -62,10 +119,16 @@ def _catalog_payload(view: GraphView, question: str) -> str:
         f"- tableName: {t['tableName']} (schema {t.get('schemaName') or '?'})"
         for t in view.table_catalog()
     )
+    hits = _lexical_hits(view, question)
+    hint = (
+        "EXACT NAME MATCHES found in the question (strong evidence — anchor "
+        "to these unless the question clearly means otherwise):\n"
+        + "\n".join(f"- {h['label']}" for h in hits) + "\n\n"
+    ) if hits else ""
     return (
         f"METRIC CATALOG ({len(view.metric_catalog())} rows):\n{metrics}\n\n"
         f"TABLE CATALOG ({len(view.table_catalog())} rows):\n{tables}\n\n"
-        f"QUESTION: {question}"
+        f"{hint}QUESTION: {question}"
     )
 
 
@@ -77,9 +140,70 @@ class LocalGraphAgent:
         self.view = view
         self.resolver = resolver
 
+    def _plan_errors(self, plan: dict, hits: "list[dict] | None" = None) -> "list[str]":
+        errors = []
+        intent = plan.get("intent")
+        if intent not in INTENTS:
+            return [f"intent {intent!r} is not one of {INTENTS}"]
+        anchor_keys = {(a.get("key") or "").upper() for a in plan.get("anchors") or []}
+        if hits and not anchor_keys & {h["key"].upper() for h in hits}:
+            errors.append(
+                "the question contains EXACT catalog matches your plan ignored: "
+                + "; ".join(h["label"] for h in hits)
+                + " — anchor to these (with their stated type) unless the "
+                "question clearly means otherwise"
+            )
+        if hits:
+            # Same bare name in several schemas: anchoring a strict subset
+            # silently resolves an ambiguity that belongs to the user.
+            by_label: "dict[str, list[dict]]" = {}
+            for h in hits:
+                if h["type"] == "metric":
+                    bare = h["label"].rsplit("name: ", 1)[-1].rstrip(")").upper()
+                    by_label.setdefault(bare, []).append(h)
+            for bare, group in by_label.items():
+                group_keys = {h["key"].upper() for h in group}
+                taken = anchor_keys & group_keys
+                if taken and taken != group_keys:
+                    errors.append(
+                        f"the bare name {bare} matches {len(group)} metrics "
+                        f"({', '.join(sorted(group_keys))}) — anchor ALL of them; "
+                        "the ambiguity is surfaced to the user, never resolved silently"
+                    )
+        expected = ANCHOR_TYPE_BY_INTENT[intent]
+        metric_keys = {m["metricId"].upper() for m in self.view.metric_catalog()}
+        table_keys = {t["tableName"].upper() for t in self.view.table_catalog()}
+        for anchor in plan.get("anchors") or []:
+            a_type, key = anchor.get("type"), anchor.get("key", "")
+            if expected and a_type != expected:
+                errors.append(
+                    f"intent {intent} takes {expected} anchors; got {a_type} "
+                    f"({key!r}) — anchors are the question's INPUTS, not the answer"
+                )
+            elif a_type == "metric" and key.upper() not in metric_keys:
+                errors.append(f"{key!r} is not a metricId in the metric catalog")
+            elif a_type == "table" and key.upper() not in table_keys:
+                errors.append(f"{key!r} is not a tableName in the table catalog")
+        return errors
+
     def answer(self, question: str) -> "dict[str, Any]":
-        raw = self.resolver(RESOLUTION_INSTRUCTIONS, _catalog_payload(self.view, question))
-        plan = json.loads(raw.strip().removeprefix("```json").removeprefix("```").removesuffix("```"))
+        payload = _catalog_payload(self.view, question)
+        hits = _lexical_hits(self.view, question)
+        raw = self.resolver(RESOLUTION_INSTRUCTIONS, payload)
+        plan = _parse_plan(raw)
+        errors = self._plan_errors(plan, hits)
+        if errors:
+            retry_payload = (
+                f"{payload}\n\nYOUR PREVIOUS PLAN WAS INVALID:\n{json.dumps(plan)}\n"
+                "Validator errors:\n- " + "\n- ".join(errors) + "\nPlan again, fixing these."
+            )
+            plan = _parse_plan(self.resolver(RESOLUTION_INSTRUCTIONS, retry_payload))
+            errors = self._plan_errors(plan, hits)
+            if errors:
+                return self._result(
+                    "Resolution failed validation twice — no answer attempted.",
+                    "invalid plan: " + "; ".join(errors), plan, [],
+                )
         intent = plan.get("intent")
         anchors = plan.get("anchors") or []
 
