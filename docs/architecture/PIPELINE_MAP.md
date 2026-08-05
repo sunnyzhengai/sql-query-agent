@@ -37,6 +37,7 @@ flowchart LR
   input_sql_sources[("input_sql_sources")]:::table
   ops_agent_descriptions[("ops_agent_descriptions")]:::table
   ops_build_summary[("ops_build_summary")]:::table
+  ops_description_cache[("ops_description_cache")]:::table
   ops_error_log[("ops_error_log")]:::table
   ops_extraction_tracking[("ops_extraction_tracking")]:::table
   ops_installation_errors[("ops_installation_errors")]:::table
@@ -62,6 +63,8 @@ flowchart LR
   05_export_graph_tables --> LPG_export__10_typed_tables_
   06_validate --> ops_build_summary
   06_validate --> ops_pipeline_validation
+  07_generate_descriptions --> ops_description_cache
+  07_generate_descriptions -->|enrich| graph_nodes
   07_generate_descriptions -->|enrich| output_metric_logic
   08_publish_collibra --> ops_agent_descriptions
   extract_views --> ops_extraction_tracking
@@ -71,12 +74,14 @@ flowchart LR
   graph_edges --> 04_build_metric_logic
   graph_edges --> 05_export_graph_tables
   graph_edges --> 06_validate
+  graph_edges --> 07_generate_descriptions
   graph_edges --> 08_publish_collibra
   graph_edges --> data_agent
   graph_edges --> verify_graph
   graph_nodes --> 04_build_metric_logic
   graph_nodes --> 05_export_graph_tables
   graph_nodes --> 06_validate
+  graph_nodes --> 07_generate_descriptions
   graph_nodes --> 08_publish_collibra
   graph_nodes --> data_agent
   graph_nodes --> manage_stewards
@@ -102,6 +107,7 @@ flowchart LR
   ops_agent_descriptions --> 08_publish_collibra
   ops_agent_descriptions --> collibra_adapter
   ops_build_summary --> admin
+  ops_description_cache --> 07_generate_descriptions
   ops_error_log --> 02_parse
   ops_error_log --> admin
   ops_extraction_tracking --> extract_views

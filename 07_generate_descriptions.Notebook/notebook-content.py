@@ -26,19 +26,28 @@
 
 # CELL ********************
 
-"""Generate business descriptions for all metrics via the Data Agent.
+"""Generate business descriptions bottom-up over the calculation DAG (ADR 0019).
 
-Reads from:  output_metric_logic (Delta)
-Writes to:   output_metric_logic (updates description column)
+Reads from:  graph_nodes, graph_edges, ops_description_cache (Delta)
+Writes to:   graph_nodes (description column: transformation + canonical rows),
+             output_metric_logic (description column), ops_description_cache
 
-Run 02-06 first — the Data Agent needs metric_logic populated.
-The Data Agent must be published and accessible.
+Order matters: CTE steps are described before the metrics that use them
+(topological walk in src/descriptions.py); each metric's description is
+composed from its root steps' descriptions — summaries of summaries, never
+raw SQL walls. Incremental: unchanged steps hit the content-hash cache and
+cost nothing.
 
-This notebook:
-1. Reads all metrics from output_metric_logic
-2. For each metric, asks the Data Agent to generate a description
-3. Writes descriptions back to output_metric_logic
-4. Incremental — skips metrics that already have descriptions
+LLM: an OpenAI-compatible chat endpoint — the customer's Azure OpenAI in
+production. Configure in org_config.yaml:
+
+    llm:
+      endpoint: https://<resource>.openai.azure.com/openai/deployments/<dep>  # or any /v1 base
+      model: gpt-4o-mini
+      api_key_file: llm_api_key.txt   # next to org_config.yaml, NEVER in git
+
+After running: re-run 05 and re-Load the Graph Model so the LPG picks up
+the step descriptions.
 """
 
 # %% Cell 0: Setup
@@ -50,128 +59,41 @@ except ImportError:
     import src
 print(f"v{src.__version__}")
 
-from src.config import load_config
-config = load_config("/lakehouse/default/Files/sql-query-agent/org_config.yaml")
+import json
+from datetime import datetime, timezone
+from pathlib import Path
 
-WORKSPACE_ID = config.fabric_graph.workspace_id
-AGENT_ID = config.fabric_graph.data_agent_id
+import requests
+import yaml
 
-if not WORKSPACE_ID or not AGENT_ID:
-    print("[X] FATAL: workspace_id and data_agent_id must be set in org_config.yaml")
-    print("    Under fabric_graph:")
-    print("      workspace_id: 'your-workspace-id'")
-    print("      data_agent_id: 'your-agent-id'")
-    raise SystemExit("Cannot generate descriptions without Data Agent config.")
+CONFIG_DIR = Path("/lakehouse/default/Files/sql-query-agent")
+raw_config = yaml.safe_load((CONFIG_DIR / "org_config.yaml").read_text())
+llm_cfg = raw_config.get("llm") or {}
+LLM_ENDPOINT = (llm_cfg.get("endpoint") or "").rstrip("/")
+LLM_MODEL = llm_cfg.get("model") or "gpt-4o-mini"
+key_file = CONFIG_DIR / (llm_cfg.get("api_key_file") or "llm_api_key.txt")
 
-print(f"Workspace: {WORKSPACE_ID}")
-print(f"Agent: {AGENT_ID}")
+if not LLM_ENDPOINT or not key_file.exists():
+    print("[X] FATAL: llm.endpoint in org_config.yaml and the api_key_file are required.")
+    print("    See this notebook's docstring for the org_config.yaml llm: block.")
+    raise SystemExit("Cannot generate descriptions without an LLM endpoint.")
+LLM_API_KEY = key_file.read_text().strip()
+print(f"LLM endpoint: {LLM_ENDPOINT} (model {LLM_MODEL})")
 
-# METADATA ********************
 
-# META {
-# META   "language": "python",
-# META   "language_group": "synapse_pyspark"
-# META }
-
-# CELL ********************
-
-# %% Cell 1: Load metrics and check what needs generation
-ml_df = spark.table("output_metric_logic")
-metrics = [r.asDict() for r in ml_df.collect()]
-
-needs_generation = []
-already_has = []
-for m in metrics:
-    desc = m.get("description") or ""
-    if desc.strip():
-        already_has.append(m["metric_name"])
-    else:
-        needs_generation.append(m)
-
-print(f"Total metrics: {len(metrics)}")
-print(f"Already have descriptions: {len(already_has)} (skipped)")
-print(f"Need generation: {len(needs_generation)}")
-
-if not needs_generation:
-    print("\nAll metrics already have descriptions. Nothing to do.")
-    print("To regenerate, clear the description column first.")
-
-# METADATA ********************
-
-# META {
-# META   "language": "python",
-# META   "language_group": "synapse_pyspark"
-# META }
-
-# CELL ********************
-
-# %% Cell 2: Generate descriptions via Data Agent
-if needs_generation:
-    from src.adapters.fabric_agent import FabricAgentClient
-
-    token = mssparkutils.credentials.getToken("https://api.fabric.microsoft.com")
-    agent = FabricAgentClient(
-        workspace_id=WORKSPACE_ID,
-        agent_id=AGENT_ID,
-        access_token=token,
+def describe(prompt: str) -> str:
+    response = requests.post(
+        f"{LLM_ENDPOINT}/chat/completions",
+        headers={"Authorization": f"Bearer {LLM_API_KEY}", "api-key": LLM_API_KEY},
+        json={
+            "model": LLM_MODEL,
+            "messages": [{"role": "user", "content": prompt}],
+            "temperature": 0,
+        },
+        timeout=60,
     )
-
-    tool_name = agent.discover_tool_name()
-    print(f"Data Agent tool: {tool_name}\n")
-
-    DESCRIPTION_PROMPT = (
-        "For the metric {metric_name}, write a concise business description in this format:\n\n"
-        "First, one sentence stating the business purpose of the report "
-        "(why it exists, who uses it, what decisions it supports).\n\n"
-        "Then add a blank line and 'Business logic:' followed by a bulleted list of the key "
-        "rules, filters, and criteria applied. For each item, describe it in business terms "
-        "(not SQL). Include:\n"
-        "- What patient/encounter population is included or excluded\n"
-        "- What time windows or date ranges apply\n"
-        "- What clinical criteria or thresholds are checked\n"
-        "- How compliance or outcomes are calculated\n"
-        "- What groupings or breakdowns are applied (by department, shift, etc.)\n\n"
-        "No greetings, no preamble, no markdown headers, no bold text. "
-        "Start directly with the purpose sentence."
-    )
-
-    REJECT_PHRASES = [
-        "wasn't able to find", "couldn't find", "not found",
-        "hasn't been", "I'm happy to help", "don't have information",
-        "not available", "no documented",
-    ]
-
-    SAVE_EVERY = 10
-    generated = {}
-    failed = []
-    save_count = 0
-
-    for i, m in enumerate(needs_generation):
-        metric_name = m["metric_name"]
-        prompt = DESCRIPTION_PROMPT.format(metric_name=metric_name)
-
-        resp = agent.query(prompt)
-
-        if resp.status == "success" and resp.answer:
-            if any(phrase in resp.answer.lower() for phrase in REJECT_PHRASES):
-                print(f"  [{i+1}/{len(needs_generation)}] REJECTED {metric_name} — non-answer")
-                failed.append(metric_name)
-                continue
-            generated[m["metric_id"]] = resp.answer
-            print(f"  [{i+1}/{len(needs_generation)}] OK {metric_name} ({len(resp.answer)} chars)")
-        else:
-            failed.append(metric_name)
-            print(f"  [{i+1}/{len(needs_generation)}] FAILED {metric_name}: {resp.error[:100]}")
-
-        # Incremental save
-        save_count += 1
-        if save_count >= SAVE_EVERY:
-            # Save progress (see cell 3)
-            save_count = 0
-
-    print(f"\nGenerated: {len(generated)}, Failed: {len(failed)}")
-    if failed:
-        print(f"Failed metrics: {', '.join(failed[:10])}")
+    response.raise_for_status()
+    return response.json()["choices"][0]["message"]["content"].strip()
 
 # METADATA ********************
 
@@ -182,40 +104,87 @@ if needs_generation:
 
 # CELL ********************
 
-# %% Cell 3: Write descriptions back to output_metric_logic
-if needs_generation and generated:
-    from pyspark.sql.functions import when, lit, col
-    from pyspark.sql import Row
+# %% Cell 1: Load graph + cache, run the bottom-up walk
+from src.descriptions import generate_descriptions
 
-    # Create a lookup dataframe from generated descriptions
-    desc_rows = [(mid, desc) for mid, desc in generated.items()]
-    if desc_rows:
-        desc_df = spark.createDataFrame(desc_rows, ["metric_id", "new_description"])
+nodes_rows = [r.asDict() for r in spark.table("graph_nodes").collect()]
+edges_rows = [r.asDict() for r in spark.table("graph_edges").collect()]
 
-        # Read current metric_logic, join with descriptions, update
-        current_df = spark.table("output_metric_logic")
+cache: dict = {}
+if spark.catalog.tableExists("ops_description_cache"):
+    for r in spark.table("ops_description_cache").collect():
+        cache[r["content_hash"]] = r["description"]
+print(f"Nodes: {len(nodes_rows)}, edges: {len(edges_rows)}, cached steps: {len(cache)}")
 
-        updated_df = current_df.join(desc_df, on="metric_id", how="left")
-        updated_df = updated_df.withColumn(
+result = generate_descriptions(nodes_rows, edges_rows, describe, cache=cache)
+print(f"Generated: {result.generated}  cache hits: {result.cache_hits}  failed: {len(result.failed)}")
+if result.failed:
+    for nid in result.failed[:10]:
+        print(f"  failed: {nid}")
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+# %% Cell 2: Write descriptions back — graph_nodes (enricher), cache, metric_logic
+from src.schemas import DESCRIPTION_CACHE, to_spark_schema
+
+if result.descriptions:
+    desc_df = spark.createDataFrame(
+        list(result.descriptions.items()), ["node_id", "new_description"]
+    )
+    from pyspark.sql.functions import col, when
+
+    updated = (
+        spark.table("graph_nodes")
+        .join(desc_df, on="node_id", how="left")
+        .withColumn(
             "description",
             when(col("new_description").isNotNull(), col("new_description"))
-            .otherwise(col("description"))
-        ).drop("new_description")
+            .otherwise(col("description")),
+        )
+        .drop("new_description")
+    )
+    updated.write.format("delta").mode("overwrite").option("overwriteSchema", "true") \
+        .saveAsTable("graph_nodes")
+    print(f"[+] Enriched {len(result.descriptions)} node descriptions in graph_nodes")
 
-        updated_df.write.format("delta").mode("overwrite") \
-            .option("overwriteSchema", "true") \
+    now = datetime.now(timezone.utc).isoformat()
+    cache_rows = [
+        {"content_hash": h, "node_id": "", "description": d, "generated_at": now}
+        for h, d in cache.items()
+    ]
+    spark.createDataFrame(cache_rows, schema=to_spark_schema(DESCRIPTION_CACHE)) \
+        .write.format("delta").mode("overwrite").option("overwriteSchema", "true") \
+        .saveAsTable("ops_description_cache")
+    print(f"[+] Persisted {len(cache_rows)} cache entries")
+
+    metric_desc = [
+        (nid.replace("canonical:", ""), d)
+        for nid, d in result.descriptions.items() if nid.startswith("canonical:")
+    ]
+    if metric_desc:
+        md_df = spark.createDataFrame(metric_desc, ["metric_id", "new_description"])
+        ml = (
+            spark.table("output_metric_logic")
+            .join(md_df, on="metric_id", how="left")
+            .withColumn(
+                "description",
+                when(col("new_description").isNotNull(), col("new_description"))
+                .otherwise(col("description")),
+            )
+            .drop("new_description")
+        )
+        ml.write.format("delta").mode("overwrite").option("overwriteSchema", "true") \
             .saveAsTable("output_metric_logic")
-
-        print(f"[+] Updated {len(desc_rows)} descriptions in output_metric_logic")
-
-        # Show samples
-        for mid, desc in list(generated.items())[:3]:
-            print(f"\n  {mid}:")
-            print(f"    {desc[:200]}...")
-    else:
-        print("No descriptions to save.")
+        print(f"[+] Updated {len(metric_desc)} metric descriptions in output_metric_logic")
 else:
-    print("Nothing to save — either all descriptions exist or generation was skipped.")
+    print("Nothing to write — all descriptions current.")
 
 # METADATA ********************
 
@@ -226,24 +195,14 @@ else:
 
 # CELL ********************
 
-# %% Cell 4: Verify
-print("\n=== DESCRIPTION COVERAGE ===")
-final_df = spark.table("output_metric_logic")
-total = final_df.count()
-with_desc = final_df.filter("description IS NOT NULL AND description != ''").count()
-without_desc = total - with_desc
+# %% Cell 3: Coverage + next steps
+for layer, label in (("transformation", "steps"), ("canonical", "metrics")):
+    df = spark.table("graph_nodes").filter(f"layer = '{layer}'")
+    total = df.count()
+    described = df.filter("description IS NOT NULL AND description != ''").count()
+    print(f"{label}: {described}/{total} described")
 
-print(f"Total metrics:       {total}")
-print(f"With descriptions:   {with_desc} ({100*with_desc//max(total,1)}%)")
-print(f"Without descriptions: {without_desc}")
-
-if without_desc > 0:
-    print("\nMetrics still missing descriptions:")
-    for r in final_df.filter("description IS NULL OR description = ''").select("metric_name").collect():
-        print(f"  {r['metric_name']}")
-    print("\nRe-run this notebook to retry failed metrics.")
-else:
-    print("\n>>> ALL METRICS HAVE DESCRIPTIONS <<<")
+print("\nNext: run 05 (export picks up step descriptions), then re-Load the Graph Model.")
 
 # METADATA ********************
 

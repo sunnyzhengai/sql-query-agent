@@ -48,6 +48,7 @@ def export_node_tables(nodes: dict[str, GraphNode]) -> dict[str, list[dict]]:
                 "nodeId": node.node_id,
                 "name": node.name,
                 "metricId": node.properties.get("metric_id", ""),
+                "description": node.description or "",
                 "sqlFragment": node.properties.get("sql_fragment", ""),
             })
         elif node.layer == NodeLayer.TECHNICAL:

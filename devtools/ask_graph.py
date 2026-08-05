@@ -35,7 +35,17 @@ def _build_view() -> GraphView:
     spec.loader.exec_module(mod)
     parse_results, tables, columns = mod.load_recorded(FIXTURES)
     graph = build_graph_step(parse_results, tables, columns)
-    return GraphView(export_step(graph.nodes_rows, graph.edges_rows))
+
+    nodes_rows = graph.nodes_rows
+    descriptions_path = FIXTURES / "descriptions.json"
+    if descriptions_path.exists():
+        import json
+        described = json.loads(descriptions_path.read_text())
+        nodes_rows = [
+            {**r, "description": described.get(r["node_id"], r.get("description"))}
+            for r in nodes_rows
+        ]
+    return GraphView(export_step(nodes_rows, graph.edges_rows))
 
 
 def main() -> None:

@@ -10,6 +10,23 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.4.0] - 2026-08-05
+
+### Added
+- **Bottom-up description generation (ADR 0019):** src/descriptions.py walks
+  the calculation DAG in topological order — every CTE step described from
+  its own sql fragment plus its dependencies' descriptions, then each
+  metric composed from its root steps (summaries of summaries). Content-hash
+  cache (ops_description_cache) makes re-runs incremental. 07 rewritten
+  around it: direct OpenAI-compatible endpoint (customer's Azure OpenAI),
+  no more Data-Agent circularity; enriches graph_nodes + output_metric_logic
+- Transformation LPG export carries the step description; the local agent's
+  resolution payload gains the calculation-step catalog
+- devtools/describe_local.py: leak-gated local generation over recorded
+  fixtures; ask_graph.py auto-loads the results
+
+---
+
 ## [1.3.1] - 2026-08-05
 
 ### Changed

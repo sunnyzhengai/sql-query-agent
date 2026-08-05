@@ -58,7 +58,11 @@ class GraphView:
 
     def transformation_catalog(self) -> "list[dict]":
         return sorted(
-            ({"metricId": r["metricId"], "name": r["name"]} for r in self._transformation),
+            (
+                {"metricId": r["metricId"], "name": r["name"],
+                 "description": r.get("description") or ""}
+                for r in self._transformation
+            ),
             key=lambda r: (_fold(r["metricId"]), _fold(r["name"])),
         )
 

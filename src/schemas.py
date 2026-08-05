@@ -412,10 +412,11 @@ GRAPH_NODES = {
     "status": "active",
     "owner": {"notebook": "03_build_graph", "module": "src/graph/builder.py"},
     "write_mode": "overwrite",
-    "enrichers": [],
+    "enrichers": ["07_generate_descriptions"],
     "consumers": [
         "04_build_metric_logic", "05_export_graph_tables", "06_validate",
-        "08_publish_collibra", "manage_stewards", "verify_graph", "data_agent",
+        "07_generate_descriptions", "08_publish_collibra", "manage_stewards",
+        "verify_graph", "data_agent",
     ],
     "columns": [
         ("node_id", "string", False),
@@ -456,7 +457,8 @@ GRAPH_EDGES = {
     "enrichers": [],
     "consumers": [
         "04_build_metric_logic", "05_export_graph_tables", "06_validate",
-        "08_publish_collibra", "verify_graph", "data_agent",
+        "07_generate_descriptions", "08_publish_collibra", "verify_graph",
+        "data_agent",
     ],
     "columns": [
         ("source_id", "string", False),
@@ -591,12 +593,17 @@ GRAPH_TRANSFORMATION = {
         ("nodeId", "string", False),
         ("name", "string", False),
         ("metricId", "string", False),
+        ("description", "string", True),
         ("sqlFragment", "string", True),
     ],
     "column_descriptions": {
         "nodeId": "Transformation node id (graph_nodes.node_id)",
         "name": "CTE/step name",
         "metricId": "Metric this step belongs to",
+        "description": (
+            "Business description of this calculation step (ADR 0019: generated "
+            "bottom-up by 07, the smallest certified unit of business definition)"
+        ),
         "sqlFragment": "Verbatim SQL fragment for this step",
     },
     "invariants": [
@@ -809,6 +816,37 @@ GRAPH_EDGE_TECH2DIM = {
 # single-writer test enforces nothing writes those until activated).
 # =====================================================================
 
+DESCRIPTION_CACHE = {
+    "table_name": "ops_description_cache",
+    "description": (
+        "Content-hash cache for generated step descriptions (ADR 0019): one "
+        "row per described sql_fragment. Re-runs of 07 only describe new or "
+        "changed steps — the hash keys on the fragment plus direct-dependency "
+        "names, so unchanged logic never pays a second LLM call."
+    ),
+    "domain": "operations",
+    "status": "active",
+    "owner": {"notebook": "07_generate_descriptions", "module": "src/descriptions.py"},
+    "write_mode": "overwrite",
+    "enrichers": [],
+    "consumers": ["07_generate_descriptions"],
+    "columns": [
+        ("content_hash", "string", False),
+        ("node_id", "string", False),
+        ("description", "string", False),
+        ("generated_at", "string", False),
+    ],
+    "column_descriptions": {
+        "content_hash": "step_content_hash(sql_fragment, direct dependency names)",
+        "node_id": "Transformation node the description was generated for",
+        "description": "Generated one-sentence business description",
+        "generated_at": "ISO timestamp of generation",
+    },
+    "invariants": [
+        {"kind": "unique", "columns": ["content_hash"]},
+    ],
+}
+
 ERROR_LOG = {
     "table_name": "ops_error_log",
     "description": (
@@ -998,6 +1036,7 @@ TABLE_REGISTRY = {
         # operations
         PARSE_RESULTS, PARSE_ERRORS, PARSE_SUCCESSES, BUILD_SUMMARY,
         PIPELINE_VALIDATION, INSTALLATION_ERRORS, AGENT_DESCRIPTIONS,
+        DESCRIPTION_CACHE,
         # graph
         GRAPH_NODES, GRAPH_EDGES,
         # output

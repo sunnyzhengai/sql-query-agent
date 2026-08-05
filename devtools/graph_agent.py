@@ -126,10 +126,24 @@ def _catalog_payload(view: GraphView, question: str) -> str:
         "to these unless the question clearly means otherwise):\n"
         + "\n".join(f"- {h['label']}" for h in hits) + "\n\n"
     ) if hits else ""
+    described_steps = [
+        t for t in view.transformation_catalog() if t.get("description")
+    ]
+    steps_block = ""
+    if described_steps:
+        steps = "\n".join(
+            f"- {t['name']} ({t['metricId']}): {t['description']}"
+            for t in described_steps
+        )
+        steps_block = (
+            f"CALCULATION-STEP CATALOG ({len(described_steps)} described steps — "
+            "business definitions live here; a topic phrase may match a step "
+            "and its metricId anchors the metric):\n" + steps + "\n\n"
+        )
     return (
         f"METRIC CATALOG ({len(view.metric_catalog())} rows):\n{metrics}\n\n"
         f"TABLE CATALOG ({len(view.table_catalog())} rows):\n{tables}\n\n"
-        f"{hint}QUESTION: {question}"
+        f"{steps_block}{hint}QUESTION: {question}"
     )
 
 
