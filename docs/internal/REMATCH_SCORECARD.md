@@ -114,6 +114,22 @@ Also record: follow-up prompting needed (friction), response latency
 |---|---|---|---|---|
 | | | /27 | /27 | |
 
+**2026-08-05 — Graph Agent, post-1.3.1 (ADR 0020 shim live), partial run:**
+
+| Q | Result | Notes |
+|---|---|---|
+| 1 | ✅ 32/32 tables | exact answer-key set, dictionary descriptions attached |
+| 4 | ✅ 13/13 metrics | generator chose USES_TABLE unprompted; exact set match |
+| 3 | ✅ ambiguity surfaced | flagged both twins, asked which (the pass criterion); twins known from chat context after bare-exact miss. Footer tic persists: Basis said "catalog fetch", executed query was a USES_TABLE traversal |
+
+Run halted at 6 questions: F2 capacity throttled (second time) — **operational
+finding: ~6 agent Q&A per burst on F2**; pause/resume resets. Both silent-
+undercount defects confirmed dead in production: the same questions that
+returned 0 and 5/13 through three instruction-fix rounds returned complete
+sets once the export was reshaped to the generator's habits. Verdict line
+for the writeup: **the data contract, not the prompt, is where correctness
+gets enforced.**
+
 ## Prior predictions (on record)
 
 - Claude (2026-08-03): A wins Q1–3 comfortably; Q4–7 is where structure
