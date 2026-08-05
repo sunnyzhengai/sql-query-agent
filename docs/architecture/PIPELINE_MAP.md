@@ -28,7 +28,7 @@ flowchart LR
   load_sql_files["load_sql_files"]:::notebook
   manage_stewards["manage_stewards"]:::notebook
   verify_graph["verify_graph"]:::notebook
-  LPG_export__9_typed_tables_[("LPG export (9 typed tables)")]:::table
+  LPG_export__10_typed_tables_[("LPG export (10 typed tables)")]:::table
   gov_steward_assignments[("gov_steward_assignments")]:::table
   graph_edges[("graph_edges")]:::table
   graph_nodes[("graph_nodes")]:::table
@@ -59,7 +59,7 @@ flowchart LR
   03_build_graph --> graph_edges
   03_build_graph --> graph_nodes
   04_build_metric_logic --> output_metric_logic
-  05_export_graph_tables --> LPG_export__9_typed_tables_
+  05_export_graph_tables --> LPG_export__10_typed_tables_
   06_validate --> ops_build_summary
   06_validate --> ops_pipeline_validation
   07_generate_descriptions -->|enrich| output_metric_logic

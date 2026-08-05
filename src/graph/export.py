@@ -8,6 +8,7 @@ writing as Delta/parquet tables that the Graph Model editor can map.
 
 from __future__ import annotations
 
+from src.graph.traversal import GraphTraverser
 from src.models import EdgeType, GraphEdge, GraphNode, NodeLayer
 
 
@@ -100,3 +101,33 @@ def export_edge_tables(edges: list[GraphEdge]) -> dict[str, list[dict]]:
         })
 
     return result
+
+
+def derive_uses_table_rows(
+    nodes: dict[str, GraphNode], edges: list[GraphEdge]
+) -> list[dict]:
+    """Materialize the metric -> table transitive closure (ADR 0018).
+
+    One row per (metric, technical TABLE the metric ultimately reads),
+    computed over the full DEPENDS_ON closure via GraphTraverser — the
+    same walk that defines metric lineage everywhere else. Column nodes
+    are excluded (lineage is table-grained; columns hang off tables via
+    TABLE_TO_COLUMN structure edges).
+
+    These edges are derived, never stored in graph_edges: they exist so
+    table<->metric questions are answerable with a single hop.
+    """
+    traverser = GraphTraverser(nodes, edges)
+    rows: list[dict] = []
+    for node in nodes.values():
+        if node.layer != NodeLayer.CANONICAL:
+            continue
+        metric_id = node.node_id.replace("canonical:", "")
+        subgraph = traverser.get_metric_subgraph(metric_id)
+        seen: set[str] = set()
+        for tech in subgraph.get("technical", []):
+            if tech.properties.get("column") or tech.node_id in seen:
+                continue
+            seen.add(tech.node_id)
+            rows.append({"sourceId": node.node_id, "targetId": tech.node_id})
+    return rows

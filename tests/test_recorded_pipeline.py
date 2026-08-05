@@ -50,3 +50,46 @@ def test_recorded_pipeline_reaches_deployment_ready():
     blocked, lines = runner.run_pipeline(parse_results, tables, columns)
     report = "\n".join(lines)
     assert not blocked, f"recorded pipeline BLOCKED:\n{report}"
+
+
+def _exported_from_recorded():
+    from src.steps.build_graph import build_graph_step
+    from src.steps.export import export_step
+
+    runner = _runner()
+    parse_results, tables, columns = runner.load_recorded(FIXTURES)
+    graph = build_graph_step(parse_results, tables, columns)
+    return export_step(graph.nodes_rows, graph.edges_rows)
+
+
+def _table_node_ids(exported, table_name):
+    return {
+        r["nodeId"] for r in exported["graph_technical"]
+        if r["tableName"].upper() == table_name and not r["columnName"]
+    }
+
+
+def test_uses_table_closure_matches_certified_answer_key():
+    """Count oracle (ADR 0018): the derived closure must reproduce the
+    REMATCH_SCORECARD answer-key numbers computed from these fixtures.
+    A silent undercount here is the exact defect the closure exists to kill."""
+    exported = _exported_from_recorded()
+    uses = exported["graph_edge_uses_table"]
+
+    def readers_of(table_name):
+        targets = _table_node_ids(exported, table_name)
+        assert targets, f"{table_name} table node missing from graph_technical"
+        return {r["sourceId"] for r in uses if r["targetId"] in targets}
+
+    assert len(readers_of("HOSPITAL_ENCOUNTERS")) == 13
+    assert len(readers_of("MEDICATION_ORDERS")) == 7
+
+    def tables_of(metric_id):
+        return {
+            r["targetId"] for r in uses
+            if r["sourceId"] == f"canonical:{metric_id}"
+        }
+
+    assert len(tables_of("reports.USP_Severe_Sepsis")) == 32
+    assert len(tables_of("reporting.USP_ED_Sepsis")) == 38
+    assert len(tables_of("reports.USP_ED_Sepsis")) == 29

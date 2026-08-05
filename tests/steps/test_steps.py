@@ -78,9 +78,32 @@ class TestExportStep:
         tables, columns = _dict_rows()
         graph = build_graph_step(parse_out.parse_results, tables, columns)
         exported = export_step(graph.nodes_rows, graph.edges_rows)
-        assert len(exported) == 9  # 4 node tables + 5 edge tables
+        assert len(exported) == 10  # 4 node tables + 5 edge tables + derived closure
         assert len(exported["graph_canonical"]) == len(parse_out.parse_results)
         assert exported["graph_edge_tab2col"], "column edges must be exported"
+
+    def test_uses_table_closure_reaches_beyond_root_steps(self):
+        """ADR 0018: the derived closure must cover the FULL DEPENDS_ON chain —
+        a root-steps-only derivation is the exact silent-undercount defect."""
+        parse_out = parse_step(SAMPLE_SQL_SOURCES, parse_sql)
+        tables, columns = _dict_rows()
+        graph = build_graph_step(parse_out.parse_results, tables, columns)
+        exported = export_step(graph.nodes_rows, graph.edges_rows)
+
+        uses = exported["graph_edge_uses_table"]
+        assert uses, "closure must produce edges on sample data"
+        # Every metric with any READS_FROM in its subgraph appears as a source
+        canonical_ids = {r["nodeId"] for r in exported["graph_canonical"]}
+        assert {r["sourceId"] for r in uses} <= canonical_ids
+        # Closure >= shallow: for each metric, tables via closure must be a
+        # superset of tables reachable from root steps only
+        t2tech = {(r["sourceId"], r["targetId"]) for r in exported["graph_edge_t2tech"]}
+        c2t = {(r["sourceId"], r["targetId"]) for r in exported["graph_edge_c2t"]}
+        for metric in canonical_ids:
+            roots = {t for (s, t) in c2t if s == metric}
+            shallow = {tech for (s, tech) in t2tech if s in roots}
+            closure = {r["targetId"] for r in uses if r["sourceId"] == metric}
+            assert shallow <= closure, f"{metric}: closure missing root-level tables"
 
 
 class TestPostconditionGate:

@@ -10,6 +10,30 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.3.0] - 2026-08-04
+
+### Added
+- **graph_edge_uses_table** — derived metric→table closure edges (ADR 0018):
+  the full DEPENDS_ON transitive closure precomputed at export, so
+  table↔metric questions are single-hop and complete by construction.
+  Count-oracle tests pin the certified answer-key numbers (13 readers of
+  HOSPITAL_ENCOUNTERS, 32 tables under reports.USP_Severe_Sepsis, …)
+- ADRs 0017–0019: resolve-then-traverse agent retrieval, materialized
+  closure edges, CTE descriptions bottom-up
+- Error KB: delta_schema_mismatch_on_upgrade (contract evolution vs.
+  existing Delta schema; overwriteSchema on snapshot writes)
+
+### Changed
+- Graph agent instructions rewritten resolution-first (ADR 0017): catalog
+  fetch + semantic matching by the LLM, traversal only with certified keys,
+  USES_TABLE preferred for lineage questions, honest Basis footer
+- All snapshot-table overwrites carry overwriteSchema (05 was the straggler;
+  02/06/utilities aligned)
+- src.__version__ now derives from package metadata — pyproject is the
+  single version home (was hand-maintained and stale at 1.1.0)
+
+---
+
 ## [1.2.2] - 2026-08-04
 
 ### Added

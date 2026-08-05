@@ -27,3 +27,6 @@ never deleted — its status changes and it links to its replacement.
 | [0014](0014-metric-logic-grounding-mandatory-dictionary.md) | Ground the agent in `metric_logic`; data dictionary mandatory | Accepted |
 | [0015](0015-metric-id-identity-propagation.md) | `metric_id` is the universal identity; consumers must propagate it | Accepted |
 | [0016](0016-case-insensitive-identifier-matching.md) | Case-insensitive identifier matching, folded to uppercase | Accepted |
+| [0017](0017-resolve-then-traverse-agent-retrieval.md) | Resolve-then-traverse: anchor resolution before any graph query | Accepted |
+| [0018](0018-materialized-closure-edges.md) | Materialize the metric→table closure as USES_TABLE edges | Accepted |
+| [0019](0019-cte-descriptions-bottom-up.md) | CTE descriptions, generated bottom-up, before metric descriptions | Accepted |

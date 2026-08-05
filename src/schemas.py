@@ -744,6 +744,33 @@ GRAPH_EDGE_TAB2COL = {
     ],
 }
 
+GRAPH_EDGE_USES_TABLE = {
+    "table_name": "graph_edge_uses_table",
+    "description": (
+        "LPG export: DERIVED metric -> technical table edges — the precomputed "
+        "transitive closure of the calculation DAG (ADR 0018), so table<->metric "
+        "questions are single-hop. Not stored in graph_edges; recomputed every export."
+    ),
+    "domain": "lpg_export",
+    "status": "active",
+    "owner": {"notebook": "05_export_graph_tables", "module": None},
+    "write_mode": "overwrite",
+    "enrichers": [],
+    "consumers": ["fabric_graph_model (planned)"],
+    "columns": [
+        ("sourceId", "string", False),
+        ("targetId", "string", False),
+    ],
+    "column_descriptions": {
+        "sourceId": "Metric node id (graph_canonical.nodeId)",
+        "targetId": "Technical TABLE node id (graph_technical.nodeId; never a column node)",
+    },
+    "invariants": [
+        {"kind": "reference", "column": "sourceId", "references": "graph_canonical.nodeId"},
+        {"kind": "reference", "column": "targetId", "references": "graph_technical.nodeId"},
+    ],
+}
+
 GRAPH_EDGE_TECH2DIM = {
     "table_name": "graph_edge_tech2dim",
     "description": "LPG export: technical -> dimension edges (table to its filterable columns).",
@@ -968,7 +995,7 @@ TABLE_REGISTRY = {
         # lpg_export
         GRAPH_CANONICAL, GRAPH_TRANSFORMATION, GRAPH_TECHNICAL, GRAPH_DIMENSION,
         GRAPH_EDGE_C2T, GRAPH_EDGE_T2T, GRAPH_EDGE_T2TECH, GRAPH_EDGE_TECH2DIM,
-        GRAPH_EDGE_TAB2COL,
+        GRAPH_EDGE_TAB2COL, GRAPH_EDGE_USES_TABLE,
         # planned (no current writer — see notes on each)
         ERROR_LOG, EXTRACTION_INSPECTION, TRACKING, SYNC_LOG, STEWARD_ASSIGNMENTS,
     ]

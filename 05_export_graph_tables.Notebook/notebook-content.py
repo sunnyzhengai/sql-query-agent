@@ -47,6 +47,8 @@ After running, create a Graph Model in the Fabric UI:
    - graph_edge_t2tech   -> TRANSFORM_TO_TECHNICAL (source_id -> Transformation, target_id -> Technical)
    - graph_edge_tab2col  -> TABLE_TO_COLUMN (source_id -> Technical table, target_id -> Technical column)
    - graph_edge_tech2dim -> TECHNICAL_TO_DIMENSION (source_id -> Technical, target_id -> Dimension)
+   - graph_edge_uses_table -> USES_TABLE (source_id -> Canonical, target_id -> Technical table)
+     DERIVED closure (ADR 0018): metric -> every table it ultimately reads, single hop
 4. Save the model to ingest data and build the queryable graph
 """
 

@@ -43,6 +43,9 @@ class EdgeType(str, Enum):
     TRANSFORM_TO_TECHNICAL = "transform_to_technical"
     TECHNICAL_TO_DIMENSION = "technical_to_dimension"
     TABLE_TO_COLUMN = "table_to_column"
+    # Derived at export time (ADR 0018): metric -> table transitive closure.
+    # Never stored in graph_edges; materialized into graph_edge_uses_table.
+    USES_TABLE = "uses_table"
 
 
 class GraphEdge(BaseModel):
