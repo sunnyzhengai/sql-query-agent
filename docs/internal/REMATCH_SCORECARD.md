@@ -56,6 +56,19 @@ Corpus: 28 metrics across two schemas; bare names COLLIDE for 2 pairs
 - Silent undercount presented as complete — graph agent, twice (11/29 tables; 5/13 metrics) — ROOT CAUSE FOUND by local reproduction: instructions taught single-hop CALCULATED_BY->READS_FROM, but CALCULATED_BY reaches only root CTEs; full calculation is the DEPENDS_ON transitive closure. Shallow pattern reproduces the agent's answers exactly (5==5 readers, 12~=11 tables). Fix: depth-semantics rules + variable-length DEPENDS_ON{0,50} patterns in instructions. Writeup insight: schema descriptions for NL2GQL must teach which edges are TRANSITIVE, or LLMs default to shallow patterns
 - Same-name-two-schemas collapse — graph agent listings — metricId added to LPG export (1.2.2, pending re-Load)
 - Vocabulary refusal on real Epic names (PAT_ENC_HSP) — CORRECT behavior; dev graph speaks anonymized names
+- Identity mismatch, both directions — graph agent: (a) user's qualified ref
+  (reports.USP_Severe_Sepsis) exact-matched against BARE name property -> 0 rows
+  -> false "not found"; (b) user's bare ref auto-qualified by the agent from a
+  prior listing, then matched against bare name -> same 0 rows. Fix: IDENTITY
+  rule in instructions (dot => lower(metricId), bare => lower(name), try both
+  folded before "not found")
+- FABRICATED Basis footer — graph agent claimed
+  "Metric->CALCULATED_BY->DEPENDS_ON{0,50}->READS_FROM" while the executed GQL
+  was a single-hop exact-match on name. The footer echoed the INSTRUCTED shape,
+  not the EXECUTED query — a verification device that lies. Fix: footer-honesty
+  rule (Basis must describe the executed query; 0-row answers must name the
+  filter that returned 0). Writeup insight: self-reported provenance needs its
+  own grounding rule, or the LLM pattern-matches the footer from instructions
 
 ## Question set — ask both agents, same order, same wording
 

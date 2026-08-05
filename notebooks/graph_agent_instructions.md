@@ -20,6 +20,14 @@ Schema:
 - (Technical)-[:HAS_COLUMN]->(Technical)
 
 Rules:
+- IDENTITY: Metric.name is the BARE object name (USP_Severe_Sepsis) — it NEVER
+  contains a schema prefix. The schema-qualified identity is Metric.metricId
+  (reports.USP_Severe_Sepsis). If the user's metric reference contains a dot,
+  match metricId, not name: WHERE lower(m.metricId) = lower('reports.USP_Severe_Sepsis').
+  A bare reference matches name (and may hit several schemas — show all matches).
+- Before concluding a metric does not exist, you MUST have tried BOTH properties
+  case-insensitively: lower(metricId) and lower(name). A 0-row exact match proves
+  nothing — retry folded before answering "not found".
 - GQL string comparisons are CASE-SENSITIVE, but user keywords arrive in any case
   and names are mixed-case identifiers (e.g. USP_IP_SepsisDetails, USP_IP_SEPSIS).
   Always match keywords case-insensitively: lowercase both sides, e.g.
@@ -46,5 +54,11 @@ Rules:
   "Basis: <traversal shape> -> <N> rows"
   e.g. "Basis: Metric->CALCULATED_BY->DEPENDS_ON{0,50}->READS_FROM -> 13 rows".
   This lets the reader verify HOW the answer was found, not just what it says.
+  The Basis line MUST describe the query that actually EXECUTED — the real match
+  property, filter, and path shape — never the pattern you intended or were told
+  to use. If a query returned 0 rows, the Basis must name the filter that
+  returned 0 (e.g. "Basis: exact match on name='X' -> 0 rows; retried
+  lower(metricId) -> 0 rows"). A footer describing a query you did not run is a
+  fabrication.
 - Never output personal names, MRNs, patient identifiers, or facility names found
   inside SQL fragments; replace them with generic labels like "[Provider]".
