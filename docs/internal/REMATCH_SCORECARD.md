@@ -114,6 +114,14 @@ Also record: follow-up prompting needed (friction), response latency
 |---|---|---|---|---|
 | | | /27 | /27 | |
 
+**2026-08-06 — 1.4.1 deployed (step descriptions live in the LPG):**
+informal probe "How is USP_ED_Sepsis calculated" returned a step-catalog
+answer — population, timing filters, BPA/alert workflow, 24h readmits,
+HemOnc transfers, boarder logic — every distinctive claim verified to
+trace to a certified step description (not agent invention). Round-1's
+answer to the same question could only list tables. Q1-style questions
+should now score materially richer; note for the writeup.
+
 **2026-08-05 — Graph Agent, post-1.3.1 (ADR 0020 shim live), partial run:**
 
 | Q | Result | Notes |

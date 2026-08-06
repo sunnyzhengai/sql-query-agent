@@ -48,8 +48,11 @@ Steps
        parity CANNOT detect a stale load when only property values
        changed — probe a property:
        `MATCH (t:Transformation) RETURN t.name AS name, t.description AS d LIMIT 5`
-6. [ ] Sanity Q&A (2 questions max, save burst budget): one metric-detail
-       question (expects step catalog in the answer), one refusal probe
+6. [x] Sanity Q&A passed (2026-08-06): property probe returned described
+       transformations; "How is USP_ED_Sepsis calculated" returned a
+       step-catalog answer whose distinctive claims (24h readmits, HemOnc
+       transfers, boarders, BPA overrides) all trace to certified step
+       descriptions — the ADR 0019 chain verified end to end in production
 7. [x] mssparkutils token caveat: if the session runs >1 hr, restart the
        session before 07 — `getToken()` caches and won't refresh mid-batch
 
