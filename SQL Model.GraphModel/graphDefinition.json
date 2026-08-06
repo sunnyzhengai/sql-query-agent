@@ -29,6 +29,10 @@
         {
           "propertyName": "metricId",
           "sourceColumn": "metricId"
+        },
+        {
+          "propertyName": "bareName",
+          "sourceColumn": "bareName"
         }
       ]
     },
@@ -136,6 +140,19 @@
       "id": "defd196c-6784-46d9-b46a-4a46e9793214",
       "edgeIdMapping": null,
       "dataSourceName": "graph_edge_tab2col",
+      "sourceNodeKeyColumns": [
+        "sourceId"
+      ],
+      "propertyMappings": [],
+      "destinationNodeKeyColumns": [
+        "targetId"
+      ]
+    },
+    {
+      "edgeTypeAlias": "c5fb48d9-8dcd-4e18-a6ae-6db981dd0b6a",
+      "id": "24e12978-c223-43a0-b9f3-f85deb0b515e",
+      "edgeIdMapping": null,
+      "dataSourceName": "graph_edge_uses_table",
       "sourceNodeKeyColumns": [
         "sourceId"
       ],

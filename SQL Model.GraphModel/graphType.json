@@ -33,6 +33,10 @@
         {
           "name": "metricId",
           "type": "STRING"
+        },
+        {
+          "name": "bareName",
+          "type": "STRING"
         }
       ]
     },
@@ -153,6 +157,19 @@
       },
       "labels": [
         "HAS_COLUMN"
+      ],
+      "properties": []
+    },
+    {
+      "sourceNodeType": {
+        "alias": "10c38402-039b-4465-a90a-399e28b13f8e"
+      },
+      "alias": "c5fb48d9-8dcd-4e18-a6ae-6db981dd0b6a",
+      "destinationNodeType": {
+        "alias": "f03774b6-fa65-46b9-bf0c-85ca532014ed"
+      },
+      "labels": [
+        "USES_TABLE"
       ],
       "properties": []
     }
