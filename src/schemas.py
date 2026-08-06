@@ -1165,6 +1165,87 @@ PERSONAL_DEFINITIONS = {
 
 
 
+PHI_FINDINGS = {
+    "table_name": "ops_phi_findings",
+    "description": (
+        "PHI / hardcoded-literal findings from ingestion-time scanning of "
+        "customer SQL (ADR 0025): one row per detected literal with rule, "
+        "severity, and disposition. Drives deterministic redaction at "
+        "every LLM/catalog egress point; steward dispositions only "
+        "unredact confirmed false positives — the default is safe."
+    ),
+    "domain": "operations",
+    "status": "planned",
+    "notes": (
+        "Contract draft from ADR 0025 (2026-08-06). Writer will be the "
+        "PHI scan step in 02_parse; redaction consumers are 07/08/09 and "
+        "devtools description generation."
+    ),
+    "columns": [
+        ("finding_id", "string", False),
+        ("metric_id", "string", False),
+        ("rule", "string", False),
+        ("matched_text", "string", False),
+        ("masked_context", "string", True),
+        ("severity", "string", False),
+        ("disposition", "string", False),
+        ("disposed_by", "string", True),
+        ("first_seen", "string", True),
+    ],
+    "column_descriptions": {
+        "finding_id": "Stable id for the finding (hash of metric_id + rule + match)",
+        "metric_id": "Metric whose SQL contains the literal (input_sql_sources.metric_id)",
+        "rule": "id_literal | date_literal | name_literal | contact_literal | threshold_literal",
+        "matched_text": "The literal as found (stays in-tenant; never exported)",
+        "masked_context": "Surrounding SQL with the literal masked, for review UI",
+        "severity": "high (id/name/contact) | medium (date) | low (threshold)",
+        "disposition": "redact | allow | open",
+        "disposed_by": "Steward who confirmed a false positive (allow)",
+        "first_seen": "When the finding first appeared",
+    },
+    "invariants": [
+        {"kind": "unique", "columns": ["finding_id"]},
+        {"kind": "allowed_values", "column": "disposition",
+         "values": ["redact", "allow", "open"]},
+    ],
+}
+
+RUNTIME_ERROR_EVENTS = {
+    "table_name": "ops_runtime_error_events",
+    "description": (
+        "Append-only occurrences of runtime/installation failures with "
+        "error-to-data lineage (ADR 0026): each event names the matched "
+        "signature, the pipeline stage, and the objects the failure "
+        "blocks — so /troubleshoot answers 'what does this failure block?', "
+        "not just 'what is this failure?'."
+    ),
+    "domain": "operations",
+    "status": "planned",
+    "notes": (
+        "Contract draft from ADR 0026 (2026-08-06). "
+        "ops_installation_errors stays the signature knowledge base; this "
+        "log records occurrences. Wire writers per-notebook when the "
+        "blast-radius view lands."
+    ),
+    "columns": [
+        ("event_at", "string", False),
+        ("run_id", "string", True),
+        ("stage", "string", False),
+        ("error_signature", "string", True),
+        ("error_message", "string", True),
+        ("affected_objects", "string", True),
+    ],
+    "column_descriptions": {
+        "event_at": "When the failure occurred (ISO)",
+        "run_id": "Pipeline run identifier, if inside a run",
+        "stage": "Which notebook/step failed (01_install ... 09_publish_purview)",
+        "error_signature": "Matched ops_installation_errors.error_signature, if recognized",
+        "error_message": "Raw error text",
+        "affected_objects": "JSON list of metric_ids / table names the failure blocks",
+    },
+    "invariants": [],
+}
+
 
 # Registry of all table contracts — the single source of truth.
 TABLE_REGISTRY = {
@@ -1188,6 +1269,8 @@ TABLE_REGISTRY = {
         ERROR_LOG, EXTRACTION_INSPECTION, TRACKING, SYNC_LOG, STEWARD_ASSIGNMENTS,
         # governance lifecycle contract drafts (ADRs 0021-0024)
         CERTIFICATION_EVENTS, USAGE_EVENTS, PERSONAL_DEFINITIONS,
+        # PHI scanning + error lineage contract drafts (ADRs 0025-0026)
+        PHI_FINDINGS, RUNTIME_ERROR_EVENTS,
     ]
 }
 

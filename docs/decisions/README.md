@@ -35,5 +35,7 @@ never deleted — its status changes and it links to its replacement.
 | [0022](0022-definition-versioning-certification-pins-a-version.md) | Definition versioning: content-hash versions; certification pins a version | Accepted |
 | [0023](0023-usage-weighted-governance-flywheel.md) | Usage is governance: the usage-weighted flywheel | Accepted |
 | [0024](0024-layered-truth-personal-and-enterprise.md) | Layered truth: personal definitions beside enterprise definitions | Accepted |
+| [0025](0025-phi-scanning-at-ingestion.md) | PHI and hardcoded-literal scanning at ingestion; LLM boundary is the gate | Accepted |
+| [0026](0026-error-to-data-lineage.md) | Every error names its data: error-to-data lineage | Accepted |
 | [0027](0027-ownership-attribution-layered-sources.md) | Ownership attribution: manual entry is the floor, Entra ID enriches | Accepted |
 | [0028](0028-contact-me-first-transactable-on-first-buyer.md) | List as Contact Me now; convert to transactable at first-buyer signal | Accepted |
