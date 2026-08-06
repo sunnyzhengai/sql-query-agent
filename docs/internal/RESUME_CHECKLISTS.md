@@ -6,42 +6,53 @@ Delete each section when done; delete the file when both are done.
 
 ---
 
-## A. 1.4.0 deploy cycle (wheel → 07 → 05 → re-Load)
+## A. 1.4.x deploy cycle — RUN 2026-08-06 (1.4.1); kept as the runbook
 
-Goal: get bottom-up descriptions (ADR 0019) + the generator-compatibility
-export (ADR 0020) live on the Fabric tenant in one sitting.
+Executed 2026-08-06 with 1.4.1. Lessons learned are folded in below —
+this section is now the reusable deploy runbook.
 
 Prereqs
-- [ ] Fabric capacity available (F2 burst budget in mind: no agent Q&A
-      needed for the deploy itself)
-- [ ] `OPENAI` endpoint decision for 07 on-tenant: customer-pattern Azure
-      OpenAI vs. dev key in notebook env (dev tenant only — never ship the key)
-- [ ] `git status` clean on dev; CI green
+- [x] Fabric capacity available; scale to F4 for the run if the F2
+      throttles (Azure portal → capacity → Scale; scale BACK to F2 after)
+- [x] 07's LLM config in lakehouse `Files/sql-query-agent/`:
+      `org_config.yaml` gets an `llm:` block (endpoint, model,
+      api_key_file) + `llm_api_key.txt` (raw key only, one line; lives in
+      Files, never in git). Dev tenant: api.openai.com + gpt-4o-mini,
+      matching the local fixtures' vocabulary
+- [x] `git status` clean on dev; CI green
 
 Steps
-1. [ ] Build the wheel: `python -m build` → verify `twine check dist/*`
-       and version says **1.4.0** (`pyproject.toml` already bumped)
-2. [ ] Upload wheel to the Fabric Environment (replace 1.3.1); publish
-       environment; wait for propagation (~10 min)
-3. [ ] Run **07_generate_descriptions** (now the ADR 0019 bottom-up path):
-       - watch call volume — first run is ~460 calls, then hash-cached
-         (`ops_description_cache`)
-       - postcondition gate green; spot-check 3 step + 2 metric
-         descriptions for grounding (no invented purposes — the tuned
-         METRIC_PROMPT from 2026-08-06 bans benefit-filler)
-4. [ ] Run **05_export_graph_tables** so the LPG export carries
-       descriptions + the 1.3.1 shim shapes (qualified `name`, closure
-       `CALCULATED_BY`)
-5. [ ] **Re-Load the Graph Model** (the LPG is a snapshot — this is the
-       step that always gets forgotten; count parity queryset from
-       REMATCH_SCORECARD pre-flight is the check)
+1. [x] Build the wheel: `python -m build` → verify metadata version
+2. [x] **Ship the wheel via git, not portal upload**: commit it into
+       `sql-logic-env.Environment/Libraries/CustomLibraries/` (remove the
+       old one), push; workspace → Source control → Update; then Publish
+       the environment. Portal upload is the fallback, not the path.
+       If Publish fails with a bare `PbiApiError`: fresh browser tab
+       first (stale-session is the common cause; 2026-08-06 incident),
+       then `devtools/publish_environment.py` for the real error payload
+3. [x] Run **07_generate_descriptions**: first run ~460 calls, then
+       hash-cached (`ops_description_cache` — separate from the committed
+       local fixtures cache). Postcondition gate green; spot-check 3 step
+       + 2 metric descriptions (no benefit-filler)
+4. [x] Run **05_export_graph_tables**
+5. [x] **Load the Graph Model — there is NO Load/Refresh button**
+       (verified 2026-08-06: neither the model editor toolbar nor the
+       item's ⋯ menu has one). A load fires only when a REAL definition
+       change is saved:
+       - 05 added/changed columns → update the node type's property
+         mapping (Get data first if the new column isn't listed) → Save
+       - content-only refresh → re-apply a mapping via Get data → Save
+       Footer "Last loaded" confirms. Count parity CANNOT detect a stale
+       load when only property values changed — probe a property:
+       `MATCH (t:Transformation) RETURN t.name AS name, t.description AS d LIMIT 5`
 6. [ ] Sanity Q&A (2 questions max, save burst budget): one metric-detail
        question (expects step catalog in the answer), one refusal probe
-7. [ ] mssparkutils token caveat: if the session runs >1 hr, restart the
+7. [x] mssparkutils token caveat: if the session runs >1 hr, restart the
        session before 07 — `getToken()` caches and won't refresh mid-batch
 
-Rollback: previous wheel stays in the Environment history; graph tables are
-overwrite-mode snapshots — rerunning 03→05 with the old wheel restores.
+Rollback: previous wheel is one git revert away (environment is
+git-integrated); graph tables are overwrite-mode snapshots — rerunning
+03→05 with the old wheel restores.
 
 ---
 
