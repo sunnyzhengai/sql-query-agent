@@ -39,3 +39,4 @@ never deleted — its status changes and it links to its replacement.
 | [0026](0026-error-to-data-lineage.md) | Every error names its data: error-to-data lineage | Accepted |
 | [0027](0027-ownership-attribution-layered-sources.md) | Ownership attribution: manual entry is the floor, Entra ID enriches | Accepted |
 | [0028](0028-contact-me-first-transactable-on-first-buyer.md) | List as Contact Me now; convert to transactable at first-buyer signal | Accepted |
+| [0029](0029-dimension-layer-activation.md) | Dimension layer activation: filter-usage qualifies, scope-local aliases resolve | Accepted |

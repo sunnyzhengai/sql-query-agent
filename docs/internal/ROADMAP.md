@@ -10,7 +10,7 @@ Phased plan for taking the **Data Empowerment Suite** from internal tool to
 Microsoft Marketplace product. No fixed dates — phases have exit criteria, not
 deadlines. Update this as you go.
 
-**Last reconciled:** 2026-08-02
+**Last reconciled:** 2026-08-06
 
 ## Canonical Numbers
 
@@ -18,10 +18,10 @@ Cite these from other documents by reference — do not copy values.
 
 | Metric | Value | As of |
 |---|---|---|
-| Package version | 1.1.0 (`pyproject.toml`) | 2026-08-02 |
+| Package version | 1.4.0 (`pyproject.toml`) | 2026-08-06 |
 | Parse rate (latest full corpus) | 1,337 / 1,344 procs (99.5%), 0 errors | 2026-07-25 |
 | Earlier validation run | 788 / 790 procs (99.7%), 24 min | 2026-07 |
-| Test suite | 186 tests collected (`pytest --collect-only`) | 2026-08-02 |
+| Test suite | 362 tests collected (`pytest --collect-only`) | 2026-08-06 |
 | Pipeline notebooks | 01_install … 09_publish_purview (9 numbered) | 2026-08-02 |
 | Pricing | $2,000/mo, $21,600/yr, 30-day free trial | 2026-07-25 |
 
@@ -130,11 +130,13 @@ Get Metadata Sync working end-to-end with real data against Purview/Collibra.
       export_test_fixtures notebook (select→anonymize→leak-gate→export),
       run_pipeline_local.py replays 03→06 pure-python with full gates,
       recorded-pipeline tests skip until fixtures land
-- [ ] **ACTION (Sunny): run export_test_fixtures on Fabric once**, download to
-      tests/fixtures/recorded/, run pytest, commit — CI then replays ScriptDom
-      truth on every push
-- [ ] Offline slice 4: LLM stand-in via AgentBackend protocol (record-replay
-      for descriptions + grounding evals; wheel-excluded)
+- [x] Run export_test_fixtures on Fabric once, download to
+      tests/fixtures/recorded/, run pytest, commit — CI replays ScriptDom
+      truth on every push (fixtures landed 2026-08-02)
+- [x] Offline slice 4 (2026-08-06): LLM stand-in via AgentBackend protocol
+      (devtools/local_llm.py + describe_local.py); full-corpus description
+      fixtures generated locally, leak-gated (with `~cs` case-sensitive scan
+      terms for org words that are common English), committed
 - [x] Recovered from dead-code purge (2026-08-02): ops_error_log (regression
       detection, appended by 02_parse) and gov_steward_assignments
       (manage_stewards utility → applied to graph by 03 → agent-visible via
@@ -266,9 +268,15 @@ Get capacity through one of:
       graph structure, architecture diagram
 
 ### Submission
-- [ ] **Decide: Contact Me vs. Transactable for launch** — recommendation:
-      Contact Me first (days not weeks, no fulfillment infrastructure), convert
-      to transactable after 3 customers ([ADR 0013](../decisions/0013-transactable-saas-on-marketplace.md))
+- [x] **Decide: Contact Me vs. Transactable for launch** — DECIDED 2026-08-06
+      ([ADR 0028](../decisions/0028-contact-me-first-transactable-on-first-buyer.md)):
+      Contact Me as soon as verification clears; convert the same offer at
+      first-buyer signal (not "after 3 customers" — private offers need
+      transactable). Execution plan:
+      [MARKETPLACE_TRANSACTABLE_PLAN.md](MARKETPLACE_TRANSACTABLE_PLAN.md)
+- [x] Fulfillment scaffold (2026-08-06): subscription state machine +
+      webhook contract + JWT claim validation as pure library code with
+      tests (`src/marketplace/`, `tests/marketplace/`)
 - [ ] Reviewer sandbox: dedicated workspace, synthetic data, test credentials, REVIEWER_GUIDE
 - [ ] Create offer in Partner Center; upload assets; submit for certification
 - [ ] Respond to certification feedback (review takes 2-4 weeks)
@@ -290,25 +298,36 @@ Get capacity through one of:
 Raised during the contract review; each gets a ground-truth answer and, where
 needed, a design pass. Do not resolve casually — these are product decisions.
 
-- [ ] **PHI/hardcoded-value scanning at ingestion** — agent-level redaction is
-      documented (whitepaper) and demo anonymization exists, but no
-      ingestion-time PHI scan of customer SQL appears to be implemented.
-      Healthcare-critical.
-- [ ] **Usage-weight flywheel + answer feedback** — `src/governance/usage.py`
-      was deleted in the dead-code purge and not yet recovered; no usage
-      columns/tables in the registry; no certify/reject interaction for agent
-      answers.
-- [ ] **Error-to-data lineage** — parse/error tables carry metric_id but most
-      lack declared reference invariants back to input_sql_sources;
-      installation errors don't record affected objects.
-- [ ] **Steward creation + certification workflow** — assignment exists
-      (manage_stewards), but the certify/reject lifecycle (ADR 0004,
-      CertificationStatus enum, Path B queue) has no tables, transitions, or
-      notification wiring. Biggest remaining product gap.
-- [ ] **Dimension-layer activation (design pass)** — column_refs now survive
-      the 02→03 boundary, but wiring add_dimension_node needs two decisions:
-      which columns qualify as dimensions (WHERE/GROUP BY filters?), and
-      alias resolution (refs carry aliases like 'e', not table names).
+- [x] **PHI/hardcoded-value scanning at ingestion** — DESIGNED 2026-08-06:
+      [ADR 0025](../decisions/0025-phi-scanning-at-ingestion.md) (scan in 02,
+      deterministic rules, redaction at the LLM/catalog egress boundary) +
+      `ops_phi_findings` contract draft. Implementation pending.
+- [x] **Usage-weight flywheel + answer feedback** — DESIGNED 2026-08-06:
+      [ADR 0023](../decisions/0023-usage-weighted-governance-flywheel.md)
+      (append-only events, derived weights, demand-sorted steward queue) +
+      `gov_usage_events` contract draft. Implementation pending.
+- [x] **Error-to-data lineage** — DESIGNED 2026-08-06:
+      [ADR 0026](../decisions/0026-error-to-data-lineage.md) (mandatory
+      reference invariants on error tables; runtime events with
+      affected_objects) + `ops_runtime_error_events` contract draft.
+      Implementation pending.
+- [x] **Steward creation + certification workflow** — DESIGNED 2026-08-06:
+      [ADR 0021](../decisions/0021-certification-discloses-never-gates.md)
+      (constitution: certification discloses, never gates) +
+      [ADR 0022](../decisions/0022-definition-versioning-certification-pins-a-version.md)
+      (content-hash versions, certification pins a version) +
+      [ADR 0024](../decisions/0024-layered-truth-personal-and-enterprise.md)
+      (personal + enterprise truth layers) + `gov_certification_events` /
+      `gov_personal_definitions` contract drafts. Implementation pending.
+- [x] **Dimension-layer activation (design pass)** — DESIGNED 2026-08-06:
+      [ADR 0029](../decisions/0029-dimension-layer-activation.md)
+      (filter-usage qualifies; scope-local alias resolution at parse time;
+      unresolvable refs dropped and counted). Implementation pending.
+- [x] **Ownership attribution** — DESIGNED 2026-08-06:
+      [ADR 0027](../decisions/0027-ownership-attribution-layered-sources.md)
+      (manual floor, Entra enrichment adapter, provenance columns) +
+      [Entra feasibility findings](../development/OWNERSHIP_ATTRIBUTION.md).
+      Implementation pending.
 - [ ] **Fallback splitter environment divergence** — identical bytes, Python
       version, sqlparse and sqlglot versions produce different statement
       boundaries on GitHub runners vs macOS (SELECT INTO absorbs a following
@@ -321,7 +340,12 @@ needed, a design pass. Do not resolve casually — these are product decisions.
       agents via FabricAgentBackend. Counts are cheap oracles: they catch
       silent-undercount defects (e.g. the 2026-08-04 shallow-traversal bug,
       5/13 readers) that prose-level evals cannot see.
-- [ ] **Delta vs Graph rematch** — rerun the backend comparison once
+- [ ] **Delta vs Graph rematch** — Round 2 PARTIAL (2026-08-05): 3/9
+      questions green on the post-1.3.1 graph (Q1 32/32, Q4 13/13, Q3
+      ambiguity surfaced); halted on F2 throttling. Writeup drafted:
+      [REMATCH_WRITEUP.md](REMATCH_WRITEUP.md); completion plan:
+      [RESUME_CHECKLISTS.md](RESUME_CHECKLISTS.md). Full rerun once the
+      dimension layer is live remains open. Original framing: rerun once
       contracts are enforced in production and the dimension layer is live;
       the original experiment compared curated Delta (metric_logic) against
       a structurally impoverished graph (case-split nodes, empty dimension
