@@ -53,6 +53,15 @@ def test_bracketed_and_bare_procedure_forms():
     assert "MHC_RPT" not in text
 
 
+def test_scan_case_sensitive_terms_skip_common_prose():
+    # '~cs' terms: leaked proper nouns/identifiers keep casing; ordinary
+    # English ('ensuring clarity') must not trip the gate
+    assert scan_for_missed("text ensuring clarity here", ["Clarity~cs"]) == []
+    assert len(scan_for_missed("reads Clarity tables", ["Clarity~cs"])) == 1
+    assert len(scan_for_missed("FROM CLARITY_DEP", ["CLARITY~cs"])) == 1
+    assert len(scan_for_missed("from clarity_dep", ["clarity_~cs"])) == 1
+
+
 def test_scan_for_missed_finds_leftovers_with_context():
     warnings = scan_for_missed("SELECT * FROM MegaHealth_Extra", ["MegaHealth"])
     assert len(warnings) == 1 and "MegaHealth_Extra" in warnings[0]

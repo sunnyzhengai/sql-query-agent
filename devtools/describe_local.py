@@ -75,7 +75,14 @@ def main() -> None:
     all_text = "\n".join(result.descriptions.values()) + "\n" + "\n".join(cache.values())
     leaks = scan_for_missed(all_text, terms)
     if leaks:
-        print("[X] LEAK GATE FAILED — nothing written:")
+        # Quarantine (gitignored) so a false-positive gate doesn't discard
+        # the paid LLM calls — inspect, fix the gate or the text, re-run.
+        quarantine = CACHE_PATH.with_suffix(".quarantine.json")
+        quarantine.write_text(
+            json.dumps({"cache": cache, "descriptions": result.descriptions},
+                       indent=1, sort_keys=True)
+        )
+        print(f"[X] LEAK GATE FAILED — nothing published; raw output quarantined in {quarantine.name}:")
         for line in leaks[:10]:
             print(f"    {line}")
         raise SystemExit(1)

@@ -8,6 +8,30 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+- Full-corpus description fixtures (ADR 0019 first pass): 432 step + 28
+  metric descriptions generated locally over the recorded fixtures,
+  leak-gated, committed for offline replay
+- Marketplace fulfillment scaffold (ADR 0028): subscription state machine,
+  webhook event contract, and JWT claim validation as pure library code
+  (src/marketplace/) with tests
+- Governance lifecycle design (ADRs 0021-0024) with contract drafts:
+  gov_certification_events, gov_usage_events, gov_personal_definitions
+- PHI-scanning and error-lineage designs (ADRs 0025-0026) with contract
+  drafts: ops_phi_findings, ops_runtime_error_events
+- Ownership attribution design (ADR 0027) + Entra ID feasibility findings;
+  Marketplace timing decision (ADR 0028); dimension-layer activation
+  design (ADR 0029)
+
+### Changed
+- Metric description prompt grounds the purpose sentence strictly in step
+  descriptions and bans benefit-filler ("supports decision-making") —
+  smoke-run QA showed invented purposes on a date-dimension proc
+- Leak-gate scan terms support `~cs` (case-sensitive) annotation for org
+  terms that are common English words ('Clarity' vs "ensuring clarity");
+  describe_local quarantines gate-failed output instead of discarding the
+  paid LLM calls
+
 ---
 
 ## [1.4.0] - 2026-08-05

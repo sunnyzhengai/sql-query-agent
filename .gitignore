@@ -47,3 +47,4 @@ data/Collibra*
 
 # Local secrets (API keys for dev tooling) — never commit
 .env
+*.quarantine.json

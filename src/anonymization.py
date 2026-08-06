@@ -139,10 +139,17 @@ def scan_for_missed(text: str, forbidden_terms: "Iterable[str]") -> "list[str]":
 
     forbidden_terms is caller-supplied (crosswalk `_scan_terms` or a local
     list) — nothing org-specific lives in this module.
+
+    A term ending in `~cs` is matched case-sensitively (mirrors the `~ci`
+    replacement suffix). Use it for org terms that are also common English
+    words ('Clarity', 'Cook'), where case-insensitive matching false-flags
+    ordinary prose — leaked proper nouns and identifiers keep their casing.
     """
     warnings = []
     for term in forbidden_terms:
-        for m in re.finditer(re.escape(term), text, re.IGNORECASE):
+        flags = 0 if term.endswith("~cs") else re.IGNORECASE
+        term = term.removesuffix("~cs")
+        for m in re.finditer(re.escape(term), text, flags):
             start = max(0, m.start() - 30)
             end = min(len(text), m.end() + 30)
             context = text[start:end].replace("\n", " ").strip()

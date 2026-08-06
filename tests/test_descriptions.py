@@ -118,3 +118,8 @@ class TestPrompts:
         assert "assembles the cohort" in p
         assert "42" in p
         assert "SELECT" not in p
+
+    def test_metric_prompt_bans_invented_purpose(self):
+        p = build_metric_prompt("USP_X", [("FinalData", "assembles the cohort")], 42)
+        assert "grounded ONLY in the step descriptions" in p
+        assert "unless a step description states them" in p
