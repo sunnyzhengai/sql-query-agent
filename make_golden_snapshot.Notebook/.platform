@@ -1,0 +1,12 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Notebook",
+    "displayName": "make_golden_snapshot",
+    "description": "Golden lakehouse snapshot: clone rebuild-expensive state + manifest"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "1c265f47-2ef4-4ae0-ba40-4cdc7f134a37"
+  }
+}

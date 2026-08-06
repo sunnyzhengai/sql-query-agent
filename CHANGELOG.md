@@ -9,6 +9,20 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 ## [Unreleased]
 
 ### Added
+- src/llm_client.py — Azure-aware LLM doorway: Azure endpoints get
+  `api-key` auth + api-version handling (query strings survive the path
+  join); OpenAI endpoints get Bearer. 07 and devtools both route
+  through it; 07's describe now sends the same system prompt as the
+  local fixtures generation
+- PHI wiring end to end (ADR 0025): parse_step scans every source
+  (parse outcome irrelevant) and carries steward dispositions +
+  first_seen across runs; 02 writes ops_phi_findings (contract now
+  active, single-writer enforced); 07 redacts fragments from the
+  findings table before any prompt — with an inline-scan fallback so
+  the gate never silently disappears
+- make_golden_snapshot notebook: DEEP CLONEs the rebuild-expensive
+  state (inputs, description cache, PHI dispositions, error history)
+  to golden_ tables + manifest; restore = clone back + rerun 02->07
 - PHI / hardcoded-literal scanner (ADR 0025, src/phi_scan.py): five
   deterministic rules, span-claiming to prevent double-flags, IN-lists
   flag every member, steward dispositions survive re-scans via stable

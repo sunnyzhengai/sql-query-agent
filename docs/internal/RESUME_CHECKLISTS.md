@@ -62,6 +62,35 @@ git-integrated); graph tables are overwrite-mode snapshots — rerunning
 
 ---
 
+## C. Next Fabric session — validate the 2026-08-06 evening batch
+
+Built offline, needs one on-tenant validation pass (order matters):
+
+1. [ ] Source control → Update (pulls updated 02/07 notebooks + the new
+       make_golden_snapshot notebook item)
+2. [ ] **Azure OpenAI live smoke** (the only piece that can't be tested
+       locally): create an Azure OpenAI resource + gpt-4o-mini deployment
+       (portal, ~10 min); point org_config `llm.endpoint` at
+       `https://<resource>.openai.azure.com/openai/deployments/<dep>`;
+       run `scripts/validate_deployment.py`; then one test cell:
+       `from src.llm_client import chat_completion; print(chat_completion("You are terse.", "Say OK.", endpoint=LLM_ENDPOINT, api_key=LLM_API_KEY))`
+       Expect "OK" — proves the api-key header + api-version handling live.
+       Then flip endpoint back (or keep Azure — same model family).
+3. [ ] Run **02_parse** — expect "Saved ~278 PHI findings to
+       ops_phi_findings (~218 redact, ~60 open for steward review)"
+4. [ ] Run **07_generate_descriptions** — expect "PHI gate: ... fragments
+       redacted", ~102 steps regenerate (redaction changed their hashes),
+       metrics recompose, rest from cache
+5. [ ] Rerun **05** + trigger the graph load (runbook step 5 — mapping
+       unchanged, so make a real definition change or re-apply Get data)
+6. [ ] Sanity: one metric-detail question still grounded; spot-check a
+       redacted step's description reads fine with `<ID>`/`<DATE>` gone
+7. [ ] Run **make_golden_snapshot** — golden_ tables + Files/golden/
+       manifest.json; record the manifest numbers here
+8. [ ] Scale back to F2 if you scaled up
+
+---
+
 ## B. Remaining rematch questions (Round 2 completion)
 
 Goal: finish the 9-question scorecard on the post-1.3.1 graph, then the
