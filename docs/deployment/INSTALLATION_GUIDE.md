@@ -23,6 +23,9 @@ Before starting, confirm you have:
   - Data Agent instructions file
 - [ ] Your organization's SQL files (`.sql` stored procedures and/or views)
 - [ ] Your data dictionary CSVs (`dict_tables.csv`, `dict_columns.csv`) — see DATA_DICTIONARY_REQUIREMENTS.md
+- [ ] An **Azure OpenAI resource** in your Azure subscription (for business-language
+      description generation — your data never leaves your tenant boundary to any
+      third-party AI service; see Step 3f to create one, ~10 minutes)
 
 ---
 
@@ -163,6 +166,57 @@ Files/
 - [ ] `dictionary/` contains both CSV files
 
 ---
+
+### 3f: Configure your Azure OpenAI endpoint
+
+Description generation (notebook 07) calls **your own** Azure OpenAI
+endpoint — the product never ships an AI key, and your SQL logic is
+PHI-redacted before any fragment reaches the endpoint.
+
+**Create the resource** (once, ~10 minutes, Azure portal):
+
+1. Portal → **Create a resource** → **Azure OpenAI** → Create
+2. **Region:** choose **East US 2** unless policy dictates otherwise — it
+   has the broadest model availability and high default quotas. (Latency
+   is irrelevant: calls happen at build time, not when users ask questions.)
+3. **Pricing tier:** Standard S0 (the only option; pay-per-token)
+4. **Networking:** select **All networks**. Fabric notebooks call the
+   endpoint over the public internet — a private endpoint or selected-networks
+   restriction makes description generation fail with errors that look like
+   authentication problems.
+5. After creation, open the resource → **Model deployments** → deploy
+   **gpt-4o-mini**, and name the deployment `gpt-4o-mini`.
+   > The **deployment name becomes part of the URL** — if you name it
+   > something else, use that name in the endpoint below.
+
+**Wire it into the product:**
+
+6. Resource → **Keys and Endpoint** → copy **Key 1** into a plain-text file
+   named `llm_api_key.txt` — the raw key only, one line, nothing else —
+   and upload it to `Files/sql-query-agent/` (next to `org_config.yaml`).
+   It lives only in your lakehouse.
+7. Add the `llm:` block to `org_config.yaml`:
+   ```yaml
+   llm:
+     endpoint: https://<your-resource-name>.openai.azure.com/openai/deployments/gpt-4o-mini
+     model: gpt-4o-mini
+     api_key_file: llm_api_key.txt
+   ```
+8. Verify before running the pipeline:
+   `python scripts/validate_deployment.py` (or the validation cell in
+   notebook 01) — it checks the endpoint shape and key file and tells you
+   exactly what to fix if something's off.
+
+**Cost expectation:** the first description run makes one call per
+calculation step and metric (a few hundred calls on a typical corpus —
+typically under a dollar with gpt-4o-mini). Re-runs only pay for changed
+SQL; everything else is cached.
+
+> **Strict PHI posture?** Azure OpenAI logs prompts for abuse monitoring by
+> default (reviewable by Microsoft). Combined with the product's built-in
+> PHI redaction this is acceptable for most organizations, but you may
+> additionally apply to Microsoft for the abuse-monitoring exemption on
+> your endpoint ("modified content filters and abuse monitoring").
 
 ## Step 4: Import Notebooks
 
