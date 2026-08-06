@@ -56,6 +56,10 @@
         {
           "propertyName": "sqlFragment",
           "sourceColumn": "sqlFragment"
+        },
+        {
+          "propertyName": "description",
+          "sourceColumn": "description"
         }
       ]
     },

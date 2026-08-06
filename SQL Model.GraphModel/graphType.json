@@ -64,6 +64,10 @@
         {
           "name": "sqlFragment",
           "type": "STRING"
+        },
+        {
+          "name": "description",
+          "type": "STRING"
         }
       ]
     },
