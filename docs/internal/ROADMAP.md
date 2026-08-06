@@ -237,7 +237,10 @@ Make the codebase enterprise-ready for Marketplace certification.
 
 ### Security & compliance docs
 - [x] Security whitepaper ([SECURITY_WHITEPAPER.md](../product/SECURITY_WHITEPAPER.md))
-- [ ] Data flow diagram showing security boundaries
+- [x] Data flow diagram showing security boundaries — 2026-08-06: "System
+      at a Glance" mermaid in ARCHITECTURE.md (tenant boundary, single
+      PHI-redacted egress to customer's Azure OpenAI); GitHub renders it,
+      screenshot for Partner Center attestation
 - [ ] Microsoft Publisher Attestation questionnaire in Partner Center
 - [ ] Review CSA STAR registry — self-attestation needed for v1?
 
