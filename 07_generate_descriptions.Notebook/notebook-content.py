@@ -63,7 +63,6 @@ import json
 from datetime import datetime, timezone
 from pathlib import Path
 
-import requests
 import yaml
 
 CONFIG_DIR = Path("/lakehouse/default/Files/sql-query-agent")
@@ -81,19 +80,16 @@ LLM_API_KEY = key_file.read_text().strip()
 print(f"LLM endpoint: {LLM_ENDPOINT} (model {LLM_MODEL})")
 
 
+from src.llm_client import chat_completion
+
+
 def describe(prompt: str) -> str:
-    response = requests.post(
-        f"{LLM_ENDPOINT}/chat/completions",
-        headers={"Authorization": f"Bearer {LLM_API_KEY}", "api-key": LLM_API_KEY},
-        json={
-            "model": LLM_MODEL,
-            "messages": [{"role": "user", "content": prompt}],
-            "temperature": 0,
-        },
-        timeout=60,
+    # Azure vs OpenAI header/url differences live in src.llm_client —
+    # Azure endpoints get api-key auth and api-version handling.
+    return chat_completion(
+        "You write terse, faithful business documentation.", prompt,
+        endpoint=LLM_ENDPOINT, api_key=LLM_API_KEY, model=LLM_MODEL,
     )
-    response.raise_for_status()
-    return response.json()["choices"][0]["message"]["content"].strip()
 
 # METADATA ********************
 
@@ -105,10 +101,36 @@ def describe(prompt: str) -> str:
 # CELL ********************
 
 # %% Cell 1: Load graph + cache, run the bottom-up walk
+import json as _json
+
 from src.descriptions import generate_descriptions
+from src.phi_scan import from_records, redact_node_fragments, scan_sql
 
 nodes_rows = [r.asDict() for r in spark.table("graph_nodes").collect()]
 edges_rows = [r.asDict() for r in spark.table("graph_edges").collect()]
+
+# PHI gate (ADR 0025): fragments are redacted BEFORE any prompt is built.
+# Normal path: findings written by 02_parse (carries steward dispositions).
+# Fallback: 02 hasn't scanned yet — scan fragments inline; the gate never
+# silently disappears. Redaction changes content hashes, so affected
+# steps regenerate once, then re-cache.
+if spark.catalog.tableExists("ops_phi_findings"):
+    phi_findings = from_records(
+        [r.asDict() for r in spark.table("ops_phi_findings").collect()]
+    )
+else:
+    print("[!] ops_phi_findings missing — rerun 02_parse to persist findings; "
+          "scanning fragments inline for this run")
+    phi_findings = []
+    for row in nodes_rows:
+        if row["layer"] != "transformation":
+            continue
+        props = _json.loads(row["properties"]) if isinstance(row["properties"], str) else row["properties"]
+        phi_findings.extend(
+            scan_sql(props.get("metric_id", ""), props.get("sql_fragment") or "")
+        )
+redacted_count = redact_node_fragments(nodes_rows, phi_findings)
+print(f"PHI gate: {len(phi_findings)} findings, {redacted_count} fragments redacted")
 
 cache: dict = {}
 if spark.catalog.tableExists("ops_description_cache"):

@@ -20,9 +20,9 @@ from __future__ import annotations
 import os
 from typing import Any
 
-import requests
-
 from src.agent_backend import build_description_prompt, retrieve_metric_rows
+from src.llm_client import chat_completion as _chat_completion
+
 
 def chat_completion(
     system: str,
@@ -33,26 +33,21 @@ def chat_completion(
     model: "str | None" = None,
     timeout: int = 60,
 ) -> str:
-    """One OpenAI-compatible chat call — the single LLM doorway for devtools."""
+    """Env-driven wrapper over src.llm_client — devtools' LLM doorway.
+
+    Azure header/url handling lives in src.llm_client (shared with 07);
+    this only resolves the dev-environment defaults.
+    """
     key = api_key or os.environ.get("OPENAI_API_KEY", "")
     if not key:
         raise ValueError("OPENAI_API_KEY not set")
-    url = (base_url or os.environ.get("OPENAI_BASE_URL", "https://api.openai.com/v1")).rstrip("/")
-    response = requests.post(
-        f"{url}/chat/completions",
-        headers={"Authorization": f"Bearer {key}"},
-        json={
-            "model": model or os.environ.get("AIVIA_LLM_MODEL", "gpt-4o-mini"),
-            "messages": [
-                {"role": "system", "content": system},
-                {"role": "user", "content": user},
-            ],
-            "temperature": 0,
-        },
+    return _chat_completion(
+        system, user,
+        endpoint=base_url or os.environ.get("OPENAI_BASE_URL", "https://api.openai.com/v1"),
+        api_key=key,
+        model=model or os.environ.get("AIVIA_LLM_MODEL", "gpt-4o-mini"),
         timeout=timeout,
     )
-    response.raise_for_status()
-    return response.json()["choices"][0]["message"]["content"].strip()
 
 
 GROUNDING_INSTRUCTIONS = (
