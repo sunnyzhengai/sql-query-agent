@@ -8,6 +8,18 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+- PHI / hardcoded-literal scanner (ADR 0025, src/phi_scan.py): five
+  deterministic rules, span-claiming to prevent double-flags, IN-lists
+  flag every member, steward dispositions survive re-scans via stable
+  finding ids; redaction wired into describe_local's prompt boundary.
+  Fixture blast radius: 278 findings, 102/432 steps affected; committed
+  descriptions verified clean (zero long numerics leaked)
+- Deployment pre-flight validator (scripts/validate_deployment.py):
+  config, llm block (incl. Azure api-version check), mandatory
+  dictionary shape from the table contracts, sql_input, ScriptDom DLL,
+  package import — every failure states the fix
+
 ---
 
 ## [1.4.1] - 2026-08-06
