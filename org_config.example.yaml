@@ -4,6 +4,13 @@
 org:
   name: "Example Health System"
 
+# LLM endpoint for description generation (notebook 07) — REQUIRED.
+# Your own Azure OpenAI resource; see INSTALLATION_GUIDE.md Step 3f.
+# llm:
+#   endpoint: https://<your-resource>.openai.azure.com/openai/deployments/<deployment-name>
+#   model: <deployment-name>            # e.g. gpt-5.4-mini
+#   api_key_file: llm_api_key.txt      # next to this file; raw key, one line
+
 # Fabric lakehouse paths for Delta tables
 lakehouse:
   # Input tables (customer data)

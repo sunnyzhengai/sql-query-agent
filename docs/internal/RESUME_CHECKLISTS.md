@@ -68,14 +68,17 @@ Built offline, needs one on-tenant validation pass (order matters):
 
 1. [ ] Source control → Update (pulls updated 02/07 notebooks + the new
        make_golden_snapshot notebook item)
-2. [ ] **Azure OpenAI live smoke** (the only piece that can't be tested
-       locally): create an Azure OpenAI resource + gpt-4o-mini deployment
-       (portal, ~10 min); point org_config `llm.endpoint` at
-       `https://<resource>.openai.azure.com/openai/deployments/<dep>`;
-       run `scripts/validate_deployment.py`; then one test cell:
-       `from src.llm_client import chat_completion; print(chat_completion("You are terse.", "Say OK.", endpoint=LLM_ENDPOINT, api_key=LLM_API_KEY))`
-       Expect "OK" — proves the api-key header + api-version handling live.
-       Then flip endpoint back (or keep Azure — same model family).
+2. [x] **Azure OpenAI live smoke — DONE 2026-08-06 from local**: resource
+       `aivia` (rg-fabric-prod, East US 2), deployment `gpt-5.4-mini`
+       v2026-03-17, DataZoneStandard sku (gpt-4o-mini is deprecated;
+       regional Standard sku no longer offered on new models).
+       src.llm_client verified live: api-key header + api-version URL,
+       model replied "OK". Remaining on-tenant: update lakehouse
+       org_config to
+       `endpoint: https://aivia.openai.azure.com/openai/deployments/gpt-5.4-mini`
+       + `model: gpt-5.4-mini`, replace llm_api_key.txt with aivia Key 1
+       (was copied to clipboard). Note: next 07 run regenerates changed
+       steps with the new model (hash cache limits the blast radius).
 3. [ ] Run **02_parse** — expect "Saved ~278 PHI findings to
        ops_phi_findings (~218 redact, ~60 open for steward review)"
 4. [ ] Run **07_generate_descriptions** — expect "PHI gate: ... fragments

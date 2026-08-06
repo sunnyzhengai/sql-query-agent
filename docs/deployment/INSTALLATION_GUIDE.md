@@ -184,10 +184,28 @@ PHI-redacted before any fragment reaches the endpoint.
    endpoint over the public internet — a private endpoint or selected-networks
    restriction makes description generation fail with errors that look like
    authentication problems.
-5. After creation, open the resource → **Model deployments** → deploy
-   **gpt-4o-mini**, and name the deployment `gpt-4o-mini`.
+5. After creation, deploy a **current mini-tier chat model** (as of
+   2026-08: `gpt-5.4-mini`; pick the newest non-deprecated "-mini" chat
+   model — the catalog marks deprecated ones), and **name the deployment
+   after the model**. Choose the **DataZoneStandard** deployment type when
+   offered — it keeps processing within your geographic data zone
+   (US/EU); "Global" types route anywhere for capacity.
    > The **deployment name becomes part of the URL** — if you name it
    > something else, use that name in the endpoint below.
+   >
+   > **Portal trap:** the "Go to Foundry portal" button may open a
+   > default project (e.g. `founder-xxxx`) instead of your resource —
+   > check the top-left breadcrumb shows YOUR resource before deploying,
+   > or a model deployed there lands on a different endpoint.
+   > **CLI alternative** (deterministic, recommended for scripted installs):
+   > ```
+   > az cognitiveservices account deployment create -g <resource-group> \
+   >   -n <resource-name> --deployment-name <model> --model-name <model> \
+   >   --model-version <version> --model-format OpenAI \
+   >   --sku-name DataZoneStandard --sku-capacity 50
+   > ```
+   > (list deployable models/versions first:
+   > `az cognitiveservices account list-models -g <rg> -n <name> -o table`)
 
 **Wire it into the product:**
 
@@ -195,11 +213,11 @@ PHI-redacted before any fragment reaches the endpoint.
    named `llm_api_key.txt` — the raw key only, one line, nothing else —
    and upload it to `Files/sql-query-agent/` (next to `org_config.yaml`).
    It lives only in your lakehouse.
-7. Add the `llm:` block to `org_config.yaml`:
+7. Add the `llm:` block to `org_config.yaml` (model = your deployment name):
    ```yaml
    llm:
-     endpoint: https://<your-resource-name>.openai.azure.com/openai/deployments/gpt-4o-mini
-     model: gpt-4o-mini
+     endpoint: https://<your-resource-name>.openai.azure.com/openai/deployments/<deployment-name>
+     model: <deployment-name>
      api_key_file: llm_api_key.txt
    ```
 8. Verify before running the pipeline:
