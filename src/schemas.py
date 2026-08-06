@@ -1027,6 +1027,145 @@ STEWARD_ASSIGNMENTS = {
 }
 
 
+# =====================================================================
+# GOVERNANCE lifecycle — contract drafts (ADRs 0021-0024)
+# Planned until writers exist; the shapes are the design deliverable.
+# =====================================================================
+
+CERTIFICATION_EVENTS = {
+    "table_name": "gov_certification_events",
+    "description": (
+        "Append-only log of certification lifecycle events. Certification "
+        "pins a definition version (ADR 0022): every event records the "
+        "definition_hash the reviewer actually saw. Current status per "
+        "metric is the latest event; staleness is derived by comparing the "
+        "certified hash to the metric's current hash — never stored. "
+        "Certification discloses trust, never gates availability (ADR 0021)."
+    ),
+    "domain": "governance",
+    "status": "planned",
+    "notes": (
+        "Contract draft from the 2026-08-06 governance design pass (ADRs "
+        "0021-0024). Writer will be a certify/reject steward interaction "
+        "(notebook or agent command); wire before flipping active."
+    ),
+    "columns": [
+        ("event_at", "string", False),
+        ("metric_id", "string", False),
+        ("definition_hash", "string", False),
+        ("definition_version", "integer", False),
+        ("action", "string", False),
+        ("actor", "string", False),
+        ("actor_email", "string", True),
+        ("previous_status", "string", True),
+        ("new_status", "string", False),
+        ("reason", "string", True),
+    ],
+    "column_descriptions": {
+        "event_at": "Event timestamp (ISO)",
+        "metric_id": "Metric certified/rejected (input_sql_sources.metric_id)",
+        "definition_hash": "SHA-256 of the normalized SQL the reviewer saw (ADR 0022)",
+        "definition_version": "Human-facing ordinal for that hash (1, 2, 3...)",
+        "action": "dev_certify | steward_certify | reject | revoke | deprecate | reinstate",
+        "actor": "Who acted (developer or steward name)",
+        "actor_email": "Actor contact email",
+        "previous_status": "CertificationStatus before the event",
+        "new_status": "CertificationStatus after the event (draft | dev_certified | steward_certified)",
+        "reason": "Free-text rationale, required on reject/revoke/deprecate",
+    },
+    "invariants": [],
+}
+
+USAGE_EVENTS = {
+    "table_name": "gov_usage_events",
+    "description": (
+        "Append-only log of agent interactions — the flywheel's ground "
+        "truth (ADR 0023). One row per question: who asked, what resolved "
+        "(or refused), and the asker's verdict on the answer. All usage "
+        "weights and steward-queue priorities are derived from this log, "
+        "never incremented in place."
+    ),
+    "domain": "governance",
+    "status": "planned",
+    "notes": (
+        "Contract draft from the 2026-08-06 governance design pass (ADRs "
+        "0021-0024). Needs an ingestion point from the Data Agent "
+        "conversation surface; refusals log with metric_id null (the "
+        "most-wanted-definitions queue)."
+    ),
+    "columns": [
+        ("event_at", "string", False),
+        ("user_id", "string", False),
+        ("user_name", "string", True),
+        ("department", "string", True),
+        ("question", "string", False),
+        ("metric_id", "string", True),
+        ("outcome", "string", False),
+        ("feedback", "string", True),
+    ],
+    "column_descriptions": {
+        "event_at": "Event timestamp (ISO)",
+        "user_id": "Asker identity (Entra object id, or pseudonymized id)",
+        "user_name": "Asker display name",
+        "department": "Asker department, if known",
+        "question": "The question as asked",
+        "metric_id": "Metric the answer resolved to; null when refused",
+        "outcome": "answered | refused",
+        "feedback": "confirmed | rejected | none — the cheapest certification signal",
+    },
+    "invariants": [],
+}
+
+PERSONAL_DEFINITIONS = {
+    "table_name": "gov_personal_definitions",
+    "description": (
+        "User-owned definitions beside the enterprise graph (ADR 0024): a "
+        "personal truth layer the agent answers from for its owner, always "
+        "disclosed as personal. Promotion to enterprise runs the standard "
+        "certification path and is fed by the flywheel (similar personal "
+        "definitions across users surface as promotion candidates)."
+    ),
+    "domain": "governance",
+    "status": "planned",
+    "notes": (
+        "Contract draft from the 2026-08-06 governance design pass (ADRs "
+        "0021-0024). First user-private data in the lakehouse — RLS and "
+        "whitepaper coverage required before flipping active."
+    ),
+    "columns": [
+        ("definition_id", "string", False),
+        ("owner_user_id", "string", False),
+        ("owner_name", "string", True),
+        ("name", "string", False),
+        ("definition_text", "string", False),
+        ("sql_fragment", "string", True),
+        ("metric_id", "string", True),
+        ("created_at", "string", False),
+        ("updated_at", "string", True),
+        ("promotion_status", "string", True),
+        ("promoted_metric_id", "string", True),
+    ],
+    "column_descriptions": {
+        "definition_id": "Unique id for this personal definition",
+        "owner_user_id": "Owning user (Entra object id); only the owner resolves against it",
+        "owner_name": "Owner display name (attribution on promotion)",
+        "name": "The term as the owner uses it",
+        "definition_text": "Plain-language definition, true for the owner",
+        "sql_fragment": "Optional SQL logic backing the definition",
+        "metric_id": "Enterprise metric this forks, if any",
+        "created_at": "Creation timestamp (ISO)",
+        "updated_at": "Last edit timestamp (ISO)",
+        "promotion_status": "none | candidate | promoted | declined",
+        "promoted_metric_id": "Enterprise metric created from this definition, if promoted",
+    },
+    "invariants": [
+        {"kind": "unique", "columns": ["definition_id"]},
+    ],
+}
+
+
+
+
 # Registry of all table contracts — the single source of truth.
 TABLE_REGISTRY = {
     s["table_name"]: s
@@ -1047,6 +1186,8 @@ TABLE_REGISTRY = {
         GRAPH_EDGE_TAB2COL, GRAPH_EDGE_USES_TABLE,
         # planned (no current writer — see notes on each)
         ERROR_LOG, EXTRACTION_INSPECTION, TRACKING, SYNC_LOG, STEWARD_ASSIGNMENTS,
+        # governance lifecycle contract drafts (ADRs 0021-0024)
+        CERTIFICATION_EVENTS, USAGE_EVENTS, PERSONAL_DEFINITIONS,
     ]
 }
 

@@ -31,3 +31,7 @@ never deleted — its status changes and it links to its replacement.
 | [0018](0018-materialized-closure-edges.md) | Materialize the metric→table closure as USES_TABLE edges | Accepted |
 | [0019](0019-cte-descriptions-bottom-up.md) | CTE descriptions, generated bottom-up, before metric descriptions | Accepted |
 | [0020](0020-generator-compatibility-export.md) | Shape the LPG export to the query generator's habits | Accepted |
+| [0021](0021-certification-discloses-never-gates.md) | Certification discloses trust; it never gates availability | Accepted |
+| [0022](0022-definition-versioning-certification-pins-a-version.md) | Definition versioning: content-hash versions; certification pins a version | Accepted |
+| [0023](0023-usage-weighted-governance-flywheel.md) | Usage is governance: the usage-weighted flywheel | Accepted |
+| [0024](0024-layered-truth-personal-and-enterprise.md) | Layered truth: personal definitions beside enterprise definitions | Accepted |
