@@ -40,6 +40,32 @@ class TestParseStep:
         assert out.error_log.current_run[0].status == "regressed"
         assert out.run_summary["regressions"] == 1
 
+    def test_phi_scan_covers_unparseable_sources(self):
+        sources = [{
+            "metric_id": "dbo.BAD", "name": "BAD",
+            "sql": "SELECT FROM WHERE PAT_MRN_ID = 1234567 (",  # won't parse
+        }]
+        out = parse_step(sources, parse_sql, scan_timestamp="2026-08-06T00:00:00Z")
+        assert len(out.parse_errors) == 1  # parse failed...
+        assert len(out.phi_findings) == 1  # ...but the literal was still caught
+        assert out.phi_findings[0]["rule"] == "id_literal"
+        assert out.phi_findings[0]["first_seen"] == "2026-08-06T00:00:00Z"
+
+    def test_phi_dispositions_and_first_seen_survive_reruns(self):
+        sources = [{
+            "metric_id": "dbo.M", "name": "M",
+            "sql": "SELECT 1 FROM t WHERE PAT_MRN_ID = 1234567",
+        }]
+        first = parse_step(sources, parse_sql, scan_timestamp="2026-01-01T00:00:00Z")
+        prior = first.phi_findings
+        prior[0]["disposition"] = "allow"  # steward: false positive
+        second = parse_step(
+            sources, parse_sql,
+            previous_phi_records=prior, scan_timestamp="2026-08-06T00:00:00Z",
+        )
+        assert second.phi_findings[0]["disposition"] == "allow"
+        assert second.phi_findings[0]["first_seen"] == "2026-01-01T00:00:00Z"
+
 
 class TestBuildGraphStep:
     def test_relations_hold_on_sample_data(self):
@@ -134,7 +160,7 @@ class TestPostconditionGate:
     def test_gate_checks_owned_tables_and_passes_clean_state(self):
         assert set(tables_owned_by("02_parse")) == {
             "ops_parse_results", "ops_parse_errors", "ops_parse_successes",
-            "ops_error_log",
+            "ops_error_log", "ops_phi_findings",
         }
         state = {"ops_parse_successes": [{"metric_id": "a", "name": "a",
                                           "cte_count": 1, "table_count": 1,

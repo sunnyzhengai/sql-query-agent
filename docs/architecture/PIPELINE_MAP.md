@@ -44,6 +44,7 @@ flowchart LR
   ops_parse_errors[("ops_parse_errors")]:::table
   ops_parse_results[("ops_parse_results")]:::table
   ops_parse_successes[("ops_parse_successes")]:::table
+  ops_phi_findings[("ops_phi_findings")]:::table
   ops_pipeline_validation[("ops_pipeline_validation")]:::table
   output_metric_logic[("output_metric_logic")]:::table
   admin{{admin}}:::actor
@@ -57,6 +58,7 @@ flowchart LR
   02_parse --> ops_parse_errors
   02_parse --> ops_parse_results
   02_parse --> ops_parse_successes
+  02_parse --> ops_phi_findings
   03_build_graph --> graph_edges
   03_build_graph --> graph_nodes
   04_build_metric_logic --> output_metric_logic
@@ -120,6 +122,8 @@ flowchart LR
   ops_parse_successes --> 02_parse
   ops_parse_successes --> 06_validate
   ops_parse_successes --> verify_graph
+  ops_phi_findings --> 02_parse
+  ops_phi_findings --> 07_generate_descriptions
   ops_pipeline_validation --> admin
   ops_pipeline_validation --> data_agent
   output_metric_logic --> 07_generate_descriptions

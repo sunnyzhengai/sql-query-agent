@@ -1175,12 +1175,11 @@ PHI_FINDINGS = {
         "unredact confirmed false positives — the default is safe."
     ),
     "domain": "operations",
-    "status": "planned",
-    "notes": (
-        "Contract draft from ADR 0025 (2026-08-06). Writer will be the "
-        "PHI scan step in 02_parse; redaction consumers are 07/08/09 and "
-        "devtools description generation."
-    ),
+    "status": "active",
+    "owner": {"notebook": "02_parse", "module": "src/phi_scan.py"},
+    "write_mode": "overwrite",
+    "enrichers": [],
+    "consumers": ["02_parse", "07_generate_descriptions"],
     "columns": [
         ("finding_id", "string", False),
         ("metric_id", "string", False),

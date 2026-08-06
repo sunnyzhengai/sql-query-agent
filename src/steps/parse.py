@@ -3,6 +3,11 @@
 Logic relations asserted here:
 - Every source produces exactly one outcome: a parse result or an error.
 - Success and error sets are disjoint and together cover all sources.
+
+PHI scanning (ADR 0025) rides along: every source's SQL is scanned with
+the deterministic rules regardless of parse outcome — an unparseable
+proc can still leak literals. Prior findings carry steward dispositions
+and first_seen forward (stable finding ids).
 """
 
 from __future__ import annotations
@@ -13,6 +18,7 @@ from typing import Any, Callable, Iterable
 from src.governance.error_log import ErrorLog
 from src.graph.serialization import parsed_sql_to_parse_result_row
 from src.parser.error_classifier import classify_parse_error
+from src.phi_scan import apply_dispositions, scan_sql, to_records
 
 
 @dataclass
@@ -22,6 +28,7 @@ class ParseStepOutput:
     parse_successes: "list[dict]"        # ops_parse_successes rows
     error_log: ErrorLog                  # append error_log.to_records() to ops_error_log
     run_summary: "dict[str, Any]" = field(default_factory=dict)
+    phi_findings: "list[dict]" = field(default_factory=list)  # ops_phi_findings rows
 
 
 def parse_step(
@@ -31,6 +38,8 @@ def parse_step(
     previous_success_ids: "Iterable[str]" = (),
     run_id: str = "",
     progress: "Callable[[int, int], None] | None" = None,
+    previous_phi_records: "Iterable[dict]" = (),
+    scan_timestamp: str = "",
 ) -> ParseStepOutput:
     """Parse every SQL source with parse_fn (ScriptDom on Fabric, sqlglot
     fallback locally). Pure: no I/O — the caller supplies previous-run state
@@ -77,6 +86,17 @@ def parse_step(
         if progress:
             progress(i + 1, len(sql_sources))
 
+    # PHI scan (ADR 0025): all sources, parse outcome irrelevant
+    previous_phi = list(previous_phi_records)
+    first_seen_by_id = {r["finding_id"]: r.get("first_seen", "") for r in previous_phi}
+    findings = []
+    for source in sql_sources:
+        findings.extend(scan_sql(source["metric_id"], source["sql"]))
+    findings = apply_dispositions(findings, previous_phi)
+    phi_rows = to_records(findings, first_seen=scan_timestamp)
+    for row in phi_rows:
+        row["first_seen"] = first_seen_by_id.get(row["finding_id"]) or row["first_seen"]
+
     run_summary = error_log.finish_run([s["metric_id"] for s in sql_sources])
 
     # Logic relations: one outcome per source, disjoint, covering.
@@ -93,4 +113,7 @@ def parse_step(
     )
     assert {r["metric_id"] for r in parse_successes} == ok_ids
 
-    return ParseStepOutput(parse_results, parse_errors, parse_successes, error_log, run_summary)
+    return ParseStepOutput(
+        parse_results, parse_errors, parse_successes, error_log, run_summary,
+        phi_findings=phi_rows,
+    )

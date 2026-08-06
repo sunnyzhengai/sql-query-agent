@@ -29,7 +29,7 @@ from devtools.grounding_evals import _load_dotenv  # noqa: E402
 from devtools.local_llm import chat_completion  # noqa: E402
 from src.anonymization import get_scan_terms, load_crosswalk, scan_for_missed  # noqa: E402
 from src.descriptions import generate_descriptions  # noqa: E402
-from src.phi_scan import redact, scan_sql  # noqa: E402
+from src.phi_scan import redact_node_fragments, scan_sql  # noqa: E402
 from src.steps.build_graph import build_graph_step  # noqa: E402
 
 FIXTURES = PROJECT_ROOT / "tests" / "fixtures" / "recorded"
@@ -54,28 +54,19 @@ def main() -> None:
         parse_results = parse_results[:limit]
     graph = build_graph_step(parse_results, tables, columns)
 
-    # PHI gate (ADR 0025): redact flagged literals from fragments BEFORE
-    # they enter prompts. Redaction changes content hashes, so affected
-    # steps regenerate — that is the point, not a bug.
+    # PHI gate (ADR 0025), mirroring production: scan whole sources (02's
+    # job), redact fragments before prompts (07's job). Redaction changes
+    # content hashes, so affected steps regenerate — the point, not a bug.
     phi_findings = []
-    for row in graph.nodes_rows:
-        if row["layer"] != "transformation":
-            continue
-        was_str = isinstance(row["properties"], str)
-        props = json.loads(row["properties"]) if was_str else row["properties"]
-        fragment = props.get("sql_fragment") or ""
-        found = scan_sql(props.get("metric_id", row["node_id"]), fragment)
-        if found:
-            phi_findings.extend(found)
-            props["sql_fragment"] = redact(fragment, found)
-            if was_str:
-                row["properties"] = json.dumps(props)
+    for pr in parse_results:
+        phi_findings.extend(scan_sql(pr["metric_id"], pr.get("normalized_sql") or ""))
+    changed = redact_node_fragments(graph.nodes_rows, phi_findings)
     if phi_findings:
         by_rule: dict = {}
         for f in phi_findings:
             by_rule[f.rule] = by_rule.get(f.rule, 0) + 1
-        redacted_n = sum(1 for f in phi_findings if f.disposition == "redact")
-        print(f"PHI scan: {len(phi_findings)} findings {by_rule}; {redacted_n} redacted from prompts")
+        print(f"PHI scan: {len(phi_findings)} findings {by_rule}; "
+              f"{changed} fragments redacted before prompting")
 
     cache: dict = {}
     if CACHE_PATH.exists():

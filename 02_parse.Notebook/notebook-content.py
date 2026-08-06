@@ -154,12 +154,22 @@ try:
 except Exception:
     print("No previous run history — regression detection starts next run")
 
+# Prior PHI findings carry steward dispositions forward (ADR 0025)
+previous_phi_records = []
+try:
+    previous_phi_records = [r.asDict() for r in spark.table("ops_phi_findings").collect()]
+except Exception:
+    print("No previous PHI findings — first scan")
+
+from datetime import datetime, timezone
 start_time = _time.time()
 out = parse_step(
     sql_sources, parse_fn,
     previous_error_records=previous_error_records,
     previous_success_ids=previous_success_ids,
     progress=lambda done, total: print(f"  Progress: {done}/{total}") if done % 100 == 0 else None,
+    previous_phi_records=previous_phi_records,
+    scan_timestamp=datetime.now(timezone.utc).isoformat(),
 )
 elapsed = _time.time() - start_time
 
@@ -180,7 +190,10 @@ print(f"Errors: {len(out.parse_errors)}")
 
 
 # %% Cell 3: Save results to Delta and run the postcondition gate
-from src.schemas import ERROR_LOG, PARSE_ERRORS, PARSE_RESULTS, PARSE_SUCCESSES, to_spark_schema
+from src.schemas import (
+    ERROR_LOG, PARSE_ERRORS, PARSE_RESULTS, PARSE_SUCCESSES, PHI_FINDINGS,
+    to_spark_schema,
+)
 from src.steps.gates import postcondition_gate
 
 if out.parse_results:
@@ -203,6 +216,15 @@ if out.parse_successes:
         .write.format("delta").mode("overwrite").option("overwriteSchema", "true") \
         .saveAsTable("ops_parse_successes")
     print(f"Saved {len(out.parse_successes)} parse successes to ops_parse_successes")
+
+if out.phi_findings:
+    spark.createDataFrame(out.phi_findings, schema=to_spark_schema(PHI_FINDINGS)) \
+        .write.format("delta").mode("overwrite").option("overwriteSchema", "true") \
+        .saveAsTable("ops_phi_findings")
+    n_redact = sum(1 for f in out.phi_findings if f["disposition"] == "redact")
+    n_open = sum(1 for f in out.phi_findings if f["disposition"] == "open")
+    print(f"Saved {len(out.phi_findings)} PHI findings to ops_phi_findings "
+          f"({n_redact} redact, {n_open} open for steward review)")
 
 if out.error_log.current_run:
     spark.createDataFrame(out.error_log.to_records(), schema=to_spark_schema(ERROR_LOG)) \

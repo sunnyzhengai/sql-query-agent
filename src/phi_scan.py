@@ -174,6 +174,56 @@ def to_records(findings: "list[Finding]", first_seen: str = "") -> "list[dict]":
     ]
 
 
+def from_records(records: "list[dict]") -> "list[Finding]":
+    """Findings back from persisted ops_phi_findings rows (07's read path)."""
+    return [
+        Finding(
+            finding_id=r["finding_id"],
+            metric_id=r["metric_id"],
+            rule=r["rule"],
+            matched_text=r["matched_text"],
+            masked_context=r.get("masked_context", ""),
+            severity=r["severity"],
+            disposition=r["disposition"],
+        )
+        for r in records
+    ]
+
+
+def redact_node_fragments(
+    nodes_rows: "list[dict]", findings: "list[Finding]"
+) -> int:
+    """Redact flagged literals from transformation sql_fragments in place.
+
+    The egress gate for description generation: fragments are redacted
+    before any prompt is built. Returns the number of fragments changed.
+    Handles rows whose properties are dicts or JSON strings.
+    """
+    import json as _json
+
+    by_metric: "dict[str, list[Finding]]" = {}
+    for f in findings:
+        if f.disposition == "redact":
+            by_metric.setdefault(f.metric_id, []).append(f)
+    changed = 0
+    for row in nodes_rows:
+        if row.get("layer") != "transformation":
+            continue
+        was_str = isinstance(row["properties"], str)
+        props = _json.loads(row["properties"]) if was_str else row["properties"]
+        fragment = props.get("sql_fragment") or ""
+        relevant = by_metric.get(props.get("metric_id", ""), [])
+        if not (fragment and relevant):
+            continue
+        redacted = redact(fragment, relevant)
+        if redacted != fragment:
+            props["sql_fragment"] = redacted
+            if was_str:
+                row["properties"] = _json.dumps(props)
+            changed += 1
+    return changed
+
+
 def apply_dispositions(
     findings: "list[Finding]", existing: "list[dict]"
 ) -> "list[Finding]":
