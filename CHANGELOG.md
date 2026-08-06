@@ -8,6 +8,10 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+---
+
+## [1.4.1] - 2026-08-06
+
 ### Added
 - Full-corpus description fixtures (ADR 0019 first pass): 432 step + 28
   metric descriptions generated locally over the recorded fixtures,
