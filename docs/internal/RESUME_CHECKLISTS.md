@@ -42,8 +42,11 @@ Steps
        - 05 added/changed columns → update the node type's property
          mapping (Get data first if the new column isn't listed) → Save
        - content-only refresh → re-apply a mapping via Get data → Save
-       Footer "Last loaded" confirms. Count parity CANNOT detect a stale
-       load when only property values changed — probe a property:
+       Saving gives NO feedback that a load started — the "Data load is
+       in progress" banner only appears after a page refresh. Refresh to
+       see it; footer "Last loaded" flipping confirms completion. Count
+       parity CANNOT detect a stale load when only property values
+       changed — probe a property:
        `MATCH (t:Transformation) RETURN t.name AS name, t.description AS d LIMIT 5`
 6. [ ] Sanity Q&A (2 questions max, save burst budget): one metric-detail
        question (expects step catalog in the answer), one refusal probe
