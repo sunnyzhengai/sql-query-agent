@@ -177,11 +177,15 @@ Legal entity and Microsoft partner registration. Runs in parallel with Phase 1.
 - [x] Apply to Microsoft for Startups Founders Hub (submitted 2026-07-20;
       Level 3 deliberately skipped — [ADR 0010](../decisions/0010-skip-founders-hub-level-3.md))
 - [x] Register as ISV on Partner Center; enroll in Commercial Marketplace program
-- [ ] Business verification approved (resubmitted — waiting 3-5 days)
-- [ ] Tax profile W-9 completed (form loading issue — follow up with apmdg@microsoft.com)
-- [ ] Payout profile verified
-- [ ] Business bank account
-- [ ] Review employment contract for invention assignment clauses; HR disclosure
+- [x] Business verification approved (2026-08-06)
+- [x] Tax profile W-9 completed (2026-08-06)
+- [x] Payout profile: Chase business account connected in Partner Center
+      (2026-08-06 — confirm verification status shows green)
+- [x] Business bank account (Chase)
+- [ ] Review employment contract for invention assignment clauses — DELEGATED
+      to Sunny's lawyer 2026-08-06 (brief: domain overlap with employer's
+      BI/healthcare space; personal time/equipment coverage; CoI disclosure
+      obligations)
 
 ### Exit criteria
 - [x] Legal entity exists
@@ -243,7 +247,9 @@ Make the codebase enterprise-ready for Marketplace certification.
 - [x] [REVIEWER_GUIDE.md](../product/REVIEWER_GUIDE.md) — for Microsoft certification testers
 - [x] Deployment packaging script (`scripts/build_deployment_package.py`) —
       allowlist build of the customer zip with internal-content leak guard (tested)
-- [ ] Prerequisite validation script (`scripts/validate_deployment.py`)
+- [x] Prerequisite validation script (`scripts/validate_deployment.py`) —
+      2026-08-06: config/llm/dictionary/sql/DLL/package checks, contract-
+      driven column requirements, fix-stating failures, tested
 - [ ] Document Fabric API rate limits and handling
 - [ ] Add Fabric/API error codes to error_classifier (403, 404, 429 → resolution steps)
 
@@ -254,11 +260,16 @@ Get capacity through one of:
 - [ ] **Option C:** Fabric free trial activates
 
 ### Deploy to own tenant (needs capacity)
-- [ ] Workspace "AIVIA-Demo" + lakehouse; upload code and ScriptDom DLL
-- [ ] Synthetic SQL files (5-10 diverse patterns, no real data) + synthetic dictionary
-- [ ] Run pipeline: 02_parse → 03_build_graph → 04_build_metric_logic →
-      05_export_graph_tables → 06_validate (expect 100% health)
-- [ ] Configure Data Agent; verify answers, /errors, /coverage
+- [x] Workspace AIVIA-DEV-2 + lakehouse; wheel ships via git-integrated
+      environment (see RESUME_CHECKLISTS.md runbook)
+- [x] Demo data DECIDED 2026-08-06: the anonymized real corpus (28 sepsis
+      metrics, leak-gated crosswalk output), NOT toy synthetic — real CTE
+      depth demos better. Pre-video check: confirm crosswalk output is
+      public-safe on screen
+- [x] Full pipeline + 07 descriptions live (1.4.1, 2026-08-06); agent
+      answers verified grounded (step-catalog answer traced to certified
+      descriptions)
+- [ ] Verify /errors, /coverage admin commands on current deployment
 - [ ] Golden lakehouse snapshot after successful run; rollback steps documented
 
 ### Demo & screenshots (needs deployed tenant)
@@ -298,10 +309,16 @@ Get capacity through one of:
 Raised during the contract review; each gets a ground-truth answer and, where
 needed, a design pass. Do not resolve casually — these are product decisions.
 
-- [x] **PHI/hardcoded-value scanning at ingestion** — DESIGNED 2026-08-06:
-      [ADR 0025](../decisions/0025-phi-scanning-at-ingestion.md) (scan in 02,
-      deterministic rules, redaction at the LLM/catalog egress boundary) +
-      `ops_phi_findings` contract draft. Implementation pending.
+- [x] **PHI/hardcoded-value scanning at ingestion** — DESIGNED + library
+      IMPLEMENTED 2026-08-06 (listing prerequisite per Sunny):
+      [ADR 0025](../decisions/0025-phi-scanning-at-ingestion.md);
+      `src/phi_scan.py` (5 rules, every-member IN-list flagging, steward
+      dispositions survive re-scans) + redaction live at describe_local's
+      prompt boundary. Fixture audit: 278 findings, 102/432 steps carry
+      redact-level literals, committed descriptions verified leak-free.
+      Remaining: notebook wiring (02 writes ops_phi_findings → flip
+      contract active; 07 applies redaction on-tenant — regenerates ~102
+      steps' cache on first redacted run) + 08/09 publish gates.
 - [x] **Usage-weight flywheel + answer feedback** — DESIGNED 2026-08-06:
       [ADR 0023](../decisions/0023-usage-weighted-governance-flywheel.md)
       (append-only events, derived weights, demand-sorted steward queue) +
