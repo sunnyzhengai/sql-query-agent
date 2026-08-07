@@ -46,6 +46,15 @@ Both components live in a single repo (`sql-query-agent`) and ship as one `.whl`
 Tier 2 shares the ScriptDom parser; Tier 3 requires a separate grammar
 ([ADR 0001](../decisions/0001-native-parsers-per-dialect.md)).
 
+**Connector roadmap (added 2026-08-07, see
+[REFERENCE_ARCHITECTURE.md](../architecture/REFERENCE_ARCHITECTURE.md)):**
+next up are **dbt** (manifest.json → compiled T-SQL + free DAG; cheapest
+connector, ScriptDom-compatible via dbt-fabric — Sunny's org's own path)
+and **Fabric semantic models** (TMDL extraction: lineage now, DAX measure
+parsing as its own ADR 0001 lane). Then Databricks (SQL views + Unity
+Catalog only — PySpark logic explicitly out of scope for v1) and
+Snowflake (GET_DDL + sqlglot dialect).
+
 ---
 
 ## Phase 0: Foundation
