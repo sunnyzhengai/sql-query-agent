@@ -69,15 +69,17 @@ flowchart TB
 **2026-08-08 additions:** business names + report links flow inside the
 Metadata Engine (no topology change); the **Purview arrow now carries
 glossary terms** at term grain, one term per definition, multi-asset
-assigned (ADR 0031); the **semantic catalog** appears as roadmap-starred
-— engine DECIDED by live probes 2026-08-08 (SQL-DB path failed at the
-agent's validation layer; Eventhouse PASSED end to end, ADR 0030). When
-the product pipeline fills it,
-the Azure OpenAI arrow gains an **ask-time** leg (question-phrase
-embeddings) — a security-story change the whitepaper must state
-explicitly: user question text, not SQL fragments, would reach the
-customer's own endpoint at ask time. The Lucid/designed PDF is
-deliberately NOT updated until the probe verdict settles the topology.
+assigned (ADR 0031); the **semantic catalog** node is settled — engine
+DECIDED by live probes 2026-08-08 (SQL-DB path failed at the agent's
+validation layer; **Eventhouse PASSED end to end**, ADR 0030) — still
+roadmap-yellow because the product pipeline that fills it isn't built.
+When it ships, the Azure OpenAI arrow gains an **ask-time** leg
+(question-phrase embeddings, user impersonation, no stored key) — a
+security-story change the whitepaper must state explicitly: user
+question text, not SQL fragments, reaches the customer's own endpoint
+at ask time. Topology is now settled — the Lucid/designed PDF should be
+updated to match on its next pass (add the Eventhouse semantic-catalog
+box, roadmap style).
 
 ## The two tiers, one sentence each
 
