@@ -97,12 +97,31 @@ Built offline, needs one on-tenant validation pass (order matters):
        OpenAI key + CREATE EXTERNAL MODEL (embeddings deployment) +
        one table (id, text, emb VECTOR(1536)); seed a few rows, embed
        in-database (UPDATE ... SET emb = AI_GENERATE_EMBEDDINGS(...));
-       add as a Data Agent source with ONE example pair containing
-       `ORDER BY VECTOR_DISTANCE(emb, AI_GENERATE_EMBEDDINGS(<q> USE MODEL ...))`;
-       ask a paraphrased question and INSPECT RUN STEPS: did the
-       generated SQL call AI_GENERATE_EMBEDDINGS and execute? Record
-       verdict in ADR 0030. (Embeddings deployment needed on aivia:
-       deploy text-embedding model first, same CLI drill.)
+       add as a Data Agent source with ONE example pair using the
+       count-then-top-k shape below; ask a paraphrased question and
+       INSPECT RUN STEPS: did the generated SQL call
+       AI_GENERATE_EMBEDDINGS and execute? Record verdict in ADR 0030.
+       Embeddings deployment READY (2026-08-08): text-embedding-3-small
+       on aivia, DataZoneStandard, 1536 dims, live-smoked.
+       Probe query shape (embedding computed ONCE via CROSS JOIN, count
+       disclosed, similarity returned — calibrate THRESHOLD empirically,
+       start ~0.55 cosine distance):
+       ```sql
+       WITH q AS (SELECT AI_GENERATE_EMBEDDINGS('cancelled appointments'
+                    USE MODEL aivia_embeddings) AS v),
+       scored AS (SELECT c.node_id, c.name, c.business_name, c.description,
+                    VECTOR_DISTANCE('cosine', c.emb, q.v) AS distance
+                  FROM semantic_catalog c CROSS JOIN q)
+       SELECT (SELECT COUNT(*) FROM scored WHERE distance < 0.55) AS total_matches,
+              TOP 10 *, 1 - distance AS closeness
+       FROM scored WHERE distance < 0.55 ORDER BY distance
+       ```
+       (exact TOP-with-count syntax may need splitting into two
+       statements — part of the probe). Instruction rules to seed with
+       it: embed the CORE CONCEPT not the full question; always report
+       total_matches ("N related, showing top 10"); closeness is
+       relative similarity, never a probability; below threshold =>
+       refuse ("nothing sufficiently related"), per ADR 0005.
 10. [ ] Business-friendly names (added 2026-08-07): author the dev-corpus
        mapping as input_metric_names (CSV → table; e.g.
        reporting.USP_ED_Sepsis → "ED Sepsis Screening" for the demo
