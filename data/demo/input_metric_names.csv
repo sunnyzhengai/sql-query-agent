@@ -1,0 +1,29 @@
+metric_id,business_name,source,report_name,report_url,assigned_date
+reporting.USP_ED_Sepsis,ED Sepsis Screening,manual,ED Sepsis Screening Dashboard,https://app.fabric.microsoft.com/groups/1f55e1c1-b660-4715-9b56-4140edce3940/reports/240b8a2a-23fb-4095-a879-25a02a334a55/1ac81d0522cd475581b6?experience=fabric-developer,2026-08-08
+reporting.USP_IP_SEPSIS,Inpatient Sepsis Overview,manual,,,2026-08-08
+reporting.USP_IP_SepsisDates,Sepsis Reporting Calendar,manual,,,2026-08-08
+reporting.USP_IP_SepsisDetails,Inpatient Sepsis Details,manual,,,2026-08-08
+reporting.USP_IP_SepsisDetails_v1,Inpatient Sepsis Details (Legacy v1),manual,,,2026-08-08
+reporting.USP_IP_SepsisEncounters,Sepsis Encounters,manual,,,2026-08-08
+reporting.USP_IP_SepsisEncountersDetails,Sepsis Encounter Details,manual,,,2026-08-08
+reporting.USP_IP_SepsisEncountersWLocations,Sepsis Encounters by Location,manual,,,2026-08-08
+reporting.USP_IP_SepsisEncountersWLocations_v1,Sepsis Encounters by Location (Legacy v1),manual,,,2026-08-08
+reporting.USP_IP_SepsisPatientDates,Sepsis Patient Timeline,manual,,,2026-08-08
+reporting.USP_IP_SepsisPatientDates_v1,Sepsis Patient Timeline (Legacy v1),manual,,,2026-08-08
+reporting.USP_IP_SepsisScreeningAudit,Sepsis Screening Audit,manual,,,2026-08-08
+reporting.USP_IP_SepsisScreeningAudit_v1,Sepsis Screening Audit (Legacy v1),manual,,,2026-08-08
+reporting.USP_IP_SepsisShiftCompliance,Sepsis Shift Compliance,manual,,,2026-08-08
+reporting.USP_IP_SepsisShiftComplianceByShift,Sepsis Compliance by Shift,manual,,,2026-08-08
+reporting.USP_IP_SepsisShiftComplianceMetrics,Sepsis Shift Compliance Metrics,manual,,,2026-08-08
+reporting.USP_IP_Sepsis_ComplianceByShift,Sepsis Bundle Compliance by Shift,manual,,,2026-08-08
+reporting.USP_IP_Sepsis_ComplianceMetrics,Sepsis Bundle Compliance Metrics,manual,,,2026-08-08
+reporting.USP_IP_Sepsis_Details,Sepsis Case Details,manual,,,2026-08-08
+reporting.USP_IP_Sepsis_Encounters,Sepsis Case Encounters,manual,,,2026-08-08
+reporting.USP_IP_Sepsis_ScreeningTool,Sepsis Screening Tool Results,manual,,,2026-08-08
+reports.USP_ED_Sepsis,ED Sepsis (Regulatory),manual,,,2026-08-08
+reports.USP_IP_SEPSIS,Inpatient Sepsis (Regulatory),manual,,,2026-08-08
+reports.USP_IP_SEPSIS_COMPLIANCE,Sepsis Compliance (Regulatory),manual,,,2026-08-08
+reports.USP_IP_SEPSIS_COMPLIANCE_BY_SHIFT_NURSES,Sepsis Nursing Shift Compliance (Regulatory),manual,,,2026-08-08
+reports.USP_IP_SEPSIS_REPORT,Sepsis Summary Report (Regulatory),manual,,,2026-08-08
+reports.USP_NonSevere_Sepsis,Non-Severe Sepsis Episodes,manual,,,2026-08-08
+reports.USP_Severe_Sepsis,Severe Sepsis Episodes,manual,,,2026-08-08
