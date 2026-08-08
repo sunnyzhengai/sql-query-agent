@@ -2,6 +2,12 @@
 // search can run inside the Data Agent via KQL, where there is NO mirror
 // layer between the agent and the data.
 //
+// HOW TO RUN (learned live 2026-08-08): KQL executes ONE dot-command
+// at a time — put the cursor INSIDE a command (no selection) and hit
+// Run; running a multi-command selection fails (the .ingest ran before
+// the .create existed -> TableNotFoundException). The section-3 search
+// query is a single statement and runs as one unit.
+//
 // Two syntax notes up front:
 // - The embedding plugin is `ai_embeddings` (preview). If any invocation
 //   below errors on syntax, the canonical reference is the official
