@@ -46,6 +46,15 @@ Both components live in a single repo (`sql-query-agent`) and ship as one `.whl`
 Tier 2 shares the ScriptDom parser; Tier 3 requires a separate grammar
 ([ADR 0001](../decisions/0001-native-parsers-per-dialect.md)).
 
+**Retrieval hardening (ADR 0030, added 2026-08-08):** L0 description
+matching + L1 generated `search_terms` land BEFORE the first
+enterprise-scale pilot (own estate = 1,344 procs; catalog fetches
+truncate at platform row caps). L2 embeddings table ships with L1 (same
+07 pass). L3 optional semantic-catalog add-on (Fabric SQL database +
+VECTOR_DISTANCE + AI_GENERATE_EMBEDDINGS, steered via example query
+pairs) after re-verifying preview status. Round 3 rematch measures
+L0/L1 vs L3.
+
 **Connector roadmap (added 2026-08-07, see
 [REFERENCE_ARCHITECTURE.md](../architecture/REFERENCE_ARCHITECTURE.md)):**
 next up are **dbt** (manifest.json → compiled T-SQL + free DAG; cheapest
