@@ -29,8 +29,8 @@ Cite these from other documents by reference — do not copy values.
 
 | Component | Short Name | Description | Tier |
 |-----------|-----------|-------------|------|
-| **Metadata Sync** | "sync" | Generate and push metadata to Purview/Collibra. Bulk, incremental, or triggered by report changes. | Basic |
-| **GraphRAG Engine** | "engine" | Knowledge graph + Data Agent grounding for certified, traceable answers. | Pro |
+| **Metadata Agent** | "agent" | Knowledge graph + Data Agent that ANSWERS metadata questions ("how is this calculated?") with certified, owner-attributed answers — plus Purview/Collibra sync. Renamed from "Metadata Sync" 2026-08-07: we answer questions, static catalogs only store them. | Basic |
+| **Analytics Agent** | "analytics" | Self-service tier: certified semantic layer compiled from the graph; Data Agent #2 executes certified metrics against real data ("what WAS it last month?"). | Pro (roadmap) |
 
 Both components live in a single repo (`sql-query-agent`) and ship as one `.whl` package.
 
@@ -117,7 +117,11 @@ Get Metadata Sync working end-to-end with real data against Purview/Collibra.
 
 ### Blocked on access
 - [ ] Collibra service account → test Collibra push (work admin)
-- [ ] Purview Data Curator role → test Purview push (own tenant when Fabric available)
+- [x] Purview push tested END TO END on own tenant (~2026-08-01: live test
+      drove the single-entity-API and service-principal-auth fixes, both
+      committed; account deprovisioned after — Purview pay-as-you-go bills
+      hard, provision short-lived for demos only). Remaining: wire
+      ops_sync_log audit rows during the next short-lived provision
 - [ ] Test PBI description updates against dev workspace
 - [ ] Test Fabric lineage API against PBI workspace (needs PBI Admin — own tenant)
 
@@ -169,7 +173,8 @@ Get Metadata Sync working end-to-end with real data against Purview/Collibra.
 - [x] Parse real SQL at 99%+ with 0 errors
 - [x] Full pipeline end-to-end (parse → graph → traverse → metadata → descriptions)
 - [x] Data Agent answers metric questions correctly
-- [ ] Push metadata to at least one catalog (Purview or Collibra) via API
+- [x] Push metadata to at least one catalog via API (Purview, live test
+      ~2026-08-01 on own tenant)
 - [ ] PBI report descriptions updated programmatically
 - [x] All tests pass; no print statements in library code
 
