@@ -51,6 +51,20 @@ Corpus: 28 metrics across two schemas; bare names COLLIDE for 2 pairs
 
 **Diagnostic probe (truncation):** "How many metrics read from HOSPITAL_ENCOUNTERS? Exact count first, then the full list." Count=13 but short list ⇒ tool-layer row cap (platform); count=5 ⇒ LIMIT in generated query (instruction-fixable).
 
+**Demo-QA suite result (2026-08-08 evening, Delta agent, post-fixes): 6/6 PASS**
+Q1 metric detail: business name + certified steps + working report link
+(links render inert in the TEST pane; right-click/new-tab loads the
+dashboard — verify left-click on the PUBLISHED surface before filming).
+Q2/Q3 readers of HOSPITAL_ENCOUNTERS: 13/13 with business names + both
+schema twins visible — AFTER the closure-table fix (was 5/13) and after
+scoping graph_edge_uses_table + graph_canonical in the agent's Data tab
+(unscoped tables fail as "data access restrictions"; install guide must
+list required tables). Q4 listing: 28/28 as "Business Name (metric_id)"
+— after the listing-template fix (was 26 proc names, twin-collapsed).
+Q5 refusal: clean. Q6 ownership: honest no-steward disclosure with
+business-name resolution. Graph agent remains OFF the demo path pending
+the multi-source resolution build.
+
 **Round 2 defect log (live):**
 - SHALLOW UNDERCOUNT CROSSES ENGINES (2026-08-08, DELTA agent, 5/13
   readers of HOSPITAL_ENCOUNTERS — the classic number): the delta
