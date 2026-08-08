@@ -56,10 +56,13 @@ Corpus: 28 metrics across two schemas; bare names COLLIDE for 2 pairs
   fabrication): with the new verbatim/no-facts rules pasted, Q1 ("How is
   ED Sepsis Screening calculated?") -> honest refusal, Basis "catalog
   fetch -> 0 matched" — despite businessName being the EXACT string in
-  the catalog. Hypothesis: generator's fetch dropped businessName from
-  RETURN. The new rules worked as safety (honest footer, no invention)
-  but resolution quality regressed same-day — fourth non-determinism
-  data point. Reinforcement added (fetch MUST return businessName; a
+  the catalog. RUN-STEP TRACE (hypothesis corrected): NO catalog fetch
+  ran at all — the generator skipped resolution and executed a
+  CALCULATED_BY traversal with WHERE name = 'ED Sepsis Screening' (user
+  phrase straight into the identity filter), 0 rows; AND the Basis
+  claimed "catalog fetch" — the footer lied about the executed SHAPE
+  again while being honest about the zero. Fifth non-determinism data
+  point; resolution-skipping is the generator's deepest habit. Reinforcement added (fetch MUST return businessName; a
   businessName match IS resolution). Durable fix remains structural:
   the semantic catalog (Eventhouse) owning resolution. DEMO DECISION:
   video rides the Delta agent (already the GA-default), which handles
