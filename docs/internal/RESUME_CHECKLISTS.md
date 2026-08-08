@@ -1,111 +1,109 @@
 # Resume Checklists — for the next Fabric-capacity session
 
-**Purpose:** the two queued work items deliberately out of scope for the
-2026-08-06 autonomous run, prepped so they can start cold in minutes.
-Delete each section when done; delete the file when both are done.
+**Purpose:** on-tenant work queued between capacity sessions, prepped so
+each session starts cold in minutes. Sections A (deploy runbook) and B
+(rematch) persist; dated sections get executed and marked.
 
 ---
 
-## A. 1.4.x deploy cycle — RUN 2026-08-06 (1.4.1); kept as the runbook
-
-Executed 2026-08-06 with 1.4.1. Lessons learned are folded in below —
-this section is now the reusable deploy runbook.
+## A. Deploy cycle runbook (executed 2026-08-06 with 1.4.1)
 
 Prereqs
 - [x] Fabric capacity available; scale to F4 for the run if the F2
       throttles (Azure portal → capacity → Scale; scale BACK to F2 after)
 - [x] 07's LLM config in lakehouse `Files/sql-query-agent/`:
-      `org_config.yaml` gets an `llm:` block (endpoint, model,
-      api_key_file) + `llm_api_key.txt` (raw key only, one line; lives in
-      Files, never in git). Dev tenant: api.openai.com + gpt-4o-mini,
-      matching the local fixtures' vocabulary
+      `org_config.yaml` `llm:` block + `llm_api_key.txt` (raw key, one
+      line; lives in Files, never in git — llm_api_key.txt is gitignored
+      after the 2026-08-08 near-commit that push protection caught)
 - [x] `git status` clean on dev; CI green
 
 Steps
 1. [x] Build the wheel: `python -m build` → verify metadata version
-2. [x] **Ship the wheel via git, not portal upload**: commit it into
+2. [x] **Ship the wheel via git, not portal upload**: commit into
        `sql-logic-env.Environment/Libraries/CustomLibraries/` (remove the
-       old one), push; workspace → Source control → Update; then Publish
-       the environment. Portal upload is the fallback, not the path.
-       If Publish fails with a bare `PbiApiError`: fresh browser tab
-       first (stale-session is the common cause; 2026-08-06 incident),
-       then `devtools/publish_environment.py` for the real error payload
-3. [x] Run **07_generate_descriptions**: first run ~460 calls, then
-       hash-cached (`ops_description_cache` — separate from the committed
-       local fixtures cache). Postcondition gate green; spot-check 3 step
-       + 2 metric descriptions (no benefit-filler)
-4. [x] Run **05_export_graph_tables**
-5. [x] **Load the Graph Model — there is NO Load/Refresh button**
-       (verified 2026-08-06: neither the model editor toolbar nor the
-       item's ⋯ menu has one). A load fires only when a REAL definition
-       change is saved:
-       - 05 added/changed columns → update the node type's property
-         mapping (Get data first if the new column isn't listed) → Save
-       - content-only refresh → re-apply a mapping via Get data → Save
-       Saving gives NO feedback that a load started — the "Data load is
-       in progress" banner only appears after a page refresh. Refresh to
-       see it; footer "Last loaded" flipping confirms completion. Count
-       parity CANNOT detect a stale load when only property values
-       changed — probe a property:
-       `MATCH (t:Transformation) RETURN t.name AS name, t.description AS d LIMIT 5`
-6. [x] Sanity Q&A passed (2026-08-06): property probe returned described
-       transformations; "How is USP_ED_Sepsis calculated" returned a
-       step-catalog answer whose distinctive claims (24h readmits, HemOnc
-       transfers, boarders, BPA overrides) all trace to certified step
-       descriptions — the ADR 0019 chain verified end to end in production
-7. [x] mssparkutils token caveat: if the session runs >1 hr, restart the
-       session before 07 — `getToken()` caches and won't refresh mid-batch
+       old one), push; workspace → Source control → Update; Publish.
+       Bare `PbiApiError` on Publish → fresh browser tab first
+       (stale-session, 2026-08-06 incident), then
+       `devtools/publish_environment.py` for the real error payload
+3. [x] Run **07** (first run ~460 calls, then hash-cached); gate green;
+       spot-check descriptions for filler
+4. [x] Run **05**
+5. [x] **Load the Graph Model — there is NO Load/Refresh button.** A load
+       fires only when a REAL definition change is saved (new columns →
+       update the node type's property mapping via Get data first).
+       Saving gives NO feedback — refresh the page to see the "Data load
+       is in progress" banner; footer "Last loaded" confirms. Count
+       parity can't detect property-value staleness — probe a property.
+6. [x] Sanity Q&A (2026-08-06: step-catalog answer verified grounded)
+7. [x] Token caveat: restart session before 07 if >1 hr old
 
-Rollback: previous wheel is one git revert away (environment is
-git-integrated); graph tables are overwrite-mode snapshots — rerunning
-03→05 with the old wheel restores.
+Rollback: previous wheel is one git revert away; graph tables are
+overwrite snapshots — rerun 03→05 with the old wheel restores.
 
 ---
 
-## C. Next Fabric session — validate the 2026-08-06 evening batch
+## C. 2026-08-06 evening batch — VALIDATED on tenant 2026-08-08
 
-Built offline, needs one on-tenant validation pass (order matters):
+1. [x] Source control Update (02/07 notebooks + make_golden_snapshot)
+2. [x] Azure OpenAI switch: `gpt-5.4-mini` (DataZoneStandard, East US 2)
+       live via src.llm_client; lakehouse org_config + key updated
+3. [x] 02_parse → ops_phi_findings written
+4. [x] 07 → PHI gate live, redacted steps regenerated
+5. [x] 05 + graph load
+6. [x] Sanity: answers grounded with redacted fragments
+7. [x] make_golden_snapshot run (record manifest numbers here when handy)
+8. [x] Scaled back to F2
 
-1. [ ] Source control → Update (pulls updated 02/07 notebooks + the new
-       make_golden_snapshot notebook item)
-2. [x] **Azure OpenAI live smoke — DONE 2026-08-06 from local**: resource
-       `aivia` (rg-fabric-prod, East US 2), deployment `gpt-5.4-mini`
-       v2026-03-17, DataZoneStandard sku (gpt-4o-mini is deprecated;
-       regional Standard sku no longer offered on new models).
-       src.llm_client verified live: api-key header + api-version URL,
-       model replied "OK". Remaining on-tenant: update lakehouse
-       org_config to
-       `endpoint: https://aivia.openai.azure.com/openai/deployments/gpt-5.4-mini`
-       + `model: gpt-5.4-mini`, replace llm_api_key.txt with aivia Key 1
-       (was copied to clipboard). Note: next 07 run regenerates changed
-       steps with the new model (hash cache limits the blast radius).
-3. [ ] Run **02_parse** — expect "Saved ~278 PHI findings to
-       ops_phi_findings (~218 redact, ~60 open for steward review)"
-4. [ ] Run **07_generate_descriptions** — expect "PHI gate: ... fragments
-       redacted", ~102 steps regenerate (redaction changed their hashes),
-       metrics recompose, rest from cache
-5. [ ] Rerun **05** + trigger the graph load (runbook step 5 — mapping
-       unchanged, so make a real definition change or re-apply Get data)
-6. [ ] Sanity: one metric-detail question still grounded; spot-check a
-       redacted step's description reads fine with `<ID>`/`<DATE>` gone
-7. [ ] Run **make_golden_snapshot** — golden_ tables + Files/golden/
-       manifest.json; record the manifest numbers here
-8. [ ] Scale back to F2 if you scaled up
-9. [ ] **L3 retrieval probe** (added 2026-08-08, ADR 0030 amendment —
-       decides the semantic-retrieval architecture): create a Fabric SQL
-       database item; DATABASE SCOPED CREDENTIAL with the aivia Azure
-       OpenAI key + CREATE EXTERNAL MODEL (embeddings deployment) +
-       one table (id, text, emb VECTOR(1536)); seed a few rows, embed
-       in-database (UPDATE ... SET emb = AI_GENERATE_EMBEDDINGS(...));
-       add as a Data Agent source with ONE example pair using the
-       count-then-top-k shape below; ask a paraphrased question and
-       INSPECT RUN STEPS: did the generated SQL call
+---
+
+## D. Next session — demo prep, L3 probe, business terms (queued 2026-08-07/08)
+
+Order matters: 1–4 change tables/instructions, 5 validates, 6 records.
+
+1. [ ] **Business names + report links CSV** → `input_metric_names`:
+       author for the demo metrics — choose names you'd SAY OUT LOUD
+       ("ED Sepsis Screening"); include `report_name` + `report_url`
+       (the app.powerbi.com link of the demo report Sunny built) on the
+       metrics the demo will touch; qualified metric_ids (bare names
+       that collide across schemas are skipped by design). Load as
+       table, rerun **03→04→05**.
+2. [ ] **Re-paste BOTH agents' instructions** (changed 2026-08-07/08:
+       business_name in every search clause, report-link rule
+       "Used in: <report> (<url>)" + never-invent-a-link, businessName
+       in the graph catalog fetch): copy current
+       `notebooks/delta_agent_instructions.md` and
+       `notebooks/graph_agent_instructions.md` into the agents.
+3. [ ] **Graph Model mapping**: Metric type gains `businessName`,
+       `reportName`, `reportUrl` columns (Get data → map → Save →
+       refresh page → wait for load; runbook step A5 drill).
+4. [ ] **Purview glossary demo** (short-lived provision — Purview
+       bills hard; provision + demo + deprovision same day):
+       - provision Purview; service-principal auth as in the Aug 1 test
+       - run **09** (asset push — proves the tested path still green)
+       - mine term candidates locally:
+         `from src.governance.business_terms import mine_term_candidates, candidates_to_records`
+         over graph_nodes rows; review top candidates, accept 2–3,
+         name siblings distinctly ("X (scheduling)" / "X (cohort)")
+       - push via `PurviewAdapter.ensure_glossary()` +
+         `publish_glossary_term(...)` — one term per definition,
+         assigned to its implementing assets, siblings see-also linked
+       - screenshot for the demo/listing; optionally wire ops_sync_log
+         audit rows while provisioned
+       - deprovision
+5. [ ] **L3 retrieval probe** (decides the semantic-retrieval
+       architecture — ADR 0030 amendment): Fabric SQL database item;
+       DATABASE SCOPED CREDENTIAL (aivia key) + CREATE EXTERNAL MODEL
+       → embeddings deployment READY: `text-embedding-3-small` on
+       aivia, DataZoneStandard, 1536 dims, live-smoked 2026-08-08;
+       table (node_id, text cols, emb VECTOR(1536)); seed rows; embed
+       in-database (`UPDATE ... SET emb = AI_GENERATE_EMBEDDINGS(...)`);
+       add as Data Agent source + ONE example pair with the shape below;
+       ask a PARAPHRASED question (test full-sentence AND distilled
+       phrasings); INSPECT RUN STEPS: did generated SQL call
        AI_GENERATE_EMBEDDINGS and execute? Record verdict in ADR 0030.
-       Embeddings deployment READY (2026-08-08): text-embedding-3-small
-       on aivia, DataZoneStandard, 1536 dims, live-smoked.
-       Probe query shape (embedding computed ONCE via CROSS JOIN, count
-       disclosed, similarity returned — calibrate THRESHOLD empirically,
-       start ~0.55 cosine distance):
+       Probe query shape (embedding computed ONCE via CROSS JOIN; count
+       disclosed; closeness returned; calibrate THRESHOLD empirically
+       against ~a dozen known question→answer pairs, start ~0.55):
        ```sql
        WITH q AS (SELECT AI_GENERATE_EMBEDDINGS('cancelled appointments'
                     USE MODEL aivia_embeddings) AS v),
@@ -116,44 +114,44 @@ Built offline, needs one on-tenant validation pass (order matters):
               TOP 10 *, 1 - distance AS closeness
        FROM scored WHERE distance < 0.55 ORDER BY distance
        ```
-       (exact TOP-with-count syntax may need splitting into two
-       statements — part of the probe). Instruction rules to seed with
-       it: embed the CORE CONCEPT not the full question; always report
-       total_matches ("N related, showing top 10"); closeness is
-       relative similarity, never a probability; below threshold =>
-       refuse ("nothing sufficiently related"), per ADR 0005.
-10. [ ] Business-friendly names (added 2026-08-07): author the dev-corpus
-       mapping as input_metric_names (CSV → table; e.g.
-       reporting.USP_ED_Sepsis → "ED Sepsis Screening" for the demo
-       metrics), rerun 03→04→05, trigger the graph load (mapping gains
-       businessName column → update the Metric type mapping first, same
-       drill as the description column), then ask an agent by the
-       business name to verify resolution
+       (TOP-with-count syntax may need two statements — part of the
+       probe.) Instruction rules to seed alongside: embed the CORE
+       CONCEPT, not the full question; always report total_matches
+       ("N related, showing top 10"); closeness is relative similarity,
+       NEVER a probability; below threshold → refuse ("nothing
+       sufficiently related"), per ADR 0005.
+6. [ ] **Demo QA subset** (before recording; ~6 Q&A per F2 burst):
+       Q1 (metric detail with step catalog), Q4 (13 readers), Q8
+       (refusal), one business-name resolution ("how is ED Sepsis
+       Screening calculated?" → resolves + shows both names + report
+       link), and one cross-grain probe (concept defined both as a
+       metric AND inside another metric's CTE — the
+       cancelled-appointments pattern; candidate: pick from miner
+       output). The cross-grain answer is demo-script material.
+7. [ ] **Golden snapshot refresh** after all table changes; record
+       manifest numbers
+8. [ ] Scale back to F2
 
 ---
 
-## B. Remaining rematch questions (Round 2 completion)
+## B. Rematch — DEFERRED to Round 3 (decided 2026-08-08)
 
-Goal: finish the 9-question scorecard on the post-1.3.1 graph, then the
-Delta head-to-head. Full protocol: [REMATCH_SCORECARD.md](REMATCH_SCORECARD.md).
+Round 2 completion is superseded: the full head-to-head waits until the
+resolution surface stops moving — dimension layer (ADR 0029), retrieval
+architecture (ADR 0030 probe verdict + implementation), report/measure
+nodes (semantic-model lane). Benchmarking a moving target twice buys
+nothing. The demo-QA subset (section D.6) covers pre-video acceptance.
 
-Prereqs
-- [ ] Deploy cycle A done (descriptions live make Q1-style answers richer;
-      at minimum 1.3.1 shim must be Loaded — it already is per 2026-08-05)
-- [ ] Pre-flight: pipeline green, Graph Model re-Loaded, count parity
-      queryset passes, both agents draft-published with current instructions
+Round 3 additions to the answer key when it runs:
+- business-name resolution questions (vocabulary → metricId)
+- report-link questions ("which report shows X?")
+- business-term questions incl. the cross-grain cancelled-appointments
+  pattern (both definitions surfaced, weights disclosed)
+- retrieval A/B: same set with and without the L3 semantic catalog —
+  quantifies what the semantic layer buys (evidence for defaulting it)
+- filter/parameter questions once the dimension layer ships
 
-Session plan (respect ~6 Q&A per F2 burst; pause/resume resets)
-- Burst 1 — Graph agent remaining: Q2 (19 tables), Q4b (7 metrics),
-  Q5 (14 sharers), Q6 (133 columns), Q7 (top = reporting.USP_ED_Sepsis, 38)
-- Burst 2 — Graph agent: Q8, Q9 (refusals) + truncation diagnostic probe;
-  re-ask anything that hit throttling mid-answer
-- Bursts 3–4 — Delta agent: full Q1–Q9 in scorecard order, same wording
-- [ ] Score 0/1 per axis (Correct / Grounded / Honest) into the /27 table;
-      verbatim transcripts for surprises; note friction + latency
-- [ ] Watch for the footer tic (Basis describing a query never run) — log
-      it per occurrence; footer-honesty rule is in instructions but the
-      generator is stochastic
-- [ ] Feed results into REMATCH_WRITEUP.md (draft exists, thesis
-      pre-written: "the data contract, not the prompt, is where correctness
-      gets enforced") and decide the publishing venue
+Protocol, scoring axes (Correct/Grounded/Honest), burst budgeting, and
+the footer-honesty watch all carry over from
+[REMATCH_SCORECARD.md](REMATCH_SCORECARD.md). Feed results into
+REMATCH_WRITEUP.md (thesis pre-written) and decide the publishing venue.
