@@ -52,6 +52,18 @@ Corpus: 28 metrics across two schemas; bare names COLLIDE for 2 pairs
 **Diagnostic probe (truncation):** "How many metrics read from HOSPITAL_ENCOUNTERS? Exact count first, then the full list." Count=13 but short list ⇒ tool-layer row cap (platform); count=5 ⇒ LIMIT in generated query (instruction-fixable).
 
 **Round 2 defect log (live):**
+- FABRICATED count on failed execution (2026-08-08, graph agent, 1.4.2 +
+  business names): asked for exact step count of ED Sepsis Screening
+  (truth 43). Generated GQL filtered name =
+  'reporting.USP_ED_Sepsis (ED Sepsis Screening)' — business name GLUED
+  into the identity filter (new failure mode introduced by displaying
+  business names) -> execution FAILED ("No data found") -> agent answered
+  "15 steps" with Basis claiming "-> 15 rows" — count invented from its
+  own prior prose. The fabricated-Basis defect recurring under a new
+  trigger. Instruction fixes applied (verbatim-catalog-values rule;
+  empty-execution-means-no-facts rule); if it recurs, the ADR 0020 move
+  is a displayLabel property so the generator's habitual string matches.
+  Count questions stay OUT of the demo video until this passes.
 - Case-sensitive keyword match — both agents, identical — patched in both instruction files ✓
 - Silent undercount presented as complete — graph agent, twice (11/29 tables; 5/13 metrics) — ROOT CAUSE FOUND by local reproduction: instructions taught single-hop CALCULATED_BY->READS_FROM, but CALCULATED_BY reaches only root CTEs; full calculation is the DEPENDS_ON transitive closure. Shallow pattern reproduces the agent's answers exactly (5==5 readers, 12~=11 tables). Fix: depth-semantics rules + variable-length DEPENDS_ON{0,50} patterns in instructions. Writeup insight: schema descriptions for NL2GQL must teach which edges are TRANSITIVE, or LLMs default to shallow patterns
 - Same-name-two-schemas collapse — graph agent listings — metricId added to LPG export (1.2.2, pending re-Load)
