@@ -22,14 +22,14 @@ flowchart TB
         subgraph FABRIC["Microsoft Fabric (customer capacity)"]
             FILES["SQL files + data dictionary<br/>(Lakehouse Files)"]
             ENGINE["AIVIA Metadata Engine<br/>parse (ScriptDom) · PHI scan ·<br/>three-layer knowledge graph +<br/>business names & terms<br/>(Delta + Labeled Property Graph)"]
-            SEMCAT["Semantic catalog — ROADMAP*<br/>(Fabric SQL DB: catalog + embeddings,<br/>VECTOR_DISTANCE at ask time)<br/>*pending L3 probe, ADR 0030"]
+            SEMCAT["Semantic catalog — ROADMAP<br/>(Eventhouse: catalog + embeddings +<br/>semantic_search() KQL function)<br/>engine probe-verified 2026-08-08, ADR 0030"]
             MAGENT["Fabric Data Agent #1<br/>'How is this metric calculated?'<br/>certified answers · named owners ·<br/>report links"]
             subgraph SS["AIVIA Analytics Self-Service — ROADMAP"]
                 COMPILER["Certified semantic layer compiler<br/>graph → generated views & measures<br/>(dimension layer = filter vocabulary)"]
                 SAGENT["Fabric Data Agent #2<br/>'What WAS this metric last month?'<br/>NL2SQL over certified views only"]
             end
         end
-        AOAI["Customer's own Azure OpenAI<br/>descriptions + embeddings at build time<br/>(PHI-redacted); question embeddings<br/>at ask time if semantic catalog ships"]
+        AOAI["Customer's own Azure OpenAI<br/>descriptions + embeddings at build time<br/>(PHI-redacted); question embeddings at<br/>ask time via user impersonation — no<br/>stored key (when semantic catalog ships)"]
         PURVIEW["Microsoft Purview"]
         COLLIBRA["Collibra (optional)"]
     end
@@ -70,8 +70,9 @@ flowchart TB
 Metadata Engine (no topology change); the **Purview arrow now carries
 glossary terms** at term grain, one term per definition, multi-asset
 assigned (ADR 0031); the **semantic catalog** appears as roadmap-starred
-— it becomes solid only if the L3 probe confirms agent queries execute
-where `AI_GENERATE_EMBEDDINGS` lives (ADR 0030 amendment). If it ships,
+— engine DECIDED by live probes 2026-08-08 (SQL-DB path failed at the
+agent's validation layer; Eventhouse PASSED end to end, ADR 0030). When
+the product pipeline fills it,
 the Azure OpenAI arrow gains an **ask-time** leg (question-phrase
 embeddings) — a security-story change the whitepaper must state
 explicitly: user question text, not SQL fragments, would reach the
