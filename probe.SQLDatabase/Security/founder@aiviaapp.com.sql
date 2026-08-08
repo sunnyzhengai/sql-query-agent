@@ -1,6 +1,0 @@
-CREATE USER [founder@aiviaapp.com]
-    WITH SID = 0x985F4B6545BED04B88D62A1594B4C575, TYPE = E;
-
-
-GO
-
