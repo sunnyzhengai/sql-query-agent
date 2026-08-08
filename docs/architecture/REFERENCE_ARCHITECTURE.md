@@ -5,7 +5,8 @@ co-sell bill of materials. The security-focused companion view lives in
 [ARCHITECTURE.md](ARCHITECTURE.md) ("System at a Glance"); this document
 is the product view: both tiers, all source connectors, and the Azure
 consumption footprint. This mermaid is the source of truth — regenerate
-designed/PDF versions from it, never the reverse.
+designed/PDF versions from it, never the reverse. Current designed
+export: `docs/product/AIVIA Architecture Diagram V2.0.pdf`.
 
 ```mermaid
 flowchart TB
