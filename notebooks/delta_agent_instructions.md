@@ -104,7 +104,7 @@ case-sensitive miss — zero rows from an unfolded LIKE is a query bug, not an a
 ### "Which reports are about [topic]?" or "Find metrics related to [topic]"
 1. ALWAYS search across ALL text columns — the user may describe a topic, not an exact name:
    ```sql
-   SELECT metric_id, metric_name, source_tables
+   SELECT metric_id, metric_name, business_name, source_tables
    FROM output_metric_logic
    WHERE lower(metric_name) LIKE '%keyword%'
       OR lower(metric_id) LIKE '%keyword%'
@@ -115,28 +115,23 @@ case-sensitive miss — zero rows from an unfolded LIKE is a query bug, not an a
 3. List matching metrics with a brief note on why they matched
 
 ### "What metrics are available?" or "What can I ask about?"
-1. Query: `SELECT metric_name, description FROM output_metric_logic ORDER BY metric_name`
-2. List them with descriptions if available
+1. Query: `SELECT metric_id, metric_name, business_name, description FROM output_metric_logic ORDER BY business_name`
+2. Display each as business_name with metric_id in parentheses; fall back
+   to metric_name when business_name is null. NEVER deduplicate on bare
+   names — two schemas can each have a metric with the same object name
+   (metric_id is the identity; 28 rows means 28 metrics).
 
 ### Interpreting SQL Fragments
 
 When you read calculation_logic to explain a metric, translate the SQL to business language. Common patterns:
 
-| SQL Pattern | How to translate |
-|---|---|
-| `WHERE column = value` | "Filters to [describe what the value means]" |
-| `WHERE column <> value` | "Excludes [describe what is excluded]" |
-| `DATEDIFF(unit, start, end)` | "Calculates duration in [unit]" |
-| `COUNT(*)` | "Counts the number of records" |
-| `AVG(column)` | "Calculates the average of [column meaning]" |
-| `SUM(column)` | "Totals [column meaning]" |
-| `GROUP BY column` | "Broken down by [column meaning]" |
-| `LEFT JOIN table` | "Includes additional reference data from [table]" |
-| `WHERE column IS NOT NULL` | "Only includes records with [column meaning] present" |
-| `BETWEEN @Start AND @End` | "Within the selected date range" |
-| `ROW_NUMBER() OVER(...)` | "Ranks or deduplicates records" |
-| `CASE WHEN ... THEN ...` | "Categorizes records based on [condition]" |
-| `COALESCE(a, b)` | "Uses [a] if available, otherwise [b]" |
+Translate SQL constructs to business meaning: WHERE = filters/exclusions
+(describe what the value means), DATEDIFF = durations, aggregates
+(COUNT/AVG/SUM) = counts/averages/totals of the column's meaning,
+GROUP BY = "broken down by", JOINs = additional reference data,
+IS NOT NULL = "only records with X present", BETWEEN @params = "within
+the selected date range", ROW_NUMBER = ranking/dedup, CASE WHEN =
+categorization, COALESCE = fallback values.
 
 **Important:** Do NOT memorize or hardcode translations for specific column values. Always read the actual SQL in `calculation_logic` and interpret it based on context. Every metric is different.
 
