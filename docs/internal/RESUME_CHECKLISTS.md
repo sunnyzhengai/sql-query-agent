@@ -91,7 +91,19 @@ Built offline, needs one on-tenant validation pass (order matters):
 7. [ ] Run **make_golden_snapshot** — golden_ tables + Files/golden/
        manifest.json; record the manifest numbers here
 8. [ ] Scale back to F2 if you scaled up
-9. [ ] Business-friendly names (added 2026-08-07): author the dev-corpus
+9. [ ] **L3 retrieval probe** (added 2026-08-08, ADR 0030 amendment —
+       decides the semantic-retrieval architecture): create a Fabric SQL
+       database item; DATABASE SCOPED CREDENTIAL with the aivia Azure
+       OpenAI key + CREATE EXTERNAL MODEL (embeddings deployment) +
+       one table (id, text, emb VECTOR(1536)); seed a few rows, embed
+       in-database (UPDATE ... SET emb = AI_GENERATE_EMBEDDINGS(...));
+       add as a Data Agent source with ONE example pair containing
+       `ORDER BY VECTOR_DISTANCE(emb, AI_GENERATE_EMBEDDINGS(<q> USE MODEL ...))`;
+       ask a paraphrased question and INSPECT RUN STEPS: did the
+       generated SQL call AI_GENERATE_EMBEDDINGS and execute? Record
+       verdict in ADR 0030. (Embeddings deployment needed on aivia:
+       deploy text-embedding model first, same CLI drill.)
+10. [ ] Business-friendly names (added 2026-08-07): author the dev-corpus
        mapping as input_metric_names (CSV → table; e.g.
        reporting.USP_ED_Sepsis → "ED Sepsis Screening" for the demo
        metrics), rerun 03→04→05, trigger the graph load (mapping gains

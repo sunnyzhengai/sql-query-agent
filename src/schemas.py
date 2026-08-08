@@ -1177,6 +1177,127 @@ PERSONAL_DEFINITIONS = {
 
 
 
+BUSINESS_TERMS = {
+    "table_name": "gov_business_terms",
+    "description": (
+        "Business terms as a weighted plurality (ADR 0031): one row = one "
+        "named definition; sibling definitions of the same concept share "
+        "concept_key and distinct names. Durable human-owned truth — the "
+        "graph projects terms per build, never the reverse. Status "
+        "discloses trust and never gates (ADR 0021)."
+    ),
+    "domain": "governance",
+    "status": "planned",
+    "notes": (
+        "Contract draft from ADR 0031 (2026-08-08). Rows come from "
+        "candidate mining (src/governance/business_terms.py) reviewed by "
+        "a steward, or direct authoring. Wire a writer (utility notebook "
+        "or steward flow) before flipping active."
+    ),
+    "columns": [
+        ("term_id", "string", False),
+        ("concept_key", "string", False),
+        ("name", "string", False),
+        ("definition", "string", False),
+        ("status", "string", False),
+        ("steward", "string", True),
+        ("source", "string", False),
+        ("created_by", "string", True),
+        ("created_at", "string", True),
+        ("updated_at", "string", True),
+    ],
+    "column_descriptions": {
+        "term_id": "Unique id for this named definition",
+        "concept_key": "Groups sibling definitions of the same concept",
+        "name": "Distinct human name (siblings must differ: 'X (scheduling)')",
+        "definition": "The definition text (certification pins this text, ADR 0022 spirit)",
+        "status": "emergent | certified | disputed | retired — discloses, never hides",
+        "steward": "Arbitrating steward, once one engages",
+        "source": "mined | authored | promoted",
+        "created_by": "Who authored/accepted the term",
+        "created_at": "Creation timestamp (ISO)",
+        "updated_at": "Last edit timestamp (ISO)",
+    },
+    "invariants": [
+        {"kind": "unique", "columns": ["term_id"]},
+        {"kind": "allowed_values", "column": "status",
+         "values": ["emergent", "certified", "disputed", "retired"]},
+    ],
+}
+
+TERM_LINKS = {
+    "table_name": "gov_term_links",
+    "description": (
+        "Which assets define/implement each business term (ADR 0031): "
+        "term -> canonical metric or transformation step (DAX measures "
+        "when that lane ships). Many-to-many; weight is DERIVED from "
+        "endorsements + usage, never stored here."
+    ),
+    "domain": "governance",
+    "status": "planned",
+    "notes": (
+        "Contract draft from ADR 0031 (2026-08-08). Written alongside "
+        "gov_business_terms by the same flow; 03 projects term nodes + "
+        "edges into the graph from these rows."
+    ),
+    "columns": [
+        ("term_id", "string", False),
+        ("node_ref", "string", False),
+        ("node_kind", "string", False),
+        ("role", "string", False),
+        ("added_by", "string", True),
+        ("added_at", "string", True),
+    ],
+    "column_descriptions": {
+        "term_id": "Term (gov_business_terms.term_id)",
+        "node_ref": "metric_id for metrics; graph node_id for steps",
+        "node_kind": "metric | step (| measure, future)",
+        "role": "defines (the definition source) | implements (uses the concept)",
+        "added_by": "Who linked it (miner or human)",
+        "added_at": "Link timestamp (ISO)",
+    },
+    "invariants": [
+        {"kind": "allowed_values", "column": "node_kind",
+         "values": ["metric", "step", "measure"]},
+        {"kind": "allowed_values", "column": "role",
+         "values": ["defines", "implements"]},
+    ],
+}
+
+TERM_ENDORSEMENTS = {
+    "table_name": "gov_term_endorsements",
+    "description": (
+        "Append-only citizen-stewardship log (ADR 0031): endorse ('this "
+        "is what I meant') and dispute events per term. All term weights "
+        "are derived from this log + usage events — recomputable, never "
+        "incremented in place (ADR 0023 discipline)."
+    ),
+    "domain": "governance",
+    "status": "planned",
+    "notes": (
+        "Contract draft from ADR 0031 (2026-08-08). Capture surface rides "
+        "the ADR 0023 usage-event wiring (agent feedback or steward UI)."
+    ),
+    "columns": [
+        ("event_at", "string", False),
+        ("user_id", "string", False),
+        ("term_id", "string", False),
+        ("action", "string", False),
+        ("context", "string", True),
+    ],
+    "column_descriptions": {
+        "event_at": "Event timestamp (ISO)",
+        "user_id": "Who endorsed/disputed (Entra object id or pseudonym)",
+        "term_id": "Term acted on (gov_business_terms.term_id)",
+        "action": "endorse | dispute",
+        "context": "Optional free text (why disputed, question asked, ...)",
+    },
+    "invariants": [
+        {"kind": "allowed_values", "column": "action",
+         "values": ["endorse", "dispute"]},
+    ],
+}
+
 METRIC_NAMES = {
     "table_name": "input_metric_names",
     "description": (
@@ -1322,6 +1443,8 @@ TABLE_REGISTRY = {
         PHI_FINDINGS, RUNTIME_ERROR_EVENTS,
         # business-friendly names (planned writer; readers live)
         METRIC_NAMES,
+        # business terms as weighted plurality (ADR 0031)
+        BUSINESS_TERMS, TERM_LINKS, TERM_ENDORSEMENTS,
     ]
 }
 

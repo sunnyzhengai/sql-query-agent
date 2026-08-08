@@ -47,6 +47,46 @@ Key naming trap: the plugin is `ai_embeddings` (the older announced
 - Our existing path: customer's Azure OpenAI embeddings deployment via
   `src/llm_client` in 07 (same key/endpoint plumbing as descriptions).
 
+## Round 2 findings (2026-08-08, deep-dive on the L3 path)
+
+- **AI_GENERATE_EMBEDDINGS on Fabric SQL DB:** documented with no preview
+  banner (customer's own Azure OpenAI with key auth explicitly supported
+  via DATABASE SCOPED CREDENTIAL + CREATE EXTERNAL MODEL); explicit GA
+  statement exists only for Azure SQL DB/MI — treat Fabric as
+  GA-equivalent-unconfirmed.
+- **Exact scan is the documented pattern under 50k vectors** — our
+  catalog (~10k rows at enterprise scale) needs no vector index. ANN
+  indexes (CREATE VECTOR INDEX / VECTOR_SEARCH) are preview on Fabric
+  SQL DB; not needed.
+- **THE GATE (undocumented, needs a live probe):** the add-datasources
+  doc says the agent's NL2SQL tool "executes the query through the SQL
+  Analytics Endpoint" — for a Fabric SQL DB that would be the READ-ONLY
+  OneLake-mirror surface where AI_GENERATE_EMBEDDINGS (and possibly
+  VECTOR columns) do not exist. Whether SQL-DB sources run on the
+  operational engine instead is not disambiguated anywhere. Probe: add a
+  SQL DB source, seed an example pair containing
+  `ORDER BY VECTOR_DISTANCE(emb, AI_GENERATE_EMBEDDINGS(...))`, inspect
+  the run steps. If it executes: L3 is real. If not: L3 falls back to
+  Eventhouse/KQL (ai_embeddings preview) or waits for platform support.
+- **Example pairs:** retrieved by vector similarity, top 3–4 injected as
+  few-shot (docs disagree on k); ≤100 pairs/source; pairs that fail
+  schema validation are silently unused; agent instructions cap at
+  15,000 chars; a fabric-data-agent-sdk exists (add_fewshots,
+  evaluate_few_shots). Docs position examples as complements to
+  instructions for shapes "hard to describe in plain instructions."
+- **Nightly write path lakehouse → SQL DB is explicit** (no reverse
+  mirroring): Spark connector (preview; Entra passthrough; use
+  truncate not overwrite — overwrite drops VECTOR columns) or plain
+  TDS. Recommended pattern: write TEXT columns, then in-database
+  `UPDATE ... SET emb = AI_GENERATE_EMBEDDINGS(...)` (documented
+  Example C) rather than shipping vectors through Spark.
+- **Purview glossary:** multi-asset term assignment is GA (Data Map
+  assignedEntities, stable 2023-09-01). Classic catalog is in support
+  mode; Unified Catalog is the forward surface and its custom metadata
+  (preview) supports NUMERIC attributes on terms — the home for usage
+  weight (classic term templates have no numeric type; weight rides in
+  the description meanwhile).
+
 ## Warehouse AI functions (for completeness)
 
 `AI_CLASSIFY`, `AI_SUMMARIZE`, `AI_GENERATE_RESPONSE`, etc. — preview,

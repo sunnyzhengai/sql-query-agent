@@ -1,7 +1,32 @@
 # 0030 — Layered retrieval: search-terms first, vectors where the engine allows
 
-**Status:** Accepted
+**Status:** Accepted (amended same day — see Amendment)
 **Date:** 2026-08-08
+
+## Amendment (2026-08-08, after product review + deep-dive research)
+
+Sunny's product call: L0/L1 are not the product answer — LIKE-widening
+reads as a workaround, and the product's credibility rides on real
+semantic retrieval. Revised posture:
+
+- **L1 is demoted** from "default product answer" to an available
+  fallback; it is not on the roadmap unless L3's gate fails.
+- **L3 is the intended path**, and the deep-dive (round 2 in
+  [FABRIC_RETRIEVAL_CAPABILITIES.md](../development/FABRIC_RETRIEVAL_CAPABILITIES.md))
+  found it green on every documented axis (AI_GENERATE_EMBEDDINGS on
+  Fabric SQL DB with the customer's own Azure OpenAI; exact scan
+  documented adequate under 50k vectors; explicit nightly write path)
+  EXCEPT one undocumented gate: whether agent-generated SQL against a
+  Fabric SQL DB source executes on the operational engine (where
+  AI_GENERATE_EMBEDDINGS works) or the read-only SQL analytics endpoint
+  (where it does not). **A live probe decides** — seeded example pair
+  with `ORDER BY VECTOR_DISTANCE(emb, AI_GENERATE_EMBEDDINGS(...))`,
+  verified via the agent's run-steps view. Probe passes → L3 becomes
+  the semantic-retrieval architecture. Probe fails → Eventhouse/KQL
+  fallback (ai_embeddings preview) is evaluated before any retreat to
+  L1.
+- **L2 ships regardless** (embeddings for runtimes we control); it does
+  not solve Fabric-agent ask-time retrieval and is not claimed to.
 
 ## Context
 
