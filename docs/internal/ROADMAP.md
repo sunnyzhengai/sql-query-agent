@@ -253,6 +253,10 @@ Make the codebase enterprise-ready for Marketplace certification.
 ---
 
 ## Phase 4: Marketplace Submission
+
+> **Execution runbook:** [LISTING_CHECKLIST.md](LISTING_CHECKLIST.md)
+> (created 2026-08-09, reconciled with the build) — work from there;
+> fold status back here at submission.
 **Status: IN PROGRESS** — blocked on Fabric capacity for the demo tenant.
 
 ### Listing assets (DONE)
