@@ -8,6 +8,10 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+---
+
+## [1.4.2] - 2026-08-08
+
 ### Added
 - Business-friendly metric names: input_metric_names (qualified or
   unambiguous bare metric_id -> business_name, with provenance) applied
