@@ -171,6 +171,31 @@ Order matters: 1–4 change tables/instructions, 5 validates, 6 records.
 
 ---
 
+## E. Next session — semantic catalog on-tenant + snapshot (queued 2026-08-08 evening)
+
+1. [ ] **make_golden_snapshot FIRST** (skipped 2026-08-08 — capacity was
+       paused before it ran): open the notebook, Run all, ~2 min. It
+       backs up the expensive state (description cache, PHI
+       dispositions, inputs) to golden_ tables + manifest.
+2. [ ] **Semantic catalog on-tenant** (offline half is built + tested;
+       plan: `devtools/eventhouse_setup.kql`, follow top to bottom):
+       1. Add a small cell to 05 (or run ad hoc): build rows via
+          `from src.steps.semantic_catalog import build_semantic_catalog`
+          over graph_nodes; write to Delta `output_semantic_catalog`.
+       2. In probe-eh (rename to aivia-eh if you like): run the setup
+          script — table, embed (only new rows pay), semantic_search()
+          function, verification queries incl. the refusal-floor probe.
+       3. Wire as a SECOND source on the Graph agent (script section 5:
+          tick semantic_catalog + the function; paste source
+          instructions; one example pair = the function call).
+       4. Re-run the two questions that failed 2026-08-08: "How is ED
+          Sepsis Screening calculated?" (resolution via semantic_search
+          -> traversal with the returned ref) and the exact-count
+          question (expect 43).
+3. [ ] Scale back to F2 after.
+
+---
+
 ## B. Rematch — DEFERRED to Round 3 (decided 2026-08-08)
 
 Round 2 completion is superseded: the full head-to-head waits until the
