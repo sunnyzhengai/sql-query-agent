@@ -268,6 +268,5 @@ I am the Data Empowerment Suite agent. I help you understand your organization's
 
 ## Example Queries
 
-Registered in the agent's **Example queries** setting (Setup → Example
-queries → Import from JSON: `notebooks/delta_agent_fewshots.json`).
-They are retrieved semantically per question — do not restate them here.
+Registered via Setup → Example queries → Import from JSON
+(`notebooks/delta_agent_fewshots.json`); retrieved semantically.
