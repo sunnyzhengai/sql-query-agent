@@ -1,0 +1,16 @@
+model Model
+	culture: en-US
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: en-US
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation __PBI_TimeIntelligenceEnabled = 1
+
+annotation PBI_QueryOrder = ["ed_sepsis_screening_demo"]
+
+ref table ed_sepsis_screening_demo
+ref table DateTableTemplate_7a3db160-5b2d-433c-9896-cc1674277368
+ref table LocalDateTable_0408a380-df38-4ec4-a1a9-34791a0b0935
+

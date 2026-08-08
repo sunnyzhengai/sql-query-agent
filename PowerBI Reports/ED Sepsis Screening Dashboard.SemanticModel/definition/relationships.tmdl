@@ -1,0 +1,5 @@
+relationship d06a3610-a6ec-4d88-bbd5-6f51eaeafb64
+	joinOnDateBehavior: datePartOnly
+	fromColumn: ed_sepsis_screening_demo.screen_date
+	toColumn: LocalDateTable_0408a380-df38-4ec4-a1a9-34791a0b0935.Date
+

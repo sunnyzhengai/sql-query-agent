@@ -1,0 +1,76 @@
+table ed_sepsis_screening_demo
+	lineageTag: 471f6a2e-9dc8-42e3-a2c9-11ea632cf6c8
+
+	column screen_date
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: cae8cdd3-ddd8-49be-a82f-5528c3d9466e
+		summarizeBy: none
+		sourceColumn: screen_date
+
+		variation Variation
+			isDefault
+			relationship: d06a3610-a6ec-4d88-bbd5-6f51eaeafb64
+			defaultHierarchy: LocalDateTable_0408a380-df38-4ec4-a1a9-34791a0b0935.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column department
+		dataType: string
+		lineageTag: 71de1ad5-8077-44a0-ac0b-9b012ef8e6e3
+		summarizeBy: none
+		sourceColumn: department
+
+		annotation SummarizationSetBy = Automatic
+
+	column patients_screened
+		dataType: int64
+		formatString: 0
+		lineageTag: d7a49025-984a-406f-a913-5c5cc413018c
+		summarizeBy: sum
+		sourceColumn: patients_screened
+
+		annotation SummarizationSetBy = Automatic
+
+	column positive_screens
+		dataType: int64
+		formatString: 0
+		lineageTag: 07002dc6-5a6c-4453-9b41-ce4c83150e48
+		summarizeBy: sum
+		sourceColumn: positive_screens
+
+		annotation SummarizationSetBy = Automatic
+
+	column bundle_compliance_pct
+		dataType: double
+		lineageTag: 6a2bfb2d-15c6-4a23-a84f-89202bb05d69
+		summarizeBy: sum
+		sourceColumn: bundle_compliance_pct
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column avg_minutes_to_screen
+		dataType: int64
+		formatString: 0
+		lineageTag: c7297da9-9165-4da1-b65a-792ff5ecf2ce
+		summarizeBy: sum
+		sourceColumn: avg_minutes_to_screen
+
+		annotation SummarizationSetBy = Automatic
+
+	partition ed_sepsis_screening_demo = m
+		mode: import
+		source =
+				let
+				  Source = Csv.Document(Web.Contents("https://aiviallc88-my.sharepoint.com/personal/founder_aiviaapp_com/Documents/Apps/Microsoft Power Query/Uploaded Files/ed_sepsis_screening_demo.csv"), [Delimiter = ",", Columns = 6, QuoteStyle = QuoteStyle.None]),
+				  #"Promoted headers" = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				  #"Changed column type" = Table.TransformColumnTypes(#"Promoted headers", {{"screen_date", type date}, {"department", type text}, {"patients_screened", Int64.Type}, {"positive_screens", Int64.Type}, {"bundle_compliance_pct", type number}, {"avg_minutes_to_screen", Int64.Type}})
+				in
+				  #"Changed column type"
+
+	annotation PBI_ResultType = Table
+
