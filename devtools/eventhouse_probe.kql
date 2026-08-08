@@ -9,7 +9,9 @@
 // query is a single statement and runs as one unit.
 //
 // Two syntax notes up front:
-// - The embedding plugin is `ai_embeddings` (preview). If any invocation
+// - The embedding plugin is `ai_embeddings` (preview). Its output
+//   column is named <input_column>_embeddings (verified live
+//   2026-08-08 via getschema: input t -> t_embeddings). If any invocation
 //   below errors on syntax, the canonical reference is the official
 //   tutorial: learn.microsoft.com/fabric/real-time-intelligence/vector-database-eventhouse
 // - KQL uses cosine SIMILARITY (higher = closer). Our SQL probe measured
@@ -51,7 +53,7 @@ canonical:reporting.USP_IP_SepsisDates,reporting.USP_IP_SepsisDates,Sepsis Repor
     | extend combined = strcat(name, " | ", coalesce(business_name, ""), " | ", description)
     | evaluate ai_embeddings(combined,
         'https://aivia.openai.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-06-01;impersonate')
-    | project node_id, name, business_name, description, emb = embedding
+    | project node_id, name, business_name, description, emb = combined_embeddings
 
 // Storage optimization (optional but documented best practice):
 .alter column semantic_catalog.emb policy encoding type='Vector16'
@@ -63,7 +65,7 @@ let q = toscalar(
     print t = "patients who came back to the ER"
     | evaluate ai_embeddings(t,
         'https://aivia.openai.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-06-01;impersonate')
-    | project embedding);
+    | project t_embeddings);
 semantic_catalog
 | extend similarity = series_cosine_similarity(q, emb)
 | top 3 by similarity desc
@@ -86,7 +88,7 @@ semantic_catalog
 //    KQL:
 //      let q = toscalar(print t = "cancelled appointments"
 //        | evaluate ai_embeddings(t, 'https://aivia.openai.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-06-01;impersonate')
-//        | project embedding);
+//        | project t_embeddings);
 //      semantic_catalog
 //      | extend similarity = series_cosine_similarity(q, emb)
 //      | top 10 by similarity desc
