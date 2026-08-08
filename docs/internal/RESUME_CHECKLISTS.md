@@ -76,50 +76,50 @@ Order matters: 1–4 change tables/instructions, 5 validates, 6 records.
 3. [ ] **Graph Model mapping**: Metric type gains `businessName`,
        `reportName`, `reportUrl` columns (Get data → map → Save →
        refresh page → wait for load; runbook step A5 drill).
-4. [ ] **Purview glossary demo** (short-lived provision — Purview
-       bills hard; provision + demo + deprovision same day):
-       - provision Purview; service-principal auth as in the Aug 1 test
-       - run **09** (asset push — proves the tested path still green)
-       - mine term candidates locally:
-         `from src.governance.business_terms import mine_term_candidates, candidates_to_records`
-         over graph_nodes rows; review top candidates, accept 2–3,
-         name siblings distinctly ("X (scheduling)" / "X (cohort)")
-       - push via `PurviewAdapter.ensure_glossary()` +
-         `publish_glossary_term(...)` — one term per definition,
-         assigned to its implementing assets, siblings see-also linked
-       - screenshot for the demo/listing; optionally wire ops_sync_log
-         audit rows while provisioned
-       - deprovision
-5. [ ] **L3 retrieval probe** (decides the semantic-retrieval
-       architecture — ADR 0030 amendment): Fabric SQL database item;
-       DATABASE SCOPED CREDENTIAL (aivia key) + CREATE EXTERNAL MODEL
-       → embeddings deployment READY: `text-embedding-3-small` on
-       aivia, DataZoneStandard, 1536 dims, live-smoked 2026-08-08;
-       table (node_id, text cols, emb VECTOR(1536)); seed rows; embed
-       in-database (`UPDATE ... SET emb = AI_GENERATE_EMBEDDINGS(...)`);
-       add as Data Agent source + ONE example pair with the shape below;
-       ask a PARAPHRASED question (test full-sentence AND distilled
-       phrasings); INSPECT RUN STEPS: did generated SQL call
-       AI_GENERATE_EMBEDDINGS and execute? Record verdict in ADR 0030.
-       Probe query shape (embedding computed ONCE via CROSS JOIN; count
-       disclosed; closeness returned; calibrate THRESHOLD empirically
-       against ~a dozen known question→answer pairs, start ~0.55):
-       ```sql
-       WITH q AS (SELECT AI_GENERATE_EMBEDDINGS('cancelled appointments'
-                    USE MODEL aivia_embeddings) AS v),
-       scored AS (SELECT c.node_id, c.name, c.business_name, c.description,
-                    VECTOR_DISTANCE('cosine', c.emb, q.v) AS distance
-                  FROM semantic_catalog c CROSS JOIN q)
-       SELECT (SELECT COUNT(*) FROM scored WHERE distance < 0.55) AS total_matches,
-              TOP 10 *, 1 - distance AS closeness
-       FROM scored WHERE distance < 0.55 ORDER BY distance
-       ```
-       (TOP-with-count syntax may need two statements — part of the
-       probe.) Instruction rules to seed alongside: embed the CORE
-       CONCEPT, not the full question; always report total_matches
-       ("N related, showing top 10"); closeness is relative similarity,
-       NEVER a probability; below threshold → refuse ("nothing
-       sufficiently related"), per ADR 0005.
+4. [ ] **Purview glossary demo.** Purview bills hard — create it, demo
+       it, and delete it the same day. Concretely:
+       1. Create the Purview account in the Azure portal (same
+          service-principal setup as the Aug 1 test).
+       2. Run notebook **09** — pushes the metric assets, proves the
+          tested path still works.
+       3. In a notebook cell, mine term candidates from your own SQL:
+          `from src.governance.business_terms import mine_term_candidates, candidates_to_records`
+          then `mine_term_candidates([r.asDict() for r in spark.table("graph_nodes").collect()])`.
+          Look at the top few. Pick 2–3 good ones. If two candidates
+          share a name but differ in logic, give each a distinguishing
+          name like "X (scheduling)" vs "X (diabetes cohort)".
+       4. Push them: `PurviewAdapter.ensure_glossary()` once, then
+          `publish_glossary_term(...)` per term (it links each term to
+          its metrics automatically).
+       5. Open Purview, screenshot the glossary terms for the listing.
+       6. Delete the Purview account.
+5. [ ] **L3 probe** — a 30–45 min experiment that decides whether
+       semantic search can run inside the Data Agent. It does NOT touch
+       the pipeline notebooks or your real agents. Everything needed is
+       in **`devtools/l3_probe.sql`** — open it and follow top to
+       bottom. In plain steps:
+       1. In the workspace: **+ New item → SQL database** (a third kind
+          of item — not the lakehouse, not a warehouse). Any name; it's
+          disposable.
+       2. Open its query editor. Paste the script's sections 1–3 one at
+          a time. Where the script says `<AIVIA-KEY-1>`, paste the aivia
+          key — into the editor only, never into the file.
+       3. Section 3 is a search you run yourself. If the readmission
+          row comes back first, setup is good. Note the distance
+          numbers — they tell us where to set the match threshold.
+       4. Create a throwaway Data Agent named "L3 Probe" with ONLY this
+          database as its source. Copy the instruction paragraph and
+          the one example pair from section 4 of the script.
+       5. Ask it: "anything about newborns screened for sepsis in the
+          ER?" Open the answer's **run steps** panel and check two
+          things: does the generated SQL contain
+          AI_GENERATE_EMBEDDINGS, and did it execute and return rows?
+       6. Both yes → **PASS**. Query errored → **FAIL** (we switch to
+          the backup plan). Agent never wrote that SQL shape at all →
+          not a verdict; reword and ask again before concluding.
+          Either way, tell Claude the result — ADR 0030 gets its
+          verdict recorded.
+       7. Delete the throwaway agent. Keep the database if PASS.
 6. [ ] **Demo QA subset** (before recording; ~6 Q&A per F2 burst):
        Q1 (metric detail with step catalog), Q4 (13 readers), Q8
        (refusal), one business-name resolution ("how is ED Sepsis
