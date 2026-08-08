@@ -1,0 +1,4 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/dataAgent/definition/stageConfiguration/1.0.0/schema.json",
+  "aiInstructions": "      To find catalog entries matching a user's topic, embed the CORE\n     CONCEPT of their question (a short noun phrase, not the full\n      sentence) with AI_GENERATE_EMBEDDINGS USE MODEL aivia_embeddings\n      and rank by VECTOR_DISTANCE('cosine', ...) ascending. Report how\n      many rows scored below 0.55 before listing the top matches.\n      1 - distance is closeness: relative similarity, never a\n      probability. If nothing scores below 0.55, say the catalog has\n      nothing sufficiently related.\n"
+}

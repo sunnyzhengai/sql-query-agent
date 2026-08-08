@@ -1,0 +1,10 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/dataAgent/definition/fewShots/1.0.0/schema.json",
+  "fewShots": [
+    {
+      "id": "fdd6863d-4438-41e3-a008-0933d559abb4",
+      "question": "what do we have about cancelled appointments?",
+      "query": "// Enter a KQL query that could answer the question using your data\nlet q = toscalar(print t = \"cancelled appointments\"\n | evaluate ai_embeddings(t, 'https://aivia.openai.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-06-01;impersonate')\n | project t_embeddings);\n semantic_catalog\n| extend similarity = series_cosine_similarity(q, emb)\n| top 10 by similarity desc\n| project node_id, name, business_name, description, similarity\n"
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "DataAgent",
+    "displayName": "L3_Probe"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "1c59afce-d5bd-a39f-4b67-8f18a31aff29"
+  }
+}

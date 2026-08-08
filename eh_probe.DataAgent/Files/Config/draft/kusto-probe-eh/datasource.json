@@ -1,0 +1,99 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/dataAgent/definition/dataSource/1.0.0/schema.json",
+  "artifactId": "5fb67189-9321-a780-4960-f07d718853ec",
+  "workspaceId": "00000000-0000-0000-0000-000000000000",
+  "dataSourceInstructions": null,
+  "displayName": "probe-eh",
+  "type": "kusto",
+  "userDescription": null,
+  "metadata": {},
+  "elements": [
+    {
+      "id": "42ddf77e-3f72-4d15-a6a2-d6ec9d922fb1",
+      "is_selected": false,
+      "display_name": "Functions",
+      "type": "function_grouping",
+      "description": null,
+      "children": []
+    },
+    {
+      "id": "1109a89a-f71e-4e04-ab09-85cda162ef22",
+      "is_selected": false,
+      "display_name": "Materialized Views",
+      "type": "materialized_view_grouping",
+      "description": null,
+      "children": []
+    },
+    {
+      "id": "0effe6e5-0248-4865-ba67-1c680fab1ff9",
+      "is_selected": false,
+      "display_name": "Shortcuts",
+      "type": "shortcut_grouping",
+      "description": null,
+      "children": []
+    },
+    {
+      "id": "5a07e914-ed32-47c8-98a2-0e2040326ae0",
+      "is_selected": false,
+      "display_name": "Tables",
+      "type": "table_grouping",
+      "description": null,
+      "children": [
+        {
+          "id": "d0b86903-1757-4c4d-a195-ed9b37eeff9d",
+          "is_selected": true,
+          "display_name": "semantic_catalog",
+          "type": "kusto.table",
+          "description": null,
+          "children": [
+            {
+              "id": "node_id",
+              "is_selected": true,
+              "display_name": "node_id",
+              "type": "kusto.column",
+              "data_type": "System.String",
+              "description": null,
+              "children": []
+            },
+            {
+              "id": "name",
+              "is_selected": true,
+              "display_name": "name",
+              "type": "kusto.column",
+              "data_type": "System.String",
+              "description": null,
+              "children": []
+            },
+            {
+              "id": "business_name",
+              "is_selected": true,
+              "display_name": "business_name",
+              "type": "kusto.column",
+              "data_type": "System.String",
+              "description": null,
+              "children": []
+            },
+            {
+              "id": "description",
+              "is_selected": true,
+              "display_name": "description",
+              "type": "kusto.column",
+              "data_type": "System.String",
+              "description": null,
+              "children": []
+            },
+            {
+              "id": "emb",
+              "is_selected": true,
+              "display_name": "emb",
+              "type": "kusto.column",
+              "data_type": "System.Object",
+              "description": null,
+              "children": []
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
