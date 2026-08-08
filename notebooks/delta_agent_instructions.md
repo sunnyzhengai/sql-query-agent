@@ -88,13 +88,18 @@ case-sensitive miss — zero rows from an unfolded LIKE is a query bug, not an a
 2. List the tables with their data dictionary descriptions
 
 ### "Which metrics use [table name]?"
-1. Query:
+1. ALWAYS use `graph_edge_uses_table` — it holds the PRECOMPUTED full
+   lineage (one row per metric per table it ultimately reads, however
+   deep the chain). NEVER join graph_edges hop-by-hop for this: chains
+   deeper than two hops silently disappear and you undercount.
    ```sql
-   SELECT DISTINCT n.name FROM graph_edges e1
-   JOIN graph_edges e2 ON e1.source_id = e2.target_id
-   JOIN graph_nodes n ON e2.source_id = n.node_id
-   WHERE lower(e1.target_id) LIKE '%table_name%' AND n.layer = 'canonical'
+   SELECT DISTINCT c.metricId, c.businessName
+   FROM graph_edge_uses_table u
+   JOIN graph_canonical c ON u.sourceId = c.nodeId
+   WHERE lower(u.targetId) LIKE '%table_name%'
    ```
+2. Report metricId (schema-qualified) — bare names collide across
+   schemas; two different metrics can share one bare name.
 
 ### "Which reports are about [topic]?" or "Find metrics related to [topic]"
 1. ALWAYS search across ALL text columns — the user may describe a topic, not an exact name:

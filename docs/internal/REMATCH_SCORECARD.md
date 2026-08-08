@@ -52,6 +52,17 @@ Corpus: 28 metrics across two schemas; bare names COLLIDE for 2 pairs
 **Diagnostic probe (truncation):** "How many metrics read from HOSPITAL_ENCOUNTERS? Exact count first, then the full list." Count=13 but short list ⇒ tool-layer row cap (platform); count=5 ⇒ LIMIT in generated query (instruction-fixable).
 
 **Round 2 defect log (live):**
+- SHALLOW UNDERCOUNT CROSSES ENGINES (2026-08-08, DELTA agent, 5/13
+  readers of HOSPITAL_ENCOUNTERS — the classic number): the delta
+  instructions + fewshot pair still taught the pre-ADR-0018 two-hop
+  graph_edges join; deep chains vanish silently, and DISTINCT bare
+  names also collapsed the two-schema twins (ADR 0015 sin). The
+  closure table (graph_edge_uses_table) existed in the lakehouse the
+  whole time — only the graph agent's instructions were ever fixed.
+  Both surfaces now use the closure + graph_canonical (qualified ids +
+  business names). Writeup insight: a defect fixed in one engine's
+  prompt is NOT fixed — data-contract fixes (the closure table) apply
+  everywhere, prompt fixes must be replicated per consumer and rot.
 - PENDULUM: over-refusal after hardening (2026-08-08, same session as the
   fabrication): with the new verbatim/no-facts rules pasted, Q1 ("How is
   ED Sepsis Screening calculated?") -> honest refusal, Basis "catalog
