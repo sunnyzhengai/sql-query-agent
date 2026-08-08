@@ -102,7 +102,14 @@ Order matters: 1–4 change tables/instructions, 5 validates, 6 records.
        before/after screenshots saved for the demo/whitepaper.
        Cleanup: [ ] delete the L3_Probe agent; keep the `probe` SQL
        database (needed for the disambiguation check below).
-       5b. [ ] **Eventhouse probe** — the fork. Everything is in
+       5b. [x] **Eventhouse probe — RUN 2026-08-08 same day, verdict:
+           PASS** (ADR 0030). Agent generated + executed ai_embeddings
+           KQL under user impersonation; correct row returned. Eventhouse
+           is the semantic-retrieval engine. Productization notes in ADR
+           0030 (stored KQL function; per-user role prereq). Cleanup:
+           [ ] delete EH Probe + L3_Probe throwaway agents; KEEP probe-eh
+           (seed of the real build); delete probe SQL DB after 5c.
+           Original steps for reference:
            **`devtools/eventhouse_probe.kql`**; follow top to bottom.
            In plain steps:
            1. Portal prereqs first (section 0): create an Eventhouse

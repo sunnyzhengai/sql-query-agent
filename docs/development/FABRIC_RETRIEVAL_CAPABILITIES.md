@@ -100,6 +100,16 @@ Direct execution in the same database worked perfectly (semantic match
 correct, 1.1 s). L3-on-SQL-DB is not viable today; see ADR 0030 probe
 verdict for the fork.
 
+## PROBE RESULT #2 (empirical, 2026-08-08 same day) — Eventhouse PASS
+
+Agent-generated KQL containing `ai_embeddings` + `series_cosine_similarity`
+was accepted by the validator, EXECUTED under the asking user's
+impersonated identity (callout fired from generated code), and returned
+the correct catalog row. Same embedding model produced identical
+geometry across SQL and KQL engines (0.5075 vs 0.375 similarity).
+Eventhouse is the L3 engine; see ADR 0030 for productization notes
+(stored KQL function to constrain generation; per-user role prereq).
+
 ## Warehouse AI functions (for completeness)
 
 `AI_CLASSIFY`, `AI_SUMMARIZE`, `AI_GENERATE_RESPONSE`, etc. — preview,

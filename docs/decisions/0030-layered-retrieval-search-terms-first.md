@@ -63,6 +63,39 @@ Consequences:
   semantic retrieval path (the agent itself sends the question to the
   index; no in-SQL embedding needed at all), at the cost of an
   external index dependency. Decide after the Eventhouse probe.
+
+## Eventhouse probe verdict (2026-08-08, same day): PASS
+
+Run live by Sunny. Full chain verified: callout policy accepted;
+`ai_embeddings` under user impersonation (NO key stored in Fabric)
+embedded the seeded catalog; direct search reproduced the SQL probe's
+geometry exactly (true match 0.5075 vs 0.375/0.369 — same embedding
+model, two engines, identical space; 0.45 threshold confirmed in-gap).
+Then the decisive part: the throwaway Data Agent's validator ACCEPTED
+the example pair (no inline rejection, unlike SQL), and on a
+paraphrased question the agent GENERATED KQL containing ai_embeddings
++ series_cosine_similarity, EXECUTED it (callout fired from
+agent-generated code under the asking user's identity), and returned
+the correct row (ED Sepsis Screening) with business name attached.
+
+**Eventhouse is the semantic-retrieval architecture (L3 = KQL).**
+
+Observed generator behavior to shape in productization:
+- It expanded the embed phrase into a keyword dump (fine for
+  embeddings; ignores the "short noun phrase" instruction).
+- It IMPROVISED hybrid retrieval: lexical `where ... has` filters ON
+  TOP of similarity ranking — correct here, but keyword filters can
+  reintroduce exact-vocabulary failure (the readmit row contains no
+  "sepsis"). Productization must decide hybrid-vs-pure.
+- It ignored the 0.45-threshold/count-reporting discipline.
+The remedy is the ADR 0020 move at the database layer: wrap the
+pattern in a **stored KQL function** (`semantic_search(phrase)`) —
+KQL functions are schema-selectable for Data Agents — so the
+generator's job shrinks to calling one function, not composing the
+pipeline. Deployment prereqs to document: Eventhouse item + callout
+policy (one-time admin) + "Cognitive Services OpenAI User" role for
+EVERY asking user (group assignment) on the customer's Azure OpenAI;
+~1 embedding call per question (fractions of a cent).
 - Bonus empirical finding for the whitepaper/demo: an unscoped Data
   Agent FABRICATED a complete appointments dataset (counts + chart)
   rather than refusing — before/after screenshots captured. The
