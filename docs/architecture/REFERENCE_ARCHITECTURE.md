@@ -21,18 +21,19 @@ flowchart TB
         end
         subgraph FABRIC["Microsoft Fabric (customer capacity)"]
             FILES["SQL files + data dictionary<br/>(Lakehouse Files)"]
-            ENGINE["AIVIA Metadata Engine<br/>parse (ScriptDom) · PHI scan ·<br/>three-layer knowledge graph<br/>(Delta + Labeled Property Graph)"]
-            MAGENT["Fabric Data Agent #1<br/>'How is this metric calculated?'<br/>certified answers · named owners"]
+            ENGINE["AIVIA Metadata Engine<br/>parse (ScriptDom) · PHI scan ·<br/>three-layer knowledge graph +<br/>business names & terms<br/>(Delta + Labeled Property Graph)"]
+            SEMCAT["Semantic catalog — ROADMAP*<br/>(Fabric SQL DB: catalog + embeddings,<br/>VECTOR_DISTANCE at ask time)<br/>*pending L3 probe, ADR 0030"]
+            MAGENT["Fabric Data Agent #1<br/>'How is this metric calculated?'<br/>certified answers · named owners ·<br/>report links"]
             subgraph SS["AIVIA Analytics Self-Service — ROADMAP"]
                 COMPILER["Certified semantic layer compiler<br/>graph → generated views & measures<br/>(dimension layer = filter vocabulary)"]
                 SAGENT["Fabric Data Agent #2<br/>'What WAS this metric last month?'<br/>NL2SQL over certified views only"]
             end
         end
-        AOAI["Customer's own Azure OpenAI<br/>build-time descriptions only<br/>PHI-redacted fragments"]
+        AOAI["Customer's own Azure OpenAI<br/>descriptions + embeddings at build time<br/>(PHI-redacted); question embeddings<br/>at ask time if semantic catalog ships"]
         PURVIEW["Microsoft Purview"]
         COLLIBRA["Collibra (optional)"]
     end
-    USERS["Business users — plain English"]
+    USERS["Business users — plain English<br/>endorse terms (citizen stewardship)"]
 
     TSQL --> FILES
     DBT --> FILES
@@ -42,8 +43,11 @@ flowchart TB
     SNOW -.-> FILES
     FILES --> ENGINE
     ENGINE --> MAGENT
+    ENGINE -.-> SEMCAT
+    SEMCAT -.-> MAGENT
     ENGINE <--> AOAI
-    ENGINE --> PURVIEW
+    SEMCAT -.-> AOAI
+    ENGINE -->|"asset descriptions +<br/>glossary terms (multi-asset)"| PURVIEW
     ENGINE -.-> COLLIBRA
     ENGINE --> COMPILER
     COMPILER --> SAGENT
@@ -61,6 +65,18 @@ flowchart TB
 | Fabric semantic models | TMDL: tables, partitions, relationships, DAX measures | TMDL now; DAX measure parsing is its own lane (ADR 0001) | Next — lineage first, DAX semantics later |
 | Azure Databricks | SQL views + Unity Catalog DDL (**scope: SQL only** — PySpark/DLT notebook logic is a separate future problem) | Spark SQL / sqlglot dialect | Roadmap |
 | Snowflake | `GET_DDL()`: views, materialized views, tasks, dynamic tables | Snowflake SQL / sqlglot dialect | Roadmap |
+
+**2026-08-08 additions:** business names + report links flow inside the
+Metadata Engine (no topology change); the **Purview arrow now carries
+glossary terms** at term grain, one term per definition, multi-asset
+assigned (ADR 0031); the **semantic catalog** appears as roadmap-starred
+— it becomes solid only if the L3 probe confirms agent queries execute
+where `AI_GENERATE_EMBEDDINGS` lives (ADR 0030 amendment). If it ships,
+the Azure OpenAI arrow gains an **ask-time** leg (question-phrase
+embeddings) — a security-story change the whitepaper must state
+explicitly: user question text, not SQL fragments, would reach the
+customer's own endpoint at ask time. The Lucid/designed PDF is
+deliberately NOT updated until the probe verdict settles the topology.
 
 ## The two tiers, one sentence each
 
