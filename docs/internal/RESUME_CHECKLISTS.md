@@ -101,10 +101,32 @@ Order matters: 1–4 change tables/instructions, 5 validates, 6 records.
        unscoped agent FABRICATED an appointments dataset + chart —
        before/after screenshots saved for the demo/whitepaper.
        Cleanup: [ ] delete the L3_Probe agent; keep the `probe` SQL
-       database until the retrieval fork is decided.
-       Next fork (new probe to spec): Eventhouse/KQL first, then
-       reconsider Azure AI Search as the agent-native semantic source.
-       Original steps kept below for reference:
+       database (needed for the disambiguation check below).
+       5b. [ ] **Eventhouse probe** — the fork. Everything is in
+           **`devtools/eventhouse_probe.kql`**; follow top to bottom.
+           In plain steps:
+           1. Portal prereqs first (section 0): create an Eventhouse
+              item; give YOUR account the "Cognitive Services OpenAI
+              User" role on aivia (this probe uses your identity, no
+              key anywhere); run the callout-policy command — the step
+              most likely to fight back; screenshot any error.
+           2. Run sections 1–3 in the KQL query editor: make the
+              table, embed the rows, then run the search yourself.
+              Readmission row first at ~0.5 similarity = setup good.
+           3. Throwaway agent "EH Probe", only this KQL database as
+              source; paste instructions + the example pair from
+              section 4. If the validator rejects the example pair —
+              screenshot; that alone is a verdict.
+           4. Ask the newborn-sepsis question; open run steps; check:
+              KQL contains ai_embeddings? Executed? Right row first?
+           5. Tell Claude the outcome (PASS / validator-reject /
+              execution error) — ADR 0030 gets the verdict.
+       5c. [ ] **SQL-DB disambiguation, 2 min** (architect follow-up,
+           script section 5): open the probe database's SQL analytics
+           endpoint (its read-only twin) and run the two queries —
+           does `emb` exist there? does AI_GENERATE_EMBEDDINGS parse?
+           Settles which wall(s) the SQL probe hit; record in ADR 0030.
+       Original SQL-probe steps kept below for reference:
        1. In the workspace: **+ New item → SQL database** (a third kind
           of item — not the lakehouse, not a warehouse). Any name; it's
           disposable.

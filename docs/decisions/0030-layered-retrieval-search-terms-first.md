@@ -37,12 +37,20 @@ readmission step first, distance 0.49 vs 0.62/0.63 for non-matches,
 where the 0.55 threshold sits). But the Data Agent's example-query
 validator rejected the vector SQL with, verbatim:
 "'AI_GENERATE_EMBEDDINGS' is not a recognized built-in function name"
-and "Invalid column name 'emb'". Diagnosis: the agent validates and
-executes against the SQL database's read-only ANALYTICS-ENDPOINT
-MIRROR, where (a) AI functions don't exist and (b) the VECTOR column
-is dropped from mirroring entirely (Vector is an unsupported mirror
-type — the column vanished from the agent's schema view). The
-research report's one flagged risk, confirmed exactly.
+and "Invalid column name 'emb'". Diagnosis, refined after external
+architect review (2026-08-08): the CONFIRMED wall is the agent's own
+QUERY-VALIDATION layer — its error "Could not locate entry in
+sysdatabases for database 'MODEL'" shows its parser read `USE MODEL`
+as an old `USE <database>` statement, i.e. the validator's parser
+predates the AI functions regardless of what engine would have
+executed. The analytics-endpoint MIRROR dropping the VECTOR column is
+a second, PLAUSIBLE wall (consistent with `emb` missing from the
+agent's schema panel and with the docs' "executes through the SQL
+Analytics Endpoint" statement) but unproven — execution never
+happened. A 2-minute disambiguation check (query the probe DB's
+analytics endpoint directly: is `emb` in INFORMATION_SCHEMA? does
+AI_GENERATE_EMBEDDINGS parse there?) is queued for next session.
+Either way the configuration verdict is unchanged.
 
 Consequences:
 - L3-on-SQL-database is retired until Microsoft either runs agent

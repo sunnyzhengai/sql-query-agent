@@ -1,0 +1,116 @@
+// Eventhouse retrieval probe (ADR 0030 fork) — decides whether semantic
+// search can run inside the Data Agent via KQL, where there is NO mirror
+// layer between the agent and the data.
+//
+// Two syntax notes up front:
+// - The embedding plugin is `ai_embeddings` (preview). If any invocation
+//   below errors on syntax, the canonical reference is the official
+//   tutorial: learn.microsoft.com/fabric/real-time-intelligence/vector-database-eventhouse
+// - KQL uses cosine SIMILARITY (higher = closer). Our SQL probe measured
+//   DISTANCE (lower = closer). The section-3 SQL results translate to:
+//   true match ~0.51 similarity, non-matches ~0.37. Threshold ~0.45.
+
+// ===== 0. Portal prereqs (before any KQL) ============================
+// a. Workspace -> + New item -> Eventhouse (name: "probe-eh"). A KQL
+//    database is created inside it automatically.
+// b. Azure portal -> the aivia resource -> Access control (IAM) ->
+//    Add role assignment -> role "Cognitive Services OpenAI User" ->
+//    assign to founder@aiviaapp.com. (The plugin calls Azure OpenAI AS
+//    YOU — "impersonation" — so YOUR account needs permission on the
+//    resource. No key is used anywhere in this probe.)
+// c. Callout policy — Eventhouse must be allowed to call Azure OpenAI.
+//    In the KQL database query editor, run:
+//      .alter-merge cluster policy callout @'[{"CalloutType":"azure_openai","CalloutUriRegex":"aivia\\.openai\\.azure\\.com","CanCall":true}]'
+//    If that errors on permissions, look for the callout setting in the
+//    Eventhouse item's settings UI — this is the step most likely to
+//    need iteration; capture any error verbatim.
+
+// ===== 1. Table + seed rows ==========================================
+.create table semantic_catalog (
+    node_id:string, name:string, business_name:string,
+    description:string, emb:dynamic
+)
+
+.ingest inline into table semantic_catalog <|
+canonical:reporting.USP_ED_Sepsis,reporting.USP_ED_Sepsis,ED Sepsis Screening,"Measures pediatric patients under 21 days old presenting to the emergency department with valid sepsis screening scores and recorded blood pressure measurements.",
+canonical:reports.USP_Severe_Sepsis,reports.USP_Severe_Sepsis,Severe Sepsis Episodes,"Reports management timelines of unique severe sepsis episodes, including arrival times and care event metrics.",
+transform:reporting.USP_ED_Sepsis:ED_Readmit,Base_Pop_ED_Readmit,,"Patient encounters readmitted to the emergency department within 24 hours of a prior visit.",
+transform:reporting.USP_ED_Sepsis:BPA,BPA,,"Timeline of clinical alerts and actions taken for each patient encounter, detailing alert statuses and overridden comments.",
+canonical:reporting.USP_IP_SepsisDates,reporting.USP_IP_SepsisDates,Sepsis Reporting Calendar,"A filtered list of fiscal dates relevant to sepsis cases within a specified date range.",
+
+// ===== 2. Embed the rows (one-time; writes emb) ======================
+// Uses YOUR identity via ";impersonate" — needs prereq 0b + 0c.
+.set-or-replace semantic_catalog <|
+    semantic_catalog
+    | extend combined = strcat(name, " | ", coalesce(business_name, ""), " | ", description)
+    | evaluate ai_embeddings(combined,
+        'https://aivia.openai.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-06-01;impersonate')
+    | project node_id, name, business_name, description, emb = embedding
+
+// Storage optimization (optional but documented best practice):
+.alter column semantic_catalog.emb policy encoding type='Vector16'
+
+// ===== 3. Verify the search works when YOU run it ====================
+// (If this fails, stop — the problem is setup, not the agent. A callout
+// or 403 error here means prereq 0b or 0c, not a platform verdict.)
+let q = toscalar(
+    print t = "patients who came back to the ER"
+    | evaluate ai_embeddings(t,
+        'https://aivia.openai.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-06-01;impersonate')
+    | project embedding);
+semantic_catalog
+| extend similarity = series_cosine_similarity(q, emb)
+| top 3 by similarity desc
+| project node_id, name, business_name, similarity
+// Expect Base_Pop_ED_Readmit first, similarity ~0.5; others ~0.37.
+
+// ===== 4. Data Agent part (portal, not KQL) ==========================
+// a. New throwaway Data Agent "EH Probe"; ONLY source: this KQL
+//    database; tick semantic_catalog in the schema selection.
+// b. Agent instructions (paste):
+//      To find catalog entries matching a user's topic, embed the CORE
+//      CONCEPT of their question (short noun phrase) using the
+//      ai_embeddings plugin with the aivia connection string, then rank
+//      by series_cosine_similarity descending. Report how many rows
+//      score above 0.45 before listing the top matches. Similarity is
+//      relative closeness, never a probability. If nothing scores above
+//      0.45, say the catalog has nothing sufficiently related.
+// c. ONE example pair:
+//    Q: "what do we have about cancelled appointments?"
+//    KQL:
+//      let q = toscalar(print t = "cancelled appointments"
+//        | evaluate ai_embeddings(t, 'https://aivia.openai.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-06-01;impersonate')
+//        | project embedding);
+//      semantic_catalog
+//      | extend similarity = series_cosine_similarity(q, emb)
+//      | top 10 by similarity desc
+//      | project node_id, name, business_name, description, similarity
+//    >>> If the validator REJECTS this pair, screenshot the error —
+//    >>> that alone is a verdict (same wall as SQL: validation layer).
+// d. THE PROBE: ask "anything about newborns screened for sepsis in
+//    the ER?" — open run steps and check:
+//      [ ] generated KQL contains ai_embeddings          -> steering OK
+//      [ ] it EXECUTED and returned rows                 -> ENGINE PASS
+//      [ ] top row is the ED Sepsis metric               -> quality OK
+// e. VERDICT -> record in ADR 0030:
+//      PASS: Eventhouse is the semantic-retrieval architecture
+//      FAIL at validation: agent's KQL validator rejects the plugin ->
+//        the wall is the validation layer across engines; Azure AI
+//        Search becomes the primary candidate
+//      FAIL at execution (callout/permission): fix 0b/0c and retry
+//        before concluding anything
+// f. Delete the throwaway agent; keep/delete the Eventhouse per verdict.
+
+// ===== 5. SQL-DB disambiguation (2 min, architect follow-up) =========
+// Settles WHICH wall the SQL probe hit. In the ORIGINAAL probe SQL
+// database, open its **SQL analytics endpoint** (the read-only twin
+// item) and run:
+//   SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS
+//   WHERE TABLE_NAME = 'semantic_catalog';
+//   -- emb present?  -> mirror does NOT drop vector columns
+//   -- emb absent?   -> mirror-drop confirmed (second wall real)
+// then:
+//   SELECT AI_GENERATE_EMBEDDINGS('hi' USE MODEL aivia_embeddings);
+//   -- parses/runs?  -> functions exist on the endpoint
+//   -- unrecognized? -> endpoint lacks AI functions (as researched)
+// Record both outcomes in ADR 0030's probe verdict.
