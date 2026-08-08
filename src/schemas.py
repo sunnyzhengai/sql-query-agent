@@ -1418,7 +1418,7 @@ RUNTIME_ERROR_EVENTS = {
 
 
 SEMANTIC_CATALOG = {
-    "table_name": "semantic_catalog",
+    "table_name": "output_semantic_catalog",
     "description": (
         "Resolution catalog for ask-time semantic search (ADR 0030 L3, "
         "Eventhouse engine probe-verified 2026-08-08): one searchable "
@@ -1431,7 +1431,8 @@ SEMANTIC_CATALOG = {
     "domain": "output",
     "status": "planned",
     "notes": (
-        "Contract draft 2026-08-08. Writer: semantic-catalog refresh "
+        "Contract draft 2026-08-08. Eventhouse copy is named plain "
+        "semantic_catalog (KQL side). Writer: semantic-catalog refresh "
         "(pipeline step exists; notebook + Eventhouse ingest wiring "
         "pending — devtools/eventhouse_setup.kql). The emb vector lives "
         "only in the Eventhouse copy, not in this Delta shape."

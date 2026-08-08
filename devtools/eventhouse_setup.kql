@@ -15,7 +15,7 @@
 //      .alter-merge cluster policy callout @'[{"CalloutType":"azure_openai","CalloutUriRegex":"aivia\\.openai\\.azure\\.com","CanCall":true}]'
 //
 // REFRESH FLOW (each pipeline run, after 05):
-//   1. semantic_catalog rows land from the lakehouse Delta table
+//   1. Rows land from the lakehouse Delta table output_semantic_catalog
 //      (built by src/steps/semantic_catalog.py). Ingest options:
 //      one-click "Get data" from OneLake, or a pipeline copy activity.
 //   2. Run section 2 to (re)embed — only rows with empty emb pay a call.
