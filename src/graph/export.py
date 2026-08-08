@@ -39,6 +39,7 @@ def export_node_tables(nodes: dict[str, GraphNode]) -> dict[str, list[dict]]:
                 # qualified reference; the bare object name lives in bareName.
                 "name": metric_id,
                 "bareName": node.name,
+                "businessName": node.properties.get("business_name", ""),
                 "description": node.description,
                 "steward": node.properties.get("steward", ""),
                 "developer": node.properties.get("developer", ""),

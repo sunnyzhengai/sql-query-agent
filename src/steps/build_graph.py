@@ -7,10 +7,11 @@ Logic relations asserted here:
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Iterable
 
 from src.dictionary import DataDictionary
+from src.governance.display_names import apply_business_names
 from src.governance.steward import StewardManager
 from src.graph.builder import GraphBuilder
 from src.graph.serialization import (
@@ -27,6 +28,8 @@ class BuildGraphOutput:
     node_count: int
     edge_count: int
     stewards_applied: int
+    business_names_applied: int = 0
+    business_names_skipped: "list[str]" = field(default_factory=list)
 
 
 def build_graph_step(
@@ -34,6 +37,7 @@ def build_graph_step(
     dict_tables_rows: "list[dict]",
     dict_columns_rows: "list[dict]",
     steward_records: "Iterable[dict]" = (),
+    metric_name_records: "Iterable[dict]" = (),
     *,
     table_name_col: str = "TABLE_NAME",
     column_name_col: str = "COLUMN_NAME",
@@ -65,6 +69,8 @@ def build_graph_step(
     steward_manager.load_from_records(list(steward_records))
     stewards_applied = steward_manager.apply_to_graph(builder)
 
+    names_applied, names_skipped = apply_business_names(builder, metric_name_records)
+
     # Logic relations.
     node_ids = set(builder.nodes)
     missing_canonical = [
@@ -86,4 +92,6 @@ def build_graph_step(
         node_count=len(builder.nodes),
         edge_count=len(builder.edges),
         stewards_applied=stewards_applied,
+        business_names_applied=names_applied,
+        business_names_skipped=names_skipped,
     )

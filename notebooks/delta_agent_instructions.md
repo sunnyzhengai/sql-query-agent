@@ -52,15 +52,15 @@ case-sensitive miss — zero rows from an unfolded LIKE is a query bug, not an a
 ### "What is [metric]?" or "What does [metric] measure?"
 1. **Always check `output_metric_logic.description` first:**
    ```sql
-   SELECT metric_id, metric_name, description, source_tables, table_descriptions
+   SELECT metric_id, metric_name, business_name, description, source_tables, table_descriptions
    FROM output_metric_logic
-   WHERE lower(metric_name) LIKE '%keyword%' OR lower(metric_id) LIKE '%keyword%'
+   WHERE lower(metric_name) LIKE '%keyword%' OR lower(metric_id) LIKE '%keyword%' OR lower(business_name) LIKE '%keyword%'
    ```
    If `description` is not null, use it as your answer. These are pre-generated business descriptions that include purpose and business logic. Present them as-is for business users — do NOT regenerate or rephrase.
 2. **Only if `description` is null,** fall back to interpreting `calculation_logic`:
    ```sql
    SELECT calculation_logic FROM output_metric_logic
-   WHERE lower(metric_name) LIKE '%keyword%' OR lower(metric_id) LIKE '%keyword%'
+   WHERE lower(metric_name) LIKE '%keyword%' OR lower(metric_id) LIKE '%keyword%' OR lower(business_name) LIKE '%keyword%'
    ```
    Read the SQL fragments and translate to plain English.
 3. **For business users:** Present the description directly. Do NOT show SQL or table names.
@@ -69,7 +69,7 @@ case-sensitive miss — zero rows from an unfolded LIKE is a query bug, not an a
    `SELECT * FROM graph_nodes WHERE layer = 'canonical' AND lower(name) LIKE '%keyword%'`
 
 ### "What criteria does [metric] use?" or "What filters are applied?"
-1. Query: `SELECT calculation_logic FROM output_metric_logic WHERE lower(metric_name) LIKE '%keyword%' OR lower(metric_id) LIKE '%keyword%'`
+1. Query: `SELECT calculation_logic FROM output_metric_logic WHERE lower(metric_name) LIKE '%keyword%' OR lower(metric_id) LIKE '%keyword%' OR lower(business_name) LIKE '%keyword%'`
 2. Read the WHERE clauses and JOIN conditions from the calculation_logic column
 3. **Translate each filter to business language.** Read the actual SQL and interpret it:
    - Column comparisons (e.g., `column = value`) → describe what is being filtered
@@ -79,11 +79,11 @@ case-sensitive miss — zero rows from an unfolded LIKE is a query bug, not an a
 4. List each criterion as a clear business rule
 
 ### "Who owns [metric]?"
-1. Query: `SELECT steward, developer FROM output_metric_logic WHERE lower(metric_name) LIKE '%keyword%' OR lower(metric_id) LIKE '%keyword%'`
+1. Query: `SELECT steward, developer FROM output_metric_logic WHERE lower(metric_name) LIKE '%keyword%' OR lower(metric_id) LIKE '%keyword%' OR lower(business_name) LIKE '%keyword%'`
 2. If steward is null, say "No steward has been assigned yet. An administrator can assign one."
 
 ### "What tables are used for [metric]?" (developer question)
-1. Query: `SELECT source_tables, table_descriptions FROM output_metric_logic WHERE lower(metric_name) LIKE '%keyword%' OR lower(metric_id) LIKE '%keyword%'`
+1. Query: `SELECT source_tables, table_descriptions FROM output_metric_logic WHERE lower(metric_name) LIKE '%keyword%' OR lower(metric_id) LIKE '%keyword%' OR lower(business_name) LIKE '%keyword%'`
 2. List the tables with their data dictionary descriptions
 
 ### "Which metrics use [table name]?"
@@ -277,7 +277,7 @@ SELECT metric_id, metric_name, description FROM output_metric_logic ORDER BY met
 Find a specific metric:
 ```sql
 SELECT metric_id, metric_name, description, calculation_logic, source_tables, table_descriptions
-FROM output_metric_logic WHERE lower(metric_name) LIKE '%keyword%' OR lower(metric_id) LIKE '%keyword%'
+FROM output_metric_logic WHERE lower(metric_name) LIKE '%keyword%' OR lower(metric_id) LIKE '%keyword%' OR lower(business_name) LIKE '%keyword%'
 ```
 
 Find metrics with no steward:

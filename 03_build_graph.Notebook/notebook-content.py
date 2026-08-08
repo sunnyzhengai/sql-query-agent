@@ -85,6 +85,13 @@ print(f"Loaded {len(parse_results)} parse results, {len(dict_tables_rows)} table
 # %% Cell 2: Build graph (all logic in src/steps/build_graph.py)
 from src.steps.build_graph import build_graph_step
 
+# Business-friendly names (input_metric_names: PBI lineage or manual)
+metric_name_records = []
+try:
+    metric_name_records = [r.asDict() for r in spark.table("input_metric_names").collect()]
+except Exception:
+    print("No input_metric_names table — metrics display object names only")
+
 steward_records = []
 try:
     steward_records = [r.asDict() for r in spark.table("gov_steward_assignments").collect()]
@@ -93,6 +100,7 @@ except Exception:
 
 out = build_graph_step(
     parse_results, dict_tables_rows, dict_columns_rows, steward_records,
+    metric_name_records=metric_name_records,
     table_name_col=config.dictionary.table_name_col,
     column_name_col=config.dictionary.column_name_col,
     description_col=config.dictionary.description_col,
@@ -101,6 +109,10 @@ out = build_graph_step(
 print(f"Built graph: {out.node_count} nodes, {out.edge_count} edges")
 if steward_records:
     print(f"Applied {out.stewards_applied} steward assignments to canonical nodes")
+if metric_name_records:
+    print(f"Applied {out.business_names_applied} business-friendly names")
+    for issue in out.business_names_skipped:
+        print(f"  [!] name skipped: {issue}")
 
 
 # METADATA ********************

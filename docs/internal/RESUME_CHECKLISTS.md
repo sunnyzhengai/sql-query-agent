@@ -91,6 +91,13 @@ Built offline, needs one on-tenant validation pass (order matters):
 7. [ ] Run **make_golden_snapshot** — golden_ tables + Files/golden/
        manifest.json; record the manifest numbers here
 8. [ ] Scale back to F2 if you scaled up
+9. [ ] Business-friendly names (added 2026-08-07): author the dev-corpus
+       mapping as input_metric_names (CSV → table; e.g.
+       reporting.USP_ED_Sepsis → "ED Sepsis Screening" for the demo
+       metrics), rerun 03→04→05, trigger the graph load (mapping gains
+       businessName column → update the Metric type mapping first, same
+       drill as the description column), then ask an agent by the
+       business name to verify resolution
 
 ---
 

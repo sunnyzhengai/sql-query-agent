@@ -156,7 +156,12 @@ Get Metadata Sync working end-to-end with real data against Purview/Collibra.
       metric_logic); ops_extraction_tracking reactivated (extract_views writer)
 - [ ] Reconcile remaining 2 "planned" contracts: ops_extraction_inspection,
       ops_sync_log — reinstate writers or drop
-- [ ] Business-friendly metric names from PBI lineage (replace proc names)
+- [x] Business-friendly metric names (2026-08-07): input_metric_names
+      contract (PBI lineage via extract_pbix_sources --names-csv, or
+      manual CSV) → canonical nodes → metric_logic.business_name +
+      graph_canonical.businessName → both agents search & display them;
+      ambiguous bare names skipped, never guessed. On-tenant: author the
+      dev-corpus mapping, rerun 03→05, re-Load
 - [x] Steward assignment module; usage tracking module
 - [x] Admin commands in agent (/admindash, /stewards, /errors, /coverage, /health)
 - [x] CI/CD pipeline (GitHub Actions: lint + test + build + security audit)

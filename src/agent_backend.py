@@ -72,7 +72,8 @@ def retrieve_metric_rows(
     folded_question = fold_identifier(question)
     scored = []
     for row in metric_rows:
-        terms = [row["metric_id"], row.get("metric_name") or ""]
+        terms = [row["metric_id"], row.get("metric_name") or "",
+                 row.get("business_name") or ""]
         terms += (row.get("source_tables") or "").split(",")
         score = sum(
             1 for t in terms

@@ -9,6 +9,13 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 ## [Unreleased]
 
 ### Added
+- Business-friendly metric names: input_metric_names (qualified or
+  unambiguous bare metric_id -> business_name, with provenance) applied
+  to canonical nodes by 03, flowing to output_metric_logic.business_name
+  and graph_canonical.businessName; both agents' instructions search and
+  display them; local resolution and retrieval match them;
+  extract_pbix_sources --names-csv emits mappings from report lineage.
+  Ambiguous bare names are skipped and reported, never guessed
 - src/llm_client.py — Azure-aware LLM doorway: Azure endpoints get
   `api-key` auth + api-version handling (query strings survive the path
   join); OpenAI endpoints get Bearer. 07 and devtools both route

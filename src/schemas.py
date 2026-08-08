@@ -504,6 +504,7 @@ METRIC_LOGIC = {
     "columns": [
         ("metric_id", "string", False),
         ("metric_name", "string", False),
+        ("business_name", "string", True),
         ("description", "string", True),
         ("steward", "string", True),
         ("developer", "string", True),
@@ -514,7 +515,8 @@ METRIC_LOGIC = {
     ],
     "column_descriptions": {
         "metric_id": "Metric identifier (input_sql_sources.metric_id)",
-        "metric_name": "Display name of the metric",
+        "metric_name": "Display name of the metric (object name)",
+        "business_name": "Business-friendly name from PBI report lineage or manual entry (input_metric_names)",
         "description": "Business-language summary of what the metric measures",
         "steward": "Business steward accountable for the definition",
         "developer": "Developer accountable for the SQL logic",
@@ -554,6 +556,7 @@ GRAPH_CANONICAL = {
         ("metricId", "string", False),
         ("name", "string", False),
         ("bareName", "string", False),
+        ("businessName", "string", True),
         ("description", "string", True),
         ("steward", "string", True),
         ("developer", "string", True),
@@ -566,6 +569,7 @@ GRAPH_CANONICAL = {
             "generator filters name with the user's qualified reference)"
         ),
         "bareName": "Bare object name (no schema); repeats across schemas",
+        "businessName": "Business-friendly name (PBI report lineage or manual; may be empty)",
         "description": "Business description of the metric",
         "steward": "Business steward",
         "developer": "Developer owner",
@@ -1165,6 +1169,42 @@ PERSONAL_DEFINITIONS = {
 
 
 
+METRIC_NAMES = {
+    "table_name": "input_metric_names",
+    "description": (
+        "Business-friendly display names per metric: metric_id (qualified "
+        "or unambiguous bare name, ADR 0016 folding) -> business_name, with "
+        "source provenance (pbi_report | manual). Applied to canonical "
+        "nodes by 03_build_graph; flows to output_metric_logic and the LPG "
+        "export. Ambiguous bare names are skipped, never guessed (ADR 0005)."
+    ),
+    "domain": "input",
+    "status": "planned",
+    "notes": (
+        "Readers wired 2026-08-07 (03_build_graph). Writers: "
+        "scripts/extract_pbix_sources.py --names-csv emits rows from PBI "
+        "report lineage; manual CSV upload is the fallback. Flip active "
+        "when a load path (01_install or utility notebook) writes it."
+    ),
+    "columns": [
+        ("metric_id", "string", False),
+        ("business_name", "string", False),
+        ("source", "string", True),
+        ("report_name", "string", True),
+        ("assigned_date", "string", True),
+    ],
+    "column_descriptions": {
+        "metric_id": "Qualified metric_id preferred; bare object name accepted when unambiguous",
+        "business_name": "The name the business knows the metric by",
+        "source": "pbi_report | manual",
+        "report_name": "Originating Power BI report, when source is pbi_report",
+        "assigned_date": "When the mapping was created (ISO)",
+    },
+    "invariants": [
+        {"kind": "unique", "columns": ["metric_id"], "fold_case": True},
+    ],
+}
+
 PHI_FINDINGS = {
     "table_name": "ops_phi_findings",
     "description": (
@@ -1270,6 +1310,8 @@ TABLE_REGISTRY = {
         CERTIFICATION_EVENTS, USAGE_EVENTS, PERSONAL_DEFINITIONS,
         # PHI scanning + error lineage contract drafts (ADRs 0025-0026)
         PHI_FINDINGS, RUNTIME_ERROR_EVENTS,
+        # business-friendly names (planned writer; readers live)
+        METRIC_NAMES,
     ]
 }
 

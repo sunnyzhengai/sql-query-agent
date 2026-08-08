@@ -225,7 +225,7 @@ def scan_pbix_files(paths: list[Path]) -> list[dict]:
                 print(f"  → {r['sql_source']}")
                 all_results.append(r)
         else:
-            print(f"  (no SQL source found)")
+            print("  (no SQL source found)")
             # Still add with None sql_source for reporting
             for r in results:
                 all_results.append(r)
@@ -233,17 +233,62 @@ def scan_pbix_files(paths: list[Path]) -> list[dict]:
     return all_results
 
 
+def friendly_name_from_report(report_name: str) -> str:
+    """Report filename -> business-friendly display name.
+
+    'IP_Sepsis_Compliance_Dashboard' -> 'IP Sepsis Compliance Dashboard'.
+    Purely mechanical (separators to spaces, collapse whitespace) — no
+    vocabulary invention; the report author chose these words.
+    """
+    return " ".join(re.split(r"[_\-]+", report_name)).strip()
+
+
+def build_metric_name_records(results: "list[dict]") -> "list[dict]":
+    """input_metric_names rows from scan results: one row per SQL source.
+
+    A proc feeding multiple reports keeps the FIRST report's name and
+    lists the rest in report_name for steward review — one business name
+    per metric (the input_metric_names unique invariant), no guessing
+    about which report is canonical.
+    """
+    by_source: "dict[str, list[str]]" = {}
+    for r in results:
+        if r.get("sql_source"):
+            # sql_source carries an access-verb prefix ("EXEC USP_X",
+            # "FROM schema.view") — strip it down to the object reference
+            # so it fold-matches metric_ids (raw SQL: fragments are skipped)
+            m = re.match(r"(?:EXEC|FROM)\s+([\w.]+)$", r["sql_source"], re.IGNORECASE)
+            if not m:
+                continue
+            by_source.setdefault(m.group(1), []).append(r["report_name"])
+    records = []
+    for source, reports in sorted(by_source.items()):
+        records.append({
+            "metric_id": source,
+            "business_name": friendly_name_from_report(reports[0]),
+            "source": "pbi_report",
+            "report_name": "; ".join(dict.fromkeys(reports)),
+            "assigned_date": "",
+        })
+    return records
+
+
 def main():
     if len(sys.argv) < 2:
-        print("Usage: python scripts/extract_pbix_sources.py <path_to_pbix_or_folder> [--csv output.csv]")
+        print("Usage: python scripts/extract_pbix_sources.py <path_to_pbix_or_folder> "
+              "[--csv output.csv] [--names-csv input_metric_names.csv]")
         sys.exit(1)
 
     paths = []
     csv_output = None
+    names_csv = None
     i = 1
     while i < len(sys.argv):
         if sys.argv[i] == '--csv' and i + 1 < len(sys.argv):
             csv_output = sys.argv[i + 1]
+            i += 2
+        elif sys.argv[i] == '--names-csv' and i + 1 < len(sys.argv):
+            names_csv = sys.argv[i + 1]
             i += 2
         else:
             paths.append(Path(sys.argv[i]))
@@ -254,14 +299,14 @@ def main():
     # Summary
     with_source = [r for r in results if r['sql_source']]
     print(f"\n{'=' * 60}")
-    print(f"SUMMARY")
+    print("SUMMARY")
     print(f"{'=' * 60}")
     print(f"  Reports processed: {len(set(r['report_name'] for r in results))}")
     print(f"  Queries found:     {len(results)}")
     print(f"  With SQL source:   {len(with_source)}")
 
     if with_source:
-        print(f"\n  SQL Sources found:")
+        print("\n  SQL Sources found:")
         for r in with_source:
             print(f"    {r['report_name']} → {r['sql_source']}")
 
@@ -272,6 +317,18 @@ def main():
             for r in results:
                 writer.writerow(r)
         print(f"\n  Saved to {csv_output}")
+
+    if names_csv:
+        records = build_metric_name_records(results)
+        with open(names_csv, 'w', newline='') as f:
+            writer = csv.DictWriter(f, fieldnames=[
+                'metric_id', 'business_name', 'source', 'report_name', 'assigned_date',
+            ])
+            writer.writeheader()
+            for r in records:
+                writer.writerow(r)
+        print(f"  Saved {len(records)} business-name mappings to {names_csv} "
+              f"(upload as input_metric_names)")
 
 
 if __name__ == "__main__":
