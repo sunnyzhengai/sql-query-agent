@@ -28,6 +28,39 @@ semantic retrieval. Revised posture:
 - **L2 ships regardless** (embeddings for runtimes we control); it does
   not solve Fabric-agent ask-time retrieval and is not claimed to.
 
+## Probe verdict (2026-08-08): FAIL — SQL-DB path ruled out empirically
+
+Run live by Sunny on the dev tenant. Setup fully worked when run
+directly in the SQL database ("patients who came back to the ER" →
+readmission step first, distance 0.49 vs 0.62/0.63 for non-matches,
+1.1 s including the embedding round-trip — semantic matching, gap
+where the 0.55 threshold sits). But the Data Agent's example-query
+validator rejected the vector SQL with, verbatim:
+"'AI_GENERATE_EMBEDDINGS' is not a recognized built-in function name"
+and "Invalid column name 'emb'". Diagnosis: the agent validates and
+executes against the SQL database's read-only ANALYTICS-ENDPOINT
+MIRROR, where (a) AI functions don't exist and (b) the VECTOR column
+is dropped from mirroring entirely (Vector is an unsupported mirror
+type — the column vanished from the agent's schema view). The
+research report's one flagged risk, confirmed exactly.
+
+Consequences:
+- L3-on-SQL-database is retired until Microsoft either runs agent
+  queries on the operational engine or mirrors vector columns.
+- Next fork, in order: (1) **Eventhouse/KQL probe** — the agent
+  queries KQL databases directly (no mirror layer to drop columns);
+  series_cosine_similarity is GA, ai_embeddings plugin is preview with
+  per-user callout/role prereqs. (2) **Azure AI Search source** —
+  previously ruled out, now REOPENED: it is the one agent-native
+  semantic retrieval path (the agent itself sends the question to the
+  index; no in-SQL embedding needed at all), at the cost of an
+  external index dependency. Decide after the Eventhouse probe.
+- Bonus empirical finding for the whitepaper/demo: an unscoped Data
+  Agent FABRICATED a complete appointments dataset (counts + chart)
+  rather than refusing — before/after screenshots captured. The
+  platform's default refusal posture is weak; AIVIA's grounding and
+  refusal rules are load-bearing, not decoration.
+
 ## Context
 
 Resolution today is exact-ish: LIKE on name columns (Delta agent) and

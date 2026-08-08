@@ -87,6 +87,19 @@ Key naming trap: the plugin is `ai_embeddings` (the older announced
   weight (classic term templates have no numeric type; weight rides in
   the description meanwhile).
 
+## PROBE RESULT (empirical, 2026-08-08) — beyond the docs
+
+The undocumented gate is now answered first-hand: **Data Agent queries
+against a Fabric SQL database run on the analytics-endpoint mirror,
+not the operational engine.** Evidence: the agent's example-query
+validator rejected `AI_GENERATE_EMBEDDINGS` ("not a recognized
+built-in function name") AND could not see the `emb` column ("Invalid
+column name") — the VECTOR column is dropped from mirroring, and the
+agent's Data panel confirmed it (column absent from the schema list).
+Direct execution in the same database worked perfectly (semantic match
+correct, 1.1 s). L3-on-SQL-DB is not viable today; see ADR 0030 probe
+verdict for the fork.
+
 ## Warehouse AI functions (for completeness)
 
 `AI_CLASSIFY`, `AI_SUMMARIZE`, `AI_GENERATE_RESPONSE`, etc. — preview,

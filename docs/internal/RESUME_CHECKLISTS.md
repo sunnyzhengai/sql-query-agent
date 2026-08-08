@@ -93,11 +93,18 @@ Order matters: 1–4 change tables/instructions, 5 validates, 6 records.
           its metrics automatically).
        5. Open Purview, screenshot the glossary terms for the listing.
        6. Delete the Purview account.
-5. [ ] **L3 probe** — a 30–45 min experiment that decides whether
-       semantic search can run inside the Data Agent. It does NOT touch
-       the pipeline notebooks or your real agents. Everything needed is
-       in **`devtools/l3_probe.sql`** — open it and follow top to
-       bottom. In plain steps:
+5. [x] **L3 probe — RUN 2026-08-08, verdict: FAIL** (recorded in ADR
+       0030). Direct SQL worked (right match first, 0.49 vs 0.62 gap,
+       1.1 s); the Data Agent could not use it — its validator sees the
+       read-only mirror where AI functions don't exist and the VECTOR
+       column is dropped ("Invalid column name 'emb'"). Bonus capture:
+       unscoped agent FABRICATED an appointments dataset + chart —
+       before/after screenshots saved for the demo/whitepaper.
+       Cleanup: [ ] delete the L3_Probe agent; keep the `probe` SQL
+       database until the retrieval fork is decided.
+       Next fork (new probe to spec): Eventhouse/KQL first, then
+       reconsider Azure AI Search as the agent-native semantic source.
+       Original steps kept below for reference:
        1. In the workspace: **+ New item → SQL database** (a third kind
           of item — not the lakehouse, not a warehouse). Any name; it's
           disposable.
