@@ -268,6 +268,7 @@ def build_metric_name_records(results: "list[dict]") -> "list[dict]":
             "business_name": friendly_name_from_report(reports[0]),
             "source": "pbi_report",
             "report_name": "; ".join(dict.fromkeys(reports)),
+            "report_url": "",  # fill from the workspace (app.powerbi.com link)
             "assigned_date": "",
         })
     return records
@@ -322,7 +323,7 @@ def main():
         records = build_metric_name_records(results)
         with open(names_csv, 'w', newline='') as f:
             writer = csv.DictWriter(f, fieldnames=[
-                'metric_id', 'business_name', 'source', 'report_name', 'assigned_date',
+                'metric_id', 'business_name', 'source', 'report_name', 'report_url', 'assigned_date',
             ])
             writer.writeheader()
             for r in records:

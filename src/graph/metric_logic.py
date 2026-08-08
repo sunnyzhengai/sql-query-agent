@@ -22,8 +22,9 @@ def build_metric_logic_rows(
     """Build metric_logic row tuples from the in-memory graph.
 
     Returns list of tuples matching the METRIC_LOGIC schema:
-    (metric_id, metric_name, business_name, description, steward, developer,
-     transform_count, calculation_logic, source_tables, table_descriptions)
+    (metric_id, metric_name, business_name, report_name, report_url,
+     description, steward, developer, transform_count, calculation_logic,
+     source_tables, table_descriptions)
     """
     traverser = GraphTraverser(nodes, edges)
 
@@ -64,6 +65,8 @@ def build_metric_logic_rows(
         rows.append((
             metric_id, canonical.name,
             canonical.properties.get("business_name"),
+            canonical.properties.get("report_name"),
+            canonical.properties.get("report_url"),
             canonical.description,
             steward, developer,
             len(transforms), combined_logic,

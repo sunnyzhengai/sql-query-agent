@@ -69,7 +69,8 @@ class TestPipelineFlow:
             list(SAMPLE_DICT_TABLES), list(SAMPLE_DICT_COLUMNS),
             metric_name_records=[
                 {"metric_id": target, "business_name": "Friendly Name",
-                 "source": "pbi_report"},
+                 "source": "pbi_report", "report_name": "Ops_Dashboard",
+                 "report_url": "https://app.powerbi.com/links/x"},
             ],
         )
         assert out.business_names_applied == 1
@@ -80,11 +81,14 @@ class TestPipelineFlow:
         logic_rows = metric_logic_step(out.nodes_rows, out.edges_rows)
         by_id = {r["metric_id"]: r for r in logic_rows}
         assert by_id[target]["business_name"] == "Friendly Name"
+        assert by_id[target]["report_name"] == "Ops_Dashboard"
+        assert by_id[target]["report_url"] == "https://app.powerbi.com/links/x"
         assert all(r["business_name"] is None for m, r in by_id.items() if m != target)
 
         tables = export_step(out.nodes_rows, out.edges_rows)
         canonical = {r["metricId"]: r for r in tables["graph_canonical"]}
         assert canonical[target]["businessName"] == "Friendly Name"
+        assert canonical[target]["reportUrl"] == "https://app.powerbi.com/links/x"
 
     def test_local_retrieval_matches_business_name(self):
         from src.agent_backend import retrieve_metric_rows

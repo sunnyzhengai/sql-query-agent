@@ -73,6 +73,10 @@ def apply_business_names(
         node.properties["business_name"] = name
         if r.get("source"):
             node.properties["business_name_source"] = r["source"]
+        if r.get("report_name"):
+            node.properties["report_name"] = r["report_name"]
+        if r.get("report_url"):
+            node.properties["report_url"] = r["report_url"]
         applied += 1
 
     if skipped:

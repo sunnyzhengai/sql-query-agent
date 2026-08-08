@@ -40,6 +40,8 @@ def export_node_tables(nodes: dict[str, GraphNode]) -> dict[str, list[dict]]:
                 "name": metric_id,
                 "bareName": node.name,
                 "businessName": node.properties.get("business_name", ""),
+                "reportName": node.properties.get("report_name", ""),
+                "reportUrl": node.properties.get("report_url", ""),
                 "description": node.description,
                 "steward": node.properties.get("steward", ""),
                 "developer": node.properties.get("developer", ""),

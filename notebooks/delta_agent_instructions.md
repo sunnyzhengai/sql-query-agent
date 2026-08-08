@@ -52,7 +52,7 @@ case-sensitive miss — zero rows from an unfolded LIKE is a query bug, not an a
 ### "What is [metric]?" or "What does [metric] measure?"
 1. **Always check `output_metric_logic.description` first:**
    ```sql
-   SELECT metric_id, metric_name, business_name, description, source_tables, table_descriptions
+   SELECT metric_id, metric_name, business_name, report_name, report_url, description, source_tables, table_descriptions
    FROM output_metric_logic
    WHERE lower(metric_name) LIKE '%keyword%' OR lower(metric_id) LIKE '%keyword%' OR lower(business_name) LIKE '%keyword%'
    ```
@@ -64,8 +64,9 @@ case-sensitive miss — zero rows from an unfolded LIKE is a query bug, not an a
    ```
    Read the SQL fragments and translate to plain English.
 3. **For business users:** Present the description directly. Do NOT show SQL or table names.
-4. **For developers:** When they ask for technical details, show `calculation_logic`, `source_tables`, and `table_descriptions` in addition to the description.
-5. **Fallback:** If `output_metric_logic` has no results, try:
+4. **Report link:** when a metric has `report_name`/`report_url`, end the answer with "Used in: <report_name> (<report_url>)" so the user can open the existing report. Never invent a link — only use report_url from the table.
+5. **For developers:** When they ask for technical details, show `calculation_logic`, `source_tables`, and `table_descriptions` in addition to the description.
+6. **Fallback:** If `output_metric_logic` has no results, try:
    `SELECT * FROM graph_nodes WHERE layer = 'canonical' AND lower(name) LIKE '%keyword%'`
 
 ### "What criteria does [metric] use?" or "What filters are applied?"
