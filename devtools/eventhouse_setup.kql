@@ -1,0 +1,93 @@
+// Semantic catalog — PRODUCTION Eventhouse setup (ADR 0030 L3).
+// Productizes the probe pattern verified 2026-08-08: full catalog,
+// in-database embedding, and the semantic_search() stored function so
+// the Data Agent generator calls ONE function instead of composing the
+// embed/rank/threshold pipeline it repeatedly mangles.
+//
+// HOW TO RUN: one dot-command at a time (cursor inside the command, no
+// selection). Queries (section 4 checks) run as single statements.
+//
+// PREREQS (once per environment — same as the probe):
+//   a. Eventhouse item exists (reuse probe-eh or create "aivia-eh")
+//   b. Every ASKING user holds "Cognitive Services OpenAI User" on the
+//      customer's Azure OpenAI resource (group assignment recommended)
+//   c. Callout policy allows the endpoint:
+//      .alter-merge cluster policy callout @'[{"CalloutType":"azure_openai","CalloutUriRegex":"aivia\\.openai\\.azure\\.com","CanCall":true}]'
+//
+// REFRESH FLOW (each pipeline run, after 05):
+//   1. semantic_catalog rows land from the lakehouse Delta table
+//      (built by src/steps/semantic_catalog.py). Ingest options:
+//      one-click "Get data" from OneLake, or a pipeline copy activity.
+//   2. Run section 2 to (re)embed — only rows with empty emb pay a call.
+
+// ===== 1. Table (mirrors the SEMANTIC_CATALOG contract + emb) =========
+.create-merge table semantic_catalog (
+    node_id:string, kind:string, ref:string, name:string,
+    business_name:string, search_text:string, display_text:string,
+    emb:dynamic
+)
+
+.alter column semantic_catalog.emb policy encoding type='Vector16'
+
+// ===== 2. Embed new/changed rows (in-database, impersonation) =========
+// Re-runnable: only rows lacking a vector are embedded.
+.set-or-replace semantic_catalog <|
+    let todo = semantic_catalog | where isnull(emb) or array_length(emb) == 0;
+    let done = semantic_catalog | where isnotnull(emb) and array_length(emb) > 0;
+    let embedded = todo
+        | evaluate ai_embeddings(search_text,
+            'https://aivia.openai.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-06-01;impersonate')
+        | project node_id, kind, ref, name, business_name, search_text,
+                  display_text, emb = search_text_embeddings;
+    union done, embedded
+
+// ===== 3. THE function the Data Agent calls =============================
+// Owns the whole discipline: embed once, rank, threshold, disclose count.
+// Threshold 0.45 sits in the measured gap (true ~0.51, noise ~0.37);
+// recalibrate against a dozen known question->answer pairs at full scale.
+.create-or-alter function with (
+    docstring = "Semantic resolution over the certified catalog: returns the closest metrics/steps/terms for a topic phrase. total_matches on every row discloses how many cleared the threshold; closeness is relative similarity, never a probability.",
+    folder = "aivia"
+) semantic_search(phrase:string, top_k:int = 10, threshold:real = 0.45) {
+    let q = toscalar(
+        print t = phrase
+        | evaluate ai_embeddings(t,
+            'https://aivia.openai.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-06-01;impersonate')
+        | project t_embeddings);
+    let scored = semantic_catalog
+        | extend closeness = series_cosine_similarity(q, emb)
+        | where closeness >= threshold;
+    let total = toscalar(scored | count);
+    scored
+    | top top_k by closeness desc
+    | project node_id, kind, ref, name, business_name, display_text,
+              closeness, total_matches = total
+}
+
+// ===== 4. Verify =======================================================
+// (a) Embedding coverage — expect 0:
+semantic_catalog | where isnull(emb) or array_length(emb) == 0 | count
+
+// (b) The function, end to end — expect the readmit step first:
+semantic_search("patients who came back to the ER", 5)
+
+// (c) Refusal floor — nonsense phrase; expect ZERO rows (this is what
+//     keeps ADR 0005 alive in fuzzy matching):
+semantic_search("unicorn readmission velocity")
+
+// ===== 5. Data Agent wiring (portal) ===================================
+// a. Add this KQL database as a SOURCE on the agents (alongside their
+//    existing source); in schema selection tick semantic_catalog AND
+//    the aivia/semantic_search function.
+// b. Source instructions (paste):
+//      To resolve a user's topic or metric reference, call
+//      semantic_search('<core concept phrase>') FIRST. Use the returned
+//      ref (metric_id or term_id) for any further lookups in other
+//      sources. Report total_matches when > top rows shown. closeness
+//      is relative similarity — never present it as a probability. If
+//      semantic_search returns no rows, say the certified knowledge
+//      base has nothing sufficiently related; do not guess.
+// c. ONE example pair:
+//      Q: "what do we have about cancelled appointments?"
+//      KQL: semantic_search("cancelled appointments")
+//    (the function call IS the whole query — that is the point)

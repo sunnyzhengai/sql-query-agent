@@ -1417,6 +1417,51 @@ RUNTIME_ERROR_EVENTS = {
 }
 
 
+SEMANTIC_CATALOG = {
+    "table_name": "semantic_catalog",
+    "description": (
+        "Resolution catalog for ask-time semantic search (ADR 0030 L3, "
+        "Eventhouse engine probe-verified 2026-08-08): one searchable "
+        "document per metric, named calculation step, and business term. "
+        "Built by src/steps/semantic_catalog.py; the Eventhouse copy "
+        "embeds search_text in-database (ai_embeddings, user "
+        "impersonation) and serves semantic_search() to Data Agents — "
+        "the stochastic generator never owns resolution."
+    ),
+    "domain": "output",
+    "status": "planned",
+    "notes": (
+        "Contract draft 2026-08-08. Writer: semantic-catalog refresh "
+        "(pipeline step exists; notebook + Eventhouse ingest wiring "
+        "pending — devtools/eventhouse_setup.kql). The emb vector lives "
+        "only in the Eventhouse copy, not in this Delta shape."
+    ),
+    "columns": [
+        ("node_id", "string", False),
+        ("kind", "string", False),
+        ("ref", "string", False),
+        ("name", "string", False),
+        ("business_name", "string", True),
+        ("search_text", "string", False),
+        ("display_text", "string", False),
+    ],
+    "column_descriptions": {
+        "node_id": "Graph node id (canonical:/transform:) or term:<term_id>",
+        "kind": "metric | step | term — consumers dispatch on this",
+        "ref": "metric_id for metrics/steps; term_id for terms",
+        "name": "Technical name (object, CTE, or term name)",
+        "business_name": "Business-friendly name when one exists",
+        "search_text": "Composed document the engine embeds and searches",
+        "display_text": "How resolution results introduce themselves",
+    },
+    "invariants": [
+        {"kind": "unique", "columns": ["node_id"]},
+        {"kind": "allowed_values", "column": "kind",
+         "values": ["metric", "step", "term"]},
+    ],
+}
+
+
 # Registry of all table contracts — the single source of truth.
 TABLE_REGISTRY = {
     s["table_name"]: s
@@ -1445,6 +1490,8 @@ TABLE_REGISTRY = {
         METRIC_NAMES,
         # business terms as weighted plurality (ADR 0031)
         BUSINESS_TERMS, TERM_LINKS, TERM_ENDORSEMENTS,
+        # semantic-search resolution catalog (ADR 0030 L3)
+        SEMANTIC_CATALOG,
     ]
 }
 
