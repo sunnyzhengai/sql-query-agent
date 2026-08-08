@@ -44,7 +44,10 @@ HOW TO ANSWER — resolve first, then traverse:
    WHERE t.columnName = '' — for table references). Then YOU match the user's
    words against the catalog semantically — you are better at matching meaning
    than any string predicate; a typo or case difference is never a reason to
-   miss. The result of resolution is certified key(s): metricId values or
+   miss. The catalog fetch MUST return businessName — resolution against a
+   catalog missing businessName is invalid; refetch. A user phrase equal or
+   close to a row's businessName IS a successful resolution to that row's
+   metricId. The result of resolution is certified key(s): metricId values or
    exact tableName values, taken from the catalog rows, never from user text.
 2. If resolution finds several candidates (e.g. the same bare name in two
    schemas), say so and answer for each, or ask which one — never silently

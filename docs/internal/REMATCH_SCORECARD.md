@@ -52,6 +52,18 @@ Corpus: 28 metrics across two schemas; bare names COLLIDE for 2 pairs
 **Diagnostic probe (truncation):** "How many metrics read from HOSPITAL_ENCOUNTERS? Exact count first, then the full list." Count=13 but short list ⇒ tool-layer row cap (platform); count=5 ⇒ LIMIT in generated query (instruction-fixable).
 
 **Round 2 defect log (live):**
+- PENDULUM: over-refusal after hardening (2026-08-08, same session as the
+  fabrication): with the new verbatim/no-facts rules pasted, Q1 ("How is
+  ED Sepsis Screening calculated?") -> honest refusal, Basis "catalog
+  fetch -> 0 matched" — despite businessName being the EXACT string in
+  the catalog. Hypothesis: generator's fetch dropped businessName from
+  RETURN. The new rules worked as safety (honest footer, no invention)
+  but resolution quality regressed same-day — fourth non-determinism
+  data point. Reinforcement added (fetch MUST return businessName; a
+  businessName match IS resolution). Durable fix remains structural:
+  the semantic catalog (Eventhouse) owning resolution. DEMO DECISION:
+  video rides the Delta agent (already the GA-default), which handles
+  business-name resolution robustly via LIKE.
 - FABRICATED count on failed execution (2026-08-08, graph agent, 1.4.2 +
   business names): asked for exact step count of ED Sepsis Screening
   (truth 43). Generated GQL filtered name =
