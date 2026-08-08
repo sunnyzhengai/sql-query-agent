@@ -1,0 +1,30 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/dataAgent/definition/fewShots/1.0.0/schema.json",
+  "fewShots": [
+    {
+      "id": "13a32c84-aade-4164-ae8f-7f446ca19e06",
+      "question": "What metrics are available?",
+      "query": "-- Enter a SQL query that could answer the question using your data\nSELECT metric_id, metric_name, business_name, description\nFROM output_metric_logic ORDER BY business_name"
+    },
+    {
+      "id": "3c1e26a5-83b0-4a86-8f1c-7c5e33676c9b",
+      "question": "Tell me about a specific metric",
+      "query": "-- Enter a SQL query that could answer the question using your data\nSELECT metric_id, metric_name, business_name, report_name, report_url, description, steward, developer, calculation_logic, source_tables, table_descriptions\nFROM output_metric_logic\nWHERE lower(metric_name) LIKE '%keyword%' OR lower(metric_id) LIKE '%keyword%' OR lower(business_name) LIKE '%keyword%'"
+    },
+    {
+      "id": "a4b26203-e83f-47ad-9340-44db6f802cfc",
+      "question": "Which metrics use a specific table?",
+      "query": "-- Enter a SQL query that could answer the question using your data\nSELECT DISTINCT n.name FROM graph_edges e1\nJOIN graph_edges e2 ON e1.source_id = e2.target_id\nJOIN graph_nodes n ON e2.source_id = n.node_id\nWHERE lower(e1.target_id) LIKE '%table_name%' AND n.layer = 'canonical'"
+    },
+    {
+      "id": "504d2c51-0694-4f7b-b69c-76bde9ad8a0a",
+      "question": "Which metrics have no steward assigned?",
+      "query": "-- Enter a SQL query that could answer the question using your data\nSELECT metric_id, metric_name, business_name FROM output_metric_logic WHERE steward IS NULL"
+    },
+    {
+      "id": "65f22396-204c-4ced-9bbe-93ac840fa989",
+      "question": "Show the recent build history",
+      "query": "-- Enter a SQL query that could answer the question using your data\nSELECT TOP 20 * FROM ops_build_summary ORDER BY build_time DESC"
+    }
+  ]
+}

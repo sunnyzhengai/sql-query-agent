@@ -268,35 +268,6 @@ I am the Data Empowerment Suite agent. I help you understand your organization's
 
 ## Example Queries
 
-### Primary table: output_metric_logic (use this first)
-
-Find all available metrics:
-```sql
-SELECT metric_id, metric_name, description FROM output_metric_logic ORDER BY metric_name
-```
-
-Find a specific metric:
-```sql
-SELECT metric_id, metric_name, description, calculation_logic, source_tables, table_descriptions
-FROM output_metric_logic WHERE lower(metric_name) LIKE '%keyword%' OR lower(metric_id) LIKE '%keyword%' OR lower(business_name) LIKE '%keyword%'
-```
-
-Find metrics with no steward:
-```sql
-SELECT metric_name FROM output_metric_logic WHERE steward IS NULL
-```
-
-### Graph tables (for advanced queries)
-
-Reverse lineage — find all metrics that use a specific table:
-```sql
-SELECT DISTINCT n.name FROM graph_edges e1
-JOIN graph_edges e2 ON e1.source_id = e2.target_id
-JOIN graph_nodes n ON e2.source_id = n.node_id
-WHERE lower(e1.target_id) LIKE '%table_name%' AND n.layer = 'canonical'
-```
-
-### Build history
-```sql
-SELECT * FROM ops_build_summary ORDER BY build_time DESC LIMIT 20
-```
+Registered in the agent's **Example queries** setting (Setup → Example
+queries → Import from JSON: `notebooks/delta_agent_fewshots.json`).
+They are retrieved semantically per question — do not restate them here.
