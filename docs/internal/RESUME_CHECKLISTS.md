@@ -128,11 +128,12 @@ Order matters: 1–4 change tables/instructions, 5 validates, 6 records.
               KQL contains ai_embeddings? Executed? Right row first?
            5. Tell Claude the outcome (PASS / validator-reject /
               execution error) — ADR 0030 gets the verdict.
-       5c. [ ] **SQL-DB disambiguation, 2 min** (architect follow-up,
-           script section 5): open the probe database's SQL analytics
-           endpoint (its read-only twin) and run the two queries —
-           does `emb` exist there? does AI_GENERATE_EMBEDDINGS parse?
-           Settles which wall(s) the SQL probe hit; record in ADR 0030.
+       5c. [x] **SQL-DB disambiguation — DONE 2026-08-08**: emb absent
+           from the mirror (drop confirmed) AND the endpoint's engine
+           refuses the function ("not supported", Msg 15871 — modern
+           parser, disabled by policy). Three-wall taxonomy recorded in
+           ADR 0030. Cleanup now clear: delete probe SQL DB + its
+           endpoint twin + both throwaway agents; keep probe-eh.
        Original SQL-probe steps kept below for reference:
        1. In the workspace: **+ New item → SQL database** (a third kind
           of item — not the lakehouse, not a warehouse). Any name; it's

@@ -47,10 +47,20 @@ executed. The analytics-endpoint MIRROR dropping the VECTOR column is
 a second, PLAUSIBLE wall (consistent with `emb` missing from the
 agent's schema panel and with the docs' "executes through the SQL
 Analytics Endpoint" statement) but unproven — execution never
-happened. A 2-minute disambiguation check (query the probe DB's
-analytics endpoint directly: is `emb` in INFORMATION_SCHEMA? does
-AI_GENERATE_EMBEDDINGS parse there?) is queued for next session.
-Either way the configuration verdict is unchanged.
+happened. Disambiguation completed 2026-08-08, run live on the analytics
+endpoint. BOTH walls confirmed, and a third distinguished — the full
+taxonomy of why the SQL path is closed:
+1. AGENT VALIDATOR: pre-AI-functions parser (misread USE MODEL as
+   USE <database>) — blocks before execution.
+2. ANALYTICS ENDPOINT ENGINE: modern parser, function deliberately
+   disabled ("FUNCTION 'AI_GENERATE_EMBEDDINGS' is not supported",
+   Msg 15871) — would block execution even past the validator.
+3. MIRROR: vector column genuinely dropped (INFORMATION_SCHEMA lists
+   node_id/name/business_name/description — no emb) — no vectors to
+   search even if the function existed.
+Any one wall suffices; all three are real. Re-test trigger: Microsoft
+would need to fix all three (or route agents to the operational
+engine) before L3-on-SQL-DB becomes viable.
 
 Consequences:
 - L3-on-SQL-database is retired until Microsoft either runs agent
