@@ -82,6 +82,11 @@ def collect_contents(repo_root: Path, version: str) -> "dict[str, Path]":
         "notebooks/delta_agent_instructions.md": (
             repo_root / "notebooks" / "delta_agent_instructions.md"
         ),
+        # Instructions reference importing these as the agent's example
+        # queries (Setup -> Example queries -> Import from JSON)
+        "notebooks/delta_agent_fewshots.json": (
+            repo_root / "notebooks" / "delta_agent_fewshots.json"
+        ),
     }
 
     # Pipeline notebooks: NN_name.Notebook/notebook-content.py -> notebooks/NN_name.py

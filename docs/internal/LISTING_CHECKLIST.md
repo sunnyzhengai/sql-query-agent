@@ -42,28 +42,27 @@ response.
        the Delta agent one question on the published surface and
        LEFT-CLICK the report link — if it opens, the video shows a
        click; if not, the video shows open-in-new-tab. Ten minutes.
-3. [ ] **Record the demo video** (~5 min, per DEMO_SCRIPT.md — but
-       note the script predates business names/report links; adjust
-       beats to feature: "How is ED Sepsis Screening calculated?" →
-       certified steps → "Used in:" link → open the dashboard; the
-       28-metric business-name listing; the FAKE_METRIC refusal; the
-       honest no-steward answer). No org-specific data on screen —
-       the corpus is anonymized and the dashboard is synthetic-footed.
+3. [ ] **Record the demo video** (~5 min): DEMO_SCRIPT.md REFRESHED
+       2026-08-09 — beats are the QA-passed question set verbatim
+       (headline + report-link click, business-name portfolio, 13-metric
+       impact analysis, refusal, honest ownership). Follow it as
+       written; don't improvise count questions on camera.
 4. [ ] **Capture 3–5 screenshots** while recording: business answer
        with report link, metric listing, refusal, validation health
        (06 output), architecture diagram. Save originals to
        presentation/ for reuse.
-5. [ ] **Package + self-validate** (30 min, terminal):
-       `python scripts/build_deployment_package.py` then point
-       `python scripts/validate_deployment.py --root <unzipped output>`
-       at it — the artifact a lead receives must pass our own
-       pre-flight. Claude can run this with you.
-6. [ ] **Lead-handling minimum** (writing, ~1 hour, Claude drafts):
-       - support@ response expectation on the listing (e.g. 2 business
-         days) + the escalation note (support@ → founder)
-       - lead intake questionnaire (Fabric capacity? dictionary ready?
-         SQL dialect? Azure OpenAI available?)
-       - scheduling link (Calendly/Bookings) for qualified leads
+5. [x] **Package + self-validate** — DONE 2026-08-09 (Claude):
+       v1.4.2 package built (now ships delta_agent_fewshots.json — gap
+       found and fixed); validator run against the unzipped artifact:
+       all shipped components green; the only failures are the three
+       customer-supplied inputs (SQL, dictionary), each with
+       fix-stating messages — which IS the pass condition for a fresh
+       package (that's the lead's first-run experience working).
+6. [~] **Lead-handling minimum** — DRAFTED 2026-08-09
+       ([LEAD_HANDLING.md](LEAD_HANDLING.md)): first-response template,
+       5-question qualification questionnaire, rubric, listing support
+       statement. YOUR two steps: review/edit the template wording, and
+       create the Bookings/Calendly page (paste URL into the doc).
 7. [ ] **Partner Center: create the offer** (portal, ~1–2 hours):
        New offer → SaaS → listing option **Contact Me** → paste/upload
        assets from docs/product → lead destination: start with email
