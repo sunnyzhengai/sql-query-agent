@@ -21,6 +21,12 @@
 //   2. Run section 2 to (re)embed — only rows with empty emb pay a call.
 
 // ===== 1. Table (mirrors the SEMANTIC_CATALOG contract + emb) =========
+// MIGRATING FROM THE PROBE? The probe's semantic_catalog has an older
+// schema (description column, no kind/ref) — drop it first or its rows
+// pollute search results:
+//   .drop table semantic_catalog
+// Also: never run with a SELECTION spanning two dot-commands — that
+// yields "Syntax error: A recognition error occurred" (live, 2026-08-09).
 .create-merge table semantic_catalog (
     node_id:string, kind:string, ref:string, name:string,
     business_name:string, search_text:string, display_text:string,
