@@ -27,7 +27,9 @@
 //   .drop table semantic_catalog
 // Also: never run with a SELECTION spanning two dot-commands — that
 // yields "Syntax error: A recognition error occurred" (live, 2026-08-09).
-.create-merge table semantic_catalog (
+// plain .create — .create-merge is rejected by the Fabric queryset
+// parser ('recognition error', live 2026-08-09); drop first if exists
+.create table semantic_catalog (
     node_id:string, kind:string, ref:string, name:string,
     business_name:string, search_text:string, display_text:string,
     emb:dynamic
