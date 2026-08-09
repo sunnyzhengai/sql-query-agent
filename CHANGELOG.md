@@ -31,7 +31,7 @@ Versioning follows [Semantic Versioning](https://semver.org/).
   active, single-writer enforced); 07 redacts fragments from the
   findings table before any prompt — with an inline-scan fallback so
   the gate never silently disappears
-- make_golden_snapshot notebook: DEEP CLONEs the rebuild-expensive
+- make_golden_snapshot notebook: copies (CTAS) the rebuild-expensive
   state (inputs, description cache, PHI dispositions, error history)
   to golden_ tables + manifest; restore = clone back + rerun 02->07
 - PHI / hardcoded-literal scanner (ADR 0025, src/phi_scan.py): five
