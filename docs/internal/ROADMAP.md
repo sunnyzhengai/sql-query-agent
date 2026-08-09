@@ -55,6 +55,19 @@ VECTOR_DISTANCE + AI_GENERATE_EMBEDDINGS, steered via example query
 pairs) after re-verifying preview status. Round 3 rematch measures
 L0/L1 vs L3.
 
+**Retrieval consolidation + instruction diet (added 2026-08-09,
+post-listing sprint 1):** the week's instruction fixes were reactive
+(whack-a-mole signature: two 15k-cap collisions; Sunny's one-word-
+difference observation) and the platform's steering is inherently
+stochastic (semantic fewshot retrieval + sampled generation). Exit:
+structure absorbs behavior — wire the Eventhouse semantic catalog into
+the DELTA agent (plurality arrives as rows: total_matches + distinct
+definitions; today's plurality prompt rule becomes redundant), add
+stepCount/tableCount as Metric properties (counts become reads), land
+business terms — THEN delete prompt rules down to invariant safety +
+function/column guidance. Round 3 scores phrasing-robustness before/
+after. Demo interim: pinned QA-verified phrasings only.
+
 **Connector roadmap (added 2026-08-07, see
 [REFERENCE_ARCHITECTURE.md](../architecture/REFERENCE_ARCHITECTURE.md)):**
 next up are **dbt** (manifest.json → compiled T-SQL + free DAG; cheapest
