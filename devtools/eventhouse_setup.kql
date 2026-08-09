@@ -30,9 +30,12 @@
 // plain .create — .create-merge is rejected by the Fabric queryset
 // parser ('recognition error', live 2026-08-09); drop first if exists
 .create table semantic_catalog (
-    node_id:string, kind:string, ref:string, name:string,
+    node_id:string, ['kind']:string, ['ref']:string, name:string,
     business_name:string, search_text:string, display_text:string,
     emb:dynamic
+    // kind and ref are KQL reserved words — bracket-escaped in DDL
+    // (bare `kind` = "recognition error", live 2026-08-09; the editor's
+    // red squiggle under kind was the tell)
 )
 
 .alter column semantic_catalog.emb policy encoding type='Vector16'
@@ -45,8 +48,8 @@
     let embedded = todo
         | evaluate ai_embeddings(search_text,
             'https://aivia.openai.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-06-01;impersonate')
-        | project node_id, kind, ref, name, business_name, search_text,
-                  display_text, emb = search_text_embeddings;
+        | project node_id, ['kind'], ['ref'], name, business_name,
+                  search_text, display_text, emb = search_text_embeddings;
     union done, embedded
 
 // ===== 3. THE function the Data Agent calls =============================
@@ -68,8 +71,8 @@
     let total = toscalar(scored | count);
     scored
     | top top_k by closeness desc
-    | project node_id, kind, ref, name, business_name, display_text,
-              closeness, total_matches = total
+    | project node_id, ['kind'], ['ref'], name, business_name,
+              display_text, closeness, total_matches = total
 }
 
 // ===== 4. Verify =======================================================
