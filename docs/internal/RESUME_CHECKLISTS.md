@@ -181,7 +181,10 @@ Order matters: 1–4 change tables/instructions, 5 validates, 6 records.
        plan: `devtools/eventhouse_setup.kql`, follow top to bottom):
        1. Add a small cell to 05 (or run ad hoc): build rows via
           `from src.steps.semantic_catalog import build_semantic_catalog`
-          over graph_nodes; write to Delta `output_semantic_catalog`.
+          over graph_nodes; write to Delta `output_semantic_catalog` —
+          ALWAYS with explicit column order (Spark alphabetizes dict
+          rows; positional copies downstream then shift columns):
+          `df = spark.createDataFrame(out.rows).select("node_id","kind","ref","name","business_name","search_text","display_text")`
        2. In probe-eh (rename to aivia-eh if you like): run the setup
           script — table, embed (only new rows pay), semantic_search()
           function, verification queries incl. the refusal-floor probe.
