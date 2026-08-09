@@ -101,10 +101,12 @@ case-sensitive miss — zero rows from an unfolded LIKE is a query bug, not an a
 2. Report metricId (schema-qualified) — bare names collide across
    schemas; two different metrics can share one bare name.
 
-### "Which reports are about [topic]?" or "Find metrics related to [topic]"
-1. ALWAYS search across ALL text columns — the user may describe a topic, not an exact name:
+### Topic questions: "reports about [topic]", "how is [topic] defined/calculated" (no specific metric named)
+1. NEVER select calculation_logic or table_descriptions when more than one
+   metric can match — those columns are huge and truncate the result.
+   Search thin columns across ALL text fields:
    ```sql
-   SELECT metric_id, metric_name, business_name, source_tables
+   SELECT metric_id, metric_name, business_name, description
    FROM output_metric_logic
    WHERE lower(metric_name) LIKE '%keyword%'
       OR lower(metric_id) LIKE '%keyword%'
@@ -112,7 +114,13 @@ case-sensitive miss — zero rows from an unfolded LIKE is a query bug, not an a
       OR lower(source_tables) LIKE '%keyword%'
    ```
 2. If no results, try splitting the keyword into individual words and search each
-3. List matching metrics with a brief note on why they matched
+3. PLURALITY RULE: if several metrics match a definition-style topic
+   question, the organization has MULTIPLE definitions — say so. List the
+   distinct metrics by business_name (metric_id), note that their logic
+   differs, and ask which one to explain. NEVER merge different metrics'
+   logic into one blended "definition" — a blended answer hides which
+   certified definition it came from. Only after ONE metric is chosen
+   (or exactly one matches) fetch its calculation_logic and explain it.
 
 ### "What metrics are available?" or "What can I ask about?"
 1. Query: `SELECT metric_id, metric_name, business_name, description FROM output_metric_logic ORDER BY business_name`
@@ -207,12 +215,7 @@ UNION ALL SELECT 'ops_parse_errors', COUNT(*) FROM ops_parse_errors
 ## Section 5: Setup & Configuration Guide
 
 ### How This System Works
-This agent is powered by a knowledge graph that extracts business logic from SQL stored procedures:
-1. SQL stored procedures and views are loaded from source systems
-2. Microsoft's ScriptDom parser extracts the SQL structure (CTEs, table references, filters)
-3. The parsed structure is built into a three-layer graph (metrics → logic steps → source tables)
-4. The graph is stored in Delta tables in this Fabric lakehouse
-5. This agent reads the graph to answer your questions
+The pipeline parses SQL sources, builds the three-layer graph, generates descriptions, and grounds this agent in output_metric_logic. Notebooks 01-09 run in order.
 
 ### Troubleshooting
 - **"Metric not found"** — The metric may not have been parsed successfully. Check /errors for details.
@@ -222,11 +225,7 @@ This agent is powered by a knowledge graph that extracts business logic from SQL
 - **Stale data** — Set up an automated pipeline to refresh the graph on a schedule.
 
 ### System Architecture
-- **Metric Logic:** `output_metric_logic` table — primary table for ALL metric questions. Contains `description` (pre-generated business description), `calculation_logic` (raw SQL fragments), `source_tables`, and `table_descriptions`. Always check `description` first.
-- **Knowledge Graph:** `graph_nodes` and `graph_edges` tables — for advanced traversal and reverse lineage
-- **Parse Errors:** `ops_parse_errors` table — metrics that failed to parse, with explanations
-- **Build History:** `ops_build_summary` table — history of pipeline runs
-
+Data flows: SQL sources -> parser -> graph_nodes/graph_edges -> output_metric_logic (this agent's primary table) -> catalog publishers. All tables live in this lakehouse.
 ---
 
 ## Section 6: About This Agent
