@@ -55,18 +55,34 @@ VECTOR_DISTANCE + AI_GENERATE_EMBEDDINGS, steered via example query
 pairs) after re-verifying preview status. Round 3 rematch measures
 L0/L1 vs L3.
 
-**Retrieval consolidation + instruction diet (added 2026-08-09,
-post-listing sprint 1):** the week's instruction fixes were reactive
-(whack-a-mole signature: two 15k-cap collisions; Sunny's one-word-
-difference observation) and the platform's steering is inherently
-stochastic (semantic fewshot retrieval + sampled generation). Exit:
-structure absorbs behavior — wire the Eventhouse semantic catalog into
-the DELTA agent (plurality arrives as rows: total_matches + distinct
-definitions; today's plurality prompt rule becomes redundant), add
-stepCount/tableCount as Metric properties (counts become reads), land
-business terms — THEN delete prompt rules down to invariant safety +
-function/column guidance. Round 3 scores phrasing-robustness before/
-after. Demo interim: pinned QA-verified phrasings only.
+**THE ANSWER LAYER (2026-08-09, PRE-LISTING — hard rule: readiness
+before shipping; supersedes the earlier "post-listing sprint"
+framing):** both agents failed the same first-principles test in
+different ways (Delta blended 28 definitions into one; Graph
+cherry-picked 1 and presented it as authoritative; both varied on
+one-word rephrasing). Root cause: the stochastic generator still owns
+three decisions — what to retrieve, how to rank, how to present.
+Fix: a deterministic answer layer between retrieval and language.
+- Phase A — Answer contracts: resolve_topic() returns the FULL
+  plurality (metrics + steps + terms, closeness, certification,
+  weight; no generator-side filtering — expose functions, not raw
+  tables, in the resolution source's schema); explain_metric(ref)
+  returns the assembled fact row; counts become node properties.
+  Converge toward ONE product agent (Eventhouse resolution + lakehouse
+  facts + Graph Model lineage).
+- Phase B — Instruction diet: prompts shrink to invariants (never
+  fabricate, refuse on empty, PHI, translate-don't-dump) + which
+  function answers which question class.
+- Phase C — Paraphrase-robustness suite: canonical questions x 8-10
+  paraphrases, scored Correct/Grounded/Honest/Consistent; shipping
+  gate set from the baseline. Fewshots may steer but passing must not
+  depend on staying near them.
+- Phase D — If the Fabric agent cannot pass the gate even with answer
+  contracts, the decision point: AIVIA's own orchestration surface
+  (MCP client exists) runs the pipeline deterministically and the LLM
+  only narrates — the Fabric agent becomes one consumer, not the
+  product.
+Listing, demo, and Purview screenshots all follow Phase C's gate.
 
 **Connector roadmap (added 2026-08-07, see
 [REFERENCE_ARCHITECTURE.md](../architecture/REFERENCE_ARCHITECTURE.md)):**

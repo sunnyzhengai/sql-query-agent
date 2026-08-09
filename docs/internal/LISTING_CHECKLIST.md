@@ -33,6 +33,18 @@ response.
 
 ## Blockers — must happen before submission, in order
 
+0. [ ] **READINESS GATE (hard rule, 2026-08-09 — supersedes all
+       sequencing below):** the product ships only when it is
+       battle-tested against phrasing variance — no staged demos, no
+       structural work deferred to post-listing. Concretely:
+       1. Answer contracts land (deterministic resolution + assembly;
+          the generator narrates, never decides) — see ROADMAP
+          "Answer layer" phases.
+       2. Paraphrase-robustness suite passes: each canonical question
+          x 8-10 paraphrases, scored Correct/Grounded/Honest/
+          Consistent; gate thresholds set from the first baseline run.
+       3. Only then: record the demo — and deliberately deviate from
+          the script on camera to show agility.
 1. [ ] **Checklist E first** (you're running it now): golden snapshot,
        then the semantic-catalog on-tenant pass. The snapshot matters
        here because the demo gets recorded against a state you can
