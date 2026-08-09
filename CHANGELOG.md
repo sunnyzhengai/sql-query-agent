@@ -10,6 +10,15 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.4.3] - 2026-08-09
+
+### Added
+- src/steps/semantic_catalog.py + output_semantic_catalog contract
+  (ADR 0030 L3): search-document build step for the Eventhouse
+  resolution catalog
+
+---
+
 ## [1.4.2] - 2026-08-08
 
 ### Added
