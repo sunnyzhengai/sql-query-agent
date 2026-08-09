@@ -2,27 +2,27 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/dataAgent/definition/fewShots/1.0.0/schema.json",
   "fewShots": [
     {
-      "id": "1b7b619f-12eb-4330-ad59-b9853451b3d4",
+      "id": "403192a5-2bb9-48ea-a621-86a5c00415c7",
       "question": "What metrics are available?",
       "query": "-- Enter a SQL query that could answer the question using your data\nSELECT metric_id, metric_name, business_name, description\nFROM output_metric_logic ORDER BY business_name"
     },
     {
-      "id": "943b3d07-1198-4ff3-a0e7-a4aea6ef3f93",
+      "id": "c402e39c-aef0-4026-8c4c-7b79a4aae3dc",
       "question": "Tell me about a specific metric",
       "query": "-- Enter a SQL query that could answer the question using your data\nSELECT metric_id, metric_name, business_name, report_name, report_url, description, steward, developer, calculation_logic, source_tables, table_descriptions\nFROM output_metric_logic\nWHERE lower(metric_name) LIKE '%keyword%' OR lower(metric_id) LIKE '%keyword%' OR lower(business_name) LIKE '%keyword%'"
     },
     {
-      "id": "51bf2fb1-713b-4ae3-8584-9641e27fbd4f",
+      "id": "6d0c9e04-57e0-4fb6-8bd1-59ae94d0a538",
       "question": "Which metrics use a specific table?",
-      "query": "-- Enter a SQL query that could answer the question using your data\nSELECT DISTINCT c.metricId, c.businessName\nFROM graph_edge_uses_table u\nJOIN graph_canonical c ON u.sourceId = c.nodeId\nWHERE lower(u.targetId) LIKE '%table_name%'"
+      "query": "-- Enter a SQL query that could answer the question using your data\nSELECT DISTINCT n.name FROM graph_edges e1\nJOIN graph_edges e2 ON e1.source_id = e2.target_id\nJOIN graph_nodes n ON e2.source_id = n.node_id\nWHERE lower(e1.target_id) LIKE '%table_name%' AND n.layer = 'canonical'"
     },
     {
-      "id": "55ce8ee8-a434-4fe8-a23e-78e52a54da5e",
+      "id": "6c6539e0-2509-40b3-b274-42933867a2c7",
       "question": "Which metrics have no steward assigned?",
       "query": "-- Enter a SQL query that could answer the question using your data\nSELECT metric_id, metric_name, business_name FROM output_metric_logic WHERE steward IS NULL"
     },
     {
-      "id": "d357a425-df49-425b-85ad-5d57dd2cca70",
+      "id": "d3632410-4d7c-4cc7-9621-513211e5dcb5",
       "question": "Show the recent build history",
       "query": "-- Enter a SQL query that could answer the question using your data\nSELECT TOP 20 * FROM ops_build_summary ORDER BY build_time DESC"
     }

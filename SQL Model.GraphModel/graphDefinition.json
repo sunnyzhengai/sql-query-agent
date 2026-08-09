@@ -33,6 +33,18 @@
         {
           "propertyName": "bareName",
           "sourceColumn": "bareName"
+        },
+        {
+          "propertyName": "businessName",
+          "sourceColumn": "businessName"
+        },
+        {
+          "propertyName": "reportName",
+          "sourceColumn": "reportName"
+        },
+        {
+          "propertyName": "reportUrl",
+          "sourceColumn": "reportUrl"
         }
       ]
     },

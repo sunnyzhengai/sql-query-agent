@@ -37,6 +37,18 @@
         {
           "name": "bareName",
           "type": "STRING"
+        },
+        {
+          "name": "businessName",
+          "type": "STRING"
+        },
+        {
+          "name": "reportName",
+          "type": "STRING"
+        },
+        {
+          "name": "reportUrl",
+          "type": "STRING"
         }
       ]
     },
@@ -113,68 +125,68 @@
   ],
   "edgeTypes": [
     {
+      "alias": "f4f7b2de-c295-4779-b81d-0af77e5eb6de",
       "sourceNodeType": {
         "alias": "10c38402-039b-4465-a90a-399e28b13f8e"
-      },
-      "alias": "f4f7b2de-c295-4779-b81d-0af77e5eb6de",
-      "destinationNodeType": {
-        "alias": "bfa6593b-5ed4-432d-8aba-e79373fd5d26"
       },
       "labels": [
         "CALCULATED_BY"
       ],
+      "destinationNodeType": {
+        "alias": "bfa6593b-5ed4-432d-8aba-e79373fd5d26"
+      },
       "properties": []
     },
     {
-      "sourceNodeType": {
-        "alias": "bfa6593b-5ed4-432d-8aba-e79373fd5d26"
-      },
       "alias": "ed2e612f-e632-4231-a6d0-705ebcc7568c",
-      "destinationNodeType": {
+      "sourceNodeType": {
         "alias": "bfa6593b-5ed4-432d-8aba-e79373fd5d26"
       },
       "labels": [
         "DEPENDS_ON"
       ],
+      "destinationNodeType": {
+        "alias": "bfa6593b-5ed4-432d-8aba-e79373fd5d26"
+      },
       "properties": []
     },
     {
+      "alias": "f71e6111-cb28-41c5-a964-0d5f074fc806",
       "sourceNodeType": {
         "alias": "bfa6593b-5ed4-432d-8aba-e79373fd5d26"
-      },
-      "alias": "f71e6111-cb28-41c5-a964-0d5f074fc806",
-      "destinationNodeType": {
-        "alias": "f03774b6-fa65-46b9-bf0c-85ca532014ed"
       },
       "labels": [
         "READS_FROM"
       ],
+      "destinationNodeType": {
+        "alias": "f03774b6-fa65-46b9-bf0c-85ca532014ed"
+      },
       "properties": []
     },
     {
-      "sourceNodeType": {
-        "alias": "f03774b6-fa65-46b9-bf0c-85ca532014ed"
-      },
       "alias": "94129eae-b2ef-489e-9bf8-c08702553690",
-      "destinationNodeType": {
+      "sourceNodeType": {
         "alias": "f03774b6-fa65-46b9-bf0c-85ca532014ed"
       },
       "labels": [
         "HAS_COLUMN"
       ],
+      "destinationNodeType": {
+        "alias": "f03774b6-fa65-46b9-bf0c-85ca532014ed"
+      },
       "properties": []
     },
     {
+      "alias": "c5fb48d9-8dcd-4e18-a6ae-6db981dd0b6a",
       "sourceNodeType": {
         "alias": "10c38402-039b-4465-a90a-399e28b13f8e"
-      },
-      "alias": "c5fb48d9-8dcd-4e18-a6ae-6db981dd0b6a",
-      "destinationNodeType": {
-        "alias": "f03774b6-fa65-46b9-bf0c-85ca532014ed"
       },
       "labels": [
         "USES_TABLE"
       ],
+      "destinationNodeType": {
+        "alias": "f03774b6-fa65-46b9-bf0c-85ca532014ed"
+      },
       "properties": []
     }
   ]

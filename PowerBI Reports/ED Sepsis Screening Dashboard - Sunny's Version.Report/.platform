@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Report",
+    "displayName": "ED Sepsis Screening Dashboard - Sunny's Version"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "37e2b600-ba92-a662-4b70-0f6fc39427f5"
+  }
+}
