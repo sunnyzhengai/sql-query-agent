@@ -56,7 +56,7 @@ canonical:reporting.USP_IP_SepsisDates,reporting.USP_IP_SepsisDates,Sepsis Repor
     | project node_id, name, business_name, description, emb = combined_embeddings
 
 // Storage optimization (optional but documented best practice):
-.alter column semantic_catalog.emb policy encoding type='Vector16'
+.alter column semantic_catalog.emb policy encoding @'{"Type":"Vector16"}'  // JSON form; shorthand rejected live
 
 // ===== 3. Verify the search works when YOU run it ====================
 // (If this fails, stop — the problem is setup, not the agent. A callout
