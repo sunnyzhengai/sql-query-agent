@@ -1,0 +1,688 @@
+{
+ "canonicals": [
+  {
+   "id": "ed_screening",
+   "runs": [
+    {
+     "question": "How is ED Sepsis Screening calculated?",
+     "token": "ED Sepsis Screening Calculation",
+     "top5": [
+      "canonical:reporting.USP_ED_Sepsis",
+      "transform:reporting.USP_ED_Sepsis:ED2GEN",
+      "transform:reporting.USP_ED_Sepsis:ED2ICU",
+      "transform:reporting.USP_ED_Sepsis:ED2HEMONC",
+      "transform:reporting.USP_ED_Sepsis:ED_NegativeScores"
+     ],
+     "total_matches": 441,
+     "latency_s": 0.83,
+     "hit": true,
+     "top1": true,
+     "refused_correctly": null
+    },
+    {
+     "question": "What is the method used to calculate ED Sepsis Screening?",
+     "token": "ED Sepsis Screening Calculation",
+     "top5": [
+      "canonical:reporting.USP_ED_Sepsis",
+      "transform:reporting.USP_ED_Sepsis:ED2GEN",
+      "transform:reporting.USP_ED_Sepsis:ED2ICU",
+      "transform:reporting.USP_ED_Sepsis:ED2HEMONC",
+      "transform:reporting.USP_ED_Sepsis:ED_NegativeScores"
+     ],
+     "total_matches": 441,
+     "latency_s": 0.71,
+     "hit": true,
+     "top1": true,
+     "refused_correctly": null
+    },
+    {
+     "question": "Can you explain the calculation process for ED Sepsis Screening?",
+     "token": "ED Sepsis Screening Calculation",
+     "top5": [
+      "canonical:reporting.USP_ED_Sepsis",
+      "transform:reporting.USP_ED_Sepsis:ED2GEN",
+      "transform:reporting.USP_ED_Sepsis:ED2ICU",
+      "transform:reporting.USP_ED_Sepsis:ED2HEMONC",
+      "transform:reporting.USP_ED_Sepsis:ED_NegativeScores"
+     ],
+     "total_matches": 441,
+     "latency_s": 0.71,
+     "hit": true,
+     "top1": true,
+     "refused_correctly": null
+    },
+    {
+     "question": "How do we determine the figures for ED Sepsis Screening?",
+     "token": "ED Sepsis Screening Metrics",
+     "top5": [
+      "canonical:reporting.USP_ED_Sepsis",
+      "transform:reporting.USP_ED_Sepsis:Labs",
+      "transform:reporting.USP_ED_Sepsis:ED_NegativeScores",
+      "transform:reporting.USP_ED_Sepsis:ED2GEN",
+      "transform:reports.USP_ED_Sepsis:ED_PositiveScores"
+     ],
+     "total_matches": 441,
+     "latency_s": 0.72,
+     "hit": true,
+     "top1": true,
+     "refused_correctly": null
+    },
+    {
+     "question": "What approach is taken to calculate ED Sepsis Screening?",
+     "token": "ED Sepsis Screening Calculation",
+     "top5": [
+      "canonical:reporting.USP_ED_Sepsis",
+      "transform:reporting.USP_ED_Sepsis:ED2GEN",
+      "transform:reporting.USP_ED_Sepsis:ED2ICU",
+      "transform:reporting.USP_ED_Sepsis:ED2HEMONC",
+      "transform:reporting.USP_ED_Sepsis:ED_NegativeScores"
+     ],
+     "total_matches": 441,
+     "latency_s": 0.74,
+     "hit": true,
+     "top1": true,
+     "refused_correctly": null
+    },
+    {
+     "question": "Could you clarify how ED Sepsis Screening is computed?",
+     "token": "ED Sepsis Screening Metrics",
+     "top5": [
+      "canonical:reporting.USP_ED_Sepsis",
+      "transform:reporting.USP_ED_Sepsis:Labs",
+      "transform:reporting.USP_ED_Sepsis:ED_NegativeScores",
+      "transform:reporting.USP_ED_Sepsis:ED2GEN",
+      "transform:reports.USP_ED_Sepsis:ED_PositiveScores"
+     ],
+     "total_matches": 441,
+     "latency_s": 0.72,
+     "hit": true,
+     "top1": true,
+     "refused_correctly": null
+    }
+   ],
+   "replay_ranking_stable": true,
+   "replay_closeness_jitter": 4.9e-05,
+   "top1_agreement": 1.0,
+   "top5_jaccard_mean": 0.7714285714285715
+  },
+  {
+   "id": "readmit",
+   "runs": [
+    {
+     "question": "Which patients came back to the emergency room within a day?",
+     "token": "emergency room readmission rate",
+     "top5": [
+      "transform:reporting.USP_ED_Sepsis:Base_Pop_ED_Readmit",
+      "transform:reports.USP_ED_Sepsis:Base_Pop_ED_Readmit",
+      "transform:reports.USP_ED_Sepsis:Base_Pop_ED_Readmit_All",
+      "transform:reporting.USP_ED_Sepsis:Base_Pop_ED_Readmit_All",
+      "transform:reports.USP_NonSevere_Sepsis:NICUAdmissions"
+     ],
+     "total_matches": 72,
+     "latency_s": 0.77,
+     "hit": true,
+     "top1": true,
+     "refused_correctly": null
+    },
+    {
+     "question": "Which patients returned to the emergency department within 24 hours?",
+     "token": "Emergency department readmission rate",
+     "top5": [
+      "transform:reporting.USP_ED_Sepsis:Base_Pop_ED_Readmit",
+      "transform:reports.USP_ED_Sepsis:Base_Pop_ED_Readmit",
+      "transform:reports.USP_ED_Sepsis:Base_Pop_ED_Readmit_All",
+      "transform:reporting.USP_ED_Sepsis:Base_Pop_ED_Readmit_All",
+      "transform:reports.USP_NonSevere_Sepsis:NICUAdmissions"
+     ],
+     "total_matches": 101,
+     "latency_s": 0.74,
+     "hit": true,
+     "top1": true,
+     "refused_correctly": null
+    },
+    {
+     "question": "Who were the patients that revisited the ER in less than a day?",
+     "token": "ER revisit rate",
+     "top5": [
+      "transform:reports.USP_IP_SEPSIS_REPORT:ODORDSET",
+      "transform:reports.USP_IP_SEPSIS_REPORT:ETT"
+     ],
+     "total_matches": 2,
+     "latency_s": 0.69,
+     "hit": false,
+     "top1": false,
+     "refused_correctly": null
+    },
+    {
+     "question": "Can you identify the patients who came back to the emergency room within a day?",
+     "token": "emergency room readmission rate",
+     "top5": [
+      "transform:reporting.USP_ED_Sepsis:Base_Pop_ED_Readmit",
+      "transform:reports.USP_ED_Sepsis:Base_Pop_ED_Readmit",
+      "transform:reports.USP_ED_Sepsis:Base_Pop_ED_Readmit_All",
+      "transform:reporting.USP_ED_Sepsis:Base_Pop_ED_Readmit_All",
+      "transform:reports.USP_NonSevere_Sepsis:NICUAdmissions"
+     ],
+     "total_matches": 72,
+     "latency_s": 0.67,
+     "hit": true,
+     "top1": true,
+     "refused_correctly": null
+    },
+    {
+     "question": "Which individuals re-entered the emergency room within a one-day period?",
+     "token": "emergency room readmission",
+     "top5": [
+      "transform:reporting.USP_ED_Sepsis:Base_Pop_ED_Readmit",
+      "transform:reports.USP_ED_Sepsis:Base_Pop_ED_Readmit",
+      "transform:reporting.USP_ED_Sepsis:Base_Pop_ED_Readmit_All",
+      "transform:reports.USP_ED_Sepsis:Base_Pop_ED_Readmit_All",
+      "transform:reports.USP_NonSevere_Sepsis:NICUAdmissions"
+     ],
+     "total_matches": 105,
+     "latency_s": 0.7,
+     "hit": true,
+     "top1": true,
+     "refused_correctly": null
+    },
+    {
+     "question": "What patients returned to the emergency department within a day of their initial visit?",
+     "token": "emergency department return rate",
+     "top5": [
+      "transform:reports.USP_Severe_Sepsis:EDDepts",
+      "transform:reporting.USP_ED_Sepsis:Base_Pop_ED_Readmit",
+      "transform:reports.USP_ED_Sepsis:Base_Pop_ED_Readmit",
+      "transform:reports.USP_ED_Sepsis:ED2HEMONC",
+      "transform:reports.USP_ED_Sepsis:Base_Pop_ED_Readmit_All"
+     ],
+     "total_matches": 78,
+     "latency_s": 0.69,
+     "hit": true,
+     "top1": false,
+     "refused_correctly": null
+    }
+   ],
+   "replay_ranking_stable": true,
+   "replay_closeness_jitter": 8.2e-05,
+   "top1_agreement": 0.6,
+   "top5_jaccard_mean": 0.6857142857142857
+  },
+  {
+   "id": "severe_episodes",
+   "runs": [
+    {
+     "question": "How do we track severe sepsis episodes?",
+     "token": "severe sepsis tracking",
+     "top5": [
+      "transform:reports.USP_Severe_Sepsis:ScoresAll",
+      "transform:reports.USP_Severe_Sepsis:Scores",
+      "transform:reports.USP_Severe_Sepsis:Treatment",
+      "transform:reports.USP_Severe_Sepsis:SSTP",
+      "transform:reports.USP_Severe_Sepsis:TP1"
+     ],
+     "total_matches": 435,
+     "latency_s": 0.67,
+     "hit": true,
+     "top1": true,
+     "refused_correctly": null
+    },
+    {
+     "question": "What methods do we use to monitor severe sepsis cases?",
+     "token": "severe sepsis monitoring methods",
+     "top5": [
+      "transform:reports.USP_Severe_Sepsis:ECMO",
+      "transform:reports.USP_Severe_Sepsis:Scores",
+      "transform:reports.USP_Severe_Sepsis:ScoresAll",
+      "transform:reports.USP_Severe_Sepsis:Treatment",
+      "transform:reports.USP_Severe_Sepsis:OSET"
+     ],
+     "total_matches": 391,
+     "latency_s": 0.74,
+     "hit": true,
+     "top1": true,
+     "refused_correctly": null
+    },
+    {
+     "question": "In what ways are we able to keep track of severe sepsis incidents?",
+     "token": "severe sepsis tracking",
+     "top5": [
+      "transform:reports.USP_Severe_Sepsis:ScoresAll",
+      "transform:reports.USP_Severe_Sepsis:Scores",
+      "transform:reports.USP_Severe_Sepsis:Treatment",
+      "transform:reports.USP_Severe_Sepsis:SSTP",
+      "transform:reports.USP_Severe_Sepsis:TP1"
+     ],
+     "total_matches": 434,
+     "latency_s": 0.68,
+     "hit": true,
+     "top1": true,
+     "refused_correctly": null
+    },
+    {
+     "question": "How is the tracking of severe sepsis episodes conducted?",
+     "token": "severe sepsis tracking",
+     "top5": [
+      "transform:reports.USP_Severe_Sepsis:ScoresAll",
+      "transform:reports.USP_Severe_Sepsis:Scores",
+      "transform:reports.USP_Severe_Sepsis:Treatment",
+      "transform:reports.USP_Severe_Sepsis:SSTP",
+      "transform:reports.USP_Severe_Sepsis:TP1"
+     ],
+     "total_matches": 434,
+     "latency_s": 0.69,
+     "hit": true,
+     "top1": true,
+     "refused_correctly": null
+    },
+    {
+     "question": "What processes are in place for recording severe sepsis occurrences?",
+     "token": "severe sepsis recording processes",
+     "top5": [
+      "transform:reports.USP_Severe_Sepsis:Scores",
+      "transform:reports.USP_Severe_Sepsis:ScoresAll",
+      "transform:reports.USP_Severe_Sepsis:ECMO",
+      "transform:reports.USP_Severe_Sepsis:C7",
+      "transform:reports.USP_Severe_Sepsis:OSET"
+     ],
+     "total_matches": 439,
+     "latency_s": 0.74,
+     "hit": true,
+     "top1": true,
+     "refused_correctly": null
+    },
+    {
+     "question": "How can we effectively follow the progression of severe sepsis episodes?",
+     "token": "severe sepsis tracking",
+     "top5": [
+      "transform:reports.USP_Severe_Sepsis:ScoresAll",
+      "transform:reports.USP_Severe_Sepsis:Scores",
+      "transform:reports.USP_Severe_Sepsis:Treatment",
+      "transform:reports.USP_Severe_Sepsis:SSTP",
+      "transform:reports.USP_Severe_Sepsis:TP1"
+     ],
+     "total_matches": 434,
+     "latency_s": 0.77,
+     "hit": true,
+     "top1": true,
+     "refused_correctly": null
+    }
+   ],
+   "replay_ranking_stable": true,
+   "replay_closeness_jitter": 8.7e-05,
+   "top1_agreement": 0.6,
+   "top5_jaccard_mean": 0.7357142857142858
+  },
+  {
+   "id": "bundle_compliance",
+   "runs": [
+    {
+     "question": "How is sepsis bundle compliance measured?",
+     "token": "sepsis bundle compliance metrics",
+     "top5": [
+      "canonical:reporting.USP_IP_Sepsis_ComplianceMetrics",
+      "canonical:reporting.USP_IP_Sepsis_ComplianceByShift",
+      "transform:reports.USP_IP_SEPSIS_COMPLIANCE:SepsisSummary",
+      "canonical:reporting.USP_IP_SepsisShiftComplianceMetrics",
+      "canonical:reports.USP_IP_SEPSIS_COMPLIANCE"
+     ],
+     "total_matches": 439,
+     "latency_s": 0.7,
+     "hit": true,
+     "top1": true,
+     "refused_correctly": null
+    },
+    {
+     "question": "What methods are used to assess compliance with the sepsis bundle?",
+     "token": "sepsis bundle compliance assessment",
+     "top5": [
+      "canonical:reporting.USP_IP_Sepsis_ComplianceMetrics",
+      "canonical:reporting.USP_IP_Sepsis_ComplianceByShift",
+      "transform:reports.USP_IP_SEPSIS_COMPLIANCE:SepsisSummary",
+      "canonical:reports.USP_IP_SEPSIS_COMPLIANCE",
+      "transform:reports.USP_Severe_Sepsis:SepsisScoreFlo"
+     ],
+     "total_matches": 433,
+     "latency_s": 0.7,
+     "hit": true,
+     "top1": true,
+     "refused_correctly": null
+    },
+    {
+     "question": "In what ways do we evaluate adherence to the sepsis bundle?",
+     "token": "sepsis bundle adherence metrics",
+     "top5": [
+      "canonical:reporting.USP_IP_Sepsis_ComplianceMetrics",
+      "canonical:reporting.USP_IP_Sepsis_ComplianceByShift",
+      "transform:reports.USP_IP_SEPSIS_COMPLIANCE:SepsisSummary",
+      "canonical:reporting.USP_IP_SepsisShiftComplianceMetrics",
+      "transform:reports.USP_Severe_Sepsis:SepsisScoreFlo"
+     ],
+     "total_matches": 429,
+     "latency_s": 0.71,
+     "hit": true,
+     "top1": true,
+     "refused_correctly": null
+    },
+    {
+     "question": "How do we measure the compliance rates for the sepsis bundle?",
+     "token": "sepsis bundle compliance rates",
+     "top5": [
+      "canonical:reporting.USP_IP_Sepsis_ComplianceMetrics",
+      "canonical:reporting.USP_IP_Sepsis_ComplianceByShift",
+      "transform:reports.USP_IP_SEPSIS_COMPLIANCE:SepsisSummary",
+      "canonical:reports.USP_IP_SEPSIS_COMPLIANCE",
+      "canonical:reports.USP_IP_SEPSIS_COMPLIANCE_BY_SHIFT_NURSES"
+     ],
+     "total_matches": 436,
+     "latency_s": 0.74,
+     "hit": true,
+     "top1": true,
+     "refused_correctly": null
+    },
+    {
+     "question": "What metrics are utilized to gauge sepsis bundle compliance?",
+     "token": "sepsis bundle compliance metrics",
+     "top5": [
+      "canonical:reporting.USP_IP_Sepsis_ComplianceMetrics",
+      "canonical:reporting.USP_IP_Sepsis_ComplianceByShift",
+      "transform:reports.USP_IP_SEPSIS_COMPLIANCE:SepsisSummary",
+      "canonical:reporting.USP_IP_SepsisShiftComplianceMetrics",
+      "canonical:reports.USP_IP_SEPSIS_COMPLIANCE"
+     ],
+     "total_matches": 439,
+     "latency_s": 0.68,
+     "hit": true,
+     "top1": true,
+     "refused_correctly": null
+    },
+    {
+     "question": "How is adherence to the sepsis bundle quantified?",
+     "token": "sepsis bundle adherence metrics",
+     "top5": [
+      "canonical:reporting.USP_IP_Sepsis_ComplianceMetrics",
+      "canonical:reporting.USP_IP_Sepsis_ComplianceByShift",
+      "transform:reports.USP_IP_SEPSIS_COMPLIANCE:SepsisSummary",
+      "canonical:reporting.USP_IP_SepsisShiftComplianceMetrics",
+      "transform:reports.USP_Severe_Sepsis:SepsisScoreFlo"
+     ],
+     "total_matches": 429,
+     "latency_s": 0.67,
+     "hit": true,
+     "top1": true,
+     "refused_correctly": null
+    }
+   ],
+   "replay_ranking_stable": true,
+   "replay_closeness_jitter": 3e-05,
+   "top1_agreement": 1.0,
+   "top5_jaccard_mean": 0.7333333333333333
+  },
+  {
+   "id": "blood_cultures",
+   "runs": [
+    {
+     "question": "When do we order blood cultures for sepsis patients?",
+     "token": "blood culture ordering guidelines",
+     "top5": [
+      "transform:reports.USP_ED_Sepsis:BloodCultureResults",
+      "transform:reports.USP_Severe_Sepsis:BloodCultures",
+      "transform:reports.USP_ED_Sepsis:BloodCultureValue",
+      "transform:reports.USP_Severe_Sepsis:BloodCultureValue",
+      "transform:reporting.USP_ED_Sepsis:Labs_and_Cultures"
+     ],
+     "total_matches": 156,
+     "latency_s": 0.77,
+     "hit": true,
+     "top1": true,
+     "refused_correctly": null
+    },
+    {
+     "question": "What is the appropriate timing for ordering blood cultures in patients with sepsis?",
+     "token": "blood culture timing sepsis",
+     "top5": [
+      "transform:reports.USP_ED_Sepsis:BloodCultureResults",
+      "transform:reports.USP_ED_Sepsis:BloodCultureValue",
+      "transform:reports.USP_Severe_Sepsis:BloodCultureValue",
+      "transform:reports.USP_Severe_Sepsis:BloodCultures",
+      "transform:reporting.USP_ED_Sepsis:Cultures"
+     ],
+     "total_matches": 362,
+     "latency_s": 0.59,
+     "hit": true,
+     "top1": true,
+     "refused_correctly": null
+    },
+    {
+     "question": "At what point should we request blood cultures for individuals diagnosed with sepsis?",
+     "token": "blood cultures in sepsis",
+     "top5": [
+      "transform:reports.USP_ED_Sepsis:BloodCultureResults",
+      "transform:reports.USP_Severe_Sepsis:BloodCultures",
+      "transform:reports.USP_ED_Sepsis:BloodCultureValue",
+      "transform:reports.USP_Severe_Sepsis:BloodCultureValue",
+      "transform:reporting.USP_ED_Sepsis:Cultures"
+     ],
+     "total_matches": 338,
+     "latency_s": 0.95,
+     "hit": true,
+     "top1": true,
+     "refused_correctly": null
+    },
+    {
+     "question": "When should blood cultures be obtained for patients suffering from sepsis?",
+     "token": "sepsis blood culture timing",
+     "top5": [
+      "transform:reports.USP_ED_Sepsis:BloodCultureResults",
+      "transform:reports.USP_ED_Sepsis:UrineCultureResults",
+      "transform:reporting.USP_ED_Sepsis:Cultures",
+      "transform:reporting.USP_ED_Sepsis:Labs_and_Cultures",
+      "transform:reporting.USP_ED_Sepsis:Labs"
+     ],
+     "total_matches": 375,
+     "latency_s": 0.82,
+     "hit": true,
+     "top1": true,
+     "refused_correctly": null
+    },
+    {
+     "question": "In which situations do we typically order blood cultures for those with sepsis?",
+     "token": "blood culture guidelines sepsis",
+     "top5": [
+      "transform:reports.USP_ED_Sepsis:BloodCultureResults",
+      "transform:reports.USP_Severe_Sepsis:BloodCultures",
+      "transform:reports.USP_Severe_Sepsis:BloodCultureValue",
+      "transform:reports.USP_ED_Sepsis:BloodCultureValue",
+      "transform:reporting.USP_ED_Sepsis:Cultures"
+     ],
+     "total_matches": 347,
+     "latency_s": 0.81,
+     "hit": true,
+     "top1": true,
+     "refused_correctly": null
+    },
+    {
+     "question": "What guidelines do we follow regarding the timing of blood culture orders for sepsis cases?",
+     "token": "blood culture timing guidelines",
+     "top5": [
+      "transform:reports.USP_ED_Sepsis:BloodCultureResults",
+      "transform:reports.USP_Severe_Sepsis:BloodCultureValue",
+      "transform:reports.USP_ED_Sepsis:BloodCultureValue",
+      "transform:reports.USP_Severe_Sepsis:BloodCultures",
+      "transform:reports.USP_Severe_Sepsis:FirstBolusTime"
+     ],
+     "total_matches": 85,
+     "latency_s": 0.76,
+     "hit": true,
+     "top1": true,
+     "refused_correctly": null
+    }
+   ],
+   "replay_ranking_stable": true,
+   "replay_closeness_jitter": 0.0,
+   "top1_agreement": 1.0,
+   "top5_jaccard_mean": 0.5833333333333333
+  },
+  {
+   "id": "refusal_unicorn",
+   "runs": [
+    {
+     "question": "What is the average unicorn readmission velocity?",
+     "token": "unicorn readmission velocity",
+     "top5": [],
+     "total_matches": 0,
+     "latency_s": 0.64,
+     "refused_correctly": true,
+     "hit": true,
+     "top1": true
+    },
+    {
+     "question": "What is the typical readmission rate for unicorns?",
+     "token": "readmission rate unicorns",
+     "top5": [],
+     "total_matches": 0,
+     "latency_s": 0.78,
+     "refused_correctly": true,
+     "hit": true,
+     "top1": true
+    },
+    {
+     "question": "How quickly do unicorns tend to be readmitted on average?",
+     "token": "unicorn readmission rate",
+     "top5": [
+      "transform:reporting.USP_ED_Sepsis:Base_Pop_ED_Readmit"
+     ],
+     "total_matches": 1,
+     "latency_s": 0.68,
+     "refused_correctly": false,
+     "hit": false,
+     "top1": false
+    },
+    {
+     "question": "Can you provide the average speed of unicorn readmissions?",
+     "token": "unicorn readmission rate",
+     "top5": [
+      "transform:reporting.USP_ED_Sepsis:Base_Pop_ED_Readmit"
+     ],
+     "total_matches": 1,
+     "latency_s": 0.7,
+     "refused_correctly": false,
+     "hit": false,
+     "top1": false
+    },
+    {
+     "question": "What\u2019s the mean velocity of readmissions for unicorn patients?",
+     "token": "mean velocity of readmissions",
+     "top5": [
+      "transform:reporting.USP_ED_Sepsis:Base_Pop_ED_Readmit",
+      "transform:reports.USP_ED_Sepsis:Base_Pop_ED_Readmit_All",
+      "transform:reporting.USP_ED_Sepsis:Base_Pop_ED_Readmit_All",
+      "transform:reports.USP_ED_Sepsis:Base_Pop_ED_Readmit",
+      "transform:reports.USP_ED_Sepsis:ALLCVLTime"
+     ],
+     "total_matches": 20,
+     "latency_s": 0.7,
+     "refused_correctly": false,
+     "hit": false,
+     "top1": false
+    },
+    {
+     "question": "How fast do we see unicorns being readmitted, on average?",
+     "token": "unicorn readmission rate",
+     "top5": [
+      "transform:reporting.USP_ED_Sepsis:Base_Pop_ED_Readmit"
+     ],
+     "total_matches": 1,
+     "latency_s": 0.7,
+     "refused_correctly": false,
+     "hit": false,
+     "top1": false
+    }
+   ],
+   "replay_ranking_stable": true,
+   "replay_closeness_jitter": 0.0,
+   "top1_agreement": 0.2,
+   "top5_jaccard_mean": 0.2
+  },
+  {
+   "id": "refusal_cafeteria",
+   "runs": [
+    {
+     "question": "How satisfied are staff with the cafeteria menu this quarter?",
+     "token": "staff satisfaction cafeteria menu",
+     "top5": [],
+     "total_matches": 0,
+     "latency_s": 0.86,
+     "refused_correctly": true,
+     "hit": true,
+     "top1": true
+    },
+    {
+     "question": "What is the level of staff satisfaction with the cafeteria menu for this quarter?",
+     "token": "staff satisfaction cafeteria menu",
+     "top5": [],
+     "total_matches": 0,
+     "latency_s": 0.71,
+     "refused_correctly": true,
+     "hit": true,
+     "top1": true
+    },
+    {
+     "question": "How do staff members feel about the cafeteria menu this quarter?",
+     "token": "employee satisfaction cafeteria menu",
+     "top5": [],
+     "total_matches": 0,
+     "latency_s": 0.68,
+     "refused_correctly": true,
+     "hit": true,
+     "top1": true
+    },
+    {
+     "question": "To what extent are employees pleased with the cafeteria offerings this quarter?",
+     "token": "employee satisfaction cafeteria offerings",
+     "top5": [],
+     "total_matches": 0,
+     "latency_s": 0.75,
+     "refused_correctly": true,
+     "hit": true,
+     "top1": true
+    },
+    {
+     "question": "What feedback have we received from staff regarding the cafeteria menu this quarter?",
+     "token": "staff feedback cafeteria menu",
+     "top5": [],
+     "total_matches": 0,
+     "latency_s": 0.68,
+     "refused_correctly": true,
+     "hit": true,
+     "top1": true
+    },
+    {
+     "question": "How content are the staff with the cafeteria food options during this quarter?",
+     "token": "staff satisfaction cafeteria food",
+     "top5": [],
+     "total_matches": 0,
+     "latency_s": 0.7,
+     "refused_correctly": true,
+     "hit": true,
+     "top1": true
+    }
+   ],
+   "replay_ranking_stable": true,
+   "replay_closeness_jitter": 0.0,
+   "top1_agreement": 1.0,
+   "top5_jaccard_mean": 1.0
+  }
+ ],
+ "totals": {
+  "questions_run": 42,
+  "hit_at_5": 0.967,
+  "top1": 0.933,
+  "refusal_correct": 0.667,
+  "top1_agreement_mean": 0.771,
+  "top5_jaccard_mean": 0.673,
+  "replay_ranking_stable_all": true,
+  "replay_jitter_max": 8.7e-05,
+  "latency_p50_s": 0.71,
+  "latency_max_s": 0.95
+ }
+}
