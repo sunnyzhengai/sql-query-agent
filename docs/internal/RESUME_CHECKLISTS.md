@@ -177,8 +177,14 @@ Order matters: 1–4 change tables/instructions, 5 validates, 6 records.
        paused before it ran): open the notebook, Run all, ~2 min. It
        backs up the expensive state (description cache, PHI
        dispositions, inputs) to golden_ tables + manifest.
-2. [ ] **Semantic catalog on-tenant** (offline half is built + tested;
-       plan: `devtools/eventhouse_setup.kql`, follow top to bottom):
+2. [x] **Semantic catalog on-tenant — BUILT + VERIFIED 2026-08-09**
+       (ADR 0030 build log): 441 rows embedded, threshold 0.35
+       calibrated, semantic_search() live, two-source Graph agent
+       verified (KQL resolution -> keyed traversal -> grounded answer
+       with report link). Remaining follow-ups: paraphrase test
+       (semantic_search on fuzzy phrasing), stepCount/tableCount as
+       Metric properties for count questions (future 1.4.4), publish
+       agents before demo. Original plan:
        1. Add a small cell to 05 (or run ad hoc): build rows via
           `from src.steps.semantic_catalog import build_semantic_catalog`
           over graph_nodes; write to Delta `output_semantic_catalog` —

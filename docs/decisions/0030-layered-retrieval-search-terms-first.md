@@ -90,6 +90,35 @@ the correct row (ED Sepsis Screening) with business name attached.
 
 **Eventhouse is the semantic-retrieval architecture (L3 = KQL).**
 
+## Production build log (2026-08-09, run live by Sunny)
+
+Full catalog built end to end: 441 rows (28 metrics + 413 named steps)
+via src/steps/semantic_catalog.py -> Delta -> OneLake SHORTCUT ->
+project-by-name copy -> in-database embedding (~70 s). Threshold
+calibrated from full-scale data: real matches 0.41+, adversarial noise
+ceiling 0.311 -> 0.35. Platform traps found and encoded in
+devtools/eventhouse_setup.kql: kind/ref are reserved words
+(bracket-escape); Get data cannot see Delta tables (use a shortcut);
+Spark dict-rows alphabetize columns (project by name, never position);
+one dot-command per run.
+
+TWO-SOURCE AGENT VERIFIED: with agent-level instructions rewritten
+(resolve in KQL source first), "How is ED Sepsis Screening calculated?"
+executed as two steps — KQL resolution (business_name exact match ->
+ref reporting.USP_ED_Sepsis) then Graph traversal keyed on the resolved
+ref -> 46 rows -> grounded step-catalog answer with report link and
+honest Basis. The exact failure of the prior night (display-label
+filter -> fabricated count) is closed by architecture.
+
+Still open (known class, out of demo scope): count-shape questions —
+"how many steps" answered 18 (truth 43) by deduplicating a step-x-table
+traversal, dropping steps with no direct table reads; no resolution
+step (chat-context reuse). Durable fix specified, not prompt-based:
+materialize stepCount/tableCount as Metric node PROPERTIES in the LPG
+export (ADR 0020 move) so counts become property reads. Also pending:
+paraphrase test to confirm semantic_search fires when exact
+business_name match fails.
+
 Observed generator behavior to shape in productization:
 - It expanded the embed phrase into a keyword dump (fine for
   embeddings; ignores the "short noun phrase" instruction).
