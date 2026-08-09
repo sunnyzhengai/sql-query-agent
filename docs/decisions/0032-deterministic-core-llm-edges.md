@@ -95,7 +95,7 @@ presented, and usage ranks it over time (ADR 0021/0024).
   statistically, measured by the paraphrase-robustness suite). The
   line is SOLID only in AIVIA's own orchestration surface (MCP
   client + agent harness + llm_client + resolve function — largely
-  already built), where the LLM has no tools beyond the three
+  already built), where the LLM has no tools beyond the two
   touchpoints. The Fabric agent becomes a consumer surface and
   distribution channel, not the product's spine. Runtime pivot
   pending Sunny's explicit confirmation.
