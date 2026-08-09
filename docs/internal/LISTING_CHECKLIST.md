@@ -42,11 +42,14 @@ response.
        the Delta agent one question on the published surface and
        LEFT-CLICK the report link — if it opens, the video shows a
        click; if not, the video shows open-in-new-tab. Ten minutes.
-3. [ ] **Record the demo video** (~5 min): DEMO_SCRIPT.md REFRESHED
-       2026-08-09 — beats are the QA-passed question set verbatim
-       (headline + report-link click, business-name portfolio, 13-metric
-       impact analysis, refusal, honest ownership). Follow it as
-       written; don't improvise count questions on camera.
+3. [ ] **Record the demo video** (~5 min). TWO scripts now exist:
+       docs/internal/DEMO_SCRIPT.md (5-min listing cut, QA-verified
+       questions) and data/demo/Demo Script Sepsis.md (long-form
+       lead-call narrative, reviewed + corrected 2026-08-09 with the
+       listing cut listed in its header). Pre-record QA gate: the new
+       "How is our sepsis population defined?" question must pass a
+       test-pane run first — fallback is the verified headline
+       question. Never improvise count questions on camera.
 4. [ ] **Capture 3–5 screenshots** while recording: business answer
        with report link, metric listing, refusal, validation health
        (06 output), architecture diagram. Save originals to
