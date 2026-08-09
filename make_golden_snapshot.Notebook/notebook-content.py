@@ -38,11 +38,12 @@ impossible to rebuild:
     ops_phi_findings                                           (steward dispositions)
     ops_error_log                                              (append-only history)
 
-Each is DEEP CLONEd to golden_<table>; a manifest (row counts, wheel
+Each is copied via CTAS (Fabric Spark is OSS Delta — no DEEP
+CLONE; that is Databricks-only) to golden_<table>; a manifest (row counts, wheel
 version, timestamp) goes to Files/golden/manifest.json.
 
 RESTORE: for each golden_<table>:
-    CREATE OR REPLACE TABLE <table> DEEP CLONE golden_<table>
+    CREATE OR REPLACE TABLE <table> AS SELECT * FROM golden_<table>
 then rerun 02 -> 07 (05, 06) — with cache and findings restored, the
 rebuild costs minutes and pennies, not a description regeneration.
 """
@@ -78,7 +79,7 @@ for table in GOLDEN_TABLES:
     if not spark.catalog.tableExists(table):
         print(f"[!] {table} missing — skipped (run the pipeline first)")
         continue
-    spark.sql(f"CREATE OR REPLACE TABLE golden_{table} DEEP CLONE {table}")
+    spark.sql(f"CREATE OR REPLACE TABLE golden_{table} AS SELECT * FROM {table}")
     count = spark.table(f"golden_{table}").count()
     manifest["tables"][table] = count
     print(f"[+] golden_{table}: {count} rows")
@@ -94,7 +95,7 @@ with open(manifest_path, "w") as f:
     json.dump(manifest, f, indent=2)
 print("\nManifest -> Files/golden/manifest.json")
 print(json.dumps(manifest, indent=2))
-print("\nRestore: CREATE OR REPLACE TABLE <t> DEEP CLONE golden_<t> per table, "
+print("\nRestore: CREATE OR REPLACE TABLE <t> AS SELECT * FROM golden_<t> per table, "
       "then rerun 02->07.")
 
 # METADATA ********************
