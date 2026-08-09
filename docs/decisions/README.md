@@ -42,3 +42,4 @@ never deleted — its status changes and it links to its replacement.
 | [0029](0029-dimension-layer-activation.md) | Dimension layer activation: filter-usage qualifies, scope-local aliases resolve | Accepted |
 | [0030](0030-layered-retrieval-search-terms-first.md) | Layered retrieval: search-terms first, vectors where the engine allows | Accepted (amended) |
 | [0031](0031-business-terms-weighted-plurality.md) | Business terms: a weighted plurality, citizen-endorsed, steward-arbitrated | Accepted |
+| [0032](0032-deterministic-core-llm-edges.md) | Deterministic Core, LLM Edges — the LLM translates, the data answers, the human decides | Accepted |
