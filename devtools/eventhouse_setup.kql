@@ -65,12 +65,16 @@
 
 // ===== 3. THE function the Data Agent calls =============================
 // Owns the whole discipline: embed once, rank, threshold, disclose count.
-// Threshold 0.45 sits in the measured gap (true ~0.51, noise ~0.37);
-// recalibrate against a dozen known question->answer pairs at full scale.
+// Threshold 0.35 CALIBRATED at full scale 2026-08-09 (441 rows, real
+// search docs): true matches 0.41+, hardest adversarial junk ("unicorn
+// readmission velocity" — contains a domain word) tops at 0.311. Note
+// scores are NOT comparable across doc compositions: the 5-row probe
+// scored 0.51/0.37 with shorter docs. Recalibrate whenever search_text
+// composition changes.
 .create-or-alter function with (
     docstring = "Semantic resolution over the certified catalog: returns the closest metrics/steps/terms for a topic phrase. total_matches on every row discloses how many cleared the threshold; closeness is relative similarity, never a probability.",
     folder = "aivia"
-) semantic_search(phrase:string, top_k:int = 10, threshold:real = 0.45) {
+) semantic_search(phrase:string, top_k:int = 10, threshold:real = 0.35) {
     let q = toscalar(
         print t = phrase
         | evaluate ai_embeddings(t,
