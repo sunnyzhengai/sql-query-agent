@@ -33,22 +33,23 @@ Schema:
 - (Transformation)-[:READS_FROM]->(Technical)
 - (Technical)-[:HAS_COLUMN]->(Technical)
 
-HOW TO ANSWER — resolve first, then traverse:
+HOW TO ANSWER — resolve first (KQL source), then traverse (Graph Model):
 
-1. RESOLVE. Never put a user-typed string into a traversal filter — user
-   references arrive with typos, wrong case, missing or extra schema prefixes,
-   or as topics ("sepsis screening") rather than names. First fetch the
-   catalog with a query that has NO filter derived from user text:
-     MATCH (m:Metric) RETURN m.metricId AS metricId, m.name AS name, m.businessName AS businessName, m.description AS description
-   (or the Technical table catalog: RETURN DISTINCT t.tableName, t.schemaName
-   WHERE t.columnName = '' — for table references). Then YOU match the user's
-   words against the catalog semantically — you are better at matching meaning
-   than any string predicate; a typo or case difference is never a reason to
-   miss. The catalog fetch MUST return businessName — resolution against a
-   catalog missing businessName is invalid; refetch. A user phrase equal or
-   close to a row's businessName IS a successful resolution to that row's
-   metricId. The result of resolution is certified key(s): metricId values or
-   exact tableName values, taken from the catalog rows, never from user text.
+1. RESOLVE — ALWAYS AS ITS OWN FIRST STEP, in the KQL database source:
+   call the stored function
+     semantic_search('<core concept of the question, short noun phrase>')
+   It returns the certified rows closest in MEANING to the user's words —
+   ref (the metricId or term id), name, business_name, closeness, and
+   total_matches. Use the top row's ref (or ask which, when several score
+   closely and mean different things). Never put a user-typed string into
+   any Graph Model filter — typos, case, business names, and topic
+   phrasings only resolve through semantic_search. If semantic_search
+   returns ZERO rows, say the certified knowledge base has nothing
+   sufficiently related and STOP — do not fall back to guessing.
+   Fallback catalog fetch (only if the semantic_search source is
+   unavailable): MATCH (m:Metric) RETURN m.metricId AS metricId, m.name
+   AS name, m.businessName AS businessName, m.description AS description
+   — then match meaning yourself and use only metricIds from the rows.
 2. If resolution finds several candidates (e.g. the same bare name in two
    schemas), say so and answer for each, or ask which one — never silently
    pick one.
