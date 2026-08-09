@@ -27,17 +27,24 @@ ADR writes that model into the record as the product architecture.
 
 ## Decision
 
-**The boundary is defined by three typed LLM touchpoints; everything
-between them is replayable code.**
+**The boundary is defined by TWO typed LLM touchpoints; everything
+between them is replayable code.** (Amended 2026-08-09 same day: the
+pick-interpretation touchpoint is eliminated — picks are structural.)
 
-1. **`translate(question) → search_phrase`** (entry edge): the LLM's
-   entire output is one string. It never sees schema, catalog, or
-   threshold. A poor translation degrades ranking, never correctness.
+1. **Entry edge — the LLM produces the search token** (Sunny's term):
+   its entire output is one string. It never sees schema, catalog, or
+   threshold. A poor token degrades ranking, never correctness.
 2. **The deterministic core** — no LLM tokens inside:
    - `embed(phrase)`: pinned embedding model, no sampling;
-   - similarity over the semantic catalog spanning **all three
-     layers** (metrics, calculation steps, technical tables — plus
-     business terms when present);
+   - **one fixed command, every time**: semantic_search(<token>) —
+     the token is a parameter plugged into an immutable function body;
+     no query is ever constructed at ask time. Closeness falls out of
+     the vector math — nothing scores at runtime;
+   - **Tier-1 search space: metric + transformation descriptions only**
+     (+ business terms when present — concept grain). Table/column
+     descriptions are deliberately excluded: users ask about concepts,
+     not objects; object-grain search joins in Tier 2/Pro (Sunny,
+     2026-08-09);
    - threshold θ from config, never from a prompt;
    - rank by closeness, ties broken deterministically (node_id);
    - **present ALL candidates** through a fixed render template —
@@ -54,13 +61,16 @@ between them is replayable code.**
      output_metric_logic row; step → its node + parent metric;
      table → dictionary entry + closure-table readers. No free query
      exists in the core.
-3. **`interpret_pick(reply, candidates) → index`** (chat surfaces
-   only; a click in a real UI): LLM output validated against the
-   candidate set — it can produce one of K or "none", nothing else.
-4. **`narrate(fact_set) → prose`** (exit edge): the LLM receives only
-   assembled facts and may add only language. **Provenance (the Basis
-   line) is stamped by the orchestrator, never written by the LLM** —
-   closing the lying-footer defect class permanently.
+3. **Picks are structural, not an LLM touchpoint**: in a UI the click
+   IS the pick; in chat, candidates are numbered and a number or exact
+   name is parsed by code (regex + case-folded match; re-prompt on
+   failure). An OPTIONAL LLM fallback may map a fuzzy reply ("the ED
+   one") onto the candidate set, validated so it can only yield one of
+   K or none — a UX convenience, never architecture.
+4. **Exit edge — the LLM narrates the assembled facts**: it receives
+   only the fact set and may add only language. **Provenance (the
+   Basis line) is stamped by the orchestrator, never written by the
+   LLM** — closing the lying-footer defect class permanently.
 
 **The testable definition of deterministic:** same phrase + same
 catalog state ⇒ byte-identical candidate set, order, and facts. This
@@ -69,7 +79,11 @@ replay property goes into CI; "battle-tested" becomes mechanical
 
 **Resolution IS the flywheel's capture surface:** the human's pick is
 simultaneously disambiguation and an endorsement signal
-(ADR 0023/0031). Plurality is never collapsed by a machine — it is
+(ADR 0023/0031) — and capture is ONLY possible on an owned surface:
+the Fabric agent is read-only and its conversations are not exposed as
+data, so a pick made in Fabric chat evaporates; in the orchestrator it
+is one appended row to gov_usage_events / gov_term_endorsements
+(writers the contracts have been waiting for). Plurality is never collapsed by a machine — it is
 presented, and usage ranks it over time (ADR 0021/0024).
 
 ## Consequences
