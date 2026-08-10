@@ -32,12 +32,22 @@ TOKENS_SYSTEM_PROMPT = (
     "You turn a user's question about business metrics into search "
     "phrases. Output ONE short phrase (2-6 words) per DISTINCT business "
     "concept the question asks about, one per line, at most 3 lines. A "
-    "question about a single concept gets exactly one line; a comparison "
-    "of two things gets two lines. No numbering, no punctuation, no "
-    "explanation. Do not add concepts the question does not name."
+    "question about a single concept gets exactly ONE line — even if it "
+    "mentions that concept's definition, metrics, or calculation; those "
+    "are aspects of one concept, never separate lines. Never output two "
+    "phrasings of the same concept. Only a question naming clearly "
+    "different things (a comparison, an explicit 'and') gets multiple "
+    "lines. No numbering, no punctuation, no explanation. Do not add "
+    "concepts the question does not name."
 )
 
 MAX_TOKENS_PER_QUESTION = 3
+
+# Deterministic backstop for over-split tokens (live find, 2026-08-10:
+# "which metrics defined sepsis" -> 'sepsis metrics' + 'sepsis definition
+# metrics', two near-identical candidate lists, two pick rounds). The
+# prompt discourages the split; this guard makes the duplicate harmless.
+DUPLICATE_LIST_OVERLAP = 0.5
 
 # The ONE fixed command. The token is the only variable — parameterized
 # via Kusto's declare statement so user text is data, never query syntax.
@@ -130,6 +140,21 @@ def resolve(
     )
 
 
+def duplicate_list(
+    new_ids: "set[str]", prior_id_sets: "list[set[str]]"
+) -> bool:
+    """True when a candidate list substantially repeats one already shown
+    for THIS question — noise from an over-split token, not a second
+    concept. Overlap coefficient (shared / smaller list) against each
+    prior list; deterministic set math, never a model judgment.
+    """
+    for prior in prior_id_sets:
+        denom = min(len(new_ids), len(prior))
+        if denom and len(new_ids & prior) / denom >= DUPLICATE_LIST_OVERLAP:
+            return True
+    return False
+
+
 def parse_pick(reply: str, candidates: "tuple[Candidate, ...]") -> "int | None":
     """Structural pick: 1-based number, or exact (case-folded) name /
     business name / ref. Returns the candidate index or None (re-prompt).
@@ -137,6 +162,8 @@ def parse_pick(reply: str, candidates: "tuple[Candidate, ...]") -> "int | None":
     validated LLM fallback, not the core's concern.
     """
     text = reply.strip()
+    if not text:
+        return None   # empty must never exact-match an empty business_name
     if text.isdigit():
         n = int(text)
         return n - 1 if 1 <= n <= len(candidates) else None

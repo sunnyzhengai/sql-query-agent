@@ -14,15 +14,28 @@ No bypass: one candidate is presented exactly like ten. Run:
 
 from __future__ import annotations
 
+import re
 from datetime import datetime, timezone
 
 from src.orchestrator.assemble import AssemblyError, assemble
 from src.orchestrator.core import (
     ResolutionResult,
+    duplicate_list,
     parse_pick,
     produce_search_tokens,
     resolve,
 )
+
+# Terminal reality (live find, 2026-08-10): Esc/arrow keys glue invisible
+# escape sequences onto typed replies — "\x1b2" is not a digit, so a real
+# pick fell through to the new-question hatch. Strip ANSI sequences, then
+# any remaining non-printable characters, before parsing ANY input.
+_ANSI_SEQ = re.compile(r"\x1b\[[0-9;?]*[A-Za-z~]")
+
+
+def clean_input(text: str) -> str:
+    text = _ANSI_SEQ.sub("", text)
+    return "".join(ch for ch in text if ch.isprintable()).strip()
 from src.orchestrator.events import ConfirmEvent, JsonlEventSink, PickEvent
 from src.orchestrator.narrate import narrate_many
 
@@ -116,6 +129,8 @@ def _ask_pick(ask, say, result) -> "int | None":
     """
     while True:
         reply = ask("pick> ").strip()
+        if not reply:
+            continue   # stray Enter / swallowed escape key: just re-prompt
         if reply.lower() in ("n", "none"):
             return None
         picked = parse_pick(reply, result.candidates)
@@ -131,6 +146,8 @@ def _ask_pick(ask, say, result) -> "int | None":
 
 def chat_loop(chat, run_kql, sink, user_id: str = "local-dev",
               ask=input, say=print) -> None:
+    raw_ask = ask
+    ask = lambda prompt="": clean_input(raw_ask(prompt))
     say("AIVIA — ask about your certified metrics ('q' to quit)\n")
     pending = None
     last_fact_sets = []
@@ -156,6 +173,7 @@ def chat_loop(chat, run_kql, sink, user_id: str = "local-dev",
         tokens = produce_search_tokens(question, chat)
         fact_sets = []
         any_candidates = False
+        shown_id_sets = []
 
         try:
             for token in tokens:
@@ -165,6 +183,11 @@ def chat_loop(chat, run_kql, sink, user_id: str = "local-dev",
                         say(f"For '{token}': nothing sufficiently related.")
                     _record(sink, user_id, question, result, None)
                     continue
+                ids = {c.node_id for c in result.candidates}
+                if duplicate_list(ids, shown_id_sets):
+                    say(f"(Skipping '{token}' — repeats the list above.)")
+                    continue   # nothing shown, so nothing to record
+                shown_id_sets.append(ids)
                 any_candidates = True
                 header = f"For '{token}':" if len(tokens) > 1 else ""
                 say(render_candidates(result, header))

@@ -319,6 +319,78 @@ class TestConfirmation:
         assert len(events) == 2                       # two picks, no verdicts
 
 
+class TestLiveFindings20260810:
+    """Sunny's live session (2026-08-10): escape keys corrupted a pick,
+    and an over-split token produced near-duplicate candidate lists."""
+
+    def run_kql(self, query, params):
+        from src.orchestrator.core import RESOLVE_QUERY
+        if query == RESOLVE_QUERY:
+            return [{
+                "node_id": "canonical:reporting.USP_ED_Sepsis",
+                "kind": "metric", "ref": "reporting.USP_ED_Sepsis",
+                "name": "USP_ED_Sepsis", "business_name": "ED Sepsis Screening",
+                "display_text": "d", "closeness": 0.44, "total_matches": 1,
+            }]
+        return fake_kql(query, params)
+
+    def drive(self, tmp_path, replies, chat=None):
+        from src.orchestrator.cli import chat_loop
+        sink = JsonlEventSink(tmp_path / "e.jsonl")
+        out = []
+        say = lambda *a: out.append(" ".join(str(x) for x in a))
+        chat = chat or (lambda s, u: ("topic" if "search phrase" in s
+                                      else "Prose."))
+        it = iter(replies)
+        chat_loop(chat, self.run_kql, sink, ask=lambda p="": next(it), say=say)
+        events = [json.loads(x) for x in
+                  (tmp_path / "e.jsonl").read_text().splitlines()]
+        return "\n".join(out), events
+
+    def test_escape_char_glued_to_digit_still_picks(self, tmp_path):
+        # the live bug: Esc echoed as ^[ made "2" a non-digit -> new question
+        text, events = self.drive(tmp_path, ["q1", "\x1b1", "", "q"])
+        assert "(Taking that as a new question.)" not in text
+        assert "Prose." in text
+        assert events[0]["picked_ref"] == "reporting.USP_ED_Sepsis"
+
+    def test_arrow_key_alone_reprompts(self, tmp_path):
+        text, events = self.drive(tmp_path, ["q1", "\x1b[A", "1", "", "q"])
+        assert "(Taking that as a new question.)" not in text
+        assert "Prose." in text
+
+    def test_empty_pick_reply_never_false_matches(self, tmp_path):
+        # empty reply must re-prompt — not exact-match an empty business_name
+        from src.orchestrator.core import parse_pick
+        c = cand("metric", "canonical:x", "x")     # business_name == ""
+        assert parse_pick("", (c,)) is None
+        text, events = self.drive(tmp_path, ["q1", "", "1", "", "q"])
+        assert "Prose." in text
+        assert len(events) == 1                    # one pick, no phantom
+
+    def test_duplicate_token_list_shown_once(self, tmp_path):
+        # over-split single concept -> second (identical) list is skipped:
+        # one pick round, one answer, one pick event
+        def chat(system, user):
+            if "search phrase" in system:
+                return "sepsis metrics\nsepsis definition metrics"
+            return "Prose."
+        text, events = self.drive(tmp_path, ["which metrics defined sepsis",
+                                             "1", "", "q"], chat=chat)
+        assert "(Skipping 'sepsis definition metrics'" in text
+        assert text.count("Pick a number") == 1
+        assert "Prose." in text
+        assert len(events) == 1
+
+    def test_duplicate_list_math(self):
+        from src.orchestrator.core import duplicate_list
+        a = {"n1", "n2", "n3", "n4"}
+        assert duplicate_list({"n1", "n2", "n9", "n10"}, [a])      # 2/4 = 0.5
+        assert not duplicate_list({"n1", "n8", "n9", "n10"}, [a])  # 1/4
+        assert not duplicate_list(set(), [a])                      # empty new
+        assert not duplicate_list({"n1"}, [])                      # no priors
+
+
 class TestFollowUpDetail:
     """Sunny's live case (2026-08-09): 'show me its sql' after an answer
     must show THAT answer's SQL — never re-resolve into weak ODBC steps."""
