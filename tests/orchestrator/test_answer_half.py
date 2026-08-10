@@ -11,7 +11,7 @@ from src.orchestrator.assemble import (
     assemble,
 )
 from src.orchestrator.cli import chat_loop, render_candidates
-from src.orchestrator.core import Candidate, ResolutionResult, resolve
+from src.orchestrator.core import Candidate, resolve
 from src.orchestrator.events import JsonlEventSink, PickEvent
 from src.orchestrator.narrate import narrate
 from src.schemas import USAGE_EVENTS
