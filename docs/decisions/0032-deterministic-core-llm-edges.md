@@ -97,8 +97,16 @@ presented, and usage ranks it over time (ADR 0021/0024).
   client + agent harness + llm_client + resolve function — largely
   already built), where the LLM has no tools beyond the two
   touchpoints. The Fabric agent becomes a consumer surface and
-  distribution channel, not the product's spine. Runtime pivot
-  pending Sunny's explicit confirmation.
+  distribution channel, not the product's spine. **Runtime pivot
+  CONFIRMED by Sunny 2026-08-09** after the live baseline (hit@5
+  96.7%, top1 93.3%, replay stable 7/7, p50 0.71s vs 19-47s on the
+  Fabric surface): the orchestrator is the flagship experience.
+  Policies set with the confirmation: the threshold is a VOLUME
+  CONTROL, not a correctness gate (theta keeps lists reasonable; weak
+  matches are shown with visible closeness; the human judges); sibling
+  variance across paraphrases is accepted — the readiness metric is
+  hit@5, not top1 agreement ("we can't predict which sibling is the
+  best answer for different users").
 - The instruction files shrink to invariants + touchpoint guidance;
   the question-template casebook (the whack-a-mole surface) is
   deleted where the orchestrator runs.
