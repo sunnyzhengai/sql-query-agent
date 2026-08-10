@@ -1,0 +1,44 @@
+"""The exit edge: the LLM narrates assembled facts — language only.
+
+The prose is grounded in the FactSet and nothing else; the Basis line
+is appended BY CODE after narration, so provenance can never be
+invented. Invariants here are the product's constitution, not question
+templates.
+"""
+
+from __future__ import annotations
+
+from typing import Callable
+
+from src.orchestrator.assemble import FactSet
+
+NARRATE_SYSTEM = (
+    "You write clear business prose from the provided facts — nothing "
+    "else. Rules:\n"
+    "1. Every claim must come from the facts given. Never add outside "
+    "knowledge, never estimate, never fill gaps.\n"
+    "2. Translate any SQL into business language; never paste raw SQL.\n"
+    "3. If a fact is null or missing, either omit it or say it is not "
+    "recorded — do not invent it.\n"
+    "4. Never output personal names from inside SQL text, medical record "
+    "numbers, or patient identifiers; use generic labels.\n"
+    "5. When report_name and report_url are present, end with: "
+    "Used in: <report_name> (<report_url>). Never fabricate a link.\n"
+    "6. No greetings, no confidence claims, no percentages of certainty."
+)
+
+
+def facts_block(fact_set: FactSet) -> str:
+    lines = [f"{k}: {v}" for k, v in fact_set.facts.items() if v not in (None, "")]
+    return "\n".join(lines)
+
+
+def narrate(fact_set: FactSet, chat: "Callable[[str, str], str]") -> str:
+    """chat(system, user) -> str is the injected LLM client. Returns the
+    full answer: LLM prose + the code-stamped Basis line."""
+    prose = chat(
+        NARRATE_SYSTEM,
+        f"Facts about this {fact_set.kind}:\n{facts_block(fact_set)}\n\n"
+        "Write the explanation a business user needs.",
+    ).strip()
+    return f"{prose}\n\nBasis: {fact_set.basis}"

@@ -51,3 +51,4 @@ data/Collibra*
 llm_api_key.txt
 .DS_Store
 dist/
+data/events/

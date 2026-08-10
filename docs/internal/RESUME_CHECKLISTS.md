@@ -205,6 +205,34 @@ Order matters: 1–4 change tables/instructions, 5 validates, 6 records.
 
 ---
 
+## F. Next session — orchestrator goes live end to end (queued 2026-08-09)
+
+The answer half is built and offline-tested; it needs two shortcuts and
+one live conversation. Plain steps:
+
+1. Resume capacity.
+2. In the **probe-eh KQL database**: create TWO more OneLake shortcuts
+   (same drill as output_semantic_catalog): one to lakehouse table
+   **output_metric_logic**, one to **graph_nodes**.
+3. Quick checks in the query editor:
+   `output_metric_logic | count` (expect 28) and
+   `graph_nodes | count` (expect ~4,700).
+4. On your laptop, run the product:
+   `python -m src.orchestrator.cli`
+   Ask anything — candidates appear ranked with closeness; pick by
+   number; the narrated answer ends with a code-stamped Basis. Every
+   pick lands in `data/events/pick_events.jsonl` (the flywheel,
+   capturing locally until the production sink).
+5. Try to break it: rephrase, ask nonsense, decline all candidates.
+   Screenshot anything surprising.
+6. Pause capacity.
+
+Then the remaining build (no tenant needed): robustness suite reruns
+against the FULL loop (assembly+narration graded too), UI beyond the
+terminal, Entra sign-in, production event sink.
+
+---
+
 ## B. Rematch — DEFERRED to Round 3 (decided 2026-08-08)
 
 Round 2 completion is superseded: the full head-to-head waits until the
