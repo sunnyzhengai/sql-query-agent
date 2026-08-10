@@ -1,6 +1,6 @@
 # ADR 0002: Delta Tables over an External Graph Database
 
-**Status:** Accepted
+**Status:** Accepted (extended by [ADR 0033](0033-system-of-record-plus-projections.md))
 **Date:** 2026-07 (recorded 2026-08-02)
 
 ## Context
@@ -23,3 +23,7 @@ tables) so a native Fabric Graph backend can be adopted later without re-parsing
 - Multi-hop traversal is less natural in flat tables; a hybrid is planned —
   Delta for metadata search, Fabric Graph for deep traversal (LPG export tables
   already use camelCase columns as Fabric Graph NL2GQL requires)
+- ADR 0033 later generalized this into the storage philosophy: Delta is the
+  **system of record**; every specialized engine (Eventhouse vectors, Fabric
+  Graph) is a **projection** built from it — added when needed, never a second
+  source of truth

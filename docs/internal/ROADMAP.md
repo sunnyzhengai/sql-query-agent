@@ -30,7 +30,7 @@ Cite these from other documents by reference — do not copy values.
 | Component | Short Name | Description | Tier |
 |-----------|-----------|-------------|------|
 | **Metadata Agent** | "agent" | Knowledge graph + Data Agent that ANSWERS metadata questions ("how is this calculated?") with certified, owner-attributed answers — plus Purview/Collibra sync. Renamed from "Metadata Sync" 2026-08-07: we answer questions, static catalogs only store them. | Basic |
-| **Analytics Agent** | "analytics" | Self-service tier: certified semantic layer compiled from the graph; Data Agent #2 executes certified metrics against real data ("what WAS it last month?"). | Pro (roadmap) |
+| **Analytics Agent** | "analytics" | Self-service tier: certified semantic layer compiled from the graph; Data Agent #2 executes certified metrics against real data ("what WAS it last month?"). The compiler stitches certified fragments into executable SQL — deterministic topological reassembly with ScriptDom round-trip + execution validation, personal libraries (ADR 0024) compile beside enterprise definitions (ADR 0033). | Pro (roadmap) |
 
 Both components live in a single repo (`sql-query-agent`) and ship as one `.whl` package.
 
