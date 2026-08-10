@@ -53,11 +53,41 @@ def render_candidates(result: ResolutionResult, header: str = "") -> str:
     return "\n".join(lines)
 
 
+class _NewQuestion(Exception):
+    def __init__(self, text: str) -> None:
+        self.text = text
+
+
+def _ask_pick(ask, say, result) -> "int | None":
+    """Pick prompt with a deterministic escape hatch: a reply that is
+    neither a valid pick, a digit, nor a decline is a NEW QUESTION —
+    the shown list is recorded as declined and the conversation moves
+    on. A chat must never trap the user in a menu.
+    """
+    while True:
+        reply = ask("pick> ").strip()
+        if reply.lower() in ("n", "none"):
+            return None
+        picked = parse_pick(reply, result.candidates)
+        if picked is not None:
+            return picked
+        if reply.isdigit():
+            say(f"Pick a number between 1 and {len(result.candidates)}, "
+                "or 'n' for none.")
+            continue
+        say("(Taking that as a new question.)")
+        raise _NewQuestion(reply)
+
+
 def chat_loop(chat, run_kql, sink, user_id: str = "local-dev",
               ask=input, say=print) -> None:
     say("AIVIA — ask about your certified metrics ('q' to quit)\n")
+    pending = None
     while True:
-        question = ask("you> ").strip()
+        if pending is not None:
+            question, pending = pending, None
+        else:
+            question = ask("you> ").strip()
         if question.lower() in ("q", "quit", "exit"):
             return
         if not question:
@@ -67,35 +97,35 @@ def chat_loop(chat, run_kql, sink, user_id: str = "local-dev",
         fact_sets = []
         any_candidates = False
 
-        for token in tokens:
-            result = resolve(token, run_kql)
-            if not result.candidates:
-                if len(tokens) > 1:
-                    say(f"For '{token}': nothing sufficiently related.")
-                _record(sink, user_id, question, result, None)
-                continue
-            any_candidates = True
-            header = f"For '{token}':" if len(tokens) > 1 else ""
-            say(render_candidates(result, header))
-            picked = None
-            while picked is None:
-                reply = ask("pick> ").strip()
-                if reply.lower() in ("n", "none"):
-                    break
-                picked = parse_pick(reply, result.candidates)
+        try:
+            for token in tokens:
+                result = resolve(token, run_kql)
+                if not result.candidates:
+                    if len(tokens) > 1:
+                        say(f"For '{token}': nothing sufficiently related.")
+                    _record(sink, user_id, question, result, None)
+                    continue
+                any_candidates = True
+                header = f"For '{token}':" if len(tokens) > 1 else ""
+                say(render_candidates(result, header))
+                try:
+                    picked = _ask_pick(ask, say, result)
+                except _NewQuestion as nq:
+                    _record(sink, user_id, question, result, None)
+                    pending = nq.text
+                    raise
                 if picked is None:
-                    say("Reply with the item number or its exact name "
-                        "('n' for none).")
-            if picked is None:
-                say("Noted — none of these matched what you meant.")
-                _record(sink, user_id, question, result, None)
-                continue
-            candidate = result.candidates[picked]
-            _record(sink, user_id, question, result, candidate)
-            try:
-                fact_sets.append(assemble(candidate, run_kql))
-            except AssemblyError as e:
-                say(f"Could not assemble facts: {e}")
+                    say("Noted — none of these matched what you meant.")
+                    _record(sink, user_id, question, result, None)
+                    continue
+                candidate = result.candidates[picked]
+                _record(sink, user_id, question, result, candidate)
+                try:
+                    fact_sets.append(assemble(candidate, run_kql))
+                except AssemblyError as e:
+                    say(f"Could not assemble facts: {e}")
+        except _NewQuestion:
+            continue
 
         if fact_sets:
             say("\n" + narrate_many(fact_sets, question, chat) + "\n")

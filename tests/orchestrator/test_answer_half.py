@@ -220,3 +220,49 @@ class TestCompareFlow:
         events = [json.loads(x) for x in
                   (tmp_path / "e.jsonl").read_text().splitlines()]
         assert len(events) == 2                  # one pick event per concept
+
+
+class TestPickEscape:
+    """A new question typed at the pick prompt escapes the menu."""
+
+    def run_kql(self, query, params):
+        from src.orchestrator.core import RESOLVE_QUERY
+        if query == RESOLVE_QUERY:
+            if params["token"] == "second topic":
+                return []          # new question resolves to nothing
+            return [{
+                "node_id": "canonical:reporting.USP_ED_Sepsis",
+                "kind": "metric", "ref": "reporting.USP_ED_Sepsis",
+                "name": "USP_ED_Sepsis", "business_name": "ED Sepsis Screening",
+                "display_text": "d", "closeness": 0.44, "total_matches": 1,
+            }]
+        return fake_kql(query, params)
+
+    def test_question_at_pick_prompt_becomes_new_question(self, tmp_path):
+        from src.orchestrator.cli import chat_loop
+        sink = JsonlEventSink(tmp_path / "e.jsonl")
+        out = []
+        say = lambda *a: out.append(" ".join(str(x) for x in a))
+        def chat(system, user):
+            return "second topic" if "second" in user else "first topic"
+        it = iter(["first question", "what about something else second", "q"])
+        chat_loop(chat, self.run_kql, sink, ask=lambda p="": next(it), say=say)
+        text = "\n".join(out)
+        assert "(Taking that as a new question.)" in text
+        assert "Nothing in the certified knowledge base" in text  # new q refused
+        events = [json.loads(x) for x in
+                  (tmp_path / "e.jsonl").read_text().splitlines()]
+        assert events[0]["picked_node_id"] is None   # abandoned list = decline
+        assert len(events) == 2
+
+    def test_out_of_range_number_still_reprompts(self, tmp_path):
+        from src.orchestrator.cli import chat_loop
+        sink = JsonlEventSink(tmp_path / "e.jsonl")
+        out = []
+        say = lambda *a: out.append(" ".join(str(x) for x in a))
+        chat = lambda s, u: ("topic" if "search phrase" in s else "Prose.")
+        it = iter(["q1", "9", "1", "q"])
+        chat_loop(chat, self.run_kql, sink, ask=lambda p="": next(it), say=say)
+        text = "\n".join(out)
+        assert "between 1 and 1" in text
+        assert "Prose." in text
