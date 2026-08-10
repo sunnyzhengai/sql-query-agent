@@ -23,7 +23,7 @@ from src.orchestrator.core import (
     produce_search_tokens,
     resolve,
 )
-from src.orchestrator.events import JsonlEventSink, PickEvent
+from src.orchestrator.events import ConfirmEvent, JsonlEventSink, PickEvent
 from src.orchestrator.narrate import narrate_many
 
 WEAK_CLOSENESS = 0.40   # display label only — never a gate (ADR 0032)
@@ -129,8 +129,33 @@ def chat_loop(chat, run_kql, sink, user_id: str = "local-dev",
 
         if fact_sets:
             say("\n" + narrate_many(fact_sets, question, chat) + "\n")
+            pending = _confirm(ask, say, sink, user_id, question, fact_sets)
         elif not any_candidates:
             say(REFUSAL_MESSAGE)
+
+
+def _confirm(ask, say, sink, user_id, question, fact_sets) -> "str | None":
+    """The strong signal: after READING the answer, does the human stand
+    by their pick? y = endorsement, n = rejection, Enter = skip (no
+    signal). Anything else is a new question — same no-trap rule as the
+    pick prompt. Returns the new question text, or None."""
+    reply = ask("was this what you needed? (y/n, Enter to skip)> ").strip()
+    verdict = {"y": "confirmed", "yes": "confirmed",
+               "n": "rejected", "no": "rejected"}.get(reply.lower())
+    if verdict is None and reply:
+        say("(Taking that as a new question.)")
+        return reply
+    if verdict:
+        now = datetime.now(timezone.utc).isoformat()
+        for fs in fact_sets:
+            sink.record(ConfirmEvent(
+                event_at=now, user_id=user_id, question=question,
+                picked_node_id=f"{fs.kind}:{fs.ref}", picked_ref=fs.ref,
+                verdict=verdict,
+            ))
+        say("Thanks — recorded." if verdict == "confirmed"
+            else "Noted — that definition didn't match what you meant.")
+    return None
 
 
 def _record(sink, user_id, question, result, candidate) -> None:

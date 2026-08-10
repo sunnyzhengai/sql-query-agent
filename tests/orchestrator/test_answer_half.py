@@ -266,3 +266,54 @@ class TestPickEscape:
         text = "\n".join(out)
         assert "between 1 and 1" in text
         assert "Prose." in text
+
+
+class TestConfirmation:
+    """The strong signal: endorsement is the verdict AFTER reading."""
+
+    def run_kql(self, query, params):
+        from src.orchestrator.core import RESOLVE_QUERY
+        if query == RESOLVE_QUERY:
+            return [{
+                "node_id": "canonical:reporting.USP_ED_Sepsis",
+                "kind": "metric", "ref": "reporting.USP_ED_Sepsis",
+                "name": "USP_ED_Sepsis", "business_name": "ED Sepsis Screening",
+                "display_text": "d", "closeness": 0.44, "total_matches": 1,
+            }]
+        return fake_kql(query, params)
+
+    def drive(self, tmp_path, replies):
+        from src.orchestrator.cli import chat_loop
+        sink = JsonlEventSink(tmp_path / "e.jsonl")
+        out = []
+        say = lambda *a: out.append(" ".join(str(x) for x in a))
+        chat = lambda s, u: ("topic" if "search phrase" in s else "Prose.")
+        it = iter(replies)
+        chat_loop(chat, self.run_kql, sink, ask=lambda p="": next(it), say=say)
+        events = [json.loads(x) for x in
+                  (tmp_path / "e.jsonl").read_text().splitlines()]
+        return "\n".join(out), events
+
+    def test_yes_records_confirmed_endorsement(self, tmp_path):
+        _, events = self.drive(tmp_path, ["q1", "1", "y", "q"])
+        assert len(events) == 2                       # pick + confirmation
+        assert events[1]["verdict"] == "confirmed"
+        from src.orchestrator.events import ConfirmEvent
+        row = ConfirmEvent(**{k: events[1][k] for k in
+            ("event_at", "user_id", "question", "picked_node_id",
+             "picked_ref", "verdict")}).to_usage_event_row()
+        assert row["feedback"] == "confirmed"
+
+    def test_no_records_rejection(self, tmp_path):
+        _, events = self.drive(tmp_path, ["q1", "1", "n", "q"])
+        assert events[1]["verdict"] == "rejected"
+
+    def test_enter_skips_no_signal(self, tmp_path):
+        _, events = self.drive(tmp_path, ["q1", "1", "", "q"])
+        assert len(events) == 1                       # pick only
+
+    def test_new_question_at_confirm_escapes(self, tmp_path):
+        text, events = self.drive(
+            tmp_path, ["q1", "1", "something entirely new", "1", "", "q"])
+        assert "(Taking that as a new question.)" in text
+        assert len(events) == 2                       # two picks, no verdicts
