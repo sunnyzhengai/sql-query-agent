@@ -33,7 +33,10 @@ The product is a **Knowledge Graph Generator for Fabric Data Agents**. It's a Py
 
 ### For Data Governance Leaders
 - "Stop maintaining spreadsheets of business definitions. Let usage build your catalog automatically."
-- "Bulk-load report metadata into Collibra and Purview — the feature Collibra told you they won't build."
+- "Bulk-load business terms and report metadata into Purview — the governance content Microsoft's scanners can't generate." (Purview-first,
+  2026-08-10: the demoable route. Collibra connector: built and
+  API-validated; positioned as "awaiting a customer instance" — never
+  demoed until a real instance exists.)
 - Key pain: manual term creation is slow (50/year), this does 250+ and accelerating
 
 ### For BI / Analytics Leaders

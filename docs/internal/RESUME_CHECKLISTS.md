@@ -258,7 +258,19 @@ terminal, Entra sign-in, production event sink.
 
 ---
 
-## B. Rematch — DEFERRED to Round 3 (decided 2026-08-08)
+## B. Rematch — SUPERSEDED by ADR 0032 (2026-08-10; was: deferred to Round 3)
+
+The contest's question ("which query language does the generator write
+better — NL2SQL over Delta or NL2GQL over the LPG?") was DISSOLVED,
+not decided: the orchestrator's flagship loop has no query generator —
+resolution is vector search, facts are fixed lookups, closures are
+precomputed. The paraphrase-robustness suite is the successor
+measurement (baseline 2026-08-09: hit@5 96.7%, replay stable). The
+scorecard and Round-1/2 evidence remain as the historical record of
+WHY the generator was removed. A Fabric-agent secondary surface, if
+ever shipped, would revive a scoped version of this protocol.
+
+Original Round-3 framing kept below for reference:
 
 Round 2 completion is superseded: the full head-to-head waits until the
 resolution surface stops moving — dimension layer (ADR 0029), retrieval

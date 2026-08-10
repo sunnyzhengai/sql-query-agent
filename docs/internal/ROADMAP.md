@@ -84,6 +84,19 @@ Fix: a deterministic answer layer between retrieval and language.
   product.
 Listing, demo, and Purview screenshots all follow Phase C's gate.
 
+**Catalog strategy (DECIDED 2026-08-10): Purview-first.** Purview is
+the primary marketing/demo route — bigger addressable market (every
+Fabric customer), co-sell alignment (Microsoft sellers can tell the
+"AIVIA feeds Purview" story), lowest entry ramp for orgs without
+governance tooling, and — decisively — the only catalog AIVIA can
+honestly demo (own-tenant path proven 2026-08-01; term-grain glossary
+push built). The Collibra connector stays BUILT and offline-tested
+against the Collibra REST contract, shown in diagrams as built, but is
+NOT demoable: AIVIA holds no Collibra instance and never will borrow
+one (no staged demos). Positioning line: "built, validated, awaiting a
+customer instance." Healthcare Collibra community remains a
+relationship/thought-leadership channel, product-agnostic.
+
 **Connector roadmap (added 2026-08-07, see
 [REFERENCE_ARCHITECTURE.md](../architecture/REFERENCE_ARCHITECTURE.md)):**
 next up are **dbt** (manifest.json → compiled T-SQL + free DAG; cheapest
@@ -154,7 +167,9 @@ Get Metadata Sync working end-to-end with real data against Purview/Collibra.
 - [x] Metadata Sync notebook; Fabric Agent client (MCP)
 
 ### Blocked on access
-- [ ] Collibra service account → test Collibra push (work admin)
+- [ ] Collibra live push: BLOCKED INDEFINITELY for AIVIA — no Collibra
+      instance is or will be available to the product (2026-08-10);
+      adapter stays offline-validated until a customer instance exists
 - [x] Purview push tested END TO END on own tenant (~2026-08-01: live test
       drove the single-entity-API and service-principal-auth fixes, both
       committed; account deprovisioned after — Purview pay-as-you-go bills
