@@ -211,14 +211,28 @@ The answer half is built and offline-tested; it needs two shortcuts and
 one live conversation. Plain steps:
 
 1. Resume capacity.
-2. In the **probe-eh KQL database**: create TWO more OneLake shortcuts
-   (same drill as output_semantic_catalog): one to lakehouse table
-   **output_metric_logic**, one to **graph_nodes**.
-3. Quick checks in the query editor:
-   `output_metric_logic | count` (expect 28) and
-   `graph_nodes | count` (expect ~4,700).
+2. **Create the two shortcuts** (full click path — same as the one you
+   made for output_semantic_catalog yesterday):
+   1. In the workspace item list, open **probe-eh** — the item typed
+      **KQL Database** (the child), not the Eventhouse parent.
+   2. In the database view, find **New → OneLake shortcut** (either a
+      "+ New" button in the toolbar, or right-click the **Shortcuts**
+      node in the left tree → New shortcut).
+   3. Source: **Microsoft OneLake** → pick your lakehouse
+      **sql_query_lh** → expand **Tables**.
+   4. Tick **output_metric_logic** AND **graph_nodes** — the picker
+      allows selecting both in one pass (if yours doesn't, just run
+      the wizard twice, once per table).
+   5. **Create**. Both appear under the Shortcuts node within a
+      minute. A shortcut is a live pointer — no copying, no refresh
+      to manage; it always shows the lakehouse table's current rows.
+3. Quick checks (query editor, one at a time):
+   `output_metric_logic | count` → expect **28**
+   `graph_nodes | count` → expect **a few thousand** (28 metrics +
+   432 steps + every table and column node)
 4. On your laptop, run the product:
    `python -m src.orchestrator.cli`
+   **This IS the end-to-end test** — see the note below the steps.
    Ask anything — candidates appear ranked with closeness; pick by
    number; the narrated answer ends with a code-stamped Basis. Every
    pick lands in `data/events/pick_events.jsonl` (the flywheel,
@@ -226,6 +240,17 @@ one live conversation. Plain steps:
 5. Try to break it: rephrase, ask nonsense, decline all candidates.
    Screenshot anything surprising.
 6. Pause capacity.
+
+**Why the CLI is the end-to-end test (not a shortcut around Fabric):**
+after the runtime pivot (ADR 0032), the orchestrator IS the product —
+Fabric's role is the data plane, not the conversation. The CLI run
+exercises every real production hop: your Entra identity → Eventhouse
+(resolution + embeddings impersonated as you) → OneLake shortcuts →
+lakehouse facts → your Azure OpenAI (both LLM edges). The only thing
+"CLI" about it is the shell around the loop — a web/Teams surface later
+swaps the rendering, not the code underneath. Testing "on Fabric end
+to end" in the old sense would mean testing the demoted chat agents —
+the secondary surface, not the flagship.
 
 Then the remaining build (no tenant needed): robustness suite reruns
 against the FULL loop (assembly+narration graded too), UI beyond the
