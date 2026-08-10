@@ -28,6 +28,17 @@ TOKEN_SYSTEM_PROMPT = (
     "add words the question does not imply."
 )
 
+TOKENS_SYSTEM_PROMPT = (
+    "You turn a user's question about business metrics into search "
+    "phrases. Output ONE short phrase (2-6 words) per DISTINCT business "
+    "concept the question asks about, one per line, at most 3 lines. A "
+    "question about a single concept gets exactly one line; a comparison "
+    "of two things gets two lines. No numbering, no punctuation, no "
+    "explanation. Do not add concepts the question does not name."
+)
+
+MAX_TOKENS_PER_QUESTION = 3
+
 # The ONE fixed command. The token is the only variable — parameterized
 # via Kusto's declare statement so user text is data, never query syntax.
 RESOLVE_QUERY = (
@@ -56,6 +67,24 @@ class ResolutionResult:
     basis: str                            # stamped by code, never by an LLM
 
 
+def _sanitize(raw: str) -> str:
+    token = " ".join(raw.replace('"', " ").replace("'", " ").split())
+    return token[:120]
+
+
+def produce_search_tokens(
+    question: str, chat: "Callable[[str, str], str]"
+) -> "list[str]":
+    """Entry edge, multi-concept: 1..MAX tokens, one per concept the
+    question names. Still translation-only — decomposing a comparison
+    into two phrases is a linguistic act, not a retrieval decision; a
+    wrong split degrades UX, never correctness.
+    """
+    raw = chat(TOKENS_SYSTEM_PROMPT, question)
+    tokens = [_sanitize(line) for line in raw.splitlines() if _sanitize(line)]
+    return tokens[:MAX_TOKENS_PER_QUESTION] or [_sanitize(raw)]
+
+
 def produce_search_token(question: str, chat: "Callable[[str, str], str]") -> str:
     """Entry edge. `chat(system, user) -> str` is the injected LLM client.
 
@@ -63,9 +92,7 @@ def produce_search_token(question: str, chat: "Callable[[str, str], str]") -> st
     cannot smuggle syntax into the core (the core parameterizes anyway;
     this is belt-and-braces).
     """
-    raw = chat(TOKEN_SYSTEM_PROMPT, question)
-    token = " ".join(raw.replace('"', " ").replace("'", " ").split())
-    return token[:120]
+    return _sanitize(chat(TOKEN_SYSTEM_PROMPT, question))
 
 
 def resolve(

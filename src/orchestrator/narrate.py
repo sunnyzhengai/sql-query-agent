@@ -42,3 +42,27 @@ def narrate(fact_set: FactSet, chat: "Callable[[str, str], str]") -> str:
         "Write the explanation a business user needs.",
     ).strip()
     return f"{prose}\n\nBasis: {fact_set.basis}"
+
+
+def narrate_many(
+    fact_sets: "list[FactSet]",
+    question: str,
+    chat: "Callable[[str, str], str]",
+) -> str:
+    """Exit edge for multi-concept questions (comparisons, contrasts):
+    same facts-only rules, several fact sets, the user's question for
+    framing. The Basis lists every lookup — stamped by code."""
+    if len(fact_sets) == 1:
+        return narrate(fact_sets[0], chat)
+    blocks = [
+        f"--- Facts, item {i} ({fs.kind}) ---\n{facts_block(fs)}"
+        for i, fs in enumerate(fact_sets, 1)
+    ]
+    prose = chat(
+        NARRATE_SYSTEM,
+        f"The user asked: {question}\n\n" + "\n\n".join(blocks) +
+        "\n\nAnswer their question using ONLY these facts. If they asked "
+        "for a comparison, compare the items point by point.",
+    ).strip()
+    basis = "; ".join(fs.basis for fs in fact_sets)
+    return f"{prose}\n\nBasis: {basis}"

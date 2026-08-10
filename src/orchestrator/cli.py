@@ -20,11 +20,11 @@ from src.orchestrator.assemble import AssemblyError, assemble
 from src.orchestrator.core import (
     ResolutionResult,
     parse_pick,
-    produce_search_token,
+    produce_search_tokens,
     resolve,
 )
 from src.orchestrator.events import JsonlEventSink, PickEvent
-from src.orchestrator.narrate import narrate
+from src.orchestrator.narrate import narrate_many
 
 WEAK_CLOSENESS = 0.40   # display label only — never a gate (ADR 0032)
 
@@ -34,11 +34,14 @@ REFUSAL_MESSAGE = (
 )
 
 
-def render_candidates(result: ResolutionResult) -> str:
-    lines = [
+def render_candidates(result: ResolutionResult, header: str = "") -> str:
+    lines = []
+    if header:
+        lines.append(header)
+    lines.append(
         f"Found {result.total_matches} related item(s); showing "
         f"{len(result.candidates)}:"
-    ]
+    )
     for i, c in enumerate(result.candidates, 1):
         weak = "  (weak match)" if c.closeness < WEAK_CLOSENESS else ""
         label = c.business_name or c.name
@@ -60,38 +63,44 @@ def chat_loop(chat, run_kql, sink, user_id: str = "local-dev",
         if not question:
             continue
 
-        token = produce_search_token(question, chat)
-        result = resolve(token, run_kql)
+        tokens = produce_search_tokens(question, chat)
+        fact_sets = []
+        any_candidates = False
 
-        if not result.candidates:
-            say(REFUSAL_MESSAGE)
-            say(f"Basis: {result.basis}")
-            _record(sink, user_id, question, result, None)
-            continue
-
-        say(render_candidates(result))
-        picked = None
-        while picked is None:
-            reply = ask("pick> ").strip()
-            if reply.lower() in ("n", "none"):
-                break
-            picked = parse_pick(reply, result.candidates)
+        for token in tokens:
+            result = resolve(token, run_kql)
+            if not result.candidates:
+                if len(tokens) > 1:
+                    say(f"For '{token}': nothing sufficiently related.")
+                _record(sink, user_id, question, result, None)
+                continue
+            any_candidates = True
+            header = f"For '{token}':" if len(tokens) > 1 else ""
+            say(render_candidates(result, header))
+            picked = None
+            while picked is None:
+                reply = ask("pick> ").strip()
+                if reply.lower() in ("n", "none"):
+                    break
+                picked = parse_pick(reply, result.candidates)
+                if picked is None:
+                    say("Reply with the item number or its exact name "
+                        "('n' for none).")
             if picked is None:
-                say("Reply with the item number or its exact name "
-                    "('n' for none).")
-        if picked is None:
-            say("Noted — none of these matched what you meant.")
-            _record(sink, user_id, question, result, None)
-            continue
+                say("Noted — none of these matched what you meant.")
+                _record(sink, user_id, question, result, None)
+                continue
+            candidate = result.candidates[picked]
+            _record(sink, user_id, question, result, candidate)
+            try:
+                fact_sets.append(assemble(candidate, run_kql))
+            except AssemblyError as e:
+                say(f"Could not assemble facts: {e}")
 
-        candidate = result.candidates[picked]
-        _record(sink, user_id, question, result, candidate)
-        try:
-            facts = assemble(candidate, run_kql)
-        except AssemblyError as e:
-            say(f"Could not assemble facts: {e}")
-            continue
-        say("\n" + narrate(facts, chat) + "\n")
+        if fact_sets:
+            say("\n" + narrate_many(fact_sets, question, chat) + "\n")
+        elif not any_candidates:
+            say(REFUSAL_MESSAGE)
 
 
 def _record(sink, user_id, question, result, candidate) -> None:

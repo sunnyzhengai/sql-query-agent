@@ -183,3 +183,40 @@ class TestRendering:
         text = render_candidates(result)
         assert "closeness 0.36" in text and "(weak match)" in text
         assert "Found 12 related item(s); showing 1" in text
+
+
+class TestCompareFlow:
+    """'Compare X and Y': two tokens -> two pick rounds -> one comparison."""
+
+    def run_kql(self, query, params):
+        from src.orchestrator.core import RESOLVE_QUERY
+        if query == RESOLVE_QUERY:
+            token = params["token"]
+            row = {
+                "node_id": f"canonical:m.{token}", "kind": "metric",
+                "ref": "reporting.USP_ED_Sepsis",
+                "name": f"USP_{token}", "business_name": token.title(),
+                "display_text": f"{token} (metric)",
+                "closeness": 0.5, "total_matches": 1,
+            }
+            return [row]
+        return fake_kql(query, params)
+
+    def test_two_tokens_two_picks_one_comparison(self, tmp_path):
+        from src.orchestrator.cli import chat_loop
+        sink = JsonlEventSink(tmp_path / "e.jsonl")
+        out = []
+        say = lambda *a: out.append(" ".join(str(x) for x in a))
+        def chat(system, user):
+            if "search phrase" in system:
+                return "alpha\nbeta"           # entry edge splits into 2
+            return "Alpha does X; Beta does Y."  # exit edge compares
+        it = iter(["compare alpha and beta", "1", "1", "q"])
+        chat_loop(chat, self.run_kql, sink, ask=lambda p="": next(it), say=say)
+        text = "\n".join(out)
+        assert "For 'alpha':" in text and "For 'beta':" in text
+        assert "Alpha does X; Beta does Y." in text
+        assert text.count("output_metric_logic[metric_id=") >= 1  # stamped basis
+        events = [json.loads(x) for x in
+                  (tmp_path / "e.jsonl").read_text().splitlines()]
+        assert len(events) == 2                  # one pick event per concept
