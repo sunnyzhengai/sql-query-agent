@@ -33,6 +33,56 @@ REFUSAL_MESSAGE = (
     "that. Try naming the metric, report, or business concept differently."
 )
 
+# Deterministic follow-up commands about the LAST answer (ADR 0032:
+# follow-ups are structural, not a new LLM decision). Matching: strip
+# filler words; the remainder must be exactly one command's keywords.
+_FILLER = {"show", "me", "its", "the", "their", "his", "her", "please",
+           "can", "you", "what", "is", "are", "give", "of", "this", "that",
+           "it", "who", "which", "does", "do", "for", "a", "an", "?"}
+DETAIL_COMMANDS = {
+    "sql": {"sql", "code", "query", "logic"},
+    "owner": {"owner", "owners", "steward", "developer", "owns"},
+    "tables": {"tables", "sources", "table"},
+    "link": {"link", "url", "report", "dashboard"},
+}
+
+
+def match_detail_command(question: str) -> "str | None":
+    words = [w.strip("?.,!").lower() for w in question.split()]
+    rest = {w for w in words if w and w not in _FILLER}
+    if not rest:
+        return None
+    for command, keywords in DETAIL_COMMANDS.items():
+        if rest <= keywords:
+            return command
+    return None
+
+
+def render_detail(command: str, fact_sets) -> str:
+    """Pure code — facts straight from the last assembly, no LLM."""
+    out = []
+    for fs in fact_sets:
+        f = fs.facts
+        label = (f.get("business_name") or f.get("metric_name")
+                 or f.get("step_name") or fs.ref)
+        if command == "sql":
+            sql = f.get("calculation_logic") or f.get("sql_fragment")
+            out.append(f"--- SQL for {label} ---\n{sql or '(no SQL recorded)'}")
+        elif command == "owner":
+            out.append(f"{label}: steward = "
+                       f"{f.get('steward') or '(none assigned)'}, developer = "
+                       f"{f.get('developer') or '(none assigned)'}")
+        elif command == "tables":
+            out.append(f"{label}: {f.get('source_tables') or '(not recorded)'}")
+        elif command == "link":
+            if f.get("report_name") and f.get("report_url"):
+                out.append(f"{label}: {f['report_name']} — {f['report_url']}")
+            else:
+                out.append(f"{label}: no report link recorded")
+    out.append(f"Basis: {'; '.join(fs.basis for fs in fact_sets)} (cached "
+               "from your last answer)")
+    return "\n".join(out)
+
 
 def render_candidates(result: ResolutionResult, header: str = "") -> str:
     lines = []
@@ -83,6 +133,7 @@ def chat_loop(chat, run_kql, sink, user_id: str = "local-dev",
               ask=input, say=print) -> None:
     say("AIVIA — ask about your certified metrics ('q' to quit)\n")
     pending = None
+    last_fact_sets = []
     while True:
         if pending is not None:
             question, pending = pending, None
@@ -91,6 +142,15 @@ def chat_loop(chat, run_kql, sink, user_id: str = "local-dev",
         if question.lower() in ("q", "quit", "exit"):
             return
         if not question:
+            continue
+
+        command = match_detail_command(question)
+        if command:
+            if last_fact_sets:
+                say("\n" + render_detail(command, last_fact_sets) + "\n")
+            else:
+                say("Ask about a metric first — then I can show its "
+                    f"{command}.")
             continue
 
         tokens = produce_search_tokens(question, chat)
@@ -128,6 +188,7 @@ def chat_loop(chat, run_kql, sink, user_id: str = "local-dev",
             continue
 
         if fact_sets:
+            last_fact_sets = fact_sets
             say("\n" + narrate_many(fact_sets, question, chat) + "\n")
             pending = _confirm(ask, say, sink, user_id, question, fact_sets)
         elif not any_candidates:

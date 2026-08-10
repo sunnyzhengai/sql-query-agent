@@ -22,8 +22,10 @@ NARRATE_SYSTEM = (
     "recorded — do not invent it.\n"
     "4. Never output personal names from inside SQL text, medical record "
     "numbers, or patient identifiers; use generic labels.\n"
-    "5. When report_name and report_url are present, end with: "
-    "Used in: <report_name> (<report_url>). Never fabricate a link.\n"
+    "5. ONLY if BOTH report_name AND report_url appear in the facts, end "
+    "with: Used in: <report_name> (<report_url>). If either is absent, "
+    "write NO Used-in line at all — never substitute the business name "
+    "or write placeholders like (not recorded).\n"
     "6. No greetings, no confidence claims, no percentages of certainty."
 )
 

@@ -84,7 +84,7 @@ class TestNarrate:
         assert out.endswith(f"Basis: {fs.basis}")       # stamped by code
         assert "ED Sepsis Screening" in seen["user"]     # facts in prompt
         assert "steward" not in seen["user"]             # nulls omitted
-        assert "Never fabricate a link" in seen["system"]
+        assert "never substitute the business name" in seen["system"]
 
 
 class TestEvents:
@@ -317,3 +317,59 @@ class TestConfirmation:
             tmp_path, ["q1", "1", "something entirely new", "1", "", "q"])
         assert "(Taking that as a new question.)" in text
         assert len(events) == 2                       # two picks, no verdicts
+
+
+class TestFollowUpDetail:
+    """Sunny's live case (2026-08-09): 'show me its sql' after an answer
+    must show THAT answer's SQL — never re-resolve into weak ODBC steps."""
+
+    def run_kql(self, query, params):
+        from src.orchestrator.core import RESOLVE_QUERY
+        if query == RESOLVE_QUERY:
+            assert params["token"] != "sql", "follow-up leaked into resolution"
+            return [{
+                "node_id": "canonical:reporting.USP_ED_Sepsis",
+                "kind": "metric", "ref": "reporting.USP_ED_Sepsis",
+                "name": "USP_ED_Sepsis", "business_name": "ED Sepsis Screening",
+                "display_text": "d", "closeness": 0.44, "total_matches": 1,
+            }]
+        return fake_kql(query, params)
+
+    def drive(self, tmp_path, replies):
+        from src.orchestrator.cli import chat_loop
+        sink = JsonlEventSink(tmp_path / "e.jsonl")
+        out = []
+        say = lambda *a: out.append(" ".join(str(x) for x in a))
+        chat = lambda s, u: ("topic" if "search phrase" in s else "Prose.")
+        it = iter(replies)
+        chat_loop(chat, self.run_kql, sink, ask=lambda p="": next(it), say=say)
+        return "\n".join(out)
+
+    def test_show_me_its_sql_uses_last_answer(self, tmp_path):
+        text = self.drive(tmp_path,
+                          ["how is ed screening done?", "1", "",
+                           "show me its sql", "q"])
+        assert "--- SQL for ED Sepsis Screening ---" in text
+        assert "-- Base_Pop SELECT ..." in text          # the actual SQL
+        assert "(cached from your last answer)" in text  # basis honesty
+        assert "weak match" not in text                  # never re-resolved
+
+    def test_owner_and_tables_and_link_commands(self, tmp_path):
+        text = self.drive(tmp_path,
+                          ["how is ed screening done?", "1", "",
+                           "who owns it?", "tables?", "show the link", "q"])
+        assert "steward = (none assigned)" in text
+        assert "A, B" in text                            # source tables
+        assert "ED Dashboard — https://r/1" in text
+
+    def test_detail_before_any_answer_prompts_kindly(self, tmp_path):
+        text = self.drive(tmp_path, ["show me its sql", "q"])
+        assert "Ask about a metric first" in text
+
+    def test_real_questions_with_command_words_still_resolve(self, tmp_path):
+        # "which metrics read from sql server tables" is NOT a detail command
+        from src.orchestrator.cli import match_detail_command
+        assert match_detail_command("which metrics read from sql server tables") is None
+        assert match_detail_command("show me its sql") == "sql"
+        assert match_detail_command("who owns it?") == "owner"
+        assert match_detail_command("link?") == "link"
