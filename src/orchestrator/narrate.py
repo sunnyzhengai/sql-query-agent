@@ -8,9 +8,24 @@ templates.
 
 from __future__ import annotations
 
+import re
 from typing import Callable
 
 from src.orchestrator.assemble import FactSet
+
+# Mechanical enforcement of rule 5 (live defiance twice, 2026-08-10:
+# "Used in: <name> (not recorded)" kept appearing after two prompt
+# rewordings). The rule stays in the prompt; the code stops trusting
+# it: an unfounded Used-in line is stripped before anyone sees it.
+_USED_IN_LINE = re.compile(r"^[ \t]*Used in:.*$", re.MULTILINE)
+
+
+def _enforce_used_in(prose: str, fact_dicts: "list[dict]") -> str:
+    grounded = any(f.get("report_name") and f.get("report_url")
+                   for f in fact_dicts)
+    if grounded:
+        return prose
+    return _USED_IN_LINE.sub("", prose).rstrip()
 
 NARRATE_SYSTEM = (
     "You write clear business prose from the provided facts — nothing "
@@ -44,6 +59,7 @@ def narrate(fact_set: FactSet, chat: "Callable[[str, str], str]") -> str:
         f"Facts about this {fact_set.kind}:\n{facts_block(fact_set)}\n\n"
         "Write the explanation a business user needs.",
     ).strip()
+    prose = _enforce_used_in(prose, [fact_set.facts])
     return f"{prose}\n\nBasis: {fact_set.basis}"
 
 
@@ -59,6 +75,7 @@ def narrate_question(
         f"{facts_block(fact_set)}\n\n"
         "Answer their question using ONLY these facts.",
     ).strip()
+    prose = _enforce_used_in(prose, [fact_set.facts])
     return f"{prose}\n\nBasis: {fact_set.basis}"
 
 
@@ -82,5 +99,6 @@ def narrate_many(
         "\n\nAnswer their question using ONLY these facts. If they asked "
         "for a comparison, compare the items point by point.",
     ).strip()
+    prose = _enforce_used_in(prose, [fs.facts for fs in fact_sets])
     basis = "; ".join(fs.basis for fs in fact_sets)
     return f"{prose}\n\nBasis: {basis}"

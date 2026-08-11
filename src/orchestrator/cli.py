@@ -341,8 +341,8 @@ def _compare_flow(intent, question, chat, run_kql, sink, user_id,
         fake = ResolutionResult(token=prompt_label, candidates=candidates,
                                 total_matches=len(candidates), basis="")
         say(render_candidates(fake))
-        picked = _ask_pick(ask, say, fake)   # _NewQuestion propagates
-        return picked if picked is not None else 0
+        return _ask_pick(ask, say, fake)   # None = skip the zoom;
+                                           # _NewQuestion propagates
 
     try:
         return build_comparison(refs[0], refs[1], run_kql,

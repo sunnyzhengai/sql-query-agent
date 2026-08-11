@@ -58,6 +58,17 @@ BATCH_FRAGMENTS_QUERY = (
 
 MAX_SHARED_STEP_CHECKS = 20   # fragment fetches are 2 per shared name
 
+# Aspect-zoom policy (live find 2026-08-10: the chooser dumped a proc's
+# ENTIRE 32-step inventory on the user — the system delegating its
+# hardest question to the person who asked it). Deterministic ladder:
+# nothing clears the floor -> say the concept doesn't map cleanly and
+# answer from the full panel; one clear match -> auto-bind; a few
+# contenders -> ask, showing at most 5, with 'n' meaning skip the zoom.
+# Floor calibrated from live data: exact-name concepts score ~0.71,
+# vague concepts top out ~0.56.
+ASPECT_CHOICES_SHOWN = 5
+ASPECT_MATCH_FLOOR = 0.60
+
 # Aspects that are schema FIELDS need no resolution — the panel already
 # computes them; the narrate edge just answers from the facts.
 _FIELD_ASPECTS = {
@@ -210,9 +221,12 @@ def _aspect_panel(facts, aspect, ref_a, ref_b, label_a, label_b,
 
     matched = {}
     for ref, label in ((ref_a, label_a), (ref_b, label_b)):
-        side = per_side[ref]
-        if not side:
-            facts[f"'{aspect}' in {label}"] = "no step matches this concept"
+        side = per_side[ref][:ASPECT_CHOICES_SHOWN]
+        if not side or float(side[0]["closeness"]) < ASPECT_MATCH_FLOOR:
+            best = f" (best closeness {side[0]['closeness']:.2f})" if side else ""
+            facts[f"'{aspect}' in {label}"] = (
+                "no step clearly matches this concept"
+                f"{best} — see the shared-step comparison instead")
             continue
         idx = 0
         if len(side) > 1 and choose is not None:
@@ -224,7 +238,13 @@ def _aspect_panel(facts, aspect, ref_a, ref_b, label_a, label_b,
                           closeness=float(r["closeness"]),
                           total_matches=len(side))
                 for r in side)
-            idx = choose(f"Which step in {label} is '{aspect}'?", candidates)
+            idx = choose(f"Which step in {label} is '{aspect}'? "
+                         "('n' = skip, answer from the full comparison)",
+                         candidates)
+            if idx is None:
+                facts[f"'{aspect}' in {label}"] = (
+                    "zoom skipped — answered from the full comparison")
+                continue
         matched[ref] = side[idx]
         facts[f"'{aspect}' in {label}"] = side[idx]["name"]
 

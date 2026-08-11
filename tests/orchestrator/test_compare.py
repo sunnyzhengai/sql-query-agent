@@ -103,10 +103,10 @@ class TestPanel:
         scoped = [
             {"node_id": f"transform:{REF_A}:Labs", "kind": "step",
              "ref": REF_A, "name": "Labs", "business_name": "",
-             "display_text": "d", "closeness": 0.6},
+             "display_text": "d", "closeness": 0.72},
             {"node_id": f"transform:{REF_B}:Labs", "kind": "step",
              "ref": REF_B, "name": "Labs", "business_name": "",
-             "display_text": "d", "closeness": 0.58},
+             "display_text": "d", "closeness": 0.70},
         ]
         fs = build_comparison(REF_A, REF_B, panel_kql(scoped),
                               chosen_aspect="lab criteria")
@@ -118,20 +118,20 @@ class TestPanel:
     def test_concept_aspect_no_match_is_honest(self):
         fs = build_comparison(REF_A, REF_B, panel_kql(scoped_rows=[]),
                               chosen_aspect="unicorn logic")
-        assert (fs.facts["'unicorn logic' in ED Sepsis Screening"]
-                == "no step matches this concept")
+        assert ("no step clearly matches"
+                in fs.facts["'unicorn logic' in ED Sepsis Screening"])
 
     def test_ambiguous_concept_invokes_choose(self):
         scoped = [
             {"node_id": f"transform:{REF_A}:Labs", "kind": "step",
              "ref": REF_A, "name": "Labs", "business_name": "",
-             "display_text": "d", "closeness": 0.6},
+             "display_text": "d", "closeness": 0.70},
             {"node_id": f"transform:{REF_A}:Cultures", "kind": "step",
              "ref": REF_A, "name": "Cultures", "business_name": "",
-             "display_text": "d", "closeness": 0.55},
+             "display_text": "d", "closeness": 0.65},
             {"node_id": f"transform:{REF_B}:Labs", "kind": "step",
              "ref": REF_B, "name": "Labs", "business_name": "",
-             "display_text": "d", "closeness": 0.5},
+             "display_text": "d", "closeness": 0.68},
         ]
         calls = []
         def choose(label, candidates):
@@ -142,6 +142,41 @@ class TestPanel:
         assert len(calls) == 1            # only side A was ambiguous
         assert calls[0][1] == ["Labs", "Cultures"]
         assert fs.facts["'micro' in ED Sepsis Screening"] == "Cultures"
+
+    def test_weak_concept_skips_the_quiz_entirely(self):
+        # Live find (2026-08-10): 'sepsis definition' matched nothing
+        # above the floor, and the chooser dumped 32 steps on the user.
+        # Below the floor: no choose call, honest note, panel answers.
+        scoped = [
+            {"node_id": f"transform:{REF_A}:S{i}", "kind": "step",
+             "ref": REF_A, "name": f"S{i}", "business_name": "",
+             "display_text": "d", "closeness": 0.56 - i / 100}
+            for i in range(30)
+        ]
+        calls = []
+        fs = build_comparison(
+            REF_A, REF_B, panel_kql(scoped), chosen_aspect="sepsis definition",
+            choose=lambda label, cands: calls.append(1) or 0)
+        assert not calls                  # the user was never quizzed
+        note = fs.facts["'sepsis definition' in ED Sepsis Screening"]
+        assert "no step clearly matches" in note
+        assert "0.56" in note             # honest about how weak it was
+
+    def test_choices_capped_at_five(self):
+        scoped = [
+            {"node_id": f"transform:{REF_A}:S{i}", "kind": "step",
+             "ref": REF_A, "name": f"S{i}", "business_name": "",
+             "display_text": "d", "closeness": 0.75 - i / 100}
+            for i in range(12)
+        ]
+        seen = {}
+        def choose(label, candidates):
+            seen["n"] = len(candidates)
+            return None                   # 'n' = skip the zoom
+        fs = build_comparison(REF_A, REF_B, panel_kql(scoped),
+                              chosen_aspect="micro", choose=choose)
+        assert seen["n"] == 5             # never the whole inventory
+        assert "zoom skipped" in fs.facts["'micro' in ED Sepsis Screening"]
 
     def test_field_aspect_needs_no_resolution(self):
         assert is_field_aspect("developer")

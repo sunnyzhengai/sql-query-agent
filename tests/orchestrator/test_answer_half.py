@@ -8,6 +8,7 @@ from src.orchestrator.assemble import (
     METRIC_FACTS_QUERY,
     NODE_FACTS_QUERY,
     AssemblyError,
+    FactSet,
     assemble,
 )
 from src.orchestrator.cli import chat_loop, render_candidates
@@ -85,6 +86,28 @@ class TestNarrate:
         assert "ED Sepsis Screening" in seen["user"]     # facts in prompt
         assert "steward" not in seen["user"]             # nulls omitted
         assert "never substitute the business name" in seen["system"]
+
+    def test_unfounded_used_in_line_is_stripped_by_code(self):
+        # Rule 5 was defied live TWICE after prompt rewordings — the
+        # code now enforces it: no report facts, no Used-in line.
+        fs = assemble(cand("step", NODE_ROW["node_id"],
+                           "reporting.USP_ED_Sepsis"), fake_kql)
+        no_report = FactSet(kind="metric", ref="x",
+                            facts={k: v for k, v in fs.facts.items()
+                                   if not k.startswith("report_")},
+                            basis="b")
+        chat = lambda s, u: ("It measures X.\n\n"
+                             "Used in: USP_ED_Sepsis (not recorded).")
+        out = narrate(no_report, chat)
+        assert "Used in" not in out
+        assert out.startswith("It measures X.")
+
+    def test_grounded_used_in_line_survives(self):
+        fs = assemble(cand("metric", "canonical:reporting.USP_ED_Sepsis",
+                           "reporting.USP_ED_Sepsis"), fake_kql)
+        chat = lambda s, u: ("Prose.\n\nUsed in: ED Dashboard (https://r/1)")
+        out = narrate(fs, chat)
+        assert "Used in: ED Dashboard" in out
 
     def test_rule5_wording_cannot_leak_as_output(self):
         # Live regression (2026-08-10): "write NO Used-in line" was pasted
