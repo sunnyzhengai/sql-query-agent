@@ -85,20 +85,96 @@ class InMemoryStore:
         self._rows[record["subscription_id"]] = dict(record)
 
 
+class JsonFileSubscriptionStore:
+    """Durable single-file store — right-sized for one App Service
+    instance at listing-launch volume (a handful of subscriptions).
+    Azure Table Storage swaps in behind the same two methods when
+    volume ever justifies it."""
+
+    def __init__(self, path) -> None:
+        import pathlib
+        self.path = pathlib.Path(path)
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+
+    def _load(self) -> dict:
+        import json
+        if not self.path.exists():
+            return {}
+        return json.loads(self.path.read_text() or "{}")
+
+    def get(self, subscription_id: str) -> "dict | None":
+        return self._load().get(subscription_id)
+
+    def save(self, record: dict) -> None:
+        import json
+        rows = self._load()
+        rows[record["subscription_id"]] = dict(record)
+        self.path.write_text(json.dumps(rows, indent=1))
+
+
+def entra_token_provider(tenant_id: str, client_id: str,
+                         client_secret: str):
+    """Client-credentials token for the Fulfillment API scope, cached
+    until 5 minutes before expiry (T2 implementation, 2026-08-11)."""
+    import time
+
+    cache = {"token": "", "expires": 0.0}
+
+    def provider() -> str:
+        if time.time() < cache["expires"] - 300:
+            return cache["token"]
+        r = requests.post(
+            f"https://login.microsoftonline.com/{tenant_id}/oauth2/v2.0/token",
+            data={
+                "grant_type": "client_credentials",
+                "client_id": client_id,
+                "client_secret": client_secret,
+                "scope": f"{MARKETPLACE_RESOURCE}/.default",
+            },
+            timeout=30,
+        )
+        r.raise_for_status()
+        body = r.json()
+        cache["token"] = body["access_token"]
+        cache["expires"] = time.time() + int(body.get("expires_in", 3600))
+        return cache["token"]
+
+    return provider
+
+
+def entra_webhook_verifier(tenant_id: str):
+    """Webhook JWT verification against Entra's JWKS (T2, 2026-08-11):
+    signature + expiry here; claim checks (aud/tid) stay in
+    validate_webhook_claims so tests cover them without crypto.
+    Returns decoded claims, or None on any verification failure."""
+    import jwt
+    from jwt import PyJWKClient
+
+    jwks = PyJWKClient(
+        f"https://login.microsoftonline.com/{tenant_id}/discovery/v2.0/keys")
+
+    def verify(token: str) -> "dict | None":
+        try:
+            key = jwks.get_signing_key_from_jwt(token)
+            return jwt.decode(
+                token, key.key, algorithms=["RS256"],
+                options={"verify_aud": False},  # aud checked by claims layer
+            )
+        except Exception:                        # noqa: BLE001
+            return None
+
+    return verify
+
+
 def build_dependencies(config: HostConfig):
-    """Deploy-time wiring. Token provider + JWKS verifier are stubs that
-    fail loudly until phase T2 fills them in — never silently insecure."""
+    """Deploy-time wiring (dev flavor): in-memory store + loud-failing
+    token provider. Production wiring lives in src.webapp.main, which
+    supplies entra_token_provider / entra_webhook_verifier /
+    JsonFileSubscriptionStore from env config."""
 
     def token_provider() -> str:
         raise NotImplementedError(
-            "Phase T2: client-credentials token for scope "
-            f"{MARKETPLACE_RESOURCE}/.default (MSAL confidential client)"
-        )
+            "supply entra_token_provider(tenant, client_id, secret)")
 
-    def verify_token(token: str) -> "dict | None":
-        raise NotImplementedError(
-            "Phase T2: validate signature against Entra JWKS "
-            f"(tenant {config.publisher_tenant_id}) before decoding claims"
-        )
-
-    return InMemoryStore(), HttpMarketplaceClient(token_provider), verify_token
+    return InMemoryStore(), HttpMarketplaceClient(token_provider), \
+        entra_webhook_verifier(config.publisher_tenant_id)
