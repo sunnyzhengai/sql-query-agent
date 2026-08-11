@@ -362,26 +362,45 @@ class TestScorecardFixtures:
         assert "searching instead" in text
         assert "Nothing in the certified knowledge base" in text
 
-    def test_unbindable_subject_falls_to_resolution_pick(self, tmp_path):
-        # the LLM names a subject loosely -> resolve + human pick binds it
+    def resolve_kql(self, candidates_rows):
+        def run_kql(query, params):
+            from src.orchestrator.core import RESOLVE_QUERY
+            if query == RESOLVE_QUERY:
+                return candidates_rows
+            return panel_kql()(query, params)
+        return run_kql
+
+    ED_ROW = {
+        "node_id": f"canonical:{REF_A}", "kind": "metric",
+        "ref": REF_A, "name": "USP_ED_Sepsis",
+        "business_name": "ED Sepsis Screening",
+        "display_text": "d", "closeness": 0.6, "total_matches": 1,
+    }
+
+    def test_exact_business_name_auto_binds_no_menu(self, tmp_path):
+        # Live find (2026-08-10): typing the exact business name still
+        # produced a pick menu. Exact name IS the pick (parse_pick rule).
         def chat(system, user):
             if "typed request" in system:
                 return f"COMPARE: ed sepsis screening | {REF_B}"
             return "Narrated."
-        def run_kql(query, params):
-            from src.orchestrator.core import RESOLVE_QUERY
-            if query == RESOLVE_QUERY:
-                return [{
-                    "node_id": f"canonical:{REF_A}", "kind": "metric",
-                    "ref": REF_A, "name": "USP_ED_Sepsis",
-                    "business_name": "ED Sepsis Screening",
-                    "display_text": "d", "closeness": 0.6,
-                    "total_matches": 1,
-                }]
-            return panel_kql()(query, params)
         text, events = self.drive(
-            ["compare ed sepsis screening to the regulatory one", "1", "q"],
-            chat, run_kql, tmp_path)
-        assert "Pick a number" in text           # binding went through pick
+            ["does ED Sepsis Screening use the same definition as the "
+             "regulatory one?", "q"],
+            chat, self.resolve_kql([self.ED_ROW]), tmp_path)
+        assert "Pick a number" not in text       # no menu for exact names
+        assert "matched exactly" in text
+        assert "Narrated." in text
+        assert events[0]["picked_ref"] == REF_A  # auto-bind still recorded
+
+    def test_fuzzy_subject_falls_to_resolution_pick(self, tmp_path):
+        def chat(system, user):
+            if "typed request" in system:
+                return f"COMPARE: the ed screening one | {REF_B}"
+            return "Narrated."
+        text, events = self.drive(
+            ["compare the ed screening one to the regulatory one", "1", "q"],
+            chat, self.resolve_kql([self.ED_ROW]), tmp_path)
+        assert "To compare, confirm which item is" in text
         assert "Narrated." in text
         assert events[0]["picked_ref"] == REF_A  # the bind was recorded

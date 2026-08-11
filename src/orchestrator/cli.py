@@ -185,8 +185,12 @@ _REF_IN_PARENS = re.compile(r"\(([^()]+)\)\s*$")
 def _bind_subject(subject: str, run_kql, ask, say, sink, user_id, question):
     """Turn a compare subject into a metric ref. Order: the id the LLM
     copied from context ('Label (metric ref)'), then the text as an
-    exact ref, then ordinary resolution with a human pick. Returns a
-    ref or None (nothing matched / user declined)."""
+    exact ref, then resolution — where an EXACT (case-folded) name or
+    business-name match auto-binds (typing the exact name IS the pick,
+    same structural rule as parse_pick; live find 2026-08-10: exact
+    business names were still quizzed through menus). A menu appears
+    only for genuinely fuzzy subjects. Returns a ref or None."""
+    from src.graph.templates import _fold
     text = subject.strip()
     m = _REF_IN_PARENS.search(text)
     if m:
@@ -201,7 +205,18 @@ def _bind_subject(subject: str, run_kql, ask, say, sink, user_id, question):
     if not result.candidates:
         say(f"For '{text}': nothing sufficiently related.")
         return None
-    say(render_candidates(result, f"For '{text}':"))
+    folded = _fold(text)
+    exact = [i for i, c in enumerate(result.candidates)
+             if folded in (_fold(c.name), _fold(c.business_name))]
+    if len(exact) == 1:
+        candidate = result.candidates[exact[0]]
+        say(f"('{text}' matched exactly: "
+            f"{candidate.business_name or candidate.name} "
+            f"[{candidate.ref}])")
+        _record(sink, user_id, question, result, candidate)
+        return candidate.ref
+    say(render_candidates(result, f"To compare, confirm which item is "
+                                  f"'{text}':"))
     picked = _ask_pick(ask, say, result)   # _NewQuestion propagates
     if picked is None:
         _record(sink, user_id, question, result, None)
