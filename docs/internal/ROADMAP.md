@@ -34,6 +34,15 @@ Cite these from other documents by reference — do not copy values.
 
 Both components live in a single repo (`sql-query-agent`) and ship as one `.whl` package.
 
+**Source connectors + change monitoring (2026-08-11):** full
+configuration research and the modular connector plan live in
+docs/architecture/SOURCE_CONNECTORS.md — one SourceConnector protocol
+feeding input_sql_sources; build order files → fabric_sql →
+tmdl_native_query (M-embedded SQL) → azure_sql → on-prem extractor
+script; change monitoring = collect + content-hash diff (ADR 0022) with
+three triggers (scheduled sweep as default, CI/CD hook, ETL post-hook)
+and drifted objects flipping metrics to "changed since certification".
+
 ## Data Source Tiers (validated by coworker feedback 2026-07-21)
 
 | Tier | Data Source | Parser | Market |
