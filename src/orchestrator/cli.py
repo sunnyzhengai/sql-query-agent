@@ -100,15 +100,26 @@ def render_detail(command: str, fact_sets) -> str:
     return "\n".join(out)
 
 
+_GROUP_LABELS = {"metric": "Metrics:", "step": "Calculation steps:"}
+
+
 def render_candidates(result: ResolutionResult, header: str = "") -> str:
+    """Stratified display: the closest metrics, then the closest steps —
+    continuous numbering so picks stay simple. The honest signal is the
+    closeness column; the floor count is context, not a relevance claim."""
     lines = []
     if header:
         lines.append(header)
     lines.append(
-        f"Found {result.total_matches} related item(s); showing "
-        f"{len(result.candidates)}:"
+        f"Closest matches ({result.total_matches} item(s) cleared the "
+        "similarity floor):"
     )
+    current_kind = None
     for i, c in enumerate(result.candidates, 1):
+        if c.kind != current_kind:
+            current_kind = c.kind
+            lines.append(
+                _GROUP_LABELS.get(c.kind, f"{c.kind.title()}s:"))
         weak = "  (weak match)" if c.closeness < WEAK_CLOSENESS else ""
         label = c.business_name or c.name
         lines.append(

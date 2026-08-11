@@ -77,10 +77,23 @@ DUPLICATE_LIST_OVERLAP = 0.5
 
 # The ONE fixed command. The token is the only variable — parameterized
 # via Kusto's declare statement so user text is data, never query syntax.
+# Fetches a wide slice (100) so stratification below has material.
 RESOLVE_QUERY = (
     "declare query_parameters(token:string);\n"
-    "semantic_search(token)"
+    "semantic_search(token, 100)"
 )
+
+# Stratified plurality (live find 2026-08-10): steps outnumber metrics
+# 413:28 and sibling steps cluster in embedding space, so a flat top-10
+# buried every metric but one under a single proc's branch steps
+# ("ED2GEN, ED2ICU, IV, ETT..." while ED Sepsis (Regulatory) went
+# unshown). The candidate list is the ROADMAP Phase A full plurality:
+# the closest METRICS and the closest STEPS as labeled groups, with a
+# per-proc cap inside the step group for diversity. Pure code —
+# closeness order within groups, node_id ties, replayable.
+METRICS_SHOWN = 5
+STEPS_SHOWN = 5
+STEPS_PER_PROC = 2
 
 
 @dataclass(frozen=True)
@@ -174,6 +187,21 @@ def resolve(
     (config), ranking is the vector math, ties break on node_id.
     """
     rows = run_kql(RESOLVE_QUERY, {"token": token})
+    ordered = sorted(rows, key=lambda r: (-float(r["closeness"]), r["node_id"]))
+
+    metrics = [r for r in ordered if r["kind"] == "metric"][:METRICS_SHOWN]
+    steps, per_proc = [], {}
+    for r in ordered:
+        if r["kind"] != "step":
+            continue
+        if per_proc.get(r["ref"], 0) >= STEPS_PER_PROC:
+            continue
+        per_proc[r["ref"]] = per_proc.get(r["ref"], 0) + 1
+        steps.append(r)
+        if len(steps) >= STEPS_SHOWN:
+            break
+    other = [r for r in ordered if r["kind"] not in ("metric", "step")]
+
     candidates = tuple(
         Candidate(
             node_id=r["node_id"],
@@ -185,14 +213,12 @@ def resolve(
             closeness=float(r["closeness"]),
             total_matches=int(r["total_matches"]),
         )
-        for r in sorted(
-            rows, key=lambda r: (-float(r["closeness"]), r["node_id"])
-        )
+        for r in metrics + steps + other[:2]
     )
-    total = candidates[0].total_matches if candidates else 0
+    total = int(ordered[0]["total_matches"]) if ordered else 0
     basis = (
-        f"semantic_search({token!r}) -> {total} above threshold, "
-        f"showing {len(candidates)}"
+        f"semantic_search({token!r}) -> {total} above threshold; "
+        f"showing {len(metrics)} metric(s) + {len(steps)} step(s)"
     )
     return ResolutionResult(
         token=token, candidates=candidates, total_matches=total, basis=basis

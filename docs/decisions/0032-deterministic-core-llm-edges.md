@@ -118,3 +118,24 @@ presented, and usage ranks it over time (ADR 0021/0024).
 - Readiness gate (hard rule, 2026-08-09) sequences everything:
   answer contracts → instruction diet → robustness suite pass →
   demo (with deliberate on-camera deviation) → listing.
+
+## Amendment: stratified plurality (2026-08-10)
+
+Live find: steps outnumber metrics 413:28 and sibling steps cluster in
+embedding space, so the flat closeness-ranked top-10 buried every
+metric but one under a single proc's branch steps — "how is ED sepsis
+screening calculated" showed ED2GEN/ED2ICU/IV/ETT while ED Sepsis
+(Regulatory), the second-most-relevant item in the catalog, went
+unshown. Irrelevant shown + relevant hidden = a retrieval-policy
+defect, not a display nit (Sunny's call).
+
+Ranking policy amended: resolve() fetches a wide slice (top 100, still
+the one fixed command) and STRATIFIES by kind in pure code — the
+closest metrics (≤5) and the closest steps (≤5, max 2 per proc for
+diversity), rendered as labeled groups with continuous numbering.
+Closeness order within groups, node_id ties, replay property intact.
+This enforces the ROADMAP Phase A "full plurality" contract at the
+list level. The "Found N related items" headline is retired — at a
+0.35 cosine floor over a same-domain corpus nearly everything clears
+(434/441), so the floor count is context, never a relevance claim;
+the honest signal is the closeness column.

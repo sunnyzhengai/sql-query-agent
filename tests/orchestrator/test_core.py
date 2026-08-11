@@ -68,8 +68,29 @@ class TestCore:
         assert "3 above threshold" in result.basis
 
 
+class TestStratification:
+    def test_metrics_group_before_steps_despite_closeness(self):
+        # stratified plurality: the step outscores both metrics (0.51)
+        # but the metric group leads; order within groups is closeness
+        c = resolve("t", lambda q, p: SAMPLE).candidates
+        assert [x.kind for x in c] == ["metric", "metric", "step"]
+        assert c[0].business_name == "ED Screening"     # 0.44 > 0.40
+
+    def test_per_proc_cap_frees_slots_for_other_procs(self):
+        flood = rows(*[
+            (f"transform:a.M1:S{i}", "step", "a.M1", f"S{i}", "",
+             0.60 - i / 100, 9)
+            for i in range(6)
+        ], ("transform:b.M2:Other", "step", "b.M2", "Other", "", 0.40, 9))
+        c = resolve("t", lambda q, p: flood).candidates
+        step_refs = [x.ref for x in c if x.kind == "step"]
+        assert step_refs.count("a.M1") == 2             # capped
+        assert "b.M2" in step_refs                      # diversity slot
+
+
 class TestStructuralPick:
     def cands(self):
+        # stratified order: metrics first, then steps
         return resolve("t", lambda q, p: SAMPLE).candidates
 
     def test_number_pick(self):
@@ -79,10 +100,10 @@ class TestStructuralPick:
         assert parse_pick("9", self.cands()) is None
 
     def test_exact_business_name_case_folded(self):
-        assert parse_pick("ed screening", self.cands()) == 1
+        assert parse_pick("ed screening", self.cands()) == 0
 
     def test_exact_ref_pick(self):
-        assert parse_pick("b.M2", self.cands()) == 2
+        assert parse_pick("b.M2", self.cands()) == 1
 
     def test_fuzzy_reply_rejected_not_guessed(self):
         assert parse_pick("the readmit one", self.cands()) is None

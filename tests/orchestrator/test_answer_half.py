@@ -190,7 +190,8 @@ class TestRendering:
         result = resolve("t", lambda q, p: rows)
         text = render_candidates(result)
         assert "closeness 0.36" in text and "(weak match)" in text
-        assert "Found 12 related item(s); showing 1" in text
+        assert "12 item(s) cleared the similarity floor" in text
+        assert "Calculation steps:" in text          # stratified group label
 
 
 class TestCompareFlow:
