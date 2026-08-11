@@ -44,3 +44,4 @@ never deleted — its status changes and it links to its replacement.
 | [0031](0031-business-terms-weighted-plurality.md) | Business terms: a weighted plurality, citizen-endorsed, steward-arbitrated | Accepted |
 | [0032](0032-deterministic-core-llm-edges.md) | Deterministic Core, LLM Edges — the LLM translates, the data answers, the human decides | Accepted |
 | [0033](0033-system-of-record-plus-projections.md) | System of record + projections: Delta is the record; graph engines are read models | Accepted |
+| [0034](0034-conversational-entry-edge.md) | The conversational entry edge: language to the LLM, computation to code | Accepted |

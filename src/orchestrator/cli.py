@@ -1,11 +1,10 @@
 """AIVIA chat — surface v1 (terminal REPL).
 
-The full ADR 0032 loop, human-visible:
-
-    question -> token -> candidates (ALL shown, ranked, closeness
-    visible, weak matches labeled) -> the human picks (number or exact
-    name; 'n' declines) -> fixed assembly -> narration + code-stamped
-    Basis -> pick captured to the flywheel sink.
+The ADR 0032/0034 loop, human-visible: the conversational entry edge
+routes every question to ONE typed call from the closed verb menu
+(search / detail / variants / compare / unsupported); the deterministic
+engine executes fixed lookups and computations; the narrate edge turns
+computed facts into prose; the human picks whenever candidates exist.
 
 No bypass: one candidate is presented exactly like ten. Run:
 
@@ -18,6 +17,7 @@ import re
 from datetime import datetime, timezone
 
 from src.orchestrator.assemble import AssemblyError, assemble
+from src.orchestrator.compare import build_comparison
 from src.orchestrator.core import (
     ResolutionResult,
     duplicate_list,
@@ -48,29 +48,26 @@ REFUSAL_MESSAGE = (
     "that. Try naming the metric, report, or business concept differently."
 )
 
-# Deterministic follow-up commands about the LAST answer (ADR 0032:
-# follow-ups are structural, not a new LLM decision). Matching: strip
-# filler words; the remainder must be exactly one command's keywords.
-_FILLER = {"show", "me", "its", "the", "their", "his", "her", "please",
-           "can", "you", "what", "is", "are", "give", "of", "this", "that",
-           "it", "who", "which", "does", "do", "for", "a", "an", "?"}
-DETAIL_COMMANDS = {
-    "sql": {"sql", "code", "query", "logic"},
-    "owner": {"owner", "owners", "steward", "developer", "owns"},
-    "tables": {"tables", "sources", "table"},
-    "link": {"link", "url", "report", "dashboard"},
+# Verb-gap refusals (scorecard amendment 4): honest, named, logged —
+# never a degraded pick list into the wrong question. Fact-gap routing
+# (amendment 5) lives in the wording where the fact's canonical home is
+# known.
+UNSUPPORTED_MESSAGES = {
+    "lineage": (
+        "Lineage questions (what feeds a table, what is downstream of "
+        "it) aren't supported yet. I can explain any specific metric, "
+        "compare two, or check whether a named step's definitions agree."),
+    "enumerate": (
+        "Listing everything that matches a filter isn't supported yet. "
+        "I can answer about a specific metric or step if you name one."),
+    "usage": (
+        "Usage questions (who uses what, how often) aren't supported "
+        "yet. I can tell you a metric's steward and developer."),
+    "data-values": (
+        "I answer questions about how metrics are DEFINED — never about "
+        "actual patient or row-level data. For data values, run the "
+        "certified report itself."),
 }
-
-
-def match_detail_command(question: str) -> "str | None":
-    words = [w.strip("?.,!").lower() for w in question.split()]
-    rest = {w for w in words if w and w not in _FILLER}
-    if not rest:
-        return None
-    for command, keywords in DETAIL_COMMANDS.items():
-        if rest <= keywords:
-            return command
-    return None
 
 
 def render_detail(command: str, fact_sets) -> str:
@@ -122,6 +119,26 @@ def render_candidates(result: ResolutionResult, header: str = "") -> str:
     return "\n".join(lines)
 
 
+def build_context(last_fact_sets, last_shown) -> str:
+    """Code-built conversation state for the entry edge — what 'this',
+    'it', 'they', 'these two' can refer to. Labels carry the id in
+    parentheses so the LLM can name subjects unambiguously."""
+    parts = []
+    if last_fact_sets:
+        labels = []
+        for fs in last_fact_sets:
+            f = fs.facts
+            name = (f.get("business_name") or f.get("metric_name")
+                    or f.get("step_name") or fs.ref)
+            labels.append(f"{name} ({fs.kind} {fs.ref})")
+        parts.append("Last answer covered: " + "; ".join(labels))
+    if last_shown:
+        items = [f"{c.business_name or c.name} ({c.kind} {c.ref})"
+                 for c in last_shown[:10]]
+        parts.append("Visible candidate list: " + "; ".join(items))
+    return "\n".join(parts)
+
+
 class _NewQuestion(Exception):
     def __init__(self, text: str) -> None:
         self.text = text
@@ -150,6 +167,43 @@ def _ask_pick(ask, say, result) -> "int | None":
         raise _NewQuestion(reply)
 
 
+_REF_IN_PARENS = re.compile(r"\(([^()]+)\)\s*$")
+
+
+def _bind_subject(subject: str, run_kql, ask, say, sink, user_id, question):
+    """Turn a compare subject into a metric ref. Order: the id the LLM
+    copied from context ('Label (metric ref)'), then the text as an
+    exact ref, then ordinary resolution with a human pick. Returns a
+    ref or None (nothing matched / user declined)."""
+    text = subject.strip()
+    m = _REF_IN_PARENS.search(text)
+    if m:
+        inner = m.group(1).strip()
+        inner = inner.split()[-1] if inner else inner   # "metric x.Y" -> "x.Y"
+        if _is_metric_ref(inner, run_kql):
+            return inner
+        text = _REF_IN_PARENS.sub("", text).strip()
+    if _is_metric_ref(text, run_kql):
+        return text
+    result = resolve(text, run_kql)
+    if not result.candidates:
+        say(f"For '{text}': nothing sufficiently related.")
+        return None
+    say(render_candidates(result, f"For '{text}':"))
+    picked = _ask_pick(ask, say, result)   # _NewQuestion propagates
+    if picked is None:
+        _record(sink, user_id, question, result, None)
+        return None
+    candidate = result.candidates[picked]
+    _record(sink, user_id, question, result, candidate)
+    return candidate.ref
+
+
+def _is_metric_ref(text: str, run_kql) -> bool:
+    from src.orchestrator.assemble import METRIC_FACTS_QUERY
+    return bool(text) and bool(run_kql(METRIC_FACTS_QUERY, {"p_ref": text}))
+
+
 def chat_loop(chat, run_kql, sink, user_id: str = "local-dev",
               ask=input, say=print) -> None:
     raw_ask = ask
@@ -157,6 +211,7 @@ def chat_loop(chat, run_kql, sink, user_id: str = "local-dev",
     say("AIVIA — ask about your certified metrics ('q' to quit)\n")
     pending = None
     last_fact_sets = []
+    last_shown = []
     while True:
         if pending is not None:
             question, pending = pending, None
@@ -167,8 +222,11 @@ def chat_loop(chat, run_kql, sink, user_id: str = "local-dev",
         if not question:
             continue
 
-        command = match_detail_command(question)
-        if command:
+        context = build_context(last_fact_sets, last_shown)
+        intent = produce_intent(question, chat, context)
+
+        if intent.verb == "detail":
+            command = intent.tokens[0]
             if last_fact_sets:
                 say("\n" + render_detail(command, last_fact_sets) + "\n")
             else:
@@ -176,7 +234,24 @@ def chat_loop(chat, run_kql, sink, user_id: str = "local-dev",
                     f"{command}.")
             continue
 
-        intent = produce_intent(question, chat)
+        if intent.verb == "unsupported":
+            reason = intent.tokens[0]
+            say(UNSUPPORTED_MESSAGES[reason])
+            _record_refusal(sink, user_id, question, f"unsupported:{reason}")
+            continue
+
+        if intent.verb == "compare":
+            try:
+                fs = _compare_flow(intent, question, chat, run_kql,
+                                   sink, user_id, ask, say)
+            except _NewQuestion as nq:
+                pending = nq.text
+                continue
+            if fs is not None:
+                last_fact_sets = [fs]
+                say("\n" + narrate_question(fs, question, chat) + "\n")
+            continue
+
         if intent.verb == "variants":
             fs = variants_answer(intent.tokens[0], run_kql)
             if fs is not None:
@@ -186,6 +261,7 @@ def chat_loop(chat, run_kql, sink, user_id: str = "local-dev",
             # misfired classification or fuzzy name: degrade to search
             say(f"No step named '{intent.tokens[0]}' found by exact "
                 "name — searching instead.")
+
         tokens = intent.tokens
         fact_sets = []
         any_candidates = False
@@ -205,6 +281,7 @@ def chat_loop(chat, run_kql, sink, user_id: str = "local-dev",
                     continue   # nothing shown, so nothing to record
                 shown_id_sets.append(ids)
                 any_candidates = True
+                last_shown = list(result.candidates)
                 header = f"For '{token}':" if len(tokens) > 1 else ""
                 say(render_candidates(result, header))
                 try:
@@ -232,6 +309,36 @@ def chat_loop(chat, run_kql, sink, user_id: str = "local-dev",
             pending = _confirm(ask, say, sink, user_id, question, fact_sets)
         elif not any_candidates:
             say(REFUSAL_MESSAGE)
+
+
+def _compare_flow(intent, question, chat, run_kql, sink, user_id,
+                  ask, say):
+    """Bind both subjects (context id, exact ref, or resolve+pick),
+    then run the fixed panel. `choose` reuses the ordinary pick UI for
+    ambiguous concept aspects (amendment 2)."""
+    refs = []
+    for subject in intent.tokens:
+        ref = _bind_subject(subject, run_kql, ask, say, sink, user_id,
+                            question)
+        if ref is None:
+            say("Could not identify both sides of the comparison.")
+            return None
+        refs.append(ref)
+
+    def choose(prompt_label, candidates):
+        say(prompt_label)
+        fake = ResolutionResult(token=prompt_label, candidates=candidates,
+                                total_matches=len(candidates), basis="")
+        say(render_candidates(fake))
+        picked = _ask_pick(ask, say, fake)   # _NewQuestion propagates
+        return picked if picked is not None else 0
+
+    try:
+        return build_comparison(refs[0], refs[1], run_kql,
+                                chosen_aspect=intent.aspect, choose=choose)
+    except AssemblyError as e:
+        say(f"Could not assemble facts: {e}")
+        return None
 
 
 def _confirm(ask, say, sink, user_id, question, fact_sets) -> "str | None":
@@ -268,6 +375,17 @@ def _record(sink, user_id, question, result, candidate) -> None:
         picked_node_id=candidate.node_id if candidate else None,
         picked_ref=candidate.ref if candidate else None,
         total_matches=result.total_matches,
+    ))
+
+
+def _record_refusal(sink, user_id, question, token) -> None:
+    """Verb-gap refusals are logged (scorecard amendment 4): the miss
+    stream demand-ranks the punch list of unbuilt verbs."""
+    sink.record(PickEvent(
+        event_at=datetime.now(timezone.utc).isoformat(),
+        user_id=user_id, question=question, token=token,
+        candidates_shown=(), picked_node_id=None, picked_ref=None,
+        total_matches=0,
     ))
 
 

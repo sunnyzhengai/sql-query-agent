@@ -10,9 +10,17 @@ caller's Azure OpenAI role — the no-stored-keys property end to end.
 
 from __future__ import annotations
 
+import json
 from typing import Callable
 
 import requests
+
+
+class KustoQueryError(RuntimeError):
+    """The query failed (fully or MID-STREAM). Raised so partial data can
+    never masquerade as an answer — the v2 protocol reports mid-stream
+    failures as an error OBJECT appended to Rows, which a naive zip turns
+    into a fake row (live find 2026-08-10: node_id='OneApiErrors')."""
 
 
 class KustoClient:
@@ -47,14 +55,30 @@ class KustoClient:
 
     @staticmethod
     def _primary_rows(frames: "list[dict]") -> "list[dict]":
-        """Kusto v2 protocol: find the PrimaryResult table, zip rows."""
+        """Kusto v2 protocol: find the PrimaryResult table, zip rows.
+        Any error — top-level frame, dataset-completion errors, or an
+        error object inside Rows — RAISES; partial data is never
+        returned as if complete."""
+        for frame in frames:
+            if frame.get("FrameType") == "DataSetCompletion" and frame.get(
+                    "HasErrors"):
+                raise KustoQueryError(
+                    "query completed with errors: "
+                    f"{json.dumps(frame.get('OneApiErrors'))[:400]}")
         for frame in frames:
             if (
                 frame.get("FrameType") == "DataTable"
                 and frame.get("TableKind") == "PrimaryResult"
             ):
                 cols = [c["ColumnName"] for c in frame["Columns"]]
-                return [dict(zip(cols, row)) for row in frame["Rows"]]
+                rows = []
+                for row in frame["Rows"]:
+                    if isinstance(row, dict):   # mid-stream error object
+                        raise KustoQueryError(
+                            "query failed mid-stream: "
+                            f"{json.dumps(row)[:400]}")
+                    rows.append(dict(zip(cols, row)))
+                return rows
         return []
 
 

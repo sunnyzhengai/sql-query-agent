@@ -401,7 +401,9 @@ class TestLiveFindings20260810:
 
 class TestFollowUpDetail:
     """Sunny's live case (2026-08-09): 'show me its sql' after an answer
-    must show THAT answer's SQL — never re-resolve into weak ODBC steps."""
+    must show THAT answer's SQL — never re-resolve into weak ODBC steps.
+    Routing is the entry edge's job now (ADR 0034): the fake classifier
+    emits DETAIL lines; the loop renders from cached facts, no LLM."""
 
     def run_kql(self, query, params):
         from src.orchestrator.core import RESOLVE_QUERY
@@ -415,14 +417,24 @@ class TestFollowUpDetail:
             }]
         return fake_kql(query, params)
 
+    def chat(self, system, user):
+        if "typed request" in system:      # the conversational entry edge
+            q = user.splitlines()[-1].lower()
+            for command, cue in (("sql", "sql"), ("owner", "own"),
+                                 ("tables", "table"), ("link", "link")):
+                if cue in q:
+                    return f"DETAIL: {command}"
+            return "topic"
+        return "Prose."
+
     def drive(self, tmp_path, replies):
         from src.orchestrator.cli import chat_loop
         sink = JsonlEventSink(tmp_path / "e.jsonl")
         out = []
         say = lambda *a: out.append(" ".join(str(x) for x in a))
-        chat = lambda s, u: ("topic" if "search phrase" in s else "Prose.")
         it = iter(replies)
-        chat_loop(chat, self.run_kql, sink, ask=lambda p="": next(it), say=say)
+        chat_loop(self.chat, self.run_kql, sink,
+                  ask=lambda p="": next(it), say=say)
         return "\n".join(out)
 
     def test_show_me_its_sql_uses_last_answer(self, tmp_path):
@@ -446,10 +458,29 @@ class TestFollowUpDetail:
         text = self.drive(tmp_path, ["show me its sql", "q"])
         assert "Ask about a metric first" in text
 
-    def test_real_questions_with_command_words_still_resolve(self, tmp_path):
-        # "which metrics read from sql server tables" is NOT a detail command
-        from src.orchestrator.cli import match_detail_command
-        assert match_detail_command("which metrics read from sql server tables") is None
-        assert match_detail_command("show me its sql") == "sql"
-        assert match_detail_command("who owns it?") == "owner"
-        assert match_detail_command("link?") == "link"
+    def test_detail_parse_is_validated(self):
+        # structural validation: only the four known commands route
+        from src.orchestrator.core import produce_intent
+        good = produce_intent("q", lambda s, u: "DETAIL: sql")
+        assert good.verb == "detail" and good.tokens == ("sql",)
+        bad = produce_intent("q", lambda s, u: "DETAIL: dance")
+        assert bad.verb == "search"   # unknown command degrades safely
+
+    def test_context_reaches_the_entry_edge(self, tmp_path):
+        seen = {}
+        def chat(system, user):
+            if "typed request" in system:
+                seen["user"] = user
+                return "topic"
+            return "Prose."
+        from src.orchestrator.cli import chat_loop
+        sink = JsonlEventSink(tmp_path / "e.jsonl")
+        out = []
+        say = lambda *a: out.append(" ".join(str(x) for x in a))
+        it = iter(["how is ed screening done?", "1", "", "and this?", "1",
+                   "", "q"])
+        chat_loop(chat, self.run_kql, sink, ask=lambda p="": next(it),
+                  say=say)
+        # the second question saw the first answer as conversation state
+        assert "Last answer covered: ED Sepsis Screening" in seen["user"]
+        assert "(metric reporting.USP_ED_Sepsis)" in seen["user"]

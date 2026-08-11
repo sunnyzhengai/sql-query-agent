@@ -28,45 +28,46 @@ TOKEN_SYSTEM_PROMPT = (
     "add words the question does not imply."
 )
 
-TOKENS_SYSTEM_PROMPT = (
-    "You turn a user's question about business metrics into search "
-    "phrases. Output ONE short phrase (2-6 words) per DISTINCT business "
-    "concept the question asks about, one per line, at most 3 lines. A "
-    "question about a single concept gets exactly ONE line — even if it "
-    "mentions that concept's definition, metrics, or calculation; those "
-    "are aspects of one concept, never separate lines. Never output two "
-    "phrasings of the same concept. Only a question naming clearly "
-    "different things (a comparison, an explicit 'and') gets multiple "
-    "lines. No numbering, no punctuation, no explanation. Do not add "
-    "concepts the question does not name."
-)
-
-# Entry edge v2: the LLM CLASSIFIES from a closed verb menu — it never
-# composes. FORM 1 names the one set-subject verb built so far
-# (variants); FORM 2 is the default search translation. A misfired
-# VARIANTS line degrades to search downstream (empty family), never
-# breaks — same property as a wrong token split.
+# The conversational entry edge (ADR 0034): the LLM ROUTES — it reads
+# the conversation state plus the new question and chooses ONE typed
+# request from a closed menu. It never composes a query and never
+# answers. Plain lines are the safe default (search), so malformed or
+# unrecognized output degrades to the ordinary flow, never breaks.
 INTENT_SYSTEM_PROMPT = (
-    "You turn a user's question about business metrics into a typed "
-    "request. Two forms exist.\n"
-    "FORM 1 — consistency check: ONLY if the question asks whether "
-    "definitions of one NAMED step, table, or calculation agree, differ, "
-    "are consistent, or have drifted across procedures or reports, "
-    "output exactly one line:\n"
-    "VARIANTS: <that name exactly as the question spells it>\n"
-    "FORM 2 — search (everything else): output ONE short search phrase "
-    "(2-6 words) per DISTINCT business concept the question asks about, "
-    "one per line, at most 3 lines. A question about a single concept "
-    "gets exactly ONE line — even if it mentions that concept's "
-    "definition, metrics, or calculation; those are aspects of one "
-    "concept, never separate lines. Never output two phrasings of the "
-    "same concept. Only a question naming clearly different things (a "
-    "comparison, an explicit 'and') gets multiple lines. No numbering, "
-    "no punctuation, no explanation. Do not add concepts the question "
-    "does not name."
+    "You route a user's request in a conversation about business "
+    "metrics. You receive conversation state (the last answer, any "
+    "visible candidate list) and the new question. Output EXACTLY ONE "
+    "typed request — never answer the question yourself. Forms:\n"
+    "1. DETAIL: sql|owner|tables|link — the question asks for that "
+    "detail of what the last answer covered ('show me its sql', 'who "
+    "owns it').\n"
+    "2. VARIANTS: <name> — the question asks whether definitions of one "
+    "NAMED step, table, or calculation agree, differ, or have drifted "
+    "across procedures or reports.\n"
+    "3. COMPARE: <subject A> | <subject B> — the question compares two "
+    "metrics or reports; name each subject exactly as the conversation "
+    "state names it (prefer the id in parentheses when shown). Append "
+    "| on=<aspect> when one specific aspect is compared — a field "
+    "(developer, steward, tables, steps, sql, report) or a concept "
+    "phrase (e.g. sepsis definition).\n"
+    "4. UNSUPPORTED: lineage|enumerate|usage|data-values — the question "
+    "asks for a known-unsupported thing: lineage (what feeds a table / "
+    "what is downstream of it), enumerate (list all items matching a "
+    "filter), usage (who uses what, how often), data-values (actual "
+    "row-level data, counts, totals).\n"
+    "5. Otherwise (the DEFAULT): output ONE short search phrase (2-6 "
+    "words) per DISTINCT business concept the question asks about, one "
+    "per line, at most 3 lines. A single concept gets exactly ONE line; "
+    "never two phrasings of the same concept. Plain lines only — no "
+    "numbering, no punctuation, no explanation.\n"
+    "Never add concepts, subjects, or aspects the question does not "
+    "imply. When unsure, use form 5."
 )
 
 MAX_TOKENS_PER_QUESTION = 3
+
+DETAIL_KEYS = ("sql", "owner", "tables", "link")
+UNSUPPORTED_REASONS = ("lineage", "enumerate", "usage", "data-values")
 
 # Deterministic backstop for over-split tokens (live find, 2026-08-10:
 # "which metrics defined sepsis" -> 'sepsis metrics' + 'sepsis definition
@@ -84,25 +85,45 @@ RESOLVE_QUERY = (
 
 @dataclass(frozen=True)
 class Intent:
-    verb: str                    # search | variants
-    tokens: "tuple[str, ...]"    # search phrases, or (family_name,)
+    verb: str                    # search | variants | detail | compare | unsupported
+    tokens: "tuple[str, ...]"    # phrases / (name,) / (command,) / subjects / (reason,)
+    aspect: "str | None" = None  # compare only: field name or concept phrase
 
 
 def produce_intent(
-    question: str, chat: "Callable[[str, str], str]"
+    question: str, chat: "Callable[[str, str], str]", context: str = ""
 ) -> Intent:
-    """Entry edge: classify + translate in one call. The verb is a choice
-    from a closed menu, validated structurally — an unrecognized or
-    empty VARIANTS line falls through to search, so a misbehaving model
-    can only ever degrade to the default flow.
+    """The conversational entry edge: route + translate in one call.
+    `context` is the code-built conversation state (last answer, visible
+    candidates) — the LLM resolves 'this/it/they' against it. Every
+    prefixed form is validated structurally; anything malformed falls
+    through to search, so a misbehaving model can only ever degrade to
+    the default flow.
     """
-    raw = chat(INTENT_SYSTEM_PROMPT, question)
+    user = f"{context}\nQuestion: {question}" if context else question
+    raw = chat(INTENT_SYSTEM_PROMPT, user)
     lines = [ln for ln in raw.splitlines() if ln.strip()]
     first = lines[0].strip() if lines else ""
-    if first.upper().startswith("VARIANTS:"):
+    upper = first.upper()
+    if upper.startswith("VARIANTS:"):
         name = _sanitize(first.split(":", 1)[1])
         if name:
             return Intent(verb="variants", tokens=(name,))
+    elif upper.startswith("DETAIL:"):
+        command = first.split(":", 1)[1].strip().lower()
+        if command in DETAIL_KEYS:
+            return Intent(verb="detail", tokens=(command,))
+    elif upper.startswith("UNSUPPORTED:"):
+        reason = first.split(":", 1)[1].strip().lower()
+        if reason in UNSUPPORTED_REASONS:
+            return Intent(verb="unsupported", tokens=(reason,))
+    elif upper.startswith("COMPARE:"):
+        parts = [p.strip() for p in first.split(":", 1)[1].split("|")]
+        subjects = [p for p in parts if p and not p.lower().startswith("on=")]
+        aspects = [p[3:].strip() for p in parts if p.lower().startswith("on=")]
+        if len(subjects) == 2 and all(subjects):
+            return Intent(verb="compare", tokens=tuple(subjects),
+                          aspect=aspects[0] if aspects and aspects[0] else None)
     tokens = [_sanitize(ln) for ln in lines if _sanitize(ln)]
     tokens = tokens[:MAX_TOKENS_PER_QUESTION] or [_sanitize(raw)]
     return Intent(verb="search", tokens=tuple(tokens))
@@ -131,19 +152,6 @@ class ResolutionResult:
 def _sanitize(raw: str) -> str:
     token = " ".join(raw.replace('"', " ").replace("'", " ").split())
     return token[:120]
-
-
-def produce_search_tokens(
-    question: str, chat: "Callable[[str, str], str]"
-) -> "list[str]":
-    """Entry edge, multi-concept: 1..MAX tokens, one per concept the
-    question names. Still translation-only — decomposing a comparison
-    into two phrases is a linguistic act, not a retrieval decision; a
-    wrong split degrades UX, never correctness.
-    """
-    raw = chat(TOKENS_SYSTEM_PROMPT, question)
-    tokens = [_sanitize(line) for line in raw.splitlines() if _sanitize(line)]
-    return tokens[:MAX_TOKENS_PER_QUESTION] or [_sanitize(raw)]
 
 
 def produce_search_token(question: str, chat: "Callable[[str, str], str]") -> str:

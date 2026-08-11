@@ -145,7 +145,10 @@ class TestCliVariantsFlow:
         return "\n".join(out)
 
     def chat(self, system, user):
-        if "VARIANTS" in system:      # entry edge (intent prompt)
+        if "typed request" in system:      # the conversational entry edge
+            q = user.splitlines()[-1].lower()
+            if "sql" in q:
+                return "DETAIL: sql"
             return "VARIANTS: #Base_Pop_Severe_ED_Scores"
         return "No — 2 of 3 procs agree; reports.USP_IP_SEPSIS differs."
 
