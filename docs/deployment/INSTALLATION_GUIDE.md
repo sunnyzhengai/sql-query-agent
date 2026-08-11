@@ -146,6 +146,30 @@ Files/
 - [ ] All filenames are **unique** across the upload folder (no duplicates)
 - [ ] Files are **UTF-8 encoded** (not ANSI or Latin-1)
 
+> ## 🔴 CRITICAL — RENAMING A PROCEDURE OR VIEW RESETS ITS GOVERNANCE HISTORY
+>
+> The metric's identity **is** its `[schema].[object]` name. If a
+> developer renames a procedure or view (or moves it to another
+> schema) and you re-upload, the system sees the old object as
+> **deleted** and the new name as a **brand-new metric**. Everything
+> attached to the old name — **certification status, steward
+> assignments, usage history, endorsements, business terms** — does
+> NOT transfer. Your data-governance work on that metric starts over.
+>
+> **Tell your development teams before go-live:**
+> - Renaming or re-schema'ing a proc/view = wiping its governance
+>   record in this product. Treat renames as a governed change, not a
+>   refactor.
+> - If a rename is unavoidable, note it and re-certify the new name —
+>   there is currently NO automatic carry-over.
+> - Editing a procedure **in place** (same name) is fine: the system
+>   versions content changes and flags drifted definitions for steward
+>   review automatically.
+>
+> This limitation applies to file uploads and to SQL Server sources in
+> general (SQL Server itself provides no rename-stable object id
+> across the DROP-and-CREATE deployments most shops use).
+
 ### 3e: Upload data dictionary
 
 1. Navigate to `Files/sql-query-agent/dictionary/`

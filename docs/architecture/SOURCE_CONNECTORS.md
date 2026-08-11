@@ -159,3 +159,16 @@ deterministic ladder (decisions placed per ADR 0035's taxonomy):
 
 Identity transfer is itself a governed event: automatic only when
 byte-deterministic, steward-confirmed when fuzzy, append-only always.
+
+**Shipping decision (Sunny, 2026-08-11):** v1 ships the LIMITATION,
+loudly — a red-flag disclaimer in the Installation Guide and the
+customer-facing CONNECTIVITY_AND_CHANGE_MANAGEMENT.md (packaged):
+renames reset governance history; admins must warn their developers.
+
+**Conditional future build (NOT scheduled):** internal ID + incoming-
+file comparison against existing objects — catching changes and
+duplicates, asking the human to confirm "this is a rename," and
+connecting the renamed object to the original (steps 1-2 of the ladder
+above, implemented). Trigger: build ONLY if rename-loss becomes a true
+blocker for more than a one-off customer. Until then the disclaimer +
+recommended change-control policy is the product's answer.

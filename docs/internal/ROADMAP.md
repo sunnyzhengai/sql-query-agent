@@ -34,6 +34,13 @@ Cite these from other documents by reference — do not copy values.
 
 Both components live in a single repo (`sql-query-agent`) and ship as one `.whl` package.
 
+**CONDITIONAL (unscheduled) — rename identity carry-over:** internal
+ID + incoming-object comparison (changes/dups caught, human confirms
+renames, alias links renamed→original). Trigger per Sunny 2026-08-11:
+build ONLY if rename-loss blocks more than a one-off customer; until
+then the shipped red-flag disclaimer + change-control policy is the
+answer (SOURCE_CONNECTORS.md part 4).
+
 **Source connectors + change monitoring (2026-08-11):** full
 configuration research and the modular connector plan live in
 docs/architecture/SOURCE_CONNECTORS.md — one SourceConnector protocol

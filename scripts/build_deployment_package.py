@@ -25,6 +25,7 @@ class PackagingError(Exception):
 SHIPPED_DOCS = [
     "docs/deployment/INSTALLATION_GUIDE.md",
     "docs/deployment/DATA_DICTIONARY_REQUIREMENTS.md",
+    "docs/deployment/CONNECTIVITY_AND_CHANGE_MANAGEMENT.md",
     "docs/product/SECURITY_WHITEPAPER.md",
 ]
 
