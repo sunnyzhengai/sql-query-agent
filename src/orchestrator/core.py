@@ -1,14 +1,9 @@
-"""The two edges and the deterministic core (ADR 0032).
+"""The retrieval core (ADR 0032/0035).
 
-Entry edge:  produce_search_token(question)  — one LLM call, one string out.
-Core:        resolve(token)                  — ONE fixed KQL command, the
-             token is the only parameter; threshold/rank/ties are config
-             and math, never generation.
-Pick:        parse_pick(reply, candidates)   — structural: number or exact
-             name, parsed by code. (Optional LLM fallback lives in the
-             surface layer, validated against the candidate set.)
-Exit edge:   narrate(...)                    — surface-layer concern; the
-             core returns facts and a code-stamped basis, never prose.
+resolve(token) — ONE fixed KQL command, the token is the only
+parameter; threshold/rank/ties are config and math, never generation;
+stratified plurality (closest metrics + closest steps). Consumed by
+the ADR 0035 toolset (tools.py) and the robustness suite.
 
 Replay property (CI-enforced): same token + same catalog state =>
 identical candidate list, order, and basis.
@@ -19,7 +14,6 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Callable
 
-from src.graph.templates import _fold  # case-fold used across resolution
 
 TOKEN_SYSTEM_PROMPT = (
     "You turn a user's question about business metrics into ONE short "
@@ -27,55 +21,6 @@ TOKEN_SYSTEM_PROMPT = (
     "the phrase only — no punctuation, no quotes, no explanation. Do not "
     "add words the question does not imply."
 )
-
-# The conversational entry edge (ADR 0034): the LLM ROUTES — it reads
-# the conversation state plus the new question and chooses ONE typed
-# request from a closed menu. It never composes a query and never
-# answers. Plain lines are the safe default (search), so malformed or
-# unrecognized output degrades to the ordinary flow, never breaks.
-INTENT_SYSTEM_PROMPT = (
-    "You route a user's request in a conversation about business "
-    "metrics. You receive conversation state (the last answer, any "
-    "visible candidate list) and the new question. Output EXACTLY ONE "
-    "typed request — never answer the question yourself. Forms:\n"
-    "1. DETAIL: sql|owner|tables|link — the question asks for that "
-    "detail of what the last answer covered ('show me its sql', 'who "
-    "owns it').\n"
-    "2. VARIANTS: <name> — the question asks whether definitions of one "
-    "NAMED step, table, or calculation agree, differ, or have drifted "
-    "across procedures or reports. If the question names TWO metrics or "
-    "reports and asks whether THEY share or agree on something, that is "
-    "form 3 (COMPARE with on=<aspect>), never form 2.\n"
-    "3. COMPARE: <subject A> | <subject B> — the question compares two "
-    "metrics or reports; name each subject exactly as the conversation "
-    "state names it (prefer the id in parentheses when shown). Append "
-    "| on=<aspect> when one specific aspect is compared — a field "
-    "(developer, steward, tables, steps, sql, report) or a concept "
-    "phrase (e.g. sepsis definition).\n"
-    "4. UNSUPPORTED: lineage|enumerate|usage|data-values — the question "
-    "asks for a known-unsupported thing: lineage (what feeds a table / "
-    "what is downstream of it), enumerate (list all items matching a "
-    "filter), usage (who uses what, how often), data-values (actual "
-    "row-level data, counts, totals).\n"
-    "5. Otherwise (the DEFAULT): output ONE short search phrase (2-6 "
-    "words) per DISTINCT business concept the question asks about, one "
-    "per line, at most 3 lines. A single concept gets exactly ONE line; "
-    "never two phrasings of the same concept. Plain lines only — no "
-    "numbering, no punctuation, no explanation.\n"
-    "Never add concepts, subjects, or aspects the question does not "
-    "imply. When unsure, use form 5."
-)
-
-MAX_TOKENS_PER_QUESTION = 3
-
-DETAIL_KEYS = ("sql", "owner", "tables", "link")
-UNSUPPORTED_REASONS = ("lineage", "enumerate", "usage", "data-values")
-
-# Deterministic backstop for over-split tokens (live find, 2026-08-10:
-# "which metrics defined sepsis" -> 'sepsis metrics' + 'sepsis definition
-# metrics', two near-identical candidate lists, two pick rounds). The
-# prompt discourages the split; this guard makes the duplicate harmless.
-DUPLICATE_LIST_OVERLAP = 0.5
 
 # The ONE fixed command. The token is the only variable — parameterized
 # via Kusto's declare statement so user text is data, never query syntax.
@@ -96,52 +41,6 @@ RESOLVE_QUERY = (
 METRICS_SHOWN = 5
 STEPS_SHOWN = 5
 STEPS_PER_PROC = 2
-
-
-@dataclass(frozen=True)
-class Intent:
-    verb: str                    # search | variants | detail | compare | unsupported
-    tokens: "tuple[str, ...]"    # phrases / (name,) / (command,) / subjects / (reason,)
-    aspect: "str | None" = None  # compare only: field name or concept phrase
-
-
-def produce_intent(
-    question: str, chat: "Callable[[str, str], str]", context: str = ""
-) -> Intent:
-    """The conversational entry edge: route + translate in one call.
-    `context` is the code-built conversation state (last answer, visible
-    candidates) — the LLM resolves 'this/it/they' against it. Every
-    prefixed form is validated structurally; anything malformed falls
-    through to search, so a misbehaving model can only ever degrade to
-    the default flow.
-    """
-    user = f"{context}\nQuestion: {question}" if context else question
-    raw = chat(INTENT_SYSTEM_PROMPT, user)
-    lines = [ln for ln in raw.splitlines() if ln.strip()]
-    first = lines[0].strip() if lines else ""
-    upper = first.upper()
-    if upper.startswith("VARIANTS:"):
-        name = _sanitize(first.split(":", 1)[1])
-        if name:
-            return Intent(verb="variants", tokens=(name,))
-    elif upper.startswith("DETAIL:"):
-        command = first.split(":", 1)[1].strip().lower()
-        if command in DETAIL_KEYS:
-            return Intent(verb="detail", tokens=(command,))
-    elif upper.startswith("UNSUPPORTED:"):
-        reason = first.split(":", 1)[1].strip().lower()
-        if reason in UNSUPPORTED_REASONS:
-            return Intent(verb="unsupported", tokens=(reason,))
-    elif upper.startswith("COMPARE:"):
-        parts = [p.strip() for p in first.split(":", 1)[1].split("|")]
-        subjects = [p for p in parts if p and not p.lower().startswith("on=")]
-        aspects = [p[3:].strip() for p in parts if p.lower().startswith("on=")]
-        if len(subjects) == 2 and all(subjects):
-            return Intent(verb="compare", tokens=tuple(subjects),
-                          aspect=aspects[0] if aspects and aspects[0] else None)
-    tokens = [_sanitize(ln) for ln in lines if _sanitize(ln)]
-    tokens = tokens[:MAX_TOKENS_PER_QUESTION] or [_sanitize(raw)]
-    return Intent(verb="search", tokens=tuple(tokens))
 
 
 @dataclass(frozen=True)
@@ -225,37 +124,3 @@ def resolve(
     return ResolutionResult(
         token=token, candidates=candidates, total_matches=total, basis=basis
     )
-
-
-def duplicate_list(
-    new_ids: "set[str]", prior_id_sets: "list[set[str]]"
-) -> bool:
-    """True when a candidate list substantially repeats one already shown
-    for THIS question — noise from an over-split token, not a second
-    concept. Overlap coefficient (shared / smaller list) against each
-    prior list; deterministic set math, never a model judgment.
-    """
-    for prior in prior_id_sets:
-        denom = min(len(new_ids), len(prior))
-        if denom and len(new_ids & prior) / denom >= DUPLICATE_LIST_OVERLAP:
-            return True
-    return False
-
-
-def parse_pick(reply: str, candidates: "tuple[Candidate, ...]") -> "int | None":
-    """Structural pick: 1-based number, or exact (case-folded) name /
-    business name / ref. Returns the candidate index or None (re-prompt).
-    Never interprets — a fuzzy reply is the surface layer's optional,
-    validated LLM fallback, not the core's concern.
-    """
-    text = reply.strip()
-    if not text:
-        return None   # empty must never exact-match an empty business_name
-    if text.isdigit():
-        n = int(text)
-        return n - 1 if 1 <= n <= len(candidates) else None
-    folded = _fold(text)
-    for i, c in enumerate(candidates):
-        if folded in (_fold(c.name), _fold(c.business_name), _fold(c.ref)):
-            return i
-    return None

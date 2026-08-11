@@ -55,6 +55,22 @@ class JsonlEventSink:
 
 
 @dataclass(frozen=True)
+class TurnEvent:
+    """ADR 0035 flywheel grain: one conversational turn — the question,
+    the tools consulted (the code-stamped trace), the ids read. Pick/
+    confirm granularity returns when a surface affords it; append-only
+    as ever."""
+
+    event_at: str
+    user_id: str
+    question: str
+    tools_used: "tuple[str, ...]"
+    ids_read: "tuple[str, ...]"
+    basis: str
+    answered: bool
+
+
+@dataclass(frozen=True)
 class ConfirmEvent:
     """The strong signal: verdict after reading the narrated answer."""
 

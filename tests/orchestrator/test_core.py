@@ -1,7 +1,6 @@
 """Tests for the orchestrator core — ADR 0032's line, mechanically held."""
 
 from src.orchestrator import (
-    parse_pick,
     produce_search_token,
     resolve,
 )
@@ -86,27 +85,6 @@ class TestStratification:
         step_refs = [x.ref for x in c if x.kind == "step"]
         assert step_refs.count("a.M1") == 2             # capped
         assert "b.M2" in step_refs                      # diversity slot
-
-
-class TestStructuralPick:
-    def cands(self):
-        # stratified order: metrics first, then steps
-        return resolve("t", lambda q, p: SAMPLE).candidates
-
-    def test_number_pick(self):
-        assert parse_pick("2", self.cands()) == 1
-
-    def test_out_of_range_number_rejected(self):
-        assert parse_pick("9", self.cands()) is None
-
-    def test_exact_business_name_case_folded(self):
-        assert parse_pick("ed screening", self.cands()) == 0
-
-    def test_exact_ref_pick(self):
-        assert parse_pick("b.M2", self.cands()) == 1
-
-    def test_fuzzy_reply_rejected_not_guessed(self):
-        assert parse_pick("the readmit one", self.cands()) is None
 
 
 class TestKustoParsing:

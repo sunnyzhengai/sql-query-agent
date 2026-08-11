@@ -1,19 +1,14 @@
-"""AIVIA orchestrator — Deterministic Core, LLM Edges (ADR 0032/0034).
+"""AIVIA orchestrator — agentic conversation, deterministic tools
+(ADR 0032/0035).
 
-The LLM translates. The data answers. The human decides.
-
-Two LLM touchpoints (the conversational entry edge routes to a closed
-verb menu; the narrate edge speaks computed facts); everything between
-is replayable code. This package is the core's spine — also the engine
-of the paraphrase-robustness suite.
+The LLM owns the conversation. The engine owns every computation. The
+trace is always code. Right answers are computed, judgments are
+disclosed, language is generated.
 """
 
 from src.orchestrator.core import (  # noqa: F401
     Candidate,
-    Intent,
     ResolutionResult,
-    parse_pick,
-    produce_intent,
     produce_search_token,
     resolve,
 )

@@ -1,0 +1,308 @@
+"""The deterministic toolset (ADR 0035): find, read, list, verify.
+
+Five tools shaped by what the STORE can do — never by question types.
+Each is a fixed parameterized query plus pure computation; the LLM can
+choose which tool and what parameters, never compose a query. The
+dispatcher enforces the two structural guarantees:
+
+1. No unsurfaced facts — read/verify tools accept only ids that a tool
+   call in THIS conversation surfaced, or that the user's own words
+   contain.
+2. Every call lands in the trace, from which code stamps the Basis
+   line (see agent.py) — silent selection is structurally impossible.
+"""
+
+from __future__ import annotations
+
+import difflib
+import hashlib
+import json
+import re
+from dataclasses import dataclass, field
+from typing import Callable
+
+from src.graph.templates import _fold
+from src.orchestrator.assemble import (
+    AssemblyError,
+    assemble_metric,
+    assemble_step,
+)
+from src.orchestrator.core import resolve
+
+# --- fixed queries ----------------------------------------------------
+
+FIND_BY_NAME_QUERY = (
+    "declare query_parameters(p_name:string);\n"
+    "semantic_catalog | where tolower(name) == tolower(p_name)\n"
+    "| project node_id, ['kind'], ['ref'], name, business_name\n"
+    "| order by node_id asc"
+)
+
+STEPS_OF_QUERY = (
+    "declare query_parameters(p_ref:string);\n"
+    "semantic_catalog | where ['kind'] == 'step' and ['ref'] == p_ref\n"
+    "| project node_id, name\n"
+    "| order by node_id asc"
+)
+
+BATCH_FRAGMENTS_QUERY = (
+    "declare query_parameters(p_ids:string);\n"
+    "graph_nodes\n"
+    "| where set_has_element(todynamic(p_ids), node_id)\n"
+    "| project node_id, properties"
+)
+
+MAX_VERIFY_IDS = 40
+_MAX_FRAGMENT_CHARS = 4000
+_MAX_DIFF_LINES = 60
+
+
+# --- the content kernel (was variants.py) -----------------------------
+
+def _normalized(text: str) -> str:
+    """Equality view: whitespace collapsed, casefolded (T-SQL default
+    collation is case-insensitive). Literal/structural differences
+    still count as distinct."""
+    return re.sub(r"\s+", " ", text or "").strip().casefold()
+
+
+def _content_key(text: str) -> str:
+    return hashlib.sha256(_normalized(text).encode()).hexdigest()[:16]
+
+
+def _cap(text: str) -> str:
+    if len(text) <= _MAX_FRAGMENT_CHARS:
+        return text
+    return text[:_MAX_FRAGMENT_CHARS] + "\n... (truncated)"
+
+
+def _diff(a: str, b: str) -> str:
+    lines = list(difflib.unified_diff(
+        a.splitlines(), b.splitlines(),
+        fromfile="group_1", tofile="group_2", lineterm="", n=1,
+    ))
+    if len(lines) > _MAX_DIFF_LINES:
+        lines = lines[:_MAX_DIFF_LINES] + [
+            f"... ({len(lines) - _MAX_DIFF_LINES} more diff lines)"]
+    return "\n".join(lines)
+
+
+# --- session (guarantee 1 state) --------------------------------------
+
+@dataclass
+class Session:
+    """Ids this conversation may legitimately read: surfaced by a tool,
+    or present verbatim in the user's own words."""
+    surfaced: "set[str]" = field(default_factory=set)
+    user_text: str = ""
+
+    def note_user(self, text: str) -> None:
+        self.user_text += "\n" + _fold(text)
+
+    def allow(self, ids) -> None:
+        self.surfaced.update(ids)
+
+    def permitted(self, an_id: str) -> bool:
+        return an_id in self.surfaced or _fold(an_id) in self.user_text
+
+
+class ToolError(Exception):
+    """Returned to the model as the tool result — visible, recoverable."""
+
+
+# --- the five tools ---------------------------------------------------
+
+def search_catalog(phrase: str, run_kql, session: Session) -> dict:
+    """Find things: the one fixed semantic search, stratified plurality
+    (closest metrics + closest steps), closeness visible."""
+    result = resolve(phrase, run_kql)
+    candidates = [
+        {"id": (c.ref if c.kind == "metric" else c.node_id),
+         "kind": c.kind, "name": c.name,
+         "business_name": c.business_name or None,
+         "of_metric": c.ref if c.kind == "step" else None,
+         "closeness": round(c.closeness, 3)}
+        for c in result.candidates
+    ]
+    session.allow(c["id"] for c in candidates)
+    return {"candidates": candidates,
+            "cleared_similarity_floor": result.total_matches,
+            "note": ("closeness is the honest relevance signal; the floor "
+                     "count is context, not a relevance claim")}
+
+
+def find_by_name(name: str, run_kql, session: Session) -> dict:
+    """Find things by EXACT (case-folded) name — families of same-named
+    steps, precise refs. Leading # (temp-table spelling) is forgiven."""
+    clean = name.strip().lstrip("#").strip("[]")
+    rows = run_kql(FIND_BY_NAME_QUERY, {"p_name": clean})
+    matches = [
+        {"id": (r["ref"] if r["kind"] == "metric" else r["node_id"]),
+         "kind": r["kind"], "name": r["name"],
+         "business_name": r.get("business_name") or None,
+         "of_metric": r["ref"] if r["kind"] == "step" else None}
+        for r in rows
+    ]
+    session.allow(m["id"] for m in matches)
+    return {"matches": matches, "count": len(matches)}
+
+
+def get_facts(an_id: str, run_kql, session: Session) -> dict:
+    """Read one thing — a metric ref or a step node_id. Fixed lookups."""
+    if not session.permitted(an_id):
+        raise ToolError(
+            f"id {an_id!r} was not surfaced by any search in this "
+            "conversation and does not appear in the user's words — "
+            "search first (no unsurfaced facts)")
+    try:
+        if an_id.startswith("transform:"):
+            ref = an_id.split(":", 2)[1]
+            fs = assemble_step(an_id, ref, run_kql)
+        else:
+            fs = assemble_metric(an_id, run_kql)
+    except AssemblyError as e:
+        raise ToolError(str(e))
+    return {"kind": fs.kind, "ref": fs.ref, "facts": fs.facts,
+            "basis": fs.basis}
+
+
+def list_steps(ref: str, run_kql, session: Session) -> dict:
+    """The structure of one metric: its step inventory."""
+    if not session.permitted(ref):
+        raise ToolError(
+            f"metric {ref!r} was not surfaced in this conversation — "
+            "search first (no unsurfaced facts)")
+    rows = run_kql(STEPS_OF_QUERY, {"p_ref": ref})
+    steps = [{"id": r["node_id"], "name": r["name"]} for r in rows]
+    session.allow(s["id"] for s in steps)
+    return {"metric": ref, "steps": steps, "count": len(steps)}
+
+
+def check_same_logic(ids: "list[str]", run_kql, session: Session) -> dict:
+    """Verify: THE computation. Content-hash partition over any set of
+    nodes (step node_ids and/or metric refs — a metric contributes its
+    whole calculation_logic). Groups, diffs between the two largest
+    groups, and honest 'not comparable' for unrecorded SQL. Never an
+    LLM impression."""
+    if not ids or len(ids) < 2:
+        raise ToolError("give at least two ids to compare")
+    if len(ids) > MAX_VERIFY_IDS:
+        raise ToolError(f"at most {MAX_VERIFY_IDS} ids per call")
+    for an_id in ids:
+        if not session.permitted(an_id):
+            raise ToolError(
+                f"id {an_id!r} was not surfaced in this conversation — "
+                "search first (no unsurfaced facts)")
+
+    texts: "dict[str, str]" = {}
+    step_ids = [i for i in ids if i.startswith("transform:")]
+    if step_ids:
+        rows = run_kql(BATCH_FRAGMENTS_QUERY,
+                       {"p_ids": json.dumps(sorted(step_ids))})
+        for r in rows:
+            props = r.get("properties") or "{}"
+            if isinstance(props, str):
+                props = json.loads(props)
+            texts[r["node_id"]] = props.get("sql_fragment") or ""
+    for an_id in ids:
+        if an_id.startswith("transform:"):
+            texts.setdefault(an_id, "")
+        else:
+            try:
+                fs = assemble_metric(an_id, run_kql)
+            except AssemblyError as e:
+                raise ToolError(str(e))
+            texts[an_id] = fs.facts.get("calculation_logic") or ""
+
+    unrecorded = sorted(i for i in ids if not texts[i].strip())
+    grouped: "dict[str, list]" = {}
+    for an_id in sorted(set(ids) - set(unrecorded)):
+        grouped.setdefault(_content_key(texts[an_id]), []).append(an_id)
+    groups = sorted(grouped.values(), key=lambda g: (-len(g), g[0]))
+
+    out: dict = {
+        "distinct_definitions": len(groups),
+        "groups": [{"members": g} for g in groups],
+        "all_same": len(groups) == 1 and not unrecorded,
+    }
+    if unrecorded:
+        out["not_comparable"] = unrecorded
+        out["note"] = ("SQL not recorded for these ids — absence is not "
+                       "sameness; all_same cannot be claimed")
+        out["all_same"] = False if len(groups) != 1 else None
+    if len(groups) >= 2:
+        out["diff_between_two_largest_groups"] = _diff(
+            _cap(texts[groups[0][0]]), _cap(texts[groups[1][0]]))
+    return out
+
+
+# --- schemas + dispatch ----------------------------------------------
+
+TOOL_SCHEMAS = [
+    {"type": "function", "function": {
+        "name": "search_catalog",
+        "description": ("Semantic search over the certified catalog of "
+                        "metrics and calculation steps. Returns the "
+                        "closest metrics and closest steps with a "
+                        "closeness score each."),
+        "parameters": {"type": "object", "properties": {
+            "phrase": {"type": "string",
+                       "description": "short search phrase (2-6 words)"}},
+            "required": ["phrase"]}}},
+    {"type": "function", "function": {
+        "name": "find_by_name",
+        "description": ("Exact-name lookup (case-insensitive). Use for a "
+                        "specific step/metric name the user typed, or to "
+                        "find every proc defining a same-named step."),
+        "parameters": {"type": "object", "properties": {
+            "name": {"type": "string"}}, "required": ["name"]}}},
+    {"type": "function", "function": {
+        "name": "get_facts",
+        "description": ("Full certified facts for one item: a metric ref "
+                        "(e.g. reporting.USP_X) or a step id "
+                        "(transform:...). Only ids surfaced this "
+                        "conversation or typed by the user."),
+        "parameters": {"type": "object", "properties": {
+            "id": {"type": "string"}}, "required": ["id"]}}},
+    {"type": "function", "function": {
+        "name": "list_steps",
+        "description": "All calculation steps of one metric, with ids.",
+        "parameters": {"type": "object", "properties": {
+            "ref": {"type": "string"}}, "required": ["ref"]}}},
+    {"type": "function", "function": {
+        "name": "check_same_logic",
+        "description": ("Computed verdict on whether items share identical "
+                        "SQL logic (content-hash; whitespace/case "
+                        "forgiven). Accepts 2-40 step ids and/or metric "
+                        "refs; returns groups of identical members, a "
+                        "diff, and which ids had no SQL recorded. ALWAYS "
+                        "use this for any same/different-logic question — "
+                        "never judge SQL equality yourself."),
+        "parameters": {"type": "object", "properties": {
+            "ids": {"type": "array", "items": {"type": "string"}}},
+            "required": ["ids"]}}},
+]
+
+_IMPL: "dict[str, Callable]" = {
+    "search_catalog": lambda args, run_kql, s: search_catalog(
+        str(args.get("phrase", "")), run_kql, s),
+    "find_by_name": lambda args, run_kql, s: find_by_name(
+        str(args.get("name", "")), run_kql, s),
+    "get_facts": lambda args, run_kql, s: get_facts(
+        str(args.get("id", "")), run_kql, s),
+    "list_steps": lambda args, run_kql, s: list_steps(
+        str(args.get("ref", "")), run_kql, s),
+    "check_same_logic": lambda args, run_kql, s: check_same_logic(
+        list(args.get("ids", [])), run_kql, s),
+}
+
+
+def dispatch(name: str, args: dict, run_kql, session: Session) -> dict:
+    """Run one tool call. Errors return AS RESULTS (visible to the
+    model, recoverable) — only unknown tools are a hard failure."""
+    if name not in _IMPL:
+        return {"error": f"unknown tool {name!r}"}
+    try:
+        return _IMPL[name](args, run_kql, session)
+    except ToolError as e:
+        return {"error": str(e)}
