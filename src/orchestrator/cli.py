@@ -19,6 +19,7 @@ from datetime import datetime, timezone
 from src.orchestrator.assemble import AssemblyError, assemble
 from src.orchestrator.compare import build_comparison
 from src.orchestrator.core import (
+    Intent,
     ResolutionResult,
     duplicate_list,
     parse_pick,
@@ -236,6 +237,30 @@ def chat_loop(chat, run_kql, sink, user_id: str = "local-dev",
         context = build_context(last_fact_sets, last_shown)
         intent = produce_intent(question, chat, context)
 
+        if intent.verb == "variants":
+            fs = variants_answer(intent.tokens[0], run_kql)
+            if fs is not None:
+                last_fact_sets = [fs]
+                say("\n" + narrate_question(fs, question, chat) + "\n")
+                continue
+            # The call failed validation against the data (no such step
+            # family) — one validated RE-ROUTE (ADR 0034): the failure
+            # goes back as context, the model re-picks from the same
+            # closed menu. Live find 2026-08-10: a COMPARE question
+            # misrouted to VARIANTS and the old fallback degraded to a
+            # noise search instead of re-asking.
+            name = intent.tokens[0]
+            retry_note = ((context + "\n") if context else "") + (
+                f"NOTE: your reply 'VARIANTS: {name}' was invalid — no "
+                "step with that exact name exists in the catalog. Choose "
+                "a different form (COMPARE if the question names two "
+                "subjects; otherwise search phrases).")
+            intent = produce_intent(question, chat, retry_note)
+            if intent.verb == "variants":   # insisted — degrade to search
+                say(f"No step named '{name}' found by exact name — "
+                    "searching instead.")
+                intent = Intent(verb="search", tokens=(name,))
+
         if intent.verb == "detail":
             command = intent.tokens[0]
             if last_fact_sets:
@@ -262,16 +287,6 @@ def chat_loop(chat, run_kql, sink, user_id: str = "local-dev",
                 last_fact_sets = [fs]
                 say("\n" + narrate_question(fs, question, chat) + "\n")
             continue
-
-        if intent.verb == "variants":
-            fs = variants_answer(intent.tokens[0], run_kql)
-            if fs is not None:
-                last_fact_sets = [fs]
-                say("\n" + narrate_question(fs, question, chat) + "\n")
-                continue
-            # misfired classification or fuzzy name: degrade to search
-            say(f"No step named '{intent.tokens[0]}' found by exact "
-                "name — searching instead.")
 
         tokens = intent.tokens
         fact_sets = []

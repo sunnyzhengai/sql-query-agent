@@ -321,6 +321,47 @@ class TestScorecardFixtures:
         assert events[0]["token"] == "unsupported:lineage"
         assert events[0]["picked_node_id"] is None
 
+    def test_variants_misroute_rerouted_to_compare(self, tmp_path):
+        # Live transcript (2026-08-10): "does ED Sepsis Screening use the
+        # same sepsis definition as ED Sepsis (Regulatory)" classified as
+        # VARIANTS: sepsis definition. No such family -> the failure goes
+        # back to the classifier, which re-picks COMPARE. No noise search.
+        def chat(system, user):
+            if "typed request" in system:
+                if "was invalid" in user:
+                    return f"COMPARE: {REF_A} | {REF_B} | on=sepsis definition"
+                return "VARIANTS: sepsis definition"
+            return "Comparison narrated."
+        def run_kql(query, params):
+            from src.orchestrator.variants import FAMILY_QUERY
+            if query == FAMILY_QUERY:
+                return []
+            return panel_kql(scoped_rows=[])(query, params)
+        text, _ = self.drive(
+            ["does ED Sepsis Screening use the same sepsis definition "
+             "as ED Sepsis (Regulatory)?", "q"],
+            chat, run_kql, tmp_path)
+        assert "Comparison narrated." in text
+        assert "searching instead" not in text
+        assert "1 identical, 1 drifted" in text     # the panel ran
+
+    def test_variants_reroute_insistence_degrades_to_search(self, tmp_path):
+        def chat(system, user):
+            if "typed request" in system:
+                return "VARIANTS: Ghost_Step"      # insists both times
+            return "should not narrate"
+        def run_kql(query, params):
+            from src.orchestrator.variants import FAMILY_QUERY
+            from src.orchestrator.core import RESOLVE_QUERY
+            if query == FAMILY_QUERY:
+                return []
+            assert query == RESOLVE_QUERY
+            return []
+        text, _ = self.drive(["do ghosts agree?", "q"], chat, run_kql,
+                             tmp_path)
+        assert "searching instead" in text
+        assert "Nothing in the certified knowledge base" in text
+
     def test_unbindable_subject_falls_to_resolution_pick(self, tmp_path):
         # the LLM names a subject loosely -> resolve + human pick binds it
         def chat(system, user):
