@@ -87,12 +87,21 @@ def match(candidate, needles) -> bool:
 
 
 def grade(result, spec) -> dict:
+    """Group-aware since the stratified-plurality amendment (ADR 0032,
+    2026-08-10): the product shows labeled kind groups, so absolute
+    position 1 is meaningless across groups. hit = expected target is
+    anywhere on the SHOWN list; top1 = expected target LEADS ITS KIND
+    GROUP (what a user scanning that group sees first)."""
     if spec.get("refusal"):
         ok = len(result.candidates) == 0
         return {"refused_correctly": ok, "hit": ok, "top1": ok}
-    top = result.candidates[: spec["top_k"]]
-    hit = any(match(c, spec["any_of"]) for c in top)
-    top1 = bool(result.candidates) and match(result.candidates[0], spec["any_of"])
+    shown = result.candidates
+    hit = any(match(c, spec["any_of"]) for c in shown)
+    top1 = False
+    for i, c in enumerate(shown):
+        if match(c, spec["any_of"]):
+            top1 = all(prev.kind != c.kind for prev in shown[:i])
+            break
     return {"hit": hit, "top1": top1, "refused_correctly": None}
 
 
@@ -132,6 +141,7 @@ def main() -> None:
             runs.append({
                 "question": question, "token": token,
                 "top5": [c.node_id for c in result.candidates[:5]],
+                "shown": [c.node_id for c in result.candidates],
                 "total_matches": result.total_matches,
                 "latency_s": round(latency, 2),
                 **grade(result, spec),

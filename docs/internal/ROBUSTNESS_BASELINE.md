@@ -1,17 +1,23 @@
-# Robustness Suite — Baseline Run (2026-08-09)
+# Robustness Suite — Baseline (re-based 2026-08-10, stratified plurality)
 
 **What this is:** 7 canonical questions, each also asked in 5
 LLM-generated rephrasings (42 questions total), run LIVE through
-the orchestrator spine (token → fixed semantic_search → ranked
-candidates) against the probe-eh Eventhouse. Raw data:
+the orchestrator spine (token → fixed semantic_search → stratified
+candidate groups) against the probe-eh Eventhouse. Raw data:
 `robustness_baseline.json`. Regenerate: `python devtools/robustness_suite.py`.
+
+**Re-based** after the stratified-plurality amendment (ADR 0032,
+2026-08-10): the product now shows labeled kind groups (closest
+metrics, then closest steps), so grading is group-aware — absolute
+position 1 across groups is meaningless by design.
 
 ## The metrics, in plain language
 
-- **hit@5** — the expected item appears somewhere in the top 5
-  candidates shown to the user. "Did the right answer make the list?"
-- **top1** — the expected item is the FIRST candidate. "Was it at
-  the top of the list?"
+- **hit** — the expected item appears somewhere on the SHOWN list
+  (both groups). "Did the right answer make the screen?"
+- **top1 (group)** — the expected item is FIRST WITHIN ITS KIND
+  GROUP. "Scanning the group it belongs to, is it the first thing
+  you see?"
 - **refusal correct** — for nonsense questions, zero candidates
   cleared the threshold. "Did we say no instead of guessing?"
 - **top1 agreement** — asking the SAME question 6 different ways:
@@ -26,17 +32,20 @@ candidates) against the probe-eh Eventhouse. Raw data:
 
 ## Scoreboard
 
-| Metric | Result |
-|---|---|
-| Questions run | 42 |
-| hit@5 | **96.7%** |
-| top1 | **93.3%** |
-| Refusal correct | **66.7%** |
-| top1 agreement (mean) | 77.1% |
-| top5 Jaccard (mean) | 0.67 |
-| Replay ranking stable | 7/7 YES |
-| Max embedding jitter | 8.7e-05 |
-| Latency p50 / max | 0.71s / 0.95s |
+| Metric | 2026-08-09 flat list | 2026-08-10 stratified |
+|---|---|---|
+| Questions run | 42 | 42 |
+| hit | 96.7% (top-5) | **100%** (shown list) |
+| top1 | 93.3% (absolute) | **96.7%** (group) |
+| Refusal correct | 66.7% | 66.7% (unchanged; paraphrase drift on the unicorn canonical — plain "readmission rate" legitimately matches Readmit steps) |
+| top1 agreement (mean) | 77.1% | 65.7% (watch item: grouped tails swap more across paraphrases) |
+| top5 Jaccard (mean) | 0.67 | 0.63 |
+| Replay ranking stable | 7/7 YES | 7/7 YES |
+| Max embedding jitter | 8.7e-05 | 6.4e-05 |
+| Latency p50 / max | 0.71s / 0.95s | 0.74s / 1.02s |
+
+Note: the per-question tables below are from the 2026-08-09 flat-list
+run; headline metrics above are current. Regenerate tables as needed.
 
 ## ed_screening
 
