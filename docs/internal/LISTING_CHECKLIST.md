@@ -41,11 +41,11 @@ response.
 0. [~] **READINESS GATE (hard rule, 2026-08-09):**
        1. [x] Answer layer — DONE as ADR 0035: deterministic tools +
           two dispatch guarantees; live-evaluated 12/12 (2026-08-11).
-       2. [~] Robustness suite — retrieval-level suite passes (hit
-          100%, group-top1 96.7%, re-based 2026-08-10). REMAINING: an
-          AGENT-level paraphrase suite (the 12 live conversations x
-          paraphrases, graded Correct/Grounded/Honest) — the successor
-          gate; agent_live_eval.py is its seed.
+       2. [x] Robustness suite — DONE both levels: retrieval suite
+          (hit 100%, group-top1 96.7%, re-based 2026-08-10) AND the
+          agent-level paraphrase suite (2026-08-11: 54 live
+          conversations, all mechanical checks 100% — see
+          AGENT_ROBUSTNESS_BASELINE.md; gate ≥0.95 set).
        3. [ ] Demo recording with deliberate deviation — after the web
           surface exists (see 1b).
 1. [x] **Checklist E** — golden snapshot + semantic catalog on tenant:
