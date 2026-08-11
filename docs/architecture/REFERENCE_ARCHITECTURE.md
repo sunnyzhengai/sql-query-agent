@@ -22,14 +22,15 @@ flowchart TB
         subgraph FABRIC["Microsoft Fabric (customer capacity)"]
             FILES["SQL files + data dictionary<br/>(Lakehouse Files)"]
             ENGINE["AIVIA Metadata Engine<br/>parse (ScriptDom) · PHI scan ·<br/>three-layer knowledge graph +<br/>business names & terms<br/>(Delta + Labeled Property Graph)"]
-            SEMCAT["Semantic catalog — ROADMAP<br/>(Eventhouse: catalog + embeddings +<br/>semantic_search() KQL function)<br/>engine probe-verified 2026-08-08, ADR 0030"]
-            MAGENT["Fabric Data Agent #1<br/>'How is this metric calculated?'<br/>certified answers · named owners ·<br/>report links"]
+            SEMCAT["Semantic catalog — SHIPPED<br/>(Eventhouse: catalog + embeddings +<br/>semantic_search() KQL function)<br/>live 2026-08-10, ADR 0030/0032"]
+            MAGENT["AIVIA Agent — SHIPPED (ADR 0035)<br/>LLM conversation over five deterministic<br/>tools · code-stamped Basis every answer ·<br/>web chat (App Service) · Teams next"]
+            FDAOPT["Fabric Data Agent — OPTIONAL<br/>customer-configured over the same<br/>certified tables; not the product's<br/>answer path"]
             subgraph SS["AIVIA Analytics Self-Service — ROADMAP"]
                 COMPILER["Certified semantic layer compiler<br/>graph → generated views & measures<br/>(dimension layer = filter vocabulary)"]
-                SAGENT["Fabric Data Agent #2<br/>'What WAS this metric last month?'<br/>NL2SQL over certified views only"]
+                SAGENT["Analytics agent<br/>'What WAS this metric last month?'<br/>NL2SQL over certified views only"]
             end
         end
-        AOAI["Customer's own Azure OpenAI<br/>descriptions + embeddings at build time<br/>(PHI-redacted); question embeddings at<br/>ask time via user impersonation — no<br/>stored key (when semantic catalog ships)"]
+        AOAI["Customer's own Azure OpenAI<br/>build time: descriptions + embeddings<br/>(PHI-redacted) · ask time: the agent's<br/>conversation + question embeddings under<br/>the user's identity — no stored key"]
         PURVIEW["Microsoft Purview"]
         COLLIBRA["Collibra (optional)"]
     end
@@ -42,16 +43,18 @@ flowchart TB
     DBX -.-> FILES
     SNOW -.-> FILES
     FILES --> ENGINE
+    ENGINE --> SEMCAT
     ENGINE --> MAGENT
-    ENGINE -.-> SEMCAT
-    SEMCAT -.-> MAGENT
+    SEMCAT --> MAGENT
     ENGINE <--> AOAI
-    SEMCAT -.-> AOAI
+    MAGENT <--> AOAI
     ENGINE -->|"asset descriptions +<br/>glossary terms (multi-asset)"| PURVIEW
     ENGINE -.-> COLLIBRA
+    ENGINE -.optional:<br/>compatible export.-> FDAOPT
     ENGINE --> COMPILER
     COMPILER --> SAGENT
     USERS --> MAGENT
+    USERS -.-> FDAOPT
     USERS --> SAGENT
 ```
 
@@ -89,14 +92,14 @@ box, roadmap style).
 - **Analytics Self-Service (roadmap):** a build-time **compiler**, not a
   new runtime — it emits each certified metric's assembled SQL (ADR 0003
   fragments) as generated views/measures, parameterized by the dimension
-  layer (ADR 0029); Data Agent #2 runs plain NL2SQL over those views, so
-  the generator's habitual query IS the certified query (the ADR 0020
+  layer (ADR 0029); the analytics agent runs plain NL2SQL over those
+  views, so the habitual query IS the certified query (the ADR 0020
   lesson applied to execution). Runtime is 100% Microsoft's engine.
 
 ## Azure consumption footprint (co-sell annotation)
 
 Field-seller-relevant consumption this solution drives, in order:
-**Fabric capacity** (pipeline + both Data Agents + graph), **Azure
+**Fabric capacity** (pipeline + Eventhouse + graph), **Azure
 OpenAI** (customer's own endpoint, build-time), **Microsoft Purview**
 (catalog publish), **Azure DevOps** (git-integrated workspaces, TMDL
 lineage), **Azure SQL / SQL Server** (source estates). Snowflake and

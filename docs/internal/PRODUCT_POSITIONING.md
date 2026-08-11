@@ -3,6 +3,16 @@
 Key framing, messaging, and strategic options for the Data Empowerment Suite.
 Use these when writing Marketplace copy, investor conversations, or customer pitches.
 
+> **REPOSITIONING IN PROGRESS (2026-08-11, ADR 0035):** the product's
+> answer surface is now the **AIVIA agent** — a real conversation over
+> deterministic tools, every answer carrying a code-stamped Basis line.
+> The Fabric Data Agent is an **optional compatibility surface** (dotted
+> line on the architecture diagram; excluded from the demo — Sunny's
+> decision). Copy below that frames the product as a "generator for
+> Fabric Data Agents" is STALE and gets rewritten in the listing-asset
+> pass; the durable pitch: *your SQL becomes a certified knowledge
+> graph, and a governed AI answers from it — provably, or not at all.*
+
 ---
 
 ## What We Are

@@ -2,38 +2,54 @@
 
 ## The System at a Glance
 
-Everything runs inside the customer's Fabric tenant. One arrow leaves it —
-build-time description generation against the customer's **own** Azure
-OpenAI — and that arrow carries PHI-redacted SQL fragments only. The agent
-answers exclusively from the certified graph and refuses beyond it.
+Everything runs inside the customer's tenant. The only service any data
+ever reaches is the customer's **own** Azure OpenAI — at build time for
+PHI-redacted description generation, at ask time for the conversation
+itself. Every factual claim in an answer comes from the deterministic
+tool layer over the certified graph; the code-stamped **Basis** line
+under every answer discloses exactly what was consulted (ADR 0035).
 
 ```mermaid
 flowchart LR
-    subgraph TENANT["CUSTOMER'S FABRIC TENANT — data stays here (one marked exception)"]
+    subgraph TENANT["CUSTOMER'S TENANT — data stays here"]
         SQL["SQL sources<br/>(procs & views)"]
         DICT["Data dictionary<br/>(CSVs — mandatory)"]
         PIPE["Pipeline notebooks 01–09<br/>ScriptDom parse · PHI scan · graph build"]
-        KG["Three-layer knowledge graph<br/>metrics → CTE steps → tables<br/>(Delta tables + LPG export)"]
-        AGENT["Fabric Data Agent<br/>answers only from the graph,<br/>refuses beyond it"]
+        KG["Three-layer knowledge graph<br/>metrics → CTE steps → tables<br/>(Delta = system of record, ADR 0033)"]
+        EH["Eventhouse semantic catalog<br/>(vector projection)"]
+        TOOLS["Five deterministic tools<br/>find · read · list · verify<br/>no unsurfaced facts · basis stamped by code"]
+        APP["AIVIA agent<br/>web chat (App Service, Entra) ·<br/>Teams next — LLM owns the conversation"]
         GOV["Governance<br/>stewards certify · usage prioritizes ·<br/>never gates availability"]
+        FDA["Fabric Data Agent<br/>(optional surface)"]
         SQL --> PIPE
         DICT --> PIPE
         PIPE --> KG
-        KG --> AGENT
-        GOV -.certification & ownership<br/>disclosed in answers.-> AGENT
+        KG --> EH
+        KG --> TOOLS
+        EH --> TOOLS
+        TOOLS <--> APP
+        GOV -.certification & ownership<br/>disclosed in answers.-> TOOLS
+        KG -.optional:<br/>compatible export.-> FDA
     end
-    USER["Business user"] -->|"plain-English question"| AGENT
+    USER["Business user"] -->|"any phrasing,<br/>real conversation"| APP
+    USER -.-> FDA
     LLM["Customer's own<br/>Azure OpenAI"]
-    KG <-->|"build-time only:<br/>PHI-redacted fragments → descriptions"| LLM
+    APP <-->|"ask time: conversation +<br/>tool selection"| LLM
+    KG <-.->|"build time: PHI-redacted<br/>fragments → descriptions"| LLM
 ```
 
 Three sentences of it: **(1)** A Python library (.whl) parses the
 customer's SQL and data dictionary into a three-layer knowledge graph,
-entirely in their lakehouse. **(2)** A Fabric Data Agent grounds every
-answer in that graph — named steward/developer accountability attached,
-refusal instead of guessing. **(3)** The only data egress is build-time
-description generation against the customer's own Azure OpenAI endpoint,
-gated by deterministic PHI redaction — we never ship or hold a key.
+entirely in their lakehouse. **(2)** The AIVIA agent holds a real
+conversation while five deterministic tools own every computation —
+each answer carries a code-stamped Basis line naming exactly what was
+searched, read, and verified, with named steward/developer
+accountability and refusal instead of guessing. **(3)** The only
+service data ever reaches is the customer's own Azure OpenAI — build
+time gated by deterministic PHI redaction, ask time under the user's
+own identity — we never ship or hold a key. (A Fabric Data Agent can
+optionally be pointed at the same certified tables; it is not part of
+the product's answer path.)
 
 ## Three-Layer Graph Model
 
