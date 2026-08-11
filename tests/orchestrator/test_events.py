@@ -2,7 +2,11 @@
 WHO made its load-bearing decisions, so no-solution feedback patterns
 attribute to the deterministic layer or the LLM."""
 
-from src.orchestrator.events import decision_shape
+from src.orchestrator.events import (
+    OneLakeJsonlSink,
+    TurnEvent,
+    decision_shape,
+)
 
 
 def call(tool, result=None, args=None):
@@ -47,3 +51,69 @@ class TestDecisionShape:
              call("search_catalog"), call("get_facts")],
             "Here are the facts.")
         assert d["tool_errors"] == 1
+
+
+class FakeResponse:
+    def __init__(self, status_code=200, headers=None):
+        self.status_code = status_code
+        self.headers = headers or {}
+
+    def raise_for_status(self):
+        if self.status_code >= 400 and self.status_code != 404:
+            raise RuntimeError(f"HTTP {self.status_code}")
+
+
+class FakeDfs:
+    """Programmable ADLS-gen2 transport: tracks the appended bytes."""
+
+    def __init__(self, exists=False, length=0):
+        self.exists, self.length = exists, length
+        self.calls, self.appended = [], b""
+
+    def head(self, url, **kw):
+        self.calls.append(("head", url))
+        if not self.exists:
+            return FakeResponse(404)
+        return FakeResponse(200, {"Content-Length": str(self.length)})
+
+    def put(self, url, **kw):
+        self.calls.append(("put", url))
+        self.exists, self.length = True, 0
+        return FakeResponse(201)
+
+    def patch(self, url, data=b"", **kw):
+        self.calls.append(("patch", url))
+        if "action=append" in url:
+            self.appended += data
+            self.length += len(data)
+        return FakeResponse(202)
+
+
+def _event():
+    return TurnEvent(
+        event_at="t", user_id="u", question="q", tools_used=(),
+        ids_read=(), basis="b", answered=True,
+        conversation_id="c", turn_index=0)
+
+
+class TestOneLakeSink:
+    URL = "https://onelake.dfs.fabric.microsoft.com/ws/lh.Lakehouse/Files/agent_events/webapp.jsonl"
+
+    def test_creates_then_appends_and_flushes(self):
+        dfs = FakeDfs(exists=False)
+        sink = OneLakeJsonlSink(self.URL, lambda: "tok", transport=dfs)
+        sink.record(_event())
+        ops = [c[0] for c in dfs.calls]
+        assert ops == ["head", "put", "patch", "patch"]
+        assert "action=append&position=0" in dfs.calls[2][1]
+        assert dfs.appended.endswith(b"\n")
+        assert b'"question": "q"' in dfs.appended
+
+    def test_appends_at_existing_length(self):
+        dfs = FakeDfs(exists=True, length=100)
+        OneLakeJsonlSink(self.URL, lambda: "tok", transport=dfs).record(_event())
+        assert "action=append&position=100" in dfs.calls[1][1]
+        flush = dfs.calls[2][1]
+        assert f"action=flush&position={100 + dfs.length - 100 + 100}" \
+            not in flush  # flush position = 100 + len(line)
+        assert f"action=flush&position={dfs.length}" in flush

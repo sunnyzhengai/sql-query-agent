@@ -1088,6 +1088,136 @@ CERTIFICATION_EVENTS = {
     "invariants": [],
 }
 
+PUBLISH_LOG = {
+    "table_name": "gov_publish_log",
+    "description": (
+        "Append-only log of every push to an external governance catalog "
+        "(Purview, Collibra): assets, descriptions, glossary terms — one "
+        "row per attempted publish with its outcome. The admin telemetry "
+        "answer to 'what did we push to our DG tools, and did it land?' "
+        "(Sunny, 2026-08-11)."
+    ),
+    "domain": "governance",
+    "status": "planned",
+    "notes": (
+        "Row builder shipped (src/governance/publish_log.py, tested); "
+        "notebooks 08/09 wire the writes next capacity session — "
+        "status flips to active then."
+    ),
+    "columns": [
+        ("published_at", "string", False),
+        ("run_id", "string", False),
+        ("target", "string", False),
+        ("kind", "string", False),
+        ("asset_id", "string", False),
+        ("name", "string", True),
+        ("status", "string", False),
+        ("message", "string", True),
+    ],
+    "column_descriptions": {
+        "published_at": "ISO timestamp of the publish attempt",
+        "run_id": "Pipeline run identifier the publish belonged to",
+        "target": "purview | collibra",
+        "kind": "asset | glossary_term",
+        "asset_id": "Asset/term identity pushed",
+        "name": "Display name pushed",
+        "status": "success | skipped | failed (PublishStatus)",
+        "message": "Adapter message — term guid, assignment counts, or the error",
+    },
+    "invariants": [],
+}
+
+TURN_EVENTS = {
+    "table_name": "gov_turn_events",
+    "description": (
+        "Append-only log of agent conversation turns with the DECISION "
+        "SHAPE (ADR 0035 telemetry): which tools ran, what was read, and "
+        "whether the load-bearing decisions were computed by the engine "
+        "or assembled by the LLM. Ingested from the surfaces' JSONL by "
+        "the agent-events pipeline step; joined to gov_feedback_events "
+        "for failure attribution."
+    ),
+    "domain": "governance",
+    "status": "planned",
+    "notes": (
+        "Transforms shipped (src/steps/agent_events.py, tested); the "
+        "ingest notebook wires the writes next capacity session."
+    ),
+    "columns": [
+        ("event_at", "string", False),
+        ("user_id", "string", False),
+        ("conversation_id", "string", False),
+        ("turn_index", "integer", False),
+        ("question", "string", False),
+        ("tools_used", "string", True),
+        ("ids_read", "string", True),
+        ("basis", "string", True),
+        ("answered", "boolean", False),
+        ("verified_by_tool", "boolean", True),
+        ("llm_assembled", "boolean", True),
+        ("unverified_sameness_language", "boolean", True),
+        ("search_only", "boolean", True),
+        ("no_tools", "boolean", True),
+        ("tool_errors", "integer", True),
+        ("trace", "string", True),
+    ],
+    "column_descriptions": {
+        "event_at": "Turn timestamp (ISO)",
+        "user_id": "Asker identity (Entra principal from Easy Auth)",
+        "conversation_id": "Conversation the turn belongs to",
+        "turn_index": "0-based turn number within the conversation",
+        "question": "The question as asked",
+        "tools_used": "Comma-joined tool names in call order",
+        "ids_read": "Comma-joined metric/step ids read this turn",
+        "basis": "The code-stamped Basis line shown to the user",
+        "answered": "Whether an answer was produced",
+        "verified_by_tool": "A same-logic verdict came from check_same_logic",
+        "llm_assembled": "2+ fact reads, no verify call — LLM computed in memory",
+        "unverified_sameness_language": "Same/different claims with no verify run (highest-risk shape)",
+        "search_only": "Answer rested on a candidate list only",
+        "no_tools": "No tools ran (refusals, smalltalk)",
+        "tool_errors": "Count of tool calls that returned errors",
+        "trace": "Full tool trace as JSON (results capped)",
+    },
+    "invariants": [
+        {"kind": "unique", "columns": ["conversation_id", "turn_index",
+                                       "event_at"]},
+    ],
+}
+
+FEEDBACK_EVENTS = {
+    "table_name": "gov_feedback_events",
+    "description": (
+        "Append-only user verdicts on agent turns (thumbs), joined to "
+        "gov_turn_events by (conversation_id, turn_index) — the other "
+        "half of decision attribution: no-solution patterns land next to "
+        "the decision shape that produced them."
+    ),
+    "domain": "governance",
+    "status": "planned",
+    "notes": (
+        "Transforms shipped (src/steps/agent_events.py, tested); the "
+        "ingest notebook wires the writes next capacity session."
+    ),
+    "columns": [
+        ("event_at", "string", False),
+        ("user_id", "string", False),
+        ("conversation_id", "string", False),
+        ("turn_index", "integer", False),
+        ("verdict", "string", False),
+        ("comment", "string", True),
+    ],
+    "column_descriptions": {
+        "event_at": "Verdict timestamp (ISO)",
+        "user_id": "Who gave the verdict",
+        "conversation_id": "Conversation of the turn being judged",
+        "turn_index": "Turn being judged",
+        "verdict": "helpful | not_helpful",
+        "comment": "Optional free text",
+    },
+    "invariants": [],
+}
+
 USAGE_EVENTS = {
     "table_name": "gov_usage_events",
     "description": (
@@ -1493,6 +1623,8 @@ TABLE_REGISTRY = {
         BUSINESS_TERMS, TERM_LINKS, TERM_ENDORSEMENTS,
         # semantic-search resolution catalog (ADR 0030 L3)
         SEMANTIC_CATALOG,
+        # admin telemetry (2026-08-11): DG pushes + agent decision shapes
+        PUBLISH_LOG, TURN_EVENTS, FEEDBACK_EVENTS,
     ]
 }
 

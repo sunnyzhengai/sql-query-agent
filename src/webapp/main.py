@@ -61,15 +61,27 @@ def _marketplace():
     )
 
 
+def _sink():
+    """OneLake sink when configured (events land in the tenant for the
+    ingest step); local JSONL otherwise."""
+    onelake_url = os.environ.get("AIVIA_EVENTS_ONELAKE_URL", "")
+    if onelake_url:
+        from src.orchestrator.events import OneLakeJsonlSink
+        from src.orchestrator.kusto import az_cli_token_provider
+        return OneLakeJsonlSink(
+            onelake_url, az_cli_token_provider("https://storage.azure.com"))
+    from src.orchestrator.events import JsonlEventSink
+    return JsonlEventSink(Path(os.environ.get(
+        "AIVIA_EVENTS_PATH", "data/events/turn_events.jsonl")))
+
+
 def build() -> "object":
     from devtools.grounding_evals import _load_dotenv
     _load_dotenv()
     from src.orchestrator.agent import azure_chat_api
-    from src.orchestrator.events import JsonlEventSink
     from src.webapp.app import create_app
-    sink = JsonlEventSink(Path(os.environ.get(
-        "AIVIA_EVENTS_PATH", "data/events/turn_events.jsonl")))
-    return create_app(azure_chat_api(), _kusto_run(), sink, _marketplace())
+    return create_app(azure_chat_api(), _kusto_run(), _sink(),
+                      _marketplace())
 
 
 app = build() if os.environ.get("AIVIA_WEBAPP_EAGER", "1") != "0" else None

@@ -54,6 +54,60 @@ class JsonlEventSink:
             f.write(json.dumps(asdict(event)) + "\n")
 
 
+class OneLakeJsonlSink:
+    """Production sink (admin telemetry, 2026-08-11): appends event JSONL
+    to a OneLake Files path over the ADLS gen2 DFS API, so the App
+    Service's events land IN THE TENANT where the ingest step
+    (src/steps/agent_events.py) folds them into gov_turn_events /
+    gov_feedback_events each pipeline run.
+
+    file_url example:
+      https://onelake.dfs.fabric.microsoft.com/<workspace>/<lakehouse>.Lakehouse/Files/agent_events/webapp.jsonl
+
+    token_provider returns a bearer token for the storage resource
+    (managed identity on App Service; az CLI locally). transport is
+    injectable for tests. Append protocol: create-if-missing, then
+    append at current length + flush — single-writer per file (one App
+    Service instance per file path), which is the v1 deployment shape.
+    """
+
+    def __init__(self, file_url: str, token_provider,
+                 transport=None, timeout: int = 30) -> None:
+        import requests as _requests
+        self.file_url = file_url
+        self._token = token_provider
+        self._http = transport or _requests
+        self.timeout = timeout
+
+    def _headers(self) -> dict:
+        return {"Authorization": f"Bearer {self._token()}"}
+
+    def _length(self) -> "int | None":
+        r = self._http.head(self.file_url, headers=self._headers(),
+                            timeout=self.timeout)
+        if r.status_code == 404:
+            return None
+        r.raise_for_status()
+        return int(r.headers.get("Content-Length", 0))
+
+    def record(self, event) -> None:
+        line = (json.dumps(asdict(event)) + "\n").encode("utf-8")
+        length = self._length()
+        if length is None:
+            r = self._http.put(f"{self.file_url}?resource=file",
+                               headers=self._headers(), timeout=self.timeout)
+            r.raise_for_status()
+            length = 0
+        r = self._http.patch(
+            f"{self.file_url}?action=append&position={length}",
+            headers=self._headers(), data=line, timeout=self.timeout)
+        r.raise_for_status()
+        r = self._http.patch(
+            f"{self.file_url}?action=flush&position={length + len(line)}",
+            headers=self._headers(), timeout=self.timeout)
+        r.raise_for_status()
+
+
 @dataclass(frozen=True)
 class TurnEvent:
     """ADR 0035 flywheel grain: one conversational turn — the question,
