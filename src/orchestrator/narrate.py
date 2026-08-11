@@ -24,8 +24,9 @@ NARRATE_SYSTEM = (
     "numbers, or patient identifiers; use generic labels.\n"
     "5. ONLY if BOTH report_name AND report_url appear in the facts, end "
     "with: Used in: <report_name> (<report_url>). If either is absent, "
-    "write NO Used-in line at all — never substitute the business name "
-    "or write placeholders like (not recorded).\n"
+    "end the answer without mentioning reports or usage at all — never "
+    "substitute the business name, never write placeholders like (not "
+    "recorded), and never state that a line is missing or omitted.\n"
     "6. No greetings, no confidence claims, no percentages of certainty."
 )
 

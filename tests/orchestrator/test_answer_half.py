@@ -86,6 +86,14 @@ class TestNarrate:
         assert "steward" not in seen["user"]             # nulls omitted
         assert "never substitute the business name" in seen["system"]
 
+    def test_rule5_wording_cannot_leak_as_output(self):
+        # Live regression (2026-08-10): "write NO Used-in line" was pasted
+        # verbatim into an answer. The rule must never contain words that
+        # read as content to emit.
+        from src.orchestrator.narrate import NARRATE_SYSTEM
+        assert "write NO Used-in" not in NARRATE_SYSTEM
+        assert "NO Used-in line" not in NARRATE_SYSTEM
+
 
 class TestEvents:
     def test_jsonl_sink_appends_and_maps_to_contract(self, tmp_path):
