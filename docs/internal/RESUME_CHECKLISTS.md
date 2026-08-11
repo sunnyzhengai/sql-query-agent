@@ -207,6 +207,15 @@ Order matters: 1–4 change tables/instructions, 5 validates, 6 records.
 
 ## F. Next session — orchestrator goes live end to end (queued 2026-08-09)
 
+**STATUS 2026-08-10 (live sessions ran):** shortcuts created; multiple
+live CLI sessions done. Shipped from live findings: input cleaning
+(escape keys), duplicate-list backstop, empty-pick guard, narrate rule
+5 reword (leak fix), the VARIANTS VERB (live-verified:
+Base_Pop_Severe_ED_Scores = 6 procs, 5 distinct definitions), and the
+verb scorecard game → conversational entry edge REFACTOR GREEN-LIT
+(see VERB_SCORECARD.md). UI decided: one backend, two faces (ROADMAP).
+Remaining below still valid for further break-it testing.
+
 The answer half is built and offline-tested; it needs two shortcuts and
 one live conversation. Plain steps:
 

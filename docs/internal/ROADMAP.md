@@ -84,6 +84,20 @@ Fix: a deterministic answer layer between retrieval and language.
   product.
 Listing, demo, and Purview screenshots all follow Phase C's gate.
 
+**Answer-layer status (2026-08-10):** Phase D happened — the
+orchestrator IS the flagship (ADR 0032), live-verified, with the
+variants verb shipped and the conversational entry edge green-lit via
+the 8-question paper test (docs/internal/VERB_SCORECARD.md = acceptance
+criteria). Fabric Data Agents are optional secondary surfaces.
+
+**UI DECISION (2026-08-10): one backend, two faces.** The orchestrator
+becomes a small service (FastAPI); the flagship demo surface is a web
+chat page deployed in the customer's tenant (App Service, Entra
+sign-in); a Teams bot wraps the SAME service as fast-follow. The
+terminal CLI remains the dev harness. Rationale: web-first gives full
+visual control for the listing demo; Teams is the enterprise adoption
+surface with per-user Entra identity feeding the flywheel.
+
 **Catalog strategy (DECIDED 2026-08-10): Purview-first.** Purview is
 the primary marketing/demo route — bigger addressable market (every
 Fabric customer), co-sell alignment (Microsoft sellers can tell the
