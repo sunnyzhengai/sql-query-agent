@@ -31,29 +31,35 @@ response.
 - [x] validate_deployment.py + build_deployment_package.py exist and
       are tested
 
+## STATE RECONCILIATION (2026-08-11, overnight): the flagship is now
+## the ADR 0035 agent (LLM conversation over five deterministic tools),
+## live-evaluated 12/12 (docs/internal/AGENT_LIVE_RESULTS.md). The gate
+## items below are re-mapped to that architecture.
+
 ## Blockers — must happen before submission, in order
 
-0. [ ] **READINESS GATE (hard rule, 2026-08-09 — supersedes all
-       sequencing below):** the product ships only when it is
-       battle-tested against phrasing variance — no staged demos, no
-       structural work deferred to post-listing. Concretely:
-       1. Answer contracts land (deterministic resolution + assembly;
-          the generator narrates, never decides) — see ROADMAP
-          "Answer layer" phases.
-       2. Paraphrase-robustness suite passes: each canonical question
-          x 8-10 paraphrases, scored Correct/Grounded/Honest/
-          Consistent; gate thresholds set from the first baseline run.
-       3. Only then: record the demo — and deliberately deviate from
-          the script on camera to show agility.
-1. [ ] **Checklist E first** (you're running it now): golden snapshot,
-       then the semantic-catalog on-tenant pass. The snapshot matters
-       here because the demo gets recorded against a state you can
-       restore.
-2. [ ] **Publish both agents** (they are still **Draft** — tonight's QA
-       ran in the test pane): open each agent → **Publish**. Then ask
-       the Delta agent one question on the published surface and
-       LEFT-CLICK the report link — if it opens, the video shows a
-       click; if not, the video shows open-in-new-tab. Ten minutes.
+0. [~] **READINESS GATE (hard rule, 2026-08-09):**
+       1. [x] Answer layer — DONE as ADR 0035: deterministic tools +
+          two dispatch guarantees; live-evaluated 12/12 (2026-08-11).
+       2. [~] Robustness suite — retrieval-level suite passes (hit
+          100%, group-top1 96.7%, re-based 2026-08-10). REMAINING: an
+          AGENT-level paraphrase suite (the 12 live conversations x
+          paraphrases, graded Correct/Grounded/Honest) — the successor
+          gate; agent_live_eval.py is its seed.
+       3. [ ] Demo recording with deliberate deviation — after the web
+          surface exists (see 1b).
+1. [x] **Checklist E** — golden snapshot + semantic catalog on tenant:
+       DONE (2026-08-10, validated live).
+1b. [ ] **NEW — the web surface** (UI decision 2026-08-10: one backend,
+       two faces). The demo must show a customer-grade surface, not a
+       terminal: FastAPI service wrapping the agent + a chat page +
+       Entra sign-in, deployed in the tenant. This is the largest
+       remaining build. Teams face is post-listing.
+2. [ ] **Fabric Data Agents: decide their listing role** — they are
+       demoted secondary surfaces (ADR 0032/0035). Either publish them
+       as an optional feature with one verification question each, or
+       drop them from the listing narrative entirely. Ten minutes
+       either way; the demo no longer depends on them.
 3. [ ] **Record the demo video** (~5 min). TWO scripts now exist:
        docs/internal/DEMO_SCRIPT.md (5-min listing cut, QA-verified
        questions) and data/demo/Demo Script Sepsis.md (long-form
@@ -90,6 +96,14 @@ response.
 
 ## Should-do (not blocking; before or during certification wait)
 
+- [ ] Whitepaper + reviewer guide + DEMO_SCRIPT refresh for ADR 0035:
+      the product story is now "conversational agent, deterministic
+      tools, code-stamped provenance" — the demo script's beats change
+      (basis lines under every answer are the differentiator to show)
+- [ ] Architecture diagram redraw (promised post-refactor): agent +
+      five tools + guarantees; Data Agents as optional surfaces
+- [ ] Data refresh: live output_metric_logic lacks business_name —
+      re-run the snapshot/05 path so answers use business names
 - [ ] Whitepaper refresh: PHI scanning is now IMPLEMENTED (ADR 0025,
       live on tenant 2026-08-08) — claim it accurately; add the Azure
       OpenAI abuse-monitoring exemption note for strict-PHI customers
