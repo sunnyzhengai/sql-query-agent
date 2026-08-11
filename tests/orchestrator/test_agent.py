@@ -49,7 +49,7 @@ class TestLoop:
         turn = run_turn([], f"does ED Sepsis Screening use the same "
                         f"logic as {REF_B}?", api, fake_kql, session)
         assert "two distinct definitions" in turn.answer
-        assert "same_logic(2 ids) -> 2 distinct" in turn.basis
+        assert f"same_logic([{REF_A}, {REF_B}]) -> 2 distinct" in turn.basis
 
     def test_guarantee_violation_is_visible_and_recoverable(self):
         # model tries an unsurfaced id; error returns AS a tool result,

@@ -58,9 +58,15 @@ def fake_kql(query, params):
         ]
     if query == FIND_BY_NAME_QUERY:
         name = params["p_name"].lower()
-        return [{"node_id": s, "kind": "step", "ref": s.split(":")[1],
-                 "name": "Scores", "business_name": ""}
-                for s in (STEP_1, STEP_2)] if name == "scores" else []
+        if name == "scores":
+            return [{"node_id": s, "kind": "step", "ref": s.split(":")[1],
+                     "name": "Scores", "business_name": ""}
+                    for s in (STEP_1, STEP_2)]
+        if name in ("ed sepsis screening", REF_A.lower()):
+            return [{"node_id": f"canonical:{REF_A}", "kind": "metric",
+                     "ref": REF_A, "name": "USP_ED_Sepsis",
+                     "business_name": "ED Sepsis Screening"}]
+        return []
     if query == METRIC_FACTS_QUERY:
         row = METRIC_ROWS.get(params["p_ref"])
         return [row] if row else []
@@ -97,6 +103,14 @@ class TestFind:
         out = find_by_name("#Scores", fake_kql, s)
         assert out["count"] == 2
         assert s.permitted(STEP_1) and s.permitted(STEP_2)
+
+    def test_find_by_business_name_and_ref(self):
+        # live find (2026-08-10): users say business names and refs;
+        # exact lookup must honor all three spellings
+        s = Session()
+        assert find_by_name("ED Sepsis Screening", fake_kql, s)["count"] == 1
+        assert find_by_name(REF_A, fake_kql, s)["count"] == 1
+        assert s.permitted(REF_A)
 
 
 class TestGuarantee1:

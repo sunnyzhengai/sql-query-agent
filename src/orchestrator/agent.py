@@ -24,15 +24,35 @@ SYSTEM_PROMPT = (
     "conversation. You may arrange and summarize facts; you may never "
     "add, estimate, or fill gaps. If the tools cannot support an "
     "answer, say so plainly.\n"
-    "2. Questions outside the certified knowledge base (actual patient "
-    "or row-level data, counts from data, systems we do not track): "
-    "refuse honestly and say what you CAN answer.\n"
+    "2. Questions outside the certified knowledge base: refuse honestly "
+    "and say what you CAN answer. Outside it are: actual patient or "
+    "row-level data and counts; LINEAGE (which metrics read from or are "
+    "downstream of a table — the tools cannot answer this; search "
+    "results are NOT lineage, never present them as such); usage "
+    "statistics; and listing all items by a filter such as owner.\n"
+    "2b. NEVER refuse a question that mentions a clinical or business "
+    "concept without searching first — 'how is X defined' means how "
+    "this ORGANIZATION defines/calculates X, which the certified "
+    "metrics likely answer. Search, show what exists, and only then "
+    "say what is missing.\n"
     "3. For any question about whether SQL logic is the same or "
     "different, call check_same_logic — never judge SQL equality "
     "yourself.\n"
-    "4. When a search returns several plausible matches for what the "
-    "user named, either ask which they meant or state the assumption "
-    "you are making — never silently pretend there was only one.\n"
+    "4. Closeness is the relevance signal. Plausible matches (roughly "
+    "0.5 and above): show the candidates by business name and either "
+    "ask which the user meant or answer the most likely one while "
+    "naming the alternatives — never silently pretend there was only "
+    "one. Only weak matches (below roughly 0.5): say nothing "
+    "sufficiently related exists — never present weak matches as if "
+    "they were relevant.\n"
+    "4b. Answer the question actually asked, about the item actually "
+    "named: a question about a specific named STEP operates on that "
+    "step's ids (not the whole metrics); a question about TABLES uses "
+    "the source tables in metric facts (not the step list). If the "
+    "user names an item that has not been surfaced UNDER THAT NAME in "
+    "this conversation, look it up (find_by_name, then search) — NEVER "
+    "substitute a similarly-themed item you happen to have seen; a "
+    "name mismatch is a wrong answer.\n"
     "5. Translate SQL into business language in answers; show raw SQL "
     "only when asked for it.\n"
     "6. Never output personal names from inside SQL text, medical "
@@ -53,7 +73,7 @@ class Turn:
     trace: "list[dict]" = field(default_factory=list)
 
 
-def _basis_from_trace(trace: "list[dict]") -> str:
+def _basis_from_trace(trace: "list[dict]", had_prior_facts: bool = False) -> str:
     """Guarantee 2 (ADR 0035): disclosure is stamped, not written."""
     parts = []
     for t in trace:
@@ -73,11 +93,17 @@ def _basis_from_trace(trace: "list[dict]") -> str:
             parts.append(f"steps[{args.get('ref', '')}] -> "
                          f"{result.get('count', 0)}")
         elif name == "check_same_logic":
-            n = len(args.get("ids", []))
+            ids = args.get("ids", [])
+            shown = ", ".join(ids[:4]) + (", ..." if len(ids) > 4 else "")
             parts.append(
-                f"same_logic({n} ids) -> "
+                f"same_logic([{shown}]) -> "
                 f"{result.get('distinct_definitions', '?')} distinct")
-    return "; ".join(parts) if parts else "no tools consulted"
+    if parts:
+        return "; ".join(parts)
+    if had_prior_facts:
+        return ("no new lookups — answered from facts already retrieved "
+                "in this conversation")
+    return "no tools consulted"
 
 
 def _short(args: dict) -> str:
@@ -108,7 +134,7 @@ def run_turn(
         tool_calls = message.get("tool_calls") or []
         if not tool_calls:
             answer = (message.get("content") or "").strip()
-            basis = _basis_from_trace(trace)
+            basis = _basis_from_trace(trace, bool(session.surfaced))
             history.append({"role": "assistant", "content": answer})
             return Turn(answer=answer, basis=basis, trace=trace)
         history.append(message)

@@ -31,9 +31,16 @@ from src.orchestrator.core import resolve
 
 # --- fixed queries ----------------------------------------------------
 
+# Exact match on internal name, business name, or (for metrics) the
+# ref itself — live find 2026-08-10: users say "ED Sepsis Screening"
+# (business name) and "reporting.USP_IP_SEPSIS" (ref); matching only
+# the internal name refused both.
 FIND_BY_NAME_QUERY = (
     "declare query_parameters(p_name:string);\n"
-    "semantic_catalog | where tolower(name) == tolower(p_name)\n"
+    "semantic_catalog\n"
+    "| where tolower(name) == tolower(p_name)\n"
+    "    or tolower(business_name) == tolower(p_name)\n"
+    "    or (['kind'] == 'metric' and tolower(['ref']) == tolower(p_name))\n"
     "| project node_id, ['kind'], ['ref'], name, business_name\n"
     "| order by node_id asc"
 )
@@ -244,29 +251,37 @@ TOOL_SCHEMAS = [
         "description": ("Semantic search over the certified catalog of "
                         "metrics and calculation steps. Returns the "
                         "closest metrics and closest steps with a "
-                        "closeness score each."),
+                        "closeness score each. TOP MATCHES ONLY — not "
+                        "exhaustive; to gather EVERY item bearing a "
+                        "specific name, use find_by_name instead."),
         "parameters": {"type": "object", "properties": {
             "phrase": {"type": "string",
                        "description": "short search phrase (2-6 words)"}},
             "required": ["phrase"]}}},
     {"type": "function", "function": {
         "name": "find_by_name",
-        "description": ("Exact-name lookup (case-insensitive). Use for a "
-                        "specific step/metric name the user typed, or to "
-                        "find every proc defining a same-named step."),
+        "description": ("Exact lookup (case-insensitive) by internal name, "
+                        "business name, or metric ref. Use for a specific "
+                        "name the user typed, or to find every proc "
+                        "defining a same-named step."),
         "parameters": {"type": "object", "properties": {
             "name": {"type": "string"}}, "required": ["name"]}}},
     {"type": "function", "function": {
         "name": "get_facts",
         "description": ("Full certified facts for one item: a metric ref "
                         "(e.g. reporting.USP_X) or a step id "
-                        "(transform:...). Only ids surfaced this "
-                        "conversation or typed by the user."),
+                        "(transform:...). For metrics this includes the "
+                        "SOURCE TABLES list, steward/developer, report "
+                        "link, description, and full SQL. Only ids "
+                        "surfaced this conversation or typed by the "
+                        "user."),
         "parameters": {"type": "object", "properties": {
             "id": {"type": "string"}}, "required": ["id"]}}},
     {"type": "function", "function": {
         "name": "list_steps",
-        "description": "All calculation steps of one metric, with ids.",
+        "description": ("All calculation steps (SQL stages) of one metric, "
+                        "with ids. Steps are NOT source tables — for "
+                        "tables use get_facts."),
         "parameters": {"type": "object", "properties": {
             "ref": {"type": "string"}}, "required": ["ref"]}}},
     {"type": "function", "function": {
@@ -277,7 +292,9 @@ TOOL_SCHEMAS = [
                         "refs; returns groups of identical members, a "
                         "diff, and which ids had no SQL recorded. ALWAYS "
                         "use this for any same/different-logic question — "
-                        "never judge SQL equality yourself."),
+                        "never judge SQL equality yourself. For 'is this "
+                        "step the same everywhere' questions, gather the "
+                        "complete family with find_by_name first."),
         "parameters": {"type": "object", "properties": {
             "ids": {"type": "array", "items": {"type": "string"}}},
             "required": ["ids"]}}},
