@@ -41,6 +41,31 @@ TOKENS_SYSTEM_PROMPT = (
     "concepts the question does not name."
 )
 
+# Entry edge v2: the LLM CLASSIFIES from a closed verb menu — it never
+# composes. FORM 1 names the one set-subject verb built so far
+# (variants); FORM 2 is the default search translation. A misfired
+# VARIANTS line degrades to search downstream (empty family), never
+# breaks — same property as a wrong token split.
+INTENT_SYSTEM_PROMPT = (
+    "You turn a user's question about business metrics into a typed "
+    "request. Two forms exist.\n"
+    "FORM 1 — consistency check: ONLY if the question asks whether "
+    "definitions of one NAMED step, table, or calculation agree, differ, "
+    "are consistent, or have drifted across procedures or reports, "
+    "output exactly one line:\n"
+    "VARIANTS: <that name exactly as the question spells it>\n"
+    "FORM 2 — search (everything else): output ONE short search phrase "
+    "(2-6 words) per DISTINCT business concept the question asks about, "
+    "one per line, at most 3 lines. A question about a single concept "
+    "gets exactly ONE line — even if it mentions that concept's "
+    "definition, metrics, or calculation; those are aspects of one "
+    "concept, never separate lines. Never output two phrasings of the "
+    "same concept. Only a question naming clearly different things (a "
+    "comparison, an explicit 'and') gets multiple lines. No numbering, "
+    "no punctuation, no explanation. Do not add concepts the question "
+    "does not name."
+)
+
 MAX_TOKENS_PER_QUESTION = 3
 
 # Deterministic backstop for over-split tokens (live find, 2026-08-10:
@@ -55,6 +80,32 @@ RESOLVE_QUERY = (
     "declare query_parameters(token:string);\n"
     "semantic_search(token)"
 )
+
+
+@dataclass(frozen=True)
+class Intent:
+    verb: str                    # search | variants
+    tokens: "tuple[str, ...]"    # search phrases, or (family_name,)
+
+
+def produce_intent(
+    question: str, chat: "Callable[[str, str], str]"
+) -> Intent:
+    """Entry edge: classify + translate in one call. The verb is a choice
+    from a closed menu, validated structurally — an unrecognized or
+    empty VARIANTS line falls through to search, so a misbehaving model
+    can only ever degrade to the default flow.
+    """
+    raw = chat(INTENT_SYSTEM_PROMPT, question)
+    lines = [ln for ln in raw.splitlines() if ln.strip()]
+    first = lines[0].strip() if lines else ""
+    if first.upper().startswith("VARIANTS:"):
+        name = _sanitize(first.split(":", 1)[1])
+        if name:
+            return Intent(verb="variants", tokens=(name,))
+    tokens = [_sanitize(ln) for ln in lines if _sanitize(ln)]
+    tokens = tokens[:MAX_TOKENS_PER_QUESTION] or [_sanitize(raw)]
+    return Intent(verb="search", tokens=tuple(tokens))
 
 
 @dataclass(frozen=True)

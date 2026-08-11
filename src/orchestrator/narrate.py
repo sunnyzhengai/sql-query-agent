@@ -46,6 +46,21 @@ def narrate(fact_set: FactSet, chat: "Callable[[str, str], str]") -> str:
     return f"{prose}\n\nBasis: {fact_set.basis}"
 
 
+def narrate_question(
+    fact_set: FactSet, question: str, chat: "Callable[[str, str], str]"
+) -> str:
+    """Exit edge for verbs whose answer depends on what was asked (e.g.
+    variants: 'do A and B agree?' is answered from the full partition).
+    Same facts-only rules; the question frames, the facts bound."""
+    prose = chat(
+        NARRATE_SYSTEM,
+        f"The user asked: {question}\n\nFacts about this {fact_set.kind}:\n"
+        f"{facts_block(fact_set)}\n\n"
+        "Answer their question using ONLY these facts.",
+    ).strip()
+    return f"{prose}\n\nBasis: {fact_set.basis}"
+
+
 def narrate_many(
     fact_sets: "list[FactSet]",
     question: str,

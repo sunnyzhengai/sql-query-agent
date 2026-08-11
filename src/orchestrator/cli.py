@@ -22,9 +22,12 @@ from src.orchestrator.core import (
     ResolutionResult,
     duplicate_list,
     parse_pick,
-    produce_search_tokens,
+    produce_intent,
     resolve,
 )
+from src.orchestrator.events import ConfirmEvent, JsonlEventSink, PickEvent
+from src.orchestrator.narrate import narrate_many, narrate_question
+from src.orchestrator.variants import variants_answer
 
 # Terminal reality (live find, 2026-08-10): Esc/arrow keys glue invisible
 # escape sequences onto typed replies — "\x1b2" is not a digit, so a real
@@ -36,8 +39,7 @@ _ANSI_SEQ = re.compile(r"\x1b\[[0-9;?]*[A-Za-z~]")
 def clean_input(text: str) -> str:
     text = _ANSI_SEQ.sub("", text)
     return "".join(ch for ch in text if ch.isprintable()).strip()
-from src.orchestrator.events import ConfirmEvent, JsonlEventSink, PickEvent
-from src.orchestrator.narrate import narrate_many
+
 
 WEAK_CLOSENESS = 0.40   # display label only — never a gate (ADR 0032)
 
@@ -80,6 +82,10 @@ def render_detail(command: str, fact_sets) -> str:
                  or f.get("step_name") or fs.ref)
         if command == "sql":
             sql = f.get("calculation_logic") or f.get("sql_fragment")
+            if not sql:   # variants fact set: one block per definition
+                blocks = [f"-- {k.replace('_', ' ')}\n{v}"
+                          for k, v in f.items() if k.endswith("_sql")]
+                sql = "\n\n".join(blocks) or None
             out.append(f"--- SQL for {label} ---\n{sql or '(no SQL recorded)'}")
         elif command == "owner":
             out.append(f"{label}: steward = "
@@ -170,7 +176,17 @@ def chat_loop(chat, run_kql, sink, user_id: str = "local-dev",
                     f"{command}.")
             continue
 
-        tokens = produce_search_tokens(question, chat)
+        intent = produce_intent(question, chat)
+        if intent.verb == "variants":
+            fs = variants_answer(intent.tokens[0], run_kql)
+            if fs is not None:
+                last_fact_sets = [fs]
+                say("\n" + narrate_question(fs, question, chat) + "\n")
+                continue
+            # misfired classification or fuzzy name: degrade to search
+            say(f"No step named '{intent.tokens[0]}' found by exact "
+                "name — searching instead.")
+        tokens = intent.tokens
         fact_sets = []
         any_candidates = False
         shown_id_sets = []
