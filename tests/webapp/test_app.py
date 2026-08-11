@@ -82,6 +82,40 @@ class TestChat:
         client, _ = chat_client(tmp_path, [])
         assert client.post("/api/chat", json={"message": " "}).status_code == 400
 
+    def test_turn_event_carries_decision_shape_and_trace(self, tmp_path):
+        client, events = chat_client(tmp_path, [
+            [("search_catalog", {"phrase": "ed sepsis"}),
+             ("get_facts", {"id": REF_A})],
+            "It is calculated from encounters.",
+        ])
+        client.post("/api/chat", json={"message": "how is it calculated?"})
+        row = json.loads(events.read_text().splitlines()[0])
+        assert row["conversation_id"] and row["turn_index"] == 0
+        assert row["decision"]["verified_by_tool"] is False
+        assert row["decision"]["no_tools"] is False
+        assert [t["tool"] for t in row["trace"]] == ["search_catalog",
+                                                     "get_facts"]
+
+    def test_feedback_joins_to_the_turn(self, tmp_path):
+        client, events = chat_client(tmp_path, [
+            [("search_catalog", {"phrase": "x"})], "A.",
+        ])
+        r = client.post("/api/chat", json={"message": "q"}).json()
+        fb = client.post("/api/feedback", json={
+            "conversation_id": r["conversation_id"],
+            "turn_index": r["turn_index"],
+            "verdict": "not_helpful", "comment": "wrong metric"})
+        assert fb.status_code == 200
+        rows = [json.loads(x) for x in events.read_text().splitlines()]
+        assert rows[1]["verdict"] == "not_helpful"
+        assert rows[1]["conversation_id"] == rows[0]["conversation_id"]
+        assert rows[1]["turn_index"] == rows[0]["turn_index"]
+
+    def test_feedback_verdict_validated(self, tmp_path):
+        client, _ = chat_client(tmp_path, [])
+        assert client.post("/api/feedback", json={
+            "verdict": "meh"}).status_code == 400
+
 
 class FakeStore:
     def __init__(self):

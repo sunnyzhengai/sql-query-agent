@@ -13,7 +13,7 @@ import re
 from datetime import datetime, timezone
 
 from src.orchestrator.agent import azure_chat_api, run_turn
-from src.orchestrator.events import JsonlEventSink, TurnEvent
+from src.orchestrator.events import JsonlEventSink, TurnEvent, decision_shape
 from src.orchestrator.tools import Session
 
 # Terminal reality (live find, 2026-08-10): Esc/arrow keys glue
@@ -30,8 +30,13 @@ def clean_input(text: str) -> str:
 def chat_loop(chat_api, run_kql, sink, user_id: str = "local-dev",
               ask=input, say=print) -> None:
     say("AIVIA — ask about your certified metrics ('q' to quit)\n")
+    import json as _json
+    import uuid
+
     history: "list[dict]" = []
     session = Session()
+    conv_id = f"cli-{uuid.uuid4()}"
+    turn_index = 0
     while True:
         question = clean_input(ask("you> "))
         if question.lower() in ("q", "quit", "exit"):
@@ -52,7 +57,14 @@ def chat_loop(chat_api, run_kql, sink, user_id: str = "local-dev",
                 and (t["args"].get("id") or t["args"].get("ref"))})),
             basis=turn.basis,
             answered=bool(turn.answer),
+            conversation_id=conv_id, turn_index=turn_index,
+            decision=decision_shape(turn.trace, turn.answer),
+            trace=tuple(
+                {"tool": t["tool"], "args": t["args"],
+                 "result": _json.dumps(t["result"])[:1500]}
+                for t in turn.trace),
         ))
+        turn_index += 1
 
 
 def main() -> None:

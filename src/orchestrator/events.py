@@ -57,9 +57,12 @@ class JsonlEventSink:
 @dataclass(frozen=True)
 class TurnEvent:
     """ADR 0035 flywheel grain: one conversational turn — the question,
-    the tools consulted (the code-stamped trace), the ids read. Pick/
-    confirm granularity returns when a surface affords it; append-only
-    as ever."""
+    the tools consulted (the code-stamped trace), the ids read, and the
+    DECISION SHAPE (Sunny, 2026-08-11): when a user says "this is not
+    the solution I wanted", the record must say whether the answer's
+    load-bearing decisions were made by deterministic tools or by the
+    LLM in its own head — so no-solution patterns attribute to the
+    right component. Append-only as ever."""
 
     event_at: str
     user_id: str
@@ -68,6 +71,54 @@ class TurnEvent:
     ids_read: "tuple[str, ...]"
     basis: str
     answered: bool
+    conversation_id: str = ""
+    turn_index: int = 0
+    decision: "dict | None" = None      # see decision_shape()
+    trace: "tuple[dict, ...]" = ()      # full tool calls (args + results)
+
+
+def decision_shape(trace: "list[dict]", answer: str) -> dict:
+    """Code-computed classification of WHO made this turn's decisions.
+
+    - verified_by_tool: a same/different-logic verdict came from
+      check_same_logic (the engine decided)
+    - llm_assembled: the answer draws on 2+ fact sets with no verify
+      call — comparisons/intersections computed by the LLM in memory
+      (legitimate for small facts per ADR 0035, but recorded so failure
+      patterns can point here)
+    - unverified_sameness_language: the answer speaks of same/identical/
+      differ while NO verify tool ran — the highest-risk LLM decision
+    - search_only / no_tools: the answer rests on a candidate list only,
+      or on nothing (refusals, smalltalk)
+    - tool_errors: tools refused or failed this turn (visible recovery)
+    """
+    tools = [t["tool"] for t in trace]
+    reads = sum(1 for t in tools if t in ("get_facts", "list_steps"))
+    verified = "check_same_logic" in tools
+    sameness_words = any(w in answer.lower() for w in (
+        "same logic", "identical", "differ", "not the same", "share the same"))
+    return {
+        "verified_by_tool": verified,
+        "llm_assembled": reads >= 2 and not verified,
+        "unverified_sameness_language": sameness_words and not verified,
+        "search_only": bool(tools) and reads == 0 and not verified,
+        "no_tools": not tools,
+        "tool_errors": sum(1 for t in trace if "error" in t["result"]),
+    }
+
+
+@dataclass(frozen=True)
+class FeedbackEvent:
+    """The user's verdict on a turn ("this is/isn't what I wanted"),
+    joined to the TurnEvent by (conversation_id, turn_index) — the
+    other half of decision attribution."""
+
+    event_at: str
+    user_id: str
+    conversation_id: str
+    turn_index: int
+    verdict: str             # helpful | not_helpful
+    comment: str = ""
 
 
 @dataclass(frozen=True)

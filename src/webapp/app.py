@@ -23,8 +23,10 @@ from typing import Callable
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse, JSONResponse
 
+import json as _json
+
 from src.orchestrator.agent import Turn, run_turn
-from src.orchestrator.events import TurnEvent
+from src.orchestrator.events import FeedbackEvent, TurnEvent, decision_shape
 from src.orchestrator.tools import Session
 
 MAX_CONVERSATIONS = 500          # in-memory cap; oldest evicted
@@ -91,6 +93,7 @@ def create_app(
                  "conversation_id": conv_id}, status_code=409)
         turn: Turn = run_turn(conv.history, message, chat_api, run_kql,
                               conv.session)
+        turn_index = conv.turns
         conv.turns += 1
         sink.record(TurnEvent(
             event_at=datetime.now(timezone.utc).isoformat(),
@@ -102,9 +105,33 @@ def create_app(
                 if t["tool"] in ("get_facts", "list_steps")
                 and (t["args"].get("id") or t["args"].get("ref"))})),
             basis=turn.basis, answered=bool(turn.answer),
+            conversation_id=conv_id, turn_index=turn_index,
+            decision=decision_shape(turn.trace, turn.answer),
+            trace=tuple(
+                {"tool": t["tool"], "args": t["args"],
+                 "result": _json.dumps(t["result"])[:1500]}
+                for t in turn.trace),
         ))
         return JSONResponse({"conversation_id": conv_id,
+                             "turn_index": turn_index,
                              "answer": turn.answer, "basis": turn.basis})
+
+    @app.post("/api/feedback")
+    async def feedback(request: Request) -> JSONResponse:
+        body = await request.json()
+        verdict = str(body.get("verdict", ""))
+        if verdict not in ("helpful", "not_helpful"):
+            return JSONResponse({"error": "verdict must be helpful or "
+                                 "not_helpful"}, status_code=400)
+        sink.record(FeedbackEvent(
+            event_at=datetime.now(timezone.utc).isoformat(),
+            user_id=_user_from(request),
+            conversation_id=str(body.get("conversation_id", "")),
+            turn_index=int(body.get("turn_index", 0)),
+            verdict=verdict,
+            comment=str(body.get("comment", ""))[:2000],
+        ))
+        return JSONResponse({"recorded": True})
 
     # ---- marketplace fulfillment (SaaS Fulfillment API v2) ----------
 
@@ -185,6 +212,11 @@ CHAT_PAGE = """<!doctype html>
            cursor:pointer; }
   button:disabled { opacity:.5; }
   .thinking { color:#6b7080; font-style:italic; }
+  .fb { margin-top:6px; }
+  .fb button { background:none; border:1px solid var(--line);
+               color:#6b7080; padding:2px 10px; border-radius:6px;
+               margin-right:6px; cursor:pointer; font-size:13px; }
+  .fb button.done { border-color:var(--accent); color:var(--accent); }
 </style></head>
 <body>
 <header>AIVIA <span>·</span> ask about your certified metrics</header>
@@ -225,11 +257,25 @@ form.addEventListener('submit', async (e) => {
       conversationId = j.conversation_id;
       w.className = 'msg';
       w.innerHTML = esc(j.answer) +
-        '<div class="basis">Basis: ' + esc(j.basis) + '</div>';
+        '<div class="basis">Basis: ' + esc(j.basis) + '</div>' +
+        '<div class="fb">' +
+        '<button onclick="fb(this,' + j.turn_index + ',\\'helpful\\')">' +
+        '&#128077; helpful</button>' +
+        '<button onclick="fb(this,' + j.turn_index +
+        ',\\'not_helpful\\')">&#128078; not what I needed</button></div>';
     }
   } catch (err) { w.textContent = 'network error: ' + err; }
   button.disabled = false; input.focus();
 });
+async function fb(btn, turnIndex, verdict) {
+  await fetch('/api/feedback', { method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({conversation_id: conversationId,
+                          turn_index: turnIndex, verdict})});
+  btn.parentElement.querySelectorAll('button')
+     .forEach(b => b.classList.remove('done'));
+  btn.classList.add('done');
+}
 input.focus();
 </script>
 </body></html>
