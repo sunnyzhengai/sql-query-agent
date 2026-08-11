@@ -84,12 +84,20 @@ response.
        5-question qualification questionnaire, rubric, listing support
        statement. YOUR two steps: review/edit the template wording, and
        create the Bookings/Calendly page (paste URL into the doc).
-7. [ ] **Partner Center: create the offer** (portal, ~1–2 hours):
-       New offer → SaaS → listing option **Contact Me** → paste/upload
-       assets from docs/product → lead destination: start with email
-       (Referrals workspace default), CRM connector later →
-       **Publisher Attestation questionnaire** (answers project from
-       SECURITY_WHITEPAPER.md; Claude drafts responses on request)
+7. [ ] **Partner Center: create the TRANSACTABLE offer** (2026-08-11:
+       Contact Me is not available — Sunny, from the portal; ADR 0028
+       superseded). Two halves:
+       1. [ ] Claude: deploy marketplace_host (SaaS Fulfillment API v2
+          landing page + lifecycle webhook + Entra app) to the same
+          App Service as the web chat surface; end-to-end test with a
+          Partner Center preview offer.
+       2. [ ] Sunny (portal, ~1–2 hours): New offer → SaaS →
+          transactable → plans ($2,000/mo · $21,600/yr · 30-day trial)
+          → technical configuration (landing page + webhook URLs +
+          Entra ids from step 1) → assets from docs/product →
+          **Publisher Attestation** (Claude drafts responses on
+          request). Note: transactable certification tests the
+          fulfillment APIs — heavier than Contact Me would have been.
 8. [ ] **Review and publish** → automated validation (<30 min) → fix
        anything the validation report flags → certification (days,
        lighter for Contact Me — no API tests) → **live**.

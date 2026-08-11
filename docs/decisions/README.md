@@ -38,7 +38,7 @@ never deleted — its status changes and it links to its replacement.
 | [0025](0025-phi-scanning-at-ingestion.md) | PHI and hardcoded-literal scanning at ingestion; LLM boundary is the gate | Accepted |
 | [0026](0026-error-to-data-lineage.md) | Every error names its data: error-to-data lineage | Accepted |
 | [0027](0027-ownership-attribution-layered-sources.md) | Ownership attribution: manual entry is the floor, Entra ID enriches | Accepted |
-| [0028](0028-contact-me-first-transactable-on-first-buyer.md) | List as Contact Me now; convert to transactable at first-buyer signal | Accepted |
+| [0028](0028-contact-me-first-transactable-on-first-buyer.md) | List as Contact Me now; convert to transactable at first-buyer signal | Superseded 2026-08-11 (Contact Me unavailable; ship transactable) |
 | [0029](0029-dimension-layer-activation.md) | Dimension layer activation: filter-usage qualifies, scope-local aliases resolve | Accepted |
 | [0030](0030-layered-retrieval-search-terms-first.md) | Layered retrieval: search-terms first, vectors where the engine allows | Accepted (amended) |
 | [0031](0031-business-terms-weighted-plurality.md) | Business terms: a weighted plurality, citizen-endorsed, steward-arbitrated | Accepted |

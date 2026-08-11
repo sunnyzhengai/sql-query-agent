@@ -1,6 +1,11 @@
 # 0028 — List as Contact Me now; convert the same offer to transactable at first-buyer signal
 
-**Status:** Accepted
+**Status:** Superseded (2026-08-11) — Partner Center does not offer a
+Contact Me listing path for this offer; the listing ships TRANSACTABLE
+from day one (Sunny, from the portal). The staging logic below is moot;
+the transactable scaffold (marketplace_host/, built 2026-08-08 for the
+"first-buyer signal") deploys now, sharing one App Service with the
+ADR 0035 web chat surface. Pricing unchanged.
 **Date:** 2026-08-06
 
 ## Context
