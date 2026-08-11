@@ -122,3 +122,40 @@ closing its loop.
 **Recommendation:** ship trigger 1 (scheduled sweep) as the default in
 the next connector milestone; document 2 and 3 as integration recipes.
 Decision recorded here; ADR when the build starts.
+
+## Part 4 — Object identity across re-ingests (Sunny's question,
+## 2026-08-11: "is there an id that can be reliably used?")
+
+Identity is the fully qualified name DECLARED IN THE SQL
+(schema.object, case-folded per ADR 0016) — never the file name.
+metric_id (ADR 0015) is that name; the content hash (ADR 0022) is the
+VERSION of it. Two levels: name says which object, hash says which
+revision. Same name + new hash = drift (the normal case; works).
+
+**The rename gap:** a renamed/re-schema'd object looks like one
+disappearance plus one unrelated arrival — certification and usage
+history would strand. No universal reliable id exists, so a
+deterministic ladder (decisions placed per ADR 0035's taxonomy):
+
+1. **Exact-hash rename** (computable → code): a new name whose content
+   hash equals a vanished name's hash auto-maps, disclosed as
+   "renamed from X".
+2. **Step-overlap similarity** (computable signal, judgment call):
+   per-step fragment hashes score candidate rename+edits; the system
+   PROPOSES with evidence, the steward CONFIRMS — never auto-merged.
+   Confirmed mappings land as append-only alias records that carry
+   certification + usage history across.
+3. **No match** → genuinely new object; the vanished one is archived.
+
+**Native stable ids, used wherever a connector has one:**
+
+| Source | Stable id? | Use |
+|---|---|---|
+| SQL Server/Azure SQL object_id | NO — DROP+CREATE deployments mint new ones | declared name only |
+| File drop paths | NO — customers reorganize folders | declared name only |
+| Power BI artifacts (reports, semantic models) | YES — stable GUIDs | GUID is the identity |
+| DevOps git sources | partial — git rename detection | feeds ladder step 1 |
+| dbt | YES — unique_id | unique_id is the identity |
+
+Identity transfer is itself a governed event: automatic only when
+byte-deterministic, steward-confirmed when fuzzy, append-only always.
