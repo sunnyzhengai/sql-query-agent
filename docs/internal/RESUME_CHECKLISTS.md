@@ -329,3 +329,10 @@ table — an ad-hoc 04 rerun wipes them until 07 reruns (cache makes
 that cheap). Rule: 04 rerun => 07 rerun. Fix candidate for the
 product: 04 preserves the description column on rebuild (merge, not
 blind overwrite).
+
+**Direct Lake framing note (2026-08-13):** auto-framing catches Delta
+changes with variable lag (instant to minutes). The datasets refresh
+API ({"type":"automatic"}) forces a reframe in seconds — pipeline
+notebooks that write admin tables should end with it so the dashboard
+is instantly current. Verified: description restore appeared at 100%
+immediately after the forced reframe.
