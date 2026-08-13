@@ -45,12 +45,26 @@ def validate_pipeline_per_metric(
         c2t_count = len([e for e in c2t_edges if e["edge_type"] == "canonical_to_transform"])
         step5_edges = c2t_count > 0
 
+        # Step 6 is a REAL walk (fixed 2026-08-13 — the shallow 2-hop
+        # check was ADR 0018's disease in a second location: a metric
+        # whose entry transform assembles only from temp tables showed
+        # zero direct table edges and false-negatived, while its chain
+        # reached dozens. Found by the admin dashboard's first render.)
         tech_reachable = 0
         if step5_edges:
-            for c2t in c2t_edges:
-                target = c2t["target_id"]
-                t2tech = edges_by_source.get(target, [])
-                tech_reachable += len([e for e in t2tech if e["edge_type"] == "transform_to_technical"])
+            visited: set = set()
+            stack = [canonical_id]
+            while stack:
+                nid = stack.pop()
+                if nid in visited:
+                    continue
+                visited.add(nid)
+                for e in edges_by_source.get(nid, []):
+                    if e["edge_type"] == "transform_to_technical":
+                        tech_reachable += 1
+                    elif e["edge_type"] in ("canonical_to_transform",
+                                            "transform_to_transform"):
+                        stack.append(e["target_id"])
         step6_traversal = tech_reachable > 0
 
         results.append({

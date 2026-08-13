@@ -10,6 +10,17 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.5.1] - 2026-08-13
+
+### Fixed
+- Validation step 6 is a real traversal: the shallow 2-hop check
+  false-negatived metrics whose entry transform assembles from temp
+  tables (ADR 0018's disease in a second location — caught by the
+  admin dashboard's first render). Validator gains its first test
+  suite, with the live regression as fixture.
+
+---
+
 ## [1.5.0] - 2026-08-12
 
 ### Added
