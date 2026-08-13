@@ -45,4 +45,5 @@ never deleted — its status changes and it links to its replacement.
 | [0032](0032-deterministic-core-llm-edges.md) | Deterministic Core, LLM Edges — the LLM translates, the data answers, the human decides | Accepted |
 | [0033](0033-system-of-record-plus-projections.md) | System of record + projections: Delta is the record; graph engines are read models | Accepted |
 | [0034](0034-conversational-entry-edge.md) | The conversational entry edge: language to the LLM, computation to code | Superseded in part by 0035 (dialogue machinery); engine content survives |
-| [0035](0035-agentic-conversation-deterministic-tools.md) | Agentic conversation over deterministic tools — computed answers, disclosed judgments, generated language | Accepted |
+| [0035](0035-agentic-conversation-deterministic-tools.md) | Agentic conversation over deterministic tools — computed answers, disclosed judgments, generated language | Superseded in part by 0036 (conversation protocol); tool layer survives as primitives |
+| [0036](0036-operations-are-the-product.md) | Operations are the product: interpret → confirm → execute → display over a primitive algebra | Accepted |
