@@ -10,6 +10,26 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.5.0] - 2026-08-12
+
+### Added
+- ADR 0035 agent stack in src/orchestrator: tools (find/read/list/
+  verify), function-calling agent loop with code-stamped Basis,
+  decision-shape telemetry (TurnEvent/FeedbackEvent, OneLakeJsonlSink)
+- src/webapp: chat surface + SaaS fulfillment endpoints (one App
+  Service); src/marketplace Phase T2 wiring (token provider, JWKS
+  verifier, durable store)
+- Admin telemetry contracts: gov_publish_log, gov_turn_events,
+  gov_feedback_events; src/governance/publish_log.py;
+  src/steps/agent_events.py (notebook 10 ingest)
+- Stratified plurality retrieval (ADR 0032 amendment); metric facts
+  carry business_name/report fields end to end
+
+### Removed
+- Typed-intent dialogue machinery (ADR 0034 superseded by 0035)
+
+---
+
 ## [1.4.3] - 2026-08-09
 
 ### Added
