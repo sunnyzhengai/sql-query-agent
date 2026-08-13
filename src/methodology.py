@@ -1,0 +1,107 @@
+"""OPERATIONS ARE THE PRODUCT — the methodology manifest (ADR 0036).
+
+This module is the machine-readable constitution. The methodology
+tests (tests/test_methodology.py) enforce it against the CODE on every
+run — the same mechanism as the table contracts, aimed at the failure
+mode this project hit three times: pattern predefinition sneaking back
+into the control path in a new disguise.
+
+AMENDMENT RULE: changing ANYTHING in this file is a methodology
+amendment. It requires (a) an ADR reference in the entry itself and
+(b) Sunny's explicit approval — Claude must never modify this file
+silently as a side effect of making a test pass. The tests make
+bypasses LOUD; the regulator makes them legitimate. (No guard fully
+binds its own author — the root of trust is the loop itself:
+translated by LLM, regulated by human, applied to this repo.)
+"""
+
+FOUR_LINES = (
+    "Data can be operated on three ways: search (semantic|exact), "
+    "retrieve, update — plus three compare kernels over results.\n"
+    "The LLM translates questions into plans of those operations.\n"
+    "The human regulates — every decision visible, confirmable, "
+    "interceptable.\n"
+    "Everything displays — results are the answer; prose is the caption."
+)
+
+# --- the closed operation registry ------------------------------------
+# Adding an operation REQUIRES an entry here with a data-shaped
+# justification and an ADR. The test fails on any op_* function in the
+# control path that is not registered — additions are loud by design.
+
+PRIMITIVES = {
+    "op_search": {
+        "kind": "primitive",
+        "data_shaped_because": "the store admits lookup by meaning "
+                               "(vector) and by literal identity — two "
+                               "modes of one find operation",
+        "adr": "0036",
+    },
+    "op_retrieve": {
+        "kind": "primitive",
+        "data_shaped_because": "the store admits reading a record by id",
+        "adr": "0036",
+    },
+    "op_compare": {
+        "kind": "kernel-dispatch",
+        "data_shaped_because": "comparisons range over exactly three "
+                               "data types (text bodies, sets, scalars) "
+                               "— one kernel per type, typed by data "
+                               "not by question",
+        "adr": "0036",
+    },
+    # "op_update": future (ADR 0036) — always plan-confirmed, never
+    # autonomous. Register here before implementing.
+}
+
+# --- the control path --------------------------------------------------
+# Files whose code DECIDES what answers contain. The vocabulary and
+# import rules below apply to these files. Adding a control file is an
+# amendment (register it here).
+
+CONTROL_PATH_FILES = (
+    "src/orchestrator/ops.py",
+    "src/orchestrator/agent.py",       # superseded by the plan protocol;
+                                       # remove at demolition
+)
+
+# --- system vocabulary -------------------------------------------------
+# The ONLY literal string collections allowed in control-path code:
+# names of OUR system's parts (modes, ops, aspects, edge types, tool
+# names). Collections of USER-ENGLISH (phrase lexicons, quantifier
+# lists, filler words) are pattern predefinition and are banned — the
+# methodology test fails on any control-path literal collection whose
+# elements are not registered here. Registering English phrases here
+# to "make the test pass" is a silent amendment — forbidden above.
+
+SYSTEM_VOCAB = frozenset({
+    # search modes (ADR 0036)
+    "semantic", "exact",
+    # compare aspects that name SYSTEM fields/kernels, not user phrasings
+    "logic", "definition", "sql", "tables", "source_tables",
+    # edge types (graph contract)
+    "canonical_to_transform", "transform_to_transform",
+    "transform_to_technical",
+    # tool/op names appearing in dispatch tables and basis stamping
+    "search", "retrieve", "update", "compare", "explain",
+    "search_catalog", "find_by_name", "get_facts", "list_steps",
+    "check_same_logic",
+})
+
+# --- the prompt budget -------------------------------------------------
+# Instruction creep is pattern predefinition in prose. The system
+# prompt is capped; raising the budget is an amendment. Quoted example
+# phrasings inside the prompt are capped separately — examples steer,
+# casebooks predict.
+
+PROMPT_LINE_BUDGET = 60
+PROMPT_QUOTED_EXAMPLES_BUDGET = 12
+
+# --- observation is not control ----------------------------------------
+# Language lexicons are permitted ONLY in observation modules (they
+# watch, they never decide an answer). This list is the exhaustive set
+# of modules allowed to hold user-English word collections.
+
+OBSERVATION_FILES = (
+    "src/orchestrator/events.py",      # decision_shape telemetry
+)
