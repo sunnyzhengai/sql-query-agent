@@ -57,6 +57,39 @@ The disguise evolves; the move is identical. Hence mechanical guards.
 5. **Manifest integrity** — the four lines and the control-file list
    are asserted present and real.
 
+## What can and cannot be proven (the mathematical footing)
+
+**The algebra side — completeness is achievable.** Codd (1972): a
+finite operator basis (relational algebra) provably expresses ALL
+first-order queries — finite primitives covering infinite questions
+is a theorem, not a hope. Our four are a workload-chosen SUB-basis of
+that framework: retrieve/exact-search/compare-kernels/update are
+algebra-expressible; semantic search is a deliberate extra-algebraic
+finder (marked complete:false forever); general join is an unregistered
+future kernel; transitive closure (lineage/reachability) is PROVABLY
+inexpressible in first-order logic — which is why ADR 0018
+materializes closures at build time, converting the provably-hard
+class into a retrieve. Gaps fail LOUD at plan time ("no operation for
+this"), never wrong at answer time; the human-approved raw-KQL escape
+hatch is relationally complete as the last resort; the registry is
+the regulated path toward full completeness.
+
+**The translation side — completeness is impossible, provably so.**
+(1) "All user questions" is not a formally definable set — nothing to
+quantify over; (2) a learned model is an unspecifiable function —
+universal properties of unwritable functions cannot be verified;
+(3) the function is stochastic — only statistical statements exist.
+The correct response, with real standing in logic, is the
+PER-INSTANCE WITNESS (the structure of interactive proof): don't
+prove the translator universally right; check each translation with
+the only oracle of intent — the asker. Suites bound the error RATE;
+confirmation bounds the error IMPACT.
+
+**The asymmetry IS the methodology:** prove where proof exists (the
+algebra, the kernels, the code); witness where it doesn't (the
+translation, one confirmed plan at a time). The regulator is not a
+concession — it is the load-bearing consequence of a theorem.
+
 ## The amendment rule (the honest limit)
 
 No guard fully binds its own author: Claude writes the tests and
