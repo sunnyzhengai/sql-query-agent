@@ -130,8 +130,9 @@ if spark.catalog.tableExists("gov_turn_events"):
         print(f"  {flag}: {n}")
 if spark.catalog.tableExists("gov_feedback_events"):
     fdf = spark.table("gov_feedback_events")
+    not_helpful = fdf.filter(fdf.verdict == "not_helpful").count()
     print(f"gov_feedback_events total: {fdf.count()} "
-          f"(not_helpful: {fdf.filter(\"verdict = 'not_helpful'\").count()})")
+          f"(not_helpful: {not_helpful})")
 
 # METADATA ********************
 
