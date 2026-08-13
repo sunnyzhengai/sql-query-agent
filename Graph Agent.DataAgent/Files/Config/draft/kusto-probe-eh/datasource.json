@@ -1,0 +1,208 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/dataAgent/definition/dataSource/1.0.0/schema.json",
+  "artifactId": "5fb67189-9321-a780-4960-f07d718853ec",
+  "workspaceId": "00000000-0000-0000-0000-000000000000",
+  "dataSourceInstructions": null,
+  "displayName": "probe-eh",
+  "type": "kusto",
+  "userDescription": "To resolve a user's topic or metric reference, call semantic_search('<core concept phrase>') FIRST. Use the returned ref (metric_id or term_id) for any further lookups in other sources. Report total_matches when more matched than shown. closeness is relative similarity — never present it as a probability. If semantic_search returns no rows, say the certified knowledge base has nothing sufficiently related; do not guess.",
+  "metadata": {},
+  "elements": [
+    {
+      "id": "02c015ef-7b17-41b2-b87b-33a3b0044062",
+      "is_selected": false,
+      "display_name": "Functions",
+      "type": "function_grouping",
+      "description": null,
+      "children": [
+        {
+          "id": "ce473d06-539d-4660-8f23-4af876b3eafb",
+          "is_selected": true,
+          "display_name": "semantic_search",
+          "type": "kusto.function",
+          "description": null,
+          "children": []
+        }
+      ]
+    },
+    {
+      "id": "fd566083-52b2-4279-9a95-9cc884133d33",
+      "is_selected": false,
+      "display_name": "Materialized Views",
+      "type": "materialized_view_grouping",
+      "description": null,
+      "children": []
+    },
+    {
+      "id": "a49c5cdf-71ea-4a1c-a08e-a1fa0df7a604",
+      "is_selected": false,
+      "display_name": "Shortcuts",
+      "type": "shortcut_grouping",
+      "description": null,
+      "children": [
+        {
+          "id": "6cd0ad7d-1466-4755-b5f5-1d9bec991418",
+          "is_selected": false,
+          "display_name": "output_semantic_catalog",
+          "type": "kusto.external_table",
+          "description": null,
+          "children": [
+            {
+              "id": "business_name",
+              "is_selected": true,
+              "display_name": "business_name",
+              "type": "kusto.column",
+              "data_type": "System.String",
+              "description": null,
+              "children": []
+            },
+            {
+              "id": "display_text",
+              "is_selected": true,
+              "display_name": "display_text",
+              "type": "kusto.column",
+              "data_type": "System.String",
+              "description": null,
+              "children": []
+            },
+            {
+              "id": "kind",
+              "is_selected": true,
+              "display_name": "kind",
+              "type": "kusto.column",
+              "data_type": "System.String",
+              "description": null,
+              "children": []
+            },
+            {
+              "id": "name",
+              "is_selected": true,
+              "display_name": "name",
+              "type": "kusto.column",
+              "data_type": "System.String",
+              "description": null,
+              "children": []
+            },
+            {
+              "id": "node_id",
+              "is_selected": true,
+              "display_name": "node_id",
+              "type": "kusto.column",
+              "data_type": "System.String",
+              "description": null,
+              "children": []
+            },
+            {
+              "id": "ref",
+              "is_selected": true,
+              "display_name": "ref",
+              "type": "kusto.column",
+              "data_type": "System.String",
+              "description": null,
+              "children": []
+            },
+            {
+              "id": "search_text",
+              "is_selected": true,
+              "display_name": "search_text",
+              "type": "kusto.column",
+              "data_type": "System.String",
+              "description": null,
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f0811799-5dca-4efb-b354-d3b62c6b4061",
+      "is_selected": false,
+      "display_name": "Tables",
+      "type": "table_grouping",
+      "description": null,
+      "children": [
+        {
+          "id": "be608524-3825-4a00-94d4-8e2bbb386c5c",
+          "is_selected": true,
+          "display_name": "semantic_catalog",
+          "type": "kusto.table",
+          "description": null,
+          "children": [
+            {
+              "id": "node_id",
+              "is_selected": true,
+              "display_name": "node_id",
+              "type": "kusto.column",
+              "data_type": "System.String",
+              "description": null,
+              "children": []
+            },
+            {
+              "id": "kind",
+              "is_selected": true,
+              "display_name": "kind",
+              "type": "kusto.column",
+              "data_type": "System.String",
+              "description": null,
+              "children": []
+            },
+            {
+              "id": "ref",
+              "is_selected": true,
+              "display_name": "ref",
+              "type": "kusto.column",
+              "data_type": "System.String",
+              "description": null,
+              "children": []
+            },
+            {
+              "id": "name",
+              "is_selected": true,
+              "display_name": "name",
+              "type": "kusto.column",
+              "data_type": "System.String",
+              "description": null,
+              "children": []
+            },
+            {
+              "id": "business_name",
+              "is_selected": true,
+              "display_name": "business_name",
+              "type": "kusto.column",
+              "data_type": "System.String",
+              "description": null,
+              "children": []
+            },
+            {
+              "id": "search_text",
+              "is_selected": true,
+              "display_name": "search_text",
+              "type": "kusto.column",
+              "data_type": "System.String",
+              "description": null,
+              "children": []
+            },
+            {
+              "id": "display_text",
+              "is_selected": true,
+              "display_name": "display_text",
+              "type": "kusto.column",
+              "data_type": "System.String",
+              "description": null,
+              "children": []
+            },
+            {
+              "id": "emb",
+              "is_selected": true,
+              "display_name": "emb",
+              "type": "kusto.column",
+              "data_type": "System.Object",
+              "description": null,
+              "children": []
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -2,4 +2,19 @@
 // Use management commands in this script to configure your database items, such as tables, functions, materialized views, and more.
 
 
-.create-merge table semantic_catalog (node_id:string, name:string, business_name:string, description:string, emb:dynamic) 
+.create-merge table semantic_catalog (node_id:string, ['kind']:string, ref:string, name:string, business_name:string, search_text:string, display_text:string, emb:dynamic) 
+.create-or-alter function with (folder = "aivia", docstring = "Semantic resolution over the certified catalog: closest metrics/steps/terms for a topic phrase. total_matches discloses how many cleared the threshold; closeness is relative similarity, never a probability.", skipvalidation = "true") semantic_search(phrase:string, top_k:int=10, threshold:real=0.35) {
+    let q = toscalar(
+        print t = phrase
+        | evaluate ai_embeddings(t,
+            'https://aivia.openai.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-06-01;impersonate')
+        | project t_embeddings);
+    let scored = semantic_catalog
+        | extend closeness = series_cosine_similarity(q, emb)
+        | where closeness >= threshold;
+    let total = toscalar(scored | count);
+    scored
+    | top top_k by closeness desc
+    | project node_id, ['kind'], ['ref'], name, business_name,
+              display_text, closeness, total_matches = total
+}

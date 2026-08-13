@@ -1,0 +1,22 @@
+{
+  "queryset": {
+    "version": "1.0.0",
+    "dataSources": [
+      {
+        "id": "0a11a466-3f81-452e-9d47-7e0fad9fdc76",
+        "clusterUri": "",
+        "type": "Fabric",
+        "databaseItemId": "5fb67189-9321-a780-4960-f07d718853ec"
+      }
+    ],
+    "tabs": [
+      {
+        "id": "3cb841f6-2588-4511-b501-11bd03477902",
+        "content": ".set-or-replace semantic_catalog <| output_semantic_catalog\n| project node_id, ['kind'], ['ref'], name, business_name, search_text, display_text, emb = dynamic(null)\n\n// ===== 2. Embed new/changed rows (in-database, impersonation) =========\n// Re-runnable: only rows lacking a vector are embedded.\n.set-or-replace semantic_catalog <|\n    let todo = semantic_catalog | where isnull(emb) or array_length(emb) == 0;\n    let done = semantic_catalog | where isnotnull(emb) and array_length(emb) > 0;\n    let embedded = todo\n        | evaluate ai_embeddings(search_text,\n            'https://aivia.openai.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-06-01;impersonate')\n        | project node_id, ['kind'], ['ref'], name, business_name,\n                  search_text, display_text, emb = search_text_embeddings;\n    union done, embedded\n\nsemantic_catalog | where isnull(emb) or array_length(emb) == 0 | count\n\n\nlet q = toscalar(\n    print t = \"patients who came back to the ER\"\n    | evaluate ai_embeddings(t, 'https://aivia.openai.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-06-01;impersonate')\n    | project t_embeddings);\nsemantic_catalog\n| extend closeness = series_cosine_similarity(q, emb)\n| top 5 by closeness desc\n| project name, business_name, closeness\n\n\nlet q = toscalar(\n    print t = \"unicorn readmission velocity\"\n    | evaluate ai_embeddings(t, 'https://aivia.openai.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-06-01;impersonate')\n    | project t_embeddings);\nsemantic_catalog\n| extend closeness = series_cosine_similarity(q, emb)\n| top 3 by closeness desc\n| project name, closeness\n\n\n.create-or-alter function with (\n    docstring = \"Semantic resolution over the certified catalog: closest metrics/steps/terms for a topic phrase. total_matches discloses how many cleared the threshold; closeness is relative similarity, never a probability.\",\n    folder = \"aivia\"\n) semantic_search(phrase:string, top_k:int = 10, threshold:real = 0.35) {\n    let q = toscalar(\n        print t = phrase\n        | evaluate ai_embeddings(t,\n            'https://aivia.openai.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-06-01;impersonate')\n        | project t_embeddings);\n    let scored = semantic_catalog\n        | extend closeness = series_cosine_similarity(q, emb)\n        | where closeness >= threshold;\n    let total = toscalar(scored | count);\n    scored\n    | top top_k by closeness desc\n    | project node_id, ['kind'], ['ref'], name, business_name,\n              display_text, closeness, total_matches = total\n}\n\nsemantic_search(\"patients who came back to the ER\", 5)\n\nsemantic_search(\"unicorn readmission velocity\")\n\n\n",
+        "title": "Tab",
+        "dataSourceId": "0a11a466-3f81-452e-9d47-7e0fad9fdc76"
+      }
+    ],
+    "querysetType": "Standalone"
+  }
+}
