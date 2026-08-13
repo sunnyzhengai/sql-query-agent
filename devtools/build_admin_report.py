@@ -46,6 +46,27 @@ MODEL_MEASURES = {
     "ops_build_summary": [
         ("Last Build", "MAX(ops_build_summary[build_time])", None),
     ],
+    "output_metric_logic": [
+        ("Certified Metrics", "COUNTROWS(output_metric_logic)", "0"),
+        ("Total Calculation Steps",
+         "SUM(output_metric_logic[transform_count])", "0"),
+        *[(f"Pct With {label}",
+           f"DIVIDE(CALCULATE(COUNTROWS(output_metric_logic), "
+           f"output_metric_logic[{col}] <> \"\"), "
+           f"COUNTROWS(output_metric_logic))", "0%")
+          for col, label in [("description", "Description"),
+                             ("business_name", "Business Name"),
+                             ("steward", "Steward"),
+                             ("developer", "Developer"),
+                             ("report_url", "Report Link")]],
+        ("Missing Steward",
+         "COUNTROWS(output_metric_logic) - CALCULATE("
+         "COUNTROWS(output_metric_logic), "
+         "output_metric_logic[steward] <> \"\")", "0"),
+    ],
+    "ops_parse_results": [
+        ("Objects Parsed", "COUNTROWS(ops_parse_results)", "0"),
+    ],
     "ops_installation_errors": [
         ("Errors On Record", "COUNTROWS(ops_installation_errors) + 0", "0"),
     ],
@@ -156,14 +177,15 @@ def table(name: str, entity: str, props: "list[str]", pos: dict) -> dict:
 
 
 def column_chart(name: str, entity: str, category: str, count_prop: str,
-                 pos: dict) -> dict:
+                 pos: dict, function: int = 4) -> dict:
     alias = entity[0]
     cat_name = f"{entity}.{category}"
-    val_name = f"Count({entity}.{count_prop})"
+    agg = {4: "Count", 0: "Sum"}[function]
+    val_name = f"{agg}({entity}.{count_prop})"
     select = [
         {"Column": _col(alias, category)["Column"], "Name": cat_name},
         {"Aggregation": {"Expression": _col(alias, count_prop),
-                         "Function": 4}, "Name": val_name},
+                         "Function": function}, "Name": val_name},
     ]
     return _container(
         name, "clusteredColumnChart", pos,
@@ -296,14 +318,29 @@ def build_report_json() -> dict:
     ], 0)
 
     p2 = page("p2", "Knowledge Coverage", [
-        card_count("v21", "output_metric_logic", "metric_id",
-                   {"x": 20.0, "y": 20.0, **CARD}),
-        card_count("v22", "ops_parse_results", "metric_id",
-                   {"x": 340.0, "y": 20.0, **CARD}),
+        card_measure("v21", "output_metric_logic", "Certified Metrics",
+                     {"x": 20.0, "y": 20.0, **CARD}),
+        card_measure("v22", "ops_parse_results", "Objects Parsed",
+                     {"x": 340.0, "y": 20.0, **CARD}),
+        card_measure("v2s", "output_metric_logic",
+                     "Total Calculation Steps",
+                     {"x": 660.0, "y": 20.0, **CARD}),
+        bar_measures("v2g", "output_metric_logic",
+                     ["Pct With Description", "Pct With Business Name",
+                      "Pct With Steward", "Pct With Developer",
+                      "Pct With Report Link"],
+                     {"x": 20.0, "y": 160.0, "width": 620.0,
+                      "height": 320.0}),
+        card_measure("v2m", "output_metric_logic", "Missing Steward",
+                     {"x": 660.0, "y": 160.0, **CARD}),
         table("v23", "output_metric_logic",
               ["metric_id", "business_name", "steward", "developer",
-               "transform_count", "report_name"],
-              {"x": 20.0, "y": 160.0, **WIDE}),
+               "report_name"],
+              {"x": 660.0, "y": 300.0, "width": 600.0, "height": 180.0}),
+        column_chart("v2c", "output_metric_logic", "metric_id",
+                     "transform_count",
+                     {"x": 20.0, "y": 500.0, "width": 1240.0,
+                      "height": 200.0}, function=0),
     ], 1)
 
     p3 = page("p3", "Agent Activity & Decisions", [

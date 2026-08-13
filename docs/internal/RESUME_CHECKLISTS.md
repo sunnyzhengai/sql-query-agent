@@ -321,3 +321,11 @@ invisible to the Direct Lake semantic-model picker until a forced
 refresh — POST /v1/workspaces/{ws}/sqlEndpoints/{id}/refreshMetadata
 (works, returns per-table status). The installer's report-deployment
 step calls this before creating the model.
+
+**Pipeline ordering gotcha (2026-08-12, caught by the admin dashboard's
+first Knowledge Coverage render):** 04 rebuilds output_metric_logic
+from the graph; metric DESCRIPTIONS are 07's enrichment INTO that
+table — an ad-hoc 04 rerun wipes them until 07 reruns (cache makes
+that cheap). Rule: 04 rerun => 07 rerun. Fix candidate for the
+product: 04 preserves the description column on rebuild (merge, not
+blind overwrite).
