@@ -1,145 +1,170 @@
-# Demo Video Script (5 minutes)
+# Demo Video Script (~6 minutes)
 
 **Target audience:** Microsoft Marketplace reviewers, prospective customers
-**Tone:** Professional, concise, focused on value — not technical internals
-**Refreshed 2026-08-09** for business names, report links, and honest
-governance — every question below passed live QA on 2026-08-08 (6/6).
-Ask questions EXACTLY as written; they are the tested set.
+**Tone:** professional, concise, value-first — the architecture is SHOWN
+(the Basis line, computed verdicts), never narrated as history.
+**Rewritten 2026-08-13** for the AIVIA agent (ADR 0035): web chat
+surface, deterministic tools, code-stamped provenance, admin telemetry.
+
+**Deviation is welcome, not feared (hard rule, 2026-08-09):** the
+agent passed a 54-conversation paraphrase suite at 100% on every
+mechanical check (AGENT_ROBUSTNESS_BASELINE.md). Phrase the questions
+naturally; the script's wording is a guide, not a guardrail. Beat 6
+deviates ON CAMERA on purpose.
+
+**Prerequisite:** the web chat (App Service) deployed and signed in;
+admin dashboard open in a second tab; capacity Active; a fresh
+conversation.
 
 ---
 
 ## Opening (30 seconds)
 
-**[Screen: Fabric workspace showing the SQL Intelligence Agent]**
+**[Screen: the AIVIA chat page, empty]**
 
-"Every health system has hundreds of SQL stored procedures powering their
-reports. The business logic inside them — the filters, the clinical
-criteria, the compliance calculations — is undocumented. When an analyst
-asks 'How is this metric calculated?', the answer takes days.
+"Every health system has hundreds of SQL stored procedures powering
+their reports. The business logic inside them — the filters, the
+clinical criteria, the compliance calculations — is undocumented. When
+an analyst asks 'how is this metric calculated?', the answer takes
+days, and when an AI answers instead, you can't tell whether it's
+right.
 
-The SQL Intelligence Agent solves this automatically. It reads your SQL,
-extracts the business logic, and lets anyone ask questions in plain
-English — using the names the business actually uses."
+AIVIA reads your SQL, builds a certified knowledge graph in your own
+tenant, and answers in plain English — with every answer showing
+exactly what it consulted. Provable, or it doesn't answer."
 
 ---
 
-## Part 1: Show the Problem (30 seconds)
+## Part 1: The problem (30 seconds)
 
-**[Screen: Open USP_Severe_Sepsis SQL — scroll through it]**
+**[Screen: open USP_Severe_Sepsis SQL — scroll]**
 
 "Here's a real example — a sepsis compliance procedure. Thousands of
-lines of T-SQL, dozens of temp tables, complex clinical criteria. No one
-has time to read this. No one documents it. And the business doesn't
-even call it 'USP_Severe_Sepsis' — they call it the severe sepsis
-report."
+lines of T-SQL, dozens of temp tables, complex clinical criteria.
+Nobody has time to read this, and the business doesn't even call it
+'USP_Severe_Sepsis' — they call it the severe sepsis report."
 
 ---
 
-## Part 2: Run the Pipeline (45 seconds)
+## Part 2: The pipeline (45 seconds)
 
-**[Screen: 01_install output → 02_parse output → 06_validate output]**
+**[Screen: 02_parse output → 06_validate output]**
 
-"Setup is one notebook. The pipeline parses every SQL file with
-Microsoft's own ScriptDom parser — 28 of 28 files, zero errors — scans
-for hardcoded PHI before anything reaches an AI model, builds a
-three-layer knowledge graph, and generates business descriptions for
-every calculation step using YOUR Azure OpenAI endpoint. Your SQL never
-leaves your tenant."
+"Setup is a notebook pipeline in YOUR Fabric tenant. Microsoft's own
+ScriptDom parser reads every file — 28 of 28, zero errors — a PHI scan
+gates anything that would reach an AI model, and business descriptions
+are generated against your own Azure OpenAI endpoint. Your SQL never
+leaves your tenant, and we never hold a key."
 
-**[Show 06_validate: DEPLOYMENT READY, 100% parse rate]**
-
----
-
-## Part 3: Ask the Agent (2.5 minutes — the heart)
-
-**[Screen: the published SQL Intelligence Agent chat]**
-
-### Beat 1 — the headline (the whole product in one answer)
-
-**[Type: `How is ED Sepsis Screening calculated?`]**
-
-"I asked by the BUSINESS name — no proc names. The agent resolves it to
-the certified procedure, and answers with the actual calculation steps:
-the patient population, the screening criteria, the exclusions — every
-claim traced to certified logic, not AI guesswork.
-
-And notice the last line: 'Used in: ED Sepsis Screening Dashboard' —
-with a link."
-
-**[Open the report link — the dashboard appears]**
-
-"From question to certified answer to the live report. That loop
-normally takes a week of asking around."
-
-### Beat 2 — the portfolio
-
-**[Type: `What sepsis metrics do we have?`]**
-
-"All 28 metrics, as business names with their technical identity beside
-them. Two departments define ED Sepsis differently? Both are here,
-clearly labeled — operational and regulatory — nothing silently merged."
-
-### Beat 3 — impact analysis
-
-**[Type: `Which metrics read from the HOSPITAL_ENCOUNTERS table?`]**
-
-"Reverse lineage: if this table changes, these 13 metrics are affected —
-computed from the FULL dependency chain, however deep the SQL nesting
-goes. This completeness is precomputed at build time, not improvised by
-the AI."
-
-### Beat 4 — honesty (the differentiator)
-
-**[Type: `How is the metric FAKE_METRIC_XYZ calculated?`]**
-
-"I asked about a metric that doesn't exist. The agent refuses — it will
-not invent an answer. Every response is grounded in the certified
-knowledge graph, or it says so."
-
-**[Type: `Who owns ED Sepsis Screening?`]**
-
-"And when governance has a gap, it says that too: no steward assigned
-yet. Honest disclosure over confident guessing — in healthcare, that's
-the whole point."
+**[Show 06_validate: DEPLOYMENT READY]**
 
 ---
 
-## Part 4: The Value (30 seconds)
+## Part 3: Ask anything (2.5 minutes — the heart)
 
-**[Screen: split view — raw SQL left, agent answer right]**
+**[Screen: the AIVIA chat]**
 
-"What took a developer hours of reading SQL now takes anyone ten
-seconds — in their own vocabulary, with named accountability, linked to
-the reports they already use. Your undocumented SQL library becomes a
-governed, searchable knowledge base — automatically."
+### Beat 1 — the headline answer, with receipts
+
+**[Ask, in your own words: how is ED Sepsis Screening calculated?]**
+
+Answer arrives in business language, ends with the real Power BI
+report link. **Point at the Basis line under the answer:**
+
+"Notice the Basis line. Every answer discloses exactly what was
+searched, what was read, and what was computed — stamped by code, not
+written by the AI. This is what makes the answer auditable instead of
+plausible."
+
+**[Click the report link — the dashboard opens.]**
+
+### Beat 2 — a real conversation
+
+**[Ask: show me its SQL]** → the actual stored logic, on demand.
+**[Ask: who owns it?]** → honest: "no steward recorded." Say:
+
+"It doesn't invent an owner. Unassigned stewardship is a governance
+gap — and you'll see in a minute that the admin dashboard tracks
+exactly that."
+
+### Beat 3 — the governance stunner (the money shot)
+
+**[Ask: are all definitions of Base_Pop_Severe_ED_Scores the same
+across our procedures?]**
+
+Six procedures define that step. **Five different definitions.**
+
+"This is copy-paste drift caught red-handed — six teams believing they
+compute the same thing, five different truths. The comparison is a
+computed verdict — content hashes, not an AI's impression — and this
+single answer is why data governance teams want this product."
+
+### Beat 4 — computed comparisons
+
+**[Ask: does ED Sepsis Screening use the same logic as ED Sepsis
+(Regulatory)?]**
+
+"Two metrics, one question, a computed answer: distinct definitions.
+The AI never judges whether SQL is the same — a hash comparison does,
+and the AI just explains it."
+
+### Beat 5 — it knows what it doesn't know
+
+**[Ask: how many sepsis patients did we have yesterday?]**
+
+"Definitions, not patient data — it refuses, instantly, and says what
+it CAN do. No tools were consulted; nothing was made up."
+
+### Beat 6 — DELIBERATE DEVIATION (on camera)
+
+"Don't take the script's word for it." **[Have a colleague — or
+ChatGPT, on screen — phrase a question about any certified metric
+however they like. Ask it verbatim.]**
+
+"Same grounded behavior on a question nobody rehearsed. That's not
+luck — it's a 54-conversation robustness suite passing at 100% before
+this recording."
 
 ---
 
-## Closing (30 seconds)
+## Part 4: The admin dashboard (45 seconds)
 
-**[Screen: workspace overview]**
+**[Screen: aivia_admin_telemetry_report, page through]**
 
-"The SQL Intelligence Agent runs entirely inside your Microsoft Fabric
-workspace, on your capacity, with your Azure OpenAI endpoint. Your SQL,
-your data, your tenant — nothing ever reaches us.
+"Admins get a Power BI report — generated and deployed automatically,
+always current, no refresh to manage. Pipeline health with a
+per-metric validation funnel. Knowledge coverage — including the
+honest gaps: unassigned stewards are a work queue, in red. And agent
+telemetry: every conversation, WHO made each decision — the
+deterministic engine or the language model — and user feedback joined
+to it, so if answers ever disappoint, you know which component to
+blame.
 
-Available now on the Microsoft Marketplace."
-
-**[End screen: AIVIA — product name, aiviaapp.com, contact email]**
+This dashboard found a real validation bug in our own product the
+first hour it existed. We fixed it the same day. That's what
+observability is for."
 
 ---
 
-## Recording Notes
+## Part 5: Governance sync + close (30 seconds)
 
-- **Use the PUBLISHED agents, not the test pane** (links left-click
-  there; verify once before recording — fallback: open in new tab,
-  looks fine on video)
-- Ask questions verbatim from this script — this exact set is QA-passed
-  (2026-08-08); do NOT improvise count questions ("how many...") on
-  camera
-- Clear chat before each beat so answers are clean and un-contaminated
-- Resolution 1920x1080; clean browser profile; no personal bookmarks
-- All data on screen is anonymized (corpus) or synthetic-footed
-  (dashboard) — say so if a reviewer could wonder
-- Pause 2–3 s after each answer; voiceover recorded separately
-- Target 4–5 minutes; cut ruthlessly
+**[Screen: Purview glossary with published terms/descriptions]**
+
+"Everything certified syncs to Microsoft Purview — descriptions and
+business terms published to your catalog, with every push logged.
+
+AIVIA: your SQL becomes a certified knowledge graph, and a governed AI
+answers from it — provably, or not at all. Available on Azure
+Marketplace."
+
+---
+
+## Recording checklist
+
+- [ ] Fresh conversation (no leftover context on screen)
+- [ ] Web app signed in as a real Entra user (identity visible = fine)
+- [ ] Admin dashboard tab pre-loaded (page 1 green: 28/28)
+- [ ] Purview provisioned same-day for Part 5 (batch with screenshots)
+- [ ] Capture stills during recording: Basis-line answer, variants
+      answer, refusal, dashboard page 1 + 3, Purview glossary
+- [ ] Beat 6's outside question genuinely unrehearsed
