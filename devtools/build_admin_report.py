@@ -1,5 +1,9 @@
 """Generate + deploy the AIVIA admin telemetry report (PBIR-Legacy).
 
+Also injects the health MEASURES into the semantic model's TMDL
+(updateDefinition), so the funnel/verdict visuals ship with every
+customer's model — the installer runs both halves.
+
 Authors the report definition programmatically — four pages of visuals
 bound to the aivia_admin_telemetry Direct Lake model — and creates it
 via the Fabric reports API. No hand-built visuals: this script IS the
@@ -21,6 +25,93 @@ import time
 import requests
 
 FABRIC = "https://api.fabric.microsoft.com/v1"
+
+# --- measures injected into the model (page 1's vocabulary) ------------
+
+VALIDATION_STEPS = ["step1_loaded", "step2_parsed", "step3_canonical",
+                    "step4_transforms", "step5_edges", "step6_traversal"]
+STEP_LABELS = ["1 Loaded", "2 Parsed", "3 Canonical", "4 Transforms",
+               "5 Edges", "6 Traversable"]
+
+MODEL_MEASURES = {
+    "ops_pipeline_validation": [
+        ("Metrics Total", "COUNTROWS(ops_pipeline_validation)", "0"),
+        *[(f"Passed {label}",
+           f"CALCULATE(COUNTROWS(ops_pipeline_validation), "
+           f"ops_pipeline_validation[{col}] = TRUE())", "0")
+          for col, label in zip(VALIDATION_STEPS, STEP_LABELS)],
+        ("Metrics Fully Valid",
+         "[Passed 6 Traversable] & \" / \" & [Metrics Total]", None),
+    ],
+    "ops_build_summary": [
+        ("Last Build", "MAX(ops_build_summary[build_time])", None),
+    ],
+    "ops_installation_errors": [
+        ("Errors On Record", "COUNTROWS(ops_installation_errors) + 0", "0"),
+    ],
+}
+
+
+def measures_tmdl(table: str) -> str:
+    import uuid
+    out = []
+    for name, dax, fmt in MODEL_MEASURES.get(table, []):
+        out.append(f"\tmeasure '{name}' = {dax}")
+        if fmt:
+            out.append(f"\t\tformatString: {fmt}")
+        out.append(f"\t\tlineageTag: {uuid.uuid4()}")
+        out.append("")
+    return "\n".join(out)
+
+
+def inject_measures(workspace: str, model_id: str) -> None:
+    """Pull the model definition, append measures to their tables,
+    push back via updateDefinition. Idempotent: skips if present."""
+    h = {"Authorization": f"Bearer {_token()}",
+         "Content-Type": "application/json"}
+    r = requests.post(
+        f"{FABRIC}/workspaces/{workspace}/semanticModels/{model_id}/"
+        "getDefinition?format=TMDL", headers=h, json={}, timeout=120)
+    if r.status_code == 202:
+        op = r.headers["Location"]
+        for _ in range(24):
+            time.sleep(5)
+            if requests.get(op, headers=h, timeout=30).json().get(
+                    "status") == "Succeeded":
+                break
+        r = requests.get(op + "/result", headers=h, timeout=60)
+    parts = r.json()["definition"]["parts"]
+    changed = False
+    for p in parts:
+        for table in MODEL_MEASURES:
+            if p["path"] == f"definition/tables/{table}.tmdl":
+                text = base64.b64decode(p["payload"]).decode()
+                if "measure '" in text:
+                    continue
+                block = measures_tmdl(table)
+                # measures go inside the table block, before first column
+                idx = text.index("\tcolumn ")
+                text = text[:idx] + block + "\n" + text[idx:]
+                p["payload"] = base64.b64encode(text.encode()).decode()
+                changed = True
+    if not changed:
+        print("measures: already present")
+        return
+    r = requests.post(
+        f"{FABRIC}/workspaces/{workspace}/semanticModels/{model_id}/"
+        "updateDefinition", headers=h,
+        json={"definition": {"parts": parts}}, timeout=120)
+    print("model updateDefinition:", r.status_code)
+    if r.status_code == 202:
+        op = r.headers["Location"]
+        for _ in range(24):
+            time.sleep(5)
+            s = requests.get(op, headers=h, timeout=30).json()
+            if s.get("status") in ("Succeeded", "Failed"):
+                print("  op:", s.get("status"))
+                if s.get("status") == "Failed":
+                    print(json.dumps(s)[:600])
+                break
 
 
 # --- semantic-query builders (PBI prototypeQuery shapes) ---------------
@@ -98,6 +189,52 @@ def line_chart(name: str, entity: str, axis: str, count_prop: str,
         entity=entity, alias=alias, select=select)
 
 
+def _measure(src_alias: str, prop: str) -> dict:
+    return {"Measure": {"Expression": {"SourceRef": {"Source": src_alias}},
+                        "Property": prop}}
+
+
+def card_measure(name: str, entity: str, measure: str, pos: dict) -> dict:
+    alias = entity[0]
+    qname = f"{entity}.{measure}"
+    select = [{"Measure": _measure(alias, measure)["Measure"], "Name": qname}]
+    return _container(name, "card", pos,
+                      projections={"Values": [{"queryRef": qname}]},
+                      entity=entity, alias=alias, select=select)
+
+
+def bar_measures(name: str, entity: str, measures: "list[str]",
+                 pos: dict) -> dict:
+    """Horizontal bars, one per measure, in order — the funnel story."""
+    alias = entity[0]
+    select = [{"Measure": _measure(alias, m)["Measure"],
+               "Name": f"{entity}.{m}"} for m in measures]
+    return _container(
+        name, "clusteredBarChart", pos,
+        projections={"Y": [{"queryRef": f"{entity}.{m}"} for m in measures]},
+        entity=entity, alias=alias, select=select)
+
+
+def _bool_filter(entity: str, prop: str, value: str) -> str:
+    """Visual-level filter (e.g. failures only)."""
+    alias = entity[0]
+    return json.dumps([{
+        "name": f"flt_{prop}",
+        "expression": {"Column": {
+            "Expression": {"SourceRef": {"Entity": entity}},
+            "Property": prop}},
+        "filter": {"Version": 2,
+                   "From": [{"Name": alias, "Entity": entity, "Type": 0}],
+                   "Where": [{"Condition": {"Comparison": {
+                       "ComparisonKind": 0,
+                       "Left": {"Column": {
+                           "Expression": {"SourceRef": {"Source": alias}},
+                           "Property": prop}},
+                       "Right": {"Literal": {"Value": value}}}}}]},
+        "type": "Categorical", "howCreated": 1,
+    }])
+
+
 def _container(name, visual_type, pos, projections, entity, alias,
                select) -> dict:
     config = {
@@ -134,15 +271,28 @@ def build_report_json() -> dict:
     CARD = {"width": 300.0, "height": 120.0}
 
     p1 = page("p1", "Pipeline Health", [
-        card_count("v11", "ops_pipeline_validation", "metric_id",
-                   {"x": 20.0, "y": 20.0, **CARD}),
-        table("v12", "ops_pipeline_validation",
-              ["metric_id", "step6_traversal", "transform_count",
-               "edge_count", "tech_reachable"],
-              {"x": 20.0, "y": 160.0, **WIDE}),
+        card_measure("v10", "ops_build_summary", "Last Build",
+                     {"x": 20.0, "y": 20.0, **CARD}),
+        card_measure("v11", "ops_pipeline_validation", "Metrics Fully Valid",
+                     {"x": 340.0, "y": 20.0, **CARD}),
+        card_measure("v1b", "ops_installation_errors", "Errors On Record",
+                     {"x": 660.0, "y": 20.0, **CARD}),
+        bar_measures("v1f", "ops_pipeline_validation",
+                     [f"Passed {label}" for label in STEP_LABELS],
+                     {"x": 20.0, "y": 160.0, "width": 620.0,
+                      "height": 340.0}),
+        {**{"x": 660.0, "y": 160.0, "width": 600.0, "height": 340.0,
+            "z": 0},
+         "config": table("v1m", "ops_pipeline_validation",
+                         ["metric_id"] + VALIDATION_STEPS,
+                         {"x": 660.0, "y": 160.0, "width": 600.0,
+                          "height": 340.0})["config"],
+         "filters": _bool_filter("ops_pipeline_validation",
+                                 "step6_traversal", "false")},
         table("v13", "ops_installation_errors",
-              ["error_category", "error_signature", "first_seen"],
-              {"x": 20.0, "y": 540.0, "width": 1240.0, "height": 160.0}),
+              ["error_category", "error_signature", "root_cause", "fix",
+               "first_seen"],
+              {"x": 20.0, "y": 520.0, "width": 1240.0, "height": 180.0}),
     ], 0)
 
     p2 = page("p2", "Knowledge Coverage", [
@@ -240,10 +390,45 @@ def deploy(workspace: str, model_id: str, name: str) -> None:
         print(r.text[:800])
 
 
+def update_report(workspace: str, model_id: str, report_id: str) -> None:
+    parts = [
+        {"path": "report.json", "payload": _b64(build_report_json()),
+         "payloadType": "InlineBase64"},
+        {"path": "definition.pbir", "payload": _b64(definition_pbir(model_id)),
+         "payloadType": "InlineBase64"},
+    ]
+    h = {"Authorization": f"Bearer {_token()}",
+         "Content-Type": "application/json"}
+    r = requests.post(
+        f"{FABRIC}/workspaces/{workspace}/reports/{report_id}/"
+        "updateDefinition", headers=h,
+        json={"definition": {"parts": parts}}, timeout=120)
+    print("report updateDefinition:", r.status_code)
+    if r.status_code == 202:
+        op = r.headers["Location"]
+        for _ in range(24):
+            time.sleep(5)
+            s = requests.get(op, headers=h, timeout=30).json()
+            if s.get("status") in ("Succeeded", "Failed"):
+                print("  op:", s.get("status"))
+                if s.get("status") == "Failed":
+                    print(json.dumps(s)[:800])
+                break
+    elif not r.ok:
+        print(r.text[:800])
+
+
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--workspace", required=True)
     ap.add_argument("--model", required=True)
     ap.add_argument("--name", default="aivia_admin_telemetry_report")
+    ap.add_argument("--report", help="existing report id -> updateDefinition")
+    ap.add_argument("--skip-measures", action="store_true")
     a = ap.parse_args()
-    deploy(a.workspace, a.model, a.name)
+    if not a.skip_measures:
+        inject_measures(a.workspace, a.model)
+    if a.report:
+        update_report(a.workspace, a.model, a.report)
+    else:
+        deploy(a.workspace, a.model, a.name)
