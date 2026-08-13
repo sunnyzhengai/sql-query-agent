@@ -1,0 +1,249 @@
+"""Generate + deploy the AIVIA admin telemetry report (PBIR-Legacy).
+
+Authors the report definition programmatically — four pages of visuals
+bound to the aivia_admin_telemetry Direct Lake model — and creates it
+via the Fabric reports API. No hand-built visuals: this script IS the
+phase-3 installer step in embryo (per-customer deployment = same parts,
+different model id).
+
+Run:  python3 devtools/build_admin_report.py --workspace <ws-id> \
+          --model <semantic-model-id> [--name aivia_admin_telemetry_report]
+"""
+
+from __future__ import annotations
+
+import argparse
+import base64
+import json
+import subprocess
+import time
+
+import requests
+
+FABRIC = "https://api.fabric.microsoft.com/v1"
+
+
+# --- semantic-query builders (PBI prototypeQuery shapes) ---------------
+
+def _col(src: str, prop: str) -> dict:
+    return {"Column": {"Expression": {"SourceRef": {"Source": src}},
+                       "Property": prop}}
+
+
+def _countrows(entity_alias: str) -> dict:
+    return {"Aggregation": {
+        "Expression": {"Column": {
+            "Expression": {"SourceRef": {"Source": entity_alias}},
+            "Property": None}},
+        "Function": 4}}
+
+
+def card_count(name: str, entity: str, prop: str, pos: dict) -> dict:
+    """A card showing COUNT(entity.prop)."""
+    alias = entity[0]
+    qname = f"Count({entity}.{prop})"
+    select = [{"Aggregation": {"Expression": _col(alias, prop),
+                               "Function": 4}, "Name": qname}]
+    return _container(name, "card", pos,
+                      projections={"Values": [{"queryRef": qname}]},
+                      entity=entity, alias=alias, select=select)
+
+
+def table(name: str, entity: str, props: "list[str]", pos: dict) -> dict:
+    alias = entity[0]
+    select = [{"Column": _col(alias, p)["Column"],
+               "Name": f"{entity}.{p}"} for p in props]
+    for s in select:
+        s.update({"Column": s["Column"]})
+    select = [{"Column": _col(alias, p)["Column"], "Name": f"{entity}.{p}"}
+              for p in props]
+    return _container(
+        name, "tableEx", pos,
+        projections={"Values": [{"queryRef": f"{entity}.{p}"}
+                                for p in props]},
+        entity=entity, alias=alias, select=select)
+
+
+def column_chart(name: str, entity: str, category: str, count_prop: str,
+                 pos: dict) -> dict:
+    alias = entity[0]
+    cat_name = f"{entity}.{category}"
+    val_name = f"Count({entity}.{count_prop})"
+    select = [
+        {"Column": _col(alias, category)["Column"], "Name": cat_name},
+        {"Aggregation": {"Expression": _col(alias, count_prop),
+                         "Function": 4}, "Name": val_name},
+    ]
+    return _container(
+        name, "clusteredColumnChart", pos,
+        projections={"Category": [{"queryRef": cat_name}],
+                     "Y": [{"queryRef": val_name}]},
+        entity=entity, alias=alias, select=select)
+
+
+def line_chart(name: str, entity: str, axis: str, count_prop: str,
+               pos: dict) -> dict:
+    alias = entity[0]
+    ax_name = f"{entity}.{axis}"
+    val_name = f"Count({entity}.{count_prop})"
+    select = [
+        {"Column": _col(alias, axis)["Column"], "Name": ax_name},
+        {"Aggregation": {"Expression": _col(alias, count_prop),
+                         "Function": 4}, "Name": val_name},
+    ]
+    return _container(
+        name, "lineChart", pos,
+        projections={"Category": [{"queryRef": ax_name}],
+                     "Y": [{"queryRef": val_name}]},
+        entity=entity, alias=alias, select=select)
+
+
+def _container(name, visual_type, pos, projections, entity, alias,
+               select) -> dict:
+    config = {
+        "name": name,
+        "layouts": [{"id": 0, "position": {**pos, "z": 0}}],
+        "singleVisual": {
+            "visualType": visual_type,
+            "projections": projections,
+            "prototypeQuery": {
+                "Version": 2,
+                "From": [{"Name": alias, "Entity": entity, "Type": 0}],
+                "Select": select,
+            },
+            "drillFilterOtherVisuals": True,
+        },
+    }
+    return {**pos, "z": 0, "config": json.dumps(config)}
+
+
+def page(name, display, visuals, ordinal) -> dict:
+    return {
+        "name": name, "displayName": display, "displayOption": 1,
+        "height": 720.0, "width": 1280.0, "ordinal": ordinal,
+        "visualContainers": visuals,
+        "config": "{}", "filters": "[]",
+    }
+
+
+# --- the four pages ----------------------------------------------------
+
+def build_report_json() -> dict:
+    HALF = {"width": 620.0, "height": 300.0}
+    WIDE = {"width": 1240.0, "height": 360.0}
+    CARD = {"width": 300.0, "height": 120.0}
+
+    p1 = page("p1", "Pipeline Health", [
+        card_count("v11", "ops_pipeline_validation", "metric_id",
+                   {"x": 20.0, "y": 20.0, **CARD}),
+        table("v12", "ops_pipeline_validation",
+              ["metric_id", "step6_traversal", "transform_count",
+               "edge_count", "tech_reachable"],
+              {"x": 20.0, "y": 160.0, **WIDE}),
+        table("v13", "ops_installation_errors",
+              ["error_category", "error_signature", "first_seen"],
+              {"x": 20.0, "y": 540.0, "width": 1240.0, "height": 160.0}),
+    ], 0)
+
+    p2 = page("p2", "Knowledge Coverage", [
+        card_count("v21", "output_metric_logic", "metric_id",
+                   {"x": 20.0, "y": 20.0, **CARD}),
+        card_count("v22", "ops_parse_results", "metric_id",
+                   {"x": 340.0, "y": 20.0, **CARD}),
+        table("v23", "output_metric_logic",
+              ["metric_id", "business_name", "steward", "developer",
+               "transform_count", "report_name"],
+              {"x": 20.0, "y": 160.0, **WIDE}),
+    ], 1)
+
+    p3 = page("p3", "Agent Activity & Decisions", [
+        card_count("v31", "gov_turn_events", "event_at",
+                   {"x": 20.0, "y": 20.0, **CARD}),
+        column_chart("v32", "gov_turn_events", "verified_by_tool",
+                     "event_at", {"x": 20.0, "y": 160.0, **HALF}),
+        column_chart("v33", "gov_turn_events",
+                     "unverified_sameness_language", "event_at",
+                     {"x": 660.0, "y": 160.0, **HALF}),
+        table("v34", "gov_turn_events",
+              ["event_at", "user_id", "question", "tools_used",
+               "verified_by_tool"],
+              {"x": 20.0, "y": 480.0, "width": 1240.0, "height": 220.0}),
+    ], 2)
+
+    p4 = page("p4", "Feedback & Governance", [
+        card_count("v41", "gov_feedback_events", "event_at",
+                   {"x": 20.0, "y": 20.0, **CARD}),
+        column_chart("v42", "gov_feedback_events", "verdict", "event_at",
+                     {"x": 20.0, "y": 160.0, **HALF}),
+        table("v43", "gov_feedback_events",
+              ["event_at", "user_id", "verdict", "comment"],
+              {"x": 20.0, "y": 480.0, "width": 1240.0, "height": 220.0}),
+    ], 3)
+
+    return {
+        "config": json.dumps({"version": "5.43", "themeCollection": {}}),
+        "layoutOptimization": 0,
+        "sections": [p1, p2, p3, p4],
+    }
+
+
+def definition_pbir(model_id: str) -> dict:
+    return {"version": "1.0", "datasetReference": {"byConnection": {
+        "connectionString": None,
+        "pbiServiceModelId": None,
+        "pbiModelVirtualServerName": "sobe_wowvirtualserver",
+        "pbiModelDatabaseName": model_id,
+        "name": "EntityDataSource",
+        "connectionType": "pbiServiceXmlaStyleLive"}}}
+
+
+# --- deployment ---------------------------------------------------------
+
+def _token() -> str:
+    return subprocess.run(
+        ["az", "account", "get-access-token", "--resource",
+         "https://api.fabric.microsoft.com", "--query", "accessToken",
+         "-o", "tsv"], capture_output=True, text=True, check=True,
+    ).stdout.strip()
+
+
+def _b64(obj) -> str:
+    return base64.b64encode(
+        json.dumps(obj, indent=1).encode()).decode()
+
+
+def deploy(workspace: str, model_id: str, name: str) -> None:
+    parts = [
+        {"path": "report.json", "payload": _b64(build_report_json()),
+         "payloadType": "InlineBase64"},
+        {"path": "definition.pbir", "payload": _b64(definition_pbir(model_id)),
+         "payloadType": "InlineBase64"},
+    ]
+    h = {"Authorization": f"Bearer {_token()}",
+         "Content-Type": "application/json"}
+    r = requests.post(
+        f"{FABRIC}/workspaces/{workspace}/reports", headers=h,
+        json={"displayName": name, "definition": {"parts": parts}},
+        timeout=120)
+    print("create:", r.status_code)
+    if r.status_code == 202:
+        op = r.headers.get("Location", "")
+        for _ in range(24):
+            time.sleep(5)
+            s = requests.get(op, headers=h, timeout=30).json()
+            print("  op:", s.get("status"))
+            if s.get("status") in ("Succeeded", "Failed"):
+                if s.get("status") == "Failed":
+                    print(json.dumps(s, indent=1)[:800])
+                return
+    elif not r.ok:
+        print(r.text[:800])
+
+
+if __name__ == "__main__":
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--workspace", required=True)
+    ap.add_argument("--model", required=True)
+    ap.add_argument("--name", default="aivia_admin_telemetry_report")
+    a = ap.parse_args()
+    deploy(a.workspace, a.model, a.name)
