@@ -300,3 +300,24 @@ Protocol, scoring axes (Correct/Grounded/Honest), burst budgeting, and
 the footer-honesty watch all carry over from
 [REMATCH_SCORECARD.md](REMATCH_SCORECARD.md). Feed results into
 REMATCH_WRITEUP.md (thesis pre-written) and decide the publishing venue.
+
+## Fabric gotcha log — 2026-08-12 session
+
+**KQL shortcut schemas FREEZE at creation.** The lakehouse table gained
+business_name/report columns Aug 8 (Delta v11), but probe-eh's shortcut
+kept serving the 9-column schema it inferred at creation — recreating
+the SHORTCUT did not help (the external-table definition persisted),
+and after dropping the external table, lazy re-materialization never
+came (15+ min). Working fix, fully API/mgmt-scriptable:
+  1. `.drop external table <name>` (mgmt endpoint)
+  2. `.create external table <name> kind=delta (h@'abfss://<ws-guid>@onelake.dfs.fabric.microsoft.com/<lakehouse-guid>/Tables/dbo/<name>;impersonate')`
+     — infers the CURRENT Delta schema; bare-name queries still resolve.
+Product consequence: the installer/upgrade path must rebuild external
+tables after any schema-evolving release; customer symptom otherwise is
+"new columns exist in the lakehouse but the agent can't see them."
+
+**SQL-endpoint metadata sync lag**: new lakehouse tables (gov_*) were
+invisible to the Direct Lake semantic-model picker until a forced
+refresh — POST /v1/workspaces/{ws}/sqlEndpoints/{id}/refreshMetadata
+(works, returns per-table status). The installer's report-deployment
+step calls this before creating the model.
