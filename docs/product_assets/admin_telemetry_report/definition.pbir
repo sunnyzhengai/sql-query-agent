@@ -1,0 +1,9 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definitionProperties/2.0.0/schema.json",
+  "version": "4.0",
+  "datasetReference": {
+    "byConnection": {
+      "connectionString": "Data Source=powerbi://api.powerbi.com/v1.0/myorg/AIVIA-DEV-2;initial catalog=aivia_admin_telemetry;integrated security=ClaimsToken;semanticmodelid=c0fa87c5-bbb7-416e-b23e-a17d20370998"
+    }
+  }
+}

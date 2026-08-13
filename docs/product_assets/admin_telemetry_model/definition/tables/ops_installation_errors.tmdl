@@ -2,6 +2,10 @@ table ops_installation_errors
 	lineageTag: 9e71bd1d-c26a-4e6f-b91f-32096870894a
 	sourceLineageTag: [dbo].[ops_installation_errors]
 
+	measure 'Errors On Record' = COUNTROWS(ops_installation_errors) + 0
+		formatString: 0
+		lineageTag: 0f7729f7-efa4-4753-9994-5fad3f349a8a
+
 	column error_signature
 		dataType: string
 		lineageTag: a08b6da1-12f9-4b2f-b39b-d4a9a6a1e15b

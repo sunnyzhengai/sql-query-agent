@@ -2,6 +2,9 @@ table ops_build_summary
 	lineageTag: 08eb6d84-cb52-417e-a95a-5fa52527a946
 	sourceLineageTag: [dbo].[ops_build_summary]
 
+	measure 'Last Build' = MAX(ops_build_summary[build_time])
+		lineageTag: 61f9380f-b13b-44c0-a731-e68753f110c0
+
 	column build_time
 		dataType: string
 		lineageTag: 591e5b84-3883-46e6-917b-3b6759033a60

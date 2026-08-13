@@ -67,6 +67,26 @@ MODEL_MEASURES = {
     "ops_parse_results": [
         ("Objects Parsed", "COUNTROWS(ops_parse_results)", "0"),
     ],
+    "gov_turn_events": [
+        ("Turns", "COUNTROWS(gov_turn_events)", "0"),
+        ("Distinct Users", "DISTINCTCOUNT(gov_turn_events[user_id])", "0"),
+        *[(label,
+           f"CALCULATE(COUNTROWS(gov_turn_events), "
+           f"gov_turn_events[{col}] = TRUE())", "0")
+          for col, label in [("verified_by_tool", "Verified By Tool"),
+                             ("llm_assembled", "LLM Assembled"),
+                             ("search_only", "Search Only"),
+                             ("no_tools", "No Tools"),
+                             ("unverified_sameness_language",
+                              "Unverified Sameness Claims")]],
+        ("Tool Errors", "SUM(gov_turn_events[tool_errors]) + 0", "0"),
+    ],
+    "gov_feedback_events": [
+        ("Feedback Events", "COUNTROWS(gov_feedback_events)", "0"),
+        ("Not Helpful",
+         "CALCULATE(COUNTROWS(gov_feedback_events), "
+         "gov_feedback_events[verdict] = \"not_helpful\") + 0", "0"),
+    ],
     "ops_installation_errors": [
         ("Errors On Record", "COUNTROWS(ops_installation_errors) + 0", "0"),
     ],
@@ -344,13 +364,23 @@ def build_report_json() -> dict:
     ], 1)
 
     p3 = page("p3", "Agent Activity & Decisions", [
-        card_count("v31", "gov_turn_events", "event_at",
-                   {"x": 20.0, "y": 20.0, **CARD}),
-        column_chart("v32", "gov_turn_events", "verified_by_tool",
-                     "event_at", {"x": 20.0, "y": 160.0, **HALF}),
-        column_chart("v33", "gov_turn_events",
-                     "unverified_sameness_language", "event_at",
-                     {"x": 660.0, "y": 160.0, **HALF}),
+        card_measure("v31", "gov_turn_events", "Turns",
+                     {"x": 20.0, "y": 20.0, **CARD}),
+        card_measure("v3u", "gov_turn_events", "Distinct Users",
+                     {"x": 340.0, "y": 20.0, **CARD}),
+        card_measure("v3z", "gov_turn_events",
+                     "Unverified Sameness Claims",
+                     {"x": 660.0, "y": 20.0, **CARD}),
+        card_measure("v3e", "gov_turn_events", "Tool Errors",
+                     {"x": 980.0, "y": 20.0, **CARD}),
+        bar_measures("v3d", "gov_turn_events",
+                     ["Verified By Tool", "LLM Assembled", "Search Only",
+                      "No Tools"],
+                     {"x": 20.0, "y": 160.0, "width": 620.0,
+                      "height": 300.0}),
+        line_chart("v3t", "gov_turn_events", "event_at", "conversation_id",
+                   {"x": 660.0, "y": 160.0, "width": 600.0,
+                    "height": 300.0}),
         table("v34", "gov_turn_events",
               ["event_at", "user_id", "question", "tools_used",
                "verified_by_tool"],
@@ -358,13 +388,21 @@ def build_report_json() -> dict:
     ], 2)
 
     p4 = page("p4", "Feedback & Governance", [
-        card_count("v41", "gov_feedback_events", "event_at",
-                   {"x": 20.0, "y": 20.0, **CARD}),
+        card_measure("v41", "gov_feedback_events", "Feedback Events",
+                     {"x": 20.0, "y": 20.0, **CARD}),
+        card_measure("v4n", "gov_feedback_events", "Not Helpful",
+                     {"x": 340.0, "y": 20.0, **CARD}),
         column_chart("v42", "gov_feedback_events", "verdict", "event_at",
                      {"x": 20.0, "y": 160.0, **HALF}),
         table("v43", "gov_feedback_events",
               ["event_at", "user_id", "verdict", "comment"],
+              {"x": 660.0, "y": 160.0, "width": 600.0, "height": 300.0}),
+        table("v44", "gov_turn_events",
+              ["event_at", "question", "verified_by_tool", "llm_assembled",
+               "search_only", "no_tools"],
               {"x": 20.0, "y": 480.0, "width": 1240.0, "height": 220.0}),
+        # gov_publish_log joins this page once 08/09 first writes it
+        # (table does not exist in lakehouse or model yet — honest gap)
     ], 3)
 
     return {

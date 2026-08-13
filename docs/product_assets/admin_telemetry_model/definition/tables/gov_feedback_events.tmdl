@@ -2,6 +2,14 @@ table gov_feedback_events
 	lineageTag: c8c71653-9616-4f8b-93f7-60db08c0f20d
 	sourceLineageTag: [dbo].[gov_feedback_events]
 
+	measure 'Feedback Events' = COUNTROWS(gov_feedback_events)
+		formatString: 0
+		lineageTag: 3e99b8bd-3fa6-4e5f-a0ca-98f360b7e05c
+
+	measure 'Not Helpful' = CALCULATE(COUNTROWS(gov_feedback_events), gov_feedback_events[verdict] = "not_helpful") + 0
+		formatString: 0
+		lineageTag: 38b2651e-a5ac-46e1-ae47-691c825c5841
+
 	column event_at
 		dataType: string
 		lineageTag: b0f49933-89d4-45d3-8386-cc4cc3e2fe03

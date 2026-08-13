@@ -2,6 +2,10 @@ table ops_parse_results
 	lineageTag: 9ad81b53-813a-4290-9873-f4078abe2989
 	sourceLineageTag: [dbo].[ops_parse_results]
 
+	measure 'Objects Parsed' = COUNTROWS(ops_parse_results)
+		formatString: 0
+		lineageTag: f4f48867-ca38-4e3f-89f8-8a4371f2a89e
+
 	column metric_id
 		dataType: string
 		lineageTag: d5ce851a-8234-42f0-8e7a-452f9d7cdeb2

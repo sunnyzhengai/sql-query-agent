@@ -2,6 +2,37 @@ table ops_pipeline_validation
 	lineageTag: 9e114891-8b61-4a88-8ac5-dda2f8ece1d5
 	sourceLineageTag: [dbo].[ops_pipeline_validation]
 
+	measure 'Metrics Total' = COUNTROWS(ops_pipeline_validation)
+		formatString: 0
+		lineageTag: d915c66e-046c-4a0e-9d0d-7a2d19cbce37
+
+	measure 'Passed 1 Loaded' = CALCULATE(COUNTROWS(ops_pipeline_validation), ops_pipeline_validation[step1_loaded] = TRUE())
+		formatString: 0
+		lineageTag: 88b997de-9cfc-4d9e-825c-b49440a8d602
+
+	measure 'Passed 2 Parsed' = CALCULATE(COUNTROWS(ops_pipeline_validation), ops_pipeline_validation[step2_parsed] = TRUE())
+		formatString: 0
+		lineageTag: d7a144e0-9693-45ea-8449-ce0894a2d2f6
+
+	measure 'Passed 3 Canonical' = CALCULATE(COUNTROWS(ops_pipeline_validation), ops_pipeline_validation[step3_canonical] = TRUE())
+		formatString: 0
+		lineageTag: 12436b19-971b-4e0f-9dc5-c213fa6a99d3
+
+	measure 'Passed 4 Transforms' = CALCULATE(COUNTROWS(ops_pipeline_validation), ops_pipeline_validation[step4_transforms] = TRUE())
+		formatString: 0
+		lineageTag: 6480e0b2-8cc5-4252-9a00-304b5b354350
+
+	measure 'Passed 5 Edges' = CALCULATE(COUNTROWS(ops_pipeline_validation), ops_pipeline_validation[step5_edges] = TRUE())
+		formatString: 0
+		lineageTag: 6cf8dc03-8911-4cab-b6a7-6a4e8015c8c4
+
+	measure 'Passed 6 Traversable' = CALCULATE(COUNTROWS(ops_pipeline_validation), ops_pipeline_validation[step6_traversal] = TRUE())
+		formatString: 0
+		lineageTag: c95902ae-0d39-46a0-9406-9a7b4b70dd98
+
+	measure 'Metrics Fully Valid' = [Passed 6 Traversable] & " / " & [Metrics Total]
+		lineageTag: b6a54770-3a59-4d84-810c-7fbbd322a4eb
+
 	column metric_id
 		dataType: string
 		lineageTag: 48d4f6b1-2b86-45e6-9e70-41422cd52cb4

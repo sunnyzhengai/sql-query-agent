@@ -2,6 +2,38 @@ table gov_turn_events
 	lineageTag: 0233f758-0c63-46eb-88ef-a428a556c8f5
 	sourceLineageTag: [dbo].[gov_turn_events]
 
+	measure Turns = COUNTROWS(gov_turn_events)
+		formatString: 0
+		lineageTag: faa5c843-9096-4353-a399-30dfb3472b06
+
+	measure 'Distinct Users' = DISTINCTCOUNT(gov_turn_events[user_id])
+		formatString: 0
+		lineageTag: 6bc10355-f510-4eed-b585-127e1a858d48
+
+	measure 'Verified By Tool' = CALCULATE(COUNTROWS(gov_turn_events), gov_turn_events[verified_by_tool] = TRUE())
+		formatString: 0
+		lineageTag: 4175aeb6-460e-4ccd-b753-61805d7b0ff7
+
+	measure 'LLM Assembled' = CALCULATE(COUNTROWS(gov_turn_events), gov_turn_events[llm_assembled] = TRUE())
+		formatString: 0
+		lineageTag: 24df27a9-39c6-4316-ae04-249473091535
+
+	measure 'Search Only' = CALCULATE(COUNTROWS(gov_turn_events), gov_turn_events[search_only] = TRUE())
+		formatString: 0
+		lineageTag: d6f11aca-3301-47ac-82dc-478e5f06027c
+
+	measure 'No Tools' = CALCULATE(COUNTROWS(gov_turn_events), gov_turn_events[no_tools] = TRUE())
+		formatString: 0
+		lineageTag: 6ffcc5d6-3e89-410b-bfd0-888129a64e77
+
+	measure 'Unverified Sameness Claims' = CALCULATE(COUNTROWS(gov_turn_events), gov_turn_events[unverified_sameness_language] = TRUE())
+		formatString: 0
+		lineageTag: da44e499-1610-480c-89da-b70d7e7975e4
+
+	measure 'Tool Errors' = SUM(gov_turn_events[tool_errors]) + 0
+		formatString: 0
+		lineageTag: 2e045b03-7214-4393-ae9a-584956e0ce96
+
 	column event_at
 		dataType: string
 		lineageTag: bd17c8ed-eec3-41fc-ae3a-d4e2ff1c4eef

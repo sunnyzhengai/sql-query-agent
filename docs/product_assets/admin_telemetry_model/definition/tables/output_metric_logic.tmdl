@@ -2,6 +2,38 @@ table output_metric_logic
 	lineageTag: 6c468c90-7723-4a36-8520-266cf7e323f6
 	sourceLineageTag: [dbo].[output_metric_logic]
 
+	measure 'Certified Metrics' = COUNTROWS(output_metric_logic)
+		formatString: 0
+		lineageTag: e69469f1-aac1-4a5d-94af-4db6b29a2f5b
+
+	measure 'Total Calculation Steps' = SUM(output_metric_logic[transform_count])
+		formatString: 0
+		lineageTag: 5a95deba-8838-4b3e-ad35-bc29fd6a2630
+
+	measure 'Pct With Description' = DIVIDE(CALCULATE(COUNTROWS(output_metric_logic), output_metric_logic[description] <> ""), COUNTROWS(output_metric_logic))
+		formatString: 0%
+		lineageTag: 496d7664-c17f-4765-9c0e-404a215aefc6
+
+	measure 'Pct With Business Name' = DIVIDE(CALCULATE(COUNTROWS(output_metric_logic), output_metric_logic[business_name] <> ""), COUNTROWS(output_metric_logic))
+		formatString: 0%
+		lineageTag: 22a88a15-c9bd-4f9a-b48c-5e291f0a1c5e
+
+	measure 'Pct With Steward' = DIVIDE(CALCULATE(COUNTROWS(output_metric_logic), output_metric_logic[steward] <> ""), COUNTROWS(output_metric_logic))
+		formatString: 0%
+		lineageTag: fbb9c36e-a459-4229-a051-05d59207e7ec
+
+	measure 'Pct With Developer' = DIVIDE(CALCULATE(COUNTROWS(output_metric_logic), output_metric_logic[developer] <> ""), COUNTROWS(output_metric_logic))
+		formatString: 0%
+		lineageTag: d6b61167-2109-4d74-87df-c713393786d1
+
+	measure 'Pct With Report Link' = DIVIDE(CALCULATE(COUNTROWS(output_metric_logic), output_metric_logic[report_url] <> ""), COUNTROWS(output_metric_logic))
+		formatString: 0%
+		lineageTag: 826765f7-f714-4a20-a7e7-92b56d334af5
+
+	measure 'Missing Steward' = COUNTROWS(output_metric_logic) - CALCULATE(COUNTROWS(output_metric_logic), output_metric_logic[steward] <> "")
+		formatString: 0
+		lineageTag: 7e55dbad-ad95-4026-a67d-fc197db123b1
+
 	column metric_id
 		dataType: string
 		lineageTag: e3cd20d3-1481-4b07-9e28-1264002089ae
