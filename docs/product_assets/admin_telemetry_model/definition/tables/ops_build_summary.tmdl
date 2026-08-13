@@ -1,0 +1,47 @@
+table ops_build_summary
+	lineageTag: 08eb6d84-cb52-417e-a95a-5fa52527a946
+	sourceLineageTag: [dbo].[ops_build_summary]
+
+	column build_time
+		dataType: string
+		lineageTag: 591e5b84-3883-46e6-917b-3b6759033a60
+		sourceLineageTag: build_time
+		summarizeBy: none
+		sourceColumn: build_time
+
+		annotation SummarizationSetBy = Automatic
+
+	column metric_key
+		dataType: string
+		lineageTag: 8a4cc1d6-60bd-4d17-9d72-e0e1c437b5a8
+		sourceLineageTag: metric_key
+		summarizeBy: none
+		sourceColumn: metric_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column value
+		dataType: string
+		lineageTag: e03600bb-e7b7-43d0-bb82-9143e4071def
+		sourceLineageTag: value
+		summarizeBy: none
+		sourceColumn: value
+
+		annotation SummarizationSetBy = Automatic
+
+	column detail
+		dataType: string
+		lineageTag: b24aa02a-1a2a-46bc-b85a-4cab68e83483
+		sourceLineageTag: detail
+		summarizeBy: none
+		sourceColumn: detail
+
+		annotation SummarizationSetBy = Automatic
+
+	partition ops_build_summary = entity
+		mode: directLake
+		source
+			entityName: ops_build_summary
+			schemaName: dbo
+			expressionSource: 'DirectLake - sql_query_lh'
+

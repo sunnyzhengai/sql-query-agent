@@ -1,0 +1,95 @@
+table ops_parse_results
+	lineageTag: 9ad81b53-813a-4290-9873-f4078abe2989
+	sourceLineageTag: [dbo].[ops_parse_results]
+
+	column metric_id
+		dataType: string
+		lineageTag: d5ce851a-8234-42f0-8e7a-452f9d7cdeb2
+		sourceLineageTag: metric_id
+		summarizeBy: none
+		sourceColumn: metric_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column name
+		dataType: string
+		lineageTag: 33476e8d-d7e7-4ba3-b8f1-27d3019e9d69
+		sourceLineageTag: name
+		summarizeBy: none
+		sourceColumn: name
+
+		annotation SummarizationSetBy = Automatic
+
+	column ctes_json
+		dataType: string
+		lineageTag: d43a960d-b3b4-47dd-840b-6ea55d6e6e8c
+		sourceLineageTag: ctes_json
+		summarizeBy: none
+		sourceColumn: ctes_json
+
+		annotation SummarizationSetBy = Automatic
+
+	column final_select_tables
+		dataType: string
+		lineageTag: d83fd2bc-a962-41c9-96fe-ca09917ca5c6
+		sourceLineageTag: final_select_tables
+		summarizeBy: none
+		sourceColumn: final_select_tables
+
+		annotation SummarizationSetBy = Automatic
+
+	column final_select_cte_refs
+		dataType: string
+		lineageTag: 96c16c23-8645-41af-9347-93698b9fa064
+		sourceLineageTag: final_select_cte_refs
+		summarizeBy: none
+		sourceColumn: final_select_cte_refs
+
+		annotation SummarizationSetBy = Automatic
+
+	column cte_count
+		dataType: int64
+		formatString: 0
+		lineageTag: 1f6b22bd-9b84-4a4e-aba4-ba11c0f3db38
+		sourceLineageTag: cte_count
+		summarizeBy: sum
+		sourceColumn: cte_count
+
+		annotation SummarizationSetBy = Automatic
+
+	column table_count
+		dataType: int64
+		formatString: 0
+		lineageTag: b6da2728-d58e-4b1f-8e40-ca06075bbe45
+		sourceLineageTag: table_count
+		summarizeBy: sum
+		sourceColumn: table_count
+
+		annotation SummarizationSetBy = Automatic
+
+	column line_count
+		dataType: int64
+		formatString: 0
+		lineageTag: e6f62bb7-21e1-47e5-b3b2-f0e0e9846e15
+		sourceLineageTag: line_count
+		summarizeBy: sum
+		sourceColumn: line_count
+
+		annotation SummarizationSetBy = Automatic
+
+	column normalized_sql
+		dataType: string
+		lineageTag: c6b44da5-652c-48a3-a824-60cdac9e63e3
+		sourceLineageTag: normalized_sql
+		summarizeBy: none
+		sourceColumn: normalized_sql
+
+		annotation SummarizationSetBy = Automatic
+
+	partition ops_parse_results = entity
+		mode: directLake
+		source
+			entityName: ops_parse_results
+			schemaName: dbo
+			expressionSource: 'DirectLake - sql_query_lh'
+

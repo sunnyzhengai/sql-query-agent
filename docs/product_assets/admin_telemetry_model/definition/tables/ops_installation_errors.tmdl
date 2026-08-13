@@ -1,0 +1,65 @@
+table ops_installation_errors
+	lineageTag: 9e71bd1d-c26a-4e6f-b91f-32096870894a
+	sourceLineageTag: [dbo].[ops_installation_errors]
+
+	column error_signature
+		dataType: string
+		lineageTag: a08b6da1-12f9-4b2f-b39b-d4a9a6a1e15b
+		sourceLineageTag: error_signature
+		summarizeBy: none
+		sourceColumn: error_signature
+
+		annotation SummarizationSetBy = Automatic
+
+	column error_category
+		dataType: string
+		lineageTag: b38a2981-9f79-4bbc-a469-61c711e4f286
+		sourceLineageTag: error_category
+		summarizeBy: none
+		sourceColumn: error_category
+
+		annotation SummarizationSetBy = Automatic
+
+	column root_cause
+		dataType: string
+		lineageTag: 7c9c4db0-8b62-4756-9399-f2e47441be74
+		sourceLineageTag: root_cause
+		summarizeBy: none
+		sourceColumn: root_cause
+
+		annotation SummarizationSetBy = Automatic
+
+	column fix
+		dataType: string
+		lineageTag: 70f2ccd9-1e09-4444-a97b-aa340ea53be5
+		sourceLineageTag: fix
+		summarizeBy: none
+		sourceColumn: fix
+
+		annotation SummarizationSetBy = Automatic
+
+	column prevention
+		dataType: string
+		lineageTag: 9d092e08-9afa-43c9-82ea-aac149846b98
+		sourceLineageTag: prevention
+		summarizeBy: none
+		sourceColumn: prevention
+
+		annotation SummarizationSetBy = Automatic
+
+	column first_seen
+		dataType: string
+		lineageTag: 845cf5d3-336b-4d22-8cd4-a0db8eca8941
+		sourceLineageTag: first_seen
+		summarizeBy: none
+		sourceColumn: first_seen
+
+		annotation SummarizationSetBy = Automatic
+
+	partition ops_installation_errors = entity
+		mode: directLake
+		source
+			entityName: ops_installation_errors
+			schemaName: dbo
+			expressionSource: 'DirectLake - sql_query_lh'
+

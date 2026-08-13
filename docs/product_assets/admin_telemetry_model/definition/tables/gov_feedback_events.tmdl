@@ -1,0 +1,66 @@
+table gov_feedback_events
+	lineageTag: c8c71653-9616-4f8b-93f7-60db08c0f20d
+	sourceLineageTag: [dbo].[gov_feedback_events]
+
+	column event_at
+		dataType: string
+		lineageTag: b0f49933-89d4-45d3-8386-cc4cc3e2fe03
+		sourceLineageTag: event_at
+		summarizeBy: none
+		sourceColumn: event_at
+
+		annotation SummarizationSetBy = Automatic
+
+	column user_id
+		dataType: string
+		lineageTag: e3d02327-6a50-4cea-bb03-298e42429959
+		sourceLineageTag: user_id
+		summarizeBy: none
+		sourceColumn: user_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column conversation_id
+		dataType: string
+		lineageTag: b0c21e05-3e4d-4151-9788-7fdd4191f6ef
+		sourceLineageTag: conversation_id
+		summarizeBy: none
+		sourceColumn: conversation_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column turn_index
+		dataType: int64
+		formatString: 0
+		lineageTag: c51e0adb-42ea-4848-8e4b-4c3984b00ca8
+		sourceLineageTag: turn_index
+		summarizeBy: sum
+		sourceColumn: turn_index
+
+		annotation SummarizationSetBy = Automatic
+
+	column verdict
+		dataType: string
+		lineageTag: 9769553d-5d46-41d4-9ab9-7cf240def06f
+		sourceLineageTag: verdict
+		summarizeBy: none
+		sourceColumn: verdict
+
+		annotation SummarizationSetBy = Automatic
+
+	column comment
+		dataType: string
+		lineageTag: 8c1ad8eb-b3bb-42c3-bc29-ad2c6680841d
+		sourceLineageTag: comment
+		summarizeBy: none
+		sourceColumn: comment
+
+		annotation SummarizationSetBy = Automatic
+
+	partition gov_feedback_events = entity
+		mode: directLake
+		source
+			entityName: gov_feedback_events
+			schemaName: dbo
+			expressionSource: 'DirectLake - sql_query_lh'
+

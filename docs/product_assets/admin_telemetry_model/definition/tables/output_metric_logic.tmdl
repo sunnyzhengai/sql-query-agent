@@ -1,0 +1,120 @@
+table output_metric_logic
+	lineageTag: 6c468c90-7723-4a36-8520-266cf7e323f6
+	sourceLineageTag: [dbo].[output_metric_logic]
+
+	column metric_id
+		dataType: string
+		lineageTag: e3cd20d3-1481-4b07-9e28-1264002089ae
+		sourceLineageTag: metric_id
+		summarizeBy: none
+		sourceColumn: metric_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column metric_name
+		dataType: string
+		lineageTag: 1a7a60e8-15c5-48fe-b091-825147fe1b4b
+		sourceLineageTag: metric_name
+		summarizeBy: none
+		sourceColumn: metric_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column description
+		dataType: string
+		lineageTag: 6cc4eed6-8645-41c1-b080-2c5140624207
+		sourceLineageTag: description
+		summarizeBy: none
+		sourceColumn: description
+
+		annotation SummarizationSetBy = Automatic
+
+	column steward
+		dataType: string
+		lineageTag: f2f25bb2-5185-49ff-8190-ff21955882cf
+		sourceLineageTag: steward
+		summarizeBy: none
+		sourceColumn: steward
+
+		annotation SummarizationSetBy = Automatic
+
+	column developer
+		dataType: string
+		lineageTag: 2b14958a-e4a3-410b-9bf9-fb178b32d246
+		sourceLineageTag: developer
+		summarizeBy: none
+		sourceColumn: developer
+
+		annotation SummarizationSetBy = Automatic
+
+	column transform_count
+		dataType: int64
+		formatString: 0
+		lineageTag: 15e858ac-6e15-4ac6-a7a7-d697365870f0
+		sourceLineageTag: transform_count
+		summarizeBy: sum
+		sourceColumn: transform_count
+
+		annotation SummarizationSetBy = Automatic
+
+	column calculation_logic
+		dataType: string
+		lineageTag: fb6eeb2f-5da1-47c0-9eba-89165f75bd47
+		sourceLineageTag: calculation_logic
+		summarizeBy: none
+		sourceColumn: calculation_logic
+
+		annotation SummarizationSetBy = Automatic
+
+	column source_tables
+		dataType: string
+		lineageTag: d86693e0-28f0-496c-9b6c-9e0f7ce73681
+		sourceLineageTag: source_tables
+		summarizeBy: none
+		sourceColumn: source_tables
+
+		annotation SummarizationSetBy = Automatic
+
+	column table_descriptions
+		dataType: string
+		lineageTag: ae169f00-2b2d-4016-9ba2-378d8aa769c3
+		sourceLineageTag: table_descriptions
+		summarizeBy: none
+		sourceColumn: table_descriptions
+
+		annotation SummarizationSetBy = Automatic
+
+	column business_name
+		dataType: string
+		lineageTag: 1dcd3638-8196-4b2a-a4c3-3f9281b1a35b
+		sourceLineageTag: business_name
+		summarizeBy: none
+		sourceColumn: business_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column report_name
+		dataType: string
+		lineageTag: 6ec3030a-5437-460f-90e8-e60a35e5648a
+		sourceLineageTag: report_name
+		summarizeBy: none
+		sourceColumn: report_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column report_url
+		dataType: string
+		lineageTag: 0d114492-07f1-4d92-bd6f-7c84a320a927
+		sourceLineageTag: report_url
+		summarizeBy: none
+		sourceColumn: report_url
+
+		annotation SummarizationSetBy = Automatic
+
+	partition output_metric_logic = entity
+		mode: directLake
+		source
+			entityName: output_metric_logic
+			schemaName: dbo
+			expressionSource: 'DirectLake - sql_query_lh'
+
