@@ -1,0 +1,195 @@
+table gov_turn_events
+	lineageTag: 0233f758-0c63-46eb-88ef-a428a556c8f5
+	sourceLineageTag: [dbo].[gov_turn_events]
+
+	measure Turns = COUNTROWS(gov_turn_events)
+		formatString: 0
+		lineageTag: faa5c843-9096-4353-a399-30dfb3472b06
+
+	measure 'Distinct Users' = DISTINCTCOUNT(gov_turn_events[user_id])
+		formatString: 0
+		lineageTag: 6bc10355-f510-4eed-b585-127e1a858d48
+
+	measure 'Verified By Tool' = CALCULATE(COUNTROWS(gov_turn_events), gov_turn_events[verified_by_tool] = TRUE())
+		formatString: 0
+		lineageTag: 4175aeb6-460e-4ccd-b753-61805d7b0ff7
+
+	measure 'LLM Assembled' = CALCULATE(COUNTROWS(gov_turn_events), gov_turn_events[llm_assembled] = TRUE())
+		formatString: 0
+		lineageTag: 24df27a9-39c6-4316-ae04-249473091535
+
+	measure 'Search Only' = CALCULATE(COUNTROWS(gov_turn_events), gov_turn_events[search_only] = TRUE())
+		formatString: 0
+		lineageTag: d6f11aca-3301-47ac-82dc-478e5f06027c
+
+	measure 'No Tools' = CALCULATE(COUNTROWS(gov_turn_events), gov_turn_events[no_tools] = TRUE())
+		formatString: 0
+		lineageTag: 6ffcc5d6-3e89-410b-bfd0-888129a64e77
+
+	measure 'Unverified Sameness Claims' = CALCULATE(COUNTROWS(gov_turn_events), gov_turn_events[unverified_sameness_language] = TRUE())
+		formatString: 0
+		lineageTag: da44e499-1610-480c-89da-b70d7e7975e4
+
+	measure 'Tool Errors' = SUM(gov_turn_events[tool_errors]) + 0
+		formatString: 0
+		lineageTag: 2e045b03-7214-4393-ae9a-584956e0ce96
+
+	column event_at
+		dataType: string
+		lineageTag: bd17c8ed-eec3-41fc-ae3a-d4e2ff1c4eef
+		sourceLineageTag: event_at
+		summarizeBy: none
+		sourceColumn: event_at
+
+		annotation SummarizationSetBy = Automatic
+
+	column user_id
+		dataType: string
+		lineageTag: b79dc49a-47f6-4d23-a133-87d85b3b5ffa
+		sourceLineageTag: user_id
+		summarizeBy: none
+		sourceColumn: user_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column conversation_id
+		dataType: string
+		lineageTag: e16766b2-9722-4d16-b758-b56d002ba753
+		sourceLineageTag: conversation_id
+		summarizeBy: none
+		sourceColumn: conversation_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column turn_index
+		dataType: int64
+		formatString: 0
+		lineageTag: ae0b97a1-ea85-42fc-a0c1-6c196e1ae952
+		sourceLineageTag: turn_index
+		summarizeBy: sum
+		sourceColumn: turn_index
+
+		annotation SummarizationSetBy = Automatic
+
+	column question
+		dataType: string
+		lineageTag: ec0bb353-2459-4a04-b098-8b2c198469cc
+		sourceLineageTag: question
+		summarizeBy: none
+		sourceColumn: question
+
+		annotation SummarizationSetBy = Automatic
+
+	column tools_used
+		dataType: string
+		lineageTag: 39e59cea-262a-492f-a043-92b01ccc6611
+		sourceLineageTag: tools_used
+		summarizeBy: none
+		sourceColumn: tools_used
+
+		annotation SummarizationSetBy = Automatic
+
+	column ids_read
+		dataType: string
+		lineageTag: ae508c4e-64c3-44dc-974f-1cebdbc008d1
+		sourceLineageTag: ids_read
+		summarizeBy: none
+		sourceColumn: ids_read
+
+		annotation SummarizationSetBy = Automatic
+
+	column basis
+		dataType: string
+		lineageTag: 519df438-d08b-484d-b71f-466d3821d01c
+		sourceLineageTag: basis
+		summarizeBy: none
+		sourceColumn: basis
+
+		annotation SummarizationSetBy = Automatic
+
+	column answered
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: dd477585-4b96-4abf-a24f-0dc7655870b6
+		sourceLineageTag: answered
+		summarizeBy: none
+		sourceColumn: answered
+
+		annotation SummarizationSetBy = Automatic
+
+	column verified_by_tool
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: b5077bd7-b474-4cf0-9621-fc7184926fdf
+		sourceLineageTag: verified_by_tool
+		summarizeBy: none
+		sourceColumn: verified_by_tool
+
+		annotation SummarizationSetBy = Automatic
+
+	column llm_assembled
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 2d21c1e5-cc80-473a-ab2b-46464b45f218
+		sourceLineageTag: llm_assembled
+		summarizeBy: none
+		sourceColumn: llm_assembled
+
+		annotation SummarizationSetBy = Automatic
+
+	column unverified_sameness_language
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: c0e622d5-c321-482c-a6a5-25927019b93f
+		sourceLineageTag: unverified_sameness_language
+		summarizeBy: none
+		sourceColumn: unverified_sameness_language
+
+		annotation SummarizationSetBy = Automatic
+
+	column search_only
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 9f8df1e2-14d6-4e18-a765-7a8cec12e43c
+		sourceLineageTag: search_only
+		summarizeBy: none
+		sourceColumn: search_only
+
+		annotation SummarizationSetBy = Automatic
+
+	column no_tools
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 663a276d-ddef-44bf-b65b-c4fa74fc73c9
+		sourceLineageTag: no_tools
+		summarizeBy: none
+		sourceColumn: no_tools
+
+		annotation SummarizationSetBy = Automatic
+
+	column tool_errors
+		dataType: int64
+		formatString: 0
+		lineageTag: 5d9bdcd2-ab6c-4e5e-b69e-ee5956241709
+		sourceLineageTag: tool_errors
+		summarizeBy: sum
+		sourceColumn: tool_errors
+
+		annotation SummarizationSetBy = Automatic
+
+	column trace
+		dataType: string
+		lineageTag: b0c442df-e354-46fd-8862-ce19318adb20
+		sourceLineageTag: trace
+		summarizeBy: none
+		sourceColumn: trace
+
+		annotation SummarizationSetBy = Automatic
+
+	partition gov_turn_events = entity
+		mode: directLake
+		source
+			entityName: gov_turn_events
+			schemaName: dbo
+			expressionSource: 'DirectLake - sql_query_lh'
+

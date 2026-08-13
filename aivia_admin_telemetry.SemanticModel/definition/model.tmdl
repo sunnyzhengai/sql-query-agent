@@ -1,0 +1,22 @@
+model Model
+	culture: en-US
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: en-US
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation __PBI_TimeIntelligenceEnabled = 1
+
+annotation PBI_QueryOrder = ["DirectLake - sql_query_lh"]
+
+annotation PBI_ProTooling = ["DirectLakeOnOneLakeInWeb"]
+
+ref table gov_feedback_events
+ref table gov_turn_events
+ref table ops_pipeline_validation
+ref table ops_build_summary
+ref table ops_installation_errors
+ref table ops_parse_results
+ref table output_metric_logic
+

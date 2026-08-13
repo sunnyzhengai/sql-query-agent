@@ -1,0 +1,141 @@
+table ops_pipeline_validation
+	lineageTag: 9e114891-8b61-4a88-8ac5-dda2f8ece1d5
+	sourceLineageTag: [dbo].[ops_pipeline_validation]
+
+	measure 'Metrics Total' = COUNTROWS(ops_pipeline_validation)
+		formatString: 0
+		lineageTag: d915c66e-046c-4a0e-9d0d-7a2d19cbce37
+
+	measure 'Passed 1 Loaded' = CALCULATE(COUNTROWS(ops_pipeline_validation), ops_pipeline_validation[step1_loaded] = TRUE())
+		formatString: 0
+		lineageTag: 88b997de-9cfc-4d9e-825c-b49440a8d602
+
+	measure 'Passed 2 Parsed' = CALCULATE(COUNTROWS(ops_pipeline_validation), ops_pipeline_validation[step2_parsed] = TRUE())
+		formatString: 0
+		lineageTag: d7a144e0-9693-45ea-8449-ce0894a2d2f6
+
+	measure 'Passed 3 Canonical' = CALCULATE(COUNTROWS(ops_pipeline_validation), ops_pipeline_validation[step3_canonical] = TRUE())
+		formatString: 0
+		lineageTag: 12436b19-971b-4e0f-9dc5-c213fa6a99d3
+
+	measure 'Passed 4 Transforms' = CALCULATE(COUNTROWS(ops_pipeline_validation), ops_pipeline_validation[step4_transforms] = TRUE())
+		formatString: 0
+		lineageTag: 6480e0b2-8cc5-4252-9a00-304b5b354350
+
+	measure 'Passed 5 Edges' = CALCULATE(COUNTROWS(ops_pipeline_validation), ops_pipeline_validation[step5_edges] = TRUE())
+		formatString: 0
+		lineageTag: 6cf8dc03-8911-4cab-b6a7-6a4e8015c8c4
+
+	measure 'Passed 6 Traversable' = CALCULATE(COUNTROWS(ops_pipeline_validation), ops_pipeline_validation[step6_traversal] = TRUE())
+		formatString: 0
+		lineageTag: c95902ae-0d39-46a0-9406-9a7b4b70dd98
+
+	measure 'Metrics Fully Valid' = [Passed 6 Traversable] & " / " & [Metrics Total]
+		lineageTag: b6a54770-3a59-4d84-810c-7fbbd322a4eb
+
+	column metric_id
+		dataType: string
+		lineageTag: 48d4f6b1-2b86-45e6-9e70-41422cd52cb4
+		sourceLineageTag: metric_id
+		summarizeBy: none
+		sourceColumn: metric_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column step1_loaded
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 685fa9c7-37f4-4bb6-afd0-a984c993c87a
+		sourceLineageTag: step1_loaded
+		summarizeBy: none
+		sourceColumn: step1_loaded
+
+		annotation SummarizationSetBy = Automatic
+
+	column step2_parsed
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 9c0b77f9-0d49-4a90-87d5-e4b88f4683ce
+		sourceLineageTag: step2_parsed
+		summarizeBy: none
+		sourceColumn: step2_parsed
+
+		annotation SummarizationSetBy = Automatic
+
+	column step3_canonical
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 59754b52-6a6f-44d0-8e54-b37dd0034c56
+		sourceLineageTag: step3_canonical
+		summarizeBy: none
+		sourceColumn: step3_canonical
+
+		annotation SummarizationSetBy = Automatic
+
+	column step4_transforms
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 26f181a1-67f0-41ba-96da-4433a2ea7613
+		sourceLineageTag: step4_transforms
+		summarizeBy: none
+		sourceColumn: step4_transforms
+
+		annotation SummarizationSetBy = Automatic
+
+	column step5_edges
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: d1e9c869-f247-47ea-8ad6-a4af5f27eda0
+		sourceLineageTag: step5_edges
+		summarizeBy: none
+		sourceColumn: step5_edges
+
+		annotation SummarizationSetBy = Automatic
+
+	column step6_traversal
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 706ae04b-766a-4596-9986-c22ea30098b0
+		sourceLineageTag: step6_traversal
+		summarizeBy: none
+		sourceColumn: step6_traversal
+
+		annotation SummarizationSetBy = Automatic
+
+	column transform_count
+		dataType: int64
+		formatString: 0
+		lineageTag: 24ca61ba-2c08-4c06-86fb-ddacf7edb7ad
+		sourceLineageTag: transform_count
+		summarizeBy: sum
+		sourceColumn: transform_count
+
+		annotation SummarizationSetBy = Automatic
+
+	column edge_count
+		dataType: int64
+		formatString: 0
+		lineageTag: d3036191-7031-4f06-bd5e-f949c5a3ef00
+		sourceLineageTag: edge_count
+		summarizeBy: sum
+		sourceColumn: edge_count
+
+		annotation SummarizationSetBy = Automatic
+
+	column tech_reachable
+		dataType: int64
+		formatString: 0
+		lineageTag: dc1ba320-1b7e-4ec1-aadb-9484d63e4847
+		sourceLineageTag: tech_reachable
+		summarizeBy: sum
+		sourceColumn: tech_reachable
+
+		annotation SummarizationSetBy = Automatic
+
+	partition ops_pipeline_validation = entity
+		mode: directLake
+		source
+			entityName: ops_pipeline_validation
+			schemaName: dbo
+			expressionSource: 'DirectLake - sql_query_lh'
+

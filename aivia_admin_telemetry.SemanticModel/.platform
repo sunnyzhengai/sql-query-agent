@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "SemanticModel",
+    "displayName": "aivia_admin_telemetry"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "20370998-a17d-b23e-416e-bbb7c0fa87c5"
+  }
+}

@@ -1,0 +1,255 @@
+{
+  "config": "{\"version\": \"5.43\", \"themeCollection\": {}}",
+  "layoutOptimization": 0,
+  "resourcePackages": [],
+  "sections": [
+    {
+      "config": "{}",
+      "displayName": "Pipeline Health",
+      "displayOption": 1,
+      "filters": "[]",
+      "height": 720.00,
+      "name": "p1",
+      "visualContainers": [
+        {
+          "config": "{\"name\": \"v10\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 20.0, \"y\": 20.0, \"width\": 300.0, \"height\": 120.0, \"z\": 0}}], \"singleVisual\": {\"visualType\": \"card\", \"projections\": {\"Values\": [{\"queryRef\": \"ops_build_summary.Last Build\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"o\", \"Entity\": \"ops_build_summary\", \"Type\": 0}], \"Select\": [{\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"o\"}}, \"Property\": \"Last Build\"}, \"Name\": \"ops_build_summary.Last Build\"}]}, \"drillFilterOtherVisuals\": true}}",
+          "height": 120.00,
+          "width": 300.00,
+          "x": 20.00,
+          "y": 20.00,
+          "z": 0.00
+        },
+        {
+          "config": "{\"name\": \"v11\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 340.0, \"y\": 20.0, \"width\": 300.0, \"height\": 120.0, \"z\": 0}}], \"singleVisual\": {\"visualType\": \"card\", \"projections\": {\"Values\": [{\"queryRef\": \"ops_pipeline_validation.Metrics Fully Valid\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"o\", \"Entity\": \"ops_pipeline_validation\", \"Type\": 0}], \"Select\": [{\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"o\"}}, \"Property\": \"Metrics Fully Valid\"}, \"Name\": \"ops_pipeline_validation.Metrics Fully Valid\"}]}, \"drillFilterOtherVisuals\": true}}",
+          "height": 120.00,
+          "width": 300.00,
+          "x": 340.00,
+          "y": 20.00,
+          "z": 0.00
+        },
+        {
+          "config": "{\"name\": \"v13\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 20.0, \"y\": 520.0, \"width\": 1240.0, \"height\": 180.0, \"z\": 0}}], \"singleVisual\": {\"visualType\": \"tableEx\", \"projections\": {\"Values\": [{\"queryRef\": \"ops_installation_errors.error_category\"}, {\"queryRef\": \"ops_installation_errors.error_signature\"}, {\"queryRef\": \"ops_installation_errors.root_cause\"}, {\"queryRef\": \"ops_installation_errors.fix\"}, {\"queryRef\": \"ops_installation_errors.first_seen\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"o\", \"Entity\": \"ops_installation_errors\", \"Type\": 0}], \"Select\": [{\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"o\"}}, \"Property\": \"error_category\"}, \"Name\": \"ops_installation_errors.error_category\"}, {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"o\"}}, \"Property\": \"error_signature\"}, \"Name\": \"ops_installation_errors.error_signature\"}, {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"o\"}}, \"Property\": \"root_cause\"}, \"Name\": \"ops_installation_errors.root_cause\"}, {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"o\"}}, \"Property\": \"fix\"}, \"Name\": \"ops_installation_errors.fix\"}, {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"o\"}}, \"Property\": \"first_seen\"}, \"Name\": \"ops_installation_errors.first_seen\"}]}, \"drillFilterOtherVisuals\": true}}",
+          "height": 180.00,
+          "width": 1240.00,
+          "x": 20.00,
+          "y": 520.00,
+          "z": 0.00
+        },
+        {
+          "config": "{\"name\": \"v1b\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 660.0, \"y\": 20.0, \"width\": 300.0, \"height\": 120.0, \"z\": 0}}], \"singleVisual\": {\"visualType\": \"card\", \"projections\": {\"Values\": [{\"queryRef\": \"ops_installation_errors.Errors On Record\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"o\", \"Entity\": \"ops_installation_errors\", \"Type\": 0}], \"Select\": [{\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"o\"}}, \"Property\": \"Errors On Record\"}, \"Name\": \"ops_installation_errors.Errors On Record\"}]}, \"drillFilterOtherVisuals\": true}}",
+          "height": 120.00,
+          "width": 300.00,
+          "x": 660.00,
+          "y": 20.00,
+          "z": 0.00
+        },
+        {
+          "config": "{\"name\": \"v1f\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 20.0, \"y\": 160.0, \"width\": 620.0, \"height\": 340.0, \"z\": 0}}], \"singleVisual\": {\"visualType\": \"clusteredBarChart\", \"projections\": {\"Y\": [{\"queryRef\": \"ops_pipeline_validation.Passed 1 Loaded\"}, {\"queryRef\": \"ops_pipeline_validation.Passed 2 Parsed\"}, {\"queryRef\": \"ops_pipeline_validation.Passed 3 Canonical\"}, {\"queryRef\": \"ops_pipeline_validation.Passed 4 Transforms\"}, {\"queryRef\": \"ops_pipeline_validation.Passed 5 Edges\"}, {\"queryRef\": \"ops_pipeline_validation.Passed 6 Traversable\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"o\", \"Entity\": \"ops_pipeline_validation\", \"Type\": 0}], \"Select\": [{\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"o\"}}, \"Property\": \"Passed 1 Loaded\"}, \"Name\": \"ops_pipeline_validation.Passed 1 Loaded\"}, {\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"o\"}}, \"Property\": \"Passed 2 Parsed\"}, \"Name\": \"ops_pipeline_validation.Passed 2 Parsed\"}, {\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"o\"}}, \"Property\": \"Passed 3 Canonical\"}, \"Name\": \"ops_pipeline_validation.Passed 3 Canonical\"}, {\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"o\"}}, \"Property\": \"Passed 4 Transforms\"}, \"Name\": \"ops_pipeline_validation.Passed 4 Transforms\"}, {\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"o\"}}, \"Property\": \"Passed 5 Edges\"}, \"Name\": \"ops_pipeline_validation.Passed 5 Edges\"}, {\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"o\"}}, \"Property\": \"Passed 6 Traversable\"}, \"Name\": \"ops_pipeline_validation.Passed 6 Traversable\"}]}, \"drillFilterOtherVisuals\": true}}",
+          "height": 340.00,
+          "width": 620.00,
+          "x": 20.00,
+          "y": 160.00,
+          "z": 0.00
+        },
+        {
+          "config": "{\"name\": \"v1m\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 660.0, \"y\": 160.0, \"width\": 600.0, \"height\": 340.0, \"z\": 0}}], \"singleVisual\": {\"visualType\": \"tableEx\", \"projections\": {\"Values\": [{\"queryRef\": \"ops_pipeline_validation.metric_id\"}, {\"queryRef\": \"ops_pipeline_validation.step1_loaded\"}, {\"queryRef\": \"ops_pipeline_validation.step2_parsed\"}, {\"queryRef\": \"ops_pipeline_validation.step3_canonical\"}, {\"queryRef\": \"ops_pipeline_validation.step4_transforms\"}, {\"queryRef\": \"ops_pipeline_validation.step5_edges\"}, {\"queryRef\": \"ops_pipeline_validation.step6_traversal\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"o\", \"Entity\": \"ops_pipeline_validation\", \"Type\": 0}], \"Select\": [{\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"o\"}}, \"Property\": \"metric_id\"}, \"Name\": \"ops_pipeline_validation.metric_id\"}, {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"o\"}}, \"Property\": \"step1_loaded\"}, \"Name\": \"ops_pipeline_validation.step1_loaded\"}, {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"o\"}}, \"Property\": \"step2_parsed\"}, \"Name\": \"ops_pipeline_validation.step2_parsed\"}, {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"o\"}}, \"Property\": \"step3_canonical\"}, \"Name\": \"ops_pipeline_validation.step3_canonical\"}, {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"o\"}}, \"Property\": \"step4_transforms\"}, \"Name\": \"ops_pipeline_validation.step4_transforms\"}, {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"o\"}}, \"Property\": \"step5_edges\"}, \"Name\": \"ops_pipeline_validation.step5_edges\"}, {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"o\"}}, \"Property\": \"step6_traversal\"}, \"Name\": \"ops_pipeline_validation.step6_traversal\"}]}, \"drillFilterOtherVisuals\": true}}",
+          "filters": "[{\"name\": \"flt_step6_traversal\", \"expression\": {\"Column\": {\"Expression\": {\"SourceRef\": {\"Entity\": \"ops_pipeline_validation\"}}, \"Property\": \"step6_traversal\"}}, \"filter\": {\"Version\": 2, \"From\": [{\"Name\": \"o\", \"Entity\": \"ops_pipeline_validation\", \"Type\": 0}], \"Where\": [{\"Condition\": {\"Comparison\": {\"ComparisonKind\": 0, \"Left\": {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"o\"}}, \"Property\": \"step6_traversal\"}}, \"Right\": {\"Literal\": {\"Value\": \"false\"}}}}}]}, \"type\": \"Categorical\", \"howCreated\": 1}]",
+          "height": 340.00,
+          "width": 600.00,
+          "x": 660.00,
+          "y": 160.00,
+          "z": 0.00
+        }
+      ],
+      "width": 1280.00
+    },
+    {
+      "config": "{}",
+      "displayName": "Knowledge Coverage",
+      "displayOption": 1,
+      "filters": "[]",
+      "height": 720.00,
+      "name": "p2",
+      "ordinal": 1,
+      "visualContainers": [
+        {
+          "config": "{\"name\": \"v21\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 20.0, \"y\": 20.0, \"width\": 300.0, \"height\": 120.0, \"z\": 0}}], \"singleVisual\": {\"visualType\": \"card\", \"projections\": {\"Values\": [{\"queryRef\": \"output_metric_logic.Certified Metrics\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"o\", \"Entity\": \"output_metric_logic\", \"Type\": 0}], \"Select\": [{\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"o\"}}, \"Property\": \"Certified Metrics\"}, \"Name\": \"output_metric_logic.Certified Metrics\"}]}, \"drillFilterOtherVisuals\": true}}",
+          "height": 120.00,
+          "width": 300.00,
+          "x": 20.00,
+          "y": 20.00,
+          "z": 0.00
+        },
+        {
+          "config": "{\"name\": \"v22\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 340.0, \"y\": 20.0, \"width\": 300.0, \"height\": 120.0, \"z\": 0}}], \"singleVisual\": {\"visualType\": \"card\", \"projections\": {\"Values\": [{\"queryRef\": \"ops_parse_results.Objects Parsed\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"o\", \"Entity\": \"ops_parse_results\", \"Type\": 0}], \"Select\": [{\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"o\"}}, \"Property\": \"Objects Parsed\"}, \"Name\": \"ops_parse_results.Objects Parsed\"}]}, \"drillFilterOtherVisuals\": true}}",
+          "height": 120.00,
+          "width": 300.00,
+          "x": 340.00,
+          "y": 20.00,
+          "z": 0.00
+        },
+        {
+          "config": "{\"name\": \"v23\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 660.0, \"y\": 300.0, \"width\": 600.0, \"height\": 180.0, \"z\": 0}}], \"singleVisual\": {\"visualType\": \"tableEx\", \"projections\": {\"Values\": [{\"queryRef\": \"output_metric_logic.metric_id\"}, {\"queryRef\": \"output_metric_logic.business_name\"}, {\"queryRef\": \"output_metric_logic.steward\"}, {\"queryRef\": \"output_metric_logic.developer\"}, {\"queryRef\": \"output_metric_logic.report_name\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"o\", \"Entity\": \"output_metric_logic\", \"Type\": 0}], \"Select\": [{\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"o\"}}, \"Property\": \"metric_id\"}, \"Name\": \"output_metric_logic.metric_id\"}, {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"o\"}}, \"Property\": \"business_name\"}, \"Name\": \"output_metric_logic.business_name\"}, {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"o\"}}, \"Property\": \"steward\"}, \"Name\": \"output_metric_logic.steward\"}, {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"o\"}}, \"Property\": \"developer\"}, \"Name\": \"output_metric_logic.developer\"}, {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"o\"}}, \"Property\": \"report_name\"}, \"Name\": \"output_metric_logic.report_name\"}]}, \"drillFilterOtherVisuals\": true}}",
+          "height": 180.00,
+          "width": 600.00,
+          "x": 660.00,
+          "y": 300.00,
+          "z": 0.00
+        },
+        {
+          "config": "{\"name\": \"v2c\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 20.0, \"y\": 500.0, \"width\": 1240.0, \"height\": 200.0, \"z\": 0}}], \"singleVisual\": {\"visualType\": \"clusteredColumnChart\", \"projections\": {\"Category\": [{\"queryRef\": \"output_metric_logic.metric_id\"}], \"Y\": [{\"queryRef\": \"Sum(output_metric_logic.transform_count)\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"o\", \"Entity\": \"output_metric_logic\", \"Type\": 0}], \"Select\": [{\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"o\"}}, \"Property\": \"metric_id\"}, \"Name\": \"output_metric_logic.metric_id\"}, {\"Aggregation\": {\"Expression\": {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"o\"}}, \"Property\": \"transform_count\"}}, \"Function\": 0}, \"Name\": \"Sum(output_metric_logic.transform_count)\"}]}, \"drillFilterOtherVisuals\": true}}",
+          "height": 200.00,
+          "width": 1240.00,
+          "x": 20.00,
+          "y": 500.00,
+          "z": 0.00
+        },
+        {
+          "config": "{\"name\": \"v2g\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 20.0, \"y\": 160.0, \"width\": 620.0, \"height\": 320.0, \"z\": 0}}], \"singleVisual\": {\"visualType\": \"clusteredBarChart\", \"projections\": {\"Y\": [{\"queryRef\": \"output_metric_logic.Pct With Description\"}, {\"queryRef\": \"output_metric_logic.Pct With Business Name\"}, {\"queryRef\": \"output_metric_logic.Pct With Steward\"}, {\"queryRef\": \"output_metric_logic.Pct With Developer\"}, {\"queryRef\": \"output_metric_logic.Pct With Report Link\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"o\", \"Entity\": \"output_metric_logic\", \"Type\": 0}], \"Select\": [{\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"o\"}}, \"Property\": \"Pct With Description\"}, \"Name\": \"output_metric_logic.Pct With Description\"}, {\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"o\"}}, \"Property\": \"Pct With Business Name\"}, \"Name\": \"output_metric_logic.Pct With Business Name\"}, {\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"o\"}}, \"Property\": \"Pct With Steward\"}, \"Name\": \"output_metric_logic.Pct With Steward\"}, {\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"o\"}}, \"Property\": \"Pct With Developer\"}, \"Name\": \"output_metric_logic.Pct With Developer\"}, {\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"o\"}}, \"Property\": \"Pct With Report Link\"}, \"Name\": \"output_metric_logic.Pct With Report Link\"}]}, \"drillFilterOtherVisuals\": true}}",
+          "height": 320.00,
+          "width": 620.00,
+          "x": 20.00,
+          "y": 160.00,
+          "z": 0.00
+        },
+        {
+          "config": "{\"name\": \"v2m\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 660.0, \"y\": 160.0, \"width\": 300.0, \"height\": 120.0, \"z\": 0}}], \"singleVisual\": {\"visualType\": \"card\", \"projections\": {\"Values\": [{\"queryRef\": \"output_metric_logic.Missing Steward\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"o\", \"Entity\": \"output_metric_logic\", \"Type\": 0}], \"Select\": [{\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"o\"}}, \"Property\": \"Missing Steward\"}, \"Name\": \"output_metric_logic.Missing Steward\"}]}, \"drillFilterOtherVisuals\": true}}",
+          "height": 120.00,
+          "width": 300.00,
+          "x": 660.00,
+          "y": 160.00,
+          "z": 0.00
+        },
+        {
+          "config": "{\"name\": \"v2s\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 660.0, \"y\": 20.0, \"width\": 300.0, \"height\": 120.0, \"z\": 0}}], \"singleVisual\": {\"visualType\": \"card\", \"projections\": {\"Values\": [{\"queryRef\": \"output_metric_logic.Total Calculation Steps\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"o\", \"Entity\": \"output_metric_logic\", \"Type\": 0}], \"Select\": [{\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"o\"}}, \"Property\": \"Total Calculation Steps\"}, \"Name\": \"output_metric_logic.Total Calculation Steps\"}]}, \"drillFilterOtherVisuals\": true}}",
+          "height": 120.00,
+          "width": 300.00,
+          "x": 660.00,
+          "y": 20.00,
+          "z": 0.00
+        }
+      ],
+      "width": 1280.00
+    },
+    {
+      "config": "{}",
+      "displayName": "Agent Activity & Decisions",
+      "displayOption": 1,
+      "filters": "[]",
+      "height": 720.00,
+      "name": "p3",
+      "ordinal": 2,
+      "visualContainers": [
+        {
+          "config": "{\"name\": \"v31\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 20.0, \"y\": 20.0, \"width\": 300.0, \"height\": 120.0, \"z\": 0}}], \"singleVisual\": {\"visualType\": \"card\", \"projections\": {\"Values\": [{\"queryRef\": \"gov_turn_events.Turns\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"g\", \"Entity\": \"gov_turn_events\", \"Type\": 0}], \"Select\": [{\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"g\"}}, \"Property\": \"Turns\"}, \"Name\": \"gov_turn_events.Turns\"}]}, \"drillFilterOtherVisuals\": true}}",
+          "height": 120.00,
+          "width": 300.00,
+          "x": 20.00,
+          "y": 20.00,
+          "z": 0.00
+        },
+        {
+          "config": "{\"name\": \"v34\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 20.0, \"y\": 480.0, \"width\": 1240.0, \"height\": 220.0, \"z\": 0}}], \"singleVisual\": {\"visualType\": \"tableEx\", \"projections\": {\"Values\": [{\"queryRef\": \"gov_turn_events.event_at\"}, {\"queryRef\": \"gov_turn_events.user_id\"}, {\"queryRef\": \"gov_turn_events.question\"}, {\"queryRef\": \"gov_turn_events.tools_used\"}, {\"queryRef\": \"gov_turn_events.verified_by_tool\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"g\", \"Entity\": \"gov_turn_events\", \"Type\": 0}], \"Select\": [{\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"g\"}}, \"Property\": \"event_at\"}, \"Name\": \"gov_turn_events.event_at\"}, {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"g\"}}, \"Property\": \"user_id\"}, \"Name\": \"gov_turn_events.user_id\"}, {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"g\"}}, \"Property\": \"question\"}, \"Name\": \"gov_turn_events.question\"}, {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"g\"}}, \"Property\": \"tools_used\"}, \"Name\": \"gov_turn_events.tools_used\"}, {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"g\"}}, \"Property\": \"verified_by_tool\"}, \"Name\": \"gov_turn_events.verified_by_tool\"}]}, \"drillFilterOtherVisuals\": true}}",
+          "height": 220.00,
+          "width": 1240.00,
+          "x": 20.00,
+          "y": 480.00,
+          "z": 0.00
+        },
+        {
+          "config": "{\"name\": \"v3d\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 20.0, \"y\": 160.0, \"width\": 620.0, \"height\": 300.0, \"z\": 0}}], \"singleVisual\": {\"visualType\": \"clusteredBarChart\", \"projections\": {\"Y\": [{\"queryRef\": \"gov_turn_events.Verified By Tool\"}, {\"queryRef\": \"gov_turn_events.LLM Assembled\"}, {\"queryRef\": \"gov_turn_events.Search Only\"}, {\"queryRef\": \"gov_turn_events.No Tools\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"g\", \"Entity\": \"gov_turn_events\", \"Type\": 0}], \"Select\": [{\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"g\"}}, \"Property\": \"Verified By Tool\"}, \"Name\": \"gov_turn_events.Verified By Tool\"}, {\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"g\"}}, \"Property\": \"LLM Assembled\"}, \"Name\": \"gov_turn_events.LLM Assembled\"}, {\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"g\"}}, \"Property\": \"Search Only\"}, \"Name\": \"gov_turn_events.Search Only\"}, {\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"g\"}}, \"Property\": \"No Tools\"}, \"Name\": \"gov_turn_events.No Tools\"}]}, \"drillFilterOtherVisuals\": true}}",
+          "height": 300.00,
+          "width": 620.00,
+          "x": 20.00,
+          "y": 160.00,
+          "z": 0.00
+        },
+        {
+          "config": "{\"name\": \"v3e\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 980.0, \"y\": 20.0, \"width\": 300.0, \"height\": 120.0, \"z\": 0}}], \"singleVisual\": {\"visualType\": \"card\", \"projections\": {\"Values\": [{\"queryRef\": \"gov_turn_events.Tool Errors\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"g\", \"Entity\": \"gov_turn_events\", \"Type\": 0}], \"Select\": [{\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"g\"}}, \"Property\": \"Tool Errors\"}, \"Name\": \"gov_turn_events.Tool Errors\"}]}, \"drillFilterOtherVisuals\": true}}",
+          "height": 120.00,
+          "width": 300.00,
+          "x": 980.00,
+          "y": 20.00,
+          "z": 0.00
+        },
+        {
+          "config": "{\"name\": \"v3t\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 660.0, \"y\": 160.0, \"width\": 600.0, \"height\": 300.0, \"z\": 0}}], \"singleVisual\": {\"visualType\": \"lineChart\", \"projections\": {\"Category\": [{\"queryRef\": \"gov_turn_events.event_at\"}], \"Y\": [{\"queryRef\": \"Count(gov_turn_events.conversation_id)\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"g\", \"Entity\": \"gov_turn_events\", \"Type\": 0}], \"Select\": [{\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"g\"}}, \"Property\": \"event_at\"}, \"Name\": \"gov_turn_events.event_at\"}, {\"Aggregation\": {\"Expression\": {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"g\"}}, \"Property\": \"conversation_id\"}}, \"Function\": 4}, \"Name\": \"Count(gov_turn_events.conversation_id)\"}]}, \"drillFilterOtherVisuals\": true}}",
+          "height": 300.00,
+          "width": 600.00,
+          "x": 660.00,
+          "y": 160.00,
+          "z": 0.00
+        },
+        {
+          "config": "{\"name\": \"v3u\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 340.0, \"y\": 20.0, \"width\": 300.0, \"height\": 120.0, \"z\": 0}}], \"singleVisual\": {\"visualType\": \"card\", \"projections\": {\"Values\": [{\"queryRef\": \"gov_turn_events.Distinct Users\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"g\", \"Entity\": \"gov_turn_events\", \"Type\": 0}], \"Select\": [{\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"g\"}}, \"Property\": \"Distinct Users\"}, \"Name\": \"gov_turn_events.Distinct Users\"}]}, \"drillFilterOtherVisuals\": true}}",
+          "height": 120.00,
+          "width": 300.00,
+          "x": 340.00,
+          "y": 20.00,
+          "z": 0.00
+        },
+        {
+          "config": "{\"name\": \"v3z\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 660.0, \"y\": 20.0, \"width\": 300.0, \"height\": 120.0, \"z\": 0}}], \"singleVisual\": {\"visualType\": \"card\", \"projections\": {\"Values\": [{\"queryRef\": \"gov_turn_events.Unverified Sameness Claims\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"g\", \"Entity\": \"gov_turn_events\", \"Type\": 0}], \"Select\": [{\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"g\"}}, \"Property\": \"Unverified Sameness Claims\"}, \"Name\": \"gov_turn_events.Unverified Sameness Claims\"}]}, \"drillFilterOtherVisuals\": true}}",
+          "height": 120.00,
+          "width": 300.00,
+          "x": 660.00,
+          "y": 20.00,
+          "z": 0.00
+        }
+      ],
+      "width": 1280.00
+    },
+    {
+      "config": "{}",
+      "displayName": "Feedback & Governance",
+      "displayOption": 1,
+      "filters": "[]",
+      "height": 720.00,
+      "name": "p4",
+      "ordinal": 3,
+      "visualContainers": [
+        {
+          "config": "{\"name\": \"v41\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 20.0, \"y\": 20.0, \"width\": 300.0, \"height\": 120.0, \"z\": 0}}], \"singleVisual\": {\"visualType\": \"card\", \"projections\": {\"Values\": [{\"queryRef\": \"gov_feedback_events.Feedback Events\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"g\", \"Entity\": \"gov_feedback_events\", \"Type\": 0}], \"Select\": [{\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"g\"}}, \"Property\": \"Feedback Events\"}, \"Name\": \"gov_feedback_events.Feedback Events\"}]}, \"drillFilterOtherVisuals\": true}}",
+          "height": 120.00,
+          "width": 300.00,
+          "x": 20.00,
+          "y": 20.00,
+          "z": 0.00
+        },
+        {
+          "config": "{\"name\": \"v42\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 20.0, \"y\": 160.0, \"width\": 620.0, \"height\": 300.0, \"z\": 0}}], \"singleVisual\": {\"visualType\": \"clusteredColumnChart\", \"projections\": {\"Category\": [{\"queryRef\": \"gov_feedback_events.verdict\"}], \"Y\": [{\"queryRef\": \"Count(gov_feedback_events.event_at)\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"g\", \"Entity\": \"gov_feedback_events\", \"Type\": 0}], \"Select\": [{\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"g\"}}, \"Property\": \"verdict\"}, \"Name\": \"gov_feedback_events.verdict\"}, {\"Aggregation\": {\"Expression\": {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"g\"}}, \"Property\": \"event_at\"}}, \"Function\": 4}, \"Name\": \"Count(gov_feedback_events.event_at)\"}]}, \"drillFilterOtherVisuals\": true}}",
+          "height": 300.00,
+          "width": 620.00,
+          "x": 20.00,
+          "y": 160.00,
+          "z": 0.00
+        },
+        {
+          "config": "{\"name\": \"v43\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 660.0, \"y\": 160.0, \"width\": 600.0, \"height\": 300.0, \"z\": 0}}], \"singleVisual\": {\"visualType\": \"tableEx\", \"projections\": {\"Values\": [{\"queryRef\": \"gov_feedback_events.event_at\"}, {\"queryRef\": \"gov_feedback_events.user_id\"}, {\"queryRef\": \"gov_feedback_events.verdict\"}, {\"queryRef\": \"gov_feedback_events.comment\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"g\", \"Entity\": \"gov_feedback_events\", \"Type\": 0}], \"Select\": [{\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"g\"}}, \"Property\": \"event_at\"}, \"Name\": \"gov_feedback_events.event_at\"}, {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"g\"}}, \"Property\": \"user_id\"}, \"Name\": \"gov_feedback_events.user_id\"}, {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"g\"}}, \"Property\": \"verdict\"}, \"Name\": \"gov_feedback_events.verdict\"}, {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"g\"}}, \"Property\": \"comment\"}, \"Name\": \"gov_feedback_events.comment\"}]}, \"drillFilterOtherVisuals\": true}}",
+          "height": 300.00,
+          "width": 600.00,
+          "x": 660.00,
+          "y": 160.00,
+          "z": 0.00
+        },
+        {
+          "config": "{\"name\": \"v44\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 20.0, \"y\": 480.0, \"width\": 1240.0, \"height\": 220.0, \"z\": 0}}], \"singleVisual\": {\"visualType\": \"tableEx\", \"projections\": {\"Values\": [{\"queryRef\": \"gov_turn_events.event_at\"}, {\"queryRef\": \"gov_turn_events.question\"}, {\"queryRef\": \"gov_turn_events.verified_by_tool\"}, {\"queryRef\": \"gov_turn_events.llm_assembled\"}, {\"queryRef\": \"gov_turn_events.search_only\"}, {\"queryRef\": \"gov_turn_events.no_tools\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"g\", \"Entity\": \"gov_turn_events\", \"Type\": 0}], \"Select\": [{\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"g\"}}, \"Property\": \"event_at\"}, \"Name\": \"gov_turn_events.event_at\"}, {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"g\"}}, \"Property\": \"question\"}, \"Name\": \"gov_turn_events.question\"}, {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"g\"}}, \"Property\": \"verified_by_tool\"}, \"Name\": \"gov_turn_events.verified_by_tool\"}, {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"g\"}}, \"Property\": \"llm_assembled\"}, \"Name\": \"gov_turn_events.llm_assembled\"}, {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"g\"}}, \"Property\": \"search_only\"}, \"Name\": \"gov_turn_events.search_only\"}, {\"Column\": {\"Expression\": {\"SourceRef\": {\"Source\": \"g\"}}, \"Property\": \"no_tools\"}, \"Name\": \"gov_turn_events.no_tools\"}]}, \"drillFilterOtherVisuals\": true}}",
+          "height": 220.00,
+          "width": 1240.00,
+          "x": 20.00,
+          "y": 480.00,
+          "z": 0.00
+        },
+        {
+          "config": "{\"name\": \"v4n\", \"layouts\": [{\"id\": 0, \"position\": {\"x\": 340.0, \"y\": 20.0, \"width\": 300.0, \"height\": 120.0, \"z\": 0}}], \"singleVisual\": {\"visualType\": \"card\", \"projections\": {\"Values\": [{\"queryRef\": \"gov_feedback_events.Not Helpful\"}]}, \"prototypeQuery\": {\"Version\": 2, \"From\": [{\"Name\": \"g\", \"Entity\": \"gov_feedback_events\", \"Type\": 0}], \"Select\": [{\"Measure\": {\"Expression\": {\"SourceRef\": {\"Source\": \"g\"}}, \"Property\": \"Not Helpful\"}, \"Name\": \"gov_feedback_events.Not Helpful\"}]}, \"drillFilterOtherVisuals\": true}}",
+          "height": 120.00,
+          "width": 300.00,
+          "x": 340.00,
+          "y": 20.00,
+          "z": 0.00
+        }
+      ],
+      "width": 1280.00
+    }
+  ]
+}
