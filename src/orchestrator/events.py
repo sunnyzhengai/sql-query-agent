@@ -150,7 +150,9 @@ def decision_shape(trace: "list[dict]", answer: str) -> dict:
     reads = sum(1 for t in tools if t in ("get_facts", "list_steps"))
     verified = "check_same_logic" in tools
     sameness_words = any(w in answer.lower() for w in (
-        "same logic", "identical", "differ", "not the same", "share the same"))
+        "same logic", "identical", "differ", "not the same",
+        "share the same", "same definition", "uses the same",
+        "utilize the same", "no other metric", "only metric"))
     return {
         "verified_by_tool": verified,
         "llm_assembled": reads >= 2 and not verified,

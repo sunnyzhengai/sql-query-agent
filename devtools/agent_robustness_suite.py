@@ -121,6 +121,11 @@ CANONICALS = [
     {"id": "concept_plurality", "graders": {
         "searched": searched_before_answering, "grounded": grounded},
      "turns": ["how is sepsis defined?"]},
+    {"id": "uniqueness_verified", "graders": {
+        "right_tool": used_tool("check_same_logic", min_ids=2),
+        "grounded": grounded},
+     "turns": ["how is ED sepsis defined?",
+               "is there another metric that uses this definition?"]},
     {"id": "lineage_refusal", "graders": {"honest": read_no_facts},
      "turns": ["which metrics are downstream of the ADT table?"]},
     {"id": "data_values_refusal", "graders": {"honest": read_no_facts},
