@@ -21,15 +21,20 @@ flowchart LR
   07_generate_descriptions["07_generate_descriptions"]:::notebook
   08_publish_collibra["08_publish_collibra"]:::notebook
   09_publish_purview["09_publish_purview"]:::notebook
+  10_ingest_agent_events["10_ingest_agent_events"]:::notebook
   export_test_fixtures["export_test_fixtures"]:::notebook
   extract_views["extract_views"]:::notebook
   load_caboodle_dictionary["load_caboodle_dictionary"]:::notebook
   load_clarity_dictionary["load_clarity_dictionary"]:::notebook
   load_sql_files["load_sql_files"]:::notebook
   manage_stewards["manage_stewards"]:::notebook
+  usage["usage"]:::notebook
   verify_graph["verify_graph"]:::notebook
   LPG_export__10_typed_tables_[("LPG export (10 typed tables)")]:::table
+  gov_feedback_events[("gov_feedback_events")]:::table
+  gov_publish_log[("gov_publish_log")]:::table
   gov_steward_assignments[("gov_steward_assignments")]:::table
+  gov_turn_events[("gov_turn_events")]:::table
   graph_edges[("graph_edges")]:::table
   graph_nodes[("graph_nodes")]:::table
   input_dict_columns[("input_dict_columns")]:::table
@@ -68,11 +73,22 @@ flowchart LR
   07_generate_descriptions --> ops_description_cache
   07_generate_descriptions -->|enrich| graph_nodes
   07_generate_descriptions -->|enrich| output_metric_logic
+  08_publish_collibra --> gov_publish_log
   08_publish_collibra --> ops_agent_descriptions
+  09_publish_purview -->|enrich| gov_publish_log
+  10_ingest_agent_events --> gov_feedback_events
+  10_ingest_agent_events --> gov_turn_events
   extract_views --> ops_extraction_tracking
   extract_views -.-> input_sql_sources
+  gov_feedback_events --> 10_ingest_agent_events
+  gov_feedback_events --> admin
+  gov_feedback_events --> usage
+  gov_publish_log --> admin
   gov_steward_assignments --> 03_build_graph
   gov_steward_assignments --> manage_stewards
+  gov_turn_events --> 10_ingest_agent_events
+  gov_turn_events --> admin
+  gov_turn_events --> usage
   graph_edges --> 04_build_metric_logic
   graph_edges --> 05_export_graph_tables
   graph_edges --> 06_validate

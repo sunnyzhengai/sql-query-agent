@@ -354,7 +354,12 @@ It is idempotent — safe to re-run; it will not destroy existing data.
 
 - `07_generate_descriptions` — LLM-generated business descriptions for metrics
 - `08_publish_collibra` / `09_publish_purview` — push metadata to your catalog
-  (requires adapter credentials in `org_config.yaml`)
+  (requires adapter credentials in `org_config.yaml`); every push is
+  logged to `gov_publish_log` for the admin telemetry report
+- `10_ingest_agent_events` — folds the chat surfaces' event files
+  (`Files/agent_events/*.jsonl`) into `gov_turn_events` /
+  `gov_feedback_events` for admin telemetry. Run on a schedule (weekly
+  works); re-runs are idempotent — rows are never duplicated
 
 ---
 

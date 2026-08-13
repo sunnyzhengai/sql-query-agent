@@ -320,6 +320,23 @@ for m in match_result.matched:
     status = result.status.value
     print(f"  {status}: {m.object_name} → {result.message}")
 
+# %% Cell 6b: Durable publish log (gov_publish_log — admin telemetry)
+from datetime import datetime, timezone
+
+from src.governance.publish_log import publish_log_rows
+from src.schemas import PUBLISH_LOG, to_spark_schema
+
+_now = datetime.now(timezone.utc)
+log_rows = publish_log_rows(
+    [r for _, _, r in publish_results], target="collibra", kind="asset",
+    run_id=_now.strftime("%Y%m%dT%H%M%SZ"),
+    published_at=_now.isoformat(),
+)
+if log_rows:
+    spark.createDataFrame(log_rows, schema=to_spark_schema(PUBLISH_LOG)) \
+        .write.format("delta").mode("append").saveAsTable("gov_publish_log")
+print(f"[+] gov_publish_log: {len(log_rows)} rows appended")
+
 # %% Cell 7: Summary
 succeeded = sum(1 for _, _, r in publish_results if r.status.value == "success")
 failed = sum(1 for _, _, r in publish_results if r.status.value == "failed")

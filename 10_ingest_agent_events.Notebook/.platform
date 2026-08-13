@@ -1,0 +1,12 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Notebook",
+    "displayName": "10_ingest_agent_events",
+    "description": "Fold agent surfaces' event JSONL into gov_turn_events / gov_feedback_events (admin telemetry)"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "afdb6e95-d9c7-4b2f-8966-7c83b9b3ea5a"
+  }
+}

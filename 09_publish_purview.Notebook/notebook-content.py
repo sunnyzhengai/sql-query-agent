@@ -165,6 +165,33 @@ if failed:
 
 # CELL ********************
 
+# %% Cell 3b: Durable publish log (gov_publish_log — admin telemetry)
+# Every push is answerable forever: what went to Purview, and did it land.
+from datetime import datetime, timezone
+
+from src.governance.publish_log import publish_log_rows
+from src.schemas import PUBLISH_LOG, to_spark_schema
+
+_now = datetime.now(timezone.utc)
+log_rows = publish_log_rows(
+    result, target="purview", kind="asset",
+    run_id=_now.strftime("%Y%m%dT%H%M%SZ"),
+    published_at=_now.isoformat(),
+)
+if log_rows:
+    spark.createDataFrame(log_rows, schema=to_spark_schema(PUBLISH_LOG)) \
+        .write.format("delta").mode("append").saveAsTable("gov_publish_log")
+print(f"[+] gov_publish_log: {len(log_rows)} rows appended")
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
 # %% Cell 4: Summary
 print(f"\n{'=' * 60}")
 print(f"PURVIEW PUBLISH SUMMARY")

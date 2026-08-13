@@ -1098,12 +1098,12 @@ PUBLISH_LOG = {
         "(Sunny, 2026-08-11)."
     ),
     "domain": "governance",
-    "status": "planned",
-    "notes": (
-        "Row builder shipped (src/governance/publish_log.py, tested); "
-        "notebooks 08/09 wire the writes next capacity session — "
-        "status flips to active then."
-    ),
+    "status": "active",
+    "owner": {"notebook": "08_publish_collibra",
+              "module": "src/governance/publish_log.py"},
+    "write_mode": "append",
+    "enrichers": ["09_publish_purview"],
+    "consumers": ["admin telemetry report"],
     "columns": [
         ("published_at", "string", False),
         ("run_id", "string", False),
@@ -1138,11 +1138,13 @@ TURN_EVENTS = {
         "for failure attribution."
     ),
     "domain": "governance",
-    "status": "planned",
-    "notes": (
-        "Transforms shipped (src/steps/agent_events.py, tested); the "
-        "ingest notebook wires the writes next capacity session."
-    ),
+    "status": "active",
+    "owner": {"notebook": "10_ingest_agent_events",
+              "module": "src/steps/agent_events.py"},
+    "write_mode": "append",
+    "enrichers": [],
+    "consumers": ["10_ingest_agent_events", "admin telemetry report",
+                  "usage flywheel"],
     "columns": [
         ("event_at", "string", False),
         ("user_id", "string", False),
@@ -1194,11 +1196,13 @@ FEEDBACK_EVENTS = {
         "the decision shape that produced them."
     ),
     "domain": "governance",
-    "status": "planned",
-    "notes": (
-        "Transforms shipped (src/steps/agent_events.py, tested); the "
-        "ingest notebook wires the writes next capacity session."
-    ),
+    "status": "active",
+    "owner": {"notebook": "10_ingest_agent_events",
+              "module": "src/steps/agent_events.py"},
+    "write_mode": "append",
+    "enrichers": [],
+    "consumers": ["10_ingest_agent_events", "admin telemetry report",
+                  "usage flywheel"],
     "columns": [
         ("event_at", "string", False),
         ("user_id", "string", False),
