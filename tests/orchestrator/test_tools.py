@@ -191,3 +191,14 @@ class TestVerify:
         with pytest.raises(ToolError, match="not surfaced"):
             check_same_logic([STEP_1, "transform:q.Q:Hidden"],
                              fake_kql, self.session())
+
+
+class TestInfraErrorsAreResults:
+    def test_kusto_outage_becomes_visible_tool_error(self):
+        # Live find (2026-08-13): paused capacity surfaced as a raw 500.
+        def dead_kql(query, params):
+            raise RuntimeError("connection refused")
+        s = Session()
+        out = dispatch("search_catalog", {"phrase": "x"}, dead_kql, s)
+        assert "unreachable" in out["error"]
+        assert "RuntimeError" in out["error"]

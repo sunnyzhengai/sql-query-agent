@@ -316,10 +316,17 @@ _IMPL: "dict[str, Callable]" = {
 
 def dispatch(name: str, args: dict, run_kql, session: Session) -> dict:
     """Run one tool call. Errors return AS RESULTS (visible to the
-    model, recoverable) — only unknown tools are a hard failure."""
+    model, recoverable) — including infrastructure failures (live find
+    2026-08-13: a paused capacity became a raw 500 through the web
+    surface; the model should instead be able to SAY the knowledge
+    base is unreachable)."""
     if name not in _IMPL:
         return {"error": f"unknown tool {name!r}"}
     try:
         return _IMPL[name](args, run_kql, session)
     except ToolError as e:
         return {"error": str(e)}
+    except Exception as e:                     # noqa: BLE001 — infra layer
+        return {"error": ("the certified knowledge base is unreachable "
+                          "right now (data platform may be paused or "
+                          f"starting): {type(e).__name__}")}

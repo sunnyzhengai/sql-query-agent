@@ -74,6 +74,11 @@ def create_app(
     def healthz() -> dict:
         return {"ok": True}
 
+    @app.get("/favicon.ico")
+    def favicon():
+        from fastapi.responses import Response
+        return Response(status_code=204)
+
     @app.get("/", response_class=HTMLResponse)
     def index() -> str:
         return CHAT_PAGE
@@ -91,8 +96,16 @@ def create_app(
             return JSONResponse(
                 {"error": "conversation limit reached — start a new one",
                  "conversation_id": conv_id}, status_code=409)
-        turn: Turn = run_turn(conv.history, message, chat_api, run_kql,
-                              conv.session)
+        try:
+            turn: Turn = run_turn(conv.history, message, chat_api, run_kql,
+                                  conv.session)
+        except Exception as e:                 # noqa: BLE001 — surface layer
+            return JSONResponse(
+                {"error": ("The assistant is temporarily unavailable "
+                           f"({type(e).__name__}). Check that the data "
+                           "platform and AI endpoint are running, then "
+                           "try again."),
+                 "conversation_id": conv_id}, status_code=502)
         turn_index = conv.turns
         conv.turns += 1
         sink.record(TurnEvent(
