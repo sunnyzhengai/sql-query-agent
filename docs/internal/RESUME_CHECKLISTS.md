@@ -360,3 +360,48 @@ Steps for Sunny:
 
 Until step 3 runs, step rows show "<business name> → step" without a
 number (honest fallback — the number does not exist in the graph yet).
+
+## 1.5.3 rollout — search relevance + concrete descriptions (2026-08-13)
+
+Two live finds from the workbench screenshot (steps outranking metrics
+on "ED sepsis"; vague descriptions):
+
+**Root causes:** (1) step search_text contained the parent metric_id —
+every step of USP_ED_Sepsis carried the tokens "ED Sepsis", so
+transfer-timeline steps outscored the actual sepsis metrics; (2) the
+step prompt asked for ONE 40-word sentence with no values, so the LLM
+wrote "specific departments"; and the description cache key knew only
+the SQL, not the prompt — prompt fixes could never reach cached text.
+
+What 1.5.3 changes: step search_text = step name + own description
+only; STEP_PROMPT demands one summary line + '- ' decision lines with
+ACTUAL values (codes, statuses, thresholds, time windows); PROMPT_VERSION
+is in every cache key (prompt change auto-regenerates everything);
+metric descriptions are now cached too (idempotent reruns, zero calls);
+vague-filler flags ('specific'/'certain' hiding a value) print in 07's
+run report.
+
+Steps for Sunny:
+1. Sync DevOps, publish sql-logic-env (1.5.3).
+2. Rerun 07. Cache keys are versioned, so ALL ~441 descriptions
+   regenerate this run (413 step + 28 metric LLM calls — same cost as
+   tonight's run). Watch the "Vague-filler flags" line; a handful is
+   tolerable, dozens means the prompt needs another pass.
+3. Rebuild the semantic catalog Delta table (the ad-hoc
+   build_semantic_catalog cell — draft notebook / checklist E.2 step 1,
+   explicit column order!). Must run AFTER 07 so the new concrete
+   descriptions land in search_text.
+4. In the Eventhouse (aivia-eh/probe-eh): `.drop table semantic_catalog`
+   then rerun eventhouse_setup.kql sections 1-2 (recreate + full
+   re-embed — search_text changed on every row, and the embed step
+   only pays for rows with an empty vector, so a drop is required.
+   441 embeddings ≈ cents). semantic_search() function is unchanged.
+5. Re-test "ED sepsis" in the workbench: metrics should now lead;
+   any step that still ranks does so on its own content.
+6. Re-run the robustness suite before trusting the change broadly —
+   retrieval inputs changed, so the 12/12 live baseline must be
+   re-earned, not assumed.
+
+NOTE the standing gotcha now has a sibling: 03/04 rerun => 07 rerun,
+and 07 rerun => catalog rebuild + re-embed (steps 3-4) whenever
+descriptions change, or search keeps ranking on stale embeddings.

@@ -79,13 +79,19 @@ def build_semantic_catalog(
                 continue  # plumbing, resolves to its metric
             props = node.properties or {}
             metric_id = props.get("metric_id", "")
+            # search_text deliberately EXCLUDES metric_id (live find
+            # 2026-08-13: identity leak — every step of USP_ED_Sepsis
+            # carried the tokens "ED Sepsis", so transfer-timeline
+            # steps outscored the sepsis metrics on "ED sepsis"). A
+            # step matches when ITS OWN definition matches; finding a
+            # metric's steps is retrieve's job, not search's.
             rows.append({
                 "node_id": node_id,
                 "kind": KIND_STEP,
                 "ref": metric_id,
                 "name": node.name,
                 "business_name": "",
-                "search_text": _doc(node.name, metric_id, node.description),
+                "search_text": _doc(node.name, node.description),
                 "display_text": _doc(node.name, f"step of {metric_id}"),
             })
             step_count += 1

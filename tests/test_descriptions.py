@@ -74,24 +74,49 @@ class TestGeneration:
             calls.append(prompt)
             return "regenerated"
         second = generate_descriptions(g.nodes_rows, g.edges_rows, counting, cache=cache)
-        # steps come from cache; only metric compositions call the LLM
-        nodes = rows_to_nodes(g.nodes_rows)
-        n_metrics = sum(1 for x in nodes.values() if x.layer == NodeLayer.CANONICAL)
-        assert second.cache_hits == first.generated - n_metrics
-        assert len(calls) == n_metrics
+        # steps AND metric compositions come from the cache — reruns
+        # with unchanged inputs and prompts cost zero LLM calls
+        assert second.cache_hits == first.generated
+        assert len(calls) == 0
 
     def test_changed_fragment_changes_hash(self):
         assert step_content_hash("SELECT 1", ["a"]) != step_content_hash("SELECT 2", ["a"])
         assert step_content_hash("SELECT 1", ["a"]) != step_content_hash("SELECT 1", ["b"])
         assert step_content_hash("SELECT 1", ["b", "a"]) == step_content_hash("SELECT 1", ["a", "b"])
 
-    def test_existing_descriptions_are_skipped(self):
+    def test_prompt_version_is_part_of_every_cache_key(self):
+        """Live find 2026-08-13: vague descriptions survived a rerun
+        because the cache key knew only the SQL, not the prompt that
+        read it. The version constant must appear in both hashes."""
+        import src.descriptions as d
+        h_step = step_content_hash("SELECT 1", ["a"])
+        h_metric = d.metric_content_hash("USP_X", [("Final", "cohort")], 3)
+        original = d.PROMPT_VERSION
+        try:
+            d.PROMPT_VERSION = original + "-next"
+            assert step_content_hash("SELECT 1", ["a"]) != h_step
+            assert d.metric_content_hash(
+                "USP_X", [("Final", "cohort")], 3) != h_metric
+        finally:
+            d.PROMPT_VERSION = original
+
+    def test_existing_node_descriptions_do_not_block_regeneration(self):
+        """The cache is the ONLY skip authority — a prompt upgrade must
+        reach nodes that already carry text from the old prompt."""
         g = _graph()
         rows = [dict(r) for r in g.nodes_rows]
         for r in rows:
             r["description"] = "already certified"
         result = generate_descriptions(rows, g.edges_rows, fake_describe)
-        assert result.generated == 0 and not result.descriptions
+        assert result.generated > 0
+
+    def test_vague_fillers_are_flagged_not_retried(self):
+        g = _graph()
+        result = generate_descriptions(
+            g.nodes_rows, g.edges_rows,
+            lambda p: "Filtered by specific departments.")
+        assert result.vague              # every node flagged
+        assert set(result.vague) <= set(result.descriptions)  # still kept
 
     def test_one_bad_step_does_not_kill_the_batch(self):
         g = _graph()

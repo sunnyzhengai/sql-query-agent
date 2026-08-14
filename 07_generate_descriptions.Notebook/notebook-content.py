@@ -143,6 +143,10 @@ print(f"Generated: {result.generated}  cache hits: {result.cache_hits}  failed: 
 if result.failed:
     for nid in result.failed[:10]:
         print(f"  failed: {nid}")
+if result.vague:
+    print(f"Vague-filler flags (value hidden behind 'specific'/'certain'): {len(result.vague)}")
+    for nid in result.vague[:10]:
+        print(f"  vague: {nid}")
 
 # METADATA ********************
 

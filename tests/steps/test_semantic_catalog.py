@@ -34,6 +34,18 @@ class TestBuild:
         assert kinds.get("step", 0) == out.step_count
         assert all(not r["name"].startswith("__") for r in out.rows)
 
+    def test_step_search_text_has_no_identity_leak(self):
+        """Live find 2026-08-13: metric_id in step search_text made
+        every step of USP_ED_Sepsis match 'ED sepsis' regardless of
+        content — steps must match on their OWN definition only."""
+        g = sample_graph()
+        out = build_semantic_catalog(g.nodes_rows)
+        steps = [r for r in out.rows if r["kind"] == "step"]
+        assert steps
+        for r in steps:
+            assert r["ref"] not in r["search_text"]
+            assert r["ref"] in r["display_text"]   # provenance still shown
+
     def test_business_name_and_report_flow_into_search_text(self):
         g = sample_graph(metric_name_records=[{
             "metric_id": SAMPLE_SQL_SOURCES[0]["metric_id"],
