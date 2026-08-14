@@ -77,6 +77,8 @@ PRIMITIVES = {
 
 CONTROL_PATH_FILES = (
     "src/orchestrator/ops.py",
+    "src/orchestrator/protocol.py",    # ADR 0036 plan protocol —
+                                       # approved by Sunny 2026-08-13
     "src/orchestrator/agent.py",       # superseded by the plan protocol;
                                        # remove at demolition
 )

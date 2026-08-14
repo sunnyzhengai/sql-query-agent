@@ -207,3 +207,55 @@ class TestJsonFileStore:
         again = JsonFileSubscriptionStore(tmp_path / "subs.json")
         assert again.get("s1")["status"] == "Subscribed"
         assert again.get("ghost") is None
+
+
+class TestPlanProtocolEndpoints:
+    def scripted(self, payloads):
+        import json as j
+        it = iter(payloads)
+
+        def call(messages, tools, tool_choice=None):
+            name = tools[0]["function"]["name"]
+            return {"role": "assistant", "content": None, "tool_calls": [
+                {"id": "c", "type": "function",
+                 "function": {"name": name,
+                              "arguments": j.dumps(next(it))}}]}
+        return call
+
+    def test_plan_then_execute_flow(self, tmp_path):
+        from tests.orchestrator.test_tools import REF_A, REF_B
+        plan_payload = {"components": [
+            {"op": "retrieve", "params": {"ids": [REF_A, REF_B]},
+             "note": "records"},
+            {"op": "compare", "params": {"refs": ["$1"]},
+             "note": "partition"}]}
+        caption_payload = {"caption": "Two distinct definitions (R2).",
+                           "suggestions": []}
+        sink = JsonlEventSink(tmp_path / "e.jsonl")
+        app = TestClient(create_app(
+            self.scripted([plan_payload, caption_payload]),
+            fake_kql, sink))
+        # 1) interpret — nothing executes
+        r = app.post("/api/plan", json={
+            "message": f"do {REF_A} and {REF_B} share logic?"}).json()
+        assert [c["valid"] for c in r["plan"]["components"]] == [True, True]
+        # 2) human confirms (unedited here) — execution + caption
+        r2 = app.post("/api/execute", json={
+            "conversation_id": r["conversation_id"],
+            "question": "do they share logic?",
+            "plan": r["plan"]}).json()
+        assert r2["outputs"][0]["result"]["op"] == "retrieve"
+        groups = [x for x in r2["outputs"][1]["result"]["rows"]
+                  if "group" in x]
+        assert len(groups) == 2
+        assert r2["caption"].startswith("Two distinct")
+        assert r2["caption_inputs"] == ["R1", "R2"]
+        row = json.loads((tmp_path / "e.jsonl").read_text().splitlines()[0])
+        assert row["tools_used"] == ["retrieve", "compare"]
+        assert row["decision"]["verified_by_tool"] is False  # partition op
+        assert row["question"] == "do they share logic?"
+
+    def test_execute_requires_conversation_and_components(self, tmp_path):
+        sink = JsonlEventSink(tmp_path / "e.jsonl")
+        app = TestClient(create_app(self.scripted([]), fake_kql, sink))
+        assert app.post("/api/execute", json={"plan": {}}).status_code == 400

@@ -178,12 +178,13 @@ def azure_chat_api(timeout: int = 120) -> "Callable[[list[dict], list[dict]], di
         raise ValueError("OPENAI_API_KEY not set")
     url, headers = build_chat_request(endpoint, api_key)
 
-    def call(messages: "list[dict]", tools: "list[dict]") -> dict:
-        resp = requests.post(
-            url, headers=headers,
-            json={"model": model, "messages": messages, "tools": tools},
-            timeout=timeout,
-        )
+    def call(messages: "list[dict]", tools: "list[dict]",
+             tool_choice=None) -> dict:
+        body = {"model": model, "messages": messages, "tools": tools}
+        if tool_choice is not None:
+            body["tool_choice"] = tool_choice
+        resp = requests.post(url, headers=headers, json=body,
+                             timeout=timeout)
         resp.raise_for_status()
         return resp.json()["choices"][0]["message"]
 

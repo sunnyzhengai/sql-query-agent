@@ -27,6 +27,12 @@ import json as _json
 
 from src.orchestrator.agent import Turn, run_turn
 from src.orchestrator.events import FeedbackEvent, TurnEvent, decision_shape
+from src.orchestrator.protocol import (
+    ProtocolSession,
+    caption_turn,
+    execute_confirmed,
+    propose_turn,
+)
 from src.orchestrator.tools import Session
 
 MAX_CONVERSATIONS = 500          # in-memory cap; oldest evicted
@@ -37,6 +43,7 @@ MAX_TURNS_PER_CONVERSATION = 60
 class Conversation:
     history: "list[dict]" = field(default_factory=list)
     session: Session = field(default_factory=Session)
+    protocol: ProtocolSession = field(default_factory=ProtocolSession)
     turns: int = 0
 
 
@@ -145,6 +152,79 @@ def create_app(
             comment=str(body.get("comment", ""))[:2000],
         ))
         return JSONResponse({"recorded": True})
+
+    # ---- the plan protocol (ADR 0036) -------------------------------
+
+    @app.post("/api/plan")
+    async def plan(request: Request) -> JSONResponse:
+        """Interpret only — returns the plan for CONFIRMATION. Nothing
+        executes here; that separation is structural (the protocol has
+        no execution path from this call)."""
+        body = await request.json()
+        message = str(body.get("message", "")).strip()
+        if not message:
+            return JSONResponse({"error": "empty message"}, status_code=400)
+        user = _user_from(request)
+        conv_id = str(body.get("conversation_id") or uuid.uuid4())
+        conv = _conversation(user, conv_id)
+        try:
+            proposed = propose_turn(conv.protocol, message, chat_api)
+        except Exception as e:                 # noqa: BLE001
+            return JSONResponse(
+                {"error": f"planner unavailable ({type(e).__name__})",
+                 "conversation_id": conv_id}, status_code=502)
+        return JSONResponse({"conversation_id": conv_id,
+                             "plan": proposed})
+
+    @app.post("/api/execute")
+    async def execute(request: Request) -> JSONResponse:
+        """Execute a HUMAN-CONFIRMED (possibly edited) plan, display
+        results, caption them. The plan arrives as data from the
+        confirming surface — the only path to execution."""
+        body = await request.json()
+        user = _user_from(request)
+        conv_id = str(body.get("conversation_id") or "")
+        confirmed = body.get("plan") or {}
+        if not conv_id or not confirmed.get("components"):
+            return JSONResponse({"error": "conversation_id and a plan "
+                                 "with components are required"},
+                                status_code=400)
+        conv = _conversation(user, conv_id)
+        turn_index = conv.turns
+        outputs = execute_confirmed(conv.protocol, confirmed, run_kql)
+        try:
+            cap = caption_turn(conv.protocol, outputs, chat_api)
+        except Exception as e:                 # noqa: BLE001
+            cap = {"caption": f"(caption unavailable: {type(e).__name__} "
+                              "— the results above are complete)",
+                   "caption_inputs": [], "suggestions": []}
+        trace = [{"tool": o["component"]["op"],
+                  "args": o["component"]["params"],
+                  "result": (o.get("result") or {"error": o.get("error")})}
+                 for o in outputs]
+        sink.record(TurnEvent(
+            event_at=datetime.now(timezone.utc).isoformat(),
+            user_id=user,
+            question=str(body.get("question", ""))[:500],
+            tools_used=tuple(t["tool"] for t in trace),
+            ids_read=tuple(sorted({
+                str(i) for t in trace if t["tool"] == "retrieve"
+                for i in t["args"].get("ids", [])})),
+            basis="; ".join(
+                f"{t['tool']}({_json.dumps(t['args'])[:80]})"
+                for t in trace),
+            answered=any("result" in o for o in outputs),
+            conversation_id=conv_id, turn_index=turn_index,
+            decision=decision_shape(trace, cap.get("caption", "")),
+            trace=tuple(
+                {"tool": t["tool"], "args": t["args"],
+                 "result": _json.dumps(t["result"])[:1500]}
+                for t in trace),
+        ))
+        conv.turns += 1
+        return JSONResponse({"conversation_id": conv_id,
+                             "turn_index": turn_index,
+                             "outputs": outputs, **cap})
 
     # ---- marketplace fulfillment (SaaS Fulfillment API v2) ----------
 

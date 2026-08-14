@@ -118,21 +118,36 @@ class TestPromptBudget:
     """Instruction creep is pattern predefinition in prose. The budget
     forces trade-offs; raising it is an amendment, not an edit."""
 
-    def test_system_prompt_within_budget(self):
-        from src.orchestrator.agent import SYSTEM_PROMPT
-        lines = SYSTEM_PROMPT.count("\n") + 1
-        assert lines <= PROMPT_LINE_BUDGET, (
-            f"system prompt is {lines} lines (budget "
-            f"{PROMPT_LINE_BUDGET}) — remove instructions or bring a "
-            "methodology amendment to Sunny")
+    def _discover_prompts(self):
+        """Every *_PROMPT string constant in every control file is
+        budgeted — new prompts are caged from birth, by discovery."""
+        import importlib
+        found = {}
+        for rel in CONTROL_PATH_FILES:
+            mod = importlib.import_module(
+                rel.removesuffix(".py").replace("/", "."))
+            for name in dir(mod):
+                if name.endswith("_PROMPT"):
+                    value = getattr(mod, name)
+                    if isinstance(value, str):
+                        found[f"{rel}:{name}"] = value
+        assert found, "no prompts discovered — discovery broken?"
+        return found
+
+    def test_every_control_prompt_within_line_budget(self):
+        for where, prompt in self._discover_prompts().items():
+            lines = prompt.count("\n") + 1
+            assert lines <= PROMPT_LINE_BUDGET, (
+                f"{where} is {lines} lines (budget {PROMPT_LINE_BUDGET})"
+                " — remove instructions or bring an amendment to Sunny")
 
     def test_quoted_example_phrasings_capped(self):
-        from src.orchestrator.agent import SYSTEM_PROMPT
-        quoted = re.findall(r"'[^']{3,60}'", SYSTEM_PROMPT)
-        assert len(quoted) <= PROMPT_QUOTED_EXAMPLES_BUDGET, (
-            f"{len(quoted)} quoted example phrasings in the prompt "
-            f"(budget {PROMPT_QUOTED_EXAMPLES_BUDGET}) — examples "
-            "steer, casebooks predict")
+        for where, prompt in self._discover_prompts().items():
+            quoted = re.findall(r"'[^']{3,60}'", prompt)
+            assert len(quoted) <= PROMPT_QUOTED_EXAMPLES_BUDGET, (
+                f"{where}: {len(quoted)} quoted example phrasings "
+                f"(budget {PROMPT_QUOTED_EXAMPLES_BUDGET}) — examples "
+                "steer, casebooks predict")
 
 
 class TestManifestIntegrity:
