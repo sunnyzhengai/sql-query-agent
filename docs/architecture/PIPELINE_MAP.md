@@ -22,12 +22,15 @@ flowchart LR
   08_publish_collibra["08_publish_collibra"]:::notebook
   09_publish_purview["09_publish_purview"]:::notebook
   10_ingest_agent_events["10_ingest_agent_events"]:::notebook
+  11_refresh_search_index["11_refresh_search_index"]:::notebook
+  eventhouse_semantic_search["eventhouse_semantic_search"]:::notebook
   export_test_fixtures["export_test_fixtures"]:::notebook
   extract_views["extract_views"]:::notebook
   load_caboodle_dictionary["load_caboodle_dictionary"]:::notebook
   load_clarity_dictionary["load_clarity_dictionary"]:::notebook
   load_sql_files["load_sql_files"]:::notebook
   manage_stewards["manage_stewards"]:::notebook
+  orchestrator_core["orchestrator_core"]:::notebook
   usage["usage"]:::notebook
   verify_graph["verify_graph"]:::notebook
   LPG_export__10_typed_tables_[("LPG export (10 typed tables)")]:::table
@@ -52,6 +55,7 @@ flowchart LR
   ops_phi_findings[("ops_phi_findings")]:::table
   ops_pipeline_validation[("ops_pipeline_validation")]:::table
   output_metric_logic[("output_metric_logic")]:::table
+  output_semantic_catalog[("output_semantic_catalog")]:::table
   admin{{admin}}:::actor
   collibra_adapter{{collibra_adapter}}:::actor
   data_agent{{data_agent}}:::actor
@@ -78,6 +82,7 @@ flowchart LR
   09_publish_purview -->|enrich| gov_publish_log
   10_ingest_agent_events --> gov_feedback_events
   10_ingest_agent_events --> gov_turn_events
+  11_refresh_search_index --> output_semantic_catalog
   extract_views --> ops_extraction_tracking
   extract_views -.-> input_sql_sources
   gov_feedback_events --> 10_ingest_agent_events
@@ -101,6 +106,7 @@ flowchart LR
   graph_nodes --> 06_validate
   graph_nodes --> 07_generate_descriptions
   graph_nodes --> 08_publish_collibra
+  graph_nodes --> 11_refresh_search_index
   graph_nodes --> data_agent
   graph_nodes --> manage_stewards
   graph_nodes --> verify_graph
@@ -146,6 +152,9 @@ flowchart LR
   output_metric_logic --> 08_publish_collibra
   output_metric_logic --> 09_publish_purview
   output_metric_logic --> data_agent
+  output_semantic_catalog --> data_agent
+  output_semantic_catalog --> eventhouse_semantic_search
+  output_semantic_catalog --> orchestrator_core
   classDef notebook fill:#e8f0fe,stroke:#4285f4
   classDef table fill:#fef7e0,stroke:#f9ab00
   classDef actor fill:#e6f4ea,stroke:#34a853

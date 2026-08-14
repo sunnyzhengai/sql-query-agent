@@ -53,6 +53,28 @@ class KustoClient:
         resp.raise_for_status()
         return self._primary_rows(resp.json())
 
+    def mgmt(self, command: str) -> "list[dict]":
+        """Execute one management (dot) command; return first-table rows.
+
+        Dot commands (.set-or-replace, .drop, ...) are rejected by the
+        query endpoint — they run on /v1/rest/mgmt, whose response is
+        the v1 shape ({"Tables": [...]}), not the v2 frame stream."""
+        resp = requests.post(
+            f"{self.query_uri}/v1/rest/mgmt",
+            headers={
+                "Authorization": f"Bearer {self._token()}",
+                "Content-Type": "application/json; charset=utf-8",
+            },
+            json={"db": self.database, "csl": command},
+            timeout=self.timeout,
+        )
+        resp.raise_for_status()
+        tables = resp.json().get("Tables") or []
+        if not tables:
+            return []
+        cols = [c["ColumnName"] for c in tables[0]["Columns"]]
+        return [dict(zip(cols, row)) for row in tables[0]["Rows"]]
+
     @staticmethod
     def _primary_rows(frames: "list[dict]") -> "list[dict]":
         """Kusto v2 protocol: find the PrimaryResult table, zip rows.

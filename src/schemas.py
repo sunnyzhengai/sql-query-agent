@@ -416,7 +416,7 @@ GRAPH_NODES = {
     "consumers": [
         "04_build_metric_logic", "05_export_graph_tables", "06_validate",
         "07_generate_descriptions", "08_publish_collibra", "manage_stewards",
-        "verify_graph", "data_agent",
+        "verify_graph", "data_agent", "11_refresh_search_index",
     ],
     "columns": [
         ("node_id", "string", False),
@@ -1563,13 +1563,23 @@ SEMANTIC_CATALOG = {
         "the stochastic generator never owns resolution."
     ),
     "domain": "output",
-    "status": "planned",
+    "status": "active",
+    "owner": {"notebook": "11_refresh_search_index",
+              "module": "src/steps/semantic_catalog.py"},
+    "write_mode": "overwrite",
+    "consumers": [
+        # Non-notebook consumers, declared on trust: the Eventhouse
+        # copy (plain `semantic_catalog`) embeds search_text and serves
+        # semantic_search() to the orchestrator core and Data Agents.
+        "eventhouse_semantic_search", "data_agent", "orchestrator_core",
+    ],
     "notes": (
-        "Contract draft 2026-08-08. Eventhouse copy is named plain "
-        "semantic_catalog (KQL side). Writer: semantic-catalog refresh "
-        "(pipeline step exists; notebook + Eventhouse ingest wiring "
-        "pending — devtools/eventhouse_setup.kql). The emb vector lives "
-        "only in the Eventhouse copy, not in this Delta shape."
+        "Eventhouse copy is named plain semantic_catalog (KQL side); "
+        "one-time setup (DDL, encoding policy, semantic_search "
+        "function) in devtools/eventhouse_setup.kql; every-run refresh "
+        "+ re-embed is notebook 11 (src/steps/search_index.py). The "
+        "emb vector lives only in the Eventhouse copy, not in this "
+        "Delta shape."
     ),
     "columns": [
         ("node_id", "string", False),

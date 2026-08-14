@@ -360,6 +360,13 @@ It is idempotent — safe to re-run; it will not destroy existing data.
   (`Files/agent_events/*.jsonl`) into `gov_turn_events` /
   `gov_feedback_events` for admin telemetry. Run on a schedule (weekly
   works); re-runs are idempotent — rows are never duplicated
+- `11_refresh_search_index` — rebuilds `output_semantic_catalog` from
+  the graph, copies it into the Eventhouse, and re-embeds every search
+  document (verifying full coverage and the refusal floor). One-time
+  Eventhouse setup first: `devtools/eventhouse_setup.kql` (table,
+  encoding policy, `semantic_search()` function, callout policy), plus
+  `KUSTO_URI` in the notebook's first cell. **Run after every 07 run**
+  — description changes do not reach search until this re-embeds
 
 ---
 

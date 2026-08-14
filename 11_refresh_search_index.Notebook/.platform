@@ -1,0 +1,12 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Notebook",
+    "displayName": "11_refresh_search_index",
+    "description": "Rebuild output_semantic_catalog from graph_nodes, copy to the Eventhouse, full re-embed + verify (run after 07)"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "984775e1-fb77-40d4-8eb9-870cb6586cf8"
+  }
+}

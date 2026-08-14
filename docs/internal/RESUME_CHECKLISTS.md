@@ -405,3 +405,16 @@ Steps for Sunny:
 NOTE the standing gotcha now has a sibling: 03/04 rerun => 07 rerun,
 and 07 rerun => catalog rebuild + re-embed (steps 3-4) whenever
 descriptions change, or search keeps ranking on stale embeddings.
+
+## 1.5.4 — notebook 11 replaces the manual re-embed ritual (2026-08-13)
+
+The 1.5.3 runbook's manual steps 3-5 (catalog rebuild cell, KQL-editor
+.set-or-replace, embed, verify) are now pipeline notebook
+**11_refresh_search_index**: rebuild Delta -> Eventhouse copy (mgmt
+API, columns by name, emb nulled) -> full re-embed -> coverage check
+(raises if any row lacks a vector) -> refusal-floor probe (reported,
+never auto-acted). One-time first: KUSTO_URI in cell 0 (KQL database
+-> copy Query URI). eventhouse_setup.kql remains the one-time DDL/
+function/callout setup only.
+
+Standing rule (final form): 03/04 rerun => 07 rerun => 11 rerun.
