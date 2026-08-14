@@ -56,7 +56,7 @@ BATCH_FRAGMENTS_QUERY = (
     "declare query_parameters(p_ids:string);\n"
     "graph_nodes\n"
     "| where set_has_element(todynamic(p_ids), node_id)\n"
-    "| project node_id, properties"
+    "| project node_id, name, description, properties"
 )
 
 MAX_VERIFY_IDS = 40

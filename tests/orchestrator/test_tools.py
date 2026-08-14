@@ -84,9 +84,21 @@ def fake_kql(query, params):
                 for s in FRAGMENTS if f":{ref}:" in s]
     if query == BATCH_FRAGMENTS_QUERY:
         wanted = set(json.loads(params["p_ids"]))
-        return [{"node_id": s, "properties":
-                 json.dumps({"sql_fragment": FRAGMENTS[s]})}
-                for s in FRAGMENTS if s in wanted]
+        out = [{"node_id": s, "name": s.split(":")[-1],
+                "description": f"what {s.split(':')[-1]} computes",
+                "properties": json.dumps(
+                    {"sql_fragment": FRAGMENTS[s], "step_no": 1})}
+               for s in FRAGMENTS if s in wanted]
+        for ref, row in METRIC_ROWS.items():
+            cid = f"canonical:{ref}"
+            if cid in wanted:
+                out.append({"node_id": cid, "name": row["metric_name"],
+                            "description": f"measures {row['business_name']}",
+                            "properties": json.dumps(
+                                {"business_name": row["business_name"],
+                                 "steward": row["steward"],
+                                 "developer": row["developer"]})})
+        return out
     raise AssertionError(f"unexpected query: {query}")
 
 

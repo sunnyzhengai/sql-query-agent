@@ -87,15 +87,27 @@ class GraphBuilder:
 
         return None
 
-    def add_transformation_node(self, metric_id: str, cte_name: str, sql_fragment: str) -> str:
-        """Add a transformation-layer node (CTE step)."""
+    def add_transformation_node(
+        self, metric_id: str, cte_name: str, sql_fragment: str,
+        step_no: "int | None" = None,
+    ) -> str:
+        """Add a transformation-layer node (CTE step).
+
+        step_no is the CTE's 1-based declaration position — T-SQL
+        requires CTEs be declared before use, so declaration order IS
+        the logical step order. Persisted so surfaces can say
+        "step 3 of ED Sepsis" instead of exposing CTE names.
+        """
         node_id = f"transform:{metric_id}:{cte_name}"
         if node_id not in self.nodes:
+            properties = {"metric_id": metric_id, "sql_fragment": sql_fragment}
+            if step_no is not None:
+                properties["step_no"] = step_no
             self.nodes[node_id] = GraphNode(
                 node_id=node_id,
                 layer=NodeLayer.TRANSFORMATION,
                 name=cte_name,
-                properties={"metric_id": metric_id, "sql_fragment": sql_fragment},
+                properties=properties,
             )
         return node_id
 
@@ -149,8 +161,9 @@ class GraphBuilder:
         cte_names = {cte.name for cte in parsed.ctes}
 
         # Create transformation nodes for each CTE
-        for cte in parsed.ctes:
-            transform_id = self.add_transformation_node(metric_id, cte.name, cte.sql_fragment)
+        for step_no, cte in enumerate(parsed.ctes, start=1):
+            transform_id = self.add_transformation_node(
+                metric_id, cte.name, cte.sql_fragment, step_no=step_no)
 
             # Wire CTE dependencies (transform -> transform)
             for dep in cte.depends_on:

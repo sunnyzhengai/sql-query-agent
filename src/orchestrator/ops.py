@@ -97,6 +97,49 @@ class OpError(Exception):
 
 # --- search: one primitive, two modes ---------------------------------
 
+def _node_cards(ids: "set[str]", run_kql) -> "dict[str, dict]":
+    """id -> {name, description, props} from graph_nodes, one batch."""
+    cards: "dict[str, dict]" = {}
+    for r in run_kql(BATCH_FRAGMENTS_QUERY, {"p_ids": json.dumps(sorted(ids))}):
+        props = r.get("properties") or "{}"
+        if isinstance(props, str):
+            props = json.loads(props)
+        cards[r["node_id"]] = {"name": r.get("name"),
+                               "description": r.get("description"),
+                               "props": props}
+    return cards
+
+
+def _attach_cards(rows: "list[dict]", run_kql) -> "list[dict]":
+    """Search rows answer "what does this MEAN", not just what it is
+    called (live ask 2026-08-13: the basic tier is customer-facing).
+    Each row gains its catalog description; step rows also gain their
+    parent metric's business identity and the step's position."""
+    want: "set[str]" = set()
+    for r in rows:
+        if r["kind"] == "metric":
+            want.add("canonical:" + r["id"])
+        elif r["kind"] == "step":
+            want.add(r["id"])
+            if r.get("of_metric"):
+                want.add("canonical:" + r["of_metric"])
+    if not want:
+        return rows
+    cards = _node_cards(want, run_kql)
+    for r in rows:
+        if r["kind"] == "metric":
+            card = cards.get("canonical:" + r["id"]) or {}
+            r["description"] = card.get("description") or None
+        elif r["kind"] == "step":
+            card = cards.get(r["id"]) or {}
+            r["description"] = card.get("description") or None
+            r["step_no"] = (card.get("props") or {}).get("step_no")
+            parent = cards.get("canonical:" + (r.get("of_metric") or "")) or {}
+            r["business_name"] = (
+                (parent.get("props") or {}).get("business_name")
+                or r.get("business_name") or None)
+    return rows
+
 def op_search(phrase: str, mode: str, run_kql,
               session: OpsSession) -> ResultSet:
     if mode not in ("semantic", "exact"):
@@ -114,7 +157,8 @@ def op_search(phrase: str, mode: str, run_kql,
             for r in rows
         ]
         return session.register(
-            "search", {"phrase": phrase, "mode": "exact"}, out,
+            "search", {"phrase": phrase, "mode": "exact"},
+            _attach_cards(out, run_kql),
             complete=True,
             universe="every catalog item whose name, business name, or "
                      "ref equals the phrase (case-insensitive)")
@@ -128,7 +172,8 @@ def op_search(phrase: str, mode: str, run_kql,
         for c in result.candidates
     ]
     return session.register(
-        "search", {"phrase": phrase, "mode": "semantic"}, out,
+        "search", {"phrase": phrase, "mode": "semantic"},
+        _attach_cards(out, run_kql),
         complete=False,
         universe=f"closest matches by meaning (top {len(out)} of "
                  f"{result.total_matches} above the similarity floor) — "

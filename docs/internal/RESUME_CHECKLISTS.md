@@ -336,3 +336,27 @@ API ({"type":"automatic"}) forces a reframe in seconds — pipeline
 notebooks that write admin tables should end with it so the dashboard
 is instantly current. Verified: description restore appeared at 100%
 immediately after the forced reframe.
+
+## 1.5.2 rollout — step numbers + customer-facing search rows (2026-08-13)
+
+What changed: search results are now customer-facing (business name,
+description, closeness — no CTE names or raw ids). Steps display as
+"<metric business name> → step N". Step numbers come from CTE
+declaration order, written by 03 into transform node properties
+(step_no). No table schema changed (properties is a JSON bag and
+graph_nodes.description already existed), so NO shortcut/external-table
+rebuild is needed.
+
+Steps for Sunny:
+1. Sync DevOps source control (pulls the 1.5.2 wheel in
+   sql-logic-env.Environment/Libraries/CustomLibraries).
+2. Publish the sql-logic-env environment (picks up 1.5.2).
+3. Rerun notebook 03 (writes step_no into graph_nodes properties).
+4. Rerun notebook 07 (03's overwrite wiped descriptions — standing
+   rule: 03 or 04 rerun => 07 rerun).
+5. Optional: rerun 06 to revalidate; expect 28/28 unchanged.
+6. Restart the local web app (`uvicorn`); search rows now show
+   descriptions immediately, step numbers after steps 1-5.
+
+Until step 3 runs, step rows show "<business name> → step" without a
+number (honest fallback — the number does not exist in the graph yet).

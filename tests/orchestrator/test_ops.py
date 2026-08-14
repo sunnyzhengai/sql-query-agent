@@ -38,6 +38,20 @@ class TestSearch:
         assert rs.params["mode"] == "exact"
         assert {r["id"] for r in rs.rows} == {STEP_1, STEP_2}
 
+    def test_rows_carry_business_identity(self):
+        """Live ask 2026-08-13: the basic tier is customer-facing — a
+        search row must say what the thing MEANS (description) and, for
+        steps, whose metric it belongs to (business name + step #),
+        never bare CTE names."""
+        s = OpsSession()
+        rs = op_search("ed sepsis", "semantic", fake_kql, s)
+        metric = next(r for r in rs.rows if r["kind"] == "metric")
+        assert metric["description"] == "measures ED Sepsis Screening"
+        step = next(r for r in rs.rows if r["kind"] == "step")
+        assert step["business_name"] == "ED Sepsis Screening"  # parent's
+        assert step["step_no"] == 1
+        assert step["description"] == "what Scores computes"
+
     def test_mode_is_mandatory_and_validated(self):
         with pytest.raises(OpError, match="mode"):
             op_search("x", "fuzzy", fake_kql, OpsSession())

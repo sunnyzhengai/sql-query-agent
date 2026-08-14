@@ -39,12 +39,19 @@ MAX_CONVERSATIONS = 500          # in-memory cap; oldest evicted
 MAX_TURNS_PER_CONVERSATION = 60
 
 
+def _plan_shape(plan: dict) -> "list[tuple]":
+    """Comparable skeleton of a plan: (op, params) per component."""
+    return [(c.get("op"), _json.dumps(c.get("params"), sort_keys=True))
+            for c in (plan or {}).get("components", [])]
+
+
 @dataclass
 class Conversation:
     history: "list[dict]" = field(default_factory=list)
     session: Session = field(default_factory=Session)
     protocol: ProtocolSession = field(default_factory=ProtocolSession)
     turns: int = 0
+    last_proposed: "dict | None" = None
 
 
 @dataclass
@@ -173,6 +180,7 @@ def create_app(
             return JSONResponse(
                 {"error": f"planner unavailable ({type(e).__name__})",
                  "conversation_id": conv_id}, status_code=502)
+        conv.last_proposed = proposed          # for the edit diff
         return JSONResponse({"conversation_id": conv_id,
                              "plan": proposed})
 
@@ -202,6 +210,17 @@ def create_app(
                   "args": o["component"]["params"],
                   "result": (o.get("result") or {"error": o.get("error")})}
                  for o in outputs]
+        # The human's edit is training material (ADR 0038): record the
+        # proposed-vs-confirmed diff mechanically.
+        proposed = conv.last_proposed
+        conv.last_proposed = None
+        edited = (proposed is not None and
+                  _plan_shape(proposed) != _plan_shape(confirmed))
+        trace.append({"tool": "plan_review",
+                      "args": {"edited": edited},
+                      "result": {"proposed": proposed or {},
+                                 "confirmed": {"components":
+                                     confirmed.get("components", [])}}})
         sink.record(TurnEvent(
             event_at=datetime.now(timezone.utc).isoformat(),
             user_id=user,
@@ -497,14 +516,35 @@ function renderOutput(o) {
     ${badge}
     <span class="universe">${esc(r.universe)}${r.note ? ' · ' + esc(r.note) : ''}</span>
     </div></div>`);
-  rs.appendChild(renderTable(r.rows));
+  let rows2 = r.rows, prefer = null;
+  if (r.op === 'search') {
+    // Customer-facing view: an exec asking what logic is in a report
+    // reads business identities, not CTE names or refs.
+    rows2 = [...rows2].sort((a, b) => (b.closeness || 0) - (a.closeness || 0));
+    rows2 = rows2.map(x => {
+      let label;
+      if (x.kind === 'step') {
+        label = (x.business_name || x.of_metric || x.id) + ' → step' +
+          (x.step_no ? ' ' + x.step_no
+                     : (x.description ? '' : ' · ' + (x.name || '')));
+      } else {
+        label = x.business_name || x.name || x.id;
+      }
+      const row = { item: label, description: x.description || '' };
+      if (x.closeness !== undefined) row.closeness = x.closeness;
+      return row;
+    });
+    prefer = ['item', 'description', 'closeness'];
+  }
+  rs.appendChild(renderTable(rows2, prefer));
   add(rs);
 }
 
-function renderTable(rows) {
+function renderTable(rows, prefer) {
   if (!rows || !rows.length)
     return el('<p class="muted">no rows — an honest empty result</p>');
-  const cols = [...new Set(rows.flatMap(r => Object.keys(r)))];
+  let cols = [...new Set(rows.flatMap(r => Object.keys(r)))];
+  if (prefer) cols = prefer.filter(c => cols.includes(c));
   const wrap = el('<div class="tblwrap"></div>');
   const cell = v => {
     if (v === null || v === undefined) return '';

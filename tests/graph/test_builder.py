@@ -74,5 +74,10 @@ class TestGraphBuilder:
         assert "transform:ER_LOS:er_visits" in gb.nodes
         assert "transform:ER_LOS:los_calc" in gb.nodes
 
+        # Declaration order persists as the customer-facing step number
+        # (T-SQL declares CTEs before use, so this IS the logical order)
+        assert gb.nodes["transform:ER_LOS:er_visits"].properties["step_no"] == 1
+        assert gb.nodes["transform:ER_LOS:los_calc"].properties["step_no"] == 2
+
         # Should have edges
         assert len(gb.edges) > 0

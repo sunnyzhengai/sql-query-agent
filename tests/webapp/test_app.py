@@ -251,9 +251,38 @@ class TestPlanProtocolEndpoints:
         assert r2["caption"].startswith("Two distinct")
         assert r2["caption_inputs"] == ["R1", "R2"]
         row = json.loads((tmp_path / "e.jsonl").read_text().splitlines()[0])
-        assert row["tools_used"] == ["retrieve", "compare"]
+        # plan_review is the recorded proposed-vs-confirmed edit diff —
+        # the human's regulation act is training material (ADR 0038)
+        assert row["tools_used"] == ["retrieve", "compare", "plan_review"]
+        assert row["trace"][-1]["args"] == {"edited": False}  # unedited here
         assert row["decision"]["verified_by_tool"] is False  # partition op
         assert row["question"] == "do they share logic?"
+
+    def test_human_edit_is_recorded_in_telemetry(self, tmp_path):
+        """The user changing the proposed plan (e.g. deleting a filler
+        word from the search phrase) is the regulation signal — it must
+        land in telemetry mechanically, never be inferred."""
+        plan_payload = {"components": [
+            {"op": "search",
+             "params": {"phrase": "ED sepsis definition",
+                        "mode": "semantic"}}]}
+        caption_payload = {"caption": "Closest matches shown (R1).",
+                           "suggestions": []}
+        sink = JsonlEventSink(tmp_path / "e.jsonl")
+        app = TestClient(create_app(
+            self.scripted([plan_payload, caption_payload]),
+            fake_kql, sink))
+        r = app.post("/api/plan", json={"message": "how is ED sepsis "
+                                        "defined?"}).json()
+        confirmed = r["plan"]
+        confirmed["components"][0]["params"]["phrase"] = "ED sepsis"
+        r2 = app.post("/api/execute", json={
+            "conversation_id": r["conversation_id"],
+            "question": "how is ED sepsis defined?",
+            "plan": confirmed}).json()
+        assert r2["outputs"][0]["result"]["op"] == "search"
+        row = json.loads((tmp_path / "e.jsonl").read_text().splitlines()[0])
+        assert row["trace"][-1]["args"] == {"edited": True}
 
     def test_execute_requires_conversation_and_components(self, tmp_path):
         sink = JsonlEventSink(tmp_path / "e.jsonl")
