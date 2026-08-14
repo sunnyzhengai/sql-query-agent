@@ -393,7 +393,7 @@ function fieldFor(c) {
       <option value="exact" ${p.mode==='exact'?'selected':''}>exact — complete enumeration by name</option>
     </select>`;
   if (c.op === 'retrieve') return `
-    <textarea data-f="ids">${esc((p.ids||[]).join('\n'))}</textarea>
+    <textarea data-f="ids">${esc((p.ids||[]).join('\\n'))}</textarea>
     <span class="note">one id per line</span>`;
   if (c.op === 'compare') return `
     <input type="text" data-f="refs" value="${esc((p.refs||[]).join(', '))}">
@@ -444,7 +444,7 @@ function collectPlan(card) {
                        return n ? n.value : ''; };
     let params = {};
     if (op === 'search') params = { phrase: get('phrase'), mode: get('mode') };
-    if (op === 'retrieve') params = { ids: get('ids').split('\n')
+    if (op === 'retrieve') params = { ids: get('ids').split('\\n')
         .map(s => s.trim()).filter(Boolean) };
     if (op === 'compare') { params = { refs: get('refs').split(',')
         .map(s => s.trim()).filter(Boolean) };
@@ -510,7 +510,7 @@ function renderTable(rows) {
     if (v === null || v === undefined) return '';
     if (typeof v === 'object') v = JSON.stringify(v, null, 1);
     v = String(v);
-    if (v.length > 160 || v.includes('\n'))
+    if (v.length > 160 || v.includes('\\n'))
       return `<details><summary>${esc(v.slice(0, 60))}…</summary><pre>${esc(v)}</pre></details>`;
     return esc(v);
   };
