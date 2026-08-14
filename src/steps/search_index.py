@@ -32,6 +32,12 @@ COVERAGE_QUERY = (
 
 ROWCOUNT_QUERY = "semantic_catalog | count"
 
+MISSING_ROWS_QUERY = (
+    "semantic_catalog | where isnull(emb) or array_length(emb) == 0 "
+    "| project node_id, search_len = strlen(search_text) "
+    "| order by search_len desc | take 20"
+)
+
 # Calibrated adversarial phrase from eventhouse_setup.kql section 4 —
 # contains a domain word yet must clear NO threshold (ADR 0005's
 # refusal floor in fuzzy form). Nonzero rows after a re-embed means
@@ -69,26 +75,43 @@ def refresh_search_index(
 ) -> dict:
     """Copy the catalog into the Eventhouse and re-embed every row.
 
-    Raises SearchIndexError if any row is left without a vector — a
-    partially embedded index silently mis-ranks, which is worse than
-    a loud failure. The refusal probe result is REPORTED (threshold
-    calibration is a judgment call), never auto-acted on.
+    The embed pass retries ONCE for rows still missing a vector —
+    transient throttling on a couple of in-batch calls is normal at
+    catalog scale, and retried rows are the only ones that pay (live
+    find 2026-08-13: 2 of 441 rows failed; rerunning the whole cell
+    would have re-nulled and re-paid everything). Persistent failures
+    raise with the offending rows NAMED — a partially embedded index
+    silently mis-ranks, which is worse than a loud failure. The
+    refusal probe result is REPORTED (threshold calibration is a
+    judgment call), never auto-acted on.
     """
     mgmt(COPY_COMMAND)
     mgmt(embed_command(embedding_endpoint))
     total = int(query(ROWCOUNT_QUERY)[0]["Count"])
     missing = int(query(COVERAGE_QUERY)[0]["Count"])
+    retried = False
     if missing:
+        retried = True
+        mgmt(embed_command(embedding_endpoint))    # only missing rows pay
+        missing = int(query(COVERAGE_QUERY)[0]["Count"])
+    if missing:
+        offenders = query(MISSING_ROWS_QUERY)
+        detail = "; ".join(
+            f"{r['node_id']} (search_len={r['search_len']})"
+            for r in offenders)
         raise SearchIndexError(
-            f"{missing} of {total} rows have no embedding after the "
-            "embed pass — check the Azure OpenAI endpoint, callout "
+            f"{missing} of {total} rows have no embedding after a "
+            f"retry: {detail}. Very large search_len suggests the "
+            "document exceeds the embedding model's input limit; "
+            "otherwise check the Azure OpenAI endpoint, callout "
             "policy, and the caller's Cognitive Services OpenAI User "
-            "role, then rerun (only missing rows pay)."
+            "role."
         )
     refusal_rows = len(query(REFUSAL_PROBE))
     return {
         "rows": total,
         "missing_embeddings": missing,
+        "embed_retried": retried,
         "refusal_probe_rows": refusal_rows,
         "threshold_ok": refusal_rows == 0,
     }
