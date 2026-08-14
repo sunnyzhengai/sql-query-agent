@@ -34,6 +34,24 @@ Cite these from other documents by reference — do not copy values.
 
 Both components live in a single repo (`sql-query-agent`) and ship as one `.whl` package.
 
+**THE RELEASE-SCOPING RULE (Sunny's question, 2026-08-13: "it's
+never-ending to build all features"):** v1 is the smallest product
+that keeps every promise it makes. Because of OAP, features are mostly
+COMPOSITIONS (free — no code); the only real build surfaces are
+primitives, kernels, schema kinds, and surfaces. Something enters a
+release only if it passes ALL three: (1) the hard rule — battle-tested
+before shipping, robustness-suite covered; (2) demanded by EVIDENCE
+(the refusal/miss log, a buyer requirement, or the demo story) — never
+by imagination; (3) it creates no governance/privacy surface we have
+not policied (e.g., the ADR 0038 user layer waits for the
+access-control ADR). Applied to today's approvals: op_traverse = v1
+candidate (small, unlocks the lineage question class); result-set
+kernels = filter/sort in v1, set-join on demand evidence; interaction
+GRAPH projection, creation flow, user/concept topology = post-v1
+behind the access-control gate (pro-tier prerequisite: access control
+is defined BEFORE any customer data connects — the first healthcare
+buyer question).
+
 **CONDITIONAL (unscheduled) — rename identity carry-over:** internal
 ID + incoming-object comparison (changes/dups caught, human confirms
 renames, alias links renamed→original). Trigger per Sunny 2026-08-11:

@@ -50,8 +50,24 @@ PRIMITIVES = {
                                "not by question",
         "adr": "0036",
     },
-    # "op_update": future (ADR 0036) — always plan-confirmed, never
-    # autonomous. Register here before implementing.
+    "op_traverse": {
+        "kind": "primitive",
+        "data_shaped_because": "the store admits following edges; join "
+                               "and transitive closure are the depth-1 "
+                               "and depth-* cases of one operation",
+        "adr": "0037",   # approved by Sunny 2026-08-13; not yet built
+    },
+    "op_resultset_kernels": {
+        "kind": "kernel-dispatch",
+        "data_shaped_because": "full local relational algebra (filter/"
+                               "project/sort/group/set-join) over "
+                               "DISPLAYED result sets only — operates "
+                               "on visible data, never fetches",
+        "adr": "0037",   # approved by Sunny 2026-08-13; not yet built
+    },
+    # "op_update": ADR 0036/0038 — always plan-confirmed, never
+    # autonomous; first use case: proposed_by_user definitions.
+    # GATED on the access-control ADR (0038 §4) before implementation.
 }
 
 # --- the control path --------------------------------------------------

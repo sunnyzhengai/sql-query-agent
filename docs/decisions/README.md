@@ -47,3 +47,5 @@ never deleted — its status changes and it links to its replacement.
 | [0034](0034-conversational-entry-edge.md) | The conversational entry edge: language to the LLM, computation to code | Superseded in part by 0035 (dialogue machinery); engine content survives |
 | [0035](0035-agentic-conversation-deterministic-tools.md) | Agentic conversation over deterministic tools — computed answers, disclosed judgments, generated language | Superseded in part by 0036 (conversation protocol); tool layer survives as primitives |
 | [0036](0036-operations-are-the-product.md) | Operations are the product: interpret → confirm → execute → display over a primitive algebra | Accepted |
+| [0037](0037-completed-algebra-traverse.md) | The completed algebra: traverse (join=1 hop, closure=*), result-set kernels, closures as checkable cache | Accepted |
+| [0038](0038-interaction-layer-no-is-input.md) | The interaction layer: no is input; users and concepts enter the graph — gated on the access-control ADR | Accepted (build gated) |
