@@ -88,7 +88,7 @@ def create_app(
 
     @app.get("/", response_class=HTMLResponse)
     def index() -> str:
-        return CHAT_PAGE
+        return WORKBENCH_PAGE
 
     @app.post("/api/chat")
     async def chat(request: Request) -> JSONResponse:
@@ -276,100 +276,297 @@ def create_app(
     return app
 
 
-CHAT_PAGE = """<!doctype html>
+WORKBENCH_PAGE = """<!doctype html>
 <html><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AIVIA — certified metrics</title>
+<title>AIVIA — certified metrics workbench</title>
 <style>
-  :root { --ink:#1a1f2e; --paper:#f7f7f5; --accent:#2b5db9; --line:#e2e2de; }
+  :root { --ink:#1a1f2e; --paper:#f7f7f5; --accent:#2b5db9;
+          --line:#e2e2de; --ok:#1a7f4b; --warn:#b76e00; --bad:#b3261e; }
   * { box-sizing:border-box; }
-  body { margin:0; font:16px/1.5 -apple-system, "Segoe UI", sans-serif;
+  body { margin:0; font:15px/1.5 -apple-system,"Segoe UI",sans-serif;
          color:var(--ink); background:var(--paper);
          display:flex; flex-direction:column; height:100vh; }
-  header { padding:14px 22px; border-bottom:1px solid var(--line);
+  header { padding:12px 22px; border-bottom:1px solid var(--line);
            background:#fff; font-weight:600; }
-  header span { color:var(--accent); }
-  #log { flex:1; overflow-y:auto; padding:22px; max-width:860px;
+  header span { color:var(--accent); font-weight:400; }
+  #log { flex:1; overflow-y:auto; padding:18px; max-width:980px;
          width:100%; margin:0 auto; }
-  .msg { margin:0 0 16px; white-space:pre-wrap; }
-  .you { font-weight:600; }
-  .basis { font:12px/1.4 ui-monospace, monospace; color:#6b7080;
-           border-left:3px solid var(--line); padding-left:10px;
-           margin-top:6px; word-break:break-all; }
-  form { display:flex; gap:10px; padding:16px 22px 22px;
-         max-width:860px; width:100%; margin:0 auto; }
-  input { flex:1; padding:12px 14px; border:1px solid var(--line);
-          border-radius:8px; font:inherit; background:#fff; }
-  button { padding:12px 20px; border:0; border-radius:8px;
-           background:var(--accent); color:#fff; font:inherit;
-           cursor:pointer; }
-  button:disabled { opacity:.5; }
-  .thinking { color:#6b7080; font-style:italic; }
-  .fb { margin-top:6px; }
+  .you { font-weight:600; margin:14px 0 8px; }
+  .card { background:#fff; border:1px solid var(--line);
+          border-radius:10px; padding:14px 16px; margin:0 0 14px; }
+  .card h3 { margin:0 0 8px; font-size:13px; text-transform:uppercase;
+             letter-spacing:.06em; color:#6b7080; }
+  .comp { display:flex; gap:10px; align-items:flex-start;
+          padding:8px 0; border-top:1px dashed var(--line); }
+  .comp:first-of-type { border-top:0; }
+  .comp .num { font:600 13px ui-monospace,monospace; color:var(--accent);
+               padding-top:7px; min-width:22px; }
+  .comp .fields { flex:1; display:flex; flex-wrap:wrap; gap:8px;
+                  align-items:center; }
+  .comp input[type=text], .comp textarea, .comp select {
+      font:13px ui-monospace,monospace; padding:6px 8px;
+      border:1px solid var(--line); border-radius:6px; background:#fff; }
+  .comp input[type=text] { min-width:220px; }
+  .comp textarea { min-width:320px; min-height:34px; }
+  .comp .note { font-size:12.5px; color:#6b7080; width:100%; }
+  .comp.invalid { background:#fdf1f0; border-radius:8px; padding:8px; }
+  .comp .reason { color:var(--bad); font-size:12.5px; width:100%; }
+  .oplabel { font:600 12px ui-monospace,monospace; background:#eef2fa;
+             color:var(--accent); border-radius:6px; padding:4px 8px; }
+  .actions { margin-top:10px; display:flex; gap:8px; }
+  button { padding:8px 16px; border:0; border-radius:8px; font:inherit;
+           cursor:pointer; background:#e9e9e5; }
+  button.primary { background:var(--accent); color:#fff; }
+  button:disabled { opacity:.45; cursor:default; }
+  .clarify { background:#fff8e8; border:1px solid #f0dfae;
+             border-radius:10px; padding:12px 14px; margin-bottom:14px; }
+  .rs { margin:0 0 14px; }
+  .rs .head { display:flex; gap:8px; align-items:center; flex-wrap:wrap;
+              margin-bottom:6px; }
+  .ref { font:600 13px ui-monospace,monospace; color:#fff;
+         background:var(--accent); border-radius:6px; padding:2px 8px; }
+  .badge { font-size:11.5px; border-radius:6px; padding:2px 8px;
+           font-weight:600; }
+  .badge.complete { background:#e6f4ec; color:var(--ok); }
+  .badge.partial { background:#fdf3e2; color:var(--warn); }
+  .badge.error { background:#fdf1f0; color:var(--bad); }
+  .universe { font-size:12px; color:#6b7080; }
+  .tblwrap { overflow-x:auto; border:1px solid var(--line);
+             border-radius:8px; background:#fff; }
+  table { border-collapse:collapse; width:100%; font-size:12.5px; }
+  th { text-align:left; padding:6px 10px; background:#f2f2ee;
+       position:sticky; top:0; white-space:nowrap; }
+  td { padding:6px 10px; border-top:1px solid var(--line);
+       vertical-align:top; max-width:420px; }
+  td pre { margin:0; white-space:pre-wrap; font-size:11.5px;
+           max-height:180px; overflow-y:auto; }
+  details summary { cursor:pointer; color:var(--accent);
+                    font-size:12px; }
+  .caption { background:#f0f4fb; border-radius:10px; padding:12px 16px;
+             margin:0 0 8px; white-space:pre-wrap; }
+  .caption .inputs { display:block; margin-top:6px; font:11.5px
+             ui-monospace,monospace; color:#6b7080; }
+  .chips { display:flex; gap:8px; flex-wrap:wrap; margin:0 0 14px; }
+  .chip { border:1px solid var(--accent); color:var(--accent);
+          background:#fff; border-radius:999px; padding:6px 14px;
+          font-size:13px; cursor:pointer; }
+  .fb { margin:-6px 0 14px; }
   .fb button { background:none; border:1px solid var(--line);
                color:#6b7080; padding:2px 10px; border-radius:6px;
-               margin-right:6px; cursor:pointer; font-size:13px; }
+               margin-right:6px; font-size:13px; }
   .fb button.done { border-color:var(--accent); color:var(--accent); }
+  form#ask { display:flex; gap:10px; padding:14px 22px 20px;
+             max-width:980px; width:100%; margin:0 auto; }
+  #q { flex:1; padding:12px 14px; border:1px solid var(--line);
+       border-radius:8px; font:inherit; background:#fff; }
+  .err { color:var(--bad); margin:0 0 14px; }
+  .muted { color:#6b7080; font-style:italic; }
 </style></head>
 <body>
-<header>AIVIA <span>·</span> ask about your certified metrics</header>
+<header>AIVIA workbench <span>· ask about your certified metrics — every
+operation shown, confirmed by you, results are the answer</span></header>
 <div id="log"></div>
-<form id="f"><input id="q" autocomplete="off"
+<form id="ask"><input id="q" autocomplete="off"
   placeholder="e.g. are all definitions of Base_Pop_Severe_ED_Scores the same?">
-  <button id="b">Ask</button></form>
+  <button class="primary" id="askbtn">Plan</button></form>
 <script>
 let conversationId = null;
 const log = document.getElementById('log');
-const form = document.getElementById('f');
-const input = document.getElementById('q');
-const button = document.getElementById('b');
-function add(html, cls) {
-  const d = document.createElement('div');
-  d.className = 'msg ' + (cls || '');
-  d.innerHTML = html;
-  log.appendChild(d);
-  log.scrollTop = log.scrollHeight;
-  return d;
-}
+const q = document.getElementById('q');
+const askbtn = document.getElementById('askbtn');
+
+function el(html) { const d = document.createElement('div');
+  d.innerHTML = html; return d.firstElementChild; }
 function esc(s) { const t = document.createElement('span');
-  t.textContent = s; return t.innerHTML; }
-form.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const message = input.value.trim();
-  if (!message) return;
-  input.value = ''; button.disabled = true;
-  add('you&gt; ' + esc(message), 'you');
-  const w = add('thinking…', 'thinking');
-  try {
-    const r = await fetch('/api/chat', { method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({message, conversation_id: conversationId})});
-    const j = await r.json();
-    if (!r.ok) { w.textContent = j.error || ('error ' + r.status); }
-    else {
-      conversationId = j.conversation_id;
-      w.className = 'msg';
-      w.innerHTML = esc(j.answer) +
-        '<div class="basis">Basis: ' + esc(j.basis) + '</div>' +
-        '<div class="fb">' +
-        '<button onclick="fb(this,' + j.turn_index + ',\\'helpful\\')">' +
-        '&#128077; helpful</button>' +
-        '<button onclick="fb(this,' + j.turn_index +
-        ',\\'not_helpful\\')">&#128078; not what I needed</button></div>';
-    }
-  } catch (err) { w.textContent = 'network error: ' + err; }
-  button.disabled = false; input.focus();
-});
-async function fb(btn, turnIndex, verdict) {
-  await fetch('/api/feedback', { method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({conversation_id: conversationId,
-                          turn_index: turnIndex, verdict})});
-  btn.parentElement.querySelectorAll('button')
-     .forEach(b => b.classList.remove('done'));
-  btn.classList.add('done');
+  t.textContent = String(s ?? ''); return t.innerHTML; }
+function add(node) { log.appendChild(node);
+  log.scrollTop = log.scrollHeight; return node; }
+
+// ---- plan card: per-op editors, skip, run --------------------------
+function fieldFor(c) {
+  const p = c.params || {};
+  if (c.op === 'search') return `
+    <input type="text" data-f="phrase" value="${esc(p.phrase||'')}">
+    <select data-f="mode">
+      <option value="semantic" ${p.mode==='semantic'?'selected':''}>semantic — closest by meaning (top-K, not exhaustive)</option>
+      <option value="exact" ${p.mode==='exact'?'selected':''}>exact — complete enumeration by name</option>
+    </select>`;
+  if (c.op === 'retrieve') return `
+    <textarea data-f="ids">${esc((p.ids||[]).join('\n'))}</textarea>
+    <span class="note">one id per line</span>`;
+  if (c.op === 'compare') return `
+    <input type="text" data-f="refs" value="${esc((p.refs||[]).join(', '))}">
+    <input type="text" data-f="aspect" placeholder="aspect (blank = logic)"
+           value="${esc(p.aspect||'')}">
+    <span class="note">refs: R1… for earlier results, $n for this plan's step n</span>`;
+  return '';
 }
-input.focus();
+
+function planCard(plan, question) {
+  const card = el('<div class="card"><h3>Proposed plan — review, edit, then run</h3></div>');
+  if (plan.clarification) {
+    add(el(`<div class="clarify">${esc(plan.clarification)}</div>`));
+    if (!plan.components.length) return null;
+  }
+  (plan.components || []).forEach(c => {
+    const comp = el(`<div class="comp ${c.valid?'':'invalid'}" data-op="${esc(c.op)}">
+      <span class="num">${c.index}</span>
+      <div class="fields">
+        <span class="oplabel">${esc(c.op)}</span>
+        ${c.valid ? fieldFor(c) : ''}
+        <label style="margin-left:auto;font-size:12px">
+          <input type="checkbox" data-f="skip"> skip</label>
+        ${c.note ? `<span class="note">${esc(c.note)}</span>` : ''}
+        ${c.valid ? '' : `<span class="reason">cannot run: ${esc(c.invalid_reason)}</span>`}
+      </div></div>`);
+    if (!c.valid) comp.querySelector('[data-f=skip]').checked = true;
+    card.appendChild(comp);
+  });
+  const actions = el(`<div class="actions">
+    <button class="primary" data-a="run">Run plan</button>
+    <button data-a="cancel">Cancel</button></div>`);
+  card.appendChild(actions);
+  actions.querySelector('[data-a=run]').onclick = () => runPlan(card, question);
+  actions.querySelector('[data-a=cancel]').onclick = () => {
+    card.querySelector('h3').textContent = 'Plan cancelled';
+    actions.remove(); };
+  add(card);
+  return card;
+}
+
+function collectPlan(card) {
+  const components = [];
+  card.querySelectorAll('.comp').forEach(comp => {
+    if (comp.querySelector('[data-f=skip]').checked) return;
+    const op = comp.dataset.op;
+    const get = f => { const n = comp.querySelector(`[data-f=${f}]`);
+                       return n ? n.value : ''; };
+    let params = {};
+    if (op === 'search') params = { phrase: get('phrase'), mode: get('mode') };
+    if (op === 'retrieve') params = { ids: get('ids').split('\n')
+        .map(s => s.trim()).filter(Boolean) };
+    if (op === 'compare') { params = { refs: get('refs').split(',')
+        .map(s => s.trim()).filter(Boolean) };
+      if (get('aspect').trim()) params.aspect = get('aspect').trim(); }
+    components.push({ op, params });
+  });
+  return { components };
+}
+
+// ---- execute + display ---------------------------------------------
+async function runPlan(card, question) {
+  const plan = collectPlan(card);
+  if (!plan.components.length) { add(el('<p class="err">Nothing to run — every component is skipped.</p>')); return; }
+  card.querySelectorAll('button,input,select,textarea').forEach(n => n.disabled = true);
+  card.querySelector('h3').textContent = 'Plan confirmed — running…';
+  try {
+    const r = await fetch('/api/execute', { method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ conversation_id: conversationId, question,
+                             plan })});
+    const j = await r.json();
+    if (!r.ok) { add(el(`<p class="err">${esc(j.error||('error '+r.status))}</p>`)); return; }
+    card.querySelector('h3').textContent = 'Plan (as run)';
+    (j.outputs || []).forEach(renderOutput);
+    if (j.caption) {
+      add(el(`<div class="caption">${esc(j.caption)}
+        <span class="inputs">caption based on: ${esc((j.caption_inputs||[]).join(', ')||'—')}</span></div>`));
+      renderFeedback(j.turn_index);
+    }
+    renderSuggestions(j.suggestions || []);
+  } catch (e) { add(el(`<p class="err">network error: ${esc(e)}</p>`)); }
+}
+
+function renderOutput(o) {
+  if (o.error) {
+    add(el(`<div class="rs"><div class="head">
+      <span class="oplabel">${esc(o.component.op)}</span>
+      <span class="badge error">error</span>
+      <span class="universe">${esc(o.error)}</span></div></div>`));
+    return;
+  }
+  const r = o.result;
+  const badge = r.complete
+    ? '<span class="badge complete">complete</span>'
+    : '<span class="badge partial">not exhaustive</span>';
+  const rs = el(`<div class="rs"><div class="head">
+    <span class="ref">${esc(r.ref)}</span>
+    <span class="oplabel">${esc(r.op)}</span>
+    <span class="universe">${esc(JSON.stringify(r.params))}</span>
+    ${badge}
+    <span class="universe">${esc(r.universe)}${r.note ? ' · ' + esc(r.note) : ''}</span>
+    </div></div>`);
+  rs.appendChild(renderTable(r.rows));
+  add(rs);
+}
+
+function renderTable(rows) {
+  if (!rows || !rows.length)
+    return el('<p class="muted">no rows — an honest empty result</p>');
+  const cols = [...new Set(rows.flatMap(r => Object.keys(r)))];
+  const wrap = el('<div class="tblwrap"></div>');
+  const cell = v => {
+    if (v === null || v === undefined) return '';
+    if (typeof v === 'object') v = JSON.stringify(v, null, 1);
+    v = String(v);
+    if (v.length > 160 || v.includes('\n'))
+      return `<details><summary>${esc(v.slice(0, 60))}…</summary><pre>${esc(v)}</pre></details>`;
+    return esc(v);
+  };
+  wrap.innerHTML = `<table><thead><tr>${cols.map(c => `<th>${esc(c)}</th>`).join('')}</tr></thead>
+    <tbody>${rows.map(r => `<tr>${cols.map(c => `<td>${cell(r[c])}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+  return wrap;
+}
+
+function renderSuggestions(suggestions) {
+  if (!suggestions.length) return;
+  const chips = el('<div class="chips"></div>');
+  suggestions.forEach(s => {
+    const chip = el(`<button class="chip">${esc(s.op)}: ${esc(JSON.stringify(s.params))}${s.note ? ' — ' + esc(s.note) : ''}</button>`);
+    chip.onclick = () => planCard({ components: [ { ...s, index: 1, valid: true } ] },
+                                  '(suggested action)');
+    chips.appendChild(chip);
+  });
+  add(chips);
+}
+
+function renderFeedback(turnIndex) {
+  const fb = el(`<div class="fb">
+    <button data-v="helpful">&#128077; helpful</button>
+    <button data-v="not_helpful">&#128078; not what I needed</button></div>`);
+  fb.querySelectorAll('button').forEach(b => b.onclick = async () => {
+    await fetch('/api/feedback', { method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ conversation_id: conversationId,
+        turn_index: turnIndex, verdict: b.dataset.v })});
+    fb.querySelectorAll('button').forEach(x => x.classList.remove('done'));
+    b.classList.add('done');
+  });
+  add(fb);
+}
+
+// ---- ask -----------------------------------------------------------
+document.getElementById('ask').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const message = q.value.trim();
+  if (!message) return;
+  q.value = ''; askbtn.disabled = true;
+  add(el(`<p class="you">you&gt; ${esc(message)}</p>`));
+  const thinking = add(el('<p class="muted">planning…</p>'));
+  try {
+    const r = await fetch('/api/plan', { method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ message, conversation_id: conversationId })});
+    const j = await r.json();
+    thinking.remove();
+    if (!r.ok) { add(el(`<p class="err">${esc(j.error||('error '+r.status))}</p>`)); }
+    else { conversationId = j.conversation_id; planCard(j.plan, message); }
+  } catch (e2) { thinking.remove();
+    add(el(`<p class="err">network error: ${esc(e2)}</p>`)); }
+  askbtn.disabled = false; q.focus();
+});
+q.focus();
 </script>
 </body></html>
 """

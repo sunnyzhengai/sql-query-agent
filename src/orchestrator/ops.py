@@ -235,11 +235,21 @@ def kernel_set_algebra(items: "list[dict]", key: str) -> "list[dict]":
 
 
 def kernel_field_diff(items: "list[dict]", fields: "list[str]") -> "list[dict]":
-    """Scalar fields side by side — agreement computed, never judged."""
+    """Scalar fields side by side — agreement computed, never judged.
+    A field NO item possesses is an honest miss, not an empty
+    comparison (live find 2026-08-13: junk all-None rows)."""
     rows = []
     for f in fields:
         vals = {i["id"]: (i.get(f) or None) for i in items}
         present = {v for v in vals.values() if v}
+        if not present:
+            available = sorted({k for i in items for k in i
+                                if not isinstance(i.get(k), (list, dict))})
+            rows.append({"field": f,
+                         "error": f"no item has a field {f!r} — "
+                                  "available fields: "
+                                  + ", ".join(available[:12])})
+            continue
         rows.append({"field": f, "values": vals,
                      "all_equal": len(present) == 1 and
                      all(v for v in vals.values())})
@@ -258,7 +268,7 @@ def op_compare(refs: "list[str]", aspect: "str | None", run_kql,
     if len(items) < 2:
         raise OpError("compare needs a selection of at least two items "
                       f"(got {len(items)} from {refs})")
-    if aspect in (None, "", "logic", "definition", "sql"):
+    if aspect in (None, "", "logic", "definition", "sql", "content"):
         rows, note, complete = kernel_partition(items, run_kql)
         return session.register(
             "compare", {"refs": refs, "aspect": "logic"}, rows,

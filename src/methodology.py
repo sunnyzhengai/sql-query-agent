@@ -96,7 +96,7 @@ SYSTEM_VOCAB = frozenset({
     # search modes (ADR 0036)
     "semantic", "exact",
     # compare aspects that name SYSTEM fields/kernels, not user phrasings
-    "logic", "definition", "sql", "tables", "source_tables",
+    "logic", "definition", "sql", "content", "tables", "source_tables",
     # edge types (graph contract)
     "canonical_to_transform", "transform_to_transform",
     "transform_to_technical",

@@ -111,3 +111,19 @@ class TestSessionRegistry:
         assert (r1.ref, r2.ref) == ("R1", "R2")
         assert len(s.rows_of(["R1", "R2"])) == len(r1.rows) + len(r2.rows)
         assert s.rows_of(["R99"]) == []
+
+
+class TestAspectHonesty:
+    def test_content_is_a_partition_alias(self):
+        s = OpsSession()
+        rs = op_search("Scores", "exact", fake_kql, s)
+        out = op_compare([rs.ref], "content", fake_kql, s)
+        assert any("group" in r for r in out.rows)      # partition ran
+
+    def test_unknown_field_is_an_honest_miss(self):
+        s = OpsSession()
+        s.note_user(f"{REF_A} {REF_B}")
+        op_retrieve([REF_A, REF_B], fake_kql, s)
+        out = op_compare(["R1"], "flavour", fake_kql, s)
+        assert "no item has a field 'flavour'" in out.rows[0]["error"]
+        assert "steward" in out.rows[0]["error"]        # offers real fields

@@ -135,3 +135,29 @@ class TestCaption:
         assert out["caption_inputs"] == ["R1", "R2", "R3"]   # code-stamped
         assert len(out["suggestions"]) == 1                  # invalid dropped
         assert out["suggestions"][0]["params"]["aspect"] == "tables"
+
+
+class TestResultPiping:
+    """Live find (2026-08-13): the planner naturally writes
+    retrieve {ids: "$1"} — pipe a search's results into retrieve.
+    Data-shaped plumbing, now supported everywhere ids appear."""
+
+    def test_retrieve_pipes_from_search(self):
+        s = ProtocolSession()
+        plan = {"components": [
+            {"op": "search", "params": {"phrase": "Scores",
+                                        "mode": "exact"}},
+            {"op": "retrieve", "params": {"ids": "$1"}},   # scalar too
+            {"op": "compare", "params": {"refs": "$2"}},
+        ]}
+        out = execute_confirmed(s, plan, fake_kql)
+        assert out[1]["result"]["count"] == 2          # both family steps
+        groups = [r for r in out[2]["result"]["rows"] if "group" in r]
+        assert len(groups) == 1                        # respaced == same
+
+    def test_forward_pipe_fails_visibly(self):
+        s = ProtocolSession()
+        plan = {"components": [
+            {"op": "retrieve", "params": {"ids": ["$3"]}}]}
+        out = execute_confirmed(s, plan, fake_kql)
+        assert "has not produced a result" in out[0]["error"]

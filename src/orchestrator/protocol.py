@@ -139,6 +139,8 @@ def validate_component(c: dict, index: int) -> "dict":
             out["valid"] = True
     elif op == "retrieve":
         ids = p.get("ids")
+        if isinstance(ids, str):
+            ids = [ids]                      # planners say "$1"; normalize
         if not isinstance(ids, list) or not ids:
             out["invalid_reason"] = "retrieve needs a non-empty ids list"
         else:
@@ -146,6 +148,8 @@ def validate_component(c: dict, index: int) -> "dict":
             out["valid"] = True
     elif op == "compare":
         refs = p.get("refs")
+        if isinstance(refs, str):
+            refs = [refs]
         if not isinstance(refs, list) or not refs:
             out["invalid_reason"] = "compare needs refs (R1... or $n)"
         elif not all(_REF_SHAPE.match(str(r)) for r in refs):
@@ -240,13 +244,32 @@ def execute_confirmed(session: ProtocolSession, plan: dict,
     return outputs
 
 
+def _expand_ids(ids: "list[str]", produced: "dict[int, str]",
+                ops: OpsSession) -> "list[str]":
+    """$n inside an ids list expands to the ids of component n's result
+    rows — result piping is parameter plumbing, not a new operation."""
+    out = []
+    for i in ids:
+        if _REF_SHAPE.match(i) and i.startswith("$"):
+            idx = int(i[1:])
+            if idx not in produced:
+                raise OpError(f"{i} refers to component {idx}, which has "
+                              "not produced a result")
+            out.extend(r["id"] for r in ops.results[produced[idx]].rows
+                       if r.get("id"))
+        else:
+            out.append(i)
+    return out
+
+
 def _run_component(c: dict, produced: "dict[int, str]", run_kql,
                    ops: OpsSession) -> ResultSet:
     p = c["params"]
     if c["op"] == "search":
         return op_search(p["phrase"], p["mode"], run_kql, ops)
     if c["op"] == "retrieve":
-        return op_retrieve(p["ids"], run_kql, ops)
+        return op_retrieve(_expand_ids(p["ids"], produced, ops),
+                           run_kql, ops)
     refs = []
     for r in p["refs"]:
         if r.startswith("$"):
