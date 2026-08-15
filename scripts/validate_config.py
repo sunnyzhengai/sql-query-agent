@@ -13,20 +13,20 @@ def main() -> None:
     try:
         config = load_config()
         print(f"Config valid for org: {config.org.name}")
-        print(f"  Lakehouse paths:")
+        print("  Lakehouse paths:")
         print(f"    dict_tables:  {config.lakehouse.dict_tables}")
         print(f"    dict_columns: {config.lakehouse.dict_columns}")
         print(f"    sql_sources:  {config.lakehouse.sql_sources}")
         print(f"    graph_nodes:  {config.lakehouse.graph_nodes}")
         print(f"    graph_edges:  {config.lakehouse.graph_edges}")
-        print(f"  Dictionary column mapping:")
+        print("  Dictionary column mapping:")
         print(f"    table_name:  {config.dictionary.table_name_col}")
         print(f"    column_name: {config.dictionary.column_name_col}")
         print(f"    description: {config.dictionary.description_col}")
     except FileNotFoundError as e:
         print(f"ERROR: {e}", file=sys.stderr)
         sys.exit(1)
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001 — any config defect exits 1 with the message
         print(f"ERROR: Invalid config: {e}", file=sys.stderr)
         sys.exit(1)
 

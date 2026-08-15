@@ -5,12 +5,13 @@
 
 # %% Cell 1: Setup
 import sys
+
 sys.path.insert(0, "/lakehouse/default/Files/sql-query-agent")
 # For local: sys.path.insert(0, ".")
 
-from src.config import load_config
 from src.adapters.collibra_lineage import CollibraClient
 from src.adapters.collibra_lineage_match import CollibraLineageMatcher
+from src.config import load_config
 
 config = load_config()
 collibra_cfg = config.adapters.collibra
@@ -69,7 +70,7 @@ if result.unmatched_objects:
         print(f"  {name}  (key: '{extract_match_key(name)}')")
 
 # %% Cell 4: Test a single name interactively
-from src.adapters.collibra_lineage_match import extract_match_key, normalize_report_name
+from src.adapters.collibra_lineage_match import extract_match_key
 
 test_name = "V_CCHP_340B_Charges_PBI"  # TODO: change to test different names
 key = extract_match_key(test_name)

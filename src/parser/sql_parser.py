@@ -86,6 +86,10 @@ class ParsedSQL:
     final_select_cte_refs: list[str] = field(default_factory=list)  # CTEs referenced by final SELECT
     final_select_columns: list[ColumnRef] = field(default_factory=list)
     normalized_sql: str = ""  # the SQL after normalization (for debugging/review)
+    # Count of AST-walk exceptions suppressed during extraction. Nonzero means
+    # refs may be MISSING from an otherwise-successful parse — surface it, or
+    # "parse success" overstates what was captured (audit 2026-08-15).
+    extraction_suppressed: int = 0
 
 
 def _is_multi_statement(sql: str) -> bool:
@@ -449,8 +453,11 @@ def parse_sql(sql: str, dialect: str = "tsql", llm_backend=None,
             if extractor.is_healthy():
                 queries = extractor.extract_sql_strings(sql)
                 logger.info("ScriptDom extracted %d queries", len(queries))
-        except Exception as e:
-            logger.info("ScriptDom not available (%s), falling back to sqlparse", e)
+        except Exception as e:  # noqa: BLE001 — degraded path, logged at WARNING
+            # WARNING, not info: sqlparse extracts less than ScriptDom and
+            # nothing downstream records which extractor produced a row
+            # (audit 2026-08-15). This whole path is slated for demolition.
+            logger.warning("ScriptDom not available (%s), falling back to sqlparse", e)
 
     # Fallback to sqlparse-based extractor
     if queries is None:

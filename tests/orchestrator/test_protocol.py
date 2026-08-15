@@ -4,8 +4,6 @@ execute -> caption, with a scripted planner that misbehaves on cue."""
 import json
 
 from src.orchestrator.protocol import (
-    CAPTION_TOOL,
-    PLAN_TOOL,
     ProtocolSession,
     caption_turn,
     execute_confirmed,

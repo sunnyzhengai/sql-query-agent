@@ -10,7 +10,13 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from src.adapters.base import BulkPublishResult, CatalogAdapter, MetadataRecord
+from src.adapters.base import (
+    BulkPublishResult,
+    CatalogAdapter,
+    MetadataRecord,
+    PublishResult,
+    PublishStatus,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -38,7 +44,7 @@ class Publisher:
         for name, adapter in self._adapters.items():
             try:
                 results[name] = adapter.test_connection()
-            except Exception as e:
+            except Exception as e:  # noqa: BLE001 — logged; recorded as False / per-record FAILED results
                 logger.error(f"Connection test failed for {name}: {e}")
                 results[name] = False
         return results
@@ -54,9 +60,19 @@ class Publisher:
             try:
                 results[name] = adapter.publish_bulk(records)
                 logger.info(f"{name}: {results[name]}")
-            except Exception as e:
+            except Exception as e:  # noqa: BLE001 — logged; recorded as False / per-record FAILED results
                 logger.error(f"Failed to publish to {name}: {e}")
+                # Every record counts as FAILED — an empty result here made
+                # "total failure" identical to "nothing to publish", and
+                # gov_publish_log recorded that nothing happened (audit
+                # 2026-08-15).
                 result = BulkPublishResult()
+                for record in records:
+                    result.add(PublishResult(
+                        asset_id=record.asset_id,
+                        status=PublishStatus.FAILED,
+                        message=f"adapter raised: {e}",
+                    ))
                 results[name] = result
         return results
 

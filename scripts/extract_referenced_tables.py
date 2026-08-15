@@ -183,7 +183,7 @@ def main():
         print(f"\nSaved to {csv_output}")
 
     print(f"\n{'=' * 60}")
-    print(f"SUMMARY")
+    print("SUMMARY")
     print(f"{'=' * 60}")
     print(f"  SQL files scanned:  {result['file_count']}")
     print(f"  Physical tables:    {len(result['tables'])}")

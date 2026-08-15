@@ -49,7 +49,7 @@ class ScriptDomExtractor:
             resp = requests.get(f"{self.service_url}/health", timeout=5)
             self._healthy = resp.status_code == 200
             return self._healthy
-        except Exception:
+        except Exception:  # noqa: BLE001 — legacy microservice probe; module slated for demolition
             self._healthy = False
             return False
 

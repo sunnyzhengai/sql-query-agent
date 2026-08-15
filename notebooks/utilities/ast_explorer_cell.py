@@ -1,13 +1,14 @@
-# Paste this as a new cell at the bottom of 02_parse.py
+# Paste this as a new cell at the bottom of the 02_parse notebook
 # Run after Cell 0 (ScriptDom is already loaded)
 # Change METRIC_ID to test different procs
 
 from Microsoft.SqlServer.TransactSql.ScriptDom import TSql160Parser
 from System.IO import StringReader
+
 from src.parser.scriptdom_fabric import _get_fragment_text
 
-METRIC_ID = "usp_PTA_CensusDashboard_PBI"
-raw_sql = spark.sql(f"SELECT sql FROM sql_sources WHERE metric_id = '{METRIC_ID}'").collect()[0]["sql"]
+METRIC_ID = "usp_PTA_CensusDashboard_PBI"  # <- change to the proc you are debugging
+raw_sql = spark.sql(f"SELECT sql FROM input_sql_sources WHERE metric_id = '{METRIC_ID}'").collect()[0]["sql"]
 
 parser = TSql160Parser(True)
 reader = StringReader(raw_sql)
@@ -34,9 +35,9 @@ def find_statements(node, results, depth=0):
                         item = value[j]
                         if hasattr(item, "StartLine"):
                             find_statements(item, results, depth + 1)
-            except Exception:
+            except Exception:  # noqa: BLE001, S110, S112 — best-effort AST exploration; tree may be truncated where reflection throws
                 continue
-    except Exception:
+    except Exception:  # noqa: BLE001, S110, S112 — best-effort AST exploration; tree may be truncated where reflection throws
         pass
 
 def walk_refs(node, tables, columns, depth=0):
@@ -46,7 +47,7 @@ def walk_refs(node, tables, columns, depth=0):
     if nt == "NamedTableReference":
         try:
             tables.append(node.SchemaObject.BaseIdentifier.Value)
-        except Exception:
+        except Exception:  # noqa: BLE001, S110, S112 — best-effort AST exploration; tree may be truncated where reflection throws
             pass
     elif nt == "ColumnReferenceExpression":
         try:
@@ -54,7 +55,7 @@ def walk_refs(node, tables, columns, depth=0):
             if multi and multi.Identifiers:
                 parts = [multi.Identifiers[k].Value for k in range(multi.Identifiers.Count)]
                 columns.append(".".join(parts))
-        except Exception:
+        except Exception:  # noqa: BLE001, S110, S112 — best-effort AST exploration; tree may be truncated where reflection throws
             pass
     try:
         for prop in node.GetType().GetProperties():
@@ -69,9 +70,9 @@ def walk_refs(node, tables, columns, depth=0):
                         item = value[k]
                         if hasattr(item, "StartLine"):
                             walk_refs(item, tables, columns, depth + 1)
-            except Exception:
+            except Exception:  # noqa: BLE001, S110, S112 — best-effort AST exploration; tree may be truncated where reflection throws
                 continue
-    except Exception:
+    except Exception:  # noqa: BLE001, S110, S112 — best-effort AST exploration; tree may be truncated where reflection throws
         pass
 
 stmts = []

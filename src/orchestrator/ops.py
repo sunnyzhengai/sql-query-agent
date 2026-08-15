@@ -16,7 +16,6 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass, field
-from typing import Callable
 
 from src.graph.templates import _fold
 from src.orchestrator.assemble import (

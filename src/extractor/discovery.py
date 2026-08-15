@@ -126,8 +126,14 @@ def strip_create_prefix(sql_definition: str) -> str:
                 return body.sql(dialect="tsql")
         # If it's already a SELECT or something else, return as-is
         return parsed.sql(dialect="tsql")
-    except Exception:
-        # Fallback: try simple string stripping
+    except Exception as e:  # noqa: BLE001 — degraded path below, and it SAYS so
+        # Fallback: simple string stripping. This is a DEGRADED extraction —
+        # log loudly, because a mangled body flows into sql_sources as if
+        # clean and every downstream artifact inherits it (audit 2026-08-15).
+        logger.warning(
+            "sqlglot could not parse a definition (%s) — falling back to "
+            "naive ' AS ' split for: %.80s", e, sql_definition,
+        )
         upper = sql_definition.upper()
         as_idx = upper.find(" AS ")
         if as_idx != -1:

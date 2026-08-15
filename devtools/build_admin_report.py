@@ -309,7 +309,6 @@ def page(name, display, visuals, ordinal) -> dict:
 
 def build_report_json() -> dict:
     HALF = {"width": 620.0, "height": 300.0}
-    WIDE = {"width": 1240.0, "height": 360.0}
     CARD = {"width": 300.0, "height": 120.0}
 
     p1 = page("p1", "Pipeline Health", [

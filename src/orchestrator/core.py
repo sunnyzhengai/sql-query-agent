@@ -14,7 +14,6 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Callable
 
-
 TOKEN_SYSTEM_PROMPT = (
     "You turn a user's question about business metrics into ONE short "
     "search phrase (2-6 words) naming the core business concept. Output "

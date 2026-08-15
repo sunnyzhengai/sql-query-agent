@@ -1,46 +1,57 @@
-# Notebooks
+# notebooks/
+
+Helper notebooks and agent assets. **The production pipeline does NOT live
+here** — it is the numbered `*.Notebook` folders at the repo root
+(`01_install` … `11_refresh_search_index`), which Fabric syncs as workspace
+items. Everything in this directory is pasted into a Fabric notebook or run
+ad hoc.
 
 ## Organization
 
 ```
 notebooks/
-├── pipeline/              ← Core pipeline (run in order)
-│   ├── 02_parse.py        — Parse SQL files → parse_results, parse_errors
-│   ├── 03_build_graph.py  — Build knowledge graph → graph_nodes, graph_edges
-│   ├── 04_build_metric_logic.py — Flatten graph → metric_logic
-│   └── 05_validate.py     — Validate pipeline health → pipeline_validation
-│
-├── data_loading/          ← Data ingestion (run before pipeline)
-│   ├── load_sql_files.py  — Load .sql files → sql_sources
-│   ├── load_clarity_dictionary.py — Load data dictionary → dict_tables, dict_columns
-│   └── extract_views.py   — Extract views from SQL Server via gateway
+├── data_loading/          ← "Step 00": load org inputs (run once per org, before 01–11)
+│   ├── load_clarity_dictionary.py  — Clarity dictionary CSVs → input_dict_tables/_columns
+│   ├── load_caboodle_dictionary.py — Caboodle variant of the same
+│   ├── load_sql_files.py           — .sql files → input_sql_sources
+│   └── extract_views.py            — live SQL Server pull via gateway (extractor config)
 │
 ├── utilities/             ← Operational tools (run as needed)
-│   ├── ast_explorer_cell.py    — Explore ScriptDom AST for debugging
-│   ├── check_stale_data.py     — Verify data freshness across tables
-│   ├── collibra_discovery.py   — Discover Collibra API data model
-│   └── verify_graph.py         — Verify graph integrity
+│   ├── ast_explorer_cell.py         — Explore a proc's ScriptDom AST (paste into 02_parse)
+│   ├── check_stale_data.py          — Spot-check descriptions/logic freshness
+│   ├── collibra_discovery.py        — Discover Collibra API data model
+│   ├── collibra_lineage_match.py    — Match PBI reports to Collibra assets
+│   ├── collibra_update_description.py — Push one description to a Collibra asset
+│   ├── devops_lineage.py            — TMDL lineage from an Azure DevOps repo
+│   ├── manage_stewards.py           — Assign stewards (writes gov_steward_assignments)
+│   └── verify_graph.py              — Verify graph integrity
 │
-└── delta_agent_instructions.md  ← System prompt for the Delta Agent (production)
+├── delta_agent_instructions.md   ← System prompt for the Delta Agent (production)
+├── delta_agent_fewshots.json     ← Few-shot examples for the Delta Agent
+└── graph_agent_instructions.md   ← System prompt for the Graph Agent (Fabric Graph)
 ```
 
-## How to Use
+## How to use
 
-1. **First time:** Run a data_loading notebook to populate sql_sources and dictionary tables
-2. **Build the graph:** Run pipeline notebooks 02 → 03 → 04 → 05 in order
-3. **Iterate:** When code changes, rerun only the affected pipeline step
-4. **Each notebook is self-contained** — has its own Cell 0 with setup (deps, config, ScriptDom)
+1. **First time per org:** run a `data_loading/` loader to populate
+   `input_sql_sources`, `input_dict_tables`, `input_dict_columns`.
+2. **Pipeline:** run the ROOT notebooks in order (02 → 03 → … → 11 as needed).
+   Prerequisite for all of them: attach the `sql-logic-env` Fabric
+   Environment — no `%pip install` anywhere.
+3. **Iterate:** when code changes, rerun only the affected root notebook.
 
-## Delta Table Flow
+## Delta table flow (current names)
 
 ```
-sql_sources ──→ 02_parse ──→ parse_results ──→ 03_build_graph ──→ graph_nodes
-dict_tables ─┘                                                     graph_edges
-dict_columns ─────────────────────────────────┘                        │
-                                                                       ▼
-                                                    04_build_metric_logic ──→ metric_logic
-                                                                       │
-                                                                       ▼
-                                                              05_validate ──→ pipeline_validation
-                                                                               build_summary
+input_sql_sources ──→ 02_parse ──→ ops_parse_results ──→ 03_build_graph ──→ graph_nodes
+input_dict_tables ─────────────────(+ errors/successes/────────┘             graph_edges
+input_dict_columns ─────────────────phi_findings)──────────────┘                 │
+                                                                                 ▼
+                                                    04_build_metric_logic ──→ output_metric_logic
+                                                                                 │
+                                                                                 ▼
+                                                              06_validate ──→ ops_pipeline_validation
+                                                                              ops_build_summary
 ```
+
+Table names and contracts: `src/schemas.py` is the single source of truth.

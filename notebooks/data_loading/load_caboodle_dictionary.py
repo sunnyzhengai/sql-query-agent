@@ -8,12 +8,14 @@ dictionary isn't loaded yet).
 """
 
 # %% Cell 0: Setup
-%pip install pydantic pyyaml
+# Prerequisites: Attach the 'sql-logic-env' Fabric Environment. No %pip install.
 
 import sys
+
 sys.path.insert(0, "/lakehouse/default/Files/sql-query-agent")
 
 from src.config import load_config
+
 config = load_config("/lakehouse/default/Files/sql-query-agent/org_config.yaml")
 
 # %% Cell 1: Load Caboodle CSVs
@@ -48,16 +50,18 @@ print(f"Resolved columns: {cab_col_resolved.count()}")
 print(f"Normalized tables: {cab_tbl_normalized.count()}")
 
 # %% Cell 3: Merge with existing dictionary and save
-# Load existing dictionary (Clarity or previous run)
-try:
+# Load existing dictionary (Clarity or previous run). Existence checked
+# explicitly: this cell OVERWRITES both tables, so a swallowed read error
+# would wipe the Clarity dictionary and leave Caboodle-only (audit 2026-08-15).
+if spark.catalog.tableExists("input_dict_tables") and spark.catalog.tableExists("input_dict_columns"):
     existing_tbl = spark.table("input_dict_tables")
     existing_col = spark.table("input_dict_columns")
     print(f"Existing dict_tables: {existing_tbl.count()}")
     print(f"Existing dict_columns: {existing_col.count()}")
     merged_tbl = existing_tbl.unionByName(cab_tbl_normalized).dropDuplicates(["TABLE_NAME"])
     merged_col = existing_col.unionByName(cab_col_resolved).dropDuplicates(["TABLE_NAME", "COLUMN_NAME"])
-except Exception as e:
-    print(f"No existing dictionary found ({e}), using Caboodle only")
+else:
+    print("No existing dictionary tables — using Caboodle only")
     merged_tbl = cab_tbl_normalized
     merged_col = cab_col_resolved
 

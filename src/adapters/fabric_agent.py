@@ -19,7 +19,7 @@ from __future__ import annotations
 import logging
 import time
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Callable, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -54,10 +54,17 @@ class FabricAgentClient:
         agent_id: str,
         tool_name: str = "",
         access_token: str = "",
+        token_provider: "Optional[Callable[[], str]]" = None,
     ) -> None:
+        """token_provider is the right choice for long runs: it is re-invoked
+        per request (and forced on 401), so >1hr description loops survive
+        token expiry. A static access_token never refreshes — tests only.
+        Pass e.g.: token_provider=lambda: notebookutils.credentials.getToken(
+        "https://api.fabric.microsoft.com")."""
         self.workspace_id = workspace_id
         self.agent_id = agent_id
         self.tool_name = tool_name  # discovered via tools/list
+        self._token_provider = token_provider
         self._explicit_token = access_token  # explicitly passed token (no refresh)
         self._cached_token = ""
         self._token_fetched_at = 0.0
@@ -67,6 +74,8 @@ class FabricAgentClient:
         )
 
     def _get_token(self) -> str:
+        if self._token_provider is not None:
+            return self._token_provider()
         if self._explicit_token:
             return self._explicit_token
 
@@ -118,6 +127,28 @@ class FabricAgentClient:
             json=payload,
             timeout=120,
         )
+
+        if resp.status_code in (401, 403):
+            # Token likely expired mid-run: force a refresh and retry ONCE.
+            # Without this, long description loops died with auth failures
+            # disguised as per-metric content failures (audit 2026-08-15).
+            logger.warning(
+                "MCP endpoint returned %d — forcing token refresh and retrying once",
+                resp.status_code,
+            )
+            self._cached_token = ""
+            self._token_fetched_at = 0.0
+            resp = requests.post(
+                self._endpoint,
+                headers=self._get_headers(),
+                json=payload,
+                timeout=120,
+            )
+            if resp.status_code in (401, 403):
+                raise RuntimeError(
+                    f"MCP endpoint returned {resp.status_code} even after token refresh — "
+                    f"authentication is broken, not the content: {resp.text[:200]}"
+                )
 
         if resp.status_code != 200:
             raise RuntimeError(f"MCP endpoint returned {resp.status_code}: {resp.text[:200]}")
@@ -179,7 +210,7 @@ class FabricAgentClient:
                     error="Empty response from agent",
                 )
 
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001 — failure becomes AgentResponse(status=failed) with the error
             return AgentResponse(
                 question=question,
                 answer="",

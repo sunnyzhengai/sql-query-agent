@@ -36,8 +36,8 @@ Run 02_parse.py at least once before this.
 
 # %% Cell 0: Setup
 # Prerequisites: Attach 'sql-logic-env' Fabric Environment. No %pip install.
-import json
 import sys
+
 # If the wheel is installed via Fabric Environment, src is already importable.
 # Fallback to sys.path for dev mode or non-wheel deployments.
 try:
@@ -48,7 +48,7 @@ except ImportError:
 print(f"v{src.__version__}")
 
 from src.config import load_config
-from src.schemas import GRAPH_NODES, GRAPH_EDGES, to_spark_schema
+from src.schemas import GRAPH_EDGES, GRAPH_NODES, to_spark_schema
 
 config = load_config("/lakehouse/default/Files/sql-query-agent/org_config.yaml")
 
@@ -64,6 +64,16 @@ config = load_config("/lakehouse/default/Files/sql-query-agent/org_config.yaml")
 
 
 # %% Cell 1: Load parse results + dictionary from Delta
+from src.steps.gates import precondition_gate
+
+# Required inputs must exist (and be non-empty where the contract says so)
+# BEFORE work starts — a missing table fails with a message naming the
+# producing notebook, not a pyspark stack trace. Registry-driven; see
+# src/steps/gates.py.
+precondition_gate("03_build_graph", table_exists=spark.catalog.tableExists,
+                  count=lambda t: spark.table(t).count())
+
+
 parse_results = [r.asDict() for r in spark.table("ops_parse_results").collect()]
 
 dict_tables_rows = [r.asDict() for r in spark.table(config.lakehouse.dict_tables).collect()]
@@ -85,17 +95,19 @@ print(f"Loaded {len(parse_results)} parse results, {len(dict_tables_rows)} table
 # %% Cell 2: Build graph (all logic in src/steps/build_graph.py)
 from src.steps.build_graph import build_graph_step
 
-# Business-friendly names (input_metric_names: PBI lineage or manual)
+# Optional enrichments: ABSENCE of the table is a legitimate state (not yet
+# assigned); a FAILED read is not — it must raise, or a transient error
+# silently rebuilds the graph with zero stewards (audit 2026-08-15).
 metric_name_records = []
-try:
+if spark.catalog.tableExists("input_metric_names"):
     metric_name_records = [r.asDict() for r in spark.table("input_metric_names").collect()]
-except Exception:
+else:
     print("No input_metric_names table — metrics display object names only")
 
 steward_records = []
-try:
+if spark.catalog.tableExists("gov_steward_assignments"):
     steward_records = [r.asDict() for r in spark.table("gov_steward_assignments").collect()]
-except Exception:
+else:
     print("No gov_steward_assignments table — run notebooks/utilities/manage_stewards to assign")
 
 out = build_graph_step(
@@ -131,8 +143,10 @@ from src.steps.gates import postcondition_gate
 nodes_df = spark.createDataFrame(out.nodes_rows, schema=to_spark_schema(GRAPH_NODES))
 edges_df = spark.createDataFrame(out.edges_rows, schema=to_spark_schema(GRAPH_EDGES))
 
-nodes_df.write.format("delta").mode("overwrite").option("overwriteSchema", "true").saveAsTable(config.lakehouse.graph_nodes)
-edges_df.write.format("delta").mode("overwrite").option("overwriteSchema", "true").saveAsTable(config.lakehouse.graph_edges)
+nodes_df.write.format("delta").mode("overwrite") \
+    .option("overwriteSchema", "true").saveAsTable(config.lakehouse.graph_nodes)
+edges_df.write.format("delta").mode("overwrite") \
+    .option("overwriteSchema", "true").saveAsTable(config.lakehouse.graph_edges)
 
 print(f"Wrote {nodes_df.count()} nodes, {edges_df.count()} edges")
 

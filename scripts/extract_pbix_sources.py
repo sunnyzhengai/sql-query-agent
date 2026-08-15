@@ -63,7 +63,7 @@ def extract_m_queries_from_pbix(pbix_path: str | Path) -> list[dict]:
 
     except zipfile.BadZipFile:
         print(f"  {report_name}: Not a valid ZIP/PBIX file")
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001 — best-effort scanner; error printed per report
         print(f"  {report_name}: Error: {e}")
 
     return results

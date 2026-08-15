@@ -215,9 +215,9 @@ for fname, data in [
     print(f"  wrote {fname}")
 
 print("\n=== Export complete ===")
-print(f"Download the 4 files from Files/sql-query-agent/fixtures_export/")
-print(f"Place them in tests/fixtures/recorded/ and run:")
-print(f"  pytest tests/test_recorded_pipeline.py")
+print("Download the 4 files from Files/sql-query-agent/fixtures_export/")
+print("Place them in tests/fixtures/recorded/ and run:")
+print("  pytest tests/test_recorded_pipeline.py")
 
 # METADATA ********************
 

@@ -27,7 +27,11 @@ from src.steps.build_graph import build_graph_step  # noqa: E402
 from src.steps.export import export_step  # noqa: E402
 from src.steps.metric_logic import metric_logic_step  # noqa: E402
 from src.steps.parse import parse_step  # noqa: E402
-from src.steps.readiness import readiness_gate  # noqa: E402
+from src.steps.readiness import (  # noqa: E402
+    dictionary_coverage_threshold,
+    readiness_gate,
+    tech_table_names,
+)
 
 FIXTURES_DIR = PROJECT_ROOT / "tests" / "fixtures" / "recorded"
 
@@ -43,7 +47,9 @@ def load_recorded(fixtures_dir: Path = FIXTURES_DIR):
 def load_sample():
     """Parse the bundled sample corpus with the local fallback parser."""
     from scripts.seed_sample_data import (
-        SAMPLE_DICT_COLUMNS, SAMPLE_DICT_TABLES, SAMPLE_SQL_SOURCES,
+        SAMPLE_DICT_COLUMNS,
+        SAMPLE_DICT_TABLES,
+        SAMPLE_SQL_SOURCES,
     )
     from src.parser.sql_parser import parse_sql
 
@@ -76,8 +82,11 @@ def run_pipeline(parse_results, dict_tables, dict_columns) -> "tuple[bool, list[
         "output_metric_logic": metric_rows,
         **exported,
     }
-    fetch = lambda t, cols: [{c: row.get(c) for c in cols} for row in tables[t]]
-    table_exists = lambda t: t in tables
+    def fetch(t, cols):
+        return [{c: row.get(c) for c in cols} for row in tables[t]]
+
+    def table_exists(t):
+        return t in tables
 
     nodes_by_id = {r["node_id"]: r for r in graph.nodes_rows}
     edges_by_source: "dict[str, list[dict]]" = {}
@@ -96,6 +105,10 @@ def run_pipeline(parse_results, dict_tables, dict_columns) -> "tuple[bool, list[
         "parse_rate": (summary["s2_parsed"] / total, 0.90, True),
         "calculation_logic": (summary["s4_transforms"] / total, 0.80, True),
         "traversal_coverage": (summary["s6_traversal"] / total, 0.70, False),
+        "dictionary_coverage": dictionary_coverage_threshold(
+            {r["TABLE_NAME"] for r in dict_tables},
+            tech_table_names(graph.nodes_rows),
+        ),
     }
 
     violations = check_all_invariants(fetch, table_exists)
@@ -116,7 +129,7 @@ def main() -> None:
     else:
         if not (FIXTURES_DIR / "parse_results.json").exists():
             print(f"No recorded fixtures in {FIXTURES_DIR}.")
-            print("Run notebooks/utilities/export_test_fixtures on Fabric once,")
+            print("Run the export_test_fixtures notebook (repo root) on Fabric once,")
             print("download the files there, or use --sample.")
             raise SystemExit(1)
         manifest = json.loads((FIXTURES_DIR / "manifest.json").read_text())

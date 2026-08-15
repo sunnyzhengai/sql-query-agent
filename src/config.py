@@ -32,10 +32,6 @@ class DictionaryConfig(BaseModel):
     accept_schema_ambiguity: bool = False
 
 
-class MetricsConfig(BaseModel):
-    catalog_path: str
-
-
 class SqlServerConfig(BaseModel):
     host: str
     port: int = 1433
@@ -96,7 +92,6 @@ class Config(BaseModel):
     org: OrgConfig
     lakehouse: LakehouseConfig
     dictionary: DictionaryConfig = DictionaryConfig()
-    metrics: MetricsConfig
     extractor: Optional[ExtractorConfig] = None
     adapters: Optional[AdaptersConfig] = None
     fabric_graph: Optional[FabricGraphConfig] = None

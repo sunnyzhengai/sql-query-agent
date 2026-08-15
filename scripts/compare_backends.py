@@ -23,7 +23,6 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from src.graph.delta_backend import DeltaBackend
 from src.graph.fabric_graph_backend import FabricGraphBackend
 from src.graph.gql_client import GQLClient
-from src.models import GraphNode
 
 
 def compare_subgraphs(
@@ -100,7 +99,8 @@ def run_comparison(delta: DeltaBackend, graph: FabricGraphBackend) -> None:
             print(f"  MATCH  {metric_id}")
         else:
             diff_count += 1
-            print(f"  DIFF   {metric_id}: {json.dumps({k: v for k, v in report.items() if k not in ('metric_id', 'status')}, indent=2)}")
+            diff = {k: v for k, v in report.items() if k not in ("metric_id", "status")}
+            print(f"  DIFF   {metric_id}: {json.dumps(diff, indent=2)}")
 
     print(f"\n{'='*70}")
     print(f"Results: {match_count} match, {diff_count} diff, {len(all_metrics)} total")

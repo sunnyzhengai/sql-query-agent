@@ -21,11 +21,13 @@ from src.schemas import STEWARD_ASSIGNMENTS, to_spark_schema
 # %% Cell 2: Load existing assignments and canonical metrics
 manager = StewardManager()
 
-try:
+# Existence checked explicitly: Cell 6 OVERWRITES this table, so a swallowed
+# read error here would erase every existing assignment (audit 2026-08-15).
+if spark.catalog.tableExists("gov_steward_assignments"):
     existing = [r.asDict() for r in spark.table("gov_steward_assignments").collect()]
     manager.load_from_records(existing)
     print(f"Loaded {len(existing)} existing steward assignments")
-except Exception:
+else:
     print("No gov_steward_assignments table yet — starting fresh")
 
 canonical_metrics = []

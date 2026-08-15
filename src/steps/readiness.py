@@ -8,7 +8,20 @@ identical wherever the pipeline runs.
 
 from __future__ import annotations
 
+import json
 from dataclasses import dataclass
+from typing import Iterable
+
+# Gate-integrity contract: these checks may FAIL, but they may never silently
+# DISAPPEAR from the gate. A caller that cannot supply one must be blocked,
+# not quietly graded on fewer checks (audit 2026-08-15: dictionary_coverage
+# vanished inside a try/except and the gate printed DEPLOYMENT READY).
+REQUIRED_CHECKS = (
+    "parse_rate",
+    "calculation_logic",
+    "traversal_coverage",
+    "dictionary_coverage",
+)
 
 
 @dataclass
@@ -17,15 +30,59 @@ class GateResult:
     lines: "list[str]"
 
 
+def tech_table_names(nodes: "Iterable[dict]") -> "set[str]":
+    """Upper-cased table names of technical table nodes.
+
+    Accepts node rows whose `properties` field is either a JSON string
+    (Delta round-trip) or a dict (in-memory build). Column nodes are skipped.
+    """
+    names: "set[str]" = set()
+    for node in nodes:
+        if not (node.get("node_id") or "").startswith("tech:"):
+            continue
+        raw = node.get("properties") or {}
+        props = json.loads(raw) if isinstance(raw, str) else raw
+        if props.get("table") and not props.get("column"):
+            names.add(props["table"].upper())
+    return names
+
+
+def dictionary_coverage_threshold(
+    dict_table_names: "set[str]",
+    sql_table_names: "set[str]",
+    threshold: float = 0.90,
+) -> "tuple[float, float, bool]":
+    """Share of SQL-referenced tables present in the data dictionary.
+
+    An empty graph (no technical table nodes) measures 0.0 — the empty case
+    blocks, it does not skip: that is exactly when deployment must not
+    proceed.
+    """
+    if not sql_table_names:
+        return (0.0, threshold, True)
+    folded_dict = {n.upper() for n in dict_table_names}
+    folded_sql = {n.upper() for n in sql_table_names}
+    return (len(folded_sql & folded_dict) / len(folded_sql), threshold, True)
+
+
 def readiness_gate(
     thresholds: "dict[str, tuple[float, float, bool]]",
     invariant_violations: "dict[str, list[str]]",
     schema_ambiguities: "dict[str, list[str]]",
     ambiguity_acknowledged: bool,
+    required_checks: "tuple[str, ...]" = REQUIRED_CHECKS,
 ) -> GateResult:
     """thresholds: {name: (actual, threshold, is_blocking)}."""
     blocked = False
     lines: "list[str]" = []
+
+    missing = [name for name in required_checks if name not in thresholds]
+    if missing:
+        blocked = True
+        lines.append(
+            f"[X] gate_integrity: required check(s) missing from gate inputs: "
+            f"{', '.join(missing)} — BLOCKED"
+        )
 
     for name, (actual, threshold, is_blocking) in thresholds.items():
         status = "PASS" if actual >= threshold else ("BLOCKED" if is_blocking else "WARNING")

@@ -103,9 +103,9 @@ try:
     from pythonnet import load
     try:
         load("coreclr")
-    except Exception:
-        pass  # Already initialized — that's fine
-    import clr
+    except Exception:  # noqa: BLE001, S110 — idempotent init: already-loaded runtime throws, which is fine
+        pass
+    import clr  # noqa: F401 — probe: importing proves pythonnet + CLR are usable
     print("[+] pythonnet loaded successfully")
 except ImportError:
     print("[X] FATAL: pythonnet not installed.")
@@ -117,7 +117,6 @@ DLL_PATH = "/lakehouse/default/Files/sql-query-agent/libs/Microsoft.SqlServer.Tr
 if os.path.exists(DLL_PATH):
     from System.Reflection import Assembly
     Assembly.LoadFrom(DLL_PATH)
-    from Microsoft.SqlServer.TransactSql.ScriptDom import TSql160Parser
     print(f"[+] ScriptDom DLL loaded: {DLL_PATH}")
 else:
     print(f"[X] FATAL: ScriptDom DLL not found at: {DLL_PATH}")
@@ -132,7 +131,7 @@ if os.path.exists(CONFIG_PATH):
     try:
         config = load_config(CONFIG_PATH)
         print(f"[+] Configuration loaded: org = '{config.org.name}'")
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001 — any config defect is FATAL with the message
         print(f"[X] FATAL: org_config.yaml is invalid: {e}")
         raise SystemExit("Installation cannot proceed.")
 else:
@@ -153,7 +152,7 @@ for name, path in required_folders.items():
         print(f"[+] Folder {name}/: {file_count} files")
     else:
         print(f"[X] FATAL: Folder not found: {path}")
-        print(f"    Create this folder in your Lakehouse under Files/sql-query-agent/")
+        print("    Create this folder in your Lakehouse under Files/sql-query-agent/")
         raise SystemExit("Installation cannot proceed.")
 
 print("\n" + "=" * 60)
@@ -205,7 +204,7 @@ for root, dirs, files in os.walk(SQL_DIR):
                 print(f"  [!] No CREATE PROCEDURE/VIEW found in {fname} — using filename as metric_id")
             sql_rows.append((metric_id, display_name, sql_content, None, None, source_type, source_schema))
             identity_files.append((metric_id, os.path.relpath(filepath, SQL_DIR)))
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001 — recorded in `skipped`, reported below
             skipped.append((fname, str(e)))
 
 if not sql_rows:
@@ -227,6 +226,7 @@ if collisions:
     raise SystemExit("Installation cannot proceed — resolve duplicate identities first.")
 
 from src.schemas import SQL_SOURCES, to_spark_schema
+
 sql_df = spark.createDataFrame(sql_rows, schema=to_spark_schema(SQL_SOURCES))
 sql_df.write.format("delta").mode("overwrite").option("overwriteSchema", "true") \
     .saveAsTable("input_sql_sources")
@@ -236,7 +236,7 @@ schemas_found = set(r[6] for r in sql_rows if r[6])
 print(f"    Schemas found: {', '.join(sorted(schemas_found)) if schemas_found else 'none'}")
 if skipped:
     print(f"[!] Skipped {len(skipped)} files: {', '.join(f[0] for f in skipped)}")
-print(f"\n    Sample metric IDs:")
+print("\n    Sample metric IDs:")
 for row in sql_rows[:5]:
     print(f"      {row[0]} (name: {row[1]})")
 if len(sql_rows) > 5:
@@ -344,15 +344,15 @@ else:
 # %% Cell 3: Seed installation errors knowledge base
 print("\n--- Seeding installation errors knowledge base ---")
 
-from src.schemas import INSTALLATION_ERRORS, to_spark_schema
 from src.governance.installation_errors import ERROR_SEEDS
+from src.schemas import INSTALLATION_ERRORS, to_spark_schema
 
 try:
     errors_df = spark.createDataFrame(ERROR_SEEDS, schema=to_spark_schema(INSTALLATION_ERRORS))
     errors_df.write.format("delta").mode("overwrite").option("overwriteSchema", "true") \
         .saveAsTable("ops_installation_errors")
     print(f"[+] Seeded {len(ERROR_SEEDS)} known error signatures into ops_installation_errors")
-except Exception as e:
+except Exception as e:  # noqa: BLE001 — degraded /troubleshoot only; consequence stated
     print(f"[!] WARNING: Could not seed installation errors: {e}")
     print("    The /troubleshoot command may not work. Non-blocking.")
 
@@ -388,8 +388,12 @@ try:
                 "CASE", "WHEN", "THEN", "ELSE", "IN", "IS", "LIKE",
             ) and not name.startswith("#"):
                 sql_table_refs.add(name.upper())
-except Exception:
-    pass
+except Exception as e:  # noqa: BLE001 — preview only; says so and names the real gate
+    # This is a rough regex PREVIEW of coverage at install time. Its failure
+    # must be visible but not fatal — 06_validate's dictionary_coverage is
+    # the authoritative, blocking check (audit 2026-08-15).
+    print(f"[!] WARNING: coverage preview failed ({e}) — continuing; "
+          "06_validate runs the authoritative dictionary_coverage gate")
 
 if sql_table_refs:
     dict_table_names = set(
@@ -438,28 +442,28 @@ dict_c_count = spark.table("input_dict_columns").count()
 print(f"  SQL sources loaded:     {sql_count}")
 print(f"  Dictionary tables:      {dict_t_count}")
 print(f"  Dictionary columns:     {dict_c_count}")
-print(f"  ScriptDom DLL:          OK")
+print("  ScriptDom DLL:          OK")
 print(f"  Configuration:          {config.org.name}")
-print(f"  Environment:            OK")
+print("  Environment:            OK")
 
 all_ok = sql_count > 0 and dict_t_count > 0 and dict_c_count > 0
 
 if all_ok:
-    print(f"\n  >>> INSTALLATION COMPLETE <<<")
-    print(f"\n  Next steps:")
-    print(f"  1. Run 02_parse     — parses SQL files with ScriptDom")
-    print(f"  2. Run 03_build_graph — builds knowledge graph")
-    print(f"  3. Run 04_build_metric_logic — flattens graph for Data Agent")
-    print(f"  4. Run 05_export_graph_tables — exports LPG tables")
-    print(f"  5. Run 06_validate  — validates pipeline health")
+    print("\n  >>> INSTALLATION COMPLETE <<<")
+    print("\n  Next steps:")
+    print("  1. Run 02_parse     — parses SQL files with ScriptDom")
+    print("  2. Run 03_build_graph — builds knowledge graph")
+    print("  3. Run 04_build_metric_logic — flattens graph for Data Agent")
+    print("  4. Run 05_export_graph_tables — exports LPG tables")
+    print("  5. Run 06_validate  — validates pipeline health")
 else:
-    print(f"\n  >>> INSTALLATION INCOMPLETE <<<")
+    print("\n  >>> INSTALLATION INCOMPLETE <<<")
     if sql_count == 0:
-        print(f"  [X] No SQL files loaded — check sql_input/ folder")
+        print("  [X] No SQL files loaded — check sql_input/ folder")
     if dict_t_count == 0:
-        print(f"  [X] No dictionary tables — check dictionary/dict_tables.csv")
+        print("  [X] No dictionary tables — check dictionary/dict_tables.csv")
     if dict_c_count == 0:
-        print(f"  [X] No dictionary columns — check dictionary/dict_columns.csv")
+        print("  [X] No dictionary columns — check dictionary/dict_columns.csv")
 
 # METADATA ********************
 

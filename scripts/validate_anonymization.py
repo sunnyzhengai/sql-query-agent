@@ -70,24 +70,24 @@ class ValidationResult:
 
     def print_summary(self):
         print(f"\n{'=' * 60}")
-        print(f"VALIDATION RESULTS")
+        print("VALIDATION RESULTS")
         print(f"{'=' * 60}")
         print(f"  Passed: {len(self.info)}")
         print(f"  Warnings: {len(self.warnings)}")
         print(f"  Errors: {len(self.errors)}")
 
         if self.warnings:
-            print(f"\n--- WARNINGS ---")
+            print("\n--- WARNINGS ---")
             for w in self.warnings:
                 print(f"  ⚠ {w}")
 
         if self.errors:
-            print(f"\n--- ERRORS ---")
+            print("\n--- ERRORS ---")
             for e in self.errors:
                 print(f"  ✗ {e}")
 
         if not self.errors and not self.warnings:
-            print(f"\n  All checks passed.")
+            print("\n  All checks passed.")
 
 
 def load_dict_tables() -> dict[str, str]:
@@ -188,7 +188,8 @@ def check_dict_to_sql(result: ValidationResult):
             unused.append(table_name)
 
     if unused:
-        result.warn(f"Dict→SQL: {len(unused)} dictionary tables not referenced in any SQL: {', '.join(sorted(unused)[:10])}{'...' if len(unused) > 10 else ''}")
+        result.warn(f"Dict→SQL: {len(unused)} dictionary tables not referenced in any SQL: "
+                    f"{', '.join(sorted(unused)[:10])}{'...' if len(unused) > 10 else ''}")
     else:
         result.ok(f"Dict→SQL: All {len(dict_tables)} dictionary tables referenced in SQL")
 
@@ -214,9 +215,10 @@ def check_columns_have_tables(result: ValidationResult):
     orphan_tables = [t for t in dict_columns if t not in dict_tables]
 
     if orphan_tables:
-        result.error(f"Columns→Tables: {len(orphan_tables)} column tables not in dict_tables: {', '.join(sorted(orphan_tables))}")
+        result.error(f"Columns→Tables: {len(orphan_tables)} column tables not in dict_tables: "
+                     f"{', '.join(sorted(orphan_tables))}")
     else:
-        result.ok(f"Columns→Tables: All column entries have matching table entries")
+        result.ok("Columns→Tables: All column entries have matching table entries")
 
 
 def check_proc_names_match_files(result: ValidationResult):
@@ -234,7 +236,7 @@ def check_proc_names_match_files(result: ValidationResult):
         for m in mismatches:
             result.error(f"Proc→File: {m}")
     else:
-        result.ok(f"Proc→File: All proc names match filenames")
+        result.ok("Proc→File: All proc names match filenames")
 
 
 def check_proprietary_terms_sql(result: ValidationResult):
@@ -256,7 +258,7 @@ def check_proprietary_terms_sql(result: ValidationResult):
         if len(hits) > 20:
             result.error(f"Proprietary: ... and {len(hits) - 20} more")
     else:
-        result.ok(f"Proprietary: No vendor/org terms found in SQL files")
+        result.ok("Proprietary: No vendor/org terms found in SQL files")
 
 
 def check_proprietary_terms_dict(result: ValidationResult):
@@ -282,7 +284,7 @@ def check_proprietary_terms_dict(result: ValidationResult):
         if len(hits) > 20:
             result.error(f"Dict Proprietary: ... and {len(hits) - 20} more")
     else:
-        result.ok(f"Dict Proprietary: No vendor/org terms found in dictionary files")
+        result.ok("Dict Proprietary: No vendor/org terms found in dictionary files")
 
 
 def check_sql_syntax(result: ValidationResult):
@@ -341,7 +343,7 @@ def check_table_name_consistency(result: ValidationResult):
         if len(unique_issues) > 15:
             result.warn(f"Case: ... and {len(unique_issues) - 15} more")
     else:
-        result.ok(f"Case: Table name casing consistent between SQL and dictionary")
+        result.ok("Case: Table name casing consistent between SQL and dictionary")
 
 
 def main():

@@ -53,8 +53,8 @@ After running, create a Graph Model in the Fabric UI:
 """
 
 # %% Cell 0: Setup
-import json
 import sys
+
 # If the wheel is installed via Fabric Environment, src is already importable.
 # Fallback to sys.path for dev mode or non-wheel deployments.
 try:
@@ -66,8 +66,6 @@ print(f"v{src.__version__}")
 
 from src.config import load_config
 from src.schemas import (
-    GRAPH_CANONICAL, GRAPH_DIMENSION, GRAPH_EDGE_C2T, GRAPH_EDGE_T2T,
-    GRAPH_EDGE_T2TECH, GRAPH_EDGE_TECH2DIM, GRAPH_TECHNICAL, GRAPH_TRANSFORMATION,
     to_spark_schema,
 )
 
@@ -85,6 +83,16 @@ config = load_config("/lakehouse/default/Files/sql-query-agent/org_config.yaml")
 
 
 # %% Cell 1: Load graph nodes and edges from Delta
+from src.steps.gates import precondition_gate
+
+# Required inputs must exist (and be non-empty where the contract says so)
+# BEFORE work starts — a missing table fails with a message naming the
+# producing notebook, not a pyspark stack trace. Registry-driven; see
+# src/steps/gates.py.
+precondition_gate("05_export_graph_tables", table_exists=spark.catalog.tableExists,
+                  count=lambda t: spark.table(t).count())
+
+
 nodes_rows = [r.asDict() for r in spark.table(config.lakehouse.graph_nodes).collect()]
 edges_rows = [r.asDict() for r in spark.table(config.lakehouse.graph_edges).collect()]
 print(f"Loaded {len(nodes_rows)} nodes, {len(edges_rows)} edges from Delta")

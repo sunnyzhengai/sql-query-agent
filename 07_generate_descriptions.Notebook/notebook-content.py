@@ -52,6 +52,7 @@ the step descriptions.
 
 # %% Cell 0: Setup
 import sys
+
 try:
     import src
 except ImportError:
@@ -59,7 +60,6 @@ except ImportError:
     import src
 print(f"v{src.__version__}")
 
-import json
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -101,34 +101,30 @@ def describe(prompt: str) -> str:
 # CELL ********************
 
 # %% Cell 1: Load graph + cache, run the bottom-up walk
-import json as _json
+
+# Registry-driven precondition gate — includes ops_phi_findings: descriptions
+# must never be generated without the steward-reviewed PHI findings (ADR 0025).
+from src.steps.gates import precondition_gate
+
+precondition_gate("07_generate_descriptions", table_exists=spark.catalog.tableExists,
+                  count=lambda t: spark.table(t).count())
+
 
 from src.descriptions import generate_descriptions
-from src.phi_scan import from_records, redact_node_fragments, scan_sql
+from src.phi_scan import from_records, redact_node_fragments
 
 nodes_rows = [r.asDict() for r in spark.table("graph_nodes").collect()]
 edges_rows = [r.asDict() for r in spark.table("graph_edges").collect()]
 
-# PHI gate (ADR 0025): fragments are redacted BEFORE any prompt is built.
-# Normal path: findings written by 02_parse (carries steward dispositions).
-# Fallback: 02 hasn't scanned yet — scan fragments inline; the gate never
-# silently disappears. Redaction changes content hashes, so affected
-# steps regenerate once, then re-cache.
-if spark.catalog.tableExists("ops_phi_findings"):
-    phi_findings = from_records(
-        [r.asDict() for r in spark.table("ops_phi_findings").collect()]
-    )
-else:
-    print("[!] ops_phi_findings missing — rerun 02_parse to persist findings; "
-          "scanning fragments inline for this run")
-    phi_findings = []
-    for row in nodes_rows:
-        if row["layer"] != "transformation":
-            continue
-        props = _json.loads(row["properties"]) if isinstance(row["properties"], str) else row["properties"]
-        phi_findings.extend(
-            scan_sql(props.get("metric_id", ""), props.get("sql_fragment") or "")
-        )
+# PHI gate (ADR 0025): fragments are redacted BEFORE any prompt is built,
+# using the findings 02_parse persisted (which carry steward dispositions —
+# a steward's 'redact' decision must hold here). 02 always writes the table,
+# even when empty, so absence means 02 never ran: STOP. The old inline
+# rescan silently dropped dispositions right before text left for an
+# external LLM endpoint (audit 2026-08-15).
+phi_findings = from_records(
+    [r.asDict() for r in spark.table("ops_phi_findings").collect()]
+)
 redacted_count = redact_node_fragments(nodes_rows, phi_findings)
 print(f"PHI gate: {len(phi_findings)} findings, {redacted_count} fragments redacted")
 

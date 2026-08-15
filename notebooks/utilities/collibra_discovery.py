@@ -4,11 +4,12 @@
 
 # %% Cell 1: Connect and discover
 import sys
+
 sys.path.insert(0, "/lakehouse/default/Files/sql-query-agent")
 # For local: sys.path.insert(0, ".")
 
-from src.config import load_config
 from src.adapters.collibra_lineage import CollibraClient
+from src.config import load_config
 
 config = load_config()
 collibra_cfg = config.adapters.collibra

@@ -82,8 +82,21 @@ class GraphBuilder:
             return exact_id
 
         candidates = self._table_name_index.get(fold_identifier(table_ref.table), set())
+        if len(candidates) > 1:
+            # Ambiguous bare-name match (same table in multiple schemas).
+            # Deterministic pick (sorted) so two runs of identical input give
+            # identical graphs — set iteration order made lineage differ
+            # between runs (audit 2026-08-15). The 06 schema-ambiguity gate
+            # (ADR 0016) blocks deployment unless the admin acknowledged
+            # this; refuse-over-guess at build time is tracked as follow-up.
+            chosen = sorted(candidates)[0]
+            logger.warning(
+                "Ambiguous table reference %r matches %d nodes (%s) — using %s",
+                table_ref.table, len(candidates), ", ".join(sorted(candidates)), chosen,
+            )
+            return chosen
         if candidates:
-            return next(iter(candidates))  # return first match
+            return next(iter(candidates))
 
         return None
 

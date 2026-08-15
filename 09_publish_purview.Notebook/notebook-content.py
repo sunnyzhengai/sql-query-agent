@@ -27,6 +27,7 @@ Prerequisites:
 
 # %% Cell 0: Setup
 import sys
+
 try:
     import src
 except ImportError:
@@ -35,6 +36,7 @@ except ImportError:
 print(f"v{src.__version__}")
 
 from src.config import load_config
+
 config = load_config("/lakehouse/default/Files/sql-query-agent/org_config.yaml")
 
 if not config.adapters or not config.adapters.purview:
@@ -59,6 +61,16 @@ print(f"Collection: {purview_cfg.collection_name or '(default)'}")
 # CELL ********************
 
 # %% Cell 1: Test Purview connection
+from src.steps.gates import precondition_gate
+
+# Required inputs must exist (and be non-empty where the contract says so)
+# BEFORE work starts — a missing table fails with a message naming the
+# producing notebook, not a pyspark stack trace. Registry-driven; see
+# src/steps/gates.py.
+precondition_gate("09_publish_purview", table_exists=spark.catalog.tableExists,
+                  count=lambda t: spark.table(t).count())
+
+
 from src.adapters.purview import PurviewAdapter, PurviewConfig
 
 # Auth via service principal (tenant_id + client_id + client_secret in org_config.yaml)
@@ -194,7 +206,7 @@ print(f"[+] gov_publish_log: {len(log_rows)} rows appended")
 
 # %% Cell 4: Summary
 print(f"\n{'=' * 60}")
-print(f"PURVIEW PUBLISH SUMMARY")
+print("PURVIEW PUBLISH SUMMARY")
 print(f"{'=' * 60}")
 print(f"  Purview account:    {purview_cfg.account_name}")
 print(f"  Collection:         {purview_cfg.collection_name or '(default)'}")
@@ -202,7 +214,7 @@ print(f"  Metrics published:  {succeeded}/{len(records)}")
 print(f"  Failed:             {failed}")
 if succeeded > 0:
     print(f"\n  Verify in Purview: https://{purview_cfg.account_name}.purview.azure.com")
-    print(f"  Search for any metric name (e.g., 'USP_Severe_Sepsis') to see the catalog entry.")
+    print("  Search for any metric name (e.g., 'USP_Severe_Sepsis') to see the catalog entry.")
 
 # METADATA ********************
 

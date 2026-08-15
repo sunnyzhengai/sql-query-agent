@@ -30,7 +30,9 @@ jobs:
 
       - name: Lint with ruff
         run: |
-          ruff check src/ tests/
+          # Everything: production notebooks live in *.Notebook/, and unlinted
+          # notebooks/scripts once hid a 100%-broken MERGE (audit 2026-08-15)
+          ruff check src/ tests/ notebooks/ scripts/ devtools/ ./*.Notebook/
 
       - name: Run tests
         run: |

@@ -7,7 +7,6 @@ In Fabric: create a new Notebook, copy each cell, attach to your Lakehouse, run 
 """
 
 # %% Cell 1: Setup
-import json
 import sys
 
 sys.path.insert(0, "/lakehouse/default/Files/sql-query-agent")
@@ -29,19 +28,21 @@ print(f"Connected to {config.extractor.sql_server.host}/{config.extractor.sql_se
 print(f"Domain filter — schemas: {config.extractor.domain.schemas}, base_tables: {config.extractor.domain.base_tables}")
 
 # %% Cell 3: Load existing tracking data
+# Existence checked explicitly — Cell 7 overwrites the tracking table, so a
+# swallowed read error would reset change tracking (audit 2026-08-15).
 tracking_records = []
-try:
-    tracking_df = spark.table(config.extractor.tracking_table)  # noqa: F821
+if spark.catalog.tableExists(config.extractor.tracking_table):
+    tracking_df = spark.table(config.extractor.tracking_table)
     tracking_records = [row.asDict() for row in tracking_df.collect()]
     print(f"Loaded {len(tracking_records)} existing tracking records")
-except Exception:
+else:
     print("No existing tracking table found — starting fresh")
 
 # %% Cell 4: Run extraction
 extractor = ViewExtractor(conn, config.extractor.domain)
 result = extractor.extract(existing_tracking=tracking_records)
 
-print(f"\n=== Extraction Summary ===")
+print("\n=== Extraction Summary ===")
 print(result.summary)
 
 # %% Cell 5: Review new and changed objects before committing
@@ -84,11 +85,15 @@ if result.sql_sources:
     ]
     new_df = spark.createDataFrame(new_rows, schema=sql_sources_schema)  # noqa: F821
 
-    # Merge: upsert by metric_id (update if exists, insert if new)
+    # Upsert by metric_id. Existence is checked EXPLICITLY: the old version
+    # caught every MERGE failure as "table doesn't exist" and blind-appended,
+    # duplicating every row on re-runs — and its SQL contained a stray
+    # comment inside the f-string that made the MERGE fail 100% of the time
+    # (audit 2026-08-15). A real MERGE failure now raises.
     new_df.createOrReplaceTempView("new_sql_sources")
 
-    try:
-        spark.sql(f"""  # noqa: F821
+    if spark.catalog.tableExists(config.lakehouse.sql_sources):
+        spark.sql(f"""
             MERGE INTO {config.lakehouse.sql_sources} AS target
             USING new_sql_sources AS source
             ON target.metric_id = source.metric_id
@@ -96,15 +101,13 @@ if result.sql_sources:
             WHEN NOT MATCHED THEN INSERT *
         """)
         print(f"Merged {len(result.sql_sources)} sql_sources records")
-    except Exception:
-        # If table doesn't exist yet, create it
-        new_df.write.format("delta").mode("append").saveAsTable(config.lakehouse.sql_sources)
-        print(f"Created sql_sources table with {len(result.sql_sources)} records")
+    else:
+        new_df.write.format("delta").saveAsTable(config.lakehouse.sql_sources)
+        print(f"Created {config.lakehouse.sql_sources} with {len(result.sql_sources)} records")
 else:
     print("Nothing to write — all objects unchanged")
 
 # %% Cell 7: Update tracking table
-from pyspark.sql.types import TimestampType  # noqa: E402
 
 tracking_schema = StructType([
     StructField("object_id", StringType(), False),
@@ -131,7 +134,7 @@ print(f"Updated tracking table: {len(result.tracking_records)} records")
 # %% Cell 8: Summary
 current = sum(1 for r in result.tracking_records if r["status"] == "current")
 deleted = sum(1 for r in result.tracking_records if r["status"] == "deleted")
-print(f"\n=== Tracking Summary ===")
+print("\n=== Tracking Summary ===")
 print(f"  Current: {current}")
 print(f"  Deleted: {deleted}")
-print(f"\nNext step: run the Orchestrator notebook to rebuild the graph with the new sql_sources.")
+print("\nNext step: run the Orchestrator notebook to rebuild the graph with the new sql_sources.")

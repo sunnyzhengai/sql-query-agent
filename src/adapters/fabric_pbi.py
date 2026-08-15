@@ -154,7 +154,7 @@ class FabricPBIUpdater:
                     status="failed",
                     message=f"HTTP {resp.status_code}: {resp.text[:200]}",
                 )
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001 — failure becomes PublishResult(FAILED) with the message
             return UpdateResult(
                 report_id=report_id, report_name="",
                 status="failed", message=str(e),

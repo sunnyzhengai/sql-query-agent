@@ -53,7 +53,7 @@ class CollibraClient:
         try:
             self._get("users/current")
             return True
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001 — interactive discovery tool; failure printed to operator
             print(f"Connection failed: {e}")
             return False
 
@@ -189,7 +189,7 @@ class CollibraClient:
                 domain_info = self._get(f"domains/{domain_id}")
                 community = domain_info.get("community", {})
                 print(f"   Community: {community.get('name', 'N/A')} (ID: {community.get('id', 'N/A')})")
-            except Exception:
+            except Exception:  # noqa: BLE001 — interactive discovery tool; failure printed to operator
                 print("   Community: could not resolve from domain")
 
         # 5. List relations on this asset

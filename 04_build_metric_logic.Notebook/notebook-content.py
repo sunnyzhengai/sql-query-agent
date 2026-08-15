@@ -38,6 +38,7 @@ Flattens the graph into a single table the Data Agent can query.
 # %% Cell 0: Setup
 # Prerequisites: Attach 'sql-logic-env' Fabric Environment. No %pip install.
 import sys
+
 # If the wheel is installed via Fabric Environment, src is already importable.
 # Fallback to sys.path for dev mode or non-wheel deployments.
 try:
@@ -64,6 +65,16 @@ config = load_config("/lakehouse/default/Files/sql-query-agent/org_config.yaml")
 
 
 # %% Cell 1: Load graph and build metric_logic (logic in src/steps/metric_logic.py)
+from src.steps.gates import precondition_gate
+
+# Required inputs must exist (and be non-empty where the contract says so)
+# BEFORE work starts — a missing table fails with a message naming the
+# producing notebook, not a pyspark stack trace. Registry-driven; see
+# src/steps/gates.py.
+precondition_gate("04_build_metric_logic", table_exists=spark.catalog.tableExists,
+                  count=lambda t: spark.table(t).count())
+
+
 from src.steps.metric_logic import metric_logic_step
 
 nodes_rows = [r.asDict() for r in spark.table(config.lakehouse.graph_nodes).collect()]

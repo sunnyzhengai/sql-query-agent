@@ -17,8 +17,8 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from devtools.grounding_evals import _load_dotenv  # noqa: E402
 from devtools.graph_agent import LocalGraphAgent  # noqa: E402
+from devtools.grounding_evals import _load_dotenv  # noqa: E402
 from devtools.local_llm import chat_completion  # noqa: E402
 from src.graph.templates import GraphView  # noqa: E402
 from src.steps.build_graph import build_graph_step  # noqa: E402

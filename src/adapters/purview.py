@@ -97,7 +97,7 @@ class PurviewAdapter:
                 "Authorization": f"Bearer {token.token}",
                 "Content-Type": "application/json",
             }
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001 — failure becomes PublishResult(FAILED) with the message
             raise RuntimeError(
                 f"No auth method available for Purview. Provide access_token, "
                 f"service principal credentials, or install azure-identity. Error: {e}"
@@ -113,7 +113,7 @@ class PurviewAdapter:
                 timeout=10,
             )
             return resp.status_code == 200
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001 — failure becomes PublishResult(FAILED) with the message
             logger.error(f"Purview connection test failed: {e}")
             return False
 
@@ -148,7 +148,7 @@ class PurviewAdapter:
                     status=PublishStatus.FAILED,
                     message=f"HTTP {resp.status_code}: {resp.text[:200]}",
                 )
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001 — failure becomes PublishResult(FAILED) with the message
             return PublishResult(
                 asset_id=record.asset_id,
                 status=PublishStatus.FAILED,

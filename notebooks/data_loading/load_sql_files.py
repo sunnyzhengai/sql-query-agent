@@ -27,11 +27,13 @@ SQL_FOLDERS = [
 SQL_SOURCES_OUTPUT = "input_sql_sources"
 
 # %% Cell 2: Read SQL files from all folders, combine, and save
-from pyspark.sql.functions import input_file_name, regexp_extract, lit
 from functools import reduce
+
 from pyspark.sql import DataFrame
+from pyspark.sql.functions import input_file_name, lit, regexp_extract
 
 all_dfs = []
+failed_folders = []
 
 for folder in SQL_FOLDERS:
     path = folder["path"]
@@ -62,8 +64,18 @@ for folder in SQL_FOLDERS:
         all_dfs.append(folder_df)
         print(f"  {path.split('/')[-1]}: {count} SQL files ({source_type}, {schema})")
 
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001 — collected below; partial loads must not overwrite
+        failed_folders.append((path, str(e)))
         print(f"  {path.split('/')[-1]}: ERROR — {e}")
+
+# A partial load must NOT overwrite input_sql_sources — losing folders
+# silently shrinks the corpus and every downstream count still "passes"
+# (audit 2026-08-15). Fix the failing folder or remove it from SQL_FOLDERS.
+if failed_folders:
+    raise RuntimeError(
+        f"{len(failed_folders)} folder(s) failed to load: "
+        + "; ".join(f"{p} ({e})" for p, e in failed_folders)
+    )
 
 # Combine all folders and save
 if all_dfs:
@@ -72,7 +84,8 @@ if all_dfs:
     print(f"\nTotal: {total} SQL files from {len(all_dfs)} folders")
 
     # Save to Delta table
-    combined_df.write.format("delta").mode("overwrite").option("overwriteSchema", "true").saveAsTable(SQL_SOURCES_OUTPUT)
+    combined_df.write.format("delta").mode("overwrite") \
+        .option("overwriteSchema", "true").saveAsTable(SQL_SOURCES_OUTPUT)
     print(f"Saved {total} records to {SQL_SOURCES_OUTPUT}")
 else:
     print("ERROR: No SQL files found in any folder")

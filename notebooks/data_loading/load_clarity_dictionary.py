@@ -7,12 +7,14 @@ Run this before load_caboodle_dictionary.py (which merges on top).
 """
 
 # %% Cell 0: Setup
-%pip install pydantic pyyaml
+# Prerequisites: Attach the 'sql-logic-env' Fabric Environment. No %pip install.
 
 import sys
+
 sys.path.insert(0, "/lakehouse/default/Files/sql-query-agent")
 
 from src.config import load_config
+
 config = load_config("/lakehouse/default/Files/sql-query-agent/org_config.yaml")
 
 # %% Cell 1: Configuration
@@ -56,10 +58,12 @@ dict_columns_df.show(5, truncate=80)
 
 # %% Cell 4: Save as Delta tables
 dict_tables_out = dict_tables_df.select("TABLE_NAME", "DESCRIPTION")
-dict_tables_out.write.format("delta").mode("overwrite").option("overwriteSchema", "true").saveAsTable(DICT_TABLES_OUTPUT)
+dict_tables_out.write.format("delta").mode("overwrite") \
+    .option("overwriteSchema", "true").saveAsTable(DICT_TABLES_OUTPUT)
 print(f"Saved {dict_tables_out.count()} rows to {DICT_TABLES_OUTPUT}")
 
-dict_columns_df.write.format("delta").mode("overwrite").option("overwriteSchema", "true").saveAsTable(DICT_COLUMNS_OUTPUT)
+dict_columns_df.write.format("delta").mode("overwrite") \
+    .option("overwriteSchema", "true").saveAsTable(DICT_COLUMNS_OUTPUT)
 print(f"Saved {dict_columns_df.count()} rows to {DICT_COLUMNS_OUTPUT}")
 
 # %% Cell 5: Verify

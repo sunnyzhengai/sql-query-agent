@@ -43,6 +43,7 @@ Run 03_build_graph.py at least once before this.
 # %% Cell 0: Setup
 import json
 import sys
+
 # If the wheel is installed via Fabric Environment, src is already importable.
 # Fallback to sys.path for dev mode or non-wheel deployments.
 try:
@@ -60,7 +61,12 @@ WORKSPACE_ID = config.fabric_graph.workspace_id
 AGENT_ID = config.fabric_graph.data_agent_id
 
 # %% Cell 1: Load graph from Delta
-from src.models import GraphNode, NodeLayer, GraphEdge, EdgeType
+from src.steps.gates import precondition_gate
+
+precondition_gate("08_publish_collibra", table_exists=spark.catalog.tableExists,
+                  count=lambda t: spark.table(t).count())
+
+from src.models import EdgeType, GraphEdge, GraphNode, NodeLayer
 
 nodes_df = spark.table(config.lakehouse.graph_nodes)
 edges_df = spark.table(config.lakehouse.graph_edges)
@@ -107,42 +113,42 @@ if len(pbi_metrics) > 5:
 
 # %% Cell 3: Generate business descriptions via Data Agent (incremental)
 import hashlib
+
 from src.adapters.fabric_agent import FabricAgentClient
 
-# mssparkutils is injected into notebook scope but not importable from modules
-token = mssparkutils.credentials.getToken("https://api.fabric.microsoft.com")
-
+# token_provider (not a one-shot token): re-fetched per request and forced
+# on 401, so >1hr generation runs survive token expiry. A static token here
+# once made 200 auth failures look like 200 content failures (audit
+# 2026-08-15). Same pattern as 11_refresh_search_index's Kusto client.
 agent = FabricAgentClient(
     workspace_id=WORKSPACE_ID,
     agent_id=AGENT_ID,
-    access_token=token,
+    token_provider=lambda: notebookutils.credentials.getToken("https://api.fabric.microsoft.com"),
 )
 
 tool_name = agent.discover_tool_name()
 print(f"Data Agent tool: {tool_name}")
 
-# Compute SQL hash for each _PBI metric from metric_logic
+# output_metric_logic is a REQUIRED input (04 writes it). A swallowed read
+# here once marked every metric "new" and re-generated all descriptions —
+# hours of Data Agent calls for nothing (audit 2026-08-15). Read errors
+# now raise; only confirmed ABSENCE of the optional cache means "generate all".
 sql_hashes = {}
-try:
-    ml_df = spark.table("output_metric_logic")
-    for row in ml_df.collect():
-        r = row.asDict()
-        logic = r.get("calculation_logic") or ""
-        sql_hashes[r["metric_name"]] = hashlib.sha256(logic.encode()).hexdigest()[:16]
-except Exception:
-    print("  metric_logic table not found — will generate all descriptions")
+for row in spark.table("output_metric_logic").collect():
+    r = row.asDict()
+    logic = r.get("calculation_logic") or ""
+    sql_hashes[r["metric_name"]] = hashlib.sha256(logic.encode()).hexdigest()[:16]
 
-# Load existing descriptions (if any)
+# Existing descriptions are an optional cache: absent on first run is fine.
 existing_descs = {}
 existing_hashes = {}
-try:
-    existing_df = spark.table("ops_agent_descriptions")
-    for row in existing_df.collect():
+if spark.catalog.tableExists("ops_agent_descriptions"):
+    for row in spark.table("ops_agent_descriptions").collect():
         r = row.asDict()
         existing_descs[r["metric_name"]] = r["description"]
         existing_hashes[r["metric_name"]] = r.get("sql_hash", "")
-except Exception:
-    print("  No existing agent_descriptions table — will generate all")
+else:
+    print("  No ops_agent_descriptions table yet (first run) — will generate all")
 
 # Determine which metrics need (re)generation
 needs_generation = []
@@ -164,7 +170,7 @@ print(f"  {len(needs_generation)} need generation")
 # Generate only for new/changed metrics, saving incrementally to Delta.
 # This ensures descriptions survive token expiry — just restart kernel
 # and re-run; already-generated descriptions will be skipped.
-from pyspark.sql.types import StructType, StructField, StringType
+from pyspark.sql.types import StringType, StructField, StructType
 
 REJECT_PHRASES = ["wasn't able to find", "couldn't find", "not found", "hasn't been", "I'm happy to help"]
 SAVE_EVERY = 25  # persist to Delta every N successful generations
@@ -216,7 +222,8 @@ if needs_generation:
         # Incremental save every SAVE_EVERY successes
         if unsaved_count >= SAVE_EVERY:
             saved = _save_all_descriptions(desc_lookup, sql_hashes)
-            print(f"  [{i+1}/{len(needs_generation)}] Saved {saved} total descriptions ({succeeded} new, {failed} failed)")
+            print(f"  [{i+1}/{len(needs_generation)}] Saved {saved} total descriptions "
+                  f"({succeeded} new, {failed} failed)")
             unsaved_count = 0
 
         # Progress log
@@ -266,9 +273,11 @@ client = CollibraClient(base, collibra_cfg.username, collibra_cfg.password)
 
 print("Testing connection...")
 if adapter.test_connection():
-    print("Connected to Collibra!")
+    print("[+] Connected to Collibra!")
 else:
-    print("Connection failed. Check org_config.yaml")
+    print("[X] Connection failed. Check base_url and credentials in org_config.yaml")
+    raise SystemExit("Cannot proceed without Collibra connection — a publish "
+                     "run against a dead adapter reports counts that look like work.")
 
 # Match _PBI metrics to Collibra reports
 objects = [{"object_name": name, "object_type": "SQL_STORED_PROCEDURE"} for name in desc_lookup]
@@ -343,7 +352,7 @@ failed = sum(1 for _, _, r in publish_results if r.status.value == "failed")
 skipped = len(match_result.matched) - len(publish_results)
 
 print(f"\n{'='*80}")
-print(f"PUBLISH SUMMARY")
+print("PUBLISH SUMMARY")
 print(f"{'='*80}")
 print(f"  Total canonical metrics: {len([n for n in nodes.values() if n.layer == NodeLayer.CANONICAL])}")
 print(f"  _PBI suffixed:           {len(pbi_metrics)}")

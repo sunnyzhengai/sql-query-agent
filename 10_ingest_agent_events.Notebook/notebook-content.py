@@ -51,10 +51,14 @@ EVENTS_DIR = "Files/agent_events"
 # %% Cell 1: Read every JSONL line under Files/agent_events
 import notebookutils  # noqa: F401  (Fabric runtime)
 
-try:
+# Existence is checked explicitly: "directory not created yet" is a normal
+# empty state, but a FAILED listing (permissions, renamed path) must raise —
+# the old catch-all reported it as "Nothing to ingest" and telemetry went
+# dark while every run printed success (audit 2026-08-15).
+if notebookutils.fs.exists(EVENTS_DIR):
     files = [f.path for f in notebookutils.fs.ls(EVENTS_DIR)
              if f.name.endswith(".jsonl")]
-except Exception:
+else:
     files = []
 
 lines = []
@@ -77,7 +81,7 @@ if not files:
 
 # %% Cell 2: Parse, dedupe against existing tables, append
 from src.schemas import FEEDBACK_EVENTS, TURN_EVENTS, to_spark_schema
-from src.steps.agent_events import dedupe_events, event_key, parse_agent_events
+from src.steps.agent_events import dedupe_events, parse_agent_events
 
 out = parse_agent_events(lines)
 print(f"Parsed: {len(out.turn_rows)} turn rows, "

@@ -151,3 +151,17 @@ def test_parse_result_legacy_string_table_refs():
     parsed = parse_result_to_parsed_sql(pr)
     assert parsed.ctes[0].table_refs[0].table == "legacy_table"
     assert parsed.final_select_tables[0].table == "another_table"
+
+
+def test_extraction_suppressed_roundtrip_and_legacy_default():
+    """extraction_suppressed must survive the 02->03 payload round-trip, and
+    legacy rows (recorded before the column existed) must read as 0."""
+    from src.parser.sql_parser import ParsedSQL
+
+    parsed = ParsedSQL(extraction_suppressed=3)
+    row = parsed_sql_to_parse_result_row("m1", "Metric One", parsed)
+    assert row["extraction_suppressed"] == 3
+    assert parse_result_to_parsed_sql(row).extraction_suppressed == 3
+
+    legacy_row = {k: v for k, v in row.items() if k != "extraction_suppressed"}
+    assert parse_result_to_parsed_sql(legacy_row).extraction_suppressed == 0

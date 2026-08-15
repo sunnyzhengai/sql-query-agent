@@ -25,11 +25,13 @@ SAMPLE = rows(
 
 class TestEntryEdge:
     def test_token_is_sanitized_single_line(self):
-        chat = lambda sys, usr: '  "cancelled\nappointments"  '
+        def chat(sys, usr):
+            return '  "cancelled\nappointments"  '
         assert produce_search_token("q?", chat) == "cancelled appointments"
 
     def test_token_length_capped(self):
-        chat = lambda sys, usr: "x " * 200
+        def chat(sys, usr):
+            return "x " * 200
         assert len(produce_search_token("q?", chat)) <= 120
 
 

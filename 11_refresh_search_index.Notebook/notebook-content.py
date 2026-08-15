@@ -121,6 +121,16 @@ for row in client.run('semantic_search("ED sepsis", 10)'):
 # CELL ********************
 
 # %% Cell 1: Rebuild the catalog Delta table from the fresh graph
+from src.steps.gates import precondition_gate
+
+# Required inputs must exist (and be non-empty where the contract says so)
+# BEFORE work starts — a missing table fails with a message naming the
+# producing notebook, not a pyspark stack trace. Registry-driven; see
+# src/steps/gates.py.
+precondition_gate("11_refresh_search_index", table_exists=spark.catalog.tableExists,
+                  count=lambda t: spark.table(t).count())
+
+
 from src.steps.semantic_catalog import build_semantic_catalog
 
 nodes_rows = [r.asDict() for r in spark.table("graph_nodes").collect()]

@@ -51,3 +51,5 @@ data/Collibra*
 llm_api_key.txt
 .DS_Store
 data/events/
+learning/
+private/

@@ -11,7 +11,7 @@ sys.path.insert(0, "/lakehouse/default/Files/sql-query-agent")
 
 from src.graph.builder import GraphBuilder
 from src.graph.traversal import GraphTraverser
-from src.models import GraphNode, GraphEdge, NodeLayer, EdgeType
+from src.models import EdgeType, GraphEdge, GraphNode, NodeLayer
 
 # %% Cell 2: Load graph
 nodes_df = spark.table("graph_nodes")
@@ -37,6 +37,7 @@ for row in edges_df.collect():
 traverser = GraphTraverser(builder.nodes, builder.edges)
 
 from collections import Counter
+
 layer_counts = Counter(n.layer.value for n in builder.nodes.values())
 print(f"Graph: {len(builder.nodes)} nodes, {len(builder.edges)} edges")
 print(f"  Canonical: {layer_counts.get('canonical', 0)}")
@@ -67,7 +68,7 @@ for e in builder.edges:
         metrics_with_edges.add(e.source_id.replace("canonical:", ""))
 
 total_canonical = sum(1 for n in builder.nodes.values() if n.layer == NodeLayer.CANONICAL)
-print(f"\n=== Coverage ===")
+print("\n=== Coverage ===")
 print(f"Total canonical: {total_canonical}")
 print(f"Traversable (have edges): {len(metrics_with_edges)}")
 print(f"No edges: {total_canonical - len(metrics_with_edges)}")
@@ -83,5 +84,5 @@ try:
 
     print("\nTop 5 errors by proc size:")
     spark.table("ops_parse_errors").orderBy("line_count", ascending=False).show(5, truncate=80)
-except Exception as e:
+except Exception as e:  # noqa: BLE001 — diagnostic utility; error printed with detail
     print(f"Parse results tables not found: {e}")

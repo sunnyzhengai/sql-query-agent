@@ -14,10 +14,21 @@ from scripts.seed_sample_data import (
 from src.parser.sql_parser import parse_sql
 from src.steps.build_graph import build_graph_step
 from src.steps.export import export_step
-from src.steps.gates import StepPostconditionError, postcondition_gate, tables_owned_by
+from src.steps.gates import (
+    StepPostconditionError,
+    StepPreconditionError,
+    postcondition_gate,
+    precondition_gate,
+    required_inputs,
+    tables_owned_by,
+)
 from src.steps.metric_logic import metric_logic_step
 from src.steps.parse import parse_step
-from src.steps.readiness import readiness_gate
+from src.steps.readiness import (
+    dictionary_coverage_threshold,
+    readiness_gate,
+    tech_table_names,
+)
 
 
 def _dict_rows():
@@ -156,6 +167,75 @@ class TestExportStep:
             assert shallow <= closure, f"{metric}: closure missing root-level tables"
 
 
+FAKE_REGISTRY = {
+    "input_a": {
+        "status": "active", "owner": {"notebook": "00_load"},
+        "consumers": ["01_step"], "must_be_nonempty": True,
+    },
+    "input_b": {
+        "status": "active", "owner": {"notebook": "00_load"},
+        "consumers": ["01_step"],
+    },
+    "optional_c": {
+        "status": "active", "owner": {"notebook": "90_util"},
+        "consumers": ["01_step"], "optional_input": True,
+    },
+    "self_state": {
+        "status": "active", "owner": {"notebook": "01_step"},
+        "consumers": ["01_step"],
+    },
+    "planned_d": {
+        "status": "planned", "owner": {"notebook": "00_load"},
+        "consumers": ["01_step"],
+    },
+}
+
+
+class TestPreconditionGate:
+    def test_required_inputs_derived_from_registry(self):
+        # self-reads, optional inputs, and non-active tables are excluded
+        assert required_inputs("01_step", FAKE_REGISTRY) == ["input_a", "input_b"]
+
+    def test_missing_table_names_producer_and_contract(self):
+        with pytest.raises(StepPreconditionError) as exc:
+            precondition_gate("01_step", table_exists=lambda t: t == "input_b",
+                              registry=FAKE_REGISTRY)
+        msg = str(exc.value)
+        assert "Preconditions failed for 01_step" in msg
+        assert "input_a missing — produced by 00_load" in msg
+        assert "contract:input_a" in msg
+        assert exc.value.failures[0]["producer"] == "00_load"
+
+    def test_empty_blocks_only_when_nonempty_required(self):
+        counts = {"input_a": 0, "input_b": 0}
+        with pytest.raises(StepPreconditionError) as exc:
+            precondition_gate("01_step", table_exists=lambda t: True,
+                              count=counts.get, registry=FAKE_REGISTRY)
+        msg = str(exc.value)
+        assert "input_a is empty" in msg
+        assert "input_b" not in msg  # emptiness is legal without the flag
+
+    def test_all_present_returns_checked(self):
+        checked = precondition_gate("01_step", table_exists=lambda t: True,
+                                    count=lambda t: 5, registry=FAKE_REGISTRY)
+        assert checked == ["input_a", "input_b"]
+
+    def test_production_registry_derivations(self):
+        # Pin the real registry's derivations for the steps we wire up —
+        # if a contract edit changes a step's required inputs, this fails.
+        assert required_inputs("03_build_graph") == [
+            "input_dict_columns", "input_dict_tables", "ops_parse_results",
+        ]
+        assert required_inputs("06_validate") == [
+            "graph_edges", "graph_nodes", "input_dict_tables",
+            "input_sql_sources", "ops_parse_errors", "ops_parse_successes",
+        ]
+        assert required_inputs("07_generate_descriptions") == [
+            "graph_edges", "graph_nodes", "ops_phi_findings",
+            "output_metric_logic",
+        ]
+
+
 class TestPostconditionGate:
     def test_gate_checks_owned_tables_and_passes_clean_state(self):
         assert set(tables_owned_by("02_parse")) == {
@@ -209,17 +289,76 @@ class TestPostconditionGate:
 class TestReadinessGate:
     def test_blocking_threshold_blocks(self):
         result = readiness_gate(
-            {"parse_rate": (0.5, 0.9, True)}, {}, {}, False)
+            {"parse_rate": (0.5, 0.9, True)}, {}, {}, False, required_checks=())
         assert result.blocked and any("BLOCKED" in line for line in result.lines)
 
     def test_ambiguity_blocks_unless_acknowledged(self):
         ambiguous = {"ENCOUNTER": ["REPORTING", "STAGING"]}
-        assert readiness_gate({}, {}, ambiguous, False).blocked
-        assert not readiness_gate({}, {}, ambiguous, True).blocked
+        assert readiness_gate({}, {}, ambiguous, False, required_checks=()).blocked
+        assert not readiness_gate({}, {}, ambiguous, True, required_checks=()).blocked
 
     def test_clean_inputs_are_ready(self):
-        result = readiness_gate({"parse_rate": (0.99, 0.9, True)}, {}, {}, False)
+        result = readiness_gate(
+            {"parse_rate": (0.99, 0.9, True)}, {}, {}, False, required_checks=())
         assert not result.blocked
+
+    # Gate-integrity contract: a required check may FAIL, but it may never
+    # silently DISAPPEAR from the gate (audit 2026-08-15: dictionary_coverage
+    # vanished inside a try/except and the gate printed DEPLOYMENT READY).
+    def test_missing_required_check_blocks(self):
+        result = readiness_gate(
+            {"parse_rate": (1.0, 0.9, True)}, {}, {}, False,
+            required_checks=("parse_rate", "dictionary_coverage"))
+        assert result.blocked
+        assert any("gate_integrity" in line and "dictionary_coverage" in line
+                   for line in result.lines)
+
+    def test_required_checks_default_on(self):
+        # Passing only one of the four default-required checks must block —
+        # safe-by-default means a forgetful caller cannot weaken the gate.
+        result = readiness_gate({"parse_rate": (1.0, 0.9, True)}, {}, {}, False)
+        assert result.blocked
+
+    def test_all_required_checks_present_and_passing_is_ready(self):
+        thresholds = {
+            "parse_rate": (0.99, 0.90, True),
+            "calculation_logic": (0.95, 0.80, True),
+            "traversal_coverage": (0.90, 0.70, False),
+            "dictionary_coverage": (0.95, 0.90, True),
+        }
+        assert not readiness_gate(thresholds, {}, {}, False).blocked
+
+
+class TestDictionaryCoverage:
+    def test_full_coverage_passes(self):
+        actual, threshold, blocking = dictionary_coverage_threshold(
+            {"ENCOUNTERS", "PATIENTS"}, {"encounters", "PATIENTS"})
+        assert actual == 1.0 and blocking
+
+    def test_partial_coverage_measured(self):
+        actual, _, _ = dictionary_coverage_threshold(
+            {"ENCOUNTERS"}, {"ENCOUNTERS", "ORPHAN_TABLE"})
+        assert actual == 0.5
+
+    def test_empty_graph_is_zero_not_skipped(self):
+        # The empty case is exactly when the gate matters most: it must
+        # measure 0.0 and block, never vanish.
+        actual, _, blocking = dictionary_coverage_threshold({"ENCOUNTERS"}, set())
+        assert actual == 0.0 and blocking
+
+
+class TestTechTableNames:
+    def test_extracts_from_json_string_and_dict_props(self):
+        nodes = [
+            {"node_id": "tech:dbo.encounters",
+             "properties": '{"schema": "dbo", "table": "ENCOUNTERS"}'},
+            {"node_id": "tech:dbo.patients",
+             "properties": {"schema": "dbo", "table": "Patients"}},
+            {"node_id": "tech:dbo.encounters.enc_id",
+             "properties": '{"table": "ENCOUNTERS", "column": "ENC_ID"}'},
+            {"node_id": "canonical:m1", "properties": "{}"},
+        ]
+        assert tech_table_names(nodes) == {"ENCOUNTERS", "PATIENTS"}
 
 
 def test_full_pipeline_runs_offline_through_step_functions():

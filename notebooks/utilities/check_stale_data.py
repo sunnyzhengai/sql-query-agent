@@ -1,4 +1,4 @@
-# Paste as a cell in any notebook after setup
+# Paste as a cell in any notebook after setup (tables: output_metric_logic, graph_nodes)
 # Checks if census reports have stale data from earlier runs
 
 # Check if census reports have descriptions that other metrics don't
@@ -7,7 +7,7 @@ spark.sql("""
            LENGTH(description) as desc_len,
            LENGTH(calculation_logic) as logic_len,
            source_tables
-    FROM metric_logic
+    FROM output_metric_logic
     WHERE metric_name LIKE '%Census%'
 """).show(truncate=100)
 
@@ -17,7 +17,7 @@ spark.sql("""
            LENGTH(description) as desc_len,
            LENGTH(calculation_logic) as logic_len,
            source_tables
-    FROM metric_logic
+    FROM output_metric_logic
     WHERE metric_name LIKE '%ED_CHART%'
 """).show(truncate=100)
 

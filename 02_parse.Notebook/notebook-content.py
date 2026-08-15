@@ -37,7 +37,6 @@ parse_results stores the full parsed output (CTEs as JSON) so
 
 # %% Cell 0: Setup
 # Prerequisites: Attach 'sql-logic-env' Fabric Environment. DO NOT use %pip install.
-import json
 import sys
 
 # If the wheel is installed via Fabric Environment, src is already importable.
@@ -51,25 +50,25 @@ print(f"v{src.__version__}")
 
 # Load pythonnet + ScriptDom directly (do not call load_scriptdom — it re-triggers init)
 from pythonnet import load
+
 try:
     load("coreclr")
-except Exception:
+except Exception:  # noqa: BLE001, S110 — idempotent init: already-loaded runtime throws, which is fine
     pass
 
-import clr
 from System.Reflection import Assembly
+
 Assembly.LoadFrom("/lakehouse/default/Files/sql-query-agent/libs/Microsoft.SqlServer.TransactSql.ScriptDom.dll")
 from Microsoft.SqlServer.TransactSql.ScriptDom import TSql160Parser
 from System.IO import StringReader
+
 print("ScriptDom loaded!")
 
 # Import parsing functions from src/ — all logic lives there, not in this notebook
-from src.parser.scriptdom_fabric import parse_from_fragment, extract_from_fragment
 from src.config import load_config
-from src.schemas import to_spark_schema
+from src.parser.scriptdom_fabric import extract_from_fragment, parse_from_fragment
 
 config = load_config("/lakehouse/default/Files/sql-query-agent/org_config.yaml")
-scriptdom_available = True
 
 
 def _parse_raw(raw_sql):
@@ -90,7 +89,7 @@ def extract_with_scriptdom(raw_sql):
     return extract_from_fragment(_parse_raw(raw_sql))
 
 
-print(f"ScriptDom ready: {scriptdom_available}")
+print("ScriptDom ready")
 
 
 def read_source(name_or_path):
@@ -113,6 +112,16 @@ def read_source(name_or_path):
 
 
 # %% Cell 1: Load SQL sources
+from src.steps.gates import precondition_gate
+
+# Required inputs must exist (and be non-empty where the contract says so)
+# BEFORE work starts — a missing table fails with a message naming the
+# producing notebook, not a pyspark stack trace. Registry-driven; see
+# src/steps/gates.py.
+precondition_gate("02_parse", table_exists=spark.catalog.tableExists,
+                  count=lambda t: spark.table(t).count())
+
+
 sql_sources_df = read_source(config.lakehouse.sql_sources)
 
 sql_sources_df = sql_sources_df.selectExpr(
@@ -123,7 +132,7 @@ sql_sources_df = sql_sources_df.selectExpr(
     "cast(null as string) as developer",
 )
 
-sql_sources = [row.asDict() for row in sql_sources_df.limit(50).collect()]  # Remove .limit(50) for full run
+sql_sources = [row.asDict() for row in sql_sources_df.collect()]
 print(f"Loaded {len(sql_sources)} SQL sources")
 
 
@@ -139,29 +148,35 @@ print(f"Loaded {len(sql_sources)} SQL sources")
 
 # %% Cell 2: Parse all sources (logic in src/steps/parse.py)
 import time as _time
-from src.parser.sql_parser import parse_sql
+
 from src.steps.parse import parse_step
 
-extractor_name = "ScriptDom (Option B)" if scriptdom_available else "sqlparse + sqlglot"
-print(f"Parsing SQL with {extractor_name}...")
-parse_fn = parse_with_scriptdom if scriptdom_available else parse_sql
+# ScriptDom only — no fallback parser. If ScriptDom failed to load, Cell 0
+# already stopped the run; degrading to a weaker parser silently thins the
+# graph (18 known extraction gaps in the sqlglot path).
+print("Parsing SQL with ScriptDom (Option B)...")
+parse_fn = parse_with_scriptdom
 
-# Previous run state (read BEFORE any writes) for regression detection
+# Previous run state (read BEFORE any writes) for regression detection.
+# Absence = first run (legit); a FAILED read must raise — a swallowed error
+# here silently disabled regression detection (audit 2026-08-15).
 previous_error_records, previous_success_ids = [], []
-try:
+if spark.catalog.tableExists("ops_error_log"):
     previous_error_records = [r.asDict() for r in spark.table("ops_error_log").collect()]
+if spark.catalog.tableExists("ops_parse_successes"):
     previous_success_ids = [r["metric_id"] for r in spark.table("ops_parse_successes").collect()]
-except Exception:
+if not previous_success_ids:
     print("No previous run history — regression detection starts next run")
 
 # Prior PHI findings carry steward dispositions forward (ADR 0025)
 previous_phi_records = []
-try:
+if spark.catalog.tableExists("ops_phi_findings"):
     previous_phi_records = [r.asDict() for r in spark.table("ops_phi_findings").collect()]
-except Exception:
+else:
     print("No previous PHI findings — first scan")
 
 from datetime import datetime, timezone
+
 start_time = _time.time()
 out = parse_step(
     sql_sources, parse_fn,
@@ -178,6 +193,20 @@ print(f"Parsed: {len(out.parse_successes)}/{len(sql_sources)} "
       f"({100 * len(out.parse_successes) // max(len(sql_sources), 1)}%)")
 print(f"Errors: {len(out.parse_errors)}")
 
+# Suppressed AST-walk exceptions: nonzero means refs may be MISSING from
+# procs that still count as parse successes. Loud here, per-proc in the row.
+suppressed_total = sum(r.get("extraction_suppressed") or 0 for r in out.parse_results)
+if suppressed_total:
+    worst = sorted(out.parse_results, key=lambda r: r.get("extraction_suppressed") or 0, reverse=True)[:5]
+    print(f"[!] {suppressed_total} AST extraction(s) suppressed across "
+          f"{sum(1 for r in out.parse_results if r.get('extraction_suppressed'))} procs — "
+          f"refs may be missing despite parse success. Worst:")
+    for r in worst:
+        if r.get("extraction_suppressed"):
+            print(f"    {r['metric_id']}: {r['extraction_suppressed']}")
+else:
+    print("[+] 0 suppressed AST extractions — every parsed ref was captured")
+
 
 # METADATA ********************
 
@@ -191,40 +220,45 @@ print(f"Errors: {len(out.parse_errors)}")
 
 # %% Cell 3: Save results to Delta and run the postcondition gate
 from src.schemas import (
-    ERROR_LOG, PARSE_ERRORS, PARSE_RESULTS, PARSE_SUCCESSES, PHI_FINDINGS,
+    ERROR_LOG,
+    PARSE_ERRORS,
+    PARSE_RESULTS,
+    PARSE_SUCCESSES,
+    PHI_FINDINGS,
     to_spark_schema,
 )
 from src.steps.gates import postcondition_gate
 
-if out.parse_results:
-    spark.createDataFrame(out.parse_results, schema=to_spark_schema(PARSE_RESULTS)) \
-        .write.format("delta").mode("overwrite").option("overwriteSchema", "true") \
-        .saveAsTable("ops_parse_results")
-    print(f"Saved {len(out.parse_results)} parse results to ops_parse_results")
+# Every outcome table is written UNCONDITIONALLY — an empty table means
+# "02 ran and found nothing", a missing table means "02 never ran". The old
+# write-only-if-nonempty made those two states indistinguishable downstream
+# (06 and 07 both mis-read absence; audit 2026-08-15).
+spark.createDataFrame(out.parse_results, schema=to_spark_schema(PARSE_RESULTS)) \
+    .write.format("delta").mode("overwrite").option("overwriteSchema", "true") \
+    .saveAsTable("ops_parse_results")
+print(f"Saved {len(out.parse_results)} parse results to ops_parse_results")
 
+spark.createDataFrame(out.parse_errors, schema=to_spark_schema(PARSE_ERRORS)) \
+    .write.format("delta").mode("overwrite").option("overwriteSchema", "true") \
+    .saveAsTable("ops_parse_errors")
+print(f"Saved {len(out.parse_errors)} parse errors to ops_parse_errors")
 if out.parse_errors:
-    spark.createDataFrame(out.parse_errors, schema=to_spark_schema(PARSE_ERRORS)) \
-        .write.format("delta").mode("overwrite").option("overwriteSchema", "true") \
-        .saveAsTable("ops_parse_errors")
-    print(f"Saved {len(out.parse_errors)} parse errors to ops_parse_errors")
     print("\nTop errors:")
     for e in sorted(out.parse_errors, key=lambda x: x["line_count"], reverse=True)[:5]:
         print(f"  {e['metric_id']} ({e['line_count']} lines): [{e['error_category']}] {e['error'][:80]}")
 
-if out.parse_successes:
-    spark.createDataFrame(out.parse_successes, schema=to_spark_schema(PARSE_SUCCESSES)) \
-        .write.format("delta").mode("overwrite").option("overwriteSchema", "true") \
-        .saveAsTable("ops_parse_successes")
-    print(f"Saved {len(out.parse_successes)} parse successes to ops_parse_successes")
+spark.createDataFrame(out.parse_successes, schema=to_spark_schema(PARSE_SUCCESSES)) \
+    .write.format("delta").mode("overwrite").option("overwriteSchema", "true") \
+    .saveAsTable("ops_parse_successes")
+print(f"Saved {len(out.parse_successes)} parse successes to ops_parse_successes")
 
-if out.phi_findings:
-    spark.createDataFrame(out.phi_findings, schema=to_spark_schema(PHI_FINDINGS)) \
-        .write.format("delta").mode("overwrite").option("overwriteSchema", "true") \
-        .saveAsTable("ops_phi_findings")
-    n_redact = sum(1 for f in out.phi_findings if f["disposition"] == "redact")
-    n_open = sum(1 for f in out.phi_findings if f["disposition"] == "open")
-    print(f"Saved {len(out.phi_findings)} PHI findings to ops_phi_findings "
-          f"({n_redact} redact, {n_open} open for steward review)")
+spark.createDataFrame(out.phi_findings, schema=to_spark_schema(PHI_FINDINGS)) \
+    .write.format("delta").mode("overwrite").option("overwriteSchema", "true") \
+    .saveAsTable("ops_phi_findings")
+n_redact = sum(1 for f in out.phi_findings if f["disposition"] == "redact")
+n_open = sum(1 for f in out.phi_findings if f["disposition"] == "open")
+print(f"Saved {len(out.phi_findings)} PHI findings to ops_phi_findings "
+      f"({n_redact} redact, {n_open} open for steward review)")
 
 if out.error_log.current_run:
     spark.createDataFrame(out.error_log.to_records(), schema=to_spark_schema(ERROR_LOG)) \

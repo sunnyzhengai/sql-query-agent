@@ -41,9 +41,9 @@ def _marketplace():
     from marketplace_host.handlers import HostConfig
     from marketplace_host.wiring import (
         HttpMarketplaceClient,
+        JsonFileSubscriptionStore,
         entra_token_provider,
         entra_webhook_verifier,
-        JsonFileSubscriptionStore,
     )
     from src.webapp.app import MarketplaceDeps
     tenant = os.environ["MKT_PUBLISHER_TENANT_ID"]

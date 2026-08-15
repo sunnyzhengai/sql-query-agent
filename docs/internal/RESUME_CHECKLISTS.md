@@ -387,10 +387,10 @@ Steps for Sunny:
    regenerate this run (413 step + 28 metric LLM calls — same cost as
    tonight's run). Watch the "Vague-filler flags" line; a handful is
    tolerable, dozens means the prompt needs another pass.
-3. Rebuild the semantic catalog Delta table (the ad-hoc
-   build_semantic_catalog cell — draft notebook / checklist E.2 step 1,
-   explicit column order!). Must run AFTER 07 so the new concrete
-   descriptions land in search_text.
+3. Rebuild the semantic catalog Delta table by running 11_refresh_search_index
+   Cell 1 (draft.Notebook is deleted — it lacked the explicit column order fix
+   and would resurrect the 2026-08-09 column-shift bug). Must run AFTER 07 so
+   the new concrete descriptions land in search_text.
 4. In the Eventhouse (aivia-eh/probe-eh): `.drop table semantic_catalog`
    then rerun eventhouse_setup.kql sections 1-2 (recreate + full
    re-embed — search_text changed on every row, and the embed step

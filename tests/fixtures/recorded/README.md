@@ -6,7 +6,7 @@ so offline tests exercise the pipeline against production parser truth
 
 ## How to (re)record
 
-1. On Fabric, run `notebooks/utilities/export_test_fixtures` (requires the
+1. On Fabric, run the `export_test_fixtures` notebook (repo root; requires the
    crosswalk uploaded; the notebook BLOCKS if any proprietary term survives
    anonymization).
 2. Download from `Files/sql-query-agent/fixtures_export/`:

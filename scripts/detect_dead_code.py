@@ -255,19 +255,19 @@ def main() -> int:
     )
 
     print(f"\n{'─' * 60}")
-    print(f"SUMMARY")
+    print("SUMMARY")
     print(f"{'─' * 60}")
     print(f"  Modules:    {total_modules - len(dead_modules)}/{total_modules} reachable")
     print(f"  Functions:  {total_names - len(dead_names)}/{total_names} referenced")
     print(f"  Dead lines: ~{dead_lines}")
 
     if dead_modules or dead_names:
-        print(f"\n  Action: Review and remove dead code, or add tests/imports.")
+        print("\n  Action: Review and remove dead code, or add tests/imports.")
         if strict:
-            print(f"\n  ✗ FAILED (--strict mode)")
+            print("\n  ✗ FAILED (--strict mode)")
             return 1
     else:
-        print(f"\n  ✓ PASSED — no dead code detected")
+        print("\n  ✓ PASSED — no dead code detected")
 
     return 0
 

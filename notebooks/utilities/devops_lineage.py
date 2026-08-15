@@ -5,6 +5,7 @@
 
 # %% Cell 1: Setup
 import sys
+
 sys.path.insert(0, "/lakehouse/default/Files/sql-query-agent")
 # For local: sys.path.insert(0, ".")
 
@@ -51,7 +52,8 @@ if test_model:
         if d.expression_type == "measure":
             print(f"  [{d.table_name}] {d.name} = {d.expression[:80]}")
 
-    print(f"\nCalculated Columns ({len([d for d in lineage.dax_expressions if d.expression_type == 'calculated_column'])}):")
+    calc_cols = [d for d in lineage.dax_expressions if d.expression_type == 'calculated_column']
+    print(f"\nCalculated Columns ({len(calc_cols)}):")
     for d in lineage.dax_expressions:
         if d.expression_type == "calculated_column":
             print(f"  [{d.table_name}] {d.name} = {d.expression[:80]}")
@@ -63,15 +65,17 @@ print(f"\n{'='*80}")
 print(f"SUMMARY: {REPO_NAME}")
 print(f"{'='*80}")
 print(f"  Reports:              {len(all_lineage)}")
-print(f"  With SQL sources:     {sum(1 for l in all_lineage if l.sql_sources)}")
-print(f"  Total SQL sources:    {sum(len(l.sql_sources) for l in all_lineage)}")
-print(f"  Total DAX measures:   {sum(len([d for d in l.dax_expressions if d.expression_type == 'measure']) for l in all_lineage)}")
-print(f"  Total calc columns:   {sum(len([d for d in l.dax_expressions if d.expression_type == 'calculated_column']) for l in all_lineage)}")
+print(f"  With SQL sources:     {sum(1 for li in all_lineage if li.sql_sources)}")
+print(f"  Total SQL sources:    {sum(len(li.sql_sources) for li in all_lineage)}")
+n_measures = sum(len([d for d in li.dax_expressions if d.expression_type == 'measure']) for li in all_lineage)
+print(f"  Total DAX measures:   {n_measures}")
+n_calc = sum(len([d for d in li.dax_expressions if d.expression_type == 'calculated_column']) for li in all_lineage)
+print(f"  Total calc columns:   {n_calc}")
 
 # Unique SQL objects referenced
 all_sql_objects = set()
-for l in all_lineage:
-    for s in l.sql_sources:
+for li in all_lineage:
+    for s in li.sql_sources:
         all_sql_objects.add(f"{s.schema}.{s.sql_object}")
 print(f"  Unique SQL objects:   {len(all_sql_objects)}")
 for obj in sorted(all_sql_objects):
@@ -88,5 +92,5 @@ for obj in sorted(all_sql_objects):
 #     all_repos_lineage[repo_name] = client.extract_all_reports(repo_name)
 #
 # total_reports = sum(len(v) for v in all_repos_lineage.values())
-# total_sources = sum(len(l.sql_sources) for v in all_repos_lineage.values() for l in v)
+# total_sources = sum(len(li.sql_sources) for v in all_repos_lineage.values() for l in v)
 # print(f"\nTotal: {total_reports} reports, {total_sources} SQL sources across {len(all_repos_lineage)} repos")

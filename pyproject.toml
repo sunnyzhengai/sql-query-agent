@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "sql-query-agent"
-version = "1.5.6"
+version = "1.6.0"
 description = "SQL Intelligence Agent for Microsoft Fabric. Extract business logic from SQL, build knowledge graphs, answer questions in plain English."
 readme = "README.md"
 requires-python = ">=3.9"
@@ -46,11 +46,23 @@ pythonpath = ["."]
 [tool.ruff]
 target-version = "py39"
 line-length = 120
+# Fabric injects these into the notebook runtime; they exist at execution time
+builtins = ["spark", "mssparkutils", "notebookutils", "display"]
 
 [tool.ruff.lint]
-select = ["E", "F", "I", "N", "W"]
+# BLE001/S110/S112 enforce the silence contract: a broad `except` is illegal
+# unless annotated with the policy that justifies it (see steps/parse.py:71).
+# Undeclared silence is a build failure (audit 2026-08-15).
+select = ["E", "F", "I", "N", "W", "BLE", "S110", "S112"]
 ignore = ["N818", "N806"]
 
 [tool.ruff.lint.per-file-ignores]
 # TMDL fixture strings must stay byte-exact; long lines are the fixtures
 "tests/adapters/test_devops_tmdl.py" = ["E501"]
+# Notebook cells import where the cell needs them, not at file top
+"*.Notebook/notebook-content.py" = ["E402"]
+"notebooks/**/*.py" = ["E402"]
+# Scripts insert the project root on sys.path before importing src
+"scripts/*.py" = ["E402"]
+# Anonymized description strings are data; keep them one-per-line
+"scripts/anonymize_dictionary.py" = ["E501"]

@@ -15,6 +15,7 @@ follow-up, not a v1 concern.
 
 from __future__ import annotations
 
+import json as _json
 import uuid
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
@@ -22,8 +23,6 @@ from typing import Callable
 
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse, JSONResponse
-
-import json as _json
 
 from src.orchestrator.agent import Turn, run_turn
 from src.orchestrator.events import FeedbackEvent, TurnEvent, decision_shape
@@ -408,8 +407,10 @@ function fieldFor(c) {
   if (c.op === 'search') return `
     <input type="text" data-f="phrase" value="${esc(p.phrase||'')}">
     <select data-f="mode">
-      <option value="semantic" ${p.mode==='semantic'?'selected':''}>semantic — closest by meaning (top-K, not exhaustive)</option>
-      <option value="exact" ${p.mode==='exact'?'selected':''}>exact — complete enumeration by name</option>
+      <option value="semantic" ${p.mode==='semantic'?'selected':''}>semantic — closest by meaning
+        (top-K, not exhaustive)</option>
+      <option value="exact" ${p.mode==='exact'?'selected':''}>exact — complete enumeration
+        by name</option>
     </select>`;
   if (c.op === 'retrieve') return `
     <textarea data-f="ids">${esc((p.ids||[]).join('\\n'))}</textarea>
@@ -563,9 +564,10 @@ function renderSuggestions(suggestions) {
   if (!suggestions.length) return;
   const chips = el('<div class="chips"></div>');
   suggestions.forEach(s => {
-    const chip = el(`<button class="chip">${esc(s.op)}: ${esc(JSON.stringify(s.params))}${s.note ? ' — ' + esc(s.note) : ''}</button>`);
-    chip.onclick = () => planCard({ components: [ { ...s, index: 1, valid: true } ] },
-                                  '(suggested action)');
+    const label = `${esc(s.op)}: ${esc(JSON.stringify(s.params))}${s.note ? ' — ' + esc(s.note) : ''}`;
+    const chip = el(`<button class="chip">${label}</button>`);
+    chip.onclick = () =>
+      planCard({ components: [ { ...s, index: 1, valid: true } ] }, '(suggested action)');
     chips.appendChild(chip);
   });
   add(chips);

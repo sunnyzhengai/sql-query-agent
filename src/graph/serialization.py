@@ -124,6 +124,7 @@ def parsed_sql_to_parse_result_row(
         "cte_count": len(parsed.ctes),
         "table_count": len(parsed.final_select_tables),
         "line_count": line_count,
+        "extraction_suppressed": parsed.extraction_suppressed,
     }
 
 
@@ -174,4 +175,5 @@ def parse_result_to_parsed_sql(pr: dict) -> ParsedSQL:
         final_select_tables=final_tables,
         final_select_cte_refs=json.loads(pr["final_select_cte_refs"]),
         normalized_sql=pr.get("normalized_sql", ""),
+        extraction_suppressed=pr.get("extraction_suppressed") or 0,
     )

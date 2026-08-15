@@ -374,7 +374,7 @@ class DevOpsTmdlClient:
         # Get all TMDL files in the tables directory
         try:
             items = self.list_items(repo_name, tables_path)
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001 — logged warning; record-and-continue per repo item
             logger.warning("Could not list tables for %s: %s", report_name, e)
             return lineage
 
@@ -390,7 +390,7 @@ class DevOpsTmdlClient:
 
             try:
                 content = self.get_file(repo_name, path)
-            except Exception as e:
+            except Exception as e:  # noqa: BLE001 — logged warning; record-and-continue per repo item
                 logger.warning("Could not read %s: %s", path, e)
                 continue
 

@@ -38,6 +38,7 @@ Run 02-04 at least once before this.
 # Prerequisites: Attach 'sql-logic-env' Fabric Environment. No %pip install.
 import json
 import sys
+
 # If the wheel is installed via Fabric Environment, src is already importable.
 # Fallback to sys.path for dev mode or non-wheel deployments.
 try:
@@ -48,7 +49,7 @@ except ImportError:
 print(f"v{src.__version__}")
 
 from src.config import load_config
-from src.schemas import PIPELINE_VALIDATION, BUILD_SUMMARY, to_spark_schema
+from src.schemas import BUILD_SUMMARY, PIPELINE_VALIDATION, to_spark_schema
 
 config = load_config("/lakehouse/default/Files/sql-query-agent/org_config.yaml")
 
@@ -64,6 +65,14 @@ config = load_config("/lakehouse/default/Files/sql-query-agent/org_config.yaml")
 
 
 # %% Cell 1: Load all data from Delta
+# Registry-driven precondition gate: every required input (sources, dict,
+# graph, parse outcomes) must exist before validation computes anything —
+# absence means an upstream notebook never ran, and the failure names it.
+from src.steps.gates import precondition_gate
+
+precondition_gate("06_validate", table_exists=spark.catalog.tableExists,
+                  count=lambda t: spark.table(t).count())
+
 sql_source_ids = [r.asDict()["metric_id"] for r in spark.table(config.lakehouse.sql_sources).collect()]
 
 nodes = {}
@@ -76,21 +85,11 @@ for r in spark.table(config.lakehouse.graph_edges).collect():
     rd = r.asDict()
     edges_by_source.setdefault(rd["source_id"], []).append(rd)
 
-parse_ok_ids = set()
-try:
-    for r in spark.table("ops_parse_successes").collect():
-        parse_ok_ids.add(r.asDict()["metric_id"])
-except Exception:
-    pass
+parse_ok_ids = {r["metric_id"] for r in spark.table("ops_parse_successes").collect()}
+parse_error_ids = {r["metric_id"] for r in spark.table("ops_parse_errors").collect()}
 
-parse_error_ids = set()
-try:
-    for r in spark.table("ops_parse_errors").collect():
-        parse_error_ids.add(r.asDict()["metric_id"])
-except Exception:
-    pass
-
-print(f"Loaded: {len(sql_source_ids)} sources, {len(nodes)} nodes, {sum(len(v) for v in edges_by_source.values())} edges")
+print(f"Loaded: {len(sql_source_ids)} sources, {len(nodes)} nodes, "
+      f"{sum(len(v) for v in edges_by_source.values())} edges")
 
 
 # METADATA ********************
@@ -104,13 +103,13 @@ print(f"Loaded: {len(sql_source_ids)} sources, {len(nodes)} nodes, {sum(len(v) f
 
 
 # %% Cell 2: Validate (all logic in src/)
-from src.governance.validation import validate_pipeline_per_metric, summarize_validation
+from src.governance.validation import summarize_validation, validate_pipeline_per_metric
 
 results = validate_pipeline_per_metric(sql_source_ids, parse_ok_ids, nodes, edges_by_source)
 summary = summarize_validation(results)
 
 total = summary["total"]
-print(f"\n=== Pipeline Health ===")
+print("\n=== Pipeline Health ===")
 for step_key in ["s1_loaded", "s2_parsed", "s3_canonical", "s4_transforms", "s5_edges", "s6_traversal"]:
     label = step_key.replace("s", "Step ", 1).replace("_", " — ", 1)
     count = summary[step_key]
@@ -174,12 +173,15 @@ summary_rows = [
     (now, "total_edges", str(sum(len(v) for v in edges_by_source.values())), ""),
 ]
 summary_df = spark.createDataFrame(summary_rows, schema=to_spark_schema(BUILD_SUMMARY))
-try:
+# ops_build_summary is append-only history. Create it explicitly on first
+# run; a failing append must RAISE — never silently become an overwrite
+# that destroys every prior run's telemetry (audit 2026-08-15).
+if spark.catalog.tableExists("ops_build_summary"):
     summary_df.write.format("delta").mode("append").saveAsTable("ops_build_summary")
-except Exception:
-    summary_df.write.format("delta").mode("overwrite").option("overwriteSchema", "true") \
-        .saveAsTable("ops_build_summary")
-print(f"Saved build summary")
+    print("Appended build summary")
+else:
+    summary_df.write.format("delta").saveAsTable("ops_build_summary")
+    print("Created ops_build_summary with first build summary")
 
 
 # METADATA ********************
@@ -197,25 +199,24 @@ s2 = summary["s2_parsed"]
 s4 = summary["s4_transforms"]
 s6 = summary["s6_traversal"]
 
+# Coverage logic lives in src/steps/readiness.py (pure, tested). No
+# try/except here: if the dictionary table can't be read, the run FAILS —
+# the gate-integrity contract in readiness_gate blocks any run where a
+# required check is missing, so this can never silently vanish again.
+from src.steps.readiness import dictionary_coverage_threshold, tech_table_names
+
+table_col = config.dictionary.table_name_col
+dict_table_names = {
+    r[table_col] for r in spark.table(config.lakehouse.dict_tables).select(table_col).collect()
+}
+
 THRESHOLDS = {
     "parse_rate": (s2 / max(total, 1), 0.90, True),
     "calculation_logic": (s4 / max(total, 1), 0.80, True),
     "traversal_coverage": (s6 / max(total, 1), 0.70, False),
+    "dictionary_coverage": dictionary_coverage_threshold(
+        dict_table_names, tech_table_names(nodes.values())),
 }
-
-try:
-    dict_table_names = set(r["TABLE_NAME"].upper() for r in spark.table("input_dict_tables").collect())
-    sql_table_names = set()
-    for nid, node in nodes.items():
-        if nid.startswith("tech:"):
-            props = json.loads(node.get("properties", "{}")) if isinstance(node.get("properties"), str) else node.get("properties", {})
-            tname = props.get("table", "")
-            if tname:
-                sql_table_names.add(tname.upper())
-    if sql_table_names:
-        THRESHOLDS["dictionary_coverage"] = (len(sql_table_names & dict_table_names) / len(sql_table_names), 0.90, True)
-except Exception:
-    pass
 
 # Schema-ambiguity gate (ADR 0016): the dictionary matches tables by bare
 # name (it has no schema column). If the SQL references the same bare name
@@ -226,7 +227,8 @@ from src.dictionary import find_cross_schema_collisions
 schema_table_pairs = []
 for nid, node in nodes.items():
     if nid.startswith("tech:"):
-        props = json.loads(node.get("properties", "{}")) if isinstance(node.get("properties"), str) else node.get("properties", {})
+        raw_props = node.get("properties", {})
+        props = json.loads(raw_props) if isinstance(raw_props, str) else raw_props
         if props.get("table") and not props.get("column"):
             schema_table_pairs.append((props.get("schema") or "dbo", props["table"]))
 schema_ambiguities = find_cross_schema_collisions(schema_table_pairs)
@@ -235,6 +237,7 @@ ambiguity_acknowledged = bool(getattr(config.dictionary, "accept_schema_ambiguit
 # Data-contract invariants: enforce unique / allowed_values / reference
 # rules declared in TABLE_REGISTRY against the actual Delta tables.
 from src.invariants import check_all_invariants
+
 
 def _fetch(table_name, columns):
     return [r.asDict() for r in spark.table(table_name).select(*columns).collect()]
@@ -251,15 +254,15 @@ from src.steps.readiness import readiness_gate
 gate = readiness_gate(THRESHOLDS, invariant_violations, schema_ambiguities, ambiguity_acknowledged)
 
 print(f"\n{'=' * 60}")
-print(f"DEPLOYMENT READINESS GATE")
+print("DEPLOYMENT READINESS GATE")
 print(f"{'=' * 60}")
 for line in gate.lines:
     print(f"  {line}")
 
 if gate.blocked:
-    print(f"\n  >>> DEPLOYMENT BLOCKED <<<")
+    print("\n  >>> DEPLOYMENT BLOCKED <<<")
 else:
-    print(f"\n  >>> DEPLOYMENT READY <<<")
+    print("\n  >>> DEPLOYMENT READY <<<")
 
 # METADATA ********************
 

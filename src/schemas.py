@@ -55,6 +55,7 @@ EDGE_TYPES = [edge.value for edge in EdgeType]
 
 SQL_SOURCES = {
     "table_name": "input_sql_sources",
+    "must_be_nonempty": True,
     "description": (
         "Customer SQL source files (stored procedures and views) loaded from "
         "Files/sql-query-agent/sql_input/. One row per SQL object; identity "
@@ -93,6 +94,7 @@ SQL_SOURCES = {
 
 DICT_TABLES = {
     "table_name": "input_dict_tables",
+    "must_be_nonempty": True,
     "description": (
         "Customer data dictionary: one row per warehouse table with its "
         "business description. Loaded from dictionary/dict_tables.csv. "
@@ -123,6 +125,7 @@ DICT_TABLES = {
 
 DICT_COLUMNS = {
     "table_name": "input_dict_columns",
+    "must_be_nonempty": True,
     "description": (
         "Customer data dictionary: one row per warehouse column with its "
         "business description. Loaded from dictionary/dict_columns.csv."
@@ -156,6 +159,7 @@ DICT_COLUMNS = {
 
 PARSE_RESULTS = {
     "table_name": "ops_parse_results",
+    "must_be_nonempty": True,
     "description": (
         "Intermediate parse output: the structural extraction of each SQL "
         "source (CTEs, table references, final SELECT) that 03_build_graph "
@@ -177,6 +181,7 @@ PARSE_RESULTS = {
         ("cte_count", "integer", True),
         ("table_count", "integer", True),
         ("line_count", "integer", True),
+        ("extraction_suppressed", "integer", True),
     ],
     "column_descriptions": {
         "metric_id": "SQL object this parse belongs to (input_sql_sources.metric_id)",
@@ -185,6 +190,8 @@ PARSE_RESULTS = {
         "final_select_tables": "JSON list of physical tables read by the final SELECT",
         "final_select_cte_refs": "JSON list of CTEs referenced by the final SELECT",
         "normalized_sql": "Cleaned SQL after extraction (verbatim statements, \\n endings)",
+        "extraction_suppressed": "AST-walk exceptions suppressed during extraction; "
+                                 "nonzero = refs may be missing despite parse success",
         "cte_count": "Number of CTE/temp-table steps extracted",
         "table_count": "Number of distinct physical tables referenced",
         "line_count": "Line count of the source SQL",
@@ -401,6 +408,7 @@ AGENT_DESCRIPTIONS = {
 
 GRAPH_NODES = {
     "table_name": "graph_nodes",
+    "must_be_nonempty": True,
     "description": (
         "All nodes of the three-layer knowledge graph in one table, "
         "discriminated by `layer`: canonical (business metrics), "
@@ -445,6 +453,7 @@ GRAPH_NODES = {
 
 GRAPH_EDGES = {
     "table_name": "graph_edges",
+    "must_be_nonempty": True,
     "description": (
         "Directed edges wiring the graph layers together: metric -> logic "
         "steps -> source tables -> dimensions. Both endpoints must exist in "
@@ -486,6 +495,7 @@ GRAPH_EDGES = {
 
 METRIC_LOGIC = {
     "table_name": "output_metric_logic",
+    "must_be_nonempty": True,
     "description": (
         "The agent's primary table: one pre-joined row per metric with its "
         "calculation logic, source tables, and descriptions. Created by "
@@ -1003,6 +1013,7 @@ SYNC_LOG = {
 
 STEWARD_ASSIGNMENTS = {
     "table_name": "gov_steward_assignments",
+    "optional_input": True,
     "description": (
         "Steward ownership per metric — assigned individually, in bulk, or "
         "by name pattern via the manage_stewards utility notebook. Applied "

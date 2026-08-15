@@ -1,18 +1,117 @@
-"""Notebook-boundary postcondition gate.
+"""Notebook-boundary gates: preconditions and postconditions.
 
-After a notebook writes its tables, the gate proves the persisted state
-satisfies the tables' contracts — catching orchestration failures (partial
-writes, wrong lakehouse, stale inputs) that the pure step functions can
-never see. Driven entirely by the ownership declarations in TABLE_REGISTRY:
-a notebook gates exactly the tables it owns or enriches.
+precondition_gate — BEFORE a step runs, its required input tables must
+exist (and be non-empty where the contract says emptiness is invalid).
+A failure is a STATE problem with an admin-actionable message naming the
+producing notebook — never a pyspark stack trace. Failures have two
+audiences: state problems route to the customer admin (self-serve); raw
+stack traces are reserved for true product defects, which route to the
+vendor. Every stack trace a gate could have prevented is a misfiled
+support ticket.
+
+postcondition_gate — AFTER a notebook writes its tables, the gate proves
+the persisted state satisfies the tables' contracts — catching
+orchestration failures (partial writes, wrong lakehouse, stale inputs)
+that the pure step functions can never see.
+
+Both are driven entirely by TABLE_REGISTRY: required inputs come from each
+table's `consumers` list (excluding self-reads of previous-run state and
+tables flagged `optional_input`), producers from `owner.notebook`,
+emptiness rules from `must_be_nonempty`. Gates cannot drift from the
+contracts because they ARE the contracts, executed.
+
+Every failure cites the violated contract's stable id (`contract:<table>`)
+so error events can link error → contract → data (extends ADR 0026).
 """
 
 from __future__ import annotations
 
-from typing import Callable
+from typing import Callable, Optional
 
 from src.invariants import Fetch, check_table_invariants, check_table_relations
 from src.schemas import TABLE_REGISTRY
+
+
+def contract_id(table_name: str) -> str:
+    """Stable identifier for a table's contract, citable from error events."""
+    return f"contract:{table_name}"
+
+
+class StepPreconditionError(Exception):
+    """A required input table is missing or empty BEFORE a step runs.
+
+    Carries structured `failures` (table, problem, producer, contract_id)
+    so callers can log them as error events; the message is the
+    admin-actionable rendering.
+    """
+
+    def __init__(self, step_name: str, failures: "list[dict]") -> None:
+        self.step_name = step_name
+        self.failures = failures
+        lines = [f"[!] Preconditions failed for {step_name}:"]
+        for f in failures:
+            lines.append(
+                f"    {f['table']} {f['problem']} — produced by "
+                f"{f['producer']} [{f['contract_id']}]"
+            )
+        super().__init__("\n".join(lines))
+
+
+def required_inputs(step_name: str, registry: "dict | None" = None) -> "list[str]":
+    """Tables this step consumes, derived from the registry.
+
+    Excluded: self-reads of the step's own previous-run state (absent on a
+    legitimate first run), tables flagged optional_input, non-active tables.
+    """
+    registry = registry if registry is not None else TABLE_REGISTRY
+    out = []
+    for name, contract in registry.items():
+        if contract.get("status") != "active":
+            continue
+        if step_name not in contract.get("consumers", []):
+            continue
+        if (contract.get("owner") or {}).get("notebook") == step_name:
+            continue
+        if contract.get("optional_input"):
+            continue
+        out.append(name)
+    return sorted(out)
+
+
+def precondition_gate(
+    step_name: str,
+    table_exists: Callable[[str], bool],
+    count: "Optional[Callable[[str], int]]" = None,
+    registry: "dict | None" = None,
+) -> "list[str]":
+    """Check every required input before the step runs.
+
+    count enables the non-empty check for tables whose contract sets
+    must_be_nonempty; pass e.g. `lambda t: spark.table(t).count()`.
+    Returns checked table names; raises StepPreconditionError otherwise.
+    """
+    registry = registry if registry is not None else TABLE_REGISTRY
+    failures: "list[dict]" = []
+    checked: "list[str]" = []
+
+    for table in required_inputs(step_name, registry):
+        producer = (registry[table].get("owner") or {}).get("notebook") or "unknown"
+        entry = {"table": table, "producer": producer, "contract_id": contract_id(table)}
+        if not table_exists(table):
+            failures.append({**entry, "problem": "missing"})
+            continue
+        if (
+            count is not None
+            and registry[table].get("must_be_nonempty")
+            and not count(table)
+        ):
+            failures.append({**entry, "problem": "is empty"})
+            continue
+        checked.append(table)
+
+    if failures:
+        raise StepPreconditionError(step_name, failures)
+    return checked
 
 
 class StepPostconditionError(Exception):

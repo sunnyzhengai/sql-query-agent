@@ -19,7 +19,6 @@ Usage:
 
 from __future__ import annotations
 
-
 # Required Delta tables and their minimum expected row counts
 REQUIRED_TABLES = {
     "input_sql_sources": 1,
@@ -69,7 +68,7 @@ class AcceptanceResult:
 
     def print_report(self):
         print(f"\n{'=' * 60}")
-        print(f"ACCEPTANCE TEST RESULTS")
+        print("ACCEPTANCE TEST RESULTS")
         print(f"{'=' * 60}")
 
         passed = sum(1 for c in self.checks if c["passed"])
@@ -87,7 +86,7 @@ class AcceptanceResult:
         elif self.warnings:
             print(f"\n  >>> ACCEPTANCE PASSED with {len(self.warnings)} warning(s) <<<")
         else:
-            print(f"\n  >>> ACCEPTANCE PASSED — all checks green <<<")
+            print("\n  >>> ACCEPTANCE PASSED — all checks green <<<")
 
 
 def run_acceptance_test(spark) -> AcceptanceResult:
@@ -110,7 +109,7 @@ def run_acceptance_test(spark) -> AcceptanceResult:
                     passed=False, blocking=True,
                     detail=f"{count} rows (minimum: {min_rows})",
                 )
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001 — failure becomes a blocking FAIL check result
             result.add(
                 f"table:{table_name}",
                 passed=False, blocking=True,
@@ -138,15 +137,17 @@ def run_acceptance_test(spark) -> AcceptanceResult:
                 "metric_logic:calculation_logic",
                 passed=logic_pct >= THRESHOLDS["calculation_logic_populated"],
                 blocking=True,
-                detail=f"{with_logic}/{total} ({logic_pct:.0%}) have calculation logic (threshold: {THRESHOLDS['calculation_logic_populated']:.0%})",
+                detail=f"{with_logic}/{total} ({logic_pct:.0%}) have calculation logic "
+                       f"(threshold: {THRESHOLDS['calculation_logic_populated']:.0%})",
             )
             result.add(
                 "metric_logic:source_tables",
                 passed=tables_pct >= THRESHOLDS["source_tables_populated"],
                 blocking=False,  # warning, not blocking
-                detail=f"{with_tables}/{total} ({tables_pct:.0%}) have source tables (threshold: {THRESHOLDS['source_tables_populated']:.0%})",
+                detail=f"{with_tables}/{total} ({tables_pct:.0%}) have source tables "
+                       f"(threshold: {THRESHOLDS['source_tables_populated']:.0%})",
             )
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001 — failure becomes a blocking FAIL check result
         result.add(
             "metric_logic:completeness",
             passed=False, blocking=True,
@@ -181,7 +182,8 @@ def run_acceptance_test(spark) -> AcceptanceResult:
                 "dictionary:coverage",
                 passed=coverage >= THRESHOLDS["dictionary_coverage"],
                 blocking=True,
-                detail=f"{covered}/{len(sql_tables)} ({coverage:.0%}) SQL tables found in dictionary (threshold: {THRESHOLDS['dictionary_coverage']:.0%})"
+                detail=f"{covered}/{len(sql_tables)} ({coverage:.0%}) SQL tables found "
+                       f"in dictionary (threshold: {THRESHOLDS['dictionary_coverage']:.0%})"
                 + (f". Missing: {', '.join(missing_sample)}{'...' if len(missing) > 5 else ''}" if missing else ""),
             )
         else:
@@ -190,7 +192,7 @@ def run_acceptance_test(spark) -> AcceptanceResult:
                 passed=True, blocking=True,
                 detail="No technical table nodes found (skipped)",
             )
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001 — failure becomes a blocking FAIL check result
         result.add(
             "dictionary:coverage",
             passed=False, blocking=True,
@@ -219,7 +221,7 @@ def run_acceptance_test(spark) -> AcceptanceResult:
                 passed=False, blocking=True,
                 detail="No parse results found",
             )
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001 — failure becomes a blocking FAIL check result
         result.add(
             "parse:error_rate",
             passed=False, blocking=True,

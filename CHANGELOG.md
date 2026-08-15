@@ -10,6 +10,61 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.6.0] - 2026-08-15
+
+### Added
+- Precondition gates (ADR 0039): every numbered notebook checks its required
+  input tables exist (and are non-empty where the contract demands) BEFORE
+  reading — failures are admin-actionable messages naming the producing
+  notebook and the violated contract id, never a pyspark stack trace.
+  Registry-driven via new `consumers`-derived `required_inputs`; new
+  registry vocabulary `must_be_nonempty` / `optional_input`.
+- Gate-integrity contract in the readiness gate: required checks
+  (`REQUIRED_CHECKS` incl. dictionary_coverage) may FAIL but can never
+  silently disappear; local replay now enforces all four checks.
+- `ParsedSQL.extraction_suppressed`: the nine ScriptDom AST-walk swallows
+  now count what they suppress; the total is persisted per proc in
+  ops_parse_results and reported by notebook 02 — "parse success" can no
+  longer hide lost table/column refs.
+- FabricAgentClient `token_provider` callable + one forced-refresh retry on
+  401/403; notebook 08 uses it, so >1hr description runs survive token
+  expiry instead of failing as fake content errors.
+- Silence contract in CI: ruff BLE001/S110/S112 across src, tests,
+  notebooks, scripts, devtools and all root *.Notebook folders — every
+  surviving broad `except` carries an explicit policy annotation.
+
+### Fixed
+- Collibra adapter: publish() now writes the Description attribute (was
+  name-only — descriptions silently dropped while reporting SUCCESS);
+  `_find_asset` failures no longer read as "absent" (was creating duplicate
+  assets on transient errors); publish_bulk routes per-record so
+  descriptions land; Publisher.publish_all failure yields per-record
+  FAILED results instead of an empty result indistinguishable from
+  "nothing to publish".
+- 06_validate: dictionary_coverage can no longer vanish from the deployment
+  gate; ops_build_summary append no longer silently degrades to
+  history-destroying overwrite; parse outcome reads are loud.
+- 02_parse always writes all outcome tables (even empty) — absence now
+  unambiguously means "02 never ran"; removed dead sqlglot fallback branch
+  and a leftover `.limit(50)` dev cap on production parsing.
+- 07 hard-stops without steward-reviewed PHI findings (inline rescan that
+  dropped dispositions removed); 08 stops on Collibra connection failure;
+  extract_views MERGE fixed (comment-in-f-string made it fail 100% and
+  blind-append duplicates); 10_ingest distinguishes listing failure from
+  empty directory; steward/dictionary loaders check table existence
+  instead of swallowing read errors before overwrites.
+- builder: ambiguous bare-name table refs resolve deterministically
+  (sorted) with a warning, instead of set-iteration-order lineage.
+
+### Removed
+- Ghosts: draft.Notebook (reintroduced the fixed 2026-08-09 column-shift
+  bug against a production table), dead `load_scriptdom()` + stale parser
+  copy, scripts/validate_dictionary.py always-green stub,
+  scripts/run_full_pipeline.py (superseded), duplicate
+  export_test_fixtures copy, dead `metrics.catalog_path` config.
+
+---
+
 ## [1.5.1] - 2026-08-13
 
 ### Fixed
