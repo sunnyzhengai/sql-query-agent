@@ -418,3 +418,22 @@ never auto-acted). One-time first: KUSTO_URI in cell 0 (KQL database
 function/callout setup only.
 
 Standing rule (final form): 03/04 rerun => 07 rerun => 11 rerun.
+
+## 1.5.6 — description prompt v3: dictionary-grounded translation (2026-08-14)
+
+Live find: v2 descriptions carried actual values (good) AND raw Epic
+identifiers (ADT_DEPARTMENT_ID, #SDX, `pd.PatEncCSNID`) — unreadable
+for the customer-facing tier. Root cause: the step prompt demanded
+literals but had NO translation material. Fix: each step's prompt now
+carries the data dictionary for the tables it touches (+ only the
+columns its SQL references) from the graph's own technical nodes; raw
+identifiers banned in output (use dictionary description or plain
+phrase; refer to earlier steps by what they produce); literal VALUES
+(codes/thresholds/statuses/hours) still required. New jargon flags in
+07's run report (raw-identifier regex, observation only). Cache keys
+now include dictionary content — dictionary edits regenerate affected
+steps automatically.
+
+Steps: sync + publish env (1.5.6) -> rerun 07 (full regen, ~441 calls,
+PROMPT_VERSION=3) -> run notebook 11 (re-embed) -> workbench re-test.
+Watch BOTH flag lines in 07's output: vague + jargon counts.

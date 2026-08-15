@@ -32,25 +32,34 @@ from src.models import EdgeType, NodeLayer
 # the next 07 run — no flags, no manual cache wipe (live find
 # 2026-08-13: vague descriptions survived a rerun because the cache
 # key knew only the SQL, not the prompt that read it).
-PROMPT_VERSION = "2"
+# v3 (live find 2026-08-14): v2 kept actual values but also kept raw
+# warehouse identifiers — the fix is grounded translation material
+# (the data dictionary the graph already holds) plus a ban on raw
+# identifiers in the output.
+PROMPT_VERSION = "3"
 
 STEP_PROMPT = (
     "You are documenting a certified business metric's calculation step "
-    "for a business audience.\n"
+    "for a business audience of clinicians and executives.\n"
     "Step name: {name}\n"
     "{deps_block}"
+    "{dict_block}"
     "SQL for THIS step:\n{fragment}\n\n"
     "Write ONE sentence (max 30 words) stating what this step produces "
     "in business terms. Then, if the SQL makes decisions, add one line "
     "per decision, each starting with '- ': filters, inclusion and "
     "exclusion rules, code lists, thresholds, time windows, and joins "
-    "that restrict the population. Every decision line must state the "
-    "ACTUAL value from the SQL — the real codes, numbers, statuses, "
-    "names — translated to business meaning where evident but always "
-    "keeping the literal value. Never write vague fillers such as "
-    "'specific', 'specified', 'certain', or 'various' in place of a "
-    "value. Ground every line in the SQL above; describe THIS step "
-    "only, not its dependencies. No patient identifiers, no preamble."
+    "that restrict the population. State each decision in plain "
+    "business language and keep the literal VALUES that define it — "
+    "codes, numbers, statuses, hours — with the business meaning "
+    "beside each code when the data dictionary above provides one. "
+    "NEVER show raw table or column identifiers or temp-table names "
+    "in the output — use the dictionary description or a plain phrase "
+    "instead, and refer to earlier steps by what they produce. Never "
+    "write vague fillers such as 'specific', 'specified', 'certain', "
+    "or 'various' in place of a value. Ground every line in the SQL "
+    "above; describe THIS step only, not its dependencies. No patient "
+    "identifiers, no preamble."
 )
 
 METRIC_PROMPT = (
@@ -80,11 +89,19 @@ METRIC_PROMPT = (
 _VAGUE_FILLERS = re.compile(
     r"\b(specific|specified|certain|various)\b", re.IGNORECASE)
 
+# Raw-identifier smell in OUTPUT text: SNAKE_CASE_CAPS columns,
+# #temp tables, backticked/dotted code refs (live find 2026-08-14:
+# ADT_DEPARTMENT_ID / #SDX / `pd.PatEncCSNID` all over the workbench).
+_RAW_IDENTIFIERS = re.compile(
+    r"(#\w+|`[^`]+`|\b[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)+\b)")
 
-def step_content_hash(fragment: str, dep_names: "list[str]") -> str:
+
+def step_content_hash(fragment: str, dep_names: "list[str]",
+                      dict_lines: "list[str] | None" = None) -> str:
     payload = (
         PROMPT_VERSION + "\n" + (fragment or "")
         + "\n--deps--\n" + "\n".join(sorted(dep_names))
+        + "\n--dict--\n" + "\n".join(dict_lines or [])
     )
     return hashlib.sha256(payload.encode()).hexdigest()[:32]
 
@@ -104,7 +121,8 @@ class DescriptionResult:
     cache_hits: int = 0
     generated: int = 0
     failed: "list[str]" = field(default_factory=list)
-    vague: "list[str]" = field(default_factory=list)  # filler-word flags
+    vague: "list[str]" = field(default_factory=list)   # filler-word flags
+    jargon: "list[str]" = field(default_factory=list)  # raw-identifier flags
 
 
 def topological_step_order(nodes: dict, edges: list) -> "list[str]":
@@ -139,13 +157,54 @@ def topological_step_order(nodes: dict, edges: list) -> "list[str]":
     return ordered
 
 
-def build_step_prompt(name: str, fragment: str, deps: "list[tuple[str, str]]") -> str:
+MAX_DICT_LINES = 30
+
+
+def build_step_prompt(
+    name: str, fragment: str, deps: "list[tuple[str, str]]",
+    dict_lines: "list[str] | None" = None,
+) -> str:
     if deps:
         lines = "\n".join(f"- {n}: {d}" for n, d in deps)
         deps_block = f"It builds on these already-described steps:\n{lines}\n\n"
     else:
         deps_block = ""
-    return STEP_PROMPT.format(name=name, deps_block=deps_block, fragment=fragment or "(none)")
+    if dict_lines:
+        entries = "\n".join(dict_lines[:MAX_DICT_LINES])
+        dict_block = (
+            "Data dictionary for what this step touches (translate "
+            f"identifiers using these):\n{entries}\n\n"
+        )
+    else:
+        dict_block = ""
+    return STEP_PROMPT.format(name=name, deps_block=deps_block,
+                              dict_block=dict_block,
+                              fragment=fragment or "(none)")
+
+
+def dictionary_for_step(
+    step_id: str, nodes: dict, tech_map: "dict[str, list[str]]",
+    columns_map: "dict[str, list[str]]", fragment: str,
+) -> "list[str]":
+    """Dictionary lines for the tables a step touches, plus only the
+    COLUMNS the fragment actually references (whole-table column lists
+    would drown the prompt). Pure selection — the dictionary text
+    itself is the customer's own, from graph_nodes."""
+    frag = (fragment or "").lower()
+    lines: "list[str]" = []
+    for table_id in sorted(tech_map.get(step_id, [])):
+        table = nodes.get(table_id)
+        if table is None:
+            continue
+        if (table.description or "").strip():
+            lines.append(f"- {table.name}: {table.description.strip()}")
+        for col_id in sorted(columns_map.get(table_id, [])):
+            col = nodes.get(col_id)
+            if col is None or not (col.description or "").strip():
+                continue
+            if col.name.lower() in frag:
+                lines.append(f"  - {col.name}: {col.description.strip()}")
+    return lines
 
 
 def build_metric_prompt(metric_name: str, roots: "list[tuple[str, str]]", step_count: int) -> str:
@@ -183,6 +242,13 @@ def generate_descriptions(
     for e in edges:
         if e.edge_type == EdgeType.CANONICAL_TO_TRANSFORM:
             roots_map.setdefault(e.source_id, []).append(e.target_id)
+    tech_map: "dict[str, list[str]]" = {}       # step -> touched tables
+    columns_map: "dict[str, list[str]]" = {}    # table -> its columns
+    for e in edges:
+        if e.edge_type == EdgeType.TRANSFORM_TO_TECHNICAL:
+            tech_map.setdefault(e.source_id, []).append(e.target_id)
+        elif e.edge_type == EdgeType.TABLE_TO_COLUMN:
+            columns_map.setdefault(e.source_id, []).append(e.target_id)
 
     described: "dict[str, str]" = {}
 
@@ -190,7 +256,9 @@ def generate_descriptions(
         node = nodes[step_id]
         fragment = node.properties.get("sql_fragment", "")
         dep_names = [nodes[d].name for d in dep_map.get(step_id, []) if d in nodes]
-        key = step_content_hash(fragment, dep_names)
+        dict_lines = dictionary_for_step(
+            step_id, nodes, tech_map, columns_map, fragment)
+        key = step_content_hash(fragment, dep_names, dict_lines)
         if key in cache:
             described[step_id] = cache[key]
             result.descriptions[step_id] = cache[key]
@@ -201,7 +269,8 @@ def generate_descriptions(
             for d in dep_map.get(step_id, []) if d in nodes
         ]
         try:
-            text = describe(build_step_prompt(node.name, fragment, deps)).strip()
+            text = describe(build_step_prompt(
+                node.name, fragment, deps, dict_lines)).strip()
         except Exception:  # noqa: BLE001 — one bad step must not kill the batch
             result.failed.append(step_id)
             continue
@@ -210,6 +279,8 @@ def generate_descriptions(
             continue
         if _VAGUE_FILLERS.search(text):
             result.vague.append(step_id)
+        if _RAW_IDENTIFIERS.search(text):
+            result.jargon.append(step_id)
         cache[key] = text
         described[step_id] = text
         result.descriptions[step_id] = text
@@ -250,6 +321,8 @@ def generate_descriptions(
             continue
         if _VAGUE_FILLERS.search(text):
             result.vague.append(node_id)
+        if _RAW_IDENTIFIERS.search(text):
+            result.jargon.append(node_id)
         cache[key] = text
         result.descriptions[node_id] = text
         result.generated += 1

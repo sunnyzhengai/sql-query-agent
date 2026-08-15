@@ -147,6 +147,10 @@ if result.vague:
     print(f"Vague-filler flags (value hidden behind 'specific'/'certain'): {len(result.vague)}")
     for nid in result.vague[:10]:
         print(f"  vague: {nid}")
+if result.jargon:
+    print(f"Raw-identifier flags (warehouse jargon in business text): {len(result.jargon)}")
+    for nid in result.jargon[:10]:
+        print(f"  jargon: {nid}")
 
 # METADATA ********************
 

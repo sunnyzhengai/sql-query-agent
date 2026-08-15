@@ -118,6 +118,38 @@ class TestGeneration:
         assert result.vague              # every node flagged
         assert set(result.vague) <= set(result.descriptions)  # still kept
 
+    def test_raw_identifiers_are_flagged(self):
+        """Live find 2026-08-14: ADT_DEPARTMENT_ID / #SDX /
+        `pd.PatEncCSNID` all over the customer-facing workbench."""
+        g = _graph()
+        result = generate_descriptions(
+            g.nodes_rows, g.edges_rows,
+            lambda p: "Joins on ADT_DEPARTMENT_ID from #SDX.")
+        assert result.jargon
+        clean = generate_descriptions(
+            g.nodes_rows, g.edges_rows,
+            lambda p: "Includes emergency department stays over 6 hours.")
+        assert not clean.jargon
+
+    def test_step_prompt_carries_the_data_dictionary(self):
+        """The graph's own dictionary is the translation material —
+        the model is never asked to invent business meanings."""
+        g = _graph()
+        prompts = []
+
+        def capture(p):
+            prompts.append(p)
+            return "ok"
+        generate_descriptions(g.nodes_rows, g.edges_rows, capture)
+        step_prompts = [p for p in prompts if "calculation step" in p]
+        assert any("Data dictionary" in p for p in step_prompts), (
+            "no step prompt carried dictionary lines — check "
+            "TRANSFORM_TO_TECHNICAL wiring")
+
+    def test_dictionary_changes_regenerate(self):
+        assert step_content_hash("SELECT 1", ["a"], ["- T: patients"]) \
+            != step_content_hash("SELECT 1", ["a"], ["- T: encounters"])
+
     def test_one_bad_step_does_not_kill_the_batch(self):
         g = _graph()
         flaky = {"n": 0}
