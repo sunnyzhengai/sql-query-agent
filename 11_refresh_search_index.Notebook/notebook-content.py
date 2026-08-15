@@ -26,23 +26,6 @@
 
 # CELL ********************
 
-from src.steps.search_index import embed_command, COVERAGE_QUERY
-
-client.mgmt(embed_command(EMBED_ENDPOINT))          # only missing rows pay
-print(client.run(COVERAGE_QUERY))                   # expect Count = 0
-print(client.run(
-    "semantic_catalog | where isnull(emb) or array_length(emb) == 0 "
-    "| project node_id, search_len = strlen(search_text)"))
-
-# METADATA ********************
-
-# META {
-# META   "language": "python",
-# META   "language_group": "synapse_pyspark"
-# META }
-
-# CELL ********************
-
 """Refresh the semantic search index end to end (run AFTER 07).
 
 Reads from:  graph_nodes (fresh descriptions)
@@ -80,8 +63,9 @@ PROBE_PHRASE = ""
 # CELL ********************
 
 import notebookutils
+
 from src.orchestrator.kusto import KustoClient
-from src.steps.search_index import embed_command, COVERAGE_QUERY
+from src.steps.search_index import COVERAGE_QUERY, embed_command
 
 client = KustoClient(
     KUSTO_URI, KUSTO_DB,
@@ -155,8 +139,7 @@ print(f"output_semantic_catalog: {df.count()} rows")
 # CELL ********************
 
 # %% Cell 2: Copy into the Eventhouse + full re-embed + verify
-import notebookutils  # noqa: F401  (Fabric runtime)
-
+# (notebookutils is a Fabric-injected global — no import needed)
 from src.orchestrator.kusto import KustoClient
 from src.steps.search_index import refresh_search_index
 
@@ -178,6 +161,27 @@ if not report["threshold_ok"]:
 if PROBE_PHRASE:
     for row in client.run(f'semantic_search("{PROBE_PHRASE}", 10)'):
         print(f"{row['closeness']:.3f}  {row['kind']:<7} {row['node_id']}")
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+# %% Manual cell: re-embed missing rows + coverage check (moved from the top
+# of this notebook 2026-08-15 — it uses `client`/`EMBED_ENDPOINT`, which are
+# only defined above, so at the top it broke Run All with a NameError).
+# Run AFTER the main cells when you want to top-up embeddings ad hoc.
+from src.steps.search_index import COVERAGE_QUERY, embed_command
+
+client.mgmt(embed_command(EMBED_ENDPOINT))          # only missing rows pay
+print(client.run(COVERAGE_QUERY))                   # expect Count = 0
+print(client.run(
+    "semantic_catalog | where isnull(emb) or array_length(emb) == 0 "
+    "| project node_id, search_len = strlen(search_text)"))
 
 # METADATA ********************
 
