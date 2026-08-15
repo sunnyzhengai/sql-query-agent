@@ -150,6 +150,28 @@ edges_df.write.format("delta").mode("overwrite") \
 
 print(f"Wrote {nodes_df.count()} nodes, {edges_df.count()} edges")
 
+# Record setup completeness: proceeding without an optional enrichment is
+# legitimate but DEGRADED (e.g. zero stewards) — queryable state, not just
+# a printed line (ADR 0039 amendment / handoff item 3).
+from datetime import datetime, timezone
+
+from src.schemas import SETUP_COMPLETENESS
+from src.steps.gates import setup_completeness_rows
+
+completeness = setup_completeness_rows(
+    "03_build_graph", table_exists=spark.catalog.tableExists,
+    run_at=datetime.now(timezone.utc).isoformat(),
+)
+completeness_df = spark.createDataFrame(
+    completeness, schema=to_spark_schema(SETUP_COMPLETENESS))
+if spark.catalog.tableExists("ops_setup_completeness"):
+    completeness_df.write.format("delta").mode("append").saveAsTable("ops_setup_completeness")
+else:
+    completeness_df.write.format("delta").saveAsTable("ops_setup_completeness")
+for row in completeness:
+    state = "present" if row["present"] else f"ABSENT — {row['remediation']}"
+    print(f"[{'+' if row['present'] else '!'}] optional input {row['table_name']}: {state}")
+
 checked = postcondition_gate(
     "03_build_graph",
     fetch=lambda t, cols: [r.asDict() for r in spark.table(t).select(*cols).collect()],

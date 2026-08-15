@@ -26,6 +26,7 @@ flowchart LR
   eventhouse_semantic_search["eventhouse_semantic_search"]:::notebook
   export_test_fixtures["export_test_fixtures"]:::notebook
   extract_views["extract_views"]:::notebook
+  health["health"]:::notebook
   load_caboodle_dictionary["load_caboodle_dictionary"]:::notebook
   load_clarity_dictionary["load_clarity_dictionary"]:::notebook
   load_sql_files["load_sql_files"]:::notebook
@@ -54,6 +55,7 @@ flowchart LR
   ops_parse_successes[("ops_parse_successes")]:::table
   ops_phi_findings[("ops_phi_findings")]:::table
   ops_pipeline_validation[("ops_pipeline_validation")]:::table
+  ops_setup_completeness[("ops_setup_completeness")]:::table
   output_metric_logic[("output_metric_logic")]:::table
   output_semantic_catalog[("output_semantic_catalog")]:::table
   admin{{admin}}:::actor
@@ -70,6 +72,7 @@ flowchart LR
   02_parse --> ops_phi_findings
   03_build_graph --> graph_edges
   03_build_graph --> graph_nodes
+  03_build_graph --> ops_setup_completeness
   04_build_metric_logic --> output_metric_logic
   05_export_graph_tables --> LPG_export__10_typed_tables_
   06_validate --> ops_build_summary
@@ -148,6 +151,8 @@ flowchart LR
   ops_phi_findings --> 07_generate_descriptions
   ops_pipeline_validation --> admin
   ops_pipeline_validation --> data_agent
+  ops_setup_completeness --> admin
+  ops_setup_completeness --> health
   output_metric_logic --> 07_generate_descriptions
   output_metric_logic --> 08_publish_collibra
   output_metric_logic --> 09_publish_purview

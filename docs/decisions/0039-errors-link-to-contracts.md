@@ -71,6 +71,23 @@ it. The chain is error → contract → data.**
   `must_be_nonempty`) that make previously-implicit operational knowledge
   declarative.
 
+## Amendment (2026-08-15, same day): the third failure category
+
+Handoff item 3 identified a category between "gate error" and "product
+defect": **legitimate-but-degraded** — a run that correctly proceeds
+without an optional enrichment (graph with zero stewards, metrics showing
+object names only). Treatment:
+
+- Registry: optional inputs carry `optional_input: True` plus a
+  `remediation` field naming the utility that provides them.
+- `setup_completeness_rows()` (src/steps/gates.py) emits one row per
+  optional input per run into `ops_setup_completeness` — present or not,
+  with remediation and contract_id. State that matters is queryable,
+  never only stdout.
+- `tests/test_docs_consistency.py` pins INSTALLATION_GUIDE's post-install
+  steps to the optional-input registry, so docs cannot drift from
+  contracts.
+
 ## Alternatives considered
 
 - **Hand-maintained per-notebook required-table lists** — rejected: that

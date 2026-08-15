@@ -436,6 +436,19 @@ When your data dictionary changes:
 1. Upload updated CSVs to `Files/sql-query-agent/dictionary/`
 2. Re-run notebooks 03 → 04 → 05 → 06 (skip 02 — no need to re-parse)
 
+### Optional enrichments (recommended)
+
+The pipeline runs without these, but the result is degraded until they are
+set up. Every run records their presence in `ops_setup_completeness`, so
+you can check the current state with:
+
+    SELECT * FROM ops_setup_completeness ORDER BY run_at DESC
+
+1. **Steward assignments** (`gov_steward_assignments`) — without it,
+   metrics carry no ownership. Open `notebooks/utilities/manage_stewards`
+   in a Fabric notebook, follow its cells to assign stewards, then re-run
+   03 → 04 so ownership lands in the graph and `output_metric_logic`.
+
 ### Automated refresh (optional)
 
 To keep the knowledge graph up to date without manual runs:

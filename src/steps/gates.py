@@ -78,6 +78,44 @@ def required_inputs(step_name: str, registry: "dict | None" = None) -> "list[str
     return sorted(out)
 
 
+def optional_inputs(step_name: str, registry: "dict | None" = None) -> "list[str]":
+    """Active tables this step consumes that are flagged optional_input."""
+    registry = registry if registry is not None else TABLE_REGISTRY
+    return sorted(
+        name for name, contract in registry.items()
+        if contract.get("status") == "active"
+        and step_name in contract.get("consumers", [])
+        and contract.get("optional_input")
+    )
+
+
+def setup_completeness_rows(
+    step_name: str,
+    table_exists: Callable[[str], bool],
+    run_at: str,
+    registry: "dict | None" = None,
+) -> "list[dict]":
+    """One ops_setup_completeness row per optional input of this step.
+
+    A run that proceeds without an optional enrichment is legitimate but
+    DEGRADED (graph with zero stewards, object names only) — a third
+    category between gate error and product defect. That state must be
+    queryable, never only a printed line (handoff item 3, 2026-08-15).
+    """
+    registry = registry if registry is not None else TABLE_REGISTRY
+    return [
+        {
+            "run_at": run_at,
+            "step": step_name,
+            "table_name": table,
+            "present": bool(table_exists(table)),
+            "remediation": registry[table].get("remediation", ""),
+            "contract_id": contract_id(table),
+        }
+        for table in optional_inputs(step_name, registry)
+    ]
+
+
 def precondition_gate(
     step_name: str,
     table_exists: Callable[[str], bool],

@@ -17,9 +17,11 @@ from src.steps.export import export_step
 from src.steps.gates import (
     StepPostconditionError,
     StepPreconditionError,
+    optional_inputs,
     postcondition_gate,
     precondition_gate,
     required_inputs,
+    setup_completeness_rows,
     tables_owned_by,
 )
 from src.steps.metric_logic import metric_logic_step
@@ -179,6 +181,7 @@ FAKE_REGISTRY = {
     "optional_c": {
         "status": "active", "owner": {"notebook": "90_util"},
         "consumers": ["01_step"], "optional_input": True,
+        "remediation": "run 90_util to assign",
     },
     "self_state": {
         "status": "active", "owner": {"notebook": "01_step"},
@@ -219,6 +222,31 @@ class TestPreconditionGate:
         checked = precondition_gate("01_step", table_exists=lambda t: True,
                                     count=lambda t: 5, registry=FAKE_REGISTRY)
         assert checked == ["input_a", "input_b"]
+
+    def test_optional_inputs_derived_with_remediation(self):
+        assert optional_inputs("01_step", FAKE_REGISTRY) == ["optional_c"]
+
+    def test_setup_completeness_rows_record_degraded_state(self):
+        """A run proceeding without an optional input must leave queryable
+        state (handoff item 3: 'legitimate-but-degraded' is a category
+        between gate error and product defect — never only stdout)."""
+        rows = setup_completeness_rows(
+            "01_step", table_exists=lambda t: False,
+            run_at="2026-08-15T00:00:00+00:00", registry=FAKE_REGISTRY)
+        assert rows == [{
+            "run_at": "2026-08-15T00:00:00+00:00",
+            "step": "01_step",
+            "table_name": "optional_c",
+            "present": False,
+            "remediation": "run 90_util to assign",
+            "contract_id": "contract:optional_c",
+        }]
+
+    def test_setup_completeness_rows_record_present_state(self):
+        rows = setup_completeness_rows(
+            "01_step", table_exists=lambda t: True,
+            run_at="t0", registry=FAKE_REGISTRY)
+        assert len(rows) == 1 and rows[0]["present"] is True
 
     def test_production_registry_derivations(self):
         # Pin the real registry's derivations for the steps we wire up —

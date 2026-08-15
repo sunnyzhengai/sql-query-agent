@@ -297,6 +297,39 @@ BUILD_SUMMARY = {
     "invariants": [],
 }
 
+SETUP_COMPLETENESS = {
+    "table_name": "ops_setup_completeness",
+    "description": (
+        "Queryable setup state: one row per optional enrichment per pipeline "
+        "run recording whether it was present. A run without an optional "
+        "input is legitimate but degraded — this table is how /health and "
+        "admins see it (never only notebook stdout). ADR 0039 amendment."
+    ),
+    "domain": "operations",
+    "status": "active",
+    "owner": {"notebook": "03_build_graph", "module": "src/steps/gates.py"},
+    "write_mode": "append",
+    "enrichers": [],
+    "consumers": ["admin", "health"],
+    "columns": [
+        ("run_at", "string", False),
+        ("step", "string", False),
+        ("table_name", "string", False),
+        ("present", "boolean", False),
+        ("remediation", "string", True),
+        ("contract_id", "string", False),
+    ],
+    "column_descriptions": {
+        "run_at": "ISO timestamp of the pipeline run that recorded this state",
+        "step": "Pipeline step that proceeded with/without the enrichment",
+        "table_name": "The optional input table checked",
+        "present": "Whether the enrichment existed when the step ran",
+        "remediation": "Which utility/notebook provides the enrichment",
+        "contract_id": "Stable id of the optional input's contract (ADR 0039)",
+    },
+    "invariants": [],
+}
+
 PIPELINE_VALIDATION = {
     "table_name": "ops_pipeline_validation",
     "description": (
@@ -1014,6 +1047,7 @@ SYNC_LOG = {
 STEWARD_ASSIGNMENTS = {
     "table_name": "gov_steward_assignments",
     "optional_input": True,
+    "remediation": "run notebooks/utilities/manage_stewards to assign stewards",
     "description": (
         "Steward ownership per metric — assigned individually, in bulk, or "
         "by name pattern via the manage_stewards utility notebook. Applied "
@@ -1627,7 +1661,7 @@ TABLE_REGISTRY = {
         # operations
         PARSE_RESULTS, PARSE_ERRORS, PARSE_SUCCESSES, BUILD_SUMMARY,
         PIPELINE_VALIDATION, INSTALLATION_ERRORS, AGENT_DESCRIPTIONS,
-        DESCRIPTION_CACHE,
+        DESCRIPTION_CACHE, SETUP_COMPLETENESS,
         # graph
         GRAPH_NODES, GRAPH_EDGES,
         # output

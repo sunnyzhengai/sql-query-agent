@@ -85,3 +85,25 @@ def test_install_guide_does_not_hardcode_package_version():
         "INSTALLATION_GUIDE.md hardcodes a wheel version; use "
         "sql_query_agent-<version>-py3-none-any.whl so releases don't stale it"
     )
+
+
+def test_install_guide_documents_every_optional_input_remediation():
+    """Handoff item 3 (2026-08-15): optional inputs are contract state, and
+    the guide's post-install steps must not drift from the registry. Every
+    active optional_input table must appear in INSTALLATION_GUIDE.md along
+    with its remediation utility."""
+    from src.schemas import TABLE_REGISTRY
+
+    guide = INSTALL_GUIDE.read_text()
+    missing = []
+    for name, contract in TABLE_REGISTRY.items():
+        if contract.get("status") != "active" or not contract.get("optional_input"):
+            continue
+        remediation = contract.get("remediation", "")
+        assert remediation, f"{name}: optional_input without a remediation field"
+        util = remediation.split()[1] if " " in remediation else remediation
+        if name not in guide or util.split("/")[-1] not in guide:
+            missing.append(f"{name} (remediation: {remediation})")
+    assert not missing, (
+        f"INSTALLATION_GUIDE.md lacks post-install coverage for: {missing}"
+    )

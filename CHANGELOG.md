@@ -10,6 +10,18 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.7.0] - 2026-08-15
+
+### Added
+- Setup-completeness contract (ADR 0039 amendment, handoff item 3): the
+  third failure category — legitimate-but-degraded. Optional inputs carry
+  a `remediation` field; each 03 run records their presence in the new
+  `ops_setup_completeness` table (queryable by /health and admins, never
+  only stdout). INSTALLATION_GUIDE gains an Optional Enrichments section,
+  pinned to the registry by a docs-consistency test.
+
+---
+
 ## [1.6.1] - 2026-08-15
 
 ### Fixed
