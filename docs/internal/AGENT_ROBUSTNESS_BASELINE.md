@@ -56,3 +56,25 @@ known disease is back.
   decision_shape telemetry) ever points at prose.
 - Paraphrases are LLM-generated; adversarial human phrasings (the
   demo's "surprise question" beat) remain the live test.
+
+## Re-earned 2026-08-14 — post retrieval rebuild (1.5.3-1.5.5)
+
+The search documents changed underneath the agent (step identity-leak
+removed from search_text; decision-level descriptions; full re-embed
+via notebook 11), so the baseline above was stale evidence. Re-run:
+
+- **60 conversations** (10 canonicals x 6 variants), **all checks
+  1.00** — every grader, every class, including uniqueness_verified
+  and both refusal classes.
+- Latency p50 7.97s / max 46.0s per turn (Kusto + Azure OpenAI, F2).
+- Manual ranking probe same day: "ED sepsis" -> 8 sepsis metrics lead,
+  only content-relevant steps remain (ENC_COND, SepsisSummary);
+  refusal floor holds at threshold 0.35 (junk: zero rows). True
+  matches 0.49-0.56 — absolute closeness dropped vs the old doc
+  composition (expected; scores are not comparable across
+  compositions, per eventhouse_setup.kql section 3).
+
+Note: the suite still measures the ADR 0035 loop (run_turn + five
+tools). Regrading to plan-protocol quality is queued with the
+demolition task; both paths share the retrieval core this rerun
+validates.
