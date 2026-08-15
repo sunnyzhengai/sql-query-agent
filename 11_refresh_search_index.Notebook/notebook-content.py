@@ -26,6 +26,23 @@
 
 # CELL ********************
 
+from src.steps.search_index import embed_command, COVERAGE_QUERY
+
+client.mgmt(embed_command(EMBED_ENDPOINT))          # only missing rows pay
+print(client.run(COVERAGE_QUERY))                   # expect Count = 0
+print(client.run(
+    "semantic_catalog | where isnull(emb) or array_length(emb) == 0 "
+    "| project node_id, search_len = strlen(search_text)"))
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
 """Refresh the semantic search index end to end (run AFTER 07).
 
 Reads from:  graph_nodes (fresh descriptions)
@@ -43,7 +60,7 @@ Standing rule: 03/04 rerun => 07 rerun => THIS notebook.
 
 # Fill once per environment: the Eventhouse QUERY URI (KQL database
 # page -> copy Query URI) and database name.
-KUSTO_URI = "https://REPLACE-ME.kusto.fabric.microsoft.com"
+KUSTO_URI = "https://trd-uzdu1yhqrmqtutkej8.z7.kusto.fabric.microsoft.com"
 KUSTO_DB = "probe-eh"
 EMBED_ENDPOINT = (
     "https://aivia.openai.azure.com/openai/deployments/"
@@ -52,6 +69,47 @@ EMBED_ENDPOINT = (
 # Optional smoke phrase printed with top scores after the refresh
 # (leave empty to skip) — set to whatever you are testing today.
 PROBE_PHRASE = ""
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+import notebookutils
+from src.orchestrator.kusto import KustoClient
+from src.steps.search_index import embed_command, COVERAGE_QUERY
+
+client = KustoClient(
+    KUSTO_URI, KUSTO_DB,
+    lambda: notebookutils.credentials.getToken(KUSTO_URI),
+    timeout=600,
+)
+client.mgmt(embed_command(EMBED_ENDPOINT))          # only missing rows pay
+print(client.run(COVERAGE_QUERY))                   # expect [{'Count': 0}]
+print(client.run(
+    "semantic_catalog | where isnull(emb) or array_length(emb) == 0 "
+    "| project node_id, search_len = strlen(search_text)"))
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+# refusal floor — expect [] (junk must clear nothing)
+print(client.run('semantic_search("unicorn readmission velocity")'))
+
+# the question that started all this — new ranking with scores
+for row in client.run('semantic_search("ED sepsis", 10)'):
+    print(f"{row['closeness']:.3f}  {row['kind']:<7} {row['node_id']}")
+
 
 # METADATA ********************
 
