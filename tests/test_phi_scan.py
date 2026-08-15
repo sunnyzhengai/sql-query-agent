@@ -120,3 +120,21 @@ class TestPersistence:
         rescanned = apply_dispositions(scan_sql("m", sql), first)
         out = redact(sql, rescanned)
         assert "21" not in out and PLACEHOLDERS["threshold_literal"] in out
+
+
+class TestFindingIdsAreUnique:
+    def test_repeated_literal_in_one_proc_dedupes_to_one_finding(self):
+        """finding_id = hash(metric_id|rule|matched); the same literal
+        matched twice (e.g. a code list repeated across CTEs) must produce
+        ONE finding — one steward decision per (metric, rule, value). Caught
+        live by 02's postcondition gate on the first full-corpus run after
+        the .limit(50) dev cap was removed (219 duplicate ids, 2026-08-15)."""
+        sql = (
+            "WITH a AS (SELECT * FROM t WHERE patient_id = 1234567890),\n"
+            "     b AS (SELECT * FROM t WHERE patient_id = 1234567890)\n"
+            "SELECT * FROM a JOIN b ON a.x = b.x"
+        )
+        findings = scan_sql("m1", sql)
+        ids = [f.finding_id for f in findings]
+        assert len(ids) == len(set(ids)), f"duplicate finding_ids: {ids}"
+        assert len([f for f in findings if f.matched_text == "1234567890"]) == 1

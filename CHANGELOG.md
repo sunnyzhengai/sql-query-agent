@@ -10,6 +10,18 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.6.1] - 2026-08-15
+
+### Fixed
+- PHI scan: the same literal repeated within one proc (code lists copied
+  across CTEs) produced duplicate finding_ids — one finding per
+  (metric, rule, value) now, first occurrence's context kept. Found by
+  02's postcondition gate (unique(finding_id), 219 duplicates) on the
+  first full-corpus run after the .limit(50) dev cap was removed — the
+  gate catching a real defect the limiter had been masking.
+
+---
+
 ## [1.6.0] - 2026-08-15
 
 ### Added

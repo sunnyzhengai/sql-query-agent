@@ -53,3 +53,26 @@ Implications for the contract work:
 
 If this lands, it likely warrants an ADR amendment or a new ADR that
 cites 0026.
+
+## 3. Optional inputs: setup incompleteness should be queryable state
+
+Sunny's question (2026-08-15, reading 03 cell 2): are the optional-table
+messages tied to documented admin prerequisites? Today: prose only. The
+"No gov_steward_assignments table — run manage_stewards" line exists only
+in notebook stdout; INSTALLATION_GUIDE lists the table but has no
+matching setup step; nothing queryable records that a run proceeded
+without the enrichment.
+
+There is a third failure category between "gate error" and "product
+defect": **legitimate-but-degraded state** (graph built with 0 stewards,
+metrics showing object names only). Suggested contract treatment:
+
+- Registry marks these inputs `optional`, each with a `remediation`
+  field (which utility/notebook provides it).
+- A pipeline run that proceeds without an optional input emits a
+  setup-completeness record (queryable, e.g. feeding `/health`), not
+  just a printed line — consistent with item 2: state that matters is a
+  node in the graph, never only stdout.
+- INSTALLATION_GUIDE's post-install steps should be generated from (or
+  at least checked against) the optional-input registry so docs and
+  contracts can't drift.

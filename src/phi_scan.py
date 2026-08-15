@@ -108,6 +108,7 @@ def scan_sql(metric_id: str, sql: str) -> "list[Finding]":
         return []
     findings: "list[Finding]" = []
     claimed: "list[tuple[int, int]]" = []
+    seen_ids: "set[str]" = set()
 
     def overlaps(start: int, end: int) -> bool:
         return any(s < end and start < e for s, e in claimed)
@@ -115,8 +116,17 @@ def scan_sql(metric_id: str, sql: str) -> "list[Finding]":
     def add(rule: str, start: int, end: int) -> None:
         claimed.append((start, end))
         matched = sql[start:end]
+        fid = _finding_id(metric_id, rule, matched)
+        # The same literal repeated in one proc (code lists copied across
+        # CTEs) hashes to the same id: ONE finding, first occurrence's
+        # context — one steward decision per (metric, rule, value). The
+        # ops_phi_findings unique(finding_id) invariant enforces this
+        # (caught live by 02's postcondition gate, 2026-08-15).
+        if fid in seen_ids:
+            return
+        seen_ids.add(fid)
         findings.append(Finding(
-            finding_id=_finding_id(metric_id, rule, matched),
+            finding_id=fid,
             metric_id=metric_id,
             rule=rule,
             matched_text=matched,
