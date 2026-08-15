@@ -5,6 +5,16 @@ read-only by agreement and will not implement these. **To:** the session
 fixing contract misalignments and creating the contracts. Fold these into
 the contract design rather than treating them as separate tasks.
 
+> **Role swap (2026-08-15, later):** the sessions exchanged roles — the
+> former teaching session now builds; the former contracts session now
+> teaches (read-only). Items 1–3 below all landed (1.6.0–1.7.0). First
+> build act after the swap: 1.7.1 — CI had been red since 1.6.0 (fastapi
+> imported but undeclared broke collection, masking the whole suite);
+> fixed with declared extras + a new imported-vs-declared contract test,
+> which also caught undeclared PyJWT in marketplace_host before deploy.
+> Note for local runs: tests/golden fallback smoke needs the ScriptDom
+> sidecar on localhost:5111 (18 local-only failures when it's down).
+
 ## 1. Precondition gates (mirror of `postcondition_gate`)
 
 `src/steps/gates.py` has `postcondition_gate` (proves what a step *wrote*

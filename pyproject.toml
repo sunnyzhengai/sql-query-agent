@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "sql-query-agent"
-version = "1.7.0"
+version = "1.7.1"
 description = "SQL Intelligence Agent for Microsoft Fabric. Extract business logic from SQL, build knowledge graphs, answer questions in plain English."
 readme = "README.md"
 requires-python = ">=3.9"
@@ -26,10 +26,22 @@ dev = [
     "ruff>=0.1.9",
     "build",
     "requests>=2.31.0",  # tests/adapters imports the adapters; keep in sync with [adapters]
+    "fastapi>=0.110",    # tests/webapp imports the webapp surface; keep in sync with [webapp]
+    "httpx>=0.27",       # fastapi.testclient's transport
 ]
 adapters = [
     "requests>=2.31.0",
     "azure-identity>=1.15.0",
+]
+webapp = [
+    # The workbench/chat surface (src/webapp) served on App Service
+    "fastapi>=0.110",
+    "uvicorn>=0.29",
+]
+marketplace = [
+    # marketplace_host: SaaS Fulfillment webhook + Entra token validation
+    "pyjwt[crypto]>=2.8",
+    "requests>=2.31.0",
 ]
 
 [project.urls]

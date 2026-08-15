@@ -10,6 +10,28 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.7.1] - 2026-08-15
+
+### Fixed
+- CI red since 1.6.0: `src/webapp` and its tests import fastapi, which was
+  never declared, so CI's `pip install -e ".[dev]"` produced a collection
+  error that also masked every other test. fastapi/httpx now declared in
+  `dev`; new `webapp` (fastapi, uvicorn) and `marketplace` (pyjwt[crypto],
+  requests) extras.
+- `marketplace_host/wiring.py` imports jwt (Entra token validation) with
+  PyJWT undeclared anywhere — caught before the App Service deploy
+  (LISTING_CHECKLIST item) could ship without it.
+
+### Added
+- Dependency-declaration contract test
+  (`tests/test_dependency_declarations.py`): every third-party import in
+  src/, tests/, and marketplace_host/ must be declared in pyproject.toml;
+  Fabric-runtime modules (pyspark, mssparkutils, notebookutils, pyodbc,
+  clr) are exempt with named providers. Table contracts police
+  declared-vs-written; this polices imported-vs-declared.
+
+---
+
 ## [1.7.0] - 2026-08-15
 
 ### Added
