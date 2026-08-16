@@ -70,6 +70,37 @@ types, so the DAX half is extracted and discarded.
 5. **End-to-end test** with recorded TMDL fixtures through whatever
    pipeline shape 1–3 produce.
 
+## Follow-ups (2026-08-16, post-1.9.0)
+
+> **Status (2026-08-16, dev session): all three implemented in 1.9.2.**
+> (1) extract_pbix_sources.py DELETED; its live-tested
+> friendly_name_from_report moved to src/governance/display_names (now
+> used by the TMDL path); reading its multi-report handling exposed and
+> fixed a real 1.9.0 bug — two reports EXECing the same proc would have
+> emitted duplicate metric_id rows and failed 12's unique-invariant
+> gate. (2) collibra_lineage_match docstring corrected (publishing-side
+> ASSET MATCHING, not lineage) AND the upgrade implemented: exact
+> TMDL-derived names from input_metric_names match deterministically
+> (score 1.0, no fuzzy fallback when the exact name is known); _PBI
+> heuristic demoted to fallback. (3) The scoping header had already been
+> reconciled same-day in 1.9.0.
+
+Verdicts from the failed-lineage-attempts review (Sunny asked; recorded
+late — the review session initially promised these only in conversation):
+
+1. **DELETE scripts/extract_pbix_sources.py** — pbix-cracking is superseded
+   in every path: git-integrated workspaces serialize TMDL, and
+   non-integrated ones yield TMDL via the Fabric getDefinition REST API.
+   Zero callers (audit ghost list). No scenario keeps it alive.
+2. **Correct collibra_lineage_match's story** — it survived by changing
+   jobs: it is publishing-side ASSET MATCHING (find the Collibra asset to
+   write a description onto), not lineage. Docstring still introduces it
+   as report-matching-by-naming-convention lineage. Update docstring (and
+   consider keying on exact TMDL-derived report names now that
+   input_metric_names is active, shrinking the _PBI-suffix heuristic).
+3. Minor: the 1.9.0 status header above says the scoping question "stays
+   open" — it does not; see DECIDED section below. Reconcile the header.
+
 ## Scoping — DECIDED (Sunny, 2026-08-16): PBI layer IS v1 Marketplace scope
 
 Rationale: real customers ask about REPORTS, not procs/views — the report

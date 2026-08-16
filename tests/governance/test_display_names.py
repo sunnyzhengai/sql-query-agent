@@ -1,15 +1,11 @@
 """Tests for business-friendly metric names (input_metric_names -> graph)."""
 
-from scripts.extract_pbix_sources import (
-    build_metric_name_records,
-    friendly_name_from_report,
-)
 from scripts.seed_sample_data import (
     SAMPLE_DICT_COLUMNS,
     SAMPLE_DICT_TABLES,
     SAMPLE_SQL_SOURCES,
 )
-from src.governance.display_names import apply_business_names
+from src.governance.display_names import apply_business_names, friendly_name_from_report
 from src.graph.builder import GraphBuilder
 from src.parser.sql_parser import parse_sql
 from src.steps.build_graph import build_graph_step
@@ -102,23 +98,9 @@ class TestPipelineFlow:
         assert [h["metric_id"] for h in hits] == ["reporting.USP_X1"]
 
 
-class TestPbixEmission:
+class TestFriendlyName:
+    # Name-record EMISSION now lives in semantic_models_step (TMDL path;
+    # pbix-cracking deleted 2026-08-16) — see tests/steps/test_semantic_models.py.
     def test_friendly_name_from_report(self):
         assert friendly_name_from_report("IP_Sepsis-Compliance_Dashboard") == \
             "IP Sepsis Compliance Dashboard"
-
-    def test_one_record_per_source_first_report_wins(self):
-        results = [
-            {"report_name": "Sepsis_Dashboard", "sql_source": "EXEC USP_A"},
-            {"report_name": "Ops_Review", "sql_source": "EXEC USP_A"},
-            {"report_name": "Ops_Review", "sql_source": "FROM reporting.V_B"},
-            {"report_name": "NoSource", "sql_source": None},
-            {"report_name": "RawSql", "sql_source": "SQL: SELECT * FROM x JOIN y"},
-        ]
-        records = build_metric_name_records(results)
-        assert len(records) == 2  # raw-SQL fragment skipped, not guessed
-        a = next(r for r in records if r["metric_id"] == "USP_A")
-        assert a["business_name"] == "Sepsis Dashboard"
-        assert a["report_name"] == "Sepsis_Dashboard; Ops_Review"
-        assert a["source"] == "pbi_report"
-        assert any(r["metric_id"] == "reporting.V_B" for r in records)

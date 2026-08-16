@@ -1,6 +1,8 @@
-# Collibra Lineage Match: Stored Procs/Views → Power BI Reports
-# Matches _PBI-suffixed procs and views to PBI reports in Collibra
-# by extracting the meaningful name part and fuzzy-matching.
+# Collibra Asset Match: which Collibra PBI Report asset gets the description?
+# Publishing-side matching, NOT lineage (lineage is TMDL partition parsing,
+# ADR 0040). Exact TMDL-derived report names (input_metric_names) match
+# deterministically; the _PBI-suffix fuzzy heuristic is the fallback for
+# objects 12_ingest_semantic_models has not covered.
 # Uses credentials from org_config.yaml.
 
 # %% Cell 1: Setup
@@ -46,8 +48,19 @@ objects = [
 #     for row in tracking.collect()
 # ]
 
+# Exact names from TMDL lineage (12_ingest_semantic_models): objects in
+# this mapping match deterministically, skipping the fuzzy heuristic.
+known_report_names = {}
+if spark.catalog.tableExists("input_metric_names"):  # noqa: F821
+    for row in spark.table("input_metric_names").collect():  # noqa: F821
+        # first-listed report is the naming report (see semantic_models)
+        first_report = (row["report_name"] or "").split(";")[0].strip()
+        if row["source"] == "pbi_report" and first_report:
+            known_report_names[row["metric_id"].split(".")[-1]] = first_report
+    print(f"Exact report names from input_metric_names: {len(known_report_names)}")
+
 matcher = CollibraLineageMatcher(client, min_score=0.5)
-result = matcher.match_objects(objects)
+result = matcher.match_objects(objects, known_report_names=known_report_names)
 print(result)
 
 # %% Cell 3: Review matches

@@ -25,6 +25,7 @@ from typing import Iterable
 
 from src.extractor.devops_tmdl import parse_tmdl_dax, parse_tmdl_partition
 from src.extractor.tmdl_source import TmdlFile
+from src.governance.display_names import friendly_name_from_report
 
 
 @dataclass
@@ -96,9 +97,13 @@ def semantic_models_step(
         sources_by_report, scan_timestamp
     )
 
-    # Logic relations.
+    # Logic relations. (metric-name rows may list several reports,
+    # "; "-joined — every listed report must have been seen.)
     report_set = set(reports_seen)
-    assert all(r["report_name"] in report_set for r in metric_name_rows)
+    assert all(
+        name.strip() in report_set
+        for r in metric_name_rows for name in r["report_name"].split(";")
+    )
     assert all(r["report_name"] in report_set for r in dax_rows)
 
     return SemanticModelsOutput(
@@ -113,7 +118,7 @@ def semantic_models_step(
 def _derive_metric_names(
     sources_by_report: "dict[str, list[dict]]", scan_timestamp: str
 ) -> "tuple[list[dict], list[str]]":
-    rows: "list[dict]" = []
+    by_metric: "dict[str, list[str]]" = {}
     skipped: "list[str]" = []
     for report_name, sources in sources_by_report.items():
         # Only procs/views name metrics — a DirectLake TABLE source is
@@ -136,11 +141,20 @@ def _derive_metric_names(
             f"{src['schema_name']}.{src['sql_object']}"
             if src["schema_name"] else src["sql_object"]
         )
+        by_metric.setdefault(metric_id, []).append(report_name)
+
+    # One row per metric (the input_metric_names unique invariant). A
+    # metric fed by multiple reports keeps the FIRST report's name
+    # (insertion order = TMDL file order, deterministic) and lists the
+    # rest in report_name for steward review — no guessing which report
+    # is canonical.
+    rows: "list[dict]" = []
+    for metric_id, reports in by_metric.items():
         rows.append({
             "metric_id": metric_id,
-            "business_name": report_name,
+            "business_name": friendly_name_from_report(reports[0]),
             "source": "pbi_report",
-            "report_name": report_name,
+            "report_name": "; ".join(dict.fromkeys(reports)),
             "report_url": "",
             "assigned_date": scan_timestamp,
         })

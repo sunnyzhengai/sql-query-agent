@@ -15,6 +15,7 @@ SKIPPED and reported, never guessed.
 from __future__ import annotations
 
 import logging
+import re
 from typing import Any, Iterable
 
 from src.graph.builder import GraphBuilder
@@ -83,3 +84,15 @@ def apply_business_names(
         logger.warning("Business names skipped: %s", "; ".join(skipped))
     logger.info("Applied %d business names to canonical nodes", applied)
     return applied, skipped
+
+
+def friendly_name_from_report(report_name: str) -> str:
+    """Report/folder name -> business-friendly display name.
+
+    'IP_Sepsis_Compliance_Dashboard' -> 'IP Sepsis Compliance Dashboard'.
+    Purely mechanical (separators to spaces, collapse whitespace) — no
+    vocabulary invention; the report author chose these words.
+    (Moved from scripts/extract_pbix_sources.py when pbix-cracking was
+    deleted — TMDL supersedes it in every path.)
+    """
+    return " ".join(re.split(r"[_\-]+", report_name)).strip()

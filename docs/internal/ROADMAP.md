@@ -258,8 +258,9 @@ Get Metadata Sync working end-to-end with real data against Purview/Collibra.
 - [ ] Reconcile remaining 2 "planned" contracts: ops_extraction_inspection,
       ops_sync_log — reinstate writers or drop
 - [x] Business-friendly metric names (2026-08-07): input_metric_names
-      contract (PBI lineage via extract_pbix_sources --names-csv, or
-      manual CSV) → canonical nodes → metric_logic.business_name +
+      contract (since 1.9.x: TMDL lineage via 12_ingest_semantic_models —
+      pbix-cracking deleted — or manual CSV) → canonical nodes →
+      metric_logic.business_name +
       graph_canonical.businessName → both agents search & display them;
       ambiguous bare names skipped, never guessed. On-tenant: author the
       dev-corpus mapping, rerun 03→05, re-Load

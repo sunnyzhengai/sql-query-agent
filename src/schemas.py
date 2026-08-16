@@ -1601,7 +1601,7 @@ METRIC_NAMES = {
     "owner": {"notebook": "12_ingest_semantic_models", "module": "src/steps/semantic_models.py"},
     "write_mode": "overwrite",
     "enrichers": [],
-    "consumers": ["03_build_graph"],
+    "consumers": ["03_build_graph", "collibra_lineage_match"],
     "optional_input": True,
     "remediation": (
         "run 12_ingest_semantic_models to derive names from PBI semantic "

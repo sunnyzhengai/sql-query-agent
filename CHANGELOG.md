@@ -10,6 +10,29 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.9.2] - 2026-08-16
+
+### Fixed
+- 1.9.0 latent bug found while retiring the pbix script: two reports
+  executing the same proc emitted duplicate metric_id rows into
+  input_metric_names, which would fail the unique invariant in 12's
+  postcondition gate. Now one row per metric — first report names it
+  (friendly-cased), the rest listed in report_name for steward review.
+
+### Changed
+- collibra_lineage_match identity corrected (PBI handoff follow-up 2):
+  it is publishing-side ASSET matching, not lineage. Upgrade: exact
+  TMDL-derived report names from input_metric_names match
+  deterministically (score 1.0; a known-but-absent asset is a miss,
+  never a fuzzy guess); the _PBI-suffix heuristic is now the fallback.
+
+### Removed
+- scripts/extract_pbix_sources.py (follow-up 1): pbix-cracking is
+  superseded everywhere by TMDL (git-synced or getDefinition API).
+  friendly_name_from_report survives in src/governance/display_names.
+
+---
+
 ## [1.9.1] - 2026-08-16
 
 ### Added

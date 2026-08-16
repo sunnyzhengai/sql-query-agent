@@ -120,6 +120,21 @@ class TestSemanticModelsStep:
         names = [d["name"] for d in out.dax_rows]
         assert "encounter_id" not in names
 
+    def test_two_reports_same_metric_emit_one_row(self):
+        """input_metric_names has a unique metric_id invariant: a metric
+        fed by two reports gets ONE row — first report names it, the
+        rest are listed for steward review, never guessed."""
+        files = [
+            TmdlFile("Sepsis_Dashboard", "SepsisData", SEPSIS_TMDL),
+            TmdlFile("Exec_Overview", "SepsisData", SEPSIS_TMDL),
+        ]
+        out = semantic_models_step(files)
+        assert len(out.metric_name_rows) == 1
+        row = out.metric_name_rows[0]
+        assert row["metric_id"] == "reporting.USP_IP_SepsisDates"
+        assert row["business_name"] == "Sepsis Dashboard"  # friendly-cased
+        assert row["report_name"] == "Sepsis_Dashboard; Exec_Overview"
+
 
 class TestDaxColumnRefs:
     def test_qualified_refs_extracted(self):

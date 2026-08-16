@@ -2,6 +2,7 @@
 
 
 from src.adapters.collibra_lineage_match import (
+    CollibraLineageMatcher,
     extract_match_key,
     fuzzy_match_score,
     normalize_report_name,
@@ -83,3 +84,53 @@ class TestFuzzyMatchScore:
         # "compliance" is substring of "compliancemetrics" → should match
         score = fuzzy_match_score("compliance metrics", "ip sepsis compliancemetrics report")
         assert score >= 0.5
+
+
+class TestExactMatchTier:
+    """Exact TMDL-derived names beat the heuristic (follow-up 2026-08-16)."""
+
+    def _matcher(self):
+        m = CollibraLineageMatcher(client=None, min_score=0.5)
+        m._report_cache = [
+            {"id": "asset-1", "name": "Sepsis Compliance Dashboard"},
+            {"id": "asset-2", "name": "ED Throughput"},
+        ]
+        return m
+
+    def test_exact_name_matches_deterministically(self):
+        match = self._matcher().match_object(
+            "USP_CCHP_Whatever", exact_report_name="Sepsis Compliance Dashboard"
+        )
+        assert match is not None
+        assert match.report_asset_id == "asset-1"
+        assert match.score == 1.0
+
+    def test_exact_name_is_case_insensitive(self):
+        match = self._matcher().match_object(
+            "USP_X", exact_report_name="sepsis compliance DASHBOARD"
+        )
+        assert match is not None and match.report_asset_id == "asset-1"
+
+    def test_known_but_absent_name_never_falls_back_to_fuzzy(self):
+        # The asset is not in Collibra yet: correct answer is NO match,
+        # not a fuzzy guess against a name we know exactly.
+        match = self._matcher().match_object(
+            "USP_CCHP_ED_Throughput_PBI", exact_report_name="Missing Report"
+        )
+        assert match is None
+
+    def test_match_objects_uses_known_names_case_insensitively(self):
+        result = self._matcher().match_objects(
+            [{"object_name": "USP_A", "object_type": "SQL_STORED_PROCEDURE"}],
+            known_report_names={"usp_a": "ED Throughput"},
+        )
+        assert len(result.matched) == 1
+        assert result.matched[0].report_asset_id == "asset-2"
+
+    def test_without_known_name_heuristic_still_applies(self):
+        result = self._matcher().match_objects(
+            [{"object_name": "USP_CCHP_ED_Throughput_PBI",
+              "object_type": "SQL_STORED_PROCEDURE"}],
+        )
+        assert len(result.matched) == 1
+        assert result.matched[0].report_name == "ED Throughput"

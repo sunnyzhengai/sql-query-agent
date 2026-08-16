@@ -25,6 +25,7 @@ flowchart LR
   11_refresh_search_index["11_refresh_search_index"]:::notebook
   12_ingest_semantic_models["12_ingest_semantic_models"]:::notebook
   13_publish_pbi["13_publish_pbi"]:::notebook
+  collibra_lineage_match["collibra_lineage_match"]:::notebook
   eventhouse_semantic_search["eventhouse_semantic_search"]:::notebook
   export_test_fixtures["export_test_fixtures"]:::notebook
   extract_views["extract_views"]:::notebook
@@ -135,6 +136,7 @@ flowchart LR
   input_dict_tables --> export_test_fixtures
   input_dict_tables --> load_caboodle_dictionary
   input_metric_names --> 03_build_graph
+  input_metric_names --> collibra_lineage_match
   input_report_sources --> 03_build_graph
   input_sql_sources --> 01_install
   input_sql_sources --> 02_parse
