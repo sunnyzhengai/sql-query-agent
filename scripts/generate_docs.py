@@ -17,9 +17,11 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
+from src.integration_registry import INTEGRATION_REGISTRY  # noqa: E402
 from src.schemas import TABLE_REGISTRY  # noqa: E402
 
 PIPELINE_MAP_PATH = PROJECT_ROOT / "docs" / "architecture" / "PIPELINE_MAP.md"
+INTEGRATION_MAP_PATH = PROJECT_ROOT / "docs" / "architecture" / "INTEGRATION_MAP.md"
 
 # Non-notebook consumers rendered as terminal actors.
 ACTORS = {"data_agent", "admin", "collibra_adapter", "purview_adapter"}
@@ -113,9 +115,74 @@ invariants, relations — live in `src/schemas.py`.
 """
 
 
+def build_integration_map() -> str:
+    """Project INTEGRATION_REGISTRY to mermaid + table.
+
+    Deliberately SEPARATE from PIPELINE_MAP: this answers "what tools do
+    we connect to and how", for roadmap/marketplace audiences; the
+    pipeline map answers "how does data flow inside an installation".
+    """
+    style = {"shipped": "shipped", "planned": "planned", "watchlist": "watchlist"}
+    lines = ["flowchart LR", '  AIVIA(("AIVIA<br/>knowledge graph")):::core']
+    for i, row in enumerate(INTEGRATION_REGISTRY):
+        other = row["to_tool"] if row["from_tool"] == "AIVIA" else row["from_tool"]
+        node = f"T{i}"
+        lines.append(f'  {node}["{other}"]:::{style[row["status"]]}')
+        label = row["status"] if row["status"] != "shipped" else row["direction"]
+        if row["from_tool"] == "AIVIA":
+            lines.append(f"  AIVIA -->|{label}| {node}")
+        else:
+            lines.append(f"  {node} -->|{label}| AIVIA")
+    lines.append("  classDef core fill:#e8f0fe,stroke:#4285f4,stroke-width:2px")
+    lines.append("  classDef shipped fill:#e6f4ea,stroke:#34a853")
+    lines.append("  classDef planned fill:#fef7e0,stroke:#f9ab00")
+    lines.append("  classDef watchlist fill:#fce8e6,stroke:#ea4335,stroke-dasharray: 4")
+    mermaid = "\n".join(lines)
+
+    header = (
+        "| From | To | Artifact parsed | Mechanism | Status | Tier | Direction |\n"
+        "|---|---|---|---|---|---|---|"
+    )
+    rows = [
+        f"| {r['from_tool']} | {r['to_tool']} | {r['artifact_parsed']} | "
+        f"{r['mechanism']} | {r['status']} | {r['tier']} | {r['direction']} |"
+        for r in INTEGRATION_REGISTRY
+    ]
+    notes = [
+        f"- **{r['from_tool']} → {r['to_tool']}**: {r['notes']}"
+        for r in INTEGRATION_REGISTRY if r["notes"]
+    ]
+
+    return f"""<!-- GENERATED FILE — do not edit.
+     Source: INTEGRATION_REGISTRY in src/integration_registry.py
+     Regenerate: python scripts/generate_docs.py
+     CI fails if this file differs from regeneration. -->
+
+# Integration Map
+
+The tool/connector landscape as data: what AIVIA parses on the way in
+(always via each layer's native parser) and what it publishes on the way
+out. Supersedes the ROADMAP connector table (2026-08-07) and the
+REFERENCE_ARCHITECTURE tier table as source of truth.
+
+```mermaid
+{mermaid}
+```
+
+{header}
+{chr(10).join(rows)}
+
+## Notes
+
+{chr(10).join(notes)}
+"""
+
+
 def main() -> None:
     PIPELINE_MAP_PATH.write_text(build_pipeline_map())
     print(f"Wrote {PIPELINE_MAP_PATH}")
+    INTEGRATION_MAP_PATH.write_text(build_integration_map())
+    print(f"Wrote {INTEGRATION_MAP_PATH}")
 
 
 if __name__ == "__main__":

@@ -1,5 +1,14 @@
 # Handoff — integration registry: the tool/connector landscape as data
 
+> **Status (2026-08-16, dev session): items 1–3 implemented in 1.9.1.**
+> src/integration_registry.py (validated on import), generated
+> INTEGRATION_MAP.md + freshness test, shipped-ingest-connector ↔
+> INSTALLATION_GUIDE projection test. Databricks/Snowflake parser
+> columns carry the TBD-at-build-time note verbatim. Item 4
+> (customer-runtime connector state) deliberately not built, per the
+> handoff. ROADMAP/REFERENCE_ARCHITECTURE tables should be banner-noted
+> as superseded on their next edit.
+
 **From:** learning/review session, 2026-08-16. **To:** dev session.
 **Origin:** Sunny: "best way to keep track of all tools (PBI, Fabric, SQL
 Server, Collibra, Purview, dbt, Databricks, Snowflake) and the connectors

@@ -10,6 +10,21 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.9.1] - 2026-08-16
+
+### Added
+- Integration registry (HANDOFF_INTEGRATION_REGISTRY): the connector
+  landscape as data in `src/integration_registry.py` — one record per
+  tool edge (SQL Server profiles, PBI/TMDL, Collibra, Purview, dbt,
+  Databricks, Snowflake) with status/tier/direction/mechanism.
+  Supersedes the ROADMAP connector table and REFERENCE_ARCHITECTURE
+  tier table as source of truth. Projections: generated
+  `docs/architecture/INTEGRATION_MAP.md` (mermaid + table) with a
+  freshness test, plus a projection test that every SHIPPED ingest
+  connector is covered by the INSTALLATION_GUIDE.
+
+---
+
 ## [1.9.0] - 2026-08-16
 
 ### Added

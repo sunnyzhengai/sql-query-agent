@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "sql-query-agent"
-version = "1.9.0"
+version = "1.9.1"
 description = "SQL Intelligence Agent for Microsoft Fabric. Extract business logic from SQL, build knowledge graphs, answer questions in plain English."
 readme = "README.md"
 requires-python = ">=3.9"

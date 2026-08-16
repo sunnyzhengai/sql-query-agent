@@ -79,6 +79,47 @@ def test_pipeline_map_is_freshly_generated():
     )
 
 
+def test_integration_map_is_freshly_generated():
+    """Same generated-tier check for the connector landscape projection."""
+    import importlib.util
+
+    spec = importlib.util.spec_from_file_location(
+        "generate_docs", REPO_ROOT / "scripts" / "generate_docs.py"
+    )
+    gen = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(gen)
+
+    on_disk = (REPO_ROOT / "docs" / "architecture" / "INTEGRATION_MAP.md").read_text()
+    assert on_disk == gen.build_integration_map(), (
+        "INTEGRATION_MAP.md is stale — run: python scripts/generate_docs.py"
+    )
+
+
+def test_shipped_ingest_connectors_are_covered_by_install_guide():
+    """Projection check (integration-registry handoff item 3): every
+    SHIPPED ingest connector's config surface must appear in the guide —
+    a customer must be able to set up everything we claim ships."""
+    from src.integration_registry import INTEGRATION_REGISTRY
+
+    guide = INSTALL_GUIDE.read_text()
+    anchors = {
+        "onprem_gateway": "onprem_gateway",
+        "azure_direct": "azure_direct",
+        "fabric_native": "fabric_native",
+        "devops_git": "devops_git",
+        "folder profile": "folder",
+    }
+    missing = []
+    for row in INTEGRATION_REGISTRY:
+        if row["status"] != "shipped" or row["direction"] != "ingest":
+            continue
+        if not any(a in row["mechanism"] and anchors[a] in guide for a in anchors):
+            missing.append(f"{row['from_tool']} ({row['mechanism']})")
+    assert not missing, (
+        f"shipped ingest connectors not covered by INSTALLATION_GUIDE: {missing}"
+    )
+
+
 def test_install_guide_does_not_hardcode_package_version():
     guide = INSTALL_GUIDE.read_text()
     assert not re.search(r"sql_query_agent-\d+\.\d+\.\d+", guide), (
