@@ -10,6 +10,34 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.10.0] - 2026-08-16
+
+### Added
+- **The agent learns the consumption layer** (demo gap 1, ADR 0040
+  consequence closed): semantic catalog gains report + measure kinds;
+  new `list_report_links` tool (metric → reports built on it; report →
+  executed metrics, DirectLake tables, DAX measures — deterministic
+  edges, never name-matched); `get_facts` reads report/measure nodes;
+  system prompt teaches the report-links exception to the lineage
+  refusal. GraphView gains reports_of_metric / metrics_of_report /
+  measures_of_report. Requires a `graph_edges` OneLake shortcut in the
+  Eventhouse (RESUME_CHECKLISTS updated).
+- **07 describes DAX** (demo gap 2): measure nodes get dictionary-
+  grounded business descriptions (MEASURE_PROMPT, v3 discipline: keep
+  values, ban raw identifiers), cached by content hash like steps.
+- **PHI gate covers DAX**: measure expressions are scanned and redacted
+  inline in 07 before any prompt (fail-safe toward redaction), and the
+  literal rules gained double-quoted variants — DAX quotes strings with
+  double quotes, which the SQL-shaped rules silently missed.
+
+### Fixed
+- Extractor emitted source_type "stored_procedure" but the
+  input_sql_sources contract allows "procedure"/"view" (01 derives the
+  same via extract_object_identity) — the direct-MERGE path would have
+  failed the allowed-values invariant on first Fabric run.
+
+---
+
 ## [1.9.2] - 2026-08-16
 
 ### Fixed

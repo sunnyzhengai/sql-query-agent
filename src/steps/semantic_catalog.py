@@ -23,6 +23,8 @@ from src.models import NodeLayer
 KIND_METRIC = "metric"
 KIND_STEP = "step"
 KIND_TERM = "term"
+KIND_REPORT = "report"
+KIND_MEASURE = "measure"
 
 
 @dataclass
@@ -31,6 +33,8 @@ class SemanticCatalogOutput:
     metric_count: int
     step_count: int
     term_count: int
+    report_count: int = 0
+    measure_count: int = 0
 
 
 def _doc(*parts: "str | None") -> str:
@@ -54,6 +58,7 @@ def build_semantic_catalog(
     nodes = rows_to_nodes(nodes_rows)
     rows: "list[dict]" = []
     metric_count = step_count = term_count = 0
+    report_count = measure_count = 0
 
     for node_id, node in sorted(nodes.items()):
         if node.layer == NodeLayer.CANONICAL:
@@ -95,6 +100,36 @@ def build_semantic_catalog(
                 "display_text": _doc(node.name, f"step of {metric_id}"),
             })
             step_count += 1
+        elif node.layer == NodeLayer.REPORT:
+            # Consumption layer (ADR 0040): users ask by dashboard name
+            rows.append({
+                "node_id": node_id,
+                "kind": KIND_REPORT,
+                "ref": node.name,
+                "name": node.name,
+                "business_name": node.name,
+                "search_text": _doc(node.name, node.description),
+                "display_text": _doc(node.name, "Power BI report"),
+            })
+            report_count += 1
+        elif node.layer == NodeLayer.MEASURE:
+            props = node.properties or {}
+            # Like steps, search_text excludes the parent report's name
+            # (identity-leak lesson 2026-08-13): a measure matches when
+            # ITS definition matches; finding a report's measures is the
+            # links tool's job, not search's.
+            rows.append({
+                "node_id": node_id,
+                "kind": KIND_MEASURE,
+                "ref": props.get("report_name", ""),
+                "name": node.name,
+                "business_name": "",
+                "search_text": _doc(node.name, node.description),
+                "display_text": _doc(
+                    node.name, f"DAX measure of {props.get('report_name', '')}"
+                ),
+            })
+            measure_count += 1
 
     links_by_term: "dict[str, list[str]]" = {}
     for link in term_links or []:
@@ -126,4 +161,6 @@ def build_semantic_catalog(
         metric_count=metric_count,
         step_count=step_count,
         term_count=term_count,
+        report_count=report_count,
+        measure_count=measure_count,
     )

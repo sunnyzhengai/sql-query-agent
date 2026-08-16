@@ -62,6 +62,26 @@ STEP_PROMPT = (
     "identifiers, no preamble."
 )
 
+MEASURE_PROMPT = (
+    "You are documenting a Power BI DAX {expression_type} for a business "
+    "audience of clinicians and executives.\n"
+    "Measure name: {name}\n"
+    "Defined in report: {report_name}\n"
+    "{dict_block}"
+    "DAX expression:\n{expression}\n\n"
+    "Write ONE sentence (max 30 words) stating what this calculates in "
+    "business terms. Then, if the DAX makes decisions, add one line per "
+    "decision, each starting with '- ': filters, thresholds, time "
+    "windows, and conditions. Keep the literal VALUES that define each "
+    "decision — codes, numbers, statuses — with the business meaning "
+    "beside each when the data dictionary above provides one. NEVER "
+    "show raw table or column identifiers in the output — use the "
+    "dictionary description or a plain phrase instead. Never write "
+    "vague fillers such as 'specific', 'specified', 'certain', or "
+    "'various' in place of a value. Ground every line in the DAX above. "
+    "No patient identifiers, no preamble."
+)
+
 METRIC_PROMPT = (
     "You are documenting the certified business metric {metric_name}.\n"
     "Its calculation is assembled from these final steps (each already "
@@ -101,6 +121,15 @@ def step_content_hash(fragment: str, dep_names: "list[str]",
     payload = (
         PROMPT_VERSION + "\n" + (fragment or "")
         + "\n--deps--\n" + "\n".join(sorted(dep_names))
+        + "\n--dict--\n" + "\n".join(dict_lines or [])
+    )
+    return hashlib.sha256(payload.encode()).hexdigest()[:32]
+
+
+def measure_content_hash(name: str, expression: str,
+                         dict_lines: "list[str] | None" = None) -> str:
+    payload = (
+        PROMPT_VERSION + "\n--measure--\n" + name + "\n" + (expression or "")
         + "\n--dict--\n" + "\n".join(dict_lines or [])
     )
     return hashlib.sha256(payload.encode()).hexdigest()[:32]
@@ -207,6 +236,26 @@ def dictionary_for_step(
     return lines
 
 
+def build_measure_prompt(
+    name: str, expression: str, expression_type: str,
+    report_name: str, dict_lines: "list[str] | None" = None,
+) -> str:
+    if dict_lines:
+        entries = "\n".join(dict_lines[:MAX_DICT_LINES])
+        dict_block = (
+            "Data dictionary for the columns this DAX references "
+            f"(translate identifiers using these):\n{entries}\n\n"
+        )
+    else:
+        dict_block = ""
+    return MEASURE_PROMPT.format(
+        name=name, expression=expression or "(none)",
+        expression_type=("calculated column" if expression_type == "calculated_column"
+                         else "measure"),
+        report_name=report_name or "(unknown)", dict_block=dict_block,
+    )
+
+
 def build_metric_prompt(metric_name: str, roots: "list[tuple[str, str]]", step_count: int) -> str:
     roots_block = "\n".join(f"- {n}: {d}" for n, d in roots) or "- (no described steps)"
     return METRIC_PROMPT.format(
@@ -284,6 +333,53 @@ def generate_descriptions(
         cache[key] = text
         described[step_id] = text
         result.descriptions[step_id] = text
+        result.generated += 1
+
+    # Measures (ADR 0040): DAX is business logic — same treatment as SQL
+    # steps. Independent of the step DAG; grounded in its own expression
+    # plus the dictionary text of the columns it provably references
+    # (MEASURE_TO_COLUMN edges — resolved, never guessed).
+    measure_cols: "dict[str, list[str]]" = {}
+    for e in edges:
+        if e.edge_type == EdgeType.MEASURE_TO_COLUMN:
+            measure_cols.setdefault(e.source_id, []).append(e.target_id)
+
+    for node_id, node in sorted(nodes.items()):
+        if node.layer != NodeLayer.MEASURE:
+            continue
+        expression = node.properties.get("dax_expression", "")
+        if not expression:
+            result.failed.append(node_id)
+            continue
+        dict_lines = []
+        for col_id in sorted(measure_cols.get(node_id, [])):
+            col = nodes.get(col_id)
+            if col is not None and (col.description or "").strip():
+                dict_lines.append(f"- {col.name}: {col.description.strip()}")
+        key = measure_content_hash(node.name, expression, dict_lines)
+        if key in cache:
+            result.descriptions[node_id] = cache[key]
+            result.cache_hits += 1
+            continue
+        prompt = build_measure_prompt(
+            node.name, expression,
+            node.properties.get("expression_type", "measure"),
+            node.properties.get("report_name", ""), dict_lines,
+        )
+        try:
+            text = describe(prompt).strip()
+        except Exception:  # noqa: BLE001 — one bad measure must not kill the batch
+            result.failed.append(node_id)
+            continue
+        if not text:
+            result.failed.append(node_id)
+            continue
+        if _VAGUE_FILLERS.search(text):
+            result.vague.append(node_id)
+        if _RAW_IDENTIFIERS.search(text):
+            result.jargon.append(node_id)
+        cache[key] = text
+        result.descriptions[node_id] = text
         result.generated += 1
 
     # Metrics: composed from ROOT step descriptions (raw roots-only edges)

@@ -28,9 +28,17 @@ class GraphView:
         self._c2t = tables["graph_edge_c2t"]
         self._t2t = tables["graph_edge_t2t"]
         self._tab2col = tables["graph_edge_tab2col"]
+        # Consumption layer (ADR 0040) — absent keys tolerated so views
+        # over pre-1.9.0 exports still load
+        self._report = tables.get("graph_report", [])
+        self._measure = tables.get("graph_measure", [])
+        self._r2c = tables.get("graph_edge_report2canonical", [])
+        self._r2m = tables.get("graph_edge_report2measure", [])
         self._canonical_by_id = {r["nodeId"]: r for r in self._canonical}
         self._tech_by_id = {r["nodeId"]: r for r in self._technical}
         self._transform_by_id = {r["nodeId"]: r for r in self._transformation}
+        self._report_by_id = {r["nodeId"]: r for r in self._report}
+        self._measure_by_id = {r["nodeId"]: r for r in self._measure}
 
     # ---- catalogs: resolution inputs. No user string ever filters these ----
 
@@ -106,6 +114,44 @@ class GraphView:
             for e in self._uses if e["sourceId"] == node_id
         ]
         return sorted(rows, key=lambda r: (_fold(r.get("schemaName")), _fold(r["tableName"])))
+
+    def reports_of_metric(self, metric_id: str) -> "list[dict]":
+        """Which reports are built on metric M? — REPORT_TO_CANONICAL reversed."""
+        node_id = self._metric_node_id(metric_id)
+        if node_id is None:
+            return []
+        rows = [
+            self._report_by_id[e["sourceId"]]
+            for e in self._r2c
+            if e["targetId"] == node_id and e["sourceId"] in self._report_by_id
+        ]
+        return sorted(rows, key=lambda r: _fold(r["name"]))
+
+    def metrics_of_report(self, report_name: str) -> "list[dict]":
+        """Which metrics does report R execute? — REPORT_TO_CANONICAL forward."""
+        report_ids = {
+            r["nodeId"] for r in self._report
+            if _fold(r["name"]) == _fold(report_name)
+        }
+        rows = [
+            self._canonical_by_id[e["targetId"]]
+            for e in self._r2c
+            if e["sourceId"] in report_ids and e["targetId"] in self._canonical_by_id
+        ]
+        return sorted(rows, key=lambda r: _fold(r["metricId"]))
+
+    def measures_of_report(self, report_name: str) -> "list[dict]":
+        """Which DAX measures does report R define? — REPORT_TO_MEASURE."""
+        report_ids = {
+            r["nodeId"] for r in self._report
+            if _fold(r["name"]) == _fold(report_name)
+        }
+        rows = [
+            self._measure_by_id[e["targetId"]]
+            for e in self._r2m
+            if e["sourceId"] in report_ids and e["targetId"] in self._measure_by_id
+        ]
+        return sorted(rows, key=lambda r: _fold(r["name"]))
 
     def metrics_of_table(self, table_name: str) -> "list[dict]":
         """Which metrics read table T? — USES_TABLE reversed, single hop."""

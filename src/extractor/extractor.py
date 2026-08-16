@@ -96,11 +96,13 @@ class ViewExtractor:
         )
 
 
-# sys.objects type_desc -> input_sql_sources.source_type vocabulary
-# (must match what load_sql_files writes for the same object kind)
+# sys.objects type_desc -> input_sql_sources.source_type vocabulary.
+# The CONTRACT vocabulary is "procedure"/"view" (allowed-values invariant;
+# 01_install derives the same via extract_object_identity). The extractor
+# merges directly, so it must speak contract vocabulary itself.
 _SOURCE_TYPE = {
     "VIEW": "view",
-    "SQL_STORED_PROCEDURE": "stored_procedure",
+    "SQL_STORED_PROCEDURE": "procedure",
 }
 
 

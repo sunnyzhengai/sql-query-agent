@@ -111,7 +111,7 @@ precondition_gate("07_generate_descriptions", table_exists=spark.catalog.tableEx
 
 
 from src.descriptions import generate_descriptions
-from src.phi_scan import from_records, redact_node_fragments
+from src.phi_scan import from_records, redact_measure_expressions, redact_node_fragments
 
 nodes_rows = [r.asDict() for r in spark.table("graph_nodes").collect()]
 edges_rows = [r.asDict() for r in spark.table("graph_edges").collect()]
@@ -127,6 +127,12 @@ phi_findings = from_records(
 )
 redacted_count = redact_node_fragments(nodes_rows, phi_findings)
 print(f"PHI gate: {len(phi_findings)} findings, {redacted_count} fragments redacted")
+
+# DAX passes the same gate (ADR 0040): measure expressions are scanned
+# and redacted inline every run — fail-safe toward redaction — before
+# any measure prompt is built.
+dax_findings, dax_redacted = redact_measure_expressions(nodes_rows)
+print(f"PHI gate (DAX): {dax_findings} findings, {dax_redacted} expressions redacted")
 
 cache: dict = {}
 if spark.catalog.tableExists("ops_description_cache"):

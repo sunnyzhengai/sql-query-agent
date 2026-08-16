@@ -67,6 +67,16 @@ _RULES: "list[tuple[str, re.Pattern, int]]" = [
     ("date_literal", re.compile(
         r"'(\d{4}-\d{1,2}-\d{1,2}(?:[ T][\d:.]+)?)'"), 0),
     ("date_literal", re.compile(r"'(\d{1,2}/\d{1,2}/\d{2,4})'"), 0),
+    # Double-quoted variants (ADR 0040): DAX string literals use double
+    # quotes, so measure expressions need these to pass the same gate.
+    # In T-SQL double quotes are usually identifiers — a rare false
+    # positive over-redacts, which is the failure direction we accept.
+    ("id_literal", re.compile(
+        rf'(?i)\b({ID_COLUMN})\s*(?:=|!=|<>)\s*"(\d{{5,}})"'), 2),
+    ("name_literal", re.compile(
+        rf'(?i)\b({NAME_COLUMN})\s*(?:=|<>|!=)\s*("[^"]+")'), 2),
+    ("date_literal", re.compile(r'"(\d{4}-\d{1,2}-\d{1,2}(?:[ T][\d:.]+)?)"'), 0),
+    ("date_literal", re.compile(r'"(\d{1,2}/\d{1,2}/\d{2,4})"'), 0),
     ("threshold_literal", re.compile(
         r"(?i)\b([\w\[\]\.]+)\s*(?:>=|<=|>|<)\s*(\d+(?:\.\d+)?)\b"), 2),
 ]
@@ -232,6 +242,42 @@ def redact_node_fragments(
                 row["properties"] = _json.dumps(props)
             changed += 1
     return changed
+
+
+def redact_measure_expressions(nodes_rows: "list[dict]") -> "tuple[int, int]":
+    """Scan and redact DAX measure expressions in place (ADR 0040/0025).
+
+    DAX embeds literals exactly as SQL does, so measure nodes pass the
+    same gate before any prompt is built. Findings are keyed by the
+    measure node_id and applied immediately with default dispositions —
+    fail-safe toward redaction (steward dispositions for DAX are a
+    follow-up; SQL findings carry them via ops_phi_findings).
+
+    Returns (findings_count, expressions_redacted).
+    """
+    import json as _json
+
+    findings_total = 0
+    changed = 0
+    for row in nodes_rows:
+        if row.get("layer") != "measure":
+            continue
+        was_str = isinstance(row["properties"], str)
+        props = _json.loads(row["properties"]) if was_str else row["properties"]
+        expression = props.get("dax_expression") or ""
+        if not expression:
+            continue
+        findings = scan_sql(row.get("node_id", ""), expression)
+        if not findings:
+            continue
+        findings_total += len(findings)
+        redacted = redact(expression, [f for f in findings if f.disposition == "redact"])
+        if redacted != expression:
+            props["dax_expression"] = redacted
+            if was_str:
+                row["properties"] = _json.dumps(props)
+            changed += 1
+    return findings_total, changed
 
 
 def apply_dispositions(

@@ -94,9 +94,18 @@ def test_rows_match_sql_sources_contract(extraction):
         assert set(row) == contract_columns
 
 
-def test_source_type_vocabulary_matches_file_loader(extraction):
-    """load_sql_files writes 'stored_procedure'/'view'; extractor must agree."""
-    assert {s["source_type"] for s in extraction.sql_sources} == {"stored_procedure"}
+def test_source_type_vocabulary_matches_contract(extraction):
+    """The contract's allowed values are 'procedure'/'view' (same as
+    01_install's extract_object_identity derives); the extractor merges
+    directly into input_sql_sources so it must emit exactly these."""
+    from src.schemas import SQL_SOURCES
+
+    allowed = next(
+        inv["values"] for inv in SQL_SOURCES["invariants"]
+        if inv["kind"] == "allowed_values" and inv["column"] == "source_type"
+    )
+    assert {s["source_type"] for s in extraction.sql_sources} == {"procedure"}
+    assert {"procedure", "view"} == set(allowed)
     schemas = {s["source_schema"] for s in extraction.sql_sources}
     assert schemas == {"reporting", "reports"}
 

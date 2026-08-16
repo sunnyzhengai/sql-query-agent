@@ -138,3 +138,37 @@ class TestFindingIdsAreUnique:
         ids = [f.finding_id for f in findings]
         assert len(ids) == len(set(ids)), f"duplicate finding_ids: {ids}"
         assert len([f for f in findings if f.matched_text == "1234567890"]) == 1
+
+
+class TestMeasureRedaction:
+    """DAX passes the same egress gate as SQL (ADR 0040)."""
+
+    def _measure_row(self, dax):
+        import json
+        return {
+            "node_id": "measure:R:T[M]", "layer": "measure", "name": "M",
+            "properties": json.dumps({"dax_expression": dax}),
+        }
+
+    def test_dax_literal_redacted_in_place(self):
+        from src.phi_scan import redact_measure_expressions
+        rows = [self._measure_row(
+            'CALCULATE([x], Patients[MRN] = "12345678")')]
+        findings, changed = redact_measure_expressions(rows)
+        assert findings >= 1 and changed == 1
+        import json
+        props = json.loads(rows[0]["properties"])
+        assert "12345678" not in props["dax_expression"]
+
+    def test_clean_dax_untouched(self):
+        from src.phi_scan import redact_measure_expressions
+        rows = [self._measure_row("DIVIDE(SUM(T[a]), COUNTROWS(T))")]
+        findings, changed = redact_measure_expressions(rows)
+        assert changed == 0
+        import json
+        assert json.loads(rows[0]["properties"])["dax_expression"].startswith("DIVIDE")
+
+    def test_non_measure_rows_ignored(self):
+        from src.phi_scan import redact_measure_expressions
+        rows = [{"node_id": "tech:X", "layer": "technical", "properties": "{}"}]
+        assert redact_measure_expressions(rows) == (0, 0)

@@ -180,3 +180,60 @@ class TestPrompts:
         p = build_metric_prompt("USP_X", [("FinalData", "assembles the cohort")], 42)
         assert "grounded ONLY in the step descriptions" in p
         assert "unless a step description states them" in p
+
+
+class TestMeasureDescriptions:
+    """DAX measures get the same walk treatment as SQL steps (ADR 0040)."""
+
+    def _rows(self):
+        import json
+        nodes = [
+            {"node_id": "measure:R:T[Rate]", "layer": "measure", "name": "Rate",
+             "description": "", "properties": json.dumps({
+                 "dax_expression": "DIVIDE(SUM(T[num]), SUM(T[den]))",
+                 "expression_type": "measure", "report_name": "R",
+                 "pbi_table": "T"})},
+            {"node_id": "tech:DBO.V.NUM", "layer": "technical", "name": "num",
+             "description": "Numerator: compliant encounters",
+             "properties": json.dumps({"table": "V", "schema": "DBO",
+                                       "column": "num"})},
+        ]
+        edges = [
+            {"source_id": "measure:R:T[Rate]", "target_id": "tech:DBO.V.NUM",
+             "edge_type": "measure_to_column", "properties": "{}"},
+        ]
+        return nodes, edges
+
+    def test_measure_described_with_column_dictionary(self):
+        from src.descriptions import generate_descriptions
+        nodes, edges = self._rows()
+        prompts = []
+
+        def fake(prompt):
+            prompts.append(prompt)
+            return "Share of compliant encounters."
+
+        result = generate_descriptions(nodes, edges, fake)
+        assert result.descriptions["measure:R:T[Rate]"] == \
+            "Share of compliant encounters."
+        assert "DIVIDE" in prompts[0]
+        assert "Numerator: compliant encounters" in prompts[0]
+
+    def test_measure_cache_hit_on_rerun(self):
+        from src.descriptions import generate_descriptions
+        nodes, edges = self._rows()
+        cache = {}
+        generate_descriptions(nodes, edges, lambda p: "Text.", cache=cache)
+        rerun = generate_descriptions(
+            nodes, edges, lambda p: (_ for _ in ()).throw(AssertionError()),
+            cache=cache)
+        assert rerun.cache_hits >= 1 and rerun.generated == 0
+
+    def test_measure_without_expression_fails_loudly(self):
+        import json
+
+        from src.descriptions import generate_descriptions
+        nodes = [{"node_id": "measure:R:T[X]", "layer": "measure", "name": "X",
+                  "description": "", "properties": json.dumps({})}]
+        result = generate_descriptions(nodes, [], lambda p: "t")
+        assert "measure:R:T[X]" in result.failed

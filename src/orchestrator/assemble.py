@@ -105,6 +105,44 @@ def assemble_step(
     )
 
 
+def assemble_consumption_node(
+    node_id: str, run_kql: "Callable[[str, dict], list[dict]]"
+) -> FactSet:
+    """A report or measure node (ADR 0040), from graph_nodes alone.
+
+    Report facts carry provenance (repo/path); measure facts carry the
+    DAX expression — PHI-gated at 07 before any description was
+    generated, and shown raw only when the user asks, same rule as SQL.
+    """
+    kind = node_id.split(":", 1)[0]  # "report" | "measure"
+    node = _one_row(run_kql(NODE_FACTS_QUERY, {"p_node_id": node_id}),
+                    f"{kind} {node_id}")
+    props = node.get("properties") or "{}"
+    if isinstance(props, str):
+        props = json.loads(props)
+    if kind == "report":
+        facts = {
+            "report_name": node.get("name"),
+            "description": node.get("description"),
+            "repo_name": props.get("repo_name"),
+            "semantic_model_path": props.get("semantic_model_path"),
+        }
+    else:
+        facts = {
+            "measure_name": node.get("name"),
+            "description": node.get("description"),
+            "dax_expression": props.get("dax_expression"),
+            "expression_type": props.get("expression_type"),
+            "of_report": props.get("report_name"),
+            "pbi_table": props.get("pbi_table"),
+        }
+    return FactSet(
+        kind=kind, ref=node_id, facts=facts,
+        basis=f"graph_nodes[node_id={node_id!r}] -> 1 row",
+        sources=("graph_nodes",),
+    )
+
+
 def assemble(candidate: Candidate,
              run_kql: "Callable[[str, dict], list[dict]]") -> FactSet:
     if candidate.kind == "metric":

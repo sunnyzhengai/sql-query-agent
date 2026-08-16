@@ -1,6 +1,6 @@
-"""The deterministic toolset (ADR 0035): find, read, list, verify.
+"""The deterministic toolset (ADR 0035): find, read, list, link, verify.
 
-Five tools shaped by what the STORE can do — never by question types.
+Six tools shaped by what the STORE can do — never by question types.
 Each is a fixed parameterized query plus pure computation; the LLM can
 choose which tool and what parameters, never compose a query. The
 dispatcher enforces the two structural guarantees:
@@ -24,6 +24,7 @@ from typing import Callable
 from src.graph.templates import _fold
 from src.orchestrator.assemble import (
     AssemblyError,
+    assemble_consumption_node,
     assemble_metric,
     assemble_step,
 )
@@ -57,6 +58,29 @@ BATCH_FRAGMENTS_QUERY = (
     "graph_nodes\n"
     "| where set_has_element(todynamic(p_ids), node_id)\n"
     "| project node_id, name, description, properties"
+)
+
+# Consumption-layer links (ADR 0040): deterministic edges from TMDL
+# partition lineage, exposed via the graph_edges shortcut.
+REPORTS_OF_METRIC_QUERY = (
+    "declare query_parameters(p_id:string);\n"
+    "graph_edges\n"
+    "| where edge_type == 'report_to_canonical' and target_id == p_id\n"
+    "| project node_id = source_id\n"
+    "| join kind=inner (graph_nodes | project node_id, name, description) on node_id\n"
+    "| project node_id, name, description\n"
+    "| order by node_id asc"
+)
+
+LINKS_OF_REPORT_QUERY = (
+    "declare query_parameters(p_id:string);\n"
+    "graph_edges\n"
+    "| where source_id == p_id and edge_type in ("
+    "'report_to_canonical', 'report_to_technical', 'report_to_measure')\n"
+    "| project edge_type, node_id = target_id\n"
+    "| join kind=inner (graph_nodes | project node_id, name) on node_id\n"
+    "| project edge_type, node_id, name\n"
+    "| order by edge_type asc, node_id asc"
 )
 
 MAX_VERIFY_IDS = 40
@@ -165,6 +189,8 @@ def get_facts(an_id: str, run_kql, session: Session) -> dict:
         if an_id.startswith("transform:"):
             ref = an_id.split(":", 2)[1]
             fs = assemble_step(an_id, ref, run_kql)
+        elif an_id.startswith(("report:", "measure:")):
+            fs = assemble_consumption_node(an_id, run_kql)
         else:
             fs = assemble_metric(an_id, run_kql)
     except AssemblyError as e:
@@ -183,6 +209,49 @@ def list_steps(ref: str, run_kql, session: Session) -> dict:
     steps = [{"id": r["node_id"], "name": r["name"]} for r in rows]
     session.allow(s["id"] for s in steps)
     return {"metric": ref, "steps": steps, "count": len(steps)}
+
+
+def list_report_links(an_id: str, run_kql, session: Session) -> dict:
+    """The consumption layer's edges, both directions (ADR 0040).
+
+    For a metric ref: which Power BI reports are built on it. For a
+    report id: everything its semantic model links to — metrics it
+    executes, warehouse tables it reads directly (DirectLake), and its
+    DAX measures. Edges come from parsed TMDL partitions, never name
+    similarity."""
+    if not session.permitted(an_id):
+        raise ToolError(
+            f"id {an_id!r} was not surfaced in this conversation and does "
+            "not appear in the user's words — search first (no unsurfaced "
+            "facts)")
+    if an_id.startswith("report:"):
+        rows = run_kql(LINKS_OF_REPORT_QUERY, {"p_id": an_id})
+        links = {"executes_metrics": [], "reads_tables": [], "measures": []}
+        bucket = {"report_to_canonical": "executes_metrics",
+                  "report_to_technical": "reads_tables",
+                  "report_to_measure": "measures"}
+        for r in rows:
+            entry = {"id": r["node_id"], "name": r["name"]}
+            if r["edge_type"] == "report_to_canonical":
+                entry["id"] = r["node_id"].removeprefix("canonical:")
+            links[bucket[r["edge_type"]]].append(entry)
+        session.allow(
+            e["id"] for group in links.values() for e in group)
+        return {"report": an_id, **links,
+                "note": ("links come from parsed semantic-model partitions "
+                         "(deterministic lineage), not name matching")}
+    canonical_id = f"canonical:{an_id}"
+    rows = run_kql(REPORTS_OF_METRIC_QUERY, {"p_id": canonical_id})
+    reports = [
+        {"id": r["node_id"], "name": r["name"],
+         "description": r.get("description") or None}
+        for r in rows
+    ]
+    session.allow(r["id"] for r in reports)
+    return {"metric": an_id, "reports": reports, "count": len(reports),
+            "note": ("empty means no semantic model linking this metric has "
+                     "been ingested — absence of a link is not proof no "
+                     "report exists")}
 
 
 def check_same_logic(ids: "list[str]", run_kql, session: Session) -> dict:
@@ -285,6 +354,19 @@ TOOL_SCHEMAS = [
         "parameters": {"type": "object", "properties": {
             "ref": {"type": "string"}}, "required": ["ref"]}}},
     {"type": "function", "function": {
+        "name": "list_report_links",
+        "description": ("The Power BI consumption layer, both directions. "
+                        "For a metric ref: which reports are BUILT ON it "
+                        "(blast radius up). For a report id (report:...): "
+                        "the metrics its semantic model executes, warehouse "
+                        "tables it reads directly, and its DAX measures. "
+                        "Links are parsed from the semantic models "
+                        "themselves — deterministic, never name-matched. "
+                        "Only ids surfaced this conversation or typed by "
+                        "the user."),
+        "parameters": {"type": "object", "properties": {
+            "id": {"type": "string"}}, "required": ["id"]}}},
+    {"type": "function", "function": {
         "name": "check_same_logic",
         "description": ("Computed verdict on whether items share identical "
                         "SQL logic (content-hash; whitespace/case "
@@ -311,6 +393,8 @@ _IMPL: "dict[str, Callable]" = {
         str(args.get("ref", "")), run_kql, s),
     "check_same_logic": lambda args, run_kql, s: check_same_logic(
         list(args.get("ids", [])), run_kql, s),
+    "list_report_links": lambda args, run_kql, s: list_report_links(
+        str(args.get("id", "")), run_kql, s),
 }
 
 

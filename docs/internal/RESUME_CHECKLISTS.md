@@ -229,9 +229,11 @@ one live conversation. Plain steps:
       node in the left tree → New shortcut).
    3. Source: **Microsoft OneLake** → pick your lakehouse
       **sql_query_lh** → expand **Tables**.
-   4. Tick **output_metric_logic** AND **graph_nodes** — the picker
-      allows selecting both in one pass (if yours doesn't, just run
-      the wizard twice, once per table).
+   4. Tick **output_metric_logic** AND **graph_nodes** AND
+      **graph_edges** (graph_edges added 2026-08-16: the
+      list_report_links tool reads consumption-layer edges through it)
+      — the picker allows selecting all in one pass (if yours doesn't,
+      just run the wizard once per table).
    5. **Create**. Both appear under the Shortcuts node within a
       minute. A shortcut is a live pointer — no copying, no refresh
       to manage; it always shows the lakehouse table's current rows.

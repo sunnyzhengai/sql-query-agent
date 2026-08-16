@@ -88,3 +88,34 @@ class TestBuild:
         json.dumps(out.rows)
         ids = [r["node_id"] for r in out.rows]
         assert len(ids) == len(set(ids))
+
+
+class TestConsumptionKinds:
+    """Reports and measures are searchable (ADR 0040)."""
+
+    def _rows(self):
+        import json
+        return [
+            {"node_id": "report:SEPSIS DASH", "layer": "report",
+             "name": "Sepsis Dash", "description": "Screening compliance.",
+             "properties": json.dumps({})},
+            {"node_id": "measure:SEPSIS DASH:T[Rate]", "layer": "measure",
+             "name": "Rate", "description": "Share compliant.",
+             "properties": json.dumps({"report_name": "Sepsis Dash"})},
+        ]
+
+    def test_report_and_measure_rows_emitted(self):
+        from src.steps.semantic_catalog import build_semantic_catalog
+        out = build_semantic_catalog(self._rows())
+        kinds = {r["kind"] for r in out.rows}
+        assert kinds == {"report", "measure"}
+        assert out.report_count == 1 and out.measure_count == 1
+
+    def test_measure_search_text_excludes_report_identity(self):
+        # identity-leak lesson (2026-08-13): a measure matches on ITS
+        # definition; its report's name must not score it
+        from src.steps.semantic_catalog import build_semantic_catalog
+        out = build_semantic_catalog(self._rows())
+        measure = next(r for r in out.rows if r["kind"] == "measure")
+        assert "Sepsis Dash" not in measure["search_text"]
+        assert "Sepsis Dash" in measure["display_text"]
