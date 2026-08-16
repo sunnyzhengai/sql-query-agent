@@ -125,6 +125,33 @@ feature your compliance team will love."
 
 ---
 
+## Part 2b: Governance Without the Bottleneck (30 seconds)
+
+**[Screen: the admin telemetry page showing conversations + WHO-decided
++ feedback joined]**
+
+"One more thing about how AIVIA treats governance. Certification here
+**discloses — it never gates**: users get answers on day one, and the
+answer always shows its certification status honestly. Meanwhile every
+conversation is recorded — who asked, what was consulted, which
+component decided, and how the user rated it.
+
+That usage graph is the foundation of where AIVIA is going: a
+**citizen-stewardship model**. Instead of a central steward team as
+the bottleneck, the roadmap connects users to the definitions they
+query and confirm — so trusted interpretations can coexist, anchored
+to the people who rely on them, and the graph gets smarter with every
+question your teams ask."
+
+> SCRIPT RULE (verdict 2026-08-16): present tense stops at what ships
+> (disclose-never-gate, per-turn telemetry, feedback joins — ADR 0021,
+> gov_turn_events). Users-as-nodes / per-user certified definitions
+> are ADR 0038, Accepted but BUILD-GATED on the access-control ADR —
+> spoken ONLY as roadmap ("where AIVIA is going"). Do not move them
+> into present tense until the interaction layer ships.
+
+---
+
 ## Part 3: The Write-Back Loop & Admin Trust (1 minute)
 
 **[Screen: the report's EMPTY description field, then 13_publish_pbi:
@@ -164,3 +191,12 @@ Marketplace."
 - [ ] Claims audit on the final cut: only the three shipped source
       profiles named; no "instantly"; no UI/node-map language beyond
       what was actually shown
+
+## Immediately AFTER recording (same day — wall + credential cleanup)
+
+- [ ] Remove the temporary work-Collibra block from org_config.yaml in
+      the AIVIA tenant (sanctioned as demo-only, 2026-08-16; the wall
+      rule resumes the moment recording ends)
+- [ ] Rotate the Collibra apiuser password AND the Purview app secret —
+      both were exposed in plaintext config + screenshot on 2026-08-16
+- [ ] Delete the screenshot files containing the credentials

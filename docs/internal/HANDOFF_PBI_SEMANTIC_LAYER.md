@@ -123,7 +123,17 @@ otherwise adjust the demo. Verdicts:
 - DEMO_SCRIPT.md is now Sunny's V1 narrative with claims verified;
   tenant-prep runbook + QA gate embedded in the script.
 
-## Scoping — DECIDED (Sunny, 2026-08-16): PBI layer IS v1 Marketplace scope
+## Follow-up (live find 2026-08-16, first 12 run on tenant): metric-name clobber
+
+12 owns input_metric_names with write_mode OVERWRITE, but manual CSV
+curation is a sanctioned second source. On the demo tenant, 28 manually
+loaded names survived ONLY because 12 derived zero rows (DirectLake
+model) and skips empty writes — had it derived one, all 28 would be
+gone. Proposed rule: 12 MERGES by metric_id and NEVER replaces a row
+whose source is 'manual' (steward curation outranks derivation); the
+same dual-writer protocol as input_sql_sources. Needs: merge semantics
+in the notebook, registry write_mode vocabulary ('merge' not currently
+an allowed value), and a test pinning manual-wins.
 
 Rationale: real customers ask about REPORTS, not procs/views — the report
 layer is the customer-facing entry point, so items 1–5 precede launch

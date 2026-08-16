@@ -234,6 +234,10 @@ one live conversation. Plain steps:
       list_report_links tool reads consumption-layer edges through it)
       — the picker allows selecting all in one pass (if yours doesn't,
       just run the wizard once per table).
+      CHECK FIRST: run `<table> | count` in the query editor — a
+      shortcut that already exists fails the wizard with "External
+      table ... already exists" (seen live 2026-08-16; that error means
+      DONE, not broken).
    5. **Create**. Both appear under the Shortcuts node within a
       minute. A shortcut is a live pointer — no copying, no refresh
       to manage; it always shows the lakehouse table's current rows.
