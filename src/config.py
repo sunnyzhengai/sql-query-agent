@@ -62,6 +62,24 @@ class ExtractorConfig(BaseModel):
     tracking_table: str = "ops_extraction_tracking"
 
 
+class DevOpsGitConfig(BaseModel):
+    org: str
+    project: str
+    repo: str
+    # PAT is fetched at run time from Key Vault (notebookutils in Fabric),
+    # NEVER stored in config — these two fields say where to fetch it.
+    key_vault_url: str = ""
+    pat_secret_name: str = ""
+
+
+class SemanticModelsConfig(BaseModel):
+    # folder: git-synced workspace checkout / uploaded Files — Fabric-native.
+    # devops_git: Azure DevOps repos (DevOpsTmdlClient).
+    source_type: Literal["folder", "devops_git"] = "folder"
+    folder_path: str = ""
+    devops: Optional[DevOpsGitConfig] = None
+
+
 class PurviewAdapterConfig(BaseModel):
     account_name: str
     collection_name: str = ""
@@ -102,6 +120,7 @@ class Config(BaseModel):
     lakehouse: LakehouseConfig
     dictionary: DictionaryConfig = DictionaryConfig()
     extractor: Optional[ExtractorConfig] = None
+    semantic_models: Optional[SemanticModelsConfig] = None
     adapters: Optional[AdaptersConfig] = None
     fabric_graph: Optional[FabricGraphConfig] = None
 

@@ -26,7 +26,6 @@ class GraphBackend(Protocol):
             canonical: GraphNode for the metric
             transformations: list[GraphNode] transformation nodes
             technical: list[GraphNode] technical table/column nodes
-            dimensions: list[GraphNode] dimension nodes
             sql_fragments: list[str] ordered SQL fragments
 
         Returns {} if the metric is not found.

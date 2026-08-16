@@ -23,6 +23,8 @@ flowchart LR
   09_publish_purview["09_publish_purview"]:::notebook
   10_ingest_agent_events["10_ingest_agent_events"]:::notebook
   11_refresh_search_index["11_refresh_search_index"]:::notebook
+  12_ingest_semantic_models["12_ingest_semantic_models"]:::notebook
+  13_publish_pbi["13_publish_pbi"]:::notebook
   eventhouse_semantic_search["eventhouse_semantic_search"]:::notebook
   export_test_fixtures["export_test_fixtures"]:::notebook
   extract_views["extract_views"]:::notebook
@@ -34,15 +36,18 @@ flowchart LR
   orchestrator_core["orchestrator_core"]:::notebook
   usage["usage"]:::notebook
   verify_graph["verify_graph"]:::notebook
-  LPG_export__10_typed_tables_[("LPG export (10 typed tables)")]:::table
+  LPG_export__14_typed_tables_[("LPG export (14 typed tables)")]:::table
   gov_feedback_events[("gov_feedback_events")]:::table
   gov_publish_log[("gov_publish_log")]:::table
   gov_steward_assignments[("gov_steward_assignments")]:::table
   gov_turn_events[("gov_turn_events")]:::table
   graph_edges[("graph_edges")]:::table
   graph_nodes[("graph_nodes")]:::table
+  input_dax_expressions[("input_dax_expressions")]:::table
   input_dict_columns[("input_dict_columns")]:::table
   input_dict_tables[("input_dict_tables")]:::table
+  input_metric_names[("input_metric_names")]:::table
+  input_report_sources[("input_report_sources")]:::table
   input_sql_sources[("input_sql_sources")]:::table
   ops_agent_descriptions[("ops_agent_descriptions")]:::table
   ops_build_summary[("ops_build_summary")]:::table
@@ -74,7 +79,7 @@ flowchart LR
   03_build_graph --> graph_nodes
   03_build_graph --> ops_setup_completeness
   04_build_metric_logic --> output_metric_logic
-  05_export_graph_tables --> LPG_export__10_typed_tables_
+  05_export_graph_tables --> LPG_export__14_typed_tables_
   06_validate --> ops_build_summary
   06_validate --> ops_pipeline_validation
   07_generate_descriptions --> ops_description_cache
@@ -86,6 +91,10 @@ flowchart LR
   10_ingest_agent_events --> gov_feedback_events
   10_ingest_agent_events --> gov_turn_events
   11_refresh_search_index --> output_semantic_catalog
+  12_ingest_semantic_models --> input_dax_expressions
+  12_ingest_semantic_models --> input_metric_names
+  12_ingest_semantic_models --> input_report_sources
+  13_publish_pbi -->|enrich| gov_publish_log
   extract_views --> ops_extraction_tracking
   extract_views -.-> input_sql_sources
   gov_feedback_events --> 10_ingest_agent_events
@@ -102,6 +111,7 @@ flowchart LR
   graph_edges --> 06_validate
   graph_edges --> 07_generate_descriptions
   graph_edges --> 08_publish_collibra
+  graph_edges --> 13_publish_pbi
   graph_edges --> data_agent
   graph_edges --> verify_graph
   graph_nodes --> 04_build_metric_logic
@@ -110,9 +120,11 @@ flowchart LR
   graph_nodes --> 07_generate_descriptions
   graph_nodes --> 08_publish_collibra
   graph_nodes --> 11_refresh_search_index
+  graph_nodes --> 13_publish_pbi
   graph_nodes --> data_agent
   graph_nodes --> manage_stewards
   graph_nodes --> verify_graph
+  input_dax_expressions --> 03_build_graph
   input_dict_columns --> 01_install
   input_dict_columns --> 03_build_graph
   input_dict_columns --> export_test_fixtures
@@ -122,6 +134,8 @@ flowchart LR
   input_dict_tables --> 06_validate
   input_dict_tables --> export_test_fixtures
   input_dict_tables --> load_caboodle_dictionary
+  input_metric_names --> 03_build_graph
+  input_report_sources --> 03_build_graph
   input_sql_sources --> 01_install
   input_sql_sources --> 02_parse
   input_sql_sources --> 06_validate

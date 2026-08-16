@@ -3,7 +3,6 @@
 Given a canonical metric, traverse the graph to collect:
 - The transformation pipeline (CTE chain with sql_fragments)
 - The technical tables/columns involved
-- Available dimension filters
 """
 
 from __future__ import annotations
@@ -35,7 +34,6 @@ class GraphTraverser:
             canonical: the canonical node
             transformations: ordered list of transformation nodes
             technical: list of technical nodes
-            dimensions: list of dimension nodes
             sql_fragments: ordered list of SQL fragments for assembly
         """
         canonical_id = f"canonical:{metric_id}"
@@ -45,15 +43,13 @@ class GraphTraverser:
         visited: set[str] = set()
         transformations: list[GraphNode] = []
         technical: list[GraphNode] = []
-        dimensions: list[GraphNode] = []
 
-        self._traverse(canonical_id, visited, transformations, technical, dimensions)
+        self._traverse(canonical_id, visited, transformations, technical)
 
         return {
             "canonical": self.nodes[canonical_id],
             "transformations": transformations,
             "technical": technical,
-            "dimensions": dimensions,
             "sql_fragments": [t.properties.get("sql_fragment", "") for t in transformations],
         }
 
@@ -63,7 +59,6 @@ class GraphTraverser:
         visited: set[str],
         transformations: list[GraphNode],
         technical: list[GraphNode],
-        dimensions: list[GraphNode],
     ) -> None:
         if node_id in visited:
             return
@@ -77,8 +72,6 @@ class GraphTraverser:
             transformations.append(node)
         elif node.layer == NodeLayer.TECHNICAL:
             technical.append(node)
-        elif node.layer == NodeLayer.DIMENSION:
-            dimensions.append(node)
 
         for edge in self._adjacency.get(node_id, []):
             # Metric subgraphs describe lineage (which TABLES feed the
@@ -87,4 +80,4 @@ class GraphTraverser:
             # source_tables with every column of every table.
             if edge.edge_type == EdgeType.TABLE_TO_COLUMN:
                 continue
-            self._traverse(edge.target_id, visited, transformations, technical, dimensions)
+            self._traverse(edge.target_id, visited, transformations, technical)

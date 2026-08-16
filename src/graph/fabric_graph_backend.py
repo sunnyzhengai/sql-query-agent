@@ -46,15 +46,10 @@ class FabricGraphBackend:
         transform_ids = [t.node_id for t in transformations]
         technical = self._query_technical_nodes(transform_ids) if transform_ids else []
 
-        # Step 3: Get dimension nodes from technical nodes
-        tech_ids = [t.node_id for t in technical]
-        dimensions = self._query_dimension_nodes(tech_ids) if tech_ids else []
-
         return {
             "canonical": canonical,
             "transformations": transformations,
             "technical": technical,
-            "dimensions": dimensions,
             "sql_fragments": [
                 t.properties.get("sql_fragment", "") for t in transformations
             ],
@@ -214,31 +209,3 @@ class FabricGraphBackend:
 
         return list(nodes.values())
 
-    def _query_dimension_nodes(self, tech_ids: list[str]) -> list[GraphNode]:
-        """Get all dimension nodes reachable from the given technical nodes."""
-        id_list = ", ".join(f"'{tid}'" for tid in tech_ids)
-        gql = (
-            f"MATCH (tech:Technical)-[:TECHNICAL_TO_DIMENSION]->(d:Dimension) "
-            f"WHERE tech.nodeId IN [{id_list}] "
-            f"RETURN DISTINCT d.nodeId AS nodeId, d.name AS name, "
-            f"d.description AS description, d.tableName AS tableName, "
-            f"d.columnName AS columnName"
-        )
-
-        result = self._client.execute(gql)
-        nodes: dict[str, GraphNode] = {}
-        for row in result.data:
-            nid = row.get("nodeId")
-            if nid and nid not in nodes:
-                nodes[nid] = GraphNode(
-                    node_id=nid,
-                    layer=NodeLayer.DIMENSION,
-                    name=row.get("name", ""),
-                    description=row.get("description", ""),
-                    properties={
-                        "table": row.get("tableName", ""),
-                        "column": row.get("columnName", ""),
-                    },
-                )
-
-        return list(nodes.values())

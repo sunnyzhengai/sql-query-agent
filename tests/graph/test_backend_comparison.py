@@ -50,12 +50,6 @@ def _assert_subgraph_equivalent(result_a: dict, result_b: dict, strict_fragments
         f"Technical mismatch: {tech_ids_a - tech_ids_b} vs {tech_ids_b - tech_ids_a}"
     )
 
-    dim_ids_a = {t.node_id for t in result_a["dimensions"]}
-    dim_ids_b = {t.node_id for t in result_b["dimensions"]}
-    assert dim_ids_a == dim_ids_b, (
-        f"Dimension mismatch: {dim_ids_a - dim_ids_b} vs {dim_ids_b - dim_ids_a}"
-    )
-
 
 class TestGraphBackendProtocol:
     """Verify both backends satisfy the GraphBackend protocol."""
@@ -77,7 +71,6 @@ class TestBackendContract:
         assert "canonical" in result
         assert "transformations" in result
         assert "technical" in result
-        assert "dimensions" in result
         assert "sql_fragments" in result
 
     @pytest.mark.parametrize("backend_name", ["delta_backend", "gql_backend"])

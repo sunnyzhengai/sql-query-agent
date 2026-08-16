@@ -143,21 +143,57 @@ class GraphBuilder:
         )
         return node_id
 
-    def add_dimension_node(self, table: str, column: str, description: str = "") -> str:
-        """Add a dimension node (branches from technical table for filtering)."""
-        node_id = f"dim:{table}.{column}"
+    def add_report_node(
+        self, report_name: str, description: str = "",
+        repo_name: str = "", semantic_model_path: str = "",
+    ) -> str:
+        """Add a consumption-layer report node (ADR 0040).
+
+        Identity is the report name from the .SemanticModel folder —
+        stable across git and workspace views of the same model.
+        """
+        node_id = f"report:{fold_identifier(report_name)}"
         if node_id not in self.nodes:
             self.nodes[node_id] = GraphNode(
                 node_id=node_id,
-                layer=NodeLayer.DIMENSION,
-                name=column,
+                layer=NodeLayer.REPORT,
+                name=report_name,
                 description=description,
-                properties={"table": table, "column": column},
+                properties={
+                    "repo_name": repo_name,
+                    "semantic_model_path": semantic_model_path,
+                },
             )
-            # Auto-wire edge from the parent technical table
-            tech_table_id = f"tech:{table}"
-            if tech_table_id in self.nodes:
-                self.add_edge(tech_table_id, node_id, EdgeType.TECHNICAL_TO_DIMENSION)
+        return node_id
+
+    def add_measure_node(
+        self, report_name: str, table_name: str, measure_name: str,
+        expression: str, expression_type: str = "measure",
+    ) -> str:
+        """Add a DAX measure / calculated-column node (ADR 0040).
+
+        The expression is stored like a transformation's sql_fragment —
+        it IS business logic, so 07's description walk and the PHI gate
+        treat it the same way.
+        """
+        node_id = (
+            f"measure:{fold_identifier(report_name)}:"
+            f"{fold_identifier(table_name)}[{measure_name}]"
+        )
+        if node_id not in self.nodes:
+            self.nodes[node_id] = GraphNode(
+                node_id=node_id,
+                layer=NodeLayer.MEASURE,
+                name=measure_name,
+                properties={
+                    "report_name": report_name,
+                    "pbi_table": table_name,
+                    "dax_expression": expression,
+                    "expression_type": expression_type,
+                },
+            )
+            report_id = self.add_report_node(report_name)
+            self.add_edge(report_id, node_id, EdgeType.REPORT_TO_MEASURE)
         return node_id
 
     def add_edge(self, source_id: str, target_id: str, edge_type: EdgeType) -> None:

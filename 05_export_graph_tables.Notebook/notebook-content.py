@@ -29,8 +29,11 @@
 """Fabric Notebook: Export Typed Tables for Fabric Graph Model
 
 Reads from: graph_nodes, graph_edges (Delta tables)
-Writes to:  graph_canonical, graph_transformation, graph_technical, graph_dimension,
-            graph_edge_c2t, graph_edge_t2t, graph_edge_t2tech, graph_edge_tech2dim (Delta tables)
+Writes to:  graph_canonical, graph_transformation, graph_technical, graph_report,
+            graph_measure, graph_edge_c2t, graph_edge_t2t, graph_edge_t2tech,
+            graph_edge_report2canonical, graph_edge_report2technical,
+            graph_edge_report2measure, graph_edge_measure2column,
+            graph_edge_tab2col, graph_edge_uses_table
 
 Run 03_build_graph.py at least once before this.
 
@@ -41,13 +44,21 @@ After running, create a Graph Model in the Fabric UI:
    - graph_canonical     -> Canonical (key: node_id)
    - graph_transformation -> Transformation (key: node_id)
    - graph_technical     -> Technical (key: node_id)
-   - graph_dimension     -> Dimension (key: node_id)
+   - graph_report        -> Report (key: node_id)          [ADR 0040]
+   - graph_measure       -> Measure (key: node_id)         [ADR 0040]
    - graph_edge_c2t      -> CANONICAL_TO_TRANSFORM (source_id -> Canonical, target_id -> Transformation)
    - graph_edge_t2t      -> TRANSFORM_TO_TRANSFORM (source_id -> Transformation, target_id -> Transformation)
    - graph_edge_t2tech   -> TRANSFORM_TO_TECHNICAL (source_id -> Transformation, target_id -> Technical)
    - graph_edge_tab2col  -> TABLE_TO_COLUMN (source_id -> Technical table, target_id -> Technical column)
-   - graph_edge_tech2dim -> TECHNICAL_TO_DIMENSION (source_id -> Technical, target_id -> Dimension)
+   - graph_edge_report2canonical -> REPORT_TO_CANONICAL (source_id -> Report, target_id -> Canonical)
+   - graph_edge_report2technical -> REPORT_TO_TECHNICAL (source_id -> Report, target_id -> Technical table; DirectLake)
+   - graph_edge_report2measure   -> REPORT_TO_MEASURE (source_id -> Report, target_id -> Measure)
+   - graph_edge_measure2column   -> MEASURE_TO_COLUMN (source_id -> Measure, target_id -> Technical column)
    - graph_edge_uses_table -> USES_TABLE (source_id -> Canonical, target_id -> Technical table)
+
+Upgrading an existing deployment: DROP TABLE graph_dimension and
+graph_edge_tech2dim in the lakehouse — the dimension layer is removed
+(ADR 0040) and 05 no longer writes them.
      DERIVED closure (ADR 0018): metric -> every table it ultimately reads, single hop
 4. Save the model to ingest data and build the queryable graph
 """

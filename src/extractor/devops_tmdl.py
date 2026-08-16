@@ -95,7 +95,8 @@ def parse_tmdl_partition(tmdl_content: str, table_name: str) -> SqlSource | None
 
     match = partition_pattern.search(tmdl_content)
     if not match:
-        return None
+        # Pattern 5: DirectLake has no M expression at all
+        return _parse_directlake_partition(tmdl_content, table_name)
 
     m_expr = match.group(1).strip()
     source = SqlSource(table_name=table_name, raw_m_expression=m_expr)
@@ -196,6 +197,42 @@ def parse_tmdl_partition(tmdl_content: str, table_name: str) -> SqlSource | None
         source.server = sql_dbs_match.group(1)
 
     return source if source.sql_object else None
+
+
+def _parse_directlake_partition(tmdl_content: str, table_name: str) -> SqlSource | None:
+    """Pattern 5: DirectLake partitions (Fabric-native default).
+
+    DirectLake reads a warehouse/lakehouse TABLE directly — there is no
+    M query and no EXEC (DirectLake cannot call procs; views fall back
+    to DirectQuery). Shape:
+
+        partition Foo = entity
+            mode: directLake
+            source
+                entityName: dimension_customer
+                schemaName: dbo            (optional)
+                expressionSource: DatabaseQuery
+    """
+    block = re.search(
+        r"partition\s+[^\n]+=\s*entity\s*\n"
+        r"\s+mode:\s*directLake\s*\n"
+        r"(.*?)(?=\n\s*\n|\n\s+annotation|\Z)",
+        tmdl_content, re.DOTALL,
+    )
+    if not block:
+        return None
+    body = block.group(1)
+    entity = re.search(r"entityName:\s*([^\s]+)", body)
+    if not entity:
+        return None
+    schema = re.search(r"schemaName:\s*([^\s]+)", body)
+    return SqlSource(
+        table_name=table_name,
+        schema=schema.group(1) if schema else "",
+        sql_object=entity.group(1),
+        sql_object_type="Table",
+        raw_m_expression=body.strip(),
+    )
 
 
 def parse_tmdl_dax(tmdl_content: str, table_name: str) -> list[DaxExpression]:

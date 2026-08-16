@@ -196,51 +196,75 @@ class FabricPBIUpdater:
         return result
 
 
-def match_reports_to_metrics(
+def match_reports_by_lineage(
     reports: list[PBIReport],
-    graph_nodes: dict[str, Any],
-) -> list[dict[str, str]]:
-    """Match Power BI reports to canonical graph nodes by name similarity.
+    nodes_rows: "list[dict[str, Any]]",
+    edges_rows: "list[dict[str, Any]]",
+) -> "tuple[list[dict[str, str]], list[str]]":
+    """Match workspace reports to graph report nodes by EXACT name, then
+    follow report_to_canonical lineage to the metric description.
 
-    Simple matching: checks if the report name contains the metric name
-    or vice versa (case-insensitive). Returns a list of updates with
-    generated descriptions.
+    Deterministic only (ADR 0040): a workspace report matches when its
+    name folds to exactly one report node; the description published is
+    the linked metric's. Reports with zero or multiple linked metrics
+    are skipped with a reason — publishing onto a guess is worse than
+    not publishing. Returns (updates, skipped).
 
-    Args:
-        reports: List of PBIReport objects from list_reports().
-        graph_nodes: Dict of node_id -> GraphNode from the builder.
-
-    Returns:
-        List of dicts with report_id, report_name, description, matched_metric.
+    The old name-similarity matcher is deliberately gone: it could put
+    metric A's description on report B forever, silently.
     """
-    from src.models import NodeLayer
+    from src.parser.identity import fold_identifier
 
-    # Build lookup of canonical nodes
-    canonicals = {
-        n.name.lower(): n
-        for n in graph_nodes.values()
-        if n.layer == NodeLayer.CANONICAL
-    }
+    report_nodes = {}
+    descriptions = {}
+    for n in nodes_rows:
+        if n.get("layer") == "report":
+            report_nodes[fold_identifier(n["name"])] = n["node_id"]
+        elif n.get("layer") == "canonical":
+            descriptions[n["node_id"]] = n.get("description") or ""
 
-    matches = []
+    linked: "dict[str, list[str]]" = {}
+    for e in edges_rows:
+        if e.get("edge_type") == "report_to_canonical":
+            linked.setdefault(e["source_id"], []).append(e["target_id"])
+
+    updates, skipped = [], []
     for report in reports:
-        report_name_lower = report.name.lower().replace("_", " ").replace("-", " ")
+        node_id = report_nodes.get(fold_identifier(report.name))
+        if node_id is None:
+            skipped.append(f"{report.name}: no semantic model in the graph — run 12 first")
+            continue
+        targets = linked.get(node_id, [])
+        if len(targets) != 1:
+            skipped.append(
+                f"{report.name}: linked to {len(targets)} metrics — "
+                f"needs exactly one for an unambiguous description"
+            )
+            continue
+        description = descriptions.get(targets[0], "")
+        if not description:
+            skipped.append(f"{report.name}: linked metric has no description yet — run 07")
+            continue
+        updates.append({
+            "report_id": report.report_id,
+            "report_name": report.name,
+            "description": description,
+            "matched_metric": targets[0].removeprefix("canonical:"),
+        })
 
-        # Try to match report name to a canonical metric
-        best_match = None
-        for metric_name_lower, node in canonicals.items():
-            clean_metric = metric_name_lower.lower().replace("_", " ").replace("usp ", "").replace(" pbi", "")
-            if clean_metric in report_name_lower or report_name_lower in clean_metric:
-                best_match = node
-                break
+    logger.info("Lineage-matched %d/%d reports", len(updates), len(reports))
+    return updates, skipped
 
-        if best_match and best_match.description:
-            matches.append({
-                "report_id": report.report_id,
-                "report_name": report.name,
-                "description": best_match.description,
-                "matched_metric": best_match.name,
-            })
 
-    logger.info("Matched %d/%d reports to graph metrics", len(matches), len(reports))
-    return matches
+def to_publish_results(bulk: BulkUpdateResult) -> "list[Any]":
+    """Project UpdateResults onto PublishResult for gov_publish_log."""
+    from src.adapters.base import PublishResult, PublishStatus
+
+    return [
+        PublishResult(
+            asset_id=r.report_id,
+            status=PublishStatus(r.status),
+            message=f"{r.report_name}: {r.message}".strip(": "),
+        )
+        for r in bulk.results
+    ]

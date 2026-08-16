@@ -50,3 +50,4 @@ never deleted — its status changes and it links to its replacement.
 | [0037](0037-completed-algebra-traverse.md) | The completed algebra: traverse (join=1 hop, closure=*), result-set kernels, closures as checkable cache | Accepted |
 | [0038](0038-interaction-layer-no-is-input.md) | The interaction layer: no is input; users and concepts enter the graph — gated on the access-control ADR | Accepted (build gated) |
 | [0039](0039-errors-link-to-contracts.md) | Every error links to its contract: error → contract → data; registry-derived precondition gates cite stable contract ids | Accepted |
+| [0040](0040-consumption-layer-reports-measures.md) | The consumption layer: report + measure nodes from TMDL lineage; ghost dimension layer removed; fabric_pbi wired via lineage-exact publish | Accepted |

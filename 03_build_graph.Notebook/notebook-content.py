@@ -110,9 +110,24 @@ if spark.catalog.tableExists("gov_steward_assignments"):
 else:
     print("No gov_steward_assignments table — run notebooks/utilities/manage_stewards to assign")
 
+# Consumption layer (ADR 0040): PBI report lineage + DAX, written by 12
+report_source_records = []
+if spark.catalog.tableExists("input_report_sources"):
+    report_source_records = [r.asDict() for r in spark.table("input_report_sources").collect()]
+else:
+    print("No input_report_sources table — run 12_ingest_semantic_models for report lineage")
+
+dax_records = []
+if spark.catalog.tableExists("input_dax_expressions"):
+    dax_records = [r.asDict() for r in spark.table("input_dax_expressions").collect()]
+else:
+    print("No input_dax_expressions table — run 12_ingest_semantic_models for DAX measures")
+
 out = build_graph_step(
     parse_results, dict_tables_rows, dict_columns_rows, steward_records,
     metric_name_records=metric_name_records,
+    report_source_records=report_source_records,
+    dax_records=dax_records,
     table_name_col=config.dictionary.table_name_col,
     column_name_col=config.dictionary.column_name_col,
     description_col=config.dictionary.description_col,
@@ -125,6 +140,10 @@ if metric_name_records:
     print(f"Applied {out.business_names_applied} business-friendly names")
     for issue in out.business_names_skipped:
         print(f"  [!] name skipped: {issue}")
+if report_source_records or dax_records:
+    print(f"Consumption layer: {out.reports_added} reports, {out.measures_added} measures")
+    for issue in out.consumption_skipped[:10]:
+        print(f"  [!] lineage skipped: {issue}")
 
 
 # METADATA ********************

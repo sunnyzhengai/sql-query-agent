@@ -14,6 +14,7 @@ from src.dictionary import DataDictionary
 from src.governance.display_names import apply_business_names
 from src.governance.steward import StewardManager
 from src.graph.builder import GraphBuilder
+from src.graph.consumption import wire_consumption_layer
 from src.graph.serialization import (
     edges_to_row_dicts,
     nodes_to_row_dicts,
@@ -30,6 +31,10 @@ class BuildGraphOutput:
     stewards_applied: int
     business_names_applied: int = 0
     business_names_skipped: "list[str]" = field(default_factory=list)
+    # Consumption layer (ADR 0040)
+    reports_added: int = 0
+    measures_added: int = 0
+    consumption_skipped: "list[str]" = field(default_factory=list)
 
 
 def build_graph_step(
@@ -38,6 +43,8 @@ def build_graph_step(
     dict_columns_rows: "list[dict]",
     steward_records: "Iterable[dict]" = (),
     metric_name_records: "Iterable[dict]" = (),
+    report_source_records: "Iterable[dict]" = (),
+    dax_records: "Iterable[dict]" = (),
     *,
     table_name_col: str = "TABLE_NAME",
     column_name_col: str = "COLUMN_NAME",
@@ -71,6 +78,10 @@ def build_graph_step(
 
     names_applied, names_skipped = apply_business_names(builder, metric_name_records)
 
+    reports_added, measures_added, consumption_skipped = wire_consumption_layer(
+        builder, list(report_source_records), list(dax_records)
+    )
+
     # Logic relations.
     node_ids = set(builder.nodes)
     missing_canonical = [
@@ -94,4 +105,7 @@ def build_graph_step(
         stewards_applied=stewards_applied,
         business_names_applied=names_applied,
         business_names_skipped=names_skipped,
+        reports_added=reports_added,
+        measures_added=measures_added,
+        consumption_skipped=consumption_skipped,
     )

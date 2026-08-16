@@ -9,8 +9,8 @@ from __future__ import annotations
 
 from src.adapters.base import BulkPublishResult, PublishResult
 
-TARGETS = ("purview", "collibra")
-KINDS = ("asset", "glossary_term")
+TARGETS = ("purview", "collibra", "fabric_pbi")
+KINDS = ("asset", "glossary_term", "report_description")
 
 
 def publish_log_rows(

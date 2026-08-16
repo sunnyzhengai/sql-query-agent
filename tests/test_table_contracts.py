@@ -22,8 +22,10 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 NOTEBOOK_INDIRECT_WRITES = {
     "05_export_graph_tables": [
         "graph_canonical", "graph_transformation", "graph_technical",
-        "graph_dimension", "graph_edge_c2t", "graph_edge_t2t",
-        "graph_edge_t2tech", "graph_edge_tech2dim", "graph_edge_tab2col",
+        "graph_report", "graph_measure", "graph_edge_c2t", "graph_edge_t2t",
+        "graph_edge_t2tech", "graph_edge_report2canonical",
+        "graph_edge_report2technical", "graph_edge_report2measure",
+        "graph_edge_measure2column", "graph_edge_tab2col",
         "graph_edge_uses_table",
     ],
     "load_clarity_dictionary": ["input_dict_tables", "input_dict_columns"],

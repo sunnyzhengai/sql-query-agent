@@ -449,6 +449,39 @@ you can check the current state with:
    in a Fabric notebook, follow its cells to assign stewards, then re-run
    03 → 04 so ownership lands in the graph and `output_metric_logic`.
 
+2. **PBI semantic-model ingestion** (`input_report_sources`,
+   `input_dax_expressions`, `input_metric_names`) — without it, the graph
+   has no report lineage, no DAX measures, and metrics display object
+   names only. Remediation: run 12_ingest_semantic_models with a
+   `semantic_models` config section (folder or devops_git profile) —
+   see the section below. For `input_metric_names` alone, remediation:
+   run 12_ingest_semantic_models to derive names from PBI semantic
+   models, or upload a manual metric_id,business_name CSV. Then re-run
+   03 → 04 → 05.
+
+### PBI semantic models and report descriptions (ADR 0040)
+
+The consumption layer: which reports run which metrics, and the DAX
+measures defined on top of them.
+
+1. Add a `semantic_models:` section to `org_config.yaml`
+   (see `org_config.example.yaml`). Pick a source profile:
+   - `folder` — point `folder_path` at a git-synced workspace checkout
+     or an uploaded `Files/` area containing `*.SemanticModel` folders.
+     No credentials needed.
+   - `devops_git` — Azure DevOps repos. Store a PAT (Code: Read) as a
+     Key Vault secret and set `key_vault_url` + `pat_secret_name`; the
+     PAT is fetched at run time and never stored.
+2. Import and run `12_ingest_semantic_models` (same import drill as
+   Step 4). Review the per-report summary it prints.
+3. Re-run 03 → 04 → 05 so report and measure nodes land in the graph
+   and its exports.
+4. Optional, after 07 has generated descriptions: run `13_publish_pbi`
+   to publish each metric's certified description onto the Power BI
+   report built on it. Matching is lineage-exact; the notebook prints
+   the matches and stops for review before publishing, and every push
+   is logged to `gov_publish_log`.
+
 ### Automated refresh (optional)
 
 To keep the knowledge graph up to date without manual runs:

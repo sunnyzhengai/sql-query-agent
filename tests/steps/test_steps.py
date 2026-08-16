@@ -117,7 +117,7 @@ class TestExportStep:
         tables, columns = _dict_rows()
         graph = build_graph_step(parse_out.parse_results, tables, columns)
         exported = export_step(graph.nodes_rows, graph.edges_rows)
-        assert len(exported) == 10  # 4 node tables + 5 edge tables + derived closure
+        assert len(exported) == 14  # 5 node tables + 8 edge tables + derived closure (ADR 0040)
         assert len(exported["graph_canonical"]) == len(parse_out.parse_results)
         assert exported["graph_edge_tab2col"], "column edges must be exported"
 

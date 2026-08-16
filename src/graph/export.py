@@ -20,13 +20,15 @@ def export_node_tables(nodes: dict[str, GraphNode]) -> dict[str, list[dict]]:
             "graph_canonical": [...],
             "graph_transformation": [...],
             "graph_technical": [...],
-            "graph_dimension": [...],
+            "graph_report": [...],
+            "graph_measure": [...],
         }
     """
     canonical = []
     transformation = []
     technical = []
-    dimension = []
+    report = []
+    measure = []
 
     for node in nodes.values():
         if node.layer == NodeLayer.CANONICAL:
@@ -64,20 +66,31 @@ def export_node_tables(nodes: dict[str, GraphNode]) -> dict[str, list[dict]]:
                 "databaseName": node.properties.get("database") or "",
                 "columnName": node.properties.get("column") or "",
             })
-        elif node.layer == NodeLayer.DIMENSION:
-            dimension.append({
+        elif node.layer == NodeLayer.REPORT:
+            report.append({
                 "nodeId": node.node_id,
                 "name": node.name,
                 "description": node.description,
-                "tableName": node.properties.get("table", ""),
-                "columnName": node.properties.get("column", ""),
+                "repoName": node.properties.get("repo_name", ""),
+                "semanticModelPath": node.properties.get("semantic_model_path", ""),
+            })
+        elif node.layer == NodeLayer.MEASURE:
+            measure.append({
+                "nodeId": node.node_id,
+                "name": node.name,
+                "description": node.description,
+                "reportName": node.properties.get("report_name", ""),
+                "pbiTable": node.properties.get("pbi_table", ""),
+                "daxExpression": node.properties.get("dax_expression", ""),
+                "expressionType": node.properties.get("expression_type", ""),
             })
 
     return {
         "graph_canonical": canonical,
         "graph_transformation": transformation,
         "graph_technical": technical,
-        "graph_dimension": dimension,
+        "graph_report": report,
+        "graph_measure": measure,
     }
 
 
@@ -89,15 +102,18 @@ def export_edge_tables(edges: list[GraphEdge]) -> dict[str, list[dict]]:
             "graph_edge_c2t": [...],
             "graph_edge_t2t": [...],
             "graph_edge_t2tech": [...],
-            "graph_edge_tech2dim": [...],
+            "graph_edge_report2canonical": [...],
         }
     """
     table_map = {
         EdgeType.CANONICAL_TO_TRANSFORM: "graph_edge_c2t",
         EdgeType.TRANSFORM_TO_TRANSFORM: "graph_edge_t2t",
         EdgeType.TRANSFORM_TO_TECHNICAL: "graph_edge_t2tech",
-        EdgeType.TECHNICAL_TO_DIMENSION: "graph_edge_tech2dim",
         EdgeType.TABLE_TO_COLUMN: "graph_edge_tab2col",
+        EdgeType.REPORT_TO_CANONICAL: "graph_edge_report2canonical",
+        EdgeType.REPORT_TO_TECHNICAL: "graph_edge_report2technical",
+        EdgeType.REPORT_TO_MEASURE: "graph_edge_report2measure",
+        EdgeType.MEASURE_TO_COLUMN: "graph_edge_measure2column",
     }
 
     result: dict[str, list[dict]] = {name: [] for name in table_map.values()}

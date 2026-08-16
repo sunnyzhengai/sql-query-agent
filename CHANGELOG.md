@@ -10,6 +10,38 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.9.0] - 2026-08-16
+
+### Added
+- **The consumption layer** (ADR 0040, HANDOFF_PBI_SEMANTIC_LAYER):
+  report and measure node types with three deterministic edge types —
+  report→canonical (TMDL partition lineage), report→technical
+  (DirectLake pattern 5 — the Fabric-native default reads warehouse
+  tables directly), report→measure (ownership), and measure→column
+  (table-qualified DAX refs; unresolved refs skipped, never guessed).
+  DAX is business logic and now has a home. PBI layer confirmed v1
+  scope (Sunny, 2026-08-16).
+- Notebook `12_ingest_semantic_models`: parses TMDL via the native
+  parser into `input_report_sources`, `input_dax_expressions`, and
+  `input_metric_names` (planned→ACTIVE — first writer). Two source
+  profiles: `folder` (git-synced workspace / Files, no credentials) and
+  `devops_git` (PAT fetched from Key Vault at run time, never stored).
+- Notebook `13_publish_pbi`: `fabric_pbi.py` verdict = WIRED — metric
+  descriptions published onto PBI reports via lineage-EXACT matching
+  (the name-similarity guesser is deleted); pushes append to
+  `gov_publish_log` (target `fabric_pbi`).
+- LPG exports: `graph_report`, `graph_measure`, three new edge tables.
+- End-to-end tests: TMDL fixtures → step → graph → export.
+
+### Removed
+- The ghost DIMENSION layer (zero producers since inception):
+  `NodeLayer.DIMENSION`, `add_dimension_node`, `graph_dimension`,
+  `graph_edge_tech2dim`, and the `dimensions` key of metric subgraphs.
+  Existing deployments: drop the two empty Delta tables (upgrade note in
+  05's docstring).
+
+---
+
 ## [1.8.0] - 2026-08-16
 
 ### Changed
