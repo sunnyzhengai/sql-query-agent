@@ -104,6 +104,13 @@ response.
 
 ## Should-do (not blocking; before or during certification wait)
 
+- [ ] PRE-SUBMISSION: finish the COLUMN-level anonymization crosswalk
+      (live find 2026-08-16: PAT_ENC_CSN_ID x2205 in 15/28 files, plus
+      PAT_ID/PAT_MRN_ID/HSP_ACCOUNT_ID/SERV_AREA_ID — Epic dialect the
+      strategy doc says should be mapped). Sequenced AFTER the demo
+      recording: rename pass -> make_golden_snapshot fixture rebuild ->
+      full pipeline re-run -> robustness baseline re-earn -> re-seed
+      demo source DB.
 - [ ] Whitepaper + reviewer guide + DEMO_SCRIPT refresh for ADR 0035:
       the product story is now "conversational agent, deterministic
       tools, code-stamped provenance" — the demo script's beats change
