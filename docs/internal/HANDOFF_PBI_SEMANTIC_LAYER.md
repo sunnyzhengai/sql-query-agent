@@ -101,6 +101,28 @@ late — the review session initially promised these only in conversation):
 3. Minor: the 1.9.0 status header above says the scoping question "stays
    open" — it does not; see DECIDED section below. Reconcile the header.
 
+## Demo gap analysis — DECIDED (Sunny + dev session, 2026-08-16)
+
+Rule applied: if a demo blocker is part of the final offering, build it;
+otherwise adjust the demo. Verdicts:
+
+- **BUILT (1.11.0): `workspace` TMDL source profile** — Fabric REST
+  getDefinition (TMDL format, LRO polling); works on any workspace,
+  git integration or not. Now the recommended default. This closes the
+  "getDefinition API" alternative named in follow-up 1.
+- **Roadmap (fast-follow, not v1): materialization edges** — proc
+  WRITES table → closes report→table→materializing-proc blast radius
+  for customers whose reports read output tables instead of EXECing
+  procs. The two-hop implication in the appendix stands.
+- **Demo adjustments, not product**: seeded demo source DB (doubles as
+  the extractor live verification), EXEC-partition demo semantic model
+  (authentic topology — matches the real fixtures), notebook review
+  cell shown as the ingestion surface (no separate UI is product),
+  Fabric Graph model view for dependency visuals (chat answers in
+  text), Snowflake removed from spoken claims (watchlist).
+- DEMO_SCRIPT.md is now Sunny's V1 narrative with claims verified;
+  tenant-prep runbook + QA gate embedded in the script.
+
 ## Scoping — DECIDED (Sunny, 2026-08-16): PBI layer IS v1 Marketplace scope
 
 Rationale: real customers ask about REPORTS, not procs/views — the report

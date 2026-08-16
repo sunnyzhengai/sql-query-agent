@@ -70,10 +70,24 @@ if config.semantic_models is None:
 # CELL ********************
 
 # %% Cell 1: Collect TMDL files via the configured source profile
-from src.extractor.tmdl_source import FolderTmdlSource, collect_from_devops
+from src.extractor.tmdl_source import (
+    FabricWorkspaceTmdlSource,
+    FolderTmdlSource,
+    collect_from_devops,
+)
 
 sm = config.semantic_models
-if sm.source_type == "folder":
+if sm.source_type == "workspace":
+    # Turn-key default: straight from the Fabric workspace REST API —
+    # works whether or not the workspace has git integration.
+    workspace_id = sm.workspace_id or notebookutils.runtime.context.get(  # noqa: F821
+        "currentWorkspaceId")
+    tmdl_files = FabricWorkspaceTmdlSource(
+        workspace_id,
+        token_provider=lambda: notebookutils.credentials.getToken(  # noqa: F821
+            "https://api.fabric.microsoft.com"),
+    ).collect()
+elif sm.source_type == "folder":
     if not sm.folder_path:
         raise ValueError("semantic_models.folder_path is required for the folder profile")
     tmdl_files = FolderTmdlSource(sm.folder_path).collect()

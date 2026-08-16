@@ -1,218 +1,166 @@
-# Demo Video Script (~7 minutes)
+# Marketplace Demo Script (~5 minutes)
 
-**Target audience:** Microsoft Marketplace reviewers, prospective customers
-**Tone:** professional, concise, value-first — the architecture is SHOWN
-(the Basis line, computed verdicts), never narrated as history.
-**Rewritten 2026-08-16** for the full 1.10.0 surface: turn-key
-extraction, the consumption layer (reports + DAX), lineage-exact
-publish-back. The through-line is the approved pitch: **"a federation of
-native parsers, one per layer, stitched into one graph."**
+**Canonical recording script** — Sunny's V1 narrative flow
+(DEMO_SCRIPT_V1, 2026-08-16) with every claim verified against the
+shipped product (gap analysis 2026-08-16). Problem → Ingestion → the
+"Aha!" (drift + blast radius) → Write-back → Admin close.
 
-**Deviation is welcome, not feared (hard rule, 2026-08-09):** the
-agent passed a 54-conversation paraphrase suite at 100% on every
-mechanical check (AGENT_ROBUSTNESS_BASELINE.md). Phrase the questions
-naturally; the script's wording is a guide, not a guardrail. Beat 7
-deviates ON CAMERA on purpose.
-**QA gate before recording:** the report-layer beats (5 and 6) are NEW
-surface — run them as a demo-QA pass on the live tenant first; the
-robustness suite predates them.
-
-**Prerequisites:** capacity Active; sql-logic-env at v1.10.0; 12 → 03 →
-04 → 05 → 07 → 11 run since the upgrade (consumption layer + measure
-descriptions in the graph and catalog); the `graph_edges` shortcut
-created in the Eventhouse (RESUME_CHECKLISTS); web chat deployed and
-signed in; admin dashboard open in a second tab; one PBI report whose
-description field is EMPTY (for Part 4's publish moment); a fresh
-conversation.
+**Tone:** fast, value-first; the architecture is SHOWN (Basis line,
+computed verdicts), never narrated as history. Deviation from the
+scripted wording is welcome — but run the QA gate below first: the
+report-layer questions are newer than the robustness baseline.
 
 ---
 
-## Opening (30 seconds)
+## Tenant prep (run BEFORE recording day — plain steps)
 
-**[Screen: the AIVIA chat page, empty]**
-
-"Every health system runs on two layers of hidden business logic: the
-SQL in hundreds of stored procedures, and the DAX inside the Power BI
-reports built on top of them. Both undocumented. When an analyst asks
-'how is this number calculated?', the answer takes days — and when a
-generic AI answers instead, you can't tell whether it's right.
-
-AIVIA parses both layers with each platform's own native parser —
-Microsoft's ScriptDom for SQL, the semantic-model definitions for
-Power BI — and stitches them into one certified knowledge graph in
-YOUR tenant. A federation of native parsers, one graph, and every
-answer shows exactly what it consulted. Provable, or it doesn't
-answer."
-
----
-
-## Part 1: The problem (30 seconds)
-
-**[Screen: open USP_Severe_Sepsis SQL — scroll]**
-
-"Here's the SQL half — a sepsis compliance procedure. Thousands of
-lines, dozens of temp tables, real clinical criteria. And the business
-doesn't even call it 'USP_Severe_Sepsis' — they know it as the
-dashboard built on it. That dashboard adds its own logic: DAX measures
-nobody documents either. Two layers, zero documentation."
-
----
-
-## Part 2: Turn-key ingestion (45 seconds)
-
-**[Screen: extract_views cell 5 — the NEW / CHANGED / DELETED review]**
-
-"Setup is turn-key: point AIVIA at your database — on-prem through a
-gateway, Azure SQL, or Fabric-native — and it discovers every
-procedure and view itself. No exports, no file drops. This is a
-re-run: it found only what CHANGED since last week, and stops here for
-your review before anything is written.
-
-**[Screen: 12_ingest_semantic_models output — reports + measures +
-derived names]**
-
-The Power BI side is the same motion: it reads your semantic models —
-git-synced or straight from the workspace — and extracts which SQL
-each report executes, every DAX measure, and the reports' names, which
-become the business names your people actually use.
-
-**[Screen: 06_validate: DEPLOYMENT READY]**
-
-Everything is parsed by the platform's own parser — never regex, never
-guesswork — a PHI scan gates both SQL and DAX before anything reaches
-an AI model, and descriptions are generated against your own Azure
-OpenAI endpoint. Your logic never leaves your tenant; we never hold a
-key."
+1. Resume the capacity.
+2. Update from Git; publish **sql-logic-env** with the current wheel
+   (v1.11.0+); verify the version in any notebook's Cell 0.
+3. Create the **graph_edges** OneLake shortcut in the Eventhouse
+   (RESUME_CHECKLISTS has the click path, next to the existing two).
+4. Seed the demo source database: create a **Fabric SQL database**,
+   deploy the 28 synthetic procs into it, and set the extractor config
+   to `source_type: "fabric_native"` pointing at its SQL endpoint.
+   Run extract_views once end-to-end (this is ALSO the extractor's
+   live-parity verification). Two days later, edit 2–3 procs
+   trivially so the on-camera re-run shows a real CHANGED delta.
+5. Demo semantic model: the ED Sepsis dashboard's model must EXECUTE
+   the demo procs (EXEC partitions — same shape as the real Cook
+   fixtures). Its displayName must match the semantic-model name
+   (the publish matcher is lineage-exact on the name). Leave the
+   report's description field EMPTY.
+6. Set `semantic_models.source_type: "workspace"` (no git needed) and
+   run 12 → 03 → 04 → 05 → 07 → 11.
+7. **QA gate** — ask the live agent, verbatim, and confirm grounded
+   answers: (a) the headline metric question; (b) the drift question
+   phrased WITHOUT the literal step name; (c) "which dashboards are
+   impacted by these?" after the drift verdict; (d) the DAX measure
+   question. Fix anything that wobbles before scheduling the recording.
+8. Admin dashboard tab pre-loaded; fresh chat conversation; sign in as
+   a real Entra user.
 
 ---
 
-## Part 3: Ask anything (2.5 minutes — the heart)
+## Opening: The Hook (30 seconds)
 
-**[Screen: the AIVIA chat]**
+**[Screen: split — a 2,000-line SQL procedure | a Power BI dashboard]**
 
-### Beat 1 — the headline answer, with receipts
+"Every hospital runs on two layers of hidden business logic: thousands
+of lines of legacy SQL, and the undocumented DAX inside your Power BI
+reports. When an executive asks *'how exactly is this compliance
+metric calculated?'*, it takes days to answer. And when a generic AI
+answers instead, it hallucinates.
 
-**[Ask, in your own words: how is ED Sepsis Screening calculated?]**
-
-Answer arrives in business language, ends with the real Power BI
-report link. **Point at the Basis line under the answer:**
-
-"Notice the Basis line. Every answer discloses exactly what was
-searched, what was read, and what was computed — stamped by code, not
-written by the AI. And it answered to the name the business uses —
-learned automatically from your own report estate."
-
-### Beat 2 — a real conversation
-
-**[Ask: show me its SQL]** → the actual stored logic, on demand.
-**[Ask: who owns it?]** → honest: "no steward recorded." Say:
-
-"It doesn't invent an owner. Unassigned stewardship is a governance
-gap — and the admin dashboard tracks exactly that."
-
-### Beat 3 — the governance stunner (the money shot)
-
-**[Ask: are all definitions of Base_Pop_Severe_ED_Scores the same
-across our procedures?]**
-
-Six procedures define that step. **Five different definitions.**
-
-"Copy-paste drift caught red-handed — six teams believing they compute
-the same thing, five different truths. The comparison is a computed
-verdict — content hashes, not an AI's impression."
-
-### Beat 4 — blast radius: logic to dashboards
-
-**[Ask: which reports are built on these?]**
-
-"And here's why drift matters: these are the DASHBOARDS each version
-feeds. That link isn't name-matching — it's parsed from the semantic
-models themselves. When a definition is wrong, this is the blast
-radius; when you fix it, this is who to notify."
-
-### Beat 5 — the DAX layer
-
-**[Ask: what does the Compliance Rate measure on that dashboard do?]**
-
-Business description of the DAX arrives, grounded in the dictionary.
-**[Ask: show me the DAX]** → the expression, on demand.
-
-"Same treatment as SQL: parsed natively, PHI-gated, described in
-business terms, raw code only when you ask. The report layer stopped
-being a black box."
-
-### Beat 6 — it knows what it doesn't know
-
-**[Ask: how many sepsis patients did we have yesterday?]**
-
-"Definitions, not patient data — it refuses instantly and says what it
-CAN do. No tools consulted; nothing made up."
-
-### Beat 7 — DELIBERATE DEVIATION (on camera)
-
-"Don't take the script's word for it." **[Have a colleague — or
-ChatGPT, on screen — phrase a question about any certified metric
-however they like. Ask it verbatim.]**
-
-"Same grounded behavior on a question nobody rehearsed — backed by a
-robustness suite that passed at 100% before this recording."
+Meet **AIVIA**. AIVIA parses both layers with each platform's own
+native parser and stitches them into a single certified knowledge
+graph that lives entirely inside your tenant. Every answer comes with
+exact provenance — or it doesn't answer at all."
 
 ---
 
-## Part 4: The answer becomes the caption (45 seconds)
+## Part 1: Turn-key Ingestion & Guardrails (45 seconds)
 
-**[Screen: the empty description field on the PBI report, THEN run
-13_publish_pbi cell 1 — the match review — then cell 2]**
+**[Screen: extract_views review cell — the NEW / CHANGED / DELETED
+delta, e.g. "3 changed, 0 new"]**
 
-"Everything the graph certifies flows back out. Watch this report's
-description field — currently empty. AIVIA matches reports to metrics
-by parsed lineage — exact, never fuzzy; where it isn't sure, it
-declines and says why — and publishes the certified description onto
-the report itself.
+"Setup is turn-key. Point AIVIA at your database — on-prem SQL Server
+through a gateway, Azure SQL, or Fabric-native — and it discovers
+your procedures and views itself. This is a re-run: it found only
+what changed since last week, and it stops here for review before
+anything is written. Nothing moves without your eyes on it.
 
-**[Refresh the report — the description is there.]**
+**[Screen: 12_ingest_semantic_models output — reports, measures,
+derived business names]**
 
-The answer just became the report's caption, where every viewer sees
-it. Every push is logged. The same motion publishes to Microsoft
-Purview and Collibra."
+Power BI is the same motion — read straight from the workspace, no
+exports, no git setup required: which SQL feeds which report, every
+DAX measure, and the business names your people actually use.
+
+And a built-in PHI gate scans both SQL and DAX *before* anything
+reaches an AI model, which runs against your own Azure OpenAI
+endpoint. Your data never leaves your tenant."
 
 ---
 
-## Part 5: The admin dashboard + close (45 seconds)
+## Part 2: Ask Anything, With Proof (2 minutes)
 
-**[Screen: aivia_admin_telemetry_report, page through]**
+**[Screen: the AIVIA web chat]**
 
-"Admins get a Power BI report — generated and deployed automatically.
-Pipeline health with a per-metric validation funnel. Knowledge
-coverage, including the honest gaps: unassigned stewards are a work
-queue in red, and setup-completeness is a table, not a memory — the
-system knows which enrichments you haven't configured yet. Every
-error cites the contract it violated, so support starts from the
-cause, not the symptom. And agent telemetry: every conversation, WHO
-made each decision — the deterministic engine or the language model —
+**[Ask: "How is our ED Sepsis Screening rate calculated?"]**
+
+"Plain business language, ending with the live dashboard link. Two
+things to notice. It answered to the business name — learned
+automatically from your report estate. And the **Basis line** here:
+a code-stamped record of exactly what was searched, read, and
+computed. Not the AI's account of itself — the system's.
+
+**[Ask: "Show me the underlying SQL"]** → the stored logic, on demand.
+
+Now the multi-million-dollar governance problem: copy-paste drift.
+
+**[Ask: "Are all definitions of our base population score consistent
+across our procedures?"]**
+
+**[Screen: the computed verdict — six procedures, five distinct
+definitions, with a diff]**
+
+Six procedures claiming the same calculation. Five different truths —
+caught by content hashing, not an AI's impression. And because the
+graph holds the report layer too:
+
+**[Ask: "Which dashboards are impacted by these?"]**
+
+That's the blast radius — parsed from the semantic models themselves,
+never name-matching. When a definition is wrong, this is who's
+affected; when you fix it, this is who to notify.
+
+One more thing — what it WON'T do:
+
+**[Ask: "How many sepsis patients did we have yesterday?"]**
+
+Definitions, not patient data. It refuses instantly and says what it
+can do. No tools consulted, nothing invented — that refusal is a
+feature your compliance team will love."
+
+---
+
+## Part 3: The Write-Back Loop & Admin Trust (1 minute)
+
+**[Screen: the report's EMPTY description field, then 13_publish_pbi:
+the match review, then the publish cell]**
+
+"Governance shouldn't die in a silo. This report's description field
+is empty. AIVIA matches reports to metrics by parsed lineage — exact,
+never fuzzy; where it isn't certain it declines and says why — and
+publishes the certified definition onto the report itself.
+
+**[Refresh — the description is populated.]**
+
+The answer just became the report's caption, visible to every viewer.
+Every push is logged, and the same motion syncs to Microsoft Purview
+and Collibra.
+
+**[Screen: quick pan through aivia_admin_telemetry_report]**
+
+Administrators see everything: pipeline health, validation funnels,
+stewardship gaps as a work queue in red, setup-completeness as data,
+and an audit log of every AI decision — which component decided,
 with user feedback joined to it.
 
-**[Final slide: the federation diagram — TMDL parser + ScriptDom → one
-graph → the agent]**
-
-AIVIA: a federation of native parsers, one per layer, stitched into
-one certified knowledge graph — and a governed AI that answers from
-it. Provably, or not at all. Available on Azure Marketplace."
+AIVIA: a federation of native parsers, one knowledge graph, and a
+governed AI that answers with proof. Available on the Microsoft
+Marketplace."
 
 ---
 
 ## Recording checklist
 
-- [ ] QA pass on Beats 4 and 5 against the live tenant FIRST (new
-      surface; the robustness baseline predates the report layer)
-- [ ] Fresh conversation (no leftover context on screen)
-- [ ] Web app signed in as a real Entra user (identity visible = fine)
-- [ ] Admin dashboard tab pre-loaded (page 1 green)
-- [ ] Target PBI report's description field emptied BEFORE recording
-      (Part 4's reveal depends on it)
-- [ ] extract_views run once earlier in the week so the on-camera
-      re-run shows a real CHANGED delta, not all-NEW
-- [ ] Purview provisioned same-day if its screenshot is still wanted
-- [ ] Capture stills: Basis-line answer, drift verdict, report blast
-      radius, DAX description, the caption reveal, dashboard page 1+3
-- [ ] Beat 7's outside question genuinely unrehearsed
+- [ ] Tenant prep steps 1–8 done (incl. the QA gate — non-negotiable)
+- [ ] Fresh conversation; no leftover context on screen
+- [ ] Report description field verified EMPTY right before Part 3
+- [ ] Capture stills: Basis-line answer, drift verdict + diff, blast
+      radius, the refusal, the caption reveal, dashboard pages 1+3
+- [ ] Claims audit on the final cut: only the three shipped source
+      profiles named; no "instantly"; no UI/node-map language beyond
+      what was actually shown

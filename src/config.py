@@ -73,9 +73,12 @@ class DevOpsGitConfig(BaseModel):
 
 
 class SemanticModelsConfig(BaseModel):
-    # folder: git-synced workspace checkout / uploaded Files — Fabric-native.
+    # workspace: Fabric REST getDefinition — any workspace, no git needed
+    #            (the turn-key default).
+    # folder: git-synced workspace checkout / uploaded Files.
     # devops_git: Azure DevOps repos (DevOpsTmdlClient).
-    source_type: Literal["folder", "devops_git"] = "folder"
+    source_type: Literal["workspace", "folder", "devops_git"] = "workspace"
+    workspace_id: str = ""  # empty = the workspace the notebook runs in
     folder_path: str = ""
     devops: Optional[DevOpsGitConfig] = None
 

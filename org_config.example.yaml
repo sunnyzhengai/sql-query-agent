@@ -55,7 +55,8 @@ dictionary:
 # PBI semantic models (optional — report lineage, DAX measures, business
 # names; ADR 0040). Pick ONE source profile.
 # semantic_models:
-#   source_type: "folder"        # folder | devops_git
+#   source_type: "workspace"     # workspace | folder | devops_git
+#   workspace_id: ""             # workspace profile; empty = current workspace
 #   folder_path: "/lakehouse/default/Files/semantic-models"   # folder profile
 #   devops:                      # devops_git profile
 #     org: "YourDevOpsOrg"

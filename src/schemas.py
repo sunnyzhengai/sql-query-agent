@@ -1645,7 +1645,7 @@ REPORT_SOURCES = {
     "optional_input": True,
     "remediation": (
         "run 12_ingest_semantic_models with a semantic_models config "
-        "section (folder or devops_git profile)"
+        "section (workspace, folder, or devops_git profile)"
     ),
     "columns": [
         ("report_name", "string", False),
@@ -1690,7 +1690,7 @@ DAX_EXPRESSIONS = {
     "optional_input": True,
     "remediation": (
         "run 12_ingest_semantic_models with a semantic_models config "
-        "section (folder or devops_git profile)"
+        "section (workspace, folder, or devops_git profile)"
     ),
     "columns": [
         ("report_name", "string", False),

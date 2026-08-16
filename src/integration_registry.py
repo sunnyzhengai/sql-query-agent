@@ -73,14 +73,18 @@ INTEGRATION_REGISTRY = [
         "notes": "1.9.0 — consumption layer (ADR 0040); v1 scope per Sunny 2026-08-16",
     },
     {
-        "from_tool": "Power BI (Fabric-native / git-synced workspace)",
+        "from_tool": "Power BI (Fabric workspace, git or not)",
         "to_tool": "AIVIA",
         "artifact_parsed": "TMDL incl. DirectLake partitions (entityName)",
-        "mechanism": "TMDL parser via folder profile; DirectLake = pattern 5, report->technical edges",
+        "mechanism": (
+            "TMDL parser via workspace profile (REST getDefinition, no git "
+            "needed) or folder profile (git-synced); DirectLake = pattern 5, "
+            "report->technical edges"
+        ),
         "status": "shipped",
         "tier": "Pro",
         "direction": "ingest",
-        "notes": "1.9.0 — verify Fabric-WH-endpoint M shapes with a real fixture on Fabric",
+        "notes": "workspace profile 1.11.0 — verify Fabric-WH-endpoint M shapes with a real fixture",
     },
     {
         "from_tool": "AIVIA",

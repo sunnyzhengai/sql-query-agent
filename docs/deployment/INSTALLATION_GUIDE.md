@@ -453,7 +453,7 @@ you can check the current state with:
    `input_dax_expressions`, `input_metric_names`) — without it, the graph
    has no report lineage, no DAX measures, and metrics display object
    names only. Remediation: run 12_ingest_semantic_models with a
-   `semantic_models` config section (folder or devops_git profile) —
+   `semantic_models` config section (workspace, folder, or devops_git profile) —
    see the section below. For `input_metric_names` alone, remediation:
    run 12_ingest_semantic_models to derive names from PBI semantic
    models, or upload a manual metric_id,business_name CSV. Then re-run
@@ -466,9 +466,13 @@ measures defined on top of them.
 
 1. Add a `semantic_models:` section to `org_config.yaml`
    (see `org_config.example.yaml`). Pick a source profile:
+   - `workspace` (recommended) — reads semantic-model definitions
+     straight from the Fabric workspace REST API. Works whether or not
+     the workspace has git integration; no credentials to manage — the
+     notebook's own identity is used. Leave `workspace_id` empty to
+     use the workspace the notebook runs in.
    - `folder` — point `folder_path` at a git-synced workspace checkout
      or an uploaded `Files/` area containing `*.SemanticModel` folders.
-     No credentials needed.
    - `devops_git` — Azure DevOps repos. Store a PAT (Code: Read) as a
      Key Vault secret and set `key_vault_url` + `pat_secret_name`; the
      PAT is fetched at run time and never stored.

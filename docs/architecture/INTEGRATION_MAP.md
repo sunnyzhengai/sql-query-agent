@@ -21,7 +21,7 @@ flowchart LR
   T2 -->|ingest| AIVIA
   T3["Power BI (DevOps git repos)"]:::shipped
   T3 -->|ingest| AIVIA
-  T4["Power BI (Fabric-native / git-synced workspace)"]:::shipped
+  T4["Power BI (Fabric workspace, git or not)"]:::shipped
   T4 -->|ingest| AIVIA
   T5["Power BI reports"]:::shipped
   AIVIA -->|publish| T5
@@ -47,7 +47,7 @@ flowchart LR
 | Azure SQL / Managed Instance | AIVIA | sys.sql_modules definitions (procs + views) | extractor: azure_direct profile (AAD-token pyodbc) -> ScriptDom | shipped | Basic | ingest |
 | Fabric Warehouse / SQL DB / mirrored DB | AIVIA | sys.sql_modules definitions (procs + views) | extractor: fabric_native profile (AAD-token pyodbc) -> ScriptDom | shipped | Basic | ingest |
 | Power BI (DevOps git repos) | AIVIA | TMDL (.SemanticModel: partitions, DAX measures, calc columns) | TMDL parser via devops_git profile (PAT from Key Vault) | shipped | Pro | ingest |
-| Power BI (Fabric-native / git-synced workspace) | AIVIA | TMDL incl. DirectLake partitions (entityName) | TMDL parser via folder profile; DirectLake = pattern 5, report->technical edges | shipped | Pro | ingest |
+| Power BI (Fabric workspace, git or not) | AIVIA | TMDL incl. DirectLake partitions (entityName) | TMDL parser via workspace profile (REST getDefinition, no git needed) or folder profile (git-synced); DirectLake = pattern 5, report->technical edges | shipped | Pro | ingest |
 | AIVIA | Power BI reports | report descriptions (Fabric REST PATCH) | fabric_pbi adapter, lineage-exact matching (13_publish_pbi) | shipped | Pro | publish |
 | AIVIA | Collibra | assets + descriptions + glossary terms (REST) | collibra adapter (08_publish_collibra) | shipped | Pro | publish |
 | AIVIA | Microsoft Purview | assets + descriptions (REST) | purview adapter (09_publish_purview) | shipped | Pro | publish |
@@ -61,7 +61,7 @@ flowchart LR
 - **Azure SQL / Managed Instance → AIVIA**: 1.8.0
 - **Fabric Warehouse / SQL DB / mirrored DB → AIVIA**: 1.8.0
 - **Power BI (DevOps git repos) → AIVIA**: 1.9.0 — consumption layer (ADR 0040); v1 scope per Sunny 2026-08-16
-- **Power BI (Fabric-native / git-synced workspace) → AIVIA**: 1.9.0 — verify Fabric-WH-endpoint M shapes with a real fixture on Fabric
+- **Power BI (Fabric workspace, git or not) → AIVIA**: workspace profile 1.11.0 — verify Fabric-WH-endpoint M shapes with a real fixture
 - **AIVIA → Power BI reports**: 1.9.0 — pushes logged to gov_publish_log
 - **dbt → AIVIA**: NEXT — cheapest connector; out of v1 unless a design partner needs it
 - **Databricks → AIVIA**: post-v1; 2026-08-07 'sqlglot dialect' note predates sqlglot retirement — re-decide

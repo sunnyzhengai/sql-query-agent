@@ -10,6 +10,21 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.11.0] - 2026-08-16
+
+### Added
+- **`workspace` semantic-model source profile** (demo gap analysis:
+  part of the offering, so built): TMDL pulled straight from the
+  Fabric workspace REST API (getDefinition, TMDL format, bounded LRO
+  polling) — works with or without git integration, no credentials to
+  manage. Now the recommended default in config, guide, and registry.
+- DEMO_SCRIPT.md rewritten as the V1 narrative with every claim
+  verified: three shipped source profiles named (Snowflake removed —
+  watchlist), notebook review cell as the ingestion surface, refusal
+  beat restored, tenant-prep runbook + live QA gate embedded.
+
+---
+
 ## [1.10.0] - 2026-08-16
 
 ### Added
