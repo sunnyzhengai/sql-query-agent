@@ -10,6 +10,39 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.8.0] - 2026-08-16
+
+### Changed
+- **Extractor promoted to the turn-key front door** (HANDOFF_TO_DEV_EXTRACTOR
+  items 1–6): `object_types` defaults to views + stored procedures;
+  Marketplace customers no longer hand-export files.
+- Definitions are stored **as extracted** — the sqlglot
+  `strip_create_prefix` (and its naive " AS " fallback that could corrupt
+  bodies) is deleted; 02's ScriptDom parses CREATE VIEW/PROCEDURE
+  wrappers natively, exactly as the 790-proc corpus proved. Line endings
+  normalized \r\n→\n at the extraction entry point.
+- Connection profiles: `source_type: onprem_gateway | azure_direct |
+  fabric_native`. Token profiles use pyodbc + AAD access token (fresh
+  token per connection — the getToken() session cache breaks >1h holds);
+  provider injectable for tests.
+
+### Fixed
+- extract_views wrote 5-column rows against the 7-column
+  input_sql_sources contract — MERGE `UPDATE SET *` would fail; the
+  extractor now emits `source_type`/`source_schema` in the file-loader's
+  vocabulary, and row shape is pinned to TABLE_REGISTRY by test.
+
+### Added
+- Proc-parity tests: the 28-file golden corpus through discovery filter,
+  hash/change tracking, and sql_sources production — extracted output is
+  byte-identical to the file-loaded path's input to 02.
+- INSTALLATION_GUIDE "Automated Extraction": prereq checklist + numbered
+  runbook for all three profiles.
+- SQL_SOURCES contract documents the dual-writer protocol: install path
+  overwrites, extractor merges by metric_id; owner stays 01_install.
+
+---
+
 ## [1.7.1] - 2026-08-15
 
 ### Fixed

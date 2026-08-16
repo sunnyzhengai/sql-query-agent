@@ -9,9 +9,6 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass
 
-import sqlglot
-from sqlglot import exp
-
 from src.config import DomainFilterConfig
 from src.extractor.connection import SqlConnection
 
@@ -109,38 +106,6 @@ JOIN sys.schemas s ON o.schema_id = s.schema_id
 WHERE {type_filter}
 ORDER BY s.name, o.name
 """.strip()
-
-
-def strip_create_prefix(sql_definition: str) -> str:
-    """Strip CREATE VIEW/ALTER VIEW/CREATE PROCEDURE prefix, returning the SELECT body.
-
-    Uses sqlglot to parse the AST and extract the inner query.
-    Falls back to the original definition if parsing fails.
-    """
-    try:
-        parsed = sqlglot.parse_one(sql_definition, dialect="tsql")
-        if isinstance(parsed, exp.Create):
-            # The body of CREATE VIEW ... AS <select> is parsed.this
-            body = parsed.expression
-            if body is not None:
-                return body.sql(dialect="tsql")
-        # If it's already a SELECT or something else, return as-is
-        return parsed.sql(dialect="tsql")
-    except Exception as e:  # noqa: BLE001 — degraded path below, and it SAYS so
-        # Fallback: simple string stripping. This is a DEGRADED extraction —
-        # log loudly, because a mangled body flows into sql_sources as if
-        # clean and every downstream artifact inherits it (audit 2026-08-15).
-        logger.warning(
-            "sqlglot could not parse a definition (%s) — falling back to "
-            "naive ' AS ' split for: %.80s", e, sql_definition,
-        )
-        upper = sql_definition.upper()
-        as_idx = upper.find(" AS ")
-        if as_idx != -1:
-            after_as = sql_definition[as_idx + 4 :].strip()
-            if after_as.upper().startswith("SELECT") or after_as.upper().startswith("WITH"):
-                return after_as
-        return sql_definition
 
 
 def discover_objects(conn: SqlConnection, domain: DomainFilterConfig) -> list[DiscoveredObject]:

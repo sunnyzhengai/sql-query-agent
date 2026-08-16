@@ -71,16 +71,22 @@ if not result.sql_sources:
 from pyspark.sql.types import StringType, StructField, StructType  # noqa: E402
 
 if result.sql_sources:
+    # Column set MUST match the input_sql_sources contract (7 columns) —
+    # MERGE ... UPDATE SET * fails or nulls columns when source and target
+    # schemas differ. The extractor emits all seven.
     sql_sources_schema = StructType([
         StructField("metric_id", StringType(), False),
         StructField("name", StringType(), False),
         StructField("sql", StringType(), False),
         StructField("steward", StringType(), True),
         StructField("developer", StringType(), True),
+        StructField("source_type", StringType(), True),
+        StructField("source_schema", StringType(), True),
     ])
 
     new_rows = [
-        (s["metric_id"], s["name"], s["sql"], s.get("steward"), s.get("developer"))
+        (s["metric_id"], s["name"], s["sql"], s.get("steward"), s.get("developer"),
+         s.get("source_type"), s.get("source_schema"))
         for s in result.sql_sources
     ]
     new_df = spark.createDataFrame(new_rows, schema=sql_sources_schema)  # noqa: F821

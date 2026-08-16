@@ -35,19 +35,21 @@ dictionary:
   # to every schema's table with that name).
   accept_schema_ambiguity: false
 
-# View extractor (optional — only needed for automated SQL Server extraction)
+# Automated extraction — the primary ingestion path (procs AND views).
+# Pick ONE source_type; see INSTALLATION_GUIDE "Automated extraction".
 # extractor:
 #   sql_server:
-#     host: "your-sql-server.corp.local"
+#     host: "your-sql-server.corp.local"   # or Azure SQL / Fabric SQL endpoint
 #     port: 1433
 #     database: "YourDatabase"
-#     gateway_connection_name: "OnPremSQLGateway"  # Fabric gateway name
-#     driver: "ODBC Driver 17 for SQL Server"       # local dev only
+#     source_type: "onprem_gateway"   # onprem_gateway | azure_direct | fabric_native
+#     gateway_connection_name: "OnPremSQLGateway"  # onprem_gateway only
+#     driver: "ODBC Driver 17 for SQL Server"       # token/local profiles
 #     trusted_connection: true                       # local dev only
 #   domain:
 #     schemas: ["dbo", "reporting"]
 #     base_tables: ["encounter", "patient"]
-#     object_types: ["VIEW"]
+#     object_types: ["VIEW", "SQL_STORED_PROCEDURE"]   # the default
 #   tracking_table: "ops_extraction_tracking"
 
 # Fabric Graph (optional — enable to use native graph backend alongside Delta)

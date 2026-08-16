@@ -460,6 +460,72 @@ To keep the knowledge graph up to date without manual runs:
 
 ---
 
+## Automated Extraction (recommended — no manual SQL export)
+
+Instead of exporting `.sql` files by hand, the extractor connects to your
+database, discovers stored procedures and views, and loads them directly.
+Re-running it picks up only new and changed objects. Manual upload
+(Step 3) remains available, but automated extraction is the primary path.
+
+**Prerequisite checklist (all profiles):**
+
+- [ ] Pipeline installed through Step 4 (Environment, Lakehouse, files, notebooks)
+- [ ] A database account/identity with permission to read
+      `sys.objects`, `sys.schemas`, `sys.sql_modules` (e.g. `VIEW DEFINITION`)
+- [ ] `org_config.yaml` updated with an `extractor:` section
+      (see `org_config.example.yaml` — copy the block, remove the `#` marks)
+
+Pick the profile matching where your SQL lives:
+
+### A. On-premises SQL Server (`source_type: onprem_gateway`)
+
+1. Install the **On-premises Data Gateway** on a server that can reach
+   your SQL Server: Microsoft download → sign in with your Fabric account.
+2. In Fabric: **Settings (gear) → Manage connections and gateways →
+   New connection** → choose your gateway → type **SQL Server** → enter
+   host, database, and credentials → save. Note the connection name.
+3. In `org_config.yaml`, set `source_type: "onprem_gateway"` and
+   `gateway_connection_name:` to the name from step 2.
+4. Continue at "Run the extraction" below.
+
+### B. Azure SQL / Managed Instance (`source_type: azure_direct`)
+
+1. Grant your Fabric workspace identity (or your own account) access on
+   the database: `CREATE USER [<identity>] FROM EXTERNAL PROVIDER;` then
+   `GRANT VIEW DEFINITION TO [<identity>];`
+2. In `org_config.yaml`, set `source_type: "azure_direct"`, `host:` to
+   `<server>.database.windows.net`, and your `database:`. No gateway.
+3. Continue at "Run the extraction" below.
+
+### C. Fabric Warehouse / Fabric SQL DB / Mirrored DB (`source_type: fabric_native`)
+
+1. Copy the item's **SQL connection string** (item settings → SQL
+   endpoint) into `host:`; set `database:` to the item name.
+2. Set `source_type: "fabric_native"`. No gateway, no stored credentials —
+   the notebook authenticates with your Entra identity automatically.
+3. Continue at "Run the extraction" below.
+
+### Run the extraction
+
+1. Import `notebooks/data_loading/extract_views` as a notebook (same
+   drill as Step 4) and attach your Lakehouse + Environment.
+2. Run cells 1–5. **Stop at cell 5** and review the NEW / CHANGED /
+   DELETED lists — if you see objects you don't expect, adjust
+   `extractor.domain` (schemas, base_tables, object_types) in
+   `org_config.yaml` and re-run.
+3. Run the remaining cells. Definitions are stored exactly as extracted —
+   full `CREATE PROCEDURE` / `CREATE VIEW` text; the parser handles the
+   wrappers natively.
+4. Run notebooks 02 → 03 → 04 → 05 → 06 as in Step 5.
+5. To keep the catalog current, re-run extract_views + 02→06 on your
+   change cadence (weekly is typical). Only new and changed objects are
+   re-loaded; nothing loaded manually is erased (upsert by `metric_id`).
+
+**If the connection fails:** profile A — confirm the gateway shows
+**Online** under Manage connections and the connection name matches the
+config exactly; profiles B/C — confirm the identity was granted
+`VIEW DEFINITION` and the host string has no `https://` prefix.
+
 ## Support
 
 If you encounter issues not covered in this guide:

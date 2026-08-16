@@ -1,14 +1,31 @@
-"""Connection abstraction for SQL Server.
+"""Connection abstraction for SQL Server-family sources.
 
-Fabric uses JDBC through an On-premises Data Gateway.
-Local dev uses pyodbc with Windows auth.
+Three connection profiles, selected by config source_type — discovery is
+identical across all of them (sys.objects / sys.sql_modules everywhere):
+
+  onprem_gateway — JDBC through an On-premises Data Gateway (or pyodbc
+                   with Windows auth for local dev, when no Spark session).
+  azure_direct   — Azure SQL / Managed Instance over pyodbc with an AAD
+                   access token; no gateway.
+  fabric_native  — Fabric Warehouse / Fabric SQL DB / mirrored DB T-SQL
+                   endpoint, same AAD-token pyodbc path, reachable
+                   straight from the notebook.
 """
 
 from __future__ import annotations
 
-from typing import Any, Protocol
+import struct
+from typing import Any, Callable, Protocol
 
 from src.config import SqlServerConfig
+
+# pyodbc connection attribute for passing an AAD access token (MS docs:
+# SQL_COPT_SS_ACCESS_TOKEN)
+_SQL_COPT_SS_ACCESS_TOKEN = 1256
+
+# Token audience accepted by Azure SQL, Managed Instance, AND Fabric
+# T-SQL endpoints alike.
+TOKEN_AUDIENCE = "https://database.windows.net/"
 
 
 class SqlConnection(Protocol):
@@ -64,8 +81,62 @@ class LocalPyodbcConnection:
         return [dict(zip(columns, row)) for row in cursor.fetchall()]
 
 
-def create_connection(config: SqlServerConfig, spark_session: Any = None) -> SqlConnection:
-    """Factory: use JDBC in Fabric (when spark is available), pyodbc locally."""
+class AadTokenPyodbcConnection:
+    """pyodbc with an Azure AD access token — Azure SQL / MI / Fabric T-SQL.
+
+    A FRESH connection fetches a FRESH token: notebookutils/mssparkutils
+    getToken() caches within a session and will not refresh, which breaks
+    batch runs longer than the token lifetime (~1h). Callers that loop for
+    hours should create a new connection per batch, not hold this one.
+    """
+
+    def __init__(self, config: SqlServerConfig, token_provider: "Callable[[], str]") -> None:
+        import pyodbc
+
+        token = token_provider()
+        # SQL Server expects the token bytes UTF-16-LE, length-prefixed
+        token_bytes = token.encode("utf-16-le")
+        packed = struct.pack(f"<I{len(token_bytes)}s", len(token_bytes), token_bytes)
+        conn_str = (
+            f"DRIVER={{{config.driver}}};"
+            f"SERVER={config.host},{config.port};"
+            f"DATABASE={config.database};"
+            f"Encrypt=yes;TrustServerCertificate=no"
+        )
+        self.conn = pyodbc.connect(
+            conn_str, attrs_before={_SQL_COPT_SS_ACCESS_TOKEN: packed}
+        )
+
+    def execute_query(self, sql: str) -> list[dict[str, Any]]:
+        cursor = self.conn.cursor()
+        cursor.execute(sql)
+        columns = [desc[0] for desc in cursor.description]
+        return [dict(zip(columns, row)) for row in cursor.fetchall()]
+
+
+def _notebook_token_provider() -> str:
+    """Default AAD token source inside a Fabric notebook."""
+    import notebookutils  # Fabric runtime provides this
+
+    return notebookutils.credentials.getToken(TOKEN_AUDIENCE)
+
+
+def create_connection(
+    config: SqlServerConfig,
+    spark_session: Any = None,
+    token_provider: "Callable[[], str] | None" = None,
+) -> SqlConnection:
+    """Factory keyed on config.source_type.
+
+    onprem_gateway: JDBC when a Spark session is available (Fabric),
+    pyodbc with Windows auth otherwise (local dev). azure_direct and
+    fabric_native: AAD-token pyodbc; token_provider defaults to
+    notebookutils inside Fabric, injectable for tests and non-notebook
+    runtimes.
+    """
+    if config.source_type in ("azure_direct", "fabric_native"):
+        provider = token_provider if token_provider is not None else _notebook_token_provider
+        return AadTokenPyodbcConnection(config, provider)
     if spark_session is not None:
         return FabricJdbcConnection(spark_session, config)
     return LocalPyodbcConnection(config)

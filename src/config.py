@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import logging
 from pathlib import Path
-from typing import Optional
+from typing import Literal, Optional
 
 import yaml
 from pydantic import BaseModel
@@ -36,6 +36,13 @@ class SqlServerConfig(BaseModel):
     host: str
     port: int = 1433
     database: str
+    # Which connection profile the extractor uses (discovery is identical
+    # across all three — sys.objects/sys.sql_modules exist everywhere):
+    #   onprem_gateway — JDBC through an On-premises Data Gateway
+    #   azure_direct   — Azure SQL / Managed Instance, AAD token, no gateway
+    #   fabric_native  — Fabric Warehouse / SQL DB / mirrored DB T-SQL
+    #                    endpoint, AAD token straight from the notebook
+    source_type: Literal["onprem_gateway", "azure_direct", "fabric_native"] = "onprem_gateway"
     gateway_connection_name: str = ""  # Fabric gateway linked connection name
     driver: str = "ODBC Driver 17 for SQL Server"  # local dev only
     trusted_connection: bool = True  # local dev only (Windows auth)
@@ -44,7 +51,9 @@ class SqlServerConfig(BaseModel):
 class DomainFilterConfig(BaseModel):
     schemas: list[str] = []
     base_tables: list[str] = []
-    object_types: list[str] = ["VIEW"]
+    # Turn-key default: customers must not hand-export files, and the
+    # corpus is procs + views — both come through the front door.
+    object_types: list[str] = ["VIEW", "SQL_STORED_PROCEDURE"]
 
 
 class ExtractorConfig(BaseModel):

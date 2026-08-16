@@ -57,9 +57,15 @@ SQL_SOURCES = {
     "table_name": "input_sql_sources",
     "must_be_nonempty": True,
     "description": (
-        "Customer SQL source files (stored procedures and views) loaded from "
-        "Files/sql-query-agent/sql_input/. One row per SQL object; identity "
-        "comes from the CREATE/ALTER statement inside the file, not the filename."
+        "Customer SQL sources (stored procedures and views). One row per SQL "
+        "object; identity comes from the CREATE/ALTER statement inside the "
+        "definition, not the filename. TWO writers, one protocol: the manual "
+        "file path (01_install / load_sql_files) OVERWRITES the full corpus "
+        "at install; the automated extractor (extract_views — the primary "
+        "customer path) MERGES incrementally by metric_id, so scheduled "
+        "extractions upsert changed objects without erasing rows loaded by "
+        "the other writer. Owner stays 01_install for gate attribution; "
+        "write_mode describes the owner's install-time write."
     ),
     "domain": "input",
     "status": "active",

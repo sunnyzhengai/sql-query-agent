@@ -12,7 +12,7 @@ from typing import Any
 
 from src.config import DomainFilterConfig
 from src.extractor.connection import SqlConnection
-from src.extractor.discovery import DiscoveredObject, discover_objects, strip_create_prefix
+from src.extractor.discovery import DiscoveredObject, discover_objects
 from src.extractor.tracker import ExtractionDelta, ExtractionTracker
 
 logger = logging.getLogger(__name__)
@@ -96,13 +96,32 @@ class ViewExtractor:
         )
 
 
+# sys.objects type_desc -> input_sql_sources.source_type vocabulary
+# (must match what load_sql_files writes for the same object kind)
+_SOURCE_TYPE = {
+    "VIEW": "view",
+    "SQL_STORED_PROCEDURE": "stored_procedure",
+}
+
+
 def _to_sql_source(obj: DiscoveredObject) -> dict[str, Any]:
-    """Convert a DiscoveredObject to a sql_sources record."""
-    select_body = strip_create_prefix(obj.sql_definition)
+    """Convert a DiscoveredObject to an input_sql_sources record.
+
+    The definition is stored AS EXTRACTED — no stripping. 02_parse's
+    ScriptDom understands full CREATE VIEW/PROCEDURE wrappers natively
+    (the 790-proc corpus went in unstripped); routing definitions through
+    another parser to pre-chew them only added a corruption path.
+
+    Line endings are normalized at this entry point: sys.sql_modules
+    returns \r\n, and the input_sql_sources contract promises \n.
+    """
+    sql = obj.sql_definition.replace("\r\n", "\n").replace("\r", "\n")
     return {
         "metric_id": f"{obj.schema_name}.{obj.object_name}",
         "name": obj.object_name,
-        "sql": select_body,
+        "sql": sql,
         "steward": None,
         "developer": None,
+        "source_type": _SOURCE_TYPE.get(obj.object_type, obj.object_type.lower()),
+        "source_schema": obj.schema_name,
     }

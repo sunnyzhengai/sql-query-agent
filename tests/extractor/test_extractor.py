@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import Any
 
 from src.config import DomainFilterConfig
-from src.extractor.discovery import DiscoveredObject, build_discovery_query, strip_create_prefix
+from src.extractor.discovery import DiscoveredObject, build_discovery_query
 from src.extractor.extractor import ViewExtractor
 from src.extractor.tracker import ExtractionTracker, compute_sql_hash
 
@@ -138,32 +138,6 @@ class TestBuildDiscoveryQuery:
         assert "referenced_entity_name IN" not in query
 
 
-# --- CREATE VIEW stripping tests ---
-
-
-class TestStripCreatePrefix:
-    def test_simple_create_view(self):
-        sql = "CREATE VIEW dbo.v1 AS SELECT a, b FROM t1"
-        result = strip_create_prefix(sql)
-        assert result.upper().startswith("SELECT")
-        assert "CREATE" not in result.upper()
-
-    def test_create_or_alter_view(self):
-        sql = "CREATE OR ALTER VIEW dbo.v1 AS SELECT a FROM t1"
-        result = strip_create_prefix(sql)
-        assert "SELECT" in result.upper()
-
-    def test_plain_select_passthrough(self):
-        sql = "SELECT a, b FROM t1 WHERE x = 1"
-        result = strip_create_prefix(sql)
-        assert "SELECT" in result.upper()
-
-    def test_with_cte(self):
-        sql = "CREATE VIEW dbo.v1 AS WITH cte AS (SELECT 1 AS x) SELECT x FROM cte"
-        result = strip_create_prefix(sql)
-        assert "WITH" in result.upper() or "SELECT" in result.upper()
-
-
 # --- End-to-end extractor test with mock connection ---
 
 
@@ -200,8 +174,11 @@ class TestViewExtractor:
         assert result.summary.new_count == 2
         assert len(result.sql_sources) == 2
         assert result.sql_sources[0]["metric_id"] == "dbo.vw_er_los"
-        # SQL should have CREATE VIEW stripped
-        assert "CREATE" not in result.sql_sources[0]["sql"].upper()
+        # Definition is stored AS EXTRACTED — ScriptDom in 02 handles the
+        # CREATE VIEW wrapper natively; no pre-stripping.
+        assert result.sql_sources[0]["sql"] == mock_rows[0]["sql_definition"]
+        assert result.sql_sources[0]["source_type"] == "view"
+        assert result.sql_sources[0]["source_schema"] == "dbo"
 
     def test_extract_with_existing_tracking(self):
         sql = "CREATE VIEW dbo.vw_old AS SELECT 1 AS x"
