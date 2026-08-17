@@ -37,20 +37,26 @@ block once before editing):**
 
 ---
 
-## VO-1 — The Hook (~75 words, ~30s)
+## VO-1 — The Hook (~85 words, ~35s)
+<!-- Rewritten 2026-08-17 (Sunny's critique): lead with the pain and the
+     debt cycle, not the mechanism. "Duplicate dashboards" deliberately
+     foreshadows the drift stunner in VO-4. -->
 
-**[Screen: split — a 2,000-line SQL procedure | a Power BI dashboard]**
+**[Screen: split — a 2,000-line SQL procedure | a sprawl of look-alike
+dashboards]**
 
-"Every hospital on Microsoft suite runs on two layers of hidden business logic. Thousands
-of lines of production SQL — and the undocumented DAX inside your Power BI
-reports. When an executive asks how a compliance metric is calculated,
-the answer takes days. When a generic AI answers instead, it
-hallucinates.
+"Ungoverned dashboards are technical debt — not assets.
 
-Meet AIVIA. AIVIA parses both layers with each platform's own native
-parser, and stitches them into one certified knowledge graph — inside
-your tenant. Every answer carries exact provenance. Or it doesn't
-answer at all."
+Thousands of reports. None fully trusted — because the logic behind
+them is undocumented. Developers don't write plain-English
+descriptions. Stewards can't read raw code. So the debt compounds —
+and teams cope by building even more duplicate dashboards.
+
+AIVIA breaks the cycle. It parses deep SQL and DAX automatically, and
+stitches them into one certified knowledge graph — inside your own
+tenant. Answers proven by code, not by confidence.
+
+Stop accumulating debt. Turn hidden code into certified truth."
 
 ## VO-2 — Ingestion & Guardrails (~95 words, ~40s)
 
