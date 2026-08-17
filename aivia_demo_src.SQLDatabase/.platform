@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "SQLDatabase",
+    "displayName": "aivia_demo_src"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "e7a00ff4-8c0b-a009-49bd-59220c288ffd"
+  }
+}
