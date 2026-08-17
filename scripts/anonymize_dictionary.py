@@ -140,9 +140,22 @@ def anonymize_description(
     desc = re.sub(r"\bclarity\b", "the EMR", desc)
     desc = re.sub(r"\bEpic\b", "the EMR system", desc)
 
-    # Step 2b: Strip vendor master-file item references like "(EPT/18838)"
-    # or "(ALT/1010)" — proprietary record-numbering vocabulary.
+    # Step 2b: Strip vendor master-file item references — proprietary
+    # record-numbering vocabulary in every observed form: "(EPT/18838)",
+    # "(EPT .1)", "(I SER 21000)", "(EDG 2002)", "HNO-34150", "HNO 34021",
+    # and bare master-file words ("HNO records"). Enumerated from the raw
+    # source (2026-08-16); CSN/ADT handled elsewhere.
+    desc = re.sub(r"\(\s*\.\d+\s+ITEM\s*\)", "", desc, flags=re.IGNORECASE)
+    desc = re.sub(r"\bLDA\b", "device", desc)
+    _INI = r"(?:CID|EPT|ORD|HNO|UCI|EMP|EDG|SER|HAR|ERX|EAP|ALT)"
+    desc = re.sub(r"\s*\(\s*I?\s*" + _INI + r"\b[^)]*\)", "", desc)
     desc = re.sub(r"\s*\([A-Z]{2,4}\s*[./]\s*\d+\)", "", desc)
+    desc = re.sub(r"\b" + _INI + r"[- ]\d{2,6}\b", "the source item", desc)
+    for word, plain in [("HNO", "note"), ("EPT", "patient"), ("SER", "provider"),
+                        ("EDG", "diagnosis"), ("EAP", "procedure"), ("ORD", "order"),
+                        ("EMP", "employee"), ("HAR", "billing account"),
+                        ("ERX", "medication"), ("UCI", "contact"), ("CID", "contact")]:
+        desc = re.sub(r"\b" + word + r"\b", plain, desc)
 
     # Step 3: Clean up artifacts
     desc = desc.replace("the the EMR", "the EMR")  # "the Clarity" -> "the the EMR"

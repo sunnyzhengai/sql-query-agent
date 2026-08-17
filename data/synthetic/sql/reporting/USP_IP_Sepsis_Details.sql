@@ -304,7 +304,7 @@ SELECT [PatientName] [PATIENTS]
 
 	, [ECMOYN] [ECMO Y/N]
 
-	, [IPSOSevereSepsisYN] [IPSO Severe Sepsis Y/N]
+	, [IPSOSevereSepsisYN] [SSS Severe Sepsis Y/N]
 
 	, [AlertNotActivatedReason] [CLINICAL_ALERTS Not Activated Reason]
 

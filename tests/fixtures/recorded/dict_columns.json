@@ -106,17 +106,17 @@
  },
  {
   "COLUMN_NAME": "ENC_SERIES_FROM_FIN_CLASS_CODE",
-  "DESCRIPTION": "*** Deprecated *** This column is being renamed for accuracy and consistency. This item stores the financial class of the LTC encounter series HAR prior to this event.",
+  "DESCRIPTION": "*** Deprecated *** This column is being renamed for accuracy and consistency. This item stores the financial class of the LTC encounter series billing account prior to this event.",
   "TABLE_NAME": "ADT_EVENTS"
  },
  {
   "COLUMN_NAME": "ENC_SERIES_FROM_PAYER_ID",
-  "DESCRIPTION": "*** Deprecated *** This column is being renamed for accuracy and consistency. This item stores the primary payer of the LTC encounter series HAR prior to this event.",
+  "DESCRIPTION": "*** Deprecated *** This column is being renamed for accuracy and consistency. This item stores the primary payer of the LTC encounter series billing account prior to this event.",
   "TABLE_NAME": "ADT_EVENTS"
  },
  {
   "COLUMN_NAME": "ENC_SERIES_FROM_PLAN_ID",
-  "DESCRIPTION": "*** Deprecated *** This column is being renamed for accuracy and consistency. This item stores the primary plan of the LTC encounter series HAR prior to this event.",
+  "DESCRIPTION": "*** Deprecated *** This column is being renamed for accuracy and consistency. This item stores the primary plan of the LTC encounter series billing account prior to this event.",
   "TABLE_NAME": "ADT_EVENTS"
  },
  {
@@ -166,17 +166,17 @@
  },
  {
   "COLUMN_NAME": "ENC_SERIES_TO_FIN_CLASS_CODE",
-  "DESCRIPTION": "*** Deprecated *** This column is being renamed for accuracy and consistency. This item stores the finacial class of the LTC encounter series HAR after this event.",
+  "DESCRIPTION": "*** Deprecated *** This column is being renamed for accuracy and consistency. This item stores the finacial class of the LTC encounter series billing account after this event.",
   "TABLE_NAME": "ADT_EVENTS"
  },
  {
   "COLUMN_NAME": "ENC_SERIES_TO_PAYER_ID",
-  "DESCRIPTION": "*** Deprecated *** This column is being renamed for accuracy and consistency. This item stores the primary payer of the LTC encounter series HAR after this event.",
+  "DESCRIPTION": "*** Deprecated *** This column is being renamed for accuracy and consistency. This item stores the primary payer of the LTC encounter series billing account after this event.",
   "TABLE_NAME": "ADT_EVENTS"
  },
  {
   "COLUMN_NAME": "ENC_SERIES_TO_PLAN_ID",
-  "DESCRIPTION": "*** Deprecated *** This column is being renamed for accuracy and consistency. This item stores the primary plan of the LTC encounter series HAR after this event.",
+  "DESCRIPTION": "*** Deprecated *** This column is being renamed for accuracy and consistency. This item stores the primary plan of the LTC encounter series billing account after this event.",
   "TABLE_NAME": "ADT_EVENTS"
  },
  {
@@ -266,7 +266,7 @@
  },
  {
   "COLUMN_NAME": "ORDER_ID",
-  "DESCRIPTION": "This item is a link to the ORD record directly responsible for generating an ADT event.",
+  "DESCRIPTION": "This item is a link to the order record directly responsible for generating an ADT event.",
   "TABLE_NAME": "ADT_EVENTS"
  },
  {
@@ -296,7 +296,7 @@
  },
  {
   "COLUMN_NAME": "ENCOUNTER_ID",
-  "DESCRIPTION": "The unique encounter identifier for this contact. This number is unique across all PATIENTS encounters in your system. If you use IntraConnect, this is the Unique Contact Identifier (UCI).",
+  "DESCRIPTION": "The unique encounter identifier for this contact. This number is unique across all PATIENTS encounters in your system. If you use IntraConnect, this is the Unique Contact Identifier.",
   "TABLE_NAME": "ADT_EVENTS"
  },
  {
@@ -506,7 +506,7 @@
  },
  {
   "COLUMN_NAME": "CM_CT_OWNER_ID",
-  "DESCRIPTION": "The Community ID (CID) of the instance that owns this contact. This is populated only if you use IntraConnect.",
+  "DESCRIPTION": "The Community ID of the instance that owns this contact. This is populated only if you use IntraConnect.",
   "TABLE_NAME": "ALERT_ACTIONS"
  },
  {
@@ -591,12 +591,12 @@
  },
  {
   "COLUMN_NAME": "BARCODE_ERX_ID",
-  "DESCRIPTION": "If a med NDC barcode is scanned, this is the ERX ID that the NDC maps to.",
+  "DESCRIPTION": "If a med NDC barcode is scanned, this is the medication ID that the NDC maps to.",
   "TABLE_NAME": "ALERT_HISTORY"
  },
  {
   "COLUMN_NAME": "BARCODE_ORD_ID",
-  "DESCRIPTION": "When an ORD ID barcode is scanned, this is the order ID.",
+  "DESCRIPTION": "When an order ID barcode is scanned, this is the order ID.",
   "TABLE_NAME": "ALERT_HISTORY"
  },
  {
@@ -971,7 +971,7 @@
  },
  {
   "COLUMN_NAME": "TPN_COMPONENT_CODE",
-  "DESCRIPTION": "TPN Component for which other data in SI ALT 820 applies",
+  "DESCRIPTION": "TPN Component for which other data in SI the source item applies",
   "TABLE_NAME": "ALERT_HISTORY"
  },
  {
@@ -1071,12 +1071,12 @@
  },
  {
   "COLUMN_NAME": "CM_LOG_OWNER_ID",
-  "DESCRIPTION": "The Community ID (CID) of the instance from which this record or line was extracted. This is only populated if you use IntraConnect.",
+  "DESCRIPTION": "The Community ID of the instance from which this record or line was extracted. This is only populated if you use IntraConnect.",
   "TABLE_NAME": "BED_CONFIG"
  },
  {
   "COLUMN_NAME": "CM_PHY_OWNER_ID",
-  "DESCRIPTION": "The Community ID (CID) of the instance that owns this record or line. This is only populated if you use IntraConnect.",
+  "DESCRIPTION": "The Community ID of the instance that owns this record or line. This is only populated if you use IntraConnect.",
   "TABLE_NAME": "BED_CONFIG"
  },
  {
@@ -1481,7 +1481,7 @@
  },
  {
   "COLUMN_NAME": "MAR_DUPLICATE_FLAG",
-  "DESCRIPTION": "This column stores if this CLINICAL_ALERTS fired within 95 minutes of another CLINICAL_ALERTS with the same EPT ENC_ID, User, and CLINICAL_ALERTS type. This denotes it as a POTENTIAL duplicate. Despite the name of this column, this duplication flag can be set for a variety of CLINICAL_ALERTS types, including MAR alerts and Dispense Preparation alerts.",
+  "DESCRIPTION": "This column stores if this CLINICAL_ALERTS fired within 95 minutes of another CLINICAL_ALERTS with the same patient ENC_ID, User, and CLINICAL_ALERTS type. This denotes it as a POTENTIAL duplicate. Despite the name of this column, this duplication flag can be set for a variety of CLINICAL_ALERTS types, including MAR alerts and Dispense Preparation alerts.",
   "TABLE_NAME": "CLINICAL_ALERTS"
  },
  {
@@ -1616,7 +1616,7 @@
  },
  {
   "COLUMN_NAME": "ACCT_NOTES_EXTRA_ID",
-  "DESCRIPTION": "This item would be used to link with HAR record to store the claim image and error messages.",
+  "DESCRIPTION": "This item would be used to link with billing account record to store the claim image and error messages.",
   "TABLE_NAME": "CLINICAL_NOTES"
  },
  {
@@ -1676,12 +1676,12 @@
  },
  {
   "COLUMN_NAME": "CM_LOG_OWNER_ID",
-  "DESCRIPTION": "The Community ID (CID) of the instance from which this record or line was extracted. This is only populated if you use IntraConnect.",
+  "DESCRIPTION": "The Community ID of the instance from which this record or line was extracted. This is only populated if you use IntraConnect.",
   "TABLE_NAME": "CLINICAL_NOTES"
  },
  {
   "COLUMN_NAME": "CM_PHY_OWNER_ID",
-  "DESCRIPTION": "The Community ID (CID) of the instance that owns this record or line. This is only populated if you use IntraConnect.",
+  "DESCRIPTION": "The Community ID of the instance that owns this record or line. This is only populated if you use IntraConnect.",
   "TABLE_NAME": "CLINICAL_NOTES"
  },
  {
@@ -1701,7 +1701,7 @@
  },
  {
   "COLUMN_NAME": "COSIGNED_NOTE_LINK",
-  "DESCRIPTION": "Contains a encounter identifier (ENC_ID) that points to the resident's note being cosigned. Cosigning Note Link (I HNO 34158) is a link for the opposite direction.",
+  "DESCRIPTION": "Contains a encounter identifier (ENC_ID) that points to the resident's note being cosigned. Cosigning Note Link is a link for the opposite direction.",
   "TABLE_NAME": "CLINICAL_NOTES"
  },
  {
@@ -1711,7 +1711,7 @@
  },
  {
   "COLUMN_NAME": "CRT_INST_LOCAL_DTTM",
-  "DESCRIPTION": "This is a virtual item that gets the create instant (I HNO 17105), in local time format.",
+  "DESCRIPTION": "This is a virtual item that gets the create instant, in local time format.",
   "TABLE_NAME": "CLINICAL_NOTES"
  },
  {
@@ -1741,7 +1741,7 @@
  },
  {
   "COLUMN_NAME": "DEL_INST_LOCAL_DTTM",
-  "DESCRIPTION": "This is a virtual item that gets the delete instant, HNO-34150, in local time format.",
+  "DESCRIPTION": "This is a virtual item that gets the delete instant, the source item, in local time format.",
   "TABLE_NAME": "CLINICAL_NOTES"
  },
  {
@@ -1831,7 +1831,7 @@
  },
  {
   "COLUMN_NAME": "INPATIENT_DATA_ID",
-  "DESCRIPTION": "*** Deprecated *** In table CLINICAL_NOTES, the column INPATIENT_DATA_ID (HNO 34021) has been deprecated. This column has been replaced by column INPATIENT_DATA_ID (EPT 87400) in table PATIENT_ENCOUNTERS. To look up the deprecated column's value after the EMR system upgrade, join column CLINICAL_NOTES.ENCOUNTER_ID to table PATIENT_ENCOUNTERS column ENCOUNTER_ID and get the INPATIENT_DATA_ID value.",
+  "DESCRIPTION": "*** Deprecated *** In table CLINICAL_NOTES, the column INPATIENT_DATA_ID has been deprecated. This column has been replaced by column INPATIENT_DATA_ID in table PATIENT_ENCOUNTERS. To look up the deprecated column's value after the EMR system upgrade, join column CLINICAL_NOTES.ENCOUNTER_ID to table PATIENT_ENCOUNTERS column ENCOUNTER_ID and get the INPATIENT_DATA_ID value.",
   "TABLE_NAME": "CLINICAL_NOTES"
  },
  {
@@ -1856,7 +1856,7 @@
  },
  {
   "COLUMN_NAME": "LETTER_TEMPLATE_SMARTTEXT_ID",
-  "DESCRIPTION": "For HNO records with a note type (NOTE_TYPE_NOADD_CODE) of 3-Letter, this column stores the ID of the SmartText (ETX) which was used to build a letter from the Communication Management navigator section or the Letters activity. For HNO records with a note type of 84-Treatment Summary, this column stores the ID of the Treatment Summary template SmartText that was used to generate the summary.",
+  "DESCRIPTION": "For note records with a note type (NOTE_TYPE_NOADD_CODE) of 3-Letter, this column stores the ID of the SmartText (ETX) which was used to build a letter from the Communication Management navigator section or the Letters activity. For note records with a note type of 84-Treatment Summary, this column stores the ID of the Treatment Summary template SmartText that was used to generate the summary.",
   "TABLE_NAME": "CLINICAL_NOTES"
  },
  {
@@ -1866,7 +1866,7 @@
  },
  {
   "COLUMN_NAME": "LET_PRNT_MTHD_CODE",
-  "DESCRIPTION": "The purpose of this item is to provide additional context for I HNO 39 - Letter Print Instant (HNO_LTR_PRT_DTTM). This item specifies whether the last print action for this letter was via the server or via the client.",
+  "DESCRIPTION": "The purpose of this item is to provide additional context for I the source item - Letter Print Instant (HNO_LTR_PRT_DTTM). This item specifies whether the last print action for this letter was via the server or via the client.",
   "TABLE_NAME": "CLINICAL_NOTES"
  },
  {
@@ -1896,7 +1896,7 @@
  },
  {
   "COLUMN_NAME": "NOTE_FORMAT_NOADD_CODE",
-  "DESCRIPTION": "The note format (on the No-Add item, HNO 52) category number for the note.",
+  "DESCRIPTION": "The note format (on the No-Add item, the source item) category number for the note.",
   "TABLE_NAME": "CLINICAL_NOTES"
  },
  {
@@ -1916,7 +1916,7 @@
  },
  {
   "COLUMN_NAME": "NOTE_PURPOSE_CODE",
-  "DESCRIPTION": "*** Deprecated *** In table CLINICAL_NOTES, the column NOTE_PURPOSE_CODE (I HNO 17045) has been deprecated.  The deprecated column's content/data is no longer available since it is no longer extracted to the EMR.",
+  "DESCRIPTION": "*** Deprecated *** In table CLINICAL_NOTES, the column NOTE_PURPOSE_CODE has been deprecated.  The deprecated column's content/data is no longer available since it is no longer extracted to the EMR.",
   "TABLE_NAME": "CLINICAL_NOTES"
  },
  {
@@ -1931,7 +1931,7 @@
  },
  {
   "COLUMN_NAME": "NOTE_TYPE_NOADD_CODE",
-  "DESCRIPTION": "Starting in November 2025 this column has the value for Note - Type No-Add (I HNO 51) to identify the type of note this record is for non clinical notes. For clinical notes, instead use the column IP_NOTE_TYPE_CODE in table CLINICAL_NOTES to get the UCN note type (I HNO 34033) value.  Versions prior to November 2025 used the following logic: This virtual item (I HNO 17051) is populated with a category value from Note - Type No-Add (I HNO 51) according to the following logic: * if Note - Type No-Add (I HNO 51) is populated, use the value directly * if Note - Type No-Add (I HNO 51) is null and the note is not ambulatory, return null * if Note - Type No-Add (I HNO 51) is null and the note has an ambulatory encounter context, obtain a category from the UCN note type (I HNO 34033) and map that value to an equivalent category from Note - Type No Add (I HNO 51), if possible",
+  "DESCRIPTION": "Starting in November 2025 this column has the value for Note - Type No-Add to identify the type of note this record is for non clinical notes. For clinical notes, instead use the column IP_NOTE_TYPE_CODE in table CLINICAL_NOTES to get the UCN note type value.  Versions prior to November 2025 used the following logic: This virtual item is populated with a category value from Note - Type No-Add according to the following logic: * if Note - Type No-Add is populated, use the value directly * if Note - Type No-Add is null and the note is not ambulatory, return null * if Note - Type No-Add is null and the note has an ambulatory encounter context, obtain a category from the UCN note type and map that value to an equivalent category from Note - Type No Add, if possible",
   "TABLE_NAME": "CLINICAL_NOTES"
  },
  {
@@ -1946,7 +1946,7 @@
  },
  {
   "COLUMN_NAME": "NURS_NOTE_AUTH_NAM",
-  "DESCRIPTION": "The name of the note's author. Populated from an EPT nursing note during conversion to HNO.",
+  "DESCRIPTION": "The name of the note's author. Populated from an patient nursing note during conversion to note.",
   "TABLE_NAME": "CLINICAL_NOTES"
  },
  {
@@ -1991,7 +1991,7 @@
  },
  {
   "COLUMN_NAME": "ENCOUNTER_ID",
-  "DESCRIPTION": "The unique encounter identifier for the PATIENTS encounter to which the note is attached. This number is unique across all PATIENTS encounters in your system. If you use IntraConnect this is the Unique Contact Identifier (UCI).",
+  "DESCRIPTION": "The unique encounter identifier for the PATIENTS encounter to which the note is attached. This number is unique across all PATIENTS encounters in your system. If you use IntraConnect this is the Unique Contact Identifier.",
   "TABLE_NAME": "CLINICAL_NOTES"
  },
  {
@@ -2001,7 +2001,7 @@
  },
  {
   "COLUMN_NAME": "PATIENT_LINK_ID",
-  "DESCRIPTION": "Virtual item that will check all HNO items linked to EPT and return the first EPT ID it finds. The items are checked in the following order: 505, 38970, 21001, 600 (which gives us an order, then we look at ord 210), 1605, 1643, 1640.",
+  "DESCRIPTION": "Virtual item that will check all note items linked to patient and return the first patient ID it finds. The items are checked in the following order: 505, 38970, 21001, 600 (which gives us an order, then we look at ord 210), 1605, 1643, 1640.",
   "TABLE_NAME": "CLINICAL_NOTES"
  },
  {
@@ -2026,7 +2026,7 @@
  },
  {
   "COLUMN_NAME": "RTE_REVIEW_VER_ID",
-  "DESCRIPTION": "*** Deprecated *** In table CLINICAL_NOTES, the column RTE_REVIEW_VER_ID (I HNO 16350) has been deprecated. The deprecated column's content/data is no longer available since it is no longer populated in the source system.",
+  "DESCRIPTION": "*** Deprecated *** In table CLINICAL_NOTES, the column RTE_REVIEW_VER_ID has been deprecated. The deprecated column's content/data is no longer available since it is no longer populated in the source system.",
   "TABLE_NAME": "CLINICAL_NOTES"
  },
  {
@@ -2076,7 +2076,7 @@
  },
  {
   "COLUMN_NAME": "TREAT_SUM_RLS_TO_MYC_ENC",
-  "DESCRIPTION": "Stores the ENC_ID of the Treatment Summary (HNO) that is released to MyChart. If you use IntraConnect, this column stores the Unique Contact Identifier (UCI).",
+  "DESCRIPTION": "Stores the ENC_ID of the Treatment Summary that is released to MyChart. If you use IntraConnect, this column stores the Unique Contact Identifier.",
   "TABLE_NAME": "CLINICAL_NOTES"
  },
  {
@@ -2111,7 +2111,7 @@
  },
  {
   "COLUMN_NAME": "WORKING_COPY_FLAG",
-  "DESCRIPTION": "Whether or not a note is listed as a working copy for another note in I HNO 17102.",
+  "DESCRIPTION": "Whether or not a note is listed as a working copy for another note in I the source item.",
   "TABLE_NAME": "CLINICAL_NOTES"
  },
  {
@@ -2121,17 +2121,17 @@
  },
  {
   "COLUMN_NAME": "CM_LOG_OWNER_ID",
-  "DESCRIPTION": "The Community ID (CID) of the instance from which this record or line was extracted. This is only populated if you use IntraConnect.",
+  "DESCRIPTION": "The Community ID of the instance from which this record or line was extracted. This is only populated if you use IntraConnect.",
   "TABLE_NAME": "CONFIG_GROUPER_CATEGORIES"
  },
  {
   "COLUMN_NAME": "CM_PHY_OWNER_ID",
-  "DESCRIPTION": "The Community ID (CID) of the instance that owns this record or line. This is only populated if you use IntraConnect.",
+  "DESCRIPTION": "The Community ID of the instance that owns this record or line. This is only populated if you use IntraConnect.",
   "TABLE_NAME": "CONFIG_GROUPER_CATEGORIES"
  },
  {
   "COLUMN_NAME": "GROUPER_ID",
-  "DESCRIPTION": "The unique identifier (.1 item) for the grouper record.",
+  "DESCRIPTION": "The unique identifier  for the grouper record.",
   "TABLE_NAME": "CONFIG_GROUPER_CATEGORIES"
  },
  {
@@ -2226,12 +2226,12 @@
  },
  {
   "COLUMN_NAME": "CM_LOG_OWNER_ID",
-  "DESCRIPTION": "The Community ID (CID) of the instance from which this record or line was extracted. This is only populated if you use IntraConnect.",
+  "DESCRIPTION": "The Community ID of the instance from which this record or line was extracted. This is only populated if you use IntraConnect.",
   "TABLE_NAME": "DEPARTMENTS"
  },
  {
   "COLUMN_NAME": "CM_PHY_OWNER_ID",
-  "DESCRIPTION": "The Community ID (CID) of the instance that owns this record or line. This is only populated if you use IntraConnect.",
+  "DESCRIPTION": "The Community ID of the instance that owns this record or line. This is only populated if you use IntraConnect.",
   "TABLE_NAME": "DEPARTMENTS"
  },
  {
@@ -2451,7 +2451,7 @@
  },
  {
   "COLUMN_NAME": "REQ_ADM_HAR_MCH_FLAG",
-  "DESCRIPTION": "Flag to require a HAR match to redirect to an inpatient admission.",
+  "DESCRIPTION": "Flag to require a billing account match to redirect to an inpatient admission.",
   "TABLE_NAME": "DEPARTMENTS"
  },
  {
@@ -2706,7 +2706,7 @@
  },
  {
   "COLUMN_NAME": "USE_HAR_REC_FLAG",
-  "DESCRIPTION": "Use HAR recommendation?",
+  "DESCRIPTION": "Use billing account recommendation?",
   "TABLE_NAME": "DEPARTMENTS"
  },
  {
@@ -2761,7 +2761,7 @@
  },
  {
   "COLUMN_NAME": "DIAGNOSIS_CODE",
-  "DESCRIPTION": "*** Deprecated *** In table DIAGNOSES, the column DIAGNOSIS_CODE (EDG) has been deprecated. Refer to the Diagnosis and ICD Procedure Updates section of [see vendor documentation] to determine the correct column to use.",
+  "DESCRIPTION": "*** Deprecated *** In table DIAGNOSES, the column DIAGNOSIS_CODE has been deprecated. Refer to the Diagnosis and ICD Procedure Updates section of [see vendor documentation] to determine the correct column to use.",
   "TABLE_NAME": "DIAGNOSES"
  },
  {
@@ -2771,7 +2771,7 @@
  },
  {
   "COLUMN_NAME": "DX_CODE_TYPE",
-  "DESCRIPTION": "*** Deprecated *** In table DIAGNOSES, the column DX_CODE_TYPE (EDG 95) has been deprecated. Use the DIAGNOSES.REF_BILL_CODE_S ET_C column instead.",
+  "DESCRIPTION": "*** Deprecated *** In table DIAGNOSES, the column DX_CODE_TYPE has been deprecated. Use the DIAGNOSES.REF_BILL_CODE_S ET_C column instead.",
   "TABLE_NAME": "DIAGNOSES"
  },
  {
@@ -2786,7 +2786,7 @@
  },
  {
   "COLUMN_NAME": "DX_ICD99_IMO_ID",
-  "DESCRIPTION": "*** Deprecated *** In table DIAGNOSES, the column DX_ICD99_IMO_ID (EDG 3000) has been deprecated. Use the DIAGNOSES.DX_IMO_ID column instead.",
+  "DESCRIPTION": "*** Deprecated *** In table DIAGNOSES, the column DX_ICD99_IMO_ID has been deprecated. Use the DIAGNOSES.DX_IMO_ID column instead.",
   "TABLE_NAME": "DIAGNOSES"
  },
  {
@@ -2796,7 +2796,7 @@
  },
  {
   "COLUMN_NAME": "DX_IMO_ID",
-  "DESCRIPTION": "Stores the IMO id corresponding to the record from the IMO table that was used to create this EDG record.",
+  "DESCRIPTION": "Stores the IMO id corresponding to the record from the IMO table that was used to create this diagnosis record.",
   "TABLE_NAME": "DIAGNOSES"
  },
  {
@@ -2811,7 +2811,7 @@
  },
  {
   "COLUMN_NAME": "DX_OTHER_DESC",
-  "DESCRIPTION": "This column displays additional information about the diagnosis. EDG item 200 is a free-text field in the database that can be used for ICD-99 codes or other descriptive information.",
+  "DESCRIPTION": "This column displays additional information about the diagnosis. diagnosis item 200 is a free-text field in the database that can be used for ICD-99 codes or other descriptive information.",
   "TABLE_NAME": "DIAGNOSES"
  },
  {
@@ -2831,7 +2831,7 @@
  },
  {
   "COLUMN_NAME": "DX_STATUS",
-  "DESCRIPTION": "This column no longer extracts valid data. This column previously indicated whether the diagnosis is Active or Inactive as of the time of the enterprise reporting extract. This corresponding EDG item was discontinued in the EMR system July 2000 release, and the extract of this item is discontinued as of the Spring 06 release.",
+  "DESCRIPTION": "This column no longer extracts valid data. This column previously indicated whether the diagnosis is Active or Inactive as of the time of the enterprise reporting extract. This corresponding diagnosis item was discontinued in the EMR system July 2000 release, and the extract of this item is discontinued as of the Spring 06 release.",
   "TABLE_NAME": "DIAGNOSES"
  },
  {
@@ -2871,7 +2871,7 @@
  },
  {
   "COLUMN_NAME": "HISTORICAL_REF_CODE",
-  "DESCRIPTION": "*** Deprecated *** In table DIAGNOSES, the column HISTORICAL_REF_CODE (EDG 2000) has been deprecated. Refer to the Diagnosis and ICD Procedure Updates section of [see vendor documentation] to determine the correct column to use.",
+  "DESCRIPTION": "*** Deprecated *** In table DIAGNOSES, the column HISTORICAL_REF_CODE has been deprecated. Refer to the Diagnosis and ICD Procedure Updates section of [see vendor documentation] to determine the correct column to use.",
   "TABLE_NAME": "DIAGNOSES"
  },
  {
@@ -2881,17 +2881,17 @@
  },
  {
   "COLUMN_NAME": "HX_REF_CODE_NO_ADD",
-  "DESCRIPTION": "*** Deprecated *** In table DIAGNOSES, the column HX_REF_CODE_NO_ADD (EDG 2001) has been deprecated. Refer to the Diagnosis and ICD Procedure Updates section of [see vendor documentation] to determine the correct column to use.",
+  "DESCRIPTION": "*** Deprecated *** In table DIAGNOSES, the column HX_REF_CODE_NO_ADD has been deprecated. Refer to the Diagnosis and ICD Procedure Updates section of [see vendor documentation] to determine the correct column to use.",
   "TABLE_NAME": "DIAGNOSES"
  },
  {
   "COLUMN_NAME": "ICD99_CODE",
-  "DESCRIPTION": "*** Deprecated *** In table DIAGNOSES, the column ICD99_CODE (EDG 2000) has been deprecated. Refer to the Diagnosis and ICD Procedure Updates section of [see vendor documentation] to determine the correct column to use.",
+  "DESCRIPTION": "*** Deprecated *** In table DIAGNOSES, the column ICD99_CODE has been deprecated. Refer to the Diagnosis and ICD Procedure Updates section of [see vendor documentation] to determine the correct column to use.",
   "TABLE_NAME": "DIAGNOSES"
  },
  {
   "COLUMN_NAME": "ICD99_CODE_NO_ADD",
-  "DESCRIPTION": "*** Deprecated *** In table DIAGNOSES, the column ICD99_CODE_NO_ADD (EDG 2001) has been deprecated. Refer to the Diagnosis and ICD Procedure Updates section of [see vendor documentation] to determine the correct column to use.",
+  "DESCRIPTION": "*** Deprecated *** In table DIAGNOSES, the column ICD99_CODE_NO_ADD has been deprecated. Refer to the Diagnosis and ICD Procedure Updates section of [see vendor documentation] to determine the correct column to use.",
   "TABLE_NAME": "DIAGNOSES"
  },
  {
@@ -2921,7 +2921,7 @@
  },
  {
   "COLUMN_NAME": "PATIENT_FRIENDLY_ID",
-  "DESCRIPTION": "This points to the term record that should be used as PATIENTS friendly term for a code type EDG record.",
+  "DESCRIPTION": "This points to the term record that should be used as PATIENTS friendly term for a code type diagnosis record.",
   "TABLE_NAME": "DIAGNOSES"
  },
  {
@@ -2931,7 +2931,7 @@
  },
  {
   "COLUMN_NAME": "PREFERRED_TERM_ID",
-  "DESCRIPTION": "This is a foreign key linking to the preferred clinical term for a code, another EDG record.",
+  "DESCRIPTION": "This is a foreign key linking to the preferred clinical term for a code, another diagnosis record.",
   "TABLE_NAME": "DIAGNOSES"
  },
  {
@@ -2951,12 +2951,12 @@
  },
  {
   "COLUMN_NAME": "RECORD_TYPE_CODE",
-  "DESCRIPTION": "This column displays the record type (code, term, or both) of the diagnosis record. This item contains no data before the conversion has completed on EDG (to support multiple code sets of data).",
+  "DESCRIPTION": "This column displays the record type (code, term, or both) of the diagnosis record. This item contains no data before the conversion has completed on diagnosis (to support multiple code sets of data).",
   "TABLE_NAME": "DIAGNOSES"
  },
  {
   "COLUMN_NAME": "REFERENCE_CODE",
-  "DESCRIPTION": "*** Deprecated *** In table DIAGNOSES, the column REFERENCE_CODE (EDG 2002) has been deprecated. Use the DIAGNOSES.REF_BILL_CODE column instead.",
+  "DESCRIPTION": "*** Deprecated *** In table DIAGNOSES, the column REFERENCE_CODE has been deprecated. Use the DIAGNOSES.REF_BILL_CODE column instead.",
   "TABLE_NAME": "DIAGNOSES"
  },
  {
@@ -3056,12 +3056,12 @@
  },
  {
   "COLUMN_NAME": "CM_LOG_OWNER_ID",
-  "DESCRIPTION": "The Community ID (CID) of the instance from which this record or line was extracted. This is only populated if you use IntraConnect.",
+  "DESCRIPTION": "The Community ID of the instance from which this record or line was extracted. This is only populated if you use IntraConnect.",
   "TABLE_NAME": "ED_ENCOUNTERS_DM"
  },
  {
   "COLUMN_NAME": "CM_PHY_OWNER_ID",
-  "DESCRIPTION": "The Community ID (CID) of the instance that owns this record or line. This is only populated if you use IntraConnect.",
+  "DESCRIPTION": "The Community ID of the instance that owns this record or line. This is only populated if you use IntraConnect.",
   "TABLE_NAME": "ED_ENCOUNTERS_DM"
  },
  {
@@ -3111,7 +3111,7 @@
  },
  {
   "COLUMN_NAME": "ED_LDA_REMOVAL_DOC_FLAG",
-  "DESCRIPTION": "\"Rule: ED METRIC: ED LDA REMOVAL DOCUMENTED (49721) This rule takes an ED end event as a parameter. If all LDAs that are placed before the last instance of the end event firing are eventually removed, then this column holds a value of \"\"Y\"\". If an LDA was placed before the PATIENTS left the ED and it was never documented as benig removed",
+  "DESCRIPTION": "\"Rule: ED METRIC: ED device REMOVAL DOCUMENTED (49721) This rule takes an ED end event as a parameter. If all LDAs that are placed before the last instance of the end event firing are eventually removed, then this column holds a value of \"\"Y\"\". If an device was placed before the PATIENTS left the ED and it was never documented as benig removed",
   "TABLE_NAME": "ED_ENCOUNTERS_DM"
  },
  {
@@ -3336,22 +3336,22 @@
  },
  {
   "COLUMN_NAME": "KEY_ATND_PROV_ID",
-  "DESCRIPTION": "The unique provider ID (I SER .1) corresponding to the key attending provider for this encounter. Rule: RESPONSIBLE ATTENDING PROVIDER (49364).  Depending on how this rule is configured, it will link to a single attending provider who was either the first, last or longest attending on the PATIENTS's treatment team. This should determine which provider ultimately had the most significant contribution to the ED portion of the PATIENTS's encounter.",
+  "DESCRIPTION": "The unique provider ID corresponding to the key attending provider for this encounter. Rule: RESPONSIBLE ATTENDING PROVIDER (49364).  Depending on how this rule is configured, it will link to a single attending provider who was either the first, last or longest attending on the PATIENTS's treatment team. This should determine which provider ultimately had the most significant contribution to the ED portion of the PATIENTS's encounter.",
   "TABLE_NAME": "ED_ENCOUNTERS_DM"
  },
  {
   "COLUMN_NAME": "KEY_MIDLEVEL_ID",
-  "DESCRIPTION": "The unique provider ID (I SER .1) corresponding to the key midlevel provider for this encounter. Rule: RESPONSIBLE MIDLEVEL PROVIDER (49730) Depending on how this rule is configured, it will link to a single non-attending provider who was either the first, last or longest member on the PATIENTS's treatment team. It can further be filtered to consider only certain treatment team roles or ignore any non-ED treatment team members. This should determine which treatment team member ultimately had the most significant contribution to the ED portion of the PATIENTS's encounter.",
+  "DESCRIPTION": "The unique provider ID corresponding to the key midlevel provider for this encounter. Rule: RESPONSIBLE MIDLEVEL PROVIDER (49730) Depending on how this rule is configured, it will link to a single non-attending provider who was either the first, last or longest member on the PATIENTS's treatment team. It can further be filtered to consider only certain treatment team roles or ignore any non-ED treatment team members. This should determine which treatment team member ultimately had the most significant contribution to the ED portion of the PATIENTS's encounter.",
   "TABLE_NAME": "ED_ENCOUNTERS_DM"
  },
  {
   "COLUMN_NAME": "KEY_NURSE_ID",
-  "DESCRIPTION": "The unique provider ID (I SER .1) corresponding to the key nurse for this encounter. Rule: RESPONSIBLE NURSE (49368) Depending on how this rule is configured, it will link to a single non-attending provider who was either the first, last or longest member on the PATIENTS's treatment team. It can further be filtered to consider only certain treatment team roles or ignore any non-ED treatment team members. This should determine which treatment team member ultimately had the most significant contribution to the ED portion of the PATIENTS's encounter.",
+  "DESCRIPTION": "The unique provider ID corresponding to the key nurse for this encounter. Rule: RESPONSIBLE NURSE (49368) Depending on how this rule is configured, it will link to a single non-attending provider who was either the first, last or longest member on the PATIENTS's treatment team. It can further be filtered to consider only certain treatment team roles or ignore any non-ED treatment team members. This should determine which treatment team member ultimately had the most significant contribution to the ED portion of the PATIENTS's encounter.",
   "TABLE_NAME": "ED_ENCOUNTERS_DM"
  },
  {
   "COLUMN_NAME": "KEY_RESIDENT_ID",
-  "DESCRIPTION": "The unique provider ID (I SER .1) corresponding to the key resident for this encounter. Rule: RESPONSIBLE RESIDENT (49731) Depending on how this rule is configured, it will link to a single non-attending provider who was either the first, last or longest member on the PATIENTS's treatment team. It can further be filtered to consider only certain treatment team roles or ignore any non-ED treatment team members. This should determine which treatment team member ultimately had the most significant contribution to the ED portion of the PATIENTS's encounter.",
+  "DESCRIPTION": "The unique provider ID corresponding to the key resident for this encounter. Rule: RESPONSIBLE RESIDENT (49731) Depending on how this rule is configured, it will link to a single non-attending provider who was either the first, last or longest member on the PATIENTS's treatment team. It can further be filtered to consider only certain treatment team roles or ignore any non-ED treatment team members. This should determine which treatment team member ultimately had the most significant contribution to the ED portion of the PATIENTS's encounter.",
   "TABLE_NAME": "ED_ENCOUNTERS_DM"
  },
  {
@@ -3636,7 +3636,7 @@
  },
  {
   "COLUMN_NAME": "LOA_ENCOUNTER_ID",
-  "DESCRIPTION": "The unique encounter identifier for the contact on leave of absence when this encounter happened. This number is unique across all PATIENTS encounters in your system. If you use IntraConnect, this is the Unique Contact Identifier (UCI).",
+  "DESCRIPTION": "The unique encounter identifier for the contact on leave of absence when this encounter happened. This number is unique across all PATIENTS encounters in your system. If you use IntraConnect, this is the Unique Contact Identifier.",
   "TABLE_NAME": "ED_ENCOUNTERS_FACT"
  },
  {
@@ -3666,7 +3666,7 @@
  },
  {
   "COLUMN_NAME": "ENCOUNTER_ID",
-  "DESCRIPTION": "The unique encounter identifier for this contact. This number is unique across all PATIENTS encounters in your system. If you use IntraConnect, this is the Unique Contact Identifier (UCI).",
+  "DESCRIPTION": "The unique encounter identifier for this contact. This number is unique across all PATIENTS encounters in your system. If you use IntraConnect, this is the Unique Contact Identifier.",
   "TABLE_NAME": "ED_ENCOUNTERS_FACT"
  },
  {
@@ -3756,7 +3756,7 @@
  },
  {
   "COLUMN_NAME": "AN_DX_ID",
-  "DESCRIPTION": "Networks to the EDG record that the corresponds to the diagnosis documented during Anesthesia problem list integration with the pre-evaluation note.",
+  "DESCRIPTION": "Networks to the diagnosis record that the corresponds to the diagnosis documented during Anesthesia problem list integration with the pre-evaluation note.",
   "TABLE_NAME": "ED_EVENT_INFO"
  },
  {
@@ -3776,12 +3776,12 @@
  },
  {
   "COLUMN_NAME": "CM_LOG_OWNER_ID",
-  "DESCRIPTION": "The Community ID (CID) of the instance from which this record or line was extracted. This is only populated if you use IntraConnect.",
+  "DESCRIPTION": "The Community ID of the instance from which this record or line was extracted. This is only populated if you use IntraConnect.",
   "TABLE_NAME": "ED_EVENT_INFO"
  },
  {
   "COLUMN_NAME": "CM_PHY_OWNER_ID",
-  "DESCRIPTION": "The Community ID (CID) of the instance that owns this record or line. This is only populated if you use IntraConnect.",
+  "DESCRIPTION": "The Community ID of the instance that owns this record or line. This is only populated if you use IntraConnect.",
   "TABLE_NAME": "ED_EVENT_INFO"
  },
  {
@@ -3841,7 +3841,7 @@
  },
  {
   "COLUMN_NAME": "EVENT_INI_RECORD_ID",
-  "DESCRIPTION": "The master file and ID of the source of a duplicate procedure CLINICAL_ALERTS event. For example, this item usually holds LDG-ID (the ID of the procedure duplicate group used) or EAP-ID (the ID of the procedure used).",
+  "DESCRIPTION": "The master file and ID of the source of a duplicate procedure CLINICAL_ALERTS event. For example, this item usually holds LDG-ID (the ID of the procedure duplicate group used) or procedure-ID (the ID of the procedure used).",
   "TABLE_NAME": "ED_EVENT_INFO"
  },
  {
@@ -4071,7 +4071,7 @@
  },
  {
   "COLUMN_NAME": "REC_MED_AUTH_ADDR_IDENT",
-  "DESCRIPTION": "Medication authorizing provider's location-specific routing address (I SER 21000 unique ID) selected during reconciliation/review, to apply to the continued/reviewed medication order. Companion to IEV 839.",
+  "DESCRIPTION": "Medication authorizing provider's location-specific routing address selected during reconciliation/review, to apply to the continued/reviewed medication order. Companion to IEV 839.",
   "TABLE_NAME": "ED_EVENT_INFO"
  },
  {
@@ -4086,7 +4086,7 @@
  },
  {
   "COLUMN_NAME": "REC_ORD_PROV_ADDR_IDENT",
-  "DESCRIPTION": "Ordering provider's location-specific routing address (I SER 21000 unique ID) selected during reconciliation/review, to apply to the continued order. Companion to IEV 835.",
+  "DESCRIPTION": "Ordering provider's location-specific routing address selected during reconciliation/review, to apply to the continued order. Companion to IEV 835.",
   "TABLE_NAME": "ED_EVENT_INFO"
  },
  {
@@ -4101,7 +4101,7 @@
  },
  {
   "COLUMN_NAME": "REC_PROC_AUTH_ADDR_IDENT",
-  "DESCRIPTION": "Procedure authorizing provider's location-specific routing address (I SER 21000 unique ID) selected during reconciliation/review, to apply to the continued/reviewed procedure order. Companion to IEV 838.",
+  "DESCRIPTION": "Procedure authorizing provider's location-specific routing address selected during reconciliation/review, to apply to the continued/reviewed procedure order. Companion to IEV 838.",
   "TABLE_NAME": "ED_EVENT_INFO"
  },
  {
@@ -4256,7 +4256,7 @@
  },
  {
   "COLUMN_NAME": "LEV_LDAPLASSESS_FLAG",
-  "DESCRIPTION": "Yes/No flag for determining how the LDA placement popup event should behave. When set to 1-Yes, the LDA assessment opens automatically when the popup closes. When set to 0-No or when left blank, the assessment does not open automatically, and the default behavior is observed.",
+  "DESCRIPTION": "Yes/No flag for determining how the device placement popup event should behave. When set to 1-Yes, the device assessment opens automatically when the popup closes. When set to 0-No or when left blank, the assessment does not open automatically, and the default behavior is observed.",
   "TABLE_NAME": "ED_EVENT_TEMPLATES"
  },
  {
@@ -4301,12 +4301,12 @@
  },
  {
   "COLUMN_NAME": "CM_LOG_OWNER_ID",
-  "DESCRIPTION": "The Community ID (CID) of the instance from which this record or line was extracted. This is only populated if you use IntraConnect.",
+  "DESCRIPTION": "The Community ID of the instance from which this record or line was extracted. This is only populated if you use IntraConnect.",
   "TABLE_NAME": "ED_PATIENT_INFO"
  },
  {
   "COLUMN_NAME": "CM_PHY_OWNER_ID",
-  "DESCRIPTION": "The Community ID (CID) of the instance that owns this record or line. This is only populated if you use IntraConnect.",
+  "DESCRIPTION": "The Community ID of the instance that owns this record or line. This is only populated if you use IntraConnect.",
   "TABLE_NAME": "ED_PATIENT_INFO"
  },
  {
@@ -4391,7 +4391,7 @@
  },
  {
   "COLUMN_NAME": "VISIT_ID",
-  "DESCRIPTION": "The unique encounter identifier for this contact. This number is unique across patients and encounters in your system. If you use IntraConnect this is the Unique Contact Identifier (UCI).",
+  "DESCRIPTION": "The unique encounter identifier for this contact. This number is unique across patients and encounters in your system. If you use IntraConnect this is the Unique Contact Identifier.",
   "TABLE_NAME": "ED_PATIENT_INFO"
  },
  {
@@ -4401,7 +4401,7 @@
  },
  {
   "COLUMN_NAME": "ENCOUNTER_ID",
-  "DESCRIPTION": "The unique encounter identifier for this contact. This number is unique across patients and encounters in your system. If you use IntraConnect this is the Unique Contact Identifier (UCI).",
+  "DESCRIPTION": "The unique encounter identifier for this contact. This number is unique across patients and encounters in your system. If you use IntraConnect this is the Unique Contact Identifier.",
   "TABLE_NAME": "ED_PATIENT_INFO"
  },
  {
@@ -4491,17 +4491,17 @@
  },
  {
   "COLUMN_NAME": "ADT_DFLT_ECL_ID",
-  "DESCRIPTION": "The unique ID (.1 item) of the default ADT security class record. This column is frequently used to link to the SECURITY_CLASS table.",
+  "DESCRIPTION": "The unique ID  of the default ADT security class record. This column is frequently used to link to the SECURITY_CLASS table.",
   "TABLE_NAME": "EMPLOYEES"
  },
  {
   "COLUMN_NAME": "APCLM_DEF_ECL_ID",
-  "DESCRIPTION": "The unique ID (.1 item) of the Accounts Payable Claims security class record. This column is frequently used to link to the SECURITY_CLASS table.",
+  "DESCRIPTION": "The unique ID  of the Accounts Payable Claims security class record. This column is frequently used to link to the SECURITY_CLASS table.",
   "TABLE_NAME": "EMPLOYEES"
  },
  {
   "COLUMN_NAME": "AP_DEF_ECL_ID",
-  "DESCRIPTION": "The unique ID (.1 item) of the Accounts Payable security class record. This column is frequently used to link to the SECURITY_CLASS table.",
+  "DESCRIPTION": "The unique ID  of the Accounts Payable security class record. This column is frequently used to link to the SECURITY_CLASS table.",
   "TABLE_NAME": "EMPLOYEES"
  },
  {
@@ -4556,7 +4556,7 @@
  },
  {
   "COLUMN_NAME": "CAD_OTH_DEP_ECL_ID",
-  "DESCRIPTION": "The unique ID (.1 item) of the Cadence security class record used for all other departments. This column is frequently used to link to the SECURITY_CLASS table.",
+  "DESCRIPTION": "The unique ID  of the Cadence security class record used for all other departments. This column is frequently used to link to the SECURITY_CLASS table.",
   "TABLE_NAME": "EMPLOYEES"
  },
  {
@@ -4566,42 +4566,42 @@
  },
  {
   "COLUMN_NAME": "CAPPAY_DEF_ECL_ID",
-  "DESCRIPTION": "The unique ID (.1 item) of the Capitation Payment security class record. This column is frequently used to link to the SECURITY_CLASS table.",
+  "DESCRIPTION": "The unique ID  of the Capitation Payment security class record. This column is frequently used to link to the SECURITY_CLASS table.",
   "TABLE_NAME": "EMPLOYEES"
  },
  {
   "COLUMN_NAME": "CAPRR_DEF_ECL_ID",
-  "DESCRIPTION": "The unique ID (.1 item) of the Capitation Receipt and Reconciliation security class record. This column is frequently used to link to the SECURITY_CLASS table.",
+  "DESCRIPTION": "The unique ID  of the Capitation Receipt and Reconciliation security class record. This column is frequently used to link to the SECURITY_CLASS table.",
   "TABLE_NAME": "EMPLOYEES"
  },
  {
   "COLUMN_NAME": "CARD_DFLT_ECL_ID",
-  "DESCRIPTION": "The unique ID (.1 item) of the default cardiology security class record. This column is frequently used to link to the SECURITY_CLASS table.",
+  "DESCRIPTION": "The unique ID  of the default cardiology security class record. This column is frequently used to link to the SECURITY_CLASS table.",
   "TABLE_NAME": "EMPLOYEES"
  },
  {
   "COLUMN_NAME": "CASE_DEF_ECL_ID",
-  "DESCRIPTION": "The unique ID (.1 item) of the Case Management security class record. This column is frequently used to link to the SECURITY_CLASS table.",
+  "DESCRIPTION": "The unique ID  of the Case Management security class record. This column is frequently used to link to the SECURITY_CLASS table.",
   "TABLE_NAME": "EMPLOYEES"
  },
  {
   "COLUMN_NAME": "CDA_DFLT_ECL_ID",
-  "DESCRIPTION": "The unique ID (.1 item) of the Cross Deployment Access security class record. This column is frequently used to link to the SECURITY_CLASS table.",
+  "DESCRIPTION": "The unique ID  of the Cross Deployment Access security class record. This column is frequently used to link to the SECURITY_CLASS table.",
   "TABLE_NAME": "EMPLOYEES"
  },
  {
   "COLUMN_NAME": "CDT_DFLT_ECL_ID",
-  "DESCRIPTION": "The unique ID (.1 item) of the Chart Deficiency Tracking security class record. This column is frequently used to link to the SECURITY_CLASS table.",
+  "DESCRIPTION": "The unique ID  of the Chart Deficiency Tracking security class record. This column is frequently used to link to the SECURITY_CLASS table.",
   "TABLE_NAME": "EMPLOYEES"
  },
  {
   "COLUMN_NAME": "CE_DFLT_ECL_ID",
-  "DESCRIPTION": "The unique ID (.1 item) of the default Care Everywhere security class record. This column is frequently used to link to the SECURITY_CLASS table.",
+  "DESCRIPTION": "The unique ID  of the default Care Everywhere security class record. This column is frequently used to link to the SECURITY_CLASS table.",
   "TABLE_NAME": "EMPLOYEES"
  },
  {
   "COLUMN_NAME": "CHSYNC_DFLT_ECL_ID",
-  "DESCRIPTION": "The unique ID (.1 item) of the default Chart Sync security class record. This column is frequently used to link to the SECURITY_CLASS table.",
+  "DESCRIPTION": "The unique ID  of the default Chart Sync security class record. This column is frequently used to link to the SECURITY_CLASS table.",
   "TABLE_NAME": "EMPLOYEES"
  },
  {
@@ -4636,7 +4636,7 @@
  },
  {
   "COLUMN_NAME": "CONF_DFLT_ECL_ID",
-  "DESCRIPTION": "The unique ID (.1 item) of the default Confidentiality security class record. This functionality is part of the Health Plan Operations application. This column is frequently used to link to the SECURITY_CLASS table.",
+  "DESCRIPTION": "The unique ID  of the default Confidentiality security class record. This functionality is part of the Health Plan Operations application. This column is frequently used to link to the SECURITY_CLASS table.",
   "TABLE_NAME": "EMPLOYEES"
  },
  {
@@ -4646,7 +4646,7 @@
  },
  {
   "COLUMN_NAME": "CR_DFLT_ECL_ID",
-  "DESCRIPTION": "The unique ID (.1 item) of the default the EMR security class record. This column is frequently used to link to the SECURITY_CLASS table.",
+  "DESCRIPTION": "The unique ID  of the default the EMR security class record. This column is frequently used to link to the SECURITY_CLASS table.",
   "TABLE_NAME": "EMPLOYEES"
  },
  {
@@ -4656,12 +4656,12 @@
  },
  {
   "COLUMN_NAME": "CTM_DFLT_ECL_ID",
-  "DESCRIPTION": "The unique ID (.1 item) of the default Contract Management security class record. This column is frequently used to link to the SECURITY_CLASS table.",
+  "DESCRIPTION": "The unique ID  of the default Contract Management security class record. This column is frequently used to link to the SECURITY_CLASS table.",
   "TABLE_NAME": "EMPLOYEES"
  },
  {
   "COLUMN_NAME": "CT_DFLT_CLS_CODE",
-  "DESCRIPTION": "The column CT_DEF_CLS_ID from the EMPLOYEES_EXT table should be used instead of this column. This column will be deprecated in a future release. The unique ID (.1 item) of the default Chart Tracking security class record. This column is frequently used to link to the SECURITY_CLASS table.",
+  "DESCRIPTION": "The column CT_DEF_CLS_ID from the EMPLOYEES_EXT table should be used instead of this column. This column will be deprecated in a future release. The unique ID  of the default Chart Tracking security class record. This column is frequently used to link to the SECURITY_CLASS table.",
   "TABLE_NAME": "EMPLOYEES"
  },
  {
@@ -4671,12 +4671,12 @@
  },
  {
   "COLUMN_NAME": "CUST_SVC_DEF_CLS",
-  "DESCRIPTION": "The unique ID (.1 item) of the Customer Relationship Management security class record. This column is frequently used to link to the SECURITY_CLASS table.",
+  "DESCRIPTION": "The unique ID  of the Customer Relationship Management security class record. This column is frequently used to link to the SECURITY_CLASS table.",
   "TABLE_NAME": "EMPLOYEES"
  },
  {
   "COLUMN_NAME": "DC_DFLT_ECL_ID",
-  "DESCRIPTION": "The unique ID (.1 item) of the default Data Courier security class record. This column is frequently used to link to the SECURITY_CLASS table.",
+  "DESCRIPTION": "The unique ID  of the default Data Courier security class record. This column is frequently used to link to the SECURITY_CLASS table.",
   "TABLE_NAME": "EMPLOYEES"
  },
  {
@@ -4731,7 +4731,7 @@
  },
  {
   "COLUMN_NAME": "EDI_DFLT_ECL_ID",
-  "DESCRIPTION": "The unique ID (.1 item) of the default EDI security class record. This column is frequently used to link to the SECURITY_CLASS table.",
+  "DESCRIPTION": "The unique ID  of the default EDI security class record. This column is frequently used to link to the SECURITY_CLASS table.",
   "TABLE_NAME": "EMPLOYEES"
  },
  {
@@ -4791,7 +4791,7 @@
  },
  {
   "COLUMN_NAME": "EMFI_DFLT_ECL_ID",
-  "DESCRIPTION": "The unique ID (.1 item) of the default EMFI security class record. This column is frequently used to link to the SECURITY_CLASS table.",
+  "DESCRIPTION": "The unique ID  of the default EMFI security class record. This column is frequently used to link to the SECURITY_CLASS table.",
   "TABLE_NAME": "EMPLOYEES"
  },
  {
@@ -4811,7 +4811,7 @@
  },
  {
   "COLUMN_NAME": "ER_DFLT_ECL_ID",
-  "DESCRIPTION": "The unique ID (.1 item) of the default ASAP security class record. This column is frequently used to link to the SECURITY_CLASS table.",
+  "DESCRIPTION": "The unique ID  of the default ASAP security class record. This column is frequently used to link to the SECURITY_CLASS table.",
   "TABLE_NAME": "EMPLOYEES"
  },
  {
@@ -4856,7 +4856,7 @@
  },
  {
   "COLUMN_NAME": "HB_DFLT_ECL_ID",
-  "DESCRIPTION": "The unique ID (.1 item) of the default Hospital Billing security class record. This column is frequently used to link to the SECURITY_CLASS table.",
+  "DESCRIPTION": "The unique ID  of the default Hospital Billing security class record. This column is frequently used to link to the SECURITY_CLASS table.",
   "TABLE_NAME": "EMPLOYEES"
  },
  {
@@ -4866,7 +4866,7 @@
  },
  {
   "COLUMN_NAME": "HH_DFLT_ECL_ID",
-  "DESCRIPTION": "The unique ID (.1 item) of the default Home Health security class record. This column is frequently used to link to the SECURITY_CLASS table.",
+  "DESCRIPTION": "The unique ID  of the default Home Health security class record. This column is frequently used to link to the SECURITY_CLASS table.",
   "TABLE_NAME": "EMPLOYEES"
  },
  {
@@ -4881,7 +4881,7 @@
  },
  {
   "COLUMN_NAME": "HNDHLD_DFLT_ECL_ID",
-  "DESCRIPTION": "The unique ID (.1 item) of the default Rover security class record. This column is frequently used to link to the SECURITY_CLASS table.",
+  "DESCRIPTION": "The unique ID  of the default Rover security class record. This column is frequently used to link to the SECURITY_CLASS table.",
   "TABLE_NAME": "EMPLOYEES"
  },
  {
@@ -4941,7 +4941,7 @@
  },
  {
   "COLUMN_NAME": "LAB_BIL_DFLT_ECL_ID",
-  "DESCRIPTION": "The unique ID (.1 item) of the default Beaker Billing security class record. This column is frequently used to link to the SECURITY_CLASS table.",
+  "DESCRIPTION": "The unique ID  of the default Beaker Billing security class record. This column is frequently used to link to the SECURITY_CLASS table.",
   "TABLE_NAME": "EMPLOYEES"
  },
  {
@@ -4951,7 +4951,7 @@
  },
  {
   "COLUMN_NAME": "LAB_DFLT_TST_ECL_ID",
-  "DESCRIPTION": "The unique ID (.1 item) of the default Beaker Test-Level security class record that is used when a user attempts to take action on a test. This security class can be overridden by making use of workbench security. This column is frequently used to link to the SECURITY_CLASS table.",
+  "DESCRIPTION": "The unique ID  of the default Beaker Test-Level security class record that is used when a user attempts to take action on a test. This security class can be overridden by making use of workbench security. This column is frequently used to link to the SECURITY_CLASS table.",
   "TABLE_NAME": "EMPLOYEES"
  },
  {
@@ -5071,7 +5071,7 @@
  },
  {
   "COLUMN_NAME": "MR_LOGON_DEPT_ID",
-  "DESCRIPTION": "The user's login department. Depending on system configuration, this information can be retrieved from different places. If Cadence is licensed, the information is retrieved from Cadence Logon Department (I EMP 5115). Otherwise, the system first checks Last Login Department (I EMP 20670) if the user's primary role is configured to use their last login department as their default login department. If this item doesn't have a value, or if the user's last login department isn't their default login department, the system checks the clinical application Login Department (I EMP 20660). If the clinical application Login Department doesn't have a value, then the system checks MR Facility Department (I EMP 17330).",
+  "DESCRIPTION": "The user's login department. Depending on system configuration, this information can be retrieved from different places. If Cadence is licensed, the information is retrieved from Cadence Logon Department. Otherwise, the system first checks Last Login Department if the user's primary role is configured to use their last login department as their default login department. If this item doesn't have a value, or if the user's last login department isn't their default login department, the system checks the clinical application Login Department. If the clinical application Login Department doesn't have a value, then the system checks MR Facility Department.",
   "TABLE_NAME": "EMPLOYEES"
  },
  {
@@ -5086,12 +5086,12 @@
  },
  {
   "COLUMN_NAME": "NTCM_DFLT_ECL_ID",
-  "DESCRIPTION": "The unique ID (.1 item) of the default Nurse Triage/Call Management security class record. This column is frequently used to link to the SECURITY_CLASS table.",
+  "DESCRIPTION": "The unique ID  of the default Nurse Triage/Call Management security class record. This column is frequently used to link to the SECURITY_CLASS table.",
   "TABLE_NAME": "EMPLOYEES"
  },
  {
   "COLUMN_NAME": "OB_DFLT_ECL_ID",
-  "DESCRIPTION": "The unique ID (.1 item) of the default Stork security class record. This column is frequently used to link to the SECURITY_CLASS table.",
+  "DESCRIPTION": "The unique ID  of the default Stork security class record. This column is frequently used to link to the SECURITY_CLASS table.",
   "TABLE_NAME": "EMPLOYEES"
  },
  {
@@ -5126,7 +5126,7 @@
  },
  {
   "COLUMN_NAME": "PEAR_DFLT_ECL_ID",
-  "DESCRIPTION": "The unique ID (.1 item) of the default Procedural Application security class record. This column is frequently used to link to the SECURITY_CLASS table.",
+  "DESCRIPTION": "The unique ID  of the default Procedural Application security class record. This column is frequently used to link to the SECURITY_CLASS table.",
   "TABLE_NAME": "EMPLOYEES"
  },
  {
@@ -5166,7 +5166,7 @@
  },
  {
   "COLUMN_NAME": "PRM_BIL_DFLT_ECL_ID",
-  "DESCRIPTION": "The unique ID (.1 item) of the default Premium Billing security class record. Premium Billing is part of the health plan operations application. This column is frequently used to link to the SECURITY_CLASS table.",
+  "DESCRIPTION": "The unique ID  of the default Premium Billing security class record. Premium Billing is part of the health plan operations application. This column is frequently used to link to the SECURITY_CLASS table.",
   "TABLE_NAME": "EMPLOYEES"
  },
  {
@@ -5201,12 +5201,12 @@
  },
  {
   "COLUMN_NAME": "RESTR_ACCS_REV_FLAG",
-  "DESCRIPTION": "\"*** Deprecated *** I EMP 17350 is being discontinued. Indicates whether or not the user should be prevented from entering clinical system's review module. NOTE: Translates 1 to \"\"Y\"\" and 2 to \"\"N.\"\"\"",
+  "DESCRIPTION": "\"*** Deprecated *** I the source item is being discontinued. Indicates whether or not the user should be prevented from entering clinical system's review module. NOTE: Translates 1 to \"\"Y\"\" and 2 to \"\"N.\"\"\"",
   "TABLE_NAME": "EMPLOYEES"
  },
  {
   "COLUMN_NAME": "RFL_DEF_CLS_CODE",
-  "DESCRIPTION": "*** Deprecated *** The column RFL_DEF_CLS_CODE (RFL) has been deprecated because the item definition for I EMP 19500 has been changed from a category updated item to a networked item. This is the user's Referral default security class.",
+  "DESCRIPTION": "*** Deprecated *** The column RFL_DEF_CLS_CODE (RFL) has been deprecated because the item definition for I the source item has been changed from a category updated item to a networked item. This is the user's Referral default security class.",
   "TABLE_NAME": "EMPLOYEES"
  },
  {
@@ -5216,12 +5216,12 @@
  },
  {
   "COLUMN_NAME": "RIS_DFLT_ECL_ID",
-  "DESCRIPTION": "The unique ID (.1 item) of the default Radiant security class record. This column is frequently used to link to the SECURITY_CLASS table.",
+  "DESCRIPTION": "The unique ID  of the default Radiant security class record. This column is frequently used to link to the SECURITY_CLASS table.",
   "TABLE_NAME": "EMPLOYEES"
  },
  {
   "COLUMN_NAME": "ROI_DFLT_ECL_ID",
-  "DESCRIPTION": "The unique ID (.1 item) of the default Release of Information security class record. This column is frequently used to link to the SECURITY_CLASS table.",
+  "DESCRIPTION": "The unique ID  of the default Release of Information security class record. This column is frequently used to link to the SECURITY_CLASS table.",
   "TABLE_NAME": "EMPLOYEES"
  },
  {
@@ -5246,7 +5246,7 @@
  },
  {
   "COLUMN_NAME": "SHARED_SEC_CL_ID",
-  "DESCRIPTION": "\"The unique ID (.1 item) of the Shared security class record. This class controls access to certain provider-related functions, such as editing provider records \"\"on the fly\"\" across system applications and applies to both the Text and the clinical application interfaces. This column is frequently used to link to the SECURITY_CLASS table.\"",
+  "DESCRIPTION": "\"The unique ID  of the Shared security class record. This class controls access to certain provider-related functions, such as editing provider records \"\"on the fly\"\" across system applications and applies to both the Text and the clinical application interfaces. This column is frequently used to link to the SECURITY_CLASS table.\"",
   "TABLE_NAME": "EMPLOYEES"
  },
  {
@@ -5381,7 +5381,7 @@
  },
  {
   "COLUMN_NAME": "DX_ED_FLAG",
-  "DESCRIPTION": "Definitively identifies an encounter diagnosis (I EDG 18400) as being an ED clinical impression. This is important to differentiate ED diagnoses from diagnoses filed to the same item as in the IP setting.",
+  "DESCRIPTION": "Definitively identifies an encounter diagnosis as being an ED clinical impression. This is important to differentiate ED diagnoses from diagnoses filed to the same item as in the IP setting.",
   "TABLE_NAME": "ENCOUNTER_DIAGNOSES"
  },
  {
@@ -5411,12 +5411,12 @@
  },
  {
   "COLUMN_NAME": "ENC_ICD_CODE",
-  "DESCRIPTION": "*** Deprecated *** In table ENCOUNTER_DIAGNOSES, the column ENC_ICD_CODE (EDG 2000) has been deprecated. Link to the DIAGNOSES table using ENCOUNTER_DIAGNOSES.DX_ID column. Refer to the Diagnosis and ICD Procedure Updates section of [see vendor documentation] to determine the correct column to use.",
+  "DESCRIPTION": "*** Deprecated *** In table ENCOUNTER_DIAGNOSES, the column ENC_ICD_CODE has been deprecated. Link to the DIAGNOSES table using ENCOUNTER_DIAGNOSES.DX_ID column. Refer to the Diagnosis and ICD Procedure Updates section of [see vendor documentation] to determine the correct column to use.",
   "TABLE_NAME": "ENCOUNTER_DIAGNOSES"
  },
  {
   "COLUMN_NAME": "ICD99_CODE",
-  "DESCRIPTION": "*** Deprecated *** In table ENCOUNTER_DIAGNOSES, the column ICD99_CODE (EDG 40) has been deprecated. Link to the DIAGNOSES table using ENCOUNTER_DIAGNOSES.DX_ID column. Refer to the Diagnosis and ICD Procedure Updates section of [see vendor documentation] to determine the correct column to use.",
+  "DESCRIPTION": "*** Deprecated *** In table ENCOUNTER_DIAGNOSES, the column ICD99_CODE has been deprecated. Link to the DIAGNOSES table using ENCOUNTER_DIAGNOSES.DX_ID column. Refer to the Diagnosis and ICD Procedure Updates section of [see vendor documentation] to determine the correct column to use.",
   "TABLE_NAME": "ENCOUNTER_DIAGNOSES"
  },
  {
@@ -5601,7 +5601,7 @@
  },
  {
   "COLUMN_NAME": "FLO_CATEGORY_VALUE",
-  "DESCRIPTION": "*** Deprecated *** In table FLOWSHEET_MEASUREMENTS, the column FLO_CATEGORY_VALUE has been deprecated. MEAS_VALUE in FLOWSHEET_MEASUREMENTS should be used instead. If CID Translation is enabled, MEAS_VALUE links to INTERNAL_ID in ALL_CATEGORIES ******",
+  "DESCRIPTION": "*** Deprecated *** In table FLOWSHEET_MEASUREMENTS, the column FLO_CATEGORY_VALUE has been deprecated. MEAS_VALUE in FLOWSHEET_MEASUREMENTS should be used instead. If contact Translation is enabled, MEAS_VALUE links to INTERNAL_ID in ALL_CATEGORIES ******",
   "TABLE_NAME": "FLOWSHEET_MEASUREMENTS"
  },
  {
@@ -5826,12 +5826,12 @@
  },
  {
   "COLUMN_NAME": "CM_LOG_OWNER_ID",
-  "DESCRIPTION": "The Community ID (CID) of the instance from which this record or line was extracted. This is only populated if you use IntraConnect.",
+  "DESCRIPTION": "The Community ID of the instance from which this record or line was extracted. This is only populated if you use IntraConnect.",
   "TABLE_NAME": "GROUPER_COMPILED_LIST"
  },
  {
   "COLUMN_NAME": "CM_PHY_OWNER_ID",
-  "DESCRIPTION": "The Community ID (CID) of the instance that owns this record or line. This is only populated if you use IntraConnect.",
+  "DESCRIPTION": "The Community ID of the instance that owns this record or line. This is only populated if you use IntraConnect.",
   "TABLE_NAME": "GROUPER_COMPILED_LIST"
  },
  {
@@ -5891,12 +5891,12 @@
  },
  {
   "COLUMN_NAME": "CM_LOG_OWNER_ID",
-  "DESCRIPTION": "The Community ID (CID) of the instance from which this record or line was extracted. This is only populated if you use IntraConnect.",
+  "DESCRIPTION": "The Community ID of the instance from which this record or line was extracted. This is only populated if you use IntraConnect.",
   "TABLE_NAME": "GROUPER_MED_RECORDS"
  },
  {
   "COLUMN_NAME": "CM_PHY_OWNER_ID",
-  "DESCRIPTION": "The Community ID (CID) of the instance that owns this record or line. This is only populated if you use IntraConnect.",
+  "DESCRIPTION": "The Community ID of the instance that owns this record or line. This is only populated if you use IntraConnect.",
   "TABLE_NAME": "GROUPER_MED_RECORDS"
  },
  {
@@ -5916,12 +5916,12 @@
  },
  {
   "COLUMN_NAME": "CM_LOG_OWNER_ID",
-  "DESCRIPTION": "The Community ID (CID) of the instance from which this record or line was extracted. This is only populated if you use IntraConnect.",
+  "DESCRIPTION": "The Community ID of the instance from which this record or line was extracted. This is only populated if you use IntraConnect.",
   "TABLE_NAME": "GROUPER_TERMINOLOGY"
  },
  {
   "COLUMN_NAME": "CM_PHY_OWNER_ID",
-  "DESCRIPTION": "The Community ID (CID) of the instance that owns this record or line. This is only populated if you use IntraConnect.",
+  "DESCRIPTION": "The Community ID of the instance that owns this record or line. This is only populated if you use IntraConnect.",
   "TABLE_NAME": "GROUPER_TERMINOLOGY"
  },
  {
@@ -6051,7 +6051,7 @@
  },
  {
   "COLUMN_NAME": "ACCT_ZERO_BAL_DT",
-  "DESCRIPTION": "This column stores the date the hospital account went to a zero balance. This may be empty for older accounts, as Zero Balance Date (I HAR 244) had not always been available.",
+  "DESCRIPTION": "This column stores the date the hospital account went to a zero balance. This may be empty for older accounts, as Zero Balance Date had not always been available.",
   "TABLE_NAME": "HOSPITAL_ACCOUNTS"
  },
  {
@@ -6076,7 +6076,7 @@
  },
  {
   "COLUMN_NAME": "ADM_DATE_TIME",
-  "DESCRIPTION": "This column stores the admission date and time associated with the hospital account. The admission date and time (I HAR 400/405) are first pulled from the coding information on the hospital account. If that data is not stored on the hospital account yet, then this will use the primary encounter to determine the admission date and time. The exact items used varies based on the encounter type.",
+  "DESCRIPTION": "This column stores the admission date and time associated with the hospital account. The admission date and time are first pulled from the coding information on the hospital account. If that data is not stored on the hospital account yet, then this will use the primary encounter to determine the admission date and time. The exact items used varies based on the encounter type.",
   "TABLE_NAME": "HOSPITAL_ACCOUNTS"
  },
  {
@@ -6341,7 +6341,7 @@
  },
  {
   "COLUMN_NAME": "DISCH_DATE_TIME",
-  "DESCRIPTION": "This column stores the discharge date and time associated with the hospital account. The discharge date and time (I HAR 425/430) are first pulled from the coding information on the hospital account. If that data is not stored on the hospital account yet, then this will use the primary encounter to determine the discharge date and time. The exact items used varies based on the encounter type.",
+  "DESCRIPTION": "This column stores the discharge date and time associated with the hospital account. The discharge date and time are first pulled from the coding information on the hospital account. If that data is not stored on the hospital account yet, then this will use the primary encounter to determine the discharge date and time. The exact items used varies based on the encounter type.",
   "TABLE_NAME": "HOSPITAL_ACCOUNTS"
  },
  {
@@ -6596,7 +6596,7 @@
  },
  {
   "COLUMN_NAME": "INST_OF_UPDATE",
-  "DESCRIPTION": "*** Deprecated *** In table HOSPITAL_ACCOUNTS, the column INST_OF_UPDATE has been deprecated. This column was deprecated because the underlying data is no longer flagged for extraction with the table-based tracking build method that the HAR masterfile uses. This column has been replaced by column INST_OF_UPDATE_DTTM in table HOSPITAL_ACCT_LAST_UPDATE. To look up the deprecated column's value after the EMR system upgrade, join column HOSPITAL_ACCOUNTS.HOSPITAL_ACCOUNT_ID to table HOSPITAL_ACCT_LAST_UPDATE column HOSPITAL_ACCOUNT_ID and get the INST_OF_UPDATE_DTTM value.",
+  "DESCRIPTION": "*** Deprecated *** In table HOSPITAL_ACCOUNTS, the column INST_OF_UPDATE has been deprecated. This column was deprecated because the underlying data is no longer flagged for extraction with the table-based tracking build method that the billing account masterfile uses. This column has been replaced by column INST_OF_UPDATE_DTTM in table HOSPITAL_ACCT_LAST_UPDATE. To look up the deprecated column's value after the EMR system upgrade, join column HOSPITAL_ACCOUNTS.HOSPITAL_ACCOUNT_ID to table HOSPITAL_ACCT_LAST_UPDATE column HOSPITAL_ACCOUNT_ID and get the INST_OF_UPDATE_DTTM value.",
   "TABLE_NAME": "HOSPITAL_ACCOUNTS"
  },
  {
@@ -6881,7 +6881,7 @@
  },
  {
   "COLUMN_NAME": "PRIM_ENC_ENC_ID",
-  "DESCRIPTION": "The encounter identifier associated with the primary PATIENTS contact on the hospital account. The primary PATIENTS contact is stored in I HAR 103. Combined HARs are no longer associated with any PATIENTS contacts and will not have a primary ENC_ID.",
+  "DESCRIPTION": "The encounter identifier associated with the primary PATIENTS contact on the hospital account. The primary PATIENTS contact is stored in I the source item. Combined HARs are no longer associated with any PATIENTS contacts and will not have a primary ENC_ID.",
   "TABLE_NAME": "HOSPITAL_ACCOUNTS"
  },
  {
@@ -7171,12 +7171,12 @@
  },
  {
   "COLUMN_NAME": "CM_LOG_OWNER_ID",
-  "DESCRIPTION": "The Community ID (CID) of the instance from which this record or line was extracted. This is only populated if you use IntraConnect.",
+  "DESCRIPTION": "The Community ID of the instance from which this record or line was extracted. This is only populated if you use IntraConnect.",
   "TABLE_NAME": "HOSPITAL_ACCOUNTS_EXT"
  },
  {
   "COLUMN_NAME": "CM_PHY_OWNER_ID",
-  "DESCRIPTION": "The Community ID (CID) of the instance that owns this record or line. This is only populated if you use IntraConnect.",
+  "DESCRIPTION": "The Community ID of the instance that owns this record or line. This is only populated if you use IntraConnect.",
   "TABLE_NAME": "HOSPITAL_ACCOUNTS_EXT"
  },
  {
@@ -7221,12 +7221,12 @@
  },
  {
   "COLUMN_NAME": "HAS_OPEN_CLAIM_STAT_FOL_UP_FLAG",
-  "DESCRIPTION": "Whether a HAR has any open claim status follow-up BDC records on relevant buckets: 'Y' indicates there is at least one open claim status follow-up, 'N' or no value indicates that either all claim status follow-ups are closed or otherwise inactive or that there are no claim status follow-ups.",
+  "DESCRIPTION": "Whether a billing account has any open claim status follow-up BDC records on relevant buckets: 'Y' indicates there is at least one open claim status follow-up, 'N' or no value indicates that either all claim status follow-ups are closed or otherwise inactive or that there are no claim status follow-ups.",
   "TABLE_NAME": "HOSPITAL_ACCOUNTS_EXT"
  },
  {
   "COLUMN_NAME": "HOSPITAL_ACCOUNT_ID",
-  "DESCRIPTION": "The unique identifier (.1 item) for the hospital account record.",
+  "DESCRIPTION": "The unique identifier  for the hospital account record.",
   "TABLE_NAME": "HOSPITAL_ACCOUNTS_EXT"
  },
  {
@@ -7281,7 +7281,7 @@
  },
  {
   "COLUMN_NAME": "PAYER_DOWNGRADE_TYPE_CODE",
-  "DESCRIPTION": "The payer downgrade request type category ID for the hospital account. This category is the type of downgrade requested when the primary payer tries to dispute the level of care of the HAR. NULL if no such attempt was made.",
+  "DESCRIPTION": "The payer downgrade request type category ID for the hospital account. This category is the type of downgrade requested when the primary payer tries to dispute the level of care of the billing account. NULL if no such attempt was made.",
   "TABLE_NAME": "HOSPITAL_ACCOUNTS_EXT"
  },
  {
@@ -7326,12 +7326,12 @@
  },
  {
   "COLUMN_NAME": "SVC_LN_GROUPER_ID",
-  "DESCRIPTION": "*** Deprecated *** In table HOSPITAL_ACCOUNTS_EXT, the column SVC_LN_GROUPER_ID (I HAR 9301) has been deprecated.  This column has been replaced by column REV_SPEC_GROUPER_ID (I HAR 9301) in table HOSPITAL_ACCOUNTS_EXT.",
+  "DESCRIPTION": "*** Deprecated *** In table HOSPITAL_ACCOUNTS_EXT, the column SVC_LN_GROUPER_ID has been deprecated.  This column has been replaced by column REV_SPEC_GROUPER_ID in table HOSPITAL_ACCOUNTS_EXT.",
   "TABLE_NAME": "HOSPITAL_ACCOUNTS_EXT"
  },
  {
   "COLUMN_NAME": "SVC_LN_SUB_SPEC_GROUPER_ID",
-  "DESCRIPTION": "*** Deprecated *** In table HOSPITAL_ACCOUNTS_EXT, the column SVC_LN_SUB_SPEC_GROUPER_ID (I HAR 9302) has been deprecated.  This column has been replaced by column REV_SUBSPEC_GROUPER_ID (I HAR 9302) in table HOSPITAL_ACCOUNTS_EXT.",
+  "DESCRIPTION": "*** Deprecated *** In table HOSPITAL_ACCOUNTS_EXT, the column SVC_LN_SUB_SPEC_GROUPER_ID has been deprecated.  This column has been replaced by column REV_SUBSPEC_GROUPER_ID in table HOSPITAL_ACCOUNTS_EXT.",
   "TABLE_NAME": "HOSPITAL_ACCOUNTS_EXT"
  },
  {
@@ -7406,7 +7406,7 @@
  },
  {
   "COLUMN_NAME": "DX_DOCUMENTING_USER_ID",
-  "DESCRIPTION": "Contains the user (EMP) ID of the user that documented the diagnosis",
+  "DESCRIPTION": "Contains the user ID of the user that documented the diagnosis",
   "TABLE_NAME": "HOSPITAL_ACCT_DIAGNOSES"
  },
  {
@@ -7436,7 +7436,7 @@
  },
  {
   "COLUMN_NAME": "DX_POA_YNU",
-  "DESCRIPTION": "*** Deprecated *** This column is being deprecated because the category item for HAR 611 has been changed from ECT 8004 (YNU) to its own category (source is HAR 611) that supports YNUWE. For backwards compatibility, the SQL generation code for this column is being extended to TRANSLATE 12345 to YNUWE. The new column, FINAL_DX_POA_CODE, will link to a new category table ZC_DX_POA. This column should be used in Spring 2008 and beyond. Specifies whether each diagnosis was present on admission, default value is 'Y'",
+  "DESCRIPTION": "*** Deprecated *** This column is being deprecated because the category item for the source item has been changed from ECT 8004 (YNU) to its own category (source is the source item) that supports YNUWE. For backwards compatibility, the SQL generation code for this column is being extended to TRANSLATE 12345 to YNUWE. The new column, FINAL_DX_POA_CODE, will link to a new category table ZC_DX_POA. This column should be used in Spring 2008 and beyond. Specifies whether each diagnosis was present on admission, default value is 'Y'",
   "TABLE_NAME": "HOSPITAL_ACCT_DIAGNOSES"
  },
  {
@@ -7541,7 +7541,7 @@
  },
  {
   "COLUMN_NAME": "ADMIT_ADDR_ID",
-  "DESCRIPTION": "Address ID for attending provider (EPT 18867)",
+  "DESCRIPTION": "Address ID for attending provider",
   "TABLE_NAME": "HOSPITAL_ENCOUNTERS"
  },
  {
@@ -7976,7 +7976,7 @@
  },
  {
   "COLUMN_NAME": "MU_HOSP_ADMSN_TIME",
-  "DESCRIPTION": "The date and time the PATIENTS was admitted to inpatient or roomed in ED. It will look at item EPT 10290 to see if it is populated. If yes, it will be populated with the instant the PATIENTS was first inpatient (EPT 10290 and 10291). Otherwise, it will look at which version of the standard unique PATIENTS denominator is being used (LSD 34062) and whether the PATIENTS was an ED PATIENTS (EPT 10296 and 10297). If the standard unique PATIENTS denominator being used in LSD 34062 is the all ED patients denominator, this item will be populated with the hospital admission date and time (EPT 18850 and 18851). If the PATIENTS was not inpatient and not seen in the ED, this item will be null. If the standard unique PATIENTS denominator being using in LSD 34062 is the ED to Observation patients only denominator, if the PATIENTS was seen in the ED and was an observation PATIENTS, this item will be populated with the hospital admission date and time (EPT 18850 and 18851).   If the settings for excluding newborns are present and the encounter is for a newborn, this item will be null.",
+  "DESCRIPTION": "The date and time the PATIENTS was admitted to inpatient or roomed in ED. It will look at item the source item to see if it is populated. If yes, it will be populated with the instant the PATIENTS was first inpatient. Otherwise, it will look at which version of the standard unique PATIENTS denominator is being used (LSD 34062) and whether the PATIENTS was an ED PATIENTS. If the standard unique PATIENTS denominator being used in LSD 34062 is the all ED patients denominator, this item will be populated with the hospital admission date and time. If the PATIENTS was not inpatient and not seen in the ED, this item will be null. If the standard unique PATIENTS denominator being using in LSD 34062 is the ED to Observation patients only denominator, if the PATIENTS was seen in the ED and was an observation PATIENTS, this item will be populated with the hospital admission date and time.   If the settings for excluding newborns are present and the encounter is for a newborn, this item will be null.",
   "TABLE_NAME": "HOSPITAL_ENCOUNTERS"
  },
  {
@@ -8026,7 +8026,7 @@
  },
  {
   "COLUMN_NAME": "ENCOUNTER_ID",
-  "DESCRIPTION": "The unique encounter identifier for this contact. This number is unique across all PATIENTS encounters in your system. If you use IntraConnect, this is the Unique Contact Identifier (UCI).",
+  "DESCRIPTION": "The unique encounter identifier for this contact. This number is unique across all PATIENTS encounters in your system. If you use IntraConnect, this is the Unique Contact Identifier.",
   "TABLE_NAME": "HOSPITAL_ENCOUNTERS"
  },
  {
@@ -8306,12 +8306,12 @@
  },
  {
   "COLUMN_NAME": "CM_LOG_OWNER_ID",
-  "DESCRIPTION": "The Community ID (CID) of the instance from which this the source system record was extracted. This is populated only if you use IntraConnect.",
+  "DESCRIPTION": "The Community ID of the instance from which this the source system record was extracted. This is populated only if you use IntraConnect.",
   "TABLE_NAME": "HOSPITAL_TRANSACTIONS"
  },
  {
   "COLUMN_NAME": "CM_PHY_OWNER_ID",
-  "DESCRIPTION": "The Community ID (CID) of the instance that owns this the source system record. This is populated only if you use IntraConnect.",
+  "DESCRIPTION": "The Community ID of the instance that owns this the source system record. This is populated only if you use IntraConnect.",
   "TABLE_NAME": "HOSPITAL_TRANSACTIONS"
  },
  {
@@ -8381,7 +8381,7 @@
  },
  {
   "COLUMN_NAME": "DFLT_PROC_DESC",
-  "DESCRIPTION": "This column stores the original description of the procedure stored in the procedure record's Name History (I EAP 6), which appears in Procedure Editor as Name. This item is only populated if the description for the procedure was overridden in charge entry.",
+  "DESCRIPTION": "This column stores the original description of the procedure stored in the procedure record's Name History, which appears in Procedure Editor as Name. This item is only populated if the description for the procedure was overridden in charge entry.",
   "TABLE_NAME": "HOSPITAL_TRANSACTIONS"
  },
  {
@@ -8696,7 +8696,7 @@
  },
  {
   "COLUMN_NAME": "PATIENT_SERIAL_NUM",
-  "DESCRIPTION": "The PATIENTS Serial Number is stored in item 2090 of the Enterprise PATIENTS (EPT) master file.",
+  "DESCRIPTION": "The PATIENTS Serial Number is stored in item 2090 of the Enterprise PATIENTS master file.",
   "TABLE_NAME": "HOSPITAL_TRANSACTIONS"
  },
  {
@@ -8781,7 +8781,7 @@
  },
  {
   "COLUMN_NAME": "PROCEDURE_DESC",
-  "DESCRIPTION": "This column stores the value manually entered for the procedure description at the time of charge entry. If no value was manually entered, then the procedure record's Name History (I EAP 6) is populated here.",
+  "DESCRIPTION": "This column stores the value manually entered for the procedure description at the time of charge entry. If no value was manually entered, then the procedure record's Name History is populated here.",
   "TABLE_NAME": "HOSPITAL_TRANSACTIONS"
  },
  {
@@ -8886,17 +8886,17 @@
  },
  {
   "COLUMN_NAME": "RVU_MLPRACT",
-  "DESCRIPTION": "The malpractice RVU associated with the transaction (from EAP).",
+  "DESCRIPTION": "The malpractice RVU associated with the transaction (from procedure).",
   "TABLE_NAME": "HOSPITAL_TRANSACTIONS"
  },
  {
   "COLUMN_NAME": "RVU_OVERHEAD",
-  "DESCRIPTION": "The overhead RVU associated with this transaction (from EAP).",
+  "DESCRIPTION": "The overhead RVU associated with this transaction (from procedure).",
   "TABLE_NAME": "HOSPITAL_TRANSACTIONS"
  },
  {
   "COLUMN_NAME": "RVU_WORK",
-  "DESCRIPTION": "The work RVU associated with the transaction (from EAP).",
+  "DESCRIPTION": "The work RVU associated with the transaction (from procedure).",
   "TABLE_NAME": "HOSPITAL_TRANSACTIONS"
  },
  {
@@ -9216,7 +9216,7 @@
  },
  {
   "COLUMN_NAME": "LAB_ANTIBIOTIC_CODE",
-  "DESCRIPTION": "If component type is antibiotic, the component's antibiotic category used in the clinical system ORD 2210.",
+  "DESCRIPTION": "If component type is antibiotic, the component's antibiotic category used in the clinical system the source item.",
   "TABLE_NAME": "LAB_COMPONENTS"
  },
  {
@@ -9506,7 +9506,7 @@
  },
  {
   "COLUMN_NAME": "PERFORMING_ORG_INFO_LINE",
-  "DESCRIPTION": "This is used to indicate the performing organization information for the component. This item stores the line number of the ORD related group which is used to save the performing organization information.",
+  "DESCRIPTION": "This is used to indicate the performing organization information for the component. This item stores the line number of the order related group which is used to save the performing organization information.",
   "TABLE_NAME": "LAB_ORDER_RESULTS"
  },
  {
@@ -9601,17 +9601,17 @@
  },
  {
   "COLUMN_NAME": "RESULT_TREND_CODE",
-  "DESCRIPTION": "Trend status for the common name at the time logged in I ORD 2057 - Result Trend Audit Instant.",
+  "DESCRIPTION": "Trend status for the common name at the time logged in I the source item - Result Trend Audit Instant.",
   "TABLE_NAME": "LAB_ORDER_RESULTS"
  },
  {
   "COLUMN_NAME": "RESULT_TREND_NAME",
-  "DESCRIPTION": "Common name for which trend status (I ORD 2056) was calculated.",
+  "DESCRIPTION": "Common name for which trend status was calculated.",
   "TABLE_NAME": "LAB_ORDER_RESULTS"
  },
  {
   "COLUMN_NAME": "RESULT_TREND_UTC_DTTM",
-  "DESCRIPTION": "Instant trend status (I ORD 2056) was set.",
+  "DESCRIPTION": "Instant trend status was set.",
   "TABLE_NAME": "LAB_ORDER_RESULTS"
  },
  {
@@ -9666,12 +9666,12 @@
  },
  {
   "COLUMN_NAME": "SIGNATURE_END_LN",
-  "DESCRIPTION": "Gives the last line of I ORD 2090 that signatures for the related component are stored in",
+  "DESCRIPTION": "Gives the last line of I the source item that signatures for the related component are stored in",
   "TABLE_NAME": "LAB_ORDER_RESULTS"
  },
  {
   "COLUMN_NAME": "SIGNATURE_START_LN",
-  "DESCRIPTION": "Gives the first line of I ORD 2090 that signatures for the related component are stored in",
+  "DESCRIPTION": "Gives the first line of I the source item that signatures for the related component are stored in",
   "TABLE_NAME": "LAB_ORDER_RESULTS"
  },
  {
@@ -9686,37 +9686,37 @@
  },
  {
   "COLUMN_NAME": "ADDED_TO_BACKGROUND_AVATAR_CODE",
-  "DESCRIPTION": "The avatar type that was used to add this LDA.",
+  "DESCRIPTION": "The avatar type that was used to add this device.",
   "TABLE_NAME": "LINE_DEVICE_AIRWAY"
  },
  {
   "COLUMN_NAME": "AVATAR_CALCULATED_RECORD_ID",
-  "DESCRIPTION": "Used to store the current region (VEL) record calculated from the Lines/Drains/Airways (LDA) properties and the Avatar LDA Mapping Configuration.",
+  "DESCRIPTION": "Used to store the current region (VEL) record calculated from the Lines/Drains/Airways (device) properties and the Avatar device Mapping Configuration.",
   "TABLE_NAME": "LINE_DEVICE_AIRWAY"
  },
  {
   "COLUMN_NAME": "AVATAR_ORIENT_CODE",
-  "DESCRIPTION": "The orientation of the avatar when this LDA was inserted.",
+  "DESCRIPTION": "The orientation of the avatar when this device was inserted.",
   "TABLE_NAME": "LINE_DEVICE_AIRWAY"
  },
  {
   "COLUMN_NAME": "AVATAR_PROPERTY_OVERRIDE_FLAG",
-  "DESCRIPTION": "Specifies whether the current region for the LDA was determined by a user override and may not have been calculated from the property values.",
+  "DESCRIPTION": "Specifies whether the current region for the device was determined by a user override and may not have been calculated from the property values.",
   "TABLE_NAME": "LINE_DEVICE_AIRWAY"
  },
  {
   "COLUMN_NAME": "AVATAR_RECORD_ID",
-  "DESCRIPTION": "The unique ID of the Anatomy record associated with the region in which this Line/Drain/Airway (LDA) is located on the LDA Avatar activity.",
+  "DESCRIPTION": "The unique ID of the Anatomy record associated with the region in which this Line/Drain/Airway (device) is located on the device Avatar activity.",
   "TABLE_NAME": "LINE_DEVICE_AIRWAY"
  },
  {
   "COLUMN_NAME": "AVATAR_X_COORDINATE",
-  "DESCRIPTION": "The x-coordinate for this LDA on the PATIENTS's Avatar.",
+  "DESCRIPTION": "The x-coordinate for this device on the PATIENTS's Avatar.",
   "TABLE_NAME": "LINE_DEVICE_AIRWAY"
  },
  {
   "COLUMN_NAME": "AVATAR_Y_COORDINATE",
-  "DESCRIPTION": "The y-coordinate for this LDA on the PATIENTS's Avatar.",
+  "DESCRIPTION": "The y-coordinate for this device on the PATIENTS's Avatar.",
   "TABLE_NAME": "LINE_DEVICE_AIRWAY"
  },
  {
@@ -9736,22 +9736,22 @@
  },
  {
   "COLUMN_NAME": "FLO_MEAS_ID",
-  "DESCRIPTION": "This item stores the Flowsheet ID that defines the structure of this record. It is the flowsheet group that is used to define the set of rows for the Line/Drain/Airway (LDA).",
+  "DESCRIPTION": "This item stores the Flowsheet ID that defines the structure of this record. It is the flowsheet group that is used to define the set of rows for the Line/Drain/Airway (device).",
   "TABLE_NAME": "LINE_DEVICE_AIRWAY"
  },
  {
   "COLUMN_NAME": "FSD_ID",
-  "DESCRIPTION": "This item stores the flowsheet data (FSD) ID of the record that has information about the properties of the line/drain/airway (LDA).",
+  "DESCRIPTION": "This item stores the flowsheet data (FSD) ID of the record that has information about the properties of the line/drain/airway (device).",
   "TABLE_NAME": "LINE_DEVICE_AIRWAY"
  },
  {
   "COLUMN_NAME": "IP_LDA_ID",
-  "DESCRIPTION": "The internal ID of the Lines/Drains/Airways (LDA) record.",
+  "DESCRIPTION": "The internal ID of the Lines/Drains/Airways (device) record.",
   "TABLE_NAME": "LINE_DEVICE_AIRWAY"
  },
  {
   "COLUMN_NAME": "LDA_GROUP_CDR",
-  "DESCRIPTION": "This column stores the contact date real of the Line/Drain/Airway (LDA) Group contact that created this LDA. This column is stored in the EMR system's datetime (DTE) format.",
+  "DESCRIPTION": "This column stores the contact date real of the Line/Drain/Airway (device) Group contact that created this device. This column is stored in the EMR system's datetime (DTE) format.",
   "TABLE_NAME": "LINE_DEVICE_AIRWAY"
  },
  {
@@ -9781,12 +9781,12 @@
  },
  {
   "COLUMN_NAME": "RECORDED_DTTM",
-  "DESCRIPTION": "The recorded time used in FLOWSHEET_MEASUREMENTS for storing the property data for this LDA.",
+  "DESCRIPTION": "The recorded time used in FLOWSHEET_MEASUREMENTS for storing the property data for this device.",
   "TABLE_NAME": "LINE_DEVICE_AIRWAY"
  },
  {
   "COLUMN_NAME": "REC_ARCHIVED_FLAG",
-  "DESCRIPTION": "Record archived status for LDA.",
+  "DESCRIPTION": "Record archived status for device.",
   "TABLE_NAME": "LINE_DEVICE_AIRWAY"
  },
  {
@@ -10006,12 +10006,12 @@
  },
  {
   "COLUMN_NAME": "EPT_PRIVACY_FLAG_CODE",
-  "DESCRIPTION": "The private hospital encounter flag category which will be set for confidential cases and flags (in EPT).",
+  "DESCRIPTION": "The private hospital encounter flag category which will be set for confidential cases and flags (in patient).",
   "TABLE_NAME": "LOCATIONS"
  },
  {
   "COLUMN_NAME": "FACILITY_ID",
-  "DESCRIPTION": "Facility ID is the CID of the facility level within an IntraConnect neighborhood. The local Facility ID in an environment (including non-IC environments) is always 1; this column performs the standard the EMR CID translation.",
+  "DESCRIPTION": "Facility ID is the contact of the facility level within an IntraConnect neighborhood. The local Facility ID in an environment (including non-IC environments) is always 1; this column performs the standard the EMR contact translation.",
   "TABLE_NAME": "LOCATIONS"
  },
  {
@@ -10366,7 +10366,7 @@
  },
  {
   "COLUMN_NAME": "EQUIP_STATUS_FLAG",
-  "DESCRIPTION": "This column indicates whether the ERX record is equipment.",
+  "DESCRIPTION": "This column indicates whether the medication record is equipment.",
   "TABLE_NAME": "MEDICATIONS"
  },
  {
@@ -10381,7 +10381,7 @@
  },
  {
   "COLUMN_NAME": "GPI",
-  "DESCRIPTION": "The Generic Product Identifier for the medication: first line of Item ERX 210.",
+  "DESCRIPTION": "The Generic Product Identifier for the medication: first line of Item the source item.",
   "TABLE_NAME": "MEDICATIONS"
  },
  {
@@ -10396,7 +10396,7 @@
  },
  {
   "COLUMN_NAME": "MED_IS_CONFIGURED_CODE",
-  "DESCRIPTION": "Whether this ERX record is ready for use. This column returns the category number for 'Configured?' setting in ERX records. This is usually the same as the internal ID. If you use IntraConnect, this is the Community ID (CID).",
+  "DESCRIPTION": "Whether this medication record is ready for use. This column returns the category number for 'Configured?' setting in medication records. This is usually the same as the internal ID. If you use IntraConnect, this is the Community ID.",
   "TABLE_NAME": "MEDICATIONS"
  },
  {
@@ -10491,12 +10491,12 @@
  },
  {
   "COLUMN_NAME": "CM_LOG_OWNER_ID",
-  "DESCRIPTION": "The Community ID (CID) of the instance from which this record or line was extracted. This is only populated if you use IntraConnect.",
+  "DESCRIPTION": "The Community ID of the instance from which this record or line was extracted. This is only populated if you use IntraConnect.",
   "TABLE_NAME": "MEDICATION_ORDERS"
  },
  {
   "COLUMN_NAME": "CM_PHY_OWNER_ID",
-  "DESCRIPTION": "The Community ID (CID) of the instance that owns this record or line. This is only populated if you use IntraConnect.",
+  "DESCRIPTION": "The Community ID of the instance that owns this record or line. This is only populated if you use IntraConnect.",
   "TABLE_NAME": "MEDICATION_ORDERS"
  },
  {
@@ -10881,7 +10881,7 @@
  },
  {
   "COLUMN_NAME": "ORDER_MED_ID",
-  "DESCRIPTION": "The unique ID of the order record associated with this medication order. This is an internal unique identifier for ORD master file records in this table and cannot be used to link to MEDICATIONS.",
+  "DESCRIPTION": "The unique ID of the order record associated with this medication order. This is an internal unique identifier for order master file records in this table and cannot be used to link to MEDICATIONS.",
   "TABLE_NAME": "MEDICATION_ORDERS"
  },
  {
@@ -10906,7 +10906,7 @@
  },
  {
   "COLUMN_NAME": "ORD_CREATR_USER_ID",
-  "DESCRIPTION": "The EMP ID (.1) of the user who signed the order (for a non-signed and held order) or the last person who performed a sign and hold or release action for a signed and held order.",
+  "DESCRIPTION": "The employee ID (.1) of the user who signed the order (for a non-signed and held order) or the last person who performed a sign and hold or release action for a signed and held order.",
   "TABLE_NAME": "MEDICATION_ORDERS"
  },
  {
@@ -10936,7 +10936,7 @@
  },
  {
   "COLUMN_NAME": "ENCOUNTER_ID",
-  "DESCRIPTION": "The unique encounter identifier (ENC_ID) for the PATIENTS contact associated with this medication order. This number is unique across patients and encounters in your system. If you use IntraConnect, this is the Unique Contact Identifier (UCI).",
+  "DESCRIPTION": "The unique encounter identifier (ENC_ID) for the PATIENTS contact associated with this medication order. This number is unique across patients and encounters in your system. If you use IntraConnect, this is the Unique Contact Identifier.",
   "TABLE_NAME": "MEDICATION_ORDERS"
  },
  {
@@ -11371,7 +11371,7 @@
  },
  {
   "COLUMN_NAME": "PENDED_PREV_SIG",
-  "DESCRIPTION": "*** Deprecated *** This column has been replaced by column PENDED_PREV_SIG (ORD 540) in table ORDER_MED_7. To look up the deprecated column's value after the EMR system upgrade, use the column PENDED_PREV_SIG in table ORDER_MED_7 to get the PENDED_PREV_SIG value.",
+  "DESCRIPTION": "*** Deprecated *** This column has been replaced by column PENDED_PREV_SIG in table ORDER_MED_7. To look up the deprecated column's value after the EMR system upgrade, use the column PENDED_PREV_SIG in table ORDER_MED_7 to get the PENDED_PREV_SIG value.",
   "TABLE_NAME": "MEDICATION_ORDERS_EXT"
  },
  {
@@ -11386,7 +11386,7 @@
  },
  {
   "COLUMN_NAME": "PEND_REF_REAS_COMM",
-  "DESCRIPTION": "Extracts the comment attached to the pend refusal reason (I ORD 7706)",
+  "DESCRIPTION": "Extracts the comment attached to the pend refusal reason",
   "TABLE_NAME": "MEDICATION_ORDERS_EXT"
  },
  {
@@ -11441,7 +11441,7 @@
  },
  {
   "COLUMN_NAME": "SIG_BEFOREEDIT",
-  "DESCRIPTION": "*** Deprecated *** This column has been replaced by column SIG_BEFOREEDIT (ORD 7059) in table ORDER_MED_7. To look up the deprecated column's value after the EMR system upgrade, use the column SIG_BEFOREEDIT in table ORDER_MED_7 to get the SIG_BEFOREEDIT value. The field saves the calculated sig at the time of the last edit or translation.",
+  "DESCRIPTION": "*** Deprecated *** This column has been replaced by column SIG_BEFOREEDIT in table ORDER_MED_7. To look up the deprecated column's value after the EMR system upgrade, use the column SIG_BEFOREEDIT in table ORDER_MED_7 to get the SIG_BEFOREEDIT value. The field saves the calculated sig at the time of the last edit or translation.",
   "TABLE_NAME": "MEDICATION_ORDERS_EXT"
  },
  {
@@ -11486,7 +11486,7 @@
  },
  {
   "COLUMN_NAME": "TXT_AUTHPROV_NPI",
-  "DESCRIPTION": "If the authorizing provider for a medication is not currently an the EMR system provider (no SER record for this provider), free text provider items are used to save information about this provider. This item stores the National Provider ID (NPI) of the provider.",
+  "DESCRIPTION": "If the authorizing provider for a medication is not currently an the EMR system provider (no provider record for this provider), free text provider items are used to save information about this provider. This item stores the National Provider ID (NPI) of the provider.",
   "TABLE_NAME": "MEDICATION_ORDERS_EXT"
  },
  {
@@ -11706,7 +11706,7 @@
  },
  {
   "COLUMN_NAME": "MAR_DOC_USER_ID",
-  "DESCRIPTION": "User (EMP) ID of the user who documented the med administration. This item is null unless the administering user (ORD 11110) is different than the documenting user.",
+  "DESCRIPTION": "User ID of the user who documented the med administration. This item is null unless the administering user is different than the documenting user.",
   "TABLE_NAME": "MED_ADMIN_RECORDS"
  },
  {
@@ -11741,7 +11741,7 @@
  },
  {
   "COLUMN_NAME": "MAR_ORD_CONTACT_DATE_REAL",
-  "DESCRIPTION": "The ORD contact date for this administration in decimal format. The integer portion of the number indicates the date of the contact. The digits after the decimal distinguish different contacts on the same date and are unique for each contact on that date. For example, .00 is the first/only contact, .01 is the second contact, etc.",
+  "DESCRIPTION": "The order contact date for this administration in decimal format. The integer portion of the number indicates the date of the contact. The digits after the decimal distinguish different contacts on the same date and are unique for each contact on that date. For example, .00 is the first/only contact, .01 is the second contact, etc.",
   "TABLE_NAME": "MED_ADMIN_RECORDS"
  },
  {
@@ -11796,7 +11796,7 @@
  },
  {
   "COLUMN_NAME": "MED_OVERRIDE_COUNT",
-  "DESCRIPTION": "In table MED_ADMIN_RECORDS, the column MER_OVERRIDE_COUNT (ORD 11410) has been deprecated. This column has been replaced by MED_OVERRIDE_ALERT_ID. The deprecated columns data is no longer available since it is no longer extracted to the EMR. Previous Description:- The count of how many MAR override alerts are medication not scanned alerts.",
+  "DESCRIPTION": "In table MED_ADMIN_RECORDS, the column MER_OVERRIDE_COUNT has been deprecated. This column has been replaced by MED_OVERRIDE_ALERT_ID. The deprecated columns data is no longer available since it is no longer extracted to the EMR. Previous Description:- The count of how many MAR override alerts are medication not scanned alerts.",
   "TABLE_NAME": "MED_ADMIN_RECORDS"
  },
  {
@@ -11851,7 +11851,7 @@
  },
  {
   "COLUMN_NAME": "PATIENT_OVERRIDE_COUNT",
-  "DESCRIPTION": "In table MED_ADMIN_RECORDS, the column PATIENT_OVERRIDE_COUNT (ORD 11420) has been deprecated. This column has been replaced by PAT_OVERRIDE_ALERT_ID. The deprecated columns data is no longer available since it is no longer extracted to the EMR. Previous description: The count of how many MAR override alerts are PATIENTS not scanned alerts.",
+  "DESCRIPTION": "In table MED_ADMIN_RECORDS, the column PATIENT_OVERRIDE_COUNT has been deprecated. This column has been replaced by PAT_OVERRIDE_ALERT_ID. The deprecated columns data is no longer available since it is no longer extracted to the EMR. Previous description: The count of how many MAR override alerts are PATIENTS not scanned alerts.",
   "TABLE_NAME": "MED_ADMIN_RECORDS"
  },
  {
@@ -12111,7 +12111,7 @@
  },
  {
   "COLUMN_NAME": "APC_ALLERGY_CHECK",
-  "DESCRIPTION": "In table MED_DETAILS_EXT, the column APC_ALLERGY_CHECK (ERX 530) has been deprecated. The deprecated column's content/data is no longer available since it is no longer populated in the source system.",
+  "DESCRIPTION": "In table MED_DETAILS_EXT, the column APC_ALLERGY_CHECK has been deprecated. The deprecated column's content/data is no longer available since it is no longer populated in the source system.",
   "TABLE_NAME": "MED_DETAILS_EXT"
  },
  {
@@ -12221,7 +12221,7 @@
  },
  {
   "COLUMN_NAME": "DPC_DRG_DRG_INTRCT",
-  "DESCRIPTION": "In table MED_DETAILS_EXT, the column DPC_DRG_DRG_INTRCT (ERX 520) has been deprecated. The deprecated column's content/data is no longer available since it is no longer populated in the source system.",
+  "DESCRIPTION": "In table MED_DETAILS_EXT, the column DPC_DRG_DRG_INTRCT has been deprecated. The deprecated column's content/data is no longer available since it is no longer populated in the source system.",
   "TABLE_NAME": "MED_DETAILS_EXT"
  },
  {
@@ -12246,7 +12246,7 @@
  },
  {
   "COLUMN_NAME": "IMS_ENABLED_FLAG",
-  "DESCRIPTION": "*** Deprecated *** I ERX 190 has been changed from a Yes/No field to a category list with three options. In table MED_DETAILS_EXT, the column IMS_ENABLED_FLAG has been deprecated.",
+  "DESCRIPTION": "*** Deprecated *** I the source item has been changed from a Yes/No field to a category list with three options. In table MED_DETAILS_EXT, the column IMS_ENABLED_FLAG has been deprecated.",
   "TABLE_NAME": "MED_DETAILS_EXT"
  },
  {
@@ -12291,7 +12291,7 @@
  },
  {
   "COLUMN_NAME": "MDDB_RECORD_KEY",
-  "DESCRIPTION": "In table MED_DETAILS_EXT, the column MDDB_RECORD_KEY (ERX 510) has been deprecated. The deprecated column's content/data is no longer available since it is no longer populated in the source system.",
+  "DESCRIPTION": "In table MED_DETAILS_EXT, the column MDDB_RECORD_KEY has been deprecated. The deprecated column's content/data is no longer available since it is no longer populated in the source system.",
   "TABLE_NAME": "MED_DETAILS_EXT"
  },
  {
@@ -12406,7 +12406,7 @@
  },
  {
   "COLUMN_NAME": "PPC_PAT_CONS_MSG",
-  "DESCRIPTION": "In table MED_DETAILS_EXT, the column PPC_PAT_CONS_MSG (ERX 540) has been deprecated. The deprecated column's content/data is no longer available since it is no longer populated in the source system.",
+  "DESCRIPTION": "In table MED_DETAILS_EXT, the column PPC_PAT_CONS_MSG has been deprecated. The deprecated column's content/data is no longer available since it is no longer populated in the source system.",
   "TABLE_NAME": "MED_DETAILS_EXT"
  },
  {
@@ -12471,12 +12471,12 @@
  },
  {
   "COLUMN_NAME": "RX_NAME_VERIFY_ID",
-  "DESCRIPTION": "*** Deprecated *** In table MED_DETAILS_EXT, the column RX_NAME_VERIFY_ID (ERX 3010) has been deprecated. The deprecated column's content/data is no longer available since it is no longer populated in the source system.",
+  "DESCRIPTION": "*** Deprecated *** In table MED_DETAILS_EXT, the column RX_NAME_VERIFY_ID has been deprecated. The deprecated column's content/data is no longer available since it is no longer populated in the source system.",
   "TABLE_NAME": "MED_DETAILS_EXT"
  },
  {
   "COLUMN_NAME": "RX_SETTINGS_MED_ID",
-  "DESCRIPTION": "This item points to an ERX record to use for various configuration settings.",
+  "DESCRIPTION": "This item points to an medication record to use for various configuration settings.",
   "TABLE_NAME": "MED_DETAILS_EXT"
  },
  {
@@ -12521,7 +12521,7 @@
  },
  {
   "COLUMN_NAME": "STRENGTH_UNIT_CODE",
-  "DESCRIPTION": "Stores information related to Strength unit in category format. It is similar to ERX-1106 which stores it in string format. Enter the strength unit for the corresponding strength of this NDC version of the drug. This strength unit will be used for Intelligent Medication Selection determination.",
+  "DESCRIPTION": "Stores information related to Strength unit in category format. It is similar to the source item which stores it in string format. Enter the strength unit for the corresponding strength of this NDC version of the drug. This strength unit will be used for Intelligent Medication Selection determination.",
   "TABLE_NAME": "MED_DETAILS_EXT"
  },
  {
@@ -12611,7 +12611,7 @@
  },
  {
   "COLUMN_NAME": "CM_CT_OWNER_ID",
-  "DESCRIPTION": "The Community ID (CID) of the instance that owns this contact. This is only populated if you use IntraConnect.",
+  "DESCRIPTION": "The Community ID of the instance that owns this contact. This is only populated if you use IntraConnect.",
   "TABLE_NAME": "NOTE_ENCOUNTER_INFO"
  },
  {
@@ -12966,7 +12966,7 @@
  },
  {
   "COLUMN_NAME": "TRAN_WORK_COPY_ID",
-  "DESCRIPTION": "Pointer to an HNO record containing text edited from a transcription message. This text should not be available until accepted as part of the transcription process.",
+  "DESCRIPTION": "Pointer to an note record containing text edited from a transcription message. This text should not be available until accepted as part of the transcription process.",
   "TABLE_NAME": "NOTE_ENCOUNTER_INFO"
  },
  {
@@ -13066,7 +13066,7 @@
  },
  {
   "COLUMN_NAME": "NOTE_ID",
-  "DESCRIPTION": "The unique identifier (.1 item) for the note record.",
+  "DESCRIPTION": "The unique identifier  for the note record.",
   "TABLE_NAME": "NOTE_TEMPLATE_LIST_IDS"
  },
  {
@@ -13096,7 +13096,7 @@
  },
  {
   "COLUMN_NAME": "NOTE_ID",
-  "DESCRIPTION": "The unique identifier (.1 item) for the note record.",
+  "DESCRIPTION": "The unique identifier  for the note record.",
   "TABLE_NAME": "NOTE_TEMPLATE_TEXT_IDS"
  },
  {
@@ -13171,7 +13171,7 @@
  },
  {
   "COLUMN_NAME": "CM_CT_OWNER_ID",
-  "DESCRIPTION": "The Community ID (CID) of the instance that owns this contact. This is only populated if you use IntraConnect.",
+  "DESCRIPTION": "The Community ID of the instance that owns this contact. This is only populated if you use IntraConnect.",
   "TABLE_NAME": "ORDER_DISPENSE_INFO"
  },
  {
@@ -13186,7 +13186,7 @@
  },
  {
   "COLUMN_NAME": "DAW_REASON_CODE",
-  "DESCRIPTION": "The category number for dispense as written (DAW) reason. It can be specified when dispensing a brand package (NDC) for a prescription fill. This is usually the same as the internal ID. If you use IntraConnect, this is the Community ID (CID).",
+  "DESCRIPTION": "The category number for dispense as written (DAW) reason. It can be specified when dispensing a brand package (NDC) for a prescription fill. This is usually the same as the internal ID. If you use IntraConnect, this is the Community ID.",
   "TABLE_NAME": "ORDER_DISPENSE_INFO"
  },
  {
@@ -13526,12 +13526,12 @@
  },
  {
   "COLUMN_NAME": "RX_FRM_PHRM_USERNAM",
-  "DESCRIPTION": "This is the name of the user that authorized the outgoing prescription transfer (typically a pharmacist) when the user does not exist in the User (EMP) master file.",
+  "DESCRIPTION": "This is the name of the user that authorized the outgoing prescription transfer (typically a pharmacist) when the user does not exist in the User master file.",
   "TABLE_NAME": "ORDER_DISPENSE_INFO"
  },
  {
   "COLUMN_NAME": "RX_FRM_PHRM_USER_ID",
-  "DESCRIPTION": "This is the user that authorized the outgoing prescription transfer (typically a pharmacist) when the user exists in the User (EMP) master file.",
+  "DESCRIPTION": "This is the user that authorized the outgoing prescription transfer (typically a pharmacist) when the user exists in the User master file.",
   "TABLE_NAME": "ORDER_DISPENSE_INFO"
  },
  {
@@ -13561,12 +13561,12 @@
  },
  {
   "COLUMN_NAME": "RX_TO_PHRM_USERNAM",
-  "DESCRIPTION": "This is the name of the user that authorized the incoming prescription transfer (typically a pharmacist) when the user does not exist in the User (EMP) master file.",
+  "DESCRIPTION": "This is the name of the user that authorized the incoming prescription transfer (typically a pharmacist) when the user does not exist in the User master file.",
   "TABLE_NAME": "ORDER_DISPENSE_INFO"
  },
  {
   "COLUMN_NAME": "RX_TO_PHRM_USER_ID",
-  "DESCRIPTION": "This is the user that authorized the incoming prescription transfer (typically a pharmacist) when the user exists in the User (EMP) master file.",
+  "DESCRIPTION": "This is the user that authorized the incoming prescription transfer (typically a pharmacist) when the user exists in the User master file.",
   "TABLE_NAME": "ORDER_DISPENSE_INFO"
  },
  {
@@ -13631,12 +13631,12 @@
  },
  {
   "COLUMN_NAME": "CM_LOG_OWNER_ID",
-  "DESCRIPTION": "The Community ID (CID) of the instance from which this record or line was extracted. This is only populated if you use IntraConnect.",
+  "DESCRIPTION": "The Community ID of the instance from which this record or line was extracted. This is only populated if you use IntraConnect.",
   "TABLE_NAME": "ORDER_TRACKING_METRICS"
  },
  {
   "COLUMN_NAME": "CM_PHY_OWNER_ID",
-  "DESCRIPTION": "The Community ID (CID) of the instance that owns this record or line. This is only populated if you use IntraConnect.",
+  "DESCRIPTION": "The Community ID of the instance that owns this record or line. This is only populated if you use IntraConnect.",
   "TABLE_NAME": "ORDER_TRACKING_METRICS"
  },
  {
@@ -13646,7 +13646,7 @@
  },
  {
   "COLUMN_NAME": "CSGN_TURNAROUND_SEC",
-  "DESCRIPTION": "In table ORDER_TRACKING_METRICS, the column CSGN_TURNAROUND_SEC has been deprecated.  This column's data was not trustworthy, since it did not account for situations where an order required multiple signatures (e.g. a verbal order placed by a user who additionally required cosignature). To determine the amount of time from order signing to cosigning or verbal signature for a medication order, join MEDICATION_ORDERS.ORDER_MED_ID to ORDER_SIGNED_MED.ORDER_MED_ID and compare the time in ORDER_SIGNED_MED.CSGN_SIGNED_TIME (for cosigns - ORD/34855) or ORDER_SIGNED_MED.VERB_SIGNED_TIME (for verbal signature - ORD/34825) to the time in MEDICATION_ORDERS.ORDER_INST. Alternately, join ORDER_TRACKING_METRICS.ORDER_ID to ORDER_SIGNED_MED.ORDER_MED_ID and compare against ORDER_TRACKING_METRICS.ORDER_DTTM.",
+  "DESCRIPTION": "In table ORDER_TRACKING_METRICS, the column CSGN_TURNAROUND_SEC has been deprecated.  This column's data was not trustworthy, since it did not account for situations where an order required multiple signatures (e.g. a verbal order placed by a user who additionally required cosignature). To determine the amount of time from order signing to cosigning or verbal signature for a medication order, join MEDICATION_ORDERS.ORDER_MED_ID to ORDER_SIGNED_MED.ORDER_MED_ID and compare the time in ORDER_SIGNED_MED.CSGN_SIGNED_TIME (for cosigns - order/34855) or ORDER_SIGNED_MED.VERB_SIGNED_TIME (for verbal signature - order/34825) to the time in MEDICATION_ORDERS.ORDER_INST. Alternately, join ORDER_TRACKING_METRICS.ORDER_ID to ORDER_SIGNED_MED.ORDER_MED_ID and compare against ORDER_TRACKING_METRICS.ORDER_DTTM.",
   "TABLE_NAME": "ORDER_TRACKING_METRICS"
  },
  {
@@ -13686,7 +13686,7 @@
  },
  {
   "COLUMN_NAME": "FIRST_FINAL_LOC_DTTM",
-  "DESCRIPTION": "The instant final results were first made available on the chart. This is the result contact instant (ORD-1970) from the first contact where the procedure result status (ORD-115) is 3-Final result.",
+  "DESCRIPTION": "The instant final results were first made available on the chart. This is the result contact instant from the first contact where the procedure result status is 3-Final result.",
   "TABLE_NAME": "ORDER_TRACKING_METRICS"
  },
  {
@@ -13716,7 +13716,7 @@
  },
  {
   "COLUMN_NAME": "ORDERING_USER_ID",
-  "DESCRIPTION": "The EMP ID (.1) of the user who signed or signed and held the order.",
+  "DESCRIPTION": "The employee ID (.1) of the user who signed or signed and held the order.",
   "TABLE_NAME": "ORDER_TRACKING_METRICS"
  },
  {
@@ -13766,22 +13766,22 @@
  },
  {
   "COLUMN_NAME": "ORD_WORKSTATION_ID",
-  "DESCRIPTION": "The unique ID associated with the ordering workstation record on which this order was first signed. For most orders, this is ORD 80, but for sign+held orders, this comes from ORD 34430.",
+  "DESCRIPTION": "The unique ID associated with the ordering workstation record on which this order was first signed. For most orders, this is the source item, but for sign+held orders, this comes from the source item.",
   "TABLE_NAME": "ORDER_TRACKING_METRICS"
  },
  {
   "COLUMN_NAME": "ORIGINAL_SESSIONKEY",
-  "DESCRIPTION": "The original session in which this order was created. (In a few cases, this may be earlier than the ORD-455 sessionkey if you pend an order set, then add an order to it after unpending.) Used by discontinue logic for locating all related orders, even if they are not all signed at the same time.",
+  "DESCRIPTION": "The original session in which this order was created. (In a few cases, this may be earlier than the the source item sessionkey if you pend an order set, then add an order to it after unpending.) Used by discontinue logic for locating all related orders, even if they are not all signed at the same time.",
   "TABLE_NAME": "ORDER_TRACKING_METRICS"
  },
  {
   "COLUMN_NAME": "ORIG_AUTH_PROV_ID",
-  "DESCRIPTION": "This will hold the SER ID of the authorizing provider at the time the order was signed or sign & held.",
+  "DESCRIPTION": "This will hold the provider ID of the authorizing provider at the time the order was signed or sign & held.",
   "TABLE_NAME": "ORDER_TRACKING_METRICS"
  },
  {
   "COLUMN_NAME": "ORIG_ORD_PROV_ID",
-  "DESCRIPTION": "This will hold the SER ID of the ordering provider at the time the order was signed or sign & held.",
+  "DESCRIPTION": "This will hold the provider ID of the ordering provider at the time the order was signed or sign & held.",
   "TABLE_NAME": "ORDER_TRACKING_METRICS"
  },
  {
@@ -13791,7 +13791,7 @@
  },
  {
   "COLUMN_NAME": "ENCOUNTER_ID",
-  "DESCRIPTION": "The unique encounter identifier for the PATIENTS contact associated with this order. This number is unique across patients and encounters in your system. If you use IntraConnect this is the Unique Contact Identifier (UCI).",
+  "DESCRIPTION": "The unique encounter identifier for the PATIENTS contact associated with this order. This number is unique across patients and encounters in your system. If you use IntraConnect this is the Unique Contact Identifier.",
   "TABLE_NAME": "ORDER_TRACKING_METRICS"
  },
  {
@@ -13951,12 +13951,12 @@
  },
  {
   "COLUMN_NAME": "ADD_LINE_1",
-  "DESCRIPTION": "This column, although not deprecated, should no longer be used. Instead you should use the column ADDRESS (EPT 50) in table PAT_ADDRESS. PATIENTS addresses can contain an unlimited number of lines. Previously you could only access the first two lines with the columns PATIENTS.ADD_LINE_1 and PATIENTS.ADD_LINE_2. Now, there is a new table, called PAT_ADDRESS, which allows you to get all lines of the PATIENTS's permanent address. We have chosen not to deprecate PATIENTS.ADD_LINE_1 and PATIENTS.ADD_LINE_2 because doing so would break any custom reports that use these columns. To use the new column, join column PATIENTS.PATIENT_ID to table PAT_ADDRESS on column PATIENT_ID and get the ADDRESS value and also the LINE value. Each PATIENT_ID value represents a different PATIENTS, and each LINE value represents a different line of that PATIENTS's address.",
+  "DESCRIPTION": "This column, although not deprecated, should no longer be used. Instead you should use the column ADDRESS in table PAT_ADDRESS. PATIENTS addresses can contain an unlimited number of lines. Previously you could only access the first two lines with the columns PATIENTS.ADD_LINE_1 and PATIENTS.ADD_LINE_2. Now, there is a new table, called PAT_ADDRESS, which allows you to get all lines of the PATIENTS's permanent address. We have chosen not to deprecate PATIENTS.ADD_LINE_1 and PATIENTS.ADD_LINE_2 because doing so would break any custom reports that use these columns. To use the new column, join column PATIENTS.PATIENT_ID to table PAT_ADDRESS on column PATIENT_ID and get the ADDRESS value and also the LINE value. Each PATIENT_ID value represents a different PATIENTS, and each LINE value represents a different line of that PATIENTS's address.",
   "TABLE_NAME": "PATIENTS"
  },
  {
   "COLUMN_NAME": "ADD_LINE_2",
-  "DESCRIPTION": "This column, although not deprecated, should no longer be used. Instead you should use the column ADDRESS (EPT 50) in table PAT_ADDRESS. PATIENTS addresses can contain an unlimited number of lines. Previously you could only access the first two lines with the columns PATIENTS.ADD_LINE_1 and PATIENTS.ADD_LINE_2. Now, there is a new table, called PAT_ADDRESS, which allows you to get all lines of the PATIENTS's permanent address. We have chosen not to deprecate PATIENTS.ADD_LINE_1 and PATIENTS.ADD_LINE_2 because doing so would break any custom reports that use these columns. To use the new column, join column PATIENTS.PATIENT_ID to table PAT_ADDRESS on column PATIENT_ID and get the ADDRESS value and also the LINE value. Each PATIENT_ID value represents a different PATIENTS, and each LINE value represents a different line of that PATIENTS's address.",
+  "DESCRIPTION": "This column, although not deprecated, should no longer be used. Instead you should use the column ADDRESS in table PAT_ADDRESS. PATIENTS addresses can contain an unlimited number of lines. Previously you could only access the first two lines with the columns PATIENTS.ADD_LINE_1 and PATIENTS.ADD_LINE_2. Now, there is a new table, called PAT_ADDRESS, which allows you to get all lines of the PATIENTS's permanent address. We have chosen not to deprecate PATIENTS.ADD_LINE_1 and PATIENTS.ADD_LINE_2 because doing so would break any custom reports that use these columns. To use the new column, join column PATIENTS.PATIENT_ID to table PAT_ADDRESS on column PATIENT_ID and get the ADDRESS value and also the LINE value. Each PATIENT_ID value represents a different PATIENTS, and each LINE value represents a different line of that PATIENTS's address.",
   "TABLE_NAME": "PATIENTS"
  },
  {
@@ -14561,12 +14561,12 @@
  },
  {
   "COLUMN_NAME": "TMP_ADDR_LINE_1",
-  "DESCRIPTION": "This column, although not deprecated, should no longer be used. Instead you should use the column TEMP_ADDRESS (EPT 5430) in table PAT_TEMP_ST_ADDR. PATIENTS addresses can contain an unlimited number of lines. Previously you could only access the first two lines with the columns PATIENTS.TMP_ADDR_LINE_1 and PATIENTS.TMP_ADDR_LINE_2. PAT_TEMP_ST_ADDR allows you to get all lines of the PATIENTS's temporary address. We have chosen not to deprecate PATIENTS.TMP_ADDR_LINE_1 and PATIENTS.TMP_ADDR_LINE_2 because doing so would break any custom reports that use these columns. To use the new column, join column PATIENTS.PATIENT_ID to table PAT_TEMP_ST_ADDR on column PATIENT_ID and get the TEMP_ADDRESS and LINE values. Each PATIENT_ID value represents a different PATIENTS, and each LINE value represents a different line of that PATIENTS's temporary address.",
+  "DESCRIPTION": "This column, although not deprecated, should no longer be used. Instead you should use the column TEMP_ADDRESS in table PAT_TEMP_ST_ADDR. PATIENTS addresses can contain an unlimited number of lines. Previously you could only access the first two lines with the columns PATIENTS.TMP_ADDR_LINE_1 and PATIENTS.TMP_ADDR_LINE_2. PAT_TEMP_ST_ADDR allows you to get all lines of the PATIENTS's temporary address. We have chosen not to deprecate PATIENTS.TMP_ADDR_LINE_1 and PATIENTS.TMP_ADDR_LINE_2 because doing so would break any custom reports that use these columns. To use the new column, join column PATIENTS.PATIENT_ID to table PAT_TEMP_ST_ADDR on column PATIENT_ID and get the TEMP_ADDRESS and LINE values. Each PATIENT_ID value represents a different PATIENTS, and each LINE value represents a different line of that PATIENTS's temporary address.",
   "TABLE_NAME": "PATIENTS"
  },
  {
   "COLUMN_NAME": "TMP_ADDR_LINE_2",
-  "DESCRIPTION": "This column, although not deprecated, should no longer be used. Instead you should use the column TEMP_ADDRESS (EPT 5430) in table PAT_TEMP_ST_ADDR. PATIENTS addresses can contain an unlimited number of lines. Previously you could only access the first two lines with the columns PATIENTS.TMP_ADDR_LINE_1 and PATIENTS.TMP_ADDR_LINE_2. PAT_TEMP_ST_ADDR allows you to get all lines of the PATIENTS's temporary address. We have chosen not to deprecate PATIENTS.TMP_ADDR_LINE_1 and PATIENTS.TMP_ADDR_LINE_2 because doing so would break any custom reports that use these columns. To use the new column, join column PATIENTS.PATIENT_ID to table PAT_TEMP_ST_ADDR on column PATIENT_ID and get the TEMP_ADDRESS and LINE values. Each PATIENT_ID value represents a different PATIENTS, and each LINE value represents a different line of that PATIENTS's temporary address.",
+  "DESCRIPTION": "This column, although not deprecated, should no longer be used. Instead you should use the column TEMP_ADDRESS in table PAT_TEMP_ST_ADDR. PATIENTS addresses can contain an unlimited number of lines. Previously you could only access the first two lines with the columns PATIENTS.TMP_ADDR_LINE_1 and PATIENTS.TMP_ADDR_LINE_2. PAT_TEMP_ST_ADDR allows you to get all lines of the PATIENTS's temporary address. We have chosen not to deprecate PATIENTS.TMP_ADDR_LINE_1 and PATIENTS.TMP_ADDR_LINE_2 because doing so would break any custom reports that use these columns. To use the new column, join column PATIENTS.PATIENT_ID to table PAT_TEMP_ST_ADDR on column PATIENT_ID and get the TEMP_ADDRESS and LINE values. Each PATIENT_ID value represents a different PATIENTS, and each LINE value represents a different line of that PATIENTS's temporary address.",
   "TABLE_NAME": "PATIENTS"
  },
  {
@@ -14771,17 +14771,17 @@
  },
  {
   "COLUMN_NAME": "ARVL_LST_DL_TIME",
-  "DESCRIPTION": "The date and time the encounter was deleted from the arrival list. NOTE: This column will try to pull from the ARRIVAL LIST DELETE WHEN item (EPT 7233) first, then if it finds nothing there it will pull from AUDITED INSTANT (EPT 7544).",
+  "DESCRIPTION": "The date and time the encounter was deleted from the arrival list. NOTE: This column will try to pull from the ARRIVAL LIST DELETE WHEN item first, then if it finds nothing there it will pull from AUDITED INSTANT.",
   "TABLE_NAME": "PATIENT_ENCOUNTERS"
  },
  {
   "COLUMN_NAME": "ARVL_LST_DL_USR_ID",
-  "DESCRIPTION": "The unique ID of the system user who removed the encounter from the arrival list. This ID may be encrypted. NOTE: This column will try to pull from the ARRIVAL LIST DELETE BY WHOM item (EPT 7234) first, then if it finds nothing there it will pull from AUDITED USER ID (EPT 7543).",
+  "DESCRIPTION": "The unique ID of the system user who removed the encounter from the arrival list. This ID may be encrypted. NOTE: This column will try to pull from the ARRIVAL LIST DELETE BY WHOM item first, then if it finds nothing there it will pull from AUDITED USER ID.",
   "TABLE_NAME": "PATIENT_ENCOUNTERS"
  },
  {
   "COLUMN_NAME": "AR_EPISODE_ID",
-  "DESCRIPTION": "In the table PATIENT_ENCOUNTERS, the column AR_EPISODE_ID (EPT,2208) has been deprecated. The deprecated column's content/data is no longer available since it is no longer populated in the source system.",
+  "DESCRIPTION": "In the table PATIENT_ENCOUNTERS, the column AR_EPISODE_ID has been deprecated. The deprecated column's content/data is no longer available since it is no longer populated in the source system.",
   "TABLE_NAME": "PATIENT_ENCOUNTERS"
  },
  {
@@ -15006,12 +15006,12 @@
  },
  {
   "COLUMN_NAME": "EFFECTIVE_DATE_DT",
-  "DESCRIPTION": "The date of the encounter. The returned date is handled differently depending on the contact type of the encounter: If it is a surgery encounter, the date of the surgery will be returned. If it is a Hospital encounter, Admission/Discharge/Transfer (ADT) info will be used to return an appropriate date. If ADT info cannot be found, then the Hospital Admission date (I EPT 18850) will be returned. If the Hospital Admission Date cannot be found, the temporary admission date (I EPT 18846) will be returned..",
+  "DESCRIPTION": "The date of the encounter. The returned date is handled differently depending on the contact type of the encounter: If it is a surgery encounter, the date of the surgery will be returned. If it is a Hospital encounter, Admission/Discharge/Transfer (ADT) info will be used to return an appropriate date. If ADT info cannot be found, then the Hospital Admission date will be returned. If the Hospital Admission Date cannot be found, the temporary admission date will be returned..",
   "TABLE_NAME": "PATIENT_ENCOUNTERS"
  },
  {
   "COLUMN_NAME": "EFFECTIVE_DATE_DTTM",
-  "DESCRIPTION": "The start date and time of an encounter. The start date is pulled from the date stored in the EFFECTIVE_DATE_DT column. The time references the first populated time in the following fields: hospital admission time (EPT 18851), hospital temporary admission time (EPT 18847), ADT arrival time (EPT 10815), and expected admission time (EPT 10300). The SlicerDicer reporting application uses this column to determine the EffectiveStartDate of encounters.",
+  "DESCRIPTION": "The start date and time of an encounter. The start date is pulled from the date stored in the EFFECTIVE_DATE_DT column. The time references the first populated time in the following fields: hospital admission time, hospital temporary admission time, ADT arrival time, and expected admission time. The SlicerDicer reporting application uses this column to determine the EffectiveStartDate of encounters.",
   "TABLE_NAME": "PATIENT_ENCOUNTERS"
  },
  {
@@ -15346,7 +15346,7 @@
  },
  {
   "COLUMN_NAME": "VISIT_PROV_TITLE",
-  "DESCRIPTION": "The visit provider\u2019s provider title (SER 95). See VISIT_PROV_ID above for the definition of visit provider.",
+  "DESCRIPTION": "The visit provider\u2019s provider title. See VISIT_PROV_ID above for the definition of visit provider.",
   "TABLE_NAME": "PATIENT_ENCOUNTERS"
  },
  {
@@ -15361,7 +15361,7 @@
  },
  {
   "COLUMN_NAME": "WC_TPL_VISIT_CMT",
-  "DESCRIPTION": "Comments related to anticipated account type stored in EPT 2245",
+  "DESCRIPTION": "Comments related to anticipated account type stored in the source item",
   "TABLE_NAME": "PATIENT_ENCOUNTERS"
  },
  {
@@ -15381,7 +15381,7 @@
  },
  {
   "COLUMN_NAME": "ADMIN_PX_ERX_ID",
-  "DESCRIPTION": "\"ERX for configuring some of the \"\"MAR\"\" administration behaviors of this administrable procedure.\"",
+  "DESCRIPTION": "\"medication for configuring some of the \"\"MAR\"\" administration behaviors of this administrable procedure.\"",
   "TABLE_NAME": "PROCEDURES_CATALOG"
  },
  {
@@ -15621,7 +15621,7 @@
  },
  {
   "COLUMN_NAME": "EXT_CROSS_REF_CODE",
-  "DESCRIPTION": "Stores the external cross reference code for the EAP record (used by Tapestry to store the UBC Revenue Code, as an override for the value stored in EAP 100)",
+  "DESCRIPTION": "Stores the external cross reference code for the procedure record (used by Tapestry to store the UBC Revenue Code, as an override for the value stored in the source item)",
   "TABLE_NAME": "PROCEDURES_CATALOG"
  },
  {
@@ -15751,7 +15751,7 @@
  },
  {
   "COLUMN_NAME": "NAME",
-  "DESCRIPTION": "In table PROCEDURES_CATALOG, the column NAME (EAP-90) has been deprecated. The deprecated column's content/data is no longer available since it is no longer populated in the source system. The deprecated column's content/data is no longer available since it is no longer extracted to the EMR Desc: The name for this procedure.",
+  "DESCRIPTION": "In table PROCEDURES_CATALOG, the column NAME has been deprecated. The deprecated column's content/data is no longer available since it is no longer populated in the source system. The deprecated column's content/data is no longer available since it is no longer extracted to the EMR Desc: The name for this procedure.",
   "TABLE_NAME": "PROCEDURES_CATALOG"
  },
  {
@@ -15781,7 +15781,7 @@
  },
  {
   "COLUMN_NAME": "PRINT_DESC_FLAG",
-  "DESCRIPTION": "Indicates whether the procedure description will print on claim forms for this procedure. If this flag is blank, the system will look at EAP-250 (ENTER DESCRIPTION?). If that is marked as Yes then the procedure description will print on the claim forms.",
+  "DESCRIPTION": "Indicates whether the procedure description will print on claim forms for this procedure. If this flag is blank, the system will look at the source item (ENTER DESCRIPTION?). If that is marked as Yes then the procedure description will print on the claim forms.",
   "TABLE_NAME": "PROCEDURES_CATALOG"
  },
  {
@@ -15806,7 +15806,7 @@
  },
  {
   "COLUMN_NAME": "PROC_DEFAULT_ORD_ID",
-  "DESCRIPTION": "This item holds the default orderable EAP",
+  "DESCRIPTION": "This item holds the default orderable procedure",
   "TABLE_NAME": "PROCEDURES_CATALOG"
  },
  {
@@ -16036,7 +16036,7 @@
  },
  {
   "COLUMN_NAME": "SURG_HIST_ID",
-  "DESCRIPTION": "Stores the EAP ID of the linked surgical history procedure which should be used to update surgical history when this procedure is documented as having been performed.",
+  "DESCRIPTION": "Stores the procedure ID of the linked surgical history procedure which should be used to update surgical history when this procedure is documented as having been performed.",
   "TABLE_NAME": "PROCEDURES_CATALOG"
  },
  {
@@ -16151,12 +16151,12 @@
  },
  {
   "COLUMN_NAME": "CM_LOG_OWNER_ID",
-  "DESCRIPTION": "The Community ID (CID) of the instance from which this record or line was extracted. This is only populated if you use IntraConnect.",
+  "DESCRIPTION": "The Community ID of the instance from which this record or line was extracted. This is only populated if you use IntraConnect.",
   "TABLE_NAME": "PROCEDURE_ORDERS"
  },
  {
   "COLUMN_NAME": "CM_PHY_OWNER_ID",
-  "DESCRIPTION": "The Community ID (CID) of the instance that owns this record or line. This is only populated if you use IntraConnect.",
+  "DESCRIPTION": "The Community ID of the instance that owns this record or line. This is only populated if you use IntraConnect.",
   "TABLE_NAME": "PROCEDURE_ORDERS"
  },
  {
@@ -16376,7 +16376,7 @@
  },
  {
   "COLUMN_NAME": "ENCOUNTER_ID",
-  "DESCRIPTION": "The unique encounter identifier for this contact. This number is unique across patients and encounters in your system. If you use IntraConnect this is the Unique Contact Identifier (UCI).",
+  "DESCRIPTION": "The unique encounter identifier for this contact. This number is unique across patients and encounters in your system. If you use IntraConnect this is the Unique Contact Identifier.",
   "TABLE_NAME": "PROCEDURE_ORDERS"
  },
  {
@@ -16666,12 +16666,12 @@
  },
  {
   "COLUMN_NAME": "CM_LOG_OWNER_ID",
-  "DESCRIPTION": "The Community ID (CID) of the instance from which this record or line was extracted. This is only populated if you use IntraConnect.",
+  "DESCRIPTION": "The Community ID of the instance from which this record or line was extracted. This is only populated if you use IntraConnect.",
   "TABLE_NAME": "PROCEDURE_ORDERS_EXT"
  },
  {
   "COLUMN_NAME": "CM_PHY_OWNER_ID",
-  "DESCRIPTION": "The Community ID (CID) of the instance that owns this record or line. This is only populated if you use IntraConnect.",
+  "DESCRIPTION": "The Community ID of the instance that owns this record or line. This is only populated if you use IntraConnect.",
   "TABLE_NAME": "PROCEDURE_ORDERS_EXT"
  },
  {
@@ -16751,7 +16751,7 @@
  },
  {
   "COLUMN_NAME": "INSTANT_MET_DTTM",
-  "DESCRIPTION": "\"Stores the instant when the condition was marked as \"\"met/satisfied\"\" (ORD-1401) for an inpatient conditional order.\"",
+  "DESCRIPTION": "\"Stores the instant when the condition was marked as \"\"met/satisfied\"\" for an inpatient conditional order.\"",
   "TABLE_NAME": "PROCEDURE_ORDERS_EXT"
  },
  {
@@ -16781,7 +16781,7 @@
  },
  {
   "COLUMN_NAME": "LAB_CRT_CNCT_ENC_ID",
-  "DESCRIPTION": "The unique encounter identifier for the contact that was created from this order. This number is unique across all PATIENTS encounters in your system. If you use IntraConnect, this is the Unique Contact Identifier (UCI).",
+  "DESCRIPTION": "The unique encounter identifier for the contact that was created from this order. This number is unique across all PATIENTS encounters in your system. If you use IntraConnect, this is the Unique Contact Identifier.",
   "TABLE_NAME": "PROCEDURE_ORDERS_EXT"
  },
  {
@@ -16926,7 +16926,7 @@
  },
  {
   "COLUMN_NAME": "PATH_NARR_NOTE_ID",
-  "DESCRIPTION": "In table PROCEDURE_ORDERS_EXT, the column PATH_NARR_NOTE_ID (ORD-52323) has been deprecated. This column has been replaced by column PATH_NOTE_ID (RES-52341) in table ORDER_RES. To look up the deprecated column's value after the EMR system upgrade, join column ORDER_RAD_PATH_RES.FINDING_ID to table ORDER_RES column FINDING_ID and get the PATH_NOTE_ID value.",
+  "DESCRIPTION": "In table PROCEDURE_ORDERS_EXT, the column PATH_NARR_NOTE_ID has been deprecated. This column has been replaced by column PATH_NOTE_ID (RES-52341) in table ORDER_RES. To look up the deprecated column's value after the EMR system upgrade, join column ORDER_RAD_PATH_RES.FINDING_ID to table ORDER_RES column FINDING_ID and get the PATH_NOTE_ID value.",
   "TABLE_NAME": "PROCEDURE_ORDERS_EXT"
  },
  {
@@ -16951,7 +16951,7 @@
  },
  {
   "COLUMN_NAME": "PREV_POC_CODE",
-  "DESCRIPTION": "The phase of care for an order is stored in I ORD 61010. If the phase of care is not needed when the sign and held order is released, the phase of care stored in I ORD 61010 is moved to I ORD 61040 for tracking purposes. The phase of care stored in I ORD 61040 can still be used in the MAR activity to allow for continued phase of care grouping. The list of phases of care not needed when sign and held orders are released is stored in I LSD 61050.",
+  "DESCRIPTION": "The phase of care for an order is stored in I the source item. If the phase of care is not needed when the sign and held order is released, the phase of care stored in I the source item is moved to I the source item for tracking purposes. The phase of care stored in I the source item can still be used in the MAR activity to allow for continued phase of care grouping. The list of phases of care not needed when sign and held orders are released is stored in I LSD 61050.",
   "TABLE_NAME": "PROCEDURE_ORDERS_EXT"
  },
  {
@@ -17176,12 +17176,12 @@
  },
  {
   "COLUMN_NAME": "CM_LOG_OWNER_ID",
-  "DESCRIPTION": "The Community ID (CID) of the instance from which this record or line was extracted. This is only populated if you use IntraConnect.",
+  "DESCRIPTION": "The Community ID of the instance from which this record or line was extracted. This is only populated if you use IntraConnect.",
   "TABLE_NAME": "PROVIDERS"
  },
  {
   "COLUMN_NAME": "CM_PHY_OWNER_ID",
-  "DESCRIPTION": "The Community ID (CID) of the instance that owns this record or line. This is only populated if you use IntraConnect.",
+  "DESCRIPTION": "The Community ID of the instance that owns this record or line. This is only populated if you use IntraConnect.",
   "TABLE_NAME": "PROVIDERS"
  },
  {
@@ -17201,7 +17201,7 @@
  },
  {
   "COLUMN_NAME": "DBC_EXT_POS_ID",
-  "DESCRIPTION": "The unique ID of the EAF record that represents the external place of service for the provider. It is only for providers deemed external by the internal/external flag (I SER 190).",
+  "DESCRIPTION": "The unique ID of the EAF record that represents the external place of service for the provider. It is only for providers deemed external by the internal/external flag.",
   "TABLE_NAME": "PROVIDERS"
  },
  {
@@ -17261,7 +17261,7 @@
  },
  {
   "COLUMN_NAME": "ENC_PROV_FLAG",
-  "DESCRIPTION": "Determines whether the SER record can be used as a default encounter provider when creating quick encounters in the ambulatory EMR. Null is treated as yes.",
+  "DESCRIPTION": "Determines whether the provider record can be used as a default encounter provider when creating quick encounters in the ambulatory EMR. Null is treated as yes.",
   "TABLE_NAME": "PROVIDERS"
  },
  {
@@ -17271,7 +17271,7 @@
  },
  {
   "COLUMN_NAME": "EP_FLAG_FLAG",
-  "DESCRIPTION": "In table PROVIDERS, the column EP_FLAG_FLAG has been deprecated. The deprecated column's content/data is no longer available since it is no longer populated in the source system. Information about whether a SER record is considered an eligible professional can be found in the MU_EP_PROV_STATUS table.",
+  "DESCRIPTION": "In table PROVIDERS, the column EP_FLAG_FLAG has been deprecated. The deprecated column's content/data is no longer available since it is no longer populated in the source system. Information about whether a provider record is considered an eligible professional can be found in the MU_EP_PROV_STATUS table.",
   "TABLE_NAME": "PROVIDERS"
  },
  {
@@ -17726,7 +17726,7 @@
  },
  {
   "COLUMN_NAME": "TEAM_LEADER_ID",
-  "DESCRIPTION": "This column contains the provider ID (SER dot one) of the provider's team leader.",
+  "DESCRIPTION": "This column contains the provider ID of the provider's team leader.",
   "TABLE_NAME": "PROVIDERS"
  },
  {
@@ -17751,7 +17751,7 @@
  },
  {
   "COLUMN_NAME": "VERIFYING_PERSON_ID",
-  "DESCRIPTION": "User ID of the person verifying the SER record.",
+  "DESCRIPTION": "User ID of the person verifying the provider record.",
   "TABLE_NAME": "PROVIDERS"
  },
  {
@@ -17811,27 +17811,27 @@
  },
  {
   "COLUMN_NAME": "ABBR",
-  "DESCRIPTION": "The abbreviation for CLINICAL_ALERTS status, item ALT 230.",
+  "DESCRIPTION": "The abbreviation for CLINICAL_ALERTS status, item the source item.",
   "TABLE_NAME": "REF_ALERT_STATUS"
  },
  {
   "COLUMN_NAME": "ALT_STATUS_CODE",
-  "DESCRIPTION": "The category value for CLINICAL_ALERTS status, item ALT 230.",
+  "DESCRIPTION": "The category value for CLINICAL_ALERTS status, item the source item.",
   "TABLE_NAME": "REF_ALERT_STATUS"
  },
  {
   "COLUMN_NAME": "INTERNAL_ID",
-  "DESCRIPTION": "The unique internal ID for CLINICAL_ALERTS status, item ALT 230.",
+  "DESCRIPTION": "The unique internal ID for CLINICAL_ALERTS status, item the source item.",
   "TABLE_NAME": "REF_ALERT_STATUS"
  },
  {
   "COLUMN_NAME": "NAME",
-  "DESCRIPTION": "The name for CLINICAL_ALERTS status, item ALT 230.",
+  "DESCRIPTION": "The name for CLINICAL_ALERTS status, item the source item.",
   "TABLE_NAME": "REF_ALERT_STATUS"
  },
  {
   "COLUMN_NAME": "TITLE",
-  "DESCRIPTION": "The title for CLINICAL_ALERTS status, item ALT 230.",
+  "DESCRIPTION": "The title for CLINICAL_ALERTS status, item the source item.",
   "TABLE_NAME": "REF_ALERT_STATUS"
  },
  {
@@ -17916,7 +17916,7 @@
  },
  {
   "COLUMN_NAME": "INTERNAL_ID",
-  "DESCRIPTION": "The internal ID of the category(ERX-114) value. This is the value as it appears in the source system.",
+  "DESCRIPTION": "The internal ID of the category value. This is the value as it appears in the source system.",
   "TABLE_NAME": "REF_GENERIC_MED"
  },
  {
@@ -18011,7 +18011,7 @@
  },
  {
   "COLUMN_NAME": "ORDER_MED_ID",
-  "DESCRIPTION": "The unique ID of the medication order (prescription) record. NOTE: This is an internal unique identifier for ORD master file records in this table and cannot be used to link to MEDICATIONS.",
+  "DESCRIPTION": "The unique ID of the medication order (prescription) record. NOTE: This is an internal unique identifier for order master file records in this table and cannot be used to link to MEDICATIONS.",
   "TABLE_NAME": "RX_VERIFY_TRACE"
  },
  {
@@ -18046,7 +18046,7 @@
  },
  {
   "COLUMN_NAME": "RX_VER_USER_DEP_ID",
-  "DESCRIPTION": "This item stores the login department of the verifying user, stored in ORD 48018.",
+  "DESCRIPTION": "This item stores the login department of the verifying user, stored in the source item.",
   "TABLE_NAME": "RX_VERIFY_TRACE"
  },
  {
@@ -18296,12 +18296,12 @@
  },
  {
   "COLUMN_NAME": "CM_LOG_OWNER_ID",
-  "DESCRIPTION": "The Community ID (CID) of the instance from which this the source system record was extracted. This is populated only if you use IntraConnect.",
+  "DESCRIPTION": "The Community ID of the instance from which this the source system record was extracted. This is populated only if you use IntraConnect.",
   "TABLE_NAME": "V_HOSPITAL_TRANSACTIONS"
  },
  {
   "COLUMN_NAME": "CM_PHY_OWNER_ID",
-  "DESCRIPTION": "The Community ID (CID) of the instance that owns this the source system record. This is populated only if you use IntraConnect.",
+  "DESCRIPTION": "The Community ID of the instance that owns this the source system record. This is populated only if you use IntraConnect.",
   "TABLE_NAME": "V_HOSPITAL_TRANSACTIONS"
  },
  {
@@ -18371,7 +18371,7 @@
  },
  {
   "COLUMN_NAME": "DFLT_PROC_DESC",
-  "DESCRIPTION": "This column stores the original description of the procedure stored in the procedure record's Name History (I EAP 6), which appears in Procedure Editor as Name. This item is only populated if the description for the procedure was overridden in charge entry.",
+  "DESCRIPTION": "This column stores the original description of the procedure stored in the procedure record's Name History, which appears in Procedure Editor as Name. This item is only populated if the description for the procedure was overridden in charge entry.",
   "TABLE_NAME": "V_HOSPITAL_TRANSACTIONS"
  },
  {
@@ -18686,7 +18686,7 @@
  },
  {
   "COLUMN_NAME": "PATIENT_SERIAL_NUM",
-  "DESCRIPTION": "The PATIENTS Serial Number is stored in item 2090 of the Enterprise PATIENTS (EPT) master file.",
+  "DESCRIPTION": "The PATIENTS Serial Number is stored in item 2090 of the Enterprise PATIENTS master file.",
   "TABLE_NAME": "V_HOSPITAL_TRANSACTIONS"
  },
  {
@@ -18771,7 +18771,7 @@
  },
  {
   "COLUMN_NAME": "PROCEDURE_DESC",
-  "DESCRIPTION": "This column stores the value manually entered for the procedure description at the time of charge entry. If no value was manually entered, then the procedure record's Name History (I EAP 6) is populated here.",
+  "DESCRIPTION": "This column stores the value manually entered for the procedure description at the time of charge entry. If no value was manually entered, then the procedure record's Name History is populated here.",
   "TABLE_NAME": "V_HOSPITAL_TRANSACTIONS"
  },
  {
@@ -18876,17 +18876,17 @@
  },
  {
   "COLUMN_NAME": "RVU_MLPRACT",
-  "DESCRIPTION": "The malpractice RVU associated with the transaction (from EAP).",
+  "DESCRIPTION": "The malpractice RVU associated with the transaction (from procedure).",
   "TABLE_NAME": "V_HOSPITAL_TRANSACTIONS"
  },
  {
   "COLUMN_NAME": "RVU_OVERHEAD",
-  "DESCRIPTION": "The overhead RVU associated with this transaction (from EAP).",
+  "DESCRIPTION": "The overhead RVU associated with this transaction (from procedure).",
   "TABLE_NAME": "V_HOSPITAL_TRANSACTIONS"
  },
  {
   "COLUMN_NAME": "RVU_WORK",
-  "DESCRIPTION": "The work RVU associated with the transaction (from EAP).",
+  "DESCRIPTION": "The work RVU associated with the transaction (from procedure).",
   "TABLE_NAME": "V_HOSPITAL_TRANSACTIONS"
  },
  {
@@ -19106,7 +19106,7 @@
  },
  {
   "COLUMN_NAME": "ENCOUNTER_NUM",
-  "DESCRIPTION": "The unique encounter identifier for this contact. This number is unique across all PATIENTS encounters in your system. If you use IntraConnect, this is the Unique Contact Identifier (UCI).",
+  "DESCRIPTION": "The unique encounter identifier for this contact. This number is unique across all PATIENTS encounters in your system. If you use IntraConnect, this is the Unique Contact Identifier.",
   "TABLE_NAME": "V_PATIENT_LOCATION_HISTORY"
  },
  {
@@ -19626,7 +19626,7 @@
  },
  {
   "COLUMN_NAME": "ENCOUNTER_ID",
-  "DESCRIPTION": "The unique encounter identifier for the encounter the order was placed on. This number is unique across all PATIENTS encounters. If you use IntraConnect, this is the Unique Contact Identifier (UCI). This column is commonly used to join to the PATIENT_ENCOUNTERS table.",
+  "DESCRIPTION": "The unique encounter identifier for the encounter the order was placed on. This number is unique across all PATIENTS encounters. If you use IntraConnect, this is the Unique Contact Identifier. This column is commonly used to join to the PATIENT_ENCOUNTERS table.",
   "TABLE_NAME": "V_PHARMACY_ORDER"
  },
  {
@@ -19706,7 +19706,7 @@
  },
  {
   "COLUMN_NAME": "VERIFY_QUEUE_LOGIN_DEPT_ID",
-  "DESCRIPTION": "This item stores the login department of the verifying user, stored in ORD 48018.",
+  "DESCRIPTION": "This item stores the login department of the verifying user, stored in the source item.",
   "TABLE_NAME": "V_PHARMACY_ORDER"
  },
  {

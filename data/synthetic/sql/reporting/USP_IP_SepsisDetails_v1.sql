@@ -126,7 +126,7 @@ SELECT
 
 	, sd.[ECMOYN] [ECMO Y/N]
 
-	, sd.[IPSOSevereSepsisYN] [IPSO Severe Sepsis Y/N]
+	, sd.[IPSOSevereSepsisYN] [SSS Severe Sepsis Y/N]
 
 	, sd.[ENCOVERALLORDER] [ENC_ID Overall Order]
 

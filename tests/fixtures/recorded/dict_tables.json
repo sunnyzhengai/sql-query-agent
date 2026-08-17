@@ -24,7 +24,7 @@
   "TABLE_NAME": "CLINICAL_ALERTS"
  },
  {
-  "DESCRIPTION": "This table contains common information from General Use Notes items. This table focuses on time-insensitive, once-per-record data while other HNO tables (e.g., NOTES_ACCT, CODING_CLA_NOTES) contain the data for different note types.",
+  "DESCRIPTION": "This table contains common information from General Use Notes items. This table focuses on time-insensitive, once-per-record data while other note tables (e.g., NOTES_ACCT, CODING_CLA_NOTES) contain the data for different note types.",
   "TABLE_NAME": "CLINICAL_NOTES"
  },
  {
@@ -104,19 +104,19 @@
   "TABLE_NAME": "GROUPER_TERMINOLOGY"
  },
  {
-  "DESCRIPTION": "This table contains hospital account information from the Hospital Account (HAR) and Claim (CLM) master files. It will exclude professional billing hospital accounts created by visit filing order in non-single billing office service areas.",
+  "DESCRIPTION": "This table contains hospital account information from the Hospital Account and Claim (CLM) master files. It will exclude professional billing hospital accounts created by visit filing order in non-single billing office service areas.",
   "TABLE_NAME": "HOSPITAL_ACCOUNTS"
  },
  {
-  "DESCRIPTION": "This table contains hospital account information from the Hospital Accounts Receivable (HAR) master file. This fifth hospital account table has the same basic structure as HOSPITAL_ACCOUNTS, HOSPITAL_ACCOUNT_2, HOSPITAL_ACCOUNT_3, and HOSPITAL_ACCOUNT_4, but was created as a fifth table to prevent the other tables from getting any larger. It excludes Professional Billing accounts in classic PB self-pay service areas.",
+  "DESCRIPTION": "This table contains hospital account information from the Hospital Accounts Receivable master file. This fifth hospital account table has the same basic structure as HOSPITAL_ACCOUNTS, HOSPITAL_ACCOUNT_2, HOSPITAL_ACCOUNT_3, and HOSPITAL_ACCOUNT_4, but was created as a fifth table to prevent the other tables from getting any larger. It excludes Professional Billing accounts in classic PB self-pay service areas.",
   "TABLE_NAME": "HOSPITAL_ACCOUNTS_EXT"
  },
  {
-  "DESCRIPTION": "This table contains hospital account final diagnosis list information from the Hospital Accounts Receivable (HAR) master file.",
+  "DESCRIPTION": "This table contains hospital account final diagnosis list information from the Hospital Accounts Receivable master file.",
   "TABLE_NAME": "HOSPITAL_ACCT_DIAGNOSES"
  },
  {
-  "DESCRIPTION": "This table is the primary table for hospital encounter information. A hospital encounter is a contact in the PATIENTS record created through an ADT workflow such as preadmission, admission, ED Arrival, discharge, and hospital outpatient visit (HOV) contacts. These contact types have the ADT flag (I EPT 10101) set to 1. This table excludes all other contacts.",
+  "DESCRIPTION": "This table is the primary table for hospital encounter information. A hospital encounter is a contact in the PATIENTS record created through an ADT workflow such as preadmission, admission, ED Arrival, discharge, and hospital outpatient visit (HOV) contacts. These contact types have the ADT flag set to 1. This table excludes all other contacts.",
   "TABLE_NAME": "HOSPITAL_ENCOUNTERS"
  },
  {
@@ -156,11 +156,11 @@
   "TABLE_NAME": "LAB_COMPONENTS"
  },
  {
-  "DESCRIPTION": "This table contains information on results from clinical system orders. This table extracts only the last Orders (ORD) contact for each ORD record.",
+  "DESCRIPTION": "This table contains information on results from clinical system orders. This table extracts only the last Orders contact for each order record.",
   "TABLE_NAME": "LAB_ORDER_RESULTS"
  },
  {
-  "DESCRIPTION": "This table stores LDA information for a PATIENTS. A record is created in LDA for insertion of every line, drain, airway, or wound for a PATIENTS, as well as entering a trip into a PATIENTS's travel history. The no-add information for this LDA is stored in the table.",
+  "DESCRIPTION": "This table stores device information for a PATIENTS. A record is created in device for insertion of every line, drain, airway, or wound for a PATIENTS, as well as entering a trip into a PATIENTS's travel history. The no-add information for this device is stored in the table.",
   "TABLE_NAME": "LINE_DEVICE_AIRWAY"
  },
  {
@@ -192,7 +192,7 @@
   "TABLE_NAME": "NON_SEVERE_SEPSIS_STAGING"
  },
  {
-  "DESCRIPTION": "This table contains information from overtime single-response items about General Use Notes (HNO) records. Contact creation logic for clinical notes is as follows: 1. If a note doesn't exist, a new note is created. This represents the first contact on that note. 2. If a revision is filed by the incoming transcription interface, a new contact is created on the note being revised regardless of note status.",
+  "DESCRIPTION": "This table contains information from overtime single-response items about General Use Notes records. Contact creation logic for clinical notes is as follows: 1. If a note doesn't exist, a new note is created. This represents the first contact on that note. 2. If a revision is filed by the incoming transcription interface, a new contact is created on the note being revised regardless of note status.",
   "TABLE_NAME": "NOTE_ENCOUNTER_INFO"
  },
  {
@@ -296,7 +296,7 @@
   "TABLE_NAME": "VISIT_REASONS"
  },
  {
-  "DESCRIPTION": "This view is to make charge homing reporting easier. It filters out non-home charges once they have been re-homed, and re-points HAR IDs so they point to the correct HAR record for reporting. It contains hospital account transaction detail information from the HTR master file.",
+  "DESCRIPTION": "This view is to make charge homing reporting easier. It filters out non-home charges once they have been re-homed, and re-points billing account IDs so they point to the correct billing account record for reporting. It contains hospital account transaction detail information from the HTR master file.",
   "TABLE_NAME": "V_HOSPITAL_TRANSACTIONS"
  },
  {

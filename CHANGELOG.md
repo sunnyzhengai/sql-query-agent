@@ -10,6 +10,23 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.11.2] - 2026-08-16
+
+### Changed
+- Alias de-fingerprinting (Sunny's find): 33 table aliases derived from
+  ORIGINAL vendor table initials (PEH, HSP, SER, EAP, EDG, HNO, the
+  ZC_* family) renamed corpus-wide via a new crosswalk `aliases`
+  category; generic aliases (DX, DD, ADT, RSN, MAR) kept.
+- Master-file vocabulary scrubbed from dictionary prose in every
+  observed form — "(I SER .1)", "(EDG 2002)", "HNO-34150", bare-word
+  INIs, "(.1 ITEM)" notation, LDA — enumerated from source; scan terms
+  gained a word-boundary mode (~wcs) because short codes are substrings
+  of ordinary words (SER in USER, EPT in DEPT).
+- All previously stubbed descriptions resolved (paraphrase retries +
+  12 hand-rewritten short rows); zero stubs remain.
+
+---
+
 ## [1.11.1] - 2026-08-16
 
 ### Changed — corpus fully de-dialected (Sunny's verdict: no Epic

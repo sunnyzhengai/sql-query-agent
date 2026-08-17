@@ -89,6 +89,15 @@ def build_replacements(crosswalk: dict) -> "list[tuple[str, str, str]]":
         if orig.startswith("_") or orig == anon:
             continue
         replacements.append((orig, anon, "column~ci"))
+
+    # Table-alias renames (2026-08-16): aliases derived from ORIGINAL
+    # vendor table initials fingerprint the dialect after table renames.
+    for orig, anon in sorted(
+        crosswalk.get("aliases", {}).items(), key=lambda x: -len(x[0])
+    ):
+        if orig.startswith("_") or orig == anon:
+            continue
+        replacements.append((orig, anon, "alias~ci"))
     for orig, anon in sorted(crosswalk.get("proc_codes", {}).items(), key=lambda x: -len(x[0])):
         replacements.append((orig, anon, "proc_code"))
 
@@ -153,12 +162,26 @@ def scan_for_missed(text: str, forbidden_terms: "Iterable[str]") -> "list[str]":
     replacement suffix). Use it for org terms that are also common English
     words ('Clarity', 'Cook'), where case-insensitive matching false-flags
     ordinary prose — leaked proper nouns and identifiers keep their casing.
+
+    `~wcs` additionally requires WORD BOUNDARIES (2026-08-16): short
+    master-file codes like SER or EPT are substrings of ordinary words
+    (USER, DEPT) — without \\b they false-flag half the dictionary.
+    Plain terms stay substring-matched: prefix-style terms ('IPSO_',
+    'clarity_~cs') rely on it.
     """
     warnings = []
     for term in forbidden_terms:
-        flags = 0 if term.endswith("~cs") else re.IGNORECASE
-        term = term.removesuffix("~cs")
-        for m in re.finditer(re.escape(term), text, flags):
+        word_bound = False
+        if term.endswith("~wcs"):
+            term, flags, word_bound = term.removesuffix("~wcs"), 0, True
+        elif term.endswith("~cs"):
+            term, flags = term.removesuffix("~cs"), 0
+        else:
+            flags = re.IGNORECASE
+        pattern = re.escape(term)
+        if word_bound:
+            pattern = r"\b" + pattern + r"\b"
+        for m in re.finditer(pattern, text, flags):
             start = max(0, m.start() - 30)
             end = min(len(text), m.end() + 30)
             context = text[start:end].replace("\n", " ").strip()
