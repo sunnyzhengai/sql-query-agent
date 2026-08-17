@@ -68,21 +68,21 @@ BEGIN
 
 	IF @i_vRelativeStartDate IS NULL OR @i_vRelativeStartDate = ''
 
-		SET @StartDate = EMRDB.[dbo].[fn_parse_date]('MB-1')--DEFAULTING TO PREVIOUS MONTH
+		SET @StartDate = [dbo].[fn_parse_date]('MB-1')--DEFAULTING TO PREVIOUS MONTH
 
 	ELSE
 
-		SET @StartDate = EMRDB.[dbo].[fn_parse_date](@i_vRelativeStartDate)
+		SET @StartDate = [dbo].[fn_parse_date](@i_vRelativeStartDate)
 
 
 
 	IF @i_vRelativeEndDate IS NULL OR @i_vRelativeEndDate = ''
 
-		SET @EndDate = EMRDB.[dbo].[fn_parse_date]('ME-1')--DEFAULTING TO PREVIOUS MONTH
+		SET @EndDate = [dbo].[fn_parse_date]('ME-1')--DEFAULTING TO PREVIOUS MONTH
 
 	ELSE
 
-		SET @EndDate = EMRDB.[dbo].[fn_parse_date](@i_vRelativeEndDate)	
+		SET @EndDate = [dbo].[fn_parse_date](@i_vRelativeEndDate)	
 
 
 
@@ -118,7 +118,7 @@ WHILE @OW = 0
 
 BEGIN
 
-	DELETE FROM [reportingDB].[reports].[NON_SEVERE_SEPSIS_STAGING]
+	DELETE FROM [reports].[NON_SEVERE_SEPSIS_STAGING]
 
 
 
@@ -156,7 +156,7 @@ IF
 
 			FROM 
 
-				[reportingDB].[reports].[NON_SEVERE_SEPSIS_STAGING]
+				[reports].[NON_SEVERE_SEPSIS_STAGING]
 
 
 
@@ -220,13 +220,13 @@ INTO
 
 FROM 
 
-	EMRDB.dbo.V_HOSPITAL_TRANSACTIONS HTR
+	dbo.V_HOSPITAL_TRANSACTIONS HTR
 
-	JOIN EMRDB.dbo.HOSPITAL_ENCOUNTERS HE 
+	JOIN dbo.HOSPITAL_ENCOUNTERS HE 
 
 		ON HTR.ENCOUNTER_ID = HE.ENCOUNTER_ID
 
-	JOIN EMRDB.dbo.PATIENTS PAT 
+	JOIN dbo.PATIENTS PAT 
 
 		ON PAT.PATIENT_ID = HE.PATIENT_ID
 
@@ -270,7 +270,7 @@ FROM
 
 	#Base_Pop_1 B
 
-	JOIN EMRDB.dbo.ADT_EVENTS ADT
+	JOIN dbo.ADT_EVENTS ADT
 
 		ON ADT.ENCOUNTER_ID = B.ENCOUNTER_ID
 
@@ -346,11 +346,11 @@ FROM
 
 		#Base_Pop B -- ONLY THOSE PATIENTS WITH A POSITIVE SCORE
 
-		INNER JOIN EMRDB.dbo.MEDICATION_ORDERS MO ON MO.ENCOUNTER_ID = B.ENCOUNTER_ID
+		INNER JOIN dbo.MEDICATION_ORDERS MO ON MO.ENCOUNTER_ID = B.ENCOUNTER_ID
 
-		INNER JOIN EMRDB.dbo.MEDICATIONS MEDS ON MEDS.MEDICATION_ID = MO.MEDICATION_ID --AND MEDS.THERA_CLASS_CODE = 11 --Antibiotics
+		INNER JOIN dbo.MEDICATIONS MEDS ON MEDS.MEDICATION_ID = MO.MEDICATION_ID --AND MEDS.THERA_CLASS_CODE = 11 --Antibiotics
 
-		INNER JOIN EMRDB.dbo.MED_ADMIN_RECORDS MA ON MA.ORDER_MED_ID = MO.ORDER_MED_ID
+		INNER JOIN dbo.MED_ADMIN_RECORDS MA ON MA.ORDER_MED_ID = MO.ORDER_MED_ID
 
 	WHERE
 
@@ -410,9 +410,9 @@ FROM
 
 							SELECT 
 
-								erx.MEDICATION_ID,
+								RXM.MEDICATION_ID,
 
-								erx.NAME,
+								RXM.NAME,
 
 								cntl.VALUE_SET_DISPLAY as AGENT,
 
@@ -422,13 +422,13 @@ FROM
 
 								gen.TITLE,
 
-								ROW_NUMBER() over(partition by erx.MEDICATION_ID order by cntl.VALUE_SET_ABBR,cntl.VALUE_SET_DISPLAY asc) as AGENT_ORDER
+								ROW_NUMBER() over(partition by RXM.MEDICATION_ID order by cntl.VALUE_SET_ABBR,cntl.VALUE_SET_DISPLAY asc) as AGENT_ORDER
 
 
 
 							FROM
 
-								EMRDB.dbo.MEDICATIONS erx
+								dbo.MEDICATIONS RXM
 
 								OUTER APPLY(
 
@@ -442,15 +442,15 @@ FROM
 
 									FROM
 
-										EMRDB.dbo.MED_MIX_COMPONENTS mix
+										dbo.MED_MIX_COMPONENTS mix
 
-										INNER JOIN EMRDB.dbo.MEDICATIONS comp on mix.DRUG_ID=comp.MEDICATION_ID
+										INNER JOIN dbo.MEDICATIONS comp on mix.DRUG_ID=comp.MEDICATION_ID
 
 									WHERE
 
 										mix.TYPE_CODE=3		--3 - Medications 
 
-										AND mix.MEDICATION_ID=erx.MEDICATION_ID
+										AND mix.MEDICATION_ID=RXM.MEDICATION_ID
 
 									ORDER BY
 
@@ -458,9 +458,9 @@ FROM
 
 								) mixture
 
-								INNER JOIN EMRDB.dbo.REF_GENERIC_MED gen on gen.SIMPLE_GENERIC_CODE=coalesce(erx.SIMPLE_GENERIC_CODE,mixture.SIMPLE_GENERIC_CODE)
+								INNER JOIN dbo.REF_GENERIC_MED gen on gen.SIMPLE_GENERIC_CODE=coalesce(RXM.SIMPLE_GENERIC_CODE,mixture.SIMPLE_GENERIC_CODE)
 
-								INNER JOIN reportingDB.reports.CONFIG_VALUE_SET cntl on cntl.VALUE_SET_ID=3016 and cntl.CODE=gen.SIMPLE_GENERIC_CODE -- and cntl.VALUE_SET_ABBR='Antibacterial'
+								INNER JOIN reports.CONFIG_VALUE_SET cntl on cntl.VALUE_SET_ID=3016 and cntl.CODE=gen.SIMPLE_GENERIC_CODE -- and cntl.VALUE_SET_ABBR='Antibacterial'
 
 						) medlist
 
@@ -494,11 +494,11 @@ GROUP BY
 
 		#Base_Pop B -- ONLY THOSE PATIENTS WITH A POSITIVE SCORE
 
-		INNER JOIN EMRDB.dbo.MEDICATION_ORDERS MO ON MO.ENCOUNTER_ID = B.ENCOUNTER_ID
+		INNER JOIN dbo.MEDICATION_ORDERS MO ON MO.ENCOUNTER_ID = B.ENCOUNTER_ID
 
-		INNER JOIN EMRDB.dbo.MEDICATIONS MEDS ON MEDS.MEDICATION_ID = MO.MEDICATION_ID AND MEDS.THERA_CLASS_CODE = 11 --Antibiotics
+		INNER JOIN dbo.MEDICATIONS MEDS ON MEDS.MEDICATION_ID = MO.MEDICATION_ID AND MEDS.THERA_CLASS_CODE = 11 --Antibiotics
 
-		INNER JOIN EMRDB.dbo.MED_ADMIN_RECORDS MA ON MA.ORDER_MED_ID = MO.ORDER_MED_ID
+		INNER JOIN dbo.MED_ADMIN_RECORDS MA ON MA.ORDER_MED_ID = MO.ORDER_MED_ID
 
 	WHERE
 
@@ -586,7 +586,7 @@ FROM
 
 	#Base_Pop B
 
-	JOIN EMRDB.dbo.PROCEDURE_ORDERS PO
+	JOIN dbo.PROCEDURE_ORDERS PO
 
 		ON PO.ENCOUNTER_ID = B.ENCOUNTER_ID
 
@@ -674,9 +674,9 @@ FROM
 
 WHERE
 
-	B.ENCOUNTER_ID NOT IN (SELECT DISTINCT ENCOUNTER_ID FROM reportingDB.reports.[NON_SEVERE_SEPSIS_STAGING] )--08.12.2019 make sure we are not includiung already submitted encounters
+	B.ENCOUNTER_ID NOT IN (SELECT DISTINCT ENCOUNTER_ID FROM reports.[NON_SEVERE_SEPSIS_STAGING] )--08.12.2019 make sure we are not includiung already submitted encounters
 
-	AND  B.ENCOUNTER_ID NOT IN  (SELECT DISTINCT ENCOUNTER_ID FROM reportingDB.reports.[SEVERE_SEPSIS_STAGING] )--08.12.2019 make sure we are not includiung already submitted encounters
+	AND  B.ENCOUNTER_ID NOT IN  (SELECT DISTINCT ENCOUNTER_ID FROM reports.[SEVERE_SEPSIS_STAGING] )--08.12.2019 make sure we are not includiung already submitted encounters
 
 
 
@@ -766,7 +766,7 @@ FROM
 
 	#COHORT C
 
-	JOIN EMRDB..V_PATIENT_LOCATION_HISTORY V
+	JOIN .V_PATIENT_LOCATION_HISTORY V
 
 		ON V.ENCOUNTER_NUM = C.ENCOUNTER_ID
 
@@ -834,7 +834,7 @@ IF @TEST = 0
 
 	BEGIN
 
-		INSERT INTO reportingDB.[reports].[NON_SEVERE_SEPSIS_STAGING]
+		INSERT INTO [reports].[NON_SEVERE_SEPSIS_STAGING]
 
 			([Sepsis_Episode_ID_V01]
 
@@ -870,7 +870,7 @@ IF @TEST = 0
 
 		FROM
 
-			reportingDB.[reports].[NON_SEVERE_SEPSIS_STAGING]
+			[reports].[NON_SEVERE_SEPSIS_STAGING]
 
 
 
@@ -900,7 +900,7 @@ ELSE
 
 		FROM
 
-			reportingDB.[reports].[NON_SEVERE_SEPSIS_STAGING]
+			[reports].[NON_SEVERE_SEPSIS_STAGING]
 
 
 

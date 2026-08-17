@@ -24,7 +24,7 @@ Date			Who					Description
 
 USAGE:
 
-exec [reportingDB].[reporting].[USP_IP_SepsisDates]
+exec [reporting].[USP_IP_SepsisDates]
 
 ************************************************************************************/
 
@@ -46,9 +46,9 @@ DECLARE @dEndDate DATE
 
 	
 
-SET @dStartDate = (SELECT MIN(SepsisPatientDate) FROM reportingDB.reporting.IP_SepsisPatientDates)
+SET @dStartDate = (SELECT MIN(SepsisPatientDate) FROM reporting.IP_SepsisPatientDates)
 
-SET @dEndDate = ( SELECT MAX(SepsisPatientDate) FROM reportingDB.reporting.IP_SepsisPatientDates)
+SET @dEndDate = ( SELECT MAX(SepsisPatientDate) FROM reporting.IP_SepsisPatientDates)
 
 
 

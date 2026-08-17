@@ -6881,7 +6881,7 @@
  },
  {
   "COLUMN_NAME": "PRIM_ENC_ENC_ID",
-  "DESCRIPTION": "The encounter identifier associated with the primary PATIENTS contact on the hospital account. The primary PATIENTS contact is stored in I the source item. Combined HARs are no longer associated with any PATIENTS contacts and will not have a primary ENC_ID.",
+  "DESCRIPTION": "The encounter identifier associated with the primary PATIENTS contact on the hospital account. The primary PATIENTS contact is stored in I the source item. Combined accounts are no longer associated with any PATIENTS contacts and will not have a primary ENC_ID.",
   "TABLE_NAME": "HOSPITAL_ACCOUNTS"
  },
  {

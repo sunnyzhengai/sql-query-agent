@@ -28,7 +28,7 @@ Date			Who					Description
 
 USAGE:
 
-exec [reportingDB].[reporting].[USP_IP_SepsisDetails_v1]
+exec [reporting].[USP_IP_SepsisDetails_v1]
 
 ************************************************************************************/
 
@@ -132,7 +132,7 @@ SELECT
 
 	, sd.[RefreshDate] [Refresh Date]
 
-	FROM [reportingDB].[reporting].[IP_SepsisDetails] sd
+	FROM [reporting].[IP_SepsisDetails] sd
 
 	ORDER BY sd.PATENCENCID, sd.ENCOVERALLORDER
 

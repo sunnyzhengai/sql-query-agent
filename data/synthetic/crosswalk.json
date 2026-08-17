@@ -1650,7 +1650,13 @@
    "LIFEGIFT": "ORGANDONOR",
    "RCU": "NEW_UNIT",
    "EpicBusinessIntelligenceTeam": "BusinessIntelligenceTeam",
-   "TEST CSN 1016010350": "TEST ENCOUNTER 5550010001"
+   "TEST CSN 1016010350": "TEST ENCOUNTER 5550010001",
+   "[EMRDB].": "",
+   "EMRDB.": "",
+   "[reportingDB].": "",
+   "reportingDB.": "",
+   "'ERX'": "'MEDS'",
+   "Combined HAR": "Combined account"
   },
   "prefix_patterns": {
    "CCMC": "MAIN",
@@ -2004,6 +2010,10 @@
   "ZED": "REDI",
   "ZEG": "REG",
   "ZPR": "RPR",
-  "ZSP": "RSP"
+  "ZSP": "RSP",
+  "HAR": "HACC",
+  "EMRDB_ADT_GENCARE": "ADT_GENCARE",
+  "EMRDB_ADT_ED": "ADT_ED",
+  "ERX": "RXM"
  }
 }

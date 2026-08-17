@@ -32,7 +32,7 @@ Date			Who					Description
 
 USAGE:
 
-exec [reportingDB].[reporting].[USP_IP_SepsisScreeningAudit_v1]
+exec [reporting].[USP_IP_SepsisScreeningAudit_v1]
 
 ************************************************************************************/
 
@@ -158,5 +158,5 @@ SELECT
 
 	, CASE WHEN [ODScore] IS NOT NULL THEN 1 ELSE 0 END [Screened]
 
-	FROM [reportingDB].[reporting].[IP_SepsisScreeningAudit] 
+	FROM [reporting].[IP_SepsisScreeningAudit] 
 

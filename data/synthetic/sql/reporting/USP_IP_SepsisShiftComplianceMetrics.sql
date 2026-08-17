@@ -26,7 +26,7 @@ Date			Who					Description
 
 USAGE:
 
-exec [reportingDB].[reporting].[USP_IP_SepsisShifComplianceMetrics_PBI]
+exec [reporting].[USP_IP_SepsisShifComplianceMetrics_PBI]
 
 ************************************************************************************/
 
@@ -96,7 +96,7 @@ SELECT [PATENCENCID] [ENC_ID]
 
 	,[RefreshDate]
 
-FROM [reportingDB].reporting.[IP_SepsisShiftCompliance]
+FROM reporting.[IP_SepsisShiftCompliance]
 
 ORDER BY ENC_ID, ENCOVERALLORDER
 

@@ -26,7 +26,7 @@ Date			Who					Description
 
 USAGE:
 
-exec [reportingDB].[reporting].[USP_IP_SepsisShiftComplianceByShift]
+exec [reporting].[USP_IP_SepsisShiftComplianceByShift]
 
 ************************************************************************************/
 
@@ -116,7 +116,7 @@ SELECT
 
 	, [UniqueRow] [Unique Row]
 
-	FROM [reportingDB].reporting.[IP_SepsisShiftCompliance]
+	FROM reporting.[IP_SepsisShiftCompliance]
 
   ORDER BY ENC_ID, ENCOVERALLORDER
 

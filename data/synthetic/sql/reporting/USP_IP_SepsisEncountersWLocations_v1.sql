@@ -28,7 +28,7 @@ Date			Who					Description
 
 USAGE:
 
-exec [reportingDB].[reporting].[USP_IP_SepsisEncountersWLocations_v1]
+exec [reporting].[USP_IP_SepsisEncountersWLocations_v1]
 
 ************************************************************************************/
 
@@ -80,9 +80,9 @@ SELECT DISTINCT
 
 	, loc.[UniqueRow] [Unique Row]
 
-	FROM [reportingDB].[reporting].[IP_SepsisEncounters] enc
+	FROM [reporting].[IP_SepsisEncounters] enc
 
-	INNER JOIN [reportingDB].[reporting].[IP_SepsisEncountersWLocations] loc ON loc.PATENCENCID = enc.PATENCENCID
+	INNER JOIN [reporting].[IP_SepsisEncountersWLocations] loc ON loc.PATENCENCID = enc.PATENCENCID
 
   ORDER BY ENC_ID, ENCORDER
 

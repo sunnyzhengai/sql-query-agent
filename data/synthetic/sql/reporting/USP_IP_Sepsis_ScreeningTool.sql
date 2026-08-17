@@ -30,7 +30,7 @@ Date			Who					Description
 
 USAGE:
 
-exec [reportingDB].[reporting].[USP_IP_Sepsis_ScreeningTool]
+exec [reporting].[USP_IP_Sepsis_ScreeningTool]
 
 ************************************************************************************/
 
@@ -190,7 +190,7 @@ SELECT [PatientName] [PATIENTS]
 
 	, [UniqueRow] [Unique Row]
 
-  FROM [reportingDB].[reporting].[IP_SEPSIS] 
+  FROM [reporting].[IP_SEPSIS] 
 
   --WHERE ODScore >= 2 --7/24/2025 Removing Score restriction
 

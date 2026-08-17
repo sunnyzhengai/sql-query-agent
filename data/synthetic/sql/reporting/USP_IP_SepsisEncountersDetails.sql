@@ -28,7 +28,7 @@ Date			Who					Description
 
 USAGE:
 
-exec [reportingDB].[reporting].[USP_IP_SepsisEncountersDetails]
+exec [reporting].[USP_IP_SepsisEncountersDetails]
 
 ************************************************************************************/
 
@@ -82,7 +82,7 @@ SELECT DISTINCT
 
 	, [RefreshDate] [Refresh Date]
 
-	FROM [reportingDB].[reporting].[IP_SepsisEncounters] enc
+	FROM [reporting].[IP_SepsisEncounters] enc
 
   ORDER BY ENC_ID
 

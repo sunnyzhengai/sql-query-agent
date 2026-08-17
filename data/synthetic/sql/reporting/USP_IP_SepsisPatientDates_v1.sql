@@ -28,7 +28,7 @@ Date			Who					Description
 
 USAGE:
 
-exec [reportingDB].[reporting].[USP_IP_SepsisPatientDates_v1]
+exec [reporting].[USP_IP_SepsisPatientDates_v1]
 
 ************************************************************************************/
 
@@ -70,7 +70,7 @@ SELECT
 
 	, pd.[RefreshDate] [Refresh Date]
 
-	FROM [reportingDB].[reporting].[IP_SepsisPatientDates] pd
+	FROM [reporting].[IP_SepsisPatientDates] pd
 
 END 
 

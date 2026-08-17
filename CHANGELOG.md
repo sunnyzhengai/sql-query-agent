@@ -10,6 +10,20 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.11.3] - 2026-08-16
+
+### Fixed
+- Seed script failed on Fabric SQL database (Msg 40515): three-part
+  cross-database names are unsupported there. Database qualifiers
+  (EMRDB., reportingDB.) stripped from the CORPUS, not the seed — one
+  corpus everywhere keeps file-load and extraction byte-identical (no
+  flip-flop between writers). Also caught by the now-SQL-policing scan:
+  aliases HAR->HACC, ERX->RXM, EMRDB_-prefixed aliases, and the Epic
+  grouper context literal 'ERX'->'MEDS'. Zero warnings; fixtures,
+  cassette, and seed regenerated in lockstep.
+
+---
+
 ## [1.11.2] - 2026-08-16
 
 ### Changed

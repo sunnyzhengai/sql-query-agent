@@ -24,7 +24,7 @@ Date			Who					Description
 
 USAGE: 
 
-exec [reportingDB].[reporting].[USP_IP_SepsisEncountersWLocations]
+exec [reporting].[USP_IP_SepsisEncountersWLocations]
 
 ************************************************************************************/ 
 
@@ -62,21 +62,21 @@ DECLARE @dTestRun BIT
 
 IF @StartDate IS NULL OR @StartDate = ''
 
-	SET @dStartDate = [EMRDB].[dbo].[fn_parse_date]('MB-12') /*('2018-01-01')*/
+	SET @dStartDate = [dbo].[fn_parse_date]('MB-12') /*('2018-01-01')*/
 
 ELSE
 
-	SET @dStartDate = [EMRDB].[dbo].[fn_parse_date](@StartDate)
+	SET @dStartDate = [dbo].[fn_parse_date](@StartDate)
 
 	
 
 IF @EndDate IS NULL OR @EndDate = ''
 
-	SET @dEndDate = [EMRDB].[dbo].[fn_parse_date]('ME-1') /*DEFAULTING TO PREVIOUS MONTH*/
+	SET @dEndDate = [dbo].[fn_parse_date]('ME-1') /*DEFAULTING TO PREVIOUS MONTH*/
 
 ELSE
 
-	SET @dEndDate = [EMRDB].[dbo].[fn_parse_date](@EndDate)
+	SET @dEndDate = [dbo].[fn_parse_date](@EndDate)
 
 
 
@@ -124,7 +124,7 @@ SELECT DISTINCT
 
 INTO #MainAdmDetails
 
-FROM [reportingDB].[reporting].[IP_SepsisEncounters]
+FROM [reporting].[IP_SepsisEncounters]
 
 CREATE INDEX IDX_Main ON #MainAdmDetails (ENCOUNTER_ID) 
 
@@ -182,13 +182,13 @@ INTO #Base_Pop
 
 FROM #MainAdmDetails ENCS
 
-INNER JOIN [EMRDB].[dbo].[ADT_EVENTS] adtIn ON adtIn.ENCOUNTER_ID = ENCS.ENCOUNTER_ID
+INNER JOIN [dbo].[ADT_EVENTS] adtIn ON adtIn.ENCOUNTER_ID = ENCS.ENCOUNTER_ID
 
-LEFT OUTER JOIN [EMRDB].[dbo].[ADT_EVENTS] adtOut ON adtIn.NEXT_OUT_EVENT_ID = adtOut.EVENT_ID
+LEFT OUTER JOIN [dbo].[ADT_EVENTS] adtOut ON adtIn.NEXT_OUT_EVENT_ID = adtOut.EVENT_ID
 
-LEFT OUTER JOIN [EMRDB].[dbo].[DEPARTMENTS] dep ON adtIn.DEPARTMENT_ID = dep.DEPARTMENT_ID
+LEFT OUTER JOIN [dbo].[DEPARTMENTS] dep ON adtIn.DEPARTMENT_ID = dep.DEPARTMENT_ID
 
-INNER JOIN [reportingDB].[reports].[CONFIG_VALUE_SET] cvs ON cvs.CODE = CONVERT(Varchar(100), adtIn.DEPARTMENT_ID)
+INNER JOIN [reports].[CONFIG_VALUE_SET] cvs ON cvs.CODE = CONVERT(Varchar(100), adtIn.DEPARTMENT_ID)
 
 			AND cvs.VALUE_SET_ID = 3031 /*DEPARTMENT ROLL UP*/
 

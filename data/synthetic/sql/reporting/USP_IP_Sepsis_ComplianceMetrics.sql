@@ -26,7 +26,7 @@ Date			Who					Description
 
 USAGE:
 
-exec [reportingDB].[reporting].[USP_IP_Sepsis_ComplianceMetrics]
+exec [reporting].[USP_IP_Sepsis_ComplianceMetrics]
 
 ************************************************************************************/
 
@@ -122,7 +122,7 @@ SELECT [PatientName] [PATIENTS]
 
 	,[RefreshDate]
 
-FROM [reportingDB].[reporting].[IP_SEPSIS]
+FROM [reporting].[IP_SEPSIS]
 
 ORDER BY ENC_ID, ENCOVERALLORDER
 

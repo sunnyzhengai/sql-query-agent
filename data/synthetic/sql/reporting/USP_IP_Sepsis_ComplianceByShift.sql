@@ -28,7 +28,7 @@ Date			Who					Description
 
 USAGE:
 
-exec [reportingDB].[reporting].[USP_IP_Sepsis_ComplianceByShift]
+exec [reporting].[USP_IP_Sepsis_ComplianceByShift]
 
 ************************************************************************************/
 
@@ -154,7 +154,7 @@ SELECT [PatientName] [PATIENTS]
 
 	, [UniqueRow] [Unique Row]
 
-	FROM [reportingDB].[reporting].[IP_SEPSIS]
+	FROM [reporting].[IP_SEPSIS]
 
 
 
