@@ -26,6 +26,9 @@ class _StubPyodbc:
     def __init__(self):
         self.calls = []
 
+    def drivers(self):
+        return ["ODBC Driver 17 for SQL Server"]
+
     def connect(self, conn_str, attrs_before=None):
         self.calls.append({"conn_str": conn_str, "attrs_before": attrs_before})
         return SimpleNamespace(cursor=lambda: None)
@@ -84,3 +87,42 @@ def test_fresh_connection_fetches_fresh_token(monkeypatch):
         for c in stub.calls
     ]
     assert packed_tokens == ["token-1", "token-2"]
+
+
+class TestDriverResolution:
+    """Turn-key driver pick (live find 2026-08-16: config said Driver 17,
+    Fabric ships Driver 18 — hardcoded defaults fail at first contact)."""
+
+    def test_configured_driver_wins_when_installed(self):
+        from src.extractor.connection import _resolve_driver
+        assert _resolve_driver("My Custom Driver",
+                               ["My Custom Driver", "ODBC Driver 18 for SQL Server"]) \
+            == "My Custom Driver"
+
+    def test_falls_back_to_newest_microsoft_driver(self):
+        from src.extractor.connection import _resolve_driver
+        assert _resolve_driver("ODBC Driver 17 for SQL Server",
+                               ["ODBC Driver 18 for SQL Server"]) \
+            == "ODBC Driver 18 for SQL Server"
+
+    def test_any_sql_server_driver_as_last_resort(self):
+        from src.extractor.connection import _resolve_driver
+        assert _resolve_driver("ODBC Driver 17 for SQL Server",
+                               ["FreeTDS", "SQL Server Native Client 11.0"]) \
+            == "SQL Server Native Client 11.0"
+
+    def test_no_driver_fails_with_installed_list(self):
+        import pytest
+
+        from src.extractor.connection import _resolve_driver
+        with pytest.raises(RuntimeError, match="installed drivers"):
+            _resolve_driver("ODBC Driver 17 for SQL Server", ["FreeTDS"])
+
+
+def test_token_connection_resolves_driver(monkeypatch):
+    import sys
+    stub = _StubPyodbc()
+    stub.drivers = lambda: ["ODBC Driver 18 for SQL Server"]
+    monkeypatch.setitem(sys.modules, "pyodbc", stub)
+    create_connection(_config("fabric_native"), token_provider=lambda: "t")
+    assert "ODBC Driver 18 for SQL Server" in stub.calls[0]["conn_str"]

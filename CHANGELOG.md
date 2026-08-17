@@ -10,6 +10,19 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.12.1] - 2026-08-16
+
+### Fixed
+- fabric_native/azure_direct connections failed on Fabric with "Can't
+  open lib 'ODBC Driver 17'" — the config default named a driver the
+  Fabric Spark runtime doesn't ship (it has Driver 18). The connection
+  now RESOLVES the driver: configured name if installed, else newest
+  Microsoft driver present, else any SQL Server driver, else a loud
+  error listing what IS installed. First live customer-shaped contact
+  for the token profile; hardcoded environment assumptions lose again.
+
+---
+
 ## [1.12.0] - 2026-08-16
 
 ### Changed

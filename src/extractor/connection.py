@@ -81,6 +81,29 @@ class LocalPyodbcConnection:
         return [dict(zip(columns, row)) for row in cursor.fetchall()]
 
 
+def _resolve_driver(configured: str, installed: "list[str]") -> str:
+    """Pick a usable SQL Server ODBC driver — turn-key over hardcoded.
+
+    The configured name wins when it's actually installed; otherwise
+    prefer the newest Microsoft driver present (live find 2026-08-16:
+    the config default said Driver 17, Fabric Spark ships Driver 18 —
+    'file not found' at first customer-shaped contact). No driver at
+    all fails with the installed list, not an ODBC riddle.
+    """
+    if configured in installed:
+        return configured
+    for preferred in ("ODBC Driver 18 for SQL Server", "ODBC Driver 17 for SQL Server"):
+        if preferred in installed:
+            return preferred
+    for name in installed:
+        if "SQL Server" in name:
+            return name
+    raise RuntimeError(
+        f"No SQL Server ODBC driver found. Configured: {configured!r}; "
+        f"installed drivers: {installed or '(none)'}"
+    )
+
+
 class AadTokenPyodbcConnection:
     """pyodbc with an Azure AD access token — Azure SQL / MI / Fabric T-SQL.
 
@@ -97,8 +120,9 @@ class AadTokenPyodbcConnection:
         # SQL Server expects the token bytes UTF-16-LE, length-prefixed
         token_bytes = token.encode("utf-16-le")
         packed = struct.pack(f"<I{len(token_bytes)}s", len(token_bytes), token_bytes)
+        driver = _resolve_driver(config.driver, pyodbc.drivers())
         conn_str = (
-            f"DRIVER={{{config.driver}}};"
+            f"DRIVER={{{driver}}};"
             f"SERVER={config.host},{config.port};"
             f"DATABASE={config.database};"
             f"Encrypt=yes;TrustServerCertificate=no"
