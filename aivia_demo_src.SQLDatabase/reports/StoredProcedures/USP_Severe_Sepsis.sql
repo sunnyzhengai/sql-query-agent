@@ -1,0 +1,5450 @@
+
+-- ==== reports/USP_RPTS_Severe_Sepsis.sql ====
+CREATE         PROCEDURE [reports].[USP_Severe_Sepsis] 
+
+--DECLARE
+
+	@i_vRelativeStartDate VARCHAR(20) = NULL
+
+	, @i_vRelativeEndDate VARCHAR(20) = NULL
+
+	, @i_vRelativeTest VARCHAR(20) = NULL
+
+	, @i_vRelativeOW VARCHAR(20) = NULL
+
+	, @i_vHospitals INT = 1 -- 1 = MAIN Only, 2 = WEST Only, 3 = Both
+
+AS
+
+
+
+BEGIN
+
+	DECLARE @StartDate DATE
+
+	DECLARE @EndDate DATE
+
+	DECLARE @TEST INT
+
+	DECLARE @OW INT
+
+	DECLARE @Hospitals INT;
+
+/*
+
+========================================================================================================================================================
+
+Author:			Developer D
+
+Create date:	10/12/2018
+
+Description:	SSS SEVERE SEPSIS. THIS CODE MUST BE RAN FOR FULL MONTH.
+
+Sample Call:	EXEC [reports].[USP_Severe_Sepsis] '', '', '0', '', 1   --TO WRITE DATA TO ARCHIVE TABLE. ******USE THIS COMMAND FOR BATCH******
+
+				EXEC [reports].[USP_Severe_Sepsis] '', '', '0', '0', 1	--TO OVERWRITE THE DATA IN THE ARCHIVE TABLE IF THE DATA ALREADY EXISTS
+
+				EXEC [reports].[USP_Severe_Sepsis] '', '', '1', '', 1
+
+Change log: 
+
+=========================================================================================================================================================
+
+    Date                By:                        Description
+
+    ============        ====================       ========================================================================================================
+
+    2018-10-12          Developer D         CREATE STORED PROC
+
+ 	2018-12-04			Developer D			ADDED REVIED FILE CHECK LOGIC
+
+    04.02.2019			V_DEV001					ADDED MEDICATION FOR BOLUS (, 700002	--SODIUM CHLORIDE 0.99 % INJECTION SYRINGE)
+
+    05.16.2019			V_DEV001					CHANGED PROCEDURE_ORDERS.PROC_CODE TO PROCEDURE_ORDERS.PROC_ID AS PROC_CODE IS DEPRICATED IN PROCEDURE_ORDERS TABLE
+
+ 	08.08.2019			V_DEV001					33 CHANGES MADE TO THE ORIGINAL CODE BY Developer D. PLEASE SEE THE WORD DOCUMENT
+
+ 	08.16.2019			V_DEV001					Added 200108013 to GenCare departments
+
+ 	Developer D'S CODE		N:\BusinessIntelligenceTeam\Project Documentation\Quality Initiatives\Sepsis ETL\TKT-012\Code\USP_Severe_Sepsis_Prior_To_Change_On_08092019.doc
+
+ 	CODE CHANGES		N:\BusinessIntelligenceTeam\Project Documentation\Quality Initiatives\Sepsis ETL\TKT-012\Code\SSS CHANGES.DOCX
+
+ 	CODE CHANGES		http://extranet.samplehealth.org/teams/bi/pmo/QualityInitiatives/Shared%20Documents/Report%20Requirements/2-%20Sepsis-Severe/SSS%20Changes.docx
+
+ 	10.01.2019			V_DEV001					Added new ED Sepsis Score -R HS IP SEPSIS SCORE 2019 [9000002613]  and New Organ Dysfunction Score - R HS IP SEPSIS ODS 2019 [9000002644] 
+
+ 	12.06.2019			V_DEV001					MODIFICATION: Added code to include Quick Set/ Orderset OSQ 
+
+													ED Sepsis Panel - OSQ 400002
+
+													Sepsis Antimicrobials Unknown Source - OSQ 400007
+
+													Neo Fever Panel - OSQ 400003
+
+													Oncology with Fever Panel - OSQ 400004
+
+	02.11.2020			V_DEV001					MODIFICATION: to #Base_Pop_1, Added code to include only Admit Conf Statuses 1(confirmed) & 2(complete) AND CHECK IF HOSP ADMIT TIME IS NOT NULL (ALTHOUG BOTH SHOULD DO THE SAME)
+
+													REPLACE V_ICU_STAY_METRICS(DEPRICATED) WITH DM_ICU_STAY
+
+	04.08.2020			V_DEV001					MODIFICATION: Added Huddle Time calculation logic and reporting data point. Huddle Time calculation for only IP OD Scores - since there is no huddle time for ED Sepsis scores
+
+	06.19.2020			V_DEV001					MODIFICATION: Per Stakeholder A's request changing the defaul huddle time from '1900-01-02 00:00:00' TO '1900-01-01 00:00:00'
+
+	10.12.2020			V_DEV001					MODIFICATION: Changed CONVERT(FLOAT to TRY_CAST(...as FLOAT)--> LacticAcidValue & Weight_v16--https://samplehealth.zendesk.com/agent/tickets/1133719
+
+	01.21.2022			V_DEV001					MODIFICATION: Added 95 ST department to the list of GEN Floor departments
+
+	02.12.2024			V_DEV005					Modifying from SSS program to CHA and PHIS
+
+	12.10.2024			V_DEV005					Modifying to remove accounts where primary plan is ORGANDONOR to prevent duplicate encounters for organ donor patients
+
+ --==========================================================================================================================================================
+
+ */
+
+	IF @i_vRelativeStartDate IS NULL OR @i_vRelativeStartDate = ''
+
+		SET @StartDate = [dbo].[fn_parse_date]('MB-1')--DEFAULTING TO PREVIOUS MONTH
+
+	ELSE
+
+		SET @StartDate = [dbo].[fn_parse_date](@i_vRelativeStartDate)
+
+
+
+	IF @i_vRelativeEndDate IS NULL OR @i_vRelativeEndDate = ''
+
+		SET @EndDate = [dbo].[fn_parse_date]('ME-1')--DEFAULTING TO PREVIOUS MONTH
+
+	ELSE
+
+		SET @EndDate = [dbo].[fn_parse_date](@i_vRelativeEndDate)	
+
+
+
+	IF @i_vRelativeTest IS NULL OR @i_vRelativeTest = '' OR @i_vRelativeTest <> 0
+
+		SET @TEST = 1
+
+	ELSE
+
+		SET @TEST = @i_vRelativeTest
+
+
+
+	IF @i_vRelativeOW IS NULL OR @i_vRelativeOW = '' OR @i_vRelativeOW <> 0
+
+		SET @OW = 1
+
+	ELSE
+
+		SET @OW = @i_vRelativeOW
+
+		
+
+	IF @i_vHospitals IS NULL OR @i_vHospitals = '' OR @i_vHospitals = 0 -- 1 = MAIN Only, 2 = WEST Only, 3 = Both
+
+		SET @Hospitals = 1
+
+	ELSE
+
+		SET @Hospitals = @i_vHospitals
+
+---------------------------------------------------------------------------------------------------------------------------------------------------
+
+/* CHECK IF OVERWRITE FLAG IS ON */
+
+---------------------------------------------------------------------------------------------------------------------------------------------------
+
+WHILE @OW = 0
+
+
+
+BEGIN
+
+	DELETE FROM [reports].[SEVERE_SEPSIS_STAGING]
+
+
+
+	WHERE
+
+		Reviewed = 0
+
+		AND DATE_STAMP = DATENAME(month, CONVERT(DATE, @EndDate)) + DATENAME(YEAR, CONVERT(DATE, @EndDate));
+
+		PRINT('EXISTING DATA DELETED... RUNNING CODE FOR NEW DATA')
+
+	GOTO MAIN
+
+END
+
+---------------------------------------------------------------------------------------------------------------------------------------------------
+
+/* CHECK IF DATA EXISTS */
+
+---------------------------------------------------------------------------------------------------------------------------------------------------
+
+IF 
+
+	EXISTS( SELECT *
+
+			FROM [reports].[SEVERE_SEPSIS_STAGING]
+
+			WHERE DATE_STAMP = DATENAME(month, CONVERT(DATE, @EndDate)) + DATENAME(YEAR, CONVERT(DATE, @EndDate))
+
+			AND @TEST = 0
+
+			)
+
+		PRINT('Data for given time range already exists in [reports].[SEVERE_SEPSIS_STAGING]. USE EXEC COMMAND WITH 0 AS 4TH PARAMETER TO OVERWRITE THE DATA');
+
+ELSE
+
+		BEGIN
+
+---------------------------------------------------------------------------------------------------------------------------------------------------
+
+---------------------------------------------------------------------------------------------------------------------------------------------------
+
+MAIN:
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+
+-----------------------------------------------------------------------------------------------------------------------------------------------
+
+/* Temp tables to for data used in subqueries */
+
+IF OBJECT_ID(N'tempdb..#NICUCICUDept') IS NOT NULL DROP TABLE #NICUCICUDept;
+
+	SELECT vcg.GROUPER_RECORDS_NUMERIC_ID DEPARTMENT_ID
+
+	INTO #NICUCICUDept
+
+	FROM [dbo].[GROUPER_COMPILED_LIST] vcg
+
+	WHERE vcg.COMPILED_CONTEXT = 'DEP'
+
+	AND vcg.BASE_GROUPER_ID IN ('800001', '800002', '800003')
+
+CREATE INDEX IDX_NICICUDept ON #NICUCICUDept (DEPARTMENT_ID) 
+
+
+
+IF OBJECT_ID(N'tempdb..#AllICUDept') IS NOT NULL DROP TABLE #AllICUDept;
+
+	SELECT vcg.GROUPER_RECORDS_NUMERIC_ID DEPARTMENT_ID
+
+	INTO #AllICUDept
+
+	FROM [dbo].[GROUPER_COMPILED_LIST] vcg
+
+	WHERE vcg.COMPILED_CONTEXT = 'DEP'
+
+	AND vcg.BASE_GROUPER_ID IN ('800016') --HS BI IP ALL ICU UNITS
+
+CREATE INDEX IDX_AllICUDept ON #AllICUDept (DEPARTMENT_ID) 
+
+	
+
+IF OBJECT_ID(N'tempdb..#MedDept') IS NOT NULL DROP TABLE #MedDept;
+
+	SELECT vcg.GROUPER_RECORDS_NUMERIC_ID DEPARTMENT_ID
+
+	INTO #MedDept
+
+	FROM [dbo].[GROUPER_COMPILED_LIST] vcg
+
+	WHERE vcg.COMPILED_CONTEXT = 'DEP'
+
+	AND vcg.BASE_GROUPER_ID IN ('800004')
+
+CREATE INDEX IDX_MedSurgDept ON #MedDept (DEPARTMENT_ID) 
+
+
+
+IF OBJECT_ID(N'tempdb..#ODScores') IS NOT NULL DROP TABLE #ODScores;
+
+	SELECT vcg.GROUPER_RECORDS_NUMERIC_ID FLO_ID
+
+	INTO #ODScores
+
+	FROM [dbo].[GROUPER_COMPILED_LIST] vcg
+
+	WHERE vcg.COMPILED_CONTEXT = 'FLO'
+
+	AND vcg.BASE_GROUPER_ID IN ('800006')
+
+CREATE INDEX IDX_OdScores ON #ODScores (FLO_ID) 
+
+
+
+IF OBJECT_ID(N'tempdb..#BloodCultures') IS NOT NULL DROP TABLE #BloodCultures;
+
+	SELECT vcg.GROUPER_RECORDS_NUMERIC_ID PROC_ID
+
+	INTO #BloodCultures
+
+	FROM [dbo].[GROUPER_COMPILED_LIST] vcg
+
+	WHERE vcg.COMPILED_CONTEXT = 'PCAT'
+
+	AND vcg.BASE_GROUPER_ID IN ('800013')
+
+CREATE INDEX IDX_BloodCultures ON #BloodCultures (PROC_ID) 
+
+	
+
+IF OBJECT_ID(N'tempdb..#BolusMeds') IS NOT NULL DROP TABLE #BolusMeds;
+
+	SELECT vcg.GROUPER_RECORDS_NUMERIC_ID MED_ID
+
+	INTO #BolusMeds
+
+	FROM [dbo].[GROUPER_COMPILED_LIST] vcg
+
+	WHERE vcg.COMPILED_CONTEXT = 'MEDS'
+
+	AND vcg.BASE_GROUPER_ID IN ('800009')
+
+CREATE INDEX IDX_BolusMeds ON #BolusMeds (MED_ID) 
+
+	
+
+IF OBJECT_ID(N'tempdb..#BolusMedsOnce') IS NOT NULL DROP TABLE #BolusMedsOnce;
+
+	SELECT vcg.GROUPER_RECORDS_NUMERIC_ID MED_ID
+
+	INTO #BolusMedsOnce
+
+	FROM [dbo].[GROUPER_COMPILED_LIST] vcg
+
+	WHERE vcg.COMPILED_CONTEXT = 'MEDS'
+
+	AND vcg.BASE_GROUPER_ID IN ('800017')
+
+CREATE INDEX IDX_BolusMedOnce ON #BolusMedsOnce (MED_ID) 
+
+	
+
+IF OBJECT_ID(N'tempdb..#MedGroupers') IS NOT NULL DROP TABLE #MedGroupers;
+
+	SELECT vcg.GROUPER_LIST VCG_ID
+
+	INTO #MedGroupers
+
+	FROM [dbo].[GROUPER_GROUPS] vcg
+
+	WHERE vcg.GROUPER_ID IN ('800011')
+
+CREATE INDEX IDX_MedGroupers ON #MedGroupers (VCG_ID) 
+
+
+
+IF OBJECT_ID(N'tempdb..#MedGroupersERX') IS NOT NULL DROP TABLE #MedGroupersERX;
+
+	SELECT vcg.GROUPER_RECORDS_NUMERIC_ID ERX_ID
+
+	INTO #MedGroupersERX
+
+	FROM [dbo].[GROUPER_COMPILED_LIST] vcg
+
+	WHERE VCG.COMPILED_CONTEXT = 'MEDS'
+
+	AND vcg.BASE_GROUPER_ID IN ('800011')
+
+CREATE INDEX IDX_MedGroupersERX ON #MedGroupersERX (ERX_ID) 
+
+
+
+IF OBJECT_ID(N'tempdb..#MARActions') IS NOT NULL DROP TABLE #MARActions;
+
+	SELECT CAST(vcg.LIST_CAT_VALUE_CODE AS varchar) CAT_ID
+
+	INTO #MARActions
+
+	FROM [dbo].[CONFIG_GROUPER_CATEGORIES] vcg
+
+	WHERE vcg.GROUPER_ID IN ('800007')
+
+CREATE INDEX IDX_MARActions ON #MARActions (CAT_ID) 
+
+
+
+IF OBJECT_ID(N'tempdb..#RouteExclusions') IS NOT NULL DROP TABLE #RouteExclusions;
+
+	SELECT vcg.LIST_CAT_VALUE_CODE CAT_ID
+
+	INTO #RouteExclusions
+
+	FROM [dbo].[CONFIG_GROUPER_CATEGORIES] vcg
+
+	WHERE vcg.GROUPER_ID IN ('800008')
+
+CREATE INDEX IDX_RouteExclusions ON #RouteExclusions (CAT_ID) 
+
+
+
+IF OBJECT_ID(N'tempdb..#CVLFlo') IS NOT NULL DROP TABLE #CVLFlo;
+
+	SELECT vcg.GROUPER_RECORDS_NUMERIC_ID FLO_ID
+
+	INTO #CVLFlo
+
+	FROM [dbo].[GROUPER_COMPILED_LIST] vcg
+
+	WHERE vcg.COMPILED_CONTEXT = 'FLO'
+
+	AND vcg.BASE_GROUPER_ID IN ('800010')
+
+CREATE INDEX IDX_CVLFlo ON #CVLFlo (FLO_ID) 
+
+	
+
+IF OBJECT_ID(N'tempdb..#SepsisScoreFlo') IS NOT NULL DROP TABLE #SepsisScoreFlo;
+
+	SELECT vcg.GROUPER_RECORDS_NUMERIC_ID FLO_ID
+
+	INTO #SepsisScoreFlo
+
+	FROM [dbo].[GROUPER_COMPILED_LIST] vcg
+
+	WHERE vcg.COMPILED_CONTEXT = 'FLO'
+
+	AND vcg.BASE_GROUPER_ID IN ('800005')
+
+CREATE INDEX IDX_SepsisScoreFlo ON #SepsisScoreFlo (FLO_ID) 
+
+	
+
+IF OBJECT_ID(N'tempdb..#LacticAcidLRR') IS NOT NULL DROP TABLE #LacticAcidLRR;
+
+	SELECT vcg.GROUPER_RECORDS_NUMERIC_ID LRR_ID
+
+	INTO #LacticAcidLRR
+
+	FROM [dbo].[GROUPER_COMPILED_LIST] vcg
+
+	WHERE vcg.COMPILED_CONTEXT = 'LRR'
+
+	AND vcg.BASE_GROUPER_ID IN ('800012')
+
+CREATE INDEX IDX_Lactic ON #LacticAcidLRR (LRR_ID) 
+
+
+
+IF OBJECT_ID(N'tempdb..#LacticAcidLRRByName') IS NOT NULL DROP TABLE #LacticAcidLRRByName;
+
+	SELECT LC.COMPONENT_ID LRR_ID
+
+	INTO #LacticAcidLRRByName
+
+	FROM [dbo].[LAB_COMPONENTS] LC
+
+	WHERE LC.NAME LIKE '%LACTIC ACID%'
+
+CREATE INDEX IDX_Lacticacidbyname ON #LacticAcidLRRByName (LRR_ID) 
+
+
+
+IF OBJECT_ID(N'tempdb..#Ordersets') IS NOT NULL DROP TABLE #Ordersets;
+
+	SELECT vcg.GROUPER_RECORDS_NUMERIC_ID PRL_ID
+
+	INTO #Ordersets
+
+	FROM [dbo].[GROUPER_COMPILED_LIST] vcg
+
+	WHERE vcg.COMPILED_CONTEXT = 'PRL'
+
+	AND vcg.BASE_GROUPER_ID IN ('800018')
+
+CREATE INDEX IDX_ordersets ON #Ordersets (PRL_ID) 
+
+	
+
+IF OBJECT_ID(N'tempdb..#DXSepticShock') IS NOT NULL DROP TABLE #DXSepticShock;
+
+	SELECT vcg.CODE EDG_ID
+
+	INTO #DXSepticShock
+
+	FROM [dbo].[GROUPER_TERMINOLOGY] vcg
+
+	WHERE vcg.GROUPER_ID IN ('800019')
+
+CREATE INDEX IDX_septicshock ON #DXSepticShock (EDG_ID) 
+
+	
+
+IF OBJECT_ID(N'tempdb..#DXSepsis') IS NOT NULL DROP TABLE #DXSepsis;
+
+	SELECT vcg.CODE EDG_ID
+
+	INTO #DXSepsis
+
+	FROM [dbo].[GROUPER_TERMINOLOGY] vcg
+
+	WHERE vcg.GROUPER_ID IN ('800020')
+
+CREATE INDEX IDX_Sepsis ON #DXSepsis (EDG_ID) 
+
+	
+
+IF OBJECT_ID(N'tempdb..#EDDepts') IS NOT NULL DROP TABLE #EDDepts;
+
+	SELECT vcg.GROUPER_RECORDS_NUMERIC_ID DEP_ID
+
+	INTO #EDDepts
+
+	FROM [dbo].[GROUPER_COMPILED_LIST] vcg
+
+	WHERE vcg.COMPILED_CONTEXT = 'DEP'
+
+	AND vcg.BASE_GROUPER_ID IN ('800021')
+
+CREATE INDEX IDX_EDDepts ON #EDDepts (DEP_ID) 
+
+	
+
+IF OBJECT_ID(N'tempdb..#HemOncBMTDepts') IS NOT NULL DROP TABLE #HemOncBMTDepts;
+
+	SELECT vcg.GROUPER_RECORDS_NUMERIC_ID DEP_ID
+
+	INTO #HemOncBMTDepts
+
+	FROM [dbo].[GROUPER_COMPILED_LIST] vcg
+
+	WHERE vcg.COMPILED_CONTEXT = 'DEP'
+
+	AND vcg.BASE_GROUPER_ID IN ('800022')
+
+CREATE INDEX IDX_HOBMTDepts ON #HemOncBMTDepts (DEP_ID) 
+
+
+
+IF OBJECT_ID(N'tempdb..#DXIDCebrealPalsy') IS NOT NULL DROP TABLE #DXIDCebrealPalsy;
+
+	SELECT vcg.CODE EDG_ID
+
+	INTO #DXIDCebrealPalsy
+
+	FROM [dbo].[GROUPER_TERMINOLOGY] vcg
+
+	WHERE vcg.GROUPER_ID IN ('800023')
+
+CREATE INDEX IDX_exidcebrealpalsy ON #DXIDCebrealPalsy (EDG_ID) 
+
+
+
+IF OBJECT_ID(N'tempdb..#DXTrachDependent') IS NOT NULL DROP TABLE #DXTrachDependent;
+
+	SELECT vcg.CODE EDG_ID
+
+	INTO #DXTrachDependent
+
+	FROM [dbo].[GROUPER_TERMINOLOGY] vcg
+
+	WHERE vcg.GROUPER_ID IN ('800024')
+
+CREATE INDEX IDX_dxtrachdep ON  #DXTrachDependent(EDG_ID) 
+
+
+
+IF OBJECT_ID(N'tempdb..#ERXAntimicrobial') IS NOT NULL DROP TABLE #ERXAntimicrobial;
+
+	SELECT cntl.CODE 
+
+	, cntl.VALUE_SET_DISPLAY as AGENT
+
+	, case when CHARINDEX('^',cntl.VALUE_SET_ABBR)>0 then SUBSTRING(cntl.VALUE_SET_ABBR,0,CHARINDEX('^',cntl.VALUE_SET_ABBR)) else cntl.VALUE_SET_ABBR end as AGENT_GROUP
+
+	, case when cntl.VALUE_SET_ABBR like '%^Y' then 1 else 0 end as DOT_MONITORING
+
+	INTO #ERXAntimicrobial
+
+	FROM reports.CONFIG_VALUE_SET cntl 
+
+	WHERE cntl.VALUE_SET_ID = 3016
+
+CREATE INDEX IDX_ERXAntimicrobial ON  #ERXAntimicrobial(CODE) 
+
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+/* DEFINING BASE POPULATION */
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+/*GETTING ENCOUNTERS WITHIN GIVEN DATE RANGES SO WE DON'T HAVE TO QUERY ON WHOLE DATABASE FOR EACH CRITERIA*/
+
+IF OBJECT_ID(N'tempdb..#Base_Pop_1') IS NOT NULL DROP TABLE #Base_Pop_1;
+
+SELECT DISTINCT
+
+	HE.PATIENT_ID
+
+	, HE.ENCOUNTER_ID
+
+	, HTR.HOSPITAL_ACCOUNT_ID
+
+	, HE.INPATIENT_DATA_ID
+
+	, HE.ADT_ARRIVAL_TIME
+
+	, HE.HOSP_ADMSN_TIME
+
+	, HE.ADMIT_SOURCE_CODE
+
+	, HE.INP_ADM_DATE
+
+	, HE.HOSP_DISCH_TIME
+
+	, HE.DISCH_DISP_CODE
+
+	, DATEDIFF(MM,PAT.BIRTH_DATE,COALESCE(HE.ADT_ARRIVAL_TIME,HE.HOSP_ADMSN_TIME)) AS AGE_MONTHS
+
+	, FLOOR(DATEDIFF(DD,PAT.BIRTH_DATE,HE.HOSP_ADMSN_TIME)/365.25) AS AGE_YEARS
+
+	, HTR.REVENUE_LOC_ID
+
+INTO #Base_Pop_1
+
+FROM dbo.V_HOSPITAL_TRANSACTIONS HTR
+
+INNER JOIN dbo.HOSPITAL_ENCOUNTERS HE ON HTR.ENCOUNTER_ID = HE.ENCOUNTER_ID AND HE.ADMIT_CONF_STAT_CODE IN (1,4) AND HE.HOSP_ADMSN_TIME IS NOT NULL AND HE.ADT_PATIENT_CLASS_CODE <> 102
+
+INNER JOIN dbo.PATIENTS PAT ON PAT.PATIENT_ID = HE.PATIENT_ID
+
+INNER JOIN dbo.HOSPITAL_ACCOUNTS HACC ON HACC.HOSPITAL_ACCOUNT_ID = HTR.HOSPITAL_ACCOUNT_ID
+
+INNER JOIN dbo.CALENDAR_DATES dd ON dd.CALENDAR_DT = CAST(HE.HOSP_DISCH_TIME AS DATE)
+
+WHERE HTR.SERVICE_DATE BETWEEN @StartDate AND @EndDate 
+
+AND (
+
+	HACC.ACCT_BASECLS_HA_CODE IN (1,3)--EXCLUDE OUTPATIENTS
+
+	OR
+
+	HACC.ACCT_CLASS_HA_CODE = 104--BUT INCLUDE OBSERVATION PATIENTS
+
+)
+
+AND HTR.TX_TYPE_HA_CODE = 1
+
+AND HACC.ACCT_BILLSTS_HA_CODE <> 99 --Combined account (Not the primary)
+
+AND dd.CALENDAR_DT BETWEEN @StartDate AND @EndDate
+
+AND ( -- Developer C - Added to restrict datas by hospital location
+
+		(@Hospitals = 1 AND HTR.REVENUE_LOC_ID IN ('200108', '200999')) -- MAIN ONLY
+
+	OR	(@Hospitals = 2 AND HTR.REVENUE_LOC_ID IN ('200200', '200299')) -- WEST Only
+
+	OR	(@Hospitals = 3 AND htr.REVENUE_LOC_ID IS NOT NULL) -- Any hospital
+
+)
+
+AND htr.HOSPITAL_ACCOUNT_ID NOT IN (SELECT HOSPITAL_ACCOUNT_ID FROM dbo.HOSPITAL_ACCOUNTS_EXT WHERE AT_BILLING_PRIM_PAYER_ID = 2109) 
+
+	-- Exclude Hospital Accounts where PATIENTS is on ORGANDONOR insurance (organ donations)
+
+CREATE INDEX IDX_BasePop1 ON #Base_Pop_1 (ENCOUNTER_ID) 
+
+-- SELECT * FROM #Base_Pop_1
+
+
+
+/* LIST OF ENCOUNTER ADMITTED DIRECTLY TO NICU BEGIN */
+
+IF OBJECT_ID(N'tempdb..#NICUAdmissions') IS NOT NULL DROP TABLE #NICUAdmissions;
+
+SELECT DISTINCT ADT.ENCOUNTER_ID 
+
+INTO #NICUAdmissions
+
+FROM #Base_Pop_1 B
+
+INNER JOIN dbo.ADT_EVENTS ADT ON ADT.ENCOUNTER_ID = B.ENCOUNTER_ID
+
+WHERE ADT.EVENT_TYPE_CODE = 1 --ADMISSION
+
+AND ADT.EVENT_SUBTYPE_CODE <> 2 --CANCELLED
+
+AND ADT.DEPARTMENT_ID IN ( SELECT * FROM #NICUCICUDept)
+
+/* LIST OF ENCOUNTER ADMITTED DIRECTLY TO NICU END */
+
+
+
+--Final Base Population -- ALL ENCOUNTERS FROM PREVIOUS MONTH WHERE PATIENTS WAS ADMITTED (NOT DISCHARGED FROM ED). EXCLUDING PATIENTS WHO WERE ADMITTED TO NICU DIRECTLY
+
+IF OBJECT_ID(N'tempdb..#Base_Pop') IS NOT NULL DROP TABLE #Base_Pop;
+
+SELECT FP.*
+
+INTO #Base_Pop
+
+FROM #Base_Pop_1 FP
+
+WHERE FP.ENCOUNTER_ID NOT IN (SELECT ENCOUNTER_ID FROM #NICUAdmissions)--EXCLUDE NICU ADMISSIONS
+
+AND FP.ENCOUNTER_ID  NOT IN (SELECT DISTINCT ENCOUNTER_ID FROM reports.SEVERE_SEPSIS_STAGING)--make sure we are not includiung already submitted encounters
+
+	-- Developer C moved from #Base_Pop_1 to #Base_Pop for reporting on a month that's already been submitted
+
+CREATE INDEX IDX_BasePopPat ON #Base_Pop (ENCOUNTER_ID) 
+
+CREATE INDEX IDX_BasePopFLO ON #Base_Pop (INPATIENT_DATA_ID) 
+
+
+
+--SELECT * FROM #Base_Pop WHERE HOSPITAL_ACCOUNT_ID = '6003056042'
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+/* Treatment Plan Begin*/
+
+-- All encounters from #Base_pop where ABX was administered
+
+IF OBJECT_ID(N'tempdb..#TreatPlanABX') IS NOT NULL DROP TABLE #TreatPlanABX; --SELECT * FROM #TreatPlanABX
+
+SELECT MO.ENCOUNTER_ID
+
+	, MA.TAKEN_TIME AS ABX_ADMIN_TIME
+
+	, MEDS.NAME
+
+INTO #TreatPlanABX
+
+FROM #Base_Pop B -- ONLY THOSE PATIENTS WITH A POSITIVE SCORE
+
+INNER JOIN dbo.MEDICATION_ORDERS MO ON MO.ENCOUNTER_ID = B.ENCOUNTER_ID
+
+INNER JOIN dbo.MEDICATIONS MEDS ON MEDS.MEDICATION_ID = MO.MEDICATION_ID --AND MEDS.THERA_CLASS_CODE = 11 --Antibiotics
+
+INNER JOIN dbo.MED_ADMIN_RECORDS MA ON MA.ORDER_MED_ID = MO.ORDER_MED_ID
+
+WHERE MA.TAKEN_TIME IS NOT NULL	--ADMINISTERED ABX ONLY
+
+AND MO.MED_ROUTE_CODE = 11--IV ONLY
+
+AND MA.MAR_ACTION_CODE IN (SELECT * FROM #MARActions)
+
+AND MO.MEDICATION_ID IN 
+
+	(	
+
+		SELECT medlist.MEDICATION_ID
+
+		FROM (
+
+			SELECT RXM.MEDICATION_ID
+
+				, RXM.NAME
+
+				, cntl.AGENT
+
+				, cntl.AGENT_GROUP
+
+				, cntl.DOT_MONITORING
+
+				, gen.TITLE
+
+				, ROW_NUMBER() over(partition by RXM.MEDICATION_ID order by cntl.DOT_MONITORING, cntl.AGENT asc) as AGENT_ORDER
+
+			FROM dbo.MEDICATIONS RXM
+
+			OUTER APPLY( --Get the main medication's simple generic if its a mixture
+
+				SELECT TOP 1 
+
+					mix.DRUG_ID
+
+					, comp.SIMPLE_GENERIC_CODE 
+
+				FROM dbo.MED_MIX_COMPONENTS mix
+
+				INNER JOIN dbo.MEDICATIONS comp on mix.DRUG_ID = comp.MEDICATION_ID
+
+				WHERE mix.TYPE_CODE = 3		--3 - Medications 
+
+				AND mix.MEDICATION_ID = RXM.MEDICATION_ID
+
+				ORDER BY mix.LINE
+
+			) mixture
+
+			INNER JOIN dbo.REF_GENERIC_MED gen on gen.SIMPLE_GENERIC_CODE = coalesce(RXM.SIMPLE_GENERIC_CODE,mixture.SIMPLE_GENERIC_CODE)
+
+			INNER JOIN #ERXAntimicrobial cntl ON cntl.CODE = gen.SIMPLE_GENERIC_CODE
+
+		) medlist
+
+		WHERE medlist.AGENT_ORDER=1						
+
+	)
+
+UNION
+
+	SELECT DISTINCT
+
+		MO.ENCOUNTER_ID
+
+		, MA.TAKEN_TIME AS ABX_ADMIN_TIME
+
+		, MEDS.NAME
+
+	FROM #Base_Pop B -- ONLY THOSE PATIENTS WITH A POSITIVE SCORE
+
+	INNER JOIN dbo.MEDICATION_ORDERS MO ON MO.ENCOUNTER_ID = B.ENCOUNTER_ID
+
+	INNER JOIN dbo.MEDICATIONS MEDS ON MEDS.MEDICATION_ID = MO.MEDICATION_ID AND MEDS.THERA_CLASS_CODE = 11 --Antibiotics
+
+	INNER JOIN dbo.MED_ADMIN_RECORDS MA ON MA.ORDER_MED_ID = MO.ORDER_MED_ID
+
+	WHERE MA.TAKEN_TIME IS NOT NULL	--ADMINISTERED ABX ONLY
+
+	AND MO.MED_ROUTE_CODE = 11--IV ONLY
+
+	AND MA.MAR_ACTION_CODE IN (SELECT * FROM #MARActions)
+
+CREATE INDEX IDX_TreatPlan ON #TreatPlanABX (ENCOUNTER_ID) 
+
+	--SELECT * FROM #TreatPlanABX 
+
+
+
+-- All encounters from #Base_pop where Bolus was administered
+
+IF OBJECT_ID(N'tempdb..#TreatPlanBolus') IS NOT NULL DROP TABLE #TreatPlanBolus;
+
+SELECT b.ENCOUNTER_ID
+
+	, MA.TAKEN_TIME AS BOLUS_ADMIN_TIME
+
+	, ROW_NUMBER() OVER(PARTITION BY b.ENCOUNTER_ID ORDER BY MA.TAKEN_TIME ASC) BOLUS_NUM
+
+	, MA.SIG AS BOLUS_VOLUME
+
+INTO #TreatPlanBolus
+
+FROM #Base_Pop B
+
+INNER JOIN dbo.MEDICATION_ORDERS MO ON MO.ENCOUNTER_ID = B.ENCOUNTER_ID
+
+INNER JOIN dbo.MEDICATIONS MEDS ON MEDS.MEDICATION_ID = MO.MEDICATION_ID
+
+INNER JOIN dbo.MED_ADMIN_RECORDS MA ON MA.ORDER_MED_ID = MO.ORDER_MED_ID
+
+WHERE MA.TAKEN_TIME IS NOT NULL --ADMINISTERED BOLUS ONLY
+
+AND ( MO.MEDICATION_ID IN (SELECT * FROM #BolusMeds) 
+
+	OR (MO.MEDICATION_ID IN (SELECT * FROM #BolusMedsOnce) AND MO.HV_DISCR_FREQ_ID = '300902')
+
+) -- FREQUENCY = ONCE 
+
+AND (MA.MAR_ACTION_CODE IN (SELECT * FROM #MARActions) AND MA.MAR_ACTION_CODE <> '99') --3/18/24 - Original code didn't have Rate Change action Stakeholder A believes there was a specific reason so leaving as it was 
+
+AND CONVERT(NUMERIC, MA.SIG ) > 95.0
+
+GROUP BY b.ENCOUNTER_ID
+
+	, MA.TAKEN_TIME
+
+	, MA.SIG
+
+CREATE INDEX IDX_TreatPlanBolus ON #TreatPlanBolus (ENCOUNTER_ID) 
+
+
+
+-- All encounters with 2 bolusus within 6 hours
+
+IF OBJECT_ID(N'tempdb..#BOL22') IS NOT NULL DROP TABLE #BOL22
+
+SELECT ENCOUNTER_ID
+
+	, BOLUS_ADMIN_TIME AS FIRST_BOLUS_TIME
+
+	, LEAD(BOLUS_ADMIN_TIME,1,NULL) OVER(PARTITION BY ENCOUNTER_ID ORDER BY BOLUS_ADMIN_TIME) AS SECOND_BOLUS_TIME
+
+	, ABS(DATEDIFF(MI,BOLUS_ADMIN_TIME, LEAD(BOLUS_ADMIN_TIME,1,NULL) OVER(PARTITION BY ENCOUNTER_ID ORDER BY BOLUS_ADMIN_TIME)))/60.0 AS BOL12_TIME
+
+INTO #BOL22 
+
+FROM #TreatPlanBolus
+
+CREATE INDEX IDX_Bol22 ON #BOL22 (ENCOUNTER_ID) 
+
+
+
+IF OBJECT_ID(N'tempdb..#TPTwoBolus') IS NOT NULL DROP TABLE #TPTwoBolus;	
+
+SELECT B1.ENCOUNTER_ID
+
+	,B1.FIRST_BOLUS_TIME
+
+	, B1.SECOND_BOLUS_TIME
+
+INTO #TPTwoBolus
+
+FROM #BOL22 B1
+
+WHERE B1.BOL12_TIME <= 6.0
+
+--CREATE INDEX IDX_TPTwoBolus ON #TPTwoBolus (ENCOUNTER_ID) 
+
+
+
+-- All encounters from #Base_pop where Pressor was administered
+
+IF OBJECT_ID(N'tempdb..#TreatPlanPres') IS NOT NULL DROP TABLE #TreatPlanPres;
+
+SELECT B.ENCOUNTER_ID
+
+	, MA.MAR_ACTION_CODE
+
+	, MA.TAKEN_TIME AS PRESSOR_START_TIME
+
+	, ROW_NUMBER() OVER(PARTITION BY B.ENCOUNTER_ID ORDER BY MA.TAKEN_TIME ASC) AS SS_LINE
+
+	, GMR.GROUPER_ID
+
+INTO #TreatPlanPres 
+
+FROM #Base_Pop B
+
+INNER JOIN dbo.MEDICATION_ORDERS MO ON MO.ENCOUNTER_ID = B.ENCOUNTER_ID
+
+INNER JOIN dbo.MEDICATIONS MEDS ON MEDS.MEDICATION_ID = MO.MEDICATION_ID
+
+INNER JOIN dbo.GROUPER_MED_RECORDS GMR ON GMR.EXP_MEDS_LIST_ID = MEDS.MEDICATION_ID
+
+INNER JOIN dbo.MED_ADMIN_RECORDS MA ON MA.ORDER_MED_ID = MO.ORDER_MED_ID
+
+		AND MA.ROUTE_CODE = 11  --INTRAVENOUS		
+
+WHERE GMR.GROUPER_ID IN (SELECT * FROM #MedGroupers)
+
+CREATE INDEX IDX_TreatPlanPres ON #TreatPlanPres (ENCOUNTER_ID) 
+
+
+
+-- All encounters with a bolus and a pressor within 6 hours
+
+IF OBJECT_ID(N'tempdb..#TPBolusPressor') IS NOT NULL DROP TABLE #TPBolusPressor;
+
+SELECT b.ENCOUNTER_ID
+
+	, b.BOLUS_ADMIN_TIME AS BOLUS_TIME
+
+	, p.PRESSOR_START_TIME AS PRESSOR_TIME
+
+INTO #TPBolusPressor
+
+FROM #TreatPlanBolus b
+
+INNER JOIN #TreatPlanPres p ON b.ENCOUNTER_ID = p.ENCOUNTER_ID
+
+WHERE ABS(DATEDIFF(MI, b.BOLUS_ADMIN_TIME, p.PRESSOR_START_TIME))/60.0 <= 6.0 --BOLUS AND PRESSOR WITHIN 6 HOURS
+
+--CREATE INDEX IDX_TPBolusPres ON #TPBolusPressor (ENCOUNTER_ID) 
+
+	
+
+-- All encounters with 2 bolusus and abx within 6 hours
+
+IF OBJECT_ID(N'tempdb..#TPAbx2Bolus') IS NOT NULL DROP TABLE #TPAbx2Bolus;	
+
+SELECT tpa.ENCOUNTER_ID
+
+	, tpa.ABX_ADMIN_TIME
+
+	, tpb.FIRST_BOLUS_TIME
+
+	, tpb.SECOND_BOLUS_TIME
+
+INTO #TPAbx2Bolus
+
+FROM #TreatPlanABX tpa
+
+JOIN #TPTwoBolus tpb ON tpb.ENCOUNTER_ID = tpa.ENCOUNTER_ID
+
+WHERE ABS(DATEDIFF(MI, tpa.ABX_ADMIN_TIME, tpb.FIRST_BOLUS_TIME))/60.0 <= 6 --ABX AND BOLUS WITHIN 6 HOURS
+
+AND ABS(DATEDIFF(MI, tpa.ABX_ADMIN_TIME, tpb.SECOND_BOLUS_TIME))/60.0 <= 6 --ABX AND SECOND BOLUS WITHIN 6 HOURS
+
+--CREATE INDEX IDX_TPAbx2Bolus ON #TPAbx2Bolus (ENCOUNTER_ID) 
+
+
+
+-- All encounters with a bolus, a pressor and abx within 6 hours
+
+IF OBJECT_ID(N'tempdb..#TPAbxBolusPressor') IS NOT NULL DROP TABLE #TPAbxBolusPressor;	
+
+SELECT tpa.ENCOUNTER_ID
+
+	, tpa.ABX_ADMIN_TIME
+
+	, tpbp.BOLUS_TIME
+
+	, tpbp.PRESSOR_TIME
+
+INTO #TPAbxBolusPressor
+
+FROM #TreatPlanABX tpa
+
+JOIN #TPBolusPressor tpbp ON tpbp.ENCOUNTER_ID = tpa.ENCOUNTER_ID
+
+WHERE ABS(DATEDIFF(MI, tpa.ABX_ADMIN_TIME, tpbp.BOLUS_TIME))/60.0 <= 6 --ABX AND BOLUS WITHIN 6 HOURS 
+
+AND ABS(DATEDIFF(MI, tpa.ABX_ADMIN_TIME, tpbp.PRESSOR_TIME))/60.0 <= 6 --ABX AND SECOND BOLUS WITHIN 6 HOURS	
+
+--CREATE INDEX IDX_TPAbxBolusPressor ON #TPAbxBolusPressor (ENCOUNTER_ID) 
+
+	
+
+-- Merging them into one table for the first part of treatment plan i.e., abx + (2 boluses or (1 bolus + pressor))
+
+IF OBJECT_ID(N'tempdb..#TP1') IS NOT NULL DROP TABLE #TP1;
+
+	SELECT  ENCOUNTER_ID
+
+		, ABX_ADMIN_TIME
+
+		, FIRST_BOLUS_TIME
+
+		, SECOND_BOLUS_TIME
+
+		, NULL AS PRESSOR_START_TIME
+
+	INTO #TP1
+
+	FROM #TPAbx2Bolus
+
+UNION ALL
+
+	SELECT ENCOUNTER_ID
+
+		, ABX_ADMIN_TIME
+
+		, BOLUS_TIME AS FIRST_BOLUS_TIME
+
+		, NULL AS SECOND_BOLUS_TIME
+
+		, PRESSOR_TIME
+
+	FROM #TPAbxBolusPressor
+
+--CREATE INDEX IDX_TP1 ON #TP1 (ENCOUNTER_ID) 
+
+
+
+--Getting List of Encounters where a Blood Culture was ordered. this is the 2nd pat of treatment plan
+
+IF OBJECT_ID(N'tempdb..#TP2') IS NOT NULL DROP TABLE #TP2;
+
+SELECT b.ENCOUNTER_ID
+
+	, PO.ORDER_INST AS BLOOD_CULTURE_ORDER_TIME
+
+INTO #TP2
+
+FROM #Base_Pop b
+
+INNER JOIN dbo.PROCEDURE_ORDERS PO ON PO.ENCOUNTER_ID = b.ENCOUNTER_ID
+
+	AND PO.PROC_ID IN (SELECT * FROM #BloodCultures)  --BLOOD CULTURE
+
+	AND PO.INSTANTIATED_TIME IS NOT NULL 
+
+	AND PO.FUTURE_OR_STAND IS NULL
+
+--CREATE INDEX IDX_TP2 ON #TP2 (ENCOUNTER_ID) 
+
+
+
+--COMBINING BOTH PARTS OF TREATMENT PLAN INTO ONE
+
+IF OBJECT_ID(N'tempdb..#Treatment') IS NOT NULL DROP TABLE #Treatment;
+
+SELECT p1.*
+
+	, p2.BLOOD_CULTURE_ORDER_TIME
+
+INTO #Treatment 
+
+FROM #TP1 p1
+
+INNER JOIN #TP2 p2 ON p2.ENCOUNTER_ID = p1.ENCOUNTER_ID
+
+WHERE p2.BLOOD_CULTURE_ORDER_TIME BETWEEN DATEADD(HH, -72, p1.ABX_ADMIN_TIME) AND DATEADD(HH, 72, p1.ABX_ADMIN_TIME) --BLOOD CULTURE ORDERED 72 HOURS BEFORE OF AFTER ABX ADMINISTERED TIME
+
+AND p2.BLOOD_CULTURE_ORDER_TIME BETWEEN DATEADD(HH, -72, P1.FIRST_BOLUS_TIME) AND DATEADD(HH, 72, p1.FIRST_BOLUS_TIME) --BLOOD CULTURE ORDERED 72 HOURS BEFORE OF AFTER FIRST BOLUS ADMINISTERED TIME
+
+AND p2.BLOOD_CULTURE_ORDER_TIME BETWEEN DATEADD(HH, -72, COALESCE(p1.SECOND_BOLUS_TIME, p1.PRESSOR_START_TIME)) AND DATEADD(HH, 72, COALESCE(p1.SECOND_BOLUS_TIME, p1.PRESSOR_START_TIME)) --BLOOD CULTURE ORDERED 72 HOURS BEFORE OF AFTER SECONF BOLUS OR PRESSOR ADMINISTERED TIME
+
+CREATE INDEX IDX_Treatment ON #Treatment (ENCOUNTER_ID) 
+
+/* Treatment Plan End */
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+/*SEVERE SEPSIS CRITERIA 1 BEGIN*/
+
+/*1. ER SEPSIS SCORE >= 95 OR OD SCORE >= 3
+
+AND 2. TREAMENT*/
+
+
+
+--POSITIVE SEPSIS SCORES
+
+IF OBJECT_ID(N'tempdb..#Base_Pop_Severe_ED_Scores') IS NOT NULL DROP TABLE #Base_Pop_Severe_ED_Scores;
+
+SELECT BP.ENCOUNTER_ID
+
+	, FM.MEAS_VALUE
+
+	, FM.RECORDED_TIME
+
+	, BP.ADT_ARRIVAL_TIME
+
+	, BP.INP_ADM_DATE
+
+INTO  #Base_Pop_Severe_ED_Scores 
+
+FROM #Base_Pop BP 
+
+INNER JOIN dbo.PATIENT_ENCOUNTERS enc on enc.ENCOUNTER_ID = bp.ENCOUNTER_ID
+
+--INNER JOIN #Base_Pop HE ON HE.ENCOUNTER_ID = BP.ENCOUNTER_ID AND HE.ADT_ARRIVAL_TIME IS NOT NULL--MAKE SURE ITS AN ED ARRIVAL--Arrival Time Filter addedd on 07.30.2019
+
+JOIN dbo.FLOWSHEET_RECORDS FR ON FR.INPATIENT_DATA_ID = enc.INPATIENT_DATA_ID
+
+JOIN dbo.FLOWSHEET_MEASUREMENTS FM ON FM.FSD_ID = FR.FSD_ID
+
+WHERE FM.FLO_MEAS_ID IN (SELECT * FROM #SepsisScoreFlo)
+
+AND FM.RECORDED_TIME < COALESCE(BP.INP_ADM_DATE, BP.HOSP_DISCH_TIME) --since ED Sepsis Score is also documented in IP setting but can't be counted towards Positive Sepsis Score, making sure that it is before the PATIENTS departed ED--addedd on 07.30.2019
+
+CREATE INDEX IDX_BPEDScore ON #Base_Pop_Severe_ED_Scores (ENCOUNTER_ID) 
+
+
+
+IF OBJECT_ID(N'tempdb..#ED_PositiveScores') IS NOT NULL DROP TABLE #ED_PositiveScores;
+
+SELECT ENCOUNTER_ID
+
+	, MEAS_VALUE
+
+	, RECORDED_TIME
+
+	, ROW_NUMBER() OVER(PARTITION BY ENCOUNTER_ID ORDER BY RECORDED_TIME ASC) AS SS_LINE
+
+INTO #ED_PositiveScores
+
+FROM #Base_Pop_Severe_ED_Scores
+
+WHERE MEAS_VALUE > 4
+
+ORDER BY ENCOUNTER_ID
+
+--CREATE INDEX IDX_EDPosScores ON #ED_PositiveScores (ENCOUNTER_ID) 
+
+
+
+IF OBJECT_ID(N'tempdb..#Base_Pop_Severe_IP_Scores') IS NOT NULL DROP TABLE #Base_Pop_Severe_IP_Scores;
+
+SELECT BP.ENCOUNTER_ID
+
+	, FM.MEAS_VALUE
+
+	, FM.RECORDED_TIME
+
+INTO #Base_Pop_Severe_IP_Scores
+
+FROM #Base_Pop BP 
+
+INNER JOIN dbo.PATIENT_ENCOUNTERS enc on enc.ENCOUNTER_ID = bp.ENCOUNTER_ID
+
+JOIN dbo.FLOWSHEET_RECORDS FR ON FR.INPATIENT_DATA_ID = enc.INPATIENT_DATA_ID
+
+JOIN dbo.FLOWSHEET_MEASUREMENTS FM ON FM.FSD_ID = FR.FSD_ID
+
+WHERE FM.FLO_MEAS_ID IN (SELECT * FROM #ODScores)
+
+AND FM.RECORDED_TIME > COALESCE(BP.INP_ADM_DATE,BP.HOSP_ADMSN_TIME) --WE WANT OD SCORES AFTER THE PATIENTS'S STATUS WAS CHANGED TO IP 
+
+--CREATE INDEX IDX_BPIPScores ON #Base_Pop_Severe_IP_Scores (ENCOUNTER_ID) 
+
+
+
+IF OBJECT_ID(N'tempdb..#IP_PositiveScores') IS NOT NULL DROP TABLE #IP_PositiveScores;
+
+SELECT ENCOUNTER_ID
+
+	, MEAS_VALUE
+
+	, RECORDED_TIME
+
+	, ROW_NUMBER() OVER(PARTITION BY ENCOUNTER_ID ORDER BY RECORDED_TIME ASC) AS SS_LINE	
+
+INTO #IP_PositiveScores
+
+FROM #Base_Pop_Severe_IP_Scores
+
+WHERE MEAS_VALUE > 2 --OD SCORES >=3 IS A POSITIVE SCORE
+
+ORDER BY ENCOUNTER_ID
+
+--CREATE INDEX IDX_IPPosScore ON #IP_PositiveScores (ENCOUNTER_ID) 
+
+	
+
+-- GETTING SCORE INFO FOR EACH ENCOUNTER
+
+IF OBJECT_ID(N'tempdb..#ScoresAll') IS NOT NULL DROP TABLE #ScoresAll;
+
+	SELECT IP.ENCOUNTER_ID
+
+		, MEAS_VALUE AS SCORE
+
+		, IP.RECORDED_TIME AS SCORE_TIME
+
+	INTO #ScoresAll
+
+	FROM #IP_PositiveScores IP
+
+UNION
+
+	SELECT ED.ENCOUNTER_ID
+
+		, MEAS_VALUE AS SCORE
+
+		, ED.RECORDED_TIME AS SCORE_TIME
+
+	FROM #ED_PositiveScores ED
+
+--CREATE INDEX IDX_ScoresAll ON #ScoresAll (ENCOUNTER_ID) 
+
+
+
+-- Ranking the scores 
+
+IF OBJECT_ID(N'tempdb..#Scores') IS NOT NULL DROP TABLE #Scores;
+
+SELECT *
+
+	, ROW_NUMBER() OVER(PARTITION BY ENCOUNTER_ID ORDER BY SCORE_TIME ASC) AS SS_LINE
+
+INTO #Scores 
+
+FROM #ScoresAll
+
+GROUP BY ENCOUNTER_ID
+
+	, SCORE_TIME
+
+	, SCORE
+
+CREATE INDEX IDX_Scores ON #Scores (ENCOUNTER_ID) 
+
+
+
+--ADDING TREATMENT PLAN CRITERIA
+
+IF OBJECT_ID(N'tempdb..#SSTP') IS NOT NULL DROP TABLE #SSTP;
+
+SELECT S.ENCOUNTER_ID
+
+	, S.SCORE_TIME
+
+	, TP1.ABX_ADMIN_TIME AS TREATMENT_ABX_ADMIN_TIME
+
+	, TP1.FIRST_BOLUS_TIME AS TREATMENT_FIRST_BOLUS_TIME
+
+	, TP1.SECOND_BOLUS_TIME AS TREATMENT_SECOND_BOLUS_TIME
+
+	, TP1.PRESSOR_START_TIME AS TREATMENT_PRESSOR_START_TIME
+
+	, TP1.BLOOD_CULTURE_ORDER_TIME AS TREATMENT_BLOOD_CULTURE_TIME
+
+INTO #SSTP
+
+FROM #Scores S
+
+INNER JOIN #Treatment TP1 ON S.ENCOUNTER_ID = TP1.ENCOUNTER_ID	
+
+WHERE TP1.ABX_ADMIN_TIME BETWEEN DATEADD(HH, -24, S.SCORE_TIME) AND DATEADD(HH, 24, S.SCORE_TIME) --ABX ADMINISTERED TIME 24 HOURS BEFORE OF AFTER +ve SEPSIS SCORE TIME
+
+AND TP1.FIRST_BOLUS_TIME BETWEEN DATEADD(HH, -24, S.SCORE_TIME) AND DATEADD(HH, 24, S.SCORE_TIME) --FIRST BOLUS ADMINISTERED TIME 24 HOURS BEFORE OF AFTER +ve SEPSIS SCORE TIME
+
+AND COALESCE(TP1.SECOND_BOLUS_TIME, TP1.PRESSOR_START_TIME) BETWEEN DATEADD(HH, -24, S.SCORE_TIME) AND DATEADD(HH, 24, S.SCORE_TIME) --SECOND BOLUS ADMINISTERED TIME OR PRESSOR TIME 24 HOURS BEFORE OF AFTER +ve SEPSIS SCORE TIME
+
+ORDER BY S.ENCOUNTER_ID
+
+	, S.SCORE_TIME
+
+	, TP1.ABX_ADMIN_TIME
+
+	, TP1.FIRST_BOLUS_TIME
+
+	, TP1.SECOND_BOLUS_TIME
+
+	, TP1.PRESSOR_START_TIME
+
+	, TP1.BLOOD_CULTURE_ORDER_TIME
+
+--CREATE INDEX IDX_sstp ON #SSTP (ENCOUNTER_ID) 	
+
+-- GETTING DISTINCT ENCOUNTERS THAT SATISFY CRITERIA 1
+
+
+
+/*CRITERIA 2 DOESN'T APPLY*/
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+/* Criteria 3. Orderset and Treatment  Begin*/
+
+/* MEDICATION/ PROCEDURES ORDERS FROM OSQ's ARE ALSO CONSIDERED AS ORDERSET USAGE */
+
+IF OBJECT_ID(N'tempdb..#SSOrderSetOSQ_PRL') IS NOT NULL DROP TABLE #SSOrderSetOSQ_PRL;
+
+	SELECT b.ENCOUNTER_ID
+
+		, MO.ORDER_DTTM
+
+		, MO2.ORD_OSQ_ID AS PRL_ORDERSET_ID
+
+	INTO #SSOrderSetOSQ_PRL
+
+	FROM #Base_Pop b
+
+	INNER JOIN dbo.ORDER_TRACKING_METRICS MO ON MO.ENCOUNTER_ID = b.ENCOUNTER_ID
+
+	INNER JOIN dbo.MEDICATION_ORDERS_EXT MO2 ON MO2.ORDER_ID = MO.ORDER_ID 
+
+		AND MO2.ORD_OSQ_ID IN (400002,400007,400003,400004)
+
+UNION
+
+	SELECT b.ENCOUNTER_ID
+
+		, MO.ORDER_DTTM
+
+		, MO2.ORD_OSQ_ID AS PRL_ORDERSET_ID
+
+	FROM #Base_Pop b
+
+	INNER JOIN dbo.ORDER_TRACKING_METRICS MO ON MO.ENCOUNTER_ID = b.ENCOUNTER_ID
+
+	INNER JOIN dbo.PROCEDURE_ORDERS_EXT MO2 ON MO2.ORDER_ID = MO.ORDER_ID 
+
+		AND MO2.ORD_OSQ_ID IN (400002,400007,400003,400004)
+
+UNION
+
+	SELECT b.ENCOUNTER_ID
+
+		, MO.ORDER_DTTM
+
+		, MO.PRL_ORDERSET_ID
+
+	FROM #Base_Pop b
+
+	INNER JOIN dbo.ORDER_TRACKING_METRICS MO ON MO.ENCOUNTER_ID = b.ENCOUNTER_ID
+
+	WHERE MO.PRL_ORDERSET_ID IN (SELECT * FROM #Ordersets)--Severe Sepsis, Short Stay – Sepsis, H/O – Sepsis CLINICAL_ALERTS, ID – Staph Aureus Sepsis, H/O Sepsis CLINICAL_ALERTS in Clinic, Sepsis Pathway
+
+--CREATE INDEX IDX_SSOrdSetPRL ON #SSOrderSetOSQ_PRL (ENCOUNTER_ID) 
+
+	
+
+IF OBJECT_ID(N'tempdb..#SSOrderSet') IS NOT NULL DROP TABLE #SSOrderSet;
+
+SELECT ENCOUNTER_ID
+
+	, ORDER_DTTM
+
+	, ROW_NUMBER() OVER(PARTITION BY ENCOUNTER_ID ORDER BY ORDER_DTTM ASC) AS SS_LINE
+
+	, PRL_ORDERSET_ID
+
+INTO #SSOrderSet 
+
+FROM #SSOrderSetOSQ_PRL
+
+CREATE INDEX IDX_SSOrdSet ON #SSOrderSet (ENCOUNTER_ID) 
+
+
+
+--ADDING TREATMENT PLAN CRITERIA
+
+IF OBJECT_ID(N'tempdb..#OSTP') IS NOT NULL DROP TABLE #OSTP;
+
+SELECT s.ENCOUNTER_ID
+
+	, s.ORDER_DTTM
+
+	, tp1.ABX_ADMIN_TIME AS TREATMENT_ABX_ADMIN_TIME
+
+	, tp1.FIRST_BOLUS_TIME AS TREATMENT_FIRST_BOLUS_TIME
+
+	, tp1.SECOND_BOLUS_TIME AS TREATMENT_SECOND_BOLUS_TIME
+
+	, tp1.PRESSOR_START_TIME AS TREATMENT_PRESSOR_START_TIME
+
+	, tp1.BLOOD_CULTURE_ORDER_TIME AS TREATMENT_BLOOD_CULTURE_TIME
+
+	, ROW_NUMBER() OVER(PARTITION BY s.ENCOUNTER_ID ORDER BY s.ORDER_DTTM ASC) AS SS_LINE
+
+INTO #OSTP
+
+FROM #SSOrderSet s
+
+INNER JOIN #Treatment TP1 ON s.ENCOUNTER_ID = tp1.ENCOUNTER_ID	
+
+WHERE tp1.ABX_ADMIN_TIME BETWEEN DATEADD(HH, -24, s.ORDER_DTTM) AND DATEADD(HH, 24, s.ORDER_DTTM) --ABX ADMINISTERED TIME 24 HOURS BEFORE OF AFTER SEPSIS ORDERSET TIME
+
+AND tp1.FIRST_BOLUS_TIME BETWEEN DATEADD(HH, -24, s.ORDER_DTTM) AND DATEADD(HH, 24, s.ORDER_DTTM) --FIRST BOLUS ADMINISTERED TIME 24 HOURS BEFORE OF AFTER SEPSIS ORDERSET TIME
+
+AND COALESCE(tp1.SECOND_BOLUS_TIME, tp1.PRESSOR_START_TIME) BETWEEN DATEADD(HH, -24, s.ORDER_DTTM) AND DATEADD(HH, 24, s.ORDER_DTTM) --SECOND BOLUS ADMINISTERED TIME OR PRESSOR TIME 24 HOURS BEFORE OF AFTER SEPSIS ORDERSET TIME
+
+ORDER BY s.ENCOUNTER_ID
+
+	, s.ORDER_DTTM
+
+	, tp1.ABX_ADMIN_TIME
+
+	, tp1.FIRST_BOLUS_TIME
+
+	, tp1.SECOND_BOLUS_TIME
+
+	, tp1.PRESSOR_START_TIME
+
+	, tp1.BLOOD_CULTURE_ORDER_TIME
+
+--CREATE INDEX IDX_OSTP ON #OSTP (ENCOUNTER_ID) 
+
+
+
+/* GETTING DISTINCT ENCOUNTERS THAT SATISFY CRITERIA 3 */
+
+/*---------------------------------------------------------------------------------------------------------------------------------------------------
+
+	ESTANBLISHING PATIENTS QUALIFIED FOR CRITERIA 1-98----Developer A 07.08.2019
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------*/
+
+/*TREATMENT PLAN*/
+
+		--BLOOD CULTURE
+
+		IF OBJECT_ID(N'tempdb..#BC') IS NOT NULL DROP TABLE #BC
+
+		SELECT DISTINCT B.ENCOUNTER_ID
+
+			,PO.ORDER_INST AS BLOOD_CULTURE_ORDER_TIME
+
+		INTO #BC
+
+		FROM #Base_Pop B --ONLY LOOKIN FOR BLOOD CULTURE FOR THOSE PATIENTS WHO HAD A POSITIVE SCORE
+
+		JOIN dbo.PROCEDURE_ORDERS PO ON PO.ENCOUNTER_ID = B.ENCOUNTER_ID
+
+				AND PO.PROC_ID IN (SELECT * FROM #BloodCultures)
+
+				AND PO.INSTANTIATED_TIME IS NOT NULL AND PO.FUTURE_OR_STAND IS NULL
+
+		CREATE INDEX IDX_BC ON #BC (ENCOUNTER_ID) 
+
+
+
+		--ANTIBIOTICS
+
+		IF OBJECT_ID(N'tempdb..#ABX') IS NOT NULL DROP TABLE #ABX
+
+		SELECT DISTINCT
+
+			MO.ENCOUNTER_ID
+
+			, BC.BLOOD_CULTURE_ORDER_TIME
+
+			, MA.TAKEN_TIME AS ABX_ADMIN_TIME
+
+		INTO #ABX
+
+		FROM #Base_Pop B -- ONLY THOSE PATIENTS WITH A POSITIVE SCORE
+
+		INNER JOIN #BC BC ON BC.ENCOUNTER_ID = B.ENCOUNTER_ID--SINCE ABX SHOULD ALWAYS HAVE A BLOOD CULTURE WITH IN 72 HOURS
+
+		INNER JOIN dbo.MEDICATION_ORDERS MO ON MO.ENCOUNTER_ID = B.ENCOUNTER_ID
+
+		INNER JOIN dbo.MEDICATIONS MEDS ON MEDS.MEDICATION_ID = MO.MEDICATION_ID --AND MEDS.THERA_CLASS_CODE = 11 --Antibiotics
+
+		INNER JOIN dbo.MED_ADMIN_RECORDS MA ON MA.ORDER_MED_ID = MO.ORDER_MED_ID
+
+		WHERE MA.TAKEN_TIME IS NOT NULL	--ADMINISTERED ABX ONLY
+
+			AND MO.MED_ROUTE_CODE=11--IV ONLY
+
+			AND MA.MAR_ACTION_CODE IN (SELECT * FROM #MARActions)
+
+			AND MO.MEDICATION_ID IN 
+
+				(
+
+					SELECT medlist.MEDICATION_ID
+
+					FROM (
+
+						SELECT RXM.MEDICATION_ID
+
+							, RXM.NAME
+
+							, cntl.AGENT
+
+							, cntl.AGENT_GROUP
+
+							, cntl.DOT_MONITORING
+
+							, gen.TITLE
+
+							, ROW_NUMBER() over(partition by RXM.MEDICATION_ID order by cntl.DOT_MONITORING,cntl.AGENT asc) as AGENT_ORDER
+
+						FROM dbo.MEDICATIONS RXM
+
+						OUTER APPLY ( --Get the main medication's simple generic if its a mixture
+
+							SELECT TOP 1 mix.DRUG_ID
+
+								, comp.SIMPLE_GENERIC_CODE 
+
+							FROM dbo.MED_MIX_COMPONENTS mix
+
+							INNER JOIN dbo.MEDICATIONS comp on mix.DRUG_ID = comp.MEDICATION_ID
+
+							WHERE mix.TYPE_CODE = 3		--3 - Medications 
+
+							AND mix.MEDICATION_ID = RXM.MEDICATION_ID
+
+							ORDER BY mix.LINE
+
+						) mixture
+
+						INNER JOIN dbo.REF_GENERIC_MED gen on gen.SIMPLE_GENERIC_CODE=coalesce(RXM.SIMPLE_GENERIC_CODE,mixture.SIMPLE_GENERIC_CODE)
+
+						INNER JOIN #ERXAntimicrobial cntl ON cntl.CODE = gen.SIMPLE_GENERIC_CODE
+
+						--reports.CONFIG_VALUE_SET cntl on cntl.VALUE_SET_ID = 3016 and cntl.CODE = gen.SIMPLE_GENERIC_CODE -- and cntl.VALUE_SET_ABBR='Antibacterial'
+
+					) medlist
+
+					WHERE medlist.AGENT_ORDER = 1
+
+				)
+
+			AND (ABS(DATEDIFF(MI,MA.TAKEN_TIME,BC.BLOOD_CULTURE_ORDER_TIME))/60.00) <= 72.0
+
+		UNION
+
+		SELECT DISTINCT MO.ENCOUNTER_ID
+
+			, BC.BLOOD_CULTURE_ORDER_TIME
+
+			, MA.TAKEN_TIME AS ABX_ADMIN_TIME
+
+		FROM #Base_Pop B -- ONLY THOSE PATIENTS WITH A POSITIVE SCORE
+
+		INNER JOIN #BC BC ON BC.ENCOUNTER_ID = B.ENCOUNTER_ID--SINCE ABX SHOULD ALWAYS HAVE A BLOOD CULTURE WITH IN 72 HOURS
+
+		INNER JOIN dbo.MEDICATION_ORDERS MO ON MO.ENCOUNTER_ID = B.ENCOUNTER_ID
+
+		INNER JOIN dbo.MEDICATIONS MEDS ON MEDS.MEDICATION_ID = MO.MEDICATION_ID AND MEDS.THERA_CLASS_CODE = 11 --Antibiotics
+
+		INNER JOIN dbo.MED_ADMIN_RECORDS MA ON MA.ORDER_MED_ID = MO.ORDER_MED_ID
+
+		WHERE MA.TAKEN_TIME IS NOT NULL	--ADMINISTERED ABX ONLY
+
+		AND MO.MED_ROUTE_CODE = 11--IV ONLY
+
+		AND MA.MAR_ACTION_CODE IN (SELECT * FROM #MARActions)
+
+		AND (ABS(DATEDIFF(MI,MA.TAKEN_TIME,BC.BLOOD_CULTURE_ORDER_TIME))/60.00) <= 72.0
+
+		CREATE INDEX IDX_abx ON #ABX (ENCOUNTER_ID) 
+
+
+
+		IF OBJECT_ID(N'tempdb..#BOL1') IS NOT NULL DROP TABLE #BOL1
+
+		SELECT DISTINCT
+
+			MO.ENCOUNTER_ID
+
+			, MA.TAKEN_TIME AS FIRST_BOLUS_TIME
+
+		INTO #BOL1
+
+		FROM #Base_Pop C
+
+		INNER JOIN #ABX ABX ON ABX.ENCOUNTER_ID = C.ENCOUNTER_ID--SINCE A BOLUS IS ALWAYS NEEDED WITH ANTIBIOTIC
+
+		INNER JOIN #BC BC ON BC.ENCOUNTER_ID = C.ENCOUNTER_ID--SINCE A BOLUS IS ALWAYS NEEDED WITH ANTIBIOTIC AND A BLOOD CULTURE
+
+		JOIN dbo.MEDICATION_ORDERS MO ON MO.ENCOUNTER_ID = C.ENCOUNTER_ID
+
+		JOIN dbo.MEDICATIONS MEDS ON MEDS.MEDICATION_ID = MO.MEDICATION_ID
+
+		JOIN dbo.MED_ADMIN_RECORDS MA ON MA.ORDER_MED_ID = MO.ORDER_MED_ID
+
+		WHERE MA.TAKEN_TIME IS NOT NULL --ADMINISTERED BOLUS ONLY
+
+		AND (
+
+			MO.MEDICATION_ID IN (SELECT * FROM #BolusMeds)
+
+			OR (MO.MEDICATION_ID IN (SELECT * FROM #BolusMedsOnce) AND MO.HV_DISCR_FREQ_ID = '300902')
+
+		) -- FREQUENCY = ONCE 
+
+		AND MA.MAR_ACTION_CODE IN (SELECT * FROM #MARActions)
+
+		AND CONVERT(NUMERIC, MA.SIG ) > 95.0--AT LEAST 95 ML
+
+		AND (ABS(DATEDIFF(MI,MA.TAKEN_TIME,BC.BLOOD_CULTURE_ORDER_TIME))/60.00) <= 72.0--BOLUS WITHIN 72 HOURS OF BLOODCULTURE
+
+		AND (ABS(DATEDIFF(MI,MA.TAKEN_TIME,ABX.ABX_ADMIN_TIME))/60.00) <= 6.0--BOLUS WITHIN 6 HOURS OF ABX
+
+		--CREATE INDEX IDX_Bol1 ON #BOL1 (ENCOUNTER_ID) 
+
+
+
+		--2 BOLUSES
+
+		IF OBJECT_ID(N'tempdb..#BOL2') IS NOT NULL DROP TABLE #BOL2
+
+		SELECT ENCOUNTER_ID
+
+			, FIRST_BOLUS_TIME
+
+			, LEAD(FIRST_BOLUS_TIME,1,NULL) OVER(PARTITION BY ENCOUNTER_ID ORDER BY FIRST_BOLUS_TIME) AS SECOND_BOLUS_TIME
+
+			, ABS(DATEDIFF(MI,FIRST_BOLUS_TIME, LEAD(FIRST_BOLUS_TIME,1,NULL) OVER(PARTITION BY ENCOUNTER_ID ORDER BY FIRST_BOLUS_TIME)))/60.0 AS BOL12_TIME
+
+		INTO #BOL2 
+
+		FROM #BOL1
+
+		CREATE INDEX IDX_bol2 ON #BOL2 (ENCOUNTER_ID) 
+
+		
+
+		--PRESSORS
+
+		IF OBJECT_ID(N'tempdb..#PRESS') IS NOT NULL DROP TABLE #PRESS
+
+		SELECT DISTINCT
+
+			BC.ENCOUNTER_ID
+
+			, BOL.FIRST_BOLUS_TIME
+
+			, MA.TAKEN_TIME AS PRESSOR_START_TIME
+
+			, ABS(DATEDIFF(MI,FIRST_BOLUS_TIME,MA.TAKEN_TIME))/60.00 AS PRESS_BOL_TIME 
+
+			, ABS(DATEDIFF(MI,BC.BLOOD_CULTURE_ORDER_TIME,MA.TAKEN_TIME))/60.00 AS PRESS_BC_TIME
+
+		INTO #PRESS
+
+		FROM #Base_Pop SC
+
+		INNER JOIN dbo.MEDICATION_ORDERS MO ON MO.ENCOUNTER_ID = SC.ENCOUNTER_ID
+
+		INNER JOIN dbo.MEDICATIONS MEDS ON MEDS.MEDICATION_ID = MO.MEDICATION_ID
+
+		INNER JOIN #MedGroupersERX RXM ON RXM.ERX_ID = MEDS.MEDICATION_ID
+
+		--INNER JOIN dbo.GROUPER_MED_RECORDS GMR ON GMR.EXP_MEDS_LIST_ID = MEDS.MEDICATION_ID 	AND
+
+		--	GMR.GROUPER_ID IN (SELECT * FROM #MedGroupers)
+
+		INNER JOIN #ABX ABX ON ABX.ENCOUNTER_ID = MO.ENCOUNTER_ID
+
+		INNER JOIN #BC BC ON BC.ENCOUNTER_ID = MO.ENCOUNTER_ID
+
+		INNER JOIN #BOL2 BOL ON BOL.ENCOUNTER_ID = MO.ENCOUNTER_ID
+
+		INNER JOIN dbo.MED_ADMIN_RECORDS MA ON MA.ORDER_MED_ID = MO.ORDER_MED_ID AND MA.ROUTE_CODE = 11  --INTRAVENOUS
+
+			AND (ABS(DATEDIFF(MI,MA.TAKEN_TIME,BC.BLOOD_CULTURE_ORDER_TIME))/60.00) <= 72.0 --PRESSOR BC TIME
+
+			AND (ABS(DATEDIFF(MI,MA.TAKEN_TIME,BOL.FIRST_BOLUS_TIME))/60.00) <= 6.0--PRESSOR BOLUS TIME
+
+			AND (ABS(DATEDIFF(MI,MA.TAKEN_TIME,ABX.ABX_ADMIN_TIME))/60.00) <= 6.0--PRESSOR ABX TIME
+
+		CREATE INDEX IDX_Press ON #PRESS (ENCOUNTER_ID) 
+
+/*END OF TREATMENT PLAN*/
+
+
+
+
+
+/*CRITERIA 1*/
+
+--GET ALL THE POSITIVE SEPSIS SCORES
+
+IF OBJECT_ID(N'tempdb..#C1') IS NOT NULL DROP TABLE #C1
+
+	SELECT DISTINCT A.ENCOUNTER_ID, '1' AS CRITERIA
+
+	INTO #C1
+
+	FROM #Scores A
+
+	INNER JOIN #ABX B ON A.ENCOUNTER_ID = B.ENCOUNTER_ID 
+
+		AND (ABS(DATEDIFF(MI,A.SCORE_TIME,B.ABX_ADMIN_TIME))/60.00) <= 24.0
+
+	INNER JOIN #PRESS PRESS ON PRESS.ENCOUNTER_ID = A.ENCOUNTER_ID 
+
+		AND (ABS(DATEDIFF(MI,PRESS.PRESSOR_START_TIME,A.SCORE_TIME))/60.00) <= 24.0--PRESSOR SCORE TIME
+
+UNION
+
+	SELECT DISTINCT A.ENCOUNTER_ID, '1' AS CRITERIA 
+
+	FROM #Scores A
+
+	INNER JOIN #BC B ON A.ENCOUNTER_ID = B.ENCOUNTER_ID
+
+	INNER JOIN #ABX C ON A.ENCOUNTER_ID = C.ENCOUNTER_ID
+
+		AND (ABS(DATEDIFF(MI,A.SCORE_TIME,C.ABX_ADMIN_TIME))/60.00) <= 24.0
+
+	INNER JOIN #BOL2 BOL ON BOL.ENCOUNTER_ID = A.ENCOUNTER_ID 
+
+		AND BOL.SECOND_BOLUS_TIME IS NOT NULL 
+
+		AND (BOL.FIRST_BOLUS_TIME <> BOL.SECOND_BOLUS_TIME)
+
+		AND (ABS(DATEDIFF(MI,BOL.FIRST_BOLUS_TIME,A.SCORE_TIME))/60.00) <= 24.0
+
+		AND (ABS(DATEDIFF(MI,BOL.SECOND_BOLUS_TIME,A.SCORE_TIME))/60.00) <= 24.0
+
+		AND BOL.BOL12_TIME <= 6.0
+
+CREATE INDEX IDX_C1 ON #C1 (ENCOUNTER_ID) 
+
+
+
+/*END OF CRITERIA 1*/
+
+
+
+/*CRITERIA 3 ORDER SET*/
+
+--GET ALL THE POSITIVE SEPSIS SCORES
+
+IF OBJECT_ID(N'tempdb..#OSET') IS NOT NULL DROP TABLE #OSET
+
+SELECT b.ENCOUNTER_ID
+
+	, MO.ORDER_ID
+
+	, MO.ORDER_DTTM AS OSET_TIME
+
+	, PO.ORDER_STATUS_CODE
+
+	, ROW_NUMBER() OVER(PARTITION BY b.ENCOUNTER_ID ORDER BY MO.ORDER_DTTM ASC) AS SS_LINE
+
+	, MO.PRL_ORDERSET_ID
+
+INTO #OSET 
+
+FROM #Base_Pop b
+
+INNER JOIN dbo.PROCEDURE_ORDERS PO ON PO.ENCOUNTER_ID = b.ENCOUNTER_ID
+
+JOIN dbo.ORDER_TRACKING_METRICS MO ON MO.ORDER_ID = PO.ORDER_PROC_ID --AND PO.ORDER_STATUS_CODE<>4-- AND PO.INSTANTIATED_TIME IS NOT NULL AND PO.FUTURE_OR_STAND IS NULL-- ENCOUNTER_ID = B.ENCOUNTER_ID
+
+WHERE MO.PRL_ORDERSET_ID IN (SELECT * FROM #Ordersets)
+
+--CREATE INDEX IDX_Oset ON #OSET (ENCOUNTER_ID) 
+
+
+
+IF OBJECT_ID(N'tempdb..#C3') IS NOT NULL DROP TABLE #C3
+
+	SELECT DISTINCT a.ENCOUNTER_ID, '3' AS CRITERIA
+
+	INTO #C3
+
+	FROM #OSET a
+
+	INNER JOIN #BC bc ON a.ENCOUNTER_ID = bc.ENCOUNTER_ID
+
+	INNER JOIN #ABX b ON a.ENCOUNTER_ID = b.ENCOUNTER_ID 
+
+		AND (ABS(DATEDIFF(MI,a.OSET_TIME,b.ABX_ADMIN_TIME))/60.00) <= 24.0
+
+	INNER JOIN #PRESS press ON press.ENCOUNTER_ID = a.ENCOUNTER_ID 
+
+		AND (ABS(DATEDIFF(MI,press.PRESSOR_START_TIME,a.OSET_TIME))/60.00) <= 24.0--PRESSOR SCORE TIME
+
+UNION
+
+	SELECT DISTINCT a.ENCOUNTER_ID, '3' AS CRITERIA 
+
+	FROM #OSET a
+
+	INNER JOIN #BC b ON a.ENCOUNTER_ID = b.ENCOUNTER_ID
+
+	INNER JOIN #ABX c ON a.ENCOUNTER_ID = c.ENCOUNTER_ID  
+
+		AND (ABS(DATEDIFF(MI,a.OSET_TIME,c.ABX_ADMIN_TIME))/60.00) <= 24.0
+
+	INNER JOIN #BOL2 bol ON bol.ENCOUNTER_ID = a.ENCOUNTER_ID 
+
+		AND bol.SECOND_BOLUS_TIME IS NOT NULL 
+
+		AND (bol.FIRST_BOLUS_TIME <> bol.SECOND_BOLUS_TIME)
+
+		AND (ABS(DATEDIFF(MI,bol.FIRST_BOLUS_TIME,a.OSET_TIME))/60.00) <= 24.0
+
+		AND (ABS(DATEDIFF(MI,bol.SECOND_BOLUS_TIME,a.OSET_TIME))/60.00) <= 24.0
+
+		AND (ABS(DATEDIFF(MI,bol.FIRST_BOLUS_TIME,c.ABX_ADMIN_TIME))/60.00) <= 24.0
+
+		AND BOL.BOL12_TIME <= 6.0
+
+CREATE INDEX IDX_C3 ON #C3 (ENCOUNTER_ID) 
+
+/*END OF CRITERIA 3*/
+
+
+
+/*CRITERIA 4*/
+
+	IF OBJECT_ID(N'tempdb..#ICU') IS NOT NULL DROP TABLE #ICU
+
+	SELECT PLH.ENCOUNTER_NUM AS ENCOUNTER_ID
+
+		, PLH.IN_DTTM
+
+		, CASE WHEN PLH.OUT_DTTM > DATEADD(YY,10,PLH.IN_DTTM) THEN @EndDate ELSE PLH.OUT_DTTM END AS OUT_DTTM -- IN CASE THERE ARE ANY PATIENTS STILL IN THE ICU THE OUT_DTTM IS DEFAULTED TO 2200-12-31 00:00:00.000
+
+		, DATEDIFF(MI,PLH.IN_DTTM, PLH.OUT_DTTM) AS MYDIF
+
+	INTO #ICU
+
+	FROM #Base_Pop b
+
+	INNER JOIN dbo.V_PATIENT_LOCATION_HISTORY PLH ON PLH.ENCOUNTER_NUM = b.ENCOUNTER_ID
+
+	WHERE PLH.EVENT_TYPE_CODE in (1, 3) --ADMISSION AND TRANSFER-IN
+
+	AND PLH.ADT_DEPARTMENT_ID IN (20101116			--EAST ICU
+
+		, 20101124			--EAST CARDIAC ICU
+
+		, 20101126			--EAST NEURO ICU
+
+		, 20101127			--EAST PEDIATRIC ICU
+
+		, 20101128			--EAST SURGICAL ICU
+
+		, 20101165			--EAST REMOTE ICU
+
+		, 20120106			--WEST CARDIAC ICU
+
+		, 20120121			--WEST ICU
+
+		, 200108001			--MAIN 2 PAVILION PICU
+
+		, 200108070			--MAIN 3 CICU
+
+		, 200108115			--MAIN 2 PICU NEURO
+
+		, 200108147			--MAIN PHARMACY ICU
+
+	)	
+
+	--CREATE INDEX IDX_ICU ON #ICU (ENCOUNTER_ID) 
+
+	
+
+	IF OBJECT_ID(N'tempdb..#C4') IS NOT NULL DROP TABLE #C4
+
+		SELECT DISTINCT a.ENCOUNTER_ID, '4' AS CRITERIA
+
+		INTO #C4
+
+		FROM #ICU a
+
+		INNER JOIN #BC bc ON a.ENCOUNTER_ID = bc.ENCOUNTER_ID
+
+		INNER JOIN #ABX b ON a.ENCOUNTER_ID = b.ENCOUNTER_ID
+
+			AND 
+
+			(
+
+				(	b.ABX_ADMIN_TIME < a.IN_DTTM 
+
+					AND ((ABS(DATEDIFF(MI,b.ABX_ADMIN_TIME,a.IN_DTTM))/60.00) <= 24.0)--LESS THAN 24 HOURS BEFORE THE PICU IN TIME
+
+				)
+
+				OR
+
+				(CONVERT(DATE,b.ABX_ADMIN_TIME) BETWEEN a.IN_DTTM AND a.OUT_DTTM)--OR BETWEEN PICU TIMES WITHIN THE MEASUREMENT PERIOD
+
+			)
+
+		INNER JOIN #PRESS PRESS ON press.ENCOUNTER_ID = a.ENCOUNTER_ID
+
+			AND --PRESSOR AND ICU TIMES
+
+			(
+
+				(	press.PRESSOR_START_TIME < a.IN_DTTM 
+
+					AND ((ABS(DATEDIFF(MI,press.PRESSOR_START_TIME,a.IN_DTTM))/60.00) <= 24.0) --LESS THAN 24 HOURS BEFORE THE PICU IN TIME
+
+				)
+
+				OR
+
+				(CONVERT(DATE,press.PRESSOR_START_TIME) BETWEEN a.IN_DTTM AND a.OUT_DTTM)--OR BETWEEN PICU TIMES WITHIN THE MEASUREMENT PERIOD
+
+			)
+
+	UNION
+
+		SELECT DISTINCT a.ENCOUNTER_ID,'4' AS CRITERIA 
+
+		FROM #ICU a
+
+		INNER JOIN #BC b ON a.ENCOUNTER_ID = b.ENCOUNTER_ID
+
+		INNER JOIN #ABX c ON a.ENCOUNTER_ID = c.ENCOUNTER_ID
+
+			AND 
+
+			(
+
+				(	c.ABX_ADMIN_TIME < a.IN_DTTM 
+
+					AND ((ABS(DATEDIFF(MI,c.ABX_ADMIN_TIME,a.IN_DTTM))/60.00) <= 24.0)--LESS THAN 24 HOURS BEFORE THE PICU IN TIME
+
+				)
+
+				OR
+
+				(CONVERT(DATE,c.ABX_ADMIN_TIME) BETWEEN a.IN_DTTM AND a.OUT_DTTM)--OR BETWEEN PICU TIMES WITHIN THE MEASUREMENT PERIOD
+
+			)
+
+		INNER JOIN #BOL2 bol ON bol.ENCOUNTER_ID = a.ENCOUNTER_ID 
+
+			AND bol.SECOND_BOLUS_TIME IS NOT NULL 
+
+			AND (bol.FIRST_BOLUS_TIME <> bol.SECOND_BOLUS_TIME)
+
+			AND 
+
+			(
+
+				(	bol.FIRST_BOLUS_TIME < a.IN_DTTM 
+
+					AND ((ABS(DATEDIFF(MI,bol.FIRST_BOLUS_TIME,a.IN_DTTM))/60.00) <= 24.0) --LESS THAN 24 HOURS BEFORE THE PICU IN TIME
+
+				)
+
+				OR
+
+				(CONVERT(DATE,bol.FIRST_BOLUS_TIME) BETWEEN a.IN_DTTM AND a.OUT_DTTM)--OR BETWEEN PICU TIMES WITHIN THE MEASUREMENT PERIOD
+
+			)
+
+			AND bol.BOL12_TIME <= 6.0 
+
+	CREATE INDEX IDX_C4 ON #C4 (ENCOUNTER_ID) 
+
+/*END OF CRITERIA 4*/
+
+
+
+/*CRITERIA 95 LACTIC ACID*/
+
+IF OBJECT_ID(N'tempdb..#LACID') IS NOT NULL DROP TABLE #LACID
+
+SELECT DISTINCT bp.ENCOUNTER_ID
+
+	, PO.ORDER_TIME AS LACID_TIME
+
+INTO #LACID
+
+FROM #Base_Pop bp
+
+JOIN dbo.PROCEDURE_ORDERS PO ON bp.ENCOUNTER_ID = PO.ENCOUNTER_ID
+
+	AND PO.INSTANTIATED_TIME IS NOT NULL AND PO.FUTURE_OR_STAND IS NULL
+
+JOIN dbo.LAB_ORDER_RESULTS res ON PO.ORDER_PROC_ID = res.ORDER_PROC_ID
+
+INNER JOIN #LacticAcidLRRByName LC ON LC.LRR_ID = res.COMPONENT_ID
+
+CREATE INDEX IDX_lacid ON #LACID (ENCOUNTER_ID) 
+
+
+
+IF OBJECT_ID(N'tempdb..#C95') IS NOT NULL DROP TABLE #C95
+
+	SELECT DISTINCT a.ENCOUNTER_ID, '95' AS CRITERIA
+
+	INTO #C95
+
+	FROM #LACID a
+
+	INNER JOIN #BC bc ON a.ENCOUNTER_ID = bc.ENCOUNTER_ID
+
+	INNER JOIN #ABX b ON a.ENCOUNTER_ID = b.ENCOUNTER_ID 
+
+		AND (ABS(DATEDIFF(MI,a.LACID_TIME,b.ABX_ADMIN_TIME))/60.00) <= 24.0
+
+	INNER JOIN #PRESS press ON a.ENCOUNTER_ID = press.ENCOUNTER_ID
+
+		AND (ABS(DATEDIFF(MI,press.PRESSOR_START_TIME,a.LACID_TIME))/60.00) <= 24.0--PRESSOR SCORE TIME
+
+UNION
+
+	SELECT DISTINCT a.ENCOUNTER_ID, '95' AS CRITERIA 
+
+	FROM #LACID a
+
+	INNER JOIN #BC b ON a.ENCOUNTER_ID = b.ENCOUNTER_ID
+
+	INNER JOIN #ABX c ON a.ENCOUNTER_ID = c.ENCOUNTER_ID  
+
+		AND (ABS(DATEDIFF(MI,a.LACID_TIME,c.ABX_ADMIN_TIME))/60.00) <= 24.0
+
+	INNER JOIN #BOL2 bol ON bol.ENCOUNTER_ID = a.ENCOUNTER_ID 
+
+		AND bol.SECOND_BOLUS_TIME IS NOT NULL 
+
+		AND (bol.FIRST_BOLUS_TIME <> bol.SECOND_BOLUS_TIME)
+
+		AND (ABS(DATEDIFF(MI,bol.FIRST_BOLUS_TIME,a.LACID_TIME))/60.00) <= 24.0
+
+		AND (ABS(DATEDIFF(MI,bol.SECOND_BOLUS_TIME,a.LACID_TIME))/60.00) <= 24.0
+
+		AND (ABS(DATEDIFF(MI,bol.FIRST_BOLUS_TIME,c.ABX_ADMIN_TIME))/60.00) <= 24.0
+
+		AND bol.BOL12_TIME <= 6.0 
+
+CREATE INDEX IDX_C95 ON #C95 (ENCOUNTER_ID) 
+
+
+
+/*END OF CRITERIA 95 LACTIC ACID*/
+
+
+
+/*CRITERIA 6 PRESSORS*/
+
+	IF OBJECT_ID(N'tempdb..#PRESS61') IS NOT NULL DROP TABLE #PRESS61
+
+	SELECT DISTINCT b.ENCOUNTER_ID
+
+		, MA.TAKEN_TIME AS PRESS_TIME
+
+	INTO #PRESS61
+
+	FROM #Base_Pop b
+
+	INNER JOIN dbo.MEDICATION_ORDERS MO ON MO.ENCOUNTER_ID = b.ENCOUNTER_ID
+
+	INNER JOIN dbo.MEDICATIONS MEDS ON MEDS.MEDICATION_ID = MO.MEDICATION_ID
+
+	INNER JOIN dbo.GROUPER_MED_RECORDS gmr ON gmr.EXP_MEDS_LIST_ID = MEDS.MEDICATION_ID
+
+		AND gmr.GROUPER_ID IN (SELECT * FROM #MedGroupers)
+
+	INNER JOIN dbo.MED_ADMIN_RECORDS MA ON MA.ORDER_MED_ID = MO.ORDER_MED_ID AND MA.ROUTE_CODE = 11  --INTRAVENOUS	
+
+	--CREATE INDEX IDX_PRESS61 ON #PRESS61 (ENCOUNTER_ID) 
+
+
+
+IF OBJECT_ID(N'tempdb..#C6') IS NOT NULL DROP TABLE #C6
+
+	SELECT DISTINCT press.ENCOUNTER_ID
+
+		,'6' AS CRITERIA
+
+	INTO #C6
+
+	FROM #PRESS61 press
+
+	INNER JOIN #ABX abx ON abx.ENCOUNTER_ID = press.ENCOUNTER_ID 
+
+		AND press.PRESS_TIME < abx.ABX_ADMIN_TIME 
+
+		AND (ABS(DATEDIFF(MI,abx.ABX_ADMIN_TIME,press.PRESS_TIME))/60.00) <= 24.0
+
+	INNER JOIN #BOL2 bol ON bol.ENCOUNTER_ID = abx.ENCOUNTER_ID 
+
+		AND bol.FIRST_BOLUS_TIME < press.PRESS_TIME 
+
+		AND (ABS(DATEDIFF(MI,bol.FIRST_BOLUS_TIME,press.PRESS_TIME))/60.00) <= 24.0
+
+	INNER JOIN #PRESS press6 ON press6.ENCOUNTER_ID = press.ENCOUNTER_ID 
+
+		AND press6.PRESSOR_START_TIME < press.PRESS_TIME 
+
+		AND (ABS(DATEDIFF(MI,press6.PRESSOR_START_TIME,press.PRESS_TIME))/60.00) <= 24.0
+
+UNION
+
+	SELECT DISTINCT press.ENCOUNTER_ID,'6' AS CRITERIA
+
+	FROM #PRESS61 press
+
+	INNER JOIN #ABX abx ON abx.ENCOUNTER_ID = press.ENCOUNTER_ID 
+
+		AND press.PRESS_TIME < abx.ABX_ADMIN_TIME 
+
+		AND (ABS(DATEDIFF(MI,abx.ABX_ADMIN_TIME,press.PRESS_TIME))/60.00) <= 24.0
+
+	INNER JOIN #BOL2 bol ON bol.ENCOUNTER_ID = abx.ENCOUNTER_ID 
+
+		AND bol.SECOND_BOLUS_TIME IS NOT NULL 
+
+		AND (bol.FIRST_BOLUS_TIME <> bol.SECOND_BOLUS_TIME)
+
+		AND bol.FIRST_BOLUS_TIME < press.PRESS_TIME
+
+		AND (ABS(DATEDIFF(MI,bol.FIRST_BOLUS_TIME,press.PRESS_TIME))/60.00) <= 24.0		
+
+		AND (ABS(DATEDIFF(MI,bol.SECOND_BOLUS_TIME,press.PRESS_TIME))/60.00) <= 24.0
+
+		AND bol.BOL12_TIME <= 6.0
+
+CREATE INDEX IDX_C6 ON #C6 (ENCOUNTER_ID) 
+
+/*END OF CRITERIA 6 PRESSORS*/
+
+
+
+/*CRITERIA 7 SEPTIC SHOCK DIAGNOSIS*/
+
+IF OBJECT_ID(N'tempdb..#C7') IS NOT NULL DROP TABLE #C7;
+
+	SELECT bp.ENCOUNTER_ID, '7' AS CRITERIA	
+
+	INTO #C7
+
+	FROM #Base_Pop bp
+
+	JOIN dbo.HOSPITAL_ACCT_DIAGNOSES dx ON dx.HOSPITAL_ACCOUNT_ID = bp.HOSPITAL_ACCOUNT_ID
+
+	JOIN dbo.DIAGNOSES DIAG ON DIAG.DX_ID = dx.DX_ID 
+
+		AND COALESCE(DIAG.REF_BILL_CODE, DIAG.CURRENT_ICD10_LIST) IN (SELECT * FROM #DXSepticShock)
+
+UNION
+
+	SELECT bp.ENCOUNTER_ID, '7' AS CRITERIA
+
+	FROM  #Base_Pop bp
+
+	JOIN dbo.ENCOUNTER_DIAGNOSES dx ON dx.ENCOUNTER_ID = bp.ENCOUNTER_ID
+
+	JOIN dbo.DIAGNOSES DIAG ON DIAG.DX_ID = dx.DX_ID 
+
+		AND COALESCE(DIAG.REF_BILL_CODE, DIAG.CURRENT_ICD10_LIST) IN (SELECT * FROM #DXSepticShock)
+
+CREATE INDEX IDX_C7 ON #C7 (ENCOUNTER_ID) 
+
+/*END OF CRITERIA 7*/
+
+
+
+/*CRITERIA 98 SEPSIS DIAGNOSIS CODES*/
+
+IF OBJECT_ID(N'tempdb..#SDX') IS NOT NULL DROP TABLE #SDX
+
+	SELECT bp.ENCOUNTER_ID
+
+	INTO #SDX
+
+	FROM  #Base_Pop bp
+
+	JOIN dbo.HOSPITAL_ACCT_DIAGNOSES dx ON dx.HOSPITAL_ACCOUNT_ID = bp.HOSPITAL_ACCOUNT_ID
+
+	JOIN dbo.DIAGNOSES DIAG ON DIAG.DX_ID = dx.DX_ID 
+
+		AND COALESCE(DIAG.REF_BILL_CODE, DIAG.CURRENT_ICD10_LIST) IN (SELECT * FROM #DXSepsis) 
+
+UNION
+
+	SELECT bp.ENCOUNTER_ID
+
+	FROM #Base_Pop bp
+
+	JOIN dbo.ENCOUNTER_DIAGNOSES dx ON dx.ENCOUNTER_ID = bp.ENCOUNTER_ID
+
+	JOIN dbo.DIAGNOSES DIAG ON DIAG.DX_ID = dx.DX_ID 
+
+		AND COALESCE(DIAG.REF_BILL_CODE, DIAG.CURRENT_ICD10_LIST) IN (SELECT * FROM #DXSepsis)
+
+--CREATE INDEX IDX_SDX ON #SDX (ENCOUNTER_ID) 
+
+
+
+IF OBJECT_ID(N'tempdb..#C98') IS NOT NULL DROP TABLE #C98
+
+	SELECT DISTINCT a.ENCOUNTER_ID, '98' AS CRITERIA
+
+	INTO #C98
+
+	FROM #SDX a
+
+	INNER JOIN #ABX b ON a.ENCOUNTER_ID = b.ENCOUNTER_ID
+
+	INNER JOIN #PRESS press ON press.ENCOUNTER_ID = a.ENCOUNTER_ID		
+
+UNION
+
+	SELECT DISTINCT a.ENCOUNTER_ID, '98' AS CRITERIA 
+
+	FROM #SDX a
+
+	INNER JOIN #ABX c ON a.ENCOUNTER_ID = c.ENCOUNTER_ID 
+
+	INNER JOIN #BOL2 bol ON bol.ENCOUNTER_ID = a.ENCOUNTER_ID 
+
+		AND bol.SECOND_BOLUS_TIME IS NOT NULL 
+
+		AND (bol.FIRST_BOLUS_TIME <> bol.SECOND_BOLUS_TIME)
+
+		AND bol.BOL12_TIME <= 6.0
+
+CREATE INDEX IDX_C98 ON #C98 (ENCOUNTER_ID) 
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------
+
+/* PUTTING ALL THE CRITERIA'S TOGETHER */
+
+IF OBJECT_ID(N'tempdb..#ENC_COND') IS NOT NULL DROP TABLE #ENC_COND;
+
+SELECT * 
+
+INTO
+
+	#ENC_COND	
+
+FROM 
+
+	#C1 
+
+UNION
+
+	SELECT * FROM #C3
+
+UNION
+
+	SELECT * FROM #C4
+
+UNION
+
+	SELECT * FROM #C95
+
+UNION
+
+	SELECT * FROM #C6
+
+UNION
+
+	SELECT * FROM #C7
+
+UNION
+
+	SELECT * FROM #C98
+
+--CREATE INDEX IDX_EncCond ON #ENC_COND (ENCOUNTER_ID) 
+
+
+
+--Developer A ADDED #C7_R65_ONLY ON 08.01.2019... TO ADDRESS THE ISSUE WHERE THERE IS ONLY R65/CRITERIA 7 - IN THIS CASE THE FTZ WILL BE THE EARLIEST OF SCREENTIME OR OSET TIME OR ABX TIME ETC...
+
+IF OBJECT_ID(N'tempdb..#C7_R65_ONLY') IS NOT NULL DROP TABLE #C7_R65_ONLY;
+
+SELECT
+
+	DISTINCT ENCOUNTER_ID 
+
+INTO #C7_R65_ONLY
+
+FROM #C7 A
+
+WHERE A.ENCOUNTER_ID NOT IN 
+
+(
+
+	SELECT ENCOUNTER_ID FROM 	#C1 
+
+	UNION
+
+	SELECT ENCOUNTER_ID FROM  #C3
+
+	UNION
+
+	SELECT ENCOUNTER_ID FROM  #C4
+
+	UNION
+
+	SELECT ENCOUNTER_ID FROM  #C95
+
+	UNION
+
+	SELECT ENCOUNTER_ID FROM  #C6
+
+	UNION
+
+	SELECT ENCOUNTER_ID FROM  #C98
+
+)
+
+--CREATE INDEX IDX_C76r65 ON #C7_R65_ONLY (ENCOUNTER_ID) 
+
+
+
+/* CREATING A TABLE TO SEE WHICH ENCOUNTER SATISFIEST WHICH CRITERIA*/
+
+IF OBJECT_ID(N'tempdb..#ENC_CONDL') IS NOT NULL DROP TABLE #ENC_CONDL;
+
+SELECT *
+
+	, ROW_NUMBER() OVER(PARTITION BY ENCOUNTER_ID ORDER BY CRITERIA ASC) LINE 
+
+INTO #ENC_CONDL
+
+FROM #ENC_COND
+
+--CREATE INDEX IDX_EncCondl ON #ENC_CONDL (ENCOUNTER_ID) 
+
+
+
+/* CREATING A LIST OF ENCOUNTERS AND THE INCLUSION CRITERIA # THAT THE ENCOUNTER SATISFIES*/
+
+IF OBJECT_ID(N'tempdb..#CLIST') IS NOT NULL DROP TABLE #CLIST;
+
+SELECT DISTINCT ENCOUNTER_ID
+
+	, INCLUSION_CRITERIA = STUFF((SELECT ', ' + CRITERIA
+
+								FROM #ENC_CONDL
+
+								WHERE ENCOUNTER_ID = x.ENCOUNTER_ID
+
+								ORDER BY LINE
+
+								FOR XML PATH(''), TYPE
+
+								).value('.[1]', 'nvarchar(max)'), 1, 2, ''
+
+								)
+
+INTO #CLIST
+
+FROM #ENC_COND x
+
+--CREATE INDEX IDX_CList ON #CLIST (ENCOUNTER_ID) 
+
+--END
+
+
+
+--Delete all records from BASE_POP where they didn't meet criteria
+
+DELETE FROM #Base_Pop where ENCOUNTER_ID NOT IN (SELECT ENCOUNTER_ID FROM #CLIST)
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+/*FINAL BASE POPULATION */
+
+-- WE NEED TO CHECK IF THE PATIENTS WERE ALREADY REPORTED IN PRIOR MONTHS. IF THEY WERE REPORTED PREVIOUSLY THEN WE SHOULDN'T REPORT THEM AGAIN
+
+IF OBJECT_ID(N'tempdb..#COHORT') IS NOT NULL DROP TABLE #COHORT;
+
+SELECT  b.ENCOUNTER_ID
+
+	, c.INCLUSION_CRITERIA 
+
+	, b.INPATIENT_DATA_ID
+
+	, b.AGE_MONTHS
+
+	, b.AGE_YEARS
+
+INTO #COHORT 
+
+FROM #CLIST c   
+
+LEFT JOIN #Base_Pop b ON b.ENCOUNTER_ID = c.ENCOUNTER_ID
+
+LEFT JOIN [reports].[SEVERE_SEPSIS_STAGING] p ON p.ENCOUNTER_ID = c.ENCOUNTER_ID AND p.Reviewed = 1
+
+WHERE p.ENCOUNTER_ID IS NULL
+
+CREATE INDEX IDX_cohort ON #COHORT (ENCOUNTER_ID) 
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------
+
+--/*DISPLAY COLUMNS*/
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------
+
+/*Screen Time
+
+Variable ID – V06
+
+Time of initial screening process to identify possible severe sepsis in PATIENTS, where screen was positive. Note:
+
+The initial screening process may consist of an electronic CLINICAL_ALERTS, a checklist, PEWS scores (absolute value and/or change), 
+
+bedside nursing screens, or other identification tools. The initial screening process may use paper-based tools or electronic tools.
+
+For more details on initial screening processes, refer to the document “Sepsis Bundles, Bundle 2: Recognition”.
+
+For MAIN purposes this should be a sepsis score of 95 or greater in the ED and an Organ dysfunction score of 3 or greater for in house.
+
+*/
+
+
+
+IF OBJECT_ID(N'tempdb..#ScreenTime') IS NOT NULL DROP TABLE #ScreenTime;
+
+SELECT a.ENCOUNTER_ID
+
+	--, COALESCE(MIN(#SSTP.SCORE_TIME),'1900-01-02 00:00:00') AS ScreenTime_V06--Developer A COMMENTED ON 07.16.2019
+
+	, MIN(sstp.SCORE_TIME) AS ScreenTime_V06
+
+	, MIN(sstp.SCORE_TIME) AS ScreenTime	
+
+INTO #ScreenTime
+
+FROM #COHORT a
+
+	--LEFT JOIN #Scores  ON #Scores.ENCOUNTER_ID = A.ENCOUNTER_ID --Developer A CHANGED THIS ON 07.11.2019
+
+LEFT JOIN #SSTP sstp ON sstp.ENCOUNTER_ID = a.ENCOUNTER_ID	
+
+GROUP BY a.ENCOUNTER_ID
+
+CREATE INDEX IDX_ScreenTime ON #ScreenTime (ENCOUNTER_ID) 
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+/* Funtional Time Zero */
+
+/*FUNCTIONAL TIME ZERO IS CALCULATED AS FOLLOWS:
+
+THE FIRST POSITIVE SEPSIS SCORE IN ED	
+
+THE FIRST POSITIVE ORGAN DYSFUNCTION SCORE ON FLOOR
+
+If no positict Sepsis/OD scores then First OrderSet time
+
+If no Orderset time then the closest Abx time to the satistfied criteria (if more than one criteria satisfied then the first abx time among them)
+
+If not Abx time then the closest Bolus time to the satisfied criteria (if more than one criteria satisfied then the first bolus time among them)
+
+*/
+
+
+
+/* Finding Closest ABX time to Score time and  orderset time*/
+
+--C1 - +VE SCORE 
+
+IF OBJECT_ID(N'tempdb..#C1ABXS') IS NOT NULL DROP TABLE #C1ABXS;
+
+SELECT s.ENCOUNTER_ID
+
+	, s.screentime
+
+	, abx.ABX_ADMIN_TIME
+
+	, ABS(DATEDIFF(MI, s.SCREENTIME, abx.ABX_ADMIN_TIME)) AS DIFF
+
+INTO #C1ABXS
+
+FROM #C1 c1
+
+INNER JOIN #ScreenTime s ON s.ENCOUNTER_ID = c1.ENCOUNTER_ID
+
+INNER JOIN #TreatPlanABX abx ON abx.ENCOUNTER_ID = s.ENCOUNTER_ID 
+
+WHERE abx.ABX_ADMIN_TIME BETWEEN DATEADD(HH, -6, s.ScreenTime) AND DATEADD(HH, 24, s.ScreenTime)
+
+--CREATE INDEX IDX_C1abxs ON #C1ABXS (ENCOUNTER_ID) 
+
+
+
+IF OBJECT_ID(N'tempdb..#C1ABX1') IS NOT NULL DROP TABLE #C1ABX1;
+
+SELECT c1abxs.*
+
+INTO #C1ABX1	
+
+FROM #C1ABXS c1abxs
+
+WHERE DIFF = (SELECT MIN(a.DIFF)
+
+				FROM #C1ABXS a
+
+				WHERE a.ENCOUNTER_ID = c1abxs.ENCOUNTER_ID
+
+	)
+
+--CREATE INDEX IDX_C1abx1 ON #C1ABX1 (ENCOUNTER_ID) 
+
+
+
+--C3 - ORDERSET TIME		
+
+IF OBJECT_ID(N'tempdb..#C3ABXS') IS NOT NULL DROP TABLE #C3ABXS;
+
+SELECT  ostp.ENCOUNTER_ID 
+
+	, ostp.TREATMENT_ABX_ADMIN_TIME AS ABX_ADMIN_TIME
+
+	, ABS(DATEDIFF(MI, ostp.ORDER_DTTM, ostp.TREATMENT_ABX_ADMIN_TIME)) AS DIFF	
+
+INTO #C3ABXS	
+
+FROM #OSTP ostp
+
+WHERE ostp.TREATMENT_ABX_ADMIN_TIME BETWEEN DATEADD(HH, -6, ostp.ORDER_DTTM) AND DATEADD(HH, 24, ostp.ORDER_DTTM)
+
+--CREATE INDEX IDX_c3abxs ON #C3ABXS (ENCOUNTER_ID) 
+
+
+
+IF OBJECT_ID(N'tempdb..#C3ABX1') IS NOT NULL DROP TABLE #C3ABX1;
+
+SELECT c3abxs.*
+
+INTO #C3ABX1	
+
+FROM #C3ABXS c3abxs
+
+WHERE DIFF = (SELECT MIN(a.DIFF)
+
+				FROM #C3ABXS a
+
+				WHERE a.ENCOUNTER_ID = c3abxs.ENCOUNTER_ID
+
+	)
+
+--CREATE INDEX IDX_C3abx1 ON #C3ABX1 (ENCOUNTER_ID) 
+
+
+
+-- EARLIEST ABX TIME (PART OF TREATMENT) WHERE THE ECOUNTERS DONT HAVE +VE SCORE AND ORDERSET PLACE.
+
+--FINDING LIST OF ENCOUNTERS WHICH ARE NOT A PART OF CRITERIA 1 AND CRITERIA 3
+
+
+
+IF OBJECT_ID(N'tempdb..#ENC') IS NOT NULL DROP TABLE #ENC;
+
+SELECT DISTINCT c.ENCOUNTER_ID
+
+INTO #ENC
+
+FROM #COHORT c
+
+LEFT JOIN #C1 c1 ON c1.ENCOUNTER_ID = c.ENCOUNTER_ID
+
+LEFT JOIN #C3 c3 ON c3.ENCOUNTER_ID = c.ENCOUNTER_ID
+
+WHERE c1.ENCOUNTER_ID IS NULL
+
+AND c3.ENCOUNTER_ID IS NULL
+
+--CREATE INDEX IDX_enc ON #ENC (ENCOUNTER_ID) 
+
+
+
+--FINDING THE EARLIEST ABX (PART OF TREATMENT PLAN) FOR THE ENCOUNTERS WHICH ARE NOT A PART OF CRITERIA 1 AND CRITERIA 3
+
+IF OBJECT_ID(N'tempdb..#C45678ABX1') IS NOT NULL DROP TABLE #C45678ABX1;
+
+SELECT enc.ENCOUNTER_ID
+
+	, t.ABX_ADMIN_TIME 
+
+INTO #C45678ABX1
+
+FROM  #ENC enc
+
+INNER JOIN #Treatment t ON t.ENCOUNTER_ID = enc.ENCOUNTER_ID
+
+--CREATE INDEX IDX_C45678ax1 ON #C45678ABX1 (ENCOUNTER_ID) 
+
+
+
+--PUTTING ALL THE ABX TIMES TOGETHER TO FIND THE FIRST ABX TIME FOR AN ENCOUNTER BASED ON WHICH CRITERIA THEY SATISFIED
+
+IF OBJECT_ID(N'tempdb..#ABXTIMES') IS NOT NULL DROP TABLE #ABXTIMES;
+
+	SELECT ENCOUNTER_ID
+
+		, ABX_ADMIN_TIME
+
+	INTO #ABXTIMES
+
+	FROM #C1ABX1
+
+UNION
+
+	SELECT ENCOUNTER_ID
+
+		, ABX_ADMIN_TIME
+
+	FROM #C3ABX1
+
+UNION
+
+	SELECT ENCOUNTER_ID
+
+		, ABX_ADMIN_TIME
+
+	FROM #C45678ABX1
+
+--CREATE INDEX IDX_AbxTimes ON #ABXTIMES (ENCOUNTER_ID) 
+
+	
+
+IF OBJECT_ID(N'tempdb..#FirstABXTime') IS NOT NULL DROP TABLE #FirstABXTime;
+
+SELECT ENCOUNTER_ID
+
+	, MIN(ABX_ADMIN_TIME) AS FIRST_ABX_TIME
+
+INTO #FirstABXTime
+
+FROM #ABXTIMES
+
+GROUP BY ENCOUNTER_ID 
+
+--CREATE INDEX IDX_FirstAbxTime ON #FirstABXTime (ENCOUNTER_ID) 
+
+
+
+/* FINDING THE CLOSEST BOLUS TIME FOR EACH CRITERIA INVOLVING TREATMENT */
+
+--C1
+
+
+
+IF OBJECT_ID(N'tempdb..#C1BOLUS') IS NOT NULL DROP TABLE #C1BOLUS;
+
+SELECT  s.ENCOUNTER_ID
+
+	, s.ScreenTime
+
+	, abx.BOLUS_ADMIN_TIME
+
+	, ABS(DATEDIFF(MI, s.SCREENTIME, abx.BOLUS_ADMIN_TIME)) AS DIFF
+
+	, abx.BOLUS_NUM
+
+INTO #C1BOLUS
+
+FROM #C1 c
+
+INNER JOIN #ScreenTime s ON s.ENCOUNTER_ID = c.ENCOUNTER_ID
+
+INNER JOIN #TreatPlanBolus abx ON abx.ENCOUNTER_ID = s.ENCOUNTER_ID 
+
+WHERE abx.BOLUS_ADMIN_TIME BETWEEN DATEADD(HH, -6, s.ScreenTime) AND DATEADD(HH, 6, s.ScreenTime)
+
+--CREATE INDEX IDX_C1bolus ON #C1BOLUS (ENCOUNTER_ID) 
+
+	
+
+IF OBJECT_ID(N'tempdb..#C1BOLUS1') IS NOT NULL DROP TABLE #C1BOLUS1;
+
+SELECT c.*
+
+INTO #C1BOLUS1 	
+
+FROM #C1BOLUS c
+
+WHERE DIFF = (SELECT MIN(a.DIFF)
+
+				FROM #C1BOLUS a
+
+				WHERE a.ENCOUNTER_ID = c.ENCOUNTER_ID
+
+	)
+
+--CREATE INDEX IDX_C1Bolus1 ON #C1BOLUS1 (ENCOUNTER_ID) 
+
+
+
+--C3		
+
+IF OBJECT_ID(N'tempdb..#C3BOLUS') IS NOT NULL DROP TABLE #C3BOLUS;	
+
+SELECT s.* 
+
+	, abx.BOLUS_ADMIN_TIME
+
+	, ABS(DATEDIFF(MI, s.ORDER_DTTM, abx.BOLUS_ADMIN_TIME)) AS DIFF
+
+	, abx.BOLUS_NUM
+
+INTO #C3BOLUS	
+
+FROM #C3 c3
+
+	INNER JOIN #SSOrderSet s ON s.ENCOUNTER_ID = c3.ENCOUNTER_ID
+
+	INNER JOIN #TreatPlanBolus abx ON abx.ENCOUNTER_ID = s.ENCOUNTER_ID AND s.SS_LINE = 1
+
+WHERE abx.BOLUS_ADMIN_TIME BETWEEN DATEADD(HH, -6, s.ORDER_DTTM) AND DATEADD(HH, 6, s.ORDER_DTTM)
+
+--CREATE INDEX IDX_C3Bolus ON #C3BOLUS (ENCOUNTER_ID) 
+
+
+
+IF OBJECT_ID(N'tempdb..#C3BOLUS1') IS NOT NULL DROP TABLE #C3BOLUS1;
+
+SELECT c3.*
+
+INTO #C3BOLUS1	
+
+FROM #C3BOLUS c3
+
+WHERE DIFF = (SELECT MIN(a.DIFF)
+
+				FROM #C3BOLUS a
+
+				WHERE a.ENCOUNTER_ID = c3.ENCOUNTER_ID
+
+	)
+
+--CREATE INDEX IDX_C3Bolus1 ON #C3BOLUS1 (ENCOUNTER_ID) 
+
+	
+
+--FINDING EARLIEST BOLUS (PART OF TREATMENT PLAN) FOR THE ENCOUNTERS THAT ARE NOT A PART OF CRITERIA 1 AND CRITERIA 3
+
+IF OBJECT_ID(N'tempdb..#C45678BOLUS1') IS NOT NULL DROP TABLE #C45678BOLUS1;
+
+SELECT t.ENCOUNTER_ID
+
+	, t.FIRST_BOLUS_TIME AS BOLUS_ADMIN_TIME
+
+	, MIN(tb.BOLUS_NUM) AS BOLUS_NUM
+
+INTO  #C45678BOLUS1
+
+FROM #ENC enc
+
+INNER JOIN #Treatment t ON t.ENCOUNTER_ID = enc.ENCOUNTER_ID
+
+LEFT JOIN #TreatPlanBolus tb ON tb.ENCOUNTER_ID = t.ENCOUNTER_ID AND tb.BOLUS_ADMIN_TIME = t.FIRST_BOLUS_TIME
+
+GROUP BY t.ENCOUNTER_ID
+
+	, t.FIRST_BOLUS_TIME
+
+--CREATE INDEX IDX_C45678Bolus1 ON #C45678BOLUS1 (ENCOUNTER_ID) 
+
+
+
+--PUTTING ALL THE BOLUS TIMES TOGETHER TO FIND THE FIRST BOLUS TIME FOR AN ENCOUNTER BASED ON WHICH CRITERIA THEY SATISFIED
+
+IF OBJECT_ID(N'tempdb..#BOLUSTIMES') IS NOT NULL DROP TABLE #BOLUSTIMES;
+
+	SELECT ENCOUNTER_ID
+
+		, BOLUS_ADMIN_TIME
+
+		, BOLUS_NUM
+
+	INTO #BOLUSTIMES
+
+	FROM #C1BOLUS1
+
+UNION
+
+	SELECT ENCOUNTER_ID
+
+		, BOLUS_ADMIN_TIME
+
+		, BOLUS_NUM
+
+	FROM #C3BOLUS1
+
+UNION
+
+	SELECT ENCOUNTER_ID
+
+		, BOLUS_ADMIN_TIME
+
+		, BOLUS_NUM
+
+	FROM #C45678BOLUS1
+
+--CREATE INDEX IDX_BolusTimes ON #BOLUSTIMES (ENCOUNTER_ID) 
+
+
+
+IF OBJECT_ID(N'tempdb..#FBT') IS NOT NULL DROP TABLE #FBT;
+
+SELECT b.ENCOUNTER_ID
+
+	, MIN(b.BOLUS_ADMIN_TIME) AS FIRST_BOLUS_TIME
+
+INTO #FBT
+
+FROM #BOLUSTIMES b
+
+GROUP BY b.ENCOUNTER_ID  
+
+--CREATE INDEX IDX_Fbt ON #FBT (ENCOUNTER_ID) 
+
+
+
+IF OBJECT_ID(N'tempdb..#FirstBolusTime') IS NOT NULL DROP TABLE #FirstBolusTime;
+
+SELECT fbt.ENCOUNTER_ID
+
+	, fbt.FIRST_BOLUS_TIME
+
+	, MIN(t.BOLUS_NUM) AS BOLUS_NUM
+
+INTO #FirstBolusTime
+
+FROM #FBT fbt
+
+INNER JOIN #BOLUSTIMES t ON t.ENCOUNTER_ID = fbt.ENCOUNTER_ID AND t.BOLUS_ADMIN_TIME = fbt.FIRST_BOLUS_TIME
+
+GROUP BY fbt.ENCOUNTER_ID
+
+	, fbt.FIRST_BOLUS_TIME 
+
+--CREATE INDEX IDX_FirstBolusTime ON #FirstBolusTime (ENCOUNTER_ID) 
+
+	
+
+IF OBJECT_ID(N'tempdb..#FTZ') IS NOT NULL DROP TABLE #FTZ;
+
+SELECT c.ENCOUNTER_ID
+
+	, CASE WHEN c7.ENCOUNTER_ID IS NOT NULL THEN 
+
+		COALESCE(
+
+				DefaultScreenTime.DefaultScreenTime
+
+				, DefaultOSetTime.DefaultOSetTime
+
+				, CASE 
+
+					WHEN(DefaultABXTime.DefaultABXTime <= DefaultBolTime.DefaultBolTime) 
+
+						THEN DefaultABXTime.DefaultABXTime 
+
+					ELSE DefaultBolTime.DefaultBolTime
+
+				END
+
+		) 
+
+	ELSE
+
+		COALESCE(st.ScreenTime
+
+				, ssos.ORDER_DTTM
+
+				, CASE WHEN(ABXT.FIRST_ABX_TIME <= FBT.FIRST_BOLUS_TIME) 
+
+						THEN ABXT.FIRST_ABX_TIME 
+
+					ELSE FBT.FIRST_BOLUS_TIME  END
+
+				, DefaultScreenTime.DefaultScreenTime
+
+				, DefaultOSetTime.DefaultOSetTime
+
+				, CASE  WHEN(DefaultABXTime.DefaultABXTime <= DefaultBolTime.DefaultBolTime) 
+
+						THEN DefaultABXTime.DefaultABXTime 
+
+					ELSE DefaultBolTime.DefaultBolTime
+
+				END
+
+		) 
+
+	END AS ftz
+
+	, CASE WHEN c7.ENCOUNTER_ID IS NOT NULL THEN
+
+		CASE WHEN DefaultScreenTime.DefaultScreenTime IS NOT NULL THEN 1
+
+			WHEN DefaultOSetTime.DefaultOSetTime IS NOT NULL THEN 3
+
+			WHEN (DefaultABXTime.DefaultABXTime <= DefaultBolTime.DefaultBolTime) THEN 4
+
+			WHEN (DefaultBolTime.DefaultBolTime < DefaultABXTime.DefaultABXTime) THEN 95
+
+			ELSE 6
+
+		END
+
+	ELSE 
+
+		CASE 
+
+		WHEN st.ScreenTime IS NOT NULL THEN 1
+
+		WHEN ssos.ORDER_DTTM IS NOT NULL THEN 3
+
+		WHEN (abxt.FIRST_ABX_TIME <= fbt.FIRST_BOLUS_TIME) THEN 4
+
+		WHEN (fbt.FIRST_BOLUS_TIME < abxt.FIRST_ABX_TIME) THEN 95
+
+		ELSE 6 END
+
+	END AS FunctionalTimeZero_V68
+
+INTO #FTZ
+
+FROM #COHORT c
+
+LEFT OUTER JOIN #C7_R65_ONLY c7 ON c7.ENCOUNTER_ID = c.ENCOUNTER_ID
+
+LEFT JOIN #ScreenTime st ON st.ENCOUNTER_ID = c.ENCOUNTER_ID
+
+LEFT JOIN #OSTP ssos ON ssos.ENCOUNTER_ID = c.ENCOUNTER_ID AND ssos.SS_LINE = 1
+
+LEFT JOIN #FirstABXTime abxt ON abxt.ENCOUNTER_ID = c.ENCOUNTER_ID
+
+LEFT JOIN #FirstBolusTime fbt ON fbt.ENCOUNTER_ID = c.ENCOUNTER_ID
+
+/*MODIFIED BY Developer A ON 07.16.2019 - IN CASE NONE OF THE ABOVE TIMES ARE POPULATED, WE LOOK FOR THE FIRST SCREENTIME/OSSET TIME ETC IN THE REPORTING PERIOD*/
+
+OUTER APPLY
+
+(	SELECT MIN(a.SCORE_TIME) AS DefaultScreenTime
+
+	FROM #Scores a
+
+	WHERE a.ENCOUNTER_ID = c.ENCOUNTER_ID
+
+)DefaultScreenTime
+
+OUTER APPLY
+
+(	SELECT MIN(a.ORDER_DTTM) AS DefaultOSetTime
+
+	FROM #SSOrderSet a
+
+	WHERE a.ENCOUNTER_ID = c.ENCOUNTER_ID
+
+)DefaultOSetTime
+
+OUTER APPLY
+
+(	SELECT MIN(a.ABX_ADMIN_TIME) AS DefaultABXTime
+
+	FROM #TreatPlanABX a
+
+	WHERE a.ENCOUNTER_ID = c.ENCOUNTER_ID
+
+)DefaultABXTime
+
+OUTER APPLY
+
+(	SELECT MIN(a.BOLUS_ADMIN_TIME) AS DefaultBolTime
+
+	FROM #TreatPlanBolus a
+
+	WHERE a.ENCOUNTER_ID = c.ENCOUNTER_ID
+
+)DefaultBolTime
+
+CREATE INDEX IDX_Ftx ON #FTZ(ENCOUNTER_ID) 
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+/*Time Zero Location Variable ID – V66 DEFAULT 99*/
+
+IF OBJECT_ID(N'tempdb..#FTZLoc') IS NOT NULL DROP TABLE #FTZLoc;
+
+SELECT c.ENCOUNTER_ID
+
+	, adt.ADT_DEPARTMENT_NAME AS FUNCTIONAL_TIME_ZERO_DEPT
+
+	, adt.ADT_LOC_NAME AS FUNCTIONAL_TIME_ZERO_LOC
+
+	, CASE WHEN adt.ADT_DEPARTMENT_ID IS NULL THEN 99 --NOT SPECIFIED
+
+		WHEN adt.ADT_DEPARTMENT_ID IN (SELECT * FROM #EDDepts) THEN 1--ED
+
+		WHEN adt.ADT_DEPARTMENT_ID IN ( SELECT d.DEPARTMENT_ID FROM #AllICUDept d ) THEN 2--ICU
+
+		WHEN adt.ADT_DEPARTMENT_ID IN ( SELECT m.DEPARTMENT_ID FROM #MedDept m )THEN 3 --GEN FLOOR--updated on 01.21.2022
+
+		WHEN adt.ADT_DEPARTMENT_ID IN (SELECT * FROM #HemOncBMTDepts) THEN 4--HEMONC
+
+		ELSE 95
+
+	END AS TimeZeroLoc_V66
+
+INTO #FTZLoc
+
+FROM #COHORT c
+
+LEFT JOIN #FTZ ftz ON ftz.ENCOUNTER_ID = c.ENCOUNTER_ID
+
+LEFT JOIN dbo.V_PATIENT_LOCATION_HISTORY adt ON c.ENCOUNTER_ID = adt.ENCOUNTER_NUM 
+
+	AND adt.ADT_SERVICE_AREA_ID IS NOT NULL
+
+	AND ftz.FTZ BETWEEN adt.IN_DTTM AND adt.OUT_DTTM
+
+CREATE INDEX IDX_FtzLoc ON #FTZLoc (ENCOUNTER_ID) 
+
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+/*Time First Hypotension - If PATIENTS was hypotensive, this is the time of the first documented hypotension at time closest
+
+to time zero (within 24 hours before to 24 hours after Time Zero). */
+
+IF OBJECT_ID(N'tempdb..#Hypotension') IS NOT NULL DROP TABLE #Hypotension;
+
+SELECT c.ENCOUNTER_ID
+
+	, ftz.FTZ
+
+	, FM.RECORDED_TIME
+
+	, c.AGE_MONTHS
+
+	, c.AGE_YEARS
+
+	, CASE WHEN 
+
+			c.AGE_MONTHS < 2 AND LEFT(FM.MEAS_VALUE, CHARINDEX('/', FM.MEAS_VALUE)-1) < 65
+
+		OR	(c.AGE_MONTHS >= 2 AND c.AGE_MONTHS < 12) AND LEFT(FM.MEAS_VALUE, CHARINDEX('/', FM.MEAS_VALUE)-1) < 70
+
+		OR	(c.AGE_YEARS >= 1 AND c.AGE_YEARS < 2) AND LEFT(FM.MEAS_VALUE, CHARINDEX('/', FM.MEAS_VALUE)-1) < 80
+
+		OR	(c.AGE_YEARS >= 2 AND c.AGE_YEARS < 6) AND LEFT(FM.MEAS_VALUE, CHARINDEX('/', FM.MEAS_VALUE)-1) < 90
+
+		OR	(c.AGE_YEARS >= 6 AND c.AGE_YEARS < 13) AND LEFT(FM.MEAS_VALUE, CHARINDEX('/', FM.MEAS_VALUE)-1) < 100
+
+		OR	c.AGE_YEARS >= 13 AND LEFT(FM.MEAS_VALUE, CHARINDEX('/', FM.MEAS_VALUE)-1) < 110
+
+		THEN FM.RECORDED_TIME
+
+	ELSE '1900-01-02 00:00:00'
+
+	END AS FirstTimeHypotension_V18
+
+	, LEFT(FM.MEAS_VALUE, CHARINDEX('/', FM.MEAS_VALUE)-1) AS SYSTOLIC
+
+	, FM.MEAS_VALUE
+
+	, ROW_NUMBER() OVER(PARTITION BY c.ENCOUNTER_ID ORDER BY ABS(DATEDIFF(SS, ftz.FTZ, FM.RECORDED_TIME))ASC) AS ORD_RESULTS_LINE
+
+INTO #Hypotension 
+
+FROM #COHORT c 
+
+LEFT JOIN #FTZ ftz ON ftz.ENCOUNTER_ID = c.ENCOUNTER_ID
+
+LEFT JOIN dbo.FLOWSHEET_RECORDS FR ON FR.INPATIENT_DATA_ID = c.INPATIENT_DATA_ID
+
+LEFT JOIN dbo.FLOWSHEET_MEASUREMENTS FM ON FM.FSD_ID = FR.FSD_ID AND FM.FLO_MEAS_ID = '95'
+
+WHERE FM.RECORDED_TIME IS NOT NULL 
+
+	AND FM.MEAS_VALUE IS NOT NULL
+
+	AND FM.RECORDED_TIME BETWEEN DATEADD(HH, -24, ftz.FTZ) AND DATEADD(HH, 24, ftz.FTZ)
+
+	AND (c.AGE_MONTHS < 2 AND LEFT(FM.MEAS_VALUE, CHARINDEX('/', FM.MEAS_VALUE)-1) < 65
+
+		OR	(c.AGE_MONTHS >= 2 AND c.AGE_MONTHS < 12) AND LEFT(FM.MEAS_VALUE, CHARINDEX('/', FM.MEAS_VALUE)-1) < 70
+
+		OR	(c.AGE_YEARS >= 1 AND c.AGE_YEARS < 2) AND LEFT(FM.MEAS_VALUE, CHARINDEX('/', FM.MEAS_VALUE)-1) < 80
+
+		OR	(c.AGE_YEARS >= 2 AND c.AGE_YEARS < 6) AND LEFT(FM.MEAS_VALUE, CHARINDEX('/',	FM.MEAS_VALUE)-1) < 90
+
+		OR	(c.AGE_YEARS >= 6 AND c.AGE_YEARS < 13) AND LEFT(FM.MEAS_VALUE, CHARINDEX('/', FM.MEAS_VALUE)-1) < 100
+
+		OR	c.AGE_YEARS >= 13 AND LEFT(FM.MEAS_VALUE, CHARINDEX('/', FM.MEAS_VALUE)-1) < 110)
+
+
+
+--CREATE INDEX IDX_hypotension ON #Hypotension (ENCOUNTER_ID) 
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+/* FIRST PRESSOR TIME - Indicates the time and type of vasoactive agent was first used. The target time is within 24 hours after
+
+Time Zero.*/
+
+IF OBJECT_ID(N'tempdb..#FirstPressorTime') IS NOT NULL DROP TABLE #FirstPressorTime;
+
+SELECT c.ENCOUNTER_ID
+
+	, p.PRESSOR_START_TIME
+
+	, ROW_NUMBER() OVER(PARTITION BY c.ENCOUNTER_ID ORDER BY p.PRESSOR_START_TIME ASC) AS PRESSOR_ORDER_LINE
+
+	, p.GROUPER_ID
+
+INTO #FirstPressorTime
+
+FROM #COHORT c
+
+LEFT JOIN #FTZ f ON f.ENCOUNTER_ID = c.ENCOUNTER_ID
+
+LEFT JOIN #TreatPlanPres p ON p.ENCOUNTER_ID = c.ENCOUNTER_ID
+
+WHERE p.PRESSOR_START_TIME BETWEEN f.FTZ AND DATEADD(HH, 24, f.FTZ)
+
+--CREATE INDEX IDX_firstPressorTime ON #FirstPressorTime (ENCOUNTER_ID) 
+
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------	
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------	
+
+/*CVL PLACEMENT TIME - Time of placement of central venous line in PATIENTS, if within timeframe of 72 hours before Time
+
+Zero to 72 hours after Time Zero. Report as not applicable if the central line was placed more
+
+than 72 hours before Time Zero or more than 72 hours after Time Zero. DEFAULT 1900-01-03T00:00:00 */
+
+IF OBJECT_ID(N'tempdb..#ALLCVLTime') IS NOT NULL DROP TABLE #ALLCVLTime;
+
+SELECT DISTINCT c.ENCOUNTER_ID
+
+	, LNA.PLACEMENT_INSTANT	
+
+INTO #ALLCVLTime
+
+FROM #COHORT c
+
+INNER JOIN dbo.LINE_DEVICE_AIRWAY LNA ON LNA.ENCOUNTER_ID = c.ENCOUNTER_ID 
+
+INNER JOIN reports.CONFIG_VALUE_SET cvs ON cvs.CODE = LNA.FLO_MEAS_ID
+
+	AND cvs.VALUE_SET_ID = 3022 --CVL CODES
+
+--INNER JOIN #CVLFlo cvl ON cvl.FLO_ID = LNA.FLO_MEAS_ID
+
+--CREATE INDEX IDX_allcvlTime ON #ALLCVLTime (ENCOUNTER_ID) 
+
+
+
+--CALCULATING ALL THE CVL TIME 72 HOURS BEFORE AND AFTER FTZ
+
+IF OBJECT_ID(N'tempdb..#CVLTZIN') IS NOT NULL DROP TABLE #CVLTZIN;
+
+SELECT DISTINCT a.ENCOUNTER_ID
+
+	, a.PLACEMENT_INSTANT
+
+	, ROW_NUMBER() OVER(PARTITION BY a.ENCOUNTER_ID ORDER BY ABS(DATEDIFF(MI, a.PLACEMENT_INSTANT, f.FTZ)) ASC) AS LINE
+
+INTO #CVLTZIN
+
+FROM #ALLCVLTime a
+
+LEFT JOIN #FTZ f ON f.ENCOUNTER_ID = a.ENCOUNTER_ID
+
+WHERE a.PLACEMENT_INSTANT BETWEEN DATEADD(HH, -72, f.FTZ) AND DATEADD(HH, 72, f.FTZ)
+
+--CREATE INDEX IDX_CvlTzin ON #CVLTZIN (ENCOUNTER_ID) 
+
+
+
+--CALCULATING ALL THE CVL TIME NOT 72 HOURS BEFORE AND AFTER FTZ
+
+IF OBJECT_ID(N'tempdb..#CVLTZOUT') IS NOT NULL DROP TABLE #CVLTZOUT;
+
+SELECT DISTINCT a.ENCOUNTER_ID
+
+	, a.PLACEMENT_INSTANT
+
+	, ROW_NUMBER() OVER(PARTITION BY a.ENCOUNTER_ID ORDER BY ABS(DATEDIFF(MI, a.PLACEMENT_INSTANT, f.FTZ)) ASC) AS LINE
+
+INTO #CVLTZOUT
+
+FROM #ALLCVLTime a
+
+LEFT JOIN #FTZ f ON f.ENCOUNTER_ID = a.ENCOUNTER_ID
+
+WHERE a.PLACEMENT_INSTANT NOT BETWEEN DATEADD(HH, -72, f.FTZ) AND DATEADD(HH, 72, f.FTZ)
+
+--CREATE INDEX IDX_cvltzout ON #CVLTZOUT (ENCOUNTER_ID) 
+
+
+
+--CALCULATING CVL TIME
+
+IF OBJECT_ID(N'tempdb..#CVLTIME') IS NOT NULL DROP TABLE #CVLTIME;
+
+SELECT c.ENCOUNTER_ID
+
+	, CASE WHEN cvIn.PLACEMENT_INSTANT IS NULL AND cvOut.PLACEMENT_INSTANT IS NULL  THEN '1900-01-03 00:00:00'
+
+		WHEN cvIn.PLACEMENT_INSTANT IS NOT NULL THEN cvIn.PLACEMENT_INSTANT
+
+		WHEN cvIn.PLACEMENT_INSTANT IS NULL AND cvOut.PLACEMENT_INSTANT IS NOT NULL THEN '1900-01-02 00:00:00'
+
+	END AS CVLTIME
+
+INTO #CVLTIME
+
+FROM #COHORT C
+
+LEFT JOIN #CVLTZIN  cvIn ON cvIn.ENCOUNTER_ID = C.ENCOUNTER_ID AND cvIn.LINE = 1
+
+LEFT JOIN #CVLTZOUT cvOut ON cvOut.ENCOUNTER_ID = C.ENCOUNTER_ID AND cvOut.LINE = 1
+
+--CREATE INDEX IDX_CvlTime ON #CVLTIME (ENCOUNTER_ID) 
+
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+/*SVO2 - Time of obtaining mixed venous saturation for PATIENTS, if within timeframe of 72 hours before
+
+Time Zero to 72 hours after Time Zero. Report as not applicable if mixed venous saturation was
+
+obtained more than 72 hours before Time Zero or more than 72 hours after Time Zero.*/
+
+--O2 SATURATION VENOUS, GEM CALC [5000001861]
+
+--O2 SATURATION VENOUS [5000000478]
+
+
+
+IF OBJECT_ID(N'tempdb..#ALLSVO2Time') IS NOT NULL DROP TABLE #ALLSVO2Time;
+
+SELECT c.ENCOUNTER_ID
+
+	, ord.COMP_OBS_INST_TM AS SVO2TIME	
+
+INTO #ALLSVO2Time
+
+FROM #COHORT c
+
+LEFT JOIN dbo.LAB_ORDER_RESULTS ord ON c.ENCOUNTER_ID = ord.ENCOUNTER_ID
+
+WHERE ord.COMPONENT_ID IN (5000001861, 5000000478)
+
+--CREATE INDEX IDX_allsvo2Time ON #AllSVO2Time (ENCOUNTER_ID) 
+
+
+
+--CALCULATING ALL THE SVO2 TIME 72 HOURS BEFORE AND AFTER FTZ
+
+IF OBJECT_ID(N'tempdb..#SVO2IN') IS NOT NULL DROP TABLE #SVO2IN;
+
+SELECT DISTINCT  a.ENCOUNTER_ID
+
+	, a.SVO2TIME
+
+	, ROW_NUMBER() OVER(PARTITION BY a.ENCOUNTER_ID ORDER BY ABS(DATEDIFF(MI, a.SVO2TIME, f.FTZ)) ASC) AS LINE
+
+INTO #SVO2IN
+
+FROM #ALLSVO2Time a
+
+LEFT JOIN #FTZ f ON f.ENCOUNTER_ID = a.ENCOUNTER_ID
+
+WHERE a.SVO2TIME BETWEEN DATEADD(HH, -72, f.FTZ) AND DATEADD(HH, 72, f.FTZ)
+
+--CREATE INDEX IDX_Svo2In ON #SVO2IN (ENCOUNTER_ID) 
+
+
+
+--CALCULATING ALL THE CVL TIME NOT 72 HOURS BEFORE AND AFTER FTZ
+
+IF OBJECT_ID(N'tempdb..#SVO2OUT') IS NOT NULL DROP TABLE #SVO2OUT;
+
+SELECT DISTINCT
+
+	a.ENCOUNTER_ID
+
+	, a.SVO2TIME
+
+	, ROW_NUMBER() OVER(PARTITION BY a.ENCOUNTER_ID ORDER BY a.SVO2TIME ASC) AS LINE
+
+INTO #SVO2OUT
+
+FROM #ALLSVO2Time a
+
+LEFT JOIN #FTZ f ON f.ENCOUNTER_ID = a.ENCOUNTER_ID
+
+WHERE a.SVO2TIME NOT BETWEEN DATEADD(HH, -72, f.FTZ) AND DATEADD(HH, 72, f.FTZ)
+
+--CREATE INDEX IDX_Svo2Out ON #SVO2OUT (ENCOUNTER_ID) 
+
+
+
+--CALCULATING SVO2 TIME
+
+IF OBJECT_ID(N'tempdb..#SVO2TIME') IS NOT NULL DROP TABLE #SVO2TIME;
+
+SELECT
+
+	C.ENCOUNTER_ID
+
+	, CASE
+
+		WHEN 
+
+			#SVO2IN.SVO2TIME IS NULL AND #SVO2OUT.SVO2TIME IS NULL
+
+		THEN
+
+			'1900-01-02 00:00:00'
+
+		WHEN
+
+			#SVO2IN.SVO2TIME IS NOT NULL
+
+		THEN
+
+			#SVO2IN.SVO2TIME
+
+		WHEN
+
+			#SVO2IN.SVO2TIME IS NULL AND #SVO2OUT.SVO2TIME IS NOT NULL
+
+		THEN
+
+			'1900-01-02 00:00:00'
+
+	END AS SVO2TIME
+
+INTO
+
+	#SVO2TIME
+
+FROM
+
+	#COHORT C
+
+	LEFT JOIN #SVO2IN ON #SVO2IN.ENCOUNTER_ID = C.ENCOUNTER_ID AND #SVO2IN.LINE = 1
+
+	LEFT JOIN #SVO2OUT ON #SVO2OUT.ENCOUNTER_ID = C.ENCOUNTER_ID AND #SVO2OUT.LINE = 1
+
+--CREATE INDEX IDX_Svo2Time ON #SVO2TIME (ENCOUNTER_ID) 
+
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+/*LACTIC ACID - Time first lactic acid was obtained within timeframe of 48 hours beforeTime Zero to 48 hours
+
+after Time Zero. This variable is not applicable if lactic acid was obtained more than 48 hours
+
+before Time Zero or more than 48 hours after Time Zero.*/
+
+
+
+--LACTIC ACID ISTAT [5000000446]
+
+--LACTIC ACID, GEM RESPIRATORY [5000000447]
+
+--LACTIC ACID LEVEL [5000000449]
+
+
+
+IF OBJECT_ID(N'tempdb..#ALLLacticAcidTime') IS NOT NULL DROP TABLE #ALLLacticAcidTime;
+
+SELECT
+
+	C.ENCOUNTER_ID
+
+	, COALESCE(LAB_ORDER_RESULTS.COMP_OBS_INST_TM,'1900-01-02 00:00:00') AS LacticAcidTime
+
+	, CASE
+
+		WHEN LAB_ORDER_RESULTS.ORD_VALUE = '>11.0'
+
+			THEN '11.0' 
+
+		ELSE LAB_ORDER_RESULTS.ORD_VALUE 
+
+	END AS LacticAcidValue	
+
+	, LAB_ORDER_RESULTS.COMP_ANL_INST_TM
+
+INTO 
+
+	#ALLLacticAcidTime
+
+FROM 
+
+	#COHORT C
+
+	LEFT JOIN dbo.LAB_ORDER_RESULTS ON LAB_ORDER_RESULTS.ENCOUNTER_ID = C.ENCOUNTER_ID
+
+WHERE
+
+	LAB_ORDER_RESULTS.COMPONENT_ID IN ( SELECT * FROM #LacticAcidLRR)
+
+	--AND c.ENCOUNTER_ID = '1050585796'
+
+--CREATE INDEX IDX_AllLacticacidtime ON #ALLLacticAcidTime (ENCOUNTER_ID) 
+
+
+
+--CALCULATING ALL THE SVO2 TIME 48 HOURS BEFORE AND AFTER FTZ
+
+IF OBJECT_ID(N'tempdb..#LAIN') IS NOT NULL DROP TABLE #LAIN;
+
+SELECT DISTINCT
+
+	A.ENCOUNTER_ID
+
+	, A.LacticAcidTime
+
+	, A.LacticAcidValue
+
+	, ROW_NUMBER() OVER(PARTITION BY A.ENCOUNTER_ID ORDER BY A.LacticAcidTime, A.COMP_ANL_INST_TM ASC) AS LINE
+
+INTO
+
+	#LAIN
+
+FROM
+
+	#ALLLacticAcidTime A
+
+	LEFT JOIN #FTZ F ON F.ENCOUNTER_ID = A.ENCOUNTER_ID
+
+WHERE
+
+	A.LacticAcidTime BETWEEN DATEADD(HH, -48, F.FTZ) AND DATEADD(HH, 48, F.FTZ)
+
+--CREATE INDEX IDX_Lain ON #LAIN (ENCOUNTER_ID) 
+
+
+
+--CALCULATING ALL THE SVO2 TIME NOT 48 HOURS BEFORE AND AFTER FTZ
+
+IF OBJECT_ID(N'tempdb..#LAOUT') IS NOT NULL DROP TABLE #LAOUT;
+
+SELECT DISTINCT
+
+	A.ENCOUNTER_ID
+
+	, A.LacticAcidTime
+
+	, A.LacticAcidValue
+
+	, ROW_NUMBER() OVER(PARTITION BY A.ENCOUNTER_ID ORDER BY ABS(DATEDIFF(MI, A.LacticAcidTime, F.FTZ)) ASC) AS LINE
+
+INTO
+
+	#LAOUT
+
+FROM
+
+	#ALLLacticAcidTime A
+
+	LEFT JOIN #FTZ F ON F.ENCOUNTER_ID = A.ENCOUNTER_ID
+
+WHERE
+
+	A.LacticAcidTime NOT BETWEEN DATEADD(HH, -48, F.FTZ) AND DATEADD(HH, 48, F.FTZ)
+
+--CREATE INDEX IDX_laout ON #LAOUT (ENCOUNTER_ID) 
+
+
+
+--CALCULATING LACTIC ACID TIME AND VALUE
+
+IF OBJECT_ID(N'tempdb..#LacticAcid') IS NOT NULL DROP TABLE #LacticAcid
+
+SELECT
+
+	C.ENCOUNTER_ID
+
+	, CASE
+
+		WHEN 
+
+			#LAIN.LacticAcidTime IS NULL AND #LAOUT.LacticAcidTime IS NULL
+
+		THEN
+
+			'1900-01-02 00:00:00'
+
+		WHEN
+
+			#LAIN.LacticAcidTime IS NOT NULL
+
+		THEN
+
+			#LAIN.LacticAcidTime
+
+		WHEN
+
+			#LAIN.LacticAcidTime IS NULL AND #LAOUT.LacticAcidTime IS NOT NULL
+
+		THEN
+
+			'1900-01-02 00:00:00'
+
+	END AS LacticAcidTime
+
+	, CASE
+
+		WHEN 
+
+			#LAIN.LacticAcidTime IS NULL AND #LAOUT.LacticAcidTime IS NULL
+
+		THEN
+
+			'88'
+
+		WHEN
+
+			#LAIN.LacticAcidTime IS NOT NULL
+
+		THEN
+
+			--ROUND(CONVERT(FLOAT, #LAIN.LacticAcidValue), 1)
+
+			ROUND(TRY_CAST(#LAIN.LacticAcidValue AS FLOAT),1)--10.12.2020--erroring out because of text in data :)
+
+		WHEN
+
+			#LAIN.LacticAcidTime IS NULL AND #LAOUT.LacticAcidTime IS NOT NULL
+
+		THEN
+
+			'88'
+
+	END AS LacticAcidValue
+
+INTO
+
+	#LacticAcid
+
+FROM
+
+	#COHORT C
+
+	LEFT JOIN #LAIN ON #LAIN.ENCOUNTER_ID = C.ENCOUNTER_ID AND #LAIN.LINE = 1
+
+	LEFT JOIN #LAOUT ON #LAOUT.ENCOUNTER_ID = C.ENCOUNTER_ID AND #LAOUT.LINE = 1
+
+--CREATE INDEX IDX_LacticAcid ON #LacticAcid (ENCOUNTER_ID) 
+
+
+
+/*END OF LACTIC ACID*/
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+/* BLOOD CULTURE POSITIVE - Indicates whether or not there was a positive blood culture for the PATIENTS. The
+
+timeframe for the positive culture can be from the 48 hours prior to arrival time at your hospital
+
+(as reported in the ArrivalTime field) up to 72 hours after Time Zero.*/
+
+
+
+IF OBJECT_ID(N'tempdb..#BloodCultureValue') IS NOT NULL DROP TABLE #BloodCultureValue;
+
+SELECT
+
+	C.ENCOUNTER_ID
+
+	, PO.ORDER_TIME AS MBOrderTime
+
+	, RESULTS.COMP_OBS_INST_TM AS ResultTime
+
+	, RESULTS.ORD_VALUE
+
+	, ROW_NUMBER() OVER(PARTITION BY C.ENCOUNTER_ID ORDER BY ABS(DATEDIFF(MI, PO.ORDER_TIME, #FTZ.FTZ)) ASC) AS LINE
+
+	, CASE
+
+		WHEN RESULTS.ORD_VALUE IS NULL THEN 99
+
+		WHEN RESULTS.ORD_VALUE LIKE '%No growth%' THEN 0
+
+		ELSE 1 
+
+	END AS BCPositive_V35	
+
+INTO 
+
+	#BloodCultureValue 
+
+FROM 
+
+	#COHORT C
+
+	LEFT JOIN #FTZ ON #FTZ.ENCOUNTER_ID = C.ENCOUNTER_ID
+
+	JOIN dbo.LAB_ORDER_RESULTS RESULTS ON C.ENCOUNTER_ID = RESULTS.ENCOUNTER_ID
+
+	JOIN dbo.PROCEDURE_ORDERS PO ON RESULTS.ORDER_PROC_ID = PO.ORDER_PROC_ID 
+
+			--AND PO.PROC_CODE in ('LAB001', 'lab6219', 'nur13204', 'lab6218')
+
+			AND PO.PROC_ID in (SELECT * FROM #BloodCultures)
+
+	JOIN #Base_Pop HE ON HE.ENCOUNTER_ID = C.ENCOUNTER_ID
+
+WHERE
+
+	RESULTS.RESULT_TIME BETWEEN DATEADD(HH, -48, HE.HOSP_ADMSN_TIME) AND DATEADD(HH, 168, #FTZ.FTZ) --MAY NEED TO CONSIDER PRLIMINARY RESULT TIME BUT AS PER STEPHANIE FINAL REULT TIME IS FINE FOR NOW
+
+--CREATE INDEX IDX_bloodculturevalue ON #BloodCultureValue (ENCOUNTER_ID) 
+
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+/* Time Surgical Source Control - Time of surgical procedure to control the source of PATIENTS's infection where the source of the
+
+infection is abscess, peritonitis, line infection, bone/joint infection, empyema, or infected
+
+hardware, if the procedure was within 48 hours before Time Zero to 48 hours after Time Zero.*/
+
+
+
+IF OBJECT_ID(N'tempdb..#TSSC') IS NOT NULL DROP TABLE #TSSC;
+
+SELECT DISTINCT
+
+	C.ENCOUNTER_ID
+
+	, VLB.IN_OR_DTTM AS PROC_DATE
+
+	, ROW_NUMBER() OVER(PARTITION BY C.ENCOUNTER_ID ORDER BY ABS(DATEDIFF(MI, VLB.IN_OR_DTTM, #FTZ.FTZ)) ASC) AS LINE
+
+INTO
+
+	#TSSC 
+
+FROM
+
+	#COHORT C
+
+	LEFT JOIN #FTZ ON #FTZ.ENCOUNTER_ID = C.ENCOUNTER_ID
+
+	INNER JOIN #Base_Pop HE ON HE.ENCOUNTER_ID = C.ENCOUNTER_ID
+
+	INNER JOIN dbo.PATIENT_OR_ADM_LINK POAL ON POAL.OR_LINK_VISIT_ID = C.ENCOUNTER_ID
+
+	INNER JOIN dbo.V_LOG_BASED VLB ON VLB.LOG_ID = POAL.LOG_ID
+
+	INNER JOIN dbo.HOSPITAL_ACCT_PX_LIST HAPL ON HAPL.HOSPITAL_ACCOUNT_ID = HE.HOSPITAL_ACCOUNT_ID
+
+	INNER JOIN dbo.CL_ICD_PX CIP ON CIP.ICD_PX_ID = HAPL.FINAL_ICD_PX_ID
+
+	INNER JOIN reports.CONFIG_VALUE_SET CVS ON CVS.CODE = cip.REF_BILL_CODE AND CVS.VALUE_SET_ID = 1023 --SURGICAL SOURCE CODES
+
+WHERE
+
+	VLB.IN_OR_DTTM BETWEEN DATEADD(HH, -48, #FTZ.FTZ) AND DATEADD(HH, 48, #FTZ.FTZ)
+
+--CREATE INDEX IDX_tssc ON #TSSC (ENCOUNTER_ID) 
+
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+/*ECMO - Indicates if PATIENTS was placed on ECMO within 30 days after Time Zero.*/
+
+
+
+IF OBJECT_ID(N'tempdb..#ECMO') IS NOT NULL DROP TABLE #ECMO;
+
+SELECT
+
+	C.ENCOUNTER_ID
+
+	, FM.MEAS_VALUE
+
+	, ROW_NUMBER() OVER(PARTITION BY C.ENCOUNTER_ID ORDER BY MEAS_VALUE DESC) AS LINE	
+
+INTO 
+
+	#ECMO
+
+FROM 
+
+	#COHORT C
+
+	LEFT JOIN #FTZ ON #FTZ.ENCOUNTER_ID = C.ENCOUNTER_ID
+
+	INNER JOIN dbo.FLOWSHEET_RECORDS FR ON FR.INPATIENT_DATA_ID = C.INPATIENT_DATA_ID
+
+	INNER JOIN dbo.FLOWSHEET_MEASUREMENTS FM ON FR.FSD_ID = FM.FSD_ID 
+
+			AND FM.FLO_MEAS_ID = '9000101014'
+
+			AND FM.RECORDED_TIME BETWEEN #FTZ.FTZ AND DATEADD(DD, 30, #FTZ.FTZ)
+
+--CREATE INDEX IDX_ecmo ON #ECMO (ENCOUNTER_ID) 
+
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+/* HIGH RISK CONDITIONS - The PATIENTS's underlying high risk conditions documented in ED or on admission. May require
+
+manual chart review to determine. Select all that apply. If no high risk conditions are identified,
+
+use 88 for not applicable. Note: this variable is a multi-select variable. If you import data, the
+
+import template provides a column for each high risk condition as well as a column for N/A and
+
+you must answer TRUE or FALSE for each*/
+
+
+
+--MALIGNANCY
+
+IF OBJECT_ID(N'tempdb..#HRC1') IS NOT NULL DROP TABLE #HRC1;
+
+SELECT DISTINCT
+
+	C.ENCOUNTER_ID
+
+INTO
+
+	#HRC1
+
+FROM
+
+	#COHORT C
+
+	INNER JOIN dbo.ENCOUNTER_DIAGNOSES EDX ON EDX.ENCOUNTER_ID = C.ENCOUNTER_ID
+
+	INNER JOIN dbo.EDG_CURRENT_ICD10 ECI ON ECI.DX_ID = EDX.DX_ID
+
+	INNER JOIN reports.CONFIG_VALUE_SET CVS ON CVS.CODE = ECI.CODE AND CVS.VALUE_SET_ID = 1021 --MALIGNANCY CODES
+
+--CREATE INDEX IDX_hrc1 ON #HRC1 (ENCOUNTER_ID) 
+
+
+
+--ASPLENIA
+
+IF OBJECT_ID(N'tempdb..#HRC2') IS NOT NULL DROP TABLE #HRC2;
+
+SELECT DISTINCT
+
+	C.ENCOUNTER_ID
+
+INTO
+
+	#HRC2
+
+FROM
+
+	#COHORT C
+
+	INNER JOIN dbo.ENCOUNTER_DIAGNOSES EDX ON EDX.ENCOUNTER_ID = C.ENCOUNTER_ID
+
+	INNER JOIN dbo.EDG_CURRENT_ICD10 ECI ON ECI.DX_ID = EDX.DX_ID AND ECI.CODE IN ('Q89.01', 'Z90.81') --ASPLENIA CODES
+
+--CREATE INDEX IDX_hrc2 ON #HRC2 (ENCOUNTER_ID) 
+
+
+
+--Bone Marrow Transp
+
+IF OBJECT_ID(N'tempdb..#HRC3') IS NOT NULL DROP TABLE #HRC3;
+
+SELECT DISTINCT
+
+	C.ENCOUNTER_ID
+
+INTO
+
+	#HRC3
+
+FROM
+
+	#COHORT C
+
+	LEFT JOIN #FTZ ON #FTZ.ENCOUNTER_ID = C.ENCOUNTER_ID
+
+	INNER JOIN #Base_Pop HE ON HE.ENCOUNTER_ID = C.ENCOUNTER_ID
+
+	INNER JOIN dbo.HOSPITAL_ACCT_PX_LIST HAPL ON HAPL.HOSPITAL_ACCOUNT_ID = HE.HOSPITAL_ACCOUNT_ID
+
+	INNER JOIN dbo.CL_ICD_PX CIP ON CIP.ICD_PX_ID = HAPL.FINAL_ICD_PX_ID
+
+	INNER JOIN reports.CONFIG_VALUE_SET CVS ON CVS.CODE = cip.REF_BILL_CODE AND CVS.VALUE_SET_ID = 1018 --Bone Marrow Transp CODES
+
+--CREATE INDEX IDX_hrc3 ON #HRC3 (ENCOUNTER_ID) 
+
+
+
+--Indwelling Line/Catheter
+
+IF OBJECT_ID(N'tempdb..#HRC4') IS NOT NULL DROP TABLE #HRC4;
+
+SELECT DISTINCT
+
+	C.ENCOUNTER_ID
+
+INTO
+
+	#HRC4
+
+FROM
+
+	#COHORT C
+
+	LEFT JOIN #FTZ ON #FTZ.ENCOUNTER_ID = C.ENCOUNTER_ID
+
+	INNER JOIN #Base_Pop HE ON HE.ENCOUNTER_ID = C.ENCOUNTER_ID
+
+	INNER JOIN dbo.HOSPITAL_ACCT_PX_LIST HAPL ON HAPL.HOSPITAL_ACCOUNT_ID = HE.HOSPITAL_ACCOUNT_ID
+
+	INNER JOIN dbo.CL_ICD_PX CIP ON CIP.ICD_PX_ID = HAPL.FINAL_ICD_PX_ID
+
+	INNER JOIN reports.CONFIG_VALUE_SET CVS ON CVS.CODE = cip.REF_BILL_CODE AND CVS.VALUE_SET_ID = 1019 --Indwelling Line/Catheter CODES
+
+--CREATE INDEX IDX_hrc4 ON #HRC4 (ENCOUNTER_ID) 
+
+
+
+--Solid Organ Transplant
+
+IF OBJECT_ID(N'tempdb..#HRC95') IS NOT NULL DROP TABLE #HRC95;
+
+SELECT DISTINCT
+
+	C.ENCOUNTER_ID
+
+INTO
+
+	#HRC95
+
+FROM
+
+	#COHORT C
+
+	LEFT JOIN #FTZ ON #FTZ.ENCOUNTER_ID = C.ENCOUNTER_ID
+
+	INNER JOIN #Base_Pop HE ON HE.ENCOUNTER_ID = C.ENCOUNTER_ID
+
+	INNER JOIN dbo.HOSPITAL_ACCT_PX_LIST HAPL ON HAPL.HOSPITAL_ACCOUNT_ID = HE.HOSPITAL_ACCOUNT_ID
+
+	INNER JOIN dbo.CL_ICD_PX CIP ON CIP.ICD_PX_ID = HAPL.FINAL_ICD_PX_ID
+
+	INNER JOIN reports.CONFIG_VALUE_SET CVS ON CVS.CODE = cip.REF_BILL_CODE AND CVS.VALUE_SET_ID = 1020 --Solid Organ Transplant CODES
+
+--CREATE INDEX IDX_hrc95 ON #HRC95 (ENCOUNTER_ID) 
+
+
+
+--Severe Mental Retardation/Cerebral Palsy
+
+IF OBJECT_ID(N'tempdb..#HRC6') IS NOT NULL DROP TABLE #HRC6;
+
+SELECT DISTINCT
+
+	C.ENCOUNTER_ID
+
+INTO
+
+	#HRC6
+
+FROM
+
+	#COHORT C
+
+	INNER JOIN dbo.ENCOUNTER_DIAGNOSES EDX ON EDX.ENCOUNTER_ID = C.ENCOUNTER_ID
+
+	INNER JOIN dbo.EDG_CURRENT_ICD10 ECI ON ECI.DX_ID = EDX.DX_ID
+
+			AND ECI.CODE IN (SELECT * FROM #DXIDCebrealPalsy)
+
+--CREATE INDEX IDX_hrc6 ON #HRC6 (ENCOUNTER_ID) 
+
+
+
+--Tech Depend (Gtube, Trach, VP Shunt)
+
+IF OBJECT_ID(N'tempdb..#HRC98') IS NOT NULL DROP TABLE #HRC98;
+
+SELECT DISTINCT
+
+	C.ENCOUNTER_ID
+
+INTO
+
+	#HRC98
+
+FROM
+
+	#COHORT C
+
+	INNER JOIN dbo.ENCOUNTER_DIAGNOSES EDX ON EDX.ENCOUNTER_ID = C.ENCOUNTER_ID
+
+	INNER JOIN dbo.EDG_CURRENT_ICD10 ECI ON ECI.DX_ID = EDX.DX_ID
+
+			AND ECI.CODE IN (SELECT * FROM #DXTrachDependent)--Tech Depend (Gtube, Trach, VP Shunt) CODES
+
+--CREATE INDEX IDX_hrc98 ON #HRC98 (ENCOUNTER_ID) 
+
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+/* ICU DAYS - Number of days the PATIENTS was in ICU for any part of the day beginning at Time Zero until
+
+discharge, death, or 30 days, whichever comes first. Do not include ICU days before Time Zero. If
+
+the PATIENTS was not in ICU, report 0 days.*/
+
+/* Developer D'S CODE TO COUNT ICU DAYS PRIOR TO THE CHANGE ON 08.02.2019 (BY Developer A)
+
+IF OBJECT_ID(N'tempdb..#ICUDays1') IS NOT NULL DROP TABLE #ICUDays1;
+
+SELECT
+
+	C.ENCOUNTER_ID
+
+	, CASE
+
+		WHEN ISM.ICU_STAY_START_DT < CONVERT(DATE, #FTZ.FTZ) 
+
+			THEN CONVERT(DATE, #FTZ.FTZ)
+
+		ELSE ISM.ICU_STAY_START_DT
+
+	END AS START_DATE
+
+	, CASE
+
+		WHEN ISM.ICU_STAY_END_DT > DATEADD(DD, 29, CONVERT(DATE, #FTZ.FTZ))
+
+			THEN DATEADD(DD, 29, CONVERT(DATE, #FTZ.FTZ))
+
+		ELSE ISM.ICU_STAY_END_DT 
+
+	END AS END_DATE	
+
+INTO
+
+	#ICUDays1
+
+FROM
+
+	#COHORT C
+
+	JOIN #FTZ ON #FTZ.ENCOUNTER_ID = C.ENCOUNTER_ID
+
+	INNER JOIN dbo.HOSPITAL_ENCOUNTERS HE ON HE.ENCOUNTER_ID = C.ENCOUNTER_ID
+
+	JOIN dbo.DM_ICU_STAY ISM ON ISM.ENCOUNTER_ID = C.ENCOUNTER_ID
+
+			AND (ISM.ICU_STAY_END_DT >= CONVERT(DATE, #FTZ.FTZ) OR ISM.ICU_STAY_END_DT IS NULL)
+
+			AND ISM.PATIENT_ID IS NOT NULL
+
+
+
+IF OBJECT_ID(N'tempdb..#ICUDaySum') IS NOT NULL DROP TABLE #ICUDaySum;
+
+SELECT
+
+	ENCOUNTER_ID
+
+	, SUM(DATEDIFF(DD, START_DATE, END_DATE)) + 1 AS ICUDays_V58
+
+INTO
+
+	#ICUDaySum 
+
+FROM
+
+	#ICUDays
+
+GROUP BY
+
+	ENCOUNTER_ID	
+
+*/
+
+IF OBJECT_ID(N'tempdb..#ICUDaySum') IS NOT NULL DROP TABLE #ICUDaySum;
+
+SELECT
+
+PLH.ENCOUNTER_NUM,
+
+SUM(
+
+
+
+CASE WHEN CONVERT(DATE,PLH.IN_DTTM) = CONVERT(DATE,PLH.OUT_DTTM) THEN 1
+
+WHEN OR2ICU.SPECIALTY LIKE '%SURGERY%' THEN 99999
+
+WHEN PLH.IN_DTTM IS NULL THEN 0
+
+ELSE
+
+CEILING(DATEDIFF(MI,PLH.IN_DTTM,PLH.OUT_DTTM)/(60*24.0))END
+
+
+
+)  AS ICUDays_V58
+
+INTO #ICUDaySum
+
+FROM
+
+	#COHORT C
+
+	INNER JOIN #FTZ FTZ ON FTZ.ENCOUNTER_ID = C.ENCOUNTER_ID
+
+	INNER JOIN dbo.V_PATIENT_LOCATION_HISTORY PLH ON PLH.ENCOUNTER_NUM = FTZ.ENCOUNTER_ID
+
+		AND (
+
+				PLH.IN_DTTM > FTZ.FTZ
+
+				OR
+
+				(FTZ.FTZ BETWEEN PLH.IN_DTTM AND PLH.OUT_DTTM)--modified by Developer A on 07.30.2019				
+
+				
+
+			)
+
+		AND PLH.ADT_DEPARTMENT_ID IN (	
+
+										SELECT d.DEPARTMENT_ID
+
+										FROM #AllICUDept d --HS BI IP ALL ICU UNITS
+
+										) 
+
+	OUTER APPLY
+
+		(
+
+			SELECT TOP 1 DEP.SPECIALTY FROM
+
+			dbo.V_PATIENT_LOCATION_HISTORY N
+
+			INNER JOIN dbo.DEPARTMENTS DEP ON DEP.DEPARTMENT_ID = N.ADT_DEPARTMENT_ID
+
+			WHERE N.ENCOUNTER_NUM = PLH.ENCOUNTER_NUM AND N.IN_DTTM < PLH.IN_DTTM
+
+			AND N.EVENT_TYPE_CODE=1--ONLY OR ADMITS
+
+			ORDER BY N.IN_DTTM DESC
+
+		)OR2ICU
+
+GROUP BY PLH.ENCOUNTER_NUM
+
+--CREATE INDEX IDX_icudaysum ON #ICUDaySum (ENCOUNTER_NUM) 
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+/*ABX DAYS - The number of days the PATIENTS is on IV antibiotics within the 30 days after Time Zero. Use whole
+
+numbers only; if the PATIENTS is on IV antibiotics for part of a day, it counts as one day. If the
+
+PATIENTS is on multiple antibiotics, each antibiotic counts as a day.*/
+
+IF OBJECT_ID(N'tempdb..#ABXDays') IS NOT NULL DROP TABLE #ABXDays;
+
+SELECT
+
+	OMED.ENCOUNTER_ID
+
+	, CONVERT(DATE, (MAR.TAKEN_TIME)) AS ABX_Time
+
+	, ROW_NUMBER() OVER(PARTITION BY OMED.ENCOUNTER_ID, OMED.MEDICATION_ID ORDER BY MAR.TAKEN_TIME ASC) AS MAR_Line
+
+	, OMED.MEDICATION_ID
+
+	, omed.ORDER_MED_ID
+
+INTO 
+
+	#ABXDays 
+
+FROM 
+
+	#COHORT C
+
+	LEFT JOIN #FTZ ON #FTZ.ENCOUNTER_ID = C.ENCOUNTER_ID
+
+	JOIN dbo.MEDICATION_ORDERS OMED ON OMED.ENCOUNTER_ID = C.ENCOUNTER_ID
+
+	JOIN dbo.MED_ADMIN_RECORDS MAR ON MAR.ORDER_MED_ID = OMED.ORDER_MED_ID 
+
+	JOIN dbo.MEDICATIONS MED ON MED.MEDICATION_ID = OMED.MEDICATION_ID AND MED.THERA_CLASS_CODE = 11 --ANTIBIOTICS
+
+	JOIN dbo.MED_DETAILS_EXT MED_TWO ON MED_TWO.MEDICATION_ID = MED.MEDICATION_ID
+
+WHERE
+
+	(MAR.TAKEN_TIME BETWEEN #FTZ.FTZ AND DATEADD(DD, 30, #FTZ.FTZ)) --TIME COMPARISON ONLY FOR DURING THE PATIENTS TIME IN ED. NOT WHEN THE PATIENTS IS ON THE FLOOR AS AN IP ADMIT.
+
+	AND MAR.MAR_ACTION_CODE IN (SELECT * FROM #MARActions)
+
+--VALUES BELOW ADDED TO THE CODE ON STEPHANIE'S REQUEST DURING VALIDATION.
+
+	AND MED_TWO.ADMIN_ROUTE_CODE NOT IN (SELECT * FROM #RouteExclusions)
+
+--CREATE INDEX IDX_abxdayys ON #ABXDays (ENCOUNTER_ID) 
+
+
+
+IF OBJECT_ID(N'tempdb..#ABXDayspermed') IS NOT NULL DROP TABLE #ABXDayspermed;
+
+SELECT
+
+	ENCOUNTER_ID
+
+	, COUNT(DISTINCT ABX_TIME) AS ABXDayspermed
+
+INTO 
+
+	#ABXDayspermed
+
+FROM 
+
+	#ABXDays
+
+GROUP BY 
+
+	ENCOUNTER_ID
+
+	, MEDICATION_ID
+
+--CREATE INDEX IDX_abxdayspermed ON #ABXDayspermed (ENCOUNTER_ID) 
+
+
+
+IF OBJECT_ID(N'tempdb..#ABXDays_Count') IS NOT NULL DROP TABLE #ABXDays_Count;
+
+SELECT
+
+	ENCOUNTER_ID
+
+	, SUM(ABXDayspermed) AS ABXDays_V42
+
+INTO 
+
+	#ABXDays_Count
+
+FROM 
+
+	#ABXDayspermed
+
+GROUP BY 
+
+	ENCOUNTER_ID
+
+--CREATE INDEX IDX_abxdayscount ON #ABXDays_Count (ENCOUNTER_ID) 
+
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+/* PRESSOR DAYS - Number of days the PATIENTS was on pressors for any part of the day beginning at Time Zero until
+
+discharge, death, or 30 days, whichever comes first. Do not include pressor days before Time
+
+Zero.*/
+
+
+
+IF OBJECT_ID(N'tempdb..#PressorAdminDays') IS NOT NULL DROP TABLE #PressorAdminDays;
+
+SELECT DISTINCT
+
+	B.ENCOUNTER_ID
+
+	, COUNT (DISTINCT CONVERT(DATE, MA.TAKEN_TIME) )AS Pressor_Days_V57
+
+INTO
+
+	#PressorAdminDays 
+
+FROM
+
+	#COHORT B
+
+	LEFT JOIN dbo.MEDICATION_ORDERS MO ON MO.ENCOUNTER_ID = B.ENCOUNTER_ID
+
+	LEFT JOIN dbo.MEDICATIONS MEDS ON MEDS.MEDICATION_ID = MO.MEDICATION_ID
+
+	LEFT JOIN dbo.GROUPER_MED_RECORDS GMR ON GMR.EXP_MEDS_LIST_ID = MEDS.MEDICATION_ID
+
+	LEFT JOIN dbo.MED_ADMIN_RECORDS MA ON MA.ORDER_MED_ID = MO.ORDER_MED_ID
+
+	LEFT JOIN #FTZ ON #FTZ.ENCOUNTER_ID = B.ENCOUNTER_ID
+
+	LEFT JOIN #Base_Pop HE ON HE.ENCOUNTER_ID = B.ENCOUNTER_ID	
+
+WHERE
+
+	GMR.GROUPER_ID IN (SELECT * FROM #MedGroupers)
+
+	AND MA.ROUTE_CODE = 11 --INTRAVENOUS
+
+	AND (MA.TAKEN_TIME BETWEEN #FTZ.FTZ AND COALESCE(HE.HOSP_DISCH_TIME, DATEADD(DD, 30, #FTZ.FTZ)))
+
+GROUP BY
+
+	B.ENCOUNTER_ID, HE.HOSP_DISCH_TIME
+
+--CREATE INDEX IDX_pressorAdminDays ON #PressorAdminDays (ENCOUNTER_ID) 
+
+
+
+IF OBJECT_ID(N'tempdb..#PressorsDays') IS NOT NULL DROP TABLE #PressorsDays;
+
+SELECT
+
+	ENCOUNTER_ID
+
+	, CASE WHEN SUM(Pressor_Days_V57) > 30 THEN 30 ELSE SUM(Pressor_Days_V57) END AS Pressor_Days_V57--08.01.2019 Developer A UPDATED TO DEFAULT TO 30 DAYS
+
+INTO 
+
+	#PressorsDays 
+
+FROM 
+
+	#PressorAdminDays 	
+
+GROUP BY 
+
+	ENCOUNTER_ID
+
+--CREATE INDEX IDX_PressorsDays ON #PressorsDays (ENCOUNTER_ID) 
+
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+/* PRESSURE VENT DAYS - Number of days the PATIENTS was on ventilation for any part of the day beginning at Time Zero
+
+until discharge, death, or 30 days, whichever comes first. Include days where PATIENTS had
+
+noninvasive ventilation such as BIPAP or CPAP. Do not include ventilator days before Time Zero.*/
+
+
+
+IF OBJECT_ID(N'tempdb..#AllPVDays') IS NOT NULL DROP TABLE #AllPVDays;
+
+SELECT DISTINCT
+
+	C.ENCOUNTER_ID
+
+	, CONVERT(DATE, FM.RECORDED_TIME) AS VENT_DATE
+
+INTO
+
+	#AllPVDays 
+
+FROM
+
+	#COHORT C
+
+	LEFT JOIN #FTZ ON #FTZ.ENCOUNTER_ID = C.ENCOUNTER_ID
+
+	LEFT JOIN dbo.FLOWSHEET_RECORDS FR ON FR.INPATIENT_DATA_ID = C.INPATIENT_DATA_ID
+
+	LEFT JOIN dbo.FLOWSHEET_MEASUREMENTS FM ON FM.FSD_ID = FR.FSD_ID
+
+	LEFT JOIN #Base_Pop HE ON HE.ENCOUNTER_ID = C.ENCOUNTER_ID
+
+WHERE
+
+	FM.FLO_MEAS_ID = '3040104328' -- VENT ON
+
+	AND FM.MEAS_VALUE = 'Yes'
+
+	AND (FM.RECORDED_TIME BETWEEN #FTZ.FTZ AND COALESCE(HE.HOSP_DISCH_TIME, DATEADD(DD, 29, #FTZ.FTZ))) 
+
+CREATE INDEX IDX_allpvdays ON #AllPVDays (ENCOUNTER_ID) 
+
+
+
+IF OBJECT_ID(N'tempdb..#PVDays') IS NOT NULL DROP TABLE #PVDays;
+
+SELECT 
+
+	ENCOUNTER_ID
+
+	, CASE WHEN COUNT(DISTINCT VENT_DATE)> 30 THEN 30 ELSE COUNT(DISTINCT VENT_DATE) END AS PRESSURE_VENT_DAYS--08.01.2019 Developer A UPDATED TO DEFAULT TO 30 DAYS
+
+INTO
+
+	#PVDays
+
+FROM
+
+	#AllPVDays
+
+GROUP BY
+
+	ENCOUNTER_ID
+
+--CREATE INDEX IDX_pvDays ON #PVDays (ENCOUNTER_ID) 
+
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+/* PUTTING ALL THE DISPLAY COLUMNS TOGETHER */
+
+IF OBJECT_ID(N'tempdb..#FinalTData') IS NOT NULL DROP TABLE #FinalTData;
+
+SELECT DISTINCT				
+
+	CONVERT(VARCHAR,C.INPATIENT_DATA_ID) + CONVERT(VARCHAR, YEAR(DATEADD(MM,-1,GETDATE()))) + CONVERT(VARCHAR, MONTH(DATEADD(MM,-1,GETDATE()))) AS Sepsis_Episode_ID_V01			
+
+	, COALESCE(COALESCE(HE.ADT_ARRIVAL_TIME,HE.HOSP_ADMSN_TIME),'1900‐01‐01 00:00:00') AS Arrival_Time_V10
+
+	, COALESCE((CONVERT(VARCHAR, CONVERT(DATE, PAT.BIRTH_DATE))),'1900‐01‐01') AS Birth_Date_V02			
+
+	, CASE WHEN CRO.ENCOUNTER_ID IS NOT NULL THEN 			
+
+		COALESCE(#ScreenTime.ScreenTime_V06,DefaultScreenTime.DefaultScreenTime, '1900‐01‐02 00:00:00')		
+
+		ELSE COALESCE(#ScreenTime.ScreenTime_V06, '1900-01-02 00:00:00')		
+
+		END AS ScreenTime_V06		
+
+	, COALESCE(HuddleTime.HuddleTime, HuddleNoteTime.HuddleNoteTime,'1900-01-01 00:00:00') AS Huddle_Time_V07			
+
+	, CASE WHEN CRO.ENCOUNTER_ID IS NOT NULL THEN 			
+
+		COALESCE(#OSTP.ORDER_DTTM, DefaulTOsetTime.DefaulTOsetTime, '1900-01-02 00:00:00') --AS OrderSet_Time_V08		
+
+		ELSE COALESCE(#OSTP.ORDER_DTTM, '1900‐01‐02 00:00:00')		
+
+		END AS OrderSet_Time_V08		
+
+	, CASE WHEN CRO.ENCOUNTER_ID IS NOT NULL THEN 			
+
+		COALESCE(#FirstABXTime.FIRST_ABX_TIME,DefaultABXTime.DefaultABXTime, '1900-01-02 00:00:00')		
+
+		ELSE COALESCE(#FirstABXTime.FIRST_ABX_TIME, '1900-01-02 00:00:00')		
+
+		END AS FirstABXTime_V26		
+
+	, CASE WHEN CRO.ENCOUNTER_ID IS NOT NULL THEN 			
+
+		COALESCE(#FirstBolusTime.FIRST_BOLUS_TIME,DefaultBolTime.DefaultBolTime, '1900-01-02 00:00:00')		
+
+		ELSE COALESCE(#FirstBolusTime.FIRST_BOLUS_TIME, '1900-01-02 00:00:00')		
+
+		END AS Bolus1Time_V20		
+
+	, #FTZ.FunctionalTimeZero_V68			
+
+	, #FTZLoc.TimeZeroLoc_V66			
+
+	, 999 AS Weight_V16 -- Developer C -3/21/24 no longer tracked so setting default value 
+
+	, COALESCE(ROUND(B1.BOLUS_VOLUME, 0), 99999) AS Bolus1Volume_V21			
+
+	, CASE			
+
+		WHEN B2.BOLUS_ADMIN_TIME BETWEEN DATEADD(HH, -6, #FTZ.FTZ) AND DATEADD(HH, 6, #FTZ.FTZ)		
+
+			THEN COALESCE(B2.BOLUS_ADMIN_TIME, '1900-01-02 00:00:00')	
+
+		ELSE '1900-01-02 00:00:00'		
+
+	END AS Bolus2Time_V22			
+
+	, CASE			
+
+		WHEN B2.BOLUS_ADMIN_TIME BETWEEN DATEADD(HH, -6, #FTZ.FTZ) AND DATEADD(HH, 6, #FTZ.FTZ)		
+
+			THEN COALESCE(ROUND(B2.BOLUS_VOLUME, 0), 99999) 	
+
+		ELSE 99999		
+
+	END AS Bolus2Volume_V23			
+
+	, CASE			
+
+		WHEN B3.BOLUS_ADMIN_TIME BETWEEN DATEADD(HH, -6, #FTZ.FTZ) AND DATEADD(HH, 6, #FTZ.FTZ)		
+
+			THEN COALESCE(B3.BOLUS_ADMIN_TIME, '1900-01-02 00:00:00') 	
+
+		ELSE '1900-01-02 00:00:00'		
+
+	END AS Bolus3Time_V24			
+
+	, CASE			
+
+		WHEN B3.BOLUS_ADMIN_TIME BETWEEN DATEADD(HH, -6, #FTZ.FTZ) AND DATEADD(HH, 6, #FTZ.FTZ)		
+
+			THEN COALESCE(ROUND(B3.BOLUS_VOLUME, 0), 99999) 	
+
+		ELSE 99999		
+
+	END AS Bolus3Volume_V25			
+
+	, COALESCE(#Hypotension.FirstTimeHypotension_V18, '1900-01-02 00:00:00') AS FirstTimeHypotension_V18			
+
+	, COALESCE(F.PRESSOR_START_TIME, '1900-01-02 00:00:00') AS FirstPressorTime_V29			
+
+	, CASE			
+
+		WHEN F.GROUPER_ID = '8000100' THEN '1'		
+
+		WHEN F.GROUPER_ID = '8000101' THEN '2'		
+
+		WHEN F.GROUPER_ID = '8000102' THEN '95'		
+
+		WHEN F.GROUPER_ID = '8000103' THEN '4'		
+
+		WHEN F.GROUPER_ID = '8000104' THEN '3'		
+
+		ELSE '88'		
+
+	END AS FirstPressorType_V30			
+
+	, 99 AS OrganDysfunction_V41			
+
+	, COALESCE(#CVLTIME.CVLTIME, '1900‐01‐01 00:00:00') AS CVLPlacementTime_V44			
+
+	, CASE WHEN			
+
+		#SVO2TIME.SVO2TIME < COALESCE(HE.ADT_ARRIVAL_TIME,HE.HOSP_ADMSN_TIME) THEN '1900‐01‐01 00:00:00'--ARRIVAL TIME CHECK ADDED BY Developer A ON 08.08.2019		
+
+		ELSE COALESCE(#SVO2TIME.SVO2TIME, '1900‐01‐01 00:00:00')		
+
+	END AS SVO2Time_V45			
+
+	, CASE WHEN			
+
+		#LacticAcid.LacticAcidTime < COALESCE(HE.ADT_ARRIVAL_TIME,HE.HOSP_ADMSN_TIME) THEN '1900‐01‐01 00:00:00'--ARRIVAL TIME CHECK ADDED BY Developer A ON 08.08.2019		
+
+		ELSE COALESCE(#LacticAcid.LacticAcidTime, '1900‐01‐01 00:00:00')		
+
+	END AS LacticAcidTime_V46			
+
+	, COALESCE(#LacticAcid.LacticAcidValue, '99') AS LacticAcidValue_V47			
+
+	, COALESCE(#BloodCultureValue.BCPositive_V35, 99) AS BCPositive_V35			
+
+	, COALESCE(#TSSC.PROC_DATE, '1900‐01‐03 00:00:00') AS TimeSurgicalSourceControl_V39			
+
+	, CASE --if time zero is 24 hours after arrival, Outside Hospital should be reported as zero. Developer A updated this on 08.01.2019			
+
+		WHEN HE.ADMIT_SOURCE_CODE IS NULL THEN 99		
+
+		WHEN  #FTZ.FTZ > DATEADD(HH,24,COALESCE(HE.ADT_ARRIVAL_TIME,HE.HOSP_ADMSN_TIME)) THEN 0--NEWLY ADDED, SHOULD CHECK THIS BEFORE CHECKING IF ADMIT SOURCE IS NOT NULL		
+
+		WHEN HE.ADMIT_SOURCE_CODE IN (106,23,4,95,6) THEN 1 		
+
+		ELSE 0		
+
+	END AS OutsideHospital_V11 			
+
+	, '1900‐01‐02 00:00:00' AS ED2GenCareTime_V12 -- Developer C -3/21/24 no longer tracked so setting default value 
+
+	, '1900‐01‐02 00:00:00' AS ED2HemoncTime_V63 -- Developer C -3/21/24 no longer tracked so setting default value 
+
+	, '1900‐01‐02 00:00:00' AS ED2ICUTime_V13 -- Developer C -3/21/24 no longer tracked so setting default value 
+
+	, '1900‐01‐02 00:00:00' AS GENCARE2ICUTime_V94 -- Developer C -3/21/24 no longer tracked so setting default value 
+
+	, '1900‐01‐02 00:00:00' AS HEMONC2ICUTime_V64 -- Developer C -3/21/24 no longer tracked so setting default value 
+
+	, CASE			
+
+		WHEN HE.HOSP_DISCH_TIME IS NULL THEN 4		
+
+		WHEN HE.DISCH_DISP_CODE IN ('1', '40', '50', '6', '81', '86') THEN 1		
+
+		WHEN HE.DISCH_DISP_CODE IN ('62', '90') THEN 2		
+
+		WHEN HE.DISCH_DISP_CODE IN ('20', '40', '41', '42') THEN 3		
+
+		ELSE 6		
+
+	END AS Disposition_V54			
+
+	, #FTZ.FTZ AS FunctionalTimeZero			
+
+	, CASE	WHEN CRO.ENCOUNTER_ID IS NOT NULL THEN CONVERT(char(10), DATEADD(DD, 30, HE.HOSP_ADMSN_TIME), 126) 		
+
+			WHEN (HE.HOSP_DISCH_TIME IS NOT NULL AND DATEADD(DD, 30, #FTZ.FTZ)< HE.HOSP_DISCH_TIME) THEN DATEADD(DD, 30, #FTZ.FTZ)	
+
+			ELSE COALESCE(CONVERT(char(10), HE.HOSP_DISCH_TIME, 126), CONVERT(char(10), DATEADD(DD, 30, #FTZ.FTZ), 126))	
+
+	END AS DispositionDate_V53			
+
+	, CASE			
+
+		WHEN CRO.ENCOUNTER_ID IS NOT NULL THEN CONVERT(char(10), DATEADD(DD, 30, HE.HOSP_ADMSN_TIME), 126)		
+
+		WHEN HE.HOSP_DISCH_TIME IS NULL OR (HE.HOSP_DISCH_TIME NOT BETWEEN @StartDate AND @EndDate)		
+
+		 THEN CONVERT(char(10), DATEADD(DD, 30, #FTZ.FTZ), 126) ELSE CONVERT(char(10), HE.HOSP_DISCH_TIME, 126) END AS New_DispositionDate_V53		
+
+	, HE.HOSP_DISCH_TIME as Hospital_Discharge_Time			
+
+	, CASE 			
+
+		WHEN #ECMO.MEAS_VALUE = 'On' THEN 1		
+
+		ELSE 0		
+
+	END AS ECMO_V48			
+
+	, 99 AS Risk_Score_V52			
+
+	, CASE 			
+
+		WHEN COALESCE(CEILING(DM_ICU_STAY.ICU_LENGTH_OF_STAY_DAYS), 0) = 0 THEN 99 		
+
+		ELSE 4 		
+
+	END AS Risk_Score_Method_V51			
+
+	, CASE			
+
+		WHEN #HRC1.ENCOUNTER_ID IS NULL THEN 'FALSE'		
+
+		ELSE 'TRUE'		
+
+	END AS HighRiskConditions_1_V65			
+
+	, CASE			
+
+		WHEN #HRC2.ENCOUNTER_ID IS NULL THEN 'FALSE'		
+
+		ELSE 'TRUE'		
+
+	END AS HighRiskConditions_2_V65			
+
+	, CASE			
+
+		WHEN #HRC3.ENCOUNTER_ID IS NULL THEN 'FALSE'		
+
+		ELSE 'TRUE'		
+
+	END AS HighRiskConditions_3_V65			
+
+	, CASE			
+
+		WHEN #HRC4.ENCOUNTER_ID IS NULL THEN 'FALSE'		
+
+		ELSE 'TRUE'		
+
+	END AS HighRiskConditions_4_V65			
+
+	, CASE			
+
+		WHEN #HRC95.ENCOUNTER_ID IS NULL THEN 'FALSE'		
+
+		ELSE 'TRUE'		
+
+	END AS HighRiskConditions_95_V65			
+
+	, CASE			
+
+		WHEN #HRC6.ENCOUNTER_ID IS NULL THEN 'FALSE'		
+
+		ELSE 'TRUE'		
+
+	END AS HighRiskConditions_6_V65			
+
+	, 'FALSE' AS HighRiskConditions_7_V65			
+
+	, CASE			
+
+		WHEN #HRC98.ENCOUNTER_ID IS NULL THEN 'FALSE'		
+
+		ELSE 'TRUE'		
+
+	END AS HighRiskConditions_98_V65			
+
+	, CASE			
+
+		WHEN 		
+
+			#HRC1.ENCOUNTER_ID IS NULL	
+
+			AND #HRC2.ENCOUNTER_ID IS NULL	
+
+			AND #HRC3.ENCOUNTER_ID IS NULL	
+
+			AND #HRC4.ENCOUNTER_ID IS NULL	
+
+			AND #HRC95.ENCOUNTER_ID IS NULL	
+
+			AND #HRC6.ENCOUNTER_ID IS NULL	
+
+			AND #HRC98.ENCOUNTER_ID IS NULL	
+
+		THEN 'TRUE'		
+
+		ELSE 'FALSE'		
+
+	END AS HighRiskConditions_88_V65			
+
+	, COALESCE(#ABXDays_Count.ABXDays_V42, 99999) AS ABXDays_V42--Developer A UPDATED THIS FROM COALESCE(#ABXDays_Count.ABXDays_V42, 99999) TO COALESCE(#ABXDays_Count.ABXDays_V42, 0), PER SSS VARIABLE DEFINITION			
+
+	, COALESCE(#PressorsDays.Pressor_Days_V57, 0) AS Pressor_Days_V57			
+
+	, CASE 			
+
+		WHEN #ICUDaySum.ICUDays_V58 IS NULL THEN 0		
+
+		WHEN #ICUDaySum.ICUDays_V58 =99999 THEN 99999		
+
+		WHEN COALESCE(#ICUDaySum.ICUDays_V58, 0) > 30 THEN 30 ELSE #ICUDaySum.ICUDays_V58 END AS ICUDays_V58		
+
+	, 99 AS Pt_Chronically_Vented_V32			
+
+	, COALESCE(#PVDays.PRESSURE_VENT_DAYS, 0) AS PressureVentDays_V56			
+
+	, '1900‐01‐02 00:00:00' AS Clinically_Derived_Time_Zero_V09			
+
+	, C.ENCOUNTER_ID			
+
+	, DATENAME(month, CONVERT(DATE, @EndDate)) + DATENAME(YEAR, CONVERT(DATE, @EndDate)) AS DATE_STAMP			
+
+	, 0 AS REVIEWED			
+
+	, CASE WHEN CRO.ENCOUNTER_ID IS NOT NULL THEN 1 ELSE 0 END AS R_65	
+
+	, '3036' [NACHRI_hosp]
+
+	, HE.HOSPITAL_ACCOUNT_ID [bill]
+
+INTO #FinalTData	
+
+FROM #COHORT C
+
+	LEFT JOIN #Base_Pop HE ON HE.ENCOUNTER_ID = C.ENCOUNTER_ID
+
+	LEFT JOIN dbo.PATIENTS PAT ON PAT.PATIENT_ID = HE.PATIENT_ID
+
+	LEFT JOIN #ScreenTime ON #ScreenTime.ENCOUNTER_ID = C.ENCOUNTER_ID
+
+	LEFT JOIN #OSTP ON #OSTP.ENCOUNTER_ID = C.ENCOUNTER_ID AND #OSTP.SS_LINE = 1
+
+	LEFT JOIN #FirstABXTime ON #FirstABXTime.ENCOUNTER_ID = C.ENCOUNTER_ID
+
+	LEFT JOIN #FirstBolusTime ON #FirstBolusTime.ENCOUNTER_ID = C.ENCOUNTER_ID
+
+	LEFT JOIN #TreatPlanBolus B1 ON B1.ENCOUNTER_ID = #FirstBolusTime.ENCOUNTER_ID AND B1.BOLUS_NUM = #FirstBolusTime.BOLUS_NUM
+
+	LEFT JOIN #FTZ ON #FTZ.ENCOUNTER_ID = C.ENCOUNTER_ID
+
+	LEFT JOIN #FTZLoc ON #FTZLoc.ENCOUNTER_ID = C.ENCOUNTER_ID
+
+	LEFT JOIN #TreatPlanBolus B2 ON B2.ENCOUNTER_ID = #FirstBolusTime.ENCOUNTER_ID AND B2.BOLUS_NUM = (#FirstBolusTime.BOLUS_NUM + 1) --select * from #TreatPlanBolus--ftz 2019-06-28 21:24:00.000
+
+	LEFT JOIN #TreatPlanBolus B3 ON B3.ENCOUNTER_ID = #FirstBolusTime.ENCOUNTER_ID AND B3.BOLUS_NUM = (#FirstBolusTime.BOLUS_NUM + 2)
+
+	LEFT JOIN #Hypotension ON #Hypotension.ENCOUNTER_ID = C.ENCOUNTER_ID AND #Hypotension.ORD_RESULTS_LINE = 1
+
+	LEFT JOIN #FirstPressorTime F ON F.ENCOUNTER_ID = C.ENCOUNTER_ID AND F.PRESSOR_ORDER_LINE = 1
+
+	LEFT JOIN #CVLTIME ON #CVLTime.ENCOUNTER_ID = C.ENCOUNTER_ID 
+
+	LEFT JOIN #SVO2TIME ON #SVO2TIME.ENCOUNTER_ID = C.ENCOUNTER_ID
+
+	LEFT JOIN #LacticAcid ON #LacticAcid.ENCOUNTER_ID = C.ENCOUNTER_ID
+
+	LEFT JOIN #BloodCultureValue ON #BloodCultureValue.ENCOUNTER_ID = C.ENCOUNTER_ID AND #BloodCultureValue.LINE = 1
+
+	LEFT JOIN #ECMO ON #ECMO.ENCOUNTER_ID = C.ENCOUNTER_ID AND #ECMO.LINE = 1
+
+	LEFT JOIN #ICUDaySum ON #ICUDaySum.ENCOUNTER_NUM = C.ENCOUNTER_ID
+
+	OUTER APPLY(SELECT TOP 1 ICU_LENGTH_OF_STAY_DAYS 
+
+				FROM dbo.DM_ICU_STAY 
+
+				WHERE DM_ICU_STAY.ENCOUNTER_ID = C.ENCOUNTER_ID 
+
+						AND DM_ICU_STAY.ICU_STAY_END_DTTM > #FTZ.FTZ
+
+				)DM_ICU_STAY
+
+	LEFT JOIN #ABXDays_Count ON #ABXDays_Count.ENCOUNTER_ID = C.ENCOUNTER_ID
+
+	LEFT JOIN #PressorsDays ON #PressorsDays.ENCOUNTER_ID = C.ENCOUNTER_ID
+
+	LEFT JOIN #PVDays ON #PVDays.ENCOUNTER_ID = C.ENCOUNTER_ID
+
+	LEFT JOIN #HRC1 ON #HRC1.ENCOUNTER_ID = C.ENCOUNTER_ID
+
+	LEFT JOIN #HRC2 ON #HRC2.ENCOUNTER_ID = C.ENCOUNTER_ID
+
+	LEFT JOIN #HRC3 ON #HRC3.ENCOUNTER_ID = C.ENCOUNTER_ID
+
+	LEFT JOIN #HRC4 ON #HRC4.ENCOUNTER_ID = C.ENCOUNTER_ID
+
+	LEFT JOIN #HRC95 ON #HRC95.ENCOUNTER_ID = C.ENCOUNTER_ID
+
+	LEFT JOIN #HRC6 ON #HRC6.ENCOUNTER_ID = C.ENCOUNTER_ID
+
+	LEFT JOIN #HRC98 ON #HRC98.ENCOUNTER_ID = C.ENCOUNTER_ID
+
+	LEFT JOIN #TSSC ON #TSSC.ENCOUNTER_ID = C.ENCOUNTER_ID AND #TSSC.LINE = 1
+
+	LEFT OUTER JOIN #C7_R65_ONLY CRO ON CRO.ENCOUNTER_ID = C.ENCOUNTER_ID
+
+	/*MODIFIED BY Developer A MO 07.16.2019 - IN CASE NONE OF THE ABOVE TIMES ARE POPULATED, WE LOOK FOR THE FIRST SCREENTIME/OSSET TIME ETC IN THE REPORTING PERIOD*/
+
+	OUTER APPLY
+
+	(
+
+		SELECT
+
+		MIN(A.SCORE_TIME) AS DefaultScreenTime
+
+		FROM #Scores A
+
+		WHERE A.ENCOUNTER_ID = C.ENCOUNTER_ID
+
+	)DefaultScreenTime
+
+	OUTER APPLY
+
+	(
+
+		SELECT
+
+		MIN(A.ORDER_DTTM) AS DefaultOSetTime
+
+		FROM #SSOrderSet A
+
+		WHERE A.ENCOUNTER_ID = C.ENCOUNTER_ID
+
+	)DefaultOSetTime
+
+	OUTER APPLY
+
+	(
+
+		SELECT
+
+		MIN(A.ABX_ADMIN_TIME) AS DefaultABXTime
+
+		FROM #TreatPlanABX A
+
+		WHERE A.ENCOUNTER_ID = C.ENCOUNTER_ID
+
+	)DefaultABXTime
+
+	OUTER APPLY
+
+	(
+
+		SELECT
+
+		MIN(A.BOLUS_ADMIN_TIME) AS DefaultBolTime
+
+		FROM #TreatPlanBolus A
+
+		WHERE A.ENCOUNTER_ID = C.ENCOUNTER_ID
+
+	)DefaultBolTime
+
+	OUTER APPLY
+
+	(
+
+		SELECT MIN(FM.RECORDED_TIME) AS HuddleTime
+
+		FROM 
+
+			#Base_Pop HE
+
+			INNER JOIN dbo.FLOWSHEET_RECORDS FR ON FR.INPATIENT_DATA_ID = HE.INPATIENT_DATA_ID
+
+			INNER JOIN dbo.FLOWSHEET_MEASUREMENTS FM ON FM.FSD_ID = FR.FSD_ID
+
+			INNER JOIN #IP_PositiveScores IPS ON IPS.ENCOUNTER_ID = HE.ENCOUNTER_ID
+
+				AND IPS.RECORDED_TIME = FM.RECORDED_TIME--MAKE SURE THE SCORE IS AN OD SCORE AND NOT ED SCORE - BECAUSE THERE IS NO HUDDLE TIME FOR ED SCORE
+
+		WHERE
+
+			HE.ENCOUNTER_ID = #ScreenTime.ENCOUNTER_ID
+
+			AND FM.FLO_MEAS_ID = '9000002733'--HUDDLE TIME
+
+			AND FM.RECORDED_TIME>=#ScreenTime.ScreenTime
+
+		--ORDER BY FM.RECORDED_TIME ASC
+
+	)HuddleTime
+
+	OUTER APPLY
+
+	(--HUDDLE TIME FROM NOTES TKT-014
+
+		SELECT MIN(CNOTE.CRT_INST_LOCAL_DTTM) AS HuddleNoteTime
+
+		FROM 
+
+			dbo.CLINICAL_NOTES CNOTE			
+
+			INNER JOIN dbo.HNO_NOTE_TEXT HNT ON HNT.NOTE_ID = CNOTE.NOTE_ID			
+
+		WHERE
+
+			CNOTE.ENCOUNTER_ID = #ScreenTime.ENCOUNTER_ID
+
+			AND CNOTE.IP_NOTE_TYPE_CODE='1000007'--	Significant Event
+
+			AND HNT.NOTE_TEXT LIKE '%Sepsis%Huddle%Note%'
+
+		--ORDER BY FM.RECORDED_TIME ASC
+
+	) HuddleNoteTime
+
+CREATE INDEX IDX_finalTData ON #FinalTData (ENCOUNTER_ID) 	
+
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------
+
+IF OBJECT_ID(N'tempdb..#FinalData') IS NOT NULL DROP TABLE #FinalData;
+
+SELECT
+
+	CONVERT(numeric, F.Sepsis_Episode_ID_V01) AS Sepsis_Episode_ID_V01				
+
+	, CONVERT(datetime2(0), F.Arrival_Time_V10) AS Arrival_Time_V10			
+
+	, CONVERT(date, F.Birth_Date_V02) AS Birth_Date_V02			
+
+	, CONVERT(datetime2(0), F.ScreenTime_V06) AS ScreenTime_V06			
+
+	, CONVERT(datetime2(0), F.Huddle_Time_V07) AS Huddle_Time_V07			
+
+	, CONVERT(datetime2(0), F.OrderSet_Time_V08) AS OrderSet_Time_V08			
+
+	, CONVERT(datetime2(0), F.FirstABXTime_V26) AS FirstABXTime_V26			
+
+	, CONVERT(datetime2(0), F.Bolus1Time_V20) AS Bolus1Time_V20			
+
+	, CONVERT(numeric, F.FunctionaLTimeZero_V68) AS FunctionaLTimeZero_V68			
+
+	, CONVERT(numeric, F.TimeZeroLoc_V66) AS TimeZeroLoc_V66			
+
+	, CONVERT(float, F.Weight_V16) AS Weight_V16			
+
+	, CONVERT(int, F.Bolus1Volume_V21) AS Bolus1Volume_V21			
+
+	, CONVERT(datetime2(0), F.Bolus2Time_V22) AS Bolus2Time_V22			
+
+	, CONVERT(int, F.Bolus2Volume_V23) AS Bolus2Volume_V23			
+
+	, CONVERT(datetime2(0), F.Bolus3Time_V24) AS Bolus3Time_V24			
+
+	, CONVERT(int, F.Bolus3Volume_V25) AS Bolus3Volume_V25			
+
+	, CONVERT(datetime2(0), F.FirstTimeHypotension_V18) AS FirstTimeHypotension_V18			
+
+	, CONVERT(datetime2(0), F.FirstPressorTime_V29) AS FirstPressorTime_V29			
+
+	, CONVERT(numeric, F.FirstPressorType_V30) AS FirstPressorType_V30			
+
+	, CONVERT(numeric, F.OrganDysfunction_V41) AS OrganDysfunction_V41			
+
+	, CONVERT(datetime2(0), F.CVLPlacementTime_V44) AS CVLPlacementTime_V44			
+
+	, CONVERT(datetime2(0), F.SVO2Time_V45) AS SVO2Time_V45			
+
+	, CONVERT(datetime2(0), F.LacticAcidTime_V46) AS LacticAcidTime_V46			
+
+	, CONVERT(float, F.LacticAcidValue_V47) AS LacticAcidValue_V47			
+
+	, CONVERT(numeric, F.BCPositive_V35) AS BCPositive_V35			
+
+	, CONVERT(datetime2(0), F.TimeSurgicalSourceControl_V39) AS TimeSurgicalSourceControl_V39			
+
+	, CONVERT(numeric, F.OutsideHospital_V11) AS OutsideHospital_V11			
+
+	, CONVERT(datetime2(0), F.ED2GenCareTime_V12) AS ED2GenCareTime_V12			
+
+	, CONVERT(datetime2(0), F.ED2HemoncTime_V63) AS ED2HemoncTime_V63			
+
+	, CONVERT(datetime2(0), F.ED2ICUTime_V13) AS ED2ICUTime_V13			
+
+	, CONVERT(datetime2(0), F.GENCARE2ICUTime_V94) AS GENCARE2ICUTime_V94			
+
+	, CONVERT(datetime2(0), F.HEMONC2ICUTime_V64) AS HEMONC2ICUTime_V64			
+
+	, CONVERT(numeric, F.Disposition_V54) AS Disposition_V54 			
+
+	--, CONVERT(date, F.FunctionalTimeZero) AS FunctionalTimeZero			
+
+	, CONVERT(date, F.DispositionDate_V53) AS DispositionDate_V53			
+
+	, CONVERT(numeric, F.ECMO_V48) AS ECMO_V48			
+
+	, CONVERT(float, F.Risk_Score_V52) AS Risk_Score_V52			
+
+	, CONVERT(numeric, F.Risk_Score_Method_V51) AS Risk_Score_Method_V51			
+
+	, CONVERT(varchar, F.HighRiskConditions_1_V65) AS HighRiskConditions_1_V65			
+
+	, CONVERT(varchar, F.HighRiskConditions_2_V65) AS HighRiskConditions_2_V65			
+
+	, CONVERT(varchar, F.HighRiskConditions_3_V65) AS HighRiskConditions_3_V65			
+
+	, CONVERT(varchar, F.HighRiskConditions_4_V65) AS HighRiskConditions_4_V65			
+
+	, CONVERT(varchar, F.HighRiskConditions_95_V65) AS HighRiskConditions_95_V65			
+
+	, CONVERT(varchar, F.HighRiskConditions_6_V65) AS HighRiskConditions_6_V65			
+
+	, CONVERT(varchar, F.HighRiskConditions_7_V65) AS HighRiskConditions_7_V65			
+
+	, CONVERT(varchar, F.HighRiskConditions_98_V65) AS HighRiskConditions_98_V65			
+
+	, CONVERT(varchar, F.HighRiskConditions_88_V65) AS HighRiskConditions_88_V65 			
+
+	, CONVERT(int, F.ABXDays_V42) AS ABXDays_V42			
+
+	, CONVERT(int, F.Pressor_Days_V57) AS Pressor_Days_V57			
+
+	, CASE			
+
+		WHEN F.ICUDays_V58 = 0 OR F.ICUDays_V58 = 99999 THEN F.ICUDays_V58		
+
+		WHEN DATEDIFF(DD,CONVERT(DATE,FunctionalTimeZero), DispositionDate_V53)+1 < F.ICUDays_V58 THEN DATEDIFF(DD,CONVERT(DATE,FunctionalTimeZero), DispositionDate_V53)+1		
+
+		WHEN		
+
+			F.ED2ICUTime_V13 ='1900-01-02 00:00:00'	
+
+			AND 	
+
+			F.GENCARE2ICUTime_V94 ='1900-01-02 00:00:00'	
+
+			AND 	
+
+			F.HEMONC2ICUTime_V64 ='1900-01-02 00:00:00'	
+
+			AND	
+
+			(	
+
+				F.ICUDays_V58 = 99999 OR
+
+				F.ICUDays_V58 = 0
+
+			)	
+
+			THEN 99999	
+
+		ELSE CONVERT(int, F.ICUDays_V58)		
+
+		END AS ICUDays_V58		
+
+	, CONVERT(numeric, F.Pt_Chronically_Vented_V32) AS Pt_Chronically_Vented_V32			
+
+	, CONVERT(int, F.PressureVentDays_V56) AS PressureVentDays_V56			
+
+	, CONVERT(datetime2(0), F.Clinically_Derived_Time_Zero_V09) AS Clinically_Derived_Time_Zero_V09			
+
+	, CONVERT(varchar, F.ENCOUNTER_ID) AS ENCOUNTER_ID			
+
+	, CONVERT(varchar, F.DATE_STAMP) AS DATE_STAMP			
+
+	, CONVERT(bit, F.REVIEWED) AS REVIEWED
+
+	, f.[NACHRI_hosp]
+
+	, f.[bill]
+
+INTO
+
+	#FinalData
+
+FROM
+
+	#FinalTData F
+
+CREATE INDEX IDX_FinalData ON #FinalData (ENCOUNTER_ID) 
+
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------
+
+/* WRITING OR PRINING DATA BASED ON THE INPUT PARAMETER */
+
+IF @TEST = 0
+
+	BEGIN
+
+		INSERT INTO [reports].[SEVERE_SEPSIS_STAGING] 
+
+			([Sepsis_Episode_ID_V01]
+
+			, [Arrival_Time_V10]
+
+			, [Birth_Date_V02]
+
+			, [ScreenTime_V06]
+
+			, [Huddle_Time_V07]
+
+			, [OrderSet_Time_V08]
+
+			, [FirstABXTime_V26]
+
+			, [Bolus1Time_V20]
+
+			, [FunctionaLTimeZero_V68]
+
+			, [TimeZeroLoc_V66]
+
+			, [Weight_V16]
+
+			, [Bolus1Volume_V21]
+
+			, [Bolus2Time_V22]
+
+			, [Bolus2Volume_V23]
+
+			, [Bolus3Time_V24]
+
+			, [Bolus3Volume_V25]
+
+			, [FirstTimeHypotension_V18]
+
+			, [FirstPressorTime_V29]
+
+			, [FirstPressorType_V30]
+
+			, [OrganDysfunction_V41]
+
+			, [CVLPlacementTime_V44]
+
+			, [SVO2Time_V45]
+
+			, [LacticAcidTime_V46]
+
+			, [LacticAcidValue_V47]
+
+			, [BCPositive_V35]
+
+			, [TimeSurgicalSourceControl_V39]
+
+			, [OutsideHospital_V11]
+
+			, [ED2GenCareTime_V12]
+
+			, [ED2HemoncTime_V63]
+
+			, [ED2ICUTime_V13]
+
+			, [GENCARE2ICUTime_V94]
+
+			, [HEMONC2ICUTime_V64]
+
+			, [Disposition_V54]
+
+			, [DispositionDate_V53]
+
+			, [ECMO_V48]
+
+			, [Risk_Score_V52]
+
+			, [Risk_Score_Method_V51]
+
+			, [HighRiskConditions_1_V65]
+
+			, [HighRiskConditions_2_V65]
+
+			, [HighRiskConditions_3_V65]
+
+			, [HighRiskConditions_4_V65]
+
+			, [HighRiskConditions_95_V65]
+
+			, [HighRiskConditions_6_V65]
+
+			, [HighRiskConditions_7_V65]
+
+			, [HighRiskConditions_98_V65]
+
+			, [HighRiskConditions_88_V65]
+
+			, [ABXDays_V42]
+
+			, [Pressor_Days_V57]
+
+			, [ICUDays_V58]
+
+			, [Pt_Chronically_Vented_V32]
+
+			, [PressureVentDays_V56]
+
+			, [Clinically_Derived_Time_Zero_V09]
+
+			, [ENCOUNTER_ID]
+
+			, [DATE_STAMP]
+
+			, [Reviewed]
+
+			, [NACHRI_hosp]
+
+			, [bill])
+
+
+
+			SELECT [Sepsis_Episode_ID_V01] 
+
+				, [Arrival_Time_V10] [arrivaltime]
+
+				, [Birth_Date_V02] 
+
+				, [ScreenTime_V06] [screentime]
+
+				, [Huddle_Time_V07] [huddletime]
+
+				, [OrderSet_Time_V08] [ordersettime]
+
+				, [FirstABXTime_V26] [firstantibiotictime]
+
+				, [Bolus1Time_V20] [bolus1time]
+
+				, [FunctionaLTimeZero_V68] [functionaltimezero]
+
+				, [TimeZeroLoc_V66] [timezerolocation]
+
+				, [Weight_V16] 
+
+				, [Bolus1Volume_V21] 
+
+				, [Bolus2Time_V22] [bolus2time]
+
+				, [Bolus2Volume_V23] 
+
+				, [Bolus3Time_V24] [bolus3time]
+
+				, [Bolus3Volume_V25] 
+
+				, [FirstTimeHypotension_V18] [timefirsthypotension]
+
+				, [FirstPressorTime_V29] [firstpressorstarttime]
+
+				, [FirstPressorType_V30] 
+
+				, [OrganDysfunction_V41] 
+
+				, [CVLPlacementTime_V44] 
+
+				, [SVO2Time_V45] 
+
+				, [LacticAcidTime_V46] 
+
+				, [LacticAcidValue_V47] [lacticacidvalue]
+
+				, [BCPositive_V35] [bloodcxpositive]
+
+				, [TimeSurgicalSourceControl_V39] 
+
+				, [OutsideHospital_V11] [outsidehospital]
+
+				, [ED2GenCareTime_V12] 
+
+				, [ED2HemoncTime_V63] 
+
+				, [ED2ICUTime_V13] 
+
+				, [GENCARE2ICUTime_V94] 
+
+				, [HEMONC2ICUTime_V64] 
+
+				, [Disposition_V54] [disposition]
+
+				, [DispositionDate_V53] 
+
+				, [ECMO_V48] 
+
+				, [Risk_Score_V52] 
+
+				, [Risk_Score_Method_V51] 
+
+				, [HighRiskConditions_1_V65] 
+
+				, [HighRiskConditions_2_V65] 
+
+				, [HighRiskConditions_3_V65] 
+
+				, [HighRiskConditions_4_V65] 
+
+				, [HighRiskConditions_95_V65] 
+
+				, [HighRiskConditions_6_V65] 
+
+				, [HighRiskConditions_7_V65] 
+
+				, [HighRiskConditions_98_V65] 
+
+				, [HighRiskConditions_88_V65] 
+
+				, [ABXDays_V42] [totalivabxdays]
+
+				, [Pressor_Days_V57] [pressordays]
+
+				, [ICUDays_V58] [icudays]
+
+				, [Pt_Chronically_Vented_V32] 
+
+				, [PressureVentDays_V56] 
+
+				, [Clinically_Derived_Time_Zero_V09] 
+
+				, [ENCOUNTER_ID] 
+
+				, [DATE_STAMP] 
+
+				, [REVIEWED] 
+
+				, [NACHRI_hosp]
+
+				, [bill]
+
+		FROM
+
+			#FinalData s
+
+			
+
+		SELECT 
+
+			[NACHRI_hosp]
+
+			, [bill]
+
+			, [Arrival_Time_V10] [arrivaltime]
+
+			, [ScreenTime_V06] [screentime]
+
+			, [Huddle_Time_V07] [huddletime]
+
+			, [OrderSet_Time_V08] [ordersettime]
+
+			, [FirstABXTime_V26] [firstantibiotictime]
+
+			, [Bolus1Time_V20] [bolus1time]
+
+			, [FunctionaLTimeZero_V68] [functionaltimezero]
+
+			, [TimeZeroLoc_V66] [timezerolocation]
+
+			, [Bolus2Time_V22] [bolus2time]
+
+			, [Bolus3Time_V24] [bolus3time]
+
+			, [FirstTimeHypotension_V18] [timefirsthypotension]
+
+			, [FirstPressorTime_V29] [firstpressorstarttime]
+
+			, [LacticAcidValue_V47] [lacticacidvalue]
+
+			, [BCPositive_V35] [bloodcxpositive]
+
+			, [OutsideHospital_V11] [outsidehospital]
+
+			, [Disposition_V54] [disposition]
+
+			, [ABXDays_V42] [totalivabxdays]
+
+			, [Pressor_Days_V57] [pressordays]
+
+			, [ICUDays_V58] [icudays]
+
+			, [ENCOUNTER_ID]
+
+		FROM [reports].[SEVERE_SEPSIS_STAGING] s
+
+		WHERE
+
+			DATE_STAMP = DATENAME(month, CONVERT(DATE, @EndDate)) + DATENAME(YEAR, CONVERT(DATE, @EndDate))
+
+	END;
+
+ELSE
+
+	BEGIN
+
+		SELECT 
+
+			[NACHRI_hosp]
+
+			, [bill]
+
+			, [Arrival_Time_V10] [arrivaltime]
+
+			, [ScreenTime_V06] [screentime]
+
+			, [Huddle_Time_V07] [huddletime]
+
+			, [OrderSet_Time_V08] [ordersettime]
+
+			, [FirstABXTime_V26] [firstantibiotictime]
+
+			, [Bolus1Time_V20] [bolus1time]
+
+			, [FunctionaLTimeZero_V68] [functionaltimezero]
+
+			, [TimeZeroLoc_V66] [timezerolocation]
+
+			, [Bolus2Time_V22] [bolus2time]
+
+			, [Bolus3Time_V24] [bolus3time]
+
+			, [FirstTimeHypotension_V18] [timefirsthypotension]
+
+			, [FirstPressorTime_V29] [firstpressorstarttime]
+
+			, [LacticAcidValue_V47] [lacticacidvalue]
+
+			, [BCPositive_V35] [bloodcxpositive]
+
+			, [OutsideHospital_V11] [outsidehospital]
+
+			, [Disposition_V54] [disposition]
+
+			, [ABXDays_V42] [totalivabxdays]
+
+			, [Pressor_Days_V57] [pressordays]
+
+			, [ICUDays_V58] [icudays]
+
+			, [ENCOUNTER_ID]
+
+
+
+		FROM [reports].[SEVERE_SEPSIS_STAGING]
+
+
+
+		WHERE DATE_STAMP = DATENAME(month, CONVERT(DATE, @EndDate)) + DATENAME(YEAR, CONVERT(DATE, @EndDate))
+
+	END;
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------
+
+END;
+
+END;
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-----------------------------------------------------------END---------------------------------------------------------------------------------------
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+GO
+
