@@ -365,7 +365,8 @@ It is idempotent — safe to re-run; it will not destroy existing data.
   document (verifying full coverage and the refusal floor). One-time
   Eventhouse setup first: `devtools/eventhouse_setup.kql` (table,
   encoding policy, `semantic_search()` function, callout policy), plus
-  `KUSTO_URI` in the notebook's first cell. **Run after every 07 run**
+  the `search:` block in `org_config.yaml` (Eventhouse Query URI,
+  database name, embeddings endpoint — see org_config.example.yaml). **Run after every 07 run**
   — description changes do not reach search until this re-embeds
 
 ---

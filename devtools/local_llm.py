@@ -12,7 +12,7 @@ agent verification remains a Fabric milestone task.
 Env:
   OPENAI_API_KEY    required for live calls
   OPENAI_BASE_URL   default https://api.openai.com/v1
-  AIVIA_LLM_MODEL   default gpt-4o-mini
+  SQA_LLM_MODEL   default gpt-4o-mini
 """
 
 from __future__ import annotations
@@ -45,7 +45,7 @@ def chat_completion(
         system, user,
         endpoint=base_url or os.environ.get("OPENAI_BASE_URL", "https://api.openai.com/v1"),
         api_key=key,
-        model=model or os.environ.get("AIVIA_LLM_MODEL", "gpt-4o-mini"),
+        model=model or __import__("src.branding", fromlist=["legacy_env"]).legacy_env("LLM_MODEL", "gpt-4o-mini"),
         timeout=timeout,
     )
 
@@ -74,7 +74,7 @@ class LocalLLMBackend:
         self.base_url = (
             base_url or os.environ.get("OPENAI_BASE_URL", "https://api.openai.com/v1")
         ).rstrip("/")
-        self.model = model or os.environ.get("AIVIA_LLM_MODEL", "gpt-4o-mini")
+        self.model = model or __import__("src.branding", fromlist=["legacy_env"]).legacy_env("LLM_MODEL", "gpt-4o-mini")
         self.timeout = timeout
         if not self.api_key:
             raise ValueError(

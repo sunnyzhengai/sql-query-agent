@@ -1,4 +1,4 @@
-"""AIVIA orchestrator — agentic conversation, deterministic tools
+"""Orchestrator — agentic conversation, deterministic tools
 (ADR 0032/0035).
 
 The LLM owns the conversation. The engine owns every computation. The

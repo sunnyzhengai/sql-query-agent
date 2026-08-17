@@ -17,11 +17,9 @@ arguments — this module never reads key material from disk.
 
 from __future__ import annotations
 
-import os
-
 import requests
 
-# Bump deliberately; override per-deployment via AIVIA_AZURE_API_VERSION
+# Bump deliberately; override per-deployment via SQA_AZURE_API_VERSION
 # or by putting api-version=... in the configured endpoint.
 DEFAULT_AZURE_API_VERSION = "2024-06-01"
 
@@ -41,9 +39,8 @@ def build_chat_request(endpoint: str, api_key: str) -> "tuple[str, dict]":
     if is_azure_endpoint(endpoint):
         headers = {"api-key": api_key}
         if "api-version" not in query:
-            version = os.environ.get(
-                "AIVIA_AZURE_API_VERSION", DEFAULT_AZURE_API_VERSION
-            )
+            from src.branding import legacy_env
+            version = legacy_env("AZURE_API_VERSION", DEFAULT_AZURE_API_VERSION)
             query = (query + "&" if query else "") + f"api-version={version}"
     else:
         headers = {"Authorization": f"Bearer {api_key}"}

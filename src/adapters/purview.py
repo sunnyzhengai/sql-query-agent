@@ -157,8 +157,14 @@ class PurviewAdapter:
 
     # ---- Glossary (ADR 0031: business terms at term grain) ----
 
-    def ensure_glossary(self, name: str = "AIVIA") -> "str | None":
-        """Return the guid of the named glossary, creating it if absent."""
+    def ensure_glossary(self, name: "str | None" = None) -> "str | None":
+        """Return the guid of the named glossary, creating it if absent.
+
+        Defaults to the deployment's product name (src/branding.py) — the
+        glossary carries the deployment's brand, the code does not.
+        """
+        from src.branding import product_name
+        name = name or product_name()
         import requests
         resp = requests.get(
             f"{self.base_url}/catalog/api/atlas/v2/glossary",
@@ -171,7 +177,7 @@ class PurviewAdapter:
         resp = requests.post(
             f"{self.base_url}/catalog/api/atlas/v2/glossary",
             headers=self._get_headers(),
-            json={"name": name, "shortDescription": "AIVIA certified business terms"},
+            json={"name": name, "shortDescription": f"{name} certified business terms"},
             timeout=30,
         )
         if resp.status_code in (200, 201):
@@ -216,7 +222,8 @@ class PurviewAdapter:
         trailer = [f"status: {status}"]
         if weight is not None:
             trailer.append(f"usage weight: {weight}")
-        long_desc = f"{definition}\n\n[AIVIA] {' | '.join(trailer)}"
+        from src.branding import product_name
+        long_desc = f"{definition}\n\n[{product_name()}] {' | '.join(trailer)}"
 
         term: dict = {
             "name": name,

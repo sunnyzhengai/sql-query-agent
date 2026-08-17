@@ -35,6 +35,12 @@ dictionary:
   # to every schema's table with that name).
   accept_schema_ambiguity: false
 
+# Search index (notebook 11) — Eventhouse + embeddings endpoints
+# search:
+#   kusto_uri: "https://<your-eventhouse>.kusto.fabric.microsoft.com"  # KQL database page -> Query URI
+#   kusto_db: "<your-kql-database>"
+#   embed_endpoint: "https://<your-resource>.openai.azure.com/openai/deployments/<embed-deployment>/embeddings?api-version=2024-06-01"
+
 # Automated extraction — the primary ingestion path (procs AND views).
 # Pick ONE source_type; see INSTALLATION_GUIDE "Automated extraction".
 # extractor:

@@ -68,7 +68,7 @@ for path in files:
 print(f"Event files: {len(files)}; lines: {len(lines)}")
 if not files:
     print("Nothing to ingest — upload JSONL to Files/agent_events/ or "
-          "configure AIVIA_EVENTS_ONELAKE_URL on the web app.")
+          "configure SQA_EVENTS_ONELAKE_URL on the web app.")
 
 # METADATA ********************
 

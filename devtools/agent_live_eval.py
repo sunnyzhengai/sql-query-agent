@@ -87,7 +87,7 @@ def main() -> None:
     out_jsonl = Path("docs/internal/agent_live_results.jsonl")
     md = ["# ADR 0035 Agent — Live Evaluation",
           "",
-          f"Model: env AIVIA_LLM_MODEL | Eventhouse: {DATABASE} | "
+          f"Model: env SQA_LLM_MODEL | Eventhouse: {DATABASE} | "
           "multi-turn, real function calling.",
           ""]
     records = []

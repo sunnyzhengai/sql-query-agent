@@ -1,10 +1,11 @@
-"""Production wiring for the AIVIA web app.
+"""Production wiring for the chat web app.
 
-Env (chat):
-  AIVIA_KUSTO_URI       Eventhouse query URI
-  AIVIA_KUSTO_DB        database name
-  OPENAI_BASE_URL / OPENAI_API_KEY / AIVIA_LLM_MODEL   (Azure OpenAI)
-  AIVIA_EVENTS_PATH     TurnEvent JSONL path (default data/events/...)
+Env (chat; legacy pre-rename names still read for one release):
+  SQA_PRODUCT_NAME    display name shown in the UI (deployment brands itself)
+  SQA_KUSTO_URI       Eventhouse query URI
+  SQA_KUSTO_DB        database name
+  OPENAI_BASE_URL / OPENAI_API_KEY / SQA_LLM_MODEL   (Azure OpenAI)
+  SQA_EVENTS_PATH     TurnEvent JSONL path (default data/events/...)
 
 Env (marketplace — all four present enables the fulfillment endpoints):
   MKT_FULFILLMENT_APP_ID   Entra app id from the offer's technical config
@@ -23,13 +24,16 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
+from src.branding import legacy_env
+
 
 def _kusto_run():
+    from src.branding import legacy_env
     from src.orchestrator.kusto import KustoClient, az_cli_token_provider
-    uri = os.environ.get(
-        "AIVIA_KUSTO_URI",
+    uri = legacy_env(
+        "KUSTO_URI",
         "https://trd-uzdu1yhqrmqtutkej8.z7.kusto.fabric.microsoft.com")
-    db = os.environ.get("AIVIA_KUSTO_DB", "probe-eh")
+    db = legacy_env("KUSTO_DB", "probe-eh")
     return KustoClient(uri, db, az_cli_token_provider(uri)).run
 
 
@@ -64,7 +68,7 @@ def _marketplace():
 def _sink():
     """OneLake sink when configured (events land in the tenant for the
     ingest step); local JSONL otherwise."""
-    onelake_url = os.environ.get("AIVIA_EVENTS_ONELAKE_URL", "")
+    onelake_url = legacy_env("EVENTS_ONELAKE_URL", "")
     if onelake_url:
         from src.orchestrator.events import OneLakeJsonlSink
         from src.orchestrator.kusto import az_cli_token_provider
@@ -72,7 +76,7 @@ def _sink():
             onelake_url, az_cli_token_provider("https://storage.azure.com"))
     from src.orchestrator.events import JsonlEventSink
     return JsonlEventSink(Path(os.environ.get(
-        "AIVIA_EVENTS_PATH", "data/events/turn_events.jsonl")))
+        "SQA_EVENTS_PATH", "data/events/turn_events.jsonl")))
 
 
 def build() -> "object":
@@ -84,4 +88,4 @@ def build() -> "object":
                       _marketplace())
 
 
-app = build() if os.environ.get("AIVIA_WEBAPP_EAGER", "1") != "0" else None
+app = build() if legacy_env("WEBAPP_EAGER", "1") != "0" else None

@@ -41,14 +41,25 @@ devtools/eventhouse_setup.kql — this notebook is the every-run path.
 Standing rule: 03/04 rerun => 07 rerun => THIS notebook.
 """
 
-# Fill once per environment: the Eventhouse QUERY URI (KQL database
-# page -> copy Query URI) and database name.
-KUSTO_URI = "https://trd-uzdu1yhqrmqtutkej8.z7.kusto.fabric.microsoft.com"
-KUSTO_DB = "probe-eh"
-EMBED_ENDPOINT = (
-    "https://aivia.openai.azure.com/openai/deployments/"
-    "text-embedding-3-small/embeddings?api-version=2024-06-01"
-)
+# Per-environment endpoints come from org_config.yaml (search: block) —
+# never hardcoded here: tenant URIs in a notebook are config drift waiting
+# to happen, and the embed endpoint is deployment-specific.
+import yaml as _yaml
+
+_raw_cfg = _yaml.safe_load(
+    open("/lakehouse/default/Files/sql-query-agent/org_config.yaml"))
+_search_cfg = _raw_cfg.get("search") or {}
+KUSTO_URI = _search_cfg.get("kusto_uri") or ""
+KUSTO_DB = _search_cfg.get("kusto_db") or ""
+EMBED_ENDPOINT = _search_cfg.get("embed_endpoint") or ""
+missing = [k for k, v in
+           {"kusto_uri": KUSTO_URI, "kusto_db": KUSTO_DB,
+            "embed_endpoint": EMBED_ENDPOINT}.items() if not v]
+if missing:
+    raise ValueError(
+        f"org_config.yaml search: block is missing {missing} — add the "
+        "Eventhouse Query URI, database name, and the Azure OpenAI "
+        "embeddings endpoint (see org_config.example.yaml)")
 # Optional smoke phrase printed with top scores after the refresh
 # (leave empty to skip) — set to whatever you are testing today.
 PROBE_PHRASE = ""
@@ -143,8 +154,7 @@ print(f"output_semantic_catalog: {df.count()} rows")
 from src.orchestrator.kusto import KustoClient
 from src.steps.search_index import refresh_search_index
 
-if "REPLACE-ME" in KUSTO_URI:
-    raise ValueError("Set KUSTO_URI in cell 0 (KQL database -> Query URI)")
+# (endpoint presence is validated where the search: block is loaded)
 
 client = KustoClient(
     KUSTO_URI, KUSTO_DB,

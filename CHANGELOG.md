@@ -10,6 +10,36 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.13.0] - 2026-08-17
+
+### Added
+- Brand-neutral core (HANDOFF_BRAND_NEUTRAL_CORE): the commercial name no
+  longer appears anywhere in src/ or the numbered notebooks — enforced by
+  a CI grep test (tests/test_brand_neutral_core.py, allowlist empty).
+  New src/branding.py seam: SQA_PRODUCT_NAME env var brands a deployment
+  (neutral default "SQL Intelligence Agent"); Purview glossary + term
+  trailer, web UI titles, CLI banner, and the agent system prompt all
+  read it. docs/deployment/BRAND_NEUTRAL_SNAPSHOT.md documents what a
+  neutral snapshot includes.
+- Notebook 11 endpoints moved to org_config `search:` block (kusto_uri,
+  kusto_db, embed_endpoint) — tenant URIs no longer hardcoded in the
+  notebook; loud config error names the missing keys.
+
+### Changed
+- Env var rename with one-release deprecation window (old prefix still
+  read, warning logged): SQA_AZURE_API_VERSION, SQA_KUSTO_URI,
+  SQA_KUSTO_DB, SQA_LLM_MODEL, SQA_EVENTS_PATH, SQA_EVENTS_ONELAKE_URL,
+  SQA_WEBAPP_EAGER. Integration registry endpoint token is now "core".
+
+### Upgrade notes
+- App Service (marketplace host): set SQA_PRODUCT_NAME=AIVIA to keep the
+  branded UI, and migrate AIVIA_* app settings to SQA_* before the
+  fallback is removed next release.
+- org_config.yaml: add the `search:` block before running notebook 11
+  (see org_config.example.yaml).
+
+---
+
 ## [1.12.1] - 2026-08-16
 
 ### Fixed

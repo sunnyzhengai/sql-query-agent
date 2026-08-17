@@ -1,7 +1,7 @@
 """INTEGRATION_REGISTRY — the tool/connector landscape as data.
 
 The TABLE_REGISTRY pattern applied to integrations (handoff 2026-08-16):
-one record per connector between AIVIA and an external tool, single
+one record per connector between the product core and an external tool, single
 source of truth for what ships, what's next, and what's on watch. The
 generated projection is docs/architecture/INTEGRATION_MAP.md
 (scripts/generate_docs.py); a freshness test pins it. This registry
@@ -16,7 +16,7 @@ Customer-runtime state — which connectors an installation actually has
 configured — is ops_setup_completeness / adapters config, NOT this.
 
 Fields:
-  from_tool / to_tool  — edge direction is dataflow, AIVIA in the middle
+  from_tool / to_tool  — edge direction is dataflow, "core" in the middle
   artifact_parsed      — the native artifact the connector consumes/emits
   mechanism            — parser or adapter that does the work
   status               — shipped | planned | watchlist
@@ -34,7 +34,7 @@ TIERS = ("Basic", "Pro")
 INTEGRATION_REGISTRY = [
     {
         "from_tool": "SQL Server (on-prem)",
-        "to_tool": "AIVIA",
+        "to_tool": "core",
         "artifact_parsed": "sys.sql_modules definitions (procs + views)",
         "mechanism": "extractor: onprem_gateway profile (JDBC via On-premises Data Gateway) -> ScriptDom",
         "status": "shipped",
@@ -44,7 +44,7 @@ INTEGRATION_REGISTRY = [
     },
     {
         "from_tool": "Azure SQL / Managed Instance",
-        "to_tool": "AIVIA",
+        "to_tool": "core",
         "artifact_parsed": "sys.sql_modules definitions (procs + views)",
         "mechanism": "extractor: azure_direct profile (AAD-token pyodbc) -> ScriptDom",
         "status": "shipped",
@@ -54,7 +54,7 @@ INTEGRATION_REGISTRY = [
     },
     {
         "from_tool": "Fabric Warehouse / SQL DB / mirrored DB",
-        "to_tool": "AIVIA",
+        "to_tool": "core",
         "artifact_parsed": "sys.sql_modules definitions (procs + views)",
         "mechanism": "extractor: fabric_native profile (AAD-token pyodbc) -> ScriptDom",
         "status": "shipped",
@@ -64,7 +64,7 @@ INTEGRATION_REGISTRY = [
     },
     {
         "from_tool": "Power BI (DevOps git repos)",
-        "to_tool": "AIVIA",
+        "to_tool": "core",
         "artifact_parsed": "TMDL (.SemanticModel: partitions, DAX measures, calc columns)",
         "mechanism": "TMDL parser via devops_git profile (PAT from Key Vault)",
         "status": "shipped",
@@ -74,7 +74,7 @@ INTEGRATION_REGISTRY = [
     },
     {
         "from_tool": "Power BI (Fabric workspace, git or not)",
-        "to_tool": "AIVIA",
+        "to_tool": "core",
         "artifact_parsed": "TMDL incl. DirectLake partitions (entityName)",
         "mechanism": (
             "TMDL parser via workspace profile (REST getDefinition, no git "
@@ -87,7 +87,7 @@ INTEGRATION_REGISTRY = [
         "notes": "workspace profile 1.11.0 — verify Fabric-WH-endpoint M shapes with a real fixture",
     },
     {
-        "from_tool": "AIVIA",
+        "from_tool": "core",
         "to_tool": "Power BI reports",
         "artifact_parsed": "report descriptions (Fabric REST PATCH)",
         "mechanism": "fabric_pbi adapter, lineage-exact matching (13_publish_pbi)",
@@ -97,7 +97,7 @@ INTEGRATION_REGISTRY = [
         "notes": "1.9.0 — pushes logged to gov_publish_log",
     },
     {
-        "from_tool": "AIVIA",
+        "from_tool": "core",
         "to_tool": "Collibra",
         "artifact_parsed": "assets + descriptions + glossary terms (REST)",
         "mechanism": "collibra adapter (08_publish_collibra)",
@@ -107,7 +107,7 @@ INTEGRATION_REGISTRY = [
         "notes": "",
     },
     {
-        "from_tool": "AIVIA",
+        "from_tool": "core",
         "to_tool": "Microsoft Purview",
         "artifact_parsed": "assets + descriptions (REST)",
         "mechanism": "purview adapter (09_publish_purview)",
@@ -118,7 +118,7 @@ INTEGRATION_REGISTRY = [
     },
     {
         "from_tool": "dbt",
-        "to_tool": "AIVIA",
+        "to_tool": "core",
         "artifact_parsed": "manifest.json (DAG from ref() edges) + compiled T-SQL",
         "mechanism": "manifest reader (native JSON) -> ScriptDom on compiled SQL",
         "status": "planned",
@@ -128,7 +128,7 @@ INTEGRATION_REGISTRY = [
     },
     {
         "from_tool": "Databricks",
-        "to_tool": "AIVIA",
+        "to_tool": "core",
         "artifact_parsed": "SQL views + Unity Catalog DDL ONLY (PySpark/DLT notebook logic out of scope)",
         "mechanism": "PARSER TBD at build time: Spark Catalyst in-runtime vs documented doctrine exception",
         "status": "watchlist",
@@ -138,7 +138,7 @@ INTEGRATION_REGISTRY = [
     },
     {
         "from_tool": "Snowflake",
-        "to_tool": "AIVIA",
+        "to_tool": "core",
         "artifact_parsed": "GET_DDL() over views / materialized views / tasks / dynamic tables",
         "mechanism": "PARSER TBD at build time: documented doctrine exception (sqlglot dialect) vs ANTLR grammar",
         "status": "watchlist",
@@ -154,7 +154,7 @@ def _validate() -> None:
         assert row["status"] in STATUSES, f"bad status: {row}"
         assert row["direction"] in DIRECTIONS, f"bad direction: {row}"
         assert row["tier"] in TIERS, f"bad tier: {row}"
-        assert "AIVIA" in (row["from_tool"], row["to_tool"]), f"AIVIA not an endpoint: {row}"
+        assert "core" in (row["from_tool"], row["to_tool"]), f"core not an endpoint: {row}"
 
 
 _validate()

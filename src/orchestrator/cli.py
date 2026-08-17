@@ -1,4 +1,4 @@
-"""AIVIA chat — surface v1 (terminal REPL), ADR 0035 thin.
+"""Certified-metrics chat — surface v1 (terminal REPL), ADR 0035 thin.
 
 The surface relays the conversation and prints the code-stamped Basis
 under each answer. No menus, no grammars, no dialogue machinery — the
@@ -29,7 +29,8 @@ def clean_input(text: str) -> str:
 
 def chat_loop(chat_api, run_kql, sink, user_id: str = "local-dev",
               ask=input, say=print) -> None:
-    say("AIVIA — ask about your certified metrics ('q' to quit)\n")
+    from src.branding import product_name
+    say(f"{product_name()} — ask about your certified metrics ('q' to quit)\n")
     import json as _json
     import uuid
 

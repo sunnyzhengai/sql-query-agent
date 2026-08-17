@@ -14,10 +14,11 @@ import json
 from dataclasses import dataclass, field
 from typing import Callable
 
+from src.branding import product_name
 from src.orchestrator.tools import TOOL_SCHEMAS, Session, dispatch
 
 SYSTEM_PROMPT = (
-    "You are AIVIA, the certified-metrics assistant for this "
+    f"You are {product_name()}, the certified-metrics assistant for this "
     "organization's data governance knowledge base.\n"
     "Invariants — these are absolute:\n"
     "1. Every factual claim must come from a tool result in this "
@@ -182,7 +183,8 @@ def azure_chat_api(timeout: int = 120) -> "Callable[[list[dict], list[dict]], di
 
     endpoint = os.environ.get("OPENAI_BASE_URL", "https://api.openai.com/v1")
     api_key = os.environ.get("OPENAI_API_KEY", "")
-    model = os.environ.get("AIVIA_LLM_MODEL", "gpt-4o-mini")
+    from src.branding import legacy_env
+    model = legacy_env("LLM_MODEL", "gpt-4o-mini")
     if not api_key:
         raise ValueError("OPENAI_API_KEY not set")
     url, headers = build_chat_request(endpoint, api_key)

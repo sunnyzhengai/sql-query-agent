@@ -51,7 +51,7 @@ class TestAzureShape:
         assert "api-version=2024-10-21/chat" not in url
 
     def test_env_override_of_default_version(self, monkeypatch):
-        monkeypatch.setenv("AIVIA_AZURE_API_VERSION", "2025-01-01")
+        monkeypatch.setenv("SQA_AZURE_API_VERSION", "2025-01-01")
         url, _ = build_chat_request(AZURE, KEY)
         assert "api-version=2025-01-01" in url
 

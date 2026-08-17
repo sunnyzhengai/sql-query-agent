@@ -1,4 +1,4 @@
-"""The AIVIA web app: chat surface + marketplace fulfillment, one host.
+"""The chat web app: certified-metrics surface + marketplace fulfillment, one host.
 
 Everything is injected (chat_api, run_kql, sink, marketplace deps), so
 the whole app is offline-testable with FastAPI's TestClient; the
@@ -24,6 +24,7 @@ from typing import Callable
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse, JSONResponse
 
+from src.branding import product_name
 from src.orchestrator.agent import Turn, run_turn
 from src.orchestrator.events import FeedbackEvent, TurnEvent, decision_shape
 from src.orchestrator.protocol import (
@@ -72,7 +73,7 @@ def create_app(
     sink,
     marketplace: "MarketplaceDeps | None" = None,
 ) -> FastAPI:
-    app = FastAPI(title="AIVIA", docs_url=None, redoc_url=None)
+    app = FastAPI(title=product_name(), docs_url=None, redoc_url=None)
     conversations: "dict[str, Conversation]" = {}
 
     def _conversation(user: str, conv_id: str) -> Conversation:
@@ -94,7 +95,7 @@ def create_app(
 
     @app.get("/", response_class=HTMLResponse)
     def index() -> str:
-        return WORKBENCH_PAGE
+        return WORKBENCH_PAGE.replace("__PRODUCT__", product_name())
 
     @app.post("/api/chat")
     async def chat(request: Request) -> JSONResponse:
@@ -260,10 +261,10 @@ def create_app(
             token, marketplace.client, marketplace.store)
         if status != 200:
             return HTMLResponse(
-                f"<h1>AIVIA</h1><p>Could not resolve this purchase: "
+                f"<h1>{product_name()}</h1><p>Could not resolve this purchase: "
                 f"{body.get('error')}</p>", status_code=status)
         sub = body["subscription"]
-        return HTMLResponse(LANDING_PAGE.format(
+        return HTMLResponse(LANDING_PAGE.replace("__PRODUCT__", product_name()).format(
             plan=sub.get("plan_id") or "",
             subscription_id=sub.get("subscription_id") or "",
             purchaser=sub.get("purchaser") or ""))
@@ -297,7 +298,7 @@ def create_app(
 WORKBENCH_PAGE = """<!doctype html>
 <html><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AIVIA — certified metrics workbench</title>
+<title>__PRODUCT__ — certified metrics workbench</title>
 <style>
   :root { --ink:#1a1f2e; --paper:#f7f7f5; --accent:#2b5db9;
           --line:#e2e2de; --ok:#1a7f4b; --warn:#b76e00; --bad:#b3261e; }
@@ -382,7 +383,7 @@ WORKBENCH_PAGE = """<!doctype html>
   .muted { color:#6b7080; font-style:italic; }
 </style></head>
 <body>
-<header>AIVIA workbench <span>· ask about your certified metrics — every
+<header>__PRODUCT__ workbench <span>· ask about your certified metrics — every
 operation shown, confirmed by you, results are the answer</span></header>
 <div id="log"></div>
 <form id="ask"><input id="q" autocomplete="off"
@@ -614,13 +615,13 @@ q.focus();
 """
 
 LANDING_PAGE = """<!doctype html>
-<html><head><meta charset="utf-8"><title>AIVIA — activate</title>
+<html><head><meta charset="utf-8"><title>__PRODUCT__ — activate</title>
 <style>body{{font:16px/1.6 -apple-system,"Segoe UI",sans-serif;
 max-width:640px;margin:60px auto;color:#1a1f2e;padding:0 20px}}
 button{{padding:12px 24px;border:0;border-radius:8px;background:#2b5db9;
 color:#fff;font:inherit;cursor:pointer}}</style></head>
 <body>
-<h1>AIVIA</h1>
+<h1>__PRODUCT__</h1>
 <p>Thanks for your purchase. {purchaser}</p>
 <p>Plan: <b>{plan}</b><br>Subscription: <code>{subscription_id}</code></p>
 <p>Activating starts your subscription billing. Our onboarding team
