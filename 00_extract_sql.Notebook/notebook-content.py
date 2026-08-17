@@ -1,34 +1,87 @@
-"""Fabric Notebook: Extract SQL views from on-prem SQL Server.
+# Fabric notebook source
 
-Connects to SQL Server via On-premises Data Gateway, discovers views
-matching the domain filter, tracks changes, and writes sql_sources.
+# METADATA ********************
 
-In Fabric: create a new Notebook, copy each cell, attach to your Lakehouse, run all.
+# META {
+# META   "kernel_info": {
+# META     "name": "synapse_pyspark"
+# META   },
+# META   "dependencies": {
+# META     "lakehouse": {
+# META       "default_lakehouse": "f7c297eb-4659-4600-ab89-0e860638fb6c",
+# META       "default_lakehouse_name": "sql_query_lh",
+# META       "default_lakehouse_workspace_id": "1f55e1c1-b660-4715-9b56-4140edce3940",
+# META       "known_lakehouses": [
+# META         {
+# META           "id": "f7c297eb-4659-4600-ab89-0e860638fb6c"
+# META         }
+# META       ]
+# META     },
+# META     "environment": {
+# META       "environmentId": "0776fc8d-1451-838d-47e6-f5c7a0bd174b",
+# META       "workspaceId": "00000000-0000-0000-0000-000000000000"
+# META     }
+# META   }
+# META }
+
+# CELL ********************
+
+"""Fabric Notebook: Extract SQL objects from the configured source (Tier-1 ingestion)
+
+The turn-key front door (1.8.0): connects via the configured profile
+(onprem_gateway | azure_direct | fabric_native), discovers procedures
+and views, tracks changes by content hash, and MERGES new/changed
+objects into input_sql_sources. Manual file upload (01_install) remains
+the fallback path; both writers share the metric_id upsert protocol.
+
+Reads from: the customer SQL source (sys.objects / sys.sql_modules)
+Writes to:  input_sql_sources (merge), ops_extraction_tracking
+
+Run BEFORE 01_install on extraction-first installs; re-run on your
+change cadence — only new and changed objects are re-loaded.
 """
 
-# %% Cell 1: Setup
+# %% Cell 0: Setup
 import sys
 
-sys.path.insert(0, "/lakehouse/default/Files/sql-query-agent")
-
-# Prerequisites: Attach 'sql-logic-env' Fabric Environment. No %pip install.
+try:
+    import src
+except ImportError:
+    sys.path.insert(0, "/lakehouse/default/Files/sql-query-agent")
+    import src
+print(f"v{src.__version__}")
 
 from src.config import load_config
 from src.extractor.connection import create_connection
 from src.extractor.extractor import ViewExtractor
 
-# %% Cell 2: Load config and connect to SQL Server
 config = load_config("/lakehouse/default/Files/sql-query-agent/org_config.yaml")
 
 if config.extractor is None:
-    raise ValueError("No 'extractor' section in org_config.yaml. See org_config.example.yaml.")
+    raise ValueError(
+        "No 'extractor' section in org_config.yaml — add one (see "
+        "org_config.example.yaml and INSTALLATION_GUIDE 'Automated "
+        "Extraction'), or load SQL files manually via 01_install."
+    )
 
 conn = create_connection(config.extractor.sql_server, spark_session=spark)  # noqa: F821
-print(f"Connected to {config.extractor.sql_server.host}/{config.extractor.sql_server.database}")
-print(f"Domain filter — schemas: {config.extractor.domain.schemas}, base_tables: {config.extractor.domain.base_tables}")
+print(f"Source: {config.extractor.sql_server.host}/{config.extractor.sql_server.database} "
+      f"({config.extractor.sql_server.source_type})")
+print(f"Domain filter — schemas: {config.extractor.domain.schemas}, "
+      f"base_tables: {config.extractor.domain.base_tables}, "
+      f"object_types: {config.extractor.domain.object_types}")
 
-# %% Cell 3: Load existing tracking data
-# Existence checked explicitly — Cell 7 overwrites the tracking table, so a
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+# %% Cell 1: Load existing tracking data
+# Existence checked explicitly — Cell 4 overwrites the tracking table, so a
 # swallowed read error would reset change tracking (audit 2026-08-15).
 tracking_records = []
 if spark.catalog.tableExists(config.extractor.tracking_table):
@@ -38,14 +91,22 @@ if spark.catalog.tableExists(config.extractor.tracking_table):
 else:
     print("No existing tracking table found — starting fresh")
 
-# %% Cell 4: Run extraction
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+# %% Cell 2: Run extraction and REVIEW the delta before committing
 extractor = ViewExtractor(conn, config.extractor.domain)
 result = extractor.extract(existing_tracking=tracking_records)
 
 print("\n=== Extraction Summary ===")
 print(result.summary)
 
-# %% Cell 5: Review new and changed objects before committing
 if result.delta.new:
     print(f"\n--- NEW ({len(result.delta.new)}) ---")
     for obj in result.delta.new:
@@ -67,7 +128,16 @@ if not result.sql_sources:
 # STOP HERE and review before running the next cells.
 # If you see unexpected objects, adjust your domain filter in org_config.yaml and re-run.
 
-# %% Cell 6: Write extracted sql_sources to Delta table
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+# %% Cell 3: Write extracted sql_sources to Delta (merge by metric_id)
 from pyspark.sql.types import StringType, StructField, StructType  # noqa: E402
 
 if result.sql_sources:
@@ -93,9 +163,8 @@ if result.sql_sources:
 
     # Upsert by metric_id. Existence is checked EXPLICITLY: the old version
     # caught every MERGE failure as "table doesn't exist" and blind-appended,
-    # duplicating every row on re-runs — and its SQL contained a stray
-    # comment inside the f-string that made the MERGE fail 100% of the time
-    # (audit 2026-08-15). A real MERGE failure now raises.
+    # duplicating every row on re-runs (audit 2026-08-15). A real MERGE
+    # failure now raises.
     new_df.createOrReplaceTempView("new_sql_sources")
 
     if spark.catalog.tableExists(config.lakehouse.sql_sources):
@@ -113,7 +182,16 @@ if result.sql_sources:
 else:
     print("Nothing to write — all objects unchanged")
 
-# %% Cell 7: Update tracking table
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+# %% Cell 4: Update tracking table and summarize
 
 tracking_schema = StructType([
     StructField("object_id", StringType(), False),
@@ -137,10 +215,16 @@ tracking_df.write.format("delta").mode("overwrite").option("overwriteSchema", "t
     .saveAsTable(config.extractor.tracking_table)
 print(f"Updated tracking table: {len(result.tracking_records)} records")
 
-# %% Cell 8: Summary
 current = sum(1 for r in result.tracking_records if r["status"] == "current")
 deleted = sum(1 for r in result.tracking_records if r["status"] == "deleted")
 print("\n=== Tracking Summary ===")
 print(f"  Current: {current}")
 print(f"  Deleted: {deleted}")
-print("\nNext step: run the Orchestrator notebook to rebuild the graph with the new sql_sources.")
+print("\nNext: run 01_install (first install) or 02_parse onward (refresh).")
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }

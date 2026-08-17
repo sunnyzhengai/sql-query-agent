@@ -544,8 +544,9 @@ Pick the profile matching where your SQL lives:
 
 ### Run the extraction
 
-1. Import `notebooks/data_loading/extract_views` as a notebook (same
-   drill as Step 4) and attach your Lakehouse + Environment.
+1. Open the **00_extract_sql** notebook (a numbered pipeline notebook,
+   synced like the rest) and attach your Lakehouse + Environment if not
+   already attached.
 2. Run cells 1–5. **Stop at cell 5** and review the NEW / CHANGED /
    DELETED lists — if you see objects you don't expect, adjust
    `extractor.domain` (schemas, base_tables, object_types) in
@@ -554,7 +555,7 @@ Pick the profile matching where your SQL lives:
    full `CREATE PROCEDURE` / `CREATE VIEW` text; the parser handles the
    wrappers natively.
 4. Run notebooks 02 → 03 → 04 → 05 → 06 as in Step 5.
-5. To keep the catalog current, re-run extract_views + 02→06 on your
+5. To keep the catalog current, re-run 00_extract_sql + 02→06 on your
    change cadence (weekly is typical). Only new and changed objects are
    re-loaded; nothing loaded manually is erased (upsert by `metric_id`).
 

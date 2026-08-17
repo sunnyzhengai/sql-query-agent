@@ -70,7 +70,7 @@ SQL_SOURCES = {
     "domain": "input",
     "status": "active",
     "owner": {"notebook": "01_install", "module": None},
-    "utility_writers": ["load_sql_files", "extract_views"],
+    "utility_writers": ["load_sql_files", "00_extract_sql"],
     "write_mode": "overwrite",
     "enrichers": [],
     "consumers": ["01_install", "02_parse", "06_validate"],
@@ -1099,31 +1099,36 @@ EXTRACTION_INSPECTION = {
 TRACKING = {
     "table_name": "ops_extraction_tracking",
     "description": (
-        "Change tracking for SQL objects extracted from a live SQL Server "
-        "(hash-based diff detection), for Tier 2 on-prem extraction. Written "
-        "by the extract_views utility notebook, not the core pipeline."
+        "Change tracking for SQL objects extracted from the configured "
+        "source (hash-based diff detection). Written by 00_extract_sql — "
+        "the turn-key ingestion front door (promoted from utility status "
+        "2026-08-16; columns corrected to the tracker's real shape)."
     ),
     "domain": "operations",
     "status": "active",
-    "owner": {"notebook": "extract_views", "module": "src/extractor/tracker.py"},
+    "owner": {"notebook": "00_extract_sql", "module": "src/extractor/tracker.py"},
     "write_mode": "overwrite",
     "enrichers": [],
-    "consumers": ["extract_views"],
+    "consumers": ["00_extract_sql"],
     "columns": [
+        ("object_id", "string", False),
+        ("schema_name", "string", False),
         ("object_name", "string", False),
         ("object_type", "string", False),
-        ("schema_name", "string", True),
-        ("sql_hash", "string", True),
-        ("status", "string", True),
-        ("last_seen", "string", True),
+        ("sql_hash", "string", False),
+        ("extracted_at", "string", False),
+        ("sql_definition", "string", True),
+        ("status", "string", False),
     ],
     "column_descriptions": {
-        "object_name": "Proc/view name in the source server",
-        "object_type": "procedure | view",
+        "object_id": "schema.object_name — stable identity across extractions",
         "schema_name": "Schema in the source server",
-        "sql_hash": "SHA-256 of the object's SQL at last extraction",
-        "status": "new | changed | unchanged | removed",
-        "last_seen": "Last extraction timestamp",
+        "object_name": "Proc/view name in the source server",
+        "object_type": "sys.objects type_desc at discovery",
+        "sql_hash": "SHA-256 of the normalized SQL at last extraction",
+        "extracted_at": "Last extraction timestamp (ISO)",
+        "sql_definition": "Definition text at last extraction",
+        "status": "current | deleted",
     },
     "invariants": [],
 }

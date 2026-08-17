@@ -54,7 +54,7 @@ answer at all."
 
 ## VO-2 — Ingestion & Guardrails (~95 words, ~40s)
 
-**[Screen: the extraction review cell — "3 changed, 0 new" — then a
+**[Screen: 00_extract_sql's review cell — "3 changed, 0 new" — then a
 quick cut to the semantic-model ingestion summary and the PHI gate
 lines]**
 

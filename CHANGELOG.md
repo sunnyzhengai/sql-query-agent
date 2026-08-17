@@ -10,6 +10,21 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.12.0] - 2026-08-16
+
+### Changed
+- **extract_views promoted to pipeline notebook `00_extract_sql`**
+  (Sunny's call): the turn-key front door now git-syncs like every
+  numbered notebook — no more copy-paste import. Runs before 01;
+  handles procs AND views (old name undersold it). The
+  notebooks/data_loading script is retired (ghost rule); registry
+  writer names updated (input_sql_sources, ops_extraction_tracking).
+- ops_extraction_tracking contract drift fixed: registry columns now
+  match the tracker's real record shape (object_id/extracted_at/
+  sql_definition were undeclared; last_seen never existed).
+
+---
+
 ## [1.11.3] - 2026-08-16
 
 ### Fixed

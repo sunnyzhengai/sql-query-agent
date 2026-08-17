@@ -14,7 +14,6 @@ notebooks/
 │   ├── load_clarity_dictionary.py  — Clarity dictionary CSVs → input_dict_tables/_columns
 │   ├── load_caboodle_dictionary.py — Caboodle variant of the same
 │   ├── load_sql_files.py           — .sql files → input_sql_sources
-│   └── extract_views.py            — live SQL Server pull via gateway (extractor config)
 │
 ├── utilities/             ← Operational tools (run as needed)
 │   ├── ast_explorer_cell.py         — Explore a proc's ScriptDom AST (paste into 02_parse)

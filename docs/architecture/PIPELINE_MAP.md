@@ -12,6 +12,7 @@ consumers (notebook reads are verified against code by the contract tests).
 
 ```mermaid
 flowchart LR
+  00_extract_sql["00_extract_sql"]:::notebook
   01_install["01_install"]:::notebook
   02_parse["02_parse"]:::notebook
   03_build_graph["03_build_graph"]:::notebook
@@ -28,7 +29,6 @@ flowchart LR
   collibra_lineage_match["collibra_lineage_match"]:::notebook
   eventhouse_semantic_search["eventhouse_semantic_search"]:::notebook
   export_test_fixtures["export_test_fixtures"]:::notebook
-  extract_views["extract_views"]:::notebook
   health["health"]:::notebook
   load_caboodle_dictionary["load_caboodle_dictionary"]:::notebook
   load_clarity_dictionary["load_clarity_dictionary"]:::notebook
@@ -67,6 +67,8 @@ flowchart LR
   admin{{admin}}:::actor
   collibra_adapter{{collibra_adapter}}:::actor
   data_agent{{data_agent}}:::actor
+  00_extract_sql --> ops_extraction_tracking
+  00_extract_sql -.-> input_sql_sources
   01_install --> input_dict_columns
   01_install --> input_dict_tables
   01_install --> input_sql_sources
@@ -96,8 +98,6 @@ flowchart LR
   12_ingest_semantic_models --> input_metric_names
   12_ingest_semantic_models --> input_report_sources
   13_publish_pbi -->|enrich| gov_publish_log
-  extract_views --> ops_extraction_tracking
-  extract_views -.-> input_sql_sources
   gov_feedback_events --> 10_ingest_agent_events
   gov_feedback_events --> admin
   gov_feedback_events --> usage
@@ -153,7 +153,7 @@ flowchart LR
   ops_description_cache --> 07_generate_descriptions
   ops_error_log --> 02_parse
   ops_error_log --> admin
-  ops_extraction_tracking --> extract_views
+  ops_extraction_tracking --> 00_extract_sql
   ops_installation_errors --> data_agent
   ops_parse_errors --> 06_validate
   ops_parse_errors --> data_agent
