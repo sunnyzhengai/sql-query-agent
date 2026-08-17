@@ -10,8 +10,13 @@
 > documented in the SQL_SOURCES contract (owner 01_install, extractor
 > merges by metric_id). Appendix: extractor/discovery sqlglot references
 > are GONE; the parser-core demolition remains a separate release.
-> Remaining live verification (Fabric): run extract_views against the
-> demo DB with procs enabled, then 02, and confirm parse parity.
+> LIVE-VERIFIED 2026-08-16: first extraction run on Fabric succeeded —
+> 28/28 procs discovered and merged via the fabric_native profile
+> (00_extract_sql against the seeded demo SQL database). Two
+> customer-shaped fixes fell out en route: ODBC driver resolution
+> (Fabric ships 18, config said 17 — 1.12.1) and single-database
+> corpus (Fabric SQL rejects three-part names — 1.11.3). Parse
+> parity confirms when 02 reproduces the known counts.
 
 **From:** the learning/review session, 2026-08-16 (read-only by agreement).
 **To:** the dev session. **Origin:** Sunny's turn-key requirement ("no manual
