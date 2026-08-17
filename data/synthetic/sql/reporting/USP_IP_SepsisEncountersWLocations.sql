@@ -86,13 +86,13 @@ IF OBJECT_ID(N'tempdb..#MainAdmDetails') IS NOT NULL DROP TABLE #MainAdmDetails;
 
 SELECT DISTINCT
 
-	[PatEncCSNID] PAT_ENC_CSN_ID
+	[PATENCENCID] ENCOUNTER_ID
 
-	, [PatID] PAT_ID
+	, [PatientID] PATIENT_ID
 
-	, [PatMRNID] PAT_MRN_ID
+	, [PATIENTMRN] PATIENT_MRN
 
-	, [PatName] PAT_NAME
+	, [PatientName] PATIENT_NAME
 
 	, [EthnicGroup] [Ethnic Group]
 
@@ -126,7 +126,7 @@ INTO #MainAdmDetails
 
 FROM [reportingDB].[reporting].[IP_SepsisEncounters]
 
-CREATE INDEX IDX_Main ON #MainAdmDetails (PAT_ENC_CSN_ID) 
+CREATE INDEX IDX_Main ON #MainAdmDetails (ENCOUNTER_ID) 
 
 /*SELECT * FROM #MainAdmDetails*/
 
@@ -142,9 +142,9 @@ IF OBJECT_ID(N'tempdb..#Base_Pop') IS NOT NULL DROP TABLE #Base_Pop;
 
 SELECT 
 
-	adtIn.PAT_ENC_CSN_ID
+	adtIn.ENCOUNTER_ID
 
-	, csns.PAT_ID
+	, ENCS.PATIENT_ID
 
 	, adtIn.DEPARTMENT_ID AS ADT_DEPARTMENT_ID
 
@@ -164,25 +164,25 @@ SELECT
 
 	, COALESCE(adtOut.EFFECTIVE_TIME,GETDATE()) AS OUT_DTTM
 
-	, csns.INPATIENT_DATA_ID
+	, ENCS.INPATIENT_DATA_ID
 
-	, csns.BIRTH_DATE
+	, ENCS.BIRTH_DATE
 
-	, csns.ADT_ARRIVAL_TIME
+	, ENCS.ADT_ARRIVAL_TIME
 
-	, csns.ED_DEPARTURE_TIME
+	, ENCS.ED_DEPARTURE_TIME
 
 	, CONVERT(DATE, adtIn.EFFECTIVE_TIME) [InDeptDate]
 
 	, CONVERT(DATE, COALESCE(adtOut.EFFECTIVE_TIME,GETDATE())) [OutDeptDate]
 
-	, ROW_NUMBER() OVER (PARTITION BY csns.PAT_ENC_CSN_ID ORDER BY adtIn.EFFECTIVE_TIME, adtOut.EFFECTIVE_TIME ) [CSN Order]
+	, ROW_NUMBER() OVER (PARTITION BY ENCS.ENCOUNTER_ID ORDER BY adtIn.EFFECTIVE_TIME, adtOut.EFFECTIVE_TIME ) [ENC_ID Order]
 
 INTO #Base_Pop
 
-FROM #MainAdmDetails csns
+FROM #MainAdmDetails ENCS
 
-INNER JOIN [EMRDB].[dbo].[ADT_EVENTS] adtIn ON adtIn.PAT_ENC_CSN_ID = csns.PAT_ENC_CSN_ID
+INNER JOIN [EMRDB].[dbo].[ADT_EVENTS] adtIn ON adtIn.ENCOUNTER_ID = ENCS.ENCOUNTER_ID
 
 LEFT OUTER JOIN [EMRDB].[dbo].[ADT_EVENTS] adtOut ON adtIn.NEXT_OUT_EVENT_ID = adtOut.EVENT_ID
 
@@ -192,11 +192,11 @@ INNER JOIN [reportingDB].[reports].[CONFIG_VALUE_SET] cvs ON cvs.CODE = CONVERT(
 
 			AND cvs.VALUE_SET_ID = 3031 /*DEPARTMENT ROLL UP*/
 
-WHERE adtIn.EVENT_TYPE_C IN (1, 3, 99) /*Only look at "in" events (Admission and Transfer In, LOA Return)*/
+WHERE adtIn.EVENT_TYPE_CODE IN (1, 3, 99) /*Only look at "in" events (Admission and Transfer In, LOA Return)*/
 
-AND adtIn.EVENT_SUBTYPE_C <> 2 /*Exclude deleted/canceled events*/
+AND adtIn.EVENT_SUBTYPE_CODE <> 2 /*Exclude deleted/canceled events*/
 
-CREATE INDEX IDX_Base_Pop ON #Base_Pop (PAT_ENC_CSN_ID) 
+CREATE INDEX IDX_Base_Pop ON #Base_Pop (ENCOUNTER_ID) 
 
 /*SELECT * FROM ##Base_Pop*/
 
@@ -208,11 +208,11 @@ INSERT INTO [reporting].[IP_SepsisEncountersWLocations]
 
 	(
 
-		[PatID], 
+		[PatientID], 
 
-		[PatMRNID],
+		[PATIENTMRN],
 
-		[PatEncCSNID],
+		[PATENCENCID],
 
 		[ADTDepartmentID],
 
@@ -224,7 +224,7 @@ INSERT INTO [reporting].[IP_SepsisEncountersWLocations]
 
 		[OutDepartmentTime],
 
-		[CSNOrder], 
+		[ENCORDER], 
 
 		[InpatientDataID], 
 
@@ -240,11 +240,11 @@ INSERT INTO [reporting].[IP_SepsisEncountersWLocations]
 
 		[RefreshDate])
 
-SELECT main.PAT_ID 
+SELECT main.PATIENT_ID 
 
-	, main.PAT_MRN_ID [MRN]
+	, main.PATIENT_MRN [MRN]
 
-	, main.PAT_ENC_CSN_ID [CSN]
+	, main.ENCOUNTER_ID [ENC_ID]
 
 	, bp.ADT_DEPARTMENT_ID 
 
@@ -256,7 +256,7 @@ SELECT main.PAT_ID
 
 	, bp.OUT_DTTM [Out Department Time]
 
-	, bp.[CSN Order]
+	, bp.[ENC_ID Order]
 
 	, main.INPATIENT_DATA_ID
 
@@ -268,15 +268,15 @@ SELECT main.PAT_ID
 
 	, main.BIRTH_DATE
 
-	, CAST(main.PAT_ENC_CSN_ID AS varchar(20)) + '-' + CAST(bp.[CSN Order] AS VARCHAR(95)) [Unique Row]
+	, CAST(main.ENCOUNTER_ID AS varchar(20)) + '-' + CAST(bp.[ENC_ID Order] AS VARCHAR(95)) [Unique Row]
 
 	, GETDATE()
 
 FROM #MainAdmDetails main  
 
-INNER JOIN #Base_Pop bp ON bp.PAT_ENC_CSN_ID = main.PAT_ENC_CSN_ID
+INNER JOIN #Base_Pop bp ON bp.ENCOUNTER_ID = main.ENCOUNTER_ID
 
-ORDER BY bp.PAT_ENC_CSN_ID, bp.[CSN Order]
+ORDER BY bp.ENCOUNTER_ID, bp.[ENC_ID Order]
 
 END
 

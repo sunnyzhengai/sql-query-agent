@@ -1,5 +1,17 @@
 # SQL File Anonymization Strategy
 
+> **2026-08-16 amendments:** (1) The column-level crosswalk is now
+> REQUIRED and complete — the earlier "columns are Epic-standard, keep
+> as-is" note is reversed (verdict: no vendor dialect anywhere
+> customer-facing). 1,264 rule-generated renames (CSN family, PAT_/HSP_
+> prefixes, _C/_YN suffixes), collision-checked per table. (2) Dictionary
+> prose is LLM-paraphrased after anonymization
+> (scripts/paraphrase_dictionary.py) — vendor documentation text must
+> not survive verbatim. (3) Raw sources live OUTSIDE the repo
+> (~/aivia-private, AIVIA_RAW_SQL_DIR). Regeneration order:
+> anonymize_sql -> anonymize_dictionary -> paraphrase_dictionary.
+> (4) Output filenames are pinned via crosswalk `output_file`.
+
 **Purpose:** Transform proprietary SQL files into clean, generic demo files for Microsoft Marketplace reviewer sandbox. Remove all vendor-specific (Epic Clarity/Caboodle), health system-specific, and author-specific references while preserving SQL structural complexity.
 
 ---

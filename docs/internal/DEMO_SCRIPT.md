@@ -41,8 +41,8 @@ block once before editing):**
 
 **[Screen: split — a 2,000-line SQL procedure | a Power BI dashboard]**
 
-"Every hospital runs on two layers of hidden business logic. Thousands
-of lines of legacy SQL — and the undocumented DAX inside your Power BI
+"Every hospital on Microsoft suite runs on two layers of hidden business logic. Thousands
+of lines of production SQL — and the undocumented DAX inside your Power BI
 reports. When an executive asks how a compliance metric is calculated,
 the answer takes days. When a generic AI answers instead, it
 hallucinates.

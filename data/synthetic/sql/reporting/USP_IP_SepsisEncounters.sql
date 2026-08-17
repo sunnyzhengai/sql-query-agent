@@ -86,13 +86,13 @@ IF OBJECT_ID(N'tempdb..#MainAdmDetails') IS NOT NULL DROP TABLE #MainAdmDetails;
 
 SELECT DISTINCT
 
-	peh.PAT_ENC_CSN_ID
+	peh.ENCOUNTER_ID
 
-	, peh.PAT_ID
+	, peh.PATIENT_ID
 
-	, pat.PAT_MRN_ID
+	, pat.PATIENT_MRN
 
-	, pat.PAT_NAME
+	, pat.PATIENT_NAME
 
 	, zeg.NAME AS [Ethnic Group]
 
@@ -132,17 +132,17 @@ FROM [EMRDB].[dbo].[HOSPITAL_TRANSACTIONS] htr
 
 INNER JOIN [EMRDB].[dbo].[CALENDAR_DATES] sd ON sd.CALENDAR_DT = CONVERT(DATE, htr.SERVICE_DATE)
 
-INNER JOIN [EMRDB].[dbo].[HOSPITAL_ENCOUNTERS] peh ON htr.PAT_ENC_CSN_ID = peh.PAT_ENC_CSN_ID
+INNER JOIN [EMRDB].[dbo].[HOSPITAL_ENCOUNTERS] peh ON htr.ENCOUNTER_ID = peh.ENCOUNTER_ID
 
-INNER JOIN [EMRDB].[dbo].[PATIENTS] pat ON pat.PAT_ID = peh.PAT_ID
+INNER JOIN [EMRDB].[dbo].[PATIENTS] pat ON pat.PATIENT_ID = peh.PATIENT_ID
 
-LEFT OUTER JOIN [EMRDB].[dbo].[REF_DISCHARGE_DISPOSITION] zdd ON zdd.DISCH_DISP_C = peh.DISCH_DISP_C
+LEFT OUTER JOIN [EMRDB].[dbo].[REF_DISCHARGE_DISPOSITION] zdd ON zdd.DISCH_DISP_CODE = peh.DISCH_DISP_CODE
 
-LEFT OUTER JOIN [EMRDB].[dbo].[REF_ETHNIC_GROUP] zeg ON zeg.ETHNIC_GROUP_C = pat.ETHNIC_GROUP_C
+LEFT OUTER JOIN [EMRDB].[dbo].[REF_ETHNIC_GROUP] zeg ON zeg.ETHNIC_GROUP_CODE = pat.ETHNIC_GROUP_CODE
 
-LEFT OUTER JOIN [EMRDB].[dbo].[PATIENT_DEMOGRAPHICS_RACE] race ON race.PAT_ID = pat.PAT_ID AND race.LINE = 1
+LEFT OUTER JOIN [EMRDB].[dbo].[PATIENT_DEMOGRAPHICS_RACE] race ON race.PATIENT_ID = pat.PATIENT_ID AND race.LINE = 1
 
-LEFT OUTER JOIN [EMRDB].[dbo].[REF_PATIENT_RACE] zpr ON zpr.PATIENT_RACE_C = race.PATIENT_RACE_C
+LEFT OUTER JOIN [EMRDB].[dbo].[REF_PATIENT_RACE] zpr ON zpr.PATIENT_RACE_CODE = race.PATIENT_RACE_CODE
 
 LEFT OUTER JOIN [EMRDB].[dbo].[DEPARTMENTS] dep ON dep.DEPARTMENT_ID = peh.DEPARTMENT_ID
 
@@ -154,7 +154,7 @@ AND sd.CALENDAR_DT BETWEEN @dStartDate AND @dEndDate /*Service data of a charge*
 
 AND loc.POS_TYPE IS NULL -- Exclude locations set up as Clinic/non-hospital
 
-CREATE INDEX IDX_Main ON #MainAdmDetails (PAT_ENC_CSN_ID) 
+CREATE INDEX IDX_Main ON #MainAdmDetails (ENCOUNTER_ID) 
 
 
 
@@ -164,7 +164,7 @@ CREATE INDEX IDX_Main ON #MainAdmDetails (PAT_ENC_CSN_ID)
 
 IF OBJECT_ID(N'tempdb..#Base_Pop_ENC_Reason') IS NOT NULL DROP TABLE #Base_Pop_ENC_Reason;
 
-SELECT DISTINCT cat.PAT_ENC_CSN_ID
+SELECT DISTINCT cat.ENCOUNTER_ID
 
 	, STRING_AGG(edg.DX_NAME,  ' % ') AS [AllEncReasons]
 
@@ -172,13 +172,13 @@ INTO #Base_Pop_ENC_Reason
 
 FROM #MainAdmDetails cat
 
-INNER JOIN [EMRDB].[dbo].[ENCOUNTER_DIAGNOSES] ped ON ped.PAT_ENC_CSN_ID = cat.PAT_ENC_CSN_ID AND ped.LINE >= 1
+INNER JOIN [EMRDB].[dbo].[ENCOUNTER_DIAGNOSES] ped ON ped.ENCOUNTER_ID = cat.ENCOUNTER_ID AND ped.LINE >= 1
 
 INNER JOIN [EMRDB].[dbo].[DIAGNOSES] edg ON edg.DX_ID = ped.DX_ID
 
-GROUP BY cat.PAT_ENC_CSN_ID
+GROUP BY cat.ENCOUNTER_ID
 
-CREATE INDEX IDX_EncReason ON #Base_Pop_ENC_Reason (PAT_ENC_CSN_ID) 
+CREATE INDEX IDX_EncReason ON #Base_Pop_ENC_Reason (ENCOUNTER_ID) 
 
 /*SELECT * FROM #Base_Pop_ENC_Reason*/
 
@@ -190,11 +190,11 @@ INSERT INTO [reporting].[IP_SepsisEncounters]
 
 	(
 
-		[PatID], 
+		[PatientID], 
 
-		[PatName],
+		[PatientName],
 
-		[PatMRNID],
+		[PATIENTMRN],
 
 		[EthnicGroup],
 
@@ -202,7 +202,7 @@ INSERT INTO [reporting].[IP_SepsisEncounters]
 
 		[Location],
 
-		[PatEncCSNID],
+		[PATENCENCID],
 
 		[AgeMonths],
 
@@ -230,11 +230,11 @@ INSERT INTO [reporting].[IP_SepsisEncounters]
 
 		[RefreshDate])
 
-SELECT main.PAT_ID 
+SELECT main.PATIENT_ID 
 
-	, main.PAT_NAME [PATIENTS]
+	, main.PATIENT_NAME [PATIENTS]
 
-	, main.PAT_MRN_ID [MRN]
+	, main.PATIENT_MRN [MRN]
 
 	, main.[Ethnic Group]
 
@@ -242,7 +242,7 @@ SELECT main.PAT_ID
 
 	, main.[Location]
 
-	, main.PAT_ENC_CSN_ID [CSN]
+	, main.ENCOUNTER_ID [ENC_ID]
 
 	, main.AGE_MONTHS [Age (M)]
 
@@ -272,7 +272,7 @@ SELECT main.PAT_ID
 
 FROM #MainAdmDetails main  
 
-LEFT OUTER JOIN #Base_Pop_ENC_Reason enc ON enc.PAT_ENC_CSN_ID = main.PAT_ENC_CSN_ID;
+LEFT OUTER JOIN #Base_Pop_ENC_Reason enc ON enc.ENCOUNTER_ID = main.ENCOUNTER_ID;
 
 END 
 

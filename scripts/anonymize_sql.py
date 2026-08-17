@@ -12,12 +12,17 @@ Usage:
 """
 
 import json
+import os
 import re
 import sys
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-INPUT_DIR = PROJECT_ROOT / "data" / "synthetic" / "sepsis_sql" / "procs"
+# Raw pre-anonymization sources live OUTSIDE the repo (wall rule,
+# relocated 2026-08-16). Override with AIVIA_RAW_SQL_DIR.
+RAW_ROOT = Path(os.environ.get(
+    "AIVIA_RAW_SQL_DIR", str(Path.home() / "aivia-private" / "sepsis_sql")))
+INPUT_DIR = RAW_ROOT / "procs"
 OUTPUT_DIR = PROJECT_ROOT / "data" / "synthetic" / "sql"
 CROSSWALK_PATH = PROJECT_ROOT / "data" / "synthetic" / "crosswalk.json"
 
@@ -75,8 +80,19 @@ def process_file(
 
 
 def get_output_path(input_path: Path, crosswalk: dict, anonymized_sql: str) -> Path:
-    """Determine output path based on the anonymized CREATE PROCEDURE name."""
+    """Determine output path: crosswalk pin first, else anonymized proc name.
+
+    Filenames are a CORPUS CONTRACT (goldens, lakehouse uploads, and the
+    parity tests reference them) even though metric identity comes from
+    content — a crosswalk `output_file` pin keeps regeneration from
+    renaming files (2026-08-16: content-derived names silently diverged
+    from the July reports/ filenames, leaving stale strays)."""
     rel = input_path.relative_to(INPUT_DIR)
+    rel_key = "/".join(rel.parts)
+    for entry in crosswalk.get("procedures", {}).values():
+        if isinstance(entry, dict) and entry.get("file") == rel_key \
+                and entry.get("output_file"):
+            return OUTPUT_DIR / entry["output_file"]
     schema_folder = rel.parts[0]  # 'reporting' or 'reports'
 
     # Extract proc name from the anonymized SQL

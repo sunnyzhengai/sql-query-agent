@@ -42,7 +42,7 @@ SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;
 
 
 
-SELECT [PatEncCSNID] [CSN]
+SELECT [PATENCENCID] [ENC_ID]
 
 	, [ShiftDate] [Shift Date]
 
@@ -80,7 +80,7 @@ SELECT [PatEncCSNID] [CSN]
 
 	, [FifteenthOrEOM] [15th or EOM]
 
-	, [ShiftComplianceYN] [Shift Compliance Y/N]
+	, [ShiftComplianceFlag] [Shift Compliance Y/N]
 
 	, [ShiftCompliance] [Shift Compliance]
 
@@ -98,7 +98,7 @@ SELECT [PatEncCSNID] [CSN]
 
 FROM [reportingDB].reporting.[IP_SepsisShiftCompliance]
 
-ORDER BY CSN, CSNOverallOrder
+ORDER BY ENC_ID, ENCOVERALLORDER
 
 END 
 

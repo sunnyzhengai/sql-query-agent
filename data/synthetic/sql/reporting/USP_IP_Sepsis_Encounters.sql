@@ -46,9 +46,9 @@ SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;
 
 SELECT DISTINCT
 
-	[PatName] [PATIENTS]
+	[PatientName] [PATIENTS]
 
-	, [PatMRNID] [MRN]
+	, [PATIENTMRN] [MRN]
 
 	, [EthnicGroup] [Ethnic Group]
 
@@ -56,7 +56,7 @@ SELECT DISTINCT
 
 	, [Location]
 
-	, [PatEncCSNID] [CSN]
+	, [PATENCENCID] [ENC_ID]
 
 	, [AgeMonths] [Age (M)]
 
@@ -74,11 +74,11 @@ SELECT DISTINCT
 
 	, [OutDepartmentTime][Out Department Time]
 
-	, [CSNOrder] [CSN Order]
+	, [ENCORDER] [ENC_ID Order]
 
 	, [UniqueRow] [Unique Row]
 
 	FROM [reportingDB].[reporting].[IP_SEPSIS]
 
-  ORDER BY CSN, CSNOrder
+  ORDER BY ENC_ID, ENCORDER
 

@@ -48,7 +48,7 @@ SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;
 
 SELECT
 
-	sd.[PatEncCSNID] [CSN]
+	sd.[PATENCENCID] [ENC_ID]
 
 	, sd.[SepsisDate] [Sepsis Date]
 
@@ -128,13 +128,13 @@ SELECT
 
 	, sd.[IPSOSevereSepsisYN] [IPSO Severe Sepsis Y/N]
 
-	, sd.[CSNOverallOrder] [CSN Overall Order]
+	, sd.[ENCOVERALLORDER] [ENC_ID Overall Order]
 
 	, sd.[RefreshDate] [Refresh Date]
 
 	FROM [reportingDB].[reporting].[IP_SepsisDetails] sd
 
-	ORDER BY sd.PatEncCSNID, sd.CSNOverallOrder
+	ORDER BY sd.PATENCENCID, sd.ENCOVERALLORDER
 
 END 
 

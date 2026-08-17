@@ -46,9 +46,9 @@ SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;
 
 
 
-SELECT [PatName] [PATIENTS]
+SELECT [PatientName] [PATIENTS]
 
-	, [PatMRNID] [MRN]
+	, [PATIENTMRN] [MRN]
 
 	, [EthnicGroup] [Ethnic Group]
 
@@ -56,7 +56,7 @@ SELECT [PatName] [PATIENTS]
 
 	, [Location]
 
-	, [PatEncCSNID] [CSN]
+	, [PATENCENCID] [ENC_ID]
 
 	, [AgeMonths] [Age (M)]
 
@@ -106,7 +106,7 @@ SELECT [PatName] [PATIENTS]
 
 	  
 
-	, CASE WHEN [ShiftAMPM] = 'AM (Day Shift)' THEN [ShiftComplianceYN] ELSE NULL END [Shift 1 Compliance Y/N]
+	, CASE WHEN [ShiftAMPM] = 'AM (Day Shift)' THEN [ShiftComplianceFlag] ELSE NULL END [Shift 1 Compliance Y/N]
 
 	, CASE WHEN [ShiftAMPM] = 'AM (Day Shift)' THEN [ShiftCompliance] ELSE NULL END [Shift 1 Compliance]
 
@@ -122,7 +122,7 @@ SELECT [PatName] [PATIENTS]
 
 
 
-	, CASE WHEN [ShiftAMPM] = 'PM (Night Shift)' THEN [ShiftComplianceYN] ELSE NULL END [Shift 2 Compliance Y/N]
+	, CASE WHEN [ShiftAMPM] = 'PM (Night Shift)' THEN [ShiftComplianceFlag] ELSE NULL END [Shift 2 Compliance Y/N]
 
 	, CASE WHEN [ShiftAMPM] = 'PM (Night Shift)' THEN [ShiftCompliance] ELSE NULL END [Shift 2 Compliance]
 
@@ -142,7 +142,7 @@ SELECT [PatName] [PATIENTS]
 
 	, CASE WHEN [ShiftAMPM] like 'AM%' THEN [AMDenom] ELSE [PMDenom] END [Denominator]
 
-	, [ShiftComplianceYN] [Shift Compliance Y/N]
+	, [ShiftComplianceFlag] [Shift Compliance Y/N]
 
 	, [ShiftCompliance] [Shift Compliance]
 
@@ -158,5 +158,5 @@ SELECT [PatName] [PATIENTS]
 
 
 
-  ORDER BY CSN, CSNOverallOrder
+  ORDER BY ENC_ID, ENCOVERALLORDER
 

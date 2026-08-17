@@ -10,6 +10,35 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.11.1] - 2026-08-16
+
+### Changed — corpus fully de-dialected (Sunny's verdict: no Epic
+anything, ever, anywhere customer-facing)
+
+- **Column-level anonymization completed** (reversing the 2026-07
+  "columns are fine" call): 1,264 rule-generated, per-table
+  collision-checked renames in the crosswalk — the CSN family,
+  PAT_/HSP_ prefixes (mid-token included), _C→_CODE, _YN→_FLAG,
+  SERV_AREA — applied to the 28-proc corpus, both dictionary CSVs, all
+  recorded fixtures, and the agent cassette. Scan terms extended (CSN,
+  PAT_*, HSP_ACCOUNT, Chronicles, Hyperspace) so the fixture and
+  cassette scans mechanically enforce the standard.
+- Dictionary prose: vendor master-file refs "(EPT/18838)"-style
+  stripped; "Chronicles" and "contact serial number" vocabulary
+  replaced; ALL ~4,200 descriptions LLM-paraphrased in place
+  (scripts/paraphrase_dictionary.py — cached, scan-verified, loud on
+  failure) so no vendor documentation prose survives verbatim.
+- Output filenames pinned in the crosswalk (`output_file`) — filenames
+  are a corpus contract; regeneration can no longer mint strays
+  (found: 7 stale reports/ files + name drift from July).
+- **Raw pre-anonymization sources relocated OUT of the repo tree** to
+  ~/aivia-private/ (never git-tracked — verified); anonymize scripts
+  read AIVIA_RAW_SQL_DIR. Regeneration order: anonymize_sql →
+  anonymize_dictionary → paraphrase_dictionary.
+- Demo seed script regenerated from the clean corpus.
+
+---
+
 ## [1.11.0] - 2026-08-16
 
 ### Added

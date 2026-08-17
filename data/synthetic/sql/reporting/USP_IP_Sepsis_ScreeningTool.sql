@@ -48,9 +48,9 @@ SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;
 
 
 
-SELECT [PatName] [PATIENTS]
+SELECT [PatientName] [PATIENTS]
 
-	, [PatMRNID] [MRN]
+	, [PATIENTMRN] [MRN]
 
 	, [EthnicGroup] [Ethnic Group]
 
@@ -58,7 +58,7 @@ SELECT [PatName] [PATIENTS]
 
 	, [Location] 
 
-	, [PatEncCSNID] [CSN]
+	, [PATENCENCID] [ENC_ID]
 
 	, [AgeMonths] [Age (M)]
 

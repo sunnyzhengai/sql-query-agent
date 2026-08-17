@@ -84,13 +84,13 @@ IF OBJECT_ID(N'tempdb..#MainAdmDetails') IS NOT NULL DROP TABLE #MainAdmDetails;
 
 SELECT DISTINCT
 
-	enc.[PatEncCSNID] PAT_ENC_CSN_ID
+	enc.[PATENCENCID] ENCOUNTER_ID
 
-	, enc.[PatID] PAT_ID
+	, enc.[PatientID] PATIENT_ID
 
-	, enc.[PatMRNID] PAT_MRN_ID
+	, enc.[PATIENTMRN] PATIENT_MRN
 
-	, enc.[PatName] PAT_NAME
+	, enc.[PatientName] PATIENT_NAME
 
 	, enc.[EthnicGroup] [Ethnic Group]
 
@@ -120,7 +120,7 @@ INTO #MainAdmDetails
 
 FROM [reporting].[IP_SepsisEncounters] enc 
 
-CREATE INDEX IDX_Main ON #MainAdmDetails (PAT_ENC_CSN_ID) 
+CREATE INDEX IDX_Main ON #MainAdmDetails (ENCOUNTER_ID) 
 
 /*SELECT * FROM #MainAdmDetails*/
 
@@ -136,7 +136,7 @@ IF OBJECT_ID(N'tempdb..#Base_Pop') IS NOT NULL DROP TABLE #Base_Pop;
 
 SELECT 	
 
-	[PatEncCSNID] [PAT_ENC_CSN_ID],
+	[PATENCENCID] [ENCOUNTER_ID],
 
 	[InDepartmentTime] [In Dept Date],
 
@@ -146,13 +146,13 @@ SELECT
 
 	[ADTDepartmentName] [ADT_DEPARTMENT_NAME],
 
-	[PatID] [PAT_ID], 
+	[PatientID] [PATIENT_ID], 
 
 	[DepartmentRollup] [DEPARTMENT_ROLLUP],
 
 	[InpatientDataID] [INPATIENT_DATA_ID], 
 
-	[CSNOrder] [CSN Order],
+	[ENCORDER] [ENC_ID Order],
 
 	[UniqueRow] [Unique Row]
 
@@ -160,9 +160,9 @@ INTO #Base_Pop
 
 FROM #MainAdmDetails main
 
-INNER JOIN [reporting].[IP_SepsisEncountersWLocations] loc ON loc.PatEncCSNID = main.PAT_ENC_CSN_ID
+INNER JOIN [reporting].[IP_SepsisEncountersWLocations] loc ON loc.PATENCENCID = main.ENCOUNTER_ID
 
-CREATE INDEX IDX_Base_Pop ON #Base_Pop (PAT_ENC_CSN_ID) 
+CREATE INDEX IDX_Base_Pop ON #Base_Pop (ENCOUNTER_ID) 
 
 CREATE INDEX IDX_Base_Pop_Inp ON #Base_Pop (INPATIENT_DATA_ID) 
 
@@ -174,7 +174,7 @@ CREATE INDEX IDX_Base_Pop_Inp ON #Base_Pop (INPATIENT_DATA_ID)
 
 IF OBJECT_ID(N'tempdb..#FlwshtLst') IS NOT NULL DROP TABLE #FlwshtLst;
 
-	SELECT main.PAT_ENC_CSN_ID
+	SELECT main.ENCOUNTER_ID
 
 		, meas.FLO_MEAS_ID
 
@@ -194,9 +194,9 @@ IF OBJECT_ID(N'tempdb..#FlwshtLst') IS NOT NULL DROP TABLE #FlwshtLst;
 
 		, CAST(meas.RECORDED_TIME AS DATE) AS [Score Date]
 
-		, main.[CSN Order]
+		, main.[ENC_ID Order]
 
-		, ROW_NUMBER() OVER(PARTITION BY main.PAT_ENC_CSN_ID ORDER BY main.[CSN Order], RECORDED_TIME) AS [CSN Overall Score Order]
+		, ROW_NUMBER() OVER(PARTITION BY main.ENCOUNTER_ID ORDER BY main.[ENC_ID Order], RECORDED_TIME) AS [ENC_ID Overall Score Order]
 
 		, main.[Unique Row]
 
@@ -210,11 +210,11 @@ IF OBJECT_ID(N'tempdb..#FlwshtLst') IS NOT NULL DROP TABLE #FlwshtLst;
 
 	WHERE meas.RECORDED_TIME BETWEEN main.[In Dept Date] AND main.[Out Dept Date]
 
-CREATE INDEX IDX_FlwshtLst ON #FlwshtLst (PAT_ENC_CSN_ID) 
+CREATE INDEX IDX_FlwshtLst ON #FlwshtLst (ENCOUNTER_ID) 
 
 CREATE INDEX IDX_FlwshtLstFSD ON #FlwshtLst (FSD_ID) 
 
-/*SELECT * FROM #FlwshtLst WHERE PAT_ENC_CSN_ID = '1060789013' ORDER BY PAT_ENC_CSN_ID, RECORDED_TIME*/
+/*SELECT * FROM #FlwshtLst WHERE ENCOUNTER_ID = '1060789013' ORDER BY ENCOUNTER_ID, RECORDED_TIME*/
 
 
 
@@ -222,7 +222,7 @@ CREATE INDEX IDX_FlwshtLstFSD ON #FlwshtLst (FSD_ID)
 
 IF OBJECT_ID(N'tempdb..#FlwshtLstHuddleODScore') IS NOT NULL DROP TABLE #FlwshtLstHuddleODScore;
 
-SELECT main.PAT_ENC_CSN_ID
+SELECT main.ENCOUNTER_ID
 
 	, meas.FSD_ID
 
@@ -232,7 +232,7 @@ SELECT main.PAT_ENC_CSN_ID
 
 	, meas.MEAS_VALUE
 
-	, flo.[CSN Overall Score Order]
+	, flo.[ENC_ID Overall Score Order]
 
 	, main.[Unique Row]
 
@@ -252,11 +252,11 @@ OUTER APPLY
 
 (
 
-	SELECT MAX(flo.[CSN Overall Score Order]) [CSN Overall Score Order]
+	SELECT MAX(flo.[ENC_ID Overall Score Order]) [ENC_ID Overall Score Order]
 
 	FROM #FlwshtLst flo 
 
-	WHERE  flo.PAT_ENC_CSN_ID = main.PAT_ENC_CSN_ID 
+	WHERE  flo.ENCOUNTER_ID = main.ENCOUNTER_ID 
 
 	AND flo.RECORDED_TIME <= meas.RECORDED_TIME
 
@@ -264,11 +264,11 @@ OUTER APPLY
 
 WHERE meas.RECORDED_TIME BETWEEN main.[In Dept Date] AND main.[Out Dept Date]
 
-ORDER BY main.PAT_ENC_CSN_ID, meas.RECORDED_TIME
+ORDER BY main.ENCOUNTER_ID, meas.RECORDED_TIME
 
-CREATE INDEX IDX_FlwshtLstHuddleODScore ON #FlwshtLstHuddleODScore (PAT_ENC_CSN_ID, FSD_ID) 
+CREATE INDEX IDX_FlwshtLstHuddleODScore ON #FlwshtLstHuddleODScore (ENCOUNTER_ID, FSD_ID) 
 
-/*SELECT * FROM #FlwshtLstHuddleODScore ORDER BY PAT_ENC_CSN_ID, RECORDED_TIME*/
+/*SELECT * FROM #FlwshtLstHuddleODScore ORDER BY ENCOUNTER_ID, RECORDED_TIME*/
 
 
 
@@ -276,7 +276,7 @@ CREATE INDEX IDX_FlwshtLstHuddleODScore ON #FlwshtLstHuddleODScore (PAT_ENC_CSN_
 
 IF OBJECT_ID(N'tempdb..#FlwshtNoAlert') IS NOT NULL DROP TABLE #FlwshtNoAlert;
 
-SELECT a.PAT_ENC_CSN_ID
+SELECT a.ENCOUNTER_ID
 
 	, MAX(a.RECORDED_TIME) RECORDED_TIME
 
@@ -284,13 +284,13 @@ SELECT a.PAT_ENC_CSN_ID
 
 	, STRING_AGG([CLINICAL_ALERTS Not Activated Comment],  ' % ') [CLINICAL_ALERTS Not Activated Comment]
 
-	, a.[CSN Overall Score Order]
+	, a.[ENC_ID Overall Score Order]
 
 INTO #FlwshtNoAlert
 
 FROM (
 
-	SELECT main.PAT_ENC_CSN_ID
+	SELECT main.ENCOUNTER_ID
 
 		, rec.INPATIENT_DATA_ID
 
@@ -302,7 +302,7 @@ FROM (
 
 		, meas.MEAS_COMMENT as [CLINICAL_ALERTS Not Activated Comment]
 
-		, flo.[CSN Overall Score Order]
+		, flo.[ENC_ID Overall Score Order]
 
 	FROM #Base_Pop main
 
@@ -314,11 +314,11 @@ FROM (
 
 	(
 
-		SELECT MAX(flo.[CSN Overall Score Order]) [CSN Overall Score Order]
+		SELECT MAX(flo.[ENC_ID Overall Score Order]) [ENC_ID Overall Score Order]
 
 		FROM #FlwshtLst flo 
 
-		WHERE  flo.PAT_ENC_CSN_ID = main.PAT_ENC_CSN_ID 
+		WHERE  flo.ENCOUNTER_ID = main.ENCOUNTER_ID 
 
 		AND flo.RECORDED_TIME <= meas.RECORDED_TIME
 
@@ -328,9 +328,9 @@ FROM (
 
 ) a
 
-GROUP BY a.PAT_ENC_CSN_ID, a.[CSN Overall Score Order]
+GROUP BY a.ENCOUNTER_ID, a.[ENC_ID Overall Score Order]
 
-CREATE INDEX IDX_FlwshtNoAlert ON #FlwshtNoAlert (PAT_ENC_CSN_ID, [CSN Overall Score Order]) 
+CREATE INDEX IDX_FlwshtNoAlert ON #FlwshtNoAlert (ENCOUNTER_ID, [ENC_ID Overall Score Order]) 
 
 /*SELECT * FROM #FlwshtNoAlert*/
 
@@ -338,7 +338,7 @@ CREATE INDEX IDX_FlwshtNoAlert ON #FlwshtNoAlert (PAT_ENC_CSN_ID, [CSN Overall S
 
 IF OBJECT_ID(N'tempdb..#FlwshtAlert') IS NOT NULL DROP TABLE #FlwshtAlert;
 
-SELECT a.PAT_ENC_CSN_ID
+SELECT a.ENCOUNTER_ID
 
 	, a.ALT_ID
 
@@ -346,7 +346,7 @@ SELECT a.PAT_ENC_CSN_ID
 
 	, a.[CLINICAL_ALERTS Activated Comment]
 
-	, a.[CSN Overall Score Order]
+	, a.[ENC_ID Overall Score Order]
 
 	, a.[OPA TYPE]
 
@@ -354,7 +354,7 @@ INTO #FlwshtAlert
 
 FROM (
 
-	SELECT main.PAT_ENC_CSN_ID
+	SELECT main.ENCOUNTER_ID
 
 		, alt.ALT_ID
 
@@ -364,29 +364,29 @@ FROM (
 
 		, alt.BPA_LOCATOR_ID 
 
-		, flo.[CSN Overall Score Order]
+		, flo.[ENC_ID Overall Score Order]
 
 		, CASE WHEN alt.BPA_LOCATOR_ID = 900400001 THEN 'Non-PICU' ELSE 'PICU' END [OPA TYPE]
 
-		, ROW_NUMBER() OVER(PARTITION BY main.PAT_ENC_CSN_ID, flo.[CSN Overall Score Order] ORDER BY flo.[CSN Overall Score Order]) RowNum
+		, ROW_NUMBER() OVER(PARTITION BY main.ENCOUNTER_ID, flo.[ENC_ID Overall Score Order] ORDER BY flo.[ENC_ID Overall Score Order]) RowNum
 
 	FROM #Base_Pop main
 
-	INNER JOIN [EMRDB].[dbo].[CLINICAL_ALERTS] alt ON alt.PAT_CSN = main.PAT_ENC_CSN_ID AND alt.BPA_LOCATOR_ID in (900400001, 900400011) /*BASE 2019 HS OD SCORE SEPSIS >2 [900400001]*/
+	INNER JOIN [EMRDB].[dbo].[CLINICAL_ALERTS] alt ON alt.VISIT_ID = main.ENCOUNTER_ID AND alt.BPA_LOCATOR_ID in (900400001, 900400011) /*BASE 2019 HS OD SCORE SEPSIS >2 [900400001]*/
 
 	INNER JOIN [EMRDB].[dbo].[ALERT_HISTORY] his ON his.ALT_ID = alt.ALT_ID
 
-	INNER JOIN [EMRDB].[dbo].[REF_ALERT_OVERRIDE_REASONS] rsn ON rsn.ALRT_SP_OVR_RSN_C = his.SPEC_OVR_RSN_C
+	INNER JOIN [EMRDB].[dbo].[REF_ALERT_OVERRIDE_REASONS] rsn ON rsn.ALRT_SP_OVR_RSN_CODE = his.SPEC_OVR_RSN_CODE
 
 	OUTER APPLY 
 
 	(
 
-		SELECT MAX(flo.[CSN Overall Score Order]) [CSN Overall Score Order]
+		SELECT MAX(flo.[ENC_ID Overall Score Order]) [ENC_ID Overall Score Order]
 
 		FROM #FlwshtLst flo 
 
-		WHERE  flo.PAT_ENC_CSN_ID = main.PAT_ENC_CSN_ID 
+		WHERE  flo.ENCOUNTER_ID = main.ENCOUNTER_ID 
 
 		AND flo.RECORDED_TIME <= his.ALT_ACTION_INST
 
@@ -398,7 +398,7 @@ FROM (
 
 WHERE a.RowNum = 1
 
-CREATE INDEX IDX_FlwshtAlert ON #FlwshtAlert (PAT_ENC_CSN_ID) 
+CREATE INDEX IDX_FlwshtAlert ON #FlwshtAlert (ENCOUNTER_ID) 
 
 /*SELECT * FROM #FlwshtAlert*/
 
@@ -406,7 +406,7 @@ CREATE INDEX IDX_FlwshtAlert ON #FlwshtAlert (PAT_ENC_CSN_ID)
 
 IF OBJECT_ID(N'tempdb..#Base_Pop_OD_Scores') IS NOT NULL DROP TABLE #Base_Pop_OD_Scores;
 
-SELECT bp.PAT_ENC_CSN_ID
+SELECT bp.ENCOUNTER_ID
 
 	, bp.ADT_DEPARTMENT_ID
 
@@ -440,9 +440,9 @@ SELECT bp.PAT_ENC_CSN_ID
 
 	, alertActivated.[CLINICAL_ALERTS Activated Comment]
 
-	, meas.[CSN Overall Score Order]
+	, meas.[ENC_ID Overall Score Order]
 
-	, meas.[CSN Order]
+	, meas.[ENC_ID Order]
 
 	, CASE WHEN meas.MEAS_VALUE >= 2 THEN 'Y' ELSE 'N' END [ShowComponents]
 
@@ -454,17 +454,17 @@ INTO #Base_Pop_OD_Scores
 
 FROM #Base_Pop bp 
 
-INNER JOIN [EMRDB].[dbo].[HOSPITAL_ENCOUNTERS] peh ON peh.PAT_ENC_CSN_ID = bp.PAT_ENC_CSN_ID
+INNER JOIN [EMRDB].[dbo].[HOSPITAL_ENCOUNTERS] peh ON peh.ENCOUNTER_ID = bp.ENCOUNTER_ID
 
-LEFT OUTER JOIN #FlwshtLst meas ON meas.PAT_ENC_CSN_ID = bp.PAT_ENC_CSN_ID AND meas.[CSN Order] = bp.[CSN Order]
+LEFT OUTER JOIN #FlwshtLst meas ON meas.ENCOUNTER_ID = bp.ENCOUNTER_ID AND meas.[ENC_ID Order] = bp.[ENC_ID Order]
 
 LEFT OUTER JOIN #FlwshtNoAlert alertNotActivated on 
 
 	(	
 
-		alertNotActivated.PAT_ENC_CSN_ID = bp.PAT_ENC_CSN_ID 
+		alertNotActivated.ENCOUNTER_ID = bp.ENCOUNTER_ID 
 
-		AND alertNotActivated.[CSN Overall Score Order] = meas.[CSN Overall Score Order]
+		AND alertNotActivated.[ENC_ID Overall Score Order] = meas.[ENC_ID Overall Score Order]
 
 	)
 
@@ -472,9 +472,9 @@ LEFT OUTER JOIN #FlwshtAlert alertActivated on
 
 	(	
 
-		alertActivated.PAT_ENC_CSN_ID = bp.PAT_ENC_CSN_ID 
+		alertActivated.ENCOUNTER_ID = bp.ENCOUNTER_ID 
 
-		AND alertActivated.[CSN Overall Score Order] = meas.[CSN Overall Score Order]
+		AND alertActivated.[ENC_ID Overall Score Order] = meas.[ENC_ID Overall Score Order]
 
 	)
 
@@ -534,7 +534,7 @@ OUTER APPLY
 
 ) huddleNote
 
-CREATE INDEX IDX_Base_Pop_OD_Scores ON #Base_Pop_OD_Scores (PAT_ENC_CSN_ID) 
+CREATE INDEX IDX_Base_Pop_OD_Scores ON #Base_Pop_OD_Scores (ENCOUNTER_ID) 
 
 /*SELECT * FROM #Base_Pop_OD_Scores WHERE [OD Score] > 2 */
 
@@ -542,7 +542,7 @@ CREATE INDEX IDX_Base_Pop_OD_Scores ON #Base_Pop_OD_Scores (PAT_ENC_CSN_ID)
 
 IF OBJECT_ID(N'tempdb..#SepsisAuditTemp') IS NOT NULL DROP TABLE #SepsisAuditTemp;
 
-SELECT od.PAT_ENC_CSN_ID, od.[CSN Overall Score Order], od.[OD Score Time], meas.FLO_MEAS_ID, meas.MEAS_VALUE, meas.RECORDED_TIME
+SELECT od.ENCOUNTER_ID, od.[ENC_ID Overall Score Order], od.[OD Score Time], meas.FLO_MEAS_ID, meas.MEAS_VALUE, meas.RECORDED_TIME
 
 	, DATEDIFF(n, od.[OD Score Time], meas.RECORDED_TIME) [Time since OD Score]
 
@@ -574,7 +574,7 @@ AND DATEDIFF(MINUTE, od.[OD Score Time], meas.RECORDED_TIME) BETWEEN -60 AND 180
 
 IF OBJECT_ID(N'tempdb..#FlwshtLstSepsisAudit') IS NOT NULL DROP TABLE #FlwshtLstSepsisAudit;
 
-SELECT bp.PAT_ENC_CSN_ID
+SELECT bp.ENCOUNTER_ID
 
 	, bp.[Documented Department ID]
 
@@ -646,7 +646,7 @@ SELECT bp.PAT_ENC_CSN_ID
 
 	, sepsisAudit.[Notification]
 
-	, bp.[CSN Overall Score Order]
+	, bp.[ENC_ID Overall Score Order]
 
 	, bp.[Unique Row]
 
@@ -658,9 +658,9 @@ OUTER APPLY
 
 (
 
-	SELECT bp.PAT_ENC_CSN_ID
+	SELECT bp.ENCOUNTER_ID
 
-		, bp.[CSN Overall Score Order]
+		, bp.[ENC_ID Overall Score Order]
 
 		, MAX(CASE WHEN a.FLO_MEAS_ID = '900101' THEN a.MEAS_VALUE END) AS "R Brachial Pulse"
 
@@ -724,7 +724,7 @@ OUTER APPLY
 
 		SELECT 
 
-			subMeas.PAT_ENC_CSN_ID
+			subMeas.ENCOUNTER_ID
 
 			, subMeas.FLO_MEAS_ID
 
@@ -732,17 +732,17 @@ OUTER APPLY
 
 			, subMeas.MEAS_VALUE
 
-			, ROW_NUMBER() OVER (PARTITION BY subMeas.PAT_ENC_CSN_ID, subMeas.[CSN Overall Score Order], subMeas.FLO_MEAS_ID ORDER BY subMeas.[ABS Time since OD Score]) rownumber
+			, ROW_NUMBER() OVER (PARTITION BY subMeas.ENCOUNTER_ID, subMeas.[ENC_ID Overall Score Order], subMeas.FLO_MEAS_ID ORDER BY subMeas.[ABS Time since OD Score]) rownumber
 
-			, subMeas.[CSN Overall Score Order]
+			, subMeas.[ENC_ID Overall Score Order]
 
 			, subMeas.[ABS Time since OD Score]
 
 		FROM #SepsisAuditTemp subMeas
 
-		WHERE subMeas.PAT_ENC_CSN_ID = bp.PAT_ENC_CSN_ID
+		WHERE subMeas.ENCOUNTER_ID = bp.ENCOUNTER_ID
 
-		AND subMeas.[CSN Overall Score Order] = bp.[CSN Overall Score Order]
+		AND subMeas.[ENC_ID Overall Score Order] = bp.[ENC_ID Overall Score Order]
 
 		AND subMeas.MEAS_VALUE IS NOT NULL
 
@@ -750,7 +750,7 @@ OUTER APPLY
 
 	WHERE a.rownumber = 1
 
-	GROUP BY PAT_ENC_CSN_ID, [CSN Overall Score Order]
+	GROUP BY ENCOUNTER_ID, [ENC_ID Overall Score Order]
 
 ) sepsisAudit
 
@@ -772,7 +772,7 @@ INSERT INTO [reporting].[IP_SepsisScreeningAudit]
 
 	(
 
-		[PatEncCSNID],
+		[PATENCENCID],
 
 		[ScoreDate],
 
@@ -872,7 +872,7 @@ INSERT INTO [reporting].[IP_SepsisScreeningAudit]
 
 SELECT  
 
-	main.PAT_ENC_CSN_ID [CSN]
+	main.ENCOUNTER_ID [ENC_ID]
 
 	, scores.[Score Day]
 
@@ -972,13 +972,13 @@ SELECT
 
 FROM #MainAdmDetails main  
 
-INNER JOIN #Base_Pop bp ON bp.PAT_ENC_CSN_ID = main.PAT_ENC_CSN_ID
+INNER JOIN #Base_Pop bp ON bp.ENCOUNTER_ID = main.ENCOUNTER_ID
 
-INNER JOIN #Base_Pop_OD_Scores scores ON scores.PAT_ENC_CSN_ID = main.PAT_ENC_CSN_ID AND scores.[CSN Order] = bp.[CSN Order]
+INNER JOIN #Base_Pop_OD_Scores scores ON scores.ENCOUNTER_ID = main.ENCOUNTER_ID AND scores.[ENC_ID Order] = bp.[ENC_ID Order]
 
 INNER JOIN reports.FY_DATE_DIMENSION fyDate ON fyDate.CALENDAR_DT = scores.[Score Day]
 
-LEFT OUTER JOIN #FlwshtLstSepsisAudit sepsisAudit ON sepsisAudit.PAT_ENC_CSN_ID = main.PAT_ENC_CSN_ID AND sepsisAudit.[CSN Overall Score Order] = scores.[CSN Overall Score Order]
+LEFT OUTER JOIN #FlwshtLstSepsisAudit sepsisAudit ON sepsisAudit.ENCOUNTER_ID = main.ENCOUNTER_ID AND sepsisAudit.[ENC_ID Overall Score Order] = scores.[ENC_ID Overall Score Order]
 
 OUTER APPLY
 
@@ -1000,7 +1000,7 @@ OUTER APPLY
 
 	WHERE
 
-		hno.PAT_ENC_CSN_ID = main.PAT_ENC_CSN_ID
+		hno.ENCOUNTER_ID = main.ENCOUNTER_ID
 
 		AND (hno.CRT_INST_LOCAL_DTTM BETWEEN scores.[OD Score Time] AND DATEADD(MI, 180, scores.[OD Score Time])) /*within one hour from OD SCORE*/
 
@@ -1010,5 +1010,5 @@ OUTER APPLY
 
 ) sepsisAlert
 
-ORDER BY main.PAT_ENC_CSN_ID, scores.[CSN Overall Score Order]
+ORDER BY main.ENCOUNTER_ID, scores.[ENC_ID Overall Score Order]
 

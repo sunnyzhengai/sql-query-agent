@@ -84,7 +84,7 @@ ELSE
 
 IF OBJECT_ID(N'tempdb..#MARActions') IS NOT NULL DROP TABLE #MARActions;
 
-	SELECT CAST(vcg.LIST_CAT_VALUE_C AS varchar) CAT_ID
+	SELECT CAST(vcg.LIST_CAT_VALUE_CODE AS varchar) CAT_ID
 
 	INTO #MARActions
 
@@ -98,7 +98,7 @@ CREATE INDEX IDX_MARActions ON #MARActions (CAT_ID)
 
 IF OBJECT_ID(N'tempdb..#RouteExclusions') IS NOT NULL DROP TABLE #RouteExclusions;
 
-	SELECT vcg.LIST_CAT_VALUE_C CAT_ID
+	SELECT vcg.LIST_CAT_VALUE_CODE CAT_ID
 
 	INTO #RouteExclusions
 
@@ -214,13 +214,13 @@ IF OBJECT_ID(N'tempdb..#MainAdmDetails') IS NOT NULL DROP TABLE #MainAdmDetails;
 
 SELECT DISTINCT
 
-	 PatEncCSNID PAT_ENC_CSN_ID
+	 PATENCENCID ENCOUNTER_ID
 
-	, PatID PAT_ID
+	, PatientID PATIENT_ID
 
-	, PatMRNID PAT_MRN_ID
+	, PATIENTMRN PATIENT_MRN
 
-	, PatName PAT_NAME
+	, PatientName PATIENT_NAME
 
 	, EthnicGroup [Ethnic Group]
 
@@ -256,7 +256,7 @@ INTO #MainAdmDetails
 
 FROM [reportingDB].[reporting].[IP_SepsisEncounters]
 
-CREATE INDEX IDX_Main ON #MainAdmDetails (PAT_ENC_CSN_ID)
+CREATE INDEX IDX_Main ON #MainAdmDetails (ENCOUNTER_ID)
 
 CREATE INDEX IDX_MainInpID ON #MainAdmDetails (INPATIENT_DATA_ID) 
 
@@ -272,7 +272,7 @@ Get record for every date the PATIENTS was in a department
 
 IF OBJECT_ID(N'tempdb..#Base_Pop') IS NOT NULL DROP TABLE #Base_Pop;
 
-SELECT pd.PatEncCSNID [PAT_ENC_CSN_ID]
+SELECT pd.PATENCENCID [ENCOUNTER_ID]
 
 	, CAST(pd.InDepartmentTime AS DATE) [In Dept Date]
 
@@ -288,7 +288,7 @@ SELECT pd.PatEncCSNID [PAT_ENC_CSN_ID]
 
 	, pd.ADTDepartmentName [ADT_DEPARTMENT_NAME]
 
-	, pd.PatID [PAT_ID]
+	, pd.PatientID [PATIENT_ID]
 
 	, pd.DepartmentRollup [DEPARTMENT_ROLLUP]
 
@@ -298,23 +298,23 @@ SELECT pd.PatEncCSNID [PAT_ENC_CSN_ID]
 
 	, pd.[AgeOnDateYears] [AGE_YEARS]
 
-	, pd.CSNOrder [CSN Order]
+	, pd.ENCORDER [ENC_ID Order]
 
-	, pd.CSNOverallOrder [CSN Overall Order]
+	, pd.ENCOVERALLORDER [ENC_ID Overall Order]
 
 	, pd.UnitOrder [Unit Order]
 
-	, CAST(pd.PatEncCSNID AS varchar(20)) + '-' + CAST(pd.CSNOrder AS VARCHAR(95)) [Unique Row]
+	, CAST(pd.PATENCENCID AS varchar(20)) + '-' + CAST(pd.ENCORDER AS VARCHAR(95)) [Unique Row]
 
 INTO #Base_Pop
 
 FROM [reportingDB].[reporting].[IP_SepsisPatientDates] pd
 
-INNER JOIN [reportingDB].[reporting].[IP_SepsisEncounters] enc ON enc.PatEncCSNID = pd.PatEncCSNID
+INNER JOIN [reportingDB].[reporting].[IP_SepsisEncounters] enc ON enc.PATENCENCID = pd.PATENCENCID
 
 WHERE pd.SepsisPatientDate BETWEEN @dStartDate AND @dEndDate
 
-CREATE INDEX IDX_Base_Pop ON #Base_Pop (PAT_ENC_CSN_ID) 
+CREATE INDEX IDX_Base_Pop ON #Base_Pop (ENCOUNTER_ID) 
 
 CREATE INDEX IDX_Base_PopInpIDOnly ON #Base_Pop (INPATIENT_DATA_ID) 
 
@@ -326,7 +326,7 @@ CREATE INDEX IDX_Base_PopDate ON #Base_Pop ([Sepsis Pt Date])
 
 IF OBJECT_ID(N'tempdb..#FlwshtLstEncounterWts') IS NOT NULL DROP TABLE #FlwshtLstEncounterWts;
 
-SELECT * , ROW_NUMBER() OVER(PARTITION BY PAT_ENC_CSN_ID ORDER BY [CSN Order], [Unit Order], RECORDED_TIME) AS [Weight Row]
+SELECT * , ROW_NUMBER() OVER(PARTITION BY ENCOUNTER_ID ORDER BY [ENC_ID Order], [Unit Order], RECORDED_TIME) AS [Weight Row]
 
 INTO #FlwshtLstEncounterWts
 
@@ -336,7 +336,7 @@ FROM
 
 	SELECT 
 
-		main.PAT_ENC_CSN_ID
+		main.ENCOUNTER_ID
 
 		, meas.FSD_ID
 
@@ -346,17 +346,17 @@ FROM
 
 		, meas.RECORDED_TIME
 
-		, main.[CSN Order]
+		, main.[ENC_ID Order]
 
 		, main.[Unit Order]
 
-		, main.[CSN Overall Order]
+		, main.[ENC_ID Overall Order]
 
 		, main.[Sepsis Pt Date]
 
 		, main.ADT_DEPARTMENT_ID
 
-		, ROW_NUMBER() OVER(PARTITION BY PAT_ENC_CSN_ID, [CSN Order], [Unit Order] ORDER BY [CSN Order], [Unit Order], RECORDED_TIME) AS [Unit Order Row]
+		, ROW_NUMBER() OVER(PARTITION BY ENCOUNTER_ID, [ENC_ID Order], [Unit Order] ORDER BY [ENC_ID Order], [Unit Order], RECORDED_TIME) AS [Unit Order Row]
 
 	FROM #Base_Pop main 
 
@@ -374,7 +374,7 @@ FROM
 
 WHERE a.[Unit Order Row] = 1
 
-CREATE INDEX IDX_FloEncWeight ON #FlwshtLstEncounterWts (PAT_ENC_CSN_ID) 
+CREATE INDEX IDX_FloEncWeight ON #FlwshtLstEncounterWts (ENCOUNTER_ID) 
 
 --/*SELECT * FROM #FlwshtLstEncounterWts */
 
@@ -384,13 +384,13 @@ CREATE INDEX IDX_FloEncWeight ON #FlwshtLstEncounterWts (PAT_ENC_CSN_ID)
 
 IF OBJECT_ID(N'tempdb..#Base_Pop_OD_Scores') IS NOT NULL DROP TABLE #Base_Pop_OD_Scores;
 
-SELECT main.PAT_ENC_CSN_ID
+SELECT main.ENCOUNTER_ID
 
-	, main.[CSN Order]
+	, main.[ENC_ID Order]
 
 	, main.[Unit Order]
 
-	, main.[CSN Overall Order]
+	, main.[ENC_ID Overall Order]
 
 	, CASE WHEN a.UniqueRow = main.[Unique Row] THEN 'Yes' ELSE 'No' END [+ OD Score in Dept]
 
@@ -408,7 +408,7 @@ OUTER APPLY
 
 	FROM [reportingDB].[reporting].[IP_SepsisScreeningAudit] aud
 
-	WHERE aud.PatEncCSNID = main.PAT_ENC_CSN_ID
+	WHERE aud.PATENCENCID = main.ENCOUNTER_ID
 
 	AND aud.PosODScore = 1
 
@@ -416,7 +416,7 @@ OUTER APPLY
 
 ) a
 
-CREATE INDEX IDX_Base_Pop_OD_Scores ON #Base_Pop_OD_Scores (PAT_ENC_CSN_ID) 
+CREATE INDEX IDX_Base_Pop_OD_Scores ON #Base_Pop_OD_Scores (ENCOUNTER_ID) 
 
 /*SELECT * FROM #Base_Pop_OD_Scores */
 
@@ -428,7 +428,7 @@ IF OBJECT_ID(N'tempdb..#FlwShtHypo') IS NOT NULL DROP TABLE #FlwShtHypo;
 
 Select
 
-	main.PAT_ENC_CSN_ID
+	main.ENCOUNTER_ID
 
 	, meas.FLO_MEAS_ID
 
@@ -442,7 +442,7 @@ Select
 
 	, main.[AGE_YEARS]
 
-	, main.[CSN Overall Order]
+	, main.[ENC_ID Overall Order]
 
 	, bpMeas.MEAS_VALUE [BP Percentile]
 
@@ -468,7 +468,7 @@ WHERE  ( dd.CALENDAR_DT = main.[Sepsis Pt Date]
 
 	AND meas.RECORDED_TIME BETWEEN main.In_DTTM AND main.Out_DTTM )
 
-CREATE INDEX IDX_FlwShtHypo ON #FlwShtHypo (PAT_ENC_CSN_ID, [CSN Overall Order])
+CREATE INDEX IDX_FlwShtHypo ON #FlwShtHypo (ENCOUNTER_ID, [ENC_ID Overall Order])
 
 /*SELECT * FROM #FlwShtHypo*/
 
@@ -478,7 +478,7 @@ IF OBJECT_ID(N'tempdb..#Hypotension') IS NOT NULL DROP TABLE #Hypotension;
 
 SELECT    
 
-	base.PAT_ENC_CSN_ID
+	base.ENCOUNTER_ID
 
 	, base.AGE_MONTHS
 
@@ -492,23 +492,23 @@ SELECT
 
 	, systolic.SYSTOLIC    
 
-	, base.[CSN Order]
+	, base.[ENC_ID Order]
 
 	, base.[Unit Order]
 
-	, base.[CSN Overall Order]
+	, base.[ENC_ID Overall Order]
 
 	, base.[Sepsis Pt Date]
 
 	, meas.[BP Percentile]
 
-	, ROW_NUMBER() OVER(PARTITION BY base.PAT_ENC_CSN_ID, base.[CSN Order], base.[Unit Order] ORDER BY base.[CSN Overall Order] ASC) AS TIME_LINE 
+	, ROW_NUMBER() OVER(PARTITION BY base.ENCOUNTER_ID, base.[ENC_ID Order], base.[Unit Order] ORDER BY base.[ENC_ID Overall Order] ASC) AS TIME_LINE 
 
 INTO #Hypotension 
 
 FROM #Base_Pop base 
 
-INNER JOIN #FlwShtHypo meas ON meas.PAT_ENC_CSN_ID = base.PAT_ENC_CSN_ID AND meas.[CSN Overall Order] = base.[CSN Overall Order] AND meas.[Sepsis Pt Date] = base.[Sepsis Pt Date]
+INNER JOIN #FlwShtHypo meas ON meas.ENCOUNTER_ID = base.ENCOUNTER_ID AND meas.[ENC_ID Overall Order] = base.[ENC_ID Overall Order] AND meas.[Sepsis Pt Date] = base.[Sepsis Pt Date]
 
 CROSS APPLY ( SELECT LEFT(meas.MEAS_VALUE, CHARINDEX('/', meas.MEAS_VALUE)-1) SYSTOLIC ) systolic 
 
@@ -560,9 +560,9 @@ hypo
 
 WHERE hypo.[Hypotension Value] IS NOT NULL -- Only show where PATIENTS is Hypotensive
 
-CREATE INDEX IDX_ODHYPO ON #Hypotension (PAT_ENC_CSN_ID) 
+CREATE INDEX IDX_ODHYPO ON #Hypotension (ENCOUNTER_ID) 
 
-/*SELECT * FROM #Hypotension ORDER BY [CSN Order], [CSN Overall Order], TIME_LINE */
+/*SELECT * FROM #Hypotension ORDER BY [ENC_ID Order], [ENC_ID Overall Order], TIME_LINE */
 
 /*****************************END OF HYPO*****************************/
 
@@ -576,7 +576,7 @@ IF OBJECT_ID(N'tempdb..#BasePopABX') IS NOT NULL DROP TABLE #BasePopABX;
 
 SELECT
 
-	om.PAT_ENC_CSN_ID
+	om.ENCOUNTER_ID
 
 	, base.ADT_DEPARTMENT_ID
 
@@ -594,19 +594,19 @@ SELECT
 
 	, base.[Sepsis Pt Date]
 
-	, base.[CSN Overall Order]
+	, base.[ENC_ID Overall Order]
 
-	, ROW_NUMBER() OVER(PARTITION BY om.PAT_ENC_CSN_ID, base.[Sepsis Pt Date] ORDER BY mar.TAKEN_TIME) TIME_LINE
+	, ROW_NUMBER() OVER(PARTITION BY om.ENCOUNTER_ID, base.[Sepsis Pt Date] ORDER BY mar.TAKEN_TIME) TIME_LINE
 
 INTO #BasePopABX
 
 FROM #Base_Pop base
 
-INNER JOIN [EMRDB].[dbo].[MEDICATION_ORDERS] om	ON om.PAT_ENC_CSN_ID = base.PAT_ENC_CSN_ID
+INNER JOIN [EMRDB].[dbo].[MEDICATION_ORDERS] om	ON om.ENCOUNTER_ID = base.ENCOUNTER_ID
 
-INNER JOIN [EMRDB].[dbo].[MEDICATIONS] med ON med.MEDICATION_ID = om.MEDICATION_ID AND med.THERA_CLASS_C = 11 /*Antibiotics*/
+INNER JOIN [EMRDB].[dbo].[MEDICATIONS] med ON med.MEDICATION_ID = om.MEDICATION_ID AND med.THERA_CLASS_CODE = 11 /*Antibiotics*/
 
-INNER JOIN [EMRDB].[dbo].MED_DETAILS_EXT med2 ON med2.MEDICATION_ID = med.MEDICATION_ID /*Developer C Adding to be able to exclude ADMIN_ROUTE_C instead of text*/
+INNER JOIN [EMRDB].[dbo].MED_DETAILS_EXT med2 ON med2.MEDICATION_ID = med.MEDICATION_ID /*Developer C Adding to be able to exclude ADMIN_ROUTE_CODE instead of text*/
 
 INNER JOIN [EMRDB].[dbo].[MED_ADMIN_RECORDS] mar ON mar.ORDER_MED_ID = om.ORDER_MED_ID
 
@@ -614,11 +614,11 @@ INNER JOIN [EMRDB].[dbo].[CALENDAR_DATES] dd ON dd.CALENDAR_DT = CAST(mar.TAKEN_
 
 WHERE mar.TAKEN_TIME IS NOT NULL /*ADMINISTERED ABX ONLY*/
 
-AND mar.MAR_ACTION_C IN ( SELECT CAT_ID FROM #MARActions WHERE CAT_ID <> '99')
+AND mar.MAR_ACTION_CODE IN ( SELECT CAT_ID FROM #MARActions WHERE CAT_ID <> '99')
 
 /*VALUES BELOW ADDED TO THE CODE ON STEPHANIE'S REQUEST DURING VALIDATION.*/
 
-AND med2.ADMIN_ROUTE_C NOT IN (SELECT * FROM #RouteExclusions)
+AND med2.ADMIN_ROUTE_CODE NOT IN (SELECT * FROM #RouteExclusions)
 
 AND (CAST(mar.TAKEN_TIME AS DATE) = base.[Sepsis Pt Date]
 
@@ -626,7 +626,7 @@ AND (CAST(mar.TAKEN_TIME AS DATE) = base.[Sepsis Pt Date]
 
 	)
 
-CREATE INDEX IDX_BasePopABX ON #BasePopABX (PAT_ENC_CSN_ID) 
+CREATE INDEX IDX_BasePopABX ON #BasePopABX (ENCOUNTER_ID) 
 
 /*SELECT * FROM #BasePopABX*/
 
@@ -640,7 +640,7 @@ IF OBJECT_ID(N'tempdb..#SSOrderSet') IS NOT NULL DROP TABLE #SSOrderSet;
 
 SELECT DISTINCT
 
-	base.PAT_ENC_CSN_ID
+	base.ENCOUNTER_ID
 
 	, base.ADT_DEPARTMENT_ID
 
@@ -652,19 +652,19 @@ SELECT DISTINCT
 
 	, om.ORDER_DTTM
 
-	, ROW_NUMBER() OVER(PARTITION BY base.PAT_ENC_CSN_ID, base.[Sepsis Pt Date] ORDER BY om.ORDER_DTTM ASC) AS TIME_LINE
+	, ROW_NUMBER() OVER(PARTITION BY base.ENCOUNTER_ID, base.[Sepsis Pt Date] ORDER BY om.ORDER_DTTM ASC) AS TIME_LINE
 
 	, om.PRL_ORDERSET_ID
 
 	, base.[Sepsis Pt Date]
 
-	, base.[CSN Overall Order]
+	, base.[ENC_ID Overall Order]
 
 INTO #SSOrderSet 
 
 FROM #Base_Pop base
 
-INNER JOIN [EMRDB].[dbo].ORDER_TRACKING_METRICS om ON om.PAT_ENC_CSN_ID = base.PAT_ENC_CSN_ID
+INNER JOIN [EMRDB].[dbo].ORDER_TRACKING_METRICS om ON om.ENCOUNTER_ID = base.ENCOUNTER_ID
 
 INNER JOIN [EMRDB].[dbo].[CALENDAR_DATES] dd ON dd.CALENDAR_DT = CAST(om.ORDER_DTTM AS Date)
 
@@ -676,7 +676,7 @@ AND (CAST(om.ORDER_DTTM AS DATE) = base.[Sepsis Pt Date]
 
 	)
 
-CREATE INDEX IDX_SSOrderSet ON #SSOrderSet (PAT_ENC_CSN_ID) 
+CREATE INDEX IDX_SSOrderSet ON #SSOrderSet (ENCOUNTER_ID) 
 
 /*SELECT * FROM #SSOrderSet*/
 
@@ -688,7 +688,7 @@ IF OBJECT_ID(N'tempdb..#BasePopBolus') IS NOT NULL DROP TABLE #BasePopBolus;
 
 SELECT
 
-	base.PAT_ENC_CSN_ID
+	base.ENCOUNTER_ID
 
 	, base.ADT_DEPARTMENT_ID
 
@@ -702,19 +702,19 @@ SELECT
 
 	, med.NAME AS Medication
 
-	, ROW_NUMBER() OVER(PARTITION BY base.PAT_ENC_CSN_ID, base.[Sepsis Pt Date] ORDER BY mar.TAKEN_TIME ASC) TIME_LINE
+	, ROW_NUMBER() OVER(PARTITION BY base.ENCOUNTER_ID, base.[Sepsis Pt Date] ORDER BY mar.TAKEN_TIME ASC) TIME_LINE
 
 	, mar.SIG AS BOLUS_VOLUME
 
 	, base.[Sepsis Pt Date]
 
-	, base.[CSN Overall Order]
+	, base.[ENC_ID Overall Order]
 
 INTO #BasePopBolus 
 
 FROM #Base_Pop base
 
-INNER JOIN [EMRDB].[dbo].[MEDICATION_ORDERS] om ON om.PAT_ENC_CSN_ID = base.PAT_ENC_CSN_ID
+INNER JOIN [EMRDB].[dbo].[MEDICATION_ORDERS] om ON om.ENCOUNTER_ID = base.ENCOUNTER_ID
 
 INNER JOIN [EMRDB].[dbo].[MEDICATIONS] med ON med.MEDICATION_ID = om.MEDICATION_ID
 
@@ -734,7 +734,7 @@ AND om.HV_DISCR_FREQ_ID = '300902') /*FREQUENCY = ONCE*/
 
 /*Developer C VCG Grouper 1222252*/
 
-AND mar.MAR_ACTION_C IN ( SELECT CAT_ID FROM #MARActions WHERE CAT_ID <> '99')
+AND mar.MAR_ACTION_CODE IN ( SELECT CAT_ID FROM #MARActions WHERE CAT_ID <> '99')
 
 AND CONVERT(NUMERIC, mar.SIG ) > 95.0
 
@@ -744,7 +744,7 @@ AND (CAST(mar.TAKEN_TIME AS DATE) = base.[Sepsis Pt Date]
 
 	)
 
-CREATE INDEX IDX_BasePopBolus ON #BasePopBolus (PAT_ENC_CSN_ID) 
+CREATE INDEX IDX_BasePopBolus ON #BasePopBolus (ENCOUNTER_ID) 
 
 /*SELECT * FROM #BasePopBolus*/
 
@@ -756,7 +756,7 @@ IF OBJECT_ID(N'tempdb..#Pressors') IS NOT NULL DROP TABLE #Pressors;
 
 SELECT DISTINCT
 
-	base.PAT_ENC_CSN_ID
+	base.ENCOUNTER_ID
 
 	, base.ADT_DEPARTMENT_ID
 
@@ -772,7 +772,7 @@ SELECT DISTINCT
 
 	, cm.NAME AS MEDICATION
 
-	, ROW_NUMBER() OVER(PARTITION BY base.PAT_ENC_CSN_ID, base.[Sepsis Pt Date] ORDER BY mar.TAKEN_TIME) AS TIME_LINE
+	, ROW_NUMBER() OVER(PARTITION BY base.ENCOUNTER_ID, base.[Sepsis Pt Date] ORDER BY mar.TAKEN_TIME) AS TIME_LINE
 
 	, base.[Sepsis Pt Date]
 
@@ -780,7 +780,7 @@ INTO #Pressors
 
 FROM #Base_Pop base
 
-LEFT JOIN [EMRDB].[dbo].[MEDICATION_ORDERS] om ON om.PAT_ENC_CSN_ID = base.PAT_ENC_CSN_ID
+LEFT JOIN [EMRDB].[dbo].[MEDICATION_ORDERS] om ON om.ENCOUNTER_ID = base.ENCOUNTER_ID
 
 LEFT JOIN [EMRDB].[dbo].[MEDICATIONS] cm ON cm.MEDICATION_ID = om.MEDICATION_ID
 
@@ -790,15 +790,15 @@ LEFT JOIN [EMRDB].[dbo].[MED_ADMIN_RECORDS] mar ON mar.ORDER_MED_ID = om.ORDER_M
 
 LEFT JOIN [EMRDB].[dbo].[CALENDAR_DATES] dd ON dd.CALENDAR_DT = CAST(mar.TAKEN_TIME AS DATE)
 
-LEFT JOIN [EMRDB].[dbo].[HOSPITAL_ENCOUNTERS] peh ON peh.PAT_ENC_CSN_ID = base.PAT_ENC_CSN_ID
+LEFT JOIN [EMRDB].[dbo].[HOSPITAL_ENCOUNTERS] peh ON peh.ENCOUNTER_ID = base.ENCOUNTER_ID
 
 WHERE
 
 gmr.GROUPER_ID IN (SELECT * FROM #MedGroupers)
 
-AND mar.MAR_ACTION_C IN ( SELECT CAT_ID FROM #MARActions WHERE CAT_ID <> '99')
+AND mar.MAR_ACTION_CODE IN ( SELECT CAT_ID FROM #MARActions WHERE CAT_ID <> '99')
 
-AND mar.ROUTE_C = 11 /*INTRAVENOUS*/
+AND mar.ROUTE_CODE = 11 /*INTRAVENOUS*/
 
 AND (CAST(mar.TAKEN_TIME AS DATE) = base.[Sepsis Pt Date]
 
@@ -806,7 +806,7 @@ AND (CAST(mar.TAKEN_TIME AS DATE) = base.[Sepsis Pt Date]
 
 	)
 
-CREATE INDEX IDX_Pressors ON #Pressors (PAT_ENC_CSN_ID) 
+CREATE INDEX IDX_Pressors ON #Pressors (ENCOUNTER_ID) 
 
 /*SELECT * FROM #Pressors*/
 
@@ -814,7 +814,7 @@ CREATE INDEX IDX_Pressors ON #Pressors (PAT_ENC_CSN_ID)
 
 IF OBJECT_ID(N'tempdb..#ODPressorSummary') IS NOT NULL DROP TABLE #ODPressorSummary;
 
-SELECT p.PAT_ENC_CSN_ID
+SELECT p.ENCOUNTER_ID
 
 	, p.[Sepsis Pt Date] [Sepsis_Date]
 
@@ -836,9 +836,9 @@ INTO #ODPressorSummary
 
 FROM #Pressors p
 
-GROUP BY p.PAT_ENC_CSN_ID, p.GROUPER_ID, p.[Sepsis Pt Date]
+GROUP BY p.ENCOUNTER_ID, p.GROUPER_ID, p.[Sepsis Pt Date]
 
-CREATE INDEX IDX_ODPressorSummary ON #ODPressorSummary (PAT_ENC_CSN_ID) 
+CREATE INDEX IDX_ODPressorSummary ON #ODPressorSummary (ENCOUNTER_ID) 
 
 /*SELECT * FROM #ODPressorSummary*/
 
@@ -846,7 +846,7 @@ CREATE INDEX IDX_ODPressorSummary ON #ODPressorSummary (PAT_ENC_CSN_ID)
 
 IF OBJECT_ID ('TEMPDB..#ODPressorPivot') IS NOT NULL DROP TABLE #ODPressorPivot
 
-SELECT PAT_ENC_CSN_ID
+SELECT ENCOUNTER_ID
 
 	, Sepsis_Date
 
@@ -868,7 +868,7 @@ PIVOT( MAX(myc)
 
 FOR PRESSOR IN ([EPINEPHRINE],[DOPAMINE],[DOBUTAMINE],[MILRINONE],[NOREPINEPHRINE])) AS pvt
 
-CREATE INDEX IDX_ODPressorPivot ON #ODPressorPivot (PAT_ENC_CSN_ID) 
+CREATE INDEX IDX_ODPressorPivot ON #ODPressorPivot (ENCOUNTER_ID) 
 
 /*SELECT * FROM #ODPressorPivot*/
 
@@ -880,7 +880,7 @@ IF OBJECT_ID(N'tempdb..#LacticAcid') IS NOT NULL DROP TABLE #LacticAcid;
 
 SELECT
 
-	base.PAT_ENC_CSN_ID
+	base.ENCOUNTER_ID
 
 	, base.ADT_DEPARTMENT_ID
 
@@ -900,17 +900,17 @@ SELECT
 
 	, ordR.ORD_VALUE
 
-	, ROW_NUMBER() OVER(PARTITION BY base.PAT_ENC_CSN_ID, base.[Sepsis Pt Date] ORDER BY op.ORDER_TIME, base.IN_DTTM, ordR.RESULT_TIME ASC) AS TIME_LINE -- Developer C added Result time
+	, ROW_NUMBER() OVER(PARTITION BY base.ENCOUNTER_ID, base.[Sepsis Pt Date] ORDER BY op.ORDER_TIME, base.IN_DTTM, ordR.RESULT_TIME ASC) AS TIME_LINE -- Developer C added Result time
 
 	, base.[Sepsis Pt Date]
 
-	, base.[CSN Overall Order]
+	, base.[ENC_ID Overall Order]
 
 INTO #LacticAcid
 
 FROM #Base_Pop base
 
-INNER JOIN [EMRDB].[dbo].[LAB_ORDER_RESULTS] ordR ON ordR.PAT_ENC_CSN_ID = base.PAT_ENC_CSN_ID
+INNER JOIN [EMRDB].[dbo].[LAB_ORDER_RESULTS] ordR ON ordR.ENCOUNTER_ID = base.ENCOUNTER_ID
 
 INNER JOIN [EMRDB].[dbo].[PROCEDURE_ORDERS] op ON op.ORDER_PROC_ID = ordR.ORDER_PROC_ID
 
@@ -924,7 +924,7 @@ AND (CAST(op.ORDER_TIME AS DATE) = base.[Sepsis Pt Date]
 
 	)
 
-CREATE INDEX IDX_LacticAcid ON #LacticAcid (PAT_ENC_CSN_ID) 
+CREATE INDEX IDX_LacticAcid ON #LacticAcid (ENCOUNTER_ID) 
 
 /*SELECT * FROM #LacticAcid */
 
@@ -936,7 +936,7 @@ IF OBJECT_ID(N'tempdb..#Procalcitonin') IS NOT NULL DROP TABLE #Procalcitonin;
 
 SELECT
 
-	base.PAT_ENC_CSN_ID
+	base.ENCOUNTER_ID
 
 	, base.ADT_DEPARTMENT_ID
 
@@ -954,19 +954,19 @@ SELECT
 
 	, ordR.ORD_VALUE
 
-	, ROW_NUMBER() OVER(PARTITION BY base.PAT_ENC_CSN_ID, base.[Sepsis Pt Date] ORDER BY op.ORDER_TIME ASC) AS TIME_LINE
+	, ROW_NUMBER() OVER(PARTITION BY base.ENCOUNTER_ID, base.[Sepsis Pt Date] ORDER BY op.ORDER_TIME ASC) AS TIME_LINE
 
 	, ordR.ORDER_PROC_ID
 
 	, base.[Sepsis Pt Date]
 
-	, base.[CSN Overall Order]
+	, base.[ENC_ID Overall Order]
 
 INTO #Procalcitonin
 
 FROM  #Base_Pop base
 
-INNER JOIN [EMRDB].[dbo].[LAB_ORDER_RESULTS] ordR ON ordR.PAT_ENC_CSN_ID = base.PAT_ENC_CSN_ID
+INNER JOIN [EMRDB].[dbo].[LAB_ORDER_RESULTS] ordR ON ordR.ENCOUNTER_ID = base.ENCOUNTER_ID
 
 INNER JOIN [EMRDB].[dbo].[PROCEDURE_ORDERS] op ON op.ORDER_PROC_ID = ordR.ORDER_PROC_ID
 
@@ -980,7 +980,7 @@ AND (CAST(op.ORDER_TIME AS DATE) = base.[Sepsis Pt Date]
 
 	)
 
-CREATE INDEX IDX_Procalcitonin ON #Procalcitonin (PAT_ENC_CSN_ID) 
+CREATE INDEX IDX_Procalcitonin ON #Procalcitonin (ENCOUNTER_ID) 
 
 /*SELECT * FROM #Procalcitonin*/
 
@@ -992,7 +992,7 @@ CREATE INDEX IDX_Procalcitonin ON #Procalcitonin (PAT_ENC_CSN_ID)
 
 IF OBJECT_ID(N'tempdb..#BloodCultureValue') IS NOT NULL DROP TABLE #BloodCultureValue;
 
-SELECT base.PAT_ENC_CSN_ID
+SELECT base.ENCOUNTER_ID
 
 	, base.ADT_DEPARTMENT_ID
 
@@ -1016,17 +1016,17 @@ SELECT base.PAT_ENC_CSN_ID
 
 	, CASE WHEN res.ORD_VALUE LIKE '%No growth%' THEN 'Negative' ELSE 'Positive' END [Order Result]
 
-	, ROW_NUMBER() OVER(PARTITION BY base.PAT_ENC_CSN_ID, base.[Sepsis Pt Date] ORDER BY op.ORDER_TIME, res.RESULT_TIME ASC) AS TIME_LINE
+	, ROW_NUMBER() OVER(PARTITION BY base.ENCOUNTER_ID, base.[Sepsis Pt Date] ORDER BY op.ORDER_TIME, res.RESULT_TIME ASC) AS TIME_LINE
 
 	, base.[Sepsis Pt Date]
 
-	, base.[CSN Overall Order]
+	, base.[ENC_ID Overall Order]
 
 INTO #BloodCultureValue 
 
 FROM #Base_Pop base
 
-INNER JOIN [EMRDB].[dbo].[LAB_ORDER_RESULTS] res ON base.PAT_ENC_CSN_ID = res.PAT_ENC_CSN_ID
+INNER JOIN [EMRDB].[dbo].[LAB_ORDER_RESULTS] res ON base.ENCOUNTER_ID = res.ENCOUNTER_ID
 
 INNER JOIN [EMRDB].[dbo].[PROCEDURE_ORDERS] op  ON res.ORDER_PROC_ID = op.ORDER_PROC_ID 
 
@@ -1042,7 +1042,7 @@ WHERE (CAST(op.ORDER_TIME AS DATE) = base.[Sepsis Pt Date]
 
 	)
 
-CREATE INDEX IDX_BloodCultureValue ON #BloodCultureValue (PAT_ENC_CSN_ID) 
+CREATE INDEX IDX_BloodCultureValue ON #BloodCultureValue (ENCOUNTER_ID) 
 
 /*SELECT * FROM #BloodCultureValue*/
 
@@ -1054,7 +1054,7 @@ IF OBJECT_ID(N'tempdb..#CSF') IS NOT NULL DROP TABLE #CSF;
 
 SELECT
 
-	base.PAT_ENC_CSN_ID
+	base.ENCOUNTER_ID
 
 	, base.ADT_DEPARTMENT_ID
 
@@ -1076,21 +1076,21 @@ SELECT
 
 	, res.ORD_VALUE
 
-	, ROW_NUMBER() OVER(PARTITION BY base.PAT_ENC_CSN_ID, base.[Sepsis Pt Date] ORDER BY op.ORDER_TIME ASC) AS TIME_LINE
+	, ROW_NUMBER() OVER(PARTITION BY base.ENCOUNTER_ID, base.[Sepsis Pt Date] ORDER BY op.ORDER_TIME ASC) AS TIME_LINE
 
 	, base.[Sepsis Pt Date]
 
-	, base.[CSN Overall Order]
+	, base.[ENC_ID Overall Order]
 
 INTO #CSF 
 
 FROM #Base_Pop base
 
-INNER JOIN [EMRDB].[dbo].[LAB_ORDER_RESULTS] res ON base.PAT_ENC_CSN_ID = res.PAT_ENC_CSN_ID
+INNER JOIN [EMRDB].[dbo].[LAB_ORDER_RESULTS] res ON base.ENCOUNTER_ID = res.ENCOUNTER_ID
 
 INNER JOIN [EMRDB].[dbo].[PROCEDURE_ORDERS] op  ON res.ORDER_PROC_ID = op.ORDER_PROC_ID
 
-			AND PROC_ID IN (600005, 600006) AND op.SPECIMEN_SOURCE_C = 304
+			AND PROC_ID IN (600005, 600006) AND op.SPECIMEN_SOURCE_CODE = 304
 
 INNER JOIN [EMRDB].[dbo].[CALENDAR_DATES] dd ON dd.CALENDAR_DT = CAST(op.ORDER_TIME AS DATE)
 
@@ -1102,7 +1102,7 @@ WHERE (CAST(op.ORDER_TIME AS DATE) = base.[Sepsis Pt Date]
 
 	)
 
-CREATE INDEX IDX_CSF ON #CSF (PAT_ENC_CSN_ID) 
+CREATE INDEX IDX_CSF ON #CSF (ENCOUNTER_ID) 
 
 /*SELECT * FROM #CSF*/
 
@@ -1112,7 +1112,7 @@ CREATE INDEX IDX_CSF ON #CSF (PAT_ENC_CSN_ID)
 
 IF OBJECT_ID(N'tempdb..#ETT') IS NOT NULL DROP TABLE #ETT;
 
-SELECT base.PAT_ENC_CSN_ID
+SELECT base.ENCOUNTER_ID
 
 	, base.ADT_DEPARTMENT_ID
 
@@ -1126,17 +1126,17 @@ SELECT base.PAT_ENC_CSN_ID
 
 	, lda.PLACEMENT_INSTANT
 
-	, ROW_NUMBER() OVER(PARTITION BY base.PAT_ENC_CSN_ID, base.[Sepsis Pt Date] ORDER BY lda.PLACEMENT_INSTANT) TIME_LINE
+	, ROW_NUMBER() OVER(PARTITION BY base.ENCOUNTER_ID, base.[Sepsis Pt Date] ORDER BY lda.PLACEMENT_INSTANT) TIME_LINE
 
 	, base.[Sepsis Pt Date]
 
-	, base.[CSN Overall Order]
+	, base.[ENC_ID Overall Order]
 
 INTO #ETT
 
 FROM #Base_Pop base
 
-INNER JOIN [EMRDB].[dbo].[LINE_DEVICE_AIRWAY] lda ON lda.PAT_ENC_CSN_ID = base.PAT_ENC_CSN_ID AND lda.FLO_MEAS_ID = '900112' AND lda.PLACEMENT_INSTANT IS NOT NULL
+INNER JOIN [EMRDB].[dbo].[LINE_DEVICE_AIRWAY] lda ON lda.ENCOUNTER_ID = base.ENCOUNTER_ID AND lda.FLO_MEAS_ID = '900112' AND lda.PLACEMENT_INSTANT IS NOT NULL
 
 INNER JOIN [EMRDB].[dbo].[CALENDAR_DATES] dd ON dd.CALENDAR_DT = CAST(lda.PLACEMENT_INSTANT AS DATE)
 
@@ -1146,7 +1146,7 @@ WHERE (CAST(lda.PLACEMENT_INSTANT AS DATE) = base.[Sepsis Pt Date]
 
 	)
 
-CREATE INDEX IDX_ETT ON #ETT (PAT_ENC_CSN_ID) 
+CREATE INDEX IDX_ETT ON #ETT (ENCOUNTER_ID) 
 
 /*SELECT * FROM #ETT WHERE TIME_LINE = 1*/
 
@@ -1156,7 +1156,7 @@ CREATE INDEX IDX_ETT ON #ETT (PAT_ENC_CSN_ID)
 
 IF OBJECT_ID(N'tempdb..#PIV') IS NOT NULL DROP TABLE #PIV;
 
-SELECT base.PAT_ENC_CSN_ID
+SELECT base.ENCOUNTER_ID
 
 	, base.ADT_DEPARTMENT_ID
 
@@ -1170,17 +1170,17 @@ SELECT base.PAT_ENC_CSN_ID
 
 	, lda.PLACEMENT_INSTANT
 
-	, ROW_NUMBER() OVER(PARTITION BY base.PAT_ENC_CSN_ID, base.[Sepsis Pt Date] ORDER BY lda.PLACEMENT_INSTANT) TIME_LINE
+	, ROW_NUMBER() OVER(PARTITION BY base.ENCOUNTER_ID, base.[Sepsis Pt Date] ORDER BY lda.PLACEMENT_INSTANT) TIME_LINE
 
 	, base.[Sepsis Pt Date]
 
-	, base.[CSN Overall Order]
+	, base.[ENC_ID Overall Order]
 
 INTO #PIV
 
 FROM #Base_Pop base
 
-INNER JOIN [EMRDB].[dbo].[LINE_DEVICE_AIRWAY] lda ON lda.PAT_ENC_CSN_ID = base.PAT_ENC_CSN_ID AND lda.FLO_MEAS_ID='900111' AND lda.PLACEMENT_INSTANT IS NOT NULL
+INNER JOIN [EMRDB].[dbo].[LINE_DEVICE_AIRWAY] lda ON lda.ENCOUNTER_ID = base.ENCOUNTER_ID AND lda.FLO_MEAS_ID='900111' AND lda.PLACEMENT_INSTANT IS NOT NULL
 
 INNER JOIN [EMRDB].[dbo].[CALENDAR_DATES] dd ON dd.CALENDAR_DT = CAST(lda.PLACEMENT_INSTANT AS DATE)
 
@@ -1190,7 +1190,7 @@ WHERE (CAST(lda.PLACEMENT_INSTANT AS DATE) = base.[Sepsis Pt Date]
 
 	)
 
-CREATE INDEX IDX_PIV ON #PIV (PAT_ENC_CSN_ID) 
+CREATE INDEX IDX_PIV ON #PIV (ENCOUNTER_ID) 
 
 /*SELECT * FROM #PIV WHERE TIME_LINE = 1*/
 
@@ -1200,11 +1200,11 @@ CREATE INDEX IDX_PIV ON #PIV (PAT_ENC_CSN_ID)
 
 IF OBJECT_ID(N'tempdb..#CVVH') IS NOT NULL DROP TABLE #CVVH;
 
-SELECT base.PAT_ENC_CSN_ID
+SELECT base.ENCOUNTER_ID
 
-	, CASE WHEN COUNT(meas.RECORDED_TIME) > 0 THEN 'Y' ELSE 'N' END AS CVVH_YN
+	, CASE WHEN COUNT(meas.RECORDED_TIME) > 0 THEN 'Y' ELSE 'N' END AS CVVH_FLAG
 
-	, base.[CSN Overall Order]
+	, base.[ENC_ID Overall Order]
 
 	, base.[Sepsis Pt Date]
 
@@ -1224,9 +1224,9 @@ WHERE (dd.CALENDAR_DT = base.[Sepsis Pt Date]
 
 	)
 
-GROUP BY base.PAT_ENC_CSN_ID, base.[CSN Overall Order], base.[Sepsis Pt Date]
+GROUP BY base.ENCOUNTER_ID, base.[ENC_ID Overall Order], base.[Sepsis Pt Date]
 
-CREATE INDEX IDX_CVVH ON #CVVH (PAT_ENC_CSN_ID) 
+CREATE INDEX IDX_CVVH ON #CVVH (ENCOUNTER_ID) 
 
 /*SELECT * FROM #CVVH*/
 
@@ -1238,11 +1238,11 @@ CREATE INDEX IDX_CVVH ON #CVVH (PAT_ENC_CSN_ID)
 
 IF OBJECT_ID(N'tempdb..#OX') IS NOT NULL DROP TABLE #OX;
 
-SELECT base.PAT_ENC_CSN_ID
+SELECT base.ENCOUNTER_ID
 
-	, CASE WHEN COUNT(meas.RECORDED_TIME)>0 THEN 'Y' ELSE 'N' END AS OX_YN
+	, CASE WHEN COUNT(meas.RECORDED_TIME)>0 THEN 'Y' ELSE 'N' END AS OX_FLAG
 
-	, base.[CSN Overall Order]
+	, base.[ENC_ID Overall Order]
 
 	, base.[Sepsis Pt Date]
 
@@ -1266,9 +1266,9 @@ WHERE (dd.CALENDAR_DT = base.[Sepsis Pt Date]
 
 	)
 
-GROUP BY base.PAT_ENC_CSN_ID, base.[CSN Overall Order], base.[Sepsis Pt Date]
+GROUP BY base.ENCOUNTER_ID, base.[ENC_ID Overall Order], base.[Sepsis Pt Date]
 
-CREATE INDEX IDX_OX ON #OX (PAT_ENC_CSN_ID) 
+CREATE INDEX IDX_OX ON #OX (ENCOUNTER_ID) 
 
 /*SELECT * FROM #OX*/
 
@@ -1280,11 +1280,11 @@ CREATE INDEX IDX_OX ON #OX (PAT_ENC_CSN_ID)
 
 IF OBJECT_ID(N'tempdb..#ECMO') IS NOT NULL DROP TABLE #ECMO;
 
-SELECT base.PAT_ENC_CSN_ID
+SELECT base.ENCOUNTER_ID
 
-	, CASE WHEN COUNT(meas.RECORDED_TIME) > 0 THEN 'Y' ELSE 'N' END AS ECMO_YN
+	, CASE WHEN COUNT(meas.RECORDED_TIME) > 0 THEN 'Y' ELSE 'N' END AS ECMO_FLAG
 
-	, base.[CSN Overall Order]
+	, base.[ENC_ID Overall Order]
 
 	, base.[Sepsis Pt Date]
 
@@ -1306,9 +1306,9 @@ WHERE (dd.CALENDAR_DT = base.[Sepsis Pt Date]
 
 	)
 
-GROUP BY base.PAT_ENC_CSN_ID, base.[CSN Overall Order], base.[Sepsis Pt Date]
+GROUP BY base.ENCOUNTER_ID, base.[ENC_ID Overall Order], base.[Sepsis Pt Date]
 
-CREATE INDEX IDX_ECMO ON #ECMO (PAT_ENC_CSN_ID) 
+CREATE INDEX IDX_ECMO ON #ECMO (ENCOUNTER_ID) 
 
 /*SELECT * FROM #ECMO*/
 
@@ -1320,7 +1320,7 @@ CREATE INDEX IDX_ECMO ON #ECMO (PAT_ENC_CSN_ID)
 
 INSERT INTO [reporting].[IP_SepsisDetails]
 
-	( [PatEncCSNID],
+	( [PATENCENCID],
 
 	[SepsisDate],
 
@@ -1394,11 +1394,11 @@ INSERT INTO [reporting].[IP_SepsisDetails]
 
 	[IPSOSevereSepsisYN],
 
-	[CSNOrder],
+	[ENCORDER],
 
 	[UnitOrder],
 
-	[CSNOverallOrder],
+	[ENCOVERALLORDER],
 
 	[UniqueRow],
 
@@ -1406,7 +1406,7 @@ INSERT INTO [reporting].[IP_SepsisDetails]
 
 	)
 
-SELECT main.PAT_ENC_CSN_ID [CSN]
+SELECT main.ENCOUNTER_ID [ENC_ID]
 
 	, bp.[Sepsis Pt Date] [Sepsis PATIENTS Date]
 
@@ -1486,65 +1486,65 @@ SELECT main.PAT_ENC_CSN_ID [CSN]
 
 				pressor.NOREPINEPHRINE IS NOT NULL) THEN 'Y'END AS [PRESSOR Y/N]
 
-	, cvvh.CVVH_YN AS [CVVH Y/N]
+	, cvvh.CVVH_FLAG AS [CVVH Y/N]
 
-	, ox.OX_YN AS [OX Y/N]
+	, ox.OX_FLAG AS [OX Y/N]
 
-	, ecmo.ECMO_YN AS [ECMO Y/N]
+	, ecmo.ECMO_FLAG AS [ECMO Y/N]
 
 
 
-	, CASE WHEN IPSO.PAT_ENC_CSN_ID IS NULL THEN 'N' ELSE 'Y' END SEVERE_SEPSIS_STAGING
+	, CASE WHEN IPSO.ENCOUNTER_ID IS NULL THEN 'N' ELSE 'Y' END SEVERE_SEPSIS_STAGING
 
-	, bp.[CSN Order]
+	, bp.[ENC_ID Order]
 
 	, bp.[Unit Order]
 
-	, bp.[CSN Overall Order]
+	, bp.[ENC_ID Overall Order]
 
-	, CAST(bp.PAT_ENC_CSN_ID AS varchar(20)) + '-' + CAST(bp.[CSN Order] AS VARCHAR(95)) [Unique Row]
+	, CAST(bp.ENCOUNTER_ID AS varchar(20)) + '-' + CAST(bp.[ENC_ID Order] AS VARCHAR(95)) [Unique Row]
 
 	, GETDATE()
 
 FROM #Base_Pop bp -- reportingDB.reporting.IP_SepsisPatientDates pd
 
-INNER JOIN #MainAdmDetails main ON main.PAT_ENC_CSN_ID = bp.PAT_ENC_CSN_ID
+INNER JOIN #MainAdmDetails main ON main.ENCOUNTER_ID = bp.ENCOUNTER_ID
 
-INNER JOIN #Base_Pop_OD_Scores scores ON scores.PAT_ENC_CSN_ID = bp.PAT_ENC_CSN_ID AND scores.[CSN Overall Order] = bp.[CSN Overall Order]
+INNER JOIN #Base_Pop_OD_Scores scores ON scores.ENCOUNTER_ID = bp.ENCOUNTER_ID AND scores.[ENC_ID Overall Order] = bp.[ENC_ID Overall Order]
 
 INNER JOIN reports.FY_DATE_DIMENSION fyDate ON fyDate.CALENDAR_DT = bp.[Sepsis Pt Date]
 
-LEFT OUTER JOIN #FlwshtLstEncounterWts wght ON wght.PAT_ENC_CSN_ID = bp.PAT_ENC_CSN_ID AND wght.[CSN Overall Order] = bp.[CSN Overall Order] AND wght.[Unit Order] = 1
+LEFT OUTER JOIN #FlwshtLstEncounterWts wght ON wght.ENCOUNTER_ID = bp.ENCOUNTER_ID AND wght.[ENC_ID Overall Order] = bp.[ENC_ID Overall Order] AND wght.[Unit Order] = 1
 
-LEFT OUTER JOIN #Hypotension hypo ON hypo.PAT_ENC_CSN_ID = bp.PAT_ENC_CSN_ID AND hypo.[CSN Overall Order] = bp.[CSN Overall Order] AND hypo.TIME_LINE = 1
+LEFT OUTER JOIN #Hypotension hypo ON hypo.ENCOUNTER_ID = bp.ENCOUNTER_ID AND hypo.[ENC_ID Overall Order] = bp.[ENC_ID Overall Order] AND hypo.TIME_LINE = 1
 
-LEFT OUTER JOIN #BasePopABX abx ON abx.PAT_ENC_CSN_ID = bp.PAT_ENC_CSN_ID AND abx.[CSN Overall Order] = bp.[CSN Overall Order] AND abx.TIME_LINE = 1
+LEFT OUTER JOIN #BasePopABX abx ON abx.ENCOUNTER_ID = bp.ENCOUNTER_ID AND abx.[ENC_ID Overall Order] = bp.[ENC_ID Overall Order] AND abx.TIME_LINE = 1
 
-LEFT OUTER JOIN #BasePopBolus bol ON bol.PAT_ENC_CSN_ID = bp.PAT_ENC_CSN_ID AND bol.[CSN Overall Order] = bp.[CSN Overall Order] AND bol.TIME_LINE = 1
+LEFT OUTER JOIN #BasePopBolus bol ON bol.ENCOUNTER_ID = bp.ENCOUNTER_ID AND bol.[ENC_ID Overall Order] = bp.[ENC_ID Overall Order] AND bol.TIME_LINE = 1
 
-LEFT OUTER JOIN #LacticAcid la ON la.PAT_ENC_CSN_ID = bp.PAT_ENC_CSN_ID AND la.[CSN Overall Order] = bp.[CSN Overall Order] AND la.TIME_LINE = 1
+LEFT OUTER JOIN #LacticAcid la ON la.ENCOUNTER_ID = bp.ENCOUNTER_ID AND la.[ENC_ID Overall Order] = bp.[ENC_ID Overall Order] AND la.TIME_LINE = 1
 
-LEFT OUTER JOIN #SSOrderSet ordSet ON ordSet.PAT_ENC_CSN_ID = bp.PAT_ENC_CSN_ID AND ordSet.[CSN Overall Order] = bp.[CSN Overall Order] AND ordSet.TIME_LINE = 1
+LEFT OUTER JOIN #SSOrderSet ordSet ON ordSet.ENCOUNTER_ID = bp.ENCOUNTER_ID AND ordSet.[ENC_ID Overall Order] = bp.[ENC_ID Overall Order] AND ordSet.TIME_LINE = 1
 
-LEFT OUTER JOIN #ODPressorPivot pressor ON pressor.PAT_ENC_CSN_ID = scores.PAT_ENC_CSN_ID AND bp.[Sepsis Pt Date] = pressor.Sepsis_Date 
+LEFT OUTER JOIN #ODPressorPivot pressor ON pressor.ENCOUNTER_ID = scores.ENCOUNTER_ID AND bp.[Sepsis Pt Date] = pressor.Sepsis_Date 
 
-LEFT OUTER JOIN #Procalcitonin proCal ON proCal.PAT_ENC_CSN_ID = bp.PAT_ENC_CSN_ID AND proCal.[CSN Overall Order] = bp.[CSN Overall Order] AND proCal.TIME_LINE = 1
+LEFT OUTER JOIN #Procalcitonin proCal ON proCal.ENCOUNTER_ID = bp.ENCOUNTER_ID AND proCal.[ENC_ID Overall Order] = bp.[ENC_ID Overall Order] AND proCal.TIME_LINE = 1
 
-LEFT OUTER JOIN #BloodCultureValue bc ON bc.PAT_ENC_CSN_ID = bp.PAT_ENC_CSN_ID AND bc.[CSN Overall Order] = bp.[CSN Overall Order] AND bc.TIME_LINE = 1
+LEFT OUTER JOIN #BloodCultureValue bc ON bc.ENCOUNTER_ID = bp.ENCOUNTER_ID AND bc.[ENC_ID Overall Order] = bp.[ENC_ID Overall Order] AND bc.TIME_LINE = 1
 
-LEFT OUTER JOIN #CSF csf ON csf.PAT_ENC_CSN_ID = bp.PAT_ENC_CSN_ID AND csf.[CSN Overall Order] = bp.[CSN Overall Order] AND csf.TIME_LINE = 1
+LEFT OUTER JOIN #CSF csf ON csf.ENCOUNTER_ID = bp.ENCOUNTER_ID AND csf.[ENC_ID Overall Order] = bp.[ENC_ID Overall Order] AND csf.TIME_LINE = 1
 
-LEFT OUTER JOIN #PIV piv ON piv.PAT_ENC_CSN_ID = bp.PAT_ENC_CSN_ID AND piv.[CSN Overall Order] = bp.[CSN Overall Order] AND piv.TIME_LINE = 1
+LEFT OUTER JOIN #PIV piv ON piv.ENCOUNTER_ID = bp.ENCOUNTER_ID AND piv.[ENC_ID Overall Order] = bp.[ENC_ID Overall Order] AND piv.TIME_LINE = 1
 
-LEFT OUTER JOIN #ETT ett ON ett.PAT_ENC_CSN_ID = bp.PAT_ENC_CSN_ID AND ett.[CSN Overall Order] = bp.[CSN Overall Order] AND ett.TIME_LINE = 1
+LEFT OUTER JOIN #ETT ett ON ett.ENCOUNTER_ID = bp.ENCOUNTER_ID AND ett.[ENC_ID Overall Order] = bp.[ENC_ID Overall Order] AND ett.TIME_LINE = 1
 
-LEFT OUTER JOIN #CVVH cvvh ON cvvh.PAT_ENC_CSN_ID = scores.PAT_ENC_CSN_ID AND cvvh.[CSN Overall Order] = bp.[CSN Overall Order]
+LEFT OUTER JOIN #CVVH cvvh ON cvvh.ENCOUNTER_ID = scores.ENCOUNTER_ID AND cvvh.[ENC_ID Overall Order] = bp.[ENC_ID Overall Order]
 
-LEFT OUTER JOIN #OX ox ON ox.PAT_ENC_CSN_ID = scores.PAT_ENC_CSN_ID AND ox.[CSN Overall Order] = bp.[CSN Overall Order]
+LEFT OUTER JOIN #OX ox ON ox.ENCOUNTER_ID = scores.ENCOUNTER_ID AND ox.[ENC_ID Overall Order] = bp.[ENC_ID Overall Order]
 
-LEFT OUTER JOIN #ECMO ecmo ON ecmo.PAT_ENC_CSN_ID = bp.PAT_ENC_CSN_ID AND ecmo.[CSN Overall Order] = bp.[CSN Overall Order]
+LEFT OUTER JOIN #ECMO ecmo ON ecmo.ENCOUNTER_ID = bp.ENCOUNTER_ID AND ecmo.[ENC_ID Overall Order] = bp.[ENC_ID Overall Order]
 
-LEFT OUTER JOIN [reportingDB].[reports].[SEVERE_SEPSIS_STAGING] IPSO ON IPSO.PAT_ENC_CSN_ID = main.PAT_ENC_CSN_ID
+LEFT OUTER JOIN [reportingDB].[reports].[SEVERE_SEPSIS_STAGING] IPSO ON IPSO.ENCOUNTER_ID = main.ENCOUNTER_ID
 
 
 
@@ -1562,7 +1562,7 @@ WHERE ( scores.[+ OD Score in Dept] = 'Y'
 
 	OR ordSet.TIME_LINE = 1
 
-	OR pressor.PAT_ENC_CSN_ID IS NOT NULL
+	OR pressor.ENCOUNTER_ID IS NOT NULL
 
 	OR proCal.TIME_LINE = 1
 
@@ -1574,15 +1574,15 @@ WHERE ( scores.[+ OD Score in Dept] = 'Y'
 
 	OR ett.TIME_LINE = 1
 
-	OR cvvh.PAT_ENC_CSN_ID IS NOT NULL
+	OR cvvh.ENCOUNTER_ID IS NOT NULL
 
-	OR ox.PAT_ENC_CSN_ID IS NOT NULL
+	OR ox.ENCOUNTER_ID IS NOT NULL
 
-	OR ecmo.PAT_ENC_CSN_ID IS NOT NULL
+	OR ecmo.ENCOUNTER_ID IS NOT NULL
 
 )
 
-ORDER BY bp.PAT_ENC_CSN_ID, bp.[Sepsis Pt Date], bp.[CSN Overall Order]
+ORDER BY bp.ENCOUNTER_ID, bp.[Sepsis Pt Date], bp.[ENC_ID Overall Order]
 
 END 
 

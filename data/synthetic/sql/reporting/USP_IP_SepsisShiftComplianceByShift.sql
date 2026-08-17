@@ -46,7 +46,7 @@ SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;
 
 SELECT 
 
-	[PatEncCSNID] [CSN]
+	[PATENCENCID] [ENC_ID]
 
 	, [ShiftDate] [Shift Date]
 
@@ -104,7 +104,7 @@ SELECT
 
 	, CASE WHEN [ShiftAMPM] like 'AM%' THEN [AMDenom] ELSE [PMDenom] END [Denominator]
 
-	, [ShiftComplianceYN] [Shift Compliance Y/N]
+	, [ShiftComplianceFlag] [Shift Compliance Y/N]
 
 	, [ShiftCompliance] [Shift Compliance]
 
@@ -118,7 +118,7 @@ SELECT
 
 	FROM [reportingDB].reporting.[IP_SepsisShiftCompliance]
 
-  ORDER BY CSN, CSNOverallOrder
+  ORDER BY ENC_ID, ENCOVERALLORDER
 
 END 
 

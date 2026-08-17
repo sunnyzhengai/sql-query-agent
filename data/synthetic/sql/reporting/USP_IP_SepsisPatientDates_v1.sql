@@ -46,7 +46,7 @@ SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;
 
 SELECT
 
-	pd.[PatEncCSNID] [CSN]
+	pd.[PATENCENCID] [ENC_ID]
 
 	, pd.SepsisPatientDate [PATIENTS Date]
 
@@ -62,11 +62,11 @@ SELECT
 
 	, pd.InpatientDataID [Inp Data ID]
 
-	, pd.CSNOrder [CSN Order]
+	, pd.ENCORDER [ENC_ID Order]
 
 	, pd.UnitOrder [Unit Order]
 
-	, pd.[CSNOverallOrder] [CSN Overall Order]
+	, pd.[ENCOVERALLORDER] [ENC_ID Overall Order]
 
 	, pd.[RefreshDate] [Refresh Date]
 

@@ -44,9 +44,9 @@ SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;
 
 
 
-SELECT [PatName] [PATIENTS]
+SELECT [PatientName] [PATIENTS]
 
-	, [PatMRNID] [MRN]
+	, [PATIENTMRN] [MRN]
 
 	, [EthnicGroup] [Ethnic Group]
 
@@ -54,7 +54,7 @@ SELECT [PatName] [PATIENTS]
 
 	, [Location] 
 
-	, [PatEncCSNID] [CSN]
+	, [PATENCENCID] [ENC_ID]
 
 	, [AgeMonths] [Age (M)]
 
@@ -110,7 +110,7 @@ SELECT [PatName] [PATIENTS]
 
 	, [ScoreTime] [OD Score Time]
 
-	, [ShiftComplianceYN] [Shift Compliance Y/N]
+	, [ShiftComplianceFlag] [Shift Compliance Y/N]
 
 	, [ShiftCompliance] [Shift Compliance]
 
@@ -336,11 +336,11 @@ SELECT [PatName] [PATIENTS]
 
 	, [PositiveODScore] [Positive OD Score]
 
-	, [CSNOrder] [CSN Order]
+	, [ENCORDER] [ENC_ID Order]
 
 	, [UnitOrder] [Unit Order]
 
-	, [CSNOverallOrder] [CSN Overall Order]
+	, [ENCOVERALLORDER] [ENC_ID Overall Order]
 
 	, [AMDenom] [AM Denom]
 

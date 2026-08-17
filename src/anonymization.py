@@ -80,6 +80,15 @@ def build_replacements(crosswalk: dict) -> "list[tuple[str, str, str]]":
 
     for orig, anon in crosswalk.get("cook_fy_columns_to_rename", {}).items():
         replacements.append((orig, anon, "renamed_column"))
+
+    # Column-level dialect renames (2026-08-16): word-boundary,
+    # case-insensitive, longest-first so PAT_ENC_CSN_ID wins over PAT_ID.
+    for orig, anon in sorted(
+        crosswalk.get("columns", {}).items(), key=lambda x: -len(x[0])
+    ):
+        if orig.startswith("_") or orig == anon:
+            continue
+        replacements.append((orig, anon, "column~ci"))
     for orig, anon in sorted(crosswalk.get("proc_codes", {}).items(), key=lambda x: -len(x[0])):
         replacements.append((orig, anon, "proc_code"))
 

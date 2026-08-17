@@ -16,13 +16,18 @@ Usage:
 
 import csv
 import json
+import os
 import re
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 CROSSWALK_PATH = PROJECT_ROOT / "data" / "synthetic" / "crosswalk.json"
-INPUT_TABLES = PROJECT_ROOT / "data" / "synthetic" / "sepsis_sql" / "sepsis_clarity_tables.csv"
-INPUT_COLUMNS = PROJECT_ROOT / "data" / "synthetic" / "sepsis_sql" / "sepsis_clarity_columns.csv"
+# Raw vendor dictionary lives OUTSIDE the repo (wall rule, relocated
+# 2026-08-16). Override with AIVIA_RAW_SQL_DIR.
+_RAW_ROOT = Path(os.environ.get(
+    "AIVIA_RAW_SQL_DIR", str(Path.home() / "aivia-private" / "sepsis_sql")))
+INPUT_TABLES = _RAW_ROOT / "sepsis_clarity_tables.csv"
+INPUT_COLUMNS = _RAW_ROOT / "sepsis_clarity_columns.csv"
 OUTPUT_TABLES = PROJECT_ROOT / "data" / "synthetic" / "dict_tables.csv"
 OUTPUT_COLUMNS = PROJECT_ROOT / "data" / "synthetic" / "dict_columns.csv"
 
@@ -93,6 +98,10 @@ def build_description_replacements(crosswalk: dict) -> list[tuple[str, str]]:
     replacements.append(("EPIC_DTE", "INTERNAL_DTE"))
     replacements.append(("CLARITY_SER_2", "PROVIDERS_EXT"))
     replacements.append(("CLARITY_SER_DEPT", "PROVIDERS_DEPT"))
+    replacements.append(("PAT_ENC_HSP_2", "HOSPITAL_ENCOUNTERS_EXT"))
+    replacements.append(("PAT_ENC_HSP", "HOSPITAL_ENCOUNTERS"))
+    replacements.append(("contact serial number (CSN)", "encounter identifier"))
+    replacements.append(("contact serial number", "encounter identifier"))
 
     # Org references
     for orig, anon in crosswalk.get("org_references_to_remove", {}).get("string_literals", {}).items():
@@ -131,6 +140,10 @@ def anonymize_description(
     desc = re.sub(r"\bclarity\b", "the EMR", desc)
     desc = re.sub(r"\bEpic\b", "the EMR system", desc)
 
+    # Step 2b: Strip vendor master-file item references like "(EPT/18838)"
+    # or "(ALT/1010)" — proprietary record-numbering vocabulary.
+    desc = re.sub(r"\s*\([A-Z]{2,4}\s*[./]\s*\d+\)", "", desc)
+
     # Step 3: Clean up artifacts
     desc = desc.replace("the the EMR", "the EMR")  # "the Clarity" -> "the the EMR"
     desc = desc.replace("your the EMR", "the EMR")  # "your Clarity" -> "your the EMR"
@@ -140,6 +153,25 @@ def anonymize_description(
     # Step 4: Apply general prose replacements
     for orig, anon in replacements:
         desc = re.sub(re.escape(orig), anon, desc, flags=re.IGNORECASE)
+
+    # Step 5: Generic dialect scrub for cross-references to vendor tables
+    # OUTSIDE our set (PAT_ENC_7, HSP_ACCOUNT_2, ...) — no enumerated map
+    # can cover them, and any survivor is a leak. Specific before generic.
+    # Anchor-free, most-specific-first: compounds like
+    # INPATIENT_PAT_ENC_CSN_ID and EIX_FILT_PAT_ENC_RFL must resolve too.
+    desc = desc.replace("PAT_ENC_CSN_ID", "ENCOUNTER_ID")   # catches plural too
+    desc = desc.replace("PAT_ENC_CSN", "ENCOUNTER_NUM")
+    desc = desc.replace("PAT_CSN_ID", "VISIT_ID")   # before generic CSN->ENC,
+    desc = desc.replace("PAT_CSN", "VISIT_ID")      # which would mint PAT_ENC_*
+    desc = desc.replace("PAT_ENC", "PATIENT_ENC")
+    desc = desc.replace("HSP_ACCOUNT", "HOSPITAL_ACCOUNT")
+    desc = desc.replace("HSP_ACCT", "HOSPITAL_ACCT")
+    desc = desc.replace("PAT_MRN", "PATIENT_MRN")
+    desc = desc.replace("PAT_ID", "PATIENT_ID")   # mid-token too (NBA_PAT_ID)
+    desc = desc.replace("CSN", "ENC")                        # any last survivor
+    # Vendor database name in prose (75 occurrences, found 2026-08-16)
+    desc = re.sub(r"\bChronicles\b", "the source system", desc)
+    desc = desc.replace("in the the source system", "in the source system")
 
     return desc
 
@@ -159,23 +191,23 @@ ORG_TABLE_DESCRIPTIONS = {
 }
 
 ORG_COLUMN_ENTRIES = [
-    ("IP_SEPSIS", "PatEncCSNID", "Patient encounter contact serial number (unique encounter identifier)", "NUMERIC"),
-    ("IP_SEPSIS", "PatID", "Internal patient identifier", "VARCHAR"),
-    ("IP_SEPSIS", "PatMRNID", "Patient medical record number", "VARCHAR"),
-    ("IP_SEPSIS", "PatName", "Patient full name", "VARCHAR"),
+    ("IP_SEPSIS", "EncounterID", "Unique hospital encounter identifier", "NUMERIC"),
+    ("IP_SEPSIS", "PatientID", "Internal patient identifier", "VARCHAR"),
+    ("IP_SEPSIS", "PatientMRN", "Patient medical record number", "VARCHAR"),
+    ("IP_SEPSIS", "PatientName", "Patient full name", "VARCHAR"),
     ("IP_SEPSIS", "HospAdmsnTime", "Hospital admission date and time", "DATETIME"),
     ("IP_SEPSIS", "HospDischTime", "Hospital discharge date and time", "DATETIME"),
     ("IP_SEPSIS", "ADTDepartmentName", "ADT department name at time of screening", "VARCHAR"),
     ("IP_SEPSIS", "DepartmentRollup", "Rolled-up department grouping for reporting", "VARCHAR"),
     ("IP_SEPSIS", "ODScore", "Organ dysfunction score value", "NUMERIC"),
-    ("IP_SEPSIS", "ShiftComplianceYN", "Whether sepsis screening was compliant for this shift (Y/N)", "VARCHAR"),
+    ("IP_SEPSIS", "ShiftComplianceFlag", "Whether sepsis screening was compliant for this shift (Y/N)", "VARCHAR"),
     ("IP_SEPSIS", "RefreshDate", "Date when this record was last refreshed", "DATETIME"),
     ("SEVERE_SEPSIS_STAGING", "SepsisDate", "Date the patient met severe sepsis criteria", "DATE"),
-    ("SEVERE_SEPSIS_STAGING", "PatEncCSNID", "Patient encounter contact serial number", "NUMERIC"),
-    ("SEVERE_SEPSIS_STAGING", "PatID", "Internal patient identifier", "VARCHAR"),
+    ("SEVERE_SEPSIS_STAGING", "EncounterID", "Unique hospital encounter identifier", "NUMERIC"),
+    ("SEVERE_SEPSIS_STAGING", "PatientID", "Internal patient identifier", "VARCHAR"),
     ("NON_SEVERE_SEPSIS_STAGING", "SepsisDate", "Date the patient met non-severe sepsis criteria", "DATE"),
-    ("NON_SEVERE_SEPSIS_STAGING", "PatEncCSNID", "Patient encounter contact serial number", "NUMERIC"),
-    ("NON_SEVERE_SEPSIS_STAGING", "PatID", "Internal patient identifier", "VARCHAR"),
+    ("NON_SEVERE_SEPSIS_STAGING", "EncounterID", "Unique hospital encounter identifier", "NUMERIC"),
+    ("NON_SEVERE_SEPSIS_STAGING", "PatientID", "Internal patient identifier", "VARCHAR"),
     ("FY_DATE_DIMENSION", "CALENDAR_DT", "Calendar date", "DATE"),
     ("FY_DATE_DIMENSION", "FISCAL_YEAR", "Fiscal year number", "INTEGER"),
     ("FY_DATE_DIMENSION", "FY_MONTH_NUMBER", "Month number within the fiscal year", "INTEGER"),
@@ -188,9 +220,42 @@ ORG_COLUMN_ENTRIES = [
 ]
 
 
+def build_column_map(crosswalk: dict) -> dict[str, str]:
+    """Column renames (2026-08-16 verdict): keyed uppercase for lookups."""
+    return {
+        orig.upper(): anon
+        for orig, anon in crosswalk.get("columns", {}).items()
+        if not orig.startswith("_") and orig != anon
+    }
+
+
+_COLUMN_RE_CACHE: dict = {}
+
+
+def apply_column_map(text: str, column_map: dict[str, str]) -> str:
+    """Rename column references inside prose (word-boundary, ci).
+
+    One combined alternation, compiled once — 1,200+ individual re.sub
+    calls per row thrash the regex cache and take minutes over 4k rows.
+    Longest-first alternation preserves most-specific-wins.
+    """
+    if not text or not column_map:
+        return text
+    key = id(column_map)
+    if key not in _COLUMN_RE_CACHE:
+        alternation = "|".join(
+            re.escape(k) for k in sorted(column_map, key=len, reverse=True)
+        )
+        _COLUMN_RE_CACHE[key] = re.compile(
+            r"\b(" + alternation + r")\b", re.IGNORECASE)
+    pattern = _COLUMN_RE_CACHE[key]
+    return pattern.sub(lambda m: column_map[m.group(1).upper()], text)
+
+
 def main():
     crosswalk = load_crosswalk()
     table_map = build_table_map(crosswalk)
+    column_map = build_column_map(crosswalk)
     desc_replacements = build_description_replacements(crosswalk)
 
     # --- Process tables ---
@@ -201,6 +266,7 @@ def main():
             orig_name = row["TABLE_NAME"].strip()
             anon_name = table_map.get(orig_name.upper(), orig_name)
             desc = anonymize_description(row["DESCRIPTION"].strip(), desc_replacements, table_map)
+            desc = apply_column_map(desc, column_map)
             tables_out.append({"TABLE_NAME": anon_name, "DESCRIPTION": desc})
 
     # Add org-specific table descriptions
@@ -228,7 +294,15 @@ def main():
             for orig_col, anon_col in desc_replacements:
                 if orig_col in col_name:
                     col_name = col_name.replace(orig_col, anon_col)
+            # Column-dialect rename (2026-08-16 verdict). The fallback
+            # chain catches names MINTED by the replacements above
+            # (EPIC_PAT_ID -> INTERNAL_PAT_ID misses the map).
+            col_name = column_map.get(col_name.upper(), col_name)
+            for a, b in (("PAT_ID", "PATIENT_ID"), ("PAT_MRN", "PATIENT_MRN"),
+                         ("CSN", "ENC")):
+                col_name = col_name.replace(a, b)
             desc = anonymize_description(row["DESCRIPTION"].strip(), desc_replacements, table_map)
+            desc = apply_column_map(desc, column_map)
             data_type = row.get("DATA_TYPE", "").strip()
             columns_out.append({
                 "TABLE_NAME": anon_table,

@@ -100,7 +100,7 @@ ELSE
 
 IF OBJECT_ID(N'tempdb..#MARActions') IS NOT NULL DROP TABLE #MARActions;
 
-	SELECT CAST(vcg.LIST_CAT_VALUE_C AS varchar) CAT_ID
+	SELECT CAST(vcg.LIST_CAT_VALUE_CODE AS varchar) CAT_ID
 
 	INTO #MARActions
 
@@ -114,7 +114,7 @@ CREATE INDEX IDX_MARActions ON #MARActions (CAT_ID)
 
 IF OBJECT_ID(N'tempdb..#RouteExclusions') IS NOT NULL DROP TABLE #RouteExclusions;
 
-	SELECT vcg.LIST_CAT_VALUE_C CAT_ID
+	SELECT vcg.LIST_CAT_VALUE_CODE CAT_ID
 
 	INTO #RouteExclusions
 
@@ -246,13 +246,13 @@ IF OBJECT_ID(N'tempdb..#MainAdmDetails') IS NOT NULL DROP TABLE #MainAdmDetails;
 
 SELECT DISTINCT
 
-	peh.PAT_ENC_CSN_ID
+	peh.ENCOUNTER_ID
 
-	, peh.PAT_ID
+	, peh.PATIENT_ID
 
-	, pat.PAT_MRN_ID
+	, pat.PATIENT_MRN
 
-	, pat.PAT_NAME
+	, pat.PATIENT_NAME
 
 	, zeg.NAME AS [Ethnic Group]
 
@@ -292,17 +292,17 @@ FROM [EMRDB].[dbo].[HOSPITAL_TRANSACTIONS] htr
 
 INNER JOIN [EMRDB].[dbo].[CALENDAR_DATES] sd ON sd.CALENDAR_DT = CONVERT(DATE, htr.SERVICE_DATE)
 
-INNER JOIN [EMRDB].[dbo].[HOSPITAL_ENCOUNTERS] peh ON htr.PAT_ENC_CSN_ID = peh.PAT_ENC_CSN_ID
+INNER JOIN [EMRDB].[dbo].[HOSPITAL_ENCOUNTERS] peh ON htr.ENCOUNTER_ID = peh.ENCOUNTER_ID
 
-INNER JOIN [EMRDB].[dbo].[PATIENTS] pat ON pat.PAT_ID = peh.PAT_ID
+INNER JOIN [EMRDB].[dbo].[PATIENTS] pat ON pat.PATIENT_ID = peh.PATIENT_ID
 
-LEFT OUTER JOIN [EMRDB].[dbo].[REF_DISCHARGE_DISPOSITION] zdd ON zdd.DISCH_DISP_C = peh.DISCH_DISP_C
+LEFT OUTER JOIN [EMRDB].[dbo].[REF_DISCHARGE_DISPOSITION] zdd ON zdd.DISCH_DISP_CODE = peh.DISCH_DISP_CODE
 
-LEFT OUTER JOIN [EMRDB].[dbo].[REF_ETHNIC_GROUP] zeg ON zeg.ETHNIC_GROUP_C = pat.ETHNIC_GROUP_C
+LEFT OUTER JOIN [EMRDB].[dbo].[REF_ETHNIC_GROUP] zeg ON zeg.ETHNIC_GROUP_CODE = pat.ETHNIC_GROUP_CODE
 
-LEFT OUTER JOIN [EMRDB].[dbo].[PATIENT_DEMOGRAPHICS_RACE] race ON race.PAT_ID = pat.PAT_ID AND race.LINE = 1
+LEFT OUTER JOIN [EMRDB].[dbo].[PATIENT_DEMOGRAPHICS_RACE] race ON race.PATIENT_ID = pat.PATIENT_ID AND race.LINE = 1
 
-LEFT OUTER JOIN [EMRDB].[dbo].[REF_PATIENT_RACE] zpr ON zpr.PATIENT_RACE_C = race.PATIENT_RACE_C
+LEFT OUTER JOIN [EMRDB].[dbo].[REF_PATIENT_RACE] zpr ON zpr.PATIENT_RACE_CODE = race.PATIENT_RACE_CODE
 
 LEFT OUTER JOIN [EMRDB].[dbo].[DEPARTMENTS] dep ON dep.DEPARTMENT_ID = peh.DEPARTMENT_ID
 
@@ -312,7 +312,7 @@ WHERE peh.INP_ADM_DATE IS NOT NULL  /*date time of inpatient admission*/
 
 AND sd.CALENDAR_DT BETWEEN @dStartDate AND @dEndDate /*Service data of a charge*/
 
-CREATE INDEX IDX_Main ON #MainAdmDetails (PAT_ENC_CSN_ID) 
+CREATE INDEX IDX_Main ON #MainAdmDetails (ENCOUNTER_ID) 
 
 /*SELECT * FROM #MainAdmDetails*/
 
@@ -322,7 +322,7 @@ CREATE INDEX IDX_Main ON #MainAdmDetails (PAT_ENC_CSN_ID)
 
 IF OBJECT_ID(N'tempdb..#Base_Pop_ENC_Reason') IS NOT NULL DROP TABLE #Base_Pop_ENC_Reason;
 
-SELECT DISTINCT cat.PAT_ENC_CSN_ID
+SELECT DISTINCT cat.ENCOUNTER_ID
 
 	, STRING_AGG(edg.DX_NAME,  ' % ') AS [AllEncReasons]
 
@@ -330,13 +330,13 @@ INTO #Base_Pop_ENC_Reason
 
 FROM #MainAdmDetails cat
 
-INNER JOIN [EMRDB].[dbo].[ENCOUNTER_DIAGNOSES] ped ON ped.PAT_ENC_CSN_ID = cat.PAT_ENC_CSN_ID AND ped.LINE > 1
+INNER JOIN [EMRDB].[dbo].[ENCOUNTER_DIAGNOSES] ped ON ped.ENCOUNTER_ID = cat.ENCOUNTER_ID AND ped.LINE > 1
 
 INNER JOIN [EMRDB].[dbo].[DIAGNOSES] edg ON edg.DX_ID = ped.DX_ID
 
-GROUP BY cat.PAT_ENC_CSN_ID
+GROUP BY cat.ENCOUNTER_ID
 
-CREATE INDEX IDX_EncReason ON #Base_Pop_ENC_Reason (PAT_ENC_CSN_ID) 
+CREATE INDEX IDX_EncReason ON #Base_Pop_ENC_Reason (ENCOUNTER_ID) 
 
 /*SELECT * FROM #Base_Pop_ENC_Reason*/
 
@@ -356,7 +356,7 @@ WITH vaplh AS
 
 	SELECT 
 
-		adtIn.PAT_ENC_CSN_ID
+		adtIn.ENCOUNTER_ID
 
 		, adtIn.EFFECTIVE_TIME AS IN_DTTM
 
@@ -398,19 +398,19 @@ WITH vaplh AS
 
 		, DATEADD(MI, 419, DATEADD(DD, 1, DATEDIFF(DD, 0, CONVERT(DATE, COALESCE(adtOut.EFFECTIVE_TIME,GETDATE()))))) [Out PM End]
 
-	FROM #MainAdmDetails csns
+	FROM #MainAdmDetails ENCS
 
-	INNER JOIN [EMRDB].[dbo].[HOSPITAL_ENCOUNTERS] hsp ON csns.PAT_ENC_CSN_ID = hsp.PAT_ENC_CSN_ID /*Developer C minimize to csn's we are looking at*/
+	INNER JOIN [EMRDB].[dbo].[HOSPITAL_ENCOUNTERS] hsp ON ENCS.ENCOUNTER_ID = hsp.ENCOUNTER_ID /*Developer C minimize to ENC_ID's we are looking at*/
 
-	INNER JOIN [EMRDB].[dbo].[ADT_EVENTS] adtIn ON adtIn.PAT_ENC_CSN_ID = hsp.PAT_ENC_CSN_ID
+	INNER JOIN [EMRDB].[dbo].[ADT_EVENTS] adtIn ON adtIn.ENCOUNTER_ID = hsp.ENCOUNTER_ID
 
 	LEFT OUTER JOIN [EMRDB].[dbo].[ADT_EVENTS] adtOut ON adtIn.NEXT_OUT_EVENT_ID = adtOut.EVENT_ID
 
 	LEFT OUTER JOIN [EMRDB].[dbo].[DEPARTMENTS] dep ON adtIn.DEPARTMENT_ID = dep.DEPARTMENT_ID
 
-	WHERE adtIn.EVENT_TYPE_C IN (1, 3, 99) /*Only look at "in" events (Admission and Transfer In, LOA Return)*/
+	WHERE adtIn.EVENT_TYPE_CODE IN (1, 3, 99) /*Only look at "in" events (Admission and Transfer In, LOA Return)*/
 
-	AND adtIn.EVENT_SUBTYPE_C <> 2 /*Exclude deleted/canceled events*/
+	AND adtIn.EVENT_SUBTYPE_CODE <> 2 /*Exclude deleted/canceled events*/
 
 )
 
@@ -418,9 +418,9 @@ WITH vaplh AS
 
 SELECT DISTINCT
 
-	peh.PAT_ENC_CSN_ID
+	peh.ENCOUNTER_ID
 
-	, peh.PAT_ID
+	, peh.PATIENT_ID
 
 	, vaplh.ADT_DEPARTMENT_ID
 
@@ -474,23 +474,23 @@ SELECT DISTINCT
 
 	, [Out Previous PM End] 
 
-	, ROW_NUMBER() OVER (PARTITION BY peh.PAT_ENC_CSN_ID, vaplh.IN_DTTM ORDER BY vaplh.IN_DTTM, vaplh.OUT_DTTM) [inDeptRN]
+	, ROW_NUMBER() OVER (PARTITION BY peh.ENCOUNTER_ID, vaplh.IN_DTTM ORDER BY vaplh.IN_DTTM, vaplh.OUT_DTTM) [inDeptRN]
 
-	, ROW_NUMBER() OVER (PARTITION BY peh.PAT_ENC_CSN_ID ORDER BY vaplh.IN_DTTM, vaplh.OUT_DTTM ) [CSN Order]
+	, ROW_NUMBER() OVER (PARTITION BY peh.ENCOUNTER_ID ORDER BY vaplh.IN_DTTM, vaplh.OUT_DTTM ) [ENC_ID Order]
 
 INTO #Base_PopTemp
 
 FROM #MainAdmDetails main
 
-INNER JOIN [EMRDB].[dbo].[HOSPITAL_ENCOUNTERS] peh ON peh.PAT_ENC_CSN_ID = main.PAT_ENC_CSN_ID
+INNER JOIN [EMRDB].[dbo].[HOSPITAL_ENCOUNTERS] peh ON peh.ENCOUNTER_ID = main.ENCOUNTER_ID
 
-INNER JOIN  vaplh ON vaplh.PAT_ENC_CSN_ID = peh.PAT_ENC_CSN_ID AND vaplh.ADT_DEPARTMENT_ID IS NOT NULL /*[EMRDB].[dbo].V_PATIENT_LOCATION_HISTORY*/
+INNER JOIN  vaplh ON vaplh.ENCOUNTER_ID = peh.ENCOUNTER_ID AND vaplh.ADT_DEPARTMENT_ID IS NOT NULL /*[EMRDB].[dbo].V_PATIENT_LOCATION_HISTORY*/
 
 INNER JOIN [reportingDB].[reports].[CONFIG_VALUE_SET] cvs ON cvs.CODE = vaplh.ADT_DEPARTMENT_ID
 
 			AND cvs.VALUE_SET_ID = 3031 /*DEPARTMENT ROLL UP*/
 
-CREATE INDEX IDX_Base_PopTemp ON #Base_PopTemp (PAT_ENC_CSN_ID) 
+CREATE INDEX IDX_Base_PopTemp ON #Base_PopTemp (ENCOUNTER_ID) 
 
 /*SELECT * FROM #Base_PopTemp*/
 
@@ -508,7 +508,7 @@ IF OBJECT_ID(N'tempdb..#Base_Pop') IS NOT NULL DROP TABLE #Base_Pop;
 
 (
 
-	SELECT PAT_ENC_CSN_ID
+	SELECT ENCOUNTER_ID
 
 		, [In Shift Date] [Expansion Start Date]
 
@@ -548,7 +548,7 @@ IF OBJECT_ID(N'tempdb..#Base_Pop') IS NOT NULL DROP TABLE #Base_Pop;
 
 		, ADT_DEPARTMENT_NAME
 
-		, PAT_ID
+		, PATIENT_ID
 
 		, DEPARTMENT_ROLLUP
 
@@ -560,7 +560,7 @@ IF OBJECT_ID(N'tempdb..#Base_Pop') IS NOT NULL DROP TABLE #Base_Pop;
 
 		, CASE WHEN [In Shift Date] = [Out Shift Date] THEN 1 ELSE 0 END [Out Record]
 
-		, [CSN Order]
+		, [ENC_ID Order]
 
 	FROM #Base_PopTemp
 
@@ -570,7 +570,7 @@ IF OBJECT_ID(N'tempdb..#Base_Pop') IS NOT NULL DROP TABLE #Base_Pop;
 
 	UNION ALL 
 
-	SELECT PAT_ENC_CSN_ID
+	SELECT ENCOUNTER_ID
 
 		, d.[Expansion Start Date]
 
@@ -612,7 +612,7 @@ IF OBJECT_ID(N'tempdb..#Base_Pop') IS NOT NULL DROP TABLE #Base_Pop;
 
 		, d.ADT_DEPARTMENT_NAME
 
-		, d.PAT_ID
+		, d.PATIENT_ID
 
 		, d.DEPARTMENT_ROLLUP
 
@@ -624,7 +624,7 @@ IF OBJECT_ID(N'tempdb..#Base_Pop') IS NOT NULL DROP TABLE #Base_Pop;
 
 		, CASE WHEN DATEADD(d, 1, d.[Expansion Date]) = d.[Expansion End Date] THEN 1 ELSE 0 END [Out Record]
 
-		, [CSN Order]
+		, [ENC_ID Order]
 
 	FROM dateCTE d 
 
@@ -642,17 +642,17 @@ Finalize base table, one record for each shift a PATIENTS was in a unit
 
 SELECT * 
 
-	, ROW_NUMBER() OVER(PARTITION BY PAT_ENC_CSN_ID, [InDepartmentTime] ORDER BY [Score Date], [Shift AM/PM]) AS [Unit Order]
+	, ROW_NUMBER() OVER(PARTITION BY ENCOUNTER_ID, [InDepartmentTime] ORDER BY [Score Date], [Shift AM/PM]) AS [Unit Order]
 
-	, ROW_NUMBER() OVER(PARTITION BY PAT_ENC_CSN_ID ORDER BY [InDepartmentTime], [Score Date], [Shift AM/PM]) AS [CSN Overall Order]
+	, ROW_NUMBER() OVER(PARTITION BY ENCOUNTER_ID ORDER BY [InDepartmentTime], [Score Date], [Shift AM/PM]) AS [ENC_ID Overall Order]
 
-	, ROW_NUMBER() OVER(PARTITION BY PAT_ENC_CSN_ID, [Shift Start] ORDER BY [Score Date], [Shift AM/PM]) AS [Shift Order]
+	, ROW_NUMBER() OVER(PARTITION BY ENCOUNTER_ID, [Shift Start] ORDER BY [Score Date], [Shift AM/PM]) AS [Shift Order]
 
 INTO #Base_Pop
 
 FROM (
 
-	SELECT am.PAT_ENC_CSN_ID
+	SELECT am.ENCOUNTER_ID
 
 		, am.[Expansion Start Date] [In Dept Date]
 
@@ -678,7 +678,7 @@ FROM (
 
 		, am.ADT_DEPARTMENT_NAME
 
-		, am.PAT_ID
+		, am.PATIENT_ID
 
 		, am.DEPARTMENT_ROLLUP
 
@@ -692,7 +692,7 @@ FROM (
 
 		, am.[Out Record]
 
-		, [CSN Order]
+		, [ENC_ID Order]
 
 		, 'AM (Day Shift)' [Shift AM/PM]
 
@@ -714,7 +714,7 @@ FROM (
 
 	UNION ALL
 
-	SELECT pm.PAT_ENC_CSN_ID
+	SELECT pm.ENCOUNTER_ID
 
 		, pm.[Expansion Start Date]
 
@@ -740,7 +740,7 @@ FROM (
 
 		, pm.ADT_DEPARTMENT_NAME
 
-		, pm.PAT_ID
+		, pm.PATIENT_ID
 
 		, pm.DEPARTMENT_ROLLUP
 
@@ -754,7 +754,7 @@ FROM (
 
 		, pm.[Out Record]
 
-		, [CSN Order]
+		, [ENC_ID Order]
 
 		, 'PM (Night Shift)' [Shift AM/PM]
 
@@ -778,7 +778,7 @@ FROM (
 
 OPTION (MAXRECURSION 8000);  /*default is 100*/
 
-CREATE INDEX IDX_Base_Pop ON #Base_Pop (PAT_ENC_CSN_ID) 
+CREATE INDEX IDX_Base_Pop ON #Base_Pop (ENCOUNTER_ID) 
 
 /*SELECT * FROM #Base_Pop*/
 
@@ -786,7 +786,7 @@ CREATE INDEX IDX_Base_Pop ON #Base_Pop (PAT_ENC_CSN_ID)
 
 IF OBJECT_ID(N'tempdb..#FlwshtLstEncounterWts') IS NOT NULL DROP TABLE #FlwshtLstEncounterWts;
 
-SELECT * , ROW_NUMBER() OVER(PARTITION BY PAT_ENC_CSN_ID ORDER BY [CSN Order], [Unit Order], RECORDED_TIME) AS [Weight Row]
+SELECT * , ROW_NUMBER() OVER(PARTITION BY ENCOUNTER_ID ORDER BY [ENC_ID Order], [Unit Order], RECORDED_TIME) AS [Weight Row]
 
 INTO #FlwshtLstEncounterWts
 
@@ -796,7 +796,7 @@ FROM
 
 	SELECT 
 
-		main.PAT_ENC_CSN_ID
+		main.ENCOUNTER_ID
 
 		, meas.FSD_ID
 
@@ -804,13 +804,13 @@ FROM
 
 		, meas.RECORDED_TIME
 
-		, main.[CSN Order]
+		, main.[ENC_ID Order]
 
 		, main.[Unit Order]
 
-		, main.[CSN Overall Order]
+		, main.[ENC_ID Overall Order]
 
-		, ROW_NUMBER() OVER(PARTITION BY PAT_ENC_CSN_ID, [CSN Order], [Unit Order] ORDER BY [CSN Order], [Unit Order], RECORDED_TIME) AS [Unit Order Row]
+		, ROW_NUMBER() OVER(PARTITION BY ENCOUNTER_ID, [ENC_ID Order], [Unit Order] ORDER BY [ENC_ID Order], [Unit Order], RECORDED_TIME) AS [Unit Order Row]
 
 	FROM #Base_Pop main 
 
@@ -824,7 +824,7 @@ FROM
 
 WHERE a.[Unit Order Row] = 1
 
-CREATE INDEX IDX_FloEncWeight ON #FlwshtLstEncounterWts (PAT_ENC_CSN_ID) 
+CREATE INDEX IDX_FloEncWeight ON #FlwshtLstEncounterWts (ENCOUNTER_ID) 
 
 /*SELECT * FROM #FlwshtLstEncounterWts */
 
@@ -834,23 +834,23 @@ IF OBJECT_ID(N'tempdb..#EncWeights') IS NOT NULL DROP TABLE #EncWeights;
 
 SELECT
 
-	PAT_ENC_CSN_ID
+	ENCOUNTER_ID
 
 	, EncWeight
 
-	, [CSN Order]
+	, [ENC_ID Order]
 
 	, [Unit Order]
 
-	, [CSN Overall Order]
+	, [ENC_ID Overall Order]
 
 	, [Weight Row]
 
-	, CASE WHEN [Previous Weight Record] IS NULL THEN 1 ELSE [CSN Overall Order] + 1 END AS [Start Weight Record]
+	, CASE WHEN [Previous Weight Record] IS NULL THEN 1 ELSE [ENC_ID Overall Order] + 1 END AS [Start Weight Record]
 
 	, CASE WHEN [Next Weight Record] IS NULL THEN 
 
-		( SELECT MAX([CSN Overall Order]) FROM #Base_Pop bp WHERE bp.PAT_ENC_CSN_ID = a.PAT_ENC_CSN_ID)
+		( SELECT MAX([ENC_ID Overall Order]) FROM #Base_Pop bp WHERE bp.ENCOUNTER_ID = a.ENCOUNTER_ID)
 
 	ELSE [Next Weight Record] - 1 END AS [Next Weight Record]
 
@@ -860,21 +860,21 @@ FROM (
 
 	SELECT
 
-		encWt.PAT_ENC_CSN_ID
+		encWt.ENCOUNTER_ID
 
 		, CAST(ROUND(CONVERT(FLOAT, encWt.MEAS_VALUE) * 0.0283495, 2) AS DECIMAL(4, 1)) AS EncWeight
 
-		, [CSN Order]
+		, [ENC_ID Order]
 
 		, [Unit Order]
 
-		, [CSN Overall Order]
+		, [ENC_ID Overall Order]
 
 		, [Weight Row]
 
-		, LAG([CSN Overall Order], 1) OVER(PARTITION BY PAT_ENC_CSN_ID ORDER BY PAT_ENC_CSN_ID, [Weight Row]) AS [Previous Weight Record]
+		, LAG([ENC_ID Overall Order], 1) OVER(PARTITION BY ENCOUNTER_ID ORDER BY ENCOUNTER_ID, [Weight Row]) AS [Previous Weight Record]
 
-		, LEAD([CSN Overall Order], 1) OVER(PARTITION BY PAT_ENC_CSN_ID ORDER BY PAT_ENC_CSN_ID, [Weight Row]) AS [Next Weight Record]
+		, LEAD([ENC_ID Overall Order], 1) OVER(PARTITION BY ENCOUNTER_ID ORDER BY ENCOUNTER_ID, [Weight Row]) AS [Next Weight Record]
 
 	FROM #FlwshtLstEncounterWts encWt
 
@@ -884,9 +884,9 @@ FROM (
 
 IF OBJECT_ID(N'tempdb..#EncounterWeights') IS NOT NULL DROP TABLE #EncounterWeights;
 
-	SELECT bp.PAT_ENC_CSN_ID
+	SELECT bp.ENCOUNTER_ID
 
-		, bp.[CSN Overall Order]
+		, bp.[ENC_ID Overall Order]
 
 		, e.EncWeight
 
@@ -894,21 +894,21 @@ IF OBJECT_ID(N'tempdb..#EncounterWeights') IS NOT NULL DROP TABLE #EncounterWeig
 
 	FROM #Base_Pop bp
 
-	INNER JOIN #EncWeights e ON bp.PAT_ENC_CSN_ID = e.PAT_ENC_CSN_ID AND e.[CSN Overall Order] = bp.[CSN Overall Order]
+	INNER JOIN #EncWeights e ON bp.ENCOUNTER_ID = e.ENCOUNTER_ID AND e.[ENC_ID Overall Order] = bp.[ENC_ID Overall Order]
 
 UNION 
 
-	SELECT  bp.PAT_ENC_CSN_ID
+	SELECT  bp.ENCOUNTER_ID
 
-		, bp.[CSN Overall Order]
+		, bp.[ENC_ID Overall Order]
 
 		, e.EncWeight 
 
 	FROM #Base_Pop bp
 
-	INNER JOIN #EncWeights e ON bp.PAT_ENC_CSN_ID = e.PAT_ENC_CSN_ID AND bp.[CSN Overall Order] between e.[Start Weight Record] AND e.[Next Weight Record]
+	INNER JOIN #EncWeights e ON bp.ENCOUNTER_ID = e.ENCOUNTER_ID AND bp.[ENC_ID Overall Order] between e.[Start Weight Record] AND e.[Next Weight Record]
 
-CREATE INDEX IDX_EncounterWeights ON #EncounterWeights (PAT_ENC_CSN_ID) 
+CREATE INDEX IDX_EncounterWeights ON #EncounterWeights (ENCOUNTER_ID) 
 
 /*SELECT * FROM #EncounterWeights*/
 
@@ -918,7 +918,7 @@ CREATE INDEX IDX_EncounterWeights ON #EncounterWeights (PAT_ENC_CSN_ID)
 
 IF OBJECT_ID(N'tempdb..#Base_Pop_Severe_ED_Scores') IS NOT NULL DROP TABLE #Base_Pop_Severe_ED_Scores;
 
-SELECT main.PAT_ENC_CSN_ID
+SELECT main.ENCOUNTER_ID
 
 	, CEILING(CONVERT(FLOAT,DATEDIFF(MI, main.ADT_ARRIVAL_TIME, main.ED_DEPARTURE_TIME))/60) HoursInED/*CHECK WITH STEPHANIE ON */
 
@@ -930,13 +930,13 @@ SELECT main.PAT_ENC_CSN_ID
 
 	, main.ED_DEPARTURE_TIME
 
-	, ROW_NUMBER() OVER(PARTITION BY main.PAT_ENC_CSN_ID ORDER BY RECORDED_TIME ASC) AS TIME_LINE
+	, ROW_NUMBER() OVER(PARTITION BY main.ENCOUNTER_ID ORDER BY RECORDED_TIME ASC) AS TIME_LINE
 
 INTO #Base_Pop_Severe_ED_Scores 
 
 FROM #MainAdmDetails main 
 
-INNER JOIN [EMRDB].[dbo].[HOSPITAL_ENCOUNTERS] PEH ON PEH.PAT_ENC_CSN_ID = main.PAT_ENC_CSN_ID
+INNER JOIN [EMRDB].[dbo].[HOSPITAL_ENCOUNTERS] PEH ON PEH.ENCOUNTER_ID = main.ENCOUNTER_ID
 
 INNER JOIN [EMRDB].[dbo].[FLOWSHEET_RECORDS] rec ON rec.INPATIENT_DATA_ID = PEH.INPATIENT_DATA_ID
 
@@ -946,7 +946,7 @@ INNER JOIN [EMRDB].[dbo].[FLOWSHEET_MEASUREMENTS] meas ON meas.FSD_ID = rec.FSD_
 
 	and (meas.RECORDED_TIME <=  main.ED_DEPARTURE_TIME)
 
-CREATE INDEX IDX_Pop_Severe_ED_Scores ON #Base_Pop_Severe_ED_Scores (PAT_ENC_CSN_ID) 
+CREATE INDEX IDX_Pop_Severe_ED_Scores ON #Base_Pop_Severe_ED_Scores (ENCOUNTER_ID) 
 
 /*Select * from #Base_Pop_Severe_ED_Scores*/
 
@@ -954,7 +954,7 @@ CREATE INDEX IDX_Pop_Severe_ED_Scores ON #Base_Pop_Severe_ED_Scores (PAT_ENC_CSN
 
 IF OBJECT_ID(N'tempdb..#EDPosScore_EDLOS') IS NOT NULL DROP TABLE #EDPosScore_EDLOS;
 
-SELECT edScore.PAT_ENC_CSN_ID
+SELECT edScore.ENCOUNTER_ID
 
 	, edScore.HoursInED
 
@@ -962,9 +962,9 @@ SELECT edScore.PAT_ENC_CSN_ID
 
 	, edScore.RECORDED_TIME
 
-	, ROW_NUMBER() OVER(PARTITION BY edScore.PAT_ENC_CSN_ID ORDER BY edScore.RECORDED_TIME ASC) AS FIRST_TIME_LINE
+	, ROW_NUMBER() OVER(PARTITION BY edScore.ENCOUNTER_ID ORDER BY edScore.RECORDED_TIME ASC) AS FIRST_TIME_LINE
 
-	, ROW_NUMBER() OVER(PARTITION BY edScore.PAT_ENC_CSN_ID ORDER BY edScore.RECORDED_TIME DESC) AS LAST_TIME_LINE
+	, ROW_NUMBER() OVER(PARTITION BY edScore.ENCOUNTER_ID ORDER BY edScore.RECORDED_TIME DESC) AS LAST_TIME_LINE
 
 INTO #EDPosScore_EDLOS
 
@@ -972,7 +972,7 @@ FROM #Base_Pop_Severe_ED_Scores edScore
 
 WHERE edScore.MEAS_VALUE > 4
 
-CREATE INDEX IDX_EDPosScore_EDLOS ON #EDPosScore_EDLOS (PAT_ENC_CSN_ID) 
+CREATE INDEX IDX_EDPosScore_EDLOS ON #EDPosScore_EDLOS (ENCOUNTER_ID) 
 
 /*SELECT * FROM #EDPosScore_EDLOS*/
 
@@ -982,13 +982,13 @@ CREATE INDEX IDX_EDPosScore_EDLOS ON #EDPosScore_EDLOS (PAT_ENC_CSN_ID)
 
 IF OBJECT_ID(N'tempdb..#FlwshtLst') IS NOT NULL DROP TABLE #FlwshtLst;
 
-SELECT PAT_ENC_CSN_ID, FLO_MEAS_ID, RECORDED_TIME, MEAS_VALUE, FSD_ID, [Documented Department ID], [Documented Department], [CSN Overall Order]
+SELECT ENCOUNTER_ID, FLO_MEAS_ID, RECORDED_TIME, MEAS_VALUE, FSD_ID, [Documented Department ID], [Documented Department], [ENC_ID Overall Order]
 
 INTO #FlwshtLst
 
 FROM (
 
-	SELECT main.PAT_ENC_CSN_ID
+	SELECT main.ENCOUNTER_ID
 
 		, meas.FLO_MEAS_ID
 
@@ -1006,13 +1006,13 @@ FROM (
 
 		, bpt.ADT_DEPARTMENT_NAME [Documented Department]
 
-		, main.[CSN Order]
+		, main.[ENC_ID Order]
 
 		, main.[Unit Order]
 
-		, main.[CSN Overall Order]
+		, main.[ENC_ID Overall Order]
 
-		, ROW_NUMBER() OVER(PARTITION BY main.PAT_ENC_CSN_ID, main.[CSN Order], main.[Unit Order] ORDER BY [Shift Start], RECORDED_TIME) AS RowNum
+		, ROW_NUMBER() OVER(PARTITION BY main.ENCOUNTER_ID, main.[ENC_ID Order], main.[Unit Order] ORDER BY [Shift Start], RECORDED_TIME) AS RowNum
 
 	FROM #Base_Pop main
 
@@ -1020,7 +1020,7 @@ FROM (
 
 	INNER JOIN [EMRDB].[dbo].[FLOWSHEET_MEASUREMENTS] meas ON rec.FSD_ID = meas.FSD_ID AND meas.FLO_MEAS_ID IN (SELECT * FROM #ODScores)
 
-	INNER JOIN #Base_PopTemp bpt ON bpt.PAT_ENC_CSN_ID = main.PAT_ENC_CSN_ID AND meas.RECORDED_TIME BETWEEN bpt.IN_DTTM AND bpt.OUT_DTTM AND main.[CSN Order] = bpt.[CSN Order]
+	INNER JOIN #Base_PopTemp bpt ON bpt.ENCOUNTER_ID = main.ENCOUNTER_ID AND meas.RECORDED_TIME BETWEEN bpt.IN_DTTM AND bpt.OUT_DTTM AND main.[ENC_ID Order] = bpt.[ENC_ID Order]
 
 	WHERE meas.RECORDED_TIME BETWEEN main.[Shift Start] AND main.[Shift End]
 
@@ -1028,7 +1028,7 @@ FROM (
 
 WHERE a.RowNum = 1
 
-CREATE INDEX IDX_FlwshtLst ON #FlwshtLst (PAT_ENC_CSN_ID, FSD_ID) 
+CREATE INDEX IDX_FlwshtLst ON #FlwshtLst (ENCOUNTER_ID, FSD_ID) 
 
 /*SELECT * FROM #FlwshtLst ORDER BY RECORDED_TIME*/
 
@@ -1038,7 +1038,7 @@ CREATE INDEX IDX_FlwshtLst ON #FlwshtLst (PAT_ENC_CSN_ID, FSD_ID)
 
 IF OBJECT_ID(N'tempdb..#FlwshtLstHuddleODScore') IS NOT NULL DROP TABLE #FlwshtLstHuddleODScore;
 
-SELECT main.PAT_ENC_CSN_ID
+SELECT main.ENCOUNTER_ID
 
 	, meas.FSD_ID
 
@@ -1048,7 +1048,7 @@ SELECT main.PAT_ENC_CSN_ID
 
 	, meas.MEAS_VALUE
 
-	, main.[CSN Overall Order]
+	, main.[ENC_ID Overall Order]
 
 INTO #FlwshtLstHuddleODScore
 
@@ -1064,7 +1064,7 @@ INNER JOIN [EMRDB].[dbo].[FLOWSHEET_MEASUREMENTS] meas ON rec.FSD_ID = meas.FSD_
 
 WHERE meas.RECORDED_TIME BETWEEN main.[Shift Start] AND main.[Shift End]
 
-CREATE INDEX IDX_FlwshtLstHuddleODScore ON #FlwshtLstHuddleODScore (PAT_ENC_CSN_ID, FSD_ID) 
+CREATE INDEX IDX_FlwshtLstHuddleODScore ON #FlwshtLstHuddleODScore (ENCOUNTER_ID, FSD_ID) 
 
 /*SELECT * FROM #FlwshtLstHuddleODScore*/
 
@@ -1074,7 +1074,7 @@ CREATE INDEX IDX_FlwshtLstHuddleODScore ON #FlwshtLstHuddleODScore (PAT_ENC_CSN_
 
 IF OBJECT_ID(N'tempdb..#FlwshtNoAlert') IS NOT NULL DROP TABLE #FlwshtNoAlert;
 
-SELECT a.PAT_ENC_CSN_ID
+SELECT a.ENCOUNTER_ID
 
 	, MAX(a.RECORDED_TIME) RECORDED_TIME
 
@@ -1082,13 +1082,13 @@ SELECT a.PAT_ENC_CSN_ID
 
 	, STRING_AGG([CLINICAL_ALERTS Not Activated Comment],  ' % ') [CLINICAL_ALERTS Not Activated Comment]
 
-	, a.[CSN Overall Order]
+	, a.[ENC_ID Overall Order]
 
 INTO #FlwshtNoAlert
 
 FROM (
 
-	SELECT main.PAT_ENC_CSN_ID
+	SELECT main.ENCOUNTER_ID
 
 		, rec.INPATIENT_DATA_ID
 
@@ -1100,7 +1100,7 @@ FROM (
 
 		, meas.MEAS_COMMENT as [CLINICAL_ALERTS Not Activated Comment]
 
-		, main.[CSN Overall Order]
+		, main.[ENC_ID Overall Order]
 
 	FROM #Base_Pop main
 
@@ -1112,9 +1112,9 @@ FROM (
 
 ) a
 
-GROUP BY a.PAT_ENC_CSN_ID, a.[CSN Overall Order]
+GROUP BY a.ENCOUNTER_ID, a.[ENC_ID Overall Order]
 
-CREATE INDEX IDX_FlwshtNoAlert ON #FlwshtNoAlert (PAT_ENC_CSN_ID, [CSN Overall Order]) 
+CREATE INDEX IDX_FlwshtNoAlert ON #FlwshtNoAlert (ENCOUNTER_ID, [ENC_ID Overall Order]) 
 
 /*SELECT * FROM #FlwshtNoAlert*/
 
@@ -1122,7 +1122,7 @@ CREATE INDEX IDX_FlwshtNoAlert ON #FlwshtNoAlert (PAT_ENC_CSN_ID, [CSN Overall O
 
 IF OBJECT_ID(N'tempdb..#FlwshtAlert') IS NOT NULL DROP TABLE #FlwshtAlert;
 
-SELECT a.PAT_ENC_CSN_ID
+SELECT a.ENCOUNTER_ID
 
 	, a.ALT_ID
 
@@ -1130,13 +1130,13 @@ SELECT a.PAT_ENC_CSN_ID
 
 	, a.[CLINICAL_ALERTS Activated Comment]
 
-	, a.[CSN Overall Order]
+	, a.[ENC_ID Overall Order]
 
 INTO #FlwshtAlert
 
 FROM (
 
-	SELECT main.PAT_ENC_CSN_ID
+	SELECT main.ENCOUNTER_ID
 
 		, alt.ALT_ID
 
@@ -1144,17 +1144,17 @@ FROM (
 
 		, COALESCE(his.SPEC_OVR_CMNT,' ')+ rsn.[NAME] [CLINICAL_ALERTS Activated Comment]
 
-		, main.[CSN Overall Order]
+		, main.[ENC_ID Overall Order]
 
-		, ROW_NUMBER() OVER(PARTITION BY main.PAT_ENC_CSN_ID, main.[CSN Overall Order] ORDER BY main.[CSN Overall Order]) RowNum
+		, ROW_NUMBER() OVER(PARTITION BY main.ENCOUNTER_ID, main.[ENC_ID Overall Order] ORDER BY main.[ENC_ID Overall Order]) RowNum
 
 	FROM #Base_Pop main
 
-	INNER JOIN [EMRDB].[dbo].[CLINICAL_ALERTS] alt ON alt.PAT_CSN = main.PAT_ENC_CSN_ID AND alt.BPA_LOCATOR_ID = 900400001 /*BASE 2019 HS OD SCORE SEPSIS >2 [900400001]*/
+	INNER JOIN [EMRDB].[dbo].[CLINICAL_ALERTS] alt ON alt.VISIT_ID = main.ENCOUNTER_ID AND alt.BPA_LOCATOR_ID = 900400001 /*BASE 2019 HS OD SCORE SEPSIS >2 [900400001]*/
 
 	INNER JOIN [EMRDB].[dbo].[ALERT_HISTORY] his ON his.ALT_ID = alt.ALT_ID
 
-	INNER JOIN [EMRDB].[dbo].[REF_ALERT_OVERRIDE_REASONS] rsn ON rsn.ALRT_SP_OVR_RSN_C = his.SPEC_OVR_RSN_C
+	INNER JOIN [EMRDB].[dbo].[REF_ALERT_OVERRIDE_REASONS] rsn ON rsn.ALRT_SP_OVR_RSN_CODE = his.SPEC_OVR_RSN_CODE
 
 	WHERE his.ALT_ACTION_INST BETWEEN main.[Shift Start] AND main.[Shift End]
 
@@ -1162,7 +1162,7 @@ FROM (
 
 WHERE a.RowNum = 1
 
-CREATE INDEX IDX_FlwshtAlert ON #FlwshtAlert (PAT_ENC_CSN_ID) 
+CREATE INDEX IDX_FlwshtAlert ON #FlwshtAlert (ENCOUNTER_ID) 
 
 /*SELECT * FROM #FlwshtAlert*/
 
@@ -1170,7 +1170,7 @@ CREATE INDEX IDX_FlwshtAlert ON #FlwshtAlert (PAT_ENC_CSN_ID)
 
 IF OBJECT_ID(N'tempdb..#Base_Pop_OD_Scores') IS NOT NULL DROP TABLE #Base_Pop_OD_Scores;
 
-SELECT bp.PAT_ENC_CSN_ID
+SELECT bp.ENCOUNTER_ID
 
 	, bp.ADT_DEPARTMENT_ID
 
@@ -1204,7 +1204,7 @@ SELECT bp.PAT_ENC_CSN_ID
 
 	, alertActivated.[CLINICAL_ALERTS Activated Comment]
 
-	, bp.[CSN Overall Order]
+	, bp.[ENC_ID Overall Order]
 
 	, CASE WHEN meas.MEAS_VALUE >= 2 THEN 'Y' ELSE 'N' END [ShowComponents]
 
@@ -1214,17 +1214,17 @@ INTO #Base_Pop_OD_Scores
 
 FROM #Base_Pop bp 
 
-INNER JOIN [EMRDB].[dbo].[HOSPITAL_ENCOUNTERS] peh ON peh.PAT_ENC_CSN_ID = bp.PAT_ENC_CSN_ID
+INNER JOIN [EMRDB].[dbo].[HOSPITAL_ENCOUNTERS] peh ON peh.ENCOUNTER_ID = bp.ENCOUNTER_ID
 
-LEFT OUTER JOIN #FlwshtLst meas ON meas.PAT_ENC_CSN_ID = bp.PAT_ENC_CSN_ID AND meas.[CSN Overall Order] = bp.[CSN Overall Order]
+LEFT OUTER JOIN #FlwshtLst meas ON meas.ENCOUNTER_ID = bp.ENCOUNTER_ID AND meas.[ENC_ID Overall Order] = bp.[ENC_ID Overall Order]
 
 LEFT OUTER JOIN #FlwshtNoAlert alertNotActivated on 
 
 	(	
 
-		alertNotActivated.PAT_ENC_CSN_ID = bp.PAT_ENC_CSN_ID 
+		alertNotActivated.ENCOUNTER_ID = bp.ENCOUNTER_ID 
 
-		AND alertNotActivated.[CSN Overall Order] = bp.[CSN Overall Order]
+		AND alertNotActivated.[ENC_ID Overall Order] = bp.[ENC_ID Overall Order]
 
 	)
 
@@ -1232,9 +1232,9 @@ LEFT OUTER JOIN #FlwshtAlert alertActivated on
 
 	(	
 
-		alertActivated.PAT_ENC_CSN_ID = bp.PAT_ENC_CSN_ID 
+		alertActivated.ENCOUNTER_ID = bp.ENCOUNTER_ID 
 
-		AND alertActivated.[CSN Overall Order] = bp.[CSN Overall Order]
+		AND alertActivated.[ENC_ID Overall Order] = bp.[ENC_ID Overall Order]
 
 	)
 
@@ -1294,7 +1294,7 @@ OUTER APPLY
 
 ) huddleNote
 
-CREATE INDEX IDX_Base_Pop_OD_Scores ON #Base_Pop_OD_Scores (PAT_ENC_CSN_ID) 
+CREATE INDEX IDX_Base_Pop_OD_Scores ON #Base_Pop_OD_Scores (ENCOUNTER_ID) 
 
 /*SELECT * FROM #Base_Pop_OD_Scores */
 
@@ -1302,7 +1302,7 @@ CREATE INDEX IDX_Base_Pop_OD_Scores ON #Base_Pop_OD_Scores (PAT_ENC_CSN_ID)
 
 IF OBJECT_ID(N'tempdb..#SepsisAuditTemp') IS NOT NULL DROP TABLE #SepsisAuditTemp;
 
-SELECT main.PAT_ENC_CSN_ID, main.[CSN Overall Order], od.[OD Score Time], meas.FLO_MEAS_ID, meas.MEAS_VALUE, meas.RECORDED_TIME
+SELECT main.ENCOUNTER_ID, main.[ENC_ID Overall Order], od.[OD Score Time], meas.FLO_MEAS_ID, meas.MEAS_VALUE, meas.RECORDED_TIME
 
 	, DATEDIFF(n, od.[OD Score Time], meas.RECORDED_TIME) [Time since OD Score]
 
@@ -1312,7 +1312,7 @@ INTO #SepsisAuditTemp
 
 FROM #Base_Pop main
 
-INNER JOIN #Base_Pop_OD_Scores od ON od.PAT_ENC_CSN_ID = main.PAT_ENC_CSN_ID AND od.[CSN Overall Order] = main.[CSN Overall Order]
+INNER JOIN #Base_Pop_OD_Scores od ON od.ENCOUNTER_ID = main.ENCOUNTER_ID AND od.[ENC_ID Overall Order] = main.[ENC_ID Overall Order]
 
 INNER JOIN [EMRDB].[dbo].[FLOWSHEET_MEASUREMENTS] meas ON od.FSD_ID = meas.FSD_ID 
 
@@ -1332,7 +1332,7 @@ AND DATEDIFF(MINUTE, od.[OD Score Time], meas.RECORDED_TIME) BETWEEN -30 AND 180
 
 IF OBJECT_ID(N'tempdb..#FlwshtLstSepsisAudit') IS NOT NULL DROP TABLE #FlwshtLstSepsisAudit;
 
-SELECT bp.PAT_ENC_CSN_ID
+SELECT bp.ENCOUNTER_ID
 
 	, bp.ADT_DEPARTMENT_ID
 
@@ -1398,23 +1398,23 @@ SELECT bp.PAT_ENC_CSN_ID
 
 	, sepsisAudit.[Notification]
 
-	, bp.[CSN Overall Order]
+	, bp.[ENC_ID Overall Order]
 
 INTO #FlwshtLstSepsisAudit
 
 FROM #Base_Pop bp 
 
-INNER JOIN [EMRDB].[dbo].[HOSPITAL_ENCOUNTERS] peh ON peh.PAT_ENC_CSN_ID = bp.PAT_ENC_CSN_ID
+INNER JOIN [EMRDB].[dbo].[HOSPITAL_ENCOUNTERS] peh ON peh.ENCOUNTER_ID = bp.ENCOUNTER_ID
 
-LEFT OUTER JOIN #FlwshtLst meas ON meas.PAT_ENC_CSN_ID = bp.PAT_ENC_CSN_ID AND meas.[CSN Overall Order] = bp.[CSN Overall Order]
+LEFT OUTER JOIN #FlwshtLst meas ON meas.ENCOUNTER_ID = bp.ENCOUNTER_ID AND meas.[ENC_ID Overall Order] = bp.[ENC_ID Overall Order]
 
 OUTER APPLY 
 
 (
 
-	SELECT bp.PAT_ENC_CSN_ID
+	SELECT bp.ENCOUNTER_ID
 
-		, bp.[CSN Overall Order]
+		, bp.[ENC_ID Overall Order]
 
 		, MAX(CASE WHEN a.FLO_MEAS_ID = '900101' THEN a.MEAS_VALUE END) AS "R Brachial Pulse"
 
@@ -1472,7 +1472,7 @@ OUTER APPLY
 
 		SELECT 
 
-			subMeas.PAT_ENC_CSN_ID
+			subMeas.ENCOUNTER_ID
 
 			, subMeas.FLO_MEAS_ID
 
@@ -1480,17 +1480,17 @@ OUTER APPLY
 
 			, subMeas.MEAS_VALUE
 
-			, ROW_NUMBER() OVER (PARTITION BY subMeas.PAT_ENC_CSN_ID, subMeas.[CSN Overall Order], subMeas.FLO_MEAS_ID ORDER BY subMeas.[ABS Time since OD Score]) rownumber
+			, ROW_NUMBER() OVER (PARTITION BY subMeas.ENCOUNTER_ID, subMeas.[ENC_ID Overall Order], subMeas.FLO_MEAS_ID ORDER BY subMeas.[ABS Time since OD Score]) rownumber
 
-			, subMeas.[CSN Overall Order]
+			, subMeas.[ENC_ID Overall Order]
 
 			, subMeas.[ABS Time since OD Score]
 
 		FROM #SepsisAuditTemp subMeas
 
-		WHERE subMeas.PAT_ENC_CSN_ID = bp.PAT_ENC_CSN_ID
+		WHERE subMeas.ENCOUNTER_ID = bp.ENCOUNTER_ID
 
-		AND subMeas.[CSN Overall Order] = bp.[CSN Overall Order]
+		AND subMeas.[ENC_ID Overall Order] = bp.[ENC_ID Overall Order]
 
 		AND subMeas.MEAS_VALUE IS NOT NULL
 
@@ -1498,7 +1498,7 @@ OUTER APPLY
 
 	WHERE a.rownumber = 1
 
-	GROUP BY PAT_ENC_CSN_ID, [CSN Overall Order]
+	GROUP BY ENCOUNTER_ID, [ENC_ID Overall Order]
 
 ) sepsisAudit
 
@@ -1510,7 +1510,7 @@ IF OBJECT_ID(N'tempdb..#FlwShtHypo') IS NOT NULL DROP TABLE #FlwShtHypo;
 
 Select
 
-	main.PAT_ENC_CSN_ID
+	main.ENCOUNTER_ID
 
 	, meas.FLO_MEAS_ID
 
@@ -1524,7 +1524,7 @@ Select
 
 	, main.AGE_YEARS /*Age at shift start*/
 
-	, main.[CSN Overall Order]
+	, main.[ENC_ID Overall Order]
 
 Into #FlwShtHypo 
 
@@ -1536,7 +1536,7 @@ INNER JOIN [EMRDB].[dbo].[FLOWSHEET_MEASUREMENTS] meas ON rec.FSD_ID = meas.FSD_
 
 WHERE meas.RECORDED_TIME BETWEEN main.[Shift Start] AND main.[Shift End]
 
-CREATE INDEX IDX_FlwShtHypo ON #FlwShtHypo (PAT_ENC_CSN_ID, [CSN Overall Order])
+CREATE INDEX IDX_FlwShtHypo ON #FlwShtHypo (ENCOUNTER_ID, [ENC_ID Overall Order])
 
 /*SELECT * FROM #FlwShtHypo*/
 
@@ -1546,7 +1546,7 @@ IF OBJECT_ID(N'tempdb..#Hypotension') IS NOT NULL DROP TABLE #Hypotension;
 
 SELECT    
 
-	base.PAT_ENC_CSN_ID
+	base.ENCOUNTER_ID
 
 	, base.AGE_MONTHS
 
@@ -1562,19 +1562,19 @@ SELECT
 
 	, systolic.SYSTOLIC    
 
-	, base.[CSN Order]
+	, base.[ENC_ID Order]
 
 	, base.[Unit Order]
 
-	, base.[CSN Overall Order]
+	, base.[ENC_ID Overall Order]
 
-	, ROW_NUMBER() OVER(PARTITION BY base.PAT_ENC_CSN_ID, base.[CSN Order], base.[Unit Order] ORDER BY base.[CSN Overall Order] ASC) AS TIME_LINE 
+	, ROW_NUMBER() OVER(PARTITION BY base.ENCOUNTER_ID, base.[ENC_ID Order], base.[Unit Order] ORDER BY base.[ENC_ID Overall Order] ASC) AS TIME_LINE 
 
 INTO #Hypotension 
 
 FROM #Base_Pop base 
 
-INNER JOIN #FlwShtHypo meas ON meas.PAT_ENC_CSN_ID = base.PAT_ENC_CSN_ID AND meas.[CSN Overall Order] = base.[CSN Overall Order]
+INNER JOIN #FlwShtHypo meas ON meas.ENCOUNTER_ID = base.ENCOUNTER_ID AND meas.[ENC_ID Overall Order] = base.[ENC_ID Overall Order]
 
 CROSS APPLY ( SELECT LEFT(meas.MEAS_VALUE, CHARINDEX('/', meas.MEAS_VALUE)-1) SYSTOLIC ) systolic 
 
@@ -1638,7 +1638,7 @@ OUTER APPLY
 
 	FROM #Hypotension hypo
 
-	WHERE hypo.PAT_ENC_CSN_ID = a.PAT_ENC_CSN_ID 
+	WHERE hypo.ENCOUNTER_ID = a.ENCOUNTER_ID 
 
 	AND hypo.[Hypotension Time] < a.[OD Score Time]
 
@@ -1654,7 +1654,7 @@ OUTER APPLY
 
 	FROM #Hypotension hypo
 
-	WHERE hypo.PAT_ENC_CSN_ID = a.PAT_ENC_CSN_ID 
+	WHERE hypo.ENCOUNTER_ID = a.ENCOUNTER_ID 
 
 	AND hypo.[Hypotension Time] >= a.[OD Score Time]
 
@@ -1662,7 +1662,7 @@ OUTER APPLY
 
 )firstHypo
 
-CREATE INDEX IDX_ODHYPO ON #ODHYPO (PAT_ENC_CSN_ID) 
+CREATE INDEX IDX_ODHYPO ON #ODHYPO (ENCOUNTER_ID) 
 
 /*SELECT * FROM #ODHYPO*/
 
@@ -1690,7 +1690,7 @@ IF OBJECT_ID(N'tempdb..#BasePopABX') IS NOT NULL DROP TABLE #BasePopABX;
 
 SELECT
 
-	om.PAT_ENC_CSN_ID
+	om.ENCOUNTER_ID
 
 	, base.ADT_DEPARTMENT_ID
 
@@ -1706,19 +1706,19 @@ SELECT
 
 	, mar.SIG AS BOLUS_VOLUME
 
-	, CASE WHEN mar.TAKEN_TIME BETWEEN base.[Shift Start] AND base.[Shift End] THEN base.[CSN Overall Order] ELSE NULL END [In Shift]
+	, CASE WHEN mar.TAKEN_TIME BETWEEN base.[Shift Start] AND base.[Shift End] THEN base.[ENC_ID Overall Order] ELSE NULL END [In Shift]
 
-	, ROW_NUMBER() OVER(PARTITION BY om.PAT_ENC_CSN_ID ORDER BY mar.TAKEN_TIME) TIME_LINE
+	, ROW_NUMBER() OVER(PARTITION BY om.ENCOUNTER_ID ORDER BY mar.TAKEN_TIME) TIME_LINE
 
 INTO #BasePopABX
 
 FROM #Base_Pop base
 
-INNER JOIN [EMRDB].[dbo].[MEDICATION_ORDERS] om	ON om.PAT_ENC_CSN_ID = base.PAT_ENC_CSN_ID
+INNER JOIN [EMRDB].[dbo].[MEDICATION_ORDERS] om	ON om.ENCOUNTER_ID = base.ENCOUNTER_ID
 
-INNER JOIN [EMRDB].[dbo].[MEDICATIONS] med ON med.MEDICATION_ID = om.MEDICATION_ID AND med.THERA_CLASS_C = 11 /*Antibiotics*/
+INNER JOIN [EMRDB].[dbo].[MEDICATIONS] med ON med.MEDICATION_ID = om.MEDICATION_ID AND med.THERA_CLASS_CODE = 11 /*Antibiotics*/
 
-INNER JOIN [EMRDB].[dbo].MED_DETAILS_EXT med2 ON med2.MEDICATION_ID = med.MEDICATION_ID /*Developer C Adding to be able to exclude ADMIN_ROUTE_C instead of text*/
+INNER JOIN [EMRDB].[dbo].MED_DETAILS_EXT med2 ON med2.MEDICATION_ID = med.MEDICATION_ID /*Developer C Adding to be able to exclude ADMIN_ROUTE_CODE instead of text*/
 
 INNER JOIN [EMRDB].[dbo].[MED_ADMIN_RECORDS] mar ON mar.ORDER_MED_ID = om.ORDER_MED_ID
 
@@ -1726,13 +1726,13 @@ INNER JOIN [EMRDB].[dbo].[CALENDAR_DATES] dd ON dd.CALENDAR_DT = CAST(mar.TAKEN_
 
 WHERE mar.TAKEN_TIME IS NOT NULL /*ADMINISTERED ABX ONLY*/
 
-AND mar.MAR_ACTION_C IN ( SELECT CAT_ID FROM #MARActions WHERE CAT_ID <> '99')
+AND mar.MAR_ACTION_CODE IN ( SELECT CAT_ID FROM #MARActions WHERE CAT_ID <> '99')
 
 /*VALUES BELOW ADDED TO THE CODE ON STEPHANIE'S REQUEST DURING VALIDATION.*/
 
-AND med2.ADMIN_ROUTE_C NOT IN (SELECT * FROM #RouteExclusions)
+AND med2.ADMIN_ROUTE_CODE NOT IN (SELECT * FROM #RouteExclusions)
 
-CREATE INDEX IDX_BasePopABX ON #BasePopABX (PAT_ENC_CSN_ID) 
+CREATE INDEX IDX_BasePopABX ON #BasePopABX (ENCOUNTER_ID) 
 
 /*SELECT * FROM #BasePopABX*/
 
@@ -1780,7 +1780,7 @@ OUTER APPLY
 
 		, abx.NAME
 
-		, abx.PAT_ENC_CSN_ID
+		, abx.ENCOUNTER_ID
 
 		, abx.ADT_DEPARTMENT_NAME
 
@@ -1792,7 +1792,7 @@ OUTER APPLY
 
 	FROM #BasePopABX abx
 
-	WHERE abx.PAT_ENC_CSN_ID = scores.PAT_ENC_CSN_ID 
+	WHERE abx.ENCOUNTER_ID = scores.ENCOUNTER_ID 
 
 	AND abx.ABX_ADMIN_TIME < scores.[OD Score Time]
 
@@ -1814,7 +1814,7 @@ OUTER APPLY
 
 		, abx.NAME
 
-		, abx.PAT_ENC_CSN_ID
+		, abx.ENCOUNTER_ID
 
 		, abx.ADT_DEPARTMENT_NAME
 
@@ -1826,13 +1826,13 @@ OUTER APPLY
 
 	FROM #BasePopABX abx
 
-	WHERE abx.PAT_ENC_CSN_ID = scores.PAT_ENC_CSN_ID AND abx.ABX_ADMIN_TIME >= scores.[OD Score Time]
+	WHERE abx.ENCOUNTER_ID = scores.ENCOUNTER_ID AND abx.ABX_ADMIN_TIME >= scores.[OD Score Time]
 
 	ORDER BY abx.ABX_ADMIN_TIME ASC
 
 ) firstAbx
 
-CREATE INDEX IDX_ODABX ON #ODABX (PAT_ENC_CSN_ID) 
+CREATE INDEX IDX_ODABX ON #ODABX (ENCOUNTER_ID) 
 
 /*SELECT * FROM #ODABX*/
 
@@ -1854,7 +1854,7 @@ IF OBJECT_ID(N'tempdb..#SSOrderSet') IS NOT NULL DROP TABLE #SSOrderSet;
 
 SELECT DISTINCT
 
-	base.PAT_ENC_CSN_ID
+	base.ENCOUNTER_ID
 
 	, base.ADT_DEPARTMENT_ID
 
@@ -1866,7 +1866,7 @@ SELECT DISTINCT
 
 	, om.ORDER_DTTM
 
-	, ROW_NUMBER() OVER(PARTITION BY base.PAT_ENC_CSN_ID ORDER BY om.ORDER_DTTM ASC) AS TIME_LINE
+	, ROW_NUMBER() OVER(PARTITION BY base.ENCOUNTER_ID ORDER BY om.ORDER_DTTM ASC) AS TIME_LINE
 
 	, om.PRL_ORDERSET_ID
 
@@ -1874,13 +1874,13 @@ INTO #SSOrderSet
 
 FROM #Base_Pop base
 
-INNER JOIN [EMRDB].[dbo].ORDER_TRACKING_METRICS om ON om.PAT_ENC_CSN_ID = base.PAT_ENC_CSN_ID
+INNER JOIN [EMRDB].[dbo].ORDER_TRACKING_METRICS om ON om.ENCOUNTER_ID = base.ENCOUNTER_ID
 
 INNER JOIN [EMRDB].[dbo].[CALENDAR_DATES] dd ON dd.CALENDAR_DT = CAST(om.ORDER_DTTM AS Date)
 
 WHERE om.PRL_ORDERSET_ID IN (400001) /*(40400100, 40400058, 40400196, 40400153, 4058600002, 400001) Severe Sepsis, Short Stay – Sepsis, H/O – Sepsis CLINICAL_ALERTS, ID – Staph Aureus Sepsis, H/O Sepsis CLINICAL_ALERTS in Clinic, Sepsis Pathway*/
 
-CREATE INDEX IDX_SSOrderSet ON #SSOrderSet (PAT_ENC_CSN_ID) 
+CREATE INDEX IDX_SSOrderSet ON #SSOrderSet (ENCOUNTER_ID) 
 
 /*SELECT * FROM #SSOrderSet*/
 
@@ -1916,7 +1916,7 @@ OUTER APPLY
 
 	FROM #SSOrderSet sos
 
-	WHERE sos.PAT_ENC_CSN_ID = scores.PAT_ENC_CSN_ID 
+	WHERE sos.ENCOUNTER_ID = scores.ENCOUNTER_ID 
 
 	AND sos.ORDER_DTTM < scores.[OD Score Time]
 
@@ -1934,7 +1934,7 @@ OUTER APPLY
 
 	FROM #SSOrderSet sos
 
-	WHERE sos.PAT_ENC_CSN_ID = scores.PAT_ENC_CSN_ID 
+	WHERE sos.ENCOUNTER_ID = scores.ENCOUNTER_ID 
 
 	AND sos.ORDER_DTTM >= scores.[OD Score Time]
 
@@ -1942,7 +1942,7 @@ OUTER APPLY
 
 )firstOs
 
-CREATE INDEX IDX_ODORDSET ON #ODORDSET (PAT_ENC_CSN_ID) 
+CREATE INDEX IDX_ODORDSET ON #ODORDSET (ENCOUNTER_ID) 
 
 /*SELECT * FROM #ODORDSET*/
 
@@ -1962,7 +1962,7 @@ IF OBJECT_ID(N'tempdb..#BasePopBolus') IS NOT NULL DROP TABLE #BasePopBolus;
 
 SELECT
 
-	base.PAT_ENC_CSN_ID
+	base.ENCOUNTER_ID
 
 	, base.ADT_DEPARTMENT_ID
 
@@ -1976,7 +1976,7 @@ SELECT
 
 	, med.NAME AS Medication
 
-	, ROW_NUMBER() OVER(PARTITION BY base.PAT_ENC_CSN_ID ORDER BY mar.TAKEN_TIME ASC) TIME_LINE
+	, ROW_NUMBER() OVER(PARTITION BY base.ENCOUNTER_ID ORDER BY mar.TAKEN_TIME ASC) TIME_LINE
 
 	, mar.SIG AS BOLUS_VOLUME
 
@@ -1984,7 +1984,7 @@ INTO #BasePopBolus
 
 FROM #Base_Pop base
 
-INNER JOIN [EMRDB].[dbo].[MEDICATION_ORDERS] om ON om.PAT_ENC_CSN_ID = base.PAT_ENC_CSN_ID
+INNER JOIN [EMRDB].[dbo].[MEDICATION_ORDERS] om ON om.ENCOUNTER_ID = base.ENCOUNTER_ID
 
 INNER JOIN [EMRDB].[dbo].[MEDICATIONS] med ON med.MEDICATION_ID = om.MEDICATION_ID
 
@@ -2004,11 +2004,11 @@ AND om.HV_DISCR_FREQ_ID = '300902') /*FREQUENCY = ONCE*/
 
 /*Developer C VCG Grouper 1222252*/
 
-AND mar.MAR_ACTION_C IN ( SELECT CAT_ID FROM #MARActions WHERE CAT_ID <> '99')
+AND mar.MAR_ACTION_CODE IN ( SELECT CAT_ID FROM #MARActions WHERE CAT_ID <> '99')
 
 AND CONVERT(NUMERIC, mar.SIG ) > 95.0
 
-CREATE INDEX IDX_BasePopBolus ON #BasePopBolus (PAT_ENC_CSN_ID) 
+CREATE INDEX IDX_BasePopBolus ON #BasePopBolus (ENCOUNTER_ID) 
 
 /*SELECT * FROM #BasePopBolus*/
 
@@ -2056,7 +2056,7 @@ OUTER APPLY
 
 	FROM #BasePopBolus bol
 
-	WHERE bol.PAT_ENC_CSN_ID = scores.PAT_ENC_CSN_ID 
+	WHERE bol.ENCOUNTER_ID = scores.ENCOUNTER_ID 
 
 	AND bol.BOLUS_ADMIN_TIME < scores.[OD Score Time]
 
@@ -2078,7 +2078,7 @@ OUTER APPLY
 
 	FROM #BasePopBolus bol
 
-	WHERE bol.PAT_ENC_CSN_ID = scores.PAT_ENC_CSN_ID 
+	WHERE bol.ENCOUNTER_ID = scores.ENCOUNTER_ID 
 
 	AND bol.BOLUS_ADMIN_TIME >= scores.[OD Score Time]
 
@@ -2086,7 +2086,7 @@ OUTER APPLY
 
 )firstBol
 
-CREATE INDEX IDX_OdboL ON #OdboL (PAT_ENC_CSN_ID) 
+CREATE INDEX IDX_OdboL ON #OdboL (ENCOUNTER_ID) 
 
 /*SELECT * FROM #OdboL*/
 
@@ -2102,13 +2102,13 @@ IF OBJECT_ID(N'tempdb..#BasePopBolus') IS NOT NULL DROP TABLE #BasePopBolus;
 
 /*****************************CVL TIMES*****************************/
 
-/*CVL TIME - TEST CSN 1016010350*/
+/*CVL TIME - TEST ENCOUNTER 5550010001*/
 
 IF OBJECT_ID(N'tempdb..#ALLCVLTime') IS NOT NULL DROP TABLE #ALLCVLTime;
 
 SELECT DISTINCT
 
-	b.PAT_ENC_CSN_ID
+	b.ENCOUNTER_ID
 
 	, b.ADT_DEPARTMENT_ID
 
@@ -2120,13 +2120,13 @@ SELECT DISTINCT
 
 	, lda.PLACEMENT_INSTANT
 
-	, ROW_NUMBER() OVER(PARTITION BY b.PAT_ENC_CSN_ID, b.ADT_DEPARTMENT_ID, b.InDepartmentTime ORDER BY lda.PLACEMENT_INSTANT) TIME_LINE
+	, ROW_NUMBER() OVER(PARTITION BY b.ENCOUNTER_ID, b.ADT_DEPARTMENT_ID, b.InDepartmentTime ORDER BY lda.PLACEMENT_INSTANT) TIME_LINE
 
 INTO #ALLCVLTime
 
 FROM #Base_Pop b
 
-INNER JOIN [EMRDB].[dbo].[LINE_DEVICE_AIRWAY] lda ON lda.PAT_ENC_CSN_ID = b.PAT_ENC_CSN_ID 
+INNER JOIN [EMRDB].[dbo].[LINE_DEVICE_AIRWAY] lda ON lda.ENCOUNTER_ID = b.ENCOUNTER_ID 
 
 INNER JOIN [EMRDB].[dbo].[CALENDAR_DATES] dd ON dd.CALENDAR_DT = CAST(lda.PLACEMENT_INSTANT AS DATE)
 
@@ -2136,7 +2136,7 @@ INNER JOIN [reportingDB].[reports].[CONFIG_VALUE_SET] cvs ON cvs.CODE = lda.FLO_
 
 			AND cvs.VALUE_SET_ID = 3022 /*CVL CODES*/
 
-CREATE INDEX IDX_ALLCVLTime ON #ALLCVLTime (PAT_ENC_CSN_ID) 
+CREATE INDEX IDX_ALLCVLTime ON #ALLCVLTime (ENCOUNTER_ID) 
 
 /*SELECT * FROM #ALLCVLTime*/
 
@@ -2166,7 +2166,7 @@ OUTER APPLY
 
 	FROM #ALLCVLTime cvl
 
-	WHERE cvl.PAT_ENC_CSN_ID = scores.PAT_ENC_CSN_ID 
+	WHERE cvl.ENCOUNTER_ID = scores.ENCOUNTER_ID 
 
 	AND cvl.PLACEMENT_INSTANT < scores.[OD Score Time]
 
@@ -2182,7 +2182,7 @@ OUTER APPLY
 
 	FROM #ALLCVLTime cvl
 
-	WHERE cvl.PAT_ENC_CSN_ID = scores.PAT_ENC_CSN_ID 
+	WHERE cvl.ENCOUNTER_ID = scores.ENCOUNTER_ID 
 
 	AND cvl.PLACEMENT_INSTANT >= scores.[OD Score Time]
 
@@ -2190,7 +2190,7 @@ OUTER APPLY
 
 )firstCVL
 
-CREATE INDEX IDX_ODCVL ON #ODCVL (PAT_ENC_CSN_ID) 
+CREATE INDEX IDX_ODCVL ON #ODCVL (ENCOUNTER_ID) 
 
 /*SELECT * FROM #ODCVL*/
 
@@ -2210,7 +2210,7 @@ IF OBJECT_ID(N'tempdb..#Pressors') IS NOT NULL DROP TABLE #Pressors;
 
 SELECT DISTINCT
 
-	base.PAT_ENC_CSN_ID
+	base.ENCOUNTER_ID
 
 	, base.ADT_DEPARTMENT_ID
 
@@ -2226,13 +2226,13 @@ SELECT DISTINCT
 
 	, cm.NAME AS MEDICATION
 
-	, ROW_NUMBER() OVER(PARTITION BY base.PAT_ENC_CSN_ID ORDER BY mar.TAKEN_TIME) AS TIME_LINE
+	, ROW_NUMBER() OVER(PARTITION BY base.ENCOUNTER_ID ORDER BY mar.TAKEN_TIME) AS TIME_LINE
 
 INTO #Pressors 
 
 FROM #Base_Pop base
 
-LEFT JOIN [EMRDB].[dbo].[MEDICATION_ORDERS] om ON om.PAT_ENC_CSN_ID = base.PAT_ENC_CSN_ID
+LEFT JOIN [EMRDB].[dbo].[MEDICATION_ORDERS] om ON om.ENCOUNTER_ID = base.ENCOUNTER_ID
 
 LEFT JOIN [EMRDB].[dbo].[MEDICATIONS] cm ON cm.MEDICATION_ID = om.MEDICATION_ID
 
@@ -2242,17 +2242,17 @@ LEFT JOIN [EMRDB].[dbo].[MED_ADMIN_RECORDS] mar ON mar.ORDER_MED_ID = om.ORDER_M
 
 LEFT JOIN [EMRDB].[dbo].[CALENDAR_DATES] dd ON dd.CALENDAR_DT = CAST(mar.TAKEN_TIME AS DATE)
 
-LEFT JOIN [EMRDB].[dbo].[HOSPITAL_ENCOUNTERS] peh ON peh.PAT_ENC_CSN_ID = base.PAT_ENC_CSN_ID
+LEFT JOIN [EMRDB].[dbo].[HOSPITAL_ENCOUNTERS] peh ON peh.ENCOUNTER_ID = base.ENCOUNTER_ID
 
 WHERE
 
 gmr.GROUPER_ID IN (SELECT * FROM #MedGroupers)
 
-AND mar.MAR_ACTION_C IN ( SELECT CAT_ID FROM #MARActions WHERE CAT_ID <> '99')
+AND mar.MAR_ACTION_CODE IN ( SELECT CAT_ID FROM #MARActions WHERE CAT_ID <> '99')
 
-AND mar.ROUTE_C = 11 /*INTRAVENOUS*/
+AND mar.ROUTE_CODE = 11 /*INTRAVENOUS*/
 
-CREATE INDEX IDX_Pressors ON #Pressors (PAT_ENC_CSN_ID) 
+CREATE INDEX IDX_Pressors ON #Pressors (ENCOUNTER_ID) 
 
 /*SELECT * FROM #Pressors*/
 
@@ -2260,7 +2260,7 @@ CREATE INDEX IDX_Pressors ON #Pressors (PAT_ENC_CSN_ID)
 
 IF OBJECT_ID(N'tempdb..#ODPressorSummary') IS NOT NULL DROP TABLE #ODPressorSummary;
 
-SELECT p.PAT_ENC_CSN_ID
+SELECT p.ENCOUNTER_ID
 
 	, CASE WHEN p.GROUPER_ID = '8000100'   THEN 'EPINEPHRINE' /*HS RX EPINEPHRINE SEPSIS*/
 
@@ -2280,9 +2280,9 @@ INTO #ODPressorSummary
 
 FROM #Pressors p
 
-GROUP BY p.PAT_ENC_CSN_ID, p.GROUPER_ID
+GROUP BY p.ENCOUNTER_ID, p.GROUPER_ID
 
-CREATE INDEX IDX_ODPressorSummary ON #ODPressorSummary (PAT_ENC_CSN_ID) 
+CREATE INDEX IDX_ODPressorSummary ON #ODPressorSummary (ENCOUNTER_ID) 
 
 /*SELECT * FROM #ODPressorSummary*/
 
@@ -2296,7 +2296,7 @@ IF OBJECT_ID(N'tempdb..#Pressors') IS NOT NULL DROP TABLE #Pressors;
 
 IF OBJECT_ID ('TEMPDB..#ODPressorPivot') IS NOT NULL DROP TABLE #ODPressorPivot
 
-SELECT PAT_ENC_CSN_ID
+SELECT ENCOUNTER_ID
 
 	, pvt.[EPINEPHRINE] AS [EPINEPHRINE]
 
@@ -2316,7 +2316,7 @@ PIVOT( MAX(myc)
 
 FOR PRESSOR IN ([EPINEPHRINE],[DOPAMINE],[DOBUTAMINE],[MILRINONE],[NOREPINEPHRINE])) AS pvt
 
-CREATE INDEX IDX_ODPressorPivot ON #ODPressorPivot (PAT_ENC_CSN_ID) 
+CREATE INDEX IDX_ODPressorPivot ON #ODPressorPivot (ENCOUNTER_ID) 
 
 /*SELECT * FROM #ODPressorPivot*/
 
@@ -2334,7 +2334,7 @@ IF OBJECT_ID(N'tempdb..#ODPressorSummary') IS NOT NULL DROP TABLE #ODPressorSumm
 
 IF OBJECT_ID(N'tempdb..#SVO2') IS NOT NULL DROP TABLE #SVO2;
 
-SELECT base.PAT_ENC_CSN_ID
+SELECT base.ENCOUNTER_ID
 
 	, base.ADT_DEPARTMENT_ID
 
@@ -2352,7 +2352,7 @@ SELECT base.PAT_ENC_CSN_ID
 
 	, ordR.ORD_VALUE
 
-	, ROW_NUMBER() OVER(PARTITION BY base.PAT_ENC_CSN_ID ORDER BY op.ORDER_TIME ASC) AS TIME_LINE
+	, ROW_NUMBER() OVER(PARTITION BY base.ENCOUNTER_ID ORDER BY op.ORDER_TIME ASC) AS TIME_LINE
 
 	, ordR.ORDER_PROC_ID
 
@@ -2360,13 +2360,13 @@ INTO #SVO2
 
 FROM #Base_Pop base
 
-	INNER JOIN [EMRDB].[dbo].[LAB_ORDER_RESULTS] ordR ON base.PAT_ENC_CSN_ID = ordR.PAT_ENC_CSN_ID
+	INNER JOIN [EMRDB].[dbo].[LAB_ORDER_RESULTS] ordR ON base.ENCOUNTER_ID = ordR.ENCOUNTER_ID
 
 	INNER JOIN [EMRDB].[dbo].[PROCEDURE_ORDERS] op ON op.ORDER_PROC_ID = ordR.ORDER_PROC_ID
 
 WHERE ordR.COMPONENT_ID IN (5000001861, 5000000478)
 
-CREATE INDEX IDX_SVO2 ON #SVO2 (PAT_ENC_CSN_ID) 
+CREATE INDEX IDX_SVO2 ON #SVO2 (ENCOUNTER_ID) 
 
 /*SELECT * FROM #SVO2*/
 
@@ -2396,7 +2396,7 @@ OUTER APPLY
 
 	FROM #SVO2 SVO2
 
-	WHERE SVO2.PAT_ENC_CSN_ID = scores.PAT_ENC_CSN_ID AND SVO2.SVO2OrderTime < scores.[OD Score Time]
+	WHERE SVO2.ENCOUNTER_ID = scores.ENCOUNTER_ID AND SVO2.SVO2OrderTime < scores.[OD Score Time]
 
 	ORDER BY SVO2.SVO2OrderTime DESC
 
@@ -2408,13 +2408,13 @@ OUTER APPLY
 
 	SELECT TOP 1 SVO2.SVO2OrderTime FROM #SVO2 SVO2
 
-	WHERE SVO2.PAT_ENC_CSN_ID = scores.PAT_ENC_CSN_ID AND SVO2.SVO2OrderTime >= scores.[OD Score Time]
+	WHERE SVO2.ENCOUNTER_ID = scores.ENCOUNTER_ID AND SVO2.SVO2OrderTime >= scores.[OD Score Time]
 
 	ORDER BY SVO2.SVO2OrderTime ASC
 
 )firstSVO2
 
-CREATE INDEX IDX_ODSVO2 ON #ODSVO2 (PAT_ENC_CSN_ID) 
+CREATE INDEX IDX_ODSVO2 ON #ODSVO2 (ENCOUNTER_ID) 
 
 /*SELECT * FROM #ODSVO2*/
 
@@ -2434,7 +2434,7 @@ IF OBJECT_ID(N'tempdb..#LacticAcid') IS NOT NULL DROP TABLE #LacticAcid;
 
 SELECT
 
-	base.PAT_ENC_CSN_ID
+	base.ENCOUNTER_ID
 
 	, base.ADT_DEPARTMENT_ID
 
@@ -2454,13 +2454,13 @@ SELECT
 
 	, ordR.ORD_VALUE
 
-	, ROW_NUMBER() OVER(PARTITION BY base.PAT_ENC_CSN_ID ORDER BY op.ORDER_TIME, base.InDepartmentTime, ordR.RESULT_TIME ASC) AS TIME_LINE -- Developer C added Result time
+	, ROW_NUMBER() OVER(PARTITION BY base.ENCOUNTER_ID ORDER BY op.ORDER_TIME, base.InDepartmentTime, ordR.RESULT_TIME ASC) AS TIME_LINE -- Developer C added Result time
 
 INTO #LacticAcid
 
 FROM #Base_Pop base
 
-INNER JOIN [EMRDB].[dbo].[LAB_ORDER_RESULTS] ordR ON ordR.PAT_ENC_CSN_ID = base.PAT_ENC_CSN_ID
+INNER JOIN [EMRDB].[dbo].[LAB_ORDER_RESULTS] ordR ON ordR.ENCOUNTER_ID = base.ENCOUNTER_ID
 
 INNER JOIN [EMRDB].[dbo].[PROCEDURE_ORDERS] op ON op.ORDER_PROC_ID = ordR.ORDER_PROC_ID
 
@@ -2468,7 +2468,7 @@ INNER JOIN [EMRDB].[dbo].[CALENDAR_DATES] dd ON dd.CALENDAR_DT = CAST(op.ORDER_T
 
 WHERE ordR.COMPONENT_ID IN (SELECT * FROM #LacticAcidLRR)
 
-CREATE INDEX IDX_LacticAcid ON #LacticAcid (PAT_ENC_CSN_ID) 
+CREATE INDEX IDX_LacticAcid ON #LacticAcid (ENCOUNTER_ID) 
 
 /*SELECT * FROM #LacticAcid */
 
@@ -2504,7 +2504,7 @@ OUTER APPLY
 
 	FROM #LacticAcid lacA
 
-	WHERE lacA.PAT_ENC_CSN_ID = base.PAT_ENC_CSN_ID 
+	WHERE lacA.ENCOUNTER_ID = base.ENCOUNTER_ID 
 
 	AND lacA.MBOrderTime < base.[OD Score Time]
 
@@ -2522,7 +2522,7 @@ OUTER APPLY
 
 	FROM #LacticAcid lacA
 
-	WHERE lacA.PAT_ENC_CSN_ID = base.PAT_ENC_CSN_ID 
+	WHERE lacA.ENCOUNTER_ID = base.ENCOUNTER_ID 
 
 	AND lacA.MBOrderTime >= base.[OD Score Time]
 
@@ -2530,7 +2530,7 @@ OUTER APPLY
 
 )firstLA
 
-CREATE INDEX IDX_ODLA ON #ODLA(PAT_ENC_CSN_ID)
+CREATE INDEX IDX_ODLA ON #ODLA(ENCOUNTER_ID)
 
 /*SELECT * FROM #ODLA ORDER BY TIME_LINE*/
 
@@ -2550,7 +2550,7 @@ IF OBJECT_ID(N'tempdb..#Procalcitonin') IS NOT NULL DROP TABLE #Procalcitonin;
 
 SELECT
 
-	base.PAT_ENC_CSN_ID
+	base.ENCOUNTER_ID
 
 	, base.ADT_DEPARTMENT_ID
 
@@ -2568,7 +2568,7 @@ SELECT
 
 	, ordR.ORD_VALUE
 
-	, ROW_NUMBER() OVER(PARTITION BY base.PAT_ENC_CSN_ID ORDER BY op.ORDER_TIME ASC) AS TIME_LINE
+	, ROW_NUMBER() OVER(PARTITION BY base.ENCOUNTER_ID ORDER BY op.ORDER_TIME ASC) AS TIME_LINE
 
 	, ordR.ORDER_PROC_ID
 
@@ -2576,7 +2576,7 @@ INTO #Procalcitonin
 
 FROM  #Base_Pop base
 
-INNER JOIN [EMRDB].[dbo].[LAB_ORDER_RESULTS] ordR ON ordR.PAT_ENC_CSN_ID = base.PAT_ENC_CSN_ID
+INNER JOIN [EMRDB].[dbo].[LAB_ORDER_RESULTS] ordR ON ordR.ENCOUNTER_ID = base.ENCOUNTER_ID
 
 INNER JOIN [EMRDB].[dbo].[PROCEDURE_ORDERS] op ON op.ORDER_PROC_ID = ordR.ORDER_PROC_ID
 
@@ -2584,7 +2584,7 @@ INNER JOIN [EMRDB].[dbo].[CALENDAR_DATES] dd ON dd.CALENDAR_DT = CAST(op.ORDER_T
 
 WHERE ordR.COMPONENT_ID = 500001 /*COULD USE PROC CODE ALSO.... LAB014*/
 
-CREATE INDEX IDX_Procalcitonin ON #Procalcitonin (PAT_ENC_CSN_ID) 
+CREATE INDEX IDX_Procalcitonin ON #Procalcitonin (ENCOUNTER_ID) 
 
 /*SELECT * FROM #Procalcitonin*/
 
@@ -2620,7 +2620,7 @@ OUTER APPLY
 
 	FROM #Procalcitonin procal
 
-	WHERE procal.PAT_ENC_CSN_ID = base.PAT_ENC_CSN_ID 
+	WHERE procal.ENCOUNTER_ID = base.ENCOUNTER_ID 
 
 	AND procal.MBOrderTime < base.[OD Score Time]
 
@@ -2638,7 +2638,7 @@ OUTER APPLY
 
 	FROM #Procalcitonin procal
 
-	WHERE procal.PAT_ENC_CSN_ID = base.PAT_ENC_CSN_ID 
+	WHERE procal.ENCOUNTER_ID = base.ENCOUNTER_ID 
 
 	AND procal.MBOrderTime >= base.[OD Score Time]
 
@@ -2646,7 +2646,7 @@ OUTER APPLY
 
 )firstPro
 
-CREATE INDEX IDX_ODPROCAL ON #ODPROCAL (PAT_ENC_CSN_ID) 
+CREATE INDEX IDX_ODPROCAL ON #ODPROCAL (ENCOUNTER_ID) 
 
 /*SELECT * FROM #ODPROCAL*/
 
@@ -2666,7 +2666,7 @@ IF OBJECT_ID(N'tempdb..#Procalcitonin') IS NOT NULL DROP TABLE #Procalcitonin;
 
 IF OBJECT_ID(N'tempdb..#BloodCultureValue') IS NOT NULL DROP TABLE #BloodCultureValue;
 
-SELECT base.PAT_ENC_CSN_ID
+SELECT base.ENCOUNTER_ID
 
 	, base.ADT_DEPARTMENT_ID
 
@@ -2688,13 +2688,13 @@ SELECT base.PAT_ENC_CSN_ID
 
 	, res.ORD_VALUE
 
-	, ROW_NUMBER() OVER(PARTITION BY base.PAT_ENC_CSN_ID ORDER BY op.ORDER_TIME, res.RESULT_TIME ASC) AS TIME_LINE
+	, ROW_NUMBER() OVER(PARTITION BY base.ENCOUNTER_ID ORDER BY op.ORDER_TIME, res.RESULT_TIME ASC) AS TIME_LINE
 
 INTO #BloodCultureValue 
 
 FROM #Base_Pop base
 
-INNER JOIN [EMRDB].[dbo].[LAB_ORDER_RESULTS] res ON base.PAT_ENC_CSN_ID = res.PAT_ENC_CSN_ID
+INNER JOIN [EMRDB].[dbo].[LAB_ORDER_RESULTS] res ON base.ENCOUNTER_ID = res.ENCOUNTER_ID
 
 INNER JOIN [EMRDB].[dbo].[PROCEDURE_ORDERS] op  ON res.ORDER_PROC_ID = op.ORDER_PROC_ID 
 
@@ -2704,7 +2704,7 @@ INNER JOIN [EMRDB].[dbo].[PROCEDURES_CATALOG] eap ON eap.PROC_ID = op.PROC_ID
 
 INNER JOIN [EMRDB].[dbo].[CALENDAR_DATES] dd ON dd.CALENDAR_DT = CAST(op.ORDER_TIME AS DATE)
 
-CREATE INDEX IDX_BloodCultureValue ON #BloodCultureValue (PAT_ENC_CSN_ID) 
+CREATE INDEX IDX_BloodCultureValue ON #BloodCultureValue (ENCOUNTER_ID) 
 
 /*SELECT * FROM #BloodCultureValue*/
 
@@ -2746,7 +2746,7 @@ OUTER APPLY
 
 	FROM #BloodCultureValue bc
 
-	WHERE bc.PAT_ENC_CSN_ID = scores.PAT_ENC_CSN_ID 
+	WHERE bc.ENCOUNTER_ID = scores.ENCOUNTER_ID 
 
 	AND bc.RESULT_TIME < scores.[OD Score Time]
 
@@ -2766,7 +2766,7 @@ OUTER APPLY
 
 	FROM #BloodCultureValue bc
 
-	WHERE bc.PAT_ENC_CSN_ID = scores.PAT_ENC_CSN_ID 
+	WHERE bc.ENCOUNTER_ID = scores.ENCOUNTER_ID 
 
 	AND bc.RESULT_TIME >= scores.[OD Score Time]
 
@@ -2774,7 +2774,7 @@ OUTER APPLY
 
 )firstbc
 
-CREATE INDEX IDX_ODBC ON #ODBC (PAT_ENC_CSN_ID) 
+CREATE INDEX IDX_ODBC ON #ODBC (ENCOUNTER_ID) 
 
 /*SELECT * FROM #ODBC*/
 
@@ -2794,7 +2794,7 @@ IF OBJECT_ID(N'tempdb..#CSF') IS NOT NULL DROP TABLE #CSF;
 
 SELECT
 
-	base.PAT_ENC_CSN_ID
+	base.ENCOUNTER_ID
 
 	, base.ADT_DEPARTMENT_ID
 
@@ -2816,23 +2816,23 @@ SELECT
 
 	, res.ORD_VALUE
 
-	, ROW_NUMBER() OVER(PARTITION BY base.PAT_ENC_CSN_ID ORDER BY op.ORDER_TIME ASC) AS TIME_LINE
+	, ROW_NUMBER() OVER(PARTITION BY base.ENCOUNTER_ID ORDER BY op.ORDER_TIME ASC) AS TIME_LINE
 
 INTO #CSF 
 
 FROM #Base_Pop base
 
-INNER JOIN [EMRDB].[dbo].[LAB_ORDER_RESULTS] res ON base.PAT_ENC_CSN_ID = res.PAT_ENC_CSN_ID
+INNER JOIN [EMRDB].[dbo].[LAB_ORDER_RESULTS] res ON base.ENCOUNTER_ID = res.ENCOUNTER_ID
 
 INNER JOIN [EMRDB].[dbo].[PROCEDURE_ORDERS] op  ON res.ORDER_PROC_ID = op.ORDER_PROC_ID
 
-			AND PROC_ID IN (600005, 600006) AND op.SPECIMEN_SOURCE_C = 304
+			AND PROC_ID IN (600005, 600006) AND op.SPECIMEN_SOURCE_CODE = 304
 
 INNER JOIN [EMRDB].[dbo].[CALENDAR_DATES] dd ON dd.CALENDAR_DT = CAST(op.ORDER_TIME AS DATE)
 
 INNER JOIN [EMRDB].[dbo].[PROCEDURES_CATALOG] eap ON eap.PROC_ID = op.PROC_ID
 
-CREATE INDEX IDX_CSF ON #CSF (PAT_ENC_CSN_ID) 
+CREATE INDEX IDX_CSF ON #CSF (ENCOUNTER_ID) 
 
 /*SELECT * FROM #CSF*/
 
@@ -2868,7 +2868,7 @@ OUTER APPLY
 
 	FROM #CSF csf
 
-	WHERE csf.PAT_ENC_CSN_ID = scores.PAT_ENC_CSN_ID 
+	WHERE csf.ENCOUNTER_ID = scores.ENCOUNTER_ID 
 
 	AND csf.MBOrderTime < scores.[OD Score Time]
 
@@ -2886,7 +2886,7 @@ OUTER APPLY
 
 		FROM #CSF csf
 
-	WHERE csf.PAT_ENC_CSN_ID = scores.PAT_ENC_CSN_ID 
+	WHERE csf.ENCOUNTER_ID = scores.ENCOUNTER_ID 
 
 	AND csf.MBOrderTime >= scores.[OD Score Time]
 
@@ -2894,7 +2894,7 @@ OUTER APPLY
 
 )firstCF
 
-CREATE INDEX IDX_ODCSF ON #ODCSF (PAT_ENC_CSN_ID) 
+CREATE INDEX IDX_ODCSF ON #ODCSF (ENCOUNTER_ID) 
 
 /*SELECT * FROM #ODCSF*/
 
@@ -2912,7 +2912,7 @@ IF OBJECT_ID(N'tempdb..#CSF') IS NOT NULL DROP TABLE #CSF;
 
 IF OBJECT_ID(N'tempdb..#ETT') IS NOT NULL DROP TABLE #ETT;
 
-SELECT base.PAT_ENC_CSN_ID
+SELECT base.ENCOUNTER_ID
 
 	, base.ADT_DEPARTMENT_ID
 
@@ -2926,17 +2926,17 @@ SELECT base.PAT_ENC_CSN_ID
 
 	, lda.PLACEMENT_INSTANT
 
-	, ROW_NUMBER() OVER(PARTITION BY base.PAT_ENC_CSN_ID ORDER BY lda.PLACEMENT_INSTANT) TIME_LINE
+	, ROW_NUMBER() OVER(PARTITION BY base.ENCOUNTER_ID ORDER BY lda.PLACEMENT_INSTANT) TIME_LINE
 
 INTO #ETT
 
 FROM #Base_Pop base
 
-INNER JOIN [EMRDB].[dbo].[LINE_DEVICE_AIRWAY] lda ON lda.PAT_ENC_CSN_ID = base.PAT_ENC_CSN_ID AND lda.FLO_MEAS_ID = '900112' AND lda.PLACEMENT_INSTANT IS NOT NULL
+INNER JOIN [EMRDB].[dbo].[LINE_DEVICE_AIRWAY] lda ON lda.ENCOUNTER_ID = base.ENCOUNTER_ID AND lda.FLO_MEAS_ID = '900112' AND lda.PLACEMENT_INSTANT IS NOT NULL
 
 INNER JOIN [EMRDB].[dbo].[CALENDAR_DATES] dd ON dd.CALENDAR_DT = CAST(lda.PLACEMENT_INSTANT AS DATE)
 
-CREATE INDEX IDX_ETT ON #ETT (PAT_ENC_CSN_ID) 
+CREATE INDEX IDX_ETT ON #ETT (ENCOUNTER_ID) 
 
 /*SELECT * FROM #ETT WHERE TIME_LINE = 1*/
 
@@ -2966,7 +2966,7 @@ OUTER APPLY
 
 	FROM #ETT ett
 
-	WHERE ett.PAT_ENC_CSN_ID = scores.PAT_ENC_CSN_ID 
+	WHERE ett.ENCOUNTER_ID = scores.ENCOUNTER_ID 
 
 	AND ett.PLACEMENT_INSTANT < scores.[OD Score Time]
 
@@ -2982,7 +2982,7 @@ OUTER APPLY
 
 	FROM #ETT ett
 
-	WHERE ett.PAT_ENC_CSN_ID = scores.PAT_ENC_CSN_ID 
+	WHERE ett.ENCOUNTER_ID = scores.ENCOUNTER_ID 
 
 	AND ett.PLACEMENT_INSTANT >= scores.[OD Score Time]
 
@@ -2990,7 +2990,7 @@ OUTER APPLY
 
 )firstETT
 
-CREATE INDEX IDX_ODETT ON #ODETT (PAT_ENC_CSN_ID) 
+CREATE INDEX IDX_ODETT ON #ODETT (ENCOUNTER_ID) 
 
 /*SELECT * FROM #ODETT*/
 
@@ -3008,7 +3008,7 @@ IF OBJECT_ID(N'tempdb..#ETT') IS NOT NULL DROP TABLE #ETT;
 
 IF OBJECT_ID(N'tempdb..#PIV') IS NOT NULL DROP TABLE #PIV;
 
-SELECT base.PAT_ENC_CSN_ID
+SELECT base.ENCOUNTER_ID
 
 	, base.ADT_DEPARTMENT_ID
 
@@ -3022,17 +3022,17 @@ SELECT base.PAT_ENC_CSN_ID
 
 	, lda.PLACEMENT_INSTANT
 
-	, ROW_NUMBER() OVER(PARTITION BY base.PAT_ENC_CSN_ID ORDER BY lda.PLACEMENT_INSTANT) TIME_LINE
+	, ROW_NUMBER() OVER(PARTITION BY base.ENCOUNTER_ID ORDER BY lda.PLACEMENT_INSTANT) TIME_LINE
 
 INTO #PIV
 
 FROM #Base_Pop base
 
-INNER JOIN [EMRDB].[dbo].[LINE_DEVICE_AIRWAY] lda ON lda.PAT_ENC_CSN_ID = base.PAT_ENC_CSN_ID AND lda.FLO_MEAS_ID='900111' AND lda.PLACEMENT_INSTANT IS NOT NULL
+INNER JOIN [EMRDB].[dbo].[LINE_DEVICE_AIRWAY] lda ON lda.ENCOUNTER_ID = base.ENCOUNTER_ID AND lda.FLO_MEAS_ID='900111' AND lda.PLACEMENT_INSTANT IS NOT NULL
 
 INNER JOIN [EMRDB].[dbo].[CALENDAR_DATES] dd ON dd.CALENDAR_DT = CAST(lda.PLACEMENT_INSTANT AS DATE)
 
-CREATE INDEX IDX_PIV ON #PIV (PAT_ENC_CSN_ID) 
+CREATE INDEX IDX_PIV ON #PIV (ENCOUNTER_ID) 
 
 /*SELECT * FROM #PIV WHERE TIME_LINE = 1*/
 
@@ -3062,7 +3062,7 @@ OUTER APPLY
 
 	FROM #PIV piv
 
-	WHERE piv.PAT_ENC_CSN_ID = scores.PAT_ENC_CSN_ID 
+	WHERE piv.ENCOUNTER_ID = scores.ENCOUNTER_ID 
 
 	AND piv.PLACEMENT_INSTANT < scores.[OD Score Time]
 
@@ -3078,7 +3078,7 @@ OUTER APPLY
 
 	FROM #PIV piv
 
-	WHERE piv.PAT_ENC_CSN_ID = scores.PAT_ENC_CSN_ID 
+	WHERE piv.ENCOUNTER_ID = scores.ENCOUNTER_ID 
 
 	AND piv.PLACEMENT_INSTANT >= scores.[OD Score Time]
 
@@ -3086,7 +3086,7 @@ OUTER APPLY
 
 )firstPIV
 
-CREATE INDEX IDX_ODPIV ON #ODPIV (PAT_ENC_CSN_ID) 
+CREATE INDEX IDX_ODPIV ON #ODPIV (ENCOUNTER_ID) 
 
 /*SELECT * FROM #ODPIV */
 
@@ -3130,11 +3130,11 @@ AND RECORDED_TIME IS NOT NULL
 
 
 
-SELECT base.PAT_ENC_CSN_ID
+SELECT base.ENCOUNTER_ID
 
-	, CASE WHEN COUNT(meas.RECORDED_TIME) > 0 THEN 'Y' ELSE 'N' END AS PROPHYLAXIS_YN
+	, CASE WHEN COUNT(meas.RECORDED_TIME) > 0 THEN 'Y' ELSE 'N' END AS PROPHYLAXIS_FLAG
 
-	, base.[CSN Overall Order]
+	, base.[ENC_ID Overall Order]
 
 INTO #PROPHYLAXIS
 
@@ -3144,9 +3144,9 @@ INNER JOIN [EMRDB].[dbo].[FLOWSHEET_RECORDS] rec ON rec.INPATIENT_DATA_ID = base
 
 INNER JOIN FlwshtProp meas ON meas.FSD_ID = rec.FSD_ID
 
-GROUP BY base.PAT_ENC_CSN_ID, base.[CSN Overall Order]
+GROUP BY base.ENCOUNTER_ID, base.[ENC_ID Overall Order]
 
-CREATE INDEX IDX_PROPHYLAXIS ON #PROPHYLAXIS (PAT_ENC_CSN_ID) 
+CREATE INDEX IDX_PROPHYLAXIS ON #PROPHYLAXIS (ENCOUNTER_ID) 
 
 /*SELECT * FROM #PROPHYLAXIS*/
 
@@ -3158,11 +3158,11 @@ CREATE INDEX IDX_PROPHYLAXIS ON #PROPHYLAXIS (PAT_ENC_CSN_ID)
 
 IF OBJECT_ID(N'tempdb..#CVVH') IS NOT NULL DROP TABLE #CVVH;
 
-SELECT base.PAT_ENC_CSN_ID
+SELECT base.ENCOUNTER_ID
 
-	, CASE WHEN COUNT(meas.RECORDED_TIME)>0 THEN 'Y' ELSE 'N' END AS CVVH_YN
+	, CASE WHEN COUNT(meas.RECORDED_TIME)>0 THEN 'Y' ELSE 'N' END AS CVVH_FLAG
 
-	, base.[CSN Overall Order]
+	, base.[ENC_ID Overall Order]
 
 INTO #CVVH
 
@@ -3174,9 +3174,9 @@ INNER JOIN [EMRDB].[dbo].[FLOWSHEET_MEASUREMENTS] meas ON meas.FSD_ID = rec.FSD_
 
 INNER JOIN [EMRDB].[dbo].[CALENDAR_DATES] dd ON dd.CALENDAR_DT = CAST(meas.RECORDED_TIME AS DATE)
 
-GROUP BY base.PAT_ENC_CSN_ID, base.[CSN Overall Order]
+GROUP BY base.ENCOUNTER_ID, base.[ENC_ID Overall Order]
 
-CREATE INDEX IDX_CVVH ON #CVVH (PAT_ENC_CSN_ID) 
+CREATE INDEX IDX_CVVH ON #CVVH (ENCOUNTER_ID) 
 
 /*SELECT * FROM #CVVH*/
 
@@ -3188,11 +3188,11 @@ CREATE INDEX IDX_CVVH ON #CVVH (PAT_ENC_CSN_ID)
 
 IF OBJECT_ID(N'tempdb..#OX') IS NOT NULL DROP TABLE #OX;
 
-SELECT base.PAT_ENC_CSN_ID
+SELECT base.ENCOUNTER_ID
 
-	, CASE WHEN COUNT(meas.RECORDED_TIME)>0 THEN 'Y' ELSE 'N' END AS OX_YN
+	, CASE WHEN COUNT(meas.RECORDED_TIME)>0 THEN 'Y' ELSE 'N' END AS OX_FLAG
 
-	, base.[CSN Overall Order]
+	, base.[ENC_ID Overall Order]
 
 INTO #OX
 
@@ -3208,9 +3208,9 @@ AND meas.FLO_MEAS_ID IN ('900201', '900202', '900203', '9000001977') /*(SELECT *
 
 INNER JOIN [EMRDB].[dbo].[CALENDAR_DATES] dd ON dd.CALENDAR_DT = CAST(meas.RECORDED_TIME AS DATE)
 
-GROUP BY base.PAT_ENC_CSN_ID, base.[CSN Overall Order]
+GROUP BY base.ENCOUNTER_ID, base.[ENC_ID Overall Order]
 
-CREATE INDEX IDX_OX ON #OX (PAT_ENC_CSN_ID) 
+CREATE INDEX IDX_OX ON #OX (ENCOUNTER_ID) 
 
 /*SELECT * FROM #OX*/
 
@@ -3222,11 +3222,11 @@ CREATE INDEX IDX_OX ON #OX (PAT_ENC_CSN_ID)
 
 IF OBJECT_ID(N'tempdb..#ECMO') IS NOT NULL DROP TABLE #ECMO;
 
-SELECT base.PAT_ENC_CSN_ID
+SELECT base.ENCOUNTER_ID
 
-	, CASE WHEN COUNT(meas.RECORDED_TIME) > 0 THEN 'Y' ELSE 'N' END AS ECMO_YN
+	, CASE WHEN COUNT(meas.RECORDED_TIME) > 0 THEN 'Y' ELSE 'N' END AS ECMO_FLAG
 
-	, base.[CSN Overall Order]
+	, base.[ENC_ID Overall Order]
 
 INTO #ECMO
 
@@ -3240,9 +3240,9 @@ INNER JOIN [EMRDB].[dbo].[FLOWSHEET_MEASUREMENTS] meas ON meas.FSD_ID = rec.FSD_
 
 INNER JOIN [EMRDB].[dbo].[CALENDAR_DATES] dd ON dd.CALENDAR_DT = CAST(meas.RECORDED_TIME AS DATE)
 
-GROUP BY base.PAT_ENC_CSN_ID, base.[CSN Overall Order]
+GROUP BY base.ENCOUNTER_ID, base.[ENC_ID Overall Order]
 
-CREATE INDEX IDX_ECMO ON #ECMO (PAT_ENC_CSN_ID) 
+CREATE INDEX IDX_ECMO ON #ECMO (ENCOUNTER_ID) 
 
 /*SELECT * FROM #ECMO*/
 
@@ -3256,9 +3256,9 @@ INSERT INTO [reporting].[IP_SEPSIS]
 
 	(
 
-		[PatName],
+		[PatientName],
 
-		[PatMRNID],
+		[PATIENTMRN],
 
 		[EthnicGroup],
 
@@ -3266,7 +3266,7 @@ INSERT INTO [reporting].[IP_SEPSIS]
 
 		[Location],
 
-		[PatEncCSNID],
+		[PATENCENCID],
 
 		[AgeMonths],
 
@@ -3322,7 +3322,7 @@ INSERT INTO [reporting].[IP_SEPSIS]
 
 		[ScoreTime],
 
-		[ShiftComplianceYN],
+		[ShiftComplianceFlag],
 
 		[ShiftCompliance],
 
@@ -3550,11 +3550,11 @@ INSERT INTO [reporting].[IP_SEPSIS]
 
 		[PositiveODScore],
 
-		[CSNOrder], 
+		[ENCORDER], 
 
 		[UnitOrder], 
 
-		[CSNOverallOrder],
+		[ENCOVERALLORDER],
 
 		[AMDenom],
 
@@ -3620,9 +3620,9 @@ INSERT INTO [reporting].[IP_SEPSIS]
 
 		[RefreshDate])
 
-SELECT main.PAT_NAME [PATIENTS]
+SELECT main.PATIENT_NAME [PATIENTS]
 
-	, main.PAT_MRN_ID [MRN]
+	, main.PATIENT_MRN [MRN]
 
 	, main.[Ethnic Group]
 
@@ -3630,7 +3630,7 @@ SELECT main.PAT_NAME [PATIENTS]
 
 	, main.[Location]
 
-	, main.PAT_ENC_CSN_ID [CSN]
+	, main.ENCOUNTER_ID [ENC_ID]
 
 	, main.AGE_MONTHS [Age (M)]
 
@@ -3766,7 +3766,7 @@ SELECT main.PAT_NAME [PATIENTS]
 
 	, la.[FIRST LacticAcid in Dept Y/N]
 
-	, CASE WHEN (la.[LAST LacticAcid Order Time] IS NOT NULL OR la.[FIRST LacticAcid Order Time] IS NOT NULL) THEN 'Y' ELSE 'N' END AS LacticAcid_YN
+	, CASE WHEN (la.[LAST LacticAcid Order Time] IS NOT NULL OR la.[FIRST LacticAcid Order Time] IS NOT NULL) THEN 'Y' ELSE 'N' END AS LACTICACID_FLAG
 
 	, ordSet.[LAST OrderSet Time]
 
@@ -3888,17 +3888,17 @@ SELECT main.PAT_NAME [PATIENTS]
 
 				pressor.NOREPINEPHRINE IS NOT NULL) THEN 'Y' ELSE 'N' END AS [PRESSOR Y/N]
 
-	, COALESCE(prophy.PROPHYLAXIS_YN,'N') AS [DVTPROPHYLAXIS Y/N]
+	, COALESCE(prophy.PROPHYLAXIS_FLAG,'N') AS [DVTPROPHYLAXIS Y/N]
 
-	, COALESCE(cvvh.CVVH_YN,'N') AS [CVVH Y/N]
+	, COALESCE(cvvh.CVVH_FLAG,'N') AS [CVVH Y/N]
 
-	, COALESCE(ox.OX_YN,'N') AS [OX Y/N]
+	, COALESCE(ox.OX_FLAG,'N') AS [OX Y/N]
 
-	, COALESCE(ecmo.ECMO_YN,'N') AS [ECMO Y/N]
+	, COALESCE(ecmo.ECMO_FLAG,'N') AS [ECMO Y/N]
 
 
 
-	, CASE WHEN IPSO.PAT_ENC_CSN_ID IS NULL THEN 'N' ELSE 'Y' END SEVERE_SEPSIS_STAGING
+	, CASE WHEN IPSO.ENCOUNTER_ID IS NULL THEN 'N' ELSE 'Y' END SEVERE_SEPSIS_STAGING
 
 	
 
@@ -3934,11 +3934,11 @@ SELECT main.PAT_NAME [PATIENTS]
 
 	, CASE WHEN scores.[OD Score] > 2 THEN 1 ELSE 0 END [Positive OD Score]
 
-	, bp.[CSN Order]
+	, bp.[ENC_ID Order]
 
 	, bp.[Unit Order]
 
-	, bp.[CSN Overall Order]
+	, bp.[ENC_ID Overall Order]
 
 	, bp.[AM Denom]
 
@@ -4000,59 +4000,59 @@ SELECT main.PAT_NAME [PATIENTS]
 
 	, sepsisAudit.[Notification]
 
-	, CAST(bp.PAT_ENC_CSN_ID AS varchar(20)) + '-' + CAST(bp.[CSN Order] AS VARCHAR(95)) [Unique Row]
+	, CAST(bp.ENCOUNTER_ID AS varchar(20)) + '-' + CAST(bp.[ENC_ID Order] AS VARCHAR(95)) [Unique Row]
 
 	, GETDATE()
 
 FROM #MainAdmDetails main  
 
-INNER JOIN #Base_Pop bp ON bp.PAT_ENC_CSN_ID = main.PAT_ENC_CSN_ID
+INNER JOIN #Base_Pop bp ON bp.ENCOUNTER_ID = main.ENCOUNTER_ID
 
-INNER JOIN #Base_Pop_OD_Scores scores ON scores.PAT_ENC_CSN_ID = bp.PAT_ENC_CSN_ID AND scores.[CSN Overall Order] = bp.[CSN Overall Order]
+INNER JOIN #Base_Pop_OD_Scores scores ON scores.ENCOUNTER_ID = bp.ENCOUNTER_ID AND scores.[ENC_ID Overall Order] = bp.[ENC_ID Overall Order]
 
 INNER JOIN reports.FY_DATE_DIMENSION fyDate ON fyDate.CALENDAR_DT = bp.[Score Date] 
 
-LEFT OUTER JOIN #Base_Pop_ENC_Reason encRsn ON encRsn.PAT_ENC_CSN_ID = main.PAT_ENC_CSN_ID
+LEFT OUTER JOIN #Base_Pop_ENC_Reason encRsn ON encRsn.ENCOUNTER_ID = main.ENCOUNTER_ID
 
-LEFT OUTER JOIN #EncounterWeights wght ON wght.PAT_ENC_CSN_ID = main.PAT_ENC_CSN_ID AND wght.[CSN Overall Order] = bp.[CSN Overall Order]
+LEFT OUTER JOIN #EncounterWeights wght ON wght.ENCOUNTER_ID = main.ENCOUNTER_ID AND wght.[ENC_ID Overall Order] = bp.[ENC_ID Overall Order]
 
-LEFT OUTER JOIN #ODHYPO hypo ON hypo.PAT_ENC_CSN_ID = scores.PAT_ENC_CSN_ID AND hypo.[CSN Overall Order] = bp.[CSN Overall Order]
+LEFT OUTER JOIN #ODHYPO hypo ON hypo.ENCOUNTER_ID = scores.ENCOUNTER_ID AND hypo.[ENC_ID Overall Order] = bp.[ENC_ID Overall Order]
 
-LEFT OUTER JOIN #ODABX abx ON abx.PAT_ENC_CSN_ID = scores.PAT_ENC_CSN_ID AND abx.ADT_DEPARTMENT_ID = scores.ADT_DEPARTMENT_ID AND abx.InDepartmentTime = scores.InDepartmentTime AND abx.[CSN Overall Order] = bp.[CSN Overall Order]
+LEFT OUTER JOIN #ODABX abx ON abx.ENCOUNTER_ID = scores.ENCOUNTER_ID AND abx.ADT_DEPARTMENT_ID = scores.ADT_DEPARTMENT_ID AND abx.InDepartmentTime = scores.InDepartmentTime AND abx.[ENC_ID Overall Order] = bp.[ENC_ID Overall Order]
 
-LEFT OUTER JOIN #OdboL bol ON bol.PAT_ENC_CSN_ID = scores.PAT_ENC_CSN_ID AND bol.ADT_DEPARTMENT_ID = scores.ADT_DEPARTMENT_ID AND bol.InDepartmentTime = scores.InDepartmentTime AND bol.[CSN Overall Order] = bp.[CSN Overall Order]
+LEFT OUTER JOIN #OdboL bol ON bol.ENCOUNTER_ID = scores.ENCOUNTER_ID AND bol.ADT_DEPARTMENT_ID = scores.ADT_DEPARTMENT_ID AND bol.InDepartmentTime = scores.InDepartmentTime AND bol.[ENC_ID Overall Order] = bp.[ENC_ID Overall Order]
 
-LEFT OUTER JOIN #ODLA la ON la.PAT_ENC_CSN_ID = scores.PAT_ENC_CSN_ID AND la.ADT_DEPARTMENT_ID = scores.ADT_DEPARTMENT_ID AND la.InDepartmentTime = scores.InDepartmentTime AND la.[CSN Overall Order] = bp.[CSN Overall Order]
+LEFT OUTER JOIN #ODLA la ON la.ENCOUNTER_ID = scores.ENCOUNTER_ID AND la.ADT_DEPARTMENT_ID = scores.ADT_DEPARTMENT_ID AND la.InDepartmentTime = scores.InDepartmentTime AND la.[ENC_ID Overall Order] = bp.[ENC_ID Overall Order]
 
-LEFT OUTER JOIN #ODORDSET ordSet ON ordSet.PAT_ENC_CSN_ID = scores.PAT_ENC_CSN_ID AND ordSet.ADT_DEPARTMENT_ID = scores.ADT_DEPARTMENT_ID AND ordSet.InDepartmentTime = scores.InDepartmentTime AND ordSet.[CSN Overall Order] = bp.[CSN Overall Order]
+LEFT OUTER JOIN #ODORDSET ordSet ON ordSet.ENCOUNTER_ID = scores.ENCOUNTER_ID AND ordSet.ADT_DEPARTMENT_ID = scores.ADT_DEPARTMENT_ID AND ordSet.InDepartmentTime = scores.InDepartmentTime AND ordSet.[ENC_ID Overall Order] = bp.[ENC_ID Overall Order]
 
-LEFT OUTER JOIN #ODCVL cvl ON cvl.PAT_ENC_CSN_ID = scores.PAT_ENC_CSN_ID AND cvl.ADT_DEPARTMENT_ID = scores.ADT_DEPARTMENT_ID AND cvl.InDepartmentTime = scores.InDepartmentTime AND cvl.[CSN Overall Order] = bp.[CSN Overall Order]
+LEFT OUTER JOIN #ODCVL cvl ON cvl.ENCOUNTER_ID = scores.ENCOUNTER_ID AND cvl.ADT_DEPARTMENT_ID = scores.ADT_DEPARTMENT_ID AND cvl.InDepartmentTime = scores.InDepartmentTime AND cvl.[ENC_ID Overall Order] = bp.[ENC_ID Overall Order]
 
-LEFT OUTER JOIN #ODPressorPivot pressor ON pressor.PAT_ENC_CSN_ID = scores.PAT_ENC_CSN_ID
+LEFT OUTER JOIN #ODPressorPivot pressor ON pressor.ENCOUNTER_ID = scores.ENCOUNTER_ID
 
-LEFT OUTER JOIN #ODSVO2 svo2 ON svo2.PAT_ENC_CSN_ID = scores.PAT_ENC_CSN_ID AND svo2.ADT_DEPARTMENT_ID = scores.ADT_DEPARTMENT_ID AND svo2.InDepartmentTime = scores.InDepartmentTime AND svo2.[CSN Overall Order] = bp.[CSN Overall Order]
+LEFT OUTER JOIN #ODSVO2 svo2 ON svo2.ENCOUNTER_ID = scores.ENCOUNTER_ID AND svo2.ADT_DEPARTMENT_ID = scores.ADT_DEPARTMENT_ID AND svo2.InDepartmentTime = scores.InDepartmentTime AND svo2.[ENC_ID Overall Order] = bp.[ENC_ID Overall Order]
 
-LEFT OUTER JOIN #ODPROCAL proCal ON proCal.PAT_ENC_CSN_ID = scores.PAT_ENC_CSN_ID AND proCal.ADT_DEPARTMENT_ID = scores.ADT_DEPARTMENT_ID AND proCal.InDepartmentTime = scores.InDepartmentTime AND proCal.[CSN Overall Order] = bp.[CSN Overall Order]
+LEFT OUTER JOIN #ODPROCAL proCal ON proCal.ENCOUNTER_ID = scores.ENCOUNTER_ID AND proCal.ADT_DEPARTMENT_ID = scores.ADT_DEPARTMENT_ID AND proCal.InDepartmentTime = scores.InDepartmentTime AND proCal.[ENC_ID Overall Order] = bp.[ENC_ID Overall Order]
 
-LEFT OUTER JOIN #ODBC bc ON bc.PAT_ENC_CSN_ID = scores.PAT_ENC_CSN_ID AND bc.ADT_DEPARTMENT_ID = scores.ADT_DEPARTMENT_ID AND bc.InDepartmentTime = scores.InDepartmentTime AND bc.[CSN Overall Order] = bp.[CSN Overall Order]
+LEFT OUTER JOIN #ODBC bc ON bc.ENCOUNTER_ID = scores.ENCOUNTER_ID AND bc.ADT_DEPARTMENT_ID = scores.ADT_DEPARTMENT_ID AND bc.InDepartmentTime = scores.InDepartmentTime AND bc.[ENC_ID Overall Order] = bp.[ENC_ID Overall Order]
 
-LEFT OUTER JOIN #ODCSF csf ON csf.PAT_ENC_CSN_ID = scores.PAT_ENC_CSN_ID AND csf.ADT_DEPARTMENT_ID = scores.ADT_DEPARTMENT_ID AND csf.InDepartmentTime = scores.InDepartmentTime AND csf.[CSN Overall Order] = bp.[CSN Overall Order]
+LEFT OUTER JOIN #ODCSF csf ON csf.ENCOUNTER_ID = scores.ENCOUNTER_ID AND csf.ADT_DEPARTMENT_ID = scores.ADT_DEPARTMENT_ID AND csf.InDepartmentTime = scores.InDepartmentTime AND csf.[ENC_ID Overall Order] = bp.[ENC_ID Overall Order]
 
-LEFT OUTER JOIN #ODPIV piv ON piv.PAT_ENC_CSN_ID = scores.PAT_ENC_CSN_ID AND piv.ADT_DEPARTMENT_ID = scores.ADT_DEPARTMENT_ID AND piv.InDepartmentTime = scores.InDepartmentTime AND piv.[CSN Overall Order] = bp.[CSN Overall Order]
+LEFT OUTER JOIN #ODPIV piv ON piv.ENCOUNTER_ID = scores.ENCOUNTER_ID AND piv.ADT_DEPARTMENT_ID = scores.ADT_DEPARTMENT_ID AND piv.InDepartmentTime = scores.InDepartmentTime AND piv.[ENC_ID Overall Order] = bp.[ENC_ID Overall Order]
 
-LEFT OUTER JOIN #ODETT ett ON ett.PAT_ENC_CSN_ID = scores.PAT_ENC_CSN_ID AND ett.ADT_DEPARTMENT_ID = scores.ADT_DEPARTMENT_ID AND ett.InDepartmentTime = scores.InDepartmentTime AND ett.[CSN Overall Order] = bp.[CSN Overall Order]
+LEFT OUTER JOIN #ODETT ett ON ett.ENCOUNTER_ID = scores.ENCOUNTER_ID AND ett.ADT_DEPARTMENT_ID = scores.ADT_DEPARTMENT_ID AND ett.InDepartmentTime = scores.InDepartmentTime AND ett.[ENC_ID Overall Order] = bp.[ENC_ID Overall Order]
 
-LEFT OUTER JOIN #PROPHYLAXIS prophy ON prophy.PAT_ENC_CSN_ID = scores.PAT_ENC_CSN_ID AND prophy.[CSN Overall Order] = scores.[CSN Overall Order]
+LEFT OUTER JOIN #PROPHYLAXIS prophy ON prophy.ENCOUNTER_ID = scores.ENCOUNTER_ID AND prophy.[ENC_ID Overall Order] = scores.[ENC_ID Overall Order]
 
-LEFT OUTER JOIN #CVVH cvvh ON cvvh.PAT_ENC_CSN_ID = scores.PAT_ENC_CSN_ID AND cvvh.[CSN Overall Order] = scores.[CSN Overall Order]
+LEFT OUTER JOIN #CVVH cvvh ON cvvh.ENCOUNTER_ID = scores.ENCOUNTER_ID AND cvvh.[ENC_ID Overall Order] = scores.[ENC_ID Overall Order]
 
-LEFT OUTER JOIN #OX ox ON ox.PAT_ENC_CSN_ID = scores.PAT_ENC_CSN_ID AND ox.[CSN Overall Order] = bp.[CSN Overall Order]
+LEFT OUTER JOIN #OX ox ON ox.ENCOUNTER_ID = scores.ENCOUNTER_ID AND ox.[ENC_ID Overall Order] = bp.[ENC_ID Overall Order]
 
-LEFT OUTER JOIN #ECMO ecmo ON ecmo.PAT_ENC_CSN_ID = scores.PAT_ENC_CSN_ID AND ecmo.[CSN Overall Order] = bp.[CSN Overall Order]
+LEFT OUTER JOIN #ECMO ecmo ON ecmo.ENCOUNTER_ID = scores.ENCOUNTER_ID AND ecmo.[ENC_ID Overall Order] = bp.[ENC_ID Overall Order]
 
-LEFT OUTER JOIN #EDPosScore_EDLOS edLOS ON edLOS.PAT_ENC_CSN_ID = main.PAT_ENC_CSN_ID AND edLOS.FIRST_TIME_LINE = 1
+LEFT OUTER JOIN #EDPosScore_EDLOS edLOS ON edLOS.ENCOUNTER_ID = main.ENCOUNTER_ID AND edLOS.FIRST_TIME_LINE = 1
 
-LEFT OUTER JOIN #FlwshtLstSepsisAudit sepsisAudit ON sepsisAudit.PAT_ENC_CSN_ID = main.PAT_ENC_CSN_ID AND sepsisAudit.[CSN Overall Order] = bp.[CSN Overall Order]
+LEFT OUTER JOIN #FlwshtLstSepsisAudit sepsisAudit ON sepsisAudit.ENCOUNTER_ID = main.ENCOUNTER_ID AND sepsisAudit.[ENC_ID Overall Order] = bp.[ENC_ID Overall Order]
 
 /*Register Nurse*/
 
@@ -4066,11 +4066,11 @@ OUTER APPLY
 
 	INNER JOIN [EMRDB].[dbo].[PROVIDERS] ser ON SER.PROV_ID = tTeam.PROV_ID
 
-	WHERE tTeam.PAT_ENC_CSN_ID = bp.PAT_ENC_CSN_ID
+	WHERE tTeam.ENCOUNTER_ID = bp.ENCOUNTER_ID
 
 	AND (tTeam.TRTMNT_TM_BEGIN_DT BETWEEN DATEADD(N,-35, bp.[Shift Start]) AND bp.[Shift End])
 
-	AND tTeam.TRTMNT_TEAM_REL_C = '2' /*Registered Nurse*/
+	AND tTeam.TRTMNT_TEAM_REL_CODE = '2' /*Registered Nurse*/
 
 ) ShiftRNs
 
@@ -4086,11 +4086,11 @@ OUTER APPLY
 
 	INNER JOIN [EMRDB].[dbo].[PROVIDERS] ser ON SER.PROV_ID = tTeam.PROV_ID
 
-	WHERE tTeam.PAT_ENC_CSN_ID = bp.PAT_ENC_CSN_ID
+	WHERE tTeam.ENCOUNTER_ID = bp.ENCOUNTER_ID
 
 	AND (tTeam.TRTMNT_TM_BEGIN_DT BETWEEN DATEADD(N,-35, bp.[Shift Start]) AND bp.[Shift End])
 
-	AND tTeam.TRTMNT_TEAM_REL_C = '99' /*Charge Nurse*/
+	AND tTeam.TRTMNT_TEAM_REL_CODE = '99' /*Charge Nurse*/
 
 ) ShiftCNs
 
@@ -4116,7 +4116,7 @@ OUTER APPLY
 
 	WHERE
 
-		hno.PAT_ENC_CSN_ID = main.PAT_ENC_CSN_ID
+		hno.ENCOUNTER_ID = main.ENCOUNTER_ID
 
 		AND (hno.CRT_INST_LOCAL_DTTM BETWEEN scores.[OD Score Time] AND DATEADD(MI, 180, scores.[OD Score Time])) /*within one hour from OD SCORE*/
 
@@ -4126,7 +4126,7 @@ OUTER APPLY
 
 ) sepsisAlert
 
-LEFT OUTER JOIN [reportingDB].[reports].[SEVERE_SEPSIS_STAGING] IPSO ON IPSO.PAT_ENC_CSN_ID = main.PAT_ENC_CSN_ID
+LEFT OUTER JOIN [reportingDB].[reports].[SEVERE_SEPSIS_STAGING] IPSO ON IPSO.ENCOUNTER_ID = main.ENCOUNTER_ID
 
-ORDER BY bp.PAT_ENC_CSN_ID, bp.[CSN Overall Order]
+ORDER BY bp.ENCOUNTER_ID, bp.[ENC_ID Overall Order]
 

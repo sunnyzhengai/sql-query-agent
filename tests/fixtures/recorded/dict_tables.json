@@ -20,7 +20,7 @@
   "TABLE_NAME": "CALENDAR_DATES"
  },
  {
-  "DESCRIPTION": "The CLINICAL_ALERTS table contains one record for every CLINICAL_ALERTS that was created in the clinical application. Each record is based on the CLINICAL_ALERTS ID and contains key information about the CLINICAL_ALERTS such as the PATIENTS, PATIENTS CSN, CLINICAL_ALERTS type, and whether it was seen by a user.",
+  "DESCRIPTION": "The CLINICAL_ALERTS table contains one record for every CLINICAL_ALERTS that was created in the clinical application. Each record is based on the CLINICAL_ALERTS ID and contains key information about the CLINICAL_ALERTS such as the PATIENTS, PATIENTS ENC_ID, CLINICAL_ALERTS type, and whether it was seen by a user.",
   "TABLE_NAME": "CLINICAL_ALERTS"
  },
  {
@@ -108,7 +108,7 @@
   "TABLE_NAME": "HOSPITAL_ACCOUNTS"
  },
  {
-  "DESCRIPTION": "This table contains hospital account information from the Hospital Accounts Receivable (HAR) master file. This fifth hospital account table has the same basic structure as HOSPITAL_ACCOUNTS, HSP_ACCOUNT_2, HSP_ACCOUNT_3, and HSP_ACCOUNT_4, but was created as a fifth table to prevent the other tables from getting any larger. It excludes Professional Billing accounts in classic PB self-pay service areas.",
+  "DESCRIPTION": "This table contains hospital account information from the Hospital Accounts Receivable (HAR) master file. This fifth hospital account table has the same basic structure as HOSPITAL_ACCOUNTS, HOSPITAL_ACCOUNT_2, HOSPITAL_ACCOUNT_3, and HOSPITAL_ACCOUNT_4, but was created as a fifth table to prevent the other tables from getting any larger. It excludes Professional Billing accounts in classic PB self-pay service areas.",
   "TABLE_NAME": "HOSPITAL_ACCOUNTS_EXT"
  },
  {
@@ -224,7 +224,7 @@
   "TABLE_NAME": "PATIENT_DEMOGRAPHICS_RACE"
  },
  {
-  "DESCRIPTION": "The PATIENTS encounter table contains one record for each PATIENTS encounter in your system. By default, this table does not contain Registration or PCP/Clinic Change contacts (encounter types 1 and 31). It does contain all appointments, office visits, telephone encounters, and other types of encounters. The primary key for the PATIENTS encounter table is PAT_ENC_CSN_ID. Note that there is an index named EIX_FILT_PAT_ENC_RFL on the REFERRAL_ID column in Oracle that does not appear in the index list. The index is created by EFN_FAUX_RFL_FILT_INX.",
+  "DESCRIPTION": "The PATIENTS encounter table contains one record for each PATIENTS encounter in your system. By default, this table does not contain Registration or PCP/Clinic Change contacts (encounter types 1 and 31). It does contain all appointments, office visits, telephone encounters, and other types of encounters. The primary key for the PATIENTS encounter table is ENCOUNTER_ID. Note that there is an index named EIX_FILT_PATIENT_ENC_RFL on the REFERRAL_ID column in Oracle that does not appear in the index list. The index is created by EFN_FAUX_RFL_FILT_INX.",
   "TABLE_NAME": "PATIENT_ENCOUNTERS"
  },
  {
@@ -288,7 +288,7 @@
   "TABLE_NAME": "SEVERE_SEPSIS_STAGING"
  },
  {
-  "DESCRIPTION": "The TREATMENT_TEAMS table contains information on inpatient treatment teams. Each record in this table is based on PAT_ENC_CSN_ID.",
+  "DESCRIPTION": "The TREATMENT_TEAMS table contains information on inpatient treatment teams. Each record in this table is based on ENCOUNTER_ID.",
   "TABLE_NAME": "TREATMENT_TEAMS"
  },
  {
@@ -300,7 +300,7 @@
   "TABLE_NAME": "V_HOSPITAL_TRANSACTIONS"
  },
  {
-  "DESCRIPTION": "A dimensional view used to find a PATIENTS's department, room and/or bed at a given datetime. The view contains one row for each admission, transfer in, or leave of absence return ADT event and contains columns for in and out times. By equal joining to this view on an inpatient CSN and theta joining on a given instant, you can find one row with the PATIENTS's department, room and bed at the given instant. Please note that this view was tested on ADT from the EMR system's ADT application. If you are using interfaces to capture ADT data, you may experience odd behavior.",
+  "DESCRIPTION": "A dimensional view used to find a PATIENTS's department, room and/or bed at a given datetime. The view contains one row for each admission, transfer in, or leave of absence return ADT event and contains columns for in and out times. By equal joining to this view on an inpatient ENC_ID and theta joining on a given instant, you can find one row with the PATIENTS's department, room and bed at the given instant. Please note that this view was tested on ADT from the EMR system's ADT application. If you are using interfaces to capture ADT data, you may experience odd behavior.",
   "TABLE_NAME": "V_PATIENT_LOCATION_HISTORY"
  },
  {

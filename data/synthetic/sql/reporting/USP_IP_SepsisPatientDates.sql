@@ -88,13 +88,13 @@ IF OBJECT_ID(N'tempdb..#MainAdmDetails') IS NOT NULL DROP TABLE #MainAdmDetails;
 
 SELECT DISTINCT
 
-	[PatEncCSNID] PAT_ENC_CSN_ID
+	[PATENCENCID] ENCOUNTER_ID
 
-	, [PatID] PAT_ID
+	, [PatientID] PATIENT_ID
 
-	, [PatMRNID] PAT_MRN_ID
+	, [PATIENTMRN] PATIENT_MRN
 
-	, [PatName] PAT_NAME
+	, [PatientName] PATIENT_NAME
 
 	, [EthnicGroup] [Ethnic Group]
 
@@ -128,7 +128,7 @@ INTO #MainAdmDetails
 
 FROM [reportingDB].[reporting].[IP_SepsisEncounters]
 
-CREATE INDEX IDX_Main ON #MainAdmDetails (PAT_ENC_CSN_ID) 
+CREATE INDEX IDX_Main ON #MainAdmDetails (ENCOUNTER_ID) 
 
 CREATE INDEX IDX_MaininpDt ON #MainAdmDetails (INPATIENT_DATA_ID) 
 
@@ -146,9 +146,9 @@ IF OBJECT_ID(N'tempdb..#Base_PopTemp') IS NOT NULL DROP TABLE #Base_PopTemp;
 
 SELECT DISTINCT
 
-	main.[PatEncCSNID] PAT_ENC_CSN_ID
+	main.[PATENCENCID] ENCOUNTER_ID
 
-	, main.[PatID] PAT_ID
+	, main.[PatientID] PATIENT_ID
 
 	, main.[InpatientDataID] INPATIENT_DATA_ID
 
@@ -174,7 +174,7 @@ SELECT DISTINCT
 
 	, CONVERT(DATE, main.[OutDepartmentTime]) OutDeptDate
 
-	, main.CSNOrder [CSN Order]
+	, main.ENCORDER [ENC_ID Order]
 
 	, main.UniqueRow
 
@@ -186,7 +186,7 @@ INNER JOIN [reportingDB].[reports].[CONFIG_VALUE_SET] cvs ON cvs.CODE = main.[AD
 
 			AND cvs.VALUE_SET_ID = 3031 /*DEPARTMENT ROLL UP*/
 
-CREATE INDEX IDX_Base_PopTemp ON #Base_PopTemp (PAT_ENC_CSN_ID) 
+CREATE INDEX IDX_Base_PopTemp ON #Base_PopTemp (ENCOUNTER_ID) 
 
 --/*SELECT * FROM #Base_PopTemp*/
 
@@ -204,7 +204,7 @@ IF OBJECT_ID(N'tempdb..#Base_Pop') IS NOT NULL DROP TABLE #Base_Pop;
 
 (
 
-	SELECT PAT_ENC_CSN_ID
+	SELECT ENCOUNTER_ID
 
 		, InDeptDate [Expansion Date]
 
@@ -218,7 +218,7 @@ IF OBJECT_ID(N'tempdb..#Base_Pop') IS NOT NULL DROP TABLE #Base_Pop;
 
 		, ADT_DEPARTMENT_NAME
 
-		, PAT_ID
+		, PATIENT_ID
 
 		, DEPARTMENT_ROLLUP
 
@@ -226,7 +226,7 @@ IF OBJECT_ID(N'tempdb..#Base_Pop') IS NOT NULL DROP TABLE #Base_Pop;
 
 		, BIRTH_DATE
 
-		, [CSN Order]
+		, [ENC_ID Order]
 
 	FROM #Base_PopTemp
 
@@ -234,7 +234,7 @@ IF OBJECT_ID(N'tempdb..#Base_Pop') IS NOT NULL DROP TABLE #Base_Pop;
 
 	UNION ALL 
 
-	SELECT PAT_ENC_CSN_ID
+	SELECT ENCOUNTER_ID
 
 		, DATEADD(d, 1, d.[Expansion Date]) [Expansion Date]
 
@@ -248,7 +248,7 @@ IF OBJECT_ID(N'tempdb..#Base_Pop') IS NOT NULL DROP TABLE #Base_Pop;
 
 		, d.ADT_DEPARTMENT_NAME
 
-		, d.PAT_ID
+		, d.PATIENT_ID
 
 		, d.DEPARTMENT_ROLLUP
 
@@ -256,7 +256,7 @@ IF OBJECT_ID(N'tempdb..#Base_Pop') IS NOT NULL DROP TABLE #Base_Pop;
 
 		, BIRTH_DATE
 
-		, [CSN Order]
+		, [ENC_ID Order]
 
 	FROM dateCTE d 
 
@@ -274,15 +274,15 @@ Finalize base table, one record for each shift a PATIENTS was in a unit
 
 SELECT * 
 
-	, ROW_NUMBER() OVER(PARTITION BY PAT_ENC_CSN_ID, InDepartmentTime ORDER BY [Service Date]) [Unit Order]
+	, ROW_NUMBER() OVER(PARTITION BY ENCOUNTER_ID, InDepartmentTime ORDER BY [Service Date]) [Unit Order]
 
-	, ROW_NUMBER() OVER(PARTITION BY PAT_ENC_CSN_ID ORDER BY InDepartmentTime, [Service Date]) AS [CSN Overall Order]
+	, ROW_NUMBER() OVER(PARTITION BY ENCOUNTER_ID ORDER BY InDepartmentTime, [Service Date]) AS [ENC_ID Overall Order]
 
 INTO #Base_Pop
 
 FROM (
 
-	SELECT PAT_ENC_CSN_ID
+	SELECT ENCOUNTER_ID
 
 		, [Expansion Date] [Service Date]
 
@@ -294,13 +294,13 @@ FROM (
 
 		, ADT_DEPARTMENT_NAME
 
-		, PAT_ID
+		, PATIENT_ID
 
 		, DEPARTMENT_ROLLUP
 
 		, INPATIENT_DATA_ID
 
-		, [CSN Order]
+		, [ENC_ID Order]
 
 		, DATEDIFF(MM, BIRTH_DATE, [Expansion Date]) [AGE_MONTHS]
 
@@ -314,7 +314,7 @@ FROM (
 
 OPTION (MAXRECURSION 8000);  /*default is 100*/
 
-CREATE INDEX IDX_Base_Pop ON #Base_Pop (PAT_ENC_CSN_ID) 
+CREATE INDEX IDX_Base_Pop ON #Base_Pop (ENCOUNTER_ID) 
 
 --/*SELECT * FROM #Base_Pop */
 
@@ -326,9 +326,9 @@ INSERT INTO [reporting].[IP_SepsisPatientDates]
 
 	(
 
-		[PatID],
+		[PatientID],
 
-		[PatEncCSNID],
+		[PATENCENCID],
 
 		[SepsisPatientDate],
 
@@ -348,19 +348,19 @@ INSERT INTO [reporting].[IP_SepsisPatientDates]
 
 		[AgeOnDateYears],
 
-		[CSNOrder], 
+		[ENCORDER], 
 
 		[UnitOrder], 
 
-		[CSNOverallOrder],
+		[ENCOVERALLORDER],
 
 		[UniqueRow],
 
 		[RefreshDate])
 
-SELECT main.PAT_ID
+SELECT main.PATIENT_ID
 
-	, main.PAT_ENC_CSN_ID [CSN]
+	, main.ENCOUNTER_ID [ENC_ID]
 
 	, main.[Service Date] [Sepsis PATIENTS Date]
 
@@ -380,19 +380,19 @@ SELECT main.PAT_ID
 
 	, main.AGE_YEARS [Age on Date (Y)]
 
-	, main.[CSN Order]
+	, main.[ENC_ID Order]
 
 	, main.[Unit Order]
 
-	, main.[CSN Overall Order]
+	, main.[ENC_ID Overall Order]
 
-	, CAST(main.PAT_ENC_CSN_ID AS varchar(20)) + '-' + CAST(main.[CSN Order] AS VARCHAR(95)) [Unique Row]
+	, CAST(main.ENCOUNTER_ID AS varchar(20)) + '-' + CAST(main.[ENC_ID Order] AS VARCHAR(95)) [Unique Row]
 
 	, GETDATE()
 
 FROM #Base_Pop main  
 
-ORDER BY main.PAT_ENC_CSN_ID, main.[CSN Overall Order]
+ORDER BY main.ENCOUNTER_ID, main.[ENC_ID Overall Order]
 
 END 
 
