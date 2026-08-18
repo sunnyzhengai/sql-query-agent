@@ -98,7 +98,7 @@ class ViewExtractor:
 
 # sys.objects type_desc -> input_sql_sources.source_type vocabulary.
 # The CONTRACT vocabulary is "procedure"/"view" (allowed-values invariant;
-# 01_install derives the same via extract_object_identity). The extractor
+# 100_install derives the same via extract_object_identity). The extractor
 # merges directly, so it must speak contract vocabulary itself.
 _SOURCE_TYPE = {
     "VIEW": "view",
@@ -109,7 +109,7 @@ _SOURCE_TYPE = {
 def _to_sql_source(obj: DiscoveredObject) -> dict[str, Any]:
     """Convert a DiscoveredObject to an input_sql_sources record.
 
-    The definition is stored AS EXTRACTED — no stripping. 02_parse's
+    The definition is stored AS EXTRACTED — no stripping. 200_parse's
     ScriptDom understands full CREATE VIEW/PROCEDURE wrappers natively
     (the 790-proc corpus went in unstripped); routing definitions through
     another parser to pre-chew them only added a corruption path.

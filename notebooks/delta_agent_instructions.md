@@ -247,7 +247,7 @@ UNION ALL SELECT 'ops_parse_errors', COUNT(*) FROM ops_parse_errors
 ## Section 5: Setup & Configuration Guide
 
 ### How This System Works
-The pipeline parses SQL sources, builds the three-layer graph, generates descriptions, and grounds this agent in output_metric_logic. Notebooks 01-09 run in order.
+The pipeline parses SQL sources, builds the three-layer graph, generates descriptions, and grounds this agent in output_metric_logic. Notebooks run in lexicographic order (010 ... 950).
 
 ### Troubleshooting
 - **"Metric not found"** — The metric may not have been parsed successfully. Check /errors for details.

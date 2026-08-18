@@ -60,7 +60,7 @@ Stop accumulating debt. Turn hidden code into certified truth."
 
 ## VO-2 — Ingestion & Guardrails (~95 words, ~40s)
 
-**[Screen: 00c_ingest_sql_live's review cell — "3 changed, 0 new" — then a
+**[Screen: 030_ingest_sql_live's review cell — "3 changed, 0 new" — then a
 quick cut to the semantic-model ingestion summary and the PHI gate
 lines]**
 

@@ -50,7 +50,7 @@ EDGE_TYPES = [edge.value for edge in EdgeType]
 
 
 # =====================================================================
-# INPUT domain — customer-provided data, loaded by 01_install
+# INPUT domain — customer-provided data, loaded by 100_install
 # =====================================================================
 
 SQL_SOURCES = {
@@ -64,17 +64,17 @@ SQL_SOURCES = {
         "at install; the automated extractor (extract_views — the primary "
         "customer path) MERGES incrementally by metric_id, so scheduled "
         "extractions upsert changed objects without erasing rows loaded by "
-        "the other writer. Owner stays 01_install for gate attribution; "
+        "the other writer. Owner stays 100_install for gate attribution; "
         "write_mode describes the owner's install-time write."
     ),
     "domain": "input",
     "status": "active",
-    "owner": {"notebook": "00a_ingest_sql_filedrop", "module": None},
-    "utility_writers": ["00b_ingest_sql_folders", "00c_ingest_sql_live"],
+    "owner": {"notebook": "010_ingest_sql_filedrop", "module": None},
+    "utility_writers": ["020_ingest_sql_folders", "030_ingest_sql_live"],
     "write_mode": "overwrite",
     "enrichers": [],
-    "consumers": ["01_install", "02_parse", "06_validate", "00b_ingest_sql_folders",
-                  "12_ingest_semantic_models"],
+    "consumers": ["100_install", "200_parse", "500_validate", "020_ingest_sql_folders",
+                  "060_ingest_semantic_models"],
     "columns": [
         ("metric_id", "string", False),
         ("name", "string", False),
@@ -109,11 +109,11 @@ DICT_TABLES = {
     ),
     "domain": "input",
     "status": "active",
-    "owner": {"notebook": "00d_dict_clarity", "module": None},
-    "utility_writers": ["00e_dict_caboodle"],
+    "owner": {"notebook": "040_dict_clarity", "module": None},
+    "utility_writers": ["050_dict_caboodle"],
     "write_mode": "overwrite",
     "enrichers": [],
-    "consumers": ["01_install", "03_build_graph", "06_validate", "00e_dict_caboodle", "export_test_fixtures"],
+    "consumers": ["100_install", "300_build_graph", "500_validate", "050_dict_caboodle", "export_test_fixtures"],
     "columns": [
         ("TABLE_NAME", "string", False),
         ("DESCRIPTION", "string", True),
@@ -139,11 +139,11 @@ DICT_COLUMNS = {
     ),
     "domain": "input",
     "status": "active",
-    "owner": {"notebook": "00d_dict_clarity", "module": None},
-    "utility_writers": ["00e_dict_caboodle"],
+    "owner": {"notebook": "040_dict_clarity", "module": None},
+    "utility_writers": ["050_dict_caboodle"],
     "write_mode": "overwrite",
     "enrichers": [],
-    "consumers": ["03_build_graph", "00e_dict_caboodle", "export_test_fixtures"],
+    "consumers": ["300_build_graph", "050_dict_caboodle", "export_test_fixtures"],
     "columns": [
         ("TABLE_NAME", "string", False),
         ("COLUMN_NAME", "string", False),
@@ -169,15 +169,15 @@ PARSE_RESULTS = {
     "must_be_nonempty": True,
     "description": (
         "Intermediate parse output: the structural extraction of each SQL "
-        "source (CTEs, table references, final SELECT) that 03_build_graph "
+        "source (CTEs, table references, final SELECT) that 300_build_graph "
         "turns into the knowledge graph."
     ),
     "domain": "operations",
     "status": "active",
-    "owner": {"notebook": "02_parse", "module": "src/parser/sql_parser.py"},
+    "owner": {"notebook": "200_parse", "module": "src/parser/sql_parser.py"},
     "write_mode": "overwrite",
     "enrichers": [],
-    "consumers": ["03_build_graph", "export_test_fixtures"],
+    "consumers": ["300_build_graph", "export_test_fixtures"],
     "columns": [
         ("metric_id", "string", False),
         ("name", "string", False),
@@ -218,10 +218,10 @@ PARSE_ERRORS = {
     ),
     "domain": "operations",
     "status": "active",
-    "owner": {"notebook": "02_parse", "module": "src/parser/error_classifier.py"},
+    "owner": {"notebook": "200_parse", "module": "src/parser/error_classifier.py"},
     "write_mode": "overwrite",
     "enrichers": [],
-    "consumers": ["06_validate", "verify_graph", "data_agent"],
+    "consumers": ["500_validate", "verify_graph", "data_agent"],
     "columns": [
         ("metric_id", "string", False),
         ("name", "string", False),
@@ -254,10 +254,10 @@ PARSE_SUCCESSES = {
     ),
     "domain": "operations",
     "status": "active",
-    "owner": {"notebook": "02_parse", "module": "src/parser/sql_parser.py"},
+    "owner": {"notebook": "200_parse", "module": "src/parser/sql_parser.py"},
     "write_mode": "overwrite",
     "enrichers": [],
-    "consumers": ["02_parse", "06_validate", "verify_graph"],
+    "consumers": ["200_parse", "500_validate", "verify_graph"],
     "columns": [
         ("metric_id", "string", False),
         ("name", "string", False),
@@ -285,7 +285,7 @@ BUILD_SUMMARY = {
     ),
     "domain": "operations",
     "status": "active",
-    "owner": {"notebook": "06_validate", "module": None},
+    "owner": {"notebook": "500_validate", "module": None},
     "write_mode": "append",
     "enrichers": [],
     "consumers": ["admin"],
@@ -314,7 +314,7 @@ SETUP_COMPLETENESS = {
     ),
     "domain": "operations",
     "status": "active",
-    "owner": {"notebook": "03_build_graph", "module": "src/steps/gates.py"},
+    "owner": {"notebook": "300_build_graph", "module": "src/steps/gates.py"},
     "write_mode": "append",
     "enrichers": [],
     "consumers": ["admin", "health"],
@@ -346,7 +346,7 @@ PIPELINE_VALIDATION = {
     ),
     "domain": "operations",
     "status": "active",
-    "owner": {"notebook": "06_validate", "module": None},
+    "owner": {"notebook": "500_validate", "module": None},
     "write_mode": "overwrite",
     "enrichers": [],
     "consumers": ["data_agent", "admin"],
@@ -383,12 +383,12 @@ INSTALLATION_ERRORS = {
     "table_name": "ops_installation_errors",
     "description": (
         "Known installation/runtime error signatures with root cause, fix, "
-        "and prevention. Seeded by 01_install; powers the agent's "
+        "and prevention. Seeded by 100_install; powers the agent's "
         "/troubleshoot command so failures are diagnosable at a distance."
     ),
     "domain": "operations",
     "status": "active",
-    "owner": {"notebook": "01_install", "module": None},
+    "owner": {"notebook": "100_install", "module": None},
     "write_mode": "overwrite",
     "enrichers": [],
     "consumers": ["data_agent"],
@@ -424,15 +424,15 @@ AGENT_DESCRIPTIONS = {
     ),
     "domain": "operations",
     "status": "active",
-    "owner": {"notebook": "07b_generate_agent_descriptions",
+    "owner": {"notebook": "610_generate_agent_descriptions",
               "module": "src/steps/agent_descriptions.py"},
     "write_mode": "overwrite",
     "enrichers": [],
-    "consumers": ["07b_generate_agent_descriptions", "08_publish_collibra",
-                  "13_publish_pbi", "06_validate", "collibra_adapter"],
+    "consumers": ["610_generate_agent_descriptions", "900_publish_collibra",
+                  "920_publish_pbi", "500_validate", "collibra_adapter"],
     "optional_input": True,
     "remediation": (
-        "run 07b_generate_agent_descriptions (needs the Fabric Data "
+        "run 610_generate_agent_descriptions (needs the Fabric Data "
         "Agent configured in fabric_graph)"
     ),
     "columns": [
@@ -471,15 +471,15 @@ GRAPH_NODES = {
     ),
     "domain": "graph",
     "status": "active",
-    "owner": {"notebook": "03_build_graph", "module": "src/graph/builder.py"},
+    "owner": {"notebook": "300_build_graph", "module": "src/graph/builder.py"},
     "write_mode": "overwrite",
-    "enrichers": ["07_generate_descriptions"],
+    "enrichers": ["600_generate_descriptions"],
     "consumers": [
-        "04_build_metric_logic", "05_export_graph_tables", "06_validate",
-        "07_generate_descriptions", "07b_generate_agent_descriptions",
-        "08_publish_collibra", "manage_stewards",
-        "verify_graph", "data_agent", "11_refresh_search_index",
-        "13_publish_pbi",
+        "400_build_metric_logic", "800_export_graph_tables", "500_validate",
+        "600_generate_descriptions", "610_generate_agent_descriptions",
+        "900_publish_collibra", "manage_stewards",
+        "verify_graph", "data_agent", "700_refresh_search_index",
+        "920_publish_pbi",
     ],
     "columns": [
         ("node_id", "string", False),
@@ -516,13 +516,13 @@ GRAPH_EDGES = {
     ),
     "domain": "graph",
     "status": "active",
-    "owner": {"notebook": "03_build_graph", "module": "src/graph/builder.py"},
+    "owner": {"notebook": "300_build_graph", "module": "src/graph/builder.py"},
     "write_mode": "overwrite",
     "enrichers": [],
     "consumers": [
-        "04_build_metric_logic", "05_export_graph_tables", "06_validate",
-        "07_generate_descriptions", "08_publish_collibra", "verify_graph",
-        "data_agent", "13_publish_pbi",
+        "400_build_metric_logic", "800_export_graph_tables", "500_validate",
+        "600_generate_descriptions", "900_publish_collibra", "verify_graph",
+        "data_agent", "920_publish_pbi",
     ],
     "columns": [
         ("source_id", "string", False),
@@ -560,7 +560,7 @@ METRIC_TWINS = {
     ),
     "domain": "output",
     "status": "active",
-    "owner": {"notebook": "04_build_metric_logic",
+    "owner": {"notebook": "400_build_metric_logic",
               "module": "src/graph/decomposition_diff.py"},
     "write_mode": "overwrite",
     "enrichers": [],
@@ -598,18 +598,18 @@ METRIC_LOGIC = {
     "description": (
         "The agent's primary table: one pre-joined row per metric with its "
         "calculation logic, source tables, and descriptions. Created by "
-        "04_build_metric_logic; descriptions enriched in place by "
-        "07_generate_descriptions."
+        "400_build_metric_logic; descriptions enriched in place by "
+        "600_generate_descriptions."
     ),
     "domain": "output",
     "status": "active",
-    "owner": {"notebook": "04_build_metric_logic", "module": "src/graph/traversal.py"},
+    "owner": {"notebook": "400_build_metric_logic", "module": "src/graph/traversal.py"},
     "write_mode": "overwrite",
-    "enrichers": ["07_generate_descriptions"],
+    "enrichers": ["600_generate_descriptions"],
     "consumers": [
-        "07b_generate_agent_descriptions",
-        "07_generate_descriptions", "09_publish_purview",
-        "06_validate", "04_build_metric_logic",
+        "610_generate_agent_descriptions",
+        "600_generate_descriptions", "910_publish_purview",
+        "500_validate", "400_build_metric_logic",
         "data_agent",
     ],
     "columns": [
@@ -668,7 +668,7 @@ GRAPH_CANONICAL = {
     "description": "LPG export: canonical (business metric) nodes, flattened for Fabric Graph.",
     "domain": "lpg_export",
     "status": "active",
-    "owner": {"notebook": "05_export_graph_tables", "module": None},
+    "owner": {"notebook": "800_export_graph_tables", "module": None},
     "write_mode": "overwrite",
     "enrichers": [],
     "consumers": ["fabric_graph_model (planned)"],
@@ -714,7 +714,7 @@ GRAPH_TRANSFORMATION = {
     "description": "LPG export: transformation (CTE step) nodes with their SQL fragments.",
     "domain": "lpg_export",
     "status": "active",
-    "owner": {"notebook": "05_export_graph_tables", "module": None},
+    "owner": {"notebook": "800_export_graph_tables", "module": None},
     "write_mode": "overwrite",
     "enrichers": [],
     "consumers": ["fabric_graph_model (planned)"],
@@ -745,7 +745,7 @@ GRAPH_TECHNICAL = {
     "description": "LPG export: technical nodes (warehouse tables/columns with dictionary descriptions).",
     "domain": "lpg_export",
     "status": "active",
-    "owner": {"notebook": "05_export_graph_tables", "module": None},
+    "owner": {"notebook": "800_export_graph_tables", "module": None},
     "write_mode": "overwrite",
     "enrichers": [],
     "consumers": ["fabric_graph_model (planned)"],
@@ -780,7 +780,7 @@ GRAPH_REPORT = {
     ),
     "domain": "lpg_export",
     "status": "active",
-    "owner": {"notebook": "05_export_graph_tables", "module": None},
+    "owner": {"notebook": "800_export_graph_tables", "module": None},
     "write_mode": "overwrite",
     "enrichers": [],
     "consumers": ["fabric_graph_model (planned)"],
@@ -808,7 +808,7 @@ GRAPH_MEASURE = {
     "description": "LPG export: DAX measure / calculated-column nodes (ADR 0040) — the DAX half of the business logic.",
     "domain": "lpg_export",
     "status": "active",
-    "owner": {"notebook": "05_export_graph_tables", "module": None},
+    "owner": {"notebook": "800_export_graph_tables", "module": None},
     "write_mode": "overwrite",
     "enrichers": [],
     "consumers": ["fabric_graph_model (planned)"],
@@ -850,7 +850,7 @@ GRAPH_EDGE_C2T = {
     ),
     "domain": "lpg_export",
     "status": "active",
-    "owner": {"notebook": "05_export_graph_tables", "module": None},
+    "owner": {"notebook": "800_export_graph_tables", "module": None},
     "write_mode": "overwrite",
     "enrichers": [],
     "consumers": ["fabric_graph_model (planned)"],
@@ -870,7 +870,7 @@ GRAPH_EDGE_T2T = {
     "description": "LPG export: transformation -> transformation edges (step dependency chain).",
     "domain": "lpg_export",
     "status": "active",
-    "owner": {"notebook": "05_export_graph_tables", "module": None},
+    "owner": {"notebook": "800_export_graph_tables", "module": None},
     "write_mode": "overwrite",
     "enrichers": [],
     "consumers": ["fabric_graph_model (planned)"],
@@ -890,7 +890,7 @@ GRAPH_EDGE_T2TECH = {
     "description": "LPG export: transformation -> technical edges (logic step to source table).",
     "domain": "lpg_export",
     "status": "active",
-    "owner": {"notebook": "05_export_graph_tables", "module": None},
+    "owner": {"notebook": "800_export_graph_tables", "module": None},
     "write_mode": "overwrite",
     "enrichers": [],
     "consumers": ["fabric_graph_model (planned)"],
@@ -910,7 +910,7 @@ GRAPH_EDGE_TAB2COL = {
     "description": "LPG export: technical table -> technical column edges (columns reachable by traversal).",
     "domain": "lpg_export",
     "status": "active",
-    "owner": {"notebook": "05_export_graph_tables", "module": None},
+    "owner": {"notebook": "800_export_graph_tables", "module": None},
     "write_mode": "overwrite",
     "enrichers": [],
     "consumers": ["fabric_graph_model (planned)"],
@@ -934,7 +934,7 @@ GRAPH_EDGE_USES_TABLE = {
     ),
     "domain": "lpg_export",
     "status": "active",
-    "owner": {"notebook": "05_export_graph_tables", "module": None},
+    "owner": {"notebook": "800_export_graph_tables", "module": None},
     "write_mode": "overwrite",
     "enrichers": [],
     "consumers": ["fabric_graph_model (planned)"],
@@ -957,7 +957,7 @@ GRAPH_EDGE_REPORT2CANONICAL = {
     "description": "LPG export: report -> metric edges from TMDL partition lineage (ADR 0040, deterministic).",
     "domain": "lpg_export",
     "status": "active",
-    "owner": {"notebook": "05_export_graph_tables", "module": None},
+    "owner": {"notebook": "800_export_graph_tables", "module": None},
     "write_mode": "overwrite",
     "enrichers": [],
     "consumers": ["fabric_graph_model (planned)"],
@@ -981,7 +981,7 @@ GRAPH_EDGE_REPORT2TECHNICAL = {
     ),
     "domain": "lpg_export",
     "status": "active",
-    "owner": {"notebook": "05_export_graph_tables", "module": None},
+    "owner": {"notebook": "800_export_graph_tables", "module": None},
     "write_mode": "overwrite",
     "enrichers": [],
     "consumers": ["fabric_graph_model (planned)"],
@@ -1001,7 +1001,7 @@ GRAPH_EDGE_REPORT2MEASURE = {
     "description": "LPG export: report -> measure ownership edges (ADR 0040).",
     "domain": "lpg_export",
     "status": "active",
-    "owner": {"notebook": "05_export_graph_tables", "module": None},
+    "owner": {"notebook": "800_export_graph_tables", "module": None},
     "write_mode": "overwrite",
     "enrichers": [],
     "consumers": ["fabric_graph_model (planned)"],
@@ -1024,7 +1024,7 @@ GRAPH_EDGE_MEASURE2COLUMN = {
     ),
     "domain": "lpg_export",
     "status": "active",
-    "owner": {"notebook": "05_export_graph_tables", "module": None},
+    "owner": {"notebook": "800_export_graph_tables", "module": None},
     "write_mode": "overwrite",
     "enrichers": [],
     "consumers": ["fabric_graph_model (planned)"],
@@ -1057,10 +1057,10 @@ DESCRIPTION_CACHE = {
     ),
     "domain": "operations",
     "status": "active",
-    "owner": {"notebook": "07_generate_descriptions", "module": "src/descriptions.py"},
+    "owner": {"notebook": "600_generate_descriptions", "module": "src/descriptions.py"},
     "write_mode": "overwrite",
     "enrichers": [],
-    "consumers": ["07_generate_descriptions"],
+    "consumers": ["600_generate_descriptions"],
     "columns": [
         ("content_hash", "string", False),
         ("node_id", "string", False),
@@ -1088,10 +1088,10 @@ ERROR_LOG = {
     ),
     "domain": "operations",
     "status": "active",
-    "owner": {"notebook": "02_parse", "module": "src/governance/error_log.py"},
+    "owner": {"notebook": "200_parse", "module": "src/governance/error_log.py"},
     "write_mode": "append",
     "enrichers": [],
-    "consumers": ["02_parse", "admin"],
+    "consumers": ["200_parse", "admin"],
     "columns": [
         ("run_id", "string", False),
         ("run_timestamp", "string", False),
@@ -1172,10 +1172,10 @@ TRACKING = {
     ),
     "domain": "operations",
     "status": "active",
-    "owner": {"notebook": "00c_ingest_sql_live", "module": "src/extractor/tracker.py"},
+    "owner": {"notebook": "030_ingest_sql_live", "module": "src/extractor/tracker.py"},
     "write_mode": "overwrite",
     "enrichers": [],
-    "consumers": ["00c_ingest_sql_live"],
+    "consumers": ["030_ingest_sql_live"],
     "columns": [
         ("object_id", "string", False),
         ("schema_name", "string", False),
@@ -1232,7 +1232,7 @@ STEWARD_ASSIGNMENTS = {
     "description": (
         "Steward ownership per metric — assigned individually, in bulk, or "
         "by name pattern via the manage_stewards utility notebook. Applied "
-        "to canonical graph nodes by 03_build_graph, from where "
+        "to canonical graph nodes by 300_build_graph, from where "
         "output_metric_logic and the agent pick them up."
     ),
     "domain": "governance",
@@ -1240,7 +1240,7 @@ STEWARD_ASSIGNMENTS = {
     "owner": {"notebook": "manage_stewards", "module": "src/governance/steward.py"},
     "write_mode": "overwrite",
     "enrichers": [],
-    "consumers": ["03_build_graph", "manage_stewards"],
+    "consumers": ["300_build_graph", "manage_stewards"],
     "columns": [
         ("metric_id", "string", False),
         ("metric_name", "string", False),
@@ -1327,14 +1327,14 @@ FALLOUT = {
     ),
     "domain": "operations",
     "status": "active",
-    "owner": {"notebook": "12_ingest_semantic_models",
+    "owner": {"notebook": "060_ingest_semantic_models",
               "module": "src/steps/semantic_models.py"},
     "write_mode": "append",
-    "enrichers": ["06_validate", "08_publish_collibra"],
-    "consumers": ["admin telemetry report", "06_validate"],
+    "enrichers": ["500_validate", "900_publish_collibra"],
+    "consumers": ["admin telemetry report", "500_validate"],
     "optional_input": True,
     "remediation": (
-        "run 12_ingest_semantic_models (or any fallout-writing "
+        "run 060_ingest_semantic_models (or any fallout-writing "
         "stage) — absent means no stage has recorded fallout yet"
     ),
     "columns": [
@@ -1347,8 +1347,8 @@ FALLOUT = {
     ],
     "column_descriptions": {
         "run_at": "ISO timestamp of the pipeline run that dropped it",
-        "stage": "Stage that dropped the entity (e.g. 12_partition_parse, "
-                 "12_name_derivation, 12_collect)",
+        "stage": "Stage that dropped the entity (e.g. 060_partition_parse, "
+                 "060_name_derivation, 060_collect)",
         "entity_id": "Dropped entity (report/model/metric/file identity)",
         "reason_code": "Machine-groupable code (non_sql_source:<fn>, "
                        "unrecognized_shape, multi_report_consumer, "
@@ -1366,14 +1366,14 @@ FUNNEL = {
         "Per-run pipeline funnel (family G, HANDOFF_FUNNEL_AND_FALLOUT): "
         "per stage — in_count, out_count, fell_off, and the aggregated "
         "reason codes behind every drop. Derived from stage outputs + "
-        "ops_fallout by 06_validate; each fell-off number links back to "
+        "ops_fallout by 500_validate; each fell-off number links back to "
         "queryable fallout rows. Extends ops_build_summary, never "
         "duplicates it (derived_from names the sources). The admin "
         "dashboard's funnel page reads this table."
     ),
     "domain": "operations",
     "status": "active",
-    "owner": {"notebook": "06_validate",
+    "owner": {"notebook": "500_validate",
               "module": "src/governance/funnel.py"},
     "write_mode": "append",
     "enrichers": [],
@@ -1412,10 +1412,10 @@ PUBLISH_LOG = {
     ),
     "domain": "governance",
     "status": "active",
-    "owner": {"notebook": "08_publish_collibra",
+    "owner": {"notebook": "900_publish_collibra",
               "module": "src/governance/publish_log.py"},
     "write_mode": "append",
-    "enrichers": ["09_publish_purview", "13_publish_pbi"],
+    "enrichers": ["910_publish_purview", "920_publish_pbi"],
     "consumers": ["admin telemetry report"],
     "columns": [
         ("published_at", "string", False),
@@ -1452,11 +1452,11 @@ TURN_EVENTS = {
     ),
     "domain": "governance",
     "status": "active",
-    "owner": {"notebook": "10_ingest_agent_events",
+    "owner": {"notebook": "950_ingest_agent_events",
               "module": "src/steps/agent_events.py"},
     "write_mode": "append",
     "enrichers": [],
-    "consumers": ["10_ingest_agent_events", "admin telemetry report",
+    "consumers": ["950_ingest_agent_events", "admin telemetry report",
                   "usage flywheel"],
     "columns": [
         ("event_at", "string", False),
@@ -1510,11 +1510,11 @@ FEEDBACK_EVENTS = {
     ),
     "domain": "governance",
     "status": "active",
-    "owner": {"notebook": "10_ingest_agent_events",
+    "owner": {"notebook": "950_ingest_agent_events",
               "module": "src/steps/agent_events.py"},
     "write_mode": "append",
     "enrichers": [],
-    "consumers": ["10_ingest_agent_events", "admin telemetry report",
+    "consumers": ["950_ingest_agent_events", "admin telemetry report",
                   "usage flywheel"],
     "columns": [
         ("event_at", "string", False),
@@ -1751,7 +1751,7 @@ METRIC_NAMES = {
         "Business-friendly display names per metric: metric_id (qualified "
         "or unambiguous bare name, ADR 0016 folding) -> business_name, with "
         "source provenance (pbi_report | manual). Applied to canonical "
-        "nodes by 03_build_graph; flows to output_metric_logic and the LPG "
+        "nodes by 300_build_graph; flows to output_metric_logic and the LPG "
         "export. Ambiguous bare names are skipped, never guessed (ADR 0005). "
         "Cross-workspace rule (2026-08-18): when reports in multiple "
         "workspaces execute the same metric, the FIRST report in "
@@ -1761,13 +1761,13 @@ METRIC_NAMES = {
     ),
     "domain": "input",
     "status": "active",
-    "owner": {"notebook": "12_ingest_semantic_models", "module": "src/steps/semantic_models.py"},
+    "owner": {"notebook": "060_ingest_semantic_models", "module": "src/steps/semantic_models.py"},
     "write_mode": "overwrite",
     "enrichers": [],
-    "consumers": ["03_build_graph", "collibra_lineage_match"],
+    "consumers": ["300_build_graph", "collibra_lineage_match"],
     "optional_input": True,
     "remediation": (
-        "run 12_ingest_semantic_models to derive names from PBI semantic "
+        "run 060_ingest_semantic_models to derive names from PBI semantic "
         "models, or upload a manual metric_id,business_name CSV"
     ),
     "columns": [
@@ -1801,13 +1801,13 @@ REPORT_SOURCES = {
     ),
     "domain": "input",
     "status": "active",
-    "owner": {"notebook": "12_ingest_semantic_models", "module": "src/steps/semantic_models.py"},
+    "owner": {"notebook": "060_ingest_semantic_models", "module": "src/steps/semantic_models.py"},
     "write_mode": "overwrite",
     "enrichers": [],
-    "consumers": ["03_build_graph", "06_validate"],
+    "consumers": ["300_build_graph", "500_validate"],
     "optional_input": True,
     "remediation": (
-        "run 12_ingest_semantic_models with a semantic_models config "
+        "run 060_ingest_semantic_models with a semantic_models config "
         "section (workspace, folder, or devops_git profile)"
     ),
     "columns": [
@@ -1846,13 +1846,13 @@ DAX_EXPRESSIONS = {
     ),
     "domain": "input",
     "status": "active",
-    "owner": {"notebook": "12_ingest_semantic_models", "module": "src/steps/semantic_models.py"},
+    "owner": {"notebook": "060_ingest_semantic_models", "module": "src/steps/semantic_models.py"},
     "write_mode": "overwrite",
     "enrichers": [],
-    "consumers": ["03_build_graph"],
+    "consumers": ["300_build_graph"],
     "optional_input": True,
     "remediation": (
-        "run 12_ingest_semantic_models with a semantic_models config "
+        "run 060_ingest_semantic_models with a semantic_models config "
         "section (workspace, folder, or devops_git profile)"
     ),
     "columns": [
@@ -1883,10 +1883,10 @@ PHI_FINDINGS = {
     ),
     "domain": "operations",
     "status": "active",
-    "owner": {"notebook": "02_parse", "module": "src/phi_scan.py"},
+    "owner": {"notebook": "200_parse", "module": "src/phi_scan.py"},
     "write_mode": "overwrite",
     "enrichers": [],
-    "consumers": ["02_parse", "07_generate_descriptions"],
+    "consumers": ["200_parse", "600_generate_descriptions"],
     "columns": [
         ("finding_id", "string", False),
         ("metric_id", "string", False),
@@ -1944,7 +1944,7 @@ RUNTIME_ERROR_EVENTS = {
     "column_descriptions": {
         "event_at": "When the failure occurred (ISO)",
         "run_id": "Pipeline run identifier, if inside a run",
-        "stage": "Which notebook/step failed (01_install ... 09_publish_purview)",
+        "stage": "Which notebook/step failed (100_install ... 910_publish_purview)",
         "error_signature": "Matched ops_installation_errors.error_signature, if recognized",
         "error_message": "Raw error text",
         "affected_objects": "JSON list of metric_ids / table names the failure blocks",
@@ -1966,7 +1966,7 @@ SEMANTIC_CATALOG = {
     ),
     "domain": "output",
     "status": "active",
-    "owner": {"notebook": "11_refresh_search_index",
+    "owner": {"notebook": "700_refresh_search_index",
               "module": "src/steps/semantic_catalog.py"},
     "write_mode": "overwrite",
     "consumers": [

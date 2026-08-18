@@ -20,7 +20,7 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 # table name. If a new notebook writes indirectly, it must be declared here —
 # the scanner fails on any unresolved saveAsTable(<identifier>) otherwise.
 NOTEBOOK_INDIRECT_WRITES = {
-    "05_export_graph_tables": [
+    "800_export_graph_tables": [
         "graph_canonical", "graph_transformation", "graph_technical",
         "graph_report", "graph_measure", "graph_edge_c2t", "graph_edge_t2t",
         "graph_edge_t2tech", "graph_edge_report2canonical",
@@ -28,7 +28,7 @@ NOTEBOOK_INDIRECT_WRITES = {
         "graph_edge_measure2column", "graph_edge_tab2col",
         "graph_edge_uses_table",
     ],
-    "00b_ingest_sql_folders": ["input_sql_sources"],
+    "020_ingest_sql_folders": ["input_sql_sources"],
 }
 
 # config.<section>.<attr> table-name indirections the scanner can resolve.
@@ -39,7 +39,7 @@ CONFIG_EXTRACTOR_DEFAULTS = {"tracking_table": "ops_extraction_tracking"}
 
 # Notebooks that read via a helper/variable instead of a literal table name.
 NOTEBOOK_INDIRECT_READS = {
-    "02_parse": ["input_sql_sources"],  # via a load helper taking name_or_path
+    "200_parse": ["input_sql_sources"],  # via a load helper taking name_or_path
 }
 
 DOMAIN_PREFIXES = {
@@ -54,7 +54,7 @@ DOMAIN_PREFIXES = {
 
 def _notebook_files():
     """All code that can write Delta tables: pipeline + utility notebooks."""
-    # [0-9][0-9]* covers both derivation (02_) and lettered acquisition (00a_)
+    # [0-9][0-9]* covers the 3-digit century-phase names (010_ ... 950_)
     pipeline = list(REPO_ROOT.glob("[0-9][0-9]*.Notebook/notebook-content.py"))
     utilities = [
         p for p in REPO_ROOT.glob("notebooks/**/*.py")

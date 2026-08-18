@@ -8,7 +8,7 @@ the description be written onto?
 
 Two matching tiers, best first:
 
-1. EXACT report name — when input_metric_names (12_ingest_semantic_models)
+1. EXACT report name — when input_metric_names (060_ingest_semantic_models)
    recorded the actual TMDL-derived report for the metric, match the
    Collibra asset by that name, case-insensitively. Deterministic;
    score 1.0.

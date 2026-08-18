@@ -12,25 +12,25 @@ consumers (notebook reads are verified against code by the contract tests).
 
 ```mermaid
 flowchart LR
-  00a_ingest_sql_filedrop["00a_ingest_sql_filedrop"]:::notebook
-  00b_ingest_sql_folders["00b_ingest_sql_folders"]:::notebook
-  00c_ingest_sql_live["00c_ingest_sql_live"]:::notebook
-  00d_dict_clarity["00d_dict_clarity"]:::notebook
-  00e_dict_caboodle["00e_dict_caboodle"]:::notebook
-  01_install["01_install"]:::notebook
-  02_parse["02_parse"]:::notebook
-  03_build_graph["03_build_graph"]:::notebook
-  04_build_metric_logic["04_build_metric_logic"]:::notebook
-  05_export_graph_tables["05_export_graph_tables"]:::notebook
-  06_validate["06_validate"]:::notebook
-  07_generate_descriptions["07_generate_descriptions"]:::notebook
-  07b_generate_agent_descriptions["07b_generate_agent_descriptions"]:::notebook
-  08_publish_collibra["08_publish_collibra"]:::notebook
-  09_publish_purview["09_publish_purview"]:::notebook
-  10_ingest_agent_events["10_ingest_agent_events"]:::notebook
-  11_refresh_search_index["11_refresh_search_index"]:::notebook
-  12_ingest_semantic_models["12_ingest_semantic_models"]:::notebook
-  13_publish_pbi["13_publish_pbi"]:::notebook
+  010_ingest_sql_filedrop["010_ingest_sql_filedrop"]:::notebook
+  020_ingest_sql_folders["020_ingest_sql_folders"]:::notebook
+  030_ingest_sql_live["030_ingest_sql_live"]:::notebook
+  040_dict_clarity["040_dict_clarity"]:::notebook
+  050_dict_caboodle["050_dict_caboodle"]:::notebook
+  060_ingest_semantic_models["060_ingest_semantic_models"]:::notebook
+  100_install["100_install"]:::notebook
+  200_parse["200_parse"]:::notebook
+  300_build_graph["300_build_graph"]:::notebook
+  400_build_metric_logic["400_build_metric_logic"]:::notebook
+  500_validate["500_validate"]:::notebook
+  600_generate_descriptions["600_generate_descriptions"]:::notebook
+  610_generate_agent_descriptions["610_generate_agent_descriptions"]:::notebook
+  700_refresh_search_index["700_refresh_search_index"]:::notebook
+  800_export_graph_tables["800_export_graph_tables"]:::notebook
+  900_publish_collibra["900_publish_collibra"]:::notebook
+  910_publish_purview["910_publish_purview"]:::notebook
+  920_publish_pbi["920_publish_pbi"]:::notebook
+  950_ingest_agent_events["950_ingest_agent_events"]:::notebook
   collibra_lineage_match["collibra_lineage_match"]:::notebook
   eventhouse_semantic_search["eventhouse_semantic_search"]:::notebook
   export_test_fixtures["export_test_fixtures"]:::notebook
@@ -72,125 +72,125 @@ flowchart LR
   admin{{admin}}:::actor
   collibra_adapter{{collibra_adapter}}:::actor
   data_agent{{data_agent}}:::actor
-  00a_ingest_sql_filedrop --> input_sql_sources
-  00b_ingest_sql_folders -.-> input_sql_sources
-  00c_ingest_sql_live --> ops_extraction_tracking
-  00c_ingest_sql_live -.-> input_sql_sources
-  00d_dict_clarity --> input_dict_columns
-  00d_dict_clarity --> input_dict_tables
-  00e_dict_caboodle -.-> input_dict_columns
-  00e_dict_caboodle -.-> input_dict_tables
-  01_install --> ops_installation_errors
-  02_parse --> ops_error_log
-  02_parse --> ops_parse_errors
-  02_parse --> ops_parse_results
-  02_parse --> ops_parse_successes
-  02_parse --> ops_phi_findings
-  03_build_graph --> graph_edges
-  03_build_graph --> graph_nodes
-  03_build_graph --> ops_setup_completeness
-  04_build_metric_logic --> output_metric_logic
-  04_build_metric_logic --> output_metric_twins
-  05_export_graph_tables --> LPG_export__14_typed_tables_
-  06_validate --> ops_build_summary
-  06_validate --> ops_funnel
-  06_validate --> ops_pipeline_validation
-  06_validate -->|enrich| ops_fallout
-  07_generate_descriptions --> ops_description_cache
-  07_generate_descriptions -->|enrich| graph_nodes
-  07_generate_descriptions -->|enrich| output_metric_logic
-  07b_generate_agent_descriptions --> ops_agent_descriptions
-  08_publish_collibra --> gov_publish_log
-  08_publish_collibra -->|enrich| ops_fallout
-  09_publish_purview -->|enrich| gov_publish_log
-  10_ingest_agent_events --> gov_feedback_events
-  10_ingest_agent_events --> gov_turn_events
-  11_refresh_search_index --> output_semantic_catalog
-  12_ingest_semantic_models --> input_dax_expressions
-  12_ingest_semantic_models --> input_metric_names
-  12_ingest_semantic_models --> input_report_sources
-  12_ingest_semantic_models --> ops_fallout
-  13_publish_pbi -->|enrich| gov_publish_log
-  gov_feedback_events --> 10_ingest_agent_events
+  010_ingest_sql_filedrop --> input_sql_sources
+  020_ingest_sql_folders -.-> input_sql_sources
+  030_ingest_sql_live --> ops_extraction_tracking
+  030_ingest_sql_live -.-> input_sql_sources
+  040_dict_clarity --> input_dict_columns
+  040_dict_clarity --> input_dict_tables
+  050_dict_caboodle -.-> input_dict_columns
+  050_dict_caboodle -.-> input_dict_tables
+  060_ingest_semantic_models --> input_dax_expressions
+  060_ingest_semantic_models --> input_metric_names
+  060_ingest_semantic_models --> input_report_sources
+  060_ingest_semantic_models --> ops_fallout
+  100_install --> ops_installation_errors
+  200_parse --> ops_error_log
+  200_parse --> ops_parse_errors
+  200_parse --> ops_parse_results
+  200_parse --> ops_parse_successes
+  200_parse --> ops_phi_findings
+  300_build_graph --> graph_edges
+  300_build_graph --> graph_nodes
+  300_build_graph --> ops_setup_completeness
+  400_build_metric_logic --> output_metric_logic
+  400_build_metric_logic --> output_metric_twins
+  500_validate --> ops_build_summary
+  500_validate --> ops_funnel
+  500_validate --> ops_pipeline_validation
+  500_validate -->|enrich| ops_fallout
+  600_generate_descriptions --> ops_description_cache
+  600_generate_descriptions -->|enrich| graph_nodes
+  600_generate_descriptions -->|enrich| output_metric_logic
+  610_generate_agent_descriptions --> ops_agent_descriptions
+  700_refresh_search_index --> output_semantic_catalog
+  800_export_graph_tables --> LPG_export__14_typed_tables_
+  900_publish_collibra --> gov_publish_log
+  900_publish_collibra -->|enrich| ops_fallout
+  910_publish_purview -->|enrich| gov_publish_log
+  920_publish_pbi -->|enrich| gov_publish_log
+  950_ingest_agent_events --> gov_feedback_events
+  950_ingest_agent_events --> gov_turn_events
+  gov_feedback_events --> 950_ingest_agent_events
   gov_feedback_events --> admin
   gov_feedback_events --> usage
   gov_publish_log --> admin
-  gov_steward_assignments --> 03_build_graph
+  gov_steward_assignments --> 300_build_graph
   gov_steward_assignments --> manage_stewards
-  gov_turn_events --> 10_ingest_agent_events
+  gov_turn_events --> 950_ingest_agent_events
   gov_turn_events --> admin
   gov_turn_events --> usage
-  graph_edges --> 04_build_metric_logic
-  graph_edges --> 05_export_graph_tables
-  graph_edges --> 06_validate
-  graph_edges --> 07_generate_descriptions
-  graph_edges --> 08_publish_collibra
-  graph_edges --> 13_publish_pbi
+  graph_edges --> 400_build_metric_logic
+  graph_edges --> 500_validate
+  graph_edges --> 600_generate_descriptions
+  graph_edges --> 800_export_graph_tables
+  graph_edges --> 900_publish_collibra
+  graph_edges --> 920_publish_pbi
   graph_edges --> data_agent
   graph_edges --> verify_graph
-  graph_nodes --> 04_build_metric_logic
-  graph_nodes --> 05_export_graph_tables
-  graph_nodes --> 06_validate
-  graph_nodes --> 07_generate_descriptions
-  graph_nodes --> 07b_generate_agent_descriptions
-  graph_nodes --> 08_publish_collibra
-  graph_nodes --> 11_refresh_search_index
-  graph_nodes --> 13_publish_pbi
+  graph_nodes --> 400_build_metric_logic
+  graph_nodes --> 500_validate
+  graph_nodes --> 600_generate_descriptions
+  graph_nodes --> 610_generate_agent_descriptions
+  graph_nodes --> 700_refresh_search_index
+  graph_nodes --> 800_export_graph_tables
+  graph_nodes --> 900_publish_collibra
+  graph_nodes --> 920_publish_pbi
   graph_nodes --> data_agent
   graph_nodes --> manage_stewards
   graph_nodes --> verify_graph
-  input_dax_expressions --> 03_build_graph
-  input_dict_columns --> 00e_dict_caboodle
-  input_dict_columns --> 03_build_graph
+  input_dax_expressions --> 300_build_graph
+  input_dict_columns --> 050_dict_caboodle
+  input_dict_columns --> 300_build_graph
   input_dict_columns --> export_test_fixtures
-  input_dict_tables --> 00e_dict_caboodle
-  input_dict_tables --> 01_install
-  input_dict_tables --> 03_build_graph
-  input_dict_tables --> 06_validate
+  input_dict_tables --> 050_dict_caboodle
+  input_dict_tables --> 100_install
+  input_dict_tables --> 300_build_graph
+  input_dict_tables --> 500_validate
   input_dict_tables --> export_test_fixtures
-  input_metric_names --> 03_build_graph
+  input_metric_names --> 300_build_graph
   input_metric_names --> collibra_lineage_match
-  input_report_sources --> 03_build_graph
-  input_report_sources --> 06_validate
-  input_sql_sources --> 00b_ingest_sql_folders
-  input_sql_sources --> 01_install
-  input_sql_sources --> 02_parse
-  input_sql_sources --> 06_validate
-  input_sql_sources --> 12_ingest_semantic_models
+  input_report_sources --> 300_build_graph
+  input_report_sources --> 500_validate
+  input_sql_sources --> 020_ingest_sql_folders
+  input_sql_sources --> 060_ingest_semantic_models
+  input_sql_sources --> 100_install
+  input_sql_sources --> 200_parse
+  input_sql_sources --> 500_validate
   manage_stewards --> gov_steward_assignments
-  ops_agent_descriptions --> 06_validate
-  ops_agent_descriptions --> 07b_generate_agent_descriptions
-  ops_agent_descriptions --> 08_publish_collibra
-  ops_agent_descriptions --> 13_publish_pbi
+  ops_agent_descriptions --> 500_validate
+  ops_agent_descriptions --> 610_generate_agent_descriptions
+  ops_agent_descriptions --> 900_publish_collibra
+  ops_agent_descriptions --> 920_publish_pbi
   ops_agent_descriptions --> collibra_adapter
   ops_build_summary --> admin
-  ops_description_cache --> 07_generate_descriptions
-  ops_error_log --> 02_parse
+  ops_description_cache --> 600_generate_descriptions
+  ops_error_log --> 200_parse
   ops_error_log --> admin
-  ops_extraction_tracking --> 00c_ingest_sql_live
-  ops_fallout --> 06_validate
+  ops_extraction_tracking --> 030_ingest_sql_live
+  ops_fallout --> 500_validate
   ops_fallout --> admin
   ops_funnel --> admin
   ops_installation_errors --> data_agent
-  ops_parse_errors --> 06_validate
+  ops_parse_errors --> 500_validate
   ops_parse_errors --> data_agent
   ops_parse_errors --> verify_graph
-  ops_parse_results --> 03_build_graph
+  ops_parse_results --> 300_build_graph
   ops_parse_results --> export_test_fixtures
-  ops_parse_successes --> 02_parse
-  ops_parse_successes --> 06_validate
+  ops_parse_successes --> 200_parse
+  ops_parse_successes --> 500_validate
   ops_parse_successes --> verify_graph
-  ops_phi_findings --> 02_parse
-  ops_phi_findings --> 07_generate_descriptions
+  ops_phi_findings --> 200_parse
+  ops_phi_findings --> 600_generate_descriptions
   ops_pipeline_validation --> admin
   ops_pipeline_validation --> data_agent
   ops_setup_completeness --> admin
   ops_setup_completeness --> health
-  output_metric_logic --> 04_build_metric_logic
-  output_metric_logic --> 06_validate
-  output_metric_logic --> 07_generate_descriptions
-  output_metric_logic --> 07b_generate_agent_descriptions
-  output_metric_logic --> 09_publish_purview
+  output_metric_logic --> 400_build_metric_logic
+  output_metric_logic --> 500_validate
+  output_metric_logic --> 600_generate_descriptions
+  output_metric_logic --> 610_generate_agent_descriptions
+  output_metric_logic --> 910_publish_purview
   output_metric_logic --> data_agent
   output_metric_twins --> data_agent
   output_semantic_catalog --> data_agent

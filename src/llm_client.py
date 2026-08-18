@@ -10,7 +10,7 @@ Azure OpenAI and api.openai.com disagree on two things this module owns:
                 deployment is in the path and any query string in the
                 configured endpoint must survive the path join.
 
-Consumers: 07_generate_descriptions (customer's Azure OpenAI in
+Consumers: 600_generate_descriptions (customer's Azure OpenAI in
 production), devtools (dev key against api.openai.com). Keys arrive as
 arguments — this module never reads key material from disk.
 """

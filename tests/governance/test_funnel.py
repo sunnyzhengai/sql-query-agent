@@ -11,7 +11,7 @@ from src.governance.funnel import (
 class TestFunnelRows:
     def test_fell_off_and_reasons_rendered(self):
         rows = funnel_rows([FunnelStage(
-            "02_parse", 100, 97,
+            "200_parse", 100, 97,
             reasons={"parse_error": 3},
             derived_from="input_sql_sources -> ops_parse_successes")],
             run_at="t0")
@@ -33,7 +33,7 @@ class TestFunnelRows:
         assert rows[0]["fell_off"] == 0 and rows[0]["reasons"] == ""
 
     def test_lines_show_the_arrow_shape(self):
-        rows = funnel_rows([FunnelStage("02_parse", 100, 97,
+        rows = funnel_rows([FunnelStage("200_parse", 100, 97,
                                         {"parse_error": 3})], run_at="t")
         lines = funnel_lines(rows)
         assert any("100 -> 97" in ln and "parse_error:3" in ln
@@ -43,17 +43,17 @@ class TestFunnelRows:
 class TestReasonsFromFallout:
     def test_latest_run_only_grouped_by_code(self):
         fallout = [
-            {"stage": "12_partition_parse", "run_at": "t1",
+            {"stage": "060_partition_parse", "run_at": "t1",
              "reason_code": "non_sql_source:Excel.Workbook"},
-            {"stage": "12_partition_parse", "run_at": "t2",
+            {"stage": "060_partition_parse", "run_at": "t2",
              "reason_code": "unrecognized_shape"},
-            {"stage": "12_partition_parse", "run_at": "t2",
+            {"stage": "060_partition_parse", "run_at": "t2",
              "reason_code": "unrecognized_shape"},
-            {"stage": "12_name_derivation", "run_at": "t2",
+            {"stage": "060_name_derivation", "run_at": "t2",
              "reason_code": "multi_report_consumer"},
         ]
-        reasons = reasons_from_fallout(fallout, "12_partition_parse")
+        reasons = reasons_from_fallout(fallout, "060_partition_parse")
         assert reasons == {"unrecognized_shape": 2}  # t1 history excluded
 
     def test_absent_stage_is_empty(self):
-        assert reasons_from_fallout([], "02_parse") == {}
+        assert reasons_from_fallout([], "200_parse") == {}

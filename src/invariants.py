@@ -4,7 +4,7 @@ Declarations live in TABLE_REGISTRY[table]["invariants"] (src/schemas.py);
 this module validates actual rows against them. Delta Lake has no
 engine-enforced constraints (no PRIMARY KEY / UNIQUE / FOREIGN KEY), so
 uniqueness, allowed values, and referential integrity only become real
-where code checks them — at write time and in the 06_validate gate, which
+where code checks them — at write time and in the 500_validate gate, which
 calls check_all_invariants with a Spark-backed fetch.
 
 The checker is generic on purpose: it reads the contracts and enforces

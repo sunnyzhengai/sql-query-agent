@@ -3,7 +3,7 @@
 Assign data stewards to metrics — individually, by pattern, or by department.
 Assignments are saved to the gov_steward_assignments Delta table (this
 notebook is its contract owner). They flow into the graph on the next
-03_build_graph run, which applies them to canonical nodes; 04 then projects
+300_build_graph run, which applies them to canonical nodes; 04 then projects
 them into output_metric_logic, where the agent reads them.
 
 Requires the sql-logic-env Environment (no %pip installs — they break the
@@ -82,7 +82,7 @@ if records:
     df.write.format("delta").mode("overwrite").option("overwriteSchema", "true") \
         .saveAsTable("gov_steward_assignments")
     print(f"Saved {len(records)} assignments to gov_steward_assignments")
-    print("\nRe-run 03_build_graph → 04_build_metric_logic to apply them to the")
+    print("\nRe-run 300_build_graph → 400_build_metric_logic to apply them to the")
     print("graph and the agent's metric_logic table.")
 else:
     print("No assignments to save")

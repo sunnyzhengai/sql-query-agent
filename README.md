@@ -39,14 +39,14 @@ Follow the step-by-step [Installation Guide](docs/deployment/INSTALLATION_GUIDE.
 1. Create a Fabric Environment (`sql-logic-env`) with the pinned packages and the product wheel
 2. Create a Lakehouse; upload the ScriptDom DLL, your `.sql` files, data dictionary CSVs, and `org_config.yaml`
 3. Run the numbered pipeline notebooks in order:
-   - `01_install` — create Delta tables, load SQL files and dictionary
-   - `02_parse` — parse SQL with ScriptDom
-   - `03_build_graph` — build the three-layer knowledge graph
-   - `04_build_metric_logic` — flatten the graph for the Data Agent
-   - `05_export_graph_tables` — export typed LPG tables (automatic)
-   - `06_validate` — pipeline health gate (DEPLOYMENT READY / BLOCKED)
-   - `07_generate_descriptions` — LLM business descriptions (optional)
-   - `08_publish_collibra` / `09_publish_purview` — catalog sync (optional add-ons)
+   - `100_install` — create Delta tables, load SQL files and dictionary
+   - `200_parse` — parse SQL with ScriptDom
+   - `300_build_graph` — build the three-layer knowledge graph
+   - `400_build_metric_logic` — flatten the graph for the Data Agent
+   - `800_export_graph_tables` — export typed LPG tables (automatic)
+   - `500_validate` — pipeline health gate (DEPLOYMENT READY / BLOCKED)
+   - `600_generate_descriptions` — LLM business descriptions (optional)
+   - `900_publish_collibra` / `910_publish_purview` — catalog sync (optional add-ons)
 4. Create a Fabric Data Agent and add `output_metric_logic` plus the graph tables as data sources
 5. Paste `notebooks/delta_agent_instructions.md` into the agent's instructions
 

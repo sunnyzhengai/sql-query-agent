@@ -28,7 +28,7 @@
 
 """Fabric Notebook (utility): Golden lakehouse snapshot.
 
-Run AFTER a verified-good pipeline run (06_validate green, agent sanity
+Run AFTER a verified-good pipeline run (500_validate green, agent sanity
 Q&A passed). The pipeline is deterministic — inputs + wheel version
 rebuild everything — so the snapshot only clones what is expensive or
 impossible to rebuild:
@@ -44,7 +44,7 @@ version, timestamp) goes to Files/golden/manifest.json.
 
 RESTORE: for each golden_<table>:
     CREATE OR REPLACE TABLE <table> AS SELECT * FROM golden_<table>
-then rerun 02 -> 07 (05, 06) — with cache and findings restored, the
+then rerun 200 -> 600 (500, 800) — with cache and findings restored, the
 rebuild costs minutes and pennies, not a description regeneration.
 """
 
@@ -96,7 +96,7 @@ with open(manifest_path, "w") as f:
 print("\nManifest -> Files/golden/manifest.json")
 print(json.dumps(manifest, indent=2))
 print("\nRestore: CREATE OR REPLACE TABLE <t> AS SELECT * FROM golden_<t> per table, "
-      "then rerun 02->07.")
+      "then rerun 200->600.")
 
 # METADATA ********************
 

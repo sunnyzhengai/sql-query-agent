@@ -1,0 +1,12 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Notebook",
+    "displayName": "020_ingest_sql_folders",
+    "description": "Ingestion route B \u2014 .sql files spread across folders/workspaces (configured folder list, loud partial-load failure)"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "478e1f14-0225-418a-9476-bf1ce5aabded"
+  }
+}

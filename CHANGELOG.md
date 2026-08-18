@@ -10,6 +10,24 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.22.0] - 2026-08-18
+
+### Changed — century-phase renumbering (Sunny's full scheme)
+- All 19 notebooks renamed: 0xx acquire (010 filedrop, 020 folders,
+  030 live, 040/050 dictionaries, 060 semantic models — the 12
+  misfile corrected), 100 verify, 200 parse, 300 graph, 400 cards,
+  500 validate, 600/610 describe, 700 index, 800 export, 900/910/920
+  publish, 950 ops. Lexicographic sort = run order; 100-gaps leave
+  insertion room.
+- THE ordering fix: 800_export runs AFTER descriptions — the
+  documented "re-run 05 after 07" double-run is deleted everywhere.
+- Engine floor raised to 1.22 in every notebook: gates key on step
+  names, so notebook/wheel skew across the rename dies loudly.
+- Fallout stage codes renamed with their notebooks (060_*, 500_*,
+  900_match); historical rows keep old codes (append tables).
+
+---
+
 ## [1.21.0] - 2026-08-18
 
 ### Added — the funnel view (Question Map gap 3, family G — complete)

@@ -7,15 +7,15 @@ from src.engine_floor import require_engine
 
 def test_older_engine_dies_loudly():
     with pytest.raises(SystemExit) as e:
-        require_engine("1.17.2", "1.18", "02_parse")
-    assert "02_parse" in str(e.value)
+        require_engine("1.17.2", "1.18", "200_parse")
+    assert "200_parse" in str(e.value)
     assert "1.17.2" in str(e.value)
 
 
 def test_equal_and_newer_pass():
-    require_engine("1.18.0", "1.18", "02_parse")
-    require_engine("1.18", "1.18", "02_parse")
-    require_engine("2.0.0", "1.18", "02_parse")
+    require_engine("1.18.0", "1.18", "200_parse")
+    require_engine("1.18", "1.18", "200_parse")
+    require_engine("2.0.0", "1.18", "200_parse")
 
 
 def test_minor_compare_is_numeric_not_lexical():

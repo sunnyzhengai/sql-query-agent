@@ -26,7 +26,7 @@ class DictionaryConfig(BaseModel):
     table_description_col: str = "DESCRIPTION" # description column in dict_tables (may differ from dict_columns)
     column_name_col: str = "COLUMN_NAME"
     description_col: str = "DESCRIPTION"       # description column in dict_columns
-    # Dictionary matching is schema-agnostic (ADR 0016). When 06_validate
+    # Dictionary matching is schema-agnostic (ADR 0016). When 500_validate
     # detects the same bare table name in multiple schemas, deployment blocks
     # unless the admin acknowledges the ambiguity by setting this to true.
     accept_schema_ambiguity: bool = False
@@ -132,7 +132,7 @@ class FabricGraphConfig(BaseModel):
 
 
 class FreshnessConfig(BaseModel):
-    # Trust staleness threshold (Question Map gap 2): 06_validate WARNS
+    # Trust staleness threshold (Question Map gap 2): 500_validate WARNS
     # when a metric's source extraction is older than this — health
     # signal only, never a deployment gate.
     stale_after_days: int = 30

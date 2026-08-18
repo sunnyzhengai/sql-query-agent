@@ -181,7 +181,7 @@ After uploading your dictionary, the pipeline validates it automatically. Check 
 | "No calculation logic" | The SQL couldn't be parsed (dictionary unrelated) | Check parse_errors table |
 | "Missing description" | A table or column has an empty description | Update the CSV |
 
-You can also run the validation notebook (`06_validate`) independently to check coverage before asking the agent questions.
+You can also run the validation notebook (`500_validate`) independently to check coverage before asking the agent questions.
 
 ---
 

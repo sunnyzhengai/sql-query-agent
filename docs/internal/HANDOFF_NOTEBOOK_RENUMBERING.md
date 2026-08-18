@@ -1,5 +1,8 @@
 # Handoff — full renumbering: century phases, true ordering (SUPERSEDES the minimal verdict)
 
+> **Status (2026-08-18, dev session): implemented in 1.22.0.**
+> All 19 notebooks renamed to the century-phase scheme (dirs, .platform displayNames, registry, TABLE_REGISTRY owner/enricher/consumer strings, fallout stage codes, gates, tests, guide, generated maps). The ordering fix landed: 800_export runs AFTER 600/610 descriptions and 700 index — every 're-run 05 after 07' instruction is deleted; the Data-Pipeline recipe now schedules 500 before 800. ENGINE FLOOR RAISED to 1.22 in every notebook (gates key on step names — old-wheel/new-notebook skew now dies loudly at cell 0, which is what the binding is for). Historical handoffs keep old numbers; mapping note added to HANDOFF_INGESTION_ROUTES. SUNNY: after git sync, home-workspace items get NEW ids (rename = delete+create) — re-point any Data Pipeline activities; work side re-pastes once in the sync window.
+
 > **2026-08-18, later same day:** Sunny overruled the minimal proposal —
 > "this time really consider the best ordering, don't preserve current
 > numbers; 100-intervals for insertion room." Full scheme below replaces

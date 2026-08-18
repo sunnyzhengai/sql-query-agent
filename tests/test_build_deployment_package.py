@@ -62,11 +62,11 @@ def test_ships_all_pipeline_notebooks_as_importable_py(zip_names):
     notebook_stems = sorted(
         n.removeprefix("notebooks/").removesuffix(".py")
         for n in zip_names
-        if re.fullmatch(r"notebooks/\d{2}_\w+\.py", n)
+        if re.fullmatch(r"notebooks/\d{3}_\w+\.py", n)
     )
     expected = sorted(
         p.name.removesuffix(".Notebook")
-        for p in REPO_ROOT.glob("[0-9][0-9]_*.Notebook")
+        for p in REPO_ROOT.glob("[0-9][0-9][0-9]_*.Notebook")
     )
     assert notebook_stems == expected
     assert len(expected) >= 6, "pipeline notebooks disappeared from repo root?"

@@ -93,7 +93,7 @@ def collect_contents(repo_root: Path, version: str) -> "dict[str, Path]":
     # Pipeline notebooks: NN_name.Notebook/notebook-content.py -> notebooks/NN_name.py
     # (Fabric's "Import notebook" accepts .py files.) Only numbered pipeline
     # notebooks ship; test/utility notebooks never do.
-    for nb_dir in sorted(repo_root.glob("[0-9][0-9]_*.Notebook")):
+    for nb_dir in sorted(repo_root.glob("[0-9][0-9][0-9]_*.Notebook")):
         source = nb_dir / "notebook-content.py"
         if not source.exists():
             raise PackagingError(f"notebook content missing: {source}")

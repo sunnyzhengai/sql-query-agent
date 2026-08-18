@@ -1,4 +1,4 @@
-# Paste this as a new cell at the bottom of the 02_parse notebook
+# Paste this as a new cell at the bottom of the 200_parse notebook
 # Run after Cell 0 (ScriptDom is already loaded)
 # Change METRIC_ID to test different procs
 

@@ -5,7 +5,7 @@ proven ingestion path was manual file load. These tests run the 28
 anonymized golden procedures through the extractor pipeline — discovery
 filter, hash/change tracking, sql_sources production — and prove the
 extracted output is byte-identical to what the file-loaded path feeds
-02_parse. Input parity is the whole claim: 02's ScriptDom is
+200_parse. Input parity is the whole claim: 02's ScriptDom is
 deterministic, so identical input text means identical parse results
 (live confirmation on Fabric is a run of extract_views + 02 against the
 demo database).
@@ -96,7 +96,7 @@ def test_rows_match_sql_sources_contract(extraction):
 
 def test_source_type_vocabulary_matches_contract(extraction):
     """The contract's allowed values are 'procedure'/'view' (same as
-    01_install's extract_object_identity derives); the extractor merges
+    100_install's extract_object_identity derives); the extractor merges
     directly into input_sql_sources so it must emit exactly these."""
     from src.schemas import SQL_SOURCES
 

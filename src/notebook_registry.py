@@ -47,10 +47,10 @@ QUESTION_FAMILIES = ("A", "B", "C", "D", "E", "F", "G")
 
 # The engine floor asserted by every notebook this release. Raise it
 # when a notebook starts depending on newer src/ surface.
-ENGINE_FLOOR = "1.18"
+ENGINE_FLOOR = "1.22"
 
 NOTEBOOK_REGISTRY: "dict[str, dict]" = {
-    "00a_ingest_sql_filedrop": {
+    "010_ingest_sql_filedrop": {
         "family": "acquisition",
         "serves": ["A", "B", "C", "D", "F"],
         "purpose": "Load dropped .sql files into input_sql_sources",
@@ -59,7 +59,7 @@ NOTEBOOK_REGISTRY: "dict[str, dict]" = {
         "gates": ["find_duplicate_identities"],
         "requires_engine": ENGINE_FLOOR,
     },
-    "00b_ingest_sql_folders": {
+    "020_ingest_sql_folders": {
         "family": "acquisition",
         "serves": ["A", "B", "C", "D", "F"],
         "purpose": "Load configured ABFS folders of .sql into input_sql_sources",
@@ -70,7 +70,7 @@ NOTEBOOK_REGISTRY: "dict[str, dict]" = {
         "gates": ["CREATE_HEADER_SPARK_PATTERN"],
         "requires_engine": ENGINE_FLOOR,
     },
-    "00c_ingest_sql_live": {
+    "030_ingest_sql_live": {
         "family": "acquisition",
         "serves": ["A", "B", "C", "D", "F"],
         "purpose": "Live extraction from the customer SQL source (merge)",
@@ -79,7 +79,7 @@ NOTEBOOK_REGISTRY: "dict[str, dict]" = {
         "gates": [],  # identity + change tracking live in the extractor
         "requires_engine": ENGINE_FLOOR,
     },
-    "00d_dict_clarity": {
+    "040_dict_clarity": {
         "family": "acquisition",
         "serves": ["A", "B"],
         "purpose": "Primary dictionary load (formatted CSVs or raw export)",
@@ -88,7 +88,7 @@ NOTEBOOK_REGISTRY: "dict[str, dict]" = {
         "gates": ["find_duplicate_identities"],
         "requires_engine": ENGINE_FLOOR,
     },
-    "00e_dict_caboodle": {
+    "050_dict_caboodle": {
         "family": "acquisition",
         "serves": ["A", "B"],
         "purpose": "Merge a second dictionary source (primary wins)",
@@ -97,7 +97,7 @@ NOTEBOOK_REGISTRY: "dict[str, dict]" = {
         "gates": [],
         "requires_engine": ENGINE_FLOOR,
     },
-    "01_install": {
+    "100_install": {
         "family": "verification",
         "serves": ["G"],
         "purpose": "Environment verification + ingestion-state report",
@@ -106,7 +106,7 @@ NOTEBOOK_REGISTRY: "dict[str, dict]" = {
         "gates": [],
         "requires_engine": ENGINE_FLOOR,
     },
-    "02_parse": {
+    "200_parse": {
         "family": "derivation",
         "serves": ["A", "B", "C", "F", "G"],
         "purpose": "Parse the SQL corpus with ScriptDom into parse tables",
@@ -117,7 +117,7 @@ NOTEBOOK_REGISTRY: "dict[str, dict]" = {
         "gates": ["precondition_gate", "postcondition_gate"],
         "requires_engine": ENGINE_FLOOR,
     },
-    "03_build_graph": {
+    "300_build_graph": {
         "family": "derivation",
         "serves": ["A", "B", "C", "F"],
         "purpose": "Build the knowledge graph (nodes/edges, all layers)",
@@ -126,7 +126,7 @@ NOTEBOOK_REGISTRY: "dict[str, dict]" = {
         "gates": ["precondition_gate", "postcondition_gate"],
         "requires_engine": ENGINE_FLOOR,
     },
-    "04_build_metric_logic": {
+    "400_build_metric_logic": {
         "family": "derivation",
         "serves": ["A", "E"],
         "purpose": "Flatten the graph into the metric card table",
@@ -135,7 +135,7 @@ NOTEBOOK_REGISTRY: "dict[str, dict]" = {
         "gates": ["precondition_gate", "postcondition_gate"],
         "requires_engine": ENGINE_FLOOR,
     },
-    "05_export_graph_tables": {
+    "800_export_graph_tables": {
         "family": "derivation",
         "serves": ["B", "C"],
         "purpose": "Export typed tables for the Fabric Graph model",
@@ -144,7 +144,7 @@ NOTEBOOK_REGISTRY: "dict[str, dict]" = {
         "gates": ["precondition_gate", "postcondition_gate"],
         "requires_engine": ENGINE_FLOOR,
     },
-    "06_validate": {
+    "500_validate": {
         "family": "verification",
         "serves": ["G"],
         "purpose": "Pipeline validation + deployment readiness gate",
@@ -154,7 +154,7 @@ NOTEBOOK_REGISTRY: "dict[str, dict]" = {
         "gates": ["precondition_gate"],
         "requires_engine": ENGINE_FLOOR,
     },
-    "07_generate_descriptions": {
+    "600_generate_descriptions": {
         "family": "derivation",
         "serves": ["A"],
         "purpose": "Bottom-up LLM descriptions over the calculation DAG",
@@ -163,7 +163,7 @@ NOTEBOOK_REGISTRY: "dict[str, dict]" = {
         "gates": ["precondition_gate"],
         "requires_engine": ENGINE_FLOOR,
     },
-    "07b_generate_agent_descriptions": {
+    "610_generate_agent_descriptions": {
         "family": "derivation",
         "serves": ["A"],
         "purpose": "Data-Agent metric descriptions (owns ops_agent_descriptions)",
@@ -173,7 +173,7 @@ NOTEBOOK_REGISTRY: "dict[str, dict]" = {
         "gates": ["precondition_gate"],
         "requires_engine": ENGINE_FLOOR,
     },
-    "08_publish_collibra": {
+    "900_publish_collibra": {
         "family": "publisher",
         "serves": ["A", "E"],
         "purpose": "Publish descriptions onto Collibra report assets",
@@ -182,7 +182,7 @@ NOTEBOOK_REGISTRY: "dict[str, dict]" = {
         "gates": ["precondition_gate"],
         "requires_engine": ENGINE_FLOOR,
     },
-    "09_publish_purview": {
+    "910_publish_purview": {
         "family": "publisher",
         "serves": ["A", "E"],
         "purpose": "Publish metric cards to the Purview Data Map",
@@ -191,7 +191,7 @@ NOTEBOOK_REGISTRY: "dict[str, dict]" = {
         "gates": ["precondition_gate"],
         "requires_engine": ENGINE_FLOOR,
     },
-    "10_ingest_agent_events": {
+    "950_ingest_agent_events": {
         "family": "acquisition",
         "serves": ["G"],
         "purpose": "Fold agent conversation events into gov_* telemetry",
@@ -200,7 +200,7 @@ NOTEBOOK_REGISTRY: "dict[str, dict]" = {
         "gates": [],
         "requires_engine": ENGINE_FLOOR,
     },
-    "11_refresh_search_index": {
+    "700_refresh_search_index": {
         "family": "derivation",
         "serves": ["D"],
         "purpose": "Rebuild the semantic catalog + Eventhouse re-embed",
@@ -210,7 +210,7 @@ NOTEBOOK_REGISTRY: "dict[str, dict]" = {
         "gates": ["precondition_gate"],
         "requires_engine": ENGINE_FLOOR,
     },
-    "12_ingest_semantic_models": {
+    "060_ingest_semantic_models": {
         "family": "acquisition",
         "serves": ["A", "B", "E", "G"],
         "purpose": "Ingest PBI semantic models (lineage, DAX, names, fallout)",
@@ -219,7 +219,7 @@ NOTEBOOK_REGISTRY: "dict[str, dict]" = {
         "gates": ["postcondition_gate"],
         "requires_engine": ENGINE_FLOOR,
     },
-    "13_publish_pbi": {
+    "920_publish_pbi": {
         "family": "publisher",
         "serves": ["A", "E"],
         "purpose": "Publish certified descriptions onto PBI reports",

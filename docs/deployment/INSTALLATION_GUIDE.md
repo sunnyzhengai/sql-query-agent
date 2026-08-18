@@ -263,7 +263,7 @@ SQL; everything else is cached.
 ## Step 4: Import Notebooks
 
 1. Go to your workspace
-2. For each notebook file (01_install through 09_publish_purview):
+2. For each notebook file (100_install through 910_publish_purview):
    a. Click **+ New** → **Import notebook**
    b. Upload the notebook `.py` file
 3. For each imported notebook:
@@ -271,10 +271,14 @@ SQL; everything else is cached.
    b. In the toolbar, click the **Environment** dropdown → select `sql-logic-env`
    c. In the left sidebar, click **Lakehouses** → **Add** → select your Lakehouse
 
-> **Note:** The notebooks are numbered for run order. 01-06 are required; 07-09 are optional (description generation and catalog publishing).
+> **Note:** Run order = lexicographic sort of the 3-digit numbers; the
+> century is the phase: 0xx acquire, 100 verify, 200 parse, 300 graph,
+> 400 cards, 500 validate, 600s describe, 700 index, 800 export,
+> 900s publish, 950 ops. 0xx-500 are required; 600 onward are optional
+> (description generation, search index, graph export, publishing).
 
 **Verification:**
-- [ ] All 9 pipeline notebooks imported (01 through 09)
+- [ ] All pipeline notebooks imported (010 through 950)
 - [ ] Each notebook shows `sql-logic-env` as its Environment
 - [ ] Each notebook shows your Lakehouse in the left sidebar
 
@@ -293,21 +297,21 @@ enters as a PAIR: its SQL and its dictionary together** — otherwise
 
 | Your situation | SQL route | Dictionary route |
 |---|---|---|
-| .sql files in one folder (`Files/sql_input/`) | `00a_ingest_sql_filedrop` | `00d_dict_clarity` (Cell 1: formatted CSVs) |
-| .sql files spread across folders/workspaces | `00b_ingest_sql_folders` | `00d_dict_clarity` |
-| Live SQL server (gateway / Azure / Fabric) | `00c_ingest_sql_live` | `00d_dict_clarity` (Cell 2: raw export) |
-| Second dictionary source to merge on top | — | `00e_dict_caboodle` |
+| .sql files in one folder (`Files/sql_input/`) | `010_ingest_sql_filedrop` | `040_dict_clarity` (Cell 1: formatted CSVs) |
+| .sql files spread across folders/workspaces | `020_ingest_sql_folders` | `040_dict_clarity` |
+| Live SQL server (gateway / Azure / Fabric) | `030_ingest_sql_live` | `040_dict_clarity` (Cell 2: raw export) |
+| Second dictionary source to merge on top | — | `050_dict_caboodle` |
 
-Acquisition routes are event-driven: re-run one when its source
-material changes. Numbered notebooks (`01`–`13`) are derivation —
-route-agnostic and rerunnable.
+Acquisition routes (0xx) are event-driven: re-run one when its source
+material changes. 100 onward are derivation/verification — route-
+agnostic and rerunnable.
 
 ### 5a-2: Verify the installation
 
-1. Open `01_install`
+1. Open `100_install`
 2. Click **Run all**
 
-01 verifies the environment (packages, DLL, config), seeds the error
+100_install verifies the environment (packages, DLL, config), seeds the error
 knowledge base, and reports **ingestion state from the tables
 themselves** — which routes are satisfied, which are pending and what
 to run. It loads nothing itself and never assumes a route.
@@ -319,7 +323,7 @@ to run. It loads nothing itself and never assumes a route.
 
 ### 5b: Parse SQL files
 
-1. Open `02_parse`
+1. Open `200_parse`
 2. Click **Run all**
 3. Wait for completion (~30 seconds to 5 minutes depending on file count)
 
@@ -331,7 +335,7 @@ to run. It loads nothing itself and never assumes a route.
 
 ### 5c: Build knowledge graph
 
-1. Open `03_build_graph`
+1. Open `300_build_graph`
 2. Click **Run all**
 
 **Verification:**
@@ -341,7 +345,7 @@ to run. It loads nothing itself and never assumes a route.
 
 ### 5d: Build metric logic
 
-1. Open `04_build_metric_logic`
+1. Open `400_build_metric_logic`
 2. Click **Run all**
 
 **Verification:**
@@ -350,7 +354,7 @@ to run. It loads nothing itself and never assumes a route.
 
 ### 5e: Export graph tables
 
-1. Open `05_export_graph_tables`
+1. Open `800_export_graph_tables`
 2. Click **Run all**
 
 **Verification:**
@@ -358,7 +362,7 @@ to run. It loads nothing itself and never assumes a route.
 
 ### 5f: Validate pipeline
 
-1. Open `06_validate`
+1. Open `500_validate`
 2. Click **Run all**
 
 **Verification:**
@@ -371,19 +375,19 @@ to run. It loads nothing itself and never assumes a route.
 
 ### Optional notebooks (after the agent is working)
 
-- `07_generate_descriptions` — LLM-generated business descriptions for metrics
-- `07b_generate_agent_descriptions` — Data-Agent descriptions into
+- `600_generate_descriptions` — LLM-generated business descriptions for metrics
+- `610_generate_agent_descriptions` — Data-Agent descriptions into
   `ops_agent_descriptions` (run after 04; publishers 08/13 consume it —
   generation was split from publishing, so a PBI-only customer never
   touches a Collibra notebook)
-- `08_publish_collibra` / `09_publish_purview` — push metadata to your catalog
+- `900_publish_collibra` / `910_publish_purview` — push metadata to your catalog
   (requires adapter credentials in `org_config.yaml`); every push is
   logged to `gov_publish_log` for the admin telemetry report
-- `10_ingest_agent_events` — folds the chat surfaces' event files
+- `950_ingest_agent_events` — folds the chat surfaces' event files
   (`Files/agent_events/*.jsonl`) into `gov_turn_events` /
   `gov_feedback_events` for admin telemetry. Run on a schedule (weekly
   works); re-runs are idempotent — rows are never duplicated
-- `11_refresh_search_index` — rebuilds `output_semantic_catalog` from
+- `700_refresh_search_index` — rebuilds `output_semantic_catalog` from
   the graph, copies it into the Eventhouse, and re-embeds every search
   document (verifying full coverage and the refusal floor). One-time
   Eventhouse setup first: `devtools/eventhouse_setup.kql` (table,
@@ -452,13 +456,14 @@ Ask these questions to verify it's working:
 When your SQL files change (new procs added, existing ones modified):
 
 1. Upload new/updated `.sql` files to `Files/sql-query-agent/sql_input/`
-2. Run notebooks 02 → 03 → 04 → 05 → 06 in order
+2. Run notebooks 200 → 300 → 400 → 500 in order (then 600/610 and
+   700 → 800 if you use descriptions, search, and the graph model)
 3. The Data Agent automatically uses the updated `output_metric_logic` table
 
 When your data dictionary changes:
 
 1. Upload updated CSVs to `Files/sql-query-agent/dictionary/`
-2. Re-run notebooks 03 → 04 → 05 → 06 (skip 02 — no need to re-parse)
+2. Re-run notebooks 300 → 400 → 500 (skip 200 — no need to re-parse)
 
 ### Optional enrichments (recommended)
 
@@ -471,22 +476,22 @@ you can check the current state with:
 1. **Steward assignments** (`gov_steward_assignments`) — without it,
    metrics carry no ownership. Open `notebooks/utilities/manage_stewards`
    in a Fabric notebook, follow its cells to assign stewards, then re-run
-   03 → 04 so ownership lands in the graph and `output_metric_logic`.
+   300 → 400 so ownership lands in the graph and `output_metric_logic`.
 
 2. **PBI semantic-model ingestion** (`input_report_sources`,
    `input_dax_expressions`, `input_metric_names`) — without it, the graph
    has no report lineage, no DAX measures, and metrics display object
-   names only. Remediation: run 12_ingest_semantic_models with a
+   names only. Remediation: run 060_ingest_semantic_models with a
    `semantic_models` config section (workspace, folder, or devops_git profile) —
    see the section below. For `input_metric_names` alone, remediation:
-   run 12_ingest_semantic_models to derive names from PBI semantic
+   run 060_ingest_semantic_models to derive names from PBI semantic
    models, or upload a manual metric_id,business_name CSV. Then re-run
-   03 → 04 → 05.
+   300 → 400 (and 800 if you use the graph model).
 
 3. **Fallout history** (`ops_fallout`) — the queryable record of every
    dropped entity (why a file, report, or metric fell out of a stage).
    Absent until the first fallout-writing stage runs; remediation: run
-   12_ingest_semantic_models (or any fallout-writing stage). 06's
+   060_ingest_semantic_models (or any fallout-writing stage). 06's
    funnel then reports per-stage in/out/fell-off counts backed by
    these rows.
 
@@ -507,11 +512,11 @@ measures defined on top of them.
    - `devops_git` — Azure DevOps repos. Store a PAT (Code: Read) as a
      Key Vault secret and set `key_vault_url` + `pat_secret_name`; the
      PAT is fetched at run time and never stored.
-2. Import and run `12_ingest_semantic_models` (same import drill as
+2. Import and run `060_ingest_semantic_models` (same import drill as
    Step 4). Review the per-report summary it prints.
-3. Re-run 03 → 04 → 05 so report and measure nodes land in the graph
-   and its exports.
-4. Optional, after 07 has generated descriptions: run `13_publish_pbi`
+3. Re-run 300 → 400 (and 800) so report and measure nodes land in the
+   graph and its exports.
+4. Optional, after 600/610 have generated descriptions: run `920_publish_pbi`
    to publish each metric's certified description onto the Power BI
    report built on it. Matching is lineage-exact; the notebook prints
    the matches and stops for review before publishing, and every push
@@ -522,7 +527,10 @@ measures defined on top of them.
 To keep the knowledge graph up to date without manual runs:
 
 1. In your workspace, create a **Data Pipeline**
-2. Add **Notebook Activities** in order: 02_parse → 03_build_graph → 04_build_metric_logic → 05_export_graph_tables → 06_validate
+2. Add **Notebook Activities** in order: 200_parse → 300_build_graph →
+   400_build_metric_logic → 500_validate → 800_export_graph_tables
+   (export AFTER descriptions when 600 is in the schedule — the 800
+   export picks up whatever the graph holds when it runs)
 3. Set a **Schedule Trigger** (recommended: weekly, or after SQL deployments)
 4. The Data Agent automatically uses the refreshed tables
 
@@ -575,7 +583,7 @@ Pick the profile matching where your SQL lives:
 
 ### Run the extraction
 
-1. Open the **00c_ingest_sql_live** notebook (a pipeline notebook,
+1. Open the **030_ingest_sql_live** notebook (a pipeline notebook,
    synced like the rest) and attach your Lakehouse + Environment if not
    already attached.
 2. Run cells 1–5. **Stop at cell 5** and review the NEW / CHANGED /
@@ -585,8 +593,8 @@ Pick the profile matching where your SQL lives:
 3. Run the remaining cells. Definitions are stored exactly as extracted —
    full `CREATE PROCEDURE` / `CREATE VIEW` text; the parser handles the
    wrappers natively.
-4. Run notebooks 02 → 03 → 04 → 05 → 06 as in Step 5.
-5. To keep the catalog current, re-run 00c_ingest_sql_live + 02→06 on your
+4. Run notebooks 200 → 300 → 400 → 500 as in Step 5.
+5. To keep the catalog current, re-run 030_ingest_sql_live + 200→500 on your
    change cadence (weekly is typical). Only new and changed objects are
    re-loaded; nothing loaded manually is erased (upsert by `metric_id`).
 

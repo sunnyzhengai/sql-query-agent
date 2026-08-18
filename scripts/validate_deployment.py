@@ -90,7 +90,7 @@ def check_llm(root: Path, cfg: dict) -> "list[CheckResult]":
     llm = cfg.get("llm") or {}
     if not llm:
         return [_warn("llm", "no llm: block in org_config.yaml — "
-                      "07_generate_descriptions will refuse to run. Add "
+                      "600_generate_descriptions will refuse to run. Add "
                       "endpoint/model/api_key_file (see 07's docstring)")]
     results = []
     endpoint = (llm.get("endpoint") or "").strip()
@@ -167,7 +167,7 @@ def check_scriptdom(root: Path) -> CheckResult:
         if candidate.is_file():
             return _ok("scriptdom", f"{SCRIPTDOM_DLL} at {candidate.parent.name}/")
     return _warn("scriptdom", f"{SCRIPTDOM_DLL} not found under libs/ — "
-                 "02_parse falls back to sqlparse (lower fidelity). Upload "
+                 "200_parse falls back to sqlparse (lower fidelity). Upload "
                  "the DLL for production parse rates")
 
 

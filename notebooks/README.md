@@ -2,7 +2,7 @@
 
 Helper notebooks and agent assets. **The production pipeline does NOT live
 here** — it is the numbered `*.Notebook` folders at the repo root
-(`01_install` … `11_refresh_search_index`), which Fabric syncs as workspace
+(`100_install` … `700_refresh_search_index`), which Fabric syncs as workspace
 items. Everything in this directory is pasted into a Fabric notebook or run
 ad hoc.
 
@@ -13,7 +13,7 @@ notebooks/
 ├── data_loading/          ← "Step 00": load org inputs (run once per org, before 01–11)
 │
 ├── utilities/             ← Operational tools (run as needed)
-│   ├── ast_explorer_cell.py         — Explore a proc's ScriptDom AST (paste into 02_parse)
+│   ├── ast_explorer_cell.py         — Explore a proc's ScriptDom AST (paste into 200_parse)
 │   ├── check_stale_data.py          — Spot-check descriptions/logic freshness
 │   ├── collibra_discovery.py        — Discover Collibra API data model
 │   ├── collibra_lineage_match.py    — Match PBI reports to Collibra assets
@@ -39,14 +39,14 @@ notebooks/
 ## Delta table flow (current names)
 
 ```
-input_sql_sources ──→ 02_parse ──→ ops_parse_results ──→ 03_build_graph ──→ graph_nodes
+input_sql_sources ──→ 200_parse ──→ ops_parse_results ──→ 300_build_graph ──→ graph_nodes
 input_dict_tables ─────────────────(+ errors/successes/────────┘             graph_edges
 input_dict_columns ─────────────────phi_findings)──────────────┘                 │
                                                                                  ▼
-                                                    04_build_metric_logic ──→ output_metric_logic
+                                                    400_build_metric_logic ──→ output_metric_logic
                                                                                  │
                                                                                  ▼
-                                                              06_validate ──→ ops_pipeline_validation
+                                                              500_validate ──→ ops_pipeline_validation
                                                                               ops_build_summary
 ```
 

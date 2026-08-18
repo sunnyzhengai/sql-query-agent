@@ -47,7 +47,7 @@ overwrite snapshots — rerun 03→05 with the old wheel restores.
 1. [x] Source control Update (02/07 notebooks + make_golden_snapshot)
 2. [x] Azure OpenAI switch: `gpt-5.4-mini` (DataZoneStandard, East US 2)
        live via src.llm_client; lakehouse org_config + key updated
-3. [x] 02_parse → ops_phi_findings written
+3. [x] 200_parse → ops_phi_findings written
 4. [x] 07 → PHI gate live, redacted steps regenerated
 5. [x] 05 + graph load
 6. [x] Sanity: answers grounded with redacted fragments
@@ -393,7 +393,7 @@ Steps for Sunny:
    regenerate this run (413 step + 28 metric LLM calls — same cost as
    tonight's run). Watch the "Vague-filler flags" line; a handful is
    tolerable, dozens means the prompt needs another pass.
-3. Rebuild the semantic catalog Delta table by running 11_refresh_search_index
+3. Rebuild the semantic catalog Delta table by running 700_refresh_search_index
    Cell 1 (draft.Notebook is deleted — it lacked the explicit column order fix
    and would resurrect the 2026-08-09 column-shift bug). Must run AFTER 07 so
    the new concrete descriptions land in search_text.
@@ -416,7 +416,7 @@ descriptions change, or search keeps ranking on stale embeddings.
 
 The 1.5.3 runbook's manual steps 3-5 (catalog rebuild cell, KQL-editor
 .set-or-replace, embed, verify) are now pipeline notebook
-**11_refresh_search_index**: rebuild Delta -> Eventhouse copy (mgmt
+**700_refresh_search_index**: rebuild Delta -> Eventhouse copy (mgmt
 API, columns by name, emb nulled) -> full re-embed -> coverage check
 (raises if any row lacks a vector) -> refusal-floor probe (reported,
 never auto-acted). One-time first: KUSTO_URI in cell 0 (KQL database

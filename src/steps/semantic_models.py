@@ -98,7 +98,7 @@ def semantic_models_step(
                 row = census_file(f.report_name, f.table_name, f.content)
                 text = f"{text} [signature: {row.signature}]"
             fallout_rows.append({
-                "stage": "12_partition_parse",
+                "stage": "060_partition_parse",
                 "entity_id": f"{f.report_name}/{f.table_name}",
                 "reason_code": code,
                 "reason_text": text,
@@ -212,7 +212,7 @@ def _derive_metric_names(
             )
             skipped.append(reason)
             fallout.append({
-                "stage": "12_name_derivation",
+                "stage": "060_name_derivation",
                 "entity_id": display_id[folded],
                 "reason_code": "multi_report_consumer",
                 "reason_text": reason,

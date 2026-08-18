@@ -1,0 +1,12 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Notebook",
+    "displayName": "920_publish_pbi",
+    "description": "Publish certified metric descriptions onto Power BI reports via lineage-exact matching (ADR 0040; run after 07)"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "50920661-e752-441b-9851-f97e5ea4f9d1"
+  }
+}

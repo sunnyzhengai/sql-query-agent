@@ -1,5 +1,7 @@
 # Handoff — ingestion routes: verification-only 01 + peer route notebooks
 
+> **Renumbering note (2026-08-18, 1.22.0):** the century-phase scheme renamed the routes: 00a->010, 00b->020, 00c->030, 00d->040, 00e->050; 12->060 (acquisition, where it belonged); 01->100, 02->200, 03->300, 04->400, 06->500, 07->600, 07b->610, 11->700, 05->800 (export now runs AFTER descriptions — the double-run is gone), 08->900, 09->910, 13->920, 10->950. Historical handoffs keep old numbers.
+
 > **Status (2026-08-17, dev session): items 1–5 implemented in 1.14.0.**
 > 01_install is verification-only (env checks; error-seed kept; final
 > cell reports ingestion STATE from the tables with route pointers; no

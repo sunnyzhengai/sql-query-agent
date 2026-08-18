@@ -142,7 +142,7 @@ class TestSemanticModelsStep:
         assert "reporting.USP_IP_SepsisDates" in skip
         assert "Sepsis_Dashboard" in skip and "Exec_Overview" in skip
         fallout = [f for f in out.fallout_rows
-                   if f["stage"] == "12_name_derivation"]
+                   if f["stage"] == "060_name_derivation"]
         assert len(fallout) == 1
         assert fallout[0]["reason_code"] == "multi_report_consumer"
         assert fallout[0]["entity_id"] == "reporting.USP_IP_SepsisDates"
@@ -215,7 +215,7 @@ class TestFalloutRows:
         assert out.report_source_rows == []
         assert len(out.fallout_rows) == 1
         f = out.fallout_rows[0]
-        assert f["stage"] == "12_partition_parse"
+        assert f["stage"] == "060_partition_parse"
         assert f["entity_id"] == "Config Report/Params"
         assert f["reason_code"] == "non_sql_source:Table.FromRows"
         assert f["contract_id"] == "contract:input_report_sources"
@@ -223,7 +223,7 @@ class TestFalloutRows:
     def test_parsed_files_leave_no_fallout(self):
         out = semantic_models_step(_files())
         assert [f for f in out.fallout_rows
-                if f["stage"] == "12_partition_parse"] == []
+                if f["stage"] == "060_partition_parse"] == []
 
     def test_every_file_yields_source_or_fallout(self):
         """The 174-silent-models rule: sources + partition fallout rows
@@ -231,7 +231,7 @@ class TestFalloutRows:
         files = _files() + [TmdlFile("Config Report", "Params", self.NON_SQL_TMDL)]
         out = semantic_models_step(files)
         partition_fallout = [f for f in out.fallout_rows
-                             if f["stage"] == "12_partition_parse"]
+                             if f["stage"] == "060_partition_parse"]
         assert len(out.report_source_rows) + len(partition_fallout) == len(files)
 
 

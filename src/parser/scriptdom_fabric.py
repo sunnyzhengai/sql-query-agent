@@ -11,7 +11,7 @@ temp table dependencies. 100% T-SQL compatibility, no whack-a-mole.
 This module only works where pythonnet and the ScriptDom DLL are available
 (Fabric notebooks; locally with a .NET runtime + libs/ DLL).
 
-Usage (see 02_parse Cell 0): the caller initializes pythonnet + the DLL,
+Usage (see 200_parse Cell 0): the caller initializes pythonnet + the DLL,
 builds the AST with TSql160Parser, then calls parse_from_fragment(fragment)
 to get a ParsedSQL directly.
 """

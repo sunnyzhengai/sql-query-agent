@@ -1,0 +1,12 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Notebook",
+    "displayName": "100_install",
+    "description": "Installation verification: environment, packages, DLL, config, error-seed, then a state-driven ingestion report (which 00-routes are satisfied). Loads nothing itself."
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "2d9f28a9-add4-ab5a-43bd-3f0eac10e666"
+  }
+}

@@ -251,17 +251,17 @@ class TestPreconditionGate:
     def test_production_registry_derivations(self):
         # Pin the real registry's derivations for the steps we wire up —
         # if a contract edit changes a step's required inputs, this fails.
-        assert required_inputs("03_build_graph") == [
+        assert required_inputs("300_build_graph") == [
             "input_dict_columns", "input_dict_tables", "ops_parse_results",
         ]
-        assert required_inputs("06_validate") == [
+        assert required_inputs("500_validate") == [
             "graph_edges", "graph_nodes", "input_dict_tables",
             "input_sql_sources", "ops_parse_errors", "ops_parse_successes",
             # freshness check (Trust family, 1.19.0): 06 reads the card
             # table — consistent with its "run 02-04 first" contract
             "output_metric_logic",
         ]
-        assert required_inputs("07_generate_descriptions") == [
+        assert required_inputs("600_generate_descriptions") == [
             "graph_edges", "graph_nodes", "ops_phi_findings",
             "output_metric_logic",
         ]
@@ -269,7 +269,7 @@ class TestPreconditionGate:
 
 class TestPostconditionGate:
     def test_gate_checks_owned_tables_and_passes_clean_state(self):
-        assert set(tables_owned_by("02_parse")) == {
+        assert set(tables_owned_by("200_parse")) == {
             "ops_parse_results", "ops_parse_errors", "ops_parse_successes",
             "ops_error_log", "ops_phi_findings",
         }
@@ -278,7 +278,7 @@ class TestPostconditionGate:
                                           "line_count": 1}]}
         def fetch(t, cols):
             return [{c: r.get(c) for c in cols} for r in state[t]]
-        checked = postcondition_gate("02_parse", fetch, lambda t: t in state)
+        checked = postcondition_gate("200_parse", fetch, lambda t: t in state)
         assert checked == ["ops_parse_successes"]
 
     def test_gate_enforces_cross_table_relations(self):
@@ -304,7 +304,7 @@ class TestPostconditionGate:
         def fetch(t, cols):
             return [{c: r.get(c) for c in cols} for r in state[t]]
         with pytest.raises(StepPostconditionError, match="relation violated"):
-            postcondition_gate("04_build_metric_logic", fetch, lambda t: t in state)
+            postcondition_gate("400_build_metric_logic", fetch, lambda t: t in state)
 
     def test_gate_raises_on_contract_violation(self):
         state = {"ops_parse_successes": [
@@ -314,7 +314,7 @@ class TestPostconditionGate:
         def fetch(t, cols):
             return [{c: r.get(c) for c in cols} for r in state[t]]
         with pytest.raises(StepPostconditionError, match="unique"):
-            postcondition_gate("02_parse", fetch, lambda t: t in state)
+            postcondition_gate("200_parse", fetch, lambda t: t in state)
 
 
 class TestReadinessGate:

@@ -166,11 +166,11 @@ org:
 
 ---
 
-## Phase 3: Setup Notebook (01_install)
+## Phase 3: Setup Notebook (100_install)
 
 **Goal:** Delta tables created, data loaded, environment validated — all in one click.
 
-### 3.1 Run `01_install` Notebook
+### 3.1 Run `100_install` Notebook
 
 This notebook does everything:
 
@@ -229,20 +229,20 @@ This notebook does everything:
 
 Run in order:
 
-1. [ ] `02_parse` — parses SQL files with ScriptDom
+1. [ ] `200_parse` — parses SQL files with ScriptDom
    - Verify: `parse_successes` has rows, `parse_errors` is empty or has known issues
-2. [ ] `03_build_graph` — builds knowledge graph from parse results + dictionary
+2. [ ] `300_build_graph` — builds knowledge graph from parse results + dictionary
    - Verify: `graph_nodes` and `graph_edges` have rows
-3. [ ] `04_build_metric_logic` — flattens graph for Data Agent
+3. [ ] `400_build_metric_logic` — flattens graph for Data Agent
    - Verify: `metric_logic` has rows with `calculation_logic` and `source_tables` populated
-4. [ ] `05_export_graph_tables` — exports typed tables for LPG (automatic, no config needed)
+4. [ ] `800_export_graph_tables` — exports typed tables for LPG (automatic, no config needed)
    - Verify: 9 graph tables have rows (4 node tables, 5 edge tables)
-5. [ ] `06_validate` — validates pipeline health
+5. [ ] `500_validate` — validates pipeline health
    - Verify: `pipeline_validation` shows coverage percentages
 
 ### 4.1 Pipeline Health Check (Automated Gate)
 
-The `06_validate` notebook enforces minimum coverage thresholds. If any threshold is not met, the notebook outputs a **DEPLOYMENT BLOCKED** warning with the specific gap. The deployment team must resolve the gap before proceeding to Phase 5.
+The `500_validate` notebook enforces minimum coverage thresholds. If any threshold is not met, the notebook outputs a **DEPLOYMENT BLOCKED** warning with the specific gap. The deployment team must resolve the gap before proceeding to Phase 5.
 
 | Metric | Minimum threshold | Blocking? |
 |---|---|---|
@@ -253,7 +253,7 @@ The `06_validate` notebook enforces minimum coverage thresholds. If any threshol
 
 After pipeline completes, verify:
 
-- [ ] `06_validate` output shows all thresholds met (no DEPLOYMENT BLOCKED warnings)
+- [ ] `500_validate` output shows all thresholds met (no DEPLOYMENT BLOCKED warnings)
 - [ ] Parse rate meets threshold
 - [ ] Calculation logic coverage meets threshold
 - [ ] Dictionary coverage meets threshold
@@ -307,7 +307,7 @@ Run the golden path test scenarios:
 
 **Goal:** LPG tables are populated for future use. No customer action required.
 
-The pipeline step `05_export_graph_tables` automatically populates 9 typed Delta tables from the knowledge graph. These tables are structured for future Fabric Graph Model ingestion when the self-service report generation feature is released.
+The pipeline step `800_export_graph_tables` automatically populates 9 typed Delta tables from the knowledge graph. These tables are structured for future Fabric Graph Model ingestion when the self-service report generation feature is released.
 
 **Tables created:**
 
@@ -369,7 +369,7 @@ Run `notebooks/utilities/collibra_discovery.py` to verify Collibra connectivity:
 - [ ] Finds PBI Report assets in the target domain
 - [ ] Shows asset type IDs and relation types
 
-### 7.3 Run `08_publish_collibra` Notebook
+### 7.3 Run `900_publish_collibra` Notebook
 
 This notebook orchestrates the full flow:
 
@@ -451,7 +451,7 @@ The acceptance test script (`scripts/acceptance_test.py`) programmatically valid
 - [ ] Customer knows how to re-run the pipeline when they update SQL files
 - [ ] Customer knows how to update the data dictionary when tables change
 - [ ] `/troubleshoot` command works and returns relevant help for common errors
-- [ ] *(If Collibra)* Customer can re-run `08_publish_collibra` after pipeline updates
+- [ ] *(If Collibra)* Customer can re-run `900_publish_collibra` after pipeline updates
 
 ### 9.3 Sign-Off
 
@@ -468,11 +468,11 @@ The acceptance test script (`scripts/acceptance_test.py`) programmatically valid
 |---|---|---|
 | "No documented calculation logic" | Agent instructions have hardcoded examples | Remove examples, use teaching rules only |
 | "0 source tables" for a metric | Tables not in data dictionary | Add tables to dict_tables.csv, re-run pipeline |
-| Parse errors on all files | ScriptDom DLL not loaded | Check 01_install output, verify DLL path |
+| Parse errors on all files | ScriptDom DLL not loaded | Check 100_install output, verify DLL path |
 | Parse errors on non-T-SQL files | Wrong SQL dialect (PL/SQL, PgSQL) | This release supports T-SQL only — remove non-T-SQL files |
 | pythonnet initialization fails | `%pip install` was used in a notebook | Remove %pip, use Fabric Environment only |
 | Agent gives wrong table names | Table missing from dictionary | Add the table to dict_tables.csv (matching is case-insensitive) |
-| Pipeline runs but metric_logic is empty | No parse_results (parse step failed) | Check parse_errors, run 02_parse with verbose |
+| Pipeline runs but metric_logic is empty | No parse_results (parse step failed) | Check parse_errors, run 200_parse with verbose |
 | Agent returns truncated list | Fabric Data Agent response limit | Ask narrower questions or use `/coverage` for counts |
 | Data Agent query fails silently | Workspace/capacity/agent in different regions | Move all resources to same Azure region |
 | "Cross-geo" or capacity errors | Region mismatch | Verify in Workspace Settings → Capacity → Region |

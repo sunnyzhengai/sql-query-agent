@@ -75,7 +75,7 @@ def find_cross_schema_collisions(
     The dictionary matches tables schema-agnostically (it has no schema
     column), so a bare name appearing in multiple schemas makes description
     attachment ambiguous. Returns {folded_table_name: sorted folded schemas}
-    for each ambiguous name. Used by the 06_validate gate (ADR 0016).
+    for each ambiguous name. Used by the 500_validate gate (ADR 0016).
     """
     schemas_by_table: "dict[str, set[str]]" = {}
     for schema, table in schema_table_pairs:
@@ -100,8 +100,8 @@ _TABLE_REF = None  # compiled lazily; regex belongs here, not in notebooks
 
 
 def preview_table_references(sql_texts: "list[str]") -> "set[str]":
-    """ROUGH table-name harvest from raw SQL, for the 01_install coverage
-    PREVIEW only — 06_validate's dictionary_coverage (parse-based) is the
+    """ROUGH table-name harvest from raw SQL, for the 100_install coverage
+    PREVIEW only — 500_validate's dictionary_coverage (parse-based) is the
     authoritative, blocking check. Text-scanning is banned as a lineage
     source (native-parsers doctrine); this exists solely so the installer
     can say "your dictionary probably misses these" before the first

@@ -2,7 +2,7 @@
 
 Each entry matches the ops_installation_errors contract exactly and powers
 the agent's /troubleshoot command (rule 5: supportable at a distance).
-Seeded into Delta by 01_install; never author signatures anywhere else.
+Seeded into Delta by 100_install; never author signatures anywhere else.
 
 When a new failure mode is diagnosed, add it here with the signature
 (distinctive substring), root cause, fix, and prevention — the next
@@ -42,7 +42,7 @@ ERROR_SEEDS = [
         "error_category": "config_not_found",
         "root_cause": "org_config.yaml is missing or in the wrong location.",
         "fix": "Upload org_config.yaml to Files/sql-query-agent/ (NOT in a config/ subfolder).",
-        "prevention": "Verify file path during 01_install.",
+        "prevention": "Verify file path during 100_install.",
         "first_seen": "2026-07-30",
     },
     {
@@ -89,10 +89,10 @@ ERROR_SEEDS = [
         "error_category": "table_not_found",
         "root_cause": "Delta table doesn't exist yet, or org_config.yaml has old table names.",
         "fix": (
-            "Run 01_install first to create all tables. Verify org_config.yaml uses domain-prefixed "
+            "Run 100_install first to create all tables. Verify org_config.yaml uses domain-prefixed "
             "names (input_sql_sources, not sql_sources)."
         ),
-        "prevention": "Always run 01_install before other notebooks.",
+        "prevention": "Always run 100_install before other notebooks.",
         "first_seen": "2026-07-30",
     },
     {
