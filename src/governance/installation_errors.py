@@ -11,6 +11,84 @@ customer's agent explains it without a support ticket.
 
 ERROR_SEEDS = [
     {
+        "error_signature": "Invalid object name",
+        "error_category": "missing_source_object",
+        "root_cause": (
+            "SQL references a table/view that does not exist in the target "
+            "database. Two usual causes: (1) a setup/seed script was "
+            "PARTIALLY applied — without GO separators, the first failed "
+            "statement silently kills every statement after it in the same "
+            "batch, so the script 'ran' but the database is incomplete; "
+            "(2) the object list was built from read-lineage only and "
+            "missed write-target tables (INSERT INTO/UPDATE/MERGE)."
+        ),
+        "fix": (
+            "Re-run the seed scripts top to bottom (they are idempotent), "
+            "then run the VERIFICATION query at the end of "
+            "seed_demo_tables_supplement.sql — it lists every referenced "
+            "object still missing; expect an empty result before retrying."
+        ),
+        "prevention": (
+            "Author seed scripts with GO after every statement (one failure "
+            "can never silently kill the rest) and end them with a "
+            "verification query that names anything missing."
+        ),
+        "first_seen": "2026-08-18",
+    },
+    {
+        "error_signature": "Cannot find either column \"dbo\" or the user-defined function",
+        "error_category": "missing_function",
+        "root_cause": (
+            "A stored procedure calls a scalar UDF (e.g. dbo.fn_parse_date) "
+            "that was never created — table seeds cover tables, not "
+            "functions, and nothing exercises functions until a proc "
+            "actually EXECUTEs (extraction only reads definitions)."
+        ),
+        "fix": "Run seed_demo_functions.sql (or create the named function), then retry.",
+        "prevention": (
+            "Enumerate function dependencies alongside tables when seeding "
+            "a source database; execute one proc end-to-end as the seed's "
+            "acceptance check."
+        ),
+        "first_seen": "2026-08-18",
+    },
+    {
+        "error_signature": "PyToIPynbFailure",
+        "error_category": "notebook_format",
+        "root_cause": (
+            "A notebook-content.py in git is not convertible by Fabric's "
+            "py-to-ipynb importer (dangling '# CELL' marker at EOF or a "
+            "malformed '# META' JSON block). One bad item blocks the whole "
+            "git update batch for the workspace."
+        ),
+        "fix": (
+            "Pull the latest release (the repo enforces Fabric format "
+            "integrity in CI), refresh Source control, and Update all again."
+        ),
+        "prevention": (
+            "Notebook contract plank: tests/test_notebook_contract.py "
+            "validates header, META JSON, and cell-marker structure on "
+            "every commit."
+        ),
+        "first_seen": "2026-08-18",
+    },
+    {
+        "error_signature": "Additional text encountered after finished reading JSON",
+        "error_category": "notebook_format",
+        "root_cause": (
+            "Inner message of PyToIPynbFailure: Fabric's converter hit "
+            "unexpected trailing content while parsing a notebook's "
+            "structure (usually a dangling '# CELL' marker at end of file)."
+        ),
+        "fix": (
+            "Same as PyToIPynbFailure: pull the latest release and re-run "
+            "the Source control update."
+        ),
+        "prevention": "Covered by the notebook-format CI guard.",
+        "first_seen": "2026-08-18",
+    },
+
+    {
         "error_signature": "This property must be set before runtime is initialized",
         "error_category": "pythonnet_initialization",
         "root_cause": "%pip install restarts the kernel, breaking pythonnet CLR init.",
