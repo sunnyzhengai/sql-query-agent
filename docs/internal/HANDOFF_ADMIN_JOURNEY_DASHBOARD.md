@@ -27,13 +27,29 @@ HANDOFF_FUNNEL_AND_FALLOUT; serves Question Map family G.
    pin loaded = parsed + errored (etc.) per stage so the dashboard
    cannot drift from the system of record.
 
-## Open questions (SUNNY to answer before build)
+## Decisions — ALL RESOLVED (Sunny, 2026-08-18): BUILD-READY
 
-(a) Materialize ops_metric_journey as a Delta table written by 06
-    (review session leans yes: versioned, gate-checked, registry
-    contract) vs semantic-model view only.
-(b) Workspace NAMES need an id->name lookup added to 12's collection —
-    worth the extra API call? (census currently has ids only)
-(c) error_type taxonomy scope v1: parse errors only, or unified now
-    with 07b rejections + publish failures (fallout-rows work will
-    unify eventually regardless).
+(a) **Materialize via 06.** ops_metric_journey and ops_report_journey
+    are Delta tables written by 06, registry contracts, gate-checked —
+    no dashboard-side computation, ever.
+(b) **Workspace names: yes.** 12's collection adds the id->name lookup
+    (one API call per workspace per run); both journey tables and all
+    chart axes use names.
+(c) **Error taxonomy: unified now.** One error_type vocabulary across
+    parse errors, 07b rejections, and publish failures from day one
+    (aligns with the fallout-rows reason-code work — share the codes).
+
+## Grain rules (settled with Sunny, same day)
+
+- View 1 (ops_metric_journey) is PROC/METRIC-GRAIN and drives the
+  funnel: pipeline stages happen to metrics, so stage columns live here.
+  ONE ROW PER METRIC, always — a proc feeding 2 reports gets
+  report_count=2 and a '; '-joined report_names (input_metric_names
+  convention), NEVER two rows. Grain integrity: a junction may not
+  multiply the driving grain, or funnel totals stop reconciling.
+- View 2 (ops_report_journey) is REPORT-GRAIN (one PBI report uses many
+  procs — the common direction): proc_count + proc list per report.
+  Exploded (proc, report) pairs stay in input_report_sources (the
+  junction). Clickthrough: journey row -> View 2 filtered by proc.
+- Publish flags named published_collibra / published_pbi_writeback
+  (08 / 13 respectively).
