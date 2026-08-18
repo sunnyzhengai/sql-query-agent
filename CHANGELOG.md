@@ -10,6 +10,27 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.20.0] - 2026-08-18
+
+### Added — the diff kernel (Question Map gap 1, family F; ADR 0043)
+- src/graph/decomposition_diff.py: deterministic step-aligned diff of
+  metric decompositions — WHERE definitions diverge (aligned pairs,
+  fragment diffs, per-step table divergence, missing-step findings).
+  Alignment: name -> identical content -> table-set similarity;
+  unmatched steps are findings, never noise. LLM captions, never
+  judges (ADR 0032).
+- op_compare gains aspect 'steps' (fourth kernel) — METHODOLOGY
+  AMENDMENT made loudly per the amendment rule (ADR 0043; approved
+  via HANDOFF_COMPARISON_SHAPE + go-ahead 2026-08-18).
+- output_metric_twins: cached divergence verdicts for same-bare-name
+  metric groups, recomputed every 04 run (doctrine level 3 —
+  verifiable cache of the kernel).
+- Agent instructions: sameness questions go twin-cache-first, report
+  the kernel verdict verbatim, and never claim sameness from names.
+  (Re-paste delta_agent_instructions.md into the Data Agent.)
+
+---
+
 ## [1.19.0] - 2026-08-18
 
 ### Added — freshness reaches the answer (Question Map gap 2, Trust)

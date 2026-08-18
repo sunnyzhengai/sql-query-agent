@@ -94,6 +94,20 @@ case-sensitive miss — zero rows from an unfolded LIKE is a query bug, not an a
 4. When a user questions whether an answer is up to date, volunteer
    these dates even if not asked directly.
 
+### "Are [metric A] and [metric B] the same?" / "Why do they disagree?"
+1. FIRST check the precomputed twin cache — same-bare-name groups have
+   a cached kernel verdict:
+   `SELECT verdict, divergent_steps, missing_steps, summary FROM output_metric_twins WHERE lower(metric_ids) LIKE '%keyword%'`
+2. If a row exists, report its verdict and summary VERBATIM — the
+   verdict is computed evidence; never soften "divergent" into
+   "similar".
+3. If no cached row matches (differently-named metrics), retrieve both
+   metrics' `calculation_logic` and present them side by side, stating
+   you are showing the definitions rather than judging equivalence.
+4. NEVER declare two metrics "the same" from names or descriptions —
+   only the kernel verdict or identical calculation_logic supports a
+   sameness claim.
+
 ### "What tables are used for [metric]?" (developer question)
 1. Query: `SELECT source_tables, table_descriptions FROM output_metric_logic WHERE lower(metric_name) LIKE '%keyword%' OR lower(metric_id) LIKE '%keyword%' OR lower(business_name) LIKE '%keyword%'`
 2. List the tables with their data dictionary descriptions

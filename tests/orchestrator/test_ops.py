@@ -141,3 +141,34 @@ class TestAspectHonesty:
         out = op_compare(["R1"], "flavour", fake_kql, s)
         assert "no item has a field 'flavour'" in out.rows[0]["error"]
         assert "steward" in out.rows[0]["error"]        # offers real fields
+
+
+class TestStepAlignmentKernel:
+    """The fourth kernel (ADR 0043): WHERE two metrics diverge —
+    aligned steps, missing steps, fragment diffs. Family F."""
+
+    def prepared(self):
+        s = OpsSession()
+        s.note_user(f"{REF_A} {REF_B}")
+        op_retrieve([REF_A, REF_B], fake_kql, s)
+        return s
+
+    def test_missing_step_is_the_finding(self):
+        s = self.prepared()
+        rs = op_compare(["R1"], "steps", fake_kql, s)
+        verdict = rs.rows[0]
+        # Scores aligns (respaced == identical, same forgiveness as the
+        # partition kernel); Labs exists only in REF_B
+        assert verdict["verdict"] == "divergent"
+        assert verdict["aligned_steps"] == 1
+        assert verdict["divergent_steps"] == 0
+        assert verdict["steps_only_in"][REF_B] == ["Labs"]
+        assert verdict["steps_only_in"][REF_A] == []
+        assert rs.complete is True
+        assert "step-aligned" in rs.universe
+
+    def test_steps_aspect_refuses_step_selections(self):
+        s = OpsSession()
+        rs = op_search("Scores", "exact", fake_kql, s)  # rows are steps
+        with pytest.raises(OpError, match="at least two metrics"):
+            op_compare([rs.ref], "steps", fake_kql, s)

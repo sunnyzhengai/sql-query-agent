@@ -44,11 +44,15 @@ PRIMITIVES = {
     },
     "op_compare": {
         "kind": "kernel-dispatch",
-        "data_shaped_because": "comparisons range over exactly three "
-                               "data types (text bodies, sets, scalars) "
-                               "— one kernel per type, typed by data "
-                               "not by question",
-        "adr": "0036",
+        "data_shaped_because": "comparisons range over exactly four "
+                               "data types (text bodies, sets, scalars, "
+                               "ordered step sequences) — one kernel "
+                               "per type, typed by data not by question",
+        # AMENDMENT 2026-08-18 (ADR 0043): the step-alignment kernel
+        # joins the dispatch — approved via HANDOFF_COMPARISON_SHAPE
+        # (Question Map gap 1, Layer 0 approved by Sunny) and Sunny's
+        # go-ahead on the implementation order the same day.
+        "adr": "0036, 0043",
     },
     "op_traverse": {
         "kind": "primitive",
@@ -96,7 +100,9 @@ SYSTEM_VOCAB = frozenset({
     # search modes (ADR 0036)
     "semantic", "exact",
     # compare aspects that name SYSTEM fields/kernels, not user phrasings
+    # ("steps": ADR 0043 amendment 2026-08-18 — the step-alignment kernel)
     "logic", "definition", "sql", "content", "tables", "source_tables",
+    "steps",
     # edge types (graph contract)
     "canonical_to_transform", "transform_to_transform",
     "transform_to_technical",

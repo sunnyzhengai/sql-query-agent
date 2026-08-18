@@ -143,6 +143,30 @@ with_logic = sum(1 for r in metric_logic_rows if r["calculation_logic"] is not N
 with_tables = sum(1 for r in metric_logic_rows if r["source_tables"] is not None)
 print(f"Saved {len(metric_logic_rows)} rows. Logic: {with_logic}, Tables: {with_tables}")
 
+# Twin divergence cache (family F, ADR 0043): same-bare-name groups get
+# the diff kernel's verdict precomputed. Written UNCONDITIONALLY — an
+# empty table means "no twins exist", absence means 04 never ran.
+from src.graph.decomposition_diff import twin_divergence_rows
+from src.schemas import METRIC_TWINS
+
+twin_rows = twin_divergence_rows(
+    nodes_rows, edges_rows,
+    run_at=datetime.now(timezone.utc).isoformat(),
+)
+twins_df = spark.createDataFrame(
+    [(r["group_key"], r["metric_ids"], r["member_count"], r["verdict"],
+      r["divergent_steps"], r["missing_steps"], r["summary"],
+      r["computed_at"]) for r in twin_rows],
+    schema=to_spark_schema(METRIC_TWINS))
+twins_df.write.format("delta").mode("overwrite") \
+    .option("overwriteSchema", "true").saveAsTable("output_metric_twins")
+divergent = sum(1 for r in twin_rows if r["verdict"] == "divergent")
+print(f"output_metric_twins: {len(twin_rows)} same-name groups "
+      f"({divergent} divergent)")
+for r in twin_rows:
+    if r["verdict"] == "divergent":
+        print(f"  [!] {r['group_key']}: {r['summary'][:160]}")
+
 checked = postcondition_gate(
     "04_build_metric_logic",
     fetch=lambda t, cols: [r.asDict() for r in spark.table(t).select(*cols).collect()],

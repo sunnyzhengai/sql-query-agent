@@ -66,6 +66,7 @@ flowchart LR
   ops_pipeline_validation[("ops_pipeline_validation")]:::table
   ops_setup_completeness[("ops_setup_completeness")]:::table
   output_metric_logic[("output_metric_logic")]:::table
+  output_metric_twins[("output_metric_twins")]:::table
   output_semantic_catalog[("output_semantic_catalog")]:::table
   admin{{admin}}:::actor
   collibra_adapter{{collibra_adapter}}:::actor
@@ -88,6 +89,7 @@ flowchart LR
   03_build_graph --> graph_nodes
   03_build_graph --> ops_setup_completeness
   04_build_metric_logic --> output_metric_logic
+  04_build_metric_logic --> output_metric_twins
   05_export_graph_tables --> LPG_export__14_typed_tables_
   06_validate --> ops_build_summary
   06_validate --> ops_pipeline_validation
@@ -183,6 +185,7 @@ flowchart LR
   output_metric_logic --> 07b_generate_agent_descriptions
   output_metric_logic --> 09_publish_purview
   output_metric_logic --> data_agent
+  output_metric_twins --> data_agent
   output_semantic_catalog --> data_agent
   output_semantic_catalog --> eventhouse_semantic_search
   output_semantic_catalog --> orchestrator_core

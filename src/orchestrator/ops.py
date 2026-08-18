@@ -300,18 +300,71 @@ def kernel_field_diff(items: "list[dict]", fields: "list[str]") -> "list[dict]":
     return rows
 
 
+def kernel_step_alignment(items: "list[dict]", run_kql) -> "tuple[list, str, bool]":
+    """Step-aligned decomposition diff (ADR 0043, family F): WHERE two
+    metrics diverge — aligned step pairs, missing steps, fragment
+    diffs. The partition kernel says THAT they differ; this says where.
+    Deterministic; the LLM captions, never judges (ADR 0032)."""
+    from src.graph.decomposition_diff import (
+        Decomposition,
+        DecompStep,
+        diff_many,
+    )
+
+    # metric refs are bare metric_ids; every non-metric node id carries
+    # a layer prefix (transform:/report:/measure:/tech:) — one rule,
+    # no prefix lexicon
+    metric_refs = [i["id"] for i in items if ":" not in i["id"]]
+    if len(metric_refs) < 2:
+        raise OpError("aspect 'steps' aligns metric decompositions — "
+                      "select at least two metrics (not steps/reports)")
+    decomps = []
+    for ref in metric_refs:
+        step_rows = run_kql(STEPS_OF_QUERY, {"p_ref": ref})
+        ids = sorted(r["node_id"] for r in step_rows)
+        frags: "dict[str, str]" = {}
+        if ids:
+            for r in run_kql(BATCH_FRAGMENTS_QUERY,
+                             {"p_ids": json.dumps(ids)}):
+                props = r.get("properties") or "{}"
+                if isinstance(props, str):
+                    props = json.loads(props)
+                frags[r["node_id"]] = props.get("sql_fragment") or ""
+        decomps.append(Decomposition(entity_id=ref, steps=[
+            DecompStep(name=r["name"], fragment=frags.get(r["node_id"], ""))
+            for r in step_rows
+        ]))
+    rows: "list[dict]" = []
+    for res in diff_many(decomps):
+        rows.extend(res.rows())
+    skipped = len(items) - len(metric_refs)
+    note = (f"{skipped} non-metric item(s) ignored — the steps aspect "
+            "ranges over metric decompositions" if skipped else "")
+    return rows, note, not skipped
+
+
 LIST_FIELDS = {"tables": "source_tables", "source_tables": "source_tables"}
 
 
 def op_compare(refs: "list[str]", aspect: "str | None", run_kql,
                session: OpsSession) -> ResultSet:
     """Compare a selection: aspect None/'logic' -> partition kernel;
-    a list field -> set algebra; scalar fields -> field diff."""
+    'steps' -> step-aligned decomposition diff; a list field -> set
+    algebra; scalar fields -> field diff."""
     items = session.rows_of(refs)
     items = [i for i in items if i.get("id")]
     if len(items) < 2:
         raise OpError("compare needs a selection of at least two items "
                       f"(got {len(items)} from {refs})")
+    if aspect == "steps":
+        rows, note, complete = kernel_step_alignment(items, run_kql)
+        return session.register(
+            "compare", {"refs": refs, "aspect": "steps"}, rows,
+            complete=complete,
+            universe="step-aligned decomposition diff of the selected "
+                     "metrics (name -> content -> table alignment; "
+                     "whitespace/case forgiven)",
+            note=note)
     if aspect in (None, "", "logic", "definition", "sql", "content"):
         rows, note, complete = kernel_partition(items, run_kql)
         return session.register(

@@ -547,6 +547,50 @@ GRAPH_EDGES = {
 # OUTPUT domain — flattened, agent-facing products
 # =====================================================================
 
+METRIC_TWINS = {
+    "table_name": "output_metric_twins",
+    "description": (
+        "Cached divergence summaries for same-bare-name metric groups "
+        "(the founding comparison question, family F — ADR 0043). One "
+        "row per twin group with the diff kernel's verdict: identical "
+        "or divergent, where, and a deterministic summary. Verifiable "
+        "cache of the kernel (precomputation doctrine level 3) — "
+        "recomputed every 04 run, never hand-maintained."
+    ),
+    "domain": "output",
+    "status": "active",
+    "owner": {"notebook": "04_build_metric_logic",
+              "module": "src/graph/decomposition_diff.py"},
+    "write_mode": "overwrite",
+    "enrichers": [],
+    "consumers": ["data_agent"],
+    "columns": [
+        ("group_key", "string", False),
+        ("metric_ids", "string", False),
+        ("member_count", "integer", False),
+        ("verdict", "string", False),
+        ("divergent_steps", "integer", False),
+        ("missing_steps", "integer", False),
+        ("summary", "string", True),
+        ("computed_at", "string", False),
+    ],
+    "column_descriptions": {
+        "group_key": "Folded bare object name shared by the group",
+        "metric_ids": "Comma-separated schema-qualified members",
+        "member_count": "How many metrics share the bare name",
+        "verdict": "identical | divergent (kernel output, never judged)",
+        "divergent_steps": "Aligned step pairs whose logic/tables differ",
+        "missing_steps": "Steps present in one member and absent in another",
+        "summary": "Deterministic evidence line(s) from the diff kernel",
+        "computed_at": "When the cache was computed (04 run timestamp)",
+    },
+    "invariants": [
+        {"kind": "unique", "columns": ["group_key"]},
+        {"kind": "allowed_values", "column": "verdict",
+         "values": ["identical", "divergent"]},
+    ],
+}
+
 METRIC_LOGIC = {
     "table_name": "output_metric_logic",
     "must_be_nonempty": True,
@@ -1931,7 +1975,7 @@ TABLE_REGISTRY = {
         # graph
         GRAPH_NODES, GRAPH_EDGES,
         # output
-        METRIC_LOGIC,
+        METRIC_LOGIC, METRIC_TWINS,
         # lpg_export
         GRAPH_CANONICAL, GRAPH_TRANSFORMATION, GRAPH_TECHNICAL,
         GRAPH_REPORT, GRAPH_MEASURE,
