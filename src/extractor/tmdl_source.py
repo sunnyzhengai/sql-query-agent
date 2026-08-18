@@ -161,6 +161,33 @@ class FabricWorkspaceTmdlSource:
         return files
 
 
+def collect_from_workspaces(
+    workspace_ids: "list[str]",
+    token_provider: "Callable[[], str]",
+    current_workspace_id: str = "",
+    source_factory=None,
+) -> "tuple[list[TmdlFile], dict[str, int]]":
+    """Collect TMDL across MULTIPLE workspaces in one pass (2026-08-18:
+    reports live across 4-5 workspaces at real customers).
+
+    Returns (all files IN WORKSPACE ORDER, per-workspace file counts).
+    Order is load-bearing: file order feeds the metric-naming priority
+    rule (earlier workspace's report names a shared metric). One
+    combined list -> ONE downstream write — sequential per-workspace
+    runs would clobber each other under overwrite semantics.
+    """
+    if source_factory is None:
+        source_factory = lambda ws: FabricWorkspaceTmdlSource(ws, token_provider)  # noqa: E731
+    files: "list[TmdlFile]" = []
+    counts: "dict[str, int]" = {}
+    for ws in workspace_ids:
+        ws_id = ws or current_workspace_id
+        ws_files = source_factory(ws_id).collect()
+        counts[ws_id] = len(ws_files)
+        files.extend(ws_files)
+    return files, counts
+
+
 def collect_from_devops(client, repo_name: str) -> "list[TmdlFile]":
     """Collect TMDL files from a DevOps repo via DevOpsTmdlClient."""
     files: "list[TmdlFile]" = []

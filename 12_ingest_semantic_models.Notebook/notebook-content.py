@@ -71,7 +71,6 @@ if config.semantic_models is None:
 
 # %% Cell 1: Collect TMDL files via the configured source profile
 from src.extractor.tmdl_source import (
-    FabricWorkspaceTmdlSource,
     FolderTmdlSource,
     collect_from_devops,
 )
@@ -79,14 +78,22 @@ from src.extractor.tmdl_source import (
 sm = config.semantic_models
 if sm.source_type == "workspace":
     # Turn-key default: straight from the Fabric workspace REST API —
-    # works whether or not the workspace has git integration.
-    workspace_id = sm.workspace_id or notebookutils.runtime.context.get(  # noqa: F821
-        "currentWorkspaceId")
-    tmdl_files = FabricWorkspaceTmdlSource(
-        workspace_id,
+    # works whether or not the workspace has git integration. Reports
+    # commonly span several workspaces: workspace_ids collects them all
+    # in ONE pass and ONE write (per-workspace runs would clobber each
+    # other under overwrite semantics). List ORDER is the metric-naming
+    # priority when reports in two workspaces execute the same metric.
+    from src.extractor.tmdl_source import collect_from_workspaces
+
+    tmdl_files, ws_counts = collect_from_workspaces(
+        sm.resolved_workspace_ids(),
         token_provider=lambda: notebookutils.credentials.getToken(  # noqa: F821
             "https://api.fabric.microsoft.com"),
-    ).collect()
+        current_workspace_id=notebookutils.runtime.context.get(  # noqa: F821
+            "currentWorkspaceId"),
+    )
+    for ws_id, n in ws_counts.items():
+        print(f"  workspace {ws_id}: {n} TMDL table files")
 elif sm.source_type == "folder":
     if not sm.folder_path:
         raise ValueError("semantic_models.folder_path is required for the folder profile")

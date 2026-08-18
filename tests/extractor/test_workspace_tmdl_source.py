@@ -116,3 +116,46 @@ def test_rows_are_json_serializable_end_to_end():
     )
     files = _source(http).collect()
     json.dumps([f.__dict__ for f in files])
+
+
+class TestMultiWorkspace:
+    """Field find 2026-08-18: reports span 4-5 workspaces. One pass, one
+    write; workspace order is the metric-naming priority."""
+
+    def _source_factory(self, per_ws):
+        class _FakeSource:
+            def __init__(self, ws):
+                self.ws = ws
+
+            def collect(self):
+                return per_ws[self.ws]
+        return _FakeSource
+
+    def test_collects_in_workspace_order_with_counts(self):
+        from src.extractor.tmdl_source import TmdlFile, collect_from_workspaces
+        per_ws = {
+            "ws-1": [TmdlFile("Dash A", "T", "x")],
+            "ws-2": [TmdlFile("Dash B", "T", "y"), TmdlFile("Dash C", "T", "z")],
+        }
+        files, counts = collect_from_workspaces(
+            ["ws-1", "ws-2"], token_provider=lambda: "t",
+            source_factory=self._source_factory(per_ws))
+        assert [f.report_name for f in files] == ["Dash A", "Dash B", "Dash C"]
+        assert counts == {"ws-1": 1, "ws-2": 2}
+
+    def test_empty_id_resolves_to_current_workspace(self):
+        from src.extractor.tmdl_source import TmdlFile, collect_from_workspaces
+        per_ws = {"current-ws": [TmdlFile("Dash", "T", "x")]}
+        files, counts = collect_from_workspaces(
+            [""], token_provider=lambda: "t", current_workspace_id="current-ws",
+            source_factory=self._source_factory(per_ws))
+        assert counts == {"current-ws": 1}
+
+
+def test_workspace_ids_config_resolution():
+    from src.config import SemanticModelsConfig
+    assert SemanticModelsConfig().resolved_workspace_ids() == [""]
+    assert SemanticModelsConfig(workspace_id="a").resolved_workspace_ids() == ["a"]
+    assert SemanticModelsConfig(
+        workspace_ids=["a", "b"], workspace_id="ignored"
+    ).resolved_workspace_ids() == ["a", "b"]

@@ -1612,7 +1612,12 @@ METRIC_NAMES = {
         "or unambiguous bare name, ADR 0016 folding) -> business_name, with "
         "source provenance (pbi_report | manual). Applied to canonical "
         "nodes by 03_build_graph; flows to output_metric_logic and the LPG "
-        "export. Ambiguous bare names are skipped, never guessed (ADR 0005)."
+        "export. Ambiguous bare names are skipped, never guessed (ADR 0005). "
+        "Cross-workspace rule (2026-08-18): when reports in multiple "
+        "workspaces execute the same metric, the FIRST report in "
+        "semantic_models.workspace_ids order names it; every other report "
+        "is listed in report_name for steward review — never silently "
+        "deduped."
     ),
     "domain": "input",
     "status": "active",

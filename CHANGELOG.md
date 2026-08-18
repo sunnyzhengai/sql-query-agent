@@ -10,6 +10,19 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.16.0] - 2026-08-18
+
+### Added
+- **Multi-workspace TMDL collection** (field find: reports span 4–5 PBI
+  workspaces): `semantic_models.workspace_ids` collects every workspace
+  in one pass and one write (sequential runs would clobber under
+  overwrite semantics); per-workspace counts in the run report.
+  Cross-workspace duplicate verdict promoted to contract: workspace_ids
+  ORDER names a shared metric; all other reports stay listed for
+  steward review — never silently deduped.
+
+---
+
 ## [1.15.0] - 2026-08-18
 
 ### Changed

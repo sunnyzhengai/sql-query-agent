@@ -62,7 +62,9 @@ dictionary:
 # names; ADR 0040). Pick ONE source profile.
 # semantic_models:
 #   source_type: "workspace"     # workspace | folder | devops_git
-#   workspace_id: ""             # workspace profile; empty = current workspace
+#   workspace_ids: []            # several workspaces, ONE pass; order =
+#                                # naming priority for shared metrics
+#   workspace_id: ""             # single-workspace sugar; empty = current
 #   folder_path: "/lakehouse/default/Files/semantic-models"   # folder profile
 #   devops:                      # devops_git profile
 #     org: "YourDevOpsOrg"

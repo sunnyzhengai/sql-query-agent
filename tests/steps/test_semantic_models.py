@@ -230,3 +230,21 @@ class TestDirectLake:
             report_source_records=out.report_source_rows,
         )
         assert any("not in the dictionary" in s for s in graph.consumption_skipped)
+
+
+class TestCrossWorkspaceNamingPriority:
+    """Multi-workspace rule (2026-08-18): the FIRST report in workspace
+    order names a shared metric; the rest are listed, never deduped."""
+
+    def test_first_workspace_report_names_shared_metric(self):
+        files = [
+            TmdlFile("Prod Dashboard", "SepsisData", SEPSIS_TMDL,
+                     semantic_model_path="workspace:ws-prod/m1"),
+            TmdlFile("Dev Dashboard", "SepsisData", SEPSIS_TMDL,
+                     semantic_model_path="workspace:ws-dev/m2"),
+        ]
+        out = semantic_models_step(files)
+        assert len(out.metric_name_rows) == 1
+        row = out.metric_name_rows[0]
+        assert row["business_name"] == "Prod Dashboard"
+        assert row["report_name"] == "Prod Dashboard; Dev Dashboard"

@@ -78,9 +78,21 @@ class SemanticModelsConfig(BaseModel):
     # folder: git-synced workspace checkout / uploaded Files.
     # devops_git: Azure DevOps repos (DevOpsTmdlClient).
     source_type: Literal["workspace", "folder", "devops_git"] = "workspace"
-    workspace_id: str = ""  # empty = the workspace the notebook runs in
+    # Reports commonly live across several PBI workspaces (field find
+    # 2026-08-18). ORDER MATTERS: when reports in different workspaces
+    # execute the same metric, the earlier workspace's report names it
+    # (the rest are listed for steward review — never silently deduped).
+    workspace_ids: "list[str]" = []
+    workspace_id: str = ""  # single-value sugar; empty = current workspace
     folder_path: str = ""
     devops: Optional[DevOpsGitConfig] = None
+
+    def resolved_workspace_ids(self) -> "list[str]":
+        """workspace_ids wins; else the single id; else [""] meaning
+        'the workspace the notebook runs in'."""
+        if self.workspace_ids:
+            return list(self.workspace_ids)
+        return [self.workspace_id or ""]
 
 
 class PurviewAdapterConfig(BaseModel):
