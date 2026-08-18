@@ -66,3 +66,15 @@ documentation, and acquisition has no fixed cadence.
 A source system enters as a PAIR — its SQL and its dictionary together —
 or the 06 dictionary_coverage gate blocks (by design). The route table
 should say this where users pick routes.
+
+## Field evidence (2026-08-17, work deployment, added post-1.14.0)
+
+00b's filename-keyed identity produced 25 REAL metric_id collisions at
+Sunny's work deployment (same proc names exported in both procs_cookrpt
+and procs_reporting folders) — caught by 02's ops_parse_results
+unique(metric_id) postcondition. Stopgap applied in the field: regex on
+each file's CREATE header (schema-qualified id, folder-schema fallback) +
+dropDuplicates. Wanted properly: parse-based identity in 00b (ScriptDom /
+src/parser/identity.py, NOT regex — native-parsers rule), plus a
+duplicate-identity gate inside every ingestion route so collisions fail
+AT THE ROUTE with a message, not downstream at 02's postcondition.
