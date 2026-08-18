@@ -97,7 +97,13 @@ def created_objects(sql: str) -> "set[str]":
 
 
 def alias_columns(sql: str, table_key: str) -> "set[str]":
-    """Columns referenced through aliases of this table + INSERT lists."""
+    """Columns referenced through aliases of this table + INSERT lists.
+
+    An alias REBOUND to any other source in the same scope (a temp
+    table, another table) contributes NOTHING — 'FSD' bound to
+    FLOWSHEET_MEASUREMENTS in one FROM and to #Flowsheets two queries
+    later attributed the temp's columns to the real table, creating
+    'Ambiguous column name' errors the true schema never had."""
     schema, name = table_key.split(".")
     cols: "set[str]" = set()
     alias_pat = re.compile(
@@ -107,6 +113,17 @@ def alias_columns(sql: str, table_key: str) -> "set[str]":
     )
     aliases = {m.group(1).strip("[]") for m in alias_pat.finditer(sql)}
     aliases -= {a for a in aliases if a.upper() in KEYWORDS}
+    table_ref = rf"\[?{schema}\]?\s*\.\s*\[?{name}\]?"
+    for alias in list(aliases):
+        bindings = re.findall(
+            rf"\b(?:FROM|JOIN)\s+((?:\[?[#\w]+\]?\s*\.\s*)?\[?[#\w]+\]?)\s+"
+            rf"(?:AS\s+)?\[?{re.escape(alias)}\]?\b",
+            sql, re.IGNORECASE,
+        )
+        for b in bindings:
+            if not re.fullmatch(table_ref, b.strip(), re.IGNORECASE):
+                aliases.discard(alias)   # rebound elsewhere: unsafe
+                break
     for alias in aliases:
         for m in re.finditer(rf"\b{re.escape(alias)}\s*\.\s*\[?([A-Za-z_][\w]*)\]?",
                              sql):
