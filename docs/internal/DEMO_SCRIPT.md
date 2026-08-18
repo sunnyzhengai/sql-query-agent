@@ -168,8 +168,9 @@ the cut lands ~4:30–5:00.*
 5. Demo semantic model: must EXECUTE the demo procs (EXEC partitions);
    displayName must match the model name; report description field
    left EMPTY.
-6. `semantic_models.source_type: "workspace"`; run 12 → 03 → 04 → 05
-   → 06 → 07 → 11.
+6. `semantic_models.source_type: "workspace"`; run (renumbered 1.22.0,
+   export now AFTER descriptions): 060 → 300 → 400 → 500 → 600 → 700
+   → 800.
 7. **QA gate** — verbatim against the live agent: (a) the headline
    question; (b) the drift question WITHOUT the literal step name;
    (c) "which dashboards are impacted?" after the verdict; (d) the
