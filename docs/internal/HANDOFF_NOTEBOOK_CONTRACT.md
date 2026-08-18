@@ -48,3 +48,11 @@ version binding, field-patch law.
 ADR-worthy (peer of TABLE_REGISTRY / INTEGRATION_REGISTRY / the shape
 registry). Sequencing: after the current four opens or alongside —
 Sunny has removed deadline pressure specifically to do this right.
+
+## Amendment (2026-08-18, Question Map — approved by Sunny)
+
+Registry entries gain a `serves` field: the Layer-0 question families
+(A-G, see docs/architecture/QUESTION_MAP.md) each notebook ultimately
+exists for. Enforcement: every notebook must serve >=1 family (else it
+is by definition a ghost); the QUESTION_MAP's layer-4 table becomes a
+generated projection of the registry once built.
