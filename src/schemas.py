@@ -415,28 +415,39 @@ INSTALLATION_ERRORS = {
 AGENT_DESCRIPTIONS = {
     "table_name": "ops_agent_descriptions",
     "description": (
-        "Cache of agent-generated business descriptions for _PBI metrics, "
-        "keyed by SQL hash so unchanged metrics are not re-generated. "
-        "Source for the Collibra description publish."
+        "Agent-generated business descriptions, keyed by SQL hash so "
+        "unchanged metrics are not re-generated. Written ONLY by 07b "
+        "(generation split from publishing 2026-08-18); 08 and 13 are "
+        "pure publishers consuming it. Rejected agent non-answers "
+        "persist with status=rejected so retry/inspection is a query."
     ),
     "domain": "operations",
     "status": "active",
-    "owner": {"notebook": "08_publish_collibra", "module": None},
+    "owner": {"notebook": "07b_generate_agent_descriptions",
+              "module": "src/steps/agent_descriptions.py"},
     "write_mode": "overwrite",
     "enrichers": [],
-    "consumers": ["08_publish_collibra", "collibra_adapter"],
+    "consumers": ["07b_generate_agent_descriptions", "08_publish_collibra", "13_publish_pbi", "collibra_adapter"],
+    "optional_input": True,
+    "remediation": (
+        "run 07b_generate_agent_descriptions (needs the Fabric Data "
+        "Agent configured in fabric_graph)"
+    ),
     "columns": [
         ("metric_name", "string", False),
         ("description", "string", False),
         ("sql_hash", "string", True),
+        ("status", "string", False),
     ],
     "column_descriptions": {
         "metric_name": "Metric the description belongs to",
-        "description": "Agent-generated business-language description",
+        "description": "Agent answer (business description, or the rejected non-answer for inspection)",
         "sql_hash": "Hash of the source SQL at generation time (change detection)",
+        "status": "ok | rejected (agent non-answer; retried next run)",
     },
     "invariants": [
         {"kind": "unique", "columns": ["metric_name"]},
+        {"kind": "allowed_values", "column": "status", "values": ["ok", "rejected"]},
     ],
 }
 
@@ -463,7 +474,8 @@ GRAPH_NODES = {
     "enrichers": ["07_generate_descriptions"],
     "consumers": [
         "04_build_metric_logic", "05_export_graph_tables", "06_validate",
-        "07_generate_descriptions", "08_publish_collibra", "manage_stewards",
+        "07_generate_descriptions", "07b_generate_agent_descriptions",
+        "08_publish_collibra", "manage_stewards",
         "verify_graph", "data_agent", "11_refresh_search_index",
         "13_publish_pbi",
     ],
@@ -549,7 +561,8 @@ METRIC_LOGIC = {
     "write_mode": "overwrite",
     "enrichers": ["07_generate_descriptions"],
     "consumers": [
-        "07_generate_descriptions", "08_publish_collibra", "09_publish_purview",
+        "07b_generate_agent_descriptions",
+        "07_generate_descriptions", "09_publish_purview",
         "data_agent",
     ],
     "columns": [

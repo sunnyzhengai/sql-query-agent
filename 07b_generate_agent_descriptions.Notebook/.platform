@@ -1,0 +1,12 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Notebook",
+    "displayName": "07b_generate_agent_descriptions",
+    "description": "Generate Data-Agent business descriptions into ops_agent_descriptions (derivation; run after 04; publishers 08/13 consume)"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "6f1a2d3c-9b8e-47a5-9c0d-2e4f5a6b7c8d"
+  }
+}

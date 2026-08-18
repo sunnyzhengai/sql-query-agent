@@ -10,6 +10,23 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.15.0] - 2026-08-18
+
+### Changed
+- **Generation split from publishing** (HANDOFF_SPLIT_GENERATION_FROM_
+  PUBLISH; audit finding #37): new step 07b_generate_agent_descriptions
+  owns ops_agent_descriptions (status column added — rejected agent
+  non-answers persist for queryable retry/inspection; batch vs final
+  tallies distinct; resume-by-rerun preserved). 08 (Collibra) and 13
+  (PBI) are pure publishers; a PBI-only customer never touches a
+  Collibra notebook. Logic in src/steps/agent_descriptions.py, tested.
+- Notebook reorganization audit: devops_lineage.py retired (superseded
+  by 12's devops profile), empty notebooks/data_loading/ removed,
+  root-utility constraint documented, guide-coverage tests widened to
+  lettered notebooks.
+
+---
+
 ## [1.14.0] - 2026-08-17
 
 ### Changed

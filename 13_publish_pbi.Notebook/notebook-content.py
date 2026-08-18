@@ -72,6 +72,26 @@ print(f"Workspace: {WORKSPACE_ID}")
 from src.adapters.fabric_pbi import FabricPBIUpdater, match_reports_by_lineage
 
 nodes_rows = [r.asDict() for r in spark.table("graph_nodes").collect()]
+
+# Prefer Data-Agent descriptions where 07b generated them (optional —
+# without the table, 07's graph descriptions publish as before). 13 is
+# a pure publisher either way (split verdict 2026-08-18).
+if spark.catalog.tableExists("ops_agent_descriptions"):
+    from src.steps.agent_descriptions import STATUS_OK
+
+    agent_descs = {
+        r["metric_name"]: r["description"]
+        for r in (row.asDict() for row in spark.table("ops_agent_descriptions").collect())
+        if r.get("status", STATUS_OK) == STATUS_OK
+    }
+    overlaid = 0
+    for n in nodes_rows:
+        if n.get("layer") == "canonical" and n["name"] in agent_descs:
+            n["description"] = agent_descs[n["name"]]
+            overlaid += 1
+    print(f"Agent-description overlay: {overlaid} canonical nodes")
+else:
+    print("No ops_agent_descriptions — publishing 07 graph descriptions")
 edges_rows = [r.asDict() for r in spark.table("graph_edges").collect()]
 
 updater = FabricPBIUpdater(workspace_id=WORKSPACE_ID)

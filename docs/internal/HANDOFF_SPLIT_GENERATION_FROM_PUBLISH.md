@@ -1,5 +1,21 @@
 # Handoff — split agent description generation out of 08
 
+> **Status (2026-08-18, dev session): implemented in 1.15.0.**
+> New step 07b_generate_agent_descriptions owns ops_agent_descriptions;
+> logic lives in src/steps/agent_descriptions.py with 11 tests (plan,
+> rejection heuristic, batch saves). Field notes designed in: rejected
+> rows persist with status=rejected (queryable, retried next run, final
+> summary names them); batch tallies flow through the progress callback
+> while the final tally is a separate RunResult block; resume-by-rerun
+> preserved via full-row-set saves. 08 is a pure publisher (hard stop
+> with remediation if the table is absent); 13 overlays agent
+> descriptions when present and falls back to 07 graph descriptions —
+> deliberately optional there so the demo path needs no Data Agent
+> (verdict recorded here, not just in conversation). Also this pass:
+> devops_lineage.py retired (superseded by 12), empty data_loading/
+> removed, root-utilities constraint documented, guide-coverage tests
+> widened to lettered notebooks (07b/00a-e now enforced).
+
 **From:** review session, 2026-08-18 (Sunny, mid-work-deployment: "if 08
 is about Collibra, why is generation in this notebook? shouldn't it be
 independent?"). **To:** dev session. Confirms audit finding #37

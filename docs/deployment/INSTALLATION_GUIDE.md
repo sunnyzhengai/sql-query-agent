@@ -372,6 +372,10 @@ to run. It loads nothing itself and never assumes a route.
 ### Optional notebooks (after the agent is working)
 
 - `07_generate_descriptions` — LLM-generated business descriptions for metrics
+- `07b_generate_agent_descriptions` — Data-Agent descriptions into
+  `ops_agent_descriptions` (run after 04; publishers 08/13 consume it —
+  generation was split from publishing, so a PBI-only customer never
+  touches a Collibra notebook)
 - `08_publish_collibra` / `09_publish_purview` — push metadata to your catalog
   (requires adapter credentials in `org_config.yaml`); every push is
   logged to `gov_publish_log` for the admin telemetry report

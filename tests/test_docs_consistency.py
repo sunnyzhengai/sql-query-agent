@@ -32,7 +32,7 @@ def test_install_guide_covers_every_pipeline_notebook():
     guide = INSTALL_GUIDE.read_text()
     stems = [
         p.name.removesuffix(".Notebook")
-        for p in sorted(REPO_ROOT.glob("[0-9][0-9]_*.Notebook"))
+        for p in sorted(REPO_ROOT.glob("[0-9][0-9]*.Notebook"))
     ]
     assert stems, "no pipeline notebooks found at repo root"
     missing = [s for s in stems if s not in guide]
@@ -43,9 +43,9 @@ def test_install_guide_references_no_ghost_notebooks():
     guide = INSTALL_GUIDE.read_text()
     stems = {
         p.name.removesuffix(".Notebook")
-        for p in REPO_ROOT.glob("[0-9][0-9]_*.Notebook")
+        for p in REPO_ROOT.glob("[0-9][0-9]*.Notebook")
     }
-    referenced = set(re.findall(r"\b(\d{2}_[a-z_]+)\b", guide))
+    referenced = set(re.findall(r"\b(\d{2}[a-z]?_[a-z_]+)\b", guide))
     ghosts = {r for r in referenced if r not in stems}
     assert not ghosts, f"INSTALLATION_GUIDE.md references nonexistent notebooks: {ghosts}"
 

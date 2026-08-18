@@ -24,6 +24,7 @@ flowchart LR
   05_export_graph_tables["05_export_graph_tables"]:::notebook
   06_validate["06_validate"]:::notebook
   07_generate_descriptions["07_generate_descriptions"]:::notebook
+  07b_generate_agent_descriptions["07b_generate_agent_descriptions"]:::notebook
   08_publish_collibra["08_publish_collibra"]:::notebook
   09_publish_purview["09_publish_purview"]:::notebook
   10_ingest_agent_events["10_ingest_agent_events"]:::notebook
@@ -92,8 +93,8 @@ flowchart LR
   07_generate_descriptions --> ops_description_cache
   07_generate_descriptions -->|enrich| graph_nodes
   07_generate_descriptions -->|enrich| output_metric_logic
+  07b_generate_agent_descriptions --> ops_agent_descriptions
   08_publish_collibra --> gov_publish_log
-  08_publish_collibra --> ops_agent_descriptions
   09_publish_purview -->|enrich| gov_publish_log
   10_ingest_agent_events --> gov_feedback_events
   10_ingest_agent_events --> gov_turn_events
@@ -123,6 +124,7 @@ flowchart LR
   graph_nodes --> 05_export_graph_tables
   graph_nodes --> 06_validate
   graph_nodes --> 07_generate_descriptions
+  graph_nodes --> 07b_generate_agent_descriptions
   graph_nodes --> 08_publish_collibra
   graph_nodes --> 11_refresh_search_index
   graph_nodes --> 13_publish_pbi
@@ -146,7 +148,9 @@ flowchart LR
   input_sql_sources --> 02_parse
   input_sql_sources --> 06_validate
   manage_stewards --> gov_steward_assignments
+  ops_agent_descriptions --> 07b_generate_agent_descriptions
   ops_agent_descriptions --> 08_publish_collibra
+  ops_agent_descriptions --> 13_publish_pbi
   ops_agent_descriptions --> collibra_adapter
   ops_build_summary --> admin
   ops_description_cache --> 07_generate_descriptions
@@ -169,7 +173,7 @@ flowchart LR
   ops_setup_completeness --> admin
   ops_setup_completeness --> health
   output_metric_logic --> 07_generate_descriptions
-  output_metric_logic --> 08_publish_collibra
+  output_metric_logic --> 07b_generate_agent_descriptions
   output_metric_logic --> 09_publish_purview
   output_metric_logic --> data_agent
   output_semantic_catalog --> data_agent

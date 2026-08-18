@@ -18,7 +18,7 @@ notebooks/
 │   ├── collibra_discovery.py        — Discover Collibra API data model
 │   ├── collibra_lineage_match.py    — Match PBI reports to Collibra assets
 │   ├── collibra_update_description.py — Push one description to a Collibra asset
-│   ├── devops_lineage.py            — TMDL lineage from an Azure DevOps repo
+│   ├──             — TMDL lineage from an Azure DevOps repo
 │   ├── manage_stewards.py           — Assign stewards (writes gov_steward_assignments)
 │   └── verify_graph.py              — Verify graph integrity
 │
@@ -51,3 +51,12 @@ input_dict_columns ─────────────────phi_findin
 ```
 
 Table names and contracts: `src/schemas.py` is the single source of truth.
+
+## Why some utility notebooks live at the repo root
+
+`export_test_fixtures.Notebook` and `make_golden_snapshot.Notebook` are
+Fabric ITEMS (they must run on Fabric with ScriptDom), and Fabric git
+sync only materializes items from root-level folders — so they cannot
+move under notebooks/. Rule of thumb: root = pipeline notebooks
+(numbered derivation, lettered acquisition) + Fabric-item utilities
+that have no other home; notebooks/utilities/ = plain-python drivers.
