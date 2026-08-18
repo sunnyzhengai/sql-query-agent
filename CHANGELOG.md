@@ -10,6 +10,20 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.21.0] - 2026-08-18
+
+### Added — the funnel view (Question Map gap 3, family G — complete)
+- ops_funnel (06-owned, registry-declared): per run per stage —
+  in_count, out_count, fell_off, aggregated reason codes. Fallout rows
+  that don't cover a drop surface as 'unexplained', loudly. 02 errors
+  and 07b rejections fold into the same view.
+- 08 matcher retrofit: unmatched Collibra reports write
+  no_collibra_match fallout rows (queryable, not scrollback).
+- Agent instructions: health questions answer funnel-first, counts
+  always WITH reasons. (Re-paste delta_agent_instructions.md.)
+
+---
+
 ## [1.20.0] - 2026-08-18
 
 ### Added — the diff kernel (Question Map gap 1, family F; ADR 0043)

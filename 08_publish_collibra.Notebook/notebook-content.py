@@ -176,6 +176,22 @@ if match_result.unmatched_objects:
     for name in match_result.unmatched_objects:
         print(f"  {name}  (key: '{extract_match_key(name)}')")
 
+    # Matcher fallout (HANDOFF_FUNNEL_AND_FALLOUT item 3): unmatched is
+    # queryable state, not scrollback.
+    from datetime import datetime, timezone
+
+    from src.schemas import FALLOUT, to_spark_schema
+
+    _now = datetime.now(timezone.utc).isoformat()
+    _rows = [(_now, "08_match", name, "no_collibra_match",
+              f"no Collibra report asset matched key "
+              f"'{extract_match_key(name)}' — create/rename the asset or "
+              f"adjust the report name", "contract:gov_publish_log")
+             for name in match_result.unmatched_objects]
+    spark.createDataFrame(_rows, schema=to_spark_schema(FALLOUT)) \
+        .write.format("delta").mode("append").saveAsTable("ops_fallout")
+    print(f"  -> {len(_rows)} no_collibra_match rows appended to ops_fallout")
+
 # %% Cell 6: Publish descriptions to Collibra
 # Review cell 5 output first!
 # To publish only specific reports, add names to PUBLISH_ONLY.

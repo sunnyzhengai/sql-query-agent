@@ -428,7 +428,8 @@ AGENT_DESCRIPTIONS = {
               "module": "src/steps/agent_descriptions.py"},
     "write_mode": "overwrite",
     "enrichers": [],
-    "consumers": ["07b_generate_agent_descriptions", "08_publish_collibra", "13_publish_pbi", "collibra_adapter"],
+    "consumers": ["07b_generate_agent_descriptions", "08_publish_collibra",
+                  "13_publish_pbi", "06_validate", "collibra_adapter"],
     "optional_input": True,
     "remediation": (
         "run 07b_generate_agent_descriptions (needs the Fabric Data "
@@ -1329,8 +1330,13 @@ FALLOUT = {
     "owner": {"notebook": "12_ingest_semantic_models",
               "module": "src/steps/semantic_models.py"},
     "write_mode": "append",
-    "enrichers": ["06_validate"],
-    "consumers": ["admin telemetry report"],
+    "enrichers": ["06_validate", "08_publish_collibra"],
+    "consumers": ["admin telemetry report", "06_validate"],
+    "optional_input": True,
+    "remediation": (
+        "run 12_ingest_semantic_models (or any fallout-writing "
+        "stage) — absent means no stage has recorded fallout yet"
+    ),
     "columns": [
         ("run_at", "string", False),
         ("stage", "string", False),
@@ -1350,6 +1356,47 @@ FALLOUT = {
         "reason_text": "Human remediation text for the admin",
         "contract_id": "Contract the drop violates or informs "
                        "(contract:<table>)",
+    },
+    "invariants": [],
+}
+
+FUNNEL = {
+    "table_name": "ops_funnel",
+    "description": (
+        "Per-run pipeline funnel (family G, HANDOFF_FUNNEL_AND_FALLOUT): "
+        "per stage — in_count, out_count, fell_off, and the aggregated "
+        "reason codes behind every drop. Derived from stage outputs + "
+        "ops_fallout by 06_validate; each fell-off number links back to "
+        "queryable fallout rows. Extends ops_build_summary, never "
+        "duplicates it (derived_from names the sources). The admin "
+        "dashboard's funnel page reads this table."
+    ),
+    "domain": "operations",
+    "status": "active",
+    "owner": {"notebook": "06_validate",
+              "module": "src/governance/funnel.py"},
+    "write_mode": "append",
+    "enrichers": [],
+    "consumers": ["admin telemetry report"],
+    "columns": [
+        ("run_at", "string", False),
+        ("stage", "string", False),
+        ("in_count", "integer", False),
+        ("out_count", "integer", False),
+        ("fell_off", "integer", False),
+        ("reasons", "string", True),
+        ("derived_from", "string", True),
+    ],
+    "column_descriptions": {
+        "run_at": "ISO timestamp of the 06 run that derived the funnel",
+        "stage": "Pipeline stage the counts describe",
+        "in_count": "Entities entering the stage",
+        "out_count": "Entities surviving the stage",
+        "fell_off": "in - out; every unit backed by fallout/error rows",
+        "reasons": "code:count pairs, count-desc; 'unexplained' when "
+                   "fallout rows do not cover the drop",
+        "derived_from": "Tables the counts came from (extend, never "
+                        "duplicate ops_build_summary)",
     },
     "invariants": [],
 }
@@ -1757,7 +1804,7 @@ REPORT_SOURCES = {
     "owner": {"notebook": "12_ingest_semantic_models", "module": "src/steps/semantic_models.py"},
     "write_mode": "overwrite",
     "enrichers": [],
-    "consumers": ["03_build_graph"],
+    "consumers": ["03_build_graph", "06_validate"],
     "optional_input": True,
     "remediation": (
         "run 12_ingest_semantic_models with a semantic_models config "
@@ -1971,7 +2018,7 @@ TABLE_REGISTRY = {
         # operations
         PARSE_RESULTS, PARSE_ERRORS, PARSE_SUCCESSES, BUILD_SUMMARY,
         PIPELINE_VALIDATION, INSTALLATION_ERRORS, AGENT_DESCRIPTIONS,
-        DESCRIPTION_CACHE, SETUP_COMPLETENESS, FALLOUT,
+        DESCRIPTION_CACHE, SETUP_COMPLETENESS, FALLOUT, FUNNEL,
         # graph
         GRAPH_NODES, GRAPH_EDGES,
         # output

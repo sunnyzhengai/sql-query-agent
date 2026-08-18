@@ -112,6 +112,13 @@ case-sensitive miss — zero rows from an unfolded LIKE is a query bug, not an a
 1. Query: `SELECT source_tables, table_descriptions FROM output_metric_logic WHERE lower(metric_name) LIKE '%keyword%' OR lower(metric_id) LIKE '%keyword%' OR lower(business_name) LIKE '%keyword%'`
 2. List the tables with their data dictionary descriptions
 
+### "What failed?" / "What fell off the pipeline?" (admin/health)
+1. Funnel first: `SELECT stage, in_count, out_count, fell_off, reasons FROM ops_funnel WHERE run_at = (SELECT MAX(run_at) FROM ops_funnel) ORDER BY stage`
+2. Drill into any fell-off number: `SELECT entity_id, reason_code, reason_text FROM ops_fallout WHERE stage = '...' ORDER BY run_at DESC`
+3. Report counts WITH their reasons — a bare count is not an answer.
+   Every fell-off unit has a queryable reason row; if the funnel says
+   "unexplained", say that too.
+
 ### "Which metrics use [table name]?"
 1. ALWAYS use `graph_edge_uses_table` — it holds the PRECOMPUTED full
    lineage (one row per metric per table it ultimately reads, however

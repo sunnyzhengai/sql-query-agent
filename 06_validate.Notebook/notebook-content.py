@@ -317,3 +317,86 @@ if spark.catalog.tableExists("output_metric_logic"):
               "(health funnel; NOT a deployment gate)")
 else:
     print("\nFreshness: output_metric_logic absent — run 04 first")
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+# %% Cell 7: The pipeline funnel — per stage: in -> out, and WHY it fell
+from src.governance.funnel import (
+    FunnelStage,
+    funnel_lines,
+    funnel_rows,
+    reasons_from_fallout,
+)
+from src.schemas import FUNNEL
+
+_fallout_rows = []
+if spark.catalog.tableExists("ops_fallout"):
+    _fallout_rows = [r.asDict() for r in spark.table("ops_fallout").collect()]
+
+_stages = []
+
+# 02: corpus -> parsed (error reasons from ops_parse_errors)
+_err_reasons = {}
+for r in spark.table("ops_parse_errors").collect():
+    code = r["error_category"] or "parse_error"
+    _err_reasons[code] = _err_reasons.get(code, 0) + 1
+_stages.append(FunnelStage(
+    "02_parse", len(sql_source_ids), len(parse_ok_ids), _err_reasons,
+    derived_from="input_sql_sources -> ops_parse_successes / ops_parse_errors"))
+
+# 03: parsed -> canonical nodes in the graph
+_canonical = sum(1 for nid in nodes if nid.startswith("canonical:"))
+_stages.append(FunnelStage(
+    "03_build_graph", len(parse_ok_ids), _canonical,
+    derived_from="ops_parse_successes -> graph_nodes(canonical)"))
+
+# 04: canonical -> cards with calculation logic
+if spark.catalog.tableExists("output_metric_logic"):
+    _card_rows = [r.asDict() for r in
+                  spark.table("output_metric_logic")
+                  .select("metric_id", "calculation_logic").collect()]
+    _with_logic = sum(1 for r in _card_rows if r["calculation_logic"])
+    _stages.append(FunnelStage(
+        "04_build_metric_logic", _canonical, _with_logic,
+        derived_from="graph_nodes(canonical) -> output_metric_logic"
+                     "(calculation_logic)"))
+
+# 12: collected partition files -> report source rows (fallout-backed)
+if spark.catalog.tableExists("input_report_sources"):
+    _src_count = spark.table("input_report_sources").count()
+    _p_reasons = reasons_from_fallout(_fallout_rows, "12_partition_parse")
+    _stages.append(FunnelStage(
+        "12_ingest_semantic_models", _src_count + sum(_p_reasons.values()),
+        _src_count, _p_reasons,
+        derived_from="input_report_sources + ops_fallout"
+                     "(12_partition_parse, latest run)"))
+
+# 07b: planned descriptions -> ok (rejected rows are the reasons)
+if spark.catalog.tableExists("ops_agent_descriptions"):
+    _desc = [r.asDict() for r in
+             spark.table("ops_agent_descriptions").select("status").collect()]
+    _ok = sum(1 for r in _desc if r["status"] == "ok")
+    _rej = len(_desc) - _ok
+    _stages.append(FunnelStage(
+        "07b_generate_agent_descriptions", len(_desc), _ok,
+        {"rejected_by_agent": _rej} if _rej else {},
+        derived_from="ops_agent_descriptions(status)"))
+
+_funnel = funnel_rows(_stages, run_at=now)
+for line in funnel_lines(_funnel):
+    print(line)
+
+spark.createDataFrame(
+    [(r["run_at"], r["stage"], r["in_count"], r["out_count"],
+      r["fell_off"], r["reasons"], r["derived_from"]) for r in _funnel],
+    schema=to_spark_schema(FUNNEL)) \
+    .write.format("delta").mode("append").saveAsTable("ops_funnel")
+print(f"[+] ops_funnel: {len(_funnel)} stage rows appended "
+      "(each fell-off links to ops_fallout / ops_parse_errors rows)")

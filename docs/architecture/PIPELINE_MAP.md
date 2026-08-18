@@ -58,6 +58,7 @@ flowchart LR
   ops_error_log[("ops_error_log")]:::table
   ops_extraction_tracking[("ops_extraction_tracking")]:::table
   ops_fallout[("ops_fallout")]:::table
+  ops_funnel[("ops_funnel")]:::table
   ops_installation_errors[("ops_installation_errors")]:::table
   ops_parse_errors[("ops_parse_errors")]:::table
   ops_parse_results[("ops_parse_results")]:::table
@@ -92,6 +93,7 @@ flowchart LR
   04_build_metric_logic --> output_metric_twins
   05_export_graph_tables --> LPG_export__14_typed_tables_
   06_validate --> ops_build_summary
+  06_validate --> ops_funnel
   06_validate --> ops_pipeline_validation
   06_validate -->|enrich| ops_fallout
   07_generate_descriptions --> ops_description_cache
@@ -99,6 +101,7 @@ flowchart LR
   07_generate_descriptions -->|enrich| output_metric_logic
   07b_generate_agent_descriptions --> ops_agent_descriptions
   08_publish_collibra --> gov_publish_log
+  08_publish_collibra -->|enrich| ops_fallout
   09_publish_purview -->|enrich| gov_publish_log
   10_ingest_agent_events --> gov_feedback_events
   10_ingest_agent_events --> gov_turn_events
@@ -148,12 +151,14 @@ flowchart LR
   input_metric_names --> 03_build_graph
   input_metric_names --> collibra_lineage_match
   input_report_sources --> 03_build_graph
+  input_report_sources --> 06_validate
   input_sql_sources --> 00b_ingest_sql_folders
   input_sql_sources --> 01_install
   input_sql_sources --> 02_parse
   input_sql_sources --> 06_validate
   input_sql_sources --> 12_ingest_semantic_models
   manage_stewards --> gov_steward_assignments
+  ops_agent_descriptions --> 06_validate
   ops_agent_descriptions --> 07b_generate_agent_descriptions
   ops_agent_descriptions --> 08_publish_collibra
   ops_agent_descriptions --> 13_publish_pbi
@@ -163,7 +168,9 @@ flowchart LR
   ops_error_log --> 02_parse
   ops_error_log --> admin
   ops_extraction_tracking --> 00c_ingest_sql_live
+  ops_fallout --> 06_validate
   ops_fallout --> admin
+  ops_funnel --> admin
   ops_installation_errors --> data_agent
   ops_parse_errors --> 06_validate
   ops_parse_errors --> data_agent

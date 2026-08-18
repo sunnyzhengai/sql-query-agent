@@ -483,6 +483,13 @@ you can check the current state with:
    models, or upload a manual metric_id,business_name CSV. Then re-run
    03 → 04 → 05.
 
+3. **Fallout history** (`ops_fallout`) — the queryable record of every
+   dropped entity (why a file, report, or metric fell out of a stage).
+   Absent until the first fallout-writing stage runs; remediation: run
+   12_ingest_semantic_models (or any fallout-writing stage). 06's
+   funnel then reports per-stage in/out/fell-off counts backed by
+   these rows.
+
 ### PBI semantic models and report descriptions (ADR 0040)
 
 The consumption layer: which reports run which metrics, and the DAX
