@@ -24,7 +24,6 @@
 # META   }
 # META }
 
-
 # CELL ********************
 
 """Fabric Notebook: Validate Pipeline and Build Summary
@@ -456,3 +455,10 @@ if report_journey:
 print(f"ops_report_journey: {len(report_journey)} reports")
 print("\nThe journey dashboard reads these two tables + ops_funnel — "
       "see docs/internal/RUNBOOK_JOURNEY_DASHBOARD.md")
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
