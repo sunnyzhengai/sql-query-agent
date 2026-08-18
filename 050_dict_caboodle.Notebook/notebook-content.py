@@ -122,5 +122,3 @@ print("Next: run 100_install to verify state, then 300_build_graph onward.")
 # META   "language": "python",
 # META   "language_group": "synapse_pyspark"
 # META }
-
-# CELL ********************

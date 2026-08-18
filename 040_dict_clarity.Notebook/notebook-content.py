@@ -174,5 +174,3 @@ print("\nNext: 050_dict_caboodle (merge a second source) or 100_install to verif
 # META   "language": "python",
 # META   "language_group": "synapse_pyspark"
 # META }
-
-# CELL ********************

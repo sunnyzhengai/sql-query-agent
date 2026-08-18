@@ -184,3 +184,39 @@ def test_field_patch_marker_illegal_in_repo():
             f"{nb} contains a FIELD PATCH marker — fold the fix into "
             f"src/ with tests; patches never merge"
         )
+
+
+# --- Plank 6 (added 2026-08-18): Fabric py-format integrity ----------
+# Field failure: six file-authored notebooks carried a dangling
+# '# CELL' marker at EOF — valid Python, but Fabric's py->ipynb
+# converter dies on it (PyToIPynbFailure, "Additional text encountered
+# after finished reading JSON"), which blocked the whole git update
+# batch at the workspace. The repo must only contain notebooks the
+# converter can ingest.
+
+def test_fabric_notebook_format_integrity():
+    import json as _json
+    for nb, path in NOTEBOOKS.items():
+        text = _source(path)
+        assert text.startswith("# Fabric notebook source"), (
+            f"{nb}: missing the Fabric header line")
+        assert not text.rstrip().endswith("# CELL ********************"), (
+            f"{nb}: dangling '# CELL' marker at EOF — Fabric's py->ipynb "
+            f"converter rejects it (PyToIPynbFailure)")
+        # every '# META ' block must be one valid JSON object
+        lines = text.splitlines()
+        i = 0
+        while i < len(lines):
+            if lines[i].startswith("# META "):
+                block = []
+                while i < len(lines) and (
+                        lines[i] == "# META" or lines[i].startswith("# META ")):
+                    block.append(lines[i][7:] if lines[i].startswith("# META ")
+                                 else "")
+                    i += 1
+                try:
+                    _json.loads("\n".join(block))
+                except _json.JSONDecodeError as e:
+                    pytest.fail(f"{nb}: malformed META JSON block: {e}")
+            else:
+                i += 1

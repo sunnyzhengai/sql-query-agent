@@ -197,5 +197,3 @@ print("Next: 900_publish_collibra and/or 920_publish_pbi consume this table.")
 # META   "language": "python",
 # META   "language_group": "synapse_pyspark"
 # META }
-
-# CELL ********************
