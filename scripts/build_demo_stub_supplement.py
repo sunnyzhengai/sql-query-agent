@@ -153,7 +153,12 @@ def main() -> None:
     ]
     for key in missing:
         schema, name = key.split(".")
-        cols = sorted(alias_columns(corpus, key)) or ["STUB_COL"]
+        # SQL Server column names are case-insensitively unique — fold
+        # duplicates, first spelling wins (LOC_ID vs loc_id broke a CREATE)
+        seen: "dict[str, str]" = {}
+        for c in sorted(alias_columns(corpus, key)):
+            seen.setdefault(c.lower(), c)
+        cols = list(seen.values()) or ["STUB_COL"]
         lines.append(f"IF OBJECT_ID('{schema}.{name}') IS NULL")
         lines.append(f"CREATE TABLE [{schema}].[{name}] (")
         body = [f"    [{c}] {infer_type(corpus, c)} NULL" for c in cols]

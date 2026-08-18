@@ -207,8 +207,7 @@ CREATE TABLE [reporting].[ip_sepsisencounterswlocations] (
     [Shift] DATETIME2 NULL,
     [Unique] NVARCHAR(400) NULL,
     [UniqueRow] NVARCHAR(400) NULL,
-    [Unit] NVARCHAR(400) NULL,
-    [loc_id] DECIMAL(18,4) NULL
+    [Unit] NVARCHAR(400) NULL
 );
 GO
 
