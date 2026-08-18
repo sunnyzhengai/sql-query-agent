@@ -145,9 +145,12 @@ if all_dfs:
     # see HANDOFF_INGESTION_ROUTES. The pattern has ONE spelling, in
     # src.parser.identity, per the notebook contract.)
     from src.parser.identity import CREATE_HEADER_SPARK_PATTERN
+
+    header_schema = regexp_extract("sql", CREATE_HEADER_SPARK_PATTERN, 1)
+    header_object = regexp_extract("sql", CREATE_HEADER_SPARK_PATTERN, 2)
     combined_df = (combined_df
-        .withColumn("_schema", coalesce(nullif(regexp_extract("sql", CREATE_HEADER_SPARK_PATTERN, 1), lit("")), col("source_schema")))
-        .withColumn("_object", coalesce(nullif(regexp_extract("sql", CREATE_HEADER_SPARK_PATTERN, 2), lit("")), col("metric_id")))
+        .withColumn("_schema", coalesce(nullif(header_schema, lit("")), col("source_schema")))
+        .withColumn("_object", coalesce(nullif(header_object, lit("")), col("metric_id")))
         .withColumn("metric_id", concat_ws(".", "_schema", "_object"))
         .withColumn("name", col("metric_id"))
         .withColumn("source_schema", col("_schema"))
