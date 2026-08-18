@@ -10,8 +10,7 @@ metric_ids are schema-qualified since the 00b identity fix (2026-08-17).
 extract_match_key() assumes bare object names: at work,
 "SCHEMA_A.USP_EXAMPLE_ONE_PBI" produced key 'a.usp example one'
 → 128 unmatched reports, and junk keys fed the fuzzy scorer garbage
-matches with implausible 1.00 scores (ExampleReportProc → "Admission
-Documentation Report"). Sunny's cell-5 review caught it pre-publish.
+matches with implausible 1.00 scores (ExampleReportProc → "Unrelated Report A"). Sunny's cell-5 review caught it pre-publish.
 
 ## Wanted
 
