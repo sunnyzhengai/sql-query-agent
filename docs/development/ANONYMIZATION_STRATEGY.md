@@ -25,7 +25,7 @@ A JSON mapping file (`data/synthetic/crosswalk.json`) that translates every prop
 - **Database/schema names:** Clarity → ClinicalDB, Caboodle → AnalyticsDB
 - **Table names:** Semantic replacements (CLARITY_ADT → admissions, PATIENT → patients)
 - **Column names:** Functional equivalents (PAT_ID → patient_id, PAT_ENC_CSN_ID → encounter_id)
-- **Proc names:** Strip org prefixes (USP_CCMC_IP_SEPSIS → USP_IP_Sepsis_Screening)
+- **Proc names:** Strip org prefixes (USP_<ORGPREFIX>_IP_SEPSIS → USP_IP_Sepsis_Screening)
 - **Author/ticket references:** Remove entirely
 
 The crosswalk serves as the **backtrack reference** — if we need to trace an anonymized name back to the original, look it up here.
@@ -69,46 +69,28 @@ Descriptions are realistic but generic: "Patient demographic information", "Date
 
 ---
 
-## Source Files (28 Sepsis Procedures)
+---
 
-### Original Proc Names → Anonymized Names
+## Source corpus (anonymized side only)
 
-| # | Original Name | Anonymized Name | Category |
-|---|---|---|---|
-| 1 | USP_IPSO_SEVERE_SEPSIS | USP_Sepsis_Severe_Screening | Screening |
-| 2 | USP_IPSO_NON_SEVERE_SEPSIS | USP_Sepsis_NonSevere_Screening | Screening |
-| 3 | USP_CCMC_ED_SEPSIS | USP_ED_Sepsis_Dashboard | ED |
-| 4 | USP_CCMC_IP_SEPSIS_PBI | USP_IP_Sepsis_Overview | Inpatient |
-| 5 | USP_CCMC_IP_SEPSIS | USP_IP_Sepsis_Summary | Inpatient |
-| 6 | USP_CCMC_IP_SepsisDetails | USP_IP_Sepsis_Detail | Inpatient |
-| 7 | USP_CCMC_IP_SepsisShiftCompliance | USP_IP_Sepsis_ShiftCompliance | Compliance |
-| 8 | USP_CCMC_IP_SepsisScreeningAudit | USP_IP_Sepsis_ScreeningAudit | Audit |
-| 9 | USP_CCHCS_Stroke_Study_Sepsis_Newborn_PBI | USP_Sepsis_Newborn_Study | Study |
-| 10 | USP_CCHCS_Stroke_Study_Sepsis_PBI | USP_Sepsis_Clinical_Study | Study |
-| 11 | USP_CCMC_IP_SEPSIS_COMPLIANCE_BY_SHIFT_NURSES_PBI | USP_IP_Sepsis_NurseShiftCompliance | Compliance |
-| 12 | USP_CCMC_IP_SEPSIS_COMPLIANCE_PBI | USP_IP_Sepsis_ComplianceRate | Compliance |
-| 13 | USP_IP_Sepsis_Details_PBI | USP_IP_Sepsis_PatientDetails | Inpatient |
-| 14 | USP_CCMC_IP_SepsisPatientDates | USP_IP_Sepsis_PatientTimeline | Inpatient |
-| 15 | USP_CCMC_IP_SepsisEncountersWLocations | USP_IP_Sepsis_EncounterLocations | Inpatient |
-| 16 | USP_CCMC_IP_SepsisEncounters | USP_IP_Sepsis_EncounterList | Inpatient |
-| 17 | USP_IP_Sepsis_ScreeningTool_PBI | USP_IP_Sepsis_ScreeningTool | Screening |
-| 18 | USP_IP_SepsisScreeningAudit_PBI | USP_IP_Sepsis_AuditReport | Audit |
-| 19 | USP_IP_Sepsis_ComplianceByShift_PBI | USP_IP_Sepsis_ComplianceByShift | Compliance |
-| 20 | USP_IP_SepsisDetails_PBI | USP_IP_Sepsis_ClinicalDetail | Inpatient |
-| 21 | USP_IP_Sepsis_ComplianceMetrics_PBI | USP_IP_Sepsis_ComplianceMetrics | Compliance |
-| 22 | USP_IP_SepsisShiftComplianceByShift_PBI | USP_IP_Sepsis_ShiftMetrics | Compliance |
-| 23 | USP_IP_SepsisShiftComplianceMetrics_PBI | USP_IP_Sepsis_ShiftSummary | Compliance |
-| 24 | USP_IP_SepsisEncountersWLocations_PBI | USP_IP_Sepsis_LocationReport | Inpatient |
-| 25 | USP_IP_SepsisEncountersDetails_PBI | USP_IP_Sepsis_EncounterDetail | Inpatient |
-| 26 | USP_IP_Sepsis_Encounters_PBI | USP_IP_Sepsis_EncounterSummary | Inpatient |
-| 27 | USP_IP_SepsisPatientDates_PBI | USP_IP_Sepsis_DateTimeline | Inpatient |
-| 28 | USP_IP_SepsisDates_PBI | USP_IP_Sepsis_DateReport | Inpatient |
+28 sepsis procedures, organized as staging views, transformations, and
+final reporting procedures under data/synthetic/ (folder layout below).
+The mapping from ORIGINAL proprietary names — and the full inventory of
+proprietary terms to scrub (vendor databases/schemas/tables/functions,
+org names and prefixes, people, tickets, departments) — lives OUTSIDE
+the repo, with the raw sources:
+
+- authoritative term list: private/SCRUB_TERMS.md (gitignored)
+- raw SQL: ~/aivia-private (AIVIA_RAW_SQL_DIR)
+
+The crosswalk is DATA supplied at run time (src/anonymization.py) —
+nothing proprietary is hardcoded in the repo, INCLUDING this document.
 
 ### Folder Organization
 
 ```
 data/synthetic/
-├── crosswalk.json              ← Name mapping (original → anonymized)
+├── crosswalk.json              ← Name mapping (original → anonymized; gitignored source side)
 ├── sql/
 │   ├── 01_staging_views/       ← 8 base views
 │   ├── 02_transformations/     ← 12 transformation procedures
@@ -117,35 +99,9 @@ data/synthetic/
 └── dict_columns.csv            ← Anonymized column descriptions
 ```
 
----
+## Verification
 
-## Scrubbing Checklist
-
-For each SQL file, verify removal of:
-
-- [ ] Epic/vendor database names (Clarity, Caboodle, CookClarity, CDWPRD, CookCDW)
-- [ ] Organization-specific prefixes (CCMC, CCHCS, CCHP, CC, Cook)
-- [ ] Schema names (Reporting, COOK_RPT, cookrpt)
-- [ ] Epic-specific table names (CLARITY_*, ZC_*, PAT_ENC_*, ORDER_*)
-- [ ] Epic utility functions (EPIC_UTIL.EFN_DIN)
-- [ ] Author names in comments
-- [ ] Ticket/change request numbers (#1815556, ZD#4195198, RITM#)
-- [ ] Department/facility names (Cook Children's, CCMC, PCCMC)
-- [ ] Provider/staff names
-- [ ] Hardcoded IDs that reference proprietary systems (grouper IDs, flowsheet IDs)
-
----
-
-## Proprietary Terms to Watch For
-
-| Category | Examples to scrub |
-|---|---|
-| Vendor databases | Clarity, Caboodle, CookClarity, CookCDW, CDWPRD |
-| Vendor schemas | EPIC_UTIL, Reporting, COOK_RPT |
-| Vendor tables | CLARITY_ADT, CLARITY_DEP, CLARITY_EMP, CLARITY_SER, PAT_ENC_HSP, ORDER_MED, ZC_*, IP_FLWSHT_*, MAR_ADMIN_INFO |
-| Vendor functions | EFN_DIN, EPIC_UTIL.* |
-| Org names | Cook Children's, CCMC, PCCMC, CCHCS, CCHP |
-| Org prefixes | USP_CCMC_*, USP_CCHCS_*, CC_*, COOK_* |
-| People names | Any author/developer names in comment headers |
-| Ticket numbers | #nnnnnnn, ZD#, RITM# |
-| Dept/location names | Specific department names, building names, service area IDs |
+Local (non-CI) leak check reads private/SCRUB_TERMS.md and sweeps the
+FULL repo — src docstrings, tests, fixtures, notebooks, docs — before
+any push or release (see HANDOFF_WORK_TERM_HYGIENE). CI cannot hold the
+term list, by design; the check is a local pre-push discipline.
