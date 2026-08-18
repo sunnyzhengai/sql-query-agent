@@ -174,6 +174,8 @@ checked = postcondition_gate(
 )
 print(f"[+] Postcondition gate passed for: {', '.join(checked)}")
 
+print("\nNext: run 500_validate (the readiness gate).")
+
 # METADATA ********************
 
 # META {

@@ -227,6 +227,8 @@ for pr in parse_results[:3]:
         tables = [t.name for t in subgraph["technical"] if t.properties.get("column") is None]
         print(f"  {subgraph['canonical'].name}: {len(subgraph['transformations'])} transforms, {len(tables)} tables")
 
+print("\nNext: run 400_build_metric_logic.")
+
 # METADATA ********************
 
 # META {

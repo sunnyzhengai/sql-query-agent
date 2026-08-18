@@ -259,7 +259,7 @@ checked = postcondition_gate(
     table_exists=spark.catalog.tableExists,
 )
 print(f"[+] Postcondition gate passed for: {', '.join(checked)}")
-print("\nNext: run 300_build_graph to land the consumption layer in the graph.")
+print("\nNext: run 100_install to verify state; 300_build_graph then lands the consumption layer in the graph.")
 
 # METADATA ********************
 

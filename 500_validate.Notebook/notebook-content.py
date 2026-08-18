@@ -318,6 +318,9 @@ if spark.catalog.tableExists("output_metric_logic"):
 else:
     print("\nFreshness: output_metric_logic absent — run 400 first")
 
+print("\nNext (optional path): 600/610 descriptions -> 700 index -> "
+      "800 export -> 900-series publishers.")
+
 # METADATA ********************
 
 # META {

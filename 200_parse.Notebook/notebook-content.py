@@ -276,7 +276,7 @@ checked = postcondition_gate(
 )
 print(f"[+] Postcondition gate passed for: {', '.join(checked)}")
 
-print("\n→ Next: run 300_build_graph.py (no need to rerun this unless SQL sources changed)")
+print("\n→ Next: run 300_build_graph (no need to rerun this unless SQL sources changed)")
 
 # METADATA ********************
 
