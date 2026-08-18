@@ -1,5 +1,8 @@
 # Handoff — TMDL partition patterns: real estates write messier M
 
+> **Status (2026-08-18, dev session): implemented in 1.17.0.**
+> All three breakers fixed for Sql.Database AND Odbc.Query (shared _parse_exec_target incl. 3-part bracketed; _M_SOURCE_ARG accepts literal/@param/plain/#\"quoted\" servers; Query= taken as first literal chunk, mid-record position allowed). Bonus from the census guard: Schema/Item navigation now extracts too. Per-file fallout rows land in ops_fallout with classified reason_codes — the 174-silent-models class is structurally impossible. Field patch can be retired on the next wheel. Fixtures mirror the live sample.
+
 **From:** review session, 2026-08-18 (full-estate taxonomy over a live
 5-workspace harvest: 601 models, 1065 sources parsed, 174 models yielded
 ZERO sources). **To:** dev session. All examples anonymized — shapes only.

@@ -1,5 +1,8 @@
 # Handoff — pipeline funnel + fallout capture (the error graph's foundation)
 
+> **Status (2026-08-18, dev session): implemented in 1.17.0.**
+> ops_fallout is a registry-declared contract table (append; run_at/stage/entity_id/reason_code/reason_text/contract_id) and 12 — the worst offender — is retrofitted end to end: partition-parse drops, naming refusals, and collector skips all land as rows; the notebook prints a per-run funnel (files -> sources -> fallout by reason). Remaining scope, deliberately deferred: the admin-dashboard funnel page, folding 02's error rows / 07b's rejected rows into one funnel VIEW, and errors-as-graph-nodes (ADR 0039 follow-up) — those want the dashboard work, not more plumbing.
+
 **From:** review session, 2026-08-18 (Sunny, mid-diagnosis of the 12 run:
 "each error is gold and needs to be captured and tied back to the root
 cause" + "admin dashboard: each step, how many come through vs fell off").

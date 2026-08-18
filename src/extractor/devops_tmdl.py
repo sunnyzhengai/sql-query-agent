@@ -28,10 +28,10 @@ logger = logging.getLogger(__name__)
 class SqlSource:
     """A SQL data source extracted from a TMDL partition."""
     table_name: str          # PBI table name (e.g., "Claims")
-    server: str = ""         # e.g., "claritytstdb.cchcs.ldap" or DSN name
-    database: str = ""       # e.g., "CookClarity"
+    server: str = ""         # e.g., "clarity-host.example.corp" or DSN name
+    database: str = ""       # e.g., "ClarityDB"
     schema: str = ""         # e.g., "Reporting"
-    sql_object: str = ""     # e.g., "V_CCHP_Executive_Dashboard_Claims_PBI"
+    sql_object: str = ""     # e.g., "V_ACME_Executive_Dashboard_Claims_PBI"
     sql_object_type: str = ""  # "View", "Table", "Function", or "StoredProcedure"
     raw_m_expression: str = ""  # the full M/Power Query source
 
@@ -66,6 +66,41 @@ class ReportLineage:
         )
 
 
+# An M argument that names a server/DSN: a string literal, a parameter
+# reference (@Scoped or plain identifier), or a quoted identifier
+# (#"Server Param"). Field find 2026-08-18: real estates pass servers as
+# PARAMETERS at scale (277 pattern misses) — literal-only matching was
+# the dominant fallout.
+_M_SOURCE_ARG = r'(?:"([^"]*)"|@([A-Za-z_]\w*)|#"([^"]+)"|([A-Za-z_]\w*))'
+
+
+def _first_group(*groups: "str | None") -> str:
+    return next((g for g in groups if g), "")
+
+
+def _parse_exec_target(query: str) -> "tuple[str, str, str] | None":
+    """(database, schema, object) from an EXEC statement, any of:
+    EXEC proc | EXEC schema.proc | EXEC db.schema.proc — each part
+    bracketed or bare. The query may be the FIRST literal chunk of a
+    concatenated M string ("exec [S].P '" & Param & ...): the target
+    always lives in that first chunk, so a trailing fragment is fine.
+    """
+    m = re.search(
+        r"\bEXEC(?:UTE)?\s+"
+        r"(?:\[?(\w+)\]?\s*\.\s*)?"  # optional database
+        r"(?:\[?(\w+)\]?\s*\.\s*)?"  # optional schema
+        r"\[?(\w+)\]?",              # object name
+        query, re.IGNORECASE,
+    )
+    if not m:
+        return None
+    parts = [p for p in m.groups() if p]
+    obj = parts[-1]
+    schema = parts[-2] if len(parts) >= 2 else ""
+    database = parts[-3] if len(parts) >= 3 else ""
+    return database, schema, obj
+
+
 def parse_tmdl_partition(tmdl_content: str, table_name: str) -> SqlSource | None:
     """Extract the SQL source from a TMDL partition block.
 
@@ -74,9 +109,9 @@ def parse_tmdl_partition(tmdl_content: str, table_name: str) -> SqlSource | None
             source =
                 let
                     Source = Odbc.DataSource("dsn=Clarity", ...),
-                    DB = Source{[Name="CookClarity",Kind="Database"]}[Data],
+                    DB = Source{[Name="ClarityDB",Kind="Database"]}[Data],
                     Schema = DB{[Name="Reporting",Kind="Schema"]}[Data],
-                    View = Schema{[Name="V_CCHP_...",Kind="View"]}[Data]
+                    View = Schema{[Name="V_ACME_...",Kind="View"]}[Data]
                 in
                     View
 
@@ -125,71 +160,63 @@ def parse_tmdl_partition(tmdl_content: str, table_name: str) -> SqlSource | None
     if dsn_match:
         source.server = dsn_match.group(1)
 
-    # Pattern 2: Odbc.Query("dsn", "exec [db].[schema].[proc]")
-    # Query string may contain #(lf) (Power Query line feed escape)
-    odbc_query_match = re.search(r'Odbc\.Query\(\s*"([^"]+)"\s*,\s*"([^"]+)"', m_expr)
+    # Pattern 2: Odbc.Query(<server-arg>, "exec [db].[schema].[proc] ...")
+    # Server arg: literal, parameter, or quoted identifier (_M_SOURCE_ARG).
+    # Query capture stops at the first closing quote — for concatenated
+    # queries ("exec ... '" & Param & ...) that IS the first literal
+    # chunk, which always carries the exec target.
+    odbc_query_match = re.search(
+        r"Odbc\.Query\(\s*" + _M_SOURCE_ARG + r'\s*,\s*"([^"]*)', m_expr
+    )
     if odbc_query_match:
-        source.server = odbc_query_match.group(1)
-        query = odbc_query_match.group(2)
+        source.server = _first_group(*odbc_query_match.groups()[:4])
+        query = odbc_query_match.group(5)
         # Clean Power Query escape sequences
         query = query.replace("#(lf)", " ").replace("#(cr)", " ").replace("#(tab)", " ")
-        # Parse "exec [CookClarity].[COOK_RPT].[USP_CCMC_ANESTHESIA_CRNA_PBI]"
-        # or "exec dbo.USP_Something" or "exec db.schema.proc"
-        exec_match = re.search(
-            r'exec\s+'
-            r'(?:\[?(\w+)\]?\.)?' # optional database
-            r'(?:\[?(\w+)\]?\.)?' # optional schema
-            r'\[?(\w+)\]?',       # object name
-            query, re.IGNORECASE
-        )
-        if exec_match:
-            parts = [p for p in exec_match.groups() if p]
-            source.sql_object = parts[-1]  # last part is always the object
+        target = _parse_exec_target(query)
+        if target:
+            source.database, source.schema, source.sql_object = target
             source.sql_object_type = "StoredProcedure"
-            if len(parts) >= 2:
-                source.schema = parts[-2]
-            if len(parts) >= 3:
-                source.database = parts[-3]
 
-    # Pattern 3: Sql.Database("server", "database", [Query="..."])
-    # Server can be a string literal or a variable/parameter name
+    # Pattern 3: Sql.Database(<server-arg>, "database", [..., Query="..."])
     sql_db_match = re.search(
-        r'Sql\.Database\(\s*"([^"]+)"\s*,\s*"([^"]+)"', m_expr
+        r"Sql\.Database\(\s*" + _M_SOURCE_ARG + r'\s*,\s*"([^"]+)"', m_expr
     )
     if sql_db_match:
-        source.server = sql_db_match.group(1)
-        source.database = sql_db_match.group(2)
+        source.server = _first_group(*sql_db_match.groups()[:4])
+        source.database = sql_db_match.group(5)
 
-    # Sql.Database with variable server: Sql.Database(ServerParam, "database", ...)
-    if not sql_db_match:
-        sql_db_var_match = re.search(
-            r'Sql\.Database\(\s*(\w+)\s*,\s*"([^"]+)"', m_expr
-        )
-        if sql_db_var_match:
-            source.server = sql_db_var_match.group(1)  # parameter name
-            source.database = sql_db_var_match.group(2)
-
-    # Extract stored proc or inline SQL from Query parameter
-    # Query value may span multiple lines with #(lf) escapes
-    query_match = re.search(r'\[Query\s*=\s*"((?:[^"\\]|\\.)*)"\s*\]', m_expr, re.DOTALL)
+    # Extract stored proc or inline SQL from the Query record field. The
+    # field need not open the record ([CommandTimeout=..., Query="..."])
+    # and the value may be a concatenation — first literal chunk again.
+    query_match = re.search(r'[\[,]\s*Query\s*=\s*"([^"]*)', m_expr)
     if query_match and not source.sql_object:
         query = query_match.group(1)
         query = query.replace("#(lf)", " ").replace("#(cr)", " ").replace("#(tab)", " ")
-        # Try to extract proc name from "EXEC [schema].[proc]" or "EXEC schema.proc"
-        proc_match = re.search(
-            r'EXEC\s+'
-            r'(?:\[?(\w+)\]?\.)?' # optional schema
-            r'\[?(\w+)\]?',       # proc name
-            query, re.IGNORECASE
-        )
-        if proc_match:
-            source.schema = proc_match.group(1) or ""
-            source.sql_object = proc_match.group(2)
+        target = _parse_exec_target(query)
+        if target:
+            database, source.schema, source.sql_object = target
             source.sql_object_type = "StoredProcedure"
+            if database:
+                source.database = database
         else:
             # Inline SQL — mark as InlineQuery with a summary
             source.sql_object = "InlineQuery"
             source.sql_object_type = "InlineSQL"
+
+    # Sql.Database Schema/Item navigation: Source{[Schema="rpt",
+    # Item="V_X"]}[Data] — the common navigator form when no Query is
+    # used (census guard caught this as claimed-but-unextractable).
+    nav_si = re.search(
+        r'\{\s*\[\s*Schema\s*=\s*"([^"]+)"\s*,\s*Item\s*=\s*"([^"]+)"\s*\]\s*\}',
+        m_expr,
+    )
+    if nav_si and not source.sql_object:
+        source.schema = nav_si.group(1)
+        source.sql_object = nav_si.group(2)
+        # Kind is unstated in this form — corpus membership decides what
+        # it really is downstream (Table is the neutral claim).
+        source.sql_object_type = "Table"
 
     # Pattern 4: Sql.Databases("server") with navigation
     sql_dbs_match = re.search(r'Sql\.Databases\(\s*"([^"]+)"', m_expr)
@@ -233,6 +260,61 @@ def _parse_directlake_partition(tmdl_content: str, table_name: str) -> SqlSource
         sql_object_type="Table",
         raw_m_expression=body.strip(),
     )
+
+
+# M functions that are legitimately not SQL sources — files built on
+# these are CORRECT to skip, but the skip must be a recorded reason, not
+# a silent absence (174 models vanished silently on a live estate,
+# 2026-08-18). Order matters only for reporting: first hit names the row.
+_NON_SQL_SOURCE_FNS = (
+    "Snowflake.Databases",
+    "Folder.Files",
+    "Excel.Workbook",
+    "SharePoint.Files",
+    "SharePoint.Tables",
+    "Web.Contents",
+    "ActiveDirectory.Domains",
+    "Table.FromRows",
+    "Table.Combine",
+    "Table.NestedJoin",
+    "DateTime.LocalNow",
+    "DateTime.FixedLocalNow",
+    "List.Dates",
+    "#table",
+)
+
+
+def classify_partition_fallout(
+    tmdl_content: str, table_name: str
+) -> "tuple[str, str]":
+    """Why a table file yielded no SQL source row: (reason_code, reason_text).
+
+    Total classification — every parse miss gets a reason
+    (HANDOFF_TMDL_PATTERN_GAPS item 2; the silent-absence rule). Codes:
+      calculated_table       DAX-defined table, no external source
+      no_partition           measures-only / annotation-only table file
+      directlake_entity      entity partition without an entityName
+      non_sql_source:<fn>    recognized non-SQL M source (correct skip)
+      unrecognized_shape     M partition no pattern understood (the
+                             product signal — file a shape)
+    """
+    if re.search(r"partition\s+[^\n]+=\s*calculated\b", tmdl_content):
+        return ("calculated_table",
+                "calculated table (DAX-defined) — no external SQL source")
+    part = re.search(r"partition\s+[^\n]+=\s*(m|entity)\b", tmdl_content)
+    if not part:
+        return ("no_partition",
+                "no partition block (measures-only or annotation-only file)")
+    if part.group(1) == "entity":
+        return ("directlake_entity",
+                "directLake entity partition without a resolvable entityName")
+    for fn in _NON_SQL_SOURCE_FNS:
+        if fn in tmdl_content:
+            return (f"non_sql_source:{fn}",
+                    f"recognized non-SQL M source ({fn}) — correctly skipped")
+    return ("unrecognized_shape",
+            "M partition matched no known SQL source pattern — report this "
+            "shape so a handler can ship")
 
 
 def parse_tmdl_dax(tmdl_content: str, table_name: str) -> list[DaxExpression]:

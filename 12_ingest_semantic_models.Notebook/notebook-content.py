@@ -124,6 +124,16 @@ else:  # devops_git
 print(f"Collected {len(tmdl_files)} TMDL table files "
       f"({len({f.report_name for f in tmdl_files})} semantic models) via {sm.source_type}")
 
+# Shape census (pre-step): total classification at file grain BEFORE
+# parsing — the harvest states its coverage up front instead of failing
+# silently partway. Unknown signatures are whitelist-anonymized (M
+# stdlib names only) and safe to send to support.
+from src.mquery import census_files, coverage_lines
+
+census_rows = census_files(tmdl_files)
+for line in coverage_lines(census_rows):
+    print(line)
+
 # METADATA ********************
 
 # META {
@@ -138,8 +148,23 @@ from datetime import datetime, timezone
 
 from src.steps.semantic_models import semantic_models_step
 
+# Corpus membership for name derivation (amendment 2026-08-18): trust
+# "is this a parsed metric" over the TMDL Kind field — connectors reach
+# views as Kind='Table'. Absence of the corpus is legitimate on a
+# fresh workspace; a failed read is not (it must raise).
+corpus_metric_ids = None
+if spark.catalog.tableExists(config.lakehouse.sql_sources):
+    corpus_metric_ids = {
+        r["metric_id"] for r in
+        spark.table(config.lakehouse.sql_sources).select("metric_id").collect()
+    }
+    print(f"Corpus membership: {len(corpus_metric_ids)} metric ids")
+else:
+    print("No input_sql_sources yet — name derivation falls back to TMDL kinds")
+
+RUN_AT = datetime.now(timezone.utc).isoformat()
 out = semantic_models_step(
-    tmdl_files, scan_timestamp=datetime.now(timezone.utc).isoformat()
+    tmdl_files, scan_timestamp=RUN_AT, corpus_metric_ids=corpus_metric_ids
 )
 
 print(f"Reports: {len(out.reports_seen)}")
@@ -148,6 +173,18 @@ print(f"DAX expressions: {len(out.dax_rows)}")
 print(f"Business names derived: {len(out.metric_name_rows)}")
 for reason in out.names_skipped:
     print(f"  [i] no name derived — {reason}")
+
+# Funnel (HANDOFF_FUNNEL_AND_FALLOUT): every collected file is accounted
+# for — a source row or a classified fallout row, never silent absence.
+from collections import Counter
+
+partition_fallout = [f for f in out.fallout_rows if f["stage"] == "12_partition_parse"]
+print(f"\nFunnel: {len(tmdl_files)} files -> "
+      f"{len(out.report_source_rows)} sources, "
+      f"{len(partition_fallout)} fallout, "
+      f"{len(out.fallout_rows) - len(partition_fallout)} naming refusals")
+for (code, cnt) in Counter(f["reason_code"] for f in out.fallout_rows).most_common():
+    print(f"  {code}: {cnt}")
 
 # METADATA ********************
 
@@ -158,9 +195,38 @@ for reason in out.names_skipped:
 
 # CELL ********************
 
-# %% Cell 3: Write the three input tables and run the postcondition gate
-from src.schemas import DAX_EXPRESSIONS, METRIC_NAMES, REPORT_SOURCES, to_spark_schema
+# %% Cell 3: Write the input tables + fallout, run the postcondition gate
+from src.schemas import (
+    DAX_EXPRESSIONS,
+    FALLOUT,
+    METRIC_NAMES,
+    REPORT_SOURCES,
+    to_spark_schema,
+)
 from src.steps.gates import postcondition_gate
+
+# Fallout rows are the gold (append-only history): collector skips +
+# partition-parse drops + naming refusals, all queryable by reason_code.
+fallout_all = [
+    {"run_at": RUN_AT, **f} for f in out.fallout_rows
+]
+if sm.source_type == "workspace":
+    for ws_id, r in ws_counts.items():
+        for model, cls, reason in r["skipped"]:
+            fallout_all.append({
+                "run_at": RUN_AT, "stage": "12_collect",
+                "entity_id": f"{ws_id}/{model}",
+                "reason_code": f"collect_{cls}", "reason_text": reason,
+                "contract_id": "contract:input_report_sources",
+            })
+if fallout_all:
+    fallout_df = spark.createDataFrame(
+        [(f["run_at"], f["stage"], f["entity_id"], f["reason_code"],
+          f["reason_text"], f["contract_id"]) for f in fallout_all],
+        schema=to_spark_schema(FALLOUT))
+    fallout_df.write.format("delta").mode("append").saveAsTable("ops_fallout")
+print(f"ops_fallout: {len(fallout_all)} rows appended "
+      "(query: GROUP BY reason_code)")
 
 if out.report_source_rows:
     spark.createDataFrame(out.report_source_rows, schema=to_spark_schema(REPORT_SOURCES)) \

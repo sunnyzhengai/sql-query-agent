@@ -13,40 +13,40 @@ class TestExtractMatchKey:
     """extract_match_key strips prefix, company, and _PBI suffix."""
 
     def test_view_standard(self):
-        assert extract_match_key("V_CCHP_SomeReport_PBI") == "somereport"
+        assert extract_match_key("V_ACME_SomeReport_PBI") == "somereport"
 
     def test_view_multi_word(self):
-        assert extract_match_key("V_CCHP_Some_Report_Name_PBI") == "some report name"
+        assert extract_match_key("V_ACME_Some_Report_Name_PBI") == "some report name"
 
     def test_proc_standard(self):
-        assert extract_match_key("USP_CCHP_Some_Report_PBI") == "some report"
+        assert extract_match_key("USP_ACME_Some_Report_PBI") == "some report"
 
     def test_proc_different_company(self):
-        assert extract_match_key("USP_COOK_ED_Sepsis_PBI") == "ed sepsis"
+        assert extract_match_key("USP_ACME_ED_Sepsis_PBI") == "ed sepsis"
 
     def test_view_with_numbers(self):
-        assert extract_match_key("V_CCHP_340B_Charges_PBI") == "340b charges"
+        assert extract_match_key("V_ACME_340B_Charges_PBI") == "340b charges"
 
     def test_no_pbi_suffix_returns_none(self):
-        assert extract_match_key("USP_CCHP_SomeReport") is None
+        assert extract_match_key("USP_ACME_SomeReport") is None
 
     def test_no_pbi_suffix_view_returns_none(self):
-        assert extract_match_key("V_CCHP_SomeReport") is None
+        assert extract_match_key("V_ACME_SomeReport") is None
 
     def test_case_insensitive_pbi(self):
-        assert extract_match_key("V_CCHP_Test_pbi") == "test"
+        assert extract_match_key("V_ACME_Test_pbi") == "test"
 
     def test_proc_case_insensitive_prefix(self):
-        assert extract_match_key("usp_CCHP_Test_PBI") == "test"
+        assert extract_match_key("usp_ACME_Test_PBI") == "test"
 
     def test_view_case_insensitive_prefix(self):
-        assert extract_match_key("v_CCHP_Test_PBI") == "test"
+        assert extract_match_key("v_ACME_Test_PBI") == "test"
 
     def test_single_word_after_company(self):
-        assert extract_match_key("V_CCHP_Dashboard_PBI") == "dashboard"
+        assert extract_match_key("V_ACME_Dashboard_PBI") == "dashboard"
 
     def test_long_name(self):
-        assert extract_match_key("USP_CCHP_IP_Sepsis_Compliance_By_Shift_PBI") == "ip sepsis compliance by shift"
+        assert extract_match_key("USP_ACME_IP_Sepsis_Compliance_By_Shift_PBI") == "ip sepsis compliance by shift"
 
 
 class TestNormalizeReportName:
@@ -99,7 +99,7 @@ class TestExactMatchTier:
 
     def test_exact_name_matches_deterministically(self):
         match = self._matcher().match_object(
-            "USP_CCHP_Whatever", exact_report_name="Sepsis Compliance Dashboard"
+            "USP_ACME_Whatever", exact_report_name="Sepsis Compliance Dashboard"
         )
         assert match is not None
         assert match.report_asset_id == "asset-1"
@@ -115,7 +115,7 @@ class TestExactMatchTier:
         # The asset is not in Collibra yet: correct answer is NO match,
         # not a fuzzy guess against a name we know exactly.
         match = self._matcher().match_object(
-            "USP_CCHP_ED_Throughput_PBI", exact_report_name="Missing Report"
+            "USP_ACME_ED_Throughput_PBI", exact_report_name="Missing Report"
         )
         assert match is None
 
@@ -129,7 +129,7 @@ class TestExactMatchTier:
 
     def test_without_known_name_heuristic_still_applies(self):
         result = self._matcher().match_objects(
-            [{"object_name": "USP_CCHP_ED_Throughput_PBI",
+            [{"object_name": "USP_ACME_ED_Throughput_PBI",
               "object_type": "SQL_STORED_PROCEDURE"}],
         )
         assert len(result.matched) == 1

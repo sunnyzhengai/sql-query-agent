@@ -32,7 +32,7 @@ SEPSIS_TMDL = """table SepsisData
 \t\tmode: import
 \t\tsource =
 \t\t\t\tlet
-\t\t\t\t    Source = Odbc.Query("dsn=Clarity", "exec [CookClarity].[reporting].[USP_IP_SepsisDates]")
+\t\t\t\t    Source = Odbc.Query("dsn=Clarity", "exec [ClarityDB].[reporting].[USP_IP_SepsisDates]")
 \t\t\t\tin
 \t\t\t\t    Source
 
@@ -104,36 +104,135 @@ class TestSemanticModelsStep:
         assert out.dax_rows[0]["name"] == "Compliance Rate"
         assert out.dax_rows[0]["expression_type"] == "measure"
 
-    def test_business_name_derived_only_for_single_source_reports(self):
+    def test_names_are_proc_keyed_not_report_keyed(self):
+        """Inversion (HANDOFF_NAME_DERIVATION_DIRECTION): a proc consumed
+        by exactly ONE report inherits that report's title — even when
+        the report reads several procs. The old report-keyed rule named
+        only single-source reports (228/601 at a live estate)."""
         out = semantic_models_step(_files(), scan_timestamp="t")
-        assert len(out.metric_name_rows) == 1
-        row = out.metric_name_rows[0]
-        assert row["metric_id"] == "reporting.USP_IP_SepsisDates"
-        assert row["business_name"] == "Sepsis Compliance Dashboard"
-        assert row["source"] == "pbi_report"
-        # the two-source report is skipped with a reason, never guessed
-        assert len(out.names_skipped) == 1
-        assert "Sepsis Ops Overview" in out.names_skipped[0]
+        by_id = {r["metric_id"]: r for r in out.metric_name_rows}
+        assert by_id["reporting.USP_IP_SepsisDates"]["business_name"] == \
+            "Sepsis Compliance Dashboard"
+        # BOTH procs of the two-source report now inherit its title
+        assert by_id["reporting.USP_IP_SepsisEncounters"]["business_name"] == \
+            "Sepsis Ops Overview"
+        assert by_id["reporting.USP_IP_SepsisDetails"]["business_name"] == \
+            "Sepsis Ops Overview"
+        assert out.names_skipped == []
+        assert all(r["source"] == "pbi_report" for r in out.metric_name_rows)
 
     def test_source_column_not_extracted_as_dax(self):
         out = semantic_models_step(_files())
         names = [d["name"] for d in out.dax_rows]
         assert "encounter_id" not in names
 
-    def test_two_reports_same_metric_emit_one_row(self):
-        """input_metric_names has a unique metric_id invariant: a metric
-        fed by two reports gets ONE row — first report names it, the
-        rest are listed for steward review, never guessed."""
+    def test_proc_consumed_by_two_different_reports_refuses(self):
+        """Refuse-over-guess (amends the 1.16.0 first-workspace verdict,
+        per HANDOFF_NAME_DERIVATION_DIRECTION): two DIFFERENT reports
+        consuming one proc is genuine ambiguity — list both, name
+        nothing, emit a fallout row."""
         files = [
             TmdlFile("Sepsis_Dashboard", "SepsisData", SEPSIS_TMDL),
             TmdlFile("Exec_Overview", "SepsisData", SEPSIS_TMDL),
         ]
         out = semantic_models_step(files)
+        assert out.metric_name_rows == []
+        assert len(out.names_skipped) == 1
+        skip = out.names_skipped[0]
+        assert "reporting.USP_IP_SepsisDates" in skip
+        assert "Sepsis_Dashboard" in skip and "Exec_Overview" in skip
+        fallout = [f for f in out.fallout_rows
+                   if f["stage"] == "12_name_derivation"]
+        assert len(fallout) == 1
+        assert fallout[0]["reason_code"] == "multi_report_consumer"
+        assert fallout[0]["entity_id"] == "reporting.USP_IP_SepsisDates"
+
+    def test_same_title_consumers_are_not_ambiguous(self):
+        """Every candidate name identical (prod/dev copies of one
+        dashboard) — there is nothing to guess, so the name lands and
+        all consumers stay listed for steward review."""
+        files = [
+            TmdlFile("Sepsis Dashboard", "SepsisData", SEPSIS_TMDL,
+                     semantic_model_path="workspace:ws-prod/m1"),
+            TmdlFile("Sepsis Dashboard", "SepsisData", SEPSIS_TMDL,
+                     semantic_model_path="workspace:ws-dev/m2"),
+        ]
+        out = semantic_models_step(files)
+        assert len(out.metric_name_rows) == 1
+        assert out.metric_name_rows[0]["business_name"] == "Sepsis Dashboard"
+
+    def test_case_variant_spellings_count_as_one_proc(self):
+        """Amendment 1: the same proc spelled differently across
+        partitions (case) must not fake a second consumer/identity."""
+        upper = SEPSIS_TMDL.replace(
+            "[reporting].[USP_IP_SepsisDates]", "[REPORTING].[USP_IP_SEPSISDATES]")
+        files = [
+            TmdlFile("Sepsis Compliance Dashboard", "SepsisData", SEPSIS_TMDL),
+            TmdlFile("Sepsis Compliance Dashboard", "SepsisData2", upper),
+        ]
+        out = semantic_models_step(files)
+        assert len(out.metric_name_rows) == 1
+        assert out.names_skipped == []
+
+    def test_corpus_membership_replaces_kind_filter(self):
+        """Amendment 2: connectors reach VIEWS as Kind='Table' — trust
+        corpus membership, not the TMDL Kind. A source matching a corpus
+        metric_id can name it; casing comes from the corpus."""
+        out = semantic_models_step(
+            [TmdlFile("Encounter Explorer", "Encounters", DIRECTLAKE_TMDL)],
+            corpus_metric_ids={"DBO.Encounter"},
+        )
         assert len(out.metric_name_rows) == 1
         row = out.metric_name_rows[0]
-        assert row["metric_id"] == "reporting.USP_IP_SepsisDates"
-        assert row["business_name"] == "Sepsis Dashboard"  # friendly-cased
-        assert row["report_name"] == "Sepsis_Dashboard; Exec_Overview"
+        assert row["metric_id"] == "DBO.Encounter"  # corpus casing wins
+        assert row["business_name"] == "Encounter Explorer"
+
+    def test_non_corpus_sources_never_name(self):
+        out = semantic_models_step(
+            [TmdlFile("Encounter Explorer", "Encounters", DIRECTLAKE_TMDL)],
+            corpus_metric_ids={"reporting.USP_Something_Else"},
+        )
+        assert out.metric_name_rows == []
+
+
+class TestFalloutRows:
+    """HANDOFF_FUNNEL_AND_FALLOUT: every dropped entity leaves a row."""
+
+    NON_SQL_TMDL = """table Params
+\tpartition Params = m
+\t\tmode: import
+\t\tsource =
+\t\t\t\tlet
+\t\t\t\t    Source = Table.FromRows({{"a", 1}}, {"Name", "Value"})
+\t\t\t\tin
+\t\t\t\t    Source
+"""
+
+    def test_parse_miss_writes_classified_fallout_row(self):
+        out = semantic_models_step(
+            [TmdlFile("Config Report", "Params", self.NON_SQL_TMDL)]
+        )
+        assert out.report_source_rows == []
+        assert len(out.fallout_rows) == 1
+        f = out.fallout_rows[0]
+        assert f["stage"] == "12_partition_parse"
+        assert f["entity_id"] == "Config Report/Params"
+        assert f["reason_code"] == "non_sql_source:Table.FromRows"
+        assert f["contract_id"] == "contract:input_report_sources"
+
+    def test_parsed_files_leave_no_fallout(self):
+        out = semantic_models_step(_files())
+        assert [f for f in out.fallout_rows
+                if f["stage"] == "12_partition_parse"] == []
+
+    def test_every_file_yields_source_or_fallout(self):
+        """The 174-silent-models rule: sources + partition fallout rows
+        account for every collected file, always."""
+        files = _files() + [TmdlFile("Config Report", "Params", self.NON_SQL_TMDL)]
+        out = semantic_models_step(files)
+        partition_fallout = [f for f in out.fallout_rows
+                             if f["stage"] == "12_partition_parse"]
+        assert len(out.report_source_rows) + len(partition_fallout) == len(files)
 
 
 class TestDaxColumnRefs:
@@ -176,7 +275,8 @@ class TestConsumptionLayerEndToEnd:
 
     def test_business_name_applied_via_lineage(self):
         graph = self._build()
-        assert graph.business_names_applied == 1
+        # proc-keyed inversion: all three procs carry a report title
+        assert graph.business_names_applied == 3
 
     def test_exports_carry_consumption_tables(self):
         graph = self._build()
@@ -233,10 +333,12 @@ class TestDirectLake:
 
 
 class TestCrossWorkspaceNamingPriority:
-    """Multi-workspace rule (2026-08-18): the FIRST report in workspace
-    order names a shared metric; the rest are listed, never deduped."""
+    """AMENDED 2026-08-18 (HANDOFF_NAME_DERIVATION_DIRECTION supersedes
+    the 1.16.0 first-workspace verdict): differently-titled reports
+    consuming one metric REFUSE — refuse-over-guess. Only same-title
+    consumers (true workspace copies) still name it."""
 
-    def test_first_workspace_report_names_shared_metric(self):
+    def test_differently_titled_workspace_reports_refuse(self):
         files = [
             TmdlFile("Prod Dashboard", "SepsisData", SEPSIS_TMDL,
                      semantic_model_path="workspace:ws-prod/m1"),
@@ -244,7 +346,28 @@ class TestCrossWorkspaceNamingPriority:
                      semantic_model_path="workspace:ws-dev/m2"),
         ]
         out = semantic_models_step(files)
-        assert len(out.metric_name_rows) == 1
-        row = out.metric_name_rows[0]
-        assert row["business_name"] == "Prod Dashboard"
-        assert row["report_name"] == "Prod Dashboard; Dev Dashboard"
+        assert out.metric_name_rows == []
+        assert len(out.names_skipped) == 1
+        assert "Prod Dashboard" in out.names_skipped[0]
+        assert "Dev Dashboard" in out.names_skipped[0]
+
+
+def test_unrecognized_shape_fallout_carries_signature():
+    """SHAPE_CENSUS x FUNNEL: the unknown-shape fallout row carries the
+    whitelist-anonymized signature — support sees the shape, never the
+    customer's M."""
+    weird = """table Blend
+\tpartition Blend = m
+\t\tmode: import
+\t\tsource =
+\t\t\t\tlet
+\t\t\t\t    Source = SecretCustomFn("x", SecretParam)
+\t\t\t\tin
+\t\t\t\t    Source
+"""
+    out = semantic_models_step([TmdlFile("R", "Blend", weird)])
+    f = out.fallout_rows[0]
+    assert f["reason_code"] == "unrecognized_shape"
+    assert "[signature:" in f["reason_text"]
+    assert "SecretCustomFn" not in f["reason_text"]
+    assert "SecretParam" not in f["reason_text"]

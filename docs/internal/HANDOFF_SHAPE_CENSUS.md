@@ -1,5 +1,8 @@
 # Handoff — proactive shape census + shape registry (go-live requirement)
 
+> **Status (2026-08-18, dev session): implemented in 1.17.0.**
+> Shipped as designed, amendments upheld (ADR 0041): src/mquery/ M mini-parser (tokenizer + recursive descent, never raises), whitelist-based signatures WITH argument kinds (CI leak test pins that customer identifiers cannot be emitted), declarative SHAPE_REGISTRY (supported shapes must have fixtures that classify AND extract — the guard caught Schema/Item navigation as claimed-but-unextractable on day one), census wired as 12's pre-step at file grain with the coverage statement up front; unknown-shape fallout rows carry the anonymized signature. NOT yet: acceptance re-run against the reference estate (needs your workspace), extraction itself migrating onto the M AST (regex handlers remain behind the registry), column-overlap reconciliation, cross-customer telemetry aggregation.
+
 **From:** review session, 2026-08-18. **To:** dev session.
 **Origin (Sunny, verbatim intent):** "instead of waiting for lineage
 harvesting to fail, collect all possible shapes from the customer's

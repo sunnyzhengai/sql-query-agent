@@ -73,7 +73,8 @@ SQL_SOURCES = {
     "utility_writers": ["00b_ingest_sql_folders", "00c_ingest_sql_live"],
     "write_mode": "overwrite",
     "enrichers": [],
-    "consumers": ["01_install", "02_parse", "06_validate", "00b_ingest_sql_folders"],
+    "consumers": ["01_install", "02_parse", "06_validate", "00b_ingest_sql_folders",
+                  "12_ingest_semantic_models"],
     "columns": [
         ("metric_id", "string", False),
         ("name", "string", False),
@@ -1261,6 +1262,47 @@ CERTIFICATION_EVENTS = {
     "invariants": [],
 }
 
+FALLOUT = {
+    "table_name": "ops_fallout",
+    "description": (
+        "Fallout capture (HANDOFF_FUNNEL_AND_FALLOUT, 2026-08-18): every "
+        "pipeline stage that drops an entity writes a row — run, stage, "
+        "entity, machine reason code, human reason text, and the contract "
+        "the drop belongs to. Root-cause aggregation is a GROUP BY on "
+        "reason_code; silent absence (174 models vanished at a live "
+        "estate with evidence only in stdout) is a contract violation. "
+        "Foundation for errors-as-graph-nodes (ADR 0039 follow-up)."
+    ),
+    "domain": "operations",
+    "status": "active",
+    "owner": {"notebook": "12_ingest_semantic_models",
+              "module": "src/steps/semantic_models.py"},
+    "write_mode": "append",
+    "enrichers": [],
+    "consumers": ["admin telemetry report"],
+    "columns": [
+        ("run_at", "string", False),
+        ("stage", "string", False),
+        ("entity_id", "string", False),
+        ("reason_code", "string", False),
+        ("reason_text", "string", True),
+        ("contract_id", "string", True),
+    ],
+    "column_descriptions": {
+        "run_at": "ISO timestamp of the pipeline run that dropped it",
+        "stage": "Stage that dropped the entity (e.g. 12_partition_parse, "
+                 "12_name_derivation, 12_collect)",
+        "entity_id": "Dropped entity (report/model/metric/file identity)",
+        "reason_code": "Machine-groupable code (non_sql_source:<fn>, "
+                       "unrecognized_shape, multi_report_consumer, "
+                       "collect_permission, ...)",
+        "reason_text": "Human remediation text for the admin",
+        "contract_id": "Contract the drop violates or informs "
+                       "(contract:<table>)",
+    },
+    "invariants": [],
+}
+
 PUBLISH_LOG = {
     "table_name": "gov_publish_log",
     "description": (
@@ -1878,7 +1920,7 @@ TABLE_REGISTRY = {
         # operations
         PARSE_RESULTS, PARSE_ERRORS, PARSE_SUCCESSES, BUILD_SUMMARY,
         PIPELINE_VALIDATION, INSTALLATION_ERRORS, AGENT_DESCRIPTIONS,
-        DESCRIPTION_CACHE, SETUP_COMPLETENESS,
+        DESCRIPTION_CACHE, SETUP_COMPLETENESS, FALLOUT,
         # graph
         GRAPH_NODES, GRAPH_EDGES,
         # output

@@ -29,11 +29,11 @@ ODBC_TMDL = """table Claims
         source =
                 let
                     Source = Odbc.DataSource("dsn=Clarity", [HierarchicalNavigation=true]),
-                    CookClarity_Database = Source{[Name="CookClarity",Kind="Database"]}[Data],
-                    Reporting_Schema = CookClarity_Database{[Name="Reporting",Kind="Schema"]}[Data],
-                    V_CCHP_Executive_Dashboard_Claims_PBI_View = Reporting_Schema{[Name="V_CCHP_Executive_Dashboard_Claims_PBI",Kind="View"]}[Data]
+                    ClarityDB_Database = Source{[Name="ClarityDB",Kind="Database"]}[Data],
+                    Reporting_Schema = ClarityDB_Database{[Name="Reporting",Kind="Schema"]}[Data],
+                    V_ACME_Executive_Dashboard_Claims_PBI_View = Reporting_Schema{[Name="V_ACME_Executive_Dashboard_Claims_PBI",Kind="View"]}[Data]
                 in
-                    V_CCHP_Executive_Dashboard_Claims_PBI_View
+                    V_ACME_Executive_Dashboard_Claims_PBI_View
 
     annotation PBI_ResultType = Exception
 """
@@ -49,7 +49,7 @@ ODBC_QUERY_TMDL = """table Anesthesia
         mode: import
         source =
                 let
-                    Source = Odbc.Query("dsn=Clarity", "exec [CookClarity].[COOK_RPT].[USP_CCMC_ANESTHESIA_CRNA_PBI]")
+                    Source = Odbc.Query("dsn=Clarity", "exec [ClarityDB].[RPT].[USP_ACME_ANESTHESIA_STAFFING_PBI]")
                 in
                     Source
 
@@ -63,7 +63,7 @@ ODBC_QUERY_LF_TMDL = """table EmployeeInfo
         mode: import
         source =
                 let
-                    Source = Odbc.Query("dsn=EmployeeCare", "exec employeecare.cook_rpt.usp_employee_info#(lf)")
+                    Source = Odbc.Query("dsn=HrDb", "exec hrdb.rpt.usp_employee_info#(lf)")
                 in
                     Source
 
@@ -77,7 +77,7 @@ SQL_DATABASE_VAR_TMDL = """table AdmitDischarge
         mode: import
         source =
                 let
-                    Source = Sql.Database(CaboodleServer, "CookCDW", [Query="SET NOCOUNT ON;#(lf)EXEC dbo.USP_AdmitDischarge_PBI"])
+                    Source = Sql.Database(WarehouseServer, "WarehouseDW", [Query="SET NOCOUNT ON;#(lf)EXEC dbo.USP_AdmitDischarge_PBI"])
                 in
                     Source
 
@@ -91,7 +91,7 @@ SQL_INLINE_TMDL = """table Membership
         mode: import
         source =
                 let
-                    Source = Sql.Database(CaboodleServer, "cookcdw", [Query="SELECT DISTINCT MemberNo, MemberName FROM Members"])
+                    Source = Sql.Database(WarehouseServer, "warehousedw", [Query="SELECT DISTINCT MemberNo, MemberName FROM Members"])
                 in
                     Source
 
@@ -134,9 +134,9 @@ class TestParseTmdlPartition:
         result = parse_tmdl_partition(ODBC_TMDL, "Claims")
         assert result is not None
         assert result.table_name == "Claims"
-        assert result.database == "CookClarity"
+        assert result.database == "ClarityDB"
         assert result.schema == "Reporting"
-        assert result.sql_object == "V_CCHP_Executive_Dashboard_Claims_PBI"
+        assert result.sql_object == "V_ACME_Executive_Dashboard_Claims_PBI"
         assert result.sql_object_type == "View"
 
     def test_sql_database_with_exec(self):
@@ -161,9 +161,9 @@ class TestParseTmdlPartition:
         result = parse_tmdl_partition(ODBC_QUERY_TMDL, "Anesthesia")
         assert result is not None
         assert result.table_name == "Anesthesia"
-        assert result.database == "CookClarity"
-        assert result.schema == "COOK_RPT"
-        assert result.sql_object == "USP_CCMC_ANESTHESIA_CRNA_PBI"
+        assert result.database == "ClarityDB"
+        assert result.schema == "RPT"
+        assert result.sql_object == "USP_ACME_ANESTHESIA_STAFFING_PBI"
         assert result.sql_object_type == "StoredProcedure"
         assert result.server == "dsn=Clarity"
 
@@ -171,15 +171,15 @@ class TestParseTmdlPartition:
         result = parse_tmdl_partition(ODBC_QUERY_LF_TMDL, "EmployeeInfo")
         assert result is not None
         assert result.sql_object == "usp_employee_info"
-        assert result.schema == "cook_rpt"
-        assert result.database == "employeecare"
+        assert result.schema == "rpt"
+        assert result.database == "hrdb"
         assert result.sql_object_type == "StoredProcedure"
 
     def test_sql_database_variable_server(self):
         result = parse_tmdl_partition(SQL_DATABASE_VAR_TMDL, "AdmitDischarge")
         assert result is not None
-        assert result.server == "CaboodleServer"
-        assert result.database == "CookCDW"
+        assert result.server == "WarehouseServer"
+        assert result.database == "WarehouseDW"
         assert result.sql_object == "USP_AdmitDischarge_PBI"
         assert result.sql_object_type == "StoredProcedure"
         assert result.schema == "dbo"
@@ -189,7 +189,7 @@ class TestParseTmdlPartition:
         assert result is not None
         assert result.sql_object == "InlineQuery"
         assert result.sql_object_type == "InlineSQL"
-        assert result.database == "cookcdw"
+        assert result.database == "warehousedw"
 
 
 class TestParseTmdlDax:
@@ -223,3 +223,218 @@ class TestParseTmdlDax:
         exprs = parse_tmdl_dax(ODBC_TMDL, "Claims")
         for expr in exprs:
             assert expr.table_name == "Claims"
+
+
+# --- Field pattern-breakers (HANDOFF_TMDL_PATTERN_GAPS, 2026-08-18) ---
+# One live sample carried all three: parameter as server argument,
+# bracketed EXEC identifiers, string-concatenated Query. 277 SQL-shaped
+# sources were missed on a real estate; these fixtures mirror the shapes.
+
+SQL_DB_PARAM_CONCAT_TMDL = """table SepsisTrend
+    partition SepsisTrend = m
+        mode: import
+        source =
+                let
+                    Source = Sql.Database(@ServerParam, "AnalyticsDb",
+                        [Query="exec [SCHEMA_X].USP_Sepsis_Trend '"& StartDate &"' , '"& EndDate &"' "])
+                in
+                    Source
+
+    annotation PBI_ResultType = Table
+"""
+
+SQL_DB_QUOTED_PARAM_TMDL = """table Census
+    partition Census = m
+        mode: import
+        source =
+                let
+                    Source = Sql.Database(#"Server Param", "AnalyticsDb", [Query="EXEC rpt.USP_Census_PBI"])
+                in
+                    Source
+"""
+
+SQL_DB_THREE_PART_EXEC_TMDL = """table Falls
+    partition Falls = m
+        mode: import
+        source =
+                let
+                    Source = Sql.Database("srv.example.corp", "AnalyticsDb", [Query="EXEC [AnalyticsDb].[rpt].[USP_Falls_PBI]"])
+                in
+                    Source
+"""
+
+SQL_DB_QUERY_AFTER_OPTION_TMDL = """table Meds
+    partition Meds = m
+        mode: import
+        source =
+                let
+                    Source = Sql.Database("srv.example.corp", "AnalyticsDb", [CommandTimeout=#duration(0,0,30,0), Query="EXEC rpt.USP_Meds_PBI"])
+                in
+                    Source
+"""
+
+ODBC_QUERY_PARAM_DSN_TMDL = """table FluVax
+    partition FluVax = m
+        mode: import
+        source =
+                let
+                    Source = Odbc.Query(DsnParam, "exec rpt.USP_Flu_Vaccinations_PBI")
+                in
+                    Source
+"""
+
+ODBC_QUERY_CONCAT_TMDL = """table Readmits
+    partition Readmits = m
+        mode: import
+        source =
+                let
+                    Source = Odbc.Query("dsn=Analytics", "exec [rpt].[USP_Readmit_Rate] '"& RunDate &"' ")
+                in
+                    Source
+"""
+
+
+class TestPatternBreakers:
+    """The three field variants, for Sql.Database AND Odbc.Query."""
+
+    def test_param_server_bracket_concat_all_at_once(self):
+        # the live sample: all three breakers in one partition
+        result = parse_tmdl_partition(SQL_DB_PARAM_CONCAT_TMDL, "SepsisTrend")
+        assert result is not None
+        assert result.server == "ServerParam"
+        assert result.database == "AnalyticsDb"
+        assert result.schema == "SCHEMA_X"
+        assert result.sql_object == "USP_Sepsis_Trend"
+        assert result.sql_object_type == "StoredProcedure"
+
+    def test_quoted_identifier_server(self):
+        result = parse_tmdl_partition(SQL_DB_QUOTED_PARAM_TMDL, "Census")
+        assert result is not None
+        assert result.server == "Server Param"
+        assert result.sql_object == "USP_Census_PBI"
+
+    def test_three_part_bracketed_exec_in_query(self):
+        result = parse_tmdl_partition(SQL_DB_THREE_PART_EXEC_TMDL, "Falls")
+        assert result is not None
+        assert result.database == "AnalyticsDb"
+        assert result.schema == "rpt"
+        assert result.sql_object == "USP_Falls_PBI"
+
+    def test_query_field_not_first_in_record(self):
+        result = parse_tmdl_partition(SQL_DB_QUERY_AFTER_OPTION_TMDL, "Meds")
+        assert result is not None
+        assert result.sql_object == "USP_Meds_PBI"
+
+    def test_odbc_query_parameter_dsn(self):
+        result = parse_tmdl_partition(ODBC_QUERY_PARAM_DSN_TMDL, "FluVax")
+        assert result is not None
+        assert result.server == "DsnParam"
+        assert result.schema == "rpt"
+        assert result.sql_object == "USP_Flu_Vaccinations_PBI"
+
+    def test_odbc_query_concatenated_query_string(self):
+        result = parse_tmdl_partition(ODBC_QUERY_CONCAT_TMDL, "Readmits")
+        assert result is not None
+        assert result.schema == "rpt"
+        assert result.sql_object == "USP_Readmit_Rate"
+        assert result.sql_object_type == "StoredProcedure"
+
+
+# --- Fallout classification (HANDOFF_TMDL_PATTERN_GAPS item 2) ---
+
+CALCULATED_TMDL = """table DateDim
+    partition DateDim = calculated
+        mode: import
+        source = CALENDAR(DATE(2020,1,1), DATE(2030,12,31))
+"""
+
+TABLE_FROMROWS_TMDL = """table Params
+    partition Params = m
+        mode: import
+        source =
+                let
+                    Source = Table.FromRows({{"a", 1}}, {"Name", "Value"})
+                in
+                    Source
+"""
+
+SNOWFLAKE_TMDL = """table Fin
+    partition Fin = m
+        mode: import
+        source =
+                let
+                    Source = Snowflake.Databases("acct.snowflakecomputing.com", "WH")
+                in
+                    Source
+"""
+
+CUSTOM_REF_TMDL = """table Blended
+    partition Blended = m
+        mode: import
+        source =
+                let
+                    Source = SomeSharedQuery
+                in
+                    Source
+"""
+
+
+class TestFalloutClassification:
+    def _cls(self, content, table):
+        from src.extractor.devops_tmdl import classify_partition_fallout
+        return classify_partition_fallout(content, table)
+
+    def test_calculated_table(self):
+        code, text = self._cls(CALCULATED_TMDL, "DateDim")
+        assert code == "calculated_table"
+
+    def test_non_sql_source_names_the_function(self):
+        code, _ = self._cls(TABLE_FROMROWS_TMDL, "Params")
+        assert code == "non_sql_source:Table.FromRows"
+
+    def test_snowflake_is_recognized_not_unknown(self):
+        code, _ = self._cls(SNOWFLAKE_TMDL, "Fin")
+        assert code == "non_sql_source:Snowflake.Databases"
+
+    def test_measures_only_file_is_no_partition(self):
+        code, _ = self._cls(NO_PARTITION_TMDL, "Measures")
+        assert code == "no_partition"
+
+    def test_unrecognized_shape_is_the_residue_class(self):
+        code, _ = self._cls(CUSTOM_REF_TMDL, "Blended")
+        assert code == "unrecognized_shape"
+
+    def test_every_parse_miss_classifies(self):
+        # total classification: anything parse_tmdl_partition returns
+        # None for must yield a reason (the 174-silent-models rule)
+        for content, table in [
+            (CALCULATED_TMDL, "DateDim"), (TABLE_FROMROWS_TMDL, "Params"),
+            (SNOWFLAKE_TMDL, "Fin"), (NO_PARTITION_TMDL, "Measures"),
+            (CUSTOM_REF_TMDL, "Blended"),
+        ]:
+            assert parse_tmdl_partition(content, table) is None
+            code, text = self._cls(content, table)
+            assert code and text
+
+
+SQL_DB_SCHEMA_ITEM_NAV_TMDL = """table Falls
+    partition Falls = m
+        mode: import
+        source =
+                let
+                    Source = Sql.Database("srv.example.corp", "AnalyticsDb"),
+                    T = Source{[Schema="rpt",Item="V_Falls_PBI"]}[Data]
+                in
+                    T
+"""
+
+
+class TestSchemaItemNavigation:
+    def test_schema_item_navigator_extracted(self):
+        result = parse_tmdl_partition(SQL_DB_SCHEMA_ITEM_NAV_TMDL, "Falls")
+        assert result is not None
+        assert result.schema == "rpt"
+        assert result.sql_object == "V_Falls_PBI"
+        assert result.database == "AnalyticsDb"
+        # Kind unstated in this form — membership decides downstream
+        assert result.sql_object_type == "Table"

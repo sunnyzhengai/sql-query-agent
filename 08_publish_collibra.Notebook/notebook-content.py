@@ -174,7 +174,7 @@ if match_result.unmatched_objects:
 # To publish only specific reports, add names to PUBLISH_ONLY.
 # Leave empty [] to publish all matched reports.
 
-PUBLISH_ONLY = []  # e.g., ["CCHP Executive Dashboard", "Another Report"]
+PUBLISH_ONLY = []  # e.g., ["Executive Dashboard", "Another Report"]
 
 publish_results = []
 for m in match_result.matched:

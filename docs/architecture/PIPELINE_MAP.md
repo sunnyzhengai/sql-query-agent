@@ -57,6 +57,7 @@ flowchart LR
   ops_description_cache[("ops_description_cache")]:::table
   ops_error_log[("ops_error_log")]:::table
   ops_extraction_tracking[("ops_extraction_tracking")]:::table
+  ops_fallout[("ops_fallout")]:::table
   ops_installation_errors[("ops_installation_errors")]:::table
   ops_parse_errors[("ops_parse_errors")]:::table
   ops_parse_results[("ops_parse_results")]:::table
@@ -102,6 +103,7 @@ flowchart LR
   12_ingest_semantic_models --> input_dax_expressions
   12_ingest_semantic_models --> input_metric_names
   12_ingest_semantic_models --> input_report_sources
+  12_ingest_semantic_models --> ops_fallout
   13_publish_pbi -->|enrich| gov_publish_log
   gov_feedback_events --> 10_ingest_agent_events
   gov_feedback_events --> admin
@@ -147,6 +149,7 @@ flowchart LR
   input_sql_sources --> 01_install
   input_sql_sources --> 02_parse
   input_sql_sources --> 06_validate
+  input_sql_sources --> 12_ingest_semantic_models
   manage_stewards --> gov_steward_assignments
   ops_agent_descriptions --> 07b_generate_agent_descriptions
   ops_agent_descriptions --> 08_publish_collibra
@@ -157,6 +160,7 @@ flowchart LR
   ops_error_log --> 02_parse
   ops_error_log --> admin
   ops_extraction_tracking --> 00c_ingest_sql_live
+  ops_fallout --> admin
   ops_installation_errors --> data_agent
   ops_parse_errors --> 06_validate
   ops_parse_errors --> data_agent

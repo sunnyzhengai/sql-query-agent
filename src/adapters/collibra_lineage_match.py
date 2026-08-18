@@ -12,8 +12,8 @@ Two matching tiers, best first:
    recorded the actual TMDL-derived report for the metric, match the
    Collibra asset by that name, case-insensitively. Deterministic;
    score 1.0.
-2. _PBI-suffix heuristic (legacy fallback) — V_CCHP_SomeReport_PBI /
-   USP_CCHP_Some_Report_PBI: strip prefix + company segment + suffix,
+2. _PBI-suffix heuristic (legacy fallback) — V_ACME_SomeReport_PBI /
+   USP_ACME_Some_Report_PBI: strip prefix + company segment + suffix,
    fuzzy-match the middle against Collibra report names. Only names
    ending in _PBI are considered; min_score gates acceptance.
 
@@ -64,11 +64,11 @@ def extract_match_key(object_name: str) -> str | None:
     """Extract the matchable middle part from a _PBI-suffixed object name.
 
     Examples:
-        V_CCHP_SomeReport_PBI          → "somereport"
-        V_CCHP_Some_Report_Name_PBI    → "some report name"
-        USP_CCHP_Some_Report_PBI       → "some report"
-        USP_COOK_ED_Sepsis_PBI         → "ed sepsis"
-        V_CCHP_340B_Charges_PBI        → "340b charges"
+        V_ACME_SomeReport_PBI          → "somereport"
+        V_ACME_Some_Report_Name_PBI    → "some report name"
+        USP_ACME_Some_Report_PBI       → "some report"
+        USP_ACME_ED_Sepsis_PBI         → "ed sepsis"
+        V_ACME_340B_Charges_PBI        → "340b charges"
         SomeOtherProc                  → None (no _PBI suffix)
 
     Returns:
@@ -91,7 +91,7 @@ def extract_match_key(object_name: str) -> str | None:
     # Strip leading V_ or USP_ prefix
     name = re.sub(r"^(V|USP)_", "", name, flags=re.IGNORECASE)
 
-    # Strip the company prefix (first segment — e.g., CCHP, COOK, etc.)
+    # Strip the company prefix (first segment — e.g., ACME, COOK, etc.)
     parts = name.split("_", 1)
     if len(parts) > 1:
         name = parts[1]
@@ -201,7 +201,7 @@ class CollibraLineageMatcher:
         """Match a single proc/view name to a Collibra PBI Report asset.
 
         Args:
-            object_name: The proc/view name (e.g., V_CCHP_SomeReport_PBI).
+            object_name: The proc/view name (e.g., V_ACME_SomeReport_PBI).
             object_type: "VIEW" or "SQL_STORED_PROCEDURE".
             exact_report_name: The TMDL-derived report name for this
                 object (from input_metric_names), when known. Matched

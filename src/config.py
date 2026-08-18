@@ -79,9 +79,10 @@ class SemanticModelsConfig(BaseModel):
     # devops_git: Azure DevOps repos (DevOpsTmdlClient).
     source_type: Literal["workspace", "folder", "devops_git"] = "workspace"
     # Reports commonly live across several PBI workspaces (field find
-    # 2026-08-18). ORDER MATTERS: when reports in different workspaces
-    # execute the same metric, the earlier workspace's report names it
-    # (the rest are listed for steward review — never silently deduped).
+    # 2026-08-18). Naming is refuse-over-guess (amended same day): a
+    # metric consumed by differently-titled reports gets NO derived name
+    # (all consumers listed for steward review); same-title workspace
+    # copies name it. List order only fixes the listing order.
     workspace_ids: "list[str]" = []
     workspace_id: str = ""  # single-value sugar; empty = current workspace
     folder_path: str = ""

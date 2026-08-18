@@ -10,6 +10,38 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.17.0] - 2026-08-18
+
+### Added — the estate-scale recovery release (four handoffs + ADR 0041)
+- M mini-parser + shape census (src/mquery/): tokenizer + recursive
+  descent over the needed M subset; shape signatures carry argument
+  KINDS; anonymization is whitelist-based (CI leak test — customer
+  identifiers cannot appear in a signature). SHAPE_REGISTRY is the
+  declarative authority; every supported shape must have a fixture that
+  classifies AND extracts. Census runs as 12's pre-step and prints the
+  coverage statement up front.
+- ops_fallout contract table: every stage that drops an entity writes a
+  reason row (stage, entity_id, reason_code, contract_id). 12 fully
+  retrofitted (partition drops, naming refusals, collector skips) with
+  a per-run funnel print. The 174-silent-models class is impossible.
+- TMDL pattern-breakers fixed for Sql.Database AND Odbc.Query:
+  parameter/quoted-identifier servers, 3-part bracketed EXEC targets,
+  string-concatenated Query values (first-literal-chunk extraction),
+  Query field at any record position, Schema/Item navigation. ~430
+  files recoverable at the reference estate.
+
+### Changed
+- Business-name derivation INVERTED to proc-keyed: a proc consumed by
+  one report (or same-titled workspace copies) inherits the title;
+  differently-titled consumers refuse with a fallout row — supersedes
+  the 1.16.0 first-workspace naming verdict. Identity case-folded;
+  corpus membership replaces the TMDL Kind filter (views-as-Table now
+  name; DirectLake/InlineSQL self-exclude).
+- Test fixtures and docstring examples de-identified (work identifiers
+  swept from parser/matcher fixtures and notebook examples).
+
+---
+
 ## [1.16.1] - 2026-08-18
 
 ### Fixed — the small-fixes sweep (five handoffs, all field-driven)

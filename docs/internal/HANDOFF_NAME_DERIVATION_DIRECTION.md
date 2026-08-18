@@ -1,5 +1,8 @@
 # Handoff — business-name derivation should be proc-keyed, not report-keyed
 
+> **Status (2026-08-18, dev session): implemented in 1.17.0.**
+> Inverted: derivation is proc-keyed; a proc consumed by exactly one report — or by several reports ALL carrying the same title (workspace copies) — inherits the title. Differently-titled consumers REFUSE with a listed fallout row (multi_report_consumer); this supersedes the 1.16.0 first-workspace verdict as you flagged. Amendment 1: identity is case-folded. Amendment 2: corpus MEMBERSHIP (input_sql_sources.metric_id, folded; corpus casing wins) replaces the Kind filter when the corpus exists — views-as-Table now name; DirectLake tables and InlineSQL self-exclude. NOT done: routing InlineSQL text through ScriptDom for table lineage (amendment 2 item 4) — real feature, file it when wanted.
+
 **From:** review session, 2026-08-18 (first full-estate 12 run at work:
 601 models, 1065 SQL sources, 3646 DAX expressions — but only 228 names
 derived). **To:** dev session.
