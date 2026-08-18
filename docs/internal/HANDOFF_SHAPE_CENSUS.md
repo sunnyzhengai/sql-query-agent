@@ -41,3 +41,26 @@ Pattern gaps already filed (brackets/param-server/concat) land first as
 ordinary fixes; census+registry is the structural layer that makes the
 NEXT gap a data point instead of an incident. ADR-worthy — the shape
 registry is a peer of TABLE_REGISTRY and INTEGRATION_REGISTRY.
+
+## Amendment (2026-08-18, Sunny's two challenges — both upheld)
+
+1. **No regex. The foundation is a minimal M expression parser.** The
+   existing patterns 1-5 ARE regex over M text — that is the root cause
+   of the field misses, and adding patterns extends the disease. Build a
+   tokenizer + small recursive-descent over the needed M subset (let,
+   function application, string concatenation, records,
+   identifiers/parameters); census classifies the AST, shape handlers
+   walk it. Native-parsers doctrine applied to layer three. (Microsoft's
+   powerquery-parser is a grammar reference.) The filed regex pattern
+   fixes (brackets/param/concat) may still ship as a stopgap; the parser
+   retires them.
+2. **Lineage QA is deterministic reconciliation, not an agent:**
+   (a) membership: extracted (schema, object) must exist in the parsed
+   corpus / source catalog; (b) COLUMN RECONCILIATION: TMDL carries each
+   report table's column list (columnIdentities/sourceColumn) and
+   ScriptDom knows each proc's output columns — overlap score per
+   lineage edge = objective cross-layer correctness signal; low overlap
+   flags suspect edges; (c) per-shape known-answer fixtures in CI;
+   (d) optional LLM triage ONLY for flagged residue and unknown-shape
+   classification proposals — judgment assistant, never authority
+   (ADR 0032: deterministic core, LLM edges).
