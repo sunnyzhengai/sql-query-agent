@@ -37,6 +37,7 @@ class TmdlFile:
     content: str
     repo_name: str = ""
     semantic_model_path: str = ""
+    workspace_name: str = ""  # display name (journey dashboard axes)
 
 
 def _skip(table_name: str) -> bool:
@@ -101,6 +102,17 @@ class FabricWorkspaceTmdlSource:
         resp.raise_for_status()
         return resp.json()
 
+    def get_workspace_name(self) -> str:
+        """Workspace display name — one API call per workspace per run
+        (journey-dashboard decision (b): axes use NAMES, never ids).
+        Tolerant: on any failure the id stands in, loudly noted."""
+        try:
+            payload = self._get_json(
+                f"{self.BASE_URL}/workspaces/{self.workspace_id}")
+            return payload.get("displayName") or self.workspace_id
+        except Exception:  # noqa: BLE001 — name is display sugar, id is identity
+            return self.workspace_id
+
     def list_semantic_models(self) -> "list[dict]":
         url = f"{self.BASE_URL}/workspaces/{self.workspace_id}/semanticModels"
         models: "list[dict]" = []
@@ -153,6 +165,7 @@ class FabricWorkspaceTmdlSource:
         """
         files: "list[TmdlFile]" = []
         self.skipped: "list[tuple[str, str, str]]" = []
+        self.workspace_name = self.get_workspace_name()
         for model in self.list_semantic_models():
             report_name = model.get("displayName", "")
             try:
@@ -182,6 +195,7 @@ class FabricWorkspaceTmdlSource:
                     table_name=table_name,
                     content=content,
                     semantic_model_path=f"workspace:{self.workspace_id}/{model['id']}",
+                    workspace_name=self.workspace_name,
                 ))
         return files
 
@@ -212,6 +226,7 @@ def collect_from_workspaces(
         ws_files = source.collect()
         report[ws_id] = {
             "files": len(ws_files),
+            "name": getattr(source, "workspace_name", ws_id),
             "skipped": list(getattr(source, "skipped", [])),
         }
         files.extend(ws_files)

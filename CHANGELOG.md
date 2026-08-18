@@ -10,6 +10,25 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.23.0] - 2026-08-18
+
+### Added — admin journey dashboard tables (family G's UI half)
+- ops_metric_journey: one row per metric, stage columns left-to-right
+  ARE the pipeline (loaded/parsed+error_type/in_graph/card/
+  described_status/report ties/published flags). Metric-grain always —
+  junctions never multiply the driving grain.
+- ops_report_journey: report-grain twin — workspace NAME, proc count +
+  list, tie_kind with corpus membership.
+- Workspace display names: the collector fetches them (one call per
+  workspace per run); input_report_sources carries workspace_name; all
+  chart axes use names, never ids.
+- Unified error vocabulary: journey shares the funnel's codes
+  (rejected_by_agent; parse error_category pass-through).
+- Reconciliation tests pin loaded = parsed + errored and both grains;
+  RUNBOOK_JOURNEY_DASHBOARD.md gives the four-visual build steps.
+
+---
+
 ## [1.22.0] - 2026-08-18
 
 ### Changed — century-phase renumbering (Sunny's full scheme)

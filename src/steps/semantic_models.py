@@ -116,6 +116,7 @@ def semantic_models_step(
                 "repo_name": f.repo_name,
                 "semantic_model_path": f.semantic_model_path,
                 "extracted_at": scan_timestamp,
+                "workspace_name": f.workspace_name,
             }
             report_source_rows.append(row)
             sources_by_report[f.report_name].append(row)

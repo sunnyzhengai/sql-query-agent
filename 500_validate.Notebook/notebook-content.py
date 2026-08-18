@@ -403,3 +403,62 @@ spark.createDataFrame(
     .write.format("delta").mode("append").saveAsTable("ops_funnel")
 print(f"[+] ops_funnel: {len(_funnel)} stage rows appended "
       "(each fell-off links to ops_fallout / ops_parse_errors rows)")
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+# %% Cell 8: Journey tables — one row, the whole pipeline (family G)
+# Metric-grain + report-grain, joins over contract tables ONLY; the
+# dashboard reads these and computes nothing (accuracy contract).
+from src.governance.journey import metric_journey_rows, report_journey_rows
+from src.schemas import METRIC_JOURNEY, REPORT_JOURNEY
+
+_sql_sources = [r.asDict() for r in
+                spark.table(config.lakehouse.sql_sources)
+                .select("metric_id", "source_type", "source_schema").collect()]
+_validation = [r.asDict() for r in spark.table("ops_pipeline_validation").collect()]
+_parse_errs = [r.asDict() for r in
+               spark.table("ops_parse_errors")
+               .select("metric_id", "error_category").collect()]
+_cards2 = ([r.asDict() for r in
+            spark.table("output_metric_logic")
+            .select("metric_id", "calculation_logic").collect()]
+           if spark.catalog.tableExists("output_metric_logic") else [])
+_descs = ([r.asDict() for r in spark.table("ops_agent_descriptions").collect()]
+          if spark.catalog.tableExists("ops_agent_descriptions") else [])
+_report_srcs = ([r.asDict() for r in spark.table("input_report_sources").collect()]
+                if spark.catalog.tableExists("input_report_sources") else [])
+_pub_log = ([r.asDict() for r in spark.table("gov_publish_log").collect()]
+            if spark.catalog.tableExists("gov_publish_log") else [])
+
+journey = metric_journey_rows(
+    now, _sql_sources, _validation, _parse_errs, _cards2, _descs,
+    _report_srcs, _pub_log)
+spark.createDataFrame(
+    [tuple(r[c] for c, _, _ in METRIC_JOURNEY["columns"]) for r in journey],
+    schema=to_spark_schema(METRIC_JOURNEY)) \
+    .write.format("delta").mode("overwrite").option("overwriteSchema", "true") \
+    .saveAsTable("ops_metric_journey")
+tied = sum(1 for r in journey if r["report_count"])
+print(f"\nops_metric_journey: {len(journey)} metrics "
+      f"({tied} tied to PBI reports)")
+
+report_journey = report_journey_rows(
+    now, _report_srcs,
+    corpus_metric_ids={s["metric_id"] for s in _sql_sources})
+if report_journey:
+    spark.createDataFrame(
+        [tuple(r[c] for c, _, _ in REPORT_JOURNEY["columns"])
+         for r in report_journey],
+        schema=to_spark_schema(REPORT_JOURNEY)) \
+        .write.format("delta").mode("overwrite") \
+        .option("overwriteSchema", "true").saveAsTable("ops_report_journey")
+print(f"ops_report_journey: {len(report_journey)} reports")
+print("\nThe journey dashboard reads these two tables + ops_funnel — "
+      "see docs/internal/RUNBOOK_JOURNEY_DASHBOARD.md")

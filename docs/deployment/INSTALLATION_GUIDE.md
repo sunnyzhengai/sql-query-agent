@@ -488,7 +488,12 @@ you can check the current state with:
    models, or upload a manual metric_id,business_name CSV. Then re-run
    300 → 400 (and 800 if you use the graph model).
 
-3. **Fallout history** (`ops_fallout`) — the queryable record of every
+3. **Publish history** (`gov_publish_log`) — the durable record of
+   every push to an external catalog. Absent until a publisher runs;
+   remediation: run a publisher (900/910/920). 500's journey table
+   then shows per-metric published flags.
+
+4. **Fallout history** (`ops_fallout`) — the queryable record of every
    dropped entity (why a file, report, or metric fell out of a stage).
    Absent until the first fallout-writing stage runs; remediation: run
    060_ingest_semantic_models (or any fallout-writing stage). 06's

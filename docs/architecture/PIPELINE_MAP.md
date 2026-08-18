@@ -60,11 +60,13 @@ flowchart LR
   ops_fallout[("ops_fallout")]:::table
   ops_funnel[("ops_funnel")]:::table
   ops_installation_errors[("ops_installation_errors")]:::table
+  ops_metric_journey[("ops_metric_journey")]:::table
   ops_parse_errors[("ops_parse_errors")]:::table
   ops_parse_results[("ops_parse_results")]:::table
   ops_parse_successes[("ops_parse_successes")]:::table
   ops_phi_findings[("ops_phi_findings")]:::table
   ops_pipeline_validation[("ops_pipeline_validation")]:::table
+  ops_report_journey[("ops_report_journey")]:::table
   ops_setup_completeness[("ops_setup_completeness")]:::table
   output_metric_logic[("output_metric_logic")]:::table
   output_metric_twins[("output_metric_twins")]:::table
@@ -97,7 +99,9 @@ flowchart LR
   400_build_metric_logic --> output_metric_twins
   500_validate --> ops_build_summary
   500_validate --> ops_funnel
+  500_validate --> ops_metric_journey
   500_validate --> ops_pipeline_validation
+  500_validate --> ops_report_journey
   500_validate -->|enrich| ops_fallout
   600_generate_descriptions --> ops_description_cache
   600_generate_descriptions -->|enrich| graph_nodes
@@ -114,6 +118,7 @@ flowchart LR
   gov_feedback_events --> 950_ingest_agent_events
   gov_feedback_events --> admin
   gov_feedback_events --> usage
+  gov_publish_log --> 500_validate
   gov_publish_log --> admin
   gov_steward_assignments --> 300_build_graph
   gov_steward_assignments --> manage_stewards
@@ -172,6 +177,7 @@ flowchart LR
   ops_fallout --> admin
   ops_funnel --> admin
   ops_installation_errors --> data_agent
+  ops_metric_journey --> admin
   ops_parse_errors --> 500_validate
   ops_parse_errors --> data_agent
   ops_parse_errors --> verify_graph
@@ -182,8 +188,10 @@ flowchart LR
   ops_parse_successes --> verify_graph
   ops_phi_findings --> 200_parse
   ops_phi_findings --> 600_generate_descriptions
+  ops_pipeline_validation --> 500_validate
   ops_pipeline_validation --> admin
   ops_pipeline_validation --> data_agent
+  ops_report_journey --> admin
   ops_setup_completeness --> admin
   ops_setup_completeness --> health
   output_metric_logic --> 400_build_metric_logic

@@ -52,8 +52,10 @@ def _source(http):
 
 def test_collects_and_decodes_table_parts_only():
     http = _StubHttp(
-        get_responses=[_resp(payload={"value": [
-            {"id": "m1", "displayName": "Sepsis Compliance Dashboard"}]})],
+        get_responses=[
+            _resp(payload={"displayName": "Clinical Analytics"}),
+            _resp(payload={"value": [
+                {"id": "m1", "displayName": "Sepsis Compliance Dashboard"}]})],
         post_responses=[_resp(payload={"definition": {"parts": [
             _part("definition/tables/SepsisData.tmdl", TMDL),
             _part("definition/tables/LocalDateTable_x.tmdl", "skip me"),
@@ -67,11 +69,13 @@ def test_collects_and_decodes_table_parts_only():
     assert f.table_name == "SepsisData"
     assert f.content == TMDL
     assert f.semantic_model_path == "workspace:ws-1/m1"
+    assert f.workspace_name == "Clinical Analytics"  # decision (b): names
 
 
 def test_202_long_running_polls_until_succeeded():
     http = _StubHttp(
         get_responses=[
+            _resp(payload={"displayName": "W"}),
             _resp(payload={"value": [{"id": "m1", "displayName": "R"}]}),
             _resp(payload={"status": "Running"}),
             _resp(payload={"status": "Succeeded"}),
@@ -110,7 +114,9 @@ def test_pagination_follows_continuation():
 
 def test_rows_are_json_serializable_end_to_end():
     http = _StubHttp(
-        get_responses=[_resp(payload={"value": [{"id": "m1", "displayName": "R"}]})],
+        get_responses=[
+            _resp(payload={"displayName": "W"}),
+            _resp(payload={"value": [{"id": "m1", "displayName": "R"}]})],
         post_responses=[_resp(payload={"definition": {"parts": [
             _part("definition/tables/T.tmdl", TMDL)]}})],
     )

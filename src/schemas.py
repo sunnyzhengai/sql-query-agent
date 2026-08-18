@@ -349,7 +349,7 @@ PIPELINE_VALIDATION = {
     "owner": {"notebook": "500_validate", "module": None},
     "write_mode": "overwrite",
     "enrichers": [],
-    "consumers": ["data_agent", "admin"],
+    "consumers": ["data_agent", "admin", "500_validate"],
     "columns": [
         ("metric_id", "string", False),
         ("step1_loaded", "boolean", True),
@@ -1401,6 +1401,99 @@ FUNNEL = {
     "invariants": [],
 }
 
+METRIC_JOURNEY = {
+    "table_name": "ops_metric_journey",
+    "description": (
+        "The admin journey table (HANDOFF_ADMIN_JOURNEY_DASHBOARD): one "
+        "row per metric, stage columns left-to-right ARE the pipeline — "
+        "type/schema, loaded, parsed + error_type, in_graph, card, "
+        "described_status, report ties, published flags. Materialized by "
+        "500_validate as joins over contract tables ONLY; reconciliation "
+        "tests pin the totals so the dashboard cannot drift from the "
+        "system of record. Metric-grain, always — junctions never "
+        "multiply the driving grain."
+    ),
+    "domain": "operations",
+    "status": "active",
+    "owner": {"notebook": "500_validate",
+              "module": "src/governance/journey.py"},
+    "write_mode": "overwrite",
+    "enrichers": [],
+    "consumers": ["admin telemetry report"],
+    "columns": [
+        ("run_at", "string", False),
+        ("metric_id", "string", False),
+        ("source_type", "string", True),
+        ("source_schema", "string", True),
+        ("loaded", "boolean", False),
+        ("parsed", "boolean", False),
+        ("error_type", "string", True),
+        ("in_graph", "boolean", False),
+        ("card", "boolean", False),
+        ("described_status", "string", True),
+        ("report_count", "integer", False),
+        ("report_names", "string", True),
+        ("published_collibra", "boolean", False),
+        ("published_pbi_writeback", "boolean", False),
+    ],
+    "column_descriptions": {
+        "run_at": "500 run that materialized the row",
+        "metric_id": "The metric (input_sql_sources.metric_id)",
+        "source_type": "procedure | view (from acquisition)",
+        "source_schema": "Source schema (from acquisition)",
+        "loaded": "Present in input_sql_sources",
+        "parsed": "Parsed by 200 (ops_pipeline_validation.step2)",
+        "error_type": "Unified error code when a stage dropped it",
+        "in_graph": "Canonical node exists (step3)",
+        "card": "output_metric_logic row with calculation logic",
+        "described_status": "ok | rejected_by_agent | pending | null",
+        "report_count": "PBI reports executing this metric",
+        "report_names": "'; '-joined report list (grain rule: one row)",
+        "published_collibra": "A successful Collibra publish landed",
+        "published_pbi_writeback": "A successful PBI writeback landed",
+    },
+    "invariants": [
+        {"kind": "unique", "columns": ["metric_id"]},
+    ],
+}
+
+REPORT_JOURNEY = {
+    "table_name": "ops_report_journey",
+    "description": (
+        "Report-grain journey (the other side of the M:N tie): one row "
+        "per PBI report — workspace NAME, proc count + list, tie kind "
+        "(lineage vs corpus membership). Exploded (proc, report) pairs "
+        "stay in input_report_sources; clickthrough joins there."
+    ),
+    "domain": "operations",
+    "status": "active",
+    "owner": {"notebook": "500_validate",
+              "module": "src/governance/journey.py"},
+    "write_mode": "overwrite",
+    "enrichers": [],
+    "consumers": ["admin telemetry report"],
+    "columns": [
+        ("run_at", "string", False),
+        ("report_name", "string", False),
+        ("workspace_name", "string", True),
+        ("proc_count", "integer", False),
+        ("proc_names", "string", True),
+        ("tie_kind", "string", True),
+    ],
+    "column_descriptions": {
+        "run_at": "500 run that materialized the row",
+        "report_name": "PBI report (semantic model)",
+        "workspace_name": "Workspace display name (never the id)",
+        "proc_count": "Distinct SQL objects the report executes",
+        "proc_names": "'; '-joined schema-qualified objects",
+        "tie_kind": "lineage_in_corpus | lineage_partial_corpus | "
+                    "lineage_outside_corpus | lineage",
+    },
+    "invariants": [
+        {"kind": "unique", "columns": ["report_name"]},
+    ],
+}
+
 PUBLISH_LOG = {
     "table_name": "gov_publish_log",
     "description": (
@@ -1416,7 +1509,12 @@ PUBLISH_LOG = {
               "module": "src/governance/publish_log.py"},
     "write_mode": "append",
     "enrichers": ["910_publish_purview", "920_publish_pbi"],
-    "consumers": ["admin telemetry report"],
+    "consumers": ["admin telemetry report", "500_validate"],
+    "optional_input": True,
+    "remediation": (
+        "run a publisher (900/910/920) — absent means nothing has "
+        "been pushed to an external catalog yet"
+    ),
     "columns": [
         ("published_at", "string", False),
         ("run_id", "string", False),
@@ -1821,6 +1919,7 @@ REPORT_SOURCES = {
         ("repo_name", "string", True),
         ("semantic_model_path", "string", True),
         ("extracted_at", "string", True),
+        ("workspace_name", "string", True),
     ],
     "column_descriptions": {
         "report_name": "Report (from the .SemanticModel folder name)",
@@ -1833,6 +1932,7 @@ REPORT_SOURCES = {
         "repo_name": "DevOps repo, when the devops_git profile fetched it",
         "semantic_model_path": "Path of the .SemanticModel folder",
         "extracted_at": "Extraction timestamp (ISO)",
+        "workspace_name": "Workspace display name (journey dashboard axes)",
     },
     "invariants": [],
 }
@@ -2019,6 +2119,7 @@ TABLE_REGISTRY = {
         PARSE_RESULTS, PARSE_ERRORS, PARSE_SUCCESSES, BUILD_SUMMARY,
         PIPELINE_VALIDATION, INSTALLATION_ERRORS, AGENT_DESCRIPTIONS,
         DESCRIPTION_CACHE, SETUP_COMPLETENESS, FALLOUT, FUNNEL,
+        METRIC_JOURNEY, REPORT_JOURNEY,
         # graph
         GRAPH_NODES, GRAPH_EDGES,
         # output
