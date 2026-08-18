@@ -37,6 +37,15 @@ env-checks with file-drop ingestion" item.
    preferred instead, it cascades into docs/tests/PIPELINE_MAP — dev
    session's call, but don't renumber casually.
 
+## Naming principle (Sunny + review session, 2026-08-17)
+
+**Number the derivation, letter the acquisition.** Numbered notebooks
+(02+) = derivation: org-agnostic, rerunnable, order-meaningful. The 00
+letter family = acquisition: org-specific, route-alternative,
+event-driven (run when source material changes). Order is enforced by
+the precondition gates on STATE, not by numbering — numbers are cadence
+documentation, and acquisition has no fixed cadence.
+
 ## Source-pairing rule (same evening's finding, belongs in the guide)
 
 A source system enters as a PAIR — its SQL and its dictionary together —
