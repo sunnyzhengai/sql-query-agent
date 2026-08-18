@@ -85,3 +85,25 @@ registry is a peer of TABLE_REGISTRY and INTEGRATION_REGISTRY.
    input_report_sources carries pbi_table; report-level membership
    masks per-file failures (e.g. non-SQL tables inside parsed reports).
    The coverage report joins at file grain.
+
+## Reference field data (file-grain census, 2026-08-18, aggregates only)
+
+2013 partition files across 601 models / 5 workspaces:
+- Supported today: ~1065 (53%). By style: Odbc.DataSource 190/191
+  (99.5%); Odbc.Query 674/986 (68%); Sql.Database 189/305 (62%) —
+  navigation style solved, query-string styles fail on argument
+  variants (concat/param/brackets): argument-kind signatures proven.
+- Recoverable via filed pattern fixes: ~430 files (21%) → ~74% coverage.
+- Genuinely non-SQL (needs reason rows): ~370 (calculated 158,
+  Table.FromRows 88, Folder.Files 27, Excel 20, Snowflake 21+,
+  ActiveDirectory 2, date/list generators, ref(custom) ~31).
+- Unclassified tail (~9%): nested lets 87+, DirectLake entity split
+  (5 parsed / 7 missed — pattern 5 partially firing, autopsy wanted),
+  incremental-refresh 'query' partitions 18.
+- Anomaly for autopsy: 7 Snowflake.Databases files PRODUCED lineage rows
+  with no Snowflake pattern in the parser — verify those rows are not
+  garbage matches.
+
+This table is the acceptance target: the shipped census feature run on
+the same estate must reproduce these aggregates (at file grain, with
+argument-kind signatures and whitelist labels).
