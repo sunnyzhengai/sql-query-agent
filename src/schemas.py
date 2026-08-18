@@ -60,7 +60,7 @@ SQL_SOURCES = {
         "Customer SQL sources (stored procedures and views). One row per SQL "
         "object; identity comes from the CREATE/ALTER statement inside the "
         "definition, not the filename. TWO writers, one protocol: the manual "
-        "file path (01_install / load_sql_files) OVERWRITES the full corpus "
+        "routes (00a filedrop / 00b folders) OVERWRITE the full corpus "
         "at install; the automated extractor (extract_views — the primary "
         "customer path) MERGES incrementally by metric_id, so scheduled "
         "extractions upsert changed objects without erasing rows loaded by "
@@ -69,11 +69,11 @@ SQL_SOURCES = {
     ),
     "domain": "input",
     "status": "active",
-    "owner": {"notebook": "01_install", "module": None},
-    "utility_writers": ["load_sql_files", "00_extract_sql"],
+    "owner": {"notebook": "00a_ingest_sql_filedrop", "module": None},
+    "utility_writers": ["00b_ingest_sql_folders", "00c_ingest_sql_live"],
     "write_mode": "overwrite",
     "enrichers": [],
-    "consumers": ["01_install", "02_parse", "06_validate"],
+    "consumers": ["01_install", "02_parse", "06_validate", "00b_ingest_sql_folders"],
     "columns": [
         ("metric_id", "string", False),
         ("name", "string", False),
@@ -108,11 +108,11 @@ DICT_TABLES = {
     ),
     "domain": "input",
     "status": "active",
-    "owner": {"notebook": "01_install", "module": None},
-    "utility_writers": ["load_clarity_dictionary", "load_caboodle_dictionary"],
+    "owner": {"notebook": "00d_dict_clarity", "module": None},
+    "utility_writers": ["00e_dict_caboodle"],
     "write_mode": "overwrite",
     "enrichers": [],
-    "consumers": ["01_install", "03_build_graph", "06_validate", "load_caboodle_dictionary", "export_test_fixtures"],
+    "consumers": ["01_install", "03_build_graph", "06_validate", "00e_dict_caboodle", "export_test_fixtures"],
     "columns": [
         ("TABLE_NAME", "string", False),
         ("DESCRIPTION", "string", True),
@@ -138,11 +138,11 @@ DICT_COLUMNS = {
     ),
     "domain": "input",
     "status": "active",
-    "owner": {"notebook": "01_install", "module": None},
-    "utility_writers": ["load_clarity_dictionary", "load_caboodle_dictionary"],
+    "owner": {"notebook": "00d_dict_clarity", "module": None},
+    "utility_writers": ["00e_dict_caboodle"],
     "write_mode": "overwrite",
     "enrichers": [],
-    "consumers": ["01_install", "03_build_graph", "load_caboodle_dictionary", "export_test_fixtures"],
+    "consumers": ["03_build_graph", "00e_dict_caboodle", "export_test_fixtures"],
     "columns": [
         ("TABLE_NAME", "string", False),
         ("COLUMN_NAME", "string", False),
@@ -1106,10 +1106,10 @@ TRACKING = {
     ),
     "domain": "operations",
     "status": "active",
-    "owner": {"notebook": "00_extract_sql", "module": "src/extractor/tracker.py"},
+    "owner": {"notebook": "00c_ingest_sql_live", "module": "src/extractor/tracker.py"},
     "write_mode": "overwrite",
     "enrichers": [],
-    "consumers": ["00_extract_sql"],
+    "consumers": ["00c_ingest_sql_live"],
     "columns": [
         ("object_id", "string", False),
         ("schema_name", "string", False),

@@ -3,7 +3,7 @@
   "metadata": {
     "type": "Notebook",
     "displayName": "01_install",
-    "description": "New notebook"
+    "description": "Installation verification: environment, packages, DLL, config, error-seed, then a state-driven ingestion report (which 00-routes are satisfied). Loads nothing itself."
   },
   "config": {
     "version": "2.0",

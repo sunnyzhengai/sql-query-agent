@@ -1,5 +1,20 @@
 # Handoff — ingestion routes: verification-only 01 + peer route notebooks
 
+> **Status (2026-08-17, dev session): items 1–5 implemented in 1.14.0.**
+> 01_install is verification-only (env checks; error-seed kept; final
+> cell reports ingestion STATE from the tables with route pointers; no
+> folder FATALs — sql_input/dictionary are informational). Routes:
+> 00a_ingest_sql_filedrop (from 01's load cell, dup-identity gate
+> intact), 00b_ingest_sql_folders (promoted loader, loud partial-load
+> refusal), 00c_ingest_sql_live (renamed from 00_extract_sql, same
+> logicalId so the Fabric item renames in place), 00d_dict_clarity
+> (formatted-CSV cell + raw-export cell, dup gates intact),
+> 00e_dict_caboodle (merge, wipe-guard intact). Old loader scripts
+> retired. Registry owners/writers rewired (writers ground truth
+> enforced; contracts scanner glob widened to see lettered notebooks).
+> INSTALLATION_GUIDE Step 5a is the route decision table + the
+> source-pairing rule. 00a-e lettering kept — no renumbering (item 5).
+
 **From:** review session, 2026-08-17. **To:** dev session.
 **Evidence:** during the work-copy setup, Sunny was pulled back to
 01_install THREE times despite explicit skip-it guidance — its cell-0

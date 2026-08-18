@@ -284,19 +284,38 @@ SQL; everything else is cached.
 
 Run notebooks in order. **Wait for each to complete before starting the next.**
 
-### 5a: Install & validate setup
+### 5a: Choose your ingestion route(s) and load
+
+Ingestion is a family of peer route notebooks (the `00` letter family) —
+pick the ones matching where your material lives. **A source system
+enters as a PAIR: its SQL and its dictionary together** — otherwise
+06's dictionary-coverage gate blocks, by design.
+
+| Your situation | SQL route | Dictionary route |
+|---|---|---|
+| .sql files in one folder (`Files/sql_input/`) | `00a_ingest_sql_filedrop` | `00d_dict_clarity` (Cell 1: formatted CSVs) |
+| .sql files spread across folders/workspaces | `00b_ingest_sql_folders` | `00d_dict_clarity` |
+| Live SQL server (gateway / Azure / Fabric) | `00c_ingest_sql_live` | `00d_dict_clarity` (Cell 2: raw export) |
+| Second dictionary source to merge on top | — | `00e_dict_caboodle` |
+
+Acquisition routes are event-driven: re-run one when its source
+material changes. Numbered notebooks (`01`–`13`) are derivation —
+route-agnostic and rerunnable.
+
+### 5a-2: Verify the installation
 
 1. Open `01_install`
 2. Click **Run all**
 
-This one notebook validates the Environment and DLL, creates all Delta tables,
-loads your SQL files and dictionary CSVs, and prints a PASS/FAIL summary.
-It is idempotent — safe to re-run; it will not destroy existing data.
+01 verifies the environment (packages, DLL, config), seeds the error
+knowledge base, and reports **ingestion state from the tables
+themselves** — which routes are satisfied, which are pending and what
+to run. It loads nothing itself and never assumes a route.
 
 **Verification:**
-- [ ] PASS summary with no errors (any FAIL line names the exact file or setting to fix)
-- [ ] `input_sql_sources` row count matches your .sql file count
-- [ ] `input_dict_tables` / `input_dict_columns` row counts match your CSVs
+- [ ] Environment verification PASSED
+- [ ] Ingestion state shows all three input tables present with
+      expected row counts (any ABSENT line names the routes to run)
 
 ### 5b: Parse SQL files
 
@@ -545,7 +564,7 @@ Pick the profile matching where your SQL lives:
 
 ### Run the extraction
 
-1. Open the **00_extract_sql** notebook (a numbered pipeline notebook,
+1. Open the **00c_ingest_sql_live** notebook (a pipeline notebook,
    synced like the rest) and attach your Lakehouse + Environment if not
    already attached.
 2. Run cells 1–5. **Stop at cell 5** and review the NEW / CHANGED /
@@ -556,7 +575,7 @@ Pick the profile matching where your SQL lives:
    full `CREATE PROCEDURE` / `CREATE VIEW` text; the parser handles the
    wrappers natively.
 4. Run notebooks 02 → 03 → 04 → 05 → 06 as in Step 5.
-5. To keep the catalog current, re-run 00_extract_sql + 02→06 on your
+5. To keep the catalog current, re-run 00c_ingest_sql_live + 02→06 on your
    change cadence (weekly is typical). Only new and changed objects are
    re-loaded; nothing loaded manually is erased (upsert by `metric_id`).
 

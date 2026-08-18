@@ -12,7 +12,11 @@ consumers (notebook reads are verified against code by the contract tests).
 
 ```mermaid
 flowchart LR
-  00_extract_sql["00_extract_sql"]:::notebook
+  00a_ingest_sql_filedrop["00a_ingest_sql_filedrop"]:::notebook
+  00b_ingest_sql_folders["00b_ingest_sql_folders"]:::notebook
+  00c_ingest_sql_live["00c_ingest_sql_live"]:::notebook
+  00d_dict_clarity["00d_dict_clarity"]:::notebook
+  00e_dict_caboodle["00e_dict_caboodle"]:::notebook
   01_install["01_install"]:::notebook
   02_parse["02_parse"]:::notebook
   03_build_graph["03_build_graph"]:::notebook
@@ -30,9 +34,6 @@ flowchart LR
   eventhouse_semantic_search["eventhouse_semantic_search"]:::notebook
   export_test_fixtures["export_test_fixtures"]:::notebook
   health["health"]:::notebook
-  load_caboodle_dictionary["load_caboodle_dictionary"]:::notebook
-  load_clarity_dictionary["load_clarity_dictionary"]:::notebook
-  load_sql_files["load_sql_files"]:::notebook
   manage_stewards["manage_stewards"]:::notebook
   orchestrator_core["orchestrator_core"]:::notebook
   usage["usage"]:::notebook
@@ -67,11 +68,14 @@ flowchart LR
   admin{{admin}}:::actor
   collibra_adapter{{collibra_adapter}}:::actor
   data_agent{{data_agent}}:::actor
-  00_extract_sql --> ops_extraction_tracking
-  00_extract_sql -.-> input_sql_sources
-  01_install --> input_dict_columns
-  01_install --> input_dict_tables
-  01_install --> input_sql_sources
+  00a_ingest_sql_filedrop --> input_sql_sources
+  00b_ingest_sql_folders -.-> input_sql_sources
+  00c_ingest_sql_live --> ops_extraction_tracking
+  00c_ingest_sql_live -.-> input_sql_sources
+  00d_dict_clarity --> input_dict_columns
+  00d_dict_clarity --> input_dict_tables
+  00e_dict_caboodle -.-> input_dict_columns
+  00e_dict_caboodle -.-> input_dict_tables
   01_install --> ops_installation_errors
   02_parse --> ops_error_log
   02_parse --> ops_parse_errors
@@ -126,26 +130,21 @@ flowchart LR
   graph_nodes --> manage_stewards
   graph_nodes --> verify_graph
   input_dax_expressions --> 03_build_graph
-  input_dict_columns --> 01_install
+  input_dict_columns --> 00e_dict_caboodle
   input_dict_columns --> 03_build_graph
   input_dict_columns --> export_test_fixtures
-  input_dict_columns --> load_caboodle_dictionary
+  input_dict_tables --> 00e_dict_caboodle
   input_dict_tables --> 01_install
   input_dict_tables --> 03_build_graph
   input_dict_tables --> 06_validate
   input_dict_tables --> export_test_fixtures
-  input_dict_tables --> load_caboodle_dictionary
   input_metric_names --> 03_build_graph
   input_metric_names --> collibra_lineage_match
   input_report_sources --> 03_build_graph
+  input_sql_sources --> 00b_ingest_sql_folders
   input_sql_sources --> 01_install
   input_sql_sources --> 02_parse
   input_sql_sources --> 06_validate
-  load_caboodle_dictionary -.-> input_dict_columns
-  load_caboodle_dictionary -.-> input_dict_tables
-  load_clarity_dictionary -.-> input_dict_columns
-  load_clarity_dictionary -.-> input_dict_tables
-  load_sql_files -.-> input_sql_sources
   manage_stewards --> gov_steward_assignments
   ops_agent_descriptions --> 08_publish_collibra
   ops_agent_descriptions --> collibra_adapter
@@ -153,7 +152,7 @@ flowchart LR
   ops_description_cache --> 07_generate_descriptions
   ops_error_log --> 02_parse
   ops_error_log --> admin
-  ops_extraction_tracking --> 00_extract_sql
+  ops_extraction_tracking --> 00c_ingest_sql_live
   ops_installation_errors --> data_agent
   ops_parse_errors --> 06_validate
   ops_parse_errors --> data_agent

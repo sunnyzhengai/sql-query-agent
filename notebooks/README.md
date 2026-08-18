@@ -11,9 +11,6 @@ ad hoc.
 ```
 notebooks/
 ├── data_loading/          ← "Step 00": load org inputs (run once per org, before 01–11)
-│   ├── load_clarity_dictionary.py  — Clarity dictionary CSVs → input_dict_tables/_columns
-│   ├── load_caboodle_dictionary.py — Caboodle variant of the same
-│   ├── load_sql_files.py           — .sql files → input_sql_sources
 │
 ├── utilities/             ← Operational tools (run as needed)
 │   ├── ast_explorer_cell.py         — Explore a proc's ScriptDom AST (paste into 02_parse)

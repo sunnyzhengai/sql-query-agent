@@ -29,45 +29,31 @@
 
 # CELL ********************
 
-"""Fabric Notebook: One-Click Installation & Setup
+"""Fabric Notebook: Installation Verification
 
-Run this FIRST before any other notebook. It:
-1. Validates the Fabric Environment is correctly attached
-2. Validates the ScriptDom DLL is in the right place
-3. Loads SQL files from sql_input/ into input_sql_sources Delta table
-4. Loads dictionary CSVs from dictionary/ into input_dict_tables/input_dict_columns
-5. Creates all Delta table schemas
-6. Seeds the installation_errors knowledge base
-7. Validates everything is consistent
-8. Prints a clear PASS/FAIL summary
+Run FIRST on a new install and any time state is unclear. It verifies
+the ENVIRONMENT (library, packages, pythonnet, ScriptDom DLL, config),
+seeds the error knowledge base, then reports INGESTION STATE from the
+tables themselves — which acquisition routes (00a-00e) have satisfied
+their contracts and which still need running. It never assumes a route
+and never loads data itself (that is what the 00-family routes do).
 
-Safe to re-run — idempotent. Will not destroy existing data.
-
-Prerequisites:
-  - Fabric Environment 'sql-logic-env' attached to this notebook
-  - Lakehouse attached as default
-  - Files uploaded to Files/sql-query-agent/:
-      libs/Microsoft.SqlServer.TransactSql.ScriptDom.dll
-      sql_input/*.sql
-      dictionary/dict_tables.csv
-      dictionary/dict_columns.csv
-      org_config.yaml
+Safe to re-run — idempotent, read-only except the error seed.
 """
 
-# %% Cell 0: Environment validation
+# %% Cell 0: Environment verification (route-independent)
 import os
 import sys
 
 print("=" * 60)
-print("SQL Intelligence Agent — Installation & Setup")
+print("Installation Verification")
 print("=" * 60)
 
-# --- Check 1: Can we import the product library? ---
+# --- Check 1: product library ---
 try:
     import src
     print(f"\n[+] Product library loaded: v{src.__version__}")
 except ImportError:
-    # Fallback for non-wheel deployment
     sys.path.insert(0, "/lakehouse/default/Files/sql-query-agent")
     try:
         import src
@@ -76,9 +62,9 @@ except ImportError:
         print("\n[X] FATAL: Cannot import 'src' package.")
         print("    Either upload the .whl to the Fabric Environment,")
         print("    or ensure src/ is at Files/sql-query-agent/src/")
-        raise SystemExit("Installation cannot proceed.")
+        raise SystemExit("Verification cannot proceed.")
 
-# --- Check 2: Required Python packages ---
+# --- Check 2: required Python packages ---
 missing_packages = []
 for pkg_name, import_name in [
     ("pydantic", "pydantic"),
@@ -90,13 +76,11 @@ for pkg_name, import_name in [
         __import__(import_name)
     except ImportError:
         missing_packages.append(pkg_name)
-
 if missing_packages:
     print(f"\n[X] FATAL: Missing Python packages: {', '.join(missing_packages)}")
-    print("    Add these to your Fabric Environment → External repositories → Add library")
-    raise SystemExit("Installation cannot proceed.")
-else:
-    print("[+] All required Python packages installed")
+    print("    Add these to your Fabric Environment -> External repositories -> Add library")
+    raise SystemExit("Verification cannot proceed.")
+print("[+] All required Python packages installed")
 
 # --- Check 3: pythonnet ---
 try:
@@ -109,8 +93,8 @@ try:
     print("[+] pythonnet loaded successfully")
 except ImportError:
     print("[X] FATAL: pythonnet not installed.")
-    print("    Add 'pythonnet' version 3.0.1 to Fabric Environment → External repositories")
-    raise SystemExit("Installation cannot proceed.")
+    print("    Add 'pythonnet' version 3.0.1 to Fabric Environment -> External repositories")
+    raise SystemExit("Verification cannot proceed.")
 
 # --- Check 4: ScriptDom DLL ---
 DLL_PATH = "/lakehouse/default/Files/sql-query-agent/libs/Microsoft.SqlServer.TransactSql.ScriptDom.dll"
@@ -121,8 +105,8 @@ if os.path.exists(DLL_PATH):
 else:
     print(f"[X] FATAL: ScriptDom DLL not found at: {DLL_PATH}")
     print("    Download from: https://www.nuget.org/packages/Microsoft.SqlServer.TransactSql.ScriptDom")
-    print("    Rename .nupkg → .zip, extract, upload lib/netstandard2.0/*.dll to Files/sql-query-agent/libs/")
-    raise SystemExit("Installation cannot proceed.")
+    print("    Rename .nupkg -> .zip, extract, upload lib/netstandard2.0/*.dll to Files/sql-query-agent/libs/")
+    raise SystemExit("Verification cannot proceed.")
 
 # --- Check 5: org_config.yaml ---
 CONFIG_PATH = "/lakehouse/default/Files/sql-query-agent/org_config.yaml"
@@ -133,32 +117,23 @@ if os.path.exists(CONFIG_PATH):
         print(f"[+] Configuration loaded: org = '{config.org.name}'")
     except Exception as e:  # noqa: BLE001 — any config defect is FATAL with the message
         print(f"[X] FATAL: org_config.yaml is invalid: {e}")
-        raise SystemExit("Installation cannot proceed.")
+        raise SystemExit("Verification cannot proceed.")
 else:
     print(f"[X] FATAL: org_config.yaml not found at: {CONFIG_PATH}")
     print("    Upload org_config.yaml to Files/sql-query-agent/ (NOT in a subfolder)")
-    raise SystemExit("Installation cannot proceed.")
+    raise SystemExit("Verification cannot proceed.")
 
-# --- Check 6: File folders exist ---
+# --- Check 6: folders (INFORMATIONAL — folders belong to specific routes) ---
 BASE = "/lakehouse/default/Files/sql-query-agent"
-required_folders = {
-    "libs": f"{BASE}/libs",
-    "sql_input": f"{BASE}/sql_input",
-    "dictionary": f"{BASE}/dictionary",
-}
-for name, path in required_folders.items():
+for name, route in [("sql_input", "route 00a"), ("dictionary", "route 00d Cell 1")]:
+    path = f"{BASE}/{name}"
     if os.path.isdir(path):
         file_count = len([f for f in os.listdir(path) if not f.startswith(".")])
-        print(f"[+] Folder {name}/: {file_count} files")
+        print(f"[+] Folder {name}/: {file_count} files (used by {route})")
     else:
-        print(f"[X] FATAL: Folder not found: {path}")
-        print("    Create this folder in your Lakehouse under Files/sql-query-agent/")
-        raise SystemExit("Installation cannot proceed.")
+        print(f"[i] Folder {name}/ absent — only needed for {route}")
 
-print("\n" + "=" * 60)
-print("Environment validation PASSED — proceeding to data loading")
-print("=" * 60)
-
+print("\n[+] Environment verification PASSED")
 
 # METADATA ********************
 
@@ -170,180 +145,7 @@ print("=" * 60)
 # CELL ********************
 
 
-# %% Cell 1: Load SQL files into Delta table
-print("\n--- Loading SQL files ---")
-
-from src.parser.identity import (
-    extract_object_identity,
-    find_duplicate_identities,
-    normalize_sql_text,
-)
-
-SQL_DIR = "/lakehouse/default/Files/sql-query-agent/sql_input/"
-sql_rows = []
-identity_files = []
-skipped = []
-
-for root, dirs, files in os.walk(SQL_DIR):
-    for fname in sorted(files):
-        if not fname.endswith(".sql"):
-            continue
-        filepath = os.path.join(root, fname)
-        try:
-            with open(filepath, encoding="utf-8-sig") as f:
-                sql_content = normalize_sql_text(f.read())
-            schema, obj_name, source_type = extract_object_identity(sql_content)
-            if schema and obj_name:
-                metric_id = f"{schema}.{obj_name}"
-                display_name = obj_name
-                source_schema = schema
-            else:
-                metric_id = fname.replace(".sql", "")
-                display_name = metric_id
-                source_schema = None
-                print(f"  [!] No CREATE PROCEDURE/VIEW found in {fname} — using filename as metric_id")
-            sql_rows.append((metric_id, display_name, sql_content, None, None, source_type, source_schema))
-            identity_files.append((metric_id, os.path.relpath(filepath, SQL_DIR)))
-        except Exception as e:  # noqa: BLE001 — recorded in `skipped`, reported below
-            skipped.append((fname, str(e)))
-
-if not sql_rows:
-    print("[X] FATAL: No .sql files found in sql_input/")
-    raise SystemExit("Installation cannot proceed — upload your SQL files first.")
-
-# Contract gate: unique(metric_id). Two definitions of the same
-# [schema].[object] is a governance decision, not something to guess at.
-collisions = find_duplicate_identities(identity_files)
-if collisions:
-    print(f"[X] FATAL: {len(collisions)} duplicate metric identities detected:")
-    for metric_id, files in sorted(collisions.items()):
-        print(f"    {metric_id} is defined by {len(files)} files:")
-        for f in files:
-            print(f"      - {f}")
-    print("    Each [schema].[object] may be defined by exactly one file.")
-    print("    Remove or rename the extra file(s). If both versions are real,")
-    print("    they are different metrics and need different object names.")
-    raise SystemExit("Installation cannot proceed — resolve duplicate identities first.")
-
-from src.schemas import SQL_SOURCES, to_spark_schema
-
-sql_df = spark.createDataFrame(sql_rows, schema=to_spark_schema(SQL_SOURCES))
-sql_df.write.format("delta").mode("overwrite").option("overwriteSchema", "true") \
-    .saveAsTable("input_sql_sources")
-
-print(f"\n[+] Loaded {len(sql_rows)} SQL files into input_sql_sources")
-schemas_found = set(r[6] for r in sql_rows if r[6])
-print(f"    Schemas found: {', '.join(sorted(schemas_found)) if schemas_found else 'none'}")
-if skipped:
-    print(f"[!] Skipped {len(skipped)} files: {', '.join(f[0] for f in skipped)}")
-print("\n    Sample metric IDs:")
-for row in sql_rows[:5]:
-    print(f"      {row[0]} (name: {row[1]})")
-if len(sql_rows) > 5:
-    print(f"      ... and {len(sql_rows) - 5} more")
-
-
-# METADATA ********************
-
-# META {
-# META   "language": "python",
-# META   "language_group": "synapse_pyspark"
-# META }
-
-# CELL ********************
-
-
-# %% Cell 2: Load dictionary CSVs into Delta tables
-print("\n--- Loading data dictionary ---")
-
-DICT_DIR = "/lakehouse/default/Files/sql-query-agent/dictionary/"
-
-# Tables
-tables_path = os.path.join(DICT_DIR, "dict_tables.csv")
-if os.path.exists(tables_path):
-    dict_tables_df = spark.read.option("header", "true").csv("file://" + tables_path)
-
-    # Validate required columns
-    cols = [c.upper() for c in dict_tables_df.columns]
-    if "TABLE_NAME" not in cols:
-        print("[X] FATAL: dict_tables.csv missing TABLE_NAME column")
-        print(f"    Found columns: {dict_tables_df.columns}")
-        raise SystemExit("Fix dict_tables.csv and re-run.")
-
-    if "DESCRIPTION" not in cols:
-        print("[!] WARNING: dict_tables.csv missing DESCRIPTION column — adding empty descriptions")
-        from pyspark.sql.functions import lit
-        dict_tables_df = dict_tables_df.withColumn("DESCRIPTION", lit(""))
-
-    dict_tables_df = dict_tables_df.select("TABLE_NAME", "DESCRIPTION")
-
-    # Contract gate: unique(TABLE_NAME), case-insensitive (ADR 0016) —
-    # in a CI-collation database, Encounter and ENCOUNTER are the same table.
-    _names = [r["TABLE_NAME"] for r in dict_tables_df.collect()]
-    _dupes = find_duplicate_identities([(n, n) for n in _names])
-    if _dupes:
-        print("[X] FATAL: dict_tables.csv has duplicate table names (matching is case-insensitive):")
-        for folded, originals in sorted(_dupes.items()):
-            print(f"    {folded}: {originals}")
-        raise SystemExit("Fix dict_tables.csv (one row per table) and re-run.")
-
-    dict_tables_df.write.format("delta").mode("overwrite").option("overwriteSchema", "true") \
-        .saveAsTable("input_dict_tables")
-    print(f"[+] Loaded {dict_tables_df.count()} table descriptions into input_dict_tables")
-else:
-    print(f"[X] FATAL: dict_tables.csv not found at {tables_path}")
-    print("    See DATA_DICTIONARY_REQUIREMENTS.md for format specification.")
-    raise SystemExit("Installation cannot proceed — upload dict_tables.csv first.")
-
-# Columns
-columns_path = os.path.join(DICT_DIR, "dict_columns.csv")
-if os.path.exists(columns_path):
-    dict_columns_df = spark.read.option("header", "true").csv("file://" + columns_path)
-
-    cols = [c.upper() for c in dict_columns_df.columns]
-    if "TABLE_NAME" not in cols or "COLUMN_NAME" not in cols:
-        print("[X] FATAL: dict_columns.csv missing TABLE_NAME or COLUMN_NAME column")
-        print(f"    Found columns: {dict_columns_df.columns}")
-        raise SystemExit("Fix dict_columns.csv and re-run.")
-
-    if "DESCRIPTION" not in cols:
-        print("[!] WARNING: dict_columns.csv missing DESCRIPTION column — adding empty descriptions")
-        from pyspark.sql.functions import lit
-        dict_columns_df = dict_columns_df.withColumn("DESCRIPTION", lit(""))
-
-    dict_columns_df = dict_columns_df.select("TABLE_NAME", "COLUMN_NAME", "DESCRIPTION")
-
-    # Contract gate: unique(TABLE_NAME, COLUMN_NAME), case-insensitive (ADR 0016)
-    _pairs = [f'{r["TABLE_NAME"]}.{r["COLUMN_NAME"]}' for r in dict_columns_df.collect()]
-    _dupes = find_duplicate_identities([(p, p) for p in _pairs])
-    if _dupes:
-        print("[X] FATAL: dict_columns.csv has duplicate columns (matching is case-insensitive):")
-        for folded, originals in sorted(_dupes.items()):
-            print(f"    {folded}: {originals}")
-        raise SystemExit("Fix dict_columns.csv (one row per table+column) and re-run.")
-
-    dict_columns_df.write.format("delta").mode("overwrite").option("overwriteSchema", "true") \
-        .saveAsTable("input_dict_columns")
-    print(f"[+] Loaded {dict_columns_df.count()} column descriptions into input_dict_columns")
-else:
-    print(f"[X] FATAL: dict_columns.csv not found at {columns_path}")
-    print("    See DATA_DICTIONARY_REQUIREMENTS.md for format specification.")
-    raise SystemExit("Installation cannot proceed — upload dict_columns.csv first.")
-
-
-# METADATA ********************
-
-# META {
-# META   "language": "python",
-# META   "language_group": "synapse_pyspark"
-# META }
-
-# CELL ********************
-
-
-# %% Cell 3: Seed installation errors knowledge base
-print("\n--- Seeding installation errors knowledge base ---")
-
+# %% Cell 1: Seed installation errors knowledge base (route-independent)
 from src.governance.installation_errors import ERROR_SEEDS
 from src.schemas import INSTALLATION_ERRORS, to_spark_schema
 
@@ -356,7 +158,6 @@ except Exception as e:  # noqa: BLE001 — degraded /troubleshoot only; conseque
     print(f"[!] WARNING: Could not seed installation errors: {e}")
     print("    The /troubleshoot command may not work. Non-blocking.")
 
-
 # METADATA ********************
 
 # META {
@@ -367,103 +168,70 @@ except Exception as e:  # noqa: BLE001 — degraded /troubleshoot only; conseque
 # CELL ********************
 
 
-# %% Cell 4: Validate dictionary coverage
-print("\n--- Validating dictionary coverage ---")
-
-# Get table names from SQL files
-sql_table_refs = set()
-try:
-    import re
-    for row in sql_rows:
-        sql_text = row[2]  # sql column
-        # Simple extraction: FROM/JOIN table names
-        for match in re.finditer(
-            r'(?:FROM|JOIN)\s+(?:\[?\w+\]?\.)?(?:\[?\w+\]?\.)?\[?(\w+)\]?',
-            sql_text, re.IGNORECASE,
-        ):
-            name = match.group(1)
-            if name.upper() not in (
-                "SELECT", "WHERE", "SET", "BEGIN", "END", "AS", "ON",
-                "AND", "OR", "NOT", "NULL", "TABLE", "VIEW", "PROCEDURE",
-                "CASE", "WHEN", "THEN", "ELSE", "IN", "IS", "LIKE",
-            ) and not name.startswith("#"):
-                sql_table_refs.add(name.upper())
-except Exception as e:  # noqa: BLE001 — preview only; says so and names the real gate
-    # This is a rough regex PREVIEW of coverage at install time. Its failure
-    # must be visible but not fatal — 06_validate's dictionary_coverage is
-    # the authoritative, blocking check (audit 2026-08-15).
-    print(f"[!] WARNING: coverage preview failed ({e}) — continuing; "
-          "06_validate runs the authoritative dictionary_coverage gate")
-
-if sql_table_refs:
-    dict_table_names = set(
-        r["TABLE_NAME"].upper()
-        for r in spark.table("input_dict_tables").collect()
-    )
-    covered = sql_table_refs & dict_table_names
-    missing = sql_table_refs - dict_table_names
-    coverage = len(covered) / len(sql_table_refs) if sql_table_refs else 1.0
-
-    print(f"    SQL references {len(sql_table_refs)} unique tables")
-    print(f"    Dictionary covers {len(covered)} ({coverage:.0%})")
-    if missing:
-        print(f"    Missing from dictionary: {', '.join(sorted(missing)[:10])}")
-        if len(missing) > 10:
-            print(f"    ... and {len(missing) - 10} more")
-    if coverage >= 0.9:
-        print(f"[+] Dictionary coverage: {coverage:.0%} — GOOD")
-    elif coverage >= 0.7:
-        print(f"[!] Dictionary coverage: {coverage:.0%} — ACCEPTABLE (some tables missing descriptions)")
-    else:
-        print(f"[!] Dictionary coverage: {coverage:.0%} — LOW (agent answers will be incomplete)")
-else:
-    print("[!] Could not extract table references — skipping coverage check")
-
-
-# METADATA ********************
-
-# META {
-# META   "language": "python",
-# META   "language_group": "synapse_pyspark"
-# META }
-
-# CELL ********************
-
-
-# %% Cell 5: Final summary
+# %% Cell 2: Ingestion state report — from the tables, never from memory
 print("\n" + "=" * 60)
-print("INSTALLATION SUMMARY")
+print("INGESTION STATE (state-driven, like the gates)")
 print("=" * 60)
 
-sql_count = spark.table("input_sql_sources").count()
-dict_t_count = spark.table("input_dict_tables").count()
-dict_c_count = spark.table("input_dict_columns").count()
+ROUTES = {
+    "input_sql_sources": "00a_ingest_sql_filedrop | 00b_ingest_sql_folders | 00c_ingest_sql_live",
+    "input_dict_tables": "00d_dict_clarity (then optionally 00e_dict_caboodle)",
+    "input_dict_columns": "00d_dict_clarity (then optionally 00e_dict_caboodle)",
+}
 
-print(f"  SQL sources loaded:     {sql_count}")
-print(f"  Dictionary tables:      {dict_t_count}")
-print(f"  Dictionary columns:     {dict_c_count}")
-print("  ScriptDom DLL:          OK")
-print(f"  Configuration:          {config.org.name}")
-print("  Environment:            OK")
+state = {}
+for table, routes in ROUTES.items():
+    if spark.catalog.tableExists(table):
+        n = spark.table(table).count()
+        state[table] = n
+        mark = "+" if n > 0 else "!"
+        print(f"  [{mark}] {table}: present ({n} rows)")
+    else:
+        state[table] = None
+        print(f"  [!] {table}: ABSENT — run one of: {routes}")
 
-all_ok = sql_count > 0 and dict_t_count > 0 and dict_c_count > 0
+# Coverage preview only when both halves of a source pair are present.
+# (Rough regex preview; 06_validate's dictionary_coverage is the
+# authoritative, blocking check.)
+if state.get("input_sql_sources") and state.get("input_dict_tables"):
+    import re
+    sql_table_refs = set()
+    try:
+        for row in spark.table("input_sql_sources").select("sql").collect():
+            for match in re.finditer(
+                r'(?:FROM|JOIN)\s+(?:\[?\w+\]?\.)?(?:\[?\w+\]?\.)?\[?(\w+)\]?',
+                row["sql"] or "", re.IGNORECASE,
+            ):
+                name = match.group(1)
+                if name.upper() not in (
+                    "SELECT", "WHERE", "SET", "BEGIN", "END", "AS", "ON",
+                    "AND", "OR", "NOT", "NULL", "TABLE", "VIEW", "PROCEDURE",
+                    "CASE", "WHEN", "THEN", "ELSE", "IN", "IS", "LIKE",
+                ) and not name.startswith("#"):
+                    sql_table_refs.add(name.upper())
+        dict_table_names = set(
+            r["TABLE_NAME"].upper() for r in spark.table("input_dict_tables").collect()
+        )
+        if sql_table_refs:
+            covered = sql_table_refs & dict_table_names
+            coverage = len(covered) / len(sql_table_refs)
+            print(f"\n  Dictionary coverage preview: {coverage:.0%} "
+                  f"({len(covered)}/{len(sql_table_refs)} referenced tables)")
+            missing = sorted(sql_table_refs - dict_table_names)
+            if missing:
+                print(f"  Missing from dictionary: {', '.join(missing[:10])}"
+                      + (f" ... and {len(missing) - 10} more" if len(missing) > 10 else ""))
+    except Exception as e:  # noqa: BLE001 — preview only; 06 runs the authoritative gate
+        print(f"  [!] coverage preview failed ({e}) — 06_validate runs the authoritative gate")
 
-if all_ok:
-    print("\n  >>> INSTALLATION COMPLETE <<<")
-    print("\n  Next steps:")
-    print("  1. Run 02_parse     — parses SQL files with ScriptDom")
-    print("  2. Run 03_build_graph — builds knowledge graph")
-    print("  3. Run 04_build_metric_logic — flattens graph for Data Agent")
-    print("  4. Run 05_export_graph_tables — exports LPG tables")
-    print("  5. Run 06_validate  — validates pipeline health")
+all_present = all(v for v in state.values())
+print("\n" + "=" * 60)
+if all_present:
+    print(">>> VERIFIED — ingestion satisfied. Next: 02_parse -> 03 -> 04 -> 05 -> 06 <<<")
 else:
-    print("\n  >>> INSTALLATION INCOMPLETE <<<")
-    if sql_count == 0:
-        print("  [X] No SQL files loaded — check sql_input/ folder")
-    if dict_t_count == 0:
-        print("  [X] No dictionary tables — check dictionary/dict_tables.csv")
-    if dict_c_count == 0:
-        print("  [X] No dictionary columns — check dictionary/dict_columns.csv")
+    print(">>> VERIFIED (environment) — ingestion PENDING <<<")
+    print("Remember: a source system enters as a PAIR (its SQL and its")
+    print("dictionary together), or 06's coverage gate will block.")
 
 # METADATA ********************
 
@@ -471,3 +239,5 @@ else:
 # META   "language": "python",
 # META   "language_group": "synapse_pyspark"
 # META }
+
+# CELL ********************

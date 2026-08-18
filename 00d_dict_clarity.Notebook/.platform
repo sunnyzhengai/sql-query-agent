@@ -1,0 +1,12 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Notebook",
+    "displayName": "00d_dict_clarity",
+    "description": "Dictionary route D \u2014 formatted CSVs from Files/dictionary OR raw TABLE_ID-keyed export (run when the dictionary changes)"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "a44e5a44-2b1b-4dcb-888b-db7143acf84a"
+  }
+}

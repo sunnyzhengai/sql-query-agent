@@ -1,0 +1,12 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Notebook",
+    "displayName": "00a_ingest_sql_filedrop",
+    "description": "Ingestion route A \u2014 .sql files dropped in Files/sql_input (identity from CREATE statements; run when files change)"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "9c24cf1d-187b-439b-9be1-cf62c91f1d37"
+  }
+}

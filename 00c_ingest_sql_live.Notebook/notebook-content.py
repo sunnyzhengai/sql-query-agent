@@ -26,7 +26,12 @@
 
 # CELL ********************
 
-"""Fabric Notebook: Extract SQL objects from the configured source (Tier-1 ingestion)
+"""Fabric Notebook: Ingestion Route C — live extraction from a SQL source
+
+ROUTE: one of the peer acquisition routes (00a filedrop | 00b folders |
+00c live). All routes write input_sql_sources under the same contract;
+run whichever matches where your SQL lives — see the INSTALLATION_GUIDE
+route table.
 
 The turn-key front door (1.8.0): connects via the configured profile
 (onprem_gateway | azure_direct | fabric_native), discovers procedures
@@ -37,8 +42,8 @@ the fallback path; both writers share the metric_id upsert protocol.
 Reads from: the customer SQL source (sys.objects / sys.sql_modules)
 Writes to:  input_sql_sources (merge), ops_extraction_tracking
 
-Run BEFORE 01_install on extraction-first installs; re-run on your
-change cadence — only new and changed objects are re-loaded.
+Acquisition is event-driven: run when source SQL changes — only new
+and changed objects are re-loaded. 01_install verifies state after.
 """
 
 # %% Cell 0: Setup

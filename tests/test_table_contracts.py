@@ -28,8 +28,7 @@ NOTEBOOK_INDIRECT_WRITES = {
         "graph_edge_measure2column", "graph_edge_tab2col",
         "graph_edge_uses_table",
     ],
-    "load_clarity_dictionary": ["input_dict_tables", "input_dict_columns"],
-    "load_sql_files": ["input_sql_sources"],
+    "00b_ingest_sql_folders": ["input_sql_sources"],
 }
 
 # config.<section>.<attr> table-name indirections the scanner can resolve.
@@ -55,7 +54,8 @@ DOMAIN_PREFIXES = {
 
 def _notebook_files():
     """All code that can write Delta tables: pipeline + utility notebooks."""
-    pipeline = list(REPO_ROOT.glob("[0-9][0-9]_*.Notebook/notebook-content.py"))
+    # [0-9][0-9]* covers both derivation (02_) and lettered acquisition (00a_)
+    pipeline = list(REPO_ROOT.glob("[0-9][0-9]*.Notebook/notebook-content.py"))
     utilities = [
         p for p in REPO_ROOT.glob("notebooks/**/*.py")
         if p.name != "__init__.py"

@@ -10,6 +10,23 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.14.0] - 2026-08-17
+
+### Changed
+- **Ingestion decoupled from installation** (HANDOFF_INGESTION_ROUTES —
+  evidence: three pullbacks into 01's route-assuming FATAL during a
+  loader-based setup). 01_install is now VERIFICATION-ONLY: environment
+  checks, error-seed, and a state-driven ingestion report (which routes
+  are satisfied, from the tables — never from memory). Acquisition is
+  the 00 letter family of peer routes: 00a filedrop, 00b folders
+  (promoted), 00c live (renamed from 00_extract_sql, item renames in
+  place), 00d dictionary (formatted or raw), 00e second-source merge.
+  Naming principle recorded: number the derivation, letter the
+  acquisition. Guide Step 5a is now a route decision table with the
+  source-pairing rule (SQL + dictionary enter together).
+
+---
+
 ## [1.13.0] - 2026-08-17
 
 ### Added
