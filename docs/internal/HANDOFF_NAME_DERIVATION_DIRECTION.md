@@ -39,3 +39,24 @@ already captured in input_report_sources; this is derivation-only.
 Field expectation: 228/601 derived is a floor produced by three fixable
 conservatisms (direction, normalization, kind-trust) — not estate shape.
 Diagnostic queries used at work are in the session log if needed.
+
+## Amendment 2 (field diagnostics, same day): corrected fallout ranking
+
+Type distribution over 1065 sources: StoredProcedure 804, View 120,
+Table 82, InlineSQL 59. Findings:
+1. PRIMARY within-table lever = the per-proc inversion (confirmed:
+   "Coding Productivity" is two GENUINELY different procs — real
+   multi-proc report; under inversion each proc inherits the name).
+2. Case-normalization suspect: NOT confirmed as a driver (keep the fold,
+   but don't expect big gains).
+3. Kind-filter (views-as-Table): minor — 82 rows ceiling.
+4. InlineSQL (59): correctly excluded from metric IDENTITY, but the
+   embedded SQL text should be routed through ScriptDom for TABLE
+   lineage — it is unparsed calculation logic today.
+5. THE BIG ONE (belongs to HANDOFF_FUNNEL_AND_FALLOUT): 601 models
+   collected, only 427 ever wrote a source row — 174 models yielded
+   ZERO sources and left NO record (absence, not rows; evidence only in
+   session memory). Prime exhibit for fallout rows: every collected
+   model must write either sources or a fallout row with a reason
+   (no-partitions/live-connect, non-SQL source family, unrecognized
+   partition shape). Autopsy of shapes in progress at work.
