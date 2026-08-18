@@ -1,0 +1,11 @@
+CREATE TABLE [dbo].[PATIENT_DEMOGRAPHICS_RACE] (
+    [CM_LOG_OWNER_ID]   NVARCHAR (400) NULL,
+    [CM_PHY_OWNER_ID]   NVARCHAR (400) NULL,
+    [LINE]              INT            NULL,
+    [PATIENT_ID]        NVARCHAR (400) NULL,
+    [PATIENT_RACE_CODE] INT            NULL
+);
+
+
+GO
+

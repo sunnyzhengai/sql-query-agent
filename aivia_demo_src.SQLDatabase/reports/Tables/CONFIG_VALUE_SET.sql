@@ -1,0 +1,11 @@
+CREATE TABLE [reports].[CONFIG_VALUE_SET] (
+    [CODE]              NVARCHAR (400)  NULL,
+    [CODE_DESC]         NVARCHAR (400)  NULL,
+    [VALUE_SET_ID]      DECIMAL (18, 4) NULL,
+    [VALUE_SET_ABBR]    NVARCHAR (400)  NULL,
+    [VALUE_SET_DISPLAY] NVARCHAR (400)  NULL
+);
+
+
+GO
+

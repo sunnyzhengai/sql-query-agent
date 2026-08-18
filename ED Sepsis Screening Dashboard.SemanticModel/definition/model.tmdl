@@ -1,0 +1,160 @@
+model Model
+	culture: en-US
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: en-US
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation __PBI_TimeIntelligenceEnabled = 1
+
+annotation PBI_QueryOrder = ["Screening Detail","IP Sepsis","ED Sepsis Summary","Screening Trend"]
+
+annotation PBI_ProTooling = ["WebModelingEdit"]
+
+ref table 'Screening Trend'
+ref table DateTableTemplate_0a818c6a-e704-48ae-9411-351f8cf55915
+ref table LocalDateTable_e511f4a3-6fb2-4264-90c1-dcdfdaf93a34
+ref table 'Screening Detail'
+ref table LocalDateTable_ab91ffe2-e1bb-4b5b-ba59-980744f39724
+ref table LocalDateTable_f3c4ba64-da29-496c-b5da-482c9ce32759
+ref table LocalDateTable_01e9e21b-754a-40d9-9ed2-514741ede48f
+ref table LocalDateTable_0ea29fea-9f33-467b-8d76-e25128b5e63e
+ref table LocalDateTable_dcf68230-2571-443c-a0be-ae231f944835
+ref table LocalDateTable_b3ded26c-db36-4f30-ae86-77656b291848
+ref table LocalDateTable_d124d568-f5b9-4869-8ce6-2e258bc153ca
+ref table LocalDateTable_a535c232-b927-4e5d-92f9-444234482a73
+ref table LocalDateTable_2d6bc3b6-92ba-4121-90c3-88b9c60c3941
+ref table LocalDateTable_c69966a4-dc7e-49df-a620-c6c299a76dde
+ref table LocalDateTable_b0cfd23c-d7a6-46d9-ae8d-663c1e37c1fe
+ref table LocalDateTable_8d0df1b5-949f-4da1-883d-26a74974d4a0
+ref table LocalDateTable_0ce66b77-00b0-433e-b515-07222c88c1c4
+ref table LocalDateTable_873bd50c-75c3-4921-9080-706432d88c3c
+ref table LocalDateTable_13e27e3c-63b7-4b23-98f5-5cb2ff0e0cd8
+ref table LocalDateTable_c8c2aa9c-daf9-486f-9291-6815175e36ea
+ref table LocalDateTable_bb225926-2f19-45c4-b817-680ac6efa27e
+ref table LocalDateTable_ce7d1dd1-1440-47d8-b7a9-0c3f1f214e4b
+ref table LocalDateTable_ffdfa57e-15ce-4a50-ae62-f438b47a2b17
+ref table LocalDateTable_bb8e2d41-bf06-4d16-8750-30218ad7eb54
+ref table LocalDateTable_db509ef2-05d6-4919-8070-d78e775082f8
+ref table LocalDateTable_11e30c13-706f-4462-90f1-191d40c23f06
+ref table LocalDateTable_49b77c20-4cf0-4d11-a163-23e1478fad9c
+ref table LocalDateTable_59617061-f13f-47e8-8da8-ebfbf567899d
+ref table LocalDateTable_8afcfce6-1078-4979-b7fe-482f2f62b8ee
+ref table LocalDateTable_892c7287-c998-4ef2-9559-20e1fd62fc08
+ref table LocalDateTable_27b0370a-bf94-4c89-9ba7-751d4d387a41
+ref table LocalDateTable_eb640228-fd91-45f4-a736-360346d823f2
+ref table LocalDateTable_8726630a-66dd-47c9-99a5-41dd0211d996
+ref table LocalDateTable_3bc1b9e4-104d-44ba-80f6-41417cec4bee
+ref table LocalDateTable_723e00c2-22a9-4b5e-a7dd-eec062072fea
+ref table LocalDateTable_012bf02e-37f1-4158-ac71-485f5321aeec
+ref table LocalDateTable_5e65d872-522b-4673-9a92-a0416eb21124
+ref table LocalDateTable_2122cea3-7808-4f6d-8abd-aff86bfccb70
+ref table LocalDateTable_87b2b29d-c8bb-4bea-9a67-ec22c6eaf30d
+ref table LocalDateTable_9824b0e0-0fbd-457f-bf50-e1ffc716c539
+ref table LocalDateTable_a313b724-2bd0-4b9a-ba5e-e8d7d41dcdb6
+ref table LocalDateTable_7022d27e-8dc0-4da5-93f4-ad878a3fa45d
+ref table LocalDateTable_6997c9b8-7799-4130-b6c4-8752d83b57a1
+ref table LocalDateTable_87ef4dbc-b16f-4785-a5ab-2ffa889c445e
+ref table LocalDateTable_0e267558-2e03-4450-8d93-9fa283936357
+ref table LocalDateTable_28af6a7d-935c-43d2-aa3a-08dbd6e37ea4
+ref table LocalDateTable_cc40935d-020b-4ffc-8397-93fc2cd2c140
+ref table LocalDateTable_4a4b8b46-3db1-4b35-9d43-5b4f4d8440cb
+ref table LocalDateTable_828e9db2-206c-41e9-88ac-9da4e6b41a89
+ref table LocalDateTable_309bc9d2-eeb0-4700-92c6-29a32400940c
+ref table LocalDateTable_aaae4237-77c9-46e8-8563-09e58d3266ef
+ref table LocalDateTable_97a323b6-6d4e-41f6-b455-08a7dda2659a
+ref table LocalDateTable_9e9dbf86-735a-4b6d-9454-81da6b4d42b2
+ref table LocalDateTable_0529313f-294f-4bd3-9b0e-136b562f9d91
+ref table LocalDateTable_9c804234-4652-44ee-916e-2de610926f24
+ref table LocalDateTable_296446ca-0b95-40b4-bc32-5d6906565100
+ref table LocalDateTable_00584e54-fb90-4938-9bcd-ebc365a9d127
+ref table LocalDateTable_acfbffd8-e293-418c-9c47-2a740612437c
+ref table LocalDateTable_8dc75ceb-443e-4aa6-9f35-70079a51129f
+ref table LocalDateTable_67bc0d56-8956-4fb3-b0a2-0ef5233fce16
+ref table LocalDateTable_0c68d3c4-781c-4b16-9596-c1e6044c342a
+ref table 'IP Sepsis'
+ref table LocalDateTable_8c9efe4a-f424-41cd-8345-a0bc014f3057
+ref table LocalDateTable_ae7fd790-72fa-4e0c-9ae2-2458dfd515db
+ref table LocalDateTable_df88d884-4253-41f0-9a5b-40f224964280
+ref table LocalDateTable_9d0f8842-e7cb-4ba6-9035-0efb0c0e1555
+ref table LocalDateTable_8b8035bd-01f7-4e96-8bc7-b5ded687f3c8
+ref table LocalDateTable_45739e38-32b8-4696-89ad-1c684b68d430
+ref table LocalDateTable_7d542483-5b33-405e-a208-8f8ef89ad295
+ref table LocalDateTable_b59f3ec0-c465-44e3-b584-05f2d5446407
+ref table LocalDateTable_dc30a640-e461-4693-999b-66e8022d060f
+ref table LocalDateTable_2280bd84-c517-4903-b67b-b9d0e7de04b7
+ref table LocalDateTable_6402c170-f034-4fc0-813a-5fb326c2aa93
+ref table LocalDateTable_24151a3f-c888-4f22-b08d-0e9fdd33b7b8
+ref table LocalDateTable_92085f22-2e97-4d8d-9dd2-6106b7e153ed
+ref table LocalDateTable_e1fe5e87-7491-48ba-a344-43c83ea01918
+ref table LocalDateTable_90196046-696b-4d67-a9a7-7908ecf0ba9d
+ref table LocalDateTable_367ae4b7-00f1-45e4-8b7d-a4a8c440e986
+ref table LocalDateTable_f16ce66c-c436-40cf-ad68-7706ed537efc
+ref table LocalDateTable_a361b94c-6801-46cb-be71-875ca3334dd7
+ref table LocalDateTable_b17b5b1b-74b6-4d2d-8227-fe42ef7314a7
+ref table LocalDateTable_3bcbece3-5bc9-4f35-8dec-e635c5560034
+ref table LocalDateTable_06ae4576-2133-457d-b862-6a2f8abc5f0d
+ref table LocalDateTable_6a12d33c-23b0-4c13-a116-d8ece43d10f8
+ref table LocalDateTable_1f785dee-e495-43a6-9bcb-4fc0adbc3cd5
+ref table LocalDateTable_971447f9-000c-4281-bf57-82409f871cc4
+ref table LocalDateTable_24cd22d7-5770-4478-a1d9-cb3d4132ac78
+ref table LocalDateTable_b45ad3b5-5977-4bc6-8e99-f59db80d7bf0
+ref table LocalDateTable_18b248cd-22c5-4442-9ff1-2b5d1407cb91
+ref table LocalDateTable_be706a42-0122-42b6-ad6d-3e804f9911ea
+ref table LocalDateTable_33b49fe0-8f4f-4284-b837-133a9ef608c2
+ref table LocalDateTable_2766f1c3-2170-408a-b8c9-a6e18f35a6b7
+ref table LocalDateTable_fd2caaae-f4e2-46a0-a496-674f2ccb80de
+ref table LocalDateTable_6dbf2d4b-5fc5-4712-8fa2-58e8e398a924
+ref table 'ED Sepsis Summary'
+ref table LocalDateTable_71a3c52d-bad5-42ad-83fb-049f97be82c2
+ref table LocalDateTable_6ebc8ba7-e498-4c8a-a2ff-c91d0df18456
+ref table LocalDateTable_8f720376-61b6-42a7-b767-750deda6bade
+ref table LocalDateTable_9481bf15-4b74-4243-9330-20806943020f
+ref table LocalDateTable_20ccdbca-3184-4b29-9492-bb1467a6ce22
+ref table LocalDateTable_b6073af9-e79c-4da4-8246-49d222f537e4
+ref table LocalDateTable_33e4d8b4-bd80-44a1-b039-97cb39c98797
+ref table LocalDateTable_271a66fc-d22d-424f-a9c5-de1f21446000
+ref table LocalDateTable_8a626941-80b3-47c1-bc63-0cd761bdf67a
+ref table LocalDateTable_d0ca821b-5abb-4afc-8520-f4984339e121
+ref table LocalDateTable_df205f4c-d316-4f39-a467-73b14158cfd6
+ref table LocalDateTable_6bc8bd48-6879-45ce-a4bf-6cac8ae74c1d
+ref table LocalDateTable_ecb0f789-1f95-4fa6-acd2-f0f060a817bc
+ref table LocalDateTable_54c375a8-2f39-40cc-b6b7-5cbf15cc0102
+ref table LocalDateTable_1f232f95-0abf-413e-82ab-d92013b056e5
+ref table LocalDateTable_e41a9268-0ec8-439f-b7de-1f98020bb29b
+ref table LocalDateTable_b6b03e9d-26c3-46a1-91fa-a22bd4c1a17a
+ref table LocalDateTable_ebd3934d-b42c-4c9b-85a5-d7a8ea1f7955
+ref table LocalDateTable_006e5ca4-1fca-4306-94f6-1d7861ec33c8
+ref table LocalDateTable_f6ce1c00-d1bc-451f-964d-eb244266bf15
+ref table LocalDateTable_6ca0a3cf-1090-4d18-b38f-24b19fade804
+ref table LocalDateTable_602a0514-357a-4b08-92c9-980e97e8a286
+ref table LocalDateTable_3848cb6b-60d1-48c9-97c4-d40bf796c1ce
+ref table LocalDateTable_c8ea107e-9617-4969-845d-fbf90dfc3116
+ref table LocalDateTable_094b3c6c-5840-481d-8009-36c29de5de14
+ref table LocalDateTable_c84abf4e-b719-4b98-8cb4-8ae0892a0b17
+ref table LocalDateTable_2473f0ca-bf2f-44b4-bcfd-22589bf7072e
+ref table LocalDateTable_30ce9de9-c018-456b-b0db-2085506557e0
+ref table LocalDateTable_a3953ad7-59e3-4adc-9bfb-89983ca5384a
+ref table LocalDateTable_d3c8cc79-5891-49e6-9095-b207e21b3653
+ref table LocalDateTable_12547b7f-a64e-481b-bddf-1188bb012990
+ref table LocalDateTable_c45c8fe0-6ab6-49ee-997a-d242bc319593
+ref table LocalDateTable_de57acd7-92a4-4fe8-94b1-181625a66334
+ref table LocalDateTable_57864d9e-1ec8-40c0-891d-bcefc6bc24b9
+ref table LocalDateTable_5f3f68e1-3b4d-41b5-a057-dd71a7aa53ea
+ref table LocalDateTable_6b779fb9-91f6-44c4-a7ce-bf927d89e256
+ref table LocalDateTable_f3cd80dc-2abf-4f45-a84e-965069c3c93b
+ref table LocalDateTable_2de37e2e-768f-47ae-baf4-aeb06cc6bacf
+ref table LocalDateTable_b11ac746-b119-48e2-bd6e-e304d02caabf
+ref table LocalDateTable_ded040e4-3bb8-434c-9015-0305472af460
+ref table LocalDateTable_e5ec7d06-8592-4e8a-8cdd-2547ec4feee9
+ref table LocalDateTable_59e00fb6-0ae9-4bd4-8399-f235af700ae0
+ref table LocalDateTable_3e1ce584-2be3-4991-924e-b1d4f5ff4e05
+ref table LocalDateTable_803b2d99-9eb6-4b10-bcbd-5b7d431a79eb
+ref table LocalDateTable_f7f322d1-1f35-462d-a329-96b40687d752
+ref table LocalDateTable_0c04b66a-b84a-4f7b-a541-5b86ae7bb46a
+ref table LocalDateTable_cd4ab89e-ba45-49b5-9d95-41947860e08f
+ref table LocalDateTable_334fc610-673d-4787-a829-050ceffd7197
+ref table LocalDateTable_4cde3b1d-a6dd-4d96-9880-18ca88dfef4d
+ref table LocalDateTable_c1542259-c392-48fe-a1b8-34eb0e67be95
+

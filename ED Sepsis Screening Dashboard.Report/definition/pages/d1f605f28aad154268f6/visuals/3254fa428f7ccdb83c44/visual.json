@@ -1,0 +1,122 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "3254fa428f7ccdb83c44",
+  "position": {
+    "x": 640.29878618113912,
+    "y": 406.69467787114849,
+    "z": 2000,
+    "height": 307.15219421101773,
+    "width": 562.91316526610649,
+    "tabOrder": 2000
+  },
+  "visual": {
+    "visualType": "columnChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Screening Trend"
+                    }
+                  },
+                  "Property": "department"
+                }
+              },
+              "queryRef": "Screening Trend.department",
+              "nativeQueryRef": "department",
+              "active": true
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Aggregation": {
+                  "Expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "Screening Trend"
+                        }
+                      },
+                      "Property": "patients_screened"
+                    }
+                  },
+                  "Function": 0
+                }
+              },
+              "queryRef": "Sum(Screening Trend.patients_screened)",
+              "nativeQueryRef": "Sum of patients_screened"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Aggregation": {
+                "Expression": {
+                  "Column": {
+                    "Expression": {
+                      "SourceRef": {
+                        "Entity": "Screening Trend"
+                      }
+                    },
+                    "Property": "patients_screened"
+                  }
+                },
+                "Function": 0
+              }
+            },
+            "direction": "Descending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "f54f41f74305ab48d3b4",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "Screening Trend"
+              }
+            },
+            "Property": "department"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "46447ae6841789a5bf66",
+        "field": {
+          "Aggregation": {
+            "Expression": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "Screening Trend"
+                  }
+                },
+                "Property": "patients_screened"
+              }
+            },
+            "Function": 0
+          }
+        },
+        "type": "Advanced"
+      }
+    ]
+  }
+}

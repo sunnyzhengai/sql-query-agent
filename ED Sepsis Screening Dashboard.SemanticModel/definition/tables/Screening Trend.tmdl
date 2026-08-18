@@ -1,0 +1,81 @@
+table 'Screening Trend'
+	lineageTag: 963f66b4-3541-4dbb-a454-c7d6f6864b3b
+
+	measure 'Screening Rate' = DIVIDE(SUM('Screening Trend'[positive_screens]), SUM('Screening Trend'[patients_screened]))
+		lineageTag: 4c7b9662-c145-469d-9d7b-42f984ae75fa
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column screen_date
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: ab9f7642-dae5-464f-87e7-4336fae306ef
+		summarizeBy: none
+		sourceColumn: screen_date
+
+		variation Variation
+			isDefault
+			relationship: ec5d6eba-b87a-4e3a-9a98-f0014be08a69
+			defaultHierarchy: LocalDateTable_e511f4a3-6fb2-4264-90c1-dcdfdaf93a34.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column department
+		dataType: string
+		lineageTag: b0d5c873-6a37-41b2-b7a2-de6705c39c50
+		summarizeBy: none
+		sourceColumn: department
+
+		annotation SummarizationSetBy = Automatic
+
+	column patients_screened
+		dataType: int64
+		formatString: 0
+		lineageTag: 7500339e-35e5-4585-891a-a572699e4d08
+		summarizeBy: sum
+		sourceColumn: patients_screened
+
+		annotation SummarizationSetBy = Automatic
+
+	column positive_screens
+		dataType: int64
+		formatString: 0
+		lineageTag: fc2d1d9f-b82a-42b9-8b24-df21e883b507
+		summarizeBy: sum
+		sourceColumn: positive_screens
+
+		annotation SummarizationSetBy = Automatic
+
+	column bundle_compliance_pct
+		dataType: double
+		lineageTag: 56dd2840-33d2-4dbd-9b90-d564e5f94b83
+		summarizeBy: sum
+		sourceColumn: bundle_compliance_pct
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column avg_minutes_to_screen
+		dataType: int64
+		formatString: 0
+		lineageTag: 27ef7c11-5736-4b9c-a937-e953cac56dbb
+		summarizeBy: sum
+		sourceColumn: avg_minutes_to_screen
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Screening Trend' = m
+		mode: import
+		source =
+				let
+				  Source = Csv.Document(Web.Contents("https://aiviallc88-my.sharepoint.com/personal/founder_aiviaapp_com/Documents/Apps/Microsoft Power Query/Uploaded Files/ed_sepsis_screening_demo 2.csv"), [Delimiter = ",", Columns = 6, QuoteStyle = QuoteStyle.None]),
+				  #"Promoted headers" = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				  #"Changed column type" = Table.TransformColumnTypes(#"Promoted headers", {{"screen_date", type date}, {"department", type text}, {"patients_screened", Int64.Type}, {"positive_screens", Int64.Type}, {"bundle_compliance_pct", type number}, {"avg_minutes_to_screen", Int64.Type}})
+				in
+				  #"Changed column type"
+
+	annotation PBI_ResultType = Table
+

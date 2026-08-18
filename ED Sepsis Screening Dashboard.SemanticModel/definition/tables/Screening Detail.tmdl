@@ -1,0 +1,2119 @@
+table 'Screening Detail'
+	lineageTag: 2635ea2e-d5f0-4154-b5b8-642e058c22cd
+
+	column MRN
+		dataType: string
+		lineageTag: d7665828-4a4a-4c88-ad1e-a85b14b0958a
+		summarizeBy: none
+		sourceColumn: MRN
+
+		annotation SummarizationSetBy = Automatic
+
+	column PATIENTS
+		dataType: string
+		lineageTag: 361f1283-271b-43a5-b462-63e90d93e12e
+		summarizeBy: none
+		sourceColumn: PATIENTS
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Ethnic Group'
+		dataType: string
+		lineageTag: 95cd6905-bb11-4db4-8b53-44713b6c3730
+		summarizeBy: none
+		sourceColumn: Ethnic Group
+
+		annotation SummarizationSetBy = Automatic
+
+	column Race
+		dataType: string
+		lineageTag: 3ad97fe1-af2f-4acc-8721-a11720bdb59b
+		summarizeBy: none
+		sourceColumn: Race
+
+		annotation SummarizationSetBy = Automatic
+
+	column ENC_ID
+		dataType: double
+		lineageTag: 2e9297fa-0414-4a58-a20e-0b9312d5a235
+		summarizeBy: count
+		sourceColumn: ENC_ID
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Age at ED Arrival (Months)'
+		dataType: int64
+		formatString: 0
+		lineageTag: ad94f716-f0c7-4dcb-aa9e-46eed8bf47d5
+		summarizeBy: sum
+		sourceColumn: Age at ED Arrival (Months)
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Age at ED Arrival (Years)'
+		dataType: double
+		lineageTag: c50aa4af-ca0f-4e65-b131-405c2e82fdf9
+		summarizeBy: sum
+		sourceColumn: Age at ED Arrival (Years)
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Age In Days'
+		dataType: int64
+		formatString: 0
+		lineageTag: 7eb1667c-1f80-48c4-a770-cb3344b3680e
+		summarizeBy: sum
+		sourceColumn: Age In Days
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Age in Days Count'
+		dataType: int64
+		formatString: 0
+		lineageTag: 032609fe-3d56-4fba-ad7b-69bdd29eed60
+		summarizeBy: sum
+		sourceColumn: Age in Days Count
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Age in Days Indicator'
+		dataType: string
+		lineageTag: 73ecb4c8-fd95-4043-a7d5-64353295a373
+		summarizeBy: none
+		sourceColumn: Age in Days Indicator
+
+		annotation SummarizationSetBy = Automatic
+
+	column Location
+		dataType: string
+		lineageTag: c7e25493-5343-4e38-895c-cdc85f4d31bb
+		summarizeBy: none
+		sourceColumn: Location
+
+		annotation SummarizationSetBy = Automatic
+
+	column DATE_STAMP
+		dataType: string
+		lineageTag: 0d96aab2-3528-4a2f-9eb4-d1bbe2d01af2
+		summarizeBy: none
+		sourceColumn: DATE_STAMP
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'ED Arrival Time'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 4e9ba5f9-0f01-4a9f-92cc-c3c595a3b727
+		summarizeBy: none
+		sourceColumn: ED Arrival Time
+
+		variation Variation
+			isDefault
+			relationship: 4d0d6593-5d5d-4240-8392-8cc88a8e53da
+			defaultHierarchy: LocalDateTable_ab91ffe2-e1bb-4b5b-ba59-980744f39724.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Traige Start Time'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 180ea92c-f8ff-4797-9282-9e015022aed9
+		summarizeBy: none
+		sourceColumn: Traige Start Time
+
+		variation Variation
+			isDefault
+			relationship: 95a16db1-e6b1-4340-8c23-3a0fa20ecf29
+			defaultHierarchy: LocalDateTable_f3c4ba64-da29-496c-b5da-482c9ce32759.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Traige Stop Time'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: b4b645c0-4ca5-4675-b1ee-4736a18c4f83
+		summarizeBy: none
+		sourceColumn: Traige Stop Time
+
+		variation Variation
+			isDefault
+			relationship: 1b026d5f-a543-418f-89ea-8aab919b0542
+			defaultHierarchy: LocalDateTable_01e9e21b-754a-40d9-9ed2-514741ede48f.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'ED Arrival Date'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: c18445cf-3732-4589-adf6-24f78a84adec
+		summarizeBy: none
+		sourceColumn: ED Arrival Date
+
+		variation Variation
+			isDefault
+			relationship: 2b7aad3c-69d1-41bd-871f-b90800f23f3e
+			defaultHierarchy: LocalDateTable_0ea29fea-9f33-467b-8d76-e25128b5e63e.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Chief Complaint'
+		dataType: string
+		lineageTag: 67b35a32-2c17-40eb-9d07-a5141ecd4e9d
+		summarizeBy: none
+		sourceColumn: Chief Complaint
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Other Visit Reasons'
+		dataType: string
+		lineageTag: 3577f964-d525-45f3-899a-7ff5818021cb
+		summarizeBy: none
+		sourceColumn: Other Visit Reasons
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'ED Departure Time'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 1f53dce8-33db-4efe-90e0-54355453f2ce
+		summarizeBy: none
+		sourceColumn: ED Departure Time
+
+		variation Variation
+			isDefault
+			relationship: a23cad05-18d0-4f7a-9923-9147dc04b60c
+			defaultHierarchy: LocalDateTable_dcf68230-2571-443c-a0be-ae231f944835.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'HOSP Admit Time'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 1e4075b6-fa3d-477f-8bf7-3186a68a6636
+		summarizeBy: none
+		sourceColumn: HOSP Admit Time
+
+		variation Variation
+			isDefault
+			relationship: d3ccb60c-70ce-44a0-8b2b-544f981c756a
+			defaultHierarchy: LocalDateTable_b3ded26c-db36-4f30-ae86-77656b291848.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'HOSP Discharge Time'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 80af3377-8a71-424c-8791-8a6c4f5cdbb7
+		summarizeBy: none
+		sourceColumn: HOSP Discharge Time
+
+		variation Variation
+			isDefault
+			relationship: 4bba52bc-1f2b-45aa-bcbf-683f1a224324
+			defaultHierarchy: LocalDateTable_d124d568-f5b9-4869-8ce6-2e258bc153ca.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'ED Disposition'
+		dataType: string
+		lineageTag: eb50f109-98c5-41d1-b5ae-63264047b00f
+		summarizeBy: none
+		sourceColumn: ED Disposition
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Screened Positive 01'
+		dataType: int64
+		formatString: 0
+		lineageTag: dba4b353-6876-4721-87c7-586f646c1977
+		summarizeBy: sum
+		sourceColumn: Screened Positive 01
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'First Positive Score AM/PM'
+		dataType: string
+		lineageTag: e739a873-5911-4a78-85c7-aeb345fd2606
+		summarizeBy: none
+		sourceColumn: First Positive Score AM/PM
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'First Positive Score Time'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 068c4bbd-a4c7-4e16-94fc-bc7910a241ca
+		summarizeBy: none
+		sourceColumn: First Positive Score Time
+
+		variation Variation
+			isDefault
+			relationship: fbb4ccea-8593-4aee-afb3-074b088ea9aa
+			defaultHierarchy: LocalDateTable_a535c232-b927-4e5d-92f9-444234482a73.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'First Positive Score'
+		dataType: string
+		lineageTag: 4a378d06-ae49-49b6-9828-9d733ac5a43c
+		summarizeBy: none
+		sourceColumn: First Positive Score
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'First Negative Score Time'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 7e397b0d-10b9-4b63-bc6f-92c675a9cae3
+		summarizeBy: none
+		sourceColumn: First Negative Score Time
+
+		variation Variation
+			isDefault
+			relationship: 24ab237c-cbbe-448b-86c7-101b703c866d
+			defaultHierarchy: LocalDateTable_2d6bc3b6-92ba-4121-90c3-88b9c60c3941.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'First Negative Score'
+		dataType: string
+		lineageTag: 3e9c919e-a825-4319-bd32-5d07eec9545a
+		summarizeBy: none
+		sourceColumn: First Negative Score
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'All Sepsis Scores'
+		dataType: string
+		lineageTag: a62627c8-28b8-42f6-9c85-8dccf67133b8
+		summarizeBy: none
+		sourceColumn: All Sepsis Scores
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Order date and time'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: bca508bb-0ef0-41a0-953c-98d051b647e7
+		summarizeBy: none
+		sourceColumn: Order date and time
+
+		variation Variation
+			isDefault
+			relationship: c7d0b758-76c5-40ac-893a-afb4c0eb5769
+			defaultHierarchy: LocalDateTable_c69966a4-dc7e-49df-a620-c6c299a76dde.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'In VERIFY Queue Time'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 406eb1bc-9fb5-4151-94fc-5de4f8a57e40
+		summarizeBy: none
+		sourceColumn: In VERIFY Queue Time
+
+		variation Variation
+			isDefault
+			relationship: fa825b33-f693-45c2-ba0e-cbf7695b0f57
+			defaultHierarchy: LocalDateTable_b0cfd23c-d7a6-46d9-ae8d-663c1e37c1fe.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Verified in Queue Time'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: bbda4e53-6421-4180-9a45-13ddce88d535
+		summarizeBy: none
+		sourceColumn: Verified in Queue Time
+
+		variation Variation
+			isDefault
+			relationship: 7809aadd-7870-4043-bf89-c5b43209620f
+			defaultHierarchy: LocalDateTable_8d0df1b5-949f-4da1-883d-26a74974d4a0.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Queue Verified by'
+		dataType: string
+		lineageTag: bb4d0c3e-d08c-4d59-9a0b-1a60d7a6eb81
+		summarizeBy: none
+		sourceColumn: Queue Verified by
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Order Dispense date and time'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 633a779c-90f8-4f91-8e98-3f073f5040eb
+		summarizeBy: none
+		sourceColumn: Order Dispense date and time
+
+		variation Variation
+			isDefault
+			relationship: 3e555ee2-c90f-4004-953d-acc37a0e43cb
+			defaultHierarchy: LocalDateTable_0ce66b77-00b0-433e-b515-07222c88c1c4.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Rx Dispense Sent Time'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 071ebed7-4e67-4a55-b6fa-fc3f52743229
+		summarizeBy: none
+		sourceColumn: Rx Dispense Sent Time
+
+		variation Variation
+			isDefault
+			relationship: 37f2acc3-e02d-4049-8df8-7a06f67b7e92
+			defaultHierarchy: LocalDateTable_873bd50c-75c3-4921-9080-706432d88c3c.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'First ABX Admin Time'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: a0156eb5-309b-49a4-a593-1a23371cda20
+		summarizeBy: none
+		sourceColumn: First ABX Admin Time
+
+		variation Variation
+			isDefault
+			relationship: 8b10fcdd-705e-498e-97cb-3054051b26da
+			defaultHierarchy: LocalDateTable_13e27e3c-63b7-4b23-98f5-5cb2ff0e0cd8.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'First ABX Name'
+		dataType: string
+		lineageTag: d3a717cc-e0bb-493e-8c83-e6a4bc4c671b
+		summarizeBy: none
+		sourceColumn: First ABX Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Arrival To First ABX Admin Time'
+		dataType: int64
+		formatString: 0
+		lineageTag: 6d653923-1093-40a9-b995-d96e569dd2f6
+		summarizeBy: sum
+		sourceColumn: Arrival To First ABX Admin Time
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Triage To First ABX Admin Time'
+		dataType: int64
+		formatString: 0
+		lineageTag: 139b65ca-7bfd-49da-a1e4-2a113e931854
+		summarizeBy: sum
+		sourceColumn: Triage To First ABX Admin Time
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'First Positive Screen To First ABX Time'
+		dataType: int64
+		formatString: 0
+		lineageTag: 9b66bd0c-8304-4808-a220-74c1539ce840
+		summarizeBy: sum
+		sourceColumn: First Positive Screen To First ABX Time
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Second ABX Admin Time'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: ec07c094-a146-4a81-a951-6f2f63dcaf96
+		summarizeBy: none
+		sourceColumn: Second ABX Admin Time
+
+		variation Variation
+			isDefault
+			relationship: 123fda01-239a-417b-b5cd-1a6cc37ae00a
+			defaultHierarchy: LocalDateTable_c8c2aa9c-daf9-486f-9291-6815175e36ea.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Second ABX Name'
+		dataType: string
+		lineageTag: b3f29fdb-761d-473c-ad67-7319a7437a5e
+		summarizeBy: none
+		sourceColumn: Second ABX Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'First ABX To Second ABX Admin Time'
+		dataType: int64
+		formatString: 0
+		lineageTag: 3ad186dd-1c53-4b2b-aa03-131343de4431
+		summarizeBy: sum
+		sourceColumn: First ABX To Second ABX Admin Time
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'First Positive Screen To Second ABX Time'
+		dataType: int64
+		formatString: 0
+		lineageTag: 755b9f27-5d89-46ff-b400-8ccd70b12efe
+		summarizeBy: sum
+		sourceColumn: First Positive Screen To Second ABX Time
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Order Set Time'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: f8f404ca-cfd0-4ff0-852c-633e492efbf6
+		summarizeBy: none
+		sourceColumn: Order Set Time
+
+		variation Variation
+			isDefault
+			relationship: d410f75f-235b-447b-bf1f-8e71bf9214b7
+			defaultHierarchy: LocalDateTable_bb225926-2f19-45c4-b817-680ac6efa27e.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Arrival To Order Set Time'
+		dataType: int64
+		formatString: 0
+		lineageTag: 3d98cfdc-c427-45b4-bea4-a1f74200bcae
+		summarizeBy: sum
+		sourceColumn: Arrival To Order Set Time
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Triage To Order Set Time'
+		dataType: int64
+		formatString: 0
+		lineageTag: b4a060d4-2f22-41d4-af3c-c6b0a695e5ea
+		summarizeBy: sum
+		sourceColumn: Triage To Order Set Time
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Bolus 1 Admin Time'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 7da8c730-406c-40d6-b9a8-6e9ae27f1fe3
+		summarizeBy: none
+		sourceColumn: Bolus 1 Admin Time
+
+		variation Variation
+			isDefault
+			relationship: a6eaf23c-1441-4dac-bbd0-84274d9dd186
+			defaultHierarchy: LocalDateTable_ce7d1dd1-1440-47d8-b7a9-0c3f1f214e4b.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Bolus 1 Volume'
+		dataType: string
+		lineageTag: 1c3f4cae-c254-45d6-a6fe-8aebd7a88532
+		summarizeBy: none
+		sourceColumn: Bolus 1 Volume
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Bolus 1 Administered'
+		dataType: string
+		lineageTag: 7bdcb451-d6cc-4c14-9e86-dbff7fe632c1
+		summarizeBy: none
+		sourceColumn: Bolus 1 Administered
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Arrival To First Bolus Time'
+		dataType: int64
+		formatString: 0
+		lineageTag: c7b878dc-1cc6-421b-9c62-1e1590bf908a
+		summarizeBy: sum
+		sourceColumn: Arrival To First Bolus Time
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Triage To First Bolus Time'
+		dataType: int64
+		formatString: 0
+		lineageTag: 639ee012-e0d5-422b-b57b-c7b76cd357cf
+		summarizeBy: sum
+		sourceColumn: Triage To First Bolus Time
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'First Positive Screen To First Bolus Time'
+		dataType: int64
+		formatString: 0
+		lineageTag: 9af38482-c9e3-4ba7-ad08-811c4c627da9
+		summarizeBy: sum
+		sourceColumn: First Positive Screen To First Bolus Time
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Bolus 2 Admin Time'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: d36abf17-a095-45f8-8965-985949d8ad59
+		summarizeBy: none
+		sourceColumn: Bolus 2 Admin Time
+
+		variation Variation
+			isDefault
+			relationship: f579aa6f-045a-4eae-8340-4fb2ea3eb0a6
+			defaultHierarchy: LocalDateTable_ffdfa57e-15ce-4a50-ae62-f438b47a2b17.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Bolus 2 Volume'
+		dataType: string
+		lineageTag: 6d1f97d3-45ac-4f45-b605-311e343c5bc7
+		summarizeBy: none
+		sourceColumn: Bolus 2 Volume
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Bolus 2 Administered'
+		dataType: string
+		lineageTag: 759c576c-7e7d-4c7a-ae82-9e2f2d0270e5
+		summarizeBy: none
+		sourceColumn: Bolus 2 Administered
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'First Positive Screen To Second Bolus Time'
+		dataType: int64
+		formatString: 0
+		lineageTag: ebf6a961-91f2-48e2-955d-968cc1299cf8
+		summarizeBy: sum
+		sourceColumn: First Positive Screen To Second Bolus Time
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'First Bolus To Second Bolus Time'
+		dataType: int64
+		formatString: 0
+		lineageTag: da02f86e-ba61-45c8-838d-0729a012f350
+		summarizeBy: sum
+		sourceColumn: First Bolus To Second Bolus Time
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Bolus 3 Admin Time'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: cebc0f26-a4a5-4445-8640-5663e4ab6791
+		summarizeBy: none
+		sourceColumn: Bolus 3 Admin Time
+
+		variation Variation
+			isDefault
+			relationship: f74c034d-55cf-444a-8d75-925278b3f3f4
+			defaultHierarchy: LocalDateTable_bb8e2d41-bf06-4d16-8750-30218ad7eb54.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Bolus 3 Volume'
+		dataType: string
+		lineageTag: 145878b2-447f-406e-941d-47a5765cd4fa
+		summarizeBy: none
+		sourceColumn: Bolus 3 Volume
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Bolus 3 Administered'
+		dataType: string
+		lineageTag: ce25457c-56ad-4277-8765-58275b7d53dd
+		summarizeBy: none
+		sourceColumn: Bolus 3 Administered
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'First Positive Screen To Third Bolus Time'
+		dataType: int64
+		formatString: 0
+		lineageTag: 29631d4c-63b5-4c82-8011-f23cd3e2321b
+		summarizeBy: sum
+		sourceColumn: First Positive Screen To Third Bolus Time
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Second Bolus To Third Bolus Time'
+		dataType: int64
+		formatString: 0
+		lineageTag: ce6b79f8-3289-4aac-bfbf-816167c6fe94
+		summarizeBy: sum
+		sourceColumn: Second Bolus To Third Bolus Time
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'PATIENTS Weight'
+		dataType: double
+		lineageTag: dc2975c8-017c-4c37-8dea-c1cac6ae0867
+		summarizeBy: sum
+		sourceColumn: PATIENTS Weight
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'First Hypotension Recorded Time'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: c5c043cc-a15b-463c-ad4e-9264fc7a571b
+		summarizeBy: none
+		sourceColumn: First Hypotension Recorded Time
+
+		variation Variation
+			isDefault
+			relationship: eff1834b-b1ce-4aeb-8e5e-5e272edc3539
+			defaultHierarchy: LocalDateTable_db509ef2-05d6-4919-8070-d78e775082f8.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'First Hypotension Value'
+		dataType: int64
+		formatString: 0
+		lineageTag: 5ea963c2-2365-420d-bdaa-6773cf9b6c76
+		summarizeBy: sum
+		sourceColumn: First Hypotension Value
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Arrival To First Hypotension Time'
+		dataType: int64
+		formatString: 0
+		lineageTag: 7847ac46-a7af-4dc9-bff0-5f1dfcb4b580
+		summarizeBy: sum
+		sourceColumn: Arrival To First Hypotension Time
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Triage To First Hypotension Time'
+		dataType: int64
+		formatString: 0
+		lineageTag: 0e6b4d07-f75e-44c2-a86e-8bd281bf13a2
+		summarizeBy: sum
+		sourceColumn: Triage To First Hypotension Time
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'CVL Placement Time'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 38489d46-bcea-4f02-b87b-51d54d73cbb9
+		summarizeBy: none
+		sourceColumn: CVL Placement Time
+
+		variation Variation
+			isDefault
+			relationship: 2888dd3a-6782-410f-91e5-ae0813447379
+			defaultHierarchy: LocalDateTable_11e30c13-706f-4462-90f1-191d40c23f06.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Arrival To CLV Placement Time'
+		dataType: int64
+		formatString: 0
+		lineageTag: 660d7904-2234-4625-adb0-2947d086c9f1
+		summarizeBy: sum
+		sourceColumn: Arrival To CLV Placement Time
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Triage To CLV Placement Time'
+		dataType: int64
+		formatString: 0
+		lineageTag: dbe24cbe-11c1-48cc-8155-159c8910dfc2
+		summarizeBy: sum
+		sourceColumn: Triage To CLV Placement Time
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Vasopressor Admin Time'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 928168fe-687a-412b-bc92-1b749274186a
+		summarizeBy: none
+		sourceColumn: Vasopressor Admin Time
+
+		variation Variation
+			isDefault
+			relationship: 479a785d-0321-4eea-898e-12be97873d9d
+			defaultHierarchy: LocalDateTable_49b77c20-4cf0-4d11-a163-23e1478fad9c.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Vasopressor Administered'
+		dataType: string
+		lineageTag: 89e98f12-6ccd-4ec6-8e80-90fab031e20c
+		summarizeBy: none
+		sourceColumn: Vasopressor Administered
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Arrival To Vasopressor Time'
+		dataType: int64
+		formatString: 0
+		lineageTag: 8ff30518-5239-436f-a39f-6118a959cf0b
+		summarizeBy: sum
+		sourceColumn: Arrival To Vasopressor Time
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Triage To Vasopressor Time'
+		dataType: int64
+		formatString: 0
+		lineageTag: 0e10640c-c92b-4afb-97af-303daf3fe6d0
+		summarizeBy: sum
+		sourceColumn: Triage To Vasopressor Time
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'First Positive Screen To Vasopressor Time'
+		dataType: int64
+		formatString: 0
+		lineageTag: 07f27b4c-fa57-4fb6-bbfc-ef10759ad346
+		summarizeBy: sum
+		sourceColumn: First Positive Screen To Vasopressor Time
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'SVO2 Order Time'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 0ebced53-2afc-4355-b17d-7b781f2b6c17
+		summarizeBy: none
+		sourceColumn: SVO2 Order Time
+
+		variation Variation
+			isDefault
+			relationship: 724304fd-2465-4800-b454-962644af89e8
+			defaultHierarchy: LocalDateTable_59617061-f13f-47e8-8da8-ebfbf567899d.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'SVO2 Order Collection Time'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: a743d45f-9a82-4178-a936-1c6c72b51926
+		summarizeBy: none
+		sourceColumn: SVO2 Order Collection Time
+
+		variation Variation
+			isDefault
+			relationship: e45876c1-ef14-42de-9743-78a60f51dcc5
+			defaultHierarchy: LocalDateTable_8afcfce6-1078-4979-b7fe-482f2f62b8ee.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'SVO2 Lab Result'
+		dataType: string
+		lineageTag: f3c800cb-1352-4101-b37e-7115631398b4
+		summarizeBy: none
+		sourceColumn: SVO2 Lab Result
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Arrival To SVO2 Order Time'
+		dataType: int64
+		formatString: 0
+		lineageTag: 3e14a855-cb3d-4ab9-96e3-33f72d246bad
+		summarizeBy: sum
+		sourceColumn: Arrival To SVO2 Order Time
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Triage To SVO2 Order Time'
+		dataType: int64
+		formatString: 0
+		lineageTag: 20daf8c4-bb59-4124-aae2-9592e9053d04
+		summarizeBy: sum
+		sourceColumn: Triage To SVO2 Order Time
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Lactic Acid Order Time'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 85fe7745-6ded-4ecb-bb22-5858c9177ad8
+		summarizeBy: none
+		sourceColumn: Lactic Acid Order Time
+
+		variation Variation
+			isDefault
+			relationship: 52451d6b-efd1-4e25-942c-de5970247e3c
+			defaultHierarchy: LocalDateTable_892c7287-c998-4ef2-9559-20e1fd62fc08.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Lactic Acid Order Collection Time'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 455259ab-6df3-4b59-882f-c3d3a4746597
+		summarizeBy: none
+		sourceColumn: Lactic Acid Order Collection Time
+
+		variation Variation
+			isDefault
+			relationship: 0c5d85c0-5e3f-4664-a63b-1c17a3c2b39a
+			defaultHierarchy: LocalDateTable_27b0370a-bf94-4c89-9ba7-751d4d387a41.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Lactic Acid Lab Result'
+		dataType: string
+		lineageTag: eeb9425b-436c-489a-b575-80788b14367b
+		summarizeBy: none
+		sourceColumn: Lactic Acid Lab Result
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Arrival To Lactic Acid Order Time'
+		dataType: int64
+		formatString: 0
+		lineageTag: b241e6f1-e87a-4fb7-a521-faa2e025f35f
+		summarizeBy: sum
+		sourceColumn: Arrival To Lactic Acid Order Time
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Triage To Lactic Acid Order Time'
+		dataType: int64
+		formatString: 0
+		lineageTag: 93eb0f25-0034-4434-abd4-5bdb2a6ec9e8
+		summarizeBy: sum
+		sourceColumn: Triage To Lactic Acid Order Time
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Procalcitonin Order Time'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 95d7b65b-80ad-41aa-8d5c-fc4eaf52f0d2
+		summarizeBy: none
+		sourceColumn: Procalcitonin Order Time
+
+		variation Variation
+			isDefault
+			relationship: f46d03cf-6bbf-454b-a1bf-84770be86abd
+			defaultHierarchy: LocalDateTable_eb640228-fd91-45f4-a736-360346d823f2.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Procalcitonin Order Collection Time'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 892a2209-45ee-46b3-9cf5-98474a9d86c4
+		summarizeBy: none
+		sourceColumn: Procalcitonin Order Collection Time
+
+		variation Variation
+			isDefault
+			relationship: 40fe8c16-754a-4ad5-acba-91fbcb515fbe
+			defaultHierarchy: LocalDateTable_8726630a-66dd-47c9-99a5-41dd0211d996.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Procalcitonin Lab Result'
+		dataType: string
+		lineageTag: affaa040-a0d8-4b58-810d-b7b3bdfabc80
+		summarizeBy: none
+		sourceColumn: Procalcitonin Lab Result
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Arrival To PRO Order Time'
+		dataType: int64
+		formatString: 0
+		lineageTag: 6a9e8f43-5933-4c92-a110-7af93f5a52a3
+		summarizeBy: sum
+		sourceColumn: Arrival To PRO Order Time
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Triage To PRO Order Time'
+		dataType: int64
+		formatString: 0
+		lineageTag: 07141892-0399-4a36-8034-c793aca05ab7
+		summarizeBy: sum
+		sourceColumn: Triage To PRO Order Time
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Blood Culture Order Time'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: f2cc9479-b31f-404f-8b13-7667aee92227
+		summarizeBy: none
+		sourceColumn: Blood Culture Order Time
+
+		variation Variation
+			isDefault
+			relationship: f2906c61-f822-46ff-9c94-bca77ec144b0
+			defaultHierarchy: LocalDateTable_3bc1b9e4-104d-44ba-80f6-41417cec4bee.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Blood Culture Order Collection Time'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: d307bd3c-dd9c-43c7-ab2f-3e9b9e5e5780
+		summarizeBy: none
+		sourceColumn: Blood Culture Order Collection Time
+
+		variation Variation
+			isDefault
+			relationship: 50870cdb-60c0-4eaa-ab74-f99f4012264b
+			defaultHierarchy: LocalDateTable_723e00c2-22a9-4b5e-a7dd-eec062072fea.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Blood Culture Lab Result'
+		dataType: string
+		lineageTag: c0fd6ade-595b-486d-8b62-4e805dca7c27
+		summarizeBy: none
+		sourceColumn: Blood Culture Lab Result
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Arrival To Blood Culture Order Time'
+		dataType: int64
+		formatString: 0
+		lineageTag: 93bdf6f9-5b14-41bb-801b-c280e7a14b17
+		summarizeBy: sum
+		sourceColumn: Arrival To Blood Culture Order Time
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Triage To Blood Culture Order Time'
+		dataType: int64
+		formatString: 0
+		lineageTag: 4db1dd68-9e74-4eab-85a9-c53cb468d7d2
+		summarizeBy: sum
+		sourceColumn: Triage To Blood Culture Order Time
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Urine Culture Order Time'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: c0b702a7-a375-421e-a3dd-7fb59f6d31d0
+		summarizeBy: none
+		sourceColumn: Urine Culture Order Time
+
+		variation Variation
+			isDefault
+			relationship: bd553d51-cc6c-47e8-b97a-24a22758dfb3
+			defaultHierarchy: LocalDateTable_012bf02e-37f1-4158-ac71-485f5321aeec.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Urine Culture Order Collection Time'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 53754011-9893-4289-b921-3feee7a41f5a
+		summarizeBy: none
+		sourceColumn: Urine Culture Order Collection Time
+
+		variation Variation
+			isDefault
+			relationship: e766a7f6-45d6-4bd6-845b-a0d5d1733fea
+			defaultHierarchy: LocalDateTable_5e65d872-522b-4673-9a92-a0416eb21124.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Urine Culture Lab Result'
+		dataType: string
+		lineageTag: ecb43779-9e13-4754-81e9-a518853d4827
+		summarizeBy: none
+		sourceColumn: Urine Culture Lab Result
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Arrival To Urine Culture Order Time'
+		dataType: int64
+		formatString: 0
+		lineageTag: 5b59d97f-de0c-4ea3-a6cf-ca6ef738fec5
+		summarizeBy: sum
+		sourceColumn: Arrival To Urine Culture Order Time
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Triage To Urine Culture Order Time'
+		dataType: int64
+		formatString: 0
+		lineageTag: 5b87db8c-4648-4d9a-9cb3-9575fb1ce6a4
+		summarizeBy: sum
+		sourceColumn: Triage To Urine Culture Order Time
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'CSF Order Time'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: e139bbc1-150f-4d53-9ee6-1e3f59b6f328
+		summarizeBy: none
+		sourceColumn: CSF Order Time
+
+		variation Variation
+			isDefault
+			relationship: 22cf8867-f7d2-42aa-88c4-93d62e508b22
+			defaultHierarchy: LocalDateTable_2122cea3-7808-4f6d-8abd-aff86bfccb70.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'CSF Order Collection Time'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: e363dd3e-53e6-41a2-9376-f1671044988e
+		summarizeBy: none
+		sourceColumn: CSF Order Collection Time
+
+		variation Variation
+			isDefault
+			relationship: e1160993-1387-41a3-b08c-267802d95ac7
+			defaultHierarchy: LocalDateTable_87b2b29d-c8bb-4bea-9a67-ec22c6eaf30d.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'CSF Lab Result'
+		dataType: string
+		lineageTag: 3d9a0a71-0ae7-4ce0-831b-b2eb77cec995
+		summarizeBy: none
+		sourceColumn: CSF Lab Result
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Arrival To CSF Order Time'
+		dataType: int64
+		formatString: 0
+		lineageTag: d75204de-88b9-4dd9-b823-2fd0c26ea8d0
+		summarizeBy: sum
+		sourceColumn: Arrival To CSF Order Time
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Triage To CSF Order Time'
+		dataType: int64
+		formatString: 0
+		lineageTag: 227033b3-23fc-465f-9633-d4f44d62a2f3
+		summarizeBy: sum
+		sourceColumn: Triage To CSF Order Time
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'First ETT Placement Time'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: cef6d0a4-74c3-42ee-9155-66165e222754
+		summarizeBy: none
+		sourceColumn: First ETT Placement Time
+
+		variation Variation
+			isDefault
+			relationship: 0f56e14d-7f52-4604-883e-6ef7cc2c0820
+			defaultHierarchy: LocalDateTable_9824b0e0-0fbd-457f-bf50-e1ffc716c539.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'First PIV Placement Time'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 4e9bc027-881f-4c12-8483-7b0483e09dd1
+		summarizeBy: none
+		sourceColumn: First PIV Placement Time
+
+		variation Variation
+			isDefault
+			relationship: e8ab41e2-92b0-4492-b91b-2382c8aa11bf
+			defaultHierarchy: LocalDateTable_a313b724-2bd0-4b9a-ba5e-e8d7d41dcdb6.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'First Positive Screen To First PIV Placement'
+		dataType: int64
+		formatString: 0
+		lineageTag: d37bee81-3ed5-487e-9279-2fab33f03a0f
+		summarizeBy: sum
+		sourceColumn: First Positive Screen To First PIV Placement
+
+		annotation SummarizationSetBy = Automatic
+
+	column ED2HemoncTime
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: e88ccb30-2868-4b0a-955e-267f5b7e5ecf
+		summarizeBy: none
+		sourceColumn: ED2HemoncTime
+
+		variation Variation
+			isDefault
+			relationship: 96565b42-1892-4cbf-82c7-ea680e309b10
+			defaultHierarchy: LocalDateTable_7022d27e-8dc0-4da5-93f4-ad878a3fa45d.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column ED2ICUTime
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: d4ba95ad-e3ef-4cd2-8f47-5ca02a4a9633
+		summarizeBy: none
+		sourceColumn: ED2ICUTime
+
+		variation Variation
+			isDefault
+			relationship: 9ec27bc7-3dec-49bf-9a74-dc060e918208
+			defaultHierarchy: LocalDateTable_6997c9b8-7799-4130-b6c4-8752d83b57a1.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column ED2GENTime
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: ff00d196-5a7e-431f-bf53-68e2993eaa8d
+		summarizeBy: none
+		sourceColumn: ED2GENTime
+
+		variation Variation
+			isDefault
+			relationship: 8af600c0-8228-4a00-b553-edc83027d84e
+			defaultHierarchy: LocalDateTable_87ef4dbc-b16f-4785-a5ab-2ffa889c445e.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Gen Back To ICU Time'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: d28799cd-7e3d-4f52-b7f7-b47a6e01cf08
+		summarizeBy: none
+		sourceColumn: Gen Back To ICU Time
+
+		variation Variation
+			isDefault
+			relationship: 2089e6f1-5d8b-4992-9b63-4abf8a479487
+			defaultHierarchy: LocalDateTable_0e267558-2e03-4450-8d93-9fa283936357.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Gen Back To ICU Department'
+		dataType: string
+		lineageTag: 36420a7f-170e-4c74-b80b-4387482a276f
+		summarizeBy: none
+		sourceColumn: Gen Back To ICU Department
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'First BPA CLINICAL_ALERTS/Action Time'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 952cab25-4326-46bc-898c-066740bc460e
+		summarizeBy: none
+		sourceColumn: First BPA CLINICAL_ALERTS/Action Time
+
+		variation Variation
+			isDefault
+			relationship: 40d44d7e-8784-47a2-bbda-b49f4ba514dc
+			defaultHierarchy: LocalDateTable_28af6a7d-935c-43d2-aa3a-08dbd6e37ea4.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Action Taken'
+		dataType: string
+		lineageTag: a75816aa-09df-4a57-b159-66760e328a5f
+		summarizeBy: none
+		sourceColumn: Action Taken
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'BPA Overridden'
+		dataType: string
+		lineageTag: 54eaeff1-798d-4763-95ed-b832d9aa6503
+		summarizeBy: none
+		sourceColumn: BPA Overridden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'BPA Overridden Comment'
+		dataType: string
+		lineageTag: 96c7eb1d-01de-458b-8c59-5e312090073e
+		summarizeBy: none
+		sourceColumn: BPA Overridden Comment
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'BPA Action User'
+		dataType: string
+		lineageTag: 06cb061c-9ada-48a8-861b-9d2f37375ab9
+		summarizeBy: none
+		sourceColumn: BPA Action User
+
+		annotation SummarizationSetBy = Automatic
+
+	column SEPSIS_ALERT_CANC_TIME
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: f3df6682-06bb-432b-8189-85d45f3f3d1b
+		summarizeBy: none
+		sourceColumn: SEPSIS_ALERT_CANC_TIME
+
+		variation Variation
+			isDefault
+			relationship: 7173c1ad-1a0e-4b1b-b4cf-7dcf88ee8c5e
+			defaultHierarchy: LocalDateTable_cc40935d-020b-4ffc-8397-93fc2cd2c140.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column SEPSIS_ALERT_CANC_BY
+		dataType: string
+		lineageTag: c55de6b9-540a-400d-9664-4feba057fb07
+		summarizeBy: none
+		sourceColumn: SEPSIS_ALERT_CANC_BY
+
+		annotation SummarizationSetBy = Automatic
+
+	column SEPSIS_ALERT_CANC_FLAG
+		dataType: string
+		lineageTag: 3f3f55d0-131c-43ff-a72c-47c2e0c25d86
+		summarizeBy: none
+		sourceColumn: SEPSIS_ALERT_CANC_FLAG
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Any BP During ED Stay?'
+		dataType: string
+		lineageTag: 6f27798d-d158-4346-a215-85455855d58c
+		summarizeBy: none
+		sourceColumn: Any BP During ED Stay?
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'ED IP Bed Requested Time'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: e915da02-6408-4f8c-9f0f-6425f123eaba
+		summarizeBy: none
+		sourceColumn: ED IP Bed Requested Time
+
+		variation Variation
+			isDefault
+			relationship: 06adf051-5cf1-4ff9-a5ec-8f64d5ba4a9f
+			defaultHierarchy: LocalDateTable_4a4b8b46-3db1-4b35-9d43-5b4f4d8440cb.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'ED IP Bed Assigned Time'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: bdc0cb60-a3ce-44a7-9664-6693e27861ad
+		summarizeBy: none
+		sourceColumn: ED IP Bed Assigned Time
+
+		variation Variation
+			isDefault
+			relationship: 338ba6b6-4bb0-4f2a-80bc-1a9804c2af67
+			defaultHierarchy: LocalDateTable_828e9db2-206c-41e9-88ac-9da4e6b41a89.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Bed Request to Bed Assigned Time'
+		dataType: int64
+		formatString: 0
+		lineageTag: 0b90f6f8-84f2-48ba-b485-ace782107fd2
+		summarizeBy: sum
+		sourceColumn: Bed Request to Bed Assigned Time
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'IP Bed Request to PICU Transfer Time'
+		dataType: int64
+		formatString: 0
+		lineageTag: 612fb94c-972e-40f8-b87b-bff4a763a5aa
+		summarizeBy: sum
+		sourceColumn: IP Bed Request to PICU Transfer Time
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'ED Border PATIENTS'
+		dataType: string
+		lineageTag: 536b4fe9-aef5-4ab9-bf9a-32a037bac03e
+		summarizeBy: none
+		sourceColumn: ED Border PATIENTS
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Sepsis Pos ED Readmit in 24Hrs'
+		dataType: string
+		lineageTag: 0891c178-348d-49e5-ac5a-4ed03d923de1
+		summarizeBy: none
+		sourceColumn: Sepsis Pos ED Readmit in 24Hrs
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'ED Readmit in 24Hrs'
+		dataType: string
+		lineageTag: 66081b36-804c-4aee-bfda-d158462f0736
+		summarizeBy: none
+		sourceColumn: ED Readmit in 24Hrs
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'SSS Severe Sepsis Criteria Met'
+		dataType: string
+		lineageTag: 2a90c2cd-7510-479c-a64f-47a5002759f7
+		summarizeBy: none
+		sourceColumn: SSS Severe Sepsis Criteria Met
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'SSS Non Severe Sepsis Criteria Met'
+		dataType: string
+		lineageTag: b2706023-c226-41f8-9cb0-9e00205e6e93
+		summarizeBy: none
+		sourceColumn: SSS Non Severe Sepsis Criteria Met
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Positive Sepsis and OrderSet Placed'
+		dataType: int64
+		formatString: 0
+		lineageTag: 87021fab-bca9-46d1-bb65-63dad333c979
+		summarizeBy: sum
+		sourceColumn: Positive Sepsis and OrderSet Placed
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Positive Sepsis and OrderSet NOT Placed'
+		dataType: int64
+		formatString: 0
+		lineageTag: 23ef8018-29a8-48b5-99b3-0512adff5de4
+		summarizeBy: sum
+		sourceColumn: Positive Sepsis and OrderSet NOT Placed
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Positive Sepsis and Abx Administered'
+		dataType: int64
+		formatString: 0
+		lineageTag: e67fa6f0-9cb6-46f3-9370-aed36de8bfc6
+		summarizeBy: sum
+		sourceColumn: Positive Sepsis and Abx Administered
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Positive Sepsis and Abx NOT Administered'
+		dataType: int64
+		formatString: 0
+		lineageTag: 5b3a1d31-a889-4c30-b203-da68fbdf8866
+		summarizeBy: sum
+		sourceColumn: Positive Sepsis and Abx NOT Administered
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Positive Sepsis and Bolus Administered'
+		dataType: int64
+		formatString: 0
+		lineageTag: 63b594ae-50a6-40c4-80c7-c1a19a68d081
+		summarizeBy: sum
+		sourceColumn: Positive Sepsis and Bolus Administered
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Positive Sepsis and Bolus NOT Administered'
+		dataType: int64
+		formatString: 0
+		lineageTag: 957e4758-9a84-4393-9f5b-c088046f2449
+		summarizeBy: sum
+		sourceColumn: Positive Sepsis and Bolus NOT Administered
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Positive Sepsis and Blood Culture Ordered'
+		dataType: int64
+		formatString: 0
+		lineageTag: 681f9966-c49a-4389-b577-3884881ccb42
+		summarizeBy: sum
+		sourceColumn: Positive Sepsis and Blood Culture Ordered
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Positive Sepsis and Blood Culture NOT Ordered'
+		dataType: int64
+		formatString: 0
+		lineageTag: 8a34d660-43b1-45ec-8b7f-153061bfe569
+		summarizeBy: sum
+		sourceColumn: Positive Sepsis and Blood Culture NOT Ordered
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Negative Sepsis and OrderSet Placed'
+		dataType: int64
+		formatString: 0
+		lineageTag: b735d210-0397-4b89-993d-783c3f653213
+		summarizeBy: sum
+		sourceColumn: Negative Sepsis and OrderSet Placed
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Negative Sepsis and OrderSet NOT Placed'
+		dataType: int64
+		formatString: 0
+		lineageTag: 4f435b3d-29ef-492e-a1af-c801f276d32e
+		summarizeBy: sum
+		sourceColumn: Negative Sepsis and OrderSet NOT Placed
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Negative Sepsis and Abx Administered'
+		dataType: int64
+		formatString: 0
+		lineageTag: 9abad232-9df9-4c99-abc2-3c0621089a4d
+		summarizeBy: sum
+		sourceColumn: Negative Sepsis and Abx Administered
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Negative Sepsis and Abx NOT Administered'
+		dataType: int64
+		formatString: 0
+		lineageTag: 18d4c193-82fd-4f42-9368-5b2caf07c333
+		summarizeBy: sum
+		sourceColumn: Negative Sepsis and Abx NOT Administered
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Negative Sepsis and Bolus Administered'
+		dataType: int64
+		formatString: 0
+		lineageTag: de63f69a-2670-4fd7-825e-983855a2a1d8
+		summarizeBy: sum
+		sourceColumn: Negative Sepsis and Bolus Administered
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Negative Sepsis and Bolus NOT Administered'
+		dataType: int64
+		formatString: 0
+		lineageTag: ea89d834-03c5-4818-af67-6a58572e3c56
+		summarizeBy: sum
+		sourceColumn: Negative Sepsis and Bolus NOT Administered
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Negative Sepsis and Blood Culture Ordered'
+		dataType: int64
+		formatString: 0
+		lineageTag: ee46dcfb-02da-4907-a71b-535a3689d701
+		summarizeBy: sum
+		sourceColumn: Negative Sepsis and Blood Culture Ordered
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Negative Sepsis and Blood Culture NOT Ordered'
+		dataType: int64
+		formatString: 0
+		lineageTag: d1db10d2-c7ce-42ae-82ed-2a1268dd71d3
+		summarizeBy: sum
+		sourceColumn: Negative Sepsis and Blood Culture NOT Ordered
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'SSS SEVERE and Positive Sepsis and OrderSet Placed'
+		dataType: int64
+		formatString: 0
+		lineageTag: e1d5414a-d3f7-40ae-b700-30e96b24f09c
+		summarizeBy: sum
+		sourceColumn: SSS SEVERE and Positive Sepsis and OrderSet Placed
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'SSS SEVERE and Positive Sepsis and OrderSet NOT Placed'
+		dataType: int64
+		formatString: 0
+		lineageTag: 9ada9bdd-42c8-4702-b33f-714072d23bf6
+		summarizeBy: sum
+		sourceColumn: SSS SEVERE and Positive Sepsis and OrderSet NOT Placed
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'SSS SEVERE and Positive Sepsis and Abx Administered'
+		dataType: int64
+		formatString: 0
+		lineageTag: b970cca2-e47b-4857-8dc1-18440196d2d3
+		summarizeBy: sum
+		sourceColumn: SSS SEVERE and Positive Sepsis and Abx Administered
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'SSS SEVERE and Positive Sepsis and Abx NOT Administered'
+		dataType: int64
+		formatString: 0
+		lineageTag: 03c4653b-b66f-47ed-a5cd-5349be5412aa
+		summarizeBy: sum
+		sourceColumn: SSS SEVERE and Positive Sepsis and Abx NOT Administered
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'SSS SEVERE and Positive Sepsis and Bolus Administered'
+		dataType: int64
+		formatString: 0
+		lineageTag: dd864c70-d357-49b7-9f6a-31f7a53fe5a8
+		summarizeBy: sum
+		sourceColumn: SSS SEVERE and Positive Sepsis and Bolus Administered
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'SSS SEVERE and Positive Sepsis and Bolus NOT Administered'
+		dataType: int64
+		formatString: 0
+		lineageTag: 983de3e9-e02f-4dd6-bb83-5149ffdb684a
+		summarizeBy: sum
+		sourceColumn: SSS SEVERE and Positive Sepsis and Bolus NOT Administered
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'SSS SEVERE and Positive Sepsis and Blood Culture Ordered'
+		dataType: int64
+		formatString: 0
+		lineageTag: 69e15f7a-a81e-4606-b068-d2cb37db7fa4
+		summarizeBy: sum
+		sourceColumn: SSS SEVERE and Positive Sepsis and Blood Culture Ordered
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'SSS SEVERE and Positive Sepsis and Blood Culture NOT Ordered'
+		dataType: int64
+		formatString: 0
+		lineageTag: 4d49dfa0-e1f5-496e-a175-6b6a795b85e4
+		summarizeBy: sum
+		sourceColumn: SSS SEVERE and Positive Sepsis and Blood Culture NOT Ordered
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'SSS NON SEVERE and Positive Sepsis and OrderSet Placed'
+		dataType: int64
+		formatString: 0
+		lineageTag: eecd41b3-9236-4bf4-b111-67a2987e3336
+		summarizeBy: sum
+		sourceColumn: SSS NON SEVERE and Positive Sepsis and OrderSet Placed
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'SSS NON SEVERE and Positive Sepsis and OrderSet NOT Placed'
+		dataType: int64
+		formatString: 0
+		lineageTag: a3ba2dbb-556c-4451-94ce-26b94aab879c
+		summarizeBy: sum
+		sourceColumn: SSS NON SEVERE and Positive Sepsis and OrderSet NOT Placed
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'SSS NON SEVERE and Positive Sepsis and Abx Administered'
+		dataType: int64
+		formatString: 0
+		lineageTag: 26e4916d-b961-4af1-9ec0-0a7aea3b860b
+		summarizeBy: sum
+		sourceColumn: SSS NON SEVERE and Positive Sepsis and Abx Administered
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'SSS NON SEVERE and Positive Sepsis and Abx NOT Administered'
+		dataType: int64
+		formatString: 0
+		lineageTag: 56708d04-75bf-4faa-9eaf-26ded4e4ae4f
+		summarizeBy: sum
+		sourceColumn: SSS NON SEVERE and Positive Sepsis and Abx NOT Administered
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'SSS NON SEVERE and Positive Sepsis and Bolus Administered'
+		dataType: int64
+		formatString: 0
+		lineageTag: 2c2e61d7-1b11-4f22-9701-c9cb74e5c00d
+		summarizeBy: sum
+		sourceColumn: SSS NON SEVERE and Positive Sepsis and Bolus Administered
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'SSS NON SEVERE and Positive Sepsis and Bolus NOT Administered'
+		dataType: int64
+		formatString: 0
+		lineageTag: f8adceb5-978c-4adc-b3e5-61345c138314
+		summarizeBy: sum
+		sourceColumn: SSS NON SEVERE and Positive Sepsis and Bolus NOT Administered
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'SSS NON SEVERE and Positive Sepsis and Blood Culture Ordered'
+		dataType: int64
+		formatString: 0
+		lineageTag: b8b2d143-d1df-4257-87a7-92b499449d09
+		summarizeBy: sum
+		sourceColumn: SSS NON SEVERE and Positive Sepsis and Blood Culture Ordered
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'SSS NON SEVERE and Positive Sepsis and Blood Culture NOT Ordered'
+		dataType: int64
+		formatString: 0
+		lineageTag: 7cd0ca0a-d447-4a7c-9033-07a559651bac
+		summarizeBy: sum
+		sourceColumn: SSS NON SEVERE and Positive Sepsis and Blood Culture NOT Ordered
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'SSS SEVERE and Negative Sepsis and OrderSet Placed'
+		dataType: int64
+		formatString: 0
+		lineageTag: 7bc4d2ad-3ea8-4214-9ff8-87f80a06474e
+		summarizeBy: sum
+		sourceColumn: SSS SEVERE and Negative Sepsis and OrderSet Placed
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'SSS SEVERE and Negative Sepsis and OrderSet NOT Placed'
+		dataType: int64
+		formatString: 0
+		lineageTag: a12cf8bd-ba2c-4cfe-9ffc-524ef3154c93
+		summarizeBy: sum
+		sourceColumn: SSS SEVERE and Negative Sepsis and OrderSet NOT Placed
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'SSS SEVERE and Negative Sepsis and Abx Administered'
+		dataType: int64
+		formatString: 0
+		lineageTag: ea81ab37-16c0-4a02-9c1a-ecc6ca9b8946
+		summarizeBy: sum
+		sourceColumn: SSS SEVERE and Negative Sepsis and Abx Administered
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'SSS SEVERE and Negative Sepsis and Abx NOT Administered'
+		dataType: int64
+		formatString: 0
+		lineageTag: 4ecdfad4-7745-4d3b-8d17-a1d52a6596b0
+		summarizeBy: sum
+		sourceColumn: SSS SEVERE and Negative Sepsis and Abx NOT Administered
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'SSS SEVERE and Negative Sepsis and Bolus Administered'
+		dataType: int64
+		formatString: 0
+		lineageTag: 895560e4-f1af-4636-af40-8774cfb88c44
+		summarizeBy: sum
+		sourceColumn: SSS SEVERE and Negative Sepsis and Bolus Administered
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'SSS SEVERE and Negative Sepsis and Bolus NOT Administered'
+		dataType: int64
+		formatString: 0
+		lineageTag: 711f5b3d-14c3-433e-a166-ce17880fdc7c
+		summarizeBy: sum
+		sourceColumn: SSS SEVERE and Negative Sepsis and Bolus NOT Administered
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'SSS SEVERE and Negative Sepsis and Blood Culture Ordered'
+		dataType: int64
+		formatString: 0
+		lineageTag: 1958ef3e-0cef-4fc5-ac14-9a20e8c9f6f9
+		summarizeBy: sum
+		sourceColumn: SSS SEVERE and Negative Sepsis and Blood Culture Ordered
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'SSS SEVERE and Negative Sepsis and Blood Culture NOT Ordered'
+		dataType: int64
+		formatString: 0
+		lineageTag: e2c1bf8a-99f0-40ab-8169-16c263e398c6
+		summarizeBy: sum
+		sourceColumn: SSS SEVERE and Negative Sepsis and Blood Culture NOT Ordered
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'SSS NON SEVERE and Negative Sepsis and OrderSet Placed'
+		dataType: int64
+		formatString: 0
+		lineageTag: 9714a364-b6f3-4193-8294-5a0b02c38458
+		summarizeBy: sum
+		sourceColumn: SSS NON SEVERE and Negative Sepsis and OrderSet Placed
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'SSS NON SEVERE and Negative Sepsis and OrderSet NOT Placed'
+		dataType: int64
+		formatString: 0
+		lineageTag: 96c29eea-929f-463b-9aef-4ee74cbc81cc
+		summarizeBy: sum
+		sourceColumn: SSS NON SEVERE and Negative Sepsis and OrderSet NOT Placed
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'SSS NON SEVERE and Negative Sepsis and Abx Administered'
+		dataType: int64
+		formatString: 0
+		lineageTag: d42ad5d7-f7a1-4b50-9b7a-a8481040f7cd
+		summarizeBy: sum
+		sourceColumn: SSS NON SEVERE and Negative Sepsis and Abx Administered
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'SSS NON SEVERE and Negative Sepsis and Abx NOT Administered'
+		dataType: int64
+		formatString: 0
+		lineageTag: a5a0653d-607b-43d2-a2d7-42dfc0e1e45b
+		summarizeBy: sum
+		sourceColumn: SSS NON SEVERE and Negative Sepsis and Abx NOT Administered
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'SSS NON SEVERE and Negative Sepsis and Bolus Administered'
+		dataType: int64
+		formatString: 0
+		lineageTag: 719decdc-3860-4075-8498-8578d0aae932
+		summarizeBy: sum
+		sourceColumn: SSS NON SEVERE and Negative Sepsis and Bolus Administered
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'SSS NON SEVERE and Negative Sepsis and Bolus NOT Administered'
+		dataType: int64
+		formatString: 0
+		lineageTag: 0dd381d6-c6ad-493c-85b7-6377c20c5de1
+		summarizeBy: sum
+		sourceColumn: SSS NON SEVERE and Negative Sepsis and Bolus NOT Administered
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'SSS NON SEVERE and Negative Sepsis and Blood Culture Ordered'
+		dataType: int64
+		formatString: 0
+		lineageTag: cecf363b-e981-4af0-a75a-c835748466fa
+		summarizeBy: sum
+		sourceColumn: SSS NON SEVERE and Negative Sepsis and Blood Culture Ordered
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'SSS NON SEVERE and Negative Sepsis and Blood Culture NOT Ordered'
+		dataType: int64
+		formatString: 0
+		lineageTag: caaede54-dbcf-4cc7-a761-980f1e0f8327
+		summarizeBy: sum
+		sourceColumn: SSS NON SEVERE and Negative Sepsis and Blood Culture NOT Ordered
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Septic Shock'
+		dataType: string
+		lineageTag: 4e3a1a04-c01e-4f5f-9f48-4b5e07f85d75
+		summarizeBy: none
+		sourceColumn: Septic Shock
+
+		annotation SummarizationSetBy = Automatic
+
+	column RECORDED_TIME
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: ba173a69-5cd9-4621-9b50-f4635665fde2
+		summarizeBy: none
+		sourceColumn: RECORDED_TIME
+
+		variation Variation
+			isDefault
+			relationship: 803647c4-914e-4ebb-8a0d-c5f714fa1a94
+			defaultHierarchy: LocalDateTable_309bc9d2-eeb0-4700-92c6-29a32400940c.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column RECORDED_TIME2
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: d13b540c-ef24-4357-821d-1b477c56bc5d
+		summarizeBy: none
+		sourceColumn: RECORDED_TIME2
+
+		variation Variation
+			isDefault
+			relationship: 5f09481d-0151-4bcd-a5e9-544811520066
+			defaultHierarchy: LocalDateTable_aaae4237-77c9-46e8-8563-09e58d3266ef.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column ADT_DEPARTMENT_NAME
+		dataType: string
+		lineageTag: 43822c61-7cbe-45a1-9611-d471cdb3d8d6
+		summarizeBy: none
+		sourceColumn: ADT_DEPARTMENT_NAME
+
+		annotation SummarizationSetBy = Automatic
+
+	column RECORDED_TIME3
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 3834734a-1971-4ea3-b38b-364d878f5881
+		summarizeBy: none
+		sourceColumn: RECORDED_TIME3
+
+		variation Variation
+			isDefault
+			relationship: 2daa8a06-95a1-4c7c-80fb-f48a904c28a3
+			defaultHierarchy: LocalDateTable_97a323b6-6d4e-41f6-b455-08a7dda2659a.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column MEAS_VALUE
+		dataType: string
+		lineageTag: 5ef02fa3-a9d3-45a9-8c2e-37e73f22d0f8
+		summarizeBy: none
+		sourceColumn: MEAS_VALUE
+
+		annotation SummarizationSetBy = Automatic
+
+	column RECORDED_TIME4
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 85d6aa6c-5179-48e7-9871-a40cd60179ea
+		summarizeBy: none
+		sourceColumn: RECORDED_TIME4
+
+		variation Variation
+			isDefault
+			relationship: 311cba32-97c8-4162-9fda-d9f4b1038fb3
+			defaultHierarchy: LocalDateTable_9e9dbf86-735a-4b6d-9454-81da6b4d42b2.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column MEAS_VALUE2
+		dataType: string
+		lineageTag: 4b59a8ba-6247-45cf-98ef-578282785e2b
+		summarizeBy: none
+		sourceColumn: MEAS_VALUE2
+
+		annotation SummarizationSetBy = Automatic
+
+	column RECORDED_TIME5
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: ee6ef634-923f-4c7c-8b03-c3205b4302a1
+		summarizeBy: none
+		sourceColumn: RECORDED_TIME5
+
+		variation Variation
+			isDefault
+			relationship: 35eda7a9-43a9-4df8-9b15-b4eb0b7f72f7
+			defaultHierarchy: LocalDateTable_0529313f-294f-4bd3-9b0e-136b562f9d91.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column MEAS_VALUE3
+		dataType: string
+		lineageTag: 14b924d5-9778-442b-9488-e946dd972b7f
+		summarizeBy: none
+		sourceColumn: MEAS_VALUE3
+
+		annotation SummarizationSetBy = Automatic
+
+	column RECORDED_TIME6
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 0ae2ab95-8340-492b-8091-70925b3fef74
+		summarizeBy: none
+		sourceColumn: RECORDED_TIME6
+
+		variation Variation
+			isDefault
+			relationship: e20e9771-70af-4357-ad32-be1a7ce3f104
+			defaultHierarchy: LocalDateTable_9c804234-4652-44ee-916e-2de610926f24.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column MEAS_VALUE4
+		dataType: string
+		lineageTag: aba80108-2c28-492c-85d4-47369671a9f2
+		summarizeBy: none
+		sourceColumn: MEAS_VALUE4
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'First IP Department'
+		dataType: string
+		lineageTag: d13a41c1-c98c-4e5f-80f3-9dcbaea2f76f
+		summarizeBy: none
+		sourceColumn: First IP Department
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Last Blood Pressure Time'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: b136d910-c63a-4a9d-a389-e969ff4277a1
+		summarizeBy: none
+		sourceColumn: Last Blood Pressure Time
+
+		variation Variation
+			isDefault
+			relationship: 03ed8927-04fc-4cd3-92e2-698dfe9a8d4e
+			defaultHierarchy: LocalDateTable_296446ca-0b95-40b4-bc32-5d6906565100.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Last Blood Pressure Value'
+		dataType: string
+		lineageTag: f67f26c5-87e1-4ee4-8059-788ac6a1283a
+		summarizeBy: none
+		sourceColumn: Last Blood Pressure Value
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Last BP to First Positive Score Time'
+		dataType: int64
+		formatString: 0
+		lineageTag: 3056fc9a-946e-4397-b84f-a764a0c8f14e
+		summarizeBy: sum
+		sourceColumn: Last BP to First Positive Score Time
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Last BP to First Negative Score Time'
+		dataType: int64
+		formatString: 0
+		lineageTag: 863dc8e5-8ffd-4dd6-a565-484bb4ad7ba9
+		summarizeBy: sum
+		sourceColumn: Last BP to First Negative Score Time
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'First Blood Pressure Time'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 05a58c15-3114-4ee1-8d77-00d8a7f02835
+		summarizeBy: none
+		sourceColumn: First Blood Pressure Time
+
+		variation Variation
+			isDefault
+			relationship: 39e74a67-3e8f-4916-8464-cf1219ed3e51
+			defaultHierarchy: LocalDateTable_00584e54-fb90-4938-9bcd-ebc365a9d127.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'First Blood Pressure Value'
+		dataType: string
+		lineageTag: 0c3e234d-a205-4034-99f5-b7bc27e16d43
+		summarizeBy: none
+		sourceColumn: First Blood Pressure Value
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'First Positive Score Time to First BP'
+		dataType: int64
+		formatString: 0
+		lineageTag: 1fc7ff50-5414-4ca3-a20a-dae8015892f1
+		summarizeBy: sum
+		sourceColumn: First Positive Score Time to First BP
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'First Negative Score Time to First BP'
+		dataType: int64
+		formatString: 0
+		lineageTag: fb309121-3604-4c04-a536-0a1fcb8eb20b
+		summarizeBy: sum
+		sourceColumn: First Negative Score Time to First BP
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Last BP Percentile Time'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: d411fc0d-024c-4540-999c-c8b4e692c445
+		summarizeBy: none
+		sourceColumn: Last BP Percentile Time
+
+		variation Variation
+			isDefault
+			relationship: 9729519c-095e-442d-a19b-2bb1c98edd90
+			defaultHierarchy: LocalDateTable_acfbffd8-e293-418c-9c47-2a740612437c.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Last BP Percentile Value'
+		dataType: string
+		lineageTag: dcce8498-bb77-4446-9624-7e5ed53ba86c
+		summarizeBy: none
+		sourceColumn: Last BP Percentile Value
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'First BP Percentile Time'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 98b93bfd-433d-43b8-babf-e6d965ca4d31
+		summarizeBy: none
+		sourceColumn: First BP Percentile Time
+
+		variation Variation
+			isDefault
+			relationship: 0856234d-c68a-4aef-8f3b-1a7b6215d4e6
+			defaultHierarchy: LocalDateTable_8dc75ceb-443e-4aa6-9f35-70079a51129f.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'First BP Percentile Value'
+		dataType: string
+		lineageTag: 29017e9b-28f8-4de5-b930-b57833c1246d
+		summarizeBy: none
+		sourceColumn: First BP Percentile Value
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'ReScreen After FPS'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: e3d36031-45e0-4fdf-b78b-b3a9d047b7a5
+		summarizeBy: none
+		sourceColumn: ReScreen After FPS
+
+		variation Variation
+			isDefault
+			relationship: b692260d-6299-4753-a149-831ca1cdc107
+			defaultHierarchy: LocalDateTable_67bc0d56-8956-4fb3-b0a2-0ef5233fce16.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Repeat Screen before ED Departure'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 0cbecbe1-c2a5-4675-b652-773e8cafbecd
+		summarizeBy: none
+		sourceColumn: Repeat Screen before ED Departure
+
+		variation Variation
+			isDefault
+			relationship: 14849c64-811f-47ae-8a50-2c3ea359c865
+			defaultHierarchy: LocalDateTable_0c68d3c4-781c-4b16-9596-c1e6044c342a.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'FPS Bolus ABX ReScreen Compliance'
+		dataType: int64
+		formatString: 0
+		lineageTag: 4e51c554-2d07-44e8-a564-2c715bb2a037
+		summarizeBy: sum
+		sourceColumn: FPS Bolus ABX ReScreen Compliance
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Screening Detail' = m
+		mode: import
+		source =
+				let
+				  Source = Sql.Database("SCRUBBED-ENDPOINT.example,1433", "SCRUBBED-DATABASE", [Query = "EXEC reporting.USP_ED_Sepsis 'MB-1', 'ME-1'"])
+				in
+				  Source
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,102 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "d5f601fa4c5a040e74e7",
+  "position": {
+    "x": 51.092436974789919,
+    "y": 406.69467787114849,
+    "z": 1000,
+    "height": 307.15219421101773,
+    "width": 542.59570494864613,
+    "tabOrder": 1000
+  },
+  "visual": {
+    "visualType": "lineChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "HierarchyLevel": {
+                  "Expression": {
+                    "Hierarchy": {
+                      "Expression": {
+                        "PropertyVariationSource": {
+                          "Expression": {
+                            "SourceRef": {
+                              "Entity": "Screening Trend"
+                            }
+                          },
+                          "Name": "Variation",
+                          "Property": "screen_date"
+                        }
+                      },
+                      "Hierarchy": "Date Hierarchy"
+                    }
+                  },
+                  "Level": "Day"
+                }
+              },
+              "queryRef": "Screening Trend.screen_date.Variation.Date Hierarchy.Day",
+              "nativeQueryRef": "screen_date Day",
+              "active": true
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Aggregation": {
+                  "Expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "Screening Trend"
+                        }
+                      },
+                      "Property": "patients_screened"
+                    }
+                  },
+                  "Function": 0
+                }
+              },
+              "queryRef": "Sum(Screening Trend.patients_screened)",
+              "nativeQueryRef": "Sum of patients_screened"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "HierarchyLevel": {
+                "Expression": {
+                  "Hierarchy": {
+                    "Expression": {
+                      "PropertyVariationSource": {
+                        "Expression": {
+                          "SourceRef": {
+                            "Entity": "Screening Trend"
+                          }
+                        },
+                        "Name": "Variation",
+                        "Property": "screen_date"
+                      }
+                    },
+                    "Hierarchy": "Date Hierarchy"
+                  }
+                },
+                "Level": "Day"
+              }
+            },
+            "direction": "Ascending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

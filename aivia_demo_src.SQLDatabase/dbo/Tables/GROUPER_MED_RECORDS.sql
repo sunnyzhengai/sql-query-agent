@@ -1,0 +1,11 @@
+CREATE TABLE [dbo].[GROUPER_MED_RECORDS] (
+    [CM_LOG_OWNER_ID]  NVARCHAR (400)  NULL,
+    [CM_PHY_OWNER_ID]  NVARCHAR (400)  NULL,
+    [EXP_MEDS_LIST_ID] DECIMAL (18, 4) NULL,
+    [GROUPER_ID]       NVARCHAR (400)  NULL,
+    [LINE]             INT             NULL
+);
+
+
+GO
+

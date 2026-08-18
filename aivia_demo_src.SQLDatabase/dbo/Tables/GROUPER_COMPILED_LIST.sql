@@ -1,0 +1,15 @@
+CREATE TABLE [dbo].[GROUPER_COMPILED_LIST] (
+    [BASE_GROUPER_ID]            NVARCHAR (400)  NULL,
+    [CM_LOG_OWNER_ID]            NVARCHAR (400)  NULL,
+    [CM_PHY_OWNER_ID]            NVARCHAR (400)  NULL,
+    [COMPILED_CONTEXT]           NVARCHAR (400)  NULL,
+    [COMPILED_GROUPER_ID]        NVARCHAR (400)  NULL,
+    [GROUPER_RECORDS_NUMERIC_ID] DECIMAL (18, 4) NULL,
+    [GROUPER_RECORDS_VARCHAR_ID] NVARCHAR (400)  NULL,
+    [LINE]                       INT             NULL,
+    [_SURROGATEKEY]              BIGINT          NULL
+);
+
+
+GO
+

@@ -1,0 +1,700 @@
+relationship ec5d6eba-b87a-4e3a-9a98-f0014be08a69
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Screening Trend'.screen_date
+	toColumn: LocalDateTable_e511f4a3-6fb2-4264-90c1-dcdfdaf93a34.Date
+
+relationship 4d0d6593-5d5d-4240-8392-8cc88a8e53da
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Screening Detail'.'ED Arrival Time'
+	toColumn: LocalDateTable_ab91ffe2-e1bb-4b5b-ba59-980744f39724.Date
+
+relationship 95a16db1-e6b1-4340-8c23-3a0fa20ecf29
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Screening Detail'.'Traige Start Time'
+	toColumn: LocalDateTable_f3c4ba64-da29-496c-b5da-482c9ce32759.Date
+
+relationship 1b026d5f-a543-418f-89ea-8aab919b0542
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Screening Detail'.'Traige Stop Time'
+	toColumn: LocalDateTable_01e9e21b-754a-40d9-9ed2-514741ede48f.Date
+
+relationship 2b7aad3c-69d1-41bd-871f-b90800f23f3e
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Screening Detail'.'ED Arrival Date'
+	toColumn: LocalDateTable_0ea29fea-9f33-467b-8d76-e25128b5e63e.Date
+
+relationship a23cad05-18d0-4f7a-9923-9147dc04b60c
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Screening Detail'.'ED Departure Time'
+	toColumn: LocalDateTable_dcf68230-2571-443c-a0be-ae231f944835.Date
+
+relationship d3ccb60c-70ce-44a0-8b2b-544f981c756a
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Screening Detail'.'HOSP Admit Time'
+	toColumn: LocalDateTable_b3ded26c-db36-4f30-ae86-77656b291848.Date
+
+relationship 4bba52bc-1f2b-45aa-bcbf-683f1a224324
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Screening Detail'.'HOSP Discharge Time'
+	toColumn: LocalDateTable_d124d568-f5b9-4869-8ce6-2e258bc153ca.Date
+
+relationship fbb4ccea-8593-4aee-afb3-074b088ea9aa
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Screening Detail'.'First Positive Score Time'
+	toColumn: LocalDateTable_a535c232-b927-4e5d-92f9-444234482a73.Date
+
+relationship 24ab237c-cbbe-448b-86c7-101b703c866d
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Screening Detail'.'First Negative Score Time'
+	toColumn: LocalDateTable_2d6bc3b6-92ba-4121-90c3-88b9c60c3941.Date
+
+relationship c7d0b758-76c5-40ac-893a-afb4c0eb5769
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Screening Detail'.'Order date and time'
+	toColumn: LocalDateTable_c69966a4-dc7e-49df-a620-c6c299a76dde.Date
+
+relationship fa825b33-f693-45c2-ba0e-cbf7695b0f57
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Screening Detail'.'In VERIFY Queue Time'
+	toColumn: LocalDateTable_b0cfd23c-d7a6-46d9-ae8d-663c1e37c1fe.Date
+
+relationship 7809aadd-7870-4043-bf89-c5b43209620f
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Screening Detail'.'Verified in Queue Time'
+	toColumn: LocalDateTable_8d0df1b5-949f-4da1-883d-26a74974d4a0.Date
+
+relationship 3e555ee2-c90f-4004-953d-acc37a0e43cb
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Screening Detail'.'Order Dispense date and time'
+	toColumn: LocalDateTable_0ce66b77-00b0-433e-b515-07222c88c1c4.Date
+
+relationship 37f2acc3-e02d-4049-8df8-7a06f67b7e92
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Screening Detail'.'Rx Dispense Sent Time'
+	toColumn: LocalDateTable_873bd50c-75c3-4921-9080-706432d88c3c.Date
+
+relationship 8b10fcdd-705e-498e-97cb-3054051b26da
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Screening Detail'.'First ABX Admin Time'
+	toColumn: LocalDateTable_13e27e3c-63b7-4b23-98f5-5cb2ff0e0cd8.Date
+
+relationship 123fda01-239a-417b-b5cd-1a6cc37ae00a
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Screening Detail'.'Second ABX Admin Time'
+	toColumn: LocalDateTable_c8c2aa9c-daf9-486f-9291-6815175e36ea.Date
+
+relationship d410f75f-235b-447b-bf1f-8e71bf9214b7
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Screening Detail'.'Order Set Time'
+	toColumn: LocalDateTable_bb225926-2f19-45c4-b817-680ac6efa27e.Date
+
+relationship a6eaf23c-1441-4dac-bbd0-84274d9dd186
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Screening Detail'.'Bolus 1 Admin Time'
+	toColumn: LocalDateTable_ce7d1dd1-1440-47d8-b7a9-0c3f1f214e4b.Date
+
+relationship f579aa6f-045a-4eae-8340-4fb2ea3eb0a6
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Screening Detail'.'Bolus 2 Admin Time'
+	toColumn: LocalDateTable_ffdfa57e-15ce-4a50-ae62-f438b47a2b17.Date
+
+relationship f74c034d-55cf-444a-8d75-925278b3f3f4
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Screening Detail'.'Bolus 3 Admin Time'
+	toColumn: LocalDateTable_bb8e2d41-bf06-4d16-8750-30218ad7eb54.Date
+
+relationship eff1834b-b1ce-4aeb-8e5e-5e272edc3539
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Screening Detail'.'First Hypotension Recorded Time'
+	toColumn: LocalDateTable_db509ef2-05d6-4919-8070-d78e775082f8.Date
+
+relationship 2888dd3a-6782-410f-91e5-ae0813447379
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Screening Detail'.'CVL Placement Time'
+	toColumn: LocalDateTable_11e30c13-706f-4462-90f1-191d40c23f06.Date
+
+relationship 479a785d-0321-4eea-898e-12be97873d9d
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Screening Detail'.'Vasopressor Admin Time'
+	toColumn: LocalDateTable_49b77c20-4cf0-4d11-a163-23e1478fad9c.Date
+
+relationship 724304fd-2465-4800-b454-962644af89e8
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Screening Detail'.'SVO2 Order Time'
+	toColumn: LocalDateTable_59617061-f13f-47e8-8da8-ebfbf567899d.Date
+
+relationship e45876c1-ef14-42de-9743-78a60f51dcc5
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Screening Detail'.'SVO2 Order Collection Time'
+	toColumn: LocalDateTable_8afcfce6-1078-4979-b7fe-482f2f62b8ee.Date
+
+relationship 52451d6b-efd1-4e25-942c-de5970247e3c
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Screening Detail'.'Lactic Acid Order Time'
+	toColumn: LocalDateTable_892c7287-c998-4ef2-9559-20e1fd62fc08.Date
+
+relationship 0c5d85c0-5e3f-4664-a63b-1c17a3c2b39a
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Screening Detail'.'Lactic Acid Order Collection Time'
+	toColumn: LocalDateTable_27b0370a-bf94-4c89-9ba7-751d4d387a41.Date
+
+relationship f46d03cf-6bbf-454b-a1bf-84770be86abd
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Screening Detail'.'Procalcitonin Order Time'
+	toColumn: LocalDateTable_eb640228-fd91-45f4-a736-360346d823f2.Date
+
+relationship 40fe8c16-754a-4ad5-acba-91fbcb515fbe
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Screening Detail'.'Procalcitonin Order Collection Time'
+	toColumn: LocalDateTable_8726630a-66dd-47c9-99a5-41dd0211d996.Date
+
+relationship f2906c61-f822-46ff-9c94-bca77ec144b0
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Screening Detail'.'Blood Culture Order Time'
+	toColumn: LocalDateTable_3bc1b9e4-104d-44ba-80f6-41417cec4bee.Date
+
+relationship 50870cdb-60c0-4eaa-ab74-f99f4012264b
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Screening Detail'.'Blood Culture Order Collection Time'
+	toColumn: LocalDateTable_723e00c2-22a9-4b5e-a7dd-eec062072fea.Date
+
+relationship bd553d51-cc6c-47e8-b97a-24a22758dfb3
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Screening Detail'.'Urine Culture Order Time'
+	toColumn: LocalDateTable_012bf02e-37f1-4158-ac71-485f5321aeec.Date
+
+relationship e766a7f6-45d6-4bd6-845b-a0d5d1733fea
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Screening Detail'.'Urine Culture Order Collection Time'
+	toColumn: LocalDateTable_5e65d872-522b-4673-9a92-a0416eb21124.Date
+
+relationship 22cf8867-f7d2-42aa-88c4-93d62e508b22
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Screening Detail'.'CSF Order Time'
+	toColumn: LocalDateTable_2122cea3-7808-4f6d-8abd-aff86bfccb70.Date
+
+relationship e1160993-1387-41a3-b08c-267802d95ac7
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Screening Detail'.'CSF Order Collection Time'
+	toColumn: LocalDateTable_87b2b29d-c8bb-4bea-9a67-ec22c6eaf30d.Date
+
+relationship 0f56e14d-7f52-4604-883e-6ef7cc2c0820
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Screening Detail'.'First ETT Placement Time'
+	toColumn: LocalDateTable_9824b0e0-0fbd-457f-bf50-e1ffc716c539.Date
+
+relationship e8ab41e2-92b0-4492-b91b-2382c8aa11bf
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Screening Detail'.'First PIV Placement Time'
+	toColumn: LocalDateTable_a313b724-2bd0-4b9a-ba5e-e8d7d41dcdb6.Date
+
+relationship 96565b42-1892-4cbf-82c7-ea680e309b10
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Screening Detail'.ED2HemoncTime
+	toColumn: LocalDateTable_7022d27e-8dc0-4da5-93f4-ad878a3fa45d.Date
+
+relationship 9ec27bc7-3dec-49bf-9a74-dc060e918208
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Screening Detail'.ED2ICUTime
+	toColumn: LocalDateTable_6997c9b8-7799-4130-b6c4-8752d83b57a1.Date
+
+relationship 8af600c0-8228-4a00-b553-edc83027d84e
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Screening Detail'.ED2GENTime
+	toColumn: LocalDateTable_87ef4dbc-b16f-4785-a5ab-2ffa889c445e.Date
+
+relationship 2089e6f1-5d8b-4992-9b63-4abf8a479487
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Screening Detail'.'Gen Back To ICU Time'
+	toColumn: LocalDateTable_0e267558-2e03-4450-8d93-9fa283936357.Date
+
+relationship 40d44d7e-8784-47a2-bbda-b49f4ba514dc
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Screening Detail'.'First BPA CLINICAL_ALERTS/Action Time'
+	toColumn: LocalDateTable_28af6a7d-935c-43d2-aa3a-08dbd6e37ea4.Date
+
+relationship 7173c1ad-1a0e-4b1b-b4cf-7dcf88ee8c5e
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Screening Detail'.SEPSIS_ALERT_CANC_TIME
+	toColumn: LocalDateTable_cc40935d-020b-4ffc-8397-93fc2cd2c140.Date
+
+relationship 06adf051-5cf1-4ff9-a5ec-8f64d5ba4a9f
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Screening Detail'.'ED IP Bed Requested Time'
+	toColumn: LocalDateTable_4a4b8b46-3db1-4b35-9d43-5b4f4d8440cb.Date
+
+relationship 338ba6b6-4bb0-4f2a-80bc-1a9804c2af67
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Screening Detail'.'ED IP Bed Assigned Time'
+	toColumn: LocalDateTable_828e9db2-206c-41e9-88ac-9da4e6b41a89.Date
+
+relationship 803647c4-914e-4ebb-8a0d-c5f714fa1a94
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Screening Detail'.RECORDED_TIME
+	toColumn: LocalDateTable_309bc9d2-eeb0-4700-92c6-29a32400940c.Date
+
+relationship 5f09481d-0151-4bcd-a5e9-544811520066
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Screening Detail'.RECORDED_TIME2
+	toColumn: LocalDateTable_aaae4237-77c9-46e8-8563-09e58d3266ef.Date
+
+relationship 2daa8a06-95a1-4c7c-80fb-f48a904c28a3
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Screening Detail'.RECORDED_TIME3
+	toColumn: LocalDateTable_97a323b6-6d4e-41f6-b455-08a7dda2659a.Date
+
+relationship 311cba32-97c8-4162-9fda-d9f4b1038fb3
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Screening Detail'.RECORDED_TIME4
+	toColumn: LocalDateTable_9e9dbf86-735a-4b6d-9454-81da6b4d42b2.Date
+
+relationship 35eda7a9-43a9-4df8-9b15-b4eb0b7f72f7
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Screening Detail'.RECORDED_TIME5
+	toColumn: LocalDateTable_0529313f-294f-4bd3-9b0e-136b562f9d91.Date
+
+relationship e20e9771-70af-4357-ad32-be1a7ce3f104
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Screening Detail'.RECORDED_TIME6
+	toColumn: LocalDateTable_9c804234-4652-44ee-916e-2de610926f24.Date
+
+relationship 03ed8927-04fc-4cd3-92e2-698dfe9a8d4e
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Screening Detail'.'Last Blood Pressure Time'
+	toColumn: LocalDateTable_296446ca-0b95-40b4-bc32-5d6906565100.Date
+
+relationship 39e74a67-3e8f-4916-8464-cf1219ed3e51
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Screening Detail'.'First Blood Pressure Time'
+	toColumn: LocalDateTable_00584e54-fb90-4938-9bcd-ebc365a9d127.Date
+
+relationship 9729519c-095e-442d-a19b-2bb1c98edd90
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Screening Detail'.'Last BP Percentile Time'
+	toColumn: LocalDateTable_acfbffd8-e293-418c-9c47-2a740612437c.Date
+
+relationship 0856234d-c68a-4aef-8f3b-1a7b6215d4e6
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Screening Detail'.'First BP Percentile Time'
+	toColumn: LocalDateTable_8dc75ceb-443e-4aa6-9f35-70079a51129f.Date
+
+relationship b692260d-6299-4753-a149-831ca1cdc107
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Screening Detail'.'ReScreen After FPS'
+	toColumn: LocalDateTable_67bc0d56-8956-4fb3-b0a2-0ef5233fce16.Date
+
+relationship 14849c64-811f-47ae-8a50-2c3ea359c865
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Screening Detail'.'Repeat Screen before ED Departure'
+	toColumn: LocalDateTable_0c68d3c4-781c-4b16-9596-c1e6044c342a.Date
+
+relationship 001f7720-56c9-4b61-bdc3-ae63e3e842ec
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'IP Sepsis'.INP_ADM_DATE
+	toColumn: LocalDateTable_8c9efe4a-f424-41cd-8345-a0bc014f3057.Date
+
+relationship 646338a0-fb91-46d2-ad7a-08a06c7b9425
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'IP Sepsis'.HOSP_DISCH_TIME
+	toColumn: LocalDateTable_ae7fd790-72fa-4e0c-9ae2-2458dfd515db.Date
+
+relationship 3402443d-9735-4250-aab0-2f72f5d8ab98
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'IP Sepsis'.'LAST Hypotension Time'
+	toColumn: LocalDateTable_df88d884-4253-41f0-9a5b-40f224964280.Date
+
+relationship 81c0660d-e2d5-48c7-a9df-ab66f46c03f7
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'IP Sepsis'.'FIRST Hypotension Time'
+	toColumn: LocalDateTable_9d0f8842-e7cb-4ba6-9035-0efb0c0e1555.Date
+
+relationship 5202c5f4-b706-497c-994c-0b55f4fc4ba8
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'IP Sepsis'.'First Positive Score Time in ED'
+	toColumn: LocalDateTable_8b8035bd-01f7-4e96-8bc7-b5ded687f3c8.Date
+
+relationship ea323f00-984b-4037-aa2e-d76683bd48a3
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'IP Sepsis'.'In Department Time'
+	toColumn: LocalDateTable_45739e38-32b8-4696-89ad-1c684b68d430.Date
+
+relationship 261d1d84-7045-40fe-afe7-91dab0fe9575
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'IP Sepsis'.'Out Department Time'
+	toColumn: LocalDateTable_7d542483-5b33-405e-a208-8f8ef89ad295.Date
+
+relationship 374724ce-2470-42e2-a383-9d284324afdc
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'IP Sepsis'.'Score Time'
+	toColumn: LocalDateTable_b59f3ec0-c465-44e3-b584-05f2d5446407.Date
+
+relationship 344e28d5-dd50-4681-a836-c39866b4d48b
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'IP Sepsis'.'Huddle Date'
+	toColumn: LocalDateTable_dc30a640-e461-4693-999b-66e8022d060f.Date
+
+relationship 1b6bfef1-119e-4703-a4cc-9c8f806b3b44
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'IP Sepsis'.'LAST ABX Time'
+	toColumn: LocalDateTable_2280bd84-c517-4903-b67b-b9d0e7de04b7.Date
+
+relationship 1ea96928-2b38-4885-8fc0-afe694de7458
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'IP Sepsis'.'FIRST ABX Time'
+	toColumn: LocalDateTable_6402c170-f034-4fc0-813a-5fb326c2aa93.Date
+
+relationship 4ee82b19-e0c1-44ee-9e98-2aacaf45c193
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'IP Sepsis'.'LAST Bolus Time'
+	toColumn: LocalDateTable_24151a3f-c888-4f22-b08d-0e9fdd33b7b8.Date
+
+relationship 37ee2b85-3bf2-4039-b9a5-6b9cf9bde06f
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'IP Sepsis'.'FIRST Bolus Time'
+	toColumn: LocalDateTable_92085f22-2e97-4d8d-9dd2-6106b7e153ed.Date
+
+relationship 75311326-b1d0-4920-b54c-988e4ac6f999
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'IP Sepsis'.'LAST LacticAcid Order Time'
+	toColumn: LocalDateTable_e1fe5e87-7491-48ba-a344-43c83ea01918.Date
+
+relationship 59d57ef0-7552-413b-a54a-366c81333a7f
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'IP Sepsis'.'FIRST LacticAcid Order Time'
+	toColumn: LocalDateTable_90196046-696b-4d67-a9a7-7908ecf0ba9d.Date
+
+relationship 37ac8a81-c4a9-4682-998c-ff2bb662879c
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'IP Sepsis'.'LAST OrderSet Time'
+	toColumn: LocalDateTable_367ae4b7-00f1-45e4-8b7d-a4a8c440e986.Date
+
+relationship c4be216d-4781-40f5-b274-afd4ef24f96a
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'IP Sepsis'.'FIRST OrderSet Time'
+	toColumn: LocalDateTable_f16ce66c-c436-40cf-ad68-7706ed537efc.Date
+
+relationship 692e2be9-aead-431c-ac3b-49195b608551
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'IP Sepsis'.'LAST CVL Time'
+	toColumn: LocalDateTable_a361b94c-6801-46cb-be71-875ca3334dd7.Date
+
+relationship 548e8381-4b03-43f5-a8f2-871a14171801
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'IP Sepsis'.'FIRST CVL Time'
+	toColumn: LocalDateTable_b17b5b1b-74b6-4d2d-8227-fe42ef7314a7.Date
+
+relationship 9c62b376-a9de-4b37-a6c0-35cdbd1c2e00
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'IP Sepsis'.'LAST SVO2 Time'
+	toColumn: LocalDateTable_3bcbece3-5bc9-4f35-8dec-e635c5560034.Date
+
+relationship 58bb1068-d35f-4fcc-9f25-bc4f07c2efe9
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'IP Sepsis'.'FIRST SVO2 Time'
+	toColumn: LocalDateTable_06ae4576-2133-457d-b862-6a2f8abc5f0d.Date
+
+relationship 79f1950b-df24-4924-b9ec-05ef7ba521f7
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'IP Sepsis'.'LAST Procalcitonin Order Time'
+	toColumn: LocalDateTable_6a12d33c-23b0-4c13-a116-d8ece43d10f8.Date
+
+relationship 581531d3-1b76-4447-88d3-bfbf54bd15fe
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'IP Sepsis'.'FIRST Procalcitonin Order Time'
+	toColumn: LocalDateTable_1f785dee-e495-43a6-9bcb-4fc0adbc3cd5.Date
+
+relationship 1d507e6f-bc55-45fa-96dc-c47c59ce9405
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'IP Sepsis'.'LAST Blood Culture Order Time'
+	toColumn: LocalDateTable_971447f9-000c-4281-bf57-82409f871cc4.Date
+
+relationship a323585c-9474-451e-9747-8e32340223d7
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'IP Sepsis'.'FIRST Blood Culture Order Time'
+	toColumn: LocalDateTable_24cd22d7-5770-4478-a1d9-cb3d4132ac78.Date
+
+relationship b9271be0-03d3-4381-b100-132f982c5ea1
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'IP Sepsis'.'LAST CSF Order Time'
+	toColumn: LocalDateTable_b45ad3b5-5977-4bc6-8e99-f59db80d7bf0.Date
+
+relationship 6e8b0856-a155-4c52-bb72-a2b4ac764542
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'IP Sepsis'.'FIRST CSF Order Time'
+	toColumn: LocalDateTable_18b248cd-22c5-4442-9ff1-2b5d1407cb91.Date
+
+relationship d3305c11-9bd6-4276-852e-f4bd379e7bd6
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'IP Sepsis'.'LAST PIV Before Screen'
+	toColumn: LocalDateTable_be706a42-0122-42b6-ad6d-3e804f9911ea.Date
+
+relationship 0d262205-2c11-4329-bb24-38beb37affeb
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'IP Sepsis'.'FIRST PIV After Screen'
+	toColumn: LocalDateTable_33b49fe0-8f4f-4284-b837-133a9ef608c2.Date
+
+relationship 70defaab-dec0-49be-9cf0-fb66933602d7
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'IP Sepsis'.'LAST Intubation Time'
+	toColumn: LocalDateTable_2766f1c3-2170-408a-b8c9-a6e18f35a6b7.Date
+
+relationship 82681266-6fad-4d56-9046-d1cf04c63cf4
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'IP Sepsis'.'FIRST Intubation Time'
+	toColumn: LocalDateTable_fd2caaae-f4e2-46a0-a496-674f2ccb80de.Date
+
+relationship 70573d40-504a-4458-a892-a6812a0b7164
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'IP Sepsis'.'Refresh Time'
+	toColumn: LocalDateTable_6dbf2d4b-5fc5-4712-8fa2-58e8e398a924.Date
+
+relationship a007618d-fa43-47f0-9739-0acfc6df6275
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'ED Sepsis Summary'.'ED Arrival Time'
+	toColumn: LocalDateTable_71a3c52d-bad5-42ad-83fb-049f97be82c2.Date
+
+relationship c338cde6-733f-49bf-90d6-6e0e4fa3c02d
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'ED Sepsis Summary'.'Traige Start Time'
+	toColumn: LocalDateTable_6ebc8ba7-e498-4c8a-a2ff-c91d0df18456.Date
+
+relationship f7acdca0-b83c-4d10-9733-1cbb1fa351ff
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'ED Sepsis Summary'.'Traige Stop Time'
+	toColumn: LocalDateTable_8f720376-61b6-42a7-b767-750deda6bade.Date
+
+relationship d94862ec-7f6a-4446-8c00-490db4fb2111
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'ED Sepsis Summary'.'ED Arrival Date'
+	toColumn: LocalDateTable_9481bf15-4b74-4243-9330-20806943020f.Date
+
+relationship 8493becf-ac9d-4ff7-ae9b-beff02677f59
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'ED Sepsis Summary'.'ED Departure Time'
+	toColumn: LocalDateTable_20ccdbca-3184-4b29-9492-bb1467a6ce22.Date
+
+relationship b14690d2-8ec2-4fcc-90fe-423dffc57987
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'ED Sepsis Summary'.'HOSP Admit Time'
+	toColumn: LocalDateTable_b6073af9-e79c-4da4-8246-49d222f537e4.Date
+
+relationship 102d70e6-ed1f-4883-b349-7be5d666e20b
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'ED Sepsis Summary'.'HOSP Discharge Time'
+	toColumn: LocalDateTable_33e4d8b4-bd80-44a1-b039-97cb39c98797.Date
+
+relationship 29cac15a-69be-403a-9696-7d5648302002
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'ED Sepsis Summary'.'First Positive Score Time'
+	toColumn: LocalDateTable_271a66fc-d22d-424f-a9c5-de1f21446000.Date
+
+relationship e46004e0-5147-47aa-8fe4-a99fd15d16d4
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'ED Sepsis Summary'.'Order date and time'
+	toColumn: LocalDateTable_8a626941-80b3-47c1-bc63-0cd761bdf67a.Date
+
+relationship bb634355-d1c4-43cc-a304-87faa87cd361
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'ED Sepsis Summary'.'In VERIFY Queue Time'
+	toColumn: LocalDateTable_d0ca821b-5abb-4afc-8520-f4984339e121.Date
+
+relationship 5f25c605-fbd6-47c1-9008-3c19ef0b2016
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'ED Sepsis Summary'.'Verified in Queue Time'
+	toColumn: LocalDateTable_df205f4c-d316-4f39-a467-73b14158cfd6.Date
+
+relationship 74dac116-b905-4f4a-b5f3-86ecca73bd46
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'ED Sepsis Summary'.'Order Dispense date and time'
+	toColumn: LocalDateTable_6bc8bd48-6879-45ce-a4bf-6cac8ae74c1d.Date
+
+relationship 1f7a4304-36e9-4d53-beac-b611d4756c2b
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'ED Sepsis Summary'.'Rx Dispense Sent Time'
+	toColumn: LocalDateTable_ecb0f789-1f95-4fa6-acd2-f0f060a817bc.Date
+
+relationship 350074f0-0e7c-457c-9811-449f42320f39
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'ED Sepsis Summary'.'First ABX Admin Time'
+	toColumn: LocalDateTable_54c375a8-2f39-40cc-b6b7-5cbf15cc0102.Date
+
+relationship 20628f9d-3671-4d96-8a67-32921d3b48ab
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'ED Sepsis Summary'.'Second ABX Admin Time'
+	toColumn: LocalDateTable_1f232f95-0abf-413e-82ab-d92013b056e5.Date
+
+relationship 6890cb5f-9a37-43f0-82cb-7b05131a6073
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'ED Sepsis Summary'.'Order Set Time'
+	toColumn: LocalDateTable_e41a9268-0ec8-439f-b7de-1f98020bb29b.Date
+
+relationship bb254442-5c2c-4a19-af55-741ad0277bdc
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'ED Sepsis Summary'.'Bolus 1 Admin Time'
+	toColumn: LocalDateTable_b6b03e9d-26c3-46a1-91fa-a22bd4c1a17a.Date
+
+relationship ae8a1b18-d65d-486c-b5d3-0864bb73d122
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'ED Sepsis Summary'.'Bolus 2 Admin Time'
+	toColumn: LocalDateTable_ebd3934d-b42c-4c9b-85a5-d7a8ea1f7955.Date
+
+relationship 1ab92b6d-8e04-4e7c-9840-f23e4e1f6973
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'ED Sepsis Summary'.'Bolus 3 Admin Time'
+	toColumn: LocalDateTable_006e5ca4-1fca-4306-94f6-1d7861ec33c8.Date
+
+relationship 495a1bea-3aec-43e0-a3fd-d183c36ec2e6
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'ED Sepsis Summary'.'First Hypotension Recorded Time'
+	toColumn: LocalDateTable_f6ce1c00-d1bc-451f-964d-eb244266bf15.Date
+
+relationship 7bae5b98-151a-4443-aa3e-0e5b08cda472
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'ED Sepsis Summary'.'CVL Placement Time'
+	toColumn: LocalDateTable_6ca0a3cf-1090-4d18-b38f-24b19fade804.Date
+
+relationship 3261320e-e389-4f94-bec3-52bd21fcabb3
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'ED Sepsis Summary'.'Vasopressor Admin Time'
+	toColumn: LocalDateTable_602a0514-357a-4b08-92c9-980e97e8a286.Date
+
+relationship eeefc1ce-e32a-481a-adda-58e9c4037140
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'ED Sepsis Summary'.'SVO2 Order Time'
+	toColumn: LocalDateTable_3848cb6b-60d1-48c9-97c4-d40bf796c1ce.Date
+
+relationship 0ccf5761-d368-42ac-895d-7c69484acf63
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'ED Sepsis Summary'.'SVO2 Order Collection Time'
+	toColumn: LocalDateTable_c8ea107e-9617-4969-845d-fbf90dfc3116.Date
+
+relationship fbd49c3f-41ba-48b5-b996-bd516d260612
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'ED Sepsis Summary'.'Lactic Acid Order Time'
+	toColumn: LocalDateTable_094b3c6c-5840-481d-8009-36c29de5de14.Date
+
+relationship 45b11f67-f52e-4300-a84e-b52dfe0c319e
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'ED Sepsis Summary'.'Lactic Acid Order Collection Time'
+	toColumn: LocalDateTable_c84abf4e-b719-4b98-8cb4-8ae0892a0b17.Date
+
+relationship c38d407c-8f33-4e10-9347-981391a846be
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'ED Sepsis Summary'.'Procalcitonin Order Time'
+	toColumn: LocalDateTable_2473f0ca-bf2f-44b4-bcfd-22589bf7072e.Date
+
+relationship 282c5b2f-4034-4fed-8feb-3e2217f73e5d
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'ED Sepsis Summary'.'Procalcitonin Order Collection Time'
+	toColumn: LocalDateTable_30ce9de9-c018-456b-b0db-2085506557e0.Date
+
+relationship fc8cb686-1d2c-4de0-a159-04ad4f4c0a23
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'ED Sepsis Summary'.'Blood Culture Order Time'
+	toColumn: LocalDateTable_a3953ad7-59e3-4adc-9bfb-89983ca5384a.Date
+
+relationship 537d7f26-726d-402e-8b8a-69b2a0b24f41
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'ED Sepsis Summary'.'Blood Culture Order Collection Time'
+	toColumn: LocalDateTable_d3c8cc79-5891-49e6-9095-b207e21b3653.Date
+
+relationship 036e0b69-49be-4a00-910b-eaad7ef84e59
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'ED Sepsis Summary'.'Urine Culture Order Time'
+	toColumn: LocalDateTable_12547b7f-a64e-481b-bddf-1188bb012990.Date
+
+relationship 9ec51dfd-f101-4744-a413-0182c662d43c
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'ED Sepsis Summary'.'Urine Culture Order Collection Time'
+	toColumn: LocalDateTable_c45c8fe0-6ab6-49ee-997a-d242bc319593.Date
+
+relationship f86a0917-ed3f-4045-a2cc-759bc3f83ecb
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'ED Sepsis Summary'.'CSF Order Time'
+	toColumn: LocalDateTable_de57acd7-92a4-4fe8-94b1-181625a66334.Date
+
+relationship 422955ee-c78f-4406-aeec-e8560a2b86c2
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'ED Sepsis Summary'.'CSF Order Collection Time'
+	toColumn: LocalDateTable_57864d9e-1ec8-40c0-891d-bcefc6bc24b9.Date
+
+relationship 5ba610e9-6630-412d-837e-8fe465f28853
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'ED Sepsis Summary'.'First ETT Placement Time'
+	toColumn: LocalDateTable_5f3f68e1-3b4d-41b5-a057-dd71a7aa53ea.Date
+
+relationship 5224a76b-a73c-4049-830e-4a895675a2ba
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'ED Sepsis Summary'.'First PIV Placement Time'
+	toColumn: LocalDateTable_6b779fb9-91f6-44c4-a7ce-bf927d89e256.Date
+
+relationship 3e219f17-35bf-4862-b8dd-22cacaf5ad3b
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'ED Sepsis Summary'.'ED IP Bed Requested Time'
+	toColumn: LocalDateTable_f3cd80dc-2abf-4f45-a84e-965069c3c93b.Date
+
+relationship fedba4bd-f1e5-45b9-b430-1db1fb618b26
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'ED Sepsis Summary'.'ED IP Bed Assigned Time'
+	toColumn: LocalDateTable_2de37e2e-768f-47ae-baf4-aeb06cc6bacf.Date
+
+relationship 98a247c5-e7c5-4188-bb86-88a449db9590
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'ED Sepsis Summary'.ED2HemoncTime
+	toColumn: LocalDateTable_b11ac746-b119-48e2-bd6e-e304d02caabf.Date
+
+relationship bbc6387e-2bcf-4c1f-accf-625f46920ede
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'ED Sepsis Summary'.ED2ICUTime
+	toColumn: LocalDateTable_ded040e4-3bb8-434c-9015-0305472af460.Date
+
+relationship 49a83070-85ba-4ced-b1c8-6fd6948a2878
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'ED Sepsis Summary'.ED2GENTime
+	toColumn: LocalDateTable_e5ec7d06-8592-4e8a-8cdd-2547ec4feee9.Date
+
+relationship f324f772-8619-4e18-a107-659850731678
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'ED Sepsis Summary'.'First BPA CLINICAL_ALERTS/Action Time'
+	toColumn: LocalDateTable_59e00fb6-0ae9-4bd4-8399-f235af700ae0.Date
+
+relationship e264ca54-5585-48e2-8dfa-a6a90895f775
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'ED Sepsis Summary'.SEPSIS_ALERT_CANC_TIME
+	toColumn: LocalDateTable_3e1ce584-2be3-4991-924e-b1d4f5ff4e05.Date
+
+relationship e3ad816d-6ef8-43d2-911a-b69cc65d5812
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'ED Sepsis Summary'.'Last Blood Pressure Time'
+	toColumn: LocalDateTable_803b2d99-9eb6-4b10-bcbd-5b7d431a79eb.Date
+
+relationship 5c18e795-a0b9-45e9-a15a-a4f9e7b4550a
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'ED Sepsis Summary'.'First Blood Pressure Time'
+	toColumn: LocalDateTable_f7f322d1-1f35-462d-a329-96b40687d752.Date
+
+relationship de8ef5fd-69e4-4545-83a7-48a318096a59
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'ED Sepsis Summary'.'Last BP Percentile Time'
+	toColumn: LocalDateTable_0c04b66a-b84a-4f7b-a541-5b86ae7bb46a.Date
+
+relationship 57615a3c-c1c4-4031-ad32-06745f4600b4
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'ED Sepsis Summary'.'First BP Percentile Time'
+	toColumn: LocalDateTable_cd4ab89e-ba45-49b5-9d95-41947860e08f.Date
+
+relationship d455c620-00e3-4396-bee5-802ed2d2e05b
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'ED Sepsis Summary'.'ReScreen After FPS'
+	toColumn: LocalDateTable_334fc610-673d-4787-a829-050ceffd7197.Date
+
+relationship 7de085d0-8e6b-4d8b-a329-2d9ae62b1c87
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'ED Sepsis Summary'.'Repeat Screen before ED Departure'
+	toColumn: LocalDateTable_4cde3b1d-a6dd-4d96-9880-18ca88dfef4d.Date
+
+relationship 49bdb3ef-28e6-4f2a-93d0-1da255f4cde4
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'ED Sepsis Summary'.'Gen Back To ICU Time'
+	toColumn: LocalDateTable_c1542259-c392-48fe-a1b8-34eb0e67be95.Date
+

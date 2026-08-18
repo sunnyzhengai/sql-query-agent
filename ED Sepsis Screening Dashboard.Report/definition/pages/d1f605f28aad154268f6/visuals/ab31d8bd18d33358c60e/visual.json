@@ -1,0 +1,97 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "ab31d8bd18d33358c60e",
+  "position": {
+    "x": 51.092436974789919,
+    "y": 171.49393090569566,
+    "z": 0,
+    "height": 203.17460317460319,
+    "width": 462.52100840336135,
+    "tabOrder": 0
+  },
+  "visual": {
+    "visualType": "cardVisual",
+    "query": {
+      "queryState": {
+        "Data": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Screening Trend"
+                    }
+                  },
+                  "Property": "Screening Rate"
+                }
+              },
+              "queryRef": "Screening Trend.Screening Rate",
+              "nativeQueryRef": "Screening Rate",
+              "format": "0.00 %;-0.00 %;0.00 %"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "Screening Trend"
+                  }
+                },
+                "Property": "Screening Rate"
+              }
+            },
+            "direction": "Descending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Positive Screen Rate'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "e8b6379e5b90aba4aa55",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "Screening Trend"
+              }
+            },
+            "Property": "Screening Rate"
+          }
+        },
+        "type": "Advanced"
+      }
+    ]
+  }
+}

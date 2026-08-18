@@ -1,0 +1,1250 @@
+table 'IP Sepsis'
+	lineageTag: 8e9754ea-a8b4-4e5b-abfc-fe176be9a42d
+
+	column PATIENT_NAME
+		dataType: string
+		lineageTag: 4a82119c-77f7-4a75-bd8b-50dfaf4737dd
+		summarizeBy: none
+		sourceColumn: PATIENT_NAME
+
+		annotation SummarizationSetBy = Automatic
+
+	column PATIENT_MRN
+		dataType: string
+		lineageTag: 0fd3faf8-007d-48ed-a2cf-a0e1f43514a3
+		summarizeBy: none
+		sourceColumn: PATIENT_MRN
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Ethnic Group'
+		dataType: string
+		lineageTag: 90360018-b842-4008-add1-f303a26a140e
+		summarizeBy: none
+		sourceColumn: Ethnic Group
+
+		annotation SummarizationSetBy = Automatic
+
+	column Race
+		dataType: string
+		lineageTag: 3f4de4e7-8ebe-4196-8d40-2da9b5aecf00
+		summarizeBy: none
+		sourceColumn: Race
+
+		annotation SummarizationSetBy = Automatic
+
+	column ENCOUNTER_ID
+		dataType: double
+		lineageTag: 3b6fa10f-55d6-4057-b659-8167851b2b90
+		summarizeBy: count
+		sourceColumn: ENCOUNTER_ID
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column AGE_MONTHS
+		dataType: int64
+		formatString: 0
+		lineageTag: 6c1b4edc-31c8-4fb2-b4a1-f2f821356bb7
+		summarizeBy: sum
+		sourceColumn: AGE_MONTHS
+
+		annotation SummarizationSetBy = Automatic
+
+	column AGE_YEARS
+		dataType: double
+		lineageTag: b2a17356-a0bf-448a-b112-91887f1baa48
+		summarizeBy: sum
+		sourceColumn: AGE_YEARS
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column INP_ADM_DATE
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 0ceee656-c341-41ae-9900-26c4e2c16e51
+		summarizeBy: none
+		sourceColumn: INP_ADM_DATE
+
+		variation Variation
+			isDefault
+			relationship: 001f7720-56c9-4b61-bdc3-ae63e3e842ec
+			defaultHierarchy: LocalDateTable_8c9efe4a-f424-41cd-8345-a0bc014f3057.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column HOSP_DISCH_TIME
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 7436ef31-567f-4848-9873-c47a74f2b4f4
+		summarizeBy: none
+		sourceColumn: HOSP_DISCH_TIME
+
+		variation Variation
+			isDefault
+			relationship: 646338a0-fb91-46d2-ad7a-08a06c7b9425
+			defaultHierarchy: LocalDateTable_ae7fd790-72fa-4e0c-9ae2-2458dfd515db.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column Disposition
+		dataType: string
+		lineageTag: f7e0a5bf-c6a5-463a-ae8a-041983b64527
+		summarizeBy: none
+		sourceColumn: Disposition
+
+		annotation SummarizationSetBy = Automatic
+
+	column LOS_HRS
+		dataType: int64
+		formatString: 0
+		lineageTag: a1457aff-bd60-43c3-9476-2a02c6e7d66d
+		summarizeBy: sum
+		sourceColumn: LOS_HRS
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Encounter Diagnoses'
+		dataType: string
+		lineageTag: 8439569a-4fbf-4454-8f3d-174e30cebf8d
+		summarizeBy: none
+		sourceColumn: Encounter Diagnoses
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'LAST Hypotension Time'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 8c722353-de86-4bc8-a299-82bdb38ab298
+		summarizeBy: none
+		sourceColumn: LAST Hypotension Time
+
+		variation Variation
+			isDefault
+			relationship: 3402443d-9735-4250-aab0-2f72f5d8ab98
+			defaultHierarchy: LocalDateTable_df88d884-4253-41f0-9a5b-40f224964280.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'LAST Hypotension Value'
+		dataType: string
+		lineageTag: c4b88477-ad86-444c-b4e0-2a487f36dd21
+		summarizeBy: none
+		sourceColumn: LAST Hypotension Value
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'LAST Hypotension taken in Dept Y/N'
+		dataType: string
+		lineageTag: ead5fe41-2888-4cee-8a63-66f8caef10c4
+		summarizeBy: none
+		sourceColumn: LAST Hypotension taken in Dept Y/N
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'FIRST Hypotension Time'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 27b8222c-f8da-4432-a2d6-cad336d13dbf
+		summarizeBy: none
+		sourceColumn: FIRST Hypotension Time
+
+		variation Variation
+			isDefault
+			relationship: 81c0660d-e2d5-48c7-a9df-ab66f46c03f7
+			defaultHierarchy: LocalDateTable_9d0f8842-e7cb-4ba6-9035-0efb0c0e1555.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'FIRST Hypotension Value'
+		dataType: string
+		lineageTag: c78f5c23-d269-460e-9911-f0d527473cdc
+		summarizeBy: none
+		sourceColumn: FIRST Hypotension Value
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'FIRST Hypotension taken in Dept Y/N'
+		dataType: string
+		lineageTag: a6b8efc6-888d-41f2-8eed-dc97c114425e
+		summarizeBy: none
+		sourceColumn: FIRST Hypotension taken in Dept Y/N
+
+		annotation SummarizationSetBy = Automatic
+
+	column EncWeight
+		dataType: double
+		lineageTag: a0a591ec-8cde-49ea-a963-e9b0d91da282
+		summarizeBy: sum
+		sourceColumn: EncWeight
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'First Positive Score in ED'
+		dataType: string
+		lineageTag: 79b100cb-e77d-42bc-be04-c1dcf7dece12
+		summarizeBy: none
+		sourceColumn: First Positive Score in ED
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'First Positive Score Time in ED'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: c319fcf8-a55a-44e5-aaa2-062f90bffaba
+		summarizeBy: none
+		sourceColumn: First Positive Score Time in ED
+
+		variation Variation
+			isDefault
+			relationship: 5202c5f4-b706-497c-994c-0b55f4fc4ba8
+			defaultHierarchy: LocalDateTable_8b8035bd-01f7-4e96-8bc7-b5ded687f3c8.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'ED LOS (Hrs)'
+		dataType: double
+		lineageTag: c76de992-b867-4c25-8cf4-b2b11513fd9c
+		summarizeBy: sum
+		sourceColumn: ED LOS (Hrs)
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ADT_DEPARTMENT_NAME
+		dataType: string
+		lineageTag: a34eb482-de9a-48a7-b38a-9e55f56c66ee
+		summarizeBy: none
+		sourceColumn: ADT_DEPARTMENT_NAME
+
+		annotation SummarizationSetBy = Automatic
+
+	column DEPARTMENT_ROLLUP
+		dataType: string
+		lineageTag: bde519a7-27ab-4b56-a8cf-31f5ebc1db01
+		summarizeBy: none
+		sourceColumn: DEPARTMENT_ROLLUP
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'In Department Time'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 32019068-906f-47f9-b28d-a6f11ae8e4dd
+		summarizeBy: none
+		sourceColumn: In Department Time
+
+		variation Variation
+			isDefault
+			relationship: ea323f00-984b-4037-aa2e-d76683bd48a3
+			defaultHierarchy: LocalDateTable_45739e38-32b8-4696-89ad-1c684b68d430.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Out Department Time'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: e786e031-f1db-415f-8403-3cb440deef19
+		summarizeBy: none
+		sourceColumn: Out Department Time
+
+		variation Variation
+			isDefault
+			relationship: 261d1d84-7045-40fe-afe7-91dab0fe9575
+			defaultHierarchy: LocalDateTable_7d542483-5b33-405e-a208-8f8ef89ad295.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column OD_SCORE
+		dataType: string
+		lineageTag: 530e78fd-4a7d-402e-88ba-80cae0e01435
+		summarizeBy: none
+		sourceColumn: OD_SCORE
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Score Time'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 6ca9c0b2-79e0-4bd0-a232-3629e1c232b4
+		summarizeBy: none
+		sourceColumn: Score Time
+
+		variation Variation
+			isDefault
+			relationship: 374724ce-2470-42e2-a383-9d284324afdc
+			defaultHierarchy: LocalDateTable_b59f3ec0-c465-44e3-b584-05f2d5446407.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'OD Score AM/PM'
+		dataType: string
+		lineageTag: 8f985946-a98c-4f23-95c2-aa26c30673b7
+		summarizeBy: none
+		sourceColumn: OD Score AM/PM
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Sepsis PATIENTS Huddle or Sepis CLINICAL_ALERTS Called//Performed with a MD/PNP'
+		dataType: string
+		lineageTag: 47fa4b95-58ec-44f8-b22e-0f72ae6da1f8
+		summarizeBy: none
+		sourceColumn: Sepsis PATIENTS Huddle or Sepis CLINICAL_ALERTS Called//Performed with a MD/PNP
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Huddle Date'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 29b05e17-8b35-45d4-a8c3-6234b898183d
+		summarizeBy: none
+		sourceColumn: Huddle Date
+
+		variation Variation
+			isDefault
+			relationship: 344e28d5-dd50-4681-a836-c39866b4d48b
+			defaultHierarchy: LocalDateTable_dc30a640-e461-4693-999b-66e8022d060f.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Huddle Time'
+		dataType: dateTime
+		formatString: Long Time
+		lineageTag: d72d4dee-e97a-4a14-9333-da205ee8fb94
+		summarizeBy: none
+		sourceColumn: Huddle Time
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Time
+
+	column 'PATIENTS Assessed by MD/PNP'
+		dataType: string
+		lineageTag: 27f20e78-50ea-41dd-88b6-c59c99eefd26
+		summarizeBy: none
+		sourceColumn: PATIENTS Assessed by MD/PNP
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Physician Name'
+		dataType: string
+		lineageTag: 074ca9f3-6849-4518-a1af-b7871a9b5716
+		summarizeBy: none
+		sourceColumn: Physician Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Additional Orders Received/Placed by MD/PNP'
+		dataType: string
+		lineageTag: 8b78f028-45f0-40ea-8d7e-d1cd6fcbf283
+		summarizeBy: none
+		sourceColumn: Additional Orders Received/Placed by MD/PNP
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'LAST ABX Time'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 82694843-d5b1-4fb5-9fe4-8fe808cbdf4c
+		summarizeBy: none
+		sourceColumn: LAST ABX Time
+
+		variation Variation
+			isDefault
+			relationship: 1b6bfef1-119e-4703-a4cc-9c8f806b3b44
+			defaultHierarchy: LocalDateTable_2280bd84-c517-4903-b67b-b9d0e7de04b7.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'LAST ABX Name'
+		dataType: string
+		lineageTag: f3586e73-3e46-4474-ad65-3f8b412e09e0
+		summarizeBy: none
+		sourceColumn: LAST ABX Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'LAST ABX Volume'
+		dataType: string
+		lineageTag: 156bfe83-1905-424d-ab85-55ec0efc1082
+		summarizeBy: none
+		sourceColumn: LAST ABX Volume
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Last ABX to OD Score Time'
+		dataType: int64
+		formatString: 0
+		lineageTag: 0b9e7ebb-e363-4457-9823-52d22ea81e51
+		summarizeBy: sum
+		sourceColumn: Last ABX to OD Score Time
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'LAST ABX Given in Dept Y/N'
+		dataType: string
+		lineageTag: 83f2b669-4c66-4de7-a098-332533b052e8
+		summarizeBy: none
+		sourceColumn: LAST ABX Given in Dept Y/N
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'FIRST ABX Time'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 07f19d1f-4334-4185-8eb0-0e43c0f937ae
+		summarizeBy: none
+		sourceColumn: FIRST ABX Time
+
+		variation Variation
+			isDefault
+			relationship: 1ea96928-2b38-4885-8fc0-afe694de7458
+			defaultHierarchy: LocalDateTable_6402c170-f034-4fc0-813a-5fb326c2aa93.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'FIRST ABX Name'
+		dataType: string
+		lineageTag: e9663d9a-d256-4c70-b503-b881939b4318
+		summarizeBy: none
+		sourceColumn: FIRST ABX Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'FIRST ABX Volume'
+		dataType: string
+		lineageTag: 0be85d44-5993-4fe0-8238-ffd9fc9d6d88
+		summarizeBy: none
+		sourceColumn: FIRST ABX Volume
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'OD Score to First ABX Time'
+		dataType: int64
+		formatString: 0
+		lineageTag: cdd5c630-ab55-4066-b3b0-3f0c2641435f
+		summarizeBy: sum
+		sourceColumn: OD Score to First ABX Time
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'FIRST ABX Given in Dept Y/N'
+		dataType: string
+		lineageTag: e868d7c2-dacb-4f93-81c4-9a56c4d71b12
+		summarizeBy: none
+		sourceColumn: FIRST ABX Given in Dept Y/N
+
+		annotation SummarizationSetBy = Automatic
+
+	column ABX_FLAG
+		dataType: string
+		lineageTag: 3e814ca8-11b2-47dc-87ec-a87c3713cf5c
+		summarizeBy: none
+		sourceColumn: ABX_FLAG
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'LAST Bolus Time'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 78734d80-46b5-42bf-b7a0-a3f6dc144b1b
+		summarizeBy: none
+		sourceColumn: LAST Bolus Time
+
+		variation Variation
+			isDefault
+			relationship: 4ee82b19-e0c1-44ee-9e98-2aacaf45c193
+			defaultHierarchy: LocalDateTable_24151a3f-c888-4f22-b08d-0e9fdd33b7b8.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'LAST Bolus'
+		dataType: string
+		lineageTag: 5b82db43-43e9-42ed-a8eb-aab88fc5ef65
+		summarizeBy: none
+		sourceColumn: LAST Bolus
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'LAST Bolus Volume'
+		dataType: string
+		lineageTag: 939915c2-a714-4260-89d2-3e4512fad3aa
+		summarizeBy: none
+		sourceColumn: LAST Bolus Volume
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Last Bolus to Screen Time'
+		dataType: int64
+		formatString: 0
+		lineageTag: dbc780f5-b5a7-48c9-be3b-e4bff2e45b64
+		summarizeBy: sum
+		sourceColumn: Last Bolus to Screen Time
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'LAST Bolus Given in Dept Y/N'
+		dataType: string
+		lineageTag: 5a47bb80-94be-4ac4-a016-a2f6edaa19b6
+		summarizeBy: none
+		sourceColumn: LAST Bolus Given in Dept Y/N
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'FIRST Bolus Time'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: a1d0cd92-cc52-4832-ab8a-56a5503cba81
+		summarizeBy: none
+		sourceColumn: FIRST Bolus Time
+
+		variation Variation
+			isDefault
+			relationship: 37ee2b85-3bf2-4039-b9a5-6b9cf9bde06f
+			defaultHierarchy: LocalDateTable_92085f22-2e97-4d8d-9dd2-6106b7e153ed.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'FIRST Bolus'
+		dataType: string
+		lineageTag: 9baea8f3-ac2c-4a01-b386-d9c901dc8265
+		summarizeBy: none
+		sourceColumn: FIRST Bolus
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'FIRST Bolus Volume'
+		dataType: string
+		lineageTag: 84621de7-8e74-47a7-b6e7-b49b2b202e38
+		summarizeBy: none
+		sourceColumn: FIRST Bolus Volume
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Screen Time to First Bolus'
+		dataType: int64
+		formatString: 0
+		lineageTag: 7a88796d-d1ff-4eeb-900a-e4c74a2312b8
+		summarizeBy: sum
+		sourceColumn: Screen Time to First Bolus
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'FIRST Bolus Given in Dept Y/N'
+		dataType: string
+		lineageTag: 1e27e9c8-795c-4e7a-84ab-7baeacb1318a
+		summarizeBy: none
+		sourceColumn: FIRST Bolus Given in Dept Y/N
+
+		annotation SummarizationSetBy = Automatic
+
+	column BOLUS_FLAG
+		dataType: string
+		lineageTag: af890baf-240e-4224-9622-6e275118b71f
+		summarizeBy: none
+		sourceColumn: BOLUS_FLAG
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'LAST LacticAcid Order Time'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 277400d9-a123-4bff-9d87-ccb9d298d4f7
+		summarizeBy: none
+		sourceColumn: LAST LacticAcid Order Time
+
+		variation Variation
+			isDefault
+			relationship: 75311326-b1d0-4920-b54c-988e4ac6f999
+			defaultHierarchy: LocalDateTable_e1fe5e87-7491-48ba-a344-43c83ea01918.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'LAST LacticAcid Result'
+		dataType: string
+		lineageTag: 95815afe-35f1-42b1-93d8-cc25555fca18
+		summarizeBy: none
+		sourceColumn: LAST LacticAcid Result
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'LAST LacticAcid in Dept Y/N'
+		dataType: string
+		lineageTag: 7a804330-25d1-405e-b32e-dc36aa9cd9dc
+		summarizeBy: none
+		sourceColumn: LAST LacticAcid in Dept Y/N
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'FIRST LacticAcid Order Time'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 48b52949-c7d9-4379-8b07-effdbb89d3b4
+		summarizeBy: none
+		sourceColumn: FIRST LacticAcid Order Time
+
+		variation Variation
+			isDefault
+			relationship: 59d57ef0-7552-413b-a54a-366c81333a7f
+			defaultHierarchy: LocalDateTable_90196046-696b-4d67-a9a7-7908ecf0ba9d.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'FIRST LacticAcid Result'
+		dataType: string
+		lineageTag: b88c3f38-b89d-48ae-9f64-d667a3a66aed
+		summarizeBy: none
+		sourceColumn: FIRST LacticAcid Result
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'FIRST LacticAcid in Dept Y/N'
+		dataType: string
+		lineageTag: 7843f323-00e3-4b58-be11-1483e649750d
+		summarizeBy: none
+		sourceColumn: FIRST LacticAcid in Dept Y/N
+
+		annotation SummarizationSetBy = Automatic
+
+	column LACTICACID_FLAG
+		dataType: string
+		lineageTag: 5283b01b-8dc4-4ea8-ba6d-6044208f60a6
+		summarizeBy: none
+		sourceColumn: LACTICACID_FLAG
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'LAST OrderSet Time'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 4b68ca97-0aff-468c-9712-ac00447c0181
+		summarizeBy: none
+		sourceColumn: LAST OrderSet Time
+
+		variation Variation
+			isDefault
+			relationship: 37ac8a81-c4a9-4682-998c-ff2bb662879c
+			defaultHierarchy: LocalDateTable_367ae4b7-00f1-45e4-8b7d-a4a8c440e986.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'LAST OrderSet ID'
+		dataType: double
+		lineageTag: 050d469b-1e5a-4765-b23a-add61f714143
+		summarizeBy: count
+		sourceColumn: LAST OrderSet ID
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'LAST OrderSet in Dept Y/N'
+		dataType: string
+		lineageTag: 20049cd0-a44b-42cb-ac4a-12a8b4d4fef8
+		summarizeBy: none
+		sourceColumn: LAST OrderSet in Dept Y/N
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'FIRST OrderSet Time'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: f194a4cc-944f-4afb-ac85-e28fea905f37
+		summarizeBy: none
+		sourceColumn: FIRST OrderSet Time
+
+		variation Variation
+			isDefault
+			relationship: c4be216d-4781-40f5-b274-afd4ef24f96a
+			defaultHierarchy: LocalDateTable_f16ce66c-c436-40cf-ad68-7706ed537efc.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'FIRST OrderSet ID'
+		dataType: double
+		lineageTag: a816b0e0-6ce6-4896-83e9-1540c491039f
+		summarizeBy: count
+		sourceColumn: FIRST OrderSet ID
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'FIRST OrderSet in Dept Y/N'
+		dataType: string
+		lineageTag: 7c4b029c-f6b7-4c72-be3a-9fff856bb1d1
+		summarizeBy: none
+		sourceColumn: FIRST OrderSet in Dept Y/N
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'LAST CVL Time'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 85cd6031-cec8-4de2-bc6a-0a162dc67bfc
+		summarizeBy: none
+		sourceColumn: LAST CVL Time
+
+		variation Variation
+			isDefault
+			relationship: 692e2be9-aead-431c-ac3b-49195b608551
+			defaultHierarchy: LocalDateTable_a361b94c-6801-46cb-be71-875ca3334dd7.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'LAST CVL in Dept Y/N'
+		dataType: string
+		lineageTag: 65d45c01-3ca8-4432-a2ef-7e6f86322b20
+		summarizeBy: none
+		sourceColumn: LAST CVL in Dept Y/N
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'FIRST CVL Time'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 41a43ae3-cf99-438e-a668-44e644670096
+		summarizeBy: none
+		sourceColumn: FIRST CVL Time
+
+		variation Variation
+			isDefault
+			relationship: 548e8381-4b03-43f5-a8f2-871a14171801
+			defaultHierarchy: LocalDateTable_b17b5b1b-74b6-4d2d-8227-fe42ef7314a7.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'FIRST CVL in Dept Y/N'
+		dataType: string
+		lineageTag: 7ebbc359-f182-49da-a603-f337a805b9ab
+		summarizeBy: none
+		sourceColumn: FIRST CVL in Dept Y/N
+
+		annotation SummarizationSetBy = Automatic
+
+	column CVL_FLAG
+		dataType: string
+		lineageTag: aeedcad2-0ac9-430e-a3cc-8873f69793a9
+		summarizeBy: none
+		sourceColumn: CVL_FLAG
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'LAST SVO2 Time'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 0b97c51b-d613-441f-931c-e877bf9824d1
+		summarizeBy: none
+		sourceColumn: LAST SVO2 Time
+
+		variation Variation
+			isDefault
+			relationship: 9c62b376-a9de-4b37-a6c0-35cdbd1c2e00
+			defaultHierarchy: LocalDateTable_3bcbece3-5bc9-4f35-8dec-e635c5560034.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'LAST SVO2 in Dept Y/N'
+		dataType: string
+		lineageTag: d9b78cb3-080a-4d89-b317-b59f4df78f27
+		summarizeBy: none
+		sourceColumn: LAST SVO2 in Dept Y/N
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'FIRST SVO2 Time'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 5fe78a2d-b9ff-4090-b79a-e37d6e3f4837
+		summarizeBy: none
+		sourceColumn: FIRST SVO2 Time
+
+		variation Variation
+			isDefault
+			relationship: 58bb1068-d35f-4fcc-9f25-bc4f07c2efe9
+			defaultHierarchy: LocalDateTable_06ae4576-2133-457d-b862-6a2f8abc5f0d.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'FIRST SVO2 in Dept Y/N'
+		dataType: string
+		lineageTag: c2e93384-4603-4177-93cc-8b075dcc6a37
+		summarizeBy: none
+		sourceColumn: FIRST SVO2 in Dept Y/N
+
+		annotation SummarizationSetBy = Automatic
+
+	column SVO2_FLAG
+		dataType: string
+		lineageTag: e70ab604-af9f-4be1-b2a1-f7038547afa2
+		summarizeBy: none
+		sourceColumn: SVO2_FLAG
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'LAST Procalcitonin Order Time'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 7364d318-d8db-43a6-9cab-e23a980f4dc6
+		summarizeBy: none
+		sourceColumn: LAST Procalcitonin Order Time
+
+		variation Variation
+			isDefault
+			relationship: 79f1950b-df24-4924-b9ec-05ef7ba521f7
+			defaultHierarchy: LocalDateTable_6a12d33c-23b0-4c13-a116-d8ece43d10f8.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'LAST Procalcitonin Result'
+		dataType: string
+		lineageTag: f05f95a8-cfb4-4537-a9b6-a8bc202fd84c
+		summarizeBy: none
+		sourceColumn: LAST Procalcitonin Result
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'LAST Procalcitonin in Dept Y/N'
+		dataType: string
+		lineageTag: 23976616-79cc-4caa-a084-618ecec71e4b
+		summarizeBy: none
+		sourceColumn: LAST Procalcitonin in Dept Y/N
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'FIRST Procalcitonin Order Time'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 3fb976e2-f07d-4d1b-a8a1-439975e960b9
+		summarizeBy: none
+		sourceColumn: FIRST Procalcitonin Order Time
+
+		variation Variation
+			isDefault
+			relationship: 581531d3-1b76-4447-88d3-bfbf54bd15fe
+			defaultHierarchy: LocalDateTable_1f785dee-e495-43a6-9bcb-4fc0adbc3cd5.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'FIRST Procalcitonin Result'
+		dataType: string
+		lineageTag: 9b723e50-8667-4ef9-836c-ed56a1318da5
+		summarizeBy: none
+		sourceColumn: FIRST Procalcitonin Result
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'FIRST Procalcitonin in Dept Y/N'
+		dataType: string
+		lineageTag: 81bd9dda-3f0b-4f40-b81a-1411d97f69c6
+		summarizeBy: none
+		sourceColumn: FIRST Procalcitonin in Dept Y/N
+
+		annotation SummarizationSetBy = Automatic
+
+	column PROCALCITONIN_FLAG
+		dataType: string
+		lineageTag: 1cb8f757-5617-42e2-882d-2caccb5bf67a
+		summarizeBy: none
+		sourceColumn: PROCALCITONIN_FLAG
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'LAST Blood Culture Order Time'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 8dd5c5c6-99e2-45ba-a679-51221848ebfa
+		summarizeBy: none
+		sourceColumn: LAST Blood Culture Order Time
+
+		variation Variation
+			isDefault
+			relationship: 1d507e6f-bc55-45fa-96dc-c47c59ce9405
+			defaultHierarchy: LocalDateTable_971447f9-000c-4281-bf57-82409f871cc4.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'LAST Blood Culture Procedure Ordered'
+		dataType: string
+		lineageTag: c1af8a59-cc4a-433a-9132-46515582b033
+		summarizeBy: none
+		sourceColumn: LAST Blood Culture Procedure Ordered
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'LAST Blood Culture Result'
+		dataType: string
+		lineageTag: e4501347-e0b4-4afe-8207-55f235dbcc97
+		summarizeBy: none
+		sourceColumn: LAST Blood Culture Result
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'LAST Blood Culture in Dept Y/N'
+		dataType: string
+		lineageTag: f097463e-afe0-4235-92e0-4ebf3d89ce31
+		summarizeBy: none
+		sourceColumn: LAST Blood Culture in Dept Y/N
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'FIRST Blood Culture Order Time'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: b92d510d-b771-4035-8ddc-af0dcd16a817
+		summarizeBy: none
+		sourceColumn: FIRST Blood Culture Order Time
+
+		variation Variation
+			isDefault
+			relationship: a323585c-9474-451e-9747-8e32340223d7
+			defaultHierarchy: LocalDateTable_24cd22d7-5770-4478-a1d9-cb3d4132ac78.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'FIRST Blood Culture Procedure Ordered'
+		dataType: string
+		lineageTag: 3cb7e48c-a3ce-44e5-8446-679c5fbf47bb
+		summarizeBy: none
+		sourceColumn: FIRST Blood Culture Procedure Ordered
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'FIRST Blood Culture Result'
+		dataType: string
+		lineageTag: 0ad92981-0f3d-4fc0-9987-694aabfc9725
+		summarizeBy: none
+		sourceColumn: FIRST Blood Culture Result
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'FIRST Blood Culture in Dept Y/N'
+		dataType: string
+		lineageTag: ef26e190-6a99-4bf0-b876-049b90af5c0c
+		summarizeBy: none
+		sourceColumn: FIRST Blood Culture in Dept Y/N
+
+		annotation SummarizationSetBy = Automatic
+
+	column BLOODCULTURE_FLAG
+		dataType: string
+		lineageTag: fb3ff2b5-99ba-46c5-b666-dc5b2f2f6eb4
+		summarizeBy: none
+		sourceColumn: BLOODCULTURE_FLAG
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'LAST CSF Order Time'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: f843b448-2ca9-4b4b-a4a7-e0d42793cb17
+		summarizeBy: none
+		sourceColumn: LAST CSF Order Time
+
+		variation Variation
+			isDefault
+			relationship: b9271be0-03d3-4381-b100-132f982c5ea1
+			defaultHierarchy: LocalDateTable_b45ad3b5-5977-4bc6-8e99-f59db80d7bf0.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'LAST CSF Ordered'
+		dataType: string
+		lineageTag: 9ca6bcc1-5612-4bfd-83e6-3dbbfdd76d7b
+		summarizeBy: none
+		sourceColumn: LAST CSF Ordered
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'LAST CSF in Dept Y/N'
+		dataType: string
+		lineageTag: d6b39606-0aa3-4b68-9f1b-8a14b731875f
+		summarizeBy: none
+		sourceColumn: LAST CSF in Dept Y/N
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'FIRST CSF Order Time'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: e99af4cb-eb98-410a-8719-6101a10ac48d
+		summarizeBy: none
+		sourceColumn: FIRST CSF Order Time
+
+		variation Variation
+			isDefault
+			relationship: 6e8b0856-a155-4c52-bb72-a2b4ac764542
+			defaultHierarchy: LocalDateTable_18b248cd-22c5-4442-9ff1-2b5d1407cb91.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'FIRST CSF Ordered'
+		dataType: string
+		lineageTag: 939317d1-fbb1-49c1-8ba7-2577bcbeec2a
+		summarizeBy: none
+		sourceColumn: FIRST CSF Ordered
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'FIRST CSF in Dept Y/N'
+		dataType: string
+		lineageTag: db44ecd9-9914-4b8a-a9d5-fc95a1358c7c
+		summarizeBy: none
+		sourceColumn: FIRST CSF in Dept Y/N
+
+		annotation SummarizationSetBy = Automatic
+
+	column CSF_FLAG
+		dataType: string
+		lineageTag: 9b30d3dd-f189-4ca7-8aed-ef5aa4d78bcc
+		summarizeBy: none
+		sourceColumn: CSF_FLAG
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'LAST PIV Before Screen'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 9b2b1963-a72b-4443-985f-9f328955719e
+		summarizeBy: none
+		sourceColumn: LAST PIV Before Screen
+
+		variation Variation
+			isDefault
+			relationship: d3305c11-9bd6-4276-852e-f4bd379e7bd6
+			defaultHierarchy: LocalDateTable_be706a42-0122-42b6-ad6d-3e804f9911ea.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'LAST PIV in Dept Y/N'
+		dataType: string
+		lineageTag: 026fe4af-1f0a-48c8-85bd-6bc16992e485
+		summarizeBy: none
+		sourceColumn: LAST PIV in Dept Y/N
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'FIRST PIV After Screen'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 54698537-62c9-43cc-a11a-671e00d11290
+		summarizeBy: none
+		sourceColumn: FIRST PIV After Screen
+
+		variation Variation
+			isDefault
+			relationship: 0d262205-2c11-4329-bb24-38beb37affeb
+			defaultHierarchy: LocalDateTable_33b49fe0-8f4f-4284-b837-133a9ef608c2.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'FIRST PIV in Dept Y/N'
+		dataType: string
+		lineageTag: 02cbdb80-d609-4e89-b857-6b6151fab6a0
+		summarizeBy: none
+		sourceColumn: FIRST PIV in Dept Y/N
+
+		annotation SummarizationSetBy = Automatic
+
+	column PIV_FLAG
+		dataType: string
+		lineageTag: a4dfd17e-1296-4497-b83c-0ed4a456a540
+		summarizeBy: none
+		sourceColumn: PIV_FLAG
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'LAST Intubation Time'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: e8cad577-5112-43aa-823b-b14c97db4555
+		summarizeBy: none
+		sourceColumn: LAST Intubation Time
+
+		variation Variation
+			isDefault
+			relationship: 70defaab-dec0-49be-9cf0-fb66933602d7
+			defaultHierarchy: LocalDateTable_2766f1c3-2170-408a-b8c9-a6e18f35a6b7.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'LAST ETT in Dept Y/N'
+		dataType: string
+		lineageTag: 051f8814-14b7-45f6-a6fe-339985566ca4
+		summarizeBy: none
+		sourceColumn: LAST ETT in Dept Y/N
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'FIRST Intubation Time'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: f4c9d96b-a5cb-4ca0-abca-7bfda05e96b1
+		summarizeBy: none
+		sourceColumn: FIRST Intubation Time
+
+		variation Variation
+			isDefault
+			relationship: 82681266-6fad-4d56-9046-d1cf04c63cf4
+			defaultHierarchy: LocalDateTable_fd2caaae-f4e2-46a0-a496-674f2ccb80de.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'FIRST ETT in Dept Y/N'
+		dataType: string
+		lineageTag: 66403bff-f034-499e-b0aa-12452f1dea53
+		summarizeBy: none
+		sourceColumn: FIRST ETT in Dept Y/N
+
+		annotation SummarizationSetBy = Automatic
+
+	column ETT_FLAG
+		dataType: string
+		lineageTag: 1b8ed5f4-0c93-4439-a7e2-09a47a29a493
+		summarizeBy: none
+		sourceColumn: ETT_FLAG
+
+		annotation SummarizationSetBy = Automatic
+
+	column DOBUTAMINE
+		dataType: string
+		lineageTag: e0a9ceef-cb88-4ceb-8d82-5af1c9f70c42
+		summarizeBy: none
+		sourceColumn: DOBUTAMINE
+
+		annotation SummarizationSetBy = Automatic
+
+	column DOPAMINE
+		dataType: string
+		lineageTag: 785dbb94-a622-4569-b06f-1fb60ec87595
+		summarizeBy: none
+		sourceColumn: DOPAMINE
+
+		annotation SummarizationSetBy = Automatic
+
+	column EPINEPHRINE
+		dataType: string
+		lineageTag: 6998459d-3043-41ed-86fd-ab442738ac1d
+		summarizeBy: none
+		sourceColumn: EPINEPHRINE
+
+		annotation SummarizationSetBy = Automatic
+
+	column MILRINONE
+		dataType: string
+		lineageTag: 0bdc056c-3567-424a-a2f6-8d0848fa44f0
+		summarizeBy: none
+		sourceColumn: MILRINONE
+
+		annotation SummarizationSetBy = Automatic
+
+	column NOREPINEPHRINE
+		dataType: string
+		lineageTag: fc758dfb-25ff-4825-ab45-55103dc61946
+		summarizeBy: none
+		sourceColumn: NOREPINEPHRINE
+
+		annotation SummarizationSetBy = Automatic
+
+	column PRESSOR_FLAG
+		dataType: string
+		lineageTag: 5eb6cccb-f0a0-4ead-9da8-593e97d8f28c
+		summarizeBy: none
+		sourceColumn: PRESSOR_FLAG
+
+		annotation SummarizationSetBy = Automatic
+
+	column DVTPROPHYLAXIS_FLAG
+		dataType: string
+		lineageTag: cb43d726-863e-44e1-9c99-5d960dba3a8c
+		summarizeBy: none
+		sourceColumn: DVTPROPHYLAXIS_FLAG
+
+		annotation SummarizationSetBy = Automatic
+
+	column CVVH_FLAG
+		dataType: string
+		lineageTag: 8210a0dd-dfd2-4e05-ba2f-9c1d7678713e
+		summarizeBy: none
+		sourceColumn: CVVH_FLAG
+
+		annotation SummarizationSetBy = Automatic
+
+	column OX_FLAG
+		dataType: string
+		lineageTag: 57f48e23-b17f-47c4-bf3a-7d7b754ccece
+		summarizeBy: none
+		sourceColumn: OX_FLAG
+
+		annotation SummarizationSetBy = Automatic
+
+	column ECMO_FLAG
+		dataType: string
+		lineageTag: 2b070e8c-3f30-431e-9d14-27d64239afd4
+		summarizeBy: none
+		sourceColumn: ECMO_FLAG
+
+		annotation SummarizationSetBy = Automatic
+
+	column SEVERE_SEPSIS_STAGING
+		dataType: string
+		lineageTag: 166ca2a2-ad7d-4fe3-b586-81768a2e41b8
+		summarizeBy: none
+		sourceColumn: SEVERE_SEPSIS_STAGING
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'CLINICAL_ALERTS Not Activated Reason'
+		dataType: string
+		lineageTag: f97fd79a-a8e5-4cd1-899c-e9601c14c055
+		summarizeBy: none
+		sourceColumn: CLINICAL_ALERTS Not Activated Reason
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'CLINICAL_ALERTS Not Activated Comment'
+		dataType: string
+		lineageTag: 0a05e8b4-e697-4e4c-8618-f0b1bc73e2dd
+		summarizeBy: none
+		sourceColumn: CLINICAL_ALERTS Not Activated Comment
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'CLINICAL_ALERTS Activated Comment'
+		dataType: string
+		lineageTag: c308300a-9bcc-4099-9927-9272c897bd30
+		summarizeBy: none
+		sourceColumn: CLINICAL_ALERTS Activated Comment
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Refresh Time'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 0d5c6f6b-935e-4711-9df5-f1126d941af9
+		summarizeBy: none
+		sourceColumn: Refresh Time
+
+		variation Variation
+			isDefault
+			relationship: 70573d40-504a-4458-a892-a6812a0b7164
+			defaultHierarchy: LocalDateTable_6dbf2d4b-5fc5-4712-8fa2-58e8e398a924.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'IP Sepsis' = m
+		mode: import
+		source =
+				let
+				  Source = Sql.Database("SCRUBBED-ENDPOINT.example,1433", "SCRUBBED-DATABASE", [Query = "EXEC reports.USP_IP_SEPSIS 'MB-1', 'ME-1'"])
+				in
+				  Source
+
+	annotation PBI_ResultType = Table
+

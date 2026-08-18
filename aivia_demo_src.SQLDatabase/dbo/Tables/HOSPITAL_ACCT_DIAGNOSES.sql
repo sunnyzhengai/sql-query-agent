@@ -1,0 +1,42 @@
+CREATE TABLE [dbo].[HOSPITAL_ACCT_DIAGNOSES] (
+    [CAUSE_DEATH_FLAG]       NVARCHAR (400)  NULL,
+    [CM_LOG_OWNER_ID]        NVARCHAR (400)  NULL,
+    [CM_PHY_OWNER_ID]        NVARCHAR (400)  NULL,
+    [COMPLEX_DX_CODE]        INT             NULL,
+    [DK_CANCER_STATUS_CODE]  INT             NULL,
+    [DX_AFFECTS_DRG_FLAG]    NVARCHAR (400)  NULL,
+    [DX_CHRONIC_FLAG_FLAG]   NVARCHAR (400)  NULL,
+    [DX_CLASS_CODE]          INT             NULL,
+    [DX_CLUSTER]             NVARCHAR (400)  NULL,
+    [DX_COF_CODE]            INT             NULL,
+    [DX_COMORBIDITY_CODE]    INT             NULL,
+    [DX_COMORBIDITY_FLAG]    NVARCHAR (400)  NULL,
+    [DX_COMPLEXITY_LVL]      INT             NULL,
+    [DX_DISPROVEN_FLAG]      NVARCHAR (400)  NULL,
+    [DX_DOCUMENTING_USER_ID] NVARCHAR (400)  NULL,
+    [DX_END_DT]              DATETIME2 (7)   NULL,
+    [DX_HAC_FLAG]            NVARCHAR (400)  NULL,
+    [DX_HOSP_PROB_FLAG_FLAG] NVARCHAR (400)  NULL,
+    [DX_ID]                  DECIMAL (18, 4) NULL,
+    [DX_OVERRIDDEN_DX_ID]    DECIMAL (18, 4) NULL,
+    [DX_POA_YNU]             NVARCHAR (400)  NULL,
+    [DX_PROBLEM_ID]          DECIMAL (18, 4) NULL,
+    [DX_START_DT]            DATETIME2 (7)   NULL,
+    [DX_SUPP_ATC_CODE_CODE]  INT             NULL,
+    [DX_TYPE_CODE]           INT             NULL,
+    [FINAL_DX_EXCLD_FLAG]    NVARCHAR (400)  NULL,
+    [FINAL_DX_POA_CODE]      INT             NULL,
+    [FINAL_DX_ROM_CODE]      INT             NULL,
+    [FINAL_DX_SOI_CODE]      INT             NULL,
+    [FNL_DX_AFCT_ROM_FLAG]   NVARCHAR (400)  NULL,
+    [FNL_DX_AFCT_SOI_FLAG]   NVARCHAR (400)  NULL,
+    [FNL_DX_QUALIFIER_CODE]  NVARCHAR (400)  NULL,
+    [HOSPITAL_ACCOUNT_ID]    DECIMAL (18, 4) NULL,
+    [LINE]                   INT             NULL,
+    [TERM_DX_ID]             DECIMAL (18, 4) NULL,
+    [_SURROGATEKEY]          BIGINT          NULL
+);
+
+
+GO
+

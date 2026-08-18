@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "SemanticModel",
+    "displayName": "ED Sepsis Screening Dashboard"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "c7cc5162-d9cf-9b7b-48de-2bf1533e9959"
+  }
+}
