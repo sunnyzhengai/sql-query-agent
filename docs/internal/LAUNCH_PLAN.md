@@ -13,13 +13,15 @@
 | Core product (parser, graph, agent) | **Done** — ScriptDom-only; contracts/gates everywhere; brand-neutral core |
 | PBI/semantic-model layer (v1 scope) | **Done** — TMDL federation (ADR 0040/0041), 12/13, workspace profile, shape census + M parser foundation |
 | Turn-key ingestion | **Done** — extractor (3 connection profiles, 1.8.0), 00-route family, live-verified 28/28 |
-| Field-proven at real estate | **Done** — 1,335-metric work deployment; 2,013-source census; fallout/funnel plumbing (1.17.0) |
+| Engineering validation | **Done** — privately validated at production scale; NO external numbers cite this (wall rule). Demo/listing claims rest ONLY on the anonymized corpus |
 | Supportability harness | **Done** — table/notebook/integration/shape registries, ADR 0039-0042, journey dashboard spec BUILD-READY |
 | Website (aiviaapp.com) + privacy/terms pages | **Live** (verify pages are published, not just in repo) |
 | LLC / ISV registration | **Done** |
 | Own Azure/Fabric tenant | **Done** — demo tenant operational (demo DB, QA-gated DEMO_SCRIPT) |
-| Partner Center publisher account | **⚠ was "verifying" on 7/25 — CHECK TODAY; external latency, critical path** |
-| Marketplace listing (offer copy, logo, plans) | Not started — Sunny-only |
+| Demo corpus | 28 anonymized procs + demo semantic model — the ONLY corpus for demos/reviewers/claims |
+| Partner Center publisher account | **APPROVED (~2026-08-04, confirmed 2026-08-18)** — critical path open |
+| Offer name | **DECIDED (Sunny, 2026-08-18): "Metadata Agent and Data Analytics Agent"** (clarify with listing copy: one offer title vs two plan names) |
+| Marketplace listing (logo, descriptions, plans/pricing) | Not started — Sunny-only |
 | Certification artifacts (whitepaper, data-flow diagrams, reviewer's guide) | Not started — draftable now |
 | In-flight dev | renumbering (century scheme), journey dashboard build, census leftovers, comparison kernel (F), freshness (E) |
 
