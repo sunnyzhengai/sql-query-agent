@@ -8,9 +8,9 @@ separate small fix in collibra_lineage_match.
 
 metric_ids are schema-qualified since the 00b identity fix (2026-08-17).
 extract_match_key() assumes bare object names: at work,
-"COOK_RPT.USP_AMB_NHC_BH_APPT_PBI" produced key 'rpt.usp amb nhc bh appt'
+"SCHEMA_A.USP_EXAMPLE_ONE_PBI" produced key 'a.usp example one'
 → 128 unmatched reports, and junk keys fed the fuzzy scorer garbage
-matches with implausible 1.00 scores (ComplexCarePDN → "Admission
+matches with implausible 1.00 scores (ExampleReportProc → "Admission
 Documentation Report"). Sunny's cell-5 review caught it pre-publish.
 
 ## Wanted
@@ -20,7 +20,7 @@ Documentation Report"). Sunny's cell-5 review caught it pre-publish.
 2. Test: qualified and bare forms of the same name produce identical
    keys; qualified non-_PBI returns None. (Draft test text exists in this
    file's git history sibling — or just write:
-   extract_match_key("COOK_RPT.USP_X_PBI") == extract_match_key("USP_X_PBI").)
+   extract_match_key("SCHEMA_A.USP_X_PBI") == extract_match_key("USP_X_PBI").)
 3. While in there: investigate why the fuzzy scorer emitted 1.00 for
    unrelated names when fed junk keys — a score ceiling/normalization bug
    may be hiding independently of the qualification issue.

@@ -26,12 +26,12 @@ already captured in input_report_sources; this is derivation-only.
 1. **Distinctness key unnormalized**: keyed on raw (schema_name,
    sql_object) — the same proc spelled differently across a model's
    partitions (case, schema alias) counts as 2 distinct and wrongly
-   refuses ("Coding Productivity: 2 distinct"). Fold case (and consider
+   refuses ("Example Multi-Proc Report: 2 distinct"). Fold case (and consider
    schema-alias mapping) before counting.
 2. **Kind filter drops view-as-Table navigations**: connectors commonly
    reach VIEWS as Kind="Table"; sources typed Table are excluded, so
    reports with real SQL lineage print "0 distinct SQL objects"
-   ("CCHCS Telemedicine Report"). Replace the TMDL-Kind test with the
+   ("Example Zero-Object Report"). Replace the TMDL-Kind test with the
    authoritative membership test: sql_object (schema-qualified, folded)
    ∈ input_sql_sources.metric_id → it can name metrics; DirectLake
    lakehouse tables self-exclude by not matching the corpus.
@@ -45,7 +45,7 @@ Diagnostic queries used at work are in the session log if needed.
 Type distribution over 1065 sources: StoredProcedure 804, View 120,
 Table 82, InlineSQL 59. Findings:
 1. PRIMARY within-table lever = the per-proc inversion (confirmed:
-   "Coding Productivity" is two GENUINELY different procs — real
+   "Example Multi-Proc Report" is two GENUINELY different procs — real
    multi-proc report; under inversion each proc inherits the name).
 2. Case-normalization suspect: NOT confirmed as a driver (keep the fold,
    but don't expect big gains).

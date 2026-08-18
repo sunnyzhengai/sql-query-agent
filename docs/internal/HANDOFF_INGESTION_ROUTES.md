@@ -70,8 +70,8 @@ should say this where users pick routes.
 ## Field evidence (2026-08-17, work deployment, added post-1.14.0)
 
 00b's filename-keyed identity produced 25 REAL metric_id collisions at
-Sunny's work deployment (same proc names exported in both procs_cookrpt
-and procs_reporting folders) — caught by 02's ops_parse_results
+Sunny's work deployment (same proc names exported in both procs_schema_a
+and procs_schema_b folders) — caught by 02's ops_parse_results
 unique(metric_id) postcondition. Stopgap applied in the field: regex on
 each file's CREATE header (schema-qualified id, folder-schema fallback) +
 dropDuplicates. Wanted properly: parse-based identity in 00b (ScriptDom /
