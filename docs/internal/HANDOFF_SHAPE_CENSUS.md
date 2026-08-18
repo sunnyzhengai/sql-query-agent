@@ -64,3 +64,24 @@ registry is a peer of TABLE_REGISTRY and INTEGRATION_REGISTRY.
    (d) optional LLM triage ONLY for flagged residue and unknown-shape
    classification proposals — judgment assistant, never authority
    (ADR 0032: deterministic core, LLM edges).
+
+## Amendment 2 (2026-08-18, full-estate census run — three corrections)
+
+1. **Signatures must capture ARGUMENT KINDS.** Field split: the same
+   source function (Odbc.Query, Sql.Database) appears in large numbers
+   on BOTH the parsed and missed sides — literal vs parameter vs
+   concatenated arguments is the discriminator. Function-name-only
+   signatures are useless for coverage claims; AST-derived argument
+   kinds are required (further evidence for the M mini-parser).
+2. **Anonymization must be WHITELIST-based.** The prototype regex leaked
+   customer-defined query/function names into shape labels (Source =
+   <CustomName> parses as a "function"). Rule: only recognized M
+   standard-library function names may appear verbatim in a signature;
+   every unrecognized identifier is emitted as ref(query)/ref(function).
+   Strip-based anonymization fails on the unrecognized by definition;
+   whitelist-based cannot leak. Census/telemetry outputs must pass a
+   leak test in CI (no non-whitelisted identifiers in emitted labels).
+3. **Coverage is per-FILE (report_name, pbi_table), not per-report** —
+   input_report_sources carries pbi_table; report-level membership
+   masks per-file failures (e.g. non-SQL tables inside parsed reports).
+   The coverage report joins at file grain.
