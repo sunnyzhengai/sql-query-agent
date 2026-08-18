@@ -49,6 +49,12 @@ except ImportError:
     import src
 print(f"v{src.__version__}")
 
+# Version binding (ADR 0042): notebook/wheel skew dies here, loudly.
+REQUIRES_ENGINE = "1.18"
+from src.engine_floor import require_engine
+require_engine(src.__version__, REQUIRES_ENGINE, "12_ingest_semantic_models")
+
+
 from src.config import load_config
 
 config = load_config("/lakehouse/default/Files/sql-query-agent/org_config.yaml")
@@ -81,8 +87,8 @@ if sm.source_type == "workspace":
     # works whether or not the workspace has git integration. Reports
     # commonly span several workspaces: workspace_ids collects them all
     # in ONE pass and ONE write (per-workspace runs would clobber each
-    # other under overwrite semantics). List ORDER is the metric-naming
-    # priority when reports in two workspaces execute the same metric.
+    # other under overwrite semantics). Naming is refuse-over-guess
+    # (2026-08-18): shared metrics name only when consumer titles agree.
     from src.extractor.tmdl_source import collect_from_workspaces
 
     tmdl_files, ws_counts = collect_from_workspaces(

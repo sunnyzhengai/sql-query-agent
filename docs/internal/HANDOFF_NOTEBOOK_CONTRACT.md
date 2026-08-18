@@ -1,5 +1,8 @@
 # Handoff — the notebook contract: a harness for the driver layer
 
+> **Status (2026-08-18, dev session): implemented in 1.18.0 (ADR 0042).**
+> NOTEBOOK_REGISTRY (src/notebook_registry.py) with family / serves / entry_points / wrappers / gates / requires_engine; all six planks enforced by AST in tests/test_notebook_contract.py; every notebook cell 0 binds REQUIRES_ENGINE via src/engine_floor.require_engine; field-patch marker illegal in repo; NOTEBOOK_MAP.md (incl. the QUESTION_MAP layer-4 coverage table) generated with a freshness test. Enforcement immediately forced three cleanups: 01's coverage preview moved to src.dictionary, 00b's identity pattern now has ONE spelling in src.parser.identity, 02's dead read_source deleted. The serves amendment is live — a notebook serving no family fails CI.
+
 **From:** review session, 2026-08-18. **To:** dev session.
 **Origin (Sunny):** "like our data contract for the engine, do we have a
 contract for our notebooks? your default is regex and fixing things in

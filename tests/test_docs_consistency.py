@@ -149,3 +149,19 @@ def test_install_guide_documents_every_optional_input_remediation():
     assert not missing, (
         f"INSTALLATION_GUIDE.md lacks post-install coverage for: {missing}"
     )
+
+
+def test_notebook_map_is_freshly_generated():
+    """Generated-tier check for the notebook contract projection."""
+    import importlib.util
+
+    spec = importlib.util.spec_from_file_location(
+        "generate_docs", REPO_ROOT / "scripts" / "generate_docs.py"
+    )
+    gen = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(gen)
+
+    on_disk = (REPO_ROOT / "docs" / "architecture" / "NOTEBOOK_MAP.md").read_text()
+    assert on_disk == gen.build_notebook_map(), (
+        "NOTEBOOK_MAP.md is stale — run: python scripts/generate_docs.py"
+    )

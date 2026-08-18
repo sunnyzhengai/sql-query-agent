@@ -48,6 +48,12 @@ except ImportError:
     import src
 print(f"v{src.__version__}")
 
+# Version binding (ADR 0042): notebook/wheel skew dies here, loudly.
+REQUIRES_ENGINE = "1.18"
+from src.engine_floor import require_engine
+require_engine(src.__version__, REQUIRES_ENGINE, "04_build_metric_logic")
+
+
 from src.config import load_config
 from src.schemas import METRIC_LOGIC, to_spark_schema
 

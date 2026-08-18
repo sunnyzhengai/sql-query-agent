@@ -64,6 +64,11 @@ except ImportError:
         print("    or ensure src/ is at Files/sql-query-agent/src/")
         raise SystemExit("Verification cannot proceed.")
 
+# Version binding (ADR 0042): notebook/wheel skew dies here, loudly.
+REQUIRES_ENGINE = "1.18"
+from src.engine_floor import require_engine
+require_engine(src.__version__, REQUIRES_ENGINE, "01_install")
+
 # --- Check 2: required Python packages ---
 missing_packages = []
 for pkg_name, import_name in [
@@ -194,21 +199,12 @@ for table, routes in ROUTES.items():
 # (Rough regex preview; 06_validate's dictionary_coverage is the
 # authoritative, blocking check.)
 if state.get("input_sql_sources") and state.get("input_dict_tables"):
-    import re
-    sql_table_refs = set()
+    from src.dictionary import preview_table_references
     try:
-        for row in spark.table("input_sql_sources").select("sql").collect():
-            for match in re.finditer(
-                r'(?:FROM|JOIN)\s+(?:\[?\w+\]?\.)?(?:\[?\w+\]?\.)?\[?(\w+)\]?',
-                row["sql"] or "", re.IGNORECASE,
-            ):
-                name = match.group(1)
-                if name.upper() not in (
-                    "SELECT", "WHERE", "SET", "BEGIN", "END", "AS", "ON",
-                    "AND", "OR", "NOT", "NULL", "TABLE", "VIEW", "PROCEDURE",
-                    "CASE", "WHEN", "THEN", "ELSE", "IN", "IS", "LIKE",
-                ) and not name.startswith("#"):
-                    sql_table_refs.add(name.upper())
+        sql_table_refs = preview_table_references(
+            [row["sql"] for row in
+             spark.table("input_sql_sources").select("sql").collect()]
+        )
         dict_table_names = set(
             r["TABLE_NAME"].upper() for r in spark.table("input_dict_tables").collect()
         )

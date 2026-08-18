@@ -87,3 +87,37 @@ def find_cross_schema_collisions(
         for table, schemas in schemas_by_table.items()
         if len(schemas) > 1
     }
+
+
+# SQL keywords that follow FROM/JOIN without being table names.
+_NOT_TABLE_WORDS = frozenset({
+    "SELECT", "WHERE", "SET", "BEGIN", "END", "AS", "ON", "AND", "OR",
+    "NOT", "NULL", "TABLE", "VIEW", "PROCEDURE", "CASE", "WHEN", "THEN",
+    "ELSE", "IN", "IS", "LIKE",
+})
+
+_TABLE_REF = None  # compiled lazily; regex belongs here, not in notebooks
+
+
+def preview_table_references(sql_texts: "list[str]") -> "set[str]":
+    """ROUGH table-name harvest from raw SQL, for the 01_install coverage
+    PREVIEW only — 06_validate's dictionary_coverage (parse-based) is the
+    authoritative, blocking check. Text-scanning is banned as a lineage
+    source (native-parsers doctrine); this exists solely so the installer
+    can say "your dictionary probably misses these" before the first
+    parse ever runs."""
+    global _TABLE_REF
+    import re as _re
+
+    if _TABLE_REF is None:
+        _TABLE_REF = _re.compile(
+            r"(?:FROM|JOIN)\s+(?:\[?\w+\]?\.)?(?:\[?\w+\]?\.)?\[?(\w+)\]?",
+            _re.IGNORECASE,
+        )
+    refs: "set[str]" = set()
+    for sql in sql_texts:
+        for match in _TABLE_REF.finditer(sql or ""):
+            name = match.group(1)
+            if name.upper() not in _NOT_TABLE_WORDS and not name.startswith("#"):
+                refs.add(name.upper())
+    return refs

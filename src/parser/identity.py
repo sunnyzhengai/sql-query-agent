@@ -69,3 +69,14 @@ def find_duplicate_identities(
     for identity, label in identities:
         by_id.setdefault(fold_identifier(identity), []).append(label)
     return {mid: labels for mid, labels in by_id.items() if len(labels) > 1}
+
+
+# The ONE spelling of the CREATE-header identity pattern for Spark-side
+# extraction (regexp_extract in 00b): group 1 = schema, group 2 = object.
+# Kept beside _QUALIFIED so the two spellings of the identity concern
+# live one screen apart — a second inline copy in a notebook is exactly
+# the drift the notebook contract bans (ADR 0042).
+CREATE_HEADER_SPARK_PATTERN = (
+    r"(?i)CREATE\s+(?:OR\s+ALTER\s+)?(?:PROC(?:EDURE)?|VIEW)"
+    r"\s+\[?([A-Za-z0-9_]+)\]?\s*\.\s*\[?([A-Za-z0-9_]+)\]?"
+)

@@ -10,6 +10,30 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.18.0] - 2026-08-18
+
+### Added — the notebook contract (ADR 0042)
+- NOTEBOOK_REGISTRY: truth-as-data for the driver layer — family,
+  serves (Layer-0 question families; >=1 or the notebook is a ghost),
+  permitted src.steps entry points, wrapper whitelist, required gates,
+  REQUIRES_ENGINE floor. NOTEBOOK_MAP.md (with the QUESTION_MAP
+  layer-4 coverage table) is a generated projection.
+- Six planks enforced by AST against notebook sources: registry 1:1,
+  regex ban, thinness (no classes; only whitelisted wrappers; import
+  allowlist; entry-point restriction), gates-by-family, version
+  binding (require_engine in every cell 0 — version skew dies loudly),
+  field-patch law (marker illegal in repo; patches die on sync).
+
+### Changed
+- 01's dictionary-coverage preview moved to src.dictionary
+  (preview_table_references, tested); 00b's CREATE-header identity
+  pattern now has ONE spelling (src.parser.identity
+  CREATE_HEADER_SPARK_PATTERN); 02's unused read_source deleted.
+- 10 and 11 gained the standard setup cell (src import + version
+  binding) they had been missing.
+
+---
+
 ## [1.17.0] - 2026-08-18
 
 ### Added — the estate-scale recovery release (four handoffs + ADR 0041)

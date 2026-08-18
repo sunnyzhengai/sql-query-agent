@@ -59,3 +59,8 @@ Every notebook's registry entry carries a `serves` field: the question
 families it ultimately exists for. "Why does this notebook exist?" must
 trace to Layer 0; a notebook serving no family is by definition a ghost.
 (Folded into ../internal/HANDOFF_NOTEBOOK_CONTRACT.md.)
+
+> **Built (1.18.0, ADR 0042):** `src/notebook_registry.py` carries
+> `serves`; tests/test_notebook_contract.py enforces >=1 family per
+> notebook; the per-notebook layer-4 projection is GENERATED at
+> NOTEBOOK_MAP.md (family -> notebooks coverage table included).

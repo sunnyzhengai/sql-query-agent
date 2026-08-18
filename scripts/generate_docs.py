@@ -18,10 +18,12 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
 from src.integration_registry import INTEGRATION_REGISTRY  # noqa: E402
+from src.notebook_registry import NOTEBOOK_REGISTRY, QUESTION_FAMILIES  # noqa: E402
 from src.schemas import TABLE_REGISTRY  # noqa: E402
 
 PIPELINE_MAP_PATH = PROJECT_ROOT / "docs" / "architecture" / "PIPELINE_MAP.md"
 INTEGRATION_MAP_PATH = PROJECT_ROOT / "docs" / "architecture" / "INTEGRATION_MAP.md"
+NOTEBOOK_MAP_PATH = PROJECT_ROOT / "docs" / "architecture" / "NOTEBOOK_MAP.md"
 
 # Non-notebook consumers rendered as terminal actors.
 ACTORS = {"data_agent", "admin", "collibra_adapter", "purview_adapter"}
@@ -178,11 +180,63 @@ REFERENCE_ARCHITECTURE tier table as source of truth.
 """
 
 
+
+FAMILY_TITLES = {
+    "A": "Meaning", "B": "Provenance", "C": "Impact", "D": "Discovery",
+    "E": "Trust", "F": "Consistency", "G": "Health",
+}
+
+
+def build_notebook_map() -> str:
+    """Project NOTEBOOK_REGISTRY: the notebook contract table + the
+    QUESTION_MAP layer-4 coverage (family -> notebooks) — generated,
+    never hand-edited (ADR 0042)."""
+    lines = [
+        "# Notebook Map",
+        "",
+        "**GENERATED from `src/notebook_registry.py` — do not edit.**",
+        "Regenerate: `python scripts/generate_docs.py`. The contract is",
+        "enforced by tests/test_notebook_contract.py (ADR 0042).",
+        "",
+        "## The notebook contract",
+        "",
+        "| Notebook | Family | Serves | Engine | Purpose |",
+        "|---|---|---|---|---|",
+    ]
+    for nb, e in sorted(NOTEBOOK_REGISTRY.items()):
+        lines.append(
+            f"| {nb} | {e['family']} | {', '.join(e['serves'])} | "
+            f">={e['requires_engine']} | {e['purpose']} |"
+        )
+    lines += [
+        "",
+        "## Question-family coverage (QUESTION_MAP layer 4, generated)",
+        "",
+        "| Family | Served by |",
+        "|---|---|",
+    ]
+    for fam in QUESTION_FAMILIES:
+        served_by = [nb for nb, e in sorted(NOTEBOOK_REGISTRY.items())
+                     if fam in e["serves"]]
+        lines.append(
+            f"| {fam}. {FAMILY_TITLES[fam]} | {', '.join(served_by) or '(GAP)'} |"
+        )
+    lines += [
+        "",
+        "Every notebook must serve >=1 family — a notebook serving none",
+        "is by definition a ghost (traceability rule, QUESTION_MAP.md).",
+        "",
+    ]
+    return "\n".join(lines)
+
+
 def main() -> None:
     PIPELINE_MAP_PATH.write_text(build_pipeline_map())
     print(f"Wrote {PIPELINE_MAP_PATH}")
     INTEGRATION_MAP_PATH.write_text(build_integration_map())
     print(f"Wrote {INTEGRATION_MAP_PATH}")
+    NOTEBOOK_MAP_PATH.write_text(build_notebook_map())
+    print(f"Wrote {NOTEBOOK_MAP_PATH}")
 
 
 if __name__ == "__main__":

@@ -44,3 +44,18 @@ class TestCrossSchemaCollisions:
         assert find_cross_schema_collisions([
             ("dbo", "PATIENT"), ("DBO", "patient"),
         ]) == {}
+
+
+class TestPreviewTableReferences:
+    def test_harvests_from_and_join_targets(self):
+        from src.dictionary import preview_table_references
+        refs = preview_table_references([
+            "SELECT * FROM dbo.PAT_ENC JOIN [rpt].[ENC_DX] ON 1=1",
+            "SELECT 1 FROM #temp",  # temp tables excluded
+            "SELECT CASE WHEN a THEN b END FROM Orders",
+        ])
+        assert refs == {"PAT_ENC", "ENC_DX", "ORDERS"}
+
+    def test_keywords_never_count_as_tables(self):
+        from src.dictionary import preview_table_references
+        assert preview_table_references(["DELETE FROM WHERE x"]) == set()

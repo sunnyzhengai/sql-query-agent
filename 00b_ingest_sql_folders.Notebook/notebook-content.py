@@ -52,6 +52,12 @@ except ImportError:
     import src
 print(f"v{src.__version__}")
 
+# Version binding (ADR 0042): notebook/wheel skew dies here, loudly.
+REQUIRES_ENGINE = "1.18"
+from src.engine_floor import require_engine
+require_engine(src.__version__, REQUIRES_ENGINE, "00b_ingest_sql_folders")
+
+
 from src.config import load_config  # noqa: F401
 
 config = load_config("/lakehouse/default/Files/sql-query-agent/org_config.yaml")
@@ -134,10 +140,10 @@ if all_dfs:
     # object belongs to; the folder label is only a fallback. Then dedupe:
     # the same object exported into two folders collapses to one row,
     # while genuine same-name twins across schemas stay distinct.
-    # (Stopgap regex on the header ONLY — parse-based identity is the
-    # wanted upgrade; see HANDOFF_INGESTION_ROUTES field evidence.)
-    ident = (r"(?i)CREATE\s+(?:OR\s+ALTER\s+)?(?:PROC(?:EDURE)?|VIEW)"
-             r"\s+\[?([A-Za-z0-9_]+)\]?\s*\.\s*\[?([A-Za-z0-9_]+)\]?")
+    # (Header pattern ONLY — parse-based identity is the wanted upgrade;
+    # see HANDOFF_INGESTION_ROUTES. The pattern has ONE spelling, in
+    # src.parser.identity, per the notebook contract.)
+    from src.parser.identity import CREATE_HEADER_SPARK_PATTERN as ident
     combined_df = (combined_df
         .withColumn("_schema", coalesce(nullif(regexp_extract("sql", ident, 1), lit("")), col("source_schema")))
         .withColumn("_object", coalesce(nullif(regexp_extract("sql", ident, 2), lit("")), col("metric_id")))

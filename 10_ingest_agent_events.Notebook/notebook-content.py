@@ -49,6 +49,20 @@ EVENTS_DIR = "Files/agent_events"
 # CELL ********************
 
 # %% Cell 1: Read every JSONL line under Files/agent_events
+import sys
+
+try:
+    import src
+except ImportError:
+    sys.path.insert(0, "/lakehouse/default/Files/sql-query-agent")
+    import src
+print(f"v{src.__version__}")
+
+# Version binding (ADR 0042): notebook/wheel skew dies here, loudly.
+REQUIRES_ENGINE = "1.18"
+from src.engine_floor import require_engine
+require_engine(src.__version__, REQUIRES_ENGINE, "10_ingest_agent_events")
+
 import notebookutils  # noqa: F401  (Fabric runtime)
 
 # Existence is checked explicitly: "directory not created yet" is a normal

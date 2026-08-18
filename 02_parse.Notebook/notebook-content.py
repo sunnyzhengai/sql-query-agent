@@ -48,6 +48,12 @@ except ImportError:
     import src
 print(f"v{src.__version__}")
 
+# Version binding (ADR 0042): notebook/wheel skew dies here, loudly.
+REQUIRES_ENGINE = "1.18"
+from src.engine_floor import require_engine
+require_engine(src.__version__, REQUIRES_ENGINE, "02_parse")
+
+
 # Load pythonnet + ScriptDom directly (do not call load_scriptdom — it re-triggers init)
 from pythonnet import load
 
@@ -92,15 +98,6 @@ def extract_with_scriptdom(raw_sql):
 print("ScriptDom ready")
 
 
-def read_source(name_or_path):
-    if name_or_path.endswith(".csv"):
-        return spark.read.option("header", "true").option("inferSchema", "true").csv(name_or_path)
-    elif "abfss://" in name_or_path or "/" in name_or_path:
-        return spark.read.format("delta").load(name_or_path)
-    else:
-        return spark.table(name_or_path)
-
-
 # METADATA ********************
 
 # META {
@@ -122,7 +119,7 @@ precondition_gate("02_parse", table_exists=spark.catalog.tableExists,
                   count=lambda t: spark.table(t).count())
 
 
-sql_sources_df = read_source(config.lakehouse.sql_sources)
+sql_sources_df = spark.table(config.lakehouse.sql_sources)
 
 sql_sources_df = sql_sources_df.selectExpr(
     "metric_id",

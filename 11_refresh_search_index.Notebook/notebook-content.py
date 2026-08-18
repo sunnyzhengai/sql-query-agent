@@ -41,6 +41,21 @@ devtools/eventhouse_setup.kql — this notebook is the every-run path.
 Standing rule: 03/04 rerun => 07 rerun => THIS notebook.
 """
 
+import sys
+
+try:
+    import src
+except ImportError:
+    sys.path.insert(0, "/lakehouse/default/Files/sql-query-agent")
+    import src
+print(f"v{src.__version__}")
+
+# Version binding (ADR 0042): notebook/wheel skew dies here, loudly.
+REQUIRES_ENGINE = "1.18"
+from src.engine_floor import require_engine
+
+require_engine(src.__version__, REQUIRES_ENGINE, "11_refresh_search_index")
+
 # Per-environment endpoints come from org_config.yaml (search: block) —
 # never hardcoded here: tenant URIs in a notebook are config drift waiting
 # to happen, and the embed endpoint is deployment-specific.
