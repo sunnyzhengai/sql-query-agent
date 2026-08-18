@@ -104,7 +104,10 @@ for folder in SQL_FOLDERS:
             .withColumn("source_schema", lit(schema))
             .selectExpr(
                 "file_name as metric_id", "file_name as name", "value as sql",
-                "null as steward", "null as developer", "source_type", "source_schema",
+                # cast REQUIRED: bare "null as x" writes a VOID-typed column that Delta
+                # persists and full-table reads then crash on (live find 2026-08-18)
+                "cast(null as string) as steward", "cast(null as string) as developer",
+                "source_type", "source_schema",
             )
         )
         count = folder_df.count()
