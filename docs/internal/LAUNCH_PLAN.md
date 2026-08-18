@@ -6,21 +6,22 @@
 
 ---
 
-## Current Status (Updated 2026-07-25)
+## Current Status (Updated 2026-08-18 — review session refresh)
 
 | Milestone | Status |
 |---|---|
-| Core product (parser, graph, agent) | **Done — 99%+ parse rate (1337/1344), Option B (ScriptDom-only, no sqlglot)** |
-| Data Agent answering questions | **Working — tested with multiple metrics** |
-| Pipeline split into independent notebooks | **Done — 02_parse, 03_build_graph, 04_build_metric_logic, 05_validate** |
-| Website (aiviaapp.com) | **Live** |
-| LLC | **Registered (AIVIA LLC)** |
-| Founders Hub application | **Submitted 2026-07-20 (deprioritized — going direct to Marketplace)** |
-| ISV registration | **Done** |
-| Own Azure/Fabric tenant | **Azure ready, Fabric capacity pending** |
-| Partner Center publisher account | **Verifying status** |
-| Marketplace listing | Not started |
-| Certification | Not started |
+| Core product (parser, graph, agent) | **Done** — ScriptDom-only; contracts/gates everywhere; brand-neutral core |
+| PBI/semantic-model layer (v1 scope) | **Done** — TMDL federation (ADR 0040/0041), 12/13, workspace profile, shape census + M parser foundation |
+| Turn-key ingestion | **Done** — extractor (3 connection profiles, 1.8.0), 00-route family, live-verified 28/28 |
+| Field-proven at real estate | **Done** — 1,335-metric work deployment; 2,013-source census; fallout/funnel plumbing (1.17.0) |
+| Supportability harness | **Done** — table/notebook/integration/shape registries, ADR 0039-0042, journey dashboard spec BUILD-READY |
+| Website (aiviaapp.com) + privacy/terms pages | **Live** (verify pages are published, not just in repo) |
+| LLC / ISV registration | **Done** |
+| Own Azure/Fabric tenant | **Done** — demo tenant operational (demo DB, QA-gated DEMO_SCRIPT) |
+| Partner Center publisher account | **⚠ was "verifying" on 7/25 — CHECK TODAY; external latency, critical path** |
+| Marketplace listing (offer copy, logo, plans) | Not started — Sunny-only |
+| Certification artifacts (whitepaper, data-flow diagrams, reviewer's guide) | Not started — draftable now |
+| In-flight dev | renumbering (century scheme), journey dashboard build, census leftovers, comparison kernel (F), freshness (E) |
 
 **Key pivot (2026-07-25):** See `MARKETPLACE_PIVOT.md` for decisions and project plan.
 
