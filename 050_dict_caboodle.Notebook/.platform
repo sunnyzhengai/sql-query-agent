@@ -3,7 +3,7 @@
   "metadata": {
     "type": "Notebook",
     "displayName": "050_dict_caboodle",
-    "description": "Dictionary route E \u2014 merge a second dictionary source on top of the primary (run when that source changes)"
+    "description": "Dictionary route E — merge a second dictionary source on top of the primary (run when that source changes)"
   },
   "config": {
     "version": "2.0",

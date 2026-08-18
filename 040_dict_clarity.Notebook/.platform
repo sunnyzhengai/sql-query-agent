@@ -3,7 +3,7 @@
   "metadata": {
     "type": "Notebook",
     "displayName": "040_dict_clarity",
-    "description": "Dictionary route D \u2014 formatted CSVs from Files/dictionary OR raw TABLE_ID-keyed export (run when the dictionary changes)"
+    "description": "Dictionary route D — formatted CSVs from Files/dictionary OR raw TABLE_ID-keyed export (run when the dictionary changes)"
   },
   "config": {
     "version": "2.0",

@@ -3,7 +3,7 @@
   "metadata": {
     "type": "Notebook",
     "displayName": "030_ingest_sql_live",
-    "description": "Ingestion route C \u2014 live extraction from the configured SQL source (gateway / Azure / Fabric-native): discover, review delta, merge (run when the source changes)"
+    "description": "Ingestion route C — live extraction from the configured SQL source (gateway / Azure / Fabric-native): discover, review delta, merge (run when the source changes)"
   },
   "config": {
     "version": "2.0",

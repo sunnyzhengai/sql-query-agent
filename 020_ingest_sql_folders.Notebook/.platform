@@ -3,7 +3,7 @@
   "metadata": {
     "type": "Notebook",
     "displayName": "020_ingest_sql_folders",
-    "description": "Ingestion route B \u2014 .sql files spread across folders/workspaces (configured folder list, loud partial-load failure)"
+    "description": "Ingestion route B — .sql files spread across folders/workspaces (configured folder list, loud partial-load failure)"
   },
   "config": {
     "version": "2.0",
