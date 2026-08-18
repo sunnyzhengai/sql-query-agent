@@ -55,6 +55,7 @@ print(f"v{src.__version__}")
 # Version binding (ADR 0042): notebook/wheel skew dies here, loudly.
 REQUIRES_ENGINE = "1.18"
 from src.engine_floor import require_engine
+
 require_engine(src.__version__, REQUIRES_ENGINE, "00b_ingest_sql_folders")
 
 
@@ -143,10 +144,10 @@ if all_dfs:
     # (Header pattern ONLY — parse-based identity is the wanted upgrade;
     # see HANDOFF_INGESTION_ROUTES. The pattern has ONE spelling, in
     # src.parser.identity, per the notebook contract.)
-    from src.parser.identity import CREATE_HEADER_SPARK_PATTERN as ident
+    from src.parser.identity import CREATE_HEADER_SPARK_PATTERN
     combined_df = (combined_df
-        .withColumn("_schema", coalesce(nullif(regexp_extract("sql", ident, 1), lit("")), col("source_schema")))
-        .withColumn("_object", coalesce(nullif(regexp_extract("sql", ident, 2), lit("")), col("metric_id")))
+        .withColumn("_schema", coalesce(nullif(regexp_extract("sql", CREATE_HEADER_SPARK_PATTERN, 1), lit("")), col("source_schema")))
+        .withColumn("_object", coalesce(nullif(regexp_extract("sql", CREATE_HEADER_SPARK_PATTERN, 2), lit("")), col("metric_id")))
         .withColumn("metric_id", concat_ws(".", "_schema", "_object"))
         .withColumn("name", col("metric_id"))
         .withColumn("source_schema", col("_schema"))
