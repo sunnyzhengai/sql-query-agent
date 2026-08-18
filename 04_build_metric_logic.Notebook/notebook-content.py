@@ -82,14 +82,45 @@ precondition_gate("04_build_metric_logic", table_exists=spark.catalog.tableExist
                   count=lambda t: spark.table(t).count())
 
 
+from datetime import datetime, timezone
+
 from src.steps.metric_logic import metric_logic_step
 
 nodes_rows = [r.asDict() for r in spark.table(config.lakehouse.graph_nodes).collect()]
 edges_rows = [r.asDict() for r in spark.table(config.lakehouse.graph_edges).collect()]
 print(f"Loaded {len(nodes_rows)} nodes, {len(edges_rows)} edges")
 
-metric_logic_rows = metric_logic_step(nodes_rows, edges_rows)
+# Freshness inputs (Trust family): the PREVIOUS card table is the memory
+# for logic-change detection; the extraction tracker (route 00c) carries
+# source_extracted_at. Both are legitimately absent on a first run or a
+# file-drop route — a FAILED read is not, and must raise.
+previous_rows = []
+if spark.catalog.tableExists("output_metric_logic"):
+    previous_rows = [r.asDict() for r in spark.table("output_metric_logic").collect()]
+else:
+    print("No previous output_metric_logic — all logic_last_changed_at = now")
+
+extraction_records = []
+tracking_table = config.extractor.tracking_table if config.extractor else "ops_extraction_tracking"
+if spark.catalog.tableExists(tracking_table):
+    extraction_records = [r.asDict() for r in spark.table(tracking_table).collect()]
+else:
+    print("No extraction tracker (file-drop route) — source_extracted_at stays null")
+
+metric_logic_rows = metric_logic_step(
+    nodes_rows, edges_rows,
+    previous_rows=previous_rows,
+    extraction_records=extraction_records,
+    run_at=datetime.now(timezone.utc).isoformat(),
+)
 print(f"Built {len(metric_logic_rows)} metric logic rows")
+changed = sum(1 for r in metric_logic_rows
+              if r["logic_last_changed_at"] and previous_rows
+              and not any(p["metric_id"].lower() == r["metric_id"].lower()
+                          and p.get("logic_last_changed_at") == r["logic_last_changed_at"]
+                          for p in previous_rows))
+if previous_rows:
+    print(f"Logic changed since last run: {changed} metric(s)")
 
 
 # METADATA ********************

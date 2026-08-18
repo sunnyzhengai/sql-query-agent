@@ -277,3 +277,43 @@ else:
 # META   "language": "python",
 # META   "language_group": "synapse_pyspark"
 # META }
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+# %% Cell 6: Freshness / staleness (Trust family — WARNING, never a gate)
+from datetime import datetime, timezone
+
+from src.schemas import FALLOUT, to_spark_schema
+from src.steps.readiness import stale_metrics
+
+if spark.catalog.tableExists("output_metric_logic"):
+    _metric_rows = [r.asDict() for r in
+                    spark.table("output_metric_logic")
+                    .select("metric_id", "source_extracted_at").collect()]
+    _now = datetime.now(timezone.utc).isoformat()
+    _threshold = config.freshness.stale_after_days
+    stale, unknown = stale_metrics(_metric_rows, _now, _threshold)
+    print(f"\nFreshness: threshold {_threshold}d — {len(stale)} stale, "
+          f"{unknown} unknown age (file-drop route), "
+          f"{len(_metric_rows) - len(stale) - unknown} fresh")
+    for metric_id, ts, age in stale[:10]:
+        print(f"  [!] {metric_id}: source extracted {age}d ago ({ts})")
+    if stale:
+        _rows = [(_now, "06_freshness", m, "stale_source",
+                  f"source extraction {age}d old (threshold {_threshold}d) — "
+                  f"re-run the 00c extraction route",
+                  "contract:output_metric_logic")
+                 for m, ts, age in stale]
+        spark.createDataFrame(_rows, schema=to_spark_schema(FALLOUT)) \
+            .write.format("delta").mode("append").saveAsTable("ops_fallout")
+        print(f"  -> {len(_rows)} stale_source rows appended to ops_fallout "
+              "(health funnel; NOT a deployment gate)")
+else:
+    print("\nFreshness: output_metric_logic absent — run 04 first")

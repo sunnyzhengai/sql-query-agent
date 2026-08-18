@@ -149,7 +149,7 @@ NOTEBOOK_REGISTRY: "dict[str, dict]" = {
         "serves": ["G"],
         "purpose": "Pipeline validation + deployment readiness gate",
         "entry_points": ["dictionary_coverage_threshold", "tech_table_names",
-                         "readiness_gate"],
+                         "readiness_gate", "stale_metrics"],
         "wrappers": ["_fetch", "_table_exists"],
         "gates": ["precondition_gate"],
         "requires_engine": ENGINE_FLOOR,

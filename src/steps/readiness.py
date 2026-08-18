@@ -121,3 +121,40 @@ def readiness_gate(
         lines.append("[+] dictionary_schema_ambiguity: none")
 
     return GateResult(blocked=blocked, lines=lines)
+
+
+def stale_metrics(
+    metric_rows: "list[dict]", now_iso: str, stale_after_days: int
+) -> "tuple[list[tuple[str, str, int]], int]":
+    """Trust staleness (Question Map gap 2): metrics whose SOURCE
+    extraction is older than the threshold. WARNING-grade, never a gate.
+
+    Returns ([(metric_id, source_extracted_at, age_days)...], unknown)
+    where unknown counts metrics with no source_extracted_at at all
+    (file-drop routes) — stated separately, never counted as stale.
+    """
+    from datetime import datetime
+
+    def _parse(ts: str):
+        try:
+            return datetime.fromisoformat(ts.replace("Z", "+00:00"))
+        except (ValueError, AttributeError):
+            return None
+
+    now = _parse(now_iso)
+    stale: "list[tuple[str, str, int]]" = []
+    unknown = 0
+    for r in metric_rows:
+        ts = r.get("source_extracted_at")
+        if not ts:
+            unknown += 1
+            continue
+        then = _parse(ts)
+        if now is None or then is None:
+            unknown += 1
+            continue
+        age = (now - then).days
+        if age > stale_after_days:
+            stale.append((r["metric_id"], ts, age))
+    stale.sort(key=lambda t: -t[2])
+    return stale, unknown

@@ -564,6 +564,7 @@ METRIC_LOGIC = {
     "consumers": [
         "07b_generate_agent_descriptions",
         "07_generate_descriptions", "09_publish_purview",
+        "06_validate", "04_build_metric_logic",
         "data_agent",
     ],
     "columns": [
@@ -579,6 +580,8 @@ METRIC_LOGIC = {
         ("calculation_logic", "string", True),
         ("source_tables", "string", True),
         ("table_descriptions", "string", True),
+        ("logic_last_changed_at", "string", True),
+        ("source_extracted_at", "string", True),
     ],
     "column_descriptions": {
         "metric_id": "Metric identifier (input_sql_sources.metric_id)",
@@ -593,6 +596,10 @@ METRIC_LOGIC = {
         "calculation_logic": "Ordered plain-language rendering of the CTE chain",
         "source_tables": "Comma-separated physical tables the metric reads",
         "table_descriptions": "Dictionary descriptions of those source tables",
+        "logic_last_changed_at": "When the calculation logic last changed "
+                                 "(hash-change across runs; Trust family)",
+        "source_extracted_at": "When the SQL was last extracted from the "
+                               "source system (null on file-drop routes)",
     },
     "invariants": [
         {"kind": "unique", "columns": ["metric_id"]},
@@ -1278,7 +1285,7 @@ FALLOUT = {
     "owner": {"notebook": "12_ingest_semantic_models",
               "module": "src/steps/semantic_models.py"},
     "write_mode": "append",
-    "enrichers": [],
+    "enrichers": ["06_validate"],
     "consumers": ["admin telemetry report"],
     "columns": [
         ("run_at", "string", False),

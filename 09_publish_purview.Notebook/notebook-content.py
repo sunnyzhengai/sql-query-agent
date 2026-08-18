@@ -144,6 +144,15 @@ for m in with_desc:
         description += f"\n\nSource tables: {m['source_tables']}"
     if m.get("table_descriptions"):
         description += f"\n\nTable details: {m['table_descriptions']}"
+    # Freshness trailer (Trust family): the catalog card carries the
+    # same dates the agent cites — one truth, two surfaces.
+    freshness_bits = []
+    if m.get("logic_last_changed_at"):
+        freshness_bits.append(f"logic last changed {m['logic_last_changed_at'][:10]}")
+    if m.get("source_extracted_at"):
+        freshness_bits.append(f"source extracted {m['source_extracted_at'][:10]}")
+    if freshness_bits:
+        description += f"\n\nFreshness: {'; '.join(freshness_bits)}"
 
     records.append(MetadataRecord(
         asset_id=m["metric_id"],

@@ -10,6 +10,21 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.19.0] - 2026-08-18
+
+### Added — freshness reaches the answer (Question Map gap 2, Trust)
+- output_metric_logic carries logic_last_changed_at (logic-hash change
+  across runs) and source_extracted_at (extraction tracker; null on
+  file-drop routes — unknown is stated, never invented).
+- Agent instructions: trust-questions section — the agent cites both
+  dates and volunteers them when currency is questioned. (Re-paste
+  delta_agent_instructions.md into the Data Agent.)
+- 09 Purview descriptions carry a Freshness trailer.
+- freshness.stale_after_days (default 30): 06 warns and appends
+  stale_source rows to ops_fallout — health signal, never a gate.
+
+---
+
 ## [1.18.0] - 2026-08-18
 
 ### Added — the notebook contract (ADR 0042)

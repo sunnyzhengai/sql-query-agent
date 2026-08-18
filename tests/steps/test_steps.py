@@ -257,6 +257,9 @@ class TestPreconditionGate:
         assert required_inputs("06_validate") == [
             "graph_edges", "graph_nodes", "input_dict_tables",
             "input_sql_sources", "ops_parse_errors", "ops_parse_successes",
+            # freshness check (Trust family, 1.19.0): 06 reads the card
+            # table — consistent with its "run 02-04 first" contract
+            "output_metric_logic",
         ]
         assert required_inputs("07_generate_descriptions") == [
             "graph_edges", "graph_nodes", "ops_phi_findings",
@@ -404,3 +407,53 @@ def test_full_pipeline_runs_offline_through_step_functions():
     layers = {r["layer"] for r in graph.nodes_rows}
     assert {"canonical", "transformation", "technical"} <= layers
     assert sum(len(v) for v in exported.values()) > 0
+
+
+class TestFreshness:
+    """Trust columns (Question Map gap 2): freshness reaches the card."""
+
+    ROWS = staticmethod(lambda logic="A then B": [
+        {"metric_id": "rpt.USP_X", "calculation_logic": logic}])
+
+    def test_new_metric_stamped_with_run_at(self):
+        from src.steps.metric_logic import apply_freshness
+        rows = self.ROWS()
+        apply_freshness(rows, [], [], "2026-08-18T00:00:00Z")
+        assert rows[0]["logic_last_changed_at"] == "2026-08-18T00:00:00Z"
+        assert rows[0]["source_extracted_at"] is None
+
+    def test_unchanged_logic_carries_previous_timestamp(self):
+        from src.steps.metric_logic import apply_freshness
+        rows = self.ROWS()
+        prev = [{"metric_id": "RPT.USP_X", "calculation_logic": "A then B",
+                 "logic_last_changed_at": "2026-01-01T00:00:00Z"}]
+        apply_freshness(rows, prev, [], "2026-08-18T00:00:00Z")
+        assert rows[0]["logic_last_changed_at"] == "2026-01-01T00:00:00Z"
+
+    def test_changed_logic_restamps(self):
+        from src.steps.metric_logic import apply_freshness
+        rows = self.ROWS("A then C")
+        prev = [{"metric_id": "rpt.USP_X", "calculation_logic": "A then B",
+                 "logic_last_changed_at": "2026-01-01T00:00:00Z"}]
+        apply_freshness(rows, prev, [], "2026-08-18T00:00:00Z")
+        assert rows[0]["logic_last_changed_at"] == "2026-08-18T00:00:00Z"
+
+    def test_source_extracted_at_from_tracker(self):
+        from src.steps.metric_logic import apply_freshness
+        rows = self.ROWS()
+        tracker = [{"schema_name": "RPT", "object_name": "usp_x",
+                    "extracted_at": "2026-08-10T00:00:00Z"}]
+        apply_freshness(rows, [], tracker, "t")
+        assert rows[0]["source_extracted_at"] == "2026-08-10T00:00:00Z"
+
+    def test_stale_metrics_threshold_and_unknowns(self):
+        from src.steps.readiness import stale_metrics
+        rows = [
+            {"metric_id": "a", "source_extracted_at": "2026-07-01T00:00:00Z"},
+            {"metric_id": "b", "source_extracted_at": "2026-08-17T00:00:00Z"},
+            {"metric_id": "c", "source_extracted_at": None},
+        ]
+        stale, unknown = stale_metrics(rows, "2026-08-18T00:00:00Z", 30)
+        assert [s[0] for s in stale] == ["a"]
+        assert stale[0][2] == 48
+        assert unknown == 1

@@ -131,6 +131,13 @@ class FabricGraphConfig(BaseModel):
     enabled: bool = False  # opt-in during parallel testing
 
 
+class FreshnessConfig(BaseModel):
+    # Trust staleness threshold (Question Map gap 2): 06_validate WARNS
+    # when a metric's source extraction is older than this — health
+    # signal only, never a deployment gate.
+    stale_after_days: int = 30
+
+
 class OrgConfig(BaseModel):
     name: str
 
@@ -143,6 +150,7 @@ class Config(BaseModel):
     semantic_models: Optional[SemanticModelsConfig] = None
     adapters: Optional[AdaptersConfig] = None
     fabric_graph: Optional[FabricGraphConfig] = None
+    freshness: FreshnessConfig = FreshnessConfig()
 
 
 def load_config(path: Path | str | None = None) -> Config:

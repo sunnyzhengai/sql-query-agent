@@ -91,6 +91,7 @@ flowchart LR
   05_export_graph_tables --> LPG_export__14_typed_tables_
   06_validate --> ops_build_summary
   06_validate --> ops_pipeline_validation
+  06_validate -->|enrich| ops_fallout
   07_generate_descriptions --> ops_description_cache
   07_generate_descriptions -->|enrich| graph_nodes
   07_generate_descriptions -->|enrich| output_metric_logic
@@ -176,6 +177,8 @@ flowchart LR
   ops_pipeline_validation --> data_agent
   ops_setup_completeness --> admin
   ops_setup_completeness --> health
+  output_metric_logic --> 04_build_metric_logic
+  output_metric_logic --> 06_validate
   output_metric_logic --> 07_generate_descriptions
   output_metric_logic --> 07b_generate_agent_descriptions
   output_metric_logic --> 09_publish_purview

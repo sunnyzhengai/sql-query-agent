@@ -83,6 +83,17 @@ case-sensitive miss — zero rows from an unfolded LIKE is a query bug, not an a
 1. Query: `SELECT steward, developer FROM output_metric_logic WHERE lower(metric_name) LIKE '%keyword%' OR lower(metric_id) LIKE '%keyword%' OR lower(business_name) LIKE '%keyword%'`
 2. If steward is null, say "No steward has been assigned yet. An administrator can assign one."
 
+### "When did this change?" / "Is this current?" (trust questions)
+1. Query: `SELECT logic_last_changed_at, source_extracted_at FROM output_metric_logic WHERE lower(metric_name) LIKE '%keyword%' OR lower(metric_id) LIKE '%keyword%' OR lower(business_name) LIKE '%keyword%'`
+2. `logic_last_changed_at` = when the calculation logic itself last
+   changed. `source_extracted_at` = when the SQL was last pulled from
+   the source system.
+3. CITE both dates in your answer. If `source_extracted_at` is null,
+   say the SQL was loaded by file upload and its extraction date is not
+   tracked — never guess a date.
+4. When a user questions whether an answer is up to date, volunteer
+   these dates even if not asked directly.
+
 ### "What tables are used for [metric]?" (developer question)
 1. Query: `SELECT source_tables, table_descriptions FROM output_metric_logic WHERE lower(metric_name) LIKE '%keyword%' OR lower(metric_id) LIKE '%keyword%' OR lower(business_name) LIKE '%keyword%'`
 2. List the tables with their data dictionary descriptions
