@@ -42,3 +42,12 @@ ZERO sources). **To:** dev session. All examples anonymized — shapes only.
 3. After shipping: a 12 rerun at a live estate should move most of the
    277 into parsed lineage; the funnel view (when built) will show the
    recovery as a before/after.
+
+## Field patch in production (2026-08-18, disclosure)
+
+A work-side notebook cell implements a scoped version of these fixes
+(exec/FROM extraction over pattern-missed Sql.Database/Odbc.Query files,
+appending contract-shaped rows to input_report_sources) — deadline-driven
+(work meeting). Deliberate, marked in-notebook, and self-sunsetting: the
+next proper 12 run on a fixed wheel overwrites its rows. Treat its
+recovery count (reported by Sunny) as another acceptance number.
