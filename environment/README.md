@@ -24,7 +24,7 @@ In the Environment settings → **Public libraries**:
 ### 3. Upload Custom Library (required)
 
 In the Environment settings → **Custom libraries**:
-1. Upload `sql_query_agent-1.1.0-py3-none-any.whl` from `dist/`
+1. Upload `sql_query_agent-<version>-py3-none-any.whl` from `dist/`
 2. This installs the `src` package — all notebooks import from it
 
 ### 4. Publish

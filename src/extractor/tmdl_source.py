@@ -141,10 +141,35 @@ class FabricWorkspaceTmdlSource:
         return resp.json().get("definition", {}).get("parts", [])
 
     def collect(self) -> "list[TmdlFile]":
+        """Collect TMDL for every exportable model — record-and-continue.
+
+        Real workspaces are full of models that cannot export TMDL
+        (default lakehouse/warehouse models, legacy datasets): one 404
+        once killed an entire 5-workspace harvest (field failure
+        2026-08-18). Per-model failures land in self.skipped as
+        (model_name, cls, reason) — cls is "not-exportable" (404,
+        expected), "permission" (403, actionable), "timeout" (retry
+        later), or "error".
+        """
         files: "list[TmdlFile]" = []
+        self.skipped: "list[tuple[str, str, str]]" = []
         for model in self.list_semantic_models():
             report_name = model.get("displayName", "")
-            for part in self.get_definition_parts(model["id"]):
+            try:
+                parts = self.get_definition_parts(model["id"])
+            except Exception as e:  # noqa: BLE001 — classified + recorded, never fatal per model
+                status = getattr(getattr(e, "response", None), "status_code", None)
+                if status == 404:
+                    cls = "not-exportable"
+                elif status in (401, 403):
+                    cls = "permission"
+                elif "retry later" in str(e):
+                    cls = "timeout"
+                else:
+                    cls = "error"
+                self.skipped.append((report_name, cls, str(e)[:120]))
+                continue
+            for part in parts:
                 path = part.get("path", "")
                 if "definition/tables/" not in path or not path.endswith(".tmdl"):
                     continue
@@ -170,7 +195,8 @@ def collect_from_workspaces(
     """Collect TMDL across MULTIPLE workspaces in one pass (2026-08-18:
     reports live across 4-5 workspaces at real customers).
 
-    Returns (all files IN WORKSPACE ORDER, per-workspace file counts).
+    Returns (all files IN WORKSPACE ORDER, per-workspace report:
+    {ws: {"files": N, "skipped": [(model, cls, reason), ...]}}).
     Order is load-bearing: file order feeds the metric-naming priority
     rule (earlier workspace's report names a shared metric). One
     combined list -> ONE downstream write — sequential per-workspace
@@ -179,13 +205,17 @@ def collect_from_workspaces(
     if source_factory is None:
         source_factory = lambda ws: FabricWorkspaceTmdlSource(ws, token_provider)  # noqa: E731
     files: "list[TmdlFile]" = []
-    counts: "dict[str, int]" = {}
+    report: "dict[str, dict]" = {}
     for ws in workspace_ids:
         ws_id = ws or current_workspace_id
-        ws_files = source_factory(ws_id).collect()
-        counts[ws_id] = len(ws_files)
+        source = source_factory(ws_id)
+        ws_files = source.collect()
+        report[ws_id] = {
+            "files": len(ws_files),
+            "skipped": list(getattr(source, "skipped", [])),
+        }
         files.extend(ws_files)
-    return files, counts
+    return files, report
 
 
 def collect_from_devops(client, repo_name: str) -> "list[TmdlFile]":

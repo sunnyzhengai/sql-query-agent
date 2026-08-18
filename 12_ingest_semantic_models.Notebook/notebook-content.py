@@ -92,8 +92,14 @@ if sm.source_type == "workspace":
         current_workspace_id=notebookutils.runtime.context.get(  # noqa: F821
             "currentWorkspaceId"),
     )
-    for ws_id, n in ws_counts.items():
-        print(f"  workspace {ws_id}: {n} TMDL table files")
+    for ws_id, r in ws_counts.items():
+        print(f"  workspace {ws_id}: {r['files']} TMDL table files, "
+              f"{len(r['skipped'])} models skipped")
+        for model, cls, reason in r["skipped"]:
+            note = {"not-exportable": "expected (default/legacy model)",
+                    "permission": "ACTIONABLE — grant workspace access",
+                    "timeout": "retry later"}.get(cls, "inspect")
+            print(f"    [skip:{cls}] {model} — {note}")
 elif sm.source_type == "folder":
     if not sm.folder_path:
         raise ValueError("semantic_models.folder_path is required for the folder profile")

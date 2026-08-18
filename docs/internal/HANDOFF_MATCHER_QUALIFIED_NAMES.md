@@ -1,5 +1,8 @@
 # Handoff — matcher must key on bare names (schema-qualified ids broke it)
 
+> **Status (2026-08-18, dev session): implemented in 1.16.1.**
+> extract_match_key rsplits to the bare object name; the 1.00-score bug is diagnosed and fixed — bidirectional substring matching let 1-2 char junk tokens match anything; short tokens now require exact equality. Also-confirmed items landed: the evading refusal phrase joined REJECT_PHRASES and the CANARY gate now runs before every 07b batch (stale-data-source class caught pre-spend).
+
 **From:** review session, 2026-08-18 (live work failure). **To:** dev
 session — flagged while you are mid-flight on the 07b split; this is a
 separate small fix in collibra_lineage_match.

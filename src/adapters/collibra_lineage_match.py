@@ -75,7 +75,11 @@ def extract_match_key(object_name: str) -> str | None:
         Normalized match key (lowercase, underscores→spaces), or None if
         the name doesn't end with _PBI.
     """
-    name = object_name.strip()
+    # metric_ids are schema-qualified since the 00b identity fix
+    # (2026-08-17): key on the BARE object name (ADR 0020 bareName) —
+    # qualified input once produced junk keys and 128 unmatched reports
+    # plus garbage 1.00 fuzzy matches (field failure 2026-08-18).
+    name = object_name.strip().rsplit(".", 1)[-1]
 
     # Must end with _PBI (case-insensitive)
     if not re.search(r"_PBI$", name, re.IGNORECASE):
@@ -134,13 +138,18 @@ def fuzzy_match_score(key: str, report_name_normalized: str) -> float:
     if not key_tokens:
         return 0.0
 
-    # Check each key token against report tokens
+    # Check each key token against report tokens. Substring matching is
+    # restricted to tokens of length >= 3: one- and two-character junk
+    # tokens ("a", "of") are substrings of nearly everything and once
+    # produced 1.00 scores for unrelated names (field failure
+    # 2026-08-18). Short tokens must match exactly.
     matched_tokens = 0
     for kt in key_tokens:
-        # Allow partial match — key token is substring of any report token
-        # or report token is substring of key token
         for rt in report_tokens:
-            if kt in rt or rt in kt:
+            if kt == rt:
+                matched_tokens += 1
+                break
+            if len(kt) >= 3 and len(rt) >= 3 and (kt in rt or rt in kt):
                 matched_tokens += 1
                 break
 

@@ -112,6 +112,10 @@ class CollibraAdapterConfig(BaseModel):
     domain_id: str = ""
     community_id: str = ""
     asset_type_id: str = ""
+    # If descriptions land but display in the wrong field, run
+    # collibra_discovery on one asset and set this to the attribute type
+    # your layout shows (enterprise layouts customize the description box).
+    description_attr_type_id: str = "00000000-0000-0000-0000-000000003114"
 
 
 class AdaptersConfig(BaseModel):

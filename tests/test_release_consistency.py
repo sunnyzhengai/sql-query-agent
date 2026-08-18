@@ -59,3 +59,24 @@ def test_environment_wheel_is_byte_identical_to_dist():
         f"{name} differs between dist/ and the Environment item — "
         f"re-copy from dist/ so Fabric installs the wheel you built."
     )
+
+
+def test_requirements_match_environment_item_libraries():
+    """Two lists, one truth (2026-08-17 drift find): a customer building
+    from environment/requirements.txt must get the same packages as the
+    git-synced sql-logic-env item's environment.yml."""
+    import re as _re
+
+    yml = (REPO / "sql-logic-env.Environment" / "Libraries" /
+           "PublicLibraries" / "environment.yml").read_text()
+    yml_pins = set(_re.findall(r"-\s*([\w\-]+==[\w\.]+)", yml))
+    req_pins = {
+        line.strip() for line in
+        (REPO / "environment" / "requirements.txt").read_text().splitlines()
+        if line.strip() and not line.startswith("#")
+    }
+    assert yml_pins == req_pins, (
+        f"environment.yml vs requirements.txt drift:\n"
+        f"  only in yml: {sorted(yml_pins - req_pins)}\n"
+        f"  only in requirements: {sorted(req_pins - yml_pins)}"
+    )

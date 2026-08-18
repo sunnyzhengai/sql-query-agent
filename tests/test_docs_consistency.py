@@ -122,6 +122,7 @@ def test_shipped_ingest_connectors_are_covered_by_install_guide():
 
 def test_install_guide_does_not_hardcode_package_version():
     guide = INSTALL_GUIDE.read_text()
+    guide += (REPO_ROOT / "environment" / "README.md").read_text()  # same rule (2026-08-17 drift find)
     assert not re.search(r"sql_query_agent-\d+\.\d+\.\d+", guide), (
         "INSTALLATION_GUIDE.md hardcodes a wheel version; use "
         "sql_query_agent-<version>-py3-none-any.whl so releases don't stale it"

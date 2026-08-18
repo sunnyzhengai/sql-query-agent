@@ -93,4 +93,6 @@ dictionary:
 #     password: ""
 #     domain_id: ""                            # target Collibra domain
 #     community_id: ""
-#     asset_type_id: ""                        # Collibra type ID for business terms
+#     asset_type_id: ""
+#     description_attr_type_id: ""  # only if descriptions display in the
+#                                   # wrong field — see collibra_discovery                        # Collibra type ID for business terms

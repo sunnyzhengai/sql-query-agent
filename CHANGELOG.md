@@ -10,6 +10,31 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.16.1] - 2026-08-18
+
+### Fixed — the small-fixes sweep (five handoffs, all field-driven)
+- Workspace TMDL collector is per-model record-and-continue: one
+  non-exportable model no longer kills a whole harvest; skips
+  classified (not-exportable / permission / timeout) in 12's report.
+- Matcher keys on bare object names (schema-qualified ids produced
+  junk keys); the 1.00-junk-score bug fixed (short tokens must match
+  exactly, no more 1-char substring wins).
+- 07b hardening from live confirmation: "I don't have information
+  about" joins REJECT_PHRASES; a CANARY probe runs before every batch
+  (stale agent data sources caught before the spend).
+- Environment drift: requirements.txt == environment item's yml, now
+  test-pinned; environment/README de-versioned and covered by the
+  no-hardcoded-version test.
+- Collibra description attribute type configurable
+  (description_attr_type_id; enterprise layouts display custom fields).
+
+### Removed
+- Purview glossary surface (ensure_glossary/publish_glossary_term):
+  ghost rule — zero callers ever. Term mining stays. ADR 0031 amended
+  with resurrection requirements.
+
+---
+
 ## [1.16.0] - 2026-08-18
 
 ### Added

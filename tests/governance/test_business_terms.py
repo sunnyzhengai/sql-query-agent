@@ -7,7 +7,6 @@ from scripts.seed_sample_data import (
     SAMPLE_DICT_TABLES,
     SAMPLE_SQL_SOURCES,
 )
-from src.adapters.purview import PurviewAdapter, PurviewConfig
 from src.governance.business_terms import (
     candidates_to_records,
     mine_term_candidates,
@@ -89,85 +88,10 @@ class TestMining:
         assert terms[0]["status"] == "emergent" and terms[0]["source"] == "mined"
 
 
-class FakeResponse:
-    def __init__(self, status_code, body):
-        self.status_code = status_code
-        self._body = body
-        self.text = json.dumps(body)
-
-    def json(self):
-        return self._body
-
-
-class TestGlossaryPush:
-    def adapter(self):
-        return PurviewAdapter(
-            PurviewConfig(account_name="test"), access_token="fake-token"
-        )
-
-    def test_term_created_and_assigned_to_multiple_assets(self, monkeypatch):
-        calls = []
-
-        def fake_post(url, headers=None, json=None, timeout=None):
-            calls.append(("POST", url, json))
-            if url.endswith("/glossary/term"):
-                return FakeResponse(200, {"guid": "term-1"})
-            return FakeResponse(200, {})
-
-        def fake_get(url, headers=None, params=None, timeout=None):
-            qn = params["attr:qualifiedName"]
-            if qn == "missing-asset":
-                return FakeResponse(404, {})
-            return FakeResponse(200, {"entity": {"guid": f"guid-{qn}"}})
-
-        monkeypatch.setattr("requests.post", fake_post)
-        monkeypatch.setattr("requests.get", fake_get)
-
-        result = self.adapter().publish_glossary_term(
-            glossary_guid="gl-1",
-            name="Cancelled Appointment (scheduling)",
-            definition="Appointments marked cancelled before start.",
-            asset_qualified_names=["asset-a", "asset-b", "missing-asset"],
-            status="certified",
-            weight=214,
-        )
-        assert result.status.value == "success"
-        assert "2 assets assigned" in result.message
-        assert "1 not found" in result.message
-
-        term_call = next(c for c in calls if c[1].endswith("/glossary/term"))
-        assert term_call[2]["anchor"] == {"glossaryGuid": "gl-1"}
-        assert "status: certified" in term_call[2]["longDescription"]
-        assert "usage weight: 214" in term_call[2]["longDescription"]
-
-        assign_call = next(c for c in calls if "assignedEntities" in c[1])
-        assert assign_call[2] == [{"guid": "guid-asset-a"}, {"guid": "guid-asset-b"}]
-
-    def test_siblings_cross_linked_via_see_also(self, monkeypatch):
-        captured = {}
-
-        def fake_post(url, headers=None, json=None, timeout=None):
-            if url.endswith("/glossary/term"):
-                captured.update(json)
-                return FakeResponse(200, {"guid": "term-2"})
-            return FakeResponse(200, {})
-
-        monkeypatch.setattr("requests.post", fake_post)
-        result = self.adapter().publish_glossary_term(
-            glossary_guid="gl-1", name="X (variant)", definition="d",
-            asset_qualified_names=[], see_also_guids=["term-1"],
-        )
-        assert result.status.value == "success"
-        assert captured["seeAlso"] == [{"termGuid": "term-1"}]
-
-    def test_failed_term_create_reports(self, monkeypatch):
-        monkeypatch.setattr(
-            "requests.post",
-            lambda url, **kw: FakeResponse(403, {"error": "forbidden"}),
-        )
-        result = self.adapter().publish_glossary_term(
-            glossary_guid="gl-1", name="X", definition="d",
-            asset_qualified_names=[],
-        )
-        assert result.status.value == "failed"
-        assert "403" in result.message
+# TestGlossaryPush removed 2026-08-18: the Purview glossary surface
+# (ensure_glossary/publish_glossary_term) was deleted per the ghost rule
+# — zero callers since it was built (HANDOFF_PURVIEW_GLOSSARY_PATH).
+# Term MINING above stays: ADR 0031's plurality logic is live. When
+# term-grain publishing lands (gov_business_terms contracts flip
+# active), resurrect the surface from git history with the
+# branding-from-config rule from the handoff.

@@ -1,6 +1,6 @@
 # 0031 — Business terms: a weighted plurality, citizen-endorsed, steward-arbitrated
 
-**Status:** Accepted
+**Status:** Accepted — amended 2026-08-18
 **Date:** 2026-08-08
 
 ## Context
@@ -87,3 +87,16 @@ only when a definition is demonstrably wrong.
   author 2–3 terms, push to a short-lived Purview as glossary terms with
   multi-asset assignment — the architecture diagram's Purview edge shown
   live at term grain, not just asset descriptions.
+
+
+## Amendment (2026-08-18)
+
+The Purview glossary-publishing surface (`ensure_glossary`,
+`publish_glossary_term`) was DELETED per the ghost rule — built ahead of
+its data, zero callers ever (HANDOFF_PURVIEW_GLOSSARY_PATH). Term MINING
+remains live and tested. When the gov_business_terms contracts flip
+active and term-grain publishing is scheduled, rebuild the surface with
+two recorded requirements: the glossary NAME comes from org_config (a
+branding block), never an env var (Fabric notebooks don't see App
+Service settings); and wiring must target the existing tenant glossary,
+not silently create a second one (split-brain catalog risk).

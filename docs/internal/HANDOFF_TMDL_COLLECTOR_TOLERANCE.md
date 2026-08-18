@@ -1,5 +1,8 @@
 # Handoff — workspace TMDL collector needs per-model failure tolerance
 
+> **Status (2026-08-18, dev session): implemented in 1.16.1.**
+> collect() is record-and-continue per model; skips classified (404=not-exportable/expected, 403=permission/actionable, timeout, error) and surfaced in 12's per-workspace skip report. 1.16.0 did NOT have this (verified — collect raised through); the field patch shape is now product.
+
 **From:** review session, 2026-08-18 (work deployment, live failure).
 **To:** dev session. Addendum to the multi-workspace work (1.16.0) —
 verify whether collect_from_workspaces already has this; 1.13's collect()

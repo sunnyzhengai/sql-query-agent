@@ -158,6 +158,18 @@ def generate(name):
     return ("error", resp.error or "no answer")
 
 if plan.needs_generation:
+    # Canary gate: one probe against an already-OK metric (or the first
+    # planned one) before spending hundreds of calls (field find
+    # 2026-08-18: stale agent data sources -> every call a refusal).
+    from src.steps.agent_descriptions import canary_check
+
+    known = next((m for m, r in rows.items() if r["status"] == STATUS_OK),
+                 plan.needs_generation[0])
+    ok, detail = canary_check(generate, known)
+    print(f"Canary [{known}]: {detail}")
+    if not ok:
+        raise SystemExit("Canary gate failed — aborting before the batch.")
+
     result = run_generation(
         plan.needs_generation, generate, rows, current_hashes, save)
     print()

@@ -102,3 +102,29 @@ class TestRunner:
 def test_sql_hash_stable():
     assert sql_hash("SELECT 1") == sql_hash("SELECT 1")
     assert sql_hash("SELECT 1") != sql_hash("SELECT 2")
+
+
+class TestCanary:
+    """Field find 2026-08-18: stale agent data sources made every call a
+    refusal — one probe before an N-hundred-call run catches it."""
+
+    def test_refusal_fails_canary(self):
+        from src.steps.agent_descriptions import canary_check
+        ok, detail = canary_check(
+            lambda n: ("success", "I don't have information about that."), "M")
+        assert not ok and "data sources" in detail
+
+    def test_error_fails_canary(self):
+        from src.steps.agent_descriptions import canary_check
+        ok, _ = canary_check(lambda n: ("error", "HTTP 500"), "M")
+        assert not ok
+
+    def test_real_answer_passes(self):
+        from src.steps.agent_descriptions import canary_check
+        ok, _ = canary_check(lambda n: ("success", "Tracks compliance."), "M")
+        assert ok
+
+
+def test_new_refusal_phrase_detected():
+    from src.steps.agent_descriptions import is_rejection
+    assert is_rejection("I don't have information about USP_X in the knowledge base.")

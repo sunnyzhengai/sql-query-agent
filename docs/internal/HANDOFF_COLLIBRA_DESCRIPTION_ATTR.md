@@ -1,5 +1,8 @@
 # Handoff — Collibra description attribute type must be configurable
 
+> **Status (2026-08-18, dev session): implemented in 1.16.1.**
+> description_attr_type_id on CollibraConfig + org config (default = OOTB Description, current behavior preserved), wired through 08; example yaml + config comment carry the discovery guidance. Discovery candidate-marker: deferred as nice-to-have.
+
 **From:** review session, 2026-08-17 (Sunny's work deployment). **To:** dev
 session.
 

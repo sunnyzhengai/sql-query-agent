@@ -39,7 +39,10 @@ class CollibraConfig:
     domain_id: str = ""        # target domain for new assets
     community_id: str = ""     # target community
     asset_type_id: str = ""    # Collibra asset type ID for business terms
-
+    # Enterprise layouts often display a DIFFERENT attribute as the
+    # description box (field find 2026-08-17: written, wrong field
+    # shown). Default = Collibra OOTB Description.
+    description_attr_type_id: str = "00000000-0000-0000-0000-000000003114"
 
 class CollibraAdapter:
     """Publishes metadata to Collibra Data Governance Center.
@@ -162,9 +165,6 @@ class CollibraAdapter:
         for record in records:
             result.add(self.publish(record))
         return result
-
-    # Collibra's well-known attribute type ID for Description
-    DESCRIPTION_ATTR_TYPE_ID = "00000000-0000-0000-0000-000000003114"
 
     def update_description(
         self,
@@ -297,7 +297,7 @@ class CollibraAdapter:
             f"{self.config.base_url}/attributes",
             params={
                 "assetId": collibra_asset_id,
-                "typeId": self.DESCRIPTION_ATTR_TYPE_ID,
+                "typeId": self.config.description_attr_type_id,
                 "limit": 1,
             },
             timeout=10,
@@ -316,7 +316,7 @@ class CollibraAdapter:
                 f"{self.config.base_url}/attributes",
                 json={
                     "assetId": collibra_asset_id,
-                    "typeId": self.DESCRIPTION_ATTR_TYPE_ID,
+                    "typeId": self.config.description_attr_type_id,
                     "value": description,
                 },
                 timeout=30,

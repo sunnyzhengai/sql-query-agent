@@ -1,5 +1,8 @@
 # Handoff — Purview glossary path: wire or delete
 
+> **Status (2026-08-18, dev session): implemented in 1.16.1.**
+> VERDICT: DELETED per the ghost rule — built ahead of its data, zero callers ever; term MINING (ADR 0031) stays live and tested. ADR 0031 amended with the resurrection requirements (branding from org_config, never env var; target the existing glossary). Glossary tests removed with the surface.
+
 **From:** review session, 2026-08-17 (found while implementing the brand
 seam). **To:** dev session.
 

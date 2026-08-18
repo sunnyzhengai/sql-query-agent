@@ -1,5 +1,8 @@
 # Handoff — environment definition drift: two lists, one truth
 
+> **Status (2026-08-18, dev session): implemented in 1.16.1.**
+> requirements.txt now carries azure-identity==1.25.3; a release-consistency test pins requirements.txt == the environment item's environment.yml; environment/README.md uses <version> and the no-hardcoded-version docs test now covers it.
+
 **From:** review session, 2026-08-17 (found walking Sunny's work setup).
 **To:** dev session.
 

@@ -137,19 +137,19 @@ class TestMultiWorkspace:
             "ws-1": [TmdlFile("Dash A", "T", "x")],
             "ws-2": [TmdlFile("Dash B", "T", "y"), TmdlFile("Dash C", "T", "z")],
         }
-        files, counts = collect_from_workspaces(
+        files, report = collect_from_workspaces(
             ["ws-1", "ws-2"], token_provider=lambda: "t",
             source_factory=self._source_factory(per_ws))
         assert [f.report_name for f in files] == ["Dash A", "Dash B", "Dash C"]
-        assert counts == {"ws-1": 1, "ws-2": 2}
+        assert report["ws-1"]["files"] == 1 and report["ws-2"]["files"] == 2
 
     def test_empty_id_resolves_to_current_workspace(self):
         from src.extractor.tmdl_source import TmdlFile, collect_from_workspaces
         per_ws = {"current-ws": [TmdlFile("Dash", "T", "x")]}
-        files, counts = collect_from_workspaces(
+        files, report = collect_from_workspaces(
             [""], token_provider=lambda: "t", current_workspace_id="current-ws",
             source_factory=self._source_factory(per_ws))
-        assert counts == {"current-ws": 1}
+        assert report["current-ws"]["files"] == 1
 
 
 def test_workspace_ids_config_resolution():
@@ -159,3 +159,36 @@ def test_workspace_ids_config_resolution():
     assert SemanticModelsConfig(
         workspace_ids=["a", "b"], workspace_id="ignored"
     ).resolved_workspace_ids() == ["a", "b"]
+
+
+def test_collect_tolerates_per_model_failures():
+    """Field failure 2026-08-18: one 404 killed a 5-workspace harvest.
+    Skips are classified and recorded, never fatal."""
+    class _Err(Exception):
+        def __init__(self, status):
+            self.response = SimpleNamespace(status_code=status)
+
+    class _FlakySource:
+        workspace_id = "ws"
+        skipped = []
+
+        def list_semantic_models(self):
+            return [{"id": "m1", "displayName": "Good"},
+                    {"id": "m2", "displayName": "DefaultModel"},
+                    {"id": "m3", "displayName": "NoAccess"}]
+
+        def get_definition_parts(self, mid):
+            if mid == "m2":
+                raise _Err(404)
+            if mid == "m3":
+                raise _Err(403)
+            return [_part("definition/tables/T.tmdl", TMDL)]
+
+    src = FabricWorkspaceTmdlSource("ws", lambda: "t",
+                                    http=SimpleNamespace(), sleep=lambda s: None)
+    src.list_semantic_models = _FlakySource().list_semantic_models
+    src.get_definition_parts = _FlakySource().get_definition_parts
+    files = src.collect()
+    assert len(files) == 1
+    classes = {name: cls for name, cls, _ in src.skipped}
+    assert classes == {"DefaultModel": "not-exportable", "NoAccess": "permission"}

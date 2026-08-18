@@ -130,6 +130,7 @@ adapter = CollibraAdapter(CollibraConfig(
     domain_id=collibra_cfg.domain_id,
     community_id=collibra_cfg.community_id,
     asset_type_id=collibra_cfg.asset_type_id,
+    description_attr_type_id=collibra_cfg.description_attr_type_id,
 ))
 
 base = collibra_cfg.base_url.replace("/rest/2.0", "")

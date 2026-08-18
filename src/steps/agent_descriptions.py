@@ -31,6 +31,8 @@ REJECT_PHRASES = (
     "not found",
     "hasn't been",
     "i'm happy to help",
+    "i don't have information about",   # evaded the list live 2026-08-18
+    "i do not have information about",
 )
 
 SAVE_EVERY = 25  # persist to Delta every N successful generations
@@ -169,3 +171,21 @@ def run_generation(
     if unsaved > 0 or result.saves == 0 and rows:
         persist()
     return result
+
+
+def canary_check(
+    generate: "Callable[[str], tuple[str, str]]", known_metric: str
+) -> "tuple[bool, str]":
+    """One known-good probe BEFORE an N-hundred-call run (field find
+    2026-08-18: agent data sources were stale while instructions were
+    fresh — every call came back a polite refusal; a canary catches
+    that class before the spend). Returns (ok, detail)."""
+    status, text = generate(known_metric)
+    if status != "success" or not text:
+        return False, f"canary call failed: {text or 'no answer'}"
+    if is_rejection(text):
+        return False, (
+            f"canary REFUSED for known metric {known_metric!r}: {text[:120]!r} "
+            "— the agent's data sources are likely stale/unattached; fix the "
+            "Data Agent before burning a full generation run")
+    return True, "canary passed"
