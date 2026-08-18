@@ -36,6 +36,27 @@ ERROR_SEEDS = [
         "first_seen": "2026-08-18",
     },
     {
+        "error_signature": "Invalid column name",
+        "error_category": "missing_source_column",
+        "root_cause": (
+            "SQL references a column that exists in the code but not in "
+            "the table — when tables are stubbed or migrated from a data "
+            "dictionary, the dictionary lags the code (428 such columns "
+            "across 27 tables at first demo-seed execution)."
+        ),
+        "fix": (
+            "Run seed_demo_columns_patch.sql (idempotent ALTER TABLE ADD "
+            "per column), then its verification query — expect an empty "
+            "result before retrying."
+        ),
+        "prevention": (
+            "Derive stub columns from the CODE's references (alias-scoped "
+            "scan), not from the dictionary alone; keep the verification "
+            "tail in every seed."
+        ),
+        "first_seen": "2026-08-18",
+    },
+    {
         "error_signature": "Cannot find either column \"dbo\" or the user-defined function",
         "error_category": "missing_function",
         "root_cause": (
