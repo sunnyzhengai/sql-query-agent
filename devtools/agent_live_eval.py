@@ -7,7 +7,10 @@ answer, code-stamped basis, tool trace, latency) to markdown + JSONL
 for human review. This measures the CONVERSATION (ADR 0035: you test
 code, you measure models).
 
-Run:  python3 devtools/agent_live_eval.py
+Run:  python3 devtools/agent_live_eval.py                 # full suite
+      python3 devtools/agent_live_eval.py --demo-gate     # the 4-question
+          pre-capture QA gate (DEMO_SCRIPT.md tenant-prep step 7),
+          verbatim demo phrasings, results to AGENT_DEMO_GATE.md
 """
 
 from __future__ import annotations
@@ -76,23 +79,50 @@ CONVERSATIONS = [
      ["hello, what can you do?"]),
 ]
 
+# The pre-capture QA gate (DEMO_SCRIPT.md step 7) — the EXACT phrasings
+# the demo uses. Rule (b): the drift question must NOT contain the
+# literal step name; (c) rides the same conversation so the verdict is
+# in context; run in a fresh conversation, answers must be real.
+DEMO_GATE_CONVERSATIONS = [
+    ("gate_a_headline",
+     "business-name answer + dashboard link + Basis line; SQL on ask",
+     ["How is our ED sepsis screening rate calculated?",
+      "show me the SQL"]),
+    ("gate_bc_drift_and_blast_radius",
+     "computed verdict (6 claims, 5 truths) via content hash, THEN the "
+     "exact impacted-report list from parsed lineage — never guessed",
+     ["Are all definitions of our base population score consistent?",
+      "which dashboards are impacted?"]),
+    ("gate_d_refusal",
+     "definitions only — clean refusal, no partial answer",
+     ["How many patients were screened for sepsis last month?"]),
+]
+
 
 def main() -> None:
     _load_dotenv()
+    demo_gate = "--demo-gate" in sys.argv
+    conversations = DEMO_GATE_CONVERSATIONS if demo_gate else CONVERSATIONS
     client = KustoClient(QUERY_URI, DATABASE,
                          az_cli_token_provider(QUERY_URI))
     chat_api = azure_chat_api()
 
-    out_md = Path("docs/internal/AGENT_LIVE_RESULTS.md")
-    out_jsonl = Path("docs/internal/agent_live_results.jsonl")
-    md = ["# ADR 0035 Agent — Live Evaluation",
+    if demo_gate:
+        out_md = Path("docs/internal/AGENT_DEMO_GATE.md")
+        out_jsonl = Path("docs/internal/agent_demo_gate.jsonl")
+        title = "# Demo QA Gate — the four pre-capture questions"
+    else:
+        out_md = Path("docs/internal/AGENT_LIVE_RESULTS.md")
+        out_jsonl = Path("docs/internal/agent_live_results.jsonl")
+        title = "# ADR 0035 Agent — Live Evaluation"
+    md = [title,
           "",
           f"Model: env SQA_LLM_MODEL | Eventhouse: {DATABASE} | "
           "multi-turn, real function calling.",
           ""]
     records = []
 
-    for conv_id, expectation, turns in CONVERSATIONS:
+    for conv_id, expectation, turns in conversations:
         print(f"=== {conv_id}")
         history: "list[dict]" = []
         session = Session()
