@@ -1,6 +1,6 @@
 # ADR 0033: System of Record + Projections — Delta Is the Record; Graph Engines Are Read Models
 
-**Status:** Accepted
+**Status:** Accepted — amended 2026-08-19 (arrows/followers; read model pulled forward to ship with ADR 0046)
 **Date:** 2026-08-10
 
 ## Context
@@ -116,3 +116,41 @@ work lives in the **Tier-2 certified semantic layer compiler**:
 - User/role/security growth lands in event tables and small dimensions, not
   in the traversed graph — the ADR 0018 build-time memory budget is
   unaffected by headcount.
+
+## Amendment (2026-08-19) — arrows and followers; the read model pulled forward
+
+Re-debated at Sunny's request when the tree contract (ADR 0044) made
+"the LLM walks the tree" central. Settled with a sharper vocabulary:
+
+- **An edge-table row IS an arrow written down** — (source, target,
+  type) fully specifies the relationship; Delta is the graph's arrows
+  at rest, not an alternative to the graph. **A follower** is whatever
+  crosses arrows: a graph engine (pointer-chasing over index-free
+  adjacency; per-hop cost flat, unbounded depth native), a SQL engine
+  (one join per hop; no recursive traversal in Spark SQL — hence the
+  ADR 0018 precomputed closures), or our own code (in-memory walk
+  after a bulk read — how every walk runs today).
+- **Fabric Graph mechanics, precisely**: it is an engine over tables,
+  not a store. The graph model is declared by binding node/edge
+  tables; on load/refresh the engine builds its own
+  traversal-optimized runtime copy and executes GQL natively against
+  it (NOT per-query GQL→SQL translation). The copy is real memory but
+  derived and disposable — refreshed from tables, never writable,
+  never authoritative. Freshness = last refresh, which is why the
+  projection direction is also the freshness mechanism.
+- **Function verdicts** (the debate's spine): single-metric tree walks
+  for the description LLM are bulk-read + in-memory — the storage
+  engine is invisible to the LLM either way, so "LLM1 must walk the
+  tree" imposes zero storage constraint. Decision-grain filters
+  ("which metrics filter on age") tie. Variable-depth blast radius is
+  the graph engine's native food, neutralized in Delta by build-time
+  closures because our graph is batch-written with predictable
+  question shapes. Writes/history/invariants/DirectLake dashboards
+  are Delta-only — the deal breaker for graph-as-record, reinforced
+  by the platform: Fabric's graph engine loads FROM lakehouse tables;
+  there is no Fabric where it is primary.
+- **Decision pulled forward**: the Fabric Graph read model ships WITH
+  the anchor-discover-match-rank engine (ADR 0046) rather than after
+  it — the decision→column edges from ADR 0044 phase 1b are exactly
+  what make its traversals worth having. Still a projection, rebuilt
+  from the record each run; the record does not move.

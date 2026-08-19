@@ -43,7 +43,7 @@ never deleted — its status changes and it links to its replacement.
 | [0030](0030-layered-retrieval-search-terms-first.md) | Layered retrieval: search-terms first, vectors where the engine allows | Accepted (amended) |
 | [0031](0031-business-terms-weighted-plurality.md) | Business terms: a weighted plurality, citizen-endorsed, steward-arbitrated | Accepted |
 | [0032](0032-deterministic-core-llm-edges.md) | Deterministic Core, LLM Edges — the LLM translates, the data answers, the human decides | Accepted (description edge narrowed 2026-08-19 by 0044) |
-| [0033](0033-system-of-record-plus-projections.md) | System of record + projections: Delta is the record; graph engines are read models | Accepted |
+| [0033](0033-system-of-record-plus-projections.md) | System of record + projections: Delta is the record; graph engines are read models | Accepted (amended 2026-08-19: read model ships with 0046) |
 | [0034](0034-conversational-entry-edge.md) | The conversational entry edge: language to the LLM, computation to code | Superseded in part by 0035 (dialogue machinery); engine content survives |
 | [0035](0035-agentic-conversation-deterministic-tools.md) | Agentic conversation over deterministic tools — computed answers, disclosed judgments, generated language | Superseded in part by 0036 (conversation protocol); tool layer survives as primitives |
 | [0036](0036-operations-are-the-product.md) | Operations are the product: interpret → confirm → execute → display over a primitive algebra | Accepted |
@@ -56,3 +56,4 @@ never deleted — its status changes and it links to its replacement.
 | [0043](0043-diff-kernel-comparison-shape.md) | The diff kernel: step-aligned decomposition comparison; twins cache; op_compare | Accepted |
 | [0044](0044-tree-contract-round-trip-descriptions.md) | The tree contract: faithful decision trees, blind round-trip verified descriptions — locked in red before implementation | Accepted (phased) |
 | [0045](0045-escalation-contract-human-checklist.md) | The escalation contract: no silent residue — unresolved outcomes become the human checklist | Accepted (phased) |
+| [0046](0046-anchor-discover-match-rank-the-human-picks.md) | Query composition: anchor, discover, match, rank — the human picks their reality; one engine for metadata and Pro | Accepted |
