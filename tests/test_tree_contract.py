@@ -27,6 +27,8 @@ from pathlib import Path
 
 import pytest
 
+from src.descriptions import grounding_violations
+
 REPO_ROOT = Path(__file__).parent.parent
 ADR = REPO_ROOT / "docs" / "decisions" / \
     "0044-tree-contract-round-trip-descriptions.md"
@@ -196,7 +198,6 @@ class TestClause5EveryDecisionVoicedOrCounted:
 class TestClause6FailurePolarityFloor:
     @clause(6, phase=3)
     def test_never_converging_loop_degrades_to_grounded_template(self):
-        from src.descriptions import grounding_violations
         from src.tree.extract import build_decision_tree
         from src.tree.pipeline import verified_describe
         tree = build_decision_tree(GNARLY_FRAGMENT)
