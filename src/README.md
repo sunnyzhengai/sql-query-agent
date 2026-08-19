@@ -34,9 +34,7 @@ SQL files → parser/ → graph/ → adapters/
 | File | Purpose | Tested by |
 |---|---|---|
 | `sql_parser.py` | Parse single/multi-statement SQL, extract CTEs + table refs | tests/parser/test_sql_parser.py |
-| `sql_extractor.py` | sqlparse-based query extraction (fallback when ScriptDom unavailable) | tests/parser/test_sql_extractor.py |
 | `scriptdom_fabric.py` | ScriptDom AST extraction via pythonnet (primary, Fabric only) | Tested in Fabric notebooks |
-| `scriptdom_extractor.py` | ScriptDom HTTP microservice client (legacy, not used in current pipeline) | — |
 | `error_classifier.py` | Classify parse errors into user-facing categories | tests/parser/test_error_classifier.py |
 
 ### graph/ — Knowledge Graph (Step 2)

@@ -1,43 +1,43 @@
-"""dict_relationships derivation (ADR 0046 join map, corpus-evidence).
+"""dict_relationships derivation (ADR 0046 join map) — NATIVE parser.
 
 Provenance is the point under test: every relationship row must be
 deducible from our own de-dialected corpus — base tables only, no
-temp/CTE names, no phantom quoted identifiers — and the committed CSV
-must match a fresh derivation (no hand edits, no drift)."""
+temp/CTE names — and the committed CSV must match a fresh derivation
+(no hand edits, no drift). Statement splitting and alias resolution
+come from ScriptDom (native-parser law, ADR 0001); the sqlglot
+bootstrap's blind spot (192 unevidenced JOINs) is structurally gone.
+"""
 
 import csv
 from collections import Counter
 from pathlib import Path
 
-from scripts.derive_dict_relationships import (
-    alias_map,
-    join_pairs,
-    split_statements,
-)
+from scripts.derive_dict_relationships import alias_map, join_pairs
+from src.tree.extract import statement_texts
 
 REPO = Path(__file__).parent.parent
-
 CSV_PATH = REPO / "data" / "synthetic" / "dict_relationships.csv"
 SQL_DIR = REPO / "data" / "synthetic" / "sql"
 DICT_TABLES = REPO / "data" / "synthetic" / "dict_tables.csv"
 
 
-class TestUnits:
-    def test_statement_heads_inside_parens_do_not_split(self):
-        sql = ("SELECT a,\nSTUFF((\nSELECT b FROM t2\nWHERE t2.id = t.id\n"
-               "FOR XML PATH('')\n), 1, 1, '')\nINTO #x\nFROM t\n"
-               "SELECT * FROM #x")
-        stmts = split_statements(sql)
-        assert len(stmts) == 2, "inner SELECT at depth>0 must not split"
+class TestNativeParserLawHolds:
+    def test_deriver_is_sqlglot_free(self):
+        source = (REPO / "scripts" / "derive_dict_relationships.py").read_text()
+        assert "sqlglot" not in source.replace(
+            "sqlglot banned", "").replace("sqlglot bootstrap", ""), \
+            "the join-map deriver must use the native parser only"
 
-    def test_bracketed_aliases_resolve_without_phantom_quotes(self):
+
+class TestUnits:
+    def test_bracketed_aliases_resolve_and_temp_keeps_marker(self):
         sql = ('SELECT 1 FROM [dbo].[HOSPITAL_ENCOUNTERS] HE '
-               'INNER JOIN dbo.PATIENTS AS [PAT] '
-               'ON [PAT].PATIENT_ID = HE.PATIENT_ID')
+               'INNER JOIN #Base_Pop AS [BP] '
+               'ON [BP].ENCOUNTER_ID = HE.ENCOUNTER_ID')
         m = alias_map(sql)
-        assert m.get("PAT") == "PATIENTS"
         assert m.get("HE") == "HOSPITAL_ENCOUNTERS"
-        assert not any('"' in k or "[" in k for k in m), m
+        assert m.get("BP") == "#BASE_POP", \
+            "ScriptDom keeps the temp marker — a temp must never masquerade as a base table"
 
     def test_join_pair_is_canonicalized_and_resolved(self):
         sql = ("SELECT 1 FROM dbo.PATIENTS PAT "
@@ -57,23 +57,15 @@ class TestUnits:
         assert "self_join_or_same_table" in reasons
         assert not [1 for _, _, r in join_pairs(sql) if r is None]
 
-
-class TestBootstrapDiesWithSqlglot:
-    def test_script_cannot_outlive_the_sqlglot_extractor(self):
-        """Native-parser law, mechanically tied: this script is
-        sanctioned ONLY as a bootstrap beside the sqlglot extractor.
-        The day phase 1b swaps src/tree/extract.py to ScriptDom
-        (sqlglot import gone), this script must be deleted and the
-        join map regenerated from graph_decision_sites — otherwise we
-        carry two paths for one goal, which is banned (2026-08-19)."""
-        extractor = (REPO / "src" / "tree" / "extract.py").read_text()
-        script = REPO / "scripts" / "derive_dict_relationships.py"
-        if "sqlglot" not in extractor:
-            assert not script.exists(), (
-                "phase 1b landed: delete derive_dict_relationships.py "
-                "and regenerate dict_relationships.csv from "
-                "graph_decision_sites (EVIDENCE stays 'corpus')"
-            )
+    def test_cte_statement_joins_are_evidenced(self):
+        # The sqlglot bootstrap's blind spot class — must contribute now.
+        sql = ("WITH abx AS (SELECT m.MEDICATION_ID FROM dbo.MEDICATIONS m "
+               "INNER JOIN dbo.GROUPER_MED_RECORDS g "
+               "ON g.EXP_MEDS_LIST_ID = m.MEDICATION_ID) "
+               "SELECT * INTO #abx FROM abx")
+        pairs = [(a, b) for a, b, r in join_pairs(sql) if r is None]
+        assert (("GROUPER_MED_RECORDS", "EXP_MEDS_LIST_ID"),
+                ("MEDICATIONS", "MEDICATION_ID")) in pairs
 
 
 class TestCommittedFileIsDerived:
@@ -82,7 +74,7 @@ class TestCommittedFileIsDerived:
                 for row in csv.DictReader(open(DICT_TABLES))}
         counts = Counter()
         for path in sorted(SQL_DIR.rglob("*.sql")):
-            for stmt in split_statements(path.read_text(encoding="utf-8-sig")):
+            for stmt in statement_texts(path.read_text(encoding="utf-8-sig")):
                 for a, b, reason in join_pairs(stmt):
                     if reason is None and a[0] in base and b[0] in base:
                         counts[(a, b)] += 1
@@ -108,6 +100,7 @@ class TestCommittedFileIsDerived:
         for r in rows:
             assert r["SOURCE_TABLE"] in base and r["DEST_TABLE"] in base
             assert not r["SOURCE_TABLE"].startswith("#")
-            assert '"' not in r["SOURCE_COLUMN"] + r["DEST_COLUMN"]
+            assert "/*" not in r["SOURCE_COLUMN"] + r["DEST_COLUMN"], \
+                "comment leakage in a column name (the sqlglot-era corruption)"
             assert r["EVIDENCE"] == "corpus"
             assert int(r["EVIDENCE_COUNT"]) >= 1

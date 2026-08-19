@@ -1,8 +1,12 @@
 # Handoff — tree phase 1b: the ScriptDom port and everything that rides with it
 
-**From:** dev session, 2026-08-19 (the day's debates, all settled with
-Sunny). **Status: SCOPED, awaiting "go".** This gathers every 1b
-commitment made in conversation so none of them lives only there.
+**From:** dev session, 2026-08-19. **Status: PARTIALLY EXECUTED same
+day** — items 1, 2, and 6 shipped in 1.28.0 (ScriptDom port done ahead
+of schedule: Sunny's total sqlglot ban made local ScriptDom viable via
+pythonnet + ~/.dotnet, so the port happened immediately; sqlglot and
+sqlparse are deleted repo-wide and CI-banned; the join map is
+native-derived with BLIND SPOT 0). Remaining: items 3, 4, 5, 7 below,
+plus one NEW item 8.
 
 ## Scope (in order)
 
@@ -42,6 +46,15 @@ commitment made in conversation so none of them lives only there.
 7. **Recorded fixtures re-recorded** (after Sunny's full tenant rerun
    on 1.25+): full fragments replace the truncated ones; decision
    trees join the recording so CI replays them.
+
+8. **Port the indexer-reflection fix + property cache into
+   `scriptdom_fabric.py`'s walkers** (from the 1.28.0 tree extractor):
+   the famous 13,156-suppression counter reproduces locally and is
+   overwhelmingly .NET indexer noise; fixing it should collapse the
+   counter to ~0 and may recover the trace's 3 missing table reads
+   (MED_MIX_COMPONENTS class). CHANGES PARSE OUTPUT: goldens +
+   REMATCH answer keys must be re-certified deliberately, together
+   with item 7's fixture re-record (now runnable locally).
 
 ## Exit evidence
 

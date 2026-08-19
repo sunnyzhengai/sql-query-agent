@@ -36,6 +36,8 @@ IMPORT_ROOT_TO_DIST = {
 # Each entry must say who provides it.
 ENVIRONMENT_PROVIDED = {
     "clr": "pythonnet CLR bridge — sql-logic-env ships pythonnet (ADR: ScriptDom)",
+    "Microsoft": "CLR namespace injected by pythonnet at runtime (ScriptDom)",
+    "System": "CLR namespace injected by pythonnet at runtime (.NET BCL)",
     "pyspark": "Fabric Spark runtime",
     "mssparkutils": "Fabric Spark runtime (notebook utilities)",
     "notebookutils": "Fabric Spark runtime (notebook utilities)",

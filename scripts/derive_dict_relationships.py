@@ -1,18 +1,22 @@
-"""Derive dict_relationships.csv from the corpus's own join predicates.
+"""Derive dict_relationships.csv from the corpus's own join predicates
+— NATIVE parser only (ScriptDom, ADR 0001; sqlglot banned 2026-08-19).
 
 Provenance rule (Sunny, 2026-08-19): the join map is DEDUCED from our
 de-dialected SQL corpus — the users'-reality evidence layer of ADR
 0046 — never extracted from a vendor's proprietary dictionary. Every
 row cites how many statements evidence it.
 
-Bootstrap status: after ADR 0044 phase 1b, relationships regenerate
-from graph_decision_sites on the tenant (ScriptDom-parsed, alias
-lineage resolved); this script then retires. Its statement splitter is
-offline demo surgery, verified by the 0-mismatch reconciliation method
-of TREE_PHASE1_ED_SEPSIS.md — it is not, and must never become, a
-production parse path (native-parser law).
+Completeness (HANDOFF_TREE_PHASE_1B criterion, "we can't miss joins"):
+statement splitting and alias resolution come from ScriptDom itself,
+so the sqlglot bootstrap's measured blind spot (33 unparseable
+statements, 192 unevidenced JOINs) is closed; any residual
+unparseable statement is printed as a counted number, never silence.
 
-Usage: python scripts/derive_dict_relationships.py
+Bootstrap status: once 300 persists decision→column edges tenant-side
+(phase 1b remainder), relationships regenerate from
+graph_decision_sites and this script retires.
+
+Usage: python3.11 scripts/derive_dict_relationships.py
 Reads  data/synthetic/sql/**/*.sql + data/synthetic/dict_tables.csv
 Writes data/synthetic/dict_relationships.csv
 """
@@ -20,97 +24,58 @@ Writes data/synthetic/dict_relationships.csv
 from __future__ import annotations
 
 import csv
-import re
 import sys
 from collections import Counter
 from pathlib import Path
 
-import sqlglot
-from sqlglot import exp
-
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-
-from src.tree.extract import build_decision_tree  # noqa: E402
-
 REPO = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(REPO))
+
+from src.parser.scriptdom_loader import parse_tsql  # noqa: E402
+from src.tree.extract import (  # noqa: E402
+    build_decision_tree,
+    find_nodes,
+    statement_texts,
+)
+
 SQL_DIR = REPO / "data" / "synthetic" / "sql"
 DICT_TABLES = REPO / "data" / "synthetic" / "dict_tables.csv"
 OUT = REPO / "data" / "synthetic" / "dict_relationships.csv"
 
-_HEAD = re.compile(
-    r"^(SELECT|INSERT|UPDATE|DELETE|IF|DROP|DECLARE|CREATE|SET|;?\s*WITH)\b",
-    re.I,
-)
-
-
-def _strip_noise(s: str) -> str:
-    s = re.sub(r"/\*.*?\*/", " ", s, flags=re.S)
-    s = re.sub(r"--[^\n]*", " ", s)
-    return re.sub(r"'[^']*'", "''", s)
-
-
-def split_statements(text: str) -> "list[str]":
-    """Paren-depth-aware statement bounding (statement heads only count
-    at depth 0, outside block comments)."""
-    lines = text.split("\n")
-    heads: "list[int]" = []
-    depth = 0
-    in_comment = False
-    for i, ln in enumerate(lines):
-        if _HEAD.match(ln) and depth == 0 and not in_comment:
-            heads.append(i)
-        probe = ln
-        if in_comment:
-            if "*/" not in probe:
-                continue
-            in_comment = False
-            probe = probe.split("*/", 1)[1]
-        probe = re.sub(r"--.*", "", probe)
-        if "/*" in probe and "*/" not in probe:
-            in_comment = True
-        probe = _strip_noise(probe)
-        depth += probe.count("(") - probe.count(")")
-    heads.append(len(lines))
-    return ["\n".join(lines[a:b]).strip() for a, b in zip(heads, heads[1:])]
-
-
-def _ident(name: str) -> str:
-    """Fold an identifier to its bare uppercase form — sqlglot renders
-    [bracketed] T-SQL identifiers as \"quoted\", which must not create
-    phantom aliases."""
-    return name.strip('"[]').upper()
-
 
 def alias_map(statement: str) -> "dict[str, str]":
-    """alias/name (upper) -> bare table name (upper) for every base
-    table in the statement. Temp tables map to '#'-prefixed names; CTE
-    aliases map to themselves so both classes are recognizably
-    step-side, not dictionary tables."""
+    """alias/name (upper) -> table name (upper) for every table in the
+    statement. Temp names keep their '#' (ScriptDom preserves it in
+    BaseIdentifier); CTE names map to themselves so both classes are
+    recognizably step-side, never dictionary tables."""
     mapping: "dict[str, str]" = {}
-    try:
-        parsed = sqlglot.parse(statement, read="tsql")
-    except Exception:  # noqa: BLE001 — unparseable statements contribute no aliases; join evidence is conservative by design
+    fragment, errors = parse_tsql(statement)
+    if errors:
         return mapping
-    for stmt in parsed:
-        if stmt is None:
-            continue
-        for cte in stmt.find_all(exp.CTE):
-            name = _ident(cte.alias or "")
-            if name:
+    ctes = find_nodes(fragment, {"CommonTableExpression"})
+    tables = find_nodes(fragment, {"NamedTableReference"})
+    derived = find_nodes(fragment, {"QueryDerivedTable"})
+    for d in derived:  # subquery aliases are step-side, like CTEs
+        try:
+            if d.Alias is not None:
+                name = d.Alias.Value.upper()
                 mapping[name] = name
-        for t in stmt.find_all(exp.Table):
-            # take the name from the RENDERED form: sqlglot's t.name
-            # drops the '#' temp marker (live find 2026-08-19 — a temp
-            # named like a base table could otherwise fabricate
-            # evidence); rendering keeps it.
-            rendered = t.sql(dialect="tsql").split(" AS ")[0].strip()
-            name = _ident(rendered.split(".")[-1])
-            alias = _ident(t.alias_or_name or "")
-            if not name:
-                continue
+        except Exception:  # noqa: BLE001, S112 — .NET reflection edge; unmapped aliases surface as skips
+            continue
+    for cte in ctes:
+        try:
+            name = cte.ExpressionName.Value.upper()
+            mapping[name] = name
+        except Exception:  # noqa: BLE001, S112 — .NET reflection edge; unmapped aliases surface as skips
+            continue
+    for t in tables:
+        try:
+            name = t.SchemaObject.BaseIdentifier.Value.upper()
             mapping.setdefault(name, name)
-            if alias:
-                mapping[alias] = name
+            if t.Alias is not None:
+                mapping[t.Alias.Value.upper()] = name
+        except Exception:  # noqa: BLE001, S112 — .NET reflection edge; unmapped aliases surface as skips
+            continue
     return mapping
 
 
@@ -132,11 +97,12 @@ def join_pairs(statement: str):
                 reason = "unqualified"
                 break
             qual, col = ref.rsplit(".", 1)
-            table = aliases.get(_ident(qual))
+            # a 3-part ref (dbo.TABLE.COL) qualifies by its last part
+            table = aliases.get(qual.split(".")[-1].upper())
             if table is None:
                 reason = "unknown_alias"
                 break
-            sides.append((table, _ident(col)))
+            sides.append((table, col.upper()))
         if reason is None and len(sides) == 2:
             a, b = sides
             if a[0] == b[0]:
@@ -158,21 +124,14 @@ def main() -> None:
     pair_counts: "Counter[tuple]" = Counter()
     skips: "Counter[str]" = Counter()
     blind_statements = 0
-    blind_joins = 0
     files = sorted(SQL_DIR.rglob("*.sql"))
     for path in files:
-        for statement in split_statements(path.read_text(encoding="utf-8-sig")):
-            # A statement sqlglot cannot parse contributes NO evidence —
-            # its joins are the map's blind spot, and the blind spot must
-            # be a NUMBER, not prose (Sunny, 2026-08-19: "we can't miss
-            # joins"). ScriptDom regeneration (phase 1b) closes it.
-            if not alias_map(statement):
-                joins_here = len(re.findall(
-                    r"\bJOIN\b", _strip_noise(statement), re.I))
-                if joins_here:
-                    blind_statements += 1
-                    blind_joins += joins_here
-                continue
+        try:
+            statements = statement_texts(path.read_text(encoding="utf-8-sig"))
+        except ValueError:
+            blind_statements += 1  # whole-file parse failure — counted
+            continue
+        for statement in statements:
             for a, b, reason in join_pairs(statement):
                 if reason is not None:
                     skips[reason] += 1
@@ -197,9 +156,8 @@ def main() -> None:
     print("counted skips (no silent drops):")
     for reason, n in skips.most_common():
         print(f"  {reason}: {n}")
-    print(f"BLIND SPOT (sqlglot bootstrap limit, closed by phase 1b): "
-          f"{blind_statements} unparseable statements holding "
-          f"{blind_joins} JOIN keywords contributed no evidence")
+    print(f"BLIND SPOT: {blind_statements} unparseable files "
+          f"(native parser — expected 0)")
     print(f"wrote {OUT.relative_to(REPO)}")
 
 

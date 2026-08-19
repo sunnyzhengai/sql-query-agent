@@ -11,7 +11,7 @@ never deleted — its status changes and it links to its replacement.
 
 | # | Decision | Status |
 |---|---|---|
-| [0001](0001-native-parsers-per-dialect.md) | Native parsers per SQL dialect (ScriptDom for T-SQL) | Accepted |
+| [0001](0001-native-parsers-per-dialect.md) | Native parsers per SQL dialect (ScriptDom for T-SQL) | Accepted (amended 2026-08-19: total — fallback abolished, ban CI-enforced) |
 | [0002](0002-delta-tables-over-graph-db.md) | Delta tables over an external graph database | Accepted |
 | [0003](0003-sql-fragments-not-full-sql.md) | Store sql_fragments, not full SQL blobs | Accepted (amended 2026-08-19 by 0044: fragments stay as provenance, no longer the LLM's input) |
 | [0004](0004-two-stage-hitl-certification.md) | Two-stage human-in-the-loop certification | Accepted |

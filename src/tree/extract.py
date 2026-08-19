@@ -1,9 +1,9 @@
 """Decision-site extraction — ADR 0044 clause 1 (conservation of
-decision sites).
+decision sites), on the NATIVE parser.
 
 Every decision-bearing position in a fragment's AST (WHERE / JOIN ON /
-HAVING / CASE WHEN conditions, at predicate grain) maps to exactly one
-extracted DecisionNode OR one counted UnextractedSite:
+HAVING / CASE WHEN, at predicate grain) maps to exactly one extracted
+DecisionNode OR one counted UnextractedSite:
 
     handled_count + len(unextracted) == decision_sites_total
 
@@ -11,46 +11,46 @@ There is no third bucket. Boolean shape (AND/OR/NOT nesting) is
 preserved, never flattened — flattening an OR into AND-bullets silently
 changes meaning (the LDA OR-inside-AND, TRACE_USP_ED_SEPSIS.md).
 
-Parser note (ADR 0001 unchanged): ScriptDom remains production parse
-truth for statement splitting and reference extraction. This module
-re-parses SINGLE-STATEMENT fragments (ScriptDom's own output) with
-sqlglot to get a walkable expression AST everywhere the wheel runs —
-Fabric, dev machines, CI. Anything sqlglot cannot model lands in
-`unextracted` with a reason code; dynamic SQL (`EXEC(@sql)`) is a
-permanent, counted, escalated gap — never described by guesswork.
+Parser: ScriptDom via src/parser/scriptdom_loader — the dialect-native
+parser, per the native-parser law (ADR 0001, hardened 2026-08-19:
+"under no circumstances" sqlglot — Sunny). Expression text is taken
+VERBATIM from the token stream (no regeneration, no CONVERT→CAST
+rewriting). What the walker does not model lands in `unextracted` with
+a reason code — counted, escalated (ADR 0045 §3), never silent:
+dynamic SQL (`EXEC(@sql)`) permanently; IF control-flow until the
+`parameter_default` modeling decision (TREE_PHASE1_ED_SEPSIS.md
+reviewer question 3) is made.
 """
 
 from __future__ import annotations
 
-import json
 from dataclasses import dataclass, field
 
-import sqlglot
-from sqlglot import exp
-from sqlglot.errors import SqlglotError
-
-# sqlglot's known failure modes: SqlglotError for grammar it rejects,
-# plus bare AssertionError/ValueError/TypeError from dialect internals
-# (live find 2026-08-19: tsql FORMAT() with one argument raises a bare
-# AssertionError in _format_time). Any of these turns the statement
-# into a COUNTED unextracted site — never a crash, never a silent drop.
-_PARSER_FAILURES = (SqlglotError, AssertionError, ValueError, TypeError)
-
-_DIALECT = "tsql"
+from src.parser.scriptdom_loader import parse_tsql
+from src.parser.sql_parser import normalize_sql_whitespace
 
 FALLOUT_STAGE = "300_tree_unextracted"
 CONTRACT_ID = "contract:graph_decision_sites"
 
-# Predicate classes the extractor models. An expression at a boolean
-# position that is not one of these (and not a connective) is counted
-# unextracted — the conservation equation makes the gap loud.
-_LEAF_OPS: "dict[type, str]" = {
-    exp.EQ: "EQ", exp.NEQ: "NEQ",
-    exp.GT: "GT", exp.GTE: "GTE", exp.LT: "LT", exp.LTE: "LTE",
-    exp.In: "IN", exp.Between: "BETWEEN",
-    exp.Like: "LIKE", exp.ILike: "LIKE",
-    exp.Is: "IS", exp.Exists: "EXISTS",
+# ScriptDom BooleanComparisonExpression.ComparisonType -> our op names
+_COMPARISON_OPS = {
+    "Equals": "EQ",
+    "NotEqualToBrackets": "NEQ",
+    "NotEqualToExclamation": "NEQ",
+    "GreaterThan": "GT",
+    "LessThan": "LT",
+    "GreaterThanOrEqualTo": "GTE",
+    "LessThanOrEqualTo": "LTE",
 }
+
+# Node type names whose subtrees never hold decision contexts we want
+# and are expensive to reflect over.
+_SKIP_PROPERTIES = frozenset({
+    "StartLine", "StartColumn", "StartOffset", "FragmentLength",
+    "FirstTokenIndex", "LastTokenIndex", "ScriptTokenStream",
+    "Value", "LargeValue", "IsNot", "IsPrimaryExpression",
+    "Collation",
+})
 
 
 @dataclass
@@ -58,7 +58,7 @@ class DecisionNode:
     node_id: str
     kind: str                       # "and" | "or" | "not" | "predicate"
     context: str                    # where | join_on | having | case_when
-    expression_sql: str             # canonical tsql rendering (deterministic)
+    expression_sql: str             # VERBATIM token-stream text, whitespace-normalized
     op: "str | None" = None         # EQ / IN / BETWEEN / EXISTS / ... (leaves)
     column: "str | None" = None     # principal (left-side) column, if simple
     columns: "list[str]" = field(default_factory=list)
@@ -81,7 +81,9 @@ class DecisionNode:
 class UnextractedSite:
     site_id: str
     context: str
-    reason_code: str        # dynamic_sql | parse_failed | unmodeled_construct:<Type>
+    # dynamic_sql | parse_failed | control_flow_if |
+    # unmodeled_construct:<Type> | reflection_suppressed
+    reason_code: str
     expression_sql: str
 
 
@@ -122,34 +124,29 @@ class DecisionTree:
         )
 
 
-def _sql(e: exp.Expression) -> str:
-    return e.sql(dialect=_DIALECT)
+def _type_name(node) -> str:
+    return node.GetType().Name
 
 
-def _repr_safe(e: exp.Expression) -> str:
-    try:
-        return _sql(e)[:400]
-    except _PARSER_FAILURES:
-        return str(e)[:400]  # regeneration can fail where parsing did not
-
-
-def _looks_dynamic(text: str) -> bool:
-    upper = text.upper()
-    return "EXEC" in upper or "SP_EXECUTESQL" in upper
-
-
-def _statement_is_dynamic_exec(stmt: exp.Expression) -> bool:
-    if isinstance(stmt, (exp.Command, exp.Anonymous)):
-        head = _sql(stmt).lstrip().upper()
-        return head.startswith(("EXEC", "SP_EXECUTESQL"))
-    return False
+def _verbatim(node) -> str:
+    """Original source text from the token stream — never regenerated."""
+    tokens = node.ScriptTokenStream
+    if tokens is None:
+        return ""
+    start, end = node.FirstTokenIndex, node.LastTokenIndex
+    if start < 0 or end < 0:
+        return ""
+    return normalize_sql_whitespace(
+        "".join(tokens[i].Text for i in range(start, min(end + 1, tokens.Count))))
 
 
 class _Extractor:
     def __init__(self, tree: DecisionTree):
         self.tree = tree
         self._site_n = 0
+        self.suppressed = 0
 
+    # -- accounting ----------------------------------------------------
     def _next_site_id(self) -> str:
         self._site_n += 1
         return f"site{self._site_n - 1}"
@@ -160,112 +157,338 @@ class _Extractor:
             site_id=self._next_site_id(), context=context,
             reason_code=reason_code, expression_sql=sql_text[:500]))
 
-    def add_site(self, context: str, condition: exp.Expression) -> None:
+    def add_site(self, context: str, condition) -> None:
         site_id = self._next_site_id()
         root = self._convert(condition, context, f"{site_id}.0")
         if root is not None:
             self.tree.sites.append(DecisionSite(
                 site_id=site_id, context=context, root=root))
 
-    def _convert(self, e: exp.Expression, context: str,
-                 path: str) -> "DecisionNode | None":
-        """One boolean expression → one faithful subtree. Every leaf
-        position increments the conservation counters exactly once."""
-        if isinstance(e, exp.Paren):
-            return self._convert(e.this, context, path)
+    # -- generic reflection walk (the scriptdom_fabric idiom, with a
+    # type-level property cache: thousands of AST nodes share ~50 types,
+    # and each pythonnet GetProperties() call marshals — caching is the
+    # difference between seconds and minutes at corpus scale) ----------
+    _PROPS_BY_TYPE: "dict[str, list]" = {}
 
-        if isinstance(e, (exp.And, exp.Or)):
-            kind = "and" if isinstance(e, exp.And) else "or"
+    def _props(self, node):
+        tn = node.GetType().Name
+        cached = self._PROPS_BY_TYPE.get(tn)
+        if cached is None:
+            cached = []
+            try:
+                for prop in node.GetType().GetProperties():
+                    if prop.Name in _SKIP_PROPERTIES:
+                        continue
+                    try:
+                        if prop.GetIndexParameters().Length > 0:
+                            continue  # an indexer, not a child property
+                    except Exception:  # noqa: BLE001 — .NET reflection; counted via suppressed
+                        self.suppressed += 1
+                        continue
+                    cached.append(prop)
+            except Exception:  # noqa: BLE001 — .NET reflection; counted via suppressed
+                self.suppressed += 1
+            self._PROPS_BY_TYPE[tn] = cached
+        return cached
+
+    def _children(self, node):
+        for prop in self._props(node):
+            try:
+                value = prop.GetValue(node)
+            except Exception:  # noqa: BLE001 — .NET reflection; counted via suppressed
+                self.suppressed += 1
+                continue
+            if value is None:
+                continue
+            if hasattr(value, "GetType") and hasattr(value, "StartLine"):
+                yield value
+            elif hasattr(value, "Count") and not isinstance(value, str):
+                try:
+                    for k in range(value.Count):
+                        item = value[k]
+                        if hasattr(item, "StartLine"):
+                            yield item
+                except Exception:  # noqa: BLE001 — .NET reflection; counted via suppressed
+                    self.suppressed += 1
+
+    def _walk_scalars(self, node, type_names: "set[str]", out: list,
+                      depth: int = 0) -> None:
+        if node is None or depth > 40:
+            return
+        if _type_name(node) in type_names:
+            out.append(node)
+        for child in self._children(node):
+            self._walk_scalars(child, type_names, out, depth + 1)
+
+    # -- leaf helpers ---------------------------------------------------
+    def _column_names(self, node) -> "list[str]":
+        cols = []
+        self._walk_scalars(node, {"ColumnReferenceExpression"}, cols)
+        names = []
+        for c in cols:
+            try:
+                idents = c.MultiPartIdentifier.Identifiers
+                names.append(".".join(idents[i].Value
+                                      for i in range(idents.Count)))
+            except Exception:  # noqa: BLE001 — .NET reflection; counted via suppressed
+                self.suppressed += 1
+        return names
+
+    def _operands(self, node) -> "list[str]":
+        found = []
+        literal_types = {"IntegerLiteral", "NumericLiteral", "StringLiteral",
+                         "MoneyLiteral", "RealLiteral", "BinaryLiteral",
+                         "NullLiteral", "VariableReference"}
+        raw = []
+        self._walk_scalars(node, literal_types, raw)
+        for lit in raw:
+            try:
+                tn = _type_name(lit)
+                if tn == "VariableReference":
+                    found.append(lit.Name)
+                elif tn == "StringLiteral":
+                    found.append(f"'{lit.Value}'")
+                elif tn == "NullLiteral":
+                    found.append("NULL")
+                else:
+                    found.append(lit.Value)
+            except Exception:  # noqa: BLE001 — .NET reflection; counted via suppressed
+                self.suppressed += 1
+        return found
+
+    def _principal_column(self, side) -> "str | None":
+        if side is not None and _type_name(side) == "ColumnReferenceExpression":
+            names = self._column_names(side)
+            return names[0] if names else None
+        return None
+
+    def _leaf(self, node, context: str, path: str, op: str,
+              principal_side=None) -> DecisionNode:
+        self.tree.decision_sites_total += 1
+        self.tree.handled_count += 1
+        return DecisionNode(
+            node_id=path, kind="predicate", op=op, context=context,
+            expression_sql=_verbatim(node),
+            column=self._principal_column(principal_side),
+            columns=self._column_names(node),
+            operands=self._operands(node),
+            must_voice=True)
+
+    # NOTE on negation: when the negation is intrinsic to the predicate's
+    # own text (x NOT IN (...), x IS NOT NULL, x NOT BETWEEN a AND b) the
+    # polarity lives in the OP (NOT_IN / IS_NOT / NOT_BETWEEN) — a single
+    # leaf, no extra NOT node. Wrapping such a leaf in NOT would DOUBLE
+    # the negation (caught by the ED-sepsis acceptance render 2026-08-19:
+    # "NOT(x IS NOT NULL)" claimed the opposite of the SQL). A standalone
+    # NOT (BooleanNotExpression, e.g. NOT EXISTS) remains a real node.
+
+    # -- boolean tree conversion ----------------------------------------
+    def _convert(self, node, context: str, path: str) -> "DecisionNode | None":
+        tn = _type_name(node)
+
+        if tn == "BooleanParenthesisExpression":
+            return self._convert(node.Expression, context, path)
+
+        if tn == "BooleanBinaryExpression":
+            kind = str(node.BinaryExpressionType).lower()   # and | or
             children = []
-            for i, part in enumerate((e.this, e.expression)):
+            for i, part in enumerate((node.FirstExpression,
+                                      node.SecondExpression)):
                 child = self._convert(part, context, f"{path}.{i}")
                 if child is not None:
                     children.append(child)
             return DecisionNode(node_id=path, kind=kind, context=context,
-                                expression_sql=_sql(e), children=children)
+                                expression_sql=_verbatim(node),
+                                children=children)
 
-        if isinstance(e, exp.Not):
-            child = self._convert(e.this, context, f"{path}.0")
+        if tn == "BooleanNotExpression":
+            child = self._convert(node.Expression, context, f"{path}.0")
             return DecisionNode(node_id=path, kind="not", context=context,
-                                expression_sql=_sql(e),
+                                expression_sql=_verbatim(node),
                                 children=[child] if child else [])
 
-        op = next((name for cls, name in _LEAF_OPS.items()
-                   if isinstance(e, cls)), None)
-        self.tree.decision_sites_total += 1
-        if op is None:
-            # A boolean position we do not model — counted, never dropped.
+        if tn == "BooleanComparisonExpression":
+            op = _COMPARISON_OPS.get(str(node.ComparisonType))
+            if op is None:
+                self.tree.decision_sites_total += 1
+                self.tree.unextracted.append(UnextractedSite(
+                    site_id=path, context=context,
+                    reason_code=f"unmodeled_construct:Comparison."
+                                f"{node.ComparisonType}",
+                    expression_sql=_verbatim(node)[:500]))
+                return None
+            return self._leaf(node, context, path, op,
+                              principal_side=node.FirstExpression)
+
+        if tn == "InPredicate":
+            op = "NOT_IN" if node.NotDefined else "IN"
+            return self._leaf(node, context, path, op,
+                              principal_side=node.Expression)
+
+        if tn == "BooleanTernaryExpression":
+            # ScriptDom's BETWEEN: TernaryExpressionType Between/NotBetween
+            # (live find 2026-08-19: 22 arrival-window filters — including
+            # Base_Pop's ONE true filter — landed unmodeled until this).
+            kind = str(node.TernaryExpressionType)
+            if kind in ("Between", "NotBetween"):
+                op = "BETWEEN" if kind == "Between" else "NOT_BETWEEN"
+                return self._leaf(node, context, path, op,
+                                  principal_side=node.FirstExpression)
+            self.tree.decision_sites_total += 1
             self.tree.unextracted.append(UnextractedSite(
                 site_id=path, context=context,
-                reason_code=f"unmodeled_construct:{type(e).__name__}",
-                expression_sql=_sql(e)[:500]))
+                reason_code=f"unmodeled_construct:Ternary.{kind}",
+                expression_sql=_verbatim(node)[:500]))
             return None
 
-        self.tree.handled_count += 1
-        columns = [_sql(c) for c in e.find_all(exp.Column)]
-        left = e.this if isinstance(e.this, exp.Column) else None
-        operands = [_sql(lit) for lit in e.find_all(exp.Literal)]
-        operands += [_sql(p) for p in e.find_all(exp.Parameter)]
-        return DecisionNode(
-            node_id=path, kind="predicate", op=op, context=context,
-            expression_sql=_sql(e),
-            column=_sql(left) if left is not None else None,
-            columns=columns, operands=operands, must_voice=True)
+        if tn == "LikePredicate":
+            op = "NOT_LIKE" if node.NotDefined else "LIKE"
+            return self._leaf(node, context, path, op,
+                              principal_side=node.FirstExpression)
 
-    def walk_statement(self, stmt: exp.Expression) -> None:
-        if _statement_is_dynamic_exec(stmt):
-            self.add_unextracted("statement", "dynamic_sql", _sql(stmt))
+        if tn == "BooleanIsNullExpression":
+            op = "IS_NOT" if node.IsNot else "IS"
+            return self._leaf(node, context, path, op,
+                              principal_side=node.Expression)
+
+        if tn == "ExistsPredicate":
+            # The subquery's own WHERE becomes its own site via the
+            # context walk; the EXISTS itself is one existence decision.
+            self.tree.decision_sites_total += 1
+            self.tree.handled_count += 1
+            return DecisionNode(
+                node_id=path, kind="predicate", op="EXISTS", context=context,
+                expression_sql=_verbatim(node),
+                columns=self._column_names(node),
+                operands=self._operands(node), must_voice=True)
+
+        # A boolean position we do not model — counted, never dropped.
+        self.tree.decision_sites_total += 1
+        self.tree.unextracted.append(UnextractedSite(
+            site_id=path, context=context,
+            reason_code=f"unmodeled_construct:{tn}",
+            expression_sql=_verbatim(node)[:500]))
+        return None
+
+    # -- context collection over a statement -----------------------------
+    def walk_statement(self, node, depth: int = 0) -> None:
+        """Visit every AST node exactly once; a context node registers
+        its site, then descent ALWAYS continues — subqueries inside a
+        WHERE (EXISTS, IN (SELECT ...)) carry their own WhereClause
+        nodes, which become their own sites. Only dynamic SQL stops
+        descent (nothing inside a runtime string is static SQL)."""
+        if node is None or depth > 60:
             return
-        if isinstance(stmt, (exp.Command, exp.Anonymous)):
-            return  # DECLARE / SET — carries no decision itself
+        tn = _type_name(node)
 
-        for select in stmt.find_all(exp.Select):
-            where = select.args.get("where")
-            if where is not None:
-                self.add_site("where", where.this)
-            having = select.args.get("having")
-            if having is not None:
-                self.add_site("having", having.this)
-            for join in select.args.get("joins") or []:
-                on = join.args.get("on")
-                if on is not None:
-                    self.add_site("join_on", on)
+        if tn == "ExecutableStringList":
+            # dynamic SQL: EXEC(@sql) / EXEC('...') — permanent counted gap
+            self.add_unextracted("statement", "dynamic_sql", _verbatim(node))
+            return
+        if tn == "IfStatement":
+            # control-flow decision (e.g. the default reporting window);
+            # counted until the parameter_default modeling decision lands
+            # (TREE_PHASE1_ED_SEPSIS reviewer question 3). Descent still
+            # collects the branches' statements and any subqueries in
+            # the predicate.
+            self.add_unextracted(
+                "statement", "control_flow_if",
+                _verbatim(node.Predicate) if node.Predicate else "IF")
+        elif tn == "WhereClause":
+            self.add_site("where", node.SearchCondition)
+        elif tn == "HavingClause":
+            self.add_site("having", node.SearchCondition)
+        elif tn == "QualifiedJoin":
+            if node.SearchCondition is not None:
+                self.add_site("join_on", node.SearchCondition)
+        elif tn == "SearchedWhenClause":
+            self.add_site("case_when", node.WhenExpression)
+        elif tn == "SimpleCaseExpression":
+            # CASE <input> WHEN <value> ... — each WHEN is an equality
+            # decision; synthesized as a leaf so it is never silent.
+            try:
+                for i in range(node.WhenClauses.Count):
+                    wc = node.WhenClauses[i]
+                    site_id = self._next_site_id()
+                    self.tree.decision_sites_total += 1
+                    self.tree.handled_count += 1
+                    leaf = DecisionNode(
+                        node_id=f"{site_id}.0", kind="predicate", op="EQ",
+                        context="case_when",
+                        expression_sql=normalize_sql_whitespace(
+                            f"{_verbatim(node.InputExpression)} = "
+                            f"{_verbatim(wc.WhenExpression)}"),
+                        column=self._principal_column(node.InputExpression),
+                        columns=self._column_names(node.InputExpression)
+                        + self._column_names(wc.WhenExpression),
+                        operands=self._operands(wc.WhenExpression),
+                        must_voice=True)
+                    self.tree.sites.append(DecisionSite(
+                        site_id=site_id, context="case_when", root=leaf))
+            except Exception:  # noqa: BLE001 — .NET reflection; counted, escalated
+                self.add_unextracted("case_when", "reflection_suppressed",
+                                     _verbatim(node))
 
-        for case in stmt.find_all(exp.Case):
-            for if_ in case.args.get("ifs") or []:
-                self.add_site("case_when", if_.this)
+        for child in self._children(node):
+            self.walk_statement(child, depth + 1)
 
 
 def build_decision_tree(fragment: str) -> DecisionTree:
-    """Parse one fragment and extract its decision sites under the
-    conservation law. A fragment that cannot be parsed at all becomes a
-    single counted unextracted site — the tree never lies by omission."""
+    """Parse one fragment with the NATIVE parser and extract its
+    decision sites under the conservation law. A fragment that cannot
+    be parsed becomes a single counted unextracted site — the tree
+    never lies by omission."""
     tree = DecisionTree(fragment=fragment)
     if not fragment or not fragment.strip():
         return tree
 
     ex = _Extractor(tree)
-    try:
-        statements = sqlglot.parse(fragment, read=_DIALECT)
-    except _PARSER_FAILURES as err:
-        reason = "dynamic_sql" if _looks_dynamic(fragment) else "parse_failed"
-        ex.add_unextracted("statement", reason, f"{fragment[:400]} -- {err}")
+    ast, errors = parse_tsql(fragment)
+    if errors:
+        upper = fragment.upper()
+        reason = ("dynamic_sql"
+                  if ("EXEC" in upper or "SP_EXECUTESQL" in upper)
+                  else "parse_failed")
+        ex.add_unextracted("statement", reason,
+                           f"{fragment[:300]} -- {errors[0]}")
         return tree
 
-    for stmt in statements:
-        if stmt is None:
-            continue
-        try:
-            ex.walk_statement(stmt)
-        except _PARSER_FAILURES as err:
-            ex.add_unextracted(
-                "statement", "parse_failed",
-                f"{_repr_safe(stmt)} -- walk failed: {err}")
+    ex.walk_statement(ast)
+
+    if ex.suppressed:
+        # Reflection suppressions could have HIDDEN a decision context —
+        # surface the possibility as one counted, escalated site.
+        ex.add_unextracted(
+            "statement", "reflection_suppressed",
+            f"{ex.suppressed} reflection accesses suppressed during walk")
 
     assert tree.handled_count + len(tree.unextracted) == tree.decision_sites_total, (
         "conservation violated — a decision site fell into a third bucket"
     )
     return tree
+
+
+def find_nodes(root, type_names: "set[str]") -> list:
+    """Collect AST nodes by ScriptDom type name (cached reflection walk)
+    — shared utility for corpus tooling (e.g. the join-map deriver)."""
+    ex = _Extractor(DecisionTree(fragment=""))
+    out: list = []
+    ex._walk_scalars(root, set(type_names), out)
+    return out
+
+
+def statement_texts(sql: str) -> "list[str]":
+    """Verbatim top-level statement texts, split by the NATIVE parser —
+    ScriptDom owns statement boundaries (no heuristics, ever)."""
+    ast, errors = parse_tsql(sql)
+    if errors:
+        raise ValueError(f"T-SQL parse errors: {errors[0]}")
+    out = []
+    for b in range(ast.Batches.Count):
+        batch = ast.Batches[b]
+        for s in range(batch.Statements.Count):
+            out.append(_verbatim(batch.Statements[s]))
+    return out
 
 
 # ---------------------------------------------------------------------
@@ -277,6 +500,7 @@ def decision_site_rows(tree: DecisionTree, metric_id: str,
     """Rows for graph_decision_sites — extracted sites carry the
     faithful subtree as JSON; unextracted sites appear with status
     'unextracted' so conservation is queryable in the table itself."""
+    import json
     rows = []
     for s in tree.sites:
         leaf_count = sum(1 for n in tree.nodes

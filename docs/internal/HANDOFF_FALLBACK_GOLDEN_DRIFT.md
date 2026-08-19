@@ -1,7 +1,12 @@
 # Handoff — fallback-parser golden smoke red since the corpus de-dialect
 
-**From:** dev session, 2026-08-19 (found while landing the ADR 0044/0045
-contract lock). **Status: OPEN.** Production is NOT affected.
+**From:** dev session, 2026-08-19. **Status: RESOLVED same day, by
+abolition** — the fallback parser is deleted under the total
+native-parser law (ADR 0001 amendment). ScriptDom now runs locally and
+on CI (scriptdom_loader + ~/.dotnet + setup-dotnet); the goldens are
+native structural pins that run on EVERY platform (no CI skip — the
+invisible tier is dead), and sqlglot/sqlparse imports fail CI
+(tests/test_native_parser_law.py). Wanted-items below kept for history.
 
 ## What was found
 

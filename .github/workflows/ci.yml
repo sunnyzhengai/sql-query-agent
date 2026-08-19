@@ -21,6 +21,14 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
+      # Native-parser law (ADR 0001, hardened 2026-08-19): ScriptDom via
+      # pythonnet is the ONLY parser, so CI hosts the .NET runtime too —
+      # the same parse everywhere; no fallback grammar exists.
+      - name: Set up .NET runtime (ScriptDom host)
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
       - name: Install dependencies (pinned to production versions)
         run: |
           python -m pip install --upgrade pip

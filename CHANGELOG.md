@@ -10,6 +10,40 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.28.0] - 2026-08-19
+
+### Changed — the native-parser law is TOTAL: sqlglot and sqlparse are gone
+- Sunny's ruling ("under no circumstances"): sqlglot/sqlparse deleted
+  from the entire codebase and BANNED by CI
+  (tests/test_native_parser_law.py: imports fail, dependency
+  declarations fail, parser instantiation outside the loader fails).
+  ADR 0001 amended: the dialect-native parser is the ONLY parser, in
+  every environment.
+- ScriptDom now runs EVERYWHERE via src/parser/scriptdom_loader:
+  Fabric (unchanged), dev machines (pythonnet + ~/.dotnet; Apple's
+  hardened system Python is subprocess-probed and fails with
+  remediation — local standard is Homebrew python3.11), and CI
+  (setup-dotnet step added). pythonnet promoted to a wheel dependency.
+- Tree extractor (ADR 0044 clause 1) ported to ScriptDom: verbatim
+  token-stream expression text (no CONVERT→CAST rewriting), FOR XML
+  PATH / CTE+SELECT INTO / one-arg FORMAT all extract natively; IF
+  control flow is a counted gap (control_flow_if) pending the
+  parameter_default modeling decision; type-level reflection caching
+  (the 13,156-suppression counter is reproduced locally and diagnosed
+  as .NET indexer noise — production fix filed as 1b item 8).
+- Fallback parser ABOLISHED: sql_parser.py is now the parse model +
+  native parse_sql only; sql_extractor.py and scriptdom_extractor.py
+  (dead sqlparse/microservice paths) deleted; golden tests reborn as
+  exact native structural pins that run on EVERY platform (no CI
+  skip — local native parse reproduces the Fabric recording: 417
+  steps exactly); parser tests rewritten for whole-script semantics.
+- Join map regenerated natively: 62 pairs, 374 evidence occurrences,
+  BLIND SPOT 0 (was 192 unevidenced JOINs); two sqlglot-era corrupt
+  rows eliminated (a /* comment */ inside a column name, a mangled
+  write-target pair); derived-table aliases classified step-side.
+
+---
+
 ## [1.27.0] - 2026-08-19
 
 ### Added — the join map, deduced from our own corpus (ADR 0046 bootstrap)

@@ -100,6 +100,30 @@ class TestRealCorpusShapes:
                        if n.kind == "predicate" and n.context == "join_on"]
         assert len(join_leaves) == 3
 
+    def test_between_window_is_a_leaf(self):
+        # Live find 2026-08-19 (ED-sepsis acceptance render): ScriptDom
+        # models BETWEEN as BooleanTernaryExpression — 22 window filters,
+        # including Base_Pop's ONE true filter, were counted gaps until
+        # the type was modeled.
+        tree = build_decision_tree(
+            "SELECT a FROM t WHERE ADT_ARRIVAL_DATE BETWEEN @dStartDate AND @dEndDate")
+        leaf = [n for n in tree.nodes if n.kind == "predicate"][0]
+        assert leaf.op == "BETWEEN"
+        assert "@dStartDate" in leaf.operands and "@dEndDate" in leaf.operands
+        assert not tree.unextracted
+
+    def test_intrinsic_negation_is_in_the_op_never_a_double_not(self):
+        # Live find 2026-08-19 (same render): wrapping "x IS NOT NULL"
+        # in a NOT node claimed the OPPOSITE of the SQL. Polarity of
+        # text-intrinsic negation lives in the op.
+        tree = build_decision_tree(
+            "SELECT a FROM t WHERE x IS NOT NULL AND y NOT IN (1, 2) "
+            "AND z NOT BETWEEN 1 AND 5")
+        ops = sorted(n.op for n in tree.nodes if n.kind == "predicate")
+        assert ops == ["IS_NOT", "NOT_BETWEEN", "NOT_IN"]
+        assert not [n for n in tree.nodes if n.kind == "not"], \
+            "no NOT node may wrap a predicate whose text already negates"
+
     def test_or_shape_is_not_reported_when_absent(self):
         tree = build_decision_tree(
             "SELECT a FROM t WHERE x = '900112' AND y = 3022")
@@ -107,9 +131,11 @@ class TestRealCorpusShapes:
 
 
 class TestHonestFailureModes:
-    def test_for_xml_path_lands_in_unextracted_never_dropped(self):
+    def test_for_xml_path_extracts_natively(self):
         # Real corpus construct (Base_Pop_ENC_Reason): STUFF(... FOR XML
-        # PATH('')) — a genuine sqlglot gap; the equation makes it loud.
+        # PATH('')) was a counted gap under sqlglot; the NATIVE parser
+        # (ADR 0001) extracts it fully — the subquery's joins and WHERE
+        # become their own sites, nothing unextracted.
         tree = build_decision_tree(
             "SELECT DISTINCT CAT.ENCOUNTER_ID,\n"
             "STUFF(( SELECT '% ' + DIAG.DX_NAME\n"
@@ -122,14 +148,14 @@ class TestHonestFailureModes:
             "), 1, 1, '') AS [AllEncReasons]\n"
             "INTO #Base_Pop_ENC_Reason FROM #Main CAT")
         assert _conserved(tree)
-        assert tree.unextracted, "an unparseable construct must be counted"
+        assert not tree.unextracted, [u.reason_code for u in tree.unextracted]
+        contexts = [n.context for n in tree.nodes if n.kind == "predicate"]
+        assert contexts.count("join_on") == 2 and contexts.count("where") == 1
 
-    def test_one_argument_format_does_not_crash_the_extractor(self):
-        # Live find 2026-08-19: sqlglot's tsql FORMAT() internals raise
-        # a bare AssertionError, not a ParseError.
-        tree = build_decision_tree(
-            "SELECT FORMAT(x) AS f FROM t WHERE a = 1")
+    def test_genuinely_broken_sql_is_counted_not_crashed(self):
+        tree = build_decision_tree("SELECT FROM WHERE GROUP HAVING")
         assert _conserved(tree)
+        assert [u.reason_code for u in tree.unextracted] == ["parse_failed"]
 
     def test_truncated_fragment_is_counted_not_crashed(self):
         # The stale-fixture class: amputated mid-token.

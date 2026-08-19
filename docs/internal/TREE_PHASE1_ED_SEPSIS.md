@@ -99,3 +99,30 @@ ORDER BY step_name, site_id
 ```
 
 Deltas against this document are gaps in the pipeline — report them.
+
+## Native re-run (1.28.0, same day — sqlglot abolished)
+
+The extractor now runs on ScriptDom everywhere (ADR 0001 total law).
+Re-run against the same raw proc:
+
+| | sqlglot bootstrap | native (1.28.0) |
+|---|---|---|
+| Decision sites | 442 | **488** |
+| Extracted | 431 (97.5%) | **486 (99.6%)** |
+| Gaps | 11 | **2** (both `control_flow_if` — reviewer question 3) |
+
+The review of the previous render caught two extractor bugs the unit
+tests had missed — the acceptance protocol working exactly as designed:
+
+1. **BETWEEN was a counted gap** (ScriptDom models it as
+   `BooleanTernaryExpression`) — 22 window filters, INCLUDING
+   Base_Pop's one true filter, were unextracted until modeled. Now a
+   `BETWEEN`/`NOT_BETWEEN` leaf; pinned by regression test.
+2. **Double negation**: `x IS NOT NULL` was wrapped in an extra NOT
+   node, claiming the OPPOSITE of the SQL. Text-intrinsic negation now
+   lives in the op (`IS_NOT`, `NOT_IN`, `NOT_BETWEEN`, `NOT_LIKE`);
+   only standalone `NOT` (e.g. NOT EXISTS) is a NOT node. Pinned.
+
+Remaining reviewer question (unchanged): should the two IF blocks (the
+MB-12/T-1 default reporting window) become a `parameter_default` site
+kind in 1b, or stay counted gaps?
