@@ -43,8 +43,10 @@ Build a small pure function + utility surface:
 
     replan(changed_tables) -> ordered minimal notebook list
 
-e.g. replan({"input_metric_names"}) -> [300, 400, 700, 800]
-(skip 200: not a consumer; skip 600: descriptions keyed on SQL hashes).
+e.g. replan({"input_metric_names"}) -> [300, 400, 600, 700, 800]
+(skip 200: not a consumer; 600 IS required — its node enrichment is
+invalidated by 300's rebuild even though its CACHE is hash-keyed;
+the run is all cache hits and near-free, but it must run).
 Surface it three ways: a src function with tests; a line in 500's
 output ("inputs changed since last run: X — minimal re-run: ...");
 and the /troubleshoot agent command (admins ask "what do I re-run if I
