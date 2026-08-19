@@ -543,6 +543,52 @@ GRAPH_EDGES = {
     ],
 }
 
+DICT_RELATIONSHIPS = {
+    "table_name": "input_dict_relationships",
+    "description": (
+        "The technical-layer join map (ADR 0046): one row per evidenced "
+        "table-to-table join pair with the joining columns, cardinality "
+        "(declared or blank), and provenance. EVIDENCE distinguishes "
+        "corpus-deduced rows (users'-reality: joins real reports "
+        "actually perform, with occurrence counts) from declared rows. "
+        "NEVER extracted from a vendor's proprietary dictionary — "
+        "customers derive theirs in-tenant under their own license; the "
+        "demo's is deduced from the de-dialected corpus by "
+        "scripts/derive_dict_relationships.py."
+    ),
+    "domain": "input",
+    "status": "planned",
+    "notes": (
+        "Generated file exists (data/synthetic/dict_relationships.csv, "
+        "pinned to the corpus by tests/test_derive_relationships.py); "
+        "becomes an active lakehouse table when the discovery engine "
+        "(ADR 0046) consumes it. After ADR 0044 phase 1b it regenerates "
+        "from graph_decision_sites instead of the bootstrap script."
+    ),
+    "columns": [
+        ("SOURCE_TABLE", "string", False),
+        ("SOURCE_COLUMN", "string", False),
+        ("DEST_TABLE", "string", False),
+        ("DEST_COLUMN", "string", False),
+        ("CARDINALITY", "string", True),
+        ("EVIDENCE", "string", False),
+        ("EVIDENCE_COUNT", "integer", True),
+    ],
+    "column_descriptions": {
+        "SOURCE_TABLE": "One side of the join pair (canonical sort order, not direction)",
+        "SOURCE_COLUMN": "Joining column on the source side",
+        "DEST_TABLE": "Other side of the join pair",
+        "DEST_COLUMN": "Joining column on the destination side",
+        "CARDINALITY": "one-to-many / many-to-one / one-to-one — declared or inferred; blank = unknown",
+        "EVIDENCE": "corpus (deduced from parsed reports) or declared (hand-authored)",
+        "EVIDENCE_COUNT": "How many corpus statements evidence this pair (ranking signal, ADR 0046)",
+    },
+    "invariants": [
+        {"kind": "allowed_values", "column": "EVIDENCE",
+         "values": ["corpus", "declared"]},
+    ],
+}
+
 GRAPH_DECISION_SITES = {
     "table_name": "graph_decision_sites",
     "description": (
@@ -2181,7 +2227,7 @@ TABLE_REGISTRY = {
     s["table_name"]: s
     for s in [
         # input
-        SQL_SOURCES, DICT_TABLES, DICT_COLUMNS,
+        SQL_SOURCES, DICT_TABLES, DICT_COLUMNS, DICT_RELATIONSHIPS,
         # operations
         PARSE_RESULTS, PARSE_ERRORS, PARSE_SUCCESSES, BUILD_SUMMARY,
         PIPELINE_VALIDATION, INSTALLATION_ERRORS, AGENT_DESCRIPTIONS,

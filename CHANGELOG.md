@@ -10,6 +10,27 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.27.0] - 2026-08-19
+
+### Added — the join map, deduced from our own corpus (ADR 0046 bootstrap)
+- `data/synthetic/dict_relationships.csv`: 63 table-to-table join pairs
+  with joining columns and per-pair evidence counts, DEDUCED from the
+  de-dialected corpus's own join predicates (users'-reality layer) —
+  explicitly never extracted from any vendor dictionary (wall + IP
+  decision, Sunny 2026-08-19). Generator:
+  `scripts/derive_dict_relationships.py` (bootstrap; retires when
+  phase 1b regenerates relationships from graph_decision_sites).
+- `input_dict_relationships` registered (planned) with EVIDENCE
+  provenance column (corpus | declared) and CARDINALITY (declared or
+  blank — Clarity publishes none, so ours is ours).
+- Tests pin the CSV to a fresh derivation (drift fails CI) and pin two
+  live finds: sqlglot renders [bracketed] identifiers as "quoted"
+  (phantom aliases), and t.name drops the '#' temp marker (a temp
+  named like a base table could fabricate evidence; names now taken
+  from the rendered form).
+
+---
+
 ## [1.26.0] - 2026-08-19
 
 ### Added — ADR 0044 phase 1: the faithful decision tree (clause 1 green)
