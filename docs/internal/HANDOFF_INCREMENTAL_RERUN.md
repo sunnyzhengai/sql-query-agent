@@ -24,6 +24,18 @@ search_text per node_id; on refresh, carry forward emb for unchanged
 hashes; embed only new/changed rows. At 100k nodes with a one-name
 change, the embed bill should be ~1 row, not ~100k.
 
+## Field evidence 2 (same night): the hand-derived list was WRONG
+
+The dev session prescribed 300 -> 400 -> 700 -> 800 after a
+metric-names reload and omitted 600 — 300's rebuild wiped 600's
+in-place node descriptions, 400 built bare cards, and the demo tenant
+served descriptionless answers until a Kusto check caught it (28
+canonicals, 432 steps, 0 described). Cache made the repair free, but
+the lesson is structural: enrichment dependencies (300 invalidates
+600's enrichment; 600 invalidates 700's embeddings) MUST be encoded in
+replan, not remembered by anyone — the expert in the loop got it wrong
+on the first real try.
+
 ## Gap 2 — registry-derived re-run advisor ("replan")
 
 TABLE_REGISTRY already IS the dependency DAG (owners + consumers).
