@@ -112,8 +112,9 @@ class TestClause1ConservationOfDecisionSites:
 class TestClause2TranslatorBlindness:
     @clause(2, phase=2)
     def test_translator_prompts_carry_facts_never_raw_sql(self):
-        from src.tree.extract import build_decision_tree
         from src.tree.translate import translate_tree
+
+        from src.tree.extract import build_decision_tree
         tree = build_decision_tree(GNARLY_FRAGMENT)
         prompts = []
 
@@ -181,8 +182,9 @@ class TestClause4TheJudgeIsNeverAnLLM:
 class TestClause5EveryDecisionVoicedOrCounted:
     @clause(5, phase=2)
     def test_ledger_balances_voiced_union_unvoiced_is_must_voice(self):
-        from src.tree.extract import build_decision_tree
         from src.tree.translate import translate_tree
+
+        from src.tree.extract import build_decision_tree
         tree = build_decision_tree(GNARLY_FRAGMENT)
         result = translate_tree(tree, DICT_LINES, lambda p: "line")
         voiced = set(result.ledger)
@@ -195,8 +197,9 @@ class TestClause5EveryDecisionVoicedOrCounted:
 class TestClause6FailurePolarityFloor:
     @clause(6, phase=3)
     def test_never_converging_loop_degrades_to_grounded_template(self):
-        from src.tree.extract import build_decision_tree
         from src.tree.pipeline import verified_describe
+
+        from src.tree.extract import build_decision_tree
         tree = build_decision_tree(GNARLY_FRAGMENT)
 
         def fabricating_translator(prompt):
