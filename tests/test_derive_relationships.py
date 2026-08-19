@@ -58,6 +58,24 @@ class TestUnits:
         assert not [1 for _, _, r in join_pairs(sql) if r is None]
 
 
+class TestBootstrapDiesWithSqlglot:
+    def test_script_cannot_outlive_the_sqlglot_extractor(self):
+        """Native-parser law, mechanically tied: this script is
+        sanctioned ONLY as a bootstrap beside the sqlglot extractor.
+        The day phase 1b swaps src/tree/extract.py to ScriptDom
+        (sqlglot import gone), this script must be deleted and the
+        join map regenerated from graph_decision_sites — otherwise we
+        carry two paths for one goal, which is banned (2026-08-19)."""
+        extractor = (REPO / "src" / "tree" / "extract.py").read_text()
+        script = REPO / "scripts" / "derive_dict_relationships.py"
+        if "sqlglot" not in extractor:
+            assert not script.exists(), (
+                "phase 1b landed: delete derive_dict_relationships.py "
+                "and regenerate dict_relationships.csv from "
+                "graph_decision_sites (EVIDENCE stays 'corpus')"
+            )
+
+
 class TestCommittedFileIsDerived:
     def _derive(self):
         base = {row["TABLE_NAME"].upper()
