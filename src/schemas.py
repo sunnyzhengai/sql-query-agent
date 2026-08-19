@@ -543,6 +543,67 @@ GRAPH_EDGES = {
     ],
 }
 
+GRAPH_DECISION_SITES = {
+    "table_name": "graph_decision_sites",
+    "description": (
+        "The faithful decision tree (ADR 0044 clause 1, phase 1): one row "
+        "per decision site — WHERE / JOIN ON / HAVING / CASE WHEN, at "
+        "predicate grain — with the boolean subtree preserved as JSON "
+        "(AND/OR/NOT shape intact, never flattened). Conservation is "
+        "queryable in the table itself: "
+        "sum(predicate_count where extracted) + count(status=unextracted) "
+        "== every decision site the AST holds. Unextracted rows (dynamic "
+        "SQL, unmodeled constructs) also land in ops_fallout (stage "
+        "300_tree_unextracted) and escalate per ADR 0045."
+    ),
+    "domain": "graph",
+    "status": "active",
+    "owner": {"notebook": "300_build_graph", "module": "src/tree/extract.py"},
+    "write_mode": "overwrite",
+    "enrichers": [],
+    "consumers": [
+        "description pipeline phase 2 (ADR 0044)",
+        "self-service intent matching (ADR 0044 point 3, future)",
+        "admin telemetry report",
+    ],
+    "optional_input": True,
+    "remediation": (
+        "run 300_build_graph on engine >= 1.26 — absent means the graph "
+        "predates the decision-tree layer"
+    ),
+    "columns": [
+        ("metric_id", "string", False),
+        ("step_name", "string", True),
+        ("site_id", "string", False),
+        ("context", "string", False),
+        ("status", "string", False),
+        ("predicate_count", "integer", False),
+        ("columns_used", "string", True),
+        ("tree", "string", True),
+        ("expression_sql", "string", True),
+        ("reason_code", "string", True),
+    ],
+    "column_descriptions": {
+        "metric_id": "Owning metric (ops_parse_results.metric_id)",
+        "step_name": "Transformation step (CTE/temp table) the site lives in",
+        "site_id": "Site identifier, unique within (metric_id, step_name)",
+        "context": "Decision context: where | join_on | having | case_when | statement",
+        "status": "extracted (tree JSON present) or unextracted (counted gap)",
+        "predicate_count": "Predicate leaves in this row's subtree (1 for unextracted)",
+        "columns_used": "JSON array of columns the site's predicates reference",
+        "tree": "Faithful boolean subtree as JSON (null when unextracted)",
+        "expression_sql": "Canonical SQL of the site (or the offending snippet)",
+        "reason_code": "Why extraction stopped: dynamic_sql | parse_failed | unmodeled_construct:<type>",
+    },
+    "invariants": [
+        {"kind": "unique", "columns": ["metric_id", "step_name", "site_id"]},
+        {"kind": "allowed_values", "column": "status",
+         "values": ["extracted", "unextracted"]},
+        {"kind": "allowed_values", "column": "context",
+         "values": ["where", "join_on", "having", "case_when", "statement"]},
+    ],
+}
+
 
 # =====================================================================
 # OUTPUT domain — flattened, agent-facing products
@@ -1331,7 +1392,8 @@ FALLOUT = {
               "module": "src/steps/semantic_models.py"},
     "write_mode": "append",
     "enrichers": ["500_validate", "900_publish_collibra",
-                  "600_generate_descriptions"],
+                  "600_generate_descriptions",
+                  "300_build_graph"],  # tree_unextracted (ADR 0044 clause 1)
     "consumers": ["admin telemetry report", "500_validate"],
     "optional_input": True,
     "remediation": (
@@ -2126,7 +2188,7 @@ TABLE_REGISTRY = {
         DESCRIPTION_CACHE, SETUP_COMPLETENESS, FALLOUT, FUNNEL,
         METRIC_JOURNEY, REPORT_JOURNEY,
         # graph
-        GRAPH_NODES, GRAPH_EDGES,
+        GRAPH_NODES, GRAPH_EDGES, GRAPH_DECISION_SITES,
         # output
         METRIC_LOGIC, METRIC_TWINS,
         # lpg_export

@@ -500,6 +500,15 @@ you can check the current state with:
    funnel then reports per-stage in/out/fell-off counts backed by
    these rows.
 
+5. **Decision trees** (`graph_decision_sites`) — the faithful predicate
+   trees behind every step (which filters, joins, and CASE conditions a
+   metric applies, with boolean shape preserved). Absent means the
+   graph predates the decision-tree layer; remediation: run
+   300_build_graph on engine >= 1.26. Unextracted sites (dynamic SQL,
+   unmodeled constructs) appear in `ops_fallout` under stage
+   `300_tree_unextracted` — review them; they are counted gaps, not
+   errors.
+
 ### PBI semantic models and report descriptions (ADR 0040)
 
 The consumption layer: which reports run which metrics, and the DAX

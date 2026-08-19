@@ -120,11 +120,13 @@ NOTEBOOK_REGISTRY: "dict[str, dict]" = {
     "300_build_graph": {
         "family": "derivation",
         "serves": ["A", "B", "C", "F"],
-        "purpose": "Build the knowledge graph (nodes/edges, all layers)",
+        "purpose": "Build the knowledge graph (nodes/edges, all layers, "
+                   "decision trees)",
         "entry_points": ["build_graph_step"],
         "wrappers": [],
         "gates": ["precondition_gate", "postcondition_gate"],
-        "requires_engine": ENGINE_FLOOR,
+        # decision-tree outputs (ADR 0044 phase 1) need the 1.26 wheel
+        "requires_engine": "1.26",
     },
     "400_build_metric_logic": {
         "family": "derivation",

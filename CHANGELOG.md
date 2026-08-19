@@ -8,7 +8,33 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
-### Added — contracts locked in red before the tree redesign
+---
+
+## [1.26.0] - 2026-08-19
+
+### Added — ADR 0044 phase 1: the faithful decision tree (clause 1 green)
+- `src/tree/extract.py`: sqlglot-AST decision-site extractor under the
+  conservation law — every WHERE / JOIN ON / HAVING / CASE WHEN
+  predicate maps to exactly one tree node OR one counted unextracted
+  row (`handled + unextracted == total`, no third bucket); boolean
+  shape (AND/OR/NOT) preserved, never flattened; dynamic SQL and
+  unmodeled constructs are counted, escalated gaps. Proven corpus-wide:
+  the equation holds for all 417 recorded fragments.
+- `graph_decision_sites` (owner 300, overwrite): one row per decision
+  site with the faithful subtree as JSON; conservation queryable in
+  the table itself. Unextracted sites also append to `ops_fallout`
+  (stage `300_tree_unextracted`) — admin dashboard + future checklist
+  inherit them (ADR 0045 §3). 300's engine floor is now 1.26.
+- All four clause-1 exit gates flipped (strict-xfail markers removed;
+  the lock test now tracks shipped clauses). 16 new extractor tests
+  including real corpus shapes (OR-inside-AND, computed systolic
+  expression, NOT EXISTS, STUFF/FOR XML PATH as an honest counted gap).
+- Found while proving conservation: the recorded fixtures still carry
+  pre-1.25.0 TRUNCATED fragments (~190 amputated mid-token) — parse
+  truth in CI is unaffected (fixtures replay recorded structure), but
+  fixtures must be re-recorded after the full tenant rerun on 1.25+.
+
+### Added — contracts locked in red before the tree redesign (same day, pre-release commit)
 - ADR 0044 (tree contract): faithful decision trees + blind round-trip
   verified descriptions; six clauses, each bound to a mechanical check
   in `tests/test_tree_contract.py` as STRICT xfail — CI fails the

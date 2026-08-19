@@ -16,7 +16,7 @@ enforced by tests/test_notebook_contract.py (ADR 0042).
 | 060_ingest_semantic_models | acquisition | A, B, E, G | >=1.24 | Ingest PBI semantic models (lineage, DAX, names, fallout) |
 | 100_install | verification | G | >=1.24 | Environment verification + ingestion-state report |
 | 200_parse | derivation | A, B, C, F, G | >=1.24 | Parse the SQL corpus with ScriptDom into parse tables |
-| 300_build_graph | derivation | A, B, C, F | >=1.24 | Build the knowledge graph (nodes/edges, all layers) |
+| 300_build_graph | derivation | A, B, C, F | >=1.26 | Build the knowledge graph (nodes/edges, all layers, decision trees) |
 | 400_build_metric_logic | derivation | A, E | >=1.24 | Flatten the graph into the metric card table |
 | 500_validate | verification | G | >=1.24 | Pipeline validation + deployment readiness gate |
 | 600_generate_descriptions | derivation | A | >=1.24 | Bottom-up LLM descriptions over the calculation DAG |

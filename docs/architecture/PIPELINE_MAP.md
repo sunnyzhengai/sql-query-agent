@@ -32,11 +32,13 @@ flowchart LR
   920_publish_pbi["920_publish_pbi"]:::notebook
   950_ingest_agent_events["950_ingest_agent_events"]:::notebook
   collibra_lineage_match["collibra_lineage_match"]:::notebook
+  description["description"]:::notebook
   eventhouse_semantic_search["eventhouse_semantic_search"]:::notebook
   export_test_fixtures["export_test_fixtures"]:::notebook
   health["health"]:::notebook
   manage_stewards["manage_stewards"]:::notebook
   orchestrator_core["orchestrator_core"]:::notebook
+  self_service["self-service"]:::notebook
   usage["usage"]:::notebook
   verify_graph["verify_graph"]:::notebook
   LPG_export__14_typed_tables_[("LPG export (14 typed tables)")]:::table
@@ -44,6 +46,7 @@ flowchart LR
   gov_publish_log[("gov_publish_log")]:::table
   gov_steward_assignments[("gov_steward_assignments")]:::table
   gov_turn_events[("gov_turn_events")]:::table
+  graph_decision_sites[("graph_decision_sites")]:::table
   graph_edges[("graph_edges")]:::table
   graph_nodes[("graph_nodes")]:::table
   input_dax_expressions[("input_dax_expressions")]:::table
@@ -92,9 +95,11 @@ flowchart LR
   200_parse --> ops_parse_results
   200_parse --> ops_parse_successes
   200_parse --> ops_phi_findings
+  300_build_graph --> graph_decision_sites
   300_build_graph --> graph_edges
   300_build_graph --> graph_nodes
   300_build_graph --> ops_setup_completeness
+  300_build_graph -->|enrich| ops_fallout
   400_build_metric_logic --> output_metric_logic
   400_build_metric_logic --> output_metric_twins
   500_validate --> ops_build_summary
@@ -126,6 +131,9 @@ flowchart LR
   gov_turn_events --> 950_ingest_agent_events
   gov_turn_events --> admin
   gov_turn_events --> usage
+  graph_decision_sites --> admin
+  graph_decision_sites --> description
+  graph_decision_sites --> self_service
   graph_edges --> 400_build_metric_logic
   graph_edges --> 500_validate
   graph_edges --> 600_generate_descriptions

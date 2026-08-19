@@ -29,7 +29,7 @@
 """Fabric Notebook: Build Knowledge Graph
 
 Reads from: ops_parse_results, input_dict_tables, input_dict_columns (Delta)
-Writes to:  graph_nodes, graph_edges (Delta)
+Writes to:  graph_nodes, graph_edges, graph_decision_sites, ops_fallout (Delta)
 
 Run 200_parse.py at least once before this.
 """
@@ -48,7 +48,7 @@ except ImportError:
 print(f"v{src.__version__}")
 
 # Version binding (ADR 0042): notebook/wheel skew dies here, loudly.
-REQUIRES_ENGINE = "1.24"
+REQUIRES_ENGINE = "1.26"
 from src.engine_floor import require_engine
 
 require_engine(src.__version__, REQUIRES_ENGINE, "300_build_graph")
@@ -152,6 +152,11 @@ if report_source_records or dax_records:
     for issue in out.consumption_skipped[:10]:
         print(f"  [!] lineage skipped: {issue}")
 
+# Decision tree (ADR 0044 clause 1): conservation stated out loud —
+# every unextracted site is a counted, escalated gap, never silence.
+print(f"Decision tree: {out.decision_sites_extracted} predicate sites extracted, "
+      f"{out.decision_sites_unextracted} unextracted (escalated to ops_fallout)")
+
 
 # METADATA ********************
 
@@ -175,6 +180,33 @@ edges_df.write.format("delta").mode("overwrite") \
     .option("overwriteSchema", "true").saveAsTable(config.lakehouse.graph_edges)
 
 print(f"Wrote {nodes_df.count()} nodes, {edges_df.count()} edges")
+
+# Decision tree (ADR 0044 clause 1): the faithful predicate trees, plus
+# escalated fallout for every unextracted site.
+from datetime import datetime, timezone
+
+from src.schemas import FALLOUT, GRAPH_DECISION_SITES
+
+sites_df = spark.createDataFrame(
+    out.decision_rows, schema=to_spark_schema(GRAPH_DECISION_SITES))
+sites_df.write.format("delta").mode("overwrite") \
+    .option("overwriteSchema", "true").saveAsTable("graph_decision_sites")
+print(f"Wrote {sites_df.count()} decision-site rows")
+
+if out.tree_fallout_rows:
+    run_at = datetime.now(timezone.utc).isoformat()
+    # ops_fallout's shape predates ADR 0045 clause 1; keep only its
+    # declared columns until the resolution column ships with 0045.
+    fallout_cols = [c[0] for c in FALLOUT["columns"]]
+    fallout_rows = [
+        {**{k: r.get(k) for k in fallout_cols}, "run_at": run_at}
+        for r in out.tree_fallout_rows
+    ]
+    fallout_df = spark.createDataFrame(
+        fallout_rows, schema=to_spark_schema(FALLOUT))
+    fallout_df.write.format("delta").mode("append").saveAsTable("ops_fallout")
+    print(f"[!] {len(fallout_rows)} unextracted decision sites -> ops_fallout "
+          f"(stage 300_tree_unextracted) — the admin checklist inherits these")
 
 # Record setup completeness: proceeding without an optional enrichment is
 # legitimate but DEGRADED (e.g. zero stewards) — queryable state, not just

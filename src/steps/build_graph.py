@@ -20,6 +20,11 @@ from src.graph.serialization import (
     nodes_to_row_dicts,
     parse_result_to_parsed_sql,
 )
+from src.tree.extract import (
+    build_decision_tree,
+    decision_site_rows,
+    unextracted_fallout_rows,
+)
 
 
 @dataclass
@@ -35,6 +40,11 @@ class BuildGraphOutput:
     reports_added: int = 0
     measures_added: int = 0
     consumption_skipped: "list[str]" = field(default_factory=list)
+    # Decision tree (ADR 0044 clause 1, phase 1)
+    decision_rows: "list[dict]" = field(default_factory=list)
+    tree_fallout_rows: "list[dict]" = field(default_factory=list)  # run_at stamped by caller
+    decision_sites_extracted: int = 0
+    decision_sites_unextracted: int = 0
 
 
 def build_graph_step(
@@ -68,9 +78,21 @@ def build_graph_step(
                 table_name, col_info.column_name, description=col_info.description
             )
 
+    # Decision tree (ADR 0044 clause 1): one extraction per step fragment,
+    # under the conservation law — unextractable sites become counted rows
+    # and escalated fallout, never silence.
+    decision_rows: "list[dict]" = []
+    tree_fallout_rows: "list[dict]" = []
     for pr in parse_results_rows:
         builder.add_canonical_node(pr["metric_id"], pr["name"])
-        builder.build_from_parsed_sql(pr["metric_id"], parse_result_to_parsed_sql(pr))
+        parsed = parse_result_to_parsed_sql(pr)
+        builder.build_from_parsed_sql(pr["metric_id"], parsed)
+        for cte in parsed.ctes:
+            tree = build_decision_tree(cte.sql_fragment)
+            decision_rows.extend(
+                decision_site_rows(tree, pr["metric_id"], step_name=cte.name))
+            tree_fallout_rows.extend(
+                unextracted_fallout_rows(tree, pr["metric_id"], step_name=cte.name))
 
     steward_manager = StewardManager()
     steward_manager.load_from_records(list(steward_records))
@@ -108,4 +130,10 @@ def build_graph_step(
         reports_added=reports_added,
         measures_added=measures_added,
         consumption_skipped=consumption_skipped,
+        decision_rows=decision_rows,
+        tree_fallout_rows=tree_fallout_rows,
+        decision_sites_extracted=sum(
+            r["predicate_count"] for r in decision_rows
+            if r["status"] == "extracted"),
+        decision_sites_unextracted=len(tree_fallout_rows),
     )

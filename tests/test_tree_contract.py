@@ -5,7 +5,8 @@ fail today, and CI FAILS the moment an implementation makes it pass
 while the marker is still present. Removing a marker is that clause's
 exit gate — the contract cannot be satisfied silently or partially.
 
-Intended API surface (phase targets; nothing below exists yet):
+API surface (extract.py SHIPPED in phase 1/1.26.0; the rest are
+phase targets and do not exist yet):
     src/tree/extract.py    build_decision_tree(fragment) -> DecisionTree
     src/tree/translate.py  translate_tree(tree, dict_lines, describe),
                            build_fact_prompt(node, dict_lines)
@@ -70,7 +71,6 @@ DICT_LINES = [
 
 
 class TestClause1ConservationOfDecisionSites:
-    @clause(1, phase=1)
     def test_handled_plus_unextracted_equals_total(self):
         from src.tree.extract import build_decision_tree
         tree = build_decision_tree(GNARLY_FRAGMENT)
@@ -79,7 +79,6 @@ class TestClause1ConservationOfDecisionSites:
         # window filter, IN, =, computed <, NOT EXISTS, two join ONs
         assert tree.decision_sites_total >= 6
 
-    @clause(1, phase=1)
     def test_boolean_shape_is_preserved_never_flattened(self):
         # The OR-inside-AND: flattening it to two AND-bullets silently
         # changes meaning — the tree must keep an explicit OR node.
@@ -87,7 +86,6 @@ class TestClause1ConservationOfDecisionSites:
         tree = build_decision_tree(GNARLY_FRAGMENT)
         assert tree.has_or_node(within=["900112", "3022"])
 
-    @clause(1, phase=1)
     def test_unmodeled_constructs_are_counted_not_dropped(self):
         # Dynamic SQL has no static tree — it must land in unextracted
         # with a location, never vanish (the third-bucket ban).
@@ -97,7 +95,6 @@ class TestClause1ConservationOfDecisionSites:
             "'SELECT * FROM t WHERE ' + @filter; EXEC (@sql)")
         assert tree.unextracted, "dynamic SQL must be a counted gap"
 
-    @clause(1, phase=1)
     def test_unextracted_surfaces_on_fallout_and_checklist(self):
         # Sunny 2026-08-19: "dynamic sql can't be parsed, that's ok,
         # but we need to surface them into our admin table and PBI
@@ -251,9 +248,16 @@ class TestContractIsLocked:
             assert anchor in text, f"ADR 0044 lost clause anchor: {anchor}"
 
     def test_every_clause_has_a_strict_exit_gate_in_this_file(self):
+        # A clause is either SHIPPED (marker removed, tests run green —
+        # the exit-gate flip) or still gated by a strict-xfail marker.
+        shipped = {1}  # phase 1, 1.26.0: the faithful tree extractor
         source = Path(__file__).read_text()
         for n in range(1, 7):
-            assert f"clause({n}, phase=" in source, \
-                f"clause {n} has no exit-gate skeleton"
+            if n in shipped:
+                assert f"clause({n}, phase=" not in source, \
+                    f"clause {n} shipped — its exit-gate marker must be gone"
+            else:
+                assert f"clause({n}, phase=" in source, \
+                    f"clause {n} has no exit-gate skeleton"
         assert "strict=True" in source, \
             "exit gates must be strict xfail — passing silently is drift"
