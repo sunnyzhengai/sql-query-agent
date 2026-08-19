@@ -1,6 +1,6 @@
 # 0032 — Deterministic Core, LLM Edges
 
-**Status:** Accepted
+**Status:** Accepted — description edge narrowed 2026-08-19 by [ADR 0044](0044-tree-contract-round-trip-descriptions.md): from *interpret the SQL* to *translate one tree fact at a time, then prove the translation round-trips*; the entry edge and the principle (LLM translates, data answers, human decides) stand
 **Date:** 2026-08-09
 
 > The LLM translates. The data answers. The human decides.

@@ -1,6 +1,6 @@
 # ADR 0035: Agentic Conversation over Deterministic Tools
 
-**Status:** Accepted
+**Status:** Superseded in part by [ADR 0036](0036-operations-are-the-product.md) (conversation protocol); tool layer survives as primitives
 **Date:** 2026-08-10 (evening — supersedes the dialogue machinery of ADR 0034, same day)
 
 ## Context

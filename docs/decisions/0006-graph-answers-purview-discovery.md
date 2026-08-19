@@ -1,6 +1,6 @@
 # ADR 0006: Knowledge Graph Answers Questions; Purview Discovers Reports
 
-**Status:** Accepted
+**Status:** Accepted — amended 2026-08-19: since [ADR 0040](0040-consumption-layer-reports-measures.md), reports extracted from TMDL lineage are first-class graph nodes and the graph answers report-coverage questions natively; Purview remains the librarian for estate assets *outside* the extracted corpus (optional adapter per ADR 0009)
 **Date:** 2026-07 (recorded 2026-08-02)
 
 ## Context

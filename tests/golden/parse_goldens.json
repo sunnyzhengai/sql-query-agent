@@ -1,246 +1,4 @@
 {
-  "reporting/USP_ED_Sepsis.sql": {
-    "cte_count": 41,
-    "cte_names": [
-      "Base_Pop",
-      "AllMeds",
-      "BasePopABX",
-      "ABX",
-      "BasePopBolus",
-      "Pressors",
-      "FirstABXAdminTimeDetails",
-      "Flowsheets",
-      "EncounterWeights",
-      "Hypotension",
-      "Systolic",
-      "BloodPressure",
-      "SepsisAlertCancelled",
-      "Base_Pop_Severe_ED_Scores",
-      "ED_PositiveScores",
-      "ED_NegativeScores",
-      "LDA",
-      "All_LDAs",
-      "TimeOrdered_LDAs",
-      "Labs_and_Cultures",
-      "Labs",
-      "TimeOrdered_Labs",
-      "Cultures",
-      "AllCultures",
-      "PositiveCultures",
-      "NegativeCultures",
-      "ADT",
-      "ED2HEMONC",
-      "ED2ICU",
-      "ED2GEN",
-      "BPA",
-      "BedEvents",
-      "Base_Pop_ED_Readmit_All",
-      "Base_Pop_ED_Readmit",
-      "PatientLocation",
-      "FirstPositiveOD_To_ABXAdminTime",
-      "ED_BORDER",
-      "SSOrderSet",
-      "OrderMetricIDs",
-      "SSOrderSetOSQ_PRL",
-      "Final"
-    ],
-    "table_refs_per_cte": {
-      "Base_Pop": 10,
-      "AllMeds": 3,
-      "BasePopABX": 4,
-      "ABX": 7,
-      "BasePopBolus": 0,
-      "Pressors": 1,
-      "FirstABXAdminTimeDetails": 6,
-      "Flowsheets": 2,
-      "EncounterWeights": 0,
-      "Hypotension": 0,
-      "Systolic": 1,
-      "BloodPressure": 0,
-      "SepsisAlertCancelled": 0,
-      "Base_Pop_Severe_ED_Scores": 0,
-      "ED_PositiveScores": 0,
-      "ED_NegativeScores": 0,
-      "LDA": 2,
-      "All_LDAs": 3,
-      "TimeOrdered_LDAs": 0,
-      "Labs_and_Cultures": 2,
-      "Labs": 0,
-      "TimeOrdered_Labs": 1,
-      "Cultures": 1,
-      "AllCultures": 2,
-      "PositiveCultures": 0,
-      "NegativeCultures": 0,
-      "ADT": 2,
-      "ED2HEMONC": 0,
-      "ED2ICU": 0,
-      "ED2GEN": 1,
-      "BPA": 8,
-      "BedEvents": 3,
-      "Base_Pop_ED_Readmit_All": 1,
-      "Base_Pop_ED_Readmit": 1,
-      "PatientLocation": 1,
-      "FirstPositiveOD_To_ABXAdminTime": 0,
-      "ED_BORDER": 2,
-      "SSOrderSet": 3,
-      "OrderMetricIDs": 2,
-      "SSOrderSetOSQ_PRL": 2,
-      "Final": 4
-    },
-    "depends_on_per_cte": {
-      "Base_Pop": [],
-      "AllMeds": [
-        "Base_Pop"
-      ],
-      "BasePopABX": [
-        "AllMeds"
-      ],
-      "ABX": [],
-      "BasePopBolus": [
-        "AllMeds"
-      ],
-      "Pressors": [
-        "AllMeds"
-      ],
-      "FirstABXAdminTimeDetails": [
-        "BasePopABX"
-      ],
-      "Flowsheets": [
-        "Base_Pop"
-      ],
-      "EncounterWeights": [
-        "Flowsheets"
-      ],
-      "Hypotension": [
-        "Flowsheets"
-      ],
-      "Systolic": [],
-      "BloodPressure": [
-        "Flowsheets"
-      ],
-      "SepsisAlertCancelled": [
-        "Flowsheets"
-      ],
-      "Base_Pop_Severe_ED_Scores": [
-        "Flowsheets"
-      ],
-      "ED_PositiveScores": [
-        "Base_Pop_Severe_ED_Scores"
-      ],
-      "ED_NegativeScores": [
-        "Base_Pop_Severe_ED_Scores",
-        "ED_PositiveScores"
-      ],
-      "LDA": [
-        "Base_Pop"
-      ],
-      "All_LDAs": [],
-      "TimeOrdered_LDAs": [
-        "All_LDAs"
-      ],
-      "Labs_and_Cultures": [
-        "Base_Pop"
-      ],
-      "Labs": [
-        "Labs_and_Cultures"
-      ],
-      "TimeOrdered_Labs": [],
-      "Cultures": [
-        "Labs_and_Cultures"
-      ],
-      "AllCultures": [],
-      "PositiveCultures": [
-        "AllCultures"
-      ],
-      "NegativeCultures": [
-        "AllCultures"
-      ],
-      "ADT": [
-        "Base_Pop"
-      ],
-      "ED2HEMONC": [
-        "ADT"
-      ],
-      "ED2ICU": [
-        "ADT"
-      ],
-      "ED2GEN": [
-        "ADT"
-      ],
-      "BPA": [
-        "Base_Pop"
-      ],
-      "BedEvents": [
-        "Base_Pop"
-      ],
-      "Base_Pop_ED_Readmit_All": [
-        "Base_Pop"
-      ],
-      "Base_Pop_ED_Readmit": [
-        "ED_PositiveScores",
-        "Base_Pop"
-      ],
-      "PatientLocation": [
-        "Base_Pop"
-      ],
-      "FirstPositiveOD_To_ABXAdminTime": [
-        "BasePopABX",
-        "ED_PositiveScores"
-      ],
-      "ED_BORDER": [
-        "Base_Pop"
-      ],
-      "SSOrderSet": [
-        "Base_Pop"
-      ],
-      "OrderMetricIDs": [],
-      "SSOrderSetOSQ_PRL": [
-        "OrderMetricIDs",
-        "OrderMetricIDs",
-        "OrderMetricIDs"
-      ],
-      "Final": [
-        "Base_Pop",
-        "Base_Pop_SepsisScores_ConCat",
-        "Base_Pop_Severe_ED_Scores",
-        "ED_PositiveScores",
-        "ED_NegativeScores",
-        "BasePopABX",
-        "BasePopBolus",
-        "Pressors",
-        "FirstABXAdminTimeDetails",
-        "EncounterWeights",
-        "Hypotension",
-        "LDA",
-        "Labs",
-        "Cultures",
-        "ED2HEMONC",
-        "ED2ICU",
-        "ED2GEN",
-        "BPA",
-        "Base_Pop_ED_Readmit_All",
-        "Base_Pop_ED_Readmit",
-        "Base_Pop_ENC_Reason",
-        "FirstPositiveOD_To_ABXAdminTime",
-        "SSOrderSet",
-        "SepsisAlertCancelled",
-        "BedEvents",
-        "BloodPressure",
-        "ED_BORDER"
-      ]
-    },
-    "final_table_count": 0,
-    "final_tables": [],
-    "final_cte_refs": [
-      "Final",
-      "Base_Pop_Severe_ED_Scores",
-      "PatientLocation",
-      "BloodPressure"
-    ],
-    "has_normalized_sql": true,
-    "line_count": 3449,
-    "error": null
-  },
   "reporting/USP_IP_SEPSIS.sql": {
     "cte_count": 60,
     "cte_names": [
@@ -2041,5 +1799,247 @@
   "reports/USP_RPTS_Severe_Sepsis.sql": {
     "cte_count": 0,
     "error": "CONVERT function at T-SQL does not support format style 126"
+  },
+  "reporting/USP_ED_SEPSIS.sql": {
+    "cte_count": 41,
+    "cte_names": [
+      "Base_Pop",
+      "AllMeds",
+      "BasePopABX",
+      "ABX",
+      "BasePopBolus",
+      "Pressors",
+      "FirstABXAdminTimeDetails",
+      "Flowsheets",
+      "EncounterWeights",
+      "Hypotension",
+      "Systolic",
+      "BloodPressure",
+      "SepsisAlertCancelled",
+      "Base_Pop_Severe_ED_Scores",
+      "ED_PositiveScores",
+      "ED_NegativeScores",
+      "LDA",
+      "All_LDAs",
+      "TimeOrdered_LDAs",
+      "Labs_and_Cultures",
+      "Labs",
+      "TimeOrdered_Labs",
+      "Cultures",
+      "AllCultures",
+      "PositiveCultures",
+      "NegativeCultures",
+      "ADT",
+      "ED2HEMONC",
+      "ED2ICU",
+      "ED2GEN",
+      "BPA",
+      "BedEvents",
+      "Base_Pop_ED_Readmit_All",
+      "Base_Pop_ED_Readmit",
+      "PatientLocation",
+      "FirstPositiveOD_To_ABXAdminTime",
+      "ED_BORDER",
+      "SSOrderSet",
+      "OrderMetricIDs",
+      "SSOrderSetOSQ_PRL",
+      "Final"
+    ],
+    "table_refs_per_cte": {
+      "Base_Pop": 10,
+      "AllMeds": 3,
+      "BasePopABX": 4,
+      "ABX": 7,
+      "BasePopBolus": 0,
+      "Pressors": 1,
+      "FirstABXAdminTimeDetails": 6,
+      "Flowsheets": 2,
+      "EncounterWeights": 0,
+      "Hypotension": 0,
+      "Systolic": 1,
+      "BloodPressure": 0,
+      "SepsisAlertCancelled": 0,
+      "Base_Pop_Severe_ED_Scores": 0,
+      "ED_PositiveScores": 0,
+      "ED_NegativeScores": 0,
+      "LDA": 2,
+      "All_LDAs": 3,
+      "TimeOrdered_LDAs": 0,
+      "Labs_and_Cultures": 2,
+      "Labs": 0,
+      "TimeOrdered_Labs": 1,
+      "Cultures": 1,
+      "AllCultures": 2,
+      "PositiveCultures": 0,
+      "NegativeCultures": 0,
+      "ADT": 2,
+      "ED2HEMONC": 0,
+      "ED2ICU": 0,
+      "ED2GEN": 1,
+      "BPA": 8,
+      "BedEvents": 3,
+      "Base_Pop_ED_Readmit_All": 1,
+      "Base_Pop_ED_Readmit": 1,
+      "PatientLocation": 1,
+      "FirstPositiveOD_To_ABXAdminTime": 0,
+      "ED_BORDER": 2,
+      "SSOrderSet": 3,
+      "OrderMetricIDs": 2,
+      "SSOrderSetOSQ_PRL": 2,
+      "Final": 4
+    },
+    "depends_on_per_cte": {
+      "Base_Pop": [],
+      "AllMeds": [
+        "Base_Pop"
+      ],
+      "BasePopABX": [
+        "AllMeds"
+      ],
+      "ABX": [],
+      "BasePopBolus": [
+        "AllMeds"
+      ],
+      "Pressors": [
+        "AllMeds"
+      ],
+      "FirstABXAdminTimeDetails": [
+        "BasePopABX"
+      ],
+      "Flowsheets": [
+        "Base_Pop"
+      ],
+      "EncounterWeights": [
+        "Flowsheets"
+      ],
+      "Hypotension": [
+        "Flowsheets"
+      ],
+      "Systolic": [],
+      "BloodPressure": [
+        "Flowsheets"
+      ],
+      "SepsisAlertCancelled": [
+        "Flowsheets"
+      ],
+      "Base_Pop_Severe_ED_Scores": [
+        "Flowsheets"
+      ],
+      "ED_PositiveScores": [
+        "Base_Pop_Severe_ED_Scores"
+      ],
+      "ED_NegativeScores": [
+        "Base_Pop_Severe_ED_Scores",
+        "ED_PositiveScores"
+      ],
+      "LDA": [
+        "Base_Pop"
+      ],
+      "All_LDAs": [],
+      "TimeOrdered_LDAs": [
+        "All_LDAs"
+      ],
+      "Labs_and_Cultures": [
+        "Base_Pop"
+      ],
+      "Labs": [
+        "Labs_and_Cultures"
+      ],
+      "TimeOrdered_Labs": [],
+      "Cultures": [
+        "Labs_and_Cultures"
+      ],
+      "AllCultures": [],
+      "PositiveCultures": [
+        "AllCultures"
+      ],
+      "NegativeCultures": [
+        "AllCultures"
+      ],
+      "ADT": [
+        "Base_Pop"
+      ],
+      "ED2HEMONC": [
+        "ADT"
+      ],
+      "ED2ICU": [
+        "ADT"
+      ],
+      "ED2GEN": [
+        "ADT"
+      ],
+      "BPA": [
+        "Base_Pop"
+      ],
+      "BedEvents": [
+        "Base_Pop"
+      ],
+      "Base_Pop_ED_Readmit_All": [
+        "Base_Pop"
+      ],
+      "Base_Pop_ED_Readmit": [
+        "ED_PositiveScores",
+        "Base_Pop"
+      ],
+      "PatientLocation": [
+        "Base_Pop"
+      ],
+      "FirstPositiveOD_To_ABXAdminTime": [
+        "BasePopABX",
+        "ED_PositiveScores"
+      ],
+      "ED_BORDER": [
+        "Base_Pop"
+      ],
+      "SSOrderSet": [
+        "Base_Pop"
+      ],
+      "OrderMetricIDs": [],
+      "SSOrderSetOSQ_PRL": [
+        "OrderMetricIDs",
+        "OrderMetricIDs",
+        "OrderMetricIDs"
+      ],
+      "Final": [
+        "Base_Pop",
+        "Base_Pop_SepsisScores_ConCat",
+        "Base_Pop_Severe_ED_Scores",
+        "ED_PositiveScores",
+        "ED_NegativeScores",
+        "BasePopABX",
+        "BasePopBolus",
+        "Pressors",
+        "FirstABXAdminTimeDetails",
+        "EncounterWeights",
+        "Hypotension",
+        "LDA",
+        "Labs",
+        "Cultures",
+        "ED2HEMONC",
+        "ED2ICU",
+        "ED2GEN",
+        "BPA",
+        "Base_Pop_ED_Readmit_All",
+        "Base_Pop_ED_Readmit",
+        "Base_Pop_ENC_Reason",
+        "FirstPositiveOD_To_ABXAdminTime",
+        "SSOrderSet",
+        "SepsisAlertCancelled",
+        "BedEvents",
+        "BloodPressure",
+        "ED_BORDER"
+      ]
+    },
+    "final_table_count": 0,
+    "final_tables": [],
+    "final_cte_refs": [
+      "Final",
+      "Base_Pop_Severe_ED_Scores",
+      "PatientLocation",
+      "BloodPressure"
+    ],
+    "has_normalized_sql": true,
+    "line_count": 3449,
+    "error": null
   }
 }

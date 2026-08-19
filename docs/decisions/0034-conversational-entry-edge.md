@@ -1,6 +1,6 @@
 # ADR 0034: The Conversational Entry Edge — Language to the LLM, Computation to Code
 
-**Status:** Accepted
+**Status:** Superseded in part by [ADR 0035](0035-agentic-conversation-deterministic-tools.md) (dialogue machinery); engine content survives
 **Date:** 2026-08-10
 
 ## Context

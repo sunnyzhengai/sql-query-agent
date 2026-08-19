@@ -1,6 +1,6 @@
 # 0019 — CTE descriptions, generated bottom-up, before metric descriptions
 
-**Status:** Accepted
+**Status:** Accepted — amended 2026-08-19 by [ADR 0044](0044-tree-contract-round-trip-descriptions.md): bottom-up ordering, content-hash caching, and metric-from-roots composition survive; the step input changes from raw `sqlFragment` to typed decision-tree facts, and acceptance changes from string-space grounding to blind round-trip verification
 **Date:** 2026-08-04
 
 ## Context

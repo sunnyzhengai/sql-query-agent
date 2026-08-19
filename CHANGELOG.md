@@ -8,6 +8,25 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added — contracts locked in red before the tree redesign
+- ADR 0044 (tree contract): faithful decision trees + blind round-trip
+  verified descriptions; six clauses, each bound to a mechanical check
+  in `tests/test_tree_contract.py` as STRICT xfail — CI fails the
+  moment a clause passes with its marker present; removing the marker
+  is the phase's exit gate. Fixtures are real corpus constructs from
+  the traced proc.
+- ADR 0045 (escalation contract): no silent residue — every fallout
+  row declares `resolution ∈ {auto_resolved, escalated}`; escalated +
+  open rows ARE the human checklist (`ops_human_checklist`, future
+  admin-dashboard page); novelty (unknown M shapes, unmodeled SQL
+  constructs, dynamic SQL, flagged round trips) always escalates.
+  Gated in `tests/test_escalation_contract.py`, same red pattern.
+- ADR audit: 0003/0006/0019/0032 amended with dated notes (fragments
+  become provenance-only, reports are in-graph since 0040, tree facts
+  replace raw-fragment prompting, description edge narrowed);
+  0034/0035 file statuses synced with the index (superseded in part);
+  index rows added for 0041–0045.
+
 ---
 
 ## [1.25.0] - 2026-08-19

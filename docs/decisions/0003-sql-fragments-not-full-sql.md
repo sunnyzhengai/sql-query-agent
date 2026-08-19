@@ -1,6 +1,6 @@
 # ADR 0003: Store sql_fragments, Not Full SQL Blobs
 
-**Status:** Accepted
+**Status:** Accepted — amended 2026-08-19 by [ADR 0044](0044-tree-contract-round-trip-descriptions.md): the fragment stays stored verbatim as provenance and audit trail, but it is no longer the description LLM's input; decision facts come from the persisted tree
 **Date:** 2026-07 (recorded 2026-08-02)
 
 ## Context
