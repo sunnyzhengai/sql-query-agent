@@ -99,7 +99,11 @@ marker is the exit gate, mechanically enforced, per phase:
 
 1. **Persist the faithful tree** (extractor; predicate/join/window
    nodes; conservation counter; `unextracted` → fallout + checklist).
-   Exit: clause 1 green.
+   Exit: clause 1 green. — **SHIPPED 1.26.0 (2026-08-19)**: sqlglot-AST
+   extractor in `src/tree/extract.py`, conservation proven over all
+   417 recorded corpus fragments, `graph_decision_sites` written by
+   300, unextracted sites escalated via `ops_fallout`
+   stage `300_tree_unextracted`.
 2. **Tree-walking translator** (fact prompts + ledger accounting).
    Exit: clauses 2 and 5 green.
 3. **Blind round-trip loop** (verifier, deterministic diff, template
