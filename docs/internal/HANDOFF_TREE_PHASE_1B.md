@@ -50,3 +50,13 @@ artifact from the ScriptDom path — expected: 43/43 statements, ~442+
 sites (CTE statements add theirs), gaps ≈ 0 or named, decision→column
 edge counts, reachability tally — reviewed by Sunny before 1b is
 called done.
+
+**Join-map completeness criterion** (Sunny, 2026-08-19: "we can't miss
+joins — later the LLM has gaps when drawing from the joins"): the
+sqlglot bootstrap's measured blind spot is **33 unparseable statements
+holding 192 JOIN keywords with zero evidence contributed** (the script
+prints this tally). The ScriptDom-regenerated map must reconcile:
+every JOIN occurrence in the corpus is either an evidenced pair or a
+counted skip with a reason — blind spot 0. Until that reconciliation
+passes, the join map stays status `planned` and the discovery engine
+(ADR 0046) must not consume it.

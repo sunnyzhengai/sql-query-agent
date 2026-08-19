@@ -157,9 +157,22 @@ def main() -> None:
     }
     pair_counts: "Counter[tuple]" = Counter()
     skips: "Counter[str]" = Counter()
+    blind_statements = 0
+    blind_joins = 0
     files = sorted(SQL_DIR.rglob("*.sql"))
     for path in files:
         for statement in split_statements(path.read_text(encoding="utf-8-sig")):
+            # A statement sqlglot cannot parse contributes NO evidence —
+            # its joins are the map's blind spot, and the blind spot must
+            # be a NUMBER, not prose (Sunny, 2026-08-19: "we can't miss
+            # joins"). ScriptDom regeneration (phase 1b) closes it.
+            if not alias_map(statement):
+                joins_here = len(re.findall(
+                    r"\bJOIN\b", _strip_noise(statement), re.I))
+                if joins_here:
+                    blind_statements += 1
+                    blind_joins += joins_here
+                continue
             for a, b, reason in join_pairs(statement):
                 if reason is not None:
                     skips[reason] += 1
@@ -184,6 +197,9 @@ def main() -> None:
     print("counted skips (no silent drops):")
     for reason, n in skips.most_common():
         print(f"  {reason}: {n}")
+    print(f"BLIND SPOT (sqlglot bootstrap limit, closed by phase 1b): "
+          f"{blind_statements} unparseable statements holding "
+          f"{blind_joins} JOIN keywords contributed no evidence")
     print(f"wrote {OUT.relative_to(REPO)}")
 
 
