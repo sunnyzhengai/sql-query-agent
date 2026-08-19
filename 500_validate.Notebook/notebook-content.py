@@ -49,7 +49,7 @@ except ImportError:
 print(f"v{src.__version__}")
 
 # Version binding (ADR 0042): notebook/wheel skew dies here, loudly.
-REQUIRES_ENGINE = "1.22"
+REQUIRES_ENGINE = "1.24"
 from src.engine_floor import require_engine
 
 require_engine(src.__version__, REQUIRES_ENGINE, "500_validate")
@@ -436,8 +436,7 @@ journey = metric_journey_rows(
 spark.createDataFrame(
     [tuple(r[c] for c, _, _ in METRIC_JOURNEY["columns"]) for r in journey],
     schema=to_spark_schema(METRIC_JOURNEY)) \
-    .write.format("delta").mode("overwrite").option("overwriteSchema", "true") \
-    .saveAsTable("ops_metric_journey")
+    .write.format("delta").mode("append").saveAsTable("ops_metric_journey")
 tied = sum(1 for r in journey if r["report_count"])
 print(f"\nops_metric_journey: {len(journey)} metrics "
       f"({tied} tied to PBI reports)")
@@ -450,8 +449,7 @@ if report_journey:
         [tuple(r[c] for c, _, _ in REPORT_JOURNEY["columns"])
          for r in report_journey],
         schema=to_spark_schema(REPORT_JOURNEY)) \
-        .write.format("delta").mode("overwrite") \
-        .option("overwriteSchema", "true").saveAsTable("ops_report_journey")
+        .write.format("delta").mode("append").saveAsTable("ops_report_journey")
 print(f"ops_report_journey: {len(report_journey)} reports")
 print("\nThe journey dashboard reads these two tables + ops_funnel — "
       "see docs/internal/RUNBOOK_JOURNEY_DASHBOARD.md")

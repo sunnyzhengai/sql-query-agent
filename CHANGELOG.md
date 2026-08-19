@@ -10,6 +10,27 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.24.0] - 2026-08-19
+
+### Added — trust instrumentation (Sunny's three asks)
+- Deep trace of reporting.USP_ED_Sepsis (docs/internal/
+  TRACE_USP_ED_SEPSIS.md): 43/43 steps exact, 45/48 reads (known
+  suppression class), card correct; description audit found fabricated
+  filters and invented literal codes at the STEP level — mechanism
+  identified, fix designed (HANDOFF_DESCRIPTION_GROUNDING_GATE).
+- src/replan.py: registry-derived minimal re-run advisor — consumers
+  propagation + owner-invalidates-enrichers; the 2026-08-18
+  description-wipe incident is the acceptance test.
+- Journey tables are per-run HISTORY (append; unique per run_at +
+  entity): every proc's lifecycle by each notebook run, per the
+  admin-journey handoff; dashboard runbook gains the run-over-run
+  lifecycle matrix and quick-create path.
+
+### Changed
+- Engine floor raised to 1.24 (journey contract change rides with it).
+
+---
+
 ## [1.23.0] - 2026-08-18
 
 ### Added — admin journey dashboard tables (family G's UI half)

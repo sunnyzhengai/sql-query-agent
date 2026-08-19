@@ -48,7 +48,7 @@ except ImportError:
 print(f"v{src.__version__}")
 
 # Version binding (ADR 0042): notebook/wheel skew dies here, loudly.
-REQUIRES_ENGINE = "1.22"
+REQUIRES_ENGINE = "1.24"
 from src.engine_floor import require_engine
 
 require_engine(src.__version__, REQUIRES_ENGINE, "610_generate_agent_descriptions")

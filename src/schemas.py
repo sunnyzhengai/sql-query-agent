@@ -1410,14 +1410,17 @@ METRIC_JOURNEY = {
         "described_status, report ties, published flags. Materialized by "
         "500_validate as joins over contract tables ONLY; reconciliation "
         "tests pin the totals so the dashboard cannot drift from the "
-        "system of record. Metric-grain, always — junctions never "
-        "multiply the driving grain."
+        "system of record. APPEND-per-run (2026-08-18, Sunny: 'every "
+        "proc's lifecycle by each notebook run'): one row per metric "
+        "PER RUN — the dashboard filters latest run or charts history. "
+        "Within a run, metric-grain always — junctions never multiply "
+        "the driving grain."
     ),
     "domain": "operations",
     "status": "active",
     "owner": {"notebook": "500_validate",
               "module": "src/governance/journey.py"},
-    "write_mode": "overwrite",
+    "write_mode": "append",
     "enrichers": [],
     "consumers": ["admin telemetry report"],
     "columns": [
@@ -1453,7 +1456,7 @@ METRIC_JOURNEY = {
         "published_pbi_writeback": "A successful PBI writeback landed",
     },
     "invariants": [
-        {"kind": "unique", "columns": ["metric_id"]},
+        {"kind": "unique", "columns": ["run_at", "metric_id"]},
     ],
 }
 
@@ -1463,13 +1466,14 @@ REPORT_JOURNEY = {
         "Report-grain journey (the other side of the M:N tie): one row "
         "per PBI report — workspace NAME, proc count + list, tie kind "
         "(lineage vs corpus membership). Exploded (proc, report) pairs "
-        "stay in input_report_sources; clickthrough joins there."
+        "stay in input_report_sources; clickthrough joins there. "
+        "APPEND-per-run; filter latest run for current state."
     ),
     "domain": "operations",
     "status": "active",
     "owner": {"notebook": "500_validate",
               "module": "src/governance/journey.py"},
-    "write_mode": "overwrite",
+    "write_mode": "append",
     "enrichers": [],
     "consumers": ["admin telemetry report"],
     "columns": [
@@ -1490,7 +1494,7 @@ REPORT_JOURNEY = {
                     "lineage_outside_corpus | lineage",
     },
     "invariants": [
-        {"kind": "unique", "columns": ["report_name"]},
+        {"kind": "unique", "columns": ["run_at", "report_name"]},
     ],
 }
 

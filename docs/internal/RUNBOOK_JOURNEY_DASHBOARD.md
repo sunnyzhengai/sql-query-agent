@@ -6,6 +6,23 @@ materializes — `ops_metric_journey`, `ops_report_journey`, `ops_funnel`
 (accuracy contract); if a number looks wrong, the bug is in the
 pipeline, never the report.
 
+## History note (1.24.0)
+
+Both journey tables are now APPEND-per-run: every 500 run adds a full
+snapshot stamped run_at. "Current state" visuals filter to the latest
+run_at; the per-run lifecycle view (which notebook failed/succeeded,
+run over run) charts across run_at.
+
+## Fastest build path (the quick-create you already know)
+
+1. Power BI experience -> Create -> the "Choose tables from OneLake"
+   dialog (Direct Lake) -> name it `AIVIA Admin Journey`, workspace
+   AIVIA-DEV-2.
+2. Tick exactly: ops_metric_journey, ops_report_journey, ops_funnel,
+   ops_fallout. Confirm.
+3. Build the visuals below in the auto-created report; save as
+   `AIVIA Admin Journey`.
+
 ## Steps
 
 1. Run the pipeline through `500_validate` at least once (it writes all
@@ -19,7 +36,18 @@ pipeline, never the report.
       used only for drillthrough).
    b. No relationship between the two journey tables (different grains
       — filter through visuals instead).
-5. Visual 1 — **the journey table** (Table visual):
+4b. Page filter for "current state" pages: `run_at` = Top 1 by run_at
+   (both journey tables and ops_funnel are per-run history now).
+
+5. Visual 0 — **run-over-run lifecycle** (the "which notebook
+   failed/succeeded per run" view): Matrix from `ops_metric_journey` —
+   Rows: `run_at`; Values: count of `metric_id`, sum of `parsed`,
+   count where `error_type` not blank, sum of `card`, count of
+   `described_status` = "ok". Each row is one pipeline run; a drop in
+   any column names the stage that regressed, instantly. Pair with a
+   line chart of those counts by `run_at` for the trend.
+
+5c. Visual 1 — **the journey table** (Table visual):
    a. Fields, in order: `metric_id`, `source_type`, `source_schema`,
       `loaded`, `parsed`, `error_type`, `in_graph`, `card`,
       `described_status`, `report_count`, `report_names`,

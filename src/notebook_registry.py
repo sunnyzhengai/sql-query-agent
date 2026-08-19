@@ -47,7 +47,7 @@ QUESTION_FAMILIES = ("A", "B", "C", "D", "E", "F", "G")
 
 # The engine floor asserted by every notebook this release. Raise it
 # when a notebook starts depending on newer src/ surface.
-ENGINE_FLOOR = "1.22"
+ENGINE_FLOOR = "1.24"
 
 NOTEBOOK_REGISTRY: "dict[str, dict]" = {
     "010_ingest_sql_filedrop": {

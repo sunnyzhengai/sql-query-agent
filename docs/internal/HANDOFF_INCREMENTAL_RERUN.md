@@ -1,5 +1,8 @@
 # Handoff — selective re-run + embedding carry-forward (scale economics)
 
+> **Status (2026-08-19, dev session): Gap 2 SHIPPED in 1.24.0.**
+> src/replan.py — replan(changed_tables) derives the minimal ordered notebook list from TABLE_REGISTRY (consumers + the owner-invalidates-enrichers rule); the acceptance test IS the 2026-08-18 incident (names change must include 600). Library + replan_lines() advisory; surfacing in a driver notebook and 500's output = next. Gap 1 (embedding carry-forward in 700) still open.
+
 **From:** dev session, 2026-08-18 (Sunny, during the demo rebuild: "each
 time if one thing didn't load, we have to re-run the whole pipeline? for
 a customer with thousands of procs and hundreds of thousands of
