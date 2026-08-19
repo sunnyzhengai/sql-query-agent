@@ -1,33 +1,43 @@
-# Tree phase 1 — ED sepsis acceptance output (for Sunny's gap review)
+# Tree phase 1 — ED sepsis acceptance output (traced, reconciled)
 
 Per the standing protocol (2026-08-19): every tree-contract phase
-ships real test output against `[reporting].[USP_ED_Sepsis]` for
-Sunny's domain review before the phase is called done.
+ships real test output against `[reporting].[USP_ED_Sepsis]`, and the
+dev session traces the SQL itself — the reviewer checks domain
+judgment, not arithmetic.
 
-**Method:** the 33 `SELECT ... INTO #step` statements were carved as
-FULL statements from the raw proc (70,703 chars, session scratchpad —
-the same source the deep trace used) and run through
-`src.tree.extract.build_decision_tree` (1.26.0). Carving was manual
-demo surgery; phase 1b replaces it with ScriptDom-extracted fragments
-in the pipeline itself. Conservation was asserted per step: zero
-violations.
+**Correction note (same day):** the first version of this artifact
+reported 33 steps / 99.2% by carving only the `SELECT INTO` blocks —
+it missed the 6 CTE statements, the final SELECT, and 2 IF blocks, and
+its splitter also cut two statements mid-parenthesis. The full trace
+below supersedes it. Overstated coverage is exactly the failure class
+this protocol exists to catch; it caught its own author first.
 
-## Summary
+## Method
+
+All 43 statements of the raw proc (70,703 chars) were bounded with a
+paren-depth-aware splitter (demo surgery — phase 1b replaces this with
+ScriptDom's own statement list) and run through
+`src.tree.extract.build_decision_tree` (1.26.0). Verification was
+INDEPENDENT: per statement, textual counts of `JOIN` / `WHERE` /
+`WHEN` (comments and strings stripped) were compared against the
+extractor's per-context site counts.
+
+## Results
 
 | | |
 |---|---|
-| Steps run | 33 (all `SELECT INTO` steps of the proc) |
-| Decision sites (predicate grain) | **400** |
-| Extracted | **397 (99.2%)** |
-| Counted gaps | **3** (named below — no third bucket) |
+| Statements analyzed | **43** (matches the deep trace's 43-step inventory) |
+| Decision sites (predicate grain) | **442** |
+| Extracted | **431 (97.5%)** |
+| Counted gaps | **11** — every one named below |
+| Extractor-vs-textual mismatches on clean statements | **0 of 32** |
 
-Largest step: `Final` — 255 sites, almost all `case_when` (the giant
-final-select CASE machinery). Sanity question for the reviewer: does
-~400 decisions across this proc match your read of it?
+Zero mismatches means: on every statement the extractor fully parsed,
+its join/where/case site counts equal the independently counted
+occurrences in the SQL text — including `Final` (38 joins / 2 wheres /
+66 case-whens) and `Base_Pop` (9/1/0).
 
 ## Base_Pop — the step whose description was once fabricated
-
-The extractor's complete decision inventory for Base_Pop:
 
 ```
 [where]   BETWEEN: EEF.ADT_ARRIVAL_DATE BETWEEN @dStartDate AND @dEndDate
@@ -38,44 +48,47 @@ The extractor's complete decision inventory for Base_Pop:
 [join_on] EQ: REG.ETHNIC_GROUP_CODE = PAT.ETHNIC_GROUP_CODE
 [join_on] AND
           EQ: RACE.PATIENT_ID = PAT.PATIENT_ID
-          EQ: RACE.LINE = 1
+          EQ: RACE.LINE = 1        <- line-table fan-out qualifier, captured in place
 [join_on] EQ: RPR.PATIENT_RACE_CODE = RACE.PATIENT_RACE_CODE
 [join_on] EQ: DEP.DEPARTMENT_ID = HE.DEPARTMENT_ID
 [join_on] EQ: LOC.LOC_ID = DEP.REV_LOC_ID
 ```
 
-Two things this proves mechanically:
+Exactly ONE population filter exists — the arrival-date window. The
+triage/admission/cancelled filters the old LLM description invented
+have no node here; under the tree architecture (clauses 2+5) a
+description of a nonexistent decision has no input to arise from and
+no ledger entry to survive on.
 
-1. **Exactly ONE population filter exists** — the arrival-date window.
-   The triage/admission/cancelled filters the old LLM description
-   invented have no node to attach to. Under the tree architecture the
-   translator cannot voice a decision that has no node (clause 2 +
-   clause 5 ledger).
-2. **`RACE.LINE = 1` is captured in place** — the line-table
-   fan-out qualifier riding the join (the "qualifying predicates"
-   discussed 2026-08-19). Raw schema-map synthesis would not know it;
-   shape reuse carries it.
+## The 11 gaps, classified (all sqlglot 19.7 limits; ScriptDom parses
+## every one of these classes — the 200 trace was 43/43)
 
-## The 3 counted gaps (all parse_failed, sqlglot)
+| Class | Count | Statements | Note |
+|---|---|---|---|
+| `WITH cte AS (...) SELECT ... INTO` | 6 | lines 285, 787, 1089, 1439, 1481, 2199 | "Failed to parse any statement following CTE" — CTE+SELECT INTO unsupported |
+| `STUFF(... FOR XML PATH(''))` | 2 | Base_Pop_ENC_Reason, ..._ConCat | T-SQL string aggregation idiom |
+| `SELECT * INTO ... UNION` | 1 | Cultures | |
+| `IF @param IS NULL ... SET @d = fn_parse_date('MB-12')` | 2 | lines 29, 39 | the DEFAULT REPORTING WINDOW logic — see design note |
+| Expected after phase 1b (ScriptDom port) | **~0** | | |
 
-| Step | Construct | Note |
-|---|---|---|
-| Base_Pop_ENC_Reason | `STUFF((SELECT ';' + ... FOR XML PATH('')))` | the T-SQL string-aggregation idiom |
-| Base_Pop_SepsisScores_ConCat | same `STUFF/FOR XML PATH` idiom | |
-| Cultures | `SELECT * INTO ... FROM x UNION ...` | SELECT INTO + UNION |
+**Design note for phase 1b (flagged for Sunny):** the two IF blocks
+are the parameter-defaulting logic — the 12-month default window
+(MB-12 → T-1) that the original deep trace called out as a major
+description omission. It is a real business decision but control-flow
+grain, not predicate grain. Phase 1b must decide how the tree models
+it (e.g., a `parameter_default` site kind) rather than leaving it a
+permanent counted gap.
 
-Both constructs are ordinary T-SQL that ScriptDom parses natively —
-**they are expected to go to zero in phase 1b** (the ScriptDom-visitor
-port). Until then, on a tenant run they surface as `ops_fallout`
-stage `300_tree_unextracted` — visible, escalated, never silent.
+## Remaining reviewer questions (domain judgment only)
 
-## Reviewer checklist (Sunny)
+1. 442 decision sites across the proc, 255 of them in `Final`'s CASE
+   machinery — does that match your read?
+2. Is any decision you know is in Base_Pop's SQL absent from the
+   inventory above?
+3. Do you agree the IF/default-window logic must become a modeled
+   site kind in 1b (vs staying a counted gap)?
 
-1. Does ~400 decision sites match your read of the proc? Any step's
-   count look wrong (too high = double-counting, too low = misses)?
-2. In Base_Pop's inventory: any decision you know is in the SQL that
-   is absent above?
-3. After your 300 run on 1.26+, the same view comes from the tenant:
+After the 300-on-1.26 tenant run, the same view comes from:
 
 ```sql
 SELECT step_name, context, status, predicate_count,
@@ -85,5 +98,4 @@ WHERE metric_id LIKE '%ED_Sepsis%'
 ORDER BY step_name, site_id
 ```
 
-Compare its totals to this document; deltas are gaps in either the
-carving (this doc) or the pipeline (worse — report them).
+Deltas against this document are gaps in the pipeline — report them.
