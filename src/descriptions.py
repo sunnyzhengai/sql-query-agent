@@ -36,7 +36,7 @@ from src.models import EdgeType, NodeLayer
 # warehouse identifiers — the fix is grounded translation material
 # (the data dictionary the graph already holds) plus a ban on raw
 # identifiers in the output.
-PROMPT_VERSION = "3"
+PROMPT_VERSION = "4"
 
 STEP_PROMPT = (
     "You are documenting a certified business metric's calculation step "
@@ -58,8 +58,14 @@ STEP_PROMPT = (
     "instead, and refer to earlier steps by what they produce. Never "
     "write vague fillers such as 'specific', 'specified', 'certain', "
     "or 'various' in place of a value. Ground every line in the SQL "
-    "above; describe THIS step only, not its dependencies. No patient "
-    "identifiers, no preamble."
+    "above; describe THIS step only, not its dependencies. Columns "
+    "that are merely SELECTED as output are NOT filters — never "
+    "describe a selected column as a filter, requirement, or "
+    "exclusion; only conditions written in WHERE, JOIN ON, HAVING, or "
+    "CASE WHEN are decisions. Never write a code, number, or threshold "
+    "that does not appear in the SQL above. If the SQL makes no "
+    "decisions, write no decision lines. No patient identifiers, no "
+    "preamble."
 )
 
 MEASURE_PROMPT = (
@@ -116,6 +122,108 @@ _RAW_IDENTIFIERS = re.compile(
     r"(#\w+|`[^`]+`|\b[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)+\b)")
 
 
+
+
+# --- The grounding gate (2026-08-19, TRACE_USP_ED_SEPSIS) -------------
+# Field-proven failure modes in production descriptions: (1) SELECTed
+# columns hallucinated into filters ("excludes pending or cancelled"
+# with no such condition anywhere), (2) invented literal codes
+# ("flowsheet IDs 123 and 456" vs the real 900112/900111). The prompt
+# already forbade both; prompt instructions are intent — only
+# mechanical verification survives (the notebook-contract lesson).
+
+_OUT_NUMBERS = re.compile(r"\d{2,}")
+_OUT_QUOTED = re.compile(r"'([^']{1,40})'")
+_FILTER_CLAIM = re.compile(
+    r"(?i)\b(exclud\w*|includes? only|only includ\w*|filters?\b|"
+    r"requir\w+|must have|limited to|restrict\w*)\b")
+_CLAIM_STOPWORDS = frozenset(
+    "encounters includes include included excludes exclude excluded "
+    "filters filter filtered records results patients patient orders "
+    "information department departments emergency hospital associated "
+    "between during where which their those based table tables step "
+    "steps only that this with from have been were each every there "
+    "measurements medications details specific specified certain "
+    "various".split())
+
+
+def _condition_text(fragment: str) -> str:
+    """The parts of the SQL that actually DECIDE: windows of text after
+    WHERE / ON / HAVING / AND / WHEN keywords. Approximate by design —
+    used to tell 'filtered on' apart from 'merely selected'."""
+    return " ".join(
+        m.group(1)
+        for m in re.finditer(
+            r"(?is)\b(?:WHERE|HAVING|ON|AND|WHEN)\b(.{0,240})", fragment)
+    )
+
+
+def grounding_violations(
+    text: str, fragment: str, dict_lines: "list[str] | None" = None
+) -> "list[str]":
+    """Deterministic checks of a generated description against the ONE
+    source it claims to describe. Returns human-readable violations;
+    empty list = grounded."""
+    violations: "list[str]" = []
+    ground = (fragment or "") + "\n" + "\n".join(dict_lines or [])
+    ground_low = ground.lower()
+    conditions = _condition_text(fragment or "").lower()
+
+    # 1) every literal value in the output must exist in the source
+    for num in set(_OUT_NUMBERS.findall(text)):
+        if num not in ground:
+            violations.append(f"ungrounded value: {num!r} not in the SQL")
+    for quoted in set(_OUT_QUOTED.findall(text)):
+        toks = _OUT_NUMBERS.findall(quoted)
+        probe = toks[0] if toks else quoted
+        if probe and probe.lower() not in ground_low:
+            violations.append(f"ungrounded value: '{quoted}' not in the SQL")
+
+    # 2) filter-claims need support in the DECIDING part of the SQL
+    for line in text.splitlines():
+        line = line.strip()
+        if not line.startswith("- ") or not _FILTER_CLAIM.search(line):
+            continue
+        terms = [w for w in re.findall(r"[a-z]{5,}", line.lower())
+                 if w not in _CLAIM_STOPWORDS]
+        if not terms:
+            continue
+        in_fragment = [w for w in terms if w in ground_low]
+        in_conditions = [w for w in in_fragment if w in conditions]
+        has_literal = any(n in ground for n in _OUT_NUMBERS.findall(line))
+        if not in_fragment and not has_literal:
+            violations.append(f"ungrounded filter claim: {line!r}")
+        elif in_fragment and not in_conditions and not has_literal:
+            violations.append(
+                f"selected-not-filtered: {line!r} — the concept appears "
+                f"only in the SELECT list, never in a condition")
+    return violations
+
+
+def enforce_grounding(
+    text: str, fragment: str, dict_lines: "list[str] | None" = None
+) -> "tuple[str, list[str]]":
+    """Surgical fallback after a failed retry: strip the violating
+    lines, keep grounded content. If the remaining text still violates
+    (bad summary sentence), drop everything — absence over fabrication.
+    Returns (clean_text_or_empty, removed_violations)."""
+    violations = grounding_violations(text, fragment, dict_lines)
+    if not violations:
+        return text, []
+    bad_lines = {v.split(": ", 1)[1].split(" — ")[0].strip("'\"")
+                 for v in violations if ": '" in v or ": \"" in v}
+    kept = []
+    for line in text.splitlines():
+        if any(repr(line.strip()) == b or line.strip() == b.strip("'")
+               for b in bad_lines):
+            continue
+        kept.append(line)
+    cleaned = "\n".join(kept).strip()
+    if cleaned and not grounding_violations(cleaned, fragment, dict_lines):
+        return cleaned, violations
+    return "", violations
+
+
 def step_content_hash(fragment: str, dep_names: "list[str]",
                       dict_lines: "list[str] | None" = None) -> str:
     payload = (
@@ -152,6 +260,10 @@ class DescriptionResult:
     failed: "list[str]" = field(default_factory=list)
     vague: "list[str]" = field(default_factory=list)   # filler-word flags
     jargon: "list[str]" = field(default_factory=list)  # raw-identifier flags
+    # grounding gate (2026-08-19): (node_id, violations) that survived a
+    # corrective retry — the offending lines were stripped or the whole
+    # description dropped; absence over fabrication.
+    ungrounded: "list[tuple[str, list[str]]]" = field(default_factory=list)
 
 
 def topological_step_order(nodes: dict, edges: list) -> "list[str]":
@@ -263,6 +375,39 @@ def build_metric_prompt(metric_name: str, roots: "list[tuple[str, str]]", step_c
     )
 
 
+
+_RETRY_NOTE = (
+    "\n\nYour previous draft was REJECTED by an automatic grounding "
+    "check for these violations:\n{violations}\n"
+    "Rewrite it. Every value must appear in the SQL above; describe a "
+    "column as a filter ONLY if it appears in a WHERE / JOIN ON / "
+    "HAVING / CASE WHEN condition; drop any claim you cannot ground."
+)
+
+
+def _grounded_describe(
+    describe, prompt: str, fragment: str,
+    dict_lines: "list[str] | None",
+) -> "tuple[str, list[str]]":
+    """describe() + gate + ONE corrective retry + surgical fallback.
+    Returns (text_or_empty, violations_removed)."""
+    text = describe(prompt).strip()
+    if not text:
+        return "", []
+    violations = grounding_violations(text, fragment, dict_lines)
+    if not violations:
+        return text, []
+    note = _RETRY_NOTE.format(
+        violations="\n".join(f"- {v}" for v in violations))
+    try:
+        retry = describe(prompt + note).strip()
+    except Exception:  # noqa: BLE001 — retry is best-effort
+        retry = ""
+    if retry:
+        text = retry
+    return enforce_grounding(text, fragment, dict_lines)
+
+
 def generate_descriptions(
     nodes_rows: "list[dict]",
     edges_rows: "list[dict]",
@@ -318,11 +463,15 @@ def generate_descriptions(
             for d in dep_map.get(step_id, []) if d in nodes
         ]
         try:
-            text = describe(build_step_prompt(
-                node.name, fragment, deps, dict_lines)).strip()
+            text, removed = _grounded_describe(
+                describe, build_step_prompt(node.name, fragment, deps,
+                                            dict_lines),
+                fragment, dict_lines)
         except Exception:  # noqa: BLE001 — one bad step must not kill the batch
             result.failed.append(step_id)
             continue
+        if removed:
+            result.ungrounded.append((step_id, removed))
         if not text:
             result.failed.append(step_id)
             continue
@@ -367,10 +516,13 @@ def generate_descriptions(
             node.properties.get("report_name", ""), dict_lines,
         )
         try:
-            text = describe(prompt).strip()
+            text, removed = _grounded_describe(
+                describe, prompt, expression, dict_lines)
         except Exception:  # noqa: BLE001 — one bad measure must not kill the batch
             result.failed.append(node_id)
             continue
+        if removed:
+            result.ungrounded.append((node_id, removed))
         if not text:
             result.failed.append(node_id)
             continue
@@ -407,11 +559,15 @@ def generate_descriptions(
             result.cache_hits += 1
             continue
         prompt = build_metric_prompt(node.name, roots, step_count)
+        roots_ground = "\n".join(d for _, d in roots)
         try:
-            text = describe(prompt).strip()
+            text, removed = _grounded_describe(
+                describe, prompt, roots_ground, None)
         except Exception:  # noqa: BLE001
             result.failed.append(node_id)
             continue
+        if removed:
+            result.ungrounded.append((node_id, removed))
         if not text:
             result.failed.append(node_id)
             continue

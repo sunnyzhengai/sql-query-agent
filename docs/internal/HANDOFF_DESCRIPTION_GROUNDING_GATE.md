@@ -1,5 +1,8 @@
 # Handoff — deterministic grounding gate on generated descriptions
 
+> **Status (2026-08-19, dev session): implemented in 1.25.0 — and the audit found the DEEPER root cause.**
+> Fragments were TRUNCATED to 500 chars at parse time ([:500] in scriptdom_fabric) — the LLM saw Base_Pop's column list with no FROM/WHERE and invented the missing filters; the cap also blinded same-logic hashes past char 500. Fixed: caps removed (regression test pins full fragments), STEP_PROMPT hardened (selected-columns-are-not-filters, no unlisted values), PROMPT_VERSION=4 (full regeneration), grounding_violations()/enforce_grounding() gate with one corrective retry then surgical line-removal (absence over fabrication), wired into steps/measures/metrics; ungrounded results land in ops_fallout (stage 600_grounding). Acceptance tests = the real captured fabrications (invented filters, 123/456 codes) — all caught. LIVE verification against the real gpt-4o-mini on full fragments: Base_Pop, All_LDAs, Labs, Readmit — 4/4 final outputs grounded; Base_Pop now states exactly the one true filter; LDA cites the REAL codes 900112/900111. Also fixed here: orchestrator card facts now carry the freshness columns (the trace caught them dropped).
+
 **From:** dev session, 2026-08-18 (the USP_ED_Sepsis deep trace —
 see TRACE_USP_ED_SEPSIS.md). **To:** dev session. CRITICAL for the
 "certified" claim.

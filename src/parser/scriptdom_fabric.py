@@ -285,7 +285,11 @@ def parse_from_fragment(fragment) -> "ParsedSQL":
                 cte_name_val = cte_node.ExpressionName.Value
                 cte_names.add(cte_name_val)
                 cte_body = cte_node.QueryExpression
-                cte_sql = normalize_sql_whitespace(_get_fragment_text(cte_body))[:500]
+                # FULL text, never truncated (2026-08-19): the 500-char cap fed the
+                # description LLM amputated SQL (SELECT list only, no WHERE ->
+                # fabricated filters) and made same-logic hashes blind past
+                # char 500. Display capping is the DISPLAY layer's job.
+                cte_sql = normalize_sql_whitespace(_get_fragment_text(cte_body))
                 cte_tables, cte_cols = [], []
                 _walk_for_refs(cte_body, cte_tables, cte_cols)
                 raw_entries.append((cte_name_val, cte_sql, cte_tables, cte_cols, True))
@@ -299,7 +303,7 @@ def parse_from_fragment(fragment) -> "ParsedSQL":
                 _walk_for_refs(spec.InsertSource, tables, columns)
 
         if temp_name:
-            sql_text = normalize_sql_whitespace(_get_fragment_text(stmt))[:500]
+            sql_text = normalize_sql_whitespace(_get_fragment_text(stmt))
             raw_entries.append((temp_name, sql_text, tables, columns, False))
         else:
             # Final SELECT or INSERT INTO persistent table — capture SQL text

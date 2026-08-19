@@ -62,6 +62,10 @@ def assemble_metric(ref: str, run_kql: "Callable[[str, dict], list[dict]]") -> F
         "transform_count": row.get("transform_count"),
         "source_tables": row.get("source_tables"),
         "calculation_logic": row.get("calculation_logic"),
+        # Trust family (1.19): the agent cites freshness — these were
+        # dropped here until 2026-08-19 (the deep trace caught it)
+        "logic_last_changed_at": row.get("logic_last_changed_at"),
+        "source_extracted_at": row.get("source_extracted_at"),
     }
     return FactSet(
         kind="metric", ref=ref, facts=facts,

@@ -157,6 +157,11 @@ if result.vague:
     print(f"Vague-filler flags (value hidden behind 'specific'/'certain'): {len(result.vague)}")
     for nid in result.vague[:10]:
         print(f"  vague: {nid}")
+if result.ungrounded:
+    print(f"[!] GROUNDING GATE: {len(result.ungrounded)} description(s) had "
+          "fabricated claims stripped or dropped (details in ops_fallout)")
+    for nid, violations in result.ungrounded[:10]:
+        print(f"  {nid}: {violations[0]}")
 if result.jargon:
     print(f"Raw-identifier flags (warehouse jargon in business text): {len(result.jargon)}")
     for nid in result.jargon[:10]:
@@ -203,6 +208,19 @@ if result.descriptions:
         .write.format("delta").mode("overwrite").option("overwriteSchema", "true") \
         .saveAsTable("ops_description_cache")
     print(f"[+] Persisted {len(cache_rows)} cache entries")
+
+    # Grounding-gate fallout (2026-08-19): every stripped/dropped
+    # description is queryable state, not scrollback.
+    if result.ungrounded:
+        from src.schemas import FALLOUT
+
+        _g_rows = [(now, "600_grounding", nid,
+                    "ungrounded_claims_removed",
+                    "; ".join(v)[:500], "contract:graph_nodes")
+                   for nid, v in result.ungrounded]
+        spark.createDataFrame(_g_rows, schema=to_spark_schema(FALLOUT)) \
+            .write.format("delta").mode("append").saveAsTable("ops_fallout")
+        print(f"[+] ops_fallout: {len(_g_rows)} grounding rows appended")
 
     metric_desc = [
         (nid.replace("canonical:", ""), d)

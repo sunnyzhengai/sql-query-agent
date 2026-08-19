@@ -105,6 +105,7 @@ flowchart LR
   500_validate -->|enrich| ops_fallout
   600_generate_descriptions --> ops_description_cache
   600_generate_descriptions -->|enrich| graph_nodes
+  600_generate_descriptions -->|enrich| ops_fallout
   600_generate_descriptions -->|enrich| output_metric_logic
   610_generate_agent_descriptions --> ops_agent_descriptions
   700_refresh_search_index --> output_semantic_catalog

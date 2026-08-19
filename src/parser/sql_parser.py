@@ -361,7 +361,7 @@ def parse_extracted_queries(queries: list[str], dialect: str = "tsql") -> Parsed
 
         if temp_name:
             # Temp table query → treat as CTE definition
-            fragment = query[:500] if len(query) > 500 else query
+            fragment = query  # full text — see scriptdom_fabric truncation note
             all_table_refs = list(result.final_select_tables)
             # Filter out self-reference (INTO #X creates __temp_X__ as a table ref)
             self_variants = {temp_name, f"__temp_{temp_name}__"}

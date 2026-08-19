@@ -10,6 +10,27 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.25.0] - 2026-08-19
+
+### Fixed — description fabrication eliminated (deep-trace follow-through)
+- ROOT CAUSE: fragments were truncated to 500 chars at parse time —
+  the description LLM saw amputated SQL (column lists, no WHERE) and
+  invented the missing filters; same-logic hashes were blind past
+  char 500. Caps removed; regression test pins full fragments.
+- Grounding gate: deterministic post-generation checks (ungrounded
+  values, ungrounded filter claims, selected-not-filtered) + one
+  corrective retry + surgical line removal — absence over fabrication.
+  Wired into steps, measures, and metric composition; failures land in
+  ops_fallout (stage 600_grounding). Acceptance fixtures are the real
+  captured fabrications; live verification 4/4 grounded on the same
+  model 600 uses.
+- STEP_PROMPT hardened; PROMPT_VERSION=4 — next 600 run regenerates
+  every description from full fragments under the gate.
+- Orchestrator card facts now expose logic_last_changed_at /
+  source_extracted_at (dropped at the assemble layer until now).
+
+---
+
 ## [1.24.0] - 2026-08-19
 
 ### Added — trust instrumentation (Sunny's three asks)

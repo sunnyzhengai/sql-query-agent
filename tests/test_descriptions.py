@@ -27,7 +27,12 @@ def _graph():
 
 
 def fake_describe(prompt: str) -> str:
-    return f"DESC[{hash(prompt) % 10_000}]"
+    # Distinct per prompt but GROUNDED: the 1.25 gate drops any >=2-digit
+    # literal that is absent from the fragment, so the fake must vary by
+    # letters, not numbers (a hash-suffixed fake was, correctly, rejected
+    # as fabrication).
+    tag = "".join(chr(ord("a") + int(d)) for d in str(hash(prompt) % 10_000))
+    return f"produces the {tag} result set"
 
 
 class TestTopologicalOrder:

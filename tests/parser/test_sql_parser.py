@@ -148,3 +148,27 @@ class TestParseExtractedQueries:
         # Fragment should not contain \r or \t
         assert "\r" not in staging_cte.sql_fragment
         assert "\t" not in staging_cte.sql_fragment
+
+
+def test_fragments_are_never_truncated():
+    """2026-08-19: a 500-char cap fed the description LLM amputated SQL
+    (column list only, no WHERE) — it fabricated the missing filters —
+    and blinded same-logic hashes past char 500. Fragments must carry
+    the FULL statement text."""
+    filler = ",\n".join(f"    col_{i:04d}" for i in range(120))
+    sql = (
+        "CREATE PROCEDURE dbo.USP_Long AS\n"
+        "WITH big_step AS (\n"
+        f"    SELECT\n{filler}\n"
+        "    FROM base_table\n"
+        "    WHERE status_code = 42\n"
+        ")\n"
+        "SELECT * FROM big_step"
+    )
+    from src.parser.sql_parser import parse_sql
+    parsed = parse_sql(sql)
+    frags = [getattr(c, "sql_fragment", "") or "" for c in parsed.ctes]
+    long_frag = max(frags, key=len)
+    assert len(long_frag) > 500
+    assert "status_code = 42" in long_frag, (
+        "the WHERE clause must survive into the stored fragment")

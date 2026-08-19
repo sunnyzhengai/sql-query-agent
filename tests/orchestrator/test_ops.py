@@ -140,7 +140,9 @@ class TestAspectHonesty:
         op_retrieve([REF_A, REF_B], fake_kql, s)
         out = op_compare(["R1"], "flavour", fake_kql, s)
         assert "no item has a field 'flavour'" in out.rows[0]["error"]
-        assert "steward" in out.rows[0]["error"]        # offers real fields
+        # offers real fields (list widened to 16 when freshness
+        # columns joined the card, 2026-08-19)
+        assert "steward" in out.rows[0]["error"]
 
 
 class TestStepAlignmentKernel:

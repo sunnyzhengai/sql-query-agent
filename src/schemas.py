@@ -1330,7 +1330,8 @@ FALLOUT = {
     "owner": {"notebook": "060_ingest_semantic_models",
               "module": "src/steps/semantic_models.py"},
     "write_mode": "append",
-    "enrichers": ["500_validate", "900_publish_collibra"],
+    "enrichers": ["500_validate", "900_publish_collibra",
+                  "600_generate_descriptions"],
     "consumers": ["admin telemetry report", "500_validate"],
     "optional_input": True,
     "remediation": (

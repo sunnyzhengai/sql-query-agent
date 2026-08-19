@@ -292,7 +292,7 @@ def kernel_field_diff(items: "list[dict]", fields: "list[str]") -> "list[dict]":
             rows.append({"field": f,
                          "error": f"no item has a field {f!r} — "
                                   "available fields: "
-                                  + ", ".join(available[:12])})
+                                  + ", ".join(available[:16])})
             continue
         rows.append({"field": f, "values": vals,
                      "all_equal": len(present) == 1 and
