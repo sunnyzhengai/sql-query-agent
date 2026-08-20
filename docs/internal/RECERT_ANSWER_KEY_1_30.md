@@ -26,17 +26,17 @@ subtrees.
 |---|---|---|---|
 | readers of HOSPITAL_ENCOUNTERS | 13 | 13 | unchanged |
 | readers of MEDICATION_ORDERS | 7 | 8 | a deep mixture-subquery read recovered |
-| tables of reports.USP_Severe_Sepsis | 32 | 35 | +DM_ICU_STAY, +MED_MIX_COMPONENTS (+schema variant) |
+| tables of reports.USP_Severe_Sepsis | 32 | 35 | +ICU_STAY_SUMMARY, +MED_MIX_COMPONENTS (+schema variant) |
 | tables of reporting.USP_ED_Sepsis | 38 | 47 | deep dep-chains recovered (the trace's 3 named misses among them) |
 | tables of reports.USP_ED_Sepsis | 29 | 47 | same class — 18 gained targets, 0 lost (list verified) |
 | CALCULATED_BY steps, Severe_Sepsis | 88 | 121 | step closure now reaches subtrees the depth cap cut |
 
 **Also surfaced (newly-seen reads → dictionary check):** run 500's
 leaf grounding after sync; newly recovered reads may include
-undictionaried tables (e.g. DM_ICU_STAY) — the C4 verdict will name
+undictionaried tables (e.g. ICU_STAY_SUMMARY) — the C4 verdict will name
 them.
 
 **Sign-off:** SIGNED OFF by Sunny, 2026-08-20 (morning review). The
 re-certified oracles are the standing answer key. Provenance rulings
-same morning: V_LOG_BASED and DM_ICU_STAY confirmed vendor (Epic
+same morning: V_OR_CASE_LOG and ICU_STAY_SUMMARY confirmed vendor (Epic
 Clarity) tables — ORIGIN stays vendor.

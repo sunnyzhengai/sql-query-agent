@@ -1,10 +1,11 @@
 {
- "exported_at": "2026-08-20T03:31:44.720951+00:00",
+ "exported_at": "2026-08-20T15:48:47.045408+00:00",
  "parse_results": 28,
  "dict_tables": 79,
  "dict_columns": 3946,
  "source_corpus_size": 28,
  "crosswalk_rules": 483,
  "scan_terms_checked": 14,
- "_rerecord_note": "re-recorded LOCALLY via native ScriptDom (1.30.0): full fragments (post 500-char fix), depth-cap fix (3 trace reads recovered + FY_DATE_DIMENSION/DM_ICU_STAY), suppression counter now meaningful (0). Local parse == Fabric parse by the native-parser law."
+ "_rerecord_note": "re-recorded LOCALLY via native ScriptDom (1.30.0): full fragments (post 500-char fix), depth-cap fix (3 trace reads recovered + FY_DATE_DIMENSION/DM_ICU_STAY), suppression counter now meaningful (0). Local parse == Fabric parse by the native-parser law.",
+ "_rename_note": "2026-08-20: V_LOG_BASED/DM_ICU_STAY/V_ICU_STAY_METRICS crosswalk-renamed (confirmed vendor names); scan terms extended"
 }

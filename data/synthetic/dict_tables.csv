@@ -87,5 +87,5 @@ DIAGNOSES_CURRENT_ICD10,"The DIAGNOSES_CURRENT_ICD10 table maps internal diagnos
 HOSPITAL_ACCT_PX_LIST,"The HOSPITAL_ACCT_PX_LIST table lists the procedures coded on a hospital account, one row per account-procedure entry, including the final coded procedure."
 ICD_PROCEDURE_CODES,"The ICD_PROCEDURE_CODES table is the reference list of ICD procedure codes, one row per procedure code record."
 PATIENT_OR_ADM_LINK,"The PATIENT_OR_ADM_LINK table links patient encounters to operating room cases, one row per encounter-to-OR-log link."
-V_LOG_BASED,"The V_LOG_BASED view reports operating room cases from the surgical log, one row per OR log, including in-room times."
-DM_ICU_STAY,"The DM_ICU_STAY table is a data-mart summary of intensive care unit stays, one row per ICU stay with the patient, encounter, and stay start and end dates. Successor to the deprecated ICU stay metrics view."
+V_OR_CASE_LOG,"The V_OR_CASE_LOG view reports operating room cases from the surgical log, one row per OR case log, including in-room times."
+ICU_STAY_SUMMARY,"The ICU_STAY_SUMMARY table summarizes intensive care unit stays, one row per ICU stay with the patient, encounter, and stay start and end dates. Successor to the deprecated legacy ICU stay view."

@@ -4131,9 +4131,9 @@ HOSPITAL_ACCT_PX_LIST,FINAL_ICD_PX_ID,The identifier of the final coded ICD proc
 ICD_PROCEDURE_CODES,ICD_PX_ID,The unique identifier of the ICD procedure code record.,NUMERIC
 PATIENT_OR_ADM_LINK,OR_LINK_VISIT_ID,The encounter linked to the operating room case.,NUMERIC
 PATIENT_OR_ADM_LINK,LOG_ID,The operating room log linked to the encounter.,VARCHAR
-V_LOG_BASED,LOG_ID,The unique identifier of the operating room log.,VARCHAR
-V_LOG_BASED,IN_OR_DTTM,The date and time the patient entered the operating room.,DATETIME
-DM_ICU_STAY,ENCOUNTER_ID,The encounter during which the ICU stay occurred.,NUMERIC
-DM_ICU_STAY,PATIENT_ID,The patient who had the ICU stay.,NUMERIC
-DM_ICU_STAY,ICU_STAY_START_DT,The date the ICU stay began.,DATETIME
-DM_ICU_STAY,ICU_STAY_END_DT,"The date the ICU stay ended, NULL while the stay is ongoing.",DATETIME
+V_OR_CASE_LOG,LOG_ID,The unique identifier of the operating room log.,VARCHAR
+V_OR_CASE_LOG,IN_OR_DTTM,The date and time the patient entered the operating room.,DATETIME
+ICU_STAY_SUMMARY,ENCOUNTER_ID,The encounter during which the ICU stay occurred.,NUMERIC
+ICU_STAY_SUMMARY,PATIENT_ID,The patient who had the ICU stay.,NUMERIC
+ICU_STAY_SUMMARY,ICU_STAY_START_DT,The date the ICU stay began.,DATETIME
+ICU_STAY_SUMMARY,ICU_STAY_END_DT,"The date the ICU stay ended, NULL while the stay is ongoing.",DATETIME

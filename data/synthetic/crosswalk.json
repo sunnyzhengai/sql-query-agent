@@ -36,9 +36,12 @@
   "ERX~wcs",
   "HAR~wcs",
   "CID~wcs",
-  "SER~wcs"
+  "SER~wcs",
+  "V_LOG_BASED",
+  "DM_ICU_STAY",
+  "V_ICU_STAY_METRICS"
  ],
- "_comment": "Master crosswalk: proprietary \u2192 anonymized names. Source of truth for anonymization.",
+ "_comment": "Master crosswalk: proprietary → anonymized names. Source of truth for anonymization.",
  "_instructions": "Names kept close to originals per user preference. Only org/vendor prefixes removed.",
  "_schema_note": "Two schemas with procs: Reporting (21 files) and COOK_RPT (7 files). Mapped to 'reporting' and 'reports' to match folder structure.",
  "databases": {
@@ -84,7 +87,7 @@
   "USP_IP_SEPSIS_COMPLIANCE_BY_SHIFT_NURSES_PBI": "USP_IP_SEPSIS_COMPLIANCE_BY_SHIFT_NURSES"
  },
  "procedures": {
-  "_comment_schema_reporting": "These 21 procs live in [Reporting] schema \u2192 anonymized to [reporting]",
+  "_comment_schema_reporting": "These 21 procs live in [Reporting] schema → anonymized to [reporting]",
   "USP_CCMC_ED_Sepsis__Reporting": {
    "original": "[Reporting].[USP_CCMC_ED_Sepsis]",
    "anonymized": "[reporting].[USP_ED_Sepsis]",
@@ -190,7 +193,7 @@
    "anonymized": "[reporting].[USP_IP_SepsisShiftComplianceMetrics]",
    "file": "reporting/USP_IP_SepsisShiftComplianceMetrics"
   },
-  "_comment_schema_cook_rpt": "These 7 procs live in [COOK_RPT] schema \u2192 anonymized to [reports]",
+  "_comment_schema_cook_rpt": "These 7 procs live in [COOK_RPT] schema → anonymized to [reports]",
   "USP_CCMC_ED_SEPSIS__COOK_RPT": {
    "original": "[COOK_RPT].[USP_CCMC_ED_SEPSIS]",
    "anonymized": "[reports].[USP_ED_Sepsis]",
@@ -328,7 +331,10 @@
    "ZC_ACUITY": "REF_ACUITY",
    "HNO_NOTE_TEXT": "CLINICAL_NOTE_TEXT",
    "EDG_CURRENT_ICD10": "DIAGNOSES_CURRENT_ICD10",
-   "CL_ICD_PX": "ICD_PROCEDURE_CODES"
+   "CL_ICD_PX": "ICD_PROCEDURE_CODES",
+   "V_LOG_BASED": "V_OR_CASE_LOG",
+   "DM_ICU_STAY": "ICU_STAY_SUMMARY",
+   "V_ICU_STAY_METRICS": "V_ICU_STAY_SUMMARY_LEGACY"
   }
  },
  "columns": {

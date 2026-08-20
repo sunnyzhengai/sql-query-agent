@@ -16,7 +16,7 @@ decisions, zero gaps.** The famous 13,156-suppression counter turned
 out to be pure .NET indexer noise (measured: zero structural change);
 the REAL silent bucket was a depth-15 walker cap — raised and counted,
 which **recovered the trace's 3 missing reads** (MED_MIX_COMPONENTS,
-both SEPSIS_STAGING) plus FY_DATE_DIMENSION and DM_ICU_STAY. Fixtures
+both SEPSIS_STAGING) plus FY_DATE_DIMENSION and ICU_STAY_SUMMARY. Fixtures
 re-recorded natively (417 full fragments, zero truncated, anonymization
 scan clean) — the stale-fixtures debt is dead. Toolchain contract
 delivered (CI tools pinned exactly, per-interpreter).
@@ -63,8 +63,8 @@ E1/E5 gates flipped, engine composition honestly marked as the gap.
 3. **GAP-CHECK — the refreshed ED-sepsis artifact**
    (TREE_PHASE1_ED_SEPSIS.md): phases 1b/2/3 sections with live
    outputs, including the translated Base_Pop and All_LDAs.
-4. **PROVENANCE CHECKS (two tables)**: V_LOG_BASED (never renamed by
-   the crosswalk) and DM_ICU_STAY (data-mart naming, "replaces
+4. **PROVENANCE CHECKS (two tables)**: V_OR_CASE_LOG (never renamed by
+   the crosswalk) and ICU_STAY_SUMMARY (data-mart naming, "replaces
    deprecated view" comment) — stock vendor objects, or org-built? If
    org-built: ORIGIN=org, and we discuss whether the anonymizer should
    have renamed them.
