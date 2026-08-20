@@ -4122,3 +4122,14 @@ V_PHARMACY_ORDER,VERIFY_QUEUE_USER_ID,The user who performed the action that res
 V_PHARMACY_ORDER,VERIFY_UNQUEUE_DATE,The date associated with VERIFY_UNQUEUE_DTTM.,DATETIME
 V_PHARMACY_ORDER,VERIFY_UNQUEUE_DTTM,The date and time when the user performed the action that led to the unqueue reason specified in UNQUEUE_REASON.,DATETIME
 V_PHARMACY_ORDER,VERIFY_UNQUEUE_HOUR,The hour component of VERIFY_UNQUEUE_DTTM.,INTEGER
+CLINICAL_NOTE_TEXT,NOTE_ID,The unique identifier of the clinical note this text belongs to.,VARCHAR
+CLINICAL_NOTE_TEXT,NOTE_TEXT,The free-text content of the clinical note.,VARCHAR
+DIAGNOSES_CURRENT_ICD10,DX_ID,The internal identifier of the diagnosis record being mapped.,NUMERIC
+DIAGNOSES_CURRENT_ICD10,CODE,The current ICD-10 code for the diagnosis.,VARCHAR
+HOSPITAL_ACCT_PX_LIST,HOSPITAL_ACCOUNT_ID,The hospital account this coded procedure belongs to.,NUMERIC
+HOSPITAL_ACCT_PX_LIST,FINAL_ICD_PX_ID,The identifier of the final coded ICD procedure for this account entry.,NUMERIC
+ICD_PROCEDURE_CODES,ICD_PX_ID,The unique identifier of the ICD procedure code record.,NUMERIC
+PATIENT_OR_ADM_LINK,OR_LINK_VISIT_ID,The encounter linked to the operating room case.,NUMERIC
+PATIENT_OR_ADM_LINK,LOG_ID,The operating room log linked to the encounter.,VARCHAR
+V_LOG_BASED,LOG_ID,The unique identifier of the operating room log.,VARCHAR
+V_LOG_BASED,IN_OR_DTTM,The date and time the patient entered the operating room.,DATETIME

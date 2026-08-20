@@ -82,3 +82,9 @@ V_PATIENT_LOCATION_HISTORY,"A dimensional view designed to identify a patient's 
 V_PHARMACY_DISPENSE,"The V_PHARMACY_DISPENSE view provides details regarding medication orders dispensed from inpatient pharmacies, with each row representing a single medication dispense."
 V_PHARMACY_DISPENSE_ACTION,This view includes all actions related to the preparation and tracking of inpatient medication order dispenses.
 V_PHARMACY_ORDER,"The V_PHARMACY_ORDER view provides details on medication orders that have been prepared or supplied by inpatient pharmacies, primarily for reporting purposes. Only orders that are signed and released or signed and held are included in this view."
+CLINICAL_NOTE_TEXT,"The CLINICAL_NOTE_TEXT table stores the free-text body of clinical notes, one row per note text segment, linked to note metadata by note ID."
+DIAGNOSES_CURRENT_ICD10,"The DIAGNOSES_CURRENT_ICD10 table maps internal diagnosis records to their current ICD-10 codes, one row per diagnosis-to-code mapping."
+HOSPITAL_ACCT_PX_LIST,"The HOSPITAL_ACCT_PX_LIST table lists the procedures coded on a hospital account, one row per account-procedure entry, including the final coded procedure."
+ICD_PROCEDURE_CODES,"The ICD_PROCEDURE_CODES table is the reference list of ICD procedure codes, one row per procedure code record."
+PATIENT_OR_ADM_LINK,"The PATIENT_OR_ADM_LINK table links patient encounters to operating room cases, one row per encounter-to-OR-log link."
+V_LOG_BASED,"The V_LOG_BASED view reports operating room cases from the surgical log, one row per OR log, including in-room times."
