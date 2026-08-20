@@ -10,6 +10,29 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.36.0] - 2026-08-20
+
+### Added — the admin graph, projected (ADR 0048 item 3; ADR 0039's follow-up executed)
+- src/admin_graph.py: build_admin_graph projects the registries
+  (tables, notebooks, trace/ADRs, spec axioms) + error/checklist event
+  rows into ops_admin_graph_nodes / ops_admin_graph_edges. Six edge
+  types, every edge witnessed by a registry entry or event row
+  (spec:B1); pure projection rebuilt each run (spec:D3); deterministic.
+- Contracts registered (kind/edge_type closed sets, reference
+  invariants source→node), written by 500_validate's new final cell,
+  postcondition-gated like everything else.
+- spec:C1 reflexive: EXTRACTION_REGISTRY row admin_governance_registries
+  declares the admin graph's source kind.
+- tests/test_admin_graph.py (9): endpoint existence, registry
+  coverage, owner/produces agreement, determinism, and the diagnosis
+  walk — error —violates→ contract —produced_by→ notebook,
+  contract —enforced_by→ gate —implements→ ADR — every hop asserted.
+- Naming law upheld by its own gates during development: operations
+  prefix (ops_) and declared-writers-match-code both fired and were
+  corrected before commit.
+
+---
+
 ## [1.35.0] - 2026-08-20
 
 ### Added — TRACE_REGISTRY: the decision lineage as data (ADR 0048 item 2)

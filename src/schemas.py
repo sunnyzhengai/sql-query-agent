@@ -1491,6 +1491,82 @@ FALLOUT = {
     "invariants": [],
 }
 
+ADMIN_GRAPH_NODES = {
+    "table_name": "ops_admin_graph_nodes",
+    "must_be_nonempty": True,
+    "description": (
+        "The admin graph (ADR 0048, spec §14b): the system's own "
+        "governance artifacts — contracts, notebooks, modules, ADRs, "
+        "spec axioms, error events, checklist rows — projected as "
+        "walkable nodes. A PROJECTION (spec:D3): rebuilt from the "
+        "registries + event tables each run, never a second truth. "
+        "Grounding surface for the admin companion (ADR 0048 item 4)."
+    ),
+    "domain": "operations",
+    "status": "active",
+    "owner": {"notebook": "500_validate", "module": "src/admin_graph.py"},
+    "write_mode": "overwrite",
+    "consumers": ["admin_companion"],
+    "columns": [
+        ("node_id", "string", False),
+        ("kind", "string", False),
+        ("name", "string", False),
+        ("description", "string", True),
+    ],
+    "column_descriptions": {
+        "node_id": "kind-prefixed id (contract:<table>, notebook:<name>, "
+                   "module:<path>, adr:<id>, axiom:<id>, error:<id>, "
+                   "checklist:<id>)",
+        "kind": "contract | notebook | module | adr | axiom | error | "
+                "checklist",
+        "name": "Display name (table/notebook/path/title/axiom id)",
+        "description": "Registry description or event reason text",
+    },
+    "invariants": [
+        {"kind": "unique", "columns": ["node_id"]},
+        {"kind": "allowed_values", "column": "kind",
+         "values": ["contract", "notebook", "module", "adr", "axiom",
+                    "error", "checklist"]},
+    ],
+}
+
+ADMIN_GRAPH_EDGES = {
+    "table_name": "ops_admin_graph_edges",
+    "must_be_nonempty": True,
+    "description": (
+        "Admin-graph edges (ADR 0048, spec §14b) — all deterministic "
+        "projections of registry/event truth (spec:B1: every edge has "
+        "a witness row): notebook produces contract; contract "
+        "enforced_by gate; module implements adr; adr grounds axiom; "
+        "adr traced_by test; error/checklist violates contract."
+    ),
+    "domain": "operations",
+    "status": "active",
+    "owner": {"notebook": "500_validate", "module": "src/admin_graph.py"},
+    "write_mode": "overwrite",
+    "consumers": ["admin_companion"],
+    "columns": [
+        ("source_id", "string", False),
+        ("target_id", "string", False),
+        ("edge_type", "string", False),
+    ],
+    "column_descriptions": {
+        "source_id": "ops_admin_graph_nodes.node_id",
+        "target_id": "ops_admin_graph_nodes.node_id",
+        "edge_type": "produces | enforced_by | implements | grounds | "
+                     "traced_by | violates",
+    },
+    "invariants": [
+        {"kind": "allowed_values", "column": "edge_type",
+         "values": ["produces", "enforced_by", "implements", "grounds",
+                    "traced_by", "violates"]},
+        {"kind": "reference", "column": "source_id",
+         "references": "ops_admin_graph_nodes.node_id"},
+        {"kind": "reference", "column": "target_id",
+         "references": "ops_admin_graph_nodes.node_id"},
+    ],
+}
+
 FUNNEL = {
     "table_name": "ops_funnel",
     "description": (
@@ -2258,6 +2334,7 @@ TABLE_REGISTRY = {
         PIPELINE_VALIDATION, INSTALLATION_ERRORS, AGENT_DESCRIPTIONS,
         DESCRIPTION_CACHE, SETUP_COMPLETENESS, FALLOUT, FUNNEL,
         METRIC_JOURNEY, REPORT_JOURNEY,
+        ADMIN_GRAPH_NODES, ADMIN_GRAPH_EDGES,
         # graph
         GRAPH_NODES, GRAPH_EDGES, GRAPH_DECISION_SITES,
         # output

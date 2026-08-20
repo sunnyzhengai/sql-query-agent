@@ -492,3 +492,37 @@ if _lg.fallout_rows:
 # META   "language": "python",
 # META   "language_group": "synapse_pyspark"
 # META }
+
+# CELL ********************
+
+# %% Cell: Admin graph projection (ADR 0048 item 3, spec §14b) — the
+# system's own governance, walkable. A projection (spec:D3): rebuilt
+# from the registries + event tables every run, never a second truth.
+from src.admin_graph import build_admin_graph
+from src.schemas import ADMIN_GRAPH_EDGES, ADMIN_GRAPH_NODES
+
+_ag_errors = []
+for _ag_table in ("ops_installation_errors", "ops_runtime_error_events",
+                  "ops_fallout"):
+    if spark.catalog.tableExists(_ag_table):
+        _ag_errors.extend(r.asDict() for r in spark.table(_ag_table).collect())
+_ag_checklist = ([r.asDict() for r in spark.table("ops_human_checklist").collect()]
+                 if spark.catalog.tableExists("ops_human_checklist") else [])
+
+_ag = build_admin_graph(error_rows=_ag_errors, checklist_rows=_ag_checklist)
+spark.createDataFrame(_ag.nodes_rows, schema=to_spark_schema(ADMIN_GRAPH_NODES)) \
+    .write.format("delta").mode("overwrite").option("overwriteSchema", "true") \
+    .saveAsTable("ops_admin_graph_nodes")
+spark.createDataFrame(_ag.edges_rows, schema=to_spark_schema(ADMIN_GRAPH_EDGES)) \
+    .write.format("delta").mode("overwrite").option("overwriteSchema", "true") \
+    .saveAsTable("ops_admin_graph_edges")
+print(f"[+] Admin graph projected: {len(_ag.nodes_rows)} nodes, "
+      f"{len(_ag.edges_rows)} edges ({len(_ag_errors)} error rows, "
+      f"{len(_ag_checklist)} checklist rows walked in)")
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }

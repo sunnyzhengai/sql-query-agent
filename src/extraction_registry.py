@@ -211,4 +211,22 @@ EXTRACTION_REGISTRY = {
             "Becomes an extracted row when the 0046 engine lands."
         ),
     },
+    "admin_governance_registries": {
+        # spec:C1 applied reflexively (ADR 0048 item 3): the admin
+        # graph's source kinds are the registries themselves + the
+        # error/checklist event tables.
+        "reference": "Gov",
+        "status": "extracted",
+        "extractor": {"module": "src/admin_graph.py",
+                      "entry": "build_admin_graph (registry + event "
+                               "projection, spec §14b)"},
+        "targets": ["contract", "notebook", "module", "adr", "axiom",
+                    "error", "checklist"],
+        "conservation": {
+            "home": "ops_admin_graph_nodes + ops_admin_graph_edges "
+                    "(rebuilt each run — a projection, spec:D3)",
+            "check": "tests/test_admin_graph.py — every registry entry "
+                     "projects to a node; every edge endpoint exists",
+        },
+    },
 }
