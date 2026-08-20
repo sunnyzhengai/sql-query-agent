@@ -639,6 +639,7 @@ GRAPH_DECISION_SITES = {
         ("tree", "string", True),
         ("expression_sql", "string", True),
         ("reason_code", "string", True),
+        ("reachability", "string", True),
     ],
     "column_descriptions": {
         "metric_id": "Owning metric (ops_parse_results.metric_id)",
@@ -651,13 +652,23 @@ GRAPH_DECISION_SITES = {
         "tree": "Faithful boolean subtree as JSON (null when unextracted)",
         "expression_sql": "Canonical SQL of the site (or the offending snippet)",
         "reason_code": "Why extraction stopped: dynamic_sql | parse_failed | unmodeled_construct:<type>",
+        "reachability": (
+            "The reachability law (spec + Sunny 2026-08-19: connected or "
+            "counted, no dangling decisions): connected = the decision "
+            "node has >=1 edge to a technical node or step; otherwise a "
+            "counted exception reason. NULL on unextracted rows."
+        ),
     },
     "invariants": [
         {"kind": "unique", "columns": ["metric_id", "step_name", "site_id"]},
         {"kind": "allowed_values", "column": "status",
          "values": ["extracted", "unextracted"]},
         {"kind": "allowed_values", "column": "context",
-         "values": ["where", "join_on", "having", "case_when", "statement"]},
+         "values": ["where", "join_on", "having", "case_when", "statement",
+                    "parameter_default"]},
+        {"kind": "allowed_values", "column": "reachability",
+         "values": ["connected", "literal_only", "parameter_only",
+                    "unresolved_alias", "unqualified"]},
     ],
 }
 

@@ -63,8 +63,12 @@ def test_ambiguous_bare_name_answers_for_both_schemas(view):
     }))
     result = agent.answer("Which tables does USP_ED_Sepsis use?")
     assert "matched 2 certified items" in result["text"]
-    assert "uses 29 tables" in result["text"]
-    assert "uses 38 tables" in result["text"]
+    # recert 1.30.0: both schema twins now read 47 tables (the depth-cap
+    # fix recovered the same deep subtrees in each) — assert BOTH lines
+    # answered, one per twin
+    assert result["text"].count("uses 47 tables") == 2
+    assert "reports.USP_ED_Sepsis uses" in result["text"]
+    assert "reporting.USP_ED_Sepsis uses" in result["text"]
 
 
 def test_explain_metric_walks_closure_not_roots(view):
@@ -73,7 +77,7 @@ def test_explain_metric_walks_closure_not_roots(view):
         "anchors": [{"type": "metric", "key": "reports.USP_Severe_Sepsis"}],
     }))
     result = agent.answer("How is reports.USP_Severe_Sepsis calculated?")
-    assert "32 tables" in result["text"]  # the shallow pattern found 0
+    assert "35 tables" in result["text"]  # the shallow pattern found 0
     assert "steps_of_metric" in result["basis"]
 
 

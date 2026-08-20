@@ -116,9 +116,21 @@ def export_edge_tables(edges: list[GraphEdge]) -> dict[str, list[dict]]:
         EdgeType.MEASURE_TO_COLUMN: "graph_edge_measure2column",
     }
 
+    # Decision-layer edges (ADR 0044 1b) are deliberately NOT exported
+    # yet: the Fabric Graph read model gains them when the 0046 engine
+    # ships (EXTRACTION_REGISTRY-style explicit exclusion, not a silent
+    # drop — an edge type outside BOTH maps still fails loudly).
+    deliberately_unexported = {
+        EdgeType.STEP_TO_DECISION,
+        EdgeType.DECISION_TO_COLUMN,
+        EdgeType.DECISION_TO_STEP,
+    }
+
     result: dict[str, list[dict]] = {name: [] for name in table_map.values()}
 
     for edge in edges:
+        if edge.edge_type in deliberately_unexported:
+            continue
         table_name = table_map[edge.edge_type]
         result[table_name].append({
             "sourceId": edge.source_id,

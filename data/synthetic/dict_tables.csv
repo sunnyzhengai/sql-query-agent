@@ -88,3 +88,4 @@ HOSPITAL_ACCT_PX_LIST,"The HOSPITAL_ACCT_PX_LIST table lists the procedures code
 ICD_PROCEDURE_CODES,"The ICD_PROCEDURE_CODES table is the reference list of ICD procedure codes, one row per procedure code record."
 PATIENT_OR_ADM_LINK,"The PATIENT_OR_ADM_LINK table links patient encounters to operating room cases, one row per encounter-to-OR-log link."
 V_LOG_BASED,"The V_LOG_BASED view reports operating room cases from the surgical log, one row per OR log, including in-room times."
+DM_ICU_STAY,"The DM_ICU_STAY table is a data-mart summary of intensive care unit stays, one row per ICU stay with the patient, encounter, and stay start and end dates. Successor to the deprecated ICU stay metrics view."

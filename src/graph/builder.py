@@ -124,6 +124,30 @@ class GraphBuilder:
             )
         return node_id
 
+    def add_decision_node(
+        self, metric_id: str, step_name: str, site_id: str, context: str,
+        predicate_count: int, expression_sql: str,
+    ) -> str:
+        """Add a decision-layer node (ADR 0044 1b): one per decision site.
+
+        The full faithful subtree lives in graph_decision_sites (the
+        record); the node carries light properties (spec:D3 — the node
+        is the projection, the table is the truth)."""
+        node_id = f"decision:{metric_id}:{step_name}:{site_id}"
+        if node_id not in self.nodes:
+            self.nodes[node_id] = GraphNode(
+                node_id=node_id,
+                layer=NodeLayer.DECISION,
+                name=f"{step_name}/{context}",
+                properties={
+                    "metric_id": metric_id, "step_name": step_name,
+                    "site_id": site_id, "context": context,
+                    "predicate_count": predicate_count,
+                    "expression_sql": expression_sql[:500],
+                },
+            )
+        return node_id
+
     def add_canonical_node(
         self,
         metric_id: str,

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "sql-query-agent"
-version = "1.29.0"
+version = "1.30.0"
 description = "SQL Intelligence Agent for Microsoft Fabric. Extract business logic from SQL, build knowledge graphs, answer questions in plain English."
 readme = "README.md"
 requires-python = ">=3.9"
@@ -23,13 +23,17 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
-    "pytest>=7.4.3",
-    "pytest-cov>=4.1.0",
+    # Toolchain contract (ruled 2026-08-19, tests/test_toolchain_contract.py):
+    # every tool that can fail CI is pinned EXACTLY — unpinned ruff cost
+    # three lint-only CI failures in one day; floors resolve differently
+    # on CI than on dev machines by construction.
+    "pytest==9.1.1",
+    "pytest-cov==7.1.0",
     # Pinned exactly: CI resolves this fresh while dev machines lag —
     # unpinned ruff produced three lint-only CI failures in one day
     # (2026-08-19; isort grouping changed across versions)
     "ruff==0.16.3",
-    "build",
+    "build==1.5.0",
     "requests>=2.31.0",  # tests/adapters imports the adapters; keep in sync with [adapters]
     "fastapi>=0.110",    # tests/webapp imports the webapp surface; keep in sync with [webapp]
     "httpx>=0.27",       # fastapi.testclient's transport

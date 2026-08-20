@@ -1,142 +1,142 @@
 {
  "reporting/USP_ED_SEPSIS.sql": {
   "cte_count": 43,
-  "physical_table_count": 45,
-  "extraction_suppressed": 1205
+  "physical_table_count": 48,
+  "extraction_suppressed": 0
  },
  "reporting/USP_IP_SEPSIS.sql": {
   "cte_count": 60,
-  "physical_table_count": 40,
-  "extraction_suppressed": 2088
+  "physical_table_count": 41,
+  "extraction_suppressed": 0
  },
  "reporting/USP_IP_SepsisDates.sql": {
   "cte_count": 0,
   "physical_table_count": 1,
-  "extraction_suppressed": 16
+  "extraction_suppressed": 0
  },
  "reporting/USP_IP_SepsisDetails.sql": {
   "cte_count": 29,
-  "physical_table_count": 21,
-  "extraction_suppressed": 875
+  "physical_table_count": 22,
+  "extraction_suppressed": 0
  },
  "reporting/USP_IP_SepsisDetails_v1.sql": {
   "cte_count": 0,
   "physical_table_count": 1,
-  "extraction_suppressed": 46
+  "extraction_suppressed": 0
  },
  "reporting/USP_IP_SepsisEncounters.sql": {
   "cte_count": 2,
   "physical_table_count": 12,
-  "extraction_suppressed": 114
+  "extraction_suppressed": 0
  },
  "reporting/USP_IP_SepsisEncountersDetails.sql": {
   "cte_count": 0,
   "physical_table_count": 1,
-  "extraction_suppressed": 20
+  "extraction_suppressed": 0
  },
  "reporting/USP_IP_SepsisEncountersWLocations.sql": {
   "cte_count": 2,
   "physical_table_count": 4,
-  "extraction_suppressed": 98
+  "extraction_suppressed": 0
  },
  "reporting/USP_IP_SepsisEncountersWLocations_v1.sql": {
   "cte_count": 0,
   "physical_table_count": 2,
-  "extraction_suppressed": 24
+  "extraction_suppressed": 0
  },
  "reporting/USP_IP_SepsisPatientDates.sql": {
   "cte_count": 4,
   "physical_table_count": 3,
-  "extraction_suppressed": 136
+  "extraction_suppressed": 0
  },
  "reporting/USP_IP_SepsisPatientDates_v1.sql": {
   "cte_count": 0,
   "physical_table_count": 1,
-  "extraction_suppressed": 14
+  "extraction_suppressed": 0
  },
  "reporting/USP_IP_SepsisScreeningAudit.sql": {
   "cte_count": 10,
   "physical_table_count": 15,
-  "extraction_suppressed": 503
+  "extraction_suppressed": 0
  },
  "reporting/USP_IP_SepsisScreeningAudit_v1.sql": {
   "cte_count": 0,
   "physical_table_count": 1,
-  "extraction_suppressed": 54
+  "extraction_suppressed": 0
  },
  "reporting/USP_IP_SepsisShiftCompliance.sql": {
   "cte_count": 11,
   "physical_table_count": 18,
-  "extraction_suppressed": 591
+  "extraction_suppressed": 0
  },
  "reporting/USP_IP_SepsisShiftComplianceByShift.sql": {
   "cte_count": 0,
   "physical_table_count": 1,
-  "extraction_suppressed": 37
+  "extraction_suppressed": 0
  },
  "reporting/USP_IP_SepsisShiftComplianceMetrics.sql": {
   "cte_count": 0,
   "physical_table_count": 1,
-  "extraction_suppressed": 31
+  "extraction_suppressed": 0
  },
  "reporting/USP_IP_Sepsis_ComplianceByShift.sql": {
   "cte_count": 0,
   "physical_table_count": 1,
-  "extraction_suppressed": 58
+  "extraction_suppressed": 0
  },
  "reporting/USP_IP_Sepsis_ComplianceMetrics.sql": {
   "cte_count": 0,
   "physical_table_count": 1,
-  "extraction_suppressed": 44
+  "extraction_suppressed": 0
  },
  "reporting/USP_IP_Sepsis_Details.sql": {
   "cte_count": 0,
   "physical_table_count": 1,
-  "extraction_suppressed": 159
+  "extraction_suppressed": 0
  },
  "reporting/USP_IP_Sepsis_Encounters.sql": {
   "cte_count": 0,
   "physical_table_count": 1,
-  "extraction_suppressed": 20
+  "extraction_suppressed": 0
  },
  "reporting/USP_IP_Sepsis_ScreeningTool.sql": {
   "cte_count": 0,
   "physical_table_count": 1,
-  "extraction_suppressed": 70
+  "extraction_suppressed": 0
  },
  "reports/USP_RPTS_ED_Sepsis.sql": {
   "cte_count": 41,
-  "physical_table_count": 45,
-  "extraction_suppressed": 1314
+  "physical_table_count": 48,
+  "extraction_suppressed": 0
  },
  "reports/USP_RPTS_IP_SEPSIS.sql": {
   "cte_count": 39,
   "physical_table_count": 29,
-  "extraction_suppressed": 1196
+  "extraction_suppressed": 0
  },
  "reports/USP_RPTS_IP_SEPSIS_COMPLIANCE.sql": {
   "cte_count": 3,
   "physical_table_count": 17,
-  "extraction_suppressed": 281
+  "extraction_suppressed": 0
  },
  "reports/USP_RPTS_IP_SEPSIS_COMPLIANCE_BY_SHIFT_NURSES.sql": {
   "cte_count": 2,
   "physical_table_count": 12,
-  "extraction_suppressed": 210
+  "extraction_suppressed": 0
  },
  "reports/USP_RPTS_IP_SEPSIS_REPORT.sql": {
   "cte_count": 38,
   "physical_table_count": 29,
-  "extraction_suppressed": 1224
+  "extraction_suppressed": 0
  },
  "reports/USP_RPTS_NonSevere_Sepsis.sql": {
   "cte_count": 11,
-  "physical_table_count": 13,
-  "extraction_suppressed": 220
+  "physical_table_count": 14,
+  "extraction_suppressed": 0
  },
  "reports/USP_RPTS_Severe_Sepsis.sql": {
   "cte_count": 122,
-  "physical_table_count": 41,
-  "extraction_suppressed": 2508
+  "physical_table_count": 43,
+  "extraction_suppressed": 0
  }
 }

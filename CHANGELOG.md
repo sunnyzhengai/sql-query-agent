@@ -10,6 +10,36 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.30.0] - 2026-08-20
+
+### Added — tree phase 1b complete (overnight run; ADR 0044)
+- Decision nodes IN THE GRAPH: decision layer + step_to_decision /
+  decision_to_column / decision_to_step edges, alias-resolved;
+  reachability verdict per site (connected or counted — Sunny's law);
+  decision layer deliberately excluded from the LPG export until the
+  0046 read model (counted exclusion, exact conservation asserts).
+- parameter_default sites (Sunny's ruling): the IF default-window
+  logic is first-class; ED sepsis now 488/488 decisions, gaps 0.
+- Parser-walker fixes ported to production (1b item 8): indexer noise
+  excluded (13,156 suppressions -> 0, ZERO structural change — pure
+  noise, measured) and the REAL silent bucket fixed: depth cap 15->60
+  and counted. Recovered reads corpus-wide: the trace's 3 named misses
+  (MED_MIX_COMPONENTS, both SEPSIS_STAGING) + FY_DATE_DIMENSION,
+  DM_ICU_STAY — all gains, zero losses.
+- Recorded fixtures RE-RECORDED locally via the native parser: 417
+  full fragments (0 truncated), anonymization scan clean — the
+  stale-fixtures debt is dead. Answer keys re-certified with delta doc
+  docs/internal/RECERT_ANSWER_KEY_1_30.md (PENDING Sunny's sign-off);
+  grounding evals made summarization-robust (>=2 of the metric's own
+  certified tables; refusals stay strict) and cassette re-recorded.
+- Dictionary: DM_ICU_STAY authored (newly-seen read); join map steady
+  at 68 pairs; C4 verdict 28/28 against the improved parse.
+- Toolchain contract (owed from 2026-08-19): CI tools pinned EXACTLY
+  (pytest/pytest-cov/ruff/build) + tests/test_toolchain_contract.py
+  bans floors on CI tools.
+
+---
+
 ## [1.29.0] - 2026-08-19
 
 ### Added — the shadow specification adopted (Φ_AIVIA, ADR 0047)

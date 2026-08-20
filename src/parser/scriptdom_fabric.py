@@ -58,26 +58,21 @@ def _walk_for_selects(node, results, _get_text_fn):
         if spec and spec.InsertSource and spec.InsertSource.GetType().Name == "SelectInsertSource":
             results.append(node)
             return
-    try:
-        for prop in node.GetType().GetProperties():
-            if prop.Name in _SKIP_PROPERTIES:
+    for prop in _child_properties(node):
+        try:
+            value = prop.GetValue(node)
+            if value is None:
                 continue
-            try:
-                value = prop.GetValue(node)
-                if value is None:
-                    continue
-                if hasattr(value, "GetType") and hasattr(value, "StartLine"):
-                    _walk_for_selects(value, results, _get_text_fn)
-                elif hasattr(value, "Count"):
-                    for j in range(value.Count):
-                        item = value[j]
-                        if hasattr(item, "StartLine"):
-                            _walk_for_selects(item, results, _get_text_fn)
-            except Exception:  # noqa: BLE001 — best-effort .NET reflection; counted + surfaced
-                _note_suppressed()
-                continue
-    except Exception:  # noqa: BLE001 — best-effort .NET reflection; counted + surfaced
-        _note_suppressed()
+            if hasattr(value, "GetType") and hasattr(value, "StartLine"):
+                _walk_for_selects(value, results, _get_text_fn)
+            elif hasattr(value, "Count"):
+                for j in range(value.Count):
+                    item = value[j]
+                    if hasattr(item, "StartLine"):
+                        _walk_for_selects(item, results, _get_text_fn)
+        except Exception:  # noqa: BLE001 — best-effort .NET reflection; counted + surfaced
+            _note_suppressed()
+            continue
 
 
 def _get_fragment_text(fragment):
@@ -104,35 +99,66 @@ _SKIP_PROPERTIES = frozenset({
     "Collation", "Alias",
 })
 
+# Type-level property cache with indexer skip (ported from the tree
+# extractor, 1b item 8). The famous 13,156-suppression counter was
+# overwhelmingly .NET INDEXER properties (GetValue on an indexer needs
+# arguments and always throws) — reflection NOISE, not lost data. With
+# indexers excluded up front, the remaining suppressed count means what
+# the audit always wanted it to mean: possibly-lost references.
+_PROPS_BY_TYPE: dict = {}
 
-def _walk_children(node, visitor_fn, depth=0, max_depth=15):
+
+def _child_properties(node):
+    tn = node.GetType().Name
+    cached = _PROPS_BY_TYPE.get(tn)
+    if cached is None:
+        cached = []
+        try:
+            for prop in node.GetType().GetProperties():
+                if prop.Name in _SKIP_PROPERTIES:
+                    continue
+                try:
+                    if prop.GetIndexParameters().Length > 0:
+                        continue  # an indexer, not a child property
+                except Exception:  # noqa: BLE001 — best-effort .NET reflection; counted + surfaced
+                    _note_suppressed()
+                    continue
+                cached.append(prop)
+        except Exception:  # noqa: BLE001 — best-effort .NET reflection; counted + surfaced
+            _note_suppressed()
+        _PROPS_BY_TYPE[tn] = cached
+    return cached
+
+
+def _walk_children(node, visitor_fn, depth=0, max_depth=60):
     """Generic AST walker that calls visitor_fn on each node.
 
     Skips known scalar properties to avoid expensive reflection calls.
-    """
-    if node is None or depth > max_depth:
+    Depth cutoffs are COUNTED (audit 2026-08-19: the old cap of 15 was
+    a silent third bucket — a deeply nested subquery's table reads
+    vanished without a trace; suspected cause of the trace's 3 missing
+    reads)."""
+    if node is None:
+        return
+    if depth > max_depth:
+        _note_suppressed()  # a LOST subtree, not a skipped property
         return
     visitor_fn(node)
-    try:
-        for prop in node.GetType().GetProperties():
-            if prop.Name in _SKIP_PROPERTIES:
+    for prop in _child_properties(node):
+        try:
+            value = prop.GetValue(node)
+            if value is None:
                 continue
-            try:
-                value = prop.GetValue(node)
-                if value is None:
-                    continue
-                if hasattr(value, "GetType") and hasattr(value, "StartLine"):
-                    _walk_children(value, visitor_fn, depth + 1, max_depth)
-                elif hasattr(value, "Count"):
-                    for k in range(value.Count):
-                        item = value[k]
-                        if hasattr(item, "StartLine"):
-                            _walk_children(item, visitor_fn, depth + 1, max_depth)
-            except Exception:  # noqa: BLE001 — best-effort .NET reflection; counted + surfaced
-                _note_suppressed()
-                continue
-    except Exception:  # noqa: BLE001 — best-effort .NET reflection; counted + surfaced
-        _note_suppressed()
+            if hasattr(value, "GetType") and hasattr(value, "StartLine"):
+                _walk_children(value, visitor_fn, depth + 1, max_depth)
+            elif hasattr(value, "Count"):
+                for k in range(value.Count):
+                    item = value[k]
+                    if hasattr(item, "StartLine"):
+                        _walk_children(item, visitor_fn, depth + 1, max_depth)
+        except Exception:  # noqa: BLE001 — best-effort .NET reflection; counted + surfaced
+            _note_suppressed()
+            continue
 
 
 def _extract_table_ref(schema_object):

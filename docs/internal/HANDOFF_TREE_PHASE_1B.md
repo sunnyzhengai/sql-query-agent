@@ -1,12 +1,13 @@
 # Handoff — tree phase 1b: the ScriptDom port and everything that rides with it
 
-**From:** dev session, 2026-08-19. **Status: PARTIALLY EXECUTED same
-day** — items 1, 2, and 6 shipped in 1.28.0 (ScriptDom port done ahead
-of schedule: Sunny's total sqlglot ban made local ScriptDom viable via
-pythonnet + ~/.dotnet, so the port happened immediately; sqlglot and
-sqlparse are deleted repo-wide and CI-banned; the join map is
-native-derived with BLIND SPOT 0). Remaining: items 3, 4, 5, 7 below,
-plus one NEW item 8.
+**From:** dev session, 2026-08-19. **Status: EXECUTED (1.28.0 items
+1/2/6; 1.30.0 items 3/4/5/7/8 — overnight run 2026-08-20).** Exit
+evidence in TREE_PHASE1_ED_SEPSIS.md (488/488, gaps 0) and
+RECERT_ANSWER_KEY_1_30.md (awaiting Sunny's morning sign-off: the
+depth-cap fix recovered reads corpus-wide, all gains zero losses,
+oracles re-pinned). Item 8's surprise: the 13,156 suppressions were
+pure indexer noise (zero structural change) — the REAL third bucket
+was the depth-15 cap, now raised to 60 and counted.
 
 ## Scope (in order)
 

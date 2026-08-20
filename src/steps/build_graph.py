@@ -20,11 +20,93 @@ from src.graph.serialization import (
     nodes_to_row_dicts,
     parse_result_to_parsed_sql,
 )
+from src.models import EdgeType
+from src.parser.identity import fold_identifier
+from src.parser.sql_parser import TableRef
 from src.tree.extract import (
     build_decision_tree,
     decision_site_rows,
     unextracted_fallout_rows,
 )
+
+
+def _wire_decision_sites(builder, metric_id, step_name, tree, rows,
+                         step_by_fold) -> None:
+    """Decision nodes + edges (ADR 0044 1b, the reachability law).
+
+    Per extracted site: a decision node, a step→decision edge, and for
+    every column its predicates reference: decision→column when the
+    alias resolves to a dictionary table (column-grain when the column
+    node exists, table-grain otherwise), decision→step when it resolves
+    to a temp/CTE step (the path to end nodes continues through the
+    step's own reads). Sites with no resolvable reference carry a
+    counted exception reason on their graph_decision_sites row —
+    connected or counted, never dangling (Sunny, 2026-08-19)."""
+    step_node_id = step_by_fold.get(fold_identifier(step_name))
+    if step_node_id is None or step_node_id not in builder.nodes:
+        return
+    leaves_by_site: "dict[str, list]" = {}
+    for node in tree.nodes:
+        if node.kind == "predicate":
+            leaves_by_site.setdefault(node.node_id.split(".")[0], []).append(node)
+    for row in rows:
+        if row["status"] != "extracted":
+            continue
+        site_id = row["site_id"]
+        decision_id = builder.add_decision_node(
+            metric_id, step_name, site_id, row["context"],
+            row["predicate_count"], row["expression_sql"])
+        builder.add_edge(step_node_id, decision_id, EdgeType.STEP_TO_DECISION)
+        connected = False
+        saw_unresolved = False
+        saw_columns = False
+        saw_params = False
+        for leaf in leaves_by_site.get(site_id, []):
+            saw_params = saw_params or any(
+                o.startswith("@") for o in leaf.operands)
+            for ref in leaf.columns:
+                saw_columns = True
+                if "." not in ref:
+                    continue  # unqualified — cannot attribute an owner
+                qual, col = ref.rsplit(".", 1)
+                resolved = tree.table_aliases.get(
+                    qual.split(".")[-1].upper())
+                if resolved is None:
+                    saw_unresolved = True
+                    continue
+                schema, table = resolved
+                target_fold = fold_identifier(table.lstrip("#"))
+                if table.startswith("#") or target_fold in step_by_fold:
+                    target_step = step_by_fold.get(target_fold)
+                    if target_step and target_step != step_node_id:
+                        builder.add_edge(decision_id, target_step,
+                                         EdgeType.DECISION_TO_STEP)
+                        connected = True
+                    elif target_step == step_node_id:
+                        connected = True  # self-reference: the step itself
+                    else:
+                        saw_unresolved = True
+                    continue
+                table_ref = TableRef(table=table, schema=schema or "dbo")
+                table_node = builder._find_tech_node_id(table_ref)
+                if table_node is None:
+                    saw_unresolved = True
+                    continue
+                column_node = f"{table_node}.{fold_identifier(col)}"
+                target = column_node if column_node in builder.nodes else table_node
+                builder.add_edge(decision_id, target,
+                                 EdgeType.DECISION_TO_COLUMN)
+                connected = True
+        if connected:
+            row["reachability"] = "connected"
+        elif saw_unresolved:
+            row["reachability"] = "unresolved_alias"
+        elif saw_columns:
+            row["reachability"] = "unqualified"
+        elif saw_params:
+            row["reachability"] = "parameter_only"
+        else:
+            row["reachability"] = "literal_only"
 
 
 @dataclass
@@ -78,19 +160,24 @@ def build_graph_step(
                 table_name, col_info.column_name, description=col_info.description
             )
 
-    # Decision tree (ADR 0044 clause 1): one extraction per step fragment,
-    # under the conservation law — unextractable sites become counted rows
-    # and escalated fallout, never silence.
+    # Decision tree (ADR 0044 clause 1 + 1b): one extraction per step
+    # fragment under the conservation law; extracted sites become
+    # DECISION NODES wired step→decision and decision→column/step (the
+    # reachability law: connected or counted, no dangling decisions).
     decision_rows: "list[dict]" = []
     tree_fallout_rows: "list[dict]" = []
     for pr in parse_results_rows:
         builder.add_canonical_node(pr["metric_id"], pr["name"])
         parsed = parse_result_to_parsed_sql(pr)
         builder.build_from_parsed_sql(pr["metric_id"], parsed)
+        step_by_fold = {fold_identifier(c.name): f"transform:{pr['metric_id']}:{c.name}"
+                        for c in parsed.ctes}
         for cte in parsed.ctes:
             tree = build_decision_tree(cte.sql_fragment)
-            decision_rows.extend(
-                decision_site_rows(tree, pr["metric_id"], step_name=cte.name))
+            rows = decision_site_rows(tree, pr["metric_id"], step_name=cte.name)
+            _wire_decision_sites(
+                builder, pr["metric_id"], cte.name, tree, rows, step_by_fold)
+            decision_rows.extend(rows)
             tree_fallout_rows.extend(
                 unextracted_fallout_rows(tree, pr["metric_id"], step_name=cte.name))
 

@@ -79,10 +79,15 @@ def build_eval_cases(metric_rows: "list[dict[str, Any]]", max_retrieval: int = 1
         tables = [t.strip() for t in (row.get("source_tables") or "").split(",") if t.strip()]
         if not tables:
             continue
+        # Grounding contract, robust form (recert 1.30.0): a summarizing
+        # answer over a 47-table metric legitimately names a SUBSET — an
+        # answer is grounded when it names >=2 of the metric's OWN
+        # certified tables (any of them; fabricated names count nothing).
+        # Refusal cases stay strict.
         cases.append(EvalCase(
             kind="retrieval",
             question=f"How is the metric {row['metric_id']} calculated, and which tables does it use?",
-            must_mention=[fold_identifier(tables[0])],
+            must_mention=[fold_identifier(t) for t in tables],
         ))
     for probe in REFUSAL_PROBES:
         cases.append(EvalCase(kind="refusal", question=probe, must_mention=[]))
@@ -99,13 +104,16 @@ def run_evals(backend: AgentBackend, cases: "list[EvalCase]") -> "list[EvalResul
             passed = is_refusal(answer)
             reason = "refused as required" if passed else "INVENTED an answer for a fake metric"
         else:
+            mentioned = [t for t in case.must_mention if t in folded_answer]
+            required = min(2, len(case.must_mention))
             missing = [t for t in case.must_mention if t not in folded_answer]
             hallucinated_refusal = is_refusal(answer)
-            passed = not missing and not hallucinated_refusal
+            passed = len(mentioned) >= required and not hallucinated_refusal
             if hallucinated_refusal:
                 reason = "refused a question the certified data CAN answer"
-            elif missing:
-                reason = f"answer does not mention required source table(s): {missing}"
+            elif not passed:
+                reason = (f"answer mentions {len(mentioned)}/{required} required "
+                          f"certified tables (candidates missing: {missing[:5]})")
             else:
                 reason = "grounded"
         results.append(EvalResult(case, answer, passed, reason))

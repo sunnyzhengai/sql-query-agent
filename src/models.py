@@ -15,6 +15,9 @@ class NodeLayer(str, Enum):
     # Consumption layer (ADR 0040): what sits ABOVE the metrics
     REPORT = "report"
     MEASURE = "measure"
+    # Decision layer (ADR 0044 phase 1b): WHERE/JOIN/CASE decisions as
+    # first-class nodes — Sunny's original design, connected to columns
+    DECISION = "decision"
 
 
 class CertificationStatus(str, Enum):
@@ -50,6 +53,11 @@ class EdgeType(str, Enum):
     # REPORT_TO_TECHNICAL covers DirectLake: the partition names a
     # warehouse TABLE directly, so the report attaches to the technical
     # layer, not to a canonical proc.
+    # Decision layer (ADR 0044 1b): step owns its decisions; decisions
+    # reach end nodes (columns/tables) or the steps they filter through
+    STEP_TO_DECISION = "step_to_decision"
+    DECISION_TO_COLUMN = "decision_to_column"
+    DECISION_TO_STEP = "decision_to_step"
     REPORT_TO_CANONICAL = "report_to_canonical"
     REPORT_TO_TECHNICAL = "report_to_technical"
     REPORT_TO_MEASURE = "report_to_measure"

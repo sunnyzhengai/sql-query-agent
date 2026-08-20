@@ -101,6 +101,10 @@ class DecisionTree:
     unextracted: "list[UnextractedSite]" = field(default_factory=list)
     decision_sites_total: int = 0
     handled_count: int = 0
+    # alias/name (UPPER) -> (schema or None, table-with-#-marker) — the
+    # resolution material for decision→column edges (1b). CTE names map
+    # to (None, name) like temps: both are step-side.
+    table_aliases: "dict[str, tuple]" = field(default_factory=dict)
 
     @property
     def nodes(self) -> "list[DecisionNode]":
@@ -385,15 +389,54 @@ class _Extractor:
             # dynamic SQL: EXEC(@sql) / EXEC('...') — permanent counted gap
             self.add_unextracted("statement", "dynamic_sql", _verbatim(node))
             return
+        if tn == "NamedTableReference":
+            try:
+                so = node.SchemaObject
+                table = so.BaseIdentifier.Value  # keeps the '#' marker
+                schema = so.SchemaIdentifier.Value if so.SchemaIdentifier else None
+                self.tree.table_aliases.setdefault(table.upper(), (schema, table))
+                if node.Alias is not None:
+                    self.tree.table_aliases[node.Alias.Value.upper()] = (schema, table)
+            except Exception:  # noqa: BLE001 — .NET reflection; counted via suppressed
+                self.suppressed += 1
+        elif tn == "CommonTableExpression":
+            try:
+                name = node.ExpressionName.Value
+                self.tree.table_aliases.setdefault(name.upper(), (None, name))
+            except Exception:  # noqa: BLE001 — .NET reflection; counted via suppressed
+                self.suppressed += 1
+        elif tn == "QueryDerivedTable":
+            try:
+                if node.Alias is not None:
+                    name = node.Alias.Value
+                    self.tree.table_aliases.setdefault(name.upper(), (None, name))
+            except Exception:  # noqa: BLE001 — .NET reflection; counted via suppressed
+                self.suppressed += 1
         if tn == "IfStatement":
-            # control-flow decision (e.g. the default reporting window);
-            # counted until the parameter_default modeling decision lands
-            # (TREE_PHASE1_ED_SEPSIS reviewer question 3). Descent still
-            # collects the branches' statements and any subqueries in
-            # the predicate.
-            self.add_unextracted(
-                "statement", "control_flow_if",
-                _verbatim(node.Predicate) if node.Predicate else "IF")
+            # RULED (Sunny 2026-08-19): parameter-defaulting IF blocks
+            # (branches SET variables — the default reporting window) are
+            # first-class parameter_default sites so descriptions can
+            # voice them. Other control-flow IFs stay counted gaps.
+            # Descent still collects the branches' statements and any
+            # subqueries in the predicate.
+            sets = []
+            self._walk_scalars(node, {"SetVariableStatement"}, sets)
+            if sets and node.Predicate is not None:
+                site_id = self._next_site_id()
+                self.tree.decision_sites_total += 1
+                self.tree.handled_count += 1
+                leaf = DecisionNode(
+                    node_id=f"{site_id}.0", kind="predicate",
+                    op="PARAMETER_DEFAULT", context="parameter_default",
+                    expression_sql=_verbatim(node)[:1000],
+                    columns=[], operands=self._operands(node),
+                    must_voice=True)
+                self.tree.sites.append(DecisionSite(
+                    site_id=site_id, context="parameter_default", root=leaf))
+            else:
+                self.add_unextracted(
+                    "statement", "control_flow_if",
+                    _verbatim(node.Predicate) if node.Predicate else "IF")
         elif tn == "WhereClause":
             self.add_site("where", node.SearchCondition)
         elif tn == "HavingClause":
@@ -515,6 +558,7 @@ def decision_site_rows(tree: DecisionTree, metric_id: str,
             "tree": json.dumps(s.root.to_dict()),
             "expression_sql": s.root.expression_sql,
             "reason_code": None,
+            "reachability": None,  # patched by the graph wiring (1b)
         })
     for u in tree.unextracted:
         rows.append({
@@ -524,6 +568,7 @@ def decision_site_rows(tree: DecisionTree, metric_id: str,
             "columns_used": json.dumps([]), "tree": None,
             "expression_sql": u.expression_sql,
             "reason_code": u.reason_code,
+            "reachability": None,
         })
     return rows
 

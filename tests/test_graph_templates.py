@@ -38,18 +38,18 @@ def view():
 
 class TestAnswerKey:
     def test_q1_severe_sepsis_uses_32_tables(self, view):
-        assert len(view.tables_of_metric("reports.USP_Severe_Sepsis")) == 32
+        assert len(view.tables_of_metric("reports.USP_Severe_Sepsis")) == 35  # recert 1.30.0
 
     def test_q2_ip_sepsisdetails_uses_19_tables(self, view):
-        assert len(view.tables_of_metric("reporting.USP_IP_SepsisDetails")) == 19
+        assert len(view.tables_of_metric("reporting.USP_IP_SepsisDetails")) == 22  # recert 1.30.0
 
     def test_q3_bare_name_is_ambiguous_two_schemas(self, view):
         matches = view.find_metrics("USP_ED_Sepsis")
         assert {m["metricId"] for m in matches} == {
             "reports.USP_ED_Sepsis", "reporting.USP_ED_Sepsis",
         }
-        assert len(view.tables_of_metric("reports.USP_ED_Sepsis")) == 29
-        assert len(view.tables_of_metric("reporting.USP_ED_Sepsis")) == 38
+        assert len(view.tables_of_metric("reports.USP_ED_Sepsis")) == 47  # recert 1.30.0
+        assert len(view.tables_of_metric("reporting.USP_ED_Sepsis")) == 47  # recert 1.30.0
 
     def test_q4_hospital_encounters_read_by_13_metrics(self, view):
         readers = view.metrics_of_table("HOSPITAL_ENCOUNTERS")
@@ -59,13 +59,13 @@ class TestAnswerKey:
         assert "reporting.USP_IP_SepsisShiftCompliance" in ids
 
     def test_q4b_medication_orders_read_by_7_metrics(self, view):
-        assert len(view.metrics_of_table("MEDICATION_ORDERS")) == 7
+        assert len(view.metrics_of_table("MEDICATION_ORDERS")) == 8  # recert 1.30.0
 
     def test_q5_shared_sources_14_metrics_top_is_reporting_twin(self, view):
         shared = view.shared_source_metrics("reports.USP_ED_Sepsis")
         assert len(shared) == 14
         assert shared[0]["metricId"] == "reporting.USP_ED_Sepsis"
-        assert shared[0]["sharedTables"] == 24
+        assert shared[0]["sharedTables"] == 47  # recert 1.30.0
 
     def test_q6_hospital_encounters_has_133_dictionary_columns(self, view):
         assert len(view.columns_of_table("HOSPITAL_ENCOUNTERS")) == 133
@@ -73,7 +73,7 @@ class TestAnswerKey:
     def test_q7_most_read_metric_is_reporting_ed_sepsis_38(self, view):
         top = view.most_read_metrics(top=3)
         assert top[0]["metricId"] == "reporting.USP_ED_Sepsis"
-        assert top[0]["tableCount"] == 38
+        assert top[0]["tableCount"] == 47  # recert 1.30.0
 
     def test_q8_q9_unknown_references_resolve_to_nothing(self, view):
         assert view.find_metrics("FAKE_METRIC_XYZ") == []
@@ -85,7 +85,7 @@ class TestCaseInsensitivity:
     """ADR 0016: a correct key in the wrong case must still land."""
 
     def test_metric_key_any_case(self, view):
-        assert len(view.tables_of_metric("REPORTS.usp_severe_SEPSIS")) == 32
+        assert len(view.tables_of_metric("REPORTS.usp_severe_SEPSIS")) == 35  # recert 1.30.0
 
     def test_table_key_any_case(self, view):
         assert len(view.metrics_of_table("hospital_encounters")) == 13

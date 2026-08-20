@@ -127,3 +127,27 @@ Reviewer question 3 ANSWERED (Sunny, 2026-08-19): **model it** — the
 IF default-window blocks become a `parameter_default` site kind in 1b;
 expected end state 488/488. (Questions 1–2 stand answered by the
 reconciliation and the dictionary remediation: 28/28 leaf-grounded.)
+
+## Phase 1b complete (1.30.0, overnight run)
+
+| | native 1.28.0 | **1b (1.30.0)** |
+|---|---|---|
+| Decision sites | 488 | 488 |
+| Extracted | 486 (99.6%) | **488 (100.0%)** |
+| Gaps | 2 (control_flow_if) | **0** |
+
+- `parameter_default` sites (your ruling) carry the default window
+  verbatim: operands include `'MB-12'` and `'T-1'` — the description
+  layer can now voice "defaults to the last 12 months through
+  yesterday."
+- Decision nodes are IN THE GRAPH: `step→decision`,
+  `decision→column` (column-grain when the dictionary has the column,
+  table-grain otherwise), `decision→step` for temp-side references —
+  and every extracted site carries a `reachability` verdict
+  (connected | literal_only | parameter_only | unresolved_alias |
+  unqualified): connected or counted, no dangling decisions.
+- The depth-cap fix recovered the trace's 3 missing reads — this
+  proc's read set now matches your hand-derived 48 exactly
+  (RECERT_ANSWER_KEY_1_30.md).
+
+Remaining known gap classes in the WHOLE corpus: dynamic SQL only.

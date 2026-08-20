@@ -46,7 +46,8 @@ def test_cases_are_generated_from_the_data():
     cases = build_eval_cases(ROWS)
     kinds = [c.kind for c in cases]
     assert kinds.count("retrieval") == 1 and kinds.count("refusal") == 2
-    assert cases[0].must_mention == ["ENCOUNTER"]
+    # recert 1.30.0: candidates = ALL the metric's certified tables
+    assert cases[0].must_mention == ["ENCOUNTER", "DEPARTMENT"]
 
 
 def test_grounded_backend_passes_everything():

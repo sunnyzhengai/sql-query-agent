@@ -31,11 +31,23 @@ def export_step(nodes_rows: "list[dict]", edges_rows: "list[dict]") -> "dict[str
     edge_total = sum(
         len(rows) for name, rows in tables.items() if name.startswith("graph_edge_")
     )
-    assert node_total == len(nodes), (
-        f"export_step: {len(nodes)} nodes -> {node_total} exported node rows"
+    # Decision layer (ADR 0044 1b) is deliberately NOT exported yet —
+    # the Fabric Graph read model gains it with the 0046 engine. The
+    # conservation assert stays EXACT: declared exclusions are counted,
+    # never absorbed into slack.
+    from src.models import EdgeType, NodeLayer
+    decision_nodes = sum(1 for n in nodes.values()
+                         if n.layer == NodeLayer.DECISION)
+    decision_edges = sum(1 for e in edges if e.edge_type in (
+        EdgeType.STEP_TO_DECISION, EdgeType.DECISION_TO_COLUMN,
+        EdgeType.DECISION_TO_STEP))
+    assert node_total == len(nodes) - decision_nodes, (
+        f"export_step: {len(nodes)} nodes ({decision_nodes} decision-layer "
+        f"excluded) -> {node_total} exported node rows"
     )
-    assert edge_total == len(edges), (
-        f"export_step: {len(edges)} edges -> {edge_total} exported edge rows"
+    assert edge_total == len(edges) - decision_edges, (
+        f"export_step: {len(edges)} edges ({decision_edges} decision-layer "
+        f"excluded) -> {edge_total} exported edge rows"
     )
 
     uses_table = derive_uses_table_rows(nodes, edges)
