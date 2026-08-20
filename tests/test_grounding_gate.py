@@ -66,3 +66,38 @@ class TestGroundedTextPasses:
         fragment = "SELECT a, b FROM #prior"
         text = "This step carries forward the prior result columns."
         assert grounding_violations(text, fragment) == []
+
+
+class TestDialectAwareness:
+    """Field find (tenant 600 rerun, 2026-08-20): the selected-not-
+    filtered heuristic reads SQL structure (WHERE/ON windows) and
+    misfires on DAX and composed prose, stripping legitimate text
+    until whole descriptions emptied."""
+
+    DAX = ('CALCULATE(COUNTROWS(gov_feedback_events), '
+           'gov_feedback_events[verdict] = "not_helpful")')
+    CLAIM = ('- Filters on feedback events where the verdict equals '
+             '"not_helpful."')
+
+    def test_dax_filter_claim_misfires_under_sql_rules(self):
+        # documents the misfire this class exists to prevent
+        out = grounding_violations(self.CLAIM, self.DAX, None)
+        assert any("selected-not-filtered" in v for v in out)
+
+    def test_dax_dialect_accepts_calculate_filters(self):
+        assert grounding_violations(self.CLAIM, self.DAX, None,
+                                    dialect="dax") == []
+
+    def test_dax_dialect_still_rejects_invented_values(self):
+        out = grounding_violations(
+            "- Filters on scores above 9000.", self.DAX, None, dialect="dax")
+        assert any("9000" in v for v in out)
+
+    def test_prose_dialect_grounds_prompt_supplied_step_count(self):
+        text = "This metric is computed through 122 steps."
+        roots_ground = "Counts qualifying encounters."
+        assert any("122" in v for v in grounding_violations(
+            text, roots_ground, None, dialect="prose"))
+        assert grounding_violations(
+            text, roots_ground, ["USP_Severe_Sepsis", "122", "FinalData"],
+            dialect="prose") == []

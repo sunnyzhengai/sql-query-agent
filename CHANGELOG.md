@@ -10,6 +10,24 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.33.6] - 2026-08-20
+
+### Fixed — grounding gate false positives on DAX and composed prose (field find: 600 rerun)
+- The selected-not-filtered heuristic reads SQL structure (WHERE/ON
+  windows vs SELECT list); applied to a DAX measure it stripped a
+  legitimate CALCULATE filter claim until the description emptied.
+  grounding_violations now takes a dialect ("sql" | "dax" | "prose");
+  non-SQL dialects skip the structural heuristic while value grounding
+  still applies in full.
+- Metric composition: facts the prompt itself supplies (step_count,
+  metric name, root step names) are grounded by definition — the gate
+  was rejecting "computed through 122 steps" because 122 only existed
+  in the prompt, not in the root descriptions it greps.
+- Both 600 rerun failures (the admin-telemetry measure, the
+  Severe_Sepsis metric) were this bug; reproduced in tests verbatim.
+
+---
+
 ## [1.33.5] - 2026-08-20
 
 ### Fixed — transient LLM errors no longer lose descriptions (field find: 600 run, 4 failed)

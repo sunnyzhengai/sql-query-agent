@@ -139,15 +139,25 @@ def _condition_text(fragment: str) -> str:
 
 
 def grounding_violations(
-    text: str, fragment: str, dict_lines: "list[str] | None" = None
+    text: str, fragment: str, dict_lines: "list[str] | None" = None,
+    dialect: str = "sql",
 ) -> "list[str]":
     """Deterministic checks of a generated description against the ONE
     source it claims to describe. Returns human-readable violations;
-    empty list = grounded."""
+    empty list = grounded.
+
+    dialect: "sql" applies the full check set. "dax"/"prose" skip the
+    selected-not-filtered heuristic — it reads SQL structure (WHERE/ON
+    windows vs SELECT list), which does not exist in a DAX expression
+    or in composed prose (field find, tenant 600 run 2026-08-20: a
+    legitimate CALCULATE filter was stripped as 'selected-not-
+    filtered' until the whole description emptied). Value grounding
+    (checks 1) applies to every dialect."""
     violations: "list[str]" = []
     ground = (fragment or "") + "\n" + "\n".join(dict_lines or [])
     ground_low = ground.lower()
-    conditions = _condition_text(fragment or "").lower()
+    conditions = (ground_low if dialect != "sql"
+                  else _condition_text(fragment or "").lower())
 
     # 1) every literal value in the output must exist in the source
     for num in set(_OUT_NUMBERS.findall(text)):
@@ -181,13 +191,14 @@ def grounding_violations(
 
 
 def enforce_grounding(
-    text: str, fragment: str, dict_lines: "list[str] | None" = None
+    text: str, fragment: str, dict_lines: "list[str] | None" = None,
+    dialect: str = "sql",
 ) -> "tuple[str, list[str]]":
     """Surgical fallback after a failed retry: strip the violating
     lines, keep grounded content. If the remaining text still violates
     (bad summary sentence), drop everything — absence over fabrication.
     Returns (clean_text_or_empty, removed_violations)."""
-    violations = grounding_violations(text, fragment, dict_lines)
+    violations = grounding_violations(text, fragment, dict_lines, dialect)
     if not violations:
         return text, []
     bad_lines = {v.split(": ", 1)[1].split(" — ")[0].strip("'\"")
@@ -199,7 +210,8 @@ def enforce_grounding(
             continue
         kept.append(line)
     cleaned = "\n".join(kept).strip()
-    if cleaned and not grounding_violations(cleaned, fragment, dict_lines):
+    if cleaned and not grounding_violations(cleaned, fragment, dict_lines,
+                                            dialect):
         return cleaned, violations
     return "", violations
 
@@ -357,14 +369,14 @@ _RETRY_NOTE = (
 
 def _grounded_describe(
     describe, prompt: str, fragment: str,
-    dict_lines: "list[str] | None",
+    dict_lines: "list[str] | None", dialect: str = "sql",
 ) -> "tuple[str, list[str]]":
     """describe() + gate + ONE corrective retry + surgical fallback.
     Returns (text_or_empty, violations_removed)."""
     text = describe(prompt).strip()
     if not text:
         return "", []
-    violations = grounding_violations(text, fragment, dict_lines)
+    violations = grounding_violations(text, fragment, dict_lines, dialect)
     if not violations:
         return text, []
     note = _RETRY_NOTE.format(
@@ -375,7 +387,7 @@ def _grounded_describe(
         retry = ""
     if retry:
         text = retry
-    return enforce_grounding(text, fragment, dict_lines)
+    return enforce_grounding(text, fragment, dict_lines, dialect)
 
 
 def generate_descriptions(
@@ -495,7 +507,7 @@ def generate_descriptions(
         )
         try:
             text, removed = _grounded_describe(
-                describe, prompt, expression, dict_lines)
+                describe, prompt, expression, dict_lines, dialect="dax")
         except Exception as err:  # noqa: BLE001 — one bad measure must not kill the batch
             result.fail(node_id, f"generation_error: {type(err).__name__}: {err}"[:300])
             continue
@@ -540,9 +552,15 @@ def generate_descriptions(
             continue
         prompt = build_metric_prompt(node.name, roots, step_count)
         roots_ground = "\n".join(d for _, d in roots)
+        # Facts WE put in the prompt are grounded by definition — the
+        # gate greps only roots_ground, so the step_count it asked the
+        # LLM to voice ('computed in 122 steps') must be in the ground
+        # (field find, tenant 600 run 2026-08-20).
+        prompt_facts = [node.name, str(step_count)] + [n for n, _ in roots]
         try:
             text, removed = _grounded_describe(
-                describe, prompt, roots_ground, None)
+                describe, prompt, roots_ground, prompt_facts,
+                dialect="prose")
         except Exception as err:  # noqa: BLE001
             result.fail(node_id, f"generation_error: {type(err).__name__}: {err}"[:300])
             continue
