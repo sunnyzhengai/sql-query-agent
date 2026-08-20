@@ -42,6 +42,16 @@ PRIMITIVES = {
         "data_shaped_because": "the store admits reading a record by id",
         "adr": "0036",
     },
+    "op_census": {
+        # AMENDMENT 2026-08-20 (field find, web-UI test): "how many
+        # metrics" was planned as a name-search for the word "metrics" —
+        # kind words are categories; enumeration is its own primitive.
+        "kind": "primitive",
+        "data_shaped_because": "the store partitions the catalog by a "
+                               "closed kind column; enumerating one kind "
+                               "is a complete, exact-count scan",
+        "adr": "0036",
+    },
     "op_compare": {
         "kind": "kernel-dispatch",
         "data_shaped_because": "comparisons range over exactly four "
@@ -107,9 +117,12 @@ SYSTEM_VOCAB = frozenset({
     "canonical_to_transform", "transform_to_transform",
     "transform_to_technical",
     # tool/op names appearing in dispatch tables and basis stamping
-    "search", "retrieve", "update", "compare", "explain",
+    # ("census"/"list_catalog": AMENDMENT 2026-08-20 — the enumeration
+    # primitive; catalog kinds are SYSTEM vocabulary, not user phrasing)
+    "search", "retrieve", "update", "compare", "explain", "census",
     "search_catalog", "find_by_name", "get_facts", "list_steps",
-    "check_same_logic",
+    "check_same_logic", "list_catalog",
+    "metric", "step", "term", "report", "measure",
 })
 
 # --- the prompt budget -------------------------------------------------

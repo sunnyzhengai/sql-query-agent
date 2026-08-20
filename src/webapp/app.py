@@ -413,6 +413,12 @@ function fieldFor(c) {
       <option value="exact" ${p.mode==='exact'?'selected':''}>exact — complete enumeration
         by name</option>
     </select>`;
+  if (c.op === 'census') return `
+    <select data-f="kind">
+      ${['metric','step','term','report','measure'].map(k =>
+        `<option value="${k}" ${p.kind===k?'selected':''}>every ${k} — complete list + exact count</option>`
+      ).join('')}
+    </select>`;
   if (c.op === 'retrieve') return `
     <textarea data-f="ids">${esc((p.ids||[]).join('\\n'))}</textarea>
     <span class="note">one id per line</span>`;
@@ -465,6 +471,7 @@ function collectPlan(card) {
                        return n ? n.value : ''; };
     let params = {};
     if (op === 'search') params = { phrase: get('phrase'), mode: get('mode') };
+    if (op === 'census') params = { kind: get('kind') };
     if (op === 'retrieve') params = { ids: get('ids').split('\\n')
         .map(s => s.trim()).filter(Boolean) };
     if (op === 'compare') { params = { refs: get('refs').split(',')
@@ -519,7 +526,7 @@ function renderOutput(o) {
     <span class="universe">${esc(r.universe)}${r.note ? ' · ' + esc(r.note) : ''}</span>
     </div></div>`);
   let rows2 = r.rows, prefer = null;
-  if (r.op === 'search') {
+  if (r.op === 'search' || r.op === 'census') {
     // Customer-facing view: an exec asking what logic is in a report
     // reads business identities, not CTE names or refs.
     rows2 = [...rows2].sort((a, b) => (b.closeness || 0) - (a.closeness || 0));

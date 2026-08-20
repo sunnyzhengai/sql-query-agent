@@ -23,6 +23,8 @@ from src.orchestrator.ops import (
     OpError,
     OpsSession,
     ResultSet,
+    normalize_kind,
+    op_census,
     op_compare,
     op_retrieve,
     op_search,
@@ -35,7 +37,12 @@ PLANNER_PROMPT = (
     "- search: params {phrase, mode}. mode=semantic finds the closest "
     "matches by meaning (top-K, NEVER exhaustive); mode=exact "
     "enumerates every item whose name/business name/ref equals the "
-    "phrase (the ONLY mode that supports 'all/none/unique' claims).\n"
+    "phrase. Phrases are NAMES of things — never category words.\n"
+    "- census: params {kind} (metric|step|term|report|measure). "
+    "Complete enumeration of a KIND with the exact count. ALWAYS use "
+    "this for 'how many X are there' / 'list all X' — a kind word "
+    "(metrics, reports) in a search phrase finds only items NAMED "
+    "that word.\n"
     "- retrieve: params {ids}. Full records for ids the user named or "
     "a prior result surfaced.\n"
     "- compare: params {refs, aspect?}. Deterministic comparison over "
@@ -110,7 +117,7 @@ CAPTION_TOOL = {
 
 _REF_SHAPE = re.compile(r"^(R\d+|\$\d+)$")
 
-IMPLEMENTED_OPS = ("search", "retrieve", "compare")
+IMPLEMENTED_OPS = ("search", "census", "retrieve", "compare")
 APPROVED_UNBUILT = {"traverse": "approved (ADR 0037) but not yet built",
                     "update": "approved (ADR 0036/0038) but gated on the "
                               "access-control ADR"}
@@ -136,6 +143,14 @@ def validate_component(c: dict, index: int) -> "dict":
         elif p.get("mode") not in ("semantic", "exact"):
             out["invalid_reason"] = "search mode must be semantic or exact"
         else:
+            out["valid"] = True
+    elif op == "census":
+        kind = normalize_kind(str(p.get("kind", "")))
+        if kind is None:
+            out["invalid_reason"] = ("census kind must be metric, step, "
+                                     "term, report, or measure")
+        else:
+            out["params"]["kind"] = kind
             out["valid"] = True
     elif op == "retrieve":
         ids = p.get("ids")
@@ -267,6 +282,8 @@ def _run_component(c: dict, produced: "dict[int, str]", run_kql,
     p = c["params"]
     if c["op"] == "search":
         return op_search(p["phrase"], p["mode"], run_kql, ops)
+    if c["op"] == "census":
+        return op_census(p["kind"], run_kql, ops)
     if c["op"] == "retrieve":
         return op_retrieve(_expand_ids(p["ids"], produced, ops),
                            run_kql, ops)

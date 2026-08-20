@@ -15,6 +15,25 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.38.0] - 2026-08-20
+
+### Added — the census primitive (field find: Sunny's web-UI test)
+- "how many metrics are there" was planned as an exact name-search for
+  the word "metrics"; the honest empty was then captioned as "no
+  metrics exist" — a kind word force-fit into a name slot because the
+  surface had no enumeration primitive, plus an E6 over-claim.
+- New op `census {kind}` (plan protocol) and tool `list_catalog`
+  (agent toolset): complete enumeration of one kind (metric | step |
+  term | report | measure) with the exact count; plural kind words
+  normalize; ids are surfaced for follow-up reads. Web UI gains the
+  plan editor row, params wiring, and business-identity rendering.
+- Planner prompt teaches the category-vs-name distinction (HOW, never
+  a hardcoded answer); find_by_name's empty result now carries the E6
+  guard note ("no item bears this NAME — not a statement about how
+  many items of a kind exist; use the census").
+
+---
+
 ## [1.37.0] - 2026-08-20
 
 ### Added — the admin companion, deterministic core (ADR 0048 item 4)

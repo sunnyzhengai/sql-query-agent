@@ -10,6 +10,7 @@ from src.orchestrator.core import RESOLVE_QUERY
 from src.orchestrator.tools import (
     BATCH_FRAGMENTS_QUERY,
     FIND_BY_NAME_QUERY,
+    LIST_CATALOG_QUERY,
     STEPS_OF_QUERY,
     Session,
     ToolError,
@@ -17,6 +18,7 @@ from src.orchestrator.tools import (
     dispatch,
     find_by_name,
     get_facts,
+    list_catalog,
     list_steps,
     search_catalog,
 )
@@ -66,6 +68,14 @@ def fake_kql(query, params):
             return [{"node_id": f"canonical:{REF_A}", "kind": "metric",
                      "ref": REF_A, "name": "USP_ED_Sepsis",
                      "business_name": "ED Sepsis Screening"}]
+        return []
+    if query == LIST_CATALOG_QUERY:
+        kind = params["p_kind"]
+        if kind == "metric":
+            return [{"node_id": f"canonical:{ref}", "kind": "metric",
+                     "ref": ref, "name": row["metric_name"],
+                     "business_name": row["business_name"]}
+                    for ref, row in sorted(METRIC_ROWS.items())]
         return []
     if query == METRIC_FACTS_QUERY:
         row = METRIC_ROWS.get(params["p_ref"])
@@ -123,6 +133,37 @@ class TestFind:
         assert find_by_name("ED Sepsis Screening", fake_kql, s)["count"] == 1
         assert find_by_name(REF_A, fake_kql, s)["count"] == 1
         assert s.permitted(REF_A)
+
+    def test_empty_name_lookup_blocks_the_none_exist_overclaim(self):
+        """Field find (2026-08-20, web-UI test): 'how many metrics' was
+        planned as find_by_name('metrics'); the honest empty was then
+        captioned 'no metrics exist'. The empty result now carries the
+        E6 guard pointing at the census tool."""
+        out = find_by_name("metrics", fake_kql, Session())
+        assert out["count"] == 0
+        assert "list_catalog" in out["note"]
+
+
+class TestCensus:
+    def test_enumerates_every_metric_with_exact_count(self):
+        s = Session()
+        out = list_catalog("metric", fake_kql, s)
+        assert out["count"] == 2
+        assert {i["id"] for i in out["items"]} == {REF_A, REF_B}
+        assert s.permitted(REF_A) and s.permitted(REF_B)
+        assert "complete enumeration" in out["note"]
+
+    def test_plural_kind_word_is_understood(self):
+        out = list_catalog("metrics", fake_kql, Session())
+        assert out["kind"] == "metric" and out["count"] == 2
+
+    def test_unknown_kind_answers_with_the_kinds(self):
+        with pytest.raises(ToolError, match="metric, step, term"):
+            list_catalog("dashboards", fake_kql, Session())
+
+    def test_dispatch_route(self):
+        out = dispatch("list_catalog", {"kind": "metric"}, fake_kql, Session())
+        assert out["count"] == 2
 
 
 class TestGuarantee1:

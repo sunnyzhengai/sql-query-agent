@@ -66,6 +66,24 @@ class TestPropose:
         assert plan["components"] == []
         assert "Which metric" in plan["clarification"]
 
+    def test_census_component_validates_and_normalizes_plural(self):
+        c = validate_component({"op": "census",
+                                "params": {"kind": "Metrics"}}, 1)
+        assert c["valid"] and c["params"]["kind"] == "metric"
+        c = validate_component({"op": "census",
+                                "params": {"kind": "dashboards"}}, 1)
+        assert not c["valid"] and "metric, step, term" in c["invalid_reason"]
+
+    def test_census_executes_and_declares_exact_count(self):
+        from tests.orchestrator.test_tools import fake_kql
+        s = ProtocolSession()
+        outs = execute_confirmed(
+            s, {"components": [{"op": "census",
+                                "params": {"kind": "metrics"}}]}, fake_kql)
+        r = outs[0]["result"]
+        assert r["complete"] is True and len(r["rows"]) == 2
+        assert "count is exact" in r["universe"]
+
     def test_approved_unbuilt_ops_fail_honestly(self):
         c = validate_component({"op": "traverse", "params": {}}, 1)
         assert not c["valid"] and "not yet built" in c["invalid_reason"]

@@ -26,7 +26,9 @@ from src.orchestrator.assemble import (
 from src.orchestrator.core import resolve
 from src.orchestrator.tools import (
     BATCH_FRAGMENTS_QUERY,
+    CATALOG_KINDS,
     FIND_BY_NAME_QUERY,
+    LIST_CATALOG_QUERY,
     STEPS_OF_QUERY,
     _cap,
     _content_key,
@@ -177,6 +179,40 @@ def op_search(phrase: str, mode: str, run_kql,
         universe=f"closest matches by meaning (top {len(out)} of "
                  f"{result.total_matches} above the similarity floor) — "
                  "NOT an exhaustive list")
+
+
+def normalize_kind(kind: str) -> "str | None":
+    """'metrics' → 'metric'; unknown kinds → None (never guessed)."""
+    k = str(kind).strip().lower()
+    if k not in CATALOG_KINDS and k.endswith("s") and k[:-1] in CATALOG_KINDS:
+        k = k[:-1]
+    return k if k in CATALOG_KINDS else None
+
+
+def op_census(kind: str, run_kql, session: OpsSession) -> ResultSet:
+    """Complete enumeration of one catalog KIND, with the exact count.
+
+    Field find (2026-08-20, Sunny's web-UI test): 'how many metrics are
+    there' was planned as an exact name-search for the word 'metrics' —
+    an honest empty that the caption then over-read as 'no metrics
+    exist'. Kind words are categories, never names; enumeration
+    questions get an enumeration primitive."""
+    k = normalize_kind(kind)
+    if k is None:
+        raise OpError(f"census kind must be one of "
+                      f"{', '.join(CATALOG_KINDS)}, got {kind!r}")
+    rows = run_kql(LIST_CATALOG_QUERY, {"p_kind": k})
+    out = [
+        {"id": (r["ref"] if r["kind"] == "metric" else r["node_id"]),
+         "kind": r["kind"], "name": r["name"],
+         "business_name": r.get("business_name") or None,
+         "of_metric": r["ref"] if r["kind"] == "step" else None}
+        for r in rows
+    ]
+    return session.register(
+        "census", {"kind": k}, _attach_cards(out, run_kql),
+        complete=True,
+        universe=f"every {k} in the certified catalog — the count is exact")
 
 
 # --- retrieve: one read primitive (facts + structure merged) ----------

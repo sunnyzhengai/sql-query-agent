@@ -7,6 +7,8 @@ import pytest
 from src.orchestrator.ops import (
     OpError,
     OpsSession,
+    normalize_kind,
+    op_census,
     op_compare,
     op_retrieve,
     op_search,
@@ -19,6 +21,29 @@ from tests.orchestrator.test_tools import (
     STEP_3,
     fake_kql,
 )
+
+
+class TestCensus:
+    """Field find (2026-08-20, web-UI test): 'how many metrics are
+    there' was planned as exact search for the word 'metrics' — kind
+    words are categories, and enumeration needs its own primitive."""
+
+    def test_enumerates_a_kind_completely_with_exact_count(self):
+        s = OpsSession()
+        rs = op_census("metric", fake_kql, s)
+        assert rs.complete is True
+        assert "count is exact" in rs.universe
+        assert {r["id"] for r in rs.rows} == {REF_A, REF_B}
+        assert s.permitted(REF_A)  # census surfaces ids for later reads
+
+    def test_plural_kind_word_normalizes(self):
+        assert normalize_kind("Metrics") == "metric"
+        assert normalize_kind("reports") == "report"
+        assert normalize_kind("dashboards") is None
+
+    def test_unknown_kind_is_an_op_error_naming_the_kinds(self):
+        with pytest.raises(OpError, match="metric, step, term"):
+            op_census("dashboards", fake_kql, OpsSession())
 
 
 class TestSearch:

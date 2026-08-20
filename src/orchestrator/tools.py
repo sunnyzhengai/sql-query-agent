@@ -1,6 +1,7 @@
-"""The deterministic toolset (ADR 0035): find, read, list, link, verify.
+"""The deterministic toolset (ADR 0035): find, read, list, link,
+verify, census.
 
-Six tools shaped by what the STORE can do — never by question types.
+Seven tools shaped by what the STORE can do — never by question types.
 Each is a fixed parameterized query plus pure computation; the LLM can
 choose which tool and what parameters, never compose a query. The
 dispatcher enforces the two structural guarantees:
@@ -44,6 +45,19 @@ FIND_BY_NAME_QUERY = (
     "    or (['kind'] == 'metric' and tolower(['ref']) == tolower(p_name))\n"
     "| project node_id, ['kind'], ['ref'], name, business_name\n"
     "| order by node_id asc"
+)
+
+# Complete enumeration of one kind — the census (field find
+# 2026-08-20, Sunny's web-UI test: "how many metrics are there" was
+# planned as a name-search for the phrase 'metrics'; the honest empty
+# was then captioned as "no metrics exist". Enumeration questions need
+# an enumeration tool, not a phrase slot.)
+LIST_CATALOG_QUERY = (
+    "declare query_parameters(p_kind:string);\n"
+    "semantic_catalog\n"
+    "| where ['kind'] == p_kind\n"
+    "| project node_id, ['kind'], ['ref'], name, business_name\n"
+    "| order by name asc, node_id asc"
 )
 
 STEPS_OF_QUERY = (
@@ -175,7 +189,42 @@ def find_by_name(name: str, run_kql, session: Session) -> dict:
         for r in rows
     ]
     session.allow(m["id"] for m in matches)
-    return {"matches": matches, "count": len(matches)}
+    out = {"matches": matches, "count": len(matches)}
+    if not matches:
+        # E6 guard (field find 2026-08-20): an empty NAME lookup says
+        # nothing about how many items of a KIND exist — captioning it
+        # as "none exist" is exactly the over-claim this note blocks.
+        out["note"] = ("no item bears this exact NAME — this is not a "
+                       "statement about how many items of a kind exist; "
+                       "for 'how many / list all metrics|reports|...' "
+                       "use list_catalog")
+    return out
+
+
+CATALOG_KINDS = ("metric", "step", "term", "report", "measure")
+
+
+def list_catalog(kind: str, run_kql, session: Session) -> dict:
+    """Complete census of one kind — enumeration questions ('how many
+    metrics', 'list all reports') are answered here, never by feeding
+    a kind word into a name/phrase slot."""
+    k = kind.strip().lower()
+    if k not in CATALOG_KINDS and k.endswith("s") and k[:-1] in CATALOG_KINDS:
+        k = k[:-1]
+    if k not in CATALOG_KINDS:
+        raise ToolError(
+            f"unknown kind {kind!r} — kinds: {', '.join(CATALOG_KINDS)}")
+    rows = run_kql(LIST_CATALOG_QUERY, {"p_kind": k})
+    items = [
+        {"id": (r["ref"] if r["kind"] == "metric" else r["node_id"]),
+         "name": r["name"],
+         "business_name": r.get("business_name") or None,
+         "of_metric": r["ref"] if r["kind"] == "step" else None}
+        for r in rows
+    ]
+    session.allow(i["id"] for i in items)
+    return {"kind": k, "count": len(items), "items": items,
+            "note": "complete enumeration of this kind — the count is exact"}
 
 
 def get_facts(an_id: str, run_kql, session: Session) -> dict:
@@ -336,6 +385,19 @@ TOOL_SCHEMAS = [
         "parameters": {"type": "object", "properties": {
             "name": {"type": "string"}}, "required": ["name"]}}},
     {"type": "function", "function": {
+        "name": "list_catalog",
+        "description": ("Complete census of one KIND: every metric, "
+                        "report, measure, step, or term in the certified "
+                        "catalog, with names and an exact count. ALWAYS "
+                        "use this for 'how many X are there' and 'list "
+                        "all X' — kind words (metrics, reports) are "
+                        "categories, never search phrases or names."),
+        "parameters": {"type": "object", "properties": {
+            "kind": {"type": "string",
+                     "enum": ["metric", "step", "term", "report",
+                              "measure"]}},
+            "required": ["kind"]}}},
+    {"type": "function", "function": {
         "name": "get_facts",
         "description": ("Full certified facts for one item: a metric ref "
                         "(e.g. reporting.USP_X) or a step id "
@@ -387,6 +449,8 @@ _IMPL: "dict[str, Callable]" = {
         str(args.get("phrase", "")), run_kql, s),
     "find_by_name": lambda args, run_kql, s: find_by_name(
         str(args.get("name", "")), run_kql, s),
+    "list_catalog": lambda args, run_kql, s: list_catalog(
+        str(args.get("kind", "")), run_kql, s),
     "get_facts": lambda args, run_kql, s: get_facts(
         str(args.get("id", "")), run_kql, s),
     "list_steps": lambda args, run_kql, s: list_steps(
