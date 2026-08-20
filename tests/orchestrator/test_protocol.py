@@ -152,6 +152,29 @@ class TestCaption:
         assert len(out["suggestions"]) == 1                  # invalid dropped
         assert out["suggestions"][0]["params"]["aspect"] == "tables"
 
+    def test_caption_gate_retry_then_floor(self):
+        """spec:E6 mechanical: an over-claiming caption gets one
+        corrective retry; still dirty → the deterministic floor ships,
+        visibly corrected."""
+        s = ProtocolSession()
+        s.ops.note_user(f"{REF_A} {REF_B}")
+        outputs = execute_confirmed(s, PLAN_OK, fake_kql)
+        bad = {"caption": "There are 99 metrics in every result."}
+        out = caption_turn(s, outputs, scripted_planner([bad, bad]))
+        assert out["caption_corrected"] is True
+        assert any("99" in v for v in out["caption_violations"])
+        assert out["caption"].startswith("Results as displayed.")
+
+    def test_caption_gate_retry_can_recover(self):
+        s = ProtocolSession()
+        s.ops.note_user(f"{REF_A} {REF_B}")
+        outputs = execute_confirmed(s, PLAN_OK, fake_kql)
+        bad = {"caption": "There are 99 metrics."}
+        good = {"caption": "R3 compares the two definitions shown."}
+        out = caption_turn(s, outputs, scripted_planner([bad, good]))
+        assert out["caption_corrected"] is False
+        assert out["caption"].startswith("R3 compares")
+
 
 class TestResultPiping:
     """Live find (2026-08-13): the planner naturally writes

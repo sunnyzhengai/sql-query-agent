@@ -19,6 +19,7 @@ import json
 import re
 from dataclasses import dataclass, field
 
+from src.orchestrator.caption_gate import caption_violations, enforce_caption
 from src.orchestrator.ops import (
     OpError,
     OpsSession,
@@ -312,10 +313,29 @@ def caption_turn(session: ProtocolSession, outputs: "list[dict]",
          f"Displayed results (the user sees these):\n{display_blob}\n\n"
          "Caption them and suggest next operations."}]
     raw = _forced_call(chat_api, messages, CAPTION_TOOL)
+    caption = str(raw.get("caption", "")).strip()
+
+    # The caption gate (spec:E6, mechanical — see caption_gate.py):
+    # one corrective retry, then the deterministic template floor.
+    violations = caption_violations(caption, outputs)
+    if violations and caption:
+        note = ("Your caption was REJECTED by the honesty gate:\n"
+                + "\n".join(f"- {v}" for v in violations)
+                + "\nRewrite it claiming only what the displayed result "
+                "sets support; drop any claim you cannot ground.")
+        retry = _forced_call(
+            chat_api, messages + [{"role": "user", "content": note}],
+            CAPTION_TOOL)
+        retried = str(retry.get("caption", "")).strip()
+        if retried:
+            caption, raw = retried, retry
+    caption, violations = enforce_caption(caption, outputs)
+
     suggestions = [validate_component(s, i + 1)
                    for i, s in enumerate(raw.get("suggestions") or [])][:3]
-    caption = str(raw.get("caption", "")).strip()
     session.history.append({"role": "assistant", "content": caption})
     return {"caption": caption,
             "caption_inputs": shown_refs,        # stamped by code
+            "caption_corrected": bool(violations),
+            "caption_violations": violations,
             "suggestions": [s for s in suggestions if s["valid"]]}

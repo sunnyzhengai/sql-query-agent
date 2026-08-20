@@ -396,12 +396,15 @@ classification).
 ## ADR 0036 — Operations are the product: plan, confirm, execute, display
 
 - **Category:** product
+- **Grounds:** spec:E6
 - **Implemented by:**
   - `src/methodology.py`
   - `src/orchestrator/protocol.py`
+  - `src/orchestrator/caption_gate.py`
 - **Enforced by:**
   - `tests/test_methodology.py`
   - `tests/orchestrator/test_protocol.py`
+  - `tests/orchestrator/test_caption_gate.py`
 - **Summarized in:**
   - `docs/METHODOLOGY.md`
 

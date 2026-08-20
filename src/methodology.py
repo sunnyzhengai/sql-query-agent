@@ -95,6 +95,11 @@ CONTROL_PATH_FILES = (
                                        # approved by Sunny 2026-08-13
     "src/orchestrator/agent.py",       # superseded by the plan protocol;
                                        # remove at demolition
+    # AMENDMENT 2026-08-20: the caption gate (spec:E6 mechanical) —
+    # control-path by nature (it floors captions), subject to the same
+    # no-lexicon scan; its checks are single regex patterns, the
+    # description-gate idiom.
+    "src/orchestrator/caption_gate.py",
 )
 
 # --- system vocabulary -------------------------------------------------

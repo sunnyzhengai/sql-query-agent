@@ -432,9 +432,17 @@ geometry, not a likelihood.
 *Origin:* ADRs 0032 (threshold is a volume control), 0046 (ranking presents,
 never prunes). *Binding:* the fixed render template + basis stamped by code
 (`tests/orchestrator/test_core.py::test_basis_is_stamped_by_code`).
-**Status: PARTIAL** — stated gap (audit find): the probability-vocabulary
-ban is PROMPT TEXT only (agent instructions), which is intent, not
-enforcement; a display-lexicon check is the missing binding.
+**Status: PARTIAL** — the caption gate shipped 2026-08-20
+(`src/orchestrator/caption_gate.py` + `tests/orchestrator/`
+`test_caption_gate.py`, field-found: "no metrics available" conjured
+from an empty name-scoped search): captions on the plan surface are now
+mechanically checked — invented numbers, absolute claims without a
+complete set, kind-level absence without a zero-row census — with one
+corrective retry then the deterministic template floor, corrections
+visible. Remaining stated gap: the probability-vocabulary ban is still
+PROMPT TEXT only (a display-lexicon check is the missing binding), and
+the superseded agent-loop surface (ADR 0035) is ungated pending its
+demolition.
 
 ---
 

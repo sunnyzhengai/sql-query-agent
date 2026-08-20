@@ -15,6 +15,27 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.39.0] - 2026-08-20
+
+### Added — the caption gate: spec:E6 mechanical (Sunny: "are we back to prompt engineering again?")
+- src/orchestrator/caption_gate.py — deterministic honesty checks of
+  every plan-surface caption against the SAME result payload the
+  captioner saw: invented numbers die; absolute claims (all/none/only)
+  require a self-declared-complete result set; kind-level absence
+  ("no metrics exist") requires a complete zero-row census of that
+  kind. The description-grounding-gate pattern, applied to captions.
+- Enforcement is the ADR 0044 shape: one corrective retry, then the
+  deterministic template floor ("R1: search returned 0 row(s) — …") —
+  stilted but true; the web UI shows when a caption was corrected and
+  why. The 2026-08-20 field incident is a verbatim test.
+- Registered as control-path in the methodology manifest (subject to
+  the no-lexicon scan; checks are single regex patterns, the
+  description-gate idiom). SPEC E6 updated: caption surface gated;
+  remaining stated gaps named (probability lexicon, agent-loop
+  surface).
+
+---
+
 ## [1.38.0] - 2026-08-20
 
 ### Added — the census primitive (field find: Sunny's web-UI test)

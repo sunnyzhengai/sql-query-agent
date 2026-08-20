@@ -374,9 +374,12 @@ TRACE_REGISTRY = {
     "0036": {
         "title": "Operations are the product: plan, confirm, execute, display",
         "category": "product",
-        "axioms": [],
-        "modules": ["src/methodology.py", "src/orchestrator/protocol.py"],
-        "tests": ["tests/test_methodology.py", "tests/orchestrator/test_protocol.py"],
+        "axioms": ["E6"],
+        "modules": ["src/methodology.py", "src/orchestrator/protocol.py",
+                    "src/orchestrator/caption_gate.py"],
+        "tests": ["tests/test_methodology.py",
+                  "tests/orchestrator/test_protocol.py",
+                  "tests/orchestrator/test_caption_gate.py"],
         "docs": ["docs/METHODOLOGY.md"],
     },
     "0037": {

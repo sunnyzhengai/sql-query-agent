@@ -498,8 +498,13 @@ async function runPlan(card, question) {
     card.querySelector('h3').textContent = 'Plan (as run)';
     (j.outputs || []).forEach(renderOutput);
     if (j.caption) {
+      const gate = j.caption_corrected
+        ? `<span class="inputs">honesty gate: original caption over-claimed
+            — showing the verified floor
+            (${esc((j.caption_violations||[]).join('; '))})</span>`
+        : '';
       add(el(`<div class="caption">${esc(j.caption)}
-        <span class="inputs">caption based on: ${esc((j.caption_inputs||[]).join(', ')||'—')}</span></div>`));
+        <span class="inputs">caption based on: ${esc((j.caption_inputs||[]).join(', ')||'—')}</span>${gate}</div>`));
       renderFeedback(j.turn_index);
     }
     renderSuggestions(j.suggestions || []);
