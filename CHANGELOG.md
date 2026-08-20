@@ -10,6 +10,27 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.32.0] - 2026-08-20
+
+### Added — ADR 0044 phase 3: the blind round trip (clauses 3,4,6 GREEN — all six now green)
+- src/tree/verify.py: blind reconstruction (signature-enforced: only
+  description + dictionary can arrive); src/tree/diff.py: the
+  deterministic judge (κ over op/column/values with polarity, join
+  PAIR identity, or-group partition; MATCHES==EQ; bounds fold);
+  src/tree/pipeline.py: verified_describe with bounded diff-fed
+  bounces and the template floor; provenance closed set
+  {round_trip_verified, template_fallback, flagged};
+  provenance_fallout_row (escalation clause-3b gate flipped).
+- Live: ED_PositiveScores + Labs round_trip_verified;
+  ED_NegativeScores + All_LDAs to the floor — one observed failure was
+  the LDA or-group lesson itself, caught blind. Strictness over false
+  verification, by design.
+- Extractor: WHERE 1=1 tautologies counted but not voice-worthy.
+- Phase 3b (filed): 600 wiring of the reconstructor + provenance
+  persistence (cache schema change — deliberate daytime work).
+
+---
+
 ## [1.31.0] - 2026-08-20
 
 ### Changed — ADR 0044 phase 2: the translator (clauses 2+5 GREEN)

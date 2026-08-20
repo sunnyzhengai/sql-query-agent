@@ -86,10 +86,13 @@ def tree_facts(tree: DecisionTree) -> "list[dict]":
 
 def _fact_line(i: int, fact: dict) -> str:
     parts = [f"{i}| context={fact.get('context')}", f"op={fact.get('op')}"]
-    if fact.get("column"):
+    cols = fact.get("columns") or []
+    if len(cols) >= 2:
+        parts.append(f"columns={','.join(cols[:4])}")
+    elif fact.get("column"):
         parts.append(f"column={fact['column']}")
-    elif fact.get("columns"):
-        parts.append(f"columns={','.join(fact['columns'][:4])}")
+    elif cols:
+        parts.append(f"columns={cols[0]}")
     if fact.get("operands"):
         parts.append(f"values={','.join(fact['operands'][:15])}")
     if fact.get("or_group"):

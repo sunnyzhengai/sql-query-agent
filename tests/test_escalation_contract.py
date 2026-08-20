@@ -91,7 +91,8 @@ class TestClause3NoveltyAlwaysEscalates:
             report_name="R")
         assert rows and all(r["resolution"] == "escalated" for r in rows)
 
-    @clause(3)
+    # gate flipped 1.32.0: provenance_fallout_row shipped with the
+    # round trip (ADR 0044 phase 3)
     def test_flagged_round_trip_descriptions_escalate(self):
         from src.tree.pipeline import provenance_fallout_row
         row = provenance_fallout_row("step:USP_X:Base_Pop", "flagged")

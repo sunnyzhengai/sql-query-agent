@@ -136,7 +136,6 @@ class TestClause2TranslatorBlindness:
 
 
 class TestClause3VerifierBlindness:
-    @clause(3, phase=3)
     def test_reconstruction_prompt_is_description_plus_dictionary_only(self):
         from src.tree.verify import build_reconstruction_prompt
         params = inspect.signature(build_reconstruction_prompt).parameters
@@ -153,7 +152,6 @@ class TestClause3VerifierBlindness:
 
 
 class TestClause4TheJudgeIsNeverAnLLM:
-    @clause(4, phase=3)
     def test_diff_module_imports_no_llm_and_takes_no_callback(self):
         module = pyast.parse(
             (REPO_ROOT / "src" / "tree" / "diff.py").read_text())
@@ -190,11 +188,9 @@ class TestClause5EveryDecisionVoicedOrCounted:
 
 
 class TestClause6FailurePolarityFloor:
-    @clause(6, phase=3)
     def test_never_converging_loop_degrades_to_grounded_template(self):
-        from src.tree.pipeline import verified_describe
-
         from src.tree.extract import build_decision_tree
+        from src.tree.pipeline import verified_describe
         tree = build_decision_tree(GNARLY_FRAGMENT)
 
         def fabricating_translator(prompt):
@@ -214,7 +210,6 @@ class TestClause6FailurePolarityFloor:
         assert grounding_violations(text, GNARLY_FRAGMENT) == []
         assert "pending or cancelled" not in text
 
-    @clause(6, phase=3)
     def test_version_binding_tree_contract_version_changes_cache_keys(self):
         import src.tree as tree_pkg
         from src.tree.extract import build_decision_tree, tree_content_hash
@@ -248,7 +243,7 @@ class TestContractIsLocked:
     def test_every_clause_has_a_strict_exit_gate_in_this_file(self):
         # A clause is either SHIPPED (marker removed, tests run green —
         # the exit-gate flip) or still gated by a strict-xfail marker.
-        shipped = {1, 2, 5}  # 1: extractor (1.26/1.28); 2+5: translator+ledger (1.31)
+        shipped = {1, 2, 3, 4, 5, 6}  # all six: extractor 1.26/1.28; translator 1.31; round trip 1.32
         source = Path(__file__).read_text()
         for n in range(1, 7):
             if n in shipped:

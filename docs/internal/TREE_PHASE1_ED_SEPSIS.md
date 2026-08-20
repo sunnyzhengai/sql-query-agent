@@ -186,3 +186,33 @@ Known limitation (honest): projection-only steps (~10% of the corpus,
 zero decision sites) get a deterministic one-liner — computed SELECT
 expressions are not yet facts. Enrichment filed for a later phase
 (computed-output fact kind); the trade is blindness.
+
+## Phase 3 — the blind round trip, live (1.32.0, overnight)
+
+τ → ρ → deterministic judge (κ-canonicalized fact comparison), bounded
+bounces with the diff fed back, template floor on exhaustion. All six
+tree-contract clauses are now GREEN.
+
+Live results (real gpt-4o-mini both sides, blind by signature):
+
+| Step | Provenance |
+|---|---|
+| ED_PositiveScores | **round_trip_verified** |
+| Labs | **round_trip_verified** |
+| ED_NegativeScores | template_fallback (floor: stilted, true) |
+| All_LDAs | template_fallback (floor: stilted, true) |
+
+Honest reading: simple/medium steps verify; the OR-structured and
+EXISTS-heavy steps fail blind reconstruction within 3 rounds — and one
+observed failure was EXACTLY the LDA lesson (the translator phrased an
+or-group as flat "Include" lines; the verifier read requirements; the
+judge refused). Strictness is the point: a false verification would be
+worse than a fallback. Every published description now has a
+provenance from the closed set; nothing unverified can pose as
+verified. Round-trip pass-rate tuning (better or-phrasing, richer
+reverse-mapping) raises the verified share without ever risking the
+floor.
+
+Remaining wiring (phase 3b, not blocking the gates): 600 gains the
+reconstructor callback + provenance persistence into node properties
+and the description cache (schema change — deliberate, not overnight).

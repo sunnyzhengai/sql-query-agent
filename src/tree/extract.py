@@ -270,13 +270,19 @@ class _Extractor:
               principal_side=None) -> DecisionNode:
         self.tree.decision_sites_total += 1
         self.tree.handled_count += 1
+        columns = self._column_names(node)
+        operands = self._operands(node)
+        # Trivial tautologies (WHERE 1=1 scaffolding) are extracted and
+        # counted but carry no decision content — not voice-worthy, not
+        # part of the round-trip meaning (live find 2026-08-20).
+        trivial = (op == "EQ" and not columns and len(set(operands)) <= 1)
         return DecisionNode(
             node_id=path, kind="predicate", op=op, context=context,
             expression_sql=_verbatim(node),
             column=self._principal_column(principal_side),
-            columns=self._column_names(node),
-            operands=self._operands(node),
-            must_voice=True)
+            columns=columns,
+            operands=operands,
+            must_voice=not trivial)
 
     # NOTE on negation: when the negation is intrinsic to the predicate's
     # own text (x NOT IN (...), x IS NOT NULL, x NOT BETWEEN a AND b) the
@@ -509,6 +515,25 @@ def build_decision_tree(fragment: str) -> DecisionTree:
         "conservation violated — a decision site fell into a third bucket"
     )
     return tree
+
+
+def tree_content_hash(tree: "DecisionTree",
+                      dict_lines: "list[str] | None" = None) -> str:
+    """Cache identity for anything generated FROM a tree (spec's
+    version-binding meta-clause): TREE_CONTRACT_VERSION is read at call
+    time so tightening the contract regenerates everything it governs."""
+    import hashlib
+
+    import src.tree as _tree_pkg
+    payload = (
+        _tree_pkg.TREE_CONTRACT_VERSION + "\n"
+        + "\n".join(sorted(n.expression_sql for n in tree.nodes
+                           if n.kind == "predicate"))
+        + "\n--unextracted--\n"
+        + "\n".join(sorted(u.reason_code for u in tree.unextracted))
+        + "\n--dict--\n" + "\n".join(dict_lines or [])
+    )
+    return hashlib.sha256(payload.encode()).hexdigest()[:32]
 
 
 def find_nodes(root, type_names: "set[str]") -> list:

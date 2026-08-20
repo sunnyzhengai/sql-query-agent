@@ -194,8 +194,10 @@ Debt: every edge-table contract declares its witness reference.
 
 *Gloss:* no description exists without a stated epistemic status; no fourth
 value; no NULL.
-*Origin:* ADR 0044 clause 6. *Binding:* `tests/test_tree_contract.py`
-(clause 6 skeleton). **Status: GATED** (phase 3).
+*Origin:* ADR 0044 clause 6. *Binding:* `verified_describe` returns only
+the closed set (clause 6 gate green, 1.32.0). **Status: PARTIAL** —
+stated gap: provenance persistence on stored descriptions lands with
+600's phase-3b wiring.
 
 ---
 
@@ -446,7 +448,10 @@ is not merely ignored — it is unreachable from the function's inputs
 (enforced at the signature, the noninterference trick).
 *Origin:* ADR 0044 clauses 2–6. *Binding:* `tests/test_tree_contract.py`
 (prompt-capture + signature + AST planks + never-converging acceptance test).
-**Status: GATED** (phases 2–3; clause 1 already green — see C2).
+**Status: ENFORCED** (all six clause gates flipped 1.31.0–1.32.0:
+src/tree/{translate,render,verify,diff,pipeline}.py; live round trips
+verified on real steps). Stated gap: 600's production wiring of the
+verifier (reconstructor callback + provenance persistence) is phase 3b.
 
 ---
 
@@ -615,6 +620,11 @@ governs generated artifacts revs the relevant `*_CONTRACT_VERSION` cache keys
 ---
 
 ## Changelog
+
+- **0.3.1 (2026-08-20)** — F ENFORCED (all six 0044 clause gates green);
+  B2 GATED→PARTIAL (pipeline closed-set shipped; persistence = 3b);
+  H updated: escalation clause-3b (flagged descriptions escalate)
+  flipped with provenance_fallout_row.
 
 - **0.3 (2026-08-19)** — adopted (ADR 0047). Adversarial audit corrections:
   A1's cited test did not exist (added); E6's gap stated
