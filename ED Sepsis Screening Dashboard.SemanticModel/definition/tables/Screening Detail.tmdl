@@ -2111,7 +2111,7 @@ table 'Screening Detail'
 		mode: import
 		source =
 				let
-				  Source = Sql.Database("SCRUBBED-ENDPOINT.example,1433", "SCRUBBED-DATABASE", [Query = "EXEC reporting.USP_ED_Sepsis 'MB-1', 'ME-1'"])
+				  Source = Sql.Database(DemoSqlServer, DemoSqlDatabase, [Query = "EXEC reporting.USP_ED_Sepsis 'MB-1', 'ME-1'"])
 				in
 				  Source
 

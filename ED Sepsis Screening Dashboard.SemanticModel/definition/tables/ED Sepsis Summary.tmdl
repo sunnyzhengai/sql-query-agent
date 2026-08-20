@@ -1937,7 +1937,7 @@ table 'ED Sepsis Summary'
 		mode: import
 		source =
 				let
-				  Source = Sql.Database("SCRUBBED-ENDPOINT.example,1433", "SCRUBBED-DATABASE", [Query = "EXEC reports.USP_ED_Sepsis 'MB-1', 'ME-1'"])
+				  Source = Sql.Database(DemoSqlServer, DemoSqlDatabase, [Query = "EXEC reports.USP_ED_Sepsis 'MB-1', 'ME-1'"])
 				in
 				  Source
 

@@ -1242,7 +1242,7 @@ table 'IP Sepsis'
 		mode: import
 		source =
 				let
-				  Source = Sql.Database("SCRUBBED-ENDPOINT.example,1433", "SCRUBBED-DATABASE", [Query = "EXEC reports.USP_IP_SEPSIS 'MB-1', 'ME-1'"])
+				  Source = Sql.Database(DemoSqlServer, DemoSqlDatabase, [Query = "EXEC reports.USP_IP_SEPSIS 'MB-1', 'ME-1'"])
 				in
 				  Source
 

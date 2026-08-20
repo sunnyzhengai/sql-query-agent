@@ -12,6 +12,9 @@ annotation PBI_QueryOrder = ["Screening Detail","IP Sepsis","ED Sepsis Summary",
 
 annotation PBI_ProTooling = ["WebModelingEdit"]
 
+ref expression DemoSqlServer
+ref expression DemoSqlDatabase
+
 ref table 'Screening Trend'
 ref table DateTableTemplate_0a818c6a-e704-48ae-9411-351f8cf55915
 ref table LocalDateTable_e511f4a3-6fb2-4264-90c1-dcdfdaf93a34
