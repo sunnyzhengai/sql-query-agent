@@ -60,3 +60,13 @@ on the admin dashboard).
   op_traverse ships.
 - ADR 0018/0033 stand, reinterpreted: materialization is optional
   performance engineering with a mandatory consistency check.
+
+## Margin note (2026-08-20): the census gap
+
+The completeness claim ("every first-order-plus-transitive question")
+described the ALGEBRA; the exposed plan vocabulary could not express
+plain enumeration ("how many metrics are there") until the census
+primitive shipped (1.38.0) — demand-logged exactly as ADR 0034's punch
+list predicted (`enumerate(kind, filter)` was its first entry). The
+census closes that gap between the claimed algebra and the exposed
+vocabulary; the remaining punch-list verbs stand.

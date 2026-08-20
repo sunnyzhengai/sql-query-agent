@@ -15,6 +15,32 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.40.0] - 2026-08-20
+
+### Changed — stamp, don't audit: the stamped headline (Sunny's verdict via the review session)
+- The 1.39.0 caption lint was correctly re-identified as the
+  claim-shape gate ADR 0036 already rejected (a lexicon cannot bound
+  English). The structural fix is ADR 0032's provenance pattern
+  applied to its last holdout: stamped_headline() renders every result
+  panel's quantitative/existential sentence from the result's own
+  typed metadata — count, scope, completeness, and the kind-vs-name
+  redirect ("'metrics' is a catalog KIND — run census metric for the
+  actual count"). Stamped at the protocol layer, so every surface
+  inherits it; the web UI shows it above the rows, with the LLM
+  caption demoted to labeled commentary beneath.
+- Guarantee (spec:E6, now ENFORCED for the plan surface): no
+  quantitative or existential claim reaches the user only through LLM
+  prose — a lying caption is contradicted on screen, not caught.
+- The lint stays as defense-in-depth, reclassified MEASURED not
+  tested; no soundness claim rests on it. The 2026-08-20 transcript
+  ("no metrics available" over a names-only empty result) is the
+  headline renderer's fixture, verbatim.
+- ADR 0036 amended (stamped headline); ADR 0037 margin note (the
+  census closed the algebra-vs-exposed-vocabulary gap ADR 0034's
+  punch list predicted by name).
+
+---
+
 ## [1.39.0] - 2026-08-20
 
 ### Added — the caption gate: spec:E6 mechanical (Sunny: "are we back to prompt engineering again?")

@@ -92,3 +92,22 @@ underneath; gov_turn_events records plans and confirmations.)
   captions grounded in displayed sets.
 - Autonomy modes (auto-confirm policies) are a FUTURE relaxation to
   design once the confirmed-flow baseline exists; writes never relax.
+
+## Amendment (2026-08-20): the stamped headline — E6's last holdout closed structurally
+
+A caption over-claim in live testing ("no metrics available" conjured
+from an empty NAME-scoped search) re-posed the language-policing
+question. A prose lint over "no/none/all/N" claims was built and then
+correctly re-identified (review session, Sunny's verdict) as the
+claim-shape gate this ADR already rejected — a lexicon cannot bound
+English.
+
+The structural fix is ADR 0032's provenance pattern applied to its
+last holdout: every result panel's quantitative/existential sentence
+is a STAMPED HEADLINE, rendered by code from the result's typed
+metadata (count, scope, completeness, kind-vs-name redirect); the LLM
+caption is commentary beneath it. A lying caption is contradicted on
+screen, not caught. The lint stays as defense-in-depth, classified
+MEASURED (flags/floors heuristically), never the basis of a soundness
+claim. Recorded as the E6 amendment in SPEC.md; fixture = the
+2026-08-20 transcript.

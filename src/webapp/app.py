@@ -362,8 +362,15 @@ WORKBENCH_PAGE = """<!doctype html>
            max-height:180px; overflow-y:auto; }
   details summary { cursor:pointer; color:var(--accent);
                     font-size:12px; }
+  .headline { font:13px/1.5 ui-monospace,monospace; font-weight:600;
+              background:#eef7ee; border-left:3px solid #2e7d32;
+              padding:8px 12px; margin:0 0 6px; }
   .caption { background:#f0f4fb; border-radius:10px; padding:12px 16px;
-             margin:0 0 8px; white-space:pre-wrap; }
+             margin:0 0 8px; white-space:pre-wrap; font-size:13px;
+             color:#4a4f5a; }
+  .caption::before { content:"commentary (model-written; headlines "
+             "above are machine-stamped)"; display:block; font:10.5px
+             ui-monospace,monospace; color:#8a8fa0; margin-bottom:4px; }
   .caption .inputs { display:block; margin-top:6px; font:11.5px
              ui-monospace,monospace; color:#6b7080; }
   .chips { display:flex; gap:8px; flex-wrap:wrap; margin:0 0 14px; }
@@ -530,6 +537,8 @@ function renderOutput(o) {
     ${badge}
     <span class="universe">${esc(r.universe)}${r.note ? ' · ' + esc(r.note) : ''}</span>
     </div></div>`);
+  if (r.headline) rs.appendChild(
+    el(`<div class="headline">${esc(r.headline)}</div>`));
   let rows2 = r.rows, prefer = null;
   if (r.op === 'search' || r.op === 'census') {
     // Customer-facing view: an exec asking what logic is in a report

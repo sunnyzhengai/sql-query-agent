@@ -19,7 +19,11 @@ import json
 import re
 from dataclasses import dataclass, field
 
-from src.orchestrator.caption_gate import caption_violations, enforce_caption
+from src.orchestrator.caption_gate import (
+    caption_violations,
+    enforce_caption,
+    stamped_headline,
+)
 from src.orchestrator.ops import (
     OpError,
     OpsSession,
@@ -249,7 +253,11 @@ def execute_confirmed(session: ProtocolSession, plan: dict,
         try:
             rs = _run_component(c, produced, run_kql, session.ops)
             produced[c["index"]] = rs.ref
-            outputs.append({"component": c, "result": rs.display()})
+            shown = rs.display()
+            # The stamped headline (spec:E6, ADR 0032 pattern): the
+            # panel's quantitative sentence is code, never LLM prose.
+            shown["headline"] = stamped_headline(shown)
+            outputs.append({"component": c, "result": shown})
         except OpError as e:
             outputs.append({"component": c, "error": str(e)})
         except Exception as e:              # noqa: BLE001 — infra visible

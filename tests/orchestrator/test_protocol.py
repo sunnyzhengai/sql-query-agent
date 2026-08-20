@@ -152,6 +152,18 @@ class TestCaption:
         assert len(out["suggestions"]) == 1                  # invalid dropped
         assert out["suggestions"][0]["params"]["aspect"] == "tables"
 
+    def test_every_result_carries_a_stamped_headline(self):
+        """spec:E6 ENFORCED half: the quantitative sentence is code-
+        stamped onto every result at the protocol layer — all surfaces
+        inherit it; no count reaches the user only through LLM prose."""
+        s = ProtocolSession()
+        s.ops.note_user(f"{REF_A} {REF_B}")
+        outs = execute_confirmed(s, PLAN_OK, fake_kql)
+        for o in outs:
+            if "result" in o:
+                assert "row(s)." in o["result"]["headline"]
+                assert o["result"]["headline"].startswith(o["result"]["ref"])
+
     def test_caption_gate_retry_then_floor(self):
         """spec:E6 mechanical: an over-claiming caption gets one
         corrective retry; still dirty → the deterministic floor ships,

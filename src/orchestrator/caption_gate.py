@@ -1,34 +1,40 @@
-"""The caption gate — spec:E6 made mechanical for the plan surface.
+"""Presentation honesty for the plan surface — spec:E6.
 
-Twin of the description grounding gate (src/descriptions.py, 2026-08-19):
-prompt instructions are intent; only mechanical verification survives.
 Origin (2026-08-20, Sunny's web-UI test): an exact name-search for the
 word 'metrics' returned an honest empty, and the caption over-claimed
 "there are currently no metrics available in the catalog" — a
-kind-level absence conjured from a name-scoped result. The caption
-prompt already forbade this; this gate enforces it.
+kind-level absence conjured from a name-scoped result.
 
-Deterministic checks of a caption against the SAME result payload the
-captioner saw:
+TWO mechanisms, with honestly different strengths (review-session
+verdict, relayed by Sunny 2026-08-20):
 
-1. numeric claims — every number in the caption must appear in the
-   displayed results (rows, counts, universes); invented numbers die;
-2. absolute claims (all / none / only / every / nothing) require at
-   least one result set that declared itself COMPLETE;
-3. kind-level absence ("no metrics", "there are no reports") requires
-   a complete census of that kind showing zero rows.
+STAMPED HEADLINE — the guarantee (ADR 0032's provenance pattern:
+stamped by code, never written by the LLM). Every result panel's
+quantitative/existential sentence — count, scope, completeness, and
+the kind-vs-name redirect — is rendered by stamped_headline() as a
+fixed template over the result's own typed metadata. The LLM caption
+is commentary BENEATH it; a lying caption is not caught, it is
+contradicted on screen by a machine-stamped sentence standing above
+it. No quantitative or existential claim reaches the user only through
+LLM prose. This is what flips E6 to ENFORCED: checkable by
+construction, no lexicon.
 
-Enforcement is the ADR 0044 shape: one corrective retry lives with the
-caller (protocol.caption_turn); a caption that still violates drops to
-the deterministic template floor — stilted but true, absence over
-fabrication. The floor and the violations both ship to the surface, so
-a corrected caption is visibly corrected.
+CAPTION LINT — defense-in-depth, MEASURED not tested (E3 vocabulary).
+The claim-shape checks below (invented numbers, absolutes without a
+complete set, kind-absence without a census) use a finite lexicon
+against unbounded English — the approach ADR 0036 rejected as a
+primary mechanism ("we can't possibly predict all shapes"). They stay
+as a heuristic that catches the common shapes and floors the caption
+(one corrective retry, then the deterministic template — the ADR 0044
+shape), but no soundness claim rests on them.
 """
 
 from __future__ import annotations
 
 import json
 import re
+
+from src.orchestrator.ops import normalize_kind
 
 _REF_TOKEN = re.compile(r"\b[R$]\d+\b")
 _NUMBERS = re.compile(r"\b\d+\b")
@@ -103,6 +109,38 @@ def template_caption(outputs: "list[dict]") -> str:
                      f"{r.get('universe', '')}")
     return ("Results as displayed. "
             + " ".join(lines)).strip()
+
+
+def stamped_headline(result: dict) -> str:
+    """The code-stamped headline (ADR 0032 provenance pattern): a fixed
+    template over the result's typed metadata. Deterministic and
+    replayable; the sentence the user reads FIRST.
+
+    Fixture case (the 2026-08-20 transcript): an empty exact search for
+    'metrics' must headline the zero, the name-scope, and the census
+    redirect — preempting the 'no metrics exist' over-claim on screen."""
+    params = result.get("params") or {}
+    op = result.get("op", "")
+    n = len(result.get("rows") or [])
+    parts = [f"{result.get('ref', '?')}: {op}"]
+    if op == "search":
+        parts.append(f"for {str(params.get('phrase', ''))!r} "
+                     f"({params.get('mode', '')})")
+    elif op == "census":
+        parts.append(f"of kind {str(params.get('kind', ''))!r}")
+    head = " ".join(parts) + f" — {n} row(s)."
+    universe = result.get("universe", "")
+    if universe:
+        head += f" Scope: {universe}."
+    if op == "search" and n == 0:
+        kind = normalize_kind(str(params.get("phrase", "")))
+        if kind is not None:
+            head += (f" Note: {params.get('phrase', '')!r} is a catalog "
+                     f"KIND — this was a name lookup, not a census; run "
+                     f"census {kind} for the actual count.")
+    if not result.get("complete"):
+        head += " Not exhaustive."
+    return head
 
 
 def enforce_caption(caption: str, outputs: "list[dict]"

@@ -97,3 +97,43 @@ class TestEnforcement:
                   "error": "needs two items"}
         text = template_caption([CENSUS_TWO, failed])
         assert "compare: needs two items" in text
+
+
+class TestStampedHeadline:
+    """The load-bearing half (review-session verdict, 2026-08-20):
+    stamped by code per ADR 0032, never written by the LLM. The
+    2026-08-20 transcript is the fixture — the machine-stamped sentence
+    must preempt the exact over-claim that happened."""
+
+    def test_the_transcript_fixture(self):
+        from src.orchestrator.caption_gate import stamped_headline
+        # The actual incident: caption said "there are currently no
+        # metrics available in the catalog" over this result.
+        head = stamped_headline(EMPTY_NAME_SEARCH["result"])
+        assert "0 row(s)" in head
+        assert "name, business name, or ref equals the phrase" in head
+        assert "'metrics' is a catalog KIND" in head
+        assert "census metric for the actual count" in head
+
+    def test_census_headline_carries_exact_count_and_scope(self):
+        from src.orchestrator.caption_gate import stamped_headline
+        head = stamped_headline(CENSUS_TWO["result"])
+        assert head.startswith("R1: census of kind 'metric' — 2 row(s).")
+        assert "count is exact" in head
+
+    def test_incomplete_results_say_so(self):
+        from src.orchestrator.caption_gate import stamped_headline
+        assert stamped_headline(SEMANTIC_TOP_K["result"]).endswith(
+            "Not exhaustive.")
+
+    def test_ordinary_empty_name_search_gets_no_census_redirect(self):
+        from src.orchestrator.caption_gate import stamped_headline
+        r = dict(EMPTY_NAME_SEARCH["result"],
+                 params={"phrase": "NotARealProc", "mode": "exact"})
+        head = stamped_headline(r)
+        assert "0 row(s)" in head and "KIND" not in head
+
+    def test_deterministic_replay(self):
+        from src.orchestrator.caption_gate import stamped_headline
+        a = stamped_headline(CENSUS_TWO["result"])
+        assert a == stamped_headline(dict(CENSUS_TWO["result"]))

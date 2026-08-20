@@ -432,17 +432,23 @@ geometry, not a likelihood.
 *Origin:* ADRs 0032 (threshold is a volume control), 0046 (ranking presents,
 never prunes). *Binding:* the fixed render template + basis stamped by code
 (`tests/orchestrator/test_core.py::test_basis_is_stamped_by_code`).
-**Status: PARTIAL** — the caption gate shipped 2026-08-20
-(`src/orchestrator/caption_gate.py` + `tests/orchestrator/`
-`test_caption_gate.py`, field-found: "no metrics available" conjured
-from an empty name-scoped search): captions on the plan surface are now
-mechanically checked — invented numbers, absolute claims without a
-complete set, kind-level absence without a zero-row census — with one
-corrective retry then the deterministic template floor, corrections
-visible. Remaining stated gap: the probability-vocabulary ban is still
-PROMPT TEXT only (a display-lexicon check is the missing binding), and
-the superseded agent-loop surface (ADR 0035) is ungated pending its
-demolition.
+**E6 amendment (2026-08-20, Sunny's verdict via the review session —
+stamp, don't audit):** the quantitative/existential sentence on every
+result panel is the STAMPED HEADLINE — rendered by code from the
+result's own typed metadata (count, scope, completeness, kind-vs-name
+redirect), the ADR 0032 provenance pattern. The LLM caption is
+commentary beneath it, visually subordinate; a lying caption is not
+caught, it is contradicted on screen. Guarantee: no quantitative or
+existential claim reaches the user only through LLM prose.
+**Status: ENFORCED** (plan surface) —
+`src/orchestrator/caption_gate.py::stamped_headline`, stamped at the
+protocol layer onto every result; fixture = the 2026-08-20 transcript
+("no metrics available" over a names-only empty result). The caption
+LINT (claim-shape checks + template floor) is retained as
+defense-in-depth and classified MEASURED, not tested — a lexicon
+cannot bound English (the ADR 0036 rejection stands); no soundness
+claim rests on it. Stated residue: the superseded agent-loop surface
+(ADR 0035) is unstamped pending its demolition.
 
 ---
 
