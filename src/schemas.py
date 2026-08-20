@@ -2193,7 +2193,8 @@ SEMANTIC_CATALOG = {
     "description": (
         "Resolution catalog for ask-time semantic search (ADR 0030 L3, "
         "Eventhouse engine probe-verified 2026-08-08): one searchable "
-        "document per metric, named calculation step, and business term. "
+        "document per metric, named calculation step, business term, "
+        "Power BI report, and measure (ADR 0040). "
         "Built by src/steps/semantic_catalog.py; the Eventhouse copy "
         "embeds search_text in-database (ai_embeddings, user "
         "impersonation) and serves semantic_search() to Data Agents — "
@@ -2229,7 +2230,9 @@ SEMANTIC_CATALOG = {
     ],
     "column_descriptions": {
         "node_id": "Graph node id (canonical:/transform:) or term:<term_id>",
-        "kind": "metric | step | term — consumers dispatch on this",
+        "kind": ("metric | step | term | report | measure — consumers "
+                 "dispatch on this (report/measure: ADR 0040 semantic-"
+                 "model ingestion)"),
         "ref": "metric_id for metrics/steps; term_id for terms",
         "name": "Technical name (object, CTE, or term name)",
         "business_name": "Business-friendly name when one exists",
@@ -2239,7 +2242,7 @@ SEMANTIC_CATALOG = {
     "invariants": [
         {"kind": "unique", "columns": ["node_id"]},
         {"kind": "allowed_values", "column": "kind",
-         "values": ["metric", "step", "term"]},
+         "values": ["metric", "step", "term", "report", "measure"]},
     ],
 }
 

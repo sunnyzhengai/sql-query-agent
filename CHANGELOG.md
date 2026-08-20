@@ -10,6 +10,22 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.33.4] - 2026-08-20
+
+### Fixed — semantic-catalog contract lagged the writer (field find: 500 readiness gate)
+- output_semantic_catalog legitimately carries report and measure
+  documents since semantic-model ingestion (ADR 0040), but the
+  contract's allowed kind set was never widened, so the readiness gate
+  blocked a healthy lakehouse. Allowed set is now
+  {metric, step, term, report, measure}; a new test asserts the
+  writer's emitted-kind vocabulary and the contract are one set, so a
+  future kind cannot ship without the contract widening with it.
+- Sweep of all other allowed_values contracts: graph layer/edge_type
+  derive from the enums by construction; every other persisted table
+  passed the same gate on the live tenant — no other drift.
+
+---
+
 ## [1.33.3] - 2026-08-20
 
 ### Added — schema-drift precondition (field find: 500 leaf grounding)

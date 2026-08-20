@@ -119,3 +119,17 @@ class TestConsumptionKinds:
         measure = next(r for r in out.rows if r["kind"] == "measure")
         assert "Sepsis Dash" not in measure["search_text"]
         assert "Sepsis Dash" in measure["display_text"]
+
+
+def test_writer_kinds_and_contract_allowed_set_agree():
+    """Field find (tenant 500 run, 2026-08-20): the writer grew report/
+    measure kinds (ADR 0040) but the contract's allowed set never did,
+    so the readiness gate blocked a healthy lakehouse. The emitted-kind
+    vocabulary and the contract are one set, mechanically."""
+    from src.steps import semantic_catalog as sc
+    emitted = {v for k, v in vars(sc).items()
+               if k.startswith("KIND_") and isinstance(v, str)}
+    allowed = next(
+        inv["values"] for inv in SEMANTIC_CATALOG["invariants"]
+        if inv["kind"] == "allowed_values" and inv["column"] == "kind")
+    assert emitted == set(allowed)
