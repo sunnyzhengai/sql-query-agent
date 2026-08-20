@@ -10,6 +10,19 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.33.0] - 2026-08-20
+
+### Added — phase-4 beachhead: the discovery primitives (spec:E1/E5)
+- src/discovery/paths.py: replay-deterministic simple-path enumeration
+  over the join map (both orientations — direction is meaning; hop-cap
+  disclosed, never silent pruning).
+- src/discovery/grounding.py: filter-value grounding (values only from
+  sites/value sets/human; one sourceless value fails the proposal).
+- Spec gates E1/E5 flipped; statuses PARTIAL with the engine
+  composition (anchor→discover+match→rank→pick) as the stated gap.
+
+---
+
 ## [1.32.0] - 2026-08-20
 
 ### Added — ADR 0044 phase 3: the blind round trip (clauses 3,4,6 GREEN — all six now green)

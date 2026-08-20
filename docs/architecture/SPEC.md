@@ -356,8 +356,11 @@ nodes, all candidate paths between them are **facts waiting to be
 enumerated** — a search problem, not a synthesis problem. Nothing needs to
 "generate" a path, so nothing stochastic may.
 *Origin:* ADR 0046 (Sunny's position, settled 2026-08-19).
-**Status: GATED** — strict-xfail exit gate in `tests/test_spec_gates.py`;
-lands with the 0046 discovery engine.
+**Status: PARTIAL** — the deterministic primitive is ENFORCED
+(`src/discovery/paths.py` + `tests/test_spec_gates.py`, 1.33.0:
+replay-deterministic simple-path enumeration over the join map, both
+orientations, hop-capped presentation-never-pruning). Stated gap: the
+composed 0046 engine (anchor→discover+match→rank→pick) is not built.
 
 **E2 — replay determinism for retrieval components.**
 
@@ -411,8 +414,10 @@ stored decision site, a value-set table (T_org), or the human — never from
 model memory. Carries the shared-schema/varying-values fact: the EMR schema
 travels between hospitals; the values never do.
 *Origin:* ADR 0046 grounding rules; ADR 0044's captured fabrications.
-**Status: GATED** — strict-xfail exit gate in `tests/test_spec_gates.py`;
-lands with the 0046 engine.
+**Status: PARTIAL** — the deterministic primitive is ENFORCED
+(`src/discovery/grounding.py`, 1.33.0: refuse-over-guess on any value
+without a source). Stated gap: binds to real presented/executed filters
+when the 0046 engine composes them.
 
 **E6 — presentation honesty.**
 
@@ -620,6 +625,10 @@ governs generated artifacts revs the relevant `*_CONTRACT_VERSION` cache keys
 ---
 
 ## Changelog
+
+- **0.3.2 (2026-08-20)** — E1/E5 primitives ENFORCED (src/discovery/,
+  gates flipped); statuses PARTIAL with the engine-composition gap
+  stated.
 
 - **0.3.1 (2026-08-20)** — F ENFORCED (all six 0044 clause gates green);
   B2 GATED→PARTIAL (pipeline closed-set shipped; persistence = 3b);

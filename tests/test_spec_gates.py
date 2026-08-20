@@ -23,7 +23,7 @@ def gate(axiom: str, lands_with: str):
 
 
 class TestE1PathEnumeration:
-    @gate("E1", "the 0046 discovery engine")
+    # gate flipped 1.33.0: the deterministic PRIMITIVE shipped
     def test_paths_between_anchors_are_enumerated_deterministically(self):
         from src.discovery.paths import enumerate_paths
         joinable = [
@@ -41,7 +41,7 @@ class TestE1PathEnumeration:
 
 
 class TestE5FilterGrounding:
-    @gate("E5", "the 0046 discovery engine")
+    # gate flipped 1.33.0: the deterministic PRIMITIVE shipped
     def test_filter_values_come_only_from_sites_valuesets_or_human(self):
         from src.discovery.grounding import filter_values_grounded
         verdict = filter_values_grounded(
