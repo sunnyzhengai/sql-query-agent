@@ -17,8 +17,8 @@ CREATE TABLE [dbo].[diagnoses_current_icd10] (
 );
 GO
 
-IF OBJECT_ID('dbo.dm_icu_stay') IS NULL
-CREATE TABLE [dbo].[dm_icu_stay] (
+IF OBJECT_ID('dbo.ICU_STAY_SUMMARY') IS NULL
+CREATE TABLE [dbo].[ICU_STAY_SUMMARY] (
     [ENCOUNTER_ID] DECIMAL(18,4) NULL,
     [ICU_STAY_END_DT] DATETIME2 NULL,
     [ICU_STAY_START_DT] DATETIME2 NULL,
@@ -55,8 +55,8 @@ CREATE TABLE [dbo].[patient_or_adm_link] (
 );
 GO
 
-IF OBJECT_ID('dbo.v_log_based') IS NULL
-CREATE TABLE [dbo].[v_log_based] (
+IF OBJECT_ID('dbo.V_OR_CASE_LOG') IS NULL
+CREATE TABLE [dbo].[V_OR_CASE_LOG] (
     [IN_OR_DTTM] DATETIME2 NULL,
     [LOG_ID] DECIMAL(18,4) NULL
 );
@@ -348,7 +348,7 @@ SELECT v.full_name AS missing_table FROM (VALUES
     ('dbo.departments'),
     ('dbo.diagnoses'),
     ('dbo.diagnoses_current_icd10'),
-    ('dbo.dm_icu_stay'),
+    ('dbo.ICU_STAY_SUMMARY'),
     ('dbo.ed_encounters_dm'),
     ('dbo.ed_encounters_fact'),
     ('dbo.ed_event_info'),
@@ -406,7 +406,7 @@ SELECT v.full_name AS missing_table FROM (VALUES
     ('dbo.rx_verify_trace'),
     ('dbo.treatment_teams'),
     ('dbo.v_hospital_transactions'),
-    ('dbo.v_log_based'),
+    ('dbo.V_OR_CASE_LOG'),
     ('dbo.v_patient_location_history'),
     ('dbo.v_pharmacy_dispense'),
     ('dbo.v_pharmacy_dispense_action'),

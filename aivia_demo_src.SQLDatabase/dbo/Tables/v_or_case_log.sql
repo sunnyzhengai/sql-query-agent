@@ -1,0 +1,8 @@
+CREATE TABLE [dbo].[V_OR_CASE_LOG] (
+    [IN_OR_DTTM] DATETIME2 (7)   NULL,
+    [LOG_ID]     DECIMAL (18, 4) NULL
+);
+
+
+GO
+

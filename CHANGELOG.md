@@ -10,6 +10,24 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.34.1] - 2026-08-20
+
+### Fixed — vendor-name residue on synthetic surfaces + the gate that ends the class
+- The morning scrub missed three surfaces: the git-synced demo SQL
+  database item (two table DDL files + the Severe_Sepsis proc), the
+  demo seed supplement, and the recorded-fixtures manifest notes (which
+  republished the names while documenting the rename). All renamed via
+  the crosswalk mappings; manifest notes rewritten name-free.
+- tests/test_term_hygiene.py: every fully-synthetic surface (demo DB
+  item, data/demo, data/synthetic, fixtures, goldens, ED Sepsis
+  dashboard items) is scanned against the crosswalk _scan_terms —
+  zero vendor terms, mechanically. Functional mentions (Clarity
+  connector, anonymization tooling, PHI tests) are out of scope by
+  design. A second check pins the three confirmed vendor names into
+  the scan set so the gate cannot be silently disarmed.
+
+---
+
 ## [1.34.0] - 2026-08-20
 
 ### Added — declared zones: governed ⊎ internal (HANDOFF_TRACE_AND_ADMIN_GRAPH item 1)
