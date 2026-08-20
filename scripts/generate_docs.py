@@ -230,6 +230,41 @@ def build_notebook_map() -> str:
     return "\n".join(lines)
 
 
+TRACE_MAP_PATH = PROJECT_ROOT / "docs" / "architecture" / "TRACE_MAP.md"
+
+
+def build_trace_map() -> str:
+    """TRACE_MAP.md — the trace registry projected as a readable map
+    (ADR 0048 item 2): open any ADR, see its axioms, code, tests."""
+    from src.trace_registry import TRACE_REGISTRY
+
+    lines = [
+        "# Trace Map — decision → axioms → code → tests (generated)",
+        "",
+        "Generated from `src/trace_registry.py` (ADR 0048).",
+        "Regenerate: `python scripts/generate_docs.py`. Closure checks:",
+        "`tests/test_trace_registry.py` (totality / existence / single",
+        "classification).",
+        "",
+    ]
+    for adr in sorted(TRACE_REGISTRY):
+        e = TRACE_REGISTRY[adr]
+        lines.append(f"## ADR {adr} — {e['title']}")
+        lines.append("")
+        lines.append(f"- **Category:** {e['category']}")
+        if e["axioms"]:
+            axioms = ", ".join(f"spec:{a}" for a in e["axioms"])
+            lines.append(f"- **Grounds:** {axioms}")
+        for label, kind in (("Implemented by", "modules"),
+                            ("Enforced by", "tests"),
+                            ("Summarized in", "docs")):
+            if e[kind]:
+                lines.append(f"- **{label}:**")
+                lines.extend(f"  - `{p}`" for p in e[kind])
+        lines.append("")
+    return "\n".join(lines)
+
+
 def main() -> None:
     PIPELINE_MAP_PATH.write_text(build_pipeline_map())
     print(f"Wrote {PIPELINE_MAP_PATH}")
@@ -237,6 +272,8 @@ def main() -> None:
     print(f"Wrote {INTEGRATION_MAP_PATH}")
     NOTEBOOK_MAP_PATH.write_text(build_notebook_map())
     print(f"Wrote {NOTEBOOK_MAP_PATH}")
+    TRACE_MAP_PATH.write_text(build_trace_map())
+    print(f"Wrote {TRACE_MAP_PATH}")
 
 
 if __name__ == "__main__":

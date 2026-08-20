@@ -21,7 +21,7 @@ never deleted — its status changes and it links to its replacement.
 | [0008](0008-ship-tier-1-first.md) | Ship Tier 1 (Core Agent) first | Accepted |
 | [0009](0009-decouple-catalog-adapters.md) | Catalog integrations are optional adapters | Accepted |
 | [0010](0010-skip-founders-hub-level-3.md) | Skip Founders Hub Level 3, go direct to Partner Center | Accepted |
-| [0011](0011-static-guide-v1-copilot-v2.md) | Static install guide for v1; AI co-pilot deferred to v2 | Accepted |
+| [0011](0011-static-guide-v1-copilot-v2.md) | Static install guide for v1; AI co-pilot deferred to v2 | Accepted (amended 2026-08-20: trigger is now "admin graph projected", see 0048) |
 | [0012](0012-stay-in-current-repo.md) | Build the product on the existing repo, no rewrite | Accepted |
 | [0013](0013-transactable-saas-on-marketplace.md) | List as transactable SaaS on Microsoft Marketplace | Accepted |
 | [0014](0014-metric-logic-grounding-mandatory-dictionary.md) | Ground the agent in `metric_logic`; data dictionary mandatory | Accepted |
@@ -58,3 +58,5 @@ never deleted — its status changes and it links to its replacement.
 | [0045](0045-escalation-contract-human-checklist.md) | The escalation contract: no silent residue — unresolved outcomes become the human checklist | Accepted (phased) |
 | [0046](0046-anchor-discover-match-rank-the-human-picks.md) | Query composition: anchor, discover, match, rank — the human picks their reality; one engine for metadata and Pro | Accepted |
 | [0047](0047-shadow-spec-axiom-system.md) | The shadow specification Φ_AIVIA: axiom system + enforcement homes; drift becomes a named, checkable violation | Accepted |
+| [0048](0048-trace-registry-admin-graph-companion.md) | Declared zones, the trace registry, the admin graph, and the admin companion — the closed system made walkable | Accepted |
+| [0049](0049-ingestion-routes-live-extractor.md) | Ingestion routes: filedrop, folders, and the live extractor are peer front doors | Accepted (retroactive record — first ghost finding of the 0048 totality check) |

@@ -1,7 +1,7 @@
 # Φ_AIVIA — The Shadow Specification
 
-**Version:** 0.3 (adopted; ADR 0047)
-**Date:** 2026-08-19
+**Version:** 0.4 (adopted; ADR 0047, extended by ADR 0048)
+**Date:** 2026-08-19 (v0.4: 2026-08-20)
 **Origin:** review session with Sunny; motivated by three recurring deviation
 classes discovered by code-walking: (1) missing EMR join edges — the technical
 layer was not the complete vendor join map; (2) LLM components repeatedly
@@ -588,6 +588,39 @@ the verification machinery: **verification events ARE governance data.**
 
 ---
 
+## 14b. The admin Σ-structure (v0.4, ADR 0048)
+
+The same axiom groups admit a **second model**: the admin graph, whose
+sorts are the system's own governance artifacts rather than the
+customer's data.
+
+**New sorts:** `Contract` (table contracts, TABLE_REGISTRY), `NotebookItem`
+(NOTEBOOK_REGISTRY), `Module` (src/ files), `Decision` (ADRs,
+TRACE_REGISTRY), `Axiom` (this document's ids), `ErrorEvent`
+(ops_installation_errors / ops_runtime_error_events rows),
+`ChecklistItem` (ops_human_checklist rows).
+
+**Edges** (all deterministic, registry- or event-derived — spec:B1
+applies: every admin edge has a witness row): notebook —produces→
+contract; contract —enforced_by→ gate/test; module —implements→
+decision; decision —grounds→ axiom; decision —traced_by→ module/test;
+error —violates→ contract.
+
+**Laws carried over:** B1 (witness totality — no admin edge without a
+registry/event witness), C1 reflexively (the admin graph's source
+kinds are the registries themselves, declared in EXTRACTION_REGISTRY),
+D3 (the admin graph is a projection, rebuilt from the registries and
+event tables each run — never a second truth), H (unresolved admin
+findings escalate; an uncited module is a finding, not a warning).
+
+**Bindings:** `src/trace_registry.py` + `tests/test_trace_registry.py`
+(decision lineage + three closure checks: totality, existence, single
+classification); `src/zones.py` + `tests/test_zones.py` (governed ⊎
+internal). **Status: PARTIAL** — stated gap: the graph projection
+itself (`src/admin_graph.py`, nodes/edges tables + EXTRACTION_REGISTRY
+rows) ships as ADR 0048 item 3; until then the lineage exists as
+registry truth without the walkable projection.
+
 ## 15. Honest limits
 
 1. **C1 cannot force conception.** The inventory makes "sources we haven't
@@ -625,6 +658,13 @@ governs generated artifacts revs the relevant `*_CONTRACT_VERSION` cache keys
 ---
 
 ## Changelog
+
+- **0.4 (2026-08-20)** — ADR 0048: the admin Σ-structure (§14b) — the
+  admin graph as a second model of the same axiom groups (new sorts:
+  Contract, NotebookItem, Module, Decision, Axiom, ErrorEvent,
+  ChecklistItem). Bindings shipped: TRACE_REGISTRY (decision lineage,
+  three closure checks), declared zones (governed ⊎ internal). Stated
+  gap: the walkable projection (src/admin_graph.py) is item 3.
 
 - **0.3.2 (2026-08-20)** — E1/E5 primitives ENFORCED (src/discovery/,
   gates flipped); statuses PARTIAL with the engine-composition gap

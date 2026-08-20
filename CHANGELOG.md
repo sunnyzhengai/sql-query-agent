@@ -10,6 +10,30 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.35.0] - 2026-08-20
+
+### Added — TRACE_REGISTRY: the decision lineage as data (ADR 0048 item 2)
+- src/trace_registry.py: one entry per ADR — category (architecture |
+  product), spec axioms grounded, implementing modules, enforcing
+  tests, summarizing docs. Lineages harvested from ADR texts and
+  in-file citations, all verified existing.
+- Three closure checks in CI (tests/test_trace_registry.py):
+  totality (every src/ module cited by ≥1 decision — the ghost rule
+  mechanized), existence (every cited path/axiom exists), single
+  classification (governed ⊎ internal, with test_zones).
+- First live ghost finding on day one: the live-extractor modules
+  (src/extractor/) traced to no decision — recorded retroactively as
+  ADR 0049 (ingestion routes) rather than shoehorned.
+- docs/architecture/TRACE_MAP.md generated projection
+  (scripts/generate_docs.py, NOTEBOOK_MAP pattern) with a staleness
+  gate.
+- ADR duties (item 5, docs half): ADR 0011 amended (companion trigger
+  is now "admin graph projected"); ADR 0048 records the zones + trace
+  + admin-graph + companion verdicts; SPEC.md v0.4 adds §14b — the
+  admin Σ-structure (second model of the same axiom groups).
+
+---
+
 ## [1.34.1] - 2026-08-20
 
 ### Fixed — vendor-name residue on synthetic surfaces + the gate that ends the class
