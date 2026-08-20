@@ -36,37 +36,17 @@ from src.models import EdgeType, NodeLayer
 # warehouse identifiers — the fix is grounded translation material
 # (the data dictionary the graph already holds) plus a ban on raw
 # identifiers in the output.
-PROMPT_VERSION = "4"
+# v4 hardened the SQL-reading prompt after the fabrication trace.
+# v5 (ADR 0044 phase 2, clauses 2+5): the SQL-reading step prompt is
+# DELETED — the step path translates typed tree facts via
+# src/tree/translate.py; the LLM never sees a SQL statement again.
+# TREE_CONTRACT_VERSION rides in the version so tightening the tree
+# contract regenerates everything it governs.
+from src.tree import TREE_CONTRACT_VERSION
+from src.tree.extract import build_decision_tree
+from src.tree.translate import translate_tree
 
-STEP_PROMPT = (
-    "You are documenting a certified business metric's calculation step "
-    "for a business audience of clinicians and executives.\n"
-    "Step name: {name}\n"
-    "{deps_block}"
-    "{dict_block}"
-    "SQL for THIS step:\n{fragment}\n\n"
-    "Write ONE sentence (max 30 words) stating what this step produces "
-    "in business terms. Then, if the SQL makes decisions, add one line "
-    "per decision, each starting with '- ': filters, inclusion and "
-    "exclusion rules, code lists, thresholds, time windows, and joins "
-    "that restrict the population. State each decision in plain "
-    "business language and keep the literal VALUES that define it — "
-    "codes, numbers, statuses, hours — with the business meaning "
-    "beside each code when the data dictionary above provides one. "
-    "NEVER show raw table or column identifiers or temp-table names "
-    "in the output — use the dictionary description or a plain phrase "
-    "instead, and refer to earlier steps by what they produce. Never "
-    "write vague fillers such as 'specific', 'specified', 'certain', "
-    "or 'various' in place of a value. Ground every line in the SQL "
-    "above; describe THIS step only, not its dependencies. Columns "
-    "that are merely SELECTED as output are NOT filters — never "
-    "describe a selected column as a filter, requirement, or "
-    "exclusion; only conditions written in WHERE, JOIN ON, HAVING, or "
-    "CASE WHEN are decisions. Never write a code, number, or threshold "
-    "that does not appear in the SQL above. If the SQL makes no "
-    "decisions, write no decision lines. No patient identifiers, no "
-    "preamble."
-)
+PROMPT_VERSION = f"5.t{TREE_CONTRACT_VERSION}"
 
 MEASURE_PROMPT = (
     "You are documenting a Power BI DAX {expression_type} for a business "
@@ -264,6 +244,10 @@ class DescriptionResult:
     # corrective retry — the offending lines were stripped or the whole
     # description dropped; absence over fabrication.
     ungrounded: "list[tuple[str, list[str]]]" = field(default_factory=list)
+    # (step_id, count): facts the translator failed to voice — their
+    # lines came from the deterministic template floor (clause 5); the
+    # text stays complete, the miss stays counted.
+    unvoiced: "list[tuple[str, int]]" = field(default_factory=list)
 
 
 def topological_step_order(nodes: dict, edges: list) -> "list[str]":
@@ -299,28 +283,6 @@ def topological_step_order(nodes: dict, edges: list) -> "list[str]":
 
 
 MAX_DICT_LINES = 30
-
-
-def build_step_prompt(
-    name: str, fragment: str, deps: "list[tuple[str, str]]",
-    dict_lines: "list[str] | None" = None,
-) -> str:
-    if deps:
-        lines = "\n".join(f"- {n}: {d}" for n, d in deps)
-        deps_block = f"It builds on these already-described steps:\n{lines}\n\n"
-    else:
-        deps_block = ""
-    if dict_lines:
-        entries = "\n".join(dict_lines[:MAX_DICT_LINES])
-        dict_block = (
-            "Data dictionary for what this step touches (translate "
-            f"identifiers using these):\n{entries}\n\n"
-        )
-    else:
-        dict_block = ""
-    return STEP_PROMPT.format(name=name, deps_block=deps_block,
-                              dict_block=dict_block,
-                              fragment=fragment or "(none)")
 
 
 def dictionary_for_step(
@@ -463,10 +425,16 @@ def generate_descriptions(
             for d in dep_map.get(step_id, []) if d in nodes
         ]
         try:
-            text, removed = _grounded_describe(
-                describe, build_step_prompt(node.name, fragment, deps,
-                                            dict_lines),
-                fragment, dict_lines)
+            # Phase 2 (ADR 0044 clauses 2+5): the LLM translates typed
+            # tree facts — it never sees the SQL statement. The ledger
+            # guarantees completeness: unvoiced facts appear via the
+            # deterministic template floor and are counted.
+            tree = build_decision_tree(fragment)
+            tr = translate_tree(tree, dict_lines, describe,
+                                name=node.name, deps=deps)
+            if tr.unvoiced:
+                result.unvoiced.append((step_id, len(tr.unvoiced)))
+            text, removed = enforce_grounding(tr.text, fragment, dict_lines)
         except Exception:  # noqa: BLE001 — one bad step must not kill the batch
             result.failed.append(step_id)
             continue

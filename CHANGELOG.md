@@ -10,6 +10,27 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.31.0] - 2026-08-20
+
+### Changed — ADR 0044 phase 2: the translator (clauses 2+5 GREEN)
+- The step description LLM NEVER sees SQL: src/tree/translate.py
+  renders typed tree facts (numbered, or-groups marked, negation in
+  the op) and enforces the LEDGER — every must-voice fact returns as a
+  numbered line or is counted unvoiced and rendered by the
+  deterministic template floor (src/tree/render.py). Clause 2+5
+  strict-xfail exit gates flipped.
+- descriptions.py: STEP_PROMPT (the SQL-reading prompt) DELETED — no
+  dual path; PROMPT_VERSION = 5.t1 (TREE_CONTRACT_VERSION rides in
+  every cache key); grounding gate retained on the assembled text;
+  DescriptionResult gains unvoiced counts.
+- Live spot-check (real model, real fragments): Base_Pop 11/11,
+  All_LDAs 11/11 (real codes with the devs' comment meanings),
+  ED_PositiveScores 1/1 — zero unvoiced, zero grounding violations.
+- Honest limitation: projection-only steps (~10%) get a deterministic
+  one-liner until computed-output facts land (filed).
+
+---
+
 ## [1.30.0] - 2026-08-20
 
 ### Added — tree phase 1b complete (overnight run; ADR 0044)

@@ -7,7 +7,6 @@ from scripts.seed_sample_data import (
 )
 from src.descriptions import (
     build_metric_prompt,
-    build_step_prompt,
     generate_descriptions,
     step_content_hash,
     topological_step_order,
@@ -17,6 +16,7 @@ from src.models import EdgeType, NodeLayer
 from src.parser.sql_parser import parse_sql
 from src.steps.build_graph import build_graph_step
 from src.steps.parse import parse_step
+from src.tree.translate import build_fact_prompt
 
 
 def _graph():
@@ -27,12 +27,16 @@ def _graph():
 
 
 def fake_describe(prompt: str) -> str:
-    # Distinct per prompt but GROUNDED: the 1.25 gate drops any >=2-digit
-    # literal that is absent from the fragment, so the fake must vary by
-    # letters, not numbers (a hash-suffixed fake was, correctly, rejected
-    # as fabrication).
+    # Distinct per prompt but GROUNDED: the gate drops any >=2-digit
+    # literal absent from the fragment, so the fake varies by letters.
+    # Phase 2 (clauses 2+5): step responses are LEDGER-shaped — one
+    # numbered line per fact ("N| ...") — so every fact counts as voiced
+    # and no template-floor identifiers leak into observer tests.
     tag = "".join(chr(ord("a") + int(d)) for d in str(hash(prompt) % 10_000))
-    return f"produces the {tag} result set"
+    intro = f"produces the {tag} result set"
+    # single-digit line numbers only: 2-digit numbers in unmatched lines
+    # would (correctly) trip the metric path's grounding gate
+    return "\n".join([intro] + [f"{i}| applies the {tag} rule" for i in range(1, 10)])
 
 
 class TestTopologicalOrder:
@@ -131,9 +135,14 @@ class TestGeneration:
             g.nodes_rows, g.edges_rows,
             lambda p: "Joins on ADT_DEPARTMENT_ID from #SDX.")
         assert result.jargon
+        # a CLEAN fake must voice every fact (ledger-shaped) — otherwise
+        # the template floor honestly prints raw identifiers, which is
+        # the floor working, not a jargon regression
+        clean_lines = ["Includes emergency department stays."] + [
+            f"{i}| includes emergency department stays over 6 hours"
+            for i in range(1, 10)]
         clean = generate_descriptions(
-            g.nodes_rows, g.edges_rows,
-            lambda p: "Includes emergency department stays over 6 hours.")
+            g.nodes_rows, g.edges_rows, lambda p: "\n".join(clean_lines))
         assert not clean.jargon
 
     def test_step_prompt_carries_the_data_dictionary(self):
@@ -169,11 +178,21 @@ class TestGeneration:
 
 
 class TestPrompts:
-    def test_step_prompt_grounds_in_own_fragment_and_dep_names(self):
-        p = build_step_prompt("EligibleEncounters", "SELECT x FROM t", [("Base", "base pop")])
-        assert "SELECT x FROM t" in p
+    def test_step_prompt_is_fact_shaped_and_carries_deps(self):
+        """Phase 2 (clause 2): the step prompt carries typed FACTS and
+        dependency context — there is no parameter through which a SQL
+        statement could arrive (contract-tested in test_tree_contract)."""
+        facts = [{"node_id": "site0.0", "kind": "predicate", "op": "BETWEEN",
+                  "context": "where", "column": "ADT_ARRIVAL_DATE",
+                  "columns": ["ADT_ARRIVAL_DATE"],
+                  "operands": ["@s", "@e"],
+                  "expression_sql": "ADT_ARRIVAL_DATE BETWEEN @s AND @e",
+                  "must_voice": True}]
+        p = build_fact_prompt("EligibleEncounters", facts,
+                              deps=[("Base", "base pop")])
+        assert "1| context=where op=BETWEEN" in p
         assert "Base: base pop" in p
-        assert "THIS step" in p
+        assert "SELECT" not in p
 
     def test_metric_prompt_uses_root_descriptions_not_sql(self):
         p = build_metric_prompt("USP_X", [("FinalData", "assembles the cohort")], 42)

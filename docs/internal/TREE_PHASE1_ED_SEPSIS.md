@@ -151,3 +151,38 @@ reconciliation and the dictionary remediation: 28/28 leaf-grounded.)
   (RECERT_ANSWER_KEY_1_30.md).
 
 Remaining known gap classes in the WHOLE corpus: dynamic SQL only.
+
+## Phase 2 — the translator, live (1.31.0, overnight)
+
+The step description path no longer sees SQL. The LLM receives typed
+facts (one numbered line per decision) and must return one translation
+per number — the LEDGER. Unvoiced facts appear via the deterministic
+template floor and are counted; the grounding gate still runs on the
+assembled text as belt-and-suspenders.
+
+Live spot-check (real gpt-4o-mini, real recorded fragments):
+
+| Step | Facts | Voiced | Unvoiced | Grounding violations |
+|---|---|---|---|---|
+| Base_Pop | 11 | 11 | 0 | 0 |
+| All_LDAs | 11 | 11 | 0 | 0 |
+| ED_PositiveScores | 1 | 1 | 0 | 0 |
+
+Sample (All_LDAs — compare the 1.24-era fabrication "IDs 123 and 456"):
+
+> - Include records where the flowsheet row identifier is '900112'
+>   (LDA HS IP ETT).
+> - Include records where the flowsheet row identifier is '900111'
+>   (LDA HS IP PERIPHERAL IV).
+> - Include records where the value set identifier is 3022.
+
+The codes are real, and their meanings came from the original
+developers' inline comments — carried by the tree, not remembered by
+the model. Structural consequence: the Base_Pop fabrication class
+("excludes pending or cancelled") is now IMPOSSIBLE at the input — no
+node, no sentence.
+
+Known limitation (honest): projection-only steps (~10% of the corpus,
+zero decision sites) get a deterministic one-liner — computed SELECT
+expressions are not yet facts. Enrichment filed for a later phase
+(computed-output fact kind); the trade is blindness.

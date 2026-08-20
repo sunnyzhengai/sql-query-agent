@@ -110,11 +110,9 @@ class TestClause1ConservationOfDecisionSites:
 
 
 class TestClause2TranslatorBlindness:
-    @clause(2, phase=2)
     def test_translator_prompts_carry_facts_never_raw_sql(self):
-        from src.tree.translate import translate_tree
-
         from src.tree.extract import build_decision_tree
+        from src.tree.translate import translate_tree
         tree = build_decision_tree(GNARLY_FRAGMENT)
         prompts = []
 
@@ -129,7 +127,6 @@ class TestClause2TranslatorBlindness:
             assert "SELECT EEF.ENCOUNTER_ID" not in p, \
                 "raw statement text leaked into a translator prompt"
 
-    @clause(2, phase=2)
     def test_fact_prompt_builder_cannot_accept_a_fragment(self):
         # AST plank, the 0042 regex-ban pattern: the banned input has
         # no parameter to arrive through.
@@ -180,11 +177,9 @@ class TestClause4TheJudgeIsNeverAnLLM:
 
 
 class TestClause5EveryDecisionVoicedOrCounted:
-    @clause(5, phase=2)
     def test_ledger_balances_voiced_union_unvoiced_is_must_voice(self):
-        from src.tree.translate import translate_tree
-
         from src.tree.extract import build_decision_tree
+        from src.tree.translate import translate_tree
         tree = build_decision_tree(GNARLY_FRAGMENT)
         result = translate_tree(tree, DICT_LINES, lambda p: "line")
         voiced = set(result.ledger)
@@ -253,7 +248,7 @@ class TestContractIsLocked:
     def test_every_clause_has_a_strict_exit_gate_in_this_file(self):
         # A clause is either SHIPPED (marker removed, tests run green —
         # the exit-gate flip) or still gated by a strict-xfail marker.
-        shipped = {1}  # phase 1, 1.26.0: the faithful tree extractor
+        shipped = {1, 2, 5}  # 1: extractor (1.26/1.28); 2+5: translator+ledger (1.31)
         source = Path(__file__).read_text()
         for n in range(1, 7):
             if n in shipped:
