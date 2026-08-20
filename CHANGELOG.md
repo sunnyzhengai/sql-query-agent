@@ -8,6 +8,11 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+- dist/ pruned to the current wheel only (Sunny's ruling via the
+  review-session cleanup list, confirmed in-session 2026-08-20):
+  58 historical wheels removed from tracking; release history lives
+  in git history, not the working tree.
+
 ---
 
 ## [1.37.0] - 2026-08-20
