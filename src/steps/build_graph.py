@@ -31,7 +31,7 @@ from src.tree.extract import (
 
 
 def _wire_decision_sites(builder, metric_id, step_name, tree, rows,
-                         step_by_fold) -> None:
+                         step_by_fold, row_step: "str | None" = None) -> None:
     """Decision nodes + edges (ADR 0044 1b, the reachability law).
 
     Per extracted site: a decision node, a step→decision edge, and for
@@ -54,7 +54,7 @@ def _wire_decision_sites(builder, metric_id, step_name, tree, rows,
             continue
         site_id = row["site_id"]
         decision_id = builder.add_decision_node(
-            metric_id, step_name, site_id, row["context"],
+            metric_id, row_step or step_name, site_id, row["context"],
             row["predicate_count"], row["expression_sql"])
         builder.add_edge(step_node_id, decision_id, EdgeType.STEP_TO_DECISION)
         connected = False
@@ -172,14 +172,27 @@ def build_graph_step(
         builder.build_from_parsed_sql(pr["metric_id"], parsed)
         step_by_fold = {fold_identifier(c.name): f"transform:{pr['metric_id']}:{c.name}"
                         for c in parsed.ctes}
+        # A proc may REDEFINE a CTE name across statements (field find,
+        # tenant 300 run 2026-08-20: reports.USP_ED_Sepsis defines
+        # PositiveCultures/NegativeCultures twice). Step NODES merge on
+        # the name (pre-existing graph behavior); decision ROWS keep
+        # BOTH definitions' decisions, keyed uniquely with an occurrence
+        # suffix — the unique(metric, step, site) invariant holds and
+        # nothing is silently dropped.
+        occurrence: "dict[str, int]" = {}
         for cte in parsed.ctes:
+            fold = fold_identifier(cte.name)
+            occurrence[fold] = occurrence.get(fold, 0) + 1
+            row_step = (cte.name if occurrence[fold] == 1
+                        else f"{cte.name}#{occurrence[fold]}")
             tree = build_decision_tree(cte.sql_fragment)
-            rows = decision_site_rows(tree, pr["metric_id"], step_name=cte.name)
+            rows = decision_site_rows(tree, pr["metric_id"], step_name=row_step)
             _wire_decision_sites(
-                builder, pr["metric_id"], cte.name, tree, rows, step_by_fold)
+                builder, pr["metric_id"], cte.name, tree, rows, step_by_fold,
+                row_step=row_step)
             decision_rows.extend(rows)
             tree_fallout_rows.extend(
-                unextracted_fallout_rows(tree, pr["metric_id"], step_name=cte.name))
+                unextracted_fallout_rows(tree, pr["metric_id"], step_name=row_step))
 
     steward_manager = StewardManager()
     steward_manager.load_from_records(list(steward_records))

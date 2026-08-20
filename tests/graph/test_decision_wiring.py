@@ -115,3 +115,41 @@ class TestDecisionNodesAndEdges:
                 assert r["reachability"] in (
                     "connected", "literal_only", "parameter_only",
                     "unresolved_alias", "unqualified"), r
+
+
+def test_redefined_cte_names_keep_unique_decision_keys():
+    """Field find (tenant 300 run, 2026-08-20): a proc redefining a CTE
+    name across statements produced duplicate (metric, step, site) keys
+    and the postcondition gate blocked the run. Both definitions'
+    decisions survive, keyed by occurrence."""
+    ctes = [
+        _cte("PositiveCultures",
+             "SELECT a INTO #x FROM dbo.HOSPITAL_ENCOUNTERS WHERE b = 1"),
+        _cte("PositiveCultures",
+             "SELECT a INTO #y FROM dbo.PATIENTS WHERE c = 2"),
+    ]
+    out = build_graph_step(
+        [_parse_row("dbo.USP_X", ctes)], DICT_TABLES, DICT_COLUMNS)
+    keys = [(r["metric_id"], r["step_name"], r["site_id"])
+            for r in out.decision_rows]
+    assert len(keys) == len(set(keys)), "duplicate decision keys"
+    steps = sorted({r["step_name"] for r in out.decision_rows})
+    assert steps == ["PositiveCultures", "PositiveCultures#2"]
+
+
+def test_recorded_corpus_decision_keys_are_unique():
+    """The guard that should have run BEFORE the tenant found it: the
+    full recorded corpus must produce unique decision keys."""
+    import importlib.util
+    from pathlib import Path
+    spec = importlib.util.spec_from_file_location(
+        "rpl", Path(__file__).parent.parent.parent / "scripts" / "run_pipeline_local.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    pr, tb, co = mod.load_recorded(
+        Path(__file__).parent.parent / "fixtures" / "recorded")
+    out = build_graph_step(pr, tb, co)
+    keys = [(r["metric_id"], r["step_name"], r["site_id"])
+            for r in out.decision_rows]
+    dupes = {k for k in keys if keys.count(k) > 1}
+    assert not dupes, sorted(dupes)[:5]

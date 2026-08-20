@@ -10,6 +10,19 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.33.2] - 2026-08-20
+
+### Fixed — duplicate decision keys on redefined CTE names (field find: 300 postcondition)
+- reports.USP_ED_Sepsis redefines PositiveCultures/NegativeCultures
+  across statements; both definitions' decision rows now carry an
+  occurrence suffix (Name, Name#2) so unique(metric, step, site)
+  holds — nothing dropped, nothing merged away. Step NODES still merge
+  on the name (pre-existing graph behavior, unchanged).
+- Local guards added: unit case + a recorded-corpus uniqueness test —
+  the check that should have run before the tenant found it.
+
+---
+
 ## [1.33.1] - 2026-08-20
 
 ### Fixed — ScriptDom loader on Fabric (field find: 300 rerun)
