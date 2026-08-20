@@ -27,8 +27,13 @@ dev = [
     # every tool that can fail CI is pinned EXACTLY — unpinned ruff cost
     # three lint-only CI failures in one day; floors resolve differently
     # on CI than on dev machines by construction.
-    "pytest==9.1.1",
-    "pytest-cov==7.1.0",
+    # Exact per-interpreter pins: pytest 9 requires >=3.10; the CI
+    # matrix still tests 3.9 (Fabric floor), so each leg gets its own
+    # exact pin — still no floors anywhere.
+    "pytest==9.1.1; python_version >= '3.10'",
+    "pytest==8.4.2; python_version < '3.10'",
+    "pytest-cov==7.1.0; python_version >= '3.10'",
+    "pytest-cov==6.2.1; python_version < '3.10'",
     # Pinned exactly: CI resolves this fresh while dev machines lag —
     # unpinned ruff produced three lint-only CI failures in one day
     # (2026-08-19; isort grouping changed across versions)
