@@ -108,12 +108,12 @@ def main() -> None:
     chat_api = azure_chat_api()
 
     if demo_gate:
-        out_md = Path("docs/internal/AGENT_DEMO_GATE.md")
-        out_jsonl = Path("docs/internal/agent_demo_gate.jsonl")
+        out_md = Path("internal/docs/AGENT_DEMO_GATE.md")
+        out_jsonl = Path("internal/docs/agent_demo_gate.jsonl")
         title = "# Demo QA Gate — the four pre-capture questions"
     else:
-        out_md = Path("docs/internal/AGENT_LIVE_RESULTS.md")
-        out_jsonl = Path("docs/internal/agent_live_results.jsonl")
+        out_md = Path("internal/docs/AGENT_LIVE_RESULTS.md")
+        out_jsonl = Path("internal/docs/agent_live_results.jsonl")
         title = "# ADR 0035 Agent — Live Evaluation"
     md = [title,
           "",

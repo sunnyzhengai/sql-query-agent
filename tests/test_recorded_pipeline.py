@@ -82,7 +82,7 @@ def test_uses_table_closure_matches_certified_answer_key():
         return {r["sourceId"] for r in uses if r["targetId"] in targets}
 
     # Re-certified 2026-08-20 (1.30.0 depth-cap fix; delta doc:
-    # docs/internal/RECERT_ANSWER_KEY_1_30.md — all gains, zero losses)
+    # internal/docs/RECERT_ANSWER_KEY_1_30.md — all gains, zero losses)
     assert len(readers_of("HOSPITAL_ENCOUNTERS")) == 13
     assert len(readers_of("MEDICATION_ORDERS")) == 8
 

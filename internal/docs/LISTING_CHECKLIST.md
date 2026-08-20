@@ -33,7 +33,7 @@ response.
 
 ## STATE RECONCILIATION (2026-08-11, overnight): the flagship is now
 ## the ADR 0035 agent (LLM conversation over five deterministic tools),
-## live-evaluated 12/12 (docs/internal/AGENT_LIVE_RESULTS.md). The gate
+## live-evaluated 12/12 (internal/docs/AGENT_LIVE_RESULTS.md). The gate
 ## items below are re-mapped to that architecture.
 
 ## Blockers — must happen before submission, in order
@@ -61,7 +61,7 @@ response.
        drop them from the listing narrative entirely. Ten minutes
        either way; the demo no longer depends on them.
 3. [ ] **Record the demo video** (~5 min). TWO scripts now exist:
-       docs/internal/DEMO_SCRIPT.md (5-min listing cut, QA-verified
+       internal/docs/DEMO_SCRIPT.md (5-min listing cut, QA-verified
        questions) and data/demo/Demo Script Sepsis.md (long-form
        lead-call narrative, reviewed + corrected 2026-08-09 with the
        listing cut listed in its header). Pre-record QA gate: the new

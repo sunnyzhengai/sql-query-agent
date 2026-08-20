@@ -121,7 +121,7 @@ Listing, demo, and Purview screenshots all follow Phase C's gate.
 **Answer-layer status (2026-08-10):** Phase D happened — the
 orchestrator IS the flagship (ADR 0032), live-verified, with the
 variants verb shipped and the conversational entry edge green-lit via
-the 8-question paper test (docs/internal/VERB_SCORECARD.md = acceptance
+the 8-question paper test (internal/docs/VERB_SCORECARD.md = acceptance
 criteria). Fabric Data Agents are optional secondary surfaces.
 
 **UI DECISION (2026-08-10): one backend, two faces.** The orchestrator

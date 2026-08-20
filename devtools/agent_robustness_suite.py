@@ -187,7 +187,7 @@ def main() -> None:
         "latency_p50_s": round(statistics.median(latencies), 2),
         "latency_max_s": round(max(latencies), 2),
     }
-    out = Path("docs/internal/agent_robustness_baseline.json")
+    out = Path("internal/docs/agent_robustness_baseline.json")
     out.write_text(json.dumps(report, indent=1))
     print("\n=== TOTALS ===")
     for k, v in report["totals"].items():

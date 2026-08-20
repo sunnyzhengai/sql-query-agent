@@ -34,7 +34,7 @@ core is a prerequisite for white-label/OEM tiers later.
   "AIVIA" values + prose), orchestrator docstrings, notebook 11 comment,
   CHANGELOG heading, tests referencing the above.
 - **Branded-by-design (fine, excluded from work sync anyway):** website/,
-  presentation/, marketplace_host/, docs/internal strategy files.
+  presentation/, marketplace_host/, internal/docs strategy files.
 
 ## Wanted
 
@@ -59,5 +59,5 @@ core is a prerequisite for white-label/OEM tiers later.
    src/ (post-sweep), libs/, numbered notebooks (post-sweep),
    org_config.example.yaml, environment/requirements.txt, agent
    instruction files — and what it never includes (website,
-   presentation, marketplace_host, docs/internal, CHANGELOG, dist
+   presentation, marketplace_host, internal/docs, CHANGELOG, dist
    wheels until rebuilt post-sweep).

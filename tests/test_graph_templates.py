@@ -1,6 +1,6 @@
 """The REMATCH answer key, executable (ADR 0017/0018).
 
-Every certified number in docs/internal/REMATCH_SCORECARD.md, verified
+Every certified number in internal/docs/REMATCH_SCORECARD.md, verified
 deterministically against the recorded fixtures through the traversal
 templates — no LLM, no Fabric. When a platform agent's answer disagrees
 with these, the platform layer is at fault, not the graph.

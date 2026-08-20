@@ -31,9 +31,9 @@ sandboxes.** Everything else is safe to share.
 - [terms-of-service.md](legal/terms-of-service.md)
 
 ## Internal (AIVIA only — do not distribute)
-- [internal/](internal/README.md) — Strategy, positioning, pricing, launch planning, deployment runbook
-- [internal/ROADMAP.md](internal/ROADMAP.md) — **Single source of truth for project status** and canonical metrics
-- [internal/REMATCH_SCORECARD.md](internal/REMATCH_SCORECARD.md) — Delta vs. Graph agent comparison protocol and results log
+- [internal/](../internal/docs/README.md) — Strategy, positioning, pricing, launch planning, deployment runbook
+- [internal/ROADMAP.md](../internal/docs/ROADMAP.md) — **Single source of truth for project status** and canonical metrics
+- [internal/REMATCH_SCORECARD.md](../internal/docs/REMATCH_SCORECARD.md) — Delta vs. Graph agent comparison protocol and results log
 
 ## Other
 - [notebooks/delta_agent_instructions.md](../notebooks/delta_agent_instructions.md) — Delta Agent (production) grounding instructions

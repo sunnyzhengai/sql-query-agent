@@ -453,7 +453,7 @@ if report_journey:
         .write.format("delta").mode("append").saveAsTable("ops_report_journey")
 print(f"ops_report_journey: {len(report_journey)} reports")
 print("\nThe journey dashboard reads these two tables + ops_funnel — "
-      "see docs/internal/RUNBOOK_JOURNEY_DASHBOARD.md")
+      "see internal/docs/RUNBOOK_JOURNEY_DASHBOARD.md")
 
 # METADATA ********************
 

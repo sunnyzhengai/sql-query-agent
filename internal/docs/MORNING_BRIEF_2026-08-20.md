@@ -56,7 +56,7 @@ E1/E5 gates flipped, engine composition honestly marked as the gap.
    scratchpad: stray_sync_notes.txt. I've also stopped using
    `git add -A` — explicit paths only.)
 2. **SIGN-OFF — the answer-key recertification**:
-   docs/internal/RECERT_ANSWER_KEY_1_30.md. All gains zero losses, and
+   internal/docs/RECERT_ANSWER_KEY_1_30.md. All gains zero losses, and
    the headline: the fixed extractor now finds exactly the 48 reads
    your own deep-trace hand count predicted. If any delta contradicts
    your read, name it and that oracle reverts.

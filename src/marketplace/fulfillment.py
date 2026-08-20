@@ -10,7 +10,7 @@ notify-only. Everything here is pure — the HTTP host resolves tokens,
 verifies JWTs cryptographically, and persists subscriptions; this module
 decides what is *correct*.
 
-References (verified 2026-08-06, docs/internal/MARKETPLACE_TRANSACTABLE_PLAN.md):
+References (verified 2026-08-06, internal/docs/MARKETPLACE_TRANSACTABLE_PLAN.md):
 partner-center/marketplace-offers/pc-saas-fulfillment-subscription-api,
 pc-saas-fulfillment-webhook.
 """

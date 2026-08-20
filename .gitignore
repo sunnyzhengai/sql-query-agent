@@ -39,7 +39,7 @@ data/output/
 htmlcov/
 .coverage
 data/output/
-presentation/
+internal/presentation/
 
 # Pre-anonymization source files (contain proprietary SQL/metadata)
 data/synthetic/sepsis_sql/
@@ -51,5 +51,5 @@ data/Collibra*
 llm_api_key.txt
 .DS_Store
 data/events/
-learning/
-private/
+internal/learning/
+internal/private/

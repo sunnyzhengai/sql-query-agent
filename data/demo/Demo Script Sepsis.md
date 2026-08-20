@@ -11,7 +11,7 @@ I’d also make the **28 reports** a recurring motif. It gives the audience some
 > Slide 7 close (30s).
 >
 > **Hard rule for anything on camera: only QA-verified questions,
-> word-for-word.** Verified set: docs/internal/DEMO_SCRIPT.md. New
+> word-for-word.** Verified set: internal/docs/DEMO_SCRIPT.md. New
 > questions must pass a test-pane run (answer + run steps checked)
 > BEFORE recording. Count questions ("how many...") stay OFF camera.
 

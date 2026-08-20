@@ -54,5 +54,5 @@ reads.
    `cte_count` to make red disappear (no-expedient-defaults).
 2. Escalation-contract tie-in (ADR 0045 §3): a local-only test tier
    needs a surfacing mechanism — e.g. the release drill records the
-   local tally in the commit message or a `docs/internal/` run log, so
+   local tally in the commit message or a `internal/docs/` run log, so
    "19 failed locally" can never ride along silently again.

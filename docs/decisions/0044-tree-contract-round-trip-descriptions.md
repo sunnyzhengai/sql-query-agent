@@ -5,7 +5,7 @@
 
 ## Context
 
-The 2026-08-18 deep trace ([TRACE_USP_ED_SEPSIS](../internal/TRACE_USP_ED_SEPSIS.md))
+The 2026-08-18 deep trace ([TRACE_USP_ED_SEPSIS](../../internal/docs/TRACE_USP_ED_SEPSIS.md))
 found the deterministic pipeline truthful (43/43 steps, every asserted
 edge real) and the LLM description stage not (three fabricated filters,
 invented codes). 1.25.0 removed the root cause (500-char fragment

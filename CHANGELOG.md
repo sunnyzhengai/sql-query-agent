@@ -10,6 +10,22 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.34.0] - 2026-08-20
+
+### Added — declared zones: governed ⊎ internal (HANDOFF_TRACE_AND_ADMIN_GRAPH item 1)
+- Top-level `internal/` zone consolidates all unshipped material:
+  docs/internal → internal/docs (history-preserving git mv);
+  learning/, presentation/, private/ (gitignored, local-only) also
+  relocated under internal/.
+- src/zones.py declares the partition; tests/test_zones.py enforces:
+  every top-level tracked path is governed or internal (no third
+  state), the internal zone stays inside the deployment package's
+  FORBIDDEN pattern, and docs/internal can never be recreated.
+- All cross-links rewritten (docstrings, docs, notebook messages,
+  devtools output paths); every relative doc link verified resolving.
+
+---
+
 ## [1.33.6] - 2026-08-20
 
 ### Fixed — grounding gate false positives on DAX and composed prose (field find: 600 rerun)
@@ -178,7 +194,7 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 - Recorded fixtures RE-RECORDED locally via the native parser: 417
   full fragments (0 truncated), anonymization scan clean — the
   stale-fixtures debt is dead. Answer keys re-certified with delta doc
-  docs/internal/RECERT_ANSWER_KEY_1_30.md (PENDING Sunny's sign-off);
+  internal/docs/RECERT_ANSWER_KEY_1_30.md (PENDING Sunny's sign-off);
   grounding evals made summarization-robust (>=2 of the metric's own
   certified tables; refusals stay strict) and cassette re-recorded.
 - Dictionary: ICU_STAY_SUMMARY authored (newly-seen read); join map steady
@@ -337,7 +353,7 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 ## [1.24.0] - 2026-08-19
 
 ### Added — trust instrumentation (Sunny's three asks)
-- Deep trace of reporting.USP_ED_Sepsis (docs/internal/
+- Deep trace of reporting.USP_ED_Sepsis (internal/docs/
   TRACE_USP_ED_SEPSIS.md): 43/43 steps exact, 45/48 reads (known
   suppression class), card correct; description audit found fabricated
   filters and invented literal codes at the STEP level — mechanism

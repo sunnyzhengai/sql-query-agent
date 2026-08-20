@@ -1,7 +1,7 @@
 """Build the customer deployment package.
 
 Assembles everything INSTALLATION_GUIDE.md tells the customer to expect into a
-single zip, using a strict allowlist. Internal content (docs/internal/, the
+single zip, using a strict allowlist. Internal content (internal/docs/, the
 real org_config.yaml, tests, strategy docs) can never ship because nothing is
 included that isn't explicitly listed here — and verify_package() re-scans the
 finished zip as a second line of defense.

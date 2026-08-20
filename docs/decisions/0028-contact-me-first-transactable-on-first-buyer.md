@@ -14,7 +14,7 @@ ADR 0013 decided the destination: transactable SaaS on the Microsoft
 Marketplace. The open question was timing — the ROADMAP carried
 "Contact Me first, convert after 3 customers" as a recommendation without a
 verified basis. Research against live Partner Center docs (2026-08-06,
-[MARKETPLACE_TRANSACTABLE_PLAN.md](../internal/MARKETPLACE_TRANSACTABLE_PLAN.md))
+[MARKETPLACE_TRANSACTABLE_PLAN.md](../../internal/docs/MARKETPLACE_TRANSACTABLE_PLAN.md))
 established the facts that decide it:
 
 - **Contact Me → Transact is a same-offer republish for SaaS** — listing

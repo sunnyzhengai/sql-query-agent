@@ -6,7 +6,7 @@ a marketplace API client. Handlers return (status_code, body_dict) so
 tests assert on plain values.
 
 Webhook contract obligations implemented here (see
-docs/internal/MARKETPLACE_TRANSACTABLE_PLAN.md):
+internal/docs/MARKETPLACE_TRANSACTABLE_PLAN.md):
 - always ACK 200 once authenticated (Microsoft retries 500x/8h on 5xx);
 - verify the Authorization JWT (signature by the injected verifier,
   claims by src.marketplace.validate_webhook_claims);

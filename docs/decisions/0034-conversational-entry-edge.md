@@ -21,7 +21,7 @@ and the one job the LLM is natively for. The mistake was applying
 determinism to language instead of confining it to computation.
 
 The contract was validated before implementation by an 8-question paper
-test (docs/internal/VERB_SCORECARD.md): Sunny fired question shapes,
+test (internal/docs/VERB_SCORECARD.md): Sunny fired question shapes,
 each was scored against the proposed structure, and five contract
 amendments were extracted. Verdict: green-lit, scorecard = acceptance
 criteria.
