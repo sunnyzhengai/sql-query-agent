@@ -35,8 +35,11 @@ plus one NEW item 8.
    invariant.
 5. **`parameter_default` site kind** for control-flow decisions
    (the `IF @StartDate IS NULL → fn_parse_date('MB-12')` default
-   reporting window — flagged in TREE_PHASE1_ED_SEPSIS.md; Sunny to
-   confirm the modeling).
+   reporting window). **RULED by Sunny 2026-08-19: model it.** The
+   tree captures the default-window decision as a first-class site so
+   descriptions can voice it (the omission the deep trace flagged);
+   graph_decision_sites' context allowed_values gains
+   `parameter_default`; ED sepsis expected 488/488.
 6. **Join map regenerates from graph_decision_sites** and
    `scripts/derive_dict_relationships.py` is DELETED — mechanically
    enforced: tests/test_derive_relationships.py fails the moment

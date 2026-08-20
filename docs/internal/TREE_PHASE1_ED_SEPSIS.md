@@ -123,6 +123,7 @@ tests had missed — the acceptance protocol working exactly as designed:
    lives in the op (`IS_NOT`, `NOT_IN`, `NOT_BETWEEN`, `NOT_LIKE`);
    only standalone `NOT` (e.g. NOT EXISTS) is a NOT node. Pinned.
 
-Remaining reviewer question (unchanged): should the two IF blocks (the
-MB-12/T-1 default reporting window) become a `parameter_default` site
-kind in 1b, or stay counted gaps?
+Reviewer question 3 ANSWERED (Sunny, 2026-08-19): **model it** — the
+IF default-window blocks become a `parameter_default` site kind in 1b;
+expected end state 488/488. (Questions 1–2 stand answered by the
+reconciliation and the dictionary remediation: 28/28 leaf-grounded.)
