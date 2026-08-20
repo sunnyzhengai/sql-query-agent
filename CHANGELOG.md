@@ -10,6 +10,19 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.33.1] - 2026-08-20
+
+### Fixed — ScriptDom loader on Fabric (field find: 300 rerun)
+- A forced DOTNET_ROOT=~/.dotnet (nonexistent on Fabric drivers)
+  poisoned clr-loader's own dotnet discovery — 300, the first notebook
+  to self-initialize ScriptDom, failed with ScriptDomUnavailable.
+  DOTNET_ROOT is now asserted only when the path exists; the subprocess
+  probe runs on macOS only (its sole purpose is the hardened-Python
+  SIGKILL); Linux load failures raise the remediation, never a raw
+  stack.
+
+---
+
 ## [1.33.0] - 2026-08-20
 
 ### Added — phase-4 beachhead: the discovery primitives (spec:E1/E5)

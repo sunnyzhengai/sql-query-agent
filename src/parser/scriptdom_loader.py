@@ -51,14 +51,28 @@ _parser_cls = None
 _string_reader = None
 
 
-def _dotnet_root() -> str:
-    return os.environ.get("DOTNET_ROOT") or os.path.expanduser("~/.dotnet")
+def _dotnet_root() -> "str | None":
+    """The dotnet root to assert, or None to leave discovery alone.
+
+    FIELD FIX (Fabric 300 run, 2026-08-20): forcing DOTNET_ROOT to
+    ~/.dotnet when that path does not exist POISONS clr-loader's own
+    runtime discovery — Fabric drivers have dotnet on PATH but no
+    ~/.dotnet, so the forced value broke a load that would have
+    succeeded untouched. Only assert a root that actually exists."""
+    env_root = os.environ.get("DOTNET_ROOT")
+    if env_root:
+        return env_root
+    home = os.path.expanduser("~/.dotnet")
+    return home if os.path.isdir(home) else None
 
 
 def _probe_coreclr() -> "tuple[bool, str]":
     """Attempt the coreclr load in a THROWAWAY process — a hardened
     host dies with SIGKILL, which cannot be caught in-process."""
-    env = {**os.environ, "DOTNET_ROOT": _dotnet_root()}
+    env = dict(os.environ)
+    root = _dotnet_root()
+    if root:
+        env["DOTNET_ROOT"] = root
     try:
         proc = subprocess.run(
             [sys.executable, "-c",
@@ -97,12 +111,23 @@ def ensure_scriptdom() -> None:
         raise ScriptDomUnavailable(f"pythonnet missing: {err}. {REMEDIATION}") from err
 
     if pythonnet.get_runtime_info() is None:
-        ok, detail = _probe_coreclr()
-        if not ok:
+        # The subprocess probe exists ONLY for macOS: Apple's hardened
+        # system Python SIGKILLs on coreclr load, uncatchable
+        # in-process. On Linux (Fabric drivers, CI) the failure mode is
+        # a normal catchable exception — load directly, no probe.
+        if sys.platform == "darwin":
+            ok, detail = _probe_coreclr()
+            if not ok:
+                raise ScriptDomUnavailable(
+                    f"coreclr cannot be hosted here ({detail}). {REMEDIATION}")
+        root = _dotnet_root()
+        if root:
+            os.environ.setdefault("DOTNET_ROOT", root)
+        try:
+            pythonnet.load("coreclr")
+        except Exception as err:  # noqa: BLE001 — one remediation message, never a raw stack
             raise ScriptDomUnavailable(
-                f"coreclr cannot be hosted here ({detail}). {REMEDIATION}")
-        os.environ.setdefault("DOTNET_ROOT", _dotnet_root())
-        pythonnet.load("coreclr")
+                f"coreclr load failed ({err}). {REMEDIATION}") from err
 
     dll = _find_dll()
     from System.Reflection import Assembly  # noqa: E402 (pythonnet import)
