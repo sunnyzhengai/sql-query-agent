@@ -175,6 +175,10 @@ class TestGeneration:
         result = generate_descriptions(g.nodes_rows, g.edges_rows, sometimes)
         assert len(result.failed) == 1
         assert result.generated > 0
+        # the WHY is captured, not just the fact (field find 2026-08-20)
+        nid, reason = result.failed_reasons[0]
+        assert nid == result.failed[0]
+        assert reason.startswith("generation_error: RuntimeError: transient")
 
 
 class TestPrompts:
@@ -261,3 +265,5 @@ class TestMeasureDescriptions:
                   "description": "", "properties": json.dumps({})}]
         result = generate_descriptions(nodes, [], lambda p: "t")
         assert "measure:R:T[X]" in result.failed
+        assert dict(result.failed_reasons)["measure:R:T[X]"].startswith(
+            "no_dax_expression")

@@ -151,9 +151,9 @@ print(f"Nodes: {len(nodes_rows)}, edges: {len(edges_rows)}, cached steps: {len(c
 
 result = generate_descriptions(nodes_rows, edges_rows, describe, cache=cache)
 print(f"Generated: {result.generated}  cache hits: {result.cache_hits}  failed: {len(result.failed)}")
-if result.failed:
-    for nid in result.failed[:10]:
-        print(f"  failed: {nid}")
+if result.failed_reasons:
+    for nid, reason in result.failed_reasons[:10]:
+        print(f"  failed: {nid} — {reason}")
 if result.vague:
     print(f"Vague-filler flags (value hidden behind 'specific'/'certain'): {len(result.vague)}")
     for nid in result.vague[:10]:
@@ -222,6 +222,19 @@ if result.descriptions:
         spark.createDataFrame(_g_rows, schema=to_spark_schema(FALLOUT)) \
             .write.format("delta").mode("append").saveAsTable("ops_fallout")
         print(f"[+] ops_fallout: {len(_g_rows)} grounding rows appended")
+
+    # Failed-node fallout (field find 2026-08-20): every failed node's
+    # WHY is queryable state, never only a printed line.
+    if result.failed_reasons:
+        from src.schemas import FALLOUT
+
+        _f_rows = [(now, "600_describe", nid,
+                    reason.split(":", 1)[0], reason[:500],
+                    "contract:graph_nodes")
+                   for nid, reason in result.failed_reasons]
+        spark.createDataFrame(_f_rows, schema=to_spark_schema(FALLOUT)) \
+            .write.format("delta").mode("append").saveAsTable("ops_fallout")
+        print(f"[+] ops_fallout: {len(_f_rows)} failed-node rows appended")
 
     metric_desc = [
         (nid.replace("canonical:", ""), d)

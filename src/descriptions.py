@@ -238,6 +238,10 @@ class DescriptionResult:
     cache_hits: int = 0
     generated: int = 0
     failed: "list[str]" = field(default_factory=list)
+    # (node_id, "reason_code: detail") — the WHY behind every failed
+    # node, persisted to ops_fallout by 600 (field find 2026-08-20:
+    # four failures whose causes existed only in printed output)
+    failed_reasons: "list[tuple[str, str]]" = field(default_factory=list)
     vague: "list[str]" = field(default_factory=list)   # filler-word flags
     jargon: "list[str]" = field(default_factory=list)  # raw-identifier flags
     # grounding gate (2026-08-19): (node_id, violations) that survived a
@@ -248,6 +252,10 @@ class DescriptionResult:
     # lines came from the deterministic template floor (clause 5); the
     # text stays complete, the miss stays counted.
     unvoiced: "list[tuple[str, int]]" = field(default_factory=list)
+
+    def fail(self, node_id: str, reason: str) -> None:
+        self.failed.append(node_id)
+        self.failed_reasons.append((node_id, reason))
 
 
 def topological_step_order(nodes: dict, edges: list) -> "list[str]":
@@ -435,13 +443,14 @@ def generate_descriptions(
             if tr.unvoiced:
                 result.unvoiced.append((step_id, len(tr.unvoiced)))
             text, removed = enforce_grounding(tr.text, fragment, dict_lines)
-        except Exception:  # noqa: BLE001 — one bad step must not kill the batch
-            result.failed.append(step_id)
+        except Exception as err:  # noqa: BLE001 — one bad step must not kill the batch
+            result.fail(step_id, f"generation_error: {type(err).__name__}: {err}"[:300])
             continue
         if removed:
             result.ungrounded.append((step_id, removed))
         if not text:
-            result.failed.append(step_id)
+            result.fail(step_id, "grounded_to_empty: every generated line "
+                                 "failed the grounding check")
             continue
         if _VAGUE_FILLERS.search(text):
             result.vague.append(step_id)
@@ -466,7 +475,8 @@ def generate_descriptions(
             continue
         expression = node.properties.get("dax_expression", "")
         if not expression:
-            result.failed.append(node_id)
+            result.fail(node_id, "no_dax_expression: measure ingested "
+                                 "without an expression")
             continue
         dict_lines = []
         for col_id in sorted(measure_cols.get(node_id, [])):
@@ -486,13 +496,14 @@ def generate_descriptions(
         try:
             text, removed = _grounded_describe(
                 describe, prompt, expression, dict_lines)
-        except Exception:  # noqa: BLE001 — one bad measure must not kill the batch
-            result.failed.append(node_id)
+        except Exception as err:  # noqa: BLE001 — one bad measure must not kill the batch
+            result.fail(node_id, f"generation_error: {type(err).__name__}: {err}"[:300])
             continue
         if removed:
             result.ungrounded.append((node_id, removed))
         if not text:
-            result.failed.append(node_id)
+            result.fail(node_id, "grounded_to_empty: every generated line "
+                                 "failed the grounding check")
             continue
         if _VAGUE_FILLERS.search(text):
             result.vague.append(node_id)
@@ -518,7 +529,8 @@ def generate_descriptions(
             for r in roots_map.get(node_id, []) if r in nodes
         ]
         if not roots:
-            result.failed.append(node_id)
+            result.fail(node_id, "no_root_steps: metric node has no "
+                                 "root-step edges to compose from")
             continue
         step_count = step_count_by_metric.get(metric_id, len(roots))
         key = metric_content_hash(node.name, roots, step_count)
@@ -531,13 +543,14 @@ def generate_descriptions(
         try:
             text, removed = _grounded_describe(
                 describe, prompt, roots_ground, None)
-        except Exception:  # noqa: BLE001
-            result.failed.append(node_id)
+        except Exception as err:  # noqa: BLE001
+            result.fail(node_id, f"generation_error: {type(err).__name__}: {err}"[:300])
             continue
         if removed:
             result.ungrounded.append((node_id, removed))
         if not text:
-            result.failed.append(node_id)
+            result.fail(node_id, "grounded_to_empty: every generated line "
+                                 "failed the grounding check")
             continue
         if _VAGUE_FILLERS.search(text):
             result.vague.append(node_id)

@@ -17,6 +17,8 @@ arguments — this module never reads key material from disk.
 
 from __future__ import annotations
 
+import time
+
 import requests
 
 # Bump deliberately; override per-deployment via SQA_AZURE_API_VERSION
@@ -49,6 +51,14 @@ def build_chat_request(endpoint: str, api_key: str) -> "tuple[str, dict]":
     return url, headers
 
 
+# Field find (tenant 600 run, 2026-08-20): a ~460-call sequential run
+# lost 2 adjacent steps to one transient burst — a single POST with no
+# retry turns a momentary 429 into a permanently missing description.
+TRANSIENT_STATUS = frozenset({429, 500, 502, 503, 504})
+MAX_ATTEMPTS = 3
+_sleep = time.sleep  # injection point for tests
+
+
 def chat_completion(
     system: str,
     user: str,
@@ -59,24 +69,37 @@ def chat_completion(
     timeout: int = 60,
 ) -> str:
     """One chat call, temperature 0. On Azure the deployment in the URL
-    decides the model; the body's model field is accepted and ignored."""
+    decides the model; the body's model field is accepted and ignored.
+    Transient failures (429/5xx/timeout) are retried up to MAX_ATTEMPTS
+    with backoff, honoring Retry-After; persistent failures still raise."""
     if not api_key:
         raise ValueError("api_key is required")
     if not endpoint:
         raise ValueError("endpoint is required")
     url, headers = build_chat_request(endpoint, api_key)
-    response = requests.post(
-        url,
-        headers=headers,
-        json={
-            "model": model,
-            "messages": [
-                {"role": "system", "content": system},
-                {"role": "user", "content": user},
-            ],
-            "temperature": 0,
-        },
-        timeout=timeout,
-    )
-    response.raise_for_status()
-    return response.json()["choices"][0]["message"]["content"].strip()
+    body = {
+        "model": model,
+        "messages": [
+            {"role": "system", "content": system},
+            {"role": "user", "content": user},
+        ],
+        "temperature": 0,
+    }
+    for attempt in range(1, MAX_ATTEMPTS + 1):
+        try:
+            response = requests.post(url, headers=headers, json=body, timeout=timeout)
+        except (requests.Timeout, requests.ConnectionError):
+            if attempt == MAX_ATTEMPTS:
+                raise
+            _sleep(2 * attempt)
+            continue
+        if response.status_code in TRANSIENT_STATUS and attempt < MAX_ATTEMPTS:
+            try:
+                delay = float(response.headers.get("Retry-After", ""))
+            except ValueError:
+                delay = 2 * attempt
+            _sleep(min(delay, 60))
+            continue
+        response.raise_for_status()
+        return response.json()["choices"][0]["message"]["content"].strip()
+    raise RuntimeError("unreachable")  # loop always returns or raises

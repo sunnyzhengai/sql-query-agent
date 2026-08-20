@@ -10,6 +10,24 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.33.5] - 2026-08-20
+
+### Fixed — transient LLM errors no longer lose descriptions (field find: 600 run, 4 failed)
+- Traced live: the failed ODLA steps parse, translate, and ground
+  cleanly — the losses were transport-level. chat_completion was a
+  single POST; one 429/5xx/timeout burst during a ~460-call run
+  permanently failed whichever steps it hit (two adjacent ODLA calls).
+  Now retries transient failures up to 3 attempts with backoff,
+  honoring Retry-After; hard errors (401 etc.) still raise immediately.
+- Failed-node reasons persisted: DescriptionResult.failed_reasons
+  carries (node_id, reason_code: detail) for every failure branch
+  (generation_error, grounded_to_empty, no_dax_expression,
+  no_root_steps); 600 appends them to ops_fallout (stage 600_describe)
+  and prints them inline — the WHY is queryable state, never only a
+  printed line.
+
+---
+
 ## [1.33.4] - 2026-08-20
 
 ### Fixed — semantic-catalog contract lagged the writer (field find: 500 readiness gate)

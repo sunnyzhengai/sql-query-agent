@@ -61,6 +61,9 @@ class TestChatCompletion:
         seen = {}
 
         class FakeResponse:
+            status_code = 200
+            headers: dict = {}
+
             def raise_for_status(self):
                 pass
 
@@ -84,3 +87,68 @@ class TestChatCompletion:
             chat_completion("s", "u", endpoint=OPENAI, api_key="")
         with pytest.raises(ValueError):
             chat_completion("s", "u", endpoint="", api_key=KEY)
+
+
+class _Resp:
+    def __init__(self, status, content="ok", headers=None):
+        self.status_code = status
+        self.headers = headers or {}
+        self._content = content
+
+    def raise_for_status(self):
+        if self.status_code >= 400:
+            raise RuntimeError(f"HTTP {self.status_code}")
+
+    def json(self):
+        return {"choices": [{"message": {"content": self._content}}]}
+
+
+class TestTransientRetry:
+    """Field find (tenant 600 run, 2026-08-20): a ~460-call run lost two
+    adjacent steps to one transient burst — a single POST with no retry
+    turns a momentary 429 into a permanently missing description."""
+
+    def _patch(self, monkeypatch, responses):
+        import src.llm_client as lc
+        calls = {"posts": 0, "sleeps": []}
+
+        def fake_post(url, **kwargs):
+            calls["posts"] += 1
+            r = responses[calls["posts"] - 1]
+            if isinstance(r, Exception):
+                raise r
+            return r
+
+        monkeypatch.setattr(lc.requests, "post", fake_post)
+        monkeypatch.setattr(lc, "_sleep", calls["sleeps"].append)
+        return calls
+
+    def test_429_retried_then_succeeds(self, monkeypatch):
+        calls = self._patch(monkeypatch, [_Resp(429), _Resp(200, "fine")])
+        out = chat_completion("s", "u", endpoint=OPENAI, api_key=KEY)
+        assert out == "fine" and calls["posts"] == 2
+
+    def test_retry_after_header_honored(self, monkeypatch):
+        calls = self._patch(
+            monkeypatch, [_Resp(429, headers={"Retry-After": "7"}), _Resp(200)])
+        chat_completion("s", "u", endpoint=OPENAI, api_key=KEY)
+        assert calls["sleeps"] == [7.0]
+
+    def test_timeout_retried_then_succeeds(self, monkeypatch):
+        import requests as rq
+        calls = self._patch(
+            monkeypatch, [rq.Timeout("slow"), _Resp(200, "fine")])
+        assert chat_completion("s", "u", endpoint=OPENAI, api_key=KEY) == "fine"
+        assert calls["posts"] == 2
+
+    def test_persistent_transient_error_still_raises(self, monkeypatch):
+        calls = self._patch(monkeypatch, [_Resp(503)] * 3)
+        with pytest.raises(RuntimeError, match="HTTP 503"):
+            chat_completion("s", "u", endpoint=OPENAI, api_key=KEY)
+        assert calls["posts"] == 3  # bounded — never an infinite loop
+
+    def test_hard_client_error_never_retried(self, monkeypatch):
+        calls = self._patch(monkeypatch, [_Resp(401)])
+        with pytest.raises(RuntimeError, match="HTTP 401"):
+            chat_completion("s", "u", endpoint=OPENAI, api_key=KEY)
+        assert calls["posts"] == 1
