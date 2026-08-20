@@ -31,6 +31,7 @@ flowchart LR
   910_publish_purview["910_publish_purview"]:::notebook
   920_publish_pbi["920_publish_pbi"]:::notebook
   950_ingest_agent_events["950_ingest_agent_events"]:::notebook
+  admin_companion["admin_companion"]:::notebook
   collibra_lineage_match["collibra_lineage_match"]:::notebook
   description["description"]:::notebook
   eventhouse_semantic_search["eventhouse_semantic_search"]:::notebook
@@ -55,6 +56,8 @@ flowchart LR
   input_metric_names[("input_metric_names")]:::table
   input_report_sources[("input_report_sources")]:::table
   input_sql_sources[("input_sql_sources")]:::table
+  ops_admin_graph_edges[("ops_admin_graph_edges")]:::table
+  ops_admin_graph_nodes[("ops_admin_graph_nodes")]:::table
   ops_agent_descriptions[("ops_agent_descriptions")]:::table
   ops_build_summary[("ops_build_summary")]:::table
   ops_description_cache[("ops_description_cache")]:::table
@@ -102,6 +105,8 @@ flowchart LR
   300_build_graph -->|enrich| ops_fallout
   400_build_metric_logic --> output_metric_logic
   400_build_metric_logic --> output_metric_twins
+  500_validate --> ops_admin_graph_edges
+  500_validate --> ops_admin_graph_nodes
   500_validate --> ops_build_summary
   500_validate --> ops_funnel
   500_validate --> ops_metric_journey
@@ -172,6 +177,8 @@ flowchart LR
   input_sql_sources --> 200_parse
   input_sql_sources --> 500_validate
   manage_stewards --> gov_steward_assignments
+  ops_admin_graph_edges --> admin_companion
+  ops_admin_graph_nodes --> admin_companion
   ops_agent_descriptions --> 500_validate
   ops_agent_descriptions --> 610_generate_agent_descriptions
   ops_agent_descriptions --> 900_publish_collibra
