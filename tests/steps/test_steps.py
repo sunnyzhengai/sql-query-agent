@@ -256,7 +256,9 @@ class TestPreconditionGate:
         ]
         assert required_inputs("500_validate") == [
             "graph_edges", "graph_nodes", "input_dict_tables",
-            "input_sql_sources", "ops_parse_errors", "ops_parse_successes",
+            "input_sql_sources", "ops_parse_errors",
+            # leaf grounding (spec:C4, 1.29.0) reads the parse results
+            "ops_parse_results", "ops_parse_successes",
             # freshness check (Trust family, 1.19.0): 06 reads the card
             # table — consistent with its "run 02-04 first" contract
             "output_metric_logic",

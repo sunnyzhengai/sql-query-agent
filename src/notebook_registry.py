@@ -149,12 +149,14 @@ NOTEBOOK_REGISTRY: "dict[str, dict]" = {
     "500_validate": {
         "family": "verification",
         "serves": ["G"],
-        "purpose": "Pipeline validation + deployment readiness gate",
+        "purpose": "Pipeline validation + deployment readiness gate + "
+                   "leaf grounding (spec:C4)",
         "entry_points": ["dictionary_coverage_threshold", "tech_table_names",
                          "readiness_gate", "stale_metrics"],
         "wrappers": ["_fetch", "_table_exists"],
         "gates": ["precondition_gate"],
-        "requires_engine": ENGINE_FLOOR,
+        # leaf grounding (spec:C4) needs the 1.29 wheel
+        "requires_engine": "1.29",
     },
     "600_generate_descriptions": {
         "family": "derivation",

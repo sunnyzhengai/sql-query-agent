@@ -117,6 +117,7 @@ DICT_TABLES = {
     "columns": [
         ("TABLE_NAME", "string", False),
         ("DESCRIPTION", "string", True),
+        ("ORIGIN", "string", True),
     ],
     "column_descriptions": {
         "TABLE_NAME": (
@@ -124,9 +125,19 @@ DICT_TABLES = {
             "and schema-agnostically (ADR 0016). Original casing preserved for display."
         ),
         "DESCRIPTION": "Business description of the table from the customer's dictionary",
+        "ORIGIN": (
+            "vendor (EMR dictionary, T_D) or org (org-created reference "
+            "table: value sets, control parameters — T_org, spec §4). "
+            "NULL = vendor (backward compatible). The T_org vehicle "
+            "(spec:C4/E5 dependency, ruled 2026-08-19): one lookup "
+            "surface for leaf grounding, with the sort distinguished "
+            "for filter grounding."
+        ),
     },
     "invariants": [
         {"kind": "unique", "columns": ["TABLE_NAME"], "fold_case": True},
+        {"kind": "allowed_values", "column": "ORIGIN",
+         "values": ["vendor", "org"]},
     ],
 }
 
@@ -177,7 +188,7 @@ PARSE_RESULTS = {
     "owner": {"notebook": "200_parse", "module": "src/parser/sql_parser.py"},
     "write_mode": "overwrite",
     "enrichers": [],
-    "consumers": ["300_build_graph", "export_test_fixtures"],
+    "consumers": ["300_build_graph", "export_test_fixtures", "500_validate"],
     "columns": [
         ("metric_id", "string", False),
         ("name", "string", False),

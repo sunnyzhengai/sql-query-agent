@@ -94,7 +94,10 @@ if "TABLE_NAME" not in cols:
 if "DESCRIPTION" not in cols:
     print("[!] WARNING: dict_tables.csv missing DESCRIPTION column — adding empty descriptions")
     dict_tables_df = dict_tables_df.withColumn("DESCRIPTION", lit(""))
-dict_tables_df = dict_tables_df.select("TABLE_NAME", "DESCRIPTION")
+# ORIGIN (T_org vehicle, spec:C4/E5): vendor | org; absent/NULL = vendor.
+if "ORIGIN" not in cols:
+    dict_tables_df = dict_tables_df.withColumn("ORIGIN", lit(None).cast("string"))
+dict_tables_df = dict_tables_df.select("TABLE_NAME", "DESCRIPTION", "ORIGIN")
 
 # Contract gate: unique(TABLE_NAME), case-insensitive (ADR 0016)
 _names = [r["TABLE_NAME"] for r in dict_tables_df.collect()]
@@ -160,7 +163,9 @@ dict_columns_df = (
 )
 print(f"Columns export: {dict_columns_df.count()} rows")
 
-dict_tables_df.select("TABLE_NAME", "DESCRIPTION").write.format("delta").mode("overwrite") \
+# Clarity-export path: vendor dictionary by definition (T_D)
+dict_tables_df.selectExpr("TABLE_NAME", "DESCRIPTION", "'vendor' as ORIGIN") \
+    .write.format("delta").mode("overwrite") \
     .option("overwriteSchema", "true").saveAsTable("input_dict_tables")
 dict_columns_df.write.format("delta").mode("overwrite") \
     .option("overwriteSchema", "true").saveAsTable("input_dict_columns")

@@ -98,12 +98,20 @@ print(f"Resolved columns: {cab_col_resolved.count()}")
 # Existence checked explicitly: this cell OVERWRITES both tables, so a
 # swallowed read error would wipe the primary dictionary and leave the
 # second source only (audit 2026-08-15).
+# ORIGIN (T_org vehicle, spec:C4/E5): Caboodle exports are vendor
+# dictionary; older tenant tables may predate the column, so unions
+# tolerate the missing column (NULL = vendor per contract).
+from pyspark.sql.functions import lit as _lit
+
+if "ORIGIN" not in cab_tbl_normalized.columns:
+    cab_tbl_normalized = cab_tbl_normalized.withColumn("ORIGIN", _lit("vendor"))
 if spark.catalog.tableExists("input_dict_tables") and spark.catalog.tableExists("input_dict_columns"):
     existing_tbl = spark.table("input_dict_tables")
     existing_col = spark.table("input_dict_columns")
     print(f"Existing dict_tables: {existing_tbl.count()}")
     print(f"Existing dict_columns: {existing_col.count()}")
-    merged_tbl = existing_tbl.unionByName(cab_tbl_normalized).dropDuplicates(["TABLE_NAME"])
+    merged_tbl = existing_tbl.unionByName(
+        cab_tbl_normalized, allowMissingColumns=True).dropDuplicates(["TABLE_NAME"])
     merged_col = existing_col.unionByName(cab_col_resolved).dropDuplicates(["TABLE_NAME", "COLUMN_NAME"])
 else:
     print("No existing dictionary tables — using this source only")

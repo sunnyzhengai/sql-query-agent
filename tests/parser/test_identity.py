@@ -70,3 +70,18 @@ def test_duplicate_detection_is_case_insensitive():
         ("reporting.USP_X", "b.sql"),
     ])
     assert dupes == {"REPORTING.USP_X": ["a.sql", "b.sql"]}
+
+
+def test_fold_is_idempotent():
+    """spec:A1 — fold(fold(x)) = fold(x): it never matters how many
+    times a value was folded before matching. Property-checked over the
+    identifier shapes the corpus actually produces."""
+    from src.parser.identity import fold_identifier
+    samples = [
+        "Base_Pop", "[dbo].[HOSPITAL_ENCOUNTERS]", "#ED_PositiveScores",
+        "loc_id", "LOC_ID", "  Mixed Case Name  ", "reports.USP_ED_Sepsis",
+        "\"Quoted\"", "", "ALREADY_FOLDED",
+    ]
+    for x in samples:
+        once = fold_identifier(x)
+        assert fold_identifier(once) == once, x

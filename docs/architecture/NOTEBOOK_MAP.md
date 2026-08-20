@@ -18,7 +18,7 @@ enforced by tests/test_notebook_contract.py (ADR 0042).
 | 200_parse | derivation | A, B, C, F, G | >=1.24 | Parse the SQL corpus with ScriptDom into parse tables |
 | 300_build_graph | derivation | A, B, C, F | >=1.26 | Build the knowledge graph (nodes/edges, all layers, decision trees) |
 | 400_build_metric_logic | derivation | A, E | >=1.24 | Flatten the graph into the metric card table |
-| 500_validate | verification | G | >=1.24 | Pipeline validation + deployment readiness gate |
+| 500_validate | verification | G | >=1.29 | Pipeline validation + deployment readiness gate + leaf grounding (spec:C4) |
 | 600_generate_descriptions | derivation | A | >=1.24 | Bottom-up LLM descriptions over the calculation DAG |
 | 610_generate_agent_descriptions | derivation | A | >=1.24 | Data-Agent metric descriptions (owns ops_agent_descriptions) |
 | 700_refresh_search_index | derivation | D | >=1.24 | Rebuild the semantic catalog + Eventhouse re-embed |

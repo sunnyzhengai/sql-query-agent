@@ -191,6 +191,7 @@ flowchart LR
   ops_parse_errors --> data_agent
   ops_parse_errors --> verify_graph
   ops_parse_results --> 300_build_graph
+  ops_parse_results --> 500_validate
   ops_parse_results --> export_test_fixtures
   ops_parse_successes --> 200_parse
   ops_parse_successes --> 500_validate

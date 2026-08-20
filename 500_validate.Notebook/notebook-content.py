@@ -49,7 +49,7 @@ except ImportError:
 print(f"v{src.__version__}")
 
 # Version binding (ADR 0042): notebook/wheel skew dies here, loudly.
-REQUIRES_ENGINE = "1.24"
+REQUIRES_ENGINE = "1.29"
 from src.engine_floor import require_engine
 
 require_engine(src.__version__, REQUIRES_ENGINE, "500_validate")
@@ -453,6 +453,37 @@ if report_journey:
 print(f"ops_report_journey: {len(report_journey)} reports")
 print("\nThe journey dashboard reads these two tables + ops_funnel — "
       "see docs/internal/RUNBOOK_JOURNEY_DASHBOARD.md")
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+# %% Cell: Leaf grounding (spec:C4) — completely_parsed as a computed verdict
+from src.governance.leaf_grounding import grounding_lines, leaf_grounding
+from src.schemas import FALLOUT as _FALLOUT_SCHEMA
+
+_parse_rows = [r.asDict() for r in spark.table("ops_parse_results").collect()]
+_dict_rows = [r.asDict() for r in
+              spark.table("input_dict_tables").select("TABLE_NAME").collect()]
+_lg_now = datetime.now(timezone.utc).isoformat()
+_lg = leaf_grounding(_parse_rows, _dict_rows, run_at=_lg_now)
+for _ln in grounding_lines(_lg):
+    print(_ln)
+if _lg.fallout_rows:
+    # ops_fallout predates the ADR 0045 resolution column; keep declared
+    # columns until it ships (same policy as 300_tree_unextracted).
+    _lg_cols = [c[0] for c in _FALLOUT_SCHEMA["columns"]]
+    spark.createDataFrame(
+        [{k: r.get(k) for k in _lg_cols} for r in _lg.fallout_rows],
+        schema=to_spark_schema(_FALLOUT_SCHEMA)) \
+        .write.format("delta").mode("append").saveAsTable("ops_fallout")
+    print(f"  -> {len(_lg.fallout_rows)} ungrounded_leaf rows appended to "
+          "ops_fallout (stage 500_leaf_grounding; escalates per ADR 0045)")
 
 # METADATA ********************
 

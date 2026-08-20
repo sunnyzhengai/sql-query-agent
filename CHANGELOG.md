@@ -10,6 +10,30 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.29.0] - 2026-08-19
+
+### Added — the shadow specification adopted (Φ_AIVIA, ADR 0047)
+- docs/architecture/SPEC.md v0.3: adversarially audited (A1's cited
+  test didn't exist — added; E6's prompt-only gap stated; Term
+  projection corrected to PENDING — Term nodes/implements edges do not
+  exist yet) and every UNBOUND axiom bound or gated.
+- EXTRACTION_REGISTRY (spec:C1): functor XOR exclusion per source kind;
+  the missing-joins incident pinned as the acceptance test;
+  Snowflake/Databricks/usage-layer/business-terms exclusions explicit.
+- T_org vehicle (spec:C4/E5): ORIGIN column (vendor|org) on
+  input_dict_tables; 040/050 write it; NULL = vendor.
+- Leaf grounding (spec:C4) as a computed verdict in 500:
+  completely_parsed per file + fraction + escalated fallout
+  (stage 500_leaf_grounding). First recorded-corpus verdict: 27/28 —
+  USP_Severe_Sepsis reads 6 undictionaried tables.
+- CAPABILITY_REGISTRY (spec:G1–G3): one owner per capability;
+  Uses ∖ S = ∅ over src/ for pythonnet/clr/requests/httpx; banned
+  parsers ownerless forever.
+- Spec gates: E1/E5 strict-xfail exit gates (land with the 0046
+  engine). 500's engine floor -> 1.29.
+
+---
+
 ## [1.28.0] - 2026-08-19
 
 ### Changed — the native-parser law is TOTAL: sqlglot and sqlparse are gone

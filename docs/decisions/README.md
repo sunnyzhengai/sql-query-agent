@@ -57,3 +57,4 @@ never deleted — its status changes and it links to its replacement.
 | [0044](0044-tree-contract-round-trip-descriptions.md) | The tree contract: faithful decision trees, blind round-trip verified descriptions — locked in red before implementation | Accepted (phased) |
 | [0045](0045-escalation-contract-human-checklist.md) | The escalation contract: no silent residue — unresolved outcomes become the human checklist | Accepted (phased) |
 | [0046](0046-anchor-discover-match-rank-the-human-picks.md) | Query composition: anchor, discover, match, rank — the human picks their reality; one engine for metadata and Pro | Accepted |
+| [0047](0047-shadow-spec-axiom-system.md) | The shadow specification Φ_AIVIA: axiom system + enforcement homes; drift becomes a named, checkable violation | Accepted |
