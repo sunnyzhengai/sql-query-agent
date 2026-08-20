@@ -36,5 +36,7 @@ leaf grounding after sync; newly recovered reads may include
 undictionaried tables (e.g. DM_ICU_STAY) — the C4 verdict will name
 them.
 
-**Sign-off:** if any delta looks wrong to your read of the SQL, say so
-and the specific oracle reverts pending investigation.
+**Sign-off:** SIGNED OFF by Sunny, 2026-08-20 (morning review). The
+re-certified oracles are the standing answer key. Provenance rulings
+same morning: V_LOG_BASED and DM_ICU_STAY confirmed vendor (Epic
+Clarity) tables — ORIGIN stays vendor.
