@@ -616,10 +616,13 @@ findings escalate; an uncited module is a finding, not a warning).
 **Bindings:** `src/trace_registry.py` + `tests/test_trace_registry.py`
 (decision lineage + three closure checks: totality, existence, single
 classification); `src/zones.py` + `tests/test_zones.py` (governed ⊎
-internal). **Status: PARTIAL** — stated gap: the graph projection
-itself (`src/admin_graph.py`, nodes/edges tables + EXTRACTION_REGISTRY
-rows) ships as ADR 0048 item 3; until then the lineage exists as
-registry truth without the walkable projection.
+internal); `src/admin_graph.py` + `tests/test_admin_graph.py` (the
+projection — ops_admin_graph_nodes/edges, written by 500 each run);
+`src/companion.py` + `tests/test_companion.py` (diagnosis = a path of
+real edges, captioned; narration rephrases, never decides).
+**Status: ENFORCED** — stated gap: the companion's conversational
+surface (webapp/agent wiring, BYOT narration in production) is not yet
+exposed to admins; the deterministic core and CLI are.
 
 ## 15. Honest limits
 

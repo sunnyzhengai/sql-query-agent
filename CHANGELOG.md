@@ -10,6 +10,27 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.37.0] - 2026-08-20
+
+### Added — the admin companion, deterministic core (ADR 0048 item 4)
+- src/companion.py: explain_step (what a step needs / produces /
+  checks — pure registry projection, producers and remediations
+  named) and diagnose (a failure explained as a PATH of real
+  admin-graph edges: symptom → contract → producing notebook → gate →
+  the ADR behind the check, remediation cited). ADR 0017 pattern —
+  resolve the anchor, traverse pre-shaped templates; no second engine.
+- narrate hook (BYOT, optional): the customer's LLM may rephrase the
+  caption — it receives the assembled facts, not the question, and
+  its output ships BESIDE the deterministic caption (E3/E6); a
+  narration failure never kills a diagnosis.
+- devtools/companion_cli.py: `explain <step>` / `diagnose '<json>'` —
+  the diagnose smoke replays today's live field incident (missing
+  ORIGIN column) as a walked path ending at ADR 0039.
+- SPEC §14b status PARTIAL → ENFORCED (stated gap: the conversational
+  admin surface; the deterministic core and CLI are live).
+
+---
+
 ## [1.36.0] - 2026-08-20
 
 ### Added — the admin graph, projected (ADR 0048 item 3; ADR 0039's follow-up executed)

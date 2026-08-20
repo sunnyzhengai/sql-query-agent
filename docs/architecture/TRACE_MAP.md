@@ -567,11 +567,13 @@ classification).
   - `src/zones.py`
   - `src/trace_registry.py`
   - `src/admin_graph.py`
+  - `src/companion.py`
 - **Enforced by:**
   - `tests/test_zones.py`
   - `tests/test_trace_registry.py`
   - `tests/test_term_hygiene.py`
   - `tests/test_admin_graph.py`
+  - `tests/test_companion.py`
 - **Summarized in:**
   - `docs/architecture/SPEC.md`
   - `docs/architecture/TRACE_MAP.md`

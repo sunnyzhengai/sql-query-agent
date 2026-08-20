@@ -490,9 +490,10 @@ TRACE_REGISTRY = {
         "category": "architecture",
         "axioms": ["B1", "C1", "D3", "H2"],
         "modules": ["src/zones.py", "src/trace_registry.py",
-                    "src/admin_graph.py"],
+                    "src/admin_graph.py", "src/companion.py"],
         "tests": ["tests/test_zones.py", "tests/test_trace_registry.py",
-                  "tests/test_term_hygiene.py", "tests/test_admin_graph.py"],
+                  "tests/test_term_hygiene.py", "tests/test_admin_graph.py",
+                  "tests/test_companion.py"],
         "docs": ["docs/architecture/SPEC.md", "docs/architecture/TRACE_MAP.md"],
     },
     "0049": {
