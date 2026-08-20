@@ -117,7 +117,8 @@ from src.steps.gates import precondition_gate
 # producing notebook, not a pyspark stack trace. Registry-driven; see
 # src/steps/gates.py.
 precondition_gate("200_parse", table_exists=spark.catalog.tableExists,
-                  count=lambda t: spark.table(t).count())
+                  count=lambda t: spark.table(t).count(),
+                  columns_of=lambda t: spark.table(t).columns)
 
 
 sql_sources_df = spark.table(config.lakehouse.sql_sources)

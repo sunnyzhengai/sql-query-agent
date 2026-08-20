@@ -138,7 +138,8 @@ from src.steps.gates import precondition_gate
 # producing notebook, not a pyspark stack trace. Registry-driven; see
 # src/steps/gates.py.
 precondition_gate("700_refresh_search_index", table_exists=spark.catalog.tableExists,
-                  count=lambda t: spark.table(t).count())
+                  count=lambda t: spark.table(t).count(),
+                  columns_of=lambda t: spark.table(t).columns)
 
 
 from src.steps.semantic_catalog import build_semantic_catalog

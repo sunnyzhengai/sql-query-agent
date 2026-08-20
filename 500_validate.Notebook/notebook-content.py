@@ -78,7 +78,8 @@ config = load_config("/lakehouse/default/Files/sql-query-agent/org_config.yaml")
 from src.steps.gates import precondition_gate
 
 precondition_gate("500_validate", table_exists=spark.catalog.tableExists,
-                  count=lambda t: spark.table(t).count())
+                  count=lambda t: spark.table(t).count(),
+                  columns_of=lambda t: spark.table(t).columns)
 
 sql_source_ids = [r.asDict()["metric_id"] for r in spark.table(config.lakehouse.sql_sources).collect()]
 

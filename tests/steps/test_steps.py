@@ -223,6 +223,30 @@ class TestPreconditionGate:
                                     count=lambda t: 5, registry=FAKE_REGISTRY)
         assert checked == ["input_a", "input_b"]
 
+    def test_schema_drift_blocks_with_producer_remediation(self):
+        """Field find (tenant 500 run, 2026-08-20): input_dict_tables
+        predated the ORIGIN column and leaf grounding died with a raw
+        AnalysisException. Declared-column presence is a precondition."""
+        registry = {
+            "input_a": {
+                "status": "active", "owner": {"notebook": "00_load"},
+                "consumers": ["01_step"],
+                "columns": [("ID", "string", False), ("ORIGIN", "string", True)],
+            },
+        }
+        with pytest.raises(StepPreconditionError) as exc:
+            precondition_gate("01_step", table_exists=lambda t: True,
+                              columns_of=lambda t: ["ID"], registry=registry)
+        msg = str(exc.value)
+        assert "missing column(s) ORIGIN" in msg
+        assert "rerun the producer" in msg
+        assert "00_load" in msg and "contract:input_a" in msg
+        # case-insensitive: physical casing never blocks
+        assert precondition_gate(
+            "01_step", table_exists=lambda t: True,
+            columns_of=lambda t: ["id", "origin"], registry=registry,
+        ) == ["input_a"]
+
     def test_optional_inputs_derived_with_remediation(self):
         assert optional_inputs("01_step", FAKE_REGISTRY) == ["optional_c"]
 

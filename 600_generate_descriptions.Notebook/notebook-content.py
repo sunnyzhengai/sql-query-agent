@@ -115,7 +115,8 @@ def describe(prompt: str) -> str:
 from src.steps.gates import precondition_gate
 
 precondition_gate("600_generate_descriptions", table_exists=spark.catalog.tableExists,
-                  count=lambda t: spark.table(t).count())
+                  count=lambda t: spark.table(t).count(),
+                  columns_of=lambda t: spark.table(t).columns)
 
 
 from src.descriptions import generate_descriptions

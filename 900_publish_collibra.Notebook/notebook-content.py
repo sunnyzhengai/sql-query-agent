@@ -65,7 +65,8 @@ config = load_config("/lakehouse/default/Files/sql-query-agent/org_config.yaml")
 from src.steps.gates import precondition_gate
 
 precondition_gate("900_publish_collibra", table_exists=spark.catalog.tableExists,
-                  count=lambda t: spark.table(t).count())
+                  count=lambda t: spark.table(t).count(),
+                  columns_of=lambda t: spark.table(t).columns)
 
 from src.models import EdgeType, GraphEdge, GraphNode, NodeLayer
 

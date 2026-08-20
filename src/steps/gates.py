@@ -1,7 +1,9 @@
 """Notebook-boundary gates: preconditions and postconditions.
 
 precondition_gate — BEFORE a step runs, its required input tables must
-exist (and be non-empty where the contract says emptiness is invalid).
+exist, carry every contract-declared column (schema drift: the physical
+table predates an upgrade and its producer hasn't rerun), and be
+non-empty where the contract says emptiness is invalid.
 A failure is a STATE problem with an admin-actionable message naming the
 producing notebook — never a pyspark stack trace. Failures have two
 audiences: state problems route to the customer admin (self-serve); raw
@@ -116,16 +118,37 @@ def setup_completeness_rows(
     ]
 
 
+def missing_columns(
+    table: str,
+    physical_columns: "list[str]",
+    registry: "dict | None" = None,
+) -> "list[str]":
+    """Contract columns absent from the physical table (case-insensitive).
+
+    Schema drift: an upgrade adds a column to a table's contract, but the
+    physical Delta table was written by the producer's PREVIOUS version
+    and is only rewritten when that producer reruns. Field find (tenant
+    500 run, 2026-08-20): input_dict_tables lacked ORIGIN and the leaf-
+    grounding cell died with a raw AnalysisException mid-notebook."""
+    registry = registry if registry is not None else TABLE_REGISTRY
+    have = {c.upper() for c in physical_columns}
+    return [name for name, _dtype, _nullable in registry[table].get("columns", [])
+            if name.upper() not in have]
+
+
 def precondition_gate(
     step_name: str,
     table_exists: Callable[[str], bool],
     count: "Optional[Callable[[str], int]]" = None,
     registry: "dict | None" = None,
+    columns_of: "Optional[Callable[[str], list[str]]]" = None,
 ) -> "list[str]":
     """Check every required input before the step runs.
 
     count enables the non-empty check for tables whose contract sets
     must_be_nonempty; pass e.g. `lambda t: spark.table(t).count()`.
+    columns_of enables the schema-drift check (every contract-declared
+    column present); pass e.g. `lambda t: spark.table(t).columns`.
     Returns checked table names; raises StepPreconditionError otherwise.
     """
     registry = registry if registry is not None else TABLE_REGISTRY
@@ -138,6 +161,17 @@ def precondition_gate(
         if not table_exists(table):
             failures.append({**entry, "problem": "missing"})
             continue
+        if columns_of is not None:
+            absent = missing_columns(table, columns_of(table), registry)
+            if absent:
+                failures.append({
+                    **entry,
+                    "problem": (
+                        f"is missing column(s) {', '.join(absent)} — schema "
+                        f"drift after an upgrade; rerun the producer to rewrite it"
+                    ),
+                })
+                continue
         if (
             count is not None
             and registry[table].get("must_be_nonempty")

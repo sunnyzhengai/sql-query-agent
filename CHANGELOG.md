@@ -10,6 +10,22 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.33.3] - 2026-08-20
+
+### Added — schema-drift precondition (field find: 500 leaf grounding)
+- input_dict_tables written pre-1.32 lacked the ORIGIN column; 500's
+  leaf-grounding cell died with a raw Spark AnalysisException instead
+  of a contract error. precondition_gate now verifies every
+  contract-declared column exists on each required input (columns_of
+  hook, case-insensitive) and fails with the producing notebook named:
+  "missing column(s) X — schema drift after an upgrade; rerun the
+  producer". All ten gated notebooks pass the hook.
+- Tenant remediation for the live instance (no code needed):
+  `ALTER TABLE input_dict_tables ADD COLUMN (ORIGIN STRING)` — NULL =
+  vendor by contract — or rerun 040_dict_clarity.
+
+---
+
 ## [1.33.2] - 2026-08-20
 
 ### Fixed — duplicate decision keys on redefined CTE names (field find: 300 postcondition)

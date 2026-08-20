@@ -63,7 +63,8 @@ AGENT_ID = config.fabric_graph.data_agent_id
 
 precondition_gate("610_generate_agent_descriptions",
                   table_exists=spark.catalog.tableExists,
-                  count=lambda t: spark.table(t).count())
+                  count=lambda t: spark.table(t).count(),
+                  columns_of=lambda t: spark.table(t).columns)
 
 # METADATA ********************
 

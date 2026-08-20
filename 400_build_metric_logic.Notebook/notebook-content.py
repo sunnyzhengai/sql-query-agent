@@ -79,7 +79,8 @@ from src.steps.gates import precondition_gate
 # producing notebook, not a pyspark stack trace. Registry-driven; see
 # src/steps/gates.py.
 precondition_gate("400_build_metric_logic", table_exists=spark.catalog.tableExists,
-                  count=lambda t: spark.table(t).count())
+                  count=lambda t: spark.table(t).count(),
+                  columns_of=lambda t: spark.table(t).columns)
 
 
 from datetime import datetime, timezone

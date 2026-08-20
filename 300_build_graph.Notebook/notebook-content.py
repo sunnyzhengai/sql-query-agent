@@ -78,7 +78,8 @@ from src.steps.gates import precondition_gate
 # producing notebook, not a pyspark stack trace. Registry-driven; see
 # src/steps/gates.py.
 precondition_gate("300_build_graph", table_exists=spark.catalog.tableExists,
-                  count=lambda t: spark.table(t).count())
+                  count=lambda t: spark.table(t).count(),
+                  columns_of=lambda t: spark.table(t).columns)
 
 
 parse_results = [r.asDict() for r in spark.table("ops_parse_results").collect()]

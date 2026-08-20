@@ -90,7 +90,8 @@ from src.steps.gates import precondition_gate
 # producing notebook, not a pyspark stack trace. Registry-driven; see
 # src/steps/gates.py.
 precondition_gate("910_publish_purview", table_exists=spark.catalog.tableExists,
-                  count=lambda t: spark.table(t).count())
+                  count=lambda t: spark.table(t).count(),
+                  columns_of=lambda t: spark.table(t).columns)
 
 
 from src.adapters.purview import PurviewAdapter, PurviewConfig
