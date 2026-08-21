@@ -169,3 +169,17 @@ screen but the captioner synthesized over it → the containment set is
 now STAMPED in the search headline ("Nothing is NAMED 'X' exactly;
 closest by name: ..."), and retrieve headlines stamp the step pointer.
 1.46.0 shipped with both + tests; iteration-4 full suite running.
+
+### 2026-08-20 ~23:2x — Iteration 4 (1.46.1) full suite
+census 1.00/1.00 · definition 1.00/1.00 · drilldown 1.00/1.00 (was
+0.33) · topical_count 1.00/1.00 — FOUR families perfect. bridge
+0.00/0.67 and anaphora 0.67/0.67 remain: captions neither echo the
+stamped sibling names nor stop claiming over summaries (2+2 dishonest
+turns — build-stopper active). The failure has collapsed to ONE shape:
+the captioner ignoring machine-stamped material. Next (mechanical,
+grounded-verification class — not a lexicon): (a) the template floor
+renders the stamped headlines themselves, so even a floored caption
+names the siblings; (b) caption gate verifies the caption presents at
+least one stamped closest-by-name item when the bridge stamp is on
+screen; (c) the answered verdict is demoted by code when the
+step-pointer stamp is displayed with no step record retrieved.
