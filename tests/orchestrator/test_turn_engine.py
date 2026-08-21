@@ -206,3 +206,96 @@ def test_system_prompt_is_invariants_only_no_casebook():
                    "criteria", "pointer", "how many"):
         assert banned not in SYSTEM_PROMPT.lower(), banned
     assert len(ENGINE_TOOLS) == 4
+
+
+PINNED_PROMPT_SHA = ("20781efb5545aebce28e7a1c402c5a09"
+                     "684403f29048f5302a8d5ea3de9114b9")
+
+
+class TestPGroup:
+    """P-group verification (HANDOFF_ONE_MIND Verification section):
+    prompt-capture instruments — assert what the model MUST see."""
+
+    def test_p2_round_two_request_carries_round_one_full_results(self):
+        captured = []
+
+        def capturing(steps):
+            inner = scripted_engine(steps)
+
+            def call(messages, tools, tool_choice=None):
+                captured.append({"messages": [dict(m) for m in messages],
+                                 "tool_choice": tool_choice})
+                return inner(messages, tools, tool_choice)
+            return call
+
+        s = EngineSession()
+        run_turn(s, "q", capturing([
+            {"calls": [("search", {"phrase": "ed sepsis",
+                                   "mode": "semantic"})]},
+            {"calls": [("retrieve", {"ids": [REF_A]})]},
+            {"text": "done"},
+            {"verdict": {"answered": False}},
+        ]), fake_kql)
+        # request #2 (after round 1 executed) must contain round 1's
+        # FULL tool payload — rows included, headline included
+        second_request = captured[1]["messages"]
+        tool_msgs = [m for m in second_request if m.get("role") == "tool"]
+        assert tool_msgs, "round-1 results must be in the round-2 request"
+        payload = json.loads(tool_msgs[0]["content"])
+        assert payload["rows"], "FULL rows, not a compacted stub"
+        assert payload["headline"]
+
+    def test_p3_no_forced_tool_choice_inside_the_loop(self):
+        captured = []
+
+        def capturing(steps):
+            inner = scripted_engine(steps)
+
+            def call(messages, tools, tool_choice=None):
+                captured.append(tool_choice)
+                return inner(messages, tools, tool_choice)
+            return call
+
+        s = EngineSession()
+        run_turn(s, "q", capturing([
+            {"calls": [("search", {"phrase": "x", "mode": "exact"})]},
+            {"text": "done"},
+            {"verdict": {"answered": False}},
+        ]), fake_kql)
+        # every loop call unforced; exactly ONE forced call (verdict)
+        forced = [c for c in captured if c is not None]
+        assert len(forced) == 1
+        assert forced[0]["function"]["name"] == "file_verdict"
+        assert captured[-1] is not None      # the forced one is last
+
+    def test_p6_turn_continues_after_an_observed_error(self):
+        calls_seen = []
+
+        def flaky_kql(query, params):
+            calls_seen.append(query)
+            if len(calls_seen) == 1:
+                raise RuntimeError('{"error": {"@message": "blip"}}')
+            return fake_kql(query, params)
+
+        s = EngineSession()
+        out = run_turn(s, "q", scripted_engine([
+            {"calls": [("census", {"kind": "metric"})]},
+            {"calls": [("search", {"phrase": "ed sepsis",
+                                   "mode": "semantic"})]},
+            {"text": "recovered"},
+            {"verdict": {"answered": False}},
+        ]), flaky_kql)
+        assert "error" in out["outputs"][0]          # observed
+        assert "result" in out["outputs"][1]         # and continued
+        assert not out["exhausted"]
+
+    def test_p4_thesis_prompt_hash_is_pinned(self):
+        """The thesis test runs with the prompt content-hash PINNED —
+        a pass that needed new prompt lines is visible as a hash change
+        and fails here. Changing the prompt is a conscious act: update
+        the pin AND note it in the Round-4 RESULTS log."""
+        import hashlib
+
+        from src.orchestrator.turn_engine import SYSTEM_PROMPT
+        assert hashlib.sha256(
+            SYSTEM_PROMPT.encode()).hexdigest() == PINNED_PROMPT_SHA

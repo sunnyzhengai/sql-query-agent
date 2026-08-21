@@ -27,13 +27,6 @@ from fastapi.responses import HTMLResponse, JSONResponse
 from src.branding import product_name
 from src.orchestrator.agent import Turn, run_turn
 from src.orchestrator.events import FeedbackEvent, TurnEvent, decision_shape
-from src.orchestrator.protocol import (
-    ProtocolSession,
-    caption_turn,
-    continue_rounds,
-    execute_confirmed,
-    propose_turn,
-)
 from src.orchestrator.tools import Session
 from src.orchestrator.turn_engine import EngineSession
 from src.orchestrator.turn_engine import run_turn as engine_run_turn
@@ -42,20 +35,12 @@ MAX_CONVERSATIONS = 500          # in-memory cap; oldest evicted
 MAX_TURNS_PER_CONVERSATION = 60
 
 
-def _plan_shape(plan: dict) -> "list[tuple]":
-    """Comparable skeleton of a plan: (op, params) per component."""
-    return [(c.get("op"), _json.dumps(c.get("params"), sort_keys=True))
-            for c in (plan or {}).get("components", [])]
-
-
 @dataclass
 class Conversation:
     history: "list[dict]" = field(default_factory=list)
     session: Session = field(default_factory=Session)
-    protocol: ProtocolSession = field(default_factory=ProtocolSession)
     engine: EngineSession = field(default_factory=EngineSession)
     turns: int = 0
-    last_proposed: "dict | None" = None
 
 
 @dataclass
@@ -231,108 +216,9 @@ def create_app(
             "suggestions": [],
         })
 
-    # ---- the plan protocol (ADR 0036; writes-only since ADR 0051) ---
-
-    @app.post("/api/plan")
-    async def plan(request: Request) -> JSONResponse:
-        """Interpret only — returns the plan for CONFIRMATION. Nothing
-        executes here; that separation is structural (the protocol has
-        no execution path from this call)."""
-        body = await request.json()
-        message = str(body.get("message", "")).strip()
-        if not message:
-            return JSONResponse({"error": "empty message"}, status_code=400)
-        user = _user_from(request)
-        conv_id = str(body.get("conversation_id") or uuid.uuid4())
-        conv = _conversation(user, conv_id)
-        try:
-            proposed = propose_turn(conv.protocol, message, chat_api)
-        except Exception as e:                 # noqa: BLE001
-            return JSONResponse(
-                {"error": f"planner unavailable ({type(e).__name__})",
-                 "conversation_id": conv_id}, status_code=502)
-        conv.last_proposed = proposed          # for the edit diff
-        return JSONResponse({"conversation_id": conv_id,
-                             "plan": proposed})
-
-    @app.post("/api/execute")
-    async def execute(request: Request) -> JSONResponse:
-        """Execute a HUMAN-CONFIRMED (possibly edited) plan, display
-        results, caption them. The plan arrives as data from the
-        confirming surface — the only path to execution."""
-        body = await request.json()
-        user = _user_from(request)
-        conv_id = str(body.get("conversation_id") or "")
-        confirmed = body.get("plan") or {}
-        if not conv_id or not confirmed.get("components"):
-            return JSONResponse({"error": "conversation_id and a plan "
-                                 "with components are required"},
-                                status_code=400)
-        conv = _conversation(user, conv_id)
-        turn_index = conv.turns
-        question = str(body.get("question", ""))[:500]
-        outputs = execute_confirmed(conv.protocol, confirmed, run_kql)
-        # The bounded read-only loop (Sunny's verdict 2026-08-20):
-        # auto-continue toward the ANSWER; bound enforced in the
-        # executor; every auto-hop displayed and stamped.
-        try:
-            loop = continue_rounds(conv.protocol, question, outputs,
-                                   chat_api, run_kql)
-        except Exception as e:                 # noqa: BLE001
-            loop = {"rounds": [], "exhausted": False,
-                    "status_line": ("auto-continue unavailable "
-                                    f"({type(e).__name__})"),
-                    "unanswered_note": ""}
-        try:
-            cap = caption_turn(conv.protocol, outputs, chat_api,
-                               question=question)
-        except Exception as e:                 # noqa: BLE001
-            cap = {"caption": f"(caption unavailable: {type(e).__name__} "
-                              "— the results above are complete)",
-                   "caption_inputs": [], "suggestions": [],
-                   "answered": False, "missing_op": ""}
-        cap["loop_status"] = loop["status_line"]
-        cap["loop_note"] = loop["unanswered_note"]
-        trace = [{"tool": o["component"]["op"],
-                  "args": o["component"]["params"],
-                  "result": (o.get("result") or {"error": o.get("error")})}
-                 for o in outputs]
-        # The human's edit is training material (ADR 0038): record the
-        # proposed-vs-confirmed diff mechanically.
-        proposed = conv.last_proposed
-        conv.last_proposed = None
-        edited = (proposed is not None and
-                  _plan_shape(proposed) != _plan_shape(confirmed))
-        trace.append({"tool": "plan_review",
-                      "args": {"edited": edited},
-                      "result": {"proposed": proposed or {},
-                                 "confirmed": {"components":
-                                     confirmed.get("components", [])}}})
-        sink.record(TurnEvent(
-            event_at=datetime.now(timezone.utc).isoformat(),
-            user_id=user,
-            question=str(body.get("question", ""))[:500],
-            tools_used=tuple(t["tool"] for t in trace),
-            ids_read=tuple(sorted({
-                str(i) for t in trace if t["tool"] == "retrieve"
-                for i in t["args"].get("ids", [])})),
-            basis="; ".join(
-                f"{t['tool']}({_json.dumps(t['args'])[:80]})"
-                for t in trace),
-            # Typed verdict (HANDOFF_ANSWER_LOOP): unanswered turns are
-            # the new miss stream — the flywheel that caught the census.
-            answered=bool(cap.get("answered")),
-            conversation_id=conv_id, turn_index=turn_index,
-            decision=decision_shape(trace, cap.get("caption", "")),
-            trace=tuple(
-                {"tool": t["tool"], "args": t["args"],
-                 "result": _json.dumps(t["result"])[:1500]}
-                for t in trace),
-        ))
-        conv.turns += 1
-        return JSONResponse({"conversation_id": conv_id,
-                             "turn_index": turn_index,
-                             "outputs": outputs, **cap})
+    # ADR 0051: the plan-protocol endpoints were DELETED with their
+    # minds. Writes, when they exist, get a fresh plan-confirm
+    # surface built against ADR 0050's floors.
 
     # ---- marketplace fulfillment (SaaS Fulfillment API v2) ----------
 
@@ -502,118 +388,8 @@ function esc(s) { const t = document.createElement('span');
 function add(node) { log.appendChild(node);
   log.scrollTop = log.scrollHeight; return node; }
 
-// ---- plan card: per-op editors, skip, run --------------------------
-function fieldFor(c) {
-  const p = c.params || {};
-  if (c.op === 'search') return `
-    <input type="text" data-f="phrase" value="${esc(p.phrase||'')}">
-    <select data-f="mode">
-      <option value="semantic" ${p.mode==='semantic'?'selected':''}>semantic — closest by meaning
-        (top-K, not exhaustive)</option>
-      <option value="exact" ${p.mode==='exact'?'selected':''}>exact — complete enumeration
-        by name</option>
-    </select>`;
-  if (c.op === 'census') return `
-    <select data-f="kind">
-      ${['metric','step','term','report','measure'].map(k =>
-        `<option value="${k}" ${p.kind===k?'selected':''}>every ${k} — complete list + exact count</option>`
-      ).join('')}
-    </select>`;
-  if (c.op === 'retrieve') return `
-    <textarea data-f="ids">${esc((p.ids||[]).join('\\n'))}</textarea>
-    <span class="note">one id per line</span>`;
-  if (c.op === 'compare') return `
-    <input type="text" data-f="refs" value="${esc((p.refs||[]).join(', '))}">
-    <input type="text" data-f="aspect" placeholder="aspect (blank = logic)"
-           value="${esc(p.aspect||'')}">
-    <span class="note">refs: R1… for earlier results, $n for this plan's step n</span>`;
-  return '';
-}
-
-function planCard(plan, question) {
-  const card = el('<div class="card"><h3>Proposed plan — review, edit, then run</h3></div>');
-  if (plan.clarification) {
-    add(el(`<div class="clarify">${esc(plan.clarification)}</div>`));
-    if (!plan.components.length) return null;
-  }
-  (plan.components || []).forEach(c => {
-    const comp = el(`<div class="comp ${c.valid?'':'invalid'}" data-op="${esc(c.op)}">
-      <span class="num">${c.index}</span>
-      <div class="fields">
-        <span class="oplabel">${esc(c.op)}</span>
-        ${c.valid ? fieldFor(c) : ''}
-        <label style="margin-left:auto;font-size:12px">
-          <input type="checkbox" data-f="skip"> skip</label>
-        ${c.note ? `<span class="note">${esc(c.note)}</span>` : ''}
-        ${c.valid ? '' : `<span class="reason">cannot run: ${esc(c.invalid_reason)}</span>`}
-      </div></div>`);
-    if (!c.valid) comp.querySelector('[data-f=skip]').checked = true;
-    card.appendChild(comp);
-  });
-  const actions = el(`<div class="actions">
-    <button class="primary" data-a="run">Run plan</button>
-    <button data-a="cancel">Cancel</button></div>`);
-  card.appendChild(actions);
-  actions.querySelector('[data-a=run]').onclick = () => runPlan(card, question);
-  actions.querySelector('[data-a=cancel]').onclick = () => {
-    card.querySelector('h3').textContent = 'Plan cancelled';
-    actions.remove(); };
-  add(card);
-  return card;
-}
-
-function collectPlan(card) {
-  const components = [];
-  card.querySelectorAll('.comp').forEach(comp => {
-    if (comp.querySelector('[data-f=skip]').checked) return;
-    const op = comp.dataset.op;
-    const get = f => { const n = comp.querySelector(`[data-f=${f}]`);
-                       return n ? n.value : ''; };
-    let params = {};
-    if (op === 'search') params = { phrase: get('phrase'), mode: get('mode') };
-    if (op === 'census') params = { kind: get('kind') };
-    if (op === 'retrieve') params = { ids: get('ids').split('\\n')
-        .map(s => s.trim()).filter(Boolean) };
-    if (op === 'compare') { params = { refs: get('refs').split(',')
-        .map(s => s.trim()).filter(Boolean) };
-      if (get('aspect').trim()) params.aspect = get('aspect').trim(); }
-    components.push({ op, params });
-  });
-  return { components };
-}
-
-// ---- execute + display ---------------------------------------------
-async function runPlan(card, question) {
-  const plan = collectPlan(card);
-  if (!plan.components.length) { add(el('<p class="err">Nothing to run — every component is skipped.</p>')); return; }
-  card.querySelectorAll('button,input,select,textarea').forEach(n => n.disabled = true);
-  card.querySelector('h3').textContent = 'Plan confirmed — running…';
-  try {
-    const r = await fetch('/api/execute', { method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ conversation_id: conversationId, question,
-                             plan })});
-    const j = await r.json();
-    if (!r.ok) { add(el(`<p class="err">${esc(j.error||('error '+r.status))}</p>`)); return; }
-    card.querySelector('h3').textContent = 'Plan (as run)';
-    (j.outputs || []).forEach(renderOutput);
-    if (j.loop_status) {
-      add(el(`<div class="loopline">${esc(j.loop_status)}${
-        j.loop_note ? ' — ' + esc(j.loop_note) : ''}</div>`));
-    }
-    if (j.caption) {
-      const gate = j.caption_corrected
-        ? `<span class="inputs">honesty gate: original caption over-claimed
-            — showing the verified floor
-            (${esc((j.caption_violations||[]).join('; '))})</span>`
-        : '';
-      add(el(`<div class="caption">${esc(j.caption)}
-        <span class="inputs">caption based on: ${esc((j.caption_inputs||[]).join(', ')||'—')}</span>${gate}</div>`));
-      renderFeedback(j.turn_index);
-    }
-    renderSuggestions(j.suggestions || []);
-  } catch (e) { add(el(`<p class="err">network error: ${esc(e)}</p>`)); }
-}
+// ADR 0051: the plan-card JS was deleted with the plan protocol.
+// Reads run immediately; a fresh confirm surface returns with writes.
 
 function renderOutput(o) {
   const auto = (o.component && o.component.auto_round)
@@ -687,9 +463,7 @@ function renderSuggestions(suggestions) {
   const chips = el('<div class="chips"></div>');
   suggestions.forEach(s => {
     const label = `${esc(s.op)}: ${esc(JSON.stringify(s.params))}${s.note ? ' — ' + esc(s.note) : ''}`;
-    const chip = el(`<button class="chip">${label}</button>`);
-    chip.onclick = () =>
-      planCard({ components: [ { ...s, index: 1, valid: true } ] }, '(suggested action)');
+    const chip = el(`<span class="chip">${label}</span>`);
     chips.appendChild(chip);
   });
   add(chips);

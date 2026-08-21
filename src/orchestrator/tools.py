@@ -52,6 +52,19 @@ FIND_BY_NAME_QUERY = (
 # planned as a name-search for the phrase 'metrics'; the honest empty
 # was then captioned as "no metrics exist". Enumeration questions need
 # an enumeration tool, not a phrase slot.)
+# Name-containment companions to a semantic search (2026-08-21, live
+# find: the top-K embedding ranking buried the literal near-names —
+# 'Sepsis Case Details' absent from the top 12 for 'Sepsis Case').
+# Deterministic, question-agnostic: containment IS relevance.
+NAME_CONTAINS_QUERY = (
+    "declare query_parameters(p_phrase:string);\n"
+    "semantic_catalog\n"
+    "| where name contains p_phrase or business_name contains p_phrase\n"
+    "| project node_id, ['kind'], ['ref'], name, business_name\n"
+    "| order by name asc, node_id asc\n"
+    "| take 10"
+)
+
 LIST_CATALOG_QUERY = (
     "declare query_parameters(p_kind:string);\n"
     "semantic_catalog\n"

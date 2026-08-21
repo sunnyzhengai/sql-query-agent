@@ -10,6 +10,37 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.50.0] - 2026-08-21
+
+### Added — P-group verification + the thesis verdict, reported honestly
+- Thesis test (prompt hash pinned, both tiers): ANAPHORA FLIPPED
+  0.67→1.00 on BOTH tiers with zero prompt rules — memory did it (P2
+  vindicated). Drilldown holds 1.00. On gpt-4o honesty is 1.00 across
+  all six families. Bridge stayed 0.00 (the mind does not bridge
+  natively — reported per the failure-honesty rule, no casebook lines
+  shipped); topical_count regressed 1.00→0.00 (the deleted census-for-
+  topic-counts casebook was load-bearing).
+- ROOT CAUSE found for bridge, and it is retrieval, not prompting: the
+  embedding top-K buried the literal near-names ('Sepsis Case
+  Details' absent from the top 12 for 'Sepsis Case'). Data-shaped fix
+  fully inside P4: semantic search now UNIONS name-containment
+  matches (deterministic, question-agnostic, flagged name_match) — the
+  bridge material reaches the display, the closest-by-name stamp
+  fires, and the floor carries it.
+- P-group checks landed (SPEC v0.5 §14c table + strata §14d): P2/P3
+  prompt-capture tests (round-2 request carries round-1 FULL rows; no
+  forced tool_choice in-loop), P6 continue-after-error, P4 prompt
+  content-hash PINNED in CI and at suite preflight (a pass needing
+  prompt lines is visible as a hash change).
+- P1 demolition completed: protocol.py and its three minds DELETED
+  (module, tests, /api/plan + /api/execute endpoints, plan-card JS);
+  registries updated. Writes get a fresh confirm surface when they
+  exist (ADR 0050 floors unchanged).
+- The Smartness Walk written down (internal/docs/SMARTNESS_WALK.md) —
+  L3 protocol, runs only after L2 clears.
+
+---
+
 ## [1.49.0] - 2026-08-21
 
 ### Changed — THE ONE-MIND TURN (ADR 0051): one conversation decides, the boundary enforces

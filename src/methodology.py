@@ -91,10 +91,11 @@ PRIMITIVES = {
 
 CONTROL_PATH_FILES = (
     "src/orchestrator/ops.py",
-    "src/orchestrator/protocol.py",    # ADR 0036 plan protocol —
-                                       # approved by Sunny 2026-08-13
-    "src/orchestrator/agent.py",       # superseded by the plan protocol;
-                                       # remove at demolition
+    # AMENDMENT 2026-08-21 (ADR 0051): protocol.py DELETED — the
+    # three-call plan protocol's minds retired; the one-mind engine
+    # (below) is the read-path control surface. agent.py remains the
+    # ADR 0035 MCP-surface loop pending its adoption of the engine.
+    "src/orchestrator/agent.py",
     # AMENDMENT 2026-08-20: the caption gate (spec:E6 mechanical) —
     # control-path by nature (it floors captions), subject to the same
     # no-lexicon scan; its checks are single regex patterns, the

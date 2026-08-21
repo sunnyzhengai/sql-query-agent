@@ -29,6 +29,7 @@ from src.orchestrator.tools import (
     CATALOG_KINDS,
     FIND_BY_NAME_QUERY,
     LIST_CATALOG_QUERY,
+    NAME_CONTAINS_QUERY,
     STEPS_OF_QUERY,
     _cap,
     _content_key,
@@ -172,13 +173,27 @@ def op_search(phrase: str, mode: str, run_kql,
          "closeness": round(c.closeness, 3)}
         for c in result.candidates
     ]
+    # Name-containment union (live find 2026-08-21): the embedding
+    # ranking buried literal near-names below the top-K; containment
+    # IS relevance, so those rows always ride along, flagged.
+    have = {r["id"] for r in out}
+    for r in run_kql(NAME_CONTAINS_QUERY, {"p_phrase": phrase.strip()}):
+        rid = r["ref"] if r["kind"] == "metric" else r["node_id"]
+        if rid in have:
+            continue
+        have.add(rid)
+        out.append({"id": rid, "kind": r["kind"], "name": r["name"],
+                    "business_name": r.get("business_name") or None,
+                    "of_metric": r["ref"] if r["kind"] == "step" else None,
+                    "name_match": True})
     return session.register(
         "search", {"phrase": phrase, "mode": "semantic"},
         _attach_cards(out, run_kql),
         complete=False,
         universe=f"closest matches by meaning (top {len(out)} of "
-                 f"{result.total_matches} above the similarity floor) — "
-                 "NOT an exhaustive list")
+                 f"{result.total_matches} above the similarity floor) "
+                 "plus every name-containment match — NOT an "
+                 "exhaustive list")
 
 
 def normalize_kind(kind: str) -> "str | None":

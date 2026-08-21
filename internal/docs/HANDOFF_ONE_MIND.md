@@ -104,6 +104,53 @@ bound flailing. No separate retry subsystem.
   (verbatim-overlap oracle vs paraphrase; bridge honesty demand)
   ride along.
 
+## Verification: the P-group, the strata, and the Smartness Walk
+
+**P-group axioms** (land in SPEC.md with the ADR; statuses + bindings,
+house table format). Each principle's check, typed per spec:E3:
+
+- P1 one mind — TESTED: ask path has exactly one conversation object,
+  one system prompt; PLANNER_PROMPT / GOAL_CHECK_PROMPT deleted
+  (ghost-rule grep).
+- P2 full evidence — TESTED via PROMPT CAPTURE (the 0044 clause-2/3
+  instrument, inverted: assert what the model MUST see): scripted
+  turn, capture round-2+ request messages, assert round-1 full tool
+  results present; retention policy asserted (recent whole, compaction
+  per policy only, headlines never dropped).
+- P3 thinking room — TESTED: captured request params show no forced
+  tool_choice except the final typed-verdict emission.
+- P4 no casebook — TESTED + MEASURED: extend test_methodology.py's
+  banned-vocabulary and PROMPT LINE BUDGET checks to the merged
+  engine's system prompt (casebook creep fails CI at the line cap);
+  thesis test runs with the prompt content-hash PINNED — a pass that
+  needed new prompt lines is visible as a hash change and fails the
+  thesis.
+- P5 boundary honesty — TESTED: existing cage tests adapted (gate,
+  verdict, whitelist, write-confirm, caps).
+- P6 failure as observation — TESTED via prompt capture: scripted
+  tool error appears as a tool-result message in the next request;
+  turn continues within caps.
+
+**Testing strata** (formalize as a SPEC.md section with the ADR):
+L0 contracts/kernels (tested, CI) · L1 structure/information flow
+(tested, CI — prompt capture, AST, registry closure) · L2 behavior
+(measured — suite thresholds; honesty 100% is a build-stopper) ·
+L3 human acceptance (judged — protocoled below). Rules: every new
+capability declares its checks at every stratum before shipping (trace
+registry carries the declaration); never measure what you could test;
+never ask L3 eyes to discover what L2 should have caught.
+
+**The Smartness Walk** (L3 — Sunny's protocol; runs ONLY after L2
+clears thresholds): (1) the four corpses live; (2) memory test — three
+follow-ups by pronoun only; (3) pointer chase — a two-hop question,
+judged by WATCHING the live operations trace compose; (4) honest
+wall — out-of-scope ask must refuse with capabilities; (5) deliberate
+misname — must bridge; (6) surprise round — five questions authored
+outside the fixture set (a third party or an LLM given only metric
+names). Every rejection becomes an L2 fixture before its fix ships.
+Build the walk's script as a checklist page in the webapp or a doc —
+Sunny should not have to remember it.
+
 ## ADR duties
 
 - New ADR: "the one-mind turn" — supersedes the conversation shape of

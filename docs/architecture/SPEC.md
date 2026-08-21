@@ -638,6 +638,38 @@ real edges, captioned; narration rephrases, never decides).
 surface (webapp/agent wiring, BYOT narration in production) is not yet
 exposed to admins; the deterministic core and CLI are.
 
+## 14c. Group P — the one-mind turn (v0.5, ADR 0051)
+
+The six principles of the merged turn engine, each bound to a check
+(instrument: prompt capture — assert what the model MUST see; the
+0044 clause-2/3 instrument, inverted):
+
+| axiom | statement | binding | status |
+|---|---|---|---|
+| P1 | one conversation decides a turn; no separate planner/judge/captioner minds | one EngineSession/history on the ask path; retired-prompt ghost grep (tests/test_turn_engine + methodology scans) | ENFORCED |
+| P2 | full tool results enter the SAME history and persist across rounds and turns; compaction degrades oldest to stamped headline + totals, never drops | prompt capture: round-2 request carries round-1 FULL rows; compaction test pins headline+totals survival | ENFORCED |
+| P3 | thinking room — no forced tool_choice except the final typed verdict | captured tool_choice per request: None in-loop, forced exactly once | ENFORCED |
+| P4 | no question-family casebook anywhere — invariants + tool semantics only | control-path lexicon scan + prompt line budget (auto-discovered SYSTEM_PROMPT) + banned-vocabulary pin + thesis prompt content-hash PINNED (suite refuses to grade a changed prompt) | ENFORCED |
+| P5 | honesty at the boundary only: headlines, caption gate, machine-verified evidence-quote verdict, read-only dispatch, write plan-confirm, caps as code | cage tests (gate/verdict/whitelist/caps/anti-flail) | ENFORCED |
+| P6 | failure is observation: tool errors return into the conversation; caps bound flailing | cage test: scripted error appears as a tool-result message; turn continues within caps | ENFORCED |
+
+**Interior vs boundary (the E-group note, restated):** which tool,
+when to stop, how to compose — linguistic, MEASURED (suite thresholds,
+honesty 100% as build-stopper). Everything at the user boundary —
+TESTED.
+
+## 14d. Testing strata (ADR 0051)
+
+L0 contracts/kernels — tested, CI. L1 structure & information flow —
+tested, CI (prompt capture, AST planks, registry closure). L2
+behavior — measured (suite thresholds; honesty 100% is a
+build-stopper, not a metric). L3 human acceptance — judged (the
+Smartness Walk protocol, internal/docs/SMARTNESS_WALK.md; runs ONLY
+after L2 clears). Rules: every new capability declares its checks at
+every stratum before shipping (the trace registry carries the
+declaration); never measure what you could test; never ask L3 eyes to
+discover what L2 should have caught.
+
 ## 15. Honest limits
 
 1. **C1 cannot force conception.** The inventory makes "sources we haven't

@@ -11,6 +11,7 @@ from src.orchestrator.tools import (
     BATCH_FRAGMENTS_QUERY,
     FIND_BY_NAME_QUERY,
     LIST_CATALOG_QUERY,
+    NAME_CONTAINS_QUERY,
     STEPS_OF_QUERY,
     Session,
     ToolError,
@@ -69,6 +70,14 @@ def fake_kql(query, params):
                      "ref": REF_A, "name": "USP_ED_Sepsis",
                      "business_name": "ED Sepsis Screening"}]
         return []
+    if query == NAME_CONTAINS_QUERY:
+        p = params["p_phrase"].lower()
+        return [{"node_id": f"canonical:{ref}", "kind": "metric",
+                 "ref": ref, "name": row["metric_name"],
+                 "business_name": row["business_name"]}
+                for ref, row in sorted(METRIC_ROWS.items())
+                if p in row["metric_name"].lower()
+                or p in row["business_name"].lower()]
     if query == LIST_CATALOG_QUERY:
         kind = params["p_kind"]
         if kind == "metric":

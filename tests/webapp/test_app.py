@@ -209,83 +209,31 @@ class TestJsonFileStore:
         assert again.get("ghost") is None
 
 
-class TestPlanProtocolEndpoints:
-    def scripted(self, payloads):
-        import json as j
-        it = iter(payloads)
+class TestOneMindAskEndpoint:
+    """ADR 0051: reads run immediately on /api/ask via the merged
+    engine; the plan-protocol endpoints were deleted with their minds."""
 
-        def call(messages, tools, tool_choice=None):
-            name = tools[0]["function"]["name"]
-            return {"role": "assistant", "content": None, "tool_calls": [
-                {"id": "c", "type": "function",
-                 "function": {"name": name,
-                              "arguments": j.dumps(next(it))}}]}
-        return call
-
-    def test_plan_then_execute_flow(self, tmp_path):
-        from tests.orchestrator.test_tools import REF_A, REF_B
-        plan_payload = {"components": [
-            {"op": "retrieve", "params": {"ids": [REF_A, REF_B]},
-             "note": "records"},
-            {"op": "compare", "params": {"refs": ["$1"]},
-             "note": "partition"}]}
-        goal_payload = {"answered": True}      # ADR 0050 loop check
-        caption_payload = {"caption": "Two distinct definitions (R2).",
-                           "answered": True, "suggestions": []}
+    def test_ask_runs_the_engine_and_stamps_everything(self, tmp_path):
+        from tests.orchestrator.test_turn_engine import scripted_engine
         sink = JsonlEventSink(tmp_path / "e.jsonl")
-        app = TestClient(create_app(
-            self.scripted([plan_payload, goal_payload, caption_payload]),
-            fake_kql, sink))
-        # 1) interpret — nothing executes
-        r = app.post("/api/plan", json={
-            "message": f"do {REF_A} and {REF_B} share logic?"}).json()
-        assert [c["valid"] for c in r["plan"]["components"]] == [True, True]
-        # 2) human confirms (unedited here) — execution + caption
-        r2 = app.post("/api/execute", json={
-            "conversation_id": r["conversation_id"],
-            "question": "do they share logic?",
-            "plan": r["plan"]}).json()
-        assert r2["outputs"][0]["result"]["op"] == "retrieve"
-        groups = [x for x in r2["outputs"][1]["result"]["rows"]
-                  if "group" in x]
-        assert len(groups) == 2
-        assert r2["caption"].startswith("Two distinct")
-        assert r2["caption_inputs"] == ["R1", "R2"]
-        row = json.loads((tmp_path / "e.jsonl").read_text().splitlines()[0])
-        # plan_review is the recorded proposed-vs-confirmed edit diff —
-        # the human's regulation act is training material (ADR 0038)
-        assert row["tools_used"] == ["retrieve", "compare", "plan_review"]
-        assert row["trace"][-1]["args"] == {"edited": False}  # unedited here
-        assert row["decision"]["verified_by_tool"] is False  # partition op
-        assert row["question"] == "do they share logic?"
+        app = TestClient(create_app(scripted_engine([
+            {"calls": [("search", {"phrase": "ed sepsis",
+                                   "mode": "semantic"})]},
+            {"text": "Two candidates are shown in R1."},
+            {"verdict": {"answered": True,
+                         "evidence_quote": "measures ED Sepsis "
+                                           "Screening"}},
+        ]), fake_kql, sink))
+        r = app.post("/api/ask", json={"message": "what exists?"}).json()
+        assert r["outputs"][0]["result"]["headline"].startswith("R1:")
+        assert r["caption"].startswith("Two candidates")
+        assert r["answered"] is True
+        assert "one mind: 1 tool round(s)" in r["loop_status"]
+        events = (tmp_path / "e.jsonl").read_text().splitlines()
+        assert any('"answered": true' in e for e in events)
 
-    def test_human_edit_is_recorded_in_telemetry(self, tmp_path):
-        """The user changing the proposed plan (e.g. deleting a filler
-        word from the search phrase) is the regulation signal — it must
-        land in telemetry mechanically, never be inferred."""
-        plan_payload = {"components": [
-            {"op": "search",
-             "params": {"phrase": "ED sepsis definition",
-                        "mode": "semantic"}}]}
-        caption_payload = {"caption": "Closest matches shown (R1).",
-                           "suggestions": []}
+    def test_plan_endpoints_are_gone(self, tmp_path):
         sink = JsonlEventSink(tmp_path / "e.jsonl")
-        app = TestClient(create_app(
-            self.scripted([plan_payload, caption_payload]),
-            fake_kql, sink))
-        r = app.post("/api/plan", json={"message": "how is ED sepsis "
-                                        "defined?"}).json()
-        confirmed = r["plan"]
-        confirmed["components"][0]["params"]["phrase"] = "ED sepsis"
-        r2 = app.post("/api/execute", json={
-            "conversation_id": r["conversation_id"],
-            "question": "how is ED sepsis defined?",
-            "plan": confirmed}).json()
-        assert r2["outputs"][0]["result"]["op"] == "search"
-        row = json.loads((tmp_path / "e.jsonl").read_text().splitlines()[0])
-        assert row["trace"][-1]["args"] == {"edited": True}
-
-    def test_execute_requires_conversation_and_components(self, tmp_path):
-        sink = JsonlEventSink(tmp_path / "e.jsonl")
-        app = TestClient(create_app(self.scripted([]), fake_kql, sink))
-        assert app.post("/api/execute", json={"plan": {}}).status_code == 400
+        app = TestClient(create_app(lambda *a, **k: {}, fake_kql, sink))
+        assert app.post("/api/plan", json={"message": "x"}).status_code == 404
+        assert app.post("/api/execute", json={}).status_code == 404

@@ -98,9 +98,9 @@ is a LIVE mechanism read by scripts/validate_deployment.py and 600 —
 not cruft), data/ = demo/sample/synthetic fixtures (governed),
 build//egg-info/caches untracked.
 
-Remaining cleanup, ordered — **execute only after the current field
-cycle is green** (env publish + 500/600 rerun pending), one
-coordinated commit per item:
+Remaining cleanup, ordered — **gate CLEARED 2026-08-20** (Sunny:
+env publish + pipeline rerun done) — execute now, one coordinated
+commit per item:
 
 1. **Delete the three empty husk dirs** at root: learning/,
    presentation/, private/ (git mv left them behind; verified empty).
@@ -113,15 +113,22 @@ coordinated commit per item:
    item): eh_probe.DataAgent, KustoQueryWorkbench_1/2.KQLQueryset
    (numbered scratch; violates naming discipline). Grep for references
    before each deletion (the probe-eh lesson, item 5).
-4. **Data Agent ruling needed (Sunny)**: Delta Agent / Graph Agent are
-   the rematch-era comparison pair; SQL Intelligence Agent is
-   presumably the keeper as the distribution surface. Which retire?
-5. **probe-eh.Eventhouse is PRODUCTION under a probe name** —
-   referenced by src/webapp/main.py, src/orchestrator/cli.py, and the
-   devtools KQL. Options: rename to a clean production name (house
-   naming rule) updating all reference sites + the workspace item in
-   one coordinated change; or explicitly accept the name in the trace
-   registry. Recommend rename at a quiet point; needs Sunny's go.
+4. **RULED (Sunny, 2026-08-20): retire BOTH Delta Agent and Graph
+   Agent** — the rematch-era comparison pair, work concluded and
+   recorded in ADRs 0017–0020/0032. SQL Intelligence Agent STAYS as
+   the shipping Tier-1 distribution surface (never used for
+   validation, per standing rule). Same workspace-first deletion
+   protocol as item 3.
+5. **RULED (Sunny, 2026-08-20): RENAME probe-eh.Eventhouse** to a
+   clean production name — proposal: `aivia_semantic_catalog`
+   (matches the aivia_admin_telemetry naming pattern; dev session may
+   adjust, but no probe/scratch vocabulary and no suffixes). One
+   coordinated change: workspace rename + all reference sites
+   (src/webapp/main.py, src/orchestrator/cli.py,
+   devtools/eventhouse_setup.kql, devtools/eventhouse_probe.kql,
+   devtools/robustness_suite.py — re-grep before executing) + verify
+   the orchestrator and webapp against the renamed item before
+   committing.
 6. **Utility notebooks at root** (export_test_fixtures,
    make_golden_snapshot) violate the notebooks-location rule (only
    pipeline notebooks at root). Fabric workspace folders sync as repo

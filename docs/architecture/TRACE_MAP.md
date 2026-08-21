@@ -399,11 +399,9 @@ classification).
 - **Grounds:** spec:E6
 - **Implemented by:**
   - `src/methodology.py`
-  - `src/orchestrator/protocol.py`
   - `src/orchestrator/caption_gate.py`
 - **Enforced by:**
   - `tests/test_methodology.py`
-  - `tests/orchestrator/test_protocol.py`
   - `tests/orchestrator/test_caption_gate.py`
 - **Summarized in:**
   - `docs/METHODOLOGY.md`
@@ -601,9 +599,9 @@ classification).
 - **Category:** architecture
 - **Grounds:** spec:E3
 - **Implemented by:**
-  - `src/orchestrator/protocol.py`
+  - `src/orchestrator/turn_engine.py`
 - **Enforced by:**
-  - `tests/orchestrator/test_protocol.py`
+  - `tests/orchestrator/test_turn_engine.py`
 
 ## ADR 0051 — The one-mind turn: one conversation decides, the boundary enforces (supersedes 0036/0050's shape)
 
