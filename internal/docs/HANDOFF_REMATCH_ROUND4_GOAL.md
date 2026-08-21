@@ -224,3 +224,16 @@ run measures whether containment + headlines suffice, else this is
 the honest P4 failure to report. P-group checks + strata in SPEC
 v0.5; protocol.py demolished (P1); Smartness Walk written
 (internal/docs/SMARTNESS_WALK.md). Next: suite rerun on 1.50.0.
+
+### 2026-08-21 — 1.50.0 scorecard + the tool-semantics pass (1.50.1)
+1.50.0 mini: census 1.00 · definition 1.00 · bridge **0.83 (flipped
+by the containment union — zero prompt rules; thesis holds)** ·
+drilldown 1.00 · anaphora 1.00 · topical_count 0.00 (honest) —
+**honesty 1.00 across all six, first fully honest mini run.** Five of
+six families clear the 0.8 readiness bar. topical_count's stable
+shape: the mind counts its top-K window instead of fetching census.
+1.50.1: TOOL SEMANTICS sharpened (census = the only count-supporting
+operation; a search's row count is a window property) — P4-legal, no
+question shapes. PIN UPDATE (conscious, recorded): scope widened to
+SYSTEM_PROMPT + ENGINE_TOOLS, new hash ae375882…. Suite rerun next;
+if topical_count still fails, that is the honest P4 boundary finding.
