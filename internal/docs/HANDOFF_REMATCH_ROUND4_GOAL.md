@@ -356,3 +356,15 @@ per-token note → zero-match multi-word census now DEGRADES to its
 productive tokens, degradation stamped in the universe ('ED logic' →
 2 rows, "'logic' matches nothing and was disregarded"). Zero
 prompt/tool changes — the pin stands.
+
+### 2026-08-21 — 1.50.8 board → 1.50.9 (containment degradation + exact-stamp precedence)
+1.50.8 mini: topical 0.92 PASS (census degradation worked) · anaphora
+1.00 · census/definition/drilldown/sql_request 1.00 · bridge 0.75
+BELOW — honesty 1.00. IP_SEPSIS subfamily now 6/6; the misses moved
+to 'Sepsis Case' via two shapes: (a) model paraphrased the phrase
+('Sepsis Case Definition') so full-phrase containment went dark →
+containment now degrades to productive tokens (has_all), same law as
+census, and name_match companions are stamped; (b) model widened to
+'Sepsis' whose stamp names near-everything → boundary ruling now
+aggregates with EXACT-stamp precedence, competitors drawn from all
+displayed results. Zero prompt/tool changes — the pin stands.

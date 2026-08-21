@@ -315,6 +315,28 @@ class TestExactEmptyBridgeNote:
         assert "ED Sepsis Screening" not in rs.note
 
 
+class TestTokenDegradedContainment:
+    """Suite find (2026-08-21): the model paraphrased the user's name
+    into 'Sepsis Case Definition' — full-phrase containment went dark
+    and no sibling stamp fired. A multi-word phrase that matches
+    nothing degrades to its productive tokens, same law as the
+    census."""
+
+    def test_paraphrased_phrase_still_rides_companions_along(self):
+        s = OpsSession()
+        rs = op_search("ED Sepsis Definition", "semantic", fake_kql, s)
+        flagged = [r for r in rs.rows if r.get("name_match")]
+        assert flagged, "degraded containment companions must ride"
+        assert any(r["id"] == REF_B for r in flagged)
+
+    def test_exact_empty_note_uses_degraded_companions(self):
+        rs = op_search("ED Sepsis Definition", "exact", fake_kql,
+                       OpsSession())
+        assert rs.rows == []
+        assert "closest by name:" in rs.note
+        assert "ED Sepsis Screening" in rs.note
+
+
 class TestRowMentions:
     """The 'mentions T' predicate is the SPEC shared by op_census and
     the suite oracle — pinned here at L0 because the suite, sharing it,

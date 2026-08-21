@@ -221,6 +221,41 @@ class TestNoteInHeadline:
         # competitor named earlier, which empty rows cannot supply
 
 
+class TestExactStampPrecedence:
+    """1.50.9: the exact-mode stamp names the USER'S missed phrase; a
+    model-widened semantic search stamps near-everything and must not
+    dilute the siblings-first duty."""
+
+    def _outputs(self):
+        exact = {"ref": "R1", "op": "search",
+                 "params": {"phrase": "Sepsis Case", "mode": "exact"},
+                 "rows": [], "complete": True, "universe": "u",
+                 "headline": "R1: … Nothing is NAMED 'Sepsis Case' "
+                             "exactly; closest by name: Sepsis Case "
+                             "Details, Sepsis Case Encounters."}
+        widened = {"ref": "R2", "op": "search",
+                   "params": {"phrase": "Sepsis", "mode": "semantic"},
+                   "rows": [{"id": "x", "name": "USP_Severe_Sepsis",
+                             "business_name": "Severe Sepsis Episodes"}],
+                   "complete": False, "universe": "u",
+                   "headline": "R2: … closest by name: Severe Sepsis "
+                               "Episodes."}
+        return [{"component": {"op": "search"}, "result": exact},
+                {"component": {"op": "search"}, "result": widened}]
+
+    def test_widened_stamp_does_not_dilute_the_duty(self):
+        bad = ("Related metrics include Severe Sepsis Episodes. Also "
+               "close: Sepsis Case Details.")
+        vs = caption_violations(bad, self._outputs())
+        assert any("presented FIRST" in v for v in vs)
+
+    def test_siblings_first_across_results_passes(self):
+        good = ("Closest by name: Sepsis Case Details and Sepsis Case "
+                "Encounters. Meaning-related: Severe Sepsis Episodes.")
+        assert not [v for v in caption_violations(good, self._outputs())
+                    if "presented FIRST" in v]
+
+
 class TestStampVerification:
     """ADR 0051: the bridge-duty check was removed (question-family
     control flow); what remains verified is that the FLOOR renders

@@ -31,6 +31,7 @@ from src.orchestrator.tools import (
     FIND_BY_NAME_QUERY,
     LIST_CATALOG_QUERY,
     NAME_CONTAINS_QUERY,
+    NAME_CONTAINS_TOKENS_QUERY,
     STEPS_OF_QUERY,
     TABLE_USED_BY_QUERY,
     _cap,
@@ -144,6 +145,32 @@ def _attach_cards(rows: "list[dict]", run_kql) -> "list[dict]":
                 or r.get("business_name") or None)
     return rows
 
+def _containment_rows(phrase: str, run_kql) -> "list[dict]":
+    """Name-containment companions for a phrase: full-phrase matches
+    first; a multi-word phrase that matches nothing degrades to its
+    PRODUCTIVE tokens (has_all over every token that matches anything)
+    — the same degradation law as the filtered census. Suite find
+    2026-08-21: the model paraphrased 'Sepsis Case' into 'Sepsis Case
+    Definition' and the full-phrase containment went dark."""
+    clean = phrase.strip()
+    if not clean:
+        return []
+    rows = list(run_kql(NAME_CONTAINS_QUERY, {"p_phrase": clean}))
+    if rows:
+        return rows
+    tokens = [t for t in re.split(r"[^A-Za-z0-9_]+", clean)
+              if len(t) >= 2]
+    if len(tokens) < 2:
+        return []
+    productive = [
+        t for t in tokens
+        if run_kql(NAME_CONTAINS_QUERY, {"p_phrase": t})]
+    if not productive:
+        return []
+    return list(run_kql(NAME_CONTAINS_TOKENS_QUERY,
+                        {"p_tokens": productive}))
+
+
 def _bridge_note(phrase: str, run_kql) -> str:
     """Bridge material for an honest-empty result whose parameter is a
     phrase — computed as DATA, stamped into the headline, present no
@@ -160,12 +187,12 @@ def _bridge_note(phrase: str, run_kql) -> str:
         return ""
     parts = []
     near: "list[str]" = []
-    for r in run_kql(NAME_CONTAINS_QUERY, {"p_phrase": clean}):
-        for val in (r.get("business_name"), r["name"]):
-            if (val and clean.lower() in str(val).lower()
-                    and val not in near):
-                near.append(val)
-                break
+    for r in _containment_rows(clean, run_kql):
+        val = next((v for v in (r.get("business_name"), r["name"])
+                    if v and clean.lower() in str(v).lower()),
+                   r.get("business_name") or r["name"])
+        if val and val not in near:
+            near.append(str(val))
     if near:
         parts.append(f"Nothing is NAMED {clean!r} exactly; closest by "
                      f"name: {', '.join(near[:5])}.")
@@ -223,7 +250,7 @@ def op_search(phrase: str, mode: str, run_kql,
     # ranking buried literal near-names below the top-K; containment
     # IS relevance, so those rows always ride along, flagged.
     have = {r["id"] for r in out}
-    for r in run_kql(NAME_CONTAINS_QUERY, {"p_phrase": phrase.strip()}):
+    for r in _containment_rows(phrase, run_kql):
         rid = r["ref"] if r["kind"] == "metric" else r["node_id"]
         if rid in have:
             continue

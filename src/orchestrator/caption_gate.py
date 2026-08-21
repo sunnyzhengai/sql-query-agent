@@ -87,15 +87,26 @@ def caption_violations(caption: str, outputs: "list[dict]") -> "list[str]":
     # they are presented FIRST, mandatory; meaning-related items are
     # permitted after. Grounded verification: both lists come from
     # code-stamped data and displayed rows, never a lexicon.
-    for r in results:
-        m2 = _BRIDGE_STAMP.search(str(r.get("headline") or ""))
-        if not m2:
-            continue
-        stamped = [n.strip() for n in m2.group(1).split(",") if n.strip()]
+    # Aggregated with EXACT-stamp precedence (1.50.9): the exact-mode
+    # stamp names the USER'S missed phrase; a model-widened semantic
+    # search ('Sepsis' after 'Sepsis Case') stamps near-everything and
+    # must not dilute the duty. Competitors are the displayed
+    # candidate names across ALL results.
+    stamped_hits = [
+        (r, m) for r in results
+        for m in [_BRIDGE_STAMP.search(str(r.get("headline") or ""))]
+        if m]
+    if stamped_hits:
+        exacts = [(r, m) for (r, m) in stamped_hits
+                  if (r.get("params") or {}).get("mode") == "exact"]
+        _, m2 = (exacts or stamped_hits)[0]
+        stamped = [n.strip() for n in m2.group(1).split(",")
+                   if n.strip()]
         # a stamped sibling row is a sibling wholly — its alternate
         # surface form (business vs metric name) is not a competitor
         others = sorted({
-            str(v) for row in (r.get("rows") or [])
+            str(v) for r in results
+            for row in (r.get("rows") or [])
             if not any(str(x) in stamped for x in
                        (row.get("business_name"), row.get("name")) if x)
             for v in (row.get("business_name"), row.get("name"))
@@ -200,6 +211,17 @@ def stamped_headline(result: dict) -> str:
                 for r in rows for k in ("name", "business_name"))
             contains = []
             for r in rows:
+                # rows flagged name_match rode in via containment —
+                # including token-degraded companions whose names hold
+                # the phrase's tokens but not the verbatim phrase
+                # (1.50.9: 'Sepsis Case Definition' stamps 'Sepsis
+                # Case Details' / 'Sepsis Case Encounters')
+                if r.get("name_match"):
+                    val = str(r.get("business_name") or r.get("name")
+                              or "")
+                    if val and val not in contains:
+                        contains.append(val)
+                    continue
                 for k in ("business_name", "name"):
                     val = str(r.get(k) or "")
                     if phrase in val.lower() and val not in contains:

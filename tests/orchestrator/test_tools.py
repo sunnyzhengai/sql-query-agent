@@ -12,6 +12,7 @@ from src.orchestrator.tools import (
     FIND_BY_NAME_QUERY,
     LIST_CATALOG_QUERY,
     NAME_CONTAINS_QUERY,
+    NAME_CONTAINS_TOKENS_QUERY,
     STEPS_OF_QUERY,
     TABLE_USED_BY_QUERY,
     Session,
@@ -83,6 +84,15 @@ def fake_kql(query, params):
                  "business_name": "ED Sepsis (Regulatory)"},
             ]
         return []
+    if query == NAME_CONTAINS_TOKENS_QUERY:
+        toks = [str(t).lower() for t in params["p_tokens"]]
+        return [{"node_id": f"canonical:{ref}", "kind": "metric",
+                 "ref": ref, "name": row["metric_name"],
+                 "business_name": row["business_name"]}
+                for ref, row in sorted(METRIC_ROWS.items())
+                if all(t in (row["metric_name"] + " "
+                             + row["business_name"]).lower()
+                       for t in toks)]
     if query == NAME_CONTAINS_QUERY:
         p = params["p_phrase"].lower()
         return [{"node_id": f"canonical:{ref}", "kind": "metric",

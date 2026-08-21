@@ -87,6 +87,20 @@ BATCH_FRAGMENTS_QUERY = (
     "| project node_id, name, description, properties"
 )
 
+# Token-degraded containment (suite find 2026-08-21: the model
+# paraphrased the user's name into 'Sepsis Case Definition' — the
+# full-phrase containment found nothing and no sibling stamp fired).
+# has_all is Kusto term matching: every token must appear in the
+# name/business-name text.
+NAME_CONTAINS_TOKENS_QUERY = (
+    "declare query_parameters(p_tokens:dynamic);\n"
+    "semantic_catalog\n"
+    "| where strcat(name, ' ', business_name) has_all (p_tokens)\n"
+    "| project node_id, ['kind'], ['ref'], name, business_name\n"
+    "| order by name asc, node_id asc\n"
+    "| take 10"
+)
+
 # Source-table identity (walk find 2026-08-21, Sunny: "how is
 # IP_SEPSIS defined" — the phrase names a TECHNICAL node, which the
 # semantic_catalog surfaces cannot see; the model census'd steps, got
