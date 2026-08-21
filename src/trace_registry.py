@@ -498,6 +498,15 @@ TRACE_REGISTRY = {
                   "tests/test_companion.py"],
         "docs": ["docs/architecture/SPEC.md", "docs/architecture/TRACE_MAP.md"],
     },
+    "0052": {
+        "title": "The reachability contract: every graph payload "
+                 "reachable by a named op or excluded with a reason",
+        "category": "architecture",
+        "axioms": ["C1"],
+        "modules": ["src/reachability.py"],
+        "tests": ["tests/test_reachability.py"],
+        "docs": ["docs/decisions/0052-reachability-contract.md"],
+    },
     "0051": {
         "title": "The one-mind turn: one conversation decides, the "
                  "boundary enforces (supersedes 0036/0050's shape)",
