@@ -211,18 +211,31 @@ def build_oracle(fixture: dict, run_kql) -> dict:
         assert n, "oracle: metric has no steps"
         return {"required_any": [[str(n)]], "forbidden": []}
     if kind == "beyond_summary":
+        # TIGHTENED per Sunny's rejection (2026-08-21, relayed): the
+        # summary-flavored drilldown answer ("criteria defined in the
+        # calculation steps") is rejected — a drilldown answer must
+        # carry words from the DECISION layer (ADR 0044: the WHERE/
+        # CASE criteria as first-class nodes), not step descriptions.
+        # This oracle fails until the decision layer reaches the
+        # ask-surface; that failing state is the honest one.
         ops2 = _fresh_ops_session()
         rs = op_search(fixture["item"], "exact", run_kql, ops2)
         assert rs.rows, f"oracle: {fixture['item']} not in catalog"
         rid = rs.rows[0]["id"]
         summary = json.dumps(rs.rows[0])
-        rec = op_retrieve([rid], run_kql, ops2)
-        deep_blob = json.dumps(rec.rows)
+        dec_rows = run_kql(
+            "declare query_parameters(p_ref:string);\n"
+            "graph_nodes\n"
+            "| where node_id startswith strcat('decision:', p_ref, ':')\n"
+            "| project name, description, properties",
+            {"p_ref": rid})
+        assert dec_rows, f"oracle: {fixture['item']} has no decision nodes"
+        deep_blob = json.dumps(dec_rows)
         summary_words = set(_WORD.findall(summary.lower()))
         deep = sorted({w for w in _WORD.findall(deep_blob)
                        if w.lower() not in summary_words})
-        assert deep, "oracle: no step-level facts beyond the summary"
-        return {"required_any": [deep], "required_overlap": 1,
+        assert deep, "oracle: no decision-level facts beyond the summary"
+        return {"required_any": [deep], "required_overlap": 2,
                 "forbidden": []}
     raise ValueError(kind)
 
