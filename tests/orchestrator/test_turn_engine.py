@@ -102,6 +102,41 @@ class TestLoop:
                         if m.get("role") == "tool"]
         assert any("already ran" in str(p.get("error")) for p in tool_payloads)
 
+    def test_prior_turn_rows_are_legal_verdict_evidence(self):
+        """Walk step 1 (Sunny, 2026-08-21): 'show me the sql' answered
+        verbatim from a prior retrieve with ZERO new rounds and was
+        denied a verified verdict. Rows displayed in EARLIER turns are
+        legal evidence — that is what one persistent history means
+        (P1/P2); the quote must still be verbatim from a displayed
+        row."""
+        s = EngineSession()
+        run_turn(s, "find ed sepsis", scripted_engine([
+            {"calls": [("search", {"phrase": "ed sepsis",
+                                   "mode": "semantic"})]},
+            {"text": "Shown."}, {"verdict": {"answered": False}},
+        ]), fake_kql)
+        out = run_turn(s, "what does it measure?", scripted_engine([
+            {"text": "It measures ED Sepsis Screening."},
+            {"verdict": {"answered": True, "evidence_quote": GOOD_QUOTE}},
+        ]), fake_kql)
+        assert out["rounds"] == 0
+        assert out["answered"] is True
+
+    def test_fabricated_quote_still_fails_with_history_ground(self):
+        s = EngineSession()
+        run_turn(s, "find ed sepsis", scripted_engine([
+            {"calls": [("search", {"phrase": "ed sepsis",
+                                   "mode": "semantic"})]},
+            {"text": "Shown."}, {"verdict": {"answered": False}},
+        ]), fake_kql)
+        out = run_turn(s, "what does it measure?", scripted_engine([
+            {"text": "It measures downstream compliance windows."},
+            {"verdict": {"answered": True,
+                         "evidence_quote":
+                             "measures downstream compliance windows"}},
+        ]), fake_kql)
+        assert out["answered"] is False
+
     def test_round_cap_exhausts_honestly(self):
         s = EngineSession()
         steps = [{"calls": [("search", {"phrase": f"p{i}",

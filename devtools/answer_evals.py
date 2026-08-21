@@ -66,6 +66,15 @@ FIXTURES = [
      "question": "how is Sepsis Case defined",
      "oracle": "near_name_bridge", "phrase": "Sepsis Case",
      "max_rounds": 2, "expected_kind": "bridge"},
+    # Walk step 1 rejection (Sunny, 2026-08-21): an identifier-style
+    # near-name ('IP_SEPSIS' is a source table, not a metric) ran
+    # exact, got an honest 0, and the floored caption carried no
+    # did-you-mean. Fixture first, per protocol; the fix is the
+    # exact-empty bridge note in op_search.
+    {"family": "bridge",
+     "question": "how is IP_SEPSIS defined",
+     "oracle": "near_name_bridge", "phrase": "IP_SEPSIS",
+     "max_rounds": 2, "expected_kind": "bridge"},
     {"family": "drilldown",
      "question": "in Severe Sepsis Episodes, how is a patient "
                  "diagnosed with severe sepsis",
@@ -88,6 +97,24 @@ FIXTURES = [
     # criteria in this metric" answers as misses. Severe Sepsis
     # Episodes HAS step-level criteria; the fixture now tests anaphora
     # resolution + drill-down against a metric where the answer exists.
+    # Walk step 1 (Sunny, 2026-08-21): 'show me the sql' — fresh
+    # conversation, so the engine must take the tool path and quote
+    # the stored fragments (her live turn answered from history with
+    # zero rounds; the definition_facts oracle demands verbatim words
+    # of the retrieved record either way).
+    {"family": "sql_request",
+     "question": "show me the sql of Sepsis Case Encounters",
+     "oracle": "definition_facts", "item": "Sepsis Case Encounters",
+     "max_rounds": 2, "expected_kind": "answered"},
+    # Walk step 1 (Sunny, 2026-08-21): 'how many steps does it have'
+    # by pronoun — her live turn got the right count via a 413-row
+    # full step census; the oracle only demands the exact count.
+    {"family": "anaphora",
+     "questions": ["how is metric Severe Sepsis Episodes defined",
+                   "how many steps does it have"],
+     "question": "how many steps does it have",
+     "oracle": "step_count", "item": "Severe Sepsis Episodes",
+     "max_rounds": 2, "expected_kind": "answered"},
     {"family": "anaphora",
      "questions": ["how is metric Severe Sepsis Episodes defined",
                    "in this metric, how is a patient diagnosed with "
@@ -154,6 +181,14 @@ def build_oracle(fixture: dict, run_kql) -> dict:
         rs = op_census("metric", run_kql, ops)
         n = sum(1 for r in rs.rows if row_mentions(r, fixture["topic"]))
         assert n, "oracle: topic matches nothing"
+        return {"required_any": [[str(n)]], "forbidden": []}
+    if kind == "step_count":
+        ops2 = _fresh_ops_session()
+        rs = op_search(fixture["item"], "exact", run_kql, ops2)
+        assert rs.rows, f"oracle: {fixture['item']} not in catalog"
+        rec = op_retrieve([rs.rows[0]["id"]], run_kql, ops2)
+        n = sum(len(r.get("steps") or []) for r in rec.rows)
+        assert n, "oracle: metric has no steps"
         return {"required_any": [[str(n)]], "forbidden": []}
     if kind == "beyond_summary":
         ops2 = _fresh_ops_session()

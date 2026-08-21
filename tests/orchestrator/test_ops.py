@@ -229,6 +229,29 @@ class TestTopicFilteredCensus:
         assert "mentions 'ED'" in rs.universe
 
 
+class TestExactEmptyBridgeNote:
+    """Walk step 1 (Sunny, 2026-08-21): 'how is Sepsis Case defined'
+    ran exact, got an honest 0, and the one-round floor carried no
+    did-you-mean. The empty exact result now computes its own
+    near-names — bridge material is data, present even if the engine
+    never takes a second round."""
+
+    def test_empty_exact_search_notes_near_names(self):
+        rs = op_search("Sepsis", "exact", fake_kql, OpsSession())
+        assert rs.rows == [] and rs.complete is True
+        assert "Nothing is NAMED 'Sepsis' exactly" in rs.note
+        assert "ED Sepsis Screening" in rs.note
+
+    def test_exact_hit_carries_no_note(self):
+        rs = op_search("ED Sepsis Screening", "exact", fake_kql,
+                       OpsSession())
+        assert rs.rows and rs.note == ""
+
+    def test_empty_exact_with_no_near_names_stays_bare(self):
+        rs = op_search("zzz", "exact", fake_kql, OpsSession())
+        assert rs.rows == [] and rs.note == ""
+
+
 class TestRowMentions:
     """The 'mentions T' predicate is the SPEC shared by op_census and
     the suite oracle — pinned here at L0 because the suite, sharing it,

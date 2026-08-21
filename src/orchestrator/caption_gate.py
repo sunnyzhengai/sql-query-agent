@@ -214,6 +214,13 @@ def stamped_headline(result: dict) -> str:
                      "not the summary.")
     if not result.get("complete"):
         head += " Not exhaustive."
+    # An op's honesty note is machine truth too (walk step 1,
+    # 2026-08-21: the empty exact search now carries its near-names in
+    # `note` — stamping it here puts the did-you-mean in the headline,
+    # which the template floor renders verbatim).
+    note = str(result.get("note") or "").strip()
+    if note:
+        head += f" {note}"
     return head
 
 

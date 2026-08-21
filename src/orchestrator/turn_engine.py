@@ -340,8 +340,13 @@ def run_turn(session: EngineSession, question: str, chat_api,
     answered = bool(raw.get("answered")) and not violations
     quote = _norm(str(raw.get("evidence_quote", "")))
     if answered:
+        # Evidence ground = every row DISPLAYED this conversation, not
+        # just this turn's (P1/P2 — the walk's 'show me the sql' turn
+        # answered verbatim from a prior retrieve with zero new rounds
+        # and was denied a verified verdict; session.displays still
+        # holds only PRIOR turns here, extended below).
         ground = _norm(json.dumps(
-            [row for o in outputs
+            [row for o in (list(session.displays) + outputs)
              for row in ((o.get("result") or {}).get("rows") or [])],
             ensure_ascii=False))
         if len(quote) < 20 or quote.lower() not in ground.lower():

@@ -297,3 +297,29 @@ CLOSED pending Sunny's Smartness Walk (she has added five personal
 questions to step 1 of the walk doc — per protocol, any rejection
 becomes an L2 fixture before its fix ships) and the tenant republish
 for Round 4.
+
+### 2026-08-21 — Smartness Walk step 1 (Sunny, live, 10 questions incl. her 5 additions)
+PASS: metric census (28, exact); Sepsis Case Encounters definition
+(verified verdict); which-step (final_select, verified); sql-file
+probe (bridge stamped, siblings first — honesty gate also caught an
+invented '3'); step count by pronoun (122, correct anaphora).
+REJECTIONS → fixtures → fixes (1.50.5, same day):
+1. "how many metrics contain ED logic" → census said 28 (substring
+   bug, caught in code that morning, fixed in 1.50.4; her webapp
+   predated the restart). Fixture: topical ED (added in 1.50.4).
+2. "how is Sepsis Case defined" / "how is IP_SEPSIS defined" → exact
+   search, honest 0, one round, floored caption with NO did-you-mean.
+   Root cause: bridge stamp existed only on semantic results. Fix:
+   empty exact search computes its own near-names into `note`,
+   stamped into the headline (data, not prompt — pin unchanged).
+   Fixture: bridge IP_SEPSIS variant.
+3. "show me the sql of Sepsis Case Encounter" → right SQL, 0 rounds,
+   but "based on: —": the verdict ground only covered the current
+   turn's rows. Fix: evidence ground = all displayed rows this
+   conversation (P1/P2). Fixtures: sql_request family (fresh-convo).
+4. "how many steps does it have" → correct 122 via a 413-row census
+   dump (her: answer too long). Fixture: anaphora step_count oracle;
+   plus webapp 30-row fold (presentation only, headline keeps the
+   exact total).
+Also noted: drilldown criteria were summary-flavored bullets —
+Sunny's gap-check to rule on; oracle tightening parked until then.

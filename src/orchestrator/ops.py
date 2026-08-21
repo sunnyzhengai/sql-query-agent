@@ -159,12 +159,31 @@ def op_search(phrase: str, mode: str, run_kql,
              "of_metric": r["ref"] if r["kind"] == "step" else None}
             for r in rows
         ]
+        out = _attach_cards(out, run_kql)
+        note = ""
+        if not out:
+            # Walk step 1 (Sunny, 2026-08-21): 'how is Sepsis Case
+            # defined' and 'how is IP_SEPSIS defined' both ran exact,
+            # got an honest 0, and the engine stopped at one round —
+            # the floored caption carried no did-you-mean because the
+            # bridge stamp existed only on semantic results. Bridge
+            # material is DATA: the empty exact result computes its
+            # own near-names, so even a one-round miss shows them.
+            near = []
+            for r in run_kql(NAME_CONTAINS_QUERY, {"p_phrase": clean}):
+                val = r.get("business_name") or r["name"]
+                if val not in near:
+                    near.append(val)
+            if near:
+                note = (f"Nothing is NAMED {phrase.strip()!r} exactly; "
+                        f"closest by name: {', '.join(near[:5])}.")
         return session.register(
             "search", {"phrase": phrase, "mode": "exact"},
-            _attach_cards(out, run_kql),
+            out,
             complete=True,
             universe="every catalog item whose name, business name, or "
-                     "ref equals the phrase (case-insensitive)")
+                     "ref equals the phrase (case-insensitive)",
+            note=note)
     result = resolve(phrase, run_kql)
     out = [
         {"id": (c.ref if c.kind == "metric" else c.node_id),

@@ -367,6 +367,9 @@ WORKBENCH_PAGE = """<!doctype html>
        border-radius:8px; font:inherit; background:#fff; }
   .err { color:var(--bad); margin:0 0 14px; }
   .muted { color:#6b7080; font-style:italic; }
+  .foldmore { display:block; width:100%; padding:7px; border:0;
+              border-top:1px solid var(--line); background:#f7f7f4;
+              color:var(--accent); cursor:pointer; font-size:12px; }
 </style></head>
 <body>
 <header>__PRODUCT__ workbench <span>· ask about your certified metrics — every
@@ -453,8 +456,23 @@ function renderTable(rows, prefer) {
       return `<details><summary>${esc(v.slice(0, 60))}…</summary><pre>${esc(v)}</pre></details>`;
     return esc(v);
   };
-  wrap.innerHTML = `<table><thead><tr>${cols.map(c => `<th>${esc(c)}</th>`).join('')}</tr></thead>
-    <tbody>${rows.map(r => `<tr>${cols.map(c => `<td>${cell(r[c])}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+  // Walk feedback (Sunny, 2026-08-21): a 413-row census answered one
+  // count and buried it. Presentation-only fold — the stamped headline
+  // above still carries the exact total, so nothing honest is hidden.
+  const FOLD = 30;
+  const head = `<thead><tr>${cols.map(c => `<th>${esc(c)}</th>`).join('')}</tr></thead>`;
+  const tr = r => `<tr>${cols.map(c => `<td>${cell(r[c])}</td>`).join('')}</tr>`;
+  if (rows.length <= FOLD) {
+    wrap.innerHTML = `<table>${head}<tbody>${rows.map(tr).join('')}</tbody></table>`;
+    return wrap;
+  }
+  wrap.innerHTML = `<table>${head}<tbody>${rows.slice(0, FOLD).map(tr).join('')}</tbody></table>`;
+  const more = el(`<button class="foldmore">show all ${rows.length} rows (${FOLD} shown)</button>`);
+  more.onclick = () => {
+    wrap.querySelector('tbody').innerHTML = rows.map(tr).join('');
+    more.remove();
+  };
+  wrap.appendChild(more);
   return wrap;
 }
 

@@ -5,6 +5,7 @@ floor — stilted but true, visibly corrected."""
 from src.orchestrator.caption_gate import (
     caption_violations,
     enforce_caption,
+    stamped_headline,
     template_caption,
 )
 
@@ -186,6 +187,38 @@ class TestBridgeAndDrilldownStamps:
         head = stamped_headline(r)
         assert "2 calculation step id(s)" in head
         assert "criteria live in the step records" in head
+
+
+class TestNoteInHeadline:
+    """Walk step 1 (Sunny, 2026-08-21): the empty exact search carries
+    its near-names in `note`; the headline stamps it so the template
+    floor renders the did-you-mean verbatim."""
+
+    def test_note_is_stamped_into_the_headline(self):
+        r = {"ref": "R1", "op": "search",
+             "params": {"phrase": "Sepsis Case", "mode": "exact"},
+             "rows": [], "complete": True, "universe": "u",
+             "note": "Nothing is NAMED 'Sepsis Case' exactly; closest "
+                     "by name: Sepsis Case Details, Sepsis Case "
+                     "Encounters."}
+        head = stamped_headline(r)
+        assert "closest by name: Sepsis Case Details" in head
+
+    def test_noted_headline_engages_the_siblings_first_ruling(self):
+        r = {"ref": "R1", "op": "search",
+             "params": {"phrase": "Sepsis Case", "mode": "exact"},
+             "rows": [], "complete": True, "universe": "u",
+             "note": "Nothing is NAMED 'Sepsis Case' exactly; closest "
+                     "by name: Sepsis Case Details."}
+        r["headline"] = stamped_headline(r)
+        out = [{"component": {"op": "search"}, "result": r}]
+        bad = "Semantically related: Severe Sepsis Episodes. Also " \
+              "close by name: Sepsis Case Details."
+        assert any("presented FIRST" in v
+                   for v in caption_violations(bad, out)) is False
+        # the stamped sibling IS mentioned and nothing else displayed
+        # competes, so no violation — the ruling needs a displayed
+        # competitor named earlier, which empty rows cannot supply
 
 
 class TestStampVerification:
