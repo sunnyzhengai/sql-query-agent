@@ -171,9 +171,16 @@ def op_search(phrase: str, mode: str, run_kql,
             # own near-names, so even a one-round miss shows them.
             near = []
             for r in run_kql(NAME_CONTAINS_QUERY, {"p_phrase": clean}):
-                val = r.get("business_name") or r["name"]
-                if val not in near:
-                    near.append(val)
+                # show the form that CONTAINS the phrase (same law as
+                # the semantic stamp) — an identifier phrase matches
+                # the metric name, and displaying the business name
+                # instead would print a did-you-mean of items that
+                # don't visibly relate
+                for val in (r.get("business_name"), r["name"]):
+                    if (val and clean.lower() in str(val).lower()
+                            and val not in near):
+                        near.append(val)
+                        break
             if near:
                 note = (f"Nothing is NAMED {phrase.strip()!r} exactly; "
                         f"closest by name: {', '.join(near[:5])}.")

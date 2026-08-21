@@ -159,16 +159,24 @@ def build_oracle(fixture: dict, run_kql) -> dict:
         ops2 = _fresh_ops_session()
         rs = op_census("metric", run_kql, ops2)
         phrase = fixture["phrase"].lower()
-        near = [r["name"] for r in rs.rows
-                if phrase in (r.get("business_name") or r["name"]).lower()
-                ] + [r.get("business_name") for r in rs.rows
-                     if r.get("business_name")
-                     and phrase in r["business_name"].lower()]
-        near = sorted({n for n in near if n})
+        # The sibling set is the MATCHED display forms — identifier
+        # phrases (walk find: 'IP_SEPSIS') match metric names, never
+        # the English business names, so both fields are checked and
+        # the containing form is what a did-you-mean would print.
+        near = sorted({
+            str(v) for r in rs.rows
+            for v in (r.get("business_name"), r.get("name"))
+            if v and phrase in str(v).lower()})
         assert near, "oracle: no near-name siblings found"
-        others = sorted({n for r in rs.rows
+        # A sibling row is a sibling wholly: its alternate surface form
+        # must not land in the competitors list.
+        def _is_sib(r):
+            return any(phrase in str(v).lower()
+                       for v in (r.get("business_name"), r.get("name"))
+                       if v)
+        others = sorted({str(n) for r in rs.rows if not _is_sib(r)
                          for n in (r.get("business_name"), r.get("name"))
-                         if n and n not in near})
+                         if n})
         return {"required_any": [near],
                 "siblings_first_vs": others,
                 "forbidden": ["no metrics exist",

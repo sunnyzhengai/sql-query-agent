@@ -251,6 +251,15 @@ class TestExactEmptyBridgeNote:
         rs = op_search("zzz", "exact", fake_kql, OpsSession())
         assert rs.rows == [] and rs.note == ""
 
+    def test_identifier_phrase_notes_the_matched_form(self):
+        """Walk find: 'IP_SEPSIS' matches metric NAMES, never the
+        English business names — the note must print the containing
+        form, not a business name that doesn't visibly relate."""
+        rs = op_search("USP_ED", "exact", fake_kql, OpsSession())
+        assert rs.rows == []
+        assert "USP_ED_Sepsis" in rs.note
+        assert "ED Sepsis Screening" not in rs.note
+
 
 class TestRowMentions:
     """The 'mentions T' predicate is the SPEC shared by op_census and

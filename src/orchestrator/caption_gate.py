@@ -92,10 +92,14 @@ def caption_violations(caption: str, outputs: "list[dict]") -> "list[str]":
         if not m2:
             continue
         stamped = [n.strip() for n in m2.group(1).split(",") if n.strip()]
+        # a stamped sibling row is a sibling wholly — its alternate
+        # surface form (business vs metric name) is not a competitor
         others = sorted({
             str(v) for row in (r.get("rows") or [])
+            if not any(str(x) in stamped for x in
+                       (row.get("business_name"), row.get("name")) if x)
             for v in (row.get("business_name"), row.get("name"))
-            if v and str(v) not in stamped})
+            if v})
         low = caption.lower()
         pos_sib = [low.find(n.lower()) for n in stamped]
         pos_sib = min((p for p in pos_sib if p >= 0), default=None)
