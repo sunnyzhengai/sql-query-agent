@@ -157,3 +157,15 @@ Findings, stated plainly:
    justification (the "stop sharpening prompts for mini" directive is
    answered by the experiment it asked for: sharpening was and
    remains the right lever).
+
+### 2026-08-20 ~22:4x — Iteration 3 (1.45.0) full suite + iteration 4 (1.46.0) shipped
+Iter-3 scorecard (mini, n=6): census 1.00/1.00 · definition 0.83/1.00 ·
+topical 1.00/1.00 · anaphora 0.00→0.67 (re-point + display fix) ·
+bridge 0.00 (hon 0.67) · drilldown 0.33 (hon 1.00). Transcript findings:
+(a) ALL four drilldown "misses" carried the required facts — graded
+down only for humble answered=false → grader calibration 2: facts
+score, the verdict only polices honesty; (b) bridge material was on
+screen but the captioner synthesized over it → the containment set is
+now STAMPED in the search headline ("Nothing is NAMED 'X' exactly;
+closest by name: ..."), and retrieve headlines stamp the step pointer.
+1.46.0 shipped with both + tests; iteration-4 full suite running.
