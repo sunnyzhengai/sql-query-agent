@@ -21,6 +21,7 @@ step says otherwise. Mark each step pass/fail with one sentence.
    - "how is Sepsis Case defined"
    - "in Severe Sepsis Episodes, how is a patient diagnosed with
      severe sepsis"
+   - I added "how many steps does it have"
    Pass: exact count; real definition; a did-you-mean over the two
    near-name siblings; step-level criteria (not the summary blurb).
 
