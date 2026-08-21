@@ -100,3 +100,30 @@ build-stopper is active; no optimization proceeds on mini. The
 model-tier experiment's gpt-4o leg auto-started (identical suite,
 LLM_MODEL override only — zero harness/prompt changes between the
 runs).
+
+### 2026-08-20 ~21:5x — Fabric refresh shipped (1.44.0, CI green) + Round-4 runner built
+- output_metric_logic gains decision_summary (PHI-redacted, honest
+  cap) / table_count / twin_verdict; 400 consumes
+  graph_decision_sites (contract-declared — the consumer police
+  caught the undeclared read). Drill-down/sameness/count questions
+  are now single-row reads on the Data Agent surface (ADR 0020).
+- LPG export: stepCount/tableCount as Metric node properties — the
+  open 0030 item CLOSED; count questions are property reads.
+- Data Agent instructions updated to read the new surfaces (net
+  growth minimal; no casebook).
+- devtools/rematch_round4.py: both-surface scripted runner, same
+  oracles as the suite + the historical count-oracle family
+  (step_count derived live), latency p50, scorecard writer. Fabric
+  side runs via the MCP adapter headlessly.
+
+## PARKED (for Sunny)
+
+- Round-4 EXECUTION is blocked on tenant work only Sunny can do:
+  publish env with the 1.44.0 wheel, rerun 400→800, re-Load the
+  Graph Model, republish the Data Agent with the updated
+  instructions. The runner refuses stale surfaces by protocol.
+- Any Marketplace-facing claim from Round-4 results (constitution).
+- Minimum ask-path model tier: will be RECORDED as a prerequisite
+  doc once the experiment clears — the tier CHOICE (which deployment
+  customers must provision) is Sunny's pricing/product call to
+  ratify.
