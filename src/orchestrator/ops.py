@@ -173,7 +173,7 @@ def _containment_rows(phrase: str, run_kql) -> "list[dict]":
     if not productive:
         return []
     return list(run_kql(NAME_CONTAINS_TOKENS_QUERY,
-                        {"p_tokens": productive}))
+                        {"p_tokens": " ".join(productive)}))
 
 
 def _bridge_note(phrase: str, run_kql) -> str:

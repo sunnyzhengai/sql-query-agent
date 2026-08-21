@@ -427,3 +427,14 @@ stamps "N decision site(s) carry the WHERE/CASE criteria — retrieve
 the step records to read them" — the hop-2 pointer is machine truth
 on screen, same mechanism that flipped bridge. (1.51.1 CI red was
 ruff import-order only; fixed, CI green.)
+
+### 2026-08-21 — 1.51.2 board → 1.51.3 (live serialization bug in degraded containment)
+1.51.2 mini: anaphora 1.00 (decision-count stamp worked) · five
+families 1.00 · drilldown 0.67 BELOW. Transcripts: the degraded
+containment union SILENTLY RETURNED 0 LIVE — NAME_CONTAINS_TOKENS
+declared a dynamic query parameter the v2 REST body doesn't reliably
+deserialize; the L0 fake passed because it never exercises
+serialization. 1.51.3: p_tokens is a space-joined string, split
+server-side — verified live ('severe sepsis' → Severe/Non-Severe
+Sepsis Episodes). Lesson for the strata: a query with a nontrivial
+parameter TYPE needs one live probe before its first suite run.

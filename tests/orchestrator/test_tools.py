@@ -125,7 +125,7 @@ def fake_kql(query, params):
             ]
         return []
     if query == NAME_CONTAINS_TOKENS_QUERY:
-        toks = [str(t).lower() for t in params["p_tokens"]]
+        toks = params["p_tokens"].lower().split()
         return [{"node_id": f"canonical:{ref}", "kind": "metric",
                  "ref": ref, "name": row["metric_name"],
                  "business_name": row["business_name"]}

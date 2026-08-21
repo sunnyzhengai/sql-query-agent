@@ -92,10 +92,14 @@ BATCH_FRAGMENTS_QUERY = (
 # full-phrase containment found nothing and no sibling stamp fired).
 # has_all is Kusto term matching: every token must appear in the
 # name/business-name text.
+# p_tokens is a SPACE-JOINED string, split server-side — a dynamic
+# query parameter is not reliably deserialized by the v2 REST body
+# (live find 2026-08-21: the degraded-containment union silently
+# returned 0 rows in the suite while the L0 fake passed).
 NAME_CONTAINS_TOKENS_QUERY = (
-    "declare query_parameters(p_tokens:dynamic);\n"
+    "declare query_parameters(p_tokens:string);\n"
     "semantic_catalog\n"
-    "| where strcat(name, ' ', business_name) has_all (p_tokens)\n"
+    "| where strcat(name, ' ', business_name) has_all (split(p_tokens, ' '))\n"
     "| project node_id, ['kind'], ['ref'], name, business_name\n"
     "| order by name asc, node_id asc\n"
     "| take 10"
