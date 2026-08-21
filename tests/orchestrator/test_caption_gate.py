@@ -319,11 +319,20 @@ class TestBridgeAcceptanceRuling:
     def test_siblings_absent_violates_when_candidates_are_discussed(self):
         out = caption_violations(
             "Severe Sepsis Episodes covers this topic.", [self.RESULT])
-        assert any("presented FIRST" in v for v in out)
+        assert any("MANDATORY" in v for v in out)
 
-    def test_no_candidate_mentions_is_not_forced(self):
-        # a caption that discusses none of the displayed candidates is
-        # not forced to bridge — the floor renders the stamp anyway
-        assert caption_violations(
+    def test_anchorless_content_without_siblings_violates(self):
+        """Corpse (1.52.2 suite, 2026-08-21): the caption synthesized
+        'criteria' naming zero displayed candidates and no ref — the
+        siblings are MANDATORY, not first-if-mentioned."""
+        out = caption_violations(
             "I could not resolve that name to a certified item.",
+            [self.RESULT])
+        assert any("MANDATORY" in v for v in out)
+
+    def test_ref_citation_satisfies_presence(self):
+        # pointing AT the display is presenting it — the stamped
+        # headline carries the siblings
+        assert caption_violations(
+            "The closest certified items are shown in R1.",
             [self.RESULT]) == []

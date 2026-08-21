@@ -500,3 +500,18 @@ pressure, family failure, never a build freeze. Stamp-contradicting
 declaration counter added as measured-only telemetry (M2 signal).
 The 1.52.1 re-earn run was restarted so the honesty read uses the
 ratified lens, not the interim grader.
+
+### 2026-08-21 — 1.52.2 re-earn: DRILLDOWN 1.00 under the tightened oracle; one bridge corpse → 1.52.3
+Board: drilldown 1.00 (decision layer + continuation, tightened
+oracle met) · anaphora 1.00 · definition/topical/sql 1.00 · census
+0.83 PASS · bridge 0.92/honesty 0.92 → rc=2. Telemetry: stamp-
+contradicting declarations 0. The corpse: semantic search stamped
+the siblings, the caption synthesized 'criteria' naming ZERO
+displayed candidates (even mangled a metric name into 'Severe Sepsis
+Cases'), declared answered — the ordering check only engaged on a
+mention; mention none, claim anyway was the evasion. 1.52.3: sibling
+PRESENCE is mandatory per the ruling's own word — a caption over a
+bridge-stamped result must name a sibling OR cite a displayed ref
+(pointing at the display presents it); anchorless content floors.
+Duty scoped to THIS TURN's stamps (a prior turn's stamp imposes
+nothing later). Corpse caged in the gate tests.

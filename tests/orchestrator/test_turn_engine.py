@@ -68,12 +68,12 @@ class TestLoop:
         run_turn(s, "find ed sepsis", scripted_engine([
             {"calls": [("search", {"phrase": "ed sepsis",
                                    "mode": "semantic"})]},
-            {"text": "Shown."}, {"verdict": {"answered": False}},
+            {"text": "Shown in R1."}, {"verdict": {"answered": False}},
         ]), fake_kql)
         n_before = len(s.history)
         out2 = run_turn(s, "retrieve the first one", scripted_engine([
             {"calls": [("retrieve", {"ids": [REF_A]})]},
-            {"text": "Retrieved."}, {"verdict": {"answered": False}},
+            {"text": "Retrieved in R2."}, {"verdict": {"answered": False}},
         ]), fake_kql)
         # the id surfaced in turn 1 is retrievable in turn 2 (read
         # guarantee crosses turns because the SESSION persists)
@@ -94,7 +94,7 @@ class TestLoop:
         out = run_turn(s, "q", scripted_engine([
             {"calls": [("search", {"phrase": "x", "mode": "exact"}),
                        ("search", {"phrase": "x", "mode": "exact"})]},
-            {"text": "done"}, {"verdict": {"answered": False}},
+            {"text": "done — see R2"}, {"verdict": {"answered": False}},
         ]), fake_kql)
         assert "already ran this turn" in out["outputs"][1]["error"]
         # P6: the refusal went INTO the conversation as a tool result
@@ -113,7 +113,7 @@ class TestLoop:
         run_turn(s, "find ed sepsis", scripted_engine([
             {"calls": [("search", {"phrase": "ed sepsis",
                                    "mode": "semantic"})]},
-            {"text": "Shown."}, {"verdict": {"answered": False}},
+            {"text": "Shown in R1."}, {"verdict": {"answered": False}},
         ]), fake_kql)
         out = run_turn(s, "what does it measure?", scripted_engine([
             {"text": "It measures ED Sepsis Screening."},
@@ -131,7 +131,7 @@ class TestLoop:
         run_turn(s, "find ed sepsis", scripted_engine([
             {"calls": [("search", {"phrase": "ed sepsis",
                                    "mode": "semantic"})]},
-            {"text": "Shown."}, {"verdict": {"answered": False}},
+            {"text": "Shown in R1."}, {"verdict": {"answered": False}},
         ]), fake_kql)
         n_rows = len(s.displays[0]["result"]["rows"])
         out = run_turn(s, "how many were shown?", scripted_engine([
@@ -146,7 +146,7 @@ class TestLoop:
         run_turn(s, "find ed sepsis", scripted_engine([
             {"calls": [("search", {"phrase": "ed sepsis",
                                    "mode": "semantic"})]},
-            {"text": "Shown."}, {"verdict": {"answered": False}},
+            {"text": "Shown in R1."}, {"verdict": {"answered": False}},
         ]), fake_kql)
         out = run_turn(s, "what does it measure?", scripted_engine([
             {"text": "It measures downstream compliance windows."},
@@ -253,19 +253,19 @@ class TestBoundary:
         out = run_turn(s, "q", scripted_engine([
             {"calls": [("search", {"phrase": "ed sepsis",
                                    "mode": "semantic"})]},
-            {"text": "It is the screening metric."},
+            {"text": "It is the screening metric — see R1."},
             {"verdict": {"answered": True,
                          "evidence_quote": "totally invented quote of "
                                            "sufficient length"}},
             # quote rejection -> continuation pass; still no evidence
-            {"text": "It is the screening metric."},
+            {"text": "It is the screening metric — see R1."},
             {"verdict": {"answered": False}},
         ]), fake_kql)
         assert out["answered"] is False
         out2 = run_turn(EngineSession(), "q", scripted_engine([
             {"calls": [("search", {"phrase": "ed sepsis",
                                    "mode": "semantic"})]},
-            {"text": "It is the screening metric."},
+            {"text": "It is the screening metric — see R1."},
             {"verdict": {"answered": True,
                          "evidence_quote": GOOD_QUOTE}},
         ]), fake_kql)
@@ -364,7 +364,7 @@ class TestPGroup:
             {"calls": [("search", {"phrase": "ed sepsis",
                                    "mode": "semantic"})]},
             {"calls": [("retrieve", {"ids": [REF_A]})]},
-            {"text": "done"},
+            {"text": "done — see R2"},
             {"verdict": {"answered": False}},
         ]), fake_kql)
         # request #2 (after round 1 executed) must contain round 1's
@@ -390,7 +390,7 @@ class TestPGroup:
         s = EngineSession()
         run_turn(s, "q", capturing([
             {"calls": [("search", {"phrase": "x", "mode": "exact"})]},
-            {"text": "done"},
+            {"text": "done — see R2"},
             {"verdict": {"answered": False}},
         ]), fake_kql)
         # every loop call unforced; exactly ONE forced call (verdict)
@@ -413,7 +413,7 @@ class TestPGroup:
             {"calls": [("census", {"kind": "metric"})]},
             {"calls": [("search", {"phrase": "ed sepsis",
                                    "mode": "semantic"})]},
-            {"text": "recovered"},
+            {"text": "recovered — see R2"},
             {"verdict": {"answered": False}},
         ]), flaky_kql)
         assert "error" in out["outputs"][0]          # observed

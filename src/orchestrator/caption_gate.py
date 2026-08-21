@@ -62,14 +62,22 @@ def _results(outputs: "list[dict]") -> "list[dict]":
     return [o["result"] for o in outputs if o.get("result")]
 
 
-def caption_violations(caption: str, outputs: "list[dict]") -> "list[str]":
+def caption_violations(caption: str, outputs: "list[dict]",
+                       ground_outputs: "list[dict] | None" = None
+                       ) -> "list[str]":
     """Deterministic honesty checks. Empty list = the caption's claims
-    are supported by what is on screen."""
+    are supported by what is on screen.
+
+    `ground_outputs` (one mind): what claims are checked AGAINST —
+    every result displayed this conversation. The bridge duty below
+    binds to THIS TURN's results (`outputs`) only: a prior turn's
+    sibling stamp must not impose its duty on every later caption."""
+    grounds = ground_outputs if ground_outputs is not None else outputs
     violations: "list[str]" = []
-    results = _results(outputs)
+    results = _results(grounds)
     text = _REF_TOKEN.sub(" ", caption)
 
-    ground = _ground_numbers(outputs)
+    ground = _ground_numbers(grounds)
     for num in set(_NUMBERS.findall(text)):
         if num not in ground:
             violations.append(
@@ -92,8 +100,9 @@ def caption_violations(caption: str, outputs: "list[dict]") -> "list[str]":
     # search ('Sepsis' after 'Sepsis Case') stamps near-everything and
     # must not dilute the duty. Competitors are the displayed
     # candidate names across ALL results.
+    turn_results = _results(outputs)
     stamped_hits = [
-        (r, m) for r in results
+        (r, m) for r in turn_results
         for m in [_BRIDGE_STAMP.search(str(r.get("headline") or ""))]
         if m]
     if stamped_hits:
@@ -105,7 +114,7 @@ def caption_violations(caption: str, outputs: "list[dict]") -> "list[str]":
         # a stamped sibling row is a sibling wholly — its alternate
         # surface form (business vs metric name) is not a competitor
         others = sorted({
-            str(v) for r in results
+            str(v) for r in turn_results
             for row in (r.get("rows") or [])
             if not any(str(x) in stamped for x in
                        (row.get("business_name"), row.get("name")) if x)
@@ -116,10 +125,21 @@ def caption_violations(caption: str, outputs: "list[dict]") -> "list[str]":
         pos_sib = min((p for p in pos_sib if p >= 0), default=None)
         pos_oth = [low.find(n.lower()) for n in others]
         pos_oth = min((p for p in pos_oth if p >= 0), default=None)
-        mentions_candidates = pos_sib is not None or pos_oth is not None
-        if mentions_candidates and (
-                pos_sib is None
-                or (pos_oth is not None and pos_oth < pos_sib)):
+        # PRESENCE is mandatory, not just ordering (corpse 2026-08-21,
+        # ratified-line conviction: the caption synthesized 'criteria'
+        # from other metrics' summaries while naming ZERO displayed
+        # candidates — even mangling a metric's name — and the old
+        # check never fired because it only engaged on a mention).
+        # A caption that cites a displayed ref (R1, ...) is pointing
+        # AT the display, whose stamped headline carries the siblings
+        # — that satisfies presence; a caption naming neither a
+        # sibling nor a ref presents content anchored to nothing.
+        if pos_sib is None and not _REF_TOKEN.search(caption):
+            violations.append(
+                "bridge acceptance (Sunny, 2026-08-21): the stamped "
+                f"name-siblings ({', '.join(stamped[:3])}) are "
+                "MANDATORY — present at least one, first")
+        elif pos_oth is not None and pos_oth < pos_sib:
             violations.append(
                 "bridge acceptance (Sunny, 2026-08-21): the stamped "
                 f"name-siblings ({', '.join(stamped[:3])}) must be "
@@ -271,7 +291,8 @@ def enforce_caption(caption: str, outputs: "list[dict]",
     a zero-round answer restated a count from a prior turn's rows and
     was floored as an invented number). The FLOOR still renders only
     this turn's outputs."""
-    violations = caption_violations(caption, ground or outputs)
+    violations = caption_violations(caption, outputs,
+                                    ground_outputs=ground)
     if not violations or not caption:
         return (caption or template_caption(outputs)), violations
     return template_caption(outputs), violations

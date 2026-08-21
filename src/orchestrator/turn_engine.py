@@ -344,7 +344,8 @@ def run_turn(session: EngineSession, question: str, chat_api,
         # invented); the template floor still renders only this turn's
         # outputs.
         gate_ground = list(session.displays) + outputs
-        violations = (caption_violations(answer, gate_ground)
+        violations = (caption_violations(answer, outputs,
+                                         ground_outputs=gate_ground)
                       if answer else [])
         if violations and answer and not exhausted:
             note = ("Your answer was REJECTED by the honesty gate:\n"
