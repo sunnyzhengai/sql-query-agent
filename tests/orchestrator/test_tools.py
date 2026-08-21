@@ -13,6 +13,7 @@ from src.orchestrator.tools import (
     LIST_CATALOG_QUERY,
     NAME_CONTAINS_QUERY,
     STEPS_OF_QUERY,
+    TABLE_USED_BY_QUERY,
     Session,
     ToolError,
     check_same_logic,
@@ -70,6 +71,18 @@ def fake_kql(query, params):
                      "ref": REF_A, "name": "USP_ED_Sepsis",
                      "business_name": "ED Sepsis Screening"}]
         return []
+    if query == TABLE_USED_BY_QUERY:
+        # the fake graph: technical table IP_SEPSIS is read by both
+        # metrics (walk find 2026-08-21 — table identity for phrases
+        # the catalog surfaces cannot see)
+        if params["p_phrase"].lower() in "ip_sepsis":
+            return [
+                {"table_name": "IP_SEPSIS", "ref": REF_A,
+                 "business_name": "ED Sepsis Screening"},
+                {"table_name": "IP_SEPSIS", "ref": REF_B,
+                 "business_name": "ED Sepsis (Regulatory)"},
+            ]
+        return []
     if query == NAME_CONTAINS_QUERY:
         p = params["p_phrase"].lower()
         return [{"node_id": f"canonical:{ref}", "kind": "metric",
@@ -85,6 +98,11 @@ def fake_kql(query, params):
                      "ref": ref, "name": row["metric_name"],
                      "business_name": row["business_name"]}
                     for ref, row in sorted(METRIC_ROWS.items())]
+        if kind == "step":
+            return [{"node_id": s, "kind": "step",
+                     "ref": s.split(":")[1], "name": s.split(":")[-1],
+                     "business_name": ""}
+                    for s in sorted(FRAGMENTS)]
         return []
     if query == METRIC_FACTS_QUERY:
         row = METRIC_ROWS.get(params["p_ref"])

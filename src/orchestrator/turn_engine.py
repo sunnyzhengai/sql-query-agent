@@ -308,7 +308,13 @@ def run_turn(session: EngineSession, question: str, chat_api,
         session.history.append({"role": "assistant", "content": answer})
 
     # ---- the boundary (P5) ------------------------------------------
-    violations = caption_violations(answer, outputs) if answer else []
+    # Claims are checked against every result displayed this
+    # conversation (P1/P2 — the walk's zero-round '122 steps' answer
+    # restated a prior turn's rows and was floored as invented); the
+    # template floor still renders only this turn's outputs.
+    gate_ground = list(session.displays) + outputs
+    violations = (caption_violations(answer, gate_ground)
+                  if answer else [])
     if violations and answer and not exhausted:
         note = ("Your answer was REJECTED by the honesty gate:\n"
                 + "\n".join(f"- {v}" for v in violations)
@@ -321,7 +327,8 @@ def run_turn(session: EngineSession, question: str, chat_api,
             answer = retried
             session.history.append({"role": "assistant",
                                     "content": answer})
-    answer, violations = enforce_caption(answer, outputs)
+    answer, violations = enforce_caption(answer, outputs,
+                                         ground=gate_ground)
 
     # The typed verdict — the ONE legal form-fill (P3), quote verified.
     raw = {}

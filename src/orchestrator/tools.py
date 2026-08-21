@@ -87,6 +87,30 @@ BATCH_FRAGMENTS_QUERY = (
     "| project node_id, name, description, properties"
 )
 
+# Source-table identity (walk find 2026-08-21, Sunny: "how is
+# IP_SEPSIS defined" — the phrase names a TECHNICAL node, which the
+# semantic_catalog surfaces cannot see; the model census'd steps, got
+# an honest 0, and concluded 'cannot be provided' while the graph held
+# the answer). Technical nodes + transform_to_technical edges resolve
+# a table-like phrase to the certified metrics that read it.
+TABLE_USED_BY_QUERY = (
+    "declare query_parameters(p_phrase:string);\n"
+    "graph_nodes\n"
+    "| where node_id startswith 'tech:' and name contains p_phrase\n"
+    "| project tech_id = node_id, table_name = name\n"
+    "| join kind=inner (graph_edges\n"
+    "    | where edge_type == 'transform_to_technical'\n"
+    "    | project tech_id = target_id, source_id) on tech_id\n"
+    "| extend ['ref'] = tostring(split(source_id, ':')[1])\n"
+    "| distinct table_name, ['ref']\n"
+    "| join kind=leftouter (semantic_catalog\n"
+    "    | where ['kind'] == 'metric'\n"
+    "    | project ['ref'], business_name) on ['ref']\n"
+    "| project table_name, ['ref'], business_name\n"
+    "| order by table_name asc, ['ref'] asc\n"
+    "| take 30"
+)
+
 # Consumption-layer links (ADR 0040): deterministic edges from TMDL
 # partition lineage, exposed via the graph_edges shortcut.
 REPORTS_OF_METRIC_QUERY = (

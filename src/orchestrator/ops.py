@@ -32,6 +32,7 @@ from src.orchestrator.tools import (
     LIST_CATALOG_QUERY,
     NAME_CONTAINS_QUERY,
     STEPS_OF_QUERY,
+    TABLE_USED_BY_QUERY,
     _cap,
     _content_key,
     _diff,
@@ -143,6 +144,43 @@ def _attach_cards(rows: "list[dict]", run_kql) -> "list[dict]":
                 or r.get("business_name") or None)
     return rows
 
+def _bridge_note(phrase: str, run_kql) -> str:
+    """Bridge material for an honest-empty result whose parameter is a
+    phrase — computed as DATA, stamped into the headline, present no
+    matter which op the model chose or how few rounds it took.
+
+    Two clauses (walk finds, Sunny 2026-08-21): near-NAMES from
+    catalog containment (shown in the form that contains the phrase),
+    and source-TABLE identity from the graph's technical nodes — 'how
+    is IP_SEPSIS defined' names a table the catalog surfaces cannot
+    see, and the honest zero must say so instead of 'cannot be
+    provided'."""
+    clean = phrase.strip()
+    if not clean:
+        return ""
+    parts = []
+    near: "list[str]" = []
+    for r in run_kql(NAME_CONTAINS_QUERY, {"p_phrase": clean}):
+        for val in (r.get("business_name"), r["name"]):
+            if (val and clean.lower() in str(val).lower()
+                    and val not in near):
+                near.append(val)
+                break
+    if near:
+        parts.append(f"Nothing is NAMED {clean!r} exactly; closest by "
+                     f"name: {', '.join(near[:5])}.")
+    tables: "dict[str, list[str]]" = {}
+    for r in run_kql(TABLE_USED_BY_QUERY, {"p_phrase": clean}):
+        disp = r.get("business_name") or r.get("ref") or ""
+        tables.setdefault(str(r["table_name"]), []).append(str(disp))
+    for tname in sorted(tables)[:2]:
+        readers = sorted({d for d in tables[tname] if d})
+        parts.append(f"{tname!r} is a SOURCE TABLE read by "
+                     f"{len(readers)} certified metric(s): "
+                     f"{', '.join(readers[:5])}.")
+    return " ".join(parts)
+
+
 def op_search(phrase: str, mode: str, run_kql,
               session: OpsSession) -> ResultSet:
     if mode not in ("semantic", "exact"):
@@ -160,30 +198,11 @@ def op_search(phrase: str, mode: str, run_kql,
             for r in rows
         ]
         out = _attach_cards(out, run_kql)
-        note = ""
-        if not out:
-            # Walk step 1 (Sunny, 2026-08-21): 'how is Sepsis Case
-            # defined' and 'how is IP_SEPSIS defined' both ran exact,
-            # got an honest 0, and the engine stopped at one round —
-            # the floored caption carried no did-you-mean because the
-            # bridge stamp existed only on semantic results. Bridge
-            # material is DATA: the empty exact result computes its
-            # own near-names, so even a one-round miss shows them.
-            near = []
-            for r in run_kql(NAME_CONTAINS_QUERY, {"p_phrase": clean}):
-                # show the form that CONTAINS the phrase (same law as
-                # the semantic stamp) — an identifier phrase matches
-                # the metric name, and displaying the business name
-                # instead would print a did-you-mean of items that
-                # don't visibly relate
-                for val in (r.get("business_name"), r["name"]):
-                    if (val and clean.lower() in str(val).lower()
-                            and val not in near):
-                        near.append(val)
-                        break
-            if near:
-                note = (f"Nothing is NAMED {phrase.strip()!r} exactly; "
-                        f"closest by name: {', '.join(near[:5])}.")
+        # Walk step 1 (Sunny, 2026-08-21): 'how is Sepsis Case
+        # defined' ran exact, got an honest 0, and the engine stopped
+        # at one round — the floored caption carried no did-you-mean
+        # because the bridge stamp existed only on semantic results.
+        note = _bridge_note(clean, run_kql) if not out else ""
         return session.register(
             "search", {"phrase": phrase, "mode": "exact"},
             out,
@@ -232,8 +251,11 @@ def normalize_kind(kind: str) -> "str | None":
 
 
 # The fields the topic-filtered census universe sentence names. The
-# filter scans exactly these — never the serialized row.
-_MENTION_FIELDS = ("name", "business_name", "description")
+# filter scans exactly these — never the serialized row. of_metric
+# joined 1.50.7 (walk find: census step contains='USP_Severe_Sepsis'
+# returned 0 because a step's parent REF lived in no scanned field —
+# the model's op choice was right and the data said no).
+_MENTION_FIELDS = ("name", "business_name", "description", "of_metric")
 
 
 def row_mentions(row: dict, needle: str) -> bool:
@@ -284,13 +306,43 @@ def op_census(kind: str, run_kql, session: OpsSession,
         # is a DATA operation the store answers exactly — filter the
         # complete enumeration by the shared row_mentions predicate.
         # Question-agnostic parameter, not flow.
+        full = out
         out = [r for r in out if row_mentions(r, contains)]
         params["contains"] = contains.strip()
         universe = (f"every {k} in the certified catalog whose name, "
-                    f"business name, or description mentions "
-                    f"{contains.strip()!r} — the count is exact")
+                    f"business name, description, or parent metric "
+                    f"mentions {contains.strip()!r} — the count is exact")
+    note = ""
+    if contains and contains.strip() and not out:
+        # Same law as the empty exact search (enumerate-all-cases): a
+        # zero-row FILTERED census is an honest empty holding a phrase
+        # — it carries the bridge note, whichever op the model chose
+        # (walk find 2026-08-21: census step contains='IP_SEPSIS' → 0
+        # → "cannot be provided", while the graph knew the table).
+        note = _bridge_note(contains, run_kql)
+        # Multi-word needles (suite find, same day: the model filtered
+        # by the user's literal words 'ED logic' — the filler noun
+        # matched nothing and the honest 0 read as 'none'). Per-token
+        # counts are DATA the store answers exactly; stamping them
+        # puts the true count in front of the captioner.
+        tokens = [t for t in re.split(r"[^A-Za-z0-9_]+",
+                                      contains.strip())
+                  if len(t) >= 2]
+        if len(tokens) > 1:
+            per = []
+            for tok in tokens:
+                hits = [r for r in full if row_mentions(r, tok)]
+                if hits:
+                    names = [str(r.get("business_name") or r["name"])
+                             for r in hits]
+                    per.append(f"{tok!r} alone is mentioned by "
+                               f"{len(hits)} {k}(s): "
+                               f"{', '.join(names[:5])}")
+            if per:
+                note += (f" No {k} mentions {contains.strip()!r} as a "
+                         f"phrase; " + "; ".join(per) + ".")
     return session.register("census", params, out, complete=True,
-                            universe=universe)
+                            universe=universe, note=note.strip())
 
 
 # --- retrieve: one read primitive (facts + structure merged) ----------

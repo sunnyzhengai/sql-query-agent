@@ -344,6 +344,15 @@ def main() -> None:
         if not args.smoke:
             questions += paraphrases(fixture["question"],
                                      PARAPHRASES_PER_QUESTION)
+            if trail_prefix:
+                # Trail fixtures measure pronoun resolution — a
+                # paraphrase that lost the anaphor measures nothing
+                # (suite find 2026-08-21: 'What is the step total?'
+                # is honestly ambiguous, and the literal catalog-wide
+                # 413 was graded against the metric-scoped 122).
+                questions = [questions[0]] + [
+                    q for q in questions[1:]
+                    if re.search(r"\b(it|its|this|that)\b", q, re.I)]
         for q in questions:
             turn = run_trail(trail_prefix + [q], chat_api, run_kql)
             g = grade(turn["cap"].get("caption", ""), turn["cap"], oracle,

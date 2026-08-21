@@ -122,6 +122,25 @@ class TestLoop:
         assert out["rounds"] == 0
         assert out["answered"] is True
 
+    def test_prior_turn_numbers_are_legal_caption_ground(self):
+        """Walk find (Sunny, 2026-08-21): a zero-round answer restated
+        a count from a prior turn's displayed rows and the caption
+        gate floored it as an INVENTED number — in one mind the whole
+        conversation's displays are the ground."""
+        s = EngineSession()
+        run_turn(s, "find ed sepsis", scripted_engine([
+            {"calls": [("search", {"phrase": "ed sepsis",
+                                   "mode": "semantic"})]},
+            {"text": "Shown."}, {"verdict": {"answered": False}},
+        ]), fake_kql)
+        n_rows = len(s.displays[0]["result"]["rows"])
+        out = run_turn(s, "how many were shown?", scripted_engine([
+            {"text": f"The earlier search displayed {n_rows} items."},
+            {"verdict": {"answered": False}},
+        ]), fake_kql)
+        assert out["caption_corrected"] is False
+        assert str(n_rows) in out["answer"]
+
     def test_fabricated_quote_still_fails_with_history_ground(self):
         s = EngineSession()
         run_turn(s, "find ed sepsis", scripted_engine([

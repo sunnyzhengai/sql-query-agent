@@ -228,11 +228,18 @@ def stamped_headline(result: dict) -> str:
     return head
 
 
-def enforce_caption(caption: str, outputs: "list[dict]"
+def enforce_caption(caption: str, outputs: "list[dict]",
+                    ground: "list[dict] | None" = None
                     ) -> "tuple[str, list[str]]":
     """Gate one caption. Returns (text, violations): the original text
-    when clean, the template floor when not — never a repaired lie."""
-    violations = caption_violations(caption, outputs)
+    when clean, the template floor when not — never a repaired lie.
+
+    `ground` is what the claims are checked AGAINST — in one mind that
+    is every result displayed this conversation (walk find 2026-08-21:
+    a zero-round answer restated a count from a prior turn's rows and
+    was floored as an invented number). The FLOOR still renders only
+    this turn's outputs."""
+    violations = caption_violations(caption, ground or outputs)
     if not violations or not caption:
         return (caption or template_caption(outputs)), violations
     return template_caption(outputs), violations

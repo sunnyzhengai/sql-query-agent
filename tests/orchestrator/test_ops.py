@@ -251,6 +251,49 @@ class TestExactEmptyBridgeNote:
         rs = op_search("zzz", "exact", fake_kql, OpsSession())
         assert rs.rows == [] and rs.note == ""
 
+    def test_table_phrase_notes_source_table_identity(self):
+        """Walk find (Sunny, 2026-08-21): 'how is IP_SEPSIS defined' —
+        the phrase names a TECHNICAL node invisible to the catalog
+        surfaces. The honest empty must say what the thing IS (a
+        source table) and who reads it, not 'cannot be provided'."""
+        rs = op_search("IP_SEPSIS", "exact", fake_kql, OpsSession())
+        assert rs.rows == []
+        assert "'IP_SEPSIS' is a SOURCE TABLE read by 2 certified " \
+               "metric(s)" in rs.note
+        assert "ED Sepsis Screening" in rs.note
+
+    def test_zero_row_filtered_census_carries_the_bridge_note(self):
+        """Her live miss: census kind='step' contains='IP_SEPSIS' → 0
+        rows → 'cannot be provided'. The empty FILTERED census is an
+        honest empty holding a phrase — same law, same note."""
+        rs = op_census("step", fake_kql, OpsSession(),
+                       contains="IP_SEPSIS")
+        assert rs.rows == []
+        assert "SOURCE TABLE" in rs.note
+
+    def test_unfiltered_census_never_notes(self):
+        rs = op_census("metric", fake_kql, OpsSession())
+        assert rs.note == ""
+
+    def test_step_census_filters_by_parent_metric_ref(self):
+        """Walk find (Sunny, 2026-08-21): census step
+        contains='USP_Severe_Sepsis' returned 0 — the model's op was
+        right, but a step's parent ref lived in no scanned field."""
+        rs = op_census("step", fake_kql, OpsSession(), contains=REF_A)
+        assert [r["of_metric"] for r in rs.rows] == [REF_A]
+        assert "parent metric mentions" in rs.universe
+
+    def test_multiword_zero_match_stamps_per_token_counts(self):
+        """Suite find (2026-08-21): the model filtered by the user's
+        literal words 'ED logic'; the filler noun matched nothing and
+        the honest 0 read as 'none'. Per-token counts are data."""
+        rs = op_census("metric", fake_kql, OpsSession(),
+                       contains="ED logic")
+        assert rs.rows == []
+        assert "No metric mentions 'ED logic' as a phrase" in rs.note
+        assert "'ED' alone is mentioned by 2 metric(s)" in rs.note
+        assert "ED Sepsis Screening" in rs.note
+
     def test_identifier_phrase_notes_the_matched_form(self):
         """Walk find: 'IP_SEPSIS' matches metric NAMES, never the
         English business names — the note must print the containing

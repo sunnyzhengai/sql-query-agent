@@ -136,8 +136,10 @@ SYSTEM_VOCAB = frozenset({
     # catalog row FIELD names scanned by the row_mentions predicate
     # (AMENDMENT 2026-08-21, 1.50.4: the topic-filtered census must
     # scan exactly the fields its stamped universe sentence names —
-    # these are OUR schema's column names, not user phrasings)
-    "name", "business_name", "description",
+    # these are OUR schema's column names, not user phrasings;
+    # of_metric joined 1.50.7 — a step's parent ref is part of its
+    # identity, and the universe sentence names it)
+    "name", "business_name", "description", "of_metric",
 })
 
 # --- the prompt budget -------------------------------------------------

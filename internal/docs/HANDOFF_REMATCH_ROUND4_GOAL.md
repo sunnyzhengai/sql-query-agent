@@ -323,3 +323,22 @@ REJECTIONS → fixtures → fixes (1.50.5, same day):
    exact total).
 Also noted: drilldown criteria were summary-flavored bullets —
 Sunny's gap-check to rule on; oracle tightening parked until then.
+
+### 2026-08-21 — 1.50.6 mini board + Sunny's live IP_SEPSIS retest → 1.50.7
+1.50.6 mini (walk fixtures live): census 1.00 · definition 1.00 ·
+bridge 0.92 (n=12, incl. IP_SEPSIS 6/6) · drilldown 1.00 ·
+sql_request 1.00 · topical 0.58 BELOW · anaphora 0.58 BELOW —
+honesty 1.00 everywhere.
+Sunny's live retest still failed "how is IP_SEPSIS defined": model
+census'd steps for the phrase, honest 0 → "cannot be provided", while
+the graph held tech:reporting.ip_sepsis. 1.50.7 closes the class:
+(1) TABLE_USED_BY_QUERY resolves table-phrases via technical nodes +
+transform_to_technical → "'IP_SEPSIS' is a SOURCE TABLE read by N
+metric(s): …" stamped on ANY honest-empty (exact search AND filtered
+census); (2) of_metric joins the census mention-scan (step census by
+parent ref was 0-row); (3) multi-word zero-match census stamps
+per-token counts ('ED logic' → "'ED' alone: 2"); (4) caption-gate
+ground = whole-conversation displays (zero-round answers restating
+prior rows were floored as invented); (5) suite drops trail
+paraphrases that lost the anaphor (they measure nothing). Zero
+prompt/tool changes — the pin stands.
