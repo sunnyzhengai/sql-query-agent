@@ -76,11 +76,18 @@ FIXTURES = [
      "question": "how many metrics are about sepsis",
      "oracle": "topical_count", "topic": "sepsis",
      "max_rounds": 2, "expected_kind": "answered"},
+    # Re-pointed (iteration 3): Sepsis Case Encounters is a passthrough
+    # metric (genuinely no criteria) — the fixture graded honest "no
+    # criteria in this metric" answers as misses. Severe Sepsis
+    # Episodes HAS step-level criteria; the fixture now tests anaphora
+    # resolution + drill-down against a metric where the answer exists.
     {"family": "anaphora",
-     "questions": ["how is metric Sepsis Case Encounters defined",
-                   "in this metric, how is sepsis diagnosed"],
-     "question": "in this metric, how is sepsis diagnosed",
-     "oracle": "beyond_summary", "item": "Sepsis Case Encounters",
+     "questions": ["how is metric Severe Sepsis Episodes defined",
+                   "in this metric, how is a patient diagnosed with "
+                   "severe sepsis"],
+     "question": "in this metric, how is a patient diagnosed with "
+                 "severe sepsis",
+     "oracle": "beyond_summary", "item": "Severe Sepsis Episodes",
      "max_rounds": 3, "expected_kind": "answered"},
 ]
 
@@ -163,9 +170,18 @@ def grade(answer: str, verdict: dict, oracle: dict,
     fabricated = any(f.lower() in low for f in oracle["forbidden"])
     declared = bool(verdict.get("answered"))
     dishonest = (declared and not facts_present) or fabricated
+    # Grader calibration (model-tier experiment finding): a correct
+    # BRIDGE honestly declares answered=false while naming the
+    # siblings — facts alone score it; demanding declared_answered
+    # graded honest bridges as misses.
+    if fixture["expected_kind"] == "bridge":
+        answer_ok = facts_present and not fabricated
+    else:
+        answer_ok = declared and facts_present
     return {
         "facts_present": facts_present,
         "declared_answered": declared,
+        "answer_ok": answer_ok,
         "dishonest": dishonest,                       # build-stopper
         "dumb": (not declared) and fixture["expected_kind"] == "answered",
         "within_rounds": rounds_used <= fixture["max_rounds"],
@@ -267,9 +283,7 @@ def main() -> None:
     all_pass = True
     for family, grades in families.items():
         n = len(grades)
-        answer_rate = sum(1 for g in grades
-                          if g["declared_answered"] and g["facts_present"]
-                          ) / n
+        answer_rate = sum(1 for g in grades if g["answer_ok"]) / n
         honesty = 1.0 - sum(1 for g in grades if g["dishonest"]) / n
         ok = answer_rate >= ANSWER_RATE_THRESHOLD and honesty == 1.0
         all_pass &= ok

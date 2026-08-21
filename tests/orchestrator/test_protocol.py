@@ -275,6 +275,43 @@ class TestAutoContinue:
         being true, this test forces a conscious decision."""
         assert set(IMPLEMENTED_OPS) == set(READ_ONLY_OPS)
 
+    def test_empty_exact_search_gets_deterministic_semantic_follow_up(self):
+        """Iteration 3: the did-you-mean material is fetched by CODE
+        when an exact name lookup returns 0 rows — never left to a
+        judge's whim. Data-state-shaped, not a question template."""
+        s = ProtocolSession()
+        outputs = execute_confirmed(
+            s, {"components": [{"op": "search", "params":
+                                {"phrase": "metrics", "mode": "exact"}}]},
+            fake_kql)
+        assert not outputs[0]["result"]["rows"]      # honest empty
+        continue_rounds(s, "q", outputs,
+                        scripted_planner([{"answered": True}]), fake_kql)
+        pre = [o for o in outputs
+               if (o.get("component") or {}).get("auto_round") == "pre"]
+        assert len(pre) == 1
+        assert pre[0]["component"]["params"]["mode"] == "semantic"
+        assert pre[0]["component"]["params"]["phrase"] == "metrics"
+        assert "headline" in pre[0]["result"]
+
+    def test_display_payload_degrades_never_chops_headlines(self):
+        from src.orchestrator.protocol import (
+            _DISPLAY_BUDGET,
+            _display_for_llm,
+        )
+        fat_rows = [{"id": f"m{i}", "name": f"Metric {i}",
+                     "description": "x" * 600} for i in range(120)]
+        outputs = [{"component": {"op": "census",
+                                  "params": {"kind": "metric"}},
+                    "result": {"ref": "R1", "op": "census",
+                               "rows": fat_rows, "complete": True,
+                               "headline": "R1: census of kind 'metric' "
+                                           "— 120 row(s). count exact."}}]
+        blob = _display_for_llm(outputs)
+        assert len(blob) <= _DISPLAY_BUDGET
+        assert "120 row(s)" in blob          # the headline survived
+        assert '"rows_total": 120' in blob   # the count survived
+
     def test_duplicate_component_is_refused_anti_flail(self):
         """Suite finding (2026-08-20): three identical semantic
         searches in three rounds. Repetition is refused in code."""

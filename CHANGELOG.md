@@ -10,6 +10,30 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.45.0] - 2026-08-20
+
+### Changed — iteration 3, driven by the refuted model-tier experiment
+- Model-tier experiment (identical suite, gpt-4o vs mini, no other
+  change): REFUTED — 4o net worse (definition 1.00→0.67, topical
+  0.83→0.67, bridge honesty 0.67→0.50: confident synthesis without the
+  facts). No minimum-tier prerequisite documented; ask-path default
+  stays mini; harness iteration resumes with measured justification.
+- Deterministic did-you-mean: an exact name search returning 0 rows
+  ALWAYS gets its semantic sibling run by code before any goal-check
+  (data-state-shaped, like the anti-flail bound — not a question
+  template). The bridge family's missing material is now fetched
+  mechanically.
+- Display payload degrades under budget pressure (fewer/shorter rows)
+  instead of chopping — headlines and totals survive every tier; row
+  text cap raised to 400 so step-level criteria reach the captioner.
+- Grader calibrations from the experiment's findings: a correct
+  bridge declares answered=false while naming siblings (facts score
+  it); the anaphora fixture re-pointed to Severe Sepsis Episodes
+  (the previous target was a passthrough metric whose honest answer
+  is "no criteria" — grading honesty as dumbness).
+
+---
+
 ## [1.44.0] - 2026-08-20
 
 ### Added — Fabric agent refresh, data-shaped (ADR 0020 doctrine; ROUND4 goal, pre-authorized)

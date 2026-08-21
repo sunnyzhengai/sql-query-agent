@@ -375,17 +375,11 @@ def execute_confirmed(session: ProtocolSession, plan: dict,
     return outputs
 
 
-_MAX_ROWS_SHOWN = 40
-_ROW_TEXT_CAP = 200
+_DISPLAY_BUDGET = 20000
 
 
-def _display_for_llm(outputs: "list[dict]") -> str:
-    """The result payload the caption/goal LLMs read. Suite finding
-    (2026-08-20): a naive json.dumps(outputs)[:6000] TRUNCATED the
-    stamped headline (appended after the rows) and most rows — the
-    captioner counted the surviving rows and invented '6 metrics'.
-    Headline FIRST, rows compacted, totals explicit — the counts can
-    never be truncated away again."""
+def _build_view(outputs: "list[dict]", rows_cap: int,
+                text_cap: int) -> "list[dict]":
     view = []
     for o in outputs:
         c = o.get("component") or {}
@@ -403,21 +397,37 @@ def _display_for_llm(outputs: "list[dict]") -> str:
             "headline": r.get("headline"),
             "complete": r.get("complete"),
             "rows_total": len(rows),
-            "rows_shown": min(len(rows), _MAX_ROWS_SHOWN),
+            "rows_shown": min(len(rows), rows_cap),
         })
         compact = []
-        for row in rows[:_MAX_ROWS_SHOWN]:
+        for row in rows[:rows_cap]:
             compact.append({
-                k: (v[:_ROW_TEXT_CAP] if isinstance(v, str) else v)
+                k: (v[:text_cap] if isinstance(v, str) else v)
                 for k, v in row.items() if v not in (None, "")
             })
         entry["rows"] = compact
-        if len(rows) > _MAX_ROWS_SHOWN:
-            entry["note"] = (f"{len(rows) - _MAX_ROWS_SHOWN} more rows "
+        if len(rows) > rows_cap:
+            entry["note"] = (f"{len(rows) - rows_cap} more rows "
                              "displayed to the user but omitted here — "
                              "counts come from rows_total/headline")
         view.append(entry)
-    return json.dumps(view)[:20000]
+    return view
+
+
+def _display_for_llm(outputs: "list[dict]") -> str:
+    """The result payload the caption/goal LLMs read. Suite finding
+    (2026-08-20): a naive json.dumps(outputs)[:6000] TRUNCATED the
+    stamped headline (appended after the rows) and most rows — the
+    captioner counted the surviving rows and invented '6 metrics'.
+    Headline FIRST, rows compacted, totals explicit, and over-budget
+    payloads DEGRADE (fewer/shorter rows) instead of being chopped —
+    headlines and totals survive every tier."""
+    blob = ""
+    for rows_cap, text_cap in ((40, 400), (12, 240), (5, 160)):
+        blob = json.dumps(_build_view(outputs, rows_cap, text_cap))
+        if len(blob) <= _DISPLAY_BUDGET:
+            return blob
+    return blob[:_DISPLAY_BUDGET]      # last resort; headline-first order
 
 
 def continue_rounds(session: ProtocolSession, question: str,
@@ -438,6 +448,42 @@ def continue_rounds(session: ProtocolSession, question: str,
 
     Mutates `outputs` in place (appending auto-hops) and returns
     {rounds, exhausted, status_line, unanswered_note}."""
+    # Deterministic follow-up (data-state-shaped, like the anti-flail
+    # bound — NOT a question template): an exact name search that
+    # returned 0 rows ALWAYS gets its semantic sibling run by CODE
+    # before any judge speaks — the did-you-mean material is fetched
+    # mechanically, never left to an LLM's whim. (Iteration 3 finding:
+    # missing bridge material was the top dumbness source at n=6.)
+    shown = {
+        (str((o.get("component") or {}).get("op", "")),
+         json.dumps((o.get("component") or {}).get("params") or {},
+                    sort_keys=True))
+        for o in outputs
+    }
+    pre = []
+    for o in outputs:
+        c = o.get("component") or {}
+        r = o.get("result")
+        params = c.get("params") or {}
+        if (c.get("op") == "search" and params.get("mode") == "exact"
+                and r is not None and not (r.get("rows") or [])):
+            phrase = str(params.get("phrase", ""))
+            key = ("search", json.dumps(
+                {"mode": "semantic", "phrase": phrase}, sort_keys=True))
+            if phrase and key not in shown:
+                shown.add(key)
+                pre.append({"op": "search",
+                            "params": {"phrase": phrase,
+                                       "mode": "semantic"},
+                            "note": "deterministic follow-up: empty "
+                                    "exact name lookup — fetching the "
+                                    "closest certified items"})
+    if pre:
+        executed = execute_confirmed(session, {"components": pre}, run_kql)
+        for o in executed:
+            o["component"]["auto_round"] = "pre"
+        outputs.extend(executed)
+
     rounds: "list[dict]" = []
     unanswered_note = ""
     for round_no in range(1, max_rounds + 1):
