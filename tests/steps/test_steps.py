@@ -110,6 +110,33 @@ class TestMetricLogicStep:
         assert len(rows) == len(parse_out.parse_results)
         assert all(r["metric_id"] for r in rows)
 
+    def test_fabric_refresh_columns_flatten_drilldown_material(self):
+        """Fabric refresh (HANDOFF_REMATCH_ROUND4_GOAL / ADR 0020): the
+        Data Agent answers drill-downs by reading a row — decision
+        summary, table_count, twin verdict live ON the card."""
+        parse_out = parse_step(SAMPLE_SQL_SOURCES, parse_sql)
+        tables, columns = _dict_rows()
+        graph = build_graph_step(parse_out.parse_results, tables, columns)
+        rows = metric_logic_step(graph.nodes_rows, graph.edges_rows,
+                                 decision_rows=graph.decision_rows)
+        (card,) = rows
+        assert card["table_count"] >= 1
+        assert card["decision_summary"], "decision sites must flatten"
+        assert "[where]" in card["decision_summary"] \
+            or "[join_on]" in card["decision_summary"]
+        assert card["twin_verdict"] is None  # no same-named twin in sample
+
+    def test_decision_summary_is_phi_gated_and_capped_honestly(self):
+        from src.graph.metric_logic import decision_summary_for
+        rows = [{"metric_id": "dbo.M", "status": "extracted",
+                 "context": "where", "step_name": f"S{i:02d}",
+                 "site_id": "site0",
+                 "expression_sql": "PATIENT_NAME = 'Jane Smith'"}
+                for i in range(15)]
+        text = decision_summary_for("dbo.M", rows)
+        assert "Jane Smith" not in text          # PHI redacted
+        assert "(+3 more decision sites" in text  # honest cap, no silence
+
 
 class TestExportStep:
     def test_export_partitions_nodes_and_edges(self):
@@ -120,6 +147,21 @@ class TestExportStep:
         assert len(exported) == 14  # 5 node tables + 8 edge tables + derived closure (ADR 0040)
         assert len(exported["graph_canonical"]) == len(parse_out.parse_results)
         assert exported["graph_edge_tab2col"], "column edges must be exported"
+
+    def test_counts_are_node_properties_0030_closure(self):
+        """Count questions become property READS on the Metric node —
+        the one shape the NL2GQL generator cannot get wrong."""
+        parse_out = parse_step(SAMPLE_SQL_SOURCES, parse_sql)
+        tables, columns = _dict_rows()
+        graph = build_graph_step(parse_out.parse_results, tables, columns)
+        exported = export_step(graph.nodes_rows, graph.edges_rows)
+        (metric,) = exported["graph_canonical"]
+        n_steps = sum(1 for t in exported["graph_transformation"]
+                      if t["metricId"] == metric["metricId"])
+        n_tables = sum(1 for r in exported["graph_edge_uses_table"]
+                       if r["sourceId"] == metric["nodeId"])
+        assert metric["stepCount"] == n_steps > 0
+        assert metric["tableCount"] == n_tables > 0
 
     def test_generator_compat_shape(self):
         """ADR 0020: name is schema-qualified (== metricId), bareName carries

@@ -11,14 +11,37 @@ routes, and the card says so honestly).
 
 from __future__ import annotations
 
+from src.graph.decomposition_diff import twin_divergence_rows
 from src.graph.metric_logic import build_metric_logic_rows
 from src.graph.serialization import rows_to_edges, rows_to_nodes
 from src.models import NodeLayer
 from src.schemas import METRIC_LOGIC
 
-_FRESHNESS_COLUMNS = ("logic_last_changed_at", "source_extracted_at")
+_STAMPED_COLUMNS = ("logic_last_changed_at", "source_extracted_at",
+                    "twin_verdict")
 _BASE_COLUMNS = [c[0] for c in METRIC_LOGIC["columns"]
-                 if c[0] not in _FRESHNESS_COLUMNS]
+                 if c[0] not in _STAMPED_COLUMNS]
+
+
+def apply_twin_verdicts(rows: "list[dict]", nodes_rows: "list[dict]",
+                        edges_rows: "list[dict]") -> None:
+    """Stamp each card with its same-name-twin verdict (ADR 0043 cache,
+    flattened for the Data Agent surface: 'is this the same as the
+    other USP_X' becomes a row read)."""
+    verdict_by_metric: "dict[str, str]" = {}
+    for group in twin_divergence_rows(nodes_rows, edges_rows, run_at=""):
+        ids = [m.strip() for m in str(group.get("metric_ids", "")).split(",")
+               if m.strip()]
+        for mid in ids:
+            others = ", ".join(o for o in ids if o != mid)
+            text = f"{group.get('verdict')} vs {others}"
+            summary = str(group.get("summary") or "").strip()
+            if summary:
+                text += f" — {summary[:200]}"
+            verdict_by_metric[mid.lower()] = text
+    for row in rows:
+        row["twin_verdict"] = verdict_by_metric.get(
+            row["metric_id"].lower())
 
 
 def apply_freshness(
@@ -59,13 +82,16 @@ def metric_logic_step(
     previous_rows: "list[dict] | None" = None,
     extraction_records: "list[dict] | None" = None,
     run_at: str = "",
+    decision_rows: "list[dict] | None" = None,
 ) -> "list[dict]":
     nodes = rows_to_nodes(nodes_rows)
     edges = rows_to_edges(edges_rows)
 
-    tuples = build_metric_logic_rows(nodes, edges)
+    tuples = build_metric_logic_rows(nodes, edges,
+                                     decision_rows=decision_rows)
     rows = [dict(zip(_BASE_COLUMNS, t)) for t in tuples]
     apply_freshness(rows, previous_rows or [], extraction_records or [], run_at)
+    apply_twin_verdicts(rows, nodes_rows, edges_rows)
 
     canonical_count = sum(1 for n in nodes.values() if n.layer == NodeLayer.CANONICAL)
     assert len(rows) == canonical_count, (

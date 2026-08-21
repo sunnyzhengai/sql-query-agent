@@ -36,8 +36,19 @@ Edges (`graph_edges`): canonical_to_transform, transform_to_transform, transform
 3. When report_name/report_url exist, end with "Used in: <report_name> (<report_url>)". Never invent a link.
 4. Fallback: `SELECT * FROM graph_nodes WHERE layer = 'canonical' AND lower(name) LIKE '%keyword%'`
 
-### "What criteria/filters apply?"
-Read `calculation_logic`; translate each WHERE/JOIN condition into a business rule (values → what is filtered; IS NOT NULL → what must be present; date ranges → the period; IN lists → included categories).
+### "What criteria/filters apply?" / "How is [X] decided/diagnosed?"
+1. `SELECT decision_summary FROM output_metric_logic WHERE ...` — the
+   precomputed, PHI-gated list of the metric's actual filter/threshold
+   sites (one line per decision, honest "+N more" cap). Translate each
+   line into a business rule and present them; this IS the answer.
+2. Only if decision_summary is null, read `calculation_logic` and
+   translate each WHERE/JOIN condition (values → what is filtered;
+   IS NOT NULL → what must be present; date ranges → the period; IN
+   lists → included categories).
+
+### "How many steps/tables does [metric] have?"
+`SELECT transform_count, table_count FROM output_metric_logic WHERE ...`
+— precomputed counts; read them, never count rows yourself.
 
 ### "Who owns [metric]?"
 `SELECT steward, developer FROM output_metric_logic WHERE ...` — if steward is null: "No steward has been assigned yet. An administrator can assign one."
@@ -48,8 +59,10 @@ Read `calculation_logic`; translate each WHERE/JOIN condition into a business ru
 3. CITE both dates. If source_extracted_at is null, say the SQL arrived by file upload and its extraction date is not tracked — never guess a date. Volunteer these dates whenever currency is questioned.
 
 ### "Are [A] and [B] the same?" / "Why do they disagree?" (consistency)
-1. First check the twin cache: `SELECT verdict, divergent_steps, missing_steps, summary FROM output_metric_twins WHERE lower(metric_ids) LIKE '%keyword%'`
-2. If a row exists, report verdict + summary VERBATIM — computed evidence; never soften "divergent" into "similar".
+1. Fastest: `SELECT twin_verdict FROM output_metric_logic WHERE ...` —
+   the same-named-twin verdict precomputed on the card itself; report
+   it VERBATIM (NULL means no same-named twin exists).
+2. For detail: `SELECT verdict, divergent_steps, missing_steps, summary FROM output_metric_twins WHERE lower(metric_ids) LIKE '%keyword%'` — computed evidence; never soften "divergent" into "similar".
 3. Otherwise retrieve both metrics' calculation_logic and present side by side, stating you are showing definitions, not judging equivalence.
 
 ### "What tables are used?" (developer)

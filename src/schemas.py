@@ -622,6 +622,7 @@ GRAPH_DECISION_SITES = {
         "description pipeline phase 2 (ADR 0044)",
         "self-service intent matching (ADR 0044 point 3, future)",
         "admin telemetry report",
+        "400_build_metric_logic",
     ],
     "optional_input": True,
     "remediation": (
@@ -754,6 +755,9 @@ METRIC_LOGIC = {
         ("calculation_logic", "string", True),
         ("source_tables", "string", True),
         ("table_descriptions", "string", True),
+        ("table_count", "integer", True),
+        ("decision_summary", "string", True),
+        ("twin_verdict", "string", True),
         ("logic_last_changed_at", "string", True),
         ("source_extracted_at", "string", True),
     ],
@@ -770,6 +774,15 @@ METRIC_LOGIC = {
         "calculation_logic": "Ordered plain-language rendering of the CTE chain",
         "source_tables": "Comma-separated physical tables the metric reads",
         "table_descriptions": "Dictionary descriptions of those source tables",
+        "table_count": "Number of distinct source tables (single-hop "
+                       "count read — Fabric refresh, ADR 0020 doctrine)",
+        "decision_summary": "The metric's filter/threshold decision sites "
+                            "flattened as readable lines (PHI-redacted, "
+                            "capped with an honest remainder) — drill-down "
+                            "answers as a row read",
+        "twin_verdict": "Same-bare-name twin verdict (ADR 0043 cache): "
+                        "identical|divergent vs the named counterparts; "
+                        "NULL = no same-named twin exists",
         "logic_last_changed_at": "When the calculation logic last changed "
                                  "(hash-change across runs; Trust family)",
         "source_extracted_at": "When the SQL was last extracted from the "
@@ -812,6 +825,8 @@ GRAPH_CANONICAL = {
         ("description", "string", True),
         ("steward", "string", True),
         ("developer", "string", True),
+        ("stepCount", "integer", True),
+        ("tableCount", "integer", True),
     ],
     "column_descriptions": {
         "nodeId": "Canonical node id (graph_nodes.node_id)",
@@ -821,6 +836,10 @@ GRAPH_CANONICAL = {
             "generator filters name with the user's qualified reference)"
         ),
         "bareName": "Bare object name (no schema); repeats across schemas",
+        "stepCount": "Number of calculation steps — a property READ "
+                     "(0030 closure; count questions never traverse)",
+        "tableCount": "Number of distinct source tables (uses_table "
+                      "closure count) — a property READ",
         "businessName": "Business-friendly name (PBI report lineage or manual; may be empty)",
         "reportName": "Power BI report(s) built on this metric, when known",
         "reportUrl": "Link to the primary report; the agent offers it in answers",

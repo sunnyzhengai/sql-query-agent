@@ -63,6 +63,23 @@ def export_step(nodes_rows: "list[dict]", edges_rows: "list[dict]") -> "dict[str
     )
     tables["graph_edge_uses_table"] = uses_table
 
+    # 0030 closure (Fabric refresh, HANDOFF_REMATCH_ROUND4_GOAL): counts
+    # as Metric node properties — "how many steps/tables" becomes a
+    # property READ, the one query shape the NL2GQL generator cannot
+    # get wrong (ADR 0020 doctrine).
+    steps_by_metric: "dict[str, int]" = {}
+    for n in nodes.values():
+        if n.layer == NodeLayer.TRANSFORMATION:
+            mid = (n.properties or {}).get("metric_id", "")
+            steps_by_metric[mid] = steps_by_metric.get(mid, 0) + 1
+    tables_by_canonical: "dict[str, int]" = {}
+    for r in uses_table:
+        tables_by_canonical[r["sourceId"]] = (
+            tables_by_canonical.get(r["sourceId"], 0) + 1)
+    for row in tables["graph_canonical"]:
+        row["stepCount"] = steps_by_metric.get(row["metricId"], 0)
+        row["tableCount"] = tables_by_canonical.get(row["nodeId"], 0)
+
     calculated_by = derive_calculated_by_rows(nodes, edges)
     raw_roots = {(r["sourceId"], r["targetId"]) for r in tables["graph_edge_c2t"]}
     closure_pairs = {(r["sourceId"], r["targetId"]) for r in calculated_by}

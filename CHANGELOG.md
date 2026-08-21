@@ -10,6 +10,25 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.44.0] - 2026-08-20
+
+### Added — Fabric agent refresh, data-shaped (ADR 0020 doctrine; ROUND4 goal, pre-authorized)
+- output_metric_logic gains three row-read columns: decision_summary
+  (the metric's filter/threshold sites flattened, PHI-redacted, honest
+  "+N more" cap), table_count, twin_verdict (ADR 0043 cache stamped
+  per card) — drill-down and sameness questions become single-row
+  reads, the one shape the Data Agent reliably executes. 400 feeds
+  graph_decision_sites in (consumer declared; contract police
+  enforced it).
+- LPG export: stepCount/tableCount as Metric NODE properties — the
+  open 0030 item closed; count questions become property reads.
+- Data Agent instructions updated to the new surfaces (read
+  decision_summary first for criteria questions; counts from columns;
+  twin_verdict on the card) — teaching HOW, no hardcoded answers, net
+  instruction growth minimal.
+
+---
+
 ## [1.43.0] - 2026-08-20
 
 ### Fixed — honesty 1.0 restored across all suite families (iteration 2 on live scorecards)

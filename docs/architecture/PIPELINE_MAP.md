@@ -136,6 +136,7 @@ flowchart LR
   gov_turn_events --> 950_ingest_agent_events
   gov_turn_events --> admin
   gov_turn_events --> usage
+  graph_decision_sites --> 400_build_metric_logic
   graph_decision_sites --> admin
   graph_decision_sites --> description
   graph_decision_sites --> self_service

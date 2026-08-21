@@ -108,11 +108,19 @@ if spark.catalog.tableExists(tracking_table):
 else:
     print("No extraction tracker (file-drop route) — source_extracted_at stays null")
 
+# Decision sites feed the flat drill-down column (Fabric refresh,
+# ADR 0020: the agent answers by reading a row).
+decision_rows = ([r.asDict() for r in
+                  spark.table("graph_decision_sites").collect()]
+                 if spark.catalog.tableExists("graph_decision_sites")
+                 else [])
+
 metric_logic_rows = metric_logic_step(
     nodes_rows, edges_rows,
     previous_rows=previous_rows,
     extraction_records=extraction_records,
     run_at=datetime.now(timezone.utc).isoformat(),
+    decision_rows=decision_rows,
 )
 print(f"Built {len(metric_logic_rows)} metric logic rows")
 changed = sum(1 for r in metric_logic_rows
