@@ -306,43 +306,51 @@ def op_census(kind: str, run_kql, session: OpsSession,
         # is a DATA operation the store answers exactly — filter the
         # complete enumeration by the shared row_mentions predicate.
         # Question-agnostic parameter, not flow.
+        needle = contains.strip()
         full = out
-        out = [r for r in out if row_mentions(r, contains)]
-        params["contains"] = contains.strip()
+        out = [r for r in full if row_mentions(r, needle)]
+        params["contains"] = needle
         universe = (f"every {k} in the certified catalog whose name, "
                     f"business name, description, or parent metric "
-                    f"mentions {contains.strip()!r} — the count is exact")
-    note = ""
-    if contains and contains.strip() and not out:
-        # Same law as the empty exact search (enumerate-all-cases): a
-        # zero-row FILTERED census is an honest empty holding a phrase
-        # — it carries the bridge note, whichever op the model chose
-        # (walk find 2026-08-21: census step contains='IP_SEPSIS' → 0
-        # → "cannot be provided", while the graph knew the table).
-        note = _bridge_note(contains, run_kql)
-        # Multi-word needles (suite find, same day: the model filtered
-        # by the user's literal words 'ED logic' — the filler noun
-        # matched nothing and the honest 0 read as 'none'). Per-token
-        # counts are DATA the store answers exactly; stamping them
-        # puts the true count in front of the captioner.
-        tokens = [t for t in re.split(r"[^A-Za-z0-9_]+",
-                                      contains.strip())
-                  if len(t) >= 2]
-        if len(tokens) > 1:
-            per = []
-            for tok in tokens:
-                hits = [r for r in full if row_mentions(r, tok)]
-                if hits:
-                    names = [str(r.get("business_name") or r["name"])
-                             for r in hits]
-                    per.append(f"{tok!r} alone is mentioned by "
-                               f"{len(hits)} {k}(s): "
-                               f"{', '.join(names[:5])}")
-            if per:
-                note += (f" No {k} mentions {contains.strip()!r} as a "
-                         f"phrase; " + "; ".join(per) + ".")
+                    f"mentions {needle!r} — the count is exact")
+        if not out:
+            # Multi-word degradation (suite find 2026-08-21: the model
+            # filtered by the user's literal words 'ED logic'; the
+            # filler noun matched nothing and the honest 0 read as
+            # 'none' — while a per-token clause sat unread in the
+            # note). A zero-match multi-word phrase degrades to its
+            # PRODUCTIVE tokens (AND over every token that matches
+            # anything), with the degradation stamped in the universe
+            # — the count on screen is then the one the question
+            # meant, exactly scoped.
+            tokens = [t for t in re.split(r"[^A-Za-z0-9_]+", needle)
+                      if len(t) >= 2]
+            productive = [t for t in tokens
+                          if any(row_mentions(r, t) for r in full)]
+            if len(tokens) > 1 and productive:
+                out = [r for r in full
+                       if all(row_mentions(r, t) for t in productive)]
+                dropped = [t for t in tokens if t not in productive]
+                params["effective_contains"] = " ".join(productive)
+                universe = (
+                    f"every {k} in the certified catalog whose name, "
+                    f"business name, description, or parent metric "
+                    f"mentions "
+                    + " AND ".join(repr(t) for t in productive)
+                    + f" — no {k} mentions {needle!r} as a phrase"
+                    + (f"; {', '.join(repr(t) for t in dropped)} "
+                       f"matches nothing and was disregarded"
+                       if dropped else "")
+                    + " — the count is exact")
+    # Same law as the empty exact search (enumerate-all-cases): a
+    # zero-row FILTERED census is an honest empty holding a phrase —
+    # it carries the bridge note, whichever op the model chose (walk
+    # find 2026-08-21: census step contains='IP_SEPSIS' → 0 →
+    # "cannot be provided", while the graph knew the table).
+    note = (_bridge_note(contains, run_kql)
+            if contains and contains.strip() and not out else "")
     return session.register("census", params, out, complete=True,
-                            universe=universe, note=note.strip())
+                            universe=universe, note=note)
 
 
 # --- retrieve: one read primitive (facts + structure merged) ----------

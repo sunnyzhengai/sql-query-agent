@@ -283,16 +283,27 @@ class TestExactEmptyBridgeNote:
         assert [r["of_metric"] for r in rs.rows] == [REF_A]
         assert "parent metric mentions" in rs.universe
 
-    def test_multiword_zero_match_stamps_per_token_counts(self):
+    def test_multiword_phrase_degrades_to_productive_tokens(self):
         """Suite find (2026-08-21): the model filtered by the user's
         literal words 'ED logic'; the filler noun matched nothing and
-        the honest 0 read as 'none'. Per-token counts are data."""
+        the honest 0 read as 'none' while the true count sat in a
+        note. A zero-match multi-word phrase now degrades to its
+        productive tokens with the degradation stamped in the
+        universe — the count on screen is the one the question
+        meant."""
         rs = op_census("metric", fake_kql, OpsSession(),
                        contains="ED logic")
+        assert len(rs.rows) == 2
+        assert rs.params["effective_contains"] == "ED"
+        assert "no metric mentions 'ED logic' as a phrase" in rs.universe
+        assert "'logic' matches nothing and was disregarded" in rs.universe
+        assert "count is exact" in rs.universe
+
+    def test_fully_unproductive_phrase_stays_empty_with_bridge_note(self):
+        rs = op_census("metric", fake_kql, OpsSession(),
+                       contains="zz qq")
         assert rs.rows == []
-        assert "No metric mentions 'ED logic' as a phrase" in rs.note
-        assert "'ED' alone is mentioned by 2 metric(s)" in rs.note
-        assert "ED Sepsis Screening" in rs.note
+        assert "effective_contains" not in rs.params
 
     def test_identifier_phrase_notes_the_matched_form(self):
         """Walk find: 'IP_SEPSIS' matches metric NAMES, never the

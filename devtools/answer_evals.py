@@ -45,6 +45,7 @@ from src.orchestrator.ops import (  # noqa: E402
     op_search,
     row_mentions,
 )
+from src.orchestrator.tools import TABLE_USED_BY_QUERY  # noqa: E402
 from src.orchestrator.turn_engine import EngineSession  # noqa: E402
 from src.orchestrator.turn_engine import run_turn as engine_run_turn  # noqa: E402
 
@@ -168,6 +169,17 @@ def build_oracle(fixture: dict, run_kql) -> dict:
             for v in (r.get("business_name"), r.get("name"))
             if v and phrase in str(v).lower()})
         assert near, "oracle: no near-name siblings found"
+        # Table-phrase clause (1.50.8): when the phrase names a source
+        # TABLE, the stamped identity sentence IS a direct answer —
+        # accept it in first position, and stop counting the stamped
+        # READERS as competitors (the ruling orders siblings before
+        # unstamped semantic strays, not before machine-stamped data).
+        tbl = list(run_kql(TABLE_USED_BY_QUERY,
+                           {"p_phrase": fixture["phrase"].strip()}))
+        readers = {str(r.get("business_name") or r.get("ref") or "")
+                   for r in tbl}
+        if tbl:
+            near = near + ["SOURCE TABLE"]
         # A sibling row is a sibling wholly: its alternate surface form
         # must not land in the competitors list.
         def _is_sib(r):
@@ -176,7 +188,7 @@ def build_oracle(fixture: dict, run_kql) -> dict:
                        if v)
         others = sorted({str(n) for r in rs.rows if not _is_sib(r)
                          for n in (r.get("business_name"), r.get("name"))
-                         if n})
+                         if n} - readers)
         return {"required_any": [near],
                 "siblings_first_vs": others,
                 "forbidden": ["no metrics exist",

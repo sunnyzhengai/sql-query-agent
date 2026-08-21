@@ -342,3 +342,17 @@ ground = whole-conversation displays (zero-round answers restating
 prior rows were floored as invented); (5) suite drops trail
 paraphrases that lost the anaphor (they measure nothing). Zero
 prompt/tool changes — the pin stands.
+
+### 2026-08-21 — 1.50.7 board → 1.50.8 (degradation + table-identity grading)
+1.50.7 mini: census/definition/drilldown/sql_request 1.00 · anaphora
+0.88 PASS (anaphor filter working) · bridge 0.75 BELOW · topical 0.67
+BELOW — honesty 1.00. Transcripts: the IP_SEPSIS "misses" were
+CORRECT captions ("source table read by …") failed by the oracle
+counting stamped READERS as competitors — oracle now accepts stamped
+table-identity in first position and exempts stamped readers (the
+ruling orders siblings before unstamped strays, not before machine
+stamps). Topical: mini read the 0-row headline and ignored the
+per-token note → zero-match multi-word census now DEGRADES to its
+productive tokens, degradation stamped in the universe ('ED logic' →
+2 rows, "'logic' matches nothing and was disregarded"). Zero
+prompt/tool changes — the pin stands.
