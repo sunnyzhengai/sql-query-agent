@@ -237,3 +237,15 @@ operation; a search's row count is a window property) — P4-legal, no
 question shapes. PIN UPDATE (conscious, recorded): scope widened to
 SYSTEM_PROMPT + ENGINE_TOOLS, new hash ae375882…. Suite rerun next;
 if topical_count still fails, that is the honest P4 boundary finding.
+
+### 2026-08-21 — 1.50.1 scorecard: FIVE families perfect; topical is the boundary candidate
+census 1.00 · definition 1.00 · **bridge 1.00 (perfect)** · drilldown
+1.00 · anaphora 1.00 — all with honesty 1.00. topical_count still
+0.00/1.00: the mini mind, told in tool semantics that a search's row
+count "is never a count of anything," still asserts the window count
+(6/6 identical, honest verdicts). Before declaring this the honest P4
+boundary on mini, the reopened tier question gets its measurement:
+the identical suite is running on gpt-4o. If 4o honors the semantics,
+the finding differentiates tiers (input to the PARKED min-tier
+prerequisite); if not, topical_count is the recorded P4 limit and the
+decision on it is Sunny's.
