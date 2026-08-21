@@ -10,6 +10,32 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.49.0] - 2026-08-21
+
+### Changed — THE ONE-MIND TURN (ADR 0051): one conversation decides, the boundary enforces
+- New engine (src/orchestrator/turn_engine.py), derived from the six
+  principles of HANDOFF_ONE_MIND: a single conversation loops over the
+  read-only ops with FULL tool results persisting in ONE history
+  across rounds and turns (anaphora = memory, not a prompt rule);
+  thinking room between calls; graceful compaction (oldest results
+  degrade to their stamped headline + totals, never dropped).
+- Boundary kept and relocated: stamped headlines on every panel; the
+  final answer passes the caption gate; the typed verdict requires a
+  machine-verified verbatim evidence quote; read-only dispatch with
+  writes always plan-confirm; round cap + anti-flail as code; infra
+  errors named INTO the conversation (P6).
+- The casebook is DELETED, not ported (P4): planner shape rules,
+  mandatory-bridge clause, pointer doctrine, the bridge-duty gate
+  check, the pointer verdict demotion — all removed. The thesis test:
+  bridge and anaphora must flip with zero new prompt rules.
+- Webapp: reads run immediately on /api/ask, operations displayed
+  stamped ("operations are the product" as trace-as-display); the
+  plan-confirm card remains only for writes. Suite drives the engine.
+- 11 cage tests (Floor 1) prove the bounds with a scripted mind. SPEC
+  v0.5; the model-tier question is REOPENED under the new shape.
+
+---
+
 ## [1.48.0] - 2026-08-21
 
 ### Changed — iteration 6: the answered verdict must be PROVED (Sunny's directive)

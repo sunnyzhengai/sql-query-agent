@@ -604,3 +604,14 @@ classification).
   - `src/orchestrator/protocol.py`
 - **Enforced by:**
   - `tests/orchestrator/test_protocol.py`
+
+## ADR 0051 — The one-mind turn: one conversation decides, the boundary enforces (supersedes 0036/0050's shape)
+
+- **Category:** architecture
+- **Grounds:** spec:E3, spec:E6
+- **Implemented by:**
+  - `src/orchestrator/turn_engine.py`
+- **Enforced by:**
+  - `tests/orchestrator/test_turn_engine.py`
+- **Summarized in:**
+  - `docs/architecture/SPEC.md`

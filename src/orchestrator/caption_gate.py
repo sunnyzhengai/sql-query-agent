@@ -81,24 +81,10 @@ def caption_violations(caption: str, outputs: "list[dict]") -> "list[str]":
             "absolute claim (all/none/only/every) but no displayed result "
             "set declared itself complete")
 
-    # Grounded verification, not a lexicon: when a headline stamps the
-    # closest-by-name items, the caption must present at least one of
-    # them — the required list is code-stamped DATA, and iteration 4
-    # measured the captioner synthesizing straight over it (bridge
-    # 0.00 with the material on screen).
-    for r in results:
-        m2 = _BRIDGE_STAMP.search(str(r.get("headline") or ""))
-        if not m2:
-            continue
-        names = [n.strip() for n in m2.group(1).split(",") if n.strip()]
-        # One containment match = the name effectively resolved; the
-        # bridge duty exists only under genuine ambiguity (>= 2).
-        if len(names) >= 2 and not any(
-                n.lower() in caption.lower() for n in names):
-            violations.append(
-                "the display stamps closest-by-name items "
-                f"({', '.join(names[:3])}) — the caption must present "
-                "them to the user, not synthesize past them")
+    # ADR 0051 (P4): the bridge-duty check that lived here was
+    # question-family control flow in gate clothing — REMOVED. The
+    # closest-by-name stamp remains in the headline as data; whether
+    # the one mind uses it is MEASURED by the suite, never enforced.
 
     for m in _KIND_ABSENCE.finditer(text):
         kind = m.group(1).lower()

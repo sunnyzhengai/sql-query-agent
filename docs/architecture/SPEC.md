@@ -1,7 +1,7 @@
 # Φ_AIVIA — The Shadow Specification
 
-**Version:** 0.4 (adopted; ADR 0047, extended by ADR 0048)
-**Date:** 2026-08-19 (v0.4: 2026-08-20)
+**Version:** 0.5 (adopted; ADR 0047, extended by ADR 0048, 0051)
+**Date:** 2026-08-19 (v0.5: 2026-08-21)
 **Origin:** review session with Sunny; motivated by three recurring deviation
 classes discovered by code-walking: (1) missing EMR join edges — the technical
 layer was not the complete vendor join map; (2) LLM components repeatedly
@@ -675,6 +675,17 @@ governs generated artifacts revs the relevant `*_CONTRACT_VERSION` cache keys
 ---
 
 ## Changelog
+
+- **0.5 (2026-08-21)** — ADR 0051 (the one-mind turn): E-group note —
+  a turn's INTERIOR decisions (which tool, when to stop, how to
+  compose) are linguistic and live in one conversation with full
+  evidence; they are MEASURED by the conversation suite (spec:E3
+  vocabulary), never prompt-scripted per question family. Boundary
+  mechanisms remain TESTED: stamped headlines, caption gate, the
+  machine-verified evidence-quote verdict, read-only dispatch,
+  round/anti-flail caps (src/orchestrator/turn_engine.py +
+  tests/orchestrator/test_turn_engine.py). The three-call protocol
+  shape retires; ADR 0050's floors carry over unchanged for writes.
 
 - **0.4 (2026-08-20)** — ADR 0048: the admin Σ-structure (§14b) — the
   admin graph as a second model of the same axiom groups (new sorts:

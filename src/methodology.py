@@ -100,6 +100,10 @@ CONTROL_PATH_FILES = (
     # no-lexicon scan; its checks are single regex patterns, the
     # description-gate idiom.
     "src/orchestrator/caption_gate.py",
+    # AMENDMENT 2026-08-21 (ADR 0051): the one-mind turn engine — THE
+    # control path for the read surfaces; invariants-only prompt,
+    # subject to the no-casebook scan like everything above it.
+    "src/orchestrator/turn_engine.py",
 )
 
 # --- system vocabulary -------------------------------------------------

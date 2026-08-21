@@ -40,13 +40,8 @@ from devtools.local_llm import chat_completion  # noqa: E402
 from src.orchestrator.agent import azure_chat_api  # noqa: E402
 from src.orchestrator.kusto import KustoClient, az_cli_token_provider  # noqa: E402
 from src.orchestrator.ops import op_census, op_retrieve, op_search  # noqa: E402
-from src.orchestrator.protocol import (  # noqa: E402
-    ProtocolSession,
-    caption_turn,
-    continue_rounds,
-    execute_confirmed,
-    propose_turn,
-)
+from src.orchestrator.turn_engine import EngineSession  # noqa: E402
+from src.orchestrator.turn_engine import run_turn as engine_run_turn  # noqa: E402
 
 QUERY_URI = "https://trd-uzdu1yhqrmqtutkej8.z7.kusto.fabric.microsoft.com"
 DATABASE = "probe-eh"
@@ -189,17 +184,24 @@ def grade(answer: str, verdict: dict, oracle: dict,
 
 
 def run_trail(questions: "list[str]", chat_api, run_kql) -> dict:
-    """One shared session across the trail (anaphora fixtures need the
-    prior turn's surfaced ids); graded on the FINAL turn."""
-    session = ProtocolSession()
+    """One shared ENGINE session across the trail (ADR 0051: anaphora
+    is a property of memory — the same conversation carries every
+    turn); graded on the FINAL turn."""
+    session = EngineSession()
     result: dict = {}
     for question in questions:
-        plan = propose_turn(session, question, chat_api)
-        outputs = execute_confirmed(session, plan, run_kql)  # eval confirms
-        loop = continue_rounds(session, question, outputs, chat_api,
-                               run_kql)
-        cap = caption_turn(session, outputs, chat_api, question=question)
-        result = {"outputs": outputs, "loop": loop, "cap": cap}
+        turn = engine_run_turn(session, question, chat_api, run_kql)
+        result = {
+            "outputs": turn["outputs"],
+            "loop": {"rounds": list(range(turn["rounds"])),
+                     "status_line": (f"one mind: {turn['rounds']} tool "
+                                     "round(s)")},
+            "cap": {"caption": turn["answer"],
+                    "answered": turn["answered"],
+                    "missing_op": turn["missing_op"],
+                    "caption_corrected": turn["caption_corrected"],
+                    "caption_violations": turn["caption_violations"]},
+        }
     return result
 
 

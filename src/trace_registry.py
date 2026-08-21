@@ -499,6 +499,15 @@ TRACE_REGISTRY = {
                   "tests/test_companion.py"],
         "docs": ["docs/architecture/SPEC.md", "docs/architecture/TRACE_MAP.md"],
     },
+    "0051": {
+        "title": "The one-mind turn: one conversation decides, the "
+                 "boundary enforces (supersedes 0036/0050's shape)",
+        "category": "architecture",
+        "axioms": ["E3", "E6"],
+        "modules": ["src/orchestrator/turn_engine.py"],
+        "tests": ["tests/orchestrator/test_turn_engine.py"],
+        "docs": ["docs/architecture/SPEC.md"],
+    },
     "0050": {
         "title": "Bounded read-only answer loop: plan to the answer, "
                  "caption answers, auto-continue (amends 0036)",

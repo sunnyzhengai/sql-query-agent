@@ -189,9 +189,9 @@ class TestBridgeAndDrilldownStamps:
 
 
 class TestStampVerification:
-    """Iteration 5 (grounded verification, not a lexicon): the caption
-    is checked AGAINST code-stamped data — the bridge list and the
-    floor rendering of headlines."""
+    """ADR 0051: the bridge-duty check was removed (question-family
+    control flow); what remains verified is that the FLOOR renders
+    the stamped headlines — machine truth survives every path."""
 
     BRIDGED = {
         "component": {"op": "search", "index": 1},
@@ -207,17 +207,6 @@ class TestStampVerification:
                                "Case Details, Sepsis Case Encounters. "
                                "Not exhaustive."},
     }
-
-    def test_caption_ignoring_the_bridge_stamp_is_a_violation(self):
-        out = caption_violations(
-            "A sepsis case is defined by aggregating several metrics.",
-            [self.BRIDGED])
-        assert any("closest-by-name" in v for v in out)
-
-    def test_caption_presenting_a_stamped_name_passes(self):
-        assert caption_violations(
-            "Nothing is named that exactly — did you mean Sepsis Case "
-            "Details or Sepsis Case Encounters?", [self.BRIDGED]) == []
 
     def test_the_floor_renders_the_stamped_headlines(self):
         text = template_caption([self.BRIDGED])

@@ -35,6 +35,8 @@ from src.orchestrator.protocol import (
     propose_turn,
 )
 from src.orchestrator.tools import Session
+from src.orchestrator.turn_engine import EngineSession
+from src.orchestrator.turn_engine import run_turn as engine_run_turn
 
 MAX_CONVERSATIONS = 500          # in-memory cap; oldest evicted
 MAX_TURNS_PER_CONVERSATION = 60
@@ -51,6 +53,7 @@ class Conversation:
     history: "list[dict]" = field(default_factory=list)
     session: Session = field(default_factory=Session)
     protocol: ProtocolSession = field(default_factory=ProtocolSession)
+    engine: EngineSession = field(default_factory=EngineSession)
     turns: int = 0
     last_proposed: "dict | None" = None
 
@@ -161,7 +164,74 @@ def create_app(
         ))
         return JSONResponse({"recorded": True})
 
-    # ---- the plan protocol (ADR 0036) -------------------------------
+    # ---- the one-mind turn (ADR 0051) -------------------------------
+
+    @app.post("/api/ask")
+    async def ask(request: Request) -> JSONResponse:
+        """One user turn on the merged engine: the mind loops over
+        read-only tools with full evidence in ONE conversation; the
+        boundary stamps, gates, and verifies. Reads run immediately —
+        the plan-confirm card remains only for writes (ADR 0050)."""
+        body = await request.json()
+        question = str(body.get("message", "")).strip()
+        if not question:
+            return JSONResponse({"error": "empty message"},
+                                status_code=400)
+        user = _user_from(request)
+        conv_id = str(body.get("conversation_id") or uuid.uuid4())
+        conv = _conversation(user, conv_id)
+        turn_index = conv.turns
+        try:
+            turn = engine_run_turn(conv.engine, question, chat_api,
+                                   run_kql)
+        except Exception as e:                 # noqa: BLE001
+            return JSONResponse(
+                {"error": f"engine unavailable ({type(e).__name__})",
+                 "conversation_id": conv_id}, status_code=502)
+        trace = [{"tool": o["component"]["op"],
+                  "args": o["component"]["params"],
+                  "result": (o.get("result") or {"error": o.get("error")})}
+                 for o in turn["outputs"]]
+        sink.record(TurnEvent(
+            event_at=datetime.now(timezone.utc).isoformat(),
+            user_id=user,
+            question=question[:500],
+            tools_used=tuple(t["tool"] for t in trace),
+            ids_read=tuple(sorted({
+                str(i) for t in trace if t["tool"] == "retrieve"
+                for i in t["args"].get("ids", [])})),
+            basis="; ".join(
+                f"{t['tool']}({_json.dumps(t['args'])[:80]})"
+                for t in trace),
+            answered=bool(turn["answered"]),
+            conversation_id=conv_id, turn_index=turn_index,
+            decision=decision_shape(trace, turn["answer"]),
+            trace=tuple(
+                {"tool": t["tool"], "args": t["args"],
+                 "result": _json.dumps(t["result"])[:1500]}
+                for t in trace),
+        ))
+        conv.turns += 1
+        return JSONResponse({
+            "conversation_id": conv_id,
+            "turn_index": turn_index,
+            "outputs": turn["outputs"],
+            "caption": turn["answer"],
+            "caption_inputs": sorted({
+                (o.get("result") or {}).get("ref")
+                for o in turn["outputs"] if o.get("result")} - {None}),
+            "caption_corrected": turn["caption_corrected"],
+            "caption_violations": turn["caption_violations"],
+            "answered": turn["answered"],
+            "missing_op": turn["missing_op"],
+            "loop_status": (f"one mind: {turn['rounds']} tool round(s)"
+                            + (" — budget exhausted"
+                               if turn["exhausted"] else "")),
+            "loop_note": turn["missing_op"] if not turn["answered"] else "",
+            "suggestions": [],
+        })
+
+    # ---- the plan protocol (ADR 0036; writes-only since ADR 0051) ---
 
     @app.post("/api/plan")
     async def plan(request: Request) -> JSONResponse:
@@ -647,15 +717,36 @@ document.getElementById('ask').addEventListener('submit', async (e) => {
   if (!message) return;
   q.value = ''; askbtn.disabled = true;
   add(el(`<p class="you">you&gt; ${esc(message)}</p>`));
-  const thinking = add(el('<p class="muted">planning…</p>'));
+  const thinking = add(el('<p class="muted">working — operations will appear as run…</p>'));
   try {
-    const r = await fetch('/api/plan', { method:'POST',
+    // One-mind turn (ADR 0051): reads run immediately; every
+    // operation the mind ran is displayed, stamped. The plan-confirm
+    // card returns only when write operations exist.
+    const r = await fetch('/api/ask', { method:'POST',
       headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ message, conversation_id: conversationId })});
     const j = await r.json();
     thinking.remove();
     if (!r.ok) { add(el(`<p class="err">${esc(j.error||('error '+r.status))}</p>`)); }
-    else { conversationId = j.conversation_id; planCard(j.plan, message); }
+    else {
+      conversationId = j.conversation_id;
+      (j.outputs || []).forEach(renderOutput);
+      if (j.loop_status) {
+        add(el(`<div class="loopline">${esc(j.loop_status)}${
+          j.loop_note ? ' — ' + esc(j.loop_note) : ''}</div>`));
+      }
+      if (j.caption) {
+        const gate = j.caption_corrected
+          ? `<span class="inputs">honesty gate: original answer over-claimed
+              — showing the verified floor
+              (${esc((j.caption_violations||[]).join('; '))})</span>`
+          : '';
+        add(el(`<div class="caption">${esc(j.caption)}
+          <span class="inputs">based on: ${esc((j.caption_inputs||[]).join(', ')||'—')}${
+          j.answered ? ' · verdict: answered (evidence verified)' : ''}</span>${gate}</div>`));
+        renderFeedback(j.turn_index);
+      }
+    }
   } catch (e2) { thinking.remove();
     add(el(`<p class="err">network error: ${esc(e2)}</p>`)); }
   askbtn.disabled = false; q.focus();

@@ -57,23 +57,12 @@ PLANNER_PROMPT = (
     "decompositions (says WHERE definitions diverge); tables = set "
     "algebra; a field name = field diff.\n"
     "Rules: one component per operation, in execution order; each "
-    "component carries a short note saying why. Exact mode matches "
-    "NAMES; questions about a TOPIC ('about sepsis', 'related to "
-    "compliance') are meaning — semantic search, or the census of the "
-    "kind when the question wants a count over a topic. Resolve "
-    "references like 'this metric' or 'it' to the ids already "
-    "surfaced earlier in this conversation and use those ids "
-    "directly — do not re-search for a phrase the user did not say. "
-    "Plan ALL THE WAY TO THE ANSWER, not to the first hop: when the question asks what "
-    "something is, means, or how it is defined or decided, finding it "
-    "is not answering it — chain the read in the SAME plan with "
-    "result piping (retrieve {ids: \"$1\"} reads what component 1 "
-    "found). A plan that stops at search when the question needs the "
-    "record is an incomplete plan. If the question is genuinely "
-    "ambiguous, return NO components and set clarification to the "
-    "question you need answered. Plan completeness honestly: "
-    "questions about 'all/any other/unique' need exact search or an "
-    "exhaustive retrieve, never semantic search alone."
+    "component carries a short note saying why. If the question is "
+    "genuinely ambiguous, return NO components and set clarification "
+    "to the question you need answered."
+    # ADR 0051 (P4): the question-shape casebook that lived here is
+    # DELETED, not ported — the one-mind engine composes freely and
+    # the suite measures whether it does so natively.
 )
 
 # B (Sunny's verdict, 2026-08-20): un-drifting the slogan. "The answer
@@ -86,15 +75,10 @@ CAPTION_PROMPT = (
     "set. Respect each set's declared completeness: never claim "
     "'all/none/only' from a set marked incomplete. If the displayed "
     "sets do not contain the answer, say so plainly and name the "
-    "operation that would produce it. If nothing bears the exact name "
-    "the user used but displayed items' names CONTAIN their phrase, "
-    "you MUST bridge — list those items and ask which one they mean; "
-    "never synthesize a general answer over a misnamed ask. Counting "
-    "over a topic is legal ONLY over a displayed set marked complete "
-    "(the census rows and their descriptions) — a top-K search can "
-    "never source a count. Declare answered=true only when the "
-    "specific ask (the actual values, criteria, names, or count) is "
-    "in a displayed set. When you declare answered=true you MUST also "
+    "operation that would produce it. "
+    # ADR 0051 (P4): the mandatory-bridge and topic-count casebook
+    # clauses that lived here are DELETED, not ported.
+    "When you declare answered=true you MUST also "
     "supply evidence_quote: a verbatim substring (>= 20 characters) "
     "copied exactly from a displayed row that carries the answer — it "
     "is machine-verified, and an unverifiable quote demotes the "
@@ -111,23 +95,11 @@ GOAL_CHECK_PROMPT = (
     "compare — same parameters as planning; R1... refs work) could "
     "produce the missing part, propose those components. If nothing "
     "could, answered=false with no components and say in 'note' what "
-    "is missing. Judge only from what is displayed.\n"
-    "Judging discipline:\n"
-    "- answered=true means the SPECIFIC ask is on screen — the actual "
-    "criteria, codes, values, or names the user asked for. A summary "
-    "that says criteria are 'defined in the calculation steps' is a "
-    "POINTER, not the answer: retrieve the metric (its record lists "
-    "step ids), then retrieve those step ids — the criteria live in "
-    "the step records.\n"
-    "- an exact name lookup with 0 rows is never the end: propose a "
-    "semantic search of the same phrase — the closest certified items "
-    "are the material for a did-you-mean answer.\n"
-    "- 'how many X are about/related to TOPIC' needs the census of "
-    "that kind on screen; the count is then read from the displayed "
-    "descriptions, not from a name lookup.\n"
-    "- in follow-up components, ids must be explicit (from displayed "
-    "rows) — $n placeholders do not exist here; and never re-propose "
-    "an operation already displayed with the same parameters."
+    "is missing. Judge only from what is displayed. In follow-up "
+    "components, ids must be explicit (from displayed rows) — $n "
+    "placeholders do not exist here."
+    # ADR 0051 (P4): the pointer-doctrine casebook that lived here is
+    # DELETED, not ported.
 )
 
 GOAL_TOOL = {
@@ -670,26 +642,9 @@ def caption_turn(session: ProtocolSession, outputs: "list[dict]",
                                   or "an operation whose displayed rows "
                                      "contain the claimed answer")}
 
-    # Verdict demotion, in code (iteration 5): when a retrieve headline
-    # stamps "criteria live in the step records" and NO step record is
-    # displayed, an answered=true claim is structurally unverified —
-    # demote it. (Scoring is facts-based, so honest well-answered turns
-    # lose nothing; only the summary-over-claim dies.)
-    if raw.get("answered"):
-        pointer_stamped = any(
-            "criteria live in the step records" in
-            str((o.get("result") or {}).get("headline") or "")
-            for o in outputs)
-        step_shown = any(
-            str(row.get("kind") or "") == "step"
-            or str(row.get("id") or "").startswith("transform:")
-            for o in outputs
-            for row in ((o.get("result") or {}).get("rows") or []))
-        if pointer_stamped and not step_shown:
-            raw = {**raw, "answered": False,
-                   "missing_op": (raw.get("missing_op")
-                                  or "retrieve the step ids listed in "
-                                     "the record")}
+    # ADR 0051 (P4): the pointer-doctrine verdict demotion that lived
+    # here was question-family control flow — REMOVED. The
+    # evidence-quote proof above is the boundary mechanism that stays.
 
     suggestions = [validate_component(s, i + 1)
                    for i, s in enumerate(raw.get("suggestions") or [])][:3]

@@ -1,0 +1,208 @@
+"""Cage tests for the one-mind turn engine (ADR 0051, Floor 1).
+
+These prove the BOUNDS — never that the mind is smart (that is
+MEASURED by devtools/answer_evals.py): read-only refusal, anti-flail,
+round cap with honest exhaustion, full evidence into ONE persistent
+history, graceful compaction that never drops headlines, the caption
+gate at the boundary, and the machine-verified verdict quote."""
+
+import json
+
+from src.orchestrator.turn_engine import (
+    ENGINE_TOOLS,
+    EngineSession,
+    run_turn,
+)
+from tests.orchestrator.test_tools import REF_A, fake_kql
+
+
+def scripted_engine(steps):
+    """chat_api producing scripted assistant messages. Each step is
+    either {"text": ...} (plain answer), {"calls": [(name, args), ...]}
+    (tool calls), or {"verdict": {...}} consumed by the forced verdict
+    call."""
+    it = iter(steps)
+
+    def call(messages, tools, tool_choice=None):
+        step = next(it)
+        if tool_choice is not None:            # the forced verdict form
+            return {"role": "assistant", "content": None, "tool_calls": [
+                {"id": "v1", "type": "function",
+                 "function": {"name": "file_verdict",
+                              "arguments": json.dumps(
+                                  step.get("verdict", {}))}}]}
+        if "calls" in step:
+            return {"role": "assistant", "content": None, "tool_calls": [
+                {"id": f"c{i}", "type": "function",
+                 "function": {"name": name,
+                              "arguments": json.dumps(args)}}
+                for i, (name, args) in enumerate(step["calls"])]}
+        return {"role": "assistant", "content": step["text"],
+                "tool_calls": []}
+    return call
+
+
+GOOD_QUOTE = "measures ED Sepsis Screening"    # verbatim in fake rows
+
+
+class TestLoop:
+    def test_search_then_answer_full_rows_in_history(self):
+        s = EngineSession()
+        out = run_turn(s, "what exists for ed sepsis?", scripted_engine([
+            {"calls": [("search", {"phrase": "ed sepsis",
+                                   "mode": "semantic"})]},
+            {"text": "Two candidates are shown in R1."},
+            {"verdict": {"answered": True, "evidence_quote": GOOD_QUOTE}},
+        ]), fake_kql)
+        assert out["rounds"] == 1 and not out["exhausted"]
+        assert out["outputs"][0]["result"]["headline"].startswith("R1:")
+        tool_msgs = [m for m in s.history if m.get("role") == "tool"]
+        payload = json.loads(tool_msgs[0]["content"])
+        assert payload["rows"] and payload["headline"]   # FULL evidence
+        # P2: the whole exchange persists in ONE history
+        roles = [m["role"] for m in s.history]
+        assert roles.count("tool") == 1 and roles[-1] == "assistant"
+
+    def test_memory_across_turns_is_the_same_history(self):
+        s = EngineSession()
+        run_turn(s, "find ed sepsis", scripted_engine([
+            {"calls": [("search", {"phrase": "ed sepsis",
+                                   "mode": "semantic"})]},
+            {"text": "Shown."}, {"verdict": {"answered": False}},
+        ]), fake_kql)
+        n_before = len(s.history)
+        out2 = run_turn(s, "retrieve the first one", scripted_engine([
+            {"calls": [("retrieve", {"ids": [REF_A]})]},
+            {"text": "Retrieved."}, {"verdict": {"answered": False}},
+        ]), fake_kql)
+        # the id surfaced in turn 1 is retrievable in turn 2 (read
+        # guarantee crosses turns because the SESSION persists)
+        assert "result" in out2["outputs"][0]
+        assert len(s.history) > n_before        # same growing history
+
+    def test_write_flavored_tool_refused_in_dispatch(self):
+        s = EngineSession()
+        out = run_turn(s, "q", scripted_engine([
+            {"calls": [("update", {"id": REF_A})]},
+            {"text": "ok"}, {"verdict": {"answered": False}},
+        ]), fake_kql)
+        assert "read-only" in out["outputs"][0]["error"]
+        assert "plan-confirm" in out["outputs"][0]["error"]
+
+    def test_anti_flail_duplicate_becomes_an_observed_error(self):
+        s = EngineSession()
+        out = run_turn(s, "q", scripted_engine([
+            {"calls": [("search", {"phrase": "x", "mode": "exact"}),
+                       ("search", {"phrase": "x", "mode": "exact"})]},
+            {"text": "done"}, {"verdict": {"answered": False}},
+        ]), fake_kql)
+        assert "already ran this turn" in out["outputs"][1]["error"]
+        # P6: the refusal went INTO the conversation as a tool result
+        tool_payloads = [json.loads(m["content"]) for m in s.history
+                        if m.get("role") == "tool"]
+        assert any("already ran" in str(p.get("error")) for p in tool_payloads)
+
+    def test_round_cap_exhausts_honestly(self):
+        s = EngineSession()
+        steps = [{"calls": [("search", {"phrase": f"p{i}",
+                                        "mode": "semantic"})]}
+                 for i in range(20)]
+        steps.append({"verdict": {"answered": False}})
+        out = run_turn(s, "q", scripted_engine(steps), fake_kql)
+        assert out["exhausted"] and out["rounds"] == 8
+        assert "tool budget" in out["answer"]
+        assert out["answered"] is False
+
+    def test_infra_failure_is_an_observed_result(self):
+        def dying_kql(query, params):
+            raise RuntimeError(
+                '{"error": {"@message": "Delta table does not exist"}}')
+        s = EngineSession()
+        out = run_turn(s, "q", scripted_engine([
+            {"calls": [("census", {"kind": "metric"})]},
+            {"text": "The store is unreachable."},
+            {"verdict": {"answered": False}},
+        ]), dying_kql)
+        err = out["outputs"][0]["error"]
+        assert "Delta table does not exist" in err
+        assert "capacity paused" in err
+
+
+class TestBoundary:
+    def test_verdict_requires_machine_verified_quote(self):
+        s = EngineSession()
+        out = run_turn(s, "q", scripted_engine([
+            {"calls": [("search", {"phrase": "ed sepsis",
+                                   "mode": "semantic"})]},
+            {"text": "It is the screening metric."},
+            {"verdict": {"answered": True,
+                         "evidence_quote": "totally invented quote of "
+                                           "sufficient length"}},
+        ]), fake_kql)
+        assert out["answered"] is False
+        out2 = run_turn(EngineSession(), "q", scripted_engine([
+            {"calls": [("search", {"phrase": "ed sepsis",
+                                   "mode": "semantic"})]},
+            {"text": "It is the screening metric."},
+            {"verdict": {"answered": True,
+                         "evidence_quote": GOOD_QUOTE}},
+        ]), fake_kql)
+        assert out2["answered"] is True
+
+    def test_over_claiming_answer_is_floored_by_the_gate(self):
+        s = EngineSession()
+        out = run_turn(s, "how many?", scripted_engine([
+            {"calls": [("search", {"phrase": "nope", "mode": "exact"})]},
+            {"text": "There are 999 metrics in the catalog."},
+            {"text": "There are 999 metrics in the catalog."},  # retry
+            {"verdict": {"answered": True,
+                         "evidence_quote": GOOD_QUOTE}},
+        ]), fake_kql)
+        assert out["caption_corrected"]
+        assert out["answer"].startswith("Results as displayed.")
+        assert out["answered"] is False     # floored can never claim
+
+    def test_compaction_keeps_headline_and_totals(self):
+        from src.orchestrator import turn_engine
+        s = EngineSession()
+        s.history = [{"role": "system", "content": "sys"}]
+        for i in range(6):
+            s.history.append({
+                "role": "tool", "tool_call_id": f"t{i}",
+                "content": json.dumps({
+                    "ref": f"R{i}", "headline": f"R{i}: census — 28 row(s).",
+                    "rows_total": 28,
+                    "rows": [{"d": "x" * 500}] * 200})})
+        old_budget = turn_engine.HISTORY_BUDGET_CHARS
+        turn_engine.HISTORY_BUDGET_CHARS = 10_000
+        try:
+            turn_engine._compact_history(s.history)
+        finally:
+            turn_engine.HISTORY_BUDGET_CHARS = old_budget
+        compacted = [json.loads(m["content"]) for m in s.history
+                     if m.get("role") == "tool"
+                     and "compacted" in str(m.get("content"))]
+        assert compacted, "oldest results must compact under pressure"
+        assert all(c["headline"] and c["rows_total"] == 28
+                   for c in compacted)
+
+    def test_replay_same_script_same_outputs(self):
+        def once():
+            s = EngineSession()
+            return run_turn(s, "q", scripted_engine([
+                {"calls": [("search", {"phrase": "ed sepsis",
+                                       "mode": "semantic"})]},
+                {"text": "Shown in R1."},
+                {"verdict": {"answered": False}},
+            ]), fake_kql)
+        a, b = once(), once()
+        assert json.dumps(a, sort_keys=True) == json.dumps(b, sort_keys=True)
+
+
+def test_system_prompt_is_invariants_only_no_casebook():
+    """P4 pin: no question-family vocabulary in the engine prompt."""
+    from src.orchestrator.turn_engine import SYSTEM_PROMPT
+    for banned in ("how is", "defined", "did you mean", "bridge",
+                   "criteria", "pointer", "how many"):
+        assert banned not in SYSTEM_PROMPT.lower(), banned
+    assert len(ENGINE_TOOLS) == 4
