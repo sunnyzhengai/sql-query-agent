@@ -218,7 +218,15 @@ def main() -> None:
     families: "dict[str, list[dict]]" = {}
     stop_build = False
     for fixture in FIXTURES:
-        oracle = build_oracle(fixture, run_kql)
+        try:
+            oracle = build_oracle(fixture, run_kql)
+        except AssertionError:
+            raise
+        except Exception as e:                  # noqa: BLE001 — infra
+            print(f"[X] store dropped mid-run ({type(e).__name__}) — "
+                  "capacity is flapping; resume it and retry. Partial "
+                  "grades discarded.")
+            raise SystemExit(3)
         trail_prefix = fixture.get("questions", [fixture["question"]])[:-1]
         questions = [fixture["question"]]
         if not args.smoke:
