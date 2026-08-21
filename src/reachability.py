@@ -60,11 +60,12 @@ REACHABILITY = (
                "blast-radius op ('which metrics touch PATIENTMRN'); "
                "columns appear today only inside displayed SQL "
                "fragments"},
-    {"payload": "node:decision", "status": "excluded",
-     "reason": "queued FIRST in Sunny's 2026-08-21 order — step "
-               "retrieve will attach decision nodes (ADR 0044) behind "
-               "the ADR 0025 PHI gate; this row flips when the op "
-               "lands"},
+    {"payload": "node:decision", "status": "reachable",
+     "via": "step retrieve attaches decision sites (context, "
+            "predicate count, PHI-redacted expression) — ADR 0052 "
+            "backfill item 1, landed 2026-08-21",
+     "ops": ("_decisions_of",), "queries": ("DECISIONS_OF_STEP_QUERY",),
+     "marker": "decision"},
     {"payload": "node:report", "status": "reachable",
      "via": "catalog search/census (kind report); link traversal "
             "queued second in Sunny's 2026-08-21 order",
@@ -93,9 +94,10 @@ REACHABILITY = (
     {"payload": "edge:table_to_column", "status": "excluded",
      "reason": "queued with the column work (third in Sunny's "
                "2026-08-21 order)"},
-    {"payload": "edge:step_to_decision", "status": "excluded",
-     "reason": "queued FIRST in Sunny's 2026-08-21 order — flips with "
-               "node:decision when step retrieve attaches decisions"},
+    {"payload": "edge:step_to_decision", "status": "reachable",
+     "via": "step retrieve traverses it to attach decision sites",
+     "ops": (), "queries": ("DECISIONS_OF_STEP_QUERY",),
+     "marker": "step_to_decision"},
     {"payload": "edge:decision_to_column", "status": "excluded",
      "reason": "decision→column blast radius; queued with the column "
                "work"},

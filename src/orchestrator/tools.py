@@ -125,6 +125,21 @@ TABLE_USED_BY_QUERY = (
     "| take 30"
 )
 
+# Decision layer to the ask-surface (ADR 0044 nodes, ADR 0052
+# backfill item 1, Sunny's 2026-08-21 order): the WHERE/CASE criteria
+# of one step, as first-class rows. Expression content passes the
+# ADR 0025 PHI gate before it enters any prompt.
+DECISIONS_OF_STEP_QUERY = (
+    "declare query_parameters(p_step:string);\n"
+    "graph_edges\n"
+    "| where edge_type == 'step_to_decision' and source_id == p_step\n"
+    "| project node_id = target_id\n"
+    "| join kind=inner (graph_nodes\n"
+    "    | project node_id, name, description, properties) on node_id\n"
+    "| project node_id, name, description, properties\n"
+    "| order by node_id asc"
+)
+
 # Consumption-layer links (ADR 0040): deterministic edges from TMDL
 # partition lineage, exposed via the graph_edges shortcut.
 REPORTS_OF_METRIC_QUERY = (

@@ -30,6 +30,7 @@ from src.orchestrator.tools import (
     CATALOG_KINDS,
     FIND_BY_NAME_QUERY,
     LIST_CATALOG_QUERY,
+    DECISIONS_OF_STEP_QUERY,
     NAME_CONTAINS_QUERY,
     NAME_CONTAINS_TOKENS_QUERY,
     STEPS_OF_QUERY,
@@ -382,6 +383,37 @@ def op_census(kind: str, run_kql, session: OpsSession,
 
 # --- retrieve: one read primitive (facts + structure merged) ----------
 
+def _decisions_of(step_id: str, run_kql) -> "list[dict]":
+    """The step's decision sites (ADR 0044 → ask-surface, ADR 0052
+    backfill item 1): context, predicate count, and the expression.
+
+    READ-TIME PHI gate (ADR 0025, Sunny's rider 2026-08-21): the
+    export-side redactor historically covered only transformation
+    fragments, so decision expression_sql in the store predates the
+    gate — every expression is scanned and redacted here, at the last
+    point before it can enter an ask-path prompt."""
+    from src.phi_scan import redact, scan_sql
+    out = []
+    for d in run_kql(DECISIONS_OF_STEP_QUERY, {"p_step": step_id}):
+        props = d.get("properties")
+        if isinstance(props, str):
+            props = json.loads(props or "{}")
+        props = props or {}
+        expr = str(props.get("expression_sql") or "")
+        if expr:
+            findings = [
+                f for f in scan_sql(str(props.get("metric_id") or ""),
+                                    expr)
+                if f.disposition == "redact"]
+            if findings:
+                expr = redact(expr, findings)
+        out.append({"id": d["node_id"],
+                    "context": props.get("context"),
+                    "predicate_count": props.get("predicate_count"),
+                    "expression_sql": expr})
+    return out
+
+
 def op_retrieve(ids: "list[str]", run_kql, session: OpsSession) -> ResultSet:
     if not ids:
         raise OpError("retrieve needs at least one id")
@@ -395,7 +427,8 @@ def op_retrieve(ids: "list[str]", run_kql, session: OpsSession) -> ResultSet:
         try:
             if an_id.startswith("transform:"):
                 fs = assemble_step(an_id, an_id.split(":", 2)[1], run_kql)
-                rows.append({"id": an_id, "kind": "step", **fs.facts})
+                rows.append({"id": an_id, "kind": "step", **fs.facts,
+                             "decisions": _decisions_of(an_id, run_kql)})
             else:
                 fs = assemble_metric(an_id, run_kql)
                 steps = run_kql(STEPS_OF_QUERY, {"p_ref": an_id})

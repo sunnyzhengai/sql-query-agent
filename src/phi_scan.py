@@ -225,19 +225,26 @@ def redact_node_fragments(
     for f in findings:
         if f.disposition == "redact":
             by_metric.setdefault(f.metric_id, []).append(f)
+    # Decision rows joined 2026-08-21 (Sunny's rider on the ADR 0052
+    # backfill): decision expression_sql is the payload MOST likely to
+    # carry embedded literals — ADR 0025's founding observation — and
+    # this gate historically skipped it.
+    _keys = {"transformation": "sql_fragment",
+             "decision": "expression_sql"}
     changed = 0
     for row in nodes_rows:
-        if row.get("layer") != "transformation":
+        key = _keys.get(str(row.get("layer") or ""))
+        if key is None:
             continue
         was_str = isinstance(row["properties"], str)
         props = _json.loads(row["properties"]) if was_str else row["properties"]
-        fragment = props.get("sql_fragment") or ""
+        fragment = props.get(key) or ""
         relevant = by_metric.get(props.get("metric_id", ""), [])
         if not (fragment and relevant):
             continue
         redacted = redact(fragment, relevant)
         if redacted != fragment:
-            props["sql_fragment"] = redacted
+            props[key] = redacted
             if was_str:
                 row["properties"] = _json.dumps(props)
             changed += 1

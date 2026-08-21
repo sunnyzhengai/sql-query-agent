@@ -11,6 +11,7 @@ from src.orchestrator.tools import (
     BATCH_FRAGMENTS_QUERY,
     FIND_BY_NAME_QUERY,
     LIST_CATALOG_QUERY,
+    DECISIONS_OF_STEP_QUERY,
     NAME_CONTAINS_QUERY,
     NAME_CONTAINS_TOKENS_QUERY,
     STEPS_OF_QUERY,
@@ -71,6 +72,21 @@ def fake_kql(query, params):
             return [{"node_id": f"canonical:{REF_A}", "kind": "metric",
                      "ref": REF_A, "name": "USP_ED_Sepsis",
                      "business_name": "ED Sepsis Screening"}]
+        return []
+    if query == DECISIONS_OF_STEP_QUERY:
+        if params["p_step"] == STEP_1:
+            return [{
+                "node_id": f"decision:{REF_A}:Scores:w1",
+                "name": "Scores/WHERE",
+                "description": "filters scored rows",
+                "properties": json.dumps({
+                    "metric_id": REF_A, "step_name": "Scores",
+                    "site_id": "w1", "context": "WHERE",
+                    "predicate_count": 2,
+                    "expression_sql":
+                        "PatientName = 'John Smith' AND SepsisDX = 1",
+                }),
+            }]
         return []
     if query == TABLE_USED_BY_QUERY:
         # the fake graph: technical table IP_SEPSIS is read by both

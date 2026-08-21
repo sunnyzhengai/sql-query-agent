@@ -315,6 +315,41 @@ class TestExactEmptyBridgeNote:
         assert "ED Sepsis Screening" not in rs.note
 
 
+class TestDecisionLayer:
+    """ADR 0052 backfill item 1 (Sunny's order, 2026-08-21): step
+    retrieve attaches the decision sites — the WHERE/CASE criteria as
+    data, not step-description prose. Sunny rejected the
+    summary-flavored drilldown answer; this is its fix."""
+
+    def test_step_retrieve_attaches_decisions(self):
+        s = OpsSession()
+        s.surfaced.add(STEP_1)
+        rs = op_retrieve([STEP_1], fake_kql, s)
+        decs = rs.rows[0]["decisions"]
+        assert len(decs) == 1
+        assert decs[0]["context"] == "WHERE"
+        assert decs[0]["predicate_count"] == 2
+        assert "SepsisDX = 1" in decs[0]["expression_sql"]
+
+    def test_decision_expression_is_phi_redacted_at_read_time(self):
+        """Sunny's rider: decision sites are the payload most likely
+        to carry embedded literals (ADR 0025), and the store's rows
+        predate the export-side gate — the ask-path redacts at the
+        last point before an expression can enter a prompt."""
+        s = OpsSession()
+        s.surfaced.add(STEP_1)
+        rs = op_retrieve([STEP_1], fake_kql, s)
+        expr = rs.rows[0]["decisions"][0]["expression_sql"]
+        assert "John Smith" not in expr
+        assert "<NAME>" in expr
+
+    def test_step_without_decisions_gets_empty_list(self):
+        s = OpsSession()
+        s.surfaced.add(STEP_2)
+        rs = op_retrieve([STEP_2], fake_kql, s)
+        assert rs.rows[0]["decisions"] == []
+
+
 class TestTokenDegradedContainment:
     """Suite find (2026-08-21): the model paraphrased the user's name
     into 'Sepsis Case Definition' — full-phrase containment went dark

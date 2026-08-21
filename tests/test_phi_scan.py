@@ -172,3 +172,30 @@ class TestMeasureRedaction:
         from src.phi_scan import redact_measure_expressions
         rows = [{"node_id": "tech:X", "layer": "technical", "properties": "{}"}]
         assert redact_measure_expressions(rows) == (0, 0)
+
+
+class TestDecisionRowRedaction:
+    """Export-side gate extended to decision rows (2026-08-21, Sunny's
+    rider on the ADR 0052 backfill): expression_sql is the payload
+    most likely to carry embedded literals, and the gate historically
+    skipped it."""
+
+    def test_decision_expression_sql_is_redacted(self):
+        import json
+
+        from src.phi_scan import redact_node_fragments, scan_sql
+        expr = "WHERE PatientName = 'John Smith'"
+        findings = scan_sql("m1", expr)
+        row = {"layer": "decision",
+               "properties": json.dumps({
+                   "metric_id": "m1", "expression_sql": expr})}
+        changed = redact_node_fragments([row], findings)
+        assert changed == 1
+        props = json.loads(row["properties"])
+        assert "John Smith" not in props["expression_sql"]
+
+    def test_other_layers_untouched(self):
+        from src.phi_scan import redact_node_fragments, scan_sql
+        findings = scan_sql("m1", "WHERE PatientName = 'John Smith'")
+        row = {"layer": "canonical", "properties": {"metric_id": "m1"}}
+        assert redact_node_fragments([row], findings) == 0
