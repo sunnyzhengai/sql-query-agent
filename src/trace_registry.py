@@ -503,9 +503,12 @@ TRACE_REGISTRY = {
                  "reachable by a named op or excluded with a reason",
         "category": "architecture",
         "axioms": ["C1"],
-        "modules": ["src/reachability.py"],
-        "tests": ["tests/test_reachability.py"],
-        "docs": ["docs/decisions/0052-reachability-contract.md"],
+        "modules": ["src/reachability.py",
+                    "devtools/reachability_audit.py"],
+        "tests": ["tests/test_reachability.py",
+                  "tests/test_reachability_audit.py"],
+        "docs": ["docs/decisions/0052-reachability-contract.md",
+                 "docs/architecture/SPEC.md"],
     },
     "0051": {
         "title": "The one-mind turn: one conversation decides, the "

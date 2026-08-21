@@ -620,7 +620,10 @@ classification).
 - **Grounds:** spec:C1
 - **Implemented by:**
   - `src/reachability.py`
+  - `devtools/reachability_audit.py`
 - **Enforced by:**
   - `tests/test_reachability.py`
+  - `tests/test_reachability_audit.py`
 - **Summarized in:**
   - `docs/decisions/0052-reachability-contract.md`
+  - `docs/architecture/SPEC.md`

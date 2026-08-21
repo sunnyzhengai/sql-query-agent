@@ -1,6 +1,6 @@
 # Φ_AIVIA — The Shadow Specification
 
-**Version:** 0.5 (adopted; ADR 0047, extended by ADR 0048, 0051)
+**Version:** 0.6 (adopted; ADR 0047, extended by ADR 0048, 0051; §3b ratified by ADR 0052, first live use: the reachability contract)
 **Date:** 2026-08-19 (v0.5: 2026-08-21)
 **Origin:** review session with Sunny; motivated by three recurring deviation
 classes discovered by code-walking: (1) missing EMR join edges — the technical
@@ -74,6 +74,38 @@ the formula is the law, the gloss is the teaching aid.
 
 An UNBOUND axiom is a **proposal to the dev session**: adopting the spec means
 either building its check or demoting it explicitly.
+
+---
+
+## 3b. The design-review clause (the three questions)
+
+**Mandated by Sunny, 2026-08-21.** Every NEW artifact class — a
+registry, a projection, a tool surface, a prompt surface, an export,
+a graph layer, any subsystem that produces or consumes governed
+artifacts — MUST answer the three questions **before its first line
+of code**, and the answers become its registry rows:
+
+1. **The inventory question (spec:C1 shape).** What is this thing's
+   complete frontier, enumerated as data? What is the exclusion row
+   for everything deliberately outside it? ("Nobody decided that; it
+   just happened" is only possible for an artifact class never asked
+   this question — the EMR-joins incident and the 7%-reachability
+   incident were both question-1 omissions.)
+2. **The conservation question (spec:C2 shape).** What equation proves
+   nothing vanished between input and output —
+   `handled ⊎ fallout = total`? Where do the fallout rows land?
+3. **The drift question (STPA shape).** When reality diverges from the
+   declaration, what MECHANICALLY fires — a red build, a checklist
+   row, a funnel bar? "Someone would notice" is the definition of a
+   missing feedback loop.
+
+Enforcement: a design review that cannot cite the three answers does
+not proceed to implementation; the answers are recorded as rows in the
+relevant registry (or a new registry born from question 1), so the
+declaration is data from day one. Prior art for this clause:
+IEC 62304 / DO-178C traceability + coverage analysis, and STPA's
+control-loop hazard questions — see docs/METHODOLOGY.md, "The
+enforcement lineage."
 
 ---
 
@@ -708,6 +740,11 @@ governs generated artifacts revs the relevant `*_CONTRACT_VERSION` cache keys
 
 ## Changelog
 
+- **0.6 (2026-08-21)** — §3b the design-review clause (Sunny's
+  mandate, review-session authored, dev ratifies with the next ADR):
+  three questions — inventory, conservation, drift — answered before
+  any new artifact class's first line of code; answers become registry
+  rows. Prior-art lineage recorded in docs/METHODOLOGY.md.
 - **0.5 (2026-08-21)** — ADR 0051 (the one-mind turn): E-group note —
   a turn's INTERIOR decisions (which tool, when to stop, how to
   compose) are linguistic and live in one conversation with full

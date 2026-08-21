@@ -402,3 +402,17 @@ the audit permanent first. DONE in order:
 QUEUED (rows on record in the contract): columns third, SQL-text
 last; transform_to_transform lineage unqueued pending Sunny.
 Zero prompt/tool-schema changes — the pin stands. 925 tests green.
+
+### 2026-08-21 — SPEC §3b RATIFIED (ADR 0052 amended); clause's first live use complete (1.51.1)
+The three answers, cited and mechanized: (1) inventory =
+src/reachability.py, 24 payloads, no undeclared frontier; (2)
+conservation VERIFIED LIVE: 432 transforms = 413 catalog steps ⊎ 19
+__final_select__ terminals — residual fully named, no third bucket;
+(3) drift = enum-level CI (tests/test_reachability.py) +
+store-level devtools/reachability_audit.py (exit 1 names every
+undeclared payload and every vanished step; ran clean against the
+store today). Calibration finding recorded in the ADR: store-level
+conservation cannot live in CI — the drift answer splits into a CI
+leg and a live-audit leg; expect the same split for any artifact
+class whose frontier exists only in tenant data. SPEC header flipped
+to "ratified by ADR 0052".
