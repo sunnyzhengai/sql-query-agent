@@ -30,6 +30,7 @@ from src.orchestrator.events import FeedbackEvent, TurnEvent, decision_shape
 from src.orchestrator.protocol import (
     ProtocolSession,
     caption_turn,
+    continue_rounds,
     execute_confirmed,
     propose_turn,
 )
@@ -199,13 +200,29 @@ def create_app(
                                 status_code=400)
         conv = _conversation(user, conv_id)
         turn_index = conv.turns
+        question = str(body.get("question", ""))[:500]
         outputs = execute_confirmed(conv.protocol, confirmed, run_kql)
+        # The bounded read-only loop (Sunny's verdict 2026-08-20):
+        # auto-continue toward the ANSWER; bound enforced in the
+        # executor; every auto-hop displayed and stamped.
         try:
-            cap = caption_turn(conv.protocol, outputs, chat_api)
+            loop = continue_rounds(conv.protocol, question, outputs,
+                                   chat_api, run_kql)
+        except Exception as e:                 # noqa: BLE001
+            loop = {"rounds": [], "exhausted": False,
+                    "status_line": ("auto-continue unavailable "
+                                    f"({type(e).__name__})"),
+                    "unanswered_note": ""}
+        try:
+            cap = caption_turn(conv.protocol, outputs, chat_api,
+                               question=question)
         except Exception as e:                 # noqa: BLE001
             cap = {"caption": f"(caption unavailable: {type(e).__name__} "
                               "— the results above are complete)",
-                   "caption_inputs": [], "suggestions": []}
+                   "caption_inputs": [], "suggestions": [],
+                   "answered": False, "missing_op": ""}
+        cap["loop_status"] = loop["status_line"]
+        cap["loop_note"] = loop["unanswered_note"]
         trace = [{"tool": o["component"]["op"],
                   "args": o["component"]["params"],
                   "result": (o.get("result") or {"error": o.get("error")})}
@@ -232,7 +249,9 @@ def create_app(
             basis="; ".join(
                 f"{t['tool']}({_json.dumps(t['args'])[:80]})"
                 for t in trace),
-            answered=any("result" in o for o in outputs),
+            # Typed verdict (HANDOFF_ANSWER_LOOP): unanswered turns are
+            # the new miss stream — the flywheel that caught the census.
+            answered=bool(cap.get("answered")),
             conversation_id=conv_id, turn_index=turn_index,
             decision=decision_shape(trace, cap.get("caption", "")),
             trace=tuple(
@@ -362,6 +381,10 @@ WORKBENCH_PAGE = """<!doctype html>
            max-height:180px; overflow-y:auto; }
   details summary { cursor:pointer; color:var(--accent);
                     font-size:12px; }
+  .badge.auto { background:#fff7e6; color:#8a5a00;
+                border:1px solid #e0b96a; }
+  .loopline { font:11.5px ui-monospace,monospace; color:#8a5a00;
+              margin:0 0 6px; }
   .headline { font:13px/1.5 ui-monospace,monospace; font-weight:600;
               background:#eef7ee; border-left:3px solid #2e7d32;
               padding:8px 12px; margin:0 0 6px; }
@@ -504,6 +527,10 @@ async function runPlan(card, question) {
     if (!r.ok) { add(el(`<p class="err">${esc(j.error||('error '+r.status))}</p>`)); return; }
     card.querySelector('h3').textContent = 'Plan (as run)';
     (j.outputs || []).forEach(renderOutput);
+    if (j.loop_status) {
+      add(el(`<div class="loopline">${esc(j.loop_status)}${
+        j.loop_note ? ' — ' + esc(j.loop_note) : ''}</div>`));
+    }
     if (j.caption) {
       const gate = j.caption_corrected
         ? `<span class="inputs">honesty gate: original caption over-claimed
@@ -519,9 +546,12 @@ async function runPlan(card, question) {
 }
 
 function renderOutput(o) {
+  const auto = (o.component && o.component.auto_round)
+    ? `<span class="badge auto">auto round ${o.component.auto_round} · read-only</span>`
+    : '';
   if (o.error) {
     add(el(`<div class="rs"><div class="head">
-      <span class="oplabel">${esc(o.component.op)}</span>
+      <span class="oplabel">${esc(o.component.op)}</span>${auto}
       <span class="badge error">error</span>
       <span class="universe">${esc(o.error)}</span></div></div>`));
     return;
@@ -532,7 +562,7 @@ function renderOutput(o) {
     : '<span class="badge partial">not exhaustive</span>';
   const rs = el(`<div class="rs"><div class="head">
     <span class="ref">${esc(r.ref)}</span>
-    <span class="oplabel">${esc(r.op)}</span>
+    <span class="oplabel">${esc(r.op)}</span>${auto}
     <span class="universe">${esc(JSON.stringify(r.params))}</span>
     ${badge}
     <span class="universe">${esc(r.universe)}${r.note ? ' · ' + esc(r.note) : ''}</span>

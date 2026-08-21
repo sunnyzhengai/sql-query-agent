@@ -499,6 +499,15 @@ TRACE_REGISTRY = {
                   "tests/test_companion.py"],
         "docs": ["docs/architecture/SPEC.md", "docs/architecture/TRACE_MAP.md"],
     },
+    "0050": {
+        "title": "Bounded read-only answer loop: plan to the answer, "
+                 "caption answers, auto-continue (amends 0036)",
+        "category": "architecture",
+        "axioms": ["E3"],
+        "modules": ["src/orchestrator/protocol.py"],
+        "tests": ["tests/orchestrator/test_protocol.py"],
+        "docs": [],
+    },
     "0049": {
         "title": "Ingestion routes: filedrop, folders, live extractor",
         "category": "architecture",

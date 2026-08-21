@@ -57,22 +57,68 @@ PLANNER_PROMPT = (
     "decompositions (says WHERE definitions diverge); tables = set "
     "algebra; a field name = field diff.\n"
     "Rules: one component per operation, in execution order; each "
-    "component carries a short note saying why. If the question is "
-    "genuinely ambiguous, return NO components and set clarification "
-    "to the question you need answered. Plan completeness honestly: "
+    "component carries a short note saying why. Plan ALL THE WAY TO "
+    "THE ANSWER, not to the first hop: when the question asks what "
+    "something is, means, or how it is defined or decided, finding it "
+    "is not answering it — chain the read in the SAME plan with "
+    "result piping (retrieve {ids: \"$1\"} reads what component 1 "
+    "found). A plan that stops at search when the question needs the "
+    "record is an incomplete plan. If the question is genuinely "
+    "ambiguous, return NO components and set clarification to the "
+    "question you need answered. Plan completeness honestly: "
     "questions about 'all/any other/unique' need exact search or an "
     "exhaustive retrieve, never semantic search alone."
 )
 
+# B (Sunny's verdict, 2026-08-20): un-drifting the slogan. "The answer
+# is a caption" always meant the caption IS the answer, grounded in
+# displayed results — not a description of the display.
 CAPTION_PROMPT = (
-    "You caption results that the user can already SEE on screen. "
-    "Write a concise narration grounded ONLY in the displayed result "
-    "sets provided (reference them as R1, R2...). Respect each set's "
-    "declared completeness: never claim 'all/none/only' from a set "
-    "marked incomplete. Never output patient identifiers. Then suggest "
-    "0-3 useful next operations as structured components. No "
-    "greetings; business language; SQL only if the user asked for it."
+    "You ANSWER the user's question using ONLY the displayed result "
+    "sets (reference them as R1, R2...). The answer is a caption: "
+    "concise, business language, every claim grounded in a displayed "
+    "set. Respect each set's declared completeness: never claim "
+    "'all/none/only' from a set marked incomplete. If the displayed "
+    "sets do not contain the answer, say so plainly and name the "
+    "operation that would produce it. Never output patient "
+    "identifiers. No greetings; SQL only if the user asked for it. "
+    "Then suggest 0-3 useful next operations as structured components."
 )
+
+GOAL_CHECK_PROMPT = (
+    "You judge ONE thing from the displayed result sets: do they "
+    "contain the answer to the user's question? If yes: answered=true. "
+    "If no and a read-only operation (search, census, retrieve, "
+    "compare — same parameters as planning; R1... refs work) could "
+    "produce the missing part, propose those components. If nothing "
+    "could, answered=false with no components and say in 'note' what "
+    "is missing. Judge only from what is displayed."
+)
+
+GOAL_TOOL = {
+    "type": "function",
+    "function": {
+        "name": "assess_answer",
+        "description": "Judge answer-completeness; propose next "
+                       "read-only components if needed.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "answered": {"type": "boolean"},
+                "components": {"type": "array", "items": {
+                    "type": "object",
+                    "properties": {
+                        "op": {"type": "string"},
+                        "params": {"type": "object"},
+                        "note": {"type": "string"},
+                    },
+                    "required": ["op", "params"]}},
+                "note": {"type": "string"},
+            },
+            "required": ["answered"],
+        },
+    },
+}
 
 PLAN_TOOL = {
     "type": "function",
@@ -101,11 +147,23 @@ CAPTION_TOOL = {
     "type": "function",
     "function": {
         "name": "caption_results",
-        "description": "Caption the displayed results; suggest next ops.",
+        "description": "Answer the question from the displayed results; "
+                       "declare answered honestly; suggest next ops.",
         "parameters": {
             "type": "object",
             "properties": {
                 "caption": {"type": "string"},
+                # Typed self-declaration (HANDOFF_ANSWER_LOOP): the
+                # machine-readable verdict the grader cross-checks —
+                # answered:true without the required facts is DISHONEST.
+                "answered": {"type": "boolean",
+                             "description": "true ONLY if the caption "
+                             "actually answers the user's question from "
+                             "the displayed sets"},
+                "missing_op": {"type": "string",
+                               "description": "when answered=false: the "
+                               "operation that would produce the answer, "
+                               "or empty if none could"},
                 "suggestions": {"type": "array", "items": {
                     "type": "object",
                     "properties": {
@@ -115,7 +173,7 @@ CAPTION_TOOL = {
                     },
                     "required": ["op", "params"]}},
             },
-            "required": ["caption"],
+            "required": ["caption", "answered"],
         },
     },
 }
@@ -123,6 +181,13 @@ CAPTION_TOOL = {
 _REF_SHAPE = re.compile(r"^(R\d+|\$\d+)$")
 
 IMPLEMENTED_OPS = ("search", "census", "retrieve", "compare")
+
+# The auto-continue bound (Sunny's verdict, 2026-08-20): only these ops
+# may run WITHOUT per-round human confirmation. Enforced in the
+# executor path, never by prompt. Writes always confirm — any future
+# mutating op must NOT be added here without its own ruling.
+READ_ONLY_OPS = frozenset({"search", "census", "retrieve", "compare"})
+MAX_AUTO_ROUNDS = 3
 APPROVED_UNBUILT = {"traverse": "approved (ADR 0037) but not yet built",
                     "update": "approved (ADR 0036/0038) but gated on the "
                               "access-control ADR"}
@@ -268,6 +333,79 @@ def execute_confirmed(session: ProtocolSession, plan: dict,
     return outputs
 
 
+def continue_rounds(session: ProtocolSession, question: str,
+                    outputs: "list[dict]", chat_api, run_kql,
+                    max_rounds: int = MAX_AUTO_ROUNDS) -> dict:
+    """The bounded read-only loop (Sunny's verdict, 2026-08-20 —
+    ADR 0035's intelligence shape inside ADR 0036's honesty frame).
+
+    After the confirmed plan runs, ask ONE question per round: does the
+    display answer the user's question? If not, the proposed follow-up
+    components auto-run — but the bound is enforced HERE, in the
+    executor path, never by prompt: any component whose op is not in
+    READ_ONLY_OPS is refused before validation, refusal displayed;
+    writes always confirm. Every auto-hop lands in `outputs` exactly
+    like a confirmed hop (stamped headline, visible error). The error
+    mode, by construction: one more visible read-only hop, or an
+    honest "couldn't answer" with what is missing named.
+
+    Mutates `outputs` in place (appending auto-hops) and returns
+    {rounds, exhausted, status_line, unanswered_note}."""
+    rounds: "list[dict]" = []
+    unanswered_note = ""
+    for round_no in range(1, max_rounds + 1):
+        display_blob = json.dumps(outputs)[:6000]
+        messages = list(session.history) + [
+            {"role": "system", "content": GOAL_CHECK_PROMPT},
+            {"role": "user", "content":
+             f"Question: {question}\nDisplayed results:\n{display_blob}"}]
+        raw = _forced_call(chat_api, messages, GOAL_TOOL)
+        components = list(raw.get("components") or [])
+        if raw.get("answered") or not components:
+            unanswered_note = ("" if raw.get("answered")
+                               else str(raw.get("note", ""))[:300])
+            status = (f"auto-continue: answered after "
+                      f"{len(rounds)} read-only round(s)"
+                      if raw.get("answered") else
+                      f"auto-continue: stopped after {len(rounds)} "
+                      f"read-only round(s) — no further read-only "
+                      f"operation would help")
+            return {"rounds": rounds, "exhausted": False,
+                    "status_line": status,
+                    "unanswered_note": unanswered_note}
+
+        # THE BOUND, in code: non-read-only ops never auto-run.
+        runnable, refused = [], []
+        for comp in components:
+            if str(comp.get("op", "")) in READ_ONLY_OPS:
+                runnable.append(comp)
+            else:
+                refused.append({
+                    "component": {"index": 0, "op": str(comp.get("op", "")),
+                                  "params": dict(comp.get("params") or {}),
+                                  "note": "", "valid": False,
+                                  "auto_round": round_no},
+                    "error": (f"{comp.get('op')!r} refused: auto-continue "
+                              "is read-only; writes always confirm"),
+                })
+        round_outputs = list(refused)
+        if runnable:
+            executed = execute_confirmed(
+                session, {"components": runnable}, run_kql)
+            for o in executed:
+                o["component"]["auto_round"] = round_no
+            round_outputs.extend(executed)
+        outputs.extend(round_outputs)
+        rounds.append({"round": round_no,
+                       "note": str(raw.get("note", ""))[:300],
+                       "outputs": round_outputs})
+
+    return {"rounds": rounds, "exhausted": True,
+            "status_line": (f"auto-continue: round cap ({max_rounds}) "
+                            "reached — answer may be incomplete"),
+            "unanswered_note": ""}
+
+
 def _expand_ids(ids: "list[str]", produced: "dict[int, str]",
                 ops: OpsSession) -> "list[str]":
     """$n inside an ids list expands to the ids of component n's result
@@ -310,16 +448,19 @@ def _run_component(c: dict, produced: "dict[int, str]", run_kql,
 
 
 def caption_turn(session: ProtocolSession, outputs: "list[dict]",
-                 chat_api) -> dict:
-    """Caption what is on screen; suggest next components (validated).
-    The caption's inputs are stamped by code: the refs it was shown."""
+                 chat_api, question: str = "") -> dict:
+    """ANSWER the question from what is on screen (B, 2026-08-20: the
+    caption IS the answer); suggest next components (validated). The
+    caption's inputs are stamped by code: the refs it was shown."""
     shown_refs = [o["result"]["ref"] for o in outputs if "result" in o]
     display_blob = json.dumps(outputs)[:6000]
     messages = list(session.history) + [
         {"role": "system", "content": CAPTION_PROMPT},
         {"role": "user", "content":
+         f"The user's question: {question or '(not restated)'}\n\n"
          f"Displayed results (the user sees these):\n{display_blob}\n\n"
-         "Caption them and suggest next operations."}]
+         "Answer the question from these results (or say what "
+         "operation would), then suggest next operations."}]
     raw = _forced_call(chat_api, messages, CAPTION_TOOL)
     caption = str(raw.get("caption", "")).strip()
 
@@ -346,4 +487,9 @@ def caption_turn(session: ProtocolSession, outputs: "list[dict]",
             "caption_inputs": shown_refs,        # stamped by code
             "caption_corrected": bool(violations),
             "caption_violations": violations,
+            # Typed self-declaration (HANDOFF_ANSWER_LOOP): graded by
+            # the conversation suite; logged as the miss stream. A
+            # floored caption is by definition not an answer.
+            "answered": bool(raw.get("answered", False)) and not violations,
+            "missing_op": str(raw.get("missing_op", ""))[:120],
             "suggestions": [s for s in suggestions if s["valid"]]}

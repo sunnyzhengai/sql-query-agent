@@ -60,3 +60,4 @@ never deleted — its status changes and it links to its replacement.
 | [0047](0047-shadow-spec-axiom-system.md) | The shadow specification Φ_AIVIA: axiom system + enforcement homes; drift becomes a named, checkable violation | Accepted |
 | [0048](0048-trace-registry-admin-graph-companion.md) | Declared zones, the trace registry, the admin graph, and the admin companion — the closed system made walkable | Accepted |
 | [0049](0049-ingestion-routes-live-extractor.md) | Ingestion routes: filedrop, folders, and the live extractor are peer front doors | Accepted (retroactive record — first ghost finding of the 0048 totality check) |
+| [0050](0050-bounded-read-only-answer-loop.md) | The bounded read-only answer loop: plan to the answer, caption answers, read-only auto-continue — 0035's shape in 0036's frame | Accepted (amends 0036) |

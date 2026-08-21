@@ -15,6 +15,36 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.41.0] - 2026-08-20
+
+### Added — the answer loop (ADR 0050, amends 0036): A + B + C per Sunny's verdicts
+- A: the planner plans ALL THE WAY TO THE ANSWER — chains reads with
+  result piping in one confirmed plan; finding a thing is not
+  answering a question.
+- B: the caption IS the answer (slogan un-drifted): the captioner
+  answers the question from displayed results or names the operation
+  that would; it emits a typed {answered, missing_op} verdict beside
+  the prose — a floored caption can never claim answered; the verdict
+  is logged per turn (the new miss stream).
+- C: bounded read-only auto-continue (protocol.continue_rounds):
+  after the confirmed plan, a goal check per round; follow-up
+  components auto-run ONLY if read-only — the whitelist is enforced
+  in the executor before validation, refusals displayed; round cap 3;
+  every auto-hop stamped and traced; exhaustion reported in a
+  code-stamped status line. Writes always confirm.
+- Floor-1 cage tests (9): write-op refusal, round cap + honest
+  exhaustion, whitelist-bounded trace, byte-identical replay, typed
+  verdict beside prose, question reaches the captioner.
+- Floor-2: devtools/answer_evals.py — the conversation suite, driving
+  the same entry the web UI calls; grading keys DERIVED FROM THE
+  STORE (census count, record facts, near-name siblings, step-level
+  facts beyond the summary); dishonest turns are a build-stopper;
+  thresholds per ADR 0050 (answer ≥ 0.8/family, honesty 1.0). The
+  four real corpses are the seed fixtures.
+- D rejected per verdict: no plan templates.
+
+---
+
 ## [1.40.0] - 2026-08-20
 
 ### Changed — stamp, don't audit: the stamped headline (Sunny's verdict via the review session)

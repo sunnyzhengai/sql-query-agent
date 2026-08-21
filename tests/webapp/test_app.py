@@ -229,11 +229,12 @@ class TestPlanProtocolEndpoints:
              "note": "records"},
             {"op": "compare", "params": {"refs": ["$1"]},
              "note": "partition"}]}
+        goal_payload = {"answered": True}      # ADR 0050 loop check
         caption_payload = {"caption": "Two distinct definitions (R2).",
-                           "suggestions": []}
+                           "answered": True, "suggestions": []}
         sink = JsonlEventSink(tmp_path / "e.jsonl")
         app = TestClient(create_app(
-            self.scripted([plan_payload, caption_payload]),
+            self.scripted([plan_payload, goal_payload, caption_payload]),
             fake_kql, sink))
         # 1) interpret — nothing executes
         r = app.post("/api/plan", json={

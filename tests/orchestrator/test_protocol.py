@@ -4,8 +4,12 @@ execute -> caption, with a scripted planner that misbehaves on cue."""
 import json
 
 from src.orchestrator.protocol import (
+    IMPLEMENTED_OPS,
+    MAX_AUTO_ROUNDS,
+    READ_ONLY_OPS,
     ProtocolSession,
     caption_turn,
+    continue_rounds,
     execute_confirmed,
     propose_turn,
     validate_component,
@@ -186,6 +190,129 @@ class TestCaption:
         out = caption_turn(s, outputs, scripted_planner([bad, good]))
         assert out["caption_corrected"] is False
         assert out["caption"].startswith("R3 compares")
+
+
+class TestAutoContinue:
+    """The bounded read-only loop (Sunny's verdict, 2026-08-20): 0035's
+    intelligence shape inside 0036's honesty frame. These tests prove
+    the BOUNDS — the error mode is one more visible read-only hop or an
+    honest exhaustion — never that the loop is smart (that is MEASURED,
+    devtools/answer_evals.py)."""
+
+    def _base(self):
+        s = ProtocolSession()
+        s.ops.note_user(f"{REF_A} {REF_B}")
+        outputs = execute_confirmed(s, PLAN_OK, fake_kql)
+        return s, outputs
+
+    def test_answered_verdict_stops_immediately(self):
+        s, outputs = self._base()
+        n = len(outputs)
+        loop = continue_rounds(s, "q", outputs, scripted_planner(
+            [{"answered": True}]), fake_kql)
+        assert loop["rounds"] == [] and not loop["exhausted"]
+        assert len(outputs) == n            # nothing ran
+
+    def test_one_read_only_round_then_answered(self):
+        s, outputs = self._base()
+        n = len(outputs)
+        loop = continue_rounds(s, "q", outputs, scripted_planner([
+            {"answered": False, "components": [
+                {"op": "retrieve", "params": {"ids": [REF_A]},
+                 "note": "need the record"}]},
+            {"answered": True},
+        ]), fake_kql)
+        assert len(loop["rounds"]) == 1 and not loop["exhausted"]
+        assert len(outputs) == n + 1        # the hop is displayed
+        new = outputs[-1]
+        assert new["component"]["auto_round"] == 1
+        assert "headline" in new["result"]  # stamped like every hop
+
+    def test_non_read_only_op_is_refused_in_the_executor(self):
+        """The bound lives in code, not prompt: a write-flavored op
+        proposed by the loop is refused BEFORE validation, refusal
+        displayed, nothing executed."""
+        s, outputs = self._base()
+        loop = continue_rounds(s, "q", outputs, scripted_planner([
+            {"answered": False, "components": [
+                {"op": "update", "params": {"id": REF_A}}]},
+            {"answered": True},
+        ]), fake_kql)
+        refused = loop["rounds"][0]["outputs"][0]
+        assert "error" in refused
+        assert "read-only" in refused["error"]
+        assert "writes always confirm" in refused["error"]
+
+    def test_rounds_are_bounded_then_honest_exhaustion(self):
+        s, outputs = self._base()
+        never_satisfied = [{"answered": False, "components": [
+            {"op": "retrieve", "params": {"ids": [REF_A]}}]}] * 99
+        loop = continue_rounds(s, "q", outputs,
+                               scripted_planner(never_satisfied), fake_kql)
+        assert len(loop["rounds"]) == MAX_AUTO_ROUNDS
+        assert loop["exhausted"] is True
+        assert loop["status_line"].startswith("auto-continue:")
+
+    def test_read_only_set_is_pinned_to_the_implemented_ops(self):
+        """Today every implemented op is read-only; the day that stops
+        being true, this test forces a conscious decision."""
+        assert set(IMPLEMENTED_OPS) == set(READ_ONLY_OPS)
+
+    def test_trace_ops_stay_inside_the_read_only_whitelist(self):
+        s, outputs = self._base()
+        continue_rounds(s, "q", outputs, scripted_planner([
+            {"answered": False, "components": [
+                {"op": "retrieve", "params": {"ids": [REF_A]}},
+                {"op": "census", "params": {"kind": "metric"}}]},
+            {"answered": True},
+        ]), fake_kql)
+        auto_ops = {o["component"]["op"] for o in outputs
+                    if o["component"].get("auto_round")}
+        assert auto_ops and auto_ops <= set(READ_ONLY_OPS)
+
+    def test_replay_same_decisions_same_catalog_identical_trace(self):
+        """Floor-1 clause 4 (HANDOFF_ANSWER_LOOP): scripted decisions +
+        fixed catalog ⇒ byte-identical trace."""
+        import json as _j
+        traces = []
+        for _ in range(2):
+            s, outputs = self._base()
+            continue_rounds(s, "q", outputs, scripted_planner([
+                {"answered": False, "components": [
+                    {"op": "retrieve", "params": {"ids": [REF_A]}}]},
+                {"answered": True},
+            ]), fake_kql)
+            traces.append(_j.dumps(outputs, sort_keys=True))
+        assert traces[0] == traces[1]
+
+    def test_typed_verdict_ships_beside_the_prose(self):
+        """The self-declaration the grader cross-checks; a floored
+        caption can never claim answered."""
+        s, outputs = self._base()
+        out = caption_turn(s, outputs, scripted_planner(
+            [{"caption": "R3 compares the two shown definitions.",
+              "answered": True}]), question="q")
+        assert out["answered"] is True
+        out2 = caption_turn(s, outputs, scripted_planner(
+            [{"caption": "There are 99 metrics.", "answered": True},
+             {"caption": "There are 99 metrics.", "answered": True}]),
+            question="q")
+        assert out2["caption_corrected"] and out2["answered"] is False
+
+    def test_caption_receives_the_question_and_answer_contract(self):
+        s, outputs = self._base()
+        seen = {}
+
+        def capture(messages, tools, tool_choice=None):
+            seen["system"] = messages[-2]["content"]
+            seen["user"] = messages[-1]["content"]
+            return scripted_planner([{"caption": "R1 answers it."}])(
+                messages, tools, tool_choice)
+
+        caption_turn(s, outputs, capture,
+                     question="how is X defined")
+        assert "how is X defined" in seen["user"]
+        assert "ANSWER the user's question" in seen["system"]
 
 
 class TestResultPiping:

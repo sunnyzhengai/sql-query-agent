@@ -595,3 +595,12 @@ classification).
   - `tests/extractor/test_proc_parity.py`
 - **Summarized in:**
   - `docs/architecture/SOURCE_CONNECTORS.md`
+
+## ADR 0050 — Bounded read-only answer loop: plan to the answer, caption answers, auto-continue (amends 0036)
+
+- **Category:** architecture
+- **Grounds:** spec:E3
+- **Implemented by:**
+  - `src/orchestrator/protocol.py`
+- **Enforced by:**
+  - `tests/orchestrator/test_protocol.py`

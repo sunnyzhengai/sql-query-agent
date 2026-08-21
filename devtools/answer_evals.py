@@ -1,0 +1,230 @@
+"""The conversation suite — Floor 2 of ADR 0050: measure the mind.
+
+Drives the SAME orchestrator entry the web UI calls (propose_turn →
+execute_confirmed → continue_rounds → caption_turn; one engine, no
+test-only path) against the live Eventhouse catalog, and grades each
+turn mechanically:
+
+- required_facts: literal values that must appear in the answer,
+  DERIVED FROM THE STORE at run time (descriptions, counts, decision
+  literals) — never hand-written prose expectations;
+- typed-verdict cross-check: answered:true without the required facts
+  is DISHONEST (build-stopper, not a metric); answered:false on an
+  answerable fixture is DUMB (the rate to drive down);
+- bounds: rounds used ≤ fixture's max_rounds.
+
+Seed fixtures = the four real corpses (2026-08-20 dumb-trail).
+
+Usage:
+    python devtools/answer_evals.py            # full run (live, cents)
+    python devtools/answer_evals.py --smoke    # canonical questions only
+
+Requires: az CLI logged in; capacity active; OPENAI key in .env.
+Readiness rule (ADR 0050): manual web-UI testing resumes only when
+answer rate >= 0.8 per fixture family and honesty rate == 1.0.
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import re
+import sys
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(PROJECT_ROOT))
+
+from devtools.grounding_evals import _load_dotenv  # noqa: E402
+from devtools.local_llm import chat_completion  # noqa: E402
+from src.orchestrator.agent import azure_chat_api  # noqa: E402
+from src.orchestrator.kusto import KustoClient, az_cli_token_provider  # noqa: E402
+from src.orchestrator.ops import op_census, op_retrieve, op_search  # noqa: E402
+from src.orchestrator.protocol import (  # noqa: E402
+    ProtocolSession,
+    caption_turn,
+    continue_rounds,
+    execute_confirmed,
+    propose_turn,
+)
+
+QUERY_URI = "https://trd-uzdu1yhqrmqtutkej8.z7.kusto.fabric.microsoft.com"
+DATABASE = "probe-eh"
+PARAPHRASES_PER_QUESTION = 5
+ANSWER_RATE_THRESHOLD = 0.8
+
+FIXTURES = [
+    {"family": "census",
+     "question": "how many metrics are there",
+     "oracle": "census_count", "max_rounds": 1,
+     "expected_kind": "answered"},
+    {"family": "definition",
+     "question": "how is Sepsis Case Encounters defined",
+     "oracle": "definition_facts", "item": "Sepsis Case Encounters",
+     "max_rounds": 2, "expected_kind": "answered"},
+    {"family": "bridge",
+     "question": "how is Sepsis Case defined",
+     "oracle": "near_name_bridge", "phrase": "Sepsis Case",
+     "max_rounds": 2, "expected_kind": "bridge"},
+    {"family": "drilldown",
+     "question": "in Severe Sepsis Episodes, how is a patient "
+                 "diagnosed with severe sepsis",
+     "oracle": "beyond_summary", "item": "Severe Sepsis Episodes",
+     "max_rounds": 3, "expected_kind": "answered"},
+]
+
+_WORD = re.compile(r"[A-Za-z_]{6,}")
+
+
+def _fresh_ops_session():
+    from src.orchestrator.ops import OpsSession
+    return OpsSession()
+
+
+def build_oracle(fixture: dict, run_kql) -> dict:
+    """Derive the grading key FROM THE STORE — the no-hardcoded-answers
+    rule applied to grading. Returns {required_any (list of lists —
+    each inner list is alternatives, one must appear), forbidden}."""
+    ops = _fresh_ops_session()
+    kind = fixture["oracle"]
+    if kind == "census_count":
+        rs = op_census("metric", run_kql, ops)
+        return {"required_any": [[str(len(rs.rows))]], "forbidden": []}
+    if kind == "definition_facts":
+        rs = op_search(fixture["item"], "exact", run_kql, ops)
+        assert rs.rows, f"oracle: {fixture['item']} not in catalog"
+        rec = op_retrieve([rs.rows[0]["id"]], run_kql, ops)
+        blob = json.dumps(rec.rows)
+        words = sorted(set(_WORD.findall(blob)))[:400]
+        # the answer must carry >=3 distinctive content words of the
+        # stored record — checked as alternatives, counted by grader
+        return {"required_any": [words], "required_overlap": 3,
+                "forbidden": []}
+    if kind == "near_name_bridge":
+        ops2 = _fresh_ops_session()
+        rs = op_census("metric", run_kql, ops2)
+        phrase = fixture["phrase"].lower()
+        near = [r["name"] for r in rs.rows
+                if phrase in (r.get("business_name") or r["name"]).lower()
+                ] + [r.get("business_name") for r in rs.rows
+                     if r.get("business_name")
+                     and phrase in r["business_name"].lower()]
+        near = sorted({n for n in near if n})
+        assert near, "oracle: no near-name siblings found"
+        return {"required_any": [near],
+                "forbidden": ["no metrics exist",
+                              "no such metric exists"]}
+    if kind == "beyond_summary":
+        ops2 = _fresh_ops_session()
+        rs = op_search(fixture["item"], "exact", run_kql, ops2)
+        assert rs.rows, f"oracle: {fixture['item']} not in catalog"
+        rid = rs.rows[0]["id"]
+        summary = json.dumps(rs.rows[0])
+        rec = op_retrieve([rid], run_kql, ops2)
+        deep_blob = json.dumps(rec.rows)
+        summary_words = set(_WORD.findall(summary.lower()))
+        deep = sorted({w for w in _WORD.findall(deep_blob)
+                       if w.lower() not in summary_words})
+        assert deep, "oracle: no step-level facts beyond the summary"
+        return {"required_any": [deep], "required_overlap": 1,
+                "forbidden": []}
+    raise ValueError(kind)
+
+
+def grade(answer: str, verdict: dict, oracle: dict,
+          rounds_used: int, fixture: dict) -> dict:
+    low = answer.lower()
+    hits = 0
+    for group in oracle["required_any"]:
+        if any(alt.lower() in low for alt in group):
+            hits += 1
+    need = oracle.get("required_overlap", len(oracle["required_any"]))
+    if oracle.get("required_overlap"):
+        hits = sum(1 for alt in oracle["required_any"][0]
+                   if alt.lower() in low)
+    facts_present = hits >= need
+    fabricated = any(f.lower() in low for f in oracle["forbidden"])
+    declared = bool(verdict.get("answered"))
+    dishonest = (declared and not facts_present) or fabricated
+    return {
+        "facts_present": facts_present,
+        "declared_answered": declared,
+        "dishonest": dishonest,                       # build-stopper
+        "dumb": (not declared) and fixture["expected_kind"] == "answered",
+        "within_rounds": rounds_used <= fixture["max_rounds"],
+        "fact_hits": hits,
+    }
+
+
+def run_turn(question: str, chat_api, run_kql) -> dict:
+    session = ProtocolSession()
+    plan = propose_turn(session, question, chat_api)
+    outputs = execute_confirmed(session, plan, run_kql)   # eval = the confirm
+    loop = continue_rounds(session, question, outputs, chat_api, run_kql)
+    cap = caption_turn(session, outputs, chat_api, question=question)
+    return {"outputs": outputs, "loop": loop, "cap": cap}
+
+
+def paraphrases(question: str, n: int) -> "list[str]":
+    text = chat_completion(
+        "You produce terse paraphrase lists.",
+        f"Give {n} distinct natural paraphrases of this question, one "
+        f"per line, no numbering:\n{question}")
+    lines = [ln.strip() for ln in text.splitlines() if ln.strip()]
+    return lines[:n]
+
+
+def main() -> None:
+    _load_dotenv()
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--smoke", action="store_true",
+                    help="canonical questions only, no paraphrases")
+    args = ap.parse_args()
+
+    client = KustoClient(QUERY_URI, DATABASE,
+                         az_cli_token_provider(QUERY_URI))
+    run_kql = client.run
+    chat_api = azure_chat_api()
+
+    families: "dict[str, list[dict]]" = {}
+    stop_build = False
+    for fixture in FIXTURES:
+        oracle = build_oracle(fixture, run_kql)
+        questions = [fixture["question"]]
+        if not args.smoke:
+            questions += paraphrases(fixture["question"],
+                                     PARAPHRASES_PER_QUESTION)
+        for q in questions:
+            turn = run_turn(q, chat_api, run_kql)
+            g = grade(turn["cap"].get("caption", ""), turn["cap"], oracle,
+                      len(turn["loop"]["rounds"]), fixture)
+            g["question"] = q
+            families.setdefault(fixture["family"], []).append(g)
+            flag = ("DISHONEST" if g["dishonest"] else
+                    "dumb" if g["dumb"] else "ok")
+            print(f"[{fixture['family']}] {flag:9s} facts={g['fact_hits']} "
+                  f"rounds<= {g['within_rounds']} :: {q[:60]}")
+            if g["dishonest"]:
+                stop_build = True
+
+    print("\n=== scorecard ===")
+    all_pass = True
+    for family, grades in families.items():
+        n = len(grades)
+        answer_rate = sum(1 for g in grades
+                          if g["declared_answered"] and g["facts_present"]
+                          ) / n
+        honesty = 1.0 - sum(1 for g in grades if g["dishonest"]) / n
+        ok = answer_rate >= ANSWER_RATE_THRESHOLD and honesty == 1.0
+        all_pass &= ok
+        print(f"{family:12s} answer_rate={answer_rate:.2f} "
+              f"honesty={honesty:.2f} n={n} "
+              f"{'PASS' if ok else 'BELOW THRESHOLD'}")
+    if stop_build:
+        print("\n[X] DISHONEST turn observed — build-stopper, not a metric.")
+        raise SystemExit(2)
+    raise SystemExit(0 if all_pass else 1)
+
+
+if __name__ == "__main__":
+    main()
