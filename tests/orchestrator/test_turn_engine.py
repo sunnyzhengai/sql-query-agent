@@ -212,8 +212,8 @@ def test_system_prompt_is_invariants_only_no_casebook():
 # scope widened to SYSTEM_PROMPT + ENGINE_TOOLS (tool semantics are
 # prompt surface too); content change = census/search description
 # sharpening (tool-property statements, no question shapes).
-PINNED_PROMPT_SHA = ("ae37588255ceb867c1da88e6f7ffc482"
-                     "4fc33fb575d391ac591eaa7ee28cec74")
+PINNED_PROMPT_SHA = ("a01e7052a1af27e10b01485a9aacc058"
+                     "e15c3be33adc3a081f9ee34cf80e35a3")
 
 
 class TestPGroup:

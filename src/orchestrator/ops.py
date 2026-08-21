@@ -204,7 +204,8 @@ def normalize_kind(kind: str) -> "str | None":
     return k if k in CATALOG_KINDS else None
 
 
-def op_census(kind: str, run_kql, session: OpsSession) -> ResultSet:
+def op_census(kind: str, run_kql, session: OpsSession,
+              contains: "str | None" = None) -> ResultSet:
     """Complete enumeration of one catalog KIND, with the exact count.
 
     Field find (2026-08-20, Sunny's web-UI test): 'how many metrics are
@@ -224,10 +225,22 @@ def op_census(kind: str, run_kql, session: OpsSession) -> ResultSet:
          "of_metric": r["ref"] if r["kind"] == "step" else None}
         for r in rows
     ]
-    return session.register(
-        "census", {"kind": k}, _attach_cards(out, run_kql),
-        complete=True,
-        universe=f"every {k} in the certified catalog — the count is exact")
+    out = _attach_cards(out, run_kql)
+    params: dict = {"kind": k}
+    universe = f"every {k} in the certified catalog — the count is exact"
+    if contains and contains.strip():
+        # Topic-filtered census (2026-08-21): "how many X mention T"
+        # is a DATA operation the store answers exactly — filter the
+        # complete enumeration by text containment (name, business
+        # name, description). Question-agnostic parameter, not flow.
+        needle = contains.strip().lower()
+        out = [r for r in out if needle in json.dumps(r).lower()]
+        params["contains"] = contains.strip()
+        universe = (f"every {k} in the certified catalog whose name, "
+                    f"business name, or description mentions "
+                    f"{contains.strip()!r} — the count is exact")
+    return session.register("census", params, out, complete=True,
+                            universe=universe)
 
 
 # --- retrieve: one read primitive (facts + structure merged) ----------

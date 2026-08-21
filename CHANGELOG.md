@@ -10,6 +10,23 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.50.2] - 2026-08-21
+
+### Added — topic-filtered census (data-shaped closure for the last family)
+- 1.50.1 scorecards: FIVE families at 1.00/1.00 on mini (bridge now
+  perfect); both tiers fully honest. topical_count stayed 0.00 on
+  mini; on gpt-4o ONE turn composed search→census and scored — the
+  composition exists but fires unreliably. Not a hard P4 boundary: a
+  missing data operation.
+- op_census gains optional `contains`: the complete enumeration
+  filtered by text containment (name/business name/description),
+  count exact, universe stated. "How many X mention T" becomes a
+  single deterministic operation — question-agnostic parameter, not
+  flow. Engine tool schema updated; pin consciously updated
+  (a01e7052…, recorded in the Round-4 log).
+
+---
+
 ## [1.50.1] - 2026-08-21
 
 ### Changed — 1.50.0 scorecard: five families PASS, honesty 1.00 everywhere; tool-semantics pass for the last family

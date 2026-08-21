@@ -199,3 +199,20 @@ class TestStepAlignmentKernel:
         rs = op_search("Scores", "exact", fake_kql, s)  # rows are steps
         with pytest.raises(OpError, match="at least two metrics"):
             op_compare([rs.ref], "steps", fake_kql, s)
+
+
+class TestTopicFilteredCensus:
+    """2026-08-21: 'how many X mention T' is a data operation — the
+    complete enumeration filtered by containment, count exact."""
+
+    def test_contains_filters_the_complete_enumeration(self):
+        s = OpsSession()
+        rs = op_census("metric", fake_kql, s, contains="Regulatory")
+        assert rs.complete is True
+        assert len(rs.rows) == 1
+        assert "mentions 'Regulatory'" in rs.universe
+        assert "count is exact" in rs.universe
+
+    def test_no_filter_unchanged(self):
+        rs = op_census("metric", fake_kql, OpsSession())
+        assert len(rs.rows) == 2 and "certified catalog — the count" in rs.universe
