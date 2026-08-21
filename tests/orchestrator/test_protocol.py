@@ -360,13 +360,39 @@ class TestAutoContinue:
         s, outputs = self._base()
         out = caption_turn(s, outputs, scripted_planner(
             [{"caption": "R3 compares the two shown definitions.",
-              "answered": True}]), question="q")
+              "answered": True,
+              "evidence_quote": "ED Sepsis (Regulatory)"}]), question="q")
         assert out["answered"] is True
         out2 = caption_turn(s, outputs, scripted_planner(
-            [{"caption": "There are 99 metrics.", "answered": True},
-             {"caption": "There are 99 metrics.", "answered": True}]),
+            [{"caption": "There are 99 metrics.", "answered": True,
+              "evidence_quote": "ED Sepsis (Regulatory)"},
+             {"caption": "There are 99 metrics.", "answered": True,
+              "evidence_quote": "ED Sepsis (Regulatory)"}]),
             question="q")
         assert out2["caption_corrected"] and out2["answered"] is False
+
+    def test_answered_requires_a_machine_verified_quote(self):
+        """Iteration 6 (Sunny: 'fix the dishonest caption shape'):
+        answered=true must come with a verbatim quote from a displayed
+        row; code verifies it. Claiming without grounding is
+        structurally impossible."""
+        s, outputs = self._base()
+        # no quote at all -> demoted
+        out = caption_turn(s, outputs, scripted_planner(
+            [{"caption": "Answered!", "answered": True}]), question="q")
+        assert out["answered"] is False
+        # fabricated quote -> demoted
+        out = caption_turn(s, outputs, scripted_planner(
+            [{"caption": "Answered!", "answered": True,
+              "evidence_quote": "criteria include lactate over 4.0 "
+                                "mmol"}]), question="q")
+        assert out["answered"] is False
+        # genuine verbatim row content -> verdict stands
+        out = caption_turn(s, outputs, scripted_planner(
+            [{"caption": "It measures ED sepsis screening.",
+              "answered": True,
+              "evidence_quote": "ED Sepsis (Regulatory)"}]), question="q")
+        assert out["answered"] is True
 
     def test_caption_receives_the_question_and_answer_contract(self):
         s, outputs = self._base()

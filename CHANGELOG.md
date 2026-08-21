@@ -10,6 +10,22 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.48.0] - 2026-08-21
+
+### Changed — iteration 6: the answered verdict must be PROVED (Sunny's directive)
+- Iteration-5 stamps reduced but did not kill the dishonest caption
+  shape (3 turns at 30/36 — plans whose phrasing produced no bridge
+  stamp left the captioner free to over-claim). The structural hole:
+  answered=true was still just an assertion.
+- Now: answered=true requires evidence_quote — a verbatim >=20-char
+  substring from a DISPLAYED row — and CODE verifies the quote
+  against the rows (whitespace-folded). Missing or unverifiable quote
+  demotes the verdict. Claiming without grounding is structurally
+  impossible: the basis-stamping family, applied to the verdict
+  itself. Scoring stays facts-based, so honest answers lose nothing.
+
+---
+
 ## [1.47.0] - 2026-08-20
 
 ### Changed — iteration 5: the caption is verified against the stamps (grounded, not lexical)

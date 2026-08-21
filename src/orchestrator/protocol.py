@@ -94,7 +94,11 @@ CAPTION_PROMPT = (
     "(the census rows and their descriptions) — a top-K search can "
     "never source a count. Declare answered=true only when the "
     "specific ask (the actual values, criteria, names, or count) is "
-    "in a displayed set. "
+    "in a displayed set. When you declare answered=true you MUST also "
+    "supply evidence_quote: a verbatim substring (>= 20 characters) "
+    "copied exactly from a displayed row that carries the answer — it "
+    "is machine-verified, and an unverifiable quote demotes the "
+    "verdict. "
     "Never output patient identifiers. No greetings; SQL only if the "
     "user asked for it. Then suggest 0-3 useful next operations as "
     "structured components."
@@ -195,6 +199,15 @@ CAPTION_TOOL = {
                                "description": "when answered=false: the "
                                "operation that would produce the answer, "
                                "or empty if none could"},
+                # Iteration 6: answered=true must be PROVABLE — a
+                # verbatim quote from a displayed row, verified by code.
+                "evidence_quote": {"type": "string",
+                                   "description": "when answered=true: "
+                                   "a VERBATIM substring (>=20 chars) "
+                                   "copied from a displayed row that "
+                                   "carries the answer; code verifies "
+                                   "it — an unverifiable quote demotes "
+                                   "the verdict"},
                 "suggestions": {"type": "array", "items": {
                     "type": "object",
                     "properties": {
@@ -376,6 +389,13 @@ def execute_confirmed(session: ProtocolSession, plan: dict,
 
 
 _DISPLAY_BUDGET = 20000
+_WS = re.compile(r"\s+")
+
+
+def _norm_ws(text: str) -> str:
+    """Whitespace-fold for quote verification: JSON escapes and line
+    wrapping must not defeat a genuinely verbatim quote."""
+    return _WS.sub(" ", text.replace("\\n", " ").replace('\\"', '"')).strip()
 
 
 def _build_view(outputs: "list[dict]", rows_cap: int,
@@ -632,6 +652,23 @@ def caption_turn(session: ProtocolSession, outputs: "list[dict]",
         if retried:
             caption, raw = retried, retry
     caption, violations = enforce_caption(caption, outputs)
+
+    # Verdict proof, in code (iteration 6 — Sunny: "fix the dishonest
+    # caption shape"): answered=true requires a verbatim quote from a
+    # displayed row, and CODE verifies the quote. Claiming without
+    # grounding becomes structurally impossible — the basis-stamping
+    # family, applied to the verdict itself.
+    if raw.get("answered"):
+        quote = _norm_ws(str(raw.get("evidence_quote", "")))
+        ground = _norm_ws(json.dumps(
+            [row for o in outputs
+             for row in ((o.get("result") or {}).get("rows") or [])],
+            ensure_ascii=False))
+        if len(quote) < 20 or quote.lower() not in ground.lower():
+            raw = {**raw, "answered": False,
+                   "missing_op": (raw.get("missing_op")
+                                  or "an operation whose displayed rows "
+                                     "contain the claimed answer")}
 
     # Verdict demotion, in code (iteration 5): when a retrieve headline
     # stamps "criteria live in the step records" and NO step record is
