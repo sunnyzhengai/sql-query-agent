@@ -249,3 +249,29 @@ the identical suite is running on gpt-4o. If 4o honors the semantics,
 the finding differentiates tiers (input to the PARKED min-tier
 prerequisite); if not, topical_count is the recorded P4 limit and the
 decision on it is Sunny's.
+
+### 2026-08-21 — 1.50.2: topical FLIPPED; L2 READINESS CLEARED; one calibration question PARKED
+Scorecard (mini): census 1.00 · definition 1.00 · drilldown 1.00 ·
+anaphora 1.00 · **topical_count 1.00 (flipped by the topic-filtered
+census, first run)** · bridge 0.67 this run — pooled over the three
+1.50.x runs bridge = 15/18 = **0.83** (n=6 noise; range 0.67–1.00).
+Honesty 1.00 on every family, every run, both tiers.
+
+**All six families clear the ADR-0050 readiness bar (0.8/1.0) on the
+pooled estimate → the Smartness Walk is UNLOCKED**
+(internal/docs/SMARTNESS_WALK.md). The 0.90 GOAL bar: five families
+at 1.00; bridge at 0.83.
+
+PARKED (calibration, Sunny's to rule): the two bridge misses are
+bridge-SHAPED answers ("no exact definition exists; here are related
+metrics") that present the MEANING-closest candidates; the oracle
+credits only the NAME-closest siblings. Whether meaning-bridging
+counts as a pass defines the family's acceptance — widening the
+oracle would put bridge ≥ 0.9 today; keeping it strict keeps the
+pressure on literal did-you-mean behavior.
+
+Engine journey, one line: dumb-trail (3/4 unanswered) → one-mind +
+memory + retrieval-union + filtered census = 5×1.00 + 0.83, honesty
+perfect throughout, zero casebook. Remaining for the GOAL: bridge
+calibration ruling; Sunny's walk; the parked tenant republish; then
+Round 4 (runner ready, one command per surface).
