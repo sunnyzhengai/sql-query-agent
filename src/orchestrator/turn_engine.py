@@ -235,132 +235,169 @@ def run_turn(session: EngineSession, question: str, chat_api,
     answer = ""
     rounds = 0
     exhausted = False
+    raw: dict = {}
+    answered = False
+    quote = ""
+    violations: "list[str]" = []
 
-    for _ in range(max_rounds):
-        _compact_history(session.history)
-        message = chat_api(session.history, ENGINE_TOOLS)
-        tool_calls = message.get("tool_calls") or []
-        if not tool_calls:
-            answer = (message.get("content") or "").strip()
-            session.history.append({"role": "assistant",
-                                    "content": answer})
-            break
-        session.history.append(message)
-        rounds += 1
-        for call in tool_calls:
-            name = call["function"]["name"]
-            try:
-                args = json.loads(call["function"]["arguments"] or "{}")
-            except json.JSONDecodeError:
-                args = {}
-            key = (name, json.dumps(args, sort_keys=True))
-            display: dict
-            if name not in READ_ONLY_TOOLS:
-                payload = {"error": f"{name!r} refused: this surface "
-                                    "runs read-only tools; writes "
-                                    "always plan-confirm"}
-                display = {"component": {"op": name, "params": args,
-                                         "auto_round": rounds},
-                           "error": payload["error"]}
-            elif key in seen_calls:
-                payload = {"error": f"{name} with identical parameters "
-                                    "already ran this turn — repeating "
-                                    "it cannot add information"}
-                display = {"component": {"op": name, "params": args,
-                                         "auto_round": rounds},
-                           "error": payload["error"]}
-            else:
-                seen_calls.add(key)
+    # Verdict-driven continuation (P6, suite find 2026-08-21): the
+    # model kept filing its OWN verdict as not-answered with the
+    # missing operation named — then stopping with rounds to spare. A
+    # self-diagnosed miss is an observed error, not a terminal fact:
+    # when the verdict (or a floored caption) names what is missing
+    # and budget remains, the observation goes into the conversation
+    # and the SAME bounded loop runs once more. Round cap unchanged;
+    # anti-flail persists across passes; one continuation only.
+    for pass_no in (1, 2):
+        got_answer = False
+        while rounds < max_rounds:
+            _compact_history(session.history)
+            message = chat_api(session.history, ENGINE_TOOLS)
+            tool_calls = message.get("tool_calls") or []
+            if not tool_calls:
+                answer = (message.get("content") or "").strip()
+                session.history.append({"role": "assistant",
+                                        "content": answer})
+                got_answer = True
+                break
+            session.history.append(message)
+            rounds += 1
+            for call in tool_calls:
+                name = call["function"]["name"]
                 try:
-                    rs = _run_op(name, args, run_kql, session.ops)
-                    shown = rs.display()
-                    shown["headline"] = stamped_headline(shown)
-                    display = {"component": {"op": name, "params": args,
-                                             "auto_round": rounds},
-                               "result": shown}
-                    payload = {"ref": shown.get("ref"),
-                               "headline": shown.get("headline"),
-                               "complete": shown.get("complete"),
-                               "universe": shown.get("universe"),
-                               "rows_total": len(rs.rows),
-                               "rows": rs.rows}       # FULL rows (P2)
-                except OpError as e:
-                    payload = {"error": str(e)}
-                    display = {"component": {"op": name, "params": args,
-                                             "auto_round": rounds},
-                               "error": str(e)}
-                except Exception as e:      # noqa: BLE001 — P6: observed
-                    payload = {"error": _infra_error(e)}
+                    args = json.loads(call["function"]["arguments"] or "{}")
+                except json.JSONDecodeError:
+                    args = {}
+                key = (name, json.dumps(args, sort_keys=True))
+                display: dict
+                if name not in READ_ONLY_TOOLS:
+                    payload = {"error": f"{name!r} refused: this surface "
+                                        "runs read-only tools; writes "
+                                        "always plan-confirm"}
                     display = {"component": {"op": name, "params": args,
                                              "auto_round": rounds},
                                "error": payload["error"]}
-            outputs.append(display)
-            session.history.append({
-                "role": "tool",
-                "tool_call_id": call.get("id", ""),
-                "content": json.dumps(payload),
-            })
-    else:
-        exhausted = True
-        answer = ("I hit the per-question tool budget before finishing "
-                  "— the operations run so far are displayed; ask a "
-                  "narrower question or continue from a shown result.")
-        session.history.append({"role": "assistant", "content": answer})
-
-    # ---- the boundary (P5) ------------------------------------------
-    # Claims are checked against every result displayed this
-    # conversation (P1/P2 — the walk's zero-round '122 steps' answer
-    # restated a prior turn's rows and was floored as invented); the
-    # template floor still renders only this turn's outputs.
-    gate_ground = list(session.displays) + outputs
-    violations = (caption_violations(answer, gate_ground)
-                  if answer else [])
-    if violations and answer and not exhausted:
-        note = ("Your answer was REJECTED by the honesty gate:\n"
-                + "\n".join(f"- {v}" for v in violations)
-                + "\nRewrite it claiming only what the displayed "
-                "results support.")
-        session.history.append({"role": "user", "content": note})
-        retry_msg = chat_api(session.history, [])
-        retried = (retry_msg.get("content") or "").strip()
-        if retried:
-            answer = retried
+                elif key in seen_calls:
+                    payload = {"error": f"{name} with identical parameters "
+                                        "already ran this turn — repeating "
+                                        "it cannot add information"}
+                    display = {"component": {"op": name, "params": args,
+                                             "auto_round": rounds},
+                               "error": payload["error"]}
+                else:
+                    seen_calls.add(key)
+                    try:
+                        rs = _run_op(name, args, run_kql, session.ops)
+                        shown = rs.display()
+                        shown["headline"] = stamped_headline(shown)
+                        display = {"component": {"op": name, "params": args,
+                                                 "auto_round": rounds},
+                                   "result": shown}
+                        payload = {"ref": shown.get("ref"),
+                                   "headline": shown.get("headline"),
+                                   "complete": shown.get("complete"),
+                                   "universe": shown.get("universe"),
+                                   "rows_total": len(rs.rows),
+                                   "rows": rs.rows}       # FULL rows (P2)
+                    except OpError as e:
+                        payload = {"error": str(e)}
+                        display = {"component": {"op": name, "params": args,
+                                                 "auto_round": rounds},
+                                   "error": str(e)}
+                    except Exception as e:  # noqa: BLE001 — P6: observed
+                        payload = {"error": _infra_error(e)}
+                        display = {"component": {"op": name, "params": args,
+                                                 "auto_round": rounds},
+                                   "error": payload["error"]}
+                outputs.append(display)
+                session.history.append({
+                    "role": "tool",
+                    "tool_call_id": call.get("id", ""),
+                    "content": json.dumps(payload),
+                })
+        if not got_answer:
+            exhausted = True
+            answer = ("I hit the per-question tool budget before "
+                      "finishing — the operations run so far are "
+                      "displayed; ask a narrower question or continue "
+                      "from a shown result.")
             session.history.append({"role": "assistant",
                                     "content": answer})
-    answer, violations = enforce_caption(answer, outputs,
-                                         ground=gate_ground)
 
-    # The typed verdict — the ONE legal form-fill (P3), quote verified.
-    raw = {}
-    try:
-        v_msg = chat_api(
-            session.history + [{
-                "role": "user",
-                "content": "File the verdict form for the answer above."}],
-            [VERDICT_TOOL],
-            {"type": "function", "function": {"name": "file_verdict"}})
-        calls = v_msg.get("tool_calls") or []
-        if calls:
-            raw = json.loads(calls[0]["function"]["arguments"] or "{}")
-    except Exception:               # noqa: BLE001 — verdict is boundary
+        # ---- the boundary (P5) --------------------------------------
+        # Claims are checked against every result displayed this
+        # conversation (P1/P2 — the walk's zero-round '122 steps'
+        # answer restated a prior turn's rows and was floored as
+        # invented); the template floor still renders only this turn's
+        # outputs.
+        gate_ground = list(session.displays) + outputs
+        violations = (caption_violations(answer, gate_ground)
+                      if answer else [])
+        if violations and answer and not exhausted:
+            note = ("Your answer was REJECTED by the honesty gate:\n"
+                    + "\n".join(f"- {v}" for v in violations)
+                    + "\nRewrite it claiming only what the displayed "
+                    "results support.")
+            session.history.append({"role": "user", "content": note})
+            retry_msg = chat_api(session.history, [])
+            retried = (retry_msg.get("content") or "").strip()
+            if retried:
+                answer = retried
+                session.history.append({"role": "assistant",
+                                        "content": answer})
+        answer, violations = enforce_caption(answer, outputs,
+                                             ground=gate_ground)
+
+        # The typed verdict — the ONE legal form-fill (P3), verified.
         raw = {}
-    answered = bool(raw.get("answered")) and not violations
-    quote = _norm(str(raw.get("evidence_quote", "")))
-    if answered:
-        # Evidence ground = every row DISPLAYED this conversation, not
-        # just this turn's (P1/P2 — the walk's 'show me the sql' turn
-        # answered verbatim from a prior retrieve with zero new rounds
-        # and was denied a verified verdict; session.displays still
-        # holds only PRIOR turns here, extended below).
-        ground = _norm(json.dumps(
-            [row for o in (list(session.displays) + outputs)
-             for row in ((o.get("result") or {}).get("rows") or [])],
-            ensure_ascii=False))
-        if len(quote) < 20 or quote.lower() not in ground.lower():
-            answered = False
-            raw = {**raw, "missing_op": raw.get("missing_op")
-                   or "an operation whose displayed rows contain the "
-                      "claimed answer"}
+        try:
+            v_msg = chat_api(
+                session.history + [{
+                    "role": "user",
+                    "content": "File the verdict form for the answer "
+                               "above."}],
+                [VERDICT_TOOL],
+                {"type": "function", "function": {"name": "file_verdict"}})
+            calls = v_msg.get("tool_calls") or []
+            if calls:
+                raw = json.loads(calls[0]["function"]["arguments"] or "{}")
+        except Exception:           # noqa: BLE001 — verdict is boundary
+            raw = {}
+        answered = bool(raw.get("answered")) and not violations
+        quote = _norm(str(raw.get("evidence_quote", "")))
+        if answered:
+            # Evidence ground = every row DISPLAYED this conversation,
+            # not just this turn's (P1/P2 — the walk's 'show me the
+            # sql' turn answered verbatim from a prior retrieve with
+            # zero new rounds and was denied a verified verdict;
+            # session.displays still holds only PRIOR turns here,
+            # extended below).
+            ground = _norm(json.dumps(
+                [row for o in (list(session.displays) + outputs)
+                 for row in ((o.get("result") or {}).get("rows") or [])],
+                ensure_ascii=False))
+            if len(quote) < 20 or quote.lower() not in ground.lower():
+                answered = False
+                raw = {**raw, "missing_op": raw.get("missing_op")
+                       or "an operation whose displayed rows contain "
+                          "the claimed answer"}
+        if not answered and violations and not raw.get("missing_op"):
+            # a floored caption is itself a named gap — the engine
+            # knows what is missing even when the model's form is bare
+            raw = {**raw, "missing_op":
+                   "an operation whose displayed rows support the "
+                   "claim the gate rejected"}
+
+        if (answered or exhausted or pass_no == 2
+                or not raw.get("missing_op")
+                or rounds >= max_rounds):
+            break
+        session.history.append({
+            "role": "user",
+            "content": ("Your verdict filed NOT answered — missing: "
+                        f"{raw['missing_op']}. Tool rounds remain: run "
+                        "the missing operation(s), then answer "
+                        "again.")})
 
     session.displays.extend(outputs)
     session.turns += 1

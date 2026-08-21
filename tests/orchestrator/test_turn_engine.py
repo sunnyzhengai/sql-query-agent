@@ -153,6 +153,56 @@ class TestLoop:
             {"verdict": {"answered": True,
                          "evidence_quote":
                              "measures downstream compliance windows"}},
+            # the failed quote names a missing op -> one continuation
+            # pass; the model persists, the verdict stays honest
+            {"text": "It measures downstream compliance windows."},
+            {"verdict": {"answered": False}},
+        ]), fake_kql)
+        assert out["answered"] is False
+
+    def test_self_diagnosed_miss_continues_once_and_can_recover(self):
+        """Verdict-driven continuation (P6, suite find 2026-08-21):
+        the model kept filing not-answered with the missing op named,
+        then stopping with rounds to spare. A self-diagnosed miss is
+        an observation — the SAME bounded loop runs once more."""
+        s = EngineSession()
+        out = run_turn(s, "what does ed sepsis measure?",
+                       scripted_engine([
+                           {"text": "I could not find it."},
+                           {"verdict": {"answered": False,
+                                        "missing_op":
+                                            "search the catalog"}},
+                           # pass 2: takes the hop, earns the verdict
+                           {"calls": [("search",
+                                       {"phrase": "ed sepsis",
+                                        "mode": "semantic"})]},
+                           {"text": "It measures ED Sepsis Screening."},
+                           {"verdict": {"answered": True,
+                                        "evidence_quote": GOOD_QUOTE}},
+                       ]), fake_kql)
+        assert out["answered"] is True
+        assert out["rounds"] == 1
+        # the continuation observation is IN the one history (P2)
+        assert any("NOT answered — missing" in str(m.get("content"))
+                   for m in s.history if m.get("role") == "user")
+
+    def test_continuation_happens_at_most_once(self):
+        s = EngineSession()
+        out = run_turn(s, "q", scripted_engine([
+            {"text": "No idea."},
+            {"verdict": {"answered": False, "missing_op": "search"}},
+            {"text": "Still no idea."},
+            {"verdict": {"answered": False, "missing_op": "search"}},
+            # no third pass: the script would raise StopIteration if
+            # the engine asked again
+        ]), fake_kql)
+        assert out["answered"] is False
+
+    def test_humble_miss_without_named_op_does_not_continue(self):
+        s = EngineSession()
+        out = run_turn(s, "q", scripted_engine([
+            {"text": "Nothing displayed answers this."},
+            {"verdict": {"answered": False}},
         ]), fake_kql)
         assert out["answered"] is False
 
@@ -192,6 +242,9 @@ class TestBoundary:
             {"verdict": {"answered": True,
                          "evidence_quote": "totally invented quote of "
                                            "sufficient length"}},
+            # quote rejection -> continuation pass; still no evidence
+            {"text": "It is the screening metric."},
+            {"verdict": {"answered": False}},
         ]), fake_kql)
         assert out["answered"] is False
         out2 = run_turn(EngineSession(), "q", scripted_engine([
@@ -211,6 +264,11 @@ class TestBoundary:
             {"text": "There are 999 metrics in the catalog."},  # retry
             {"verdict": {"answered": True,
                          "evidence_quote": GOOD_QUOTE}},
+            # floored caption -> engine names the gap -> continuation;
+            # the model doubles down, the floor holds
+            {"text": "There are 999 metrics in the catalog."},
+            {"text": "There are 999 metrics in the catalog."},  # retry
+            {"verdict": {"answered": False}},
         ]), fake_kql)
         assert out["caption_corrected"]
         assert out["answer"].startswith("Results as displayed.")

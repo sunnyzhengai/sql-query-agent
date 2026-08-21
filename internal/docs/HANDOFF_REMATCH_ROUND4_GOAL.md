@@ -438,3 +438,19 @@ serialization. 1.51.3: p_tokens is a space-joined string, split
 server-side — verified live ('severe sepsis' → Severe/Non-Severe
 Sepsis Episodes). Lesson for the strata: a query with a nontrivial
 parameter TYPE needs one live probe before its first suite run.
+
+### 2026-08-21 — 1.51.3 board → 1.52.0: verdict-driven continuation (P6)
+1.51.3 mini: drilldown 0.50 / anaphora 0.75 BELOW, five families
+1.00 — and the misses shared ONE shape: the model filed its OWN
+verdict as not-answered WITH the missing op named, then stopped with
+rounds to spare (searched, never retrieved; retrieved the metric,
+ignored the stamped decision pointer). Scores bouncing 0.83/0.67/0.50
+across identical code = round-laziness variance, not capability.
+1.52.0: a self-diagnosed miss is an observation, not a terminal fact
+— when the verdict (or a floored caption, engine-named) names the
+missing op and budget remains, the observation enters the one history
+and the SAME bounded loop runs once more. Round cap unchanged,
+anti-flail persists across passes, exactly one continuation, cage
+tests for recover/at-most-once/no-op-no-continue. Zero prompt/tool
+changes — the pin stands (the continuation note is boundary
+machinery, same class as the gate-rejection note).
