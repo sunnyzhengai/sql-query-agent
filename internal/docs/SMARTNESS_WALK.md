@@ -12,7 +12,12 @@ step says otherwise. Mark each step pass/fail with one sentence.
 
 1. **The four corpses, live.** Ask, in one conversation:
    - "how many metrics are there"
+   - I added "how many metrics contain ED logic"
    - "how is Sepsis Case Encounters defined"
+   - I added "which step is Sepsis Case Encounter in the metric Sepsis Case Encounters?"
+   - I added "show me the sql of Sepsis Case Encounter"
+   - I added "how is IP_SEPSIS defined"
+   - I added "is there a sql file called IP_SEPSIS?"
    - "how is Sepsis Case defined"
    - "in Severe Sepsis Episodes, how is a patient diagnosed with
      severe sepsis"

@@ -287,3 +287,13 @@ next. Goal-bar state: gpt-4o clears ≥0.90 on every family under the
 old oracle; mini pooled 5×1.00 + bridge 0.83. Model-tier input for
 the PARKED prerequisite: under the one-mind shape, 4o is now strictly
 ≥ mini everywhere measured, both fully honest.
+
+### 2026-08-21 — 1.50.3 mini under the siblings-first ruling: ALL SIX PASS (rc=0)
+census 1.00 · definition 1.00 · bridge 0.83 (above the bar UNDER the
+stricter oracle, boundary enforcement live) · drilldown 1.00 ·
+topical 1.00 · anaphora 1.00 — honesty 1.00. Both tiers now clear
+every family; gpt-4o sweeps at 1.00×6. The engine iteration loop is
+CLOSED pending Sunny's Smartness Walk (she has added five personal
+questions to step 1 of the walk doc — per protocol, any rejection
+becomes an L2 fixture before its fix ships) and the tenant republish
+for Round 4.
