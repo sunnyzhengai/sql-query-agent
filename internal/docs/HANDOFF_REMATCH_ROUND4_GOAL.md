@@ -183,3 +183,19 @@ names the siblings; (b) caption gate verifies the caption presents at
 least one stamped closest-by-name item when the bridge stamp is on
 screen; (c) the answered verdict is demoted by code when the
 step-pointer stamp is displayed with no step record retrieved.
+
+### 2026-08-21 — THE ONE-MIND MERGE shipped (ADR 0051, 1.49.0; HANDOFF_ONE_MIND executed)
+ADR written first. Engine derived from the six principles:
+src/orchestrator/turn_engine.py — one conversation, full tool results
+persistent in ONE history across rounds AND turns, thinking room,
+free composition over the four read-only ops. Boundary kept: stamped
+headlines, caption gate, machine-verified evidence-quote verdict,
+read-only dispatch (writes plan-confirm), round cap + anti-flail as
+code, infra errors observed into the conversation. Casebook DELETED
+not ported: planner shape rules, mandatory-bridge clause, pointer
+doctrine, bridge-duty gate check, pointer demotion — all gone. Webapp
+reads run immediately on /api/ask (trace-as-display); plan card
+reserved for writes. 11 cage tests; 908 local tests green; suite now
+drives the engine. THESIS TEST RUNNING: full suite on mini then 4o —
+bridge and anaphora must flip with zero new prompt rules, honesty
+100%; the model-tier question is formally reopened.
