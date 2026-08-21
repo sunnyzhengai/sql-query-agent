@@ -475,6 +475,10 @@ def dispatch(name: str, args: dict, run_kql, session: Session) -> dict:
     except ToolError as e:
         return {"error": str(e)}
     except Exception as e:                     # noqa: BLE001 — infra layer
+        text = str(e)
+        m = re.search(r'"@message"\s*:\s*"([^"]{1,160})', text)
+        detail = (m.group(1) if m else text[:140]).strip()
         return {"error": ("the certified knowledge base is unreachable "
-                          "right now (data platform may be paused or "
-                          f"starting): {type(e).__name__}")}
+                          f"({type(e).__name__}: {detail}) — common "
+                          "causes: capacity paused or a broken OneLake "
+                          "shortcut in the KQL database")}

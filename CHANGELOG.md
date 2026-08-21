@@ -8,6 +8,19 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+---
+
+## [1.41.1] - 2026-08-20
+
+### Fixed — infrastructure errors name the broken thing (field find: paused capacity)
+- A paused capacity surfaced as "operation failed — the data platform
+  may be unavailable", hiding the store's own message ("Delta table
+  does not exist"), so the admin guessed between three causes. Both
+  infra error paths (plan protocol + agent toolset) now extract the
+  store's @message and name the two common causes (capacity paused /
+  broken OneLake shortcut) — error-contract philosophy: every error
+  tells the admin what to check.
+
 - dist/ pruned to the current wheel only (Sunny's ruling via the
   review-session cleanup list, confirmed in-session 2026-08-20):
   58 historical wheels removed from tracking; release history lives

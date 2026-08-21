@@ -302,6 +302,19 @@ def propose_turn(session: ProtocolSession, question: str,
     return plan
 
 
+def _infra_error(e: Exception) -> str:
+    """Admin-facing infrastructure error: NAME the broken thing
+    (error-contract philosophy — live find 2026-08-20: 'may be
+    unavailable' hid 'Delta table does not exist', sending the admin
+    guessing between a paused capacity and a broken shortcut)."""
+    text = str(e)
+    m = re.search(r'"@message"\s*:\s*"([^"]{1,160})', text)
+    detail = (m.group(1) if m else text[:140]).strip()
+    return (f"operation failed ({type(e).__name__}: {detail}) — "
+            "common causes: capacity paused (resume it) or a broken "
+            "OneLake shortcut in the KQL database (re-create it)")
+
+
 def execute_confirmed(session: ProtocolSession, plan: dict,
                       run_kql) -> "list[dict]":
     """Execute a HUMAN-CONFIRMED plan (possibly edited — this function
@@ -326,9 +339,7 @@ def execute_confirmed(session: ProtocolSession, plan: dict,
         except OpError as e:
             outputs.append({"component": c, "error": str(e)})
         except Exception as e:              # noqa: BLE001 — infra visible
-            outputs.append({"component": c, "error":
-                            f"operation failed ({type(e).__name__}) — the "
-                            "data platform may be unavailable"})
+            outputs.append({"component": c, "error": _infra_error(e)})
     session.turns += 1
     return outputs
 

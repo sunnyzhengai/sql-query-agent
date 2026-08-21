@@ -132,6 +132,23 @@ class TestExecuteConfirmed:
         out = execute_confirmed(s, plan, fake_kql)
         assert "not been surfaced" in out[0]["error"]
 
+    def test_infra_errors_name_the_broken_thing(self):
+        """Live find (2026-08-20): 'may be unavailable' hid 'Delta
+        table does not exist' — the admin guessed between a paused
+        capacity and a broken shortcut. The cause is named now."""
+        def dying_kql(query, params):
+            raise RuntimeError(
+                '{"error": {"@message": "Query execution has resulted '
+                'in error: Delta table does not exist: graph_nodes"}}')
+        s = ProtocolSession()
+        out = execute_confirmed(
+            s, {"components": [
+                {"op": "census", "params": {"kind": "metric"}}]},
+            dying_kql)
+        err = out[0]["error"]
+        assert "Delta table does not exist" in err
+        assert "capacity paused" in err and "shortcut" in err
+
     def test_forward_plan_ref_fails_visibly(self):
         s = ProtocolSession()
         plan = {"components": [
