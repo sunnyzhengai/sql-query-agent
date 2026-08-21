@@ -199,3 +199,28 @@ reserved for writes. 11 cage tests; 908 local tests green; suite now
 drives the engine. THESIS TEST RUNNING: full suite on mini then 4o —
 bridge and anaphora must flip with zero new prompt rules, honesty
 100%; the model-tier question is formally reopened.
+
+### 2026-08-21 — THESIS VERDICT (prompt hash pinned: 20781efb…) + P-group shipped (1.50.0)
+One-mind full suite, both tiers, zero prompt-rule additions:
+| family | mini | gpt-4o |
+|---|---|---|
+| census | 1.00/1.00 | 1.00/1.00 |
+| definition | 0.83/1.00 | 0.83/1.00 |
+| drilldown | 1.00/1.00 | 1.00/1.00 |
+| anaphora | **1.00/1.00 (was 0.67)** | **1.00/0.83→1.00** |
+| bridge | 0.00/0.67 | 0.00/**1.00** |
+| topical_count | 0.00/1.00 | 0.00/1.00 |
+
+Honest reading: ANAPHORA FLIPPED on both tiers with zero prompt rules
+— memory did it; the P2 thesis holds. Drilldown holds. gpt-4o is now
+fully honest (6/6 families) under the new shape — the tier question
+re-answered. Bridge did NOT flip on prompts-free grounds — but the
+root cause is RETRIEVAL, not language: the embedding top-K buried the
+literal near-names ('Sepsis Case Details' absent from top 12). Fixed
+data-shaped inside P4: semantic search now unions name-containment
+matches (flagged). topical_count regressed 1.00→0.00 — the deleted
+census-for-topic-counts casebook was load-bearing; NOT re-added; next
+run measures whether containment + headlines suffice, else this is
+the honest P4 failure to report. P-group checks + strata in SPEC
+v0.5; protocol.py demolished (P1); Smartness Walk written
+(internal/docs/SMARTNESS_WALK.md). Next: suite rerun on 1.50.0.
