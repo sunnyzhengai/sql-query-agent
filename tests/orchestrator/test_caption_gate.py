@@ -212,3 +212,50 @@ class TestStampVerification:
         text = template_caption([self.BRIDGED])
         assert "closest by name: Sepsis Case Details" in text
         # so a floored bridge turn still hands the user the bridge
+
+
+class TestBridgeAcceptanceRuling:
+    """Sunny's ruling, 2026-08-21: name-siblings presented FIRST,
+    mandatory; meaning-related permitted after, labeled. Boundary
+    enforcement grounded in the stamped list + displayed rows."""
+
+    RESULT = {
+        "component": {"op": "search", "index": 1},
+        "result": {"ref": "R1", "op": "search",
+                   "params": {"phrase": "Sepsis Case",
+                              "mode": "semantic"},
+                   "rows": [
+                       {"name": "USP_A",
+                        "business_name": "Sepsis Case Details"},
+                       {"name": "USP_B",
+                        "business_name": "Severe Sepsis Episodes"},
+                   ],
+                   "complete": False, "universe": "top-K",
+                   "headline": "R1: search — 2 row(s). Nothing is NAMED "
+                               "'Sepsis Case' exactly; closest by name: "
+                               "Sepsis Case Details. Not exhaustive."},
+    }
+
+    def test_siblings_first_passes(self):
+        assert caption_violations(
+            "Nothing is named that exactly — closest by name: Sepsis "
+            "Case Details. Related by meaning: Severe Sepsis Episodes.",
+            [self.RESULT]) == []
+
+    def test_meaning_first_violates(self):
+        out = caption_violations(
+            "Severe Sepsis Episodes defines severe sepsis cases; also "
+            "see Sepsis Case Details.", [self.RESULT])
+        assert any("presented FIRST" in v for v in out)
+
+    def test_siblings_absent_violates_when_candidates_are_discussed(self):
+        out = caption_violations(
+            "Severe Sepsis Episodes covers this topic.", [self.RESULT])
+        assert any("presented FIRST" in v for v in out)
+
+    def test_no_candidate_mentions_is_not_forced(self):
+        # a caption that discusses none of the displayed candidates is
+        # not forced to bridge — the floor renders the stamp anyway
+        assert caption_violations(
+            "I could not resolve that name to a certified item.",
+            [self.RESULT]) == []

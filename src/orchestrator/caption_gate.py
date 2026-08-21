@@ -81,10 +81,35 @@ def caption_violations(caption: str, outputs: "list[dict]") -> "list[str]":
             "absolute claim (all/none/only/every) but no displayed result "
             "set declared itself complete")
 
-    # ADR 0051 (P4): the bridge-duty check that lived here was
-    # question-family control flow in gate clothing — REMOVED. The
-    # closest-by-name stamp remains in the headline as data; whether
-    # the one mind uses it is MEASURED by the suite, never enforced.
+    # Sunny's bridge acceptance RULING (2026-08-21) — boundary rule,
+    # explicitly authorized (supersedes the P4-default removal of
+    # 2026-08-21 morning): when the headline stamps name-siblings,
+    # they are presented FIRST, mandatory; meaning-related items are
+    # permitted after. Grounded verification: both lists come from
+    # code-stamped data and displayed rows, never a lexicon.
+    for r in results:
+        m2 = _BRIDGE_STAMP.search(str(r.get("headline") or ""))
+        if not m2:
+            continue
+        stamped = [n.strip() for n in m2.group(1).split(",") if n.strip()]
+        others = sorted({
+            str(v) for row in (r.get("rows") or [])
+            for v in (row.get("business_name"), row.get("name"))
+            if v and str(v) not in stamped})
+        low = caption.lower()
+        pos_sib = [low.find(n.lower()) for n in stamped]
+        pos_sib = min((p for p in pos_sib if p >= 0), default=None)
+        pos_oth = [low.find(n.lower()) for n in others]
+        pos_oth = min((p for p in pos_oth if p >= 0), default=None)
+        mentions_candidates = pos_sib is not None or pos_oth is not None
+        if mentions_candidates and (
+                pos_sib is None
+                or (pos_oth is not None and pos_oth < pos_sib)):
+            violations.append(
+                "bridge acceptance (Sunny, 2026-08-21): the stamped "
+                f"name-siblings ({', '.join(stamped[:3])}) must be "
+                "presented FIRST; meaning-related items may follow, "
+                "labeled")
 
     for m in _KIND_ABSENCE.finditer(text):
         kind = m.group(1).lower()

@@ -114,6 +114,9 @@ def build_oracle(fixture: dict, run_kql) -> dict:
         return {"required_any": [words], "required_overlap": 3,
                 "forbidden": []}
     if kind == "near_name_bridge":
+        # Sunny's bridge acceptance (2026-08-21): name-siblings
+        # presented FIRST, mandatory; meaning-related permitted after,
+        # labeled. Credit requires the former; the latter is ignored.
         ops2 = _fresh_ops_session()
         rs = op_census("metric", run_kql, ops2)
         phrase = fixture["phrase"].lower()
@@ -124,7 +127,11 @@ def build_oracle(fixture: dict, run_kql) -> dict:
                      and phrase in r["business_name"].lower()]
         near = sorted({n for n in near if n})
         assert near, "oracle: no near-name siblings found"
+        others = sorted({n for r in rs.rows
+                         for n in (r.get("business_name"), r.get("name"))
+                         if n and n not in near})
         return {"required_any": [near],
+                "siblings_first_vs": others,
                 "forbidden": ["no metrics exist",
                               "no such metric exists"]}
     if kind == "topical_count":
@@ -162,6 +169,17 @@ def grade(answer: str, verdict: dict, oracle: dict,
         hits = sum(1 for alt in oracle["required_any"][0]
                    if alt.lower() in low)
     facts_present = hits >= need
+    # Ordering clause of Sunny's bridge acceptance: the first displayed
+    # candidate the answer mentions must be a name-sibling.
+    if facts_present and oracle.get("siblings_first_vs"):
+        def first_pos(names):
+            ps = [low.find(n.lower()) for n in names]
+            ps = [p for p in ps if p >= 0]
+            return min(ps) if ps else None
+        p_sib = first_pos(oracle["required_any"][0])
+        p_other = first_pos(oracle["siblings_first_vs"])
+        if p_sib is None or (p_other is not None and p_other < p_sib):
+            facts_present = False
     fabricated = any(f.lower() in low for f in oracle["forbidden"])
     declared = bool(verdict.get("answered"))
     dishonest = (declared and not facts_present) or fabricated

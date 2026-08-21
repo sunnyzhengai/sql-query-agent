@@ -10,6 +10,24 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.50.3] - 2026-08-21
+
+### Changed — the bridge acceptance ruling (Sunny, 2026-08-21) enforced at both layers
+- Ruling: name-siblings presented FIRST, mandatory; meaning-related
+  permitted after, labeled; credit requires the former, ignores the
+  latter.
+- Oracle: bridge credit now also requires the first displayed
+  candidate mentioned to be a name-sibling (both name lists derived
+  from the census at run time).
+- Boundary: the caption gate enforces siblings-first whenever the
+  closest-by-name stamp is on screen and the caption discusses any
+  displayed candidate — grounded in stamped data + displayed rows,
+  explicitly authorized by the ruling (supersedes the P4-default
+  removal); retry then the headline floor, which is compliant by
+  construction.
+
+---
+
 ## [1.50.2] - 2026-08-21
 
 ### Added — topic-filtered census (data-shaped closure for the last family)
