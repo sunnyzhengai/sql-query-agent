@@ -368,3 +368,14 @@ census, and name_match companions are stamped; (b) model widened to
 'Sepsis' whose stamp names near-everything → boundary ruling now
 aggregates with EXACT-stamp precedence, competitors drawn from all
 displayed results. Zero prompt/tool changes — the pin stands.
+
+### 2026-08-21 — 1.50.9 mini: ALL SEVEN FAMILIES PASS (rc=0), walk fixtures live
+census 1.00 · definition 1.00 · bridge 1.00 (n=12, both subfamilies,
+strictest oracle) · drilldown 0.83 · topical 1.00 (n=12) · sql_request
+1.00 · anaphora 1.00 (n=8) — honesty 1.00 everywhere. CI GREEN.
+Strongest board of the campaign: mini tier, every one of Sunny's
+walk-step-1 questions running as a fixture, zero prompt changes since
+the pin. The engine iteration loop is CLOSED again pending Sunny:
+webapp restart to 1.50.9, walk steps 2–6, the graph-gap roadmap
+priority call (decisions → report links → columns → sql-text), and
+the tenant republish for Round 4.
