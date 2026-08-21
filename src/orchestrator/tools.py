@@ -140,6 +140,17 @@ DECISIONS_OF_STEP_QUERY = (
     "| order by node_id asc"
 )
 
+# One aggregate per metric: how many decision sites its steps carry
+# (suite find 2026-08-21 post-tightening: mini retrieved the METRIC,
+# whose record holds no decisions, and summarized — the count plus a
+# stamped pointer makes the second hop machine truth on screen).
+DECISION_COUNT_QUERY = (
+    "declare query_parameters(p_ref:string);\n"
+    "graph_nodes\n"
+    "| where node_id startswith strcat('decision:', p_ref, ':')\n"
+    "| count"
+)
+
 # Consumption-layer links (ADR 0040): deterministic edges from TMDL
 # partition lineage, exposed via the graph_edges shortcut.
 REPORTS_OF_METRIC_QUERY = (

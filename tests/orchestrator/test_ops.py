@@ -344,6 +344,14 @@ class TestDecisionLayer:
         assert "John Smith" not in expr
         assert "<NAME>" in expr
 
+    def test_metric_retrieve_carries_decision_count(self):
+        """The pointer to hop 2 is data: the metric record counts its
+        decision sites so the headline can stamp where criteria live."""
+        s = OpsSession()
+        s.surfaced.add(REF_A)
+        rs = op_retrieve([REF_A], fake_kql, s)
+        assert rs.rows[0]["decision_count"] == 1
+
     def test_step_without_decisions_gets_empty_list(self):
         s = OpsSession()
         s.surfaced.add(STEP_2)

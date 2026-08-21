@@ -29,6 +29,7 @@ from src.orchestrator.core import resolve
 from src.orchestrator.tools import (
     BATCH_FRAGMENTS_QUERY,
     CATALOG_KINDS,
+    DECISION_COUNT_QUERY,
     DECISIONS_OF_STEP_QUERY,
     FIND_BY_NAME_QUERY,
     LINKS_OF_REPORT_QUERY,
@@ -468,8 +469,11 @@ def op_retrieve(ids: "list[str]", run_kql, session: OpsSession) -> ResultSet:
                                      {"p_id": f"canonical:{an_id}"})]
                 for r in reports:
                     session.surfaced.add(r["id"])
+                dc = run_kql(DECISION_COUNT_QUERY, {"p_ref": an_id})
                 rows.append({"id": an_id, "kind": "metric", **fs.facts,
-                             "steps": step_rows, "reports": reports})
+                             "steps": step_rows, "reports": reports,
+                             "decision_count":
+                                 (dc[0].get("Count", 0) if dc else 0)})
         except AssemblyError as e:
             notes.append(str(e))
     return session.register(

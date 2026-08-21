@@ -9,6 +9,7 @@ from src.orchestrator.assemble import METRIC_FACTS_QUERY, NODE_FACTS_QUERY
 from src.orchestrator.core import RESOLVE_QUERY
 from src.orchestrator.tools import (
     BATCH_FRAGMENTS_QUERY,
+    DECISION_COUNT_QUERY,
     DECISIONS_OF_STEP_QUERY,
     FIND_BY_NAME_QUERY,
     LINKS_OF_REPORT_QUERY,
@@ -93,6 +94,9 @@ def fake_kql(query, params):
                  "name": "Screen Rate"},
             ]
         return []
+    if query == DECISION_COUNT_QUERY:
+        n = 1 if params["p_ref"] == REF_A else 0
+        return [{"Count": n}]
     if query == DECISIONS_OF_STEP_QUERY:
         if params["p_step"] == STEP_1:
             return [{

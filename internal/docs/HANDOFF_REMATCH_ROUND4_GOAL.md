@@ -416,3 +416,14 @@ conservation cannot live in CI — the drift answer splits into a CI
 leg and a live-audit leg; expect the same split for any artifact
 class whose frontier exists only in tenant data. SPEC header flipped
 to "ratified by ADR 0052".
+
+### 2026-08-21 — 1.51.0 board under the tightened oracle → 1.51.2
+1.51.0 mini, decision-word oracle live: DRILLDOWN PASSES 0.83 — mini
+reaches the decision layer unprompted when it retrieves steps. Six
+families 1.00/PASS; anaphora 0.75 BELOW: the two misses retrieved the
+METRIC (whose record holds no decisions) and summarized at one round.
+1.51.2: metric records carry decision_count and the retrieve headline
+stamps "N decision site(s) carry the WHERE/CASE criteria — retrieve
+the step records to read them" — the hop-2 pointer is machine truth
+on screen, same mechanism that flipped bridge. (1.51.1 CI red was
+ruff import-order only; fixed, CI green.)
