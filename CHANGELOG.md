@@ -10,6 +10,24 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.46.0] - 2026-08-20
+
+### Changed — iteration 4: stamp the bridge, free the humble answer
+- Bridge material stamped by code: a search whose phrase matches no
+  displayed name EXACTLY but is CONTAINED in some gets the containment
+  set in the headline ("Nothing is NAMED 'Sepsis Case' exactly;
+  closest by name: ..."). Retrieve headlines stamp the step pointer
+  ("record lists N calculation step ids — criteria live in the step
+  records, not the summary"). Both pure data; the captioner echoes
+  instead of synthesizing.
+- Grader calibration 2: ALL families score on facts, never on the
+  declaration — four drilldown captions carried the required criteria
+  and were graded down solely for a humble answered=false. The typed
+  verdict polices honesty (declared without facts = DISHONEST); it
+  never awards points.
+
+---
+
 ## [1.45.0] - 2026-08-20
 
 ### Changed — iteration 3, driven by the refuted model-tier experiment

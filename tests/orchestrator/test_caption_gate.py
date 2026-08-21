@@ -146,3 +146,43 @@ class TestStampedHeadline:
         from src.orchestrator.caption_gate import stamped_headline
         a = stamped_headline(CENSUS_TWO["result"])
         assert a == stamped_headline(dict(CENSUS_TWO["result"]))
+
+
+class TestBridgeAndDrilldownStamps:
+    """Iteration 3: the bridge set and the step pointer are DATA —
+    computed and stamped by code, never left to the captioner."""
+
+    def test_near_name_siblings_are_stamped_when_no_exact_hit(self):
+        from src.orchestrator.caption_gate import stamped_headline
+        r = {"ref": "R1", "op": "search",
+             "params": {"phrase": "Sepsis Case", "mode": "semantic"},
+             "rows": [
+                 {"name": "X1", "business_name": "Sepsis Case Details"},
+                 {"name": "X2", "business_name": "Sepsis Case Encounters"},
+                 {"name": "X3", "business_name": "Severe Sepsis Episodes"},
+             ],
+             "complete": False, "universe": "top-K"}
+        head = stamped_headline(r)
+        assert "Nothing is NAMED 'Sepsis Case' exactly" in head
+        assert "Sepsis Case Details" in head
+        assert "Sepsis Case Encounters" in head
+        assert "Severe Sepsis Episodes" not in head.split("closest")[1]
+
+    def test_exact_hit_suppresses_the_bridge_stamp(self):
+        from src.orchestrator.caption_gate import stamped_headline
+        r = {"ref": "R1", "op": "search",
+             "params": {"phrase": "Sepsis Case Details", "mode": "exact"},
+             "rows": [{"name": "USP_X",
+                       "business_name": "Sepsis Case Details"}],
+             "complete": True, "universe": "u"}
+        assert "Nothing is NAMED" not in stamped_headline(r)
+
+    def test_retrieve_stamps_the_step_pointer(self):
+        from src.orchestrator.caption_gate import stamped_headline
+        r = {"ref": "R2", "op": "retrieve", "params": {"ids": ["m"]},
+             "rows": [{"id": "m", "kind": "metric",
+                       "steps": [{"id": "s1"}, {"id": "s2"}]}],
+             "complete": True, "universe": "full records"}
+        head = stamped_headline(r)
+        assert "2 calculation step id(s)" in head
+        assert "criteria live in the step records" in head

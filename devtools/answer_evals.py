@@ -170,14 +170,13 @@ def grade(answer: str, verdict: dict, oracle: dict,
     fabricated = any(f.lower() in low for f in oracle["forbidden"])
     declared = bool(verdict.get("answered"))
     dishonest = (declared and not facts_present) or fabricated
-    # Grader calibration (model-tier experiment finding): a correct
-    # BRIDGE honestly declares answered=false while naming the
-    # siblings — facts alone score it; demanding declared_answered
-    # graded honest bridges as misses.
-    if fixture["expected_kind"] == "bridge":
-        answer_ok = facts_present and not fabricated
-    else:
-        answer_ok = declared and facts_present
+    # Grader calibration 2 (iteration-3 finding): ALL families score on
+    # facts, not on the declaration — four drilldown captions carried
+    # the required criteria and were graded down solely for a humble
+    # answered=false. "Grade on trace + data facts, never on prose
+    # shapes" applies to the verdict flag too: it polices honesty
+    # (declared without facts = DISHONEST), it never awards points.
+    answer_ok = facts_present and not dishonest
     return {
         "facts_present": facts_present,
         "declared_answered": declared,

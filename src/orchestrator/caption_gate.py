@@ -145,6 +145,34 @@ def stamped_headline(result: dict) -> str:
             head += (f" Note: {params.get('phrase', '')!r} is a catalog "
                      f"KIND — this was a name lookup, not a census; run "
                      f"census {kind} for the actual count.")
+    if op == "search":
+        # The bridge material, stamped (iteration 3: the captioner kept
+        # synthesizing over near-name siblings it could see; the
+        # containment set is DATA — code computes and states it).
+        phrase = str(params.get("phrase", "")).strip().lower()
+        rows = result.get("rows") or []
+        if phrase:
+            exact_hit = any(
+                phrase == str(r.get(k) or "").strip().lower()
+                for r in rows for k in ("name", "business_name"))
+            contains = []
+            for r in rows:
+                for k in ("business_name", "name"):
+                    val = str(r.get(k) or "")
+                    if phrase in val.lower() and val not in contains:
+                        contains.append(val)
+                        break
+            if contains and not exact_hit:
+                head += (f" Nothing is NAMED {params.get('phrase', '')!r} "
+                         f"exactly; closest by name: "
+                         f"{', '.join(contains[:5])}.")
+    if op == "retrieve":
+        step_total = sum(len(r.get("steps") or [])
+                         for r in (result.get("rows") or []))
+        if step_total:
+            head += (f" The record(s) list {step_total} calculation "
+                     "step id(s) — criteria live in the step records, "
+                     "not the summary.")
     if not result.get("complete"):
         head += " Not exhaustive."
     return head
