@@ -12,6 +12,7 @@ from src.orchestrator.ops import (
     op_compare,
     op_retrieve,
     op_search,
+    row_mentions,
 )
 from tests.orchestrator.test_tools import (
     REF_A,
@@ -216,3 +217,42 @@ class TestTopicFilteredCensus:
     def test_no_filter_unchanged(self):
         rs = op_census("metric", fake_kql, OpsSession())
         assert len(rs.rows) == 2 and "certified catalog — the count" in rs.universe
+
+    def test_short_token_counts_whole_tokens_not_substrings(self):
+        """1.50.4, pre-empting Sunny's walk question 'how many metrics
+        contain ED logic': both fake metrics mention ED as a token
+        ('ED Sepsis Screening', 'USP_ED_Sepsis') — and none would be
+        excluded by the fix — but the count must come from the token
+        predicate, exercised end-to-end through the census."""
+        rs = op_census("metric", fake_kql, OpsSession(), contains="ED")
+        assert len(rs.rows) == 2
+        assert "mentions 'ED'" in rs.universe
+
+
+class TestRowMentions:
+    """The 'mentions T' predicate is the SPEC shared by op_census and
+    the suite oracle — pinned here at L0 because the suite, sharing it,
+    cannot catch its bugs."""
+
+    def test_whole_token_not_substring(self):
+        assert not row_mentions(
+            {"name": "X", "description": "well defined and created"}, "ED")
+
+    def test_underscore_is_a_token_boundary(self):
+        assert row_mentions({"name": "USP_ED_SEPSIS"}, "ED")
+
+    def test_space_and_case_insensitive(self):
+        assert row_mentions({"business_name": "ed sepsis screening"}, "ED")
+
+    def test_json_keys_and_ids_never_count(self):
+        """The 1.50.3 filter scanned json.dumps(row): the key string
+        'business_name' made needle 'name' match EVERY row, and ids
+        counted despite the stamped universe naming only name,
+        business name, and description."""
+        assert not row_mentions(
+            {"id": "reports.USP_NAME", "name": "X",
+             "business_name": None, "description": None}, "name")
+
+    def test_none_fields_are_safe(self):
+        assert not row_mentions(
+            {"name": None, "business_name": None, "description": None}, "ED")

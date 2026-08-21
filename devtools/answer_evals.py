@@ -39,7 +39,12 @@ from devtools.grounding_evals import _load_dotenv  # noqa: E402
 from devtools.local_llm import chat_completion  # noqa: E402
 from src.orchestrator.agent import azure_chat_api  # noqa: E402
 from src.orchestrator.kusto import KustoClient, az_cli_token_provider  # noqa: E402
-from src.orchestrator.ops import op_census, op_retrieve, op_search  # noqa: E402
+from src.orchestrator.ops import (  # noqa: E402
+    op_census,
+    op_retrieve,
+    op_search,
+    row_mentions,
+)
 from src.orchestrator.turn_engine import EngineSession  # noqa: E402
 from src.orchestrator.turn_engine import run_turn as engine_run_turn  # noqa: E402
 
@@ -70,6 +75,13 @@ FIXTURES = [
     {"family": "topical_count",
      "question": "how many metrics are about sepsis",
      "oracle": "topical_count", "topic": "sepsis",
+     "max_rounds": 2, "expected_kind": "answered"},
+    # Sunny's walk addition (step 1, 2026-08-21), pre-empted as an L2
+    # fixture: a SHORT token exercises the whole-token row_mentions
+    # predicate end-to-end (substring matching would count 'defined').
+    {"family": "topical_count",
+     "question": "how many metrics contain ED logic",
+     "oracle": "topical_count", "topic": "ED",
      "max_rounds": 2, "expected_kind": "answered"},
     # Re-pointed (iteration 3): Sepsis Case Encounters is a passthrough
     # metric (genuinely no criteria) — the fixture graded honest "no
@@ -135,9 +147,12 @@ def build_oracle(fixture: dict, run_kql) -> dict:
                 "forbidden": ["no metrics exist",
                               "no such metric exists"]}
     if kind == "topical_count":
+        # 1.50.4: truth uses the SAME spec'd predicate as the engine
+        # (row_mentions, L0-pinned) — the old substring-over-json.dumps
+        # here shared op_census's bug, so the suite was structurally
+        # blind to it ('ED' matched 'defined'; JSON keys counted).
         rs = op_census("metric", run_kql, ops)
-        topic = fixture["topic"].lower()
-        n = sum(1 for r in rs.rows if topic in json.dumps(r).lower())
+        n = sum(1 for r in rs.rows if row_mentions(r, fixture["topic"]))
         assert n, "oracle: topic matches nothing"
         return {"required_any": [[str(n)]], "forbidden": []}
     if kind == "beyond_summary":

@@ -15,6 +15,7 @@ the LLM is the orchestrator, never the calculator.
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import dataclass, field
 
 from src.graph.templates import _fold
@@ -204,6 +205,30 @@ def normalize_kind(kind: str) -> "str | None":
     return k if k in CATALOG_KINDS else None
 
 
+# The fields the topic-filtered census universe sentence names. The
+# filter scans exactly these — never the serialized row.
+_MENTION_FIELDS = ("name", "business_name", "description")
+
+
+def row_mentions(row: dict, needle: str) -> bool:
+    """The 'mentions T' predicate — the SPEC of topic-filtered census,
+    shared by op_census and the suite oracle so execution and grading
+    can never disagree on what 'mentions' means. Its behavior is pinned
+    by L0 tests, not by the suite (which, sharing it, cannot catch it).
+
+    Whole-token match over _MENTION_FIELDS only. 1.50.4 (pre-empting
+    Sunny's walk question 'how many metrics contain ED logic'): the old
+    substring-over-json.dumps matched 'ED' inside 'defined'/'created',
+    and JSON keys counted as mentions while the stamped universe
+    claimed name/business-name/description scope — a machine-stamped
+    sentence the code didn't implement. Underscores are token
+    boundaries: 'ED' matches 'ED_SEPSIS' and 'ED Sepsis Screening'."""
+    pat = re.compile(
+        r"(?<![A-Za-z0-9])" + re.escape(needle.strip())
+        + r"(?![A-Za-z0-9])", re.IGNORECASE)
+    return any(pat.search(str(row.get(f) or "")) for f in _MENTION_FIELDS)
+
+
 def op_census(kind: str, run_kql, session: OpsSession,
               contains: "str | None" = None) -> ResultSet:
     """Complete enumeration of one catalog KIND, with the exact count.
@@ -231,10 +256,9 @@ def op_census(kind: str, run_kql, session: OpsSession,
     if contains and contains.strip():
         # Topic-filtered census (2026-08-21): "how many X mention T"
         # is a DATA operation the store answers exactly — filter the
-        # complete enumeration by text containment (name, business
-        # name, description). Question-agnostic parameter, not flow.
-        needle = contains.strip().lower()
-        out = [r for r in out if needle in json.dumps(r).lower()]
+        # complete enumeration by the shared row_mentions predicate.
+        # Question-agnostic parameter, not flow.
+        out = [r for r in out if row_mentions(r, contains)]
         params["contains"] = contains.strip()
         universe = (f"every {k} in the certified catalog whose name, "
                     f"business name, or description mentions "

@@ -133,6 +133,11 @@ SYSTEM_VOCAB = frozenset({
     "search_catalog", "find_by_name", "get_facts", "list_steps",
     "check_same_logic", "list_catalog",
     "metric", "step", "term", "report", "measure",
+    # catalog row FIELD names scanned by the row_mentions predicate
+    # (AMENDMENT 2026-08-21, 1.50.4: the topic-filtered census must
+    # scan exactly the fields its stamped universe sentence names —
+    # these are OUR schema's column names, not user phrasings)
+    "name", "business_name", "description",
 })
 
 # --- the prompt budget -------------------------------------------------
