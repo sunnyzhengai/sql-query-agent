@@ -633,6 +633,27 @@ def caption_turn(session: ProtocolSession, outputs: "list[dict]",
             caption, raw = retried, retry
     caption, violations = enforce_caption(caption, outputs)
 
+    # Verdict demotion, in code (iteration 5): when a retrieve headline
+    # stamps "criteria live in the step records" and NO step record is
+    # displayed, an answered=true claim is structurally unverified —
+    # demote it. (Scoring is facts-based, so honest well-answered turns
+    # lose nothing; only the summary-over-claim dies.)
+    if raw.get("answered"):
+        pointer_stamped = any(
+            "criteria live in the step records" in
+            str((o.get("result") or {}).get("headline") or "")
+            for o in outputs)
+        step_shown = any(
+            str(row.get("kind") or "") == "step"
+            or str(row.get("id") or "").startswith("transform:")
+            for o in outputs
+            for row in ((o.get("result") or {}).get("rows") or []))
+        if pointer_stamped and not step_shown:
+            raw = {**raw, "answered": False,
+                   "missing_op": (raw.get("missing_op")
+                                  or "retrieve the step ids listed in "
+                                     "the record")}
+
     suggestions = [validate_component(s, i + 1)
                    for i, s in enumerate(raw.get("suggestions") or [])][:3]
     session.history.append({"role": "assistant", "content": caption})

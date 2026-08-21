@@ -38,8 +38,12 @@ from src.orchestrator.ops import normalize_kind
 
 _REF_TOKEN = re.compile(r"\b[R$]\d+\b")
 _NUMBERS = re.compile(r"\b\d+\b")
+# "nothing" left this lexicon in iteration 5: the bridge headline
+# itself stamps "Nothing is NAMED 'X' exactly", and captions echoing
+# the stamp were being floored by their own required phrasing.
 _ABSOLUTE = re.compile(
-    r"(?i)\b(?:all|every|none|only|nothing|no other|any other)\b")
+    r"(?i)\b(?:all|every|none|only|no other|any other)\b")
+_BRIDGE_STAMP = re.compile(r"closest by name: ([^.]+)\.")
 _KIND_ABSENCE = re.compile(
     r"(?i)\b(?:no|none|zero|not any|are no|aren't any)\b[^.;]{0,60}?"
     r"\b(metric|step|term|report|measure)s?\b")
@@ -77,6 +81,25 @@ def caption_violations(caption: str, outputs: "list[dict]") -> "list[str]":
             "absolute claim (all/none/only/every) but no displayed result "
             "set declared itself complete")
 
+    # Grounded verification, not a lexicon: when a headline stamps the
+    # closest-by-name items, the caption must present at least one of
+    # them — the required list is code-stamped DATA, and iteration 4
+    # measured the captioner synthesizing straight over it (bridge
+    # 0.00 with the material on screen).
+    for r in results:
+        m2 = _BRIDGE_STAMP.search(str(r.get("headline") or ""))
+        if not m2:
+            continue
+        names = [n.strip() for n in m2.group(1).split(",") if n.strip()]
+        # One containment match = the name effectively resolved; the
+        # bridge duty exists only under genuine ambiguity (>= 2).
+        if len(names) >= 2 and not any(
+                n.lower() in caption.lower() for n in names):
+            violations.append(
+                "the display stamps closest-by-name items "
+                f"({', '.join(names[:3])}) — the caption must present "
+                "them to the user, not synthesize past them")
+
     for m in _KIND_ABSENCE.finditer(text):
         kind = m.group(1).lower()
         # Suite finding (first live run, 2026-08-20): requiring a
@@ -102,7 +125,9 @@ def caption_violations(caption: str, outputs: "list[dict]") -> "list[str]":
 
 def template_caption(outputs: "list[dict]") -> str:
     """The deterministic floor: stilted but true, computed from the
-    displayed results alone."""
+    displayed results alone. Iteration 5: the floor IS the stamped
+    headlines when they exist — so even a floored caption carries the
+    bridge material and the step pointer (machine truth, verbatim)."""
     lines = []
     for o in outputs:
         r = o.get("result")
@@ -110,6 +135,9 @@ def template_caption(outputs: "list[dict]") -> str:
             c = o.get("component") or {}
             lines.append(f"{c.get('op', 'component')}: "
                          f"{o.get('error', 'did not run')}")
+            continue
+        if r.get("headline"):
+            lines.append(str(r["headline"]))
             continue
         n = len(r.get("rows") or [])
         lines.append(f"{r.get('ref')}: {r.get('op')} returned {n} row(s) — "

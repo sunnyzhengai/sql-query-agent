@@ -10,6 +10,26 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.47.0] - 2026-08-20
+
+### Changed — iteration 5: the caption is verified against the stamps (grounded, not lexical)
+- Bridge duty enforced: when a headline stamps >= 2 closest-by-name
+  items and the caption names none, that's a violation (retry, then
+  floor) — the required list is code-stamped data, so this is
+  grounded verification, not a claim-shape lexicon. One containment
+  match means the name resolved; no duty fires.
+- The template floor now renders the stamped headlines verbatim —
+  even a floored caption hands the user the bridge and the counts.
+- Verdict demotion in code: answered=true with the step-pointer stamp
+  displayed and no step record retrieved is structurally unverified —
+  demoted to answered=false (scoring is facts-based; only the
+  summary-over-claim dies).
+- "nothing" removed from the absolute-claim lexicon: the bridge
+  headline itself says "Nothing is NAMED 'X' exactly" and captions
+  echoing the stamp were floored by their own required phrasing.
+
+---
+
 ## [1.46.1] - 2026-08-20
 
 ### Fixed — ask-path chat adapter retries transients (field find: 120s read-timeout killed a suite run)

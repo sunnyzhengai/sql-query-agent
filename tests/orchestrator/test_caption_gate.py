@@ -186,3 +186,40 @@ class TestBridgeAndDrilldownStamps:
         head = stamped_headline(r)
         assert "2 calculation step id(s)" in head
         assert "criteria live in the step records" in head
+
+
+class TestStampVerification:
+    """Iteration 5 (grounded verification, not a lexicon): the caption
+    is checked AGAINST code-stamped data — the bridge list and the
+    floor rendering of headlines."""
+
+    BRIDGED = {
+        "component": {"op": "search", "index": 1},
+        "result": {"ref": "R1", "op": "search",
+                   "params": {"phrase": "Sepsis Case",
+                              "mode": "semantic"},
+                   "rows": [{"name": "X1",
+                             "business_name": "Sepsis Case Details"}],
+                   "complete": False, "universe": "top-K",
+                   "headline": "R1: search for 'Sepsis Case' (semantic) "
+                               "— 1 row(s). Nothing is NAMED 'Sepsis "
+                               "Case' exactly; closest by name: Sepsis "
+                               "Case Details, Sepsis Case Encounters. "
+                               "Not exhaustive."},
+    }
+
+    def test_caption_ignoring_the_bridge_stamp_is_a_violation(self):
+        out = caption_violations(
+            "A sepsis case is defined by aggregating several metrics.",
+            [self.BRIDGED])
+        assert any("closest-by-name" in v for v in out)
+
+    def test_caption_presenting_a_stamped_name_passes(self):
+        assert caption_violations(
+            "Nothing is named that exactly — did you mean Sepsis Case "
+            "Details or Sepsis Case Encounters?", [self.BRIDGED]) == []
+
+    def test_the_floor_renders_the_stamped_headlines(self):
+        text = template_caption([self.BRIDGED])
+        assert "closest by name: Sepsis Case Details" in text
+        # so a floored bridge turn still hands the user the bridge
