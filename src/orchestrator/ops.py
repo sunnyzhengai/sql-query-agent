@@ -176,7 +176,8 @@ def _containment_rows(phrase: str, run_kql) -> "list[dict]":
                         {"p_tokens": " ".join(productive)}))
 
 
-def _bridge_note(phrase: str, run_kql) -> str:
+def _bridge_note(phrase: str, run_kql,
+                 session: "OpsSession | None" = None) -> str:
     """Bridge material for an honest-empty result whose parameter is a
     phrase — computed as DATA, stamped into the headline, present no
     matter which op the model chose or how few rounds it took.
@@ -198,6 +199,13 @@ def _bridge_note(phrase: str, run_kql) -> str:
                    r.get("business_name") or r["name"])
         if val and val not in near:
             near.append(str(val))
+        # names on screen are surfaced (corpse fixture 2026-08-21:
+        # the model retrieved the note's names, the read guarantee
+        # refused unsurfaced ids, and the flail burned the round cap)
+        if session is not None:
+            rid = r["ref"] if r.get("kind") == "metric" else r["node_id"]
+            if rid:
+                session.surfaced.add(rid)
     if near:
         parts.append(f"Nothing is NAMED {clean!r} exactly; closest by "
                      f"name: {', '.join(near[:5])}.")
@@ -205,6 +213,8 @@ def _bridge_note(phrase: str, run_kql) -> str:
     for r in run_kql(TABLE_USED_BY_QUERY, {"p_phrase": clean}):
         disp = r.get("business_name") or r.get("ref") or ""
         tables.setdefault(str(r["table_name"]), []).append(str(disp))
+        if session is not None and r.get("ref"):
+            session.surfaced.add(str(r["ref"]))
     for tname in sorted(tables)[:2]:
         readers = sorted({d for d in tables[tname] if d})
         parts.append(f"{tname!r} is a SOURCE TABLE read by "
@@ -234,7 +244,8 @@ def op_search(phrase: str, mode: str, run_kql,
         # defined' ran exact, got an honest 0, and the engine stopped
         # at one round — the floored caption carried no did-you-mean
         # because the bridge stamp existed only on semantic results.
-        note = _bridge_note(clean, run_kql) if not out else ""
+        note = (_bridge_note(clean, run_kql, session)
+                if not out else "")
         return session.register(
             "search", {"phrase": phrase, "mode": "exact"},
             out,
@@ -379,7 +390,7 @@ def op_census(kind: str, run_kql, session: OpsSession,
     # it carries the bridge note, whichever op the model chose (walk
     # find 2026-08-21: census step contains='IP_SEPSIS' → 0 →
     # "cannot be provided", while the graph knew the table).
-    note = (_bridge_note(contains, run_kql)
+    note = (_bridge_note(contains, run_kql, session)
             if contains and contains.strip() and not out else "")
     return session.register("census", params, out, complete=True,
                             universe=universe, note=note)

@@ -376,7 +376,13 @@ def run_turn(session: EngineSession, question: str, chat_api,
                 raw = json.loads(calls[0]["function"]["arguments"] or "{}")
         except Exception:           # noqa: BLE001 — verdict is boundary
             raw = {}
-        answered = bool(raw.get("answered")) and not violations
+        # An exhausted turn is by construction NOT an answer — corpse
+        # fixture 2026-08-21: the continuation drove a flail to the
+        # round cap, and the verdict then declared answered=True on
+        # the budget apology with a quote validly drawn from earlier
+        # rows. The budget message never carries an answer.
+        answered = (bool(raw.get("answered")) and not violations
+                    and not exhausted)
         quote = _norm(str(raw.get("evidence_quote", "")))
         if answered:
             # Evidence ground = every row DISPLAYED this conversation,

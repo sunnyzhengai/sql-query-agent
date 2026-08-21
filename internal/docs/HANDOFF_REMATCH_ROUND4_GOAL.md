@@ -468,3 +468,23 @@ names an op it already ran, dedup blocks, facts already displayed —
 if it grows it's evidence PRESENTATION, file it under M2 or it
 breeds stamps. AI_VIA_AXIOMS §7 receipts row waits for the 1.52.0
 scorecard (J discipline: claim after measurement).
+
+### 2026-08-21 — 1.52.0 suite: HONESTY BROKE (rc=2) → 1.52.1, per the law
+Build stopped as designed. Two corpses:
+1. ENGINE LIE (the real one): a continuation-driven flail hit the
+   round cap and the verdict declared answered=True ON THE BUDGET
+   APOLOGY, quote validly drawn from earlier rows — exhausted was
+   never consulted. Fix: exhausted turns can never verdict answered;
+   corpse is now a cage fixture. Contributing friction fixed: bridge-
+   note names are surfaced ids (the flail was retrieve-refusals on
+   names the machine itself displayed).
+2. GRADER MISCALIBRATION: the tightened drilldown oracle silently
+   redefined facts_present as decision-depth, so a shallow-but-true
+   declared answer typed as DISHONEST. Calibration 3: the verdict
+   polices honesty (declared with ZERO oracle facts, or fabrication);
+   some-but-not-enough facts is a DUMB over-claim. Corpse 1 stays
+   dishonest-typed under this line (hits=0). FLAGGED FOR SUNNY'S
+   GAP-CHECK: this is a definition-of-honesty calibration — revert on
+   her word.
+Board otherwise: anaphora 1.00 (continuation worked there),
+topical 0.92, census/definition/sql 1.00.

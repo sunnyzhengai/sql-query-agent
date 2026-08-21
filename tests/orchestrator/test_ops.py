@@ -243,6 +243,15 @@ class TestExactEmptyBridgeNote:
         assert "Nothing is NAMED 'Sepsis' exactly" in rs.note
         assert "ED Sepsis Screening" in rs.note
 
+    def test_note_names_are_surfaced_for_retrieval(self):
+        """Corpse fixture (1.52.0 suite, 2026-08-21): the model
+        retrieved the note's names, the read guarantee refused the
+        unsurfaced ids, and the flail burned the round cap. A name
+        the machine put on screen is surfaced."""
+        s = OpsSession()
+        op_search("Sepsis", "exact", fake_kql, s)
+        assert s.permitted(REF_A)
+
     def test_exact_hit_carries_no_note(self):
         rs = op_search("ED Sepsis Screening", "exact", fake_kql,
                        OpsSession())

@@ -217,6 +217,21 @@ class TestLoop:
         assert "tool budget" in out["answer"]
         assert out["answered"] is False
 
+    def test_exhausted_turn_can_never_verdict_answered(self):
+        """Corpse fixture (1.52.0 suite, 2026-08-21): a continuation-
+        driven flail hit the round cap and the verdict declared
+        answered=True on the budget apology, quoting earlier displayed
+        rows. The budget message never carries an answer."""
+        s = EngineSession()
+        steps = [{"calls": [("search", {"phrase": f"p{i}",
+                                        "mode": "semantic"})]}
+                 for i in range(20)]
+        steps.append({"verdict": {"answered": True,
+                                  "evidence_quote": GOOD_QUOTE}})
+        out = run_turn(s, "q", scripted_engine(steps), fake_kql)
+        assert out["exhausted"]
+        assert out["answered"] is False
+
     def test_infra_failure_is_an_observed_result(self):
         def dying_kql(query, params):
             raise RuntimeError(
