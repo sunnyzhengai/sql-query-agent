@@ -127,3 +127,33 @@ runs).
   doc once the experiment clears — the tier CHOICE (which deployment
   customers must provision) is Sunny's pricing/product call to
   ratify.
+
+### 2026-08-20 ~22:1x — Model-tier experiment COMPLETE: hypothesis REFUTED
+Identical suite, LLM_MODEL=gpt-4o on all ask-path edges, zero other changes.
+
+| family | mini (ans/hon) | gpt-4o (ans/hon) | delta |
+|---|---|---|---|
+| census | 1.00 / 1.00 | 1.00 / 1.00 | — |
+| definition | 1.00 / 1.00 | 0.67 / 1.00 | WORSE answer |
+| bridge | 0.00 / 0.67 | 0.00 / 0.50 | worse honesty |
+| drilldown | 0.33 / 0.83 | 0.33 / 1.00 | better honesty, same answer |
+| topical_count | 0.83 / 1.00 | 0.67 / 1.00 | worse |
+| anaphora | 0.00 / 1.00 | 0.17 / 0.83 | mixed |
+
+Findings, stated plainly:
+1. Scale did NOT fix composition; the stronger model trades humility
+   for confidence — bridge went 3/6 DISHONEST on 4o (confident
+   synthesis without the required facts), the exact failure the typed
+   verdict exists to catch.
+2. Two grader-model interactions identified (recorded, to fix):
+   the definition oracle counts VERBATIM word overlap and 4o
+   paraphrases more fluently — some "misses" may be style; and the
+   bridge grade demands declared_answered, but a correct bridge
+   honestly declares answered=false while naming the siblings.
+3. Consequence: NO minimum-tier prerequisite is documented — there is
+   no evidence a higher tier helps this harness. Ask-path default
+   stays gpt-4o-mini. The bottleneck is harness/oracle-shaped;
+   iteration resumes within ADR 0050 bounds, now with measured
+   justification (the "stop sharpening prompts for mini" directive is
+   answered by the experiment it asked for: sharpening was and
+   remains the right lever).
