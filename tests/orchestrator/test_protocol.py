@@ -275,6 +275,21 @@ class TestAutoContinue:
         being true, this test forces a conscious decision."""
         assert set(IMPLEMENTED_OPS) == set(READ_ONLY_OPS)
 
+    def test_duplicate_component_is_refused_anti_flail(self):
+        """Suite finding (2026-08-20): three identical semantic
+        searches in three rounds. Repetition is refused in code."""
+        s, outputs = self._base()
+        loop = continue_rounds(s, "q", outputs, scripted_planner([
+            {"answered": False, "components": [
+                {"op": "retrieve", "params": {"ids": [REF_A]}}]},
+            {"answered": False, "components": [
+                {"op": "retrieve", "params": {"ids": [REF_A]}}]},
+            {"answered": True},
+        ]), fake_kql)
+        second = loop["rounds"][1]["outputs"][0]
+        assert "error" in second
+        assert "already ran this turn" in second["error"]
+
     def test_trace_ops_stay_inside_the_read_only_whitelist(self):
         s, outputs = self._base()
         continue_rounds(s, "q", outputs, scripted_planner([

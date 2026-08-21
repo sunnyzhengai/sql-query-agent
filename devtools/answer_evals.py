@@ -216,6 +216,7 @@ def main() -> None:
     chat_api = azure_chat_api()
 
     families: "dict[str, list[dict]]" = {}
+    _dump: "list[dict]" = []
     stop_build = False
     for fixture in FIXTURES:
         try:
@@ -238,12 +239,29 @@ def main() -> None:
                       len(turn["loop"]["rounds"]), fixture)
             g["question"] = q
             families.setdefault(fixture["family"], []).append(g)
+            _dump.append({"family": fixture["family"], "question": q,
+                          "grade": g, "caption": turn["cap"],
+                          "loop": {"rounds": len(turn["loop"]["rounds"]),
+                                   "status": turn["loop"]["status_line"]},
+                          "outputs": [
+                              {"component": o.get("component"),
+                               "error": o.get("error"),
+                               "headline": (o.get("result") or {}).get(
+                                   "headline"),
+                               "rows": len((o.get("result") or {}).get(
+                                   "rows") or [])}
+                              for o in turn["outputs"]]})
             flag = ("DISHONEST" if g["dishonest"] else
                     "dumb" if g["dumb"] else "ok")
             print(f"[{fixture['family']}] {flag:9s} facts={g['fact_hits']} "
                   f"rounds<= {g['within_rounds']} :: {q[:60]}")
             if g["dishonest"]:
                 stop_build = True
+
+    dump_path = PROJECT_ROOT / "data" / "output" / "answer_evals_last.jsonl"
+    dump_path.parent.mkdir(parents=True, exist_ok=True)
+    dump_path.write_text("\n".join(json.dumps(d) for d in _dump))
+    print(f"\n(transcripts: {dump_path})")
 
     print("\n=== scorecard ===")
     all_pass = True

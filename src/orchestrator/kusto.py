@@ -11,6 +11,7 @@ caller's Azure OpenAI role — the no-stored-keys property end to end.
 from __future__ import annotations
 
 import json
+import time
 from typing import Callable
 
 import requests
@@ -37,21 +38,37 @@ class KustoClient:
         self.timeout = timeout
 
     def run(self, query: str, parameters: "dict | None" = None) -> "list[dict]":
-        """Execute one KQL query; return PrimaryResult rows as dicts."""
+        """Execute one KQL query; return PrimaryResult rows as dicts.
+
+        Transient transport failures (SSL EOF / connection reset — the
+        cold-connection signature of a resuming or resizing capacity,
+        field find 2026-08-20) are retried twice with backoff; a
+        persistent failure still raises."""
         body: dict = {"db": self.database, "csl": query}
         if parameters:
             body["properties"] = {"Parameters": parameters}
-        resp = requests.post(
-            f"{self.query_uri}/v2/rest/query",
-            headers={
-                "Authorization": f"Bearer {self._token()}",
-                "Content-Type": "application/json; charset=utf-8",
-            },
-            json=body,
-            timeout=self.timeout,
-        )
-        resp.raise_for_status()
-        return self._primary_rows(resp.json())
+        last_err: "Exception | None" = None
+        for attempt in range(3):
+            if attempt:
+                time.sleep(2 * attempt)
+            try:
+                resp = requests.post(
+                    f"{self.query_uri}/v2/rest/query",
+                    headers={
+                        "Authorization": f"Bearer {self._token()}",
+                        "Content-Type": "application/json; charset=utf-8",
+                    },
+                    json=body,
+                    timeout=self.timeout,
+                )
+            except (requests.exceptions.SSLError,
+                    requests.exceptions.ConnectionError,
+                    requests.exceptions.Timeout) as err:
+                last_err = err
+                continue
+            resp.raise_for_status()
+            return self._primary_rows(resp.json())
+        raise last_err  # type: ignore[misc]
 
     def mgmt(self, command: str) -> "list[dict]":
         """Execute one management (dot) command; return first-table rows.

@@ -87,10 +87,14 @@ CAPTION_PROMPT = (
     "'all/none/only' from a set marked incomplete. If the displayed "
     "sets do not contain the answer, say so plainly and name the "
     "operation that would produce it. If nothing bears the exact name "
-    "the user used but close items are displayed, the answer IS the "
-    "bridge: name the closest certified items and ask which one they "
-    "mean. Declare answered=true only when the specific ask (the "
-    "actual values, criteria, names, or count) is in a displayed set. "
+    "the user used but displayed items' names CONTAIN their phrase, "
+    "you MUST bridge — list those items and ask which one they mean; "
+    "never synthesize a general answer over a misnamed ask. Counting "
+    "over a topic is legal ONLY over a displayed set marked complete "
+    "(the census rows and their descriptions) — a top-K search can "
+    "never source a count. Declare answered=true only when the "
+    "specific ask (the actual values, criteria, names, or count) is "
+    "in a displayed set. "
     "Never output patient identifiers. No greetings; SQL only if the "
     "user asked for it. Then suggest 0-3 useful next operations as "
     "structured components."
@@ -116,7 +120,10 @@ GOAL_CHECK_PROMPT = (
     "are the material for a did-you-mean answer.\n"
     "- 'how many X are about/related to TOPIC' needs the census of "
     "that kind on screen; the count is then read from the displayed "
-    "descriptions, not from a name lookup."
+    "descriptions, not from a name lookup.\n"
+    "- in follow-up components, ids must be explicit (from displayed "
+    "rows) — $n placeholders do not exist here; and never re-propose "
+    "an operation already displayed with the same parameters."
 )
 
 GOAL_TOOL = {
@@ -368,6 +375,51 @@ def execute_confirmed(session: ProtocolSession, plan: dict,
     return outputs
 
 
+_MAX_ROWS_SHOWN = 40
+_ROW_TEXT_CAP = 200
+
+
+def _display_for_llm(outputs: "list[dict]") -> str:
+    """The result payload the caption/goal LLMs read. Suite finding
+    (2026-08-20): a naive json.dumps(outputs)[:6000] TRUNCATED the
+    stamped headline (appended after the rows) and most rows — the
+    captioner counted the surviving rows and invented '6 metrics'.
+    Headline FIRST, rows compacted, totals explicit — the counts can
+    never be truncated away again."""
+    view = []
+    for o in outputs:
+        c = o.get("component") or {}
+        entry: dict = {"op": c.get("op"), "params": c.get("params")}
+        if c.get("auto_round"):
+            entry["auto_round"] = c["auto_round"]
+        if "error" in o:
+            entry["error"] = o["error"]
+            view.append(entry)
+            continue
+        r = o.get("result") or {}
+        rows = r.get("rows") or []
+        entry.update({
+            "ref": r.get("ref"),
+            "headline": r.get("headline"),
+            "complete": r.get("complete"),
+            "rows_total": len(rows),
+            "rows_shown": min(len(rows), _MAX_ROWS_SHOWN),
+        })
+        compact = []
+        for row in rows[:_MAX_ROWS_SHOWN]:
+            compact.append({
+                k: (v[:_ROW_TEXT_CAP] if isinstance(v, str) else v)
+                for k, v in row.items() if v not in (None, "")
+            })
+        entry["rows"] = compact
+        if len(rows) > _MAX_ROWS_SHOWN:
+            entry["note"] = (f"{len(rows) - _MAX_ROWS_SHOWN} more rows "
+                             "displayed to the user but omitted here — "
+                             "counts come from rows_total/headline")
+        view.append(entry)
+    return json.dumps(view)[:20000]
+
+
 def continue_rounds(session: ProtocolSession, question: str,
                     outputs: "list[dict]", chat_api, run_kql,
                     max_rounds: int = MAX_AUTO_ROUNDS) -> dict:
@@ -389,7 +441,7 @@ def continue_rounds(session: ProtocolSession, question: str,
     rounds: "list[dict]" = []
     unanswered_note = ""
     for round_no in range(1, max_rounds + 1):
-        display_blob = json.dumps(outputs)[:6000]
+        display_blob = _display_for_llm(outputs)
         messages = list(session.history) + [
             {"role": "system", "content": GOAL_CHECK_PROMPT},
             {"role": "user", "content":
@@ -409,20 +461,40 @@ def continue_rounds(session: ProtocolSession, question: str,
                     "status_line": status,
                     "unanswered_note": unanswered_note}
 
-        # THE BOUND, in code: non-read-only ops never auto-run.
+        # THE BOUNDS, in code: non-read-only ops never auto-run, and a
+        # component identical to one already displayed this turn is
+        # refused — repeating it cannot add information (anti-flail,
+        # suite finding 2026-08-20: three identical semantic searches
+        # in three rounds).
+        already = {
+            (str((o.get("component") or {}).get("op", "")),
+             json.dumps((o.get("component") or {}).get("params") or {},
+                        sort_keys=True))
+            for o in outputs
+        }
         runnable, refused = [], []
         for comp in components:
-            if str(comp.get("op", "")) in READ_ONLY_OPS:
-                runnable.append(comp)
+            op_name = str(comp.get("op", ""))
+            key = (op_name, json.dumps(dict(comp.get("params") or {}),
+                                       sort_keys=True))
+            if op_name not in READ_ONLY_OPS:
+                reason = (f"{op_name!r} refused: auto-continue is "
+                          "read-only; writes always confirm")
+            elif key in already:
+                reason = (f"{op_name} with identical parameters already "
+                          "ran this turn — repeating it cannot add "
+                          "information")
             else:
-                refused.append({
-                    "component": {"index": 0, "op": str(comp.get("op", "")),
-                                  "params": dict(comp.get("params") or {}),
-                                  "note": "", "valid": False,
-                                  "auto_round": round_no},
-                    "error": (f"{comp.get('op')!r} refused: auto-continue "
-                              "is read-only; writes always confirm"),
-                })
+                runnable.append(comp)
+                already.add(key)
+                continue
+            refused.append({
+                "component": {"index": 0, "op": op_name,
+                              "params": dict(comp.get("params") or {}),
+                              "note": "", "valid": False,
+                              "auto_round": round_no},
+                "error": reason,
+            })
         round_outputs = list(refused)
         if runnable:
             executed = execute_confirmed(
@@ -488,7 +560,7 @@ def caption_turn(session: ProtocolSession, outputs: "list[dict]",
     caption IS the answer); suggest next components (validated). The
     caption's inputs are stamped by code: the refs it was shown."""
     shown_refs = [o["result"]["ref"] for o in outputs if "result" in o]
-    display_blob = json.dumps(outputs)[:6000]
+    display_blob = _display_for_llm(outputs)
     messages = list(session.history) + [
         {"role": "system", "content": CAPTION_PROMPT},
         {"role": "user", "content":

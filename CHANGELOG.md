@@ -10,6 +10,33 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.43.0] - 2026-08-20
+
+### Fixed — honesty 1.0 restored across all suite families (iteration 2 on live scorecards)
+- THE smoking gun: the caption/goal-check payload was
+  json.dumps(outputs)[:6000] with the stamped headline appended AFTER
+  the rows — big results truncated the headline and most rows away,
+  so the captioner literally counted surviving rows ("6 metrics").
+  New _display_for_llm: headline first, rows compacted (40 rows,
+  200-char fields), rows_total explicit, 20k budget — the counts can
+  never be truncated away again. Census and topical_count flipped to
+  PASS; no dishonest turn remains.
+- KustoClient.run retries transient transport failures (SSL EOF /
+  connection reset — the cold-connection signature of a resuming
+  capacity) twice with backoff; product-facing (the webapp shares the
+  client).
+- Anti-flail bound IN CODE: an auto-continue component identical to
+  one already displayed this turn is refused with the reason shown
+  (suite caught three identical searches in three rounds).
+- Prompt sharpening (LLM edges, measured): bridge is mandatory when
+  displayed names CONTAIN the asked phrase; topic counts only over
+  complete sets; no $n in follow-up rounds.
+- Suite: per-turn transcripts dumped to
+  data/output/answer_evals_last.jsonl — failures are diagnosable
+  without rerunning.
+
+---
+
 ## [1.42.0] - 2026-08-20
 
 ### Fixed — first conversation-suite run: three named defects + one lint false-positive
