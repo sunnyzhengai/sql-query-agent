@@ -12,8 +12,10 @@ from src.orchestrator.tools import (
     FIND_BY_NAME_QUERY,
     LIST_CATALOG_QUERY,
     DECISIONS_OF_STEP_QUERY,
+    LINKS_OF_REPORT_QUERY,
     NAME_CONTAINS_QUERY,
     NAME_CONTAINS_TOKENS_QUERY,
+    REPORTS_OF_METRIC_QUERY,
     STEPS_OF_QUERY,
     TABLE_USED_BY_QUERY,
     Session,
@@ -45,6 +47,8 @@ METRIC_ROWS = {
             "report_url": None, "transform_count": 2,
             "source_tables": "ADT, MEDS", "calculation_logic": "SELECT 2"},
 }
+REPORT_ID = "report:ed_ops"
+
 FRAGMENTS = {
     STEP_1: "SELECT S FROM T WHERE X >= 2",
     STEP_2: "select  s from t  where x >= 2",   # same logic, respaced
@@ -72,6 +76,22 @@ def fake_kql(query, params):
             return [{"node_id": f"canonical:{REF_A}", "kind": "metric",
                      "ref": REF_A, "name": "USP_ED_Sepsis",
                      "business_name": "ED Sepsis Screening"}]
+        return []
+    if query == REPORTS_OF_METRIC_QUERY:
+        if params["p_id"] == f"canonical:{REF_A}":
+            return [{"node_id": REPORT_ID, "name": "ED Ops Dashboard",
+                     "description": "ops overview"}]
+        return []
+    if query == LINKS_OF_REPORT_QUERY:
+        if params["p_id"] == REPORT_ID:
+            return [
+                {"edge_type": "report_to_canonical",
+                 "node_id": f"canonical:{REF_A}",
+                 "name": "USP_ED_Sepsis"},
+                {"edge_type": "report_to_measure",
+                 "node_id": "measure:edops.screenrate",
+                 "name": "Screen Rate"},
+            ]
         return []
     if query == DECISIONS_OF_STEP_QUERY:
         if params["p_step"] == STEP_1:
@@ -135,6 +155,12 @@ def fake_kql(query, params):
         return [row] if row else []
     if query == NODE_FACTS_QUERY:
         node_id = params["p_node_id"]
+        if node_id == REPORT_ID:
+            return [{"node_id": REPORT_ID, "name": "ED Ops Dashboard",
+                     "description": "ops overview",
+                     "properties": json.dumps({
+                         "repo_name": "pbi-repo",
+                         "semantic_model_path": "models/edops"})}]
         if node_id in FRAGMENTS:
             return [{"node_id": node_id, "name": node_id.split(":")[-1],
                      "properties": json.dumps(

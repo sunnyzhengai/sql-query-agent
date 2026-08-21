@@ -379,3 +379,26 @@ the pin. The engine iteration loop is CLOSED again pending Sunny:
 webapp restart to 1.50.9, walk steps 2–6, the graph-gap roadmap
 priority call (decisions → report links → columns → sql-text), and
 the tenant republish for Round 4.
+
+### 2026-08-21 — Sunny's green light executed: ADR 0052 + backfill items 1–2 (1.51.0)
+Her ruling: the 7% ask-surface = spec:C1 violated reflexively; make
+the audit permanent first. DONE in order:
+1. REACHABILITY CONTRACT (ADR 0052, src/reachability.py): one row per
+   NodeLayer/EdgeType/catalog kind — reachable-by-named-op (marker
+   verified against implementation text in CI) or excluded-with-
+   reason. Totality enforced; a layer can never again land invisible
+   by accident.
+2. DRILLDOWN ORACLE TIGHTENED per her rejection (fixture-first):
+   answers must carry decision-layer words, not step-description
+   prose.
+3. DECISIONS (backfill 1): step retrieve attaches decision sites.
+   PHI both sides per her rider — read-time redaction on the ask-path
+   (store rows predate the gate) + export-side redactor extended to
+   decision expression_sql for the next tenant rerun.
+4. REPORT LINKS (backfill 2): metric retrieve lists reports; report
+   retrieve carries parsed TMDL links (executes/reads/measures), all
+   linked ids surfaced for the next hop — walk step 3 unblocked.
+   Measures gained full-record retrieve in the same branch.
+QUEUED (rows on record in the contract): columns third, SQL-text
+last; transform_to_transform lineage unqueued pending Sunny.
+Zero prompt/tool-schema changes — the pin stands. 925 tests green.

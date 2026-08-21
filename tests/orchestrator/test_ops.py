@@ -17,6 +17,7 @@ from src.orchestrator.ops import (
 from tests.orchestrator.test_tools import (
     REF_A,
     REF_B,
+    REPORT_ID,
     STEP_1,
     STEP_2,
     STEP_3,
@@ -348,6 +349,33 @@ class TestDecisionLayer:
         s.surfaced.add(STEP_2)
         rs = op_retrieve([STEP_2], fake_kql, s)
         assert rs.rows[0]["decisions"] == []
+
+
+class TestReportLinks:
+    """ADR 0052 backfill item 2 (Sunny's order, 2026-08-21): the
+    pointer chase — reports were searchable but hollow. Metric
+    retrieve lists its reports; report retrieve carries the parsed
+    TMDL links, and every linked id is surfaced for the next hop."""
+
+    def test_metric_retrieve_lists_and_surfaces_reports(self):
+        s = OpsSession()
+        s.surfaced.add(REF_A)
+        rs = op_retrieve([REF_A], fake_kql, s)
+        reports = rs.rows[0]["reports"]
+        assert reports == [{"id": REPORT_ID,
+                            "name": "ED Ops Dashboard"}]
+        assert s.permitted(REPORT_ID)      # next hop is legal
+
+    def test_report_retrieve_carries_links_and_surfaces_targets(self):
+        s = OpsSession()
+        s.surfaced.add(REPORT_ID)
+        rs = op_retrieve([REPORT_ID], fake_kql, s)
+        row = rs.rows[0]
+        assert row["kind"] == "report"
+        assert row["report_name"] == "ED Ops Dashboard"
+        assert [e["id"] for e in row["executes_metrics"]] == [REF_A]
+        assert [e["name"] for e in row["measures"]] == ["Screen Rate"]
+        assert s.permitted(REF_A)          # chase continues
 
 
 class TestTokenDegradedContainment:

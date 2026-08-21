@@ -21,6 +21,7 @@ from dataclasses import dataclass, field
 from src.graph.templates import _fold
 from src.orchestrator.assemble import (
     AssemblyError,
+    assemble_consumption_node,
     assemble_metric,
     assemble_step,
 )
@@ -31,8 +32,10 @@ from src.orchestrator.tools import (
     FIND_BY_NAME_QUERY,
     LIST_CATALOG_QUERY,
     DECISIONS_OF_STEP_QUERY,
+    LINKS_OF_REPORT_QUERY,
     NAME_CONTAINS_QUERY,
     NAME_CONTAINS_TOKENS_QUERY,
+    REPORTS_OF_METRIC_QUERY,
     STEPS_OF_QUERY,
     TABLE_USED_BY_QUERY,
     _cap,
@@ -429,6 +432,29 @@ def op_retrieve(ids: "list[str]", run_kql, session: OpsSession) -> ResultSet:
                 fs = assemble_step(an_id, an_id.split(":", 2)[1], run_kql)
                 rows.append({"id": an_id, "kind": "step", **fs.facts,
                              "decisions": _decisions_of(an_id, run_kql)})
+            elif an_id.startswith(("report:", "measure:")):
+                # ADR 0052 backfill item 2 (Sunny's order, 2026-08-21):
+                # reports/measures were searchable but hollow — the
+                # consumption record plus, for reports, its parsed
+                # TMDL links (deterministic lineage, never names).
+                fs = assemble_consumption_node(an_id, run_kql)
+                row = {"id": an_id, "kind": fs.kind, **fs.facts}
+                if an_id.startswith("report:"):
+                    bucket = {"report_to_canonical": "executes_metrics",
+                              "report_to_technical": "reads_tables",
+                              "report_to_measure": "measures"}
+                    links: "dict[str, list]" = {
+                        v: [] for v in bucket.values()}
+                    for r in run_kql(LINKS_OF_REPORT_QUERY,
+                                     {"p_id": an_id}):
+                        entry = {"id": r["node_id"], "name": r["name"]}
+                        if r["edge_type"] == "report_to_canonical":
+                            entry["id"] = r["node_id"].removeprefix(
+                                "canonical:")
+                        session.surfaced.add(entry["id"])
+                        links[bucket[r["edge_type"]]].append(entry)
+                    row.update(links)
+                rows.append(row)
             else:
                 fs = assemble_metric(an_id, run_kql)
                 steps = run_kql(STEPS_OF_QUERY, {"p_ref": an_id})
@@ -436,8 +462,14 @@ def op_retrieve(ids: "list[str]", run_kql, session: OpsSession) -> ResultSet:
                              for s in steps]
                 for s in step_rows:
                     session.surfaced.add(s["id"])
+                reports = [
+                    {"id": r["node_id"], "name": r["name"]}
+                    for r in run_kql(REPORTS_OF_METRIC_QUERY,
+                                     {"p_id": f"canonical:{an_id}"})]
+                for r in reports:
+                    session.surfaced.add(r["id"])
                 rows.append({"id": an_id, "kind": "metric", **fs.facts,
-                             "steps": step_rows})
+                             "steps": step_rows, "reports": reports})
         except AssemblyError as e:
             notes.append(str(e))
     return session.register(

@@ -67,15 +67,15 @@ REACHABILITY = (
      "ops": ("_decisions_of",), "queries": ("DECISIONS_OF_STEP_QUERY",),
      "marker": "decision"},
     {"payload": "node:report", "status": "reachable",
-     "via": "catalog search/census (kind report); link traversal "
-            "queued second in Sunny's 2026-08-21 order",
-     "ops": (), "queries": ("LIST_CATALOG_QUERY",),
-     "marker": "semantic_catalog"},
+     "via": "catalog search/census + full retrieve with parsed TMDL "
+            "links (ADR 0052 backfill item 2, landed 2026-08-21)",
+     "ops": ("op_retrieve",), "queries": ("LINKS_OF_REPORT_QUERY",),
+     "marker": "report"},
     {"payload": "node:measure", "status": "reachable",
-     "via": "catalog search/census (kind measure); DAX expression "
-            "depth not yet retrievable",
-     "ops": (), "queries": ("LIST_CATALOG_QUERY",),
-     "marker": "semantic_catalog"},
+     "via": "catalog search/census + full record retrieve (DAX "
+            "expression, PHI-gated at export per ADR 0040)",
+     "ops": ("op_retrieve",), "queries": (),
+     "marker": "measure:"},
 
     # --- edges --------------------------------------------------------
     {"payload": "edge:canonical_to_transform", "status": "reachable",
@@ -104,15 +104,20 @@ REACHABILITY = (
     {"payload": "edge:decision_to_step", "status": "excluded",
      "reason": "decision→step filter-through lineage; queued with the "
                "column work"},
-    {"payload": "edge:report_to_canonical", "status": "excluded",
-     "reason": "queued SECOND in Sunny's 2026-08-21 order — "
-               "LINKS_OF_REPORT_QUERY exists, unwired to any op"},
-    {"payload": "edge:report_to_technical", "status": "excluded",
-     "reason": "queued SECOND in Sunny's 2026-08-21 order (with "
-               "report links)"},
-    {"payload": "edge:report_to_measure", "status": "excluded",
-     "reason": "queued SECOND in Sunny's 2026-08-21 order (with "
-               "report links)"},
+    {"payload": "edge:report_to_canonical", "status": "reachable",
+     "via": "both directions: metric retrieve lists reports; report "
+            "retrieve lists executed metrics",
+     "ops": ("op_retrieve",),
+     "queries": ("REPORTS_OF_METRIC_QUERY", "LINKS_OF_REPORT_QUERY"),
+     "marker": "report_to_canonical"},
+    {"payload": "edge:report_to_technical", "status": "reachable",
+     "via": "report retrieve lists DirectLake-read tables",
+     "ops": (), "queries": ("LINKS_OF_REPORT_QUERY",),
+     "marker": "report_to_technical"},
+    {"payload": "edge:report_to_measure", "status": "reachable",
+     "via": "report retrieve lists its measures",
+     "ops": (), "queries": ("LINKS_OF_REPORT_QUERY",),
+     "marker": "report_to_measure"},
     {"payload": "edge:measure_to_column", "status": "excluded",
      "reason": "measure→column lineage; queued with the column work"},
     {"payload": "edge:uses_table", "status": "excluded",
