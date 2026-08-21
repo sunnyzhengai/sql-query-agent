@@ -191,12 +191,30 @@ def azure_chat_api(timeout: int = 120) -> "Callable[[list[dict], list[dict]], di
 
     def call(messages: "list[dict]", tools: "list[dict]",
              tool_choice=None) -> dict:
+        # Transient retry (field find 2026-08-20: one 120s read-timeout
+        # killed a 36-trail suite run mid-flight) — same discipline as
+        # chat_completion and KustoClient.run: 3 attempts, backoff,
+        # persistent failures still raise.
+        import time as _time
         body = {"model": model, "messages": messages, "tools": tools}
         if tool_choice is not None:
             body["tool_choice"] = tool_choice
-        resp = requests.post(url, headers=headers, json=body,
-                             timeout=timeout)
-        resp.raise_for_status()
-        return resp.json()["choices"][0]["message"]
+        last_err: "Exception | None" = None
+        for attempt in range(3):
+            if attempt:
+                _time.sleep(2 * attempt)
+            try:
+                resp = requests.post(url, headers=headers, json=body,
+                                     timeout=timeout)
+            except (requests.exceptions.Timeout,
+                    requests.exceptions.ConnectionError) as err:
+                last_err = err
+                continue
+            if resp.status_code in (429, 500, 502, 503, 504) and attempt < 2:
+                _time.sleep(2 * (attempt + 1))
+                continue
+            resp.raise_for_status()
+            return resp.json()["choices"][0]["message"]
+        raise last_err  # type: ignore[misc]
 
     return call

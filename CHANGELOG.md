@@ -10,6 +10,15 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.46.1] - 2026-08-20
+
+### Fixed — ask-path chat adapter retries transients (field find: 120s read-timeout killed a suite run)
+- azure_chat_api gains the same 3-attempt/backoff transient discipline
+  as chat_completion and KustoClient.run (timeout/connection errors +
+  429/5xx). All three transport layers now share one failure policy.
+
+---
+
 ## [1.46.0] - 2026-08-20
 
 ### Changed — iteration 4: stamp the bridge, free the humble answer
