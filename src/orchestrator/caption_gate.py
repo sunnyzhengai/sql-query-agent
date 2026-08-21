@@ -79,16 +79,23 @@ def caption_violations(caption: str, outputs: "list[dict]") -> "list[str]":
 
     for m in _KIND_ABSENCE.finditer(text):
         kind = m.group(1).lower()
+        # Suite finding (first live run, 2026-08-20): requiring a
+        # ZERO-row census false-fired on honest name-scoped phrasing
+        # ("no metrics are NAMED sepsis") shown beside a 28-row census,
+        # flooring a good caption. Any complete census of the kind on
+        # screen means the true count is stamped in a headline — the
+        # lint (a heuristic, MEASURED) stands down; the headline is the
+        # guarantee.
         supported = any(
             r.get("op") == "census"
             and (r.get("params") or {}).get("kind") == kind
-            and r.get("complete") and not r.get("rows")
+            and r.get("complete")
             for r in results
         )
         if not supported:
             violations.append(
                 f"kind-level absence claimed for {kind!r} without a "
-                f"complete zero-row census of that kind — an empty NAME "
+                f"complete census of that kind on screen — an empty NAME "
                 f"lookup is not a kind census")
     return violations
 

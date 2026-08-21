@@ -10,6 +10,34 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.42.0] - 2026-08-20
+
+### Fixed — first conversation-suite run: three named defects + one lint false-positive
+- First live scorecard (smoke): definition PASSED (the A+B chain
+  answers); census dumb, bridge dumb, drilldown DISHONEST
+  (build-stopper caught mechanically, as designed).
+- caption-gate lint: kind-absence no longer demands a ZERO-row census —
+  any complete census of the kind on screen stands the lint down (its
+  false fire floored an honest "no metrics are NAMED sepsis" caption
+  beside a 28-row census and forced answered=false).
+- Goal-check judging discipline (LLM edge): a summary that says
+  criteria are "defined in the calculation steps" is a POINTER, not an
+  answer — retrieve the metric then its step ids; an empty exact
+  lookup proposes a semantic search (bridge material); topical counts
+  need the census on screen.
+- Captioner: bridging is an answer (name the closest certified items,
+  ask which); answered=true only when the specific ask is displayed.
+- Planner: topic questions are semantic never exact; anaphora ("this
+  metric", "it") resolves to already-surfaced ids, never re-searched
+  as a phrase.
+- Two new corpses from the evening trail become fixtures:
+  topical_count (count derived from census descriptions) and anaphora
+  (multi-turn trail support added; graded on the final turn).
+- Suite preflight: unreachable store exits cleanly with the resume
+  instruction instead of a stack trace.
+
+---
+
 ## [1.41.1] - 2026-08-20
 
 ### Fixed — infrastructure errors name the broken thing (field find: paused capacity)

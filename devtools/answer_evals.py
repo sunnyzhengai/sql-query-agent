@@ -71,6 +71,17 @@ FIXTURES = [
                  "diagnosed with severe sepsis",
      "oracle": "beyond_summary", "item": "Severe Sepsis Episodes",
      "max_rounds": 3, "expected_kind": "answered"},
+    # Corpses from the 2026-08-20 evening trail:
+    {"family": "topical_count",
+     "question": "how many metrics are about sepsis",
+     "oracle": "topical_count", "topic": "sepsis",
+     "max_rounds": 2, "expected_kind": "answered"},
+    {"family": "anaphora",
+     "questions": ["how is metric Sepsis Case Encounters defined",
+                   "in this metric, how is sepsis diagnosed"],
+     "question": "in this metric, how is sepsis diagnosed",
+     "oracle": "beyond_summary", "item": "Sepsis Case Encounters",
+     "max_rounds": 3, "expected_kind": "answered"},
 ]
 
 _WORD = re.compile(r"[A-Za-z_]{6,}")
@@ -114,6 +125,12 @@ def build_oracle(fixture: dict, run_kql) -> dict:
         return {"required_any": [near],
                 "forbidden": ["no metrics exist",
                               "no such metric exists"]}
+    if kind == "topical_count":
+        rs = op_census("metric", run_kql, ops)
+        topic = fixture["topic"].lower()
+        n = sum(1 for r in rs.rows if topic in json.dumps(r).lower())
+        assert n, "oracle: topic matches nothing"
+        return {"required_any": [[str(n)]], "forbidden": []}
     if kind == "beyond_summary":
         ops2 = _fresh_ops_session()
         rs = op_search(fixture["item"], "exact", run_kql, ops2)
@@ -156,13 +173,19 @@ def grade(answer: str, verdict: dict, oracle: dict,
     }
 
 
-def run_turn(question: str, chat_api, run_kql) -> dict:
+def run_trail(questions: "list[str]", chat_api, run_kql) -> dict:
+    """One shared session across the trail (anaphora fixtures need the
+    prior turn's surfaced ids); graded on the FINAL turn."""
     session = ProtocolSession()
-    plan = propose_turn(session, question, chat_api)
-    outputs = execute_confirmed(session, plan, run_kql)   # eval = the confirm
-    loop = continue_rounds(session, question, outputs, chat_api, run_kql)
-    cap = caption_turn(session, outputs, chat_api, question=question)
-    return {"outputs": outputs, "loop": loop, "cap": cap}
+    result: dict = {}
+    for question in questions:
+        plan = propose_turn(session, question, chat_api)
+        outputs = execute_confirmed(session, plan, run_kql)  # eval confirms
+        loop = continue_rounds(session, question, outputs, chat_api,
+                               run_kql)
+        cap = caption_turn(session, outputs, chat_api, question=question)
+        result = {"outputs": outputs, "loop": loop, "cap": cap}
+    return result
 
 
 def paraphrases(question: str, n: int) -> "list[str]":
@@ -184,18 +207,25 @@ def main() -> None:
     client = KustoClient(QUERY_URI, DATABASE,
                          az_cli_token_provider(QUERY_URI))
     run_kql = client.run
+    try:                                        # preflight, clean exit
+        run_kql("semantic_catalog | count", {})
+    except Exception as e:                      # noqa: BLE001
+        print(f"[X] store unreachable ({type(e).__name__}) — resume the "
+              "Fabric capacity, wait ~2 min, retry. Nothing was graded.")
+        raise SystemExit(3)
     chat_api = azure_chat_api()
 
     families: "dict[str, list[dict]]" = {}
     stop_build = False
     for fixture in FIXTURES:
         oracle = build_oracle(fixture, run_kql)
+        trail_prefix = fixture.get("questions", [fixture["question"]])[:-1]
         questions = [fixture["question"]]
         if not args.smoke:
             questions += paraphrases(fixture["question"],
                                      PARAPHRASES_PER_QUESTION)
         for q in questions:
-            turn = run_turn(q, chat_api, run_kql)
+            turn = run_trail(trail_prefix + [q], chat_api, run_kql)
             g = grade(turn["cap"].get("caption", ""), turn["cap"], oracle,
                       len(turn["loop"]["rounds"]), fixture)
             g["question"] = q

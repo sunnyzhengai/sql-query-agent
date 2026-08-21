@@ -55,6 +55,15 @@ class TestViolations:
         caption = "There are no terms in the catalog."
         assert caption_violations(caption, [CENSUS_ZERO]) == []
 
+    def test_name_scoped_absence_beside_a_full_census_is_not_floored(self):
+        """Suite finding (2026-08-20 first run): 'no metrics are NAMED
+        sepsis' beside a 28-row census is honest — the census headline
+        stamps the true count; the lint must stand down."""
+        caption = ("No metrics are named 'sepsis' exactly, but the "
+                   "catalog holds 2 metrics in total (R1).")
+        assert caption_violations(
+            caption, [EMPTY_NAME_SEARCH, CENSUS_TWO]) == []
+
     def test_counts_from_a_census_are_grounded(self):
         assert caption_violations(
             "There are 2 metrics: A and B.", [CENSUS_TWO]) == []
