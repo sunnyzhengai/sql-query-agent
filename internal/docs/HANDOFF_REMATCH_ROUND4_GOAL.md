@@ -275,3 +275,15 @@ memory + retrieval-union + filtered census = 5×1.00 + 0.83, honesty
 perfect throughout, zero casebook. Remaining for the GOAL: bridge
 calibration ruling; Sunny's walk; the parked tenant republish; then
 Round 4 (runner ready, one command per surface).
+
+### 2026-08-21 — gpt-4o on 1.50.2: PERFECT SWEEP (first in the campaign)
+All six families 1.00/1.00, rc=0 — census, definition, bridge,
+drilldown, topical_count (flipped by the filtered census), anaphora.
+Zero dishonest turns. Honest note: graded under the pre-ruling bridge
+oracle (any sibling mention); the siblings-FIRST oracle (Sunny's
+2026-08-21 acceptance ruling, 1.50.3) applies from the next runs.
+The 1.50.3 mini run (ruling live at oracle AND boundary) is chained
+next. Goal-bar state: gpt-4o clears ≥0.90 on every family under the
+old oracle; mini pooled 5×1.00 + bridge 0.83. Model-tier input for
+the PARKED prerequisite: under the one-mind shape, 4o is now strictly
+≥ mini everywhere measured, both fully honest.
