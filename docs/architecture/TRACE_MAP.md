@@ -613,3 +613,14 @@ classification).
   - `tests/orchestrator/test_turn_engine.py`
 - **Summarized in:**
   - `docs/architecture/SPEC.md`
+
+## ADR 0052 — The reachability contract: every graph payload reachable by a named op or excluded with a reason
+
+- **Category:** architecture
+- **Grounds:** spec:C1
+- **Implemented by:**
+  - `src/reachability.py`
+- **Enforced by:**
+  - `tests/test_reachability.py`
+- **Summarized in:**
+  - `docs/decisions/0052-reachability-contract.md`
