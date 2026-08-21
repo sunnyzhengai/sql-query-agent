@@ -454,3 +454,17 @@ anti-flail persists across passes, exactly one continuation, cage
 tests for recover/at-most-once/no-op-no-continue. Zero prompt/tool
 changes — the pin stands (the continuation note is boundary
 machinery, same class as the gate-rejection note).
+
+### 2026-08-21 — Review verdict on 1.52.0: APPROVED, reframed as the first live M5 diagnosis
+Recorded per the relay: the continuation decision (answered=false ∧
+missing_op ≠ null ∧ budget > 0 → continue) is COMPUTABLE, and it was
+resting on a stochastic decider — an M5 violation manifesting as the
+0.83/0.67/0.50 bounce on identical code. 1.52.0 moves it to code
+where M5 says it belonged. Axiom checks all pass (M4: typed fields,
+no lexicon, pin legitimate; bounds: at-most-once + cap + dedup, no
+sandbagging; B2: boundary re-runs in full). STANDING WATCH ITEM
+(typed M2, never another continuation): humble-but-blind — model
+names an op it already ran, dedup blocks, facts already displayed —
+if it grows it's evidence PRESENTATION, file it under M2 or it
+breeds stamps. AI_VIA_AXIOMS §7 receipts row waits for the 1.52.0
+scorecard (J discipline: claim after measurement).

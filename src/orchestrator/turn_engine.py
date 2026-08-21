@@ -248,6 +248,19 @@ def run_turn(session: EngineSession, question: str, chat_api,
     # and budget remains, the observation goes into the conversation
     # and the SAME bounded loop runs once more. Round cap unchanged;
     # anti-flail persists across passes; one continuation only.
+    #
+    # Review reframe (approved 2026-08-21): this is an M5 fix, not
+    # just P6 — `answered=false ∧ missing_op ≠ null ∧ budget > 0 →
+    # continue` is a COMPUTABLE decision, and it was resting on a
+    # stochastic decider (the model's whim to take the next hop). The
+    # 0.83/0.67/0.50 bounce on identical code was a misfiled decision
+    # type, not noise. The trigger reads TYPED verdict fields, never
+    # language (M4 — the pin stands legitimately).
+    #
+    # WATCH (typed M2, do not stamp): humble-but-blind — the model
+    # declares not-answered naming an op it ALREADY ran; dedup rightly
+    # blocks the repeat while the facts sit displayed. If that grows,
+    # it is an evidence-PRESENTATION problem, not a loop problem.
     for pass_no in (1, 2):
         got_answer = False
         while rounds < max_rounds:
