@@ -208,8 +208,12 @@ def test_system_prompt_is_invariants_only_no_casebook():
     assert len(ENGINE_TOOLS) == 4
 
 
-PINNED_PROMPT_SHA = ("20781efb5545aebce28e7a1c402c5a09"
-                     "684403f29048f5302a8d5ea3de9114b9")
+# Pin update 2 (2026-08-21, recorded in the Round-4 RESULTS log):
+# scope widened to SYSTEM_PROMPT + ENGINE_TOOLS (tool semantics are
+# prompt surface too); content change = census/search description
+# sharpening (tool-property statements, no question shapes).
+PINNED_PROMPT_SHA = ("ae37588255ceb867c1da88e6f7ffc482"
+                     "4fc33fb575d391ac591eaa7ee28cec74")
 
 
 class TestPGroup:
@@ -295,7 +299,12 @@ class TestPGroup:
         and fails here. Changing the prompt is a conscious act: update
         the pin AND note it in the Round-4 RESULTS log."""
         import hashlib
+        import json as _j
 
-        from src.orchestrator.turn_engine import SYSTEM_PROMPT
+        from src.orchestrator.turn_engine import (
+            ENGINE_TOOLS,
+            SYSTEM_PROMPT,
+        )
+        joint = SYSTEM_PROMPT + _j.dumps(ENGINE_TOOLS, sort_keys=True)
         assert hashlib.sha256(
-            SYSTEM_PROMPT.encode()).hexdigest() == PINNED_PROMPT_SHA
+            joint.encode()).hexdigest() == PINNED_PROMPT_SHA

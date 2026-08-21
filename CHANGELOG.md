@@ -10,6 +10,24 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.50.1] - 2026-08-21
+
+### Changed — 1.50.0 scorecard: five families PASS, honesty 1.00 everywhere; tool-semantics pass for the last family
+- 1.50.0 mini scorecard: census/definition/drilldown/anaphora 1.00,
+  bridge 0.83 (FLIPPED by the containment union, zero prompt rules),
+  honesty 1.00 across all six — first fully honest full run on mini.
+- topical_count (0.00, honest misses): the mind counts its top-K
+  search window instead of fetching the census. P4-legal fix: TOOL
+  SEMANTICS sharpened — census described as the only operation whose
+  results support an exact count; a search's row count described as a
+  property of the window, never a count of anything. No question
+  shapes added.
+- Pin scope widened (conscious update, recorded in the Round-4 log):
+  the thesis hash now covers SYSTEM_PROMPT + ENGINE_TOOLS jointly —
+  tool descriptions are prompt surface too.
+
+---
+
 ## [1.50.0] - 2026-08-21
 
 ### Added — P-group verification + the thesis verdict, reported honestly

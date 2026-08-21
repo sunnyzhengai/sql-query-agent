@@ -214,8 +214,8 @@ def paraphrases(question: str, n: int) -> "list[str]":
     return lines[:n]
 
 
-PINNED_PROMPT_SHA = ("20781efb5545aebce28e7a1c402c5a09"
-                     "684403f29048f5302a8d5ea3de9114b9")
+PINNED_PROMPT_SHA = ("ae37588255ceb867c1da88e6f7ffc482"
+                     "4fc33fb575d391ac591eaa7ee28cec74")
 
 
 def main() -> None:
@@ -225,8 +225,9 @@ def main() -> None:
     # mismatch and refuses to grade.
     import hashlib
 
-    from src.orchestrator.turn_engine import SYSTEM_PROMPT
-    actual = hashlib.sha256(SYSTEM_PROMPT.encode()).hexdigest()
+    from src.orchestrator.turn_engine import ENGINE_TOOLS, SYSTEM_PROMPT
+    joint = SYSTEM_PROMPT + json.dumps(ENGINE_TOOLS, sort_keys=True)
+    actual = hashlib.sha256(joint.encode()).hexdigest()
     if actual != PINNED_PROMPT_SHA:
         print(f"[X] prompt hash {actual[:12]}… != pinned "
               f"{PINNED_PROMPT_SHA[:12]}… — the engine prompt changed; "

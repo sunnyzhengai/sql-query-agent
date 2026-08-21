@@ -74,17 +74,22 @@ ENGINE_TOOLS = [
     {"type": "function", "function": {
         "name": "search",
         "description": ("Find catalog items. mode=semantic: closest by "
-                        "meaning, top-K, never exhaustive. mode=exact: "
-                        "every item whose name/business name/ref equals "
-                        "the phrase exactly (complete)."),
+                        "meaning plus name-containment matches — top-K, "
+                        "never exhaustive; its row count is a property "
+                        "of the search window, never a count of "
+                        "anything. mode=exact: every item whose name/"
+                        "business name/ref equals the phrase exactly "
+                        "(complete)."),
         "parameters": {"type": "object", "properties": {
             "phrase": {"type": "string"},
             "mode": {"type": "string", "enum": ["semantic", "exact"]}},
             "required": ["phrase", "mode"]}}},
     {"type": "function", "function": {
         "name": "census",
-        "description": ("Complete enumeration of one catalog kind with "
-                        "the exact count."),
+        "description": ("Complete enumeration of one catalog kind — "
+                        "the ONLY operation whose results support an "
+                        "exact count or an exhaustive statement about "
+                        "the catalog."),
         "parameters": {"type": "object", "properties": {
             "kind": {"type": "string",
                      "enum": ["metric", "step", "term", "report",
