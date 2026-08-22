@@ -50,9 +50,9 @@ REACHABILITY = (
      "ops": ("op_retrieve",), "queries": (),
      "marker": "transform:"},
     {"payload": "node:technical:table", "status": "reachable",
-     "via": "source-table identity stamped on any honest-empty result "
-            "holding a table-like phrase (1.50.7); no first-class "
-            "census yet",
+     "via": "FIRST-CLASS lineage op (walk find 4, 2026-08-21): "
+            "readers-of-table with exact count; plus the source-table "
+            "identity note on honest-empty results (1.50.7)",
      "ops": (), "queries": ("TABLE_USED_BY_QUERY",),
      "marker": "tech:"},
     {"payload": "node:technical:column", "status": "excluded",
@@ -89,7 +89,7 @@ REACHABILITY = (
                "traversal op; not yet queued — surface with the "
                "column work if Sunny orders it"},
     {"payload": "edge:transform_to_technical", "status": "reachable",
-     "via": "source-table identity resolution (1.50.7)",
+     "via": "first-class lineage op + the identity note (1.53.x)",
      "ops": (), "queries": ("TABLE_USED_BY_QUERY",),
      "marker": "transform_to_technical"},
     {"payload": "edge:table_to_column", "status": "excluded",

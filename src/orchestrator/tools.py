@@ -125,8 +125,7 @@ TABLE_USED_BY_QUERY = (
     "    | where ['kind'] == 'metric'\n"
     "    | project ['ref'], business_name) on ['ref']\n"
     "| project table_name, ['ref'], business_name\n"
-    "| order by table_name asc, ['ref'] asc\n"
-    "| take 30"
+    "| order by table_name asc, ['ref'] asc"
 )
 
 # Decision layer to the ask-surface (ADR 0044 nodes, ADR 0052

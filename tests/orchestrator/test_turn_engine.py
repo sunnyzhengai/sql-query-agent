@@ -160,6 +160,49 @@ class TestLoop:
         ]), fake_kql)
         assert out["answered"] is False
 
+    def test_evidence_grain_computed_from_displays(self):
+        """Walk find 1 (Sunny, 2026-08-21): a decision-grade ask was
+        answered from census descriptions and verdicted 'answered' —
+        the grain is computed from what is ON SCREEN, never claimed."""
+        s = EngineSession()
+        out = run_turn(s, "q", scripted_engine([
+            {"calls": [("census", {"kind": "metric"})]},
+            {"text": "Summary shown in R1."},
+            {"verdict": {"answered": False}},
+        ]), fake_kql)
+        assert out["evidence_grain"] == "summary"
+        out2 = run_turn(s, "drill in", scripted_engine([
+            {"calls": [("retrieve", {"ids": [REF_A]})]},
+            {"text": "Sites shown in R2."},
+            {"verdict": {"answered": False}},
+        ]), fake_kql)
+        assert out2["evidence_grain"] == "sites"   # inline sites shown
+
+    def test_lineage_tool_dispatches_and_stamp_echoes(self):
+        """Walk finds 3+4: lineage is a first-class op, and any
+        source-table stamp on screen is echoed machine-verbatim into
+        the answer — list identity is never model-copied."""
+        s = EngineSession()
+        out = run_turn(s, "which metrics use IP_SEPSIS?",
+                       scripted_engine([
+                           {"calls": [("lineage",
+                                       {"table": "IP_SEPSIS"})]},
+                           {"text": "Two readers are shown in R1."},
+                           {"verdict": {"answered": False}},
+                       ]), fake_kql)
+        assert "result" in out["outputs"][0]
+        assert out["outputs"][0]["result"]["complete"] is True
+        out2 = run_turn(EngineSession(), "how is IP_SEPSIS defined?",
+                        scripted_engine([
+                            {"calls": [("search",
+                                        {"phrase": "IP_SEPSIS",
+                                         "mode": "exact"})]},
+                            {"text": "See R1 for the closest items."},
+                            {"verdict": {"answered": False}},
+                        ]), fake_kql)
+        assert "Machine-stamped lineage:" in out2["answer"]
+        assert "SOURCE TABLE read by" in out2["answer"]
+
     def test_stamped_headline_is_quotable_evidence(self):
         """Walk find (Sunny, 2026-08-21): for a count question the
         natural evidence IS the number, which lives in the stamped
@@ -353,15 +396,16 @@ def test_system_prompt_is_invariants_only_no_casebook():
     for banned in ("how is", "defined", "did you mean", "bridge",
                    "criteria", "pointer", "how many"):
         assert banned not in SYSTEM_PROMPT.lower(), banned
-    assert len(ENGINE_TOOLS) == 4
+    assert len(ENGINE_TOOLS) == 5      # +lineage (walk find 4, pin bumped)
 
 
 # Pin update 2 (2026-08-21, recorded in the Round-4 RESULTS log):
 # scope widened to SYSTEM_PROMPT + ENGINE_TOOLS (tool semantics are
 # prompt surface too); content change = census/search description
 # sharpening (tool-property statements, no question shapes).
-PINNED_PROMPT_SHA = ("a01e7052a1af27e10b01485a9aacc058"
-                     "e15c3be33adc3a081f9ee34cf80e35a3")
+# Pin bumped CONSCIOUSLY 2026-08-21 (walk find 4): +lineage tool.
+PINNED_PROMPT_SHA = ("fb085dcfb9e9aef0f206c596ec4ccd57"
+                     "adf6f900d975c7ca0a6a39fde22721ad")
 
 
 class TestPGroup:

@@ -433,6 +433,37 @@ def _decisions_of(step_id: str, run_kql) -> "list[dict]":
                              {"p_step": step_id})]
 
 
+def op_lineage(table: str, run_kql, session: OpsSession) -> ResultSet:
+    """Which certified metrics READ a table — the uses relation from
+    parsed transform_to_technical edges, never name mentions. Walk
+    find 4 (Sunny, 2026-08-21): 'is there any other metrics using
+    IP_SEPSIS?' routed to a mention-census; lineage questions get a
+    lineage primitive. Promoted from the reachability roadmap's
+    rank-3 item with a walk corpse attached."""
+    if not table.strip():
+        raise OpError("lineage needs a table name")
+    out, have = [], set()
+    for r in run_kql(TABLE_USED_BY_QUERY, {"p_phrase": table.strip()}):
+        rid = str(r.get("ref") or "")
+        key = (str(r.get("table_name")), rid)
+        if not rid or key in have:
+            continue
+        have.add(key)
+        out.append({"id": rid, "kind": "metric",
+                    "name": rid.rsplit(".", 1)[-1],
+                    "business_name": r.get("business_name") or None,
+                    "of_metric": None,
+                    "reads_table": r.get("table_name")})
+    return session.register(
+        "lineage", {"table": table.strip()},
+        _attach_cards(out, run_kql),
+        complete=True,
+        universe=(f"every certified metric whose calculation reads a "
+                  f"table matching {table.strip()!r} — from parsed "
+                  "SQL lineage edges, never name mentions; the count "
+                  "is exact"))
+
+
 def op_retrieve(ids: "list[str]", run_kql, session: OpsSession) -> ResultSet:
     if not ids:
         raise OpError("retrieve needs at least one id")

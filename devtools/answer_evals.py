@@ -76,11 +76,22 @@ FIXTURES = [
      "question": "how is IP_SEPSIS defined",
      "oracle": "near_name_bridge", "phrase": "IP_SEPSIS",
      "max_rounds": 2, "expected_kind": "bridge"},
+    # expected_grain (walk find 1, 2026-08-21): this exact phrasing
+    # was answered by a census-dodge — descriptions quoted, verdict
+    # verified, actual codes/thresholds absent. A decision-grade ask
+    # must put SITE rows on screen.
     {"family": "drilldown",
      "question": "in Severe Sepsis Episodes, how is a patient "
                  "diagnosed with severe sepsis",
      "oracle": "beyond_summary", "item": "Severe Sepsis Episodes",
-     "max_rounds": 3, "expected_kind": "answered"},
+     "max_rounds": 3, "expected_kind": "answered",
+     "expected_grain": "sites"},
+    # Walk find 4 (2026-08-21): 'using' is the READER relation —
+    # lineage questions route to lineage, not mention-census.
+    {"family": "lineage",
+     "question": "which metrics use the IP_SEPSIS table?",
+     "oracle": "table_readers", "table": "IP_SEPSIS",
+     "max_rounds": 2, "expected_kind": "answered"},
     # Corpses from the 2026-08-20 evening trail:
     {"family": "topical_count",
      "question": "how many metrics are about sepsis",
@@ -123,7 +134,8 @@ FIXTURES = [
      "question": "in this metric, how is a patient diagnosed with "
                  "severe sepsis",
      "oracle": "beyond_summary", "item": "Severe Sepsis Episodes",
-     "max_rounds": 3, "expected_kind": "answered"},
+     "max_rounds": 3, "expected_kind": "answered",
+     "expected_grain": "sites"},
 ]
 
 _WORD = re.compile(r"[A-Za-z_]{6,}")
@@ -202,6 +214,19 @@ def build_oracle(fixture: dict, run_kql) -> dict:
         n = sum(1 for r in rs.rows if row_mentions(r, fixture["topic"]))
         assert n, "oracle: topic matches nothing"
         return {"required_any": [[str(n)]], "forbidden": []}
+    if kind == "table_readers":
+        rows = run_kql(TABLE_USED_BY_QUERY,
+                       {"p_phrase": fixture["table"]})
+        readers = sorted({
+            str(r.get("business_name") or r.get("ref") or "")
+            for r in rows
+            if str(r.get("table_name") or "").lower()
+            == fixture["table"].lower()})
+        readers = [r for r in readers if r]
+        assert readers, "oracle: table has no readers"
+        return {"required_any": [readers],
+                "required_overlap": min(2, len(readers)),
+                "forbidden": []}
     if kind == "step_count":
         ops2 = _fresh_ops_session()
         rs = op_search(fixture["item"], "exact", run_kql, ops2)
@@ -286,7 +311,15 @@ def grade(answer: str, verdict: dict, oracle: dict,
     # answered=false. "Grade on trace + data facts, never on prose
     # shapes" applies to the verdict flag too: it polices honesty
     # (declared without facts = DISHONEST), it never awards points.
-    answer_ok = facts_present and not dishonest
+    # Walk find 1 (Sunny, 2026-08-21): decision-grade families state
+    # the evidence GRAIN they require; the engine computes the grain
+    # from what was displayed — an answer from census descriptions
+    # cannot satisfy a fixture that demands site rows on screen.
+    grain_ok = True
+    if fixture.get("expected_grain"):
+        grain_ok = (verdict.get("evidence_grain")
+                    == fixture["expected_grain"])
+    answer_ok = facts_present and not dishonest and grain_ok
     return {
         "facts_present": facts_present,
         "declared_answered": declared,
@@ -313,6 +346,7 @@ def run_trail(questions: "list[str]", chat_api, run_kql) -> dict:
                                      "round(s)")},
             "cap": {"caption": turn["answer"],
                     "answered": turn["answered"],
+                    "evidence_grain": turn.get("evidence_grain", ""),
                     "declared_raw": turn.get("declared_raw", False),
                     "exhausted": turn.get("exhausted", False),
                     "missing_op": turn["missing_op"],
@@ -331,8 +365,11 @@ def paraphrases(question: str, n: int) -> "list[str]":
     return lines[:n]
 
 
-PINNED_PROMPT_SHA = ("a01e7052a1af27e10b01485a9aacc058"
-                     "e15c3be33adc3a081f9ee34cf80e35a3")
+# Pin bumped CONSCIOUSLY 2026-08-21 (walk find 4, recorded in the
+# Round-4 RESULTS log): ENGINE_TOOLS gained the `lineage` tool — the
+# readers-of-table primitive. SYSTEM_PROMPT unchanged.
+PINNED_PROMPT_SHA = ("fb085dcfb9e9aef0f206c596ec4ccd57"
+                     "adf6f900d975c7ca0a6a39fde22721ad")
 
 
 def main() -> None:

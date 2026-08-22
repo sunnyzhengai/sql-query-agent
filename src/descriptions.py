@@ -46,7 +46,10 @@ from src.tree import TREE_CONTRACT_VERSION
 from src.tree.extract import build_decision_tree
 from src.tree.translate import translate_tree
 
-PROMPT_VERSION = f"5.t{TREE_CONTRACT_VERSION}"
+# v6 (2026-08-21, walk find 2): the metric-grain scope rule — the
+# bump invalidates every cached description so poisoned "without
+# applying any filtering decisions" text cannot survive the next run.
+PROMPT_VERSION = f"6.t{TREE_CONTRACT_VERSION}"
 
 MEASURE_PROMPT = (
     "You are documenting a Power BI DAX {expression_type} for a business "
@@ -72,7 +75,9 @@ METRIC_PROMPT = (
     "You are documenting the certified business metric {metric_name}.\n"
     "Its calculation is assembled from these final steps (each already "
     "described in business terms):\n{roots_block}\n"
-    "It draws on {step_count} calculation steps in total.\n\n"
+    "It draws on {step_count} calculation steps in total, whose "
+    "conditions comprise {decision_count} filtering/branching decision "
+    "sites.\n\n"
     "Write a concise business description: first, one sentence stating "
     "what this metric reports or measures, grounded strictly in the step "
     "descriptions and the metric name. Then a blank line, then "
@@ -86,6 +91,11 @@ METRIC_PROMPT = (
     "value. Do not state purposes, benefits, or decisions "
     "the metric supports unless a step description states them — no "
     "filler like 'supports decision-making' or 'improves outcomes'. "
+    "If the decision-site count above is greater than zero, NEVER "
+    "claim the metric applies no filters or no filtering criteria — "
+    "such absence claims are true only of a single step, never of the "
+    "metric; instead say the detailed criteria live in its "
+    "{decision_count} decision sites. "
     "Plain text only: no greetings, no markdown headers, no bold, no "
     "trailing spaces, no invented details."
 )
@@ -236,9 +246,10 @@ def measure_content_hash(name: str, expression: str,
 
 
 def metric_content_hash(metric_name: str, roots: "list[tuple[str, str]]",
-                        step_count: int) -> str:
+                        step_count: int, decision_count: int = 0) -> str:
     payload = (
         PROMPT_VERSION + "\n" + metric_name + f"\n{step_count}\n"
+        + f"{decision_count}\n"
         + "\n".join(f"{n}\t{d}" for n, d in sorted(roots))
     )
     return hashlib.sha256(payload.encode()).hexdigest()[:32]
@@ -350,11 +361,42 @@ def build_measure_prompt(
     )
 
 
-def build_metric_prompt(metric_name: str, roots: "list[tuple[str, str]]", step_count: int) -> str:
+def build_metric_prompt(metric_name: str, roots: "list[tuple[str, str]]",
+                        step_count: int, decision_count: int = 0) -> str:
     roots_block = "\n".join(f"- {n}: {d}" for n, d in roots) or "- (no described steps)"
     return METRIC_PROMPT.format(
-        metric_name=metric_name, roots_block=roots_block, step_count=step_count
+        metric_name=metric_name, roots_block=roots_block,
+        step_count=step_count, decision_count=decision_count,
     )
+
+
+# Walk corpse (Sunny, 2026-08-21 evening — find 2): metric
+# descriptions claimed "without applying any filtering decisions" on
+# metrics carrying HUNDREDS of decision sites (427 on
+# USP_Severe_Sepsis) — the final_select step's true no-WHERE fact
+# over-scoped to the whole metric, and the engine faithfully repeated
+# the poisoned text. Sunny's rule: a metric-grain description may not
+# make absence-of-filtering claims scoped beyond its step; when
+# decision sites exist, the description voices their existence and
+# count.
+_ABSENCE_OF_FILTERING = re.compile(
+    r"(?i)\b(?:without|no|not)\b[^.\n]{0,60}?\bfilter")
+
+
+def metric_scope_violations(text: str, decision_count: int) -> "list[str]":
+    """Deterministic metric-grain scope check (find 2). Empty list =
+    no over-scoped absence claim."""
+    if decision_count <= 0:
+        return []
+    out = []
+    for line in text.splitlines():
+        if _ABSENCE_OF_FILTERING.search(line):
+            out.append(
+                f"over-scoped absence claim: {line.strip()!r} — this "
+                f"metric carries {decision_count} decision sites; an "
+                "absence-of-filtering fact is true only of a single "
+                "step, never of the metric")
+    return out
 
 
 
@@ -527,10 +569,15 @@ def generate_descriptions(
 
     # Metrics: composed from ROOT step descriptions (raw roots-only edges)
     step_count_by_metric: "dict[str, int]" = {}
+    decision_count_by_metric: "dict[str, int]" = {}
     for node_id, node in nodes.items():
         if node.layer == NodeLayer.TRANSFORMATION:
             metric_id = node.properties.get("metric_id", "")
             step_count_by_metric[metric_id] = step_count_by_metric.get(metric_id, 0) + 1
+        elif node.layer == NodeLayer.DECISION:
+            metric_id = node.properties.get("metric_id", "")
+            decision_count_by_metric[metric_id] = (
+                decision_count_by_metric.get(metric_id, 0) + 1)
 
     for node_id, node in sorted(nodes.items()):
         if node.layer != NodeLayer.CANONICAL:
@@ -545,18 +592,22 @@ def generate_descriptions(
                                  "root-step edges to compose from")
             continue
         step_count = step_count_by_metric.get(metric_id, len(roots))
-        key = metric_content_hash(node.name, roots, step_count)
+        decision_count = decision_count_by_metric.get(metric_id, 0)
+        key = metric_content_hash(node.name, roots, step_count,
+                                  decision_count)
         if key in cache:
             result.descriptions[node_id] = cache[key]
             result.cache_hits += 1
             continue
-        prompt = build_metric_prompt(node.name, roots, step_count)
+        prompt = build_metric_prompt(node.name, roots, step_count,
+                                     decision_count)
         roots_ground = "\n".join(d for _, d in roots)
         # Facts WE put in the prompt are grounded by definition — the
         # gate greps only roots_ground, so the step_count it asked the
         # LLM to voice ('computed in 122 steps') must be in the ground
         # (field find, tenant 600 run 2026-08-20).
-        prompt_facts = [node.name, str(step_count)] + [n for n, _ in roots]
+        prompt_facts = ([node.name, str(step_count), str(decision_count)]
+                        + [n for n, _ in roots])
         try:
             text, removed = _grounded_describe(
                 describe, prompt, roots_ground, prompt_facts,
@@ -570,6 +621,35 @@ def generate_descriptions(
             result.fail(node_id, "grounded_to_empty: every generated line "
                                  "failed the grounding check")
             continue
+        # Metric-grain scope rule (walk find 2, Sunny 2026-08-21): one
+        # corrective retry, then strip the violating lines; if the
+        # remainder still over-scopes, drop the description entirely —
+        # absence over poisoned certainty.
+        scope_v = metric_scope_violations(text, decision_count)
+        if scope_v:
+            note = ("\n\nYour previous draft was REJECTED: it makes "
+                    "absence-of-filtering claims at metric grain:\n"
+                    + "\n".join(f"- {v}" for v in scope_v)
+                    + "\nRewrite it without any such claim; say the "
+                    "detailed criteria live in the "
+                    f"{decision_count} decision sites.")
+            try:
+                retry = describe(prompt + note).strip()
+            except Exception:   # noqa: BLE001 — retry is best-effort
+                retry = ""
+            if retry and not grounding_violations(
+                    retry, roots_ground, prompt_facts, "prose"):
+                text = retry
+            if metric_scope_violations(text, decision_count):
+                kept = [ln for ln in text.splitlines()
+                        if not _ABSENCE_OF_FILTERING.search(ln)]
+                text = "\n".join(kept).strip()
+            result.ungrounded.append((node_id, scope_v))
+            if not text or metric_scope_violations(text, decision_count):
+                result.fail(node_id,
+                            "over_scoped_absence: metric-grain "
+                            "no-filtering claim survived retry+strip")
+                continue
         if _VAGUE_FILLERS.search(text):
             result.vague.append(node_id)
         if _RAW_IDENTIFIERS.search(text):

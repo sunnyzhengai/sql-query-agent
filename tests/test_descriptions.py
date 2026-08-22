@@ -267,3 +267,44 @@ class TestMeasureDescriptions:
         assert "measure:R:T[X]" in result.failed
         assert dict(result.failed_reasons)["measure:R:T[X]"].startswith(
             "no_dax_expression")
+
+
+class TestMetricScopeRule:
+    """Walk corpse (Sunny, 2026-08-21 evening, find 2): metric
+    descriptions claimed 'without applying any filtering decisions' on
+    metrics carrying hundreds of decision sites — the final_select's
+    true no-WHERE fact over-scoped to the whole metric, and the engine
+    faithfully repeated the poisoned text."""
+
+    CORPSE = ("This metric reports severe sepsis incidence.\n"
+              "Business logic:\n"
+              "- The outcome is calculated by aggregating data from "
+              "122 calculation steps without applying any filtering "
+              "decisions.")
+
+    def test_corpse_is_a_violation_when_sites_exist(self):
+        from src.descriptions import metric_scope_violations
+        out = metric_scope_violations(self.CORPSE, 427)
+        assert out and "427 decision sites" in out[0]
+
+    def test_no_sites_means_absence_claims_are_legal(self):
+        from src.descriptions import metric_scope_violations
+        assert metric_scope_violations(self.CORPSE, 0) == []
+
+    def test_variant_phrasings_are_caught(self):
+        from src.descriptions import metric_scope_violations
+        for line in ("No filtering criteria are applied to the data.",
+                     "The data is not filtered at this stage.",
+                     "Without any filters, all rows are included."):
+            assert metric_scope_violations(line, 5), line
+
+    def test_prompt_carries_the_decision_count(self):
+        from src.descriptions import build_metric_prompt
+        p = build_metric_prompt("M", [("s", "d")], 122, 427)
+        assert "427" in p and "decision site" in p
+
+    def test_hash_regenerates_when_count_changes(self):
+        from src.descriptions import metric_content_hash
+        a = metric_content_hash("M", [("s", "d")], 122, 0)
+        b = metric_content_hash("M", [("s", "d")], 122, 427)
+        assert a != b

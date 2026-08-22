@@ -39,6 +39,7 @@ from src.orchestrator.ops import (
     OpsSession,
     op_census,
     op_compare,
+    op_lineage,
     op_retrieve,
     op_search,
 )
@@ -110,6 +111,15 @@ ENGINE_TOOLS = [
             "ids": {"type": "array", "items": {"type": "string"}}},
             "required": ["ids"]}}},
     {"type": "function", "function": {
+        "name": "lineage",
+        "description": ("Which certified metrics READ a warehouse "
+                        "table — the uses relation from parsed SQL "
+                        "lineage edges, never name mentions. The "
+                        "result is complete and its count exact."),
+        "parameters": {"type": "object", "properties": {
+            "table": {"type": "string"}},
+            "required": ["table"]}}},
+    {"type": "function", "function": {
         "name": "compare",
         "description": ("Deterministic comparison over prior result "
                         "sets (refs like R1, R2). aspect omitted/"
@@ -147,7 +157,8 @@ VERDICT_TOOL = {
     },
 }
 
-READ_ONLY_TOOLS = frozenset({"search", "census", "retrieve", "compare"})
+READ_ONLY_TOOLS = frozenset({"search", "census", "retrieve", "compare",
+                             "lineage"})
 
 
 @dataclass
@@ -175,10 +186,30 @@ def _run_op(name: str, args: dict, run_kql, ops: OpsSession):
     if name == "retrieve":
         return op_retrieve([str(i) for i in (args.get("ids") or [])],
                            run_kql, ops)
+    if name == "lineage":
+        return op_lineage(str(args.get("table", "")), run_kql, ops)
     if name == "compare":
         return op_compare([str(r) for r in (args.get("refs") or [])],
                           args.get("aspect"), run_kql, ops)
     raise OpError(f"unknown tool {name!r}")
+
+
+def _evidence_grain(shown: "list[dict]") -> str:
+    """The DEPTH of the displayed evidence, computed from what is on
+    screen — never from a model claim (walk find 1, Sunny 2026-08-21:
+    a decision-grade ask was answered from census descriptions and
+    verdicted 'answered'; the string-space quote check cannot see
+    depth). sites > record > summary; the suite's fixtures state the
+    grain a family requires."""
+    rows = [row for o in shown
+            for row in ((o.get("result") or {}).get("rows") or [])]
+    if any(row.get("decision_sites") or row.get("expression_sql")
+           for row in rows):
+        return "sites"
+    if any((o.get("result") or {}).get("op") == "retrieve"
+           for o in shown):
+        return "record"
+    return "summary"
 
 
 def _infra_error(e: Exception) -> str:
@@ -435,10 +466,27 @@ def run_turn(session: EngineSession, question: str, chat_api,
                         "and quote it verbatim (a row or a stamped "
                         "headline) in your verdict.")})
 
+    # Machine-stamped lineage echo (walk find 3, Sunny 2026-08-21: the
+    # commentary swapped two readers for near-name procs — every name
+    # was on screen so quotes verified, but the RELATIONSHIP claimed
+    # was the model's. The reader list is machine-rendered verbatim;
+    # the model narrates around it, never copies it).
+    stamp_echo: "list[str]" = []
+    for o in outputs:
+        note = str((o.get("result") or {}).get("note") or "")
+        for sent in re.findall(r"[^.]*SOURCE TABLE read by[^.]*\.", note):
+            s = sent.strip()
+            if s and s not in stamp_echo:
+                stamp_echo.append(s)
+    if stamp_echo and answer:
+        answer += ("\n\nMachine-stamped lineage: " + " ".join(stamp_echo))
+
     session.displays.extend(outputs)
     session.turns += 1
     return {
         "answer": answer,
+        "evidence_grain": _evidence_grain(
+            list(session.displays) + outputs),
         "outputs": outputs,
         "rounds": rounds,
         "exhausted": exhausted,

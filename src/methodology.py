@@ -52,6 +52,19 @@ PRIMITIVES = {
                                "is a complete, exact-count scan",
         "adr": "0036",
     },
+    "op_lineage": {
+        # AMENDMENT 2026-08-21 (walk find 4, Sunny's verdicts file):
+        # 'using' is the READER relation — lineage questions were
+        # routing to a mention-census. Promoted from the reachability
+        # roadmap with a walk corpse attached.
+        "kind": "primitive",
+        "data_shaped_because": "the graph materializes the uses "
+                               "relation as transform_to_technical "
+                               "edges; readers-of-table is a complete, "
+                               "exact-count scan of parsed lineage, "
+                               "never name matching",
+        "adr": "0052",
+    },
     "op_compare": {
         "kind": "kernel-dispatch",
         "data_shaped_because": "comparisons range over exactly four "
@@ -129,7 +142,10 @@ SYSTEM_VOCAB = frozenset({
     # tool/op names appearing in dispatch tables and basis stamping
     # ("census"/"list_catalog": AMENDMENT 2026-08-20 — the enumeration
     # primitive; catalog kinds are SYSTEM vocabulary, not user phrasing)
+    # "lineage": AMENDMENT 2026-08-21 (walk find 4) — the readers-of-
+    # table primitive; an op name, not user phrasing
     "search", "retrieve", "update", "compare", "explain", "census",
+    "lineage",
     "search_catalog", "find_by_name", "get_facts", "list_steps",
     "check_same_logic", "list_catalog",
     "metric", "step", "term", "report", "measure",

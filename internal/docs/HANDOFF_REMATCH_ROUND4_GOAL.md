@@ -577,3 +577,28 @@ it and quote it verbatim. Also visible in her trail: the IP_SEPSIS
 bridge now stamps siblings + TWO source-table identities, and the
 honesty gate floored an invented '8'/'9' mid-walk — the machinery
 holding in the field.
+
+### 2026-08-21 — Walk verdicts executed (1.54.0): four finds, fixtures-first
+FIND 2 (priority, data layer): metric-grain scope rule in the
+description pipeline — prompt carries the decision-site count and
+instructs voicing it; deterministic gate bans metric-grain absence-
+of-filtering claims when sites exist (retry → strip → drop);
+PROMPT_VERSION 5→6 invalidates every cached description. THE
+REPUBLISH SEQUENCING CHANGES: Sunny's single pipeline run must use
+this wheel (1.54.0) so poisoned descriptions regenerate — supersedes
+the earlier "no export changes" note.
+FIND 4: `lineage` is the FIFTH engine tool — readers-of-table, exact
+count, never name mentions. PIN BUMPED CONSCIOUSLY:
+a01e7052… → fb085dcf… (ENGINE_TOOLS +lineage; SYSTEM_PROMPT
+unchanged). op registry + reachability rows updated; new suite
+family `lineage` with a store-derived table_readers oracle.
+FIND 1: evidence GRAIN (sites > record > summary) computed by the
+engine from displayed rows — never a model claim; decision-grade
+fixtures demand grain=sites (the census-dodge phrasing is the
+canonical corpse).
+FIND 3: source-table stamps echo machine-verbatim into the answer
+("Machine-stamped lineage: …") — reader-list identity is rendered,
+not model-copied.
+950 tests green; final acceptance suite (all walk fixtures + M2
+acceptance) runs next; capacity pause AFTER it per Sunny's goodnight
+instruction.

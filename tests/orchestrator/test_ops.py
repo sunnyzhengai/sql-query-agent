@@ -10,6 +10,7 @@ from src.orchestrator.ops import (
     normalize_kind,
     op_census,
     op_compare,
+    op_lineage,
     op_retrieve,
     op_search,
     row_mentions,
@@ -381,6 +382,29 @@ class TestDecisionLayer:
         s.surfaced.add(STEP_2)
         rs = op_retrieve([STEP_2], fake_kql, s)
         assert rs.rows[0]["decisions"] == []
+
+
+class TestLineage:
+    """Walk find 4 (Sunny, 2026-08-21): 'is there any other metrics
+    using IP_SEPSIS?' routed to a mention-census — 'using' is the
+    READER relation; lineage questions get a lineage primitive."""
+
+    def test_readers_of_table_complete_and_exact(self):
+        s = OpsSession()
+        rs = op_lineage("IP_SEPSIS", fake_kql, s)
+        assert rs.complete is True
+        assert "never name mentions" in rs.universe
+        assert {r["id"] for r in rs.rows} == {REF_A, REF_B}
+        assert all(r["reads_table"] == "IP_SEPSIS" for r in rs.rows)
+        assert s.permitted(REF_A)          # readers surfaced for hops
+
+    def test_unknown_table_is_an_honest_empty(self):
+        rs = op_lineage("zzz", fake_kql, OpsSession())
+        assert rs.rows == [] and rs.complete is True
+
+    def test_blank_table_is_an_op_error(self):
+        with pytest.raises(OpError, match="table name"):
+            op_lineage("  ", fake_kql, OpsSession())
 
 
 class TestReportLinks:
