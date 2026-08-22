@@ -762,3 +762,24 @@ gate was watching for.
 TENANT SEQUENCE ADDENDUM: update aivia_demo_src.SQLDatabase from git,
 fix the 3 dictionary rows to synthetic names (cell provided), then
 rerun 200→500 (SQL text changed → reparse) before 600/700.
+
+### 2026-08-22 — FULL PIPELINE AUTOMATED END-TO-END; every verification green
+Dev ran the entire tenant chain remotely (Fabric job API, 45 min,
+zero failures): 030→040→200→300→400→500→600→610→700→800, after
+OneLake-verifying the dictionary CSV and syncing the workspace from
+git (updateFromGit, no conflicts — renamed proc applied to
+aivia_demo_src, run-safe 040 live). Post-chain battery:
+- C4 leaf grounding diff: 0 missing (28/28 by construction);
+- 7/7 synthetic tech nodes present; ZERO old vendor names anywhere;
+- absence-of-filtering claims: 4, ALL on zero-site passthrough
+  metrics — the scope rule's carve-out, truthful text;
+- projection edges 153 (flat vs pre-run: expected — the 7 new tables
+  have TABLE rows but no dict_columns rows yet, so their column refs
+  still drop as no_dictionary_column; optional follow-up);
+- conservation both legs clean; reachability: no drift; total edges
+  12,009.
+Agent config in progress by Sunny (three sources attached; fewshot
+flattened-\n paste bug caught and repo file cleaned; routing text +
+all fewshots recovered via the definition API — Graph Agent holds
+nothing unique anymore). REMAINING: paste-complete → Publish →
+verify (runbook 5) → org_config data_agent_id → Round 4 → retire.
