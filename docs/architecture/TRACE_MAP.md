@@ -631,7 +631,7 @@ classification).
 ## ADR 0053 — Projection-grain column lineage: transform_to_column edges, resolved-only, conservation-counted
 
 - **Category:** architecture
-- **Grounds:** spec:D1, spec:D4, spec:J2
+- **Grounds:** spec:C1, spec:C2
 - **Implemented by:**
   - `src/graph/builder.py`
   - `src/steps/build_graph.py`

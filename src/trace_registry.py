@@ -502,7 +502,7 @@ TRACE_REGISTRY = {
         "title": "Projection-grain column lineage: transform_to_column "
                  "edges, resolved-only, conservation-counted",
         "category": "architecture",
-        "axioms": ["D1", "D4", "J2"],
+        "axioms": ["C1", "C2"],
         "modules": ["src/graph/builder.py", "src/steps/build_graph.py"],
         "tests": ["tests/graph/test_builder.py",
                   "tests/orchestrator/test_ops.py"],

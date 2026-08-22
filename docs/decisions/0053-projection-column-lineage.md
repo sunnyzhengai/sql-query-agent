@@ -3,7 +3,9 @@
 Date: 2026-08-22
 Status: accepted
 Category: architecture
-Axioms: D1, D4, J2; §3b design review (this ADR is the review record)
+Axioms: spec:C1, spec:C2 (frontier + conservation); AIVIA-framework
+typing D1/D4/J2 in prose below. §3b design review — this ADR is the
+review record.
 
 ## Context
 
