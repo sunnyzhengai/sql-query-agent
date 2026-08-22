@@ -403,16 +403,29 @@ to run. It loads nothing itself and never assumes a route.
 1. Go to your workspace
 2. Click **+ New** → **Data Agent** (or use the **Add to data agent** button in the Lakehouse)
 3. Name it: `SQL Intelligence Agent`
-4. Add these tables as data sources:
+4. Add the **Lakehouse** data source and select these tables:
    - `output_metric_logic`
+   - `output_metric_twins`
    - `ops_parse_errors`
    - `ops_pipeline_validation`
    - `ops_installation_errors`
+   - `ops_funnel`
+   - `ops_fallout`
    - `graph_nodes`
    - `graph_edges`
-5. Open the Agent's **Instructions** panel
-6. Paste the contents of `delta_agent_instructions.md`
-7. Click **Publish**
+   - `graph_edge_uses_table`
+   - `graph_canonical`
+5. If you provisioned semantic search (the `700_refresh_search_index`
+   step), add the **KQL database** data source (the Eventhouse holding
+   `semantic_search()`).
+6. If you loaded the **Graph Model**, add it as a third data source.
+7. Open the Agent's **Instructions** panel
+8. Paste the contents of `sql_intelligence_agent_instructions.md`
+   (three-source synthesis; works with the Lakehouse alone — the
+   instructions route around missing sources honestly)
+9. On the Lakehouse source: **Example queries → Import from JSON** →
+   `delta_agent_fewshots.json`
+10. Click **Publish**
 
 ### Test the Agent
 

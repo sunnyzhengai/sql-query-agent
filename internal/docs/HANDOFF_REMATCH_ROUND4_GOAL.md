@@ -676,3 +676,20 @@ BEHIND ROUND 4 (Sunny); E5 m2c: extraction-gap row stands. 963 tests
 green. THE SINGLE PIPELINE RUN now carries three payloads: v6
 descriptions, decision redaction-at-rest, and projection edges —
 all in the 1.56.0 wheel, one pass.
+
+### 2026-08-22 — Item-4 CORRECTION staged: SQL Intelligence Agent config, one tenant pass
+Per Sunny's relay: the shell gets configured as the production
+synthesis BEFORE any retirement; Round 4 targets IT. Staged:
+RUNBOOK_SQL_INTELLIGENCE_AGENT.md (numbered one-pass: capacity → env
+1.56.0 → EH rename+ref-edits → the single pipeline run [v6
+descriptions + redaction + 0053 edges] → 700 refresh → three-source
+agent config with pasted instructions + fewshot import + COPY the
+Graph agent's Eventhouse fewshots BEFORE retirement → verify [incl.
+the poisoned-description corpse as a REJECT check] → org_config
+data_agent_id → Round 4 → retire Delta/Graph/eh_probe → notebook
+moves). New: notebooks/sql_intelligence_agent_instructions.md — the
+three-source synthesis (Lakehouse cards + Eventhouse semantic_search
+resolution + Graph Model closure traversal), Basis-line discipline
+throughout. INSTALLATION_GUIDE Step 6 now prescribes exactly this, so
+the demo mirrors what customers build. Lesson from the correction
+carried: keyed on verified CONTENTS, not the item's name.

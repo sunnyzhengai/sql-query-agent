@@ -119,6 +119,35 @@ commit per item:
    the shipping Tier-1 distribution surface (never used for
    validation, per standing rule). Same workspace-first deletion
    protocol as item 3.
+   **CORRECTION (review session, 2026-08-22, caught by Sunny before
+   execution):** "SQL Intelligence Agent.DataAgent" is an EMPTY SHELL
+   (Files/ has no Config) — it was created to mirror the
+   deployment-checklist customer name but never configured. The
+   configured surfaces are Delta (metric_logic lakehouse + the 1.44.0
+   instruction refresh) and Graph (two-source: Graph model +
+   kusto-probe-eh Eventhouse with fewshots). Executing the retirement
+   as originally written would have deleted the only configured
+   agents and kept a husk. **Amended execution order:**
+   (a) CONFIGURE the SQL Intelligence Agent item as the production
+   synthesis — the sources and instructions the deployment checklist
+   prescribes for customers (metric_logic with the 1.44.0 decision
+   columns + Eventhouse semantic catalog/fewshots + Graph model as
+   prescribed), so the demo workspace mirrors exactly what customers
+   build; (b) Round 4 tests THAT item (the artifact-as-shipped);
+   (c) THEN retire Delta + Graph. The probe-eh rename (item 5), if
+   executed, also touches the kusto-probe-eh datasource config —
+   coordinate in the same session. Lesson recorded: the original
+   ruling keyed on the item's NAME, not its verified contents — an
+   unwitnessed keeper claim; naming discipline exists precisely so
+   production names name production things.
+   **STAGED (dev, 2026-08-22):** one-pass tenant runbook at
+   internal/docs/RUNBOOK_SQL_INTELLIGENCE_AGENT.md; production
+   synthesis instructions at
+   notebooks/sql_intelligence_agent_instructions.md; INSTALLATION_GUIDE
+   Step 6 now prescribes the three-source synthesis. Sequenced with
+   the item-5 rename, the single pipeline run (v6 descriptions +
+   redaction + ADR 0053 edges), Round 4, THEN retirements — with a
+   loud copy-the-Eventhouse-fewshots-before-deleting warning.
 5. **RULED (Sunny, 2026-08-20): RENAME probe-eh.Eventhouse** to a
    clean production name — proposal: `aivia_semantic_catalog`
    (matches the aivia_admin_telemetry naming pattern; dev session may
