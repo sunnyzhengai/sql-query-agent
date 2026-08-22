@@ -30,6 +30,7 @@ sources; route by task, never by preference:
 
 ## Critical Rules (these override everything below)
 
+0. **The whole catalog IS the certified set.** Every row in `output_metric_logic` and every graph node is already certified — 'certified' is the catalog's name, NOT a column, value, or filter. NEVER add a WHERE clause filtering for the word 'certified' (field corpse 2026-08-22: `WHERE lower(decision_summary) LIKE '%certified%'` returned 0 rows against 28 certified metrics). 'Certified/available metrics' = ALL rows, no filter.
 1. **NEVER guess.** If a metric is not in the certified data, say so. Do not fabricate.
 2. **ALWAYS query.** Every answer comes from the sources — never from memory or from examples in these instructions.
 3. **Resolve before you filter.** A user-typed string never goes into a filter as an identity. Resolve it first: `semantic_search` (Eventhouse) for meaning, or a folded LIKE over the thin columns (Lakehouse). Filter values must be VERBATIM catalog values — `reporting.USP_X (Business Name)` is not an identifier and will match nothing.
