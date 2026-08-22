@@ -57,8 +57,10 @@ Post-run checks (dev can run these for you if you ping):
 
 ## 4. Configure SQL Intelligence Agent (20 min)
 
-The item exists as an EMPTY SHELL — configure, don't create.
-1. Open `SQL Intelligence Agent` (Data Agent).
+FIELD CORRECTION (2026-08-22): the empty shell no longer exists in
+the workspace — CREATE the item fresh: + New item → Data agent →
+name it exactly `SQL Intelligence Agent`.
+1. Create/open `SQL Intelligence Agent` (Data Agent).
 2. Add data source 1 — **Lakehouse** (the pipeline lakehouse), select:
    `output_metric_logic`, `output_metric_twins`, `ops_parse_errors`,
    `ops_pipeline_validation`, `ops_installation_errors`, `ops_funnel`,
@@ -74,10 +76,19 @@ The item exists as an EMPTY SHELL — configure, don't create.
    `---` line).
 6. Lakehouse source → Example queries → Import from JSON →
    `notebooks/delta_agent_fewshots.json`.
-7. **Copy the Eventhouse example queries**: open Graph Agent → its
-   KQL source → Example queries → copy each pair into the SAME place
-   on SQL Intelligence Agent's KQL source. (This is the only copy —
-   do it before ANY retirement.)
+7. **Copy THREE things from Graph Agent before ANY retirement**
+   (they exist nowhere else — never synced to git):
+   a. Its KQL source → Example queries → copy each pair into the
+      same place on the new agent's KQL source.
+   b. Its KQL source → the per-source DESCRIPTION/routing text
+      (starts "To resolve a user's topic or metric reference,
+      call semantic_search(...) FIRST…") → paste verbatim into
+      the new agent's KQL source description box (review-session
+      find, 2026-08-22: per-source descriptions steer the
+      agent's source router; agent-level instructions alone do
+      not reach it).
+   c. Its Graph Model source → per-source description, if one is
+      set → same copy.
 8. Publish the agent.
 
 ## 5. Verify (10 min)
