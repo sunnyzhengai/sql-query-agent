@@ -45,7 +45,10 @@ from src.orchestrator.ops import (  # noqa: E402
     op_search,
     row_mentions,
 )
-from src.orchestrator.tools import TABLE_USED_BY_QUERY  # noqa: E402
+from src.orchestrator.tools import (  # noqa: E402
+    COLUMN_FILTERS_QUERY,
+    TABLE_USED_BY_QUERY,
+)
 from src.orchestrator.turn_engine import EngineSession  # noqa: E402
 from src.orchestrator.turn_engine import run_turn as engine_run_turn  # noqa: E402
 
@@ -91,6 +94,12 @@ FIXTURES = [
     {"family": "lineage",
      "question": "which metrics use the IP_SEPSIS table?",
      "oracle": "table_readers", "table": "IP_SEPSIS",
+     "max_rounds": 2, "expected_kind": "answered"},
+    # Columns work (2026-08-22, walk probe C2): filter blast radius —
+    # decision_to_column, never description mentions.
+    {"family": "lineage",
+     "question": "which metrics filter on the COMPILED_CONTEXT column?",
+     "oracle": "column_filters", "column": "COMPILED_CONTEXT",
      "max_rounds": 2, "expected_kind": "answered"},
     # Corpses from the 2026-08-20 evening trail:
     {"family": "topical_count",
@@ -226,6 +235,19 @@ def build_oracle(fixture: dict, run_kql) -> dict:
         assert readers, "oracle: table has no readers"
         return {"required_any": [readers],
                 "required_overlap": min(2, len(readers)),
+                "forbidden": []}
+    if kind == "column_filters":
+        rows = run_kql(COLUMN_FILTERS_QUERY,
+                       {"p_col": fixture["column"]})
+        names = sorted({
+            str(r.get("business_name") or r.get("ref") or "")
+            for r in rows
+            if str(r.get("column_name") or "").lower()
+            == fixture["column"].lower()})
+        names = [n for n in names if n]
+        assert names, "oracle: column has no filter sites"
+        return {"required_any": [names],
+                "required_overlap": min(2, len(names)),
                 "forbidden": []}
     if kind == "step_count":
         ops2 = _fresh_ops_session()
@@ -368,8 +390,8 @@ def paraphrases(question: str, n: int) -> "list[str]":
 # Pin bumped CONSCIOUSLY 2026-08-21 (walk find 4, recorded in the
 # Round-4 RESULTS log): ENGINE_TOOLS gained the `lineage` tool — the
 # readers-of-table primitive. SYSTEM_PROMPT unchanged.
-PINNED_PROMPT_SHA = ("fb085dcfb9e9aef0f206c596ec4ccd57"
-                     "adf6f900d975c7ca0a6a39fde22721ad")
+PINNED_PROMPT_SHA = ("e0cd5dfd2a955483b74d42ba7146364e"
+                     "e8fc2e0ac04202111313aa1c2f4ae25e")
 
 
 def main() -> None:

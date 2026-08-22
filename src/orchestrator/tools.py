@@ -132,6 +132,18 @@ TABLE_USED_BY_QUERY = (
 # backfill item 1, Sunny's 2026-08-21 order): the WHERE/CASE criteria
 # of one step, as first-class rows. Expression content passes the
 # ADR 0025 PHI gate before it enters any prompt.
+# Both decision queries join the sites' COLUMNS (columns work,
+# 2026-08-22, walk probe C3): decision_to_column targets are column
+# nodes whose name is the column name.
+_DECISION_COLUMNS_JOIN = (
+    "| join kind=leftouter (\n"
+    "    graph_edges | where edge_type == 'decision_to_column'\n"
+    "    | project node_id = source_id, col_id = target_id\n"
+    "    | join kind=leftouter (graph_nodes\n"
+    "        | project col_id = node_id, colname = name) on col_id\n"
+    "    | summarize columns = make_set(colname) by node_id) on node_id\n"
+)
+
 DECISIONS_OF_STEP_QUERY = (
     "declare query_parameters(p_step:string);\n"
     "graph_edges\n"
@@ -139,8 +151,52 @@ DECISIONS_OF_STEP_QUERY = (
     "| project node_id = target_id\n"
     "| join kind=inner (graph_nodes\n"
     "    | project node_id, name, description, properties) on node_id\n"
-    "| project node_id, name, description, properties\n"
+    + _DECISION_COLUMNS_JOIN +
+    "| project node_id, name, description, properties, columns\n"
     "| order by node_id asc"
+)
+
+# Column blast radius (columns work 2026-08-22, walk probes C2/D5):
+# which metrics FILTER on a column — decision sites are the only
+# column-grain relation in the graph (transform_to_technical reads
+# are table-grain, verified 2026-08-22: all 681 edges); SELECT-only
+# usage is not tracked at column grain, and results say so.
+COLUMN_FILTERS_QUERY = (
+    "declare query_parameters(p_col:string);\n"
+    "graph_nodes\n"
+    "| where node_id startswith 'tech:'\n"
+    "    and array_length(split(node_id, '.')) == 3\n"
+    "    and name contains p_col\n"
+    "| project col_id = node_id, column_name = name\n"
+    "| join kind=inner (graph_edges\n"
+    "    | where edge_type == 'decision_to_column'\n"
+    "    | project col_id = target_id, source_id) on col_id\n"
+    "| extend ['ref'] = tostring(split(source_id, ':')[1]),\n"
+    "         step_name = tostring(split(source_id, ':')[2])\n"
+    "| join kind=leftouter (semantic_catalog\n"
+    "    | where ['kind'] == 'metric'\n"
+    "    | project ['ref'], business_name) on ['ref']\n"
+    "| project column_name, ['ref'], business_name, step_name\n"
+    "| order by column_name asc, ['ref'] asc"
+)
+
+# The table record (walk probe D4): a table's columns, from the
+# dictionary-derived table_to_column edges — never parsed from SQL
+# text at ask time.
+TABLE_COLUMNS_QUERY = (
+    "declare query_parameters(p_table:string);\n"
+    "graph_nodes\n"
+    "| where node_id startswith 'tech:'\n"
+    "    and array_length(split(node_id, '.')) == 2\n"
+    "    and name contains p_table\n"
+    "| project table_id = node_id, table_name = name\n"
+    "| join kind=leftouter (graph_edges\n"
+    "    | where edge_type == 'table_to_column'\n"
+    "    | project table_id = source_id, col_id = target_id) on table_id\n"
+    "| join kind=leftouter (graph_nodes\n"
+    "    | project col_id = node_id, column_name = name) on col_id\n"
+    "| project table_id, table_name, column_name\n"
+    "| order by table_name asc, column_name asc"
 )
 
 # One aggregate per metric: how many decision sites its steps carry
@@ -167,7 +223,8 @@ DECISIONS_OF_METRIC_QUERY = (
     "graph_nodes\n"
     "| where node_id startswith strcat('decision:', p_ref, ':')\n"
     "| extend pc = tolong(todynamic(properties).predicate_count)\n"
-    "| project node_id, name, description, properties, pc\n"
+    + _DECISION_COLUMNS_JOIN +
+    "| project node_id, name, description, properties, pc, columns\n"
     "| order by pc desc, node_id asc\n"
     "| take 12"
 )

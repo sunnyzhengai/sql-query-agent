@@ -55,11 +55,14 @@ REACHABILITY = (
             "identity note on honest-empty results (1.50.7)",
      "ops": (), "queries": ("TABLE_USED_BY_QUERY",),
      "marker": "tech:"},
-    {"payload": "node:technical:column", "status": "excluded",
-     "reason": "queued third in Sunny's 2026-08-21 order — the "
-               "blast-radius op ('which metrics touch PATIENTMRN'); "
-               "columns appear today only inside displayed SQL "
-               "fragments"},
+    {"payload": "node:technical:column", "status": "reachable",
+     "via": "columns work (2026-08-22): filter blast radius via "
+            "lineage(column=), table records list columns, decision "
+            "sites carry their columns. SELECT-only column usage is "
+            "not tracked (reads are table-grain, verified live) and "
+            "results say so",
+     "ops": ("_column_filters",), "queries": ("COLUMN_FILTERS_QUERY",),
+     "marker": "decision_to_column"},
     {"payload": "node:decision", "status": "reachable",
      "via": "INLINE on metric records (top sites + exact total, M2 "
             "design pass 2026-08-21) and full sites on step retrieve "
@@ -92,16 +95,21 @@ REACHABILITY = (
      "via": "first-class lineage op + the identity note (1.53.x)",
      "ops": (), "queries": ("TABLE_USED_BY_QUERY",),
      "marker": "transform_to_technical"},
-    {"payload": "edge:table_to_column", "status": "excluded",
-     "reason": "queued with the column work (third in Sunny's "
-               "2026-08-21 order)"},
+    {"payload": "edge:table_to_column", "status": "reachable",
+     "via": "table records on retrieve list the dictionary-derived "
+            "columns (walk D4, 2026-08-22)",
+     "ops": ("_table_record",), "queries": ("TABLE_COLUMNS_QUERY",),
+     "marker": "table_to_column"},
     {"payload": "edge:step_to_decision", "status": "reachable",
      "via": "step retrieve traverses it to attach decision sites",
      "ops": (), "queries": ("DECISIONS_OF_STEP_QUERY",),
      "marker": "step_to_decision"},
-    {"payload": "edge:decision_to_column", "status": "excluded",
-     "reason": "decision→column blast radius; queued with the column "
-               "work"},
+    {"payload": "edge:decision_to_column", "status": "reachable",
+     "via": "both directions (2026-08-22): lineage(column=) reverse "
+            "blast radius; decision-site rows carry their columns "
+            "forward (walk C2/C3)",
+     "ops": ("_column_filters",), "queries": ("COLUMN_FILTERS_QUERY",),
+     "marker": "decision_to_column"},
     {"payload": "edge:decision_to_step", "status": "excluded",
      "reason": "decision→step filter-through lineage; queued with the "
                "column work"},
@@ -120,7 +128,10 @@ REACHABILITY = (
      "ops": (), "queries": ("LINKS_OF_REPORT_QUERY",),
      "marker": "report_to_measure"},
     {"payload": "edge:measure_to_column", "status": "excluded",
-     "reason": "measure→column lineage; queued with the column work"},
+     "reason": "edge type defined but ZERO rows in this corpus "
+               "(verified live 2026-08-22) — measure column refs are "
+               "an ingestion gap, not an ask-surface gap; walk E5 "
+               "grades honest-empty"},
     {"payload": "edge:uses_table", "status": "excluded",
      "reason": "materialized metric→table closure unused by the "
                "ask-surface — table identity resolves live via "

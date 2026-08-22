@@ -404,8 +404,8 @@ def test_system_prompt_is_invariants_only_no_casebook():
 # prompt surface too); content change = census/search description
 # sharpening (tool-property statements, no question shapes).
 # Pin bumped CONSCIOUSLY 2026-08-21 (walk find 4): +lineage tool.
-PINNED_PROMPT_SHA = ("fb085dcfb9e9aef0f206c596ec4ccd57"
-                     "adf6f900d975c7ca0a6a39fde22721ad")
+PINNED_PROMPT_SHA = ("e0cd5dfd2a955483b74d42ba7146364e"
+                     "e8fc2e0ac04202111313aa1c2f4ae25e")
 
 
 class TestPGroup:

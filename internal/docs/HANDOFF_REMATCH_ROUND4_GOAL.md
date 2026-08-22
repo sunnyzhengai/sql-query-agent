@@ -635,3 +635,26 @@ generate-from-registry instruction recorded. Oracles verified live
 HOSPITAL_ENCOUNTERS readers ✓ · 122 steps ✓ · 427 sites ✓ · 5
 IP_SEPSIS readers ✓ · 28/2/29 kinds ✓ · D2 corrected 32→36 (Severe
 Sepsis Episodes reads 36 tables — the cited 32 was stale).
+
+### 2026-08-22 — COLUMNS WORK SHIPPED (1.55.0): registry rank 3, walk C2/C3/D4/D5 unblocked
+Store shapes verified FIRST: reads are table-grain (all 681 t2t
+edges), so the filter blast radius rides decision_to_column alone —
+and results SAY so ("SELECT-only usage is not tracked at column
+grain"); PATIENTMRN honestly 0 (selected, never filtered — the D5
+shape). measure_to_column: ZERO rows in this corpus → exclusion
+reason updated (ingestion gap, not ask-surface; E5 grades
+honest-empty). Delivered: (1) lineage(column=) — blast radius,
+exact-name scoped, complete, honest-empty note; (2) retrieve resolves
+user-named TABLES to records (columns from table_to_column + readers)
+— D4; (3) decision-site rows carry their columns — C3; (4) suite
+lineage family gains the COMPILED_CONTEXT filter fixture with a
+store-derived column_filters oracle. PIN BUMPED consciously (lineage
+schema gains column=): fb085dcf… → e0cd5dfd…. All five new/changed
+queries LIVE-PROBED before ship (the strata lesson applied): 27
+COMPILED_CONTEXT site-rows, IP_SEPSIS 17 column rows across 4
+name-cousin tables (exact-scoping applies), PATIENTMRN 0. Registry
+rows flipped: node:technical:column, edge:table_to_column,
+edge:decision_to_column. Still excluded: transform_to_transform (dep
+chains, unqueued pending Sunny), measure_to_column (empty corpus),
+decision_to_step. 957 tests green. Capacity left ACTIVE for Sunny's
+walk.

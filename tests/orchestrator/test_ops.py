@@ -417,8 +417,54 @@ class TestLineage:
         assert rs.rows == [] and rs.complete is True
 
     def test_blank_table_is_an_op_error(self):
-        with pytest.raises(OpError, match="table name"):
+        with pytest.raises(OpError, match="table or column"):
             op_lineage("  ", fake_kql, OpsSession())
+
+
+class TestColumnsWork:
+    """Columns work (registry rank 3, walk probes C2/C3/D4/D5,
+    Sunny's order 2026-08-22)."""
+
+    def test_column_blast_radius_via_decision_sites(self):
+        s = OpsSession()
+        rs = op_lineage("", fake_kql, s, column="SepsisDX")
+        assert rs.complete is True
+        assert "WHERE/CASE decision site on the column 'SepsisDX'" \
+            in rs.universe
+        assert {r["id"] for r in rs.rows} == {REF_A, REF_B}
+        assert all(r["filters_on_column"] == "SepsisDX"
+                   for r in rs.rows)
+
+    def test_unfiltered_column_is_honest_with_scope_note(self):
+        """D5 shape: PATIENTMRN is selected, never filtered — the
+        honest 0 states that SELECT-only usage is not column-
+        tracked."""
+        rs = op_lineage("", fake_kql, OpsSession(), column="PATIENTMRN")
+        assert rs.rows == []
+        assert "SELECT-only usage is not tracked" in rs.note
+
+    def test_table_and_column_together_is_an_op_error(self):
+        with pytest.raises(OpError, match="not both"):
+            op_lineage("T", fake_kql, OpsSession(), column="C")
+
+    def test_retrieve_resolves_a_user_named_table(self):
+        """D4: 'what columns does IP_SEPSIS have' — the table record,
+        columns from the dictionary edges, readers from lineage."""
+        s = OpsSession()
+        s.note_user("what columns does IP_SEPSIS have")
+        rs = op_retrieve(["IP_SEPSIS"], fake_kql, s)
+        row = rs.rows[0]
+        assert row["kind"] == "table"
+        assert row["columns"] == ["PATIENTMRN", "SepsisDX"]
+        assert "ED Sepsis Screening" in row["read_by"]
+
+    def test_step_sites_carry_their_columns(self):
+        """C3: the site names the columns its predicates decide on."""
+        s = OpsSession()
+        s.surfaced.add(STEP_1)
+        rs = op_retrieve([STEP_1], fake_kql, s)
+        assert rs.rows[0]["decisions"][0]["columns"] == [
+            "PatientName", "SepsisDX"]
 
 
 class TestReportLinks:

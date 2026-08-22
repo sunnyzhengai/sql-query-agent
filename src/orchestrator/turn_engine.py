@@ -112,13 +112,18 @@ ENGINE_TOOLS = [
             "required": ["ids"]}}},
     {"type": "function", "function": {
         "name": "lineage",
-        "description": ("Which certified metrics READ a warehouse "
-                        "table — the uses relation from parsed SQL "
-                        "lineage edges, never name mentions. The "
-                        "result is complete and its count exact."),
+        "description": ("Structural lineage, never name mentions; "
+                        "give exactly one parameter. table=: which "
+                        "certified metrics READ that warehouse table "
+                        "(parsed SQL lineage edges). column=: which "
+                        "metrics FILTER on that column via WHERE/CASE "
+                        "decision sites — SELECT-only usage is not "
+                        "tracked at column grain. Results are "
+                        "complete, counts exact."),
         "parameters": {"type": "object", "properties": {
-            "table": {"type": "string"}},
-            "required": ["table"]}}},
+            "table": {"type": "string"},
+            "column": {"type": "string"}},
+            "required": []}}},
     {"type": "function", "function": {
         "name": "compare",
         "description": ("Deterministic comparison over prior result "
@@ -187,7 +192,9 @@ def _run_op(name: str, args: dict, run_kql, ops: OpsSession):
         return op_retrieve([str(i) for i in (args.get("ids") or [])],
                            run_kql, ops)
     if name == "lineage":
-        return op_lineage(str(args.get("table", "")), run_kql, ops)
+        return op_lineage(str(args.get("table", "") or ""), run_kql,
+                          ops, column=(str(args["column"])
+                                       if args.get("column") else None))
     if name == "compare":
         return op_compare([str(r) for r in (args.get("refs") or [])],
                           args.get("aspect"), run_kql, ops)

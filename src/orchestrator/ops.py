@@ -29,6 +29,7 @@ from src.orchestrator.core import resolve
 from src.orchestrator.tools import (
     BATCH_FRAGMENTS_QUERY,
     CATALOG_KINDS,
+    COLUMN_FILTERS_QUERY,
     DECISION_COUNT_QUERY,
     DECISIONS_OF_METRIC_QUERY,
     DECISIONS_OF_STEP_QUERY,
@@ -39,6 +40,7 @@ from src.orchestrator.tools import (
     NAME_CONTAINS_TOKENS_QUERY,
     REPORTS_OF_METRIC_QUERY,
     STEPS_OF_QUERY,
+    TABLE_COLUMNS_QUERY,
     TABLE_USED_BY_QUERY,
     _cap,
     _content_key,
@@ -418,11 +420,17 @@ def _shape_decision(d: dict) -> dict:
             if f.disposition == "redact"]
         if findings:
             expr = redact(expr, findings)
+    cols = d.get("columns")
+    if isinstance(cols, str):
+        cols = json.loads(cols or "[]")
     return {"id": d["node_id"],
             "step": props.get("step_name"),
             "context": props.get("context"),
             "predicate_count": props.get("predicate_count"),
-            "expression_sql": expr}
+            "expression_sql": expr,
+            # columns work 2026-08-22 (walk C3): the site names the
+            # columns its predicates decide on — resolved edges only
+            "columns": sorted(str(x) for x in (cols or []) if x)}
 
 
 def _decisions_of(step_id: str, run_kql) -> "list[dict]":
@@ -433,16 +441,66 @@ def _decisions_of(step_id: str, run_kql) -> "list[dict]":
                              {"p_step": step_id})]
 
 
-def op_lineage(table: str, run_kql, session: OpsSession) -> ResultSet:
+def _column_filters(column: str, run_kql, session: OpsSession) -> ResultSet:
+    """The column blast radius (columns work 2026-08-22, walk probes
+    C2/D5): which metrics FILTER on a column — decision_to_column is
+    the only column-grain relation in the graph (reads are
+    table-grain, verified live), and the universe says so."""
+    clean = column.strip()
+    rows = list(run_kql(COLUMN_FILTERS_QUERY, {"p_col": clean}))
+    exact = [r for r in rows
+             if str(r.get("column_name") or "").lower() == clean.lower()]
+    scoped = exact or rows
+    out, have = [], set()
+    for r in scoped:
+        rid = str(r.get("ref") or "")
+        if not rid:
+            continue
+        key = (str(r.get("column_name")), rid)
+        if key in have:
+            continue
+        have.add(key)
+        out.append({"id": rid, "kind": "metric",
+                    "name": rid.rsplit(".", 1)[-1],
+                    "business_name": r.get("business_name") or None,
+                    "of_metric": None,
+                    "filters_on_column": r.get("column_name"),
+                    "at_step": r.get("step_name")})
+    scope_word = ("the column" if exact
+                  else "a column whose name contains")
+    note = ("" if out else
+            f"No WHERE/CASE decision site references a column "
+            f"matching {clean!r}. SELECT-only usage is not tracked at "
+            "column grain — table-grain reads may still carry it.")
+    return session.register(
+        "lineage", {"column": clean},
+        _attach_cards(out, run_kql),
+        complete=True,
+        universe=(f"every certified metric with a WHERE/CASE decision "
+                  f"site on {scope_word} {clean!r} — from "
+                  "decision_to_column edges; SELECT-only usage is not "
+                  "tracked at column grain — the count is exact"),
+        note=note)
+
+
+def op_lineage(table: str, run_kql, session: OpsSession,
+               column: "str | None" = None) -> ResultSet:
     """Which certified metrics READ a table — the uses relation from
     parsed transform_to_technical edges, never name mentions. Walk
     find 4 (Sunny, 2026-08-21): 'is there any other metrics using
     IP_SEPSIS?' routed to a mention-census; lineage questions get a
     lineage primitive. Promoted from the reachability roadmap's
-    rank-3 item with a walk corpse attached."""
+    rank-3 item with a walk corpse attached.
+
+    column= (columns work 2026-08-22): the filter blast radius
+    instead — exactly one of table/column."""
+    if column and column.strip():
+        if table.strip():
+            raise OpError("lineage takes table OR column, not both")
+        return _column_filters(column, run_kql, session)
     clean = table.strip()
     if not clean:
-        raise OpError("lineage needs a table name")
+        raise OpError("lineage needs a table or column name")
     rows = list(run_kql(TABLE_USED_BY_QUERY, {"p_phrase": clean}))
     # Exact-table scoping first (1.54.1 corpse: 'IP_SEPSIS' pulled 23
     # table-reader PAIRS across every table containing the phrase —
@@ -475,6 +533,39 @@ def op_lineage(table: str, run_kql, session: OpsSession) -> ResultSet:
         universe=(f"every certified metric whose calculation reads "
                   f"{scope_word} {clean!r} — from parsed SQL lineage "
                   "edges, never name mentions; the count is exact"))
+
+
+def _table_record(name: str, run_kql, session: OpsSession
+                  ) -> "list[dict]":
+    """The TABLE record (columns work 2026-08-22, walk probe D4): a
+    warehouse table's identity — its columns from the dictionary-
+    derived table_to_column edges, and its certified readers from
+    parsed lineage. Resolved by name, exact first."""
+    rows = list(run_kql(TABLE_COLUMNS_QUERY, {"p_table": name.strip()}))
+    exact = [r for r in rows
+             if str(r.get("table_name") or "").lower()
+             == name.strip().lower()]
+    scoped = exact or rows
+    tables: "dict[str, dict]" = {}
+    for r in scoped:
+        t = str(r.get("table_name") or "")
+        rec = tables.setdefault(t, {"id": str(r.get("table_id") or ""),
+                                    "kind": "table", "name": t,
+                                    "columns": []})
+        col = r.get("column_name")
+        if col and col not in rec["columns"]:
+            rec["columns"].append(str(col))
+    out = []
+    for t, rec in sorted(tables.items()):
+        readers = sorted({
+            str(u.get("business_name") or u.get("ref") or "")
+            for u in run_kql(TABLE_USED_BY_QUERY, {"p_phrase": t})
+            if str(u.get("table_name") or "").lower() == t.lower()})
+        rec["columns"] = sorted(rec["columns"])
+        rec["read_by"] = [x for x in readers if x]
+        session.surfaced.add(rec["id"])
+        out.append(rec)
+    return out
 
 
 def op_retrieve(ids: "list[str]", run_kql, session: OpsSession) -> ResultSet:
@@ -516,7 +607,18 @@ def op_retrieve(ids: "list[str]", run_kql, session: OpsSession) -> ResultSet:
                     row.update(links)
                 rows.append(row)
             else:
-                fs = assemble_metric(an_id, run_kql)
+                try:
+                    fs = assemble_metric(an_id, run_kql)
+                except AssemblyError:
+                    # Not a metric ref — resolve as a TABLE by name
+                    # (columns work 2026-08-22, walk D4: 'what columns
+                    # does IP_SEPSIS have'); if that also misses, the
+                    # original honest note stands.
+                    trecs = _table_record(an_id, run_kql, session)
+                    if not trecs:
+                        raise
+                    rows.extend(trecs)
+                    continue
                 steps = run_kql(STEPS_OF_QUERY, {"p_ref": an_id})
                 step_rows = [{"id": s["node_id"], "name": s["name"]}
                              for s in steps]

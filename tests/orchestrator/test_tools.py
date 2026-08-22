@@ -9,6 +9,7 @@ from src.orchestrator.assemble import METRIC_FACTS_QUERY, NODE_FACTS_QUERY
 from src.orchestrator.core import RESOLVE_QUERY
 from src.orchestrator.tools import (
     BATCH_FRAGMENTS_QUERY,
+    COLUMN_FILTERS_QUERY,
     DECISION_COUNT_QUERY,
     DECISIONS_OF_METRIC_QUERY,
     DECISIONS_OF_STEP_QUERY,
@@ -19,6 +20,7 @@ from src.orchestrator.tools import (
     NAME_CONTAINS_TOKENS_QUERY,
     REPORTS_OF_METRIC_QUERY,
     STEPS_OF_QUERY,
+    TABLE_COLUMNS_QUERY,
     TABLE_USED_BY_QUERY,
     Session,
     ToolError,
@@ -95,6 +97,31 @@ def fake_kql(query, params):
                  "name": "Screen Rate"},
             ]
         return []
+    if query == COLUMN_FILTERS_QUERY:
+        p = params["p_col"].lower()
+        # the fake graph: SepsisDX filtered by both metrics' Scores
+        # steps; PATIENTMRN exists but is never filtered (the D5
+        # honest-empty shape)
+        if p in "sepsisdx":
+            return [
+                {"column_name": "SepsisDX", "ref": REF_A,
+                 "business_name": "ED Sepsis Screening",
+                 "step_name": "Scores"},
+                {"column_name": "SepsisDX", "ref": REF_B,
+                 "business_name": "ED Sepsis (Regulatory)",
+                 "step_name": "Scores"},
+            ]
+        return []
+    if query == TABLE_COLUMNS_QUERY:
+        p = params["p_table"].lower()
+        if p in "ip_sepsis":
+            return [
+                {"table_id": "tech:dbo.ip_sepsis",
+                 "table_name": "IP_SEPSIS", "column_name": "PATIENTMRN"},
+                {"table_id": "tech:dbo.ip_sepsis",
+                 "table_name": "IP_SEPSIS", "column_name": "SepsisDX"},
+            ]
+        return []
     if query == DECISION_COUNT_QUERY:
         n = 1 if params["p_ref"] == REF_A else 0
         return [{"Count": n}]
@@ -111,6 +138,7 @@ def fake_kql(query, params):
                     "expression_sql":
                         "PatientName = 'John Smith' AND SepsisDX = 1",
                 }),
+                "columns": ["SepsisDX", "PatientName"],
             }]
         return []
     if query == DECISIONS_OF_STEP_QUERY:
@@ -126,6 +154,7 @@ def fake_kql(query, params):
                     "expression_sql":
                         "PatientName = 'John Smith' AND SepsisDX = 1",
                 }),
+                "columns": ["SepsisDX", "PatientName"],
             }]
         return []
     if query == TABLE_USED_BY_QUERY:
