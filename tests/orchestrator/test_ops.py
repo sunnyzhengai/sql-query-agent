@@ -398,6 +398,20 @@ class TestLineage:
         assert all(r["reads_table"] == "IP_SEPSIS" for r in rs.rows)
         assert s.permitted(REF_A)          # readers surfaced for hops
 
+    def test_exact_table_scopes_out_name_cousins(self):
+        """1.54.1 corpse: 'IP_SEPSIS' pulled reader pairs for every
+        table CONTAINING the phrase; the caption computed the true
+        count itself and was floored for it. Exact match scopes to
+        that table's readers alone."""
+        rs = op_lineage("IP_SEPSIS", fake_kql, OpsSession())
+        assert "reads the table 'IP_SEPSIS'" in rs.universe
+        assert all(r["reads_table"] == "IP_SEPSIS" for r in rs.rows)
+
+    def test_partial_phrase_falls_back_to_containment(self):
+        rs = op_lineage("IP_SEP", fake_kql, OpsSession())
+        assert rs.rows
+        assert "whose name contains 'IP_SEP'" in rs.universe
+
     def test_unknown_table_is_an_honest_empty(self):
         rs = op_lineage("zzz", fake_kql, OpsSession())
         assert rs.rows == [] and rs.complete is True

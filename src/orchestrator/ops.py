@@ -440,10 +440,22 @@ def op_lineage(table: str, run_kql, session: OpsSession) -> ResultSet:
     IP_SEPSIS?' routed to a mention-census; lineage questions get a
     lineage primitive. Promoted from the reachability roadmap's
     rank-3 item with a walk corpse attached."""
-    if not table.strip():
+    clean = table.strip()
+    if not clean:
         raise OpError("lineage needs a table name")
+    rows = list(run_kql(TABLE_USED_BY_QUERY, {"p_phrase": clean}))
+    # Exact-table scoping first (1.54.1 corpse: 'IP_SEPSIS' pulled 23
+    # table-reader PAIRS across every table containing the phrase —
+    # the caption then computed the true per-table count itself and
+    # was floored for it, flailing into a dishonest turn). When a
+    # table matches exactly, the result is ITS readers — the count on
+    # screen is the answer; containment stays as the fallback for
+    # partial phrases.
+    exact = [r for r in rows
+             if str(r.get("table_name") or "").lower() == clean.lower()]
+    scoped = exact or rows
     out, have = [], set()
-    for r in run_kql(TABLE_USED_BY_QUERY, {"p_phrase": table.strip()}):
+    for r in scoped:
         rid = str(r.get("ref") or "")
         key = (str(r.get("table_name")), rid)
         if not rid or key in have:
@@ -454,14 +466,15 @@ def op_lineage(table: str, run_kql, session: OpsSession) -> ResultSet:
                     "business_name": r.get("business_name") or None,
                     "of_metric": None,
                     "reads_table": r.get("table_name")})
+    scope_word = ("the table" if exact
+                  else "a table whose name contains")
     return session.register(
-        "lineage", {"table": table.strip()},
+        "lineage", {"table": clean},
         _attach_cards(out, run_kql),
         complete=True,
-        universe=(f"every certified metric whose calculation reads a "
-                  f"table matching {table.strip()!r} — from parsed "
-                  "SQL lineage edges, never name mentions; the count "
-                  "is exact"))
+        universe=(f"every certified metric whose calculation reads "
+                  f"{scope_word} {clean!r} — from parsed SQL lineage "
+                  "edges, never name mentions; the count is exact"))
 
 
 def op_retrieve(ids: "list[str]", run_kql, session: OpsSession) -> ResultSet:
