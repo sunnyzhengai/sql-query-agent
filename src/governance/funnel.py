@@ -63,7 +63,17 @@ def funnel_lines(rows: "list[dict]") -> "list[str]":
     for r in rows:
         arrow = f"  {r['stage']}: {r['in_count']} -> {r['out_count']}"
         if r["fell_off"]:
-            arrow += f"  ({r['fell_off']} fell off — {r['reasons']})"
+            # The drill-down key travels WITH the number (field find
+            # 2026-08-22, Sunny: the funnel said 060_ingest_semantic_
+            # models, the fallout rows said 060_partition_parse — she
+            # followed the funnel's own stage string into ops_fallout
+            # and found nothing. Sub-stage labels are informative;
+            # the printed line now states the query that works.)
+            prefix = r["stage"].split("_", 1)[0] + "_"
+            where = r.get("derived_from") or "ops_fallout"
+            arrow += (f"  ({r['fell_off']} fell off — {r['reasons']}; "
+                      f"drill: {where} WHERE stage LIKE "
+                      f"'{prefix}%')")
         lines.append(arrow)
     return lines
 

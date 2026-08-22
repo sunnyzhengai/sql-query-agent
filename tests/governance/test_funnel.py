@@ -57,3 +57,27 @@ class TestReasonsFromFallout:
 
     def test_absent_stage_is_empty(self):
         assert reasons_from_fallout([], "200_parse") == {}
+
+
+class TestDrillHint:
+    """Field find (Sunny, 2026-08-22): the funnel named the stage
+    060_ingest_semantic_models; the fallout rows carried the sub-stage
+    060_partition_parse — following the funnel's own string into
+    ops_fallout found nothing. The printed line now carries the query
+    that works."""
+
+    def test_fell_off_line_carries_the_drill_query(self):
+        from src.governance.funnel import FunnelStage, funnel_lines, funnel_rows
+        rows = funnel_rows([FunnelStage(
+            stage="060_ingest_semantic_models", in_count=11,
+            out_count=10,
+            reasons={"non_sql_source:Web.Contents": 1},
+            derived_from="ops_fallout")], run_at="t")
+        line = funnel_lines(rows)[1]
+        assert "drill: ops_fallout WHERE stage LIKE '060_%'" in line
+
+    def test_clean_stage_has_no_drill_noise(self):
+        from src.governance.funnel import FunnelStage, funnel_lines, funnel_rows
+        rows = funnel_rows([FunnelStage(
+            stage="200_parse", in_count=28, out_count=28)], run_at="t")
+        assert "drill:" not in funnel_lines(rows)[1]

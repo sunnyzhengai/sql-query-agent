@@ -725,3 +725,15 @@ review-session design question, not a stamp. This is the stable
 board pending: Sunny's single pipeline pass (600 done on v6 —
 459 regenerated, gates busy and healthy; 500 pending on the 1.56.1
 env → projection edges), then the agent config runbook → Round 4.
+
+### 2026-08-22 — Field find during Sunny's pass: funnel drill-down key mismatch → 1.56.2
+Her 060 fell-off row was unfindable BY THE FUNNEL'S OWN STAGE STRING:
+the funnel says 060_ingest_semantic_models, the fallout rows carry
+sub-stages (060_partition_parse / 060_name_derivation). Error-
+contract violation: the admin followed the error to the contract and
+found nothing. 1.56.2: the printed funnel line now carries the drill
+query itself ("drill: ops_fallout WHERE stage LIKE '060_%'") — the
+key travels WITH the number. Display-only; ops_funnel schema
+unchanged. NOTE for Sunny: 1.56.2 wheel is in the env folder, but
+this is display-only — no need to republish mid-pass; it rides the
+next env update.
