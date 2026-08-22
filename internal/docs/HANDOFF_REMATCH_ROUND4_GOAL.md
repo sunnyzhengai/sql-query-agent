@@ -737,3 +737,10 @@ key travels WITH the number. Display-only; ops_funnel schema
 unchanged. NOTE for Sunny: 1.56.2 wheel is in the env folder, but
 this is display-only — no need to republish mid-pass; it rides the
 next env update.
+
+### 2026-08-22 — Ruling (Sunny): the Screening Trend SharePoint URL stays as is
+The demo CSV's Web.Contents URL in the public repo's
+ED Sepsis Screening Dashboard.SemanticModel is ACCEPTED — flagged,
+ruled, closed. Do not re-flag. (The 060 fallout row for that table is
+correct behavior and a demo beat: the funnel naming which dashboard
+feed doesn't trace to governed SQL.)
