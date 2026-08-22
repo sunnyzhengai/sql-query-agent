@@ -151,27 +151,38 @@ print("\nNext: run 100_install to verify state.")
 CLARITY_TBL_PATH = "abfss://<workspace>@onelake.dfs.fabric.microsoft.com/<lakehouse>.Lakehouse/Files/dictionaries/CLARITY_TBL.csv"
 CLARITY_COL_PATH = "abfss://<workspace>@onelake.dfs.fabric.microsoft.com/<lakehouse>.Lakehouse/Files/dictionaries/CLARITY_COL.csv"
 
-raw_tbl = spark.read.option("header", "true").csv(CLARITY_TBL_PATH)
-dict_tables_df = raw_tbl.selectExpr("TABLE_NAME", "TABLE_ID", "TABLE_INTRODUCTION as DESCRIPTION")
-print(f"Tables export: {dict_tables_df.count()} rows")
+# Run-all safety (2026-08-22): with the paths unconfigured this route
+# is a declared no-op, so a whole-notebook (API) run of the standard
+# CSV route cannot crash here — the skip is printed, never silent.
+if "<workspace>" in CLARITY_TBL_PATH:
+    print("Cell 2 skipped: raw-export route not configured "
+          "(placeholder paths). Cell 1 is the active route.")
+else:
+    raw_tbl = spark.read.option("header", "true").csv(CLARITY_TBL_PATH)
+    dict_tables_df = raw_tbl.selectExpr(
+        "TABLE_NAME", "TABLE_ID", "TABLE_INTRODUCTION as DESCRIPTION")
+    print(f"Tables export: {dict_tables_df.count()} rows")
 
-raw_col = spark.read.option("header", "true").csv(CLARITY_COL_PATH)
-dict_columns_df = (
-    raw_col
-    .join(dict_tables_df.select("TABLE_ID", "TABLE_NAME"), on="TABLE_ID", how="left")
-    .select("TABLE_NAME", "COLUMN_NAME", "DESCRIPTION")
-)
-print(f"Columns export: {dict_columns_df.count()} rows")
+    raw_col = spark.read.option("header", "true").csv(CLARITY_COL_PATH)
+    dict_columns_df = (
+        raw_col
+        .join(dict_tables_df.select("TABLE_ID", "TABLE_NAME"),
+              on="TABLE_ID", how="left")
+        .select("TABLE_NAME", "COLUMN_NAME", "DESCRIPTION")
+    )
+    print(f"Columns export: {dict_columns_df.count()} rows")
 
-# Clarity-export path: vendor dictionary by definition (T_D)
-dict_tables_df.selectExpr("TABLE_NAME", "DESCRIPTION", "'vendor' as ORIGIN") \
-    .write.format("delta").mode("overwrite") \
-    .option("overwriteSchema", "true").saveAsTable("input_dict_tables")
-dict_columns_df.write.format("delta").mode("overwrite") \
-    .option("overwriteSchema", "true").saveAsTable("input_dict_columns")
-print(f"Saved {spark.table('input_dict_tables').count()} tables, "
-      f"{spark.table('input_dict_columns').count()} columns")
-print("\nNext: 050_dict_caboodle (merge a second source) or 100_install to verify state.")
+    # Clarity-export path: vendor dictionary by definition (T_D)
+    dict_tables_df.selectExpr(
+        "TABLE_NAME", "DESCRIPTION", "'vendor' as ORIGIN") \
+        .write.format("delta").mode("overwrite") \
+        .option("overwriteSchema", "true").saveAsTable("input_dict_tables")
+    dict_columns_df.write.format("delta").mode("overwrite") \
+        .option("overwriteSchema", "true").saveAsTable("input_dict_columns")
+    print(f"Saved {spark.table('input_dict_tables').count()} tables, "
+          f"{spark.table('input_dict_columns').count()} columns")
+    print("\nNext: 050_dict_caboodle (merge a second source) or "
+          "100_install to verify state.")
 
 # METADATA ********************
 
