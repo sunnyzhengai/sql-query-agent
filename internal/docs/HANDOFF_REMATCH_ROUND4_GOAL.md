@@ -713,3 +713,15 @@ capability pressure, standing) · anaphora 0.75 (M2 residual). RERUN
 next; lesson recorded: every op that takes a user phrase inherits the
 token-matching law AT BIRTH — it is now in the lineage op's docstring
 where the next op author will read it.
+
+### 2026-08-22 — 1.56.1 re-earn: honesty 1.00 everywhere; LINEAGE 1.00 (n=12)
+census 1.00 · definition 1.00 · bridge 0.92 PASS · lineage 1.00
+(token matching + stamped names — both subfamilies perfect, the ED
+corpse dead) · topical 1.00 · sql_request 1.00 · anaphora 1.00 —
+honesty 1.00 EVERYWHERE, telemetry 0, CI GREEN. Only drilldown 0.33
+BELOW: the standing grain-gate capability pressure (Sunny's find-1
+fixture), whose remedy is the model reaching the inline sites —
+review-session design question, not a stamp. This is the stable
+board pending: Sunny's single pipeline pass (600 done on v6 —
+459 regenerated, gates busy and healthy; 500 pending on the 1.56.1
+env → projection edges), then the agent config runbook → Round 4.
