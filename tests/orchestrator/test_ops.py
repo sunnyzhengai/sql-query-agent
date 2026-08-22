@@ -353,6 +353,21 @@ class TestDecisionLayer:
         assert "John Smith" not in expr
         assert "<NAME>" in expr
 
+    def test_metric_record_carries_inline_decision_sites(self):
+        """M2 design pass (2026-08-21): drill-down needs ZERO hops —
+        the metric record carries its top decision sites, PHI-gated,
+        with the exact total beside them."""
+        s = OpsSession()
+        s.surfaced.add(REF_A)
+        rs = op_retrieve([REF_A], fake_kql, s)
+        row = rs.rows[0]
+        sites = row["decision_sites"]
+        assert sites and sites[0]["context"] == "WHERE"
+        assert sites[0]["step"] == "Scores"
+        assert "SepsisDX = 1" in sites[0]["expression_sql"]
+        assert "John Smith" not in sites[0]["expression_sql"]  # PHI
+        assert row["decision_count"] == 1                      # exact
+
     def test_metric_retrieve_carries_decision_count(self):
         """The pointer to hop 2 is data: the metric record counts its
         decision sites so the headline can stamp where criteria live."""

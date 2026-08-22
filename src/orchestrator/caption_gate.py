@@ -258,13 +258,20 @@ def stamped_headline(result: dict) -> str:
             head += (f" The record(s) list {step_total} calculation "
                      "step id(s) — criteria live in the step records, "
                      "not the summary.")
-        # Decision pointer (suite find 2026-08-21, post oracle
-        # tightening: the model retrieved the metric and summarized —
-        # the WHERE/CASE criteria live in decision sites attached to
-        # STEP records, and the count is data worth stamping).
+        # Decision evidence disclosure (M2 design pass 2026-08-21):
+        # the metric record carries its top decision sites INLINE —
+        # the stamp states the exact total and the shown cap (B3);
+        # the remainder lives in the step records.
         dec_total = sum(int(r.get("decision_count") or 0)
                         for r in (result.get("rows") or []))
-        if dec_total:
+        dec_shown = sum(len(r.get("decision_sites") or [])
+                        for r in (result.get("rows") or []))
+        if dec_total and dec_shown:
+            head += (f" {dec_total} decision site(s) carry the "
+                     f"WHERE/CASE criteria — the top {dec_shown} are "
+                     "ON THIS RECORD; the rest live in the step "
+                     "records.")
+        elif dec_total:
             head += (f" {dec_total} decision site(s) carry the "
                      "WHERE/CASE criteria — retrieve the step records "
                      "to read them.")

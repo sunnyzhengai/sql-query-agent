@@ -155,6 +155,24 @@ DECISION_COUNT_QUERY = (
     "| count"
 )
 
+# The metric's decision evidence, inline (M2 design pass 2026-08-21,
+# ADR 0018's move): the metric→decision closure is ALREADY
+# materialized by the ADR 0044 id scheme (decision:{metric}:{step}:
+# {site}) — this prefix query IS the closure, verified conserving
+# against step_to_decision (1831=1831, 0 orphans, live 2026-08-21).
+# Top sites by predicate weight, deterministic order; the cap is
+# constant in the query text (today's lesson: nontrivial parameter
+# types need live probes) and DISCLOSED in the stamped headline (B3).
+DECISIONS_OF_METRIC_QUERY = (
+    "declare query_parameters(p_ref:string);\n"
+    "graph_nodes\n"
+    "| where node_id startswith strcat('decision:', p_ref, ':')\n"
+    "| extend pc = tolong(todynamic(properties).predicate_count)\n"
+    "| project node_id, name, description, properties, pc\n"
+    "| order by pc desc, node_id asc\n"
+    "| take 12"
+)
+
 # Consumption-layer links (ADR 0040): deterministic edges from TMDL
 # partition lineage, exposed via the graph_edges shortcut.
 REPORTS_OF_METRIC_QUERY = (

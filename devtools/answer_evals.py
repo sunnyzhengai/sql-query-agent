@@ -432,7 +432,7 @@ def main() -> None:
         1 for d in _dump
         if d["grade"]["declared_answered"]
         and not d["grade"]["answer_ok"]
-        and any("retrieve the step records" in (o.get("headline") or "")
+        and any("the step records" in (o.get("headline") or "")
                 for o in d["outputs"]))
     print(f"(telemetry, M2) stamp-contradicting declarations: "
           f"{stamp_contra}")

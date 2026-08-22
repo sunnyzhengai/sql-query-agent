@@ -535,3 +535,28 @@ band-aided.
 §7 receipts row: STILL HELD — drilldown stabilized (1.00 × 2) but
 anaphora has not (1.00 → 0.75); the row's condition is both. Claim
 after measurement.
+
+### 2026-08-21 — M2 design pass executed (1.53.0): decision evidence rides the metric record, ZERO export changes
+DESIGN DEVIATION from the recommendation, argued: the metric→decision
+closure needs no new materialized edges — ADR 0044's id scheme
+(decision:{metric}:{step}:{site}) IS the closure, compiled at build
+time already; a prefix query traverses nothing. Verified conserving
+live BEFORE building: 1831 nodes = 1831 step_to_decision edges, 0
+orphans. Building duplicate edges would add a second truth AND force
+the second pipeline run Sunny asked to avoid.
+The §3b answers, as landed: (1) INVENTORY — metric records carry top
+sites inline + exact total (DECISIONS_OF_METRIC_QUERY, take 12,
+predicate-weight order, deterministic); step records keep full
+sites; reachability row updated. (2) CONSERVATION — shown ⊎ folded =
+exact total, stamped ("N sites — the top k are ON THIS RECORD; the
+rest live in the step records", B3); closure conservation asserted
+in the live audit (id-prefix count = edge count, 0 orphans → red
+run on divergence). (3) DRIFT — the audit's new leg + enum CI as
+before. PHI: inline expressions pass the same read-time gate
+(_shape_decision, L0-tested with a name literal).
+FOR SUNNY, per her rider: NO EXPORT CHANGES — republish whenever;
+one pipeline run, after this wheel (1.53.0) reaches the env, and the
+rerun's only export effect remains the decision redaction-at-rest
+already shipped in 1.51.x.
+Acceptance pending: anaphora ≥ bar with pin intact and zero new
+stamps/continuations (thesis-test form); telemetry counter → 0.

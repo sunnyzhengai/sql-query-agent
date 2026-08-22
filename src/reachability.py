@@ -61,10 +61,11 @@ REACHABILITY = (
                "columns appear today only inside displayed SQL "
                "fragments"},
     {"payload": "node:decision", "status": "reachable",
-     "via": "step retrieve attaches decision sites (context, "
-            "predicate count, PHI-redacted expression) — ADR 0052 "
-            "backfill item 1, landed 2026-08-21",
-     "ops": ("_decisions_of",), "queries": ("DECISIONS_OF_STEP_QUERY",),
+     "via": "INLINE on metric records (top sites + exact total, M2 "
+            "design pass 2026-08-21) and full sites on step retrieve "
+            "— context, predicate count, PHI-redacted expression",
+     "ops": ("_shape_decision",),
+     "queries": ("DECISIONS_OF_METRIC_QUERY", "DECISIONS_OF_STEP_QUERY"),
      "marker": "decision"},
     {"payload": "node:report", "status": "reachable",
      "via": "catalog search/census + full retrieve with parsed TMDL "

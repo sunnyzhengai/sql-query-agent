@@ -10,6 +10,7 @@ from src.orchestrator.core import RESOLVE_QUERY
 from src.orchestrator.tools import (
     BATCH_FRAGMENTS_QUERY,
     DECISION_COUNT_QUERY,
+    DECISIONS_OF_METRIC_QUERY,
     DECISIONS_OF_STEP_QUERY,
     FIND_BY_NAME_QUERY,
     LINKS_OF_REPORT_QUERY,
@@ -97,6 +98,21 @@ def fake_kql(query, params):
     if query == DECISION_COUNT_QUERY:
         n = 1 if params["p_ref"] == REF_A else 0
         return [{"Count": n}]
+    if query == DECISIONS_OF_METRIC_QUERY:
+        if params["p_ref"] == REF_A:
+            return [{
+                "node_id": f"decision:{REF_A}:Scores:w1",
+                "name": "Scores/WHERE",
+                "description": "filters scored rows",
+                "properties": json.dumps({
+                    "metric_id": REF_A, "step_name": "Scores",
+                    "site_id": "w1", "context": "WHERE",
+                    "predicate_count": 2,
+                    "expression_sql":
+                        "PatientName = 'John Smith' AND SepsisDX = 1",
+                }),
+            }]
+        return []
     if query == DECISIONS_OF_STEP_QUERY:
         if params["p_step"] == STEP_1:
             return [{

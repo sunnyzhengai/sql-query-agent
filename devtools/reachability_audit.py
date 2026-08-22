@@ -116,6 +116,30 @@ def main() -> None:
                         "the catalog and is not a "
                         f"{FINAL_SELECT} terminal — a vanished step")
 
+    # Decision-closure conservation (M2 design pass 2026-08-21): the
+    # metric→decision closure is the ADR 0044 id scheme — it conserves
+    # iff every decision node is reachable by exactly the
+    # step_to_decision edges (0037-style checkable-cache law).
+    n_dec_nodes = c.run(
+        "graph_nodes | where node_id startswith 'decision:' | count",
+        {})[0]["Count"]
+    n_dec_edges = c.run(
+        "graph_edges | where edge_type == 'step_to_decision' | count",
+        {})[0]["Count"]
+    n_orphans = c.run(
+        "graph_nodes | where node_id startswith 'decision:'\n"
+        "| join kind=leftanti (graph_edges "
+        "| where edge_type == 'step_to_decision' "
+        "| project node_id = target_id) on node_id | count",
+        {})[0]["Count"]
+    print(f"conservation: {n_dec_nodes} decision nodes = "
+          f"{n_dec_edges} step_to_decision edges, {n_orphans} orphans")
+    if n_dec_nodes != n_dec_edges or n_orphans:
+        failures.append(
+            "CONSERVATION: the decision id-prefix closure no longer "
+            "equals the step_to_decision edges — the inline metric "
+            "evidence would lie")
+
     if failures:
         print()
         for f in failures:

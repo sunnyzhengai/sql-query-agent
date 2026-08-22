@@ -30,6 +30,7 @@ from src.orchestrator.tools import (
     BATCH_FRAGMENTS_QUERY,
     CATALOG_KINDS,
     DECISION_COUNT_QUERY,
+    DECISIONS_OF_METRIC_QUERY,
     DECISIONS_OF_STEP_QUERY,
     FIND_BY_NAME_QUERY,
     LINKS_OF_REPORT_QUERY,
@@ -398,35 +399,38 @@ def op_census(kind: str, run_kql, session: OpsSession,
 
 # --- retrieve: one read primitive (facts + structure merged) ----------
 
+def _shape_decision(d: dict) -> dict:
+    """One decision-site row for the ask-path — READ-TIME PHI gate
+    (ADR 0025, Sunny's rider 2026-08-21): the export-side redactor
+    historically covered only transformation fragments, so decision
+    expression_sql in the store predates the gate — every expression
+    is scanned and redacted at the last point before it can enter an
+    ask-path prompt."""
+    from src.phi_scan import redact, scan_sql
+    props = d.get("properties")
+    if isinstance(props, str):
+        props = json.loads(props or "{}")
+    props = props or {}
+    expr = str(props.get("expression_sql") or "")
+    if expr:
+        findings = [
+            f for f in scan_sql(str(props.get("metric_id") or ""), expr)
+            if f.disposition == "redact"]
+        if findings:
+            expr = redact(expr, findings)
+    return {"id": d["node_id"],
+            "step": props.get("step_name"),
+            "context": props.get("context"),
+            "predicate_count": props.get("predicate_count"),
+            "expression_sql": expr}
+
+
 def _decisions_of(step_id: str, run_kql) -> "list[dict]":
     """The step's decision sites (ADR 0044 → ask-surface, ADR 0052
-    backfill item 1): context, predicate count, and the expression.
-
-    READ-TIME PHI gate (ADR 0025, Sunny's rider 2026-08-21): the
-    export-side redactor historically covered only transformation
-    fragments, so decision expression_sql in the store predates the
-    gate — every expression is scanned and redacted here, at the last
-    point before it can enter an ask-path prompt."""
-    from src.phi_scan import redact, scan_sql
-    out = []
-    for d in run_kql(DECISIONS_OF_STEP_QUERY, {"p_step": step_id}):
-        props = d.get("properties")
-        if isinstance(props, str):
-            props = json.loads(props or "{}")
-        props = props or {}
-        expr = str(props.get("expression_sql") or "")
-        if expr:
-            findings = [
-                f for f in scan_sql(str(props.get("metric_id") or ""),
-                                    expr)
-                if f.disposition == "redact"]
-            if findings:
-                expr = redact(expr, findings)
-        out.append({"id": d["node_id"],
-                    "context": props.get("context"),
-                    "predicate_count": props.get("predicate_count"),
-                    "expression_sql": expr})
-    return out
+    backfill item 1)."""
+    return [_shape_decision(d)
+            for d in run_kql(DECISIONS_OF_STEP_QUERY,
+                             {"p_step": step_id})]
 
 
 def op_retrieve(ids: "list[str]", run_kql, session: OpsSession) -> ResultSet:
@@ -481,10 +485,20 @@ def op_retrieve(ids: "list[str]", run_kql, session: OpsSession) -> ResultSet:
                 for r in reports:
                     session.surfaced.add(r["id"])
                 dc = run_kql(DECISION_COUNT_QUERY, {"p_ref": an_id})
+                # M2 design pass (2026-08-21): the metric record
+                # carries its decision evidence INLINE — the top sites
+                # by predicate weight, PHI-gated, with the exact total
+                # beside them — so drill-down needs ZERO further hops.
+                # The closure is the ADR 0044 id scheme itself; the
+                # cap is disclosed in the stamped headline (B3).
+                sites = [_shape_decision(d)
+                         for d in run_kql(DECISIONS_OF_METRIC_QUERY,
+                                          {"p_ref": an_id})]
                 rows.append({"id": an_id, "kind": "metric", **fs.facts,
                              "steps": step_rows, "reports": reports,
                              "decision_count":
-                                 (dc[0].get("Count", 0) if dc else 0)})
+                                 (dc[0].get("Count", 0) if dc else 0),
+                             "decision_sites": sites})
         except AssemblyError as e:
             notes.append(str(e))
     return session.register(
