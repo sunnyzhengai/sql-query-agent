@@ -407,10 +407,29 @@ class TestLineage:
         assert "reads the table 'IP_SEPSIS'" in rs.universe
         assert all(r["reads_table"] == "IP_SEPSIS" for r in rs.rows)
 
-    def test_partial_phrase_falls_back_to_containment(self):
-        rs = op_lineage("IP_SEP", fake_kql, OpsSession())
-        assert rs.rows
-        assert "whose name contains 'IP_SEP'" in rs.universe
+    def test_token_fallback_matches_whole_tokens(self):
+        """1.56.1 corpse: lineage(table='ED') substring-matched every
+        table containing 'ed' — 80 pairs read as '80 metrics', a
+        dishonest turn. The fallback is whole-token, like the census
+        learned in 1.50.4."""
+        rs = op_lineage("SEPSIS", fake_kql, OpsSession())
+        assert rs.rows                      # token of IP_SEPSIS
+        assert "whose name has the token 'SEPSIS'" in rs.universe
+        rs2 = op_lineage("EP", fake_kql, OpsSession())
+        assert rs2.rows == []               # substring of IP_SEPSIS only
+
+    def test_reader_names_are_stamped_in_the_note(self):
+        """1.56.1: the gate floored a caption for an invented
+        sub-count and the floor lost the reader names — small complete
+        results carry their names as machine truth."""
+        rs = op_lineage("IP_SEPSIS", fake_kql, OpsSession())
+        assert "2 distinct metric(s)" in rs.note
+        assert "ED Sepsis Screening" in rs.note
+
+    def test_column_note_pairs_relations_with_names(self):
+        rs = op_lineage("", fake_kql, OpsSession(), column="PATIENTMRN")
+        assert "Selects 'PATIENTMRN':" in rs.note
+        assert "ED Sepsis (Regulatory)" in rs.note
 
     def test_unknown_table_is_an_honest_empty(self):
         rs = op_lineage("zzz", fake_kql, OpsSession())

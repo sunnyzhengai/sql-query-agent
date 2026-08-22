@@ -693,3 +693,23 @@ resolution + Graph Model closure traversal), Basis-line discipline
 throughout. INSTALLATION_GUIDE Step 6 now prescribes exactly this, so
 the demo mirrors what customers build. Lesson from the correction
 carried: keyed on verified CONTENTS, not the item's name.
+
+### 2026-08-22 — 1.56.0 suite: honesty broke on the newest op → 1.56.1, per the law
+The corpse: mini reached for the NEW lineage tool with table='ED';
+the substring fallback matched every table CONTAINING 'ed' → 80
+reader-PAIRS captioned as "80 metrics" — declared, zero oracle
+facts, DISHONEST. The same substring disease the census was cured of
+in 1.50.4, reborn in the day-old op. Second find: the gate floored a
+lineage caption for an invented sub-count (correctly) and the floor
+then LOST the reader names — perfect data on screen, oracle zero.
+1.56.1: (a) lineage fallback is whole-token matching (both table and
+column paths — 'ED' matches ED_SEPSIS, never AGGREGATED); (b) small
+complete lineage results stamp their NAMES + distinct-metric counts
+into the note/headline, so the floor carries the answer ("2 distinct
+metric(s): A, B" / "Filters on X: A, B. Selects X: C"); pairs can no
+longer masquerade as metric counts. Board otherwise: bridge 1.00 ·
+census/definition/sql 1.00 · telemetry 0; drilldown 0.20 (grain gate
+capability pressure, standing) · anaphora 0.75 (M2 residual). RERUN
+next; lesson recorded: every op that takes a user phrase inherits the
+token-matching law AT BIRTH — it is now in the lineage op's docstring
+where the next op author will read it.

@@ -443,6 +443,15 @@ def _decisions_of(step_id: str, run_kql) -> "list[dict]":
                              {"p_step": step_id})]
 
 
+def _token_in(needle: str, text: str) -> bool:
+    """Whole-token containment — the row_mentions law for plain
+    values: 'ED' matches 'ED_SEPSIS' and 'ED Sepsis', never
+    'AGGREGATED' (underscores are token boundaries)."""
+    pat = re.compile(r"(?<![A-Za-z0-9])" + re.escape(needle.strip())
+                     + r"(?![A-Za-z0-9])", re.IGNORECASE)
+    return bool(pat.search(text or ""))
+
+
 def _column_usage(column: str, run_kql, session: OpsSession) -> ResultSet:
     """The column blast radius (columns work 2026-08-22, walk probes
     C2/D5; projection grain ordered by Sunny, ADR 0053): which metrics
@@ -457,9 +466,12 @@ def _column_usage(column: str, run_kql, session: OpsSession) -> ResultSet:
                    if str(r.get("column_name") or "").lower()
                    == clean.lower()}
     def scoped(rows):
-        ex = [r for r in rows
-              if str(r.get("column_name") or "") in exact_names]
-        return ex if exact_names else rows
+        if exact_names:
+            return [r for r in rows
+                    if str(r.get("column_name") or "") in exact_names]
+        # token fallback, never raw substring (the 1.56.1 'ED' corpse)
+        return [r for r in rows
+                if _token_in(clean, str(r.get("column_name") or ""))]
     out, have = [], set()
     for relation, rows in (("filters", scoped(frows)),
                            ("selects", scoped(srows))):
@@ -480,15 +492,28 @@ def _column_usage(column: str, run_kql, session: OpsSession) -> ResultSet:
                         "at_step": r.get("step_name")})
     scope_word = ("the column" if exact_names
                   else "a column whose name contains")
-    note = ""
+    # Machine-stamped relation summary with NAMES (1.56.1: the floor
+    # must carry the answer for small complete results).
+    parts = []
+    for relation, label in (("filters", "Filters on"),
+                            ("selects", "Selects")):
+        names = sorted({str(r.get("business_name") or r["id"])
+                        for r in out if r["relation"] == relation})
+        if names and len(names) <= 10:
+            parts.append(f"{label} {clean!r}: {', '.join(names)}.")
+        elif names:
+            parts.append(f"{label} {clean!r}: "
+                         f"{len(names)} metric(s).")
+    note = " ".join(parts)
     if not any(r["relation"] == "selects" for r in out):
         present = run_kql(PROJECTION_EDGES_COUNT_QUERY, {})
         n_proj = present[0].get("Count", 0) if present else 0
         if not n_proj:
-            note = ("Projection (selects) coverage is absent from "
-                    "this graph export — it predates the ADR 0053 "
-                    "edges; rerun the pipeline to mint them. Filter "
-                    "coverage above is current.")
+            note = (note + " " if note else "") + (
+                "Projection (selects) coverage is absent from "
+                "this graph export — it predates the ADR 0053 "
+                "edges; rerun the pipeline to mint them. Filter "
+                "coverage above is current.")
         elif not out:
             note = (f"No decision site filters on and no step selects "
                     f"a column matching {clean!r}.")
@@ -528,11 +553,16 @@ def op_lineage(table: str, run_kql, session: OpsSession,
     # the caption then computed the true per-table count itself and
     # was floored for it, flailing into a dishonest turn). When a
     # table matches exactly, the result is ITS readers — the count on
-    # screen is the answer; containment stays as the fallback for
-    # partial phrases.
+    # screen is the answer. The fallback is TOKEN matching, never raw
+    # substring (1.56.1 corpse: lineage(table='ED') matched every
+    # table CONTAINING 'ed' — 80 pairs read as '80 metrics', a
+    # dishonest turn; the census learned this lesson in 1.50.4 and
+    # the newest op relearned it).
     exact = [r for r in rows
              if str(r.get("table_name") or "").lower() == clean.lower()]
-    scoped = exact or rows
+    scoped = exact or [r for r in rows
+                       if _token_in(clean,
+                                    str(r.get("table_name") or ""))]
     out, have = [], set()
     for r in scoped:
         rid = str(r.get("ref") or "")
@@ -546,14 +576,31 @@ def op_lineage(table: str, run_kql, session: OpsSession,
                     "of_metric": None,
                     "reads_table": r.get("table_name")})
     scope_word = ("the table" if exact
-                  else "a table whose name contains")
+                  else "a table whose name has the token")
+    # The reader NAMES are machine truth worth stamping (1.56.1: the
+    # gate correctly floored a caption for an invented sub-count, and
+    # the floor then lost the reader names — headlines must carry the
+    # answer for small complete results).
+    distinct = sorted({str(r.get("business_name") or r["id"])
+                       for r in out})
+    n_tables = len({str(r.get("reads_table")) for r in out})
+    note = ""
+    if distinct and len(distinct) <= 10:
+        note = (f"{len(distinct)} distinct metric(s)"
+                + (f" across {n_tables} table(s)" if n_tables > 1
+                   else "")
+                + f": {', '.join(distinct)}.")
+    elif distinct:
+        note = (f"{len(distinct)} distinct metric(s) across "
+                f"{n_tables} table(s).")
     return session.register(
         "lineage", {"table": clean},
         _attach_cards(out, run_kql),
         complete=True,
         universe=(f"every certified metric whose calculation reads "
                   f"{scope_word} {clean!r} — from parsed SQL lineage "
-                  "edges, never name mentions; the count is exact"))
+                  "edges, never name mentions; the count is exact"),
+        note=note)
 
 
 def _table_record(name: str, run_kql, session: OpsSession
