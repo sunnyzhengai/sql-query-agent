@@ -49,6 +49,10 @@ class EdgeType(str, Enum):
     TRANSFORM_TO_TRANSFORM = "transform_to_transform"
     TRANSFORM_TO_TECHNICAL = "transform_to_technical"
     TABLE_TO_COLUMN = "table_to_column"
+    # Projection-grain column lineage (ADR 0053, Sunny's order
+    # 2026-08-22): the step's SELECT-list/fragment column refs,
+    # resolved against the dictionary — minted ⊎ dropped-counted.
+    TRANSFORM_TO_COLUMN = "transform_to_column"
     # Consumption layer (ADR 0040) — all deterministic, never guessed.
     # REPORT_TO_TECHNICAL covers DirectLake: the partition names a
     # warehouse TABLE directly, so the report attaches to the technical

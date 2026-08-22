@@ -124,6 +124,10 @@ def export_edge_tables(edges: list[GraphEdge]) -> dict[str, list[dict]]:
         EdgeType.STEP_TO_DECISION,
         EdgeType.DECISION_TO_COLUMN,
         EdgeType.DECISION_TO_STEP,
+        # ADR 0053: projection edges serve the ask-surface via
+        # graph_edges; the Fabric Graph read model gains them with
+        # the 0046 engine (same exclusion class as decision edges)
+        EdgeType.TRANSFORM_TO_COLUMN,
     }
 
     result: dict[str, list[dict]] = {name: [] for name in table_map.values()}

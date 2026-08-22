@@ -498,6 +498,16 @@ TRACE_REGISTRY = {
                   "tests/test_companion.py"],
         "docs": ["docs/architecture/SPEC.md", "docs/architecture/TRACE_MAP.md"],
     },
+    "0053": {
+        "title": "Projection-grain column lineage: transform_to_column "
+                 "edges, resolved-only, conservation-counted",
+        "category": "architecture",
+        "axioms": ["D1", "D4", "J2"],
+        "modules": ["src/graph/builder.py", "src/steps/build_graph.py"],
+        "tests": ["tests/graph/test_builder.py",
+                  "tests/orchestrator/test_ops.py"],
+        "docs": ["docs/decisions/0053-projection-column-lineage.md"],
+    },
     "0052": {
         "title": "The reachability contract: every graph payload "
                  "reachable by a named op or excluded with a reason",

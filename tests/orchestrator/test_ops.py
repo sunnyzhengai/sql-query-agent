@@ -429,19 +429,39 @@ class TestColumnsWork:
         s = OpsSession()
         rs = op_lineage("", fake_kql, s, column="SepsisDX")
         assert rs.complete is True
-        assert "WHERE/CASE decision site on the column 'SepsisDX'" \
-            in rs.universe
+        assert "FILTERS on" in rs.universe
+        assert "the column 'SepsisDX'" in rs.universe
         assert {r["id"] for r in rs.rows} == {REF_A, REF_B}
-        assert all(r["filters_on_column"] == "SepsisDX"
-                   for r in rs.rows)
+        assert all(r["relation"] == "filters" and
+                   r["column"] == "SepsisDX" for r in rs.rows)
 
-    def test_unfiltered_column_is_honest_with_scope_note(self):
-        """D5 shape: PATIENTMRN is selected, never filtered — the
-        honest 0 states that SELECT-only usage is not column-
-        tracked."""
+    def test_selected_by_these_filtered_by_none(self):
+        """Sunny's governance example (ADR 0053): 'PATIENTMRN is
+        selected by these metrics and filtered by none' — the pair is
+        the answer, from projection edges beside decision sites."""
         rs = op_lineage("", fake_kql, OpsSession(), column="PATIENTMRN")
-        assert rs.rows == []
-        assert "SELECT-only usage is not tracked" in rs.note
+        assert [r["relation"] for r in rs.rows] == ["selects", "selects"]
+        assert {r["id"] for r in rs.rows} == {REF_A, REF_B}
+        assert "FILTERS on" in rs.universe and "SELECTS" in rs.universe
+
+    def test_pre_0053_export_says_projection_absent(self):
+        """A graph export minted before ADR 0053 has zero projection
+        edges — 'selected by none' must not be claimed then."""
+        def kql(query, params):
+            from src.orchestrator.tools import (
+                COLUMN_SELECTS_QUERY as SQ,
+            )
+            from src.orchestrator.tools import (
+                PROJECTION_EDGES_COUNT_QUERY as PQ,
+            )
+            if query == PQ:
+                return [{"Count": 0}]
+            if query == SQ:
+                return []
+            return fake_kql(query, params)
+        rs = op_lineage("", kql, OpsSession(), column="PATIENTMRN")
+        assert rs.rows == []          # selects fake routed to count-0 path
+        assert "predates the ADR 0053 edges" in rs.note
 
     def test_table_and_column_together_is_an_op_error(self):
         with pytest.raises(OpError, match="not both"):

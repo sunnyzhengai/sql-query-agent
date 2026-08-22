@@ -30,6 +30,7 @@ from src.orchestrator.tools import (
     BATCH_FRAGMENTS_QUERY,
     CATALOG_KINDS,
     COLUMN_FILTERS_QUERY,
+    COLUMN_SELECTS_QUERY,
     DECISION_COUNT_QUERY,
     DECISIONS_OF_METRIC_QUERY,
     DECISIONS_OF_STEP_QUERY,
@@ -38,6 +39,7 @@ from src.orchestrator.tools import (
     LIST_CATALOG_QUERY,
     NAME_CONTAINS_QUERY,
     NAME_CONTAINS_TOKENS_QUERY,
+    PROJECTION_EDGES_COUNT_QUERY,
     REPORTS_OF_METRIC_QUERY,
     STEPS_OF_QUERY,
     TABLE_COLUMNS_QUERY,
@@ -441,45 +443,64 @@ def _decisions_of(step_id: str, run_kql) -> "list[dict]":
                              {"p_step": step_id})]
 
 
-def _column_filters(column: str, run_kql, session: OpsSession) -> ResultSet:
+def _column_usage(column: str, run_kql, session: OpsSession) -> ResultSet:
     """The column blast radius (columns work 2026-08-22, walk probes
-    C2/D5): which metrics FILTER on a column — decision_to_column is
-    the only column-grain relation in the graph (reads are
-    table-grain, verified live), and the universe says so."""
+    C2/D5; projection grain ordered by Sunny, ADR 0053): which metrics
+    FILTER on a column (decision_to_column) and which SELECT it
+    (transform_to_column) — the governance answer is the pair
+    ('selected by 9, filtered by none')."""
     clean = column.strip()
-    rows = list(run_kql(COLUMN_FILTERS_QUERY, {"p_col": clean}))
-    exact = [r for r in rows
-             if str(r.get("column_name") or "").lower() == clean.lower()]
-    scoped = exact or rows
+    frows = list(run_kql(COLUMN_FILTERS_QUERY, {"p_col": clean}))
+    srows = list(run_kql(COLUMN_SELECTS_QUERY, {"p_col": clean}))
+    exact_names = {str(r.get("column_name") or "")
+                   for r in frows + srows
+                   if str(r.get("column_name") or "").lower()
+                   == clean.lower()}
+    def scoped(rows):
+        ex = [r for r in rows
+              if str(r.get("column_name") or "") in exact_names]
+        return ex if exact_names else rows
     out, have = [], set()
-    for r in scoped:
-        rid = str(r.get("ref") or "")
-        if not rid:
-            continue
-        key = (str(r.get("column_name")), rid)
-        if key in have:
-            continue
-        have.add(key)
-        out.append({"id": rid, "kind": "metric",
-                    "name": rid.rsplit(".", 1)[-1],
-                    "business_name": r.get("business_name") or None,
-                    "of_metric": None,
-                    "filters_on_column": r.get("column_name"),
-                    "at_step": r.get("step_name")})
-    scope_word = ("the column" if exact
+    for relation, rows in (("filters", scoped(frows)),
+                           ("selects", scoped(srows))):
+        for r in rows:
+            rid = str(r.get("ref") or "")
+            if not rid:
+                continue
+            key = (relation, str(r.get("column_name")), rid)
+            if key in have:
+                continue
+            have.add(key)
+            out.append({"id": rid, "kind": "metric",
+                        "name": rid.rsplit(".", 1)[-1],
+                        "business_name": r.get("business_name") or None,
+                        "of_metric": None,
+                        "relation": relation,
+                        "column": r.get("column_name"),
+                        "at_step": r.get("step_name")})
+    scope_word = ("the column" if exact_names
                   else "a column whose name contains")
-    note = ("" if out else
-            f"No WHERE/CASE decision site references a column "
-            f"matching {clean!r}. SELECT-only usage is not tracked at "
-            "column grain — table-grain reads may still carry it.")
+    note = ""
+    if not any(r["relation"] == "selects" for r in out):
+        present = run_kql(PROJECTION_EDGES_COUNT_QUERY, {})
+        n_proj = present[0].get("Count", 0) if present else 0
+        if not n_proj:
+            note = ("Projection (selects) coverage is absent from "
+                    "this graph export — it predates the ADR 0053 "
+                    "edges; rerun the pipeline to mint them. Filter "
+                    "coverage above is current.")
+        elif not out:
+            note = (f"No decision site filters on and no step selects "
+                    f"a column matching {clean!r}.")
     return session.register(
         "lineage", {"column": clean},
         _attach_cards(out, run_kql),
         complete=True,
-        universe=(f"every certified metric with a WHERE/CASE decision "
-                  f"site on {scope_word} {clean!r} — from "
-                  "decision_to_column edges; SELECT-only usage is not "
-                  "tracked at column grain — the count is exact"),
+        universe=(f"every certified metric that FILTERS on "
+                  f"(decision_to_column) or SELECTS "
+                  f"(transform_to_column) {scope_word} {clean!r} — "
+                  "parsed lineage edges, never name mentions; counts "
+                  "are exact over recorded edges"),
         note=note)
 
 
@@ -497,7 +518,7 @@ def op_lineage(table: str, run_kql, session: OpsSession,
     if column and column.strip():
         if table.strip():
             raise OpError("lineage takes table OR column, not both")
-        return _column_filters(column, run_kql, session)
+        return _column_usage(column, run_kql, session)
     clean = table.strip()
     if not clean:
         raise OpError("lineage needs a table or column name")

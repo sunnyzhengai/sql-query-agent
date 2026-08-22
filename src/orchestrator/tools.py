@@ -180,6 +180,33 @@ COLUMN_FILTERS_QUERY = (
     "| order by column_name asc, ['ref'] asc"
 )
 
+# Projection-grain selection (ADR 0053): which metrics SELECT a
+# column — transform_to_column edges, minted resolved-only at build.
+COLUMN_SELECTS_QUERY = (
+    "declare query_parameters(p_col:string);\n"
+    "graph_nodes\n"
+    "| where node_id startswith 'tech:'\n"
+    "    and array_length(split(node_id, '.')) == 3\n"
+    "    and name contains p_col\n"
+    "| project col_id = node_id, column_name = name\n"
+    "| join kind=inner (graph_edges\n"
+    "    | where edge_type == 'transform_to_column'\n"
+    "    | project col_id = target_id, source_id) on col_id\n"
+    "| extend ['ref'] = tostring(split(source_id, ':')[1]),\n"
+    "         step_name = tostring(split(source_id, ':')[2])\n"
+    "| join kind=leftouter (semantic_catalog\n"
+    "    | where ['kind'] == 'metric'\n"
+    "    | project ['ref'], business_name) on ['ref']\n"
+    "| project column_name, ['ref'], business_name, step_name\n"
+    "| order by column_name asc, ['ref'] asc"
+)
+
+# Presence probe: a graph export that predates ADR 0053 has zero
+# projection edges — 'selected by none' must not be claimed then.
+PROJECTION_EDGES_COUNT_QUERY = (
+    "graph_edges | where edge_type == 'transform_to_column' | count"
+)
+
 # The table record (walk probe D4): a table's columns, from the
 # dictionary-derived table_to_column edges — never parsed from SQL
 # text at ask time.

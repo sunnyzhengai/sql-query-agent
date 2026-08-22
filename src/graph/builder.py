@@ -28,6 +28,13 @@ class GraphBuilder:
         # Lookup: simple table name → set of qualified node IDs
         # Used to match parsed table refs (which may lack schema) to dictionary nodes
         self._table_name_index: dict[str, set[str]] = {}
+        # Projection-grain column lineage (ADR 0053): conservation
+        # counters — refs = minted ⊎ dropped(reason), asserted by the
+        # build step. The ADR 0029 honesty pattern: resolved-only
+        # edges, every drop counted by reason, never absorbed.
+        self.projection_refs = 0
+        self.projection_minted = 0
+        self.projection_dropped: dict[str, int] = {}
 
     def add_technical_node(
         self, table: str, column: str | None = None, description: str = "",
@@ -220,6 +227,62 @@ class GraphBuilder:
             self.add_edge(report_id, node_id, EdgeType.REPORT_TO_MEASURE)
         return node_id
 
+    def _drop_projection(self, reason: str) -> None:
+        self.projection_dropped[reason] = (
+            self.projection_dropped.get(reason, 0) + 1)
+
+    def mint_projection_edges(
+        self, transform_id: str,
+        column_refs: "list", table_refs: "list",
+    ) -> None:
+        """Projection-grain column lineage (ADR 0053, §3b-designed):
+        mint transform→column edges for the fragment's column refs,
+        resolved against the DICTIONARY — an edge exists only when the
+        ref resolves to exactly one known column node.
+
+        Inventory of minting contexts (v1): the parser's per-step
+        column_refs (SELECT list + expressions of the fragment).
+        Conservation: every ref lands in minted or a counted drop
+        reason — unresolved_qualifier (alias/unknown table),
+        no_dictionary_column, ambiguous (unqualified, >1 candidate),
+        duplicate (already minted for this step)."""
+        seen: "set[tuple]" = set()
+        tables = [t for t in table_refs if isinstance(t, TableRef)]
+        for ref in column_refs:
+            self.projection_refs += 1
+            col = getattr(ref, "column", None)
+            if not col:
+                self._drop_projection("no_column_name")
+                continue
+            qual = (str(ref.table).split(".")[-1].upper()
+                    if getattr(ref, "table", None) else None)
+            cands = ([t for t in tables if t.table.upper() == qual]
+                     if qual else tables)
+            if qual and not cands:
+                self._drop_projection("unresolved_qualifier")
+                continue
+            hits: "set[str]" = set()
+            for t in cands:
+                tn = self._find_tech_node_id(t)
+                if tn is None:
+                    continue
+                cn = f"{tn}.{fold_identifier(col)}"
+                if cn in self.nodes:
+                    hits.add(cn)
+            if len(hits) == 1:
+                target = next(iter(hits))
+                if (transform_id, target) in seen:
+                    self._drop_projection("duplicate")
+                    continue
+                seen.add((transform_id, target))
+                self.add_edge(transform_id, target,
+                              EdgeType.TRANSFORM_TO_COLUMN)
+                self.projection_minted += 1
+            elif not hits:
+                self._drop_projection("no_dictionary_column")
+            else:
+                self._drop_projection("ambiguous")
+
     def add_edge(self, source_id: str, target_id: str, edge_type: EdgeType) -> None:
         """Add a directed edge between two nodes."""
         self.edges.append(GraphEdge(source_id=source_id, target_id=target_id, edge_type=edge_type))
@@ -250,6 +313,10 @@ class GraphBuilder:
                 if tech_id and tech_id in self.nodes:
                     self.add_edge(transform_id, tech_id, EdgeType.TRANSFORM_TO_TECHNICAL)
 
+            # Projection-grain column lineage (ADR 0053)
+            self.mint_projection_edges(transform_id, cte.column_refs,
+                                       cte.table_refs)
+
         # Find physical tables in the final SELECT that are NOT already
         # referenced by any CTE (those are already reachable via the CTE chain)
         cte_covered_tables = set()
@@ -269,6 +336,11 @@ class GraphBuilder:
                 tech_id = self._find_tech_node_id(table_ref) if isinstance(table_ref, TableRef) else f"tech:{table_ref}"
                 if tech_id and tech_id in self.nodes:
                     self.add_edge(final_id, tech_id, EdgeType.TRANSFORM_TO_TECHNICAL)
+            # Projection-grain column lineage for the final SELECT
+            # (ADR 0053) — resolved against the final tables only
+            self.mint_projection_edges(final_id,
+                                       parsed.final_select_columns,
+                                       parsed.final_select_tables)
 
         # Wire canonical -> entry point transform nodes
         canonical_id = f"canonical:{metric_id}"

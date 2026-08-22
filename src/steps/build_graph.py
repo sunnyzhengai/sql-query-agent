@@ -127,6 +127,11 @@ class BuildGraphOutput:
     tree_fallout_rows: "list[dict]" = field(default_factory=list)  # run_at stamped by caller
     decision_sites_extracted: int = 0
     decision_sites_unextracted: int = 0
+    # Projection-grain column lineage (ADR 0053): conservation —
+    # refs = minted ⊎ dropped(reason), asserted at build time
+    projection_refs: int = 0
+    projection_minted: int = 0
+    projection_dropped: "dict[str, int]" = field(default_factory=dict)
 
 
 def build_graph_step(
@@ -219,6 +224,14 @@ def build_graph_step(
     ]
     assert not dangling, f"build_graph_step: dangling edges: {dangling[:5]}"
 
+    # ADR 0053 conservation: every projection ref accounted for
+    assert builder.projection_refs == (
+        builder.projection_minted
+        + sum(builder.projection_dropped.values())), (
+        f"build_graph_step: projection refs {builder.projection_refs} "
+        f"!= minted {builder.projection_minted} + dropped "
+        f"{builder.projection_dropped}")
+
     return BuildGraphOutput(
         nodes_rows=nodes_to_row_dicts(builder.nodes),
         edges_rows=edges_to_row_dicts(builder.edges),
@@ -236,4 +249,7 @@ def build_graph_step(
             r["predicate_count"] for r in decision_rows
             if r["status"] == "extracted"),
         decision_sites_unextracted=len(tree_fallout_rows),
+        projection_refs=builder.projection_refs,
+        projection_minted=builder.projection_minted,
+        projection_dropped=dict(builder.projection_dropped),
     )

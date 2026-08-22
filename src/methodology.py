@@ -139,6 +139,8 @@ SYSTEM_VOCAB = frozenset({
     # edge types (graph contract)
     "canonical_to_transform", "transform_to_transform",
     "transform_to_technical",
+    # AMENDMENT 2026-08-22 (ADR 0053): projection-grain column edges
+    "transform_to_column",
     # tool/op names appearing in dispatch tables and basis stamping
     # ("census"/"list_catalog": AMENDMENT 2026-08-20 — the enumeration
     # primitive; catalog kinds are SYSTEM vocabulary, not user phrasing)

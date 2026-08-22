@@ -40,7 +40,10 @@ def export_step(nodes_rows: "list[dict]", edges_rows: "list[dict]") -> "dict[str
                          if n.layer == NodeLayer.DECISION)
     decision_edges = sum(1 for e in edges if e.edge_type in (
         EdgeType.STEP_TO_DECISION, EdgeType.DECISION_TO_COLUMN,
-        EdgeType.DECISION_TO_STEP))
+        EdgeType.DECISION_TO_STEP,
+        # ADR 0053 projection edges: graph_edges-only, same
+        # counted-exclusion class as the decision layer
+        EdgeType.TRANSFORM_TO_COLUMN))
     assert node_total == len(nodes) - decision_nodes, (
         f"export_step: {len(nodes)} nodes ({decision_nodes} decision-layer "
         f"excluded) -> {node_total} exported node rows"

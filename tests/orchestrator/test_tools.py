@@ -10,6 +10,7 @@ from src.orchestrator.core import RESOLVE_QUERY
 from src.orchestrator.tools import (
     BATCH_FRAGMENTS_QUERY,
     COLUMN_FILTERS_QUERY,
+    COLUMN_SELECTS_QUERY,
     DECISION_COUNT_QUERY,
     DECISIONS_OF_METRIC_QUERY,
     DECISIONS_OF_STEP_QUERY,
@@ -18,6 +19,7 @@ from src.orchestrator.tools import (
     LIST_CATALOG_QUERY,
     NAME_CONTAINS_QUERY,
     NAME_CONTAINS_TOKENS_QUERY,
+    PROJECTION_EDGES_COUNT_QUERY,
     REPORTS_OF_METRIC_QUERY,
     STEPS_OF_QUERY,
     TABLE_COLUMNS_QUERY,
@@ -112,6 +114,22 @@ def fake_kql(query, params):
                  "step_name": "Scores"},
             ]
         return []
+    if query == COLUMN_SELECTS_QUERY:
+        p = params["p_col"].lower()
+        # PATIENTMRN: selected by both metrics, filtered by none —
+        # Sunny's governance example (ADR 0053)
+        if p in "patientmrn":
+            return [
+                {"column_name": "PATIENTMRN", "ref": REF_A,
+                 "business_name": "ED Sepsis Screening",
+                 "step_name": "Scores"},
+                {"column_name": "PATIENTMRN", "ref": REF_B,
+                 "business_name": "ED Sepsis (Regulatory)",
+                 "step_name": "Labs"},
+            ]
+        return []
+    if query == PROJECTION_EDGES_COUNT_QUERY:
+        return [{"Count": 2}]
     if query == TABLE_COLUMNS_QUERY:
         p = params["p_table"].lower()
         if p in "ip_sepsis":

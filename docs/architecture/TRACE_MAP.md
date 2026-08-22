@@ -627,3 +627,16 @@ classification).
 - **Summarized in:**
   - `docs/decisions/0052-reachability-contract.md`
   - `docs/architecture/SPEC.md`
+
+## ADR 0053 — Projection-grain column lineage: transform_to_column edges, resolved-only, conservation-counted
+
+- **Category:** architecture
+- **Grounds:** spec:D1, spec:D4, spec:J2
+- **Implemented by:**
+  - `src/graph/builder.py`
+  - `src/steps/build_graph.py`
+- **Enforced by:**
+  - `tests/graph/test_builder.py`
+  - `tests/orchestrator/test_ops.py`
+- **Summarized in:**
+  - `docs/decisions/0053-projection-column-lineage.md`

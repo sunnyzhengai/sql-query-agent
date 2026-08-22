@@ -56,12 +56,11 @@ REACHABILITY = (
      "ops": (), "queries": ("TABLE_USED_BY_QUERY",),
      "marker": "tech:"},
     {"payload": "node:technical:column", "status": "reachable",
-     "via": "columns work (2026-08-22): filter blast radius via "
-            "lineage(column=), table records list columns, decision "
-            "sites carry their columns. SELECT-only column usage is "
-            "not tracked (reads are table-grain, verified live) and "
-            "results say so",
-     "ops": ("_column_filters",), "queries": ("COLUMN_FILTERS_QUERY",),
+     "via": "columns work (2026-08-22): lineage(column=) reports "
+            "FILTERS (decision sites) and SELECTS (ADR 0053 "
+            "projection edges) side by side; table records list "
+            "columns; decision sites carry their columns",
+     "ops": ("_column_usage",), "queries": ("COLUMN_FILTERS_QUERY",),
      "marker": "decision_to_column"},
     {"payload": "node:decision", "status": "reachable",
      "via": "INLINE on metric records (top sites + exact total, M2 "
@@ -88,13 +87,22 @@ REACHABILITY = (
      "ops": ("op_retrieve",), "queries": ("STEPS_OF_QUERY",),
      "marker": "step"},
     {"payload": "edge:transform_to_transform", "status": "excluded",
-     "reason": "step lineage chains (which steps feed step X) have no "
-               "traversal op; not yet queued — surface with the "
-               "column work if Sunny orders it"},
+     "reason": "step dep-chains (walk B3): PARKED BEHIND ROUND 4 by "
+               "Sunny (2026-08-22) — the metric-record step inventory "
+               "covers most dep-grain asks; revisit if the walk "
+               "surfaces real demand"},
     {"payload": "edge:transform_to_technical", "status": "reachable",
      "via": "first-class lineage op + the identity note (1.53.x)",
      "ops": (), "queries": ("TABLE_USED_BY_QUERY",),
      "marker": "transform_to_technical"},
+    {"payload": "edge:transform_to_column", "status": "reachable",
+     "via": "projection-grain selection (ADR 0053, ordered by Sunny "
+            "2026-08-22): lineage(column=) reports selects beside "
+            "filters; edges mint at graph build (resolved-only, "
+            "drops counted) — a pre-0053 export has none and the op "
+            "says so instead of claiming 'selected by none'",
+     "ops": ("_column_usage",), "queries": ("COLUMN_SELECTS_QUERY",),
+     "marker": "transform_to_column"},
     {"payload": "edge:table_to_column", "status": "reachable",
      "via": "table records on retrieve list the dictionary-derived "
             "columns (walk D4, 2026-08-22)",
@@ -108,11 +116,12 @@ REACHABILITY = (
      "via": "both directions (2026-08-22): lineage(column=) reverse "
             "blast radius; decision-site rows carry their columns "
             "forward (walk C2/C3)",
-     "ops": ("_column_filters",), "queries": ("COLUMN_FILTERS_QUERY",),
+     "ops": ("_column_usage",), "queries": ("COLUMN_FILTERS_QUERY",),
      "marker": "decision_to_column"},
     {"payload": "edge:decision_to_step", "status": "excluded",
-     "reason": "decision→step filter-through lineage; queued with the "
-               "column work"},
+     "reason": "decision→step filter-through lineage; not ordered "
+               "with the 2026-08-22 columns pass — revisit with the "
+               "0046 engine"},
     {"payload": "edge:report_to_canonical", "status": "reachable",
      "via": "both directions: metric retrieve lists reports; report "
             "retrieve lists executed metrics",

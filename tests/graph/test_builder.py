@@ -81,3 +81,83 @@ class TestGraphBuilder:
 
         # Should have edges
         assert len(gb.edges) > 0
+
+
+class TestProjectionEdges:
+    """ADR 0053 (ordered by Sunny, 2026-08-22): projection-grain
+    column lineage — transform→column edges minted resolved-only,
+    every ref conserved into minted or a counted drop reason."""
+
+    def _builder(self):
+        from src.graph.builder import GraphBuilder
+        b = GraphBuilder()
+        b.add_technical_node("IP_SEPSIS", schema="dbo")
+        b.add_technical_node("IP_SEPSIS", column="PATIENTMRN",
+                             schema="dbo")
+        b.add_technical_node("IP_SEPSIS", column="SepsisDX",
+                             schema="dbo")
+        b.add_technical_node("ADT_EVENTS", schema="dbo")
+        b.add_technical_node("ADT_EVENTS", column="SepsisDX",
+                             schema="dbo")
+        return b
+
+    def _refs(self, *pairs):
+        from src.parser.sql_parser import ColumnRef
+        return [ColumnRef(table=t, column=c) for t, c in pairs]
+
+    def _tables(self, *names):
+        from src.parser.sql_parser import TableRef
+        return [TableRef(table=n, schema="dbo") for n in names]
+
+    def test_qualified_ref_mints_one_edge(self):
+        from src.models import EdgeType
+        b = self._builder()
+        b.mint_projection_edges(
+            "transform:m:s1",
+            self._refs(("IP_SEPSIS", "PATIENTMRN")),
+            self._tables("IP_SEPSIS"))
+        edges = [e for e in b.edges
+                 if e.edge_type == EdgeType.TRANSFORM_TO_COLUMN]
+        assert len(edges) == 1
+        assert edges[0].target_id.endswith(".PATIENTMRN")
+        assert b.projection_minted == 1 and b.projection_refs == 1
+
+    def test_unqualified_unique_resolves(self):
+        b = self._builder()
+        b.mint_projection_edges(
+            "transform:m:s1",
+            self._refs((None, "PATIENTMRN")),
+            self._tables("IP_SEPSIS", "ADT_EVENTS"))
+        assert b.projection_minted == 1     # only IP_SEPSIS has it
+
+    def test_ambiguous_unqualified_drops_counted(self):
+        b = self._builder()
+        b.mint_projection_edges(
+            "transform:m:s1",
+            self._refs((None, "SepsisDX")),
+            self._tables("IP_SEPSIS", "ADT_EVENTS"))
+        assert b.projection_minted == 0
+        assert b.projection_dropped == {"ambiguous": 1}
+
+    def test_alias_qualifier_drops_counted(self):
+        b = self._builder()
+        b.mint_projection_edges(
+            "transform:m:s1",
+            self._refs(("X", "PATIENTMRN")),
+            self._tables("IP_SEPSIS"))
+        assert b.projection_dropped == {"unresolved_qualifier": 1}
+
+    def test_duplicate_and_unknown_column_conserve(self):
+        b = self._builder()
+        b.mint_projection_edges(
+            "transform:m:s1",
+            self._refs(("IP_SEPSIS", "PATIENTMRN"),
+                       ("IP_SEPSIS", "PATIENTMRN"),
+                       ("IP_SEPSIS", "NOPE")),
+            self._tables("IP_SEPSIS"))
+        assert b.projection_refs == 3
+        assert b.projection_minted == 1
+        assert b.projection_dropped == {"duplicate": 1,
+                                        "no_dictionary_column": 1}
+        assert b.projection_refs == (b.projection_minted
+                                     + sum(b.projection_dropped.values()))

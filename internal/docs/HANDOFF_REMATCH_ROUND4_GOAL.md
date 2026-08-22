@@ -658,3 +658,21 @@ edge:decision_to_column. Still excluded: transform_to_transform (dep
 chains, unqueued pending Sunny), measure_to_column (empty corpus),
 decision_to_step. 957 tests green. Capacity left ACTIVE for Sunny's
 walk.
+
+### 2026-08-22 — PROJECTION-GRAIN COLUMN LINEAGE ordered and shipped (ADR 0053, 1.56.0)
+Sunny's order executed as its own §3b artifact class (the ADR is the
+review record): transform_to_column edges minted at graph build from
+existing ScriptDom column_refs — RESOLVED-ONLY (qualified→named step
+table; unqualified→unique across step tables), conservation asserted
+(refs = minted ⊎ dropped by reason: unresolved_qualifier /
+no_dictionary_column / ambiguous / duplicate). lineage(column=) now
+answers the governance PAIR — "selected by N, filtered by M" — and a
+pre-0053 export says "projection coverage absent, rerun mints it,"
+never "selected by none". Fabric-Graph export: counted exclusion
+(0046 lifts it). The ADR 0052 totality test forced the registry row
+before CI could pass — the drift machinery firing as designed. Pin
+UNCHANGED this pass (no tool-schema change). B3 dep-chains: PARKED
+BEHIND ROUND 4 (Sunny); E5 m2c: extraction-gap row stands. 963 tests
+green. THE SINGLE PIPELINE RUN now carries three payloads: v6
+descriptions, decision redaction-at-rest, and projection edges —
+all in the 1.56.0 wheel, one pass.
