@@ -744,3 +744,21 @@ ED Sepsis Screening Dashboard.SemanticModel is ACCEPTED — flagged,
 ruled, closed. Do not re-flag. (The 060 fallout row for that table is
 correct behavior and a demo beat: the funnel naming which dashboard
 feed doesn't trace to governed SQL.)
+
+### 2026-08-22 — C4's real find: three UNAPPLIED crosswalk mappings in the public corpus
+The 7 ungrounded leaves decomposed: 4 were already-synthetic names
+missing only from the dictionary; 3 were ORIGINAL vendor table names
+(CL_ICD_PX, EDG_CURRENT_ICD10, HNO_NOTE_TEXT) live in
+USP_Severe_Sepsis.sql — the crosswalk DEFINED their mappings
+(ICD_PROCEDURE_CODES / DIAGNOSES_CURRENT_ICD10 / CLINICAL_NOTE_TEXT)
+but they were never APPLIED to the proc's deep tail, and the hygiene
+gate was blind to them (~wcs word-boundary markers can't see inside
+underscore-joined names). Fixed: crosswalk applied (9 replacements),
+the three FULL names armed as plain scan terms (substring-matched —
+recurrence now fails CI), hygiene + full suite green. The chain that
+caught it: C4 leaf grounding → dictionary diff → Sunny remembering
+the crosswalk. Her spec:C4 axiom found an anonymization escape no
+gate was watching for.
+TENANT SEQUENCE ADDENDUM: update aivia_demo_src.SQLDatabase from git,
+fix the 3 dictionary rows to synthetic names (cell provided), then
+rerun 200→500 (SQL text changed → reparse) before 600/700.
