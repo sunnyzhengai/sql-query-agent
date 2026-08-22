@@ -602,3 +602,28 @@ not model-copied.
 950 tests green; final acceptance suite (all walk fixtures + M2
 acceptance) runs next; capacity pause AFTER it per Sunny's goodnight
 instruction.
+
+### 2026-08-22 (00:xx) — 1.54.1 FINAL board of the day: honesty re-earned, §7 receipts CLAIMED
+census 1.00 · definition 1.00 · bridge 1.00 (n=12) · topical 1.00
+(n=12) · sql_request 1.00 · anaphora 0.88 PASS · lineage 0.67 BELOW
+(0.00→0.67 with exact-table scoping; new family, day one) ·
+drilldown 0.00 BELOW — honesty 1.00 EVERYWHERE, telemetry 0 (second
+consecutive run). CI GREEN.
+Drilldown's 0.00 is Sunny's find-1 fixture WORKING: the grain gate
+(sites-on-screen, machine-computed) applies her rejection to every
+paraphrase; mini answers from summaries or over-refuses ("medical
+advice") instead of retrieving. This is the standing capability
+question for the review session — data/verdict-shaped only, no
+stamps, per the verdicts file.
+§7 RECEIPTS ROW ADDED (docs/AI_VIA_AXIOMS.md), per the acceptance:
+anaphora ≥ bar with the M2 pass adding zero prompt machinery,
+telemetry 0 twice. Full disclosure in the row: the pin bump was find
+4's conscious tool addition, not M2 machinery; drilldown re-opened
+by find 1's deliberately harder gate.
+CAPACITY: pausing aiviafabric (F4) now per Sunny's instruction —
+development and testing complete for the night.
+MORNING CHECKLIST for Sunny: (1) restart the webapp on 1.54.1;
+(2) THE SINGLE PIPELINE RUN uses the 1.54.1 wheel — it regenerates
+every description (PROMPT_VERSION v6, find 2's scope rule) and
+redacts decision expressions at rest; resume capacity first;
+(3) walk steps 2–6 when ready; (4) Round 4 after republish.
