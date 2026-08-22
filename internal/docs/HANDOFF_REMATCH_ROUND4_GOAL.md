@@ -627,3 +627,11 @@ MORNING CHECKLIST for Sunny: (1) restart the webapp on 1.54.1;
 every description (PROMPT_VERSION v6, find 2's scope rule) and
 redacts decision expressions at rest; resume capacity first;
 (3) walk steps 2–6 when ready; (4) Round 4 after republish.
+
+### 2026-08-22 — Walk section 7 folded; count-oracles store-verified; capacity re-paused
+Reachability walk folded into SMARTNESS_WALK.md §7 with the standing
+generate-from-registry instruction recorded. Oracles verified live
+(capacity briefly resumed for the check, then re-paused): 13
+HOSPITAL_ENCOUNTERS readers ✓ · 122 steps ✓ · 427 sites ✓ · 5
+IP_SEPSIS readers ✓ · 28/2/29 kinds ✓ · D2 corrected 32→36 (Severe
+Sepsis Episodes reads 36 tables — the cited 32 was stale).
