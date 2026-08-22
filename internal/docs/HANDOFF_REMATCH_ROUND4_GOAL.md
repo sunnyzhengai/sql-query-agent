@@ -515,3 +515,23 @@ bridge-stamped result must name a sibling OR cite a displayed ref
 (pointing at the display presents it); anchorless content floors.
 Duty scoped to THIS TURN's stamps (a prior turn's stamp imposes
 nothing later). Corpse caged in the gate tests.
+
+### 2026-08-21 — 1.52.3: HONESTY RE-EARNED — 1.00 every family; the residual is the predicted M2 item
+Board: census 0.83 PASS · definition 1.00 · bridge 1.00 (mandatory
+presence held) · drilldown 1.00 (SECOND consecutive — stable under
+the tightened oracle) · topical 0.92 PASS · sql_request 1.00 ·
+anaphora 0.75 BELOW — honesty 1.00 EVERYWHERE, rc=1 on capability
+only. Telemetry: stamp-contradicting declarations = 1.
+The two anaphora misses are the review note's humble-but-blind shape
+EXACTLY as predicted: (1) retrieved the metric, ignored the stamped
+122-decision pointer, humbly declared 'cannot specify'; (2) declared
+over the stamp naming unretrieved material (the telemetry's 1). Per
+the note's instruction: FILED UNDER M2 (evidence presentation — how
+decision material renders into the mind's view at the metric level),
+NOT fixed with a continuation or a stamp. This is the next design
+question — how a metric record should present its decision evidence
+— and it sits adjacent to ADR 0046 shape-matching. OPEN, not
+band-aided.
+§7 receipts row: STILL HELD — drilldown stabilized (1.00 × 2) but
+anaphora has not (1.00 → 0.75); the row's condition is both. Claim
+after measurement.
