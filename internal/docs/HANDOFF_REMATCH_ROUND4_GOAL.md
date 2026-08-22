@@ -560,3 +560,20 @@ rerun's only export effect remains the decision redaction-at-rest
 already shipped in 1.51.x.
 Acceptance pending: anaphora ≥ bar with pin intact and zero new
 stamps/continuations (thesis-test form); telemetry counter → 0.
+
+### 2026-08-21 — Sunny's walk on 1.53.0: "much better", one recurring error chip → 1.53.1
+Her screenshots pin the chain: correct count answers (28 metrics / 2
+ED metrics / 122 steps) → verdict quote FAILS because for a count
+question the natural evidence is the NUMBER, which lives in the
+stamped headline and the quote ground only accepted rows → engine
+declares unanswered → continuation fires → model reruns the same op →
+anti-flail rightly refuses → red "already ran this turn" chip in the
+trail. The dedup and the continuation both behaved; the quote ground
+was too narrow. 1.53.1: stamped HEADLINES join the quotable evidence
+ground (they are code-stamped truth, ADR 0032 — quoting them is
+quoting the machine), and the continuation note now says: never
+repeat an op already run; if the evidence is on screen, answer from
+it and quote it verbatim. Also visible in her trail: the IP_SEPSIS
+bridge now stamps siblings + TWO source-table identities, and the
+honesty gate floored an invented '8'/'9' mid-walk — the machinery
+holding in the field.

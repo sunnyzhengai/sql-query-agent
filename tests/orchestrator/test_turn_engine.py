@@ -160,6 +160,27 @@ class TestLoop:
         ]), fake_kql)
         assert out["answered"] is False
 
+    def test_stamped_headline_is_quotable_evidence(self):
+        """Walk find (Sunny, 2026-08-21): for a count question the
+        natural evidence IS the number, which lives in the stamped
+        headline, not in any row — a correct census answer could never
+        verify, and the continuation fired into anti-flail refusals
+        the user saw as recurring error chips. Headlines are
+        code-stamped truth: quoting them is quoting the machine."""
+        s = EngineSession()
+        out = run_turn(s, "how many metrics are there?",
+                       scripted_engine([
+                           {"calls": [("census", {"kind": "metric"})]},
+                           {"text": "There are 2 metrics — see R1."},
+                           {"verdict": {
+                               "answered": True,
+                               "evidence_quote":
+                                   "census of kind 'metric' — 2 "
+                                   "row(s)"}},
+                       ]), fake_kql)
+        assert out["answered"] is True
+        assert out["rounds"] == 1              # no continuation fired
+
     def test_self_diagnosed_miss_continues_once_and_can_recover(self):
         """Verdict-driven continuation (P6, suite find 2026-08-21):
         the model kept filing not-answered with the missing op named,

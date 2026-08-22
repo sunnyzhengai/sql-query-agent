@@ -392,10 +392,22 @@ def run_turn(session: EngineSession, question: str, chat_api,
             # zero new rounds and was denied a verified verdict;
             # session.displays still holds only PRIOR turns here,
             # extended below).
+            # Rows AND stamped headlines are quotable evidence (walk
+            # find 2026-08-21: for a count question the natural
+            # evidence IS the number, which lives in the machine-
+            # stamped headline, not in any row — a correct census
+            # answer could never verify, so the continuation fired
+            # into anti-flail refusals the user saw as error chips).
+            # Headlines are code-stamped truth (ADR 0032): quoting
+            # them is quoting the machine.
+            shown = list(session.displays) + outputs
             ground = _norm(json.dumps(
-                [row for o in (list(session.displays) + outputs)
+                [row for o in shown
                  for row in ((o.get("result") or {}).get("rows") or [])],
                 ensure_ascii=False))
+            ground += " " + _norm(" ".join(
+                str((o.get("result") or {}).get("headline") or "")
+                for o in shown))
             if len(quote) < 20 or quote.lower() not in ground.lower():
                 answered = False
                 raw = {**raw, "missing_op": raw.get("missing_op")
@@ -416,8 +428,12 @@ def run_turn(session: EngineSession, question: str, chat_api,
             "role": "user",
             "content": ("Your verdict filed NOT answered — missing: "
                         f"{raw['missing_op']}. Tool rounds remain: run "
-                        "the missing operation(s), then answer "
-                        "again.")})
+                        "the missing operation(s), then answer again. "
+                        "Do NOT repeat an operation already run — its "
+                        "results are already displayed; if the "
+                        "evidence is already on screen, answer from it "
+                        "and quote it verbatim (a row or a stamped "
+                        "headline) in your verdict.")})
 
     session.displays.extend(outputs)
     session.turns += 1
