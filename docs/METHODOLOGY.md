@@ -119,6 +119,42 @@ algebra, the kernels, the code); witness where it doesn't (the
 translation, one confirmed plan at a time). The regulator is not a
 concession — it is the load-bearing consequence of a theorem.
 
+## The Echo Law (ratified by Sunny, 2026-08-23)
+
+*A specimen is a bug; an echo is a missing mechanism. When you hear
+the echo, stop fixing the sound and fix the room.*
+
+A **specimen** is a failure's first capture: typed into a class,
+fixed, and fixtured — nothing broken is ever parked. An **echo** is
+that class recurring.
+
+**Default: build the standing mechanism at the FIRST failure.** The
+evidence that set this default: two deferrals echoed within one week
+(the 1.51.3 serialization lesson, left in a docstring, echoed as the
+compare-op resolution bug; the census substring cure of 1.50.4
+echoed in the day-old lineage op of 1.56.0). This codebase's finite
+op algebra means failure classes recur across operations — a new op
+inherits every disease its siblings ever had — and trust is the
+product, so an escaped sibling spends the one currency the product
+sells.
+
+- Deferral is the exception and requires ONE of exactly three
+  reasons, recorded: (1) the mechanism needs real design a rush
+  would botch (e.g., the fast version is a banned lexicon); (2) the
+  mechanism's cost or false-positive noise demonstrably exceeds the
+  class risk; (3) the class is provably closed by construction.
+- A lesson recorded in a docstring or handoff is a deferral wearing
+  documentation's clothes — it does not count as a mechanism.
+- An echo of a deferred mechanism means the deferral was WRONG:
+  mandatory build, no re-deferral, and the echo becomes the
+  mechanism's acceptance test (red on the current failure, green
+  after the fix).
+- Priority ordering is sequencing, not deferral — the law governs
+  whether a mechanism enters the queue, not whether it waits its
+  turn in it.
+- Whack-a-mole, precisely defined: patching without recording which
+  mechanism you chose not to build.
+
 ## The amendment rule (the honest limit)
 
 No guard fully binds its own author: Claude writes the tests and
