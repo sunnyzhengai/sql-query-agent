@@ -41,6 +41,7 @@ from src.orchestrator.tools import (
     NAME_CONTAINS_TOKENS_QUERY,
     PROJECTION_EDGES_COUNT_QUERY,
     REPORTS_OF_METRIC_QUERY,
+    STEP_NAME_UNIVERSE_QUERY,
     STEPS_OF_QUERY,
     TABLE_COLUMNS_QUERY,
     TABLE_USED_BY_QUERY,
@@ -228,6 +229,42 @@ def _bridge_note(phrase: str, run_kql,
     return " ".join(parts)
 
 
+# The machine caveat for step-name matches (walk W6/W7, Sunny
+# 2026-08-23). Code-stamped constant: the gate detects it in headlines
+# and enforces its echo; the suite's sameness family greps for it.
+SAMENESS_CAVEAT = ("a name match is not logic sameness; "
+                   "run compare for a verdict")
+
+
+def _step_name_universe(phrase: str, run_kql,
+                        session: "OpsSession | None" = None) -> str:
+    """The step-name universe stamp (bridge-stamp pattern): when a
+    census phrase IS a step name shared across procs, code states the
+    true universe ('Base_Pop: 9 procs') and the caveat — because a
+    mention scan alone showed 2 and the model declared 'same base
+    population' from it (the walk's build-stopper corpse). Exact name
+    match only — token matches would fire on topical phrases like
+    'ED' and floor unrelated captions."""
+    clean = phrase.strip()
+    if not clean:
+        return ""
+    rows = list(run_kql(STEP_NAME_UNIVERSE_QUERY, {"p_name": clean}))
+    refs = sorted({str(r["ref"]) for r in rows if r.get("ref")})
+    if len(refs) < 2:
+        return ""
+    names = []
+    for r in rows:
+        disp = str(r.get("business_name") or r.get("ref") or "")
+        if disp and disp not in names:
+            names.append(disp)
+        if session is not None and r.get("ref"):
+            session.surfaced.add(str(r["ref"]))
+    return (f"{len(refs)} procs have a step NAMED {clean!r} "
+            f"({', '.join(names[:5])}"
+            + (", …" if len(names) > 5 else "")
+            + f") — {SAMENESS_CAVEAT}.")
+
+
 def op_search(phrase: str, mode: str, run_kql,
               session: OpsSession) -> ResultSet:
     if mode not in ("semantic", "exact"):
@@ -251,6 +288,12 @@ def op_search(phrase: str, mode: str, run_kql,
         # because the bridge stamp existed only on semantic results.
         note = (_bridge_note(clean, run_kql, session)
                 if not out else "")
+        # Same-named steps ARE name matches (walk W6, 2026-08-23):
+        # an exact search for a shared step name shows N step rows —
+        # the caveat rides with them, same as the filtered census.
+        univ = _step_name_universe(clean, run_kql, session)
+        if univ:
+            note = (note + " " if note else "") + univ
         return session.register(
             "search", {"phrase": phrase, "mode": "exact"},
             out,
@@ -395,10 +438,21 @@ def op_census(kind: str, run_kql, session: OpsSession,
     # it carries the bridge note, whichever op the model chose (walk
     # find 2026-08-21: census step contains='IP_SEPSIS' → 0 →
     # "cannot be provided", while the graph knew the table).
-    note = (_bridge_note(contains, run_kql, session)
-            if contains and contains.strip() and not out else "")
+    note_parts = []
+    if contains and contains.strip():
+        # Step-name universe stamp (walk W6, 2026-08-23): fires on
+        # EVERY filtered census whose phrase names a shared step —
+        # the mention count on screen (2) and the step-name universe
+        # (9) are different truths, and the caveat travels with both.
+        univ = _step_name_universe(contains, run_kql, session)
+        if univ:
+            note_parts.append(univ)
+        if not out:
+            bridge = _bridge_note(contains, run_kql, session)
+            if bridge:
+                note_parts.append(bridge)
     return session.register("census", params, out, complete=True,
-                            universe=universe, note=note)
+                            universe=universe, note=" ".join(note_parts))
 
 
 # --- retrieve: one read primitive (facts + structure merged) ----------

@@ -22,7 +22,7 @@ from datetime import datetime, timezone
 from typing import Callable
 
 from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse
 
 from src.branding import product_name
 from src.orchestrator.agent import Turn, run_turn
@@ -151,28 +151,12 @@ def create_app(
 
     # ---- the one-mind turn (ADR 0051) -------------------------------
 
-    @app.post("/api/ask")
-    async def ask(request: Request) -> JSONResponse:
-        """One user turn on the merged engine: the mind loops over
-        read-only tools with full evidence in ONE conversation; the
-        boundary stamps, gates, and verifies. Reads run immediately —
-        the plan-confirm card remains only for writes (ADR 0050)."""
-        body = await request.json()
-        question = str(body.get("message", "")).strip()
-        if not question:
-            return JSONResponse({"error": "empty message"},
-                                status_code=400)
-        user = _user_from(request)
-        conv_id = str(body.get("conversation_id") or uuid.uuid4())
-        conv = _conversation(user, conv_id)
+    def _ask_finish(user: str, conv_id: str, conv: Conversation,
+                    question: str, turn: dict) -> dict:
+        """Record the turn event and build the response payload —
+        shared by /api/ask and /api/ask/stream so the two surfaces
+        can never drift."""
         turn_index = conv.turns
-        try:
-            turn = engine_run_turn(conv.engine, question, chat_api,
-                                   run_kql)
-        except Exception as e:                 # noqa: BLE001
-            return JSONResponse(
-                {"error": f"engine unavailable ({type(e).__name__})",
-                 "conversation_id": conv_id}, status_code=502)
         trace = [{"tool": o["component"]["op"],
                   "args": o["component"]["params"],
                   "result": (o.get("result") or {"error": o.get("error")})}
@@ -197,7 +181,7 @@ def create_app(
                 for t in trace),
         ))
         conv.turns += 1
-        return JSONResponse({
+        return {
             "conversation_id": conv_id,
             "turn_index": turn_index,
             "outputs": turn["outputs"],
@@ -214,7 +198,89 @@ def create_app(
                                if turn["exhausted"] else "")),
             "loop_note": turn["missing_op"] if not turn["answered"] else "",
             "suggestions": [],
-        })
+        }
+
+    @app.post("/api/ask")
+    async def ask(request: Request) -> JSONResponse:
+        """One user turn on the merged engine: the mind loops over
+        read-only tools with full evidence in ONE conversation; the
+        boundary stamps, gates, and verifies. Reads run immediately —
+        the plan-confirm card remains only for writes (ADR 0050)."""
+        body = await request.json()
+        question = str(body.get("message", "")).strip()
+        if not question:
+            return JSONResponse({"error": "empty message"},
+                                status_code=400)
+        user = _user_from(request)
+        conv_id = str(body.get("conversation_id") or uuid.uuid4())
+        conv = _conversation(user, conv_id)
+        try:
+            turn = engine_run_turn(conv.engine, question, chat_api,
+                                   run_kql)
+        except Exception as e:                 # noqa: BLE001
+            return JSONResponse(
+                {"error": f"engine unavailable ({type(e).__name__})",
+                 "conversation_id": conv_id}, status_code=502)
+        return JSONResponse(_ask_finish(user, conv_id, conv, question,
+                                        turn))
+
+    @app.post("/api/ask/stream")
+    async def ask_stream(request: Request):
+        """The same turn, streamed (walk W2, 2026-08-23): each op's
+        chip renders at DISPATCH time and its stamped headline at
+        completion — the status shown is the actual operation running,
+        never a fake spinner. Events: `output` (pending pre-events and
+        completed display dicts, verbatim), `stage` (gate/verdict),
+        `done` (the exact /api/ask payload), `error`."""
+        import asyncio
+        import queue as _q
+        import threading
+
+        body = await request.json()
+        question = str(body.get("message", "")).strip()
+        if not question:
+            return JSONResponse({"error": "empty message"},
+                                status_code=400)
+        user = _user_from(request)
+        conv_id = str(body.get("conversation_id") or uuid.uuid4())
+        conv = _conversation(user, conv_id)
+
+        events: "_q.Queue[tuple]" = _q.Queue()
+
+        def work() -> None:
+            try:
+                turn = engine_run_turn(conv.engine, question, chat_api,
+                                       run_kql,
+                                       on_event=lambda e: events.put(
+                                           ("evt", e)))
+                events.put(("done", turn))
+            except Exception as e:             # noqa: BLE001
+                events.put(("err",
+                            f"engine unavailable ({type(e).__name__})"))
+
+        threading.Thread(target=work, daemon=True).start()
+
+        def _sse(event: str, data: dict) -> str:
+            return f"event: {event}\ndata: {_json.dumps(data)}\n\n"
+
+        async def gen():
+            loop = asyncio.get_event_loop()
+            while True:
+                kind, payload = await loop.run_in_executor(None,
+                                                           events.get)
+                if kind == "evt":
+                    name = "stage" if "stage" in payload else "output"
+                    yield _sse(name, payload)
+                elif kind == "err":
+                    yield _sse("error", {"error": payload,
+                                         "conversation_id": conv_id})
+                    return
+                else:
+                    yield _sse("done", _ask_finish(
+                        user, conv_id, conv, question, payload))
+                    return
+
+        return StreamingResponse(gen(), media_type="text/event-stream")
 
     # ADR 0051: the plan-protocol endpoints were DELETED with their
     # minds. Writes, when they exist, get a fresh plan-confirm
@@ -370,6 +436,24 @@ WORKBENCH_PAGE = """<!doctype html>
   .foldmore { display:block; width:100%; padding:7px; border:0;
               border-top:1px solid var(--line); background:#f7f7f4;
               color:var(--accent); cursor:pointer; font-size:12px; }
+  .caption a { color:var(--accent); }
+  .caption ul { margin:6px 0; padding-left:22px; }
+  .caption code { background:#e9edf5; border-radius:4px;
+                  padding:1px 5px; font:12px ui-monospace,monospace; }
+  .sqlfold { margin:6px 0; }
+  .sqlfold summary { cursor:pointer; color:var(--accent);
+                     font:12px ui-monospace,monospace; }
+  .sqlfold pre { background:#f4f4f1; border:1px solid var(--line);
+                 border-radius:8px; padding:10px;
+                 font:12px ui-monospace,monospace; overflow-x:auto; }
+  .cite { font:11.5px ui-monospace,monospace; background:#eef2fa;
+          color:var(--accent); border-radius:6px; padding:1px 6px; }
+  .runline { font:12px ui-monospace,monospace; color:#6b7080;
+             margin:0 0 8px; display:flex; gap:8px; align-items:center; }
+  .runline .dot { width:8px; height:8px; border-radius:50%;
+                  background:var(--warn);
+                  animation:pulse 1s infinite alternate; }
+  @keyframes pulse { from { opacity:.35; } to { opacity:1; } }
 </style></head>
 <body>
 <header>__PRODUCT__ workbench <span>· ask about your certified metrics — every
@@ -394,36 +478,45 @@ function add(node) { log.appendChild(node);
 // ADR 0051: the plan-card JS was deleted with the plan protocol.
 // Reads run immediately; a fresh confirm surface returns with writes.
 
+// Stamped headlines rendered this turn — the caption renderer
+// collapses verbatim re-quotes of these into compact citations
+// (walk W1/W3c, display-only; the caption TEXT the suite grades is
+// unchanged on the wire).
+let turnHeadlines = [];
+
 function renderOutput(o) {
   const auto = (o.component && o.component.auto_round)
     ? `<span class="badge auto">auto round ${o.component.auto_round} · read-only</span>`
     : '';
   if (o.error) {
-    add(el(`<div class="rs"><div class="head">
+    const node = el(`<div class="rs"><div class="head">
       <span class="oplabel">${esc(o.component.op)}</span>${auto}
       <span class="badge error">error</span>
-      <span class="universe">${esc(o.error)}</span></div></div>`));
-    return;
+      <span class="universe">${esc(o.error)}</span></div></div>`);
+    add(node);
+    return node;
   }
   const r = o.result;
   const badge = r.complete
     ? '<span class="badge complete">complete</span>'
     : '<span class="badge partial">not exhaustive</span>';
-  const rs = el(`<div class="rs"><div class="head">
+  const rs = el(`<div class="rs" id="ref-${esc(r.ref)}"><div class="head">
     <span class="ref">${esc(r.ref)}</span>
     <span class="oplabel">${esc(r.op)}</span>${auto}
     <span class="universe">${esc(JSON.stringify(r.params))}</span>
     ${badge}
     <span class="universe">${esc(r.universe)}${r.note ? ' · ' + esc(r.note) : ''}</span>
     </div></div>`);
-  if (r.headline) rs.appendChild(
-    el(`<div class="headline">${esc(r.headline)}</div>`));
+  if (r.headline) {
+    rs.appendChild(el(`<div class="headline">${esc(r.headline)}</div>`));
+    turnHeadlines.push({ ref: r.ref, text: String(r.headline) });
+  }
   let rows2 = r.rows, prefer = null;
   if (r.op === 'search' || r.op === 'census') {
     // Customer-facing view: an exec asking what logic is in a report
     // reads business identities, not CTE names or refs.
     rows2 = [...rows2].sort((a, b) => (b.closeness || 0) - (a.closeness || 0));
-    rows2 = rows2.map(x => {
+    let labeled = rows2.map(x => {
       let label;
       if (x.kind === 'step') {
         label = (x.business_name || x.of_metric || x.id) + ' → step' +
@@ -432,6 +525,16 @@ function renderOutput(o) {
       } else {
         label = x.business_name || x.name || x.id;
       }
+      return { x, label };
+    });
+    // Schema-qualify on display-name collision (walk W3a: reporting.
+    // vs reports. both showed as bare USP_ED_Sepsis — two identical-
+    // looking list entries). Display-only.
+    const counts = {};
+    labeled.forEach(({ label }) => { counts[label] = (counts[label] || 0) + 1; });
+    rows2 = labeled.map(({ x, label }) => {
+      if (counts[label] > 1 && x.id && String(x.id) !== label)
+        label = label + ' (' + x.id + ')';
       const row = { item: label, description: x.description || '' };
       if (x.closeness !== undefined) row.closeness = x.closeness;
       return row;
@@ -440,6 +543,7 @@ function renderOutput(o) {
   }
   rs.appendChild(renderTable(rows2, prefer));
   add(rs);
+  return rs;
 }
 
 function renderTable(rows, prefer) {
@@ -476,6 +580,84 @@ function renderTable(rows, prefer) {
   return wrap;
 }
 
+// ---- caption rendering (walk W4/W3b/W5/W1, display-only) -----------
+// The caption TEXT on the wire is what the suite grades — untouched.
+// This layer renders it: sanitized markdown (escape first, then a
+// small safe subset), SQL fences ALWAYS collapsed behind an expander
+// (register defense-in-depth — rule 5 is stochastic, the collapse is
+// not), verbatim headline re-quotes folded to compact citations, and
+// R-number tokens linked to the result panel they cite (a wrong label
+// is then checkable in one click — the Q8 nit made visible).
+
+function mdInline(s) {
+  // input is HTML-escaped text; output adds only whitelisted tags
+  s = s.replace(/\\b(R\\d{1,3})\\b/g,
+    '<a class="cite" href="#ref-$1">$1</a>');
+  s = s.replace(/\\[([^\\]]{1,160})\\]\\((https?:\\/\\/[^)\\s]+)\\)/g,
+    '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+  s = s.replace(/\\*\\*([^*]{1,200})\\*\\*/g, '<b>$1</b>');
+  s = s.replace(/`([^`]{1,160})`/g, '<code>$1</code>');
+  return s;
+}
+
+function renderMarkdown(raw) {
+  const parts = String(raw).split(/```[a-zA-Z]*\\n?([\\s\\S]*?)```/g);
+  let html = '';
+  for (let i = 0; i < parts.length; i++) {
+    if (i % 2 === 1) {
+      html += `<details class="sqlfold"><summary>show SQL</summary><pre>${esc(parts[i].trim())}</pre></details>`;
+      continue;
+    }
+    const lines = esc(parts[i]).split('\\n');
+    const out = []; let list = null;
+    for (const line of lines) {
+      const m = line.match(/^\\s*[-*]\\s+(.*)$/);
+      if (m) { (list = list || []).push('<li>' + mdInline(m[1]) + '</li>'); }
+      else {
+        if (list) { out.push('<ul>' + list.join('') + '</ul>'); list = null; }
+        out.push(mdInline(line));
+      }
+    }
+    if (list) out.push('<ul>' + list.join('') + '</ul>');
+    html += out.join('\\n');
+  }
+  return html;
+}
+
+function foldHeadlineQuotes(raw) {
+  // verbatim re-quote of a stamped headline shown above → citation
+  let text = String(raw);
+  for (const h of turnHeadlines) {
+    if (h.text.length >= 40 && text.includes(h.text))
+      text = text.split(h.text).join(`(${h.ref} headline — shown above)`);
+  }
+  return text;
+}
+
+function renderFinale(j) {
+  if (j.loop_status) {
+    add(el(`<div class="loopline">${esc(j.loop_status)}${
+      j.loop_note ? ' — ' + esc(j.loop_note) : ''}</div>`));
+  }
+  if (!j.caption) return;
+  const based = `<span class="inputs">based on: ${esc((j.caption_inputs||[]).join(', ')||'—')}${
+    j.answered ? ' · verdict: answered (evidence verified)' : ''}</span>`;
+  const body = renderMarkdown(foldHeadlineQuotes(j.caption));
+  if (j.caption_corrected) {
+    // pointer-style floor (walk W1): the results above ARE the
+    // answer; the verified floor text (stamped headlines, verbatim)
+    // stays one click away instead of repeating the screen.
+    add(el(`<div class="caption"><b>the results above are the answer</b>
+      — the draft answer over-claimed and was floored by the honesty gate
+      (${esc((j.caption_violations||[]).join('; '))}).
+      <details><summary>show the verified floor text</summary><div>${body}</div></details>
+      ${based}</div>`));
+  } else {
+    add(el(`<div class="caption">${body}${based}</div>`));
+  }
+  renderFeedback(j.turn_index);
+}
+
 function renderSuggestions(suggestions) {
   if (!suggestions.length) return;
   const chips = el('<div class="chips"></div>');
@@ -502,45 +684,113 @@ function renderFeedback(turnIndex) {
   add(fb);
 }
 
-// ---- ask -----------------------------------------------------------
+// ---- ask (walk W2: live trail via SSE; JSON /api/ask is the
+// fallback so the workbench still answers if streaming breaks) ------
+
+const pendingNodes = new Map();
+let stageNode = null;
+
+function keyOf(c) {
+  return (c.op || '') + '|' + JSON.stringify(c.params || {}) + '|' +
+    (c.auto_round || 0);
+}
+
+function clearStage() {
+  if (stageNode) { stageNode.remove(); stageNode = null; }
+  pendingNodes.forEach(n => n.remove());
+  pendingNodes.clear();
+}
+
+function handleStreamEvent(name, data) {
+  if (name === 'output') {
+    if (data.pending) {
+      // the ACTUAL op dispatching — named status, never a fake spinner
+      const node = add(el(`<div class="runline"><span class="dot"></span>
+        <span class="oplabel">${esc(data.component.op)}</span>
+        <span>${esc(JSON.stringify(data.component.params))}</span>
+        <span>running…</span></div>`));
+      pendingNodes.set(keyOf(data.component), node);
+      return;
+    }
+    const p = pendingNodes.get(keyOf(data.component || {}));
+    if (p) { p.remove(); pendingNodes.delete(keyOf(data.component || {})); }
+    renderOutput(data);
+    return;
+  }
+  if (name === 'stage') {
+    const label = data.stage === 'verdict'
+      ? 'filing the typed verdict (machine-verified)…'
+      : 'honesty gate checking the answer…';
+    if (stageNode) stageNode.remove();
+    stageNode = add(el(`<div class="runline"><span class="dot"></span>
+      <span>${esc(label)}</span></div>`));
+  }
+}
+
+async function askViaStream(message) {
+  const resp = await fetch('/api/ask/stream', { method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ message, conversation_id: conversationId })});
+  if (!resp.ok || !resp.body) throw new Error('stream unavailable');
+  const reader = resp.body.getReader();
+  const dec = new TextDecoder();
+  let buf = '', final = null, errmsg = null;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buf += dec.decode(value, { stream: true });
+    let i;
+    while ((i = buf.indexOf('\\n\\n')) >= 0) {
+      const block = buf.slice(0, i); buf = buf.slice(i + 2);
+      let ev = null, data = '';
+      for (const line of block.split('\\n')) {
+        if (line.startsWith('event: ')) ev = line.slice(7).trim();
+        else if (line.startsWith('data: ')) data += line.slice(6);
+      }
+      if (!ev || !data) continue;
+      const payload = JSON.parse(data);
+      if (ev === 'done') final = payload;
+      else if (ev === 'error') errmsg = payload.error || 'engine error';
+      else handleStreamEvent(ev, payload);
+    }
+  }
+  clearStage();
+  if (errmsg) throw new Error(errmsg);
+  if (!final) throw new Error('stream ended without a result');
+  return final;
+}
+
+async function askViaJson(message) {
+  const r = await fetch('/api/ask', { method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ message, conversation_id: conversationId })});
+  const j = await r.json();
+  if (!r.ok) throw new Error(j.error || ('error ' + r.status));
+  (j.outputs || []).forEach(renderOutput);
+  return j;
+}
+
 document.getElementById('ask').addEventListener('submit', async (e) => {
   e.preventDefault();
   const message = q.value.trim();
   if (!message) return;
   q.value = ''; askbtn.disabled = true;
+  turnHeadlines = [];
   add(el(`<p class="you">you&gt; ${esc(message)}</p>`));
-  const thinking = add(el('<p class="muted">working — operations will appear as run…</p>'));
   try {
-    // One-mind turn (ADR 0051): reads run immediately; every
-    // operation the mind ran is displayed, stamped. The plan-confirm
-    // card returns only when write operations exist.
-    const r = await fetch('/api/ask', { method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ message, conversation_id: conversationId })});
-    const j = await r.json();
-    thinking.remove();
-    if (!r.ok) { add(el(`<p class="err">${esc(j.error||('error '+r.status))}</p>`)); }
-    else {
-      conversationId = j.conversation_id;
-      (j.outputs || []).forEach(renderOutput);
-      if (j.loop_status) {
-        add(el(`<div class="loopline">${esc(j.loop_status)}${
-          j.loop_note ? ' — ' + esc(j.loop_note) : ''}</div>`));
-      }
-      if (j.caption) {
-        const gate = j.caption_corrected
-          ? `<span class="inputs">honesty gate: original answer over-claimed
-              — showing the verified floor
-              (${esc((j.caption_violations||[]).join('; '))})</span>`
-          : '';
-        add(el(`<div class="caption">${esc(j.caption)}
-          <span class="inputs">based on: ${esc((j.caption_inputs||[]).join(', ')||'—')}${
-          j.answered ? ' · verdict: answered (evidence verified)' : ''}</span>${gate}</div>`));
-        renderFeedback(j.turn_index);
-      }
+    let j;
+    try {
+      j = await askViaStream(message);        // outputs rendered live
+    } catch (e1) {
+      clearStage();
+      j = await askViaJson(message);          // fallback renders them
     }
-  } catch (e2) { thinking.remove();
-    add(el(`<p class="err">network error: ${esc(e2)}</p>`)); }
+    conversationId = j.conversation_id;
+    renderFinale(j);
+  } catch (e2) {
+    clearStage();
+    add(el(`<p class="err">${esc(e2.message || e2)}</p>`));
+  }
   askbtn.disabled = false; q.focus();
 });
 q.focus();

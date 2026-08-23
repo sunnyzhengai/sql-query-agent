@@ -237,3 +237,53 @@ class TestOneMindAskEndpoint:
         app = TestClient(create_app(lambda *a, **k: {}, fake_kql, sink))
         assert app.post("/api/plan", json={"message": "x"}).status_code == 404
         assert app.post("/api/execute", json={}).status_code == 404
+
+    def test_ask_stream_emits_pending_output_and_done(self, tmp_path):
+        """Walk W2: the SSE surface streams the ACTUAL trail — a
+        pending pre-event at dispatch, the display dict at completion,
+        stage events at the boundary, and a `done` payload identical
+        in shape to /api/ask."""
+        import json as _j
+
+        from tests.orchestrator.test_turn_engine import scripted_engine
+        sink = JsonlEventSink(tmp_path / "e.jsonl")
+        app = TestClient(create_app(scripted_engine([
+            {"calls": [("search", {"phrase": "ed sepsis",
+                                   "mode": "semantic"})]},
+            {"text": "Two candidates are shown in R1."},
+            {"verdict": {"answered": True,
+                         "evidence_quote": "measures ED Sepsis "
+                                           "Screening"}},
+        ]), fake_kql, sink))
+        with app.stream("POST", "/api/ask/stream",
+                        json={"message": "what exists?"}) as r:
+            assert r.status_code == 200
+            body = "".join(chunk for chunk in r.iter_text())
+        events = []
+        for block in body.split("\n\n"):
+            name, data = None, ""
+            for line in block.split("\n"):
+                if line.startswith("event: "):
+                    name = line[7:].strip()
+                elif line.startswith("data: "):
+                    data += line[6:]
+            if name:
+                events.append((name, _j.loads(data)))
+        names = [n for n, _ in events]
+        assert "output" in names and "done" in names
+        # pending pre-event precedes its completed display
+        outputs = [d for n, d in events if n == "output"]
+        assert outputs[0].get("pending") is True
+        assert outputs[0]["component"]["op"] == "search"
+        completed = [o for o in outputs if not o.get("pending")]
+        assert completed and completed[0]["result"]["headline"].startswith(
+            "R1:")
+        # stage events cover the boundary
+        assert {"stage": "gate"} in [d for n, d in events if n == "stage"]
+        # done payload matches the /api/ask shape
+        done = [d for n, d in events if n == "done"][0]
+        assert done["caption"].startswith("Two candidates")
+        assert done["answered"] is True
+        # the turn event reached the sink exactly once
+        lines = (tmp_path / "e.jsonl").read_text().splitlines()
+        assert len(lines) == 1

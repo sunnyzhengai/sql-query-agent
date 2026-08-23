@@ -21,6 +21,7 @@ from src.orchestrator.tools import (
     NAME_CONTAINS_TOKENS_QUERY,
     PROJECTION_EDGES_COUNT_QUERY,
     REPORTS_OF_METRIC_QUERY,
+    STEP_NAME_UNIVERSE_QUERY,
     STEPS_OF_QUERY,
     TABLE_COLUMNS_QUERY,
     TABLE_USED_BY_QUERY,
@@ -187,6 +188,19 @@ def fake_kql(query, params):
                  "business_name": "ED Sepsis (Regulatory)"},
             ]
         return []
+    if query == STEP_NAME_UNIVERSE_QUERY:
+        # exact step-name match, case-insensitive, _/space folded —
+        # 'Scores' is shared by both procs; 'Labs' belongs to one
+        p = params["p_name"].strip().lower().replace("_", " ")
+        rows = []
+        for s in sorted(FRAGMENTS):
+            name = s.split(":")[-1]
+            if name.lower().replace("_", " ") == p:
+                ref = s.split(":")[1]
+                rows.append({"step_name": name, "ref": ref,
+                             "business_name":
+                                 METRIC_ROWS[ref]["business_name"]})
+        return rows
     if query == NAME_CONTAINS_TOKENS_QUERY:
         toks = params["p_tokens"].lower().split()
         return [{"node_id": f"canonical:{ref}", "kind": "metric",

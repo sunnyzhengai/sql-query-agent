@@ -105,6 +105,28 @@ NAME_CONTAINS_TOKENS_QUERY = (
     "| take 10"
 )
 
+# Step-name universe (walk W6/W7, Sunny 2026-08-23: "is another
+# metric using the same base population?" — the mention census saw 2
+# description mentions while NINE procs build a step named Base_Pop
+# with materially different logic; sameness claims from name evidence
+# are the corpse). Exact step-NAME match (case-insensitive, space and
+# underscore interchangeable), one row per (step_name, parent metric).
+STEP_NAME_UNIVERSE_QUERY = (
+    "declare query_parameters(p_name:string);\n"
+    "graph_nodes\n"
+    "| where node_id startswith 'transform:'\n"
+    "    and (name =~ p_name\n"
+    "         or replace_string(name, '_', ' ') =~ "
+    "replace_string(p_name, '_', ' '))\n"
+    "| extend ['ref'] = tostring(split(node_id, ':')[1]), step_name = name\n"
+    "| distinct step_name, ['ref']\n"
+    "| join kind=leftouter (semantic_catalog\n"
+    "    | where ['kind'] == 'metric'\n"
+    "    | project ['ref'], business_name) on ['ref']\n"
+    "| project step_name, ['ref'], business_name\n"
+    "| order by ['ref'] asc"
+)
+
 # Source-table identity (walk find 2026-08-21, Sunny: "how is
 # IP_SEPSIS defined" — the phrase names a TECHNICAL node, which the
 # semantic_catalog surfaces cannot see; the model census'd steps, got

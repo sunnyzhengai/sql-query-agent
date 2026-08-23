@@ -34,7 +34,7 @@ from __future__ import annotations
 import json
 import re
 
-from src.orchestrator.ops import normalize_kind
+from src.orchestrator.ops import SAMENESS_CAVEAT, normalize_kind
 
 _REF_TOKEN = re.compile(r"\b[R$]\d+\b")
 _NUMBERS = re.compile(r"\b\d+\b")
@@ -145,6 +145,33 @@ def caption_violations(caption: str, outputs: "list[dict]",
                 f"name-siblings ({', '.join(stamped[:3])}) must be "
                 "presented FIRST; meaning-related items may follow, "
                 "labeled")
+
+    # Sameness duty (walk W6/W7, Sunny 2026-08-23 — the build-stopper
+    # corpse: "Yes, two other metrics use the same base population"
+    # declared from a MENTION census; ground truth 9 procs, materially
+    # different logic). Turn-scoped, like the bridge duty: when a
+    # displayed headline carries the machine caveat (a step-name match
+    # was on screen), the caption must echo the caveat or a compare
+    # result must be displayed this turn. Structural — the stamp is a
+    # code constant, no claim-shape lexicon; the floor renders the
+    # stamped headlines, so a floored caption carries the caveat.
+    sameness_stamped = any(
+        SAMENESS_CAVEAT in str(r.get("headline") or "")
+        or SAMENESS_CAVEAT in str(r.get("note") or "")
+        for r in turn_results)
+    if sameness_stamped:
+        low_c = caption.lower()
+        compare_shown = any(r.get("op") == "compare"
+                            for r in turn_results)
+        if ("not logic sameness" not in low_c
+                and "not compared" not in low_c
+                and not compare_shown):
+            violations.append(
+                "sameness duty (walk W6, 2026-08-23): a displayed "
+                "headline stamps that step-NAME matches are not logic "
+                "sameness — echo the caveat or run compare; an "
+                "equivalence/difference claim from name or mention "
+                "evidence is unsupported")
 
     for m in _KIND_ABSENCE.finditer(text):
         kind = m.group(1).lower()

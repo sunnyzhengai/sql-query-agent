@@ -130,7 +130,10 @@ ENGINE_TOOLS = [
                         "sets (refs like R1, R2). aspect omitted/"
                         "logic = content partition; steps = step-"
                         "aligned diff; tables = set algebra; a field "
-                        "name = field diff."),
+                        "name = field diff. The ONLY operation that "
+                        "can verify whether two things' logic is the "
+                        "same or different — matching names, mentions, "
+                        "or descriptions never establish sameness."),
         "parameters": {"type": "object", "properties": {
             "refs": {"type": "array", "items": {"type": "string"}},
             "aspect": {"type": "string"}},
@@ -259,10 +262,26 @@ def _compact_history(history: "list[dict]") -> None:
 
 
 def run_turn(session: EngineSession, question: str, chat_api,
-             run_kql, max_rounds: int = MAX_TOOL_ROUNDS) -> dict:
+             run_kql, max_rounds: int = MAX_TOOL_ROUNDS,
+             on_event=None) -> dict:
     """One user turn: the loop, then the boundary. Returns
     {answer, outputs, rounds, answered, missing_op, evidence_quote,
-    caption_corrected, caption_violations, exhausted}."""
+    caption_corrected, caption_violations, exhausted}.
+
+    on_event (walk W2, 2026-08-23 — display machinery only, the pin
+    stands): optional callback receiving each display dict as it is
+    produced, plus a {"pending": True} pre-event when an op dispatches
+    — the SSE surface renders the ACTUAL operation running, never a
+    fake spinner. Callback failures are swallowed; the turn's result
+    never depends on the listener."""
+
+    def _emit(evt: dict) -> None:
+        if on_event is not None:
+            try:
+                on_event(evt)
+            except Exception:   # noqa: BLE001, S110 — listener never breaks the turn
+                pass
+
     if not session.history:
         session.history.append({"role": "system", "content": SYSTEM_PROMPT})
     session.ops.note_user(question)
@@ -320,6 +339,9 @@ def run_turn(session: EngineSession, question: str, chat_api,
                 except json.JSONDecodeError:
                     args = {}
                 key = (name, json.dumps(args, sort_keys=True))
+                _emit({"component": {"op": name, "params": args,
+                                     "auto_round": rounds},
+                       "pending": True})
                 display: dict
                 if name not in READ_ONLY_TOOLS:
                     payload = {"error": f"{name!r} refused: this surface "
@@ -361,6 +383,7 @@ def run_turn(session: EngineSession, question: str, chat_api,
                                                  "auto_round": rounds},
                                    "error": payload["error"]}
                 outputs.append(display)
+                _emit(display)
                 session.history.append({
                     "role": "tool",
                     "tool_call_id": call.get("id", ""),
@@ -381,6 +404,7 @@ def run_turn(session: EngineSession, question: str, chat_api,
         # answer restated a prior turn's rows and was floored as
         # invented); the template floor still renders only this turn's
         # outputs.
+        _emit({"stage": "gate"})
         gate_ground = list(session.displays) + outputs
         violations = (caption_violations(answer, outputs,
                                          ground_outputs=gate_ground)
@@ -401,6 +425,7 @@ def run_turn(session: EngineSession, question: str, chat_api,
                                              ground=gate_ground)
 
         # The typed verdict — the ONE legal form-fill (P3), verified.
+        _emit({"stage": "verdict"})
         raw = {}
         try:
             v_msg = chat_api(

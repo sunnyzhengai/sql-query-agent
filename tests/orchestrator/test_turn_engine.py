@@ -404,8 +404,12 @@ def test_system_prompt_is_invariants_only_no_casebook():
 # prompt surface too); content change = census/search description
 # sharpening (tool-property statements, no question shapes).
 # Pin bumped CONSCIOUSLY 2026-08-21 (walk find 4): +lineage tool.
-PINNED_PROMPT_SHA = ("e0cd5dfd2a955483b74d42ba7146364e"
-                     "e8fc2e0ac04202111313aa1c2f4ae25e")
+# Pin bumped CONSCIOUSLY 2026-08-23 (walk W7, goal-file RESULTS): one
+# semantics sentence on the `compare` tool — compare is the ONLY basis
+# for a sameness/difference verdict. Tool-property statement, no
+# question shapes; SYSTEM_PROMPT unchanged.
+PINNED_PROMPT_SHA = ("01432f0c2aa83e70507b2ae7191e962a"
+                     "541a0e1e28318ba8c56b30ae2632b85c")
 
 
 class TestPGroup:

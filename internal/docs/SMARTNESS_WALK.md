@@ -94,7 +94,7 @@ verify against the store before grading.
 |---|---|---|---|
 | B1 | how many steps does Severe Sepsis Episodes have | calc closure | 122, from the record, not a search window |
 | B2 | what does the final_select step of Sepsis Case Encounters do | step retrieve by ref | the step's own description/fragment — a STEP record, not the metric blurb |
-| B3 | which steps does step X depend on (pick one from B2's display) | dep edges | upstream step names — or an honest "not reachable" that names the gap (dep-grain reachability is the probe) |
+| B3 | which steps does step X depend on (pick one from B2's display) | dep edges | **expected (1.55.0): honest "not reachable" voicing the exclusion** (dep-chains excluded-with-reason, never queued). PASS = exclusion voiced, not dodged. Ordering the op is Sunny's call — review rec: park behind Round 4 unless the walk surfaces demand. |
 
 ## C. Decision layer (sites + decision_to_column)
 
@@ -111,8 +111,8 @@ verify against the store before grading.
 | D1 | which metrics read HOSPITAL_ENCOUNTERS | uses/readers op | **13** (count oracle) — reader relation, NOT mentions |
 | D2 | what tables does Severe Sepsis Episodes use | uses closure forward | **36** (count oracle, verified 2026-08-22; the earlier 32 was stale), complete-marked |
 | D3 | is IP_SEPSIS a table, and who reads it | table identity + readers | source-table identity + **5** readers (the 1.50.7 note as a first-class answer now) |
-| D4 | what columns does IP_SEPSIS have | table_to_column | column list from the dictionary, not from SQL text |
-| D5 | which metrics touch PATIENTMRN | column blast radius | metrics reaching that column via reads/sites — the governance demo question |
+| D4 | what columns does IP_SEPSIS have | table_to_column | column list from the dictionary, not from SQL text (1.55.0: retrieve resolves user-named tables; exact name scopes away cousins) |
+| D5 | which metrics touch PATIENTMRN | column blast radius | **expected (1.55.0): honest 0 WITH the scope note** ("SELECT-only usage is not tracked at column grain") — PATIENTMRN is selected, never filtered; reads are table-grain (681/681 edges). PASS = scope note voiced. The projection-grain question is a PENDING RULING (Sunny), never a walk failure. Positive control: "which metrics filter on COMPILED_CONTEXT" → the 27-site answer. |
 
 ## E. Consumption layer (reports, measures, r2c/r2t/r2m/m2c)
 
@@ -122,7 +122,7 @@ verify against the store before grading.
 | E2 | which reports are built on ED Sepsis Screening | r2c reverse | the dashboard named via LINEAGE (TMDL), never name-similarity |
 | E3 | what does the ED Sepsis Screening Dashboard execute and read | r2c/r2t forward | the procs/tables its semantic model actually names |
 | E4 | what measures does that dashboard define (pronoun on purpose) | r2m + anaphora | measure list; pronoun resolved from E3 |
-| E5 | which columns does measure <pick one from E4> depend on | m2c | DAX column refs, resolved ones only, skipped-count honest |
+| E5 | which columns does measure <pick one from E4> depend on | m2c | **expected (1.55.0): honest-empty naming the gap** — m2c has zero rows in this corpus (INGESTION gap, registry exclusion recorded; an extraction-registry item, not an ask-surface item). |
 
 ## F. Derived structures (closures as answers, twins)
 

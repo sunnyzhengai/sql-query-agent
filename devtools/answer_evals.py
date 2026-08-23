@@ -32,6 +32,8 @@ import re
 import sys
 from pathlib import Path
 
+import requests
+
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
@@ -47,6 +49,7 @@ from src.orchestrator.ops import (  # noqa: E402
 )
 from src.orchestrator.tools import (  # noqa: E402
     COLUMN_FILTERS_QUERY,
+    STEP_NAME_UNIVERSE_QUERY,
     TABLE_USED_BY_QUERY,
 )
 from src.orchestrator.turn_engine import EngineSession  # noqa: E402
@@ -56,6 +59,24 @@ QUERY_URI = "https://trd-uzdu1yhqrmqtutkej8.z7.kusto.fabric.microsoft.com"
 DATABASE = "probe-eh"
 PARAPHRASES_PER_QUESTION = 5
 ANSWER_RATE_THRESHOLD = 0.8
+
+# INFRA-SKIP contract (2026-08-22 outage find, closed 2026-08-23): a
+# transport-dead question is skipped loudly, but when skips exceed the
+# fraction below the surviving grades no longer describe the engine —
+# the RUN is infrastructure-invalid and aborts (exit 3, same class as
+# the store preflight). The floor keeps one early blip from aborting
+# a run that would have recovered.
+INFRA_ABORT_FRACTION = 0.20
+INFRA_ABORT_MIN_ATTEMPTS = 10
+
+
+def infra_abort(skipped: int, graded: int,
+                min_attempts: int = INFRA_ABORT_MIN_ATTEMPTS) -> bool:
+    """True when infra skips exceed INFRA_ABORT_FRACTION of attempted
+    questions (skipped + graded), once at least min_attempts exist."""
+    attempted = skipped + graded
+    return (attempted >= min_attempts
+            and skipped > INFRA_ABORT_FRACTION * attempted)
 
 FIXTURES = [
     {"family": "census",
@@ -145,6 +166,39 @@ FIXTURES = [
      "oracle": "beyond_summary", "item": "Severe Sepsis Episodes",
      "max_rounds": 3, "expected_kind": "answered",
      "expected_grain": "sites"},
+    # Walk W6 (Sunny live, 2026-08-23) — the sameness honesty corpses,
+    # both directions. Q5: "same base population" declared YES from a
+    # mention census (ground truth: 9 procs build #Base_Pop with
+    # materially different logic — the claim was FALSE). Q6: the
+    # difference direction, declared from descriptions — true by luck,
+    # method wrong. An equivalence/difference claim passes ONLY with a
+    # compare result on screen or the machine caveat echoed; a claim
+    # with neither types DISHONEST (calibration 3: claim beyond
+    # declared evidence). Known limit, recorded: a compare-on-screen
+    # turn whose prose misreads the comparison direction still passes
+    # the structural check — the displayed compare rows contradict it.
+    {"family": "sameness",
+     "question": "is another metric using the same base population as "
+                 "ED Sepsis Screening?",
+     "oracle": "sameness", "step_name": "Base_Pop",
+     "max_rounds": 6, "expected_kind": "caveat_or_compare"},
+    {"family": "sameness",
+     "question": "Is ED Sepsis (Regulatory)'s base population "
+                 "different from ED Sepsis Screening's?",
+     "oracle": "sameness", "step_name": "Base_Pop",
+     "max_rounds": 6, "expected_kind": "caveat_or_compare"},
+    # Walk W5 (Sunny live, 2026-08-23) — the register rejection:
+    # SYSTEM_PROMPT rule 3 says business language, raw SQL only when
+    # asked; the model pasted the Base_Pop fragment verbatim anyway
+    # (the stochastic-rule class — rule-in-prompt is not enforcement).
+    # Structural check: a default-audience answer must contain no SQL
+    # code fence. The sql_request family stays exempt by construction
+    # (its oracle NEVER sets no_sql_fence).
+    {"family": "register",
+     "question": "what's the base population of ED Sepsis Screening?",
+     "oracle": "register_step_facts", "item": "ED Sepsis Screening",
+     "step_name": "Base_Pop",
+     "max_rounds": 3, "expected_kind": "answered"},
 ]
 
 _WORD = re.compile(r"[A-Za-z_]{6,}")
@@ -249,6 +303,20 @@ def build_oracle(fixture: dict, run_kql) -> dict:
         return {"required_any": [names],
                 "required_overlap": min(2, len(names)),
                 "forbidden": []}
+    if kind == "sameness":
+        # Walk W6 (2026-08-23): structural pass conditions, not word
+        # oracles — the caveat echo alternatives are fragments of the
+        # code-stamped SAMENESS_CAVEAT constant, and compare-on-screen
+        # is read from the trail (cap.compare_on_screen). The store
+        # check only asserts the fixture is non-vacuous: the step name
+        # must genuinely be shared across >=2 procs.
+        rows = run_kql(STEP_NAME_UNIVERSE_QUERY,
+                       {"p_name": fixture["step_name"]})
+        n = len({str(r.get("ref")) for r in rows if r.get("ref")})
+        assert n >= 2, (f"oracle: step {fixture['step_name']!r} is not "
+                        "shared across procs — sameness fixture vacuous")
+        return {"required_any": [["not logic sameness", "not compared"]],
+                "sameness": True, "forbidden": []}
     if kind == "step_count":
         ops2 = _fresh_ops_session()
         rs = op_search(fixture["item"], "exact", run_kql, ops2)
@@ -257,6 +325,23 @@ def build_oracle(fixture: dict, run_kql) -> dict:
         n = sum(len(r.get("steps") or []) for r in rec.rows)
         assert n, "oracle: metric has no steps"
         return {"required_any": [[str(n)]], "forbidden": []}
+    if kind == "register_step_facts":
+        # Walk W5: content facts from the STEP's stored description
+        # (the business voice), never its sql_fragment — plus the
+        # structural register bar: no SQL code fence in the answer.
+        ops2 = _fresh_ops_session()
+        rs = op_search(fixture["item"], "exact", run_kql, ops2)
+        assert rs.rows, f"oracle: {fixture['item']} not in catalog"
+        step_id = f"transform:{rs.rows[0]['id']}:{fixture['step_name']}"
+        ops2.note_user(step_id)          # user-named → retrievable
+        rec = op_retrieve([step_id], run_kql, ops2)
+        assert rec.rows, f"oracle: step {step_id} not found"
+        desc = " ".join(str(r.get("description") or "")
+                        for r in rec.rows)
+        words = sorted(set(_WORD.findall(desc)))
+        assert len(words) >= 2, "oracle: step description too thin"
+        return {"required_any": [words[:400]], "required_overlap": 2,
+                "no_sql_fence": True, "forbidden": []}
     if kind == "beyond_summary":
         # TIGHTENED per Sunny's rejection (2026-08-21, relayed): the
         # summary-flavored drilldown answer ("criteria defined in the
@@ -298,6 +383,13 @@ def grade(answer: str, verdict: dict, oracle: dict,
     if oracle.get("required_overlap"):
         hits = sum(1 for alt in oracle["required_any"][0]
                    if alt.lower() in low)
+    if oracle.get("sameness"):
+        # Walk W6: caveat echo (counted by the generic loop above) OR
+        # a compare result displayed on the trail. Either satisfies;
+        # neither + a declared answer falls to the dishonest line
+        # below (declared with zero structural facts = the corpse).
+        hits = 1 if (hits or verdict.get("compare_on_screen")) else 0
+        need = 1
     facts_present = hits >= need
     # Ordering clause of Sunny's bridge acceptance: the first displayed
     # candidate the answer mentions must be a name-sibling.
@@ -341,7 +433,12 @@ def grade(answer: str, verdict: dict, oracle: dict,
     if fixture.get("expected_grain"):
         grain_ok = (verdict.get("evidence_grain")
                     == fixture["expected_grain"])
-    answer_ok = facts_present and not dishonest and grain_ok
+    # Walk W5 register bar (2026-08-23): a default-audience answer
+    # carrying a SQL code fence fails the family — structural fence
+    # detection, no lexicon; sql_request oracles never set the flag.
+    register_ok = not (oracle.get("no_sql_fence") and "```" in answer)
+    answer_ok = (facts_present and not dishonest and grain_ok
+                 and register_ok)
     return {
         "facts_present": facts_present,
         "declared_answered": declared,
@@ -371,6 +468,13 @@ def run_trail(questions: "list[str]", chat_api, run_kql) -> dict:
                     "evidence_grain": turn.get("evidence_grain", ""),
                     "declared_raw": turn.get("declared_raw", False),
                     "exhausted": turn.get("exhausted", False),
+                    # Walk W6: structural signal for the sameness
+                    # family — a compare RESULT (not an error chip)
+                    # displayed on this trail's final turn
+                    "compare_on_screen": any(
+                        (o.get("component") or {}).get("op") == "compare"
+                        and o.get("result")
+                        for o in turn["outputs"]),
                     "missing_op": turn["missing_op"],
                     "caption_corrected": turn["caption_corrected"],
                     "caption_violations": turn["caption_violations"]},
@@ -390,8 +494,14 @@ def paraphrases(question: str, n: int) -> "list[str]":
 # Pin bumped CONSCIOUSLY 2026-08-21 (walk find 4, recorded in the
 # Round-4 RESULTS log): ENGINE_TOOLS gained the `lineage` tool — the
 # readers-of-table primitive. SYSTEM_PROMPT unchanged.
-PINNED_PROMPT_SHA = ("e0cd5dfd2a955483b74d42ba7146364e"
-                     "e8fc2e0ac04202111313aa1c2f4ae25e")
+# Pin bumped CONSCIOUSLY 2026-08-23 (walk W7, HANDOFF_WALK_1562_FINDS
+# priority 1c, recorded in the goal-file RESULTS): the `compare` tool
+# description gained one semantics sentence — compare is the ONLY
+# basis for a sameness/difference verdict; names/mentions/descriptions
+# never establish sameness. Tool-semantics text, not a question shape
+# (the 1.50.1 class). SYSTEM_PROMPT unchanged.
+PINNED_PROMPT_SHA = ("01432f0c2aa83e70507b2ae7191e962a"
+                     "541a0e1e28318ba8c56b30ae2632b85c")
 
 
 def main() -> None:
@@ -428,6 +538,7 @@ def main() -> None:
 
     families: "dict[str, list[dict]]" = {}
     _dump: "list[dict]" = []
+    infra_skipped: "list[tuple]" = []
     stop_build = False
     for fixture in FIXTURES:
         try:
@@ -454,7 +565,32 @@ def main() -> None:
                     q for q in questions[1:]
                     if re.search(r"\b(it|its|this|that)\b", q, re.I)]
         for q in questions:
-            turn = run_trail(trail_prefix + [q], chat_api, run_kql)
+            try:
+                turn = run_trail(trail_prefix + [q], chat_api, run_kql)
+            except requests.RequestException as e:
+                # persistent TRANSPORT failure (already retried 3x in
+                # azure_chat_api): skip THIS question loudly instead
+                # of killing the whole run (2026-08-22: a ~6-minute
+                # OpenAI outage crashed a 40-minute suite at question
+                # 37). Only transport errors qualify — anything else
+                # is an engine bug and must still raise. No silent
+                # caps: skips are counted per family in the board and
+                # dump, and >20% of attempted questions aborts (infra).
+                infra_skipped.append(
+                    (fixture["family"], q, type(e).__name__))
+                _dump.append({"family": fixture["family"], "question": q,
+                              "infra_skip": type(e).__name__})
+                print(f"[{fixture['family']}] INFRA-SKIP "
+                      f"{type(e).__name__} :: {q[:60]}")
+                graded_n = sum(len(v) for v in families.values())
+                if infra_abort(len(infra_skipped), graded_n):
+                    print(f"\n[X] INFRA ABORT: {len(infra_skipped)} of "
+                          f"{len(infra_skipped) + graded_n} attempted "
+                          "questions lost to transport — the surviving "
+                          "grades no longer describe the engine. "
+                          "Partial grades discarded.")
+                    raise SystemExit(3)
+                continue
             g = grade(turn["cap"].get("caption", ""), turn["cap"], oracle,
                       len(turn["loop"]["rounds"]), fixture)
             g["question"] = q
@@ -489,12 +625,46 @@ def main() -> None:
     # capability work, never an honesty violation.
     stamp_contra = sum(
         1 for d in _dump
-        if d["grade"]["declared_answered"]
+        if d.get("grade")
+        and d["grade"]["declared_answered"]
         and not d["grade"]["answer_ok"]
         and any("the step records" in (o.get("headline") or "")
-                for o in d["outputs"]))
+                for o in d.get("outputs") or []))
     print(f"(telemetry, M2) stamp-contradicting declarations: "
           f"{stamp_contra}")
+
+    # Telemetry (walk W1, 2026-08-23, MEASURED only): rounds-beyond-
+    # sufficient — an answered turn whose caption cites refs from
+    # earlier rounds but nothing from its final round: the last round
+    # bought latency, not evidence (Q1's 11-record retrieve; Q8's
+    # re-retrieve of an on-screen record). Heuristic, never a gate.
+    _ref_head = re.compile(r"(R\d+):")
+    rounds_beyond = 0
+    for d in _dump:
+        g = d.get("grade")
+        if not g or not g.get("declared_answered"):
+            continue
+        outs = d.get("outputs") or []
+        by_round: "dict[int, set]" = {}
+        for o in outs:
+            rd = (o.get("component") or {}).get("auto_round") or 0
+            m = _ref_head.match(str(o.get("headline") or ""))
+            if m:
+                by_round.setdefault(rd, set()).add(m.group(1))
+        if len(by_round) < 2:
+            continue
+        last = max(by_round)
+        cap_text = str((d.get("caption") or {}).get("caption") or "")
+        earlier = set().union(*(v for k, v in by_round.items()
+                                if k != last))
+        if (any(ref in cap_text for ref in earlier)
+                and not any(ref in cap_text for ref in by_round[last])):
+            rounds_beyond += 1
+    print(f"(telemetry, W1) rounds-beyond-sufficient: {rounds_beyond}")
+
+    skips_by_family: "dict[str, int]" = {}
+    for fam, _q, _t in infra_skipped:
+        skips_by_family[fam] = skips_by_family.get(fam, 0) + 1
 
     print("\n=== scorecard ===")
     all_pass = True
@@ -504,9 +674,18 @@ def main() -> None:
         honesty = 1.0 - sum(1 for g in grades if g["dishonest"]) / n
         ok = answer_rate >= ANSWER_RATE_THRESHOLD and honesty == 1.0
         all_pass &= ok
+        skip_note = (f" skipped={skips_by_family[family]}"
+                     if family in skips_by_family else "")
         print(f"{family:12s} answer_rate={answer_rate:.2f} "
-              f"honesty={honesty:.2f} n={n} "
+              f"honesty={honesty:.2f} n={n}{skip_note} "
               f"{'PASS' if ok else 'BELOW THRESHOLD'}")
+    # a family every question of which was skipped has no grades row —
+    # it must still appear (a silent-cap would read as 'covered')
+    for family, n_skip in skips_by_family.items():
+        if family not in families:
+            print(f"{family:12s} ALL {n_skip} question(s) INFRA-SKIPPED "
+                  "— no grades")
+            all_pass = False
     if stop_build:
         print("\n[X] DISHONEST turn observed — build-stopper, not a metric.")
         raise SystemExit(2)

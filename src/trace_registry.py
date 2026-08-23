@@ -498,6 +498,20 @@ TRACE_REGISTRY = {
                   "tests/test_companion.py"],
         "docs": ["docs/architecture/SPEC.md", "docs/architecture/TRACE_MAP.md"],
     },
+    "0054": {
+        # DRAFT ADR (review-session skeleton 2026-08-23): the sweep is
+        # unshipped — scope/sequencing PARKED for Sunny; modules/tests
+        # fill in when W8 lands. Registered so the ADR file and the
+        # registry can never drift (this test's own law).
+        "title": "Governance red flags and governed plurality: "
+                 "misnomer/duplicate/cousin sweep over content hashes",
+        "category": "architecture",
+        "axioms": [],
+        "modules": [],
+        "tests": [],
+        "docs": ["docs/decisions/"
+                 "0054-governance-red-flags-governed-plurality.md"],
+    },
     "0053": {
         "title": "Projection-grain column lineage: transform_to_column "
                  "edges, resolved-only, conservation-counted",

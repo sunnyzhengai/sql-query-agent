@@ -640,3 +640,9 @@ classification).
   - `tests/orchestrator/test_ops.py`
 - **Summarized in:**
   - `docs/decisions/0053-projection-column-lineage.md`
+
+## ADR 0054 — Governance red flags and governed plurality: misnomer/duplicate/cousin sweep over content hashes
+
+- **Category:** architecture
+- **Summarized in:**
+  - `docs/decisions/0054-governance-red-flags-governed-plurality.md`
