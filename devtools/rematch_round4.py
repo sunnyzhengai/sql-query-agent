@@ -26,6 +26,7 @@ refuse to run against a stale surface).
 
 from __future__ import annotations
 
+import json
 import statistics
 import sys
 import time
@@ -51,6 +52,7 @@ from src.orchestrator.ops import OpsSession, op_retrieve, op_search  # noqa: E40
 
 FABRIC_RESOURCE = "https://api.fabric.microsoft.com"
 SCORECARD = PROJECT_ROOT / "internal" / "docs" / "REMATCH_ROUND4_SCORECARD.md"
+RAW_LOG = PROJECT_ROOT / "internal" / "docs" / "REMATCH_ROUND4_RAW.jsonl"
 
 # The historical count-oracle family (rounds 2/3 class), derived live.
 EXTRA_FIXTURES = [
@@ -72,20 +74,35 @@ def build_extra_oracle(fixture: dict, run_kql) -> dict:
     return {"required_any": [[str(len(steps))]], "forbidden": []}
 
 
+def characterize(answer: str, oracle: dict) -> dict:
+    """Machine fact accounting for the scorecard: which oracle
+    alternatives the answer carries and which it lacks. The Round-4
+    lesson: the hand-written miss characterization contradicted the
+    machine table — prose may annotate these lines, never replace them.
+    """
+    low = (answer or "").lower()
+    if oracle.get("required_overlap"):
+        alts = oracle["required_any"][0]
+        hit = [a for a in alts if a.lower() in low]
+        return {"need": oracle["required_overlap"], "hits": len(hit),
+                "total": len(alts), "hit": hit,
+                "missed": [a for a in alts if a not in hit]}
+    hit, missed = [], []
+    for group in oracle["required_any"]:
+        found = next((a for a in group if a.lower() in low), None)
+        (hit.append(found) if found else missed.append(group[0]))
+    total = len(oracle["required_any"])
+    return {"need": total, "hits": len(hit), "total": total,
+            "hit": hit, "missed": missed}
+
+
 def grade_fabric(answer: str, oracle: dict, fixture: dict) -> dict:
     low = (answer or "").lower()
-    hits = 0
-    for group in oracle["required_any"]:
-        if any(alt.lower() in low for alt in group):
-            hits += 1
-    need = oracle.get("required_overlap", len(oracle["required_any"]))
-    if oracle.get("required_overlap"):
-        hits = sum(1 for alt in oracle["required_any"][0]
-                   if alt.lower() in low)
-    facts_present = hits >= need
+    facts = characterize(answer, oracle)
     fabricated = any(f.lower() in low for f in oracle["forbidden"])
-    return {"facts_present": facts_present, "dishonest": fabricated,
-            "fact_hits": hits}
+    return {"facts_present": facts["hits"] >= facts["need"],
+            "dishonest": fabricated, "fact_hits": facts["hits"],
+            "facts": facts}
 
 
 def main() -> None:
@@ -105,6 +122,7 @@ def main() -> None:
 
     all_fixtures = FIXTURES + EXTRA_FIXTURES
     rows = []
+    RAW_LOG.write_text("")            # fresh raw log for this run
     for fixture in all_fixtures:
         if fixture in EXTRA_FIXTURES:
             oracle = build_extra_oracle(fixture, run_kql)
@@ -126,14 +144,31 @@ def main() -> None:
                                   else f"[{resp.status}] {resp.error}")
         fabric_s = time.monotonic() - t0
         g_fab = grade_fabric(fabric_answers[-1], oracle, fixture)
+        # reporting-only for the homegrown side (its PASS/miss is
+        # grade()'s, typed verdict included) — same accounting ruler
+        home_caption = turn["cap"].get("caption") or ""
+        c_home = characterize(home_caption, oracle)
 
         rows.append({
             "family": fixture["family"], "question": fixture["question"],
             "home": g_home, "home_s": round(home_s, 2),
+            "home_facts": c_home,
             "fabric": g_fab, "fabric_s": round(fabric_s, 2),
             "fabric_answer": fabric_answers[-1][:400],
-            "home_answer": (turn["cap"].get("caption") or "")[:400],
+            "home_answer": home_caption[:400],
         })
+        # full evidence beside the scorecard — the truncated verbatim
+        # section can no longer be the only record of what was said
+        with RAW_LOG.open("a") as fh:
+            fh.write(json.dumps({
+                "family": fixture["family"],
+                "question": fixture["question"],
+                "oracle": oracle,
+                "home": {"answer": home_caption, "grade": g_home,
+                         "facts": c_home, "s": round(home_s, 2)},
+                "fabric": {"answers": fabric_answers, "grade": g_fab,
+                           "s": round(fabric_s, 2)},
+            }, default=str) + "\n")
         print(f"[{fixture['family']}] home="
               f"{'ok' if g_home['facts_present'] else 'miss'}"
               f"{'/DISHONEST' if g_home['dishonest'] else ''} "
@@ -144,14 +179,27 @@ def main() -> None:
 
     home_p50 = statistics.median(r["home_s"] for r in rows)
     fab_p50 = statistics.median(r["fabric_s"] for r in rows)
+    SCORECARD.write_text("\n".join(scorecard_lines(rows, home_p50, fab_p50)))
+    print(f"\nWrote {SCORECARD}")
+    print(f"Latency p50: homegrown {home_p50}s vs fabric {fab_p50}s")
 
+
+def scorecard_lines(rows: "list[dict]", home_p50: float,
+                    fab_p50: float) -> "list[str]":
+    """The scorecard, machine-emitted end to end. Prose elsewhere (goal
+    file, relays) annotates these lines — it never free-writes a miss
+    list, and any 'X is not in the catalog' claim carries its grep
+    receipt (the Round-4 record-audit rule)."""
     lines = [
         "# Rematch Round 4 — homegrown orchestrator vs Fabric Data Agent",
         "",
         "Protocol: fixed questions, ONE run, oracles derived from the "
         "store (HANDOFF_REMATCH_ROUND4_GOAL). Homegrown honesty is "
         "typed-verdict cross-checked; Fabric honesty is forbidden-claim "
-        "scanned only (no typed verdict exists on that surface).",
+        "scanned only (no typed verdict exists on that surface). Facts "
+        "bars are oracle thresholds — overlap oracles PASS on partial "
+        "name overlap; per-row hit accounting is machine-emitted below "
+        "and in full in REMATCH_ROUND4_RAW.jsonl.",
         "",
         f"Latency p50: homegrown {home_p50}s · fabric {fab_p50}s",
         "",
@@ -169,14 +217,39 @@ def main() -> None:
                        not r["fabric"]["dishonest"]) else "fabric")
         lines.append(f"| {r['family']} | {h} | {r['home_s']} | {f} | "
                      f"{r['fabric_s']} | {verdict} |")
-    lines += ["", "## Answers (verbatim, truncated 400)", ""]
+
+    # Machine-emitted characterization: every miss, and every PASS
+    # earned on partial overlap of a small name-set oracle. Prose in
+    # the goal file annotates THESE lines — it never free-writes a
+    # miss list (the Round-4 record-audit rule).
+    lines += ["", "## Misses and partial passes (machine-emitted)", ""]
+    for r in rows:
+        for side in ("home", "fabric"):
+            g = r[side]
+            facts = r["home_facts"] if side == "home" else g.get("facts")
+            if not facts:
+                continue
+            tag = None
+            if not g["facts_present"]:
+                tag = "miss"
+            elif facts["hits"] < facts["total"] and facts["total"] <= 10:
+                tag = "PASS on partial overlap"
+            if tag is None:
+                continue
+            carried = ", ".join(facts["hit"][:8]) or "none"
+            absent = ", ".join(facts["missed"][:8]) or "none"
+            lines.append(
+                f"- {side} {tag} — {r['family']} — "
+                f"\"{r['question']}\": hits {facts['hits']}/"
+                f"{facts['need']} needed of {facts['total']}; "
+                f"carried: [{carried}]; absent: [{absent}]")
+    lines += ["", "## Answers (verbatim, truncated 400 — full text in "
+              "REMATCH_ROUND4_RAW.jsonl)", ""]
     for r in rows:
         lines += [f"### {r['family']} — {r['question']}",
                   f"- homegrown: {r['home_answer']}",
                   f"- fabric: {r['fabric_answer']}", ""]
-    SCORECARD.write_text("\n".join(lines))
-    print(f"\nWrote {SCORECARD}")
-    print(f"Latency p50: homegrown {home_p50}s vs fabric {fab_p50}s")
+    return lines
 
 
 if __name__ == "__main__":
