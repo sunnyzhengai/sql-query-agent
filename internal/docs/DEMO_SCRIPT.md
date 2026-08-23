@@ -196,3 +196,21 @@ the cut lands ~4:30–5:00.*
 - [ ] Rotate the Collibra apiuser password AND the Purview app secret
       (both exposed in config + screenshot 2026-08-16)
 - [ ] Delete the screenshot files containing the credentials
+
+## Candidate phrases (2026-08-23 — not yet placed; Sunny places or cuts)
+
+**The ontology claim** (reviewer-safe framing; candidate for VO-1's
+close or the VO-6 close — do not claim ontology *reasoning* or
+*completeness*):
+
+"Your ontology already exists — it's buried in thousands of stored
+procedures and DAX measures. AIVIA extracts it, certifies it, and
+makes it governed and queryable — every concept grounded in the
+parsed logic that computes it."
+
+**Governed plurality** (candidate, only if ADR 0054 ships pre-demo;
+pairs with an estate-wide red-flags shot upgrading VO-4):
+
+"AIVIA doesn't force one definition on everyone. It finds every
+variant, labels each one, and lets your stewards certify the
+official truth — governed plurality, not forced uniformity."

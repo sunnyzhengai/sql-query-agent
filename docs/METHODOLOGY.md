@@ -28,6 +28,35 @@ The method descends from a real tradition and adds one new element:
 | 1970 | E. F. Codd (relational algebra) | a small closed operator algebra generates every query; completeness lives in the algebra, not in enumerated cases |
 | 2026 | this project | the translator is now STOCHASTIC — so the loop adds a REGULATOR: every translation is confirmed by the human before execution |
 
+## The enforcement lineage (prior art for the contract regime)
+
+Recorded 2026-08-21 (Sunny's mandate) so future references have names.
+No single framework contains this stack; every piece has a literature:
+
+| Our invention | The tradition that formalized it |
+|---|---|
+| Table contracts, pre/postcondition gates | **Design by Contract** — Bertrand Meyer, Eiffel (1986) |
+| SPEC.md, axioms, refinement, `G ⊨ Φ` | **Formal specification** — Z, VDM, Alloy, TLA+ |
+| Reference/key invariants, conservation equations | **Database dependency theory** — TGDs/EGDs, the chase |
+| TRACE_REGISTRY, ADR → code → test lineage | **Traceability matrices** — mandated by safety-critical standards |
+| "Intentions decay; only enforcement survives" | **Poka-yoke** — Toyota mistake-proofing |
+| Real-corpses rule, error-contract philosophy | **SRE postmortem culture** — Google (incident → class-level fix) |
+| "Undeclared consumers", the consumer police | **"Hidden Technical Debt in ML Systems"** — Sculley et al., 2015 |
+| Conversation suite, honesty as build-stopper | **Eval-driven development** — frontier-lab practice |
+| Escalation contract, no silent residue, drift detection | **STAMP/STPA** — Nancy Leveson, systems safety |
+
+Two umbrella standards worth reading for positioning (healthcare
+buyers recognize them): **IEC 62304** (medical-device software
+lifecycle — mandates requirements traceability, verification at every
+level, configuration management, formal anomaly resolution: our
+registries, trace contract, gates, and escalation contract, written by
+a standards committee) and **DO-178C** (avionics — adds coverage
+analysis: proving nothing exists outside the tested inventory, our
+Group C). **STPA** is the proactive form of our drift lesson: systems
+fail by silently migrating into states nobody chose, wherever a
+feedback loop is missing — the generative question set behind the
+design-review clause (SPEC.md §3b, the three questions).
+
 ## The anti-pattern this exists to kill: pattern predefinition
 
 Enumerating language — question shapes, claim shapes, comparison

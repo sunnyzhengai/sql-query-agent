@@ -1,8 +1,9 @@
 # AI via Axioms (AIVIA) — a framework for designing agentic systems
 
-**Version:** 0.1 — 2026-08-21
-**Authors:** Sunny Zheng (axioms, groups 1–3, the mandate) with the
-review session (groups 4–6, theorems, formalization)
+**Version:** 0.2 — 2026-08-22 (ratified by Sunny; see Changelog)
+**Authors:** Sunny Zheng (axioms, groups 1–3, the verification type
+system's dimensions, the mandate) with the review session (groups 4–6,
+theorems, the two verification laws, formalization)
 **Reference implementation:** AIVIA, the SQL Intelligence Agent — every
 axiom below descends from a documented incident in its construction or
 a proof in its specification (`docs/architecture/SPEC.md`). The name is
@@ -42,7 +43,9 @@ lowest Measure stratum that can carry it.
 ## 2. The axioms
 
 Format per axiom: statement · gloss · descent (the incident or proof
-it comes from) · enforcement shape.
+it comes from) · enforcement shape · strata profile (by type lookup,
+§4 — group-level assignments given there; per-axiom overrides only
+where a group default misfits, recorded loudly).
 
 ### Group D — Data (Sunny's axioms, 2026-08-21)
 
@@ -224,7 +227,7 @@ truth from which governance, weights, and personal layers are
 rebuilt. *Descent:* the purged in-place usage counter; the flywheel.
 *Enforcement:* append-only contracts; recomputability tests.
 
-## 3. The entry ritual (the three questions)
+## 3. The entry ritual (the four questions)
 
 Every new artifact class answers, before its first line of code:
 
@@ -234,6 +237,11 @@ Every new artifact class answers, before its first line of code:
    fallout lands (R1's shape).
 3. **Drift** — what mechanically fires when reality diverges (R2's
    shape).
+4. **Type** (v0.2) — the artifact class's type tuple:
+   `(processor, consumer, action, data-kind)`. The verification
+   profile and enforcement obligations then follow by LOOKUP (§4),
+   never by debate. Misfiling the type is the reviewable error — the
+   J2 pattern applied to verification planning.
 
 The answers become registry rows; a design review that cannot cite
 them does not proceed. Prior art: IEC 62304 / DO-178C traceability and
@@ -248,10 +256,88 @@ coverage analysis; STPA control-loop hazard analysis.
 | L2 | behavior under a live model (suites, paraphrase spread) | measured — thresholds; honesty violations stop the build, they are never a metric |
 | L3 | human acceptance (recorded walk protocols) | judged |
 
-Laws: every capability declares its checks at every stratum before
+Laws: every capability declares its checks per its PROFILE before
 shipping; never measure what you could test; never ask L3 eyes to
 discover what L2 should have caught; L3 rejections become L2 cases
 before their fixes ship.
+
+### 4a. The verification-profile law (v0.2, ratified 2026-08-22)
+
+**A stratum is mandatory for an axiom or artifact class exactly when a
+violation class exists that lower strata cannot witness.** An axiom
+missing a check at a mandated stratum is UNBOUND at that stratum;
+receipts cite every mandated stratum. Uniform full-stack verification
+is itself a violation: it wastes the scarcest stratum (human
+attention) and dilutes its meaning — never spend human judgment on
+what a registry can prove.
+
+*Descent:* the reader-list misattribution (walk find 3, 2026-08-21) —
+an L3-only violation class: the registry proved the op existed, the
+suite's string-space checks passed (every name was on screen), and
+only a human reading the answer could see the RELATIONSHIP claimed
+was wrong.
+
+### 4b. The verification type system (v0.2 — Sunny's dimensions)
+
+Profiles are not derived per-axiom by expert judgment (an undeclared
+decision); they are LOOKED UP from the artifact's type tuple. The
+factorization:
+
+    strata_profile = f(processor × consumer)     verification depth
+    obligations    = g(action × data-kind)       enforcement strength
+
+**The strata table (f):**
+
+| processor ↓ / consumer → | machine | admin | end-user |
+|---|---|---|---|
+| **deterministic** | L1 | L1 + L3-once | L1 + L3-once |
+| **stochastic (LLM in path)** | L1 + L2 | L1 + L2 + L3 | L1 + L2 + L3 |
+
+- **L3-once**: human judgment at design review (is the template/
+  message/checklist right?), then L1 carries it forever.
+- **L3-recurring**: the walk — mandated wherever a stochastic output
+  space meets human meaning-making; it cannot be judged once.
+- L0 underlies every cell (contracts and kernels are universal).
+
+**The obligations map (g), by the other two dimensions:** writes and
+outward actions → confirmation (B4); appends → immutability (R4);
+egress → redaction gates (E5-class); raw/PHI data-kind → boundary
+gates regardless of action; user-authored data-kind → ownership (D3)
+and ledger (R4) duties. Action and data-kind never change the strata —
+they change what the Boundary and Residue groups demand.
+
+**Group-level profile assignments (defaults; overrides recorded
+loudly):** A, S, D2–D4, J, and R1–R2 are deterministic × machine →
+L1. R3's checklist and all admin-facing operational messages are
+deterministic × admin → L1 + L3-once. D1's ask-surface, B1–B3 at the
+answer surface, and all of M are stochastic × end-user → full stack.
+B4 is enforcement (g), verified at L1.
+
+**Fallback rule:** when a type assignment is contested or a novel
+type appears, drop to first principles — enumerate the violation
+classes and ask which stratum witnesses each (4a is the semantics;
+the table is the compiled common case). The table is amendable data;
+a new cell earns its way in with a scar.
+
+*Descent:* the poisoned stored descriptions (walk find 2) — a
+stochastic × end-user artifact carrying L1 + partial L2, whose scope
+defect only L3 caught; and this type system itself, authored by Sunny
+challenging the profile law's per-axiom derivation as an undeclared
+judgment (2026-08-22).
+
+### 4c. The verification-descends law (v0.2, ratified 2026-08-22)
+
+**Every violation caught at stratum n is examined for a stratum n−1
+check.** What a human caught once becomes a suite fixture (the
+real-corpses rule); what suites catch repeatedly becomes a registry or
+CI check where mechanizable. The healthy stack is bottom-heavy: L3
+stays mandated where its type requires it, but each walk teaches the
+lower strata to need the human less.
+
+*Descent:* the standing rhythm, named — dumb-trail → fixtures → suite
+→ cage tests; and ADR 0044 phases 2–3 as the planned descent of the
+poisoned-description class from L3 (a human noticing a contradiction)
+to L2 (blind round-trip reconstruction diffing 0 sites against 427).
 
 ## 5. The theorems (conditional guarantees)
 
@@ -301,7 +387,25 @@ before their fixes ship.
 | Round-laziness variance (scores bouncing 0.83/0.67/0.50 on identical code) — a computable continuation decision resting on a stochastic decider; moved to code, variance gone | M5, first live diagnostic use |
 | Humble-but-blind residual — the mind declining a hop to evidence it was pointed at; resolved by materializing decision evidence inline on the metric record (zero prompt machinery; anaphora ≥ bar, stamp-contradiction telemetry 0 across consecutive runs). Two corpses en route: the exhausted-turn verdict lie and the anchorless bridge synthesis, both caged | M2 typed and measured; the M5 fix's boundary holes convicted by the ratified honesty line |
 
+| Reader-list misattribution (walk find 3) — correct stamps, wrong relationship in prose; invisible to L1/L2 by construction | 4a, the verification-profile law |
+| Poisoned stored descriptions (walk find 2) — "no filtering decisions" on a metric with 427 decision sites; L1+partial-L2 passed, L3 caught it | 4b's stochastic × end-user cell; 4c (its descent = ADR 0044 phases 2–3) |
+| Uniform-full-stack proposal refined by challenge into the type lookup | 4b, the verification type system |
+
 The reference implementation's specification (`SPEC.md`), methodology
 (`METHODOLOGY.md`, Operations Are the Product), and suite scorecards
 are the framework's evidence base: every axiom above has a scar or a
 proof, and the dates are in the ADRs.
+
+## Changelog
+
+- **0.2 (2026-08-22, ratified by Sunny)** — §3 gains the fourth
+  question (type declaration); §4a the verification-profile law
+  (stratum mandatory ⟺ a violation class is invisible below it); §4b
+  the verification type system (Sunny's dimensions + the processor
+  dimension; `strata = f(processor × consumer)`,
+  `obligations = g(action × data-kind)`; the strata table;
+  L3-once vs L3-recurring; group-level assignments; fallback to
+  first principles); §4c the verification-descends law (bottom-heavy
+  stacks; L3 findings migrate downward). Three receipts rows added.
+- **0.1 (2026-08-21)** — initial: eight parts, six axiom groups, five
+  theorems, three questions, strata.
