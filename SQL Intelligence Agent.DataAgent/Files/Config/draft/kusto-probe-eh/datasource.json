@@ -5,20 +5,36 @@
   "dataSourceInstructions": null,
   "displayName": "probe-eh",
   "type": "kusto",
-  "userDescription": "To resolve a user's topic or metric reference, call semantic_search('<core concept phrase>') FIRST. Use the returned ref (metric_id or term_id) for any further lookups in other sources. Report total_matches when more matched than shown. closeness is relative similarity — never present it as a probability. If semantic_search returns no rows, say the certified knowledge base has nothing sufficiently related; do not guess.\n",
+  "userDescription": "To resolve a user's topic or metric reference, call semantic_search('<core concept phrase>') FIRST. Use the returned ref (metric_id or term_id) for any further lookups in other sources. Report total_matches when more matched than shown. closeness is relative similarity — never present it as a probability. If semantic_search returns no rows, say the certified knowledge base has nothing sufficiently related; do not guess.\n\nFor LINEAGE questions - which metrics use/read a table, or filter on/select a column - call readers_of_table('<table>') or column_usage('<column>'). These read parsed SQL lineage edges; NEVER answer lineage by name similarity or hand-written LIKE queries (the catalog contains deliberate name-cousins). The matched column discloses exact vs token matching; the distinct ref count is the exact answer to 'how many metrics'.\n",
   "metadata": {},
   "elements": [
     {
-      "id": "c8026ac9-45a9-42eb-b514-26e1d541820b",
+      "id": "608442f5-3df5-40bf-a295-adddebe6eaba",
       "is_selected": false,
       "display_name": "Functions",
       "type": "function_grouping",
       "description": null,
       "children": [
         {
-          "id": "57c35ceb-ac1d-4947-bc6a-7ebcf4ff111e",
+          "id": "49febea8-5805-4c70-abc5-b41e8d7fc249",
           "is_selected": true,
           "display_name": "semantic_search",
+          "type": "kusto.function",
+          "description": null,
+          "children": []
+        },
+        {
+          "id": "b2fca510-e977-4efc-bb68-bcdbaf355462",
+          "is_selected": true,
+          "display_name": "readers_of_table",
+          "type": "kusto.function",
+          "description": null,
+          "children": []
+        },
+        {
+          "id": "24da961e-ec5d-4a66-aae5-1e163bc42830",
+          "is_selected": true,
+          "display_name": "column_usage",
           "type": "kusto.function",
           "description": null,
           "children": []
@@ -26,7 +42,7 @@
       ]
     },
     {
-      "id": "ce754066-d4d2-4bd8-b530-d79d8c2913a5",
+      "id": "3f7f0b9f-55e9-4db9-9383-1ddfe3359c6e",
       "is_selected": false,
       "display_name": "Materialized Views",
       "type": "materialized_view_grouping",
@@ -34,14 +50,14 @@
       "children": []
     },
     {
-      "id": "98adf3a1-ee26-4ef2-bba8-55c92f5d3a9c",
+      "id": "894dc634-2c30-4211-b691-1f7118124ac7",
       "is_selected": false,
       "display_name": "Shortcuts",
       "type": "shortcut_grouping",
       "description": null,
       "children": [
         {
-          "id": "83296ba2-2bd2-4217-8006-2116fcdd6280",
+          "id": "4dfd07e1-f373-4d08-97b6-4671368cf4a7",
           "is_selected": false,
           "display_name": "output_semantic_catalog",
           "type": "kusto.external_table",
@@ -113,7 +129,7 @@
           ]
         },
         {
-          "id": "8bd18a9b-6539-4418-80ad-25bdb684caf6",
+          "id": "d37d2bdf-441b-4306-b9ca-bdf28d7664fb",
           "is_selected": false,
           "display_name": "graph_nodes",
           "type": "kusto.external_table",
@@ -167,7 +183,7 @@
           ]
         },
         {
-          "id": "05c8e4f7-67c3-4c58-a0b7-c844538d77e9",
+          "id": "13dd7576-0bbd-406b-b28f-b7f6c525f40a",
           "is_selected": false,
           "display_name": "output_metric_logic",
           "type": "kusto.external_table",
@@ -284,7 +300,7 @@
           ]
         },
         {
-          "id": "ae613ad5-153f-4b2c-b6b8-2547fac60732",
+          "id": "55f8b51b-b18f-441c-a9b5-ac58726cdaa6",
           "is_selected": false,
           "display_name": "graph_edges",
           "type": "kusto.external_table",
@@ -331,7 +347,7 @@
       ]
     },
     {
-      "id": "031937a1-28a9-41df-b27a-7a49c34c4dab",
+      "id": "644124e4-590e-45fc-a97f-52e1248f3e60",
       "is_selected": false,
       "display_name": "Tables",
       "type": "table_grouping",

@@ -18,3 +18,50 @@
     | project node_id, ['kind'], ['ref'], name, business_name,
               display_text, closeness, total_matches = total
 }
+.create-or-alter function with (folder = "aivia", docstring = "Certified metrics that READ a table, from parsed SQL lineage edges (transform_to_technical) - never name mentions. Exact table-name match first; whole-token fallback only when no exact table exists (the matched column discloses which). One row per table+metric: table_name, ref, business_name, matched. Use for: which metrics use / read / depend on table X. The distinct ref count IS the exact reader count.", skipvalidation = "true") readers_of_table(p_table:string) {
+    let pairs = graph_nodes
+        | where node_id startswith 'tech:'
+        | project tech_id = node_id, table_name = name
+        | join kind=inner (graph_edges
+            | where edge_type == 'transform_to_technical'
+            | project tech_id = target_id, source_id) on tech_id
+        | extend ['ref'] = tostring(split(source_id, ':')[1])
+        | distinct table_name, ['ref']
+        | join kind=leftouter (semantic_catalog
+            | where ['kind'] == 'metric'
+            | project ['ref'], business_name) on ['ref']
+        | project table_name, ['ref'], business_name;
+    let exact_n = toscalar(pairs | where table_name =~ p_table | count);
+    union
+        (pairs | where table_name =~ p_table | extend matched = 'exact'),
+        (pairs | where exact_n == 0 and table_name has p_table
+               | extend matched = 'token')
+    | order by table_name asc, ['ref'] asc
+}
+
+.create-or-alter function with (folder = "aivia", docstring = "Certified metrics that FILTER on a column (WHERE/CASE decision sites, relation=\'filters\') or SELECT it (projection, relation=\'selects\'), from parsed SQL lineage edges - never name mentions. Exact column-name match first; whole-token fallback only when no exact column exists (matched column discloses which). Rows: column_name, relation, ref, business_name, matched. Use for: which metrics filter on / select / touch column Y.", skipvalidation = "true") column_usage(p_column:string) {
+    let cols = graph_nodes
+        | where node_id startswith 'tech:'
+            and array_length(split(node_id, '.')) == 3
+        | project col_id = node_id, column_name = name;
+    let usage = union
+        (graph_edges | where edge_type == 'decision_to_column'
+            | project col_id = target_id, source_id, relation = 'filters'),
+        (graph_edges | where edge_type == 'transform_to_column'
+            | project col_id = target_id, source_id, relation = 'selects');
+    let pairs = cols
+        | join kind=inner usage on col_id
+        | extend ['ref'] = tostring(split(source_id, ':')[1])
+        | distinct column_name, relation, ['ref']
+        | join kind=leftouter (semantic_catalog
+            | where ['kind'] == 'metric'
+            | project ['ref'], business_name) on ['ref']
+        | project column_name, relation, ['ref'], business_name;
+    let exact_n = toscalar(pairs | where column_name =~ p_column | count);
+    union
+        (pairs | where column_name =~ p_column | extend matched = 'exact'),
+        (pairs | where exact_n == 0 and column_name has p_column
+               | extend matched = 'token')
+    | order by column_name asc, relation asc, ['ref'] asc
+}
+

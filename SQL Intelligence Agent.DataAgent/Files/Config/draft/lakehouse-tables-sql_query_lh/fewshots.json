@@ -2,27 +2,32 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/dataAgent/definition/fewShots/1.0.0/schema.json",
   "fewShots": [
     {
-      "id": "81d3d06d-683a-477c-8488-fd8cb819d510",
+      "id": "46fe1f0e-32c1-5e58-b4ef-7391c593f102",
       "question": "What metrics are available?",
       "query": "SELECT metric_id, metric_name, business_name, description\nFROM output_metric_logic ORDER BY business_name"
     },
     {
-      "id": "4342c397-b436-4c3b-8a19-b928aef62718",
+      "id": "d74f1afc-58a1-5094-905a-108188c03dbb",
       "question": "Tell me about a specific metric",
-      "query": "SELECT metric_id, metric_name, business_name, report_name, report_url, description, steward, developer, calculation_logic, source_tables, table_descriptions\nFROM output_metric_logic\nWHERE lower(metric_name) LIKE '%keyword%' OR lower(metric_id) LIKE '%keyword%' OR lower(business_name) LIKE '%keyword%'"
+      "query": "-- resolve the metric via semantic_search FIRST, then look up by exact id\nSELECT metric_id, metric_name, business_name, report_name, report_url, description, steward, developer, calculation_logic, source_tables, table_descriptions\nFROM output_metric_logic\nWHERE lower(metric_id) = lower('resolved_metric_id')"
     },
     {
-      "id": "a9af5312-3eb0-438b-91b9-b588e7ac032b",
+      "id": "f6b23a89-e957-5bf0-b2d7-e3619e85a33b",
       "question": "Which metrics use a specific table?",
-      "query": "SELECT DISTINCT c.metricId, c.businessName\nFROM graph_edge_uses_table u\nJOIN graph_canonical c ON u.sourceId = c.nodeId\nWHERE lower(u.targetId) LIKE '%table_name%'"
+      "query": "-- lineage: prefer readers_of_table('table_name') on the KQL source; this Lakehouse form is token-exact\nSELECT DISTINCT c.metricId, c.businessName\nFROM graph_edge_uses_table u\nJOIN graph_canonical c ON u.sourceId = c.nodeId\nWHERE lower(u.targetId) LIKE lower('%.table_name')"
     },
     {
-      "id": "a3910586-6353-4fe4-aacd-140a9f09b7fc",
+      "id": "635e863c-88cd-5064-9112-a4d8c62cc63c",
+      "question": "How many metrics mention a term in their logic?",
+      "query": "-- token-bounded: 'ED' must match ED_SEPSIS, never COMPILED or other words merely containing the letters\nSELECT COUNT(*) AS metric_count\nFROM output_metric_logic\nWHERE lower(calculation_logic) LIKE '%[^a-z0-9]term[^a-z0-9]%'\n   OR lower(calculation_logic) LIKE 'term[^a-z0-9]%'\n   OR lower(calculation_logic) LIKE '%[^a-z0-9]term'"
+    },
+    {
+      "id": "ac295ea2-3b6d-5c8f-a06a-08728b78cb06",
       "question": "Which metrics have no steward assigned?",
       "query": "SELECT metric_id, metric_name, business_name FROM output_metric_logic WHERE steward IS NULL"
     },
     {
-      "id": "6fa44c15-b7c4-4678-96b9-beda82d5fcb7",
+      "id": "780bbfb5-089a-52f5-989d-9f65478f71e7",
       "question": "Show the recent build history",
       "query": "SELECT TOP 20 * FROM ops_build_summary ORDER BY build_time DESC"
     }
