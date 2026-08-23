@@ -1,0 +1,424 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/dataAgent/definition/dataSource/1.0.0/schema.json",
+  "artifactId": "5fb67189-9321-a780-4960-f07d718853ec",
+  "workspaceId": "00000000-0000-0000-0000-000000000000",
+  "dataSourceInstructions": null,
+  "displayName": "probe-eh",
+  "type": "kusto",
+  "userDescription": "To resolve a user's topic or metric reference, call semantic_search('<core concept phrase>') FIRST. Use the returned ref (metric_id or term_id) for any further lookups in other sources. Report total_matches when more matched than shown. closeness is relative similarity — never present it as a probability. If semantic_search returns no rows, say the certified knowledge base has nothing sufficiently related; do not guess.\n",
+  "metadata": {},
+  "elements": [
+    {
+      "id": "c8026ac9-45a9-42eb-b514-26e1d541820b",
+      "is_selected": false,
+      "display_name": "Functions",
+      "type": "function_grouping",
+      "description": null,
+      "children": [
+        {
+          "id": "57c35ceb-ac1d-4947-bc6a-7ebcf4ff111e",
+          "is_selected": true,
+          "display_name": "semantic_search",
+          "type": "kusto.function",
+          "description": null,
+          "children": []
+        }
+      ]
+    },
+    {
+      "id": "ce754066-d4d2-4bd8-b530-d79d8c2913a5",
+      "is_selected": false,
+      "display_name": "Materialized Views",
+      "type": "materialized_view_grouping",
+      "description": null,
+      "children": []
+    },
+    {
+      "id": "98adf3a1-ee26-4ef2-bba8-55c92f5d3a9c",
+      "is_selected": false,
+      "display_name": "Shortcuts",
+      "type": "shortcut_grouping",
+      "description": null,
+      "children": [
+        {
+          "id": "83296ba2-2bd2-4217-8006-2116fcdd6280",
+          "is_selected": false,
+          "display_name": "output_semantic_catalog",
+          "type": "kusto.external_table",
+          "description": null,
+          "children": [
+            {
+              "id": "business_name",
+              "is_selected": true,
+              "display_name": "business_name",
+              "type": "kusto.column",
+              "data_type": "System.String",
+              "description": null,
+              "children": []
+            },
+            {
+              "id": "display_text",
+              "is_selected": true,
+              "display_name": "display_text",
+              "type": "kusto.column",
+              "data_type": "System.String",
+              "description": null,
+              "children": []
+            },
+            {
+              "id": "kind",
+              "is_selected": true,
+              "display_name": "kind",
+              "type": "kusto.column",
+              "data_type": "System.String",
+              "description": null,
+              "children": []
+            },
+            {
+              "id": "name",
+              "is_selected": true,
+              "display_name": "name",
+              "type": "kusto.column",
+              "data_type": "System.String",
+              "description": null,
+              "children": []
+            },
+            {
+              "id": "node_id",
+              "is_selected": true,
+              "display_name": "node_id",
+              "type": "kusto.column",
+              "data_type": "System.String",
+              "description": null,
+              "children": []
+            },
+            {
+              "id": "ref",
+              "is_selected": true,
+              "display_name": "ref",
+              "type": "kusto.column",
+              "data_type": "System.String",
+              "description": null,
+              "children": []
+            },
+            {
+              "id": "search_text",
+              "is_selected": true,
+              "display_name": "search_text",
+              "type": "kusto.column",
+              "data_type": "System.String",
+              "description": null,
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "8bd18a9b-6539-4418-80ad-25bdb684caf6",
+          "is_selected": false,
+          "display_name": "graph_nodes",
+          "type": "kusto.external_table",
+          "description": null,
+          "children": [
+            {
+              "id": "node_id",
+              "is_selected": true,
+              "display_name": "node_id",
+              "type": "kusto.column",
+              "data_type": "System.String",
+              "description": null,
+              "children": []
+            },
+            {
+              "id": "layer",
+              "is_selected": true,
+              "display_name": "layer",
+              "type": "kusto.column",
+              "data_type": "System.String",
+              "description": null,
+              "children": []
+            },
+            {
+              "id": "name",
+              "is_selected": true,
+              "display_name": "name",
+              "type": "kusto.column",
+              "data_type": "System.String",
+              "description": null,
+              "children": []
+            },
+            {
+              "id": "description",
+              "is_selected": true,
+              "display_name": "description",
+              "type": "kusto.column",
+              "data_type": "System.String",
+              "description": null,
+              "children": []
+            },
+            {
+              "id": "properties",
+              "is_selected": true,
+              "display_name": "properties",
+              "type": "kusto.column",
+              "data_type": "System.String",
+              "description": null,
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "05c8e4f7-67c3-4c58-a0b7-c844538d77e9",
+          "is_selected": false,
+          "display_name": "output_metric_logic",
+          "type": "kusto.external_table",
+          "description": null,
+          "children": [
+            {
+              "id": "metric_id",
+              "is_selected": true,
+              "display_name": "metric_id",
+              "type": "kusto.column",
+              "data_type": "System.String",
+              "description": null,
+              "children": []
+            },
+            {
+              "id": "metric_name",
+              "is_selected": true,
+              "display_name": "metric_name",
+              "type": "kusto.column",
+              "data_type": "System.String",
+              "description": null,
+              "children": []
+            },
+            {
+              "id": "business_name",
+              "is_selected": true,
+              "display_name": "business_name",
+              "type": "kusto.column",
+              "data_type": "System.String",
+              "description": null,
+              "children": []
+            },
+            {
+              "id": "report_name",
+              "is_selected": true,
+              "display_name": "report_name",
+              "type": "kusto.column",
+              "data_type": "System.String",
+              "description": null,
+              "children": []
+            },
+            {
+              "id": "report_url",
+              "is_selected": true,
+              "display_name": "report_url",
+              "type": "kusto.column",
+              "data_type": "System.String",
+              "description": null,
+              "children": []
+            },
+            {
+              "id": "description",
+              "is_selected": true,
+              "display_name": "description",
+              "type": "kusto.column",
+              "data_type": "System.String",
+              "description": null,
+              "children": []
+            },
+            {
+              "id": "steward",
+              "is_selected": true,
+              "display_name": "steward",
+              "type": "kusto.column",
+              "data_type": "System.String",
+              "description": null,
+              "children": []
+            },
+            {
+              "id": "developer",
+              "is_selected": true,
+              "display_name": "developer",
+              "type": "kusto.column",
+              "data_type": "System.String",
+              "description": null,
+              "children": []
+            },
+            {
+              "id": "transform_count",
+              "is_selected": true,
+              "display_name": "transform_count",
+              "type": "kusto.column",
+              "data_type": "System.Int32",
+              "description": null,
+              "children": []
+            },
+            {
+              "id": "calculation_logic",
+              "is_selected": true,
+              "display_name": "calculation_logic",
+              "type": "kusto.column",
+              "data_type": "System.String",
+              "description": null,
+              "children": []
+            },
+            {
+              "id": "source_tables",
+              "is_selected": true,
+              "display_name": "source_tables",
+              "type": "kusto.column",
+              "data_type": "System.String",
+              "description": null,
+              "children": []
+            },
+            {
+              "id": "table_descriptions",
+              "is_selected": true,
+              "display_name": "table_descriptions",
+              "type": "kusto.column",
+              "data_type": "System.String",
+              "description": null,
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "ae613ad5-153f-4b2c-b6b8-2547fac60732",
+          "is_selected": false,
+          "display_name": "graph_edges",
+          "type": "kusto.external_table",
+          "description": null,
+          "children": [
+            {
+              "id": "source_id",
+              "is_selected": true,
+              "display_name": "source_id",
+              "type": "kusto.column",
+              "data_type": "System.String",
+              "description": null,
+              "children": []
+            },
+            {
+              "id": "target_id",
+              "is_selected": true,
+              "display_name": "target_id",
+              "type": "kusto.column",
+              "data_type": "System.String",
+              "description": null,
+              "children": []
+            },
+            {
+              "id": "edge_type",
+              "is_selected": true,
+              "display_name": "edge_type",
+              "type": "kusto.column",
+              "data_type": "System.String",
+              "description": null,
+              "children": []
+            },
+            {
+              "id": "properties",
+              "is_selected": true,
+              "display_name": "properties",
+              "type": "kusto.column",
+              "data_type": "System.String",
+              "description": null,
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "031937a1-28a9-41df-b27a-7a49c34c4dab",
+      "is_selected": false,
+      "display_name": "Tables",
+      "type": "table_grouping",
+      "description": null,
+      "children": [
+        {
+          "id": "be608524-3825-4a00-94d4-8e2bbb386c5c",
+          "is_selected": false,
+          "display_name": "semantic_catalog",
+          "type": "kusto.table",
+          "description": null,
+          "children": [
+            {
+              "id": "node_id",
+              "is_selected": true,
+              "display_name": "node_id",
+              "type": "kusto.column",
+              "data_type": "System.String",
+              "description": null,
+              "children": []
+            },
+            {
+              "id": "kind",
+              "is_selected": true,
+              "display_name": "kind",
+              "type": "kusto.column",
+              "data_type": "System.String",
+              "description": null,
+              "children": []
+            },
+            {
+              "id": "ref",
+              "is_selected": true,
+              "display_name": "ref",
+              "type": "kusto.column",
+              "data_type": "System.String",
+              "description": null,
+              "children": []
+            },
+            {
+              "id": "name",
+              "is_selected": true,
+              "display_name": "name",
+              "type": "kusto.column",
+              "data_type": "System.String",
+              "description": null,
+              "children": []
+            },
+            {
+              "id": "business_name",
+              "is_selected": true,
+              "display_name": "business_name",
+              "type": "kusto.column",
+              "data_type": "System.String",
+              "description": null,
+              "children": []
+            },
+            {
+              "id": "search_text",
+              "is_selected": true,
+              "display_name": "search_text",
+              "type": "kusto.column",
+              "data_type": "System.String",
+              "description": null,
+              "children": []
+            },
+            {
+              "id": "display_text",
+              "is_selected": true,
+              "display_name": "display_text",
+              "type": "kusto.column",
+              "data_type": "System.String",
+              "description": null,
+              "children": []
+            },
+            {
+              "id": "emb",
+              "is_selected": true,
+              "display_name": "emb",
+              "type": "kusto.column",
+              "data_type": "System.Object",
+              "description": null,
+              "children": []
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

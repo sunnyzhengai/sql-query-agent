@@ -1,4 +1,0 @@
-{
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/dataAgent/definition/stageConfiguration/1.0.0/schema.json",
-  "aiInstructions": "To find catalog entries matching a user's topic, embed the CORE\nCONCEPT of their question (short noun phrase) using the\nai_embeddings plugin with the aivia connection string, then rank\nby series_cosine_similarity descending. Report how many rows\nscore above 0.45 before listing the top matches. Similarity is\nrelative closeness, never a probability. If nothing scores above\n0.45, say the catalog has nothing sufficiently related."
-}

@@ -1,0 +1,30 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/dataAgent/definition/fewShots/1.0.0/schema.json",
+  "fewShots": [
+    {
+      "id": "81d3d06d-683a-477c-8488-fd8cb819d510",
+      "question": "What metrics are available?",
+      "query": "SELECT metric_id, metric_name, business_name, description\nFROM output_metric_logic ORDER BY business_name"
+    },
+    {
+      "id": "4342c397-b436-4c3b-8a19-b928aef62718",
+      "question": "Tell me about a specific metric",
+      "query": "SELECT metric_id, metric_name, business_name, report_name, report_url, description, steward, developer, calculation_logic, source_tables, table_descriptions\nFROM output_metric_logic\nWHERE lower(metric_name) LIKE '%keyword%' OR lower(metric_id) LIKE '%keyword%' OR lower(business_name) LIKE '%keyword%'"
+    },
+    {
+      "id": "a9af5312-3eb0-438b-91b9-b588e7ac032b",
+      "question": "Which metrics use a specific table?",
+      "query": "SELECT DISTINCT c.metricId, c.businessName\nFROM graph_edge_uses_table u\nJOIN graph_canonical c ON u.sourceId = c.nodeId\nWHERE lower(u.targetId) LIKE '%table_name%'"
+    },
+    {
+      "id": "a3910586-6353-4fe4-aacd-140a9f09b7fc",
+      "question": "Which metrics have no steward assigned?",
+      "query": "SELECT metric_id, metric_name, business_name FROM output_metric_logic WHERE steward IS NULL"
+    },
+    {
+      "id": "6fa44c15-b7c4-4678-96b9-beda82d5fcb7",
+      "question": "Show the recent build history",
+      "query": "SELECT TOP 20 * FROM ops_build_summary ORDER BY build_time DESC"
+    }
+  ]
+}

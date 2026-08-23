@@ -2,10 +2,10 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
   "metadata": {
     "type": "DataAgent",
-    "displayName": "Delta Agent"
+    "displayName": "SQL Intelligence Agent"
   },
   "config": {
     "version": "2.0",
-    "logicalId": "d1b9c482-d60d-a193-4bcc-c4e2975d9dbb"
+    "logicalId": "1e8136d8-a646-81a4-4c1a-c8e8a4b09b05"
   }
 }

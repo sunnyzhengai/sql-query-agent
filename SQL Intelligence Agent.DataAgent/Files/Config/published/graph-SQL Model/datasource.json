@@ -6,7 +6,7 @@
   "displayName": "SQL Model",
   "type": "graph",
   "userDescription": null,
-  "metadata": {},
+  "metadata": null,
   "elements": [
     {
       "id": "10c38402-039b-4465-a90a-399e28b13f8e",
@@ -62,6 +62,14 @@
       "display_name": "HAS_COLUMN",
       "type": "graph.edgeType",
       "description": "HAS_COLUMN",
+      "children": []
+    },
+    {
+      "id": "c5fb48d9-8dcd-4e18-a6ae-6db981dd0b6a",
+      "is_selected": true,
+      "display_name": "USES_TABLE",
+      "type": "graph.edgeType",
+      "description": "USES_TABLE",
       "children": []
     }
   ]
