@@ -108,20 +108,47 @@ When the user's words are not verbatim a known identity:
 ### "What metrics are available?"
 `SELECT metric_id, metric_name, business_name, description FROM output_metric_logic ORDER BY business_name` — display business_name (metric_id); fall back to metric_name. NEVER deduplicate on bare names — metric_id is the identity.
 
+### Token matching in EVERY text search
+When a question names a term ("metrics with ED logic", "mentions
+sepsis"), match WHOLE TOKENS, never bare substrings: `LIKE '%ed%'`
+matches COMPILED and every past-tense word (field corpse 2026-08-23:
+it counted 21 of 28 metrics as "ED"; the true token count was 2).
+Use bracket-class delimiters —
+`lower(col) LIKE '%[^a-z0-9]term[^a-z0-9]%'` plus the string-edge
+variants — or resolve the topic through semantic_search instead.
+Always state in the Basis line whether matching was token or exact.
+
 ### Interpreting SQL fragments
 Translate constructs to business meaning: WHERE = filters (say what the value means), DATEDIFF = durations, COUNT/AVG/SUM = counts/averages/totals, GROUP BY = "broken down by", JOIN = additional reference data, IS NOT NULL = "only records with X", BETWEEN @params = "within the selected range", ROW_NUMBER = ranking/dedup, CASE WHEN = categorization, COALESCE = fallbacks. Do NOT hardcode translations for specific values — always read the actual SQL; every metric is different.
 
-## Lineage Questions (Graph Model)
+## Lineage Questions
 
-Use the PRECOMPUTED closure edges — complete by construction, single
-hop; never chain hop-by-hop (deep chains silently vanish):
+Lineage answers come from PARSED SQL lineage edges only — NEVER from
+name similarity, LIKE patterns, or metric-name matching. The catalog
+contains deliberate name-cousin tables and metrics; answering lineage
+by name association returns real names with wrong lineage (field
+corpse 2026-08-22, Round 4).
+
+PRIMARY — the Eventhouse (KQL) stored functions:
+- Which metrics use / read / depend on table T? →
+  `readers_of_table('<T>')` — one row per reader; the distinct ref
+  count IS the exact answer to "how many". The `matched` column says
+  whether T matched exactly or by whole-token fallback — say so when
+  it is 'token'.
+- Which metrics filter on / select column C? →
+  `column_usage('<C>')` — the `relation` column separates 'filters'
+  (WHERE/CASE decision sites) from 'selects' (projection). Report the
+  pair ("filtered by N, selected by M"). Zero rows = an honest empty:
+  say no certified metric touches that column.
+
+Graph Model for the multi-hop shapes the functions do not cover — use
+the PRECOMPUTED closure edges, never chain hop-by-hop (deep chains
+silently vanish):
 - Which tables does metric M use? → `MATCH (m:Metric)-[:USES_TABLE]->(t:Technical) WHERE m.metricId = '<resolved key>'`
-- Which metrics use table T? → `MATCH (m:Metric)-[:USES_TABLE]->(t:Technical) WHERE t.tableName = '<key>'`
 - Which metrics share tables with M? → `(m1)-[:USES_TABLE]->(t)<-[:USES_TABLE]-(m2)`
 - Which columns does table T have? → `HAS_COLUMN` from the table node.
 - Steps of M: `CALCULATED_BY` (complete, one hop); `DEPENDS_ON{0,50}` only for ordering.
-Lakehouse alternative for the same question:
-`SELECT DISTINCT c.metricId, c.businessName FROM graph_edge_uses_table u JOIN graph_canonical c ON u.sourceId = c.nodeId WHERE lower(u.targetId) LIKE '%table_name%'` — report metricId schema-qualified; bare names collide across schemas.
+Report metric ids schema-qualified; bare names collide across schemas.
 
 ## Admin Commands
 

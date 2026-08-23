@@ -113,6 +113,12 @@ Ask the published agent; every answer must end with a Basis line:
 2. `python3.11 devtools/rematch_round4.py` — it writes
    internal/docs/REMATCH_ROUND4_SCORECARD.md and appends to the goal
    file. Round 4 tests THIS agent — the artifact-as-shipped.
+3. Reporting rule (Round-4 record audit, 2026-08-22): any prose about
+   the result ANNOTATES the scorecard's machine-emitted miss/partial
+   lines — never free-write a miss list from the truncated answers,
+   and any "X is not in the catalog" claim carries its grep receipt
+   against data/demo/input_metric_names.csv. Full untruncated
+   answers: REMATCH_ROUND4_RAW.jsonl beside the scorecard.
 
 ## 7. Retire (only after 5 passes and 6 has run)
 

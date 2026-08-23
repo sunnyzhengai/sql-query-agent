@@ -101,6 +101,77 @@ semantic_search("patients who came back to the ER", 5)
 //     keeps ADR 0005 alive in fuzzy matching):
 semantic_search("unicorn readmission velocity")
 
+// ===== 4b. Lineage functions (Fabric mitigation, 2026-08-23) ===========
+// Sunny's ruling (HANDOFF_FABRIC_LINEAGE_MITIGATION): the Data Agent
+// answers readers-of-table by NAME ASSOCIATION when it free-writes SQL
+// (Round 4, name-cousin corpus). These functions own the homegrown
+// lineage discipline on the Fabric surface: parsed edges NEVER name
+// mentions; exact-name scope first; whole-token fallback only when no
+// exact name exists (`has` = KQL term matching, mirroring the ops-layer
+// _token_in law: 'ED' matches ED_SEPSIS, never AGGREGATED), disclosed
+// in the `matched` column. PHI: names/refs only — no expression SQL.
+
+.create-or-alter function with (
+    docstring = "Certified metrics that READ a table, from parsed SQL lineage edges (transform_to_technical) - never name mentions. Exact table-name match first; whole-token fallback only when no exact table exists (the matched column discloses which). One row per table+metric: table_name, ref, business_name, matched. Use for: which metrics use / read / depend on table X. The distinct ref count IS the exact reader count.",
+    folder = "aivia"
+) readers_of_table(p_table:string) {
+    let pairs = graph_nodes
+        | where node_id startswith 'tech:'
+        | project tech_id = node_id, table_name = name
+        | join kind=inner (graph_edges
+            | where edge_type == 'transform_to_technical'
+            | project tech_id = target_id, source_id) on tech_id
+        | extend ['ref'] = tostring(split(source_id, ':')[1])
+        | distinct table_name, ['ref']
+        | join kind=leftouter (semantic_catalog
+            | where ['kind'] == 'metric'
+            | project ['ref'], business_name) on ['ref']
+        | project table_name, ['ref'], business_name;
+    let exact_n = toscalar(pairs | where table_name =~ p_table | count);
+    union
+        (pairs | where table_name =~ p_table | extend matched = 'exact'),
+        (pairs | where exact_n == 0 and table_name has p_table
+               | extend matched = 'token')
+    | order by table_name asc, ['ref'] asc
+}
+
+.create-or-alter function with (
+    docstring = "Certified metrics that FILTER on a column (WHERE/CASE decision sites, relation='filters') or SELECT it (projection, relation='selects'), from parsed SQL lineage edges - never name mentions. Exact column-name match first; whole-token fallback only when no exact column exists (matched column discloses which). Rows: column_name, relation, ref, business_name, matched. Use for: which metrics filter on / select / touch column Y.",
+    folder = "aivia"
+) column_usage(p_column:string) {
+    let cols = graph_nodes
+        | where node_id startswith 'tech:'
+            and array_length(split(node_id, '.')) == 3
+        | project col_id = node_id, column_name = name;
+    let usage = union
+        (graph_edges | where edge_type == 'decision_to_column'
+            | project col_id = target_id, source_id, relation = 'filters'),
+        (graph_edges | where edge_type == 'transform_to_column'
+            | project col_id = target_id, source_id, relation = 'selects');
+    let pairs = cols
+        | join kind=inner usage on col_id
+        | extend ['ref'] = tostring(split(source_id, ':')[1])
+        | distinct column_name, relation, ['ref']
+        | join kind=leftouter (semantic_catalog
+            | where ['kind'] == 'metric'
+            | project ['ref'], business_name) on ['ref']
+        | project column_name, relation, ['ref'], business_name;
+    let exact_n = toscalar(pairs | where column_name =~ p_column | count);
+    union
+        (pairs | where column_name =~ p_column | extend matched = 'exact'),
+        (pairs | where exact_n == 0 and column_name has p_column
+               | extend matched = 'token')
+    | order by column_name asc, relation asc, ['ref'] asc
+}
+
+// Verify 4b — all four must behave before agent wiring:
+// (a) exact scope: readers_of_table('IP_SEPSIS') -> 5 rows, matched=exact
+// (b) cousin isolation: readers_of_table('IP_SepsisEncounters') -> its
+//     OWN readers only (never the IP_SEPSIS five)
+// (c) token law: readers_of_table('ED') -> only tables with token ED
+//     (never AGGREGATED-class substring matches)
+// (d) column pair: column_usage('COMPILED_CONTEXT') -> filters rows > 0
+
 // ===== 5. Data Agent wiring (portal) ===================================
 // a. Add this KQL database as a SOURCE on the agents (alongside their
 //    existing source); in schema selection tick semantic_catalog AND

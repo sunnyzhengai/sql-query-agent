@@ -1,0 +1,25 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/dataAgent/definition/fewShots/1.0.0/schema.json",
+  "fewShots": [
+    {
+      "id": "31060004-e9ae-466e-97e9-84df76e68acc",
+      "question": "what do we have about cancelled appointments?",
+      "query": "semantic_search(\"cancelled appointments\")"
+    },
+    {
+      "id": "8f4a1c02-5b7d-4e19-9c33-2d6f8a0b1e45",
+      "question": "which metrics use the ED_ENCOUNTERS_FACT table?",
+      "query": "readers_of_table(\"ED_ENCOUNTERS_FACT\")"
+    },
+    {
+      "id": "a2c96e71-33d8-47b0-8154-c9e0f2b7d688",
+      "question": "which metrics filter on the BASE_GROUPER_ID column?",
+      "query": "column_usage(\"BASE_GROUPER_ID\")"
+    },
+    {
+      "id": "d7e3b540-9a16-4f82-b6c1-04a85d1f9e27",
+      "question": "which metrics select PATIENTMRN?",
+      "query": "column_usage(\"PATIENTMRN\")"
+    }
+  ]
+}
