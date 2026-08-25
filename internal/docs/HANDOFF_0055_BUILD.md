@@ -69,6 +69,35 @@ dev session. **Mode: build order — the ADR is the spec.**
   (the demo-switch mechanism dev designs tonight determines the
   runbook).
 
+## REVIEW VERDICT (2026-08-25): APPROVED — both orders closed
+
+Independently verified: 1,076 green + ruff clean (review's own run);
+SHAPES_GAPCHECK well-formed — 26/26 instantiated cells PASS, 5
+exclusions each with defensible recorded reasons (S8/S9 = honest v1
+sweep-scope follow-ups; M7/M8 non-additive; R6 ask-surface, covered
+by walk + live leg); dimension totality CI-asserted; deterministic
+regeneration. Committed 27dbfcd. Remaining are Sunny's two parked
+calls: palette confirmation and tenant-load-before-capture (the
+demo ask-leg rides on it).
+
+## RULINGS UPDATE (Sunny, 2026-08-25 morning)
+
+1. **Palette CONFIRMED: diabetic.** Clinical truth layer to be
+   blessed by Sunny (review drafted the five diagnosis paths — ICD
+   E08–E13, problem list, labs incl. HbA1c ≥ 6.5, medications with
+   the metformin/prediabetes-PCOS over-count caveat, gestational
+   O24.4x exclusion nuance); once blessed, dev applies as PALETTE
+   v2 — data-file change only, cells and oracles unchanged.
+2. **THE DEMO RUNS ON THE SHAPE QUESTIONS** (M1/M2/S4 + the shape
+   store) — sepsis retires from camera, remains the realism/
+   regression cohort. Consequences: (a) tenant-load of the shape
+   store is now REQUIRED pre-capture (the _shapes profile becomes a
+   runbook item); (b) OPEN GAP for Sunny: the report layer — the
+   shape corpus has no semantic model/report; the clickable-link
+   and write-back demo beats need a small "Diabetes Registry
+   Dashboard" (sepsis pattern), or those beats trim. Review
+   recommends building it.
+
 ## RESULTS (dev appends)
 
 ### 2026-08-25 — BOTH PHASES BUILT overnight; 26/26 cells pass; SHAPES_GAPCHECK.md + demo note delivered
