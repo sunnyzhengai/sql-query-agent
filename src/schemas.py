@@ -360,7 +360,8 @@ PIPELINE_VALIDATION = {
     "owner": {"notebook": "500_validate", "module": None},
     "write_mode": "overwrite",
     "enrichers": [],
-    "consumers": ["data_agent", "admin", "500_validate"],
+    "consumers": ["data_agent", "admin", "500_validate",
+                  "make_golden_snapshot"],
     "columns": [
         ("metric_id", "string", False),
         ("step1_loaded", "boolean", True),
