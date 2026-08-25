@@ -68,6 +68,74 @@ official-first + variants-exist stamp, admin tile, Fabric export.
    after the rerun the same numbers should come back live from
    "what governance red flags exist?".
 
+## OPS FINDS from the rerun evening (2026-08-24, review session) — next small order
+
+All three are Echo Law first-stage: mechanism named, build-or-defer
+to be recorded (review recommends BUILD on all three — each is
+small and each class recurs by construction):
+
+1. **Shortcut create-then-verify.** The API shortcut create 201'd,
+   REGISTERED the name (list showed it, UI create failed on
+   name-conflict) but never MOUNTED (invisible, unqueryable — KQL
+   400). Review session deleted the ghost via API; Sunny's UI retry
+   then succeeded (count 83). Mechanism: any automated shortcut
+   create polls the QUERY path (`table | count`) until green or
+   fails loud — the registration list lies; the 201 vouches for
+   phase one of a two-phase operation. Belongs in the updater story.
+2. **org_config referential integrity.** The 610 failure class:
+   tenant config referenced the retired Delta Agent. Mechanism: a
+   preflight/live-audit leg resolving every tenant-artifact id in
+   org_config against live APIs — dead reference fails loud with
+   its error contract BEFORE a chain burns 45 minutes.
+3. **Eventhouse rename (cosmetic, pre-capture).** The active
+   semantic catalog eventhouse still carries the retired name
+   "probe-eh" (the Item-4 correction's "EH rename+ref-edits" step
+   was never executed). Rename + reference edits before capture day
+   so no screen says "probe".
+
+## LIVE GAP-CHECK FINDS (Sunny on the workbench, 2026-08-24 evening)
+
+Wins confirmed live: compare called FIRST ROUND on the original
+corpse question, catalog ids resolved (W12 dead in the field);
+hash-partition + diff displayed; 0054 governance stamps firing on
+metric retrieve; register fix holding (business voice, no SQL);
+resolver edges live (PATIENT_MRN → 8 selects).
+
+- **FIND W15 (pre-capture priority — the recorded known-limit, now
+  a live specimen): caption inverted the compare direction.**
+  Machine showed 2 distinct hash groups + a 103-line diff (logic
+  DIFFERS); commentary said "similar… confirms they are aligned."
+  Structural gate passed (compare present) — direction unchecked.
+  Remedy (M4-clean, the proven stamp+echo pattern): op_compare's
+  headline stamps a TYPED verdict word ("2 groups — logic DIFFERS" /
+  "1 group — logic IDENTICAL"); gate duty: a caption over a
+  displayed compare must echo the verdict word; fixture: this
+  question, graded on direction. This is the demo's drift beat —
+  fix before capture.
+- **FIND W16 (display, W1 family): governance stamps flood** — 7
+  near-identical cousin-conflict sentences on one headline; fold to
+  "in 7 cousin-conflict flags (no official designated) — retrieve
+  flags for members."
+
+## GAP-CHECK EXECUTED (Sunny live, 2026-08-24 evening) — ACCEPTANCE READS PASSED, pending her word
+
+- census(flag): **83 exact, live**, matching RED_FLAGS_GAPCHECK.md;
+  30-row fold; honest verdict. PASS.
+- ED_DEPARTURE_TIME column lineage: false empty DEAD — filters: 5
+  named metrics, selects: 6, step locations on every row. PASS on
+  the machine surface.
+- **FIND W17 — ECHO, mandatory by law:** caption said "11 metrics
+  filter" — 11 relation ROWS counted as metrics (filters=5). Same
+  class as the 1.56.0 pairs-as-metrics corpse; the distinct-count
+  stamp mechanism covered the table path, not the column path.
+  Extension is mandatory (no deferral): column-lineage notes stamp
+  distinct-metric counts PER RELATION ("Filters: 5 metric(s) — …;
+  Selects: 6 metric(s) — …"), grader extended.
+
+Dev's next order, consolidated: W15 (compare verdict word — PRE-
+CAPTURE), W17 (echo, mandatory), W16 (stamp folding), F1 (error-tile
+collapse, DEMO_FEEDBACK_FRIENDS), plus the three ops finds above.
+
 ## RESULTS (dev appends)
 
 ### 2026-08-23 — BUILT: sweep, surfaces, contracts, acceptance artifact (release 1.57.0)
@@ -167,3 +235,41 @@ decision→column **2,744** — the W13a resolver's tenant numbers,
 richer than the local build's 2,251. gov_red_flags shortcut created
 VIA API (POST items/{kqlDb}/shortcuts → 201; runbook step 4 needs no
 UI) — count verification pending shortcut hydration.
+
+### 2026-08-24 — CORRECTION + CLOSE-OUT (dev): the shortcut claim above was WRONG
+**Correction (per the review's ops find 1): "runbook step 4 needs no
+UI" is FALSE.** The API create was a GHOST — registered (201, listed)
+but never mounted; the review session deleted the ghost and SUNNY'S
+UI RETRY is the shortcut that works. The 201 vouches for phase one of
+a two-phase operation.
+**Final state — everything green:**
+- gov_red_flags LIVE and queryable: **83 flags (74 misnomer/INFO, 9
+  cousin_conflict/CONFLICT)** — matching the local gap-check
+  number-for-number.
+- engine_smoke fully green INCLUDING the flag surface in live mode
+  ("flag surface live: 83 flag(s)") — the case's second acceptance
+  state, reached.
+- SQL endpoint metadata refreshed (dbo.gov_red_flags: Success); agent
+  draft carries the governance instructions + /redflags (verified
+  landed, 15,430 chars). Remaining for Sunny: tick gov_red_flags in
+  the agent's Lakehouse source elements (UI-only), spot-check, Publish.
+**Ops finds 1+2 BUILT (Echo Law, review's recommendation):**
+- devtools/create_kql_shortcut.py — create-then-VERIFY: polls the
+  QUERY path until green or deletes the ghost and fails loud with the
+  remediation; all future shortcut automation goes through it.
+- devtools/org_config_audit.py (+L0, tests/test_org_config_audit.py)
+  — resolves every tenant-artifact id in org_config (local or
+  --tenant Lakehouse copy) against live APIs; dead reference fails
+  loud with its remediation BEFORE a chain fires. First live run:
+  repointed agent resolves; graph_model_id flagged 404-stale
+  (WARN-only, no reader; fix rides the rename work).
+**Ops find 3 (eventhouse rename) staged, not executed** — tenant UI
+rename is Sunny's; the ref-edit list (git grep probe-eh, excluding
+the retired-agent folders): devtools/{agent_live_eval,
+agent_robustness_suite, answer_evals, robustness_suite}.py,
+devtools/eventhouse_{setup,probe}.kql, src/orchestrator/cli.py,
+src/webapp/main.py, plus the SQL Intelligence Agent's
+kusto-probe-eh datasource folder name (re-syncs on rename) and
+org_config search.kusto_db — rename + edits + org_config move
+together, then org_config_audit --tenant proves the store leg.
+Suite 1,054 passed + 5 xfailed, ruff clean.
