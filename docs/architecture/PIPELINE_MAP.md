@@ -38,6 +38,7 @@ flowchart LR
   eventhouse_semantic_search["eventhouse_semantic_search"]:::notebook
   export_test_fixtures["export_test_fixtures"]:::notebook
   health["health"]:::notebook
+  make_golden_snapshot["make_golden_snapshot"]:::notebook
   manage_stewards["manage_stewards"]:::notebook
   orchestrator_core["orchestrator_core"]:::notebook
   self_service["self-service"]:::notebook
@@ -215,6 +216,7 @@ flowchart LR
   ops_pipeline_validation --> 500_validate
   ops_pipeline_validation --> admin
   ops_pipeline_validation --> data_agent
+  ops_pipeline_validation --> make_golden_snapshot
   ops_report_journey --> admin
   ops_setup_completeness --> admin
   ops_setup_completeness --> health

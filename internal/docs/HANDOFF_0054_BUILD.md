@@ -131,3 +131,16 @@ Encounters" family, 4 logics) and surfaced Severe-vs-Non-Severe as a
 cousin pair — a textbook first DISPOSITION candidate (intentional
 variants; accept or label, never merge). Awaiting Sunny's gap-check
 verdict, then the combined rerun.
+
+### 2026-08-24 — LIVE SMOKE GREEN (dev): the pending leg closed
+The graph_nodes/graph_edges shortcut outage self-resolved (transient
+Fabric incident — no pipeline was running; native KQL tables were
+unaffected throughout; a background watch confirmed recovery).
+devtools/engine_smoke.py then ran green end to end through the real
+dispatch: all 9 cases including the W12 permanent reproduction and
+the NEW census(kind=flag) case, which verified the NAMED remediation
+on the pre-sweep store ("run 320_red_flag_sweep…" — exactly the
+honest state until Sunny's combined rerun). Echo Law fully
+satisfied at birth; the same case flips to enumerating live flags
+after the rerun. BUILD ORDER COMPLETE — open items are Sunny's:
+gap-check verdict, then the combined rerun (runbook above).
