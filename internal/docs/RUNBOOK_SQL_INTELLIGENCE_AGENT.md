@@ -122,6 +122,15 @@ Ask the published agent; every answer must end with a Basis line:
 
 ## 7. Retire (only after 5 passes and 6 has run)
 
+**0. REPOINT FIRST (field corpse 2026-08-24): the LAKEHOUSE
+   org_config.yaml (`Files/sql-query-agent/org_config.yaml`) must
+   have `fabric_graph.data_agent_id` set to the SQL Intelligence
+   Agent BEFORE any agent is deleted — 610_generate_agent_
+   descriptions reads that pointer, and it kept aiming at the
+   deleted Delta Agent: the next pipeline run died at 610 with a
+   cancelled Spark session. Local org_config ≠ tenant org_config;
+   both must move.**
+
 Workspace-first deletion protocol, one at a time:
 1. Delta Agent (Data Agent) — delete in workspace; on next git sync
    remove `Delta Agent.DataAgent/` from the repo.

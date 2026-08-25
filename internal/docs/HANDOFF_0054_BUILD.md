@@ -144,3 +144,26 @@ honest state until Sunny's combined rerun). Echo Law fully
 satisfied at birth; the same case flips to enumerating live flags
 after the rerun. BUILD ORDER COMPLETE — open items are Sunny's:
 gap-check verdict, then the combined rerun (runbook above).
+
+### 2026-08-24 — THE COMBINED RERUN (fired by dev on Sunny's "go")
+Preflight found Sunny had already done runbook steps 1–2 (workspace
+synced — Fabric committed back 320's .platform re-stamp — and the
+1.57.0 wheel PUBLISHED on the environment). Chain fired via job API:
+300 (2:36) → 320 (1:44, first tenant run clean) → 400 → 500 → 600
+all Completed; **610 FAILED** (Spark session cancelled).
+FIELD CORPSE — retirement completion gap: 610 reads
+fabric_graph.data_agent_id from the LAKEHOUSE org_config.yaml, which
+still pointed at the Delta Agent DELETED on 2026-08-22 (the local
+copy was repointed for Round 4; the tenant copy has one pipeline
+consumer — 610 — and nobody repointed it; the retirement runbook
+never said to). Fix: one-line OneLake patch → SQL Intelligence Agent
+id; 610 then completed in 79s. Runbook step 7 gains REPOINT FIRST as
+step 0. (OneLake write lesson: the DFS flush needs an explicit
+Content-Length: 0 — the first flush 400'd after the truncating
+create; re-flush recovered, file verified whole, 3,924 bytes.)
+Resume chain 610 → 700 → 800 running at time of writing.
+PAYLOAD VERIFICATION (live store): projection edges **153 → 2,295**,
+decision→column **2,744** — the W13a resolver's tenant numbers,
+richer than the local build's 2,251. gov_red_flags shortcut created
+VIA API (POST items/{kqlDb}/shortcuts → 201; runbook step 4 needs no
+UI) — count verification pending shortcut hydration.
