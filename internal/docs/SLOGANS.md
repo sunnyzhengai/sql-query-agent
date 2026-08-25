@@ -106,3 +106,16 @@ point.
   (COPY, future)
 - **"Data democracy — not just data governance."** — Sunny's
   original product vision. (COPY, the north star)
+
+## The sphere rounds (2026-08-25, late additions)
+
+- **"Stewards follow uses, never meanings."** — the ownership
+  round. (DOCTRINE)
+- **"Assertion opens the gap; parsing closes it."** — refined form.
+  (DOCTRINE)
+- **"The graph may describe every rule; the rules about changing
+  rules never leave code."** — the contracts round. (LAW)
+- **"The product governs itself with itself."** — self-ingestion.
+  (DOCTRINE -> COPY, dogfood claim)
+- **"Answer with evidence, or refuse with the named reason — never
+  silent, never invented."** — the totality guarantee. (LAW -> COPY)

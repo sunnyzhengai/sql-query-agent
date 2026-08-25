@@ -52,10 +52,11 @@ confirmed below).
 | view/expand | anyone | attention | 0 (telemetry) | none (event only) | — | Basic | never influences ranking alone |
 | **choose** | anyone | "proceeding with this one" (pre-reading, among candidates) | weak (1) | `chose` | candidates displayed | Basic | the 2026-08-09 pick |
 | **confirm** | anyone | "this IS the definition I use" (post-reading) | strong (3) | `confirmed` | full record displayed | Basic | the 2026-08-09 confirmation |
-| **deny** | anyone | "wrong / not what I need" | strong negative (−3 with reason, −1 without) | `denied` (+reason) | — | Basic | denial WITH reason is a fixture candidate; reason optional but weighted |
+| **deny** | anyone | "wrong / not what I need" | strong negative (−3 with reason, −1 without) | `denied` (+reason, TYPED per ADR 0057: defect→developer / mismatch→fork offer / noncompliance→use-owner) | — | Basic | reasoned denial is a fixture candidate; the type routes it |
 | **certify** | steward | "official for scope" | authoritative (5) | `certified_official` (scope) | steward role (Entra) | Basic | = 0054 disposition, now also reachable at point of use; mandatory reason per 0054 |
 | **label-variant / accept / retire** | steward | 0054 dispositions | authoritative | per 0054 | steward role; mandatory reason | Basic | the steward queue = where contested testimony escalates |
 | **fork** | anyone (owner-scoped) | "my variant of this" | strong (3, scoped) | `variant_of` + new artifact | **ADR 0038 gate** | Basic (post-0038) | personal truth layer; stays gated |
+| **accept-stewardship** | anyone offered | "I take accountability for this node" | authoritative (scoped) | `stewards` (earned, disclosed) | harvest offer (ADR 0057) | Basic | opt-in at peak willingness; contestable |
 | **run** | anyone with DB rights | "I act on this definition's data" | strongest usage signal (8) | `executed` (+count) | plan-confirm; passthrough identity; P5 | **PRO** | repeated runs compound; the ultimate elector |
 
 ## Application (Basic — Sunny's ruling: capture AND application)
