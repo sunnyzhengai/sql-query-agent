@@ -657,5 +657,12 @@ classification).
 ## ADR 0055 — The designed shape corpus: spec-derived test data (category-partition over name x logic x scope)
 
 - **Category:** architecture
+- **Grounds:** spec:E2
+- **Implemented by:**
+  - `src/shapes/generator.py`
+  - `src/shapes/matrix.py`
+  - `src/shapes/checker.py`
+- **Enforced by:**
+  - `tests/shapes/test_shapes.py`
 - **Summarized in:**
   - `docs/decisions/0055-designed-shape-corpus.md`

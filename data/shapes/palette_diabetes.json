@@ -1,0 +1,126 @@
+{
+  "palette_id": "diabetes",
+  "comment": "ADR 0055 name palette — DIABETIC DIAGNOSIS cohort analytics (RULED by Sunny 2026-08-24; retail vetoed). Fully synthetic. Cell logic is domain-independent; swapping this file re-skins the whole corpus with no code change.",
+  "schemas": ["reporting", "reports"],
+  "tables": {
+    "PATIENTS": {
+      "description": "Master patient index for the synthetic diabetic cohort.",
+      "columns": {
+        "PATIENT_ID": "Unique patient identifier.",
+        "PATIENT_NAME": "Patient display name (synthetic).",
+        "BIRTH_DATE": "Patient date of birth.",
+        "ACTIVE_FLAG": "1 when the patient is active in the panel.",
+        "PRIMARY_LANGUAGE": "Preferred language for outreach."
+      }
+    },
+    "ENCOUNTERS": {
+      "description": "Clinical encounters (visits) for cohort patients.",
+      "columns": {
+        "ENCOUNTER_ID": "Unique encounter identifier.",
+        "PATIENT_ID": "Patient seen in this encounter.",
+        "ENCOUNTER_DATE": "Date of the encounter.",
+        "DEPARTMENT": "Department where the encounter occurred."
+      }
+    },
+    "LAB_RESULTS": {
+      "description": "Laboratory results including HbA1c draws.",
+      "columns": {
+        "LAB_ID": "Unique lab result identifier.",
+        "PATIENT_ID": "Patient the result belongs to.",
+        "LAB_CODE": "Laboratory test code.",
+        "HBA1C_VALUE": "Hemoglobin A1c percentage result.",
+        "RESULT_DATE": "Date the result was finalized."
+      }
+    },
+    "DIAGNOSIS_CODES": {
+      "description": "Coded diagnoses assigned to patients.",
+      "columns": {
+        "DX_ID": "Unique diagnosis row identifier.",
+        "PATIENT_ID": "Diagnosed patient.",
+        "ICD_CODE": "ICD-10 diagnosis code.",
+        "DX_DATE": "Date the diagnosis was recorded."
+      }
+    },
+    "MEDICATION_ORDERS": {
+      "description": "Medication orders including diabetes therapies.",
+      "columns": {
+        "ORDER_ID": "Unique medication order identifier.",
+        "PATIENT_ID": "Patient the order was placed for.",
+        "MED_NAME": "Ordered medication name.",
+        "ORDER_DATE": "Date the order was placed."
+      }
+    },
+    "PROBLEM_LIST": {
+      "description": "Active problem-list entries per patient.",
+      "columns": {
+        "PROBLEM_ID": "Unique problem-list entry identifier.",
+        "PATIENT_ID": "Patient the problem belongs to.",
+        "PROBLEM_CODE": "Coded problem entry.",
+        "NOTED_DATE": "Date the problem was noted."
+      }
+    }
+  },
+  "unique_column": "HBA1C_VALUE",
+  "ambiguous_column": "PATIENT_ID",
+  "phi_literal": "'John Smith'",
+  "logic_paths": {
+    "dx": {
+      "label": "diagnosis-code path",
+      "table": "DIAGNOSIS_CODES",
+      "alias": "DC",
+      "predicate": "DC.ICD_CODE LIKE 'E11%'"
+    },
+    "lab": {
+      "label": "lab-criteria path",
+      "table": "LAB_RESULTS",
+      "alias": "LR",
+      "predicate": "LR.HBA1C_VALUE >= 6.5"
+    },
+    "med": {
+      "label": "medication path",
+      "table": "MEDICATION_ORDERS",
+      "alias": "MO",
+      "predicate": "MO.MED_NAME IN ('METFORMIN', 'INSULIN GLARGINE')"
+    },
+    "problem": {
+      "label": "problem-list path",
+      "table": "PROBLEM_LIST",
+      "alias": "PL",
+      "predicate": "PL.PROBLEM_CODE = 'DM2'"
+    }
+  },
+  "cte_names": {
+    "misnomer_seed": "Base_Cohort",
+    "ws_control": "Enc_Recent",
+    "hash_control": "Lab_Draws",
+    "sem_boundary": "A1c_High",
+    "dup_a": "Med_Orders_Cur",
+    "dup_b": "Rx_Current",
+    "temp_seed": "#Dx_Events",
+    "crlf_seed": "Crlf_Cohort"
+  },
+  "metrics": {
+    "dx_path":        {"proc": "USP_Diabetic_Patients_DX",  "schema": "reporting", "business_name": "Diabetic Patients (Diagnosis Codes)"},
+    "lab_path":       {"proc": "USP_Diabetic_Patients_Lab", "schema": "reporting", "business_name": "Diabetic Patients (Lab Criteria)"},
+    "registry":       {"proc": "USP_Diabetes_Registry",     "schema": "reporting", "business_name": "Diabetes Registry"},
+    "registry_v1":    {"proc": "USP_Diabetes_Registry_v1",  "schema": "reporting", "business_name": "Diabetes Registry (Legacy v1)"},
+    "controlled":     {"proc": "USP_Controlled_Diabetes",   "schema": "reporting", "business_name": "Controlled Diabetes Rate"},
+    "controlled_m":   {"proc": "USP_Controlled_Diabetes_M", "schema": "reporting", "business_name": "Controlled Diabetes Rate (Monthly)"},
+    "a1c_compliance": {"proc": "USP_A1c_Compliance",        "schema": "reporting", "business_name": "A1c Testing Compliance"},
+    "twin_reporting": {"proc": "USP_Active_Diabetics",      "schema": "reporting", "business_name": "Active Diabetic Patients"},
+    "twin_reports":   {"proc": "USP_Active_Diabetics",      "schema": "reports",   "business_name": "Active Diabetic Patients"},
+    "roster":         {"proc": "USP_Diabetic_Roster",       "schema": "reporting", "business_name": "Diabetic Patient Roster"},
+    "dm_list":        {"proc": "USP_DM_Patient_List",       "schema": "reporting", "business_name": "DM Patient List"},
+    "snapshot_a":     {"proc": "USP_Enrollment_Snapshot",   "schema": "reporting", "business_name": "Enrollment Snapshot"},
+    "snapshot_b":     {"proc": "USP_Enrollment_Snapshot",   "schema": "reports",   "business_name": "Enrollment Snapshot"},
+    "ref_forms":      {"proc": "USP_Ref_Forms_Probe",       "schema": "reporting", "business_name": "Reference Forms Probe"},
+    "chain_linear":   {"proc": "USP_Care_Cascade",          "schema": "reporting", "business_name": "Care Cascade (Linear)"},
+    "chain_diamond":  {"proc": "USP_Outreach_Funnel",       "schema": "reporting", "business_name": "Outreach Funnel (Diamond)"},
+    "chain_self":     {"proc": "USP_Panel_Rollup",          "schema": "reporting", "business_name": "Panel Rollup (Recursive)"},
+    "dynamic_sql":    {"proc": "USP_Adhoc_Extract",         "schema": "reporting", "business_name": "Adhoc Extract (Dynamic)"},
+    "multi_stmt":     {"proc": "USP_Panel_Refresh",         "schema": "reporting", "business_name": "Panel Refresh (Multi-Statement)"},
+    "crlf_a":         {"proc": "USP_Crlf_Probe_A",          "schema": "reporting", "business_name": "Line-Ending Probe A"},
+    "crlf_b":         {"proc": "USP_Crlf_Probe_B",          "schema": "reporting", "business_name": "Line-Ending Probe B"},
+    "phi_probe":      {"proc": "USP_Phi_Probe",             "schema": "reporting", "business_name": "PHI Literal Probe"}
+  }
+}

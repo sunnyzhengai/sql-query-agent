@@ -499,17 +499,17 @@ TRACE_REGISTRY = {
         "docs": ["docs/architecture/SPEC.md", "docs/architecture/TRACE_MAP.md"],
     },
     "0055": {
-        # DRAFT (review skeleton 2026-08-24, Sunny's "test different
-        # shapes" directive): spec-derived synthetic shape corpus
-        # beside the found 28-file realism cohort. Sunny ratifies the
-        # dimension set + phase-1 scope; modules/tests land with the
-        # build. Sanctioned no-code in test_trace_registry until then.
+        # ACCEPTED + BUILT 2026-08-25 (dimensions ratified by Sunny;
+        # both phases in one overnight run): generator + matrix
+        # registry + checker + the `shapes` CI family; corpus of
+        # record under data/shapes/generated/ (regen byte-identical).
         "title": "The designed shape corpus: spec-derived test data "
                  "(category-partition over name x logic x scope)",
         "category": "architecture",
-        "axioms": [],
-        "modules": [],
-        "tests": [],
+        "axioms": ["E2"],
+        "modules": ["src/shapes/generator.py", "src/shapes/matrix.py",
+                    "src/shapes/checker.py"],
+        "tests": ["tests/shapes/test_shapes.py"],
         "docs": ["docs/decisions/0055-designed-shape-corpus.md"],
     },
     "0054": {

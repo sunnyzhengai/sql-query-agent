@@ -64,9 +64,6 @@ def test_architecture_decisions_carry_code_or_tests():
     sanctioned = {
         "0029",  # design pass, explicitly unimplemented (status line)
         "0034",  # superseded in part by 0035; its artifacts were deleted
-        "0055",  # DRAFT (review skeleton 2026-08-24): shape corpus —
-                 # awaiting Sunny's dimension-set ratification;
-                 # modules/tests land with the build
     }
     empty = [
         adr for adr, e in TRACE_REGISTRY.items()

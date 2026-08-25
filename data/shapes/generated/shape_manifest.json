@@ -1,0 +1,492 @@
+{
+  "palette_id": "diabetes",
+  "cells": [
+    {
+      "cell_id": "S1",
+      "dims": "step.cte.identical.hash_identical",
+      "status": "instantiated",
+      "files": [
+        "reporting/USP_Diabetic_Patients_DX.sql",
+        "reporting/USP_Diabetic_Patients_Lab.sql"
+      ],
+      "expect": {
+        "absent_flag_identities": [
+          "Lab_Draws"
+        ]
+      }
+    },
+    {
+      "cell_id": "S2",
+      "dims": "step.cte.identical.ws_case_only",
+      "status": "instantiated",
+      "files": [
+        "reporting/USP_Diabetic_Patients_DX.sql",
+        "reporting/USP_Diabetic_Patients_Lab.sql"
+      ],
+      "expect": {
+        "absent_flag_identities": [
+          "Enc_Recent"
+        ]
+      }
+    },
+    {
+      "cell_id": "S3",
+      "dims": "step.cte.identical.sem_same_syn_diff",
+      "status": "instantiated",
+      "files": [
+        "reporting/USP_Diabetic_Patients_DX.sql",
+        "reporting/USP_Diabetic_Patients_Lab.sql"
+      ],
+      "expect": {
+        "flags": [
+          {
+            "flag_class": "misnomer",
+            "grain": "step",
+            "identity": "A1c_High",
+            "severity": "INFO",
+            "distinct_logics": 2
+          }
+        ],
+        "disclosure": "differs by normalized hash \u2014 the verdict never claims semantic difference (D2 boundary)"
+      }
+    },
+    {
+      "cell_id": "S4",
+      "dims": "step.cte.identical.genuinely_different",
+      "status": "instantiated",
+      "files": [
+        "reporting/USP_Diabetic_Patients_DX.sql",
+        "reporting/USP_Diabetic_Patients_Lab.sql"
+      ],
+      "expect": {
+        "flags": [
+          {
+            "flag_class": "misnomer",
+            "grain": "step",
+            "identity": "Base_Cohort",
+            "severity": "INFO",
+            "distinct_logics": 2
+          }
+        ]
+      }
+    },
+    {
+      "cell_id": "S5",
+      "dims": "step.temp.identical.genuinely_different",
+      "status": "instantiated",
+      "files": [
+        "reporting/USP_Ref_Forms_Probe.sql",
+        "reporting/USP_Panel_Refresh.sql"
+      ],
+      "expect": {
+        "flags": [
+          {
+            "flag_class": "misnomer",
+            "grain": "step",
+            "identity": "Dx_Events",
+            "severity": "INFO",
+            "distinct_logics": 2
+          }
+        ]
+      }
+    },
+    {
+      "cell_id": "S6",
+      "dims": "step.cte.disjoint.hash_identical",
+      "status": "instantiated",
+      "files": [
+        "reporting/USP_Diabetic_Patients_DX.sql",
+        "reporting/USP_Diabetic_Patients_Lab.sql"
+      ],
+      "expect": {
+        "flags": [
+          {
+            "flag_class": "duplicate",
+            "grain": "step",
+            "identity": null,
+            "severity": "INFO",
+            "distinct_logics": 1
+          }
+        ],
+        "duplicate_members": [
+          "Med_Orders_Cur",
+          "Rx_Current"
+        ]
+      }
+    },
+    {
+      "cell_id": "S7",
+      "dims": "step.cte.disjoint.genuinely_different",
+      "status": "instantiated",
+      "files": [
+        "reporting/USP_Diabetes_Registry.sql",
+        "reporting/USP_Diabetes_Registry_v1.sql"
+      ],
+      "expect": {
+        "absent_flag_identities": [
+          "Reg_Core",
+          "Reg_Core_v1"
+        ]
+      }
+    },
+    {
+      "cell_id": "S8",
+      "dims": "step.*.cousin.*",
+      "status": "excluded",
+      "reason": "sweep v1 computes cousin families at metric grain only (ADR 0054 \u00a73b inventory); step-grain cousins are a recorded follow-up"
+    },
+    {
+      "cell_id": "S9",
+      "dims": "step.schema_view.*",
+      "status": "excluded",
+      "reason": "schema-object sweep is a recorded ADR 0054 follow-up; v1 artifact classes are steps and metrics"
+    },
+    {
+      "cell_id": "M1",
+      "dims": "metric.business.identical.genuinely_different",
+      "status": "instantiated",
+      "files": [
+        "reporting/USP_Active_Diabetics.sql",
+        "reports/USP_Active_Diabetics.sql"
+      ],
+      "expect": {
+        "flags": [
+          {
+            "flag_class": "misnomer",
+            "grain": "metric",
+            "identity": "Active Diabetic Patients",
+            "severity": "CONFLICT",
+            "distinct_logics": 2
+          }
+        ],
+        "compare": {
+          "a": "reporting.USP_Active_Diabetics",
+          "b": "reports.USP_Active_Diabetics",
+          "verdict": "DIFFERS"
+        }
+      }
+    },
+    {
+      "cell_id": "M2",
+      "dims": "metric.business.cousin.genuinely_different",
+      "status": "instantiated",
+      "files": [
+        "reporting/USP_Diabetes_Registry.sql",
+        "reporting/USP_Diabetes_Registry_v1.sql"
+      ],
+      "expect": {
+        "flags": [
+          {
+            "flag_class": "cousin_conflict",
+            "grain": "metric",
+            "identity": "Diabetes Registry",
+            "severity": "CONFLICT",
+            "distinct_logics": 2
+          }
+        ]
+      }
+    },
+    {
+      "cell_id": "M3",
+      "dims": "metric.business.cousin.hash_identical",
+      "status": "instantiated",
+      "files": [
+        "reporting/USP_Controlled_Diabetes.sql",
+        "reporting/USP_Controlled_Diabetes_M.sql"
+      ],
+      "expect": {
+        "flags": [
+          {
+            "flag_class": "cousin_conflict",
+            "grain": "metric",
+            "identity": "Controlled Diabetes Rate",
+            "severity": "INFO",
+            "distinct_logics": 1
+          }
+        ]
+      }
+    },
+    {
+      "cell_id": "M4",
+      "dims": "metric.business.disjoint.hash_identical",
+      "status": "instantiated",
+      "files": [
+        "reporting/USP_Diabetic_Roster.sql",
+        "reporting/USP_DM_Patient_List.sql"
+      ],
+      "expect": {
+        "flags": [
+          {
+            "flag_class": "duplicate",
+            "grain": "metric",
+            "identity": null,
+            "severity": "INFO",
+            "distinct_logics": 1
+          }
+        ],
+        "duplicate_members": [
+          "Diabetic Patient Roster",
+          "DM Patient List"
+        ],
+        "compare": {
+          "a": "reporting.USP_Diabetic_Roster",
+          "b": "reporting.USP_DM_Patient_List",
+          "verdict": "IDENTICAL"
+        }
+      }
+    },
+    {
+      "cell_id": "M5",
+      "dims": "metric.business.disjoint.genuinely_different",
+      "status": "instantiated",
+      "files": [
+        "reporting/USP_A1c_Compliance.sql",
+        "reporting/USP_Diabetes_Registry.sql"
+      ],
+      "expect": {
+        "absent_flag_identities": [
+          "A1c Testing Compliance"
+        ]
+      }
+    },
+    {
+      "cell_id": "M6",
+      "dims": "metric.business.identical.ws_case_only",
+      "status": "instantiated",
+      "files": [
+        "reporting/USP_Enrollment_Snapshot.sql",
+        "reports/USP_Enrollment_Snapshot.sql"
+      ],
+      "expect": {
+        "absent_flag_identities": [
+          "Enrollment Snapshot"
+        ]
+      }
+    },
+    {
+      "cell_id": "M7",
+      "dims": "metric.business.identical.hash_identical",
+      "status": "excluded",
+      "reason": "the M6 pair already proves the identical-name normalized-equal control; a byte-identical twin adds no coverage"
+    },
+    {
+      "cell_id": "M8",
+      "dims": "metric.*.sem_same_syn_diff",
+      "status": "excluded",
+      "reason": "the D2 boundary is a property of the normalizer, proven at S3; the metric hash composes the same normalized keys"
+    },
+    {
+      "cell_id": "R1",
+      "dims": "ref.direct_qualified",
+      "status": "instantiated",
+      "files": [
+        "reporting/USP_Ref_Forms_Probe.sql"
+      ],
+      "expect": {
+        "edges": [
+          {
+            "step": "transform:reporting.USP_Ref_Forms_Probe:Direct_Form",
+            "column": "TECH:DBO.LAB_RESULTS.LAB_CODE"
+          }
+        ]
+      }
+    },
+    {
+      "cell_id": "R2",
+      "dims": "ref.aliased",
+      "status": "instantiated",
+      "files": [
+        "reporting/USP_Ref_Forms_Probe.sql"
+      ],
+      "expect": {
+        "edges": [
+          {
+            "step": "transform:reporting.USP_Ref_Forms_Probe:Alias_Form",
+            "column": "TECH:DBO.LAB_RESULTS.RESULT_DATE"
+          }
+        ]
+      }
+    },
+    {
+      "cell_id": "R3",
+      "dims": "ref.via_temp_projection",
+      "status": "instantiated",
+      "files": [
+        "reporting/USP_Ref_Forms_Probe.sql"
+      ],
+      "expect": {
+        "edges": [
+          {
+            "step": "transform:reporting.USP_Ref_Forms_Probe:TempChase_Form",
+            "column": "TECH:DBO.LAB_RESULTS.HBA1C_VALUE",
+            "via_step": true
+          }
+        ]
+      }
+    },
+    {
+      "cell_id": "R4",
+      "dims": "ref.unqualified_unique",
+      "status": "instantiated",
+      "files": [
+        "reporting/USP_Ref_Forms_Probe.sql"
+      ],
+      "expect": {
+        "edges": [
+          {
+            "step": "transform:reporting.USP_Ref_Forms_Probe:Unique_Form",
+            "column": "TECH:DBO.LAB_RESULTS.HBA1C_VALUE"
+          }
+        ]
+      }
+    },
+    {
+      "cell_id": "R5",
+      "dims": "ref.unqualified_ambiguous",
+      "status": "instantiated",
+      "files": [
+        "reporting/USP_Ref_Forms_Probe.sql"
+      ],
+      "expect": {
+        "drop_min": {
+          "ambiguous": 1
+        },
+        "note": "the BARE PATIENT_ID ref drops as ambiguous (two candidate tables); the QUALIFIED join refs in the same CTE legitimately mint \u2014 the drop bucket, not edge absence, is the assertion"
+      }
+    },
+    {
+      "cell_id": "R6",
+      "dims": "ref.wrong_kind",
+      "status": "excluded",
+      "reason": "ask-surface cell (lineage(table=<metric name>) \u2192 the W9 redirect stamp) \u2014 no SQL file exists for it; covered by the walk section and the live leg, recorded here for totality"
+    },
+    {
+      "cell_id": "C1",
+      "dims": "chain.linear",
+      "status": "instantiated",
+      "files": [
+        "reporting/USP_Care_Cascade.sql"
+      ],
+      "expect": {
+        "t2t_edges": [
+          [
+            "transform:reporting.USP_Care_Cascade:Cascade_B",
+            "transform:reporting.USP_Care_Cascade:Cascade_A"
+          ],
+          [
+            "transform:reporting.USP_Care_Cascade:Cascade_C",
+            "transform:reporting.USP_Care_Cascade:Cascade_B"
+          ]
+        ]
+      }
+    },
+    {
+      "cell_id": "C2",
+      "dims": "chain.diamond",
+      "status": "instantiated",
+      "files": [
+        "reporting/USP_Outreach_Funnel.sql"
+      ],
+      "expect": {
+        "t2t_edges": [
+          [
+            "transform:reporting.USP_Outreach_Funnel:Arm_Dx",
+            "transform:reporting.USP_Outreach_Funnel:Reach_Base"
+          ],
+          [
+            "transform:reporting.USP_Outreach_Funnel:Arm_Lab",
+            "transform:reporting.USP_Outreach_Funnel:Reach_Base"
+          ],
+          [
+            "transform:reporting.USP_Outreach_Funnel:Funnel_Join",
+            "transform:reporting.USP_Outreach_Funnel:Arm_Dx"
+          ],
+          [
+            "transform:reporting.USP_Outreach_Funnel:Funnel_Join",
+            "transform:reporting.USP_Outreach_Funnel:Arm_Lab"
+          ]
+        ]
+      }
+    },
+    {
+      "cell_id": "C3",
+      "dims": "chain.self_reference",
+      "status": "instantiated",
+      "files": [
+        "reporting/USP_Panel_Rollup.sql"
+      ],
+      "expect": {
+        "steps_present": [
+          "transform:reporting.USP_Panel_Rollup:Rollup_R"
+        ],
+        "note": "recursive CTE \u2014 build must complete with no dangling edges (cycle broken at the back-edge)"
+      }
+    },
+    {
+      "cell_id": "C4",
+      "dims": "chain.cross_schema_twin",
+      "status": "instantiated",
+      "files": [
+        "reporting/USP_Active_Diabetics.sql",
+        "reports/USP_Active_Diabetics.sql"
+      ],
+      "expect": {
+        "metrics_present": [
+          "reporting.USP_Active_Diabetics",
+          "reports.USP_Active_Diabetics"
+        ]
+      }
+    },
+    {
+      "cell_id": "H1",
+      "dims": "hygiene.dynamic_sql",
+      "status": "instantiated",
+      "files": [
+        "reporting/USP_Adhoc_Extract.sql"
+      ],
+      "expect": {
+        "handled_exception": "reporting.USP_Adhoc_Extract",
+        "note": "dynamic SQL \u2014 the declared exception path (suppressed extraction or zero extractable steps), never a crash"
+      }
+    },
+    {
+      "cell_id": "H2",
+      "dims": "hygiene.multi_statement",
+      "status": "instantiated",
+      "files": [
+        "reporting/USP_Panel_Refresh.sql"
+      ],
+      "expect": {
+        "steps_present": [
+          "transform:reporting.USP_Panel_Refresh:Dx_Events",
+          "transform:reporting.USP_Panel_Refresh:Refresh_Pop"
+        ]
+      }
+    },
+    {
+      "cell_id": "H3",
+      "dims": "hygiene.crlf",
+      "status": "instantiated",
+      "files": [
+        "reporting/USP_Crlf_Probe_A.sql",
+        "reporting/USP_Crlf_Probe_B.sql"
+      ],
+      "expect": {
+        "absent_flag_identities": [
+          "Crlf_Cohort"
+        ]
+      }
+    },
+    {
+      "cell_id": "H4",
+      "dims": "hygiene.phi_literal",
+      "status": "instantiated",
+      "files": [
+        "reporting/USP_Phi_Probe.sql"
+      ],
+      "expect": {
+        "phi_redaction_step": "transform:reporting.USP_Phi_Probe:Phi_Filter"
+      }
+    }
+  ]
+}

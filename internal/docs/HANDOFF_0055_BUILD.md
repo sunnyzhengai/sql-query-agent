@@ -70,3 +70,62 @@ dev session. **Mode: build order — the ADR is the spec.**
   runbook).
 
 ## RESULTS (dev appends)
+
+### 2026-08-25 — BOTH PHASES BUILT overnight; 26/26 cells pass; SHAPES_GAPCHECK.md + demo note delivered
+**Phase 0 (sequencing note 1): the caption batch was already shipped**
+(W15/W16/W17/F1 — recorded in HANDOFF_0054_BUILD RESULTS) before any
+shapes work began.
+**The corpus** (diabetic-diagnosis palette, Sunny's ruling; palette =
+data/shapes/palette_diabetes.json — swap re-skins everything, no
+code): 22 generated SQL files, 31 matrix cells — 26 instantiated, 5
+excluded-with-reason (step-grain cousins, schema-object scope, M7/M8
+duplicate-coverage exclusions, R6 ask-leg) — every ratified dimension
+value covered (CI totality test).
+**Full local pipeline run (REAL ScriptDom parse → graph → sweep):
+26/26 instantiated cells PASS — every planted sin found, none
+invented, controls clean:** Base_Cohort misnomer (2 logics, INFO),
+Active Diabetic Patients metric CONFLICT + compare DIFFERS, Diabetes
+Registry Legacy-v1 cousin CONFLICT, Controlled-Diabetes cousin INFO
+(aligned), roster/DM-list duplicates + compare IDENTICAL, ws/case and
+CRLF normalization controls unflagged, the S3 D2-boundary disclosed
+(normalized-hash difference, no semantic claim), all five D4
+reference forms (incl. the temp-projection chase minting via_step and
+the ambiguous bare ref dropping), chains linear/diamond/recursive
+building clean, dynamic SQL classified no_query (the declared path),
+PHI literal yielding a redact finding.
+**Iteration finds while building (recorded):** (a) my ref-forms temp
+initially reused #Base_Cohort and the S4 cell caught the third
+member — the matrix caught its own author; (b) R5's first expectation
+was over-broad (qualified join refs legitimately mint; the DROP
+bucket is the assertion); (c) dynamic-SQL-only procs RAISE from
+parse_sql and the 200 classifier types them no_query — the checker
+now mirrors the pipeline grain (classified = declared, UNCLASSIFIED
+= defect).
+**Deliverables:** src/shapes/{generator,matrix,checker}.py;
+devtools/generate_shapes.py (corpus of record under
+data/shapes/generated/, regen byte-identical, CI-asserted);
+devtools/shapes_gapcheck.py → internal/docs/SHAPES_GAPCHECK.md
+(matrix, expected-vs-actual, dimension coverage, DEMO NOTE with the
+three demoable cells: M1 conflict / M2 Legacy cousin / S4 Base_Cohort
+misnomer, each with the question and expected on-screen answer);
+tests/shapes/test_shapes.py (12 tests: totality, corpus-of-record,
+L0 compose styles, end-to-end, isolation, seeded property leg —
+seeded rng, spec:E2); walk addendum (field finds cite cell ids); ADR
+0055 registry entry filled + TRACE_MAP regenerated.
+**Isolation (Sunny's ruling 3) honored and designed:** the realism
+corpus, its census, and every existing oracle are untouched (CI
+asserts zero metric-id collision); shapes run locally through the
+checker. The demo-switch mechanism DESIGN: a source profile = an
+org_config variant with _shapes-suffixed lakehouse tables (+ its own
+catalog tables); one small notebook change (config path as a run
+parameter, default unchanged) makes any chain run against either
+profile. EXECUTION PARKED with Sunny's tenant-load decision — if she
+rules pre-capture load, dev wires the param + a
+100_install-style profile check in that order.
+**PARKED for Sunny (morning):** palette veto/rename; tenant load
+pre-capture vs post; the ask-leg (R6 + the three demo questions
+live) rides the tenant-load ruling.
+Gates: full suite **1,076 passed** + 5 xfailed, ruff clean; no
+engine/ops/tools changes in the shapes build (no pin motion, no
+smoke-relevant surface touched — the harness ran green in the
+caption batch that preceded it).

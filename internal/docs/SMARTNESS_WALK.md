@@ -185,3 +185,10 @@ One line per step in HANDOFF_REMATCH_ROUND4_GOAL.md's RESULTS log:
 step, pass/fail, one-sentence reason. Failures become fixtures in
 devtools/answer_evals.py (family named after the step) before any fix
 ships.
+
+ADR 0055 addendum (2026-08-25): every field find ALSO cites its
+shape-matrix cell id (data/shapes/generated/shape_manifest.json — the
+S/M/R/C/H cells). A find inside a covered cell is a coverage bug in
+that cell's expectations; a find with NO cell means the matrix grows,
+and that growth is the recorded mechanism (Echo Law endgame — the
+walk becomes audit of last resort, not discovery of first resort).
