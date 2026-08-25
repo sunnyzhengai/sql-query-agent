@@ -405,7 +405,40 @@ def find_by_name(name: str, run_kql, session: Session) -> dict:
     return out
 
 
-CATALOG_KINDS = ("metric", "step", "term", "report", "measure")
+CATALOG_KINDS = ("metric", "step", "term", "report", "measure", "flag")
+
+# ADR 0054 flag surface (walk W8 → build order 2026-08-23): the sweep's
+# verdicts as single-row machine reads (ADR 0020) — sameness/identity
+# questions stop being per-question vigilance. The queries fail with a
+# named remediation while the store predates the sweep export.
+GOV_FLAGS_QUERY = (
+    "gov_red_flags\n"
+    "| project flag_id, flag_class, grain, identity, severity, scope,\n"
+    "          member_count, distinct_logics, blast_radius, blast_basis,\n"
+    "          disposition\n"
+    "| order by severity asc, flag_class asc, identity asc"
+)
+
+GOV_FLAG_BY_ID_QUERY = (
+    "declare query_parameters(p_id:string);\n"
+    "gov_red_flags\n"
+    "| where flag_id == p_id"
+)
+
+GOV_FLAGS_BY_IDENTITY_QUERY = (
+    "declare query_parameters(p_identity:string, p_grain:string);\n"
+    "gov_red_flags\n"
+    "| where grain == p_grain and identity =~ p_identity\n"
+    "| project flag_id, flag_class, severity, member_count,\n"
+    "          distinct_logics, disposition"
+)
+
+GOV_FLAGS_FOR_MEMBER_QUERY = (
+    "declare query_parameters(p_ref:string);\n"
+    "gov_red_flags\n"
+    "| where grain == 'metric' and members contains p_ref\n"
+    "| project flag_id, flag_class, severity, identity, disposition"
+)
 
 
 def list_catalog(kind: str, run_kql, session: Session) -> dict:

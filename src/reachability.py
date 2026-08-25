@@ -162,6 +162,16 @@ REACHABILITY = (
     {"payload": "catalog:measure", "status": "reachable",
      "via": "search/census; depth queued (see node:measure)",
      "ops": (), "queries": (), "marker": ""},
+    {"payload": "catalog:flag", "status": "reachable",
+     "via": "ADR 0054 governance red flags: census kind 'flag' "
+            "enumerates the sweep's machine verdicts; retrieve "
+            "returns the full record (members + hashes + drill "
+            "query); the step-name stamp and metric retrieval "
+            "surface recorded flags inline (single-row sameness "
+            "reads, ADR 0020)",
+     "ops": ("op_census", "op_retrieve"),
+     "queries": ("GOV_FLAGS_QUERY", "GOV_FLAG_BY_ID_QUERY"),
+     "marker": "gov_red_flags"},
 )
 
 

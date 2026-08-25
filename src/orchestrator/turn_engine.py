@@ -93,11 +93,14 @@ ENGINE_TOOLS = [
                         "the catalog. Optional contains: filter the "
                         "complete enumeration to items whose name, "
                         "business name, or description mentions the "
-                        "text — the count stays exact."),
+                        "text — the count stays exact. kind=flag: the "
+                        "recorded governance red flags (misnomers, "
+                        "duplicates, cousin conflicts) — machine "
+                        "verdicts; flags disclose, never gate."),
         "parameters": {"type": "object", "properties": {
             "kind": {"type": "string",
                      "enum": ["metric", "step", "term", "report",
-                              "measure"]},
+                              "measure", "flag"]},
             "contains": {"type": "string"}},
             "required": ["kind"]}}},
     {"type": "function", "function": {

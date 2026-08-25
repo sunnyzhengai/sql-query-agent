@@ -35,6 +35,10 @@ from src.orchestrator.tools import (
     DECISIONS_OF_METRIC_QUERY,
     DECISIONS_OF_STEP_QUERY,
     FIND_BY_NAME_QUERY,
+    GOV_FLAG_BY_ID_QUERY,
+    GOV_FLAGS_BY_IDENTITY_QUERY,
+    GOV_FLAGS_FOR_MEMBER_QUERY,
+    GOV_FLAGS_QUERY,
     LINKS_OF_REPORT_QUERY,
     LIST_CATALOG_QUERY,
     NAME_CONTAINS_QUERY,
@@ -156,6 +160,24 @@ def _attach_cards(rows: "list[dict]", run_kql) -> "list[dict]":
                 or r.get("business_name") or None)
     return rows
 
+def _qualified_labels(pairs: "list[tuple[str, str]]") -> "list[str]":
+    """Display labels with schema-qualification on collision (walk
+    W3a extension, 2026-08-23: 13 readers enumerated as 8 names —
+    reporting./reports. twins are separate certified metrics and an
+    enumeration that folds them reads as a contradiction of its own
+    stamped count)."""
+    counts: "dict[str, int]" = {}
+    for label, _ in pairs:
+        counts[label] = counts.get(label, 0) + 1
+    out: "list[str]" = []
+    for label, rid in pairs:
+        full = (f"{label} ({rid})"
+                if counts[label] > 1 and rid and rid != label else label)
+        if full not in out:
+            out.append(full)
+    return out
+
+
 def _containment_rows(phrase: str, run_kql) -> "list[dict]":
     """Name-containment companions for a phrase: full-phrase matches
     first; a multi-word phrase that matches nothing degrades to its
@@ -178,8 +200,29 @@ def _containment_rows(phrase: str, run_kql) -> "list[dict]":
         if run_kql(NAME_CONTAINS_QUERY, {"p_phrase": t})]
     if not productive:
         return []
-    return list(run_kql(NAME_CONTAINS_TOKENS_QUERY,
+    conj = list(run_kql(NAME_CONTAINS_TOKENS_QUERY,
                         {"p_tokens": " ".join(productive)}))
+    if conj:
+        return conj
+    # W11 blend-misname (walk step 5, 2026-08-23: 'Sepsis Audit
+    # Summary' splits its tokens across TWO name families, so the
+    # conjunctive has_all degradation is structurally blind — no
+    # single name holds every token and the bridge went dark). When
+    # conjunction is empty but tokens are individually productive,
+    # degrade DISJUNCTIVELY: per-token near-names, each row labeled
+    # with the token that matched it (the stamp attributes them).
+    union: "list[dict]" = []
+    seen: "set" = set()
+    for t in productive:
+        for r in run_kql(NAME_CONTAINS_QUERY, {"p_phrase": t}):
+            rid = r.get("node_id")
+            if rid in seen:
+                continue
+            seen.add(rid)
+            row = dict(r)
+            row["matched_token"] = t
+            union.append(row)
+    return union
 
 
 def _bridge_note(phrase: str, run_kql,
@@ -199,12 +242,16 @@ def _bridge_note(phrase: str, run_kql,
         return ""
     parts = []
     near: "list[str]" = []
+    by_token: "dict[str, list[str]]" = {}
     for r in _containment_rows(clean, run_kql):
         val = next((v for v in (r.get("business_name"), r["name"])
                     if v and clean.lower() in str(v).lower()),
                    r.get("business_name") or r["name"])
         if val and val not in near:
             near.append(str(val))
+            tok = r.get("matched_token")
+            if tok and str(val) not in by_token.get(tok, []):
+                by_token.setdefault(tok, []).append(str(val))
         # names on screen are surfaced (corpse fixture 2026-08-21:
         # the model retrieved the note's names, the read guarantee
         # refused unsurfaced ids, and the flail burned the round cap)
@@ -215,6 +262,11 @@ def _bridge_note(phrase: str, run_kql,
     if near:
         parts.append(f"Nothing is NAMED {clean!r} exactly; closest by "
                      f"name: {', '.join(near[:5])}.")
+        # W11: the blend attribution — which token found which family
+        if by_token:
+            parts.append("Token matches — " + "; ".join(
+                f"{t!r}: {', '.join(vs[:3])}"
+                for t, vs in by_token.items()) + ".")
     tables: "dict[str, list[str]]" = {}
     for r in run_kql(TABLE_USED_BY_QUERY, {"p_phrase": clean}):
         disp = r.get("business_name") or r.get("ref") or ""
@@ -259,10 +311,30 @@ def _step_name_universe(phrase: str, run_kql,
             names.append(disp)
         if session is not None and r.get("ref"):
             session.surfaced.add(str(r["ref"]))
-    return (f"{len(refs)} procs have a step NAMED {clean!r} "
-            f"({', '.join(names[:5])}"
-            + (", …" if len(names) > 5 else "")
-            + f") — {SAMENESS_CAVEAT}.")
+    stamp = (f"{len(refs)} procs have a step NAMED {clean!r} "
+             f"({', '.join(names[:5])}"
+             + (", …" if len(names) > 5 else "")
+             + f") — {SAMENESS_CAVEAT}.")
+    # ADR 0054 single-row verdict read: when the sweep's flag surface
+    # is in the store, the machine VERDICT rides the stamp — sameness
+    # stops being per-question vigilance. Absence of the surface is a
+    # legitimate pre-sweep state; the caveat above already governs it.
+    try:
+        for fr in run_kql(GOV_FLAGS_BY_IDENTITY_QUERY,
+                          {"p_identity": clean, "p_grain": "step"}):
+            stamp += (f" Recorded governance flag "
+                      f"{str(fr.get('flag_id'))!r} "
+                      f"({fr.get('flag_class')}, {fr.get('severity')}):"
+                      f" {fr.get('distinct_logics')} distinct logic(s)"
+                      f" across {fr.get('member_count')} step(s); "
+                      f"disposition {fr.get('disposition')} — retrieve "
+                      "the flag for members and the drill query.")
+            if session is not None and fr.get("flag_id"):
+                session.surfaced.add(str(fr["flag_id"]))
+            break
+    except Exception:       # noqa: BLE001, S110 — pre-sweep store
+        pass
+    return stamp
 
 
 def op_search(phrase: str, mode: str, run_kql,
@@ -381,6 +453,42 @@ def op_census(kind: str, run_kql, session: OpsSession,
     if k is None:
         raise OpError(f"census kind must be one of "
                       f"{', '.join(CATALOG_KINDS)}, got {kind!r}")
+    if k == "flag":
+        # ADR 0054: the governance red-flag surface — machine verdicts
+        # as rows (single-row sameness reads, ADR 0020). Flags
+        # disclose, never gate.
+        try:
+            frows = list(run_kql(GOV_FLAGS_QUERY, {}))
+        except Exception as e:              # noqa: BLE001 — named state
+            raise OpError(
+                "the red-flag surface is not in this store yet — run "
+                "320_red_flag_sweep and the export, then shortcut "
+                "gov_red_flags into the KQL database "
+                f"({type(e).__name__})") from e
+        out = [{"id": str(r["flag_id"]), "kind": "flag",
+                "name": str(r.get("identity") or ""),
+                "business_name": None, "of_metric": None,
+                "flag_class": r.get("flag_class"),
+                "grain": r.get("grain"),
+                "severity": r.get("severity"),
+                "member_count": r.get("member_count"),
+                "distinct_logics": r.get("distinct_logics"),
+                "blast_radius": r.get("blast_radius"),
+                "disposition": r.get("disposition")}
+               for r in frows]
+        params = {"kind": "flag"}
+        universe = ("every governance red flag recorded by the ADR "
+                    "0054 sweep (flags disclose, never gate) — the "
+                    "count is exact")
+        if contains and contains.strip():
+            needle = contains.strip()
+            out = [r for r in out
+                   if row_mentions(r, needle)
+                   or _token_in(needle, str(r.get("flag_class") or ""))]
+            params["contains"] = needle
+            universe += f", filtered to mentions of {needle!r}"
+        return session.register("census", params, out, complete=True,
+                                universe=universe)
     rows = run_kql(LIST_CATALOG_QUERY, {"p_kind": k})
     out = [
         {"id": (r["ref"] if r["kind"] == "metric" else r["node_id"]),
@@ -506,6 +614,15 @@ def _token_in(needle: str, text: str) -> bool:
     return bool(pat.search(text or ""))
 
 
+# W13b machine stamp (walk 1562): a 0-row column lineage discloses
+# that unresolved refs are DROPPED at build — the caption gate holds
+# any caption to this caveat, and the suite's fixture greps for it.
+COLUMN_COVERAGE_CAVEAT = (
+    "Recorded-edge coverage is partial (unresolved column references "
+    "are dropped at build), so this does NOT prove the column is "
+    "unused — it is not tracked as used; cannot conclude unused.")
+
+
 def _column_usage(column: str, run_kql, session: OpsSession) -> ResultSet:
     """The column blast radius (columns work 2026-08-22, walk probes
     C2/D5; projection grain ordered by Sunny, ADR 0053): which metrics
@@ -569,8 +686,18 @@ def _column_usage(column: str, run_kql, session: OpsSession) -> ResultSet:
                 "edges; rerun the pipeline to mint them. Filter "
                 "coverage above is current.")
         elif not out:
-            note = (f"No decision site filters on and no step selects "
-                    f"a column matching {clean!r}.")
+            # W13b (walk 1562, HONESTY-CRITICAL — the
+            # ED_DEPARTURE_TIME corpse: 0 recorded edges read as
+            # "no certified metrics utilize this column" while the
+            # source filters it 46x): a zero-row column lineage is
+            # PROVEN-UNUSED only when nothing was dropped for it at
+            # build — a per-column guarantee the store does not carry
+            # — so the machine states COVERAGE-ABSENT, and the gate
+            # holds the caption to it (0053's own principle at ask
+            # time: absence of recorded edges is not proven absence
+            # of use).
+            note = (f"0 recorded edges for {clean!r}. "
+                    + COLUMN_COVERAGE_CAVEAT)
     return session.register(
         "lineage", {"column": clean},
         _attach_cards(out, run_kql),
@@ -634,12 +761,15 @@ def op_lineage(table: str, run_kql, session: OpsSession,
     # The reader NAMES are machine truth worth stamping (1.56.1: the
     # gate correctly floored a caption for an invented sub-count, and
     # the floor then lost the reader names — headlines must carry the
-    # answer for small complete results).
-    distinct = sorted({str(r.get("business_name") or r["id"])
-                       for r in out})
+    # answer for small complete results). W3a extension (walk
+    # 2026-08-23): colliding display names are schema-qualified — 13
+    # readers must enumerate as 13, never fold to 8.
+    label_pairs = sorted({(str(r.get("business_name") or r["id"]),
+                           str(r["id"])) for r in out})
+    distinct = _qualified_labels(list(label_pairs))
     n_tables = len({str(r.get("reads_table")) for r in out})
     note = ""
-    if distinct and len(distinct) <= 10:
+    if distinct and len(distinct) <= 13:
         note = (f"{len(distinct)} distinct metric(s)"
                 + (f" across {n_tables} table(s)" if n_tables > 1
                    else "")
@@ -647,6 +777,23 @@ def op_lineage(table: str, run_kql, session: OpsSession,
     elif distinct:
         note = (f"{len(distinct)} distinct metric(s) across "
                 f"{n_tables} table(s).")
+    if not out:
+        # W9 (walk step 3 + step 4 sighting, 2026-08-23): lineage used
+        # as a generic "what uses X" with a METRIC/REPORT phrase — the
+        # honest empty must resolve the wrong kind and point at the
+        # record that carries the links, or the pointer chase dies.
+        for r in list(run_kql(FIND_BY_NAME_QUERY,
+                              {"p_name": clean}))[:1]:
+            rid = (r.get("ref") if r.get("kind") == "metric"
+                   else r.get("node_id"))
+            if rid:
+                if session is not None:
+                    session.surfaced.add(str(rid))
+                note = (f"{clean!r} is a "
+                        f"{str(r.get('kind') or 'catalog item').upper()},"
+                        f" not a warehouse table — its record carries "
+                        f"its links (reports, tables, steps); retrieve "
+                        f"{str(rid)!r} for them.")
     return session.register(
         "lineage", {"table": clean},
         _attach_cards(out, run_kql),
@@ -701,7 +848,42 @@ def op_retrieve(ids: "list[str]", run_kql, session: OpsSession) -> ResultSet:
     rows, notes = [], []
     for an_id in ids:
         try:
-            if an_id.startswith("transform:"):
+            if an_id.startswith("flag:"):
+                # ADR 0054: the full flag record — members with hashes
+                # and the drill query (error-contract discipline)
+                frows = list(run_kql(GOV_FLAG_BY_ID_QUERY,
+                                     {"p_id": an_id}))
+                if not frows:
+                    notes.append(f"flag {an_id!r} not found in "
+                                 "gov_red_flags")
+                    continue
+                fr = dict(frows[0])
+                members = fr.get("members")
+                if isinstance(members, str):
+                    try:
+                        members = json.loads(members or "[]")
+                    except json.JSONDecodeError:
+                        members = []
+                rows.append({"id": an_id, "kind": "flag",
+                             "flag_class": fr.get("flag_class"),
+                             "grain": fr.get("grain"),
+                             "identity": fr.get("identity"),
+                             "severity": fr.get("severity"),
+                             "scope": fr.get("scope"),
+                             "member_count": fr.get("member_count"),
+                             "distinct_logics": fr.get("distinct_logics"),
+                             "members": members,
+                             "blast_radius": fr.get("blast_radius"),
+                             "blast_basis": fr.get("blast_basis"),
+                             "drill_query": fr.get("drill_query"),
+                             "disposition": fr.get("disposition"),
+                             "disposition_reason":
+                                 fr.get("disposition_reason")})
+                for m in (members or []):
+                    rid = str(m.get("ref") or m.get("id") or "")
+                    if rid:
+                        session.surfaced.add(rid)
+            elif an_id.startswith("transform:"):
                 fs = assemble_step(an_id, an_id.split(":", 2)[1], run_kql)
                 rows.append({"id": an_id, "kind": "step", **fs.facts,
                              "decisions": _decisions_of(an_id, run_kql)})
@@ -767,6 +949,29 @@ def op_retrieve(ids: "list[str]", run_kql, session: OpsSession) -> ResultSet:
                              "decision_count":
                                  (dc[0].get("Count", 0) if dc else 0),
                              "decision_sites": sites})
+                # ADR 0054 variants-exist stamp: definition answers
+                # disclose recorded name-family flags — official-first
+                # once a certify disposition designates one; until
+                # then, "no official is designated". Pre-sweep stores
+                # simply skip.
+                try:
+                    for fr in run_kql(GOV_FLAGS_FOR_MEMBER_QUERY,
+                                      {"p_ref": an_id}):
+                        disp = str(fr.get("disposition") or "open")
+                        notes.append(
+                            f"governance: {an_id} is in flag "
+                            f"{str(fr.get('flag_id'))!r} "
+                            f"({fr.get('flag_class')}, "
+                            f"{fr.get('severity')}) — certified "
+                            "variants exist for this name family; "
+                            + ("no official is designated yet"
+                               if disp == "open"
+                               else f"disposition: {disp}")
+                            + "; retrieve the flag for members.")
+                        if fr.get("flag_id"):
+                            session.surfaced.add(str(fr["flag_id"]))
+                except Exception:   # noqa: BLE001, S110 — pre-sweep store
+                    pass
         except AssemblyError as e:
             notes.append(str(e))
     return session.register(
@@ -880,7 +1085,8 @@ def kernel_step_alignment(items: "list[dict]", run_kql) -> "tuple[list, str, boo
     metric_refs = [i["id"] for i in items if ":" not in i["id"]]
     if len(metric_refs) < 2:
         raise OpError("aspect 'steps' aligns metric decompositions — "
-                      "select at least two metrics (not steps/reports)")
+                      "select at least two metrics (not steps/reports). "
+                      + COMPARE_ERROR_CAVEAT)
     decomps = []
     for ref in metric_refs:
         step_rows = run_kql(STEPS_OF_QUERY, {"p_ref": ref})
@@ -909,16 +1115,51 @@ def kernel_step_alignment(items: "list[dict]", run_kql) -> "tuple[list, str, boo
 LIST_FIELDS = {"tables": "source_tables", "source_tables": "source_tables"}
 
 
+# Machine caveat on every failed compare (walk W12b, 2026-08-23 —
+# the Q4 corpse: four errored compares degraded into invented
+# 'Replaced by' relationships). Rides in the OpError text, so the
+# template floor renders it verbatim; the gate enforces its echo.
+COMPARE_ERROR_CAVEAT = ("No comparison was performed — sameness, "
+                        "difference, or replacement remains UNVERIFIED.")
+
+
 def op_compare(refs: "list[str]", aspect: "str | None", run_kql,
                session: OpsSession) -> ResultSet:
     """Compare a selection: aspect None/'logic' -> partition kernel;
     'steps' -> step-aligned decomposition diff; a list field -> set
-    algebra; scalar fields -> field diff."""
+    algebra; scalar fields -> field diff.
+
+    Selection members (W12a, walk 2026-08-23 — FIVE reproductions of
+    valid ids resolving to 0): result REFS (R1, R2) resolve to their
+    rows, and CATALOG IDS the session has surfaced (or the user named)
+    resolve directly — the engine's natural call passes ids, and the
+    read guarantee, not the argument form, is the boundary."""
     items = session.rows_of(refs)
+    seen_ids = {i.get("id") for i in items}
+    refused: "list[str]" = []
+    for arg in refs:
+        if arg in session.results or arg in seen_ids:
+            continue
+        if not session.permitted(arg):
+            refused.append(arg)
+            continue
+        row: dict = {"id": arg}
+        found = run_kql(FIND_BY_NAME_QUERY, {"p_name": arg})
+        if found:
+            r0 = found[0]
+            row.update({
+                "kind": r0.get("kind"),
+                "name": r0.get("name"),
+                "business_name": r0.get("business_name") or None})
+        items.append(row)
+        seen_ids.add(arg)
     items = [i for i in items if i.get("id")]
     if len(items) < 2:
+        detail = (f"; refused (never surfaced or user-named): {refused}"
+                  if refused else "")
         raise OpError("compare needs a selection of at least two items "
-                      f"(got {len(items)} from {refs})")
+                      f"(got {len(items)} from {refs}{detail}). "
+                      + COMPARE_ERROR_CAVEAT)
     if aspect == "steps":
         rows, note, complete = kernel_step_alignment(items, run_kql)
         return session.register(

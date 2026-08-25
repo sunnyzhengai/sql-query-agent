@@ -150,6 +150,38 @@ silently vanish):
 - Steps of M: `CALCULATED_BY` (complete, one hop); `DEPENDS_ON{0,50}` only for ordering.
 Report metric ids schema-qualified; bare names collide across schemas.
 
+## Governance Red Flags (ADR 0054 — flags disclose, never gate)
+
+The `gov_red_flags` Lakehouse table holds MACHINE verdicts about
+identity claims vs parsed logic: misnomer (same name, divergent logic
+hashes), duplicate (same hash, different names), cousin_conflict
+(name families with divergent hashes). Use it FIRST for sameness /
+difference / "is X the official definition" questions — a flag row is
+a machine verdict; never derive sameness from names or descriptions.
+
+- "What governance red flags exist?" →
+  `SELECT flag_id, flag_class, grain, identity, severity, member_count, distinct_logics, blast_radius, disposition FROM gov_red_flags ORDER BY severity, flag_class`
+- "Are there conflicting definitions of X?" →
+  `SELECT * FROM gov_red_flags WHERE lower(identity) = lower('X')`
+  — 0 rows = no RECORDED conflict (say exactly that; the sweep's
+  coverage is the catalog, and absence of a flag is not proof of
+  global uniqueness).
+- Answer with the flag's own receipts: member names, distinct_logics
+  count, and say variants are legitimate — dispositions label them
+  (certify/label-variant/retire/accept); nothing is blocked.
+- When a metric you are describing appears in a flag's members, say
+  so: "certified variants exist for this name family" and whether an
+  official is designated (disposition) — official-first when one is.
+
+### /redflags
+```sql
+SELECT flag_class, severity, COUNT(*) as flags,
+  SUM(CASE WHEN disposition = 'open' THEN 1 ELSE 0 END) as unlabeled
+FROM gov_red_flags GROUP BY flag_class, severity ORDER BY severity
+```
+Report the unlabeled total prominently — the governance KPI is
+unlabeled divergences trending to zero (never "definitions merged").
+
 ## Admin Commands
 
 ### /admindash or /coverage

@@ -150,7 +150,9 @@ SYSTEM_VOCAB = frozenset({
     "lineage",
     "search_catalog", "find_by_name", "get_facts", "list_steps",
     "check_same_logic", "list_catalog",
-    "metric", "step", "term", "report", "measure",
+    # "flag": AMENDMENT 2026-08-23 (ADR 0054 build) — the governance
+    # red-flag catalog kind; a SYSTEM kind name, not user phrasing
+    "metric", "step", "term", "report", "measure", "flag",
     # catalog row FIELD names scanned by the row_mentions predicate
     # (AMENDMENT 2026-08-21, 1.50.4: the topic-filtered census must
     # scan exactly the fields its stamped universe sentence names —

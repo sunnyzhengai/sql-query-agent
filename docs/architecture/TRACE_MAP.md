@@ -644,5 +644,12 @@ classification).
 ## ADR 0054 — Governance red flags and governed plurality: misnomer/duplicate/cousin sweep over content hashes
 
 - **Category:** architecture
+- **Grounds:** spec:C1, spec:E2
+- **Implemented by:**
+  - `src/governance/red_flags.py`
+  - `src/steps/red_flag_sweep.py`
+- **Enforced by:**
+  - `tests/governance/test_red_flags.py`
+  - `tests/orchestrator/test_flag_ops.py`
 - **Summarized in:**
   - `docs/decisions/0054-governance-red-flags-governed-plurality.md`

@@ -64,9 +64,6 @@ def test_architecture_decisions_carry_code_or_tests():
     sanctioned = {
         "0029",  # design pass, explicitly unimplemented (status line)
         "0034",  # superseded in part by 0035; its artifacts were deleted
-        "0054",  # DRAFT (review skeleton 2026-08-23): red-flag sweep
-                 # parked for Sunny's scoping — modules/tests land
-                 # with W8; remove from here when it ships
     }
     empty = [
         adr for adr, e in TRACE_REGISTRY.items()

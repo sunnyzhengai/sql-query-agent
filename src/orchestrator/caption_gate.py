@@ -34,7 +34,11 @@ from __future__ import annotations
 import json
 import re
 
-from src.orchestrator.ops import SAMENESS_CAVEAT, normalize_kind
+from src.orchestrator.ops import (
+    COLUMN_COVERAGE_CAVEAT,
+    SAMENESS_CAVEAT,
+    normalize_kind,
+)
 
 _REF_TOKEN = re.compile(r"\b[R$]\d+\b")
 _NUMBERS = re.compile(r"\b\d+\b")
@@ -172,6 +176,47 @@ def caption_violations(caption: str, outputs: "list[dict]",
                 "sameness — echo the caveat or run compare; an "
                 "equivalence/difference claim from name or mention "
                 "evidence is unsupported")
+
+    # Compare-error duty (walk W12b, 2026-08-23 — the Q4 corpse: four
+    # errored compares degraded into invented 'Replaced by'
+    # relationships plus the exact conclusion the compares were meant
+    # to establish). Turn-scoped, structural: a compare ERROR chip is
+    # on screen and no successful compare result is — the caption must
+    # echo the machine caveat. The floor renders the error line, which
+    # carries the caveat verbatim.
+    low_c = caption.lower()
+    compare_errored = any(
+        o.get("error") and (o.get("component") or {}).get("op") == "compare"
+        for o in outputs)
+    compare_succeeded = any(r.get("op") == "compare" for r in turn_results)
+    if compare_errored and not compare_succeeded:
+        if ("unverified" not in low_c and "not compared" not in low_c
+                and "no comparison" not in low_c):
+            violations.append(
+                "compare-error duty (walk W12b, 2026-08-23): a compare "
+                "operation FAILED this turn — the caption must state "
+                "that sameness/difference/replacement remains "
+                "unverified; it can never degrade into a claim")
+
+    # Column-coverage duty (walk W13b, 2026-08-23 — the
+    # ED_DEPARTURE_TIME corpse: the headline scoped its zero to
+    # 'recorded edges' and the caption dropped the qualifier,
+    # claiming 'no certified metrics utilize this column'). When the
+    # coverage caveat is stamped on screen, the caption must carry
+    # the uncertainty.
+    coverage_stamped = any(
+        COLUMN_COVERAGE_CAVEAT in str(r.get("headline") or "")
+        or COLUMN_COVERAGE_CAVEAT in str(r.get("note") or "")
+        for r in turn_results)
+    if coverage_stamped:
+        if ("cannot conclude" not in low_c and "not tracked" not in low_c
+                and "does not prove" not in low_c
+                and "coverage" not in low_c):
+            violations.append(
+                "column-coverage duty (walk W13b, 2026-08-23): the "
+                "displayed result stamps that 0 recorded edges cannot "
+                "prove the column unused — the caption must carry "
+                "that uncertainty, never an absolute absence claim")
 
     for m in _KIND_ABSENCE.finditer(text):
         kind = m.group(1).lower()

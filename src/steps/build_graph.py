@@ -86,6 +86,22 @@ def _wire_decision_sites(builder, metric_id, step_name, tree, rows,
                         connected = True  # self-reference: the step itself
                     else:
                         saw_unresolved = True
+                    # W13a chase (ED_DEPARTURE_TIME corpse: FILTERED
+                    # 46x, zero recorded edges — every filter qualified
+                    # through #Base_Pop, so the column identity died at
+                    # the step boundary): the step's OWN projection map
+                    # knows the source column; when it is unique, the
+                    # decision ALSO gets its column edge — blast radius
+                    # stays column-true through temp tables.
+                    if target_step:
+                        proj = builder.projection_by_step.get(
+                            target_step) or {}
+                        chased = proj.get(fold_identifier(col)) or set()
+                        if len(chased) == 1:
+                            builder.add_edge(decision_id,
+                                             next(iter(chased)),
+                                             EdgeType.DECISION_TO_COLUMN)
+                            connected = True
                     continue
                 table_ref = TableRef(table=table, schema=schema or "dbo")
                 table_node = builder._find_tech_node_id(table_ref)
@@ -131,6 +147,7 @@ class BuildGraphOutput:
     # refs = minted ⊎ dropped(reason), asserted at build time
     projection_refs: int = 0
     projection_minted: int = 0
+    projection_minted_via_step: int = 0     # W13a chase subset
     projection_dropped: "dict[str, int]" = field(default_factory=dict)
 
 
@@ -174,7 +191,11 @@ def build_graph_step(
     for pr in parse_results_rows:
         builder.add_canonical_node(pr["metric_id"], pr["name"])
         parsed = parse_result_to_parsed_sql(pr)
-        builder.build_from_parsed_sql(pr["metric_id"], parsed)
+        # W13a: projection minting moves into the tree loop below,
+        # where the alias map exists (ED_DEPARTURE_TIME corpse: every
+        # aliased qualifier died as unresolved_qualifier without it).
+        builder.build_from_parsed_sql(pr["metric_id"], parsed,
+                                      mint_projections=False)
         step_by_fold = {fold_identifier(c.name): f"transform:{pr['metric_id']}:{c.name}"
                         for c in parsed.ctes}
         # A proc may REDEFINE a CTE name across statements (field find,
@@ -191,6 +212,12 @@ def build_graph_step(
             row_step = (cte.name if occurrence[fold] == 1
                         else f"{cte.name}#{occurrence[fold]}")
             tree = build_decision_tree(cte.sql_fragment)
+            # Projection minting with the tree's alias map + step
+            # registry (W13a) — BEFORE decision wiring, so decision
+            # refs into this step can chase its projections.
+            builder.mint_projection_edges(
+                step_by_fold[fold], cte.column_refs, cte.table_refs,
+                aliases=tree.table_aliases, step_by_fold=step_by_fold)
             rows = decision_site_rows(tree, pr["metric_id"], step_name=row_step)
             _wire_decision_sites(
                 builder, pr["metric_id"], cte.name, tree, rows, step_by_fold,
@@ -251,5 +278,6 @@ def build_graph_step(
         decision_sites_unextracted=len(tree_fallout_rows),
         projection_refs=builder.projection_refs,
         projection_minted=builder.projection_minted,
+        projection_minted_via_step=builder.projection_minted_via_step,
         projection_dropped=dict(builder.projection_dropped),
     )

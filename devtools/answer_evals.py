@@ -199,6 +199,54 @@ FIXTURES = [
      "oracle": "register_step_facts", "item": "ED Sepsis Screening",
      "step_name": "Base_Pop",
      "max_rounds": 3, "expected_kind": "answered"},
+    # Walk 1562 continuation (steps 3–6, 2026-08-23). W12: the compare
+    # resolution corpse — the model ROUTED to compare correctly (the
+    # pin sentence worked) and the op rejected valid catalog ids; the
+    # fallback was a description-derived difference claim.
+    {"family": "sameness",
+     "question": "what's the difference between Sepsis Encounters and "
+                 "Sepsis Case Encounters?",
+     "oracle": "sameness",
+     "items": ["Sepsis Encounters", "Sepsis Case Encounters"],
+     "max_rounds": 6, "expected_kind": "caveat_or_compare"},
+    # W12b/Q4 (the strongest corpse): invented supersedes ×4 after four
+    # errored compares. Relationship claims require a recorded edge or
+    # a compare verdict; with neither recorded in the store, the
+    # replaced-by phrasing itself is the fabrication.
+    {"family": "sameness",
+     "question": "list the legacy metrics — what replaced them?",
+     "oracle": "relationship_claim",
+     "max_rounds": 6, "expected_kind": "caveat_or_compare"},
+    # W13: the false-empty corpse. Store-derived and SELF-ADAPTING:
+    # while the store carries no edges for the column, pass = the
+    # coverage caveat; once the W13a resolver's edges land in a
+    # pipeline run, pass = the reader names (column_filters shape).
+    {"family": "lineage",
+     "question": "which metrics filter on the ED_DEPARTURE_TIME "
+                 "column?",
+     "oracle": "column_filters_or_coverage",
+     "column": "ED_DEPARTURE_TIME",
+     "max_rounds": 3, "expected_kind": "answered"},
+    # W9: the pointer chase — metric → report links, the 1.51.0
+    # backfill built FOR this question; the walk never reached it.
+    {"family": "pointer_chase",
+     "question": "which dashboards use the ED Sepsis Screening metric?",
+     "oracle": "metric_reports", "item": "ED Sepsis Screening",
+     "max_rounds": 4, "expected_kind": "answered"},
+    # W11: the blend misname — tokens split across two real families;
+    # the bridge must name BOTH as did-you-mean.
+    {"family": "bridge",
+     "question": "how is Sepsis Audit Summary defined",
+     "oracle": "blend_bridge", "tokens": ["Audit", "Summary"],
+     "max_rounds": 3, "expected_kind": "bridge"},
+    # ADR 0054 (build order 2026-08-23): the flag surface as a suite
+    # family. requires_table: the fixture SKIPS with a printed notice
+    # while the store predates the sweep (disclosed, never silent —
+    # the acceptance run happens after Sunny's rerun).
+    {"family": "flags",
+     "question": "what governance red flags exist?",
+     "oracle": "flag_census", "requires_table": "gov_red_flags",
+     "max_rounds": 2, "expected_kind": "answered"},
 ]
 
 _WORD = re.compile(r"[A-Za-z_]{6,}")
@@ -306,17 +354,103 @@ def build_oracle(fixture: dict, run_kql) -> dict:
     if kind == "sameness":
         # Walk W6 (2026-08-23): structural pass conditions, not word
         # oracles — the caveat echo alternatives are fragments of the
-        # code-stamped SAMENESS_CAVEAT constant, and compare-on-screen
-        # is read from the trail (cap.compare_on_screen). The store
-        # check only asserts the fixture is non-vacuous: the step name
-        # must genuinely be shared across >=2 procs.
-        rows = run_kql(STEP_NAME_UNIVERSE_QUERY,
-                       {"p_name": fixture["step_name"]})
-        n = len({str(r.get("ref")) for r in rows if r.get("ref")})
-        assert n >= 2, (f"oracle: step {fixture['step_name']!r} is not "
-                        "shared across procs — sameness fixture vacuous")
-        return {"required_any": [["not logic sameness", "not compared"]],
+        # code-stamped caveat constants, and compare-on-screen is
+        # read from the trail (cap.compare_on_screen). The store check
+        # only asserts the fixture is non-vacuous: a shared step name,
+        # or (W12 pair form) both named items resolvable.
+        if fixture.get("items"):
+            for item in fixture["items"]:
+                ops_i = _fresh_ops_session()
+                rs = op_search(item, "exact", run_kql, ops_i)
+                assert rs.rows, f"oracle: {item!r} not in catalog"
+        else:
+            rows = run_kql(STEP_NAME_UNIVERSE_QUERY,
+                           {"p_name": fixture["step_name"]})
+            n = len({str(r.get("ref")) for r in rows if r.get("ref")})
+            assert n >= 2, (f"oracle: step {fixture['step_name']!r} is "
+                            "not shared across procs — fixture vacuous")
+        return {"required_any": [["not logic sameness", "not compared",
+                                  "no comparison", "unverified"]],
                 "sameness": True, "forbidden": []}
+    if kind == "relationship_claim":
+        # W12b/Q4 (2026-08-23): replaced-by assertions require a
+        # recorded edge or a compare verdict. Store-derived: while the
+        # ADR 0054 relationship edges do not exist, the phrasing
+        # itself is a fabrication; once they ship, this branch stops
+        # forbidding and starts requiring them.
+        n_edges = 0
+        rows = run_kql(
+            "graph_edges | where edge_type in ('supersedes', "
+            "'variant_of', 'duplicate_of') | count", {})
+        if rows:
+            n_edges = int(rows[0].get("Count", 0) or 0)
+        if n_edges:
+            return {"required_any": [["supersede", "variant",
+                                      "duplicate"]],
+                    "sameness": True, "forbidden": []}
+        return {"required_any": [["not recorded", "no replacement",
+                                  "unverified", "not compared",
+                                  "no comparison"]],
+                "sameness": True,
+                "forbidden": ["replaced by", "succeeded by",
+                              "superseded by"]}
+    if kind == "column_filters_or_coverage":
+        # W13 (2026-08-23): self-adapting. Edges recorded → the
+        # column_filters shape; zero recorded → the machine coverage
+        # caveat is the only honest answer.
+        frows = run_kql(COLUMN_FILTERS_QUERY,
+                        {"p_col": fixture["column"]})
+        names = sorted({
+            str(r.get("business_name") or r.get("ref") or "")
+            for r in frows
+            if str(r.get("column_name") or "").lower()
+            == fixture["column"].lower()})
+        names = [n for n in names if n]
+        if names:
+            return {"required_any": [names],
+                    "required_overlap": min(2, len(names)),
+                    "forbidden": []}
+        return {"required_any": [["cannot conclude", "not tracked",
+                                  "does not prove", "coverage"]],
+                "forbidden": []}
+    if kind == "metric_reports":
+        # W9 pointer chase: the metric's linked reports, from the
+        # parsed TMDL consumption layer.
+        ops2 = _fresh_ops_session()
+        rs = op_search(fixture["item"], "exact", run_kql, ops2)
+        assert rs.rows, f"oracle: {fixture['item']} not in catalog"
+        rec = op_retrieve([rs.rows[0]["id"]], run_kql, ops2)
+        names = sorted({str(r.get("name") or "")
+                        for row in rec.rows
+                        for r in (row.get("reports") or [])} - {""})
+        assert names, f"oracle: {fixture['item']} has no linked reports"
+        return {"required_any": [names],
+                "required_overlap": 1, "forbidden": []}
+    if kind == "flag_census":
+        # ADR 0054: the exact flag count plus at least one recorded
+        # class word — both from the store, no hardcoded answers.
+        rows = list(run_kql(
+            "gov_red_flags | summarize n=count() by flag_class", {}))
+        total = sum(int(r.get("n") or 0) for r in rows)
+        assert total, "oracle: gov_red_flags is empty"
+        classes = sorted(str(r.get("flag_class")) for r in rows)
+        return {"required_any": [[str(total)], classes],
+                "forbidden": []}
+    if kind == "blend_bridge":
+        # W11: each token names a real family; the answer must name at
+        # least one member of EVERY family.
+        ops2 = _fresh_ops_session()
+        rs = op_census("metric", run_kql, ops2)
+        groups = []
+        for tok in fixture["tokens"]:
+            grp = sorted({
+                str(v) for r in rs.rows
+                for v in (r.get("business_name"), r.get("name"))
+                if v and tok.lower() in str(v).lower()})
+            assert grp, f"oracle: token {tok!r} matches no names"
+            groups.append(grp)
+        return {"required_any": groups,
+                "forbidden": ["no metrics exist"]}
     if kind == "step_count":
         ops2 = _fresh_ops_session()
         rs = op_search(fixture["item"], "exact", run_kql, ops2)
@@ -336,7 +470,8 @@ def build_oracle(fixture: dict, run_kql) -> dict:
         ops2.note_user(step_id)          # user-named → retrievable
         rec = op_retrieve([step_id], run_kql, ops2)
         assert rec.rows, f"oracle: step {step_id} not found"
-        desc = " ".join(str(r.get("description") or "")
+        desc = " ".join(str(r.get("step_description")
+                            or r.get("description") or "")
                         for r in rec.rows)
         words = sorted(set(_WORD.findall(desc)))
         assert len(words) >= 2, "oracle: step description too thin"
@@ -500,8 +635,12 @@ def paraphrases(question: str, n: int) -> "list[str]":
 # basis for a sameness/difference verdict; names/mentions/descriptions
 # never establish sameness. Tool-semantics text, not a question shape
 # (the 1.50.1 class). SYSTEM_PROMPT unchanged.
-PINNED_PROMPT_SHA = ("01432f0c2aa83e70507b2ae7191e962a"
-                     "541a0e1e28318ba8c56b30ae2632b85c")
+# Pin bumped CONSCIOUSLY 2026-08-23 (ADR 0054 build,
+# HANDOFF_0054_BUILD RESULTS): census kind enum gained 'flag' plus a
+# tool-property sentence (the sweep's machine verdicts; flags
+# disclose, never gate). SYSTEM_PROMPT unchanged.
+PINNED_PROMPT_SHA = ("d9f8df5ce81cfe086542cb04768df410"
+                     "1e2a6afe21783b640eeda1f20507e027")
 
 
 def main() -> None:
@@ -541,6 +680,18 @@ def main() -> None:
     infra_skipped: "list[tuple]" = []
     stop_build = False
     for fixture in FIXTURES:
+        # ADR 0054: a fixture may declare a store table it cannot run
+        # without — SKIP is disclosed, never silent, and the family
+        # prints as pending so the board can't read as covered.
+        req = fixture.get("requires_table")
+        if req:
+            try:
+                run_kql(f"{req} | count", {})
+            except Exception:                   # noqa: BLE001 — absent
+                print(f"[{fixture['family']}] SKIPPED — required table "
+                      f"{req!r} not in the store yet (pending the "
+                      "pipeline run that writes it)")
+                continue
         try:
             oracle = build_oracle(fixture, run_kql)
         except AssertionError:

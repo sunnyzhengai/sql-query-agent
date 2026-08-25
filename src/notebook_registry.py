@@ -128,6 +128,17 @@ NOTEBOOK_REGISTRY: "dict[str, dict]" = {
         # decision-tree outputs (ADR 0044 phase 1) need the 1.26 wheel
         "requires_engine": "1.26",
     },
+    "320_red_flag_sweep": {
+        "family": "derivation",
+        "serves": ["E", "F"],
+        "purpose": "Governance red-flag sweep (ADR 0054): misnomer/"
+                   "duplicate/cousin flags over content hashes",
+        "entry_points": ["red_flag_sweep_step"],
+        "wrappers": [],
+        "gates": ["precondition_gate"],
+        # red_flags module + gov_red_flags schema need the 1.57 wheel
+        "requires_engine": "1.57",
+    },
     "400_build_metric_logic": {
         "family": "derivation",
         "serves": ["A", "E"],

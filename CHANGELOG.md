@@ -10,6 +10,39 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.57.0] - 2026-08-23
+
+### Added — ADR 0054 governance red-flag sweep (build order HANDOFF_0054_BUILD)
+- `src/governance/red_flags.py`: misnomer / duplicate / cousin-conflict
+  flags at catalog grain over ScriptDom-normalized content hashes
+  (`_content_key` imported, never re-implemented); RATIFIED severity
+  boundaries; conservation partition (clean ⊎ flagged ⊎
+  excluded-with-reason) asserted; deterministic flag ids (spec:E2);
+  append-only disposition fold (reason MANDATORY on accept/retire).
+- New pipeline notebook `320_red_flag_sweep` (runs after
+  300_build_graph) writing `gov_red_flags`; schema contracts for
+  `gov_red_flags` (active) and `gov_flag_dispositions` (planned —
+  writer is the ADR 0050 plan-confirm steward surface).
+- Agent flag surface: census kind `flag`, flag retrieve (members +
+  hashes + drill query), the step-name stamp carries the recorded
+  flag verdict (single-row sameness reads, ADR 0020), metric
+  retrieval stamps variants-exist / official designation.
+  CONSCIOUS pin bump: census kind enum + one tool-property sentence.
+- Reachability row `catalog:flag` (ADR 0052); engine-smoke case for
+  the flag surface (named remediation on pre-sweep stores); suite
+  `flags` family with a disclosed requires-table skip.
+
+### Fixed / carried from the walk-1562 continuation (same release)
+- W12 compare resolution (catalog ids through the read boundary) +
+  load-bearing post-error caveat; W13a projection/decision resolver
+  (alias resolution + step-projection chase; corpus projections
+  153 → 2,251) + W13b coverage-absent stamp and gate duty; W9
+  wrong-kind lineage redirect; W11 disjunctive blend bridge; W3a
+  qualified enumerations; engine-path smoke harness (the mechanized
+  live-probe law).
+
+---
+
 ## [1.50.3] - 2026-08-21
 
 ### Changed — the bridge acceptance ruling (Sunny, 2026-08-21) enforced at both layers

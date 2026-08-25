@@ -34,7 +34,13 @@ class GraphBuilder:
         # edges, every drop counted by reason, never absorbed.
         self.projection_refs = 0
         self.projection_minted = 0
+        self.projection_minted_via_step = 0     # subset of minted (W13a)
         self.projection_dropped: dict[str, int] = {}
+        # Per-step projection map (W13a chase): step id → fold(col) →
+        # the column nodes the step's OWN projection resolved to. A
+        # later ref qualified through the step (bp.ED_DEPARTURE_TIME →
+        # #Base_Pop) chases to the source column through this map.
+        self.projection_by_step: "dict[str, dict[str, set[str]]]" = {}
 
     def add_technical_node(
         self, table: str, column: str | None = None, description: str = "",
@@ -231,23 +237,59 @@ class GraphBuilder:
         self.projection_dropped[reason] = (
             self.projection_dropped.get(reason, 0) + 1)
 
+    def _mint_one_projection(self, transform_id: str, col: str,
+                             target: str, seen: "set[tuple]",
+                             via_step: bool = False) -> None:
+        if (transform_id, target) in seen:
+            self._drop_projection("duplicate")
+            return
+        seen.add((transform_id, target))
+        self.add_edge(transform_id, target, EdgeType.TRANSFORM_TO_COLUMN)
+        self.projection_minted += 1
+        if via_step:
+            self.projection_minted_via_step += 1
+        self.projection_by_step.setdefault(transform_id, {}).setdefault(
+            fold_identifier(col), set()).add(target)
+
     def mint_projection_edges(
         self, transform_id: str,
         column_refs: "list", table_refs: "list",
+        aliases: "dict | None" = None,
+        step_by_fold: "dict[str, str] | None" = None,
     ) -> None:
         """Projection-grain column lineage (ADR 0053, §3b-designed):
         mint transform→column edges for the fragment's column refs,
         resolved against the DICTIONARY — an edge exists only when the
         ref resolves to exactly one known column node.
 
-        Inventory of minting contexts (v1): the parser's per-step
-        column_refs (SELECT list + expressions of the fragment).
+        W13a (walk 1562 corpse, ED_DEPARTURE_TIME 0-edge false empty):
+        two resolver classes added, both deliberate:
+        - `aliases` (the tree's table_aliases, alias→(schema, table)):
+          qualifiers are ALIASES in real SQL ('HE.', 'BP.') — the v1
+          resolver compared them against table NAMES only, so every
+          aliased ref died as unresolved_qualifier.
+        - `step_by_fold` (step name → transform id): a qualifier
+          resolving to a temp/CTE step chases the source column
+          through THAT step's own projection map — bp.X attributes to
+          the column #Base_Pop projected X from, when unique.
+
         Conservation: every ref lands in minted or a counted drop
         reason — unresolved_qualifier (alias/unknown table),
         no_dictionary_column, ambiguous (unqualified, >1 candidate),
-        duplicate (already minted for this step)."""
+        duplicate (already minted for this step),
+        step_projection_untracked / step_projection_ambiguous (the
+        chase found zero / several source columns)."""
         seen: "set[tuple]" = set()
         tables = [t for t in table_refs if isinstance(t, TableRef)]
+        amap = {str(k).upper(): v for k, v in (aliases or {}).items()}
+        sbf = step_by_fold or {}
+
+        def _step_id_for(name: str) -> "str | None":
+            base = name.lstrip("#")
+            if name.startswith("#") or fold_identifier(base) in sbf:
+                return sbf.get(fold_identifier(base))
+            return None
+
         for ref in column_refs:
             self.projection_refs += 1
             col = getattr(ref, "column", None)
@@ -256,10 +298,40 @@ class GraphBuilder:
                 continue
             qual = (str(ref.table).split(".")[-1].upper()
                     if getattr(ref, "table", None) else None)
-            cands = ([t for t in tables if t.table.upper() == qual]
-                     if qual else tables)
-            if qual and not cands:
-                self._drop_projection("unresolved_qualifier")
+            cands = tables
+            step_target: "str | None" = None
+            if qual:
+                resolved = amap.get(qual)
+                tname = resolved[1] if resolved else None
+                if tname is None:
+                    step_target = _step_id_for(qual)
+                    if step_target is None:
+                        cands = [t for t in tables
+                                 if t.table.upper() == qual]
+                        if not cands:
+                            self._drop_projection("unresolved_qualifier")
+                            continue
+                else:
+                    step_target = _step_id_for(str(tname))
+                    if step_target is None:
+                        base = str(tname)
+                        cands = [t for t in tables
+                                 if t.table.upper() == base.upper()]
+                        if not cands:
+                            schema = (resolved[0] if resolved and
+                                      resolved[0] else "dbo")
+                            cands = [TableRef(table=base, schema=schema)]
+            if step_target is not None:
+                proj = self.projection_by_step.get(step_target) or {}
+                hits_s = proj.get(fold_identifier(col)) or set()
+                if len(hits_s) == 1:
+                    self._mint_one_projection(
+                        transform_id, col, next(iter(hits_s)), seen,
+                        via_step=True)
+                elif not hits_s:
+                    self._drop_projection("step_projection_untracked")
+                else:
+                    self._drop_projection("step_projection_ambiguous")
                 continue
             hits: "set[str]" = set()
             for t in cands:
@@ -270,14 +342,8 @@ class GraphBuilder:
                 if cn in self.nodes:
                     hits.add(cn)
             if len(hits) == 1:
-                target = next(iter(hits))
-                if (transform_id, target) in seen:
-                    self._drop_projection("duplicate")
-                    continue
-                seen.add((transform_id, target))
-                self.add_edge(transform_id, target,
-                              EdgeType.TRANSFORM_TO_COLUMN)
-                self.projection_minted += 1
+                self._mint_one_projection(transform_id, col,
+                                          next(iter(hits)), seen)
             elif not hits:
                 self._drop_projection("no_dictionary_column")
             else:
@@ -287,7 +353,8 @@ class GraphBuilder:
         """Add a directed edge between two nodes."""
         self.edges.append(GraphEdge(source_id=source_id, target_id=target_id, edge_type=edge_type))
 
-    def build_from_parsed_sql(self, metric_id: str, parsed: ParsedSQL) -> None:
+    def build_from_parsed_sql(self, metric_id: str, parsed: ParsedSQL,
+                              mint_projections: bool = True) -> None:
         """Wire up transformation and technical nodes from a parsed SQL result.
 
         Handles both simple (single CTE) and complex (multi-CTE from
@@ -313,9 +380,14 @@ class GraphBuilder:
                 if tech_id and tech_id in self.nodes:
                     self.add_edge(transform_id, tech_id, EdgeType.TRANSFORM_TO_TECHNICAL)
 
-            # Projection-grain column lineage (ADR 0053)
-            self.mint_projection_edges(transform_id, cte.column_refs,
-                                       cte.table_refs)
+            # Projection-grain column lineage (ADR 0053). W13a: the
+            # build STEP hoists this call into its tree loop (passing
+            # the alias map + step registry) and sets
+            # mint_projections=False here; the default keeps direct
+            # callers (pipeline.py, tests) whole at v1 semantics.
+            if mint_projections:
+                self.mint_projection_edges(transform_id, cte.column_refs,
+                                           cte.table_refs)
 
         # Find physical tables in the final SELECT that are NOT already
         # referenced by any CTE (those are already reachable via the CTE chain)

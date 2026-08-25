@@ -499,16 +499,18 @@ TRACE_REGISTRY = {
         "docs": ["docs/architecture/SPEC.md", "docs/architecture/TRACE_MAP.md"],
     },
     "0054": {
-        # DRAFT ADR (review-session skeleton 2026-08-23): the sweep is
-        # unshipped — scope/sequencing PARKED for Sunny; modules/tests
-        # fill in when W8 lands. Registered so the ADR file and the
-        # registry can never drift (this test's own law).
+        # ACCEPTED + BUILT 2026-08-23 (all four ratifications ruled;
+        # build order HANDOFF_0054_BUILD): sweep + flag surface live;
+        # the disposition WRITE surface (plan-confirm, ADR 0050) is
+        # the recorded follow-up.
         "title": "Governance red flags and governed plurality: "
                  "misnomer/duplicate/cousin sweep over content hashes",
         "category": "architecture",
-        "axioms": [],
-        "modules": [],
-        "tests": [],
+        "axioms": ["C1", "E2"],
+        "modules": ["src/governance/red_flags.py",
+                    "src/steps/red_flag_sweep.py"],
+        "tests": ["tests/governance/test_red_flags.py",
+                  "tests/orchestrator/test_flag_ops.py"],
         "docs": ["docs/decisions/"
                  "0054-governance-red-flags-governed-plurality.md"],
     },

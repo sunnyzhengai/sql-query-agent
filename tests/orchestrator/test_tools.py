@@ -15,6 +15,10 @@ from src.orchestrator.tools import (
     DECISIONS_OF_METRIC_QUERY,
     DECISIONS_OF_STEP_QUERY,
     FIND_BY_NAME_QUERY,
+    GOV_FLAG_BY_ID_QUERY,
+    GOV_FLAGS_BY_IDENTITY_QUERY,
+    GOV_FLAGS_FOR_MEMBER_QUERY,
+    GOV_FLAGS_QUERY,
     LINKS_OF_REPORT_QUERY,
     LIST_CATALOG_QUERY,
     NAME_CONTAINS_QUERY,
@@ -61,6 +65,41 @@ FRAGMENTS = {
     STEP_2: "select  s from t  where x >= 2",   # same logic, respaced
     STEP_3: "SELECT L",
 }
+
+
+# ADR 0054 fake flag surface: one step misnomer (the Scores name is
+# shared by both procs) and one metric-grain cousin flag whose members
+# include REF_A
+FAKE_FLAGS = [
+    {"flag_id": "flag:misnomer:step:aaa111bbb222",
+     "flag_class": "misnomer", "grain": "step", "identity": "Scores",
+     "severity": "INFO", "scope": "proc-local", "member_count": 2,
+     "distinct_logics": 2,
+     "members": json.dumps([
+         {"id": STEP_1, "name": "Scores", "ref": REF_A,
+          "content_key": "k1"},
+         {"id": STEP_2, "name": "Scores", "ref": REF_B,
+          "content_key": "k2"}]),
+     "members_total": 2, "blast_radius": 2,
+     "blast_basis": "2 parent metric(s) share the step name",
+     "drill_query": "gov_red_flags | where flag_id == "
+                    "'flag:misnomer:step:aaa111bbb222'",
+     "disposition": "open", "disposition_reason": "", "run_at": ""},
+    {"flag_id": "flag:cousin_conflict:metric:ccc333ddd444",
+     "flag_class": "cousin_conflict", "grain": "metric",
+     "identity": "ED Sepsis Screening", "severity": "CONFLICT",
+     "scope": "catalog", "member_count": 2, "distinct_logics": 2,
+     "members": json.dumps([
+         {"id": REF_A, "name": "ED Sepsis Screening", "ref": REF_A,
+          "content_key": "m1"},
+         {"id": REF_B, "name": "ED Sepsis (Regulatory)", "ref": REF_B,
+          "content_key": "m2"}]),
+     "members_total": 2, "blast_radius": 0,
+     "blast_basis": "0 linked report(s) across the name family",
+     "drill_query": "gov_red_flags | where flag_id == "
+                    "'flag:cousin_conflict:metric:ccc333ddd444'",
+     "disposition": "open", "disposition_reason": "", "run_at": ""},
+]
 
 
 def fake_kql(query, params):
@@ -188,6 +227,19 @@ def fake_kql(query, params):
                  "business_name": "ED Sepsis (Regulatory)"},
             ]
         return []
+    if query == GOV_FLAGS_QUERY:
+        return list(FAKE_FLAGS)
+    if query == GOV_FLAG_BY_ID_QUERY:
+        return [dict(f) for f in FAKE_FLAGS
+                if f["flag_id"] == params["p_id"]]
+    if query == GOV_FLAGS_BY_IDENTITY_QUERY:
+        return [dict(f) for f in FAKE_FLAGS
+                if f["grain"] == params["p_grain"]
+                and f["identity"].lower() == params["p_identity"].lower()]
+    if query == GOV_FLAGS_FOR_MEMBER_QUERY:
+        return [dict(f) for f in FAKE_FLAGS
+                if f["grain"] == "metric"
+                and params["p_ref"] in f["members"]]
     if query == STEP_NAME_UNIVERSE_QUERY:
         # exact step-name match, case-insensitive, _/space folded —
         # 'Scores' is shared by both procs; 'Labs' belongs to one

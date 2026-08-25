@@ -150,6 +150,27 @@ full depth of the graph crossed by a human in under two minutes; every
 hop must be a real edge in the trace. It is also the demo's closing
 beat when it passes.
 
+## I. Governance red flags (ADR 0054 — post-sweep stores only)
+
+Count oracles from the gap-check build (2026-08-23, recorded corpus;
+regenerate from gov_red_flags after any pipeline run): 83 flags — 74
+step misnomers (INFO), 9 cousin conflicts (CONFLICT), 0 duplicates.
+
+1. "what governance red flags exist?" → census kind flag; exact count
+   stamped; classes named. (Demo QA gate question.)
+2. "are all definitions of Base_Pop the same?" → the step-name stamp
+   must carry the RECORDED flag verdict (misnomer, 12 steps, 12
+   logics) beside the caveat — a single-row machine read, no compare
+   needed.
+3. "how is Sepsis Patient Timeline defined?" → the record must stamp
+   "certified variants exist" (cousin flag member) and state that no
+   official is designated (until a certify disposition exists).
+4. Retrieve a flag id → members with hashes + the drill query on
+   screen (error-contract discipline).
+5. Negative control: "are there conflicting definitions of
+   PATIENTMRN?" (not a flagged identity) → honest zero: "no RECORDED
+   conflict", never "no conflict exists anywhere".
+
 ## Bookkeeping
 
 ~20 probes. Every failure → typed (dodge / honest-empty-wrong /

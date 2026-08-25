@@ -147,6 +147,92 @@ class TestProjectionEdges:
             self._tables("IP_SEPSIS"))
         assert b.projection_dropped == {"unresolved_qualifier": 1}
 
+
+class TestProjectionResolverW13:
+    """W13a (walk 1562, ED_DEPARTURE_TIME false empty): the resolver's
+    two new classes — alias resolution (qualifiers are aliases in real
+    SQL, not table names) and the step-projection chase (a ref
+    qualified through a temp/CTE step attributes to the source column
+    that step projected, when unique)."""
+
+    _builder = TestProjectionEdges._builder
+    _refs = TestProjectionEdges._refs
+    _tables = TestProjectionEdges._tables
+
+    def test_alias_resolves_to_dictionary_table(self):
+        # HE.PATIENTMRN with HE aliased to IP_SEPSIS — the exact
+        # corpse shape (qual matched table NAMES only, dropped)
+        b = self._builder()
+        b.mint_projection_edges(
+            "transform:m:s1",
+            self._refs(("HE", "PATIENTMRN")),
+            self._tables("IP_SEPSIS"),
+            aliases={"HE": ("dbo", "IP_SEPSIS")})
+        assert b.projection_minted == 1
+        assert b.projection_dropped == {}
+
+    def test_alias_to_table_outside_step_refs_still_resolves(self):
+        b = self._builder()
+        b.mint_projection_edges(
+            "transform:m:s1",
+            self._refs(("A", "SepsisDX")),
+            self._tables("IP_SEPSIS"),          # ADT not in step refs
+            aliases={"A": ("dbo", "ADT_EVENTS")})
+        assert b.projection_minted == 1
+        [e] = [e for e in b.edges
+               if str(e.edge_type).endswith("TRANSFORM_TO_COLUMN")]
+        assert "ADT_EVENTS" in e.target_id
+
+    def test_step_chase_attributes_source_column(self):
+        # step s1 projects PATIENTMRN from IP_SEPSIS; a later step's
+        # bp.PATIENTMRN (bp -> #Base_Pop = s1) chases to the source
+        b = self._builder()
+        sbf = {"BASE_POP": "transform:m:Base_Pop"}
+        b.mint_projection_edges(
+            "transform:m:Base_Pop",
+            self._refs(("IP_SEPSIS", "PATIENTMRN")),
+            self._tables("IP_SEPSIS"), step_by_fold=sbf)
+        b.mint_projection_edges(
+            "transform:m:s2",
+            self._refs(("BP", "PATIENTMRN")),
+            self._tables(), aliases={"BP": ("dbo", "#Base_Pop")},
+            step_by_fold=sbf)
+        assert b.projection_minted == 2
+        assert b.projection_minted_via_step == 1
+        targets = {e.target_id for e in b.edges
+                   if e.source_id == "transform:m:s2"}
+        assert any(t.endswith(".PATIENTMRN") for t in targets)
+
+    def test_step_chase_untracked_and_ambiguous_are_counted(self):
+        b = self._builder()
+        sbf = {"BASE_POP": "transform:m:Base_Pop"}
+        # untracked: the step never projected the column
+        b.mint_projection_edges(
+            "transform:m:s2", self._refs(("#Base_Pop", "SepsisDX")),
+            self._tables(), step_by_fold=sbf)
+        assert b.projection_dropped == {"step_projection_untracked": 1}
+        # ambiguous: the step projected the fold from TWO sources
+        b.projection_by_step["transform:m:Base_Pop"] = {
+            "SEPSISDX": {"tech:DBO.IP_SEPSIS.SEPSISDX",
+                         "tech:DBO.ADT_EVENTS.SEPSISDX"}}
+        b.mint_projection_edges(
+            "transform:m:s3", self._refs(("#Base_Pop", "SepsisDX")),
+            self._tables(), step_by_fold=sbf)
+        assert b.projection_dropped["step_projection_ambiguous"] == 1
+
+    def test_conservation_holds_across_new_buckets(self):
+        b = self._builder()
+        sbf = {"BASE_POP": "transform:m:Base_Pop"}
+        b.mint_projection_edges(
+            "transform:m:s1",
+            self._refs(("HE", "PATIENTMRN"), ("X", "SepsisDX"),
+                       ("#Base_Pop", "SepsisDX"), (None, "SepsisDX")),
+            self._tables("IP_SEPSIS", "ADT_EVENTS"),
+            aliases={"HE": ("dbo", "IP_SEPSIS")}, step_by_fold=sbf)
+        assert b.projection_refs == 4
+        assert (b.projection_minted
+                + sum(b.projection_dropped.values())) == 4
+
     def test_duplicate_and_unknown_column_conserve(self):
         b = self._builder()
         b.mint_projection_edges(

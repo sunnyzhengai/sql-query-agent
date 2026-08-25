@@ -155,6 +155,28 @@ sells.
 - Whack-a-mole, precisely defined: patching without recording which
   mechanism you chose not to build.
 
+## The live-probe law, mechanized (P0.4, 2026-08-23)
+
+*An op is not shipped until its REAL call path has run against the
+REAL store.* Twice an op passed every unit test and died on first
+field contact (1.51.3: a query parameter type the fake accepted and
+the service silently rejected; W12: the compare op's argument form —
+result refs — was not the form the engine passes — catalog ids).
+The mechanism, per the Echo Law:
+
+- **Live leg:** `devtools/engine_smoke.py` exercises every
+  ENGINE_TOOLS entry through `_run_op` (the actual dispatch) with
+  catalog-realistic arguments derived live. REQUIRED before any push
+  that touches `src/orchestrator/ops.py` or
+  `src/orchestrator/tools.py` — alongside ruff and pytest.
+- **CI leg:** `tests/orchestrator/test_engine_smoke_contract.py`
+  checks the dispatch→op argument mapping offline and enforces
+  totality: a new engine tool without an offline case AND a live
+  smoke case fails CI.
+- Each field corpse this law buries becomes a PERMANENT case in the
+  harness (the W12 catalog-ids compare is the first) — acceptance is
+  always red-on-the-bug, green-after.
+
 ## The amendment rule (the honest limit)
 
 No guard fully binds its own author: Claude writes the tests and

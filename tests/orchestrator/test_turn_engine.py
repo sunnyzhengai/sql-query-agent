@@ -408,8 +408,10 @@ def test_system_prompt_is_invariants_only_no_casebook():
 # semantics sentence on the `compare` tool — compare is the ONLY basis
 # for a sameness/difference verdict. Tool-property statement, no
 # question shapes; SYSTEM_PROMPT unchanged.
-PINNED_PROMPT_SHA = ("01432f0c2aa83e70507b2ae7191e962a"
-                     "541a0e1e28318ba8c56b30ae2632b85c")
+# Pin bumped CONSCIOUSLY 2026-08-23 (ADR 0054 build): census kind enum
+# gained 'flag' + a tool-property sentence. SYSTEM_PROMPT unchanged.
+PINNED_PROMPT_SHA = ("d9f8df5ce81cfe086542cb04768df410"
+                     "1e2a6afe21783b640eeda1f20507e027")
 
 
 class TestPGroup:

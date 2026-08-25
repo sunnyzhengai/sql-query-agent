@@ -343,6 +343,18 @@ to run. It loads nothing itself and never assumes a route.
 - [ ] `graph_nodes` table exists in the Lakehouse Tables section
 - [ ] `graph_edges` table exists
 
+### 5c-2: Governance red-flag sweep (ADR 0054)
+
+1. Open `320_red_flag_sweep`
+2. Click **Run all**
+
+**Verification:**
+- [ ] Output shows the conservation line ("swept N catalog items …")
+- [ ] `gov_red_flags` table exists in the Lakehouse Tables section
+- [ ] Flags disclose, never gate — a non-zero flag count is normal
+      (misnomers and name-family conflicts are what the sweep exists
+      to surface; dispositions label them, nothing is blocked)
+
 ### 5d: Build metric logic
 
 1. Open `400_build_metric_logic`
@@ -555,7 +567,8 @@ To keep the knowledge graph up to date without manual runs:
 
 1. In your workspace, create a **Data Pipeline**
 2. Add **Notebook Activities** in order: 200_parse → 300_build_graph →
-   400_build_metric_logic → 500_validate → 800_export_graph_tables
+   320_red_flag_sweep → 400_build_metric_logic → 500_validate →
+   800_export_graph_tables
    (export AFTER descriptions when 600 is in the schedule — the 800
    export picks up whatever the graph holds when it runs)
 3. Set a **Schedule Trigger** (recommended: weekly, or after SQL deployments)
