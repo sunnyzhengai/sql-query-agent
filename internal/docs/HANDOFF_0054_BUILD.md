@@ -273,3 +273,43 @@ kusto-probe-eh datasource folder name (re-syncs on rename) and
 org_config search.kusto_db — rename + edits + org_config move
 together, then org_config_audit --tenant proves the store leg.
 Suite 1,054 passed + 5 xfailed, ruff clean.
+
+### 2026-08-24 — W15/W16/W17/F1 SHIPPED (fixtures first; ops finds 1+2 were already built, 3 staged)
+- **W15 (PRE-CAPTURE) — typed compare verdict + direction duty.**
+  op_compare's logic partition stamps a code-constant verdict in the
+  note/headline: "N hash groups — logic DIFFERS." / "1 hash group —
+  logic IDENTICAL." (recorded members only; the absence-is-not-
+  sameness note rides beside it). Gate duty, turn-scoped and
+  structural: DIFFERS on screen → caption must say "differ";
+  IDENTICAL → "identical"/"same"; the corpse caption ("similar…
+  aligned") floors, and the floor renders the stamped verdict.
+  Fixture: "Is Sepsis Encounters' logic identical to Sepsis Case
+  Encounters'?" — oracle compare_direction derives the TRUE direction
+  from the store (content-key sets of both metrics' steps; live-built:
+  differs) — an inverted declared caption has zero hits and types
+  DISHONEST. Scope recorded: verdict covers the partition (logic)
+  aspect; the steps-alignment aspect carries its own diff rows.
+- **W17 (mandatory echo) — per-relation distinct counts.** Column-
+  lineage notes now stamp "Filters 'X': N metric(s) — names" and
+  "Selects 'X': M metric(s) — names" — DISTINCT metrics per relation,
+  never row counts, schema-qualified on collision (W3a applied).
+  Grader: the ED_DEPARTURE_TIME oracle now requires a reader name
+  AND the exact distinct filter count (live-built: 5) — "11 metrics
+  filter" misses and types dishonest when declared. Scope note: the
+  COMPILED_CONTEXT fixture keeps its names-overlap oracle (its corpse
+  class was names, not counts).
+- **W16 — governance stamps fold**: one sentence per metric ("in N
+  cousin_conflict flag(s) … (no official is designated yet) —
+  retrieve the flags for members"), counts per class, ids still
+  surfaced, dispositions disclosed when any exist.
+- **F1 — error tiles fold** to a calm one-line badge ("1 skipped
+  call · guard engaged — expand for detail"), machinery inspectable
+  on click; display-only.
+- **ADR 0055** (review skeleton, shape corpus) registered as
+  sanctioned-DRAFT in the trace registry; TRACE_MAP regenerated —
+  awaiting Sunny's dimension-set ratification before any build.
+- Tests: +11 L0 (tests/orchestrator/test_gapcheck_finds.py) across
+  stamp/gate/grade for all three finds; both new oracles live-built
+  against the store; suite 1,064 passed + 5 xfailed; ruff clean;
+  engine smoke green through the real dispatch (ops.py touched —
+  live-probe law honored).

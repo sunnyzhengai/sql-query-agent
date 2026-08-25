@@ -247,6 +247,18 @@ FIXTURES = [
      "question": "what governance red flags exist?",
      "oracle": "flag_census", "requires_table": "gov_red_flags",
      "max_rounds": 2, "expected_kind": "answered"},
+    # W15 (gap-check corpse 2026-08-24, PRE-CAPTURE): the caption
+    # inverted a displayed 2-group partition ("aligned"). Graded on
+    # DIRECTION — the store derives whether the two metrics' logic
+    # truly matches (same content keys) and the answer must carry the
+    # verdict word; the inverted caption has zero hits and types
+    # dishonest when declared.
+    {"family": "sameness",
+     "question": "Is Sepsis Encounters' logic identical to "
+                 "Sepsis Case Encounters'?",
+     "oracle": "compare_direction",
+     "items": ["Sepsis Encounters", "Sepsis Case Encounters"],
+     "max_rounds": 6, "expected_kind": "answered"},
 ]
 
 _WORD = re.compile(r"[A-Za-z_]{6,}")
@@ -407,8 +419,11 @@ def build_oracle(fixture: dict, run_kql) -> dict:
             == fixture["column"].lower()})
         names = [n for n in names if n]
         if names:
-            return {"required_any": [names],
-                    "required_overlap": min(2, len(names)),
+            # W17 (gap-check corpse 2026-08-24: 11 relation rows read
+            # as "11 metrics filter"): the answer must carry a real
+            # reader name AND the exact distinct FILTER-metric count
+            # the stamp now prints — row counts are not metric counts.
+            return {"required_any": [names, [str(len(names))]],
                     "forbidden": []}
         return {"required_any": [["cannot conclude", "not tracked",
                                   "does not prove", "coverage"]],
@@ -426,6 +441,40 @@ def build_oracle(fixture: dict, run_kql) -> dict:
         assert names, f"oracle: {fixture['item']} has no linked reports"
         return {"required_any": [names],
                 "required_overlap": 1, "forbidden": []}
+    if kind == "compare_direction":
+        # W15: the ground truth of "is the logic identical" is the
+        # content-key comparison itself, derived from the store —
+        # never a hardcoded direction.
+        from src.orchestrator.tools import (
+            BATCH_FRAGMENTS_QUERY,
+            STEPS_OF_QUERY,
+            _content_key,
+        )
+        keysets = []
+        for item in fixture["items"]:
+            ops_i = _fresh_ops_session()
+            rs = op_search(item, "exact", run_kql, ops_i)
+            assert rs.rows, f"oracle: {item!r} not in catalog"
+            ref = rs.rows[0]["id"]
+            step_ids = sorted(
+                r["node_id"] for r in run_kql(STEPS_OF_QUERY,
+                                              {"p_ref": ref}))
+            frags = []
+            if step_ids:
+                for r in run_kql(BATCH_FRAGMENTS_QUERY,
+                                 {"p_ids": json.dumps(step_ids)}):
+                    props = r.get("properties") or "{}"
+                    if isinstance(props, str):
+                        props = json.loads(props)
+                    frags.append(_content_key(
+                        str(props.get("sql_fragment") or "")))
+            keysets.append(tuple(sorted(frags)))
+        identical = (len(set(keysets)) == 1 and keysets[0])
+        if identical:
+            return {"required_any": [["identical", "same"]],
+                    "forbidden": []}
+        return {"required_any": [["differ", "not identical"]],
+                "forbidden": []}
     if kind == "flag_census":
         # ADR 0054: the exact flag count plus at least one recorded
         # class word — both from the store, no hardcoded answers.

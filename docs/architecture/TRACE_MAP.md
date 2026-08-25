@@ -653,3 +653,9 @@ classification).
   - `tests/orchestrator/test_flag_ops.py`
 - **Summarized in:**
   - `docs/decisions/0054-governance-red-flags-governed-plurality.md`
+
+## ADR 0055 — The designed shape corpus: spec-derived test data (category-partition over name x logic x scope)
+
+- **Category:** architecture
+- **Summarized in:**
+  - `docs/decisions/0055-designed-shape-corpus.md`

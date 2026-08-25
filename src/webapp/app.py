@@ -448,6 +448,14 @@ WORKBENCH_PAGE = """<!doctype html>
                  font:12px ui-monospace,monospace; overflow-x:auto; }
   .cite { font:11.5px ui-monospace,monospace; background:#eef2fa;
           color:var(--accent); border-radius:6px; padding:1px 6px; }
+  .errfold { margin:0 0 10px; }
+  .errfold summary { cursor:pointer; display:flex; gap:8px;
+                     align-items:center; list-style:none;
+                     font-size:12.5px; color:#6b7080; }
+  .errfold summary::-webkit-details-marker { display:none; }
+  .errfold .errdetail { margin:6px 0 0 6px; padding:8px 12px;
+                        background:#fdf7f6; border-left:3px solid
+                        var(--bad); font-size:12.5px; color:#6b7080; }
   .runline { font:12px ui-monospace,monospace; color:#6b7080;
              margin:0 0 8px; display:flex; gap:8px; align-items:center; }
   .runline .dot { width:8px; height:8px; border-radius:50%;
@@ -489,10 +497,14 @@ function renderOutput(o) {
     ? `<span class="badge auto">auto round ${o.component.auto_round} · read-only</span>`
     : '';
   if (o.error) {
-    const node = el(`<div class="rs"><div class="head">
-      <span class="oplabel">${esc(o.component.op)}</span>${auto}
-      <span class="badge error">error</span>
-      <span class="universe">${esc(o.error)}</span></div></div>`);
+    // F1 (demo feedback from friends, 2026-08-24): error/anti-flail
+    // chips read as breakage to outsiders — fold to a calm one-line
+    // badge, expandable. Machinery stays inspectable; default calm.
+    const node = el(`<details class="errfold"><summary>
+      <span class="badge error">1 skipped call</span>
+      <span class="oplabel">${esc(o.component.op)}</span>
+      <span class="universe">guard engaged — expand for detail</span>
+      </summary><div class="errdetail">${esc(o.error)}</div></details>`);
     add(node);
     return node;
   }

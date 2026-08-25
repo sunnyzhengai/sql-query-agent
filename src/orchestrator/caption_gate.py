@@ -36,6 +36,8 @@ import re
 
 from src.orchestrator.ops import (
     COLUMN_COVERAGE_CAVEAT,
+    COMPARE_DIFFERS,
+    COMPARE_IDENTICAL,
     SAMENESS_CAVEAT,
     normalize_kind,
 )
@@ -197,6 +199,34 @@ def caption_violations(caption: str, outputs: "list[dict]",
                 "operation FAILED this turn — the caption must state "
                 "that sameness/difference/replacement remains "
                 "unverified; it can never degrade into a claim")
+
+    # Compare-direction duty (W15, gap-check corpse 2026-08-24: the
+    # machine stamped 2 hash groups + a 103-line diff and the caption
+    # called them "aligned" — the structural compare-present check
+    # passed while the DIRECTION went unchecked). Turn-scoped: a
+    # displayed compare headline carrying a typed verdict word binds
+    # the caption to echo it. Structural — the verdict is a code
+    # constant; the floor renders the stamped headline either way.
+    differs_stamped = any(
+        COMPARE_DIFFERS in str(r.get("headline") or "")
+        or COMPARE_DIFFERS in str(r.get("note") or "")
+        for r in turn_results)
+    identical_stamped = any(
+        COMPARE_IDENTICAL in str(r.get("headline") or "")
+        or COMPARE_IDENTICAL in str(r.get("note") or "")
+        for r in turn_results)
+    if differs_stamped and "differ" not in low_c:
+        violations.append(
+            "compare-direction duty (W15, 2026-08-24): the displayed "
+            "comparison stamps 'logic DIFFERS' — the caption must say "
+            "so; 'aligned'/'similar' over a differing partition "
+            "inverts machine truth")
+    if identical_stamped and not differs_stamped \
+            and "identical" not in low_c and "same" not in low_c:
+        violations.append(
+            "compare-direction duty (W15, 2026-08-24): the displayed "
+            "comparison stamps 'logic IDENTICAL' — the caption must "
+            "echo the verdict")
 
     # Column-coverage duty (walk W13b, 2026-08-23 — the
     # ED_DEPARTURE_TIME corpse: the headline scoped its zero to

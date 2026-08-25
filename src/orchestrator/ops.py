@@ -664,17 +664,25 @@ def _column_usage(column: str, run_kql, session: OpsSession) -> ResultSet:
     scope_word = ("the column" if exact_names
                   else "a column whose name contains")
     # Machine-stamped relation summary with NAMES (1.56.1: the floor
-    # must carry the answer for small complete results).
+    # must carry the answer for small complete results). W17 (ECHO of
+    # the 1.56.0 pairs-as-metrics corpse, gap-check 2026-08-24: "11
+    # metrics filter" — 11 relation ROWS read as metrics while the
+    # true filter count was 5): the DISTINCT metric count is stamped
+    # PER RELATION, always, schema-qualified on collision (W3a).
     parts = []
-    for relation, label in (("filters", "Filters on"),
+    for relation, label in (("filters", "Filters"),
                             ("selects", "Selects")):
-        names = sorted({str(r.get("business_name") or r["id"])
+        pairs = sorted({(str(r.get("business_name") or r["id"]),
+                         str(r["id"]))
                         for r in out if r["relation"] == relation})
-        if names and len(names) <= 10:
-            parts.append(f"{label} {clean!r}: {', '.join(names)}.")
-        elif names:
-            parts.append(f"{label} {clean!r}: "
-                         f"{len(names)} metric(s).")
+        names = _qualified_labels(list(pairs))
+        if not names:
+            continue
+        head_txt = f"{label} {clean!r}: {len(names)} metric(s)"
+        if len(names) <= 10:
+            parts.append(f"{head_txt} — {', '.join(names)}.")
+        else:
+            parts.append(f"{head_txt}.")
     note = " ".join(parts)
     if not any(r["relation"] == "selects" for r in out):
         present = run_kql(PROJECTION_EDGES_COUNT_QUERY, {})
@@ -953,23 +961,37 @@ def op_retrieve(ids: "list[str]", run_kql, session: OpsSession) -> ResultSet:
                 # disclose recorded name-family flags — official-first
                 # once a certify disposition designates one; until
                 # then, "no official is designated". Pre-sweep stores
-                # simply skip.
+                # simply skip. W16 (gap-check find 2026-08-24: SEVEN
+                # near-identical sentences flooded one headline): the
+                # flags FOLD to one sentence per metric — counts per
+                # class, ids surfaced for retrieve, dispositions
+                # disclosed when any exist.
                 try:
-                    for fr in run_kql(GOV_FLAGS_FOR_MEMBER_QUERY,
-                                      {"p_ref": an_id}):
-                        disp = str(fr.get("disposition") or "open")
+                    frs = list(run_kql(GOV_FLAGS_FOR_MEMBER_QUERY,
+                                       {"p_ref": an_id}))
+                    if frs:
+                        by_class: "dict[str, int]" = {}
+                        dispositions: "set[str]" = set()
+                        for fr in frs:
+                            cls = str(fr.get("flag_class") or "flag")
+                            by_class[cls] = by_class.get(cls, 0) + 1
+                            dispositions.add(
+                                str(fr.get("disposition") or "open"))
+                            if fr.get("flag_id"):
+                                session.surfaced.add(
+                                    str(fr["flag_id"]))
+                        summary = "; ".join(
+                            f"{n} {cls} flag(s)"
+                            for cls, n in sorted(by_class.items()))
+                        ruled = sorted(dispositions - {"open"})
                         notes.append(
-                            f"governance: {an_id} is in flag "
-                            f"{str(fr.get('flag_id'))!r} "
-                            f"({fr.get('flag_class')}, "
-                            f"{fr.get('severity')}) — certified "
-                            "variants exist for this name family; "
-                            + ("no official is designated yet"
-                               if disp == "open"
-                               else f"disposition: {disp}")
-                            + "; retrieve the flag for members.")
-                        if fr.get("flag_id"):
-                            session.surfaced.add(str(fr["flag_id"]))
+                            f"governance: {an_id} — certified "
+                            f"variants exist for this name family: "
+                            f"in {summary} "
+                            + ("(no official is designated yet)"
+                               if not ruled else
+                               f"(dispositions: {', '.join(ruled)})")
+                            + " — retrieve the flags for members.")
                 except Exception:   # noqa: BLE001, S110 — pre-sweep store
                     pass
         except AssemblyError as e:
@@ -1122,6 +1144,13 @@ LIST_FIELDS = {"tables": "source_tables", "source_tables": "source_tables"}
 COMPARE_ERROR_CAVEAT = ("No comparison was performed — sameness, "
                         "difference, or replacement remains UNVERIFIED.")
 
+# W15 typed compare verdicts (gap-check corpse 2026-08-24: caption
+# inverted the direction of a displayed 2-group partition). Code
+# constants — the gate detects them in headlines and enforces the
+# caption's echo; the suite's direction fixture greps for the echo.
+COMPARE_DIFFERS = "logic DIFFERS"
+COMPARE_IDENTICAL = "logic IDENTICAL"
+
 
 def op_compare(refs: "list[str]", aspect: "str | None", run_kql,
                session: OpsSession) -> ResultSet:
@@ -1171,6 +1200,23 @@ def op_compare(refs: "list[str]", aspect: "str | None", run_kql,
             note=note)
     if aspect in (None, "", "logic", "definition", "sql", "content"):
         rows, note, complete = kernel_partition(items, run_kql)
+        # W15 (walk gap-check corpse, 2026-08-24 — PRE-CAPTURE): the
+        # machine showed 2 hash groups + a 103-line diff and the
+        # caption said "aligned". The comparison DIRECTION is machine
+        # truth: stamp a TYPED verdict word the gate can hold the
+        # caption to. Groups counted over RECORDED members only; the
+        # unrecorded note (absence is not sameness) rides beside it.
+        n_groups = sum(1 for r in rows if "group" in r)
+        verdict = ""
+        if n_groups >= 2:
+            verdict = (f"{n_groups} hash groups — {COMPARE_DIFFERS}.")
+        elif n_groups == 1:
+            members = sum(len(r.get("members") or [])
+                          for r in rows if "group" in r)
+            if members >= 2:
+                verdict = f"1 hash group — {COMPARE_IDENTICAL}."
+        note = (verdict + (" " + note if note else "")
+                if verdict else note)
         return session.register(
             "compare", {"refs": refs, "aspect": "logic"}, rows,
             complete=complete,
