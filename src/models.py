@@ -18,6 +18,11 @@ class NodeLayer(str, Enum):
     # Decision layer (ADR 0044 phase 1b): WHERE/JOIN/CASE decisions as
     # first-class nodes — Sunny's original design, connected to columns
     DECISION = "decision"
+    # Governance layer (ADR 0057 "Clusters are nodes", Sunny's demo
+    # law 2026-08-25): reified name_cluster and logic_group nodes —
+    # the sweep's verdicts as graph truth, membership via edges,
+    # dispositions attach here. Deterministic detection only.
+    GOVERNANCE = "governance"
 
 
 class CertificationStatus(str, Enum):
@@ -66,6 +71,10 @@ class EdgeType(str, Enum):
     REPORT_TO_TECHNICAL = "report_to_technical"
     REPORT_TO_MEASURE = "report_to_measure"
     MEASURE_TO_COLUMN = "measure_to_column"
+    # Governance clusters (ADR 0057): org node -> logic_group and
+    # logic_group -> name_cluster — membership is the ONLY relation;
+    # N-member clusters never explode into pairwise edges.
+    MEMBER_OF = "member_of"
     # Derived at export time (ADR 0018): metric -> table transitive closure.
     # Never stored in graph_edges; materialized into graph_edge_uses_table.
     USES_TABLE = "uses_table"

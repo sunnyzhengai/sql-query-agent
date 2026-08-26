@@ -147,3 +147,7 @@ point.
 - **"The demo surfaces what we keep; we never keep for the
   demo."** — Sunny, 2026-08-25. (LAW — bans demoing the condemned;
   first invocation resequenced graph-native clusters pre-capture)
+- **"AIVIA turns the code your organization already trusts into
+  answers everyone can trust."** — the pitch round, 2026-08-25.
+  (COPY — THE one-liner; trust conserved, not created; unfolds into
+  "the map, not the verdict" as sentence two)

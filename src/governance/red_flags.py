@@ -45,7 +45,10 @@ from dataclasses import dataclass, field
 from src.orchestrator.tools import _content_key
 from src.parser.identity import fold_identifier
 
-FLAG_CLASSES = ("misnomer", "duplicate", "cousin_conflict")
+FLAG_CLASSES = ("misnomer", "duplicate", "cousin_conflict",
+                # D7 grain (ratified 2026-08-25): same name, mixed
+                # DISTINCT-ness — "counts patients vs counts visits"
+                "grain_shift")
 SEVERITIES = ("INFO", "CONFLICT")
 DISPOSITIONS = ("certify", "label-variant", "retire", "accept")
 # reason is MANDATORY on these (RATIFIED 2026-08-23)
@@ -56,6 +59,15 @@ _TOKEN = re.compile(r"[A-Za-z0-9]+")
 @dataclass
 class SweepResult:
     flags_rows: "list[dict]" = field(default_factory=list)
+    # ADR 0057 "Clusters are nodes" (Sunny's demo law, 2026-08-25):
+    # the GRAPH is the sole flag truth — reified name_cluster and
+    # logic_group nodes with member_of edges, emitted by the sweep
+    # and merged into graph_nodes/graph_edges by build_graph_step
+    # (fold-into-300; single writer). flags_rows above is the SAME
+    # verdict set in row form — derived representation for summaries
+    # and the disposition fold, never a second store.
+    cluster_nodes_rows: "list[dict]" = field(default_factory=list)
+    cluster_edges_rows: "list[dict]" = field(default_factory=list)
     # conservation partition, per grain
     swept: int = 0
     flagged: int = 0
@@ -68,6 +80,15 @@ class SweepResult:
             f"red-flag sweep conservation broken: swept {self.swept} "
             f"!= flagged {self.flagged} + clean {self.clean} + "
             f"excluded {self.excluded}")
+        # cluster reification conservation: one cluster node per flag,
+        # one logic_group per distinct content key, one member_of per
+        # member + one per group
+        n_clusters = sum(
+            1 for n in self.cluster_nodes_rows
+            if json.loads(n["properties"]).get("kind") == "name_cluster")
+        assert n_clusters == len(self.flags_rows), (
+            f"cluster reification broken: {n_clusters} cluster nodes "
+            f"!= {len(self.flags_rows)} flags")
 
 
 def _props(row: dict) -> dict:
@@ -90,12 +111,27 @@ def _flag_id(flag_class: str, grain: str, identity: str) -> str:
     tail = hashlib.sha256(
         f"{flag_class}|{grain}|{identity.casefold()}".encode()
     ).hexdigest()[:12]
-    return f"flag:{flag_class}:{grain}:{tail}"
+    return f"cluster:{flag_class}:{grain}:{tail}"
 
 
 def _drill(flag_id: str) -> str:
-    return (f"gov_red_flags | where flag_id == '{flag_id}' "
-            "| mv-expand member = todynamic(members)")
+    # graph-native (ADR 0057): the drill traverses membership edges
+    return (f"graph_edges | where target_id == '{flag_id}' "
+            "and edge_type == 'member_of' "
+            "| join kind=inner (graph_edges "
+            "| where edge_type == 'member_of') "
+            "on $left.source_id == $right.target_id")
+
+
+# D7 grain (ratified 2026-08-25): machine-detectable, structural —
+# SELECT DISTINCT on the output. "Counts patients vs counts visits"
+# is a DISTINCT-ness difference between same-named definitions; no
+# column lexicon, no domain knowledge (M4 holds).
+_DISTINCT = re.compile(r"(?is)\bSELECT\s+DISTINCT\b")
+
+
+def _grain_signature(fragment: str) -> str:
+    return "distinct" if _DISTINCT.search(fragment or "") else "row"
 
 
 def _row(flag_class: str, grain: str, identity: str, severity: str,
