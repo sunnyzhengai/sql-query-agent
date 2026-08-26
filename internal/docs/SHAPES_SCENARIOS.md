@@ -2,8 +2,9 @@
 
 **Process (Sunny, 2026-08-25): shapes first → lego paths second →
 use cases built from legos to instantiate shapes. Status: shapes +
-legos + catalog laid out by review; AWAITING SUNNY'S CONFIRMATION,
-then this is dev's palette-v2 build order.**
+legos + catalog laid out by review; **CONFIRMED IN FULL BY SUNNY
+2026-08-25** (lego names, U1–U12, personas, D7 grain ratified) —
+this is dev's palette-v2 build order.**
 
 Theme rationale (Sunny): diabetic was chosen BECAUSE each requesting
 persona is specialized in their own workflow — the many ways to
@@ -115,7 +116,7 @@ purposes."
 - SHAPES_GAPCHECK v2 for Sunny + updated demo note (best demo
   cells likely: U9 codeset drift, U6 billing-vs-clinical, U12 grain).
 
-## SUNNY'S CONFIRMATION CHECKLIST
+## SUNNY'S CONFIRMATION CHECKLIST — ALL CONFIRMED 2026-08-25
 
 1. Shapes table — complete? anything you've seen in the wild that's
    missing?

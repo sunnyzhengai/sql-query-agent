@@ -158,3 +158,77 @@ Gates: full suite **1,076 passed** + 5 xfailed, ruff clean; no
 engine/ops/tools changes in the shapes build (no pin motion, no
 smoke-relevant surface touched — the harness ran green in the
 caption batch that preceded it).
+
+### 2026-08-25 — ARMED ORDER EXPANDED (Sunny's demo law): palette v2 + graph-native clusters fire TOGETHER on the scenario red-pen
+Acknowledged and armed; nothing builds until the red-pen lands.
+Scope on trigger (SPHERE.md "Clusters are nodes" is the spec):
+1. **Palette v2** per the red-penned SHAPES_SCENARIOS (D7 grain +
+   N-scenarios + personas; data-file change, existing cells stable).
+2. **Clusters go graph-native as sole flag truth:** the sweep emits
+   reified nodes — name_cluster → logic_group (the content-hash
+   partition) → member_of edges — deterministic ids (E2), 0052
+   registry rows, deterministic detection only (fold-name,
+   content-hash, token containment; never stochastic).
+3. **Re-point census(flag)/retrieve(flag) to graph traversal**; the
+   shape corpus is the safety net — its 26 cells' flag expectations
+   must pass UNCHANGED through the re-pointed path before anything
+   retires (the checker asserts against the new truth).
+4. **Consumer census on gov_red_flags**, then re-point-or-justify
+   each declared consumer; retire table + contract if the list
+   empties. Pre-census reading of the declared list: data_agent
+   (instructions SQL → graph_nodes export or a generated view), the
+   engine's GOV_* queries (→ traversal), the flags suite oracle
+   (→ graph query), the Eventhouse shortcut (retire with the table).
+READINESS NOTE (design tension to resolve at build, flagged now):
+single-writer law — graph_nodes/graph_edges are owned by
+300_build_graph; cluster nodes joining the graph means either the
+sweep folds INTO 300 (320 retires with its table) or the graph
+tables gain a second declared writer. Leaning fold-into-300 (one
+writer, one truth); decide against SPHERE + the notebook contract
+when the order fires. Echo Law from birth on every new
+query/op/stamp.
+
+## PALETTE V2 + GRAPH-NATIVE CLUSTERS — the combined pre-capture order (2026-08-25, Sunny's full confirmation)
+
+**Specs of record:** internal/docs/SHAPES_SCENARIOS.md (CONFIRMED IN
+FULL — shapes, lego library, U1–U12, personas, D7 grain ratified)
+and docs/architecture/SPHERE.md ("Clusters are nodes" + the demo
+law). One order, two payloads, both pre-capture:
+
+**Payload 1 — palette v2 (the shapes v2 corpus):**
+- New shapes: Codeset drift, Path divergence, Extension (step-grain
+  core matching), Grain (D7 — new dimension, 2–3 cells). Existing
+  cells re-skin; new cells only for these.
+- The lego library becomes the foundation vocabulary (tables +
+  join paths per persona, incl. APPOINTMENTS and
+  PATIENT_PCP_ASSIGNMENT supports; codesets as foundation reference
+  tables seeding the future vocabulary-flag class).
+- Use cases U1–U12 + the two silent controls, personas as
+  steward/developer metadata (Dr. Peterson, Dr. Sullivan, ED
+  medical director, OBGyn, Finance analyst, Quality & Registry
+  team).
+- Manifest expectations assert CANONICAL OUTCOMES per cell (concept
+  count, claim structure, invited disposition class), not just
+  flags.
+
+**Payload 2 — graph-native clusters (the demo law: never capture a
+condemned surface):**
+- Sweep emits reified cluster nodes: name_cluster → logic_group →
+  member_of edges; deterministic detection only; 0052 registry
+  rows; receipts on the cluster nodes.
+- Flag census/retrieve re-point to graph traversal (storage change;
+  if any tool DESCRIPTION text changes, that is a conscious pin
+  bump, recorded).
+- Consumer census on gov_red_flags NOW: re-point every declared
+  consumer to the graph (cluster nodes are KQL-queryable via the
+  graph_nodes export) or justify a generated view; zero consumers →
+  retire contract + table. Record the outcome.
+
+**Acceptance:** SHAPES_GAPCHECK v2 (matrix incl. D7 + new shapes,
+expected-vs-actual, canonical outcomes) + updated DEMO NOTE (likely
+best cells: U9 codeset drift, U6 billing-vs-clinical, U12 grain
+twin); full suite green + ruff; honesty 1.00 standing; Echo Law from
+birth on every new query/op/stamp; deterministic regeneration
+byte-identical.
+
+## RESULTS v2 (dev appends)

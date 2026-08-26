@@ -48,7 +48,7 @@ design, run under the project's own conservation discipline.
    detection (see D2 below). Proof where proof exists; disclosure
    where it doesn't (METHODOLOGY's asymmetry).
 
-## Dimensions [RATIFY the set; cells enumerated by dev]
+## Dimensions (RATIFIED; D7 added and ratified 2026-08-25)
 
 - **D1 name relation** (pairwise): identical · cousin
   (token-overlap) · disjoint.
@@ -65,6 +65,11 @@ design, run under the project's own conservation discipline.
   report id where a table is expected).
 - **D5 chain shape**: linear A→B→C · diamond · self-reference ·
   cross-schema twin pair (reporting./reports.).
+- **D7 grain** (RATIFIED 2026-08-25): patient-distinct ·
+  encounter-grain · event-grain — what one output row represents;
+  machine-detectable (DISTINCT on patient key). The
+  same-name-different-grain fight (890 patients vs 1,200
+  encounters).
 - **D6 hygiene/edge** (excluded-or-instantiated per reason): dynamic
   SQL · multi-statement · \r\n forms · PHI-shaped literals (gate
   must redact).
