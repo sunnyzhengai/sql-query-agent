@@ -119,3 +119,28 @@ point.
   (DOCTRINE -> COPY, dogfood claim)
 - **"Answer with evidence, or refuse with the named reason — never
   silent, never invented."** — the totality guarantee. (LAW -> COPY)
+
+## The stamp canon (dev session, 2026-08-23–25)
+
+- **"A name match is not logic sameness; run compare for a
+  verdict."** — the SAMENESS_CAVEAT constant, machine-stamped and
+  gate-enforced since the W6 corpse, 2026-08-23. (LAW — it ships in
+  the product's own headlines)
+- **"Absence of recorded edges is not proven absence of use."** —
+  the W13b coverage caveat, 2026-08-23; ADR 0053's principle
+  extended to ask time. (LAW)
+- **"Row counts are not metric counts."** — W17, the third birth of
+  the distinct-count law, 2026-08-24. (LAW)
+- **"The registration list lies; the 201 vouches for phase one of a
+  two-phase operation."** — review session, the ghost-shortcut find,
+  2026-08-24. (DOCTRINE — create-then-verify)
+- **"The matrix caught its own author."** — the shape-corpus build,
+  2026-08-25: the S4 cell flagged dev's own temp-name collision
+  during construction. (DOCTRINE — designed test data audits its
+  designer; candidate COPY for the methodology story)
+- **"The sweep doesn't find errors; it finds unlabeled
+  purposes."** — the canonical tie-in round, 2026-08-25. (DOCTRINE
+  -> COPY)
+- **"AIVIA delivers the map, not the verdict."** — the
+  presentation round, 2026-08-25. (DOCTRINE -> COPY, possibly the
+  best one-liner yet)

@@ -666,3 +666,16 @@ classification).
   - `tests/shapes/test_shapes.py`
 - **Summarized in:**
   - `docs/decisions/0055-designed-shape-corpus.md`
+
+## ADR 0056 — The decision algebra: every answer ends in a decision (typed deny, usage weights)
+
+- **Category:** architecture
+- **Summarized in:**
+  - `docs/decisions/0056-decision-algebra.md`
+
+## ADR 0057 — The Sphere: architecture model, ownership economy, contracts split
+
+- **Category:** architecture
+- **Summarized in:**
+  - `docs/decisions/0057-the-sphere.md`
+  - `docs/architecture/SPHERE.md`

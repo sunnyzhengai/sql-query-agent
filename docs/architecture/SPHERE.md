@@ -112,6 +112,19 @@ structurally rightful owner:
   verifiable by our own lineage machinery. The product governs
   itself with itself.
 
+## The presentation doctrine (Sunny's reframe, 2026-08-25)
+
+AIVIA delivers THE MAP, NOT THE VERDICT. Answer-time surface:
+matches-with-differences (every matching definition, diffed by
+path/persona/grain/codeset — the variant map IS the answer; choose
+follows). Estate surface: the DIFFERENTIATION QUEUE (the flag
+objects, reframed — addressable nouns the disposition acts attach
+to), usage-ranked, never a violations list. Alarm semantics
+reserved for the defect class alone (invalid vocab, typos, mandate
+violations — the one place wrongness exists). Detection machinery
+identical under both framings; internal table names unchanged; the
+reframe lands at the 0056 build.
+
 ## The formal guarantee (SPEC amendment authorized by ADR 0057)
 
 Three legs:

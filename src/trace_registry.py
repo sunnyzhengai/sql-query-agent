@@ -498,6 +498,34 @@ TRACE_REGISTRY = {
                   "tests/test_companion.py"],
         "docs": ["docs/architecture/SPEC.md", "docs/architecture/TRACE_MAP.md"],
     },
+    "0057": {
+        # ACCEPTED 2026-08-25 — DESIGN RECORD (five Sunny+review
+        # rounds): the four-shell sphere, change-propagation nervous
+        # system, ownership economy, static/dynamic contracts split.
+        # Binds future design; enters the build queue only by future
+        # orders — no modules by construction.
+        "title": "The Sphere: architecture model, ownership economy, "
+                 "contracts split",
+        "category": "architecture",
+        "axioms": [],
+        "modules": [],
+        "tests": [],
+        "docs": ["docs/decisions/0057-the-sphere.md",
+                 "docs/architecture/SPHERE.md"],
+    },
+    "0056": {
+        # ACCEPTED 2026-08-25, SEQUENCED AFTER CAPTURE: the decision
+        # algebra (typed user decisions on every answer; deny typed
+        # defect/mismatch/noncompliance with routing; accept-
+        # stewardship). No modules until its build order fires.
+        "title": "The decision algebra: every answer ends in a "
+                 "decision (typed deny, usage weights)",
+        "category": "architecture",
+        "axioms": [],
+        "modules": [],
+        "tests": [],
+        "docs": ["docs/decisions/0056-decision-algebra.md"],
+    },
     "0055": {
         # ACCEPTED + BUILT 2026-08-25 (dimensions ratified by Sunny;
         # both phases in one overnight run): generator + matrix

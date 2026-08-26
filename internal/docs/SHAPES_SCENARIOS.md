@@ -1,93 +1,125 @@
-# Shape corpus scenarios — palette v2 (diabetic), FOR SUNNY'S REVIEW
+# Shape corpus scenarios — palette v2 (diabetic), v2 STRUCTURE per Sunny's design order
 
-**Status: DRAFT by review session 2026-08-25, built on Sunny's
-workflow enrichment. Sunny red-pens; dev implements as palette v2
-(data-file change; existing cells/oracles stable; new cells only
-where marked NEW).**
+**Process (Sunny, 2026-08-25): shapes first → lego paths second →
+use cases built from legos to instantiate shapes. Status: shapes +
+legos + catalog laid out by review; AWAITING SUNNY'S CONFIRMATION,
+then this is dev's palette-v2 build order.**
 
-## The two-axis clinical model (Sunny's enrichment, formalized)
+Theme rationale (Sunny): diabetic was chosen BECAUSE each requesting
+persona is specialized in their own workflow — the many ways to
+define "diabetic patients" are structural, not contrived.
 
-**Axis 1 — care-setting workflow** (each with its own tables, joins,
-granularity):
-| workflow | reaches patient via | characteristic tables |
+## 1. THE SHAPES (abstract; each SQL pair instantiates one; suite asserts the machine verdict)
+
+| shape | pattern | required machine verdict |
 |---|---|---|
-| Outpatient/PCP visit | encounter dx, flowsheets, labs, meds, problem list | OP_ENCOUNTERS, ENCOUNTER_DX, FLOWSHEET_ROWS, LAB_RESULTS, MED_ORDERS, PROBLEM_LIST |
-| ED visit | ED dx, problem list, labs, meds | ED_ENCOUNTERS, ED_DX, LAB_RESULTS, MED_ORDERS |
-| Inpatient stay | inpatient dx + all | IP_ENCOUNTERS, IP_DX, LAB_RESULTS, MED_ORDERS, PROBLEM_LIST |
-| Surgery | pre-op labs, questionnaires + all | SURG_CASES, PREOP_LABS, PREOP_QUESTIONNAIRES |
-| Problem list (standalone) | problem list direct | PROBLEM_LIST |
-| Patient registry | curated registry membership | DM_REGISTRY |
+| Twin | same CTE name, same logic | NO flag (consistency isn't a crime — false-positive control) |
+| Impostor | same CTE name, different logic | misnomer flag; compare DIFFERS |
+| Doppelgänger | different names, identical logic | duplicate flag; compare IDENTICAL |
+| Cosmetic twin | logic differs only in whitespace/case/CRLF | normalizes IDENTICAL (control) |
+| Paraphrase | semantically same, syntactically different | "differs by normalized hash" disclosure — never a semantic claim (boundary cell) |
+| Cousins | near-names, divergent logic (Legacy class) | cousin CONFLICT |
+| **Codeset drift** (NEW) | same path + structure, different code LIST (80 vs 81 ICD) | compare DIFFERS; diff pinpoints the missing code (steward-story seed) |
+| **Path divergence** (NEW) | same concept via different JOIN PATHS (dx/lab/billing/med/proc) | concept-level conflict flags; governed plurality — each variant legitimate per persona/use |
+| Extension | B = A + extra filters | metric-grain DIFFERS; STEP-grain hash matches the shared core (reuse inside divergence) |
+| Grain shift (D7) | same name; patient-distinct vs encounter/event grain | grain flag — "counts visits vs counts patients" |
+| Reference forms | aliased / temp-projection / unqualified-ambiguous / wrong-kind | resolver cells (existing, re-skinned) |
+| Chains | linear / diamond / self-ref / cross-schema twins | existing cells, re-skinned |
 
-**Axis 2 — evidence type**: diagnosis code (ICD-10 E08–E13) ·
-problem-list entry · lab (HbA1c ≥ 6.5 / FPG ≥ 126 / random ≥ 200 w/
-symptoms) · medication (insulin/orals; METFORMIN CAVEAT: also
-prediabetes/PCOS → over-count) · questionnaire self-report ·
-gestational exclusion nuance (O24.4x counted vs excluded).
+## 2. THE LEGO LIBRARY (Sunny's EMR paths, formalized)
 
-## Personas (metadata only — steward/developer columns; NO auth)
+| persona | path |
+|---|---|
+| PCP | PATIENTS → ENCOUNTERS → ENCOUNTER_DIAGNOSIS → DIAGNOSIS_CODESET |
+| PCP (alt) | PATIENTS → PROBLEM_LIST → DIAGNOSIS_CODESET |
+| ED doc | PATIENTS → HOSPITAL_ENCOUNTERS[type=ED] → HOSPITAL_DIAGNOSIS → DIAGNOSIS_CODESET |
+| ED doc (labs) | PATIENTS → HOSPITAL_ENCOUNTERS → LAB_ORDERS → LAB_RESULTS → LAB_CODESET |
+| OBGyn | PATIENTS → ENCOUNTERS → ENCOUNTER_DIAGNOSIS → DIAGNOSIS_CODESET (O24.4x gestational nuance) |
+| Finance | PATIENTS → PROFESSIONAL_BILLING → CPT_CODES → CPT_CODESET |
+| Surgeon | PATIENTS → OR_CASES → PROCEDURE_ORDERS[diabetes procs] → PROC_CODESET |
+| Surgeon (meds) | PATIENTS → MED_ORDERS → MED_CODESET |
+| Scheduling (support) | PATIENTS → APPOINTMENTS (status: completed/cancelled/no-show) |
+| Attribution (support) | PATIENTS → PATIENT_PCP_ASSIGNMENT |
 
-- Dr. Patel — PCP, primary care (outpatient definitions)
-- Dr. Okafor — ED medical director (ED definitions)
-- Surgical Services (team) — pre-op screening definitions
-- Quality & Registry team — DM_REGISTRY steward (the certifying
-  steward in the disposition story)
-- Finance/Population Health analyst — the encounter-grain
-  double-counter (scenario N3)
+Codesets are foundation-layer reference tables (DIAGNOSIS_CODESET
+carries ICD-10 incl. E08–E13 + O24.4x; LAB_CODESET the A1c/glucose
+tests + thresholds context; MED_CODESET insulin/orals incl.
+metformin; CPT/PROC codesets). Reference-vocabulary flags (future
+class, ADR 0057) get their seed data here.
 
-## Proposed NEW dimension [SUNNY RATIFIES]
+## 3. USE-CASE CATALOG (procs dev writes; shapes instantiated in brackets)
 
-**D7 grain**: patient-distinct · encounter-grain · event-grain.
-The classic fight: "Diabetic Patients" that actually counts
-encounters. Machine-detectable (DISTINCT patient key vs not);
-candidate new flag class or compare aspect. 2–3 new cells.
+Personas: Dr. Peterson (PCP) · Dr. Sullivan (surgeon) · ED medical
+director · OBGyn · Finance analyst · Quality & Registry team
+(certifying steward). All synthetic.
 
-## Scenario catalog (each names its cells)
+- **U1 (Sunny):** Dr. Peterson's diabetic patients who cancelled/
+  no-showed PCP appointments, last 6 months. [Extension over a
+  diabetic base + scheduling lego; patient grain]
+- **U2 (Sunny):** Dr. Peterson's diabetic patients with ED visits
+  for diabetic-related symptoms, last year. [Path divergence in one
+  proc: PCP panel ∩ ED path; SYMPTOM codeset distinct from diabetes
+  codeset]
+- **U3 (Sunny):** Dr. Sullivan's patients with abnormal pre-op
+  diabetes labs. [Path divergence: lab-evidence definition;
+  surgeon + lab legos, thresholds]
+- **U4 (Sunny):** High ED utilizers, diabetic, no PCP assigned.
+  [Grain shift (visit counts per patient) + attribution absence +
+  composition]
+- **U5:** Gestational pair — "Diabetic Patients (incl. gestational)"
+  vs "(excl. gestational)", OBGyn path. [Cousins; BOTH legitimate →
+  the accept/label-variant disposition beat]
+- **U6:** Finance's diabetic panel from billing (CPT path). [Path
+  divergence at its sharpest — the billing-vs-clinical cohort fight]
+- **U7:** The Registry rebuild — Quality team's composite any-2-of-3
+  (dx, lab, med). [Path divergence resolved by governance; the
+  certified-official candidate]
+- **U8:** Med-derived cohort, metformin over-count uncorrected.
+  [Impostor vs the registry; the deliberately flawed variant the
+  demo interrogates]
+- **U9:** Codeset-drift pair — two PCP-path procs, 80 vs 81 codes.
+  [Codeset drift; the meaning-leads-code demo seed]
+- **U10:** Base_Cohort everywhere — each persona's proc opens a
+  Base_Cohort CTE from THEIR lego. [Impostor at scale]
+- **U11:** "Missed_Appointments" vs "No_Show_Panel" — two
+  departments, identical logic, different names. [Doppelgänger]
+- **U12:** "High ED Utilizers" twice — patients vs visits under one
+  name. [Grain shift as its own conflict]
+- **Controls:** one Cosmetic-twin pair and one Paraphrase pair that
+  must NOT flag (silence is the assertion).
 
-- **N1 "Diabetic Patients (Registry)"** — DM_REGISTRY membership;
-  steward: Quality team. The eventual OFFICIAL in the disposition
-  demo. [M-family anchor]
-- **N2 "Diabetic Patients (Coded)"** — encounter dx E08–E13 across
-  OP+ED+IP unions; developer: Dr. Patel. Same business concept as
-  N1, different logic → conflict twin. [M1 cell, enriched]
-- **N3 "Diabetic Patients (Utilization)"** — SAME name as N2 in a
-  different schema, encounter-grain (no DISTINCT) — the
-  double-counter; persona: Finance analyst. [M1 + NEW D7 cell]
-- **N4 "Diabetic Patients (Lab Criteria)"** — HbA1c/FPG thresholds
-  via LAB_RESULTS joined through OP + preop paths; finds the
-  undiagnosed. [M2 cousin family]
-- **N5 "Diabetic Patients (Med-Derived)"** — MED_ORDERS
-  insulin/orals; carries the metformin over-count IN ITS LOGIC (no
-  exclusion) — the deliberately-flawed variant the demo interrogates.
-  [M2/M5]
-- **N6 "DM Registry (Legacy v1)"** — N1's outdated cousin, pre-2023
-  criteria (no O24.4x exclusion). [M3 legacy-cousin cell]
-- **N7 gestational nuance pair** — "Diabetes Prevalence (Incl.
-  Gestational)" vs "(Excl. Gestational)": O24.4x counted vs
-  excluded; both LEGITIMATE → the accept/label-variant disposition
-  beat (plurality, not error). [M-family, D2 genuinely-different]
-- **N8 Base_Cohort misnomer** — every workflow's proc opens with a
-  `Base_Cohort` CTE built its own way (PCP: attributed panel; ED:
-  arrival window; Surg: scheduled cases) — the S-family misnomer
-  seed, now clinically motivated. [S4/S5]
-- **N9 pre-op path** — "Pre-Op Diabetes Screening" reads
-  PREOP_LABS + PREOP_QUESTIONNAIRES (questionnaire self-report as
-  evidence) — exercises R-family reference forms through a distinct
-  join topology; developer: Surgical Services. [R2/R3]
-- **N10 semantic-equivalence boundary** — two byte-different,
-  logically-identical A1c filters (IN-list vs OR-chain) — D2
-  disclosure cell, clinical skin. [S3/M8-class]
+## The canonical tie-in (Sunny's coherence check, recorded)
 
-## What stays fixed
+Shapes are the BIRTH PATTERNS of the canonical layer: each describes
+how name-claims cluster at extraction, and each flag invites a
+canonical ACT, never a correction — rest (twins/controls: healthy,
+no work), differentiate (impostor/path-divergence/grain: one name
+carrying N purposes → labeled variants, officials per scope),
+consolidate (doppelgänger: synonyms), link (cousins: family trees),
+derive (extension: bottom-up concept hierarchy via step-grain core
+matching), repair (codeset drift ONLY — the one cell where
+right-vs-wrong exists, routed by the deny grounds). Manifest
+expectations therefore assert the CANONICAL OUTCOME per cell
+(concept count, claim structure, invited disposition class), not
+just the flag. "The sweep doesn't find errors; it finds unlabeled
+purposes."
 
-Cell ids, oracle mechanism, manifest format, isolation from the
-realism corpus, deterministic generation. Palette v2 = names, table
-vocab, persona rows, and the marked NEW cells (D7 + N3, subject to
-ratification).
+## Build rules for dev (unchanged from v1 where not superseded)
 
-## SUNNY'S REVIEW CHECKLIST
+- Palette is a swappable data file; cells/oracles from the built
+  matrix stay stable; NEW cells only for D7 (grain — pending
+  Sunny's ratification below), Codeset drift, Path divergence, and
+  Extension (step-grain core matching).
+- Isolation from the realism corpus; oracles by construction in the
+  manifest; Echo Law from birth; D2 boundary asserts disclosure.
+- SHAPES_GAPCHECK v2 for Sunny + updated demo note (best demo
+  cells likely: U9 codeset drift, U6 billing-vs-clinical, U12 grain).
 
-1. Clinical corrections to paths/thresholds/tables (anything wrong?)
-2. Ratify D7 (grain) as a dimension + N3.
-3. Persona names/roles OK? (Synthetic, no real names.)
-4. Anything missing from the workflow list (e.g., telehealth,
-   home-health) worth a scenario — or explicitly excluded-with-reason?
+## SUNNY'S CONFIRMATION CHECKLIST
+
+1. Shapes table — complete? anything you've seen in the wild that's
+   missing?
+2. Lego table names — rename anything that rings false.
+3. D7 grain ratified? (U4/U12 depend on it.)
+4. Use cases U5–U12 — approve/cut/amend; add any.
+5. Persona roster OK?
