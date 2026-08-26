@@ -679,3 +679,9 @@ classification).
 - **Summarized in:**
   - `docs/decisions/0057-the-sphere.md`
   - `docs/architecture/SPHERE.md`
+
+## ADR 0058 — The self-service contracts: contracts-first for the Pro pillar (provenance rungs, execution floors)
+
+- **Category:** architecture
+- **Summarized in:**
+  - `docs/decisions/0058-self-service-contracts.md`

@@ -16,8 +16,7 @@ enforced by tests/test_notebook_contract.py (ADR 0042).
 | 060_ingest_semantic_models | acquisition | A, B, E, G | >=1.24 | Ingest PBI semantic models (lineage, DAX, names, fallout) |
 | 100_install | verification | G | >=1.24 | Environment verification + ingestion-state report |
 | 200_parse | derivation | A, B, C, F, G | >=1.24 | Parse the SQL corpus with ScriptDom into parse tables |
-| 300_build_graph | derivation | A, B, C, F | >=1.26 | Build the knowledge graph (nodes/edges, all layers, decision trees) |
-| 320_red_flag_sweep | derivation | E, F | >=1.57 | Governance red-flag sweep (ADR 0054): misnomer/duplicate/cousin flags over content hashes |
+| 300_build_graph | derivation | A, B, C, F | >=1.58 | Build the knowledge graph (nodes/edges, all layers, decision trees) |
 | 400_build_metric_logic | derivation | A, E | >=1.24 | Flatten the graph into the metric card table |
 | 500_validate | verification | G | >=1.29 | Pipeline validation + deployment readiness gate + leaf grounding (spec:C4) |
 | 600_generate_descriptions | derivation | A | >=1.24 | Bottom-up LLM descriptions over the calculation DAG |
@@ -37,8 +36,8 @@ enforced by tests/test_notebook_contract.py (ADR 0042).
 | B. Provenance | 010_ingest_sql_filedrop, 020_ingest_sql_folders, 030_ingest_sql_live, 040_dict_clarity, 050_dict_caboodle, 060_ingest_semantic_models, 200_parse, 300_build_graph, 800_export_graph_tables |
 | C. Impact | 010_ingest_sql_filedrop, 020_ingest_sql_folders, 030_ingest_sql_live, 200_parse, 300_build_graph, 800_export_graph_tables |
 | D. Discovery | 010_ingest_sql_filedrop, 020_ingest_sql_folders, 030_ingest_sql_live, 700_refresh_search_index |
-| E. Trust | 060_ingest_semantic_models, 320_red_flag_sweep, 400_build_metric_logic, 900_publish_collibra, 910_publish_purview, 920_publish_pbi |
-| F. Consistency | 010_ingest_sql_filedrop, 020_ingest_sql_folders, 030_ingest_sql_live, 200_parse, 300_build_graph, 320_red_flag_sweep |
+| E. Trust | 060_ingest_semantic_models, 400_build_metric_logic, 900_publish_collibra, 910_publish_purview, 920_publish_pbi |
+| F. Consistency | 010_ingest_sql_filedrop, 020_ingest_sql_folders, 030_ingest_sql_live, 200_parse, 300_build_graph |
 | G. Health | 060_ingest_semantic_models, 100_install, 200_parse, 500_validate, 950_ingest_agent_events |
 
 Every notebook must serve >=1 family — a notebook serving none

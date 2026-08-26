@@ -438,7 +438,7 @@ GOV_FLAGS_QUERY = (
 GOV_FLAG_BY_ID_QUERY = (
     "declare query_parameters(p_id:string);\n"
     "graph_nodes\n"
-    "| where node_id == p_id\n"
+    "| where node_id == p_id and node_id startswith 'cluster:'\n"
     + _CLUSTER_PROJECT
 )
 

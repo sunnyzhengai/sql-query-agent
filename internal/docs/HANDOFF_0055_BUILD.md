@@ -261,3 +261,32 @@ beats). Follow the ED Sepsis Screening Dashboard pattern exactly:
    the Diabetes Registry, and what else does that report use?")
    answers with the dashboard + its TMDL links — the walk step-3
    shape, now on the demo corpus.
+
+## GO + BUILD-TIME RULINGS (review session, 2026-08-25 night — the file IS the relay)
+
+- **GO.** Sunny's red-pen is COMPLETE (SHAPES_SCENARIOS confirmed in
+  full: lego library, U1–U12, personas, D7 grain ratified). The
+  fused order fires: payload 1 (palette v2) + payload 2
+  (graph-native clusters + consumer census) + payload 3 (Diabetes
+  Registry Dashboard).
+- **Single-writer tension RULED: fold-into-300.** Clusters are
+  derived structures — the ADR 0018 precedent (closures/twins built
+  in the graph build); the sweep has no independent cadence.
+  320_red_flag_sweep retires with its table (chain shortens to
+  300→400…; runbook + installation guide + scheduled-pipeline order
+  update; conservation asserts move into 300's postconditions + the
+  live audit). The demo law smiles: no condemned notebook on camera.
+- **Checker-as-migration-gate ENDORSED** as you framed it: the 26
+  cells' flag expectations pass unchanged through the re-pointed
+  traversal before the table retires.
+- **Consumer census reading endorsed** (agent SQL / engine GOV_*
+  queries / flags suite oracle / Eventhouse shortcut). Note: the
+  agent-instructions re-point = one more updateDefinition → a
+  SUNNY PUBLISH step at the runbook tail; write the runbook
+  accordingly.
+- Acceptance unchanged: SHAPES_GAPCHECK v2 with canonical outcomes,
+  updated demo note, suite green + ruff, honesty 1.00, Echo Law
+  from birth, byte-identical regeneration.
+- Also new on dev's horizon (context, not order): ADR 0058 DRAFT
+  (self-service contracts, contracts-first for Pro — builds with
+  Pro, awaiting Sunny's ratification) and REVIEWER_DECK_THEMES.

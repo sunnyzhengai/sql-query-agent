@@ -21,7 +21,6 @@ flowchart LR
   100_install["100_install"]:::notebook
   200_parse["200_parse"]:::notebook
   300_build_graph["300_build_graph"]:::notebook
-  320_red_flag_sweep["320_red_flag_sweep"]:::notebook
   400_build_metric_logic["400_build_metric_logic"]:::notebook
   500_validate["500_validate"]:::notebook
   600_generate_descriptions["600_generate_descriptions"]:::notebook
@@ -47,7 +46,6 @@ flowchart LR
   LPG_export__14_typed_tables_[("LPG export (14 typed tables)")]:::table
   gov_feedback_events[("gov_feedback_events")]:::table
   gov_publish_log[("gov_publish_log")]:::table
-  gov_red_flags[("gov_red_flags")]:::table
   gov_steward_assignments[("gov_steward_assignments")]:::table
   gov_turn_events[("gov_turn_events")]:::table
   graph_decision_sites[("graph_decision_sites")]:::table
@@ -106,7 +104,6 @@ flowchart LR
   300_build_graph --> graph_nodes
   300_build_graph --> ops_setup_completeness
   300_build_graph -->|enrich| ops_fallout
-  320_red_flag_sweep --> gov_red_flags
   400_build_metric_logic --> output_metric_logic
   400_build_metric_logic --> output_metric_twins
   500_validate --> ops_admin_graph_edges
@@ -135,7 +132,6 @@ flowchart LR
   gov_feedback_events --> usage
   gov_publish_log --> 500_validate
   gov_publish_log --> admin
-  gov_red_flags --> data_agent
   gov_steward_assignments --> 300_build_graph
   gov_steward_assignments --> manage_stewards
   gov_turn_events --> 950_ingest_agent_events
@@ -145,7 +141,6 @@ flowchart LR
   graph_decision_sites --> admin
   graph_decision_sites --> description
   graph_decision_sites --> self_service
-  graph_edges --> 320_red_flag_sweep
   graph_edges --> 400_build_metric_logic
   graph_edges --> 500_validate
   graph_edges --> 600_generate_descriptions
@@ -154,7 +149,6 @@ flowchart LR
   graph_edges --> 920_publish_pbi
   graph_edges --> data_agent
   graph_edges --> verify_graph
-  graph_nodes --> 320_red_flag_sweep
   graph_nodes --> 400_build_metric_logic
   graph_nodes --> 500_validate
   graph_nodes --> 600_generate_descriptions

@@ -498,6 +498,18 @@ TRACE_REGISTRY = {
                   "tests/test_companion.py"],
         "docs": ["docs/architecture/SPEC.md", "docs/architecture/TRACE_MAP.md"],
     },
+    "0058": {
+        # DRAFT 2026-08-25 (review): the self-service contracts —
+        # contracts-first for the Pro pillar; Sunny ratifies; build
+        # lands WITH Pro, nothing in the current queue.
+        "title": "The self-service contracts: contracts-first for "
+                 "the Pro pillar (provenance rungs, execution floors)",
+        "category": "architecture",
+        "axioms": [],
+        "modules": [],
+        "tests": [],
+        "docs": ["docs/decisions/0058-self-service-contracts.md"],
+    },
     "0057": {
         # ACCEPTED 2026-08-25 — DESIGN RECORD (five Sunny+review
         # rounds): the four-shell sphere, change-propagation nervous

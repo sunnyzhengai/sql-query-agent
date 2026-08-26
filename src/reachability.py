@@ -163,15 +163,30 @@ REACHABILITY = (
      "via": "search/census; depth queued (see node:measure)",
      "ops": (), "queries": (), "marker": ""},
     {"payload": "catalog:flag", "status": "reachable",
-     "via": "ADR 0054 governance red flags: census kind 'flag' "
-            "enumerates the sweep's machine verdicts; retrieve "
-            "returns the full record (members + hashes + drill "
-            "query); the step-name stamp and metric retrieval "
-            "surface recorded flags inline (single-row sameness "
-            "reads, ADR 0020)",
+     "via": "ADR 0054/0057 governance clusters, GRAPH-NATIVE: census "
+            "kind 'flag' enumerates the reified cluster nodes; "
+            "retrieve TRAVERSES member_of edges for the full record "
+            "(members + hashes + drill); the step-name stamp and "
+            "metric retrieval surface recorded flags inline "
+            "(single-row sameness reads, ADR 0020)",
      "ops": ("op_census", "op_retrieve"),
-     "queries": ("GOV_FLAGS_QUERY", "GOV_FLAG_BY_ID_QUERY"),
-     "marker": "gov_red_flags"},
+     "queries": ("GOV_FLAGS_QUERY", "GOV_FLAG_BY_ID_QUERY",
+                 "GOV_FLAG_MEMBERS_QUERY"),
+     "marker": "cluster:"},
+    {"payload": "node:governance", "status": "reachable",
+     "via": "ADR 0057 'Clusters are nodes': name_cluster and "
+            "logic_group nodes reached by census kind 'flag' and "
+            "flag retrieve; membership traversed via member_of",
+     "ops": ("op_census", "op_retrieve"),
+     "queries": ("GOV_FLAGS_QUERY",),
+     "marker": "cluster:"},
+    {"payload": "edge:member_of", "status": "reachable",
+     "via": "flag retrieve traverses org-node -> logic_group -> "
+            "name_cluster membership; the drill query on every "
+            "cluster row IS this traversal",
+     "ops": ("op_retrieve",),
+     "queries": ("GOV_FLAG_MEMBERS_QUERY",),
+     "marker": "member_of"},
 )
 
 
