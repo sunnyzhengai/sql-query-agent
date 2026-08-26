@@ -139,10 +139,15 @@ of searching a side table. Detection stays DETERMINISTIC
 (fold-name, content-hash, token containment, materialized closures
 — never stochastic clustering; M4/E2 hold). Migration: the
 gov_red_flags table is a serialized cluster set — right design,
-wrong residence; it stays authoritative THROUGH THE DEMO, then at
-the 0056 build clusters go graph-native and the table flips to a
-projection (the contracts-split authority-flip pattern). Cluster
-nodes get 0052 registry rows like every payload.
+wrong residence; it stays authoritative THROUGH THE DEMO (shipped,
+verified consumers — sequencing prudence only). At the 0056 build
+clusters go graph-native as the SOLE truth; the table is then
+RETIRED OR DEMOTED, decided mechanically by its own declared
+consumers list (the consumer police): each consumer re-points to
+the graph (cluster nodes are already KQL-queryable via the
+graph_nodes export) or justifies a GENERATED projection view;
+zero consumers remaining → the contract retires and the table with
+it. Cluster nodes get 0052 registry rows like every payload.
 
 ## The formal guarantee (SPEC amendment authorized by ADR 0057)
 
