@@ -232,3 +232,32 @@ birth on every new query/op/stamp; deterministic regeneration
 byte-identical.
 
 ## RESULTS v2 (dev appends)
+
+## PAYLOAD 3 — the Diabetes Registry Dashboard (Sunny's ruling, 2026-08-25: BUILD)
+
+Closes the report-layer gap for the demo (clickable-link + write-back
+beats). Follow the ED Sepsis Screening Dashboard pattern exactly:
+
+1. Author as GIT WORKSPACE ITEMS (the sepsis precedent): a
+   "Diabetes Registry Dashboard" semantic model (TMDL) executing the
+   shape store's Registry proc (U7 — the Quality team's composite,
+   the certified-official candidate), displayName matching the model
+   name, plus a minimal report bound to it. Keep visuals minimal but
+   plausible: registry cohort count, trend, and a by-path breakdown
+   (dx/lab/med) — the by-path visual foreshadows the path-divergence
+   demo beat.
+2. **Report description field left EMPTY** — it is the write-back
+   beat's stage (the demo publishes the certified definition onto
+   it live).
+3. Wire into the _shapes config profile so 060 ingests it: TMDL
+   links parsed → the report joins the shape graph → report_name +
+   URL land on the Registry metric record → the clickable link
+   appears in answers (the W4 machinery).
+4. Sequencing: after/with palette v2 (needs the shape store's proc
+   names), before the tenant load. Sunny's tenant steps at the
+   tail: workspace update-from-git, open the report once to verify
+   it renders, confirm description still empty.
+5. Acceptance: the pointer-chase question ("which report is built on
+   the Diabetes Registry, and what else does that report use?")
+   answers with the dashboard + its TMDL links — the walk step-3
+   shape, now on the demo corpus.
