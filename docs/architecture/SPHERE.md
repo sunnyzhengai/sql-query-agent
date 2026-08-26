@@ -139,15 +139,16 @@ of searching a side table. Detection stays DETERMINISTIC
 (fold-name, content-hash, token containment, materialized closures
 — never stochastic clustering; M4/E2 hold). Migration: the
 gov_red_flags table is a serialized cluster set — right design,
-wrong residence; it stays authoritative THROUGH THE DEMO (shipped,
-verified consumers — sequencing prudence only). At the 0056 build
-clusters go graph-native as the SOLE truth; the table is then
-RETIRED OR DEMOTED, decided mechanically by its own declared
-consumers list (the consumer police): each consumer re-points to
-the graph (cluster nodes are already KQL-queryable via the
-graph_nodes export) or justifies a GENERATED projection view;
-zero consumers remaining → the contract retires and the table with
-it. Cluster nodes get 0052 registry rows like every payload.
+wrong residence. RESEQUENCED by Sunny's demo law (2026-08-25: "the
+demo surfaces what we keep; we never keep for the demo" — never
+capture a condemned surface on camera): clusters go graph-native
+PRE-CAPTURE as the sole truth; the consumer census on gov_red_flags
+runs now (re-point each declared consumer to the graph — cluster
+nodes are KQL-queryable via the graph_nodes export — or justify a
+generated view; zero consumers → contract and table retire). The
+0056 decision UI legitimately stays post-capture: absent from the
+demo, not faked in it. Cluster nodes get 0052 registry rows like
+every payload.
 
 ## The formal guarantee (SPEC amendment authorized by ADR 0057)
 
