@@ -36,6 +36,7 @@ from src.orchestrator.tools import (
     DECISIONS_OF_STEP_QUERY,
     FIND_BY_NAME_QUERY,
     GOV_FLAG_BY_ID_QUERY,
+    GOV_FLAG_MEMBERS_QUERY,
     GOV_FLAGS_BY_IDENTITY_QUERY,
     GOV_FLAGS_FOR_MEMBER_QUERY,
     GOV_FLAGS_QUERY,
@@ -461,9 +462,9 @@ def op_census(kind: str, run_kql, session: OpsSession,
             frows = list(run_kql(GOV_FLAGS_QUERY, {}))
         except Exception as e:              # noqa: BLE001 — named state
             raise OpError(
-                "the red-flag surface is not in this store yet — run "
-                "320_red_flag_sweep and the export, then shortcut "
-                "gov_red_flags into the KQL database "
+                "the governance cluster surface is not in this store "
+                "yet — rerun 300_build_graph on engine >= 1.58 (the "
+                "sweep is folded in; clusters ride graph_nodes) "
                 f"({type(e).__name__})") from e
         out = [{"id": str(r["flag_id"]), "kind": "flag",
                 "name": str(r.get("identity") or ""),
@@ -856,22 +857,26 @@ def op_retrieve(ids: "list[str]", run_kql, session: OpsSession) -> ResultSet:
     rows, notes = [], []
     for an_id in ids:
         try:
-            if an_id.startswith("flag:"):
-                # ADR 0054: the full flag record — members with hashes
-                # and the drill query (error-contract discipline)
+            if an_id.startswith("cluster:"):
+                # ADR 0057: the full cluster record by TRAVERSAL —
+                # node properties + members through the member_of
+                # edges (error-contract discipline: drill on the row)
                 frows = list(run_kql(GOV_FLAG_BY_ID_QUERY,
                                      {"p_id": an_id}))
                 if not frows:
-                    notes.append(f"flag {an_id!r} not found in "
-                                 "gov_red_flags")
+                    notes.append(f"cluster {an_id!r} not found in "
+                                 "the graph")
                     continue
                 fr = dict(frows[0])
-                members = fr.get("members")
-                if isinstance(members, str):
-                    try:
-                        members = json.loads(members or "[]")
-                    except json.JSONDecodeError:
-                        members = []
+                members = []
+                for m in run_kql(GOV_FLAG_MEMBERS_QUERY,
+                                 {"p_id": an_id}):
+                    mid_ = str(m.get("member_id") or "")
+                    ref = (mid_.split(":", 1)[-1]
+                           if mid_.startswith("canonical:") else mid_)
+                    members.append({
+                        "id": ref, "name": m.get("member_name"),
+                        "content_key": m.get("content_key")})
                 rows.append({"id": an_id, "kind": "flag",
                              "flag_class": fr.get("flag_class"),
                              "grain": fr.get("grain"),
@@ -887,8 +892,8 @@ def op_retrieve(ids: "list[str]", run_kql, session: OpsSession) -> ResultSet:
                              "disposition": fr.get("disposition"),
                              "disposition_reason":
                                  fr.get("disposition_reason")})
-                for m in (members or []):
-                    rid = str(m.get("ref") or m.get("id") or "")
+                for m in members:
+                    rid = str(m.get("id") or "")
                     if rid:
                         session.surfaced.add(rid)
             elif an_id.startswith("transform:"):

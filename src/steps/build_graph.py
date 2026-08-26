@@ -149,6 +149,15 @@ class BuildGraphOutput:
     projection_minted: int = 0
     projection_minted_via_step: int = 0     # W13a chase subset
     projection_dropped: "dict[str, int]" = field(default_factory=dict)
+    # Governance sweep, folded in (ADR 0057): the verdict set in row
+    # form for summaries; the TRUTH is the cluster nodes/edges merged
+    # into nodes_rows/edges_rows above.
+    flags_rows: "list[dict]" = field(default_factory=list)
+    flags_swept: int = 0
+    flags_flagged: int = 0
+    flags_clean: int = 0
+    flags_excluded: "dict[str, int]" = field(default_factory=dict)
+    rejected_dispositions: "list[dict]" = field(default_factory=list)
 
 
 def build_graph_step(
@@ -159,7 +168,9 @@ def build_graph_step(
     metric_name_records: "Iterable[dict]" = (),
     report_source_records: "Iterable[dict]" = (),
     dax_records: "Iterable[dict]" = (),
+    disposition_events: "Iterable[dict]" = (),
     *,
+    sweep_run_at: str = "",
     table_name_col: str = "TABLE_NAME",
     column_name_col: str = "COLUMN_NAME",
     description_col: str = "DESCRIPTION",
@@ -236,6 +247,18 @@ def build_graph_step(
         builder, list(report_source_records), list(dax_records)
     )
 
+    # Governance red-flag sweep, FOLDED IN (ADR 0057 fold-into-300,
+    # Sunny's ruling 2026-08-25: clusters are derived structures —
+    # the ADR 0018 precedent; one writer, one truth). The sweep reads
+    # the graph just built and its verdicts return as GOVERNANCE-layer
+    # cluster nodes + member_of edges in the same tables.
+    from src.steps.red_flag_sweep import red_flag_sweep_step
+    sweep_out = red_flag_sweep_step(
+        nodes_to_row_dicts(builder.nodes),
+        edges_to_row_dicts(builder.edges),
+        disposition_events=list(disposition_events),
+        run_at=sweep_run_at)
+
     # Logic relations.
     node_ids = set(builder.nodes)
     missing_canonical = [
@@ -259,11 +282,30 @@ def build_graph_step(
         f"!= minted {builder.projection_minted} + dropped "
         f"{builder.projection_dropped}")
 
+    # Merge the governance layer (ADR 0057): cluster nodes + member_of
+    # edges join the SAME tables; the dangling check extends over the
+    # merged sets — a member edge must land on a real org node, a
+    # group edge on a real cluster node.
+    final_nodes = (nodes_to_row_dicts(builder.nodes)
+                   + sweep_out.cluster_nodes_rows)
+    final_edges = (edges_to_row_dicts(builder.edges)
+                   + sweep_out.cluster_edges_rows)
+    merged_ids = {n["node_id"] for n in final_nodes}
+    gov_dangling = [
+        (e["source_id"], e["target_id"])
+        for e in sweep_out.cluster_edges_rows
+        if e["source_id"] not in merged_ids
+        or e["target_id"] not in merged_ids
+    ]
+    assert not gov_dangling, (
+        f"build_graph_step: dangling governance edges: "
+        f"{gov_dangling[:5]}")
+
     return BuildGraphOutput(
-        nodes_rows=nodes_to_row_dicts(builder.nodes),
-        edges_rows=edges_to_row_dicts(builder.edges),
-        node_count=len(builder.nodes),
-        edge_count=len(builder.edges),
+        nodes_rows=final_nodes,
+        edges_rows=final_edges,
+        node_count=len(final_nodes),
+        edge_count=len(final_edges),
         stewards_applied=stewards_applied,
         business_names_applied=names_applied,
         business_names_skipped=names_skipped,
@@ -280,4 +322,10 @@ def build_graph_step(
         projection_minted=builder.projection_minted,
         projection_minted_via_step=builder.projection_minted_via_step,
         projection_dropped=dict(builder.projection_dropped),
+        flags_rows=sweep_out.flags_rows,
+        flags_swept=sweep_out.swept,
+        flags_flagged=sweep_out.flagged,
+        flags_clean=sweep_out.clean,
+        flags_excluded=dict(sweep_out.excluded),
+        rejected_dispositions=sweep_out.rejected_dispositions,
     )

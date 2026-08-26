@@ -60,10 +60,13 @@ def main() -> None:
              f"{run.build.projection_minted} minted "
              f"({run.build.projection_minted_via_step} via the temp "
              f"chase), drops {run.build.projection_dropped}")
-    L.append(f"- sweep: {len(run.sweep.flags_rows)} flags over "
-             f"{run.sweep.swept} swept items "
-             f"({run.sweep.flagged} flagged, {run.sweep.clean} clean, "
-             f"excluded {run.sweep.excluded}) — conservation asserted")
+    L.append(f"- sweep (folded into the graph build, ADR 0057): "
+             f"{len(run.build.flags_rows)} cluster verdicts over "
+             f"{run.build.flags_swept} swept items "
+             f"({run.build.flags_flagged} flagged, "
+             f"{run.build.flags_clean} clean, excluded "
+             f"{run.build.flags_excluded}) — conservation asserted; "
+             "every verdict reified as governance-layer nodes")
     L.append("")
     L.append("## Dimension coverage (totality — the 0052 pattern)")
     L.append("")

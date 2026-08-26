@@ -139,9 +139,9 @@ def test_conservation_and_no_dangling(corpus_run):
     # reaching here means both held. Assert the headline numbers are
     # sane and recorded.
     assert corpus_run.build.node_count > 0
-    assert corpus_run.sweep.swept == (
-        corpus_run.sweep.flagged + corpus_run.sweep.clean
-        + sum(corpus_run.sweep.excluded.values()))
+    assert corpus_run.build.flags_swept == (
+        corpus_run.build.flags_flagged + corpus_run.build.flags_clean
+        + sum(corpus_run.build.flags_excluded.values()))
 
 
 def test_isolation_realism_corpus_untouched(corpus_run):

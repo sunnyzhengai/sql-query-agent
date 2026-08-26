@@ -48,7 +48,8 @@ except ImportError:
 print(f"v{src.__version__}")
 
 # Version binding (ADR 0042): notebook/wheel skew dies here, loudly.
-REQUIRES_ENGINE = "1.26"
+# the folded governance sweep (ADR 0057) needs the 1.58 wheel
+REQUIRES_ENGINE = "1.58"
 from src.engine_floor import require_engine
 
 require_engine(src.__version__, REQUIRES_ENGINE, "300_build_graph")
@@ -131,6 +132,17 @@ if spark.catalog.tableExists("input_dax_expressions"):
 else:
     print("No input_dax_expressions table — run 060_ingest_semantic_models for DAX measures")
 
+# Steward disposition events (ADR 0054/0057): absence is legitimate
+# (no ruling yet); a FAILED read must raise, never silently drop acts.
+disposition_events = []
+if spark.catalog.tableExists("gov_flag_dispositions"):
+    disposition_events = sorted(
+        (r.asDict() for r in spark.table("gov_flag_dispositions").collect()),
+        key=lambda e: str(e.get("event_at") or ""))
+else:
+    print("No gov_flag_dispositions table — no steward rulings yet")
+
+from datetime import datetime, timezone
 out = build_graph_step(
     parse_results, dict_tables_rows, dict_columns_rows, steward_records,
     metric_name_records=metric_name_records,
@@ -140,6 +152,8 @@ out = build_graph_step(
     column_name_col=config.dictionary.column_name_col,
     description_col=config.dictionary.description_col,
     table_description_col=config.dictionary.table_description_col,
+    disposition_events=disposition_events,
+    sweep_run_at=datetime.now(timezone.utc).isoformat(),
 )
 print(f"Built graph: {out.node_count} nodes, {out.edge_count} edges")
 if steward_records:
@@ -157,6 +171,16 @@ if report_source_records or dax_records:
 # every unextracted site is a counted, escalated gap, never silence.
 print(f"Decision tree: {out.decision_sites_extracted} predicate sites extracted, "
       f"{out.decision_sites_unextracted} unextracted (escalated to ops_fallout)")
+
+# Governance sweep, folded in (ADR 0057 — clusters are nodes; flags
+# disclose, never gate): conservation stated out loud.
+print(f"Governance sweep: swept {out.flags_swept} catalog items — "
+      f"{out.flags_flagged} in flags, {out.flags_clean} clean, "
+      f"excluded {out.flags_excluded}; {len(out.flags_rows)} cluster(s) "
+      "as governance-layer nodes")
+for r in out.rejected_dispositions:
+    print(f"  [!] rejected disposition: {r.get('rejected')} :: "
+          f"{r.get('flag_id')} {r.get('kind')}")
 
 
 # METADATA ********************

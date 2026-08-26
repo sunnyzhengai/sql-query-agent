@@ -159,6 +159,68 @@ def _row(flag_class: str, grain: str, identity: str, severity: str,
     }
 
 
+def reify_clusters(flags_rows: "list[dict]"
+                   ) -> "tuple[list[dict], list[dict]]":
+    """ADR 0057 — clusters are nodes. One name_cluster node per
+    verdict, one logic_group node per distinct content key, member_of
+    edges org-node → logic_group → name_cluster. Deterministic ids
+    (the same hash the flag id carries); dispositions live as node
+    properties, so a re-reification after the disposition fold
+    carries steward acts into the graph."""
+    nodes: "list[dict]" = []
+    edges: "list[dict]" = []
+    for fr in flags_rows:
+        cid = fr["flag_id"]
+        cprops = {k: fr[k] for k in (
+            "flag_class", "grain", "identity", "severity", "scope",
+            "member_count", "distinct_logics", "members_total",
+            "blast_radius", "blast_basis", "disposition",
+            "disposition_reason")}
+        cprops["kind"] = "name_cluster"
+        cprops["drill_query"] = fr["drill_query"]
+        nodes.append({
+            "node_id": cid, "layer": "governance",
+            "name": str(fr["identity"]),
+            "description": (
+                f"{fr['flag_class']} ({fr['severity']}): "
+                f"{fr['member_count']} member(s), "
+                f"{fr['distinct_logics']} distinct logic(s) — "
+                "flags disclose, never gate"),
+            "properties": json.dumps(cprops)})
+        members = json.loads(fr["members"])
+        by_key: "dict[str, list[dict]]" = {}
+        for mrow in members:
+            by_key.setdefault(str(mrow.get("content_key")),
+                              []).append(mrow)
+        tail = cid.rsplit(":", 1)[-1]
+        for key, ms in sorted(by_key.items()):
+            gid = f"loggroup:{tail}:{key}"
+            gprops = {"kind": "logic_group", "content_key": key,
+                      "member_count": len(ms), "cluster": cid}
+            grains = sorted({str(m.get("grain")) for m in ms
+                             if m.get("grain")})
+            if grains:
+                gprops["grains"] = grains
+            nodes.append({
+                "node_id": gid, "layer": "governance",
+                "name": f"{fr['identity']} · logic {key[:8]}",
+                "description": (f"{len(ms)} member(s) sharing one "
+                                "normalized logic"),
+                "properties": json.dumps(gprops)})
+            edges.append({"source_id": gid, "target_id": cid,
+                          "edge_type": "member_of",
+                          "properties": "{}"})
+            for mrow in ms:
+                mid_ = str(mrow.get("id") or "")
+                member_node = (mid_ if mid_.startswith("transform:")
+                               else f"canonical:{mid_}")
+                edges.append({"source_id": member_node,
+                              "target_id": gid,
+                              "edge_type": "member_of",
+                              "properties": "{}"})
+    return nodes, edges
+
+
 def sweep(nodes_rows: "list[dict]",
           edges_rows: "list[dict]") -> SweepResult:
     """The sweep at CATALOG grain, a pure read over the built graph
@@ -229,6 +291,7 @@ def sweep(nodes_rows: "list[dict]",
 
     # ---- metric grain ------------------------------------------------
     steps_of: "dict[str, list[tuple]]" = {}
+    grain_of: "dict[str, str]" = {}
     for n in steps:
         p = _props(n)
         ref = str(p.get("metric_id") or "")
@@ -236,6 +299,20 @@ def sweep(nodes_rows: "list[dict]",
         if ref and frag.strip():
             steps_of.setdefault(ref, []).append(
                 (int(p.get("step_no") or 0), _content_key(frag)))
+            # D7: the metric's OUTPUT grain reads from its final
+            # (highest step_no) fragment
+            grain_of.setdefault(ref, "row")
+
+    root_step: "dict[str, tuple]" = {}
+    for n in steps:
+        p = _props(n)
+        ref = str(p.get("metric_id") or "")
+        frag = str(p.get("sql_fragment") or "")
+        no = int(p.get("step_no") or 0)
+        if ref and frag.strip() and no >= root_step.get(ref, (-1,))[0]:
+            root_step[ref] = (no, _grain_signature(frag))
+    for ref, (_, sig) in root_step.items():
+        grain_of[ref] = sig
 
     metric_items: "list[dict]" = []
     res.swept += len(metrics)
@@ -254,6 +331,7 @@ def sweep(nodes_rows: "list[dict]",
             "ref": ref,
             "content_key": hashlib.sha256(
                 "|".join(keys).encode()).hexdigest()[:16],
+            "grain": grain_of.get(ref, "row"),
         })
 
     by_metric_name: "dict[str, list[dict]]" = {}
@@ -267,6 +345,21 @@ def sweep(nodes_rows: "list[dict]",
                 "catalog", group, blast,
                 f"{blast} linked report(s) across the colliding "
                 "metrics"))
+            flagged_ids.update(g["id"] for g in group)
+
+    # D7 grain shift (ratified 2026-08-25): same claimed name, MIXED
+    # output grain (SELECT DISTINCT vs row-grain) — the "counts
+    # patients vs counts visits" fight, machine-detectable with no
+    # column lexicon. Fires beside the misnomer (the grain is the
+    # DIAGNOSIS of what the divergence does to the numbers).
+    for _fold, group in sorted(by_metric_name.items()):
+        if len(group) > 1 and len({g.get("grain") for g in group}) > 1:
+            blast = sum(reports_of.get(g["ref"], 0) for g in group)
+            res.flags_rows.append(_row(
+                "grain_shift", "metric", group[0]["name"], "CONFLICT",
+                "catalog", group, blast,
+                "mixed output grain under one name (DISTINCT vs "
+                "row-grain) — the numbers answer different questions"))
             flagged_ids.update(g["id"] for g in group)
 
     by_metric_hash: "dict[str, list[dict]]" = {}
@@ -307,6 +400,8 @@ def sweep(nodes_rows: "list[dict]",
 
     all_items = step_items + metric_items
     res.flagged = sum(1 for i in all_items if i["id"] in flagged_ids)
+    res.cluster_nodes_rows, res.cluster_edges_rows = reify_clusters(
+        res.flags_rows)
     res.clean = len(all_items) - res.flagged
     res.assert_conservation()
     return res

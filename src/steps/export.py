@@ -36,21 +36,31 @@ def export_step(nodes_rows: "list[dict]", edges_rows: "list[dict]") -> "dict[str
     # conservation assert stays EXACT: declared exclusions are counted,
     # never absorbed into slack.
     from src.models import EdgeType, NodeLayer
-    decision_nodes = sum(1 for n in nodes.values()
-                         if n.layer == NodeLayer.DECISION)
-    decision_edges = sum(1 for e in edges if e.edge_type in (
+    excluded_nodes = sum(1 for n in nodes.values()
+                         if n.layer in (NodeLayer.DECISION,
+                                        # ADR 0057 governance
+                                        # clusters: served by DIRECT
+                                        # graph queries; the LPG read
+                                        # model gains them only by a
+                                        # future order
+                                        NodeLayer.GOVERNANCE))
+    excluded_edges = sum(1 for e in edges if e.edge_type in (
         EdgeType.STEP_TO_DECISION, EdgeType.DECISION_TO_COLUMN,
         EdgeType.DECISION_TO_STEP,
         # ADR 0053 projection edges: graph_edges-only, same
         # counted-exclusion class as the decision layer
-        EdgeType.TRANSFORM_TO_COLUMN))
-    assert node_total == len(nodes) - decision_nodes, (
-        f"export_step: {len(nodes)} nodes ({decision_nodes} decision-layer "
-        f"excluded) -> {node_total} exported node rows"
+        EdgeType.TRANSFORM_TO_COLUMN,
+        # ADR 0057 governance membership (same class)
+        EdgeType.MEMBER_OF))
+    assert node_total == len(nodes) - excluded_nodes, (
+        f"export_step: {len(nodes)} nodes ({excluded_nodes} "
+        f"decision/governance-layer excluded) -> {node_total} "
+        "exported node rows"
     )
-    assert edge_total == len(edges) - decision_edges, (
-        f"export_step: {len(edges)} edges ({decision_edges} decision-layer "
-        f"excluded) -> {edge_total} exported edge rows"
+    assert edge_total == len(edges) - excluded_edges, (
+        f"export_step: {len(edges)} edges ({excluded_edges} "
+        f"decision/governance-layer excluded) -> {edge_total} "
+        "exported edge rows"
     )
 
     uses_table = derive_uses_table_rows(nodes, edges)

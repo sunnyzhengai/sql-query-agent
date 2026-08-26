@@ -21,7 +21,7 @@ class TestFlagCensus:
         assert {r["kind"] for r in rs.rows} == {"flag"}
         assert "flags disclose, never gate" in rs.universe
         # flag ids are surfaced → retrievable next hop
-        assert s.permitted("flag:misnomer:step:aaa111bbb222")
+        assert s.permitted("cluster:misnomer:step:aaa111bbb222")
 
     def test_flags_plural_normalizes(self):
         s = OpsSession()
@@ -39,15 +39,16 @@ class TestFlagRetrieve:
     def test_full_flag_record_with_members_and_drill(self):
         s = OpsSession()
         op_census("flag", fake_kql, s)
-        rec = op_retrieve(["flag:misnomer:step:aaa111bbb222"],
+        rec = op_retrieve(["cluster:misnomer:step:aaa111bbb222"],
                           fake_kql, s)
         [row] = rec.rows
         assert row["kind"] == "flag"
         assert row["distinct_logics"] == 2
         assert isinstance(row["members"], list) and len(row["members"]) == 2
-        assert "gov_red_flags" in row["drill_query"]
-        # member refs surfaced for the next hop
-        assert s.permitted(REF_A)
+        assert "member_of" in row["drill_query"]
+        # member NODES surfaced for the next hop (graph-native:
+        # cluster members ARE the org nodes — steps here)
+        assert s.permitted(f"transform:{REF_A}:Scores")
 
 
 class TestVerdictStamps:
@@ -57,9 +58,9 @@ class TestVerdictStamps:
         s = OpsSession()
         rs = op_census("metric", fake_kql, s, contains="Scores")
         assert SAMENESS_CAVEAT in rs.note
-        assert "flag:misnomer:step:aaa111bbb222" in rs.note
+        assert "cluster:misnomer:step:aaa111bbb222" in rs.note
         assert "2 distinct logic(s)" in rs.note
-        assert s.permitted("flag:misnomer:step:aaa111bbb222")
+        assert s.permitted("cluster:misnomer:step:aaa111bbb222")
 
     def test_metric_retrieve_stamps_variants_exist(self):
         s = OpsSession()
@@ -67,4 +68,4 @@ class TestVerdictStamps:
         rec = op_retrieve([REF_A], fake_kql, s)
         assert "certified variants exist" in rec.note
         assert "no official is designated yet" in rec.note
-        assert s.permitted("flag:cousin_conflict:metric:ccc333ddd444")
+        assert s.permitted("cluster:cousin_conflict:metric:ccc333ddd444")

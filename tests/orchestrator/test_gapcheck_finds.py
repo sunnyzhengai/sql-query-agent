@@ -120,4 +120,4 @@ class TestGovernanceStampFold:
         assert rec.note.count("certified variants exist") == 1
         assert "1 cousin_conflict flag(s)" in rec.note
         assert "no official is designated yet" in rec.note
-        assert s.permitted("flag:cousin_conflict:metric:ccc333ddd444")
+        assert s.permitted("cluster:cousin_conflict:metric:ccc333ddd444")

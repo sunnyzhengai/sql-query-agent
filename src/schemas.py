@@ -491,7 +491,7 @@ GRAPH_NODES = {
         "600_generate_descriptions", "610_generate_agent_descriptions",
         "900_publish_collibra", "manage_stewards",
         "verify_graph", "data_agent", "700_refresh_search_index",
-        "920_publish_pbi", "320_red_flag_sweep",
+        "920_publish_pbi",
     ],
     "columns": [
         ("node_id", "string", False),
@@ -534,7 +534,7 @@ GRAPH_EDGES = {
     "consumers": [
         "400_build_metric_logic", "800_export_graph_tables", "500_validate",
         "600_generate_descriptions", "900_publish_collibra", "verify_graph",
-        "data_agent", "920_publish_pbi", "320_red_flag_sweep",
+        "data_agent", "920_publish_pbi",
     ],
     "columns": [
         ("source_id", "string", False),
@@ -1374,79 +1374,6 @@ SYNC_LOG = {
     "invariants": [],
 }
 
-GOV_RED_FLAGS = {
-    "table_name": "gov_red_flags",
-    "must_be_nonempty": False,
-    "description": (
-        "ADR 0054 governance red flags: machine-detected contradictions "
-        "between identity claims (names) and normalized parsed logic "
-        "(content hashes) at catalog grain — misnomers (same name, "
-        "divergent hashes), duplicates (same hash, different names), "
-        "cousin conflicts (token-containment name families, divergent "
-        "hashes). Flags DISCLOSE, never gate; plurality is legitimate, "
-        "unlabeled divergence is the debt (KPI: unlabeled -> 0 via "
-        "dispositions, never merges). Every row carries its receipts: "
-        "members with hashes, blast radius with its basis, and the drill "
-        "query (error-contract discipline)."
-    ),
-    "domain": "governance",
-    "status": "active",
-    "owner": {"notebook": "320_red_flag_sweep",
-              "module": "src/steps/red_flag_sweep.py"},
-    "write_mode": "overwrite",
-    "enrichers": [],
-    # reaches the KQL database via OneLake shortcut (like graph_nodes)
-    # — no export notebook reads it; the agent queries it directly
-    "consumers": ["data_agent"],
-    "columns": [
-        ("flag_id", "string", False),
-        ("flag_class", "string", False),
-        ("grain", "string", False),
-        ("identity", "string", False),
-        ("severity", "string", False),
-        ("scope", "string", False),
-        ("member_count", "integer", False),
-        ("distinct_logics", "integer", False),
-        ("members", "string", False),
-        ("members_total", "integer", False),
-        ("blast_radius", "integer", False),
-        ("blast_basis", "string", False),
-        ("drill_query", "string", False),
-        ("disposition", "string", False),
-        ("disposition_reason", "string", True),
-        ("run_at", "string", True),
-    ],
-    "column_descriptions": {
-        "flag_id": "Deterministic id: flag:<class>:<grain>:<hash> (spec:E2 replayable)",
-        "flag_class": "misnomer | duplicate | cousin_conflict",
-        "grain": "step | metric",
-        "identity": "The claimed name (or name set) the flag is about",
-        "severity": ("INFO (proc-local / aligned) | CONFLICT (shared "
-                     "scope, divergent) — RATIFIED boundaries, ADR 0054"),
-        "scope": "proc-local | catalog",
-        "member_count": "Items in the flag group",
-        "distinct_logics": "Distinct content hashes across members",
-        "members": "JSON members [{id, name, ref, content_key}] (first 50)",
-        "members_total": "True member count before the 50-row cap",
-        "blast_radius": "Reach of the collision (see blast_basis)",
-        "blast_basis": "What blast_radius counts — stated, never bare",
-        "drill_query": "KQL that reproduces this flag's members",
-        "disposition": "open | certify | label-variant | retire | accept",
-        "disposition_reason": "MANDATORY on accept/retire (RATIFIED)",
-        "run_at": "Sweep run timestamp (ISO)",
-    },
-    "invariants": [
-        {"kind": "unique", "columns": ["flag_id"]},
-        {"kind": "allowed_values", "column": "flag_class",
-         "values": ["misnomer", "duplicate", "cousin_conflict"]},
-        {"kind": "allowed_values", "column": "severity",
-         "values": ["INFO", "CONFLICT"]},
-        {"kind": "allowed_values", "column": "disposition",
-         "values": ["open", "certify", "label-variant", "retire",
-                    "accept"]},
-    ],
-}
-
 GOV_FLAG_DISPOSITIONS = {
     "table_name": "gov_flag_dispositions",
     "optional_input": True,
@@ -1454,20 +1381,22 @@ GOV_FLAG_DISPOSITIONS = {
                     "plan-confirm write surface (ADR 0050); absence "
                     "means no steward has ruled yet"),
     "description": (
-        "APPEND-ONLY disposition events over gov_red_flags (ADR 0023 "
-        "discipline): certify (official-for-scope), label-variant "
-        "(variant_of link), retire (supersedes/duplicate_of links), "
-        "accept (closed, never re-flagged). Reason MANDATORY on "
-        "accept/retire (RATIFIED 2026-08-23). 320_red_flag_sweep folds "
-        "the event log into flag states on every run, so reruns preserve "
+        "APPEND-ONLY disposition events over the governance clusters "
+        "(ADR 0023 discipline; ADR 0057 — the clusters live as "
+        "GOVERNANCE-layer nodes in graph_nodes): certify "
+        "(official-for-scope), label-variant (variant_of link), retire "
+        "(supersedes/duplicate_of links), accept (closed, never "
+        "re-flagged). Reason MANDATORY on accept/retire (RATIFIED "
+        "2026-08-23). 300_build_graph folds the event log into the "
+        "cluster node properties on every run, so reruns preserve "
         "steward acts while re-deriving flags from current logic."
     ),
     "domain": "governance",
     "status": "planned",
     "notes": (
-        "Reader (320_red_flag_sweep) is live; the WRITER is the "
-        "plan-confirm steward surface (ADR 0050 floors) — wire before "
-        "flipping active."
+        "Reader (300_build_graph, the folded sweep) is live; the "
+        "WRITER is the plan-confirm steward surface (ADR 0050 floors) "
+        "— wire before flipping active."
     ),
     "columns": [
         ("event_at", "string", False),
@@ -2494,7 +2423,7 @@ TABLE_REGISTRY = {
         # governance lifecycle contract drafts (ADRs 0021-0024)
         CERTIFICATION_EVENTS, USAGE_EVENTS, PERSONAL_DEFINITIONS,
         # governance red flags (ADR 0054)
-        GOV_RED_FLAGS, GOV_FLAG_DISPOSITIONS,
+        GOV_FLAG_DISPOSITIONS,
         # PHI scanning + error lineage contract drafts (ADRs 0025-0026)
         PHI_FINDINGS, RUNTIME_ERROR_EVENTS,
         # business-friendly names (planned writer; readers live)

@@ -18,14 +18,12 @@ from src.parser.identity import fold_identifier
 from src.parser.sql_parser import parse_sql
 from src.shapes.generator import dict_rows, generate, metric_name_rows
 from src.steps.build_graph import BuildGraphOutput, build_graph_step
-from src.steps.red_flag_sweep import RedFlagSweepOutput, red_flag_sweep_step
 
 
 @dataclass
 class CorpusRun:
     parse_rows: "list[dict]"
-    build: BuildGraphOutput
-    sweep: RedFlagSweepOutput
+    build: BuildGraphOutput      # sweep folded in (ADR 0057)
     files: "dict[str, str]"
     manifest: dict
     parse_failures: "list[tuple[str, str]]" = field(default_factory=list)
@@ -68,20 +66,21 @@ def run_corpus(palette: dict) -> CorpusRun:
                                  f"UNCLASSIFIED:{type(e).__name__}")))
     tables, columns = dict_rows(palette)
     build = build_graph_step(parse_rows, tables, columns,
-                             metric_name_records=metric_name_rows(palette))
-    sweep = red_flag_sweep_step(build.nodes_rows, build.edges_rows,
-                                run_at="shape-corpus")
-    return CorpusRun(parse_rows=parse_rows, build=build, sweep=sweep,
+                             metric_name_records=metric_name_rows(palette),
+                             sweep_run_at="shape-corpus")
+    return CorpusRun(parse_rows=parse_rows, build=build,
                      files=files, manifest=manifest,
                      parse_failures=failures)
 
 
 # ---------------------------------------------------------------------
-# expectation checks
+# expectation checks — the GRAPH is the sole flag truth (ADR 0057),
+# so every flag expectation ALSO asserts its reified cluster node
+# and membership edges: this checker is the migration gate.
 
 
 def _flags_by(run: CorpusRun) -> "list[dict]":
-    return run.sweep.flags_rows
+    return run.build.flags_rows
 
 
 def _edges(run: CorpusRun) -> "list[dict]":
@@ -145,6 +144,30 @@ def check_cell(cell: dict, run: CorpusRun) -> CellResult:
             fails.append(f"{f['identity'] or 'duplicate'}: "
                          f"distinct_logics {r['distinct_logics']} != "
                          f"expected {f['distinct_logics']}")
+        # ADR 0057 migration gate: the verdict must exist as a
+        # reified cluster NODE with its logic_group structure and
+        # membership edges — the graph is the sole flag truth
+        cid = r["flag_id"]
+        node_ids = {str(n["node_id"]) for n in run.build.nodes_rows}
+        if cid not in node_ids:
+            fails.append(f"{cid}: flag has NO cluster node — the "
+                         "graph is not carrying the verdict")
+        else:
+            groups = [e for e in run.build.edges_rows
+                      if e["edge_type"] == "member_of"
+                      and e["target_id"] == cid]
+            if len(groups) != r["distinct_logics"]:
+                fails.append(
+                    f"{cid}: {len(groups)} logic_group edge(s) != "
+                    f"{r['distinct_logics']} distinct logics")
+            member_edges = [
+                e for e in run.build.edges_rows
+                if e["edge_type"] == "member_of"
+                and e["target_id"] in {g["source_id"] for g in groups}]
+            if len(member_edges) != r["member_count"]:
+                fails.append(
+                    f"{cid}: {len(member_edges)} member edge(s) != "
+                    f"{r['member_count']} members")
 
     for identity in exp.get("absent_flag_identities", []):
         hit = [r for r in flags

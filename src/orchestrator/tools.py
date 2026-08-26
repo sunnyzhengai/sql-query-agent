@@ -407,37 +407,91 @@ def find_by_name(name: str, run_kql, session: Session) -> dict:
 
 CATALOG_KINDS = ("metric", "step", "term", "report", "measure", "flag")
 
-# ADR 0054 flag surface (walk W8 → build order 2026-08-23): the sweep's
-# verdicts as single-row machine reads (ADR 0020) — sameness/identity
-# questions stop being per-question vigilance. The queries fail with a
-# named remediation while the store predates the sweep export.
+# ADR 0054 flag surface, GRAPH-NATIVE (ADR 0057 "Clusters are
+# nodes", Sunny's demo law 2026-08-25): the sweep's verdicts are
+# reified GOVERNANCE-layer cluster nodes with member_of edges —
+# census/retrieve TRAVERSE; the gov_red_flags side table is retired.
+_CLUSTER_PROJECT = (
+    "| extend p = todynamic(properties)\n"
+    "| project flag_id = node_id,\n"
+    "          flag_class = tostring(p.flag_class),\n"
+    "          grain = tostring(p.grain),\n"
+    "          identity = tostring(p.identity),\n"
+    "          severity = tostring(p.severity),\n"
+    "          scope = tostring(p.scope),\n"
+    "          member_count = toint(p.member_count),\n"
+    "          distinct_logics = toint(p.distinct_logics),\n"
+    "          blast_radius = toint(p.blast_radius),\n"
+    "          blast_basis = tostring(p.blast_basis),\n"
+    "          disposition = tostring(p.disposition),\n"
+    "          disposition_reason = tostring(p.disposition_reason),\n"
+    "          drill_query = tostring(p.drill_query)\n"
+)
+
 GOV_FLAGS_QUERY = (
-    "gov_red_flags\n"
-    "| project flag_id, flag_class, grain, identity, severity, scope,\n"
-    "          member_count, distinct_logics, blast_radius, blast_basis,\n"
-    "          disposition\n"
-    "| order by severity asc, flag_class asc, identity asc"
+    "graph_nodes\n"
+    "| where node_id startswith 'cluster:'\n"
+    + _CLUSTER_PROJECT
+    + "| order by severity asc, flag_class asc, identity asc"
 )
 
 GOV_FLAG_BY_ID_QUERY = (
     "declare query_parameters(p_id:string);\n"
-    "gov_red_flags\n"
-    "| where flag_id == p_id"
+    "graph_nodes\n"
+    "| where node_id == p_id\n"
+    + _CLUSTER_PROJECT
+)
+
+# member rows of one cluster: cluster <- logic_group <- org node
+GOV_FLAG_MEMBERS_QUERY = (
+    "declare query_parameters(p_id:string);\n"
+    "graph_edges\n"
+    "| where edge_type == 'member_of' and target_id == p_id\n"
+    "| project group_id = source_id\n"
+    "| join kind=inner (graph_edges\n"
+    "    | where edge_type == 'member_of'\n"
+    "    | project member_id = source_id, group_id = target_id)\n"
+    "    on group_id\n"
+    "| join kind=inner (graph_nodes\n"
+    "    | project group_id = node_id, gprops = properties)\n"
+    "    on group_id\n"
+    "| join kind=inner (graph_nodes\n"
+    "    | project member_id = node_id, member_name = name)\n"
+    "    on member_id\n"
+    "| project member_id, member_name,\n"
+    "          content_key = tostring(todynamic(gprops).content_key)\n"
+    "| order by member_id asc"
 )
 
 GOV_FLAGS_BY_IDENTITY_QUERY = (
     "declare query_parameters(p_identity:string, p_grain:string);\n"
-    "gov_red_flags\n"
-    "| where grain == p_grain and identity =~ p_identity\n"
+    "graph_nodes\n"
+    "| where node_id startswith 'cluster:'\n"
+    + _CLUSTER_PROJECT
+    + "| where grain == p_grain and identity =~ p_identity\n"
     "| project flag_id, flag_class, severity, member_count,\n"
     "          distinct_logics, disposition"
 )
 
 GOV_FLAGS_FOR_MEMBER_QUERY = (
     "declare query_parameters(p_ref:string);\n"
-    "gov_red_flags\n"
-    "| where grain == 'metric' and members contains p_ref\n"
-    "| project flag_id, flag_class, severity, identity, disposition"
+    "graph_edges\n"
+    "| where edge_type == 'member_of'\n"
+    "    and source_id == strcat('canonical:', p_ref)\n"
+    "| project group_id = target_id\n"
+    "| join kind=inner (graph_edges\n"
+    "    | where edge_type == 'member_of'\n"
+    "    | project group_id = source_id, cluster_id = target_id)\n"
+    "    on group_id\n"
+    "| distinct cluster_id\n"
+    "| join kind=inner (graph_nodes\n"
+    "    | project cluster_id = node_id, properties) on cluster_id\n"
+    "| extend p = todynamic(properties)\n"
+    "| project flag_id = cluster_id,\n"
+    "          flag_class = tostring(p.flag_class),\n"
+    "          severity = tostring(p.severity),\n"
+    "          identity = tostring(p.identity),\n"
+    "          disposition = tostring(p.disposition)"
 )
 
 

@@ -128,6 +128,12 @@ def export_edge_tables(edges: list[GraphEdge]) -> dict[str, list[dict]]:
         # graph_edges; the Fabric Graph read model gains them with
         # the 0046 engine (same exclusion class as decision edges)
         EdgeType.TRANSFORM_TO_COLUMN,
+        # Governance membership (ADR 0057): the flag surface is served
+        # by DIRECT graph_nodes/graph_edges queries (census/retrieve
+        # traversal + the agent's lakehouse SQL); the LPG read model
+        # gains cluster node types only by a future order — recorded
+        # exclusion, never a silent drop.
+        EdgeType.MEMBER_OF,
     }
 
     result: dict[str, list[dict]] = {name: [] for name in table_map.values()}

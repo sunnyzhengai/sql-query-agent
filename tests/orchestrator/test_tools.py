@@ -16,6 +16,7 @@ from src.orchestrator.tools import (
     DECISIONS_OF_STEP_QUERY,
     FIND_BY_NAME_QUERY,
     GOV_FLAG_BY_ID_QUERY,
+    GOV_FLAG_MEMBERS_QUERY,
     GOV_FLAGS_BY_IDENTITY_QUERY,
     GOV_FLAGS_FOR_MEMBER_QUERY,
     GOV_FLAGS_QUERY,
@@ -71,7 +72,7 @@ FRAGMENTS = {
 # shared by both procs) and one metric-grain cousin flag whose members
 # include REF_A
 FAKE_FLAGS = [
-    {"flag_id": "flag:misnomer:step:aaa111bbb222",
+    {"flag_id": "cluster:misnomer:step:aaa111bbb222",
      "flag_class": "misnomer", "grain": "step", "identity": "Scores",
      "severity": "INFO", "scope": "proc-local", "member_count": 2,
      "distinct_logics": 2,
@@ -82,10 +83,11 @@ FAKE_FLAGS = [
           "content_key": "k2"}]),
      "members_total": 2, "blast_radius": 2,
      "blast_basis": "2 parent metric(s) share the step name",
-     "drill_query": "gov_red_flags | where flag_id == "
-                    "'flag:misnomer:step:aaa111bbb222'",
+     "drill_query": "graph_edges | where target_id == "
+                    "'cluster:misnomer:step:aaa111bbb222' "
+                    "and edge_type == 'member_of'",
      "disposition": "open", "disposition_reason": "", "run_at": ""},
-    {"flag_id": "flag:cousin_conflict:metric:ccc333ddd444",
+    {"flag_id": "cluster:cousin_conflict:metric:ccc333ddd444",
      "flag_class": "cousin_conflict", "grain": "metric",
      "identity": "ED Sepsis Screening", "severity": "CONFLICT",
      "scope": "catalog", "member_count": 2, "distinct_logics": 2,
@@ -96,8 +98,9 @@ FAKE_FLAGS = [
           "content_key": "m2"}]),
      "members_total": 2, "blast_radius": 0,
      "blast_basis": "0 linked report(s) across the name family",
-     "drill_query": "gov_red_flags | where flag_id == "
-                    "'flag:cousin_conflict:metric:ccc333ddd444'",
+     "drill_query": "graph_edges | where target_id == "
+                    "'cluster:cousin_conflict:metric:ccc333ddd444' "
+                    "and edge_type == 'member_of'",
      "disposition": "open", "disposition_reason": "", "run_at": ""},
 ]
 
@@ -228,10 +231,23 @@ def fake_kql(query, params):
             ]
         return []
     if query == GOV_FLAGS_QUERY:
-        return list(FAKE_FLAGS)
+        return [dict(f) for f in FAKE_FLAGS]
     if query == GOV_FLAG_BY_ID_QUERY:
         return [dict(f) for f in FAKE_FLAGS
                 if f["flag_id"] == params["p_id"]]
+    if query == GOV_FLAG_MEMBERS_QUERY:
+        # graph-native member traversal (ADR 0057): org node ->
+        # logic_group -> cluster, flattened as the query projects it
+        for f in FAKE_FLAGS:
+            if f["flag_id"] == params["p_id"]:
+                return [{"member_id": (m["id"]
+                                       if str(m["id"]).startswith(
+                                           "transform:")
+                                       else f"canonical:{m['id']}"),
+                         "member_name": m["name"],
+                         "content_key": m["content_key"]}
+                        for m in json.loads(f["members"])]
+        return []
     if query == GOV_FLAGS_BY_IDENTITY_QUERY:
         return [dict(f) for f in FAKE_FLAGS
                 if f["grain"] == params["p_grain"]
