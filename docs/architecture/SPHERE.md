@@ -125,6 +125,25 @@ violations — the one place wrongness exists). Detection machinery
 identical under both framings; internal table names unchanged; the
 reframe lands at the 0056 build.
 
+## Clusters are nodes (Sunny's ruling, 2026-08-25)
+
+Shapes live IN the graph as REIFIED CLUSTER NODES with membership
+edges — never pairwise edges (N-member clusters explode O(N²) and
+give dispositions no home), never labels alone (no addressable
+noun). Structure: name_cluster node → logic_group nodes (the
+content-hash partition — identical in shape to the compare verdict)
+→ member_of edges. Dispositions, certifications, and 0056 testimony
+attach to cluster/group nodes as asserted edges; the governance
+stamps become real one-hop edges; census/retrieve traverse instead
+of searching a side table. Detection stays DETERMINISTIC
+(fold-name, content-hash, token containment, materialized closures
+— never stochastic clustering; M4/E2 hold). Migration: the
+gov_red_flags table is a serialized cluster set — right design,
+wrong residence; it stays authoritative THROUGH THE DEMO, then at
+the 0056 build clusters go graph-native and the table flips to a
+projection (the contracts-split authority-flip pattern). Cluster
+nodes get 0052 registry rows like every payload.
+
 ## The formal guarantee (SPEC amendment authorized by ADR 0057)
 
 Three legs:
