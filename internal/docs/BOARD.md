@@ -1,0 +1,78 @@
+# THE BOARD — living checklist (both sessions update ON EVERY STATE CHANGE)
+
+**Rule:** the moment a task changes state, the session that saw it
+change updates this file (handoff-verdicts law applied to status).
+Detail lives in the linked handoffs; this file stays short.
+Last touched: 2026-08-27, review session.
+
+## 🎯 THE CRITICAL PATH → demo capture
+
+- [ ] **Fused build** (dev, IN PROGRESS — HANDOFF_0055_BUILD):
+  - [ ] payload 1 — palette v2 (shapes v2, legos, U1–U12, D7)
+  - [~] payload 2 — graph-native clusters + 300 fold + consumer
+        census (0059 live leg green 1.58.1; RESULTS v2 pending)
+  - [ ] payload 3 — Diabetes Registry Dashboard (git items,
+        description EMPTY)
+- [ ] Sunny: Publish click + dashboard render check (after dev's
+      runbook tail)
+- [ ] Tenant load of the shape store (_shapes profile)
+- [ ] Re-walk on the diabetic corpus (incl. section B vs B3,
+      section I flags; suite transcript may cover part)
+- [ ] Script refresh (review session — workbench-only, candidate
+      phrases, Fang's impact-analysis framing)
+- [ ] CAPTURE
+
+## 🔧 DEV QUEUE (behind the fused build, in order)
+
+- [ ] B3 step dep-chains (green-lit; registry text stale)
+- [ ] TEST_MAP.md generated + freshness CI
+- [ ] Suite transcript artifact (question → answer → verdict per run)
+- [ ] Ops finds status REPORT NEEDED: shortcut create-then-verify /
+      org_config referential integrity / probe-eh rename — built?
+- [ ] Finder-coverage contract (timing = Sunny's call; drilldown
+      benefit if pre-capture)
+- [ ] 0056 decision layer + presentation reframe (POST-capture by
+      ruling; incl. every-round decision UI, cluster-table
+      retirement census outcome)
+
+## 👩‍⚕️ SUNNY'S OPEN DECISIONS (no deadline pressure)
+
+- [ ] ADR 0058 self-service contracts: ratify + 2 sub-calls
+      (parameter-range depth; quarantine release authority)
+- [ ] Tier naming (listing-copy time; seeds recorded in
+      PRODUCT_PICTURE)
+- [ ] Reviewer deck (themes recorded; thinking)
+- [ ] Finder-coverage timing (pre- vs post-capture)
+- [ ] Purview/Collibra write-back tier placement (PRODUCT_PICTURE
+      open item)
+
+## 🔍 REVIEW SESSION'S ITEMS
+
+- [ ] Verify dev's fused-build report (gates + gapcheck v2 + demo
+      note) when it lands
+- [ ] Script refresh (blocked on re-walk)
+- [ ] W10 refusal-posture design (standing, M4-hard)
+- [ ] M2 decision-evidence design (standing; finder-coverage may be
+      the lever)
+
+## 🅿️ PARKED DIRECTIONS (recorded, unordered)
+
+- Semantic cloud / domain clusters (deterministic only)
+- Graph visualization (first step: shape-corpus render, 140 nodes)
+- Predicate-grain decision clusters (use-pulled)
+- Updater-as-product; FDE agent (post-demo strategy)
+- Pilot cohort program (post-demo, pre-Marketplace)
+
+## ✅ SHIPPED (recent milestones, newest first)
+
+- [x] 0059 topology axioms ratified + live leg green (08-26/27)
+- [x] Sphere + ADR 0057 (ownership economy, contracts split,
+      presentation doctrine, clusters-are-nodes) (08-25/26)
+- [x] ADR 0055 shape corpus, 26/26 cells + diabetic scenarios
+      confirmed (08-24/25)
+- [x] ADR 0054 governance sweep LIVE end-to-end; original corpse
+      question answered by machine verdict (08-23/24)
+- [x] Round 4 closed: 13/13 vs 8/13; claim set approved (08-22/23)
+- [x] Walk 1562 + caption batch + W12/W13 fixes + engine smoke
+      (08-23/24)
+- [x] Echo Law (build-first) + demo law + slogan book (08-23→26)
