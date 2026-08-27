@@ -119,41 +119,44 @@ def main() -> None:
                  + ("; ".join(bits) or "structural expectations")
                  + f" — files: {', '.join(c['files'])}")
     L.append("")
-    L.append("## DEMO NOTE — the 3 most demoable cells")
+    L.append("## DEMO NOTE v2 — the 3 most demoable cells "
+             "(per SHAPES_SCENARIOS)")
     L.append("")
-    L.append("1. **M1 — the Active Diabetic Patients conflict** "
-             "(same business name, two schemas, genuinely different "
-             "logic — the classic silent disagreement).")
-    L.append("   Ask: *\"Are the two Active Diabetic Patients "
+    L.append("1. **U9 — codeset drift, 80 vs 81 codes** (the "
+             "meaning-leads-code seed; the ONE cell where "
+             "right-vs-wrong exists).")
+    L.append("   Ask: *\"Are the two Diabetic Cohort (Codeset) "
              "definitions the same?\"*")
-    L.append("   Expect on screen: compare partition with **2 hash "
-             "groups — logic DIFFERS** (W15 stamp), plus the metric "
-             "misnomer CONFLICT flag naming both members; caption "
-             "must echo \"differs\" (gate-enforced).")
-    L.append("2. **M2 — the Diabetes Registry (Legacy v1) cousin** "
-             "(the drift beat, estate-wide).")
-    L.append("   Ask: *\"What governance red flags exist for the "
-             "Diabetes Registry?\"*")
-    L.append("   Expect: the cousin_conflict CONFLICT flag row — 2 "
-             "members, 2 distinct logics, no official designated; "
-             "\"how is Diabetes Registry defined\" stamps "
-             "certified-variants-exist.")
-    L.append("3. **S4 — the Base_Cohort misnomer** (same CTE name in "
-             "two procs, materially different populations — the "
-             "Base_Pop story on a plantable corpus).")
-    L.append("   Ask: *\"Are all definitions of Base_Cohort the "
-             "same?\"*")
-    L.append("   Expect: the step-name universe stamp (\"2 procs "
-             "have a step NAMED 'Base_Cohort' — a name match is not "
-             "logic sameness\") carrying the recorded misnomer flag "
-             "(INFO, 2 logics); compare shows the dx-path vs "
-             "lab-path diff.")
+    L.append("   Expect: compare — **2 hash groups, logic DIFFERS** "
+             "(gate-enforced echo); the diff pinpoints the missing "
+             "81st code (E11.80); misnomer CONFLICT cluster with "
+             "both members. Canonical act: REPAIR (routed by the "
+             "deny grounds — the one flag that is a bug, not a "
+             "purpose).")
+    L.append("2. **U6/PD1 — the billing-vs-clinical cohort fight** "
+             "(path divergence at its sharpest, estate-wide).")
+    L.append("   Ask: *\"What governance red flags exist for "
+             "Diabetic Patients?\"*")
+    L.append("   Expect: the cousin_conflict CONFLICT cluster — "
+             "**10 members, 10 distinct logics** (dx / lab / billing "
+             "/ gestational incl+excl / ED utilization / no-show "
+             "panel …), each a legitimate persona path; no official "
+             "designated. Canonical act: DIFFERENTIATE — labeled "
+             "variants, officials per scope; \"the sweep doesn't "
+             "find errors; it finds unlabeled purposes.\"")
+    L.append("3. **U12 — the grain fight** (D7, ratified): one name, "
+             "patients vs visits.")
+    L.append("   Ask: *\"Are the two High ED Utilizers definitions "
+             "the same?\"*")
+    L.append("   Expect: the **grain_shift CONFLICT** flag — mixed "
+             "output grain under one name (DISTINCT vs row-grain — "
+             "\"the numbers answer different questions\") beside "
+             "the misnomer; compare DIFFERS.")
     L.append("")
-    L.append("Each is falsifiable on camera: the sins were PLANTED "
-             "with their oracles, so \"it found exactly these\" is a "
-             "checkable claim, not a vibe. (Demo-switch mechanism + "
-             "tenant load: PARKED for Sunny — see the handoff "
-             "RESULTS.)")
+    L.append("Every sin was PLANTED with its oracle — \"it found "
+             "exactly these\" is a checkable claim. Tenant load of "
+             "the shape corpus (the demo-switch profile) remains "
+             "PARKED for Sunny.")
     OUT.write_text("\n".join(L) + "\n")
     print(f"wrote {OUT} — {len(inst)} instantiated "
           f"({len(inst) - len(failing)} pass), {len(excl)} excluded")

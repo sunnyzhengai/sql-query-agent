@@ -1410,7 +1410,7 @@ GOV_FLAG_DISPOSITIONS = {
     ],
     "column_descriptions": {
         "event_at": "Event timestamp (ISO); fold order",
-        "flag_id": "The gov_red_flags flag this ruling addresses",
+        "flag_id": "The governance cluster node this ruling addresses",
         "kind": "certify | label-variant | retire | accept",
         "member": "The member ref the ruling addresses (variant/retiree/official-designate)",
         "official": "The official counterpart for variant/retire links",

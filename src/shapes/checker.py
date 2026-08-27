@@ -16,7 +16,12 @@ from dataclasses import dataclass, field
 from src.graph.serialization import parsed_sql_to_parse_result_row
 from src.parser.identity import fold_identifier
 from src.parser.sql_parser import parse_sql
-from src.shapes.generator import dict_rows, generate, metric_name_rows
+from src.shapes.generator import (
+    dict_rows,
+    generate,
+    metric_name_rows,
+    steward_rows,
+)
 from src.steps.build_graph import BuildGraphOutput, build_graph_step
 
 
@@ -66,6 +71,7 @@ def run_corpus(palette: dict) -> CorpusRun:
                                  f"UNCLASSIFIED:{type(e).__name__}")))
     tables, columns = dict_rows(palette)
     build = build_graph_step(parse_rows, tables, columns,
+                             steward_records=steward_rows(palette),
                              metric_name_records=metric_name_rows(palette),
                              sweep_run_at="shape-corpus")
     return CorpusRun(parse_rows=parse_rows, build=build,
@@ -110,6 +116,34 @@ def _metric_keys(run: CorpusRun, metric_id: str) -> "tuple":
     ordered = [k for _, k in sorted(keys)]
     return (hashlib.sha256("|".join(ordered).encode()).hexdigest()[:16]
             if ordered else "")
+
+
+def _step_key(run: CorpusRun, metric_id: str,
+              step_name: str) -> "str | None":
+    from src.orchestrator.tools import _content_key
+    prefix = f"transform:{metric_id}:"
+    for n in run.build.nodes_rows:
+        nid = str(n["node_id"])
+        if nid.startswith(prefix) and _fold(
+                nid[len(prefix):]) == _fold(step_name):
+            props = n.get("properties")
+            if isinstance(props, str):
+                props = json.loads(props or "{}")
+            frag = str((props or {}).get("sql_fragment") or "")
+            return _content_key(frag) if frag.strip() else None
+    return None
+
+
+def _metric_fragments(run: CorpusRun, metric_id: str) -> str:
+    prefix = f"transform:{metric_id}:"
+    frags = []
+    for n in run.build.nodes_rows:
+        if str(n["node_id"]).startswith(prefix):
+            props = n.get("properties")
+            if isinstance(props, str):
+                props = json.loads(props or "{}")
+            frags.append(str((props or {}).get("sql_fragment") or ""))
+    return "\n".join(frags)
 
 
 def check_cell(cell: dict, run: CorpusRun) -> CellResult:
@@ -265,6 +299,51 @@ def check_cell(cell: dict, run: CorpusRun) -> CellResult:
         if actual != c["verdict"]:
             fails.append(f"compare {c['a']} vs {c['b']}: {actual} != "
                          f"expected {c['verdict']}")
+
+    if exp.get("shared_step_core"):
+        # Extension (derive): the named step's content key must match
+        # across the pair — reuse INSIDE divergence
+        sc = exp["shared_step_core"]
+        keys = set()
+        for mid_ in sc["metrics"]:
+            key = _step_key(run, mid_, sc["name"])
+            if key is None:
+                fails.append(f"shared core: {mid_} has no step "
+                             f"{sc['name']!r} with a fragment")
+            else:
+                keys.add(key)
+        if len(keys) > 1:
+            fails.append(f"shared core {sc['name']!r}: content keys "
+                         "diverge — the extension lost its base")
+
+    if exp.get("diff_pinpoints"):
+        # Codeset drift (repair): the diff between the two metrics'
+        # logic must contain the drifted token — in exactly one side
+        dp = exp["diff_pinpoints"]
+        frags = [_metric_fragments(run, m) for m in dp["metrics"]]
+        holds = [dp["token"] in f for f in frags]
+        if sum(holds) != 1:
+            fails.append(
+                f"drift token {dp['token']!r} in {sum(holds)} of "
+                f"{len(frags)} members — the diff cannot pinpoint it")
+
+    outcome = exp.get("canonical_outcome")
+    if outcome:
+        # the canonical tie-in: validate the outcome's structural
+        # signature where the cell carries one (annotation otherwise)
+        if outcome == "consolidate" and not any(
+                f["flag_class"] == "duplicate"
+                for f in exp.get("flags", [])):
+            fails.append("consolidate outcome without a duplicate "
+                         "flag expectation")
+        if outcome == "link" and not any(
+                f["flag_class"] == "cousin_conflict"
+                for f in exp.get("flags", [])):
+            fails.append("link outcome without a cousin expectation")
+        if outcome == "repair" and not exp.get("diff_pinpoints"):
+            fails.append("repair outcome without a pinpointing diff")
+        if outcome == "derive" and not exp.get("shared_step_core"):
+            fails.append("derive outcome without a shared step core")
 
     return CellResult(cell["cell_id"], "instantiated", not fails,
                       details=fails)

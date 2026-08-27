@@ -245,7 +245,9 @@ FIXTURES = [
     # the acceptance run happens after Sunny's rerun).
     {"family": "flags",
      "question": "what governance red flags exist?",
-     "oracle": "flag_census", "requires_table": "gov_red_flags",
+     "oracle": "flag_census",
+     "requires_probe": "graph_nodes | where node_id startswith "
+                       "'cluster:' | count",
      "max_rounds": 2, "expected_kind": "answered"},
     # W15 (gap-check corpse 2026-08-24, PRE-CAPTURE): the caption
     # inverted a displayed 2-group partition ("aligned"). Graded on
@@ -476,12 +478,16 @@ def build_oracle(fixture: dict, run_kql) -> dict:
         return {"required_any": [["differ", "not identical"]],
                 "forbidden": []}
     if kind == "flag_census":
-        # ADR 0054: the exact flag count plus at least one recorded
-        # class word — both from the store, no hardcoded answers.
+        # ADR 0054/0057 (graph-native): the exact cluster count plus
+        # at least one recorded class word — both from the store, no
+        # hardcoded answers.
         rows = list(run_kql(
-            "gov_red_flags | summarize n=count() by flag_class", {}))
+            "graph_nodes | where node_id startswith 'cluster:' "
+            "| extend p = todynamic(properties) "
+            "| summarize n=count() by "
+            "flag_class = tostring(p.flag_class)", {}))
         total = sum(int(r.get("n") or 0) for r in rows)
-        assert total, "oracle: gov_red_flags is empty"
+        assert total, "oracle: no governance cluster nodes in store"
         classes = sorted(str(r.get("flag_class")) for r in rows)
         return {"required_any": [[str(total)], classes],
                 "forbidden": []}
@@ -733,13 +739,18 @@ def main() -> None:
         # without — SKIP is disclosed, never silent, and the family
         # prints as pending so the board can't read as covered.
         req = fixture.get("requires_table")
-        if req:
+        probe = (fixture.get("requires_probe")
+                 or (f"{req} | count" if req else None))
+        if probe:
             try:
-                run_kql(f"{req} | count", {})
+                rows_p = run_kql(probe, {})
+                if not rows_p or not int(
+                        rows_p[0].get("Count", 1) or 0):
+                    raise ValueError("probe empty")
             except Exception:                   # noqa: BLE001 — absent
-                print(f"[{fixture['family']}] SKIPPED — required table "
-                      f"{req!r} not in the store yet (pending the "
-                      "pipeline run that writes it)")
+                print(f"[{fixture['family']}] SKIPPED — required "
+                      f"surface absent ({probe[:60]}…) — pending the "
+                      "pipeline run that writes it")
                 continue
         try:
             oracle = build_oracle(fixture, run_kql)

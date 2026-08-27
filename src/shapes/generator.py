@@ -52,6 +52,28 @@ def metric_name_rows(palette: dict) -> "list[dict]":
     return sorted(rows, key=lambda r: r["metric_id"])
 
 
+def steward_rows(palette: dict) -> "list[dict]":
+    """Personas as METADATA only (scenarios ruling): steward columns,
+    no auth — Dr. Peterson, Dr. Sullivan, the ED medical director,
+    OBGyn, Finance, Quality & Registry."""
+    rows = []
+    for m in palette["metrics"].values():
+        if m.get("steward"):
+            rows.append({"metric_id": f"{m['schema']}.{m['proc']}",
+                         "metric_name": m["proc"],
+                         "steward_name": m["steward"],
+                         "steward_email": "", "department": "",
+                         "assigned_date": "2026-08-25",
+                         "assigned_by": "shape_corpus"})
+    return sorted(rows, key=lambda r: r["metric_id"])
+
+
+def drift_codes(n: int) -> "list[str]":
+    """The U9 codeset: deterministic ICD-shaped codes E11.00.. —
+    80 vs 81 is the ratified drift (the 81st code story)."""
+    return [f"E11.{i:02d}" for i in range(n)]
+
+
 # ---------------------------------------------------------------------
 # SQL building blocks — every identifier arrives via the palette
 
@@ -269,6 +291,139 @@ def generate(palette: dict) -> "tuple[dict[str, str], dict]":
         f"  WHERE P.PATIENT_NAME = {palette['phi_literal']}\n)\n"
         "SELECT * FROM Phi_Filter;\nEND\n")
 
+    # -- palette v2: the lego scenarios (U1–U12, SHAPES_SCENARIOS
+    # confirmed in full by Sunny 2026-08-25) ---------------------------
+    pcp_base = (
+        "Base_Cohort AS (\n"
+        "  SELECT DISTINCT E.PATIENT_ID\n"
+        "  FROM ENCOUNTERS E\n"
+        "  JOIN ENCOUNTER_DIAGNOSIS ED "
+        "ON ED.ENCOUNTER_ID = E.ENCOUNTER_ID\n"
+        "  JOIN DIAGNOSIS_CODESET DC ON DC.DX_CODE = ED.DX_CODE\n"
+        "  WHERE ED.DX_CODE LIKE 'E11%'\n"
+        ")")
+    put("pcp_root", [pcp_base], "Base_Cohort")
+    put("u1_noshow", [
+        pcp_base,
+        ("Missed_Appts AS (\n"
+         "  SELECT BC.PATIENT_ID\n  FROM Base_Cohort BC\n"
+         "  JOIN APPOINTMENTS A ON A.PATIENT_ID = BC.PATIENT_ID\n"
+         "  WHERE A.APPT_STATUS IN ('cancelled', 'no-show')\n)"),
+    ], "Missed_Appts")
+    put("u2_ed_overlap", [
+        pcp_base,
+        ("ED_Symptom_Visits AS (\n"
+         "  SELECT BC.PATIENT_ID\n  FROM Base_Cohort BC\n"
+         "  JOIN HOSPITAL_ENCOUNTERS HE "
+         "ON HE.PATIENT_ID = BC.PATIENT_ID\n"
+         "  JOIN HOSPITAL_DIAGNOSIS HD "
+         "ON HD.HOSP_ENC_ID = HE.HOSP_ENC_ID\n"
+         "  WHERE HE.ENCOUNTER_TYPE = 'ED' "
+         "AND HD.DX_CODE LIKE 'R73%'\n)"),
+    ], "ED_Symptom_Visits")
+    put("u3_preop", [
+        ("Base_Cohort AS (\n"
+         "  SELECT OC.PATIENT_ID, OC.CASE_ID\n  FROM OR_CASES OC\n"
+         "  WHERE OC.CASE_DATE >= '2026-01-01'\n)"),
+        ("Abnormal_Labs AS (\n"
+         "  SELECT BC.PATIENT_ID\n  FROM Base_Cohort BC\n"
+         "  JOIN LAB_RESULTS LR ON LR.PATIENT_ID = BC.PATIENT_ID\n"
+         "  WHERE LR.LAB_CODE = 'A1C' AND LR.HBA1C_VALUE >= 8.0\n)"),
+    ], "Abnormal_Labs")
+    put("u4_high_ed", [
+        ("Base_Cohort AS (\n"
+         "  SELECT HE.PATIENT_ID, HE.HOSP_ENC_ID\n"
+         "  FROM HOSPITAL_ENCOUNTERS HE\n"
+         "  WHERE HE.ENCOUNTER_TYPE = 'ED'\n)"),
+        ("High_Util AS (\n"
+         "  SELECT BC.PATIENT_ID\n  FROM Base_Cohort BC\n"
+         "  GROUP BY BC.PATIENT_ID\n"
+         "  HAVING COUNT(BC.HOSP_ENC_ID) >= 4\n)"),
+        ("No_PCP AS (\n"
+         "  SELECT HU.PATIENT_ID\n  FROM High_Util HU\n"
+         "  WHERE NOT EXISTS (SELECT 1 FROM PATIENT_PCP_ASSIGNMENT PA\n"
+         "    WHERE PA.PATIENT_ID = HU.PATIENT_ID)\n)"),
+    ], "No_PCP")
+    u5_core = (
+        "Base_Cohort AS (\n"
+        "  SELECT DISTINCT E.PATIENT_ID\n"
+        "  FROM ENCOUNTERS E\n"
+        "  JOIN ENCOUNTER_DIAGNOSIS ED "
+        "ON ED.ENCOUNTER_ID = E.ENCOUNTER_ID\n"
+        "  WHERE {pred}\n"
+        ")")
+    put("u5_incl_gest", [u5_core.format(
+        pred="(ED.DX_CODE LIKE 'E11%' OR ED.DX_CODE LIKE 'O24.4%')")],
+        "Base_Cohort")
+    put("u5_excl_gest", [u5_core.format(
+        pred="ED.DX_CODE LIKE 'E11%' "
+             "AND ED.DX_CODE NOT LIKE 'O24.4%'")], "Base_Cohort")
+    put("u6_billing", [
+        ("Base_Cohort AS (\n"
+         "  SELECT DISTINCT PB.PATIENT_ID\n"
+         "  FROM PROFESSIONAL_BILLING PB\n"
+         "  JOIN CPT_CODES CC ON CC.CPT_ROW_ID = PB.CPT_ROW_ID\n"
+         "  JOIN CPT_CODESET CS ON CS.CPT_CODE = CC.CPT_CODE\n"
+         "  WHERE CC.CPT_CODE IN ('82947', '83036')\n)"),
+    ], "Base_Cohort")
+    put("u7_registry", [
+        ("Dx_Path AS (\n  SELECT DC2.PATIENT_ID\n"
+         "  FROM DIAGNOSIS_CODES DC2\n"
+         "  WHERE DC2.ICD_CODE LIKE 'E11%'\n)"),
+        ("Lab_Path AS (\n  SELECT LR.PATIENT_ID\n"
+         "  FROM LAB_RESULTS LR\n"
+         "  WHERE LR.HBA1C_VALUE >= 6.5\n)"),
+        ("Med_Path AS (\n  SELECT MO.PATIENT_ID\n"
+         "  FROM MED_ORDERS_V MO\n"
+         "  WHERE MO.MED_NAME IN ('METFORMIN', 'INSULIN GLARGINE')\n)"
+         .replace("MED_ORDERS_V", "MEDICATION_ORDERS")),
+        ("Composite AS (\n  SELECT P.PATIENT_ID\n  FROM PATIENTS P\n"
+         "  WHERE (CASE WHEN EXISTS (SELECT 1 FROM Dx_Path D "
+         "WHERE D.PATIENT_ID = P.PATIENT_ID) THEN 1 ELSE 0 END\n"
+         "       + CASE WHEN EXISTS (SELECT 1 FROM Lab_Path L "
+         "WHERE L.PATIENT_ID = P.PATIENT_ID) THEN 1 ELSE 0 END\n"
+         "       + CASE WHEN EXISTS (SELECT 1 FROM Med_Path M "
+         "WHERE M.PATIENT_ID = P.PATIENT_ID) THEN 1 ELSE 0 END) "
+         ">= 2\n)"),
+    ], "Composite")
+    put("u8_med_derived", [
+        ("Base_Cohort AS (\n"
+         "  SELECT DISTINCT MO.PATIENT_ID\n"
+         "  FROM MEDICATION_ORDERS MO\n"
+         "  JOIN MED_CODESET MC ON MC.MED_CODE = MO.MED_NAME\n"
+         "  WHERE MO.MED_NAME IN ('METFORMIN', 'INSULIN GLARGINE')\n)"),
+    ], "Base_Cohort")
+    u9_tpl = (
+        "Coded_Cohort AS (\n"
+        "  SELECT DISTINCT ED.PATIENT_ID\n"
+        "  FROM ENCOUNTER_DIAGNOSIS ED\n"
+        "  WHERE ED.DX_CODE IN ({codes})\n"
+        ")")
+    put("u9_codes_80", [u9_tpl.format(
+        codes=", ".join(f"'{c}'" for c in drift_codes(80)))],
+        "Coded_Cohort")
+    put("u9_codes_81", [u9_tpl.format(
+        codes=", ".join(f"'{c}'" for c in drift_codes(81)))],
+        "Coded_Cohort")
+    u11_body = (
+        "Sched_Misses AS (\n"
+        "  SELECT A.PATIENT_ID, A.APPT_ID\n  FROM APPOINTMENTS A\n"
+        "  WHERE A.APPT_STATUS IN ('cancelled', 'no-show')\n)")
+    put("u11_missed", [u11_body], "Sched_Misses")
+    put("u11_noshow", [u11_body], "Sched_Misses")
+    put("u12_patients", [
+        ("Utilizers AS (\n"
+         "  SELECT DISTINCT HE.PATIENT_ID\n"
+         "  FROM HOSPITAL_ENCOUNTERS HE\n"
+         "  WHERE HE.ENCOUNTER_TYPE = 'ED'\n)"),
+    ], "Utilizers")
+    put("u12_visits", [
+        ("Utilizers AS (\n"
+         "  SELECT HE.HOSP_ENC_ID, HE.PATIENT_ID, HE.ADMIT_DATE\n"
+         "  FROM HOSPITAL_ENCOUNTERS HE\n"
+         "  WHERE HE.ENCOUNTER_TYPE = 'ED'\n)"),
+    ], "Utilizers")
+
     manifest = _manifest(palette, mid, rel)
     return files, manifest
 
@@ -307,8 +462,12 @@ def _manifest(palette: dict, mid, rel) -> dict:
          "dims": "step.cte.identical.genuinely_different",
          "status": "instantiated",
          "files": [rel("dx_path"), rel("lab_path")],
+         # U10 "Base_Cohort everywhere": the v2 scenarios grew this
+         # cluster to 11 members / 9 distinct logics — the Impostor
+         # at scale, exactly the scenario's intent
          "expect": {"flags": [flag("misnomer", "step",
-                                   n["misnomer_seed"], "INFO", 2)]}},
+                                   n["misnomer_seed"], "INFO", 9)],
+                    "canonical_outcome": "differentiate"}},
         {"cell_id": "S5",
          "dims": "step.temp.identical.genuinely_different",
          "status": "instantiated",
@@ -350,10 +509,13 @@ def _manifest(palette: dict, mid, rel) -> dict:
         {"cell_id": "M2",
          "dims": "metric.business.cousin.genuinely_different",
          "status": "instantiated",
-         "files": [rel("registry"), rel("registry_v1")],
+         "files": [rel("registry"), rel("registry_v1"),
+                   rel("u7_registry")],
+         # v2 grew the family: root + Legacy v1 + Composite (U7)
          "expect": {"flags": [flag("cousin_conflict", "metric",
                                    "Diabetes Registry",
-                                   "CONFLICT", 2)]}},
+                                   "CONFLICT", 3)],
+                    "canonical_outcome": "link"}},
         {"cell_id": "M3", "dims": "metric.business.cousin.hash_identical",
          "status": "instantiated",
          "files": [rel("controlled"), rel("controlled_m")],
@@ -478,5 +640,140 @@ def _manifest(palette: dict, mid, rel) -> dict:
          "status": "instantiated", "files": [rel("phi_probe")],
          "expect": {"phi_redaction_step":
                     f"transform:{mid('phi_probe')}:Phi_Filter"}},
+        # ---- palette v2: the lego scenarios (U1–U12, confirmed in
+        # full by Sunny 2026-08-25). Canonical outcomes per the
+        # scenarios' tie-in table: each flag invites an ACT, never a
+        # correction — "the sweep doesn't find errors; it finds
+        # unlabeled purposes."
+        {"cell_id": "U1", "dims": "scenario.extension.derive",
+         "status": "instantiated",
+         "files": [rel("pcp_root"), rel("u1_noshow")],
+         "expect": {"shared_step_core": {
+                        "name": "Base_Cohort",
+                        "metrics": [mid("pcp_root"), mid("u1_noshow")]},
+                    "compare": {"a": mid("pcp_root"),
+                                "b": mid("u1_noshow"),
+                                "verdict": "DIFFERS"},
+                    "canonical_outcome": "derive",
+                    "note": "Extension: B = A + scheduling filters; "
+                            "step-grain core matches inside "
+                            "metric-grain divergence"}},
+        {"cell_id": "U2", "dims": "scenario.path_divergence.composition",
+         "status": "instantiated",
+         "files": [rel("u2_ed_overlap")],
+         "expect": {"steps_present": [
+                        f"transform:{mid('u2_ed_overlap')}"
+                        ":ED_Symptom_Visits"],
+                    "canonical_outcome": "differentiate"}},
+        {"cell_id": "U3", "dims": "scenario.path_divergence.lab_evidence",
+         "status": "instantiated", "files": [rel("u3_preop")],
+         "expect": {"steps_present": [
+                        f"transform:{mid('u3_preop')}:Abnormal_Labs"],
+                    "canonical_outcome": "differentiate"}},
+        {"cell_id": "U4", "dims": "scenario.grain.composition",
+         "status": "instantiated", "files": [rel("u4_high_ed")],
+         "expect": {"steps_present": [
+                        f"transform:{mid('u4_high_ed')}:High_Util",
+                        f"transform:{mid('u4_high_ed')}:No_PCP"],
+                    "canonical_outcome": "differentiate"}},
+        {"cell_id": "U5", "dims": "scenario.cousins.gestational",
+         "status": "instantiated",
+         "files": [rel("u5_incl_gest"), rel("u5_excl_gest")],
+         # BOTH legitimate — the accept/label-variant disposition
+         # beat; their conflict story lives in the Diabetic Patients
+         # family cluster (PD1), not a pairwise flag
+         "expect": {"compare": {"a": mid("u5_incl_gest"),
+                                "b": mid("u5_excl_gest"),
+                                "verdict": "DIFFERS"},
+                    "canonical_outcome": "differentiate"}},
+        {"cell_id": "U6", "dims": "scenario.path_divergence.billing",
+         "status": "instantiated", "files": [rel("u6_billing")],
+         "expect": {"metrics_present": [mid("u6_billing")],
+                    "canonical_outcome": "differentiate"}},
+        {"cell_id": "PD1",
+         "dims": "scenario.path_divergence.family.cousin",
+         "status": "instantiated",
+         "files": [rel("pcp_root"), rel("dx_path"), rel("lab_path"),
+                   rel("u1_noshow"), rel("u2_ed_overlap"),
+                   rel("u5_incl_gest"), rel("u5_excl_gest"),
+                   rel("u6_billing")],
+         # THE governed-plurality cluster: every legitimate path to
+         # "diabetic patients" in ONE name family — 10 members, 10
+         # distinct logics, each variant real per persona/use
+         "expect": {"flags": [flag("cousin_conflict", "metric",
+                                   "Diabetic Patients",
+                                   "CONFLICT", 10)],
+                    "canonical_outcome": "differentiate"}},
+        {"cell_id": "U7", "dims": "scenario.composite.registry",
+         "status": "instantiated", "files": [rel("u7_registry")],
+         "expect": {"steps_present": [
+                        f"transform:{mid('u7_registry')}:Composite"],
+                    "canonical_outcome": "differentiate",
+                    "note": "the certified-official candidate — the "
+                            "any-2-of-3 composite the steward "
+                            "certifies"}},
+        {"cell_id": "U8", "dims": "scenario.impostor.registry",
+         "status": "instantiated",
+         "files": [rel("registry"), rel("u8_med_derived")],
+         # same business name as the registry, med-derived logic with
+         # the metformin over-count uncorrected — the deliberately
+         # flawed variant the demo interrogates. The sweep ALSO
+         # caught the grain difference (DISTINCT vs row) — true.
+         "expect": {"flags": [flag("misnomer", "metric",
+                                   "Diabetes Registry",
+                                   "CONFLICT", 2),
+                              flag("grain_shift", "metric",
+                                   "Diabetes Registry",
+                                   "CONFLICT", 2)],
+                    "canonical_outcome": "differentiate"}},
+        {"cell_id": "U9", "dims": "scenario.codeset_drift.repair",
+         "status": "instantiated",
+         "files": [rel("u9_codes_80"), rel("u9_codes_81")],
+         # the ONE cell where right-vs-wrong exists (repair, routed
+         # by the deny grounds): 80 vs 81 codes, the diff pinpoints
+         # the missing 81st
+         "expect": {"flags": [flag("misnomer", "metric",
+                                   "Diabetic Cohort (Codeset)",
+                                   "CONFLICT", 2)],
+                    "compare": {"a": mid("u9_codes_80"),
+                                "b": mid("u9_codes_81"),
+                                "verdict": "DIFFERS"},
+                    "diff_pinpoints": {
+                        "metrics": [mid("u9_codes_80"),
+                                    mid("u9_codes_81")],
+                        "token": "E11.80"},
+                    "canonical_outcome": "repair"}},
+        {"cell_id": "U11", "dims": "scenario.doppelganger.consolidate",
+         "status": "instantiated",
+         "files": [rel("u11_missed"), rel("u11_noshow")],
+         "expect": {"flags": [flag("duplicate", "metric", None,
+                                   "INFO", 1)],
+                    "duplicate_members": ["Missed Appointments",
+                                          "No-Show Panel"],
+                    "compare": {"a": mid("u11_missed"),
+                                "b": mid("u11_noshow"),
+                                "verdict": "IDENTICAL"},
+                    "canonical_outcome": "consolidate"}},
+        {"cell_id": "U12", "dims": "scenario.grain_shift.d7",
+         "status": "instantiated",
+         "files": [rel("u12_patients"), rel("u12_visits")],
+         # D7 ratified: same name, patient-DISTINCT vs visit rows —
+         # "counts visits vs counts patients" as its own machine flag
+         "expect": {"flags": [flag("grain_shift", "metric",
+                                   "High ED Utilizers",
+                                   "CONFLICT", 2),
+                              flag("misnomer", "metric",
+                                   "High ED Utilizers",
+                                   "CONFLICT", 2)],
+                    "canonical_outcome": "differentiate"}},
+        {"cell_id": "U10", "dims": "scenario.impostor_at_scale",
+         "status": "instantiated",
+         "files": [rel("pcp_root"), rel("u3_preop"), rel("u4_high_ed"),
+                   rel("u5_incl_gest"), rel("u6_billing"),
+                   rel("u8_med_derived")],
+         # covered jointly with S4: the Base_Cohort cluster at scale
+         "expect": {"flags": [flag("misnomer", "step", "Base_Cohort",
+                                   "INFO", 9)],
+                    "canonical_outcome": "differentiate"}},
     ]
     return {"palette_id": palette["palette_id"], "cells": cells}

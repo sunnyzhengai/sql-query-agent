@@ -170,8 +170,7 @@ REACHABILITY = (
             "metric retrieval surface recorded flags inline "
             "(single-row sameness reads, ADR 0020)",
      "ops": ("op_census", "op_retrieve"),
-     "queries": ("GOV_FLAGS_QUERY", "GOV_FLAG_BY_ID_QUERY",
-                 "GOV_FLAG_MEMBERS_QUERY"),
+     "queries": ("GOV_FLAGS_QUERY", "GOV_FLAG_BY_ID_QUERY"),
      "marker": "cluster:"},
     {"payload": "node:governance", "status": "reachable",
      "via": "ADR 0057 'Clusters are nodes': name_cluster and "

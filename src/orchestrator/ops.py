@@ -479,8 +479,8 @@ def op_census(kind: str, run_kql, session: OpsSession,
                for r in frows]
         params = {"kind": "flag"}
         universe = ("every governance red flag recorded by the ADR "
-                    "0054 sweep (flags disclose, never gate) — the "
-                    "count is exact")
+                    "0054 sweep as a reified 'cluster:' node (flags "
+                    "disclose, never gate) — the count is exact")
         if contains and contains.strip():
             needle = contains.strip()
             out = [r for r in out

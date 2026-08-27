@@ -389,7 +389,14 @@ def sweep(nodes_rows: "list[dict]",
                 fams.setdefault(a["name"], []).append(b)
     for root_name, cousins in sorted(fams.items()):
         root = next(i for i in metric_items if i["name"] == root_name)
-        group = [root] + sorted(cousins, key=lambda m: m["name"])
+        # dedupe (two same-named roots each collect the family)
+        seen_ids: "set[str]" = {root["id"]}
+        uniq = []
+        for c in sorted(cousins, key=lambda m: (m["name"], m["id"])):
+            if c["id"] not in seen_ids:
+                seen_ids.add(c["id"])
+                uniq.append(c)
+        group = [root] + uniq
         diverge = len({g["content_key"] for g in group}) > 1
         blast = sum(reports_of.get(g["ref"], 0) for g in group)
         res.flags_rows.append(_row(

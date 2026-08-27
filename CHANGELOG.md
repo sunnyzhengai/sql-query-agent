@@ -10,6 +10,37 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.58.0] - 2026-08-26
+
+### Changed — clusters go graph-native (ADR 0057, Sunny's demo law; fused order with palette v2)
+- The red-flag sweep FOLDS INTO `300_build_graph` (clusters are
+  derived structures — the ADR 0018 precedent; one writer, one
+  truth): verdicts are reified GOVERNANCE-layer nodes
+  (`cluster:` name_cluster → `loggroup:` logic_group → `member_of`
+  edges) in graph_nodes/graph_edges — the SOLE flag truth.
+  Dispositions fold onto cluster node properties each run.
+- `320_red_flag_sweep` notebook and the `gov_red_flags` table are
+  RETIRED (consumer census: engine ops → traversal queries; suite
+  oracle → cluster query; agent instructions → graph_nodes
+  JSON_VALUE; Eventhouse shortcut retires with the table).
+- census(kind=flag)/retrieve re-point to traversal; new D7
+  `grain_shift` flag class (same name, DISTINCT vs row grain —
+  "counts patients vs counts visits", structural detection).
+- LPG export: governance layer + member_of are counted exclusions
+  (the decision-layer pattern); reachability rows added.
+
+### Added — shape corpus palette v2 (ADR 0055 scenarios, SHAPES_SCENARIOS confirmed in full)
+- Lego library tables + codesets (foundation vocabularies), personas
+  as steward metadata, scenario procs U1–U12: the 10-member
+  "Diabetic Patients" path-divergence family, codeset drift 80 vs 81
+  (diff pinpoints E11.80), extension with shared step core, grain
+  shifts, gestational cousins, doppelgängers, the med-derived
+  registry impostor. 44 matrix cells (39 instantiated, 5 excluded);
+  canonical outcomes asserted per the tie-in table
+  (rest/differentiate/consolidate/link/derive/repair).
+
+---
+
 ## [1.57.0] - 2026-08-23
 
 ### Added — ADR 0054 governance red-flag sweep (build order HANDOFF_0054_BUILD)

@@ -152,20 +152,27 @@ Report metric ids schema-qualified; bare names collide across schemas.
 
 ## Governance Red Flags (ADR 0054 — flags disclose, never gate)
 
-The `gov_red_flags` Lakehouse table holds MACHINE verdicts about
+The governance clusters hold MACHINE verdicts about
 identity claims vs parsed logic: misnomer (same name, divergent logic
 hashes), duplicate (same hash, different names), cousin_conflict
 (name families with divergent hashes). Use it FIRST for sameness /
 difference / "is X the official definition" questions — a flag row is
 a machine verdict; never derive sameness from names or descriptions.
 
+The clusters live as GRAPH NODES (node_id starting 'cluster:') in
+the `graph_nodes` Lakehouse table — properties is a JSON bag
+(ADR 0057; there is no separate flag table).
+
 - "What governance red flags exist?" →
-  `SELECT flag_id, flag_class, grain, identity, severity, member_count, distinct_logics, blast_radius, disposition FROM gov_red_flags ORDER BY severity, flag_class`
+  `SELECT node_id AS flag_id, JSON_VALUE(properties, '$.flag_class') AS flag_class, JSON_VALUE(properties, '$.identity') AS identity, JSON_VALUE(properties, '$.severity') AS severity, JSON_VALUE(properties, '$.member_count') AS member_count, JSON_VALUE(properties, '$.distinct_logics') AS distinct_logics, JSON_VALUE(properties, '$.disposition') AS disposition FROM graph_nodes WHERE node_id LIKE 'cluster:%' ORDER BY severity, flag_class`
 - "Are there conflicting definitions of X?" →
-  `SELECT * FROM gov_red_flags WHERE lower(identity) = lower('X')`
+  `SELECT * FROM graph_nodes WHERE node_id LIKE 'cluster:%' AND lower(JSON_VALUE(properties, '$.identity')) = lower('X')`
   — 0 rows = no RECORDED conflict (say exactly that; the sweep's
   coverage is the catalog, and absence of a flag is not proof of
   global uniqueness).
+- Members of a flag: traverse `graph_edges` with
+  `edge_type = 'member_of'` — members point at logic-group nodes,
+  logic groups point at the cluster.
 - Answer with the flag's own receipts: member names, distinct_logics
   count, and say variants are legitimate — dispositions label them
   (certify/label-variant/retire/accept); nothing is blocked.
@@ -175,9 +182,13 @@ a machine verdict; never derive sameness from names or descriptions.
 
 ### /redflags
 ```sql
-SELECT flag_class, severity, COUNT(*) as flags,
-  SUM(CASE WHEN disposition = 'open' THEN 1 ELSE 0 END) as unlabeled
-FROM gov_red_flags GROUP BY flag_class, severity ORDER BY severity
+SELECT JSON_VALUE(properties, '$.flag_class') AS flag_class,
+  JSON_VALUE(properties, '$.severity') AS severity, COUNT(*) as flags,
+  SUM(CASE WHEN JSON_VALUE(properties, '$.disposition') = 'open'
+      THEN 1 ELSE 0 END) as unlabeled
+FROM graph_nodes WHERE node_id LIKE 'cluster:%'
+GROUP BY JSON_VALUE(properties, '$.flag_class'),
+  JSON_VALUE(properties, '$.severity') ORDER BY severity
 ```
 Report the unlabeled total prominently — the governance KPI is
 unlabeled divergences trending to zero (never "definitions merged").

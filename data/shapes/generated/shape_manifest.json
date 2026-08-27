@@ -65,9 +65,10 @@
             "grain": "step",
             "identity": "Base_Cohort",
             "severity": "INFO",
-            "distinct_logics": 2
+            "distinct_logics": 9
           }
-        ]
+        ],
+        "canonical_outcome": "differentiate"
       }
     },
     {
@@ -172,7 +173,8 @@
       "status": "instantiated",
       "files": [
         "reporting/USP_Diabetes_Registry.sql",
-        "reporting/USP_Diabetes_Registry_v1.sql"
+        "reporting/USP_Diabetes_Registry_v1.sql",
+        "reporting/USP_DM_Registry_Composite.sql"
       ],
       "expect": {
         "flags": [
@@ -181,9 +183,10 @@
             "grain": "metric",
             "identity": "Diabetes Registry",
             "severity": "CONFLICT",
-            "distinct_logics": 2
+            "distinct_logics": 3
           }
-        ]
+        ],
+        "canonical_outcome": "link"
       }
     },
     {
@@ -486,6 +489,291 @@
       ],
       "expect": {
         "phi_redaction_step": "transform:reporting.USP_Phi_Probe:Phi_Filter"
+      }
+    },
+    {
+      "cell_id": "U1",
+      "dims": "scenario.extension.derive",
+      "status": "instantiated",
+      "files": [
+        "reporting/USP_Diabetic_Panel.sql",
+        "reporting/USP_Panel_NoShows.sql"
+      ],
+      "expect": {
+        "shared_step_core": {
+          "name": "Base_Cohort",
+          "metrics": [
+            "reporting.USP_Diabetic_Panel",
+            "reporting.USP_Panel_NoShows"
+          ]
+        },
+        "compare": {
+          "a": "reporting.USP_Diabetic_Panel",
+          "b": "reporting.USP_Panel_NoShows",
+          "verdict": "DIFFERS"
+        },
+        "canonical_outcome": "derive",
+        "note": "Extension: B = A + scheduling filters; step-grain core matches inside metric-grain divergence"
+      }
+    },
+    {
+      "cell_id": "U2",
+      "dims": "scenario.path_divergence.composition",
+      "status": "instantiated",
+      "files": [
+        "reporting/USP_Panel_ED_Visits.sql"
+      ],
+      "expect": {
+        "steps_present": [
+          "transform:reporting.USP_Panel_ED_Visits:ED_Symptom_Visits"
+        ],
+        "canonical_outcome": "differentiate"
+      }
+    },
+    {
+      "cell_id": "U3",
+      "dims": "scenario.path_divergence.lab_evidence",
+      "status": "instantiated",
+      "files": [
+        "reporting/USP_PreOp_Abnormal_Labs.sql"
+      ],
+      "expect": {
+        "steps_present": [
+          "transform:reporting.USP_PreOp_Abnormal_Labs:Abnormal_Labs"
+        ],
+        "canonical_outcome": "differentiate"
+      }
+    },
+    {
+      "cell_id": "U4",
+      "dims": "scenario.grain.composition",
+      "status": "instantiated",
+      "files": [
+        "reporting/USP_High_ED_NoPCP.sql"
+      ],
+      "expect": {
+        "steps_present": [
+          "transform:reporting.USP_High_ED_NoPCP:High_Util",
+          "transform:reporting.USP_High_ED_NoPCP:No_PCP"
+        ],
+        "canonical_outcome": "differentiate"
+      }
+    },
+    {
+      "cell_id": "U5",
+      "dims": "scenario.cousins.gestational",
+      "status": "instantiated",
+      "files": [
+        "reporting/USP_Diabetic_InclGest.sql",
+        "reporting/USP_Diabetic_ExclGest.sql"
+      ],
+      "expect": {
+        "compare": {
+          "a": "reporting.USP_Diabetic_InclGest",
+          "b": "reporting.USP_Diabetic_ExclGest",
+          "verdict": "DIFFERS"
+        },
+        "canonical_outcome": "differentiate"
+      }
+    },
+    {
+      "cell_id": "U6",
+      "dims": "scenario.path_divergence.billing",
+      "status": "instantiated",
+      "files": [
+        "reporting/USP_Diabetic_Billing.sql"
+      ],
+      "expect": {
+        "metrics_present": [
+          "reporting.USP_Diabetic_Billing"
+        ],
+        "canonical_outcome": "differentiate"
+      }
+    },
+    {
+      "cell_id": "PD1",
+      "dims": "scenario.path_divergence.family.cousin",
+      "status": "instantiated",
+      "files": [
+        "reporting/USP_Diabetic_Panel.sql",
+        "reporting/USP_Diabetic_Patients_DX.sql",
+        "reporting/USP_Diabetic_Patients_Lab.sql",
+        "reporting/USP_Panel_NoShows.sql",
+        "reporting/USP_Panel_ED_Visits.sql",
+        "reporting/USP_Diabetic_InclGest.sql",
+        "reporting/USP_Diabetic_ExclGest.sql",
+        "reporting/USP_Diabetic_Billing.sql"
+      ],
+      "expect": {
+        "flags": [
+          {
+            "flag_class": "cousin_conflict",
+            "grain": "metric",
+            "identity": "Diabetic Patients",
+            "severity": "CONFLICT",
+            "distinct_logics": 10
+          }
+        ],
+        "canonical_outcome": "differentiate"
+      }
+    },
+    {
+      "cell_id": "U7",
+      "dims": "scenario.composite.registry",
+      "status": "instantiated",
+      "files": [
+        "reporting/USP_DM_Registry_Composite.sql"
+      ],
+      "expect": {
+        "steps_present": [
+          "transform:reporting.USP_DM_Registry_Composite:Composite"
+        ],
+        "canonical_outcome": "differentiate",
+        "note": "the certified-official candidate \u2014 the any-2-of-3 composite the steward certifies"
+      }
+    },
+    {
+      "cell_id": "U8",
+      "dims": "scenario.impostor.registry",
+      "status": "instantiated",
+      "files": [
+        "reporting/USP_Diabetes_Registry.sql",
+        "reporting/USP_DM_Registry_MedDerived.sql"
+      ],
+      "expect": {
+        "flags": [
+          {
+            "flag_class": "misnomer",
+            "grain": "metric",
+            "identity": "Diabetes Registry",
+            "severity": "CONFLICT",
+            "distinct_logics": 2
+          },
+          {
+            "flag_class": "grain_shift",
+            "grain": "metric",
+            "identity": "Diabetes Registry",
+            "severity": "CONFLICT",
+            "distinct_logics": 2
+          }
+        ],
+        "canonical_outcome": "differentiate"
+      }
+    },
+    {
+      "cell_id": "U9",
+      "dims": "scenario.codeset_drift.repair",
+      "status": "instantiated",
+      "files": [
+        "reporting/USP_Diabetic_CodesetA.sql",
+        "reports/USP_Diabetic_CodesetB.sql"
+      ],
+      "expect": {
+        "flags": [
+          {
+            "flag_class": "misnomer",
+            "grain": "metric",
+            "identity": "Diabetic Cohort (Codeset)",
+            "severity": "CONFLICT",
+            "distinct_logics": 2
+          }
+        ],
+        "compare": {
+          "a": "reporting.USP_Diabetic_CodesetA",
+          "b": "reports.USP_Diabetic_CodesetB",
+          "verdict": "DIFFERS"
+        },
+        "diff_pinpoints": {
+          "metrics": [
+            "reporting.USP_Diabetic_CodesetA",
+            "reports.USP_Diabetic_CodesetB"
+          ],
+          "token": "E11.80"
+        },
+        "canonical_outcome": "repair"
+      }
+    },
+    {
+      "cell_id": "U11",
+      "dims": "scenario.doppelganger.consolidate",
+      "status": "instantiated",
+      "files": [
+        "reporting/USP_Missed_Appointments.sql",
+        "reports/USP_No_Show_Panel.sql"
+      ],
+      "expect": {
+        "flags": [
+          {
+            "flag_class": "duplicate",
+            "grain": "metric",
+            "identity": null,
+            "severity": "INFO",
+            "distinct_logics": 1
+          }
+        ],
+        "duplicate_members": [
+          "Missed Appointments",
+          "No-Show Panel"
+        ],
+        "compare": {
+          "a": "reporting.USP_Missed_Appointments",
+          "b": "reports.USP_No_Show_Panel",
+          "verdict": "IDENTICAL"
+        },
+        "canonical_outcome": "consolidate"
+      }
+    },
+    {
+      "cell_id": "U12",
+      "dims": "scenario.grain_shift.d7",
+      "status": "instantiated",
+      "files": [
+        "reporting/USP_High_ED_Utilizers.sql",
+        "reports/USP_High_ED_Utilizers.sql"
+      ],
+      "expect": {
+        "flags": [
+          {
+            "flag_class": "grain_shift",
+            "grain": "metric",
+            "identity": "High ED Utilizers",
+            "severity": "CONFLICT",
+            "distinct_logics": 2
+          },
+          {
+            "flag_class": "misnomer",
+            "grain": "metric",
+            "identity": "High ED Utilizers",
+            "severity": "CONFLICT",
+            "distinct_logics": 2
+          }
+        ],
+        "canonical_outcome": "differentiate"
+      }
+    },
+    {
+      "cell_id": "U10",
+      "dims": "scenario.impostor_at_scale",
+      "status": "instantiated",
+      "files": [
+        "reporting/USP_Diabetic_Panel.sql",
+        "reporting/USP_PreOp_Abnormal_Labs.sql",
+        "reporting/USP_High_ED_NoPCP.sql",
+        "reporting/USP_Diabetic_InclGest.sql",
+        "reporting/USP_Diabetic_Billing.sql",
+        "reporting/USP_DM_Registry_MedDerived.sql"
+      ],
+      "expect": {
+        "flags": [
+          {
+            "flag_class": "misnomer",
+            "grain": "step",
+            "identity": "Base_Cohort",
+            "severity": "INFO",
+            "distinct_logics": 9
+          }
+        ],
+        "canonical_outcome": "differentiate"
       }
     }
   ]

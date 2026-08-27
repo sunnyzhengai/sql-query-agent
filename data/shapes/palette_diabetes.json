@@ -58,6 +58,136 @@
         "PROBLEM_CODE": "Coded problem entry.",
         "NOTED_DATE": "Date the problem was noted."
       }
+    },
+    "ENCOUNTER_DIAGNOSIS": {
+      "description": "Diagnoses coded on outpatient encounters (PCP lego).",
+      "columns": {
+        "ENC_DX_ID": "Unique encounter-diagnosis row identifier.",
+        "ENCOUNTER_ID": "Encounter the diagnosis was coded on.",
+        "PATIENT_ID": "Diagnosed patient.",
+        "DX_CODE": "ICD-10 code assigned on the encounter."
+      }
+    },
+    "HOSPITAL_ENCOUNTERS": {
+      "description": "Hospital encounters, ED and inpatient (ED/IP lego).",
+      "columns": {
+        "HOSP_ENC_ID": "Unique hospital encounter identifier.",
+        "PATIENT_ID": "Patient seen.",
+        "ENCOUNTER_TYPE": "ED or IP.",
+        "ADMIT_DATE": "Admission or arrival date."
+      }
+    },
+    "HOSPITAL_DIAGNOSIS": {
+      "description": "Diagnoses coded on hospital encounters.",
+      "columns": {
+        "HOSP_DX_ID": "Unique hospital-diagnosis row identifier.",
+        "HOSP_ENC_ID": "Hospital encounter the diagnosis belongs to.",
+        "PATIENT_ID": "Diagnosed patient.",
+        "DX_CODE": "ICD-10 code assigned in hospital."
+      }
+    },
+    "LAB_ORDERS": {
+      "description": "Laboratory orders placed during encounters.",
+      "columns": {
+        "LAB_ORDER_ID": "Unique lab order identifier.",
+        "HOSP_ENC_ID": "Hospital encounter the order belongs to.",
+        "PATIENT_ID": "Ordered-for patient.",
+        "ORDERED_DATE": "Date the order was placed."
+      }
+    },
+    "PROFESSIONAL_BILLING": {
+      "description": "Professional billing transactions (Finance lego).",
+      "columns": {
+        "BILLING_ID": "Unique billing transaction identifier.",
+        "PATIENT_ID": "Billed patient.",
+        "CPT_ROW_ID": "Billed CPT row reference.",
+        "SERVICE_DATE": "Date of service billed."
+      }
+    },
+    "CPT_CODES": {
+      "description": "CPT rows attached to billing transactions.",
+      "columns": {
+        "CPT_ROW_ID": "Unique CPT row identifier.",
+        "CPT_CODE": "Billed CPT code.",
+        "PATIENT_ID": "Patient the code was billed for."
+      }
+    },
+    "OR_CASES": {
+      "description": "Operating-room cases (surgical lego).",
+      "columns": {
+        "CASE_ID": "Unique OR case identifier.",
+        "PATIENT_ID": "Surgical patient.",
+        "CASE_DATE": "Scheduled case date."
+      }
+    },
+    "PROCEDURE_ORDERS": {
+      "description": "Procedure orders linked to OR cases.",
+      "columns": {
+        "PROC_ORDER_ID": "Unique procedure order identifier.",
+        "CASE_ID": "OR case the order belongs to.",
+        "PATIENT_ID": "Patient the procedure is for.",
+        "PROC_CODE": "Ordered procedure code."
+      }
+    },
+    "APPOINTMENTS": {
+      "description": "Scheduled appointments with status (scheduling lego).",
+      "columns": {
+        "APPT_ID": "Unique appointment identifier.",
+        "PATIENT_ID": "Scheduled patient.",
+        "APPT_STATUS": "completed, cancelled, or no-show.",
+        "APPT_DATE": "Appointment date."
+      }
+    },
+    "PATIENT_PCP_ASSIGNMENT": {
+      "description": "Primary-care attribution per patient (attribution lego).",
+      "columns": {
+        "ASSIGN_ID": "Unique assignment row identifier.",
+        "PATIENT_ID": "Attributed patient.",
+        "PCP_NAME": "Assigned primary-care provider."
+      }
+    },
+    "DM_REGISTRY": {
+      "description": "Curated diabetes registry membership (Quality lego).",
+      "columns": {
+        "REGISTRY_ID": "Unique registry row identifier.",
+        "PATIENT_ID": "Registry member patient.",
+        "ENROLLED_DATE": "Registry enrollment date."
+      }
+    },
+    "DIAGNOSIS_CODESET": {
+      "description": "Foundation reference vocabulary: ICD-10 incl. E08-E13 and O24.4x (gestational).",
+      "columns": {
+        "DX_CODE": "ICD-10 code.",
+        "DX_DESCRIPTION": "Code description."
+      }
+    },
+    "LAB_CODESET": {
+      "description": "Foundation reference vocabulary: lab tests incl. HbA1c and glucose.",
+      "columns": {
+        "LAB_CODE": "Lab test code.",
+        "LAB_DESCRIPTION": "Test description."
+      }
+    },
+    "MED_CODESET": {
+      "description": "Foundation reference vocabulary: medications incl. insulin/orals (metformin caveat).",
+      "columns": {
+        "MED_CODE": "Medication code.",
+        "MED_DESCRIPTION": "Medication description."
+      }
+    },
+    "CPT_CODESET": {
+      "description": "Foundation reference vocabulary: CPT procedure/billing codes.",
+      "columns": {
+        "CPT_CODE": "CPT code.",
+        "CPT_DESCRIPTION": "Code description."
+      }
+    },
+    "PROC_CODESET": {
+      "description": "Foundation reference vocabulary: procedure codes.",
+      "columns": {
+        "PROC_CODE": "Procedure code.",
+        "PROC_DESCRIPTION": "Code description."
+      }
     }
   },
   "unique_column": "HBA1C_VALUE",
@@ -114,6 +244,22 @@
     "snapshot_a":     {"proc": "USP_Enrollment_Snapshot",   "schema": "reporting", "business_name": "Enrollment Snapshot"},
     "snapshot_b":     {"proc": "USP_Enrollment_Snapshot",   "schema": "reports",   "business_name": "Enrollment Snapshot"},
     "ref_forms":      {"proc": "USP_Ref_Forms_Probe",       "schema": "reporting", "business_name": "Reference Forms Probe"},
+    "pcp_root":       {"proc": "USP_Diabetic_Panel",        "schema": "reporting", "business_name": "Diabetic Patients", "steward": "Dr. Peterson"},
+    "u1_noshow":      {"proc": "USP_Panel_NoShows",         "schema": "reporting", "business_name": "Diabetic Patients (Missed PCP Appointments)", "steward": "Dr. Peterson"},
+    "u2_ed_overlap":  {"proc": "USP_Panel_ED_Visits",       "schema": "reporting", "business_name": "Diabetic Patients (ED Utilization)", "steward": "Dr. Peterson"},
+    "u3_preop":       {"proc": "USP_PreOp_Abnormal_Labs",   "schema": "reporting", "business_name": "Pre-Op Abnormal Diabetes Labs", "steward": "Dr. Sullivan"},
+    "u4_high_ed":     {"proc": "USP_High_ED_NoPCP",         "schema": "reporting", "business_name": "High ED Utilizers Without PCP", "steward": "ED Medical Director"},
+    "u5_incl_gest":   {"proc": "USP_Diabetic_InclGest",     "schema": "reporting", "business_name": "Diabetic Patients (incl. gestational)", "steward": "OBGyn"},
+    "u5_excl_gest":   {"proc": "USP_Diabetic_ExclGest",     "schema": "reporting", "business_name": "Diabetic Patients (excl. gestational)", "steward": "OBGyn"},
+    "u6_billing":     {"proc": "USP_Diabetic_Billing",      "schema": "reporting", "business_name": "Diabetic Patients (Billing)", "steward": "Finance Analyst"},
+    "u7_registry":    {"proc": "USP_DM_Registry_Composite", "schema": "reporting", "business_name": "Diabetes Registry (Composite)", "steward": "Quality & Registry Team"},
+    "u8_med_derived": {"proc": "USP_DM_Registry_MedDerived","schema": "reporting", "business_name": "Diabetes Registry", "steward": "Quality & Registry Team"},
+    "u9_codes_80":    {"proc": "USP_Diabetic_CodesetA",     "schema": "reporting", "business_name": "Diabetic Cohort (Codeset)", "steward": "Dr. Peterson"},
+    "u9_codes_81":    {"proc": "USP_Diabetic_CodesetB",     "schema": "reports",   "business_name": "Diabetic Cohort (Codeset)", "steward": "Quality & Registry Team"},
+    "u11_missed":     {"proc": "USP_Missed_Appointments",   "schema": "reporting", "business_name": "Missed Appointments", "steward": "Dr. Peterson"},
+    "u11_noshow":     {"proc": "USP_No_Show_Panel",         "schema": "reports",   "business_name": "No-Show Panel", "steward": "ED Medical Director"},
+    "u12_patients":   {"proc": "USP_High_ED_Utilizers",     "schema": "reporting", "business_name": "High ED Utilizers", "steward": "ED Medical Director"},
+    "u12_visits":     {"proc": "USP_High_ED_Utilizers",     "schema": "reports",   "business_name": "High ED Utilizers", "steward": "Finance Analyst"},
     "chain_linear":   {"proc": "USP_Care_Cascade",          "schema": "reporting", "business_name": "Care Cascade (Linear)"},
     "chain_diamond":  {"proc": "USP_Outreach_Funnel",       "schema": "reporting", "business_name": "Outreach Funnel (Diamond)"},
     "chain_self":     {"proc": "USP_Panel_Rollup",          "schema": "reporting", "business_name": "Panel Rollup (Recursive)"},

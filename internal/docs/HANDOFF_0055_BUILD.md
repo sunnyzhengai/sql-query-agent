@@ -290,3 +290,73 @@ beats). Follow the ED Sepsis Screening Dashboard pattern exactly:
 - Also new on dev's horizon (context, not order): ADR 0058 DRAFT
   (self-service contracts, contracts-first for Pro — builds with
   Pro, awaiting Sunny's ratification) and REVIEWER_DECK_THEMES.
+
+### 2026-08-26 — FUSED ORDER BUILT: graph-native clusters + palette v2 (release 1.58.0)
+**Clusters are nodes — DONE (fold-into-300, as ruled):**
+- The sweep runs INSIDE build_graph_step; verdicts reify as
+  GOVERNANCE-layer nodes: `cluster:` (name_cluster, flag fields +
+  disposition as properties) → `loggroup:` (one per distinct content
+  key) → `member_of` edges from the actual org nodes. Deterministic
+  ids; reification conservation asserted (one cluster node per
+  verdict); dispositions fold onto node properties each run.
+- **320_red_flag_sweep RETIRED** (notebook dir, registry entry,
+  installation guide, scheduled-pipeline order) and **gov_red_flags
+  RETIRED** (contract removed; gov_flag_dispositions stays planned,
+  reader now 300). LPG export: governance layer + member_of =
+  counted exclusions (the decision-layer pattern; conservation
+  exact). New D7 flag class `grain_shift` (structural DISTINCT-vs-
+  row detection, no column lexicon).
+- **Consumer census CLOSED — the table retires with zero orphans:**
+  engine ops → traversal queries (GOV_* rewritten over
+  graph_nodes/graph_edges; retrieve walks member_of 2-hop; ids now
+  `cluster:` — census remediation names the 1.58 rerun); suite
+  oracle + fixture probe → cluster queries; agent instructions →
+  graph_nodes JSON_VALUE (+ /redflags rewritten); Eventhouse
+  gov_red_flags shortcut → retire with the table (Sunny deletes it
+  in the KQL DB, or dev via API on her go).
+- **The checker WAS the migration gate, as framed:** every flag
+  expectation now ALSO asserts its cluster node, its logic_group
+  count (== distinct logics), and its member-edge count (== members)
+  — all 44 cells passed through the re-pointed truth.
+**Palette v2 — DONE (SHAPES_SCENARIOS confirmed in full):**
+- Lego tables + 5 foundation codesets + personas (steward metadata,
+  no auth) + scenario procs U1–U12; 38 SQL files, 44 cells (39
+  instantiated / 5 excluded-with-reason), all dimension values
+  covered incl. D7.
+- The corpus told the truth about its author twice more: template
+  reuse across v1 single-CTE procs surfaced as REAL duplicate
+  clusters (kept — deliberate truth, documented); the Base_Cohort
+  cluster grew to 11 members / 9 logics (U10 by construction).
+- Headline structures live: "Diabetic Patients" cousin family **10
+  members / 10 distinct logics** (the governed-plurality cluster);
+  codeset drift misnomer with the diff pinpointing E11.80; U12
+  grain_shift + misnomer pair; U11 doppelgänger + compare IDENTICAL;
+  U1 extension with shared step core proven equal.
+- Canonical outcomes asserted per the tie-in (consolidate→duplicate,
+  link→cousin, repair→pinpointing diff, derive→shared core;
+  differentiate/rest annotated).
+**Deliverables:** SHAPES_GAPCHECK.md regenerated (v2: 39/39 PASS,
+canonical outcomes, DEMO NOTE v2 = U9 codeset drift / U6+PD1
+billing-vs-clinical family / U12 grain fight, each with question +
+expected screen). Release 1.58.0 (wheel built, env item updated,
+CHANGELOG, release-consistency green).
+**Gates:** suite 1,076 passed + 5 xfailed, ruff clean, docs
+regenerated. **Live smoke: BLOCKED by paused capacity** (Kusto host
+unresolvable — tenant state, not code); offline dispatch-contract
+legs green; a background watch runs the harness the moment the
+capacity resumes and its result appends here. NOT SHIPPED TO TENANT
+until that leg is green — the law holds.
+
+## RUNBOOK TAIL (Sunny — the 1.58.0 tenant pass)
+1. Resume capacity (the smoke watch then completes on its own).
+2. Environment → Update from git → confirm
+   sql_query_agent-1.58.0-py3-none-any.whl → Publish.
+3. Workspace → Update from git (300 updated; the 320 item DELETES on
+   sync — expected).
+4. Dev fires the chain on your go: **300 → 400 → 500 → 600 → 610 →
+   700 → 800** (no 320 — the sweep is inside 300).
+5. KQL database → delete the `gov_red_flags` shortcut (its table is
+   gone; the clusters ride the existing graph_nodes shortcut).
+6. Dev re-injects the updated agent instructions; you hard-refresh,
+   spot-check "/redflags" and "what governance red flags exist?",
+   then **Publish** (the added step from the instructions re-point).
