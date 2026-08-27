@@ -13,7 +13,11 @@ other's commits, never its own, workspace commits are informational;
 anything new, any ruling, any tenant/UI click PARKS for Sunny, as
 always; (3) every autonomous action lands in the handoffs + this
 board exactly as if relayed; (4) if a session isn't running, the
-loop falls back to Sunny's doorbell; (5) DELIVERED-NESS HAS ONE
+loop falls back to Sunny's doorbell; (5) SHARED-TREE SAFETY: the sessions share one working tree —
+inspect remote movement via fetch + origin refs; PULL ONLY WHEN THE
+TREE IS CLEAN of the other session's work (a stash around the
+other's in-flight edits is a collision hazard — near-miss 08-27);
+(6) DELIVERED-NESS HAS ONE
 TRUTH — the handoff RESULTS sections: hold only on what the files
 show pending, never on remembered sequence (first-deadlock lesson,
 08-27). Review session's watcher: LIVE
