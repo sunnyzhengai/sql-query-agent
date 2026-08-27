@@ -43,11 +43,10 @@ payload 3 built, RESULTS v2 filled under the section of record).
         via real TMDL parse; render check = Sunny's tenant step)
 - [~] Sunny 08-27: dashboard params set ✓, credentials bound ✓ —
       tables await FIRST REFRESH, blocked on the shape seed
-      (expected; don't refresh early). agent spot-check RUN 08-27: **FAILED honestly** (cluster
-      properties JSON unreadable via SQL path) — **Publish
-      BLOCKED**, field find F-1/F-2/F-3 cut to dev (priority over
-      B3); Sunny re-checks after dev's verified re-inject.
-      Post-seed: refresh → render → description-empty check.
+      (expected; don't refresh early). agent spot-check 08-27 FAILED honestly → triggered the DEMOTE
+      ruling. Publish RETIRED (never happens); Sunny deletes the
+      tenant agent later. Remaining Sunny: post-seed dashboard
+      refresh → render → description-empty check.
 - [ ] Tenant load of the shape store (_shapes profile)
 - [ ] Re-walk on the diabetic corpus (incl. section B vs B3,
       section I flags; suite transcript may cover part)
@@ -88,9 +87,10 @@ payload 3 built, RESULTS v2 filled under the section of record).
 - [ ] Finder-coverage timing (pre- vs post-capture)
 - [ ] Purview/Collibra write-back tier placement (PRODUCT_PICTURE
       open item)
-- [ ] **Fabric agent: keep vs DEMOTE-TO-RECIPE** (review recommends
-      demote: we ship surfaces we can back, not reasoning we can't —
-      analysis 08-27; cleanup order cut on ruling)
+- [x] **Fabric agent: RULED — DEMOTED to integration recipe**
+      (Sunny 08-27 evening; ruling + re-cut order in
+      HANDOFF_0055_BUILD; her tenant-agent deletion queued, no
+      urgency)
 - [ ] **Delivery architecture** (listing-time): workbench as
       container-in-customer-tenant w/ Entra SSO (near-term) vs
       native Fabric Workload (strategic — answers default-tool
@@ -107,11 +107,11 @@ payload 3 built, RESULTS v2 filled under the section of record).
 
 ## 📌 STANDING CLARIFICATIONS (so recurring questions stop recurring)
 
-- **The SQL Intelligence Agent is a MAINTAINED PRODUCT SURFACE,
-  never a demo surface** (rulings: 08-22 Item-4 production
-  synthesis; 08-23 mitigation "ship it"; 08-24 demo =
-  workbench-only). It gets one Publish click per release that
-  touches its config — that's maintenance, not a demo role.
+- **The Fabric agent is DEMOTED to an integration recipe (Sunny,
+  08-27)** — supersedes the 08-22/23 "ship it" posture. We ship
+  surfaces we can back; we don't maintain reasoning we can't. AIVIA
+  builds/verifies/publishes NO Fabric agent; Step 6 becomes an
+  optional grounding recipe over surfaces we do back.
 
 ## 🅿️ PARKED DIRECTIONS (recorded, unordered)
 

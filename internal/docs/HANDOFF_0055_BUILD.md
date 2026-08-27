@@ -732,3 +732,35 @@ REVIEW above with the recorded reason. B3 records stand; corpse
 mechanisms all L0+smoke+live-verified. Full suite 1,115 green at
 last gate; ruff clean. — Pivoting to the F-1..F-3 field find
 (priority over B3 per the order; B3 was already complete).
+
+## RULING (Sunny, 2026-08-27 evening): THE FABRIC AGENT IS DEMOTED TO AN INTEGRATION RECIPE — F-ORDER RE-CUT, READ BEFORE BUILDING F-1
+
+**The ruling:** we ship surfaces we can back; we don't maintain
+reasoning we can't. The AIVIA-configured/published Fabric Data Agent
+is no longer a product component. This supersedes the 08-22/08-23
+"ship it" posture (made before the trust-law framing; tonight's F-1
+proved the true cost: every internal improvement owes a translation
+layer to someone else's brain).
+
+**Your order, re-scoped (SMALLER — stop before agent-specific work):**
+1. **F-1 becomes a PRODUCT export, built once:** the flat
+   columns/view over cluster fields (flag_class, severity, identity,
+   member_count, distinct_logics, disposition) as a first-class
+   export surface (admin tiles, integrations, and the honest Step-6
+   recipe). NO agent config injection, NO N=3 agent verification,
+   NO publish cycle — all cancelled, now and for every future
+   release.
+2. **F-2 completes regardless:** finish gov_red_flags Lakehouse
+   retirement (census truth).
+3. **F-3 cancelled** (agent codegen behavior is no longer ours to
+   fix).
+4. **Docs re-cut (small, with this order or next):** INSTALLATION
+   GUIDE Step 6 → optional appendix "Grounding Microsoft's Data
+   Agent with AIVIA's surfaces" (recipe + disclaimer: the agent's
+   reasoning is Microsoft's; AIVIA backs the surfaces). Registry/
+   runbook references to agent publish cycles removed. Rematch
+   harness stays dormant for future benchmarks.
+5. **Then B3** as previously green-lit.
+**Sunny's side (later, no urgency):** delete the tenant SQL
+Intelligence Agent via UI (API deletes were permission-blocked
+historically); her blocked Publish is now a RETIRED publish.
