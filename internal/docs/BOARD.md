@@ -53,6 +53,10 @@ payload 3 built, RESULTS v2 filled under the section of record).
 
 ## 🔧 DEV QUEUE (behind the fused build, in order)
 
+- [ ] Tenant nit: sepsis semantic model bound directly, not via
+      DemoSqlServer/DemoSqlDatabase parameters (git-vs-tenant
+      drift; align when convenient)
+
 - [~] B3 step dep-chains — UNBLOCKED, dev GO on next wake
 - [x] TEST_MAP.md generated + freshness CI (08-27 dev — 106 modules
       / 1,072 tests all accounted; docs/architecture/TEST_MAP.md)
