@@ -100,6 +100,25 @@ class TestRetrieve:
         with pytest.raises(OpError, match="not been surfaced"):
             op_retrieve([REF_A], fake_kql, OpsSession())
 
+    def test_step_record_carries_dep_chain_both_directions(self):
+        # B3 (green-lit 2026-08-25, built 2026-08-27): "what feeds
+        # this step / what does this step feed" — the
+        # transform_to_transform edges on the step record, chain ids
+        # surfaced for follow-up retrieve (token law)
+        s = OpsSession()
+        s.note_user(REF_B)
+        op_retrieve([REF_B], fake_kql, s)          # surfaces step ids
+        rs = op_retrieve([STEP_2], fake_kql, s)
+        row = rs.rows[0]
+        assert row["kind"] == "step"
+        assert [x["name"] for x in row["fed_by_steps"]] == ["Labs"]
+        assert row["feeds_steps"] == []
+        assert s.permitted(STEP_3)     # the dep id is now retrievable
+        rs2 = op_retrieve([STEP_3], fake_kql, s)
+        assert [x["name"] for x in rs2.rows[0]["feeds_steps"]] == [
+            "Scores"]
+        assert rs2.rows[0]["fed_by_steps"] == []
+
 
 class TestCompareKernels:
     def prepared(self):

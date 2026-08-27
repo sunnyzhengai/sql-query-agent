@@ -78,6 +78,25 @@ def main() -> None:
         rs = _run_op("retrieve", {"ids": [two_ids[0]]}, run_kql, ops)
         assert rs.rows, f"0 rows for surfaced id {two_ids[0]!r}"
 
+    def check_retrieve_step_deps():
+        # B3 (built 2026-08-27): a step retrieved from a live chain
+        # edge must carry its dep chain — pick a REAL
+        # transform_to_transform edge so the assertion can't vacuously
+        # pass on empty lists.
+        t2t = run_kql(
+            "graph_edges | where edge_type == 'transform_to_transform'"
+            " | take 1 | project source_id, target_id", {})
+        assert t2t, "no transform_to_transform edges in the store"
+        sid = str(t2t[0]["source_id"])
+        ops.surfaced.add(sid)
+        rs = _run_op("retrieve", {"ids": [sid]}, run_kql, ops)
+        row = rs.rows[0]
+        assert row.get("fed_by_steps"), (
+            f"step {sid!r} sits on a live t2t edge yet its record "
+            "shows no fed_by_steps")
+        assert str(t2t[0]["target_id"]) in {
+            x["id"] for x in row["fed_by_steps"]}
+
     def check_lineage_table():
         rs = _run_op("lineage", {"table": table_name}, run_kql, ops)
         assert rs.rows, f"0 rows for real table {table_name!r}"
@@ -127,6 +146,8 @@ def main() -> None:
         ("search(exact, real business name)", check_search_exact),
         ("search(semantic)", check_search_semantic),
         ("retrieve(surfaced metric id)", check_retrieve),
+        ("retrieve(step on a live t2t edge — B3 dep chain)",
+         check_retrieve_step_deps),
         ("lineage(table=real table)", check_lineage_table),
         ("lineage(column=real filtered column)", check_lineage_column),
         ("compare(two displayed CATALOG IDS — the W12 shape)",

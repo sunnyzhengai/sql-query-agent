@@ -233,6 +233,14 @@ FIXTURES = [
      "question": "which dashboards use the ED Sepsis Screening metric?",
      "oracle": "metric_reports", "item": "ED Sepsis Screening",
      "max_rounds": 4, "expected_kind": "answered"},
+    # B3 (green-lit 2026-08-25, built 2026-08-27): step dep-chains —
+    # "what feeds this step". Oracle store-derived: the fed_by names
+    # from the transform_to_transform edges, never hardcoded.
+    {"family": "step_deps",
+     "question": "what feeds the Scores step of ED Sepsis Screening?",
+     "oracle": "step_fed_by", "item": "ED Sepsis Screening",
+     "step": "Scores",
+     "max_rounds": 4, "expected_kind": "answered"},
     # W11: the blend misname — tokens split across two real families;
     # the bridge must name BOTH as did-you-mean.
     {"family": "bridge",
@@ -443,6 +451,23 @@ def build_oracle(fixture: dict, run_kql) -> dict:
         assert names, f"oracle: {fixture['item']} has no linked reports"
         return {"required_any": [names],
                 "required_overlap": 1, "forbidden": []}
+    if kind == "step_fed_by":
+        # B3: ground truth = the transform_to_transform edges in the
+        # store — resolve the metric, find the named step, read its
+        # fed_by chain through the same query the op runs.
+        from src.orchestrator.tools import STEP_FED_BY_QUERY
+        ops3 = _fresh_ops_session()
+        rs = op_search(fixture["item"], "exact", run_kql, ops3)
+        assert rs.rows, f"oracle: {fixture['item']} not in catalog"
+        ref = rs.rows[0]["id"]
+        step_id = f"transform:{ref}:{fixture['step']}"
+        deps = sorted({str(r.get("name") or "")
+                       for r in run_kql(STEP_FED_BY_QUERY,
+                                        {"p_id": step_id})} - {""})
+        assert deps, (f"oracle: {step_id} has no recorded "
+                      "fed_by chain — pick a chained step")
+        return {"required_any": [deps], "required_overlap": 1,
+                "forbidden": []}
     if kind == "compare_direction":
         # W15: the ground truth of "is the logic identical" is the
         # content-key comparison itself, derived from the store —
@@ -694,8 +719,12 @@ def paraphrases(question: str, n: int) -> "list[str]":
 # HANDOFF_0054_BUILD RESULTS): census kind enum gained 'flag' plus a
 # tool-property sentence (the sweep's machine verdicts; flags
 # disclose, never gate). SYSTEM_PROMPT unchanged.
-PINNED_PROMPT_SHA = ("d9f8df5ce81cfe086542cb04768df410"
-                     "1e2a6afe21783b640eeda1f20507e027")
+# Pin bumped CONSCIOUSLY 2026-08-27 (B3 step dep-chains, GO in
+# HANDOFF_0055_BUILD): the retrieve description gained one
+# tool-property sentence — step records carry fed_by_steps /
+# feeds_steps. No question shapes; SYSTEM_PROMPT unchanged.
+PINNED_PROMPT_SHA = ("065dcb4daaa26bc7ed9221d934d5b93e"
+                     "6a6c5b2ae5e0d4896443cbc7bd6b0024")
 
 
 def render_transcript(dump: "list[dict]", run_stamp: str) -> str:

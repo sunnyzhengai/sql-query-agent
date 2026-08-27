@@ -27,6 +27,8 @@ from src.orchestrator.tools import (
     NAME_CONTAINS_TOKENS_QUERY,
     PROJECTION_EDGES_COUNT_QUERY,
     REPORTS_OF_METRIC_QUERY,
+    STEP_FED_BY_QUERY,
+    STEP_FEEDS_QUERY,
     STEP_NAME_UNIVERSE_QUERY,
     STEPS_OF_QUERY,
     TABLE_COLUMNS_QUERY,
@@ -171,6 +173,16 @@ def fake_kql(query, params):
                  "business_name": "ED Sepsis (Regulatory)",
                  "step_name": "Labs"},
             ]
+        return []
+    if query == STEP_FED_BY_QUERY:
+        # B3 fake chain: REF_B's Scores is fed by Labs (edge
+        # consumer -> dependency, the builder's direction)
+        if params["p_id"] == STEP_2:
+            return [{"node_id": STEP_3, "name": "Labs"}]
+        return []
+    if query == STEP_FEEDS_QUERY:
+        if params["p_id"] == STEP_3:
+            return [{"node_id": STEP_2, "name": "Scores"}]
         return []
     if query == PROJECTION_EDGES_COUNT_QUERY:
         return [{"Count": 2}]

@@ -86,11 +86,14 @@ REACHABILITY = (
             "of_metric",
      "ops": ("op_retrieve",), "queries": ("STEPS_OF_QUERY",),
      "marker": "step"},
-    {"payload": "edge:transform_to_transform", "status": "excluded",
-     "reason": "step dep-chains (walk B3): PARKED BEHIND ROUND 4 by "
-               "Sunny (2026-08-22) — the metric-record step inventory "
-               "covers most dep-grain asks; revisit if the walk "
-               "surfaces real demand"},
+    {"payload": "edge:transform_to_transform", "status": "reachable",
+     "via": "step retrieve carries the dep chain both directions "
+            "(fed_by_steps / feeds_steps — walk B3, green-lit by "
+            "Sunny 2026-08-25, built 2026-08-27); chain ids surfaced "
+            "for follow-up retrieve",
+     "ops": ("op_retrieve",),
+     "queries": ("STEP_FED_BY_QUERY", "STEP_FEEDS_QUERY"),
+     "marker": "transform_to_transform"},
     {"payload": "edge:transform_to_technical", "status": "reachable",
      "via": "first-class lineage op + the identity note (1.53.x)",
      "ops": (), "queries": ("TABLE_USED_BY_QUERY",),

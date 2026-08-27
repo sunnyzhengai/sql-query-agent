@@ -80,6 +80,33 @@ STEPS_OF_QUERY = (
     "| order by node_id asc"
 )
 
+# B3 step dep-chains (green-lit 2026-08-25, built 2026-08-27): the
+# transform_to_transform edges enter the ask surface. Build direction
+# is consumer -> dependency (builder.py wires each CTE to what it
+# reads), so: fed_by = targets of edges FROM the step; feeds = sources
+# of edges INTO the step.
+STEP_FED_BY_QUERY = (
+    "declare query_parameters(p_id:string);\n"
+    "graph_edges\n"
+    "| where source_id == p_id and edge_type == "
+    "'transform_to_transform'\n"
+    "| project node_id = target_id\n"
+    "| join kind=inner (graph_nodes | project node_id, name) on node_id\n"
+    "| project node_id, name\n"
+    "| order by node_id asc"
+)
+
+STEP_FEEDS_QUERY = (
+    "declare query_parameters(p_id:string);\n"
+    "graph_edges\n"
+    "| where target_id == p_id and edge_type == "
+    "'transform_to_transform'\n"
+    "| project node_id = source_id\n"
+    "| join kind=inner (graph_nodes | project node_id, name) on node_id\n"
+    "| project node_id, name\n"
+    "| order by node_id asc"
+)
+
 BATCH_FRAGMENTS_QUERY = (
     "declare query_parameters(p_ids:string);\n"
     "graph_nodes\n"

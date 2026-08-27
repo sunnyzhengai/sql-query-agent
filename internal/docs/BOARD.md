@@ -86,6 +86,14 @@ payload 3 built, RESULTS v2 filled under the section of record).
 - [ ] M2 decision-evidence design (standing; finder-coverage may be
       the lever)
 
+## 📌 STANDING CLARIFICATIONS (so recurring questions stop recurring)
+
+- **The SQL Intelligence Agent is a MAINTAINED PRODUCT SURFACE,
+  never a demo surface** (rulings: 08-22 Item-4 production
+  synthesis; 08-23 mitigation "ship it"; 08-24 demo =
+  workbench-only). It gets one Publish click per release that
+  touches its config — that's maintenance, not a demo role.
+
 ## 🅿️ PARKED DIRECTIONS (recorded, unordered)
 
 - Semantic cloud / domain clusters (deterministic only)

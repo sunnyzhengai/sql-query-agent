@@ -109,7 +109,9 @@ ENGINE_TOOLS = [
                         "surfaced by a tool result in this conversation "
                         "or named by the user. Metric records list "
                         "their calculation step ids; step records carry "
-                        "the step's logic."),
+                        "the step's logic plus its dependency chain — "
+                        "fed_by_steps (what feeds it) and feeds_steps "
+                        "(what consumes it)."),
         "parameters": {"type": "object", "properties": {
             "ids": {"type": "array", "items": {"type": "string"}}},
             "required": ["ids"]}}},

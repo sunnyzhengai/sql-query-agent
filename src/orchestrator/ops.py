@@ -48,6 +48,8 @@ from src.orchestrator.tools import (
     PROJECTION_EDGES_COUNT_QUERY,
     REPORTS_OF_METRIC_QUERY,
     STEP_NAME_UNIVERSE_QUERY,
+    STEP_FED_BY_QUERY,
+    STEP_FEEDS_QUERY,
     STEPS_OF_QUERY,
     TABLE_COLUMNS_QUERY,
     TABLE_USED_BY_QUERY,
@@ -913,7 +915,22 @@ def op_retrieve(ids: "list[str]", run_kql, session: OpsSession) -> ResultSet:
                         session.surfaced.add(rid)
             elif an_id.startswith("transform:"):
                 fs = assemble_step(an_id, an_id.split(":", 2)[1], run_kql)
+                # B3 (walk section B; built 2026-08-27): the step's
+                # dependency chain from the transform_to_transform
+                # edges, both directions — "what feeds this step" /
+                # "what does this step feed". Ids surfaced so a
+                # follow-up retrieve may walk the chain (token law).
+                fed_by = [{"id": r["node_id"], "name": r["name"]}
+                          for r in run_kql(STEP_FED_BY_QUERY,
+                                           {"p_id": an_id})]
+                feeds = [{"id": r["node_id"], "name": r["name"]}
+                         for r in run_kql(STEP_FEEDS_QUERY,
+                                          {"p_id": an_id})]
+                for x in (*fed_by, *feeds):
+                    session.surfaced.add(x["id"])
                 rows.append({"id": an_id, "kind": "step", **fs.facts,
+                             "fed_by_steps": fed_by,
+                             "feeds_steps": feeds,
                              "decisions": _decisions_of(an_id, run_kql)})
             elif an_id.startswith(("report:", "measure:")):
                 # ADR 0052 backfill item 2 (Sunny's order, 2026-08-21):

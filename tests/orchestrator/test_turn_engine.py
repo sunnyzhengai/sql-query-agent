@@ -410,8 +410,12 @@ def test_system_prompt_is_invariants_only_no_casebook():
 # question shapes; SYSTEM_PROMPT unchanged.
 # Pin bumped CONSCIOUSLY 2026-08-23 (ADR 0054 build): census kind enum
 # gained 'flag' + a tool-property sentence. SYSTEM_PROMPT unchanged.
-PINNED_PROMPT_SHA = ("d9f8df5ce81cfe086542cb04768df410"
-                     "1e2a6afe21783b640eeda1f20507e027")
+# Pin bumped CONSCIOUSLY 2026-08-27 (B3 step dep-chains): retrieve
+# description gained the fed_by_steps / feeds_steps sentence.
+# Tool-property statement, no question shapes; SYSTEM_PROMPT
+# unchanged.
+PINNED_PROMPT_SHA = ("065dcb4daaa26bc7ed9221d934d5b93e"
+                     "6a6c5b2ae5e0d4896443cbc7bd6b0024")
 
 
 class TestPGroup:
