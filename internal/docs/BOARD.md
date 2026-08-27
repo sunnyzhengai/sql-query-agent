@@ -43,10 +43,11 @@ payload 3 built, RESULTS v2 filled under the section of record).
         via real TMDL parse; render check = Sunny's tenant step)
 - [~] Sunny 08-27: dashboard params set ✓, credentials bound ✓ —
       tables await FIRST REFRESH, blocked on the shape seed
-      (expected; don't refresh early). REMAINING: agent
-      hard-refresh + spot-check ("what governance red flags
-      exist?" expect 83) + **Publish**; post-seed: refresh →
-      render → description-empty check.
+      (expected; don't refresh early). agent spot-check RUN 08-27: **FAILED honestly** (cluster
+      properties JSON unreadable via SQL path) — **Publish
+      BLOCKED**, field find F-1/F-2/F-3 cut to dev (priority over
+      B3); Sunny re-checks after dev's verified re-inject.
+      Post-seed: refresh → render → description-empty check.
 - [ ] Tenant load of the shape store (_shapes profile)
 - [ ] Re-walk on the diabetic corpus (incl. section B vs B3,
       section I flags; suite transcript may cover part)

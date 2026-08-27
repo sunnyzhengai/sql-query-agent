@@ -591,3 +591,134 @@ sequenced behind is now passed — GO on your next wake.**
    parameters (DemoSqlServer/DemoSqlDatabase) on the dashboard's
    semantic model; open the report once to verify render; confirm
    description still EMPTY.
+
+### 2026-08-27 — B3 STEP DEP-CHAINS BUILT (autonomous cycle 3, on review's GO)
+transform_to_transform enters the ask surface, Echo Law from birth:
+- **Op semantics:** step retrieve now carries the chain BOTH
+  directions — `fed_by_steps` (what feeds it: targets of the step's
+  outgoing t2t edges; build direction is consumer→dependency) and
+  `feeds_steps` (what consumes it: sources of its incoming edges).
+  Chain ids surface into the session registry, so a follow-up
+  retrieve walks the chain under the token-matching law unchanged.
+- **Queries:** STEP_FED_BY_QUERY / STEP_FEEDS_QUERY (graph_edges
+  joined to graph_nodes for names, ordered, complete).
+- **Registry:** the stale "PARKED BEHIND ROUND 4" exclusion row is
+  now REACHABLE (ops=op_retrieve, both queries, marker
+  transform_to_transform) — reachability CI holds it.
+- **Pin bumped CONSCIOUSLY:** the retrieve tool description gained
+  one tool-property sentence (fed_by_steps / feeds_steps). No
+  question shapes (P4 respected); SYSTEM_PROMPT unchanged. New sha
+  065dcb4d… recorded in answer_evals + test_turn_engine with the
+  bump note.
+- **Echo Law legs:** L0 (test_ops: dep chain both directions +
+  surfacing; fake graph in test_tools), smoke case "retrieve(step
+  on a live t2t edge)" — picks a REAL t2t edge first so the
+  assertion cannot vacuously pass, GREEN live; suite family
+  `step_deps` ("what feeds the Scores step of ED Sepsis
+  Screening?") with a store-derived oracle (fed_by names read
+  through the same query the op runs — never hardcoded).
+- Gates: 1,111 passed + 5 xfailed, ruff clean, live smoke all
+  green. Walk section B can now grade against the built surface.
+
+### 2026-08-27 — LIVE-EVAL CORPSES (first post-1.58 live grading) + MECHANISM, same cycle
+The B3 acceptance --smoke run was the FIRST live eval since the 1.58
+migration, and it earned its keep twice:
+1. **The suite's own guard fired first** (fixture defect): the
+   step_deps oracle refused to grade "Scores" (no recorded fed_by in
+   the live store — my pick came from the test fakes, not the store).
+   Fixed to the live-verified "ABX ← AllMeds". The oracle's assert
+   prevented a vacuous PASS — oracles-by-construction working.
+2. **Build-stopper honored: 2 DISHONEST turns** (pointer_chase,
+   bridge-W11) + one sameness flip. Diagnosis — one shared shape,
+   the W13b false-empty class reborn on the ASK surface: the model
+   ran lineage(table=<METRIC name>) — a probe that measures no
+   table — got 0 rows, IGNORED the W9 redirect note (which fired
+   correctly), and claimed absence ("no dashboards use X") quoting
+   the vacuous probe's own machine headline. The verifier accepted
+   it because headlines are quotable ground (the 08-21 count-answer
+   walk find). pointer_chase reproduced 2/2 runs — behavioral, not
+   variance.
+**Mechanism (Echo Law, same session):** NON_EVIDENCE_STAMP on any
+lineage empty whose phrase resolved to a non-table kind (the W9
+redirect now carries it); the verdict verifier EXCLUDES stamped
+results' headlines from quotable ground — an absence claim can no
+longer verify against a probe that never measured the question.
+NARROW by construction: honest empties (a real table nobody reads,
+the column-coverage caveat) are unstamped and stay quotable — cage
+test pins both directions. L0 x2 + smoke case (live GREEN:
+"lineage(table=METRIC name — non-evidence stamp)").
+**Recorded, not yet mechanized (watch items):** bridge-W11 corpse =
+model ignored the search bridge note and claimed no-official from a
+token-degraded census (needs a design pass if it recurs — the
+degraded-universe absence-claim class); step_deps + flags graded
+dumb on n=1 (engine reached the right records, caption failed to
+synthesize — capability, not honesty). Re-run scorecard appended
+below when green.
+
+### 2026-08-27 — DETERMINISM PIN + COLUMN-BRANCH STAMP; ONE CLASS DEFERRED TO REVIEW (recorded reason)
+Continuing the live-eval corpse hunt, three more mechanisms landed:
+1. **Caption-gate crash fixed** (live TypeError, fixture-first): a
+   ref-anchored caption naming a competitor but no sibling left
+   pos_sib=None and the ordering check compared int < None. The
+   ordering duty is now vacuous when no sibling is named (presence
+   already satisfied by the ref). The gate itself must never crash.
+2. **Determinism pin**: azure_chat_api sampled at DEFAULT
+   temperature — the same question flipped ok → DISHONEST across
+   runs on identical inputs, so the honesty floor moved with
+   sampling noise. temperature: 0 pinned at the engine doorway
+   (production + suite; the engine states facts from tools, it does
+   not ideate). Temp-0 rerun confirmed the remaining corpses are
+   STABLE states, not noise. Behavior-affecting change — flagged
+   for review's eyes.
+3. **NON-EVIDENCE stamp extended to the column branch**: at temp 0
+   the model probed lineage(column=<METRIC name>) and the
+   coverage caveat — designed for real-but-untracked columns —
+   legitimized the absence claim. Same category error, same
+   mechanism: W9 redirect + stamp; the honest caveat for
+   real-shaped columns stays unstamped and quotable (L0 both ways).
+**DEFERRED TO REVIEW (Echo Law recorded reason: needs a design
+ruling):** the remaining sameness corpses are one stable class —
+RELATIONSHIP CLAIMS WITHOUT COMPARE: the model retrieves both
+records and narrates a difference/sameness verdict from
+descriptions ("what's the difference between X and Y" answered
+without op_compare; "no other metric uses the same base
+population" concluded from records + census). The compare-only law
+exists as tool semantics; FLOORING it requires the caption gate to
+TYPE relationship claims in prose, which is exactly the
+lexicon/question-shape territory P4 bans. Options for review's
+design pass: (a) a turn-scoped duty keyed on ≥2 retrieved records
+of the same kind + zero compare results (structural, no lexicon —
+my recommendation to examine first); (b) verdict-form extension (a
+typed "relationship_verdict" field the machine can check against
+displayed compare results); (c) accept as capability boundary,
+suite-visible. Evidence: temp-0 dump 2026-08-27, sameness honesty
+0.60, questions and captions preserved in SUITE_TRANSCRIPT.md.
+
+## FIELD FIND — Sunny's agent spot-check FAILED; Publish BLOCKED (2026-08-27 evening; PRIORITY over B3)
+
+The spot-check worked as designed: the draft agent could NOT answer
+"what governance red flags exist" — honest refusal with remediation
+(good behavior; no invention). Root reports from its own Basis:
+JSON_VALUE over graph_nodes.properties for node_id LIKE 'cluster:%'
+→ JSON parsing error, 0 usable rows.
+
+1. **F-1 (the fix): cluster surface must be FLAT for the agent.**
+   Suspects: JSON_VALUE's 4,000-char value limit + no-array
+   extraction vs our large cluster properties (members, receipts,
+   drill). Remedy per ADR 0020 (data-shaped): promote the agent's
+   fields (flag_class, severity, identity, member_count,
+   distinct_logics, disposition) to REAL COLUMNS on the graph_nodes
+   export or a dedicated flat view; agent instructions query
+   columns, never parse JSON. Verify with the N=3 pattern before
+   handing back to Sunny.
+2. **F-2: stale config + incomplete retirement** — gov_red_flags is
+   still CHECKED as a selected source in the agent, and the
+   Lakehouse table still exists. Finish the retirement (census
+   truth) and clean the source selection.
+3. **F-3:** second question died in codegen ("no SQL candidates
+   passed validation") — likely resolves with F-1's flat surface;
+   confirm in verification.
+4. Sequence: this PRECEDES B3 (a customer-facing surface is broken
+   in draft; the demo law's cousin: never leave a condemned state
+   awaiting a click). Sunny's Publish stays BLOCKED until your
+   verified re-inject; she then re-runs the spot-check.
