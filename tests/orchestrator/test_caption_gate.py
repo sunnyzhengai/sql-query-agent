@@ -221,6 +221,31 @@ class TestNoteInHeadline:
         # competitor named earlier, which empty rows cannot supply
 
 
+class TestRefAnchoredCaptionWithCompetitor:
+    """Live-eval crash 2026-08-27: a caption that anchored via a ref
+    token (satisfying PRESENCE) while naming a displayed COMPETITOR
+    but no sibling by name left pos_sib=None, and the ordering check
+    compared int < None — a TypeError in the gate itself. The gate
+    must never crash; the ordering duty is vacuous when no sibling
+    is named (presence is already satisfied by the ref)."""
+
+    def _outputs(self):
+        exact = {"ref": "R1", "op": "search",
+                 "params": {"phrase": "Sepsis Case", "mode": "exact"},
+                 "rows": [{"id": "y", "name": "USP_Severe_Sepsis",
+                           "business_name": "Severe Sepsis Episodes"}],
+                 "complete": True, "universe": "u",
+                 "headline": "R1: … Nothing is NAMED 'Sepsis Case' "
+                             "exactly; closest by name: Sepsis Case "
+                             "Details."}
+        return [{"component": {"op": "search"}, "result": exact}]
+
+    def test_ref_anchor_plus_competitor_does_not_crash(self):
+        cap = "See R1 — related: Severe Sepsis Episodes."
+        vs = caption_violations(cap, self._outputs())   # must not raise
+        assert not [v for v in vs if "presented FIRST" in v]
+
+
 class TestExactStampPrecedence:
     """1.50.9: the exact-mode stamp names the USER'S missed phrase; a
     model-widened semantic search stamps near-everything and must not

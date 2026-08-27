@@ -196,7 +196,13 @@ def azure_chat_api(timeout: int = 120) -> "Callable[[list[dict], list[dict]], di
         # chat_completion and KustoClient.run: 3 attempts, backoff,
         # persistent failures still raise.
         import time as _time
-        body = {"model": model, "messages": messages, "tools": tools}
+        # Determinism pin (live-eval find 2026-08-27): the same
+        # question flipped ok → DISHONEST across runs on identical
+        # inputs — the doorway was sampling at default temperature.
+        # A floor that moves with sampling noise is not a floor; the
+        # engine states facts from tools, it does not ideate.
+        body = {"model": model, "messages": messages, "tools": tools,
+                "temperature": 0}
         if tool_choice is not None:
             body["tool_choice"] = tool_choice
         last_err: "Exception | None" = None

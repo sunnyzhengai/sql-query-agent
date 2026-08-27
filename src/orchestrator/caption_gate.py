@@ -145,7 +145,11 @@ def caption_violations(caption: str, outputs: "list[dict]",
                 "bridge acceptance (Sunny, 2026-08-21): the stamped "
                 f"name-siblings ({', '.join(stamped[:3])}) are "
                 "MANDATORY — present at least one, first")
-        elif pos_oth is not None and pos_oth < pos_sib:
+        # pos_sib None with a ref anchor: presence is satisfied by
+        # pointing at the display; the ordering duty is vacuous (live
+        # crash 2026-08-27: int < None TypeError in the gate itself)
+        elif (pos_sib is not None and pos_oth is not None
+              and pos_oth < pos_sib):
             violations.append(
                 "bridge acceptance (Sunny, 2026-08-21): the stamped "
                 f"name-siblings ({', '.join(stamped[:3])}) must be "

@@ -722,3 +722,13 @@ JSON_VALUE over graph_nodes.properties for node_id LIKE 'cluster:%'
    in draft; the demo law's cousin: never leave a condemned state
    awaiting a click). Sunny's Publish stays BLOCKED until your
    verified re-inject; she then re-runs the spot-check.
+
+### 2026-08-27 — CORPSE-HUNT CLOSE: 5th live run
+pointer_chase 1.00 PASS end-to-end (the column-branch stamp turned
+the category-error probe into a followed redirect); step_deps 1.00;
+flags honesty 1.00. The ONLY remaining DISHONEST turns are the
+relationship-claims-without-compare class already DEFERRED TO
+REVIEW above with the recorded reason. B3 records stand; corpse
+mechanisms all L0+smoke+live-verified. Full suite 1,115 green at
+last gate; ruff clean. — Pivoting to the F-1..F-3 field find
+(priority over B3 per the order; B3 was already complete).

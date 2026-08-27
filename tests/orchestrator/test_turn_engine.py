@@ -224,6 +224,53 @@ class TestLoop:
         assert out["answered"] is True
         assert out["rounds"] == 1              # no continuation fired
 
+    def test_non_evidence_headline_cannot_verify_an_absence_claim(self):
+        """Live-eval corpse 2026-08-27 (W13b false-empty on the ask
+        surface): lineage(table=<metric name>) measured no table —
+        the W9 redirect fired and the result is NON-EVIDENCE-stamped.
+        A verdict quoting that probe's own 0-row headline must NOT
+        verify: the probe never measured the question."""
+        s = EngineSession()
+        out = run_turn(s, "which dashboards use ED Sepsis Screening?",
+                       scripted_engine([
+                           {"calls": [("lineage",
+                                       {"table": "ED Sepsis Screening"})]},
+                           {"text": "No dashboards use it — see R1."},
+                           {"verdict": {
+                               "answered": True,
+                               "evidence_quote":
+                                   "lineage — 0 row(s). Scope: every "
+                                   "certified metric whose calculation "
+                                   "reads"}},
+                           # the floor rejects the quote; the
+                           # continuation nudges toward the stamped
+                           # redirect — model stays humble here
+                           {"text": "I could not establish it."},
+                           {"verdict": {"answered": False}},
+                       ]), fake_kql)
+        assert out["answered"] is False
+        assert out["declared_raw"] is False    # final filing was humble
+
+    def test_honest_empty_lineage_headline_still_quotable(self):
+        """The floor is NARROW: a real-table probe that nobody reads
+        is an honest empty — not stamped, its headline remains
+        quotable evidence (the walk-find that made headlines quotable
+        stands)."""
+        s = EngineSession()
+        out = run_turn(s, "which metrics read UNREAD_TABLE?",
+                       scripted_engine([
+                           {"calls": [("lineage",
+                                       {"table": "UNREAD_TABLE"})]},
+                           {"text": "None read it — see R1."},
+                           {"verdict": {
+                               "answered": True,
+                               "evidence_quote":
+                                   "lineage — 0 row(s). Scope: every "
+                                   "certified metric whose calculation "
+                                   "reads"}},
+                       ]), fake_kql)
+        assert out["answered"] is True
+
     def test_self_diagnosed_miss_continues_once_and_can_recover(self):
         """Verdict-driven continuation (P6, suite find 2026-08-21):
         the model kept filing not-answered with the missing op named,

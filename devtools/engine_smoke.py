@@ -101,6 +101,17 @@ def main() -> None:
         rs = _run_op("lineage", {"table": table_name}, run_kql, ops)
         assert rs.rows, f"0 rows for real table {table_name!r}"
 
+    def check_lineage_non_evidence_stamp():
+        # live-eval corpse 2026-08-27: a lineage probe on a METRIC
+        # name measures no table — the result must carry the
+        # NON-EVIDENCE stamp (its headline leaves the verdict's
+        # quotable ground) and the W9 redirect
+        from src.orchestrator.ops import NON_EVIDENCE_STAMP
+        rs = _run_op("lineage", {"table": m_name}, run_kql, ops)
+        assert not rs.rows and NON_EVIDENCE_STAMP in rs.note, (
+            f"metric-name probe {m_name!r} not stamped non-evidence "
+            f"(rows={len(rs.rows)}, note={rs.note[:80]!r})")
+
     def check_lineage_column():
         rs = _run_op("lineage", {"column": col_name}, run_kql, ops)
         assert rs.rows or COLUMN_COVERAGE_CAVEAT in rs.note, (
@@ -149,6 +160,8 @@ def main() -> None:
         ("retrieve(step on a live t2t edge — B3 dep chain)",
          check_retrieve_step_deps),
         ("lineage(table=real table)", check_lineage_table),
+        ("lineage(table=METRIC name — non-evidence stamp)",
+         check_lineage_non_evidence_stamp),
         ("lineage(column=real filtered column)", check_lineage_column),
         ("compare(two displayed CATALOG IDS — the W12 shape)",
          check_compare_catalog_ids),

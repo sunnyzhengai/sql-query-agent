@@ -237,9 +237,11 @@ FIXTURES = [
     # "what feeds this step". Oracle store-derived: the fed_by names
     # from the transform_to_transform edges, never hardcoded.
     {"family": "step_deps",
-     "question": "what feeds the Scores step of ED Sepsis Screening?",
+     "question": "what feeds the ABX step of ED Sepsis Screening?",
      "oracle": "step_fed_by", "item": "ED Sepsis Screening",
-     "step": "Scores",
+     "step": "ABX",     # live-verified chained step (first pick
+                        # 'Scores' had no deps — the oracle's own
+                        # guard caught it before a vacuous grade)
      "max_rounds": 4, "expected_kind": "answered"},
     # W11: the blend misname — tokens split across two real families;
     # the bridge must name BOTH as did-you-mean.

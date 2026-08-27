@@ -35,6 +35,7 @@ from src.orchestrator.caption_gate import (
     stamped_headline,
 )
 from src.orchestrator.ops import (
+    NON_EVIDENCE_STAMP,
     OpError,
     OpsSession,
     op_census,
@@ -473,9 +474,17 @@ def run_turn(session: EngineSession, question: str, chat_api,
                 [row for o in shown
                  for row in ((o.get("result") or {}).get("rows") or [])],
                 ensure_ascii=False))
+            # Live-eval corpse 2026-08-27: a NON-EVIDENCE-stamped
+            # result (a lineage probe that measured no table — the
+            # W13b false-empty class on the ask surface) contributes
+            # NO quotable headline: its emptiness cannot verify an
+            # absence claim about a question it never measured.
+            # Rows always remain quotable (stamped results have none).
             ground += " " + _norm(" ".join(
                 str((o.get("result") or {}).get("headline") or "")
-                for o in shown))
+                for o in shown
+                if NON_EVIDENCE_STAMP not in
+                str((o.get("result") or {}).get("note") or "")))
             if len(quote) < 20 or quote.lower() not in ground.lower():
                 answered = False
                 raw = {**raw, "missing_op": raw.get("missing_op")

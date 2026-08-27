@@ -47,9 +47,9 @@ from src.orchestrator.tools import (
     NAME_CONTAINS_TOKENS_QUERY,
     PROJECTION_EDGES_COUNT_QUERY,
     REPORTS_OF_METRIC_QUERY,
-    STEP_NAME_UNIVERSE_QUERY,
     STEP_FED_BY_QUERY,
     STEP_FEEDS_QUERY,
+    STEP_NAME_UNIVERSE_QUERY,
     STEPS_OF_QUERY,
     TABLE_COLUMNS_QUERY,
     TABLE_USED_BY_QUERY,
@@ -117,6 +117,19 @@ class OpsSession:
 
 class OpError(Exception):
     """Visible, recoverable — rendered to the user, never a 500."""
+
+
+# Live-eval corpse 2026-08-27 (the W13b false-empty class on the ask
+# surface): a lineage probe whose phrase resolved to a METRIC/STEP —
+# not a table — returned 0 rows, and the caption claimed absence
+# ("no dashboards use X") quoting the probe's own headline. The probe
+# never measured the question, so its emptiness is NON-EVIDENCE: the
+# stamp marks the result, and the verdict verifier refuses quotes
+# whose only ground is a stamped result's headline. Honest empties
+# (a real table nobody reads; the column-coverage caveat) are NOT
+# stamped and stay quotable.
+NON_EVIDENCE_STAMP = ("NON-EVIDENCE for absence claims — this probe "
+                      "did not measure a table: ")
 
 
 # --- search: one primitive, two modes ---------------------------------
@@ -724,6 +737,26 @@ def _column_usage(column: str, run_kql, session: OpsSession) -> ResultSet:
             # of use).
             note = (f"0 recorded edges for {clean!r}. "
                     + COLUMN_COVERAGE_CAVEAT)
+    if not out:
+        # Live-eval corpse 2026-08-27 (temp-0 run): the model probed
+        # lineage(column=<METRIC name>) and the coverage caveat —
+        # designed for real-but-untracked columns — legitimized an
+        # absence claim about a phrase that is not a column at all.
+        # Same category error as the table branch, same mechanism:
+        # W9 redirect + NON-EVIDENCE stamp when the phrase resolves
+        # to a catalog item instead.
+        for r in list(run_kql(FIND_BY_NAME_QUERY,
+                              {"p_name": clean}))[:1]:
+            rid = (r.get("ref") if r.get("kind") == "metric"
+                   else r.get("node_id"))
+            if rid:
+                session.surfaced.add(str(rid))
+                note = (NON_EVIDENCE_STAMP
+                        + f"{clean!r} is a "
+                        f"{str(r.get('kind') or 'catalog item').upper()},"
+                        f" not a column — its record carries its links "
+                        f"(reports, tables, steps); retrieve "
+                        f"{str(rid)!r} for them.")
     return session.register(
         "lineage", {"column": clean},
         _attach_cards(out, run_kql),
@@ -815,7 +848,8 @@ def op_lineage(table: str, run_kql, session: OpsSession,
             if rid:
                 if session is not None:
                     session.surfaced.add(str(rid))
-                note = (f"{clean!r} is a "
+                note = (NON_EVIDENCE_STAMP
+                        + f"{clean!r} is a "
                         f"{str(r.get('kind') or 'catalog item').upper()},"
                         f" not a warehouse table — its record carries "
                         f"its links (reports, tables, steps); retrieve "

@@ -601,3 +601,26 @@ class TestRowMentions:
     def test_none_fields_are_safe(self):
         assert not row_mentions(
             {"name": None, "business_name": None, "description": None}, "ED")
+
+
+class TestNonEvidenceStamp:
+    def test_column_probe_with_metric_name_is_stamped(self):
+        # live-eval corpse 2026-08-27 (temp-0): lineage(column=
+        # <metric name>) let the coverage caveat legitimize an
+        # absence claim — the phrase is not a column; the result is
+        # NON-EVIDENCE and redirects to the record
+        from src.orchestrator.ops import NON_EVIDENCE_STAMP, op_lineage
+        s = OpsSession()
+        rs = op_lineage("", fake_kql, s, column="ED Sepsis Screening")
+        assert not rs.rows
+        assert NON_EVIDENCE_STAMP in rs.note
+        assert "not a column" in rs.note
+        assert s.permitted(REF_A)          # redirect target surfaced
+
+    def test_real_column_with_no_edges_keeps_the_honest_caveat(self):
+        # the caveat path for a REAL-shaped column stays unstamped —
+        # coverage-absent is honest evidence, not a category error
+        from src.orchestrator.ops import NON_EVIDENCE_STAMP, op_lineage
+        rs = op_lineage("", fake_kql, OpsSession(),
+                        column="TOTALLY_UNKNOWN_COL")
+        assert NON_EVIDENCE_STAMP not in rs.note
