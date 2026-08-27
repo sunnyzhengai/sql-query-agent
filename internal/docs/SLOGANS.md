@@ -151,3 +151,6 @@ point.
   answers everyone can trust."** — the pitch round, 2026-08-25.
   (COPY — THE one-liner; trust conserved, not created; unfolds into
   "the map, not the verdict" as sentence two)
+- **"The graph can say everything; code enforces; humans
+  witness."** — the graph-language round, 2026-08-26. (LAW-adjacent
+  DOCTRINE; the folding trend's terminus)

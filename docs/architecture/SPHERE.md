@@ -163,3 +163,23 @@ Three legs:
    invented. Conditional on the op algebra's expressiveness —
    out-of-algebra questions fail LOUD at plan time (the proven
    boundary; proof where proof exists, disclosure where it doesn't).
+
+## The limits of graph language (Sunny's challenge, 2026-08-26)
+
+Every state, structure, and rule is graph-EXPRESSIBLE (reified per
+the contracts split), and every compliance check reduces to three
+graph computations: forbidden patterns (most laws — single-writer,
+ownership, even the Echo Law as "echo node with no mechanism edge"),
+conservation equations (the completeness family), and fixpoint
+derivations (connectivity/closures — provably beyond single
+traversals, hence materialized per ADR 0018). Three things escape,
+each governed by an existing law: (1) ENFORCEMENT cannot live inside
+the structure it governs — the graph finds violations, code refuses
+commits ("the rules about changing rules never leave code");
+(2) the STOCHASTIC TRANSLATOR escapes all specification — gated by
+code, witnessed per instance, its evidence graphed but never itself;
+(3) UNDECIDABLE SEMANTICS (D2) — pointed at and disclosed, never
+decided. The theorem: the graph can SAY everything; extended with
+derivation and counting it can CHECK everything checkable; it can
+ENFORCE nothing alone — code enforces, humans witness. Everything
+folds into the graph except the fold's own guarantor.
