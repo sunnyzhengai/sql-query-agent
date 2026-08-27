@@ -360,3 +360,24 @@ until that leg is green — the law holds.
 6. Dev re-injects the updated agent instructions; you hard-refresh,
    spot-check "/redflags" and "what governance red flags exist?",
    then **Publish** (the added step from the instructions re-point).
+
+### 2026-08-26 — LIVE SMOKE GREEN + one pre-ship find killed on the spot
+Capacity resumed (dev, via ARM); the armed watch ran the harness:
+all 9 cases green through the real dispatch — INCLUDING a fresh
+corpse the harness caught BEFORE the tenant could: on the pre-1.58
+store, census(flag) answered a bare "0 flags" — but that store
+merely PREDATES the graph-native sweep. Pre-sweep absence read as
+proven-zero: the W13b false-empty class reborn on the flag surface.
+Mechanism, same session (Echo Law): every 300 build writes a
+`govmeta:sweep` RECEIPT node (swept/flagged/clean + run_at); a
+zero-cluster census with NO receipt now REFUSES with the named
+remediation ("absence of clusters is not proven zero flags"); with
+the receipt, the honest zero cites it in the stamped universe. Smoke
+case asserts all three honest states; +2 L0 tests. Re-run live:
+"store predates the graph-native sweep — named remediation
+verified" — the guard working on the exact store that exposed it.
+ADR 0059 (topology axioms, review DRAFT) registered sanctioned.
+FINAL GATES: suite 1,078 passed + 5 xfailed, ruff clean, live smoke
+green. **FUSED ORDER COMPLETE** — awaiting Sunny's runbook-tail
+steps (env publish 1.58.0, workspace sync) and her "go" for the
+7-notebook chain.

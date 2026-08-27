@@ -99,18 +99,28 @@ def main() -> None:
         assert rs.rows, "0 rows"
 
     def check_census_flag():
-        # ADR 0054: a pre-sweep store legitimately lacks the table —
-        # the op must fail with the NAMED remediation, never a raw
-        # Kusto error; a post-sweep store must enumerate.
+        # ADR 0054/0057: three honest states — clusters enumerate; OR
+        # zero flags WITH the sweep receipt cited; OR the pre-sweep
+        # store refuses with the named remediation (smoke find
+        # 2026-08-26: a pre-1.58 store answered a bare 0 — the false-
+        # empty class; the receipt guard closed it).
         from src.orchestrator.ops import OpError
         try:
             rs = _run_op("census", {"kind": "flag"}, run_kql, ops)
-            print(f"       (flag surface live: {len(rs.rows)} flag(s))")
+            if rs.rows:
+                print(f"       (flag surface live: {len(rs.rows)} "
+                      "flag(s))")
+            else:
+                assert "sweep receipt" in rs.universe, (
+                    "zero flags WITHOUT a sweep receipt escaped the "
+                    "pre-sweep guard — the false-empty class")
+                print("       (zero flags, sweep receipt cited — "
+                      "honest empty)")
         except OpError as e:
-            assert "320_red_flag_sweep" in str(e), (
+            assert "300_build_graph" in str(e), (
                 f"flag census failed WITHOUT the remediation: {e}")
-            print("       (flag surface not in store yet — named "
-                  "remediation verified)")
+            print("       (store predates the graph-native sweep — "
+                  "named remediation verified)")
 
     cases = [
         ("census(kind=metric)", check_census),

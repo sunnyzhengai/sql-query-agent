@@ -20,6 +20,7 @@ from src.orchestrator.tools import (
     GOV_FLAGS_BY_IDENTITY_QUERY,
     GOV_FLAGS_FOR_MEMBER_QUERY,
     GOV_FLAGS_QUERY,
+    GOV_SWEEP_META_QUERY,
     LINKS_OF_REPORT_QUERY,
     LIST_CATALOG_QUERY,
     NAME_CONTAINS_QUERY,
@@ -232,6 +233,10 @@ def fake_kql(query, params):
         return []
     if query == GOV_FLAGS_QUERY:
         return [dict(f) for f in FAKE_FLAGS]
+    if query == GOV_SWEEP_META_QUERY:
+        # the sweep receipt (smoke find 2026-08-26)
+        return [{"swept": 63, "flagged": 37, "clean": 25,
+                 "run_at": "2026-08-26T00:00:00"}]
     if query == GOV_FLAG_BY_ID_QUERY:
         return [dict(f) for f in FAKE_FLAGS
                 if f["flag_id"] == params["p_id"]]

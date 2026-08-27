@@ -685,3 +685,9 @@ classification).
 - **Category:** architecture
 - **Summarized in:**
   - `docs/decisions/0058-self-service-contracts.md`
+
+## ADR 0059 — The graph topology axioms: connected, sound, complete (measured, then formalized)
+
+- **Category:** architecture
+- **Summarized in:**
+  - `docs/decisions/0059-graph-topology-axioms.md`

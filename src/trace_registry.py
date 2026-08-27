@@ -498,6 +498,19 @@ TRACE_REGISTRY = {
                   "tests/test_companion.py"],
         "docs": ["docs/architecture/SPEC.md", "docs/architecture/TRACE_MAP.md"],
     },
+    "0059": {
+        # DRAFT 2026-08-26 (review, Sunny's directive): the graph
+        # topology axioms (connected / sound / complete) — measured
+        # before drafted; join the formal spec on Sunny's
+        # ratification, then the enforcement legs get modules/tests.
+        "title": "The graph topology axioms: connected, sound, "
+                 "complete (measured, then formalized)",
+        "category": "architecture",
+        "axioms": [],
+        "modules": [],
+        "tests": [],
+        "docs": ["docs/decisions/0059-graph-topology-axioms.md"],
+    },
     "0058": {
         # DRAFT 2026-08-25 (review): the self-service contracts —
         # contracts-first for the Pro pillar; Sunny ratifies; build

@@ -435,6 +435,19 @@ GOV_FLAGS_QUERY = (
     + "| order by severity asc, flag_class asc, identity asc"
 )
 
+# The sweep RECEIPT (smoke find 2026-08-26: a pre-1.58 store answered
+# census(flag) with an honest-looking 0 — pre-sweep absence is not
+# proven zero-flags; the same false-empty class as W13b). The build
+# writes one govmeta node per run; a zero-flag census must cite it or
+# refuse with the remediation.
+GOV_SWEEP_META_QUERY = (
+    "graph_nodes\n"
+    "| where node_id == 'govmeta:sweep'\n"
+    "| extend p = todynamic(properties)\n"
+    "| project swept = toint(p.swept), flagged = toint(p.flagged),\n"
+    "          clean = toint(p.clean), run_at = tostring(p.run_at)"
+)
+
 GOV_FLAG_BY_ID_QUERY = (
     "declare query_parameters(p_id:string);\n"
     "graph_nodes\n"

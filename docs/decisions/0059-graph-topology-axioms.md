@@ -1,9 +1,9 @@
 # ADR 0059 — The graph topology axioms: connected, sound, complete
 
-**Status:** DRAFT 2026-08-26 — Sunny's directive ("everything is
-connected, and connections are sound and complete, should be formal
-specifications"); measured before drafted; Sunny ratifies, then the
-axioms join Φ_AIVIA (per the amendment rule).
+**Status:** ACCEPTED 2026-08-26 — G1–G3 RATIFIED by Sunny; the four
+provenance classes RATIFIED; item 3 resolved by the FOUNDATION
+EXCEPTION (below). The axioms join Φ_AIVIA per the amendment rule;
+mechanization (SPEC text + CI legs + 300 postconditions) is dev's.
 
 **The measurement (2026-08-26, full local build over the recorded
 corpus, current builder incl. the folded sweep):** 6,669 nodes /
@@ -67,11 +67,21 @@ claim without a conservation equation behind it is forbidden.
    NOW, in the same order, not as a follow-up (build the mechanism
    at the first opportunity, not after the first failure).
 
-## PARKED for Sunny
+## Rulings (Sunny, 2026-08-26)
 
-1. Ratify G1–G3 as stated (then they join SPEC beside reachability
-   and translatability, one ADR-recorded amendment).
-2. G2's provenance registry: ratify the four classes.
-3. Whether `foundation_unreferenced` islands should ALSO surface as
-   a differentiation-queue entry ("tables nobody reads") or stay
-   audit-only until sovereign foundation ships.
+1. G1–G3 RATIFIED as stated.
+2. The four provenance classes RATIFIED (parsed / declared /
+   derived / asserted; future catalog imports = declared unless an
+   ADR says otherwise).
+3. **THE FOUNDATION EXCEPTION (supersedes the question as asked):**
+   the dictionary is a SOURCE OF TRUTH — foundation nodes exist AS
+   IS, justified by the dictionary itself, whether or not any
+   transformation reads them. G1's principal-component requirement
+   applies to the DERIVED layers only (org, canonical, governance —
+   where disconnection genuinely signals a defect); foundation is
+   exempt: its required connectivity is internal (table→columns
+   always; table→table when declared join topology is ingested),
+   its islands are LEGITIMATE STATES — enumerated by the audit for
+   visibility, never findings, never queue entries, never flags.
+   In the real EMR most tables ARE connected; foundation will
+   largely be one fabric with legitimate cluster-islands inside.

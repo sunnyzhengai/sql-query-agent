@@ -40,6 +40,7 @@ from src.orchestrator.tools import (
     GOV_FLAGS_BY_IDENTITY_QUERY,
     GOV_FLAGS_FOR_MEMBER_QUERY,
     GOV_FLAGS_QUERY,
+    GOV_SWEEP_META_QUERY,
     LINKS_OF_REPORT_QUERY,
     LIST_CATALOG_QUERY,
     NAME_CONTAINS_QUERY,
@@ -460,12 +461,22 @@ def op_census(kind: str, run_kql, session: OpsSession,
         # disclose, never gate.
         try:
             frows = list(run_kql(GOV_FLAGS_QUERY, {}))
+            meta = list(run_kql(GOV_SWEEP_META_QUERY, {}))
         except Exception as e:              # noqa: BLE001 — named state
             raise OpError(
                 "the governance cluster surface is not in this store "
                 "yet — rerun 300_build_graph on engine >= 1.58 (the "
                 "sweep is folded in; clusters ride graph_nodes) "
                 f"({type(e).__name__})") from e
+        if not frows and not meta:
+            # smoke find 2026-08-26: zero cluster nodes on a store
+            # with NO sweep receipt is PRE-SWEEP absence, not proven
+            # zero flags — the W13b false-empty class on this surface
+            raise OpError(
+                "no governance clusters AND no sweep receipt in this "
+                "store — it predates the graph-native sweep; rerun "
+                "300_build_graph on engine >= 1.58 (absence of "
+                "clusters is not proven zero flags)")
         out = [{"id": str(r["flag_id"]), "kind": "flag",
                 "name": str(r.get("identity") or ""),
                 "business_name": None, "of_metric": None,
@@ -481,6 +492,10 @@ def op_census(kind: str, run_kql, session: OpsSession,
         universe = ("every governance red flag recorded by the ADR "
                     "0054 sweep as a reified 'cluster:' node (flags "
                     "disclose, never gate) — the count is exact")
+        if meta:
+            m0 = meta[0]
+            universe += (f"; sweep receipt: {m0.get('swept')} item(s) "
+                         f"swept at {str(m0.get('run_at'))[:19]}")
         if contains and contains.strip():
             needle = contains.strip()
             out = [r for r in out

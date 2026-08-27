@@ -7,6 +7,7 @@ Logic relations asserted here:
 
 from __future__ import annotations
 
+import json
 from dataclasses import dataclass, field
 from typing import Iterable
 
@@ -286,8 +287,22 @@ def build_graph_step(
     # edges join the SAME tables; the dangling check extends over the
     # merged sets — a member edge must land on a real org node, a
     # group edge on a real cluster node.
+    # The sweep RECEIPT node (smoke find 2026-08-26): pre-sweep
+    # absence must never read as zero flags — a zero-flag census
+    # cites this node's counts; its absence names the remediation.
+    sweep_meta = {
+        "node_id": "govmeta:sweep", "layer": "governance",
+        "name": "governance sweep receipt",
+        "description": (f"sweep of {sweep_out.swept} catalog items: "
+                        f"{sweep_out.flagged} in flags, "
+                        f"{sweep_out.clean} clean"),
+        "properties": json.dumps({
+            "kind": "sweep_meta", "swept": sweep_out.swept,
+            "flagged": sweep_out.flagged, "clean": sweep_out.clean,
+            "excluded": sweep_out.excluded,
+            "run_at": sweep_run_at})}
     final_nodes = (nodes_to_row_dicts(builder.nodes)
-                   + sweep_out.cluster_nodes_rows)
+                   + sweep_out.cluster_nodes_rows + [sweep_meta])
     final_edges = (edges_to_row_dicts(builder.edges)
                    + sweep_out.cluster_edges_rows)
     merged_ids = {n["node_id"] for n in final_nodes}

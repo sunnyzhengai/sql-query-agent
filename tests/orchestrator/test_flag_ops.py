@@ -34,6 +34,33 @@ class TestFlagCensus:
         assert len(rs.rows) == 1
         assert rs.rows[0]["flag_class"] == "cousin_conflict"
 
+    def test_census_cites_the_sweep_receipt(self):
+        s = OpsSession()
+        rs = op_census("flag", fake_kql, s)
+        assert "sweep receipt: 63 item(s) swept" in rs.universe
+
+    def test_pre_sweep_store_refuses_the_bare_zero(self):
+        # smoke find 2026-08-26: zero clusters + no receipt = a store
+        # that PREDATES the sweep — a bare 0 would be the false-empty
+        # class; the op must refuse with the remediation
+        import pytest
+
+        from src.orchestrator.ops import OpError
+        from src.orchestrator.tools import (
+            GOV_FLAGS_QUERY,
+            GOV_SWEEP_META_QUERY,
+        )
+
+        def pre_sweep_kql(query, params):
+            if query in (GOV_FLAGS_QUERY, GOV_SWEEP_META_QUERY):
+                return []
+            return fake_kql(query, params)
+
+        with pytest.raises(OpError) as e:
+            op_census("flag", pre_sweep_kql, OpsSession())
+        assert "predates the graph-native sweep" in str(e.value)
+        assert "not proven zero flags" in str(e.value)
+
 
 class TestFlagRetrieve:
     def test_full_flag_record_with_members_and_drill(self):
