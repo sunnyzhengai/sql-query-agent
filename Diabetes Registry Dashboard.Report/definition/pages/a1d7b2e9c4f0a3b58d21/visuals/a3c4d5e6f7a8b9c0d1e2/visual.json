@@ -1,0 +1,102 @@
+{
+ "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+ "name": "a3c4d5e6f7a8b9c0d1e2",
+ "position": {
+  "x": 52,
+  "y": 340,
+  "z": 1000,
+  "height": 307,
+  "width": 543,
+  "tabOrder": 1000
+ },
+ "visual": {
+  "visualType": "lineChart",
+  "query": {
+   "queryState": {
+    "Category": {
+     "projections": [
+      {
+       "field": {
+        "Column": {
+         "Expression": {
+          "SourceRef": {
+           "Entity": "Registry Trend"
+          }
+         },
+         "Property": "ENROLLED_MONTH"
+        }
+       },
+       "queryRef": "Registry Trend.ENROLLED_MONTH",
+       "nativeQueryRef": "ENROLLED_MONTH",
+       "active": true
+      }
+     ]
+    },
+    "Y": {
+     "projections": [
+      {
+       "field": {
+        "Aggregation": {
+         "Expression": {
+          "Column": {
+           "Expression": {
+            "SourceRef": {
+             "Entity": "Registry Trend"
+            }
+           },
+           "Property": "N_ENROLLED"
+          }
+         },
+         "Function": 0
+        }
+       },
+       "queryRef": "Sum(Registry Trend.N_ENROLLED)",
+       "nativeQueryRef": "Sum of N_ENROLLED"
+      }
+     ]
+    }
+   },
+   "sortDefinition": {
+    "sort": [
+     {
+      "field": {
+       "Column": {
+        "Expression": {
+         "SourceRef": {
+          "Entity": "Registry Trend"
+         }
+        },
+        "Property": "ENROLLED_MONTH"
+       }
+      },
+      "direction": "Ascending"
+     }
+    ],
+    "isDefaultSort": true
+   }
+  },
+  "visualContainerObjects": {
+   "title": [
+    {
+     "properties": {
+      "show": {
+       "expr": {
+        "Literal": {
+         "Value": "true"
+        }
+       }
+      },
+      "text": {
+       "expr": {
+        "Literal": {
+         "Value": "'Registry Enrollment Trend'"
+        }
+       }
+      }
+     }
+    }
+   ]
+  },
+  "drillFilterOtherVisuals": true
+ }
+}

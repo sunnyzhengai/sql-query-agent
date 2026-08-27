@@ -1,0 +1,18 @@
+model Model
+	culture: en-US
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: en-US
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation PBI_QueryOrder = ["Registry Cohort","Registry Trend","Registry Paths"]
+
+annotation PBI_ProTooling = ["WebModelingEdit"]
+
+ref expression DemoSqlServer
+ref expression DemoSqlDatabase
+
+ref table 'Registry Cohort'
+ref table 'Registry Trend'
+ref table 'Registry Paths'

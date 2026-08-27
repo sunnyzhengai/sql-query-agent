@@ -153,6 +153,35 @@ def main() -> None:
              "\"the numbers answer different questions\") beside "
              "the misnomer; compare DIFFERS.")
     L.append("")
+    L.append("## Report layer — payload 3 (Diabetes Registry "
+             "Dashboard, ruled 2026-08-25)")
+    L.append("")
+    srcs = run.report_source_rows
+    proc_links = [r for r in srcs
+                  if r["sql_object_type"] == "StoredProcedure"]
+    inline = [r for r in srcs if r["sql_object_type"] == "InlineSQL"]
+    report_edges = [
+        (e["source_id"], e["target_id"])
+        for e in run.build.edges_rows
+        if str(e["source_id"]).startswith("report:")]
+    L.append(f"- Git items authored (sepsis pattern): semantic model "
+             f"+ report, description EMPTY (the write-back stage); "
+             f"{len(srcs)} TMDL sources parsed by the real extractor "
+             f"— {len(proc_links)} proc link "
+             f"({proc_links[0]['schema_name']}."
+             f"{proc_links[0]['sql_object']}), "
+             f"{len(inline)} inline queries (disclosed, unlinked by "
+             "design).")
+    L.append(f"- The report joins the shape graph: {len(report_edges)} "
+             f"report_to_canonical edge → the U7 composite; topology "
+             "clean (the report reaches the principal component — "
+             "not consumption-isolated).")
+    L.append("- Pointer-chase acceptance (\"which report is built on "
+             "the Diabetes Registry, and what else does that report "
+             "use?\") answers with the dashboard + its TMDL links "
+             "once the shape store loads — that load and the render "
+             "check are Sunny's tenant steps.")
+    L.append("")
     L.append("Every sin was PLANTED with its oracle — \"it found "
              "exactly these\" is a checkable claim. Tenant load of "
              "the shape corpus (the demo-switch profile) remains "

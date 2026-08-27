@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "SemanticModel",
+    "displayName": "Diabetes Registry Dashboard"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "b7d1a3e5-42c9-4f1e-9a70-3a9b12c4d5e6"
+  }
+}

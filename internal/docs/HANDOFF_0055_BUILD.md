@@ -233,6 +233,51 @@ byte-identical.
 
 ## RESULTS v2 (dev appends)
 
+### 2026-08-27 — FUSED BUILD DELIVERED, all three payloads (this is the section of record; dated build logs live under the GO section below — the mislanding that caused the first deadlock is fixed)
+
+**Payload 1 — palette v2: DONE 08-26** (shipped with 1.58.0; log:
+"FUSED ORDER BUILT" below). Lego library + U1–U12 + personas + D7
+grain_shift live; 39 instantiated cells / 39 PASS / 5
+excluded-with-reason; byte-identical regeneration CI-pinned.
+SHAPES_GAPCHECK.md v2 with canonical outcomes + DEMO NOTE v2 (U9
+codeset drift · U6/PD1 cousin fight · U12 grain fight).
+
+**Payload 2 — graph-native clusters: DONE 08-26/27** (logs below +
+HANDOFF entries of 08-26). Fold-into-300 as ruled; 320 + its table
+retired, consumer census closed zero orphans; checker ran as the
+migration gate; live: 83 cluster nodes = the 83 pre-migration
+flags, census(flag) 83 by pure traversal; 0059 topology leg green.
+Sunny's tenant halves done 08-27 (1.58.1 env published, dead
+shortcut removed); instructions injected 08-26 — her Publish
+spot-check is the last click.
+
+**Payload 3 — Diabetes Registry Dashboard: DONE 08-27.**
+- Git items authored on the sepsis pattern exactly: `Diabetes
+  Registry Dashboard.SemanticModel` (TMDL; 'Registry Cohort' =
+  `EXEC reporting.USP_DM_Registry_Composite` — U7, the
+  certified-official candidate) + `.Report` (4 visuals: title,
+  cohort-count card, enrollment trend line, **by-path dx/lab/med
+  columnChart** — the path-divergence foreshadow). Two supporting
+  tables are inline SQL over DM_REGISTRY / the three path tables —
+  parsed as disclosed InlineSQL sources, deliberately unlinked.
+- **Description EMPTY and mechanically held** (ruling item 2): a
+  shapes test fails if anyone fills it before the write-back beat.
+- Endpoint hygiene: DemoSqlServer/DemoSqlDatabase placeholder
+  parameters (sepsis precedent), test-pinned.
+- **The report joins the shape graph through the REAL pipeline**:
+  checker's run_corpus now collects the dashboard's TMDL
+  (FolderTmdlSource → semantic_models_step → build_graph_step) —
+  `report:DIABETES REGISTRY DASHBOARD --report_to_canonical-->
+  canonical:reporting.USP_DM_Registry_Composite`; topology clean
+  (anchored via U7, NOT consumption-isolated). TMDL-derived metric
+  name deliberately not passed — the palette stays the one name
+  writer ("Diabetes Registry (Composite)").
+- Acceptance shape pinned in tests/shapes (4 new tests); gapcheck
+  gained the Report-layer section. The live pointer-chase question
+  fires after the tenant load (Sunny's steps, ruling item 4:
+  update-from-git, set the two SQL parameters, open once to verify
+  render, confirm description still empty).
+
 ## PAYLOAD 3 — the Diabetes Registry Dashboard (Sunny's ruling, 2026-08-25: BUILD)
 
 Closes the report-layer gap for the demo (clickable-link + write-back

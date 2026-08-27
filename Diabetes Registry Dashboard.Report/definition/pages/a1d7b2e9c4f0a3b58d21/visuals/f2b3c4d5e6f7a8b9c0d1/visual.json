@@ -1,0 +1,65 @@
+{
+ "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+ "name": "f2b3c4d5e6f7a8b9c0d1",
+ "position": {
+  "x": 52,
+  "y": 100,
+  "z": 0,
+  "height": 200,
+  "width": 460,
+  "tabOrder": 0
+ },
+ "visual": {
+  "visualType": "cardVisual",
+  "query": {
+   "queryState": {
+    "Data": {
+     "projections": [
+      {
+       "field": {
+        "Aggregation": {
+         "Expression": {
+          "Column": {
+           "Expression": {
+            "SourceRef": {
+             "Entity": "Registry Cohort"
+            }
+           },
+           "Property": "PATIENT_ID"
+          }
+         },
+         "Function": 5
+        }
+       },
+       "queryRef": "CountNonNull(Registry Cohort.PATIENT_ID)",
+       "nativeQueryRef": "Count of PATIENT_ID"
+      }
+     ]
+    }
+   }
+  },
+  "visualContainerObjects": {
+   "title": [
+    {
+     "properties": {
+      "show": {
+       "expr": {
+        "Literal": {
+         "Value": "true"
+        }
+       }
+      },
+      "text": {
+       "expr": {
+        "Literal": {
+         "Value": "'Registry Cohort Size'"
+        }
+       }
+      }
+     }
+    }
+   ]
+  },
+  "drillFilterOtherVisuals": true
+ }
+}

@@ -20,19 +20,22 @@ show pending, never on remembered sequence (first-deadlock lesson,
 as of 2026-08-27. Dev session's watcher: LIVE as of 2026-08-27
 (persistent 60s poll; re-armed at each dev session start — memory
 recorded).
-Last touched: 2026-08-27, dev session (relay protocol adopted,
-watcher armed).
+Last touched: 2026-08-27, dev session (fused build delivered:
+payload 3 built, RESULTS v2 filled under the section of record).
 
 ## 🎯 THE CRITICAL PATH → demo capture
 
-- [ ] **Fused build** (dev, IN PROGRESS — HANDOFF_0055_BUILD):
-  - [ ] payload 1 — palette v2 (shapes v2, legos, U1–U12, D7)
-  - [~] payload 2 — graph-native clusters + 300 fold + consumer
-        census (0059 live leg green; **1.58.1 env PUBLISHED by Sunny
-        08-27; gov_red_flags Eventhouse shortcut REMOVED by Sunny**
-        — census consumer #4 retired; RESULTS v2 pending)
-  - [ ] payload 3 — Diabetes Registry Dashboard (git items,
-        description EMPTY)
+- [~] **Fused build** (dev: DELIVERED 08-27, RESULTS v2 filled —
+      awaiting review verification; HANDOFF_0055_BUILD):
+  - [x] payload 1 — palette v2 (08-26; 39/39 cells, gapcheck v2)
+  - [x] payload 2 — graph-native clusters + 300 fold + consumer
+        census (0059 live leg green; 83 clusters live; **1.58.1 env
+        PUBLISHED by Sunny 08-27; gov_red_flags Eventhouse shortcut
+        REMOVED by Sunny** — census consumer #4 retired)
+  - [x] payload 3 — Diabetes Registry Dashboard (08-27 dev: git
+        items on the sepsis pattern, U7 EXEC link + by-path visual,
+        description EMPTY + test-held; report joins the shape graph
+        via real TMDL parse; render check = Sunny's tenant step)
 - [ ] Sunny: Publish click + dashboard render check (dev's runbook
       tail DONE — graph-native instructions injected 08-26;
       remaining: hard-refresh, spot-check /redflags + "what

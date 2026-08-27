@@ -1,0 +1,13 @@
+/// Demo source SQL endpoint — set the REAL values in the workspace
+/// (semantic model → Settings → Parameters) after Update-from-git.
+/// The repo carries only this placeholder (endpoint-hygiene gate,
+/// tests/test_endpoint_hygiene.py): tenant endpoints never live in git.
+expression DemoSqlServer = "SET-IN-WORKSPACE-SETTINGS" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: b7e1a3e5-0001-4e5f-8a9b-0123456789ab
+
+	annotation PBI_ResultType = Text
+
+expression DemoSqlDatabase = "SET-IN-WORKSPACE-SETTINGS" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: b7e1a3e5-0002-4e5f-8a9b-0123456789ab
+
+	annotation PBI_ResultType = Text

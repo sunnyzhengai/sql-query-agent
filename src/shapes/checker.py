@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass, field
+from pathlib import Path
 
 from src.graph.serialization import parsed_sql_to_parse_result_row
 from src.parser.identity import fold_identifier
@@ -24,6 +25,12 @@ from src.shapes.generator import (
 )
 from src.steps.build_graph import BuildGraphOutput, build_graph_step
 
+_REPO_ROOT = Path(__file__).resolve().parents[2]
+
+# payload 3 (ruled 2026-08-25): the demo report layer over U7
+DASHBOARD_NAME = "Diabetes Registry Dashboard"
+DASHBOARD_METRIC = "reporting.USP_DM_Registry_Composite"
+
 
 @dataclass
 class CorpusRun:
@@ -32,6 +39,10 @@ class CorpusRun:
     files: "dict[str, str]"
     manifest: dict
     parse_failures: "list[tuple[str, str]]" = field(default_factory=list)
+    # payload 3 (Sunny's ruling 2026-08-25): the demo dashboard's TMDL
+    # sources, parsed by the REAL extractor — the report joins the
+    # shape graph through them
+    report_source_rows: "list[dict]" = field(default_factory=list)
 
 
 @dataclass
@@ -70,13 +81,27 @@ def run_corpus(palette: dict) -> CorpusRun:
                              str(cls.get("error_category") or
                                  f"UNCLASSIFIED:{type(e).__name__}")))
     tables, columns = dict_rows(palette)
+    # Payload 3: the Diabetes Registry Dashboard's TMDL, through the
+    # REAL extractor path (FolderTmdlSource → semantic_models_step) —
+    # only that one model; the realism items (sepsis, admin telemetry)
+    # stay out per the isolation ruling. Its derived metric NAME row
+    # is deliberately not passed: the palette is the shape corpus's
+    # one name writer ("Diabetes Registry (Composite)" stands).
+    from src.extractor.tmdl_source import FolderTmdlSource
+    from src.steps.semantic_models import semantic_models_step
+    tmdl = [f for f in FolderTmdlSource(str(_REPO_ROOT)).collect()
+            if f.report_name == DASHBOARD_NAME]
+    sm = semantic_models_step(tmdl, scan_timestamp="shape-corpus")
     build = build_graph_step(parse_rows, tables, columns,
                              steward_records=steward_rows(palette),
                              metric_name_records=metric_name_rows(palette),
+                             report_source_records=sm.report_source_rows,
+                             dax_records=sm.dax_rows,
                              sweep_run_at="shape-corpus")
     return CorpusRun(parse_rows=parse_rows, build=build,
                      files=files, manifest=manifest,
-                     parse_failures=failures)
+                     parse_failures=failures,
+                     report_source_rows=sm.report_source_rows)
 
 
 # ---------------------------------------------------------------------

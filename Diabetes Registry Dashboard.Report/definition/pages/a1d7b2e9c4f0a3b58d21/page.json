@@ -1,0 +1,8 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/page/2.1.0/schema.json",
+  "name": "a1d7b2e9c4f0a3b58d21",
+  "displayName": "Diabetes Registry",
+  "displayOption": "FitToPage",
+  "height": 720,
+  "width": 1280
+}

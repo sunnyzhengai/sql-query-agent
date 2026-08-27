@@ -1,0 +1,107 @@
+{
+ "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+ "name": "b4d5e6f7a8b9c0d1e2f3",
+ "position": {
+  "x": 640,
+  "y": 340,
+  "z": 2000,
+  "height": 307,
+  "width": 563,
+  "tabOrder": 2000
+ },
+ "visual": {
+  "visualType": "columnChart",
+  "query": {
+   "queryState": {
+    "Category": {
+     "projections": [
+      {
+       "field": {
+        "Column": {
+         "Expression": {
+          "SourceRef": {
+           "Entity": "Registry Paths"
+          }
+         },
+         "Property": "PATH_TYPE"
+        }
+       },
+       "queryRef": "Registry Paths.PATH_TYPE",
+       "nativeQueryRef": "PATH_TYPE",
+       "active": true
+      }
+     ]
+    },
+    "Y": {
+     "projections": [
+      {
+       "field": {
+        "Aggregation": {
+         "Expression": {
+          "Column": {
+           "Expression": {
+            "SourceRef": {
+             "Entity": "Registry Paths"
+            }
+           },
+           "Property": "N_PATIENTS"
+          }
+         },
+         "Function": 0
+        }
+       },
+       "queryRef": "Sum(Registry Paths.N_PATIENTS)",
+       "nativeQueryRef": "Sum of N_PATIENTS"
+      }
+     ]
+    }
+   },
+   "sortDefinition": {
+    "sort": [
+     {
+      "field": {
+       "Aggregation": {
+        "Expression": {
+         "Column": {
+          "Expression": {
+           "SourceRef": {
+            "Entity": "Registry Paths"
+           }
+          },
+          "Property": "N_PATIENTS"
+         }
+        },
+        "Function": 0
+       }
+      },
+      "direction": "Descending"
+     }
+    ],
+    "isDefaultSort": true
+   }
+  },
+  "visualContainerObjects": {
+   "title": [
+    {
+     "properties": {
+      "show": {
+       "expr": {
+        "Literal": {
+         "Value": "true"
+        }
+       }
+      },
+      "text": {
+       "expr": {
+        "Literal": {
+         "Value": "'Qualification Path (dx / lab / med)'"
+        }
+       }
+      }
+     }
+    }
+   ]
+  },
+  "drillFilterOtherVisuals": true
+ }
+}

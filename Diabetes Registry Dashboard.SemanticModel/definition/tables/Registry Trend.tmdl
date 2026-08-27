@@ -1,0 +1,29 @@
+table 'Registry Trend'
+	lineageTag: b7f00002-a1b2-4c3d-8e9f-000000000001
+
+	column ENROLLED_MONTH
+		dataType: dateTime
+		lineageTag: b7f00002-a1b2-4c3d-8e9f-000000000002
+		summarizeBy: none
+		sourceColumn: ENROLLED_MONTH
+
+		annotation SummarizationSetBy = Automatic
+
+	column N_ENROLLED
+		dataType: int64
+		formatString: 0
+		lineageTag: b7f00002-a1b2-4c3d-8e9f-000000000003
+		summarizeBy: sum
+		sourceColumn: N_ENROLLED
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Registry Trend' = m
+		mode: import
+		source =
+				let
+				  Source = Sql.Database(DemoSqlServer, DemoSqlDatabase, [Query = "SELECT DATEFROMPARTS(YEAR(R.ENROLLED_DATE), MONTH(R.ENROLLED_DATE), 1) AS ENROLLED_MONTH, COUNT(*) AS N_ENROLLED FROM DM_REGISTRY R GROUP BY DATEFROMPARTS(YEAR(R.ENROLLED_DATE), MONTH(R.ENROLLED_DATE), 1)"])
+				in
+				  Source
+
+	annotation PBI_ResultType = Table

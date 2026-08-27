@@ -1,0 +1,21 @@
+table 'Registry Cohort'
+	lineageTag: b7f00001-a1b2-4c3d-8e9f-000000000001
+
+	column PATIENT_ID
+		dataType: int64
+		formatString: 0
+		lineageTag: b7f00001-a1b2-4c3d-8e9f-000000000002
+		summarizeBy: none
+		sourceColumn: PATIENT_ID
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Registry Cohort' = m
+		mode: import
+		source =
+				let
+				  Source = Sql.Database(DemoSqlServer, DemoSqlDatabase, [Query = "EXEC reporting.USP_DM_Registry_Composite"])
+				in
+				  Source
+
+	annotation PBI_ResultType = Table

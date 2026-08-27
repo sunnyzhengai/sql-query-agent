@@ -1,0 +1,29 @@
+table 'Registry Paths'
+	lineageTag: b7f00003-a1b2-4c3d-8e9f-000000000001
+
+	column PATH_TYPE
+		dataType: string
+		lineageTag: b7f00003-a1b2-4c3d-8e9f-000000000002
+		summarizeBy: none
+		sourceColumn: PATH_TYPE
+
+		annotation SummarizationSetBy = Automatic
+
+	column N_PATIENTS
+		dataType: int64
+		formatString: 0
+		lineageTag: b7f00003-a1b2-4c3d-8e9f-000000000003
+		summarizeBy: sum
+		sourceColumn: N_PATIENTS
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Registry Paths' = m
+		mode: import
+		source =
+				let
+				  Source = Sql.Database(DemoSqlServer, DemoSqlDatabase, [Query = "SELECT 'dx' AS PATH_TYPE, COUNT(DISTINCT PATIENT_ID) AS N_PATIENTS FROM DIAGNOSIS_CODES WHERE ICD_CODE LIKE 'E11%' UNION ALL SELECT 'lab', COUNT(DISTINCT PATIENT_ID) FROM LAB_RESULTS WHERE HBA1C_VALUE >= 6.5 UNION ALL SELECT 'med', COUNT(DISTINCT PATIENT_ID) FROM MEDICATION_ORDERS WHERE MED_NAME IN ('METFORMIN', 'INSULIN GLARGINE')"])
+				in
+				  Source
+
+	annotation PBI_ResultType = Table

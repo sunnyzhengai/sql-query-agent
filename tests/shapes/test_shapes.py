@@ -195,3 +195,56 @@ def test_seeded_compositions_hold_pipeline_invariants(palette):
     node_ids = {n["node_id"] for n in out.nodes_rows}
     for i in range(12):
         assert f"canonical:reporting.USP_Gen_{i}" in node_ids
+
+
+# --- payload 3: the Diabetes Registry Dashboard (ruled 2026-08-25) ---
+
+
+def test_dashboard_joins_the_shape_graph(corpus_run):
+    # acceptance (handoff §PAYLOAD 3 item 5): the pointer-chase shape —
+    # the report node exists and links to the U7 composite through the
+    # REAL TMDL parse; the two inline-SQL tables are disclosed sources,
+    # never silent
+    from src.shapes.checker import DASHBOARD_METRIC, DASHBOARD_NAME
+    node_ids = {n["node_id"] for n in corpus_run.build.nodes_rows}
+    report_id = "report:" + DASHBOARD_NAME.upper()
+    assert report_id in node_ids
+    assert (report_id, f"canonical:{DASHBOARD_METRIC}",
+            "report_to_canonical") in {
+        (e["source_id"], e["target_id"], e["edge_type"])
+        for e in corpus_run.build.edges_rows}
+    by_type = [r["sql_object_type"] for r in corpus_run.report_source_rows]
+    assert sorted(by_type) == ["InlineSQL", "InlineSQL",
+                               "StoredProcedure"]
+
+
+def test_dashboard_is_anchored_not_isolated(corpus_run):
+    # the report reaches the principal component via U7 — it must NOT
+    # appear as a consumption_unanchored island (ADR 0059 Q1)
+    from src.graph.topology import analyze
+    t = analyze(corpus_run.build.nodes_rows, corpus_run.build.edges_rows)
+    assert t.ok and not t.consumption_unanchored
+
+
+def test_dashboard_description_stays_empty():
+    # Sunny's ruling item 2: the report description is the write-back
+    # beat's STAGE — it ships empty and stays empty until the demo
+    # publishes the certified definition onto it live
+    import json as _json
+    for item in ("Diabetes Registry Dashboard.SemanticModel",
+                 "Diabetes Registry Dashboard.Report"):
+        meta = _json.loads((REPO / item / ".platform").read_text())
+        assert "description" not in meta["metadata"], (
+            f"{item}: description must stay EMPTY (write-back stage)")
+        assert meta["metadata"]["displayName"] == \
+            "Diabetes Registry Dashboard"
+
+
+def test_dashboard_tmdl_carries_no_tenant_endpoint():
+    # endpoint-hygiene law: the M source uses the workspace-parameter
+    # placeholder, exactly like the sepsis precedent
+    root = REPO / "Diabetes Registry Dashboard.SemanticModel"
+    for tmdl in root.rglob("*.tmdl"):
+        text = tmdl.read_text()
+        assert ".database.windows.net" not in text
+        assert ".fabric.microsoft.com" not in text
