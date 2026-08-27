@@ -3,6 +3,19 @@
 **Rule:** the moment a task changes state, the session that saw it
 change updates this file (handoff-verdicts law applied to status).
 Detail lives in the linked handoffs; this file stays short.
+
+**THE AUTONOMOUS RELAY PROTOCOL (2026-08-27, Sunny's directive to
+un-bottleneck herself):** both sessions run a background watcher on
+origin/dev and WAKE when the other pushes — the repo is the channel,
+the push is the doorbell. Bounds: (1) a session acts ONLY on the
+other's commits, never its own, workspace commits are informational;
+(2) auto-advance covers ONLY board-listed, already-ruled work —
+anything new, any ruling, any tenant/UI click PARKS for Sunny, as
+always; (3) every autonomous action lands in the handoffs + this
+board exactly as if relayed; (4) if a session isn't running, the
+loop falls back to Sunny's doorbell. Review session's watcher: LIVE
+as of 2026-08-27. Dev session: adopt the same (poll origin/dev ~60s
+in background; on movement, read the new commits; act per bounds).
 Last touched: 2026-08-27, dev session (morning orders 1+2 shipped,
 ops-finds report filed).
 
