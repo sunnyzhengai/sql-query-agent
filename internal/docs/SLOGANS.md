@@ -154,3 +154,5 @@ point.
 - **"The graph can say everything; code enforces; humans
   witness."** — the graph-language round, 2026-08-26. (LAW-adjacent
   DOCTRINE; the folding trend's terminus)
+- **"Facts are never deduplicated; sameness is always derived."**
+  — the decision-sharing round, 2026-08-26. (LAW)
