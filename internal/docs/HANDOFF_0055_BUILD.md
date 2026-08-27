@@ -482,3 +482,31 @@ decisions offered at EVERY answer round.
   board clears: interactive render of the SHAPE corpus graph (140
   nodes — layers as colors; the semantic-cloud clusters become
   visible). Full-estate viz needs layer-collapsed views; later.
+
+### 2026-08-27 — MORNING ORDERS 1+2 SHIPPED (suite legibility)
+**TEST_MAP.md, generated** (docs/architecture/): 106 modules /
+1,072 tests, every module accounted — ONE WRITER per linkage kind:
+ADR claims come from src/trace_registry.py (an `adr:` tag in a
+docstring is INVALID — it would be a second truth that can drift);
+law/contract claims are docstring `Proves:` lines validated against
+small registries in devtools/suite_map.py (5 laws, 6 contracts);
+spec-axiom grouping is DERIVED (axiom → grounding ADRs → their
+tests, no per-test duplication). 15 registry-unclaimed modules got
+Proves lines; test_report_links had a genuine 0040 claim → added to
+the registry (the one writer). CI: tests/test_suite_map.py —
+totality (a new unclaimed module is a red build), tag validity,
+freshness (PIPELINE_MAP pattern), and no dead registry rows (an
+unused law/contract slug fails).
+**Suite transcript artifact**: every answer_evals run now writes
+internal/docs/SUITE_TRANSCRIPT.md — per family: question → final
+caption text (blockquoted) → machine verdict (DISHONEST/dumb/ok
+with the legend stating the grader polices honesty, never depth) →
+facts/rounds/declared line, INFRA-SKIPs disclosed per family, board
+table with the gate (answer_rate >= 0.80) and the floor named as
+build-stopper. Pure emission over the existing dump
+(render_transcript, unit-tested over fabricated records — 7 tests).
+No engine change → no release; both land in git only.
+Gates: 1,106 passed + 5 xfailed, ruff clean. BOARD.md adopted:
+dev-queue items ticked + ops-finds report filed on the board.
+0056 UI placement confirmation + two parked directions: recorded,
+no build.

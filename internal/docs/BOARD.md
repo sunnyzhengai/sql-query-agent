@@ -3,7 +3,8 @@
 **Rule:** the moment a task changes state, the session that saw it
 change updates this file (handoff-verdicts law applied to status).
 Detail lives in the linked handoffs; this file stays short.
-Last touched: 2026-08-27, review session (Sunny's tenant steps).
+Last touched: 2026-08-27, dev session (morning orders 1+2 shipped,
+ops-finds report filed).
 
 ## 🎯 THE CRITICAL PATH → demo capture
 
@@ -15,8 +16,10 @@ Last touched: 2026-08-27, review session (Sunny's tenant steps).
         — census consumer #4 retired; RESULTS v2 pending)
   - [ ] payload 3 — Diabetes Registry Dashboard (git items,
         description EMPTY)
-- [ ] Sunny: Publish click + dashboard render check (after dev's
-      runbook tail)
+- [ ] Sunny: Publish click + dashboard render check (dev's runbook
+      tail DONE — graph-native instructions injected 08-26;
+      remaining: hard-refresh, spot-check /redflags + "what
+      governance red flags exist?" expect 83, Publish)
 - [ ] Tenant load of the shape store (_shapes profile)
 - [ ] Re-walk on the diabetic corpus (incl. section B vs B3,
       section I flags; suite transcript may cover part)
@@ -27,10 +30,16 @@ Last touched: 2026-08-27, review session (Sunny's tenant steps).
 ## 🔧 DEV QUEUE (behind the fused build, in order)
 
 - [ ] B3 step dep-chains (green-lit; registry text stale)
-- [ ] TEST_MAP.md generated + freshness CI
-- [ ] Suite transcript artifact (question → answer → verdict per run)
-- [ ] Ops finds status REPORT NEEDED: shortcut create-then-verify /
-      org_config referential integrity / probe-eh rename — built?
+- [x] TEST_MAP.md generated + freshness CI (08-27 dev — 106 modules
+      / 1,072 tests all accounted; docs/architecture/TEST_MAP.md)
+- [x] Suite transcript artifact (08-27 dev — every answer_evals run
+      writes internal/docs/SUITE_TRANSCRIPT.md)
+- [x] Ops finds status REPORTED (08-27 dev): shortcut
+      create-then-verify BUILT (devtools/create_kql_shortcut.py,
+      create→poll query path→delete ghost + fail loud); org_config
+      referential audit BUILT (devtools/org_config_audit.py, green
+      --tenant in the 1.58.0 preflight); probe-eh rename NOT BUILT
+      — parked for Sunny (her UI + recorded ref-edit list)
 - [ ] Finder-coverage contract (timing = Sunny's call; drilldown
       benefit if pre-capture)
 - [ ] 0056 decision layer + presentation reframe (POST-capture by
