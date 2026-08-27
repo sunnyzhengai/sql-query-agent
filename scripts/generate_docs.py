@@ -265,9 +265,15 @@ def build_trace_map() -> str:
     return "\n".join(lines)
 
 
+TEST_MAP_PATH = PROJECT_ROOT / "docs" / "architecture" / "TEST_MAP.md"
+
+
 def main() -> None:
+    from devtools.suite_map import build_test_map
     PIPELINE_MAP_PATH.write_text(build_pipeline_map())
     print(f"Wrote {PIPELINE_MAP_PATH}")
+    TEST_MAP_PATH.write_text(build_test_map())
+    print(f"Wrote {TEST_MAP_PATH}")
     INTEGRATION_MAP_PATH.write_text(build_integration_map())
     print(f"Wrote {INTEGRATION_MAP_PATH}")
     NOTEBOOK_MAP_PATH.write_text(build_notebook_map())

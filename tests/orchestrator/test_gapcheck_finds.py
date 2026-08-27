@@ -1,6 +1,9 @@
 """Gap-check finds (Sunny live, 2026-08-24) — L0: W15 typed compare
 verdict + direction duty, W17 per-relation distinct counts, W16
-governance-stamp folding."""
+governance-stamp folding.
+
+Proves: law:walk-finds
+"""
 
 from devtools.answer_evals import grade
 from src.orchestrator.caption_gate import caption_violations

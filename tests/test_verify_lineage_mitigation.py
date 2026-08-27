@@ -1,7 +1,10 @@
 """L0 tests for the lineage-mitigation verifier's answer check
 (HANDOFF_FABRIC_LINEAGE_MITIGATION item 4). The checker owns the
 pass/fail semantics: every expected name carried, zero cousin-family
-leakage, with the also-expected carve-out."""
+leakage, with the also-expected carve-out.
+
+Proves: contract:round4-scorecard
+"""
 
 from devtools.verify_lineage_mitigation import check
 

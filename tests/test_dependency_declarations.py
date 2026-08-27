@@ -9,6 +9,8 @@ declared-vs-written; this file polices imported-vs-declared.
 Scope: src/, tests/, and marketplace_host/ — everything `pytest` imports.
 Notebook-runtime modules that Fabric injects (spark, notebookutils) never
 appear as imports, so they need no exemption here.
+
+Proves: contract:toolchain
 """
 
 import ast

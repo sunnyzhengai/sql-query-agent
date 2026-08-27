@@ -4,6 +4,8 @@ Added after the Round-4 record audit (REVIEW_ROUND4_RECORD_AUDIT.md):
 the hand-written miss characterization contradicted the machine table,
 and the writer shipped untested. The rule these tests encode: scorecard
 prose annotates machine-emitted lines, never free-writes a miss list.
+
+Proves: contract:round4-scorecard
 """
 
 from devtools.rematch_round4 import (

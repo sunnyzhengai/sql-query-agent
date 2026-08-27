@@ -460,6 +460,7 @@ classification).
   - `tests/steps/test_semantic_catalog.py`
   - `tests/adapters/test_devops_tmdl.py`
   - `tests/extractor/test_workspace_tmdl_source.py`
+  - `tests/orchestrator/test_report_links.py`
 - **Summarized in:**
   - `docs/architecture/INTEGRATION_MAP.md`
 

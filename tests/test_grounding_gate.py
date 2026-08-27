@@ -1,6 +1,9 @@
 """The grounding gate — acceptance fixtures are the REAL production
 fabrications from the 2026-08-18 deep trace (TRACE_USP_ED_SEPSIS.md),
-captured live from the demo tenant. The gate must catch every one."""
+captured live from the demo tenant. The gate must catch every one.
+
+Proves: law:honesty-floor
+"""
 
 import json
 from pathlib import Path

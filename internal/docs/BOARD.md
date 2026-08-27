@@ -3,14 +3,16 @@
 **Rule:** the moment a task changes state, the session that saw it
 change updates this file (handoff-verdicts law applied to status).
 Detail lives in the linked handoffs; this file stays short.
-Last touched: 2026-08-27, review session.
+Last touched: 2026-08-27, review session (Sunny's tenant steps).
 
 ## 🎯 THE CRITICAL PATH → demo capture
 
 - [ ] **Fused build** (dev, IN PROGRESS — HANDOFF_0055_BUILD):
   - [ ] payload 1 — palette v2 (shapes v2, legos, U1–U12, D7)
   - [~] payload 2 — graph-native clusters + 300 fold + consumer
-        census (0059 live leg green 1.58.1; RESULTS v2 pending)
+        census (0059 live leg green; **1.58.1 env PUBLISHED by Sunny
+        08-27; gov_red_flags Eventhouse shortcut REMOVED by Sunny**
+        — census consumer #4 retired; RESULTS v2 pending)
   - [ ] payload 3 — Diabetes Registry Dashboard (git items,
         description EMPTY)
 - [ ] Sunny: Publish click + dashboard render check (after dev's

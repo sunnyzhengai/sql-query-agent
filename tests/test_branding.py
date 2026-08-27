@@ -1,4 +1,7 @@
-"""Tests for the product-name seam (src/branding.py)."""
+"""Tests for the product-name seam (src/branding.py).
+
+Proves: law:brand-separation
+"""
 
 from src import branding
 

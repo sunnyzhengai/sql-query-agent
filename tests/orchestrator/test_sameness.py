@@ -8,6 +8,8 @@ Three layers under test:
 2. caption gate: the sameness duty — caveat echo or compare-on-screen,
    else floored (and the floor carries the caveat headline).
 3. suite grade: the sameness oracle path (structural, no word oracle).
+
+Proves: law:walk-finds
 """
 
 from devtools.answer_evals import grade

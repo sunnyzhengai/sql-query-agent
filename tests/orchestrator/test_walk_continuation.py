@@ -1,7 +1,10 @@
 """Walk 1562 continuation (steps 3–6, 2026-08-23) — L0 for the P0/P1
 mechanics: W12 compare id-resolution + load-bearing error caveat, W13b
 column-coverage stamp + gate duty, W9 wrong-kind lineage redirect,
-W11 disjunctive blend bridge, W3a qualified enumerations."""
+W11 disjunctive blend bridge, W3a qualified enumerations.
+
+Proves: law:walk-finds
+"""
 
 import pytest
 

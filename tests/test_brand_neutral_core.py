@@ -9,6 +9,8 @@ brand-free engine. Enforcement is a grep, so the name cannot creep back.
 Branded-by-design surfaces (website/, presentation/, marketplace_host/,
 docs/, CHANGELOG, Fabric item folders like the admin telemetry report)
 are deliberately out of scope — see docs/deployment/BRAND_NEUTRAL_SNAPSHOT.md.
+
+Proves: law:brand-separation
 """
 
 import re

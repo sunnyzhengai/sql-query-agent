@@ -13,6 +13,8 @@ the original leak lived in .tmdl, which an earlier scan skipped) for
 host-shaped tenant endpoints. Documented placeholders (<server>.…,
 example.…) and the bare AAD token audience pass by construction:
 the pattern requires a real-looking host label.
+
+Proves: law:endpoint-hygiene
 """
 
 import re

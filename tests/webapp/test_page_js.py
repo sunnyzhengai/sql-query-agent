@@ -1,7 +1,10 @@
 """The served page's JS must parse AS SERVED (live find 2026-08-13:
 double-escaping put a literal newline inside a JS string literal —
 the script died at parse time and the form fell through to a native
-GET). node --check runs against the RUNTIME string, not the source."""
+GET). node --check runs against the RUNTIME string, not the source.
+
+Proves: contract:web-surface
+"""
 
 import shutil
 import subprocess

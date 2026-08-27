@@ -4,7 +4,10 @@ the recorded fake store — plus totality guards so a NEW engine tool
 cannot ship without a dispatch branch and a live smoke case.
 
 The live leg is devtools/engine_smoke.py (required before any ship
-touching src/orchestrator/ops.py or tools.py)."""
+touching src/orchestrator/ops.py or tools.py).
+
+Proves: law:live-probe
+"""
 
 from pathlib import Path
 

@@ -1,6 +1,9 @@
 """L0 tests for the answer_evals INFRA-SKIP contract (2026-08-22 outage
 find, closed 2026-08-23): transport-dead questions skip loudly; >20% of
-attempted questions skipped aborts the run as infrastructure-invalid."""
+attempted questions skipped aborts the run as infrastructure-invalid.
+
+Proves: contract:suite-integrity
+"""
 
 from devtools.answer_evals import (
     INFRA_ABORT_FRACTION,

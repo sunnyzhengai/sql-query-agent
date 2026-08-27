@@ -1,6 +1,9 @@
 """L0 for the org_config referential-integrity audit (ops find 2,
 2026-08-24 — the 610 dead-agent corpse): the reference collector is
-pure and pinned; the live resolution runs in the script."""
+pure and pinned; the live resolution runs in the script.
+
+Proves: contract:org-config
+"""
 
 from devtools.org_config_audit import collect_refs
 

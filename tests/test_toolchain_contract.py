@@ -6,6 +6,8 @@ resolved fresh on CI while dev ran a 3-year-old version, producing
 three lint-only CI failures in one day. The contract: every tool that
 can fail CI is pinned EXACTLY in the dev extra; a floor (>=) on a tool
 is drift waiting to happen and fails here with the incident named.
+
+Proves: contract:toolchain
 """
 
 import re
