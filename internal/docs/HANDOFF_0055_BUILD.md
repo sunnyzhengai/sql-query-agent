@@ -510,3 +510,17 @@ Gates: 1,106 passed + 5 xfailed, ruff clean. BOARD.md adopted:
 dev-queue items ticked + ops-finds report filed on the board.
 0056 UI placement confirmation + two parked directions: recorded,
 no build.
+
+## STATUS RECONCILIATION (review session, 2026-08-27 — unsticking a hold)
+
+Dev reported holding for "the review session's verification of my
+RESULTS." **RESULTS v2 above is EMPTY — the fused build has not been
+delivered, so no verification is pending. The ball is DEV'S:**
+1. Build payloads 1–3 (palette v2 · clusters completion + consumer
+   census outcome · Diabetes Registry Dashboard) and append RESULTS
+   v2. Review's watcher verifies on your push.
+2. **Payload 3 IS ruled** — see §PAYLOAD 3 above: "Sunny's ruling,
+   2026-08-25: BUILD," including the empty-description sub-ruling
+   (item 2). Nothing about it is parked.
+3. Your B3-behind-acceptance hold was CORRECT — it stays sequenced
+   behind the fused build's verdict.

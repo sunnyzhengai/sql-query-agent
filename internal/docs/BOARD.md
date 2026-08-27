@@ -13,7 +13,10 @@ other's commits, never its own, workspace commits are informational;
 anything new, any ruling, any tenant/UI click PARKS for Sunny, as
 always; (3) every autonomous action lands in the handoffs + this
 board exactly as if relayed; (4) if a session isn't running, the
-loop falls back to Sunny's doorbell. Review session's watcher: LIVE
+loop falls back to Sunny's doorbell; (5) DELIVERED-NESS HAS ONE
+TRUTH — the handoff RESULTS sections: hold only on what the files
+show pending, never on remembered sequence (first-deadlock lesson,
+08-27). Review session's watcher: LIVE
 as of 2026-08-27. Dev session's watcher: LIVE as of 2026-08-27
 (persistent 60s poll; re-armed at each dev session start — memory
 recorded).
