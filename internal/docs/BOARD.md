@@ -29,8 +29,9 @@ payload 3 built, RESULTS v2 filled under the section of record).
 
 ## 🎯 THE CRITICAL PATH → demo capture
 
-- [~] **Fused build** (dev: DELIVERED 08-27, RESULTS v2 filled —
-      awaiting review verification; HANDOFF_0055_BUILD):
+- [x] **Fused build** — DELIVERED 08-27 and **APPROVED by review
+      the same day** (verdict in HANDOFF_0055_BUILD; suite 1,110
+      green; B3 unblocked):
   - [x] payload 1 — palette v2 (08-26; 39/39 cells, gapcheck v2)
   - [x] payload 2 — graph-native clusters + 300 fold + consumer
         census (0059 live leg green; 83 clusters live; **1.58.1 env
@@ -40,10 +41,12 @@ payload 3 built, RESULTS v2 filled under the section of record).
         items on the sepsis pattern, U7 EXEC link + by-path visual,
         description EMPTY + test-held; report joins the shape graph
         via real TMDL parse; render check = Sunny's tenant step)
-- [ ] Sunny: Publish click + dashboard render check (dev's runbook
-      tail DONE — graph-native instructions injected 08-26;
-      remaining: hard-refresh, spot-check /redflags + "what
-      governance red flags exist?" expect 83, Publish)
+- [~] Sunny 08-27: dashboard params set ✓, credentials bound ✓ —
+      tables await FIRST REFRESH, blocked on the shape seed
+      (expected; don't refresh early). REMAINING: agent
+      hard-refresh + spot-check ("what governance red flags
+      exist?" expect 83) + **Publish**; post-seed: refresh →
+      render → description-empty check.
 - [ ] Tenant load of the shape store (_shapes profile)
 - [ ] Re-walk on the diabetic corpus (incl. section B vs B3,
       section I flags; suite transcript may cover part)
