@@ -29,6 +29,9 @@ SPEC_AXIOMS = frozenset({
     "A1", "A2", "A3", "B1", "B2", "C1", "C2", "C3", "C4",
     "D1", "D2", "D3", "E1", "E2", "E3", "E4", "E5", "E6", "F",
     "G1", "G2", "G3", "H1", "H2",
+    # Group Q — graph topology (ADR 0059, ratified 2026-08-26; the
+    # ADR's G1–G3, renamed on entry because Φ_AIVIA's G was taken)
+    "Q1", "Q2", "Q3",
 })
 
 CATEGORIES = ("architecture", "product")
@@ -499,17 +502,19 @@ TRACE_REGISTRY = {
         "docs": ["docs/architecture/SPEC.md", "docs/architecture/TRACE_MAP.md"],
     },
     "0059": {
-        # DRAFT 2026-08-26 (review, Sunny's directive): the graph
-        # topology axioms (connected / sound / complete) — measured
-        # before drafted; join the formal spec on Sunny's
-        # ratification, then the enforcement legs get modules/tests.
+        # ACCEPTED + MECHANIZED 2026-08-26: union-find analyzer
+        # (foundation exception + receipt exclusion), EDGE_PROVENANCE
+        # totality, 300 postcondition, recorded-corpus baseline as
+        # permanent CI, live-audit topology leg; spec Group Q (the
+        # ADR's G1–G3 renamed on entry — G was taken).
         "title": "The graph topology axioms: connected, sound, "
                  "complete (measured, then formalized)",
         "category": "architecture",
-        "axioms": [],
-        "modules": [],
-        "tests": [],
-        "docs": ["docs/decisions/0059-graph-topology-axioms.md"],
+        "axioms": ["Q1", "Q2", "Q3"],
+        "modules": ["src/graph/topology.py"],
+        "tests": ["tests/graph/test_topology.py"],
+        "docs": ["docs/decisions/0059-graph-topology-axioms.md",
+                 "docs/architecture/SPEC.md"],
     },
     "0058": {
         # DRAFT 2026-08-25 (review): the self-service contracts —

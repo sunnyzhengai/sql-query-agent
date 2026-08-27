@@ -689,5 +689,11 @@ classification).
 ## ADR 0059 — The graph topology axioms: connected, sound, complete (measured, then formalized)
 
 - **Category:** architecture
+- **Grounds:** spec:Q1, spec:Q2, spec:Q3
+- **Implemented by:**
+  - `src/graph/topology.py`
+- **Enforced by:**
+  - `tests/graph/test_topology.py`
 - **Summarized in:**
   - `docs/decisions/0059-graph-topology-axioms.md`
+  - `docs/architecture/SPEC.md`

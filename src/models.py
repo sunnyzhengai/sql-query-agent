@@ -80,6 +80,34 @@ class EdgeType(str, Enum):
     USES_TABLE = "uses_table"
 
 
+# ADR 0059 G2 (RATIFIED 2026-08-26): every edge type carries exactly
+# ONE provenance class — parsed (ScriptDom/TMDL evidence, source
+# recoverable) / declared (dictionary/config) / derived
+# (deterministic build computation, recomputable byte-identically) /
+# asserted (human testimony, ADR 0056 — none minted yet; the
+# disposition write surface adds variant_of/supersedes/duplicate_of
+# under this class when it ships). Totality is CI-checked (the 0052
+# pattern): an edge type outside this map cannot ship.
+EDGE_PROVENANCE = {
+    EdgeType.CANONICAL_TO_TRANSFORM: "parsed",
+    EdgeType.TRANSFORM_TO_TRANSFORM: "parsed",
+    EdgeType.TRANSFORM_TO_TECHNICAL: "parsed",
+    EdgeType.STEP_TO_DECISION: "parsed",
+    EdgeType.DECISION_TO_COLUMN: "parsed",
+    EdgeType.DECISION_TO_STEP: "parsed",
+    EdgeType.REPORT_TO_CANONICAL: "parsed",
+    EdgeType.REPORT_TO_TECHNICAL: "parsed",
+    EdgeType.REPORT_TO_MEASURE: "parsed",
+    EdgeType.MEASURE_TO_COLUMN: "parsed",
+    EdgeType.TABLE_TO_COLUMN: "declared",
+    EdgeType.TRANSFORM_TO_COLUMN: "derived",
+    EdgeType.MEMBER_OF: "derived",
+    EdgeType.USES_TABLE: "derived",
+}
+
+PROVENANCE_CLASSES = ("parsed", "declared", "derived", "asserted")
+
+
 class GraphEdge(BaseModel):
     """A directed edge in the graph."""
 

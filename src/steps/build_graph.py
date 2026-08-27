@@ -316,6 +316,23 @@ def build_graph_step(
         f"build_graph_step: dangling governance edges: "
         f"{gov_dangling[:5]}")
 
+    # ADR 0059 G1/G2 postconditions (RATIFIED 2026-08-26; built
+    # inside the 300 fold per the build-first default): accounted
+    # connectivity — one principal derived component, no degree-0
+    # nodes (the receipt is the enumerated exclusion), foundation
+    # islands legitimate and enumerated — and edge soundness (both
+    # referential and provenance-mapped). Any violation dies here,
+    # loudly, before a broken topology can persist.
+    from src.graph.topology import analyze as topology_analyze
+    topo = topology_analyze(final_nodes, final_edges)
+    assert topo.ok, (
+        "build_graph_step: ADR 0059 topology axioms violated — "
+        + topo.summary()
+        + f"; dangling={topo.dangling_edges[:3]} "
+        f"degree0={topo.degree_zero[:5]} "
+        f"stray={topo.stray_derived_components[:2]} "
+        f"unmapped={topo.unmapped_edge_types}")
+
     return BuildGraphOutput(
         nodes_rows=final_nodes,
         edges_rows=final_edges,

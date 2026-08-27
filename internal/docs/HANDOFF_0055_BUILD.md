@@ -381,3 +381,14 @@ FINAL GATES: suite 1,078 passed + 5 xfailed, ruff clean, live smoke
 green. **FUSED ORDER COMPLETE** — awaiting Sunny's runbook-tail
 steps (env publish 1.58.0, workspace sync) and her "go" for the
 7-notebook chain.
+
+## NEXT ORDER AFTER THE FUSED BUILD — B3 step dep-chains (Sunny's green light, 2026-08-25, now recorded)
+
+transform_to_transform enters the ask surface: "what feeds this
+step / what does this step feed." The registry's "PARKED BEHIND
+ROUND 4" text is STALE — update the row to reachable when built.
+Echo Law from birth (op semantics inherit the token-matching law;
+smoke case; live probe; suite family with store-derived oracle).
+Pin bump if tool schema changes — conscious, recorded. Small order;
+sequence after the fused build's acceptance, before the re-walk (so
+walk section B grades against it).

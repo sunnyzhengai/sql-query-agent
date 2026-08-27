@@ -140,6 +140,29 @@ def main() -> None:
             "equals the step_to_decision edges — the inline metric "
             "evidence would lie")
 
+    # ADR 0059 topology leg (RATIFIED 2026-08-26): the same
+    # union-find that guards the build and CI, run over the LIVE
+    # store — red on any unaccounted island, dangling edge, degree-0
+    # node, or unmapped edge type; foundation islands enumerated,
+    # never findings.
+    from src.graph.topology import analyze as topology_analyze
+    live_nodes = list(c.run(
+        "graph_nodes | project node_id, layer", {}))
+    live_edges = list(c.run(
+        "graph_edges | project source_id, target_id, edge_type", {}))
+    topo = topology_analyze(live_nodes, live_edges)
+    print(f"topology (ADR 0059): {topo.summary()}")
+    for island in topo.foundation_islands[:5]:
+        print(f"  (foundation island, legitimate: "
+              f"{', '.join(island[:3])}…)")
+    if not topo.ok:
+        failures.append(
+            "TOPOLOGY (ADR 0059): " + topo.summary()
+            + f" — dangling={topo.dangling_edges[:3]} "
+            f"degree0={topo.degree_zero[:5]} "
+            f"stray={topo.stray_derived_components[:2]} "
+            f"unmapped={topo.unmapped_edge_types}")
+
     if failures:
         print()
         for f in failures:

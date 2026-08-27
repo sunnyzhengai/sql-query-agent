@@ -67,8 +67,6 @@ def test_architecture_decisions_carry_code_or_tests():
         "0056",  # ACCEPTED, sequenced AFTER CAPTURE — modules land
                  # with its build order
         "0058",  # DRAFT — Pro-pillar contracts; build lands WITH Pro
-        "0059",  # DRAFT — topology axioms; enforcement legs land on
-                 # Sunny's ratification
         "0057",  # design record by construction — binds design, never
                  # the build queue; no modules ever expected
     }

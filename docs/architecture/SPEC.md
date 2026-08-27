@@ -702,6 +702,27 @@ every stratum before shipping (the trace registry carries the
 declaration); never measure what you could test; never ask L3 eyes to
 discover what L2 should have caught.
 
+## 14e. Group Q — graph topology (v0.6, ADR 0059; ratified 2026-08-26)
+
+The ADR names these G1–G3; Φ_AIVIA already holds a Group G
+(mechanism uniqueness), so they join as Q1–Q3 — the correspondence
+is recorded here, never silently renumbered. Measured before
+drafted: 1 component / 0 orphans / 0 dangling at 6,669 nodes /
+14,994 edges on the recorded corpus (2026-08-26); the measurement is
+now the permanent CI baseline.
+
+| axiom | statement | binding | status |
+|---|---|---|---|
+| Q1 (ADR G1) | accounted connectivity: components enumerated every build; exactly one PRINCIPAL derived component; foundation-only islands legitimate under the FOUNDATION EXCEPTION (enumerated, never findings); degree-0 forbidden (enumerated exclusion: the govmeta:sweep receipt) | src/graph/topology.py union-find — 300 postcondition assert + tests/graph/test_topology.py (recorded + shape corpora) + the live-audit topology leg | ENFORCED |
+| Q2 (ADR G2) | edge soundness: every edge referential AND provenance-mapped — parsed / declared / derived / asserted, exactly one class per edge type (EDGE_PROVENANCE, 0052-pattern totality) | models.EDGE_PROVENANCE + G2-totality CI test + unmapped-type detection in every analyze() run | ENFORCED |
+| Q3 (ADR G3) | relative completeness: every completeness claim is a conservation equation (refs = minted ⊎ dropped; swept = flagged ⊎ clean ⊎ excluded; matrix/reachability totality) with ask-time boundary disclosure; absolute completeness claims forbidden | the existing conservation asserts, cited: ADR 0053 projection sums, sweep partition + reification count, shape-matrix totality, 0052 reachability, coverage-absent stamps | ENFORCED (by citation — no new mechanism needed; the equations predate the axiom) |
+
+**The foundation exception (Sunny, 2026-08-26, verbatim force):**
+the dictionary is a source of truth — foundation nodes exist as is;
+their islands are legitimate states enumerated for visibility, never
+findings, never queue entries, never flags. Q1's principal-component
+requirement binds derived layers only.
+
 ## 15. Honest limits
 
 1. **C1 cannot force conception.** The inventory makes "sources we haven't
