@@ -10,6 +10,29 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.58.1] - 2026-08-26
+
+### Added — ADR 0059 mechanized (topology axioms Q1-Q3, ratified)
+- `src/graph/topology.py`: union-find analyzer — accounted
+  connectivity with the FOUNDATION EXCEPTION (islands legitimate,
+  enumerated, never findings), consumption-unanchored typed isolation
+  (live find: the admin-telemetry model), degree-0 forbidden with the
+  govmeta receipt as the one enumerated exclusion; G2 edge soundness
+  (EDGE_PROVENANCE totality: parsed/declared/derived/asserted).
+- Enforcement at all three strata: 300 postconditions (partial
+  fixtures declare `enforce_topology=False`), permanent CI baseline
+  (1 component / 0 orphans / 0 dangling at >= 6,669/14,994 on the
+  recorded corpus + the shape corpus), and the live-audit topology
+  leg (first tenant run green: principal 6,713, five foundation
+  islands, one typed consumption isolation).
+- The sweep RECEIPT (`govmeta:sweep`): a zero-cluster census must
+  cite it or refuse — pre-sweep absence can never read as proven
+  zero flags (smoke find, closed same-day).
+- SPEC gains Group Q (the ADR's G1-G3, renamed on entry — spec group
+  G was taken; correspondence recorded).
+
+---
+
 ## [1.58.0] - 2026-08-26
 
 ### Changed — clusters go graph-native (ADR 0057, Sunny's demo law; fused order with palette v2)

@@ -48,6 +48,15 @@ class Topology:
     unmapped_edge_types: "list[str]" = field(default_factory=list)
     # the foundation exception: legitimate, enumerated, never findings
     foundation_islands: "list[list[str]]" = field(default_factory=list)
+    # typed isolation (live find 2026-08-26, first tenant run of this
+    # leg: the admin-telemetry semantic model formed its own
+    # report/measure-only component — its anchor tables are not
+    # dictionary-tracked, so nothing joins it to the principal). A
+    # consumption-only component is a LEGITIMATE state with a typed
+    # reason, enumerated for visibility — Q1's own form ("every
+    # component is principal OR carries a typed isolation reason").
+    consumption_unanchored: "list[list[str]]" = field(
+        default_factory=list)
     excluded_degree_zero: "dict[str, str]" = field(default_factory=dict)
 
     @property
@@ -60,7 +69,9 @@ class Topology:
         return (f"{self.node_count} nodes / {self.edge_count} edges; "
                 f"components={self.components} "
                 f"(principal={self.principal_size}, foundation "
-                f"islands={len(self.foundation_islands)}); "
+                f"islands={len(self.foundation_islands)}, "
+                f"consumption-unanchored="
+                f"{len(self.consumption_unanchored)}); "
                 f"dangling={len(self.dangling_edges)}, "
                 f"degree-0={len(self.degree_zero)}, stray derived "
                 f"components={len(self.stray_derived_components)}, "
@@ -124,12 +135,19 @@ def analyze(nodes_rows: "list[dict]",
 
     derived_comps = []
     for members in comps.values():
-        if any(layer_of[m] in DERIVED_LAYERS for m in members):
-            derived_comps.append(sorted(members))
-        else:
+        derived_in = {layer_of[m] for m in members} & DERIVED_LAYERS
+        if not derived_in:
             # all-foundation: legitimate under the exception —
             # enumerated for visibility, never a finding
             t.foundation_islands.append(sorted(members)[:10])
+        elif derived_in <= {"report", "measure"}:
+            # consumption-only: a semantic model whose anchor tables
+            # are outside the dictionary — typed isolation, not a
+            # finding (enumerated; joins the principal when its
+            # tables are dictionary-tracked)
+            t.consumption_unanchored.append(sorted(members)[:10])
+        else:
+            derived_comps.append(sorted(members))
     derived_comps.sort(key=len, reverse=True)
     if derived_comps:
         t.principal_size = len(derived_comps[0])

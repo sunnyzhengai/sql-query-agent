@@ -412,3 +412,44 @@ semantic surface unions with exact/containment at birth (the
 bridge law); PHI gate on decision text; complete:false forever;
 embeddings never in a justification. Sequencing suggestion:
 post-demo unless Sunny pulls it forward for the drilldown benefit.
+
+### 2026-08-26 — TENANT CHAIN COMPLETE + ADR 0059 MECHANIZED (release 1.58.1)
+**The 1.58.0 chain: 7/7 Completed** (300 with the folded sweep in
+2:36; 22:33–22:54). Verified live: **83 cluster nodes** — matching
+the pre-migration 83 flags exactly (the migration preserved every
+verdict); census(flag) answers 83 through pure traversal. The
+govmeta receipt lands with the 1.58.1 rerun (post-1.58.0 addition;
+it guards only the zero case, which this store is not in).
+**ADR 0059 mechanized, all three strata (G1-G3 → spec Group Q —
+renamed on entry, G was taken; correspondence recorded):**
+- src/graph/topology.py union-find: foundation exception honored
+  (islands enumerated, never findings), degree-0 forbidden with the
+  receipt as the one typed exclusion, EDGE_PROVENANCE totality
+  (parsed/declared/derived/asserted; every EdgeType mapped, CI-
+  pinned), stray-derived-component detection.
+- 300 postconditions carry Q1/Q2 (build-first, in the fold as
+  ordered); partial unit fixtures declare enforce_topology=False
+  with the recorded reason — the assert is for corpora, not
+  fragments.
+- CI: the 2026-08-26 measurement is a permanent test (1 principal /
+  0 orphans / 0 dangling; sizes >= 6,669/14,994 — shrink = extraction
+  regression) + the shape corpus holds the axioms.
+- Live audit topology leg: FIRST TENANT RUN GREEN — principal
+  6,713, five foundation islands enumerated (REF_PATIENT_CLASS,
+  V_PATIENT_ENCOUNTERS, DM_ICU_STAY, REF_SEX, V_LOG_BASED — all
+  legitimate unread-dictionary states), and one LIVE FIND the
+  recorded corpus could not show: the admin-telemetry semantic
+  model forms a report/measure-only component (its gov_* anchor
+  tables are outside the dictionary) → mechanized as the typed
+  isolation class `consumption_unanchored` per Q1's own form
+  (enumerated, never a finding; joins the principal if its tables
+  are ever dictionary-tracked). Audit prefix map gained
+  cluster/loggroup/govmeta → zero drift on rerun.
+**Release 1.58.1** (wheel + env item + CHANGELOG). Suite 1,089+
+passing at last full run; final gates + smoke re-running at close.
+REMAINING FOR SUNNY (the 1.58.x closing steps, unchanged +1):
+env re-publish picks up 1.58.1 (brings the receipt + topology
+postconditions to the tenant on the NEXT routine rerun — no urgent
+rerun needed; 1.58.0's data is complete); delete the dead
+gov_red_flags KQL shortcut; dev injects instructions; spot-check
+/redflags + "what governance red flags exist?" (expect 83); Publish.

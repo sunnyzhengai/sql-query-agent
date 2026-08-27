@@ -102,6 +102,24 @@ class TestAnalyzer:
         assert len(t.foundation_islands) == 1
         assert t.components == 2
 
+    def test_consumption_only_component_is_typed_isolation(self):
+        # live find 2026-08-26 (first tenant run of the topology
+        # leg): the admin-telemetry semantic model — report/measure
+        # nodes whose anchor tables are outside the dictionary form
+        # their own component. Typed isolation, never a finding.
+        t = analyze(
+            [_n("canonical:m", "canonical"),
+             _n("transform:m:s", "transformation"),
+             _n("report:admin_dash", "report"),
+             _n("measure:admin_dash.turns", "measure")],
+            [_e("canonical:m", "transform:m:s",
+                "canonical_to_transform"),
+             _e("report:admin_dash", "measure:admin_dash.turns",
+                "report_to_measure")])
+        assert t.ok
+        assert len(t.consumption_unanchored) == 1
+        assert not t.stray_derived_components
+
     def test_unmapped_edge_type_violates(self):
         t = analyze([_n("canonical:a", "canonical"),
                      _n("canonical:b", "canonical")],

@@ -35,6 +35,10 @@ PREFIX_TO_LAYER = {
     "decision": "decision",
     "report": "report",
     "measure": "measure",
+    # ADR 0057/0059: governance clusters + the build receipt
+    "cluster": "governance",
+    "loggroup": "governance",
+    "govmeta": "governance",
 }
 
 FINAL_SELECT = "__final_select__"
