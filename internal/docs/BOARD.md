@@ -80,6 +80,13 @@ payload 3 built, RESULTS v2 filled under the section of record).
 - [ ] Finder-coverage timing (pre- vs post-capture)
 - [ ] Purview/Collibra write-back tier placement (PRODUCT_PICTURE
       open item)
+- [ ] **Fabric agent: keep vs DEMOTE-TO-RECIPE** (review recommends
+      demote: we ship surfaces we can back, not reasoning we can't —
+      analysis 08-27; cleanup order cut on ruling)
+- [ ] **Delivery architecture** (listing-time): workbench as
+      container-in-customer-tenant w/ Entra SSO (near-term) vs
+      native Fabric Workload (strategic — answers default-tool
+      gravity with OUR surface); shapes the Marketplace offer type
 
 ## 🔍 REVIEW SESSION'S ITEMS
 
