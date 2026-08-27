@@ -60,7 +60,7 @@ payload 3 built, RESULTS v2 filled under the section of record).
       DemoSqlServer/DemoSqlDatabase parameters (git-vs-tenant
       drift; align when convenient)
 
-- [~] B3 step dep-chains — UNBLOCKED, dev GO on next wake
+- [x] B3 step dep-chains — COMPLETE (step_deps 1.00; verified in worktree 08-27)
 - [x] TEST_MAP.md generated + freshness CI (08-27 dev — 106 modules
       / 1,072 tests all accounted; docs/architecture/TEST_MAP.md)
 - [x] Suite transcript artifact (08-27 dev — every answer_evals run
@@ -102,6 +102,8 @@ payload 3 built, RESULTS v2 filled under the section of record).
       note) when it lands
 - [ ] Script refresh (blocked on re-walk)
 - [ ] W10 refusal-posture design (standing, M4-hard)
+- [ ] Relationship-claims-without-compare design (deferred by dev
+      08-27 with recorded reason; the walk Q4 family; M4-hard)
 - [ ] M2 decision-evidence design (standing; finder-coverage may be
       the lever)
 

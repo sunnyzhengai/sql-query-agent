@@ -764,3 +764,16 @@ layer to someone else's brain).
 **Sunny's side (later, no urgency):** delete the tenant SQL
 Intelligence Agent via UI (API deletes were permission-blocked
 historically); her blocked Publish is now a RETIRED publish.
+
+## REVIEW VERDICT on the corpse-hunt delivery + B3 (2026-08-27 night): APPROVED
+
+Verified in an ISOLATED WORKTREE at 2f072ea (the shared tree carries
+dev's in-flight F-work — worktree verification is now the standing
+practice for deliveries in a dirty tree): 1,116 passed, ruff clean —
+matches dev's report. Accepted: pointer_chase 1.00 (the W9 redirect
+followed end-to-end), **B3 COMPLETE** (step_deps 1.00 — board
+updated), flags honesty 1.00, gate-crash/determinism/floor
+mechanisms L0+smoke+live-verified. The
+relationship-claims-without-compare class is ACCEPTED AS DEFERRED
+TO REVIEW — it is now a review-session design item (the walk's Q4
+family; M4-hard, no lexicons; sits beside W10).
