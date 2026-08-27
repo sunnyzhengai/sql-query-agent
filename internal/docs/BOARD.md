@@ -14,10 +14,11 @@ anything new, any ruling, any tenant/UI click PARKS for Sunny, as
 always; (3) every autonomous action lands in the handoffs + this
 board exactly as if relayed; (4) if a session isn't running, the
 loop falls back to Sunny's doorbell. Review session's watcher: LIVE
-as of 2026-08-27. Dev session: adopt the same (poll origin/dev ~60s
-in background; on movement, read the new commits; act per bounds).
-Last touched: 2026-08-27, dev session (morning orders 1+2 shipped,
-ops-finds report filed).
+as of 2026-08-27. Dev session's watcher: LIVE as of 2026-08-27
+(persistent 60s poll; re-armed at each dev session start — memory
+recorded).
+Last touched: 2026-08-27, dev session (relay protocol adopted,
+watcher armed).
 
 ## 🎯 THE CRITICAL PATH → demo capture
 
