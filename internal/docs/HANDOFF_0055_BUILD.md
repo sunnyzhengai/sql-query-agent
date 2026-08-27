@@ -453,3 +453,32 @@ postconditions to the tenant on the NEXT routine rerun — no urgent
 rerun needed; 1.58.0's data is complete); delete the dead
 gov_red_flags KQL shortcut; dev injects instructions; spot-check
 /redflags + "what governance red flags exist?" (expect 83); Publish.
+
+## SMALL ORDERS + PARKED DIRECTIONS (Sunny's morning four, 2026-08-27)
+
+**ORDERED (small, slot after the fused build):**
+1. **TEST_MAP.md, generated** — every test declares the
+   axiom/contract/ADR/family it proves (marker or docstring
+   convention); generator emits a grouped, readable map; freshness
+   asserted in CI (the PIPELINE_MAP pattern). Purpose: the suite
+   stays legible to Sunny as it grows.
+2. **Suite transcript artifact** — every answer_evals run emits a
+   readable SUITE_TRANSCRIPT.md: per family, question → final
+   answer text → machine verdict → grade (+ floor/gate notes). Data
+   exists in the dump; this is emission, not machinery. Purpose:
+   Sunny reviews behavior without the web UI.
+
+**CONFIRMED, no new ruling:** post-round decision UI with weights =
+ADR 0056 as ratified; builds post-capture; UI placement note —
+decisions offered at EVERY answer round.
+
+**PARKED DIRECTIONS (recorded, unordered):**
+- **Semantic cloud / domain clusters:** derived domain_cluster nodes
+  from shared-technical-neighbor overlap — DETERMINISTIC grouping
+  only (no stochastic community detection; E2). Uses: estate map by
+  subject area, domain-grouped differentiation queue, domain-scoped
+  steward harvest.
+- **Graph visualization:** nice-to-have. First cheap step when the
+  board clears: interactive render of the SHAPE corpus graph (140
+  nodes — layers as colors; the semantic-cloud clusters become
+  visible). Full-estate viz needs layer-collapsed views; later.
