@@ -256,6 +256,9 @@ class TestConsumptionLayerEndToEnd:
             metric_name_records=out.metric_name_rows,
             report_source_records=out.report_source_rows,
             dax_records=out.dax_rows,
+            # partial-fixture corpus: two deliberately disconnected
+            # families — not a topology finding (ADR 0059)
+            enforce_topology=False,
         )
 
     def test_report_and_measure_nodes_land(self):
@@ -314,6 +317,7 @@ class TestDirectLake:
             _parse_results(),
             [{"TABLE_NAME": "encounter", "DESCRIPTION": "Encounters"}], [],
             report_source_records=out.report_source_rows,
+            enforce_topology=False,   # partial fixture (ADR 0059)
         )
         r2t = [e for e in graph.edges_rows if e["edge_type"] == "report_to_technical"]
         assert len(r2t) == 1
@@ -328,6 +332,7 @@ class TestDirectLake:
         graph = build_graph_step(
             _parse_results(), [], [],
             report_source_records=out.report_source_rows,
+            enforce_topology=False,   # partial fixture (ADR 0059)
         )
         assert any("not in the dictionary" in s for s in graph.consumption_skipped)
 

@@ -30,7 +30,7 @@ SPEC_AXIOMS = frozenset({
     "D1", "D2", "D3", "E1", "E2", "E3", "E4", "E5", "E6", "F",
     "G1", "G2", "G3", "H1", "H2",
     # Group Q — graph topology (ADR 0059, ratified 2026-08-26; the
-    # ADR's G1–G3, renamed on entry because Φ_AIVIA's G was taken)
+    # ADR's G1-G3, renamed on entry because spec group G was taken)
     "Q1", "Q2", "Q3",
 })
 
@@ -506,7 +506,7 @@ TRACE_REGISTRY = {
         # (foundation exception + receipt exclusion), EDGE_PROVENANCE
         # totality, 300 postcondition, recorded-corpus baseline as
         # permanent CI, live-audit topology leg; spec Group Q (the
-        # ADR's G1–G3 renamed on entry — G was taken).
+        # ADR's G1-G3 renamed on entry — G was taken).
         "title": "The graph topology axioms: connected, sound, "
                  "complete (measured, then formalized)",
         "category": "architecture",

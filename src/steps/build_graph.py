@@ -172,6 +172,14 @@ def build_graph_step(
     disposition_events: "Iterable[dict]" = (),
     *,
     sweep_run_at: str = "",
+    # ADR 0059 Q1/Q2 postconditions. True for every REAL corpus (the
+    # notebooks never pass this); unit fixtures that deliberately
+    # build partial fragments (e.g. two disconnected families to test
+    # consumption wiring) declare themselves with False — a partial
+    # corpus is not a topology finding. If a FULL customer corpus
+    # ever splits legitimately, the loud failure here is the Echo-Law
+    # trigger for a typed isolation class (per the axiom's own form).
+    enforce_topology: bool = True,
     table_name_col: str = "TABLE_NAME",
     column_name_col: str = "COLUMN_NAME",
     description_col: str = "DESCRIPTION",
@@ -325,7 +333,7 @@ def build_graph_step(
     # loudly, before a broken topology can persist.
     from src.graph.topology import analyze as topology_analyze
     topo = topology_analyze(final_nodes, final_edges)
-    assert topo.ok, (
+    assert not enforce_topology or topo.ok, (
         "build_graph_step: ADR 0059 topology axioms violated — "
         + topo.summary()
         + f"; dangling={topo.dangling_edges[:3]} "

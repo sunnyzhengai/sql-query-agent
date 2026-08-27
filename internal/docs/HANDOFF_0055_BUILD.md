@@ -392,3 +392,23 @@ smoke case; live probe; suite family with store-derived oracle).
 Pin bump if tool schema changes — conscious, recorded. Small order;
 sequence after the fused build's acceptance, before the re-walk (so
 walk section B grades against it).
+
+## RECORDED DIRECTION — the finder-coverage contract (2026-08-26; timing = Sunny's call)
+
+Vectorization ruling (Sunny's question, review's audit): edges and
+structural properties are NEVER embedded — structure is exact,
+queried by the algebra (vectorizing relations = approximate answers
+to exact questions, the Round-4 competitor disease). The finder's
+TEXT corpus grows instead: today it embeds metrics/steps/reports/
+measures/terms (name+description); NOT embedded = the decision
+layer (1,831 sites' criteria text — meaning-entry for "which
+metrics care about antibiotic timing", also relevant to the
+standing M2/drilldown item) and the technical layer (79 tables +
+3,946 columns with dictionary descriptions — "where do we use
+patient age"). Mechanism, build-first: a FINDER-COVERAGE CONTRACT —
+0052 pattern over the semantic index (every node kind embedded ⊎
+excluded-with-reason; registry row; CI totality); every new
+semantic surface unions with exact/containment at birth (the
+bridge law); PHI gate on decision text; complete:false forever;
+embeddings never in a justification. Sequencing suggestion:
+post-demo unless Sunny pulls it forward for the drilldown benefit.

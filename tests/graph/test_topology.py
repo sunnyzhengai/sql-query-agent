@@ -5,7 +5,6 @@ orphans, 0 dangling at 6,669 nodes / 14,994 edges)."""
 
 import csv
 import importlib.util
-import json
 from pathlib import Path
 
 from src.graph.topology import DEGREE_ZERO_EXCLUSIONS, Topology, analyze
