@@ -68,7 +68,9 @@ payload 3 built, RESULTS v2 filled under the section of record).
       pending per the amended rule). **DASHBOARD LIVE (Sunny, 08-27 ~8:15pm): refresh Completed after
       credential rebind + breaker reset — cohort card = 105 (the
       seed's stamped oracle, verified on glass), trend + dx/lab/med
-      path chart rendering. Description-empty glance pending.**
+      path chart rendering. Description EMPTY confirmed —
+      **SUNNY'S DASHBOARD FINISH: COMPLETE.** (Semantic model sits
+      'Uncommitted' by design until connection-binding.)**
 - [ ] Re-walk on the diabetic corpus (incl. section B vs B3,
       section I flags; suite transcript may cover part)
 - [ ] Script refresh (review session — workbench-only, candidate
