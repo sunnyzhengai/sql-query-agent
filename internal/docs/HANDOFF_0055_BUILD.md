@@ -833,3 +833,14 @@ check) and the re-walk unblock.
 aivia_catalog_eh (Eventhouse) and its DB → semantic_catalog; on her
 confirmation, sweep code references (devtools DATABASE, org_config,
 runbooks) + live-smoke verify.
+
+## RENAME EXECUTED (Sunny, 2026-08-27 night) — REFERENCE SWEEP ORDER
+
+Final names: Eventhouse **sql_catalog_eh**; KQL database
+**semantic_catalog** (was probe-eh / probe-eh). Sweep every code and
+doc reference: devtools DATABASE constant + any "probe-eh" literal
+(engine_smoke, verify scripts, org_config, runbooks, installation
+guide, walk docs). The cluster QUERY_URI host should be unchanged by
+an Eventhouse rename — verify rather than assume (live smoke leg
+against semantic_catalog; capacity is active now). Ops-find #3
+closes with this sweep: no screen or file says "probe" again.
