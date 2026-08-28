@@ -1,0 +1,12 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "SQLDatabase",
+    "displayName": "aivia_shapes_src",
+    "description": "Isolated demo source for the shape corpus (isolation law, source leg — field find 2026-08-27)"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "300054d0-be4a-966b-43fb-731db5f4544d"
+  }
+}

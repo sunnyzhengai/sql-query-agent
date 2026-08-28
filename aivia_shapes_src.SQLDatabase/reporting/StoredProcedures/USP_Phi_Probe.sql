@@ -1,0 +1,13 @@
+CREATE PROCEDURE reporting.USP_Phi_Probe
+AS
+BEGIN
+WITH Phi_Filter AS (
+  SELECT P.PATIENT_ID
+  FROM PATIENTS P
+  WHERE P.PATIENT_NAME = 'John Smith'
+)
+SELECT * FROM Phi_Filter;
+END
+
+GO
+
