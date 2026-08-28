@@ -97,6 +97,11 @@ payload 3 built, RESULTS v2 filled under the section of record).
       STANDING RULE meanwhile: after editing semantic-model
       parameters, never source-control-commit that item — Undo it;
       the pull-time hygiene test is the backstop.
+- [x] gov_red_flags Lakehouse table DELETED by Sunny 08-27 — F-2
+      fully closed; the flags' only home is the graph.
+- [~] Rename executed by Sunny 08-27: Eventhouse → sql_catalog_eh ✓;
+      KQL database → semantic_catalog IN PROGRESS; dev's reference
+      sweep fires on her confirmation.
 
 - [ ] ADR 0058 self-service contracts: ratify + 2 sub-calls
       (parameter-range depth; quarantine release authority)
