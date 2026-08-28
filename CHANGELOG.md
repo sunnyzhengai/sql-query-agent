@@ -10,6 +10,22 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.58.3] - 2026-08-28
+
+### Changed — G1 extension (review ruling 2026-08-27, chain-incident evidence)
+- A degree-0 report/measure node — an ingested report whose EXEC
+  target is absent from THIS corpus — is typed
+  `consumption_unanchored` (1-node entry), never a degree-0
+  violation: enumerated in the topology audit, first-class and
+  queryable, and its retrieve record carries the state ("executes
+  a target outside this catalog"). Canonical/technical degree-0
+  remains a defect. MUST be published before the next realism 300
+  run (its consumption layer now meets the Diabetes dashboard).
+- probe-eh → semantic_catalog rename swept through webapp/cli
+  defaults (living code + docs; frozen records untouched).
+
+---
+
 ## [1.58.2] - 2026-08-27
 
 ### Changed — field find F-1, re-cut by ruling (flat surface = PRODUCT export; Fabric agent demoted to integration recipe)

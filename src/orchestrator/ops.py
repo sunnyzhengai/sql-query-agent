@@ -988,6 +988,15 @@ def op_retrieve(ids: "list[str]", run_kql, session: OpsSession) -> ResultSet:
                         session.surfaced.add(entry["id"])
                         links[bucket[r["edge_type"]]].append(entry)
                     row.update(links)
+                    # G1 extension (review ruling 2026-08-27): an
+                    # ingested report with ZERO parsed links executes
+                    # a target outside THIS catalog — a typed state
+                    # the answer must carry, never a silent empty
+                    if not any(links.values()):
+                        row["link_state"] = (
+                            "unanchored — this report executes a "
+                            "target outside this catalog (its links "
+                            "were parsed; none resolve here)")
                 rows.append(row)
             else:
                 try:

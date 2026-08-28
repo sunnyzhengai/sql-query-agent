@@ -624,3 +624,21 @@ class TestNonEvidenceStamp:
         rs = op_lineage("", fake_kql, OpsSession(),
                         column="TOTALLY_UNKNOWN_COL")
         assert NON_EVIDENCE_STAMP not in rs.note
+
+
+class TestUnanchoredReportState:
+    def test_zero_link_report_carries_the_typed_state(self):
+        # G1 extension ruling constraint 2: the answer carries the
+        # state — "executes a target outside this catalog"
+        from tests.orchestrator.test_tools import FOREIGN_REPORT_ID
+        s = OpsSession()
+        s.note_user(FOREIGN_REPORT_ID)
+        rs = op_retrieve([FOREIGN_REPORT_ID], fake_kql, s)
+        row = rs.rows[0]
+        assert "outside this catalog" in row["link_state"]
+
+    def test_linked_report_has_no_state_note(self):
+        s = OpsSession()
+        s.note_user(REPORT_ID)
+        rs = op_retrieve([REPORT_ID], fake_kql, s)
+        assert "link_state" not in rs.rows[0]

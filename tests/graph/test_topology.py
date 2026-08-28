@@ -171,3 +171,29 @@ def test_summary_names_every_axiom_leg():
     s = Topology(node_count=1, edge_count=0, components=1).summary()
     for word in ("components", "dangling", "degree-0", "unmapped"):
         assert word in s
+
+
+def test_degree_zero_report_is_typed_isolation_not_violation():
+    # G1 extension (review ruling 2026-08-27, chain-incident
+    # evidence): an ingested report whose EXEC target is absent from
+    # this corpus is a 1-node consumption_unanchored entry — typed
+    # reality, never a degree-0 violation, never suppressed
+    t = analyze([_n("canonical:m", "canonical"),
+                 _n("transform:m:s", "transformation"),
+                 _n("report:foreign_dash", "report")],
+                [_e("canonical:m", "transform:m:s",
+                    "canonical_to_transform")])
+    assert t.ok
+    assert ["report:foreign_dash"] in t.consumption_unanchored
+    assert not t.degree_zero
+
+
+def test_degree_zero_canonical_is_still_a_violation():
+    # the extension is CONSUMPTION-only; a floating canonical stays
+    # a defect
+    t = analyze([_n("canonical:m", "canonical"),
+                 _n("transform:m:s", "transformation"),
+                 _n("canonical:orphan", "canonical")],
+                [_e("canonical:m", "transform:m:s",
+                    "canonical_to_transform")])
+    assert not t.ok and t.degree_zero == ["canonical:orphan"]

@@ -159,6 +159,11 @@ def main() -> None:
     for island in topo.foundation_islands[:5]:
         print(f"  (foundation island, legitimate: "
               f"{', '.join(island[:3])}…)")
+    # G1 extension (ruling 2026-08-27): typed isolation is ENUMERATED,
+    # never a silent bucket
+    for iso in topo.consumption_unanchored[:5]:
+        print(f"  (consumption-unanchored, typed: "
+              f"{', '.join(iso[:3])})")
     if not topo.ok:
         failures.append(
             "TOPOLOGY (ADR 0059): " + topo.summary()

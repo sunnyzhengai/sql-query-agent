@@ -63,6 +63,7 @@ METRIC_ROWS = {
             "source_tables": "ADT, MEDS", "calculation_logic": "SELECT 2"},
 }
 REPORT_ID = "report:ed_ops"
+FOREIGN_REPORT_ID = "report:foreign_dash"   # zero parsed links (G1 ext)
 
 FRAGMENTS = {
     STEP_1: "SELECT S FROM T WHERE X >= 2",
@@ -135,6 +136,8 @@ def fake_kql(query, params):
                      "description": "ops overview"}]
         return []
     if query == LINKS_OF_REPORT_QUERY:
+        if params["p_id"] == FOREIGN_REPORT_ID:
+            return []
         if params["p_id"] == REPORT_ID:
             return [
                 {"edge_type": "report_to_canonical",
@@ -327,6 +330,12 @@ def fake_kql(query, params):
                      "properties": json.dumps({
                          "repo_name": "pbi-repo",
                          "semantic_model_path": "models/edops"})}]
+        if node_id == FOREIGN_REPORT_ID:
+            # G1 extension: ingested, zero parsed links resolve here
+            return [{"node_id": FOREIGN_REPORT_ID,
+                     "name": "Foreign Dashboard", "description": "",
+                     "properties": json.dumps({
+                         "repo_name": "", "semantic_model_path": ""})}]
         if node_id in FRAGMENTS:
             return [{"node_id": node_id, "name": node_id.split(":")[-1],
                      "properties": json.dumps(

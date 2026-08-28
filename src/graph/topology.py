@@ -123,6 +123,17 @@ def analyze(nodes_rows: "list[dict]",
         reason = DEGREE_ZERO_EXCLUSIONS.get(nid)
         if reason:
             t.excluded_degree_zero[nid] = reason
+        elif layer_of[nid] in ("report", "measure"):
+            # G1 extension (review ruling 2026-08-27, incident
+            # evidence): a workspace-scanned report whose EXEC
+            # target is absent from THIS corpus is REALITY, not an
+            # error — the component classification below types the
+            # singleton as consumption_unanchored (the foundation-
+            # exception pattern, consumption edition). Enumerated,
+            # first-class, never suppressed; the ask surface stamps
+            # its state on retrieve. Only the degree-0 VIOLATION
+            # stands down here.
+            pass
         else:
             t.degree_zero.append(nid)
 

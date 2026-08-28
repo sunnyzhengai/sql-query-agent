@@ -7,7 +7,7 @@
 
 # Test Map — what every test proves
 
-107 modules, 1091 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
+107 modules, 1095 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
 
 ## By ADR
 
@@ -42,13 +42,13 @@
 | 0033 | System of record + projections: Delta is the record | `tests/graph/test_backend_comparison.py` (11) |
 | 0035 | Agentic conversation over deterministic tools | `tests/orchestrator/test_agent.py` (6), `tests/orchestrator/test_tools.py` (20), `tests/webapp/test_app.py` (18) |
 | 0036 | Operations are the product: plan, confirm, execute, display | `tests/orchestrator/test_caption_gate.py` (30), `tests/test_methodology.py` (8) |
-| 0037 | The completed algebra: traverse + result-set kernels | `tests/graph/test_traversal.py` (2), `tests/orchestrator/test_ops.py` (63) |
+| 0037 | The completed algebra: traverse + result-set kernels | `tests/graph/test_traversal.py` (2), `tests/orchestrator/test_ops.py` (65) |
 | 0038 | The interaction layer: 'no' is input | `tests/orchestrator/test_events.py` (7), `tests/steps/test_agent_events.py` (5) |
 | 0039 | Every error links to its contract | `tests/governance/test_funnel.py` (8), `tests/governance/test_journey.py` (7), `tests/test_table_contracts.py` (10) |
 | 0040 | The consumption layer: reports and measures | `tests/adapters/test_devops_tmdl.py` (26), `tests/extractor/test_workspace_tmdl_source.py` (9), `tests/orchestrator/test_report_links.py` (6), `tests/steps/test_semantic_catalog.py` (9), `tests/steps/test_semantic_models.py` (23) |
 | 0041 | M mini-parser, shape registry, fallout capture | `tests/mquery/test_mquery.py` (16) |
 | 0042 | The notebook contract: a harness for the driver layer | `tests/test_docs_consistency.py` (10), `tests/test_notebook_contract.py` (12), `tests/test_replan.py` (9) |
-| 0043 | The diff kernel: the founding question's shape | `tests/graph/test_decomposition_diff.py` (11), `tests/orchestrator/test_ops.py` (63) |
+| 0043 | The diff kernel: the founding question's shape | `tests/graph/test_decomposition_diff.py` (11), `tests/orchestrator/test_ops.py` (65) |
 | 0044 | The tree contract: round-trip verified descriptions | `tests/graph/test_decision_wiring.py` (8), `tests/test_tree_contract.py` (13), `tests/tree/test_extract.py` (18) |
 | 0045 | The escalation contract: no silent residue | `tests/governance/test_leaf_grounding.py` (6), `tests/test_escalation_contract.py` (8) |
 | 0046 | Anchor, discover, match, rank — the human picks | `tests/test_derive_relationships.py` (7), `tests/test_spec_gates.py` (4) |
@@ -58,10 +58,10 @@
 | 0050 | Bounded read-only answer loop: plan to the answer, caption answers, auto-continue (amends 0036) | `tests/orchestrator/test_turn_engine.py` (27) |
 | 0051 | The one-mind turn: one conversation decides, the boundary enforces (supersedes 0036/0050's shape) | `tests/orchestrator/test_turn_engine.py` (27) |
 | 0052 | The reachability contract: every graph payload reachable by a named op or excluded with a reason | `tests/test_reachability.py` (8), `tests/test_reachability_audit.py` (6) |
-| 0053 | Projection-grain column lineage: transform_to_column edges, resolved-only, conservation-counted | `tests/graph/test_builder.py` (16), `tests/orchestrator/test_ops.py` (63) |
+| 0053 | Projection-grain column lineage: transform_to_column edges, resolved-only, conservation-counted | `tests/graph/test_builder.py` (16), `tests/orchestrator/test_ops.py` (65) |
 | 0054 | Governance red flags and governed plurality: misnomer/duplicate/cousin sweep over content hashes | `tests/governance/test_red_flags.py` (16), `tests/orchestrator/test_flag_ops.py` (8) |
 | 0055 | The designed shape corpus: spec-derived test data (category-partition over name x logic x scope) | `tests/shapes/test_shapes.py` (16) |
-| 0059 | The graph topology axioms: connected, sound, complete (measured, then formalized) | `tests/graph/test_topology.py` (12) |
+| 0059 | The graph topology axioms: connected, sound, complete (measured, then formalized) | `tests/graph/test_topology.py` (14) |
 
 ## By standing law
 

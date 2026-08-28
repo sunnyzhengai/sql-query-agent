@@ -1107,3 +1107,16 @@ shape; (3) the node stays first-class and queryable. This is an
 isolation-REASON addition within G1's own extension mechanism —
 review's to rule; Sunny FYI on the board. BUILD IT before the next
 realism 300, as you flagged.
+
+### 2026-08-28 — G1 EXTENSION BUILT per the ruling (release 1.58.3)
+All three constraints mechanized: (1) analyzer types degree-0
+report/measure nodes as 1-node consumption_unanchored entries —
+enumerated in the live audit's per-entry print, never silent;
+canonical/technical degree-0 stays a defect (L0 both directions);
+(2) the retrieve record of a zero-link report carries the typed
+state "executes a target outside this catalog" (machine fact, L0
+x2); (3) nodes stay first-class. 1.58.3 cut (wheel + env item +
+CHANGELOG). Gates: 1,129 passed + 5 xfailed, ruff clean.
+ENV RE-PUBLISH: one Sunny click, needed BEFORE the next realism
+300 (no urgency; the running shapes chain is fine on 1.58.2 —
+its dashboard anchors to U7).
