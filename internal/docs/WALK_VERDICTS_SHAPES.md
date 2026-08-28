@@ -48,3 +48,36 @@ retrieve (cousin/duplicate/misnomer disclosed inline). Two finds:
   fold of auxiliary rounds' tables when the verdict's primary
   basis is elsewhere ("the map on demand"). Demo impact: detour
   tables dilute beats.
+
+## Composite cohort question — "how does USP_DM_Registry_Composite define its patient cohort?"
+
+**VERDICT: PASS on substance.** All 4 source tables; three paths
+correctly read (Dx E11%, Lab HbA1c >= 6.5, Med Metformin/Insulin
+Glargine); "at least two of the criteria" stated; verdict quotes
+the real CASE WHEN EXISTS ... >= 2. The palette's hardest shape,
+answered from real SQL. Wart: R6 table-wide lineage detour after
+R5 held the answer — **second specimen of RW-3 in two consecutive
+questions → RW-3 is an ECHO. Per Echo Law the display-fold
+mechanism is now MANDATORY in the pre-capture batch; acceptance
+tests = this question + the Active_Diabetics question above.**
+
+## Lab_Path sameness question — "which other metrics define patient cohort using the same Lab_Path?"
+
+**VERDICT: MIXED — safety net PASS, answer grain FAIL.**
+- Honesty floor fired live (first sighting in the re-walk): draft
+  invented count '7' appearing in no displayed result → floored to
+  results-as-displayed. Skipped-call guard correctly blocked a
+  redundant identical lineage call. Both mechanisms behaved as
+  designed.
+- But the engine answered table-reads grain (reads LAB_RESULTS,
+  9 metrics) for a logic-sameness question (same HbA1c >= 6.5
+  criterion). Reading the same table is not sharing the same
+  Lab_Path; the caption never disclosed the grain gap.
+- **FIND RW-4 (ECHO of a deferred item → mandatory build):**
+  "relationship-claims-without-compare" sat on the standing design
+  shelf; this is its live specimen. Per Echo Law it enters the
+  ordered queue: logic-sameness questions must route to the
+  compare/closeness machinery (variant map / hash groups) or the
+  caption must state the grain explicitly ("same table ≠ same
+  criteria — logic comparison required"). Acceptance test = this
+  exact question; expected = compare route or disclosed grain.
