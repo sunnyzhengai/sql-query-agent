@@ -63,7 +63,7 @@ payload 3 built, RESULTS v2 filled under the section of record).
       chain runner armed; full record in HANDOFF_0055_BUILD).
       **(1) ✓ sql-logic-env PUBLISHED at 1.58.2 (Sunny, 08-27
       night). (2) ✓ SEED RUN COMPLETE in aivia_shapes_src (Sunny, 08-27 night).
-      **DEV: FIRE THE CHAIN** (devtools/run_shapes_chain.py).
+      **CHAIN FIRING (dev, in flight — 12 steps; results on completion push).**
       Sunny's remaining: the ONE dashboard parameter
       (DemoSqlDatabase → aivia_shapes_src-b5f4544d-731d-43fb-966b-
       be4a300054d0) before her post-chain render check.**
