@@ -175,3 +175,24 @@ payload 3 built, RESULTS v2 filled under the section of record).
 - [x] Walk 1562 + caption batch + W12/W13 fixes + engine smoke
       (08-23/24)
 - [x] Echo Law (build-first) + demo law + slogan book (08-23→26)
+
+## 📋 STRATEGY DIRECTIONS (Sunny's three questions, 2026-08-28 — recorded, sequenced post-capture)
+
+- **Doc-trace layer:** physical layout stays type-based (append-only,
+  ADR-numbered); vertical per-feature views are DERIVED — stable
+  record IDs + typed links + a doc-registry with totality (0052
+  pattern for documentation) + generated feature pages; end state =
+  docs ingested as graph nodes ("show me everything about
+  clusters"). Facts stay put; alignment is always derived.
+- **Pro tier as goal-handoff:** the Round-4 pattern scaled — Sunny
+  writes product goals; review decomposes to ADRs; involvement
+  points contractual (ratifications, gap-checks, human-only clicks;
+  new axioms/spend/pricing always park). Kickoff = 0058
+  ratification + the goals page. Sequenced AFTER capture.
+- **Shipped ops agent / adminless install:** honest form only —
+  deterministic updater (boundary-echo skeleton) + ops agent that
+  APIs everything possible, verifies everything, and degrades to
+  guided one-click runbooks with expected observations at platform
+  walls (Fabric UI-only gaps are real: publish buttons, shortcut
+  ghosts 5/5). "Admin reduced to guided minutes," never
+  "zero-human" — which is also the enterprise trust story.
