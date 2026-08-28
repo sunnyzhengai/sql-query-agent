@@ -1490,3 +1490,13 @@ downgrade, no false claim).
 answer path (the rerun's 300 has landed store-side). RW-8 is
 WORKBENCH-live via the shared tree immediately; it rides the next
 wheel cut for form (nothing tenant-side executes the engine).
+
+### REVIEW VERDICT — RW-8: VERIFIED
+Gates re-run review-side: 1,160 passed + 5 xfailed, ruff clean —
+matches. Mechanism is the right shape: the stamp carries its
+resolution as data; the verifier refuses answered verdicts while a
+stamped probe's suggested retrieve is unread — the laundered-
+absence class dies structurally, and the refusal names the exact
+unread id (continuation pressure toward the truth, not just a
+floor). Dev's live acceptance on the walk question accepted as
+claimed; Sunny re-walks it for the glass-side confirmation.
