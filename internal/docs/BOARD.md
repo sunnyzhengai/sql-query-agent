@@ -63,7 +63,7 @@ payload 3 built, RESULTS v2 filled under the section of record).
       chain runner armed; full record in HANDOFF_0055_BUILD).
       **(1) ✓ sql-logic-env PUBLISHED at 1.58.2 (Sunny, 08-27
       night). (2) ✓ SEED RUN COMPLETE in aivia_shapes_src (Sunny, 08-27 night).
-      **CHAIN FIRING (dev, in flight — 12 steps; results on completion push).**
+      **CHAIN FIRING (dev, in flight — 12 steps; results on completion push).** ECHO-order mechanism GROUNDED (bind API: placeholders stay in git forever, binding routes refresh) — **SUNNY, one 30s click when convenient: Manage connections → New → SQL Server (demo host, aivia_shapes_src catalog, OAuth2, shareable); dev does the rest by API** (plan in HANDOFF_0055_BUILD).
       Params RE-SET by Sunny (08-27 night, post-Undo mishap; model left
       pending per the amended rule). Sunny's remaining: POST-CHAIN
       ONLY — dashboard refresh → cohort 105 → description EMPTY.**

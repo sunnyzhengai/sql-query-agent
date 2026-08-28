@@ -1021,3 +1021,26 @@ cloud connection** (connection-bound, workspace-level) instead of
 text parameters, so no endpoint ever serializes into the item
 definition; parameters demoted to placeholders permanently.
 Pre-capture (the demo uses this dashboard). Board rule amended.
+
+### 2026-08-27 — ECHO ORDER (connection binding): mechanism grounded, one Sunny click queued
+Researched and grounded (Fabric REST "Bind Semantic Model
+Connection" + the binding-hints write-up): the bind request carries
+the model's DATASOURCE REFERENCE PATH and the CONNECTION ID as
+separate fields — so the definition keeps the PLACEHOLDERS
+permanently while a workspace-level binding routes refresh through
+a real shared cloud connection. No endpoint ever serializes into
+the item again; the pending-change hazard ends structurally.
+**Execution plan (sequenced):**
+1. [SUNNY — the one credential step, ~30s]: Manage connections →
+   New → SQL Server: server = the demo host (unchanged), database =
+   the aivia_shapes_src catalog, OAuth2 sign-in, shareable. (Her
+   existing demo-DB connection df066c53 proves the exact shape.)
+2. [dev] bind the dashboard model's current datasource to that
+   connection (bindConnection API), re-inject the PLACEHOLDER
+   expressions via updateDefinition (the pending change dies; git
+   and tenant match permanently), re-bind the placeholder-path
+   datasource, trigger a refresh, verify rows.
+3. Post-capture note: the sepsis model gets the same treatment (its
+   binding drift is the recorded tenant nit).
+Sources: learn.microsoft.com Bind-Semantic-Model-Connection;
+blog.crossjoin.co.uk binding-hints (2026-05).
