@@ -71,12 +71,14 @@ from src.engine_floor import require_engine
 require_engine(src.__version__, REQUIRES_ENGINE, "100_install")
 
 # --- Check 2: required Python packages ---
+# sqlglot/sqlparse were REMOVED from this list 2026-08-27 (shapes
+# chain field find): they are BANNED by the native-parser law
+# (ScriptDom only) and the environment rightly does not ship them —
+# the fossil check failed every run that reached it.
 missing_packages = []
 for pkg_name, import_name in [
     ("pydantic", "pydantic"),
     ("pyyaml", "yaml"),
-    ("sqlglot", "sqlglot"),
-    ("sqlparse", "sqlparse"),
 ]:
     try:
         __import__(import_name)
