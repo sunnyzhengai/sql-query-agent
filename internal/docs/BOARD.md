@@ -89,11 +89,9 @@ payload 3 built, RESULTS v2 filled under the section of record).
 
 ## 👩‍⚕️ SUNNY'S OPEN DECISIONS (no deadline pressure)
 
-- [ ] **Endpoint-leak residual (08-27):** tenant SQL endpoint + db
-      name (auth-gated, NOT credentials) remain in public history
-      at 3ab62e0; HEAD scrubbed. Options: ACCEPT (review
-      recommends — rewrite risks the Fabric git connection) ·
-      rotate the demo DB · history rewrite.
+- [x] **Endpoint-leak residual: RULED — ACCEPT** (Sunny 08-27:
+      auth-gated endpoint, no secret material; history rewrite risk
+      exceeds gain; HEAD clean).
       STANDING RULE meanwhile: after editing semantic-model
       parameters, never source-control-commit that item — Undo it;
       the pull-time hygiene test is the backstop.
