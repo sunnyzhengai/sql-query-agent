@@ -47,7 +47,13 @@ ROSTER = [
     "100_install", "010_ingest_sql_filedrop", "040_dict_clarity",
     "060_ingest_semantic_models", "__load_tables__", "200_parse",
     "300_build_graph", "400_build_metric_logic", "500_validate",
-    "__shortcut__", "700_refresh_search_index",
+    # first-run bootstrap (field find: the shortcut API 400s on a
+    # nonexistent target): 700's Cell 1 writes the Delta table and
+    # its Kusto copy then fails without the shortcut — tolerated IFF
+    # the table landed (postcondition-witnessed, boundary-echo
+    # spirit); then the shortcut creates against a real target and
+    # 700 reruns green.
+    "__bootstrap_700__", "__shortcut__", "700_refresh_search_index",
     "800_export_graph_tables",
 ]
 
@@ -187,7 +193,9 @@ def load_tables(t: str) -> None:
 def create_shortcut(t: str) -> None:
     from devtools.create_kql_shortcut import create_and_verify
     create_and_verify("output_semantic_catalog", WORKSPACE,
-                      KQL_DB_ITEM, SHAPES_LH, timeout_s=300)
+                      KQL_DB_ITEM, SHAPES_LH, timeout_s=300,
+                      target_path="Tables/output_semantic_catalog",
+                      verify_db=SHAPES_KUSTO_DB)
     print("[ok]      KQL shortcut output_semantic_catalog "
           "(create-then-verify)")
 
@@ -230,6 +238,34 @@ def main() -> None:
     for step in roster:
         if step == "__load_tables__":
             load_tables(t)
+        elif step == "__bootstrap_700__":
+            try:
+                run_notebook(tok(), ids["700_refresh_search_index"],
+                             "700 (bootstrap pass)")
+            except RuntimeError as e:
+                print(f"[..]      700 bootstrap failed as expected "
+                      f"pre-shortcut ({str(e)[:80]}) — verifying the "
+                      "Delta write landed")
+            import subprocess as sp
+            ol = sp.run(["az", "account", "get-access-token",
+                         "--resource", "https://storage.azure.com",
+                         "--query", "accessToken", "-o", "tsv"],
+                        capture_output=True, text=True,
+                        check=True).stdout.strip()
+            r = requests.get(
+                f"https://onelake.dfs.fabric.microsoft.com/"
+                f"{WORKSPACE}?resource=filesystem&recursive=false"
+                f"&directory={SHAPES_LH}/Tables",
+                headers={"Authorization": f"Bearer {ol}"}, timeout=60)
+            r.raise_for_status()
+            names = {p["name"].split("/")[-1]
+                     for p in r.json().get("paths", [])}
+            if "output_semantic_catalog" not in names:
+                raise RuntimeError(
+                    "bootstrap: output_semantic_catalog Delta table "
+                    "did not land — the tolerance does not apply")
+            print("[ok]      bootstrap witnessed: "
+                  "output_semantic_catalog exists")
         elif step == "__shortcut__":
             create_shortcut(t)
         else:

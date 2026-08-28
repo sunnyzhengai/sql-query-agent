@@ -1146,3 +1146,26 @@ tripwire, refresh-history check) prove the class; generalize:
 3. Existing hand-made verifies become registry entries, not
    specials.
 Sequence: post-chain, pre-updater (this IS the updater's skeleton).
+
+### 2026-08-28 — CHAIN REPORT: shapes store BUILT through 500; two first-run defects fixed; ONE UI line blocks the tail
+**Green against the SHAPES lakehouse (tripwire-witnessed):**
+100 → 010 → 040 → 060 → loadTable(names, stewards) → 200 (14.2m,
+38 procs through real ScriptDom) → **300 (12.8m — the shapes GRAPH
+IS BUILT on 1.58.2: clusters, receipt, flat columns)** → 400 → 500
+all Completed. First-run defects found + mechanized: (a) the
+shortcut-before-700 ordering (bootstrap pass added,
+postcondition-witnessed tolerance); (b) create_kql_shortcut
+hardcoded the schema-lakehouse path (generalized: target_path +
+verify_db params).
+**BLOCKED at the Eventhouse copy: the API shortcut GHOSTS — 2/2
+(201 registered, never mounts in 600s; create-then-verify caught
+and ghost-deleted both — ops-find-1's mechanism, working).
+API creation is a dead end in this tenant; UI is the documented
+remediation. RUNBOOK — Sunny, one line:** KQL database
+`semantic_catalog_shapes` → New → OneLake shortcut → lakehouse
+`sql_query_lh_shapes` → table `output_semantic_catalog`. Then
+push/tick — dev resumes `--from 700_refresh_search_index` (700 →
+800 → full verification: flat columns, clusters, semantic_search,
+the U7 dashboard link).
+Reminder while you're clicking: the **1.58.3 env publish** you held
+can go with this (both clicks, one visit).

@@ -63,18 +63,25 @@ def _api(method: str, url: str, body: "dict | None" = None) -> int:
 
 
 def create_and_verify(table: str, ws: str, kqldb: str, lakehouse: str,
-                      timeout_s: int = 300) -> None:
+                      timeout_s: int = 300,
+                      target_path: "str | None" = None,
+                      verify_db: "str | None" = None) -> None:
+    """target_path: the OneLake path of the Delta table —
+    Tables/dbo/<t> on schema-enabled lakehouses (the realism
+    default), Tables/<t> on plain ones (the shapes store).
+    verify_db: the KQL database the mount is verified in."""
     url = f"{FABRIC}/workspaces/{ws}/items/{kqldb}/shortcuts"
     status = _api("POST", url, {
         "name": table, "path": "/Tables",
         "target": {"oneLake": {"workspaceId": ws, "itemId": lakehouse,
-                               "path": f"Tables/dbo/{table}"}}})
+                               "path": target_path or
+                               f"Tables/dbo/{table}"}}})
     if status not in (200, 201):
         raise SystemExit(f"[X] shortcut create failed (HTTP {status}) "
                          f"for {table!r}")
     print(f"[.] created (HTTP {status}) — now VERIFYING the query path "
           "(the 201 alone proves registration, not mounting)")
-    client = KustoClient(QUERY_URI, DATABASE,
+    client = KustoClient(QUERY_URI, verify_db or DATABASE,
                          az_cli_token_provider(QUERY_URI))
     deadline = time.monotonic() + timeout_s
     while time.monotonic() < deadline:
