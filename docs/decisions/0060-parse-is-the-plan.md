@@ -52,12 +52,32 @@ NL question
   → DISPLAY (stamped): the map is the answer
 ```
 
-### 2a. Entity grounding — exact, from the user's own tokens
+### 2a. Entity grounding — tiered: exact, then semantic, then closed
 
-Entity tokens map to graph anchors by exact/contains match against
-the catalog name universe — deterministic string matching, no
-embeddings, no LLM judgment. (The RW-4 nudge already does this for
-lineage stamps; it generalizes.)
+*(AMENDED 2026-08-28 after Sunny's challenge: exact-only grounding
+fails concept phrases; vector search joins as the candidate tier.)*
+
+- **Tier 1 — exact:** a user token equal to a name/id in the
+  universe (metrics, steps, tables, columns) grounds with
+  certainty. Identifiers deserve exactness — fuzzy-matching an
+  identifier silently answers about the wrong object.
+- **Tier 2 — semantic candidates:** concept phrases ("the
+  registry", "lab criteria", typos) go to vector/lexical search
+  over names + business names + DESCRIPTIONS + captured phrase
+  mappings (§2f). Output is ranked CANDIDATES, never a silent
+  decision: the confirm step displays the chosen grounding and the
+  runners-up. Safe precisely because of call 1 (confirm every
+  parse): fuzzy may NOMINATE, only the user's click EXECUTES.
+  Vector retrieval is deterministic given a fixed index; residual
+  opacity is bounded by confirmation.
+- **Tier 3 — fail closed** with the vocabulary offer (§2e).
+
+The correction flywheel (§2f) feeds tier 2: every confirmed
+correction becomes an indexed phrase mapping. DEPENDENCY: tier 2
+is only as good as the description surface — see the RW-6 data
+order (palette descriptions for every node type; the search op
+already scopes descriptions, but the demo estate never authored
+them for metrics/steps).
 
 ### 2b. The relation lexicon — small, closed, composable
 

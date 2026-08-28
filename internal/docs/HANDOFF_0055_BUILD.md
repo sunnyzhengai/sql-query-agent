@@ -1362,3 +1362,18 @@ pure local + workbench. **Main risk:** the relation lexicon's
 first cut (design-sensitive; review's primitive set should be
 ratified before compose is written, or the prototype measures a
 straw lexicon).
+
+## ORDER RW-6 (data-file): descriptions for every node type
+Finding (Sunny, 2026-08-28): description fields render empty in
+every metric answer. Confirmed: palette tables carry descriptions;
+all 38 metrics carry NONE (steps likewise). The search op already
+scopes "name, business name, description" — the surface exists,
+the data doesn't. Consequences: search recall crippled, 0060
+tier-2 semantic grounding has no surface to embed, empty columns
+on camera.
+Order: author a description for EVERY palette node type (metrics,
+steps; tables/columns verify), palette-driven (no hardcodes),
+regenerate + store rerun (same pipeline as the RW-2 rename).
+Descriptions must describe the LOGIC/purpose in business words
+(they are the semantic surface tier-2 grounding will embed), never
+restate the name.
