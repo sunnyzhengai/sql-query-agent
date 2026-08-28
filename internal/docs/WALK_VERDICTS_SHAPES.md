@@ -213,3 +213,37 @@ descriptions; commentary carded only 1 of 4 flags.
    extended to the derived layer; the sweep knows why it minted
    each flag and must say it in a sentence). Small build,
    sweep-side.
+
+## Pointer chase — FAIL: a false absence claim laundered through a non-evidence probe (FIND RW-8)
+
+"Which certified metrics feed the Diabetes Registry dashboard?"
+- The ENGINE was right: lineage probe → 0 rows with the stamp
+  "NON-EVIDENCE for absence claims — 'Diabetes Registry' is a
+  METRIC, not a warehouse table — its record carries its links
+  (reports, tables, steps); retrieve USP_DM_Registry_MedDerived
+  for them." Correct diagnosis + the exact right next op, on glass.
+- The MODEL ignored both: ran a 37-row full census instead of the
+  suggested retrieve, then verdicted "There are no certified
+  metrics that directly feed the Diabetes Registry dashboard" —
+  an absence claim based on the very probe stamped NON-EVIDENCE
+  for absence claims. The GATE passed it (0 rows superficially
+  support "none"). The true answer was one retrieve away.
+- **FIND RW-8 (MANDATORY — Echo Law build-first, first specimen):
+  the gate must read the NON-EVIDENCE stamp.** Any absence verdict
+  whose evidentiary basis carries a NON-EVIDENCE-for-absence stamp
+  is floored/refused with continuation pressure toward the
+  probe's own suggested next op. The stamp exists; the gate is
+  blind to it. Acceptance test = this exact question.
+- Routing note: engine-suggested next op ignored → another 0060
+  routing specimen ("dashboard" needs grounding to report nodes;
+  the parse-plan would make the suggested retrieve the plan).
+
+## RW-6 sighting on glass: descriptions LIVE and excellent
+Census now self-explanatory; the codeset pair's descriptions
+telegraph the planted drift ("80 codes — authoring team's copy" vs
+"81 codes — one code newer than the sibling copy"); High ED pair
+descriptions state the grain fight in plain words. NOTE: names
+still show "Diabetic Cohort (Coded)" — new descriptions, old
+names: chain mid-flight or RW-2b name CSV didn't ride. Codeset
+beat HELD until chain-green recorded and "Diabetic Codeset" on
+glass. Dev: confirm chain state + whether RW-2b names landed.
