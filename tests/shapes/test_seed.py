@@ -67,3 +67,27 @@ def test_procs_file_carries_all_corpus_procs_verbatim():
         assert f.read_text().rstrip() in text, f.name
         assert f"DROP PROCEDURE IF EXISTS {f.parent.name}.{f.stem};" \
             in text
+
+
+def test_isolation_guard_precedes_every_drop():
+    # source-leg law (field find 2026-08-27): the seed refuses a
+    # database holding foreign tables BEFORE any DROP executes
+    text = (SEED_DIR / "01_schema_and_data.sql").read_text()
+    assert text.index("ISOLATION GUARD") < text.index("DROP TABLE")
+    assert "THROW 50001" in text
+    # every palette table is whitelisted inside the guard
+    guard = text[:text.index("DROP TABLE")]
+    palette = json.loads(
+        (REPO / "data" / "shapes"
+         / "palette_diabetes.json").read_text())
+    for t in palette["tables"]:
+        assert f"'{t}'" in guard, t
+
+
+def test_ddl_and_inserts_are_separate_batches():
+    # Msg-207 lesson: a batch compiles against the PRE-batch schema —
+    # DDL and INSERTs must be GO-separated for every starting state
+    text = (SEED_DIR / "01_schema_and_data.sql").read_text()
+    for block in text.split("\nGO\n"):
+        assert not ("CREATE TABLE" in block and "INSERT INTO" in block), \
+            "DDL and INSERT share a batch"

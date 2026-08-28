@@ -972,3 +972,8 @@ tables (procs + ED dashboard breakage).
    diagnostic — if PATIENTS was replaced, restore from the sepsis
    seed section before anything else touches the realism store.
 Chain stays HELD until re-targeted seed passes with cohort 105.
+
+**Damage check CLEAR (Sunny's sys.columns diagnostic, 08-27):**
+dbo.PATIENTS in aivia_demo_src is the sepsis corpus's 137-column
+table, intact — the compile abort preceded any DROP. Order item 4
+closes: no restore needed; the realism store was never touched.

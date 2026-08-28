@@ -231,10 +231,31 @@ def render_schema_and_data() -> str:
         f"med={oracle['med_path']}",
         "",
     ]
+    # ISOLATION GUARD — the source leg (field find 2026-08-27:
+    # seed 01 aimed at the SHARED demo DB collided with the sepsis
+    # corpus; Msg 207 at compile held it). The seed refuses any
+    # database holding tables outside the palette — fail loud,
+    # before a single DROP.
+    names = ", ".join(f"'{t}'" for t in _tables())
+    out += [
+        "IF EXISTS (SELECT 1 FROM sys.tables t "
+        "JOIN sys.schemas s ON t.schema_id = s.schema_id",
+        f"           WHERE s.name = 'dbo' AND t.name NOT IN ({names}))",
+        "    THROW 50001, 'ISOLATION GUARD: foreign tables present "
+        "— wrong database. This seed runs ONLY in aivia_shapes_src "
+        "(empty or palette-only).', 1;",
+        "GO",
+        "",
+    ]
     for t in _tables():
         cdefs = ", ".join(f"[{c}] {col_type(c)}" for c in cols[t])
         out.append(f"DROP TABLE IF EXISTS dbo.[{t}];")
         out.append(f"CREATE TABLE dbo.[{t}] ({cdefs});")
+        # GO between DDL and INSERTs: T-SQL compiles a whole batch
+        # against the PRE-batch schema — the collision failed at
+        # compile because INSERT saw the old table; separate batches
+        # make the seed correct in every starting state.
+        out.append("GO")
         for chunk_start in range(0, len(rows[t]), 500):
             chunk = rows[t][chunk_start:chunk_start + 500]
             if not chunk:
@@ -246,6 +267,7 @@ def render_schema_and_data() -> str:
                 f"INSERT INTO dbo.[{t}] ("
                 + ", ".join(f"[{c}]" for c in cols[t])
                 + ") VALUES\n" + values + ";")
+        out.append("GO")
         out.append("")
     return "\n".join(out) + "\n"
 

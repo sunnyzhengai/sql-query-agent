@@ -65,7 +65,7 @@ payload 3 built, RESULTS v2 filled under the section of record).
       night). (2) seed run HELD — 01 errored on SOURCE-DB COLLISION with the
       sepsis corpus (field find; dev re-targets seed to a new
       isolated aivia_shapes_src; dashboard params will need new
-      values; Sunny's sys.columns damage check pending).**
+      values; damage check CLEAR — sepsis PATIENTS intact, 137 cols).**
 - [ ] Re-walk on the diabetic corpus (incl. section B vs B3,
       section I flags; suite transcript may cover part)
 - [ ] Script refresh (review session — workbench-only, candidate
