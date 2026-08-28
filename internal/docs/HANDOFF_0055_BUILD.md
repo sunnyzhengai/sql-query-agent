@@ -936,3 +936,12 @@ description still EMPTY. Separately (realism store, before its next
 **Zones law find en route:** the renamed semantic_catalog.KQLDatabase
 synced as a NEW top-level item class — .KQLDatabase joined
 GOVERNED_SUFFIXES (the law fired exactly as built).
+
+## REVIEW VERDICT on the load staging (2026-08-27 night): APPROVED — awaiting Sunny's two clicks
+
+Verified: 1,123 green (the 3 flagged reds fixed) + ruff clean. Seed
+oracle stamped in-file (cohort 105); chain runner with
+create-then-verify shortcut (the mechanism from the ghost lesson —
+applied at birth); zones-law catch on .KQLDatabase accepted. The
+protocol note "tick the board / push wakes dev" is now the standing
+fire signal for chains needing human preconditions.
