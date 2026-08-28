@@ -64,9 +64,9 @@ payload 3 built, RESULTS v2 filled under the section of record).
       **(1) ✓ sql-logic-env PUBLISHED at 1.58.2 (Sunny, 08-27
       night). (2) ✓ SEED RUN COMPLETE in aivia_shapes_src (Sunny, 08-27 night).
       **CHAIN FIRING (dev, in flight — 12 steps; results on completion push).**
-      Sunny's remaining: the ONE dashboard parameter
-      (DemoSqlDatabase → aivia_shapes_src-b5f4544d-731d-43fb-966b-
-      be4a300054d0) before her post-chain render check.**
+      Params RE-SET by Sunny (08-27 night, post-Undo mishap; model left
+      pending per the amended rule). Sunny's remaining: POST-CHAIN
+      ONLY — dashboard refresh → cohort 105 → description EMPTY.**
 - [ ] Re-walk on the diabetic corpus (incl. section B vs B3,
       section I flags; suite transcript may cover part)
 - [ ] Script refresh (review session — workbench-only, candidate
