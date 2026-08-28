@@ -305,6 +305,33 @@ SAMENESS_CAVEAT = ("a name match is not logic sameness; "
                    "run compare for a verdict")
 
 
+def _turn_step_sameness_stamp(session, run_kql) -> str:
+    """RW-4 (re-walk find 2026-08-28, MANDATORY — the deferred
+    relationship-claims class gone live per Echo Law): the Lab_Path
+    corpse asked about a STEP by name, the engine displayed only
+    table-grain lineage, and the sameness duty never armed because
+    no op phrase was the step name. The user's OWN WORDS are the
+    trigger the turn actually carries: underscore-joined identifier
+    tokens (high signal, never topical words) are checked against
+    the step-name universe; a shared-step hit stamps the caveat on
+    the lineage note, which arms the existing W6 caption duty —
+    echo the grain gap or show a compare."""
+    if session is None or not session.user_text.strip():
+        return ""
+    # candidates: identifier-shaped tokens, EXACT-matched against
+    # the universe (equality is safe — the 'ED' corpse was about
+    # containment, never equality; a wasted exact lookup on 'same'
+    # hits nothing)
+    toks = re.findall(r"\b[A-Za-z][A-Za-z0-9_]{3,}\b",
+                      session.user_text)
+    stamps = []
+    for tok in list(dict.fromkeys(toks))[:12]:
+        s = _step_name_universe(tok, run_kql, session)
+        if s:
+            stamps.append(s)
+    return " ".join(stamps)
+
+
 def _step_name_universe(phrase: str, run_kql,
                         session: "OpsSession | None" = None) -> str:
     """The step-name universe stamp (bridge-stamp pattern): when a
@@ -757,6 +784,9 @@ def _column_usage(column: str, run_kql, session: OpsSession) -> ResultSet:
                         f" not a column — its record carries its links "
                         f"(reports, tables, steps); retrieve "
                         f"{str(rid)!r} for them.")
+    step_stamp = _turn_step_sameness_stamp(session, run_kql)
+    if step_stamp:
+        note = (note + " " if note else "") + step_stamp
     return session.register(
         "lineage", {"column": clean},
         _attach_cards(out, run_kql),
@@ -854,13 +884,18 @@ def op_lineage(table: str, run_kql, session: OpsSession,
                         f" not a warehouse table — its record carries "
                         f"its links (reports, tables, steps); retrieve "
                         f"{str(rid)!r} for them.")
+    step_stamp = _turn_step_sameness_stamp(session, run_kql)
+    if step_stamp:
+        note = (note + " " if note else "") + step_stamp
     return session.register(
         "lineage", {"table": clean},
         _attach_cards(out, run_kql),
         complete=True,
         universe=(f"every certified metric whose calculation reads "
                   f"{scope_word} {clean!r} — from parsed SQL lineage "
-                  "edges, never name mentions; the count is exact"),
+                  "edges, never name mentions; reads-grain, not "
+                  "logic-grain: shared tables do not imply shared "
+                  "logic; the count is exact"),
         note=note)
 
 

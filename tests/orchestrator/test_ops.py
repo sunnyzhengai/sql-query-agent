@@ -642,3 +642,35 @@ class TestUnanchoredReportState:
         s.note_user(REPORT_ID)
         rs = op_retrieve([REPORT_ID], fake_kql, s)
         assert "link_state" not in rs.rows[0]
+
+
+class TestTurnStepSamenessStamp:
+    """RW-4 (re-walk 2026-08-28, mandatory): a sameness question
+    naming a STEP got table-grain lineage with no caveat — the
+    user's own identifier tokens now arm the stamp on lineage."""
+
+    def test_lineage_stamps_when_user_names_a_shared_step(self):
+        s = OpsSession()
+        s.note_user("which other metrics define the cohort using "
+                    "the same Scores step?")
+        rs = op_lineage("ADT", fake_kql, s)
+        assert "not logic sameness" in rs.note
+        assert "2 procs have a step NAMED" in rs.note
+
+    def test_column_branch_stamps_too(self):
+        s = OpsSession()
+        s.note_user("who uses the same Scores logic?")
+        rs = op_lineage("", fake_kql, s, column="SepsisDX")
+        assert "not logic sameness" in rs.note
+
+    def test_no_stamp_without_a_step_token(self):
+        s = OpsSession()
+        s.note_user("which metrics read the ADT table?")
+        rs = op_lineage("ADT", fake_kql, s)
+        assert "not logic sameness" not in rs.note
+
+    def test_reads_grain_sentence_is_universal(self):
+        s = OpsSession()
+        s.note_user("which metrics read ADT?")
+        rs = op_lineage("ADT", fake_kql, s)
+        assert "shared tables do not imply shared logic" in rs.universe

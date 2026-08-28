@@ -192,6 +192,7 @@ def create_app(
             "caption_corrected": turn["caption_corrected"],
             "caption_violations": turn["caption_violations"],
             "answered": turn["answered"],
+            "folded_refs": turn.get("folded_refs", []),
             "missing_op": turn["missing_op"],
             "loop_status": (f"one mind: {turn['rounds']} tool round(s)"
                             + (" — budget exhausted"
@@ -448,6 +449,10 @@ WORKBENCH_PAGE = """<!doctype html>
                  font:12px ui-monospace,monospace; overflow-x:auto; }
   .cite { font:11.5px ui-monospace,monospace; background:#eef2fa;
           color:var(--accent); border-radius:6px; padding:1px 6px; }
+  .auxfold { margin:4px 0 2px; }
+  .auxfold summary { cursor:pointer; font-size:12px; color:#6b7080;
+                     list-style:none; }
+  .auxfold summary::-webkit-details-marker { display:none; }
   .errfold { margin:0 0 10px; }
   .errfold summary { cursor:pointer; display:flex; gap:8px;
                      align-items:center; list-style:none;
@@ -647,6 +652,16 @@ function foldHeadlineQuotes(raw) {
 }
 
 function renderFinale(j) {
+  // RW-3 (mandatory, echoed): auxiliary rounds' tables fold once the
+  // verdict lands — the map on demand; headlines stay visible.
+  for (const ref of (j.folded_refs || [])) {
+    const panel = document.getElementById('ref-' + ref);
+    if (!panel) continue;
+    const tbl = panel.querySelector('table');
+    if (!tbl) continue;
+    const d = el(`<details class="auxfold"><summary>auxiliary table folded — the verdict's primary basis is another result (expand for the map)</summary></details>`);
+    tbl.replaceWith(d); d.appendChild(tbl);
+  }
   if (j.loop_status) {
     add(el(`<div class="loopline">${esc(j.loop_status)}${
       j.loop_note ? ' — ' + esc(j.loop_note) : ''}</div>`));

@@ -81,3 +81,29 @@ tests = this question + the Active_Diabetics question above.**
   caption must state the grain explicitly ("same table ≠ same
   criteria — logic comparison required"). Acceptance test = this
   exact question; expected = compare route or disclosed grain.
+
+## "Is there another way of defining the diabetic cohort?" (Sunny's phrasing of the U6 discovery beat)
+
+**VERDICT: PASS on substance.** Census surfaced the full planted
+cousin cluster — 10 members — from natural phrasing; verdict
+floored to the honest census scope. Observation (third RW-4-class
+specimen): commentary's per-metric glosses are name-derived, and
+its closing "different data sources and criteria" is a
+logic-difference claim made without compare — while the stronger
+evidence (cousin_conflict: 10 members / 10 logics) sat unused in
+the already-disclosed header flags.
+
+## "How is Active_Diabetics different from the Composite?" — EXEMPLARY PASS
+
+Retrieve both → compare aspect:logic → 2 hash groups, machine-
+stamped "logic DIFFERS", expandable diff, both SQLs side by side
+(single-path E11% vs 2-of-3 CASE). **This is exactly the RW-4
+target behavior, chosen unprompted.**
+
+**RW-4 SCOPE SHARPENED:** same question class, two routes in one
+session — Lab_Path question → table-lineage + floor (coarse);
+this question → compare (exact). Capability exists; the build is
+ROUTING CONSISTENCY: sameness/difference questions must reach
+compare (or cite member flags) reliably. Acceptance now = the
+Lab_Path question routing to compare, judged against this
+question's behavior as the exemplar.

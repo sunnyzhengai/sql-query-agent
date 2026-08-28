@@ -733,7 +733,8 @@ def _manifest(palette: dict, mid, rel) -> dict:
          # by the deny grounds): 80 vs 81 codes, the diff pinpoints
          # the missing 81st
          "expect": {"flags": [flag("misnomer", "metric",
-                                   "Diabetic Cohort (Codeset)",
+                                   palette["metrics"]["u9_codes_80"]
+                                   ["business_name"],
                                    "CONFLICT", 2)],
                     "compare": {"a": mid("u9_codes_80"),
                                 "b": mid("u9_codes_81"),

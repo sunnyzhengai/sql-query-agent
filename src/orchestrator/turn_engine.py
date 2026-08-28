@@ -527,9 +527,32 @@ def run_turn(session: EngineSession, question: str, chat_api,
     if stamp_echo and answer:
         answer += ("\n\nMachine-stamped lineage: " + " ".join(stamp_echo))
 
+    # RW-3 (re-walk 2026-08-28, MANDATORY — echoed on two consecutive
+    # questions): when the verified quote's ground is ONE result, the
+    # other results' TABLES are auxiliary — mark their refs so the
+    # display folds them ("the map on demand"). Turn-scoped and
+    # verdict-anchored: no verified quote, or a prior-turn ground,
+    # folds nothing. Machine-computed, never model-claimed.
+    folded_refs: "list[str]" = []
+    if answered and quote:
+        def _carries(o) -> bool:
+            res = o.get("result") or {}
+            g = _norm(json.dumps(res.get("rows") or [],
+                                 ensure_ascii=False))
+            g += " " + _norm(str(res.get("headline") or ""))
+            return quote.lower() in g.lower()
+        primary = {(o.get("result") or {}).get("ref")
+                   for o in outputs if _carries(o)} - {None}
+        if primary:
+            folded_refs = [
+                str((o.get("result") or {}).get("ref"))
+                for o in outputs
+                if (o.get("result") or {}).get("ref") not in primary
+                and (o.get("result") or {}).get("rows")]
     session.displays.extend(outputs)
     session.turns += 1
     return {
+        "folded_refs": folded_refs,
         "answer": answer,
         "evidence_grain": _evidence_grain(
             list(session.displays) + outputs),

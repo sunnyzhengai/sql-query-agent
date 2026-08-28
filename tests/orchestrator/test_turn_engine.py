@@ -557,3 +557,39 @@ class TestPGroup:
         joint = SYSTEM_PROMPT + _j.dumps(ENGINE_TOOLS, sort_keys=True)
         assert hashlib.sha256(
             joint.encode()).hexdigest() == PINNED_PROMPT_SHA
+
+
+class TestAuxiliaryFold:
+    """RW-3 (re-walk 2026-08-28, mandatory — echoed on two
+    consecutive questions): when the verified quote lives in one
+    result, the other results' tables are auxiliary — machine-marked
+    for the display fold, never model-claimed."""
+
+    def test_auxiliary_round_tables_are_marked_folded(self):
+        s = EngineSession()
+        out = run_turn(s, "how is ED Sepsis Screening defined?",
+                       scripted_engine([
+                           {"calls": [("census", {"kind": "metric"})]},
+                           {"calls": [("retrieve",
+                                       {"ids": [REF_A]})]},
+                           {"text": "Defined as ED Sepsis Screening "
+                                    "per the record."},
+                           {"verdict": {
+                               "answered": True,
+                               "evidence_quote": GOOD_QUOTE}},
+                       ]), fake_kql)
+        assert out["answered"] is True
+        # the quote lives in the census rows (R1 — the fake's
+        # description carries it); the retrieve's table (R2) is
+        # the auxiliary round and folds
+        assert out["folded_refs"] == ["R2"]
+
+    def test_no_verified_quote_folds_nothing(self):
+        s = EngineSession()
+        out = run_turn(s, "and the census?",
+                       scripted_engine([
+                           {"calls": [("census", {"kind": "metric"})]},
+                           {"text": "Could not settle it."},
+                           {"verdict": {"answered": False}},
+                       ]), fake_kql)
+        assert out["folded_refs"] == []
