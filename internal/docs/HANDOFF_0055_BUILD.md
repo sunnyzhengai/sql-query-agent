@@ -1317,3 +1317,48 @@ grain sentence + co-occurrence nudge) live in the workbench via
 the shared tree — two of them already SIGHTED in Sunny's walk
 before the batch even closed. Demo ask for U9 is now: "Are the
 two Diabetic Cohort (Coded) definitions the same?"
+
+## DEV'S PROTOTYPE ESTIMATION for ADR 0060 (requested by the draft, 2026-08-28)
+
+**Headline: the prototype is a DAY-SCALE build (~1–2 sessions),
+because the deterministic 90% already exists.** The ops algebra IS
+the traversal engine; the prototype adds a planner in front of it,
+not an engine under it.
+
+Piece-by-piece:
+1. **PARSE** (~150 lines + one new PIN): one LLM call with a
+   schema-FORCED tool ("file_parse": entities[], primitives[],
+   modifiers[]) — the closed vocabulary lives in the tool schema
+   itself, so an out-of-vocabulary parse is structurally
+   impossible; unmappable input fails closed with the vocabulary
+   offer (metric 5 by construction). New pin objects: the parse
+   prompt + parse tool schema join the pin discipline.
+2. **GROUND** (~50 lines): entity tokens → anchors by exact/
+   contains against the name universe — the RW-4 nudge's mechanism
+   generalized, as the draft itself notes. Zero new queries.
+3. **COMPOSE** (~200 lines): primitives → op sequences over the
+   EXISTING algebra 1:1 — definition→retrieve; same/different→
+   retrieve×2+compare (the exemplar route, now deterministic);
+   readers→lineage; feeds/fed-by→B3 step deps; flags→flag census/
+   member flags; count→census. The experiment's question set needs
+   NO new graph surface — B3 + clusters + compare + lineage cover
+   it (checked against the walk's questions).
+4. **CONFIRM + DISPLAY** (~80 lines workbench): parse-as-plan chip
+   + confirm; the answer is the stamped map — NO LLM caption in
+   the prototype, so metric 3 (floor collapse) is zero by
+   construction and metric 4 (detour load) equals the plan's own
+   rows. Confirm-all first (Sunny's §7.1 barely touches scope —
+   relaxing later is a flag).
+5. **HARNESS** (~200 lines): CURRENT vs PROPOSED over the shape
+   corpus questions + Sunny's walk paraphrases (review holds the
+   verdict docs — extracting the paraphrase set is the one input I
+   need from review), graded on the planted oracles; scorecard in
+   the SUITE_TRANSCRIPT shape.
+**On §7.3 (parser tier):** run BOTH tiers as two harness columns —
+the harness makes it one flag; recommend frontier-during-pilot as
+the experiment's isolation control, exactly as the draft suggests.
+**Not needed:** new store surfaces, tenant changes, new queries —
+pure local + workbench. **Main risk:** the relation lexicon's
+first cut (design-sensitive; review's primitive set should be
+ratified before compose is written, or the prototype measures a
+straw lexicon).
