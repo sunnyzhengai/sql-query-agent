@@ -61,10 +61,11 @@ payload 3 built, RESULTS v2 filled under the section of record).
       dev** (shapes lakehouse + 7/7 assets + shapes KQL DB +
       semantic_search installed + seed committed w/ oracle 105 +
       chain runner armed; full record in HANDOFF_0055_BUILD).
-      **WAITING ON SUNNY (2 steps): publish sql-logic-env (staged
-      1.58.2 correct; API publish classifier-blocked) + paste-run
-      the two seed files in aivia_demo_src. Then any push/tick
-      wakes dev → chain fires automatically.**
+      **(1) ✓ sql-logic-env PUBLISHED at 1.58.2 (Sunny, 08-27
+      night). (2) REMAINING: paste-run the two seed files in
+      aivia_demo_src (01_schema_and_data.sql, then 02_procs.sql;
+      expect cohort 105). Then any push/tick wakes dev → chain
+      fires automatically.**
 - [ ] Re-walk on the diabetic corpus (incl. section B vs B3,
       section I flags; suite transcript may cover part)
 - [ ] Script refresh (review session — workbench-only, candidate
