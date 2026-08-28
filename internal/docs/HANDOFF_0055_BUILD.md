@@ -1235,3 +1235,11 @@ ready), all four engine surfaces queryable. THE RE-WALK IS
 UNBLOCKED. Dev proceeds to the boundary echo contract as sequenced;
 the connection-binding fix lands whenever Sunny's shareable
 connection click arrives.
+
+### 2026-08-28 — workbench store lever (board nicety, built)
+resolve_store(): env KUSTO_DB > org_config.yaml `search.kusto_db`
+(the line Sunny reached for now works workbench-side too) >
+default; the startup banner prints the ACTIVE store + which lever
+chose it. 3 tests. To sit the workbench on the demo store: local
+org_config search.kusto_db: "semantic_catalog_shapes" — one visible
+line, no env spelunking.

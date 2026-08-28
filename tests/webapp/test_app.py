@@ -287,3 +287,36 @@ class TestOneMindAskEndpoint:
         # the turn event reached the sink exactly once
         lines = (tmp_path / "e.jsonl").read_text().splitlines()
         assert len(lines) == 1
+
+
+class TestStoreResolution:
+    """Board item 2026-08-28: the workbench store switch gets ONE
+    obvious lever + a visible banner (env-var-only cost 20 min)."""
+
+    def test_env_wins(self, monkeypatch, tmp_path):
+        monkeypatch.setenv("SQA_KUSTO_DB", "some_db")
+        monkeypatch.chdir(tmp_path)
+        from src.webapp.main import resolve_store
+        _, db, source = resolve_store()
+        assert db == "some_db" and "env" in source
+
+    def test_org_config_search_block_is_read(self, monkeypatch,
+                                             tmp_path):
+        monkeypatch.delenv("SQA_KUSTO_DB", raising=False)
+        monkeypatch.delenv("KUSTO_DB", raising=False)
+        (tmp_path / "org_config.yaml").write_text(
+            "search:\n  kusto_db: \"semantic_catalog_shapes\"\n")
+        monkeypatch.chdir(tmp_path)
+        from src.webapp.main import resolve_store
+        _, db, source = resolve_store()
+        assert db == "semantic_catalog_shapes"
+        assert "org_config" in source
+
+    def test_default_when_nothing_configured(self, monkeypatch,
+                                             tmp_path):
+        monkeypatch.delenv("SQA_KUSTO_DB", raising=False)
+        monkeypatch.delenv("KUSTO_DB", raising=False)
+        monkeypatch.chdir(tmp_path)
+        from src.webapp.main import resolve_store
+        _, db, source = resolve_store()
+        assert db == "semantic_catalog" and "default" in source

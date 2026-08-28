@@ -7,7 +7,7 @@
 
 # Test Map — what every test proves
 
-108 modules, 1101 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
+108 modules, 1104 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
 
 ## By ADR
 
@@ -40,7 +40,7 @@
 | 0031 | Business terms: weighted plurality | `tests/governance/test_business_terms.py` (6) |
 | 0032 | Deterministic core, LLM edges | `tests/orchestrator/test_core.py` (10), `tests/test_grounding_evals.py` (6) |
 | 0033 | System of record + projections: Delta is the record | `tests/graph/test_backend_comparison.py` (11) |
-| 0035 | Agentic conversation over deterministic tools | `tests/orchestrator/test_agent.py` (6), `tests/orchestrator/test_tools.py` (20), `tests/webapp/test_app.py` (18) |
+| 0035 | Agentic conversation over deterministic tools | `tests/orchestrator/test_agent.py` (6), `tests/orchestrator/test_tools.py` (20), `tests/webapp/test_app.py` (21) |
 | 0036 | Operations are the product: plan, confirm, execute, display | `tests/orchestrator/test_caption_gate.py` (30), `tests/test_methodology.py` (8) |
 | 0037 | The completed algebra: traverse + result-set kernels | `tests/graph/test_traversal.py` (2), `tests/orchestrator/test_ops.py` (65) |
 | 0038 | The interaction layer: 'no' is input | `tests/orchestrator/test_events.py` (7), `tests/steps/test_agent_events.py` (5) |

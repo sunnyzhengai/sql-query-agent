@@ -27,13 +27,41 @@ from pathlib import Path
 from src.branding import legacy_env
 
 
-def _kusto_run():
+def resolve_store() -> "tuple[str, str, str]":
+    """(uri, db, source) — the workbench's store, ONE obvious lever
+    (board item 2026-08-28: the env-var-only switch cost Sunny 20
+    minutes; the org_config line she reached for now works here
+    too). Precedence: env override > org_config search block >
+    default. The startup banner prints the winner, so the store in
+    use is always visible."""
     from src.branding import legacy_env
-    from src.orchestrator.kusto import KustoClient, az_cli_token_provider
     uri = legacy_env(
         "KUSTO_URI",
         "https://trd-uzdu1yhqrmqtutkej8.z7.kusto.fabric.microsoft.com")
-    db = legacy_env("KUSTO_DB", "semantic_catalog")
+    env_db = legacy_env("KUSTO_DB", "")
+    if env_db:
+        return uri, env_db, "env KUSTO_DB"
+    cfg = Path("org_config.yaml")
+    if cfg.exists():
+        try:
+            import yaml
+            search = (yaml.safe_load(cfg.read_text())
+                      or {}).get("search") or {}
+            cfg_uri = str(search.get("kusto_uri") or "").strip()
+            cfg_db = str(search.get("kusto_db") or "").strip()
+            if cfg_db:
+                return cfg_uri or uri, cfg_db, "org_config.yaml search:"
+        except Exception as e:              # noqa: BLE001 — visible
+            print(f"[!] org_config.yaml unreadable ({e}) — "
+                  "falling through to the default store")
+    return uri, "semantic_catalog", "built-in default"
+
+
+def _kusto_run():
+    from src.orchestrator.kusto import KustoClient, az_cli_token_provider
+    uri, db, source = resolve_store()
+    print(f"[workbench] store: {db} @ {uri} (from {source}) — "
+          "override with KUSTO_DB or org_config.yaml search.kusto_db")
     return KustoClient(uri, db, az_cli_token_provider(uri)).run
 
 
