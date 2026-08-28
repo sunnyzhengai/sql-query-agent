@@ -206,10 +206,9 @@ measurement, already recorded in WALK_VERDICTS_SHAPES.md.
 
 ## 7. Open calls (Sunny's)
 
-1. **Confirm cadence:** confirm every parse, or auto-execute
-   unambiguous parses and confirm only when the parse is ambiguous
-   or corrected-before? (Recommendation: confirm-all during pilot;
-   relax by evidence.)
+1. **Confirm cadence:** RULED by Sunny 2026-08-28 — **confirm
+   every parse.** No auto-execute path; every question's
+   interpretation renders on glass and waits for the click.
 2. **Lexicon governance:** who may promote a personal phrase
    mapping to the estate lexicon — stewards only, or
    usage-threshold automatic with steward veto? (Mirrors the 0054
