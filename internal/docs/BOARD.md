@@ -57,7 +57,7 @@ payload 3 built, RESULTS v2 filled under the section of record).
       zero refs); physical table = Sunny's UI step above. F-3
       cancelled. Columns materialize on the next 300 rerun (rides
       the shape-seed run; no urgency).
-- [ ] Tenant load of the shape store (_shapes profile)
+- [~] Tenant load of the shape store — ORDERED 08-27 (dev executes his demo-switch design; flat columns ride the run)
 - [ ] Re-walk on the diabetic corpus (incl. section B vs B3,
       section I flags; suite transcript may cover part)
 - [ ] Script refresh (review session — workbench-only, candidate
@@ -99,8 +99,8 @@ payload 3 built, RESULTS v2 filled under the section of record).
       open item)
 - [x] **Fabric agent: RULED — DEMOTED to integration recipe**
       (Sunny 08-27 evening; ruling + re-cut order in
-      HANDOFF_0055_BUILD; her tenant-agent deletion queued, no
-      urgency)
+      HANDOFF_0055_BUILD; tenant agent DELETED by Sunny 08-27 ✓;
+      Graph Agent + eh_probe confirmed long gone)
 - [ ] **Delivery architecture** (listing-time): workbench as
       container-in-customer-tenant w/ Entra SSO (near-term) vs
       native Fabric Workload (strategic — answers default-tool

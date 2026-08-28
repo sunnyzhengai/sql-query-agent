@@ -810,3 +810,26 @@ the store on the next 300 rerun — no urgency now that no agent
 verification depends on them; they ride the next routine chain (or
 the shape-store seed run, whichever comes first).
 Gates: 1,118 passed + 5 xfailed, ruff clean.
+
+## REVIEW VERDICT on 1.58.2 (2026-08-27 night): APPROVED — F-order closed; NEXT ORDER: the shape-store tenant load
+
+Verified: 1,118 green + ruff clean (review's own run). F-1 flat
+governance columns accepted as a product export; docs re-cut
+accepted (Step 6 → recipe appendix with the disclaimer); F-2 repo
+side clean, physical table deletion correctly classifier-blocked →
+PARKED TO SUNNY (Lakehouse UI, ~10s; her other deletions confirmed
+done: Graph Agent + eh_probe long gone, SQL Intelligence Agent
+deleted 08-27). F-3 cancelled per ruling.
+
+**NEXT ORDER (already-ruled: the demo runs on shapes → tenant load
+REQUIRED): execute the shape-store tenant load per your recorded
+demo-switch design** (_shapes profile, isolation from the realism
+store, seed + chain; the 1.58.2 flat columns materialize in the
+same run). Sunny's UI-only parts → runbook lines as needed. After
+the load: her dashboard finish (refresh → render → description
+check) and the re-walk unblock.
+
+**Rename in flight (ops-find #3):** Sunny renames probe-eh →
+aivia_catalog_eh (Eventhouse) and its DB → semantic_catalog; on her
+confirmation, sweep code references (devtools DATABASE, org_config,
+runbooks) + live-smoke verify.
