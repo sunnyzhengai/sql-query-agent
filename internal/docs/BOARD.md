@@ -60,9 +60,12 @@ payload 3 built, RESULTS v2 filled under the section of record).
 - [x] **Tenant load of the shape store — COMPLETE + VERIFIED 08-28** (26 clusters w/ flat columns = local oracle; semantic_search live; U7→dashboard pointer chase ready; full record in HANDOFF_0055_BUILD). RE-WALK UNBLOCKED.
 - [x] THREE engine-surface shortcuts CREATED via UI (Sunny, 08-28
       — graph_nodes / graph_edges / output_metric_logic; 3-of-3,
-      confirmed). **DEV: run the four-way verification — the load
-      closes on green.**
-- [ ] Re-walk on the diabetic corpus (incl. section B vs B3,
+      confirmed). **LOAD CLOSED (08-28): four-way verification GREEN — 26 flat-
+      column clusters, search live, dashboard link on record.
+      APPROVED by review (1,135 green).**
+- [ ] **RE-WALK — UNBLOCKED, Sunny's session when ready** (section
+      B grades against B3; section I against the 26 flags; demo-
+      note questions in SHAPES_GAPCHECK) (incl. section B vs B3,
       section I flags; suite transcript may cover part)
 - [ ] Script refresh (review session — workbench-only, candidate
       phrases, Fang's impact-analysis framing)
