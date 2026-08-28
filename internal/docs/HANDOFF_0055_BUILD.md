@@ -1500,3 +1500,15 @@ absence class dies structurally, and the refusal names the exact
 unread id (continuation pressure toward the truth, not just a
 floor). Dev's live acceptance on the walk question accepted as
 claimed; Sunny re-walks it for the glass-side confirmation.
+
+### 2026-08-28 — RW-6/RW-2b RERUN COMPLETE: the enriched store is live
+Chain green end to end (capacity retries absorbed; the idempotent
+shortcut verified the existing mount — "the postcondition is the
+fact" on screen). VERIFIED IN STORE: "Diabetic Codeset" live, zero
+old-name residue (the walk's names discrepancy WAS mid-flight
+timing, as recorded); **ZERO canonical nodes without descriptions**
+— RW-6 at store totality; 26 flat-column clusters; U7 dashboard
+link intact; semantic_search re-embedded over the DESCRIBED
+surface (visible: richer top hits). The demo estate now carries
+the authored semantic layer end to end — tier-2 grounding's
+surface exists in the wild.
