@@ -107,3 +107,22 @@ ROUTING CONSISTENCY: sameness/difference questions must reach
 compare (or cite member flags) reliably. Acceptance now = the
 Lab_Path question routing to compare, judged against this
 question's behavior as the exemplar.
+
+## "How is Diabetic Patients (Billing) different from the Composite?" — PASS on honesty; RW-4 specimen #4
+
+- True, evidence-verified answer at source-table grain: Billing
+  reads PROFESSIONAL_BILLING (steward: Finance Analyst — persona
+  provenance on glass), Composite reads PATIENTS + clinical
+  tables. Salient and honestly bounded.
+- NEW SIGHTING: lineage headlines carried the grain disclosure
+  "reads-grain, not logic-grain: shared tables do not imply shared
+  logic" — absent from the earlier Lab_Path lineage. The engine
+  surfaces it conditionally.
+- Routing: same difference-class question, third distinct route —
+  retrieve-both + table-lineage, no compare, though compare was
+  one call away with both records in hand. Three routes now
+  observed for one question class: (a) lineage-coarse + floor,
+  (b) compare-exemplar (Q4), (c) retrieve + lineage w/ grain
+  disclosure. RW-4 conclusion firmer: BOTH target behaviors
+  (compare route, grain disclosure) already exist; the build is
+  making them reliably co-occur on sameness/difference questions.
