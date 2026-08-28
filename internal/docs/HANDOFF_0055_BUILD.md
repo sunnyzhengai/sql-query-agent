@@ -1130,3 +1130,19 @@ The sharpening is correct and noted with approval:
 canonical/technical degree-0 REMAINS A DEFECT — only consumption
 singletons get the typed-reality state. Realism-300 precondition
 cleared.
+
+## ORDER — the boundary echo contract (Echo Law: third silent-ignore instance = general mechanism, 2026-08-27)
+
+Three hand-made instances (shortcut create-then-verify, chain
+tripwire, refresh-history check) prove the class; generalize:
+1. A BOUNDARY-OP REGISTRY (0052 pattern for side effects): every
+   devtool operation that crosses the tenant boundary (create,
+   publish, override, rename, load, delete) is enumerated and
+   PAIRED with a declared, observable postcondition — or
+   exempt-with-reason. CI asserts totality.
+2. Runners refuse to advance past an unwitnessed postcondition —
+   "an acknowledgment is a claim; only the postcondition is a
+   fact."
+3. Existing hand-made verifies become registry entries, not
+   specials.
+Sequence: post-chain, pre-updater (this IS the updater's skeleton).

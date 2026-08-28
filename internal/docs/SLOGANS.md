@@ -156,3 +156,6 @@ point.
   DOCTRINE; the folding trend's terminus)
 - **"Facts are never deduplicated; sameness is always derived."**
   — the decision-sharing round, 2026-08-26. (LAW)
+- **"An acknowledgment is a claim; only the postcondition is a
+  fact."** — the boundary-echo round, 2026-08-27. (LAW; the
+  updater's founding principle)
