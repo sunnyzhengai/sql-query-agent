@@ -102,13 +102,11 @@ payload 3 built, RESULTS v2 filled under the section of record).
 
 ## 👩‍⚕️ SUNNY'S OPEN DECISIONS (no deadline pressure)
 
-- [ ] **ONE dormant UI line (before the next realism 300, no
-      urgency):** realism lakehouse → Files/sql-query-agent →
-      input_metric_names_restore.csv → Load to table → EXISTING
-      `input_metric_names` → Overwrite. (Chain-incident restore;
-      full story in HANDOFF_0055_BUILD. FYI: review ruled
-      consumption_unanchored at node grain — within G1's extension
-      mechanism.)
+- [x] input_metric_names RESTORED (Sunny, 08-27 night) — the
+      incident's damage ledger closes.
+- [ ] Env publish of 1.58.3: HOLD until the chain report (avoid
+      mid-chain version skew), then update-from-git + Publish —
+      it's the realism-300 precondition wheel.
 
 - [x] **Endpoint-leak residual: RULED — ACCEPT** (Sunny 08-27:
       auth-gated endpoint, no secret material; history rewrite risk
