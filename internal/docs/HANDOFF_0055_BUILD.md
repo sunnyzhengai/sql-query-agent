@@ -1304,3 +1304,16 @@ the step-token stamp (Lab_Path class), the universal reads-grain
 sentence (already SIGHTED in Sunny's walk via the shared tree), and
 this nudge, every observed route now carries the co-occurrence
 lever the moment it forms. 2 L0 tests; 234 orchestrator green.
+
+### 2026-08-28 — RW-BATCH-1 CLOSED: rename LIVE in the store; four-way verification green again
+The rename rerun completed (names → 200 → 300 → 400 → 500 → 700 →
+800): "Diabetic Cohort (Coded)" live in semantic_catalog_shapes,
+ZERO old-name residue, 26 flat-column clusters, search live, U7
+link intact. En route the shortcut step learned IDEMPOTENCY the
+boundary-contract way (409 → verify the query path; the
+postcondition is the fact, not the create). RW-BATCH-1 is fully
+delivered: RW-2 live tenant-side; RW-3 + RW-4 (stamp + universal
+grain sentence + co-occurrence nudge) live in the workbench via
+the shared tree — two of them already SIGHTED in Sunny's walk
+before the batch even closed. Demo ask for U9 is now: "Are the
+two Diabetic Cohort (Coded) definitions the same?"

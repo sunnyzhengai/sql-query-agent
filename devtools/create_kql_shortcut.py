@@ -76,7 +76,13 @@ def create_and_verify(table: str, ws: str, kqldb: str, lakehouse: str,
         "target": {"oneLake": {"workspaceId": ws, "itemId": lakehouse,
                                "path": target_path or
                                f"Tables/dbo/{table}"}}})
-    if status not in (200, 201):
+    if status == 409:
+        # boundary echo contract: idempotency judged by the
+        # POSTCONDITION, not the create — an existing shortcut that
+        # answers the query path IS the desired end state
+        print(f"[.] {table!r} already registered (409) — verifying "
+              "the query path (the postcondition is the fact)")
+    elif status not in (200, 201):
         raise SystemExit(f"[X] shortcut create failed (HTTP {status}) "
                          f"for {table!r}")
     print(f"[.] created (HTTP {status}) — now VERIFYING the query path "
