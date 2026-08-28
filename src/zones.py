@@ -21,6 +21,9 @@ GOVERNED_SUFFIXES = (
     ".Notebook", ".Report", ".SemanticModel", ".DataAgent",
     ".SQLDatabase", ".Lakehouse", ".Environment", ".Eventhouse",
     ".KQLQueryset", ".GraphModel",
+    # KQL databases sync as top-level items once renamed out of the
+    # eventhouse .children nesting (rename find, 2026-08-27)
+    ".KQLDatabase",
 )
 
 # Every non-Fabric top-level entry must be declared here to be governed.

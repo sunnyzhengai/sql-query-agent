@@ -895,3 +895,44 @@ the commit ships 3 RED tests (gates-green-at-push law):
 3. tests/test_trace_registry.py::test_single_classification — a new
    module lacks its classification row.
 Fix-forward in your next push; the shape-store load order stands.
+
+### 2026-08-27 — SHAPE-STORE TENANT LOAD: STAGED END-TO-END, chain armed on two Sunny clicks
+**Executed (all verified):** shapes lakehouse CREATED
+(`sql_query_lh_shapes`, bf55535b); 7/7 assets staged into its Files
+(org_config variant with targeted edits — search db →
+semantic_catalog_shapes, semantic_models → FOLDER source holding
+ONLY the dashboard TMDL so sepsis stays out of the demo store;
+ScriptDom DLL server-side copy; 38 corpus SQL files, collisions
+schema-prefixed; dictionary CSVs; metric-names CSV with the
+dashboard link resolved from the live workspace; steward personas
+CSV). Eventhouse: `semantic_catalog_shapes` DB created + table +
+Vector16 policy + semantic_search() function installed (mgmt
+commands verified). Env staging already carries the 1.58.2 wheel
+(the git sync staged it). **Demo-source seed GENERATED, tested,
+committed** (devtools/generate_shape_seed.py →
+data/shapes/generated/seed/: all 22 palette tables + deterministic
+synthetic rows + all 38 procs verbatim; ORACLE stamped in-file — U7
+composite cohort = 105, registry rows = 117; byte-identical regen +
+PHI-shape tests, 5 new). **Chain runner ready**
+(devtools/run_shapes_chain.py): 100→010→040→060→[loadTable names +
+stewards]→200→300→400→500→[create-then-verify KQL
+shortcut]→700→800, every run pinned to the shapes lakehouse via the
+job API defaultLakehouse override; post-chain verification asserts
+the F-1 flat columns live, cluster count, semantic_search, and the
+U7 dashboard link (W4).
+**RUNBOOK — Sunny, two steps, then dev fires:**
+1. **Publish sql-logic-env** (workspace → sql-logic-env → Publish;
+   the staged 1.58.2 wheel is already correct — my API publish was
+   classifier-blocked, same class as before).
+2. **Seed the demo source DB** (aivia_demo_src → New SQL query):
+   paste + run `data/shapes/generated/seed/01_schema_and_data.sql`,
+   then `02_procs.sql` (both idempotent; expect cohort 105).
+3. Tick the board / push — dev's watcher wakes and fires
+   `devtools/run_shapes_chain.py` (fully automated from there).
+Post-chain (Sunny): dashboard REFRESH → render check (the cohort
+card must read exactly **105** — the seed's stamped oracle) →
+description still EMPTY. Separately (realism store, before its next
+700 run): org_config.yaml line 96 kusto_db → "semantic_catalog".
+**Zones law find en route:** the renamed semantic_catalog.KQLDatabase
+synced as a NEW top-level item class — .KQLDatabase joined
+GOVERNED_SUFFIXES (the law fired exactly as built).

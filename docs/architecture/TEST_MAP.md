@@ -7,7 +7,7 @@
 
 # Test Map — what every test proves
 
-106 modules, 1084 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
+107 modules, 1089 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
 
 ## By ADR
 
@@ -101,6 +101,7 @@
 
 ### contract:suite-legibility — the suite explains itself to Sunny — the proof ledger and the run transcript (morning orders, 2026-08-27)
 
+- `tests/shapes/test_seed.py` (5): The demo-source seed (shape-store tenant load, 2026-08-27):
 - `tests/test_suite_map.py` (9): TEST_MAP totality (morning order 1, 2026-08-27): every test module
 - `tests/test_suite_transcript.py` (7): Suite transcript emission (morning order 2, 2026-08-27): every
 

@@ -57,7 +57,14 @@ payload 3 built, RESULTS v2 filled under the section of record).
       zero refs); physical table = Sunny's UI step above. F-3
       cancelled. Columns materialize on the next 300 rerun (rides
       the shape-seed run; no urgency).
-- [~] Tenant load of the shape store — ORDERED 08-27 (dev executes his demo-switch design; flat columns ride the run)
+- [~] Tenant load of the shape store — **STAGED END-TO-END 08-27
+      dev** (shapes lakehouse + 7/7 assets + shapes KQL DB +
+      semantic_search installed + seed committed w/ oracle 105 +
+      chain runner armed; full record in HANDOFF_0055_BUILD).
+      **WAITING ON SUNNY (2 steps): publish sql-logic-env (staged
+      1.58.2 correct; API publish classifier-blocked) + paste-run
+      the two seed files in aivia_demo_src. Then any push/tick
+      wakes dev → chain fires automatically.**
 - [ ] Re-walk on the diabetic corpus (incl. section B vs B3,
       section I flags; suite transcript may cover part)
 - [ ] Script refresh (review session — workbench-only, candidate
