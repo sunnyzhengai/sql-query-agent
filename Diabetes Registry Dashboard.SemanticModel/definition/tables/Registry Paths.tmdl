@@ -27,3 +27,4 @@ table 'Registry Paths'
 				  Source
 
 	annotation PBI_ResultType = Table
+

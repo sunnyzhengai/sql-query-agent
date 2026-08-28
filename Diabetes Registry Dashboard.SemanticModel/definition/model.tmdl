@@ -10,9 +10,7 @@ annotation PBI_QueryOrder = ["Registry Cohort","Registry Trend","Registry Paths"
 
 annotation PBI_ProTooling = ["WebModelingEdit"]
 
-ref expression DemoSqlServer
-ref expression DemoSqlDatabase
-
 ref table 'Registry Cohort'
 ref table 'Registry Trend'
 ref table 'Registry Paths'
+
