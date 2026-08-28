@@ -62,11 +62,11 @@ payload 3 built, RESULTS v2 filled under the section of record).
       semantic_search installed + seed committed w/ oracle 105 +
       chain runner armed; full record in HANDOFF_0055_BUILD).
       **(1) ✓ sql-logic-env PUBLISHED at 1.58.2 (Sunny, 08-27
-      night). (2) REMAINING (Sunny): run the two seed files in
-      **aivia_shapes_src** (guard-enforced; expect cohort 105),
-      then ONE dashboard parameter: DemoSqlDatabase →
-      aivia_shapes_src-b5f4544d-731d-43fb-966b-be4a300054d0
-      (server UNCHANGED). Then say the word → chain fires.**
+      night). (2) ✓ SEED RUN COMPLETE in aivia_shapes_src (Sunny, 08-27 night).
+      **DEV: FIRE THE CHAIN** (devtools/run_shapes_chain.py).
+      Sunny's remaining: the ONE dashboard parameter
+      (DemoSqlDatabase → aivia_shapes_src-b5f4544d-731d-43fb-966b-
+      be4a300054d0) before her post-chain render check.**
 - [ ] Re-walk on the diabetic corpus (incl. section B vs B3,
       section I flags; suite transcript may cover part)
 - [ ] Script refresh (review session — workbench-only, candidate
