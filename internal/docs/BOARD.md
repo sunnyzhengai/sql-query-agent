@@ -187,6 +187,14 @@ payload 3 built, RESULTS v2 filled under the section of record).
   architecture; when Purview push is next needed, the rotated
   secret returns via the proper path).
 
+- [ ] Small dev item (pre-capture nicety): the workbench's store
+      switch is env-var-only (KUSTO_DB, main.py:36) — cost Sunny 20
+      min on 08-28 (review's org_config instruction was wrong; the
+      config line is pipeline-side). Give it one obvious lever: an
+      org_config key the webapp actually reads, or a --store flag,
+      + print the active DB in the startup banner so the store in
+      use is always visible.
+
 ## 📋 STRATEGY DIRECTIONS (Sunny's three questions, 2026-08-28 — recorded, sequenced post-capture)
 
 - **Doc-trace layer:** physical layout stays type-based (append-only,
