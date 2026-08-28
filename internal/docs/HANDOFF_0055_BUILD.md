@@ -1243,3 +1243,20 @@ default; the startup banner prints the ACTIVE store + which lever
 chose it. 3 tests. To sit the workbench on the demo store: local
 org_config search.kusto_db: "semantic_catalog_shapes" — one visible
 line, no env spelunking.
+
+## ORDER RW-BATCH-1 (re-walk finds, pre-capture; after boundary echo contract)
+1. **RW-3 (MANDATORY — echoed twice):** display-side fold of
+   auxiliary rounds' result tables when the verdict's primary
+   basis is another round. Acceptance: the two cohort questions in
+   WALK_VERDICTS_SHAPES.md render focused (caption + primary
+   evidence; detour tables folded, expandable).
+2. **RW-4 (MANDATORY — Echo Law, deferred item gone live):**
+   logic-sameness questions ("same Lab_Path / same criteria /
+   same logic as X") route to compare/closeness (variant map) or
+   the caption states the grain gap explicitly. Acceptance: the
+   Lab_Path question in WALK_VERDICTS_SHAPES.md.
+3. **RW-2 (data-file):** rename the U9 planted pair "Diabetic
+   Cohort (Codeset)" → natural name, e.g. "Diabetic Patients
+   (Coded)"; same drift, same oracles.
+4. RW-1 (flag-census display) rides the 0056 presentation batch as
+   already recorded.
