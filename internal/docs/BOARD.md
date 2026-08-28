@@ -176,6 +176,17 @@ payload 3 built, RESULTS v2 filled under the section of record).
       (08-23/24)
 - [x] Echo Law (build-first) + demo law + slogan book (08-23→26)
 
+- [x] WALL RESTORED (Sunny, 08-28): work-Collibra block + Purview
+      secret removed from BOTH tenant org_configs (the 08-16
+      demo-only sanction finally fully unwound).
+- [ ] Purview secret ROTATION still recommended (exposed in
+      screenshots twice; removal stops future exposure, rotation
+      invalidates past) — Sunny, five Azure minutes, no deadline.
+- Recorded direction: secrets-in-yaml is itself debt — Key Vault
+  references are the enterprise end state (ties to delivery
+  architecture; when Purview push is next needed, the rotated
+  secret returns via the proper path).
+
 ## 📋 STRATEGY DIRECTIONS (Sunny's three questions, 2026-08-28 — recorded, sequenced post-capture)
 
 - **Doc-trace layer:** physical layout stays type-based (append-only,
