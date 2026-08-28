@@ -1457,3 +1457,16 @@ The ONE click is done. Dev: fire the chain `--from 300_build_graph`
 → 400→500→700→800 → verify names + descriptions live in
 semantic_catalog_shapes. Review holds the codeset walk beat until
 chain-green is recorded here.
+
+### 2026-08-28 — RW-7 part 2 BUILT (release 1.58.5): the sweep self-describes
+Every cluster node's description now states WHY it was minted — a
+class-specific business sentence authored by the sweep at mint
+("4 procedures share the name 'X' but compute 3 different logics —
+one name is doing 3 jobs"; cousins/duplicates/grain each get their
+own sentence shape). The RW-6 principle extended to the derived
+layer: the machine authors the facts it is the author of. L0 test;
+1,158 green. NOTE: the IN-FLIGHT rerun runs on 1.58.4 — the
+self-descriptions land with the NEXT publish+rerun cycle (bundle
+with the presentation batch's cycle; no extra click requested just
+for this). RW-7 part 1 (flag cards) rides the presentation batch
+with RW-1/RW-5 as ordered.

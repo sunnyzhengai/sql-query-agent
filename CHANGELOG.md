@@ -10,6 +10,19 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.58.5] - 2026-08-28
+
+### Added — RW-7 part 2: the sweep self-describes
+- Every cluster node's description now SAYS WHY it was minted — a
+  class-specific business sentence authored by the sweep at mint
+  time (misnomer: "one name is doing N jobs"; cousins: "N metrics
+  answer to X with M definitions and no official"; duplicates;
+  grain shifts). The RW-6 authored-surface principle extended to
+  the derived layer: the machine authors the facts it is the
+  author of. Flag cards (RW-7 part 1) ride the presentation batch.
+
+---
+
 ## [1.58.4] - 2026-08-28
 
 ### Added — RW-6: the authored semantic surface

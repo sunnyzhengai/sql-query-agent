@@ -242,3 +242,24 @@ class TestFlatSurface:
         for n in nodes:
             if n["node_id"].startswith("loggroup:"):
                 assert "flag_class" not in n
+
+
+class TestSelfDescription:
+    """RW-7 (2026-08-28): the sweep says WHY it minted each flag —
+    one business sentence per cluster, class-specific, never a bare
+    count line."""
+
+    def test_every_cluster_carries_a_why_sentence(self):
+        from src.governance.red_flags import reify_clusters, sweep
+        out = sweep([
+            _metric("r.A"), _metric("r.B"),
+            _step("r.A", "Base_Pop", "SELECT 1 FROM T"),
+            _step("r.B", "Base_Pop", "SELECT 2 FROM U WHERE X=1"),
+        ], [])
+        nodes, _ = reify_clusters(out.flags_rows)
+        for n in nodes:
+            if n["node_id"].startswith("cluster:"):
+                d = n["description"]
+                assert "one name is doing" in d or "answer to" in d \
+                    or "identical logic" in d or "grains" in d, d
+                assert "flags disclose, never gate" in d

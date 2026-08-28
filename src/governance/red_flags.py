@@ -167,6 +167,35 @@ FLAT_FLAG_COLUMNS = ("flag_class", "severity", "identity",
                      "member_count", "distinct_logics", "disposition")
 
 
+def _self_description(fr: dict) -> str:
+    """RW-7 (re-walk find 2026-08-28): the sweep SELF-DESCRIBES each
+    cluster at mint — it knows WHY it flagged, and says it in one
+    business sentence (the RW-6 authored-surface principle extended
+    to the derived layer; machine-authored because the machine is
+    the author of the fact)."""
+    n, m = fr["member_count"], fr["distinct_logics"]
+    ident = fr["identity"]
+    cls = fr["flag_class"]
+    if cls == "misnomer":
+        return (f"{n} procedures share the name '{ident}' but "
+                f"compute {m} different logics — one name is doing "
+                f"{m} jobs.")
+    if cls == "cousin_conflict":
+        return (f"{n} metrics answer to '{ident}' with {m} distinct "
+                "definitions and no designated official — each may "
+                "be a legitimate purpose awaiting its own label.")
+    if cls == "duplicate":
+        return (f"identical logic exists under {n} different names "
+                "— consolidation or an alias would end the drift "
+                "risk.")
+    if cls == "grain_shift":
+        return (f"'{ident}' computes at different output grains "
+                "across its members — the numbers answer different "
+                "questions under one name.")
+    return (f"{cls}: {n} member(s), {m} distinct logic(s) under "
+            f"'{ident}'.")
+
+
 def reify_clusters(flags_rows: "list[dict]"
                    ) -> "tuple[list[dict], list[dict]]":
     """ADR 0057 — clusters are nodes. One name_cluster node per
@@ -190,10 +219,9 @@ def reify_clusters(flags_rows: "list[dict]"
             "node_id": cid, "layer": "governance",
             "name": str(fr["identity"]),
             "description": (
-                f"{fr['flag_class']} ({fr['severity']}): "
-                f"{fr['member_count']} member(s), "
-                f"{fr['distinct_logics']} distinct logic(s) — "
-                "flags disclose, never gate"),
+                _self_description(fr)
+                + f" [{fr['flag_class']} ({fr['severity']}); "
+                "flags disclose, never gate]"),
             "properties": json.dumps(cprops),
             # F-1 flat surface (field find 2026-08-27): the agent's
             # SQL path reads these as REAL COLUMNS — same values as
