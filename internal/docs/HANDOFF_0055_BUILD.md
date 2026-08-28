@@ -1082,3 +1082,28 @@ report/measure nodes as `consumption_unanchored` (the
 admin-telemetry pattern at node grain). Deferred to review with
 this evidence (Echo Law recorded reason: axiom-semantics change
 needs the review pass); MUST land before the next realism 300.
+
+## REVIEW on the incident + the deferred design item (2026-08-27 night): RECOVERY APPROVED; RULING ISSUED
+
+Gates verified: 1,125 green + ruff clean. The recovery is
+Echo-Law-exemplary: postcondition refused the main polluted write,
+override root-caused (configuration nesting), TRIPWIRE at birth
+(first-writer lakehouse assertion — the silent-ignore class dead
+same-cycle), chain re-fired clean. Damage ledger honest: one
+curated table (input_metric_names) needs Sunny's staged one-line
+restore (dormant, pre-next-realism-300); regenerated tables
+acceptable.
+
+**REVIEW RULING (the deferred axiom-semantics item —
+`consumption_unanchored` at node grain): APPROVED.** A
+workspace-scanned report whose EXEC target is absent from the
+corpus is REALITY, not an error — the graph represents it with a
+TYPED state, never suppresses it (the foundation-exception
+pattern, consumption edition). Constraints binding the build:
+(1) enumerated + disclosed in the topology audit (never a silent
+bucket); (2) ask-surface answers about such reports must carry the
+state ("executes a target outside this catalog") — honest-answer
+shape; (3) the node stays first-class and queryable. This is an
+isolation-REASON addition within G1's own extension mechanism —
+review's to rule; Sunny FYI on the board. BUILD IT before the next
+realism 300, as you flagged.
