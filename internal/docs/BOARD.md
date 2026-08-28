@@ -71,6 +71,10 @@ payload 3 built, RESULTS v2 filled under the section of record).
       path chart rendering. Description EMPTY confirmed —
       **SUNNY'S DASHBOARD FINISH: COMPLETE.** (Semantic model sits
       'Uncommitted' by design until connection-binding.)**
+- [x] THREE engine-surface shortcuts CREATED via UI (Sunny, 08-28
+      — graph_nodes / graph_edges / output_metric_logic; 3-of-3,
+      confirmed). **DEV: run the four-way verification — the load
+      closes on green.**
 - [ ] Re-walk on the diabetic corpus (incl. section B vs B3,
       section I flags; suite transcript may cover part)
 - [ ] Script refresh (review session — workbench-only, candidate
