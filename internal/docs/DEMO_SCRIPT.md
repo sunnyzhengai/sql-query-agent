@@ -1,9 +1,17 @@
-# Marketplace Demo Script (~4.5–5 minutes, AI voiceover)
+# Marketplace Demo Script V2 (~4.5–5 minutes, AI voiceover)
 
-**Canonical recording script** — V1's four-part flow (simple,
-value-driven, low cognitive load — Sunny's call 2026-08-16), written
-for ElevenLabs-style TTS. The voice is generated per block; the screen
-capture is silent; the video is edited TO the voice.
+**V2 refresh 2026-08-28** — workbench-only, diabetic shape estate.
+Sepsis is retired from camera; the Fabric agent is demoted and never
+shown; every beat below was GRADED PASS on the live shapes store
+during the 2026-08-28 re-walk (verdicts: WALK_VERDICTS_SHAPES.md).
+V1 (sepsis, multi-surface) is preserved at DEMO_SCRIPT_V1.
+
+**CAPTURE GATE (hard):** capture happens only after the presentation
+batch lands — RW-5 answer-first folded rounds, RW-7 flag cards,
+RW-1 census display — plus the 1.58.5 cycle (sweep
+self-descriptions). The demo law: the demo surfaces what we keep;
+we never keep for the demo — and we also never film displays we
+have already ruled machine-grade.
 
 **Production workflow:**
 
@@ -29,188 +37,171 @@ block once before editing):**
 | Written | Speak as |
 |---|---|
 | AIVIA | "ay-VEE-uh" (lock one pronunciation, reuse everywhere) |
-| DAX | the word "dax" (not letters) |
+| E11.80 | "E-eleven-point-eight-zero" |
 | T-SQL | "tee-sequel" |
 | PHI | letters: "P-H-I" |
-| ScriptDom | "script-dom" |
-| Entra, Purview, Collibra, Fabric | standard product names — verify once |
+| ED | letters: "E-D" |
+| Fabric, Entra, Purview | standard product names — verify once |
 
 ---
 
-## VO-1 — The Hook (~85 words, ~35s)
-<!-- Rewritten 2026-08-17 (Sunny's critique): lead with the pain and the
-     debt cycle, not the mechanism. "Duplicate dashboards" deliberately
-     foreshadows the drift stunner in VO-4. -->
+## VO-1 — The Hook (~80 words, ~33s)
 
-**[Screen: split — a 2,000-line SQL procedure | a sprawl of look-alike
-dashboards]**
+**[Screen: split — a long SQL procedure | the census: ten rows all
+named "Diabetic Patients"]**
 
 "Ungoverned dashboards are technical debt — not assets.
 
 Thousands of reports. None fully trusted — because the logic behind
-them is undocumented. Developers don't write plain-English
-descriptions. Stewards can't read raw code. So the debt compounds —
-and teams cope by building even more duplicate dashboards.
+them is undocumented. Teams cope by building more copies. Same
+names. Different logic. Nobody knows which one is right.
 
-AIVIA breaks the cycle. It parses deep SQL and DAX automatically, and
-stitches them into one certified knowledge graph — inside your own
-tenant. Answers proven by code, not by confidence.
+AIVIA breaks the cycle. It parses your SQL automatically and
+stitches it into one certified knowledge graph — inside your own
+tenant. Every operation shown. Every answer proven by code, not by
+confidence."
 
-Stop accumulating debt. Turn hidden code into certified truth."
+<!-- CANDIDATE (Sunny places or cuts): append the ontology line here
+     or at VO-6's close — "Your ontology already exists — buried in
+     thousands of stored procedures. AIVIA extracts it, certifies
+     it, and makes it governed and queryable." -->
 
-## VO-2 — Ingestion & Guardrails (~95 words, ~40s)
+## VO-2 — The Estate on Glass (~70 words, ~29s)
 
-**[Screen: 030_ingest_sql_live's review cell — "3 changed, 0 new" — then a
-quick cut to the semantic-model ingestion summary and the PHI gate
-lines]**
+**[Screen: the census with descriptions — slow scroll; hold on the
+ten "Diabetic Patients" rows, then the two "Diabetic Codeset" rows]**
 
-"Setup is turn-key. Point AIVIA at your database — on-premises, Azure
-SQL, or Fabric — and it discovers your procedures and views itself.
-This re-run found only what changed, and it stops for your review
-before anything is written.
+"This is a hospital's diabetic reporting estate — thirty-seven
+certified metrics, parsed from real SQL. Every definition carries a
+plain-English description, generated from the logic itself.
 
-Power BI is the same motion — straight from the workspace. Which SQL
-feeds which report, every DAX measure, and the business names your
-people actually use.
+Look closer, and you see the problem every estate has. Ten
+different metrics — all named Diabetic Patients. Two code lists with
+the same name. Two E-D metrics that count different things.
 
-And before anything reaches an AI model, a built-in P-H-I gate scans
-both layers. Everything runs against your own Azure OpenAI endpoint.
-Your data never leaves your tenant."
+AIVIA doesn't hide the mess. It maps it."
 
-## VO-3 — Ask Anything, With Proof (~90 words, ~37s)
+## VO-3 — A Definition, With Proof (~80 words, ~33s)
 
-**[Screen: the chat — the headline question; the answer with the
-Basis line; the SQL follow-up]**
+**[Screen: the cohort question → answer card; open "show SQL"; hold
+on the verdict line; then the refusal question]**
+<!-- Walked 2026-08-28 PM: retrieve → step SQL, evidence-verified. -->
 
-"Let's ask a real clinical analytics question. — How is our E-D sepsis
-screening rate calculated?
+"Ask a real question. What does Active Diabetic Patients use to
+define its cohort?
 
-Plain business language, ending with a live link to the dashboard.
-Notice two things. It answered to the business name — learned
-automatically from your report estate. And the Basis line, right here.
-A deterministic, code-stamped record of exactly what was consulted.
-Not the AI's account of itself — the system's.
+Watch the operations — every one shown, machine-stamped, read-only.
+The answer arrives with the certified SQL one click away — patients
+with an E-eleven diagnosis code. The verdict quotes the exact WHERE
+clause. Not the AI's impression of the code — the code.
 
-Want the raw logic? Ask — and the certified SQL appears. Ask for
-patient counts instead — and it refuses. Definitions, not data."
+Ask for patient counts instead — and it refuses. Definitions, not
+data. Patient rows never reach the model."
 
-## VO-4 — Drift & Blast Radius (~75 words, ~31s)
+## VO-4 — Same Name, Different Truth (~85 words, ~35s)
 
-**[Screen: the drift question; the computed verdict with the diff;
-then the dashboards follow-up]**
+**[Screen: the 3-way High ED Utilizers question; hold on the
+compare-stamp line; the partition table; the grain sentence in the
+answer]**
+<!-- Walked 2026-08-28: PASS w/ distinction — the camera-ready beat. -->
 
-"Now the multi-million-dollar governance nightmare: copy-paste drift.
+"Now the governance nightmare: two metrics, same name — High E-D
+Utilizers. Are they the same?
 
-Are all definitions of our base population score consistent? — Six
-procedures claim the same calculation. AIVIA found five different
-truths — through content hashing, not an AI's impression.
+The engine retrieves both and refuses to guess. The stamp on screen
+says it plainly: for sameness, comparison computes it exactly —
+names and descriptions never do.
 
-And because the graph maps the report layer too: which dashboards are
-impacted? That's the exact blast radius across your report estate —
-parsed from the semantic models themselves, never guessed from
-names."
+Content-hash comparison. Verdict: they differ. One counts patients.
+The other counts visits. Same name, two dashboards — and every
+month, two different numbers in the same meeting. AIVIA shows
+exactly why."
 
-## VO-5 — The Write-Back Loop (~70 words, ~29s)
+## VO-5 — The One-Line Bug (~75 words, ~31s)
 
-**[Screen: the empty description field → the publish match review →
-publish → refresh: populated]**
+**[Screen: the codeset question → the two descriptions (80 vs 81
+codes) → the DIFFERS partition → hold on the E11.80 line]**
+<!-- Walked 2026-08-28: PASS exact — E11.80 pinpointed. -->
 
-"Governance shouldn't die in a silo. This report's description field
-is empty. AIVIA matches reports to metrics by parsed lineage — exact,
-never fuzzy. Where it isn't certain, it declines, and says why.
+"Sometimes the difference isn't philosophy — it's a bug.
 
-One action — and the certified definition is published onto the
-report itself. The answer just became the report's live caption. Every
-push is logged. The same metadata syncs to Microsoft Purview and
-Collibra."
+Two hand-maintained code lists, both named Diabetic Codeset. One
+has eighty codes. The other, eighty-one. The comparison pinpoints
+it: one copy is missing E-eleven-point-eight-zero. One dropped line
+in a copied list — and every patient with that diagnosis silently
+vanishes from one team's numbers.
 
-## VO-6 — Admin Trust & Close (~80 words, ~33s)
+Different stewards own each copy. AIVIA names them both — and hands
+them the exact line to fix."
 
-**[Screen: quick pan through the admin telemetry dashboard → final
-slide: the federation diagram]**
+## VO-6 — Governed Plurality & Close (~90 words, ~37s)
 
-"Finally — administrators see everything. Pipeline health. Validation
-funnels. Missing stewardship tracked in red. And a full audit log of
-every AI decision — who asked, what was consulted, which component
-decided.
+**[Screen: the scoped flags question → RW-7 flag cards (10 members,
+10 logics, disposition open) → final hold: the workbench banner
+"every operation shown, confirmed by you, results are the answer"]**
+<!-- Flags beat REQUIRES RW-7 cards on glass — see CAPTURE GATE. -->
 
-That usage record is the foundation of where AIVIA is going: citizen
-stewardship — users connected to the definitions they query and trust,
-so a central steward team is never the bottleneck.
+"Every finding you've seen is swept automatically — the whole
+estate, every build. Ask: what governance red flags exist for
+Diabetic Patients? One name. Ten metrics. Ten different logics —
+disclosed, never blocked.
 
-AIVIA. A federation of native parsers, one knowledge graph, a governed
-AI that answers with proof. Available now on the Microsoft
-Marketplace."
+AIVIA doesn't force one definition on everyone. It finds every
+variant, labels each one, and lets your stewards certify the
+official truth. Governed plurality — not forced uniformity.
 
-> SCRIPT RULE (verdict 2026-08-16): present tense stops at what ships
-> (disclose-never-gate, per-turn telemetry, feedback joins). Citizen
-> stewardship (users-as-nodes, per-user certified definitions) is
-> ADR 0038 — Accepted, BUILD-GATED on the access-control ADR — spoken
-> ONLY as roadmap ("where AIVIA is going") until it ships.
+One knowledge graph. Every operation shown. Answers with proof — or
+an honest refusal. AIVIA. Available on the Microsoft Marketplace."
 
 ---
 
-*VO total: ~485 words ≈ 3:20 of voice at 145 wpm; with visual holds
+*VO total: ~480 words ≈ 3:20 of voice at 145 wpm; with visual holds
 the cut lands ~4:30–5:00.*
 
-## Tenant prep (before capture day — plain steps)
+## Candidate block VO-4b — Impact Analysis (Fang's framing; Sunny
+places or cuts; +~60 words would push the cut toward 5:30)
 
-1. Resume the capacity.
-2. Update from Git; publish **sql-logic-env** (v1.11.0+); verify the
-   version in any notebook's Cell 0.
-3. `graph_edges` OneLake shortcut in the Eventhouse (if the wizard
-   says the name exists, it's DONE — verify with a count query).
-4. Seed the demo source: a **Fabric SQL database** with the 28
-   synthetic procs; extractor `source_type: "fabric_native"`; run
-   extract_views end-to-end (doubles as the live-parity verification).
-   Days later, edit 2–3 procs so the captured re-run shows a real
-   CHANGED delta.
-5. Demo semantic model: must EXECUTE the demo procs (EXEC partitions);
-   displayName must match the model name; report description field
-   left EMPTY.
-6. `semantic_models.source_type: "workspace"`; run (renumbered 1.22.0,
-   export now AFTER descriptions): 060 → 300 → 400 → 500 → 600 → 700
-   → 800.
-7. **QA gate** — verbatim against the live agent: (a) the headline
-   question; (b) the drift question WITHOUT the literal step name;
-   (c) "which dashboards are impacted?" after the verdict; (d) the
-   patient-count refusal. Fix wobbles before capture.
+**[Screen: "Which certified metrics feed the Diabetes Registry
+dashboard?" → the lineage chain to the dashboard]**
+<!-- Walked 2026-08-28: FAIL → RW-8 built same day → true answer
+     verified headlessly. Re-walk on glass before placing. -->
 
-## Capture-day checklist
+"And because the graph maps the report layer too — ask what feeds
+any dashboard, and you get the exact chain: metrics, logic, report.
+Change a definition, and you know the blast radius before anyone's
+meeting breaks."
 
-- [ ] Tenant prep 1–7 done (QA gate non-negotiable)
-- [ ] Fresh conversation; description field verified EMPTY
-- [ ] Capture generously — long silent holds are free; missing footage
-      is not: Basis answer, SQL reveal, refusal, drift verdict + diff,
-      blast radius, caption reveal, dashboard pan
-- [ ] TTS pass: listen to every block for mispronunciations BEFORE the
-      edit
-- [ ] Claims audit on the final cut: three shipped source profiles
-      only; roadmap framing intact in VO-6; nothing on screen
-      contradicts the voice
+## QA gate (verbatim, against the live workbench, AFTER the
+presentation batch lands — fix wobbles before capture)
 
-## Immediately AFTER recording (same day — wall + credential cleanup)
+1. "what does Active Diabetic Patients (reporting.USP_Active_Diabetics) use to define the patient cohort"
+2. "are these 3 metrics using the same definition: High ED Utilizers Without PCP High ED Utilizers (reporting.USP_High_ED_Utilizers) High ED Utilizers (reports.USP_High_ED_Utilizers)"
+3. "Are all the Diabetic codesets defined the same?"
+4. "What governance red flags exist for Diabetic Patients?"  ← must render as flag cards
+5. "How many patients are currently in the Diabetic Patients cohort?"  ← must refuse honestly
+6. "Which certified metrics feed the Diabetes Registry dashboard?"  ← RW-8 route: suggestion followed, true answer
 
-- [ ] Remove the temporary work-Collibra block from org_config.yaml
-      (sanctioned demo-only 2026-08-16; the wall resumes at wrap)
-- [ ] Rotate the Collibra apiuser password AND the Purview app secret
-      (both exposed in config + screenshot 2026-08-16)
-- [ ] Delete the screenshot files containing the credentials
+## Capture prep (plain steps)
 
-## Candidate phrases (2026-08-23 — not yet placed; Sunny places or cuts)
+1. Presentation batch + 1.58.5 cycle landed and chain-green recorded
+   in HANDOFF_0055_BUILD.md. No capture before this.
+2. `org_config.yaml` line 63: `kusto_db: "semantic_catalog_shapes"`;
+   restart the workbench; startup banner MUST read
+   `[workbench] store: semantic_catalog_shapes`.
+3. Run the QA gate above, verbatim, fresh conversation per question.
+4. Capture generously — long silent holds are free; missing footage
+   is not: census scroll, step-SQL reveal, refusal, compare stamp,
+   3-way partition, E11.80 diff, flag cards, closing banner.
+5. TTS pass: listen to every block for mispronunciations BEFORE the
+   edit.
+6. Claims audit on the final cut: workbench only; no Fabric agent;
+   roadmap framing intact; nothing on screen contradicts the voice.
 
-**The ontology claim** (reviewer-safe framing; candidate for VO-1's
-close or the VO-6 close — do not claim ontology *reasoning* or
-*completeness*):
+## Immediately AFTER recording (same day)
 
-"Your ontology already exists — it's buried in thousands of stored
-procedures and DAX measures. AIVIA extracts it, certifies it, and
-makes it governed and queryable — every concept grounded in the
-parsed logic that computes it."
-
-**Governed plurality** (candidate, only if ADR 0054 ships pre-demo;
-pairs with an estate-wide red-flags shot upgrading VO-4):
-
-"AIVIA doesn't force one definition on everyone. It finds every
-variant, labels each one, and lets your stewards certify the
-official truth — governed plurality, not forced uniformity."
+- [ ] Rotate the Purview app secret (exposed twice; removal done
+      2026-08-28, rotation still pending — capture day is the
+      forcing function).
+- [ ] Delete any screenshot files containing credentials.
+      (Collibra cleanup is DONE — wall restored 2026-08-28; no
+      Collibra anywhere in AIVIA.)
