@@ -57,20 +57,7 @@ payload 3 built, RESULTS v2 filled under the section of record).
       zero refs); physical table = Sunny's UI step above. F-3
       cancelled. Columns materialize on the next 300 rerun (rides
       the shape-seed run; no urgency).
-- [~] Tenant load of the shape store — **STAGED END-TO-END 08-27
-      dev** (shapes lakehouse + 7/7 assets + shapes KQL DB +
-      semantic_search installed + seed committed w/ oracle 105 +
-      chain runner armed; full record in HANDOFF_0055_BUILD).
-      **(1) ✓ sql-logic-env PUBLISHED at 1.58.2 (Sunny, 08-27
-      night). (2) ✓ SEED RUN COMPLETE in aivia_shapes_src (Sunny, 08-27 night).
-      **CHAIN: store BUILT through 500 (graph live on 1.58.2, tripwire-witnessed); Eventhouse tail blocked on the API-ghost shortcut class (2/2, mechanism caught both) — ONE Sunny UI line: semantic_catalog_shapes → New → OneLake shortcut → sql_query_lh_shapes → output_semantic_catalog; + the held 1.58.3 env publish, same visit. 700 + 800 GREEN — store built end to end; LAST STEP: three shortcut clicks in one dialog (graph_nodes, graph_edges, output_metric_logic → semantic_catalog_shapes), then dev verifies and the load closes.** ECHO-order mechanism GROUNDED (bind API: placeholders stay in git forever, binding routes refresh) — **SUNNY, one 30s click when convenient: Manage connections → New → SQL Server (demo host, aivia_shapes_src catalog, OAuth2, shareable); dev does the rest by API** (plan in HANDOFF_0055_BUILD).
-      Params RE-SET by Sunny (08-27 night, post-Undo mishap; model left
-      pending per the amended rule). **DASHBOARD LIVE (Sunny, 08-27 ~8:15pm): refresh Completed after
-      credential rebind + breaker reset — cohort card = 105 (the
-      seed's stamped oracle, verified on glass), trend + dx/lab/med
-      path chart rendering. Description EMPTY confirmed —
-      **SUNNY'S DASHBOARD FINISH: COMPLETE.** (Semantic model sits
-      'Uncommitted' by design until connection-binding.)**
+- [x] **Tenant load of the shape store — COMPLETE + VERIFIED 08-28** (26 clusters w/ flat columns = local oracle; semantic_search live; U7→dashboard pointer chase ready; full record in HANDOFF_0055_BUILD). RE-WALK UNBLOCKED.
 - [x] THREE engine-surface shortcuts CREATED via UI (Sunny, 08-28
       — graph_nodes / graph_edges / output_metric_logic; 3-of-3,
       confirmed). **DEV: run the four-way verification — the load

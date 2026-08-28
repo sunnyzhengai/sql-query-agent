@@ -1187,3 +1187,23 @@ verify caught and cleaned every one — zero residue).
 push/tick — dev runs the four-way verification (flat columns,
 cluster count, semantic_search, the U7 dashboard link) and the
 load closes.
+
+### 2026-08-28 — SHAPE-STORE TENANT LOAD: COMPLETE AND VERIFIED
+Four-way verification, all green against the live shapes store:
+1. **26 cluster nodes — exactly the local gapcheck's 26 verdicts —
+   and ALL 26 carry the F-1 flat columns** (the product export live
+   in a store for the first time).
+2. **semantic_search() answers in semantic_catalog_shapes** (top hit
+   "Diabetic Patients" for the demo's own phrase; full re-embed
+   done by 700).
+3. **The U7 record carries the Diabetes Registry Dashboard link** —
+   the pointer-chase demo beat is ready end to end (TMDL-parsed
+   EXEC → report_to_canonical → report_name + URL on the record).
+4. Graph surface complete (graph_nodes / graph_edges /
+   output_metric_logic / semantic_catalog all queryable).
+The demo estate now stands: isolated source (seeded, guard-held,
+cohort 105 on glass) → isolated lakehouse (full pipeline, 1.58.2)
+→ isolated catalog (search + engine surfaces) → the dashboard.
+THE RE-WALK IS UNBLOCKED (walk section B grades against B3; section
+I against the 26 flags). Next dev order in sequence: the boundary
+echo contract (#76, post-chain — now).
