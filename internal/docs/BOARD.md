@@ -65,8 +65,10 @@ payload 3 built, RESULTS v2 filled under the section of record).
       night). (2) ✓ SEED RUN COMPLETE in aivia_shapes_src (Sunny, 08-27 night).
       **CHAIN FIRING (dev, in flight — 12 steps; results on completion push).** ECHO-order mechanism GROUNDED (bind API: placeholders stay in git forever, binding routes refresh) — **SUNNY, one 30s click when convenient: Manage connections → New → SQL Server (demo host, aivia_shapes_src catalog, OAuth2, shareable); dev does the rest by API** (plan in HANDOFF_0055_BUILD).
       Params RE-SET by Sunny (08-27 night, post-Undo mishap; model left
-      pending per the amended rule). Sunny's remaining: POST-CHAIN
-      ONLY — dashboard refresh → cohort 105 → description EMPTY.**
+      pending per the amended rule). **DASHBOARD LIVE (Sunny, 08-27 ~8:15pm): refresh Completed after
+      credential rebind + breaker reset — cohort card = 105 (the
+      seed's stamped oracle, verified on glass), trend + dx/lab/med
+      path chart rendering. Description-empty glance pending.**
 - [ ] Re-walk on the diabetic corpus (incl. section B vs B3,
       section I flags; suite transcript may cover part)
 - [ ] Script refresh (review session — workbench-only, candidate
