@@ -247,3 +247,23 @@ still show "Diabetic Cohort (Coded)" — new descriptions, old
 names: chain mid-flight or RW-2b name CSV didn't ride. Codeset
 beat HELD until chain-green recorded and "Diabetic Codeset" on
 glass. Dev: confirm chain state + whether RW-2b names landed.
+
+## U9 — codeset drift, via Sunny's paraphrase: PASS (oracle met exactly)
+
+"Are all the Diabetic codesets defined the same?" → honest-empty
+first probe with closest-by-name hint, followed correctly →
+search 2 rows (descriptions telegraph 80 vs 81 codes) → retrieve
+both (stewards on glass: Dr. Peterson vs Quality & Registry Team)
+→ compare: 2 hash groups, DIFFERS, commentary pinpoints E11.80 as
+the one missing code ("A includes codes up to E11.79; B includes
+an additional code E11.80"). Misnomer flag disclosed on both
+family headers. Verdict evidence-verified. CAMERA-READY — the
+genuine-bug beat delivers its punchline in one screen.
+
+## CORE WALK COMPLETE — 2026-08-28
+U12 PASS w/ distinction · U6 substance-PASS/display-FAIL (RW-7) ·
+pointer chase FAIL→RW-8 built+verified same-day (headless
+acceptance passed; glass re-walk optional) · U9 PASS exact.
+Optional remaining: row-count refusal (automatable), pointer
+re-walk on glass. Next review deliverable: SCRIPT REFRESH from the
+graded camera-ready beats.
