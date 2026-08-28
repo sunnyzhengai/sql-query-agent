@@ -267,3 +267,34 @@ acceptance passed; glass re-walk optional) · U9 PASS exact.
 Optional remaining: row-count refusal (automatable), pointer
 re-walk on glass. Next review deliverable: SCRIPT REFRESH from the
 graded camera-ready beats.
+
+## 2026-08-28 evening — Sunny's full 13-question walk: 13/13 SUBSTANCE CORRECT
+Her verdict: product impressive, presentation confusing. Finds:
+- **RW-9 (BUG, mandatory):** commentary renders TWICE — the RW-5
+  answer-first card duplicated the block instead of moving it.
+  Every answer doubles itself on glass.
+- **RW-10 (design → build): ANSWER FORMAT CONTRACT** — per
+  question class the conclusion card is MACHINE-COMPOSED from
+  stamped fields; model prose fills gaps only, never the verdict.
+  Specimen pair: two DIFFERS answers, same computed diff, one
+  caption named E11.80 and one mumbled — stochastic narration of
+  deterministic facts. DIFFERS cards must show machine diff lines.
+  Flag cards get plain-language class glosses (cousin = "same
+  name, different logic"; duplicate = "identical logic under
+  different names"; misnomer; grain shift = "patients vs visits").
+  Draft: internal/docs/ANSWER_FORMAT_CONTRACT.md.
+- **RW-11 (mandatory, Echo Law — W10 gone live):** row-level
+  question ("how many patients...") wandered 8 rounds then died
+  on budget instead of refusing on policy. Honesty core held (no
+  invented number, no rows touched) but refusal shape wrong.
+  Build: first-round typed refusal — "definitions, not data;
+  patient rows never reach the model" + the definition + where it
+  runs. Acceptance = this exact question.
+- Flag why-sentences await the 1.58.5 rerun (known); cards were
+  folded out of sight by RW-5 — format contract re-seats them ON
+  the card.
+- Flywheel visibility (her point 5): 0056 decision capture is the
+  mechanism; live-loop demo moment (confirm click → next answer
+  discloses shifted weight, real usage, demo-law-clean).
+  Sequencing decision OPEN (Sunny): second short film post-0056
+  (recommended) vs reopening the post-capture ruling.
