@@ -1,9 +1,11 @@
 # ADR 0060 — The parse is the plan: deterministic traversal, parser-only LLM
 
-**Status:** DRAFT 2026-08-28 — designed in review session with Sunny;
-awaiting her rulings on the three open calls (§7) and dev's
-prototype estimation. Build is GATED on the corpus experiment (§6)
-— no engine change ships before the measurement.
+**Status:** ACCEPTED 2026-08-28 — designed in review session with
+Sunny; all three open calls RULED same-day (§7): confirm every
+parse; lexicon promotes by usage threshold with steward veto;
+frontier parser for the pilot. Build is GATED on the corpus
+experiment (§6) — no engine change ships before the measurement.
+Next: dev prototypes the parse-traverse path for the experiment.
 
 ## 1. The problem, measured
 
@@ -209,13 +211,19 @@ measurement, already recorded in WALK_VERDICTS_SHAPES.md.
 1. **Confirm cadence:** RULED by Sunny 2026-08-28 — **confirm
    every parse.** No auto-execute path; every question's
    interpretation renders on glass and waits for the click.
-2. **Lexicon governance:** who may promote a personal phrase
-   mapping to the estate lexicon — stewards only, or
-   usage-threshold automatic with steward veto? (Mirrors the 0054
-   never-gate-on-certification stance.)
-3. **Parser model tier:** mini with confirm-all, or frontier for
-   the parse during the pilot to separate parse errors from
-   architecture errors in the experiment?
+2. **Lexicon governance:** RULED by Sunny 2026-08-28 — **option B:
+   usage-threshold automatic promotion with steward veto.** A
+   personal mapping promotes to the estate lexicon once enough
+   distinct users converge on it; stewards can veto or reverse.
+   Bounded by call 1: every parse still confirms on glass, so a
+   bad default is visible before execution. (Mirrors the
+   never-gate-on-certification stance; stewards follow uses.)
+3. **Parser model tier:** RULED by Sunny 2026-08-28 — **option A:
+   frontier model for the pilot** to isolate architecture failures
+   from parse failures (one variable at a time). If the
+   architecture passes, swap in mini and measure the delta as its
+   own step. Production tier is a later, separate decision
+   informed by that measured delta.
 
 ## 8. Relations
 
