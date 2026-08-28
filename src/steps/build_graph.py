@@ -13,6 +13,7 @@ from typing import Iterable
 
 from src.dictionary import DataDictionary
 from src.governance.display_names import apply_business_names
+from src.governance.red_flags import FLAT_FLAG_COLUMNS
 from src.governance.steward import StewardManager
 from src.graph.builder import GraphBuilder
 from src.graph.consumption import wire_consumption_layer
@@ -311,6 +312,14 @@ def build_graph_step(
             "run_at": sweep_run_at})}
     final_nodes = (nodes_to_row_dicts(builder.nodes)
                    + sweep_out.cluster_nodes_rows + [sweep_meta])
+    # F-1 flat surface (field find 2026-08-27, re-cut by ruling to a
+    # PRODUCT export): every graph_nodes row carries the six flat
+    # governance columns — populated on cluster: rows by
+    # reify_clusters, NULL everywhere else. Uniform rows keep the
+    # Delta write and every local consumer schema-stable.
+    for n in final_nodes:
+        for col in FLAT_FLAG_COLUMNS:
+            n.setdefault(col, None)
     final_edges = (edges_to_row_dicts(builder.edges)
                    + sweep_out.cluster_edges_rows)
     merged_ids = {n["node_id"] for n in final_nodes}

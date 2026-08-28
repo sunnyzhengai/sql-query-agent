@@ -777,3 +777,36 @@ mechanisms L0+smoke+live-verified. The
 relationship-claims-without-compare class is ACCEPTED AS DEFERRED
 TO REVIEW — it is now a review-session design item (the walk's Q4
 family; M4-hard, no lexicons; sits beside W10).
+
+### 2026-08-27 — F-ORDER EXECUTED AS RE-CUT (release 1.58.2)
+**F-1 (PRODUCT export, per the demotion ruling): BUILT.** graph_nodes
+carries six REAL columns — flag_class, severity, identity,
+member_count, distinct_logics, disposition — populated on cluster:
+rows by reify_clusters (the one writer), NULL on every other row
+(uniform rows, schema-stable everywhere). Contract updated with the
+F-1 note; L0 tests pin flat-mirrors-bag on cluster rows and
+no-stamp on loggroup rows; shape corpus + topology + contract
+suites all green through the new shape. No agent injection, no N=3
+agent verification, no publish — cancelled per the ruling, now and
+for every future release.
+**Docs re-cut: DONE.** INSTALLATION GUIDE Step 6 → "Step 6
+(retired)" pointer + new appendix "Grounding Microsoft's Data Agent
+with AIVIA's surfaces (optional)" with the disclaimer and the
+flat-columns guidance (query columns, never JSON; gov_red_flags
+named as retired). "After the agent is working" → "after the
+pipeline is verified"; re-run section no longer names the Data
+Agent as the consumer.
+**F-2: repo side CLEAN (zero live references — census verified);
+physical Lakehouse table still present.** My OneLake DELETE of
+Tables/dbo/gov_red_flags was PERMISSION-BLOCKED by the local
+command classifier (destructive tenant action — the block is
+reasonable and I did not work around it). PARKED FOR SUNNY: delete
+the `gov_red_flags` table in the Lakehouse UI (~10 seconds),
+alongside her queued agent deletion.
+**F-3: cancelled** per the ruling.
+**Release 1.58.2** (wheel + env item + CHANGELOG: F-1 flat surface
++ the corpse-hunt mechanisms + B3). The flat columns MATERIALIZE in
+the store on the next 300 rerun — no urgency now that no agent
+verification depends on them; they ride the next routine chain (or
+the shape-store seed run, whichever comes first).
+Gates: 1,118 passed + 5 xfailed, ruff clean.

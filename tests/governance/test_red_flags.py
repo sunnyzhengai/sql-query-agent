@@ -200,3 +200,45 @@ class TestDispositions:
             {"flag_id": flags[0]["flag_id"], "kind": "bless",
              "reason": "x"}])
         assert len(out.rejected) == 2
+
+
+class TestFlatSurface:
+    """F-1 (field find 2026-08-27, ruled a PRODUCT export): cluster
+    rows carry the six governance fields as REAL top-level columns —
+    no consumer parses the properties JSON to answer flag questions."""
+
+    _ROWS = None      # built once below
+
+    @classmethod
+    def _flags(cls):
+        from src.governance.red_flags import sweep
+        return sweep([
+            _metric("r.A"), _metric("r.B"),
+            _step("r.A", "Base_Pop", "SELECT 1 FROM T"),
+            _step("r.B", "Base_Pop", "SELECT 2 FROM U WHERE X=1"),
+        ], []).flags_rows
+
+    def test_cluster_nodes_carry_flat_columns(self):
+        from src.governance.red_flags import (
+            FLAT_FLAG_COLUMNS,
+            reify_clusters,
+        )
+        nodes, _ = reify_clusters(self._flags())
+        clusters = [n for n in nodes
+                    if n["node_id"].startswith("cluster:")]
+        assert clusters
+        for n in clusters:
+            for col in FLAT_FLAG_COLUMNS:
+                assert n.get(col) is not None, (n["node_id"], col)
+            props = json.loads(n["properties"])
+            # flat values mirror the bag — one writer, two shapes
+            assert n["flag_class"] == props["flag_class"]
+            assert n["member_count"] == props["member_count"]
+            assert n["disposition"] in (props["disposition"], "open")
+
+    def test_loggroup_nodes_are_not_stamped_flat(self):
+        from src.governance.red_flags import reify_clusters
+        nodes, _ = reify_clusters(self._flags())
+        for n in nodes:
+            if n["node_id"].startswith("loggroup:"):
+                assert "flag_class" not in n

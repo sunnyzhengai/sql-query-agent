@@ -381,7 +381,7 @@ Flags disclose, never gate: a non-zero flag count is normal.
 - [ ] Data contract invariants: 0 violations (uniqueness, allowed values, references)
 - [ ] If DEPLOYMENT BLOCKED: resolve the listed issues before proceeding
 
-### Optional notebooks (after the agent is working)
+### Optional notebooks (after the pipeline is verified)
 
 - `600_generate_descriptions` — LLM-generated business descriptions for metrics
 - `610_generate_agent_descriptions` — Data-Agent descriptions into
@@ -406,50 +406,15 @@ Flags disclose, never gate: a non-zero flag count is normal.
 
 ---
 
-## Step 6: Configure the Data Agent
+## Step 6 (retired): the Fabric Data Agent
 
-1. Go to your workspace
-2. Click **+ New** → **Data Agent** (or use the **Add to data agent** button in the Lakehouse)
-3. Name it: `SQL Intelligence Agent`
-4. Add the **Lakehouse** data source and select these tables:
-   - `output_metric_logic`
-   - `output_metric_twins`
-   - `ops_parse_errors`
-   - `ops_pipeline_validation`
-   - `ops_installation_errors`
-   - `ops_funnel`
-   - `ops_fallout`
-   - `graph_nodes`
-   - `graph_edges`
-   - `graph_edge_uses_table`
-   - `graph_canonical`
-5. If you provisioned semantic search (the `700_refresh_search_index`
-   step), add the **KQL database** data source (the Eventhouse holding
-   `semantic_search()`).
-6. If you loaded the **Graph Model**, add it as a third data source.
-7. Open the Agent's **Instructions** panel
-8. Paste the contents of `sql_intelligence_agent_instructions.md`
-   (three-source synthesis; works with the Lakehouse alone — the
-   instructions route around missing sources honestly)
-9. On the Lakehouse source: **Example queries → Import from JSON** →
-   `delta_agent_fewshots.json`
-10. Click **Publish**
-
-### Test the Agent
-
-Ask these questions to verify it's working:
-
-| Question | Expected response |
-|---|---|
-| "What metrics are available?" | Lists metrics from the graph |
-| "How is [pick a metric name] calculated?" | Shows business logic explanation |
-| "/coverage" | Shows system health percentages |
-| "/errors" | Shows parse errors (or "no errors") |
-
-**Verification:**
-- [ ] Agent returns meaningful answers (not empty or error)
-- [ ] Agent does NOT hallucinate or reference metrics that don't exist
-- [ ] Agent correctly says "I don't have that information" for unknown topics
+AIVIA no longer configures, verifies, or publishes a Fabric Data
+Agent (ruling 2026-08-27): we ship surfaces we can back — the
+tables, the graph, and semantic search are the product; Microsoft's
+Data Agent reasoning is Microsoft's. If your organization wants to
+point a Fabric Data Agent at AIVIA's surfaces anyway, the optional
+recipe is in the appendix: **Grounding Microsoft's Data Agent with
+AIVIA's surfaces**.
 
 ---
 
@@ -479,7 +444,7 @@ When your SQL files change (new procs added, existing ones modified):
 1. Upload new/updated `.sql` files to `Files/sql-query-agent/sql_input/`
 2. Run notebooks 200 → 300 → 400 → 500 in order (then 600/610 and
    700 → 800 if you use descriptions, search, and the graph model)
-3. The Data Agent automatically uses the updated `output_metric_logic` table
+3. Every consumer of `output_metric_logic` (reports, integrations, any agent recipe) sees the updated table on its next read
 
 When your data dictionary changes:
 
@@ -682,3 +647,33 @@ If you encounter issues not covered in this guide:
 | `graph_edge_tech2dim` | Graph (LPG) | Technical → Dimension edges |
 | `output_metric_logic` | Output | Flattened table for Data Agent |
 | `gov_steward_assignments` | Governance | Metric ownership |
+
+---
+
+## Appendix: Grounding Microsoft's Data Agent with AIVIA's surfaces (optional)
+
+> **Disclaimer:** this is an integration recipe, not a product
+> component. The Data Agent's reasoning, SQL generation, and answer
+> quality are Microsoft's; AIVIA backs the SURFACES it reads
+> (tables, graph, semantic search) and nothing else. AIVIA does not
+> verify or maintain agent behavior.
+
+1. In your workspace: **+ New** → **Data Agent**; name it as you like.
+2. Add the **Lakehouse** source and select: `output_metric_logic`,
+   `output_metric_twins`, `ops_parse_errors`,
+   `ops_pipeline_validation`, `ops_installation_errors`,
+   `ops_funnel`, `ops_fallout`, `graph_nodes`, `graph_edges`,
+   `graph_edge_uses_table`, `graph_canonical`.
+   Do NOT select retired tables (`gov_red_flags` is retired — flag
+   truth lives on `graph_nodes` rows with `node_id LIKE 'cluster:%'`).
+3. Governance flags: query the FLAT columns on `graph_nodes`
+   (`flag_class`, `severity`, `identity`, `member_count`,
+   `distinct_logics`, `disposition` — populated on `cluster:` rows,
+   engine >= 1.58.2). Never instruct the agent to parse the
+   `properties` JSON; JSON_VALUE fails on large cluster payloads.
+4. Optional sources: the KQL database (semantic search) and the
+   Graph Model, as in `sql_intelligence_agent_instructions.md` —
+   usable as instruction material for the agent.
+5. Example queries: `delta_agent_fewshots.json`.
+6. Test with your own questions and publish under your own
+   governance. Behavior verification is yours.

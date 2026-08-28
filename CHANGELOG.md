@@ -10,6 +10,39 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.58.2] - 2026-08-27
+
+### Changed — field find F-1, re-cut by ruling (flat surface = PRODUCT export; Fabric agent demoted to integration recipe)
+- graph_nodes gains six REAL columns — flag_class, severity,
+  identity, member_count, distinct_logics, disposition — populated
+  on cluster: rows by the sweep reification, NULL elsewhere. Flag
+  consumers (admin tiles, integrations, the optional grounding
+  recipe) read columns, never parse the properties JSON
+  (JSON_VALUE fails on large cluster payloads — Sunny's
+  spot-check find).
+- INSTALLATION GUIDE: Step 6 retired; the Data Agent moves to an
+  optional appendix recipe with the disclaimer (Microsoft's
+  reasoning, AIVIA's surfaces).
+
+### Fixed — live-eval corpse hunt (first post-1.58 live grading)
+- NON-EVIDENCE floor: a lineage probe whose phrase is a METRIC or
+  STEP (not a table/column) is stamped non-evidence; the verdict
+  verifier refuses absence claims quoting such a probe's own empty
+  headline. Honest empties stay quotable. (The W13b false-empty
+  class on the ask surface; pointer_chase 0.00 → 1.00 live.)
+- Engine doorway pins temperature 0 — the honesty floor no longer
+  moves with sampling noise.
+- Caption gate: int<None crash on ref-anchored captions fixed
+  (fixture-first).
+
+### Added
+- B3 step dep-chains: step records carry fed_by_steps /
+  feeds_steps from the transform_to_transform edges; reachability
+  row REACHABLE; suite family step_deps with a store-derived
+  oracle; conscious pin bump (retrieve tool description).
+
+---
+
 ## [1.58.1] - 2026-08-26
 
 ### Added — ADR 0059 mechanized (topology axioms Q1-Q3, ratified)

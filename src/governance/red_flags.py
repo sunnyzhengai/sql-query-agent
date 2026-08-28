@@ -159,6 +159,14 @@ def _row(flag_class: str, grain: str, identity: str, severity: str,
     }
 
 
+# F-1 (field find 2026-08-27, ruled a PRODUCT export): the flat
+# governance columns on graph_nodes — the agent-independent surface
+# admin tiles, integrations, and the Step-6 grounding recipe read.
+# Populated on cluster: rows only; the one writer is reify_clusters.
+FLAT_FLAG_COLUMNS = ("flag_class", "severity", "identity",
+                     "member_count", "distinct_logics", "disposition")
+
+
 def reify_clusters(flags_rows: "list[dict]"
                    ) -> "tuple[list[dict], list[dict]]":
     """ADR 0057 — clusters are nodes. One name_cluster node per
@@ -186,7 +194,16 @@ def reify_clusters(flags_rows: "list[dict]"
                 f"{fr['member_count']} member(s), "
                 f"{fr['distinct_logics']} distinct logic(s) — "
                 "flags disclose, never gate"),
-            "properties": json.dumps(cprops)})
+            "properties": json.dumps(cprops),
+            # F-1 flat surface (field find 2026-08-27): the agent's
+            # SQL path reads these as REAL COLUMNS — same values as
+            # the properties bag, same writer, no JSON parsing
+            "flag_class": str(fr["flag_class"]),
+            "severity": str(fr["severity"]),
+            "identity": str(fr["identity"]),
+            "member_count": int(fr["member_count"]),
+            "distinct_logics": int(fr["distinct_logics"]),
+            "disposition": str(fr["disposition"] or "open")})
         members = json.loads(fr["members"])
         by_key: "dict[str, list[dict]]" = {}
         for mrow in members:

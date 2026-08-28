@@ -46,7 +46,17 @@ payload 3 built, RESULTS v2 filled under the section of record).
       (expected; don't refresh early). agent spot-check 08-27 FAILED honestly → triggered the DEMOTE
       ruling. Publish RETIRED (never happens); Sunny deletes the
       tenant agent later. Remaining Sunny: post-seed dashboard
-      refresh → render → description-empty check.
+      refresh → render → description-empty check; PLUS delete the
+      Lakehouse `gov_red_flags` table in the UI (~10s — dev's API
+      delete was permission-blocked; F-2's last physical step).
+- [x] **F-order EXECUTED as re-cut (08-27 dev, release 1.58.2):**
+      F-1 = PRODUCT export — six flat governance columns on
+      graph_nodes (cluster: rows), contract + L0 + shapes green; no
+      agent work, per the ruling. Docs re-cut: Step 6 retired →
+      appendix recipe w/ disclaimer. F-2 repo-side clean (census
+      zero refs); physical table = Sunny's UI step above. F-3
+      cancelled. Columns materialize on the next 300 rerun (rides
+      the shape-seed run; no urgency).
 - [ ] Tenant load of the shape store (_shapes profile)
 - [ ] Re-walk on the diabetic corpus (incl. section B vs B3,
       section I flags; suite transcript may cover part)

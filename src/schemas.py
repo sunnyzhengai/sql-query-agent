@@ -499,6 +499,19 @@ GRAPH_NODES = {
         ("name", "string", False),
         ("description", "string", True),
         ("properties", "string", True),
+        # Field find F-1 (2026-08-27, agent spot-check): the Data
+        # Agent's SQL path could not parse the large cluster
+        # properties JSON (JSON_VALUE limits) — the governance
+        # fields it answers from are REAL COLUMNS (ADR 0020,
+        # data-shaped), populated on cluster: rows, NULL elsewhere.
+        # The properties JSON remains the full bag; these are the
+        # agent's flat projection of it, same writer.
+        ("flag_class", "string", True),
+        ("severity", "string", True),
+        ("identity", "string", True),
+        ("member_count", "integer", True),
+        ("distinct_logics", "integer", True),
+        ("disposition", "string", True),
     ],
     "column_descriptions": {
         "node_id": "Unique node identifier, prefixed by layer",
@@ -506,6 +519,12 @@ GRAPH_NODES = {
         "name": "Display name (metric name, CTE name, or table/column name)",
         "description": "Business description (dictionary text or generated translation)",
         "properties": "JSON bag of layer-specific properties (sql_fragment, steward, ...)",
+        "flag_class": "Governance flag class (cluster: rows only; F-1 flat surface)",
+        "severity": "Flag severity: CONFLICT | INFO (cluster: rows only)",
+        "identity": "The shared name/identity the cluster groups (cluster: rows only)",
+        "member_count": "Cluster member count (cluster: rows only)",
+        "distinct_logics": "Distinct logic groups in the cluster (cluster: rows only)",
+        "disposition": "Latest steward disposition, open if none (cluster: rows only)",
     },
     "invariants": [
         {"kind": "unique", "columns": ["node_id"]},
