@@ -1293,3 +1293,14 @@ building: a multi-line template and an apostrophe comment — the
 gate earning its keep).
 Gates: 1,144 passed + 5 xfailed, ruff clean. Store rename rerun
 (names → 300…800 on the shapes store) firing next.
+
+### 2026-08-28 — RW-4 co-occurrence lever (the sharpened directive, same cycle)
+Specimen #4's shape mechanized: a retrieve holding >=2 same-kind
+records (metric/step) stamps the compare route on its note —
+"compare(refs) computes it exactly; descriptions and names never
+do." A NUDGE, deliberately NOT the duty constant: a benign
+two-record turn must never floor for a claim it didn't make. With
+the step-token stamp (Lab_Path class), the universal reads-grain
+sentence (already SIGHTED in Sunny's walk via the shared tree), and
+this nudge, every observed route now carries the co-occurrence
+lever the moment it forms. 2 L0 tests; 234 orchestrator green.

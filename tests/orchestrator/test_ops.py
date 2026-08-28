@@ -674,3 +674,23 @@ class TestTurnStepSamenessStamp:
         s.note_user("which metrics read ADT?")
         rs = op_lineage("ADT", fake_kql, s)
         assert "shared tables do not imply shared logic" in rs.universe
+
+
+class TestCompareNudge:
+    """RW-4 co-occurrence (specimen #4): >=2 same-kind records on a
+    retrieve stamp the compare route — a nudge, never the duty."""
+
+    def test_two_metric_records_stamp_the_route(self):
+        s = OpsSession()
+        s.note_user(f"{REF_A} {REF_B}")
+        rs = op_retrieve([REF_A, REF_B], fake_kql, s)
+        assert "compare(refs) computes it exactly" in rs.note
+        # deliberately NOT the duty constant — a benign two-record
+        # turn must never floor for an unmade claim
+        assert "not logic sameness" not in rs.note
+
+    def test_single_record_stays_clean(self):
+        s = OpsSession()
+        s.note_user(REF_A)
+        rs = op_retrieve([REF_A], fake_kql, s)
+        assert "compare(refs)" not in rs.note

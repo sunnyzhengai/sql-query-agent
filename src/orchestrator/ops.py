@@ -1111,6 +1111,21 @@ def op_retrieve(ids: "list[str]", run_kql, session: OpsSession) -> ResultSet:
                     pass
         except AssemblyError as e:
             notes.append(str(e))
+    # RW-4 co-occurrence (re-walk 2026-08-28, specimen #4: two
+    # records in hand, compare one call away, not taken): a retrieve
+    # holding >=2 same-kind records stamps the route — a NUDGE, not
+    # the duty constant (a benign two-record turn must never floor
+    # for an unmade claim). Data-triggered, no question typing.
+    kind_counts: "dict[str, int]" = {}
+    for r in rows:
+        k = str(r.get("kind") or "")
+        kind_counts[k] = kind_counts.get(k, 0) + 1
+    if any(n >= 2 for k, n in kind_counts.items()
+           if k in ("metric", "step")):
+        notes.append(
+            "multiple records of the same kind are on screen — for "
+            "any sameness/difference verdict, compare(refs) computes "
+            "it exactly; descriptions and names never do")
     return session.register(
         "retrieve", {"ids": ids}, rows, complete=True,
         universe="full certified records for the requested ids",
