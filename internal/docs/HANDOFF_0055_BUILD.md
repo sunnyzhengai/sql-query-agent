@@ -1000,3 +1000,12 @@ enforces this — expect cohort 105), then ONE dashboard parameter:
 semantic model → Settings → Parameters → DemoSqlDatabase → the
 aivia_shapes_src catalog name (Settings shows it; DemoSqlServer is
 UNCHANGED — same host). Then push/tick: the chain fires.
+
+## REVIEW VERDICT on the source leg (2026-08-27 night): APPROVED — chain re-armed on Sunny's seed
+
+Verified: 1,124 green after review's mechanical TEST_MAP
+regeneration (the one red) + ruff clean. Accepted: the isolation
+guard at birth (THROW before any DROP on foreign tables — the
+collision class dies at compile), GO-batching (the Msg-207 lesson
+mechanized), the three-legged isolation law in SPHERE, the isolated
+source created and read-back verified.
