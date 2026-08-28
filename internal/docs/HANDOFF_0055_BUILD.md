@@ -1512,3 +1512,24 @@ link intact; semantic_search re-embedded over the DESCRIBED
 surface (visible: richer top hits). The demo estate now carries
 the authored semantic layer end to end — tier-2 grounding's
 surface exists in the wild.
+
+### 2026-08-28 — PRESENTATION BATCH BUILT (the capture gate's dev half)
+All three display items, workbench-live via the shared tree:
+- **RW-5 answer-first folded rounds:** the conclusion card (caption
+  + citation + verdict stamp) seats ABOVE the turn's panels; every
+  panel folds to its one-line stamped headline — fold, never hide;
+  every receipt one click away.
+- **RW-7 flag cards (+RW-1):** flag rows render as the
+  differentiation-queue view — identity, class + severity chips
+  (CONFLICT red-edged, INFO amber), members · logics · disposition
+  line, and the sweep-authored why-sentence. The census projection
+  gained `description` so the self-description rides every flag
+  row. Machine-grade node labels never render.
+- RW-3's aux-fold nests harmlessly inside the round folds.
+Gates: 1,160 green, ruff clean (the page-JS gate caught the
+apostrophe-comment class a THIRD time — the gate IS the mechanism
+and it holds; noted).
+**CAPTURE GATE REMAINING: the 1.58.5 cycle** — Sunny's env-publish
+click (staged 1.58.5 carries the sweep self-descriptions), then
+dev's rerun (300→800) so the why-sentences the flag cards display
+come from the STORE mint. Then the script's QA gate runs verbatim.

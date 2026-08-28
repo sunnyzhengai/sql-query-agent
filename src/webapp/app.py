@@ -449,6 +449,22 @@ WORKBENCH_PAGE = """<!doctype html>
                  font:12px ui-monospace,monospace; overflow-x:auto; }
   .cite { font:11.5px ui-monospace,monospace; background:#eef2fa;
           color:var(--accent); border-radius:6px; padding:1px 6px; }
+  .concl { border-left:4px solid var(--accent); }
+  .roundfold { margin:4px 0; }
+  .roundfold > .rf-sum { cursor:pointer; list-style:none;
+    font:12.5px ui-monospace,monospace; color:#6b7080;
+    padding:4px 8px; background:#f4f6fb; border-radius:8px; }
+  .roundfold > .rf-sum::-webkit-details-marker { display:none; }
+  .flagcards { display:flex; flex-direction:column; gap:8px;
+    margin:8px 0; }
+  .flagcard { border:1px solid #e2e6f0; border-radius:10px;
+    padding:10px 14px; background:#fff; }
+  .flagcard.sev-CONFLICT { border-left:4px solid #d9534f; }
+  .flagcard.sev-INFO { border-left:4px solid #f0ad4e; }
+  .fc-head { display:flex; gap:8px; align-items:center; }
+  .fc-counts { font:12px ui-monospace,monospace; color:#6b7080;
+    margin-top:4px; }
+  .fc-why { margin-top:6px; font-size:13.5px; }
   .auxfold { margin:4px 0 2px; }
   .auxfold summary { cursor:pointer; font-size:12px; color:#6b7080;
                      list-style:none; }
@@ -496,6 +512,9 @@ function add(node) { log.appendChild(node);
 // (walk W1/W3c, display-only; the caption TEXT the suite grades is
 // unchanged on the wire).
 let turnHeadlines = [];
+// RW-5: the panels rendered THIS turn — the finale folds them to
+// one-line headlines and seats the conclusion card on top
+let turnPanels = [];
 
 function renderOutput(o) {
   const auto = (o.component && o.component.auto_round)
@@ -527,6 +546,28 @@ function renderOutput(o) {
   if (r.headline) {
     rs.appendChild(el(`<div class="headline">${esc(r.headline)}</div>`));
     turnHeadlines.push({ ref: r.ref, text: String(r.headline) });
+  }
+  // RW-7/RW-1 (capture gate): flag rows render as CARDS — class,
+  // severity, counts, disposition, the sweep-authored why-sentence —
+  // never machine-grade node labels
+  if (r.rows && r.rows.length && r.rows[0].flag_class) {
+    const wrap = el(`<div class="flagcards"></div>`);
+    for (const f of r.rows) {
+      const sev = String(f.severity || '');
+      wrap.appendChild(el(`<div class="flagcard sev-${esc(sev)}">
+        <div class="fc-head"><b>${esc(f.identity || f.flag_id)}</b>
+          <span class="badge">${esc(f.flag_class)}</span>
+          <span class="badge sev">${esc(sev)}</span></div>
+        <div class="fc-counts">${esc(f.member_count)} members ·
+          ${esc(f.distinct_logics)} distinct logics ·
+          disposition: ${esc(f.disposition || 'open')}</div>
+        <div class="fc-why">${esc(f.description || '')}</div>
+      </div>`));
+    }
+    rs.appendChild(wrap);
+    add(rs);
+    turnPanels.push(rs);
+    return rs;
   }
   let rows2 = r.rows, prefer = null;
   if (r.op === 'search' || r.op === 'census') {
@@ -560,6 +601,7 @@ function renderOutput(o) {
   }
   rs.appendChild(renderTable(rows2, prefer));
   add(rs);
+  turnPanels.push(rs);
   return rs;
 }
 
@@ -663,6 +705,30 @@ function renderFinale(j) {
       'auxiliary table folded — the verdict rests on another ' +
       'result (expand for the map)' + `</summary></details>`);
     tbl.replaceWith(d); d.appendChild(tbl);
+  }
+  // RW-5 (capture gate): answer-first folded-rounds layout — every
+  // panel of this turn folds to its one-line stamped headline
+  // (fold, never hide: every receipt stays one click away), and the
+  // conclusion card seats ABOVE them.
+  let anchor = null;
+  for (const panel of turnPanels) {
+    const head = panel.querySelector('.headline');
+    const line = head ? head.textContent :
+      (panel.querySelector('.ref') || {}).textContent || 'result';
+    const fold = el(`<details class="roundfold"></details>`);
+    const sum = el(`<summary class="rf-sum"></summary>`);
+    sum.textContent = line;
+    fold.appendChild(sum);
+    panel.parentNode.insertBefore(fold, panel);
+    fold.appendChild(panel);
+    if (!anchor) anchor = fold;
+  }
+  if (j.caption && anchor) {
+    const based = `<span class="inputs">based on: ${esc((j.caption_inputs||[]).join(', ')||'—')}${
+      j.answered ? ' · verdict: answered (evidence verified)' : ''}</span>`;
+    const card = el(`<div class="caption concl">${
+      renderMarkdown(foldHeadlineQuotes(j.caption))}${based}</div>`);
+    anchor.parentNode.insertBefore(card, anchor);
   }
   if (j.loop_status) {
     add(el(`<div class="loopline">${esc(j.loop_status)}${
@@ -805,6 +871,7 @@ document.getElementById('ask').addEventListener('submit', async (e) => {
   if (!message) return;
   q.value = ''; askbtn.disabled = true;
   turnHeadlines = [];
+  turnPanels = [];
   add(el(`<p class="you">you&gt; ${esc(message)}</p>`));
   try {
     let j;

@@ -452,7 +452,10 @@ _CLUSTER_PROJECT = (
     "          blast_basis = tostring(p.blast_basis),\n"
     "          disposition = tostring(p.disposition),\n"
     "          disposition_reason = tostring(p.disposition_reason),\n"
-    "          drill_query = tostring(p.drill_query)\n"
+    "          drill_query = tostring(p.drill_query),\n"
+    # RW-7 flag cards: the sweep's self-description rides every flag
+    # row — the card's one-line WHY (machine-authored at mint)
+    "          description = description\n"
 )
 
 GOV_FLAGS_QUERY = (
