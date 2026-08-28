@@ -1260,3 +1260,36 @@ line, no env spelunking.
    (Coded)"; same drift, same oracles.
 4. RW-1 (flag-census display) rides the 0056 presentation batch as
    already recorded.
+
+### 2026-08-28 — RW-BATCH-1 BUILT (all three items)
+**RW-2 (palette v3):** U9 pair renamed. DEVIATION RECORDED: Sunny's
+example name "Diabetic Patients (Coded)" JOINS the "Diabetic
+Patients" name family by fold (proven: the PD1 cell failed, 12
+logics ≠ the ratified 10) — which the order's own "same oracles"
+clause forbids. Executed as the family-neutral natural form
+**"Diabetic Cohort (Coded)"** (drops the codeset jargon, keeps the
+10-member beat). If Sunny prefers her exact wording, the tradeoff
+is now visible: it re-scopes the U6/PD1 demo number to 12.
+Corpus + gapcheck + manifest expectation made palette-driven (the
+name can never strand a hardcode again); 39/39.
+**RW-4 (mandatory):** the user's OWN identifier tokens now arm the
+sameness stamp on LINEAGE results (exact-match against the
+step-name universe — equality, never containment; the 'ED' corpse
+boundary respected). The Lab_Path shape gets the caveat + member
+surfacing on screen, which arms the existing W6 duty: caption
+echoes the grain gap or a compare displays, else floored →
+continuation pressure routes to compare. Universal reads-grain
+sentence added to the table-lineage universe. 4 L0 tests. The
+SHARPENED acceptance (routing consistency vs the exemplar) is
+live-graded on the walk rerun — the deterministic levers are all
+armed; routing beyond them would need question-shape typing (P4).
+**RW-3 (mandatory, echoed):** machine-computed fold — when the
+verified quote's ground is one result, every other result with
+rows gets its ref in `folded_refs` (turn-scoped, verdict-anchored,
+never model-claimed); the page retro-folds those tables into
+collapsed details ("the map on demand"), headlines stay visible.
+2 cage tests + page-JS gates (which caught two bugs while
+building: a multi-line template and an apostrophe comment — the
+gate earning its keep).
+Gates: 1,144 passed + 5 xfailed, ruff clean. Store rename rerun
+(names → 300…800 on the shapes store) firing next.

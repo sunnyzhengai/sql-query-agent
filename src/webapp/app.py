@@ -652,14 +652,16 @@ function foldHeadlineQuotes(raw) {
 }
 
 function renderFinale(j) {
-  // RW-3 (mandatory, echoed): auxiliary rounds' tables fold once the
-  // verdict lands — the map on demand; headlines stay visible.
+  // RW-3 (mandatory, echoed): tables from auxiliary rounds fold once
+  // the verdict lands — the map on demand; headlines stay visible.
   for (const ref of (j.folded_refs || [])) {
     const panel = document.getElementById('ref-' + ref);
     if (!panel) continue;
     const tbl = panel.querySelector('table');
     if (!tbl) continue;
-    const d = el(`<details class="auxfold"><summary>auxiliary table folded — the verdict's primary basis is another result (expand for the map)</summary></details>`);
+    const d = el(`<details class="auxfold"><summary>` +
+      'auxiliary table folded — the verdict rests on another ' +
+      'result (expand for the map)' + `</summary></details>`);
     tbl.replaceWith(d); d.appendChild(tbl);
   }
   if (j.loop_status) {
