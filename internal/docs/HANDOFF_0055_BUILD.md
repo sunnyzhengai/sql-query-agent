@@ -1431,3 +1431,14 @@ sql-logic-env (staged 1.58.4) — then push/tick and dev fires
 build, not the parse), then 400→500→700 (search re-embeds THE NEW
 SURFACE — tier-2 grounding's food) → 800 → verify descriptions
 live.**
+
+## ORDER RW-2b (data-file): rename the U9 pair again — "Diabetic Codeset"
+Sunny's ruling 2026-08-28 on the RW-2 deviation: the first rename
+fixed the wrong half. Her point was never the word "Codeset" — it
+was calling a codeset a cohort. The artifact IS a hand-maintained
+code list; name it what it is.
+Rename both members: "Diabetic Cohort (Coded)" → **"Diabetic
+Codeset"**. Family-neutral (does not contain "Diabetic Patients";
+10-member beat intact). Palette-driven, gapcheck, manifest
+expectation, store rerun — same pipeline as RW-2. Demo question
+becomes: "Are all the Diabetic Codeset definitions the same?"
