@@ -104,9 +104,12 @@ payload 3 built, RESULTS v2 filled under the section of record).
 
 - [x] input_metric_names RESTORED (Sunny, 08-27 night) — the
       incident's damage ledger closes.
-- [ ] Env publish of 1.58.3: HOLD until the chain report (avoid
-      mid-chain version skew), then update-from-git + Publish —
-      it's the realism-300 precondition wheel.
+- [x] Env 1.58.3 PUBLISHED (Sunny, 08-28 morning) — realism-300
+      precondition wheel live.
+- [x] semantic_catalog_shapes shortcut CREATED via UI (Sunny,
+      08-28 morning; accelerate off — the API ghosted 2/2, both
+      caught by create-then-verify). **DEV: RESUME the chain
+      --from 700_refresh_search_index → 800 → full verification.**
 
 - [x] **Endpoint-leak residual: RULED — ACCEPT** (Sunny 08-27:
       auth-gated endpoint, no secret material; history rewrite risk
