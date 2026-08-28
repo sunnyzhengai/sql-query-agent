@@ -189,3 +189,27 @@ Utilizers Without PCP / (reporting) / (reports)".
   the scripted 2-way — messy real question, honest empties, nudge
   visibly steering, machine DIFFERS, grain in CMO words. Script
   refresh should adopt it.
+
+## U6 scoped flags — substance PASS, display FAIL (FIND RW-7)
+
+"What governance red flags exist for Diabetic Patients?" →
+census(flag) 4 rows, sweep receipt disclosed (103 swept,
+timestamped, flags-disclose-never-gate on glass). Commentary card
+= the U6 oracle verbatim: cousin_conflict "Diabetic Patients",
+CONFLICT, 10 members / 10 distinct logics, disposition open.
+Honest count: 4 (cousin + misnomer + 2 duplicates touching the
+family). Nothing false said.
+**Display FAIL (Sunny: "not clear to an end user"):** the table
+shows raw cluster-node labels (member names slash-joined), no
+flag_class/severity/member-count/disposition columns, empty
+descriptions; commentary carded only 1 of 4 flags.
+**FIND RW-7 (two parts):**
+1. Flag answers render as FLAG CARDS (class, severity, members,
+   distinct logics, disposition, one-line self-description) — the
+   differentiation-queue view, never node labels. Rides the
+   presentation batch with RW-1/RW-5.
+2. The sweep SELF-DESCRIBES clusters at mint time — machine-
+   authored descriptions for derived nodes (the RW-6 principle
+   extended to the derived layer; the sweep knows why it minted
+   each flag and must say it in a sentence). Small build,
+   sweep-side.
