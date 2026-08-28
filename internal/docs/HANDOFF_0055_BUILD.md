@@ -881,3 +881,17 @@ Files/sql-query-agent/org_config.yaml in the Lakehouse (kusto_db:
 "probe-eh" → "semantic_catalog") — REQUIRED before the next 700 run
 (the old DB name no longer exists; 700 would fail loudly).
 CHANGELOG: rides Unreleased (webapp/cli defaults; chain unaffected).
+
+## REVIEW on the rename sweep (2026-08-27 late): sweep ACCEPTED — but the push is NOT suite-green; fix-forward now
+
+Sweep scope verified: zero live probe-eh references (grep clean),
+ruff clean, smoke green — ops-find #3 CLOSED on its merits. However
+the commit ships 3 RED tests (gates-green-at-push law):
+1. tests/shapes/test_seed.py::test_every_palette_table_is_created_
+   and_populated — your in-progress seed work riding the sweep
+   commit; finish it under the load order or gate it properly.
+2. tests/test_suite_map.py — TEST_MAP stale; regenerate
+   (scripts/generate_docs.py).
+3. tests/test_trace_registry.py::test_single_classification — a new
+   module lacks its classification row.
+Fix-forward in your next push; the shape-store load order stands.

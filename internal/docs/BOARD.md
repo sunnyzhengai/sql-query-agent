@@ -97,8 +97,9 @@ payload 3 built, RESULTS v2 filled under the section of record).
       the pull-time hygiene test is the backstop.
 - [x] gov_red_flags Lakehouse table DELETED by Sunny 08-27 — F-2
       fully closed; the flags' only home is the graph.
-- [x] Rename DONE (Sunny 08-27): sql_catalog_eh / semantic_catalog;
-      dev's reference sweep ORDERED (ops-find #3 closes with it).
+- [x] Rename + sweep DONE (08-27): sql_catalog_eh / semantic_catalog
+      live, zero probe refs — ops-find #3 CLOSED. (Sweep push shipped
+      3 red tests from in-flight seed work — fix-forward flagged.)
 
 - [ ] ADR 0058 self-service contracts: ratify + 2 sub-calls
       (parameter-range depth; quarantine release authority)
