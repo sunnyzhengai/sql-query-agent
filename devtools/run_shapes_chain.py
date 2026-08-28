@@ -77,9 +77,15 @@ def _items(t: str) -> dict:
 
 
 def run_notebook(t: str, nb_id: str, name: str) -> None:
-    body = {"executionData": {
+    # the override lives under executionData.CONFIGURATION — at the
+    # top level it is silently ignored and the notebook's pinned
+    # default (the REALISM lakehouse) wins. Field find 2026-08-27:
+    # the first chain ran 4 notebooks against realism; the topology
+    # postcondition refused the polluted graph write. The tripwire
+    # below makes the silent-ignore class impossible to repeat.
+    body = {"executionData": {"configuration": {
         "defaultLakehouse": {"name": SHAPES_LH_NAME, "id": SHAPES_LH,
-                             "workspaceId": WORKSPACE}}}
+                             "workspaceId": WORKSPACE}}}}
     r = requests.post(
         f"{API}/workspaces/{WORKSPACE}/items/{nb_id}/jobs/instances"
         "?jobType=RunNotebook",
@@ -104,31 +110,77 @@ def run_notebook(t: str, nb_id: str, name: str) -> None:
             raise RuntimeError(f"{name}: timeout")
 
 
+def assert_profile_took(step: str) -> None:
+    """TRIPWIRE (field find 2026-08-27): after the first WRITING
+    notebook, the shapes lakehouse must hold the written table — if
+    not, the lakehouse override silently failed and the chain is
+    running against REALISM. Abort before any further write."""
+    import subprocess as sp
+    ol = sp.run(["az", "account", "get-access-token", "--resource",
+                 "https://storage.azure.com", "--query", "accessToken",
+                 "-o", "tsv"], capture_output=True, text=True,
+                check=True).stdout.strip()
+    r = requests.get(
+        f"https://onelake.dfs.fabric.microsoft.com/{WORKSPACE}"
+        f"?resource=filesystem&recursive=false"
+        f"&directory={SHAPES_LH}/Tables",
+        headers={"Authorization": f"Bearer {ol}"}, timeout=60)
+    r.raise_for_status()
+    names = {p["name"].split("/")[-1] for p in r.json().get("paths", [])}
+    if "input_sql_sources" not in names:
+        raise RuntimeError(
+            f"TRIPWIRE after {step}: input_sql_sources absent from "
+            f"the SHAPES lakehouse (saw {sorted(names)[:5]}) — the "
+            "defaultLakehouse override did not take; the run went to "
+            "REALISM. Chain aborted before further writes.")
+    print(f"[ok]      tripwire: {step} wrote into the SHAPES "
+          "lakehouse")
+
+
 def load_tables(t: str) -> None:
     for table, path in TABLE_LOADS:
-        r = requests.post(
-            f"{API}/workspaces/{WORKSPACE}/lakehouses/{SHAPES_LH}"
-            f"/tables/{table}/load",
-            headers={"Authorization": f"Bearer {t}"},
-            json={"relativePath": path, "pathType": "File",
-                  "mode": "Overwrite",
-                  "formatOptions": {"format": "Csv", "header": True,
-                                    "delimiter": ","}},
-            timeout=60)
-        r.raise_for_status()
-        loc = r.headers.get("Location")
-        if loc:
-            start = time.time()
-            while time.time() - start < 600:
-                time.sleep(10)
-                s = requests.get(
-                    loc, headers={"Authorization": f"Bearer {t}"},
-                    timeout=60).json()
-                if s.get("status") in ("Completed", "Failed"):
-                    if s["status"] == "Failed":
-                        raise RuntimeError(
-                            f"loadTable {table}: {s}")
-                    break
+        # capacity rate limits (430 TooManyRequestsForCapacity) are
+        # transient contention — the notebook session ahead of us may
+        # still be releasing cores; wait and retry, never fail the
+        # chain on them (field find, first chain run 2026-08-27)
+        for attempt in range(6):
+            if attempt:
+                time.sleep(90)
+                t = tok()
+            r = requests.post(
+                f"{API}/workspaces/{WORKSPACE}/lakehouses/{SHAPES_LH}"
+                f"/tables/{table}/load",
+                headers={"Authorization": f"Bearer {t}"},
+                json={"relativePath": path, "pathType": "File",
+                      "mode": "Overwrite",
+                      "formatOptions": {"format": "Csv",
+                                        "header": True,
+                                        "delimiter": ","}},
+                timeout=60)
+            r.raise_for_status()
+            loc = r.headers.get("Location")
+            outcome = "Completed"
+            if loc:
+                start = time.time()
+                while time.time() - start < 600:
+                    time.sleep(10)
+                    s = requests.get(
+                        loc,
+                        headers={"Authorization": f"Bearer {t}"},
+                        timeout=60).json()
+                    if s.get("status") in ("Completed", "Failed"):
+                        outcome = s["status"]
+                        break
+            if outcome == "Completed":
+                break
+            if "TooManyRequestsForCapacity" not in str(s):
+                raise RuntimeError(f"loadTable {table}: {s}")
+            print(f"[..]      loadTable {table}: capacity busy, "
+                  f"retry {attempt + 1}/5")
+        else:
+            raise RuntimeError(
+                f"loadTable {table}: capacity still busy after "
+                "5 retries")
         print(f"[ok]      loadTable {table}")
 
 
@@ -163,9 +215,19 @@ def verify() -> None:
 
 
 def main() -> None:
+    import argparse
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--from", dest="from_step", default=None,
+                    help="resume the roster from this step")
+    args = ap.parse_args()
     t = tok()
     ids = _items(t)
-    for step in ROSTER:
+    roster = ROSTER
+    if args.from_step:
+        roster = ROSTER[ROSTER.index(args.from_step):]
+        print(f"resuming from {args.from_step} "
+              f"({len(roster)} steps remain)")
+    for step in roster:
         if step == "__load_tables__":
             load_tables(t)
         elif step == "__shortcut__":
@@ -174,6 +236,8 @@ def main() -> None:
             if step not in ids:
                 raise SystemExit(f"notebook {step!r} not in workspace")
             run_notebook(tok(), ids[step], step)
+            if step == "010_ingest_sql_filedrop":
+                assert_profile_took(step)
     verify()
     print("\nshape-store load COMPLETE — the demo store is live")
 

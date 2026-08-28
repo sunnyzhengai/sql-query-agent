@@ -1044,3 +1044,41 @@ the item again; the pending-change hazard ends structurally.
    binding drift is the recorded tenant nit).
 Sources: learn.microsoft.com Bind-Semantic-Model-Connection;
 blog.crossjoin.co.uk binding-hints (2026-05).
+
+### 2026-08-28 — INCIDENT + RECOVERY: the lakehouse override was silently ignored; the postcondition saved the realism graph
+**What happened:** the job API accepts `defaultLakehouse` only under
+`executionData.configuration`; at the top level (where my runner put
+it) it is SILENTLY IGNORED, so the first chain ran its notebooks
+against the notebooks' pinned default — the REALISM lakehouse.
+**What held:** 300's ADR 0059 topology postcondition REFUSED the
+polluted write (degree-0 'report:DIABETES REGISTRY DASHBOARD' — the
+dashboard TMDL ingested into a corpus with no U7 to link to) — the
+realism graph tables are UNTOUCHED. The assert built for axioms
+caught a cross-profile contamination nobody predicted.
+**What was damaged:** realism `input_metric_names` (curated, 28
+rows) was overwritten by 060's TMDL-derived names. RESTORE staged:
+the curated CSV is at Files/sql-query-agent/
+input_metric_names_restore.csv in the realism lakehouse — loadTable
+API + Livy both unsupported on a schemas-enabled lakehouse, so ONE
+SUNNY UI LINE: realism lakehouse → Files/sql-query-agent →
+input_metric_names_restore.csv → Load to table → EXISTING table
+`input_metric_names` → Overwrite. (Dormant until the next realism
+300 run — no urgency, but do it before that run.)
+Also overwritten, ACCEPTABLE: input_report_sources /
+input_dax_expressions (060-owned, regenerated content — now include
+the dashboard rows; see the recorded design note below),
+ops_parse_results (same corpus, same rows).
+**Mechanisms (same cycle):** (1) runner fixed — override under
+`configuration`; (2) TRIPWIRE at birth: after the first writing
+notebook the runner asserts the table landed in the SHAPES
+lakehouse and aborts otherwise — the silent-ignore class cannot
+recur; (3) chain re-fired FROM THE TOP against the shapes store.
+**Recorded design note (for review, not built):** the realism
+store's consumption layer will now meet the Diabetes dashboard on
+its next 060+300 (workspace-scan source): a report whose EXEC
+target is absent from the corpus mints an unlinked report node =
+degree-0 violation. Q1's own form suggests classifying degree-0
+report/measure nodes as `consumption_unanchored` (the
+admin-telemetry pattern at node grain). Deferred to review with
+this evidence (Echo Law recorded reason: axiom-semantics change
+needs the review pass); MUST land before the next realism 300.
