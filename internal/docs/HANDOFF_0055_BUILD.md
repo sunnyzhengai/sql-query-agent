@@ -1409,3 +1409,25 @@ exact + deterministic containment; tier-2 semantic-candidates slots
 into ground_entities as one more rung and DEPENDS on the RW-6
 description surface, exactly as the amendment records. RW-6 is the
 next build.
+
+### 2026-08-28 — RW-6 BUILT (release 1.58.4): the authored semantic surface
+**Palette v4:** 38 authored metric descriptions (business-logic
+words, never name echoes) + a 43-name CTE vocabulary covering every
+step name in the corpus (TOTALITY: a new test fails on any
+undescribed canonical or named step; __final_select__ is the one
+declared exception; a second test rejects name-restating fakes).
+**Carrier (turn-key, both lakehouse types):** new optional contract
+`input_node_descriptions` (kind/ref/name/description); 300 SEEDS
+the table from Files/sql-query-agent/input_node_descriptions.csv
+when present and applies text only where a node has none —
+enricher (600) text is never overwritten. 300 floors at 1.58.4;
+the registry regex learned patch-level floors (a fossil —
+require_engine always compared numerically).
+**Staged:** the 81-row CSV is in the shapes lakehouse Files
+(read-back witnessed). Wheel 1.58.4 cut + env item swapped.
+**REMAINING (the rename-pattern rerun): Sunny's ONE click — publish
+sql-logic-env (staged 1.58.4) — then push/tick and dev fires
+`--from 300_build_graph` (200 unchanged: descriptions ride the
+build, not the parse), then 400→500→700 (search re-embeds THE NEW
+SURFACE — tier-2 grounding's food) → 800 → verify descriptions
+live.**

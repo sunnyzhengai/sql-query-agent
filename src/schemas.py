@@ -2143,6 +2143,50 @@ TERM_ENDORSEMENTS = {
     ],
 }
 
+NODE_DESCRIPTIONS = {
+    "table_name": "input_node_descriptions",
+    "description": (
+        "Authored business descriptions for graph nodes (RW-6, "
+        "2026-08-28): kind=metric rows key by ref (metric_id) and "
+        "describe the metric's LOGIC in business words; kind=step "
+        "rows key by NAME — a corpus vocabulary where the "
+        "description applies to every step carrying the name. "
+        "Applied by 300_build_graph only where a node has no "
+        "description yet (an enricher's text is never overwritten). "
+        "This text is the semantic surface search scopes and 0060 "
+        "tier-2 grounding embeds — it must describe purpose, never "
+        "restate the name."
+    ),
+    "domain": "input",
+    "status": "active",
+    "owner": {"notebook": "300_build_graph",
+              "module": "src/steps/build_graph.py"},
+    "write_mode": "overwrite",
+    "enrichers": [],
+    "consumers": ["300_build_graph"],
+    "optional_input": True,
+    "remediation": (
+        "upload a kind,ref,name,description CSV (Load to table) — "
+        "the shape palette generates one via description_rows()"
+    ),
+    "columns": [
+        ("kind", "string", False),
+        ("ref", "string", True),
+        ("name", "string", True),
+        ("description", "string", False),
+    ],
+    "column_descriptions": {
+        "kind": "metric | step",
+        "ref": "metric_id for kind=metric; empty for name-keyed steps",
+        "name": "business name (metric) or the step/CTE name (step)",
+        "description": "authored business-logic text — the semantic surface",
+    },
+    "invariants": [
+        {"kind": "allowed_values", "column": "kind",
+         "values": ["metric", "step"]},
+    ],
+}
+
 METRIC_NAMES = {
     "table_name": "input_metric_names",
     "description": (
@@ -2447,6 +2491,7 @@ TABLE_REGISTRY = {
         PHI_FINDINGS, RUNTIME_ERROR_EVENTS,
         # business-friendly names (planned writer; readers live)
         METRIC_NAMES,
+        NODE_DESCRIPTIONS,
         # business terms as weighted plurality (ADR 0031)
         BUSINESS_TERMS, TERM_LINKS, TERM_ENDORSEMENTS,
         # semantic-search resolution catalog (ADR 0030 L3)

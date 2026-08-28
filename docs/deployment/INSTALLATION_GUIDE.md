@@ -459,6 +459,12 @@ you can check the current state with:
 
     SELECT * FROM ops_setup_completeness ORDER BY run_at DESC
 
+1. **Node descriptions** (`input_node_descriptions`) — authored
+   business-logic descriptions for metrics and steps: the semantic
+   surface search scopes. Upload a `kind,ref,name,description` CSV to
+   `Files/sql-query-agent/input_node_descriptions.csv` (300 seeds the
+   table on its next run) or Load to table directly. Descriptions
+   must describe purpose, never restate the name.
 1. **Steward assignments** (`gov_steward_assignments`) — without it,
    metrics carry no ownership. Open `notebooks/utilities/manage_stewards`
    in a Fabric notebook, follow its cells to assign stewards, then re-run

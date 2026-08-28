@@ -1,7 +1,10 @@
 {
   "palette_id": "diabetes",
-  "comment": "ADR 0055 name palette — DIABETIC DIAGNOSIS cohort analytics (RULED by Sunny 2026-08-24; retail vetoed). Fully synthetic. Cell logic is domain-independent; swapping this file re-skins the whole corpus with no code change.",
-  "schemas": ["reporting", "reports"],
+  "comment": "ADR 0055 name palette \u2014 DIABETIC DIAGNOSIS cohort analytics (RULED by Sunny 2026-08-24; retail vetoed). Fully synthetic. Cell logic is domain-independent; swapping this file re-skins the whole corpus with no code change.",
+  "schemas": [
+    "reporting",
+    "reports"
+  ],
   "tables": {
     "PATIENTS": {
       "description": "Master patient index for the synthetic diabetic cohort.",
@@ -230,43 +233,294 @@
     "crlf_seed": "Crlf_Cohort"
   },
   "metrics": {
-    "dx_path":        {"proc": "USP_Diabetic_Patients_DX",  "schema": "reporting", "business_name": "Diabetic Patients (Diagnosis Codes)"},
-    "lab_path":       {"proc": "USP_Diabetic_Patients_Lab", "schema": "reporting", "business_name": "Diabetic Patients (Lab Criteria)"},
-    "registry":       {"proc": "USP_Diabetes_Registry",     "schema": "reporting", "business_name": "Diabetes Registry"},
-    "registry_v1":    {"proc": "USP_Diabetes_Registry_v1",  "schema": "reporting", "business_name": "Diabetes Registry (Legacy v1)"},
-    "controlled":     {"proc": "USP_Controlled_Diabetes",   "schema": "reporting", "business_name": "Controlled Diabetes Rate"},
-    "controlled_m":   {"proc": "USP_Controlled_Diabetes_M", "schema": "reporting", "business_name": "Controlled Diabetes Rate (Monthly)"},
-    "a1c_compliance": {"proc": "USP_A1c_Compliance",        "schema": "reporting", "business_name": "A1c Testing Compliance"},
-    "twin_reporting": {"proc": "USP_Active_Diabetics",      "schema": "reporting", "business_name": "Active Diabetic Patients"},
-    "twin_reports":   {"proc": "USP_Active_Diabetics",      "schema": "reports",   "business_name": "Active Diabetic Patients"},
-    "roster":         {"proc": "USP_Diabetic_Roster",       "schema": "reporting", "business_name": "Diabetic Patient Roster"},
-    "dm_list":        {"proc": "USP_DM_Patient_List",       "schema": "reporting", "business_name": "DM Patient List"},
-    "snapshot_a":     {"proc": "USP_Enrollment_Snapshot",   "schema": "reporting", "business_name": "Enrollment Snapshot"},
-    "snapshot_b":     {"proc": "USP_Enrollment_Snapshot",   "schema": "reports",   "business_name": "Enrollment Snapshot"},
-    "ref_forms":      {"proc": "USP_Ref_Forms_Probe",       "schema": "reporting", "business_name": "Reference Forms Probe"},
-    "pcp_root":       {"proc": "USP_Diabetic_Panel",        "schema": "reporting", "business_name": "Diabetic Patients", "steward": "Dr. Peterson"},
-    "u1_noshow":      {"proc": "USP_Panel_NoShows",         "schema": "reporting", "business_name": "Diabetic Patients (Missed PCP Appointments)", "steward": "Dr. Peterson"},
-    "u2_ed_overlap":  {"proc": "USP_Panel_ED_Visits",       "schema": "reporting", "business_name": "Diabetic Patients (ED Utilization)", "steward": "Dr. Peterson"},
-    "u3_preop":       {"proc": "USP_PreOp_Abnormal_Labs",   "schema": "reporting", "business_name": "Pre-Op Abnormal Diabetes Labs", "steward": "Dr. Sullivan"},
-    "u4_high_ed":     {"proc": "USP_High_ED_NoPCP",         "schema": "reporting", "business_name": "High ED Utilizers Without PCP", "steward": "ED Medical Director"},
-    "u5_incl_gest":   {"proc": "USP_Diabetic_InclGest",     "schema": "reporting", "business_name": "Diabetic Patients (incl. gestational)", "steward": "OBGyn"},
-    "u5_excl_gest":   {"proc": "USP_Diabetic_ExclGest",     "schema": "reporting", "business_name": "Diabetic Patients (excl. gestational)", "steward": "OBGyn"},
-    "u6_billing":     {"proc": "USP_Diabetic_Billing",      "schema": "reporting", "business_name": "Diabetic Patients (Billing)", "steward": "Finance Analyst"},
-    "u7_registry":    {"proc": "USP_DM_Registry_Composite", "schema": "reporting", "business_name": "Diabetes Registry (Composite)", "steward": "Quality & Registry Team"},
-    "u8_med_derived": {"proc": "USP_DM_Registry_MedDerived","schema": "reporting", "business_name": "Diabetes Registry", "steward": "Quality & Registry Team"},
-    "u9_codes_80":    {"proc": "USP_Diabetic_CodesetA",     "schema": "reporting", "business_name": "Diabetic Cohort (Coded)", "steward": "Dr. Peterson"},
-    "u9_codes_81":    {"proc": "USP_Diabetic_CodesetB",     "schema": "reports",   "business_name": "Diabetic Cohort (Coded)", "steward": "Quality & Registry Team"},
-    "u11_missed":     {"proc": "USP_Missed_Appointments",   "schema": "reporting", "business_name": "Missed Appointments", "steward": "Dr. Peterson"},
-    "u11_noshow":     {"proc": "USP_No_Show_Panel",         "schema": "reports",   "business_name": "No-Show Panel", "steward": "ED Medical Director"},
-    "u12_patients":   {"proc": "USP_High_ED_Utilizers",     "schema": "reporting", "business_name": "High ED Utilizers", "steward": "ED Medical Director"},
-    "u12_visits":     {"proc": "USP_High_ED_Utilizers",     "schema": "reports",   "business_name": "High ED Utilizers", "steward": "Finance Analyst"},
-    "chain_linear":   {"proc": "USP_Care_Cascade",          "schema": "reporting", "business_name": "Care Cascade (Linear)"},
-    "chain_diamond":  {"proc": "USP_Outreach_Funnel",       "schema": "reporting", "business_name": "Outreach Funnel (Diamond)"},
-    "chain_self":     {"proc": "USP_Panel_Rollup",          "schema": "reporting", "business_name": "Panel Rollup (Recursive)"},
-    "dynamic_sql":    {"proc": "USP_Adhoc_Extract",         "schema": "reporting", "business_name": "Adhoc Extract (Dynamic)"},
-    "multi_stmt":     {"proc": "USP_Panel_Refresh",         "schema": "reporting", "business_name": "Panel Refresh (Multi-Statement)"},
-    "crlf_a":         {"proc": "USP_Crlf_Probe_A",          "schema": "reporting", "business_name": "Line-Ending Probe A"},
-    "crlf_b":         {"proc": "USP_Crlf_Probe_B",          "schema": "reporting", "business_name": "Line-Ending Probe B"},
-    "phi_probe":      {"proc": "USP_Phi_Probe",             "schema": "reporting", "business_name": "PHI Literal Probe"}
+    "dx_path": {
+      "proc": "USP_Diabetic_Patients_DX",
+      "schema": "reporting",
+      "business_name": "Diabetic Patients (Diagnosis Codes)",
+      "description": "Patients identified as diabetic through coded diagnoses: any E11-family (type 2 diabetes) ICD code on the diagnosis record."
+    },
+    "lab_path": {
+      "proc": "USP_Diabetic_Patients_Lab",
+      "schema": "reporting",
+      "business_name": "Diabetic Patients (Lab Criteria)",
+      "description": "Patients identified as diabetic through laboratory evidence: a hemoglobin A1c result at or above 6.5 percent."
+    },
+    "registry": {
+      "proc": "USP_Diabetes_Registry",
+      "schema": "reporting",
+      "business_name": "Diabetes Registry",
+      "description": "The maintained diabetes registry: patients formally enrolled in the registry table with an enrollment date."
+    },
+    "registry_v1": {
+      "proc": "USP_Diabetes_Registry_v1",
+      "schema": "reporting",
+      "business_name": "Diabetes Registry (Legacy v1)",
+      "description": "The retired first-generation registry pull, kept for comparison: enrollment plus an activity filter the current registry dropped."
+    },
+    "controlled": {
+      "proc": "USP_Controlled_Diabetes",
+      "schema": "reporting",
+      "business_name": "Controlled Diabetes Rate",
+      "description": "Share of diabetic patients whose most recent A1c is under 8.0 \u2014 the in-control portion of the population."
+    },
+    "controlled_m": {
+      "proc": "USP_Controlled_Diabetes_M",
+      "schema": "reporting",
+      "business_name": "Controlled Diabetes Rate (Monthly)",
+      "description": "The controlled-diabetes share computed per calendar month, for trending rather than a point-in-time rate."
+    },
+    "a1c_compliance": {
+      "proc": "USP_A1c_Compliance",
+      "schema": "reporting",
+      "business_name": "A1c Testing Compliance",
+      "description": "Diabetic patients with at least one A1c test in the measurement window \u2014 testing-cadence compliance, not result values."
+    },
+    "twin_reporting": {
+      "proc": "USP_Active_Diabetics",
+      "schema": "reporting",
+      "business_name": "Active Diabetic Patients",
+      "description": "Actively managed diabetic patients: coded diagnosis joined to an active-status flag, the reporting team's cut."
+    },
+    "twin_reports": {
+      "proc": "USP_Active_Diabetics",
+      "schema": "reports",
+      "business_name": "Active Diabetic Patients",
+      "description": "Actively managed diabetic patients as published by the reports schema \u2014 same name as the reporting cut, independently maintained."
+    },
+    "roster": {
+      "proc": "USP_Diabetic_Roster",
+      "schema": "reporting",
+      "business_name": "Diabetic Patient Roster",
+      "description": "A flat roster of diabetic patients for outreach lists: identity fields only, one row per patient."
+    },
+    "dm_list": {
+      "proc": "USP_DM_Patient_List",
+      "schema": "reporting",
+      "business_name": "DM Patient List",
+      "description": "A patient list for diabetes-management workflows; duplicates the roster logic under a different name."
+    },
+    "snapshot_a": {
+      "proc": "USP_Enrollment_Snapshot",
+      "schema": "reporting",
+      "business_name": "Enrollment Snapshot",
+      "description": "Point-in-time count of registry enrollment, produced by the reporting schema."
+    },
+    "snapshot_b": {
+      "proc": "USP_Enrollment_Snapshot",
+      "schema": "reports",
+      "business_name": "Enrollment Snapshot",
+      "description": "Point-in-time count of registry enrollment, produced by the reports schema; whitespace-only variant of the reporting version."
+    },
+    "ref_forms": {
+      "proc": "USP_Ref_Forms_Probe",
+      "schema": "reporting",
+      "business_name": "Reference Forms Probe",
+      "description": "A probe exercising every table-reference form the parser must chase: views, synonyms, temp projections, and qualified joins."
+    },
+    "pcp_root": {
+      "proc": "USP_Diabetic_Panel",
+      "schema": "reporting",
+      "business_name": "Diabetic Patients",
+      "steward": "Dr. Peterson",
+      "description": "Diabetic patients on a primary-care panel: the shared base cohort the panel-scoped variants extend."
+    },
+    "u1_noshow": {
+      "proc": "USP_Panel_NoShows",
+      "schema": "reporting",
+      "business_name": "Diabetic Patients (Missed PCP Appointments)",
+      "steward": "Dr. Peterson",
+      "description": "Panel diabetic patients who missed their primary-care appointments \u2014 the outreach-priority slice of the panel."
+    },
+    "u2_ed_overlap": {
+      "proc": "USP_Panel_ED_Visits",
+      "schema": "reporting",
+      "business_name": "Diabetic Patients (ED Utilization)",
+      "steward": "Dr. Peterson",
+      "description": "Panel diabetic patients who also appear in emergency-department visits \u2014 care happening outside the panel."
+    },
+    "u3_preop": {
+      "proc": "USP_PreOp_Abnormal_Labs",
+      "schema": "reporting",
+      "business_name": "Pre-Op Abnormal Diabetes Labs",
+      "steward": "Dr. Sullivan",
+      "description": "Surgical candidates with abnormal diabetes labs before their operation date \u2014 the pre-op safety check."
+    },
+    "u4_high_ed": {
+      "proc": "USP_High_ED_NoPCP",
+      "schema": "reporting",
+      "business_name": "High ED Utilizers Without PCP",
+      "steward": "ED Medical Director",
+      "description": "Patients with heavy emergency-department use and no assigned primary-care provider \u2014 unmanaged high utilizers."
+    },
+    "u5_incl_gest": {
+      "proc": "USP_Diabetic_InclGest",
+      "schema": "reporting",
+      "business_name": "Diabetic Patients (incl. gestational)",
+      "steward": "OBGyn",
+      "description": "Diabetic patients counting gestational diabetes codes as qualifying \u2014 the inclusive obstetric reading."
+    },
+    "u5_excl_gest": {
+      "proc": "USP_Diabetic_ExclGest",
+      "schema": "reporting",
+      "business_name": "Diabetic Patients (excl. gestational)",
+      "steward": "OBGyn",
+      "description": "Diabetic patients excluding gestational diabetes codes \u2014 the chronic-condition reading of the same population."
+    },
+    "u6_billing": {
+      "proc": "USP_Diabetic_Billing",
+      "schema": "reporting",
+      "business_name": "Diabetic Patients (Billing)",
+      "steward": "Finance Analyst",
+      "description": "Patients billed with diabetes-related procedure codes \u2014 the finance view of the diabetic population, built from claims rather than clinical records."
+    },
+    "u7_registry": {
+      "proc": "USP_DM_Registry_Composite",
+      "schema": "reporting",
+      "business_name": "Diabetes Registry (Composite)",
+      "steward": "Quality & Registry Team",
+      "description": "The composite registry definition: a patient qualifies by meeting at least two of the three paths \u2014 coded diagnosis, A1c at or above 6.5, or diabetes medication orders."
+    },
+    "u8_med_derived": {
+      "proc": "USP_DM_Registry_MedDerived",
+      "schema": "reporting",
+      "business_name": "Diabetes Registry",
+      "steward": "Quality & Registry Team",
+      "description": "A registry cut derived from medication orders alone: metformin or insulin glargine implies membership."
+    },
+    "u9_codes_80": {
+      "proc": "USP_Diabetic_CodesetA",
+      "schema": "reporting",
+      "business_name": "Diabetic Cohort (Coded)",
+      "steward": "Dr. Peterson",
+      "description": "The diabetic cohort selected by an explicit ICD code list (80 codes) maintained inline by the authoring team."
+    },
+    "u9_codes_81": {
+      "proc": "USP_Diabetic_CodesetB",
+      "schema": "reports",
+      "business_name": "Diabetic Cohort (Coded)",
+      "steward": "Quality & Registry Team",
+      "description": "The diabetic cohort selected by an explicit ICD code list (81 codes) \u2014 one code newer than the sibling list."
+    },
+    "u11_missed": {
+      "proc": "USP_Missed_Appointments",
+      "schema": "reporting",
+      "business_name": "Missed Appointments",
+      "steward": "Dr. Peterson",
+      "description": "Appointments with a no-show status, counted at the appointment grain for schedule management."
+    },
+    "u11_noshow": {
+      "proc": "USP_No_Show_Panel",
+      "schema": "reports",
+      "business_name": "No-Show Panel",
+      "steward": "ED Medical Director",
+      "description": "Patients who missed appointments, one row per patient \u2014 the panel view of the same no-show activity."
+    },
+    "u12_patients": {
+      "proc": "USP_High_ED_Utilizers",
+      "schema": "reporting",
+      "business_name": "High ED Utilizers",
+      "steward": "ED Medical Director",
+      "description": "High emergency-department utilizers counted as DISTINCT patients \u2014 how many people exceed the visit threshold."
+    },
+    "u12_visits": {
+      "proc": "USP_High_ED_Utilizers",
+      "schema": "reports",
+      "business_name": "High ED Utilizers",
+      "steward": "Finance Analyst",
+      "description": "High emergency-department utilization counted at the visit level \u2014 how many qualifying visits occur, same name as the patient-grain cut."
+    },
+    "chain_linear": {
+      "proc": "USP_Care_Cascade",
+      "schema": "reporting",
+      "business_name": "Care Cascade (Linear)",
+      "description": "A linear care cascade: each stage filters the previous one from identification through outreach to follow-up."
+    },
+    "chain_diamond": {
+      "proc": "USP_Outreach_Funnel",
+      "schema": "reporting",
+      "business_name": "Outreach Funnel (Diamond)",
+      "description": "An outreach funnel whose branches split from one base and re-join \u2014 the diamond dependency shape."
+    },
+    "chain_self": {
+      "proc": "USP_Panel_Rollup",
+      "schema": "reporting",
+      "business_name": "Panel Rollup (Recursive)",
+      "description": "A panel rollup built stepwise over its own prior stage \u2014 the self-referencing chain shape."
+    },
+    "dynamic_sql": {
+      "proc": "USP_Adhoc_Extract",
+      "schema": "reporting",
+      "business_name": "Adhoc Extract (Dynamic)",
+      "description": "An ad-hoc extract assembled as dynamic SQL at run time; its query text is not statically parseable and is declared as such."
+    },
+    "multi_stmt": {
+      "proc": "USP_Panel_Refresh",
+      "schema": "reporting",
+      "business_name": "Panel Refresh (Multi-Statement)",
+      "description": "A refresh procedure of several sequential statements; the final select defines its output."
+    },
+    "crlf_a": {
+      "proc": "USP_Crlf_Probe_A",
+      "schema": "reporting",
+      "business_name": "Line-Ending Probe A",
+      "description": "A line-ending normalization control: identical logic to its sibling except carriage returns."
+    },
+    "crlf_b": {
+      "proc": "USP_Crlf_Probe_B",
+      "schema": "reporting",
+      "business_name": "Line-Ending Probe B",
+      "description": "A line-ending normalization control: identical logic to its sibling except line feeds."
+    },
+    "phi_probe": {
+      "proc": "USP_Phi_Probe",
+      "schema": "reporting",
+      "business_name": "PHI Literal Probe",
+      "description": "A deliberately planted patient-name literal, existing so the PHI scan proves it fires."
+    }
+  },
+  "cte_descriptions": {
+    "A1c_High": "Patients whose A1c results exceed the control threshold.",
+    "A1c_Tested": "Patients with at least one A1c test in the window.",
+    "Abnormal_Labs": "Lab results outside the acceptable pre-operative range.",
+    "Active_Now": "Patients carrying an active status flag today.",
+    "Alias_Form": "Reference probe: the aliased table-reference form.",
+    "Ambig_Form": "Reference probe: a deliberately ambiguous bare reference.",
+    "Arm_Dx": "The diagnosis-code arm of the comparison pair.",
+    "Arm_Lab": "The lab-criteria arm of the comparison pair.",
+    "Base_Cohort": "The starting patient pool this procedure filters from.",
+    "Cascade_A": "Care cascade stage one: identification.",
+    "Cascade_B": "Care cascade stage two: outreach on the identified.",
+    "Cascade_C": "Care cascade stage three: follow-up on the reached.",
+    "Coded_Cohort": "Patients selected by the explicit ICD code list.",
+    "Composite": "Patients meeting at least two of the qualifying paths.",
+    "Crlf_Cohort": "Line-ending control cohort \u2014 logic identical to its twin.",
+    "Ctrl_Pop": "The controlled sub-population: most recent A1c under 8.0.",
+    "Direct_Form": "Reference probe: the directly named table form.",
+    "Dx_Path": "Patients qualifying through coded E11-family diagnoses.",
+    "ED_Symptom_Visits": "Emergency-department visits in scope for overlap.",
+    "Enc_Recent": "Encounters within the recent activity window.",
+    "Enrolled": "Patients enrolled in the registry table.",
+    "Funnel_Join": "The rejoin of the funnel's split branches.",
+    "High_Util": "Patients or visits above the utilization threshold.",
+    "Lab_Draws": "Lab draws relevant to the measurement window.",
+    "Lab_Path": "Patients qualifying through A1c results at or above 6.5.",
+    "Med_Orders_Cur": "Current diabetes medication orders.",
+    "Med_Path": "Patients qualifying through diabetes medication orders.",
+    "Missed_Appts": "Appointments with a no-show status.",
+    "No_PCP": "Patients with no assigned primary-care provider.",
+    "Panel_All": "The full primary-care panel membership.",
+    "Reach_Base": "The outreach funnel's shared base population.",
+    "Reg_Core": "The current registry membership core.",
+    "Reg_Core_v1": "The legacy registry membership core with its activity filter.",
+    "Rx_Current": "Prescriptions active in the current window.",
+    "Sched_Misses": "Scheduled appointments that were missed.",
+    "TempChase_Form": "Reference probe: projection through a temp table.",
+    "Unique_Form": "Reference probe: the uniquely named reference form.",
+    "Utilizers": "The population exceeding the visit-count threshold.",
+    "Dx_Events": "Diagnosis events feeding the refresh or probe.",
+    "Refresh_Pop": "The population assembled by the refresh statement.",
+    "Rollup_R": "The recursive rollup stage over its prior pass.",
+    "Phi_Filter": "The probe filter deliberately carrying a patient-name literal.",
+    "A1c_Pool": "The pooled A1c results the reference probe draws from."
   }
 }

@@ -171,6 +171,7 @@ def build_graph_step(
     report_source_records: "Iterable[dict]" = (),
     dax_records: "Iterable[dict]" = (),
     disposition_events: "Iterable[dict]" = (),
+    description_records: "Iterable[dict]" = (),
     *,
     sweep_run_at: str = "",
     # ADR 0059 Q1/Q2 postconditions. True for every REAL corpus (the
@@ -252,6 +253,32 @@ def build_graph_step(
     stewards_applied = steward_manager.apply_to_graph(builder)
 
     names_applied, names_skipped = apply_business_names(builder, metric_name_records)
+
+    # RW-6 (ordered 2026-08-28): authored descriptions — the semantic
+    # surface search and 0060 tier-2 grounding read. kind=metric rows
+    # key by ref (metric_id); kind=step rows key by NAME (a corpus
+    # vocabulary: the description applies to every step carrying the
+    # name). Applied only where the node has NO description yet — an
+    # enricher's text (600) is never overwritten by the palette.
+    desc_by_metric = {}
+    desc_by_step_name = {}
+    for dr in description_records:
+        if str(dr.get("kind")) == "metric" and dr.get("ref"):
+            desc_by_metric[str(dr["ref"])] = str(
+                dr.get("description") or "")
+        elif str(dr.get("kind")) == "step" and dr.get("name"):
+            desc_by_step_name[fold_identifier(str(dr["name"]))] = str(
+                dr.get("description") or "")
+    if desc_by_metric or desc_by_step_name:
+        for node in builder.nodes.values():
+            if node.description:
+                continue
+            if node.node_id.startswith("canonical:"):
+                node.description = desc_by_metric.get(
+                    node.node_id.removeprefix("canonical:"), "")
+            elif node.node_id.startswith("transform:"):
+                node.description = desc_by_step_name.get(
+                    fold_identifier(node.name), "")
 
     reports_added, measures_added, consumption_skipped = wire_consumption_layer(
         builder, list(report_source_records), list(dax_records)

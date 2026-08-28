@@ -49,7 +49,7 @@ print(f"v{src.__version__}")
 
 # Version binding (ADR 0042): notebook/wheel skew dies here, loudly.
 # the folded governance sweep (ADR 0057) needs the 1.58 wheel
-REQUIRES_ENGINE = "1.58"
+REQUIRES_ENGINE = "1.58.4"
 from src.engine_floor import require_engine
 
 require_engine(src.__version__, REQUIRES_ENGINE, "300_build_graph")
@@ -132,6 +132,29 @@ if spark.catalog.tableExists("input_dax_expressions"):
 else:
     print("No input_dax_expressions table — run 060_ingest_semantic_models for DAX measures")
 
+# Authored node descriptions (RW-6, 2026-08-28): the semantic
+# surface search scopes and 0060 tier-2 grounding embeds. The Files
+# CSV is the carrier (works on schema and plain lakehouses alike);
+# absence is legitimate — enrichers (600) can author instead.
+import os as _os
+_DESC_CSV = ("/lakehouse/default/Files/sql-query-agent/"
+             "input_node_descriptions.csv")
+description_records = []
+if (not spark.catalog.tableExists("input_node_descriptions")
+        and _os.path.exists(_DESC_CSV)):
+    _ddf = spark.read.option("header", "true").csv("file://" + _DESC_CSV)
+    _ddf.write.format("delta").mode("overwrite") \
+        .option("overwriteSchema", "true") \
+        .saveAsTable("input_node_descriptions")
+    print(f"input_node_descriptions seeded from CSV: {_ddf.count()} rows")
+if spark.catalog.tableExists("input_node_descriptions"):
+    description_records = [
+        r.asDict()
+        for r in spark.table("input_node_descriptions").collect()]
+else:
+    print("No input_node_descriptions — descriptions rely on "
+          "enrichers (600)")
+
 # Steward disposition events (ADR 0054/0057): absence is legitimate
 # (no ruling yet); a FAILED read must raise, never silently drop acts.
 disposition_events = []
@@ -154,6 +177,7 @@ out = build_graph_step(
     description_col=config.dictionary.description_col,
     table_description_col=config.dictionary.table_description_col,
     disposition_events=disposition_events,
+    description_records=description_records,
     sweep_run_at=datetime.now(timezone.utc).isoformat(),
 )
 print(f"Built graph: {out.node_count} nodes, {out.edge_count} edges")

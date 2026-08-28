@@ -10,6 +10,25 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.58.4] - 2026-08-28
+
+### Added — RW-6: the authored semantic surface
+- `input_node_descriptions` (new optional input contract): authored
+  business-logic descriptions — kind=metric rows by metric_id,
+  kind=step rows by NAME (a corpus vocabulary). 300 seeds the table
+  from a Files CSV when present and applies descriptions only where
+  a node has none (enricher text never overwritten). This is the
+  surface search scopes and ADR 0060 tier-2 grounding embeds.
+- Shape palette v4: 38 authored metric descriptions + a 43-name CTE
+  vocabulary; corpus totality asserted (every canonical + named
+  step in the built graph carries text; descriptions must never
+  restate the name).
+- ADR 0060 prototype (parse_plan) + gating experiment harness
+  (PARSE_EXPERIMENT.md: PROPOSED 7/7 oracles vs CURRENT 6/7 on the
+  shapes store). Engine unchanged — the build stays gated.
+
+---
+
 ## [1.58.3] - 2026-08-28
 
 ### Changed — G1 extension (review ruling 2026-08-27, chain-incident evidence)

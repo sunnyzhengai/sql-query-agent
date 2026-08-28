@@ -58,7 +58,11 @@ def test_registry_fields_valid():
     for nb, entry in NOTEBOOK_REGISTRY.items():
         assert entry["family"] in FAMILIES, nb
         assert entry["purpose"], nb
-        assert re.fullmatch(r"\d+\.\d+", entry["requires_engine"]), nb
+        # patch-level floors are legal — require_engine compares
+        # major.minor(.patch) numerically (RW-6: 300 floors at
+        # 1.58.4 for the description_records param)
+        assert re.fullmatch(r"\d+\.\d+(\.\d+)?",
+                            entry["requires_engine"]), nb
 
 
 def test_every_notebook_serves_a_question_family():

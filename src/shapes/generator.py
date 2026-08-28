@@ -52,6 +52,25 @@ def metric_name_rows(palette: dict) -> "list[dict]":
     return sorted(rows, key=lambda r: r["metric_id"])
 
 
+def description_rows(palette: dict) -> "list[dict]":
+    """RW-6 (ordered 2026-08-28): the authored semantic surface —
+    business-logic descriptions for every metric (keyed by
+    metric_id) and every CTE name in the corpus vocabulary (keyed
+    by name; a step description applies to every step carrying the
+    name — the vocabulary IS name-scoped meaning). Tier-2 grounding
+    (0060 §2a) embeds exactly this text."""
+    rows = []
+    for m in palette["metrics"].values():
+        rows.append({"kind": "metric",
+                     "ref": f"{m['schema']}.{m['proc']}",
+                     "name": m["business_name"],
+                     "description": m["description"]})
+    for cte, desc in sorted(palette["cte_descriptions"].items()):
+        rows.append({"kind": "step", "ref": "", "name": cte,
+                     "description": desc})
+    return rows
+
+
 def steward_rows(palette: dict) -> "list[dict]":
     """Personas as METADATA only (scenarios ruling): steward columns,
     no auth — Dr. Peterson, Dr. Sullivan, the ED medical director,

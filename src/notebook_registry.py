@@ -125,8 +125,9 @@ NOTEBOOK_REGISTRY: "dict[str, dict]" = {
         "entry_points": ["build_graph_step"],
         "wrappers": [],
         "gates": ["precondition_gate", "postcondition_gate"],
-        # the folded governance sweep (ADR 0057) needs the 1.58 wheel
-        "requires_engine": "1.58",
+        # RW-6 authored descriptions need the description_records
+        # param (1.58.4); the folded sweep needed 1.58
+        "requires_engine": "1.58.4",
     },
     "400_build_metric_logic": {
         "family": "derivation",

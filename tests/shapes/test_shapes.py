@@ -248,3 +248,33 @@ def test_dashboard_tmdl_carries_no_tenant_endpoint():
         text = tmdl.read_text()
         assert ".database.windows.net" not in text
         assert ".fabric.microsoft.com" not in text
+
+
+# --- RW-6: the authored semantic surface (descriptions) --------------
+
+
+def test_every_metric_and_step_carries_a_description(corpus_run):
+    # totality (RW-6, the 0052 pattern): every canonical node and
+    # every named step in the built graph carries authored text —
+    # empty description = a dead search surface. __final_select__
+    # terminals are the one declared exception (synthetic, unnamed
+    # in the vocabulary by design).
+    missing = []
+    for n in corpus_run.build.nodes_rows:
+        nid = n["node_id"]
+        if nid.startswith("canonical:") and not n.get("description"):
+            missing.append(nid)
+        if (nid.startswith("transform:")
+                and not nid.endswith("__final_select__")
+                and not n.get("description")):
+            missing.append(nid)
+    assert not missing, f"undescribed nodes: {missing[:8]}"
+
+
+def test_descriptions_describe_logic_never_restate_names(corpus_run):
+    # the order's bar: descriptions are the tier-2 semantic surface,
+    # not name echoes — a description equal to the name is a fake
+    for n in corpus_run.build.nodes_rows:
+        if n["node_id"].startswith("canonical:") and n.get("description"):
+            assert n["description"].strip().lower() != \
+                str(n["name"]).strip().lower(), n["node_id"]

@@ -18,6 +18,7 @@ from src.graph.serialization import parsed_sql_to_parse_result_row
 from src.parser.identity import fold_identifier
 from src.parser.sql_parser import parse_sql
 from src.shapes.generator import (
+    description_rows,
     dict_rows,
     generate,
     metric_name_rows,
@@ -97,6 +98,7 @@ def run_corpus(palette: dict) -> CorpusRun:
                              metric_name_records=metric_name_rows(palette),
                              report_source_records=sm.report_source_rows,
                              dax_records=sm.dax_rows,
+                             description_records=description_rows(palette),
                              sweep_run_at="shape-corpus")
     return CorpusRun(parse_rows=parse_rows, build=build,
                      files=files, manifest=manifest,

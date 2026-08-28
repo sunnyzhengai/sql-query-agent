@@ -55,6 +55,7 @@ flowchart LR
   input_dict_columns[("input_dict_columns")]:::table
   input_dict_tables[("input_dict_tables")]:::table
   input_metric_names[("input_metric_names")]:::table
+  input_node_descriptions[("input_node_descriptions")]:::table
   input_report_sources[("input_report_sources")]:::table
   input_sql_sources[("input_sql_sources")]:::table
   ops_admin_graph_edges[("ops_admin_graph_edges")]:::table
@@ -102,6 +103,7 @@ flowchart LR
   300_build_graph --> graph_decision_sites
   300_build_graph --> graph_edges
   300_build_graph --> graph_nodes
+  300_build_graph --> input_node_descriptions
   300_build_graph --> ops_setup_completeness
   300_build_graph -->|enrich| ops_fallout
   400_build_metric_logic --> output_metric_logic
@@ -171,6 +173,7 @@ flowchart LR
   input_dict_tables --> export_test_fixtures
   input_metric_names --> 300_build_graph
   input_metric_names --> collibra_lineage_match
+  input_node_descriptions --> 300_build_graph
   input_report_sources --> 300_build_graph
   input_report_sources --> 500_validate
   input_sql_sources --> 020_ingest_sql_folders
