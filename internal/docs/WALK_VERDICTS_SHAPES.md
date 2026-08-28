@@ -27,3 +27,24 @@ nothing).
   artifact + a TEST ORACLE (it verifies the sweep supply that
   closeness-surfacing consumes), not an end-user chat path. Tests
   stay; chat prominence goes.
+
+## Sunny's own question — "what does Active Diabetic Patients use to define the patient cohort"
+
+**VERDICT: PASS on substance** — correct, evidence-quoted answer
+(DIAGNOSIS_CODES; verdict quotes WHERE DC.ICD_CODE LIKE 'E11%');
+register fix visible (SQL folded); governance stamps rode the
+retrieve (cousin/duplicate/misnomer disclosed inline). Two finds:
+
+- **FIND RW-2 (palette verbiage, data-file fix):** the U9 pair's
+  name "Diabetic Cohort (Codeset)" confuses cohort-vs-codeset for
+  end users (Sunny's read). Rename the planted pair naturally
+  (e.g., "Diabetic Patients (Coded)"); demo question re-words
+  accordingly. Palette v3 tweak — cells/oracles stable.
+- **FIND RW-3 (display economy, pre-capture batch):** after R3
+  held the answer (top decision site ON the record), the model ran
+  column-wide lineage (16 rows, 8 unrelated metrics displayed) as
+  verification — rounds-beyond-sufficient (W1 class) + auxiliary
+  tables dominating a focused answer. M4-safe remedy: DISPLAY-side
+  fold of auxiliary rounds' tables when the verdict's primary
+  basis is elsewhere ("the map on demand"). Demo impact: detour
+  tables dilute beats.
