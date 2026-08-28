@@ -945,3 +945,30 @@ create-then-verify shortcut (the mechanism from the ghost lesson —
 applied at birth); zones-law catch on .KQLDatabase accepted. The
 protocol note "tick the board / push wakes dev" is now the standing
 fire signal for chains needing human preconditions.
+
+## FIELD FIND (Sunny's seed run, 2026-08-27 night): SOURCE-DB COLLISION — seed 01 errored, chain HELD
+
+Seed 01 in aivia_demo_src failed compile: INSERT INTO dbo.PATIENTS
+hit the SEPSIS corpus's existing PATIENTS schema (Msg 207 ×4,
+ACTIVE_FLAG / PRIMARY_LANGUAGE). **The real find: the isolation law
+missed the SOURCE leg** — shapes got their own lakehouse + KQL DB
+but the seed targets the SHARED source DB, where table names
+collide with the realism corpus; a full run would DROP sepsis
+tables (procs + ED dashboard breakage).
+
+**ORDER:**
+1. Re-target the shape seed to an ISOLATED source: new Fabric SQL
+   database **aivia_shapes_src** (create via API if permitted, else
+   one Sunny click); seed scripts unchanged otherwise.
+2. _shapes profile: point 030/ingest + anything source-bound at the
+   new DB; the Diabetes Registry Dashboard's parameters will need
+   the NEW server/db values (runbook line for Sunny; fetch via the
+   sqlDatabases API as before).
+3. Guard at birth (Echo Law): the seed gains a preflight assertion
+   — target DB must be empty OR contain only palette tables
+   (fail loud on foreign tables); isolation-law text in SPHERE
+   gains the source leg.
+4. Damage check on aivia_demo_src pending Sunny's sys.columns
+   diagnostic — if PATIENTS was replaced, restore from the sepsis
+   seed section before anything else touches the realism store.
+Chain stays HELD until re-targeted seed passes with cohort 105.

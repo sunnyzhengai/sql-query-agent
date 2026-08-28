@@ -62,10 +62,10 @@ payload 3 built, RESULTS v2 filled under the section of record).
       semantic_search installed + seed committed w/ oracle 105 +
       chain runner armed; full record in HANDOFF_0055_BUILD).
       **(1) ✓ sql-logic-env PUBLISHED at 1.58.2 (Sunny, 08-27
-      night). (2) REMAINING: paste-run the two seed files in
-      aivia_demo_src (01_schema_and_data.sql, then 02_procs.sql;
-      expect cohort 105). Then any push/tick wakes dev → chain
-      fires automatically.**
+      night). (2) seed run HELD — 01 errored on SOURCE-DB COLLISION with the
+      sepsis corpus (field find; dev re-targets seed to a new
+      isolated aivia_shapes_src; dashboard params will need new
+      values; Sunny's sys.columns damage check pending).**
 - [ ] Re-walk on the diabetic corpus (incl. section B vs B3,
       section I flags; suite transcript may cover part)
 - [ ] Script refresh (review session — workbench-only, candidate
