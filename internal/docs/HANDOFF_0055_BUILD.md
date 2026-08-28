@@ -1169,3 +1169,21 @@ push/tick — dev resumes `--from 700_refresh_search_index` (700 →
 the U7 dashboard link).
 Reminder while you're clicking: the **1.58.3 env publish** you held
 can go with this (both clicks, one visit).
+
+### 2026-08-28 — CHAIN TAIL GREEN (700 + 800); THREE shortcuts close the store
+700 (catalog rebuild + Eventhouse copy through Sunny's mounted
+shortcut + full re-embed) and 800 both Completed — the shapes STORE
+IS BUILT END TO END. The verification's first query then surfaced
+the last gap honestly: the shapes KQL DB needs the ENGINE-surface
+shortcuts (the realism DB got its set at original setup). The
+engine queries exactly FOUR tables: semantic_catalog (native ✓),
+graph_nodes, graph_edges, output_metric_logic. API shortcut
+creation confirmed DEAD in this tenant (3/3 ghosts; create-then-
+verify caught and cleaned every one — zero residue).
+**RUNBOOK — Sunny, three clicks in the SAME dialog:** KQL database
+`semantic_catalog_shapes` → New → OneLake shortcut → lakehouse
+`sql_query_lh_shapes` → select `graph_nodes`, `graph_edges`,
+`output_metric_logic` (the picker allows multi-select). Then
+push/tick — dev runs the four-way verification (flat columns,
+cluster count, semantic_search, the U7 dashboard link) and the
+load closes.
