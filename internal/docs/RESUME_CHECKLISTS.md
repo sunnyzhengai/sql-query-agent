@@ -107,7 +107,7 @@ Order matters: 1–4 change tables/instructions, 5 validates, 6 records.
            KQL under user impersonation; correct row returned. Eventhouse
            is the semantic-retrieval engine. Productization notes in ADR
            0030 (stored KQL function; per-user role prereq). Cleanup:
-           [ ] delete EH Probe + L3_Probe throwaway agents; KEEP probe-eh
+           [ ] delete EH Probe + L3_Probe throwaway agents; KEEP semantic_catalog
            (seed of the real build); delete probe SQL DB after 5c.
            Original steps for reference:
            **`devtools/eventhouse_probe.kql`**; follow top to bottom.
@@ -133,7 +133,7 @@ Order matters: 1–4 change tables/instructions, 5 validates, 6 records.
            refuses the function ("not supported", Msg 15871 — modern
            parser, disabled by policy). Three-wall taxonomy recorded in
            ADR 0030. Cleanup now clear: delete probe SQL DB + its
-           endpoint twin + both throwaway agents; keep probe-eh.
+           endpoint twin + both throwaway agents; keep semantic_catalog.
        Original SQL-probe steps kept below for reference:
        1. In the workspace: **+ New item → SQL database** (a third kind
           of item — not the lakehouse, not a warehouse). Any name; it's
@@ -191,7 +191,7 @@ Order matters: 1–4 change tables/instructions, 5 validates, 6 records.
           ALWAYS with explicit column order (Spark alphabetizes dict
           rows; positional copies downstream then shift columns):
           `df = spark.createDataFrame(out.rows).select("node_id","kind","ref","name","business_name","search_text","display_text")`
-       2. In probe-eh (rename to aivia-eh if you like): run the setup
+       2. In semantic_catalog (rename to aivia-eh if you like): run the setup
           script — table, embed (only new rows pay), semantic_search()
           function, verification queries incl. the refusal-floor probe.
        3. Wire as a SECOND source on the Graph agent (script section 5:
@@ -222,7 +222,7 @@ one live conversation. Plain steps:
 1. Resume capacity.
 2. **Create the two shortcuts** (full click path — same as the one you
    made for output_semantic_catalog yesterday):
-   1. In the workspace item list, open **probe-eh** — the item typed
+   1. In the workspace item list, open **semantic_catalog** — the item typed
       **KQL Database** (the child), not the Eventhouse parent.
    2. In the database view, find **New → OneLake shortcut** (either a
       "+ New" button in the toolbar, or right-click the **Shortcuts**
@@ -310,7 +310,7 @@ REMATCH_WRITEUP.md (thesis pre-written) and decide the publishing venue.
 ## Fabric gotcha log — 2026-08-12 session
 
 **KQL shortcut schemas FREEZE at creation.** The lakehouse table gained
-business_name/report columns Aug 8 (Delta v11), but probe-eh's shortcut
+business_name/report columns Aug 8 (Delta v11), but semantic_catalog's shortcut
 kept serving the 9-column schema it inferred at creation — recreating
 the SHORTCUT did not help (the external-table definition persisted),
 and after dropping the external table, lazy re-materialization never
@@ -397,7 +397,7 @@ Steps for Sunny:
    Cell 1 (draft.Notebook is deleted — it lacked the explicit column order fix
    and would resurrect the 2026-08-09 column-shift bug). Must run AFTER 07 so
    the new concrete descriptions land in search_text.
-4. In the Eventhouse (aivia-eh/probe-eh): `.drop table semantic_catalog`
+4. In the Eventhouse (aivia-eh/semantic_catalog): `.drop table semantic_catalog`
    then rerun eventhouse_setup.kql sections 1-2 (recreate + full
    re-embed — search_text changed on every row, and the embed step
    only pays for rows with an empty vector, so a drop is required.

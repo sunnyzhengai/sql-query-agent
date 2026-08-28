@@ -8,7 +8,7 @@
 // selection). Queries (section 4 checks) run as single statements.
 //
 // PREREQS (once per environment — same as the probe):
-//   a. Eventhouse item exists (reuse probe-eh or create "aivia-eh")
+//   a. Eventhouse item exists (reuse semantic_catalog or create "aivia-eh")
 //   b. Every ASKING user holds "Cognitive Services OpenAI User" on the
 //      customer's Azure OpenAI resource (group assignment recommended)
 //   c. Callout policy allows the endpoint:

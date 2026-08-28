@@ -39,7 +39,7 @@ from src.orchestrator.core import produce_search_token, resolve  # noqa: E402
 from src.orchestrator.kusto import KustoClient, az_cli_token_provider  # noqa: E402
 
 QUERY_URI = "https://trd-uzdu1yhqrmqtutkej8.z7.kusto.fabric.microsoft.com"
-DATABASE = "probe-eh"
+DATABASE = "semantic_catalog"
 PARAPHRASES_PER_QUESTION = 5
 TOP_K_FOR_HIT = 5
 

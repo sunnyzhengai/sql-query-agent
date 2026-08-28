@@ -19,7 +19,7 @@
 //   true match ~0.51 similarity, non-matches ~0.37. Threshold ~0.45.
 
 // ===== 0. Portal prereqs (before any KQL) ============================
-// a. Workspace -> + New item -> Eventhouse (name: "probe-eh"). A KQL
+// a. Workspace -> + New item -> Eventhouse (name: "semantic_catalog"). A KQL
 //    database is created inside it automatically.
 // b. Azure portal -> the aivia resource -> Access control (IAM) ->
 //    Add role assignment -> role "Cognitive Services OpenAI User" ->

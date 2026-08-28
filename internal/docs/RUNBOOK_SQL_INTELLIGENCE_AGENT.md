@@ -23,14 +23,14 @@ Agent — they exist nowhere else.**
 
 ## 2. Rename the Eventhouse (10 min)
 
-1. Workspace → `probe-eh.Eventhouse` → rename to
+1. Workspace → `semantic_catalog.Eventhouse` → rename to
    `aivia_semantic_catalog`.
 2. On dev, update every reference, then verify:
-   - `git grep -ln "probe-eh"` — expect: src/webapp/main.py,
+   - `git grep -ln "semantic_catalog"` — expect: src/webapp/main.py,
      src/orchestrator/cli.py, devtools/answer_evals.py,
      devtools/eventhouse_setup.kql, devtools/eventhouse_probe.kql,
      devtools/robustness_suite.py (re-grep; the list may have grown)
-   - In each, replace the database name `probe-eh` with the KQL
+   - In each, replace the database name `semantic_catalog` with the KQL
      DATABASE name as shown on the renamed item (check the item —
      the DB may keep its own name; update to what the portal shows).
    - Update `org_config.yaml` → `search.kusto_db` (and `kusto_uri` if

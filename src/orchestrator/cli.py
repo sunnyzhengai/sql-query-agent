@@ -79,7 +79,7 @@ def main() -> None:
 
     _load_dotenv()
     query_uri = "https://trd-uzdu1yhqrmqtutkej8.z7.kusto.fabric.microsoft.com"
-    client = KustoClient(query_uri, "probe-eh", az_cli_token_provider(query_uri))
+    client = KustoClient(query_uri, "semantic_catalog", az_cli_token_provider(query_uri))
     sink = JsonlEventSink(Path("data") / "events" / "turn_events.jsonl")
     chat_loop(azure_chat_api(), client.run, sink)
 

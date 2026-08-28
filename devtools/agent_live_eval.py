@@ -31,7 +31,7 @@ from src.orchestrator.kusto import (  # noqa: E402
 from src.orchestrator.tools import Session  # noqa: E402
 
 QUERY_URI = "https://trd-uzdu1yhqrmqtutkej8.z7.kusto.fabric.microsoft.com"
-DATABASE = "probe-eh"
+DATABASE = "semantic_catalog"
 
 # Each conversation: (id, expectation note, [turn, turn, ...])
 CONVERSATIONS = [

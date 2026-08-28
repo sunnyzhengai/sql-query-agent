@@ -56,7 +56,7 @@ from src.orchestrator.turn_engine import EngineSession  # noqa: E402
 from src.orchestrator.turn_engine import run_turn as engine_run_turn  # noqa: E402
 
 QUERY_URI = "https://trd-uzdu1yhqrmqtutkej8.z7.kusto.fabric.microsoft.com"
-DATABASE = "probe-eh"
+DATABASE = "semantic_catalog"
 PARAPHRASES_PER_QUESTION = 5
 ANSWER_RATE_THRESHOLD = 0.8
 

@@ -844,3 +844,40 @@ guide, walk docs). The cluster QUERY_URI host should be unchanged by
 an Eventhouse rename — verify rather than assume (live smoke leg
 against semantic_catalog; capacity is active now). Ops-find #3
 closes with this sweep: no screen or file says "probe" again.
+
+## SHAPE-STORE TENANT LOAD — EXECUTION (dev, 2026-08-27 night; design refined at execution, rationale on record)
+
+**Design refinement (recorded before building):** the 08-25 design
+said "_shapes-suffixed lakehouse tables via an org_config variant."
+At execution the suffix variant fails reality: most chain notebooks
+write LITERAL table names (saveAsTable("output_metric_logic") and
+~30 siblings) — suffixing means invasive edits across ~10 notebooks
+days before capture. The design's INTENT (absolute isolation,
+switchable chain, profile check) is delivered instead by a
+**SEPARATE LAKEHOUSE** (`sql_query_lh_shapes`): same table names,
+different store — isolation by construction (zero collision is
+structural, not conventional); ZERO notebook changes
+(/lakehouse/default/ resolves to the run's attached lakehouse; the
+job API's executionData sets defaultLakehouse per run); each
+lakehouse carries its own Files/sql-query-agent/org_config.yaml at
+the same relative path, so the profile IS the lakehouse. The
+Eventhouse side gets its own database (shapes catalog) so the ask
+surface switches by config. 100_install runs first as the
+profile check (its CONFIG_PATH parameter + install checks already
+exist — the "100-style check" the design called for).
+
+### 2026-08-27 — RENAME REFERENCE SWEEP DONE (ops-find #3 closes)
+Code + living docs swept probe-eh → semantic_catalog (4 devtools
+DATABASE constants, webapp env default, cli literal, both
+eventhouse .kql files, runbook + resume checklists, org_config
+LOCAL). Frozen RESULTS/baseline records left verbatim — they are
+history, not guidance (recorded decision). **Live smoke GREEN
+against semantic_catalog** — the cluster QUERY_URI survived the
+rename, verified not assumed. ONE residual: the TENANT org_config
+kusto_db line — my OneLake patch was classifier-blocked (config
+overwrite; the failed attempt left the file INTACT, verified by
+read-back). RUNBOOK LINE FOR SUNNY: edit line 96 of
+Files/sql-query-agent/org_config.yaml in the Lakehouse (kusto_db:
+"probe-eh" → "semantic_catalog") — REQUIRED before the next 700 run
+(the old DB name no longer exists; 700 would fail loudly).
+CHANGELOG: rides Unreleased (webapp/cli defaults; chain unaffected).

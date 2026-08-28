@@ -33,7 +33,7 @@ def _kusto_run():
     uri = legacy_env(
         "KUSTO_URI",
         "https://trd-uzdu1yhqrmqtutkej8.z7.kusto.fabric.microsoft.com")
-    db = legacy_env("KUSTO_DB", "probe-eh")
+    db = legacy_env("KUSTO_DB", "semantic_catalog")
     return KustoClient(uri, db, az_cli_token_provider(uri)).run
 
 
