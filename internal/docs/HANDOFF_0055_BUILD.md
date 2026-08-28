@@ -1533,3 +1533,16 @@ and it holds; noted).
 click (staged 1.58.5 carries the sweep self-descriptions), then
 dev's rerun (300→800) so the why-sentences the flag cards display
 come from the STORE mint. Then the script's QA gate runs verbatim.
+
+### REVIEW VERDICT — PRESENTATION BATCH: VERIFIED
+Gates re-run review-side: 1,160 passed + 5 xfailed, ruff clean —
+matches. Design conformance: fold-never-hide honored (receipts one
+click away); flag cards are the differentiation-queue view with
+class/severity chips + why-sentence; machine node labels never
+render; RW-3 aux-fold nests inside. The page-JS gate catching its
+class a third time = the mechanism holding (Echo Law working as
+law). GLASS CHECK OWED: Sunny restarts the workbench and re-asks
+the flags question + one definition question — her clarity verdict
+is the acceptance, per the walk's division of labor.
+CAPTURE GATE REMAINING: 1.58.5 publish click (Sunny) → dev rerun
+300→800 → QA gate verbatim (script V2 §QA).
