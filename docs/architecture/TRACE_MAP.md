@@ -698,3 +698,13 @@ classification).
 - **Summarized in:**
   - `docs/decisions/0059-graph-topology-axioms.md`
   - `docs/architecture/SPEC.md`
+
+## ADR 0060 — The parse is the plan: parser-only LLM, deterministic traversal, correction flywheel
+
+- **Category:** architecture
+- **Implemented by:**
+  - `src/orchestrator/parse_plan.py`
+- **Enforced by:**
+  - `tests/orchestrator/test_parse_plan.py`
+- **Summarized in:**
+  - `docs/decisions/0060-parse-is-the-plan.md`

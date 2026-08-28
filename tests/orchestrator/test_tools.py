@@ -129,6 +129,10 @@ def fake_kql(query, params):
             return [{"node_id": f"canonical:{REF_A}", "kind": "metric",
                      "ref": REF_A, "name": "USP_ED_Sepsis",
                      "business_name": "ED Sepsis Screening"}]
+        if name in ("ed sepsis (regulatory)", REF_B.lower()):
+            return [{"node_id": f"canonical:{REF_B}", "kind": "metric",
+                     "ref": REF_B, "name": "USP_ED_Sepsis",
+                     "business_name": "ED Sepsis (Regulatory)"}]
         return []
     if query == REPORTS_OF_METRIC_QUERY:
         if params["p_id"] == f"canonical:{REF_A}":

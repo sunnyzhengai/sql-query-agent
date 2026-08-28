@@ -502,6 +502,21 @@ TRACE_REGISTRY = {
                   "tests/test_companion.py"],
         "docs": ["docs/architecture/SPEC.md", "docs/architecture/TRACE_MAP.md"],
     },
+    "0060": {
+        # ACCEPTED 2026-08-28 (all three calls ruled same-day:
+        # confirm-all, usage-promotion w/ steward veto, frontier
+        # pilot parser). PROTOTYPE built + the gating experiment
+        # measured (PARSE_EXPERIMENT.md: PROPOSED 7/7 oracles vs
+        # CURRENT 6/7); the ENGINE change stays gated on the full
+        # measurement incl. Sunny's walk paraphrases.
+        "title": "The parse is the plan: parser-only LLM, "
+                 "deterministic traversal, correction flywheel",
+        "category": "architecture",
+        "axioms": [],
+        "modules": ["src/orchestrator/parse_plan.py"],
+        "tests": ["tests/orchestrator/test_parse_plan.py"],
+        "docs": ["docs/decisions/0060-parse-is-the-plan.md"],
+    },
     "0059": {
         # ACCEPTED + MECHANIZED 2026-08-26: union-find analyzer
         # (foundation exception + receipt exclusion), EDGE_PROVENANCE

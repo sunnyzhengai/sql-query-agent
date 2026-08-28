@@ -1377,3 +1377,35 @@ regenerate + store rerun (same pipeline as the RW-2 rename).
 Descriptions must describe the LOGIC/purpose in business words
 (they are the semantic surface tier-2 grounding will embed), never
 restate the name.
+
+### 2026-08-28 — ADR 0060 PROTOTYPE BUILT + THE GATING EXPERIMENT MEASURED (same day as acceptance)
+**Built:** src/orchestrator/parse_plan.py — the parser-only path:
+schema-CLOSED parse tool (the 7 ratified primitives as an enum —
+out-of-vocabulary is structurally impossible), exact-then-contains
+grounding where NAME COLLISIONS ANCHOR WHOLLY (one shared name over
+two metrics = two anchors → compare; the corpus's founding shape,
+and the Lab_Path named case pinned by test), deterministic compose
+onto the EXISTING algebra, fail-closed vocabulary offer, confirm
+line rendered (confirm-all per call 1). 9 L0 tests. Registered as
+ADR 0060 in the trace registry (the closure tests forced it —
+working as built).
+**Measured (devtools/parse_experiment.py → PARSE_EXPERIMENT.md,
+live on the shapes store, frontier parser per call 3):**
+- Oracle correctness: **PROPOSED 7/7, CURRENT 6/7**
+- Route consistency: PROPOSED 1/2 multi-ask intents (the miss: the
+  parser added a spurious `defines` on one paraphrase — parse
+  variance, disclosed), CURRENT 0/2
+- Detour load: PROPOSED 4–7 rows/question; CURRENT 7–36
+- Refusal: PROPOSED fails closed with the vocabulary offer;
+  CURRENT ran a 37-row census at a poem
+- Floor collapse: PROPOSED structurally 0 (no author)
+Iteration 1 → 2 finds (recorded): first-cut grounding took only
+rows[0] (defeating name collisions) and the parse prompt lacked the
+ratified surface forms — both fixed; 4/7 → 7/7. Walk paraphrases:
+0 loaded, DISCLOSED (review extracts to WALK_PARAPHRASES.txt; the
+harness picks them up unchanged).
+**§2a amendment alignment:** the prototype's grounding is tier-1
+exact + deterministic containment; tier-2 semantic-candidates slots
+into ground_entities as one more rung and DEPENDS on the RW-6
+description surface, exactly as the amendment records. RW-6 is the
+next build.
