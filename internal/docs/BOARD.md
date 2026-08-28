@@ -101,9 +101,10 @@ payload 3 built, RESULTS v2 filled under the section of record).
 - [x] **Endpoint-leak residual: RULED — ACCEPT** (Sunny 08-27:
       auth-gated endpoint, no secret material; history rewrite risk
       exceeds gain; HEAD clean).
-      STANDING RULE meanwhile: after editing semantic-model
-      parameters, never source-control-commit that item — Undo it;
-      the pull-time hygiene test is the backstop.
+      STANDING RULE (amended 08-27, the echo): never COMMIT the
+      parameter-bound model (re-leak) and never UNDO it (re-wipe) —
+      LEAVE IT PENDING untouched until dev's connection-binding fix
+      (ordered, pre-capture) ends the hazard permanently.
 - [x] gov_red_flags Lakehouse table DELETED by Sunny 08-27 — F-2
       fully closed; the flags' only home is the graph.
 - [x] Rename + sweep DONE (08-27): sql_catalog_eh / semantic_catalog

@@ -1009,3 +1009,15 @@ guard at birth (THROW before any DROP on foreign tables — the
 collision class dies at compile), GO-batching (the Msg-207 lesson
 mechanized), the three-legged isolation law in SPHERE, the isolated
 source created and read-back verified.
+
+## ECHO — the parameter-serialization hazard recurred (2026-08-27): CONNECTION-BINDING ORDER (mandatory per the law)
+
+Second occurrence: Sunny's re-entered parameters immediately
+re-appeared as a pending source-control change — commit re-leaks,
+Undo re-wipes (the earlier "Undo" guidance was WRONG for this item;
+corrected: leave pending, touch nothing). Mechanism, mandatory:
+**rebind the Diabetes Registry semantic model's source via a shared
+cloud connection** (connection-bound, workspace-level) instead of
+text parameters, so no endpoint ever serializes into the item
+definition; parameters demoted to placeholders permanently.
+Pre-capture (the demo uses this dashboard). Board rule amended.
