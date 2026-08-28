@@ -159,3 +159,6 @@ point.
 - **"An acknowledgment is a claim; only the postcondition is a
   fact."** — the boundary-echo round, 2026-08-27. (LAW; the
   updater's founding principle)
+- "An acknowledgment is a claim; only the postcondition is a fact."
+  — the boundary-echo round, 2026-08-27. [LAW — the updater's
+  founding principle]

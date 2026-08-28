@@ -1207,3 +1207,20 @@ cohort 105 on glass) → isolated lakehouse (full pipeline, 1.58.2)
 THE RE-WALK IS UNBLOCKED (walk section B grades against B3; section
 I against the 26 flags). Next dev order in sequence: the boundary
 echo contract (#76, post-chain — now).
+
+### 2026-08-28 — BOUNDARY ECHO CONTRACT BUILT (the ordered generalization; the updater's skeleton)
+`devtools/boundary_ops.py`: every tenant-crossing devtool op
+enumerated and PAIRED with its declared observable postcondition —
+7 rows over the 4 boundary modules (shortcut create-then-verify,
+the chain's run/tripwire/loads/verify, the staging writes, env
+publish). ONE exemption-with-reason (publish: the click is Sunny's
+and classifier-blocked for dev; the wheel's arrival is witnessed
+downstream by every notebook's REQUIRES_ENGINE floor). NEW witness
+closed en route: ol_write gains a READ-BACK length check (the
+append-202 + failed-flush shape once left a file untouched while
+looking half-done). CI teeth (tests/test_boundary_ops.py, 6 tests):
+module totality, op resolution, witness-marker fidelity in source
+(the reachability pattern applied to side effects), taxonomy, no
+stubbed postconditions. Contract slug `boundary-echo` registered in
+the suite map; the slogan is in SLOGANS.md tagged LAW. Gates: 1,135
+passed + 5 xfailed, ruff clean.

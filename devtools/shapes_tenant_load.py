@@ -89,6 +89,15 @@ def ol_write(tok: str, item: str, path: str, data: bytes) -> None:
         f"{base}?action=flush&position={len(data)}",
         headers={**h, "Content-Length": "0"}, timeout=60)
     r.raise_for_status()
+    # boundary echo contract: the flush 200 is a CLAIM — the
+    # read-back length is the FACT (a 202-append + failed flush once
+    # left a file untouched while looking half-done)
+    back = requests.get(base, headers=h, timeout=120)
+    back.raise_for_status()
+    if len(back.content) != len(data):
+        raise RuntimeError(
+            f"ol_write postcondition failed: {path} read back "
+            f"{len(back.content)} bytes, wrote {len(data)}")
 
 
 def _csv_bytes(rows: "list[dict]") -> bytes:

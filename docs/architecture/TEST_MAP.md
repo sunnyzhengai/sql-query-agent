@@ -7,7 +7,7 @@
 
 # Test Map — what every test proves
 
-107 modules, 1095 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
+108 modules, 1101 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
 
 ## By ADR
 
@@ -113,6 +113,10 @@
 
 - `tests/test_rematch_round4.py` (10): L0 tests for the Round-4 runner's fact accounting and scorecard writer.
 - `tests/test_verify_lineage_mitigation.py` (6): L0 tests for the lineage-mitigation verifier's answer check
+
+### contract:boundary-echo — every tenant-crossing devtool op pairs with an observable postcondition — an acknowledgment is a claim; only the postcondition is a fact (ordered 2026-08-27)
+
+- `tests/test_boundary_ops.py` (6): The boundary echo contract's teeth (ordered 2026-08-27).
 
 ### contract:web-surface — the served page works AS SERVED
 

@@ -49,6 +49,10 @@ KNOWN_CONTRACTS = {
                   "TENANT copies together",
     "round4-scorecard": "the Round-4 record's fact accounting and "
                         "mitigation verifiers",
+    "boundary-echo": "every tenant-crossing devtool op pairs with an "
+                     "observable postcondition — an acknowledgment "
+                     "is a claim; only the postcondition is a fact "
+                     "(ordered 2026-08-27)",
     "web-surface": "the served page works AS SERVED",
 }
 
