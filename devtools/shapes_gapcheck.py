@@ -125,7 +125,7 @@ def main() -> None:
     L.append("1. **U9 — codeset drift, 80 vs 81 codes** (the "
              "meaning-leads-code seed; the ONE cell where "
              "right-vs-wrong exists).")
-    L.append("   Ask: *\"Are the two Diabetic Cohort (Coded) "
+    L.append("   Ask: *\"Are all the Diabetic Codeset "
              "definitions the same?\"*")
     L.append("   Expect: compare — **2 hash groups, logic DIFFERS** "
              "(gate-enforced echo); the diff pinpoints the missing "

@@ -1442,3 +1442,12 @@ Codeset"**. Family-neutral (does not contain "Diabetic Patients";
 10-member beat intact). Palette-driven, gapcheck, manifest
 expectation, store rerun — same pipeline as RW-2. Demo question
 becomes: "Are all the Diabetic Codeset definitions the same?"
+
+### 2026-08-28 — RW-2b APPLIED (repo + staging): "Diabetic Codeset"
+The ruling's half understood now: the artifact IS a codeset — named
+what it is. Both members renamed, descriptions reworded to codeset
+semantics, gapcheck ask now "Are all the Diabetic Codeset
+definitions the same?", 39/39, family-neutral (10-member beat
+intact). Names + descriptions CSVs re-staged. The rename RIDES THE
+RW-6 RERUN — one chain, both changes, still waiting on the ONE
+env-publish click (1.58.4 staged).

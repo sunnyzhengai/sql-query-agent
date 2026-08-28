@@ -390,16 +390,16 @@
     "u9_codes_80": {
       "proc": "USP_Diabetic_CodesetA",
       "schema": "reporting",
-      "business_name": "Diabetic Cohort (Coded)",
+      "business_name": "Diabetic Codeset",
       "steward": "Dr. Peterson",
-      "description": "The diabetic cohort selected by an explicit ICD code list (80 codes) maintained inline by the authoring team."
+      "description": "The hand-maintained diabetic ICD code list (80 codes) and the patients it selects \u2014 the authoring team's copy."
     },
     "u9_codes_81": {
       "proc": "USP_Diabetic_CodesetB",
       "schema": "reports",
-      "business_name": "Diabetic Cohort (Coded)",
+      "business_name": "Diabetic Codeset",
       "steward": "Quality & Registry Team",
-      "description": "The diabetic cohort selected by an explicit ICD code list (81 codes) \u2014 one code newer than the sibling list."
+      "description": "The hand-maintained diabetic ICD code list (81 codes) and the patients it selects \u2014 one code newer than the sibling copy."
     },
     "u11_missed": {
       "proc": "USP_Missed_Appointments",

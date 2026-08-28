@@ -673,7 +673,7 @@
           {
             "flag_class": "misnomer",
             "grain": "metric",
-            "identity": "Diabetic Cohort (Coded)",
+            "identity": "Diabetic Codeset",
             "severity": "CONFLICT",
             "distinct_logics": 2
           }
