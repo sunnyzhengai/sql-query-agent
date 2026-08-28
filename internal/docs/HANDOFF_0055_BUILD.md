@@ -1120,3 +1120,13 @@ CHANGELOG). Gates: 1,129 passed + 5 xfailed, ruff clean.
 ENV RE-PUBLISH: one Sunny click, needed BEFORE the next realism
 300 (no urgency; the running shapes chain is fine on 1.58.2 —
 its dashboard anchors to U7).
+
+## REVIEW on 1.58.3 (2026-08-27 night): APPROVED — the ruling implemented exactly
+
+1,129 green + ruff clean (review's run). All three ruling
+constraints honored: enumerated-never-silent, the ask-time stamp
+("executes a target outside this catalog"), node stays first-class.
+The sharpening is correct and noted with approval:
+canonical/technical degree-0 REMAINS A DEFECT — only consumption
+singletons get the typed-reality state. Realism-300 precondition
+cleared.
