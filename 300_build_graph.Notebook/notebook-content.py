@@ -137,6 +137,7 @@ else:
 # CSV is the carrier (works on schema and plain lakehouses alike);
 # absence is legitimate — enrichers (600) can author instead.
 import os as _os
+
 _DESC_CSV = ("/lakehouse/default/Files/sql-query-agent/"
              "input_node_descriptions.csv")
 description_records = []
