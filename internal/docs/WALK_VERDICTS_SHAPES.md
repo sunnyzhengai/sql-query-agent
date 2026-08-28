@@ -126,3 +126,39 @@ question's behavior as the exemplar.
   disclosure. RW-4 conclusion firmer: BOTH target behaviors
   (compare route, grain disclosure) already exist; the build is
   making them reliably co-occur on sameness/difference questions.
+
+## 2026-08-28 PM — apple-to-apple rerun on RW-BATCH-1 code
+
+- **Definition questions (Active_Diabetics, Composite): markedly
+  improved.** Route is now retrieve → retrieve-step (SQL fragment
+  on glass), 2 focused rounds, zero detour tables (vs the 16-row
+  lineage dump this morning). Evidence-verified verdicts.
+- **Lab_Path acceptance: HALF-PASS.** Disclosure branch shipped
+  (universal "reads-grain, not logic-grain" sentence now on the
+  lineage headline). Route unchanged (LAB_RESULTS table-reads);
+  caption still floored on template ordinals. Matches dev's
+  delivery note: routing needs 0060. RW-4's routing half formally
+  TRANSFERS to the 0060 experiment.
+- **Root cause of the Lab_Path misread (Sunny's question), for
+  the record:** (1) grounding is model-side — "Lab_Path" is a real
+  STEP NODE but nothing exact-matches user tokens to the name
+  universe, so the model substituted the nearest op-reachable
+  concept (LAB_RESULTS + lineage): streetlight effect; prior
+  answers' text is not treated as anchors. (2) even grounded,
+  "who shares this step's logic" (estate-wide logic comparison
+  anchored on a step) has no reachable op door. RW-BATCH-1 is a
+  dishonesty mitigation only; 0060 fixes both causes (exact-match
+  grounding incl. step names; "same" primitive → logic-compare
+  virtual edge; confirm-parse catches misreads pre-execution).
+  → Lab_Path becomes a NAMED CASE in the 0060 experiment with
+  defined correct parse: same-logic(step:Lab_Path) → compare over
+  the step universe.
+- **FIND RW-5 (presentation batch): answer-first folded-rounds
+  layout.** Conclusion card on top (plain sentence + citation +
+  stamp); rounds fold to one-line headlines, expandable. Fold,
+  never hide — the trust doctrine keeps every receipt one click
+  away. DEPENDENCY: pairs with 0060 captions; layout alone would
+  frame floored text. Sequenced with the 0056 answer-time view.
+- Template-ordinal floor collapse reproduced twice this run
+  (census question, Lab_Path) — already covered by 0060 §1
+  baseline metrics 3 (floor-collapse rate).
