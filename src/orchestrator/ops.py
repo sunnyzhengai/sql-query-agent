@@ -742,6 +742,7 @@ def _column_usage(column: str, run_kql, session: OpsSession) -> ResultSet:
         else:
             parts.append(f"{head_txt}.")
     note = " ".join(parts)
+    suggested_ids_c: "list[str]" = []
     if not any(r["relation"] == "selects" for r in out):
         present = run_kql(PROJECTION_EDGES_COUNT_QUERY, {})
         n_proj = present[0].get("Count", 0) if present else 0
@@ -778,6 +779,7 @@ def _column_usage(column: str, run_kql, session: OpsSession) -> ResultSet:
                    else r.get("node_id"))
             if rid:
                 session.surfaced.add(str(rid))
+                suggested_ids_c = [str(rid)]
                 note = (NON_EVIDENCE_STAMP
                         + f"{clean!r} is a "
                         f"{str(r.get('kind') or 'catalog item').upper()},"
@@ -786,9 +788,12 @@ def _column_usage(column: str, run_kql, session: OpsSession) -> ResultSet:
                         f"{str(rid)!r} for them.")
     step_stamp = _turn_step_sameness_stamp(session, run_kql)
     if step_stamp:
-        note = (note + " " if note else "") + step_stamp
+        note = (note + " " if step_stamp and note else "") + step_stamp
+    params_c: dict = {"column": clean}
+    if suggested_ids_c:
+        params_c["suggested_next_ids"] = suggested_ids_c
     return session.register(
-        "lineage", {"column": clean},
+        "lineage", params_c,
         _attach_cards(out, run_kql),
         complete=True,
         universe=(f"every certified metric that FILTERS on "
@@ -866,6 +871,7 @@ def op_lineage(table: str, run_kql, session: OpsSession,
     elif distinct:
         note = (f"{len(distinct)} distinct metric(s) across "
                 f"{n_tables} table(s).")
+    suggested_ids: "list[str]" = []
     if not out:
         # W9 (walk step 3 + step 4 sighting, 2026-08-23): lineage used
         # as a generic "what uses X" with a METRIC/REPORT phrase — the
@@ -878,6 +884,7 @@ def op_lineage(table: str, run_kql, session: OpsSession,
             if rid:
                 if session is not None:
                     session.surfaced.add(str(rid))
+                suggested_ids = [str(rid)]
                 note = (NON_EVIDENCE_STAMP
                         + f"{clean!r} is a "
                         f"{str(r.get('kind') or 'catalog item').upper()},"
@@ -887,8 +894,12 @@ def op_lineage(table: str, run_kql, session: OpsSession,
     step_stamp = _turn_step_sameness_stamp(session, run_kql)
     if step_stamp:
         note = (note + " " if note else "") + step_stamp
+    params_t: dict = {"table": clean}
+    if suggested_ids:
+        # RW-8: the suggestion is DATA the gate reads, never just prose
+        params_t["suggested_next_ids"] = suggested_ids
     return session.register(
-        "lineage", {"table": clean},
+        "lineage", params_t,
         _attach_cards(out, run_kql),
         complete=True,
         universe=(f"every certified metric whose calculation reads "

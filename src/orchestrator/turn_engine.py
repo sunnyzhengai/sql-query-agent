@@ -490,6 +490,38 @@ def run_turn(session: EngineSession, question: str, chat_api,
                 raw = {**raw, "missing_op": raw.get("missing_op")
                        or "an operation whose displayed rows contain "
                           "the claimed answer"}
+        if answered:
+            # RW-8 (re-walk 2026-08-28, MANDATORY — first specimen):
+            # a NON-EVIDENCE-stamped probe NAMES the record that
+            # resolves it (suggested_next_ids — data, not prose).
+            # While that retrieve is UNEXECUTED this turn, an
+            # answered verdict cannot stand: the one-call resolution
+            # is on glass and the gate demands it before any claim —
+            # the laundered-absence class ("no metrics feed X" off a
+            # probe stamped non-evidence) dies here.
+            retrieved: "set[str]" = set()
+            for o in outputs:
+                comp = o.get("component") or {}
+                if comp.get("op") == "retrieve":
+                    retrieved.update(
+                        str(i) for i in
+                        (comp.get("params") or {}).get("ids") or [])
+            unexecuted: "list[str]" = []
+            for o in outputs:
+                res = o.get("result") or {}
+                if NON_EVIDENCE_STAMP not in str(res.get("note") or ""):
+                    continue
+                for sid in ((res.get("params") or {})
+                            .get("suggested_next_ids") or []):
+                    if str(sid) not in retrieved:
+                        unexecuted.append(str(sid))
+            if unexecuted:
+                answered = False
+                raw = {**raw, "missing_op":
+                       f"retrieve {', '.join(unexecuted[:3])} — the "
+                       "displayed probe named it as the record that "
+                       "carries the links; no verdict stands while "
+                       "it is unread"}
         if not answered and violations and not raw.get("missing_op"):
             # a floored caption is itself a named gap — the engine
             # knows what is missing even when the model's form is bare

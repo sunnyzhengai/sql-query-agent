@@ -593,3 +593,49 @@ class TestAuxiliaryFold:
                            {"verdict": {"answered": False}},
                        ]), fake_kql)
         assert out["folded_refs"] == []
+
+
+class TestNonEvidenceSuggestionGate:
+    """RW-8 (re-walk 2026-08-28, mandatory): a stamped probe NAMES
+    its resolution; the gate refuses any answered verdict while that
+    retrieve is unexecuted — the laundered-absence class."""
+
+    def test_absence_over_unexecuted_suggestion_is_floored(self):
+        s = EngineSession()
+        out = run_turn(
+            s, "which metrics feed the ED Sepsis dashboard?",
+            scripted_engine([
+                # the category-error probe (stamped, suggests REF_A)
+                {"calls": [("lineage",
+                            {"table": "ED Sepsis Screening"})]},
+                # the launder: a full census instead of the retrieve
+                {"calls": [("census", {"kind": "metric"})]},
+                {"text": "No certified metrics feed it — see R2."},
+                {"verdict": {
+                    "answered": True,
+                    "evidence_quote":
+                        "census of kind 'metric' — 2 row(s). Scope: "
+                        "every metric in the certified catalog"}},
+                {"text": "I need to read the named record first."},
+                {"verdict": {"answered": False}},
+            ]), fake_kql)
+        assert out["answered"] is False
+        assert "named it as the record" in out["missing_op"] or \
+            out["missing_op"] == ""
+
+    def test_executed_suggestion_clears_the_gate(self):
+        s = EngineSession()
+        out = run_turn(
+            s, "which metrics feed the ED Sepsis dashboard?",
+            scripted_engine([
+                {"calls": [("lineage",
+                            {"table": "ED Sepsis Screening"})]},
+                {"calls": [("search", {"phrase": "ed sepsis",
+                                       "mode": "semantic"}),
+                           ("retrieve", {"ids": [REF_A]})]},
+                {"text": "The record and its reports are shown in "
+                         "R2 and R3."},
+                {"verdict": {"answered": True,
+                             "evidence_quote": GOOD_QUOTE}},
+            ]), fake_kql)
+        assert out["answered"] is True

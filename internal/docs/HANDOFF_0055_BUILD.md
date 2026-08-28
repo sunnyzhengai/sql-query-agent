@@ -1470,3 +1470,23 @@ self-descriptions land with the NEXT publish+rerun cycle (bundle
 with the presentation batch's cycle; no extra click requested just
 for this). RW-7 part 1 (flag cards) rides the presentation batch
 with RW-1/RW-5 as ordered.
+
+### 2026-08-28 — RW-8 BUILT + acceptance PASSED live (the gate reads the stamp)
+**Mechanism:** the NON-EVIDENCE stamp now carries its suggested
+resolution as DATA (`suggested_next_ids` in the result params, both
+lineage branches); the verdict verifier REFUSES any answered
+verdict while a stamped probe's suggested retrieve is unexecuted
+this turn — missing_op names the exact id ("no verdict stands
+while it is unread"). The laundered-absence class (the walk's
+pointer-chase FAIL) dies structurally. 2 cage tests both
+directions; 1,160 green; ruff clean.
+**Acceptance (the exact walk question, live on the shapes store):**
+route now lineage → RETRIEVE (the suggestion followed) → census;
+the caption names USP_DM_Registry_Composite + MedDerived WITH
+their RW-6 descriptions — a true answer where the walk saw a false
+absence. Verdict filed humble on quote verification (honest
+downgrade, no false claim).
+**Sightings in the same run:** RW-6 descriptions LIVE in the
+answer path (the rerun's 300 has landed store-side). RW-8 is
+WORKBENCH-live via the shared tree immediately; it rides the next
+wheel cut for form (nothing tenant-side executes the engine).

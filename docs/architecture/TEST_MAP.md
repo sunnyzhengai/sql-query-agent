@@ -7,7 +7,7 @@
 
 # Test Map — what every test proves
 
-109 modules, 1124 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
+109 modules, 1126 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
 
 ## By ADR
 
@@ -55,8 +55,8 @@
 | 0047 | The shadow specification (the axiom system) | `tests/test_capability_registry.py` (4), `tests/test_extraction_registry.py` (6), `tests/test_spec_gates.py` (4) |
 | 0048 | Declared zones, trace registry, admin graph, companion | `tests/test_admin_graph.py` (9), `tests/test_companion.py` (7), `tests/test_term_hygiene.py` (2), `tests/test_trace_registry.py` (7), `tests/test_zones.py` (4) |
 | 0049 | Ingestion routes: filedrop, folders, live extractor | `tests/extractor/test_connection.py` (9), `tests/extractor/test_extractor.py` (15), `tests/extractor/test_proc_parity.py` (8) |
-| 0050 | Bounded read-only answer loop: plan to the answer, caption answers, auto-continue (amends 0036) | `tests/orchestrator/test_turn_engine.py` (29) |
-| 0051 | The one-mind turn: one conversation decides, the boundary enforces (supersedes 0036/0050's shape) | `tests/orchestrator/test_turn_engine.py` (29) |
+| 0050 | Bounded read-only answer loop: plan to the answer, caption answers, auto-continue (amends 0036) | `tests/orchestrator/test_turn_engine.py` (31) |
+| 0051 | The one-mind turn: one conversation decides, the boundary enforces (supersedes 0036/0050's shape) | `tests/orchestrator/test_turn_engine.py` (31) |
 | 0052 | The reachability contract: every graph payload reachable by a named op or excluded with a reason | `tests/test_reachability.py` (8), `tests/test_reachability_audit.py` (6) |
 | 0053 | Projection-grain column lineage: transform_to_column edges, resolved-only, conservation-counted | `tests/graph/test_builder.py` (16), `tests/orchestrator/test_ops.py` (71) |
 | 0054 | Governance red flags and governed plurality: misnomer/duplicate/cousin sweep over content hashes | `tests/governance/test_red_flags.py` (17), `tests/orchestrator/test_flag_ops.py` (8) |
