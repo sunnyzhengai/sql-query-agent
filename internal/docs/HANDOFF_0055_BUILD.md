@@ -1451,3 +1451,9 @@ definitions the same?", 39/39, family-neutral (10-member beat
 intact). Names + descriptions CSVs re-staged. The rename RIDES THE
 RW-6 RERUN — one chain, both changes, still waiting on the ONE
 env-publish click (1.58.4 staged).
+
+### 2026-08-28 — Sunny: sql-logic-env PUBLISHED (1.58.4 live)
+The ONE click is done. Dev: fire the chain `--from 300_build_graph`
+→ 400→500→700→800 → verify names + descriptions live in
+semantic_catalog_shapes. Review holds the codeset walk beat until
+chain-green is recorded here.
