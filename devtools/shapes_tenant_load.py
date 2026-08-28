@@ -52,6 +52,9 @@ WORKSPACE = "1f55e1c1-b660-4715-9b56-4140edce3940"
 REALISM_LH = "f7c297eb-4659-4600-ab89-0e860638fb6c"
 SHAPES_LH = "bf55535b-ba0a-4cc1-a78a-9c02b2fb93fc"
 SHAPES_KUSTO_DB = "semantic_catalog_shapes"
+# the isolated demo source (source leg, field find 2026-08-27);
+# the catalog NAME is config data, the server host stays tenant-side
+SHAPES_SRC_DB = "aivia_shapes_src-b5f4544d-731d-43fb-966b-be4a300054d0"
 API = "https://api.fabric.microsoft.com/v1"
 ONELAKE = "https://onelake.dfs.fabric.microsoft.com"
 DASHBOARD = "Diabetes Registry Dashboard"
@@ -128,6 +131,14 @@ def shapes_org_config(realism_yaml: str) -> str:
         if not in_sm and line.strip().startswith("kusto_db:"):
             indent = line[:len(line) - len(line.lstrip())]
             out.append(f'{indent}kusto_db: "{SHAPES_KUSTO_DB}"')
+            continue
+        # source leg (field find 2026-08-27): the extractor block
+        # points at the ISOLATED shapes source DB — same server
+        # host, its own catalog
+        if not in_sm and line.strip().startswith("database:") \
+                and SHAPES_SRC_DB:
+            indent = line[:len(line) - len(line.lstrip())]
+            out.append(f'{indent}database: "{SHAPES_SRC_DB}"')
             continue
         if not in_sm:
             out.append(line)

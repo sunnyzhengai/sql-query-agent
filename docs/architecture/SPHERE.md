@@ -183,3 +183,20 @@ decided. The theorem: the graph can SAY everything; extended with
 derivation and counting it can CHECK everything checkable; it can
 ENFORCE nothing alone — code enforces, humans witness. Everything
 folds into the graph except the fold's own guarantor.
+
+## The isolation law's three legs (source leg added 2026-08-27)
+
+Demo/shape material is isolated from the realism estate at EVERY
+stratum it touches, or it is not isolated at all:
+
+1. **Store leg** (ruled 2026-08-24): its own lakehouse — same table
+   names, different store; collision is structurally impossible.
+2. **Catalog leg**: its own KQL database and semantic_search
+   surface; the ask switches by config, never by filtering.
+3. **Source leg** (field find 2026-08-27 — the seed collided with
+   the sepsis corpus in the SHARED demo SQL database; Msg 207 at
+   compile held it): its own source database (aivia_shapes_src),
+   and every seed script opens with an ISOLATION GUARD that refuses
+   a database holding foreign tables — fail loud before the first
+   DROP. A leg nobody thought to isolate is where the collision
+   arrives.

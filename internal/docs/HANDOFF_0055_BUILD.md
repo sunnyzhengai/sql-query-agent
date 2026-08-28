@@ -977,3 +977,26 @@ Chain stays HELD until re-targeted seed passes with cohort 105.
 dbo.PATIENTS in aivia_demo_src is the sepsis corpus's 137-column
 table, intact — the compile abort preceded any DROP. Order item 4
 closes: no restore needed; the realism store was never touched.
+
+### 2026-08-27 — SOURCE-LEG ORDER EXECUTED (collision find closed; chain re-armed)
+1. **aivia_shapes_src CREATED** (API; same server host as the demo
+   DB, its own catalog) — the isolation law's SOURCE leg is real.
+2. **Seed re-armed with the guard at birth:** 01 now OPENS with an
+   ISOLATION GUARD (THROW 50001 on any foreign dbo table — refuses
+   before the first DROP; every palette table whitelisted) and DDL /
+   INSERTs are GO-separated — the Msg-207 lesson mechanized (a
+   T-SQL batch compiles against the PRE-batch schema; that compile
+   failure is also WHY the collision cost zero — nothing executed,
+   as Sunny's sys.columns check confirmed). 2 new tests; regen
+   byte-identical, cohort oracle still 105.
+3. **SPHERE gains the three-legged isolation law** (store / catalog
+   / source — "a leg nobody thought to isolate is where the
+   collision arrives").
+4. **_shapes org_config re-staged** with the extractor pointed at
+   the isolated source (verified by read-back).
+**RUNBOOK (updated — Sunny, one step left):** paste + run the TWO
+seed files in **aivia_shapes_src** (NOT the demo DB; the guard now
+enforces this — expect cohort 105), then ONE dashboard parameter:
+semantic model → Settings → Parameters → DemoSqlDatabase → the
+aivia_shapes_src catalog name (Settings shows it; DemoSqlServer is
+UNCHANGED — same host). Then push/tick: the chain fires.
