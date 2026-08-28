@@ -162,3 +162,30 @@ question's behavior as the exemplar.
 - Template-ordinal floor collapse reproduced twice this run
   (census question, Lab_Path) — already covered by 0060 §1
   baseline metrics 3 (floor-collapse rate).
+
+## U12 — the grain fight, via Sunny's 3-way phrasing: PASS (with distinction)
+
+Question: "are these 3 metrics using the same definition: High ED
+Utilizers Without PCP / (reporting) / (reports)".
+- Oracle MET: identically-named pair partitioned into 2 hash
+  groups, DIFFERS; grain shift described in words from the diff
+  (distinct patient IDs vs admission dates = patient-grain vs
+  visit-grain); grain_shift + misnomer CONFLICT flags disclosed on
+  both records. Without-PCP correctly stands apart as the healthy
+  NAMED variant.
+- **RW-4 co-occurrence nudge fired live for the first time** (R6
+  multi-record retrieve) and the model obeyed — straight to
+  compare, three partitions, no name-narration. Nudge acceptance:
+  PASS in the wild.
+- Honest empties handled gracefully: pasted parenthetical ids
+  matched nothing → 0 rows disclosed + closest-by-name hint,
+  thread followed correctly. No floor collapse — computed
+  structure existed before the caption (live preview of 0060's
+  thesis).
+- Minor: R7 alone sufficed (3 items → 3 groups); R8/R9 redundant
+  re-confirmations. Rounds-beyond-sufficient, benign, covered by
+  0060 metrics.
+- DEMO NOTE: this 3-way beat is camera-ready and stronger than
+  the scripted 2-way — messy real question, honest empties, nudge
+  visibly steering, machine DIFFERS, grain in CMO words. Script
+  refresh should adopt it.
