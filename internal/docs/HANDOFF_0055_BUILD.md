@@ -1546,3 +1546,23 @@ the flags question + one definition question — her clarity verdict
 is the acceptance, per the walk's division of labor.
 CAPTURE GATE REMAINING: 1.58.5 publish click (Sunny) → dev rerun
 300→800 → QA gate verbatim (script V2 §QA).
+
+## ORDER RW-BATCH-2 (from Sunny's 13-question walk — pre-capture, pre-QA-gate)
+1. **RW-9 (BUG, mandatory):** commentary renders twice — the RW-5
+   card duplicated the block instead of moving it. One render, on
+   the card, period.
+2. **RW-10 (mandatory): implement ANSWER_FORMAT_CONTRACT.md** —
+   machine-composed conclusion cards per question class; DIFFERS
+   cards show machine diff lines; flag cards seated ON the card
+   with plain-language class glosses; templates retired. Sunny's
+   clarity check is the acceptance.
+3. **RW-11 (mandatory, Echo Law — W10 specimen live):** row-level
+   data questions get a FIRST-ROUND typed policy refusal
+   ("definitions, not data — patient rows never reach the model")
+   + the definition card. No budget-wander. Acceptance = "How many
+   patients are currently in the Diabetic Patients cohort?"
+Then: 1.58.5 publish click (Sunny, on return) → rerun → QA gate
+verbatim (DEMO_SCRIPT.md V2) → capture.
+OPEN CALL (Sunny): flywheel sequencing — second short film
+post-0056 (review recommends) vs reopening the post-capture
+ruling.
