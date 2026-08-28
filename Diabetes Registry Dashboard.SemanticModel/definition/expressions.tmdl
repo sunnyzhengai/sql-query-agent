@@ -2,12 +2,12 @@
 /// (semantic model → Settings → Parameters) after Update-from-git.
 /// The repo carries only this placeholder (endpoint-hygiene gate,
 /// tests/test_endpoint_hygiene.py): tenant endpoints never live in git.
-expression DemoSqlServer = "wc5f4ecbtjbuhnnfpzbnix4n7i-yhqvkh3awykupg2wifao3trzia.database.fabric.microsoft.com" meta [IsParameterQuery = true, IsParameterQueryRequired = true, Type = "Text"]
+expression DemoSqlServer = "SET-IN-WORKSPACE-SETTINGS" meta [IsParameterQuery = true, IsParameterQueryRequired = true, Type = "Text"]
 	lineageTag: b7e1a3e5-0001-4e5f-8a9b-0123456789ab
 
 	annotation PBI_ResultType = Text
 
-expression DemoSqlDatabase = "aivia_shapes_src-b5f4544d-731d-43fb-966b-be4a300054d0" meta [IsParameterQuery = true, IsParameterQueryRequired = true, Type = "Text"]
+expression DemoSqlDatabase = "SET-IN-WORKSPACE-SETTINGS" meta [IsParameterQuery = true, IsParameterQueryRequired = true, Type = "Text"]
 	lineageTag: b7e1a3e5-0002-4e5f-8a9b-0123456789ab
 
 	annotation PBI_ResultType = Text
