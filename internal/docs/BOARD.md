@@ -24,11 +24,10 @@ show pending, never on remembered sequence (first-deadlock lesson,
 as of 2026-08-27. Dev session's watcher: LIVE as of 2026-08-27
 (persistent 60s poll; re-armed at each dev session start — memory
 recorded).
-Last touched: 2026-08-29, dev (RW-BATCH-4 + RW-16 built — 1.59.1:
-RW-15 sameness-verdict duty + turn-grain nudge + member-name
-qualify + run-failure cures; endpoint-hygiene gate re-scoped to
-git-reachable files, flagged for review; awaits verification +
-Sunny's codeset re-walk on glass).
+Last touched: 2026-08-29, dev (1.60.0: RW-17a/b/c built — cluster
+compare expands members, right-cure errors, give-up label — AND
+0060 sameness class LIVE with confirm-parse; the codeset beat now
+rides the planner; awaits review verification + Sunny's re-ask).
 
 ## 🎯 THE CRITICAL PATH → demo capture
 
@@ -112,8 +111,17 @@ Sunny's codeset re-walk on glass).
       MECHANISM; companion test earns it) after Sunny's sanctioned
       `run:` binding tripped the scan. 1,200 green + ruff.
       **VERIFIED by review 08-29** (design conformance approved).
-      Remaining glass (Sunny): codeset re-ask (DIFFERS + E11.80
-      line) · first bound Run → then the QA gate.
+- [x] **RW-17 + 0060 SAMENESS CLASS LIVE (08-29 dev, 1.60.0)** —
+      17a cluster-id compare expands to members (the glass root
+      cause dead); 17b id-kind mismatch names its own cure, infra
+      text never misattributed; 17c give-up answers never file the
+      answered verdict. Planner: sameness parses render a confirm
+      card, click executes the deterministic plan (same DIFFERS
+      line every run), engine fallback intact, opt-in wiring.
+      1,211 green + ruff. AWAITS REVIEW VERIFICATION.
+      Remaining glass (Sunny): codeset re-ask NOW VIA THE PLANNER
+      (parse card → click → DIFFERS + E11.80) · first bound Run →
+      then the QA gate.
 - [ ] Finder-coverage contract (timing = Sunny's call; drilldown
       benefit if pre-capture)
 - [ ] 0056 decision layer + presentation reframe (POST-capture by

@@ -159,10 +159,13 @@ def build() -> "object":
     from src.orchestrator.agent import azure_chat_api
     from src.webapp.app import create_app
     executor, cap, source, unbound = _run_executor()
+    # planner=True: ADR 0060 sameness class rides the parse→plan
+    # path in production (ordered 2026-08-29 after codeset FAIL #3);
+    # every other class stays on the engine
     return create_app(azure_chat_api(), _kusto_run(), _sink(),
                       _marketplace(), run_executor=executor,
                       run_cap=cap, run_source=source,
-                      run_unbound=unbound)
+                      run_unbound=unbound, planner=True)
 
 
 app = build() if legacy_env("WEBAPP_EAGER", "1") != "0" else None

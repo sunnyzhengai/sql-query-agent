@@ -29,6 +29,7 @@ import re
 from dataclasses import dataclass, field
 
 from src.branding import product_name
+from src.orchestrator.assemble import AssemblyError
 from src.orchestrator.caption_gate import (
     caption_violations,
     enforce_caption,
@@ -48,6 +49,13 @@ from src.orchestrator.ops import (
 MAX_TOOL_ROUNDS = 8
 HISTORY_BUDGET_CHARS = 350_000        # ~ model window, not a 20k amputation
 _WS = re.compile(r"\s+")
+# RW-17c: the give-up lexicon — a claim-class policy invariant (the
+# _KIND_ABSENCE precedent), matching only explicit self-declared
+# non-answers, never hedged partials
+_GIVES_UP = re.compile(
+    r"(?i)\bremains?\s+unverified\b|"
+    r"\b(?:cannot|can't|unable\s+to)\s+(?:provide|give|offer)\s+"
+    r"a\s+(?:definitive|verified|reliable)\s+answer\b")
 
 # Invariants + tool semantics ONLY (P4). No question-family rules.
 SYSTEM_PROMPT = (
@@ -385,7 +393,11 @@ def run_turn(session: EngineSession, question: str, chat_api,
                                    "universe": shown.get("universe"),
                                    "rows_total": len(rs.rows),
                                    "rows": rs.rows}       # FULL rows (P2)
-                    except OpError as e:
+                    except (OpError, AssemblyError) as e:
+                        # AssemblyError joined 2026-08-29 (RW-17b):
+                        # a data-level "no facts for X" is its own
+                        # honest message — it must never wear the
+                        # capacity/shortcut infra cure below
                         payload = {"error": str(e)}
                         display = {"component": {"op": name, "params": args,
                                                  "auto_round": rounds},
@@ -458,8 +470,16 @@ def run_turn(session: EngineSession, question: str, chat_api,
         # round cap, and the verdict then declared answered=True on
         # the budget apology with a quote validly drawn from earlier
         # rows. The budget message never carries an answer.
+        # RW-17c (codeset FAIL #3, 2026-08-29 — the same class): the
+        # model honestly gave up ("remains unverified … cannot
+        # provide a definitive answer") and the typed verdict still
+        # filed answered=True with a validly-verifying quote — the
+        # chip then read "answered (evidence verified)" over
+        # self-declared non-evidence. A SELF-DECLARED non-answer
+        # never carries the answered verdict.
         answered = (bool(raw.get("answered")) and not violations
-                    and not exhausted)
+                    and not exhausted
+                    and not _GIVES_UP.search(answer or ""))
         quote = _norm(str(raw.get("evidence_quote", "")))
         if answered:
             # Evidence ground = every row DISPLAYED this conversation,

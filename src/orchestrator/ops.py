@@ -1213,6 +1213,19 @@ def _texts_for(items: "list[dict]", run_kql) -> "dict[str, str]":
         if an_id.startswith("transform:"):
             texts.setdefault(an_id, i.get("sql_fragment") or "")
         else:
+            # RW-17b (root-caused on glass 2026-08-29): a NON-metric
+            # graph id used to fall through to assemble_metric and
+            # die as "no facts found" wearing the capacity/shortcut
+            # cure — the wrong failure class entirely. The id-kind
+            # mismatch names ITSELF and its own cure. (cluster: ids
+            # never reach here — compare expands them to members.)
+            prefix = an_id.split(":", 1)[0]
+            if ":" in an_id and prefix not in ("transform", "metric"):
+                raise OpError(
+                    f"{an_id!r} is a {prefix} node — compare "
+                    "partitions METRIC/STEP logic. Pass metric refs, "
+                    "step ids, or a cluster id (its members expand). "
+                    + COMPARE_ERROR_CAVEAT)
             logic = i.get("calculation_logic")
             if logic is None:
                 logic = assemble_metric(an_id, run_kql).facts.get(
@@ -1363,6 +1376,31 @@ def op_compare(refs: "list[str]", aspect: "str | None", run_kql,
             continue
         if not session.permitted(arg):
             refused.append(arg)
+            continue
+        if arg.startswith("cluster:"):
+            # RW-17a (codeset FAIL #3, root-caused on glass
+            # 2026-08-29): a CLUSTER id expands to its MEMBERS —
+            # clusters are nodes (0057) and compare(cluster) means
+            # partitioning the members' logics. This is the natural
+            # flags → "are they the same?" path the model reached
+            # for; it used to die in _texts_for as a fake metric.
+            members = list(run_kql(GOV_FLAG_MEMBERS_QUERY,
+                                   {"p_id": arg}))
+            if not members:
+                raise OpError(
+                    f"cluster {arg!r} has no recorded members in "
+                    "this store — retrieve the flag record to see "
+                    "its state. " + COMPARE_ERROR_CAVEAT)
+            for m in members[:10]:
+                mid_ = str(m.get("member_id") or "")
+                rid = (mid_.split(":", 1)[-1]
+                       if mid_.startswith("canonical:") else mid_)
+                if not rid or rid in seen_ids:
+                    continue
+                session.surfaced.add(rid)
+                items.append({"id": rid,
+                              "name": m.get("member_name")})
+                seen_ids.add(rid)
             continue
         found = run_kql(FIND_BY_NAME_QUERY, {"p_name": arg})
         if found:

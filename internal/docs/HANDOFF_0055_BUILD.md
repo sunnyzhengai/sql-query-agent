@@ -1908,3 +1908,46 @@ Refined order:
   claim-class label (from the FAIL #3 record).
 0060 prototype (sameness class) remains the structural fix and
 proceeds in parallel as ordered.
+
+### 2026-08-29 — RW-17 + 0060 SAMENESS CLASS LIVE — release 1.60.0
+**RW-17a (cluster-id compare — the glass root cause, dead):**
+compare now expands a `cluster:` arg to its MEMBERS via the
+member_of chain (clusters are nodes, 0057) — compare(cluster)
+partitions the members' logics, the exact flags → "are they the
+same?" path the model reached for. A memberless cluster refuses
+typed. **RW-17b:** an id-kind mismatch (table:/report:/loggroup:
+id handed to compare) is now its OWN failure class naming ITSELF
+and its cure ("pass metric refs, step ids, or a cluster id — its
+members expand") — and AssemblyError joined the visible-error
+catch in the engine dispatch, so a data-level "no facts for X"
+never again wears the capacity/shortcut infra cure (the
+misattribution Sunny saw). **RW-17c:** a SELF-DECLARED non-answer
+("remains unverified", "cannot provide a definitive answer") never
+files the answered verdict — the budget-apology law extended; the
+chip no longer reads "answered (evidence verified)" over honest
+give-ups. 3 + 3 tests.
+
+**0060 SAMENESS CLASS LIVE (the structural unblock, as ordered):**
+the workbench now parses FIRST. A parse that reads exactly
+`same_or_different over {entities}` renders as a purple parse card
+— Sunny's call 1, confirm every parse: NOTHING executes until the
+click. Confirm → ground (exact-then-contains, collisions anchor
+wholly) → compose → execute through the EXISTING algebra in the
+conversation's session → stamped results + the machine compare
+card (verdict + diff lines; E11.80-class deltas distill first via
+RW-13). No model narration anywhere in the path: same parse, same
+plan, same DIFFERS line, EVERY run. "Answer without the planner"
+falls back to the engine (body flag planner:false); any parser
+trouble falls through silently — the engine remains the default
+for every other class. Planner results join session.displays so
+later engine turns can quote them. Captured as TurnEvents with
+question `[PLANNER] …`. **Opt-in at create_app (planner=True only
+in production wiring)** so scripted test harnesses and the eval
+suite are untouched. 5 endpoint tests.
+
+**Gates:** 1,211 green + 5 xfailed, ruff clean; wheel 1.60.0
+shipped into sql-logic-env; docs regenerated.
+**The codeset beat now rides the planner** — Sunny's next re-ask
+should show: parse card → click → retrieve + compare → DIFFERS
+with the E11.80 line. The run button then completes the loop on
+the same glass.

@@ -411,3 +411,89 @@ def _run_kql_step(query, params):
         return [{"node_id": nid, "name": nid.split(":")[-1],
                  "properties": _j.dumps({"sql_fragment": frag})}]
     return []
+
+
+class TestPlannerSamenessClass:
+    """ADR 0060 sameness class LIVE (ordered 2026-08-29, codeset
+    FAIL #3 — the route was a coin flip): a sameness parse renders
+    for confirmation and the click executes the SAME deterministic
+    plan every run. Opt-in at create_app (planner=True in
+    production wiring); every other class stays on the engine."""
+
+    def _parse_api(self, engine_answer="The step is shown."):
+        def api(messages, tools, tool_choice=None):
+            forced = (tool_choice or {}).get("function", {}).get("name")
+            if forced == "file_parse":
+                return {"content": "", "tool_calls": [{
+                    "id": "p1", "function": {
+                        "name": "file_parse",
+                        "arguments": json.dumps({
+                            "entities": ["Scores"],
+                            "primitives": ["same_or_different"]})}}]}
+            if forced == "file_verdict":
+                return {"content": "", "tool_calls": [{
+                    "id": "v1", "function": {
+                        "name": "file_verdict",
+                        "arguments": json.dumps({
+                            "answered": False,
+                            "missing_op": ""})}}]}
+            return {"content": engine_answer, "tool_calls": []}
+        return api
+
+    def _client(self, planner=True):
+        import tempfile
+        from pathlib import Path
+
+        from src.orchestrator.events import JsonlEventSink
+        sink = JsonlEventSink(
+            Path(tempfile.mkdtemp()) / "events.jsonl")
+        app = create_app(self._parse_api(), fake_kql, sink,
+                         planner=planner)
+        return TestClient(app)
+
+    def test_sameness_question_renders_the_parse_not_an_answer(self):
+        client = self._client()
+        r = client.post("/api/ask", json={
+            "message": "are the two Scores steps the same?"})
+        assert r.status_code == 200
+        j = r.json()
+        assert "same_or_different over {Scores}" in j["parse_confirm"]
+        assert "outputs" not in j            # nothing executed yet
+
+    def test_confirm_click_runs_the_deterministic_plan(self):
+        client = self._client()
+        r1 = client.post("/api/ask", json={
+            "message": "are the two Scores steps the same?"})
+        conv = r1.json()["conversation_id"]
+        r2 = client.post("/api/parse/confirm",
+                         json={"conversation_id": conv})
+        assert r2.status_code == 200
+        j = r2.json()
+        assert j["planned"] is True
+        ops = [o["component"]["op"] for o in j["outputs"]]
+        assert ops == ["retrieve", "compare"]
+        assert j["conclusion"]["kind"] == "compare"
+        assert j["answered"] is True
+        assert "planner:" in j["loop_status"]
+
+    def test_confirm_without_pending_parse_is_409(self):
+        client = self._client()
+        r = client.post("/api/parse/confirm",
+                        json={"conversation_id": "nope"})
+        assert r.status_code == 409
+        assert r.json()["reason_class"] == "no_pending_parse"
+
+    def test_planner_false_body_flag_skips_to_the_engine(self):
+        client = self._client()
+        r = client.post("/api/ask", json={
+            "message": "are the two Scores steps the same?",
+            "planner": False})
+        j = r.json()
+        assert "parse_confirm" not in j
+        assert j["caption"] == "The step is shown."
+
+    def test_planner_off_by_default_engine_untouched(self):
+        client = self._client(planner=False)
+        r = client.post("/api/ask", json={
+            "message": "are the two Scores steps the same?"})
+        assert "parse_confirm" not in r.json()

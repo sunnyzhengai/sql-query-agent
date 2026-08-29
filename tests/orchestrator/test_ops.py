@@ -745,3 +745,52 @@ class TestCompareNameResolution:
                         fake_kql, s)
         groups = [r for r in rs.rows if "group" in r]
         assert len(groups) == 2          # SELECT 1 vs SELECT 2
+
+
+class TestCompareClusterExpansion:
+    """RW-17a (codeset FAIL #3, root-caused on glass 2026-08-29): a
+    CLUSTER id passed to compare expands to its MEMBERS — clusters
+    are nodes (0057), and compare(cluster) partitions the members'
+    logics. This was the natural flags -> "are they the same?" path;
+    it used to die in _texts_for as a fake metric wearing the
+    capacity/shortcut cure."""
+
+    CLUSTER = "cluster:misnomer:step:aaa111bbb222"
+
+    def test_cluster_arg_expands_and_partitions_members(self):
+        s = OpsSession()
+        op_census("flag", fake_kql, s)          # surfaces the cluster
+        rs = op_compare([self.CLUSTER], "logic", fake_kql, s)
+        groups = [r for r in rs.rows if "group" in r]
+        members = {m for g in groups for m in g["members"]}
+        # both members expanded and partitioned (the fake's respaced
+        # twins fold to one group — the machine verdict rides along)
+        assert members == {STEP_1, STEP_2}
+        assert "hash group" in rs.note
+
+    def test_memberless_cluster_refuses_typed(self):
+        from src.orchestrator.tools import GOV_FLAG_MEMBERS_QUERY
+
+        def kql(query, params):
+            if query == GOV_FLAG_MEMBERS_QUERY:
+                return []
+            return fake_kql(query, params)
+        s = OpsSession()
+        op_census("flag", fake_kql, s)
+        with pytest.raises(OpError, match="no recorded members"):
+            op_compare([self.CLUSTER], "logic", kql, s)
+
+    def test_non_comparable_graph_id_names_itself_and_the_cure(self):
+        # RW-17b: an id-kind mismatch is its OWN failure class with
+        # its own cure — never the capacity/shortcut infra text
+        s = OpsSession()
+        s.note_user("compare table:ENCOUNTERS with something")
+        s.surfaced.add("table:ENCOUNTERS")
+        s.surfaced.add("table:ADT")
+        with pytest.raises(OpError) as e:
+            op_compare(["table:ENCOUNTERS", "table:ADT"], "logic",
+                       fake_kql, s)
+        msg = str(e.value)
+        assert "table node" in msg
+        assert "cluster id (its members expand)" in msg
+        assert "capacity" not in msg and "shortcut" not in msg

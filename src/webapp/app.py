@@ -26,8 +26,10 @@ from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse
 
 from src.branding import product_name
 from src.orchestrator.agent import Turn, run_turn
+from src.orchestrator.caption_gate import stamped_headline
 from src.orchestrator.conclusion import compose_conclusion
 from src.orchestrator.events import FeedbackEvent, TurnEvent, decision_shape
+from src.orchestrator.ops import OpError
 from src.orchestrator.tools import Session
 from src.orchestrator.turn_engine import EngineSession
 from src.orchestrator.turn_engine import run_turn as engine_run_turn
@@ -42,6 +44,10 @@ class Conversation:
     session: Session = field(default_factory=Session)
     engine: EngineSession = field(default_factory=EngineSession)
     turns: int = 0
+    # ADR 0060 (sameness class live, ordered 2026-08-29): the parse
+    # awaiting Sunny's call-1 confirmation — nothing executes until
+    # the click; a new question replaces it (stale parses die)
+    pending_parse: "dict | None" = None
 
 
 @dataclass
@@ -66,6 +72,7 @@ def create_app(
     run_cap: int = 200,
     run_source: str = "",
     run_unbound: str = "",
+    planner: bool = False,
 ) -> FastAPI:
     app = FastAPI(title=product_name(), docs_url=None, redoc_url=None)
     conversations: "dict[str, Conversation]" = {}
@@ -288,6 +295,30 @@ def create_app(
             "suggestions": [],
         }
 
+    def _planner_intercept(conv: Conversation,
+                           question: str) -> "dict | None":
+        """ADR 0060, sameness class LIVE (ordered 2026-08-29 after
+        codeset FAIL #3 — three runs, three routes, three failures:
+        the route was a coin flip). The parse is the plan: a
+        sameness parse RENDERS for confirmation (Sunny's call 1 —
+        confirm every parse) and executes deterministically on the
+        click — same parse, same plan, same DIFFERS line, every
+        run. Any parser trouble falls through to the engine, which
+        remains the default surface for every other class."""
+        from src.orchestrator.parse_plan import parse_question
+        try:
+            parse = parse_question(question, chat_api)
+        except Exception:   # noqa: BLE001 — parser down ≠ workbench down
+            return None
+        if parse.primitives != ["same_or_different"] or not parse.entities:
+            return None
+        conv.pending_parse = {"question": question,
+                              "entities": parse.entities,
+                              "primitives": parse.primitives,
+                              "modifiers": parse.modifiers}
+        return {"parse_confirm": parse.render(),
+                "parse": dict(conv.pending_parse)}
+
     @app.post("/api/ask")
     async def ask(request: Request) -> JSONResponse:
         """One user turn on the merged engine: the mind loops over
@@ -302,6 +333,10 @@ def create_app(
         user = _user_from(request)
         conv_id = str(body.get("conversation_id") or uuid.uuid4())
         conv = _conversation(user, conv_id)
+        if planner and body.get("planner") is not False:
+            p = _planner_intercept(conv, question)
+            if p:
+                return JSONResponse({"conversation_id": conv_id, **p})
         try:
             turn = engine_run_turn(conv.engine, question, chat_api,
                                    run_kql)
@@ -311,6 +346,74 @@ def create_app(
                  "conversation_id": conv_id}, status_code=502)
         return JSONResponse(_ask_finish(user, conv_id, conv, question,
                                         turn))
+
+    @app.post("/api/parse/confirm")
+    async def parse_confirm(request: Request) -> JSONResponse:
+        """The click that runs the plan (0060 confirm-all): grounds
+        the entities, composes the op sequence, executes through the
+        EXISTING algebra in this conversation's session — stamped
+        results and the machine conclusion are the answer; nothing
+        is narrated by a model."""
+        from src.orchestrator.parse_plan import (
+            Parse,
+            ParseRefusal,
+            compose_plan,
+            execute_plan,
+            ground_entities,
+        )
+        body = await request.json()
+        conv_id = str(body.get("conversation_id") or "")
+        user = _user_from(request)
+        conv = _conversation(user, conv_id) if conv_id else None
+        if conv is None or not conv.pending_parse:
+            return JSONResponse(
+                {"error": "refusal", "reason_class": "no_pending_parse",
+                 "message": "no parse awaits confirmation in this "
+                            "conversation — ask the question first"},
+                status_code=409)
+        pp, conv.pending_parse = conv.pending_parse, None
+        parse = Parse(entities=list(pp["entities"]),
+                      primitives=list(pp["primitives"]),
+                      modifiers=list(pp.get("modifiers") or []))
+        ops = conv.engine.ops
+        ops.begin_turn()
+        ops.note_user(pp["question"])
+        try:
+            anchors = ground_entities(parse.entities, run_kql, ops)
+            plan = compose_plan(parse, anchors)
+            results = execute_plan(plan, run_kql, ops)
+        except ParseRefusal as e:
+            return JSONResponse(
+                {"error": "refusal", "reason_class": "parse_refusal",
+                 "message": str(e), "conversation_id": conv_id},
+                status_code=422)
+        except OpError as e:
+            return JSONResponse(
+                {"error": "refusal", "reason_class": "op_error",
+                 "message": str(e), "conversation_id": conv_id},
+                status_code=422)
+        outputs = []
+        for r in results:
+            shown = r.display()
+            shown["headline"] = stamped_headline(shown)
+            outputs.append({"component": {"op": shown["op"],
+                                          "params": shown["params"],
+                                          "planner": True},
+                            "result": shown})
+        conv.engine.displays.extend(outputs)
+        turn = {"answer": "", "outputs": outputs,
+                "rounds": len(results), "answered": True,
+                "missing_op": "", "evidence_quote": "",
+                "caption_corrected": False, "caption_violations": [],
+                "exhausted": False, "folded_refs": []}
+        payload = _ask_finish(user, conv_id, conv,
+                              f"[PLANNER] {pp['question']}", turn)
+        payload["planned"] = True
+        payload["parse_confirm"] = parse.render()
+        payload["loop_status"] = (
+            f"planner: {len(results)} deterministic op(s) — "
+            "the parse was the plan")
+        return JSONResponse(payload)
 
     @app.post("/api/ask/stream")
     async def ask_stream(request: Request):
@@ -332,6 +435,16 @@ def create_app(
         user = _user_from(request)
         conv_id = str(body.get("conversation_id") or uuid.uuid4())
         conv = _conversation(user, conv_id)
+
+        if planner and body.get("planner") is not False:
+            p = _planner_intercept(conv, question)
+            if p:
+                payload = {"conversation_id": conv_id, **p}
+                async def gen_confirm():
+                    yield ("event: done\ndata: "
+                           f"{_json.dumps(payload)}\n\n")
+                return StreamingResponse(gen_confirm(),
+                                         media_type="text/event-stream")
 
         events: "_q.Queue[tuple]" = _q.Queue()
 
@@ -542,6 +655,11 @@ WORKBENCH_PAGE = """<!doctype html>
   .runlabel { font:12.5px ui-monospace,monospace; color:#3a4160;
     margin:8px 0 2px; }
   .runlabel.refused { color:#b3423e; }
+  .parsecard { border-left:4px solid #8a63c9; }
+  .parsebtns { display:flex; gap:10px; margin:8px 0 2px; }
+  .parsebtns .skipparse { padding:6px 14px; border-radius:8px;
+    border:1px solid #9aa3b8; background:#fff; color:#3a4160;
+    cursor:pointer; font-size:13px; }
   .concl { border-left:4px solid var(--accent); }
   .cc-machine { font:12.5px ui-monospace,monospace; color:#3a4160;
     margin:6px 0; }
@@ -1002,10 +1120,11 @@ function handleStreamEvent(name, data) {
   }
 }
 
-async function askViaStream(message) {
+async function askViaStream(message, noPlanner) {
   const resp = await fetch('/api/ask/stream', { method:'POST',
     headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({ message, conversation_id: conversationId })});
+    body: JSON.stringify({ message, conversation_id: conversationId,
+      planner: noPlanner ? false : undefined })});
   if (!resp.ok || !resp.body) throw new Error('stream unavailable');
   const reader = resp.body.getReader();
   const dec = new TextDecoder();
@@ -1035,14 +1154,58 @@ async function askViaStream(message) {
   return final;
 }
 
-async function askViaJson(message) {
+async function askViaJson(message, noPlanner) {
   const r = await fetch('/api/ask', { method:'POST',
     headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({ message, conversation_id: conversationId })});
+    body: JSON.stringify({ message, conversation_id: conversationId,
+      planner: noPlanner ? false : undefined })});
   const j = await r.json();
   if (!r.ok) throw new Error(j.error || ('error ' + r.status));
   (j.outputs || []).forEach(renderOutput);
   return j;
+}
+
+// ADR 0060 sameness class: the parse IS the plan — it renders and
+// awaits the click before anything executes (confirm every parse)
+function renderParseCard(j, message) {
+  const card = add(el(`<div class="rs parsecard"><div class="head">
+    <span class="badge complete">parse</span>
+    <span class="universe">${esc(j.parse_confirm)}</span></div>
+    <div class="parsebtns">
+    <button class="primary confirmparse">run this plan</button>
+    <button class="skipparse">answer without the planner</button>
+    </div></div>`));
+  card.querySelector('.confirmparse').addEventListener('click',
+    async () => {
+      card.querySelectorAll('button').forEach(b => b.disabled = true);
+      const r = await fetch('/api/parse/confirm', { method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ conversation_id: conversationId })});
+      const jj = await r.json();
+      if (!r.ok) {
+        add(el(`<div class="loopline">${esc(jj.message ||
+          jj.error || 'the plan was refused')}</div>`));
+        askbtn.disabled = false;
+        return;
+      }
+      (jj.outputs || []).forEach(renderOutput);
+      renderFinale(jj);
+      askbtn.disabled = false;
+    });
+  card.querySelector('.skipparse').addEventListener('click',
+    async () => {
+      card.querySelectorAll('button').forEach(b => b.disabled = true);
+      try {
+        let jj;
+        try { jj = await askViaStream(message, true); }
+        catch (e1) { clearStage(); jj = await askViaJson(message, true); }
+        conversationId = jj.conversation_id;
+        renderFinale(jj);
+      } catch (e2) {
+        add(el(`<div class="loopline">${esc(e2.message)}</div>`));
+      }
+      askbtn.disabled = false;
+    });
 }
 
 document.getElementById('ask').addEventListener('submit', async (e) => {
@@ -1062,6 +1225,11 @@ document.getElementById('ask').addEventListener('submit', async (e) => {
       j = await askViaJson(message);          // fallback renders them
     }
     conversationId = j.conversation_id;
+    if (j.parse_confirm && !j.planned) {
+      renderParseCard(j, message);   // the click owns what runs next
+      q.focus();
+      return;
+    }
     renderFinale(j);
   } catch (e2) {
     clearStage();

@@ -203,3 +203,29 @@ class TestRelationshipClaimGrade:
                   _verdict(), REL_ORACLE, 3, FIXTURE)
         assert g["dishonest"] is False
         assert g["answer_ok"] is True
+
+
+class TestGiveUpNeverFilesAnswered:
+    """RW-17c (codeset FAIL #3, 2026-08-29): the model honestly gave
+    up and the typed verdict still filed answered=True — the chip
+    read "answered (evidence verified)" over self-declared
+    non-evidence. The budget-apology law extends: a SELF-DECLARED
+    non-answer never carries the answered verdict."""
+
+    def test_remains_unverified_blocks_the_verdict(self):
+        from src.orchestrator.turn_engine import _GIVES_UP
+        assert _GIVES_UP.search(
+            "Whether the two codesets are the same remains "
+            "unverified — I cannot provide a definitive answer.")
+
+    def test_hedged_partial_still_files(self):
+        from src.orchestrator.turn_engine import _GIVES_UP
+        assert not _GIVES_UP.search(
+            "ED Sepsis Screening reads 3 tables; the regulatory "
+            "variant may differ in cohort scope.")
+
+    def test_cannot_provide_definitive_answer_blocks(self):
+        from src.orchestrator.turn_engine import _GIVES_UP
+        assert _GIVES_UP.search(
+            "Both compares were skipped, so I can't provide a "
+            "definitive answer here.")
