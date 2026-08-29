@@ -1629,3 +1629,29 @@ two presentation batches + the DEMO_SCRIPT QA gate run verbatim
    (not bare counts — Sunny's ruling) + the sweep why-sentence
    (store has them; suspect projection missing the new fields).
 Capture waits on both + fresh QA gate.
+
+## ORDER PHASE2-SLICE-1 (the run layer — AFTER RW-BATCH-3; overnight-authorized by Sunny)
+Build against **ADR 0061 (DRAFT)** — docs/decisions/0061-the-run-
+layer.md. Slice 1 stays entirely on ratified ground; Sunny's three
+open calls (§6: sample cap default / charts / re-confirm cadence)
+do NOT block it — defaults: cap 200, NO charts, re-confirm each
+run (the conservative choices; her rulings can only relax them).
+Scope:
+1. `run:` source binding in org_config (demo SQL endpoint /
+   aivia_shapes_src); local fixture built FROM
+   data/shapes/generated/seed/01_schema_and_data.sql (22 INSERT
+   batches — the cohort-105 estate) — no tenant dependency in CI.
+2. Execute a confirmed STEP's SELECT only: ScriptDom statement-
+   type check (single SELECT or typed refusal — parser decides,
+   never regex), read-only credential, 30s timeout, TOP 200.
+3. Display: results table + machine sampling label ("N rows ·
+   TOP 200 · as of <t> · source <db> · read-only"); run stamps
+   join the folded receipts.
+4. **P5 cage test is the heart of the slice:** prove rows never
+   enter model context — model sees count/schema/elapsed stamps
+   only. This test is the acceptance.
+5. Run + confirm captured as decision events (0056 shape; the
+   store side may be minimal/logged for now — the capture must
+   exist so the flywheel counts runs from day one).
+Typed failures per the error contract. Whole-proc execution,
+charts, real-estate PHI output gate: explicitly LATER slices.

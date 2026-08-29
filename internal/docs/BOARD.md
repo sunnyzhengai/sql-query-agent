@@ -212,3 +212,14 @@ payload 3 built, RESULTS v2 filled under the section of record).
   walls (Fabric UI-only gaps are real: publish buttons, shortcut
   ghosts 5/5). "Admin reduced to guided minutes," never
   "zero-human" — which is also the enterprise trust story.
+
+## MORNING SUNNY (parked 2026-08-28 night → resume 08-29)
+- [ ] Re-walk the TWO fixed beats when dev reports RW-BATCH-3
+      green: flags (expect identity + member names + why-sentence
+      on cards) and codesets (expect DIFFERS + E11.80 diff lines)
+- [ ] Then the script QA gate (6 verbatim questions) → capture
+      cleared
+- [ ] Ratify ADR 0061 open calls: sample cap (rec 200) · charts in
+      slice 1 (rec no) · re-confirm cadence (rec shelf-standing)
+- [ ] Standing open: flywheel film sequencing · shareable-
+      connection click · Purview secret rotation
