@@ -507,11 +507,11 @@ TRACE_REGISTRY = {
         "docs": ["docs/architecture/SPEC.md", "docs/architecture/TRACE_MAP.md"],
     },
     "0062": {
-        # DRAFT 2026-08-29 (review-authored under the DEVELOPMENT
-        # HOLD): the dialogue loop — show/propose/ask/execute,
-        # question types abolished, escalation rung to developer
-        # RULED. Awaits Sunny's ratification; no code until the
-        # hold lifts.
+        # ACCEPTED 2026-08-29, all calls ruled same-day (developer
+        # door every round; convert the parse card FIRST on
+        # hold-lift; axiom register 0062:A1-A6 standing). Authored
+        # and ratified UNDER the DEVELOPMENT HOLD; modules land
+        # only after Sunny lifts it.
         "title": "The dialogue loop: show, propose, ask, execute",
         "category": "architecture",
         "axioms": [],

@@ -1,9 +1,10 @@
 # ADR 0062 — The dialogue loop: show, propose, ask, execute
 
-**Status:** DRAFT 2026-08-29 — the agreed outcome of Sunny's
+**Status:** ACCEPTED 2026-08-29 — the agreed outcome of Sunny's
 pause-and-plan (her Plan B + review's synthesis + the literature's
-validated pattern converged). Awaits Sunny's ratification; the
-DEVELOPMENT HOLD stands until her word. Supersedes 0060's one-shot
+validated pattern converged); all three open calls RULED same-day.
+The DEVELOPMENT HOLD remains until Sunny's explicit lift; on lift,
+the FIRST build task is the call-2 conversion. Supersedes 0060's one-shot
 confirm; keeps 0060's parse-never-generate core. ABOLISHES
 question types outright.
 
@@ -113,8 +114,10 @@ better — the flywheel's front door.
    arbitrary round cap, no proactive-trigger threshold. The
    escalation rung is a standing door, always visible, never a
    fallback of last resort.
-2. Does the iteration card replace the parse card for the
-   already-shipped sameness path immediately, or at the next
-   natural build?
-3. Ratify §3 as the standing axiom register (cited in future
-   drift debates like spec:IDs)?
+2. RULED by Sunny 2026-08-29: **option A — convert immediately.**
+   On hold-lift, dev's first task rebuilds the one-shot purple
+   parse card into the iteration card; QA gate and capture follow
+   the conversion. The demo surfaces what we keep.
+3. RULED by Sunny 2026-08-29: **ratified.** §3 is the standing
+   axiom register — citable as 0062:A1…A6 in drift debates,
+   alongside spec:IDs.
