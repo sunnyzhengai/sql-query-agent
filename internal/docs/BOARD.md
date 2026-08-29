@@ -277,3 +277,12 @@ rides the planner; awaits review verification + Sunny's re-ask).
       HANDOFF_0055_BUILD.md, restart, check banner "[run layer]
       bound read-only to aivia_shapes_src" — then click Run on any
       confirmed step: the first DATA on glass.
+
+## ⛔ DEVELOPMENT HOLD — Sunny, 2026-08-29
+ALL code changes are PAUSED effective now. Sunny is taking time to
+understand the routing/planner issue in full; she and review will
+plan together before any further execution. No new builds, no
+patches, no refactors — including items already ordered
+(RW-BATCH queues, planner class expansion, 0061 slices). Reading,
+answering questions, and writing analysis docs remain fine.
+The hold lifts only by Sunny's explicit word, recorded here.
