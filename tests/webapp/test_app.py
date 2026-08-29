@@ -696,3 +696,46 @@ class TestCardEverywhere:
         text = r2.text
         assert '"pending": true' in text
         assert text.index("event: output") < text.index("event: done")
+
+
+class TestBatch7:
+    """RW-BATCH-7 (Sunny's three fresh questions): the no-match card
+    wires (RW-19, DOM leg in test_page_dom), grounding is generous
+    (RW-20 — match maximally, human prunes), and kind-only asks are
+    a census, never a dead end (RW-21)."""
+
+    def _client(self, entities, primitives):
+        maker = TestCardEverywhere()
+        return maker._client(entities, primitives)
+
+    def test_rw21_kind_only_composes_the_census(self):
+        client = self._client([], [])   # parse: all kind words
+        # simulate the parser splitting "metrics" into kinds: the
+        # split happens in parse_question, so feed the raw entity
+        maker = TestCardEverywhere()
+        client = maker._client(["metrics"], [])
+        r = client.post("/api/ask", json={
+            "message": "what metrics are there"})
+        j = r.json()
+        assert j.get("no_match") is not True
+        assert "catalog census of metrics" in j["parse_confirm"]
+        r2 = client.post("/api/parse/confirm",
+                         json={"conversation_id": j["conversation_id"]})
+        assert [o["component"]["op"] for o in r2.json()["outputs"]] == [
+            "census"]
+
+    def test_rw20_stem_tokens_reach_near_names(self):
+        # "diabetes" reaches "Diabetic" via the stem tier — using
+        # the sepsis fixture: "sepsi screening" style near-miss
+        from src.orchestrator.ops import OpsSession
+        from src.orchestrator.parse_plan import _ground_one
+        got = _ground_one("sepsis screenings", fake_kql, OpsSession())
+        assert any(a["id"] for a in got), (
+            "stem tier found nothing for a near-miss phrase")
+
+    def test_rw20_stem_is_deterministic_morphology(self):
+        from src.orchestrator.parse_plan import _stem
+        assert _stem("diabetes") == "diabet"
+        assert _stem("diabetic") == "diabet"
+        assert _stem("codesets") == "codeset"
+        assert _stem("definition") == "definition"

@@ -39,6 +39,13 @@ B_BATTERY = [
     ("B9", "what is the weather today"),
     ("B10", "How many patients are currently in the Diabetic "
             "Patients cohort?"),
+    # RW-BATCH-7 item 4: Sunny's three fresh questions verbatim +
+    # a kind-only case + near-miss-name cases
+    ("B11", "diabetes codeset"),
+    ("B12", "diabetic patient cohort definition"),
+    ("B13", "what metrics are there"),
+    ("B14", "list all reports"),
+    ("B15", "diabetics registry"),
 ]
 
 QA_V2 = [

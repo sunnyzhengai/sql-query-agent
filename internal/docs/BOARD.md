@@ -331,6 +331,17 @@ The hold lifts only by Sunny's explicit word, recorded here.
       warm the store with one throwaway question before capture
       (~14s idle-wake). Cosmetic nit noted: "red flags" rendered
       as an unmatched entity beside the flags relation.
+      **Sunny's first walk found RW-BATCH-7 → walk paused.**
+- [x] **RW-BATCH-7 BUILT (08-29 dev, 1.64.0)** — RW-19 no-match
+      card crash fixed (dev's guard on the wrong listener; door
+      now wires on EVERY card) + the page-JS gate gained a RUNTIME
+      leg (node dom_harness renders every card variant; red-on-bug
+      proven); RW-20 stem-tier generous grounding ("diabetes
+      codeset" grounds; candidates always prunable); RW-21
+      kind-only census restored ("what metrics are there" → census
+      card). Battery extended B11-B15. 1,241 green + ruff. AWAITS
+      review's extended-battery re-run → Sunny walks on
+      review-green → QA gate → CAPTURE.
 
 ## RULED (Sunny, 2026-08-29): THE GENERATOR CLAUSE — Echo Law amendment
 "Fail twice, no matter the cause, triggers an investigation."

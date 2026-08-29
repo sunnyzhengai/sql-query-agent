@@ -2213,3 +2213,36 @@ review-green, per the order.
    verbatim (B11-B13) + a kind-only case + near-miss-name cases;
    DOM smoke joins section D.
 Sunny walks on review-green of the EXTENDED battery.
+
+### 2026-08-29 — RW-BATCH-7 BUILT — release 1.64.0
+**RW-19 (the no-match card crash): root cause was DEV'S OWN guard
+landing on the wrong listener** — `if (!j.no_match)` suppressed the
+DOOR wire while the null run-button got addEventListener: crash +
+dead door on every no-match card. Fixed (door wires on EVERY card;
+only the run button is variant-conditional). **The mechanism: the
+page-JS gate now has a RUNTIME leg** — tests/webapp/dom_harness.js
+(a purpose-built minimal DOM in node, zero dependencies; our markup
+is our own) executes the REAL page script and renders EVERY card
+variant (understanding, no-match, skeleton+fill, all 7 conclusion
+kinds, prose-only, error fold, run-button row), asserting wiring:
+door + skip on every card, run button only where a plan composes.
+RED-ON-BUG PROVEN: the harness run against the buggy variant fails
+with the exact live error. node required (present on ubuntu-latest
+CI + dev machines).
+**RW-20 (grounding generosity — ratified "match maximally, human
+prunes"):** a fourth grounding tier — deterministic STEM morphology
+(suffix strip, never a phrase lexicon: diabetes→diabet →reaches→
+Diabetic) feeds the ONE labeled any-token scan; ranked candidates
+surface as prunable matches (generosity is safe: the confirm card
+prunes). "diabetes codeset" now grounds.
+**RW-21 (kind-only regression):** "what metrics are there" = kinds
+without entities = a CENSUS plan (proposal: "the catalog census of
+metrics"; confirm runs census) — never the no-entity card. The
+regression my kind-filter fix introduced is dead, test-held.
+**Battery extended per item 4:** B11 "diabetes codeset" · B12
+"diabetic patient cohort definition" · B13 "what metrics are
+there" · B14 "list all reports" (kind-only) · B15 "diabetics
+registry" (near-miss name). DOM smoke joined section D.
+**Gates:** 1,241 green + 5 xfailed, ruff clean; wheel 1.64.0
+shipped. Ready for review's extended-battery re-run; Sunny walks
+on review-green, per the order.

@@ -331,10 +331,11 @@ def create_app(
                 "the parser is unavailable right now — you can "
                 "answer without the planner, or contact a developer")
         t_parse = int((_time.monotonic() - t0) * 1000)
-        if not parse.entities:
+        if not parse.entities and not parse.kinds:
             conv.pending_parse = {"question": question,
                                   "entities": [], "primitives": [],
-                                  "modifiers": [], "show": []}
+                                  "modifiers": [], "kinds": [],
+                                  "show": []}
             return _no_match(
                 "no catalog entities found in the question — "
                 "rephrase with a metric, step, table, or report "
@@ -1533,7 +1534,9 @@ function renderParseCard(j, message) {
     <button class="doorbtn">none of these is right —
       contact a developer</button>
     </div></div>`));
-  if (!j.no_match)
+  // RW-19: the door wires on EVERY card (it is the point of the
+  // no-match card); only the run button is variant-conditional —
+  // its listener attaches below, guarded on the element existing
   card.querySelector('.doorbtn').addEventListener('click',
     async () => {
       card.querySelectorAll('button').forEach(b => b.disabled = true);
@@ -1552,7 +1555,8 @@ function renderParseCard(j, message) {
         <pre class="errdetail">${esc(jj.summary)}</pre></div>`));
       askbtn.disabled = false;
     });
-  card.querySelector('.confirmparse').addEventListener('click',
+  const runEl = card.querySelector('.confirmparse');
+  if (runEl) runEl.addEventListener('click',
     async () => {
       // unchecked matches are PRUNED — the one confirm ratifies
       // the pruned reading (no-nag: its ops then run freely)
@@ -1601,6 +1605,7 @@ function renderParseCard(j, message) {
       }
       askbtn.disabled = false;
     });
+  return card;   // RW-19: the DOM smoke inspects the wired card
 }
 
 document.getElementById('ask').addEventListener('submit', async (e) => {

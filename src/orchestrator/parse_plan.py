@@ -131,6 +131,10 @@ class Parse:
         plan, displayed before anything executes. No relation word
         recognized → the DEFAULT MAP reading (0062, ratified
         emergent-shape debate): show what is connected."""
+        if not self.entities and self.kinds:
+            # RW-21: kind-only asks are a census, never a dead end
+            return ("reading your question as: the catalog census "
+                    f"of {', '.join(self.kinds)}")
         ents = ", ".join(self.entities) or "(no entities)"
         if not self.primitives:
             return ("reading your question as: the map around "
@@ -174,11 +178,25 @@ def parse_question(question: str, chat_api) -> Parse:
         kinds=kinds)
 
 
+def _stem(t: str) -> str:
+    """Deterministic morphology (RW-20: 'diabetes' must reach
+    'Diabetic') — a suffix strip, never a lexicon of user phrases."""
+    t = t.lower()
+    for suf in ("ical", "ies", "es", "ic", "s"):
+        if t.endswith(suf) and len(t) - len(suf) >= 4:
+            return t[: len(t) - len(suf)]
+    return t
+
+
 def _ground_one(e: str, run_kql, session: OpsSession) -> "list[dict]":
     """Ground ONE entity: exact tier, then semantic-exact, then
-    containment — deterministic string matching over the user's own
-    tokens (0060 §2a). An ungrounded entity is RETURNED, never
-    guessed around."""
+    containment, then STEM-token candidates — deterministic string
+    matching over the user's own tokens (0060 §2a; RW-20 'match
+    maximally, human prunes' — generosity is safe because every
+    match is a prunable checkbox on the card). An entity nothing
+    reaches is RETURNED, never guessed around."""
+    import re as _re
+
     rs = op_search(e, "exact", run_kql, session)
     rows = rs.rows
     if not rows:
@@ -195,6 +213,34 @@ def _ground_one(e: str, run_kql, session: OpsSession) -> "list[dict]":
                                     or r.get("name") or "").lower()
                 or str(r.get("business_name") or r.get("name")
                        or "").lower() in e.lower()][:4]
+    if not rows:
+        # RW-20 (Sunny live: "diabetes codeset" grounded NOTHING —
+        # conjunctive brittleness violates ratified 0062): ranked
+        # stem-token candidates via the ONE labeled scan; every
+        # candidate rides the card as a prunable match
+        from src.orchestrator.tools import NAME_CONTAINS_ANY_TOKEN_QUERY
+        toks = [t for t in _re.split(r"[^A-Za-z0-9_]+", e)
+                if len(t) >= 2]
+        stems = []
+        for t in toks:
+            s = _stem(t)
+            if len(s) >= 4 and s not in stems:
+                stems.append(s)
+        if stems:
+            labeled = list(run_kql(NAME_CONTAINS_ANY_TOKEN_QUERY,
+                                   {"p_tokens": " ".join(stems)}))
+            rows = []
+            for r in labeled[:6]:
+                rid = (str(r.get("ref"))
+                       if r.get("kind") == "metric"
+                       else str(r.get("node_id") or ""))
+                if not rid:
+                    continue
+                session.surfaced.add(rid)
+                rows.append({"id": rid, "kind": r.get("kind"),
+                             "name": r.get("name"),
+                             "business_name":
+                                 r.get("business_name") or None})
     if not rows:
         return [{"entity": e, "id": None, "kind": None, "rows": []}]
     # NAME COLLISIONS ANCHOR WHOLLY (the corpus's founding
@@ -246,6 +292,19 @@ def compose_plan(parse: Parse,
     lexicon cannot compose raises ParseRefusal (metric 5)."""
     grounded = [a for a in anchors if a["id"]]
     ids = [a["id"] for a in grounded]
+    if not parse.entities and parse.kinds:
+        # RW-21 (kind-only regression, Sunny live: "what metrics are
+        # there" hit the no-entity card — the engine answered this
+        # for weeks): a kind filter with zero entities is a VALID
+        # census plan; the first kind word that normalizes wins
+        import re as _re
+
+        from src.orchestrator.ops import normalize_kind
+        for phrase in parse.kinds:
+            for tok in _re.split(r"[^A-Za-z0-9_]+", phrase):
+                k = normalize_kind(tok)
+                if k:
+                    return [{"op": "census", "kind": k}]
     if not parse.primitives:
         # 0062 (card-everywhere, ratified emergent-shape debate): no
         # relation word recognized is NOT a refusal when something

@@ -7,7 +7,7 @@
 
 # Test Map — what every test proves
 
-112 modules, 1203 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
+113 modules, 1207 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
 
 ## By ADR
 
@@ -40,7 +40,7 @@
 | 0031 | Business terms: weighted plurality | `tests/governance/test_business_terms.py` (6) |
 | 0032 | Deterministic core, LLM edges | `tests/orchestrator/test_core.py` (10), `tests/test_grounding_evals.py` (6) |
 | 0033 | System of record + projections: Delta is the record | `tests/graph/test_backend_comparison.py` (11) |
-| 0035 | Agentic conversation over deterministic tools | `tests/orchestrator/test_agent.py` (6), `tests/orchestrator/test_tools.py` (21), `tests/webapp/test_app.py` (43) |
+| 0035 | Agentic conversation over deterministic tools | `tests/orchestrator/test_agent.py` (6), `tests/orchestrator/test_tools.py` (21), `tests/webapp/test_app.py` (46) |
 | 0036 | Operations are the product: plan, confirm, execute, display | `tests/orchestrator/test_caption_gate.py` (30), `tests/orchestrator/test_conclusion.py` (10), `tests/test_methodology.py` (8) |
 | 0037 | The completed algebra: traverse + result-set kernels | `tests/graph/test_traversal.py` (2), `tests/orchestrator/test_ops.py` (78) |
 | 0038 | The interaction layer: 'no' is input | `tests/orchestrator/test_events.py` (7), `tests/steps/test_agent_events.py` (5) |
@@ -64,7 +64,7 @@
 | 0059 | The graph topology axioms: connected, sound, complete (measured, then formalized) | `tests/graph/test_topology.py` (14) |
 | 0060 | The parse is the plan: parser-only LLM, deterministic traversal, correction flywheel | `tests/orchestrator/test_parse_plan.py` (14) |
 | 0061 | The run layer: Pro runs the confirmed definition | `tests/test_run_layer.py` (15) |
-| 0062 | The dialogue loop: show, propose, ask, execute | `tests/webapp/test_app.py` (43) |
+| 0062 | The dialogue loop: show, propose, ask, execute | `tests/webapp/test_app.py` (46) |
 
 ## By standing law
 
@@ -78,6 +78,7 @@
 - `tests/orchestrator/test_sameness.py` (22): Walk W6/W7 (Sunny live, 2026-08-23): sameness honesty. The corpse:
 - `tests/orchestrator/test_walk_continuation.py` (20): Walk 1562 continuation (steps 3–6, 2026-08-23) — L0 for the P0/P1
 - `tests/test_de_typing.py` (4): TESTPLAN_0062 section A — the de-typing proof (the ruling's
+- `tests/webapp/test_page_dom.py` (1): RW-19 — the page-JS gate's RUNTIME leg (TESTPLAN_0062 D).
 
 ### law:brand-separation — the product name is a seam; the core stays brand-neutral
 
