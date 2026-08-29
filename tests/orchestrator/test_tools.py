@@ -530,3 +530,29 @@ class TestInfraErrorsAreResults:
         out = dispatch("search_catalog", {"phrase": "x"}, dead_kql, s)
         assert "unreachable" in out["error"]
         assert "RuntimeError" in out["error"]
+
+
+class TestTokenProviderCaches:
+    """RW-BATCH-6 item 1: the az subprocess ran ONCE PER QUERY and
+    concurrent invocations serialized on the CLI cache lock — the
+    measured killer of live parallelism. The provider now caches in
+    process; the subprocess runs once."""
+
+    def test_provider_shells_out_once(self, monkeypatch):
+        import subprocess as sp
+
+        from src.orchestrator.kusto import az_cli_token_provider
+        calls = []
+
+        def fake_run(cmd, **kw):
+            calls.append(cmd)
+            class R:
+                stdout = "tok-123\n"
+            return R()
+
+        monkeypatch.setattr(sp, "run", fake_run)
+        provider = az_cli_token_provider("https://r")
+        assert provider() == "tok-123"
+        assert provider() == "tok-123"
+        assert provider() == "tok-123"
+        assert len(calls) == 1

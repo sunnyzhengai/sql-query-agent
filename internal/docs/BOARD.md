@@ -314,8 +314,18 @@ The hold lifts only by Sunny's explicit word, recorded here.
       count_rows lexicon word (B10); **RUN LAYER LIVE (bind bug
       was dev's import — fixed, probe verified)**;
       walk_runner_0062 ready for review's E-battery. 1,230 green
-      + ruff. AWAITS: review re-run + E-battery → THEN Sunny's
-      re-walk → QA gate → CAPTURE.
+      + ruff. **E-battery run by review 08-29: architecture PASS
+      (B1≡QA3 determinism), finish work FAILED → RW-BATCH-6.**
+- [x] **RW-BATCH-6 BUILT (08-29 dev, 1.63.0)** — transport killer
+      dead (az subprocess ran PER QUERY + serialized concurrent
+      threads on its cache lock; in-process token cache + session
+      keep-alive → MISS 30.5s→1.9s, warm hit 0.67s, token 0ms);
+      FEEDS + MAP composer cards (kind-None never an answer);
+      "another way/other than"→variants; kind phrases become
+      filters, never missed entities; B4 real table name +
+      compose-driven no-match (table words plan lineage). 1,237
+      green + ruff. AWAITS review's battery re-run → Sunny walks
+      on review-green → QA gate → CAPTURE.
 
 ## RULED (Sunny, 2026-08-29): THE GENERATOR CLAUSE — Echo Law amendment
 "Fail twice, no matter the cause, triggers an investigation."

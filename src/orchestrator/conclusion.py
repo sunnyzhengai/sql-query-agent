@@ -136,10 +136,33 @@ def compose_conclusion(outputs: "list[dict]", caption: str,
                 "diff_lines": _diff_lines(compare.get("rows") or []),
                 "items": items, "prose": caption}
 
+    # RW-BATCH-6 item 2 (E-battery B6): a retrieved REPORT record
+    # carries its parsed links — the FEEDS card renders the chain
+    # (metrics executed, tables read, measures) instead of nothing.
+    # Data-driven: link fields present on displayed rows, never
+    # question typing.
+    link_rows = [row for r in results if r.get("op") == "retrieve"
+                 for row in (r.get("rows") or [])
+                 if row.get("executes_metrics") is not None
+                 or row.get("reads_tables") is not None]
+    if link_rows:
+        top = link_rows[0]
+        def _names(field):
+            return [str(x.get("name") or x.get("id") or "")
+                    for x in (top.get(field) or [])][:8]
+        return {"kind": "feeds",
+                "name": (top.get("business_name") or top.get("name")
+                         or top.get("id")),
+                "executes_metrics": _names("executes_metrics"),
+                "reads_tables": _names("reads_tables"),
+                "measures": _names("measures"),
+                "link_state": str(top.get("link_state") or ""),
+                "prose": caption}
+
     records = [row for r in results if r.get("op") == "retrieve"
                for row in (r.get("rows") or [])
                if row.get("kind") in ("metric", "step")]
-    if records:
+    if len(records) == 1:
         top = records[0]
         sites = top.get("decision_sites") or []
         criteria = ""
@@ -153,6 +176,25 @@ def compose_conclusion(outputs: "list[dict]", caption: str,
                 "criteria": criteria,
                 "flags_line": str(top.get("governance") or "")[:200],
                 "prose": caption}
+    if records:
+        # RW-BATCH-6 item 2: MULTIPLE records with no compare = the
+        # MAP card — every record shown with its connections; the
+        # single-record definition card must not swallow the rest
+        return {"kind": "map",
+                "items": [
+                    {"name": (row.get("business_name")
+                              or row.get("name") or row.get("id")),
+                     "record_kind": row.get("kind"),
+                     "of_metric": row.get("of_metric"),
+                     "description": str(row.get("description")
+                                        or "")[:160],
+                     "steps": [str(s.get("name") or "")
+                               for s in (row.get("steps") or [])][:6],
+                     "source_tables": [
+                         str(t) for t in
+                         (row.get("source_tables") or [])][:6]}
+                    for row in records[:6]],
+                "prose": caption}
 
     lineage = next((r for r in results if r.get("op") == "lineage"),
                    None)
@@ -162,4 +204,21 @@ def compose_conclusion(outputs: "list[dict]", caption: str,
                 "note": str(lineage.get("note") or "")[:220],
                 "prose": caption}
 
+    # RW-BATCH-6 item 2 (the composer-gap law): a successful
+    # retrieve of ANY kind (table, term, ...) still composes — a
+    # bare card of names and kinds beats no answer, always
+    any_rows = [row for r in results if r.get("op") == "retrieve"
+                for row in (r.get("rows") or []) if row.get("id")]
+    if any_rows:
+        return {"kind": "map",
+                "items": [
+                    {"name": (row.get("business_name")
+                              or row.get("name") or row.get("id")),
+                     "record_kind": row.get("kind") or "record",
+                     "of_metric": row.get("of_metric"),
+                     "description": str(row.get("description")
+                                        or "")[:160],
+                     "steps": [], "source_tables": []}
+                    for row in any_rows[:6]],
+                "prose": caption}
     return None

@@ -36,6 +36,10 @@ class KustoClient:
         self.database = database
         self._token = token_provider
         self.timeout = timeout
+        # RW-BATCH-6: keep-alive — a fresh TLS handshake per query
+        # added ~0.2-0.5s to every one of an op's many round trips.
+        # urllib3's pool underneath is thread-safe; we set no cookies.
+        self._session = requests.Session()
 
     def run(self, query: str, parameters: "dict | None" = None) -> "list[dict]":
         """Execute one KQL query; return PrimaryResult rows as dicts.
@@ -52,7 +56,7 @@ class KustoClient:
             if attempt:
                 time.sleep(2 * attempt)
             try:
-                resp = requests.post(
+                resp = self._session.post(
                     f"{self.query_uri}/v2/rest/query",
                     headers={
                         "Authorization": f"Bearer {self._token()}",
@@ -122,15 +126,36 @@ class KustoClient:
 
 
 def az_cli_token_provider(resource: str) -> "Callable[[], str]":
-    """Dev-machine token provider (az CLI must be logged in)."""
+    """Dev-machine token provider (az CLI must be logged in).
+
+    RW-BATCH-6 (E-battery, 2026-08-29): the provider used to shell
+    out to `az` on EVERY query (~0.4-2s each) — and CONCURRENT az
+    subprocesses serialize on the CLI's token-cache file lock, which
+    is exactly why the parallel grounding showed no overlap live
+    (B2: 3 entities = 152s). The token now caches IN PROCESS for 40
+    minutes (AAD tokens live ~60-75); refresh takes a lock so the
+    subprocess runs once, not once per thread."""
     import subprocess
+    import threading
+    import time as _t
+
+    state = {"token": "", "expires": 0.0}
+    lock = threading.Lock()
 
     def provider() -> str:
-        out = subprocess.run(
-            ["az", "account", "get-access-token", "--resource", resource,
-             "--query", "accessToken", "-o", "tsv"],
-            capture_output=True, text=True, check=True,
-        )
-        return out.stdout.strip()
+        now = _t.monotonic()
+        if state["token"] and now < state["expires"]:
+            return state["token"]
+        with lock:
+            if state["token"] and _t.monotonic() < state["expires"]:
+                return state["token"]
+            out = subprocess.run(
+                ["az", "account", "get-access-token", "--resource",
+                 resource, "--query", "accessToken", "-o", "tsv"],
+                capture_output=True, text=True, check=True,
+            )
+            state["token"] = out.stdout.strip()
+            state["expires"] = _t.monotonic() + 40 * 60
+            return state["token"]
 
     return provider

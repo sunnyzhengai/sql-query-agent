@@ -84,7 +84,8 @@ PARSE_PROMPT = (
     "The vocabulary (surface forms -> primitive):\n"
     "same / different / match / drift / consistent -> "
     "same_or_different\n"
-    "ways of / variants / versions -> variants\n"
+    "ways of / another way / other than / variants / versions -> "
+    "variants\n"
     "reads / uses / comes from / feeds -> reads_or_feeds\n"
     "flags / issues / wrong / conflicts / problems -> flags\n"
     "defines / criteria / logic of / how calculated -> defines\n"
@@ -94,11 +95,36 @@ PARSE_PROMPT = (
 )
 
 
+# RW-BATCH-6 item 3: KIND words are SYSTEM vocabulary — an "entity"
+# made entirely of them is a KIND FILTER on the plan, never an
+# unmatched entity polluting the SHOW ("certified metrics" grounded
+# nothing on B6 and read as a miss). Words, never question shapes.
+KIND_WORDS = frozenset({
+    "metric", "metrics", "report", "reports", "table", "tables",
+    "step", "steps", "term", "terms", "measure", "measures",
+    "dashboard", "dashboards", "certified", "governance"})
+
+
+def split_kind_words(entities: "list[str]") -> "tuple[list, list]":
+    """(real_entities, kinds) — an entity whose every token is a kind
+    word becomes a filter; anything with one real token stays."""
+    import re as _re
+    real, kinds = [], []
+    for e in entities:
+        toks = [t for t in _re.split(r"[^A-Za-z0-9_]+", e) if t]
+        if toks and all(t.lower() in KIND_WORDS for t in toks):
+            kinds.append(e)
+        else:
+            real.append(e)
+    return real, kinds
+
+
 @dataclass
 class Parse:
     entities: "list[str]"
     primitives: "list[str]"
     modifiers: "list[str]" = field(default_factory=list)
+    kinds: "list[str]" = field(default_factory=list)
 
     def render(self) -> str:
         """The confirm-on-glass line (0060 §2d): the parse IS the
@@ -138,11 +164,14 @@ def parse_question(question: str, chat_api) -> Parse:
             raw = json.loads(calls[0]["function"]["arguments"] or "{}")
         except json.JSONDecodeError:
             raw = {}
+    entities, kinds = split_kind_words(
+        [str(e) for e in raw.get("entities") or []])
     return Parse(
-        entities=[str(e) for e in raw.get("entities") or []],
+        entities=entities,
         primitives=[str(p) for p in raw.get("primitives") or []
                     if p in PRIMITIVES],
-        modifiers=[str(m) for m in raw.get("modifiers") or []])
+        modifiers=[str(m) for m in raw.get("modifiers") or []],
+        kinds=kinds)
 
 
 def _ground_one(e: str, run_kql, session: OpsSession) -> "list[dict]":

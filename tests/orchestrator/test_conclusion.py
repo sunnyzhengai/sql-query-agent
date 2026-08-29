@@ -86,3 +86,52 @@ def test_diff_distills_the_literal_delta_first():
     ], "prose", True)
     assert c["diff_lines"][0] == \
         "+ E11.80 — present only in one definition"
+
+
+class TestBatch6ComposerShapes:
+    """RW-BATCH-6 item 2 (E-battery): feeds card for report links,
+    map card for multi-record retrieves, and NO successful retrieve
+    left cardless — a bare kind-None conclusion is a composer gap,
+    never an answer."""
+
+    def _out(self, rows, op="retrieve"):
+        return [{"component": {"op": op, "params": {}},
+                 "result": {"op": op, "rows": rows, "params": {},
+                            "complete": True, "universe": "u"}}]
+
+    def test_report_links_compose_the_feeds_card(self):
+        c = compose_conclusion(self._out([{
+            "id": "report:x", "kind": "report",
+            "name": "Diabetes Registry Dashboard",
+            "executes_metrics": [{"id": "reporting.USP_A",
+                                  "name": "Active Diabetics"}],
+            "reads_tables": [{"id": "table:DM", "name": "DM_REGISTRY"}],
+            "measures": []}]), "", True)
+        assert c["kind"] == "feeds"
+        assert c["executes_metrics"] == ["Active Diabetics"]
+        assert c["reads_tables"] == ["DM_REGISTRY"]
+
+    def test_two_records_compose_the_map_card_not_definition(self):
+        rows = [{"id": "transform:a:X", "kind": "step", "name": "X",
+                 "description": "d1", "steps": [],
+                 "source_tables": ["T1"]},
+                {"id": "transform:b:X", "kind": "step", "name": "X",
+                 "description": "d2", "steps": [],
+                 "source_tables": ["T2"]}]
+        c = compose_conclusion(self._out(rows), "", True)
+        assert c["kind"] == "map"
+        assert len(c["items"]) == 2
+        assert c["items"][0]["source_tables"] == ["T1"]
+
+    def test_single_record_still_composes_definition(self):
+        c = compose_conclusion(self._out([{
+            "id": "m", "kind": "metric", "name": "M",
+            "business_name": "Metric M", "description": "d"}]),
+            "", True)
+        assert c["kind"] == "definition"
+
+    def test_any_retrieved_row_composes_never_none(self):
+        c = compose_conclusion(self._out([{
+            "id": "table:ENCOUNTERS", "kind": "table",
+            "name": "ENCOUNTERS"}]), "", True)
+        assert c is not None and c["kind"] == "map"

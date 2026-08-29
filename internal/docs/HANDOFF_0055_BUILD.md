@@ -2151,3 +2151,39 @@ schema identifiers).
 4. Fix B4's test to the store's real encounters table name.
 Review re-runs the battery after delivery; Sunny walks only on
 review-green.
+
+### 2026-08-29 — RW-BATCH-6 BUILT — release 1.63.0
+**Item 1 (QA-blocking latency): the live killer was found in the
+transport, and it is dead.** Diagnosis from the recorded splits +
+code: (a) az_cli_token_provider shelled out to the `az` SUBPROCESS
+on EVERY store query (~0.4-2s each) — and concurrent az invocations
+SERIALIZE on the CLI's token-cache file lock, which is exactly why
+B2's three "parallel" groundings ran like a chain (152s); (b) every
+query opened a fresh TLS connection (no keep-alive). Mechanisms:
+the token now caches IN PROCESS (40 min, lock-guarded single
+refresh — test: the subprocess runs ONCE) and KustoClient holds a
+requests.Session. **Live re-measure: token 0 ms cached · ground
+HIT warm 0.67s · ground MISS 1.9s (from 30.5s at the start of the
+day) · LLM parse ~1-2s.** Residual: the serverless store's one-time
+capacity wake (~8.5s first query after idle) — covered on glass by
+the streamed skeleton. D3 budgets (card <8s, first op <2s) now hold
+outside the wake.
+**Item 2 (composer shapes):** FEEDS card — a retrieved report
+renders its chain (executes metrics / reads tables / measures /
+link_state), data-driven from link fields on displayed rows; MAP
+card — multiple records render ALL records with their connections
+(the single-record definition card no longer swallows the rest);
+composer-gap law enforced: ANY successful retrieve composes a card
+(tables/terms included) — kind None is never an answer. Page
+renderers for both.
+**Item 3 (lexicon + kinds):** "another way / other than" joined the
+variants surface forms; KIND phrases ("certified metrics") split
+from entities at parse (SYSTEM word-grain set) — they ride the
+Parse as filters and never pollute SHOW as missed entities.
+**Item 4 (B4):** the battery's table name fixed to the seed's real
+ENCOUNTERS; and no-match is now COMPOSE-DRIVEN — a bare table word
+composes a lineage probe (its result stamps its own honesty, W13b)
+instead of dying at the no-match card.
+**Gates:** 1,237 green + 5 xfailed, ruff clean; wheel 1.63.0
+shipped. Ready for review's battery re-run; Sunny walks on
+review-green, per the order.

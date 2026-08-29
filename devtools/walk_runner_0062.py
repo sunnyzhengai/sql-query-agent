@@ -16,9 +16,9 @@ from __future__ import annotations
 
 import json
 import sys
-from pathlib import Path
 import time
 import urllib.request
+from pathlib import Path
 
 B_BATTERY = [
     ("B1", "Are all the Diabetic codesets defined the same?"),
@@ -29,7 +29,7 @@ B_BATTERY = [
     ("B3", "what does Active Diabetic Patients "
            "(reporting.USP_Active_Diabetics) use to define the "
            "patient cohort"),
-    ("B4", "which metrics use ED_ENCOUNTERS?"),
+    ("B4", "which metrics use ENCOUNTERS?"),  # RW-BATCH-6 item 4: the seed store table name
     ("B5", "What governance red flags exist for Diabetic Patients?"),
     ("B6", "Which certified metrics feed the Diabetes Registry "
            "dashboard?"),

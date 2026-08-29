@@ -155,3 +155,24 @@ def test_d2_grounding_queries_run_concurrently():
 def test_count_rows_is_a_lexicon_word_not_a_shape():
     plan = compose_plan(Parse(["A"], ["count_rows"]), _anchors(REF_A))
     assert plan == [{"op": "retrieve", "ids": [REF_A]}]
+
+
+def test_kind_words_become_filters_never_entities():
+    # RW-BATCH-6 item 3 (B6): "certified metrics" is a KIND phrase —
+    # it filters the plan and never pollutes SHOW as a missed entity
+    from src.orchestrator.parse_plan import split_kind_words
+    real, kinds = split_kind_words(
+        ["Diabetes Registry dashboard", "certified metrics"])
+    assert real == ["Diabetes Registry dashboard"]
+    assert kinds == ["certified metrics"]
+
+
+def test_bare_table_word_composes_lineage_ungrounded():
+    # RW-BATCH-6 item 4 (B4): a reads/feeds question over a table
+    # WORD needs no catalog anchor — lineage probes the name and its
+    # result stamps its own honesty
+    plan = compose_plan(
+        Parse(["ENCOUNTERS"], ["reads_or_feeds"]),
+        [{"entity": "ENCOUNTERS", "id": None, "kind": None,
+          "rows": []}])
+    assert plan == [{"op": "lineage", "table": "ENCOUNTERS"}]

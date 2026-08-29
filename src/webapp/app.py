@@ -379,8 +379,8 @@ def create_app(
                               "entities": parse.entities,
                               "primitives": parse.primitives,
                               "modifiers": parse.modifiers,
+                              "kinds": parse.kinds,
                               "show": show}
-        grounded_any = any(s["matches"] for s in show)
         proposal = parse.render()
         if "count_rows" in parse.primitives:
             # B10: row-data asks propose the POLICY REFUSAL + the
@@ -391,15 +391,30 @@ def create_app(
         payload = {"parse_confirm": proposal,
                    "parse": {k: conv.pending_parse[k] for k in
                              ("question", "entities", "primitives",
-                              "modifiers")},
+                              "modifiers", "kinds")},
                    "show": show,
                    # RW-18d: the latency split is MEASURED, on glass
                    # and in RESULTS — never guessed
                    "latency_ms": {"parse": t_parse,
                                   "ground": t_ground}}
-        if not grounded_any:
-            # every entity missed: the no-match card (no run button
-            # — nothing composes; the doors remain)
+        # RW-BATCH-6 (B4): no-match is COMPOSE-DRIVEN, not
+        # grounding-driven — a bare table WORD composes a lineage
+        # probe even though the catalog grounds nothing; only a
+        # question the lexicon truly cannot compose gets the
+        # no-match card (the doors remain)
+        from src.orchestrator.parse_plan import (
+            ParseRefusal,
+            compose_plan,
+        )
+        anchors_now = [
+            {"entity": s["entity"], "id": m["id"],
+             "kind": m.get("kind"), "rows": [m]}
+            for s in show for m in s["matches"]] or [
+            {"entity": e, "id": None, "kind": None, "rows": []}
+            for e in parse.entities]
+        try:
+            compose_plan(parse, anchors_now)
+        except ParseRefusal:
             payload["no_match"] = True
             payload["parse_confirm"] = (
                 "no catalog match for "
@@ -462,7 +477,8 @@ def create_app(
         pp, conv.pending_parse = conv.pending_parse, None
         parse = Parse(entities=list(pp["entities"]),
                       primitives=list(pp["primitives"]),
-                      modifiers=list(pp.get("modifiers") or []))
+                      modifiers=list(pp.get("modifiers") or []),
+                      kinds=list(pp.get("kinds") or []))
         # 0062 ASK items: pruning a shown match is a decision — the
         # excluded ids never enter the plan (no-nag: this ONE confirm
         # ratifies the pruned reading; its ops then run freely)
@@ -1225,6 +1241,37 @@ function renderConclusion(j) {
       <div class="cc-machine">${esc(c.grain_line)}</div>
       ${c.note ? `<div class="cc-machine">${esc(c.note)}</div>` : ''}
       ${proseHtml}${based}</div>`);
+  }
+  // RW-BATCH-6: the FEEDS card — a report record renders its chain
+  if (c.kind === 'feeds') {
+    const seg = (label, arr) => (arr && arr.length)
+      ? `<div class="cc-item"><b>${esc(label)}:</b> ${esc(arr.join(', '))}</div>`
+      : '';
+    return el(`<div class="caption concl">
+      <div class="cc-item"><b>${esc(c.name)}</b></div>
+      ${seg('executes metrics', c.executes_metrics)}
+      ${seg('reads tables', c.reads_tables)}
+      ${seg('measures', c.measures)}
+      ${c.link_state ? `<div class="cc-machine">${esc(c.link_state)}</div>` : ''}
+      ${proseHtml}${based}</div>`);
+  }
+  // RW-BATCH-6: the MAP card — every retrieved record with its
+  // connections (default-map and multi-record shapes)
+  if (c.kind === 'map') {
+    const items = (c.items || []).map(i => {
+      const bits = [];
+      if (i.of_metric) bits.push('of ' + i.of_metric);
+      if (i.steps && i.steps.length)
+        bits.push('steps: ' + i.steps.join(', '));
+      if (i.source_tables && i.source_tables.length)
+        bits.push('reads: ' + i.source_tables.join(', '));
+      return `<div class="cc-item"><b>${esc(i.name)}</b>
+        <span class="cite">${esc(i.record_kind || '')}</span>
+        ${i.description ? ' — ' + esc(i.description) : ''}
+        ${bits.length ? `<div class="cc-machine">${esc(bits.join(' · '))}</div>` : ''}
+        </div>`;
+    }).join('');
+    return el(`<div class="caption concl">${items}${proseHtml}${based}</div>`);
   }
   return el(`<div class="caption concl">${proseHtml}${based}</div>`);
 }
