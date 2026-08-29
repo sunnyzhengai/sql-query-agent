@@ -2187,3 +2187,29 @@ instead of dying at the no-match card.
 **Gates:** 1,237 green + 5 xfailed, ruff clean; wheel 1.63.0
 shipped. Ready for review's battery re-run; Sunny walks on
 review-green, per the order.
+
+## ORDER RW-BATCH-7 (Sunny's first three fresh questions — walk PAUSED again)
+1. **RW-19 (page bug):** "Cannot read properties of null
+   (addEventListener)" on every no-match card render — the page
+   script wires elements absent on that card variant; door
+   buttons possibly dead. Fix + add a DOM-LEVEL smoke test (the
+   headless battery is API-only and structurally blind to JS;
+   the page-JS gate gains a runtime leg — jsdom or equivalent —
+   rendering every card variant).
+2. **RW-20 (grounding brittleness — violates ratified 0062
+   "match maximally, human prunes"):** phrase matching is
+   effectively conjunctive; a stray word kills the match.
+   "diabetes codeset" must surface Diabetic Codeset via the
+   productive tokens; "diabetic patient cohort definition" must
+   surface the Diabetic-family candidates. Mechanism: ranked
+   disjunctive/productive candidates ALWAYS surface as prunable
+   matches (generosity is safe — the confirm card exists);
+   token-stem matching (diabet*) at minimum until tier-2 vectors.
+3. **RW-21 (kind-only regression):** "what metrics are there" =
+   kind filter + zero entities = a VALID census plan (list the
+   kind), never a no-entity card. The engine answered this for
+   weeks; the kind-filter fix regressed it.
+4. **Battery extension:** Sunny's three questions join B-battery
+   verbatim (B11-B13) + a kind-only case + near-miss-name cases;
+   DOM smoke joins section D.
+Sunny walks on review-green of the EXTENDED battery.
