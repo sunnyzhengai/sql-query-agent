@@ -720,3 +720,9 @@ classification).
   - `tests/test_run_layer.py`
 - **Summarized in:**
   - `docs/decisions/0061-the-run-layer.md`
+
+## ADR 0062 — The dialogue loop: show, propose, ask, execute
+
+- **Category:** architecture
+- **Summarized in:**
+  - `docs/decisions/0062-the-dialogue-loop.md`

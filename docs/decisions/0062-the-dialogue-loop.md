@@ -108,10 +108,11 @@ better — the flywheel's front door.
 
 ## 5. Open calls (Sunny, at ratification)
 
-1. Iteration cap before the escalation rung is OFFERED proactively
-   (the rung itself is RULED — "none of these is right" always
-   punts to a developer; the open call is only whether we also
-   offer it unprompted after N loops, and what N is)?
+1. RULED by Sunny 2026-08-29: **the contact-a-developer option is
+   offered at EVERY round** (by email or Teams message) — no
+   arbitrary round cap, no proactive-trigger threshold. The
+   escalation rung is a standing door, always visible, never a
+   fallback of last resort.
 2. Does the iteration card replace the parse card for the
    already-shipped sameness path immediately, or at the next
    natural build?
