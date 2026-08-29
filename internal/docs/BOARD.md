@@ -286,3 +286,6 @@ patches, no refactors — including items already ordered
 (RW-BATCH queues, planner class expansion, 0061 slices). Reading,
 answering questions, and writing analysis docs remain fine.
 The hold lifts only by Sunny's explicit word, recorded here.
+— Dev session: HOLD ACKNOWLEDGED (08-29). No code moves; watcher
+  stays armed for the planning conversation; available for
+  questions and analysis docs on request.
