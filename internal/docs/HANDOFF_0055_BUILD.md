@@ -1592,3 +1592,16 @@ offered, composer typing the card policy_refusal.
 Gates: 1,165 green + ruff. Workbench-live via the shared tree.
 CAPTURE GATE now: Sunny's glass check of the batch + the 1.58.5
 publish click + rerun + the script QA verbatim.
+
+### REVIEW VERDICT — RW-BATCH-2: VERIFIED
+Gates re-run review-side: 1,165 passed + 5 xfailed, ruff clean —
+matches. Contract conformance: card class data-driven from
+displayed results (P4 holds — no question typing); diff lines from
+the partition's own field (stochastic narration retired); RW-11
+zero-round refusal accepted live on the exact walk question.
+Sunny's glass clarity check remains the batch's final acceptance.
+
+### 2026-08-28 — Sunny: 1.58.5 wheel PUBLISHED
+Dev: fire the rerun (300→800) so the sweep why-sentences mint into
+the store. Then Sunny's glass check + script QA gate verbatim →
+capture.
