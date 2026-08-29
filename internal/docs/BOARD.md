@@ -111,7 +111,9 @@ Sunny's codeset re-walk on glass).
       re-scoped to git-reachable files (gitignored exempt BY
       MECHANISM; companion test earns it) after Sunny's sanctioned
       `run:` binding tripped the scan. 1,200 green + ruff.
-      AWAITS REVIEW VERIFICATION + Sunny's codeset beat on glass.
+      **VERIFIED by review 08-29** (design conformance approved).
+      Remaining glass (Sunny): codeset re-ask (DIFFERS + E11.80
+      line) · first bound Run → then the QA gate.
 - [ ] Finder-coverage contract (timing = Sunny's call; drilldown
       benefit if pre-capture)
 - [ ] 0056 decision layer + presentation reframe (POST-capture by
