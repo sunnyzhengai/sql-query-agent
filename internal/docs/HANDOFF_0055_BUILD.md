@@ -2274,3 +2274,19 @@ B15's candidate-breadth note (Diabetes Registry family joining
 "diabetics registry") stays on the tier-2 shelf as review filed it.
 **Gates:** 1,243 green + 5 xfailed, ruff clean; wheel 1.64.1
 shipped. Ready for review's battery re-run; green → Sunny walks.
+
+## ORDER RW-23 (Sunny's walk find — chars-of-string on the map card)
+The card composer iterates the `reads` field as a list when it is
+a STRING: "reads: D, I, A, G, N, O" = "DIAGNOSIS_CODES" split into
+characters (second record spells MEDICATION_ORDERS). For "what
+tables does X use" this garbled field IS the answer — broken.
+1. Fix the string/list handling; the reads line renders full
+   table names.
+2. Battery gains CONTENT assertions (the kind-only-assertion
+   blindness): the tables question asserts real table names appear
+   in the card payload; add "what tables does metric Active
+   Diabetic Patients use" verbatim as B16.
+Walk otherwise healthy: census card exact + fast (905ms), both
+carriers prunable, latency 1-4s. Sunny's typing question answered
+in the record: vocabulary, not typology — compositional reading
+lines, tested at grep level.
