@@ -1887,3 +1887,24 @@ route; (2) the bound Run button — first data. Then the QA gate.
    Confirm-parse rendering per Sunny's call 1 (confirm every
    parse) — the parse line renders and awaits the click before
    executing.
+
+### RW-17 ROOT CAUSE (Sunny's expand-detail, on glass)
+Skip #1: compare received a CLUSTER id
+(cluster:cousin_conflict:metric:308dfb37dfff) → AssemblyError "no
+facts found" with MISATTRIBUTED common-causes text (capacity/
+shortcut — wrong failure class). Skip #2: retry guard, correct.
+Refined order:
+- **RW-17a (recommended shape): compare accepts cluster refs by
+  MEMBER-EXPANSION** — clusters are nodes (0057); compare(cluster)
+  = partition the members' logics. This is the natural flags→
+  "are they the same?" path the model instinctively reached for.
+  Fallback if too big pre-capture: typed refusal naming the
+  members (RW-8 name-the-cure pattern).
+- **RW-17b:** AssemblyError classifies id-kind mismatch as its own
+  failure class with ITS cure — never the capacity/shortcut text
+  for a non-metric id (error-contract: the named cure must be the
+  RIGHT cure).
+- RW-17c: "Verdict: Answered." on unverified content → correct
+  claim-class label (from the FAIL #3 record).
+0060 prototype (sameness class) remains the structural fix and
+proceeds in parallel as ordered.
