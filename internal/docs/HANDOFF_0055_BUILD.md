@@ -1784,3 +1784,17 @@ Phase 2 slice 1 is DONE pending Sunny's glass run.
    route: DIFFERS + E11.80 machine diff first line.
 2. Polish (rides along): schema-qualify member names on flag cards
    when bare names collide.
+
+## FIND RW-16 (turn-key/error-contract; rides next batch, not QA-blocking)
+Live field find (Sunny's laptop, run-layer binding): pyodbc +
+unixodbc + msodbcsql18 were all absent — the bind failed with no
+remediation surfaced. Per the error-contract law, the run layer's
+unbound/failed states must DISTINGUISH and NAME their cure:
+(a) no run: block → "add run: to org_config"; (b) pyodbc missing →
+the pip line; (c) no ODBC driver → the brew/apt lines (incl.
+`brew trust microsoft/mssql-release`, new brew requirement);
+(d) auth/network → the az-login line. Also: driver-stack preflight
+belongs in the install/packaging story (delivery-architecture
+shelf item) — repeats-across-customers = product signal.
+Resolved locally: unixodbc + msodbcsql18 18.6.2.1 installed,
+'ODBC Driver 18 for SQL Server' visible to python3.11 and .venv.
