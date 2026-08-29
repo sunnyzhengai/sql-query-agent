@@ -356,8 +356,9 @@ The hold lifts only by Sunny's explicit word, recorded here.
       split on commas, never iterated as chars (the tables answer
       renders full names, content-test-held); B16 verbatim in the
       battery; runner prints card CONTENT (assertion blindness
-      closed). 1,245 green + ruff. AWAITS review re-run → Sunny
-      resumes → QA gate → CAPTURE.
+      closed). 1,245 green + ruff. **BATTERY 22/22 REVIEW-GREEN
+      (08-29 night): B16 renders real table names on live content.
+      SUNNY RESUMES → QA gate → CAPTURE.**
 
 ## RULED (Sunny, 2026-08-29): THE GENERATOR CLAUSE — Echo Law amendment
 "Fail twice, no matter the cause, triggers an investigation."
