@@ -118,7 +118,9 @@ rides the planner; awaits review verification + Sunny's re-ask).
       answered verdict. Planner: sameness parses render a confirm
       card, click executes the deterministic plan (same DIFFERS
       line every run), engine fallback intact, opt-in wiring.
-      1,211 green + ruff. AWAITS REVIEW VERIFICATION.
+      1,211 green + ruff. **VERIFIED by review 08-29 — first
+      production class served by parse-is-the-plan (0060), ordered→
+      built→verified inside 24h of the ADR's acceptance.**
       Remaining glass (Sunny): codeset re-ask NOW VIA THE PLANNER
       (parse card → click → DIFFERS + E11.80) · first bound Run →
       then the QA gate.
