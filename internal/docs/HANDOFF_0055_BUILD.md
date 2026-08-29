@@ -2133,3 +2133,21 @@ internal/docs/WALK_TRANSCRIPT_0062.md.
 **Gates:** 1,230 green + 5 xfailed, ruff clean; wheel 1.62.0
 shipped; SYSTEM_VOCAB amendment recorded (node_id/kind/ref —
 schema identifiers).
+
+## ORDER RW-BATCH-6 (E-battery findings; blocks Sunny's walk + QA + capture)
+1. **Latency (QA-blocking):** diagnose from the recorded
+   per-payload splits (transcript in WALK_TRANSCRIPT_0062.md).
+   B2 3-entity ground = 152s live (parallelism not evident);
+   executes 20–185s incl. a 185s single retrieve; B2 confirm
+   timeout. Reproduce on the PRIMARY instance conditions;
+   fix measured causes; budgets stand (card <8s, first op <2s).
+2. **Composer shapes:** feeds card (reads_or_feeds → the chain,
+   metric→report links) and map card (default-map → connected
+   structure). Bare retrieve with kind None is a composer gap,
+   never an answer.
+3. **Lexicon + kinds:** "another way/other than" → variants;
+   kind words (metrics/reports/tables/certified) become KIND
+   FILTERS on the plan, never unmatched entities.
+4. Fix B4's test to the store's real encounters table name.
+Review re-runs the battery after delivery; Sunny walks only on
+review-green.

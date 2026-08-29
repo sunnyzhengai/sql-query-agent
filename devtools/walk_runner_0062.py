@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import json
 import sys
+from pathlib import Path
 import time
 import urllib.request
 
@@ -55,10 +56,14 @@ def _post(base: str, path: str, payload: dict) -> "tuple[dict, int]":
         base + path, data=json.dumps(payload).encode(),
         headers={"Content-Type": "application/json"}, method="POST")
     try:
-        with urllib.request.urlopen(req, timeout=120) as r:
+        with urllib.request.urlopen(req, timeout=300) as r:
             return json.loads(r.read().decode()), r.status
     except urllib.error.HTTPError as e:
-        return json.loads(e.read().decode() or "{}"), e.code
+        raw = e.read().decode(errors="replace")
+        try:
+            return json.loads(raw or "{}"), e.code
+        except json.JSONDecodeError:
+            return {"error": raw[:300]}, e.code
 
 
 def run(base: str, out_path: str) -> None:
@@ -66,7 +71,13 @@ def run(base: str, out_path: str) -> None:
              f"Base: {base}\n"]
     for tag, q in B_BATTERY + QA_V2:
         t0 = time.monotonic()
-        card, status = _post(base, "/api/ask", {"message": q})
+        try:
+            card, status = _post(base, "/api/ask", {"message": q})
+        except Exception as e:  # noqa: BLE001 — battery must survive
+            lines.append(f"\n## {tag}: {q}")
+            lines.append(f"- BATTERY ERROR at ask: {type(e).__name__}: {e}")
+            Path(out_path).write_text("\n".join(lines) + "\n")
+            continue
         card_ms = int((time.monotonic() - t0) * 1000)
         lines.append(f"\n## {tag}: {q}")
         lines.append(f"- card status {status} in {card_ms} ms; "
@@ -79,8 +90,13 @@ def run(base: str, out_path: str) -> None:
         if card.get("no_match") or "parse_confirm" not in card:
             continue
         t1 = time.monotonic()
-        fin, status2 = _post(base, "/api/parse/confirm", {
-            "conversation_id": card.get("conversation_id")})
+        try:
+            fin, status2 = _post(base, "/api/parse/confirm", {
+                "conversation_id": card.get("conversation_id")})
+        except Exception as e:  # noqa: BLE001
+            lines.append(f"- BATTERY ERROR at confirm: {type(e).__name__}: {e}")
+            Path(out_path).write_text("\n".join(lines) + "\n")
+            continue
         exec_ms = int((time.monotonic() - t1) * 1000)
         lines.append(f"- confirm status {status2} in {exec_ms} ms; "
                      f"execute: {fin.get('latency_ms')}")
@@ -94,6 +110,7 @@ def run(base: str, out_path: str) -> None:
                      f"verdict: {concl.get('verdict', '')}")
         for d in (concl.get("diff_lines") or [])[:3]:
             lines.append(f"  - diff: {d}")
+        Path(out_path).write_text("\n".join(lines) + "\n")
     text = "\n".join(lines) + "\n"
     with open(out_path, "w") as f:
         f.write(text)

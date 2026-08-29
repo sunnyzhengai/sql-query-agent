@@ -386,3 +386,37 @@ the disease you are operating.
 Forward: planner rollout class-by-class, evidence-driven; this
 saga is the 0060 experiment's baseline; demo gains the
 determinism beat (same question twice, same answer).
+
+## 2026-08-29 — E-BATTERY VERDICT (review, headless, live store, 16 questions)
+Transcript: WALK_TRANSCRIPT_0062.md. Sunny does NOT walk yet.
+
+**PASSED — the architecture:**
+- De-typing (A): every question produced a card; zero silent
+  routes; no-entity and no-match cards carry all three doors
+  (B9 in 765ms). A3 PROVEN: B1 ≡ QA3 — identical proposal, ops,
+  DIFFERS, E11.80 line. Determinism on glass.
+- Oracles: B1/QA3 exact (E11.80 first line). B10/QA6 policy
+  refusal exact wording + definition offer. B5/QA5 flags census.
+- Grounding wins: parenthetical ids anchor all carriers (B2 card);
+  Lab_Path/Dx_Path/Med_Path ground to their parent composite —
+  the original Lab_Path disease is dead at grounding (B7).
+
+**FAILED / GAPS — the finish work (RW-BATCH-6):**
+1. LATENCY (D3) FAILS LIVE: cards 30–154s on miss-heavy
+  questions; executes 20–185s; B2's confirm TIMED OUT (>300s) —
+  the 3-way camera beat cannot complete. Confound noted: battery
+  ran on a SECOND instance beside Sunny's; but per-payload splits
+  are recorded — dev diagnoses from data, not guesses. Parallel
+  grounding did not show on live (B2: 3 entities ≈ 152s).
+2. ASSEMBLY GAPS: reads_or_feeds plans end in bare retrieve with
+  conclusion kind None/definition (B6, QA4) — no feeds card
+  composed; map-default plans (B8, QA1) render as "definition" —
+  no map card. The composer lacks feeds + map shapes.
+3. LEXICON/KIND GAPS: "another way of defining" read as defines,
+  not variants (B7); kind words ("certified metrics", "reports")
+  treated as unmatched entities instead of kind filters (B6, QA1,
+  QA4).
+4. B4 test itself used a nonexistent table name (ED_ENCOUNTERS) —
+  the no-match card was CORRECT behavior; fix the test to the
+  real table AND note: tier-2 vector candidates (unbuilt) is what
+  would have offered the near-miss.
