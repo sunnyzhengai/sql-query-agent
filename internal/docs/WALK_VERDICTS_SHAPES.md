@@ -325,3 +325,25 @@ route change starved compare of retrieved records. Acceptance =
 this question returning to this afternoon's behavior (DIFFERS +
 E11.80 diff lines on the card).
 **QA GATE HOLDS until RW-12 + RW-13 are green.**
+
+## 2026-08-29 morning re-walk
+**Flags beat: PASS (RW-12 accepted on glass).** Identity + member
+names + why-sentences + glosses + receipt — steward-workable.
+Polish nit (non-blocking): member names lack schema, so colliding
+names render identical ("USP_Active_Diabetics, USP_Active_Diabetics"
+on the misnomer card, whose point is that the shared name hides
+difference). Schema-qualify on collision.
+**Codeset beat: FAIL on acceptance — right conclusion, wrong
+basis.** No compare ran (census → search → retrieve ×2); verdict
+derived from DESCRIPTIONS (80 vs 81) and "stewardship" (not a
+logic basis); no E11.80 machine diff line. Gate passed it because
+descriptions were displayed. Fifth routing specimen; the nudge
+never fired (it counts within ONE retrieve; the turn did two
+single retrieves).
+**FIND RW-15 (mandatory, RW-8 pattern):** sameness/difference
+verdicts REQUIRE a compare result displayed this turn — else
+floored with continuation pressure toward compare(refs). Claim-
+type gated on evidence-type; roll-proof. Plus: co-occurrence
+nudge counts same-kind records across the TURN's displayed set.
+Acceptance = this question, this route, DIFFERS + E11.80 first
+line regardless of route taken. QA GATE HOLDS.

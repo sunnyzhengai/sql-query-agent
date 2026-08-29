@@ -1774,3 +1774,13 @@ dedicated read-only principal (db_datareader minimum) — the
 statement gate is wall one, the credential is wall two; the demo
 estate binding via Sunny's AAD is acceptable for slice 1 only.
 Phase 2 slice 1 is DONE pending Sunny's glass run.
+
+## ORDER RW-BATCH-4 (QA-blocking)
+1. **RW-15 (mandatory):** sameness-verdict duty — same/differ
+   verdicts require a displayed compare basis this turn, else
+   floor + continuation pressure toward compare(refs) (the RW-8
+   claim-type/evidence-type pattern). Nudge upgraded to turn-grain
+   same-kind counting. Acceptance = the codeset question via ANY
+   route: DIFFERS + E11.80 machine diff first line.
+2. Polish (rides along): schema-qualify member names on flag cards
+   when bare names collide.
