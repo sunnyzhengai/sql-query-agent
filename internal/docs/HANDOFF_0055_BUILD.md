@@ -1618,3 +1618,14 @@ refusal (workbench, shared tree) and the store's why-sentences
 (1.58.5 mint). REMAINING FOR CAPTURE: Sunny's glass check of the
 two presentation batches + the DEMO_SCRIPT QA gate run verbatim
 (fresh conversation per question) — wobbles fix-forward, then film.
+
+## ORDER RW-BATCH-3 (glass-check finds; QA-BLOCKING)
+1. **RW-13 (REGRESSION, mandatory):** codeset sameness beat broke
+   tonight — compare blocked twice by a guard after a semantic-
+   search route (details in WALK_VERDICTS_SHAPES.md). Repro
+   headlessly, read the guard detail, fix; acceptance = afternoon
+   behavior restored (DIFFERS + E11.80 machine diff lines).
+2. **RW-12:** flag cards must carry flag IDENTITY + MEMBER NAMES
+   (not bare counts — Sunny's ruling) + the sweep why-sentence
+   (store has them; suspect projection missing the new fields).
+Capture waits on both + fresh QA gate.

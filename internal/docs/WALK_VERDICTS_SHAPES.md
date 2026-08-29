@@ -298,3 +298,30 @@ Her verdict: product impressive, presentation confusing. Finds:
   discloses shifted weight, real usage, demo-law-clean).
   Sequencing decision OPEN (Sunny): second short film post-0056
   (recommended) vs reopening the post-capture ruling.
+
+## 2026-08-28 late — glass check of RW-BATCH-2: partial pass + one REGRESSION
+
+**Flags question:** cards render (chips, glosses, counts,
+receipt) — real progress — but **FIND RW-12:** cards missing the
+flag IDENTITY and the sweep WHY-SENTENCE (empty mid-card
+whitespace; store HAS the sentences per tonight's sweep receipt —
+suspect workbench flag projection not carrying the new fields),
+and Sunny's ask: MEMBER NAMES on the card, not bare counts
+("10 members means nothing to a user"). One order: identity +
+member names + why-sentence on every flag card.
+
+**Codeset question — REGRESSION (FIND RW-13, mandatory,
+QA-blocking):** the same question PASSED this afternoon (exact
+search 2 rows → retrieve → compare → DIFFERS, E11.80). Tonight:
+census(term) 0 → SEMANTIC search (new since the re-embed; 16
+fuzzy rows, "not exhaustive") → **compare blocked TWICE by a
+guard ("skipped call — guard engaged")** → model honestly
+reported comparison failed / cannot confirm (honesty held; no
+fake verdict; verdict wording still said "Answered" — sloppy).
+Dev: pull the guard's expand-for-detail text, repro headlessly,
+identify whether (a) semantic-search rows are not compare-able
+refs, (b) a guard misfires on legitimate compare, or (c) the
+route change starved compare of retrieved records. Acceptance =
+this question returning to this afternoon's behavior (DIFFERS +
+E11.80 diff lines on the card).
+**QA GATE HOLDS until RW-12 + RW-13 are green.**
