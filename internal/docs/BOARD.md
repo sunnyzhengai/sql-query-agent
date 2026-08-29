@@ -324,8 +324,13 @@ The hold lifts only by Sunny's explicit word, recorded here.
       "another way/other than"→variants; kind phrases become
       filters, never missed entities; B4 real table name +
       compose-driven no-match (table words plan lineage). 1,237
-      green + ruff. AWAITS review's battery re-run → Sunny walks
-      on review-green → QA gate → CAPTURE.
+      green + ruff. **E-BATTERY RE-RUN REVIEW-GREEN 16/16 (08-29):
+      cards 0.8-2.6s, executes 0.9-8s, B2 timeout→8s w/ DIFFERS,
+      kind-None extinct. SUNNY CLEARED TO WALK** (her glass =
+      clarity judgment + the untried RUN BUTTON). Demo prep note:
+      warm the store with one throwaway question before capture
+      (~14s idle-wake). Cosmetic nit noted: "red flags" rendered
+      as an unmatched entity beside the flags relation.
 
 ## RULED (Sunny, 2026-08-29): THE GENERATOR CLAUSE — Echo Law amendment
 "Fail twice, no matter the cause, triggers an investigation."
