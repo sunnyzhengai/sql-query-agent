@@ -26,6 +26,7 @@ from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse
 
 from src.branding import product_name
 from src.orchestrator.agent import Turn, run_turn
+from src.orchestrator.conclusion import compose_conclusion
 from src.orchestrator.events import FeedbackEvent, TurnEvent, decision_shape
 from src.orchestrator.tools import Session
 from src.orchestrator.turn_engine import EngineSession
@@ -192,6 +193,8 @@ def create_app(
             "caption_corrected": turn["caption_corrected"],
             "caption_violations": turn["caption_violations"],
             "answered": turn["answered"],
+            "conclusion": compose_conclusion(
+                turn["outputs"], turn["answer"], turn["answered"]),
             "folded_refs": turn.get("folded_refs", []),
             "missing_op": turn["missing_op"],
             "loop_status": (f"one mind: {turn['rounds']} tool round(s)"
@@ -450,6 +453,17 @@ WORKBENCH_PAGE = """<!doctype html>
   .cite { font:11.5px ui-monospace,monospace; background:#eef2fa;
           color:var(--accent); border-radius:6px; padding:1px 6px; }
   .concl { border-left:4px solid var(--accent); }
+  .cc-machine { font:12.5px ui-monospace,monospace; color:#3a4160;
+    margin:6px 0; }
+  .cc-item { margin:6px 0; font-size:13.5px; }
+  .cc-prose { margin-top:8px; }
+  .fc-gloss { font-size:12.5px; font-style:italic; color:#6b7080;
+    margin-top:2px; }
+  .diffline { font:12.5px ui-monospace,monospace; padding:1px 8px;
+    border-radius:4px; margin:2px 0; }
+  .diffline.plus { background:#e7f6ec; }
+  .diffline.minus { background:#fdecec; }
+  .badge.verdict { background:var(--accent); color:#fff; }
   .roundfold { margin:4px 0; }
   .roundfold > .rf-sum { cursor:pointer; list-style:none;
     font:12.5px ui-monospace,monospace; color:#6b7080;
@@ -693,6 +707,66 @@ function foldHeadlineQuotes(raw) {
   return text;
 }
 
+function flagCardHtml(f) {
+  return `<div class="flagcard sev-${esc(f.severity)}">
+    <div class="fc-head"><b>${esc(f.identity)}</b>
+      <span class="badge">${esc(f.flag_class)}</span>
+      <span class="badge sev">${esc(f.severity)}</span></div>
+    <div class="fc-gloss">${esc(f.gloss || '')}</div>
+    <div class="fc-counts">${esc(f.member_count)} members ·
+      ${esc(f.distinct_logics)} distinct logics ·
+      disposition: ${esc(f.disposition)}</div>
+    <div class="fc-why">${esc(f.why || '')}</div></div>`;
+}
+
+function renderConclusion(j) {
+  const c = j.conclusion;
+  const based = `<span class="inputs">based on: ${esc((j.caption_inputs||[]).join(', ')||'—')}${
+    j.answered ? ' · verdict: answered (evidence verified)' : ''}</span>`;
+  const prose = (c && c.prose) ? c.prose : j.caption;
+  const proseHtml = prose ?
+    `<div class="cc-prose">${renderMarkdown(foldHeadlineQuotes(prose))}</div>` : '';
+  if (!c) {
+    if (!j.caption) return null;
+    return el(`<div class="caption concl">${proseHtml}${based}</div>`);
+  }
+  if (c.kind === 'flags') {
+    return el(`<div class="caption concl">
+      ${c.cards.map(flagCardHtml).join('')}
+      <div class="cc-machine">${esc(c.closing)}</div>${based}</div>`);
+  }
+  if (c.kind === 'compare') {
+    const diff = (c.diff_lines || []).map(l =>
+      `<div class="diffline ${l.startsWith('+') ? 'plus' : 'minus'}">${esc(l)}</div>`).join('');
+    const items = (c.items || []).map(i =>
+      `<div class="cc-item"><b>${esc(i.name)}</b> — ${esc(i.description)}</div>`).join('');
+    return el(`<div class="caption concl">
+      <span class="badge verdict">${esc(c.verdict || 'COMPARED')}</span>
+      <span class="cc-machine">${esc(c.verdict_note || '')}</span>
+      ${diff}${items}${proseHtml}${based}</div>`);
+  }
+  if (c.kind === 'definition') {
+    return el(`<div class="caption concl">
+      <div class="cc-item"><b>${esc(c.name)}</b> — ${esc(c.description)}</div>
+      ${c.criteria ? `<div class="cc-machine">criteria: <code>${esc(c.criteria)}</code></div>` : ''}
+      ${proseHtml}${based}</div>`);
+  }
+  if (c.kind === 'policy_refusal') {
+    const d = c.definition;
+    return el(`<div class="caption concl">
+      <div class="cc-machine"><b>${esc(c.refusal)}</b></div>
+      ${d ? `<div class="cc-item"><b>${esc(d.name)}</b> — ${esc(d.description)}</div>` : ''}
+      ${proseHtml}${based}</div>`);
+  }
+  if (c.kind === 'lineage') {
+    return el(`<div class="caption concl">
+      <div class="cc-machine">${esc(c.grain_line)}</div>
+      ${c.note ? `<div class="cc-machine">${esc(c.note)}</div>` : ''}
+      ${proseHtml}${based}</div>`);
+  }
+  return el(`<div class="caption concl">${proseHtml}${based}</div>`);
+}
+
 function renderFinale(j) {
   // RW-3 (mandatory, echoed): tables from auxiliary rounds fold once
   // the verdict lands — the map on demand; headlines stay visible.
@@ -723,34 +797,19 @@ function renderFinale(j) {
     fold.appendChild(panel);
     if (!anchor) anchor = fold;
   }
-  if (j.caption && anchor) {
-    const based = `<span class="inputs">based on: ${esc((j.caption_inputs||[]).join(', ')||'—')}${
-      j.answered ? ' · verdict: answered (evidence verified)' : ''}</span>`;
-    const card = el(`<div class="caption concl">${
-      renderMarkdown(foldHeadlineQuotes(j.caption))}${based}</div>`);
-    anchor.parentNode.insertBefore(card, anchor);
+  // RW-10 (the answer format contract): the conclusion card is
+  // MACHINE-COMPOSED from stamped fields; prose is additive color.
+  // It renders ONCE, on top (RW-9: the duplicate path is deleted).
+  const card = renderConclusion(j);
+  if (card) {
+    if (anchor) anchor.parentNode.insertBefore(card, anchor);
+    else add(card);
   }
   if (j.loop_status) {
     add(el(`<div class="loopline">${esc(j.loop_status)}${
       j.loop_note ? ' — ' + esc(j.loop_note) : ''}</div>`));
   }
-  if (!j.caption) return;
-  const based = `<span class="inputs">based on: ${esc((j.caption_inputs||[]).join(', ')||'—')}${
-    j.answered ? ' · verdict: answered (evidence verified)' : ''}</span>`;
-  const body = renderMarkdown(foldHeadlineQuotes(j.caption));
-  if (j.caption_corrected) {
-    // pointer-style floor (walk W1): the results above ARE the
-    // answer; the verified floor text (stamped headlines, verbatim)
-    // stays one click away instead of repeating the screen.
-    add(el(`<div class="caption"><b>the results above are the answer</b>
-      — the draft answer over-claimed and was floored by the honesty gate
-      (${esc((j.caption_violations||[]).join('; '))}).
-      <details><summary>show the verified floor text</summary><div>${body}</div></details>
-      ${based}</div>`));
-  } else {
-    add(el(`<div class="caption">${body}${based}</div>`));
-  }
-  renderFeedback(j.turn_index);
+    renderFeedback(j.turn_index);
 }
 
 function renderSuggestions(suggestions) {

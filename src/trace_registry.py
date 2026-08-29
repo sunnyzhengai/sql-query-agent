@@ -379,9 +379,13 @@ TRACE_REGISTRY = {
         "category": "product",
         "axioms": ["E6"],
         "modules": ["src/methodology.py",
-                    "src/orchestrator/caption_gate.py"],
+                    "src/orchestrator/caption_gate.py",
+                    # RW-10 (2026-08-28): the answer format
+                    # contract — the ADR's presentation half
+                    "src/orchestrator/conclusion.py"],
         "tests": ["tests/test_methodology.py",
-                  "tests/orchestrator/test_caption_gate.py"],
+                  "tests/orchestrator/test_caption_gate.py",
+                  "tests/orchestrator/test_conclusion.py"],
         "docs": ["docs/METHODOLOGY.md"],
     },
     "0037": {

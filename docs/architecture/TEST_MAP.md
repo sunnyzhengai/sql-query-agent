@@ -7,7 +7,7 @@
 
 # Test Map — what every test proves
 
-109 modules, 1126 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
+110 modules, 1131 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
 
 ## By ADR
 
@@ -41,7 +41,7 @@
 | 0032 | Deterministic core, LLM edges | `tests/orchestrator/test_core.py` (10), `tests/test_grounding_evals.py` (6) |
 | 0033 | System of record + projections: Delta is the record | `tests/graph/test_backend_comparison.py` (11) |
 | 0035 | Agentic conversation over deterministic tools | `tests/orchestrator/test_agent.py` (6), `tests/orchestrator/test_tools.py` (20), `tests/webapp/test_app.py` (21) |
-| 0036 | Operations are the product: plan, confirm, execute, display | `tests/orchestrator/test_caption_gate.py` (30), `tests/test_methodology.py` (8) |
+| 0036 | Operations are the product: plan, confirm, execute, display | `tests/orchestrator/test_caption_gate.py` (30), `tests/orchestrator/test_conclusion.py` (5), `tests/test_methodology.py` (8) |
 | 0037 | The completed algebra: traverse + result-set kernels | `tests/graph/test_traversal.py` (2), `tests/orchestrator/test_ops.py` (71) |
 | 0038 | The interaction layer: 'no' is input | `tests/orchestrator/test_events.py` (7), `tests/steps/test_agent_events.py` (5) |
 | 0039 | Every error links to its contract | `tests/governance/test_funnel.py` (8), `tests/governance/test_journey.py` (7), `tests/test_table_contracts.py` (10) |
@@ -102,6 +102,7 @@
 
 ### contract:suite-legibility — the suite explains itself to Sunny — the proof ledger and the run transcript (morning orders, 2026-08-27)
 
+- `tests/orchestrator/test_conclusion.py` (5): The Answer Format Contract's composer (RW-10): card class is
 - `tests/orchestrator/test_parse_plan.py` (9): ADR 0060 prototype L0: closure is structural, grounding is exact,
 - `tests/shapes/test_seed.py` (7): The demo-source seed (shape-store tenant load, 2026-08-27):
 - `tests/test_suite_map.py` (9): TEST_MAP totality (morning order 1, 2026-08-27): every test module
@@ -145,7 +146,7 @@
 | spec:E3 | 0035, 0050, 0051 | `tests/orchestrator/test_agent.py`, `tests/orchestrator/test_tools.py`, `tests/orchestrator/test_turn_engine.py`, `tests/webapp/test_app.py` |
 | spec:E4 | 0044, 0046 | `tests/graph/test_decision_wiring.py`, `tests/test_derive_relationships.py`, `tests/test_spec_gates.py`, `tests/test_tree_contract.py`, `tests/tree/test_extract.py` |
 | spec:E5 | 0044, 0046 | `tests/graph/test_decision_wiring.py`, `tests/test_derive_relationships.py`, `tests/test_spec_gates.py`, `tests/test_tree_contract.py`, `tests/tree/test_extract.py` |
-| spec:E6 | 0036, 0044, 0051 | `tests/graph/test_decision_wiring.py`, `tests/orchestrator/test_caption_gate.py`, `tests/orchestrator/test_turn_engine.py`, `tests/test_methodology.py`, `tests/test_tree_contract.py`, `tests/tree/test_extract.py` |
+| spec:E6 | 0036, 0044, 0051 | `tests/graph/test_decision_wiring.py`, `tests/orchestrator/test_caption_gate.py`, `tests/orchestrator/test_conclusion.py`, `tests/orchestrator/test_turn_engine.py`, `tests/test_methodology.py`, `tests/test_tree_contract.py`, `tests/tree/test_extract.py` |
 | spec:F | 0044 | `tests/graph/test_decision_wiring.py`, `tests/test_tree_contract.py`, `tests/tree/test_extract.py` |
 | spec:G1 | 0047 | `tests/test_capability_registry.py`, `tests/test_extraction_registry.py`, `tests/test_spec_gates.py` |
 | spec:G2 | 0001, 0047 | `tests/golden/test_parse_goldens.py`, `tests/parser/test_sql_parser.py`, `tests/test_capability_registry.py`, `tests/test_extraction_registry.py`, `tests/test_native_parser_law.py`, `tests/test_spec_gates.py` |

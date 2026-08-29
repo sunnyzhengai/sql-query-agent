@@ -400,9 +400,11 @@ classification).
 - **Implemented by:**
   - `src/methodology.py`
   - `src/orchestrator/caption_gate.py`
+  - `src/orchestrator/conclusion.py`
 - **Enforced by:**
   - `tests/test_methodology.py`
   - `tests/orchestrator/test_caption_gate.py`
+  - `tests/orchestrator/test_conclusion.py`
 - **Summarized in:**
   - `docs/METHODOLOGY.md`
 

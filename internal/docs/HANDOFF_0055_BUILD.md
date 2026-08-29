@@ -1566,3 +1566,29 @@ verbatim (DEMO_SCRIPT.md V2) → capture.
 OPEN CALL (Sunny): flywheel sequencing — second short film
 post-0056 (review recommends) vs reopening the post-capture
 ruling.
+
+### 2026-08-28 — RW-BATCH-2 BUILT (all three; RW-11 acceptance PASSED live)
+**RW-9 (bug):** dead by construction — the machine card is the ONE
+render path; the old duplicate caption blocks are deleted.
+**RW-10 (the answer format contract):** src/orchestrator/
+conclusion.py — the conclusion card is MACHINE-COMPOSED, and card
+class is DATA-DRIVEN from which results the turn displayed (flags →
+cards ON the conclusion with per-class plain glosses + the sweep
+why-sentence + the receipt closing line; compare → verdict chip +
+MACHINE DIFF LINES from the partition's own diff field (identical
+wording every run — the E11.80-vs-mumble stochasticity retired) +
+item one-liners; records → definition card with the top decision
+site's criteria; lineage → grain line verbatim) — never from typing
+question prose (P4 holds). Model prose renders beneath as additive
+color. 5 composer L0 tests; registered under ADR 0036 (its
+presentation half).
+**RW-11 (policy refusal, W10 live):** SYSTEM_PROMPT invariant 3b —
+the fixed-wording first-reply refusal (brand routed through
+product_name(); the brand-neutral-core gate caught the hardcode).
+Pin bumped consciously (recorded at both sites). **ACCEPTANCE
+PASSED LIVE: the exact walk question refused in ZERO rounds** (vs
+the 8-round budget death), fixed sentence verbatim, definition
+offered, composer typing the card policy_refusal.
+Gates: 1,165 green + ruff. Workbench-live via the shared tree.
+CAPTURE GATE now: Sunny's glass check of the batch + the 1.58.5
+publish click + rerun + the script QA verbatim.

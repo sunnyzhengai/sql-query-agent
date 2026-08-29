@@ -725,8 +725,12 @@ def paraphrases(question: str, n: int) -> "list[str]":
 # HANDOFF_0055_BUILD): the retrieve description gained one
 # tool-property sentence — step records carry fed_by_steps /
 # feeds_steps. No question shapes; SYSTEM_PROMPT unchanged.
-PINNED_PROMPT_SHA = ("065dcb4daaa26bc7ed9221d934d5b93e"
-                     "6a6c5b2ae5e0d4896443cbc7bd6b0024")
+# Pin bumped CONSCIOUSLY 2026-08-28 (RW-11, W10 gone live):
+# SYSTEM_PROMPT gained invariant 3b — the fixed-wording policy
+# refusal for patient-data requests. A POLICY statement, not a
+# question shape (P4 holds; it joins rules 1-8 as boundary law).
+PINNED_PROMPT_SHA = ("d71a0b838ddde3abb7de90b957e06132"
+                     "f28176852bbb699e3aa2b9c52738da91")
 
 
 def render_transcript(dump: "list[dict]", run_stamp: str) -> str:
