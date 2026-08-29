@@ -694,3 +694,30 @@ class TestCompareNudge:
         s.note_user(REF_A)
         rs = op_retrieve([REF_A], fake_kql, s)
         assert "compare(refs)" not in rs.note
+
+
+class TestCompareNameResolution:
+    """RW-13 (regression, 2026-08-28): a NAME passed to compare used
+    to keep the name as its id — fragments resolved to nothing and
+    the guard blocked the beat. Names resolve to real ids; a shared
+    name resolves to EVERY carrier."""
+
+    def test_shared_name_resolves_to_both_twins_and_compares(self):
+        s = OpsSession()
+        s.note_user("are the Scores definitions the same?")
+        rs = op_compare(["Scores"], "logic", fake_kql, s)
+        groups = [r for r in rs.rows if "group" in r]
+        # both same-named steps resolved and partitioned (respaced
+        # twins fold to one group in the fake)
+        members = {m for g in groups for m in g["members"]}
+        assert members == {STEP_1, STEP_2}
+
+    def test_business_name_resolves_to_the_metric_id(self):
+        s = OpsSession()
+        s.note_user("compare ED Sepsis Screening with "
+                    "ED Sepsis (Regulatory)")
+        rs = op_compare(["ED Sepsis Screening",
+                         "ED Sepsis (Regulatory)"], "logic",
+                        fake_kql, s)
+        groups = [r for r in rs.rows if "group" in r]
+        assert len(groups) == 2          # SELECT 1 vs SELECT 2

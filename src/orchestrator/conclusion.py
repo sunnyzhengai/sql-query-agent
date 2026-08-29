@@ -40,13 +40,35 @@ def _results(outputs: "list[dict]") -> "list[dict]":
 
 
 def _diff_lines(compare_rows: "list[dict]") -> "list[str]":
+    import re as _re
     for r in compare_rows:
         d = r.get("diff_between_two_largest_groups")
         if d:
             lines = [ln for ln in str(d).splitlines()
                      if (ln.startswith("+") or ln.startswith("-"))
                      and not ln.startswith(("+++", "---"))]
-            return lines[:8]
+            # the DISTILLED delta (glass check 2026-08-28: E11.80
+            # sat buried at the end of two 80-literal lines) — when
+            # a -/+ pair differs by quoted-literal SET, the card
+            # leads with the exact tokens that changed. Machine
+            # set-arithmetic, identical wording every run.
+            out: "list[str]" = []
+            for i in range(len(lines) - 1):
+                a, b = lines[i], lines[i + 1]
+                if a.startswith("-") and b.startswith("+"):
+                    sa = set(_re.findall(r"'([^']+)'", a))
+                    sb = set(_re.findall(r"'([^']+)'", b))
+                    added = sorted(sb - sa)
+                    removed = sorted(sa - sb)
+                    if (added or removed) and len(added) <= 6 \
+                            and len(removed) <= 6:
+                        for tok in added:
+                            out.append(f"+ {tok} — present only in "
+                                       "one definition")
+                        for tok in removed:
+                            out.append(f"- {tok} — absent from one "
+                                       "definition")
+            return (out + lines)[:8]
     return []
 
 
@@ -85,6 +107,8 @@ def compose_conclusion(outputs: "list[dict]", caption: str,
                      "member_count": f.get("member_count"),
                      "distinct_logics": f.get("distinct_logics"),
                      "disposition": f.get("disposition") or "open",
+                     "member_names": (f.get("member_names")
+                                      or [])[:12],
                      "why": f.get("description") or "",
                      "gloss": FLAG_GLOSS.get(
                          str(f.get("flag_class")), "")}

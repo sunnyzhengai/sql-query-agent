@@ -710,3 +710,9 @@ classification).
   - `tests/orchestrator/test_parse_plan.py`
 - **Summarized in:**
   - `docs/decisions/0060-parse-is-the-plan.md`
+
+## ADR 0061 — The run layer: Pro runs the confirmed definition
+
+- **Category:** architecture
+- **Summarized in:**
+  - `docs/decisions/0061-the-run-layer.md`

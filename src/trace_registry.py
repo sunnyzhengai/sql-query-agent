@@ -506,6 +506,17 @@ TRACE_REGISTRY = {
                   "tests/test_companion.py"],
         "docs": ["docs/architecture/SPEC.md", "docs/architecture/TRACE_MAP.md"],
     },
+    "0061": {
+        # DRAFT 2026-08-28 (overnight, review-authored): the run
+        # layer — Pro runs the confirmed definition. Slice 1 ordered
+        # after RW-BATCH-3; three open calls await Sunny (§6).
+        "title": "The run layer: Pro runs the confirmed definition",
+        "category": "architecture",
+        "axioms": [],
+        "modules": [],
+        "tests": [],
+        "docs": ["docs/decisions/0061-the-run-layer.md"],
+    },
     "0060": {
         # ACCEPTED 2026-08-28 (all three calls ruled same-day:
         # confirm-all, usage-promotion w/ steward veto, frontier

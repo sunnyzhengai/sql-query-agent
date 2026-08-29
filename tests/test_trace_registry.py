@@ -69,6 +69,8 @@ def test_architecture_decisions_carry_code_or_tests():
         "0058",  # DRAFT — Pro-pillar contracts; build lands WITH Pro
         "0057",  # design record by construction — binds design, never
                  # the build queue; no modules ever expected
+        "0061",  # DRAFT (overnight 2026-08-28) — the run layer;
+                 # slice 1 modules land with PHASE2-SLICE-1
     }
     empty = [
         adr for adr, e in TRACE_REGISTRY.items()

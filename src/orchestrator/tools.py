@@ -458,6 +458,24 @@ _CLUSTER_PROJECT = (
     "          description = description\n"
 )
 
+# RW-12 (glass check 2026-08-28): member NAMES ride every flag row —
+# "10 members means nothing to a user" (Sunny). Bulk 2-hop over the
+# member_of chain, one query for all clusters.
+GOV_FLAG_MEMBER_NAMES_QUERY = (
+    "graph_edges\n"
+    "| where edge_type == 'member_of' and target_id startswith "
+    "'loggroup:'\n"
+    "| project member = source_id, lg = target_id\n"
+    "| join kind=inner (graph_edges\n"
+    "    | where edge_type == 'member_of' and target_id startswith "
+    "'cluster:'\n"
+    "    | project lg = source_id, cluster = target_id) on lg\n"
+    "| join kind=leftouter (graph_nodes\n"
+    "    | project member = node_id, mname = name) on member\n"
+    "| extend shown = coalesce(mname, member)\n"
+    "| summarize member_names = make_list(shown, 12) by cluster"
+)
+
 GOV_FLAGS_QUERY = (
     "graph_nodes\n"
     "| where node_id startswith 'cluster:'\n"

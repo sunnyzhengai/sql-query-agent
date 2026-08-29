@@ -476,6 +476,7 @@ WORKBENCH_PAGE = """<!doctype html>
   .flagcard.sev-CONFLICT { border-left:4px solid #d9534f; }
   .flagcard.sev-INFO { border-left:4px solid #f0ad4e; }
   .fc-head { display:flex; gap:8px; align-items:center; }
+  .fc-members { font-size:12.5px; margin-top:4px; }
   .fc-counts { font:12px ui-monospace,monospace; color:#6b7080;
     margin-top:4px; }
   .fc-why { margin-top:6px; font-size:13.5px; }
@@ -713,6 +714,8 @@ function flagCardHtml(f) {
       <span class="badge">${esc(f.flag_class)}</span>
       <span class="badge sev">${esc(f.severity)}</span></div>
     <div class="fc-gloss">${esc(f.gloss || '')}</div>
+    ${(f.member_names && f.member_names.length) ?
+      `<div class="fc-members">${esc(f.member_names.join(', '))}</div>` : ''}
     <div class="fc-counts">${esc(f.member_count)} members ·
       ${esc(f.distinct_logics)} distinct logics ·
       disposition: ${esc(f.disposition)}</div>

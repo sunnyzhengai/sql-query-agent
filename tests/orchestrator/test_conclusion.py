@@ -70,3 +70,19 @@ def test_policy_refusal_recognized_by_the_fixed_sentence():
 
 def test_no_stamped_fields_returns_none():
     assert compose_conclusion([], "just prose", False) is None
+
+
+def test_diff_distills_the_literal_delta_first():
+    # glass check 2026-08-28: E11.80 sat buried at the end of two
+    # 80-literal lines — the card leads with the exact delta
+    c = compose_conclusion([
+        _out("compare",
+             [{"group": 1, "members": ["a"]},
+              {"group": 2, "members": ["b"]},
+              {"diff_between_two_largest_groups":
+               "-WHERE X IN ('E11.79', 'E11.10')\n"
+               "+WHERE X IN ('E11.79', 'E11.10', 'E11.80')"}],
+             note="2 hash groups — logic DIFFERS."),
+    ], "prose", True)
+    assert c["diff_lines"][0] == \
+        "+ E11.80 — present only in one definition"

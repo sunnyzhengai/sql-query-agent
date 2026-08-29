@@ -1655,3 +1655,25 @@ Scope:
    exist so the flywheel counts runs from day one).
 Typed failures per the error contract. Whole-proc execution,
 charts, real-estate PHI output gate: explicitly LATER slices.
+
+### 2026-08-29 — RW-BATCH-3 BUILT (QA-blocking pair closed)
+**RW-13 (regression): root-caused + dead.** A NAME passed to
+compare kept the name AS its id — the fragment fetch found nothing
+and the guard blocked the beat (the semantic route made name-args
+likely). Names now resolve to their REAL ids, and a SHARED name
+resolves to EVERY carrier (collisions anchor wholly — the
+parse-plan lesson landed in the algebra). 2 L0 tests; live
+acceptance: guard-free runs, and the compare route delivered
+**DIFFERS with E11.80 distilled to the card's FIRST line** ("+
+E11.80 — present only in one definition") — the delta no longer
+buried at the end of two 80-literal lines (deterministic
+set-arithmetic over quoted literals, identical wording every run).
+**RW-12: identity + why-sentence + MEMBER NAMES on every flag
+row/card.** The census row shaping was dropping identity and
+description (the store had them — the projection was fine); both
+now ride, plus member names via a bulk 2-hop member_of query (one
+query, all clusters, NO wheel cycle needed — query-side only,
+workbench-live). Cards render names, not bare counts.
+0061 registered as a sanctioned draft. Gates: 1,168 green + ruff.
+**Remaining before capture: fresh QA gate per the script (Sunny/
+review). Then PHASE2-SLICE-1 per the overnight order.**

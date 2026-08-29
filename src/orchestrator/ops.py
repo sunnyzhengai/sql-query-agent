@@ -36,6 +36,7 @@ from src.orchestrator.tools import (
     DECISIONS_OF_STEP_QUERY,
     FIND_BY_NAME_QUERY,
     GOV_FLAG_BY_ID_QUERY,
+    GOV_FLAG_MEMBER_NAMES_QUERY,
     GOV_FLAG_MEMBERS_QUERY,
     GOV_FLAGS_BY_IDENTITY_QUERY,
     GOV_FLAGS_FOR_MEMBER_QUERY,
@@ -519,8 +520,26 @@ def op_census(kind: str, run_kql, session: OpsSession,
                 "store — it predates the graph-native sweep; rerun "
                 "300_build_graph on engine >= 1.58 (absence of "
                 "clusters is not proven zero flags)")
+        # RW-12: identity, the sweep why-sentence, and MEMBER NAMES
+        # ride every census row — the card is the differentiation
+        # queue, and bare counts mean nothing to a user
+        names_by_cluster: "dict[str, list]" = {}
+        try:
+            for mr in run_kql(GOV_FLAG_MEMBER_NAMES_QUERY, {}):
+                names_by_cluster[str(mr.get("cluster"))] = list(
+                    mr.get("member_names") or [])
+        except Exception as e:              # noqa: BLE001 — additive
+            # member names are ADDITIVE display data; a failed bulk
+            # join never blocks the census — but it is disclosed
+            names_by_cluster = {}
+            print(f"[flag census] member-name join unavailable: "
+                  f"{type(e).__name__}")
         out = [{"id": str(r["flag_id"]), "kind": "flag",
                 "name": str(r.get("identity") or ""),
+                "identity": str(r.get("identity") or ""),
+                "description": str(r.get("description") or ""),
+                "member_names": names_by_cluster.get(
+                    str(r["flag_id"]), []),
                 "business_name": None, "of_metric": None,
                 "flag_class": r.get("flag_class"),
                 "grain": r.get("grain"),
@@ -1313,16 +1332,29 @@ def op_compare(refs: "list[str]", aspect: "str | None", run_kql,
         if not session.permitted(arg):
             refused.append(arg)
             continue
-        row: dict = {"id": arg}
         found = run_kql(FIND_BY_NAME_QUERY, {"p_name": arg})
         if found:
-            r0 = found[0]
-            row.update({
-                "kind": r0.get("kind"),
-                "name": r0.get("name"),
-                "business_name": r0.get("business_name") or None})
-        items.append(row)
-        seen_ids.add(arg)
+            # RW-13 (regression, 2026-08-28): a NAME arg used to keep
+            # the name AS its id — the fragment fetch then found
+            # nothing and the guard blocked the compare. Names now
+            # resolve to their REAL ids, and a shared name resolves
+            # to EVERY carrier (collisions anchor wholly — comparing
+            # 'Diabetic Codeset' means comparing its two twins).
+            for r0 in found[:4]:
+                rid = (str(r0.get("ref"))
+                       if r0.get("kind") == "metric"
+                       else str(r0.get("node_id") or ""))
+                if not rid or rid in seen_ids:
+                    continue
+                session.surfaced.add(rid)
+                items.append({
+                    "id": rid, "kind": r0.get("kind"),
+                    "name": r0.get("name"),
+                    "business_name": r0.get("business_name") or None})
+                seen_ids.add(rid)
+        else:
+            items.append({"id": arg})
+            seen_ids.add(arg)
     items = [i for i in items if i.get("id")]
     if len(items) < 2:
         detail = (f"; refused (never surfaced or user-named): {refused}"
