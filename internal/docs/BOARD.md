@@ -289,3 +289,10 @@ The hold lifts only by Sunny's explicit word, recorded here.
 — Dev session: HOLD ACKNOWLEDGED (08-29). No code moves; watcher
   stays armed for the planning conversation; available for
   questions and analysis docs on request.
+
+## RULED (Sunny, 2026-08-29): THE GENERATOR CLAUSE — Echo Law amendment
+"Fail twice, no matter the cause, triggers an investigation."
+Stronger than review's draft: two failures on ONE beat — even with
+different proximate causes — mandate a generator investigation
+one level up before any further same-level patch. Effective
+immediately; joins the Echo Law.
