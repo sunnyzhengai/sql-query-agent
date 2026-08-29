@@ -74,3 +74,35 @@ certified." (Round 4 is the recorded evidence for the inversion.)
 - Where the Purview/Collibra write-back now sits (previous Basic
   definition) — candidate: Basic integration add-on or Pro; not yet
   ruled.
+
+## The Ground-Truth Shelf (Sunny's direction, 2026-08-28 evening)
+
+Old SaaS = assured interfaces (autopilot muscle memory). Chat
+agents = ephemeral. AIVIA in between → give users a PERSISTENT
+SHELF: the sidebar renders their own captured decisions (0056) so
+their ground truth visibly accumulates in AIVIA.
+
+Three sections, all views over the 0056 decision store (no new
+data model):
+1. **My definitions** — confirmed/certified metrics; click →
+   instant definition card, no re-ask.
+2. **My reports** — PBI links confirmed/clicked from answers,
+   ordered by the user's own usage (capture the click, own the
+   habit that today lives in browser bookmarks).
+3. **My questions** — a saved question is a SAVED OPERATION:
+   deterministic ops replay with fresh data, same shape, machine
+   stamps. Familiar guarantees, not just familiar pixels — chat
+   products structurally cannot offer this.
+
+Principle: **the conversation is the instrument; the shelf is the
+ledger.** Retention via accrued ground truth, not lock-in. Shelf =
+stage one of citizen stewardship (0038): personal certified items
+that many users converge on are promotion candidates — the same
+usage-threshold + steward-veto ladder as the 0060 lexicon.
+
+Caveat: personal shelf needs user identity → multi-user version
+rides the access-control gate (0038). Single-user shelf suffices
+for FILM TWO: empty shelf → walk → shelf accrued on camera; the
+flywheel visible without narration.
+Sequencing: film one unchanged (governance beats). Shelf + 0056
+capture verbs = ONE build = film two's content.
