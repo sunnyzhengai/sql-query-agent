@@ -117,4 +117,3 @@ better — the flywheel's front door.
    natural build?
 3. Ratify §3 as the standing axiom register (cited in future
    drift debates like spec:IDs)?
-EOF

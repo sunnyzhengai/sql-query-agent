@@ -506,6 +506,19 @@ TRACE_REGISTRY = {
                   "tests/test_companion.py"],
         "docs": ["docs/architecture/SPEC.md", "docs/architecture/TRACE_MAP.md"],
     },
+    "0062": {
+        # DRAFT 2026-08-29 (review-authored under the DEVELOPMENT
+        # HOLD): the dialogue loop — show/propose/ask/execute,
+        # question types abolished, escalation rung to developer
+        # RULED. Awaits Sunny's ratification; no code until the
+        # hold lifts.
+        "title": "The dialogue loop: show, propose, ask, execute",
+        "category": "architecture",
+        "axioms": [],
+        "modules": [],
+        "tests": [],
+        "docs": ["docs/decisions/0062-the-dialogue-loop.md"],
+    },
     "0061": {
         # DRAFT 2026-08-28 (overnight, review-authored): the run
         # layer — Pro runs the confirmed definition. Slice 1 built

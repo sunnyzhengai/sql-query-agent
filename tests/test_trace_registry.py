@@ -69,6 +69,8 @@ def test_architecture_decisions_carry_code_or_tests():
         "0058",  # DRAFT — Pro-pillar contracts; build lands WITH Pro
         "0057",  # design record by construction — binds design, never
                  # the build queue; no modules ever expected
+        "0062",  # DRAFT under the DEVELOPMENT HOLD — modules land
+                 # only after Sunny ratifies and lifts the hold
     }
     empty = [
         adr for adr, e in TRACE_REGISTRY.items()
