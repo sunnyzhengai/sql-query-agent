@@ -121,9 +121,13 @@ rides the planner; awaits review verification + Sunny's re-ask).
       1,211 green + ruff. **VERIFIED by review 08-29 — first
       production class served by parse-is-the-plan (0060), ordered→
       built→verified inside 24h of the ADR's acceptance.**
-      Remaining glass (Sunny): codeset re-ask NOW VIA THE PLANNER
-      (parse card → click → DIFFERS + E11.80) · first bound Run →
-      then the QA gate.
+- [x] **Codeset beat PASS on glass (Sunny, 08-29)** — planner-
+      served: parse card → click → DIFFERS, "+ E11.80" first line,
+      full diff, evidence-verified. **LAST QA BLOCKER CLOSED.**
+      Retrospective recorded in WALK_VERDICTS_SHAPES (five
+      failures, five distinct causes, one generator — the 0060
+      saga is the experiment's baseline).
+      Remaining glass (Sunny): first bound Run → then the QA gate.
 - [ ] Finder-coverage contract (timing = Sunny's call; drilldown
       benefit if pre-capture)
 - [ ] 0056 decision layer + presentation reframe (POST-capture by
@@ -154,6 +158,12 @@ rides the planner; awaits review verification + Sunny's re-ask).
       live, zero probe refs — ops-find #3 CLOSED. (Sweep push shipped
       3 red tests from in-flight seed work — fix-forward flagged.)
 
+- [ ] **RULING REQUESTED — the generator clause (Echo Law
+      amendment, proposed in the 08-29 retrospective):** two
+      failures on ONE beat with DISTINCT proximate causes → stop
+      building at the failure's level; the missing mechanism is
+      one level up, in what generates the variance. (Full text in
+      WALK_VERDICTS_SHAPES.)
 - [ ] ADR 0058 self-service contracts: ratify + 2 sub-calls
       (parameter-range depth; quarantine release authority)
 - [ ] Tier naming (listing-copy time; seeds recorded in
