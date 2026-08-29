@@ -2246,3 +2246,17 @@ registry" (near-miss name). DOM smoke joined section D.
 **Gates:** 1,241 green + 5 xfailed, ruff clean; wheel 1.64.0
 shipped. Ready for review's extended-battery re-run; Sunny walks
 on review-green, per the order.
+
+## ORDER RW-22 (extended battery: one failure class)
+B13/B14: kind-only census plans execute but compose NO card
+(conclusion kind None) — the composer-gap law was written as "any
+successful RETRIEVE composes"; census escaped the wording. Amend
+the law to ANY SUCCESSFUL OP and add the CENSUS CARD: count line +
+the rows (name + description), per the format contract. Everything
+else in the 21-question battery is healthy: stem tier grounds all
+three of Sunny's questions generously (B11 2 codesets + 2 extras,
+prunable), B15 near-miss grounds, B2 completes at 8s, DIFFERS
+oracles hold. Minor note (non-blocking): B15 "diabetics registry"
+matched only the Dashboard — the Diabetes Registry metric family
+should join its candidate list; candidate breadth rides tier-2.
+Review re-runs the battery on delivery; green → Sunny walks.
