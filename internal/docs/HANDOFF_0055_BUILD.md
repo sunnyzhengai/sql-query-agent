@@ -1856,3 +1856,16 @@ regenerated; wheel 1.59.1 shipped into sql-logic-env.
 **Live acceptance remaining (Sunny/review, on glass):** the
 codeset question via any route → DIFFERS with the E11.80 machine
 diff first line; and a bound run button showing first data.
+
+### REVIEW VERDICT — RW-BATCH-4 + RW-16: VERIFIED
+Gates review-side: 1,200 passed + 5 xfailed, ruff clean — matches.
+Design conformance noted with approval: the duty is data-anchored
+(claim lexicon fires only with >=2 same-kind records displayed —
+language alone never floors a benign turn), the floored rejection
+NAMES the exact compare(refs) ids (pressure toward the truth, the
+RW-8 pattern), errored compares hand to W12b (no double-floor of
+honest "unverified"), the nudge is turn-scoped and turn-cleared,
+and every run-layer failure now carries its cure at both bind and
+execute time. LIVE ACCEPTANCE REMAINING (Sunny, on glass): (1) the
+codeset question — expect DIFFERS + E11.80 machine line via any
+route; (2) the bound Run button — first data. Then the QA gate.
