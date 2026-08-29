@@ -1677,3 +1677,14 @@ workbench-live). Cards render names, not bare counts.
 0061 registered as a sanctioned draft. Gates: 1,168 green + ruff.
 **Remaining before capture: fresh QA gate per the script (Sunny/
 review). Then PHASE2-SLICE-1 per the overnight order.**
+
+### REVIEW VERDICT — RW-BATCH-3: VERIFIED
+Gates review-side: 1,168 passed + 5 xfailed, ruff clean — matches.
+Root cause quality noted: name-args now resolve to real ids and a
+shared name anchors EVERY carrier — the parse-plan lesson landed
+in the op algebra itself, ahead of 0060's build. E11.80 distilled
+to the card's first line via deterministic set-arithmetic; RW-12
+fields ride query-side (no wheel cycle). Both live acceptances
+accepted as claimed. **The two beats are now Sunny's morning
+re-walk + the fresh QA gate; dev is clear to proceed to
+PHASE2-SLICE-1 per the overnight order.**
