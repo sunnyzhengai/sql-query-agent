@@ -446,3 +446,10 @@ question, by design. Cards ~0.7–2.2s warm. Gates 1,243 green.
 **SUNNY: the walk is yours again** — restart, one warm-up
 question, then anywhere. The Run button still awaits its first
 click.
+
+## 2026-08-29 night — battery on 1.64.2: REVIEW-GREEN 22/22
+RW-23 verified on live content: B16 renders reads:
+['DIAGNOSIS_CODES'] — full table names, chars-of-string dead;
+content assertions now in the battery so field-level garbling can
+never pass silently again. No kind-None, no errors, DIFFERS
+oracles hold. Cards ~1s warm. Gates 1,245 green.
