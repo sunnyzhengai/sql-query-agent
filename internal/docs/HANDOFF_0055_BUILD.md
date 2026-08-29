@@ -2051,3 +2051,20 @@ codeset beat on glass, then QA gate, then CAPTURE.
 Note for the lexicon corpus: Sunny — when a question misses the
 card or reads wrong, paste the question text; every miss is
 exactly the data the flywheel wants.
+
+## RULING (Sunny, 2026-08-29) — REMOVE THE TYPE FIRST; supersedes RW-BATCH-5 item 2's sequencing
+Delete the shape-recognition path OUTRIGHT before building its
+replacement — no development from the crutch. Concretely:
+- The whole-question pattern test (same_or_different template) is
+  REMOVED, not wrapped. "same/different" move into the word-grain
+  relation lexicon as edge selectors.
+- SILENT fallback to the engine ENDS for every question. The
+  engine is reachable ONLY via the card's explicit "answer
+  without the planner" button. Zero-grounded-entity questions get
+  a no-match CARD (no-dead-ends: "no catalog match" + rephrase +
+  developer door + engine button) — never a silent route.
+- Every question: extract generously → ground → CARD. No
+  recognition step exists anywhere.
+Build lands only against TESTPLAN_0062.md (below); machine
+acceptance green + measured latencies recorded BEFORE Sunny
+re-walks (her second directive).
