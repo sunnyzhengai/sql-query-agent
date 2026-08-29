@@ -345,9 +345,12 @@ The hold lifts only by Sunny's explicit word, recorded here.
 - [x] **RW-22 BUILT (08-29 dev, 1.64.1)** — census card (count
       line + rows, per the format contract); composer-gap law
       AMENDED to ANY successful op (wording bug dead, test-held);
-      DOM harness census variant. 1,243 green + ruff. AWAITS
-      review's battery re-run → green → Sunny walks → QA gate →
-      CAPTURE.
+      DOM harness census variant. 1,243 green + ruff.
+      **EXTENDED BATTERY REVIEW-GREEN 21/21 (08-29 evening):
+      Sunny's own walk-breakers pass, cards 0.7-2.2s warm, DIFFERS
+      oracles ×3. SUNNY CLEARED TO WALK — restart, one warm-up
+      question, then anywhere; the Run button awaits its first
+      click. Then QA gate → CAPTURE.**
 
 ## RULED (Sunny, 2026-08-29): THE GENERATOR CLAUSE — Echo Law amendment
 "Fail twice, no matter the cause, triggers an investigation."
