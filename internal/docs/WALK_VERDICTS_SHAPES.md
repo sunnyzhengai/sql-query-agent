@@ -435,3 +435,14 @@ unmatched entity alongside the flags relation (harmless; noted).
 clarity judgment: the streamed skeleton, card readability, prune
 boxes, the new map/feeds cards, the E11.80 beat, and the untried
 RUN BUTTON (first data on glass still awaits its first click).
+
+## 2026-08-29 evening — EXTENDED BATTERY (1.64.1): REVIEW-GREEN 21/21
+Sunny's three walk-breaking questions all pass (stem-tier generous
+grounding, prunable candidates); kind-only censuses compose their
+cards (composer law amended to ANY successful op); no-match card
+JS crash dead with the DOM runtime gate red-on-bug proven; B2
+completes at 8s; DIFFERS oracles ×3; sole no-match = the weather
+question, by design. Cards ~0.7–2.2s warm. Gates 1,243 green.
+**SUNNY: the walk is yours again** — restart, one warm-up
+question, then anywhere. The Run button still awaits its first
+click.
