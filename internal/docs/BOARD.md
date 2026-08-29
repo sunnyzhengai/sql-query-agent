@@ -295,7 +295,17 @@ The hold lifts only by Sunny's explicit word, recorded here.
 — **ON LIFT (per 0062 ACCEPTED, call 2): dev's FIRST task is the
   iteration-card conversion** (parse card → show/propose/ask/
   execute, developer door visible every round). QA gate + capture
-  follow the conversion. Dev holds ready.
+  follow the conversion.
+- [x] **ITERATION-CARD CONVERSION BUILT (08-29 dev, 1.61.0,
+      immediately on lift)** — SHOW grounded matches at parse time
+      (per-entity, collisions whole), PROPOSE reading, ASK with
+      prune checkboxes + engine fallback + THE DEVELOPER DOOR
+      every round; /api/escalate captures demand as a 0056 deny
+      event + mailto (org_config escalation.contact, optional);
+      prune-to-empty refuses typed. 0062 exits sanctioned-draft.
+      1,215 green + ruff. AWAITS REVIEW VERIFICATION, then Sunny's
+      glass check of the converted codeset beat → QA gate →
+      CAPTURE.
 
 ## RULED (Sunny, 2026-08-29): THE GENERATOR CLAUSE — Echo Law amendment
 "Fail twice, no matter the cause, triggers an investigation."

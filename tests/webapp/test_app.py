@@ -9,7 +9,7 @@ from marketplace_host.handlers import HostConfig
 from src.orchestrator.events import JsonlEventSink
 from src.webapp.app import MarketplaceDeps, create_app
 from tests.orchestrator.test_agent import scripted_api
-from tests.orchestrator.test_tools import REF_A, STEP_1, fake_kql
+from tests.orchestrator.test_tools import REF_A, STEP_1, STEP_2, fake_kql
 
 
 def chat_client(tmp_path, script):
@@ -497,3 +497,77 @@ class TestPlannerSamenessClass:
         r = client.post("/api/ask", json={
             "message": "are the two Scores steps the same?"})
         assert "parse_confirm" not in r.json()
+
+
+class TestIterationCard:
+    """ADR 0062 conversion (hold-lift order 08-29, first task): the
+    parse card becomes the ITERATION card — SHOW grounded matches
+    before the ask, prune as a decision item, developer door on
+    every round (a standing option, never a last resort)."""
+
+    def _client(self, contact=""):
+        import tempfile
+        from pathlib import Path
+
+        from src.orchestrator.events import JsonlEventSink
+        path = Path(tempfile.mkdtemp()) / "events.jsonl"
+        sink = JsonlEventSink(path)
+        maker = TestPlannerSamenessClass()
+        app = create_app(maker._parse_api(), fake_kql, sink,
+                         planner=True, escalation_contact=contact)
+        return TestClient(app), path
+
+    def test_card_shows_grounded_matches_before_the_ask(self):
+        client, _ = self._client()
+        r = client.post("/api/ask", json={
+            "message": "are the two Scores steps the same?"})
+        j = r.json()
+        [entry] = j["show"]
+        assert entry["entity"] == "Scores"
+        ids = {m["id"] for m in entry["matches"]}
+        assert ids == {STEP_1, STEP_2}   # collisions anchor wholly
+        assert "outputs" not in j        # still nothing executed
+
+    def test_pruning_a_match_excludes_it_from_the_plan(self):
+        client, _ = self._client()
+        r1 = client.post("/api/ask", json={
+            "message": "are the two Scores steps the same?"})
+        conv = r1.json()["conversation_id"]
+        # prune BOTH matches → the sameness plan cannot compose →
+        # typed refusal, never a guessed route
+        r2 = client.post("/api/parse/confirm", json={
+            "conversation_id": conv,
+            "exclude_ids": [STEP_1, STEP_2]})
+        assert r2.status_code == 422
+        assert r2.json()["reason_class"] == "parse_refusal"
+
+    def test_developer_door_captures_the_demand(self):
+        client, events = self._client(contact="dev@example.org")
+        r1 = client.post("/api/ask", json={
+            "message": "are the two Scores steps the same?"})
+        conv = r1.json()["conversation_id"]
+        r2 = client.post("/api/escalate",
+                         json={"conversation_id": conv,
+                               "note": "I meant the sepsis scores"})
+        assert r2.status_code == 200
+        j = r2.json()
+        assert j["captured"] is True
+        assert "none of the shown understanding" in j["summary"]
+        assert "I meant the sepsis scores" in j["summary"]
+        assert j["mailto"].startswith("mailto:dev@example.org?")
+        row = json.loads(events.read_text().splitlines()[-1])
+        assert row["question"].startswith("[ESCALATE]")
+        assert row["answered"] is False
+        assert row["decision"]["made_by"] == "user_escalation"
+        # the pending attempt ends at the door
+        r3 = client.post("/api/parse/confirm",
+                         json={"conversation_id": conv})
+        assert r3.status_code == 409
+
+    def test_door_without_contact_still_captures(self):
+        client, _ = self._client(contact="")
+        r = client.post("/api/escalate",
+                        json={"conversation_id": "c1",
+                              "question": "anything at all"})
+        j = r.json()
+        assert j["captured"] is True and j["mailto"] == ""

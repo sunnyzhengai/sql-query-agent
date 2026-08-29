@@ -159,13 +159,26 @@ def build() -> "object":
     from src.orchestrator.agent import azure_chat_api
     from src.webapp.app import create_app
     executor, cap, source, unbound = _run_executor()
-    # planner=True: ADR 0060 sameness class rides the parse→plan
-    # path in production (ordered 2026-08-29 after codeset FAIL #3);
-    # every other class stays on the engine
+    # planner=True: the parse→plan path serves in production (0060,
+    # generalized to the 0062 iteration card); every other class
+    # stays on the engine. escalation.contact (org_config, optional)
+    # addresses the developer door's mailto — the door itself and
+    # the captured-demand event exist regardless.
+    contact = ""
+    cfg = Path("org_config.yaml")
+    if cfg.exists():
+        try:
+            import yaml
+            contact = str(((yaml.safe_load(cfg.read_text()) or {})
+                           .get("escalation") or {})
+                          .get("contact") or "").strip()
+        except Exception:   # noqa: BLE001, S110 — optional block
+            pass
     return create_app(azure_chat_api(), _kusto_run(), _sink(),
                       _marketplace(), run_executor=executor,
                       run_cap=cap, run_source=source,
-                      run_unbound=unbound, planner=True)
+                      run_unbound=unbound, planner=True,
+                      escalation_contact=contact)
 
 
 app = build() if legacy_env("WEBAPP_EAGER", "1") != "0" else None

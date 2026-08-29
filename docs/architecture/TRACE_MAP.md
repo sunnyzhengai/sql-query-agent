@@ -724,5 +724,9 @@ classification).
 ## ADR 0062 — The dialogue loop: show, propose, ask, execute
 
 - **Category:** architecture
+- **Implemented by:**
+  - `src/webapp/app.py`
+- **Enforced by:**
+  - `tests/webapp/test_app.py`
 - **Summarized in:**
   - `docs/decisions/0062-the-dialogue-loop.md`

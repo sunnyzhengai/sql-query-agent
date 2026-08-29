@@ -1969,3 +1969,46 @@ ordered, built, and verified within 24 hours of the ADR's
 acceptance. LIVE ACCEPTANCE (Sunny): re-ask the codeset question →
 purple parse card → click → DIFFERS + E11.80. Then the Run button,
 then the QA gate.
+
+### 2026-08-29 — ITERATION-CARD CONVERSION (0062 first task, hold-lift order) — release 1.61.0
+**The purple parse card is now the ITERATION CARD.** Per the
+accepted loop:
+- **SHOW:** grounding runs at PARSE time (a read; reads run
+  immediately, ADR 0050) and the card lists what the graph
+  actually matched per entity — name, kind, id; collisions anchor
+  wholly and every carrier shows; an ungrounded entity says "no
+  catalog match" plainly. The human decides on the graph's real
+  matches, never on a blind echo of their own words.
+- **PROPOSE:** the reading line (deterministic render of the
+  parse — the model's only authorship remains the parse itself).
+- **ASK, three decision items:** (1) run this plan — unchecked
+  matches are PRUNED, and that one confirm ratifies the pruned
+  reading (no-nag: its ops then run without further ceremony;
+  pruning everything composes no plan → typed parse_refusal,
+  never a guessed route); (2) answer without the planner (engine
+  fallback unchanged); (3) **THE DEVELOPER DOOR — on the card
+  every round, as ruled.**
+- **THE DOOR (/api/escalate):** "none of these is right" is not a
+  dead end — the full exchange (question, shown matches per
+  entity, the rejection, an optional user note) becomes a
+  CAPTURED DEMAND: a 0056 deny-shape TurnEvent
+  (made_by=user_escalation, answered=false, matched ids in
+  ids_read) plus a human summary and a prefilled mailto when
+  org_config `escalation: contact:` is set (Teams users paste the
+  same summary; the door and the capture exist regardless of the
+  contact line). The pending attempt ends at the door.
+- EXECUTE: unchanged — the confirmed plan runs through the
+  existing algebra; stamped results + machine compare card.
+
+Registry: 0062 exits the sanctioned-draft set (modules + tests
+cited). Wiring: escalation contact read from org_config
+`escalation: contact:` (optional, gitignored file).
+**Gates:** 1,215 green + 5 xfailed, ruff clean; wheel 1.61.0
+shipped; docs regenerated.
+**Next per the lift order:** review verifies → Sunny glass-checks
+the converted codeset beat (expect: understanding card with both
+codeset twins SHOWN, prune boxes, three buttons; click → DIFFERS
++ E11.80 as before) → QA gate → CAPTURE.
+**SUNNY (optional, one local line):** `escalation:\n  contact:
+<your email>` in org_config.yaml puts a working mailto on the
+door; without it the door still captures and shows the summary.

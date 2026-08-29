@@ -73,6 +73,7 @@ def create_app(
     run_source: str = "",
     run_unbound: str = "",
     planner: bool = False,
+    escalation_contact: str = "",
 ) -> FastAPI:
     app = FastAPI(title=product_name(), docs_url=None, redoc_url=None)
     conversations: "dict[str, Conversation]" = {}
@@ -305,19 +306,45 @@ def create_app(
         click — same parse, same plan, same DIFFERS line, every
         run. Any parser trouble falls through to the engine, which
         remains the default surface for every other class."""
-        from src.orchestrator.parse_plan import parse_question
+        from src.orchestrator.parse_plan import (
+            ground_entities,
+            parse_question,
+        )
         try:
             parse = parse_question(question, chat_api)
         except Exception:   # noqa: BLE001 — parser down ≠ workbench down
             return None
         if parse.primitives != ["same_or_different"] or not parse.entities:
             return None
+        # 0062 conversion (hold-lift order, 2026-08-29): the card is
+        # an ITERATION card — SHOW the grounded matches BEFORE the
+        # ask (grounding is a read; reads run immediately, ADR 0050).
+        # The human decides on what the graph actually matched, not
+        # on a blind echo of their own words.
+        try:
+            anchors = ground_entities(parse.entities, run_kql,
+                                      conv.engine.ops)
+        except Exception:   # noqa: BLE001 — grounding trouble → engine
+            return None
+        show: "list[dict]" = []
+        for e in parse.entities:
+            matches = [
+                {"id": a["id"], "kind": a.get("kind"),
+                 "name": ((a.get("rows") or [{}])[0].get("business_name")
+                          or (a.get("rows") or [{}])[0].get("name")
+                          or a["id"])}
+                for a in anchors if a["entity"] == e and a["id"]]
+            show.append({"entity": e, "matches": matches})
         conv.pending_parse = {"question": question,
                               "entities": parse.entities,
                               "primitives": parse.primitives,
-                              "modifiers": parse.modifiers}
+                              "modifiers": parse.modifiers,
+                              "show": show}
         return {"parse_confirm": parse.render(),
-                "parse": dict(conv.pending_parse)}
+                "parse": {k: conv.pending_parse[k] for k in
+                          ("question", "entities", "primitives",
+                           "modifiers")},
+                "show": show}
 
     @app.post("/api/ask")
     async def ask(request: Request) -> JSONResponse:
@@ -375,11 +402,18 @@ def create_app(
         parse = Parse(entities=list(pp["entities"]),
                       primitives=list(pp["primitives"]),
                       modifiers=list(pp.get("modifiers") or []))
+        # 0062 ASK items: pruning a shown match is a decision — the
+        # excluded ids never enter the plan (no-nag: this ONE confirm
+        # ratifies the pruned reading; its ops then run freely)
+        exclude = {str(x) for x in (body.get("exclude_ids") or [])}
         ops = conv.engine.ops
         ops.begin_turn()
         ops.note_user(pp["question"])
         try:
             anchors = ground_entities(parse.entities, run_kql, ops)
+            if exclude:
+                anchors = [a for a in anchors
+                           if str(a.get("id")) not in exclude]
             plan = compose_plan(parse, anchors)
             results = execute_plan(plan, run_kql, ops)
         except ParseRefusal as e:
@@ -414,6 +448,64 @@ def create_app(
             f"planner: {len(results)} deterministic op(s) — "
             "the parse was the plan")
         return JSONResponse(payload)
+
+    @app.post("/api/escalate")
+    async def escalate(request: Request) -> JSONResponse:
+        """THE DEVELOPER DOOR (0062, RULED: offered at EVERY round —
+        a standing door, never a last resort). "None of these is
+        right" is not a dead end: the whole exchange — shown
+        matches, proposed reading, the human's rejection — becomes a
+        CAPTURED DEMAND (0056 deny shape) and the developer arrives
+        already knowing what the user wants and what the graph
+        lacks. Returns the summary + a prefilled mailto (Teams users
+        paste the same summary)."""
+        body = await request.json()
+        conv_id = str(body.get("conversation_id") or "")
+        note = str(body.get("note") or "").strip()[:500]
+        user = _user_from(request)
+        conv = _conversation(user, conv_id) if conv_id else None
+        pp = (conv.pending_parse if conv else None) or {}
+        if conv is not None:
+            conv.pending_parse = None      # the attempt ends here
+        question = str(pp.get("question")
+                       or body.get("question") or "")[:500]
+        shown = pp.get("show") or []
+        lines = [f"Captured demand from {user}",
+                 f"Question: {question}"]
+        for s in shown:
+            names = ", ".join(m["name"] for m in s["matches"]) or "—"
+            lines.append(f"  matched {s['entity']!r}: {names}")
+        lines.append("User verdict: none of the shown understanding "
+                     "or options is right"
+                     + (f" — note: {note}" if note else ""))
+        summary = "\n".join(lines)
+        sink.record(TurnEvent(
+            event_at=datetime.now(timezone.utc).isoformat(),
+            user_id=user,
+            question=f"[ESCALATE] {question}",
+            tools_used=("escalate",),
+            ids_read=tuple(sorted({m["id"] for s in shown
+                                   for m in s["matches"]})),
+            basis="developer door (0062): captured demand",
+            answered=False,
+            conversation_id=conv_id, turn_index=-1,
+            decision={"made_by": "user_escalation",
+                      "rejected_reading": True,
+                      "shown": shown, "note": note},
+            trace=({"tool": "escalate",
+                    "args": {"question": question},
+                    "result": summary[:1500]},),
+        ))
+        import urllib.parse as _url
+        mailto = ""
+        if escalation_contact:
+            mailto = ("mailto:" + escalation_contact
+                      + "?subject=" + _url.quote(
+                          f"[{product_name()}] captured demand")
+                      + "&body=" + _url.quote(summary))
+        return JSONResponse({"captured": True, "summary": summary,
+                             "mailto": mailto,
+                             "contact": escalation_contact})
 
     @app.post("/api/ask/stream")
     async def ask_stream(request: Request):
@@ -656,10 +748,15 @@ WORKBENCH_PAGE = """<!doctype html>
     margin:8px 0 2px; }
   .runlabel.refused { color:#b3423e; }
   .parsecard { border-left:4px solid #8a63c9; }
-  .parsebtns { display:flex; gap:10px; margin:8px 0 2px; }
-  .parsebtns .skipparse { padding:6px 14px; border-radius:8px;
-    border:1px solid #9aa3b8; background:#fff; color:#3a4160;
-    cursor:pointer; font-size:13px; }
+  .parsebtns { display:flex; gap:10px; margin:8px 0 2px;
+    flex-wrap:wrap; }
+  .parsebtns .skipparse, .parsebtns .doorbtn { padding:6px 14px;
+    border-radius:8px; border:1px solid #9aa3b8; background:#fff;
+    color:#3a4160; cursor:pointer; font-size:13px; }
+  .parsebtns .doorbtn { border-color:#c9a04a; color:#8a6a1d; }
+  .showbox { margin:8px 0 2px; }
+  .showline { font-size:13.5px; margin:3px 0; }
+  .matchrow { margin-right:12px; font-size:13px; }
   .concl { border-left:4px solid var(--accent); }
   .cc-machine { font:12.5px ui-monospace,monospace; color:#3a4160;
     margin:6px 0; }
@@ -1165,22 +1262,62 @@ async function askViaJson(message, noPlanner) {
   return j;
 }
 
-// ADR 0060 sameness class: the parse IS the plan — it renders and
-// awaits the click before anything executes (confirm every parse)
+// ADR 0062: the ITERATION CARD — show what the graph matched,
+// propose the reading, ask; nothing executes before the click.
+// The developer door is on EVERY round (ruled 08-29): a standing
+// option, never a last resort.
 function renderParseCard(j, message) {
+  const showRows = (j.show || []).map(s => {
+    const ms = s.matches.length
+      ? s.matches.map(m =>
+          `<label class="matchrow"><input type="checkbox" checked
+            data-id="${esc(m.id)}"> ${esc(m.name)}
+            <span class="cite">${esc(m.kind || '')}</span></label>`
+        ).join('')
+      : '<span class="universe">no catalog match</span>';
+    return `<div class="showline">matched
+      <b>${esc(s.entity)}</b>: ${ms}</div>`;
+  }).join('');
   const card = add(el(`<div class="rs parsecard"><div class="head">
-    <span class="badge complete">parse</span>
+    <span class="badge complete">understanding</span>
     <span class="universe">${esc(j.parse_confirm)}</span></div>
+    <div class="showbox">${showRows}</div>
     <div class="parsebtns">
     <button class="primary confirmparse">run this plan</button>
     <button class="skipparse">answer without the planner</button>
+    <button class="doorbtn">none of these is right —
+      contact a developer</button>
     </div></div>`));
+  card.querySelector('.doorbtn').addEventListener('click',
+    async () => {
+      card.querySelectorAll('button').forEach(b => b.disabled = true);
+      const r = await fetch('/api/escalate', { method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ conversation_id: conversationId,
+                               question: message })});
+      const jj = await r.json();
+      const link = jj.mailto
+        ? ` <a href="${esc(jj.mailto)}">open email</a>` : '';
+      add(el(`<div class="rs"><div class="head">
+        <span class="badge complete">captured demand</span>
+        <span class="universe">sent to the developer queue — a
+        developer will arrive already knowing what you asked and
+        what the graph lacked${link}</span></div>
+        <pre class="errdetail">${esc(jj.summary)}</pre></div>`));
+      askbtn.disabled = false;
+    });
   card.querySelector('.confirmparse').addEventListener('click',
     async () => {
+      // unchecked matches are PRUNED — the one confirm ratifies
+      // the pruned reading (no-nag: its ops then run freely)
+      const excluded = Array.from(
+        card.querySelectorAll('input[type=checkbox]'))
+        .filter(c => !c.checked).map(c => c.dataset.id);
       card.querySelectorAll('button').forEach(b => b.disabled = true);
       const r = await fetch('/api/parse/confirm', { method:'POST',
         headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ conversation_id: conversationId })});
+        body: JSON.stringify({ conversation_id: conversationId,
+                               exclude_ids: excluded })});
       const jj = await r.json();
       if (!r.ok) {
         add(el(`<div class="loopline">${esc(jj.message ||

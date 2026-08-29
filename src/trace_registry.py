@@ -509,14 +509,16 @@ TRACE_REGISTRY = {
     "0062": {
         # ACCEPTED 2026-08-29, all calls ruled same-day (developer
         # door every round; convert the parse card FIRST on
-        # hold-lift; axiom register 0062:A1-A6 standing). Authored
-        # and ratified UNDER the DEVELOPMENT HOLD; modules land
-        # only after Sunny lifts it.
+        # hold-lift; axiom register 0062:A1-A6 standing). First
+        # build landed the same day the hold lifted: the ITERATION
+        # card (show grounded matches → propose → ask w/ prune +
+        # the standing developer door; /api/escalate captures
+        # demand as a 0056 deny event).
         "title": "The dialogue loop: show, propose, ask, execute",
         "category": "architecture",
         "axioms": [],
-        "modules": [],
-        "tests": [],
+        "modules": ["src/webapp/app.py"],
+        "tests": ["tests/webapp/test_app.py"],
         "docs": ["docs/decisions/0062-the-dialogue-loop.md"],
     },
     "0061": {
