@@ -358,3 +358,31 @@ silent (no sameness claim made). Mislabel find: verdict chip says
 the route is a coin flip; guards are locally right; guard-patching
 cannot fix a coin flip. TERMINAL EVIDENCE FOR 0060.
 Awaiting Sunny's expand-for-detail screenshot for the exact guard.
+
+## Codeset beat: PASS — planner-served, deterministic (2026-08-29)
+Parse card ("same_or_different over {Diabetic codesets}") →
+confirm click → 2 deterministic ops → DIFFERS, "+ E11.80 —
+present only in one definition" first line, full red/green
+code-list diff, evidence-verified. LAST QA BLOCKER CLOSED.
+
+## RETROSPECTIVE (Sunny's directive: reflect on the failures and the strategy)
+One question, five failures, five DIFFERENT proximate causes —
+each fix locally correct, none fixed the question, because the
+disease was the GENERATOR: a stochastic router making a decision
+that should never have been probabilistic. The correct diagnosis
+(0060) was ratified before failures 3–5; we kept patching below
+it. Review owns ordering RW-15 after failure 4 with the
+structural fix a day away.
+What held: zero lies in five failures (every failure honest and
+self-evidencing — why iteration was fast); the patches remain as
+real op upgrades + defense-in-depth under the planner; the relay
+caught everything pre-camera.
+**PROPOSED LAW AMENDMENT (awaits Sunny's ruling) — the generator
+clause:** when one beat accumulates TWO failures with DISTINCT
+proximate causes, stop building at the failure's level — the
+missing mechanism is one level up, in what GENERATES the
+variance. Patch count on a single beat measures how far below
+the disease you are operating.
+Forward: planner rollout class-by-class, evidence-driven; this
+saga is the 0060 experiment's baseline; demo gains the
+determinism beat (same question twice, same answer).
