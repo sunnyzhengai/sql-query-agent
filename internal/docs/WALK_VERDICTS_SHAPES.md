@@ -347,3 +347,14 @@ type gated on evidence-type; roll-proof. Plus: co-occurrence
 nudge counts same-kind records across the TURN's displayed set.
 Acceptance = this question, this route, DIFFERS + E11.80 first
 line regardless of route taken. QA GATE HOLDS.
+
+## 2026-08-29 — codeset beat FAIL #3 (third DISTINCT failure mode)
+census 15 → compare called twice, BOTH "guard engaged" skips →
+model honestly gave up ("remains unverified... cannot provide a
+definitive answer"). Honesty chain held; RW-15 duty correctly
+silent (no sameness claim made). Mislabel find: verdict chip says
+"Answered." for unverified content — claim-class label wrong
+(minor, rides along). Three runs, three routes, three failures:
+the route is a coin flip; guards are locally right; guard-patching
+cannot fix a coin flip. TERMINAL EVIDENCE FOR 0060.
+Awaiting Sunny's expand-for-detail screenshot for the exact guard.

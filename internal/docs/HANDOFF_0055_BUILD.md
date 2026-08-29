@@ -1869,3 +1869,21 @@ and every run-layer failure now carries its cure at both bind and
 execute time. LIVE ACCEPTANCE REMAINING (Sunny, on glass): (1) the
 codeset question — expect DIFFERS + E11.80 machine line via any
 route; (2) the bound Run button — first data. Then the QA gate.
+
+## ORDER RW-17 + 0060-PROTOTYPE (the structural unblock)
+1. **RW-17:** repro the codeset beat's guard-blocked compares
+   (Sunny's expand-detail text to follow; suspect census-ref
+   compare args or the retry-guard on an identical second call).
+   Root-cause and fix the blocking class; also fix the "Answered."
+   verdict label on unverified content (claim-class mislabel).
+2. **0060 PROTOTYPE, SAMENESS CLASS FIRST (sanctioned by the
+   ACCEPTED ADR; your day-scale estimate):** deterministic
+   parse→plan for the sameness primitive — entity tokens resolve
+   against the name universe (exact tier), a shared name anchors
+   ALL carriers, "same/defined the same" → compare over the
+   carriers' step fragments. The codeset question becomes the
+   first planner-served beat: same parse, same plan, same DIFFERS
+   + E11.80 line, EVERY run. QA's codeset beat rides the planner.
+   Confirm-parse rendering per Sunny's call 1 (confirm every
+   parse) — the parse line renders and awaits the click before
+   executing.
