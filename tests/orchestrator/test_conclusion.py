@@ -171,3 +171,42 @@ class TestRW22CensusCard:
                                      "name": "X"}]}}]
         c = compose_conclusion(out, "", True)
         assert c is not None and c["kind"] == "map"
+
+
+class TestRW23StringFieldsNeverIterateAsChars:
+    """RW-23 (Sunny's walk find): source_tables arrives as a STRING
+    on metric facts and the map card spelled 'DIAGNOSIS_CODES' as
+    'D, I, A, G…' — for the tables question, the garbled field IS
+    the answer. Content-asserted: full names render."""
+
+    def _out(self, rows):
+        return [{"component": {"op": "retrieve", "params": {}},
+                 "result": {"op": "retrieve", "rows": rows,
+                            "params": {}, "complete": True,
+                            "universe": "u"}}]
+
+    def test_string_source_tables_render_full_names(self):
+        rows = [{"id": "m1", "kind": "metric", "name": "A",
+                 "business_name": "Active Diabetic Patients",
+                 "description": "d",
+                 "source_tables": "DIAGNOSIS_CODES, MEDICATION_ORDERS"},
+                {"id": "m2", "kind": "metric", "name": "B",
+                 "business_name": "B", "description": "d",
+                 "source_tables": "ENCOUNTERS"}]
+        c = compose_conclusion(self._out(rows), "", True)
+        assert c["kind"] == "map"
+        assert c["items"][0]["source_tables"] == [
+            "DIAGNOSIS_CODES", "MEDICATION_ORDERS"]
+        assert c["items"][1]["source_tables"] == ["ENCOUNTERS"]
+        # the char-split corpse can never return
+        assert "D" not in c["items"][0]["source_tables"]
+
+    def test_list_source_tables_pass_through(self):
+        rows = [{"id": "m1", "kind": "metric", "name": "A",
+                 "business_name": "A", "description": "",
+                 "source_tables": ["T1", "T2"]},
+                {"id": "m2", "kind": "metric", "name": "B",
+                 "business_name": "B", "description": "",
+                 "source_tables": []}]
+        c = compose_conclusion(self._out(rows), "", True)
+        assert c["items"][0]["source_tables"] == ["T1", "T2"]

@@ -7,7 +7,7 @@
 
 # Test Map — what every test proves
 
-113 modules, 1209 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
+113 modules, 1211 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
 
 ## By ADR
 
@@ -41,7 +41,7 @@
 | 0032 | Deterministic core, LLM edges | `tests/orchestrator/test_core.py` (10), `tests/test_grounding_evals.py` (6) |
 | 0033 | System of record + projections: Delta is the record | `tests/graph/test_backend_comparison.py` (11) |
 | 0035 | Agentic conversation over deterministic tools | `tests/orchestrator/test_agent.py` (6), `tests/orchestrator/test_tools.py` (21), `tests/webapp/test_app.py` (46) |
-| 0036 | Operations are the product: plan, confirm, execute, display | `tests/orchestrator/test_caption_gate.py` (30), `tests/orchestrator/test_conclusion.py` (12), `tests/test_methodology.py` (8) |
+| 0036 | Operations are the product: plan, confirm, execute, display | `tests/orchestrator/test_caption_gate.py` (30), `tests/orchestrator/test_conclusion.py` (14), `tests/test_methodology.py` (8) |
 | 0037 | The completed algebra: traverse + result-set kernels | `tests/graph/test_traversal.py` (2), `tests/orchestrator/test_ops.py` (78) |
 | 0038 | The interaction layer: 'no' is input | `tests/orchestrator/test_events.py` (7), `tests/steps/test_agent_events.py` (5) |
 | 0039 | Every error links to its contract | `tests/governance/test_funnel.py` (8), `tests/governance/test_journey.py` (7), `tests/test_table_contracts.py` (10) |
@@ -106,7 +106,7 @@
 
 ### contract:suite-legibility — the suite explains itself to Sunny — the proof ledger and the run transcript (morning orders, 2026-08-27)
 
-- `tests/orchestrator/test_conclusion.py` (12): The Answer Format Contract's composer (RW-10): card class is
+- `tests/orchestrator/test_conclusion.py` (14): The Answer Format Contract's composer (RW-10): card class is
 - `tests/orchestrator/test_parse_plan.py` (14): ADR 0060 prototype L0: closure is structural, grounding is exact,
 - `tests/shapes/test_seed.py` (7): The demo-source seed (shape-store tenant load, 2026-08-27):
 - `tests/test_run_layer.py` (15): ADR 0061 slice 1 — the run layer's cage. THE ACCEPTANCE IS P5:

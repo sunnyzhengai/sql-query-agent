@@ -2290,3 +2290,18 @@ Walk otherwise healthy: census card exact + fast (905ms), both
 carriers prunable, latency 1-4s. Sunny's typing question answered
 in the record: vocabulary, not typology — compositional reading
 lines, tested at grep level.
+
+### 2026-08-29 — RW-23 BUILT — release 1.64.2
+**The chars-of-string corpse is dead.** source_tables arrives as a
+STRING on metric facts; the map card iterated it and spelled
+"DIAGNOSIS_CODES" as "D, I, A, G…" — the garbled field WAS the
+tables answer. The composer now normalizes (strings split on
+commas, lists pass through, characters never iterate); content
+tests assert FULL names render and the char-split can never return.
+**Battery per item 2:** B16 verbatim ("what tables does metric
+Active Diabetic Patients use") + the runner now PRINTS card CONTENT
+(map items with reads/steps, feeds fields, census count_line) so
+review's assertions run on real table names, never on kinds alone —
+the kind-only-assertion blindness closed.
+**Gates:** 1,245 green + 5 xfailed, ruff clean; wheel 1.64.2.
+Ready for review's re-run; green → Sunny resumes the walk.

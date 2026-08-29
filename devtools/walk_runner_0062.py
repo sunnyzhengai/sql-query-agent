@@ -46,6 +46,9 @@ B_BATTERY = [
     ("B13", "what metrics are there"),
     ("B14", "list all reports"),
     ("B15", "diabetics registry"),
+    # RW-23: Sunny's verbatim tables question — the runner prints
+    # card CONTENT so review asserts real table names, not kinds
+    ("B16", "what tables does metric Active Diabetic Patients use"),
 ]
 
 QA_V2 = [
@@ -115,6 +118,16 @@ def run(base: str, out_path: str) -> None:
         concl = fin.get("conclusion") or {}
         lines.append(f"- conclusion kind: {concl.get('kind')} "
                      f"verdict: {concl.get('verdict', '')}")
+        # RW-23 content assertions: the card FIELDS are on record
+        for it in (concl.get("items") or [])[:6]:
+            lines.append(f"  - item: {it.get('name')} · reads: "
+                         f"{it.get('source_tables')} · steps: "
+                         f"{it.get('steps')}")
+        for fld in ("executes_metrics", "reads_tables", "measures"):
+            if concl.get(fld):
+                lines.append(f"  - {fld}: {concl[fld]}")
+        if concl.get("count_line"):
+            lines.append(f"  - count_line: {concl['count_line']}")
         for d in (concl.get("diff_lines") or [])[:3]:
             lines.append(f"  - diff: {d}")
         Path(out_path).write_text("\n".join(lines) + "\n")

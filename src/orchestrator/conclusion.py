@@ -159,6 +159,18 @@ def compose_conclusion(outputs: "list[dict]", caption: str,
                 "link_state": str(top.get("link_state") or ""),
                 "prose": caption}
 
+    def _as_names(v) -> "list[str]":
+        # RW-23 (Sunny's walk find): source_tables arrives as a
+        # STRING on metric facts — iterating it spelled
+        # "DIAGNOSIS_CODES" as "D, I, A, G…" and the garbled field
+        # WAS the tables answer. Strings split on commas; lists
+        # pass through; never iterate characters.
+        if v is None:
+            return []
+        if isinstance(v, str):
+            return [s.strip() for s in v.split(",") if s.strip()]
+        return [str(x) for x in v]
+
     records = [row for r in results if r.get("op") == "retrieve"
                for row in (r.get("rows") or [])
                if row.get("kind") in ("metric", "step")]
@@ -190,9 +202,8 @@ def compose_conclusion(outputs: "list[dict]", caption: str,
                                         or "")[:160],
                      "steps": [str(s.get("name") or "")
                                for s in (row.get("steps") or [])][:6],
-                     "source_tables": [
-                         str(t) for t in
-                         (row.get("source_tables") or [])][:6]}
+                     "source_tables":
+                         _as_names(row.get("source_tables"))[:6]}
                     for row in records[:6]],
                 "prose": caption}
 
