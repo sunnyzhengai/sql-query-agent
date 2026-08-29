@@ -1605,3 +1605,16 @@ Sunny's glass clarity check remains the batch's final acceptance.
 Dev: fire the rerun (300→800) so the sweep why-sentences mint into
 the store. Then Sunny's glass check + script QA gate verbatim →
 capture.
+
+### 2026-08-28 — 1.58.5 CYCLE COMPLETE: the capture gate's dev side is CLOSED
+Rerun green end to end on the published 1.58.5; VERIFIED IN STORE:
+all 26 clusters carry the sweep-authored why-sentence ("2
+procedures share the name 'A1c_High' but compute 2 different
+logics — one name is doing 2 jobs"), zero missing the stamp;
+four-way verification green. Everything the capture gate names on
+the dev side is now LIVE: RW-5 answer-first + RW-7/RW-1 flag cards
++ RW-9/RW-10 machine-composed conclusion + RW-11 zero-round policy
+refusal (workbench, shared tree) and the store's why-sentences
+(1.58.5 mint). REMAINING FOR CAPTURE: Sunny's glass check of the
+two presentation batches + the DEMO_SCRIPT QA gate run verbatim
+(fresh conversation per question) — wobbles fix-forward, then film.

@@ -24,7 +24,7 @@ show pending, never on remembered sequence (first-deadlock lesson,
 as of 2026-08-27. Dev session's watcher: LIVE as of 2026-08-27
 (persistent 60s poll; re-armed at each dev session start — memory
 recorded).
-Last touched: 2026-08-28, dev (presentation batch built — capture gate needs the 1.58.5 publish click + rerun).
+Last touched: 2026-08-28, dev (capture gate DEV SIDE CLOSED — 1.58.5 store-live; remaining: Sunny's glass check + QA verbatim).
 payload 3 built, RESULTS v2 filled under the section of record).
 
 ## 🎯 THE CRITICAL PATH → demo capture
