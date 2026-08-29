@@ -289,13 +289,13 @@ The hold lifts only by Sunny's explicit word, recorded here.
 — Dev session: HOLD ACKNOWLEDGED (08-29). No code moves; watcher
   stays armed for the planning conversation; available for
   questions and analysis docs on request.
-— Dev session, 08-29 (SURFACED, not fixed — the hold stands): the
-  0062 draft commit leaves the suite RED — the ADR-file/registry
-  totality gate fails (0062 needs its src/trace_registry.py entry,
-  category architecture, sanctioned-draft exception like 0061 had)
-  and the ADR file's last line is a stray heredoc "EOF" artifact.
-  Both one-line cures; awaiting review's own fix or Sunny's word
-  that registering a draft ADR is hold-exempt bookkeeping.
+— Dev session 08-29: the surfaced suite-red was remediated by
+  review same-day (EOF removed, 0062 registered, TRACE_MAP
+  regenerated) — dev re-verified 1,211 green.
+— **ON LIFT (per 0062 ACCEPTED, call 2): dev's FIRST task is the
+  iteration-card conversion** (parse card → show/propose/ask/
+  execute, developer door visible every round). QA gate + capture
+  follow the conversion. Dev holds ready.
 
 ## RULED (Sunny, 2026-08-29): THE GENERATOR CLAUSE — Echo Law amendment
 "Fail twice, no matter the cause, triggers an investigation."
