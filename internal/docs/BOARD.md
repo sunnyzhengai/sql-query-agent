@@ -303,3 +303,15 @@ Stronger than review's draft: two failures on ONE beat — even with
 different proximate causes — mandate a generator investigation
 one level up before any further same-level patch. Effective
 immediately; joins the Echo Law.
+
+## ✅ HOLD LIFTED — Sunny's explicit word, 2026-08-29
+Development resumes. Build order (per ACCEPTED 0062):
+1. FIRST: convert the purple parse card → the ITERATION CARD
+   (show / propose / ask; developer door on EVERY round via
+   email/Teams; no-nag boundary per the certain-answers rule).
+2. Review verifies; Sunny glass-checks the converted codeset beat.
+3. QA gate (script V2, six questions) → CAPTURE CLEARED.
+4. Then the ratified queue: lexicon growth under the loop, Run
+   button first click, flywheel film, Phase 2 slices.
+All work binds to 0062's invariants: no question types; LLM
+proposes only; deterministic assembly; every decision captured.
