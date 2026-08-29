@@ -2260,3 +2260,17 @@ oracles hold. Minor note (non-blocking): B15 "diabetics registry"
 matched only the Dashboard — the Diabetes Registry metric family
 should join its candidate list; candidate breadth rides tier-2.
 Review re-runs the battery on delivery; green → Sunny walks.
+
+### 2026-08-29 — RW-22 BUILT — release 1.64.1
+**The census card exists and the composer-gap law is AMENDED to ANY
+successful op.** A census (kind-only asks, B13/B14) now composes:
+the machine count line (the stamped headline, or count + universe)
+plus the rows as name + description (12 shown, "and N more" points
+at the full table — fold, never hide). The law's wording bug is
+dead: the final composer fallback scans EVERY op's rows, not just
+retrieve — a future op with rows composes on arrival, test-held
+("any_op_rows_compose"). DOM harness gained the census variant.
+B15's candidate-breadth note (Diabetes Registry family joining
+"diabetics registry") stays on the tier-2 shelf as review filed it.
+**Gates:** 1,243 green + 5 xfailed, ruff clean; wheel 1.64.1
+shipped. Ready for review's battery re-run; green → Sunny walks.

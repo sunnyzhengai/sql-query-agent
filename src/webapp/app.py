@@ -1256,6 +1256,19 @@ function renderConclusion(j) {
       ${c.link_state ? `<div class="cc-machine">${esc(c.link_state)}</div>` : ''}
       ${proseHtml}${based}</div>`);
   }
+  // RW-22: the CENSUS card — the count line + the rows
+  if (c.kind === 'census') {
+    const items = (c.items || []).map(i =>
+      `<div class="cc-item"><b>${esc(i.name)}</b>${
+        i.description ? ' — ' + esc(i.description) : ''}</div>`).join('');
+    const more = c.total > (c.items || []).length
+      ? `<div class="cc-machine">… and ${esc(String(
+          c.total - c.items.length))} more (the table above holds
+          the full enumeration)</div>` : '';
+    return el(`<div class="caption concl">
+      <div class="cc-machine">${esc(c.count_line)}</div>
+      ${items}${more}${proseHtml}${based}</div>`);
+  }
   // RW-BATCH-6: the MAP card — every retrieved record with its
   // connections (default-map and multi-record shapes)
   if (c.kind === 'map') {

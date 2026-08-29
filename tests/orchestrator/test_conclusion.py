@@ -135,3 +135,39 @@ class TestBatch6ComposerShapes:
             "id": "table:ENCOUNTERS", "kind": "table",
             "name": "ENCOUNTERS"}]), "", True)
         assert c is not None and c["kind"] == "map"
+
+
+class TestRW22CensusCard:
+    """RW-22 (extended battery, the sole blocker): a census composes
+    the census card — count line + rows; the composer-gap law is
+    amended to ANY successful op."""
+
+    def test_census_composes_count_line_and_rows(self):
+        out = [{"component": {"op": "census", "params": {}},
+                "result": {"op": "census", "params": {},
+                           "complete": True,
+                           "universe": "every certified metric",
+                           "headline": "4 metric(s) — exact",
+                           "rows": [
+                               {"id": f"m{i}", "kind": "metric",
+                                "name": f"M{i}",
+                                "business_name": f"Metric {i}",
+                                "description": f"d{i}"}
+                               for i in range(4)]}}]
+        c = compose_conclusion(out, "", True)
+        assert c["kind"] == "census"
+        assert c["count_line"] == "4 metric(s) — exact"
+        assert c["total"] == 4
+        assert c["items"][0] == {"name": "Metric 0",
+                                 "description": "d0"}
+
+    def test_any_op_rows_compose_the_law_amended(self):
+        # a hypothetical future op with rows still composes — the
+        # law reads ANY successful op, not any retrieve
+        out = [{"component": {"op": "search", "params": {}},
+                "result": {"op": "search", "params": {},
+                           "complete": False, "universe": "u",
+                           "rows": [{"id": "x", "kind": "term",
+                                     "name": "X"}]}}]
+        c = compose_conclusion(out, "", True)
+        assert c is not None and c["kind"] == "map"

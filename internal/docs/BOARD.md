@@ -339,9 +339,15 @@ The hold lifts only by Sunny's explicit word, recorded here.
       proven); RW-20 stem-tier generous grounding ("diabetes
       codeset" grounds; candidates always prunable); RW-21
       kind-only census restored ("what metrics are there" → census
-      card). Battery extended B11-B15. 1,241 green + ruff. AWAITS
-      review's extended-battery re-run → Sunny walks on
-      review-green → QA gate → CAPTURE.
+      card). Battery extended B11-B15. 1,241 green + ruff.
+      **Extended battery run by review: 20/21 healthy — sole
+      blocker RW-22 (census composes no card).**
+- [x] **RW-22 BUILT (08-29 dev, 1.64.1)** — census card (count
+      line + rows, per the format contract); composer-gap law
+      AMENDED to ANY successful op (wording bug dead, test-held);
+      DOM harness census variant. 1,243 green + ruff. AWAITS
+      review's battery re-run → green → Sunny walks → QA gate →
+      CAPTURE.
 
 ## RULED (Sunny, 2026-08-29): THE GENERATOR CLAUSE — Echo Law amendment
 "Fail twice, no matter the cause, triggers an investigation."

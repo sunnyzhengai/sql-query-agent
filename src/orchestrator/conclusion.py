@@ -204,10 +204,32 @@ def compose_conclusion(outputs: "list[dict]", caption: str,
                 "note": str(lineage.get("note") or "")[:220],
                 "prose": caption}
 
-    # RW-BATCH-6 item 2 (the composer-gap law): a successful
-    # retrieve of ANY kind (table, term, ...) still composes — a
-    # bare card of names and kinds beats no answer, always
-    any_rows = [row for r in results if r.get("op") == "retrieve"
+    # RW-22 (extended battery, the sole blocker): a CENSUS composes
+    # the census card — the count line + the rows (name +
+    # description), per the format contract. Flag censuses composed
+    # above; this catches every other kind.
+    census = next((r for r in results if r.get("op") == "census"),
+                  None)
+    if census is not None:
+        crows = census.get("rows") or []
+        return {"kind": "census",
+                "count_line": (str(census.get("headline") or "")
+                               or f"{len(crows)} item(s) — "
+                                  + str(census.get("universe")
+                                        or "")[:160]),
+                "items": [
+                    {"name": (row.get("business_name")
+                              or row.get("name") or row.get("id")),
+                     "description": str(row.get("description")
+                                        or "")[:160]}
+                    for row in crows[:12]],
+                "total": len(crows),
+                "prose": caption}
+
+    # RW-BATCH-6 item 2, AMENDED by RW-22 (the composer-gap law):
+    # ANY successful op's rows compose — a bare card of names and
+    # kinds beats no answer, always
+    any_rows = [row for r in results
                 for row in (r.get("rows") or []) if row.get("id")]
     if any_rows:
         return {"kind": "map",

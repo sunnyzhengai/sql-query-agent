@@ -233,6 +233,8 @@ const conclusionVariants = {
   map: { kind: 'map', items: [{ name: 'A', record_kind: 'step',
     of_metric: 'm', description: 'd', steps: ['s'],
     source_tables: ['t'] }] },
+  census: { kind: 'census', count_line: '4 metric(s)', total: 4,
+    items: [{ name: 'M1', description: 'd1' }] },
 };
 for (const [name, c] of Object.entries(conclusionVariants)) {
   check('conclusion ' + name, () => {
