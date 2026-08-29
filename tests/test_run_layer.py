@@ -136,3 +136,40 @@ def test_run_is_not_an_engine_tool():
     from src.orchestrator.turn_engine import ENGINE_TOOLS
     names = {t["function"]["name"] for t in ENGINE_TOOLS}
     assert "run" not in names and "run_step" not in names
+
+
+class TestRW16EveryFailureNamesItsCure:
+    """RW-16 (field find 2026-08-29, Sunny's laptop: pyodbc +
+    unixodbc + msodbcsql18 all absent, bind failed with no
+    remediation): unbound/failed run states DISTINGUISH themselves
+    and NAME their cure — the error-contract law."""
+
+    def test_missing_pyodbc_names_the_pip_line(self):
+        from src.run_layer import classify_run_error
+        cls, msg = classify_run_error(
+            ImportError("No module named 'pyodbc'"))
+        assert cls == "driver_stack"
+        assert "pip install pyodbc" in msg
+
+    def test_missing_odbc_driver_names_the_brew_and_apt_lines(self):
+        from src.run_layer import classify_run_error
+        cls, msg = classify_run_error(Exception(
+            "('01000', \"[01000] [unixODBC][Driver Manager]"
+            "Can't open lib 'ODBC Driver 18 for SQL Server' : "
+            "file not found (0) (SQLDriverConnect)\")"))
+        assert cls == "driver_stack"
+        assert "brew trust microsoft/mssql-release" in msg
+        assert "msodbcsql18" in msg and "apt-get" in msg
+
+    def test_auth_failure_names_the_az_login_line(self):
+        from src.run_layer import classify_run_error
+        cls, msg = classify_run_error(Exception(
+            "AADSTS70043: the refresh token has expired"))
+        assert cls == "auth"
+        assert "az login" in msg
+
+    def test_unclassified_failure_stays_typed_execution(self):
+        from src.run_layer import classify_run_error
+        cls, msg = classify_run_error(Exception("mystery"))
+        assert cls == "execution"
+        assert "mystery" in msg

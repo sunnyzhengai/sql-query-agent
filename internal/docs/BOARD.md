@@ -24,9 +24,11 @@ show pending, never on remembered sequence (first-deadlock lesson,
 as of 2026-08-27. Dev session's watcher: LIVE as of 2026-08-27
 (persistent 60s poll; re-armed at each dev session start — memory
 recorded).
-Last touched: 2026-08-29, dev (PHASE2-SLICE-1 built + gated —
-1.59.0; run layer typed-unbound awaiting Sunny's local `run:`
-line; awaits review verification).
+Last touched: 2026-08-29, dev (RW-BATCH-4 + RW-16 built — 1.59.1:
+RW-15 sameness-verdict duty + turn-grain nudge + member-name
+qualify + run-failure cures; endpoint-hygiene gate re-scoped to
+git-reachable files, flagged for review; awaits verification +
+Sunny's codeset re-walk on glass).
 
 ## 🎯 THE CRITICAL PATH → demo capture
 
@@ -97,7 +99,19 @@ line; awaits review verification).
       cohort-105 sqlite fixture (zero tenant dep). TYPED-UNBOUND
       until Sunny adds the local `run:` block (runbook line in
       HANDOFF_0055_BUILD). 1,182 green + ruff; 0061 exits the
-      sanctioned-draft set. AWAITS REVIEW VERIFICATION.
+      sanctioned-draft set. **VERIFIED by review 08-29** (P5 cage
+      re-run, gate read in full; listing note recorded: customer
+      sources need a dedicated read-only principal).
+- [x] **RW-BATCH-4 + RW-16 BUILT (08-29 dev, release 1.59.1)** —
+      RW-15 sameness-verdict duty (floor names compare(refs=[ids]);
+      W12b hand-off; W6-echo safe) + turn-grain co-occurrence
+      nudge + member-name collision qualify (W3a mechanism reused)
+      + RW-16 run-failure cures (pip/brew+apt/az-login typed at
+      bind AND execute). GATE CHANGE flagged: endpoint-hygiene
+      re-scoped to git-reachable files (gitignored exempt BY
+      MECHANISM; companion test earns it) after Sunny's sanctioned
+      `run:` binding tripped the scan. 1,200 green + ruff.
+      AWAITS REVIEW VERIFICATION + Sunny's codeset beat on glass.
 - [ ] Finder-coverage contract (timing = Sunny's call; drilldown
       benefit if pre-capture)
 - [ ] 0056 decision layer + presentation reframe (POST-capture by

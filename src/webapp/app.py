@@ -65,6 +65,7 @@ def create_app(
     run_executor=None,
     run_cap: int = 200,
     run_source: str = "",
+    run_unbound: str = "",
 ) -> FastAPI:
     app = FastAPI(title=product_name(), docs_url=None, redoc_url=None)
     conversations: "dict[str, Conversation]" = {}
@@ -159,12 +160,15 @@ def create_app(
                             "read guarantee applies to runs too)"},
                 status_code=403)
         if run_executor is None:
+            # RW-16: the unbound state DISTINGUISHES its cause — the
+            # wiring passes the specific reason + cure when it knows
             return JSONResponse(
                 {"error": "refusal", "reason_class": "unconfigured",
-                 "message": "the run layer has no source binding — "
-                            "add the run: section to org_config.yaml "
-                            "(server, database) with a READ-ONLY "
-                            "credential"}, status_code=503)
+                 "message": run_unbound or (
+                     "the run layer has no source binding — add the "
+                     "run: section to org_config.yaml (server, "
+                     "database) with a READ-ONLY credential")},
+                status_code=503)
         from src.orchestrator.assemble import NODE_FACTS_QUERY
         rows = run_kql(NODE_FACTS_QUERY, {"p_node_id": step_id})
         if not rows:
@@ -184,6 +188,12 @@ def create_app(
             return JSONResponse(
                 {"error": "refusal", "reason_class": e.reason_class,
                  "message": str(e)}, status_code=422)
+        except Exception as e:  # noqa: BLE001 — RW-16: name the cure
+            from src.run_layer import classify_run_error
+            reason_class, message = classify_run_error(e)
+            return JSONResponse(
+                {"error": "refusal", "reason_class": reason_class,
+                 "message": message}, status_code=502)
         # 0056-shape capture: the run + confirm as a decision event —
         # STAMPS only (P5), never rows
         sink.record(TurnEvent(

@@ -695,6 +695,30 @@ class TestCompareNudge:
         rs = op_retrieve([REF_A], fake_kql, s)
         assert "compare(refs)" not in rs.note
 
+    def test_turn_grain_two_single_retrieves_stamp_the_route(self):
+        # RW-15 rider (re-walk 2026-08-29, fifth routing specimen):
+        # the turn did census -> search -> retrieve x2 — two SINGLE
+        # retrieves — and the per-call count never saw the pair. The
+        # tally spans the TURN's displayed set.
+        s = OpsSession()
+        s.note_user(f"{REF_A} {REF_B}")
+        s.begin_turn()
+        first = op_retrieve([REF_A], fake_kql, s)
+        assert "compare(refs)" not in first.note
+        second = op_retrieve([REF_B], fake_kql, s)
+        assert "compare(refs) computes it exactly" in second.note
+
+    def test_begin_turn_resets_the_tally(self):
+        # a prior TURN's record must not stamp this turn's single
+        # retrieve — the nudge is turn-scoped, like the duties
+        s = OpsSession()
+        s.note_user(f"{REF_A} {REF_B}")
+        s.begin_turn()
+        op_retrieve([REF_A], fake_kql, s)
+        s.begin_turn()
+        rs = op_retrieve([REF_B], fake_kql, s)
+        assert "compare(refs)" not in rs.note
+
 
 class TestCompareNameResolution:
     """RW-13 (regression, 2026-08-28): a NAME passed to compare used

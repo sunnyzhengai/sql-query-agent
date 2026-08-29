@@ -296,6 +296,7 @@ def run_turn(session: EngineSession, question: str, chat_api,
 
     if not session.history:
         session.history.append({"role": "system", "content": SYSTEM_PROMPT})
+    session.ops.begin_turn()   # RW-15: the co-occurrence tally is turn-grain
     session.ops.note_user(question)
     session.history.append({"role": "user", "content": question})
 

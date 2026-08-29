@@ -53,6 +53,15 @@ _BRIDGE_STAMP = re.compile(r"closest by name: ([^.]+)\.")
 _KIND_ABSENCE = re.compile(
     r"(?i)\b(?:no|none|zero|not any|are no|aren't any)\b[^.;]{0,60}?"
     r"\b(metric|step|term|report|measure)s?\b")
+# RW-15 (morning re-walk 2026-08-29): the sameness-VERDICT lexicon —
+# a claim-shape policy invariant (the _KIND_ABSENCE precedent; P4
+# bans question typing, not claim typing). Deliberately excludes the
+# caveat-echo phrasing ("a name match is not logic sameness") so the
+# W6 duty's own required echo never trips this one.
+_SAMENESS_VERDICT = re.compile(
+    r"(?i)\b(?:identical|equivalent|interchangeable|duplicates?|"
+    r"differs?|different(?:ly)?|differences?|"
+    r"(?:the|share[sd]?\s+the|uses?\s+the|not\s+the)\s+same)\b")
 
 
 def _ground_numbers(outputs: "list[dict]") -> "set[str]":
@@ -165,14 +174,13 @@ def caption_violations(caption: str, outputs: "list[dict]",
     # result must be displayed this turn. Structural — the stamp is a
     # code constant, no claim-shape lexicon; the floor renders the
     # stamped headlines, so a floored caption carries the caveat.
+    compare_shown = any(r.get("op") == "compare" for r in turn_results)
     sameness_stamped = any(
         SAMENESS_CAVEAT in str(r.get("headline") or "")
         or SAMENESS_CAVEAT in str(r.get("note") or "")
         for r in turn_results)
     if sameness_stamped:
         low_c = caption.lower()
-        compare_shown = any(r.get("op") == "compare"
-                            for r in turn_results)
         if ("not logic sameness" not in low_c
                 and "not compared" not in low_c
                 and not compare_shown):
@@ -182,6 +190,39 @@ def caption_violations(caption: str, outputs: "list[dict]",
                 "sameness — echo the caveat or run compare; an "
                 "equivalence/difference claim from name or mention "
                 "evidence is unsupported")
+
+    # RW-15 sameness-VERDICT duty (morning re-walk 2026-08-29, fifth
+    # routing specimen — MANDATORY, the RW-8 pattern: claim-type gated
+    # on evidence-type). The codeset corpse: two codesets retrieved,
+    # verdict "differs" derived from DESCRIPTIONS (80 vs 81 literals)
+    # and "stewardship" — right conclusion, wrong basis; the E11.80
+    # machine diff was one compare away and never ran. A same/differ
+    # VERDICT requires a displayed compare result THIS TURN whenever
+    # >=2 same-kind records are on screen this turn — descriptions
+    # and names never compute logic sameness. Turn-scoped; a compare
+    # ERROR chip hands off to the W12b duty above instead.
+    rw15_compare_errored = any(
+        o.get("error") and (o.get("component") or {}).get("op") == "compare"
+        for o in outputs)
+    if (not compare_shown and not rw15_compare_errored
+            and _SAMENESS_VERDICT.search(text)):
+        kind_ids: "dict[str, list[str]]" = {}
+        for r in turn_results:
+            for row in (r.get("rows") or []):
+                k = str(row.get("kind") or "")
+                rid = str(row.get("id") or "")
+                if k in ("metric", "step") and rid:
+                    bucket = kind_ids.setdefault(k, [])
+                    if rid not in bucket:
+                        bucket.append(rid)
+        pair = next((v for v in kind_ids.values() if len(v) >= 2), None)
+        if pair:
+            violations.append(
+                "sameness-verdict duty (RW-15, re-walk 2026-08-29): a "
+                "same/different verdict requires a displayed compare "
+                "basis this turn — run compare(refs=["
+                + ", ".join(pair[:4]) + "]); descriptions and names "
+                "never compute logic sameness")
 
     # Compare-error duty (walk W12b, 2026-08-23 — the Q4 corpse: four
     # errored compares degraded into invented 'Replaced by'

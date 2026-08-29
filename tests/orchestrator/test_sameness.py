@@ -176,3 +176,77 @@ class TestSamenessGrade:
         assert g["dishonest"] is False
         # expected_kind is not 'answered', so no dumb-penalty either
         assert g["dumb"] is False
+
+
+# --- layer 2b: the RW-15 sameness-VERDICT duty -------------------------
+
+
+def _two_metric_output():
+    """Two same-kind records displayed this turn — no caveat stamp,
+    no compare (the fifth routing specimen's shape: verdict from
+    descriptions with the machine diff one call away)."""
+    return {"component": {"op": "retrieve", "params": {}},
+            "result": {"ref": "R1", "op": "retrieve", "params": {},
+                       "complete": True, "universe": "records",
+                       "rows": [
+                           {"id": "transform:reporting.USP_A:Codeset",
+                            "kind": "step", "name": "Diabetic Codeset"},
+                           {"id": "transform:reporting.USP_B:Codeset",
+                            "kind": "step", "name": "Diabetic Codeset"},
+                       ]}}
+
+
+class TestSamenessVerdictDuty:
+    """RW-15 (morning re-walk 2026-08-29, MANDATORY — the RW-8
+    pattern): a same/differ VERDICT requires a displayed compare
+    basis this turn; descriptions and names never compute it."""
+
+    def test_verdict_without_compare_floors_naming_the_op(self):
+        v = caption_violations(
+            "The two codesets differ — one has 80 literals, the "
+            "other 81.", [_two_metric_output()])
+        [hit] = [x for x in v if "sameness-verdict duty" in x]
+        assert "compare(refs=[" in hit
+        assert "transform:reporting.USP_A:Codeset" in hit
+
+    def test_sameness_wording_also_floors(self):
+        v = caption_violations(
+            "Both procs use the same codeset definition.",
+            [_two_metric_output()])
+        assert any("sameness-verdict duty" in x for x in v)
+
+    def test_compare_on_screen_satisfies_the_duty(self):
+        compare = {"component": {"op": "compare", "params": {}},
+                   "result": {"ref": "R2", "op": "compare", "params": {},
+                              "complete": True, "universe": "content",
+                              "rows": [{"verdict": "DIFFERS"}]}}
+        v = caption_violations(
+            "The definitions DIFFER — E11.80 is present in only one.",
+            [_two_metric_output(), compare])
+        assert not any("sameness-verdict duty" in x for x in v)
+
+    def test_no_same_kind_pair_no_duty(self):
+        # a lone record + sameness wording: nothing on screen to
+        # compare against — the duty is data-anchored, never fires
+        # on language alone
+        lone = _two_metric_output()
+        lone["result"]["rows"] = lone["result"]["rows"][:1]
+        v = caption_violations(
+            "This codeset is different from last year's.", [lone])
+        assert not any("sameness-verdict duty" in x for x in v)
+
+    def test_verdictless_caption_untouched(self):
+        v = caption_violations(
+            "Two codeset steps are displayed; retrieve either for "
+            "its logic.", [_two_metric_output()])
+        assert not any("sameness-verdict duty" in x for x in v)
+
+    def test_errored_compare_hands_off_to_w12b(self):
+        # a FAILED compare is the W12b duty's jurisdiction — RW-15
+        # must not double-floor the honest "remains unverified" echo
+        err = {"component": {"op": "compare", "params": {}},
+               "error": "compare failed: fragments unavailable"}
+        v = caption_violations(
+            "Whether they differ remains unverified — the comparison "
+            "failed.", [_two_metric_output(), err])
+        assert not any("sameness-verdict duty" in x for x in v)

@@ -89,6 +89,14 @@ class OpsSession:
     surfaced: "set[str]" = field(default_factory=set)
     user_text: str = ""
     _counter: int = 0
+    # RW-15 rider (re-walk 2026-08-29): same-kind records displayed
+    # THIS TURN — the co-occurrence nudge's grain. The fifth routing
+    # specimen did two SINGLE retrieves; per-call counting never saw
+    # the pair. Cleared by the engine at each turn boundary.
+    turn_kind_ids: "dict[str, set]" = field(default_factory=dict)
+
+    def begin_turn(self) -> None:
+        self.turn_kind_ids = {}
 
     def register(self, op, params, rows, complete, universe, note="") -> ResultSet:
         self._counter += 1
@@ -100,6 +108,9 @@ class OpsSession:
             rid = row.get("id")
             if rid:
                 self.surfaced.add(rid)
+            k = str(row.get("kind") or "")
+            if rid and k in ("metric", "step"):
+                self.turn_kind_ids.setdefault(k, set()).add(str(rid))
         return rs
 
     def note_user(self, text: str) -> None:
@@ -485,6 +496,18 @@ def row_mentions(row: dict, needle: str) -> bool:
     return any(pat.search(str(row.get(f) or "")) for f in _MENTION_FIELDS)
 
 
+def _member_labels(names: "list", ids: "list") -> "list[str]":
+    """RW-BATCH-4 polish (re-walk 2026-08-29): flag-card member names
+    schema-qualify on bare-name collision — the misnomer card showed
+    "USP_Active_Diabetics, USP_Active_Diabetics", hiding the very
+    difference the flag surfaces. The W3a mechanism, reused; a store
+    not returning ids falls back to the bare names unchanged."""
+    if not ids or len(ids) != len(names):
+        return [str(n) for n in names]
+    return _qualified_labels(
+        [(str(n), str(i).split(":", 1)[-1]) for n, i in zip(names, ids)])
+
+
 def op_census(kind: str, run_kql, session: OpsSession,
               contains: "str | None" = None) -> ResultSet:
     """Complete enumeration of one catalog KIND, with the exact count.
@@ -523,11 +546,14 @@ def op_census(kind: str, run_kql, session: OpsSession,
         # RW-12: identity, the sweep why-sentence, and MEMBER NAMES
         # ride every census row — the card is the differentiation
         # queue, and bare counts mean nothing to a user
+        # (colliding bare names schema-qualify: _member_labels).
         names_by_cluster: "dict[str, list]" = {}
         try:
             for mr in run_kql(GOV_FLAG_MEMBER_NAMES_QUERY, {}):
-                names_by_cluster[str(mr.get("cluster"))] = list(
-                    mr.get("member_names") or [])
+                names_by_cluster[str(mr.get("cluster"))] = (
+                    _member_labels(
+                        list(mr.get("member_names") or []),
+                        list(mr.get("member_ids") or [])))
         except Exception as e:              # noqa: BLE001 — additive
             # member names are ADDITIVE display data; a failed bulk
             # join never blocks the census — but it is disclosed
@@ -1142,15 +1168,21 @@ def op_retrieve(ids: "list[str]", run_kql, session: OpsSession) -> ResultSet:
         except AssemblyError as e:
             notes.append(str(e))
     # RW-4 co-occurrence (re-walk 2026-08-28, specimen #4: two
-    # records in hand, compare one call away, not taken): a retrieve
-    # holding >=2 same-kind records stamps the route — a NUDGE, not
+    # records in hand, compare one call away, not taken): >=2
+    # same-kind records displayed stamps the route — a NUDGE, not
     # the duty constant (a benign two-record turn must never floor
     # for an unmade claim). Data-triggered, no question typing.
-    kind_counts: "dict[str, int]" = {}
+    # RW-15 upgrade (re-walk 2026-08-29): TURN-grain — the fifth
+    # routing specimen did two SINGLE retrieves and the per-call
+    # count never saw the pair; the tally now spans the turn's
+    # whole displayed set (session.turn_kind_ids + this call).
+    kind_ids: "dict[str, set]" = {
+        k: set(v) for k, v in session.turn_kind_ids.items()}
     for r in rows:
         k = str(r.get("kind") or "")
-        kind_counts[k] = kind_counts.get(k, 0) + 1
-    if any(n >= 2 for k, n in kind_counts.items()
+        if r.get("id") and k in ("metric", "step"):
+            kind_ids.setdefault(k, set()).add(str(r["id"]))
+    if any(len(v) >= 2 for k, v in kind_ids.items()
            if k in ("metric", "step")):
         notes.append(
             "multiple records of the same kind are on screen — for "

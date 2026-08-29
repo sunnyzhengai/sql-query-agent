@@ -1798,3 +1798,61 @@ belongs in the install/packaging story (delivery-architecture
 shelf item) — repeats-across-customers = product signal.
 Resolved locally: unixodbc + msodbcsql18 18.6.2.1 installed,
 'ODBC Driver 18 for SQL Server' visible to python3.11 and .venv.
+
+### 2026-08-29 — RW-BATCH-4 + RW-16 BUILT — release 1.59.1
+**RW-15 sameness-verdict duty (the QA-blocker): built, both
+halves.** New caption-gate duty: a same/different VERDICT with >=2
+same-kind records displayed this turn and NO compare result on
+screen is FLOORED, and the violation NAMES the resolution with the
+actual ids — "run compare(refs=[transform:…A:Codeset,
+transform:…B:Codeset])" — so the rejection note + continuation
+pass carry the pressure toward compare. Claim-type gated on
+evidence-type (the RW-8 pattern); the claim lexicon is a policy
+invariant on the ANSWER (the _KIND_ABSENCE precedent — P4 bans
+question typing, not claim typing) and deliberately excludes the
+W6 caveat-echo phrasing so the older duty's own required echo
+never trips this one. Data-anchored: language alone (no same-kind
+pair on screen) never fires; an ERRORED compare hands off to the
+W12b duty (no double-floor of the honest "remains unverified").
+**Nudge upgraded to turn-grain:** the co-occurrence tally now
+spans the TURN's whole displayed set (OpsSession.turn_kind_ids,
+cleared by the engine at each turn start) — the fifth specimen's
+two SINGLE retrieves now stamp the route on the second; a prior
+turn's record never stamps this turn. 6 duty tests + 2 turn-grain
+tests + the existing benign-two-record protections all green.
+**Polish: colliding member names schema-qualify** on flag cards —
+the W3a mechanism (_qualified_labels) reused; the misnomer card
+now renders "USP_Active_Diabetics (reporting.…), USP_Active_
+Diabetics (staging.…)". Query carries member_ids alongside names;
+stores not returning ids fall back to bare names. 3 tests.
+
+**RW-16 (error-contract, ordered same morning): every run-layer
+failure DISTINGUISHES itself and NAMES its cure.**
+classify_run_error in src/run_layer.py: pyodbc missing → the pip
+line; ODBC driver missing (Can't open lib/IM002/Driver Manager) →
+the brew lines (incl. `brew trust microsoft/mssql-release`) + the
+apt line; AADSTS/token/authn → the az login line; else typed
+"execution" with the message. Wired at BOTH failure sites: bind
+time (_run_executor returns the reason; /api/run's 503 carries it
+verbatim) and execute time (a driver blowup returns a typed 502
+refusal with the cure, never a bare 500). 4 L0 + 2 endpoint tests.
+Driver-stack preflight in the install story stays on the
+delivery-architecture shelf as ordered.
+
+**GATE CHANGE (flagged for review): endpoint-hygiene scope.**
+Sunny's live `run:` binding put the FIRST sanctioned tenant
+endpoint into local org_config.yaml, and the gate — which scanned
+every file on disk — flagged it. The class the gate kills is "an
+endpoint reaches the PUBLIC repo"; the scan now covers exactly the
+files that are in git or could enter it (`git ls-files -co
+--exclude-standard`), so gitignored files are exempt BY MECHANISM,
+not by name — un-ignoring org_config.yaml puts it straight back in
+scope. A companion test EARNS the exemption by asserting
+org_config.yaml is actually gitignored. The gate's original leak
+class (tracked TMDL, stray pastes) remains fully covered.
+
+**Gates:** 1,200 green + 5 xfailed, ruff clean; TEST_MAP/TRACE_MAP
+regenerated; wheel 1.59.1 shipped into sql-logic-env.
+**Live acceptance remaining (Sunny/review, on glass):** the
+codeset question via any route → DIFFERS with the E11.80 machine
+diff first line; and a bound run button showing first data.

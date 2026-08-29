@@ -368,6 +368,37 @@ class TestRunEndpoint:
         assert r.status_code == 422
         assert r.json()["reason_class"] == "not_select"
 
+    def test_unbound_reason_carries_the_specific_cure(self):
+        # RW-16: the wiring's distinguished reason rides the 503
+        from fastapi.testclient import TestClient
+
+        from src.webapp.app import create_app
+        app = create_app(lambda *a, **k: {"content": "",
+                                          "tool_calls": []},
+                         _run_kql_step, type("S", (), {
+                             "record": lambda self, e: None})(),
+                         run_unbound="pyodbc is not installed — "
+                                     "cure: pip install pyodbc")
+        r = TestClient(app).post("/api/run",
+                                 json={"step_id": "transform:x:y"})
+        assert r.status_code == 503
+        assert "pip install pyodbc" in r.json()["message"]
+
+    def test_executor_failure_returns_typed_cure_not_500(self):
+        # RW-16: a driver-stack blowup at execute time names the
+        # brew/apt cure as a typed refusal, never a bare 500
+        def broken(sql):
+            raise Exception(
+                "[unixODBC][Driver Manager]Can't open lib "
+                "'ODBC Driver 18 for SQL Server'")
+        client, _ = self._app(broken)
+        r = client.post("/api/run",
+                        json={"step_id": "transform:r.X:Scores"})
+        assert r.status_code == 502
+        j = r.json()
+        assert j["reason_class"] == "driver_stack"
+        assert "msodbcsql18" in j["message"]
+
 
 def _run_kql_step(query, params):
     import json as _j

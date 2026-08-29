@@ -97,6 +97,42 @@ def cap_wrap_sqlite(sql: str, n: int) -> str:
     return f"SELECT * FROM (\n{sql}\n) AS certified_step LIMIT {n + 1}"
 
 
+_DRIVER_CURE = (
+    "the Microsoft ODBC driver stack is missing — macOS: brew tap "
+    "microsoft/mssql-release https://github.com/Microsoft/"
+    "homebrew-mssql-release && brew trust microsoft/mssql-release && "
+    "HOMEBREW_ACCEPT_EULA=Y brew install unixodbc msodbcsql18 · "
+    "Debian/Ubuntu: apt-get install -y unixodbc msodbcsql18")
+
+
+def classify_run_error(exc: BaseException) -> "tuple[str, str]":
+    """RW-16 (field find 2026-08-29, Sunny's laptop: pyodbc +
+    unixodbc + msodbcsql18 all absent and the bind failed with no
+    remediation surfaced): every failed run DISTINGUISHES its state
+    and NAMES its cure — the error-contract law. Returns
+    (reason_class, message-with-cure)."""
+    text = f"{type(exc).__name__}: {exc}"
+    low = text.lower()
+    if isinstance(exc, ImportError) and "pyodbc" in low:
+        return ("driver_stack",
+                "pyodbc is not installed in this environment — cure: "
+                "pip install pyodbc (if the NEXT error names the ODBC "
+                f"driver, its cure follows). ({text[:200]})")
+    if ("can't open lib" in low or "odbc driver" in low
+            or "driver manager" in low or "libodbc" in low
+            or "im002" in low):
+        return ("driver_stack", f"{_DRIVER_CURE} ({text[:200]})")
+    if ("token" in low or "login" in low or "aadsts" in low
+            or "authentication" in low or "authorization" in low
+            or "permission" in low):
+        return ("auth",
+                "the AAD credential was refused or unavailable — "
+                f"cure: az login, then retry. ({text[:200]})")
+    return ("execution",
+            f"the run failed: {text[:300]} — if this repeats, check "
+            "network reach to the server and the read-only grant")
+
+
 def run_step(sql: str, execute, cap: int = 200,
              cap_wrap=cap_wrap_tsql, source: str = "") -> RunResult:
     """Execute ONE certified SELECT through the gate. `execute` is

@@ -473,7 +473,11 @@ GOV_FLAG_MEMBER_NAMES_QUERY = (
     "| join kind=leftouter (graph_nodes\n"
     "    | project member = node_id, mname = name) on member\n"
     "| extend shown = coalesce(mname, member)\n"
-    "| summarize member_names = make_list(shown, 12) by cluster"
+    # RW-BATCH-4 polish (re-walk 2026-08-29): ids ride along so the
+    # census can schema-qualify colliding bare names — the misnomer
+    # card's whole point is that a shared name hides difference
+    "| summarize member_names = make_list(shown, 12), "
+    "member_ids = make_list(member, 12) by cluster"
 )
 
 GOV_FLAGS_QUERY = (

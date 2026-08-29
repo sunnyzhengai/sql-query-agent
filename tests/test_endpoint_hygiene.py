@@ -38,7 +38,20 @@ _SKIP_SUFFIXES = {".whl", ".png", ".jpg", ".jpeg", ".gif", ".dll",
 
 
 def _text_files():
-    for path in REPO.rglob("*"):
+    # Scope = every file that IS in git or COULD enter it (tracked +
+    # untracked-not-ignored). Gitignored files are exempt BY MECHANISM,
+    # not by name: gitignore is what keeps them out of the public repo,
+    # and org_config.yaml is the SANCTIONED local home for tenant
+    # values (the run layer's `run:` block lives there by design —
+    # live find 2026-08-29, the first sanctioned local endpoint this
+    # gate met). Un-ignoring such a file puts it straight back in
+    # scope, so the leak class stays impossible.
+    import subprocess
+    out = subprocess.run(
+        ["git", "ls-files", "-co", "--exclude-standard"],
+        cwd=REPO, capture_output=True, text=True, check=True).stdout
+    for line in out.splitlines():
+        path = REPO / line
         if not path.is_file():
             continue
         if any(part in _SKIP_DIRS for part in path.parts):
@@ -79,3 +92,14 @@ def test_semantic_model_sources_are_parameterized():
                 f"{tmdl.name}: Sql.Database called with a literal server "
                 f"string — use the DemoSqlServer parameter expression"
             )
+
+
+def test_the_sanctioned_local_config_is_actually_ignored():
+    """The scope exemption in _text_files is EARNED, not assumed: the
+    file holding tenant values must be gitignored, or the scan above
+    would rightly see it again."""
+    import subprocess
+    rc = subprocess.run(["git", "check-ignore", "-q", "org_config.yaml"],
+                        cwd=REPO).returncode
+    assert rc == 0, ("org_config.yaml is not gitignored — tenant "
+                     "values would enter the repo")

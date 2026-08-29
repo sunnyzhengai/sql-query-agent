@@ -96,3 +96,49 @@ class TestVerdictStamps:
         assert "certified variants exist" in rec.note
         assert "no official is designated yet" in rec.note
         assert s.permitted("cluster:cousin_conflict:metric:ccc333ddd444")
+
+
+class TestMemberLabelCollisions:
+    """RW-BATCH-4 polish (re-walk 2026-08-29): the misnomer card
+    rendered "USP_Active_Diabetics, USP_Active_Diabetics" — the
+    shared bare name hid the very difference the flag surfaces.
+    Colliding names schema-qualify (the W3a mechanism, reused)."""
+
+    def test_colliding_names_qualify_distinct_names_stay_bare(self):
+        from src.orchestrator.ops import _member_labels
+        labels = _member_labels(
+            ["USP_Active_Diabetics", "USP_Active_Diabetics",
+             "USP_DM_Registry"],
+            ["metric:reporting.USP_Active_Diabetics",
+             "metric:staging.USP_Active_Diabetics",
+             "metric:reporting.USP_DM_Registry"])
+        assert labels == [
+            "USP_Active_Diabetics (reporting.USP_Active_Diabetics)",
+            "USP_Active_Diabetics (staging.USP_Active_Diabetics)",
+            "USP_DM_Registry"]
+
+    def test_store_without_ids_falls_back_to_bare_names(self):
+        from src.orchestrator.ops import _member_labels
+        assert _member_labels(["A", "A"], []) == ["A", "A"]
+
+    def test_census_rows_carry_qualified_member_names(self):
+        from src.orchestrator.tools import GOV_FLAG_MEMBER_NAMES_QUERY
+
+        def kql(query, params):
+            if query == GOV_FLAG_MEMBER_NAMES_QUERY:
+                return [{
+                    "cluster": "cluster:misnomer:step:aaa111bbb222",
+                    "member_names": ["USP_Active_Diabetics",
+                                     "USP_Active_Diabetics"],
+                    "member_ids": [
+                        "metric:reporting.USP_Active_Diabetics",
+                        "metric:staging.USP_Active_Diabetics"]}]
+            return fake_kql(query, params)
+
+        s = OpsSession()
+        rs = op_census("flag", kql, s)
+        [row] = [r for r in rs.rows
+                 if r["id"] == "cluster:misnomer:step:aaa111bbb222"]
+        assert row["member_names"] == [
+            "USP_Active_Diabetics (reporting.USP_Active_Diabetics)",
+            "USP_Active_Diabetics (staging.USP_Active_Diabetics)"]
