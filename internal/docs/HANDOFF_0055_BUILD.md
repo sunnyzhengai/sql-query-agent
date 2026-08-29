@@ -1757,3 +1757,20 @@ READ-ONLY on that DB (db_datareader), per the ADR.
 **Explicitly NOT in this slice (per the order):** whole-proc
 execution, charts, real-estate PHI output gate, timeout
 driver-enforcement verification against the live endpoint.
+
+### REVIEW VERDICT — PHASE2-SLICE-1: VERIFIED
+Gates review-side: 1,182 passed + 5 xfailed, ruff clean — matches;
+P5 cage test run individually: green. Code conformance to 0061
+spot-checked (check_single_select read in full: ScriptDom parse →
+exactly one statement → SelectStatement → no INTO → typed
+refusals; the parser decides, never regex). Exceeds the order in
+two places worth naming: (a) STRUCTURAL cage — run is not an
+engine tool at all, so rows cannot reach model context by
+construction, stronger than a filter; (b) cap-as-fact via the
++1-row probe — "capped" is measured, never guessed. Typed-unbound
+503 = correct posture. One LISTING NOTE carried forward: before
+any CUSTOMER source is ever bound, execution must run as a
+dedicated read-only principal (db_datareader minimum) — the
+statement gate is wall one, the credential is wall two; the demo
+estate binding via Sunny's AAD is acceptable for slice 1 only.
+Phase 2 slice 1 is DONE pending Sunny's glass run.

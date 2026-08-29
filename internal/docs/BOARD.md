@@ -236,3 +236,8 @@ line; awaits review verification).
 - [ ] NEW (08-29): bind the run layer — one local org_config line
       (`run:` server/database → aivia_shapes_src; runbook in
       HANDOFF_0055_BUILD). Until then runs refuse typed (correct).
+- [ ] (morning, optional, 2 min) Bind the run layer: add the
+      `run:` block to org_config.yaml per dev's note in
+      HANDOFF_0055_BUILD.md, restart, check banner "[run layer]
+      bound read-only to aivia_shapes_src" — then click Run on any
+      confirmed step: the first DATA on glass.
