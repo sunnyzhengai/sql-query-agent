@@ -2012,3 +2012,17 @@ codeset twins SHOWN, prune boxes, three buttons; click → DIFFERS
 **SUNNY (optional, one local line):** `escalation:\n  contact:
 <your email>` in org_config.yaml puts a working mailto on the
 door; without it the door still captures and shows the summary.
+
+### REVIEW VERDICT — ITERATION-CARD CONVERSION (1.61.0): VERIFIED
+Gates review-side: 1,215 passed + 5 xfailed, ruff clean — matches.
+0062 conformance checked invariant by invariant: SHOW grounds at
+parse time and lists the graph's REAL matches (the human decides
+on matches, never a blind echo); PROPOSE stays the model's only
+authorship; ASK carries the three items with prune-as-decision and
+the no-nag single confirm; pruning-to-empty refuses typed (never a
+guessed route); the DEVELOPER DOOR is on every card and
+/api/escalate captures the full exchange as a 0056 deny-shape
+demand with a prefilled mailto. EXECUTE unchanged through the
+algebra. 0062 exits the sanctioned-draft set — cited modules and
+tests now anchor it. LIVE ACCEPTANCE (Sunny): the converted
+codeset beat on glass, then QA gate, then CAPTURE.
