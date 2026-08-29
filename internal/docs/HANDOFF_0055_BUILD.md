@@ -1688,3 +1688,72 @@ fields ride query-side (no wheel cycle). Both live acceptances
 accepted as claimed. **The two beats are now Sunny's morning
 re-walk + the fresh QA gate; dev is clear to proceed to
 PHASE2-SLICE-1 per the overnight order.**
+
+### 2026-08-29 — PHASE2-SLICE-1 BUILT (ADR 0061 run layer, slice 1) — release 1.59.0
+**The run layer runs the confirmed definition — nothing is
+generated.** The SQL that executes is the certified step fragment,
+byte-for-byte what was displayed; conservative defaults per the
+order (cap 200, NO charts, re-confirm each run — Sunny's §6 calls
+can only relax them).
+
+**What shipped:**
+- `src/run_layer.py` — the gate + the result + the runner.
+  `check_single_select`: ScriptDom statement-type check (the
+  parser decides, never regex) — exactly ONE SelectStatement;
+  UPDATE/EXEC/DROP → typed `not_select` naming the offending type,
+  two statements → `multi_statement`, SELECT…INTO → `select_into`,
+  unparseable → `parse`. `run_step`: TOP-cap wrap with a +1-row
+  probe so **capped is a fact, never a guess**; `RunResult`
+  separates DISPLAY rows from `model_stamps()` =
+  {row_count, columns, capped, elapsed_ms} — the ONLY
+  model-visible shape.
+- **THE P5 CAGE (the slice's acceptance): green, both halves.**
+  Value half: no seeded cell value (len≥4) appears in the stamp
+  blob. Structural half: `run` is NOT in ENGINE_TOOLS — the model
+  cannot call it; rows cannot enter model context by construction.
+  Endpoint half: the captured TurnEvent carries stamps only —
+  asserted no `rows` key in trace/decision.
+- `/api/run` (src/webapp/app.py) — body {step_id,
+  conversation_id}; the READ GUARANTEE extends to runs (step must
+  be retrieval-permitted this conversation → 403 unsurfaced);
+  unbound executor → 503 `unconfigured` typed; RunRefusal → 422
+  typed with reason_class. Every run captured as a decision event
+  (0056 shape): question `[RUN] <step_id>`, made_by
+  `deterministic_run`, stamps only — the flywheel counts runs from
+  day one. Run button on retrieved step rows renders the results
+  table + machine sampling label ("N row(s) · TOP 200 (capped) ·
+  elapsed · source · read-only").
+- Binding: `RunConfig` in src/config.py + `run:` block read from
+  org_config.yaml in src/webapp/main.py `_run_executor()` —
+  AzureDirectConnection with an az-cli AAD token
+  (database.windows.net scope), 30s/200 defaults. **Currently
+  TYPED-UNBOUND** — no `run:` block exists yet, so /api/run
+  refuses 503 by design; nothing guesses.
+- Fixture provenance: tests build the cohort-105 estate straight
+  from `devtools.generate_shape_seed.build_rows()` into in-memory
+  sqlite — same rows the seed SQL ships (117 registry rows == the
+  oracle), zero SQL-parsing of our own fixture, zero tenant
+  dependency in CI.
+- Registry: 0061 now cites code (src/run_layer.py +
+  tests/test_run_layer.py); its sanctioned-draft exception REMOVED
+  from test_trace_registry — totality holds the slice from now on.
+
+**Gates:** 1,182 green + 5 xfailed, ruff clean; TEST_MAP/TRACE_MAP
+regenerated; wheel 1.59.0 built + shipped into sql-logic-env
+(release-consistency green).
+
+**SUNNY — one local line to bind the demo source (when ready):**
+add to org_config.yaml (gitignored; endpoint never in git):
+```
+run:
+  server: <aivia_shapes_src SQL endpoint>.database.windows.net
+  database: aivia_shapes_src
+```
+Restart the workbench; the banner prints "[run layer] bound
+read-only to aivia_shapes_src". Until then runs refuse typed —
+correct posture. The credential the token maps to should be
+READ-ONLY on that DB (db_datareader), per the ADR.
+
+**Explicitly NOT in this slice (per the order):** whole-proc
+execution, charts, real-estate PHI output gate, timeout
+driver-enforcement verification against the live endpoint.

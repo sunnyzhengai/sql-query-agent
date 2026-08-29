@@ -508,13 +508,16 @@ TRACE_REGISTRY = {
     },
     "0061": {
         # DRAFT 2026-08-28 (overnight, review-authored): the run
-        # layer — Pro runs the confirmed definition. Slice 1 ordered
-        # after RW-BATCH-3; three open calls await Sunny (§6).
+        # layer — Pro runs the confirmed definition. Slice 1 built
+        # same night (PHASE2-SLICE-1, overnight-authorized against
+        # the draft): ScriptDom single-SELECT gate, TOP-cap-as-fact,
+        # P5 stamps-only capture, /api/run + run button. Three §6
+        # open calls await Sunny; defaults stand until relaxed.
         "title": "The run layer: Pro runs the confirmed definition",
         "category": "architecture",
         "axioms": [],
-        "modules": [],
-        "tests": [],
+        "modules": ["src/run_layer.py"],
+        "tests": ["tests/test_run_layer.py"],
         "docs": ["docs/decisions/0061-the-run-layer.md"],
     },
     "0060": {

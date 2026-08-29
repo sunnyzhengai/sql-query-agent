@@ -714,5 +714,9 @@ classification).
 ## ADR 0061 — The run layer: Pro runs the confirmed definition
 
 - **Category:** architecture
+- **Implemented by:**
+  - `src/run_layer.py`
+- **Enforced by:**
+  - `tests/test_run_layer.py`
 - **Summarized in:**
   - `docs/decisions/0061-the-run-layer.md`

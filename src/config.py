@@ -142,6 +142,17 @@ class OrgConfig(BaseModel):
     name: str
 
 
+class RunConfig(BaseModel):
+    """ADR 0061 slice 1 — the run layer's source binding: the demo
+    SQL endpoint the confirmed step SELECTs execute against.
+    Conservative defaults per the order (Sunny's open calls can only
+    relax them). The credential must be READ-ONLY by construction."""
+    server: str = ""
+    database: str = ""
+    timeout_s: int = 30
+    row_cap: int = 200
+
+
 class Config(BaseModel):
     org: OrgConfig
     lakehouse: LakehouseConfig
@@ -151,6 +162,7 @@ class Config(BaseModel):
     adapters: Optional[AdaptersConfig] = None
     fabric_graph: Optional[FabricGraphConfig] = None
     freshness: FreshnessConfig = FreshnessConfig()
+    run: Optional[RunConfig] = None
 
 
 def load_config(path: Path | str | None = None) -> Config:

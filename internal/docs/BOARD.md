@@ -24,8 +24,9 @@ show pending, never on remembered sequence (first-deadlock lesson,
 as of 2026-08-27. Dev session's watcher: LIVE as of 2026-08-27
 (persistent 60s poll; re-armed at each dev session start — memory
 recorded).
-Last touched: 2026-08-28, dev (capture gate DEV SIDE CLOSED — 1.58.5 store-live; remaining: Sunny's glass check + QA verbatim).
-payload 3 built, RESULTS v2 filled under the section of record).
+Last touched: 2026-08-29, dev (PHASE2-SLICE-1 built + gated —
+1.59.0; run layer typed-unbound awaiting Sunny's local `run:`
+line; awaits review verification).
 
 ## 🎯 THE CRITICAL PATH → demo capture
 
@@ -88,6 +89,15 @@ payload 3 built, RESULTS v2 filled under the section of record).
       referential audit BUILT (devtools/org_config_audit.py, green
       --tenant in the 1.58.0 preflight); probe-eh rename NOT BUILT
       — parked for Sunny (her UI + recorded ref-edit list)
+- [x] **PHASE2-SLICE-1 BUILT (08-29 dev, release 1.59.0)** — ADR
+      0061 run layer slice 1: ScriptDom single-SELECT gate (typed
+      refusals), TOP-200 cap-as-fact, /api/run + run button, P5
+      cage GREEN (rows display-only, stamps-only to model + event;
+      run not an engine tool), decision-event capture live,
+      cohort-105 sqlite fixture (zero tenant dep). TYPED-UNBOUND
+      until Sunny adds the local `run:` block (runbook line in
+      HANDOFF_0055_BUILD). 1,182 green + ruff; 0061 exits the
+      sanctioned-draft set. AWAITS REVIEW VERIFICATION.
 - [ ] Finder-coverage contract (timing = Sunny's call; drilldown
       benefit if pre-capture)
 - [ ] 0056 decision layer + presentation reframe (POST-capture by
@@ -223,3 +233,6 @@ payload 3 built, RESULTS v2 filled under the section of record).
       slice 1 (rec no) · re-confirm cadence (rec shelf-standing)
 - [ ] Standing open: flywheel film sequencing · shareable-
       connection click · Purview secret rotation
+- [ ] NEW (08-29): bind the run layer — one local org_config line
+      (`run:` server/database → aivia_shapes_src; runbook in
+      HANDOFF_0055_BUILD). Until then runs refuse typed (correct).

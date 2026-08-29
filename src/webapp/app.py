@@ -62,6 +62,9 @@ def create_app(
     run_kql,
     sink,
     marketplace: "MarketplaceDeps | None" = None,
+    run_executor=None,
+    run_cap: int = 200,
+    run_source: str = "",
 ) -> FastAPI:
     app = FastAPI(title=product_name(), docs_url=None, redoc_url=None)
     conversations: "dict[str, Conversation]" = {}
@@ -132,6 +135,77 @@ def create_app(
         return JSONResponse({"conversation_id": conv_id,
                              "turn_index": turn_index,
                              "answer": turn.answer, "basis": turn.basis})
+
+    @app.post("/api/run")
+    async def run_confirmed_step(request: Request) -> JSONResponse:
+        """ADR 0061 slice 1: execute ONE certified step SELECT —
+        byte-for-byte what the user confirmed on glass. P5 ABSOLUTE:
+        rows go to THIS response (the display); the model context
+        never sees them (the run is not an engine tool); the
+        decision event records STAMPS only."""
+        body = await request.json()
+        step_id = str(body.get("step_id", "")).strip()
+        conv_id = str(body.get("conversation_id") or "")
+        user = _user_from(request)
+        if not step_id:
+            return JSONResponse({"error": "step_id required"},
+                                status_code=400)
+        conv = _conversation(user, conv_id) if conv_id else None
+        if conv is not None and not conv.engine.ops.permitted(step_id):
+            return JSONResponse(
+                {"error": "refusal", "reason_class": "unsurfaced",
+                 "message": "that step has not been surfaced in this "
+                            "conversation — retrieve it first (the "
+                            "read guarantee applies to runs too)"},
+                status_code=403)
+        if run_executor is None:
+            return JSONResponse(
+                {"error": "refusal", "reason_class": "unconfigured",
+                 "message": "the run layer has no source binding — "
+                            "add the run: section to org_config.yaml "
+                            "(server, database) with a READ-ONLY "
+                            "credential"}, status_code=503)
+        from src.orchestrator.assemble import NODE_FACTS_QUERY
+        rows = run_kql(NODE_FACTS_QUERY, {"p_node_id": step_id})
+        if not rows:
+            return JSONResponse({"error": "refusal",
+                                 "reason_class": "unknown_step",
+                                 "message": f"no step {step_id!r}"},
+                                status_code=404)
+        props = rows[0].get("properties") or "{}"
+        if isinstance(props, str):
+            props = _json.loads(props)
+        fragment = str(props.get("sql_fragment") or "")
+        from src.run_layer import RunRefusal, run_step
+        try:
+            res = run_step(fragment, run_executor, cap=run_cap,
+                           source=run_source)
+        except RunRefusal as e:
+            return JSONResponse(
+                {"error": "refusal", "reason_class": e.reason_class,
+                 "message": str(e)}, status_code=422)
+        # 0056-shape capture: the run + confirm as a decision event —
+        # STAMPS only (P5), never rows
+        sink.record(TurnEvent(
+            event_at=datetime.now(timezone.utc).isoformat(),
+            user_id=user,
+            question=f"[RUN] {step_id}",
+            tools_used=("run",),
+            ids_read=(step_id,),
+            basis=f"run_step({step_id}) — confirmed on glass",
+            answered=True,
+            conversation_id=conv_id, turn_index=-1,
+            decision={"made_by": "deterministic_run",
+                      "stamps": res.model_stamps()},
+            trace=({"tool": "run", "args": {"step_id": step_id},
+                    "result": _json.dumps(res.model_stamps())},),
+        ))
+        return JSONResponse({
+            "step_id": step_id,
+            "columns": res.columns,
+            "rows": res.rows,
+            "sampling_label": res.sampling_label(run_cap, run_source),
+            "stamps": res.model_stamps()})
 
     @app.post("/api/feedback")
     async def feedback(request: Request) -> JSONResponse:
@@ -452,6 +526,12 @@ WORKBENCH_PAGE = """<!doctype html>
                  font:12px ui-monospace,monospace; overflow-x:auto; }
   .cite { font:11.5px ui-monospace,monospace; background:#eef2fa;
           color:var(--accent); border-radius:6px; padding:1px 6px; }
+  .runbtn { margin:8px 0 2px; padding:6px 14px; border-radius:8px;
+    border:1px solid var(--accent); background:#fff;
+    color:var(--accent); cursor:pointer; font-size:13px; }
+  .runlabel { font:12.5px ui-monospace,monospace; color:#3a4160;
+    margin:8px 0 2px; }
+  .runlabel.refused { color:#b3423e; }
   .concl { border-left:4px solid var(--accent); }
   .cc-machine { font:12.5px ui-monospace,monospace; color:#3a4160;
     margin:6px 0; }
@@ -615,6 +695,34 @@ function renderOutput(o) {
     prefer = ['item', 'description', 'closeness'];
   }
   rs.appendChild(renderTable(rows2, prefer));
+  // ADR 0061 slice 1: a retrieved STEP is runnable — confirm-each-
+  // run IS the click on the displayed, certified SQL (nothing
+  // generated). Results render to the DISPLAY; the model sees
+  // stamps only (P5).
+  if (r.op === 'retrieve') {
+    for (const row of (r.rows || [])) {
+      if (row.kind === 'step' && row.sql_fragment) {
+        const btn = el(`<button class="runbtn">&#9654; run this step (read-only, TOP 200)</button>`);
+        const sid = row.id;
+        btn.addEventListener('click', async () => {
+          btn.disabled = true; btn.textContent = 'running…';
+          const resp = await fetch('/api/run', { method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ step_id: sid,
+              conversation_id: conversationId }) });
+          const rj = await resp.json();
+          btn.remove();
+          if (rj.error) {
+            rs.appendChild(el(`<div class="runlabel refused">run refused — ${esc(rj.message || rj.error)}</div>`));
+            return;
+          }
+          rs.appendChild(el(`<div class="runlabel">${esc(rj.sampling_label)}</div>`));
+          rs.appendChild(renderTable(rj.rows, rj.columns));
+        });
+        rs.appendChild(btn);
+      }
+    }
+  }
   add(rs);
   turnPanels.push(rs);
   return rs;

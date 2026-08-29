@@ -65,6 +65,43 @@ def _kusto_run():
     return KustoClient(uri, db, az_cli_token_provider(uri)).run
 
 
+def _run_executor():
+    """ADR 0061 slice 1: the run layer's source binding from
+    org_config.yaml `run:` — returns (executor, cap, source_label)
+    or (None, cap, "") when unbound/undriverable (the endpoint then
+    refuses typed, never guesses)."""
+    cfg = Path("org_config.yaml")
+    if not cfg.exists():
+        return None, 200, ""
+    try:
+        import yaml
+        block = (yaml.safe_load(cfg.read_text()) or {}).get("run") or {}
+    except Exception as e:                  # noqa: BLE001 — visible
+        print(f"[run layer] org_config unreadable ({e}) — unbound")
+        return None, 200, ""
+    server = str(block.get("server") or "").strip()
+    database = str(block.get("database") or "").strip()
+    cap = int(block.get("row_cap") or 200)
+    if not (server and database):
+        return None, cap, ""
+    try:
+        from src.config import SqlServerConfig
+        from src.extractor.connection import AzureDirectConnection
+        from src.orchestrator.kusto import az_cli_token_provider
+        conn = AzureDirectConnection(
+            SqlServerConfig(host=server, database=database,
+                            source_type="azure_direct"),
+            lambda: az_cli_token_provider(
+                "https://database.windows.net/")())
+        print(f"[run layer] bound read-only to {database} "
+              "(confirm-each-run; TOP cap enforced)")
+        return conn.execute_query, cap, database.split("-")[0]
+    except Exception as e:                  # noqa: BLE001 — typed
+        print(f"[run layer] binding failed ({type(e).__name__}) — "
+              "runs will refuse typed")
+        return None, cap, ""
+
+
 def _marketplace():
     keys = ("MKT_FULFILLMENT_APP_ID", "MKT_PUBLISHER_TENANT_ID",
             "MKT_CLIENT_ID", "MKT_CLIENT_SECRET")
@@ -112,8 +149,10 @@ def build() -> "object":
     _load_dotenv()
     from src.orchestrator.agent import azure_chat_api
     from src.webapp.app import create_app
+    executor, cap, source = _run_executor()
     return create_app(azure_chat_api(), _kusto_run(), _sink(),
-                      _marketplace())
+                      _marketplace(), run_executor=executor,
+                      run_cap=cap, run_source=source)
 
 
 app = build() if legacy_env("WEBAPP_EAGER", "1") != "0" else None

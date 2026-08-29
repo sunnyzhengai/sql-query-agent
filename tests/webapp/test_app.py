@@ -320,3 +320,63 @@ class TestStoreResolution:
         from src.webapp.main import resolve_store
         _, db, source = resolve_store()
         assert db == "semantic_catalog" and "default" in source
+
+
+class TestRunEndpoint:
+    """ADR 0061 slice 1: /api/run — typed refusals, the read
+    guarantee extended to runs, P5 stamps-only capture."""
+
+    def _app(self, executor=None):
+        from src.webapp.app import create_app
+        events = []
+        class Sink:
+            def record(self, e): events.append(e)
+        app = create_app(lambda *a, **k: {"content": "", "tool_calls": []},
+                         _run_kql_step, Sink(),
+                         run_executor=executor, run_cap=5,
+                         run_source="fixture")
+        from fastapi.testclient import TestClient
+        return TestClient(app), events
+
+    def test_unconfigured_refuses_typed(self):
+        client, _ = self._app(None)
+        r = client.post("/api/run", json={"step_id": "transform:x:y"})
+        assert r.status_code == 503
+        assert r.json()["reason_class"] == "unconfigured"
+
+    def test_run_returns_rows_to_display_and_stamps_to_the_event(self):
+        client, events = self._app(
+            lambda sql: [{"PATIENT_ID": i} for i in range(9)])
+        r = client.post("/api/run",
+                        json={"step_id": "transform:r.X:Scores"})
+        assert r.status_code == 200
+        j = r.json()
+        assert j["stamps"]["capped"] is True and len(j["rows"]) == 5
+        assert "read-only" in j["sampling_label"]
+        # P5: the captured event carries STAMPS — count/schema/
+        # elapsed — and structurally no rows key at all
+        ev = events[-1]
+        blob = str(ev.trace) + str(ev.decision)
+        assert "'rows'" not in blob and '"rows"' not in blob
+        assert ev.decision["stamps"]["row_count"] == 5
+        assert "[RUN]" in ev.question
+
+    def test_non_select_fragment_refused_typed(self):
+        client, _ = self._app(lambda sql: [])
+        r = client.post("/api/run",
+                        json={"step_id": "transform:r.X:Bad"})
+        assert r.status_code == 422
+        assert r.json()["reason_class"] == "not_select"
+
+
+def _run_kql_step(query, params):
+    import json as _j
+
+    from src.orchestrator.assemble import NODE_FACTS_QUERY
+    if query == NODE_FACTS_QUERY:
+        nid = params["p_node_id"]
+        frag = ("UPDATE T SET X=1" if "Bad" in nid
+                else "SELECT PATIENT_ID FROM DM_REGISTRY")
+        return [{"node_id": nid, "name": nid.split(":")[-1],
+                 "properties": _j.dumps({"sql_fragment": frag})}]
+    return []
