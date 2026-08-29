@@ -303,9 +303,9 @@ The hold lifts only by Sunny's explicit word, recorded here.
       every round; /api/escalate captures demand as a 0056 deny
       event + mailto (org_config escalation.contact, optional);
       prune-to-empty refuses typed. 0062 exits sanctioned-draft.
-      1,215 green + ruff. AWAITS REVIEW VERIFICATION, then Sunny's
-      glass check of the converted codeset beat → QA gate →
-      CAPTURE.
+      1,215 green + ruff. **VERIFIED by review 08-29 (invariant by
+      invariant).** Remaining: Sunny's glass check of the
+      converted codeset beat → QA gate → CAPTURE.
 
 ## RULED (Sunny, 2026-08-29): THE GENERATOR CLAUSE — Echo Law amendment
 "Fail twice, no matter the cause, triggers an investigation."
