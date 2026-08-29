@@ -420,3 +420,18 @@ Transcript: WALK_TRANSCRIPT_0062.md. Sunny does NOT walk yet.
   the no-match card was CORRECT behavior; fix the test to the
   real table AND note: tier-2 vector candidates (unbuilt) is what
   would have offered the near-miss.
+
+## 2026-08-29 — E-BATTERY RE-RUN (1.63.0): REVIEW-GREEN, 16/16
+Latency: cards 0.8–2.6s (sole exception: Q1 ate the store's ~14s
+idle-wake — skeleton covers on glass; DEMO PREP: warm the store
+with one throwaway question before capture); executes 0.9–8.0s;
+B2 from TIMEOUT to 8.0s with DIFFERS + the No-PCP diff. Substance:
+B1≡QA3 deterministic DIFFERS + E11.80 again; B2 3-way completes;
+feeds/map/lineage cards compose (kind None extinct); variants
+lexicon fixed; kind filters clean; refusals exact; no-entity card
+0.8s with all doors. Cosmetic nit only: "red flags" rendered as an
+unmatched entity alongside the flags relation (harmless; noted).
+**SUNNY WALKS NOW** — the machine work is done; her glass is for
+clarity judgment: the streamed skeleton, card readability, prune
+boxes, the new map/feeds cards, the E11.80 beat, and the untried
+RUN BUTTON (first data on glass still awaits its first click).
