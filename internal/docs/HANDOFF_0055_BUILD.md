@@ -1951,3 +1951,21 @@ shipped into sql-logic-env; docs regenerated.
 should show: parse card → click → retrieve + compare → DIFFERS
 with the E11.80 line. The run button then completes the loop on
 the same glass.
+
+### REVIEW VERDICT — RW-17 + 0060 SAMENESS CLASS: VERIFIED
+Gates review-side: 1,211 passed + 5 xfailed, ruff clean — matches.
+Design conformance excellent on every contested point: cluster
+compare = member expansion (0057 doctrine, not a patch); id-kind
+mismatch names ITS OWN cure and AssemblyError can never again wear
+the infra cure; self-declared non-answers never file "answered";
+and the planner honors every 0060 ruling — confirm-every-parse
+(nothing executes before the click), exact-then-contains grounding
+with whole-collision anchoring, execution through the EXISTING
+algebra (the planner is a planner, not a second engine), machine
+compare card, silent fallback to the engine for every other class,
+opt-in wiring so evals stay untouched. HISTORIC NOTE: this is the
+first production question class served by parse-is-the-plan —
+ordered, built, and verified within 24 hours of the ADR's
+acceptance. LIVE ACCEPTANCE (Sunny): re-ask the codeset question →
+purple parse card → click → DIFFERS + E11.80. Then the Run button,
+then the QA gate.
