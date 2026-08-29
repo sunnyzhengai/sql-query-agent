@@ -23,6 +23,7 @@ from src.orchestrator.tools import (
     GOV_SWEEP_META_QUERY,
     LINKS_OF_REPORT_QUERY,
     LIST_CATALOG_QUERY,
+    NAME_CONTAINS_ANY_TOKEN_QUERY,
     NAME_CONTAINS_QUERY,
     NAME_CONTAINS_TOKENS_QUERY,
     PROJECTION_EDGES_COUNT_QUERY,
@@ -310,6 +311,22 @@ def fake_kql(query, params):
                 for ref, row in sorted(METRIC_ROWS.items())
                 if p in row["metric_name"].lower()
                 or p in row["business_name"].lower()]
+    if query == NAME_CONTAINS_ANY_TOKEN_QUERY:
+        # RW-18: the ONE labeled scan — any-token matches with their
+        # matched-token sets (replaces the per-token probe loop)
+        toks = [t for t in params["p_tokens"].lower().split() if t]
+        out = []
+        for ref, row in sorted(METRIC_ROWS.items()):
+            blob = (row["metric_name"] + " "
+                    + row["business_name"]).lower()
+            matched = [t for t in toks if t in blob]
+            if matched:
+                out.append({"node_id": f"canonical:{ref}",
+                            "kind": "metric", "ref": ref,
+                            "name": row["metric_name"],
+                            "business_name": row["business_name"],
+                            "matched_tokens": matched})
+        return sorted(out, key=lambda r: -len(r["matched_tokens"]))
     if query == LIST_CATALOG_QUERY:
         kind = params["p_kind"]
         if kind == "metric":

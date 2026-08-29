@@ -571,3 +571,128 @@ class TestIterationCard:
                               "question": "anything at all"})
         j = r.json()
         assert j["captured"] is True and j["mailto"] == ""
+
+
+class TestCardEverywhere:
+    """RW-BATCH-5 item 2 (0062 proper): EVERY question grounding at
+    least one entity gets the understanding card; no relation word →
+    the DEFAULT MAP reading; silent engine fallback survives only
+    for zero-grounded questions. Plus RW-18: parallel grounding,
+    streamed skeleton, measured latency."""
+
+    def _api(self, entities, primitives):
+        def api(messages, tools, tool_choice=None):
+            forced = (tool_choice or {}).get("function", {}).get("name")
+            if forced == "file_parse":
+                return {"content": "", "tool_calls": [{
+                    "id": "p1", "function": {
+                        "name": "file_parse",
+                        "arguments": json.dumps({
+                            "entities": entities,
+                            "primitives": primitives})}}]}
+            if forced == "file_verdict":
+                return {"content": "", "tool_calls": [{
+                    "id": "v1", "function": {
+                        "name": "file_verdict",
+                        "arguments": json.dumps({
+                            "answered": False, "missing_op": ""})}}]}
+            return {"content": "Engine answered.", "tool_calls": []}
+        return api
+
+    def _client(self, entities, primitives):
+        import tempfile
+        from pathlib import Path
+
+        from src.orchestrator.events import JsonlEventSink
+        sink = JsonlEventSink(Path(tempfile.mkdtemp()) / "e.jsonl")
+        app = create_app(self._api(entities, primitives), fake_kql,
+                         sink, planner=True)
+        return TestClient(app)
+
+    def test_no_relation_word_gets_the_default_map_card(self):
+        client = self._client(["ED Sepsis Screening"], [])
+        r = client.post("/api/ask", json={
+            "message": "tell me about ED Sepsis Screening"})
+        j = r.json()
+        assert "the map around" in j["parse_confirm"]
+        assert j["show"][0]["matches"]
+        assert "outputs" not in j
+        # the confirm executes the default map: retrieve, no compare
+        r2 = client.post("/api/parse/confirm",
+                         json={"conversation_id": j["conversation_id"]})
+        jj = r2.json()
+        assert [o["component"]["op"] for o in jj["outputs"]] == [
+            "retrieve"]
+        assert jj["conclusion"]["kind"] == "definition"
+
+    def test_zero_grounded_entities_get_the_no_match_card(self):
+        # B9 + the remove-the-type ruling: NO silent engine route —
+        # the no-match card carries rephrase + doors instead
+        client = self._client(["Zzz Nothing Ever"], [])
+        r = client.post("/api/ask", json={
+            "message": "what about zzz nothing ever?"})
+        j = r.json()
+        assert j["no_match"] is True
+        assert "no catalog match" in j["parse_confirm"]
+        assert "contact a developer" in j["parse_confirm"]
+        assert "caption" not in j          # the engine never ran
+
+    def test_zero_entity_question_gets_the_no_match_card(self):
+        # B9 exact: "what is the weather today"
+        client = self._client([], [])
+        r = client.post("/api/ask", json={
+            "message": "what is the weather today"})
+        j = r.json()
+        assert j["no_match"] is True
+        assert "rephrase" in j["parse_confirm"]
+
+    def test_engine_reachable_only_via_the_explicit_button(self):
+        # C5: planner:false (the card button's wire shape) is the
+        # ONLY road to the engine
+        client = self._client(["Zzz Nothing Ever"], [])
+        r = client.post("/api/ask", json={
+            "message": "what about zzz?", "planner": False})
+        assert r.json()["caption"] == "Engine answered."
+
+    def test_count_words_propose_the_policy_refusal(self):
+        # B10: row-data asks ground fine but PROPOSE the refusal +
+        # the definition offer; confirm retrieves the record
+        client = self._client(["ED Sepsis Screening"], ["count_rows"])
+        r = client.post("/api/ask", json={
+            "message": "how many patients are in the cohort?"})
+        j = r.json()
+        assert "patient rows never reach the model" in j["parse_confirm"]
+        assert "definition" in j["parse_confirm"]
+        r2 = client.post("/api/parse/confirm",
+                         json={"conversation_id": j["conversation_id"]})
+        assert [o["component"]["op"] for o in r2.json()["outputs"]] == [
+            "retrieve"]
+
+    def test_latency_split_is_measured_on_card_and_confirm(self):
+        client = self._client(["ED Sepsis Screening"], [])
+        r = client.post("/api/ask", json={"message": "about sepsis"})
+        j = r.json()
+        assert set(j["latency_ms"]) == {"parse", "ground"}
+        r2 = client.post("/api/parse/confirm",
+                         json={"conversation_id": j["conversation_id"]})
+        assert "execute" in r2.json()["latency_ms"]
+        assert "ms — the parse was the plan" in r2.json()["loop_status"]
+
+    def test_stream_surface_emits_skeleton_then_matches_then_done(self):
+        client = self._client(["ED Sepsis Screening"], [])
+        r = client.post("/api/ask/stream",
+                        json={"message": "about sepsis"})
+        text = r.text
+        assert text.index("event: stage") < text.index("event: card")
+        assert '"parse_line"' in text and '"grounded"' in text
+        assert text.rstrip().split("event: ")[-1].startswith("done")
+
+    def test_confirm_stream_emits_op_chips_then_done(self):
+        client = self._client(["ED Sepsis Screening"], [])
+        r1 = client.post("/api/ask", json={"message": "about sepsis"})
+        conv = r1.json()["conversation_id"]
+        r2 = client.post("/api/parse/confirm/stream",
+                         json={"conversation_id": conv})
+        text = r2.text
+        assert '"pending": true' in text
+        assert text.index("event: output") < text.index("event: done")

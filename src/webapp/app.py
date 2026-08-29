@@ -296,8 +296,8 @@ def create_app(
             "suggestions": [],
         }
 
-    def _planner_intercept(conv: Conversation,
-                           question: str) -> "dict | None":
+    def _planner_intercept(conv: Conversation, question: str,
+                           on_progress=None) -> "dict | None":
         """ADR 0060, sameness class LIVE (ordered 2026-08-29 after
         codeset FAIL #3 — three runs, three routes, three failures:
         the route was a coin flip). The parse is the plan: a
@@ -306,45 +306,107 @@ def create_app(
         click — same parse, same plan, same DIFFERS line, every
         run. Any parser trouble falls through to the engine, which
         remains the default surface for every other class."""
+        import time as _time
+
         from src.orchestrator.parse_plan import (
             ground_entities,
             parse_question,
         )
+        # RULED 2026-08-29 (remove-the-type-first): NO SILENT
+        # fallback anywhere. Every state is a CARD — the engine is
+        # reachable ONLY via the card's explicit button. A question
+        # nothing grounds gets the NO-MATCH card (rephrase + the
+        # developer door + the engine button), never a silent route.
+        def _no_match(line: str) -> dict:
+            return {"parse_confirm": line, "no_match": True,
+                    "show": [], "parse": {"question": question,
+                                          "entities": [],
+                                          "primitives": [],
+                                          "modifiers": []}}
+        t0 = _time.monotonic()
         try:
             parse = parse_question(question, chat_api)
-        except Exception:   # noqa: BLE001 — parser down ≠ workbench down
-            return None
-        if parse.primitives != ["same_or_different"] or not parse.entities:
-            return None
-        # 0062 conversion (hold-lift order, 2026-08-29): the card is
-        # an ITERATION card — SHOW the grounded matches BEFORE the
-        # ask (grounding is a read; reads run immediately, ADR 0050).
-        # The human decides on what the graph actually matched, not
-        # on a blind echo of their own words.
-        try:
-            anchors = ground_entities(parse.entities, run_kql,
-                                      conv.engine.ops)
-        except Exception:   # noqa: BLE001 — grounding trouble → engine
-            return None
+        except Exception:   # noqa: BLE001 — parser down is a CARD too
+            return _no_match(
+                "the parser is unavailable right now — you can "
+                "answer without the planner, or contact a developer")
+        t_parse = int((_time.monotonic() - t0) * 1000)
+        if not parse.entities:
+            conv.pending_parse = {"question": question,
+                                  "entities": [], "primitives": [],
+                                  "modifiers": [], "show": []}
+            return _no_match(
+                "no catalog entities found in the question — "
+                "rephrase with a metric, step, table, or report "
+                "name, answer without the planner, or contact a "
+                "developer")
+        if on_progress is not None:
+            try:
+                on_progress({"parse_line": parse.render(),
+                             "entities": parse.entities})
+            except Exception:   # noqa: BLE001, S110 — listener only
+                pass
+        # SHOW grounds BEFORE the ask (a read; reads run immediately,
+        # ADR 0050) — in PARALLEL, streamed per entity (RW-18a/b).
         show: "list[dict]" = []
-        for e in parse.entities:
+
+        def _grounded(entity, group):
             matches = [
                 {"id": a["id"], "kind": a.get("kind"),
                  "name": ((a.get("rows") or [{}])[0].get("business_name")
                           or (a.get("rows") or [{}])[0].get("name")
                           or a["id"])}
-                for a in anchors if a["entity"] == e and a["id"]]
-            show.append({"entity": e, "matches": matches})
+                for a in group if a["id"]]
+            show.append({"entity": entity, "matches": matches})
+            if on_progress is not None:
+                try:
+                    on_progress({"grounded": {"entity": entity,
+                                              "matches": matches}})
+                except Exception:   # noqa: BLE001, S110 — listener only
+                    pass
+
+        t1 = _time.monotonic()
+        try:
+            ground_entities(parse.entities, run_kql,
+                            conv.engine.ops, on_grounded=_grounded)
+        except Exception:   # noqa: BLE001 — grounding down is a card
+            return _no_match(
+                "the catalog store did not answer the grounding "
+                "queries — retry, answer without the planner, or "
+                "contact a developer")
+        t_ground = int((_time.monotonic() - t1) * 1000)
         conv.pending_parse = {"question": question,
                               "entities": parse.entities,
                               "primitives": parse.primitives,
                               "modifiers": parse.modifiers,
                               "show": show}
-        return {"parse_confirm": parse.render(),
-                "parse": {k: conv.pending_parse[k] for k in
-                          ("question", "entities", "primitives",
-                           "modifiers")},
-                "show": show}
+        grounded_any = any(s["matches"] for s in show)
+        proposal = parse.render()
+        if "count_rows" in parse.primitives:
+            # B10: row-data asks propose the POLICY REFUSAL + the
+            # definition offer — grounding proceeds, wandering never
+            from src.orchestrator.conclusion import POLICY_REFUSAL
+            proposal = (POLICY_REFUSAL + " I can show the certified "
+                        "definition instead — confirm to see it.")
+        payload = {"parse_confirm": proposal,
+                   "parse": {k: conv.pending_parse[k] for k in
+                             ("question", "entities", "primitives",
+                              "modifiers")},
+                   "show": show,
+                   # RW-18d: the latency split is MEASURED, on glass
+                   # and in RESULTS — never guessed
+                   "latency_ms": {"parse": t_parse,
+                                  "ground": t_ground}}
+        if not grounded_any:
+            # every entity missed: the no-match card (no run button
+            # — nothing composes; the doors remain)
+            payload["no_match"] = True
+            payload["parse_confirm"] = (
+                "no catalog match for "
+                + ", ".join(repr(e) for e in parse.entities[:4])
+                + " — rephrase with a catalog name, answer without "
+                "the planner, or contact a developer")
+        return payload
 
     @app.post("/api/ask")
     async def ask(request: Request) -> JSONResponse:
@@ -374,13 +436,16 @@ def create_app(
         return JSONResponse(_ask_finish(user, conv_id, conv, question,
                                         turn))
 
-    @app.post("/api/parse/confirm")
-    async def parse_confirm(request: Request) -> JSONResponse:
+    def _confirm_execute(user: str, conv_id: str, conv, body: dict,
+                         on_event=None) -> "tuple[dict, int]":
         """The click that runs the plan (0060 confirm-all): grounds
         the entities, composes the op sequence, executes through the
         EXISTING algebra in this conversation's session — stamped
         results and the machine conclusion are the answer; nothing
-        is narrated by a model."""
+        is narrated by a model. Shared by the JSON and stream
+        surfaces (the _ask_finish pattern) so they can never drift."""
+        import time as _time
+
         from src.orchestrator.parse_plan import (
             Parse,
             ParseRefusal,
@@ -388,16 +453,12 @@ def create_app(
             execute_plan,
             ground_entities,
         )
-        body = await request.json()
-        conv_id = str(body.get("conversation_id") or "")
-        user = _user_from(request)
-        conv = _conversation(user, conv_id) if conv_id else None
         if conv is None or not conv.pending_parse:
-            return JSONResponse(
-                {"error": "refusal", "reason_class": "no_pending_parse",
-                 "message": "no parse awaits confirmation in this "
-                            "conversation — ask the question first"},
-                status_code=409)
+            return ({"error": "refusal",
+                     "reason_class": "no_pending_parse",
+                     "message": "no parse awaits confirmation in this "
+                                "conversation — ask the question "
+                                "first"}, 409)
         pp, conv.pending_parse = conv.pending_parse, None
         parse = Parse(entities=list(pp["entities"]),
                       primitives=list(pp["primitives"]),
@@ -409,31 +470,38 @@ def create_app(
         ops = conv.engine.ops
         ops.begin_turn()
         ops.note_user(pp["question"])
+        t0 = _time.monotonic()
         try:
             anchors = ground_entities(parse.entities, run_kql, ops)
             if exclude:
                 anchors = [a for a in anchors
                            if str(a.get("id")) not in exclude]
             plan = compose_plan(parse, anchors)
-            results = execute_plan(plan, run_kql, ops)
+            results = execute_plan(plan, run_kql, ops,
+                                   on_event=on_event)
         except ParseRefusal as e:
-            return JSONResponse(
-                {"error": "refusal", "reason_class": "parse_refusal",
-                 "message": str(e), "conversation_id": conv_id},
-                status_code=422)
+            return ({"error": "refusal", "reason_class": "parse_refusal",
+                     "message": str(e),
+                     "conversation_id": conv_id}, 422)
         except OpError as e:
-            return JSONResponse(
-                {"error": "refusal", "reason_class": "op_error",
-                 "message": str(e), "conversation_id": conv_id},
-                status_code=422)
+            return ({"error": "refusal", "reason_class": "op_error",
+                     "message": str(e),
+                     "conversation_id": conv_id}, 422)
+        t_exec = int((_time.monotonic() - t0) * 1000)
         outputs = []
         for r in results:
             shown = r.display()
             shown["headline"] = stamped_headline(shown)
-            outputs.append({"component": {"op": shown["op"],
-                                          "params": shown["params"],
-                                          "planner": True},
-                            "result": shown})
+            display = {"component": {"op": shown["op"],
+                                     "params": shown["params"],
+                                     "planner": True},
+                       "result": shown}
+            outputs.append(display)
+            if on_event is not None:
+                try:
+                    on_event(display)   # RW-18c: results stream too
+                except Exception:   # noqa: BLE001, S110 — listener
+                    pass
         conv.engine.displays.extend(outputs)
         turn = {"answer": "", "outputs": outputs,
                 "rounds": len(results), "answered": True,
@@ -444,10 +512,61 @@ def create_app(
                               f"[PLANNER] {pp['question']}", turn)
         payload["planned"] = True
         payload["parse_confirm"] = parse.render()
+        payload["latency_ms"] = {"execute": t_exec}
         payload["loop_status"] = (
-            f"planner: {len(results)} deterministic op(s) — "
-            "the parse was the plan")
-        return JSONResponse(payload)
+            f"planner: {len(results)} deterministic op(s) in "
+            f"{t_exec} ms — the parse was the plan")
+        return (payload, 200)
+
+    @app.post("/api/parse/confirm")
+    async def parse_confirm(request: Request) -> JSONResponse:
+        body = await request.json()
+        conv_id = str(body.get("conversation_id") or "")
+        user = _user_from(request)
+        conv = _conversation(user, conv_id) if conv_id else None
+        payload, status = _confirm_execute(user, conv_id, conv, body)
+        return JSONResponse(payload, status_code=status)
+
+    @app.post("/api/parse/confirm/stream")
+    async def parse_confirm_stream(request: Request):
+        """RW-18c: the post-confirm blank dies — each op's chip
+        renders at DISPATCH and its stamped result at completion
+        (the ask/stream pattern, verbatim)."""
+        import asyncio
+        import queue as _q
+        import threading
+
+        body = await request.json()
+        conv_id = str(body.get("conversation_id") or "")
+        user = _user_from(request)
+        conv = _conversation(user, conv_id) if conv_id else None
+        events: "_q.Queue[tuple]" = _q.Queue()
+
+        def work() -> None:
+            payload, status = _confirm_execute(
+                user, conv_id, conv, body,
+                on_event=lambda e: events.put(("evt", e)))
+            events.put(("done", (payload, status)))
+
+        threading.Thread(target=work, daemon=True).start()
+
+        def _sse(event: str, data: dict) -> str:
+            return f"event: {event}\ndata: {_json.dumps(data)}\n\n"
+
+        async def gen():
+            loop = asyncio.get_event_loop()
+            while True:
+                kind, payload = await loop.run_in_executor(None,
+                                                           events.get)
+                if kind == "evt":
+                    yield _sse("output", payload)
+                else:
+                    result, status = payload
+                    yield _sse("done" if status == 200 else "refusal",
+                               result)
+                    return
+
+        return StreamingResponse(gen(), media_type="text/event-stream")
 
     @app.post("/api/escalate")
     async def escalate(request: Request) -> JSONResponse:
@@ -528,19 +647,21 @@ def create_app(
         conv_id = str(body.get("conversation_id") or uuid.uuid4())
         conv = _conversation(user, conv_id)
 
-        if planner and body.get("planner") is not False:
-            p = _planner_intercept(conv, question)
-            if p:
-                payload = {"conversation_id": conv_id, **p}
-                async def gen_confirm():
-                    yield ("event: done\ndata: "
-                           f"{_json.dumps(payload)}\n\n")
-                return StreamingResponse(gen_confirm(),
-                                         media_type="text/event-stream")
-
         events: "_q.Queue[tuple]" = _q.Queue()
 
         def work() -> None:
+            # RW-18a: the interception runs IN the worker so the
+            # skeleton and per-entity matches stream while grounding
+            # is still in flight — the blank before the card dies
+            if planner and body.get("planner") is not False:
+                events.put(("evt", {"stage": "parse"}))
+                p = _planner_intercept(
+                    conv, question,
+                    on_progress=lambda e: events.put(("card", e)))
+                if p:
+                    events.put(("card_done",
+                                {"conversation_id": conv_id, **p}))
+                    return
             try:
                 turn = engine_run_turn(conv.engine, question, chat_api,
                                        run_kql,
@@ -564,6 +685,11 @@ def create_app(
                 if kind == "evt":
                     name = "stage" if "stage" in payload else "output"
                     yield _sse(name, payload)
+                elif kind == "card":
+                    yield _sse("card", payload)
+                elif kind == "card_done":
+                    yield _sse("done", payload)
+                    return
                 elif kind == "err":
                     yield _sse("error", {"error": payload,
                                          "conversation_id": conv_id})
@@ -1179,6 +1305,7 @@ function renderFeedback(turnIndex) {
 
 const pendingNodes = new Map();
 let stageNode = null;
+let skeletonNode = null;   // RW-18a: the streamed card skeleton
 
 function keyOf(c) {
   return (c.op || '') + '|' + JSON.stringify(c.params || {}) + '|' +
@@ -1187,6 +1314,7 @@ function keyOf(c) {
 
 function clearStage() {
   if (stageNode) { stageNode.remove(); stageNode = null; }
+  if (skeletonNode) { skeletonNode.remove(); skeletonNode = null; }
   pendingNodes.forEach(n => n.remove());
   pendingNodes.clear();
 }
@@ -1210,10 +1338,36 @@ function handleStreamEvent(name, data) {
   if (name === 'stage') {
     const label = data.stage === 'verdict'
       ? 'filing the typed verdict (machine-verified)…'
+      : data.stage === 'parse'
+      ? 'reading your question…'
       : 'honesty gate checking the answer…';
     if (stageNode) stageNode.remove();
     stageNode = add(el(`<div class="runline"><span class="dot"></span>
       <span>${esc(label)}</span></div>`));
+    return;
+  }
+  // RW-18a: the iteration-card SKELETON — renders the instant the
+  // parse lands; per-entity matches fill in as grounding queries
+  // complete (parallel server-side). The blank before the card dies.
+  if (name === 'card') {
+    if (data.parse_line) {
+      if (stageNode) { stageNode.remove(); stageNode = null; }
+      skeletonNode = add(el(`<div class="rs parsecard"><div class="head">
+        <span class="badge complete">understanding</span>
+        <span class="universe">${esc(data.parse_line)}</span></div>
+        <div class="showbox skelbox">matching
+        ${esc(String(data.entities.length))} entit${
+        data.entities.length === 1 ? 'y' : 'ies'}…</div></div>`));
+      return;
+    }
+    if (data.grounded && skeletonNode) {
+      const g = data.grounded;
+      const names = g.matches.map(m => m.name).join(', ')
+        || 'no catalog match';
+      skeletonNode.querySelector('.skelbox').appendChild(
+        el(`<div class="showline">matched <b>${esc(g.entity)}</b>:
+          ${esc(names)}</div>`));
+    }
   }
 }
 
@@ -1251,6 +1405,43 @@ async function askViaStream(message, noPlanner) {
   return final;
 }
 
+// RW-18c: the confirm click streams — op chips at dispatch, results
+// at completion (the askViaStream reader, on the confirm endpoint)
+async function confirmViaStream(excluded) {
+  const resp = await fetch('/api/parse/confirm/stream', { method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ conversation_id: conversationId,
+                           exclude_ids: excluded })});
+  if (!resp.ok || !resp.body) throw new Error('stream unavailable');
+  const reader = resp.body.getReader();
+  const dec = new TextDecoder();
+  let buf = '', final = null, refused = null;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buf += dec.decode(value, { stream: true });
+    let i;
+    while ((i = buf.indexOf('\\n\\n')) >= 0) {
+      const block = buf.slice(0, i); buf = buf.slice(i + 2);
+      let ev = null, data = '';
+      for (const line of block.split('\\n')) {
+        if (line.startsWith('event: ')) ev = line.slice(7).trim();
+        else if (line.startsWith('data: ')) data += line.slice(6);
+      }
+      if (!ev || !data) continue;
+      const payload = JSON.parse(data);
+      if (ev === 'done') final = payload;
+      else if (ev === 'refusal') refused = payload;
+      else handleStreamEvent(ev, payload);
+    }
+  }
+  clearStage();
+  if (refused) return { refused_message: refused.message ||
+    refused.error || 'the plan was refused' };
+  if (!final) throw new Error('stream ended without a result');
+  return final;
+}
+
 async function askViaJson(message, noPlanner) {
   const r = await fetch('/api/ask', { method:'POST',
     headers:{'Content-Type':'application/json'},
@@ -1267,6 +1458,7 @@ async function askViaJson(message, noPlanner) {
 // The developer door is on EVERY round (ruled 08-29): a standing
 // option, never a last resort.
 function renderParseCard(j, message) {
+  if (skeletonNode) { skeletonNode.remove(); skeletonNode = null; }
   const showRows = (j.show || []).map(s => {
     const ms = s.matches.length
       ? s.matches.map(m =>
@@ -1278,16 +1470,23 @@ function renderParseCard(j, message) {
     return `<div class="showline">matched
       <b>${esc(s.entity)}</b>: ${ms}</div>`;
   }).join('');
+  // no_match (RULED: no silent fallback): nothing composes, so no
+  // run button — the rephrase text, the engine button, and the
+  // developer door remain (no dead ends)
+  const runBtn = j.no_match ? ''
+    : '<button class="primary confirmparse">run this plan</button>';
+  const badge = j.no_match ? 'no match' : 'understanding';
   const card = add(el(`<div class="rs parsecard"><div class="head">
-    <span class="badge complete">understanding</span>
+    <span class="badge complete">${badge}</span>
     <span class="universe">${esc(j.parse_confirm)}</span></div>
     <div class="showbox">${showRows}</div>
     <div class="parsebtns">
-    <button class="primary confirmparse">run this plan</button>
+    ${runBtn}
     <button class="skipparse">answer without the planner</button>
     <button class="doorbtn">none of these is right —
       contact a developer</button>
     </div></div>`));
+  if (!j.no_match)
   card.querySelector('.doorbtn').addEventListener('click',
     async () => {
       card.querySelectorAll('button').forEach(b => b.disabled = true);
@@ -1314,18 +1513,30 @@ function renderParseCard(j, message) {
         card.querySelectorAll('input[type=checkbox]'))
         .filter(c => !c.checked).map(c => c.dataset.id);
       card.querySelectorAll('button').forEach(b => b.disabled = true);
-      const r = await fetch('/api/parse/confirm', { method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ conversation_id: conversationId,
-                               exclude_ids: excluded })});
-      const jj = await r.json();
-      if (!r.ok) {
-        add(el(`<div class="loopline">${esc(jj.message ||
-          jj.error || 'the plan was refused')}</div>`));
+      // RW-18c: each op chip renders at dispatch, the stamped
+      // result at completion — the post-confirm blank dies; JSON
+      // is the fallback if streaming breaks
+      let jj = null, refusal = null;
+      try {
+        jj = await confirmViaStream(excluded);
+      } catch (e1) {
+        clearStage();
+        const r = await fetch('/api/parse/confirm', { method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ conversation_id: conversationId,
+                                 exclude_ids: excluded })});
+        jj = await r.json();
+        if (!r.ok) refusal = jj;
+        else (jj.outputs || []).forEach(renderOutput);
+      }
+      if (jj && jj.refused_message) refusal = jj;
+      if (refusal) {
+        add(el(`<div class="loopline">${esc(refusal.message ||
+          refusal.refused_message || refusal.error ||
+          'the plan was refused')}</div>`));
         askbtn.disabled = false;
         return;
       }
-      (jj.outputs || []).forEach(renderOutput);
       renderFinale(jj);
       askbtn.disabled = false;
     });

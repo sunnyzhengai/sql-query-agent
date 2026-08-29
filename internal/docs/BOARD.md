@@ -304,8 +304,18 @@ The hold lifts only by Sunny's explicit word, recorded here.
       event + mailto (org_config escalation.contact, optional);
       prune-to-empty refuses typed. 0062 exits sanctioned-draft.
       1,215 green + ruff. **VERIFIED by review 08-29 (invariant by
-      invariant).** Remaining: Sunny's glass check of the
-      converted codeset beat → QA gate → CAPTURE.
+      invariant).**
+- [x] **RW-BATCH-5 + REMOVE-THE-TYPE BUILT (08-29 dev, 1.62.0)** —
+      type deleted (A1 test-held; no silent fallback anywhere;
+      no-match card B9; engine only via the button C5); blank
+      screen MEASURED (serial per-token store probes = the 30s)
+      and KILLED (one labeled scan: MISS 30.5s→~5s) + skeleton/
+      parallel/streamed card + confirm streaming + latency stamps;
+      count_rows lexicon word (B10); **RUN LAYER LIVE (bind bug
+      was dev's import — fixed, probe verified)**;
+      walk_runner_0062 ready for review's E-battery. 1,230 green
+      + ruff. AWAITS: review re-run + E-battery → THEN Sunny's
+      re-walk → QA gate → CAPTURE.
 
 ## RULED (Sunny, 2026-08-29): THE GENERATOR CLAUSE — Echo Law amendment
 "Fail twice, no matter the cause, triggers an investigation."

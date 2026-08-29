@@ -44,8 +44,8 @@ from src.orchestrator.tools import (
     GOV_SWEEP_META_QUERY,
     LINKS_OF_REPORT_QUERY,
     LIST_CATALOG_QUERY,
+    NAME_CONTAINS_ANY_TOKEN_QUERY,
     NAME_CONTAINS_QUERY,
-    NAME_CONTAINS_TOKENS_QUERY,
     PROJECTION_EDGES_COUNT_QUERY,
     REPORTS_OF_METRIC_QUERY,
     STEP_FED_BY_QUERY,
@@ -89,6 +89,11 @@ class OpsSession:
     surfaced: "set[str]" = field(default_factory=set)
     user_text: str = ""
     _counter: int = 0
+    # RW-18 (2026-08-29): grounding queries run in PARALLEL threads;
+    # registration is the one mutation point, so it takes the lock —
+    # refs stay dense and the surfaced set never tears
+    _lock: "object" = field(default_factory=lambda: __import__(
+        "threading").Lock(), repr=False)
     # RW-15 rider (re-walk 2026-08-29): same-kind records displayed
     # THIS TURN — the co-occurrence nudge's grain. The fifth routing
     # specimen did two SINGLE retrieves; per-call counting never saw
@@ -99,19 +104,20 @@ class OpsSession:
         self.turn_kind_ids = {}
 
     def register(self, op, params, rows, complete, universe, note="") -> ResultSet:
-        self._counter += 1
-        rs = ResultSet(ref=f"R{self._counter}", op=op, params=params,
-                       rows=rows, complete=complete, universe=universe,
-                       note=note)
-        self.results[rs.ref] = rs
-        for row in rows:
-            rid = row.get("id")
-            if rid:
-                self.surfaced.add(rid)
-            k = str(row.get("kind") or "")
-            if rid and k in ("metric", "step"):
-                self.turn_kind_ids.setdefault(k, set()).add(str(rid))
-        return rs
+        with self._lock:
+            self._counter += 1
+            rs = ResultSet(ref=f"R{self._counter}", op=op, params=params,
+                           rows=rows, complete=complete, universe=universe,
+                           note=note)
+            self.results[rs.ref] = rs
+            for row in rows:
+                rid = row.get("id")
+                if rid:
+                    self.surfaced.add(rid)
+                k = str(row.get("kind") or "")
+                if rid and k in ("metric", "step"):
+                    self.turn_kind_ids.setdefault(k, set()).add(str(rid))
+            return rs
 
     def note_user(self, text: str) -> None:
         self.user_text += "\n" + _fold(text)
@@ -224,15 +230,31 @@ def _containment_rows(phrase: str, run_kql) -> "list[dict]":
               if len(t) >= 2]
     if len(tokens) < 2:
         return []
-    productive = [
-        t for t in tokens
-        if run_kql(NAME_CONTAINS_QUERY, {"p_phrase": t})]
-    if not productive:
+    # RW-18 (measured cause of the 30s blank, 2026-08-29): the old
+    # degradation probed one query PER TOKEN (then per-token again
+    # disjunctively) — serial store round-trips. ONE labeled scan
+    # now returns every any-token match with its matched-token set;
+    # productive, conjunctive (has_all), and the W11 disjunctive
+    # union all derive client-side, contracts unchanged.
+    labeled = list(run_kql(NAME_CONTAINS_ANY_TOKEN_QUERY,
+                           {"p_tokens": " ".join(tokens)}))
+    if not labeled:
         return []
-    conj = list(run_kql(NAME_CONTAINS_TOKENS_QUERY,
-                        {"p_tokens": " ".join(productive)}))
+    order = {t.lower(): i for i, t in enumerate(tokens)}
+    display = {t.lower(): t for t in tokens}
+
+    def _matched(r) -> "set[str]":
+        return {str(t).lower() for t in (r.get("matched_tokens")
+                                         or [])}
+
+    productive = sorted({t for r in labeled for t in _matched(r)
+                         if t in order}, key=lambda t: order[t])
+    conj = [
+        {k: r[k] for k in ("node_id", "kind", "ref", "name",
+                           "business_name") if k in r}
+        for r in labeled if _matched(r) >= set(productive)]
     if conj:
-        return conj
+        return conj[:10]
     # W11 blend-misname (walk step 5, 2026-08-23: 'Sepsis Audit
     # Summary' splits its tokens across TWO name families, so the
     # conjunctive has_all degradation is structurally blind — no
@@ -241,16 +263,13 @@ def _containment_rows(phrase: str, run_kql) -> "list[dict]":
     # degrade DISJUNCTIVELY: per-token near-names, each row labeled
     # with the token that matched it (the stamp attributes them).
     union: "list[dict]" = []
-    seen: "set" = set()
-    for t in productive:
-        for r in run_kql(NAME_CONTAINS_QUERY, {"p_phrase": t}):
-            rid = r.get("node_id")
-            if rid in seen:
-                continue
-            seen.add(rid)
-            row = dict(r)
-            row["matched_token"] = t
-            union.append(row)
+    for r in labeled:
+        matched = [t for t in productive if t in _matched(r)]
+        row = {k: r[k] for k in ("node_id", "kind", "ref", "name",
+                                 "business_name") if k in r}
+        row["matched_token"] = (display.get(matched[0], matched[0])
+                                if matched else "")
+        union.append(row)
     return union
 
 

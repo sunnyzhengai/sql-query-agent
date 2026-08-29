@@ -42,6 +42,10 @@ PRIMITIVES = (
     "defines",             # record + decision sites + steps
     "owns",                # ownership fields on the record
     "grain",               # compare + grain_shift flags
+    # TESTPLAN_0062 starting lexicon (B10): how many/count/rows →
+    # the data-policy refusal proposal + the definition offer.
+    # A word-grain entry, never a question shape (P4/0062).
+    "count_rows",
 )
 
 PARSE_TOOL = {
@@ -85,7 +89,8 @@ PARSE_PROMPT = (
     "flags / issues / wrong / conflicts / problems -> flags\n"
     "defines / criteria / logic of / how calculated -> defines\n"
     "who owns / who stewards -> owns\n"
-    "grain / per-what / level -> grain"
+    "grain / per-what / level -> grain\n"
+    "how many / count / number of rows/patients -> count_rows"
 )
 
 
@@ -97,10 +102,15 @@ class Parse:
 
     def render(self) -> str:
         """The confirm-on-glass line (0060 §2d): the parse IS the
-        plan, displayed before anything executes."""
-        prim = ", ".join(self.primitives) or "(no primitive — fails "\
-            "closed)"
+        plan, displayed before anything executes. No relation word
+        recognized → the DEFAULT MAP reading (0062, ratified
+        emergent-shape debate): show what is connected."""
         ents = ", ".join(self.entities) or "(no entities)"
+        if not self.primitives:
+            return ("reading your question as: the map around "
+                    f"{{{ents}}} — what these are and what connects "
+                    "to them")
+        prim = ", ".join(self.primitives)
         return f"reading your question as: {prim} over {{{ents}}}"
 
 
@@ -135,45 +145,69 @@ def parse_question(question: str, chat_api) -> Parse:
         modifiers=[str(m) for m in raw.get("modifiers") or []])
 
 
+def _ground_one(e: str, run_kql, session: OpsSession) -> "list[dict]":
+    """Ground ONE entity: exact tier, then semantic-exact, then
+    containment — deterministic string matching over the user's own
+    tokens (0060 §2a). An ungrounded entity is RETURNED, never
+    guessed around."""
+    rs = op_search(e, "exact", run_kql, session)
+    rows = rs.rows
+    if not rows:
+        rs = op_search(e, "semantic", run_kql, session)
+        rows = [r for r in rs.rows
+                if str(r.get("business_name") or r.get("name")
+                       or "").lower() == e.lower()]
+    if not rows:
+        # containment fallback: the closest semantic row whose
+        # display name contains the entity (or the reverse) —
+        # deterministic string logic over the search result
+        rows = [r for r in rs.rows
+                if e.lower() in str(r.get("business_name")
+                                    or r.get("name") or "").lower()
+                or str(r.get("business_name") or r.get("name")
+                       or "").lower() in e.lower()][:4]
+    if not rows:
+        return [{"entity": e, "id": None, "kind": None, "rows": []}]
+    # NAME COLLISIONS ANCHOR WHOLLY (the corpus's founding
+    # shape): every same-kind row of the exact/containment
+    # match is an anchor — one shared name over two metrics
+    # is two anchors, and sameness then compares them
+    kind0 = rows[0].get("kind")
+    return [{"entity": e, "id": r["id"], "kind": r.get("kind"),
+             "rows": [r]}
+            for r in rows if r.get("kind") == kind0][:4]
+
+
 def ground_entities(entities: "list[str]", run_kql,
-                    session: OpsSession) -> "list[dict]":
-    """Exact-then-contains against the catalog — deterministic string
-    matching over the user's own tokens (0060 §2a). Ungrounded
-    entities are RETURNED, never guessed around."""
-    anchors: "list[dict]" = []
-    for e in entities:
-        rs = op_search(e, "exact", run_kql, session)
-        rows = rs.rows
-        if not rows:
-            rs = op_search(e, "semantic", run_kql, session)
-            rows = [r for r in rs.rows
-                    if str(r.get("business_name") or r.get("name")
-                           or "").lower() == e.lower()]
-        if not rows:
-            # containment fallback: the closest semantic row whose
-            # display name contains the entity (or the reverse) —
-            # deterministic string logic over the search result
-            rows = [r for r in rs.rows
-                    if e.lower() in str(r.get("business_name")
-                                        or r.get("name") or "").lower()
-                    or str(r.get("business_name") or r.get("name")
-                           or "").lower() in e.lower()][:4]
-        if rows:
-            # NAME COLLISIONS ANCHOR WHOLLY (the corpus's founding
-            # shape): every same-kind row of the exact/containment
-            # match is an anchor — one shared name over two metrics
-            # is two anchors, and sameness then compares them
-            kind0 = rows[0].get("kind")
-            same_kind = [r for r in rows
-                         if r.get("kind") == kind0][:4]
-            for r in same_kind:
-                anchors.append({"entity": e, "id": r["id"],
-                                "kind": r.get("kind"),
-                                "rows": [r]})
-        else:
-            anchors.append({"entity": e, "id": None, "kind": None,
-                            "rows": []})
-    return anchors
+                    session: OpsSession,
+                    on_grounded=None) -> "list[dict]":
+    """Ground every entity — queries run in PARALLEL (RW-18: the
+    blank-screen echo; per-entity grounding was serial and each
+    tier is a store round-trip). Anchor order follows the input
+    entity order regardless of completion order. `on_grounded`
+    (optional) fires per entity AS ITS RESULT LANDS — the streamed
+    card's fill signal. Registration is lock-safe (OpsSession)."""
+    if not entities:
+        return []
+    if len(entities) == 1:
+        got = _ground_one(entities[0], run_kql, session)
+        if on_grounded is not None:
+            on_grounded(entities[0], got)
+        return got
+    from concurrent.futures import ThreadPoolExecutor
+    with ThreadPoolExecutor(max_workers=min(4, len(entities))) as ex:
+        futures = [ex.submit(_ground_one, e, run_kql, session)
+                   for e in entities]
+        results: "list[list[dict]]" = [[] for _ in entities]
+        for i, f in enumerate(futures):
+            try:
+                results[i] = f.result()
+            except Exception:   # noqa: BLE001 — one miss ≠ all miss
+                results[i] = [{"entity": entities[i], "id": None,
+                               "kind": None, "rows": []}]
+            if on_grounded is not None:
+                on_grounded(entities[i], results[i])
+    return [a for group in results for a in group]
 
 
 def compose_plan(parse: Parse,
@@ -184,6 +218,13 @@ def compose_plan(parse: Parse,
     grounded = [a for a in anchors if a["id"]]
     ids = [a["id"] for a in grounded]
     if not parse.primitives:
+        # 0062 (card-everywhere, ratified emergent-shape debate): no
+        # relation word recognized is NOT a refusal when something
+        # grounded — the DEFAULT MAP reading retrieves the records
+        # and their connections; the answer's shape emerges from the
+        # subgraph. Zero grounded entities still fails closed.
+        if ids:
+            return [{"op": "retrieve", "ids": ids[:4]}]
         raise ParseRefusal(VOCABULARY_OFFER)
     plan: "list[dict]" = []
     for prim in parse.primitives:
@@ -210,21 +251,35 @@ def compose_plan(parse: Parse,
             plan.append({"op": "census", "kind": "flag",
                          "contains": grounded[0]["entity"]})
         elif prim == "reads_or_feeds":
-            if not grounded:
+            if grounded:
+                a = grounded[0]
+                if str(a["id"]).startswith("transform:"):
+                    plan.append({"op": "retrieve", "ids": [a["id"]]})
+                elif a.get("kind") in ("metric", "report"):
+                    # B6-class: metric/report anchors carry their
+                    # own link edges — the record IS the lineage
+                    plan.append({"op": "retrieve", "ids": ids[:4]})
+                else:
+                    plan.append({"op": "lineage",
+                                 "table": a["entity"]})
+            elif parse.entities:
+                # a table WORD needs no catalog anchor — lineage
+                # probes the name; its result stamps its own honesty
+                # (W13b non-evidence machinery owns the miss)
+                plan.append({"op": "lineage",
+                             "table": parse.entities[0]})
+            else:
                 raise ParseRefusal(
                     "a reads/feeds question needs a named table, "
                     "metric, or step. " + VOCABULARY_OFFER)
-            a = grounded[0]
-            if str(a["id"]).startswith("transform:"):
-                plan.append({"op": "retrieve", "ids": [a["id"]]})
-            else:
-                plan.append({"op": "lineage",
-                             "table": a["entity"]})
         elif prim == "flags":
             plan.append({"op": "census", "kind": "flag",
                          "contains": (grounded[0]["entity"]
                                       if grounded else None)})
-        elif prim in ("defines", "owns"):
+        elif prim in ("defines", "owns", "count_rows"):
+            # count_rows (B10): the PROPOSAL carries the data-policy
+            # refusal wording (the card layer owns it); the plan is
+            # the definition OFFER — the record, never row data
             if not ids:
                 raise ParseRefusal(
                     "a definition/ownership question needs a named "
@@ -236,11 +291,25 @@ def compose_plan(parse: Parse,
 
 
 def execute_plan(plan: "list[dict]", run_kql,
-                 session: OpsSession) -> "list":
+                 session: OpsSession, on_event=None) -> "list":
     """Run the composed sequence through the EXISTING algebra —
-    stamped results are the answer; nothing is narrated."""
+    stamped results are the answer; nothing is narrated. `on_event`
+    (RW-18c: progressive op status, the engine's stream pattern)
+    receives a pending pre-event at each op's dispatch and never
+    breaks the run."""
+    def _emit(evt: dict) -> None:
+        if on_event is not None:
+            try:
+                on_event(evt)
+            except Exception:   # noqa: BLE001, S110 — listener only
+                pass
+
     results = []
     for step in plan:
+        _emit({"component": {"op": step["op"],
+                             "params": {k: v for k, v in step.items()
+                                        if k != "op"}},
+               "pending": True})
         if step["op"] == "retrieve":
             results.append(op_retrieve(step["ids"], run_kql, session))
         elif step["op"] == "compare":

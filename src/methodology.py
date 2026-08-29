@@ -160,6 +160,11 @@ SYSTEM_VOCAB = frozenset({
     # of_metric joined 1.50.7 — a step's parent ref is part of its
     # identity, and the universe sentence names it)
     "name", "business_name", "description", "of_metric",
+    # AMENDMENT 2026-08-29 (RW-18 containment collapse): the labeled
+    # any-token scan's projection tuple names OUR catalog columns —
+    # node_id/kind/ref join the registered field names above (schema
+    # identifiers, not user phrasing)
+    "node_id", "kind", "ref",
 })
 
 # --- the prompt budget -------------------------------------------------

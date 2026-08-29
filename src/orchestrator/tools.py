@@ -132,6 +132,29 @@ NAME_CONTAINS_TOKENS_QUERY = (
     "| take 10"
 )
 
+# RW-18 (measured 2026-08-29: an exact MISS cost 15.8s and a
+# semantic MISS 29.5s against ~1.9s hits — the containment
+# degradation probed one query PER TOKEN, serially, twice per
+# entity; ~10-15 round trips at ~1s each IS Sunny's 30s blank).
+# One labeled scan replaces the whole probe loop: every row that
+# matches ANY token rides back with the set of tokens it matched;
+# productive/conjunctive/disjunctive all derive client-side.
+NAME_CONTAINS_ANY_TOKEN_QUERY = (
+    "declare query_parameters(p_tokens:string);\n"
+    "let toks = split(p_tokens, ' ');\n"
+    "semantic_catalog\n"
+    "| extend blob = strcat(name, ' ', business_name)\n"
+    "| mv-apply tok = toks to typeof(string) on (\n"
+    "    where blob contains tok\n"
+    "    | summarize matched_tokens = make_set(tok))\n"
+    "| where array_length(matched_tokens) > 0\n"
+    "| project node_id, ['kind'], ['ref'], name, business_name,\n"
+    "          matched_tokens\n"
+    "| order by array_length(matched_tokens) desc, name asc, "
+    "node_id asc\n"
+    "| take 40"
+)
+
 # Step-name universe (walk W6/W7, Sunny 2026-08-23: "is another
 # metric using the same base population?" — the mention census saw 2
 # description mentions while NINE procs build a step named Base_Pop

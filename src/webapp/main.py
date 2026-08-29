@@ -93,16 +93,25 @@ def _run_executor():
         return None, cap, "", unbound
     try:
         from src.config import SqlServerConfig
-        from src.extractor.connection import AzureDirectConnection
+        from src.extractor.connection import create_connection
         from src.orchestrator.kusto import az_cli_token_provider
-        conn = AzureDirectConnection(
-            SqlServerConfig(host=server, database=database,
-                            source_type="azure_direct"),
-            lambda: az_cli_token_provider(
-                "https://database.windows.net/")())
+        sql_cfg = SqlServerConfig(host=server, database=database,
+                                  source_type="azure_direct")
+        provider = az_cli_token_provider("https://database.windows.net/")
+
+        def executor(sql: str) -> "list[dict]":
+            # a FRESH connection per run fetches a FRESH token — the
+            # mssparkutils token-cache lesson; runs are infrequent
+            return create_connection(
+                sql_cfg, token_provider=provider).execute_query(sql)
+
+        # bind-time probe: the banner reports a FACT, not a hope
+        # (boundary-echo law — an acknowledgment is a claim; the
+        # probe row is the postcondition)
+        executor("SELECT 1 AS probe")
         print(f"[run layer] bound read-only to {database} "
-              "(confirm-each-run; TOP cap enforced)")
-        return conn.execute_query, cap, database.split("-")[0], ""
+              "(probe verified; confirm-each-run; TOP cap enforced)")
+        return executor, cap, database.split("-")[0], ""
     except Exception as e:                  # noqa: BLE001 — typed
         from src.run_layer import classify_run_error
         reason_class, message = classify_run_error(e)

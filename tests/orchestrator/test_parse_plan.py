@@ -55,9 +55,19 @@ def test_sameness_over_two_anchors_composes_retrieve_then_compare():
     assert plan[1]["aspect"] == "logic"
 
 
-def test_no_primitive_fails_closed_with_the_offer():
-    with pytest.raises(ParseRefusal, match="relation vocabulary"):
-        compose_plan(Parse(["A"], []), _anchors(REF_A))
+def test_no_primitive_with_grounding_composes_the_default_map():
+    # 0062 (card-everywhere, ratified emergent-shape debate): no
+    # relation word + a grounded entity = the DEFAULT MAP reading —
+    # retrieve the records; the shape emerges from the subgraph
+    plan = compose_plan(Parse(["A"], []), _anchors(REF_A))
+    assert plan == [{"op": "retrieve", "ids": [REF_A]}]
+    assert "the map around" in Parse(["A"], []).render()
+
+
+def test_no_primitive_and_no_grounding_still_fails_closed():
+    with pytest.raises(ParseRefusal, match="same/different"):
+        compose_plan(Parse(["Zzz"], []), [
+            {"entity": "Zzz", "id": None, "kind": None, "rows": []}])
 
 
 def test_sameness_with_no_anchor_fails_closed():
@@ -114,3 +124,34 @@ def test_the_lab_path_named_case_step_anchored_sameness():
     assert [r["op"] for r in out["results"]] == ["retrieve", "compare"]
     assert any("group" in row for r in out["results"]
                for row in r["rows"])
+
+
+def test_d2_grounding_queries_run_concurrently():
+    """TESTPLAN_0062 D2 (RW-18b): per-entity grounding overlaps —
+    the mock store counts concurrent entries."""
+    import threading
+    import time
+
+    active, peak = [0], [0]
+    lock = threading.Lock()
+
+    def slow_kql(query, params):
+        with lock:
+            active[0] += 1
+            peak[0] = max(peak[0], active[0])
+        time.sleep(0.03)
+        try:
+            return fake_kql(query, params)
+        finally:
+            with lock:
+                active[0] -= 1
+
+    s = OpsSession()
+    ground_entities(["ED Sepsis Screening", "ED Sepsis (Regulatory)",
+                     "Scores"], slow_kql, s)
+    assert peak[0] >= 2, "grounding ran serially"
+
+
+def test_count_rows_is_a_lexicon_word_not_a_shape():
+    plan = compose_plan(Parse(["A"], ["count_rows"]), _anchors(REF_A))
+    assert plan == [{"op": "retrieve", "ids": [REF_A]}]

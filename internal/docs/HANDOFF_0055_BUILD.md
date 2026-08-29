@@ -2068,3 +2068,68 @@ replacement — no development from the crutch. Concretely:
 Build lands only against TESTPLAN_0062.md (below); machine
 acceptance green + measured latencies recorded BEFORE Sunny
 re-walks (her second directive).
+
+### 2026-08-29 — RW-BATCH-5 + REMOVE-THE-TYPE BUILT — release 1.62.0
+Built against TESTPLAN_0062 (no case removed; machine acceptance
+green). Two work fronts, one release:
+
+**THE TYPE IS REMOVED (the ruling, executed):**
+- The routing layer holds ZERO question-class references —
+  `same_or_different` survives only as a word-grain lexicon entry
+  in parse_plan (A1 enforced by tests/test_de_typing.py: grep-level
+  absence + a structural test that _planner_intercept contains no
+  `return None` — no silent route can even be written back in
+  without a red test).
+- NO SILENT FALLBACK ANYWHERE: parser-down, zero-entity, and
+  zero-grounded states each return a CARD (no-match card: rephrase
+  + developer door + engine button — B9). The engine is reachable
+  ONLY via the card's explicit button (C5; planner:false is its
+  wire shape). A3 green: two same-shape questions differ only in
+  their groundings — identical mechanics, machine-diffed.
+- Lexicon per the plan: `count_rows` joined (how many/count → the
+  B10 data-policy proposal: RW-11 refusal wording + "confirm to
+  see the definition"; the plan retrieves the record, wandering
+  never). reads_or_feeds now serves metric/report anchors via
+  retrieve (B6 shape) and probes bare table WORDS via lineage
+  (B4 — the W13b non-evidence machinery owns misses).
+
+**RW-18 — THE BLANK SCREEN, MEASURED THEN KILLED:**
+- Measured cause (devtools/measure_card_latency.py, live shapes
+  store): the containment degradation probed ONE STORE QUERY PER
+  TOKEN, serially, on BOTH tiers — an exact MISS cost 15.8s and a
+  semantic MISS 29.5s vs ~1.9s hits. That serial fan-out IS the
+  ~30s blank.
+- Mechanism: NAME_CONTAINS_ANY_TOKEN_QUERY — ONE labeled scan
+  returns every any-token match with its matched-token set;
+  productive/conjunctive/W11-disjunctive all derive client-side,
+  contracts unchanged. Re-measured: **MISS 30.5s → ~5s; cold HIT
+  14.5s → ~2-2.7s.** Residual: the serverless Kusto store shows
+  occasional single-query spikes (one warm query hit 14s across
+  three runs) — store-side variance, covered on glass by:
+- Streaming: the card SKELETON renders at parse ("reading your
+  question…"), per-entity matches stream in as each PARALLEL
+  grounding lands (ThreadPoolExecutor, order-stable, lock-safe
+  OpsSession registration — D2 test asserts real overlap);
+  post-confirm runs stream op chips at dispatch + results at
+  completion (/api/parse/confirm/stream, the ask/stream pattern).
+- Latency split rides every card and confirm payload
+  (latency_ms: parse/ground/execute) — measured, never guessed.
+  Live numbers (3 runs): token ~0.35s · store query ~0.6-0.9s ·
+  LLM parse 0.8-2.6s · ground HIT ~1.9-2.7s cold · MISS ~4.7-5.2s.
+
+**FIELD BUG FOUND + FIXED BY THE MEASURE:** the run layer's bind
+imported a nonexistent class (AzureDirectConnection) — Sunny's
+binding failures were MY wiring, mislabeled "execution". Fixed to
+the real factory (create_connection/AadTokenPyodbcConnection),
+fresh connection per run (fresh token — the mssparkutils lesson),
+and a bind-time probe so the banner reports a FACT:
+**"[run layer] bound read-only to aivia_shapes_src (probe
+verified)" — THE RUN LAYER IS LIVE.**
+
+**For review's E-battery:** devtools/walk_runner_0062.py — runs
+B1–B10 + the six QA questions against a running workbench, records
+card/matches/proposal/latency/confirm verdict per question, writes
+internal/docs/WALK_TRANSCRIPT_0062.md.
+**Gates:** 1,230 green + 5 xfailed, ruff clean; wheel 1.62.0
+shipped; SYSTEM_VOCAB amendment recorded (node_id/kind/ref —
+schema identifiers).
