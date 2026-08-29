@@ -106,3 +106,42 @@ for FILM TWO: empty shelf → walk → shelf accrued on camera; the
 flywheel visible without narration.
 Sequencing: film one unchanged (governance beats). Shelf + 0056
 capture verbs = ONE build = film two's content.
+
+## The Three-Phase Roadmap (Sunny, 2026-08-28 evening — mapped to ratified ADRs)
+
+**Phase 1 — the logic layer (NEARLY SATISFIED):** graph connects
+technical/transformational/canonical (0059-verified), descriptions
+at every node (RW-6), search embedded over the described surface.
+Remaining to satisfaction: the 0060 experiment (routing
+consistency) + format-contract glass check. Calibration: vectors
+NOMINATE, the confirm step decides (0060 §2a).
+
+**Phase 2 — self-service data (= THE PRO TIER: "Basic governs the
+definitions; Pro runs them"):** definition card → user confirms
+the logic → execute confirmed SQL → glass shows table/chart.
+`run` is already 0056's weight-8 verb — the strongest flywheel
+signal. Mock sources exist (aivia_shapes_src). LAWS: P5 absolute —
+rows render to glass, NEVER model context (model sees stamps
+only: count/schema/as-of) — say this out loud as a
+differentiator; honest sampling label machine-composed (TOP N ·
+as-of · source). New engineering: read-only execution role, row
+caps/timeouts, PHI gate in front, proc-wrapping (steps are
+runnable fragments; procs need wrapping/params). Plumbing, not
+research.
+
+**Phase 3 — multi-persona (users/developers/stewards):** personas
+= the Sphere's human shell; escalation = 0058's ladder's top rung;
+"no matching logic" = a CAPTURED DEMAND artifact (0056
+deny/absence + conversation attached) feeding the developer queue
+— the supply/demand economy live. The user→developer handoff
+mirrors our own review↔dev relay (conversation as handoff
+artifact). **INK BOUNDARY: AIVIA drafting SQL for a developer is
+authoring-time generation — legal ONLY because (a) a human
+developer verifies/owns it and (b) the result enters through the
+front door (ScriptDom parse → graph → sweep). Answer-time
+generation to end users stays banned** (the Fabric-agent
+demotion's reasoning, applied consistently).
+
+Sequencing unchanged near-term: film one (governance) → 0060
+experiment → shelf + 0056 (film two) → phase 2 build (Pro) →
+phase 3 (rides 0038/0058 access-control gates).
