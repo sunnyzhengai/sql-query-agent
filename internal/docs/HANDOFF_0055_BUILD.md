@@ -2026,3 +2026,28 @@ demand with a prefilled mailto. EXECUTE unchanged through the
 algebra. 0062 exits the sanctioned-draft set — cited modules and
 tests now anchor it. LIVE ACCEPTANCE (Sunny): the converted
 codeset beat on glass, then QA gate, then CAPTURE.
+
+## ORDER RW-BATCH-5 (Sunny's glass check of 1.61.0)
+1. **RW-18 (QA-BLOCKING; ECHO of the walk-1562 blank-screen class
+   → mechanism mandatory):** ~30s blank before the iteration card
+   and again after confirm. Fix as a mechanism, not a tune:
+   (a) card SKELETON renders immediately ("reading your question…
+   matching N entities…"), matches stream in as each grounding
+   query lands; (b) per-entity grounding queries run in PARALLEL;
+   (c) post-confirm execution shows progressive op status (the
+   old stream pattern); (d) INSTRUMENT the latency split (LLM
+   parse call vs store queries vs render) and record the measured
+   numbers in RESULTS — fix the measured cause.
+2. **CARD-EVERYWHERE increment (0062 proper, next after RW-18):**
+   every question gets the understanding card — generous
+   extraction of entities/kinds/relation words; grounded SHOW for
+   whatever matched; when no relation word is recognized, the
+   proposed reading is the DEFAULT MAP ("what's connected to
+   these"), per the ratified emergent-shape debate; "answer
+   without the planner" remains the engine escape on the card.
+   Silent engine fallback survives only for questions grounding
+   ZERO entities. The two-worlds UX (card sometimes, old engine
+   other times) ends.
+Note for the lexicon corpus: Sunny — when a question misses the
+card or reads wrong, paste the question text; every miss is
+exactly the data the flywheel wants.
