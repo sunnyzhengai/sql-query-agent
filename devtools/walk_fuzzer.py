@@ -165,4 +165,10 @@ def main() -> None:
 
 
 if __name__ == "__main__":
+    # standalone entry (FUZZ-FINDINGS-1 item 1): running the
+    # file directly must work — bootstrap the repo root
+    import os.path as _op
+    import sys as _sys
+    _sys.path.insert(0, _op.dirname(_op.dirname(
+        _op.abspath(__file__))))
     main()

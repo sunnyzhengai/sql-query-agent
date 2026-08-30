@@ -543,8 +543,10 @@ def create_app(
                      "message": str(e),
                      "conversation_id": conv_id}, 422)
         except OpError as e:
+            # FUZZ-FINDINGS-1 item 3: the refusal names the reading
+            # it was executing — the card says WHY, in context
             return ({"error": "refusal", "reason_class": "op_error",
-                     "message": str(e),
+                     "message": f"{parse.render()} — {e}",
                      "conversation_id": conv_id}, 422)
         t_exec = int((_time.monotonic() - t0) * 1000)
         if exclude:

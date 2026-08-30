@@ -82,8 +82,8 @@ PARSE_PROMPT = (
     "answer, never route, never explain. If the question maps to no "
     "primitive, return empty primitives.\n"
     "The vocabulary (surface forms -> primitive):\n"
-    "same / different / match / drift / consistent -> "
-    "same_or_different\n"
+    "same / different / match / identical / equivalent / uniform(ly) / "
+    "uniformity / matching / consistent / drift -> same_or_different\n"
     "ways of / another way / other than / variants / versions -> "
     "variants\n"
     "reads / uses / comes from / feeds -> reads_or_feeds\n"
@@ -402,7 +402,19 @@ def compose_plan(parse: Parse,
             plan.append({"op": "retrieve", "ids": ids[:4]})
     if not plan:
         raise ParseRefusal(VOCABULARY_OFFER)
-    return plan
+    # FUZZ-FINDINGS-1 item 3: a multi-relation parse composes each
+    # primitive; identical steps dedup (order-preserving) so
+    # "defined in the same way" (same_or_different + defines) runs
+    # ONE retrieve then the compare, never a duplicate-op refusal
+    seen: "set[str]" = set()
+    deduped: "list[dict]" = []
+    for step in plan:
+        key = json.dumps(step, sort_keys=True)
+        if key in seen:
+            continue
+        seen.add(key)
+        deduped.append(step)
+    return deduped
 
 
 def execute_plan(plan: "list[dict]", run_kql,

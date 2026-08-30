@@ -194,3 +194,24 @@ def test_exact_hit_takes_no_semantic_nominations():
     s = OpsSession()
     got = ground_entities(["ED Sepsis Screening"], fake_kql, s)
     assert not any(a.get("semantic") for a in got)
+
+
+def test_fuzz_findings_1_surface_forms_consumed():
+    """FUZZ-FINDINGS-1 item 2: the fuzzer's five missed phrasings
+    are lexicon food — their words now sit in the sameness surface
+    forms (identical/equivalent/uniform/uniformity/matching)."""
+    from src.orchestrator.parse_plan import PARSE_PROMPT
+    for word in ("identical", "uniform", "uniformity", "matching",
+                 "consistent"):
+        assert word in PARSE_PROMPT, word
+
+
+def test_fuzz_findings_1_multi_relation_plan_dedups():
+    # same_or_different + defines over the same anchors: ONE
+    # retrieve, then the compare — never a duplicate-op refusal
+    plan = compose_plan(
+        Parse(["A", "B"], ["same_or_different", "defines"]),
+        _anchors(REF_A, REF_B))
+    ops = [s["op"] for s in plan]
+    assert ops == ["retrieve", "compare"]
+    assert len(plan) == len({str(s) for s in plan})

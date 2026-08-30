@@ -399,6 +399,11 @@ The hold lifts only by Sunny's explicit word, recorded here.
       REPLAY). Promotion ladder stubs at single-user as ordered.
       1,268 green + ruff. **THE AUTHORIZED QUEUE IS FULLY
       DELIVERED.** AWAITS review verification.
+- [x] **FUZZ-FINDINGS-1 BUILT (08-29 dev, 1.67.1)** — standalone
+      entries fixed; five missed phrasings consumed into the
+      sameness surface forms; multi-relation plans dedup + 422s
+      lead with the reading. 1,270 green + ruff. Nightly fuzzer
+      re-judges until green.
 
 ## RULED (Sunny, 2026-08-29): THE GENERATOR CLAUSE — Echo Law amendment
 "Fail twice, no matter the cause, triggers an investigation."

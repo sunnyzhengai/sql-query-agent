@@ -2507,3 +2507,23 @@ no-modules exceptions):
 **Gates:** 1,268 green + 5 xfailed, ruff clean; wheel 1.67.0.
 The Sunny-authorized queue (RW-25 → FUZZER-1 → TIER2-1 →
 FLYWHEEL-1) is now FULLY DELIVERED.
+
+### 2026-08-29 — FUZZ-FINDINGS-1 BUILT — release 1.67.1
+The fuzzer's first six catches, consumed:
+1. **Standalone entry fixed** (both walk_fuzzer and
+   measure_card_latency bootstrap the repo root — `python
+   devtools/walk_fuzzer.py` runs anywhere).
+2. **Five missed sameness phrasings became surface forms:**
+   identical / equivalent / uniform(ly) / uniformity / matching
+   joined the same_or_different line in the parse vocabulary —
+   the lexicon food eaten, grep-test-held so the words can never
+   silently drop.
+3. **Multi-relation plans compose:** identical steps DEDUP
+   (order-preserving) — "defined in the same way?"
+   (same_or_different + defines) runs ONE retrieve then the
+   compare, never a duplicate-op refusal; and when an execution
+   step still refuses, the 422 message now leads with the READING
+   it was executing ("reading your question as: … — <the op's
+   reason>") so the card says why, in context.
+**Gates:** 1,270 green + 5 xfailed, ruff clean; wheel 1.67.1.
+The nightly fuzzer stage re-judges these nightly until green.
