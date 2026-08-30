@@ -2649,3 +2649,16 @@ Parse pinning (temp-0/caching) NOT built — recorded reason: the
 oracle variance came from routing, which is now code; entity
 variance is confirm-all-covered by design (0062). KEYVAULT-1
 next on review-green, per the queue.
+
+### REVIEW VERDICT — FUZZ-FINDINGS-3 (1.68.0): ACCEPTED — STABILITY PROVEN
+Double fuzzer run: byte-identical findings across both passes.
+The flip-flop class is dead; the deterministic relation pass
+holds. Residue = THREE STABLE ordinary bugs → **ORDER
+FUZZ-FINDINGS-4:** (a/b) "identical" + "uniformity" sameness
+phrasings deterministically miss E11.80 — trace the exact plan
+(suspect entity-span extraction pulling "definitions" into
+grounding and shifting compare's refs); (c) lexicon collision:
+"defined in a different manner" is VARIANTS but bare "different"
+claims sameness — variants surface forms must outrank in context.
+**KEYVAULT-1 released** (FINDINGS-3 green); FINDINGS-4 rides
+alongside. 0060-EXPERIMENT-CLOSE follows.
