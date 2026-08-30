@@ -901,3 +901,29 @@ class TestFlywheel1Surface:
         r = TestClient(app).get("/api/mine")
         assert r.status_code == 503
         assert r.json()["reason_class"] == "unconfigured"
+
+
+class TestFuzzer2AllIntents:
+    """FUZZER-2 (overnight queue 2): the fuzzer covers ALL intent
+    classes with per-intent oracles; kind_any admits the legitimate
+    data-driven card classes."""
+
+    def test_all_named_intent_classes_present(self):
+        from devtools.walk_fuzzer import INTENTS
+        names = {i["name"] for i in INTENTS}
+        for wanted in ("codeset_sameness", "tables_of_metric",
+                       "kind_census", "flags_family",
+                       "count_refusal", "definition", "feeds",
+                       "variants"):
+            assert wanted in names, wanted
+        assert all(i.get("oracle") for i in INTENTS)
+
+    def test_kind_any_oracle_judges(self):
+        from devtools.walk_fuzzer import _check
+        card = {"parse_confirm": "reading", "show": []}
+        fin = {"conclusion": {"kind": "map"}}
+        ok = _check(card, fin, {"oracle": {"kind_any": ["map"]}}, "p")
+        assert ok == []
+        bad = _check(card, fin,
+                     {"oracle": {"kind_any": ["flags"]}}, "p")
+        assert any("not in" in f for f in bad)

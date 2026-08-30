@@ -41,6 +41,24 @@ INTENTS = [
              "Patients cohort?",
      "oracle": {"proposal_contains":
                 "patient rows never reach the model"}},
+    # FUZZER-2 (overnight queue 2): ALL intents fuzz — definition,
+    # feeds, variants join; kind_any allows the data-driven card
+    # classes a composed answer legitimately lands in
+    {"name": "definition",
+     "seed": "what does Active Diabetic Patients "
+             "(reporting.USP_Active_Diabetics) use to define the "
+             "patient cohort",
+     "expect_ground": ["Active Diabetic Patients"],
+     "oracle": {"kind_any": ["definition", "map"]}},
+    {"name": "feeds",
+     "seed": "Which certified metrics feed the Diabetes Registry "
+             "dashboard?",
+     "expect_ground": ["Diabetes Registry Dashboard"],
+     "oracle": {"kind_any": ["feeds", "map"]}},
+    {"name": "variants",
+     "seed": "is there another way of defining the diabetic "
+             "patient cohort?",
+     "oracle": {"kind_any": ["flags", "census", "map"]}},
 ]
 
 PARAPHRASE_PROMPT = (
@@ -87,6 +105,9 @@ def _check(card: dict, fin: "dict | None", intent: dict,
         if "kind" in o and concl.get("kind") != o["kind"]:
             finds.append(f"card kind {concl.get('kind')!r} != "
                          f"{o['kind']!r} for {phrasing!r}")
+        if "kind_any" in o and concl.get("kind") not in o["kind_any"]:
+            finds.append(f"card kind {concl.get('kind')!r} not in "
+                         f"{o['kind_any']} for {phrasing!r}")
         if "verdict" in o and o["verdict"] not in \
                 str(concl.get("verdict") or ""):
             finds.append(f"verdict oracle missed for {phrasing!r}")

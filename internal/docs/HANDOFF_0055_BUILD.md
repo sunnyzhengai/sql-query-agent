@@ -2571,3 +2571,16 @@ individuals" → census — flags surface forms/extraction gaps.
 **ORDER FUZZ-FINDINGS-2:** consume all four; rides before or with
 FUZZER-2 in the overnight queue. Findings recur nightly until
 green — the loop is the enforcement.
+
+### 2026-08-29 night — FUZZER-2 BUILT (overnight queue 2, item 1)
+The fuzzer now attacks ALL intent classes: definition, feeds, and
+variants join the original five (8 intents total, every one with a
+planted oracle). New `kind_any` oracle admits the legitimate
+data-driven card classes a composed answer can land in (definition
+OR map; feeds OR map; flags/census/map for variants) — data-driven
+composition means the oracle constrains the SET, never one shape.
+Misses remain lexicon food; the nightly stage re-judges. Tests:
+intent-class completeness (grep-held) + kind_any judging both
+directions. **Gates:** 1,272 green + 5 xfailed, ruff clean. (No
+wheel — devtools only.) NEXT on review-green: KEYVAULT-1
+code-side.
