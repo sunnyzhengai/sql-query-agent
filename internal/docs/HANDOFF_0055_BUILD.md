@@ -2981,3 +2981,20 @@ lever + approver arg). Registered under 0063. 6 tests (grades,
 draft status, no-invention, parsed-edges-only, CSV round-trip).
 **Gates:** 1,324 green + 5 xfailed, ruff clean; wheel 1.73.0.
 NEXT per the queue: CONSOLE-1 (the Inbox) on review-green.
+
+### REVIEW VERDICT — BRIDGE-1 STAGE 1 (1.73.0): gates green; TWO FINDS before Sunny's experiment
+Gates 1,324 + ruff clean; template columns correct; Draft-always
+correct humility; grades on every row; no-invented-assets held.
+**BR-1 (blocking the Purview experiment):** identical-name twins
+export as duplicate Name rows — Purview requires unique term
+names; the import fails or mauls a twin INSIDE their record.
+Fix per doctrine: members of open CONFLICT-severity name flags
+export with QUALIFIED names + the conflict disclosed in the
+definition text ("N definitions share this name — unresolved") —
+uniqueness satisfied, honesty exported, never-gate preserved.
+Reconciliation assertion: no duplicate Name in any export.
+**BR-2 (value, rides along):** populate Stewards/Experts columns
+from the store's steward fields — the template has the columns;
+pre-filled stewardship is the product.
+Regenerate the live export on fix; Sunny experiments on the
+regenerated files.
