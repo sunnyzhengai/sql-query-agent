@@ -97,6 +97,33 @@ LANDING TAXONOMY (what crosses to the DG tool):
   (v1 internal; DG gets at most a link);
 - raw Q&A → nowhere, ever.
 
+**THE TOTAL LANDING MAP (Sunny's directive: map every action to
+where it lands).** Two invariants make §0 enforceable: **no
+action without a landing** (a future action with no row does not
+ship until it has one) and **no landing without a grade**:
+- certify (steward) → DG glossary/asset descr. via the Queue (+
+  PBI descr. if report-linked) + graph certification edge + flag
+  disposition · grade steward-certified, approver named
+- deny w/ reason (steward) → graph testimony + disposition; DG
+  only if deprecating something previously synced · asserted
+- delegate → delegation queue + notification; delegate's answer
+  returns as testimony; the STEWARD lands the conclusion
+- compare → nowhere permanent (evidence; its conclusion lands via
+  certify/deny)
+- approve technical (developer) → the write lands to DG/PBI,
+  publish-logged · parsed-by-AIVIA, approved-by <dev>
+- fork (developer) → new variant node, enters differentiation ·
+  asserted, owner = creator
+- Bridge proposals → the Inbox; DG/PBI only on approval
+- steward alerts → their workflow + the Inbox · class + severity
+- user confirm → weights + personal shelf, never DG · w3
+- run → executed testimony edge, never DG · w8 + rung stamp
+- escalate → demand artifact + developer message · conversation
+  attached
+- pin → certified note node (shelf); DG at most a link
+- X-Ray → the report file in their document estate
+- raw Q&A → nowhere, ever
+
 ## 4. Tier 3 — AIVIA Run (later; gated)
 
 Certified + parameterized execution (rungs 1–2, built), the
