@@ -1,10 +1,10 @@
 # ADR 0061 — The run layer: Pro runs the confirmed definition
 
-**Status:** DRAFT 2026-08-28 (overnight) — review-authored from
-Sunny's Phase 2 direction ("nobody just wants to ask questions
-about metadata; everyone's end goal is to see the data"). Slice 1
-is buildable entirely on ratified ground; three open calls await
-Sunny's morning (§6).
+**Status:** ACCEPTED 2026-08-29 — review-authored from Sunny's
+Phase 2 direction ("nobody just wants to ask questions about
+metadata; everyone's end goal is to see the data"); slice 1 built
+and verified 2026-08-29; all three §6 calls RULED by Sunny
+2026-08-29 (cap 200 · no charts slice 1 · shelf-standing runs).
 
 ## 1. The decision
 
