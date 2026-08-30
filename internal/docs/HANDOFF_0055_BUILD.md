@@ -3176,3 +3176,13 @@ buttons); single-member flags skip the picker, as ordered.
 **Gates:** 1,353 green + 5 xfailed, ruff clean; wheel 1.75.0.
 Acceptance = Sunny certifies on the Diabetic Patients cluster and
 is ASKED which act she means. One restart picks up 2+3 together.
+
+### REVIEW VERDICT — CONSOLE-2 AMENDMENT + CONSOLE-3 (1.75.0): VERIFIED (code-side)
+Gates 1,353 + ruff clean. Set-summary leads literal diffs, sides
+named; certify opens the three steward acts with the member
+picker (refuses target-less), landing totality extended to 9
+verbs, flag stays the fold key (test-held). **SUNNY: restart now
+— your two-part acceptance is live in one sitting:** (1) read the
+Active Diabetic Patients compare and say in one breath which
+member does what; (2) press certify on the Diabetic Patients
+cluster and confirm the product asks WHICH act and WHICH member.
