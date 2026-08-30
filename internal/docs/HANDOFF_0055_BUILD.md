@@ -3269,3 +3269,17 @@ arrival. Acceptance met in fixture; live parity on restart.
 a 300 rerun makes the criterion counts TRUE on glass (80 vs 81);
 until then the sketch honestly discloses the store's truncation.
 **Gates:** 1,358 green + 5 xfailed, ruff clean; wheel 1.76.0.
+
+### REVIEW VERDICT — CONSOLE-2c (1.76.0): VERIFIED
+Gates 1,358 + ruff clean; probe: set_summary names the qualified
+member (collision gate holds); criterion discloses store
+truncation honestly instead of fabricating counts. **BUNDLE NOTE
+for the next env-publish + rerun cycle:** the cap-4000 rebuild —
+after it, criteria sketch true counts (80 vs 81) and the
+truncation disclosure retires. No click requested now; the
+disclosure is the honest bridge. **SUNNY: the one-breath read is
+live** — fresh compare on the codeset card: fingerprint rows
+under each member's name, the set-summary lead naming the
+reports copy, labeled folded receipt. (The "≥49 — truncated"
+criterion line is the store's honesty, not a bug; it retires at
+the next cycle.)
