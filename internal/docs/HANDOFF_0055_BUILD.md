@@ -2603,3 +2603,19 @@ Tests: surface-form grep-holds + the canonical-name compose (L0).
 **Gates:** 1,274 green + 5 xfailed, ruff clean; wheel 1.67.2. The
 nightly fuzzer re-judges; findings recur until green — the loop
 is the enforcement, as ordered.
+
+### REVIEW VERDICT — FUZZER-2: CODE VERIFIED (1,272 green, ruff clean); run surfaced a GENERATOR-CLASS find
+**FUZZ-FINDINGS-3 (generator clause invoked):** the three sameness
+phrasings that PASSED post-1.67.1 ("have the same definitions" /
+"identical" / "uniformity") now FAIL the same oracle — same
+strings, flip-flopping outcomes across runs = PARSE-LAYER
+NONDETERMINISM (LLM extraction variance composing different
+plans). Per the ruled clause: no more surface-form patches —
+investigate one level up. Direction to evaluate: the relation
+lexicon resolves DETERMINISTICALLY on the raw question BEFORE the
+LLM's extraction gets a vote (0060's spirit: the parse should be
+as deterministic as the plan), and/or parse pinning (temp 0 /
+caching per normalized phrasing). Flags-intent catches absent
+this run — confirm consumed vs generation variance. KEYVAULT-1
+waits behind this; the flip-flop class blocks nothing on glass
+(confirm-all covers) but must die before the QA gate re-runs.
