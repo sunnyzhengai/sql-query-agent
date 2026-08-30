@@ -7,7 +7,7 @@
 
 # Test Map — what every test proves
 
-117 modules, 1290 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
+117 modules, 1293 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
 
 ## By ADR
 
@@ -66,7 +66,7 @@
 | 0060 | The parse is the plan: parser-only LLM, deterministic traversal, correction flywheel | `tests/orchestrator/test_parse_plan.py` (28) |
 | 0061 | The run layer: Pro runs the confirmed definition | `tests/test_run_layer.py` (25) |
 | 0062 | The dialogue loop: show, propose, ask, execute | `tests/webapp/test_app.py` (67) |
-| 0063 | The product tiers: X-Ray, Bridge, Workbench, Run | `tests/adapters/test_file_export.py` (6), `tests/test_xray.py` (7) |
+| 0063 | The product tiers: X-Ray, Bridge, Workbench, Run | `tests/adapters/test_file_export.py` (9), `tests/test_xray.py` (7) |
 
 ## By standing law
 
@@ -108,7 +108,7 @@
 
 ### contract:suite-legibility — the suite explains itself to Sunny — the proof ledger and the run transcript (morning orders, 2026-08-27)
 
-- `tests/adapters/test_file_export.py` (6): BRIDGE-1 stage 1 (0063 §2 file-first): native import files from
+- `tests/adapters/test_file_export.py` (9): BRIDGE-1 stage 1 (0063 §2 file-first): native import files from
 - `tests/orchestrator/test_conclusion.py` (19): The Answer Format Contract's composer (RW-10): card class is
 - `tests/orchestrator/test_parse_plan.py` (28): ADR 0060 prototype L0: closure is structural, grounding is exact,
 - `tests/shapes/test_seed.py` (7): The demo-source seed (shape-store tenant load, 2026-08-27):

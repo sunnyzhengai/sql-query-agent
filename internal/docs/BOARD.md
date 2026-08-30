@@ -480,7 +480,15 @@ The hold lifts only by Sunny's explicit word, recorded here.
       every row provenance-graded w/ named approver; LIVE EXPORT
       in internal/docs/bridge_exports (37 assets · 64 relations ·
       37 terms) — real files for Sunny's Purview experiments.
-      1,324 green + ruff. AWAITS review → CONSOLE-1.
+      1,324 green + ruff. **Gates green; BR-1 (dupe names,
+      blocking) + BR-2 (stewards) found.**
+- [x] **BR-1 + BR-2 BUILT (08-30 dev, 1.73.1)** — colliding names
+      qualify + disclose (integrity gate: a dupe-Name file never
+      leaves the house); stewards/experts pre-fill from the store;
+      live regen: 37/37 unique, 6 families qualified, 16 stewarded
+      rows. THE FILES FOR SUNNY'S PURVIEW EXPERIMENT ARE READY
+      (internal/docs/bridge_exports). 1,327 green + ruff. AWAITS
+      review → CONSOLE-1.
 
 ## RULED (Sunny, 2026-08-29): THE GENERATOR CLAUSE — Echo Law amendment
 "Fail twice, no matter the cause, triggers an investigation."

@@ -2998,3 +2998,26 @@ from the store's steward fields — the template has the columns;
 pre-filled stewardship is the product.
 Regenerate the live export on fix; Sunny experiments on the
 regenerated files.
+
+### 2026-08-30 — BR-1 + BR-2 BUILT — release 1.73.1
+**BR-1 (the duplicate-Name class, structurally dead):** colliding
+names export QUALIFIED ("ED Sepsis Screening (reporting.USP_…)")
+with the collision DISCLOSED in the definition text ("N
+definitions share the name — unresolved", citing an open conflict
+flag's class when one covers the name) — uniqueness satisfied,
+honesty exported, never-gate preserved. `assert_unique_names` is
+an EXPORT INTEGRITY GATE inside the exporter itself: a file with
+residual duplicate Names raises and never leaves the house.
+Relations use the same qualified Head for consistency. The
+exporter now reads ONE scan of output_metric_logic (the facts
+table — which also delivered BR-2 for free).
+**BR-2:** Stewards/Experts pre-fill from the store's
+steward/developer fields (the CLI arg is only the storeless
+fallback) — pre-filled stewardship is the product.
+**Live regeneration for Sunny's experiment:** 37 terms, 37 UNIQUE
+names — the six colliding families all render qualified
+(Active Diabetics, Diabetes Registry ×3, Diabetic Codeset,
+Enrollment Snapshot, High ED Utilizers); 16 rows carry store
+stewards. The files in internal/docs/bridge_exports are the ones
+to import.
+**Gates:** 1,327 green + 5 xfailed, ruff clean; wheel 1.73.1.
