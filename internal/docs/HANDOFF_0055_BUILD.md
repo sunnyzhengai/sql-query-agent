@@ -2619,3 +2619,33 @@ caching per normalized phrasing). Flags-intent catches absent
 this run — confirm consumed vs generation variance. KEYVAULT-1
 waits behind this; the flip-flop class blocks nothing on glass
 (confirm-all covers) but must die before the QA gate re-runs.
+
+### 2026-08-29 night — FUZZ-FINDINGS-3 BUILT (generator clause executed) — release 1.68.0
+**The flip-flop class is structurally dead.** Diagnosis confirmed
+the generator: the LLM's primitive choice was a stochastic router
+wearing a parser's badge — same strings, different plans across
+runs. The mechanism one level up, exactly as the clause demands:
+- **RELATION_LEXICON is now DATA** (word-grain surface forms per
+  primitive) and **detect_relations() is a PURE FUNCTION of the
+  question string** — longest-form-wins span claiming ("red
+  flags" beats "flags"), primitives ordered by first occurrence.
+  The deterministic scan OWNS the primitives; the LLM's
+  schema-closed guess survives only as the fallback when the scan
+  finds nothing. The LLM keeps exactly ONE freedom — entity
+  extraction — and confirm-all covers it.
+- **The prompt's vocabulary section GENERATES from the lexicon**
+  — one source, drift structurally impossible.
+- **Rider find:** multi-relation plans exposed @prev fragility
+  (dedup could leave the wrong retrieve as the last result;
+  compare then saw one item) — sameness now compares EXPLICIT ids
+  (op_compare resolves catalog ids, W12a). The lab-path test
+  updated: three relations legitimately read in that sentence;
+  the invariant is the compare runs and partitions.
+- Determinism tests: the five flip-flop phrasings resolve
+  identically every run; battery seeds route deterministically;
+  scan-owns/LLM-fallback both directions; prompt⊇lexicon.
+**Gates:** 1,279 green + 5 xfailed, ruff clean; wheel 1.68.0.
+Parse pinning (temp-0/caching) NOT built — recorded reason: the
+oracle variance came from routing, which is now code; entity
+variance is confirm-all-covered by design (0062). KEYVAULT-1
+next on review-green, per the queue.

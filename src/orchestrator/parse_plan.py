@@ -75,6 +75,77 @@ PARSE_TOOL = {
     },
 }
 
+# FUZZ-FINDINGS-3 (GENERATOR CLAUSE invoked, 2026-08-29 night): the
+# same phrasings flip-flopped their oracles across runs — the LLM's
+# primitive choice was a stochastic router wearing a parser's badge.
+# The relation lexicon is now DATA that resolves DETERMINISTICALLY
+# on the raw question BEFORE the LLM gets a vote (0060's spirit:
+# the parse is as deterministic as the plan). Word-grain surface
+# forms, never question shapes (P4); the LLM keeps exactly one
+# freedom — ENTITY extraction — and confirm-all covers it.
+RELATION_LEXICON: "dict[str, tuple]" = {
+    "same_or_different": (
+        "defined the same", "defined uniformly", "definitions match",
+        "same", "different", "differently", "difference", "match",
+        "matches", "matching", "identical", "equivalent", "uniform",
+        "uniformly", "uniformity", "consistent", "drift"),
+    "variants": ("another way", "other than", "ways of", "variants",
+                 "variant", "versions", "version"),
+    "reads_or_feeds": ("comes from", "reads", "read", "uses", "use",
+                       "using", "feeds", "feed", "depends", "depend"),
+    "flags": ("red flags", "governance issues", "flags", "flag",
+              "issues", "issue", "wrong", "conflicts", "conflict",
+              "problems", "problem", "concerns", "concern", "risks",
+              "risk"),
+    "defines": ("how calculated", "logic of", "defines", "define",
+                "defined", "definition", "definitions", "criteria",
+                "calculated"),
+    "owns": ("who owns", "who stewards", "owns", "steward",
+             "stewards"),
+    "grain": ("grain", "per-what"),
+    "count_rows": ("how many", "number of rows",
+                   "number of patients", "count"),
+}
+
+# longest-first so phrases win over their own words; word-bounded
+_LEXICON_PATTERNS: "list[tuple]" = sorted(
+    ((_form, _prim)
+     for _prim, _forms in RELATION_LEXICON.items()
+     for _form in _forms),
+    key=lambda x: -len(x[0]))
+
+
+def detect_relations(question: str) -> "list[str]":
+    """The deterministic relation pass: primitives by FIRST
+    OCCURRENCE in the question, deduped — a pure function of the
+    string; the flip-flop class structurally cannot exist here."""
+    import re as _re
+    low = " ".join(question.lower().split())
+    hits: "list[tuple]" = []
+    claimed: "list[tuple]" = []   # (start, end) spans already won
+    for form, prim in _LEXICON_PATTERNS:
+        for m in _re.finditer(r"\b" + _re.escape(form) + r"\b", low):
+            span = (m.start(), m.end())
+            if any(s < span[1] and span[0] < e for s, e in claimed):
+                continue          # a longer form already owns this
+            claimed.append(span)
+            hits.append((span[0], prim))
+    out: "list[str]" = []
+    for _pos, prim in sorted(hits):
+        if prim not in out:
+            out.append(prim)
+    return out
+
+
+def _vocabulary_lines() -> str:
+    return "\n".join(
+        f"{' / '.join(forms)} -> {prim}"
+        for prim, forms in RELATION_LEXICON.items())
+
+
+# The prompt's vocabulary section GENERATES from the lexicon — one
+# source, zero drift; the LLM's role here is entity extraction (its
+# primitive guess is only the fallback when the scan finds nothing).
 PARSE_PROMPT = (
     "You are a PARSER, nothing else. Translate the question into "
     "entities (the user's own tokens that name catalog things) and "
@@ -82,19 +153,7 @@ PARSE_PROMPT = (
     "answer, never route, never explain. If the question maps to no "
     "primitive, return empty primitives.\n"
     "The vocabulary (surface forms -> primitive):\n"
-    "same / different / match / identical / equivalent / uniform / "
-    "uniformly / uniformity / matching / consistent / drift / "
-    "defined the same / defined uniformly / definitions match -> "
-    "same_or_different\n"
-    "ways of / another way / other than / variants / versions -> "
-    "variants\n"
-    "reads / uses / comes from / feeds -> reads_or_feeds\n"
-    "flags / red flags / issues / wrong / conflicts / problems / "
-    "concerns / risks / governance issues -> flags\n"
-    "defines / criteria / logic of / how calculated -> defines\n"
-    "who owns / who stewards -> owns\n"
-    "grain / per-what / level -> grain\n"
-    "how many / count / number of rows/patients -> count_rows"
+    + _vocabulary_lines()
 )
 
 
@@ -173,10 +232,15 @@ def parse_question(question: str, chat_api) -> Parse:
             raw = {}
     entities, kinds = split_kind_words(
         [str(e) for e in raw.get("entities") or []])
+    # FUZZ-FINDINGS-3: the deterministic scan OWNS the primitives;
+    # the LLM's schema-closed guess is only the fallback when the
+    # lexicon finds nothing in the question
+    detected = detect_relations(question)
     return Parse(
         entities=entities,
-        primitives=[str(p) for p in raw.get("primitives") or []
-                    if p in PRIMITIVES],
+        primitives=detected or [
+            str(p) for p in raw.get("primitives") or []
+            if p in PRIMITIVES],
         modifiers=[str(m) for m in raw.get("modifiers") or []],
         kinds=kinds)
 
@@ -357,7 +421,11 @@ def compose_plan(parse: Parse,
         if prim in ("same_or_different", "grain"):
             if len(ids) >= 2:
                 plan.append({"op": "retrieve", "ids": ids[:4]})
-                plan.append({"op": "compare", "refs": ["@prev"],
+                # FUZZ-FINDINGS-3 rider: compare over EXPLICIT ids
+                # (op_compare resolves catalog ids, W12a) — @prev
+                # broke under multi-primitive plans where dedup
+                # left the wrong retrieve as the last result
+                plan.append({"op": "compare", "refs": ids[:4],
                              "aspect": "logic"})
             elif len(ids) == 1:
                 # one name, sameness asked: the identity's recorded

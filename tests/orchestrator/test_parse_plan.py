@@ -121,7 +121,11 @@ def test_the_lab_path_named_case_step_anchored_sameness():
                          "primitives": ["same_or_different"]}),
         fake_kql)
     assert out["refused"] is None
-    assert [r["op"] for r in out["results"]] == ["retrieve", "compare"]
+    # FUZZ-FINDINGS-3: the deterministic pass reads THREE relations
+    # in this sentence (define/using/same) — a legitimate
+    # multi-relation plan; the invariant is that the COMPARE runs
+    ops_run = [r["op"] for r in out["results"]]
+    assert "compare" in ops_run and "retrieve" in ops_run
     assert any("group" in row for r in out["results"]
                for row in r["rows"])
 
@@ -237,3 +241,70 @@ def test_fuzz_findings_2_flags_census_uses_canonical_name():
                     "name": "USP_Diabetic_Patients"}]}])
     assert plan == [{"op": "census", "kind": "flag",
                      "contains": "Diabetic Patients"}]
+
+
+class TestFuzzFindings3DeterministicRelations:
+    """FUZZ-FINDINGS-3 (the generator clause invoked): the same
+    phrasings flip-flopped oracles across runs — LLM primitive
+    variance. The relation pass is now a PURE FUNCTION of the
+    question string; the flip-flop class structurally cannot
+    exist."""
+
+    def test_flip_flop_phrasings_resolve_the_same_every_time(self):
+        from src.orchestrator.parse_plan import detect_relations
+        for q in ("Do all the Diabetic codesets have the same "
+                  "definitions?",
+                  "Are the Diabetic codesets identical?",
+                  "Is there uniformity across the Diabetic codesets?",
+                  "Are the codesets defined uniformly?",
+                  "Do the codeset definitions match?"):
+            for _ in range(3):
+                assert "same_or_different" in detect_relations(q), q
+
+    def test_battery_seeds_route_deterministically(self):
+        from src.orchestrator.parse_plan import detect_relations
+        cases = {
+            "which metrics use ENCOUNTERS?": "reads_or_feeds",
+            "What governance red flags exist for Diabetic "
+            "Patients?": "flags",
+            "How many patients are currently in the cohort?":
+                "count_rows",
+            "is there another way of defining the cohort?":
+                "variants",
+            "How is the Diabetic Patients cohort defined?":
+                "defines",
+        }
+        for q, prim in cases.items():
+            assert prim in detect_relations(q), (q, prim)
+
+    def test_longest_form_wins_its_span(self):
+        from src.orchestrator.parse_plan import detect_relations
+        # "red flags" must claim its span before bare "flags"
+        got = detect_relations("any red flags here?")
+        assert got == ["flags"]
+
+    def test_scan_owns_primitives_llm_is_fallback_only(self):
+        from src.orchestrator.parse_plan import parse_question
+
+        def llm(messages, tools, tool_choice=None):
+            import json as _j
+            return {"content": "", "tool_calls": [{
+                "id": "p", "function": {"name": "file_parse",
+                    "arguments": _j.dumps({
+                        "entities": ["X"],
+                        "primitives": ["flags"]})}}]}
+        # the question SAYS sameness — the LLM's 'flags' loses
+        p = parse_question("are X and Y the same?", llm)
+        assert p.primitives == ["same_or_different"]
+        # no relation words → the schema-closed LLM guess stands
+        p2 = parse_question("X please", llm)
+        assert p2.primitives == ["flags"]
+
+    def test_prompt_generates_from_the_lexicon_single_source(self):
+        from src.orchestrator.parse_plan import (
+            PARSE_PROMPT,
+            RELATION_LEXICON,
+        )
+        for forms in RELATION_LEXICON.values():
+            for f in forms:
+                assert f in PARSE_PROMPT, f

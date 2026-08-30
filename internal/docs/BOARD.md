@@ -410,8 +410,15 @@ The hold lifts only by Sunny's explicit word, recorded here.
 - [x] **FUZZ-FINDINGS-2 BUILT (08-29 night, 1.67.2)** — four
       misses consumed: whole-phrase sameness forms; flags census
       filters by the grounded CANONICAL name (mechanism), flags
-      surface forms widened. 1,274 green + ruff. AWAITS review →
-      then KEYVAULT-1 code-side → 0060-EXPERIMENT-CLOSE.
+      surface forms widened. 1,274 green + ruff.
+- [x] **FUZZ-FINDINGS-3 BUILT (08-29 night, 1.68.0, GENERATOR
+      CLAUSE EXECUTED)** — RELATION_LEXICON is data;
+      detect_relations() a pure function owns the primitives (LLM
+      = entity extraction + fallback only); prompt generates from
+      the lexicon (one source); @prev fragility dead (explicit-id
+      compare). Flip-flop class structurally impossible,
+      determinism test-held. 1,279 green + ruff. AWAITS review →
+      KEYVAULT-1 → 0060-EXPERIMENT-CLOSE.
 
 ## RULED (Sunny, 2026-08-29): THE GENERATOR CLAUSE — Echo Law amendment
 "Fail twice, no matter the cause, triggers an investigation."
