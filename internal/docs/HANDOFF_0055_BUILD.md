@@ -3080,3 +3080,21 @@ files in Sunny's hands), Console (the Inbox, live), Run (rungs
 1–2, gated for customer sources). SUNNY'S GLASS: /console awaits
 her eye — the launch demo's heart; then the film plan + capture
 day close the arc.
+
+## ORDER CONSOLE-2 (Sunny's glass: "not clear HOW they differ")
+Compare evidence leads with MEMBER FINGERPRINTS, not the diff:
+1. One row per member: qualified name · source tables (reads) ·
+   key criterion from its top decision site ("E11% diagnosis
+   codes" / "METFORMIN, INSULIN GLARGINE orders") · its RW-6
+   description. The difference rendered as rows a steward scans.
+2. A distilled contrast line NAMING OWNERS, machine-assembled
+   from the fingerprints ("reporting selects by diagnosis codes;
+   reports selects by medication orders") — never model prose.
+3. The raw diff FOLDS beneath as the receipt, sides labeled with
+   member ids (− x · + y); for >2 members, each pairwise diff
+   labeled or the per-group exemplar named.
+All fields exist in the store (descriptions, reads, decision
+sites); composition only. Applies to compare evidence EVERYWHERE
+it renders (console cards, workbench answers) — one composer.
+Acceptance: Sunny reads the Active Diabetic Patients card and can
+say in one breath which member does what.
