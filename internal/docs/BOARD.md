@@ -528,3 +528,6 @@ film sequencing · capture day · optional tenant clicks.
   battery as the day's first check.
 - Dev's standing note: local fixture tests need no tenant — code
   work is unaffected by the pause.
+- [x] 2026-08-30 morning: capacity Active · warm battery 22/22
+      green · fuzzer 24/0 · nightly cron re-armed (pause-aware).
+      Estate handed to Sunny green.
