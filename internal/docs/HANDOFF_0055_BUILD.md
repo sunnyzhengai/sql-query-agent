@@ -2364,3 +2364,25 @@ store-error card, BUT:
 4. Unit coverage: store-exception → one retry → typed card with
    retry button; fallback ops surfacing the SAME store error
    carry the infra cure verbatim.
+
+### 2026-08-29 — RW-25 BUILT — release 1.65.0
+**The idle-wake failure class is closed on all four fronts:**
+1. Store-no-answer AUTO-RETRIES ONCE in the grounding path (the
+   wake is a known ~10-15s transient) — one retry makes the error
+   card never exist; the skeleton shows "store waking from idle —
+   retrying…" meanwhile (visible, never a blank).
+2. The persistent-failure card carries **retry as a BUTTON**
+   ("retry now" re-runs the ask; the named remedy IS an action,
+   no-dead-ends) alongside the engine button and the door.
+3. **Invented-infra-cause duty (the honesty gate, MANDATORY):** a
+   caption naming access/permission/credential trouble floors
+   unless a DISPLAYED error or stamp carries that cause — infra
+   causes come from stamps, never the model. A stamped-cause echo
+   passes; non-infra captions untouched. 3 gate tests.
+4. The engine's infra text now names the wake cure first ("the
+   store waking from idle — retry in ~15s") so fallback ops
+   surfacing the same error carry it verbatim.
+Unit coverage per the order: one-failure-then-ground (retry works,
+no card), persistent-failure (typed card + retry flag), wake cure
+in _infra_error. **Gates:** 1,252 green + 5 xfailed, ruff clean;
+wheel 1.65.0.

@@ -62,6 +62,14 @@ _SAMENESS_VERDICT = re.compile(
     r"(?i)\b(?:identical|equivalent|interchangeable|duplicates?|"
     r"differs?|different(?:ly)?|differences?|"
     r"(?:the|share[sd]?\s+the|uses?\s+the|not\s+the)\s+same)\b")
+# RW-25 item 3 (Sunny's walk, the 8:06 idle-wake): commentary
+# invented "check access or permissions" over a store timeout the
+# guards had ALREADY diagnosed. Infra causes come from STAMPS,
+# never the model — a claim-class policy invariant (the
+# _KIND_ABSENCE precedent).
+_INFRA_CAUSE = re.compile(
+    r"(?i)\b(?:access|permission|credential|authoriz\w+|"
+    r"firewall|vpn)\b")
 
 
 def _ground_numbers(outputs: "list[dict]") -> "set[str]":
@@ -223,6 +231,24 @@ def caption_violations(caption: str, outputs: "list[dict]",
                 "basis this turn — run compare(refs=["
                 + ", ".join(pair[:4]) + "]); descriptions and names "
                 "never compute logic sameness")
+
+    # RW-25 invented-infra-cause duty (2026-08-29, MANDATORY): a
+    # caption naming access/permission/credential trouble is only
+    # supported when a DISPLAYED error or note carries that cause —
+    # the typed cure renders from stamps; the model never diagnoses
+    # infrastructure. Turn-scoped like every duty.
+    if _INFRA_CAUSE.search(text):
+        infra_ground = " ".join(
+            [str(o.get("error") or "") for o in outputs]
+            + [str(r.get("note") or "") + " "
+               + str(r.get("headline") or "") for r in turn_results])
+        if not _INFRA_CAUSE.search(infra_ground):
+            violations.append(
+                "invented infra cause (RW-25, 2026-08-29): the "
+                "caption names an access/permission/credential "
+                "cause no displayed error or stamp carries — infra "
+                "causes come from stamps, never the model; state "
+                "the displayed error instead")
 
     # Compare-error duty (walk W12b, 2026-08-23 — the Q4 corpse: four
     # errored compares degraded into invented 'Replaced by'

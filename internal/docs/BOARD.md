@@ -371,7 +371,14 @@ The hold lifts only by Sunny's explicit word, recorded here.
       language dead in composed text (census overflow links the
       round ref; the gate found a SECOND live instance — the
       headline citation — on its first run); grep gate standing.
-      1,246 green + ruff. Item 2 = SUNNY'S CALL below. Sunny
+      1,246 green + ruff. Item 2 = SUNNY'S CALL below.
+      **VERIFIED by review (gate caught #2 on first run).**
+- [x] **RW-25 BUILT (08-29 dev, 1.65.0)** — idle-wake closed:
+      grounding auto-retries once (skeleton says "store waking"),
+      persistent failure = typed card WITH a retry button,
+      invented-infra-cause duty in the honesty gate (causes from
+      stamps, never the model), wake cure in the engine infra
+      text. 1,252 green + ruff. AWAITS review verification → Sunny
       resumes → QA gate → CAPTURE.
 
 ## RULED (Sunny, 2026-08-29): THE GENERATOR CLAUSE — Echo Law amendment

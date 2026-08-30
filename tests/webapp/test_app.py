@@ -739,3 +739,51 @@ class TestBatch7:
         assert _stem("diabetic") == "diabet"
         assert _stem("codesets") == "codeset"
         assert _stem("definition") == "definition"
+
+
+class TestRW25IdleWake:
+    """RW-25 (Sunny's walk, the 57-min idle): store-no-answer
+    auto-retries once (the wake is a ~10-15s transient — one retry
+    makes the error card never exist); a second miss renders the
+    typed card WITH a retry button flag; the engine's infra text
+    names the wake cure."""
+
+    def _flaky_kql(self, failures):
+        state = {"n": 0}
+
+        def kql(query, params):
+            if state["n"] < failures:
+                state["n"] += 1
+                raise ConnectionError("store idle — no answer")
+            return fake_kql(query, params)
+        return kql
+
+    def _client(self, kql):
+        import tempfile
+        from pathlib import Path
+
+        from src.orchestrator.events import JsonlEventSink
+        sink = JsonlEventSink(Path(tempfile.mkdtemp()) / "e.jsonl")
+        maker = TestCardEverywhere()
+        return TestClient(create_app(
+            maker._api(["ED Sepsis Screening"], []), kql, sink,
+            planner=True))
+
+    def test_one_store_failure_retries_and_the_card_lands(self):
+        client = self._client(self._flaky_kql(failures=1))
+        r = client.post("/api/ask", json={"message": "about sepsis"})
+        j = r.json()
+        assert j.get("no_match") is not True
+        assert j["show"][0]["matches"]      # the retry grounded
+
+    def test_persistent_failure_renders_the_retry_card(self):
+        client = self._client(self._flaky_kql(failures=99))
+        r = client.post("/api/ask", json={"message": "about sepsis"})
+        j = r.json()
+        assert j["no_match"] is True and j["retry"] is True
+        assert "waking from idle" in j["parse_confirm"]
+
+    def test_engine_infra_text_names_the_wake_cure(self):
+        from src.orchestrator.turn_engine import _infra_error
+        msg = _infra_error(ConnectionError("timed out"))
+        assert "waking from idle" in msg and "retry" in msg

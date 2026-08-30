@@ -247,7 +247,8 @@ def _infra_error(e: Exception) -> str:
     m = re.search(r'"@message"\s*:\s*"([^"]{1,160})', text)
     detail = (m.group(1) if m else text[:140]).strip()
     return (f"operation failed ({type(e).__name__}: {detail}) — "
-            "common causes: capacity paused (resume it) or a broken "
+            "common causes: the store waking from idle (retry in "
+            "~15s), capacity paused (resume it), or a broken "
             "OneLake shortcut in the KQL database (re-create it)")
 
 

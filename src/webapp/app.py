@@ -367,14 +367,30 @@ def create_app(
                     pass
 
         t1 = _time.monotonic()
-        try:
-            ground_entities(parse.entities, run_kql,
-                            conv.engine.ops, on_grounded=_grounded)
-        except Exception:   # noqa: BLE001 — grounding down is a card
-            return _no_match(
-                "the catalog store did not answer the grounding "
-                "queries — retry, answer without the planner, or "
-                "contact a developer")
+        # RW-25 (Sunny's walk, the 57-min idle): store-no-answer
+        # auto-retries ONCE — the idle-wake is a known ~10-15s
+        # transient, and one retry makes the error card never
+        # exist; the skeleton says "store waking…" meanwhile
+        for attempt in (1, 2):
+            try:
+                del show[:]
+                ground_entities(parse.entities, run_kql,
+                                conv.engine.ops, on_grounded=_grounded)
+                break
+            except Exception:   # noqa: BLE001 — second miss is a card
+                if attempt == 2:
+                    payload = _no_match(
+                        "the catalog store did not answer the "
+                        "grounding queries — likely waking from "
+                        "idle. Retry, answer without the planner, "
+                        "or contact a developer")
+                    payload["retry"] = True   # the named remedy IS
+                    return payload            # a button (RW-25)
+                if on_progress is not None:
+                    try:
+                        on_progress({"store_waking": True})
+                    except Exception:   # noqa: BLE001, S110
+                        pass
         t_ground = int((_time.monotonic() - t1) * 1000)
         conv.pending_parse = {"question": question,
                               "entities": parse.entities,
@@ -1424,6 +1440,13 @@ function handleStreamEvent(name, data) {
         data.entities.length === 1 ? 'y' : 'ies'}…</div></div>`));
       return;
     }
+    if (data.store_waking && skeletonNode) {
+      // RW-25: the idle-wake retry is VISIBLE, never a blank
+      skeletonNode.querySelector('.skelbox').appendChild(
+        el(`<div class="showline">store waking from idle —
+          retrying…</div>`));
+      return;
+    }
     if (data.grounded && skeletonNode) {
       const g = data.grounded;
       const names = g.matches.map(m => m.name).join(', ')
@@ -1539,17 +1562,36 @@ function renderParseCard(j, message) {
   // developer door remain (no dead ends)
   const runBtn = j.no_match ? ''
     : '<button class="primary confirmparse">run this plan</button>';
+  // RW-25: a named remedy IS a button — the store-error card
+  // carries "retry now", never retry-in-prose alone
+  const retryBtn = j.retry
+    ? '<button class="primary retrybtn">retry now</button>' : '';
   const badge = j.no_match ? 'no match' : 'understanding';
   const card = add(el(`<div class="rs parsecard"><div class="head">
     <span class="badge complete">${badge}</span>
     <span class="universe">${esc(j.parse_confirm)}</span></div>
     <div class="showbox">${showRows}</div>
     <div class="parsebtns">
-    ${runBtn}
+    ${runBtn}${retryBtn}
     <button class="skipparse">answer without the planner</button>
     <button class="doorbtn">none of these is right —
       contact a developer</button>
     </div></div>`));
+  const retryEl = card.querySelector('.retrybtn');
+  if (retryEl) retryEl.addEventListener('click', async () => {
+    card.querySelectorAll('button').forEach(b => b.disabled = true);
+    try {
+      let jj;
+      try { jj = await askViaStream(message); }
+      catch (e1) { clearStage(); jj = await askViaJson(message); }
+      conversationId = jj.conversation_id;
+      if (jj.parse_confirm && !jj.planned) renderParseCard(jj, message);
+      else renderFinale(jj);
+    } catch (e2) {
+      add(el(`<div class="loopline">${esc(e2.message)}</div>`));
+    }
+    askbtn.disabled = false;
+  });
   // RW-19: the door wires on EVERY card (it is the point of the
   // no-match card); only the run button is variant-conditional —
   // its listener attaches below, guarded on the element existing

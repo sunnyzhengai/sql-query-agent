@@ -361,3 +361,35 @@ class TestBridgeAcceptanceRuling:
         assert caption_violations(
             "The closest certified items are shown in R1.",
             [self.RESULT]) == []
+
+
+class TestRW25InventedInfraCause:
+    """RW-25 item 3: infra causes come from STAMPS, never the model
+    — commentary invented "check access or permissions" over a
+    store timeout the guards had already diagnosed."""
+
+    def _timeout_output(self):
+        return {"component": {"op": "search", "params": {}},
+                "error": "operation failed (Timeout) — common "
+                         "causes: the store waking from idle"}
+
+    def test_invented_access_cause_floors(self):
+        v = caption_violations(
+            "I could not reach the data — please check your access "
+            "or permissions.", [self._timeout_output()])
+        assert any("invented infra cause" in x for x in v)
+
+    def test_stamped_cause_echo_passes(self):
+        out = {"component": {"op": "search", "params": {}},
+               "error": "operation failed: authorization token "
+                        "expired — run az login"}
+        v = caption_violations(
+            "The store refused the credential — the displayed error "
+            "says the authorization token expired.", [out])
+        assert not any("invented infra cause" in x for x in v)
+
+    def test_non_infra_caption_untouched(self):
+        v = caption_violations(
+            "ED Sepsis Screening reads 3 tables.",
+            [self._timeout_output()])
+        assert not any("invented infra cause" in x for x in v)
