@@ -3244,3 +3244,28 @@ Sunny's one restart now carries CONSOLE-2 + 2b + 3 together.
    becomes unwritable. Acceptance: set_summary names
    "Diabetic Codeset (reports.USP_Diabetic_CodesetB)".
 Then Sunny's one-breath glass read closes CONSOLE-2 for good.
+
+### 2026-08-30 — CONSOLE-2c BUILT — release 1.76.0
+**Item 1 — the false counts, root-caused to the GENERATOR:** the
+STORE's expression_sql is capped at 500 chars (extract.py ×4 +
+builder.py) — "IN (49 values)" was commas-in-a-truncated-string.
+Two fixes, both truth-first: (a) the cap raised 500→4000 (real
+predicates fit; takes effect on the next env publish + 300
+rerun); (b) the sketch NEVER fabricates on a stale store — a
+truncated expression (unbalanced quote / unclosed paren)
+discloses "IN (≥49 values — list truncated in this store; a graph
+rebuild restores the true count)". Test-held both ways: full
+expression sketches the true 80; the 500-cut form never says
+"49 values" bare.
+**Item 2 — GENERATOR KILL, the bare-name class (third surface:
+member lists → export Names → set_summary):** every member-name
+render in the composer now goes through _member_display —
+collision ⇒ qualified with the id, unconditionally. The COLLISION
+GATE test holds every card field (fingerprint names end with
+their id; set_summary names "Diabetic Codeset
+(reports.USP_CodesetB)") — a new bare-name surface goes red on
+arrival. Acceptance met in fixture; live parity on restart.
+**SUNNY (one line, when convenient):** publish the 1.76 env, then
+a 300 rerun makes the criterion counts TRUE on glass (80 vs 81);
+until then the sketch honestly discloses the store's truncation.
+**Gates:** 1,358 green + 5 xfailed, ruff clean; wheel 1.76.0.

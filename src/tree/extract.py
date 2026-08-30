@@ -159,7 +159,7 @@ class _Extractor:
         self.tree.decision_sites_total += 1
         self.tree.unextracted.append(UnextractedSite(
             site_id=self._next_site_id(), context=context,
-            reason_code=reason_code, expression_sql=sql_text[:500]))
+            reason_code=reason_code, expression_sql=sql_text[:4000]))
 
     def add_site(self, context: str, condition) -> None:
         site_id = self._next_site_id()
@@ -325,7 +325,7 @@ class _Extractor:
                     site_id=path, context=context,
                     reason_code=f"unmodeled_construct:Comparison."
                                 f"{node.ComparisonType}",
-                    expression_sql=_verbatim(node)[:500]))
+                    expression_sql=_verbatim(node)[:4000]))
                 return None
             return self._leaf(node, context, path, op,
                               principal_side=node.FirstExpression)
@@ -348,7 +348,7 @@ class _Extractor:
             self.tree.unextracted.append(UnextractedSite(
                 site_id=path, context=context,
                 reason_code=f"unmodeled_construct:Ternary.{kind}",
-                expression_sql=_verbatim(node)[:500]))
+                expression_sql=_verbatim(node)[:4000]))
             return None
 
         if tn == "LikePredicate":
@@ -377,7 +377,7 @@ class _Extractor:
         self.tree.unextracted.append(UnextractedSite(
             site_id=path, context=context,
             reason_code=f"unmodeled_construct:{tn}",
-            expression_sql=_verbatim(node)[:500]))
+            expression_sql=_verbatim(node)[:4000]))
         return None
 
     # -- context collection over a statement -----------------------------

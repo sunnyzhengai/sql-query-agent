@@ -522,7 +522,16 @@ The hold lifts only by Sunny's explicit word, recorded here.
       expression_sql + IN-lists sketch to counts (contrast now
       criterion-first: "IN (80 values)" vs "(81)"); set_summary
       live-verified + asserted on literal-set deltas. 1,356 green
-      + ruff. AWAITS review → Sunny's ONE restart for 2+2b+3.
+      + ruff. **Probe found CONSOLE-2c (false counts + bare
+      names).**
+- [x] **CONSOLE-2c BUILT (08-30 dev, 1.76.0)** — false counts
+      root-caused to the STORE's 500-char expression cap (raised
+      to 4000; sketch DISCLOSES on truncated stores, never
+      fabricates); bare-name class GENERATOR-KILLED (every member
+      render through _member_display; collision gate holds all
+      card fields). 1,358 green + ruff. SUNNY LINE: publish 1.76
+      env + 300 rerun → true counts on glass. AWAITS review →
+      Sunny's one restart.
 
 ## RULED (Sunny, 2026-08-29): THE GENERATOR CLAUSE — Echo Law amendment
 "Fail twice, no matter the cause, triggers an investigation."

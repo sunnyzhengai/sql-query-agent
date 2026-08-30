@@ -156,7 +156,7 @@ class GraphBuilder:
                     "metric_id": metric_id, "step_name": step_name,
                     "site_id": site_id, "context": context,
                     "predicate_count": predicate_count,
-                    "expression_sql": expression_sql[:500],
+                    "expression_sql": expression_sql[:4000],
                 },
             )
         return node_id

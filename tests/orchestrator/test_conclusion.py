@@ -419,4 +419,30 @@ class TestConsole2b:
         c = compose_conclusion(self._codeset_outputs(), "", True)
         assert c["set_summary"], "literal-set delta gave no summary"
         assert "80 value(s) shared" in c["set_summary"]
-        assert "E11.80 only in Diabetic Codeset" in c["set_summary"]
+        # CONSOLE-2c acceptance: the colliding member is QUALIFIED
+        assert ("E11.80 only in Diabetic Codeset "
+                "(reports.USP_CodesetB)") in c["set_summary"]
+
+    def test_collision_gate_every_member_render_qualifies(self):
+        """CONSOLE-2c generator kill: with colliding names, EVERY
+        member-name field on the card is qualified — bare renders
+        are unwritable (this gate goes red on any new surface)."""
+        c = compose_conclusion(self._codeset_outputs(), "", True)
+        for fp in c["fingerprints"]:
+            assert fp["name"].endswith(f"({fp['id']})"), fp["name"]
+        assert "(reports.USP_CodesetB)" in c["set_summary"]
+
+    def test_truncated_store_expression_never_fabricates_a_count(self):
+        """CONSOLE-2c item 1: the old 500-char store cap made both
+        codesets sketch 'IN (49 values)' — a truncated expression
+        DISCLOSES (≥N + the cure), never states a false count."""
+        from src.orchestrator.conclusion import _criterion_sketch
+        full = ("ED.DX_CODE IN ("
+                + ", ".join(f"'E11.{i:02d}'" for i in range(80))
+                + ")")
+        assert _criterion_sketch(full) == "ED.DX_CODE IN (80 values)"
+        cut = full[:500]
+        sketch = _criterion_sketch(cut)
+        assert "49 values)" not in sketch
+        assert sketch.startswith("ED.DX_CODE IN (≥")
+        assert "truncated in this store" in sketch

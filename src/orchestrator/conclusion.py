@@ -74,14 +74,42 @@ def _diff_lines(compare_rows: "list[dict]") -> "list[str]":
 
 def _criterion_sketch(raw: str) -> str:
     """The decision predicate, one-breath sized: long IN-lists
-    summarize to column + value count (CONSOLE-2b)."""
+    summarize to column + value count (CONSOLE-2b). CONSOLE-2c:
+    COUNTS MUST BE TRUE — a store-truncated expression (the old
+    500-char cap produced "IN (49 values)" against a real 80)
+    discloses instead of fabricating; the raised cap + a 300 rerun
+    make counts true again."""
     import re as _re
     raw = " ".join(str(raw).split())
     m = _re.match(r"(\S+)\s+(?:NOT\s+)?IN\s*\(", raw,
                   _re.IGNORECASE)
     if m and raw.count(",") >= 3:
+        truncated = (not raw.rstrip().endswith(")")
+                     or raw.count("'") % 2 == 1)
+        if truncated:
+            return (f"{m.group(1)} IN (≥{raw.count(',') + 1} "
+                    "values — list truncated in this store; a "
+                    "graph rebuild restores the true count)")
         return f"{m.group(1)} IN ({raw.count(',') + 1} values)"
     return raw[:80]
+
+
+def _member_display(retrieved: "dict[str, dict]", mid: str) -> str:
+    """CONSOLE-2c GENERATOR KILL (the bare-name class, third
+    surface): EVERY member-name render goes through this — a name
+    another member shares renders QUALIFIED with its id; bare
+    rendering of colliding members is unwritable (the collision
+    gate in tests holds every card field)."""
+    row = retrieved.get(mid, {})
+    name = str(row.get("business_name") or row.get("name") or mid)
+    for oid, other in retrieved.items():
+        if oid == mid:
+            continue
+        oname = str(other.get("business_name")
+                    or other.get("name") or oid)
+        if oname == name:
+            return f"{name} ({mid})"
+    return name
 
 
 def _as_names(v) -> "list[str]":
@@ -182,8 +210,7 @@ def compose_conclusion(outputs: "list[dict]", caption: str,
             desc = str(row.get("description") or "")
             fingerprints.append({
                 "id": mid,
-                "name": (row.get("business_name")
-                         or row.get("name") or mid),
+                "name": _member_display(retrieved, mid),
                 "owner": owner,
                 "reads": _as_names(row.get("source_tables"))[:5],
                 "criterion": criterion,
@@ -232,9 +259,7 @@ def compose_conclusion(outputs: "list[dict]", caption: str,
                 if len(sa) < 3 and len(sb) < 3:
                     continue          # not a literal-set diff
                 def _side_name(exemplar: str) -> str:
-                    row2 = retrieved.get(exemplar, {})
-                    return str(row2.get("business_name")
-                               or row2.get("name") or exemplar)
+                    return _member_display(retrieved, exemplar)
                 shared = len(sa & sb)
                 bits = [f"{shared} value(s) shared"]
                 for tok in sorted(sb - sa)[:4]:
