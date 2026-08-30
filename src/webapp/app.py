@@ -74,6 +74,7 @@ def create_app(
     run_unbound: str = "",
     planner: bool = False,
     escalation_contact: str = "",
+    events_path=None,
 ) -> FastAPI:
     app = FastAPI(title=product_name(), docs_url=None, redoc_url=None)
     conversations: "dict[str, Conversation]" = {}
@@ -244,6 +245,30 @@ def create_app(
 
     # ---- the one-mind turn (ADR 0051) -------------------------------
 
+    def _with_provenance(card: "dict | None") -> "dict | None":
+        """FLYWHEEL-1: cards DISCLOSE usage with provenance
+        ("confirmed N× · run M× — no official designated") — facts
+        from the captured decision events, stamped onto definition
+        and map cards by id; silent when the store is unreadable."""
+        if card is None or events_path is None:
+            return card
+        try:
+            from src.flywheel import provenance_line, usage_weights
+            weights = usage_weights(events_path)
+        except Exception:   # noqa: BLE001 — disclosure is additive
+            return card
+        if card.get("kind") == "definition" and card.get("id"):
+            line = provenance_line(weights.get(str(card["id"])))
+            if line:
+                card["provenance"] = line
+        if card.get("kind") == "map":
+            for item in card.get("items") or []:
+                line = provenance_line(
+                    weights.get(str(item.get("id"))))
+                if line:
+                    item["provenance"] = line
+        return card
+
     def _ask_finish(user: str, conv_id: str, conv: Conversation,
                     question: str, turn: dict) -> dict:
         """Record the turn event and build the response payload —
@@ -285,8 +310,8 @@ def create_app(
             "caption_corrected": turn["caption_corrected"],
             "caption_violations": turn["caption_violations"],
             "answered": turn["answered"],
-            "conclusion": compose_conclusion(
-                turn["outputs"], turn["answer"], turn["answered"]),
+            "conclusion": _with_provenance(compose_conclusion(
+                turn["outputs"], turn["answer"], turn["answered"])),
             "folded_refs": turn.get("folded_refs", []),
             "missing_op": turn["missing_op"],
             "loop_status": (f"one mind: {turn['rounds']} tool round(s)"
@@ -678,6 +703,21 @@ def create_app(
                              "mailto": mailto,
                              "contact": escalation_contact})
 
+    @app.get("/api/mine")
+    async def mine(request: Request) -> JSONResponse:
+        """FLYWHEEL-1: the Ground-Truth Shelf v1 — My definitions /
+        My reports / My questions from the captured decision events
+        (single-user; replay = the saved question re-posts)."""
+        if events_path is None:
+            return JSONResponse(
+                {"error": "refusal", "reason_class": "unconfigured",
+                 "message": "the shelf reads the local event store — "
+                            "unavailable on this deployment"},
+                status_code=503)
+        from src.flywheel import my_shelf
+        return JSONResponse(my_shelf(events_path,
+                                     _user_from(request)))
+
     @app.post("/api/ask/stream")
     async def ask_stream(request: Request):
         """The same turn, streamed (walk W2, 2026-08-23): each op's
@@ -935,6 +975,14 @@ WORKBENCH_PAGE = """<!doctype html>
   .showbox { margin:8px 0 2px; }
   .showline { font-size:13.5px; margin:3px 0; }
   .matchrow { margin-right:12px; font-size:13px; }
+  #minebar { margin:0 0 10px; font-size:13px; color:#3a4160; }
+  #minebar summary { cursor:pointer; font:12.5px ui-monospace,monospace;
+    color:#6b7080; }
+  .mine-sec { margin:6px 0; }
+  .mine-row { margin:2px 0 2px 10px; }
+  .replaybtn { padding:1px 8px; border-radius:6px; font-size:11.5px;
+    border:1px solid var(--accent); background:#fff;
+    color:var(--accent); cursor:pointer; }
   .concl { border-left:4px solid var(--accent); }
   .cc-machine { font:12.5px ui-monospace,monospace; color:#3a4160;
     margin:6px 0; }
@@ -985,6 +1033,8 @@ WORKBENCH_PAGE = """<!doctype html>
 <body>
 <header>__PRODUCT__ workbench <span>· ask about your certified metrics — every
 operation shown, confirmed by you, results are the answer</span></header>
+<details id="minebar"><summary>my shelf — definitions, reports,
+saved questions</summary><div class="minebody"></div></details>
 <div id="log"></div>
 <form id="ask"><input id="q" autocomplete="off"
   placeholder="e.g. are all definitions of Base_Pop_Severe_ED_Scores the same?">
@@ -1263,6 +1313,7 @@ function renderConclusion(j) {
     return el(`<div class="caption concl">
       <div class="cc-item"><b>${esc(c.name)}</b> — ${esc(c.description)}</div>
       ${c.criteria ? `<div class="cc-machine">criteria: <code>${esc(c.criteria)}</code></div>` : ''}
+      ${c.provenance ? `<div class="cc-machine">${esc(c.provenance)}</div>` : ''}
       ${proseHtml}${based}</div>`);
   }
   if (c.kind === 'policy_refusal') {
@@ -1317,6 +1368,7 @@ function renderConclusion(j) {
         bits.push('steps: ' + i.steps.join(', '));
       if (i.source_tables && i.source_tables.length)
         bits.push('reads: ' + i.source_tables.join(', '));
+      if (i.provenance) bits.push(i.provenance);
       return `<div class="cc-item"><b>${esc(i.name)}</b>
         <span class="cite">${esc(i.record_kind || '')}</span>
         ${i.description ? ' — ' + esc(i.description) : ''}
@@ -1686,6 +1738,36 @@ function renderParseCard(j, message) {
   return card;   // RW-19: the DOM smoke inspects the wired card
 }
 
+// FLYWHEEL-1: the Ground-Truth Shelf — replay is a saved operation
+async function loadShelf() {
+  const bar = document.getElementById('minebar');
+  if (!bar) return;
+  try {
+    const r = await fetch('/api/mine');
+    if (!r.ok) { bar.style.display = 'none'; return; }
+    const j = await r.json();
+    const sec = (title, rows, fmt) => (rows && rows.length)
+      ? `<div class="mine-sec"><b>${title}</b>${rows.map(fmt).join('')}</div>`
+      : '';
+    bar.querySelector('.minebody').innerHTML =
+      sec('My definitions', j.definitions, d =>
+        `<div class="mine-row">${esc(d.id)}
+         <span class="cite">${esc(d.usage)}</span></div>`) +
+      sec('My reports', j.reports, d =>
+        `<div class="mine-row">${esc(d.id)}
+         <span class="cite">${esc(d.usage)}</span></div>`) +
+      sec('My questions', j.questions, qq =>
+        `<div class="mine-row"><button class="replaybtn"
+          data-q="${esc(qq)}">replay</button> ${esc(qq)}</div>`);
+    bar.querySelectorAll('.replaybtn').forEach(b =>
+      b.addEventListener('click', () => {
+        q.value = b.dataset.q;
+        document.getElementById('ask').dispatchEvent(
+          new Event('submit', { cancelable: true }));
+      }));
+  } catch (e) { /* shelf is additive — never breaks the page */ }
+}
+
 document.getElementById('ask').addEventListener('submit', async (e) => {
   e.preventDefault();
   const message = q.value.trim();
@@ -1714,8 +1796,10 @@ document.getElementById('ask').addEventListener('submit', async (e) => {
     add(el(`<p class="err">${esc(e2.message || e2)}</p>`));
   }
   askbtn.disabled = false; q.focus();
+  loadShelf();
 });
 q.focus();
+loadShelf();
 </script>
 </body></html>
 """

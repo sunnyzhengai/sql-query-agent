@@ -390,7 +390,15 @@ The hold lifts only by Sunny's explicit word, recorded here.
       extra queries); deterministic relevance bar (stem token in
       name/description — junk still misses honestly); prunes are
       captured [PRUNE] decisions. 1,258 green + ruff. AWAITS
-      review verification. NEXT: FLYWHEEL-1.
+      review verification.
+- [x] **FLYWHEEL-1 BUILT (08-29 dev, 1.67.0)** — src/flywheel.py
+      (0056 v1): usage weights from the four decision classes;
+      definition/map cards disclose provenance ("confirmed N× ·
+      run M× — no official designated"); Ground-Truth Shelf v1
+      (/api/mine + folding panel: definitions/reports/questions w/
+      REPLAY). Promotion ladder stubs at single-user as ordered.
+      1,268 green + ruff. **THE AUTHORIZED QUEUE IS FULLY
+      DELIVERED.** AWAITS review verification.
 
 ## RULED (Sunny, 2026-08-29): THE GENERATOR CLAUSE — Echo Law amendment
 "Fail twice, no matter the cause, triggers an investigation."

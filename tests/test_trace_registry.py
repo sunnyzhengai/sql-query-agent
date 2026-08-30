@@ -64,8 +64,6 @@ def test_architecture_decisions_carry_code_or_tests():
     sanctioned = {
         "0029",  # design pass, explicitly unimplemented (status line)
         "0034",  # superseded in part by 0035; its artifacts were deleted
-        "0056",  # ACCEPTED, sequenced AFTER CAPTURE — modules land
-                 # with its build order
         "0058",  # DRAFT — Pro-pillar contracts; build lands WITH Pro
         "0057",  # design record by construction — binds design, never
                  # the build queue; no modules ever expected

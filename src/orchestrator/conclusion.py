@@ -183,6 +183,7 @@ def compose_conclusion(outputs: "list[dict]", caption: str,
                            or (sites[0] or {}).get("predicate")
                            or "")[:220]
         return {"kind": "definition",
+                "id": top.get("id"),
                 "name": top.get("business_name") or top.get("id"),
                 "description": top.get("description") or "",
                 "criteria": criteria,
@@ -194,7 +195,8 @@ def compose_conclusion(outputs: "list[dict]", caption: str,
         # single-record definition card must not swallow the rest
         return {"kind": "map",
                 "items": [
-                    {"name": (row.get("business_name")
+                    {"id": row.get("id"),
+                     "name": (row.get("business_name")
                               or row.get("name") or row.get("id")),
                      "record_kind": row.get("kind"),
                      "of_metric": row.get("of_metric"),

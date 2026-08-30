@@ -2481,3 +2481,29 @@ works and immediately caught real gaps. ORDER FUZZ-FINDINGS-1:
    same_or_different, defines over {...}) hit confirm 422 —
    multi-relation plans must compose or the card must say why.
 Findings recur nightly until green (fuzzer is a battery stage).
+
+### 2026-08-29 — FLYWHEEL-1 BUILT — release 1.67.0
+**The 0056 mechanism v1 + the Ground-Truth Shelf.** New module
+src/flywheel.py (registered under 0056, which exits the
+no-modules exceptions):
+- **usage_weights:** the captured decision events aggregate per
+  item — confirmed ([PLANNER] turns), run ([RUN]), pruned
+  ([PRUNE]), escalated ([ESCALATE]); engine-answered reads count
+  separately as the weak signal. Missing store = empty, never a
+  crash; single-user filtering built in.
+- **Card provenance:** definition and map cards now DISCLOSE
+  ("confirmed 3× · run 1× — no official designated") — facts from
+  the event store stamped by id at answer-finish time; zero-usage
+  stays silent; disclosure is additive and never load-bearing
+  (OneLake deployments simply omit it, typed).
+- **The Ground-Truth Shelf v1:** /api/mine + a folding "my shelf"
+  panel — My definitions / My reports (usage-ranked) / My
+  questions with a REPLAY button (replay = the saved question
+  re-posts; a saved operation, per the order). Single-user, from
+  the existing TurnEvent store; refreshes after every turn.
+- Promotion mechanics (usage threshold + steward veto, the ruled
+  ladder) stub at single-user as ordered — the weights are the
+  ladder's input when it lands post-capture.
+**Gates:** 1,268 green + 5 xfailed, ruff clean; wheel 1.67.0.
+The Sunny-authorized queue (RW-25 → FUZZER-1 → TIER2-1 →
+FLYWHEEL-1) is now FULLY DELIVERED.

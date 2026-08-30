@@ -593,16 +593,18 @@ TRACE_REGISTRY = {
                  "docs/architecture/SPHERE.md"],
     },
     "0056": {
-        # ACCEPTED 2026-08-25, SEQUENCED AFTER CAPTURE: the decision
-        # algebra (typed user decisions on every answer; deny typed
-        # defect/mismatch/noncompliance with routing; accept-
-        # stewardship). No modules until its build order fires.
+        # ACCEPTED 2026-08-25; FLYWHEEL-1 (Sunny-authorized
+        # 2026-08-29) pulled the v1 MECHANISM forward: usage weights
+        # from captured decision events, card provenance disclosure,
+        # the Ground-Truth Shelf (my definitions/reports/questions,
+        # replay). The full typed-deny algebra + promotion ladder
+        # still land with the post-capture build order.
         "title": "The decision algebra: every answer ends in a "
                  "decision (typed deny, usage weights)",
         "category": "architecture",
         "axioms": [],
-        "modules": [],
-        "tests": [],
+        "modules": ["src/flywheel.py"],
+        "tests": ["tests/test_flywheel.py"],
         "docs": ["docs/decisions/0056-decision-algebra.md"],
     },
     "0055": {

@@ -852,3 +852,52 @@ class TestFuzzer1:
             intents=[{"name": "d", "seed": "x",
                       "oracle": {"kind": "flags"}}])
         assert any("card kind" in f for f in result["findings"])
+
+
+class TestFlywheel1Surface:
+    """FLYWHEEL-1 web half: /api/mine serves the shelf; cards carry
+    provenance lines from the captured decisions."""
+
+    def _client(self, tmp_path):
+        from src.orchestrator.events import JsonlEventSink
+        path = tmp_path / "events.jsonl"
+        sink = JsonlEventSink(path)
+        maker = TestCardEverywhere()
+        app = create_app(maker._api(["ED Sepsis Screening"], []),
+                         fake_kql, sink, planner=True,
+                         events_path=path)
+        return TestClient(app)
+
+    def test_mine_serves_the_shelf_after_a_confirm(self, tmp_path):
+        client = self._client(tmp_path)
+        r1 = client.post("/api/ask", json={"message": "about sepsis"})
+        conv = r1.json()["conversation_id"]
+        client.post("/api/parse/confirm",
+                    json={"conversation_id": conv})
+        shelf = client.get("/api/mine").json()
+        assert shelf["definitions"], "no definitions on the shelf"
+        assert "about sepsis" in shelf["questions"]
+
+    def test_definition_card_carries_provenance(self, tmp_path):
+        client = self._client(tmp_path)
+        for _ in range(2):
+            r1 = client.post("/api/ask",
+                             json={"message": "about sepsis"})
+            client.post("/api/parse/confirm", json={
+                "conversation_id": r1.json()["conversation_id"]})
+        r = client.post("/api/ask", json={"message": "about sepsis"})
+        fin = client.post("/api/parse/confirm", json={
+            "conversation_id": r.json()["conversation_id"]}).json()
+        concl = fin["conclusion"]
+        blob = json.dumps(concl)
+        assert "no official designated" in blob
+        assert "confirmed" in blob
+
+    def test_mine_unconfigured_refuses_typed(self, tmp_path):
+        from src.orchestrator.events import JsonlEventSink
+        sink = JsonlEventSink(tmp_path / "e.jsonl")
+        maker = TestCardEverywhere()
+        app = create_app(maker._api([], []), fake_kql, sink)
+        r = TestClient(app).get("/api/mine")
+        assert r.status_code == 503
+        assert r.json()["reason_class"] == "unconfigured"

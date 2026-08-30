@@ -673,6 +673,10 @@ classification).
 ## ADR 0056 — The decision algebra: every answer ends in a decision (typed deny, usage weights)
 
 - **Category:** architecture
+- **Implemented by:**
+  - `src/flywheel.py`
+- **Enforced by:**
+  - `tests/test_flywheel.py`
 - **Summarized in:**
   - `docs/decisions/0056-decision-algebra.md`
 

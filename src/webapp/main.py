@@ -183,11 +183,20 @@ def build() -> "object":
                           .get("contact") or "").strip()
         except Exception:   # noqa: BLE001, S110 — optional block
             pass
+    # FLYWHEEL-1: the shelf + card provenance read the LOCAL event
+    # store; the OneLake sink is write-only, so those surfaces stay
+    # typed-unavailable there (additive, never load-bearing)
+    ev_path = os.environ.get("SQA_EVENTS_PATH",
+                             "data/events/turn_events.jsonl")
+    events_file = (Path(ev_path)
+                   if not legacy_env("EVENTS_ONELAKE_URL", "")
+                   else None)
     return create_app(azure_chat_api(), _kusto_run(), _sink(),
                       _marketplace(), run_executor=executor,
                       run_cap=cap, run_source=source,
                       run_unbound=unbound, planner=True,
-                      escalation_contact=contact)
+                      escalation_contact=contact,
+                      events_path=events_file)
 
 
 app = build() if legacy_env("WEBAPP_EAGER", "1") != "0" else None
