@@ -138,6 +138,12 @@ rides the planner; awaits review verification + Sunny's re-ask).
 - [ ] 0056 decision layer + presentation reframe (POST-capture by
       ruling; incl. every-round decision UI, cluster-table
       retirement census outcome)
+- [ ] Shelf standing-confirmation mechanics (0061 call 3 RULED
+      08-29: shelf items stay runnable, the shelf IS the
+      confirmation; change propagation invalidates an entry when
+      its definition changes) — sequenced, no order yet; shelf v1
+      replays the question (re-confirm via the card), which is
+      correct until the saved-operation form lands
 
 ## 👩‍⚕️ SUNNY'S OPEN DECISIONS (no deadline pressure)
 
