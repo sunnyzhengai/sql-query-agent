@@ -3203,3 +3203,27 @@ diff_lines only.
    payload) — the literal-set distiller must fire on this path;
    assert non-empty when a literal-set delta exists.
 Acceptance unchanged: Sunny's one-breath read on a FRESH compare.
+
+### 2026-08-30 — CONSOLE-2b BUILT — release 1.75.1
+1. **The console page renders the COMPOSER'S card in full** —
+   set_summary lead, owner contrast, fingerprint rows (name ·
+   owner · reads · criterion · why), the diff folded under its
+   labeled receipt. The DOM harness gained a CONSOLE-PAGE mode
+   with the ordered RED-FIRST case: renderEvidence is fed a full
+   fingerprints payload and every field must appear in the
+   rendered text — a payload-ignoring renderer structurally
+   cannot pass.
+2. **Criterion covers the store's shape:** decision sites carry
+   `expression_sql` (the composer read `expression`/`predicate` —
+   the live diagnosis found the gap in one probe); IN-list
+   predicates sketch as "ED.DX_CODE IN (80 values)" — the
+   one-breath criterion, and the contrast line becomes
+   criterion-first exactly as specified ("reporting — IN (80
+   values); reports — IN (81 values)").
+3. **set_summary asserted:** live re-compose on the codeset
+   cluster yields "80 value(s) shared · E11.80 only in Diabetic
+   Codeset" (the probe's empty was a stale pre-restart server);
+   a codeset-shaped fixture now ASSERTS non-empty whenever a
+   literal-set delta exists, so any real regression is red.
+**Gates:** 1,356 green + 5 xfailed, ruff clean; wheel 1.75.1.
+Sunny's one restart now carries CONSOLE-2 + 2b + 3 together.

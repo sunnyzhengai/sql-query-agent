@@ -140,7 +140,8 @@ function parseHTML(html) {
 // ---- document / environment stubs ------------------------------------
 
 const byId = {};
-for (const id of ['log', 'q', 'askbtn', 'ask', 'graphpanel']) {
+for (const id of ['log', 'q', 'askbtn', 'ask', 'graphpanel',
+                  'persona', 'inbox', 'inboxnote']) {
   byId[id] = new El(id === 'ask' ? 'form' : 'div');
   byId[id].attrs['id'] = id;
   byId[id].value = '';
@@ -188,6 +189,48 @@ function expectListeners(card, sel, want, name) {
   if (!want && el2) {
     failures.push(name + ': ' + sel + ' should not exist');
   }
+}
+
+// ---- console-page mode (CONSOLE-2b red-first) ------------------------
+
+const MODE = process.argv[3] || 'workbench';
+
+function textOf(node) {
+  let out = node.textContent || '';
+  for (const c of node.children) out += ' ' + textOf(c);
+  return out;
+}
+
+if (MODE === 'console') {
+  check('console evidence renders the FULL composer card '
+      + '(red-first: a payload-ignoring renderer fails)', () => {
+    const node = renderEvidence({
+      verdict: 'DIFFERS',
+      set_summary: '80 value(s) shared · E11.80 only in CodesetB',
+      contrast: 'reporting — DX_CODE IN (80 values); '
+        + 'reports — DX_CODE IN (81 values)',
+      fingerprints: [
+        { id: 'a', name: 'Diabetic Codeset', owner: 'reporting',
+          reads: ['DIAGNOSIS_CODES'],
+          criterion: 'DX_CODE IN (80 values)',
+          description: 'the hand-maintained list' }],
+      diff_label: 'receipt: − a · + b',
+      diff_lines: ['+ E11.80 — present only in one definition'],
+    }, '2 hash groups');
+    const text = textOf(node);
+    for (const want of ['80 value(s) shared',
+                        'DX_CODE IN (80 values)',
+                        'Diabetic Codeset', 'DIAGNOSIS_CODES',
+                        'receipt: − a · + b',
+                        'the hand-maintained list']) {
+      if (!text.includes(want)) {
+        throw new Error('payload field not rendered: ' + want);
+      }
+    }
+  });
+  console.log(JSON.stringify({ ok: failures.length === 0,
+                               failures }));
+  process.exit(0);
 }
 
 // ---- every card variant renders and wires ----------------------------

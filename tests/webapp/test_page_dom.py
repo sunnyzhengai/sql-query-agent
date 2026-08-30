@@ -19,6 +19,33 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[2]
 
 
+def _run_harness(tmp_path, page_text, mode):
+    import shutil
+    import subprocess
+    node = shutil.which("node")
+    assert node, "node required for the DOM smoke leg"
+    m = re.search(r"<script>\n(.*)\n</script>", page_text,
+                  re.DOTALL)
+    assert m, "page script block not found"
+    script = tmp_path / f"{mode}_script.js"
+    script.write_text(m.group(1))
+    out = subprocess.run(
+        [node, str(REPO / "tests" / "webapp" / "dom_harness.js"),
+         str(script), mode],
+        capture_output=True, text=True, timeout=60)
+    assert out.returncode == 0, out.stderr[:800]
+    verdict = json.loads(out.stdout.strip().splitlines()[-1])
+    assert verdict["ok"], "\n".join(verdict["failures"])
+
+
+def test_console_page_renders_the_full_composer_card(tmp_path):
+    """CONSOLE-2b red-first: the console page's evidence renderer
+    must render EVERY composer field — set_summary, contrast,
+    fingerprints, labeled receipt; ignoring the payload fails."""
+    from src.webapp.app import CONSOLE_PAGE
+    _run_harness(tmp_path, CONSOLE_PAGE, "console")
+
+
 def test_every_card_variant_renders_and_wires(tmp_path):
     node = shutil.which("node")
     assert node, ("node is required for the DOM smoke leg (RW-19) — "

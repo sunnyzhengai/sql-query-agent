@@ -72,6 +72,18 @@ def _diff_lines(compare_rows: "list[dict]") -> "list[str]":
     return []
 
 
+def _criterion_sketch(raw: str) -> str:
+    """The decision predicate, one-breath sized: long IN-lists
+    summarize to column + value count (CONSOLE-2b)."""
+    import re as _re
+    raw = " ".join(str(raw).split())
+    m = _re.match(r"(\S+)\s+(?:NOT\s+)?IN\s*\(", raw,
+                  _re.IGNORECASE)
+    if m and raw.count(",") >= 3:
+        return f"{m.group(1)} IN ({raw.count(',') + 1} values)"
+    return raw[:80]
+
+
 def _as_names(v) -> "list[str]":
     # RW-23 (Sunny's walk find): source_tables arrives as a STRING
     # on metric facts — iterating it spelled "DIAGNOSIS_CODES" as
@@ -158,9 +170,15 @@ def compose_conclusion(outputs: "list[dict]", caption: str,
             owner = (mid.split(":", 2)[1] if ":" in mid
                      else mid.rsplit(".", 1)[0])
             sites = row.get("decision_sites") or []
-            criterion = str((sites[0] or {}).get("expression")
-                            or (sites[0] or {}).get("predicate")
-                            or "")[:80] if sites else ""
+            # CONSOLE-2b item 2: sites carry expression_sql on the
+            # store; IN-list predicates sketch as "COL IN (N
+            # values)" — the one-breath criterion, never an
+            # 80-literal wall
+            raw_expr = str((sites[0] or {}).get("expression")
+                           or (sites[0] or {}).get("expression_sql")
+                           or (sites[0] or {}).get("predicate")
+                           or "") if sites else ""
+            criterion = _criterion_sketch(raw_expr)
             desc = str(row.get("description") or "")
             fingerprints.append({
                 "id": mid,

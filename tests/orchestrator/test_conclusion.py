@@ -362,3 +362,61 @@ class TestConsole2Fingerprints:
                                      "reports.USP_MED"]}]
         c = compose_conclusion(outs, "", True)
         assert c["contrast"] == ""
+
+
+class TestConsole2b:
+    """CONSOLE-2b: criterion covers store-shaped decision sites
+    (expression_sql, IN-lists sketch to counts) and set_summary
+    MUST compose whenever a literal-set delta exists."""
+
+    def _codeset_outputs(self):
+        codes_a = ", ".join(f"'E11.{i:02d}'" for i in range(80))
+        codes_b = codes_a + ", 'E11.80'"
+        diff = ("--- a\n+++ b\n"
+                f"-WHERE ED.DX_CODE IN ({codes_a})\n"
+                f"+WHERE ED.DX_CODE IN ({codes_b})")
+        return [
+            {"component": {"op": "retrieve", "params": {}},
+             "result": {"op": "retrieve", "params": {},
+                        "complete": True, "universe": "u",
+                        "rows": [
+                {"id": "reporting.USP_CodesetA", "kind": "metric",
+                 "business_name": "Diabetic Codeset",
+                 "description": "The hand-maintained list.",
+                 "source_tables": "DIAGNOSIS_CODES",
+                 "decision_sites": [{
+                     "expression_sql":
+                         f"ED.DX_CODE IN ({codes_a})"}]},
+                {"id": "reports.USP_CodesetB", "kind": "metric",
+                 "business_name": "Diabetic Codeset",
+                 "description": "The other list.",
+                 "source_tables": "DIAGNOSIS_CODES",
+                 "decision_sites": [{
+                     "expression_sql":
+                         f"ED.DX_CODE IN ({codes_b})"}]}]}},
+            {"component": {"op": "compare", "params": {}},
+             "result": {"op": "compare", "params": {},
+                        "complete": True, "universe": "u",
+                        "note": "2 hash groups — DIFFERS.",
+                        "rows": [
+                {"group": 1,
+                 "members": ["reporting.USP_CodesetA"],
+                 "diff_between_two_largest_groups": diff},
+                {"group": 2,
+                 "members": ["reports.USP_CodesetB"]}]}},
+        ]
+
+    def test_criterion_sketches_the_in_list(self):
+        c = compose_conclusion(self._codeset_outputs(), "", True)
+        fps = {fp["id"]: fp for fp in c["fingerprints"]}
+        assert fps["reporting.USP_CodesetA"]["criterion"] == \
+            "ED.DX_CODE IN (80 values)"
+        assert fps["reports.USP_CodesetB"]["criterion"] == \
+            "ED.DX_CODE IN (81 values)"
+        assert "IN (80 values)" in c["contrast"]
+
+    def test_set_summary_composes_on_a_literal_set_delta(self):
+        c = compose_conclusion(self._codeset_outputs(), "", True)
+        assert c["set_summary"], "literal-set delta gave no summary"
+        assert "80 value(s) shared" in c["set_summary"]
+        assert "E11.80 only in Diabetic Codeset" in c["set_summary"]

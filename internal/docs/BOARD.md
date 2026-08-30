@@ -513,8 +513,16 @@ The hold lifts only by Sunny's explicit word, recorded here.
       X"; lists stay folded); certify → the three-outcome chooser
       w/ member picker (landing map = 9 verbs, totality extended;
       picker verbs refuse memberless; members ride decisions,
-      never fold keys). 1,353 green + ruff. AWAITS review → Sunny
-      restarts ONCE for 2+3 together.
+      never fold keys). 1,353 green + ruff. **VERIFIED
+      code-side.** Review's probe then found CONSOLE-2b (page
+      ignored the composer).
+- [x] **CONSOLE-2b BUILT (08-30 dev, 1.75.1)** — console page
+      renders the full composer card (RED-FIRST DOM case: a
+      payload-ignoring renderer cannot pass); criterion reads
+      expression_sql + IN-lists sketch to counts (contrast now
+      criterion-first: "IN (80 values)" vs "(81)"); set_summary
+      live-verified + asserted on literal-set deltas. 1,356 green
+      + ruff. AWAITS review → Sunny's ONE restart for 2+2b+3.
 
 ## RULED (Sunny, 2026-08-29): THE GENERATOR CLAUSE — Echo Law amendment
 "Fail twice, no matter the cause, triggers an investigation."

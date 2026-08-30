@@ -2142,6 +2142,7 @@ CONSOLE_PAGE = """<!doctype html>
   #personabar { margin-bottom:14px; font-size:13px; }
   .diffline { font:12px ui-monospace,monospace; }
   .diffline.plus { color:#2c5e2e; } .diffline.minus { color:#8a2a24; }
+  .cc-item { margin:6px 0; font-size:13.5px; }
 </style></head><body>
 <h2>__PRODUCT__ — resolution console</h2>
 <div id="personabar">acting as
@@ -2157,6 +2158,40 @@ function esc(s) { const t = document.createElement('span');
   t.textContent = String(s ?? ''); return t.innerHTML; }
 function el(html) { const d = document.createElement('div');
   d.innerHTML = html; return d.firstElementChild; }
+
+// CONSOLE-2b: the page renders the COMPOSER'S card in full —
+// set_summary lead, owner contrast, fingerprint rows, the diff
+// folded under its labeled receipt. The DOM harness holds a
+// RED-FIRST case on this function: a renderer that ignores the
+// payload cannot pass.
+function renderEvidence(c, headline) {
+  const fps = (c.fingerprints || []).map(fp =>
+    '<div class="cc-item"><b>' + esc(fp.name) + '</b> '
+    + '<span class="badge state">' + esc(fp.owner) + '</span>'
+    + (fp.reads && fp.reads.length
+      ? '<div class="members">reads: ' + esc(fp.reads.join(', '))
+        + '</div>' : '')
+    + (fp.criterion
+      ? '<div class="members">criterion: ' + esc(fp.criterion)
+        + '</div>' : '')
+    + (fp.description
+      ? '<div class="why">' + esc(fp.description) + '</div>' : '')
+    + '</div>').join('');
+  const diffs = (c.diff_lines || []).map(l =>
+    '<div class="diffline ' + (l.startsWith('+') ? 'plus'
+      : 'minus') + '">' + esc(l) + '</div>').join('');
+  return el('<div class="evidence"><b>' + esc(c.verdict
+      || 'COMPARED') + '</b> — ' + esc(headline)
+    + (c.set_summary ? '<div class="cc-item"><b>'
+        + esc(c.set_summary) + '</b></div>' : '')
+    + (c.contrast ? '<div class="cc-item">' + esc(c.contrast)
+        + '</div>' : '')
+    + fps
+    + (diffs ? '<details><summary>' + esc(c.diff_label
+        || 'the raw diff (receipt)') + '</summary>' + diffs
+        + '</details>' : '')
+    + '</div>');
+}
 
 function certifyChooser(f, card) {
   // CONSOLE-3: certify has a TARGET and an OUTCOME — the choice a
@@ -2206,13 +2241,8 @@ async function act(verb, id, card, memberIds) {
     return;
   }
   if (verb === 'compare' && j.evidence) {
-    const c = (j.evidence.conclusion || {});
-    const diffs = (c.diff_lines || []).map(l =>
-      '<div class="diffline ' + (l.startsWith('+') ? 'plus'
-        : 'minus') + '">' + esc(l) + '</div>').join('');
-    card.appendChild(el('<div class="evidence"><b>' +
-      esc(c.verdict || 'COMPARED') + '</b> — ' +
-      esc(j.evidence.headline || '') + diffs + '</div>'));
+    card.appendChild(renderEvidence(j.evidence.conclusion || {},
+                                    j.evidence.headline || ''));
     return;
   }
   card.appendChild(el('<div class="evidence">recorded — grade: ' +
