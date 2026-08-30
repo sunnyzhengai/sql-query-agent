@@ -539,3 +539,21 @@ watcher) continue. Input: Sunny's architect conversation
 (metadata pain validated; chat = value front-end, catalog sync =
 enterprise entry ticket; moat = deterministic parse + tenant-local
 + closed loop).
+
+## ▶️ PAUSE LIFTED — Sunny, 2026-08-30
+Tier lock complete (0063 ACCEPTED, total landing map in). Dev
+resumes on the TIER-LOCKED QUEUE, recommended order ratified by
+the lift:
+1. **X-RAY-1** — productize the sweep into the diagnostic report
+   (their counts, flags w/ code basis, AI-readiness verdict) +
+   engagement runbook. The wedge.
+2. **BRIDGE-1 stage 1** — file exporters from approved review
+   sets: Collibra Data Intake Excel/CSV (incl. relations) +
+   Purview glossary CSV, every row provenance-graded. Also hands
+   Sunny a real file for her Purview import experiments.
+3. **CONSOLE-1** — the Inbox: flag-driven sessions, the button
+   verbs (compare · certify · delegate · deny | approve-technical
+   · fork), two-persona approval flows, all atop the existing
+   engine; every landing per 0063's total map.
+Scope lock in force: new ideas get a tier box before any build.
+Review verifies each delivery per the standing loop.
