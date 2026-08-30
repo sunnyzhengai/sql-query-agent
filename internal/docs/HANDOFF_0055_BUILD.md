@@ -2305,3 +2305,15 @@ review's assertions run on real table names, never on kinds alone —
 the kind-only-assertion blindness closed.
 **Gates:** 1,245 green + 5 xfailed, ruff clean; wheel 1.64.2.
 Ready for review's re-run; green → Sunny resumes the walk.
+
+## ORDER RW-24 (Sunny's census read)
+1. Card text must never use POSITIONAL language ("the table
+   above") — the folded answer-first layout broke every such
+   reference. Overflow/enumeration lines LINK the round ref
+   instead: "…and 25 more — expand R1 for the full table"
+   (refs are already clickable). Sweep all composed text for
+   positional words (above/below).
+2. OPEN CALL (Sunny rules): corpus probes (Line-Ending Probe A/B,
+   Reference Forms Probe, …) in census display — badge as
+   `control` with a split count line (review recommends) / leave
+   as-is / filter from default census.
