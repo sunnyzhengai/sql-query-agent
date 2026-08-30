@@ -3124,3 +3124,21 @@ extends). Single-member flags skip the picker.
 Acceptance: Sunny certifies on the Diabetic Patients cluster and
 is ASKED which of the three acts she means, with members
 pickable.
+
+### 2026-08-30 — CONSOLE-2 BUILT — release 1.74.1
+**Compare leads with MEMBER FINGERPRINTS — one composer, every
+surface.** The compare card now opens with one row per member
+(qualified name · owner cite · reads · the key criterion from its
+top decision site · the RW-6 description), then the
+machine-assembled OWNER-NAMED contrast line ("reporting — DX_CODE
+LIKE 'E11%'; reports — ORDER_NAME IN ('METFORMIN')") — criterion
+first, description-first-clause fallback, never model prose — and
+the raw diff FOLDS beneath as the labeled receipt ("receipt: −
+<idA> · + <idB>"; >2 groups disclose "largest two diffed"). The
+console's compare act now retrieves the members before composing
+(fingerprints have their facts); the planner path already did.
+DOM harness variant updated. 4 composer tests (fingerprint
+fields, owner contrast, receipt label, no-contrast-on-IDENTICAL).
+**Gates:** 1,348 green + 5 xfailed, ruff clean; wheel 1.74.1.
+Acceptance = Sunny reads the Active Diabetic Patients card in one
+breath. CONSOLE-2 amendment + CONSOLE-3 just landed — next.

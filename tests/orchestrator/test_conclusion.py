@@ -297,3 +297,68 @@ class TestGraphPanel1Subgraph:
     def test_empty_turn_is_none(self):
         from src.orchestrator.conclusion import compose_subgraph
         assert compose_subgraph([]) is None
+
+
+class TestConsole2Fingerprints:
+    """CONSOLE-2 (Sunny's glass — "not clear HOW they differ"):
+    compare leads with member fingerprints; the contrast line is
+    machine-assembled naming owners; the diff carries its labeled
+    receipt line. One composer serves every surface."""
+
+    def _outputs(self):
+        return [
+            {"component": {"op": "retrieve", "params": {}},
+             "result": {"op": "retrieve", "params": {},
+                        "complete": True, "universe": "u",
+                        "rows": [
+                {"id": "reporting.USP_DX", "kind": "metric",
+                 "business_name": "Diabetic Patients (DX)",
+                 "description": "Selects by diagnosis codes.",
+                 "source_tables": "DIAGNOSIS_CODES, ENCOUNTERS",
+                 "decision_sites": [
+                     {"expression": "DX_CODE LIKE 'E11%'"}]},
+                {"id": "reports.USP_MED", "kind": "metric",
+                 "business_name": "Diabetic Patients (Med)",
+                 "description": "Selects by medication orders.",
+                 "source_tables": ["MEDICATION_ORDERS"],
+                 "decision_sites": [
+                     {"expression":
+                      "ORDER_NAME IN ('METFORMIN')"}]}]}},
+            {"component": {"op": "compare", "params": {}},
+             "result": {"op": "compare", "params": {},
+                        "complete": True, "universe": "u",
+                        "note": "2 hash groups — DIFFERS.",
+                        "rows": [
+                {"group": 1, "members": ["reporting.USP_DX"]},
+                {"group": 2, "members": ["reports.USP_MED"]}]}},
+        ]
+
+    def test_fingerprints_lead_with_reads_criterion_why(self):
+        c = compose_conclusion(self._outputs(), "", True)
+        assert c["kind"] == "compare"
+        fps = {fp["id"]: fp for fp in c["fingerprints"]}
+        dx = fps["reporting.USP_DX"]
+        assert dx["reads"] == ["DIAGNOSIS_CODES", "ENCOUNTERS"]
+        assert dx["criterion"] == "DX_CODE LIKE 'E11%'"
+        assert dx["description"].startswith("Selects by diagnosis")
+        assert dx["owner"] == "reporting"
+
+    def test_contrast_names_owners_machine_assembled(self):
+        c = compose_conclusion(self._outputs(), "", True)
+        assert "reporting — DX_CODE LIKE 'E11%'" in c["contrast"]
+        assert "reports — ORDER_NAME IN ('METFORMIN')" in \
+            c["contrast"]
+
+    def test_diff_receipt_labels_its_sides(self):
+        c = compose_conclusion(self._outputs(), "", True)
+        assert c["diff_label"] == ("receipt: − reporting.USP_DX · "
+                                   "+ reports.USP_MED")
+
+    def test_identical_verdict_has_no_contrast(self):
+        outs = self._outputs()
+        outs[1]["result"]["note"] = "1 hash group — IDENTICAL."
+        outs[1]["result"]["rows"] = [
+            {"group": 1, "members": ["reporting.USP_DX",
+                                     "reports.USP_MED"]}]
+        c = compose_conclusion(outs, "", True)
+        assert c["contrast"] == ""

@@ -848,9 +848,25 @@ def create_app(
                                 conv.engine.ops)
                 shown = rs.display()
                 shown["headline"] = stamped_headline(shown)
-                outputs = [{"component": {"op": "compare",
-                                          "params": {"refs": [target]}},
-                            "result": shown}]
+                outputs = []
+                # CONSOLE-2: retrieve the members so the card leads
+                # with FINGERPRINTS (reads · criterion · why), not
+                # the raw diff
+                member_ids = [str(m) for row in rs.rows
+                              for m in (row.get("members") or [])]
+                if member_ids:
+                    from src.orchestrator.ops import op_retrieve
+                    ret = op_retrieve(member_ids[:6], run_kql,
+                                      conv.engine.ops)
+                    rshown = ret.display()
+                    rshown["headline"] = stamped_headline(rshown)
+                    outputs.append({"component": {
+                        "op": "retrieve",
+                        "params": {"ids": member_ids[:6]}},
+                        "result": rshown})
+                outputs.append({"component": {"op": "compare",
+                                              "params": {"refs": [target]}},
+                                "result": shown})
                 payload["evidence"] = {
                     "conclusion": compose_conclusion(outputs, "",
                                                      True),
@@ -1154,6 +1170,7 @@ WORKBENCH_PAGE = """<!doctype html>
   .cc-machine { font:12.5px ui-monospace,monospace; color:#3a4160;
     margin:6px 0; }
   .cc-item { margin:6px 0; font-size:13.5px; }
+  .why-line { font-size:12.5px; color:#4a4f5a; }
   .cc-prose { margin-top:8px; }
   .fc-gloss { font-size:12.5px; font-style:italic; color:#6b7080;
     margin-top:2px; }
@@ -1474,14 +1491,31 @@ function renderConclusion(j) {
       <div class="cc-machine">${esc(c.closing)}</div>${based}</div>`);
   }
   if (c.kind === 'compare') {
+    // CONSOLE-2: fingerprints LEAD; the diff folds as the
+    // labeled receipt beneath
+    const fps = (c.fingerprints || []).map(fp =>
+      `<div class="cc-item"><b>${esc(fp.name)}</b>
+        <span class="cite">${esc(fp.owner)}</span>
+        ${fp.reads && fp.reads.length
+          ? `<div class="cc-machine">reads: ${esc(fp.reads.join(', '))}</div>` : ''}
+        ${fp.criterion
+          ? `<div class="cc-machine">criterion: <code>${esc(fp.criterion)}</code></div>` : ''}
+        ${fp.description ? `<div class="why-line">${esc(fp.description)}</div>` : ''}
+        </div>`).join('');
+    const contrast = c.contrast
+      ? `<div class="cc-item"><b>${esc(c.contrast)}</b></div>` : '';
     const diff = (c.diff_lines || []).map(l =>
       `<div class="diffline ${l.startsWith('+') ? 'plus' : 'minus'}">${esc(l)}</div>`).join('');
-    const items = (c.items || []).map(i =>
+    const diffFold = diff
+      ? `<details class="errfold"><summary>${esc(c.diff_label ||
+          'the raw diff (receipt)')}</summary>${diff}</details>`
+      : '';
+    const items = fps ? '' : (c.items || []).map(i =>
       `<div class="cc-item"><b>${esc(i.name)}</b> — ${esc(i.description)}</div>`).join('');
     return el(`<div class="caption concl">
       <span class="badge verdict">${esc(c.verdict || 'COMPARED')}</span>
       <span class="cc-machine">${esc(c.verdict_note || '')}</span>
-      ${diff}${items}${proseHtml}${based}</div>`);
+      ${contrast}${fps}${items}${diffFold}${proseHtml}${based}</div>`);
   }
   if (c.kind === 'definition') {
     return el(`<div class="caption concl">

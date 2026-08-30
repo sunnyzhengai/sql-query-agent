@@ -72,6 +72,18 @@ def _diff_lines(compare_rows: "list[dict]") -> "list[str]":
     return []
 
 
+def _as_names(v) -> "list[str]":
+    # RW-23 (Sunny's walk find): source_tables arrives as a STRING
+    # on metric facts — iterating it spelled "DIAGNOSIS_CODES" as
+    # "D, I, A, G…". Strings split on commas; lists pass through;
+    # characters never iterate.
+    if v is None:
+        return []
+    if isinstance(v, str):
+        return [s.strip() for s in v.split(",") if s.strip()]
+    return [str(x) for x in v]
+
+
 def compose_conclusion(outputs: "list[dict]", caption: str,
                        answered: bool) -> "dict | None":
     """The machine card, or None when no stamped fields exist to
@@ -125,6 +137,59 @@ def compose_conclusion(outputs: "list[dict]", caption: str,
         note = str(compare.get("note") or "")
         verdict = ("DIFFERS" if "DIFFERS" in note
                    else "SAME" if "IDENTICAL" in note else "")
+        crows = compare.get("rows") or []
+        retrieved = {str(row.get("id")): row
+                     for r in results if r.get("op") == "retrieve"
+                     for row in (r.get("rows") or [])}
+        # CONSOLE-2 (Sunny's glass: "not clear HOW they differ"):
+        # the card LEADS with MEMBER FINGERPRINTS — one row per
+        # member a steward scans (qualified name · reads · key
+        # criterion from the top decision site · the RW-6
+        # description) — then a machine-assembled owner-named
+        # contrast line; the raw diff folds beneath as the
+        # labeled receipt. Composition only; one composer serves
+        # console cards and workbench answers alike.
+        groups = [[str(m) for m in (row.get("members") or [])]
+                  for row in crows if "group" in row]
+        member_ids = [m for g in groups for m in g]
+        fingerprints = []
+        for mid in member_ids:
+            row = retrieved.get(mid, {})
+            owner = (mid.split(":", 2)[1] if ":" in mid
+                     else mid.rsplit(".", 1)[0])
+            sites = row.get("decision_sites") or []
+            criterion = str((sites[0] or {}).get("expression")
+                            or (sites[0] or {}).get("predicate")
+                            or "")[:80] if sites else ""
+            desc = str(row.get("description") or "")
+            fingerprints.append({
+                "id": mid,
+                "name": (row.get("business_name")
+                         or row.get("name") or mid),
+                "owner": owner,
+                "reads": _as_names(row.get("source_tables"))[:5],
+                "criterion": criterion,
+                "description": desc[:160]})
+        def _short(fp) -> str:
+            if fp["criterion"]:
+                return fp["criterion"][:60]
+            if fp["description"]:
+                return fp["description"].split(".")[0][:60]
+            if fp["reads"]:
+                return "reads " + fp["reads"][0]
+            return "no recorded basis"
+        contrast = ""
+        if verdict == "DIFFERS" and 2 <= len(fingerprints) <= 4:
+            contrast = "; ".join(
+                f"{fp['owner']} — {_short(fp)}"
+                for fp in fingerprints)
+        diff_label = ""
+        if len(groups) >= 2:
+            big = sorted(groups, key=len, reverse=True)[:2]
+            diff_label = (f"receipt: − {big[0][0]} · + {big[1][0]}"
+                          + (f" ({len(groups)} groups — largest "
+                             "two diffed)" if len(groups) > 2
+                             else ""))
         items = [
             {"name": row.get("business_name") or row.get("id"),
              "description": row.get("description") or ""}
@@ -133,7 +198,10 @@ def compose_conclusion(outputs: "list[dict]", caption: str,
             if row.get("kind") in ("metric", "step")][:4]
         return {"kind": "compare", "verdict": verdict,
                 "verdict_note": note[:160],
-                "diff_lines": _diff_lines(compare.get("rows") or []),
+                "fingerprints": fingerprints[:6],
+                "contrast": contrast,
+                "diff_label": diff_label,
+                "diff_lines": _diff_lines(crows),
                 "items": items, "prose": caption}
 
     # RW-BATCH-6 item 2 (E-battery B6): a retrieved REPORT record
@@ -158,18 +226,6 @@ def compose_conclusion(outputs: "list[dict]", caption: str,
                 "measures": _names("measures"),
                 "link_state": str(top.get("link_state") or ""),
                 "prose": caption}
-
-    def _as_names(v) -> "list[str]":
-        # RW-23 (Sunny's walk find): source_tables arrives as a
-        # STRING on metric facts — iterating it spelled
-        # "DIAGNOSIS_CODES" as "D, I, A, G…" and the garbled field
-        # WAS the tables answer. Strings split on commas; lists
-        # pass through; never iterate characters.
-        if v is None:
-            return []
-        if isinstance(v, str):
-            return [s.strip() for s in v.split(",") if s.strip()]
-        return [str(x) for x in v]
 
     records = [row for r in results if r.get("op") == "retrieve"
                for row in (r.get("rows") or [])

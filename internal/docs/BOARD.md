@@ -501,6 +501,13 @@ The hold lifts only by Sunny's explicit word, recorded here.
       X-Ray · Bridge stage 1 · Console · Run (rungs 1-2).**
       SUNNY'S GLASS: /console awaits her eye (the launch demo's
       heart) → film plan → capture day.
+      **First eye-pass found CONSOLE-2 ("not clear HOW they
+      differ").**
+- [x] **CONSOLE-2 BUILT (08-30 dev, 1.74.1)** — compare leads w/
+      member fingerprints (name·owner·reads·criterion·why),
+      owner-named machine contrast, diff folded as labeled
+      receipt; console act retrieves members; one composer, every
+      surface. 1,348 green + ruff. Amendment + CONSOLE-3 next.
 
 ## RULED (Sunny, 2026-08-29): THE GENERATOR CLAUSE — Echo Law amendment
 "Fail twice, no matter the cause, triggers an investigation."
