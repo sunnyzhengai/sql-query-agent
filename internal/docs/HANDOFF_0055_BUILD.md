@@ -2463,3 +2463,21 @@ in ids_read, 0056 shape) — the flywheel counts accepted AND pruned
 candidates from day one, per the order.
 **Gates:** 1,258 green + 5 xfailed, ruff clean; wheel 1.66.0.
 Next in the authorized queue: FLYWHEEL-1.
+
+### REVIEW VERDICT — FUZZER-1: VERIFIED, AND IT BITES
+Smoke run (30 phrasings, 6 findings on run one) — the mechanism
+works and immediately caught real gaps. ORDER FUZZ-FINDINGS-1:
+1. Standalone entry broken (`python devtools/walk_fuzzer.py` →
+   ModuleNotFoundError; `-m devtools.walk_fuzzer` works) — fix
+   the import path.
+2. FIVE sameness paraphrases missed the E11.80 oracle ("have the
+   same definitions" / "identical" / "uniformity" / "defined
+   uniformly" / "definitions match") — diagnose per phrasing:
+   lexicon surface-form gaps vs entity-extraction drift
+   ("codesets" alone vs "Diabetic codesets") vs route; extend the
+   sameness surface forms accordingly — the fuzzer's misses ARE
+   the lexicon food, consume them.
+3. One two-relation parse ("defined in the same way?" →
+   same_or_different, defines over {...}) hit confirm 422 —
+   multi-relation plans must compose or the card must say why.
+Findings recur nightly until green (fuzzer is a battery stage).
