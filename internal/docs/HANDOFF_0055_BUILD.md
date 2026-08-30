@@ -2339,3 +2339,9 @@ page template clean of layout-positional phrases permanently.
 — parked on the board (review recommends: badge probes as
 `control` with a split count line).
 **Gates:** 1,246 green + 5 xfailed, ruff clean; wheel 1.64.3.
+
+### REVIEW VERDICT — RW-24 (1.64.3): VERIFIED
+Gates review-side green; positional-language grep gate in place
+(and it caught a second live instance on its first run — the
+mechanism earning its keep on day one). Census overflow links the
+round ref. Sunny's restart picks it up.
