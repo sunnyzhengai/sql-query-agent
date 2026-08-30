@@ -497,3 +497,6 @@ Seven releases (1.67.1→1.70-line), every one review-verified:
 - Nightly cold battery + fuzzer stand guard from 6:23am daily.
 YOUR SHELF (unchanged): probe curation · Run button first click ·
 film sequencing · capture day · optional tenant clicks.
+- [x] Probe curation RULED (Sunny, 2026-08-29): LEAVE AS-IS — the
+      controls stay in the census unbadged; their descriptions
+      disclose. No build.
