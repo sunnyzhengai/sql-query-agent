@@ -128,6 +128,11 @@ rides the planner; awaits review verification + Sunny's re-ask).
       failures, five distinct causes, one generator — the 0060
       saga is the experiment's baseline).
       Remaining glass (Sunny): first bound Run → then the QA gate.
+- [ ] Palette wording sweep (rides NEXT palette touch, per review
+      08-29): descriptions must not imply structure the SQL lacks
+      — USP_Active_Diabetics says "joined to an active-status
+      flag" over a column filter; sweep "joined" where no JOIN
+      exists (lands with the next 300 rerun + re-embed).
 - [ ] Finder-coverage contract (timing = Sunny's call; drilldown
       benefit if pre-capture)
 - [ ] 0056 decision layer + presentation reframe (POST-capture by
