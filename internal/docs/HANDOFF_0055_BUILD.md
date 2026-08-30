@@ -2527,3 +2527,18 @@ The fuzzer's first six catches, consumed:
    reason>") so the card says why, in context.
 **Gates:** 1,270 green + 5 xfailed, ruff clean; wheel 1.67.1.
 The nightly fuzzer stage re-judges these nightly until green.
+### REVIEW VERDICT — TIER2-1 + FLYWHEEL-1: VERIFIED (worktree, origin state)
+Main tree carried dev's live WIP, so verification ran in a clean
+worktree at origin/dev: 1,263 passed + 5 xfailed, ruff clean —
+the 5 "errors" are the packaging tests wanting the un-built wheel
+in a fresh checkout (1,263 + 5 = dev's 1,268 exactly; consistent).
+Design conformance: tier-2 nominations are labeled, capped,
+prunable, deterministic-bar (no threshold tuning), and B9 honesty
+survives both directions; prunes captured as [PRUNE] events.
+Flywheel: weights from captured events only, disclosure additive
+and typed-omitted where storeless, shelf v1 with replay-as-saved-
+operation, promotion stubbed per the ruled ladder. **The entire
+Sunny-authorized queue is DELIVERED AND VERIFIED.** Remaining in
+flight: FUZZ-FINDINGS-1 (dev's WIP in the shared tree right now,
+by the look of parse_plan.py). Sunny's shelf on her return:
+probe curation · Run button · film sequencing · capture day.
