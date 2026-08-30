@@ -3098,3 +3098,29 @@ sites); composition only. Applies to compare evidence EVERYWHERE
 it renders (console cards, workbench answers) — one composer.
 Acceptance: Sunny reads the Active Diabetic Patients card and can
 say in one breath which member does what.
+
+## CONSOLE-2 AMENDED + ORDER CONSOLE-3 (Sunny's continued glass)
+**CONSOLE-2 addition (her codeset screenshot):** literal-set
+diffs render as SET-SUMMARY ("79 codes shared · E11.80 only in
+CodesetB" — the distiller already computes this); full lists FOLD
+as receipt. Never print an 80-item list twice to say one item
+differs.
+**CONSOLE-3 (new, workflow): certify needs a TARGET and an
+OUTCOME.** On any multi-member flag, the certify press opens the
+choice a steward actually makes:
+1. DESIGNATE OFFICIAL — member picker (radio, qualified names +
+   fingerprints); the chosen member becomes the name's canonical
+   bearer; lands per the map (glossary/asset for THAT member,
+   grade steward-certified); others remain, flagged for
+   differentiation.
+2. DIFFERENTIATE ALL — all members ruled legitimate distinct
+   purposes; disposition resolves with no official; each member
+   queued for its own label (the 0054 canonical outcome).
+3. CERTIFY ONE DEFINITION — picker, single member's definition
+   certified without designating the name's official.
+Every outcome is its own [CONSOLE:*] event with target ids in the
+decision; the landing map gains the three rows (totality test
+extends). Single-member flags skip the picker.
+Acceptance: Sunny certifies on the Diabetic Patients cluster and
+is ASKED which of the three acts she means, with members
+pickable.
