@@ -457,8 +457,15 @@ The hold lifts only by Sunny's explicit word, recorded here.
       P4/P5-safe); layered SVG panel w/ kind colors, anchor
       emphasis, red conflict edges, dashed computed edges; click →
       /api/node card (read-guaranteed); run badges its rung on the
-      panel. DOM-harness gated. 1,311 green + ruff. AWAITS review
-      → then SUNNY'S EYE is the acceptance (legibility).
+      panel. DOM-harness gated. 1,311 green + ruff. **VERIFIED;
+      Sunny's eye-check on restart.**
+- [x] **X-RAY-1 BUILT (08-30 dev, 1.72.0, tier queue #1)** — the
+      wedge report (counts w/ disclosed absences, flags w/ code
+      basis, deterministic AI-readiness verdict, order-form last
+      page) + engagement runbook + CLI; LIVE SAMPLE on the shapes
+      estate (37 metrics/65 steps/26 flags → NOT-AI-READY) at
+      internal/docs/XRAY_REPORT.md. 1,316 green + ruff. AWAITS
+      review → BRIDGE-1 exporters → CONSOLE-1.
 
 ## RULED (Sunny, 2026-08-29): THE GENERATOR CLAUSE — Echo Law amendment
 "Fail twice, no matter the cause, triggers an investigation."

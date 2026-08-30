@@ -740,5 +740,9 @@ classification).
 ## ADR 0063 — The product tiers: X-Ray, Bridge, Workbench, Run
 
 - **Category:** product
+- **Implemented by:**
+  - `src/xray.py`
+- **Enforced by:**
+  - `tests/test_xray.py`
 - **Summarized in:**
   - `docs/decisions/0063-product-tiers.md`

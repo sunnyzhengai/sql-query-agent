@@ -2878,3 +2878,30 @@ edges dashed and labeled "(computed)"; click-through respects the
 read guarantee; truncation disclosed; DOM-harness gated. **The
 final acceptance is Sunny's eye on glass** — her previous AIVIA
 had a graph visual; legibility is hers to judge on restart.
+
+### 2026-08-30 — X-RAY-1 BUILT (tier-locked queue item 1) — release 1.72.0
+**The wedge exists.** src/xray.py composes the Estate X-Ray from
+the certified census + sweep surfaces — THEIR counts (per-kind,
+absent surfaces DISCLOSED never zeroed), every red flag with its
+identity, class, severity, members, why-sentence, distinct logics
+and blast radius, and the AI-READINESS VERDICT: deterministic
+sentence assembly keyed on the flag classes (conflict classes =
+the hallucination surface: "a name-grounded assistant answers
+differently depending on which definition it lands on — this is
+why a generic Copilot hallucinates on this estate"). NOT-AI-READY
+/ READY-WITH-DISCLOSURES / READY grades, all machine-picked; no
+model authors a sentence. The last page is the order form (the
+0063 pitch line verbatim). Brand-neutral (product_name()).
+**Live sample generated against the shapes estate**
+(internal/docs/XRAY_REPORT.md): 37 metrics · 65 steps · 1 report ·
+26 flags w/ code basis · NOT-AI-READY — the demo estate's own
+x-ray, ready for Sunny's read and the sales-deck screenshot.
+**Engagement runbook** (docs/product/XRAY_ENGAGEMENT.md): plain
+numbered steps with expected observations, prereqs, the
+dormant-or-remove close-out honoring the one-shot promise, and
+the order-form note (price = Sunny's parked call).
+CLI: devtools/run_xray.py (store lever applies). Registered under
+0063 (its first modules). 5 tests incl. determinism, clean-estate
+READY, absent-surface disclosure, brand gate.
+**Gates:** 1,316 green + 5 xfailed, ruff clean; wheel 1.72.0.
+NEXT: BRIDGE-1 stage-1 exporters (on review-green, per the queue).

@@ -7,7 +7,7 @@
 
 # Test Map — what every test proves
 
-115 modules, 1277 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
+116 modules, 1282 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
 
 ## By ADR
 
@@ -66,6 +66,7 @@
 | 0060 | The parse is the plan: parser-only LLM, deterministic traversal, correction flywheel | `tests/orchestrator/test_parse_plan.py` (28) |
 | 0061 | The run layer: Pro runs the confirmed definition | `tests/test_run_layer.py` (25) |
 | 0062 | The dialogue loop: show, propose, ask, execute | `tests/webapp/test_app.py` (67) |
+| 0063 | The product tiers: X-Ray, Bridge, Workbench, Run | `tests/test_xray.py` (5) |
 
 ## By standing law
 
@@ -115,6 +116,7 @@
 - `tests/test_secrets_vault.py` (6): KEYVAULT-1 (code-side): "keyvault:<name>" refs resolve through
 - `tests/test_suite_map.py` (9): TEST_MAP totality (morning order 1, 2026-08-27): every test module
 - `tests/test_suite_transcript.py` (7): Suite transcript emission (morning order 2, 2026-08-27): every
+- `tests/test_xray.py` (5): X-RAY-1 (0063 §1, the wedge): the Estate X-Ray report — real
 
 ### contract:org-config — org_config referential integrity, LOCAL and TENANT copies together
 

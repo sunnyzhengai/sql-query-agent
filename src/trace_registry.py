@@ -512,15 +512,16 @@ TRACE_REGISTRY = {
         "docs": ["docs/architecture/SPEC.md", "docs/architecture/TRACE_MAP.md"],
     },
     "0063": {
-        # DRAFT 2026-08-30 — the tier lock (X-Ray / Bridge /
-        # Workbench / Run), debated to convergence; Sunny ratifies.
-        # Product decision: no modules expected until the Bridge
-        # build is ordered post-ratification.
+        # ACCEPTED 2026-08-30 (Resolution Console v1, file-first,
+        # the Inbox, the total landing map). Build began on the
+        # lift: X-RAY-1 (src/xray.py — the wedge report) first;
+        # BRIDGE-1 exporters and CONSOLE-1 follow in the
+        # tier-locked queue.
         "title": "The product tiers: X-Ray, Bridge, Workbench, Run",
         "category": "product",
         "axioms": [],
-        "modules": [],
-        "tests": [],
+        "modules": ["src/xray.py"],
+        "tests": ["tests/test_xray.py"],
         "docs": ["docs/decisions/0063-product-tiers.md"],
     },
     "0062": {
