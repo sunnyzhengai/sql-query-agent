@@ -979,3 +979,77 @@ class TestRW26NominateMeansOffer:
                          or o["component"]["params"].get("refs")
                          or [])}
         assert set(sems) & ran
+
+
+class TestRung2AndProcRun:
+    """RUNG2-1 + PROC-RUN-1 on the wire: a value change runs at
+    rung 2 with the sites stamped; a logic edit refuses as the
+    fork; a single-SELECT proc fragment runs via its body."""
+
+    def _client(self, frag):
+        from src.orchestrator.assemble import NODE_FACTS_QUERY
+
+        def kql(query, params):
+            if query == NODE_FACTS_QUERY:
+                return [{"node_id": params["p_node_id"], "name": "S",
+                         "properties": json.dumps(
+                             {"sql_fragment": frag})}]
+            return []
+        events = []
+        class Sink:
+            def record(self, e): events.append(e)
+        app = create_app(lambda *a, **k: {"content": "",
+                                          "tool_calls": []},
+                         kql, Sink(),
+                         run_executor=lambda sql: [{"ID": 1}],
+                         run_cap=5, run_source="fx")
+        return TestClient(app)
+
+    CERT = ("SELECT PATIENT_ID FROM DM_REGISTRY "
+            "WHERE HBA1C >= 6.5")
+
+    def test_value_change_runs_at_rung_2(self):
+        client = self._client(self.CERT)
+        r = client.post("/api/run", json={
+            "step_id": "transform:m:S",
+            "sql": self.CERT.replace("6.5", "8.0")})
+        assert r.status_code == 200
+        j = r.json()
+        assert j["rung"] == 2
+        assert j["param_sites"][0]["submitted"] == "8.0"
+        assert "types only" in j["sampling_label"]
+        assert j["stamps"]["rung"] == 2
+
+    def test_logic_edit_refuses_as_the_fork(self):
+        client = self._client(self.CERT)
+        r = client.post("/api/run", json={
+            "step_id": "transform:m:S",
+            "sql": self.CERT.replace(">=", "<")})
+        assert r.status_code == 422
+        j = r.json()
+        assert j["reason_class"] == "variant_fork"
+        assert "your variant" in j["message"]
+
+    def test_plain_run_stays_rung_1(self):
+        client = self._client(self.CERT)
+        r = client.post("/api/run", json={"step_id": "transform:m:S"})
+        j = r.json()
+        assert j["rung"] == 1 and j["param_sites"] == []
+        assert "byte-identical" in j["sampling_label"]
+
+    def test_single_select_proc_runs_via_its_body(self):
+        proc = ("CREATE PROCEDURE reporting.USP_Reg AS\n"
+                + self.CERT)
+        client = self._client(proc)
+        r = client.post("/api/run", json={"step_id": "metric:m"})
+        assert r.status_code == 200
+        assert r.json()["rung"] == 1
+
+    def test_multi_statement_proc_stays_refused(self):
+        proc = ("CREATE PROCEDURE p AS\nBEGIN\n"
+                "UPDATE T SET X=1;\nSELECT 1;\nEND")
+        client = self._client(proc)
+        r = client.post("/api/run", json={"step_id": "metric:m"})
+        assert r.status_code == 422
+        assert r.json()["reason_class"] in ("multi_statement",
+                                            "not_select")

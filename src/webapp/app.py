@@ -153,9 +153,9 @@ def create_app(
         rows go to THIS response (the display); the model context
         never sees them (the run is not an engine tool); the
         decision event records STAMPS only."""
-        body = await request.json()
-        step_id = str(body.get("step_id", "")).strip()
-        conv_id = str(body.get("conversation_id") or "")
+        body_json = await request.json()
+        step_id = str(body_json.get("step_id", "")).strip()
+        conv_id = str(body_json.get("conversation_id") or "")
         user = _user_from(request)
         if not step_id:
             return JSONResponse({"error": "step_id required"},
@@ -189,10 +189,33 @@ def create_app(
         if isinstance(props, str):
             props = _json.loads(props)
         fragment = str(props.get("sql_fragment") or "")
-        from src.run_layer import RunRefusal, run_step
+        from src.run_layer import (
+            RunRefusal,
+            check_certified_variant,
+            extract_single_select_proc,
+            run_step,
+        )
         try:
-            res = run_step(fragment, run_executor, cap=run_cap,
+            # PROC-RUN-1: a whole single-SELECT procedure runs via
+            # its extracted body (offset-sliced, never regenerated);
+            # multi-statement bodies fall through to the statement
+            # gate and refuse typed as before
+            body = extract_single_select_proc(fragment)
+            certified = body if body is not None else fragment
+            # RUNG2-1 (0058 C2, types only): a submitted variant
+            # must equal the certified SQL except literal values
+            # within their type class — else the fork refusal
+            submitted = str(body_json.get("sql") or "").strip()
+            sites = []
+            to_run = certified
+            if submitted:
+                sites = check_certified_variant(certified, submitted)
+                to_run = submitted
+            res = run_step(to_run, run_executor, cap=run_cap,
                            source=run_source)
+            # C1: the rung stamp rides every result
+            res.stamps["rung"] = 2 if sites else 1
+            res.stamps["param_sites"] = sites
         except RunRefusal as e:
             return JSONResponse(
                 {"error": "refusal", "reason_class": e.reason_class,
@@ -219,11 +242,18 @@ def create_app(
             trace=({"tool": "run", "args": {"step_id": step_id},
                     "result": _json.dumps(res.model_stamps())},),
         ))
+        rung_line = (f"rung {res.stamps['rung']}"
+                     + (f" — certified shape, {len(sites)} "
+                        "parameter value(s) changed (types only)"
+                        if sites else " — certified, byte-identical"))
         return JSONResponse({
             "step_id": step_id,
             "columns": res.columns,
             "rows": res.rows,
-            "sampling_label": res.sampling_label(run_cap, run_source),
+            "sampling_label": (res.sampling_label(run_cap, run_source)
+                               + " · " + rung_line),
+            "rung": res.stamps["rung"],
+            "param_sites": sites,
             "stamps": res.model_stamps()})
 
     @app.post("/api/feedback")

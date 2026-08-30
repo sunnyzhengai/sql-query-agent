@@ -442,8 +442,14 @@ The hold lifts only by Sunny's explicit word, recorded here.
       7/7 vs 5/7 · 0 vs 6 floors · fails closed vs guessed census
       · 15/15 composed vs 5 floors). ADR status records
       EXPERIMENT CLOSED w/ data. **OVERNIGHT QUEUE 2 FULLY
-      DELIVERED.** AWAITS review's final verdict; the 6:23am cold
-      battery is the night's last word.
+      DELIVERED + CLOSED by review (morning report posted).**
+- [x] **RUNG2-1 + PROC-RUN-1 BUILT (08-30 dev, 1.70.0, queue 3)**
+      — parameterized runs: token-equality-except-literal-sites
+      (types only per C2); logic edits refuse as variant_fork w/
+      the 0038 language; rung stamp (C1) on every result (label +
+      payload + model stamps); single-SELECT procs run via
+      offset-sliced bodies; multi-statement stays refused. 1,305
+      green + ruff. AWAITS review verification.
 
 ## RULED (Sunny, 2026-08-29): THE GENERATOR CLAUSE — Echo Law amendment
 "Fail twice, no matter the cause, triggers an investigation."

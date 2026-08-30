@@ -173,3 +173,104 @@ class TestRW16EveryFailureNamesItsCure:
         cls, msg = classify_run_error(Exception("mystery"))
         assert cls == "execution"
         assert "mystery" in msg
+
+
+class TestRung2CertifiedVariant:
+    """RUNG2-1 (0058 C2 as ratified — TYPES ONLY): values at
+    literal sites may change within their type class; any logic
+    deviation is the fork. The rung stamp's data = the changed
+    sites."""
+
+    CERT = ("SELECT PATIENT_ID FROM DM_REGISTRY "
+            "WHERE HBA1C >= 6.5 AND MEASURED_AT > '2024-01-01'")
+
+    def test_value_changes_within_type_pass_and_name_sites(self):
+        from src.run_layer import check_certified_variant
+        sites = check_certified_variant(
+            self.CERT,
+            self.CERT.replace("6.5", "7.0")
+                     .replace("'2024-01-01'", "'2025-06-01'"))
+        assert [s["type"] for s in sites] == ["numeric", "string"]
+        assert sites[0]["submitted"] == "7.0"
+
+    def test_byte_identical_is_zero_sites(self):
+        from src.run_layer import check_certified_variant
+        assert check_certified_variant(self.CERT, self.CERT) == []
+
+    def test_cross_type_swap_is_the_fork(self):
+        import pytest as _pt
+
+        from src.run_layer import (
+            RunRefusal,
+            check_certified_variant,
+        )
+        with _pt.raises(RunRefusal) as e:
+            check_certified_variant(
+                self.CERT, self.CERT.replace("6.5", "'high'"))
+        assert e.value.reason_class == "variant_fork"
+
+    def test_operator_edit_is_the_fork_with_the_0038_language(self):
+        import pytest as _pt
+
+        from src.run_layer import (
+            RunRefusal,
+            check_certified_variant,
+        )
+        with _pt.raises(RunRefusal) as e:
+            check_certified_variant(
+                self.CERT, self.CERT.replace(">=", "<="))
+        assert "your variant" in str(e.value)
+        assert "0038" in str(e.value)
+
+    def test_added_predicate_is_the_fork(self):
+        import pytest as _pt
+
+        from src.run_layer import (
+            RunRefusal,
+            check_certified_variant,
+        )
+        with _pt.raises(RunRefusal):
+            check_certified_variant(
+                self.CERT, self.CERT + " AND ACTIVE_FLAG = 'Y'")
+
+    def test_identifier_edit_is_the_fork(self):
+        import pytest as _pt
+
+        from src.run_layer import (
+            RunRefusal,
+            check_certified_variant,
+        )
+        with _pt.raises(RunRefusal):
+            check_certified_variant(
+                self.CERT,
+                self.CERT.replace("DM_REGISTRY", "PATIENTS"))
+
+    def test_whitespace_and_case_are_not_deviations(self):
+        from src.run_layer import check_certified_variant
+        loose = self.CERT.replace("SELECT", "select  ")
+        assert check_certified_variant(self.CERT, loose) == []
+
+
+class TestProcRun1:
+    """PROC-RUN-1 (0061 deferred slice): a single-SELECT procedure
+    body extracts and runs; multi-statement stays refused typed."""
+
+    def test_single_select_proc_extracts_its_body(self):
+        from src.run_layer import extract_single_select_proc
+        sql = ("CREATE PROCEDURE reporting.USP_Reg AS\n"
+               "SELECT PATIENT_ID FROM DM_REGISTRY WHERE X = 1")
+        body = extract_single_select_proc(sql)
+        assert body is not None
+        assert body.startswith("SELECT PATIENT_ID")
+        from src.run_layer import check_single_select
+        check_single_select(body)      # the extracted body passes
+
+    def test_multi_statement_proc_returns_none(self):
+        from src.run_layer import extract_single_select_proc
+        sql = ("CREATE PROCEDURE p AS\nBEGIN\n"
+               "UPDATE T SET X=1;\nSELECT 1;\nEND")
+        assert extract_single_select_proc(sql) is None
+
+    def test_non_proc_returns_none(self):
+        from src.run_layer import extract_single_select_proc
+        assert extract_single_select_proc("SELECT 1") is None

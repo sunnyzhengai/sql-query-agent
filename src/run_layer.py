@@ -83,11 +83,16 @@ class RunResult:
 
     def model_stamps(self) -> dict:
         """P5: the ONLY shape of this result the model may ever see —
-        count, schema, elapsed. No rows, no values."""
-        return {"row_count": self.row_count,
-                "columns": list(self.columns),
-                "capped": self.capped,
-                "elapsed_ms": self.elapsed_ms}
+        count, schema, elapsed, and the assurance RUNG (C1, RUNG2-1:
+        rung metadata is provenance, never row data). No rows, no
+        cell values."""
+        out = {"row_count": self.row_count,
+               "columns": list(self.columns),
+               "capped": self.capped,
+               "elapsed_ms": self.elapsed_ms}
+        if "rung" in self.stamps:
+            out["rung"] = self.stamps["rung"]
+        return out
 
 
 def cap_wrap_tsql(sql: str, n: int) -> str:
@@ -95,6 +100,103 @@ def cap_wrap_tsql(sql: str, n: int) -> str:
 
 def cap_wrap_sqlite(sql: str, n: int) -> str:
     return f"SELECT * FROM (\n{sql}\n) AS certified_step LIMIT {n + 1}"
+
+
+# RUNG2-1 (0058 C2 as RATIFIED — types only; overnight queue 3):
+# the literal type classes a parameter site may swap within. Any
+# other token difference is a LOGIC deviation → the fork.
+_NUMERIC_TOKENS = frozenset({"Integer", "Numeric", "Real", "Money"})
+_STRING_TOKENS = frozenset({"AsciiStringLiteral",
+                            "UnicodeStringLiteral"})
+_SKIP_TOKENS = frozenset({"WhiteSpace", "SingleLineComment",
+                          "MultilineComment", "EndOfFile"})
+
+
+def _significant_tokens(sql: str) -> "list[tuple[str, str]]":
+    from src.parser.scriptdom_loader import parse_tsql
+    fragment, errors = parse_tsql(sql)
+    if errors:
+        raise RunRefusal(
+            "parse", "the SQL did not parse: "
+            + " | ".join(str(e) for e in errors[:2]))
+    out: "list[tuple[str, str]]" = []
+    for i in range(fragment.ScriptTokenStream.Count):
+        tok = fragment.ScriptTokenStream[i]
+        ttype = tok.TokenType.ToString()
+        if ttype in _SKIP_TOKENS:
+            continue
+        out.append((ttype, str(tok.Text or "")))
+    return out
+
+
+def _type_class(ttype: str) -> "str | None":
+    if ttype in _NUMERIC_TOKENS:
+        return "numeric"
+    if ttype in _STRING_TOKENS:
+        return "string"
+    return None
+
+
+def check_certified_variant(certified_sql: str,
+                            submitted_sql: str) -> "list[dict]":
+    """RUNG2-1: validity = token-stream equality EXCEPT at literal
+    sites, where the swap must stay within its TYPE class (C2 as
+    ratified: types only — range checks addable later without
+    breakage). Returns the changed sites (the rung stamp's data);
+    ANY logic deviation refuses as the fork — this becomes YOUR
+    variant, and the 0038 path is where variants become certified
+    definitions of their own."""
+    cert = _significant_tokens(certified_sql)
+    subm = _significant_tokens(submitted_sql)
+    fork = RunRefusal(
+        "variant_fork",
+        "this is no longer the certified definition — a LOGIC "
+        "change makes it your variant. Values at literal sites may "
+        "change (types only); structure may not. To keep your "
+        "version, fork it into your own definition (the 0038 "
+        "path); the certified original stays untouched.")
+    if len(cert) != len(subm):
+        raise fork
+    sites: "list[dict]" = []
+    for i, ((ct, cv), (st, sv)) in enumerate(zip(cert, subm)):
+        if ct == st and cv.lower() == sv.lower():
+            continue
+        c_cls, s_cls = _type_class(ct), _type_class(st)
+        if c_cls is None or s_cls is None or c_cls != s_cls:
+            raise fork
+        sites.append({"site": i, "type": c_cls,
+                      "certified": cv[:40], "submitted": sv[:40]})
+    return sites
+
+
+def extract_single_select_proc(sql: str) -> "str | None":
+    """PROC-RUN-1 (0061 deferred slice): a CREATE PROCEDURE whose
+    body is exactly ONE SelectStatement runs — the body SELECT is
+    extracted verbatim (offset-sliced, never regenerated).
+    Multi-statement bodies return None (the caller refuses typed)."""
+    from src.parser.scriptdom_loader import parse_tsql
+    fragment, errors = parse_tsql(sql)
+    if errors:
+        return None
+    statements = []
+    for b in range(fragment.Batches.Count):
+        batch = fragment.Batches[b]
+        for s in range(batch.Statements.Count):
+            statements.append(batch.Statements[s])
+    if len(statements) != 1:
+        return None
+    proc = statements[0]
+    if proc.GetType().Name not in ("CreateProcedureStatement",
+                                   "CreateOrAlterProcedureStatement"):
+        return None
+    body = getattr(proc, "StatementList", None)
+    if body is None or body.Statements.Count != 1:
+        return None
+    inner = body.Statements[0]
+    if inner.GetType().Name != "SelectStatement":
+        return None
+    return sql[inner.StartOffset:
+               inner.StartOffset + inner.FragmentLength]
 
 
 _DRIVER_CURE = (

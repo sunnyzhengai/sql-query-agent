@@ -2775,3 +2775,36 @@ runs is formally justified by its own measurement.
 Parked (unchanged): 0056 presentation extras (post-capture per
 ruling — Sunny may unsequence if capture drifts); Phase 3 awaits
 the access-control ADR (review drafts, someday).
+
+### 2026-08-30 — RUNG2-1 + PROC-RUN-1 BUILT (overnight queue 3) — release 1.70.0
+**RUNG2-1 (0058 C2 as ratified — TYPES ONLY):** parameterized runs
+live. `check_certified_variant`: validity = ScriptDom TOKEN-STREAM
+equality except at literal sites, where the swap must stay within
+its type class (numeric↔numeric, string↔string — dates ride string
+literals; whitespace/case are never deviations). ANY logic
+deviation — operator flip, added predicate, identifier edit,
+cross-type swap, structural change — refuses typed as
+`variant_fork` with the fork language verbatim: "this becomes your
+variant… the 0038 path; the certified original stays untouched."
+Parameter sites are DERIVED (every literal position in the
+certified fragment is a site) and DISCLOSED per run — the recorded
+declaration for the demo estate; explicit per-step declarations
+can narrow this later without breakage. **The rung stamp (C1)
+rides every result:** /api/run responses carry rung 1 ("certified,
+byte-identical") or rung 2 ("certified shape, N parameter value(s)
+changed — types only") in the sampling label, the payload, and the
+model stamps (rung metadata is provenance, never row data — the P5
+cage holds; model_stamps gains only the rung integer).
+**PROC-RUN-1 (0061 deferred slice):** a CREATE [OR ALTER]
+PROCEDURE whose body is exactly ONE SelectStatement runs via its
+extracted body (offset-sliced from the original text, never
+regenerated — the parser decides); parameters ride RUNG2-1's
+literal machinery on the extracted SELECT; multi-statement bodies
+stay refused typed, unchanged.
+**Acceptance per the order, test-held:** a date/threshold value
+change on a certified step runs at rung 2 with the sites named; a
+logic edit refuses with the fork language; the single-SELECT proc
+runs; the multi-statement proc refuses. 12 L0 + 5 wire tests.
+**Gates:** 1,305 green + 5 xfailed, ruff clean; wheel 1.70.0.
+Queue 3 item 3 (nightly findings) standing; queue 3 otherwise
+COMPLETE pending review.
