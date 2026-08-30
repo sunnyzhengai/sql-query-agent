@@ -239,3 +239,61 @@ def test_rw24_no_positional_language_in_composed_text():
     c = compose_conclusion(out, "", True)
     assert c["ref"] == "R3"          # the linkable round ref
     assert c["total"] == 30 and len(c["items"]) == 12
+
+
+class TestGraphPanel1Subgraph:
+    """GRAPH-PANEL-1: the subgraph derives EXCLUSIVELY from stamped
+    results — receipts only, deterministic, P4/P5-safe (ids, names,
+    kinds; never rows)."""
+
+    def _out(self, op, rows, params=None):
+        return {"component": {"op": op, "params": params or {}},
+                "result": {"op": op, "rows": rows,
+                           "params": params or {}, "complete": True,
+                           "universe": "u"}}
+
+    def _metric_turn(self):
+        return [
+            self._out("retrieve", [
+                {"id": "m1", "kind": "metric",
+                 "business_name": "Active Diabetics",
+                 "steps": [{"id": "transform:m1:Reg",
+                            "name": "Reg"}],
+                 "source_tables": "DIAGNOSIS_CODES, ENCOUNTERS"}],
+                {"ids": ["m1"]}),
+            self._out("compare", [
+                {"group": 1, "members": ["transform:a:X"]},
+                {"group": 2, "members": ["transform:b:X"]}]),
+        ]
+
+    def test_nodes_edges_from_receipts_with_derived_marked(self):
+        from src.orchestrator.conclusion import compose_subgraph
+        g = compose_subgraph(self._metric_turn())
+        ids = {n["id"] for n in g["nodes"]}
+        assert {"m1", "transform:m1:Reg", "table:DIAGNOSIS_CODES",
+                "table:ENCOUNTERS"} <= ids
+        kinds = {(e["from"], e["to"]): e for e in [
+            dict(e) for e in g["edges"]]}
+        assert kinds[("m1", "transform:m1:Reg")]["label"] == "step"
+        derived = [e for e in g["edges"] if e["derived"]]
+        assert derived and derived[0]["label"] == "compared"
+        # anchor emphasis from the retrieve params
+        m1 = next(n for n in g["nodes"] if n["id"] == "m1")
+        assert m1.get("anchor") is True
+
+    def test_deterministic_identical_pictures(self):
+        from src.orchestrator.conclusion import compose_subgraph
+        a = compose_subgraph(self._metric_turn())
+        b = compose_subgraph(self._metric_turn())
+        assert a == b
+
+    def test_p5_shape_ids_names_kinds_only(self):
+        from src.orchestrator.conclusion import compose_subgraph
+        g = compose_subgraph(self._metric_turn())
+        for n in g["nodes"]:
+            assert set(n) <= {"id", "kind", "name", "flag_class",
+                              "anchor"}
+
+    def test_empty_turn_is_none(self):
+        from src.orchestrator.conclusion import compose_subgraph
+        assert compose_subgraph([]) is None

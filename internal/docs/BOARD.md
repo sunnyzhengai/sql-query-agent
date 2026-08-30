@@ -452,6 +452,13 @@ The hold lifts only by Sunny's explicit word, recorded here.
       green + ruff. **VERIFIED — QUEUE 3 COMPLETE ("run it, change
       a VALUE and run it, never change the LOGIC without it
       becoming yours"). Standing guards only until morning.**
+- [x] **GRAPH-PANEL-1 BUILT (08-30 dev, 1.71.0)** — receipts-only
+      subgraph per answer (machine-composed, deterministic,
+      P4/P5-safe); layered SVG panel w/ kind colors, anchor
+      emphasis, red conflict edges, dashed computed edges; click →
+      /api/node card (read-guaranteed); run badges its rung on the
+      panel. DOM-harness gated. 1,311 green + ruff. AWAITS review
+      → then SUNNY'S EYE is the acceptance (legibility).
 
 ## RULED (Sunny, 2026-08-29): THE GENERATOR CLAUSE — Echo Law amendment
 "Fail twice, no matter the cause, triggers an investigation."

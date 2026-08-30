@@ -1053,3 +1053,35 @@ class TestRung2AndProcRun:
         assert r.status_code == 422
         assert r.json()["reason_class"] in ("multi_statement",
                                             "not_select")
+
+
+class TestGraphPanelWire:
+    """GRAPH-PANEL-1 wire: the answer payload carries the machine
+    subgraph; /api/node serves a clicked node's card under the read
+    guarantee."""
+
+    def test_planner_answer_carries_the_subgraph(self):
+        maker = TestCardEverywhere()
+        client = maker._client(["ED Sepsis Screening"], [])
+        r1 = client.post("/api/ask", json={"message": "about sepsis"})
+        conv = r1.json()["conversation_id"]
+        fin = client.post("/api/parse/confirm", json={
+            "conversation_id": conv}).json()
+        g = fin["subgraph"]
+        assert g and g["nodes"]
+        assert any(n.get("anchor") for n in g["nodes"])
+
+    def test_node_click_serves_the_card_read_guaranteed(self):
+        maker = TestCardEverywhere()
+        client = maker._client(["ED Sepsis Screening"], [])
+        r1 = client.post("/api/ask", json={"message": "about sepsis"})
+        conv = r1.json()["conversation_id"]
+        client.post("/api/parse/confirm",
+                    json={"conversation_id": conv})
+        r = client.post("/api/node", json={
+            "id": REF_A, "conversation_id": conv})
+        assert r.status_code == 200
+        assert r.json()["conclusion"]["kind"] in ("definition", "map")
+        r2 = client.post("/api/node", json={
+            "id": "metric:never-surfaced", "conversation_id": conv})
+        assert r2.status_code == 403

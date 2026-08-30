@@ -2842,3 +2842,29 @@ rendered as itself. Contract:
    visual — her eye is the acceptance).
 API: conclusion payload gains `subgraph {nodes, edges}` —
 machine-composed, P4/P5-safe (ids/names/kinds only, never rows).
+
+### 2026-08-30 — GRAPH-PANEL-1 BUILT — release 1.71.0
+**The emergent shape rendered as itself.** Every answer's payload
+now carries `subgraph {nodes, edges}` — machine-composed in the
+conclusion layer, derived EXCLUSIVELY from the turn's stamped
+results (retrieved records + their step/read/link fields; flag
+clusters with members; compare verdicts as DERIVED edges drawn
+dashed and labeled "(computed)"). Nothing model-claimed can
+render — the composer never sees prose. Deterministic by
+construction: sorted nodes and edges, test-held (identical turns
+→ identical pictures); P4/P5-safe shape (ids/names/kinds/flag
+classes only — a structural test pins the node fields).
+**The panel:** right-side, dependency-free SVG, layered columns
+(reports | metrics+flags | steps+terms | tables), kind colors,
+anchors triple-stroked, conflict-flagged nodes and their edges
+red, largest-40 disclosure on truncation. **Click a node → its
+definition card** via /api/node (read-only; the read guarantee
+applies — 403 on unsurfaced ids; subgraph nodes are surfaced by
+construction). **A run badges its step with the RUNG stamp** on
+the panel (redraw with run info after each run response).
+DOM-harness gated like every card variant (3 nodes wire, empty
+hides, run badge draws). 4 composer + 2 wire + 2 DOM checks.
+**Sunny's eye is the acceptance** — her glass judges legibility;
+the layout knobs (column widths, label lengths) are one-line
+constants when she wants them different.
+**Gates:** 1,311 green + 5 xfailed, ruff clean; wheel 1.71.0.

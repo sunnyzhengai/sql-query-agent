@@ -27,7 +27,7 @@ from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse
 from src.branding import product_name
 from src.orchestrator.agent import Turn, run_turn
 from src.orchestrator.caption_gate import stamped_headline
-from src.orchestrator.conclusion import compose_conclusion
+from src.orchestrator.conclusion import compose_conclusion, compose_subgraph
 from src.orchestrator.events import FeedbackEvent, TurnEvent, decision_shape
 from src.orchestrator.ops import OpError
 from src.orchestrator.tools import Session
@@ -342,6 +342,9 @@ def create_app(
             "answered": turn["answered"],
             "conclusion": _with_provenance(compose_conclusion(
                 turn["outputs"], turn["answer"], turn["answered"])),
+            # GRAPH-PANEL-1: the emergent shape as itself —
+            # receipts-only, machine-composed, deterministic
+            "subgraph": compose_subgraph(turn["outputs"]),
             "folded_refs": turn.get("folded_refs", []),
             "missing_op": turn["missing_op"],
             "loop_status": (f"one mind: {turn['rounds']} tool round(s)"
@@ -744,6 +747,43 @@ def create_app(
                              "mailto": mailto,
                              "contact": escalation_contact})
 
+    @app.post("/api/node")
+    async def node_card(request: Request) -> JSONResponse:
+        """GRAPH-PANEL-1 item 4: click a node → its definition card.
+        Read-only; the read guarantee applies (the node must be
+        surfaced in this conversation — subgraph nodes are, by
+        construction: they derive from displayed results)."""
+        body = await request.json()
+        node_id = str(body.get("id") or "").strip()
+        conv_id = str(body.get("conversation_id") or "")
+        user = _user_from(request)
+        conv = _conversation(user, conv_id) if conv_id else None
+        if not node_id or conv is None:
+            return JSONResponse({"error": "id and conversation_id "
+                                          "required"},
+                                status_code=400)
+        if not conv.engine.ops.permitted(node_id):
+            return JSONResponse(
+                {"error": "refusal", "reason_class": "unsurfaced",
+                 "message": "that node has not been surfaced in "
+                            "this conversation"}, status_code=403)
+        from src.orchestrator.ops import op_retrieve
+        try:
+            rs = op_retrieve([node_id], run_kql, conv.engine.ops)
+        except OpError as e:
+            return JSONResponse(
+                {"error": "refusal", "reason_class": "op_error",
+                 "message": str(e)}, status_code=422)
+        shown = rs.display()
+        shown["headline"] = stamped_headline(shown)
+        outputs = [{"component": {"op": "retrieve",
+                                  "params": {"ids": [node_id]}},
+                    "result": shown}]
+        return JSONResponse({
+            "conclusion": _with_provenance(
+                compose_conclusion(outputs, "", True)),
+            "headline": shown["headline"]})
+
     @app.get("/api/mine")
     async def mine(request: Request) -> JSONResponse:
         """FLYWHEEL-1: the Ground-Truth Shelf v1 — My definitions /
@@ -1024,6 +1064,15 @@ WORKBENCH_PAGE = """<!doctype html>
   .replaybtn { padding:1px 8px; border-radius:6px; font-size:11.5px;
     border:1px solid var(--accent); background:#fff;
     color:var(--accent); cursor:pointer; }
+  #graphpanel { position:fixed; right:12px; top:64px; width:340px;
+    max-height:82vh; overflow:auto; background:#fff;
+    border:1px solid #d9dee9; border-radius:10px; padding:10px;
+    box-shadow:0 2px 10px rgba(20,30,60,.07); }
+  .gp-title { font:12.5px ui-monospace,monospace; color:#3a4160;
+    margin-bottom:6px; }
+  .gp-node { cursor:pointer; }
+  .gp-card { margin-top:8px; }
+  @media (max-width:1180px) { #graphpanel { display:none !important; } }
   .concl { border-left:4px solid var(--accent); }
   .cc-machine { font:12.5px ui-monospace,monospace; color:#3a4160;
     margin:6px 0; }
@@ -1076,6 +1125,9 @@ WORKBENCH_PAGE = """<!doctype html>
 operation shown, confirmed by you, results are the answer</span></header>
 <details id="minebar"><summary>my shelf — definitions, reports,
 saved questions</summary><div class="minebody"></div></details>
+<div id="graphpanel" style="display:none"><div class="gp-title">the
+answer&#39;s shape <span class="cite">receipts only</span></div>
+<div class="gp-svg"></div><div class="gp-card"></div></div>
 <div id="log"></div>
 <form id="ask"><input id="q" autocomplete="off"
   placeholder="e.g. are all definitions of Base_Pop_Severe_ED_Scores the same?">
@@ -1211,6 +1263,10 @@ function renderOutput(o) {
             return;
           }
           rs.appendChild(el(`<div class="runlabel">${esc(rj.sampling_label)}</div>`));
+          // GRAPH-PANEL-1: the executed step badges its RUNG on
+          // the shape panel (redraw with run info)
+          if (lastSubgraph) renderSubgraph(lastSubgraph,
+            { step_id: rj.step_id, rung: rj.rung });
           rs.appendChild(renderTable(rj.rows, rj.columns));
         });
         rs.appendChild(btn);
@@ -1463,6 +1519,9 @@ function renderFinale(j) {
     add(el(`<div class="loopline">${esc(j.loop_status)}${
       j.loop_note ? ' — ' + esc(j.loop_note) : ''}</div>`));
   }
+  // GRAPH-PANEL-1: the shape panel redraws per answer
+  lastSubgraph = j.subgraph || null;
+  renderSubgraph(lastSubgraph, null);
     renderFeedback(j.turn_index);
 }
 
@@ -1786,6 +1845,92 @@ function renderParseCard(j, message) {
     });
   return card;   // RW-19: the DOM smoke inspects the wired card
 }
+
+// GRAPH-PANEL-1: the emergent shape rendered as itself — the SVG
+// derives ONLY from the machine-composed subgraph (receipts); a
+// deterministic layered layout so identical answers give identical
+// pictures. Kind colors; anchors emphasized; conflict flags red;
+// derived (computed) edges dashed. Click a node for its card.
+const KIND_COL = { report: 0, measure: 0, metric: 1, flag: 1,
+  step: 2, term: 2, table: 3, column: 3 };
+const KIND_FILL = { metric: '#dbe7fb', step: '#e6f2e4',
+  table: '#f6ecd9', report: '#efe2f4', flag: '#fbe3e0',
+  term: '#e8e8ef', measure: '#efe2f4', column: '#f6ecd9' };
+
+function renderSubgraph(g, runInfo) {
+  const panel = document.getElementById('graphpanel');
+  if (!panel) return null;
+  if (!g || !g.nodes || !g.nodes.length) {
+    panel.style.display = 'none'; return null;
+  }
+  panel.style.display = 'block';
+  panel.querySelector('.gp-card').innerHTML = '';
+  const cols = [[], [], [], []];
+  for (const n of g.nodes) {
+    cols[KIND_COL[n.kind] !== undefined ? KIND_COL[n.kind] : 2]
+      .push(n);
+  }
+  const W = 320, colW = W / 4, rowH = 34;
+  const pos = {};
+  let maxRows = 1;
+  cols.forEach((col, ci) => {
+    maxRows = Math.max(maxRows, col.length);
+    col.forEach((n, ri) => {
+      pos[n.id] = { x: ci * colW + colW / 2, y: 24 + ri * rowH };
+    });
+  });
+  const H = 40 + maxRows * rowH;
+  let svg = `<svg width="${W}" height="${H}" role="img">`;
+  for (const e of g.edges) {
+    const a = pos[e.from], b = pos[e.to];
+    if (!a || !b) continue;
+    const red = (g.nodes.find(n => n.id === e.from) || {})
+      .flag_class || (g.nodes.find(n => n.id === e.to) || {})
+      .flag_class;
+    svg += `<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}"
+      stroke="${red ? '#c0392b' : '#b9c2d4'}"
+      ${e.derived ? 'stroke-dasharray="4 3"' : ''}
+      stroke-width="1.2"><title>${esc(e.label)}${
+        e.derived ? ' (computed)' : ''}</title></line>`;
+  }
+  for (const n of g.nodes) {
+    const p = pos[n.id];
+    const label = String(n.name || n.id).slice(0, 14);
+    const badge = (runInfo && runInfo.step_id === n.id)
+      ? ` · rung ${runInfo.rung}` : '';
+    svg += `<g class="gp-node" data-id="${esc(n.id)}">
+      <circle cx="${p.x}" cy="${p.y}" r="9"
+        fill="${KIND_FILL[n.kind] || '#eee'}"
+        stroke="${n.flag_class ? '#c0392b' : '#5b6a8f'}"
+        stroke-width="${n.anchor ? 3 : 1}"></circle>
+      <text x="${p.x}" y="${p.y + 20}" text-anchor="middle"
+        font-size="9">${esc(label)}${esc(badge)}</text>
+      <title>${esc(n.id)} (${esc(n.kind)})${
+        n.flag_class ? ' · ' + esc(n.flag_class) : ''}</title></g>`;
+  }
+  svg += '</svg>';
+  if (g.truncated) svg += '<div class="cite">largest 40 shown</div>';
+  const box = panel.querySelector('.gp-svg');
+  box.innerHTML = svg;
+  box.querySelectorAll('.gp-node').forEach(el2 =>
+    el2.addEventListener('click', async () => {
+      const r = await fetch('/api/node', { method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ id: el2.dataset.id,
+                               conversation_id: conversationId })});
+      const j = await r.json();
+      const card = j.conclusion
+        ? renderConclusion({ conclusion: j.conclusion, caption: '',
+                             caption_inputs: [], answered: true })
+        : el(`<div class="cc-machine">${esc(j.message ||
+             'no card')}</div>`);
+      const slot = panel.querySelector('.gp-card');
+      slot.innerHTML = '';
+      slot.appendChild(card);
+    }));
+  return box;
+}
+let lastSubgraph = null;
 
 // FLYWHEEL-1: the Ground-Truth Shelf — replay is a saved operation
 async function loadShelf() {

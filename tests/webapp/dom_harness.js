@@ -140,11 +140,15 @@ function parseHTML(html) {
 // ---- document / environment stubs ------------------------------------
 
 const byId = {};
-for (const id of ['log', 'q', 'askbtn', 'ask']) {
+for (const id of ['log', 'q', 'askbtn', 'ask', 'graphpanel']) {
   byId[id] = new El(id === 'ask' ? 'form' : 'div');
   byId[id].attrs['id'] = id;
   byId[id].value = '';
 }
+// GRAPH-PANEL-1: the shape panel's slots exist like on the page
+byId['graphpanel'].innerHTML =
+  '<div class="gp-svg"></div><div class="gp-card"></div>';
+byId['graphpanel'].style = {};
 
 global.document = {
   createElement: (t) => new El(t),
@@ -252,6 +256,38 @@ check('output error fold', () => {
   renderOutput({ component: { op: 'compare', params: {} },
     error: 'guard engaged detail' });
 });
+check('subgraph panel renders and wires (GRAPH-PANEL-1)', () => {
+  const box = renderSubgraph({
+    nodes: [
+      { id: 'm1', kind: 'metric', name: 'Active Diabetics',
+        anchor: true },
+      { id: 'transform:m1:Reg', kind: 'step', name: 'Reg' },
+      { id: 'cluster:x', kind: 'flag', name: 'Misnomer',
+        flag_class: 'misnomer' }],
+    edges: [
+      { from: 'm1', to: 'transform:m1:Reg', label: 'step',
+        derived: false },
+      { from: 'm1', to: 'cluster:x', label: 'compared',
+        derived: true }],
+    truncated: false,
+  }, { step_id: 'transform:m1:Reg', rung: 2 });
+  if (!box) throw new Error('panel did not render');
+  const nodesDrawn = box.querySelectorAll('.gp-node');
+  if (nodesDrawn.length !== 3) {
+    throw new Error('expected 3 nodes, got ' + nodesDrawn.length);
+  }
+  for (const n of nodesDrawn) {
+    if (!(n.listeners['click'] || []).length) {
+      throw new Error('node not click-wired');
+    }
+  }
+});
+
+check('subgraph empty hides the panel', () => {
+  const r = renderSubgraph(null, null);
+  if (r !== null) throw new Error('expected null');
+});
+
 check('output result with run button row', () => {
   renderOutput({ component: { op: 'retrieve', params: {},
     auto_round: 1 }, result: { ref: 'R1', op: 'retrieve',

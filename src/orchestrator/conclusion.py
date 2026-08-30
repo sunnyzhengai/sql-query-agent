@@ -258,3 +258,111 @@ def compose_conclusion(outputs: "list[dict]", caption: str,
                     for row in any_rows[:6]],
                 "prose": caption}
     return None
+
+
+# --- GRAPH-PANEL-1 (Sunny's direction: show the inner workings) -------
+
+_KIND_COLUMN = {"report": 0, "measure": 0, "metric": 1, "flag": 1,
+                "step": 2, "term": 2, "table": 3, "column": 3}
+
+
+def compose_subgraph(outputs: "list[dict]") -> "dict | None":
+    """The answer's SUBGRAPH — derived EXCLUSIVELY from the turn's
+    stamped results (receipts only; nothing model-claimed renders):
+    displayed records as nodes; their step/read/link fields as
+    edges; compare verdicts as DERIVED edges, labeled as computed.
+    Deterministic: sorted nodes and edges — identical answers give
+    identical pictures. P4/P5-safe: ids, names, kinds, flag classes
+    only — never rows."""
+    results = _results(outputs)
+    nodes: "dict[str, dict]" = {}
+    edges: "set[tuple]" = set()
+
+    def add_node(nid, kind=None, name=None, flag_class=None):
+        nid = str(nid or "")
+        if not nid:
+            return ""
+        n = nodes.setdefault(nid, {"id": nid, "kind": "", "name": ""})
+        if kind and not n["kind"]:
+            n["kind"] = str(kind)
+        if name and not n["name"]:
+            n["name"] = str(name)
+        if flag_class:
+            n["flag_class"] = str(flag_class)
+        return nid
+
+    anchors: "set[str]" = set()
+    compared: "list[list[str]]" = []
+    for r in results:
+        params = r.get("params") or {}
+        if r.get("op") == "retrieve":
+            anchors.update(str(i) for i in params.get("ids") or [])
+        rows = r.get("rows") or []
+        if r.get("op") == "compare":
+            group_members = [
+                [str(m) for m in (row.get("members") or [])]
+                for row in rows if "group" in row]
+            flat = [m for g in group_members for m in g]
+            if flat:
+                compared.append(flat)
+            for m in flat:
+                add_node(m, kind="step" if
+                         m.startswith("transform:") else "metric")
+            continue
+        for row in rows:
+            rid = add_node(row.get("id"), row.get("kind"),
+                           row.get("business_name") or row.get("name"),
+                           row.get("flag_class"))
+            if not rid:
+                continue
+            for s in row.get("steps") or []:
+                sid = add_node(s.get("id") or
+                               f"{rid}:{s.get('name')}", "step",
+                               s.get("name"))
+                edges.add((rid, sid, "step", False))
+            src = row.get("source_tables")
+            src_list = ([x.strip() for x in src.split(",")]
+                        if isinstance(src, str) else list(src or []))
+            for tname in src_list:
+                if tname:
+                    tid = add_node(f"table:{tname}", "table", tname)
+                    edges.add((rid, tid, "reads", False))
+            for field, label in (("executes_metrics", "executes"),
+                                 ("reads_tables", "reads"),
+                                 ("measures", "measures")):
+                for x in row.get(field) or []:
+                    xid = add_node(
+                        x.get("id"),
+                        "table" if label == "reads" else "metric",
+                        x.get("name"))
+                    if xid:
+                        edges.add((rid, xid, label, False))
+            for m in row.get("members") or []:
+                mid = add_node(m.get("id"), None, m.get("name"))
+                if mid:
+                    edges.add((mid, rid, "member_of", False))
+            if row.get("of_metric"):
+                pid = add_node(row["of_metric"], "metric")
+                edges.add((pid, rid, "step", False))
+    # DERIVED edges (drawn distinctly, labeled as computed): the
+    # compare verdict connects every compared pair
+    for flat in compared:
+        for i in range(len(flat) - 1):
+            a, b = sorted((flat[i], flat[i + 1]))
+            edges.add((a, b, "compared", True))
+    if not nodes:
+        return None
+    for nid in anchors:
+        if nid in nodes:
+            nodes[nid]["anchor"] = True
+    out_nodes = sorted(
+        nodes.values(),
+        key=lambda n: (_KIND_COLUMN.get(n["kind"], 2),
+                       n["name"] or n["id"], n["id"]))[:40]
+    kept = {n["id"] for n in out_nodes}
+    out_edges = sorted(
+        [{"from": a, "to": b, "label": lb, "derived": dv}
+         for a, b, lb, dv in edges if a in kept and b in kept],
+        key=lambda e: (e["from"], e["to"], e["label"]))
+    return {"nodes": out_nodes, "edges": out_edges,
+            "truncated": len(nodes) > 40}
