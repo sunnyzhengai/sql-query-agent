@@ -3186,3 +3186,20 @@ verbs, flag stays the fold key (test-held). **SUNNY: restart now
 Active Diabetic Patients compare and say in one breath which
 member does what; (2) press certify on the Diabetic Patients
 cluster and confirm the product asks WHICH act and WHICH member.
+
+## ORDER CONSOLE-2b (review's headless diagnosis of Sunny's "same results")
+The composer delivered; the console PAGE ignores it. Probe proof:
+evidence.conclusion carries fingerprints(2)/contrast/set_summary/
+diff_label — the page's compare handler renders headline +
+diff_lines only.
+1. Console page renders the conclusion card fields: fingerprint
+   rows, contrast line, set_summary lead, labeled folded diff.
+   DOM harness gains a RED-FIRST case (payload with fingerprints →
+   assert they render) so payload-ignoring renderers cannot pass.
+2. criterion extraction: empty for the codeset members — cover
+   IN-list predicates / step-record decision sites; contrast must
+   be criterion-first as specified, description only as fallback.
+3. set_summary did not compose for the codeset compare (empty in
+   payload) — the literal-set distiller must fire on this path;
+   assert non-empty when a literal-set delta exists.
+Acceptance unchanged: Sunny's one-breath read on a FRESH compare.
