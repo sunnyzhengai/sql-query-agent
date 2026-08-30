@@ -224,6 +224,7 @@ def compose_conclusion(outputs: "list[dict]", caption: str,
     if census is not None:
         crows = census.get("rows") or []
         return {"kind": "census",
+                "ref": str(census.get("ref") or ""),
                 "count_line": (str(census.get("headline") or "")
                                or f"{len(crows)} item(s) — "
                                   + str(census.get("universe")

@@ -2324,3 +2324,18 @@ flag" but the SQL has no JOIN (column filter on DIAGNOSIS_CODES) —
 the wording made Sunny correctly suspect a missing table.
 Descriptions must not imply structure the SQL lacks; sweep the
 palette for "joined" where no join exists.
+
+### 2026-08-29 — RW-24 item 1 BUILT — release 1.64.3
+**Positional language is dead in composed text, and the gate that
+keeps it dead found a SECOND live instance on its first run.** The
+census overflow line now links the round ref ("… and 25 more —
+expand R1 for the full table", clickable to the panel); the caption
+renderer's headline citation "(R1 headline — shown above)" — a
+second positional break under the folded layout the walk had not
+hit yet — became "(R1 headline)"; the commentary label reworded
+positional-free. A grep gate in the suite holds conclusion.py + the
+page template clean of layout-positional phrases permanently.
+**Item 2 (probe curation in census display) is SUNNY'S OPEN CALL**
+— parked on the board (review recommends: badge probes as
+`control` with a split count line).
+**Gates:** 1,246 green + 5 xfailed, ruff clean; wheel 1.64.3.

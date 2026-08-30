@@ -210,3 +210,32 @@ class TestRW23StringFieldsNeverIterateAsChars:
                  "source_tables": []}]
         c = compose_conclusion(self._out(rows), "", True)
         assert c["items"][0]["source_tables"] == ["T1", "T2"]
+
+
+def test_rw24_no_positional_language_in_composed_text():
+    """RW-24 (Sunny's census read): positional words break under the
+    folded answer-first layout — composed card text links the round
+    ref instead. The census card carries its ref; a grep gate holds
+    the page template and composer clean of layout-positional
+    phrases."""
+    from pathlib import Path
+    repo = Path(__file__).resolve().parents[2]
+    for rel in ("src/orchestrator/conclusion.py",
+                "src/webapp/app.py"):
+        text = (repo / rel).read_text()
+        for phrase in ("table above", "table below", "listed above",
+                       "shown above", "shown below", "see above",
+                       "see below"):
+            assert phrase not in text, f"{rel}: positional {phrase!r}"
+    out = [{"component": {"op": "census", "params": {}},
+            "result": {"op": "census", "ref": "R3", "params": {},
+                       "complete": True, "universe": "u",
+                       "headline": "30 metric(s)",
+                       "rows": [{"id": f"m{i}", "kind": "metric",
+                                 "name": f"M{i}",
+                                 "business_name": f"M{i}",
+                                 "description": ""}
+                                for i in range(30)]}}]
+    c = compose_conclusion(out, "", True)
+    assert c["ref"] == "R3"          # the linkable round ref
+    assert c["total"] == 30 and len(c["items"]) == 12

@@ -164,6 +164,10 @@ rides the planner; awaits review verification + Sunny's re-ask).
       building at the failure's level; the missing mechanism is
       one level up, in what generates the variance. (Full text in
       WALK_VERDICTS_SHAPES.)
+- [ ] **RW-24 item 2 (probe curation):** corpus probes
+      (Line-Ending Probe A/B, Reference Forms Probe, …) in census
+      display — badge as `control` w/ split count line (review
+      recommends) / leave as-is / filter from default census.
 - [ ] ADR 0058 self-service contracts: ratify + 2 sub-calls
       (parameter-range depth; quarantine release authority)
 - [ ] Tier naming (listing-copy time; seeds recorded in
@@ -357,8 +361,13 @@ The hold lifts only by Sunny's explicit word, recorded here.
       renders full names, content-test-held); B16 verbatim in the
       battery; runner prints card CONTENT (assertion blindness
       closed). 1,245 green + ruff. **BATTERY 22/22 REVIEW-GREEN
-      (08-29 night): B16 renders real table names on live content.
-      SUNNY RESUMES → QA gate → CAPTURE.**
+      (08-29 night): B16 renders real table names on live content.**
+- [x] **RW-24 item 1 BUILT (08-29 dev, 1.64.3)** — positional
+      language dead in composed text (census overflow links the
+      round ref; the gate found a SECOND live instance — the
+      headline citation — on its first run); grep gate standing.
+      1,246 green + ruff. Item 2 = SUNNY'S CALL below. Sunny
+      resumes → QA gate → CAPTURE.
 
 ## RULED (Sunny, 2026-08-29): THE GENERATOR CLAUSE — Echo Law amendment
 "Fail twice, no matter the cause, triggers an investigation."

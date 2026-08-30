@@ -849,8 +849,8 @@ WORKBENCH_PAGE = """<!doctype html>
   .caption { background:#f0f4fb; border-radius:10px; padding:12px 16px;
              margin:0 0 8px; white-space:pre-wrap; font-size:13px;
              color:#4a4f5a; }
-  .caption::before { content:"commentary (model-written; headlines "
-             "above are machine-stamped)"; display:block; font:10.5px
+  .caption::before { content:"commentary (model-written; stamped "
+             "headlines carry the machine truth)"; display:block; font:10.5px
              ui-monospace,monospace; color:#8a8fa0; margin-bottom:4px; }
   .caption .inputs { display:block; margin-top:6px; font:11.5px
              ui-monospace,monospace; color:#6b7080; }
@@ -1175,11 +1175,11 @@ function renderMarkdown(raw) {
 }
 
 function foldHeadlineQuotes(raw) {
-  // verbatim re-quote of a stamped headline shown above → citation
+  // verbatim re-quote of a stamped headline → a ref citation
   let text = String(raw);
   for (const h of turnHeadlines) {
     if (h.text.length >= 40 && text.includes(h.text))
-      text = text.split(h.text).join(`(${h.ref} headline — shown above)`);
+      text = text.split(h.text).join(`(${h.ref} headline)`);
   }
   return text;
 }
@@ -1261,10 +1261,13 @@ function renderConclusion(j) {
     const items = (c.items || []).map(i =>
       `<div class="cc-item"><b>${esc(i.name)}</b>${
         i.description ? ' — ' + esc(i.description) : ''}</div>`).join('');
+    // RW-24: NEVER positional ("above" broke under the folded
+    // answer-first layout) — link the round ref instead
     const more = c.total > (c.items || []).length
       ? `<div class="cc-machine">… and ${esc(String(
-          c.total - c.items.length))} more (the table above holds
-          the full enumeration)</div>` : '';
+          c.total - c.items.length))} more — expand <a class="cite"
+          href="#ref-${esc(c.ref)}">${esc(c.ref)}</a> for the full
+          table</div>` : '';
     return el(`<div class="caption concl">
       <div class="cc-machine">${esc(c.count_line)}</div>
       ${items}${more}${proseHtml}${based}</div>`);

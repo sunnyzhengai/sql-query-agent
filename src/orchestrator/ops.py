@@ -815,7 +815,7 @@ def _column_usage(column: str, run_kql, session: OpsSession) -> ResultSet:
                 "Projection (selects) coverage is absent from "
                 "this graph export — it predates the ADR 0053 "
                 "edges; rerun the pipeline to mint them. Filter "
-                "coverage above is current.")
+                "coverage in this result is current.")
         elif not out:
             # W13b (walk 1562, HONESTY-CRITICAL — the
             # ED_DEPARTURE_TIME corpse: 0 recorded edges read as
