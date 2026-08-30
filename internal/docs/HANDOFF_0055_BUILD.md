@@ -3227,3 +3227,20 @@ Acceptance unchanged: Sunny's one-breath read on a FRESH compare.
    literal-set delta exists, so any real regression is red.
 **Gates:** 1,356 green + 5 xfailed, ruff clean; wheel 1.75.1.
 Sunny's one restart now carries CONSOLE-2 + 2b + 3 together.
+
+## ORDER CONSOLE-2c (probe on 1.75.1 — two truth defects)
+1. **Criterion counts are FALSE:** both codeset members sketch as
+   "IN (49 values)" — true counts are 80 and 81 (likely counting a
+   TRUNCATED expression_sql). Counts in sketches must be true —
+   with true counts the criterion line alone shows the difference.
+   Find and fix the truncation; assert the codeset criteria sketch
+   80 vs 81.
+2. **GENERATOR KILL for the bare-name class (third surface):**
+   set_summary reads "E11.80 only in Diabetic Codeset" — both
+   members bear that name. Mechanism, not another spot fix: every
+   member-name render goes through the qualified-label function
+   (collision → qualified), enforced by a grep/harness gate like
+   the positional-language kill — bare `name` rendering of members
+   becomes unwritable. Acceptance: set_summary names
+   "Diabetic Codeset (reports.USP_Diabetic_CodesetB)".
+Then Sunny's one-breath glass read closes CONSOLE-2 for good.
