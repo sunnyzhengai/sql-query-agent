@@ -2943,3 +2943,14 @@ on every cluster). Reconciliation assertions test-held both ways
 (full list of 10; disclosed shortfall of 8-of-10).
 **Gates:** 1,318 green + 5 xfailed, ruff clean; wheel 1.72.1;
 XRAY_REPORT.md regenerated live. The wedge is engagement-clean.
+
+### REVIEW VERDICT — XR-1 (1.72.1): VERIFIED
+Gates 1,318 + ruff clean; regenerated report reconciles (Diabetic
+Patients 10==10, twins qualified; shortfalls disclose; cap
+raised). The X-Ray wedge is engagement-ready. **XR-2 (polish,
+rides next X-ray touch, non-blocking):** cousin why-sentences at
+name-grain clusters say "N metrics" where members are NAMES
+("High ED Utilizers": 3 procs, 2 names — twins covered by their
+own grain/misnomer flags). Wording should count "named variants"
+at name grain so a paying reader never stumbles. BRIDGE-1
+exporters next per the queue.
