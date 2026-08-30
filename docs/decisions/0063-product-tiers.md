@@ -130,7 +130,11 @@ principals (recorded listing blockers).
 
 ## 7. Build delta (honest, so the lock is real)
 
-Tier 2 built. Tier 3 built through rung 2 (gates recorded). X-Ray
+Tier 2's ENGINE is built (grounding, compare, cards, graph
+panel, gate); its v1 SURFACE — the Resolution Console/Inbox — is
+new work: flag-driven sessions, the button verbs, the approval
+flows (est. days-to-a-week; all buttons invoke existing ops).
+Tier 3 built through rung 2 (gates recorded). X-Ray
 = productizing the existing sweep (report generator + engagement
 runbook). Tier 1 delta: term-proposal into DG object models,
 relationship writing, steward alerts, the Write-Back Queue UI,
