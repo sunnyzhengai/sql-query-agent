@@ -2345,3 +2345,22 @@ Gates review-side green; positional-language grep gate in place
 (and it caught a second live instance on its first run — the
 mechanism earning its keep on day one). Census overflow links the
 round ref. Sunny's restart picks it up.
+
+## ORDER RW-25 (Sunny's walk: the idle-wake failure, 8:06 PM)
+Store idle ~57 min → grounding queries unanswered → honest
+store-error card, BUT:
+1. **Auto-retry once** on store-no-answer (idle-wake is a known
+   ~10-15s transient); skeleton shows "store waking…" during the
+   retry. One retry makes this card never exist.
+2. **The named remedy must be a button:** the store-error card
+   says "retry" in prose but offers no retry action. No-dead-ends
+   = named actions ARE buttons.
+3. **Model cause-guessing floored (law):** commentary invented
+   "check access or permissions" over a store timeout the guards
+   had already diagnosed. Infra causes come from STAMPS, never
+   the model — the typed store-wake cure renders; a model
+   sentence naming an unfounded infra cause is a floorable claim
+   class (extend the honesty gate's claim lexicon).
+4. Unit coverage: store-exception → one retry → typed card with
+   retry button; fallback ops surfacing the SAME store error
+   carry the infra cure verbatim.
