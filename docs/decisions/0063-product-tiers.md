@@ -1,10 +1,13 @@
 # ADR 0063 — The product tiers: X-Ray, Bridge, Workbench, Run
 
-**Status:** DRAFT 2026-08-30 — the tier lock, debated to
-convergence between Sunny and review (architect input recorded);
-Sunny ratifies. This ADR is also a SCOPE LOCK: every new idea is
-sorted into a tier's v1 or the roadmap BEFORE it is built; what
-fits no box waits.
+**Status:** ACCEPTED 2026-08-30 — the tier lock, debated to
+convergence; Sunny ratified with three rulings same-day: Tier 2
+v1 = the RESOLUTION CONSOLE (not open chat); integration is
+FILE-FIRST (she experiments with her Purview instance); the
+Write-Back Queue is law. Only X-Ray pricing/length remains
+parked. This ADR is also a SCOPE LOCK: every new idea is sorted
+into a tier's v1 or the roadmap BEFORE it is built; what fits no
+box waits.
 
 ## 0. The cross-cutting law: artifacts land, chat doesn't
 
@@ -53,10 +56,12 @@ approved by <name>" / "steward-certified"). Confirm-before-
 execute, applied to the last mile.
 
 **Integration strategy (Sunny's Plan B = stage 1, not fallback):**
-- Stage 1 — FILE-FIRST: approved review sets export as native
-  import files (Collibra Data Intake Excel/CSV incl. relations;
-  Purview glossary CSV); the admin uploads. Zero API risk, and
-  the file itself is a second HITL artifact.
+- Stage 1 — FILE-FIRST (RULED priority, 2026-08-30): approved
+  review sets export as native import files (Collibra Data Intake
+  Excel/CSV incl. relations; Purview glossary CSV); the admin
+  uploads. Zero API risk; the file is a second HITL artifact.
+  Sunny experiments with her Purview instance to validate the
+  CSV surface firsthand.
 - Stage 2 — DIRECT API: Collibra Import API; Purview Atlas REST
   (entities/relationships/lineage) + governance APIs (domains,
   terms, data products). Adapter targets the surface spanning
@@ -64,12 +69,26 @@ execute, applied to the last mile.
 Positioning: "you aren't buying a new tool; you're buying the
 engine that makes your expensive catalog true."
 
-## 3. Tier 2 — AIVIA Workbench (end-user seats; the value explosion)
+## 3. Tier 2 — AIVIA Workbench v1 = THE RESOLUTION CONSOLE (Sunny's ruling, 2026-08-30)
 
-Everything in Bridge, plus the chat workbench for named users:
-the dialogue loop (0062), basis-line receipts, the graph panel,
-flags and variant maps, the Ground-Truth Shelf. LANDING TAXONOMY
-(what crosses from chat to the DG tool):
+NOT open chat at launch. The workbench answers RED-FLAGGED
+questions: every session starts from a machine-found flag with
+its computed evidence (members, diffs, why-sentences, the graph
+panel), and every action is a PREDEFINED BUTTON — the 0056 verbs
+in uniform: **compare · certify · delegate to citizen steward ·
+deny (with reason)**; developers additionally **approve technical
+writes / fork**. Closed domain = zero open-world parse risk; the
+dialogue-loop machinery (grounding, compare cards, diff lines,
+graph panel) is the ENGINE underneath, rendering evidence and
+executing buttons. Open interrogation ("ask anything") moves to
+the ROADMAP as a re-openable surface — the engine stays tested by
+the nightly battery + fuzzer regardless.
+**THE INBOX (unification of #3 and Plan C):** the console and the
+Write-Back Queue are ONE SURFACE — stewards see flags to resolve
++ business writes to approve; developers see technical writes to
+approve. Every approval lands through the queue, graded, logged.
+(§8.2 dissolves into this.)
+LANDING TAXONOMY (what crosses to the DG tool):
 - steward CERTIFY (0056 w5) → glossary/asset description update,
   grade steward-certified — through the Write-Back Queue;
 - differentiation rulings → term updates/relations/deprecations;
@@ -122,8 +141,7 @@ provenance-graded fields, file exporters (stage 1) then API push
 
 1. X-Ray price point + engagement length (Sunny, with sales
    motion).
-2. Whether Bridge includes a minimal read-only admin console for
-   the Write-Back Queue (review recommends YES — the queue needs
-   a surface; it is admin-only so the headless promise holds).
-3. Purview adapter target order: classic Atlas first vs Unified
-   Catalog first (recommend: Atlas first — spans both today).
+2. RESOLVED by the Inbox unification (§3): the queue's surface IS
+   the Resolution Console.
+3. Deferred with file-first: API target order decided at stage 2
+   (Atlas-first remains the recommendation).
