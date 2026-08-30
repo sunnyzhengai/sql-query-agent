@@ -2662,3 +2662,30 @@ grounding and shifting compare's refs); (c) lexicon collision:
 claims sameness — variants surface forms must outrank in context.
 **KEYVAULT-1 released** (FINDINGS-3 green); FINDINGS-4 rides
 alongside. 0060-EXPERIMENT-CLOSE follows.
+
+### 2026-08-30 — FUZZ-FINDINGS-4 + KEYVAULT-1 BUILT — release 1.69.0
+**FINDINGS-4, all three stable bugs dead:**
+- (a/b) Root cause confirmed as suspected: the LLM extracted
+  "definitions" as an ENTITY — a relation word grounding junk
+  semantic anchors that shifted compare's refs off the codesets.
+  Word-grain rule: an entity made entirely of RELATION-LEXICON
+  words is the relation, not a thing — dropped at parse
+  (test-held: "identical in their definitions" keeps only the
+  codesets entity and reads sameness).
+- (c) "defined in a different manner/way(s)" is VARIANTS as
+  ruled — multi-word variants forms outrank bare "different" via
+  longest-first span claiming; bare "different" still reads
+  sameness (both directions test-held).
+**KEYVAULT-1 code-side complete:** src/secrets_vault.py —
+"keyvault:<name>" strings anywhere in org_config resolve through
+the `key_vault: url:` block at config-load; plain configs pass
+untouched and never contact a vault. Every failure NAMES ITS CURE
+(RW-16 pattern): ref-without-vault-block → the exact YAML to add;
+404 → the `az keyvault secret set` line; 401/403 → the Key Vault
+Secrets User role; no credential → az login / Fabric token; no
+network → check URL/VPN. Token: notebookutils in Fabric, az CLI
+on dev machines (the connection.py pattern). KeyVaultConfig joins
+the config model; registered under 0007 (deployment). NO tenant
+action taken — Sunny's vault click completes the loop later.
+**Gates:** 1,288 green + 5 xfailed, ruff clean; wheel 1.69.0.
+Remaining in queue 2: 0060-EXPERIMENT-CLOSE (on review-green).

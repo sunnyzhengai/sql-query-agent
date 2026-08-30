@@ -308,3 +308,39 @@ class TestFuzzFindings3DeterministicRelations:
         for forms in RELATION_LEXICON.values():
             for f in forms:
                 assert f in PARSE_PROMPT, f
+
+
+class TestFuzzFindings4:
+    """FUZZ-FINDINGS-4: three stable bugs. (a/b) relation words
+    extracted as entities grounded junk and shifted compare refs;
+    (c) 'defined in a different manner' is VARIANTS (ruled) — the
+    multi-word forms outrank bare 'different'."""
+
+    def test_relation_word_entities_are_dropped(self):
+        from src.orchestrator.parse_plan import parse_question
+
+        def llm(messages, tools, tool_choice=None):
+            import json as _j
+            return {"content": "", "tool_calls": [{
+                "id": "p", "function": {"name": "file_parse",
+                    "arguments": _j.dumps({
+                        "entities": ["Diabetic codesets",
+                                     "definitions"],
+                        "primitives": []})}}]}
+        p = parse_question(
+            "Are the Diabetic codesets identical in their "
+            "definitions?", llm)
+        assert p.entities == ["Diabetic codesets"]
+        assert "same_or_different" in p.primitives
+
+    def test_different_manner_is_variants_not_sameness(self):
+        from src.orchestrator.parse_plan import detect_relations
+        got = detect_relations(
+            "is the cohort defined in a different manner anywhere?")
+        assert "variants" in got
+        assert "same_or_different" not in got
+
+    def test_bare_different_still_reads_sameness(self):
+        from src.orchestrator.parse_plan import detect_relations
+        got = detect_relations("are these two different?")
+        assert got == ["same_or_different"]

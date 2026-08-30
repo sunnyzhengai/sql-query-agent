@@ -417,8 +417,15 @@ The hold lifts only by Sunny's explicit word, recorded here.
       = entity extraction + fallback only); prompt generates from
       the lexicon (one source); @prev fragility dead (explicit-id
       compare). Flip-flop class structurally impossible,
-      determinism test-held. 1,279 green + ruff. AWAITS review →
-      KEYVAULT-1 → 0060-EXPERIMENT-CLOSE.
+      determinism test-held. 1,279 green + ruff. **ACCEPTED by
+      review (byte-identical double run — stability proven).**
+- [x] **FUZZ-FINDINGS-4 + KEYVAULT-1 BUILT (08-30 dev, 1.69.0)**
+      — relation-word entities dropped (the stable E11.80 misses'
+      root); "different manner/way" = variants as ruled;
+      secrets_vault.py: keyvault: refs resolve at config load,
+      every failure names its cure, zero tenant action (Sunny's
+      vault click completes later). 1,288 green + ruff. AWAITS
+      review → 0060-EXPERIMENT-CLOSE.
 
 ## RULED (Sunny, 2026-08-29): THE GENERATOR CLAUSE — Echo Law amendment
 "Fail twice, no matter the cause, triggers an investigation."

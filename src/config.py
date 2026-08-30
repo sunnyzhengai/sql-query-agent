@@ -153,6 +153,12 @@ class RunConfig(BaseModel):
     row_cap: int = 200
 
 
+class KeyVaultConfig(BaseModel):
+    """KEYVAULT-1: the vault the "keyvault:<name>" refs resolve
+    through (secrets_vault.py, config-load time)."""
+    url: str = ""
+
+
 class Config(BaseModel):
     org: OrgConfig
     lakehouse: LakehouseConfig
@@ -163,6 +169,7 @@ class Config(BaseModel):
     fabric_graph: Optional[FabricGraphConfig] = None
     freshness: FreshnessConfig = FreshnessConfig()
     run: Optional[RunConfig] = None
+    key_vault: Optional[KeyVaultConfig] = None
 
 
 def load_config(path: Path | str | None = None) -> Config:
@@ -185,6 +192,12 @@ def load_config(path: Path | str | None = None) -> Config:
 
     with open(path) as f:
         raw = yaml.safe_load(f)
+
+    # KEYVAULT-1: "keyvault:<name>" strings resolve through the
+    # key_vault: block at load time; configs without refs pass
+    # untouched and no vault is contacted
+    from src.secrets_vault import resolve_config_secrets
+    raw = resolve_config_secrets(raw)
 
     config = Config(**raw)
     logger.info("Loaded config for org: %s", config.org.name)

@@ -7,7 +7,7 @@
 
 # Test Map — what every test proves
 
-114 modules, 1245 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
+115 modules, 1254 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
 
 ## By ADR
 
@@ -19,7 +19,7 @@
 | 0004 | Two-stage human-in-the-loop certification | `tests/governance/test_steward.py` (5) |
 | 0005 | Agent refuses when no certified path exists | `tests/governance/test_display_names.py` (7), `tests/test_agent_backend.py` (7), `tests/test_graph_agent_harness.py` (6) |
 | 0006 | Knowledge graph answers questions; Purview discovers reports | `tests/adapters/test_adapters.py` (10) |
-| 0007 | BYOT deployment as a Python library (.whl) | `tests/test_build_deployment_package.py` (8), `tests/test_engine_floor.py` (4), `tests/test_release_consistency.py` (4), `tests/test_validate_deployment.py` (14) |
+| 0007 | BYOT deployment as a Python library (.whl) | `tests/test_build_deployment_package.py` (8), `tests/test_engine_floor.py` (4), `tests/test_release_consistency.py` (4), `tests/test_secrets_vault.py` (6), `tests/test_validate_deployment.py` (14) |
 | 0009 | Catalog integrations are optional adapters | `tests/adapters/test_adapters.py` (10), `tests/adapters/test_collibra.py` (10), `tests/governance/test_publish_log.py` (3), `tests/test_docs_consistency.py` (10) |
 | 0013 | List as transactable SaaS on the commercial marketplace | `tests/marketplace/test_fulfillment.py` (16), `tests/marketplace/test_host.py` (13) |
 | 0014 | Ground the agent in metric_logic; dictionary is mandatory | `tests/governance/test_validation.py` (6), `tests/steps/test_steps.py` (41), `tests/test_dictionary.py` (8) |
@@ -63,7 +63,7 @@
 | 0055 | The designed shape corpus: spec-derived test data (category-partition over name x logic x scope) | `tests/shapes/test_shapes.py` (18) |
 | 0056 | The decision algebra: every answer ends in a decision (typed deny, usage weights) | `tests/test_flywheel.py` (7) |
 | 0059 | The graph topology axioms: connected, sound, complete (measured, then formalized) | `tests/graph/test_topology.py` (14) |
-| 0060 | The parse is the plan: parser-only LLM, deterministic traversal, correction flywheel | `tests/orchestrator/test_parse_plan.py` (25) |
+| 0060 | The parse is the plan: parser-only LLM, deterministic traversal, correction flywheel | `tests/orchestrator/test_parse_plan.py` (28) |
 | 0061 | The run layer: Pro runs the confirmed definition | `tests/test_run_layer.py` (15) |
 | 0062 | The dialogue loop: show, propose, ask, execute | `tests/webapp/test_app.py` (58) |
 
@@ -108,10 +108,11 @@
 ### contract:suite-legibility — the suite explains itself to Sunny — the proof ledger and the run transcript (morning orders, 2026-08-27)
 
 - `tests/orchestrator/test_conclusion.py` (15): The Answer Format Contract's composer (RW-10): card class is
-- `tests/orchestrator/test_parse_plan.py` (25): ADR 0060 prototype L0: closure is structural, grounding is exact,
+- `tests/orchestrator/test_parse_plan.py` (28): ADR 0060 prototype L0: closure is structural, grounding is exact,
 - `tests/shapes/test_seed.py` (7): The demo-source seed (shape-store tenant load, 2026-08-27):
 - `tests/test_flywheel.py` (7): FLYWHEEL-1 (0056 mechanism v1, Sunny-authorized 2026-08-29):
 - `tests/test_run_layer.py` (15): ADR 0061 slice 1 — the run layer's cage. THE ACCEPTANCE IS P5:
+- `tests/test_secrets_vault.py` (6): KEYVAULT-1 (code-side): "keyvault:<name>" refs resolve through
 - `tests/test_suite_map.py` (9): TEST_MAP totality (morning order 1, 2026-08-27): every test module
 - `tests/test_suite_transcript.py` (7): Suite transcript emission (morning order 2, 2026-08-27): every
 

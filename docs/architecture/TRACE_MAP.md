@@ -92,11 +92,13 @@ classification).
   - `src/config.py`
   - `src/engine_floor.py`
   - `src/branding.py`
+  - `src/secrets_vault.py`
 - **Enforced by:**
   - `tests/test_build_deployment_package.py`
   - `tests/test_validate_deployment.py`
   - `tests/test_release_consistency.py`
   - `tests/test_engine_floor.py`
+  - `tests/test_secrets_vault.py`
 - **Summarized in:**
   - `docs/deployment/INSTALLATION_GUIDE.md`
 

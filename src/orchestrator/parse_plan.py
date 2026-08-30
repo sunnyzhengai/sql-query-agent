@@ -89,7 +89,12 @@ RELATION_LEXICON: "dict[str, tuple]" = {
         "same", "different", "differently", "difference", "match",
         "matches", "matching", "identical", "equivalent", "uniform",
         "uniformly", "uniformity", "consistent", "drift"),
-    "variants": ("another way", "other than", "ways of", "variants",
+    # FUZZ-FINDINGS-4c: "defined in a different manner/way" is
+    # VARIANTS (ruled) — the multi-word forms outrank bare
+    # "different" by longest-first span claiming
+    "variants": ("different manner", "different way",
+                 "different ways", "other way", "other ways",
+                 "another way", "other than", "ways of", "variants",
                  "variant", "versions", "version"),
     "reads_or_feeds": ("comes from", "reads", "read", "uses", "use",
                        "using", "feeds", "feed", "depends", "depend"),
@@ -167,6 +172,18 @@ KIND_WORDS = frozenset({
     "dashboard", "dashboards", "certified", "governance"})
 
 
+_RELATION_WORDS = frozenset(
+    form for forms in RELATION_LEXICON.values()
+    for form in forms if " " not in form)
+
+
+def _all_relation_words(entity: str) -> bool:
+    import re as _re
+    toks = [t for t in _re.split(r"[^A-Za-z0-9_]+", entity) if t]
+    return bool(toks) and all(
+        t.lower() in _RELATION_WORDS for t in toks)
+
+
 def split_kind_words(entities: "list[str]") -> "tuple[list, list]":
     """(real_entities, kinds) — an entity whose every token is a kind
     word becomes a filter; anything with one real token stays."""
@@ -232,6 +249,12 @@ def parse_question(question: str, chat_api) -> Parse:
             raw = {}
     entities, kinds = split_kind_words(
         [str(e) for e in raw.get("entities") or []])
+    # FUZZ-FINDINGS-4a/b: an "entity" made of RELATION words is the
+    # relation, not a thing — "definitions" extracted as an entity
+    # grounded junk semantic anchors and shifted compare's refs off
+    # the codesets (the stable E11.80 misses). Dropped, word-grain.
+    entities = [e for e in entities
+                if not _all_relation_words(e)]
     # FUZZ-FINDINGS-3: the deterministic scan OWNS the primitives;
     # the LLM's schema-closed guess is only the fallback when the
     # lexicon finds nothing in the question

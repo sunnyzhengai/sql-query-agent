@@ -107,11 +107,16 @@ TRACE_REGISTRY = {
         "title": "BYOT deployment as a Python library (.whl)",
         "category": "architecture",
         "axioms": [],
-        "modules": ["src/config.py", "src/engine_floor.py", "src/branding.py"],
+        # secrets_vault joined 2026-08-29 (KEYVAULT-1 code-side):
+        # config-load secret resolution is a deployment concern —
+        # the enterprise end state the board recorded, code half
+        "modules": ["src/config.py", "src/engine_floor.py", "src/branding.py",
+                    "src/secrets_vault.py"],
         "tests": [
             "tests/test_build_deployment_package.py",
             "tests/test_validate_deployment.py",
             "tests/test_release_consistency.py", "tests/test_engine_floor.py",
+            "tests/test_secrets_vault.py",
         ],
         "docs": ["docs/deployment/INSTALLATION_GUIDE.md"],
     },
