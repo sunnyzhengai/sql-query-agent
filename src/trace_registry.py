@@ -511,6 +511,18 @@ TRACE_REGISTRY = {
                   "tests/test_companion.py"],
         "docs": ["docs/architecture/SPEC.md", "docs/architecture/TRACE_MAP.md"],
     },
+    "0063": {
+        # DRAFT 2026-08-30 — the tier lock (X-Ray / Bridge /
+        # Workbench / Run), debated to convergence; Sunny ratifies.
+        # Product decision: no modules expected until the Bridge
+        # build is ordered post-ratification.
+        "title": "The product tiers: X-Ray, Bridge, Workbench, Run",
+        "category": "product",
+        "axioms": [],
+        "modules": [],
+        "tests": [],
+        "docs": ["docs/decisions/0063-product-tiers.md"],
+    },
     "0062": {
         # ACCEPTED 2026-08-29, all calls ruled same-day (developer
         # door every round; convert the parse card FIRST on

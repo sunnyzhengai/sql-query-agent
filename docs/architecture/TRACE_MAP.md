@@ -736,3 +736,9 @@ classification).
   - `tests/webapp/test_app.py`
 - **Summarized in:**
   - `docs/decisions/0062-the-dialogue-loop.md`
+
+## ADR 0063 — The product tiers: X-Ray, Bridge, Workbench, Run
+
+- **Category:** product
+- **Summarized in:**
+  - `docs/decisions/0063-product-tiers.md`
