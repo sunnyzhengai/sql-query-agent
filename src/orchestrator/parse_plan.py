@@ -82,12 +82,15 @@ PARSE_PROMPT = (
     "answer, never route, never explain. If the question maps to no "
     "primitive, return empty primitives.\n"
     "The vocabulary (surface forms -> primitive):\n"
-    "same / different / match / identical / equivalent / uniform(ly) / "
-    "uniformity / matching / consistent / drift -> same_or_different\n"
+    "same / different / match / identical / equivalent / uniform / "
+    "uniformly / uniformity / matching / consistent / drift / "
+    "defined the same / defined uniformly / definitions match -> "
+    "same_or_different\n"
     "ways of / another way / other than / variants / versions -> "
     "variants\n"
     "reads / uses / comes from / feeds -> reads_or_feeds\n"
-    "flags / issues / wrong / conflicts / problems -> flags\n"
+    "flags / red flags / issues / wrong / conflicts / problems / "
+    "concerns / risks / governance issues -> flags\n"
     "defines / criteria / logic of / how calculated -> defines\n"
     "who owns / who stewards -> owns\n"
     "grain / per-what / level -> grain\n"
@@ -312,6 +315,14 @@ def ground_entities(entities: "list[str]", run_kql,
     return [a for group in results for a in group]
 
 
+def _anchor_name(a: dict) -> str:
+    """The grounded record's own display name (canonical), falling
+    back to the user's phrase only when no row rode along."""
+    row = (a.get("rows") or [{}])[0]
+    return str(row.get("business_name") or row.get("name")
+               or a.get("entity") or "")
+
+
 def compose_plan(parse: Parse,
                  anchors: "list[dict]") -> "list[dict]":
     """Primitives + anchors → a deterministic op sequence over the
@@ -388,8 +399,12 @@ def compose_plan(parse: Parse,
                     "a reads/feeds question needs a named table, "
                     "metric, or step. " + VOCABULARY_OFFER)
         elif prim == "flags":
+            # FUZZ-FINDINGS-2: the census filter uses the grounded
+            # CANONICAL name, never the user's raw phrase —
+            # "diabetic individuals" grounded Diabetic Patients but
+            # then filtered the flags by the raw words and got zero
             plan.append({"op": "census", "kind": "flag",
-                         "contains": (grounded[0]["entity"]
+                         "contains": (_anchor_name(grounded[0])
                                       if grounded else None)})
         elif prim in ("defines", "owns", "count_rows"):
             # count_rows (B10): the PROPOSAL carries the data-policy

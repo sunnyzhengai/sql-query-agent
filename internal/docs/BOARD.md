@@ -406,8 +406,12 @@ The hold lifts only by Sunny's explicit word, recorded here.
       re-judges until green.
 - [x] **FUZZER-2 BUILT (08-29 night, queue-2 item 1)** — all 8
       intent classes fuzz w/ per-intent oracles; kind_any admits
-      the data-driven card set. 1,272 green + ruff. AWAITS review
-      → then KEYVAULT-1 code-side → 0060-EXPERIMENT-CLOSE.
+      the data-driven card set. 1,272 green + ruff.
+- [x] **FUZZ-FINDINGS-2 BUILT (08-29 night, 1.67.2)** — four
+      misses consumed: whole-phrase sameness forms; flags census
+      filters by the grounded CANONICAL name (mechanism), flags
+      surface forms widened. 1,274 green + ruff. AWAITS review →
+      then KEYVAULT-1 code-side → 0060-EXPERIMENT-CLOSE.
 
 ## RULED (Sunny, 2026-08-29): THE GENERATOR CLAUSE — Echo Law amendment
 "Fail twice, no matter the cause, triggers an investigation."

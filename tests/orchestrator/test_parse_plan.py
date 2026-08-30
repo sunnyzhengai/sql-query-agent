@@ -215,3 +215,25 @@ def test_fuzz_findings_1_multi_relation_plan_dedups():
     ops = [s["op"] for s in plan]
     assert ops == ["retrieve", "compare"]
     assert len(plan) == len({str(s) for s in plan})
+
+
+def test_fuzz_findings_2_surface_forms_consumed():
+    """FUZZ-FINDINGS-2: the four fuzzer misses become surface
+    forms — the whole-phrase sameness forms and the flags words."""
+    from src.orchestrator.parse_plan import PARSE_PROMPT
+    for phrase in ("defined uniformly", "definitions match",
+                   "red flags", "concerns", "governance issues"):
+        assert phrase in PARSE_PROMPT, phrase
+
+
+def test_fuzz_findings_2_flags_census_uses_canonical_name():
+    # the user said "diabetic individuals"; the anchor grounded
+    # "Diabetic Patients" — the flags filter uses the CANONICAL
+    plan = compose_plan(
+        Parse(["diabetic individuals"], ["flags"]),
+        [{"entity": "diabetic individuals", "id": "m1",
+          "kind": "metric",
+          "rows": [{"business_name": "Diabetic Patients",
+                    "name": "USP_Diabetic_Patients"}]}])
+    assert plan == [{"op": "census", "kind": "flag",
+                     "contains": "Diabetic Patients"}]

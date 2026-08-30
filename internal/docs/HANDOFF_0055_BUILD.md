@@ -2584,3 +2584,22 @@ intent-class completeness (grep-held) + kind_any judging both
 directions. **Gates:** 1,272 green + 5 xfailed, ruff clean. (No
 wheel — devtools only.) NEXT on review-green: KEYVAULT-1
 code-side.
+
+### 2026-08-29 night — FUZZ-FINDINGS-2 BUILT — release 1.67.2
+All four fuzzer misses consumed:
+- **"defined uniformly" / "definitions match"** — whole-phrase
+  sameness surface forms join the parse vocabulary (the two
+  phrasings likely parsed to `defines` alone; the explicit forms
+  anchor them to same_or_different — multi-primitive parses also
+  compose cleanly since the 1.67.1 dedup).
+- **The two flags misses, root-caused as a MECHANISM:** the flags
+  census filtered by the user's RAW phrase ("diabetic
+  individuals") after grounding had already found the canonical
+  record — zero flag rows matched the raw words and the card
+  degraded. compose now filters by the grounded record's OWN
+  canonical name (_anchor_name), and the flags surface forms gain
+  concerns/risks/red flags/governance issues.
+Tests: surface-form grep-holds + the canonical-name compose (L0).
+**Gates:** 1,274 green + 5 xfailed, ruff clean; wheel 1.67.2. The
+nightly fuzzer re-judges; findings recur until green — the loop
+is the enforcement, as ordered.
