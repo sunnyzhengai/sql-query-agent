@@ -3142,3 +3142,13 @@ fields, owner contrast, receipt label, no-contrast-on-IDENTICAL).
 **Gates:** 1,348 green + 5 xfailed, ruff clean; wheel 1.74.1.
 Acceptance = Sunny reads the Active Diabetic Patients card in one
 breath. CONSOLE-2 amendment + CONSOLE-3 just landed — next.
+
+### REVIEW VERDICT — CONSOLE-2 (1.74.1): VERIFIED (code-side)
+Gates 1,348 + ruff clean. Fingerprint rows (qualified name ·
+reads · key criterion · description), owner-named contrast
+assembled criterion-first with description fallback — never model
+prose, labeled folded receipts, one composer on both surfaces,
+IDENTICAL suppresses contrast. Sunny's glass check deferred ONE
+delivery so she restarts once for CONSOLE-2 + the set-summary
+amendment + CONSOLE-3 together — her one-breath read of the
+Active Diabetic Patients card plus the certify-asks-which test.
