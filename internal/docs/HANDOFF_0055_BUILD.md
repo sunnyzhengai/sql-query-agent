@@ -2542,3 +2542,21 @@ Sunny-authorized queue is DELIVERED AND VERIFIED.** Remaining in
 flight: FUZZ-FINDINGS-1 (dev's WIP in the shared tree right now,
 by the look of parse_plan.py). Sunny's shelf on her return:
 probe curation · Run button · film sequencing · capture day.
+
+## OVERNIGHT QUEUE 2 (Sunny-authorized "continue while I'm away", 2026-08-29 night)
+Sequence, each review-verified before the next consumes it:
+1. **FUZZER-2:** extend the fuzzer to ALL intents (definition,
+   flags, feeds, variants, kind-only, data-refusal) with
+   per-intent oracles; misses remain lexicon food.
+2. **KEYVAULT-1 (code-side only):** secrets resolve from Azure
+   Key Vault when an org_config `key_vault:` block exists; file
+   fallback otherwise; failures name their cure (RW-16 pattern).
+   NO tenant action required or taken — Sunny's click completes
+   it later. Closes the ship-readiness secrets gap code-side.
+3. **0060-EXPERIMENT-CLOSE:** run the full gating measurement
+   (current vs planner incl. Sunny's walk paraphrases), finalize
+   PARSE_EXPERIMENT.md with the five metrics — the ADR's gate
+   formally closed with data.
+PARKED (Sunny's rulings, do NOT build): charts (0061 slice 2),
+probe curation, film sequencing, promotion ladder full mechanics,
+personas (0038/0058 gates), capture.
