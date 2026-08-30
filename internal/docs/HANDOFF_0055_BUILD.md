@@ -2759,3 +2759,19 @@ phrasings (2-op plans vs 6-op wanders; 9-row answers vs 45-row
 dumps; 0 floors vs 6; honest refusal vs census-at-a-poem). The
 ADR's gate is closed with data; the architecture the product now
 runs is formally justified by its own measurement.
+
+## OVERNIGHT QUEUE 3 (Sunny confirmed: nothing blocks dev — all rulings in)
+1. **RUNG2-1 (0058 C2 as ratified — types only):** parameterized
+   runs — a certified step with DECLARED parameter sites accepts
+   values; validity = ScriptDom AST equality except at those
+   sites; any logic deviation refuses as "this becomes your
+   variant" (fork language, 0038 path named). Rung stamp on every
+   result (C1). Acceptance: change a date/threshold value on a
+   shapes step and run; a logic edit refuses typed.
+2. **PROC-RUN-1 (0061 deferred slice):** whole-procedure
+   execution — wrapping, single-resultset procs first; parameters
+   ride RUNG2-1's machinery; multi-statement stays refused typed.
+3. Standing: nightly fuzzer findings consumed each morning.
+Parked (unchanged): 0056 presentation extras (post-capture per
+ruling — Sunny may unsequence if capture drifts); Phase 3 awaits
+the access-control ADR (review drafts, someday).
