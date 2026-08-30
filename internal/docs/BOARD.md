@@ -389,8 +389,8 @@ The hold lifts only by Sunny's explicit word, recorded here.
       nominate on the card (labeled, prunable, capped 3, zero
       extra queries); deterministic relevance bar (stem token in
       name/description — junk still misses honestly); prunes are
-      captured [PRUNE] decisions. 1,258 green + ruff. AWAITS
-      review verification.
+      captured [PRUNE] decisions. 1,258 green + ruff. **VERIFIED
+      by review 08-29 (clean-worktree run).**
 - [x] **FLYWHEEL-1 BUILT (08-29 dev, 1.67.0)** — src/flywheel.py
       (0056 v1): usage weights from the four decision classes;
       definition/map cards disclose provenance ("confirmed N× ·
@@ -398,7 +398,7 @@ The hold lifts only by Sunny's explicit word, recorded here.
       (/api/mine + folding panel: definitions/reports/questions w/
       REPLAY). Promotion ladder stubs at single-user as ordered.
       1,268 green + ruff. **THE AUTHORIZED QUEUE IS FULLY
-      DELIVERED.** AWAITS review verification.
+      DELIVERED AND VERIFIED (review 08-29, clean worktree).**
 - [x] **FUZZ-FINDINGS-1 BUILT (08-29 dev, 1.67.1)** — standalone
       entries fixed; five missed phrasings consumed into the
       sameness surface forms; multi-relation plans dedup + 422s
