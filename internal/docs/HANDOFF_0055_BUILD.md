@@ -3283,3 +3283,28 @@ under each member's name, the set-summary lead naming the
 reports copy, labeled folded receipt. (The "≥49 — truncated"
 criterion line is the store's honesty, not a bug; it retires at
 the next cycle.)
+
+## ORDER CONSOLE-4 (Sunny's design ruling: define what stewards see)
+Root flaw found by her read: fingerprints/contrast/receipt are
+THREE computations pretending to be one story (top-site criterion
+= the SHARED filter; contrast joins shared criteria = identical
+sides; receipt diffs concatenated fragments = unattributed SQL).
+**The fix is ONE computation rendered three ways:**
+0. THE DISTINGUISHING SET (single source): set arithmetic over
+   parsed elements — predicates, reads, grain — per member: what
+   it alone has; shared elements computed as background.
+1. STEWARD VIEW (default; NO SQL): "Both …<shared core>…" then
+   per member "<qualified name> — additionally <distinguishing
+   elements in business words>" via a deterministic AST-shape
+   template table (NOT EXISTS→"excludes those with a match in X";
+   IN-list→"limits to N listed values"; COUNT>=→threshold; grain
+   via the D7 analysis → "counts patients/visits") + the RW-6
+   description. Never model prose.
+2. DEVELOPER VIEW (persona): each member's DISTINGUISHING
+   SNIPPETS labeled under its own qualified name — never an
+   unattributed interleaved diff.
+3. AUDIT: hash verdict + full fragments stay in the event record;
+   they stop being the display.
+Criterion field redefined: DISTINGUISHING site, not top site.
+Acceptance: Sunny reads the High ED Utilizers cousin card as
+steward and states the difference without seeing a line of SQL.
