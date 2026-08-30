@@ -531,3 +531,11 @@ film sequencing · capture day · optional tenant clicks.
 - [x] 2026-08-30 morning: capacity Active · warm battery 22/22
       green · fuzzer 24/0 · nightly cron re-armed (pause-aware).
       Estate handed to Sunny green.
+
+## ⏸️ STRATEGY PAUSE (Sunny, 2026-08-30 morning)
+Development paused for the TIER LOCK debate. No new dev orders
+until tiers are ruled. Standing guards (nightly battery, fuzzer,
+watcher) continue. Input: Sunny's architect conversation
+(metadata pain validated; chat = value front-end, catalog sync =
+enterprise entry ticket; moat = deterministic parse + tenant-local
++ closed loop).
