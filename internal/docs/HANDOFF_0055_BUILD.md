@@ -3021,3 +3021,14 @@ Enrollment Snapshot, High ED Utilizers); 16 rows carry store
 stewards. The files in internal/docs/bridge_exports are the ones
 to import.
 **Gates:** 1,327 green + 5 xfailed, ruff clean; wheel 1.73.1.
+
+### REVIEW VERDICT — BR-1 + BR-2 (1.73.1): VERIFIED — BRIDGE STAGE 1 READY FOR SUNNY
+Gates 1,327 + ruff clean. Twins now export qualified with the
+conflict disclosed in the definition ("2 definitions share the
+name — unresolved, cousin_conflict"); export-integrity gate holds
+uniqueness; stewards pre-fill (Dr. Peterson on glass in the CSV).
+**SUNNY: the regenerated files in internal/docs/bridge_exports/
+are yours to import into your Purview instance** — the glossary
+CSV goes in via Governance portal → your glossary → Import terms.
+Every row is Draft, graded, and honest about its conflicts.
+CONSOLE-1 (the Inbox) is dev's next per the queue.
