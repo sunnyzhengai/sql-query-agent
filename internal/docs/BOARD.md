@@ -630,3 +630,10 @@ the lift:
    engine; every landing per 0063's total map.
 Scope lock in force: new ideas get a tier box before any build.
 Review verifies each delivery per the standing loop.
+
+## ⛔ DEVELOPMENT HOLD #2 — Sunny, 2026-08-30 evening
+ALL code changes paused. CONSOLE-4 is SUSPENDED before build —
+do not start (or stop if started; no partial lands). Sunny and
+review are designing the steward-facing compare experience
+together first. Standing guards (nightly battery, fuzzer,
+watcher) continue. Lifts only by Sunny's word, recorded here.
