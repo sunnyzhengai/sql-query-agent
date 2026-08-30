@@ -2386,3 +2386,19 @@ Unit coverage per the order: one-failure-then-ground (retry works,
 no card), persistent-failure (typed card + retry flag), wake cure
 in _infra_error. **Gates:** 1,252 green + 5 xfailed, ruff clean;
 wheel 1.65.0.
+
+## ORDER FUZZER-1 (test automation, dev's half) + nightly cold battery (review's half, LIVE)
+Review has automated the cold leg: devtools/nightly_battery.sh
+runs the full battery COLD (no warm-up — the overnight-idled
+store IS the test, RW-25's standing acceptance) daily at ~6:23am,
+one summary line/day to internal/docs/NIGHTLY_BATTERY.md, pushed;
+FAILs get diagnosed and recorded by review automatically.
+(Review-session cron; if the session recycles, re-arm — noted on
+the board.)
+**Dev builds the PARAPHRASE FUZZER stage:** per run, the LLM
+generates N fresh phrasings of the known intents (the automated
+Sunny) — assert every phrasing yields a CARD (never silent),
+grounding includes the expected ids, oracles hold where planted
+(DIFFERS/E11.80 etc.), and every miss is logged as lexicon food.
+Wire as devtools/walk_fuzzer.py runnable standalone and as a
+battery stage; failures append to the same nightly file.

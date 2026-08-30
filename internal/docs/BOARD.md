@@ -399,3 +399,6 @@ Development resumes. Build order (per ACCEPTED 0062):
    button first click, flywheel film, Phase 2 slices.
 All work binds to 0062's invariants: no question types; LLM
 proposes only; deterministic assembly; every decision captured.
+- [x] Test automation: nightly COLD battery live (review cron,
+      ~6:23am, 7-day auto-expire — re-arm on session recycle);
+      paraphrase fuzzer ordered to dev (FUZZER-1)
