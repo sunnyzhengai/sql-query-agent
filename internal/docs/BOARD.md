@@ -471,7 +471,16 @@ The hold lifts only by Sunny's explicit word, recorded here.
       12→64; live regen: the 10-member family lists 10 w/
       qualified twins, 0 shortfalls estate-wide; membership
       semantics verified (26/26 reconcile). 1,318 green + ruff.
-      AWAITS review → BRIDGE-1 exporters → CONSOLE-1.
+      **VERIFIED — X-Ray engagement-ready.** XR-2 wording polish
+      (name-grain "named variants" counts) parked to next x-ray
+      touch, non-blocking.
+- [x] **BRIDGE-1 STAGE 1 BUILT (08-30 dev, 1.73.0)** — file-first
+      exporters: Collibra assets+relations CSVs (parsed edges
+      only, no invention) + Purview glossary CSV (Draft always);
+      every row provenance-graded w/ named approver; LIVE EXPORT
+      in internal/docs/bridge_exports (37 assets · 64 relations ·
+      37 terms) — real files for Sunny's Purview experiments.
+      1,324 green + ruff. AWAITS review → CONSOLE-1.
 
 ## RULED (Sunny, 2026-08-29): THE GENERATOR CLAUSE — Echo Law amendment
 "Fail twice, no matter the cause, triggers an investigation."

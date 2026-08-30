@@ -742,7 +742,9 @@ classification).
 - **Category:** product
 - **Implemented by:**
   - `src/xray.py`
+  - `src/adapters/file_export.py`
 - **Enforced by:**
   - `tests/test_xray.py`
+  - `tests/adapters/test_file_export.py`
 - **Summarized in:**
   - `docs/decisions/0063-product-tiers.md`

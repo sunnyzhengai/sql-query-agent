@@ -520,8 +520,9 @@ TRACE_REGISTRY = {
         "title": "The product tiers: X-Ray, Bridge, Workbench, Run",
         "category": "product",
         "axioms": [],
-        "modules": ["src/xray.py"],
-        "tests": ["tests/test_xray.py"],
+        "modules": ["src/xray.py", "src/adapters/file_export.py"],
+        "tests": ["tests/test_xray.py",
+                  "tests/adapters/test_file_export.py"],
         "docs": ["docs/decisions/0063-product-tiers.md"],
     },
     "0062": {

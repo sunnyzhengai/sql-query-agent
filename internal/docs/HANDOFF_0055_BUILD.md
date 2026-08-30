@@ -2954,3 +2954,30 @@ name-grain clusters say "N metrics" where members are NAMES
 own grain/misnomer flags). Wording should count "named variants"
 at name grain so a paying reader never stumbles. BRIDGE-1
 exporters next per the queue.
+
+### 2026-08-30 — BRIDGE-1 STAGE 1 BUILT — release 1.73.0
+**File-first, as ruled.** src/adapters/file_export.py exports the
+review set as NATIVE import files:
+- **Collibra Data Intake:** assets CSV (one row per certified
+  metric — Name/Full Name/Asset Type/Domain/Description) +
+  relations CSV (metric READS table from the parsed edge chain —
+  one KQL scan over transform_to_technical, deterministic lineage
+  never inferred; edges whose metric is absent from the certified
+  census never export — no invented assets).
+- **Purview glossary CSV** (the import template's columns):
+  certified metrics as terms, **Status=Draft always** — their
+  catalog's workflow owns promotion; we never claim Approved on
+  their side.
+- **Every row provenance-graded** (the Queue law applied to stage
+  1): "parsed by <product>, approved by <approver>" — the named
+  human who reviews the file before upload. The exporter AUTHORS
+  NOTHING: descriptions come from the store verbatim; an empty
+  description exports the grade line alone.
+**Live export generated** (internal/docs/bridge_exports/): 37
+assets · 64 relations · 37 glossary terms from the shapes estate —
+**real files in Sunny's hands for her Purview import experiments,
+per the order.** CLI: devtools/export_bridge_files.py (store
+lever + approver arg). Registered under 0063. 6 tests (grades,
+draft status, no-invention, parsed-edges-only, CSV round-trip).
+**Gates:** 1,324 green + 5 xfailed, ruff clean; wheel 1.73.0.
+NEXT per the queue: CONSOLE-1 (the Inbox) on review-green.
