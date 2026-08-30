@@ -402,3 +402,13 @@ proposes only; deterministic assembly; every decision captured.
 - [x] Test automation: nightly COLD battery live (review cron,
       ~6:23am, 7-day auto-expire — re-arm on session recycle);
       paraphrase fuzzer ordered to dev (FUZZER-1)
+
+## SUNNY'S SHELF (back from swimming — all unhurried)
+- [ ] Probe-curation ruling: badge (rec) / leave / filter
+- [ ] The Run button's first click — first data on glass
+- [ ] Flywheel film sequencing (film two vs reopen)
+- [ ] QA gate formality + pick a capture day
+- [ ] Standing: shareable-connection click · Purview rotation ·
+      0058 ratification · tier naming
+Dev queue: RW-25 → FUZZER-1 → TIER2-1 → FLYWHEEL-1 (all
+Sunny-authorized; review verifies each per the loop)

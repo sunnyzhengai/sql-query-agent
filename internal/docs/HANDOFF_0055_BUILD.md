@@ -2402,3 +2402,20 @@ grounding includes the expected ids, oracles hold where planted
 (DIFFERS/E11.80 etc.), and every miss is logged as lexicon food.
 Wire as devtools/walk_fuzzer.py runnable standalone and as a
 battery stage; failures append to the same nightly file.
+
+## ORDERS TIER2-1 + FLYWHEEL-1 (Sunny-authorized start, 2026-08-29 evening; after RW-25 + FUZZER-1)
+**TIER2-1 (0060 §2a tier 2, ratified):** semantic candidates from
+the description embeddings join the understanding card's SHOW as
+RANKED, LABELED (semantic), PRUNABLE matches — nominate-only;
+confirm-all makes generosity safe; every accepted/pruned candidate
+is a captured decision (lexicon food). Battery: near-miss cases
+(B15-class) must surface the intended family.
+**FLYWHEEL-1 (0056 mechanism + Ground-Truth Shelf v1):**
+aggregate captured decision events (confirm/prune/run/escalate)
+into per-item usage weights; cards disclose with provenance
+("confirmed N times · run M times — no official designated");
+sidebar v1: My definitions / My reports / My questions (replay =
+saved operation), single-user, from the existing TurnEvent store.
+Promotion mechanics per the ruled ladder (usage threshold +
+steward veto) can stub at single-user. Film sequencing remains
+Sunny's open call — mechanism only.
