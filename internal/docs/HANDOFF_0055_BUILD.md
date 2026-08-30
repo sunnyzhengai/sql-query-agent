@@ -2317,3 +2317,10 @@ Ready for review's re-run; green → Sunny resumes the walk.
    Reference Forms Probe, …) in census display — badge as
    `control` with a split count line (review recommends) / leave
    as-is / filter from default census.
+
+## NOTE (data polish, rides next palette touch): reporting
+USP_Active_Diabetics description says "joined to an active-status
+flag" but the SQL has no JOIN (column filter on DIAGNOSIS_CODES) —
+the wording made Sunny correctly suspect a missing table.
+Descriptions must not imply structure the SQL lacks; sweep the
+palette for "joined" where no join exists.
