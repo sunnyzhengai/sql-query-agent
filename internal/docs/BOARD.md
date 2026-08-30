@@ -495,8 +495,12 @@ The hold lifts only by Sunny's explicit word, recorded here.
       reason gates; every press a graded 0056 event, folded back
       (latest wins, compare lands nowhere); /console page w/ verb
       buttons + live compare evidence via the existing algebra.
-      1,344 green + ruff. **THE TIER-LOCKED QUEUE IS COMPLETE.**
-      AWAITS review verification → Sunny's glass.
+      1,344 green + ruff. **THE TIER-LOCKED QUEUE IS COMPLETE —
+      VERIFIED by review at law grade (live smoke: /console serves
+      the estate's 26 flags). ALL FOUR 0063 TIERS HAVE THEIR v1:
+      X-Ray · Bridge stage 1 · Console · Run (rungs 1-2).**
+      SUNNY'S GLASS: /console awaits her eye (the launch demo's
+      heart) → film plan → capture day.
 
 ## RULED (Sunny, 2026-08-29): THE GENERATOR CLAUSE — Echo Law amendment
 "Fail twice, no matter the cause, triggers an investigation."
