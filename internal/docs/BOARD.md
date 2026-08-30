@@ -380,6 +380,11 @@ The hold lifts only by Sunny's explicit word, recorded here.
       stamps, never the model), wake cure in the engine infra
       text. 1,252 green + ruff. AWAITS review verification → Sunny
       resumes → QA gate → CAPTURE.
+- [x] **FUZZER-1 BUILT (08-29 dev)** — walk_fuzzer.py: N LLM
+      phrasings per known intent; card-always + grounding +
+      planted-oracle assertions; misses logged verbatim = lexicon
+      food; standalone + nightly-battery stage. 1,256 green +
+      ruff. Runs cold nightly with review's battery.
 
 ## RULED (Sunny, 2026-08-29): THE GENERATOR CLAUSE — Echo Law amendment
 "Fail twice, no matter the cause, triggers an investigation."

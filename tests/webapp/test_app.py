@@ -787,3 +787,68 @@ class TestRW25IdleWake:
         from src.orchestrator.turn_engine import _infra_error
         msg = _infra_error(ConnectionError("timed out"))
         assert "waking from idle" in msg and "retry" in msg
+
+
+class TestFuzzer1:
+    """FUZZER-1 (test automation, dev's half): the paraphrase
+    fuzzer asserts every phrasing yields a CARD, grounding hits the
+    expected names, planted oracles hold, and every miss is logged
+    verbatim as lexicon food. Offline: stubbed paraphraser +
+    TestClient post adapter over the fixture estate."""
+
+    def _post(self, client):
+        def post(path, payload):
+            r = client.post(path, json=payload)
+            return r.json(), r.status_code
+        return post
+
+    def _chat(self, phrases):
+        def chat(messages, tools, tool_choice=None):
+            return {"content": json.dumps(phrases), "tool_calls": []}
+        return chat
+
+    def test_green_run_has_no_findings(self):
+        from devtools.walk_fuzzer import fuzz
+        maker = TestCardEverywhere()
+        client = maker._client(["ED Sepsis Screening"], [])
+        result = fuzz(
+            self._post(client), self._chat(["about the sepsis one"]),
+            n=1, intents=[{
+                "name": "definition",
+                "seed": "tell me about ED Sepsis Screening",
+                "expect_ground": ["ED Sepsis Screening"],
+                "oracle": {"kind": "definition"}}])
+        assert result["findings"] == []
+        assert result["phrasings"] == 1
+
+    def test_grounding_miss_is_logged_as_lexicon_food(self):
+        from devtools.walk_fuzzer import fuzz
+        maker = TestCardEverywhere()
+        client = maker._client(["Zzz Nothing"], [])
+        result = fuzz(
+            self._post(client), self._chat(["some odd phrasing"]),
+            n=1, intents=[{
+                "name": "definition",
+                "seed": "x",
+                "expect_ground": ["ED Sepsis Screening"],
+                "oracle": {}}])
+        assert any("lexicon food" in f for f in result["findings"])
+
+    def test_dead_paraphraser_is_a_finding_not_a_crash(self):
+        from devtools.walk_fuzzer import fuzz
+        maker = TestCardEverywhere()
+        client = maker._client(["ED Sepsis Screening"], [])
+        result = fuzz(self._post(client), self._chat([]), n=1,
+                      intents=[{"name": "d", "seed": "x",
+                                "oracle": {}}])
+        assert any("unfuzzed" in f for f in result["findings"])
+
+    def test_oracle_miss_is_a_finding(self):
+        from devtools.walk_fuzzer import fuzz
+        maker = TestCardEverywhere()
+        client = maker._client(["ED Sepsis Screening"], [])
+        result = fuzz(
+            self._post(client), self._chat(["about sepsis"]), n=1,
+            intents=[{"name": "d", "seed": "x",
+                      "oracle": {"kind": "flags"}}])
+        assert any("card kind" in f for f in result["findings"])

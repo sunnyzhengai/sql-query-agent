@@ -2419,3 +2419,21 @@ saved operation), single-user, from the existing TurnEvent store.
 Promotion mechanics per the ruled ladder (usage threshold +
 steward veto) can stub at single-user. Film sequencing remains
 Sunny's open call — mechanism only.
+
+### 2026-08-29 — FUZZER-1 BUILT (dev's half of test automation)
+**devtools/walk_fuzzer.py — the automated Sunny.** Per run, the
+LLM generates N fresh phrasings of the known intents (5 seeded:
+codeset sameness w/ DIFFERS+E11.80 oracle, tables-of-metric w/
+DIAGNOSIS_CODES content oracle, kind-only census, flags family,
+count→policy-refusal proposal). Assertions per phrasing: a CARD
+always (silent = instant finding), grounding includes the expected
+names, planted oracles hold; every miss logs the PHRASING VERBATIM
+— lexicon food, exactly the flywheel's intake. A dead paraphraser
+is a finding, never a crash. Standalone CLI (base_url, N) exiting
+non-zero on findings + wired as a stage in review's
+nightly_battery.sh (fuzzer verdict + findings append to
+NIGHTLY_BATTERY.md under the cold-run line). Offline unit coverage
+via stubbed paraphraser + fixture estate (green run, grounding
+miss→lexicon food, dead LLM→unfuzzed finding, oracle miss).
+**Gates:** 1,256 green + 5 xfailed, ruff clean. (No wheel bump —
+devtools + review's sh only; engine untouched.)
