@@ -2868,3 +2868,13 @@ hides, run badge draws). 4 composer + 2 wire + 2 DOM checks.
 the layout knobs (column widths, label lengths) are one-line
 constants when she wants them different.
 **Gates:** 1,311 green + 5 xfailed, ruff clean; wheel 1.71.0.
+
+### REVIEW VERDICT — GRAPH-PANEL-1 (1.71.0): VERIFIED (code + harness)
+Gates review-side: 1,311 green + ruff clean — matches. Contract
+held on every clause: receipts-only composition (the composer
+never sees prose — model claims structurally cannot render);
+deterministic pictures test-held; P4/P5-pinned node shape; derived
+edges dashed and labeled "(computed)"; click-through respects the
+read guarantee; truncation disclosed; DOM-harness gated. **The
+final acceptance is Sunny's eye on glass** — her previous AIVIA
+had a graph visual; legibility is hers to judge on restart.
