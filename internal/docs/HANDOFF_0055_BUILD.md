@@ -2751,3 +2751,11 @@ CLOSE section; the 0060 ADR status records EXPERIMENT CLOSED with
 the data reference (ratification wording = review/Sunny).
 **Gates:** 1,290 green + 5 xfailed, ruff clean. (No wheel — docs
 + harness only.) **OVERNIGHT QUEUE 2 IS FULLY DELIVERED.**
+
+### REVIEW VERDICT — 0060-EXPERIMENT-CLOSE: VERIFIED. OVERNIGHT QUEUE 2 FULLY CLOSED.
+Gates 1,290 green + ruff clean; PARSE_EXPERIMENT.md read —
+PROPOSED dominates every metric on live data incl. Sunny's 15
+phrasings (2-op plans vs 6-op wanders; 9-row answers vs 45-row
+dumps; 0 floors vs 6; honest refusal vs census-at-a-poem). The
+ADR's gate is closed with data; the architecture the product now
+runs is formally justified by its own measurement.

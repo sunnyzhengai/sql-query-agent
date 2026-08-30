@@ -470,3 +470,24 @@ proposes only; deterministic assembly; every decision captured.
       0058 ratification · tier naming
 Dev queue: RW-25 → FUZZER-1 → TIER2-1 → FLYWHEEL-1 (all
 Sunny-authorized; review verifies each per the loop)
+
+## ☀️ MORNING REPORT for Sunny (overnight 08-29→30)
+Seven releases (1.67.1→1.70-line), every one review-verified:
+- Fuzzer green ACROSS THE BOARD: 24 phrasings × 8 intents × double
+  runs = ZERO findings. Its whole catch-list was consumed en route
+  (lexicon surface forms, variants collision, nominate-means-offer).
+- Generator clause fired once more and won: parse-layer flip-flops
+  killed by making the relation pass a pure function of the
+  question string (LLM keeps only entity extraction; confirm
+  covers it).
+- RW-26: semantic nominations now default-unchecked (offer ≠
+  include) — traced live by review, fixed by dev, proven by
+  double-run.
+- KEYVAULT-1 code-side done (your optional tenant click completes
+  it whenever).
+- 0060 experiment CLOSED with data: the planner beats the old
+  router on every metric, including an honest refusal where the
+  old engine ran a census at a poem request.
+- Nightly cold battery + fuzzer stand guard from 6:23am daily.
+YOUR SHELF (unchanged): probe curation · Run button first click ·
+film sequencing · capture day · optional tenant clicks.
