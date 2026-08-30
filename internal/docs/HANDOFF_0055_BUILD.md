@@ -2560,3 +2560,14 @@ Sequence, each review-verified before the next consumes it:
 PARKED (Sunny's rulings, do NOT build): charts (0061 slice 2),
 probe curation, film sequencing, promotion ladder full mechanics,
 personas (0038/0058 gates), capture.
+
+### REVIEW VERDICT — FUZZ-FINDINGS-1: PARTIAL (3/5 fixed; loop continues)
+Fuzzer re-run on 1.67.1: three sameness phrasings now hit the
+E11.80 oracle; TWO still miss ("defined uniformly", "definitions
+match") — diagnose whether surface-form or extraction. TWO NEW
+flags-intent findings: "governance concerns … patients suffering
+from diabetes" → map; "red flags related to governance … diabetic
+individuals" → census — flags surface forms/extraction gaps.
+**ORDER FUZZ-FINDINGS-2:** consume all four; rides before or with
+FUZZER-2 in the overnight queue. Findings recur nightly until
+green — the loop is the enforcement.
