@@ -7,7 +7,7 @@
 
 # Test Map — what every test proves
 
-113 modules, 1222 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
+113 modules, 1224 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
 
 ## By ADR
 
@@ -62,7 +62,7 @@
 | 0054 | Governance red flags and governed plurality: misnomer/duplicate/cousin sweep over content hashes | `tests/governance/test_red_flags.py` (17), `tests/orchestrator/test_flag_ops.py` (11) |
 | 0055 | The designed shape corpus: spec-derived test data (category-partition over name x logic x scope) | `tests/shapes/test_shapes.py` (18) |
 | 0059 | The graph topology axioms: connected, sound, complete (measured, then formalized) | `tests/graph/test_topology.py` (14) |
-| 0060 | The parse is the plan: parser-only LLM, deterministic traversal, correction flywheel | `tests/orchestrator/test_parse_plan.py` (14) |
+| 0060 | The parse is the plan: parser-only LLM, deterministic traversal, correction flywheel | `tests/orchestrator/test_parse_plan.py` (16) |
 | 0061 | The run layer: Pro runs the confirmed definition | `tests/test_run_layer.py` (15) |
 | 0062 | The dialogue loop: show, propose, ask, execute | `tests/webapp/test_app.py` (53) |
 
@@ -107,7 +107,7 @@
 ### contract:suite-legibility — the suite explains itself to Sunny — the proof ledger and the run transcript (morning orders, 2026-08-27)
 
 - `tests/orchestrator/test_conclusion.py` (15): The Answer Format Contract's composer (RW-10): card class is
-- `tests/orchestrator/test_parse_plan.py` (14): ADR 0060 prototype L0: closure is structural, grounding is exact,
+- `tests/orchestrator/test_parse_plan.py` (16): ADR 0060 prototype L0: closure is structural, grounding is exact,
 - `tests/shapes/test_seed.py` (7): The demo-source seed (shape-store tenant load, 2026-08-27):
 - `tests/test_run_layer.py` (15): ADR 0061 slice 1 — the run layer's cage. THE ACCEPTANCE IS P5:
 - `tests/test_suite_map.py` (9): TEST_MAP totality (morning order 1, 2026-08-27): every test module

@@ -385,6 +385,12 @@ The hold lifts only by Sunny's explicit word, recorded here.
       planted-oracle assertions; misses logged verbatim = lexicon
       food; standalone + nightly-battery stage. 1,256 green +
       ruff. Runs cold nightly with review's battery.
+- [x] **TIER2-1 BUILT (08-29 dev, 1.66.0)** — semantic candidates
+      nominate on the card (labeled, prunable, capped 3, zero
+      extra queries); deterministic relevance bar (stem token in
+      name/description — junk still misses honestly); prunes are
+      captured [PRUNE] decisions. 1,258 green + ruff. AWAITS
+      review verification. NEXT: FLYWHEEL-1.
 
 ## RULED (Sunny, 2026-08-29): THE GENERATOR CLAUSE — Echo Law amendment
 "Fail twice, no matter the cause, triggers an investigation."

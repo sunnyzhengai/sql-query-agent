@@ -2444,3 +2444,22 @@ causes-from-stamps floor (invented infra diagnoses now a floorable
 claim class). The nightly cold battery is its standing live
 acceptance — tomorrow ~6:23am is the first scheduled proof.
 Dev proceeds: FUZZER-1 → TIER2-1 → FLYWHEEL-1.
+
+### 2026-08-29 — TIER2-1 BUILT — release 1.66.0
+**Semantic candidates nominate on the understanding card** (0060
+§2a tier 2, ratified): when the exact tier misses, the semantic
+result's ranked rows join SHOW as LABELED ("· semantic" on the
+checkbox row), PRUNABLE nominations — nominate-only, capped at 3,
+zero extra store queries (the tier-2 search already ran).
+**Relevance bar, deterministic:** a nomination must share a stem
+token with the candidate's name or DESCRIPTION (tier-2's own
+data) — no similarity-threshold tuning, and junk phrases still
+report honest misses (B9 survives, test-held both directions:
+nominations surface for near-miss phrasings; exact hits take zero
+nominations).
+**Prunes are captured decisions:** confirming with unchecked boxes
+now records a [PRUNE] TurnEvent (made_by=user_prune, excluded ids
+in ids_read, 0056 shape) — the flywheel counts accepted AND pruned
+candidates from day one, per the order.
+**Gates:** 1,258 green + 5 xfailed, ruff clean; wheel 1.66.0.
+Next in the authorized queue: FLYWHEEL-1.

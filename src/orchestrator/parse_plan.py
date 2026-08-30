@@ -241,16 +241,43 @@ def _ground_one(e: str, run_kql, session: OpsSession) -> "list[dict]":
                              "name": r.get("name"),
                              "business_name":
                                  r.get("business_name") or None})
-    if not rows:
+    # TIER2-1 (0060 §2a tier 2, Sunny-authorized 2026-08-29):
+    # semantic candidates from the description embeddings NOMINATE —
+    # ranked (the search's own closeness order), LABELED, PRUNABLE.
+    # Confirm-all makes generosity safe; a pruned nomination is a
+    # captured decision. Only when the exact tier missed (rs then
+    # holds the semantic result — zero extra queries).
+    nominations: "list[dict]" = []
+    if rs.params.get("mode") == "semantic":
+        # relevance bar (deterministic, no threshold-tuning): a
+        # nomination must share a stem token with the candidate's
+        # name or DESCRIPTION — tier-2's own data — so junk
+        # phrases still report honest misses (B9 survives)
+        ent_stems = {_stem(t) for t in _re.split(r"[^A-Za-z0-9_]+", e)
+                     if len(_stem(t)) >= 4}
+        have = {r.get("id") for r in rows}
+        for r in rs.rows:
+            if r.get("id") in have or len(nominations) >= 3:
+                continue
+            blob = " ".join(
+                str(r.get(k) or "") for k in
+                ("name", "business_name", "description")).lower()
+            if not any(s in blob for s in ent_stems):
+                continue
+            have.add(r.get("id"))
+            nominations.append({"entity": e, "id": r["id"],
+                                "kind": r.get("kind"),
+                                "semantic": True, "rows": [r]})
+    if not rows and not nominations:
         return [{"entity": e, "id": None, "kind": None, "rows": []}]
     # NAME COLLISIONS ANCHOR WHOLLY (the corpus's founding
     # shape): every same-kind row of the exact/containment
     # match is an anchor — one shared name over two metrics
     # is two anchors, and sameness then compares them
-    kind0 = rows[0].get("kind")
+    kind0 = rows[0].get("kind") if rows else None
     return [{"entity": e, "id": r["id"], "kind": r.get("kind"),
              "rows": [r]}
-            for r in rows if r.get("kind") == kind0][:4]
+            for r in rows if r.get("kind") == kind0][:4] + nominations
 
 
 def ground_entities(entities: "list[str]", run_kql,

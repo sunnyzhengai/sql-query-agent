@@ -354,6 +354,7 @@ def create_app(
         def _grounded(entity, group):
             matches = [
                 {"id": a["id"], "kind": a.get("kind"),
+                 "semantic": bool(a.get("semantic")),
                  "name": ((a.get("rows") or [{}])[0].get("business_name")
                           or (a.get("rows") or [{}])[0].get("name")
                           or a["id"])}
@@ -521,6 +522,24 @@ def create_app(
                      "message": str(e),
                      "conversation_id": conv_id}, 422)
         t_exec = int((_time.monotonic() - t0) * 1000)
+        if exclude:
+            # TIER2-1: a pruned candidate is a CAPTURED DECISION —
+            # the flywheel counts prunes from day one (0056 shape)
+            sink.record(TurnEvent(
+                event_at=datetime.now(timezone.utc).isoformat(),
+                user_id=user,
+                question=f"[PRUNE] {pp['question'][:400]}",
+                tools_used=("prune",),
+                ids_read=tuple(sorted(exclude)),
+                basis="iteration-card prune (0062 ASK decision)",
+                answered=True,
+                conversation_id=conv_id, turn_index=-1,
+                decision={"made_by": "user_prune",
+                          "excluded": sorted(exclude)},
+                trace=({"tool": "prune",
+                        "args": {"excluded": sorted(exclude)},
+                        "result": "excluded from the confirmed plan"},),
+            ))
         outputs = []
         for r in results:
             shown = r.display()
@@ -1551,7 +1570,8 @@ function renderParseCard(j, message) {
       ? s.matches.map(m =>
           `<label class="matchrow"><input type="checkbox" checked
             data-id="${esc(m.id)}"> ${esc(m.name)}
-            <span class="cite">${esc(m.kind || '')}</span></label>`
+            <span class="cite">${esc(m.kind || '')}${
+              m.semantic ? ' · semantic' : ''}</span></label>`
         ).join('')
       : '<span class="universe">no catalog match</span>';
     return `<div class="showline">matched

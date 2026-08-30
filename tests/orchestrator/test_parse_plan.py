@@ -176,3 +176,21 @@ def test_bare_table_word_composes_lineage_ungrounded():
         [{"entity": "ENCOUNTERS", "id": None, "kind": None,
           "rows": []}])
     assert plan == [{"op": "lineage", "table": "ENCOUNTERS"}]
+
+
+def test_tier2_semantic_candidates_nominate_labeled():
+    """TIER2-1: when the exact tier misses, semantic candidates join
+    the anchors RANKED and LABELED — nominate-only, prunable."""
+    s = OpsSession()
+    got = ground_entities(["screening for sepsis cases"], fake_kql, s)
+    sems = [a for a in got if a.get("semantic")]
+    assert sems, "no semantic nominations surfaced"
+    assert all(a["id"] for a in sems)
+    assert len(sems) <= 3
+
+
+def test_exact_hit_takes_no_semantic_nominations():
+    # a precise name needs no nominations — zero extra noise
+    s = OpsSession()
+    got = ground_entities(["ED Sepsis Screening"], fake_kql, s)
+    assert not any(a.get("semantic") for a in got)
