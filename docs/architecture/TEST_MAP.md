@@ -7,7 +7,7 @@
 
 # Test Map — what every test proves
 
-118 modules, 1314 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
+118 modules, 1319 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
 
 ## By ADR
 
@@ -66,7 +66,7 @@
 | 0060 | The parse is the plan: parser-only LLM, deterministic traversal, correction flywheel | `tests/orchestrator/test_parse_plan.py` (28) |
 | 0061 | The run layer: Pro runs the confirmed definition | `tests/test_run_layer.py` (25) |
 | 0062 | The dialogue loop: show, propose, ask, execute | `tests/webapp/test_app.py` (74) |
-| 0063 | The product tiers: X-Ray, Bridge, Workbench, Run | `tests/adapters/test_file_export.py` (9), `tests/test_console.py` (10), `tests/test_xray.py` (7) |
+| 0063 | The product tiers: X-Ray, Bridge, Workbench, Run | `tests/adapters/test_file_export.py` (9), `tests/test_console.py` (15), `tests/test_xray.py` (7) |
 
 ## By standing law
 
@@ -79,7 +79,7 @@
 - `tests/orchestrator/test_gapcheck_finds.py` (10): Gap-check finds (Sunny live, 2026-08-24) — L0: W15 typed compare
 - `tests/orchestrator/test_sameness.py` (22): Walk W6/W7 (Sunny live, 2026-08-23): sameness honesty. The corpse:
 - `tests/orchestrator/test_walk_continuation.py` (20): Walk 1562 continuation (steps 3–6, 2026-08-23) — L0 for the P0/P1
-- `tests/test_console.py` (10): CONSOLE-1 (0063 §3 — the Resolution Console / the Inbox):
+- `tests/test_console.py` (15): CONSOLE-1 (0063 §3 — the Resolution Console / the Inbox):
 - `tests/test_de_typing.py` (4): TESTPLAN_0062 section A — the de-typing proof (the ruling's
 - `tests/webapp/test_page_dom.py` (1): RW-19 — the page-JS gate's RUNTIME leg (TESTPLAN_0062 D).
 

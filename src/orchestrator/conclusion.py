@@ -184,12 +184,50 @@ def compose_conclusion(outputs: "list[dict]", caption: str,
                 f"{fp['owner']} — {_short(fp)}"
                 for fp in fingerprints)
         diff_label = ""
+        set_summary = ""
         if len(groups) >= 2:
             big = sorted(groups, key=len, reverse=True)[:2]
             diff_label = (f"receipt: − {big[0][0]} · + {big[1][0]}"
                           + (f" ({len(groups)} groups — largest "
                              "two diffed)" if len(groups) > 2
                              else ""))
+            # CONSOLE-2 amendment (Sunny's codeset screenshot):
+            # literal-SET diffs summarize — "79 codes shared ·
+            # E11.80 only in <side>" — never an 80-item list
+            # printed twice to say one item differs. Names for the
+            # sides come from the retrieved members.
+            import re as _re
+            for row in crows:
+                d = row.get("diff_between_two_largest_groups")
+                if not d:
+                    continue
+                minus = [ln for ln in str(d).splitlines()
+                         if ln.startswith("-")
+                         and not ln.startswith("---")]
+                plus = [ln for ln in str(d).splitlines()
+                        if ln.startswith("+")
+                        and not ln.startswith("+++")]
+                sa = {m for ln in minus
+                      for m in _re.findall(r"'([^']+)'", ln)}
+                sb = {m for ln in plus
+                      for m in _re.findall(r"'([^']+)'", ln)}
+                if len(sa) < 3 and len(sb) < 3:
+                    continue          # not a literal-set diff
+                def _side_name(exemplar: str) -> str:
+                    row2 = retrieved.get(exemplar, {})
+                    return str(row2.get("business_name")
+                               or row2.get("name") or exemplar)
+                shared = len(sa & sb)
+                bits = [f"{shared} value(s) shared"]
+                for tok in sorted(sb - sa)[:4]:
+                    bits.append(f"{tok} only in "
+                                f"{_side_name(big[1][0])}")
+                for tok in sorted(sa - sb)[:4]:
+                    bits.append(f"{tok} only in "
+                                f"{_side_name(big[0][0])}")
+                if shared and len(bits) > 1:
+                    set_summary = " · ".join(bits)
+                break
         items = [
             {"name": row.get("business_name") or row.get("id"),
              "description": row.get("description") or ""}
@@ -200,6 +238,7 @@ def compose_conclusion(outputs: "list[dict]", caption: str,
                 "verdict_note": note[:160],
                 "fingerprints": fingerprints[:6],
                 "contrast": contrast,
+                "set_summary": set_summary,
                 "diff_label": diff_label,
                 "diff_lines": _diff_lines(crows),
                 "items": items, "prose": caption}

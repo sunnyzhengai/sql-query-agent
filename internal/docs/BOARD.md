@@ -507,7 +507,14 @@ The hold lifts only by Sunny's explicit word, recorded here.
       member fingerprints (name·owner·reads·criterion·why),
       owner-named machine contrast, diff folded as labeled
       receipt; console act retrieves members; one composer, every
-      surface. 1,348 green + ruff. Amendment + CONSOLE-3 next.
+      surface. 1,348 green + ruff. **VERIFIED.**
+- [x] **CONSOLE-2 AMENDMENT + CONSOLE-3 BUILT (08-30 dev,
+      1.75.0)** — set-summary elision ("79 shared · E11.80 only in
+      X"; lists stay folded); certify → the three-outcome chooser
+      w/ member picker (landing map = 9 verbs, totality extended;
+      picker verbs refuse memberless; members ride decisions,
+      never fold keys). 1,353 green + ruff. AWAITS review → Sunny
+      restarts ONCE for 2+3 together.
 
 ## RULED (Sunny, 2026-08-29): THE GENERATOR CLAUSE — Echo Law amendment
 "Fail twice, no matter the cause, triggers an investigation."

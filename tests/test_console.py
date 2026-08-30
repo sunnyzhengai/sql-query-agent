@@ -26,7 +26,8 @@ class TestLandingTotality:
 
     def test_every_verb_has_a_landing_and_a_grade(self):
         assert set(LANDING_MAP) == {
-            "certify", "deny", "delegate", "compare",
+            "certify", "certify_official", "differentiate_all",
+            "certify_definition", "deny", "delegate", "compare",
             "approve_technical", "fork"}
         for verb, row in LANDING_MAP.items():
             assert row["lands"].strip(), verb
@@ -45,7 +46,8 @@ class TestLandingTotality:
                        if row["persona"] == "developer"
                        else "steward")
             ev = action_event(verb, "cluster:x", persona, "u",
-                              "because", "t0")
+                              "because", "t0",
+                              member_ids=["m1"])
             assert ev["decision"]["grade"] == row["grade"]
             assert ev["decision"]["lands"] == row["lands"]
             assert ev["question"].startswith("[CONSOLE:")
@@ -107,3 +109,44 @@ class TestInboxFolding:
         # untouched flags sort FIRST (open work on top)
         assert state["flags"][0]["console_state"] is None
         assert "landing_map" in state
+
+
+class TestConsole3CertifyOutcomes:
+    """CONSOLE-3: certify has a TARGET and an OUTCOME — the three
+    steward acts, each its own graded event with picked members in
+    the decision; picker verbs refuse without their member."""
+
+    def test_picker_verbs_require_a_member(self):
+        for verb in ("certify_official", "certify_definition"):
+            with pytest.raises(ConsoleRefusal) as e:
+                check_action(verb, "steward")
+            assert e.value.reason_class == "member_required"
+            check_action(verb, "steward", member_ids=["m1"])
+
+    def test_differentiate_all_needs_no_member(self):
+        check_action("differentiate_all", "steward")
+
+    def test_official_event_carries_the_picked_target(self):
+        ev = action_event("certify_official", "cluster:f",
+                          "steward", "u", "", "t0",
+                          member_ids=["metric:reporting.USP_A"])
+        assert ev["decision"]["targets"] == [
+            "metric:reporting.USP_A"]
+        assert "metric:reporting.USP_A" in ev["ids_read"]
+        assert "canonical bearer" in ev["decision"]["lands"]
+
+    def test_outcomes_fold_as_dispositions(self, tmp_path):
+        p = tmp_path / "e.jsonl"
+        p.write_text(json.dumps(action_event(
+            "differentiate_all", "cluster:f", "steward", "u",
+            "", "t0")))
+        d = effective_dispositions(p)
+        assert d["cluster:f"]["state"] == "differentiated"
+
+    def test_member_never_becomes_the_fold_key(self, tmp_path):
+        p = tmp_path / "e.jsonl"
+        p.write_text(json.dumps(action_event(
+            "certify_official", "cluster:f", "steward", "u",
+            "", "t0", member_ids=["m1"])))
+        d = effective_dispositions(p)
+        assert "cluster:f" in d and "m1" not in d

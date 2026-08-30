@@ -815,6 +815,8 @@ def create_app(
         target = str(body.get("target_id") or "")
         persona = str(body.get("persona") or "steward")
         reason = str(body.get("reason") or "")
+        member_ids = [str(m) for m in (body.get("member_ids")
+                                       or [])]
         user = _user_from(request)
         if not target:
             return JSONResponse({"error": "target_id required"},
@@ -822,7 +824,8 @@ def create_app(
         try:
             ev = action_event(
                 verb, target, persona, user, reason,
-                datetime.now(timezone.utc).isoformat())
+                datetime.now(timezone.utc).isoformat(),
+                member_ids=member_ids)
         except ConsoleRefusal as e:
             return JSONResponse(
                 {"error": "refusal", "reason_class": e.reason_class,
@@ -1504,6 +1507,8 @@ function renderConclusion(j) {
         </div>`).join('');
     const contrast = c.contrast
       ? `<div class="cc-item"><b>${esc(c.contrast)}</b></div>` : '';
+    const setSum = c.set_summary
+      ? `<div class="cc-item"><b>${esc(c.set_summary)}</b></div>` : '';
     const diff = (c.diff_lines || []).map(l =>
       `<div class="diffline ${l.startsWith('+') ? 'plus' : 'minus'}">${esc(l)}</div>`).join('');
     const diffFold = diff
@@ -1515,7 +1520,7 @@ function renderConclusion(j) {
     return el(`<div class="caption concl">
       <span class="badge verdict">${esc(c.verdict || 'COMPARED')}</span>
       <span class="cc-machine">${esc(c.verdict_note || '')}</span>
-      ${contrast}${fps}${items}${diffFold}${proseHtml}${based}</div>`);
+      ${setSum}${contrast}${fps}${items}${diffFold}${proseHtml}${based}</div>`);
   }
   if (c.kind === 'definition') {
     return el(`<div class="caption concl">
@@ -2153,7 +2158,36 @@ function esc(s) { const t = document.createElement('span');
 function el(html) { const d = document.createElement('div');
   d.innerHTML = html; return d.firstElementChild; }
 
-async function act(verb, id, card) {
+function certifyChooser(f, card) {
+  // CONSOLE-3: certify has a TARGET and an OUTCOME — the choice a
+  // steward actually makes; single-member flags skip the picker
+  const old = card.querySelector('.chooser');
+  if (old) { old.remove(); return; }
+  const radios = (f.members || []).map((m, i) =>
+    '<label style="display:block"><input type="radio" '
+    + 'name="pick" value="' + esc(m.id) + '"'
+    + (i === 0 ? ' checked' : '') + '> ' + esc(m.name)
+    + '</label>').join('');
+  const box = el('<div class="chooser evidence">'
+    + '<div><b>certify — which act do you mean?</b></div>' + radios
+    + '<div class="verbs">'
+    + '<button data-v="certify_official">designate official'
+    + '</button>'
+    + '<button data-v="differentiate_all">differentiate all'
+    + '</button>'
+    + '<button data-v="certify_definition">certify one definition'
+    + '</button></div></div>');
+  box.querySelectorAll('button').forEach(b =>
+    b.addEventListener('click', () => {
+      const pick = box.querySelector('input[name=pick]:checked');
+      const members = (b.dataset.v === 'differentiate_all')
+        ? [] : (pick ? [pick.value] : []);
+      act(b.dataset.v, f.id, card, members);
+    }));
+  card.appendChild(box);
+}
+
+async function act(verb, id, card, memberIds) {
   let reason = '';
   if (verb === 'deny') {
     reason = window.prompt('deny lands as testimony — the reason:')
@@ -2163,7 +2197,8 @@ async function act(verb, id, card) {
   const r = await fetch('/api/inbox/act', { method:'POST',
     headers:{'Content-Type':'application/json'},
     body: JSON.stringify({ verb, target_id: id,
-      persona: personaSel.value, reason })});
+      persona: personaSel.value, reason,
+      member_ids: memberIds || [] })});
   const j = await r.json();
   if (!r.ok) {
     card.appendChild(el('<div class="evidence">' +
@@ -2220,7 +2255,13 @@ async function load() {
       const b = el('<button' + (v === 'certify'
         ? ' class="primary"' : '') + '>'
         + esc(v.replace('_', ' ')) + '</button>');
-      b.addEventListener('click', () => act(v, f.id, card));
+      b.addEventListener('click', () => {
+        if (v === 'certify' && (f.members || []).length > 1) {
+          certifyChooser(f, card);   // CONSOLE-3: outcome + target
+          return;
+        }
+        act(v, f.id, card);
+      });
       vbox.appendChild(b);
       const row = lm[v] || {};
       card.querySelector('.land').textContent =

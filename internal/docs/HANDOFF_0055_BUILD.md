@@ -3152,3 +3152,27 @@ IDENTICAL suppresses contrast. Sunny's glass check deferred ONE
 delivery so she restarts once for CONSOLE-2 + the set-summary
 amendment + CONSOLE-3 together — her one-breath read of the
 Active Diabetic Patients card plus the certify-asks-which test.
+
+### 2026-08-30 — CONSOLE-2 AMENDMENT + CONSOLE-3 BUILT — release 1.75.0
+**Set-summary elision (the codeset screenshot):** literal-set
+diffs now LEAD with the machine summary — "79 value(s) shared ·
+E11.80 only in <member name>" (sides named from the retrieved
+members) — and the full lists stay folded in the receipt. An
+80-item list is never printed twice to say one item differs.
+**CONSOLE-3 — certify has a TARGET and an OUTCOME.** The landing
+map gains the three steward acts (totality test extended to 9
+verbs): **designate official** (member picker; the chosen member
+becomes the name's canonical bearer; others remain flagged for
+differentiation) · **differentiate all** (no official — every
+member a legitimate distinct purpose, the 0054 canonical outcome)
+· **certify one definition** (picker; certified without
+designating the official). Picker verbs REFUSE without their
+member ("choose which one you mean"); picked members ride the
+decision AND ids_read, but the FLAG stays the fold key (a member
+id never becomes a disposition key — test-held). On glass: the
+certify press on a multi-member flag opens the chooser (radio
+member list from the store's qualified labels + the three outcome
+buttons); single-member flags skip the picker, as ordered.
+**Gates:** 1,353 green + 5 xfailed, ruff clean; wheel 1.75.0.
+Acceptance = Sunny certifies on the Diabetic Patients cluster and
+is ASKED which act she means. One restart picks up 2+3 together.

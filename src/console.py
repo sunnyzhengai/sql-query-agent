@@ -30,11 +30,38 @@ from pathlib import Path
 # (0063 total landing map, verbatim landings)
 LANDING_MAP: "dict[str, dict]" = {
     "certify": {
+        # single-member flags only — multi-member certify OPENS
+        # the CONSOLE-3 chooser and records one of the three
+        # outcome verbs below
         "persona": "steward",
         "lands": "DG glossary/asset description via the Queue + "
                  "graph certification edge + flag disposition",
         "grade": "steward-certified",
         "needs_reason": False},
+    # CONSOLE-3 (Sunny's glass: certify needs a TARGET and an
+    # OUTCOME — the choice a steward actually makes)
+    "certify_official": {
+        "persona": "steward",
+        "lands": "the chosen member becomes the name's canonical "
+                 "bearer — glossary/asset update for THAT member "
+                 "via the Queue + designation edge; the others "
+                 "remain, flagged for differentiation",
+        "grade": "steward-certified",
+        "needs_reason": False, "needs_member": True},
+    "differentiate_all": {
+        "persona": "steward",
+        "lands": "disposition resolves with NO official — every "
+                 "member ruled a legitimate distinct purpose and "
+                 "queued for its own label (the 0054 canonical "
+                 "outcome); term updates/relations via the Queue",
+        "grade": "steward-certified",
+        "needs_reason": False},
+    "certify_definition": {
+        "persona": "steward",
+        "lands": "the picked member's definition certified via the "
+                 "Queue WITHOUT designating the name's official",
+        "grade": "steward-certified",
+        "needs_reason": False, "needs_member": True},
     "deny": {
         "persona": "steward",
         "lands": "graph testimony + flag disposition; DG only if "
@@ -69,6 +96,9 @@ LANDING_MAP: "dict[str, dict]" = {
 }
 
 _DISPOSITION_VERBS = {"certify": "certified",
+                      "certify_official": "official designated",
+                      "differentiate_all": "differentiated",
+                      "certify_definition": "definition certified",
                       "deny": "denied",
                       "delegate": "delegated"}
 
@@ -79,10 +109,11 @@ class ConsoleRefusal(Exception):
         super().__init__(message)
 
 
-def check_action(verb: str, persona: str,
-                 reason: str = "") -> dict:
+def check_action(verb: str, persona: str, reason: str = "",
+                 member_ids: "list[str] | None" = None) -> dict:
     """The gate every act passes: the verb must have a landing row,
-    the persona must match, a deny must carry its reason."""
+    the persona must match, a deny must carry its reason, and a
+    picker verb must carry its picked member (CONSOLE-3)."""
     row = LANDING_MAP.get(verb)
     if row is None:
         raise ConsoleRefusal(
@@ -100,6 +131,11 @@ def check_action(verb: str, persona: str,
             "reason_required",
             "deny lands as testimony — it carries its reason, "
             "always")
+    if row.get("needs_member") and not (member_ids or []):
+        raise ConsoleRefusal(
+            "member_required",
+            f"{verb} certifies a PICKED member — choose which one "
+            "you mean")
     return row
 
 
@@ -127,8 +163,9 @@ def effective_dispositions(events_path) -> "dict[str, dict]":
         if verb not in _DISPOSITION_VERBS \
                 and verb != "approve_technical":
             continue
-        for tid in ev.get("ids_read") or []:
-            out[str(tid)] = {
+        ids = list(ev.get("ids_read") or [])
+        for tid in ids[:1]:           # the flag; members ride the
+            out[str(tid)] = {          # decision, not the fold key
                 "verb": verb,
                 "state": _DISPOSITION_VERBS.get(verb, "approved"),
                 "by": str(ev.get("user_id") or ""),
@@ -142,8 +179,27 @@ def inbox_state(run_kql, events_path, persona: str) -> dict:
     """The Inbox: flags to resolve (steward) + writes to approve
     (per persona) — flags from the live census, decision state
     folded from the event store."""
-    from src.orchestrator.ops import OpsSession, op_census
+    from src.orchestrator.ops import (
+        OpsSession,
+        _member_labels,
+        op_census,
+    )
+    from src.orchestrator.tools import GOV_FLAG_MEMBER_NAMES_QUERY
     decided = effective_dispositions(events_path)
+    # CONSOLE-3: the certify chooser picks by MEMBER — ids ride
+    # each flag alongside the qualified labels
+    members_by_cluster: "dict[str, list]" = {}
+    try:
+        for mr in run_kql(GOV_FLAG_MEMBER_NAMES_QUERY, {}):
+            names = _member_labels(
+                list(mr.get("member_names") or []),
+                list(mr.get("member_ids") or []))
+            ids = [str(i) for i in (mr.get("member_ids") or [])]
+            members_by_cluster[str(mr.get("cluster"))] = [
+                {"id": mid, "name": nm}
+                for mid, nm in zip(ids, names)]
+    except Exception:   # noqa: BLE001 — picker enrich is additive
+        members_by_cluster = {}
     flags = []
     for f in op_census("flag", run_kql, OpsSession()).rows:
         fid = str(f.get("id"))
@@ -156,6 +212,7 @@ def inbox_state(run_kql, events_path, persona: str) -> dict:
             "member_count": f.get("member_count"),
             "member_names": (f.get("member_names") or [])[:12],
             "why": f.get("description") or "",
+            "members": members_by_cluster.get(fid, []),
             "store_disposition": f.get("disposition") or "open",
             "console_state": state,   # None = untouched
         })
@@ -171,21 +228,25 @@ def inbox_state(run_kql, events_path, persona: str) -> dict:
 
 
 def action_event(verb: str, target_id: str, persona: str,
-                 user: str, reason: str, event_at: str) -> dict:
+                 user: str, reason: str, event_at: str,
+                 member_ids: "list[str] | None" = None) -> dict:
     """The 0056-shape decision event an act records — graded per
-    the landing row, always."""
-    row = check_action(verb, persona, reason)
+    the landing row, always; picked members ride the decision AND
+    ids_read (CONSOLE-3: target ids in the decision)."""
+    row = check_action(verb, persona, reason, member_ids)
+    members = tuple(str(m) for m in (member_ids or []))
     return {
         "event_at": event_at,
         "user_id": user,
         "question": f"[CONSOLE:{verb.upper()}] {target_id}",
         "tools_used": ("console",),
-        "ids_read": (target_id,),
+        "ids_read": (target_id,) + members,
         "basis": f"resolution console — lands: {row['lands']}",
         "answered": True,
         "conversation_id": "console", "turn_index": -1,
         "decision": {"made_by": "console_action", "verb": verb,
                      "persona": persona, "reason": reason,
+                     "targets": list(members),
                      "grade": row["grade"],
                      "lands": row["lands"]},
         "trace": ({"tool": "console",
