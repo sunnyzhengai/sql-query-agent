@@ -2437,3 +2437,10 @@ via stubbed paraphraser + fixture estate (green run, grounding
 miss→lexicon food, dead LLM→unfuzzed finding, oracle miss).
 **Gates:** 1,256 green + 5 xfailed, ruff clean. (No wheel bump —
 devtools + review's sh only; engine untouched.)
+
+### REVIEW VERDICT — RW-25 (1.65.0): VERIFIED
+Gates review-side green. Auto-retry + retry button + the
+causes-from-stamps floor (invented infra diagnoses now a floorable
+claim class). The nightly cold battery is its standing live
+acceptance — tomorrow ~6:23am is the first scheduled proof.
+Dev proceeds: FUZZER-1 → TIER2-1 → FLYWHEEL-1.
