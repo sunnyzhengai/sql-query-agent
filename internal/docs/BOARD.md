@@ -464,8 +464,14 @@ The hold lifts only by Sunny's explicit word, recorded here.
       basis, deterministic AI-readiness verdict, order-form last
       page) + engagement runbook + CLI; LIVE SAMPLE on the shapes
       estate (37 metrics/65 steps/26 flags → NOT-AI-READY) at
-      internal/docs/XRAY_REPORT.md. 1,316 green + ruff. AWAITS
-      review → BRIDGE-1 exporters → CONSOLE-1.
+      internal/docs/XRAY_REPORT.md. 1,316 green + ruff. **Gates
+      green w/ ONE blocking find (XR-1: count-vs-list).**
+- [x] **XR-1 BUILT (08-30 dev, 1.72.1)** — all members render
+      (qualified labels); store shortfall discloses; KQL cap
+      12→64; live regen: the 10-member family lists 10 w/
+      qualified twins, 0 shortfalls estate-wide; membership
+      semantics verified (26/26 reconcile). 1,318 green + ruff.
+      AWAITS review → BRIDGE-1 exporters → CONSOLE-1.
 
 ## RULED (Sunny, 2026-08-29): THE GENERATOR CLAUSE — Echo Law amendment
 "Fail twice, no matter the cause, triggers an investigation."

@@ -2921,3 +2921,25 @@ tests so the class dies. Verify High ED cluster membership
 semantics (family-contains vs exact-name) while in there.
 BRIDGE-1 may proceed in parallel; XR-1 rides before any real
 engagement.
+
+### 2026-08-30 — XR-1 BUILT — release 1.72.1
+**The count-vs-list reconciliation, root-caused and dead.** The
+live check first: `_member_labels` (the W3a mechanism) reconciles
+26/26 clusters on the shapes store — the qualified-label machinery
+was NEVER the leak. The report's own composer was: an [:8]
+truncation listed 8 of 10 with no disclosure, and the KQL name
+list capped at 12 store-side. Fixes: **ALL members render**
+(collision-qualified labels straight from the census rows); a
+store-side shortfall DISCLOSES ("store lists N of M names"), never
+silent; the KQL cap raised 12→64 (bounded, far above any real
+cluster). **Live regeneration verifies:** the 10-member Diabetic
+family now lists all 10 — the Active_Diabetics twins render
+qualified (reporting./reports.) — and zero shortfall disclosures
+fire estate-wide. **Membership semantics verified per the order:**
+duplicate clusters group by CONTENT (different step names, same
+logic — correct); misnomer/family clusters by name/family (ids all
+distinct on the live store; the devtool check proved count==labels
+on every cluster). Reconciliation assertions test-held both ways
+(full list of 10; disclosed shortfall of 8-of-10).
+**Gates:** 1,318 green + 5 xfailed, ruff clean; wheel 1.72.1;
+XRAY_REPORT.md regenerated live. The wedge is engagement-clean.

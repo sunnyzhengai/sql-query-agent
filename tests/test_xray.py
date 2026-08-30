@@ -56,3 +56,57 @@ class TestXrayReport:
         r = compose_xray(fake_kql, "X")
         assert "AIVIA" not in r or "AIVIA" in __import__(
             "src.branding", fromlist=["product_name"]).product_name()
+
+
+class TestXR1MemberReconciliation:
+    """XR-1 (review, blocks wedge use): the member list reconciles
+    with the member count — all members render with qualified-on-
+    collision labels; a store-side shortfall discloses."""
+
+    def _kql_with_big_cluster(self, n_members, listed=None):
+        from src.orchestrator.tools import (
+            GOV_FLAG_MEMBER_NAMES_QUERY,
+            GOV_FLAGS_QUERY,
+            GOV_SWEEP_META_QUERY,
+        )
+        listed = n_members if listed is None else listed
+
+        def kql(query, params):
+            if query == GOV_FLAGS_QUERY:
+                return [{"flag_id": "cluster:family:x",
+                         "flag_class": "cousin_conflict",
+                         "grain": "metric", "identity": "Family",
+                         "severity": "WARN", "scope": "estate",
+                         "member_count": n_members,
+                         "distinct_logics": 3, "blast_radius": 4,
+                         "disposition": "open",
+                         "description": "why-sentence"}]
+            if query == GOV_FLAG_MEMBER_NAMES_QUERY:
+                return [{"cluster": "cluster:family:x",
+                         "member_names": [
+                             "USP_Twin" for _ in range(listed)],
+                         "member_ids": [
+                             f"metric:s{i}.USP_Twin"
+                             for i in range(listed)]}]
+            if query == GOV_SWEEP_META_QUERY:
+                return [{"swept": 5, "flagged": 1, "clean": 4,
+                         "run_at": "t"}]
+            return fake_kql(query, params)
+        return kql
+
+    def test_all_members_list_and_reconcile(self):
+        r = compose_xray(self._kql_with_big_cluster(10), "X")
+        line = next(ln for ln in r.splitlines()
+                    if ln.startswith("- members (10):"))
+        # every member listed, collision-qualified → 10 entries
+        entries = line.split(": ", 1)[1].split(", ")
+        assert len(entries) == 10
+        assert "s0.USP_Twin" in line and "s9.USP_Twin" in line
+        assert "store lists" not in line
+
+    def test_store_shortfall_is_disclosed_never_silent(self):
+        r = compose_xray(self._kql_with_big_cluster(10, listed=8),
+                         "X")
+        line = next(ln for ln in r.splitlines()
+                    if ln.startswith("- members (10):"))
+        assert "(store lists 8 of 10 names)" in line

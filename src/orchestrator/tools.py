@@ -499,8 +499,8 @@ GOV_FLAG_MEMBER_NAMES_QUERY = (
     # RW-BATCH-4 polish (re-walk 2026-08-29): ids ride along so the
     # census can schema-qualify colliding bare names — the misnomer
     # card's whole point is that a shared name hides difference
-    "| summarize member_names = make_list(shown, 12), "
-    "member_ids = make_list(member, 12) by cluster"
+    "| summarize member_names = make_list(shown, 64), "
+    "member_ids = make_list(member, 64) by cluster"
 )
 
 GOV_FLAGS_QUERY = (

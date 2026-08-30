@@ -63,13 +63,22 @@ def compose_xray(run_kql, org_name: str,
     if not flags:
         lines.append("The sweep found no red flags in this estate.")
     for f in flags:
-        members = ", ".join(str(m) for m in
-                            (f.get("member_names") or [])[:8])
+        # XR-1 (review, blocks wedge use): the member LIST must
+        # reconcile with the member COUNT — a paid diagnosis that
+        # disagrees with its own list discredits itself. ALL
+        # members render (census rows carry qualified-on-collision
+        # labels via the W3a mechanism); a store-side shortfall is
+        # DISCLOSED, never silent.
+        names = [str(m) for m in (f.get("member_names") or [])]
+        count = int(f.get("member_count") or 0)
+        members = ", ".join(names) or "—"
+        shortfall = (f" (store lists {len(names)} of {count} names)"
+                     if names and len(names) < count else "")
         lines += [
             f"### {f.get('identity')} — {f.get('flag_class')} "
             f"({f.get('severity')})",
             str(f.get("description") or ""),
-            f"- members ({f.get('member_count')}): {members or '—'}",
+            f"- members ({count}): {members}{shortfall}",
             f"- distinct logics: {f.get('distinct_logics')} · "
             f"blast radius: {f.get('blast_radius')} certified "
             "consumer(s)",

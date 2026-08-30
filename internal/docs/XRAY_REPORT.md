@@ -1,5 +1,5 @@
 # SQL Intelligence Agent Estate X-Ray — AIVIA Demo Health
-Generated 2026-08-30 18:09 UTC
+Generated 2026-08-30 18:16 UTC
 
 ## Your estate, in numbers
 
@@ -19,7 +19,7 @@ Generated 2026-08-30 18:09 UTC
 
 ### Diabetic Patients — cousin_conflict (CONFLICT)
 10 metrics answer to 'Diabetic Patients' with 10 distinct definitions and no designated official — each may be a legitimate purpose awaiting its own label. [cousin_conflict (CONFLICT); flags disclose, never gate]
-- members (10): USP_Diabetic_InclGest, USP_Diabetic_Panel, USP_Diabetic_Patients_DX, USP_Diabetic_Patients_Lab, USP_Panel_ED_Visits, USP_Panel_NoShows, USP_Diabetic_Billing, USP_Diabetic_ExclGest
+- members (10): USP_Diabetic_InclGest, USP_Diabetic_Panel, USP_Diabetic_Patients_DX, USP_Diabetic_Patients_Lab, USP_Panel_ED_Visits, USP_Panel_NoShows, USP_Diabetic_Billing, USP_Diabetic_ExclGest, USP_Active_Diabetics (reporting.USP_Active_Diabetics), USP_Active_Diabetics (reports.USP_Active_Diabetics)
 - distinct logics: 10 · blast radius: 0 certified consumer(s)
 - disposition: open
 
@@ -43,13 +43,13 @@ Generated 2026-08-30 18:09 UTC
 
 ### High ED Utilizers — grain_shift (CONFLICT)
 'High ED Utilizers' computes at different output grains across its members — the numbers answer different questions under one name. [grain_shift (CONFLICT); flags disclose, never gate]
-- members (2): USP_High_ED_Utilizers (reporting.USP_High_ED_Utilizers), USP_High_ED_Utilizers (reports.USP_High_ED_Utilizers)
+- members (2): USP_High_ED_Utilizers (reports.USP_High_ED_Utilizers), USP_High_ED_Utilizers (reporting.USP_High_ED_Utilizers)
 - distinct logics: 2 · blast radius: 0 certified consumer(s)
 - disposition: open
 
 ### Active Diabetic Patients — misnomer (CONFLICT)
 2 procedures share the name 'Active Diabetic Patients' but compute 2 different logics — one name is doing 2 jobs. [misnomer (CONFLICT); flags disclose, never gate]
-- members (2): USP_Active_Diabetics (reports.USP_Active_Diabetics), USP_Active_Diabetics (reporting.USP_Active_Diabetics)
+- members (2): USP_Active_Diabetics (reporting.USP_Active_Diabetics), USP_Active_Diabetics (reports.USP_Active_Diabetics)
 - distinct logics: 2 · blast radius: 0 certified consumer(s)
 - disposition: open
 
@@ -67,7 +67,7 @@ Generated 2026-08-30 18:09 UTC
 
 ### High ED Utilizers — misnomer (CONFLICT)
 2 procedures share the name 'High ED Utilizers' but compute 2 different logics — one name is doing 2 jobs. [misnomer (CONFLICT); flags disclose, never gate]
-- members (2): USP_High_ED_Utilizers (reporting.USP_High_ED_Utilizers), USP_High_ED_Utilizers (reports.USP_High_ED_Utilizers)
+- members (2): USP_High_ED_Utilizers (reports.USP_High_ED_Utilizers), USP_High_ED_Utilizers (reporting.USP_High_ED_Utilizers)
 - distinct logics: 2 · blast radius: 0 certified consumer(s)
 - disposition: open
 
@@ -85,25 +85,25 @@ identical logic exists under 5 different names — consolidation or an alias wou
 
 ### Active Diabetic Patients / Diabetes Registry / Line-Ending Probe A / Line-Ending Probe B — duplicate (INFO)
 identical logic exists under 4 different names — consolidation or an alias would end the drift risk. [duplicate (INFO); flags disclose, never gate]
-- members (4): USP_Active_Diabetics, USP_Diabetes_Registry, USP_Crlf_Probe_A, USP_Crlf_Probe_B
+- members (4): USP_Diabetes_Registry, USP_Crlf_Probe_A, USP_Crlf_Probe_B, USP_Active_Diabetics
 - distinct logics: 1 · blast radius: 0 certified consumer(s)
 - disposition: open
 
 ### Active Diabetic Patients / Enrollment Snapshot — duplicate (INFO)
 identical logic exists under 3 different names — consolidation or an alias would end the drift risk. [duplicate (INFO); flags disclose, never gate]
-- members (3): USP_Enrollment_Snapshot (reports.USP_Enrollment_Snapshot), USP_Enrollment_Snapshot (reporting.USP_Enrollment_Snapshot), USP_Active_Diabetics
+- members (3): USP_Enrollment_Snapshot (reports.USP_Enrollment_Snapshot), USP_Active_Diabetics, USP_Enrollment_Snapshot (reporting.USP_Enrollment_Snapshot)
 - distinct logics: 1 · blast radius: 0 certified consumer(s)
 - disposition: open
 
 ### Active_Now / Base_Cohort / Cascade_A / Enrolled — duplicate (INFO)
 identical logic exists under 5 different names — consolidation or an alias would end the drift risk. [duplicate (INFO); flags disclose, never gate]
-- members (5): Base_Cohort, enrolled, Enrolled, Cascade_A, Active_Now
+- members (5): Base_Cohort, enrolled, Cascade_A, Active_Now, Enrolled
 - distinct logics: 1 · blast radius: 5 certified consumer(s)
 - disposition: open
 
 ### Active_Now / Crlf_Cohort / Enc_Recent / Med_Orders_Cur — duplicate (INFO)
 identical logic exists under 8 different names — consolidation or an alias would end the drift risk. [duplicate (INFO); flags disclose, never gate]
-- members (8): Enc_Recent, Med_Orders_Cur, enc_recent, Rx_Current, Active_Now, Reg_Core, Crlf_Cohort (reporting.USP_Crlf_Probe_A:Crlf_Cohort), Crlf_Cohort (reporting.USP_Crlf_Probe_B:Crlf_Cohort)
+- members (8): Enc_Recent, Med_Orders_Cur, enc_recent, Rx_Current, Reg_Core, Crlf_Cohort (reporting.USP_Crlf_Probe_A:Crlf_Cohort), Crlf_Cohort (reporting.USP_Crlf_Probe_B:Crlf_Cohort), Active_Now
 - distinct logics: 1 · blast radius: 6 certified consumer(s)
 - disposition: open
 
@@ -139,13 +139,13 @@ identical logic exists under 4 different names — consolidation or an alias wou
 
 ### Active_Now — misnomer (INFO)
 2 procedures share the name 'Active_Now' but compute 2 different logics — one name is doing 2 jobs. [misnomer (INFO); flags disclose, never gate]
-- members (2): Active_Now (reports.USP_Active_Diabetics:Active_Now), Active_Now (reporting.USP_Active_Diabetics:Active_Now)
+- members (2): Active_Now (reporting.USP_Active_Diabetics:Active_Now), Active_Now (reports.USP_Active_Diabetics:Active_Now)
 - distinct logics: 2 · blast radius: 2 certified consumer(s)
 - disposition: open
 
 ### Base_Cohort — misnomer (INFO)
 11 procedures share the name 'Base_Cohort' but compute 9 different logics — one name is doing 9 jobs. [misnomer (INFO); flags disclose, never gate]
-- members (11): Base_Cohort (reporting.USP_Diabetic_InclGest:Base_Cohort), Base_Cohort (reporting.USP_Diabetic_Panel:Base_Cohort), Base_Cohort (reporting.USP_Diabetic_Patients_DX:Base_Cohort), Base_Cohort (reporting.USP_Diabetic_Patients_Lab:Base_Cohort), Base_Cohort (reporting.USP_PreOp_Abnormal_Labs:Base_Cohort), Base_Cohort (reporting.USP_Panel_ED_Visits:Base_Cohort), Base_Cohort (reporting.USP_Panel_NoShows:Base_Cohort), Base_Cohort (reporting.USP_Diabetic_Billing:Base_Cohort)
+- members (11): Base_Cohort (reporting.USP_Diabetic_InclGest:Base_Cohort), Base_Cohort (reporting.USP_Diabetic_Panel:Base_Cohort), Base_Cohort (reporting.USP_Diabetic_Patients_DX:Base_Cohort), Base_Cohort (reporting.USP_Diabetic_Patients_Lab:Base_Cohort), Base_Cohort (reporting.USP_PreOp_Abnormal_Labs:Base_Cohort), Base_Cohort (reporting.USP_Panel_ED_Visits:Base_Cohort), Base_Cohort (reporting.USP_Panel_NoShows:Base_Cohort), Base_Cohort (reporting.USP_Diabetic_Billing:Base_Cohort), Base_Cohort (reporting.USP_Diabetic_ExclGest:Base_Cohort), Base_Cohort (reporting.USP_DM_Registry_MedDerived:Base_Cohort), Base_Cohort (reporting.USP_High_ED_NoPCP:Base_Cohort)
 - distinct logics: 9 · blast radius: 11 certified consumer(s)
 - disposition: open
 
@@ -163,7 +163,7 @@ identical logic exists under 4 different names — consolidation or an alias wou
 
 ### Utilizers — misnomer (INFO)
 2 procedures share the name 'Utilizers' but compute 2 different logics — one name is doing 2 jobs. [misnomer (INFO); flags disclose, never gate]
-- members (2): Utilizers (reporting.USP_High_ED_Utilizers:Utilizers), Utilizers (reports.USP_High_ED_Utilizers:Utilizers)
+- members (2): Utilizers (reports.USP_High_ED_Utilizers:Utilizers), Utilizers (reporting.USP_High_ED_Utilizers:Utilizers)
 - distinct logics: 2 · blast radius: 2 certified consumer(s)
 - disposition: open
 
