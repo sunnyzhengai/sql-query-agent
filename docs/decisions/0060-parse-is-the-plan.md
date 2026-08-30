@@ -5,7 +5,14 @@ Sunny; all three open calls RULED same-day (§7): confirm every
 parse; lexicon promotes by usage threshold with steward veto;
 frontier parser for the pilot. Build is GATED on the corpus
 experiment (§6) — no engine change ships before the measurement.
-Next: dev prototypes the parse-traverse path for the experiment.
+**EXPERIMENT CLOSED 2026-08-30** (queue-2 order): the full gating
+measurement ran on the live shapes estate incl. Sunny's 15 walk
+phrasings through both systems — PROPOSED dominates every metric
+(routes 2/2 vs 1/2 · oracles 7/7 vs 5/7 · floors 0 vs 6 total ·
+fails closed vs guessed census · all 15 phrasings composed vs 5
+floors). Full record: internal/docs/PARSE_EXPERIMENT.md. The
+planner already serves production via 0062's card-everywhere; the
+gate this ADR set is formally satisfied with data.
 
 ## 1. The problem, measured
 

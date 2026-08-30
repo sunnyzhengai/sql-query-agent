@@ -1,0 +1,17 @@
+# Sunny's REAL phrasings, extracted from the walks (TESTPLAN B-battery
+# verbatim + the QA V2 set) — the route-consistency corpus half.
+Are all the Diabetic codesets defined the same?
+are these 3 metrics using the same definition: High ED Utilizers Without PCP High ED Utilizers (reporting.USP_High_ED_Utilizers) High ED Utilizers (reports.USP_High_ED_Utilizers)
+what does Active Diabetic Patients (reporting.USP_Active_Diabetics) use to define the patient cohort
+which metrics use ENCOUNTERS?
+What governance red flags exist for Diabetic Patients?
+Which certified metrics feed the Diabetes Registry dashboard?
+is there another way of defining diabetic patient cohort other than the logic in the Dx_Path, Lab_Path, Med_Path
+Diabetic Codeset
+How many patients are currently in the Diabetic Patients cohort?
+diabetes codeset
+diabetic patient cohort definition
+what metrics are there
+what tables does metric Active Diabetic Patients use
+How is the Diabetic Patients cohort defined?
+Which reports read the Diabetes Registry?

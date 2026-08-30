@@ -2733,3 +2733,21 @@ fixed; stability holds; nominate-means-offer proven). Gates 1,290
 half awaits Sunny's optional click, by design). Remaining from
 overnight queue 2: **0060-EXPERIMENT-CLOSE only.** The nightly
 cold battery (6:23am) will be the night's final word.
+
+### 2026-08-30 — 0060-EXPERIMENT-CLOSE DELIVERED (queue 2 complete)
+**The gating measurement ran in full on the live shapes store**
+(deterministic relation pass in; Sunny's 15 walk phrasings now
+EXECUTE through both systems — the harness had loaded them but
+never run them; that gap closed with this order). The verdict is
+one-directional:
+- Route consistency PROPOSED 2/2 vs CURRENT 1/2 · Oracle
+  correctness 7/7 vs 5/7 · Floor collapse 0 (by construction) vs
+  6 total (1 planted + 5 across the walk phrasings) · Detour load
+  recorded per question · Refusal honesty: fails closed vs a
+  guessed census · **all 15 walk phrasings composed, zero
+  refusals, while CURRENT floored on 5.**
+PARSE_EXPERIMENT.md finalized with the five metrics + the GATE
+CLOSE section; the 0060 ADR status records EXPERIMENT CLOSED with
+the data reference (ratification wording = review/Sunny).
+**Gates:** 1,290 green + 5 xfailed, ruff clean. (No wheel — docs
++ harness only.) **OVERNIGHT QUEUE 2 IS FULLY DELIVERED.**

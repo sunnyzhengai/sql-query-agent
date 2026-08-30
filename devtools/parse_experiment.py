@@ -192,6 +192,35 @@ def main() -> None:
             score["proposed_consistent"] += int(len(routes_p) == 1)
             score["current_consistent"] += int(len(routes_c) == 1)
         L.append("")
+    # EXPERIMENT-CLOSE (queue 2): the walk paraphrases RUN, not
+    # just count — Sunny's real phrasings through both systems,
+    # observational (no planted oracles; refusals and floors are
+    # the recorded signals, routes on record for review's diff)
+    walk_floors = 0
+    walk_refusals = 0
+    if walk:
+        L.append("## walk_paraphrases (Sunny's real phrasings — "
+                 "observational)")
+        for q in walk:
+            try:
+                p = run_proposed(q, parser_api, run_kql)
+                c = run_current(q, engine_api, run_kql)
+            except Exception as e:  # noqa: BLE001 — recorded, not fatal
+                L.append(f"- Q: {q}")
+                L.append(f"  - RUN ERROR: {type(e).__name__}: "
+                         f"{str(e)[:120]}")
+                continue
+            walk_refusals += int(bool(p["refused"]))
+            walk_floors += int(c.get("floored", False))
+            L.append(f"- Q: {q}")
+            L.append(f"  - PROPOSED: plan `{p['route']}`"
+                     + (f"; refused: {str(p['refused'])[:60]}"
+                        if p["refused"] else "")
+                     + f"; rows {p['rows_shown']}")
+            L.append(f"  - CURRENT:  route `{c['route']}`"
+                     + ("; FLOORED" if c.get("floored") else "")
+                     + f"; rows {c['rows_shown']}")
+        L.append("")
     L += [
         "## Scorecard (the ADR's five metrics)",
         "",
@@ -208,6 +237,11 @@ def main() -> None:
         "only the plan's rows; CURRENT primary vs shown per RW-3 "
         "folds)",
         "5. Refusal honesty: see the refusal intent above",
+        "",
+        (f"Walk paraphrases ({len(walk)}): PROPOSED refusals "
+         f"{walk_refusals}, CURRENT floors {walk_floors} — full "
+         "per-phrasing record above" if walk else
+         "Walk paraphrases: none loaded"),
         "",
     ]
     OUT.write_text("\n".join(L))

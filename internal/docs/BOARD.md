@@ -428,9 +428,16 @@ The hold lifts only by Sunny's explicit word, recorded here.
 - [x] **RW-26 BUILT (08-30 dev, 1.69.1)** — nominate means OFFER:
       nominations default-unchecked AND server-side default-
       excluded (include_ids opts in); the 5-way-compare dilution
-      cannot recur. 1,290 green + ruff. AWAITS review (E11.80
-      double-run acceptance + KEYVAULT-1 verdict) →
-      0060-EXPERIMENT-CLOSE.
+      cannot recur. 1,290 green + ruff. **VERIFIED — fuzzer fully
+      green twice (24 phrasings, zero findings both passes).**
+- [x] **0060-EXPERIMENT-CLOSE DELIVERED (08-30 dev)** — full live
+      measurement incl. Sunny's 15 walk phrasings EXECUTED through
+      both systems: PROPOSED dominates every metric (2/2 vs 1/2 ·
+      7/7 vs 5/7 · 0 vs 6 floors · fails closed vs guessed census
+      · 15/15 composed vs 5 floors). ADR status records
+      EXPERIMENT CLOSED w/ data. **OVERNIGHT QUEUE 2 FULLY
+      DELIVERED.** AWAITS review's final verdict; the 6:23am cold
+      battery is the night's last word.
 
 ## RULED (Sunny, 2026-08-29): THE GENERATOR CLAUSE — Echo Law amendment
 "Fail twice, no matter the cause, triggers an investigation."
