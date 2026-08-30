@@ -2905,3 +2905,19 @@ CLI: devtools/run_xray.py (store lever applies). Registered under
 READY, absent-surface disclosure, brand gate.
 **Gates:** 1,316 green + 5 xfailed, ruff clean; wheel 1.72.0.
 NEXT: BRIDGE-1 stage-1 exporters (on review-green, per the queue).
+
+### REVIEW VERDICT — X-RAY-1 (1.72.0): gates green; ONE BLOCKING FIND (XR-1)
+Gates 1,316 + ruff clean; report substance strong (counts,
+why-sentences, blast radius, machine-picked verdict, order-form
+close). **XR-1 (blocks wedge use):** member lists dedup bare
+names — "10 metrics" lists 8 members (the two USP_Active_Diabetics
+collapsed); High ED family shows the identical-name twins as one
+entry. A paid diagnosis whose count disagrees with its own list
+discredits itself. Reuse the W3a qualified-labels mechanism
+(RW-BATCH-4's card fix) in the X-ray composer — schema-qualify on
+collision, EVERYWHERE members render; add a reconciliation
+assertion (len(members listed) == member count) to the X-ray
+tests so the class dies. Verify High ED cluster membership
+semantics (family-contains vs exact-name) while in there.
+BRIDGE-1 may proceed in parallel; XR-1 rides before any real
+engagement.
