@@ -526,12 +526,21 @@ def create_app(
         # excluded ids never enter the plan (no-nag: this ONE confirm
         # ratifies the pruned reading; its ops then run freely)
         exclude = {str(x) for x in (body.get("exclude_ids") or [])}
+        # RW-26 (live trace: a 5-way compare diluted the E11.80
+        # diff): NOMINATE MEANS OFFER — semantic nominations enter
+        # the plan ONLY when explicitly opted in; exact-tier
+        # matches enter unless pruned. The straight-through click
+        # honors these defaults server-side.
+        include = {str(x) for x in (body.get("include_ids") or [])}
         ops = conv.engine.ops
         ops.begin_turn()
         ops.note_user(pp["question"])
         t0 = _time.monotonic()
         try:
             anchors = ground_entities(parse.entities, run_kql, ops)
+            anchors = [a for a in anchors
+                       if not a.get("semantic")
+                       or str(a.get("id")) in include]
             if exclude:
                 anchors = [a for a in anchors
                            if str(a.get("id")) not in exclude]
@@ -1567,11 +1576,12 @@ async function askViaStream(message, noPlanner) {
 
 // RW-18c: the confirm click streams — op chips at dispatch, results
 // at completion (the askViaStream reader, on the confirm endpoint)
-async function confirmViaStream(excluded) {
+async function confirmViaStream(excluded, included) {
   const resp = await fetch('/api/parse/confirm/stream', { method:'POST',
     headers:{'Content-Type':'application/json'},
     body: JSON.stringify({ conversation_id: conversationId,
-                           exclude_ids: excluded })});
+                           exclude_ids: excluded,
+                           include_ids: included })});
   if (!resp.ok || !resp.body) throw new Error('stream unavailable');
   const reader = resp.body.getReader();
   const dec = new TextDecoder();
@@ -1622,10 +1632,11 @@ function renderParseCard(j, message) {
   const showRows = (j.show || []).map(s => {
     const ms = s.matches.length
       ? s.matches.map(m =>
-          `<label class="matchrow"><input type="checkbox" checked
+          `<label class="matchrow"><input type="checkbox"
+            ${m.semantic ? 'data-sem="1"' : 'checked data-sem="0"'}
             data-id="${esc(m.id)}"> ${esc(m.name)}
             <span class="cite">${esc(m.kind || '')}${
-              m.semantic ? ' · semantic' : ''}</span></label>`
+              m.semantic ? ' · semantic (opt in)' : ''}</span></label>`
         ).join('')
       : '<span class="universe">no catalog match</span>';
     return `<div class="showline">matched
@@ -1692,22 +1703,28 @@ function renderParseCard(j, message) {
     async () => {
       // unchecked matches are PRUNED — the one confirm ratifies
       // the pruned reading (no-nag: its ops then run freely)
-      const excluded = Array.from(
-        card.querySelectorAll('input[type=checkbox]'))
-        .filter(c => !c.checked).map(c => c.dataset.id);
+      const boxes = Array.from(
+        card.querySelectorAll('input[type=checkbox]'));
+      const excluded = boxes
+        .filter(c => !c.checked && c.dataset.sem !== '1')
+        .map(c => c.dataset.id);
+      const included = boxes
+        .filter(c => c.checked && c.dataset.sem === '1')
+        .map(c => c.dataset.id);
       card.querySelectorAll('button').forEach(b => b.disabled = true);
       // RW-18c: each op chip renders at dispatch, the stamped
       // result at completion — the post-confirm blank dies; JSON
       // is the fallback if streaming breaks
       let jj = null, refusal = null;
       try {
-        jj = await confirmViaStream(excluded);
+        jj = await confirmViaStream(excluded, included);
       } catch (e1) {
         clearStage();
         const r = await fetch('/api/parse/confirm', { method:'POST',
           headers:{'Content-Type':'application/json'},
           body: JSON.stringify({ conversation_id: conversationId,
-                                 exclude_ids: excluded })});
+                                 exclude_ids: excluded,
+                                 include_ids: included })});
         jj = await r.json();
         if (!r.ok) refusal = jj;
         else (jj.outputs || []).forEach(renderOutput);

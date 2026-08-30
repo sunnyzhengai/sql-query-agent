@@ -2707,3 +2707,20 @@ honor defaults. Acceptance: the two phrasings ("identical",
 "uniformity") hit E11.80 on a DOUBLE run; B11-class nominations
 still visible and optable-in. KEYVAULT-1 verdict rides the same
 verification pass.
+
+### 2026-08-30 — RW-26 BUILT — release 1.69.1
+**Nominate means offer.** Semantic nominations render
+DEFAULT-UNCHECKED ("· semantic (opt in)" on the row) and — the
+half that matters for the straight-through click — the CONFIRM
+SERVER honors the defaults: nominations enter the plan only via
+explicit include_ids; exact-tier matches enter unless pruned via
+exclude_ids. The 5-way compare that diluted the twins' E11.80
+diff (review's live trace — the release-flop's cause) cannot
+recur: the straight-through confirm compares exactly the
+exact-tier anchors. Both card buttons send include+exclude;
+tests hold both directions (straight-through excludes nominations
+— or refuses typed when exacts alone cannot compose; include_ids
+opts one in). Review's acceptance (the two phrasings hitting
+E11.80 on a double run, live) rides their verification pass with
+the KEYVAULT-1 verdict.
+**Gates:** 1,290 green + 5 xfailed, ruff clean; wheel 1.69.1.

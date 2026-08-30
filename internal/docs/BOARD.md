@@ -424,8 +424,13 @@ The hold lifts only by Sunny's explicit word, recorded here.
       root); "different manner/way" = variants as ruled;
       secrets_vault.py: keyvault: refs resolve at config load,
       every failure names its cure, zero tenant action (Sunny's
-      vault click completes later). 1,288 green + ruff. AWAITS
-      review → 0060-EXPERIMENT-CLOSE.
+      vault click completes later). 1,288 green + ruff.
+- [x] **RW-26 BUILT (08-30 dev, 1.69.1)** — nominate means OFFER:
+      nominations default-unchecked AND server-side default-
+      excluded (include_ids opts in); the 5-way-compare dilution
+      cannot recur. 1,290 green + ruff. AWAITS review (E11.80
+      double-run acceptance + KEYVAULT-1 verdict) →
+      0060-EXPERIMENT-CLOSE.
 
 ## RULED (Sunny, 2026-08-29): THE GENERATOR CLAUSE — Echo Law amendment
 "Fail twice, no matter the cause, triggers an investigation."

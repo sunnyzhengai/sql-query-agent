@@ -927,3 +927,55 @@ class TestFuzzer2AllIntents:
         bad = _check(card, fin,
                      {"oracle": {"kind_any": ["flags"]}}, "p")
         assert any("not in" in f for f in bad)
+
+
+class TestRW26NominateMeansOffer:
+    """RW-26 (live trace: nominations entered the compare and a
+    5-way partition diluted the twins' E11.80 diff): semantic
+    nominations are DEFAULT-EXCLUDED at confirm — the straight-
+    through click compares only the exact-tier matches; include_ids
+    opts a nomination in."""
+
+    def _client(self):
+        maker = TestCardEverywhere()
+        return maker._client(["screening for sepsis cases"], [
+            "same_or_different"])
+
+    def test_straight_through_confirm_excludes_nominations(self):
+        client = self._client()
+        r1 = client.post("/api/ask", json={
+            "message": "are the sepsis screenings the same?"})
+        j = r1.json()
+        sems = [m for s in j["show"] for m in s["matches"]
+                if m["semantic"]]
+        assert sems, "fixture produced no nominations"
+        r2 = client.post("/api/parse/confirm", json={
+            "conversation_id": j["conversation_id"]})
+        jj = r2.json()
+        if r2.status_code != 200:
+            # nominations excluded leaves <2 anchors: typed refusal
+            # is the honest shape for this fixture phrase
+            assert jj["reason_class"] in ("parse_refusal", "op_error")
+            return
+        ran = {i for o in jj["outputs"]
+               for i in (o["component"]["params"].get("ids")
+                         or o["component"]["params"].get("refs")
+                         or [])}
+        assert not ({m["id"] for m in sems} & ran)
+
+    def test_include_ids_opts_a_nomination_in(self):
+        client = self._client()
+        r1 = client.post("/api/ask", json={
+            "message": "are the sepsis screenings the same?"})
+        j = r1.json()
+        sems = [m["id"] for s in j["show"] for m in s["matches"]
+                if m["semantic"]]
+        r2 = client.post("/api/parse/confirm", json={
+            "conversation_id": j["conversation_id"],
+            "include_ids": sems})
+        assert r2.status_code == 200
+        ran = {i for o in r2.json()["outputs"]
+               for i in (o["component"]["params"].get("ids")
+                         or o["component"]["params"].get("refs")
+                         or [])}
+        assert set(sems) & ran
