@@ -2808,3 +2808,17 @@ runs; the multi-statement proc refuses. 12 L0 + 5 wire tests.
 **Gates:** 1,305 green + 5 xfailed, ruff clean; wheel 1.70.0.
 Queue 3 item 3 (nightly findings) standing; queue 3 otherwise
 COMPLETE pending review.
+
+### REVIEW VERDICT — RUNG2-1 + PROC-RUN-1 (1.70.0): VERIFIED. QUEUE 3 COMPLETE.
+Gates review-side: 1,305 green + ruff clean — matches. Contract
+conformance to the freshly ratified C1/C2 checked: token-stream
+equality with type-class-held literal swaps only; every deviation
+refuses as variant_fork WITH the fork language; rung stamps ride
+label + payload + model stamps (rung integer only — P5 holds);
+derived-and-disclosed parameter sites are a sound demo-estate
+reading of "declared" (explicit declarations can narrow later,
+recorded). Proc bodies run offset-sliced, never regenerated — the
+parser decides, per law. Self-service data is now: run it, change
+a VALUE and run it, never change the LOGIC without it becoming
+yours. The night's queue is done; standing guards only until
+morning.
