@@ -515,3 +515,16 @@ film sequencing · capture day · optional tenant clicks.
 - [x] Probe curation RULED (Sunny, 2026-08-29): LEAVE AS-IS — the
       controls stay in the census unbadged; their descriptions
       disclose. No build.
+
+## 🌙 NIGHT CLOSE (2026-08-29 ~11:30pm, per Sunny's word)
+- Fabric capacity `aiviafabric` (F4, rg-fabric-prod) SUSPENDED
+  after dev finished (tree clean, all queues delivered+verified
+  through 1.71.0 incl. the graph panel).
+- The 6:23am cold battery cron is CANCELLED for the pause (it
+  would false-alarm against a paused store). RESUME RITUAL
+  (morning): Sunny resumes the capacity (portal or:
+  az rest --method post --uri .../capacities/aiviafabric/resume)
+  → tell review → review re-arms the nightly cron + runs a warm
+  battery as the day's first check.
+- Dev's standing note: local fixture tests need no tenant — code
+  work is unaffected by the pause.
