@@ -2689,3 +2689,21 @@ the config model; registered under 0007 (deployment). NO tenant
 action taken — Sunny's vault click completes the loop later.
 **Gates:** 1,288 green + 5 xfailed, ruff clean; wheel 1.69.0.
 Remaining in queue 2: 0060-EXPERIMENT-CLOSE (on review-green).
+
+### REVIEW DIAGNOSIS — the two stubborn sameness phrasings (traced live, third-fix-blind-order avoided)
+Repro on 1.69.0: reading "defines, same_or_different over
+{Diabetic codesets}" → grounding = 2 exact codesets + 3 TIER-2
+NOMINATIONS (Diabetic Patients variants) → confirm → compare over
+FIVE items → DIFFERS, but the two-largest-groups diff is
+codeset-vs-variant (ENCOUNTER_DIAGNOSIS lines), not the twins'
+E11.80 delta. The phrasings passed pre-TIER2 and failed after —
+the nomination set changed compare's refs across releases (the
+"flip-flop" was partly release-flop). Machinery correct; DEFAULT
+wrong.
+**ORDER RW-26: semantic nominations render DEFAULT-UNCHECKED**
+(nominate = offer, never include); exact-tier matches stay
+default-checked; auto-confirm and the straight-through click both
+honor defaults. Acceptance: the two phrasings ("identical",
+"uniformity") hit E11.80 on a DOUBLE run; B11-class nominations
+still visible and optable-in. KEYVAULT-1 verdict rides the same
+verification pass.
