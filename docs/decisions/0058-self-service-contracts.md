@@ -1,8 +1,11 @@
 # ADR 0058 — The self-service contracts (contracts-first for the Pro pillar)
 
-**Status:** DRAFT 2026-08-25 — written BEFORE any Pro build per the
-house law (contracts first, always); Sunny ratifies. Build lands
-with Pro; nothing here enters the current queue.
+**Status:** ACCEPTED 2026-08-29 — Sunny ratified C1–C6 with two
+rulings: C2 validates TYPES ONLY at parameter sites (allowed-range
+checks deferred, addable later without breakage); C4 quarantine
+releases on CREATOR CONFIRMATION (steward gate would edge toward
+gate-on-certification; stewards see drafts via flags). Build still
+lands with Pro; nothing enters the current queue.
 
 Governance's supply side shipped under a full contract regime; the
 self-service pillar has design records (the ladder, 0056 P4/P5) but
@@ -71,10 +74,8 @@ not aspiration:
 Audit leg: runs ⊎ edges reconcile; drafts ⊎ owners reconcile;
 orphan drafts are a flag class.
 
-## PARKED for Sunny
+## RULED (Sunny, 2026-08-29)
 
-1. Ratify the six contracts (wording amendable at Pro build time).
-2. C2's parameter-range enforcement depth (types only vs full
-   allowed-range validation) — a scope call.
-3. Whether C4 quarantine requires steward review to release, or
-   creator confirmation suffices.
+1. C1–C6 RATIFIED (wording amendable at Pro build time).
+2. C2: TYPES ONLY.
+3. C4: CREATOR CONFIRMATION releases quarantine.

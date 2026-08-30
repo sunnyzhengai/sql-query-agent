@@ -78,16 +78,12 @@ rounds). Charts: open call §6.
 
 ## 6. Open calls (Sunny, morning)
 
-1. **Default sample cap** — 200 rows? (Recommendation: 200,
-   configurable per org_config.)
-2. **Charts in slice 1?** — Recommendation: NO; table + count
-   first, charts as slice 2 once the table loop is trusted. A bad
-   chart misleads faster than a bad table.
-3. **Re-confirm cadence** — re-confirm every run, or a confirmed
-   definition stays runnable from the Ground-Truth Shelf?
-   (Recommendation: shelf items stay runnable — the shelf IS the
-   standing confirmation; a changed definition invalidates the
-   shelf entry via the nervous-system change propagation.)
+1. RULED (Sunny, 2026-08-29): cap 200, org-configurable.
+2. RULED (Sunny, 2026-08-29): NO charts in slice 1 — tables until
+   the run loop earns trust on glass.
+3. RULED (Sunny, 2026-08-29): shelf items STAY RUNNABLE — the
+   shelf is the standing confirmation; change propagation
+   invalidates a shelf entry when its definition changes.
 
 ## 7. Relations
 
