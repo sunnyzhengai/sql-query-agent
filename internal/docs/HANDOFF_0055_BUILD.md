@@ -3032,3 +3032,33 @@ are yours to import into your Purview instance** — the glossary
 CSV goes in via Governance portal → your glossary → Import terms.
 Every row is Draft, graded, and honest about its conflicts.
 CONSOLE-1 (the Inbox) is dev's next per the queue.
+
+### 2026-08-30 — CONSOLE-1 BUILT (the tier-locked queue COMPLETE) — release 1.74.0
+**The Resolution Console / the Inbox — Tier 2 v1 as ruled.**
+- **The landing map is DATA and its totality is LAW:**
+  src/console.py holds LANDING_MAP (verb → lands + grade +
+  persona, the 0063 total map verbatim) and check_action gates
+  every press: an unknown verb refuses with "no action without a
+  landing"; a persona mismatch refuses (steward cannot
+  approve-technical, developer cannot certify); deny without its
+  reason refuses ("deny lands as testimony — it carries its
+  reason, always"). Tests hold totality mechanically — the
+  trace-registry pattern applied to product actions, as promised
+  when the map landed.
+- **Every press is a graded 0056 event** ([CONSOLE:VERB] shape,
+  grade + landing verbatim in the decision) into the same store
+  the flywheel reads; the Inbox FOLDS the events back (latest
+  decision wins; compare lands nowhere — evidence only).
+- **/console** — the page: persona toggle (steward | developer),
+  flag cards (class badge, identity, severity, member names, the
+  why-sentence), per-persona verb buttons, decided items sink but
+  stay visible with their state and actor. **Compare computes
+  live evidence** through the EXISTING algebra (the cluster id
+  expands to members per RW-17a; verdict + diff lines + the
+  subgraph render in-card).
+- **v1 honesty, recorded:** graph-side disposition updates ride
+  the next pipeline run from the events; DG writes ride the
+  stage-1 file exports — the deliberate v1 shape, not gaps.
+**Gates:** 1,344 green + 5 xfailed, ruff clean; wheel 1.74.0.
+**THE TIER-LOCKED QUEUE (X-RAY-1 → BRIDGE-1 → CONSOLE-1) IS
+COMPLETE** pending review's verification.

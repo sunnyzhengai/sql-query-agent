@@ -1085,3 +1085,78 @@ class TestGraphPanelWire:
         r2 = client.post("/api/node", json={
             "id": "metric:never-surfaced", "conversation_id": conv})
         assert r2.status_code == 403
+
+
+class TestConsole1Wire:
+    """CONSOLE-1 wire: the Inbox serves flags with folded state;
+    the act endpoint gates verbs, records graded events, and
+    computes compare evidence through the existing algebra."""
+
+    def _client(self, tmp_path):
+        from src.orchestrator.events import JsonlEventSink
+        path = tmp_path / "events.jsonl"
+        sink = JsonlEventSink(path)
+        app = create_app(scripted_api([]), fake_kql, sink,
+                         events_path=path)
+        return TestClient(app), path
+
+    def test_console_page_serves(self, tmp_path):
+        client, _ = self._client(tmp_path)
+        page = client.get("/console")
+        assert page.status_code == 200
+        assert "resolution console" in page.text
+
+    def test_inbox_lists_flags(self, tmp_path):
+        client, _ = self._client(tmp_path)
+        j = client.get("/api/inbox?persona=steward").json()
+        assert j["flags"] and "landing_map" in j
+        assert j["flags"][0]["console_state"] is None
+
+    def test_certify_records_graded_and_folds_back(self, tmp_path):
+        client, path = self._client(tmp_path)
+        fid = "cluster:misnomer:step:aaa111bbb222"
+        r = client.post("/api/inbox/act", json={
+            "verb": "certify", "target_id": fid,
+            "persona": "steward"})
+        assert r.status_code == 200
+        assert r.json()["grade"] == "steward-certified"
+        row = json.loads(path.read_text().splitlines()[-1])
+        assert row["question"] == f"[CONSOLE:CERTIFY] {fid}"
+        j = client.get("/api/inbox?persona=steward").json()
+        done = next(f for f in j["flags"] if f["id"] == fid)
+        assert done["console_state"]["state"] == "certified"
+
+    def test_persona_gate_holds_on_the_wire(self, tmp_path):
+        client, _ = self._client(tmp_path)
+        r = client.post("/api/inbox/act", json={
+            "verb": "approve_technical", "target_id": "x",
+            "persona": "steward"})
+        assert r.status_code == 422
+        assert r.json()["reason_class"] == "persona"
+
+    def test_deny_without_reason_refuses(self, tmp_path):
+        client, _ = self._client(tmp_path)
+        r = client.post("/api/inbox/act", json={
+            "verb": "deny", "target_id": "x",
+            "persona": "steward"})
+        assert r.status_code == 422
+        assert r.json()["reason_class"] == "reason_required"
+
+    def test_compare_returns_computed_evidence(self, tmp_path):
+        client, _ = self._client(tmp_path)
+        fid = "cluster:misnomer:step:aaa111bbb222"
+        r = client.post("/api/inbox/act", json={
+            "verb": "compare", "target_id": fid,
+            "persona": "steward"})
+        assert r.status_code == 200
+        ev = r.json()["evidence"]
+        assert ev["conclusion"]["kind"] == "compare"
+        assert "hash group" in ev["headline"]
+
+    def test_unknown_verb_never_ships(self, tmp_path):
+        client, _ = self._client(tmp_path)
+        r = client.post("/api/inbox/act", json={
+            "verb": "summarize", "target_id": "x",
+            "persona": "steward"})
+        assert r.status_code == 422
+        assert "no action without a landing" in r.json()["message"]

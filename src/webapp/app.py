@@ -784,6 +784,83 @@ def create_app(
                 compose_conclusion(outputs, "", True)),
             "headline": shown["headline"]})
 
+    @app.get("/console", response_class=HTMLResponse)
+    def console_page() -> str:
+        return CONSOLE_PAGE.replace("__PRODUCT__", product_name())
+
+    @app.get("/api/inbox")
+    async def inbox(request: Request) -> JSONResponse:
+        """CONSOLE-1: the Inbox — flags to resolve + decision state
+        folded from the event store; per-persona view."""
+        if events_path is None:
+            return JSONResponse(
+                {"error": "refusal", "reason_class": "unconfigured",
+                 "message": "the Inbox folds the local event store "
+                            "— unavailable on this deployment"},
+                status_code=503)
+        from src.console import inbox_state
+        persona = (request.query_params.get("persona")
+                   or "steward")
+        return JSONResponse(inbox_state(run_kql, events_path,
+                                        persona))
+
+    @app.post("/api/inbox/act")
+    async def inbox_act(request: Request) -> JSONResponse:
+        """One button press: the verb gate (landing row + persona +
+        reason), the graded 0056 event, and — for compare — the
+        computed evidence rendered from the existing algebra."""
+        from src.console import ConsoleRefusal, action_event
+        body = await request.json()
+        verb = str(body.get("verb") or "")
+        target = str(body.get("target_id") or "")
+        persona = str(body.get("persona") or "steward")
+        reason = str(body.get("reason") or "")
+        user = _user_from(request)
+        if not target:
+            return JSONResponse({"error": "target_id required"},
+                                status_code=400)
+        try:
+            ev = action_event(
+                verb, target, persona, user, reason,
+                datetime.now(timezone.utc).isoformat())
+        except ConsoleRefusal as e:
+            return JSONResponse(
+                {"error": "refusal", "reason_class": e.reason_class,
+                 "message": str(e)}, status_code=422)
+        payload: dict = {"recorded": True,
+                         "grade": ev["decision"]["grade"],
+                         "lands": ev["decision"]["lands"],
+                         "verb": verb}
+        if verb == "compare":
+            # evidence, computed live: the cluster id expands to
+            # its members (RW-17a) through the EXISTING algebra in
+            # a per-user console conversation (read guarantee held
+            # by the census surfacing the cluster first)
+            conv = _conversation(user, "console")
+            from src.orchestrator.ops import (
+                OpError,
+                op_census,
+                op_compare,
+            )
+            try:
+                op_census("flag", run_kql, conv.engine.ops)
+                rs = op_compare([target], "logic", run_kql,
+                                conv.engine.ops)
+                shown = rs.display()
+                shown["headline"] = stamped_headline(shown)
+                outputs = [{"component": {"op": "compare",
+                                          "params": {"refs": [target]}},
+                            "result": shown}]
+                payload["evidence"] = {
+                    "conclusion": compose_conclusion(outputs, "",
+                                                     True),
+                    "headline": shown["headline"],
+                    "subgraph": compose_subgraph(outputs)}
+            except OpError as e:
+                payload["evidence"] = {"error": str(e)}
+        sink.record(TurnEvent(**ev))
+        return JSONResponse(payload)
+
     @app.get("/api/mine")
     async def mine(request: Request) -> JSONResponse:
         """FLYWHEEL-1: the Ground-Truth Shelf v1 — My definitions /
@@ -1994,6 +2071,132 @@ document.getElementById('ask').addEventListener('submit', async (e) => {
 });
 q.focus();
 loadShelf();
+</script>
+</body></html>
+"""
+
+CONSOLE_PAGE = """<!doctype html>
+<html><head><meta charset="utf-8">
+<title>__PRODUCT__ — resolution console</title>
+<style>
+  body { font:15px/1.55 -apple-system,"Segoe UI",sans-serif;
+    max-width:880px; margin:24px auto; color:#1a1f2e; padding:0 16px; }
+  .fc { border:1px solid #d9dee9; border-radius:10px; padding:12px;
+    margin:10px 0; }
+  .fc.done { opacity:.62; }
+  .badge { font:11px ui-monospace,monospace; border-radius:6px;
+    padding:1px 7px; background:#fbe3e0; color:#8a2a24;
+    margin-right:6px; }
+  .badge.state { background:#e6f2e4; color:#2c5e2e; }
+  .why { color:#4a4f5a; font-size:13.5px; margin:6px 0; }
+  .members { font:12px ui-monospace,monospace; color:#6b7080; }
+  .verbs { display:flex; gap:8px; margin-top:8px; flex-wrap:wrap; }
+  .verbs button { padding:5px 12px; border-radius:8px;
+    border:1px solid #5b6a8f; background:#fff; color:#2b3550;
+    cursor:pointer; font-size:12.5px; }
+  .verbs button.primary { background:#2b5db9; color:#fff;
+    border-color:#2b5db9; }
+  .land { font:11px ui-monospace,monospace; color:#8a8fa0;
+    margin-top:6px; }
+  .evidence { border-left:3px solid #8a63c9; margin-top:8px;
+    padding:6px 10px; font-size:13px; white-space:pre-wrap; }
+  #personabar { margin-bottom:14px; font-size:13px; }
+  .diffline { font:12px ui-monospace,monospace; }
+  .diffline.plus { color:#2c5e2e; } .diffline.minus { color:#8a2a24; }
+</style></head><body>
+<h2>__PRODUCT__ — resolution console</h2>
+<div id="personabar">acting as
+  <select id="persona"><option value="steward">steward</option>
+  <option value="developer">developer</option></select>
+  <span id="inboxnote"></span></div>
+<div id="inbox"></div>
+<script>
+const personaSel = document.getElementById('persona');
+const inboxEl = document.getElementById('inbox');
+
+function esc(s) { const t = document.createElement('span');
+  t.textContent = String(s ?? ''); return t.innerHTML; }
+function el(html) { const d = document.createElement('div');
+  d.innerHTML = html; return d.firstElementChild; }
+
+async function act(verb, id, card) {
+  let reason = '';
+  if (verb === 'deny') {
+    reason = window.prompt('deny lands as testimony — the reason:')
+      || '';
+    if (!reason.trim()) return;
+  }
+  const r = await fetch('/api/inbox/act', { method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ verb, target_id: id,
+      persona: personaSel.value, reason })});
+  const j = await r.json();
+  if (!r.ok) {
+    card.appendChild(el('<div class="evidence">' +
+      esc(j.message || j.error) + '</div>'));
+    return;
+  }
+  if (verb === 'compare' && j.evidence) {
+    const c = (j.evidence.conclusion || {});
+    const diffs = (c.diff_lines || []).map(l =>
+      '<div class="diffline ' + (l.startsWith('+') ? 'plus'
+        : 'minus') + '">' + esc(l) + '</div>').join('');
+    card.appendChild(el('<div class="evidence"><b>' +
+      esc(c.verdict || 'COMPARED') + '</b> — ' +
+      esc(j.evidence.headline || '') + diffs + '</div>'));
+    return;
+  }
+  card.appendChild(el('<div class="evidence">recorded — grade: ' +
+    esc(j.grade) + ' · lands: ' + esc(j.lands) + '</div>'));
+  load();
+}
+
+async function load() {
+  const r = await fetch('/api/inbox?persona='
+    + encodeURIComponent(personaSel.value));
+  if (!r.ok) {
+    inboxEl.textContent = 'the Inbox is unavailable here';
+    return;
+  }
+  const j = await r.json();
+  const lm = j.landing_map || {};
+  inboxEl.innerHTML = '';
+  document.getElementById('inboxnote').textContent =
+    ' · ' + j.flags.length + ' flag(s)';
+  for (const f of j.flags) {
+    const stateBadge = f.console_state
+      ? '<span class="badge state">' + esc(f.console_state.state)
+        + ' by ' + esc(f.console_state.by) + '</span>'
+      : '';
+    const card = el('<div class="fc' + (f.console_state
+      ? ' done' : '') + '"><div>'
+      + '<span class="badge">' + esc(f.flag_class) + '</span>'
+      + stateBadge + '<b>' + esc(f.identity) + '</b> · '
+      + esc(f.severity) + ' · ' + esc(String(f.member_count))
+      + ' member(s)</div>'
+      + '<div class="why">' + esc(f.why) + '</div>'
+      + '<div class="members">' + esc((f.member_names
+        || []).join(', ')) + '</div>'
+      + '<div class="verbs"></div><div class="land"></div></div>');
+    const verbs = personaSel.value === 'developer'
+      ? ['compare', 'approve_technical', 'fork']
+      : ['compare', 'certify', 'delegate', 'deny'];
+    const vbox = card.querySelector('.verbs');
+    for (const v of verbs) {
+      const b = el('<button' + (v === 'certify'
+        ? ' class="primary"' : '') + '>'
+        + esc(v.replace('_', ' ')) + '</button>');
+      b.addEventListener('click', () => act(v, f.id, card));
+      vbox.appendChild(b);
+      const row = lm[v] || {};
+      card.querySelector('.land').textContent =
+        'every action lands: see the landing map (0063)';
+    }
+    inboxEl.appendChild(card);
+  }
+}
+personaSel.addEventListener('change', load);
+load();
 </script>
 </body></html>
 """

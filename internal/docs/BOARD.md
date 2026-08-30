@@ -487,8 +487,16 @@ The hold lifts only by Sunny's explicit word, recorded here.
       leaves the house); stewards/experts pre-fill from the store;
       live regen: 37/37 unique, 6 families qualified, 16 stewarded
       rows. THE FILES FOR SUNNY'S PURVIEW EXPERIMENT ARE READY
-      (internal/docs/bridge_exports). 1,327 green + ruff. AWAITS
-      review → CONSOLE-1.
+      (internal/docs/bridge_exports). 1,327 green + ruff.
+      **VERIFIED — Sunny cleared to experiment on the exports.**
+- [x] **CONSOLE-1 BUILT (08-30 dev, 1.74.0)** — the Resolution
+      Console/Inbox: LANDING_MAP as data w/ mechanized totality
+      (unknown verb = "no action without a landing"); persona +
+      reason gates; every press a graded 0056 event, folded back
+      (latest wins, compare lands nowhere); /console page w/ verb
+      buttons + live compare evidence via the existing algebra.
+      1,344 green + ruff. **THE TIER-LOCKED QUEUE IS COMPLETE.**
+      AWAITS review verification → Sunny's glass.
 
 ## RULED (Sunny, 2026-08-29): THE GENERATOR CLAUSE — Echo Law amendment
 "Fail twice, no matter the cause, triggers an investigation."
