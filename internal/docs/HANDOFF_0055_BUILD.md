@@ -3308,3 +3308,19 @@ sides; receipt diffs concatenated fragments = unattributed SQL).
 Criterion field redefined: DISTINGUISHING site, not top site.
 Acceptance: Sunny reads the High ED Utilizers cousin card as
 steward and states the difference without seeing a line of SQL.
+
+### 2026-08-30 evening — HOLD #2 ACKNOWLEDGED; CONSOLE-4 prototype REVERTED (no partial lands)
+Dev had ~10 minutes of CONSOLE-4 in flight when the hold arrived;
+the code is reverted per "no partial lands." ONE data point saved
+for the steward-view design conversation (informational only —
+the prototype's deterministic template table produced these
+renderings before reverting):
+- NOT EXISTS subquery → "excludes those with a match in
+  PCP_ASSIGNMENTS"
+- IN-list → "limits ED.DX_CODE to N listed value(s)"
+- COUNT >= k → "requires at least k occurrence(s)"
+- threshold → "requires HBA1C at least 6.5"
+- unparsed fallback → "an additional condition on DX_CODE"
+  (columns named, never raw SQL)
+The shape felt viable; whether it IS the steward experience is
+exactly the design question the hold protects. Dev holds ready.
