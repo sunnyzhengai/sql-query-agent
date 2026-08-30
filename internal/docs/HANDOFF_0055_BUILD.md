@@ -2822,3 +2822,23 @@ parser decides, per law. Self-service data is now: run it, change
 a VALUE and run it, never change the LOGIC without it becoming
 yours. The night's queue is done; standing guards only until
 morning.
+
+## ORDER GRAPH-PANEL-1 (Sunny's direction, 2026-08-29 night: show the inner workings)
+Right-panel SUBGRAPH VISUAL per answer — the emergent shape (0062)
+rendered as itself. Contract:
+1. **Receipts only:** the drawing derives EXCLUSIVELY from the
+   turn's stamped results — anchors, retrieved records' steps/
+   reads/links, flag clusters, and DERIVED edges (compare verdicts)
+   drawn distinctly and labeled as computed. Nothing model-claimed
+   ever renders. The visual is an honesty instrument.
+2. **Deterministic layered layout** (reports | metrics | steps |
+   tables columns; stable ordering) — identical answers give
+   identical pictures. Dependency-free SVG; DOM-harness gated like
+   every card variant.
+3. Kind colors · anchor emphasis · CONFLICT flags red-edged · the
+   executed step badged with its RUNG stamp on run answers.
+4. Click node → its definition card (slice 1 read-only otherwise).
+5. Sunny's glass judges legibility (her previous AIVIA had a graph
+   visual — her eye is the acceptance).
+API: conclusion payload gains `subgraph {nodes, edges}` —
+machine-composed, P4/P5-safe (ids/names/kinds only, never rows).
