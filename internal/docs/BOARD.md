@@ -1,5 +1,68 @@
 # THE BOARD — living checklist (both sessions update ON EVERY STATE CHANGE)
 
+## ⭐ CURRENT VIEW — 2026-08-31 (rebuilt; supersedes older sections below)
+
+**Sunny's ordering ruling (2026-08-31): validate before we
+integrate.** Rationale: Bridge's whole value claim is "accurate
+descriptions your stewards never write." Plumbing them into a
+customer's system of record before the content is proven would
+deliver wrong text faster. Everything below is in dependency
+order; nothing skips ahead.
+
+### P0 — PROVE DESCRIPTION GENERATION (the only LLM-authored artifact)
+- [ ] **DESC-GATE-1:** generated descriptions must be gate-checked
+      against their OWN parsed evidence — a sentence may assert
+      only tables/predicates/grain present in the parse; anything
+      else floors to a machine-composed fallback. (The workbench
+      claim-vs-evidence discipline, applied to Bridge.)
+- [ ] **DESC-CORPUS-1:** adversarial fixture corpus + fuzzer pass
+      over live generation (not palette fixtures): inclusion vs
+      exclusion, grain, thresholds, joins, negations, empty/odd
+      procs. Failures are lexicon/gate food, per the walk loop.
+- [ ] **DESC-LIVE-1:** run generation over the REAL 790-proc
+      corpus (not the demo estate) and grade a sample by hand.
+      HONEST STATE TODAY: demo descriptions came from the palette;
+      the generation path has never been adversarially validated.
+
+### P1 — BUILD TERM PROPOSAL (Tier 1's actual product; unbuilt)
+- [ ] **TERM-PROPOSE-1:** cluster → PARENT CONCEPT term + child
+      terms with distinct names/definitions (hierarchy per the
+      landing matrix A2+A3); naming rules deterministic where
+      possible, gate-checked where generated.
+- [ ] **TERM-PROPOSE-2:** proposal payload = assets +
+      relationships (term↔proc, term↔report, steward) with the
+      `AIVIA agent generated:` prefix; zero custom attributes.
+
+### P2 — INTEGRATE (transport only, after P0+P1)
+- [ ] Bridge stage 1 hardening (files) → stage 2 API
+- [ ] **PURVIEW-SPIKE-1:** prove on Sunny's tenant, via API:
+      parent term · child term · parent-child link · term
+      assignment · description update. Hierarchy-by-REST is the
+      known-risky call; CSV fallback if it fails.
+- [ ] Collibra: Import API v2 port (assets + relations +
+      responsibilities in one job) — straightforward per API docs
+- [ ] Outbox implementation (logic_hash · target · last outcome)
+
+### RATIFICATION / RULINGS OPEN FOR SUNNY
+- [ ] Decision landing matrix v3 — overall ratification (zero
+      schema footprint + outbox + hierarchy all recorded)
+- [ ] CONSOLE-6 item 2 — resolved in principle as handoff
+      receipts (matrix §3); confirm to unblock the build
+- [ ] X-Ray price + engagement length (listing/sales time)
+- [ ] Film sequencing · capture day
+
+### PARKED (unblocked, not urgent)
+- [ ] Run button's first click; probe-curation ruling ("leave" —
+      recorded, no build)
+- [ ] Purview secret rotation · shareable-connection click
+- [ ] ADR 0058 sub-calls, tier naming, reviewer deck (listing-time)
+
+### STANDING GUARDS (running)
+- [x] Nightly cold battery ~6:23am (pause-aware) + fuzzer
+- [x] Watcher on origin/dev both sessions
+
+---
+
 **Rule:** the moment a task changes state, the session that saw it
 change updates this file (handoff-verdicts law applied to status).
 Detail lives in the linked handoffs; this file stays short.
