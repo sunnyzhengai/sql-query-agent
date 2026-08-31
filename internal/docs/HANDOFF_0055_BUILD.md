@@ -3457,3 +3457,23 @@ rendering inherits:
 **Gates:** 1,365 green + 5 xfailed, ruff clean; wheel 1.77.1.
 Acceptance: the ten-member roster reads like the ratified mock —
 grouped by business-worded method, one line per member.
+
+## ORDER CONSOLE-4d (roster TRUTH defects — probe evidence, blocks Sunny)
+1.77.1 fixed plumbing but misattributes facts:
+1. **Cross-member attribution (truth bug, generator-level):** DX
+   metric's phrase carries HbA1c + MED_NAME criteria (Lab/Med
+   elements); Lab lands in "(shared logic only)". Each member's
+   elements must come from ITS OWN parsed steps ONLY, then
+   set-subtract the family intersection. ASSERT: in a family the
+   hash partition proves all-distinct, no member may phrase as
+   "(shared logic only)".
+2. Labels inconsistent: raw ids (reporting.USP_Diabetic_Patients_
+   Lab) in one group, bare "Active Diabetic Patients" (collision
+   gate bypassed?) in another — ALL member labels through the
+   qualified-label function, business-name form.
+3. Gestational twins phrase identically ("matches E11%") — their
+   in/out gestational-code delta is the distinguishing element
+   and must surface.
+4. Spot-assert three members' phrases against their real SQL in
+   tests (DX = E11% only · Lab = HbA1c ≥ 6.5 · Billing = CPT).
+Sunny stays unpinged until the roster probe is truth-clean.
