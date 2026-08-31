@@ -3562,3 +3562,18 @@ criterion.
 **Gates:** 1,376 green + 5 xfailed, ruff clean; wheel 1.78.1.
 Next: review's probe, then SUNNY'S DOUBLE READ (pair grid +
 ten-member roster, as steward, no SQL).
+
+### REVIEW VERDICT — CONSOLE-4 COMPLETE (1.78.1): BOTH CARDS PROBE CLEAN — SUNNY'S READ IS GO
+Gates 1,376 + ruff clean. ROSTER: six business-word method groups
+("By diagnosis records / lab results / medication orders /
+billing records / appointment records / encounter records"),
+10/10 members, phrases end at the criterion, gestational twins
+visibly distinguished, qualified labels throughout. PAIR: the
+difference leads with the qualified member, deterministic pattern
+line, sames-marked grid, ZERO SQL in the steward payload.
+Residual polish (NON-blocking, next touch): "limits X to 2 listed
+value(s)" could name the values when few (e.g. "metformin,
+insulin glargine"); four panel-derived members share the
+"encounter records" group (their true method is the panel base —
+a deeper grouping question, park for Sunny's read to judge).
+**Sunny: ready for your double read.**
