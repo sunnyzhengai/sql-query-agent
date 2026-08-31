@@ -1160,3 +1160,31 @@ class TestConsole1Wire:
             "persona": "steward"})
         assert r.status_code == 422
         assert "no action without a landing" in r.json()["message"]
+
+
+class TestConsole4Wire:
+    """CONSOLE-4 v2 on the wire: the console compare returns the
+    grid card for pairs; picked members drill a pair directly."""
+
+    def test_compare_returns_the_v2_grid_card(self, tmp_path):
+        client, _ = TestConsole1Wire()._client(tmp_path)
+        fid = "cluster:misnomer:step:aaa111bbb222"
+        r = client.post("/api/inbox/act", json={
+            "verb": "compare", "target_id": fid,
+            "persona": "steward"})
+        c = r.json()["evidence"]["conclusion"]
+        assert c["mode"] == "grid"
+        assert "grid" in c and "members" in c
+        assert "diff_lines" not in c
+
+    def test_pair_drilldown_compares_the_picked_two(self, tmp_path):
+        client, _ = TestConsole1Wire()._client(tmp_path)
+        fid = "cluster:misnomer:step:aaa111bbb222"
+        r = client.post("/api/inbox/act", json={
+            "verb": "compare", "target_id": fid,
+            "persona": "steward",
+            "member_ids": [STEP_1, STEP_2]})
+        assert r.status_code == 200
+        c = r.json()["evidence"]["conclusion"]
+        ids = {m["id"] for m in c["members"]}
+        assert ids == {STEP_1, STEP_2}

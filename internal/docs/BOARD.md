@@ -639,3 +639,11 @@ together first. Standing guards (nightly battery, fuzzer,
 watcher) continue. Lifts only by Sunny's word, recorded here.
 - [x] HOLD #2 LIFTED (design ratified 2026-08-30 evening) — dev
       builds CONSOLE-4 v2 per the approved spec in the handoff
+- [x] **CONSOLE-4 v2 BUILT (08-30 night, 1.77.0)** — the
+      distinguishing set (one computation); grid card ≤3 w/
+      difference-lead first, sames marked, 💡 pattern line,
+      consequence notes; grouped roster >3 w/ pair drill-down;
+      NO SQL in steward fields (test-held); snippets per member
+      for developers; fragments display-retired (events keep
+      them). 1,361 green + ruff. AWAITS review → Sunny reads both
+      cards as steward and rules without SQL.

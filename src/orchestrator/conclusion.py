@@ -72,6 +72,147 @@ def _diff_lines(compare_rows: "list[dict]") -> "list[str]":
     return []
 
 
+# --- CONSOLE-4 v2 (design RATIFIED 2026-08-30): ONE computation,
+# three renderings. The DISTINGUISHING SET per member (parsed
+# predicates + reads; shared elements as background) feeds the
+# GRID CARD (<=3 members), the GROUPED ROSTER (>3), and the
+# developer snippets. Steward view NEVER shows SQL; the hash
+# verdict + full fragments stay in the event record.
+
+def _norm_el(s: str) -> str:
+    return " ".join(str(s).split())
+
+
+def _member_elements(row: dict) -> "list[tuple[str, str]]":
+    els: "list[tuple[str, str]]" = []
+    for tbl in _as_names(row.get("source_tables")):
+        els.append(("read", tbl))
+    for site in row.get("decision_sites") or []:
+        expr = str((site or {}).get("expression")
+                   or (site or {}).get("expression_sql")
+                   or (site or {}).get("predicate") or "")
+        if expr.strip():
+            els.append(("pred", _norm_el(expr)))
+    return els
+
+
+def distinguishing_set(member_rows: "dict[str, dict]") -> dict:
+    """mid -> its OWN elements minus every other member's; shared =
+    the intersection. Pure set arithmetic — the one computation."""
+    sets = {mid: set(_member_elements(row))
+            for mid, row in member_rows.items()}
+    if not sets:
+        return {"shared": [], "members": {}}
+    shared = (set.intersection(*sets.values())
+              if len(sets) > 1 else set())
+    members = {}
+    for mid, own in sets.items():
+        others = (set().union(*(s for m, s in sets.items()
+                                if m != mid))
+                  if len(sets) > 1 else set())
+        members[mid] = sorted(own - others)
+    return {"shared": sorted(shared), "members": members}
+
+
+def _business_words(kind: str, value: str,
+                    columns: "list[str] | None" = None) -> str:
+    """The ratified template vocabulary — deterministic English for
+    a parsed element; the fallback names tables/columns and refers
+    to the developer view. SQL never leaks to the steward."""
+    import re as _re
+    if kind == "read":
+        return f"additionally reads {value}"
+    v = value
+    if _re.match(r"NOT\s+EXISTS", v, _re.IGNORECASE):
+        m = _re.search(r"FROM\s+([\w.\[\]]+)", v, _re.IGNORECASE)
+        src = m.group(1) if m else "the checked table"
+        return f"excludes those with a match in {src}"
+    m = _re.match(r"([\w.\[\]]+)\s+(NOT\s+)?IN\s*\(", v,
+                  _re.IGNORECASE)
+    if m:
+        n = v.count(",") + 1
+        neg = "excludes" if m.group(2) else "limits"
+        trunc = (not v.rstrip().endswith(")")
+                 or v.count("'") % 2 == 1)
+        count = f"\u2265{n}" if trunc else str(n)
+        return f"{neg} {m.group(1)} to {count} listed value(s)"
+    m = _re.search(r"COUNT\s*\([^)]*\)\s*(>=|>)\s*(\d+)", v,
+                   _re.IGNORECASE)
+    if m:
+        k = int(m.group(2)) + (1 if m.group(1) == ">" else 0)
+        return f"requires at least {k} occurrence(s)"
+    m = _re.match(r"([\w.\[\]]+)\s*(>=|<=|>|<|=)\s*(\S+)", v)
+    if m:
+        opword = {">=": "at least", "<=": "at most",
+                  ">": "more than", "<": "under",
+                  "=": "exactly"}[m.group(2)]
+        return (f"requires {m.group(1)} {opword} "
+                f"{m.group(3).strip(chr(39))}")
+    m = _re.match(r"([\w.\[\]]+)\s+LIKE\s+(\S+)", v,
+                  _re.IGNORECASE)
+    if m:
+        return (f"matches the pattern {m.group(2).strip(chr(39))} "
+                f"on {m.group(1)}")
+    if columns:
+        return ("has an additional condition on "
+                + ", ".join(columns[:3])
+                + " (see developer view)")
+    return "has an additional recorded condition (see developer view)"
+
+
+def _element_words(el: "tuple[str, str]",
+                   columns: "list[str] | None" = None) -> str:
+    return _business_words(el[0], el[1], columns)
+
+
+def _difference_lead(dset: dict, retrieved: dict,
+                     set_summary: str = "") -> str:
+    """The bolded first sentence — deterministic cases over the
+    computed sets only. The approved mock's shape: a literal-set
+    delta with ONE only-in clause leads with exactly that."""
+    if set_summary and set_summary.count("only in") == 1:
+        clause = next(b for b in set_summary.split(" · ")
+                      if "only in" in b)
+        return f"The one difference: {clause}."
+    distinct = {m: els for m, els in dset["members"].items() if els}
+    if not distinct:
+        return ""
+    if len(distinct) == 1:
+        mid, els = next(iter(distinct.items()))
+        name = _member_display(retrieved, mid)
+        if len(els) == 1:
+            return (f"The one difference: {name} "
+                    f"{_element_words(els[0])}.")
+        return (f"All differences sit in {name}: "
+                + "; ".join(_element_words(e)
+                            for e in els[:3]) + ".")
+    total = sum(len(e) for e in distinct.values())
+    return (f"{total} distinguishing element(s) across "
+            f"{len(distinct)} member(s) — the grid marks what is "
+            "the same and what is not.")
+
+
+def _pattern_line(dset: dict, set_summary: str,
+                  verdict: str) -> str:
+    """The 💡 reading — deterministic templates keyed ONLY on
+    computed relations."""
+    if verdict == "SAME":
+        return ("byte-equal logic under different names — reads as "
+                "a duplicate, not two purposes")
+    only_counts = [len(e) for e in dset["members"].values() if e]
+    if (set_summary and "only in" in set_summary
+            and set_summary.count("only in") == 1
+            and sum(only_counts) <= 2):
+        return ("one side is a strict superset by a single value — "
+                "reads as a stale copy, not two purposes")
+    reads_only = all(all(k == "read" for k, _v in e)
+                     for e in dset["members"].values() if e)
+    if reads_only and any(only_counts):
+        return ("the members draw from different sources — reads "
+                "as distinct purposes sharing a name")
+    return ""
+
+
 def _criterion_sketch(raw: str) -> str:
     """The decision predicate, one-breath sized: long IN-lists
     summarize to column + value count (CONSOLE-2b). CONSOLE-2c:
@@ -181,66 +322,17 @@ def compose_conclusion(outputs: "list[dict]", caption: str,
         retrieved = {str(row.get("id")): row
                      for r in results if r.get("op") == "retrieve"
                      for row in (r.get("rows") or [])}
-        # CONSOLE-2 (Sunny's glass: "not clear HOW they differ"):
-        # the card LEADS with MEMBER FINGERPRINTS — one row per
-        # member a steward scans (qualified name · reads · key
-        # criterion from the top decision site · the RW-6
-        # description) — then a machine-assembled owner-named
-        # contrast line; the raw diff folds beneath as the
-        # labeled receipt. Composition only; one composer serves
-        # console cards and workbench answers alike.
         groups = [[str(m) for m in (row.get("members") or [])]
                   for row in crows if "group" in row]
         member_ids = [m for g in groups for m in g]
-        fingerprints = []
-        for mid in member_ids:
-            row = retrieved.get(mid, {})
-            owner = (mid.split(":", 2)[1] if ":" in mid
-                     else mid.rsplit(".", 1)[0])
-            sites = row.get("decision_sites") or []
-            # CONSOLE-2b item 2: sites carry expression_sql on the
-            # store; IN-list predicates sketch as "COL IN (N
-            # values)" — the one-breath criterion, never an
-            # 80-literal wall
-            raw_expr = str((sites[0] or {}).get("expression")
-                           or (sites[0] or {}).get("expression_sql")
-                           or (sites[0] or {}).get("predicate")
-                           or "") if sites else ""
-            criterion = _criterion_sketch(raw_expr)
-            desc = str(row.get("description") or "")
-            fingerprints.append({
-                "id": mid,
-                "name": _member_display(retrieved, mid),
-                "owner": owner,
-                "reads": _as_names(row.get("source_tables"))[:5],
-                "criterion": criterion,
-                "description": desc[:160]})
-        def _short(fp) -> str:
-            if fp["criterion"]:
-                return fp["criterion"][:60]
-            if fp["description"]:
-                return fp["description"].split(".")[0][:60]
-            if fp["reads"]:
-                return "reads " + fp["reads"][0]
-            return "no recorded basis"
-        contrast = ""
-        if verdict == "DIFFERS" and 2 <= len(fingerprints) <= 4:
-            contrast = "; ".join(
-                f"{fp['owner']} — {_short(fp)}"
-                for fp in fingerprints)
-        diff_label = ""
+        member_rows = {m: retrieved.get(m, {}) for m in member_ids}
+        # CONSOLE-4 v2: THE ONE COMPUTATION
+        dset = distinguishing_set(member_rows)
         set_summary = ""
+        diff_label = ""
         if len(groups) >= 2:
             big = sorted(groups, key=len, reverse=True)[:2]
-            diff_label = (f"receipt: − {big[0][0]} · + {big[1][0]}"
-                          + (f" ({len(groups)} groups — largest "
-                             "two diffed)" if len(groups) > 2
-                             else ""))
-            # CONSOLE-2 amendment (Sunny's codeset screenshot):
-            # literal-SET diffs summarize — "79 codes shared ·
-            # E11.80 only in <side>" — never an 80-item list
-            # printed twice to say one item differs. Names for the
-            # sides come from the retrieved members.
+            diff_label = f"receipt: − {big[0][0]} · + {big[1][0]}"
             import re as _re
             for row in crows:
                 d = row.get("diff_between_two_largest_groups")
@@ -257,34 +349,88 @@ def compose_conclusion(outputs: "list[dict]", caption: str,
                 sb = {m for ln in plus
                       for m in _re.findall(r"'([^']+)'", ln)}
                 if len(sa) < 3 and len(sb) < 3:
-                    continue          # not a literal-set diff
-                def _side_name(exemplar: str) -> str:
-                    return _member_display(retrieved, exemplar)
-                shared = len(sa & sb)
-                bits = [f"{shared} value(s) shared"]
+                    continue
+                shared_n = len(sa & sb)
+                bits = [f"{shared_n} value(s) shared"]
                 for tok in sorted(sb - sa)[:4]:
-                    bits.append(f"{tok} only in "
-                                f"{_side_name(big[1][0])}")
+                    bits.append(f"{tok} only in " + _member_display(
+                        retrieved, big[1][0]))
                 for tok in sorted(sa - sb)[:4]:
-                    bits.append(f"{tok} only in "
-                                f"{_side_name(big[0][0])}")
-                if shared and len(bits) > 1:
+                    bits.append(f"{tok} only in " + _member_display(
+                        retrieved, big[0][0]))
+                if shared_n and len(bits) > 1:
                     set_summary = " · ".join(bits)
                 break
-        items = [
-            {"name": row.get("business_name") or row.get("id"),
-             "description": row.get("description") or ""}
-            for r in results if r.get("op") == "retrieve"
-            for row in (r.get("rows") or [])
-            if row.get("kind") in ("metric", "step")][:4]
+        members = []
+        for mid in member_ids:
+            row = member_rows.get(mid, {})
+            els = dset["members"].get(mid, [])
+            sites = row.get("decision_sites") or []
+            cols = [str(c) for s in sites
+                    for c in (s or {}).get("columns") or []]
+            members.append({
+                "id": mid,
+                "name": _member_display(retrieved, mid),
+                "owner": (mid.split(":", 2)[1] if ":" in mid
+                          else mid.rsplit(".", 1)[0]),
+                "description": str(row.get("description")
+                                   or "")[:200],
+                "distinguishing_plain": [
+                    _element_words(e, cols) for e in els[:4]],
+                "snippets": [e[1] for e in els if e[0] == "pred"][:4],
+                "reads": _as_names(row.get("source_tables"))[:6],
+                "steward": str(row.get("steward") or "")})
+        # the GRID (<=3) rows with sames marked; the ROSTER above
+        mode = "grid" if len(members) <= 3 else "roster"
+        grid_rows = []
+        if mode == "grid" and members:
+            aspects = [
+                ("what it is", [m["description"] for m in members]),
+                ("the distinguishing element", [
+                    "; ".join(m["distinguishing_plain"]) or "(none)"
+                    for m in members]),
+                ("selects from", [", ".join(m["reads"]) or "—"
+                                  for m in members]),
+                ("steward", [m["steward"] or "—" for m in members]),
+            ]
+            for label, cells in aspects:
+                same = len(set(cells)) == 1
+                grid_rows.append({"aspect": label, "same": same,
+                                  "cells": cells})
+        roster_groups = []
+        if mode == "roster":
+            by_header: "dict[str, list]" = {}
+            for m in members:
+                header = (m["distinguishing_plain"][0]
+                          if m["distinguishing_plain"]
+                          else "no distinguishing element recorded")
+                by_header.setdefault(header, []).append({
+                    "id": m["id"], "name": m["name"],
+                    "phrase": "; ".join(m["distinguishing_plain"])
+                    or "(shared logic only)",
+                    "steward": m["steward"]})
+            roster_groups = [
+                {"header": h, "members": ms}
+                for h, ms in sorted(by_header.items())]
+        shared_reads = sorted({v for k, v in dset["shared"]
+                               if k == "read"})
+        shared_preds = sum(1 for k, _v in dset["shared"]
+                           if k == "pred")
         return {"kind": "compare", "verdict": verdict,
                 "verdict_note": note[:160],
-                "fingerprints": fingerprints[:6],
-                "contrast": contrast,
+                "mode": mode,
+                "difference_lead": _difference_lead(dset, retrieved,
+                                                    set_summary),
+                "pattern_line": _pattern_line(dset, set_summary,
+                                              verdict),
                 "set_summary": set_summary,
+                "shared": {"reads": shared_reads,
+                           "predicate_count": shared_preds},
+                "members": members,
+                "grid": grid_rows,
+                "roster": roster_groups,
                 "diff_label": diff_label,
-                "diff_lines": _diff_lines(crows),
-                "items": items, "prose": caption}
+                "prose": caption}
 
     # RW-BATCH-6 item 2 (E-battery B6): a retrieved REPORT record
     # carries its parsed links — the FEEDS card renders the chain

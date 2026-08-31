@@ -202,32 +202,61 @@ function textOf(node) {
 }
 
 if (MODE === 'console') {
-  check('console evidence renders the FULL composer card '
+  check('console evidence renders the FULL v2 card '
       + '(red-first: a payload-ignoring renderer fails)', () => {
     const node = renderEvidence({
       verdict: 'DIFFERS',
-      set_summary: '80 value(s) shared · E11.80 only in CodesetB',
-      contrast: 'reporting — DX_CODE IN (80 values); '
-        + 'reports — DX_CODE IN (81 values)',
-      fingerprints: [
-        { id: 'a', name: 'Diabetic Codeset', owner: 'reporting',
-          reads: ['DIAGNOSIS_CODES'],
-          criterion: 'DX_CODE IN (80 values)',
-          description: 'the hand-maintained list' }],
-      diff_label: 'receipt: − a · + b',
-      diff_lines: ['+ E11.80 — present only in one definition'],
+      mode: 'grid',
+      difference_lead: 'The one difference: E11.80 only in '
+        + 'Diabetic Codeset (reports.USP_CodesetB).',
+      pattern_line: 'reads as a stale copy, not two purposes',
+      set_summary: '80 value(s) shared',
+      members: [
+        { id: 'a', name: 'Diabetic Codeset (reporting.USP_A)',
+          snippets: ['ED.DX_CODE IN (…80)'] },
+        { id: 'b', name: 'Diabetic Codeset (reports.USP_B)',
+          snippets: ['ED.DX_CODE IN (…81)'] }],
+      grid: [
+        { aspect: 'the distinguishing element', same: false,
+          cells: ['limits ED.DX_CODE to 80 listed value(s)',
+                  'limits ED.DX_CODE to 81 listed value(s)'] },
+        { aspect: 'selects from', same: true,
+          cells: ['DIAGNOSIS_CODES', 'DIAGNOSIS_CODES'] }],
+      roster: [],
     }, '2 hash groups');
     const text = textOf(node);
-    for (const want of ['80 value(s) shared',
-                        'DX_CODE IN (80 values)',
-                        'Diabetic Codeset', 'DIAGNOSIS_CODES',
-                        'receipt: − a · + b',
-                        'the hand-maintained list']) {
+    for (const want of ['The one difference:',
+                        'limits ED.DX_CODE to 81 listed value(s)',
+                        '(same)', 'stale copy',
+                        '80 value(s) shared',
+                        'Diabetic Codeset (reports.USP_B)']) {
       if (!text.includes(want)) {
         throw new Error('payload field not rendered: ' + want);
       }
     }
   });
+
+  check('console roster mode renders groups + pair picks', () => {
+    const node = renderEvidence({
+      verdict: 'DIFFERS', mode: 'roster',
+      members: Array.from({ length: 10 }, (_x, i) =>
+        ({ id: 'm' + i, name: 'Diabetic Patients (m' + i + ')',
+           snippets: [] })),
+      roster: [{ header: 'requires HBA1C at least 6',
+        members: [{ id: 'm0',
+          name: 'Diabetic Patients (m0)',
+          phrase: 'requires HBA1C at least 6', steward: '' }] }],
+      grid: [],
+    }, '10 hash groups');
+    const text = textOf(node);
+    if (!text.includes('requires HBA1C at least 6')) {
+      throw new Error('roster group header missing');
+    }
+    if (!node.querySelectorAll('.pairpick').length) {
+      throw new Error('pair-pick checkboxes missing');
+    }
+  });
+
   console.log(JSON.stringify({ ok: failures.length === 0,
                                failures }));
   process.exit(0);

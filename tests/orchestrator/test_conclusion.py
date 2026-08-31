@@ -45,8 +45,9 @@ def test_compare_composes_verdict_and_machine_diff_lines():
                            "description": "d1", "id": "a"}]),
     ], "prose", True)
     assert c["kind"] == "compare" and c["verdict"] == "DIFFERS"
-    assert c["diff_lines"] == ["+ 'E11.80'", "- nothing"]
-    assert c["items"][0]["name"] == "A"
+    # CONSOLE-4 v2: members carry the story; fragments stay in
+    # the event record
+    assert c["members"] and c["members"][0]["name"] == "A"
 
 
 def test_records_compose_the_definition_card():
@@ -72,20 +73,23 @@ def test_no_stamped_fields_returns_none():
     assert compose_conclusion([], "just prose", False) is None
 
 
-def test_diff_distills_the_literal_delta_first():
-    # glass check 2026-08-28: E11.80 sat buried at the end of two
-    # 80-literal lines — the card leads with the exact delta
+def test_literal_delta_leads_the_card():
+    # glass check 2026-08-28 (E11.80 buried), CONSOLE-4 v2: the
+    # delta now LEADS as the difference sentence + set summary;
+    # raw fragments live in the event record, not the display
     c = compose_conclusion([
         _out("compare",
              [{"group": 1, "members": ["a"]},
               {"group": 2, "members": ["b"]},
               {"diff_between_two_largest_groups":
-               "-WHERE X IN ('E11.79', 'E11.10')\n"
-               "+WHERE X IN ('E11.79', 'E11.10', 'E11.80')"}],
+               "-WHERE X IN ('E11.79', 'E11.10', 'E11.20')\n"
+               "+WHERE X IN ('E11.79', 'E11.10', 'E11.20', "
+               "'E11.80')"}],
              note="2 hash groups — logic DIFFERS."),
     ], "prose", True)
-    assert c["diff_lines"][0] == \
-        "+ E11.80 — present only in one definition"
+    assert "E11.80 only in" in c["set_summary"]
+    assert c["difference_lead"].startswith("The one difference:")
+    assert "diff_lines" not in c        # display carries no SQL
 
 
 class TestBatch6ComposerShapes:
@@ -299,79 +303,18 @@ class TestGraphPanel1Subgraph:
         assert compose_subgraph([]) is None
 
 
-class TestConsole2Fingerprints:
-    """CONSOLE-2 (Sunny's glass — "not clear HOW they differ"):
-    compare leads with member fingerprints; the contrast line is
-    machine-assembled naming owners; the diff carries its labeled
-    receipt line. One composer serves every surface."""
+class TestConsole4V2GridCard:
+    """CONSOLE-4 v2 (design ratified): ONE distinguishing-set
+    computation renders the GRID card for pairs — difference-lead
+    sentence first, sames marked, pattern line deterministic,
+    NO SQL in any steward-facing field, developer snippets labeled
+    per member. The bare-name and false-count invariants carry
+    forward."""
 
-    def _outputs(self):
-        return [
-            {"component": {"op": "retrieve", "params": {}},
-             "result": {"op": "retrieve", "params": {},
-                        "complete": True, "universe": "u",
-                        "rows": [
-                {"id": "reporting.USP_DX", "kind": "metric",
-                 "business_name": "Diabetic Patients (DX)",
-                 "description": "Selects by diagnosis codes.",
-                 "source_tables": "DIAGNOSIS_CODES, ENCOUNTERS",
-                 "decision_sites": [
-                     {"expression": "DX_CODE LIKE 'E11%'"}]},
-                {"id": "reports.USP_MED", "kind": "metric",
-                 "business_name": "Diabetic Patients (Med)",
-                 "description": "Selects by medication orders.",
-                 "source_tables": ["MEDICATION_ORDERS"],
-                 "decision_sites": [
-                     {"expression":
-                      "ORDER_NAME IN ('METFORMIN')"}]}]}},
-            {"component": {"op": "compare", "params": {}},
-             "result": {"op": "compare", "params": {},
-                        "complete": True, "universe": "u",
-                        "note": "2 hash groups — DIFFERS.",
-                        "rows": [
-                {"group": 1, "members": ["reporting.USP_DX"]},
-                {"group": 2, "members": ["reports.USP_MED"]}]}},
-        ]
-
-    def test_fingerprints_lead_with_reads_criterion_why(self):
-        c = compose_conclusion(self._outputs(), "", True)
-        assert c["kind"] == "compare"
-        fps = {fp["id"]: fp for fp in c["fingerprints"]}
-        dx = fps["reporting.USP_DX"]
-        assert dx["reads"] == ["DIAGNOSIS_CODES", "ENCOUNTERS"]
-        assert dx["criterion"] == "DX_CODE LIKE 'E11%'"
-        assert dx["description"].startswith("Selects by diagnosis")
-        assert dx["owner"] == "reporting"
-
-    def test_contrast_names_owners_machine_assembled(self):
-        c = compose_conclusion(self._outputs(), "", True)
-        assert "reporting — DX_CODE LIKE 'E11%'" in c["contrast"]
-        assert "reports — ORDER_NAME IN ('METFORMIN')" in \
-            c["contrast"]
-
-    def test_diff_receipt_labels_its_sides(self):
-        c = compose_conclusion(self._outputs(), "", True)
-        assert c["diff_label"] == ("receipt: − reporting.USP_DX · "
-                                   "+ reports.USP_MED")
-
-    def test_identical_verdict_has_no_contrast(self):
-        outs = self._outputs()
-        outs[1]["result"]["note"] = "1 hash group — IDENTICAL."
-        outs[1]["result"]["rows"] = [
-            {"group": 1, "members": ["reporting.USP_DX",
-                                     "reports.USP_MED"]}]
-        c = compose_conclusion(outs, "", True)
-        assert c["contrast"] == ""
-
-
-class TestConsole2b:
-    """CONSOLE-2b: criterion covers store-shaped decision sites
-    (expression_sql, IN-lists sketch to counts) and set_summary
-    MUST compose whenever a literal-set delta exists."""
-
-    def _codeset_outputs(self):
+    def _codeset_outputs(self, n_extra=1):
         codes_a = ", ".join(f"'E11.{i:02d}'" for i in range(80))
-        codes_b = codes_a + ", 'E11.80'"
+        codes_b = codes_a + "".join(
+            f", 'E11.{80 + i}'" for i in range(n_extra))
         diff = ("--- a\n+++ b\n"
                 f"-WHERE ED.DX_CODE IN ({codes_a})\n"
                 f"+WHERE ED.DX_CODE IN ({codes_b})")
@@ -384,16 +327,20 @@ class TestConsole2b:
                  "business_name": "Diabetic Codeset",
                  "description": "The hand-maintained list.",
                  "source_tables": "DIAGNOSIS_CODES",
+                 "steward": "s@x",
                  "decision_sites": [{
                      "expression_sql":
-                         f"ED.DX_CODE IN ({codes_a})"}]},
+                         f"ED.DX_CODE IN ({codes_a})",
+                     "columns": ["DX_CODE"]}]},
                 {"id": "reports.USP_CodesetB", "kind": "metric",
                  "business_name": "Diabetic Codeset",
                  "description": "The other list.",
                  "source_tables": "DIAGNOSIS_CODES",
+                 "steward": "",
                  "decision_sites": [{
                      "expression_sql":
-                         f"ED.DX_CODE IN ({codes_b})"}]}]}},
+                         f"ED.DX_CODE IN ({codes_b})",
+                     "columns": ["DX_CODE"]}]}]}},
             {"component": {"op": "compare", "params": {}},
              "result": {"op": "compare", "params": {},
                         "complete": True, "universe": "u",
@@ -406,43 +353,96 @@ class TestConsole2b:
                  "members": ["reports.USP_CodesetB"]}]}},
         ]
 
-    def test_criterion_sketches_the_in_list(self):
+    def test_grid_mode_with_difference_lead_first(self):
         c = compose_conclusion(self._codeset_outputs(), "", True)
-        fps = {fp["id"]: fp for fp in c["fingerprints"]}
-        assert fps["reporting.USP_CodesetA"]["criterion"] == \
-            "ED.DX_CODE IN (80 values)"
-        assert fps["reports.USP_CodesetB"]["criterion"] == \
-            "ED.DX_CODE IN (81 values)"
-        assert "IN (80 values)" in c["contrast"]
+        assert c["mode"] == "grid"
+        lead = c["difference_lead"]
+        assert lead.startswith("The one difference:")
+        assert "E11.80 only in Diabetic Codeset " \
+               "(reports.USP_CodesetB)" in lead
 
-    def test_set_summary_composes_on_a_literal_set_delta(self):
+    def test_sames_marked_in_the_grid(self):
         c = compose_conclusion(self._codeset_outputs(), "", True)
-        assert c["set_summary"], "literal-set delta gave no summary"
+        rows = {r["aspect"]: r for r in c["grid"]}
+        assert rows["selects from"]["same"] is True
+        assert rows["the distinguishing element"]["same"] is False
+
+    def test_pattern_line_superset_by_one(self):
+        c = compose_conclusion(self._codeset_outputs(), "", True)
+        assert "stale copy" in c["pattern_line"]
+
+    def test_no_sql_reaches_steward_fields(self):
+        c = compose_conclusion(self._codeset_outputs(), "", True)
+        steward_blob = " ".join(
+            [c["difference_lead"], c["pattern_line"],
+             c["set_summary"]]
+            + [cell for r in c["grid"] for cell in r["cells"]]
+            + [p for m in c["members"]
+               for p in m["distinguishing_plain"]])
+        for token in ("SELECT", "WHERE", "IN ('", "NOT EXISTS"):
+            assert token not in steward_blob, token
+
+    def test_developer_snippets_labeled_per_member(self):
+        c = compose_conclusion(self._codeset_outputs(), "", True)
+        b = next(m for m in c["members"]
+                 if m["id"] == "reports.USP_CodesetB")
+        assert b["snippets"] and "E11.80" in b["snippets"][0]
+        assert b["name"].endswith("(reports.USP_CodesetB)")
+
+    def test_set_summary_and_qualified_names_carry_forward(self):
+        c = compose_conclusion(self._codeset_outputs(), "", True)
         assert "80 value(s) shared" in c["set_summary"]
-        # CONSOLE-2c acceptance: the colliding member is QUALIFIED
-        assert ("E11.80 only in Diabetic Codeset "
-                "(reports.USP_CodesetB)") in c["set_summary"]
-
-    def test_collision_gate_every_member_render_qualifies(self):
-        """CONSOLE-2c generator kill: with colliding names, EVERY
-        member-name field on the card is qualified — bare renders
-        are unwritable (this gate goes red on any new surface)."""
-        c = compose_conclusion(self._codeset_outputs(), "", True)
-        for fp in c["fingerprints"]:
-            assert fp["name"].endswith(f"({fp['id']})"), fp["name"]
         assert "(reports.USP_CodesetB)" in c["set_summary"]
 
-    def test_truncated_store_expression_never_fabricates_a_count(self):
-        """CONSOLE-2c item 1: the old 500-char store cap made both
-        codesets sketch 'IN (49 values)' — a truncated expression
-        DISCLOSES (≥N + the cure), never states a false count."""
-        from src.orchestrator.conclusion import _criterion_sketch
-        full = ("ED.DX_CODE IN ("
-                + ", ".join(f"'E11.{i:02d}'" for i in range(80))
-                + ")")
-        assert _criterion_sketch(full) == "ED.DX_CODE IN (80 values)"
-        cut = full[:500]
-        sketch = _criterion_sketch(cut)
-        assert "49 values)" not in sketch
-        assert sketch.startswith("ED.DX_CODE IN (≥")
-        assert "truncated in this store" in sketch
+    def test_true_counts_in_business_words(self):
+        c = compose_conclusion(self._codeset_outputs(), "", True)
+        b = next(m for m in c["members"]
+                 if m["id"] == "reports.USP_CodesetB")
+        assert "81 listed value(s)" in b["distinguishing_plain"][0]
+
+
+class TestConsole4V2Roster:
+    def _ten_cousins(self):
+        rows, groups = [], []
+        for i in range(10):
+            mid = f"reporting.USP_Cousin_{i}"
+            rows.append({
+                "id": mid, "kind": "metric",
+                "business_name": "Diabetic Patients",
+                "description": f"variant {i}",
+                "source_tables": ("ENCOUNTERS" if i % 2
+                                  else "DIAGNOSIS_CODES"),
+                "steward": "",
+                "decision_sites": [{
+                    "expression_sql": f"HBA1C >= {6 + i}",
+                    "columns": ["HBA1C"]}]})
+            groups.append({"group": i + 1, "members": [mid]})
+        return [
+            {"component": {"op": "retrieve", "params": {}},
+             "result": {"op": "retrieve", "params": {},
+                        "complete": True, "universe": "u",
+                        "rows": rows}},
+            {"component": {"op": "compare", "params": {}},
+             "result": {"op": "compare", "params": {},
+                        "complete": True, "universe": "u",
+                        "note": "10 hash groups — DIFFERS.",
+                        "rows": groups}},
+        ]
+
+    def test_roster_law_above_three(self):
+        c = compose_conclusion(self._ten_cousins(), "", True)
+        assert c["mode"] == "roster"
+        assert c["roster"], "no roster groups"
+        total = sum(len(g["members"]) for g in c["roster"])
+        assert total == 10
+        # every roster line qualified (all ten share the name)
+        for g in c["roster"]:
+            for m in g["members"]:
+                assert m["name"].endswith(f"({m['id']})")
+
+    def test_grid_stays_at_three_or_fewer(self):
+        outs = self._ten_cousins()
+        outs[0]["result"]["rows"] = outs[0]["result"]["rows"][:3]
+        outs[1]["result"]["rows"] = outs[1]["result"]["rows"][:3]
+        c = compose_conclusion(outs, "", True)
+        assert c["mode"] == "grid"

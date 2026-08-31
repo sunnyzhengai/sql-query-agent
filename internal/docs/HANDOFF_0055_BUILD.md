@@ -3368,3 +3368,47 @@ shapes: "has an additional condition on <tables/columns>" +
 developer-view reference (SQL never leaks to steward view).
 Acceptance: Sunny reads BOTH cards (codeset pair; Diabetic
 Patients ten) as steward and rules without seeing SQL.
+
+### 2026-08-30 night — CONSOLE-4 v2 BUILT (per the ratified design) — release 1.77.0
+**One computation, three renderings — exactly the approved spec.**
+- **THE DISTINGUISHING SET** (src/orchestrator/conclusion.py):
+  pure set arithmetic over parsed elements (every decision-site
+  predicate + reads) — per member what IT ALONE has; shared as
+  background. Feeds everything.
+- **THE GRID CARD (≤3):** difference-lead sentence FIRST and
+  bolded (the approved mock's shape — a single-value literal
+  delta leads as "The one difference: E11.80 only in Diabetic
+  Codeset (reports.USP_CodesetB)"); members-as-columns grid with
+  fixed aspect rows (what it is · the distinguishing element ·
+  selects from · steward) and SAMES MARKED — a same row collapses
+  to one cell + "(same)"; the 💡 pattern line from deterministic
+  templates keyed on computed relations only (superset-by-one →
+  "reads as a stale copy, not two purposes"; SAME verdict →
+  duplicate; disjoint reads → distinct purposes); verbs carry
+  CONSEQUENCE NOTES from the landing map (hover). **NO SQL in any
+  steward field — test-held** (the steward blob is scanned for
+  SELECT/WHERE/IN('/NOT EXISTS). Developer view: distinguishing
+  snippets labeled per member, open by default for the developer
+  persona; fragments live in the event record only (diff_lines
+  left the card, test-held).
+- **THE GROUPED ROSTER (>3):** grouped by primary distinguishing
+  element (headers from the template vocabulary), one line per
+  member (qualified name — phrase · steward), PAIR DRILL-DOWN:
+  pick any two → compare again → the pair's grid card (server
+  compares the picked ids; the flag retrieve surfaces them for
+  the read guarantee). The law (grid ≤3, roster above, drill
+  anywhere) is test-held.
+- Template vocabulary as ratified: NOT EXISTS→"excludes those
+  with a match in X" · IN→"limits COL to N listed value(s)"
+  (store-truncated lists render ≥N, never a false count) ·
+  COUNT≥→threshold · comparisons→"requires COL at least V" ·
+  fallback names tables/columns + "see developer view" — SQL
+  never leaks.
+- Bare-name kill carries forward: every member name in every
+  rendering is collision-qualified (gate held).
+- DOM harness: v2 red-first cases (grid fields + "(same)" marks +
+  roster groups + pair-picks) — payload-ignoring renderers cannot
+  pass. Workbench + console render from ONE body shape.
+**Gates:** 1,361 green + 5 xfailed, ruff clean; wheel 1.77.0.
+**Acceptance:** Sunny reads BOTH cards (codeset pair; Diabetic
+Patients ten) as steward and rules without seeing SQL.

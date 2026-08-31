@@ -847,7 +847,18 @@ def create_app(
             )
             try:
                 op_census("flag", run_kql, conv.engine.ops)
-                rs = op_compare([target], "logic", run_kql,
+                # CONSOLE-4 v2 pair drill-down: two picked members
+                # compare directly (the roster's law: grid <=3;
+                # pick any two anywhere). The flag RETRIEVE is what
+                # surfaces member ids for the read guarantee.
+                if len(member_ids) >= 2:
+                    from src.orchestrator.ops import (
+                        op_retrieve as _opr,
+                    )
+                    _opr([target], run_kql, conv.engine.ops)
+                refs = (member_ids[:3] if len(member_ids) >= 2
+                        else [target])
+                rs = op_compare(refs, "logic", run_kql,
                                 conv.engine.ops)
                 shown = rs.display()
                 shown["headline"] = stamped_headline(shown)
@@ -1477,6 +1488,60 @@ function flagCardHtml(f) {
     <div class="fc-why">${esc(f.why || '')}</div></div>`;
 }
 
+// CONSOLE-4 v2: ONE body builder for the compare card — grid for
+// <=3 members (sames marked "(same)"), grouped roster above, the
+// deterministic pattern line, developer snippets folded.
+function compareBodyHtml(c) {
+  let out = '';
+  if (c.difference_lead) {
+    out += `<div class="cc-item"><b>${esc(c.difference_lead)}</b></div>`;
+  }
+  if (c.mode === 'grid' && (c.members || []).length) {
+    let head = '<tr><th></th>' + c.members.map(m =>
+      `<th>${esc(m.name)}</th>`).join('') + '</tr>';
+    let body = (c.grid || []).map(r => {
+      const cells = r.same
+        ? `<td colspan="${c.members.length}">${esc(r.cells[0])}
+           <span class="cite">(same)</span></td>`
+        : r.cells.map(cell => `<td>${esc(cell)}</td>`).join('');
+      return `<tr><th>${esc(r.aspect)}</th>${cells}</tr>`;
+    }).join('');
+    out += `<div style="overflow-x:auto"><table class="gridcard">
+      ${head}${body}</table></div>`;
+  }
+  if (c.mode === 'roster' && (c.roster || []).length) {
+    out += `<div class="cc-machine">${esc(String(
+      (c.members || []).length))} member(s), grouped by how each
+      selects</div>`;
+    for (const g of c.roster) {
+      out += `<div class="cc-item"><b>${esc(g.header)}</b>` +
+        g.members.map(m =>
+          `<div class="mine-row"><label>
+           <input type="checkbox" class="pairpick"
+           data-id="${esc(m.id)}"> ${esc(m.name)}</label> —
+           ${esc(m.phrase)}${m.steward ? ' · ' + esc(m.steward)
+           : ''}</div>`).join('') + '</div>';
+    }
+  }
+  if (c.pattern_line) {
+    out += `<div class="cc-machine">💡 ${esc(c.pattern_line)}</div>`;
+  }
+  if (c.set_summary) {
+    out += `<div class="cc-item"><b>${esc(c.set_summary)}</b></div>`;
+  }
+  const snips = (c.members || []).filter(m =>
+    (m.snippets || []).length);
+  if (snips.length) {
+    out += '<details class="errfold"><summary>developer view — '
+      + 'distinguishing snippets, labeled per member</summary>'
+      + snips.map(m => `<div class="cc-item"><b>${esc(m.name)}</b>`
+        + m.snippets.map(s =>
+          `<div class="diffline">${esc(s)}</div>`).join('')
+        + '</div>').join('') + '</details>';
+  }
+  return out;
+}
+
 function renderConclusion(j) {
   const c = j.conclusion;
   const based = `<span class="inputs">based on: ${esc((j.caption_inputs||[]).join(', ')||'—')}${
@@ -1494,33 +1559,13 @@ function renderConclusion(j) {
       <div class="cc-machine">${esc(c.closing)}</div>${based}</div>`);
   }
   if (c.kind === 'compare') {
-    // CONSOLE-2: fingerprints LEAD; the diff folds as the
-    // labeled receipt beneath
-    const fps = (c.fingerprints || []).map(fp =>
-      `<div class="cc-item"><b>${esc(fp.name)}</b>
-        <span class="cite">${esc(fp.owner)}</span>
-        ${fp.reads && fp.reads.length
-          ? `<div class="cc-machine">reads: ${esc(fp.reads.join(', '))}</div>` : ''}
-        ${fp.criterion
-          ? `<div class="cc-machine">criterion: <code>${esc(fp.criterion)}</code></div>` : ''}
-        ${fp.description ? `<div class="why-line">${esc(fp.description)}</div>` : ''}
-        </div>`).join('');
-    const contrast = c.contrast
-      ? `<div class="cc-item"><b>${esc(c.contrast)}</b></div>` : '';
-    const setSum = c.set_summary
-      ? `<div class="cc-item"><b>${esc(c.set_summary)}</b></div>` : '';
-    const diff = (c.diff_lines || []).map(l =>
-      `<div class="diffline ${l.startsWith('+') ? 'plus' : 'minus'}">${esc(l)}</div>`).join('');
-    const diffFold = diff
-      ? `<details class="errfold"><summary>${esc(c.diff_label ||
-          'the raw diff (receipt)')}</summary>${diff}</details>`
-      : '';
-    const items = fps ? '' : (c.items || []).map(i =>
-      `<div class="cc-item"><b>${esc(i.name)}</b> — ${esc(i.description)}</div>`).join('');
+    // CONSOLE-4 v2: the GRID/roster card — difference lead first,
+    // sames marked, pattern line; snippets fold for developers;
+    // fragments never render (they live in the event record)
     return el(`<div class="caption concl">
       <span class="badge verdict">${esc(c.verdict || 'COMPARED')}</span>
       <span class="cc-machine">${esc(c.verdict_note || '')}</span>
-      ${setSum}${contrast}${fps}${items}${diffFold}${proseHtml}${based}</div>`);
+      ${compareBodyHtml(c)}${proseHtml}${based}</div>`);
   }
   if (c.kind === 'definition') {
     return el(`<div class="caption concl">
@@ -2165,32 +2210,66 @@ function el(html) { const d = document.createElement('div');
 // RED-FIRST case on this function: a renderer that ignores the
 // payload cannot pass.
 function renderEvidence(c, headline) {
-  const fps = (c.fingerprints || []).map(fp =>
-    '<div class="cc-item"><b>' + esc(fp.name) + '</b> '
-    + '<span class="badge state">' + esc(fp.owner) + '</span>'
-    + (fp.reads && fp.reads.length
-      ? '<div class="members">reads: ' + esc(fp.reads.join(', '))
-        + '</div>' : '')
-    + (fp.criterion
-      ? '<div class="members">criterion: ' + esc(fp.criterion)
-        + '</div>' : '')
-    + (fp.description
-      ? '<div class="why">' + esc(fp.description) + '</div>' : '')
-    + '</div>').join('');
-  const diffs = (c.diff_lines || []).map(l =>
-    '<div class="diffline ' + (l.startsWith('+') ? 'plus'
-      : 'minus') + '">' + esc(l) + '</div>').join('');
-  return el('<div class="evidence"><b>' + esc(c.verdict
-      || 'COMPARED') + '</b> — ' + esc(headline)
-    + (c.set_summary ? '<div class="cc-item"><b>'
-        + esc(c.set_summary) + '</b></div>' : '')
-    + (c.contrast ? '<div class="cc-item">' + esc(c.contrast)
-        + '</div>' : '')
-    + fps
-    + (diffs ? '<details><summary>' + esc(c.diff_label
-        || 'the raw diff (receipt)') + '</summary>' + diffs
-        + '</details>' : '')
-    + '</div>');
+  // CONSOLE-4 v2 — same card body as the workbench (grid/roster,
+  // lead, pattern, snippets fold); persona controls the default:
+  // stewards see business words, developers open the snippets
+  let out = '<b>' + esc(c.verdict || 'COMPARED') + '</b> — '
+    + esc(headline);
+  if (c.difference_lead) {
+    out += '<div class="cc-item"><b>' + esc(c.difference_lead)
+      + '</b></div>';
+  }
+  if (c.mode === 'grid' && (c.members || []).length) {
+    let head = '<tr><th></th>' + c.members.map(m =>
+      '<th>' + esc(m.name) + '</th>').join('') + '</tr>';
+    let body = (c.grid || []).map(r => {
+      const cells = r.same
+        ? '<td colspan="' + c.members.length + '">' + esc(r.cells[0])
+          + ' <span class="members">(same)</span></td>'
+        : r.cells.map(cell => '<td>' + esc(cell)
+          + '</td>').join('');
+      return '<tr><th>' + esc(r.aspect) + '</th>' + cells + '</tr>';
+    }).join('');
+    out += '<div style="overflow-x:auto"><table class="gridcard">'
+      + head + body + '</table></div>';
+  }
+  if (c.mode === 'roster' && (c.roster || []).length) {
+    for (const g of c.roster) {
+      out += '<div class="cc-item"><b>' + esc(g.header) + '</b>'
+        + g.members.map(m =>
+          '<div class="members"><label><input type="checkbox" '
+          + 'class="pairpick" data-id="' + esc(m.id) + '"> '
+          + esc(m.name) + '</label> — ' + esc(m.phrase)
+          + '</div>').join('') + '</div>';
+    }
+    out += '<div class="members">pick any TWO and press compare '
+      + 'again for the pair grid</div>';
+  }
+  if (c.pattern_line) {
+    out += '<div class="members">💡 ' + esc(c.pattern_line)
+      + '</div>';
+  }
+  if (c.set_summary) {
+    out += '<div class="cc-item"><b>' + esc(c.set_summary)
+      + '</b></div>';
+  }
+  const snips = (c.members || []).filter(m =>
+    (m.snippets || []).length);
+  if (snips.length && personaSel.value === 'developer') {
+    out += '<details open><summary>distinguishing snippets</summary>'
+      + snips.map(m => '<div class="cc-item"><b>' + esc(m.name)
+        + '</b>' + m.snippets.map(s => '<div class="diffline">'
+        + esc(s) + '</div>').join('') + '</div>').join('')
+      + '</details>';
+  } else if (snips.length) {
+    out += '<details><summary>developer view — distinguishing '
+      + 'snippets</summary>' + snips.map(m =>
+      '<div class="cc-item"><b>' + esc(m.name) + '</b>'
+      + m.snippets.map(s => '<div class="diffline">' + esc(s)
+      + '</div>').join('') + '</div>').join('') + '</details>';
+  }
+  const node = el('<div class="evidence">' + out + '</div>');
+  return node;
 }
 
 function certifyChooser(f, card) {
@@ -2241,8 +2320,21 @@ async function act(verb, id, card, memberIds) {
     return;
   }
   if (verb === 'compare' && j.evidence) {
-    card.appendChild(renderEvidence(j.evidence.conclusion || {},
-                                    j.evidence.headline || ''));
+    const ev = renderEvidence(j.evidence.conclusion || {},
+                              j.evidence.headline || '');
+    card.appendChild(ev);
+    // roster pair drill-down: two picks + compare again → the grid
+    if ((j.evidence.conclusion || {}).mode === 'roster') {
+      const drill = el('<button class="replaybtn">compare the '
+        + 'picked pair</button>');
+      drill.addEventListener('click', () => {
+        const picked = Array.from(
+          ev.querySelectorAll('.pairpick'))
+          .filter(x => x.checked).map(x => x.dataset.id);
+        if (picked.length === 2) act('compare', id, card, picked);
+      });
+      ev.appendChild(drill);
+    }
     return;
   }
   card.appendChild(el('<div class="evidence">recorded — grade: ' +
@@ -2282,9 +2374,13 @@ async function load() {
       : ['compare', 'certify', 'delegate', 'deny'];
     const vbox = card.querySelector('.verbs');
     for (const v of verbs) {
+      // CONSOLE-4 v2: every verb carries its CONSEQUENCE NOTE
+      // from the landing map (hover)
+      const row = lm[v] || {};
       const b = el('<button' + (v === 'certify'
-        ? ' class="primary"' : '') + '>'
-        + esc(v.replace('_', ' ')) + '</button>');
+        ? ' class="primary"' : '') + ' title="lands: '
+        + esc(row.lands || '') + ' · grade: ' + esc(row.grade || '')
+        + '">' + esc(v.replace('_', ' ')) + '</button>');
       b.addEventListener('click', () => {
         if (v === 'certify' && (f.members || []).length > 1) {
           certifyChooser(f, card);   // CONSOLE-3: outcome + target
@@ -2293,9 +2389,8 @@ async function load() {
         act(v, f.id, card);
       });
       vbox.appendChild(b);
-      const row = lm[v] || {};
       card.querySelector('.land').textContent =
-        'every action lands: see the landing map (0063)';
+        'hover a verb for where it lands (0063 landing map)';
     }
     inboxEl.appendChild(card);
   }
