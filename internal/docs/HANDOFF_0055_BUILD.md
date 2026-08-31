@@ -3594,3 +3594,33 @@ STATE and ACTOR — is not folding back.
    first silently. Test: certify a flag → refetch inbox → that
    flag reports decided with the actor.
 Sunny's double read is UNBLOCKED meanwhile (all flags present).
+
+### 2026-08-31 — CONSOLE-5 BUILT — release 1.79.0
+**Root cause, found by probing before fixing:** the fold-back
+logic was never broken. Against the live store,
+effective_dispositions resolves all seven of Sunny's rulings and
+/api/inbox returns 7-of-26 decided WITH actors — verified
+end-to-end through the HTTP path. What failed was the WIRING: the
+event path was resolved relative to the PROCESS CWD, so a server
+started from any other directory silently read an empty store and
+reported every flag undecided. That is the double-ruling hazard,
+and it left no trace.
+1. **The path resolves against the REPO ROOT at build time**, and
+   the startup banner prints the resolved path plus the number of
+   console events it will fold — "[inbox] decision store: <path>
+   (present, 39 console event(s) to fold)". What the Inbox will
+   show is a FACT before the first request, not a hope (the
+   boundary-echo law applied to state).
+2. **Decided cards sink but stay visible:** state chip + "ruled by
+   <actor> on <date>" + the picked target and reason where they
+   exist; the fold now carries actor, timestamp, and targets.
+3. **REOPEN is a new verb with its own landing row** (the totality
+   gate caught its absence on the first run, as designed): a
+   reopen APPENDS testimony and returns the flag to the open
+   queue — the earlier ruling stays in the record, append-only,
+   never mutated. It carries its reason, always. Decided flags
+   offer only compare + reopen, so a second silent ruling is
+   unwritable.
+**Gates:** 1,384 green + 5 xfailed, ruff clean; wheel 1.79.0.
+Ordered acceptance test-held: certify → refetch → decided with the
+actor.

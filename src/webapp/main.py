@@ -186,11 +186,30 @@ def build() -> "object":
     # FLYWHEEL-1: the shelf + card provenance read the LOCAL event
     # store; the OneLake sink is write-only, so those surfaces stay
     # typed-unavailable there (additive, never load-bearing)
+    # CONSOLE-5: the path RESOLVES at build time against the repo
+    # root, never the process cwd — a server started from another
+    # directory silently read an empty store and reported every
+    # flag undecided (the double-ruling hazard). The banner prints
+    # the resolved path + the console-event count: what the Inbox
+    # will fold is a FACT before the first request.
     ev_path = os.environ.get("SQA_EVENTS_PATH",
                              "data/events/turn_events.jsonl")
-    events_file = (Path(ev_path)
+    ev_file = Path(ev_path)
+    if not ev_file.is_absolute():
+        ev_file = (Path(__file__).resolve().parents[2]
+                   / ev_path).resolve()
+    events_file = (ev_file
                    if not legacy_env("EVENTS_ONELAKE_URL", "")
                    else None)
+    if events_file is not None:
+        n_console = 0
+        if events_file.exists():
+            n_console = sum(
+                1 for line in events_file.read_text().splitlines()
+                if "[CONSOLE:" in line)
+        print(f"[inbox] decision store: {events_file} "
+              f"({'present' if events_file.exists() else 'ABSENT'}"
+              f", {n_console} console event(s) to fold)")
     return create_app(azure_chat_api(), _kusto_run(), _sink(),
                       _marketplace(), run_executor=executor,
                       run_cap=cap, run_source=source,

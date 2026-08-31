@@ -1188,3 +1188,58 @@ class TestConsole4Wire:
         c = r.json()["evidence"]["conclusion"]
         ids = {m["id"] for m in c["members"]}
         assert ids == {STEP_1, STEP_2}
+
+
+class TestConsole5FoldBackWire:
+    """CONSOLE-5 on the wire: certify → refetch → that flag reports
+    decided WITH the actor (the ordered acceptance); reopen appends
+    and returns it to the open queue."""
+
+    def _client(self, tmp_path):
+        from src.orchestrator.events import JsonlEventSink
+        path = tmp_path / "events.jsonl"
+        app = create_app(scripted_api([]), fake_kql,
+                         JsonlEventSink(path), events_path=path)
+        return TestClient(app), path
+
+    FID = "cluster:misnomer:step:aaa111bbb222"
+
+    def test_certify_then_refetch_reports_decided(self, tmp_path):
+        client, _ = self._client(tmp_path)
+        before = client.get("/api/inbox?persona=steward").json()
+        assert all(f["console_state"] is None
+                   for f in before["flags"])
+        client.post("/api/inbox/act", json={
+            "verb": "certify", "target_id": self.FID,
+            "persona": "steward"})
+        after = client.get("/api/inbox?persona=steward").json()
+        done = next(f for f in after["flags"]
+                    if f["id"] == self.FID)
+        assert done["console_state"]["state"] == "certified"
+        assert done["console_state"]["by"] == "local-dev"
+        assert done["console_state"]["at"]
+
+    def test_reopen_appends_and_reopens(self, tmp_path):
+        client, path = self._client(tmp_path)
+        client.post("/api/inbox/act", json={
+            "verb": "certify", "target_id": self.FID,
+            "persona": "steward"})
+        r = client.post("/api/inbox/act", json={
+            "verb": "reopen", "target_id": self.FID,
+            "persona": "steward", "reason": "new evidence"})
+        assert r.status_code == 200
+        after = client.get("/api/inbox?persona=steward").json()
+        flag = next(f for f in after["flags"]
+                    if f["id"] == self.FID)
+        assert flag["console_state"] is None      # open again
+        text = path.read_text()
+        assert "[CONSOLE:CERTIFY]" in text        # record intact
+        assert "[CONSOLE:REOPEN]" in text
+
+    def test_reopen_without_reason_refuses(self, tmp_path):
+        client, _ = self._client(tmp_path)
+        r = client.post("/api/inbox/act", json={
+            "verb": "reopen", "target_id": self.FID,
+            "persona": "steward"})
+        assert r.status_code == 422
+        assert r.json()["reason_class"] == "reason_required"

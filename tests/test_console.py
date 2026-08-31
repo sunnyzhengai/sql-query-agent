@@ -28,7 +28,7 @@ class TestLandingTotality:
         assert set(LANDING_MAP) == {
             "certify", "certify_official", "differentiate_all",
             "certify_definition", "deny", "delegate", "compare",
-            "approve_technical", "fork"}
+            "reopen", "approve_technical", "fork"}
         for verb, row in LANDING_MAP.items():
             assert row["lands"].strip(), verb
             assert row["grade"].strip(), verb
@@ -150,3 +150,62 @@ class TestConsole3CertifyOutcomes:
             "", "t0", member_ids=["m1"])))
         d = effective_dispositions(p)
         assert "cluster:f" in d and "m1" not in d
+
+
+class TestConsole5FoldBack:
+    """CONSOLE-5 (governance, not cosmetics): decided state folds
+    back onto the Inbox with actor and timestamp — without it two
+    stewards re-rule the same flag and the second silently
+    overwrites the first. Reopen is an APPEND, never a mutation."""
+
+    def _events(self, tmp_path, evs):
+        p = tmp_path / "e.jsonl"
+        p.write_text("\n".join(json.dumps(e) for e in evs))
+        return p
+
+    def test_decision_carries_actor_and_timestamp(self, tmp_path):
+        p = self._events(tmp_path, [action_event(
+            "certify", "cluster:a", "steward", "sunny@aivia", "",
+            "2026-08-31T10:15:00+00:00")])
+        d = effective_dispositions(p)["cluster:a"]
+        assert d["state"] == "certified"
+        assert d["by"] == "sunny@aivia"
+        assert d["at"].startswith("2026-08-31T10:15")
+
+    def test_picked_targets_ride_the_decision(self, tmp_path):
+        p = self._events(tmp_path, [action_event(
+            "certify_official", "cluster:a", "steward", "u", "",
+            "t0", member_ids=["metric:reporting.USP_A"])])
+        d = effective_dispositions(p)["cluster:a"]
+        assert d["targets"] == ["metric:reporting.USP_A"]
+
+    def test_reopen_returns_the_flag_to_the_open_queue(self,
+                                                      tmp_path):
+        p = self._events(tmp_path, [
+            action_event("certify", "cluster:a", "steward", "u",
+                         "", "t0"),
+            action_event("reopen", "cluster:a", "steward", "u",
+                         "new evidence", "t1"),
+        ])
+        assert effective_dispositions(p) == {}
+        # the earlier ruling is STILL in the record (append-only)
+        text = p.read_text()
+        assert "[CONSOLE:CERTIFY]" in text
+        assert "[CONSOLE:REOPEN]" in text
+
+    def test_reopen_carries_its_reason(self):
+        with pytest.raises(ConsoleRefusal) as e:
+            check_action("reopen", "steward")
+        assert e.value.reason_class == "reason_required"
+
+    def test_inbox_reports_decided_flags_with_the_actor(self,
+                                                       tmp_path):
+        fid = "cluster:misnomer:step:aaa111bbb222"
+        p = self._events(tmp_path, [action_event(
+            "certify", fid, "steward", "sunny@aivia", "",
+            "2026-08-31T10:15:00+00:00")])
+        state = inbox_state(fake_kql, p, "steward")
+        done = next(f for f in state["flags"] if f["id"] == fid)
+        assert done["console_state"]["state"] == "certified"
+        assert done["console_state"]["by"] == "sunny@aivia"
+        assert done["console_state"]["at"].startswith("2026-08-31")

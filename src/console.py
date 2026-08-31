@@ -75,6 +75,15 @@ LANDING_MAP: "dict[str, dict]" = {
                  "the conclusion",
         "grade": "asserted",
         "needs_reason": False},
+    "reopen": {
+        # CONSOLE-5: a ruling is REOPENED by appending, never by
+        # mutating the record — the reopen itself is testimony
+        "persona": "any",
+        "lands": "graph testimony that the prior ruling is under "
+                 "review; the flag returns to the open queue "
+                 "(the earlier decision stays in the record)",
+        "grade": "asserted",
+        "needs_reason": True},
     "compare": {
         "persona": "any",
         "lands": "nowhere permanent — evidence; its conclusion "
@@ -94,6 +103,8 @@ LANDING_MAP: "dict[str, dict]" = {
         "grade": "asserted, owner = creator",
         "needs_reason": False},
 }
+
+_REOPEN_VERB = "reopen"
 
 _DISPOSITION_VERBS = {"certify": "certified",
                       "certify_official": "official designated",
@@ -160,6 +171,10 @@ def effective_dispositions(events_path) -> "dict[str, dict]":
     for ev in _console_events(events_path):
         d = ev.get("decision") or {}
         verb = str(d.get("verb") or "")
+        if verb == _REOPEN_VERB:
+            for tid in list(ev.get("ids_read") or [])[:1]:
+                out.pop(str(tid), None)   # back to the open queue
+            continue
         if verb not in _DISPOSITION_VERBS \
                 and verb != "approve_technical":
             continue
@@ -169,8 +184,11 @@ def effective_dispositions(events_path) -> "dict[str, dict]":
                 "verb": verb,
                 "state": _DISPOSITION_VERBS.get(verb, "approved"),
                 "by": str(ev.get("user_id") or ""),
+                "at": str(ev.get("event_at") or "")[:19],
                 "persona": str(d.get("persona") or ""),
                 "reason": str(d.get("reason") or ""),
+                "targets": [str(x) for x in
+                            (d.get("targets") or [])],
                 "grade": str(d.get("grade") or "")}
     return out
 

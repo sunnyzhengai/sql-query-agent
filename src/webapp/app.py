@@ -2308,9 +2308,10 @@ function certifyChooser(f, card) {
 
 async function act(verb, id, card, memberIds) {
   let reason = '';
-  if (verb === 'deny') {
-    reason = window.prompt('deny lands as testimony — the reason:')
-      || '';
+  if (verb === 'deny' || verb === 'reopen') {
+    reason = window.prompt(verb === 'reopen'
+      ? 'reopening appends a new ruling — why?'
+      : 'deny lands as testimony — the reason:') || '';
     if (!reason.trim()) return;
   }
   const r = await fetch('/api/inbox/act', { method:'POST',
@@ -2360,9 +2361,20 @@ async function load() {
   document.getElementById('inboxnote').textContent =
     ' · ' + j.flags.length + ' flag(s)';
   for (const f of j.flags) {
-    const stateBadge = f.console_state
-      ? '<span class="badge state">' + esc(f.console_state.state)
-        + ' by ' + esc(f.console_state.by) + '</span>'
+    // CONSOLE-5: a decided flag sinks but stays VISIBLE with its
+    // state, actor and date — the fold-back that stops two
+    // stewards silently re-ruling the same flag
+    const cs = f.console_state;
+    const stateBadge = cs
+      ? '<span class="badge state">' + esc(cs.state) + '</span>'
+      : '';
+    const ruledLine = cs
+      ? '<div class="members">ruled by ' + esc(cs.by)
+        + (cs.at ? ' on ' + esc(String(cs.at).slice(0, 10)) : '')
+        + (cs.targets && cs.targets.length
+           ? ' · target: ' + esc(cs.targets.join(', ')) : '')
+        + (cs.reason ? ' · "' + esc(cs.reason) + '"' : '')
+        + '</div>'
       : '';
     const card = el('<div class="fc' + (f.console_state
       ? ' done' : '') + '"><div>'
@@ -2372,11 +2384,15 @@ async function load() {
       + ' member(s)</div>'
       + '<div class="why">' + esc(f.why) + '</div>'
       + '<div class="members">' + esc((f.member_names
-        || []).join(', ')) + '</div>'
+        || []).join(', ')) + '</div>' + ruledLine
       + '<div class="verbs"></div><div class="land"></div></div>');
-    const verbs = personaSel.value === 'developer'
-      ? ['compare', 'approve_technical', 'fork']
-      : ['compare', 'certify', 'delegate', 'deny'];
+    // a decided flag offers COMPARE (evidence is always legal)
+    // and REOPEN — never a second silent ruling
+    const verbs = cs
+      ? ['compare', 'reopen']
+      : (personaSel.value === 'developer'
+         ? ['compare', 'approve_technical', 'fork']
+         : ['compare', 'certify', 'delegate', 'deny']);
     const vbox = card.querySelector('.verbs');
     for (const v of verbs) {
       // CONSOLE-4 v2: every verb carries its CONSEQUENCE NOTE

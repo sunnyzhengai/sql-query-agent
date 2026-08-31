@@ -667,4 +667,13 @@ watcher) continue. Lifts only by Sunny's word, recorded here.
       reference codesets demoted to lookups → 7 groups became 6)
       + roster lines end at the criterion (reads-tails trimmed).
       Live probe: six clean method groups. 1,376 green + ruff.
-      AWAITS review probe → SUNNY'S DOUBLE READ.
+      **CONSOLE-4 COMPLETE — both cards probe clean; Sunny's
+      double read is GO.**
+- [x] **CONSOLE-5 BUILT (08-31 dev, 1.79.0)** — fold-back was
+      never broken; the EVENT PATH was cwd-relative (a server
+      started elsewhere read an empty store = the double-ruling
+      hazard, traceless). Path now resolves to the repo root with
+      a startup banner stating the fold count; decided cards sink
+      visible w/ actor+date+target; REOPEN appends (never
+      mutates), carries its reason, returns the flag to the open
+      queue. 1,384 green + ruff. AWAITS review.
