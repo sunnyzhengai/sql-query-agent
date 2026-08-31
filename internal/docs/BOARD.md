@@ -637,3 +637,5 @@ do not start (or stop if started; no partial lands). Sunny and
 review are designing the steward-facing compare experience
 together first. Standing guards (nightly battery, fuzzer,
 watcher) continue. Lifts only by Sunny's word, recorded here.
+- [x] HOLD #2 LIFTED (design ratified 2026-08-30 evening) — dev
+      builds CONSOLE-4 v2 per the approved spec in the handoff

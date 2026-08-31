@@ -3324,3 +3324,47 @@ renderings before reverting):
   (columns named, never raw SQL)
 The shape felt viable; whether it IS the steward experience is
 exactly the design question the hold protects. Dev holds ready.
+
+## CONSOLE-4 v2 — DESIGN RATIFIED BY SUNNY (2026-08-30 evening); HOLD #2 FULFILLED AND LIFTED
+The hold existed to design this together; the design is approved.
+Dev builds against THIS spec (supersedes the suspended order):
+
+**One computation:** the DISTINGUISHING SET per member (parsed
+predicates, reads, grain; shared elements as background) — feeds
+every rendering.
+
+**PAIR / ≤3 MEMBERS — the GRID CARD (the approved codeset mock):**
+1. Difference-lead sentence, bolded, first ("The one difference:
+   the reports copy includes one newer code — E11.80…").
+2. Members-as-columns grid, fixed aspect rows: what it is · the
+   distinguishing element (code list/criterion in business words)
+   · selects from · counts (grain) · steward · activity (flywheel
+   weights) · feeds. SAMES MARKED EXPLICITLY ("(same)") so
+   differences pop against proven background.
+3. The 💡 pattern-reading line — deterministic template keyed on
+   computed relations only (e.g., strict-superset-by-1 → "reads
+   as a stale copy, not two purposes").
+4. Verbs with CONSEQUENCE NOTES from the landing map on each
+   button; certify picker as shipped.
+5. NO SQL in steward view. Developer persona: distinguishing
+   snippets labeled per member — never interleaved diffs. Audit:
+   hash verdict + full fragments stay in the event record.
+
+**>3 MEMBERS — the GROUPED ROSTER (the approved 10-cousin mock):**
+- Lead: "N metrics answer to this name with N logics — grouped by
+  how each selects its patients."
+- GROUPS by primary distinguishing element (dominant read +
+  criterion class; headers from the template vocabulary): one
+  line per member = qualified name — distinguishing phrase ·
+  steward · activity.
+- PAIR DRILL-DOWN: select any two → the grid card.
+- Button order flips at scale: differentiate-all leads,
+  designate-official (roster picker) second.
+**LAW: grid ≤3; grouped roster above; pair drill-down anywhere.**
+Template vocabulary: NOT EXISTS→"excludes those with a match in
+X" · IN-list→"N listed values" · COUNT>=→threshold phrase · grain
+via D7 → "counts patients/visits" · fallback for untemplated
+shapes: "has an additional condition on <tables/columns>" +
+developer-view reference (SQL never leaks to steward view).
+Acceptance: Sunny reads BOTH cards (codeset pair; Diabetic
+Patients ten) as steward and rules without seeing SQL.
