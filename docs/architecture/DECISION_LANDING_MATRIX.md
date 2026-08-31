@@ -1,12 +1,14 @@
 # The decision landing matrix — AIVIA · Purview · Collibra
 
-**Status:** DRAFT v2 2026-08-31 — rebuilt on Sunny's three
+**Status:** DRAFT v3 2026-08-31 — rebuilt on Sunny's three
 rulings: (1) HIERARCHY replaces official/sibling, parent is a
 CONCEPT node, never a promoted child; (2) approval happens in the
 customer's DG workflow — Purview's Unified Catalog publish
 workflow (author → steward → expert → owner → published) is
 native, correcting review's earlier claim; (3) NO SYNC — the
-OUTBOX model. Sunny ratifies; the Bridge adapters build from this.
+OUTBOX model; and (4, this revision) **ZERO SCHEMA FOOTPRINT** in
+the customer's tenant (§1a). Sunny ratifies; the Bridge adapters
+build from this.
 
 ## 0. The four workflow rules (crystal, no ambiguity)
 
@@ -19,6 +21,36 @@ OUTBOX model. Sunny ratifies; the Bridge adapters build from this.
 4. **We do not police their catalog between engagements** —
    divergence between catalog text and parsed truth is an X-RAY
    finding (a diagnostic engagement), not a live subsystem.
+
+## 1a. Zero schema footprint (Sunny's ruling, 2026-08-31)
+
+**AIVIA creates NO custom attributes in the customer's catalog.**
+Three consequences, and they replace every `aivia_*` field the
+earlier drafts proposed:
+- **Source is a RELATIONSHIP, never a field** — the term↔asset
+  link (Collibra *governs* / Purview term assignment) IS the
+  statement "this definition comes from that procedure," and it
+  stays correct when objects move. No `aivia_source`, no basis
+  string, no code fragment, no line pointer frozen in their
+  record.
+- **Attribution is a PREFIX in the description text** — every
+  machine-authored description begins `AIVIA agent generated: …`.
+  Honest to every reader in their native UI; needs no schema, no
+  admin setup, survives CSV import; and when a steward rewrites
+  the text, dropping the prefix is itself the signal of human
+  authorship.
+- **Logic identity (the parse hash) stays in AIVIA's OUTBOX** —
+  never written to their catalog. The hash is a normalized
+  fingerprint of a logical unit (not the snippet itself): stable
+  identity for LOGIC, where names are not. We are the party
+  proposing, so we are the party that must remember.
+- Technical explanation, where wanted, is PROSE in the technical
+  description (Collibra) / data-asset description (Purview) — a
+  readable sentence, never a snippet with pointers.
+- **Accepted limit:** with no marker in their catalog, a lost
+  outbox means we can only recognise our own artifacts by the
+  prefix text. Therefore the outbox is a BACKED-UP asset (it is
+  tiny), and the prefix is the human-readable fallback.
 
 ## 1. The OUTBOX (replaces "sync"; AIVIA-local, small)
 
@@ -47,7 +79,7 @@ type) · ❌ absent → AIVIA holds it.
 | assets | ✅ Glossary term (name + definition) · ✅ data asset (proc/view) | ✅ Business Term · ✅ Data Asset (proc/view) |
 | relationships | ✅ term → data asset (term assignment) · ✅ term → steward/expert (contacts) · ✅ term → report asset | ✅ term *governs* asset · ✅ term *responsible* steward (responsibility) · ✅ term → report relation |
 | status | ✅ Draft → Published via publish workflow | ✅ Candidate → Certified (configurable statuses) |
-| attributes | 🔧 custom metadata: `aivia_basis_ref` (proc + decision site), `aivia_parse_hash`, `aivia_proposed_at` | 🔧 custom attributes, same three |
+| attribution | description text begins `AIVIA agent generated: …` (no custom fields) | same |
 | AIVIA keeps | outbox row only | outbox row only |
 
 ### A2+A3 · organize into hierarchy  *(supersedes "designate official" and "differentiate all")*
@@ -58,7 +90,7 @@ attach as children. Optionally mark one child canonical.*
 |---|---|---|
 | assets | ✅ parent glossary term (concept, no proc behind it) · ✅ N child terms (one per variant) | ✅ parent Business Term · ✅ N child Business Terms |
 | relationships | ✅ parent-child term hierarchy · ✅ each child → its proc (term assignment) · ✅ child → report/steward | ✅ hierarchical relation (parent/child) · ✅ child *governs* its proc · ✅ steward responsibility per child |
-| canonical child (optional) | 🔧 `aivia_canonical = true` on the child (Purview has no native "the official one") | 🔧 attribute, or ✅ a configured relation type (`is preferred term`) |
+| canonical child (optional) | ✅ expressed by the hierarchy itself + description wording (Purview has no native "official one"; no custom field is added) | ✅ a configured relation type (`is preferred term`) where the estate already has one |
 | rename work | ❌ no native task → **AIVIA console work list** | ✅ native workflow task assignment |
 | AIVIA keeps | outbox rows + open rename list where the tool has no task surface | outbox rows |
 
@@ -66,8 +98,8 @@ attach as children. Optionally mark one child canonical.*
 | | Purview | Collibra |
 |---|---|---|
 | assets | ✅ the term (stays, not published) | ✅ the term |
-| status | ✅ workflow rejection (term not published); 🔧 `aivia_denied = true` for explicit denied-state (Purview's status set is not user-configurable) | ✅ status = Rejected/Denied (configurable) |
-| attributes | 🔧 `aivia_denied_reason`, `aivia_denied_by`, `aivia_denied_at` | 🔧 same, or ✅ native comment + workflow reason |
+| status | ✅ workflow rejection (the term is not published) — Purview's status set is not user-configurable, and we add no field; the rejection IS the record | ✅ status = Rejected/Denied (configurable) |
+| reason | ✅ workflow rejection comment | ✅ native comment / workflow reason |
 | AIVIA keeps | outbox row with `last_seen_outcome = denied` — **rule 2 then prevents re-proposal for that logic-hash** (no "memory" beyond this) | same |
 
 ### A5 · approve technical write  *(NOTE: approval happens in THEIR workflow)*
@@ -124,9 +156,11 @@ paid diagnostic, consistent with rule 4.
 
 ## 5. Open at ratification
 
-1. Purview custom-metadata attribute names (the `aivia_*` set)
-   and v1 transport: file-first (ruled) vs the Unified Catalog
-   API (preview) for stage 2.
+1. CLOSED 2026-08-31 (zero schema footprint, §1a): no attribute
+   names to decide. Remaining sub-question — v1 transport:
+   file-first (ruled) for v1; the Unified Catalog API (public
+   preview) evaluated for stage 2 against a design-partner
+   tenant.
 2. Collibra operating-model relation types on Sunny's target
    estates (her expertise).
 3. Canonical-child marking: attribute (both tools) vs a
