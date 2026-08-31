@@ -9,7 +9,7 @@ customer's system of record before the content is proven would
 deliver wrong text faster. Everything below is in dependency
 order; nothing skips ahead.
 
-### P0 — PROVE DESCRIPTION GENERATION (the only LLM-authored artifact)
+### P0 — PROVE DESCRIPTION GENERATION (ORDERED 2026-08-31, re-cut: P0-a gate extension → P0-b live corpus → P0-c 790-proc run + Sunny's hand-graded sample)
 - [ ] **DESC-GATE-1 — PREMISE CORRECTED BY DEV SURVEY (08-31,
       nothing built):** a grounding gate ALREADY EXISTS and is
       field-proven — src/descriptions.py `grounding_violations()`

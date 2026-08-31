@@ -3737,3 +3737,44 @@ smaller, sharper task with a red-first fixture per class), and
 DESC-CORPUS-1 gets the fuzzer treatment we already proved on the
 workbench (generate → assert → misses are gate food). Awaiting
 review/Sunny's word before I start.
+
+## ORDER P0 (RE-CUT) — prove description generation (Sunny, 2026-08-31)
+Ordered against dev's survey (the gate exists; these are the real
+gaps). Sequence matters: extend the gate BEFORE running the
+corpus, so the corpus measures the gate we intend to ship.
+
+**P0-a · DESC-GATE-2 — extend the grounding gate to TABLE + GRAIN**
+- TABLE claims: a description may name only tables the fragment
+  actually reads (parsed reads set); naming any other table is a
+  violation → corrective retry → surgical fallback, exactly as
+  the value/filter classes work today.
+- GRAIN claims: "patients" vs "visits" vs "encounters" vs
+  "rows"/"records" must agree with the parsed grain (the D7
+  analysis — DISTINCT/GROUP BY/key columns). A wrong grain claim
+  is the most dangerous description error we can ship: it reads
+  fluent and it is false.
+- RED-FIRST per class: a fixture that fails before the extension
+  and passes after, for each of table-claim and grain-claim.
+- Keep the existing dialect awareness and the retry+fallback
+  wiring; no new gate, one gate.
+
+**P0-b · DESC-CORPUS-1 — adversarial corpus over LIVE generation**
+- Not fixtures of outputs: real fragments → real generation →
+  gate → grade. Classes to cover: inclusion vs exclusion
+  (E11% with/without O24.4%), grain shifts (patient vs visit),
+  thresholds (>=6.5 vs >6.5), negation (NOT EXISTS), multi-table
+  joins, empty/degenerate procs, DAX measures.
+- Report per class: violations caught, retries that recovered,
+  fallbacks used. Failures are gate food — extend, re-run.
+
+**P0-c · DESC-LIVE-1 — the real corpus run**
+- Generate over the REAL 790-proc corpus (not the demo estate),
+  record the gate's aggregate behaviour (violation rate, retry
+  recovery rate, fallback rate), and produce a SAMPLE FILE
+  (~30 descriptions with their fragments side by side) for
+  Sunny's hand grading — she is the acceptance for accuracy.
+- Honest reporting required: if the fallback rate is high, that is
+  a finding about generation quality, not a failure to hide.
+
+Review verifies each; P1 (term proposal) waits on P0-c's sample
+passing Sunny's read. Nothing integrates before both.
