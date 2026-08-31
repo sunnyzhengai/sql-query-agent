@@ -688,6 +688,21 @@ watcher) continue. Lifts only by Sunny's word, recorded here.
       red-on-bug: async cases reported ok BEFORE their assertions
       ran (a green that could not fail) — now awaited; classList
       added. 1,384 green + ruff.
-- [ ] **CONSOLE-6 item 2 — SUNNY'S RULING (not built):** decided
-      cards (a) keep in list sunk w/ chip+reopen, or (b) move to a
-      "Resolved (N) — show" section (review recommends b).
+- [ ] **CONSOLE-6 item 2 — RESOLVED IN PRINCIPLE by the landing
+      matrix §E (draft 08-31), awaiting Sunny's ratification of
+      that doc:** decided cards become HANDOFF RECEIPTS — state
+      chip + approver + "written to <catalog> → [open in
+      catalog]" (or "queued for export" in file-first), sunk
+      beneath open work behind a Resolved (N) filter. Dev builds
+      on ratification; nothing built yet (the matrix is DRAFT and
+      carries four open calls).
+- [ ] **Decision landing matrix (DRAFT 08-31) — Sunny ratifies:**
+      docs/architecture/DECISION_LANDING_MATRIX.md maps every
+      decision to Purview/Collibra native-vs-customizable, with
+      the governing rule "assertions go to the customer's DG
+      tool; AIVIA keeps provenance + machine signals only — a
+      record with no reader is exhaust". Four open calls (§F):
+      Purview attribute names + preview-API vs file-first ·
+      Collibra relation types on her estates · delegate-queue
+      acceptability in Purview estates · denial suppression
+      window (recommend: until the SQL changes).
