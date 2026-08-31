@@ -10,11 +10,16 @@ deliver wrong text faster. Everything below is in dependency
 order; nothing skips ahead.
 
 ### P0 — PROVE DESCRIPTION GENERATION (the only LLM-authored artifact)
-- [ ] **DESC-GATE-1:** generated descriptions must be gate-checked
-      against their OWN parsed evidence — a sentence may assert
-      only tables/predicates/grain present in the parse; anything
-      else floors to a machine-composed fallback. (The workbench
-      claim-vs-evidence discipline, applied to Bridge.)
+- [ ] **DESC-GATE-1 — PREMISE CORRECTED BY DEV SURVEY (08-31,
+      nothing built):** a grounding gate ALREADY EXISTS and is
+      field-proven — src/descriptions.py `grounding_violations()`
+      checks ungrounded VALUES + filter-CLAIMS against the SQL's
+      deciding windows, dialect-aware, wired with a corrective
+      retry + surgical fallback, 33 tests. The real gap is an
+      EXTENSION: TABLE assertions and GRAIN are unchecked today.
+      Recommend re-cutting this item as "extend the gate to table
+      + grain claims, red-first fixture per class". Full survey in
+      the handoff.
 - [ ] **DESC-CORPUS-1:** adversarial fixture corpus + fuzzer pass
       over live generation (not palette fixtures): inclusion vs
       exclusion, grain, thresholds, joins, negations, empty/odd

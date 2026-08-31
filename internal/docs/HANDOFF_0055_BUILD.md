@@ -3695,3 +3695,45 @@ and dev's own harness false-green on async cases killed (awaited
 handlers + classList assertions) — the test that would have let
 this class through is now honest. Item 2 (decided-card
 treatment) remains Sunny's ruling; nothing built.
+
+### 2026-08-31 — P0 SURVEY BEFORE BUILD (dev, no code yet)
+Read the ordering ruling ("validate before we integrate") and
+surveyed what exists before starting DESC-GATE-1, because the P0
+premise is partly out of date. Findings, so the order can be
+re-cut against the real state:
+
+**A grounding gate ALREADY EXISTS and is field-proven.**
+src/descriptions.py `grounding_violations()` (built 2026-08-19
+from the TRACE_USP_ED_SEPSIS failure) mechanically checks a
+generated description against the ONE fragment it describes:
+(1) every literal value in the output must exist in the source —
+the invented-flowsheet-IDs class; (2) filter CLAIMS ("excludes",
+"only", "requires") must appear in the SQL's DECIDING windows
+(WHERE/ON/HAVING/AND/WHEN), not merely the SELECT list — the
+selected-not-filtered class. Dialect-aware (sql | dax | prose,
+after a live find on a legitimate DAX CALCULATE filter). It is
+wired into generation with ONE corrective retry and a surgical
+fallback (`describe() + gate + retry + fallback`), and the prompt
+version rides the cache key so a prompt change regenerates
+everything. Tests: tests/test_grounding_gate.py (10) +
+tests/test_descriptions.py (23) + a tree-contract assertion.
+
+**What P0 therefore still needs (the real gap):**
+- DESC-GATE-1 is NOT a new gate — it is an EXTENSION: today the
+  gate checks values and filter-claims; the order asks for
+  tables/predicates/GRAIN. Grain and table assertions are
+  unchecked, and a claim that names a table the fragment never
+  reads would pass today.
+- DESC-CORPUS-1 (adversarial corpus over LIVE generation) does
+  not exist. tests/ are fixture-based; devtools/grounding_evals.py
+  is the AGENT's harness (retrieval/refusal), not the
+  description generator's.
+- DESC-LIVE-1 (run over the real 790-proc corpus, hand-graded)
+  has never been done — the board's honest state stands here.
+
+**Nothing built.** Recommendation for the re-cut: DESC-GATE-1
+becomes "extend the existing gate to table + grain claims" (a
+smaller, sharper task with a red-first fixture per class), and
+DESC-CORPUS-1 gets the fuzzer treatment we already proved on the
+workbench (generate → assert → misses are gate food). Awaiting
+review/Sunny's word before I start.
