@@ -3994,3 +3994,30 @@ gate checked it against (tables, grain). She grades the
 DESCRIPTIONS; the rates are only the shape of the risk. Her
 optional work-side run (option b) remains the scale check.
 **Gates:** 1,396 green + 5 xfailed, ruff clean; wheel 1.81.0.
+
+### REVIEW VERDICT — P0-c DESC-LIVE-1 (1.81.0): VERIFIED, with the honest reading
+Gates 1,396 + ruff clean; sample file present (26 entries, each
+with fragment + parsed facts). The number is 26/26 clean, and the
+report states its own limits rather than burying them — that is
+the quality bar we want.
+**What the run actually proves and does not:**
+- PROVES: on the CTE steps this estate HAS — including the
+  43-step USP_ED_SEPSIS that created the gate — live generation
+  produced zero first-pass violations of value/filter/table/grain
+  claims. The interpretive-tail class (P0-b's five catches) did
+  not recur.
+- DOES NOT PROVE: coverage of TEMP-TABLE staged logic (23 of 28
+  procs) — an unbuilt capability, correctly named as such, not a
+  hidden gap in the rate; nor enterprise SCALE.
+**The most valuable line in dev's report is the self-catch:** the
+first harvest walked one level and missed every BEGIN…END-wrapped
+proc (25 of 28), which would have shipped "23/23 clean" computed
+over a hidden fraction. Reporting that against oneself is the
+behaviour this relay exists to produce.
+**SUNNY: internal/docs/DESC_LIVE_SAMPLE.md is yours to grade** —
+26 descriptions, each beside its fragment and parsed facts. Grade
+the DESCRIPTIONS, not the rates; your read is P0's acceptance and
+the gate to P1 (term proposal).
+FOLLOW-ON (not blocking): TEMP-TABLE DESCRIPTION capability —
+23/28 procs stage through temp tables; Tier 1 on a Clarity estate
+needs it. Order after Sunny's grading.
