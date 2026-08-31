@@ -3808,3 +3808,16 @@ supported it, so the FIXTURE was wrong, not the gate. Corrected,
 and the honest-both-grains case added as its own test.
 **Gates:** 1,393 green + 5 xfailed, ruff clean; wheel 1.80.0.
 NEXT: P0-b (adversarial corpus over LIVE generation).
+
+### REVIEW VERDICT — P0-a DESC-GATE-2 (1.80.0): VERIFIED BEHAVIOURALLY
+Gates 1,393 + ruff clean. Independent behaviour probe (review's
+own fragment, not dev's fixtures): an honest description passes;
+a table lie is caught ("ungrounded table claim: 'LAB_RESULTS' —
+the fragment reads diagnosis_codes"); a grain lie is caught
+("grain claim 'visit' contradicts the parsed grain (patient)").
+Both messages name the violated fact and the parsed truth, so the
+corrective retry has something to correct against. One gate, both
+new classes, dialect awareness intact.
+NEXT: P0-b (adversarial corpus over LIVE generation) — the real
+question is not whether the gate catches lies in isolation but
+what the LIVE generator actually produces at rate.
