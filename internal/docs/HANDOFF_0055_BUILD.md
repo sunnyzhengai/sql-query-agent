@@ -3534,3 +3534,31 @@ Sunny):**
    END at the criterion). Trim tails; cap the phrase at its
    distinguishing clause(s).
 Then: probe → Sunny's double read.
+
+### 2026-08-31 — CONSOLE-4e BUILT — release 1.78.1
+1. **Headers name the METHOD, not the column.** The table→business
+   word map is TOKEN-DRIVEN, never an allowlist — domain nouns the
+   parser already sees in table names (diagnos/icd → diagnosis
+   records · lab → lab results · med/rx → medication orders ·
+   cpt/billing/claim/charge → billing records · appointment/appt →
+   appointment records · encounter/visit/admission → encounter
+   records · pcp/panel/roster → panel membership · registry →
+   registry membership · proc/surg/case → procedure records), with
+   a "*_CODESET → (reference list)" shape rule. An estate we have
+   never seen still reads as itself (WEIRD_CUSTOM_TBL → "weird
+   custom tbl") — the map degrades, never fabricates.
+2. **A reference codeset is a LOOKUP, never a method:** it names a
+   group only when the member reads nothing else distinctive. Live
+   effect: the "By diagnosis codeset" group dissolved into the real
+   methods — SEVEN groups became SIX, correctly.
+3. **Roster lines END at the criterion:** "additionally reads X"
+   tails are grid material (the reads row already carries them) and
+   are trimmed from roster phrases — unless a read is the member's
+   ONLY distinguishing element, where it stays.
+**Live probe:** six method groups — appointment records ·
+billing records · diagnosis records (2) · encounter records (4) ·
+lab results · medication orders — every line ending at its
+criterion.
+**Gates:** 1,376 green + 5 xfailed, ruff clean; wheel 1.78.1.
+Next: review's probe, then SUNNY'S DOUBLE READ (pair grid +
+ten-member roster, as steward, no SQL).

@@ -112,8 +112,52 @@ def _col(token: str) -> str:
     return token.strip("[]").split(".")[-1].strip("[]")
 
 
+# CONSOLE-4e: the METHOD word for a source — token-driven, never a
+# table allowlist (it must read right on any customer estate). The
+# tokens are DOMAIN nouns the parser already sees in table names;
+# the suffix rules ("*_CODESET" is a reference list, "*_ORDERS" are
+# orders) carry the shape. Unmapped tables humanize as themselves.
+_METHOD_TOKENS = (
+    ("diagnos", "diagnosis records"),
+    ("icd", "diagnosis records"),
+    ("problem", "problem-list records"),
+    ("lab", "lab results"),
+    ("med", "medication orders"),
+    ("rx", "medication orders"),
+    ("cpt", "billing records"),
+    ("billing", "billing records"),
+    ("claim", "billing records"),
+    ("charge", "billing records"),
+    ("appointment", "appointment records"),
+    ("appt", "appointment records"),
+    ("visit", "encounter records"),
+    ("encounter", "encounter records"),
+    ("admission", "encounter records"),
+    ("registry", "registry membership"),
+    ("panel", "panel membership"),
+    ("pcp", "panel membership"),
+    ("roster", "panel membership"),
+    ("procedure", "procedure records"),
+    ("proc", "procedure records"),
+    ("surg", "procedure records"),
+    ("case", "procedure records"),
+)
+
+
+def _method_word(table: str) -> str:
+    """The business word for a source table — what a steward calls
+    the METHOD of selection, not the column it filters on."""
+    bare = table.strip("[]").split(".")[-1].lower()
+    for token, word in _METHOD_TOKENS:
+        if token in bare:
+            if bare.endswith("codeset") or bare.endswith("codesets"):
+                return f"{word} (reference list)"
+            return word
+    return bare.replace("_", " ")
+
+
 def _humanize(table: str) -> str:
-    return table.strip("[]").split(".")[-1].replace("_", " ").lower()
+    return _method_word(table)
 
 
 def distinguishing_set(member_rows: "dict[str, dict]") -> dict:
@@ -483,6 +527,13 @@ def compose_conclusion(outputs: "list[dict]", caption: str,
                 # unique set is for the grid, not the key)
                 method_reads = [r for r in m["reads"]
                                 if r not in background]
+                # CONSOLE-4e: a *_CODESET/reference table is a
+                # LOOKUP, not a method — it only names the group
+                # when the member reads nothing else distinctive
+                primary = [r for r in method_reads
+                           if "(reference list)"
+                           not in _method_word(r)]
+                method_reads = primary or method_reads
                 els = dset["members"].get(m["id"], [])
                 preds = [v for k, v in els if k == "pred"]
                 if method_reads:
@@ -494,7 +545,13 @@ def compose_conclusion(outputs: "list[dict]", caption: str,
                               if cm else "By shared sources")
                 else:
                     header = "By shared logic"
-                plain = m["distinguishing_plain"]
+                # CONSOLE-4e item 2: the roster line ENDS at the
+                # criterion — "additionally reads X" is grid
+                # material (the reads row), noise on a roster line
+                plain = [ph for ph in m["distinguishing_plain"]
+                         if not ph.startswith("additionally reads")]
+                if not plain:
+                    plain = m["distinguishing_plain"]
                 degraded = all("developer view" in ph
                                for ph in plain) if plain else True
                 if degraded and m["description"]:

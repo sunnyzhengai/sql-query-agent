@@ -660,5 +660,11 @@ watcher) continue. Lifts only by Sunny's word, recorded here.
       label form per family; compound predicates phrase every
       clause (gestational twins now distinct); all-distinct never
       says "shared logic only"; spot-asserts vs real SQL. Live
-      roster probe TRUTH-CLEAN. 1,373 green + ruff. AWAITS review
-      → Sunny reads BOTH cards as steward, no SQL.
+      roster probe TRUTH-CLEAN. 1,373 green + ruff. **TRUTH
+      VERIFIED by review; two cosmetics → CONSOLE-4e.**
+- [x] **CONSOLE-4e BUILT (08-31 dev, 1.78.1)** — method-word
+      headers (token-driven map, degrades on unseen estates;
+      reference codesets demoted to lookups → 7 groups became 6)
+      + roster lines end at the criterion (reads-tails trimmed).
+      Live probe: six clean method groups. 1,376 green + ruff.
+      AWAITS review probe → SUNNY'S DOUBLE READ.

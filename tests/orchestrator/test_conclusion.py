@@ -513,7 +513,8 @@ class TestConsole4c:
         c = compose_conclusion(self._cousins(specs), "", True)
         assert c["mode"] == "roster"
         headers = {g["header"] for g in c["roster"]}
-        assert "By diagnosis codes" in headers
+        # CONSOLE-4e: headers are METHOD words, not column names
+        assert "By diagnosis records" in headers
         assert "By lab results" in headers
         # groups hold PAIRS, not singletons
         sizes = sorted(len(g["members"]) for g in c["roster"])
@@ -675,3 +676,87 @@ class TestConsole4dCompoundAndLabels:
         assert len(labels) == 6
         assert all(lb.endswith(")") and "(reporting.USP_M" in lb
                    for lb in labels), labels
+
+
+class TestConsole4eMethodWords:
+    """CONSOLE-4e: headers name the METHOD (business word), not
+    the filter column; roster lines end at the criterion; a
+    reference codeset is a lookup, never a method."""
+
+    def test_method_words_are_token_driven_not_a_table_list(self):
+        from src.orchestrator.conclusion import _method_word
+        assert _method_word("DBO.CPT_CODES") == "billing records"
+        assert _method_word("PROFESSIONAL_BILLING") == \
+            "billing records"
+        assert _method_word("APPOINTMENTS") == "appointment records"
+        assert _method_word("HOSPITAL_ENCOUNTERS") == \
+            "encounter records"
+        assert _method_word("PATIENT_PCP_ASSIGNMENT") == \
+            "panel membership"
+        assert _method_word("DIAGNOSIS_CODESET") == \
+            "diagnosis records (reference list)"
+        # an estate we have never seen still reads as itself
+        assert _method_word("WEIRD_CUSTOM_TBL") == "weird custom tbl"
+
+    def test_roster_line_ends_at_the_criterion(self):
+        rows, groups = [], []
+        for i in range(4):
+            mid = f"reporting.USP_R{i}"
+            rows.append({
+                "id": mid, "kind": "metric",
+                "business_name": f"Cousin {i}",
+                "description": "d",
+                "source_tables": f"LAB_RESULTS, EXTRA_{i}",
+                "steward": "",
+                "decision_sites": [{
+                    "expression_sql": f"HBA1C_VALUE >= {6 + i}"}]})
+            groups.append({"group": i + 1, "members": [mid]})
+        c = compose_conclusion([
+            {"component": {"op": "retrieve", "params": {}},
+             "result": {"op": "retrieve", "params": {},
+                        "complete": True, "universe": "u",
+                        "rows": rows}},
+            {"component": {"op": "compare", "params": {}},
+             "result": {"op": "compare", "params": {},
+                        "complete": True, "universe": "u",
+                        "note": "4 hash groups — DIFFERS.",
+                        "rows": groups}}], "", True)
+        for g in c["roster"]:
+            for m in g["members"]:
+                assert "additionally reads" not in m["phrase"]
+                assert "requires HBA1C_VALUE at least" in m["phrase"]
+
+    def test_reference_codeset_never_names_a_group(self):
+        rows, groups = [], []
+        specs = [("DIAGNOSIS_CODES, DIAGNOSIS_CODESET", "A"),
+                 ("DIAGNOSIS_CODES", "B")]
+        for i, (tbls, nm) in enumerate(specs):
+            mid = f"reporting.USP_{nm}"
+            rows.append({"id": mid, "kind": "metric",
+                         "business_name": f"Fam {nm}",
+                         "description": "d", "source_tables": tbls,
+                         "steward": "",
+                         "decision_sites": [{
+                             "expression_sql": f"ICD LIKE 'E1{i}%'"}]})
+            groups.append({"group": i + 1, "members": [mid]})
+        rows += [{"id": f"reporting.USP_X{i}", "kind": "metric",
+                  "business_name": f"Fam X{i}", "description": "d",
+                  "source_tables": "LAB_RESULTS", "steward": "",
+                  "decision_sites": [{
+                      "expression_sql": f"HBA1C >= {i}"}]}
+                 for i in range(2)]
+        groups += [{"group": 3 + i,
+                    "members": [f"reporting.USP_X{i}"]}
+                   for i in range(2)]
+        c = compose_conclusion([
+            {"component": {"op": "retrieve", "params": {}},
+             "result": {"op": "retrieve", "params": {},
+                        "complete": True, "universe": "u",
+                        "rows": rows}},
+            {"component": {"op": "compare", "params": {}},
+             "result": {"op": "compare", "params": {},
+                        "complete": True, "universe": "u",
+                        "note": "4 hash groups — DIFFERS.",
+                        "rows": groups}}], "", True)
+        headers = {g["header"] for g in c["roster"]}
+        assert not any("reference list" in h for h in headers)
