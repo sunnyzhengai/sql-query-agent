@@ -3687,3 +3687,11 @@ every future async case.
 sunk, full colour with chip+reopen, or (b) a "Resolved (N) — show"
 section (review recommends b: an inbox is a work queue, not an
 archive).
+
+### REVIEW VERDICT — CONSOLE-6 items 1+3 (1.79.1): VERIFIED
+Gates 1,384 + ruff clean. One evidence block per flag (replace,
+not append); click feedback with pressed state + working label;
+and dev's own harness false-green on async cases killed (awaited
+handlers + classList assertions) — the test that would have let
+this class through is now honest. Item 2 (decided-card
+treatment) remains Sunny's ruling; nothing built.
