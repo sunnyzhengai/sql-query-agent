@@ -3412,3 +3412,27 @@ Patients ten) as steward and rules without seeing SQL.
 **Gates:** 1,361 green + 5 xfailed, ruff clean; wheel 1.77.0.
 **Acceptance:** Sunny reads BOTH cards (codeset pair; Diabetic
 Patients ten) as steward and rules without seeing SQL.
+
+### REVIEW — CONSOLE-4 v2 (1.77.0): PAIR GRID VERIFIED; ROSTER NEEDS CONSOLE-4c
+Gates 1,361 + ruff clean. PAIR CARD passes every probe:
+difference-lead with qualified name · 4-aspect grid · sames
+marked · deterministic pattern line ("strict superset by a single
+value — reads as a stale copy") · ZERO SQL in steward payload.
+**ROSTER (CONSOLE-4c, blocks Sunny's read):** populated but the
+template vocabulary leaked plumbing:
+1. Group headers are member-specific predicate phrases ("limits
+   CC.CPT_CODE to 2 listed value(s)") — groups collapse to
+   singletons. Spec: group key = DOMINANT DISTINGUISHING READ
+   (method); headers "By <business word>: diagnosis codes /
+   lab results / medication orders / billing records /
+   panel-scoped" from the table→word map.
+2. Member phrases chain EQUIJOIN predicates ("requires X exactly
+   Y") — joins are structural plumbing, never criteria: filter
+   equijoin column-pair predicates OUT of the distinguishing set
+   before phrasing.
+3. Alias-qualified columns (CC.CPT_CODE) face the steward —
+   resolve aliases to table names or suppress; phrase length cap;
+   when templates degrade, the RW-6 description LEADS and the
+   template phrase folds.
+Acceptance: the ten-member roster reads like the ratified mock —
+five groups, one business line per member.
