@@ -3913,3 +3913,26 @@ the re-cut, Sunny/review to choose:
 My recommendation is (a) now — it unblocks P1 with real measured
 rates — with (b) as an optional confirmation Sunny may choose at
 her convenience. Nothing built until the choice lands.
+
+## RULING (Sunny, 2026-08-31): P0-c RUNS ON OPTION (a) — OUR OWN CORPUS
+Run P0-c over the 28 de-dialected synthetic procs (~65 CTE steps)
++ the shapes estate (37 metric compositions) — ~100 descriptions.
+No wall crossing; the work estate stays where it belongs, and
+review's original "790-proc" wording was the error (it named a
+WORK artifact — corrected here, and the claims-scale rule already
+binds our public claims to this same synthetic corpus).
+Deliverables unchanged from the P0-c order:
+1. Aggregate gate behaviour, reported honestly: violation rate by
+   class (value / filter / table / grain / interpretive-tail),
+   retry-recovery rate, surgical-fallback rate, empty rate.
+2. A SAMPLE FILE (~30 descriptions, each beside its fragment and
+   its parsed facts) for Sunny's hand grading — she is the
+   acceptance for accuracy, not the rates.
+3. **Honest-floor caveat recorded with the numbers:** the
+   synthetic corpus is modelled on Clarity patterns but is
+   SIMPLER than a real hospital estate, so measured rates are a
+   FLOOR ON DIFFICULTY, not a ceiling. Any place we quote these
+   rates must carry that sentence.
+Optional later confirmation (Sunny's convenience, not a gate):
+run generation at work against Clarity and report aggregate rates
+only — no text crosses the wall.
