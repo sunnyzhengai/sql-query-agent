@@ -3643,3 +3643,19 @@ visible again at the bottom of the console, with your name and
 the time. The double read stands: the Diabetic Codeset pair now
 shows "official designated"; the Diabetic Patients ten remains
 open for the roster read.
+
+## ORDER CONSOLE-6 (Sunny's double-read passes with three UX finds)
+**Her verdict: both cards read clearly — "much clearer than
+earlier."** Three fixes:
+1. **One evidence block per flag** — a fresh compare REPLACES the
+   card's evidence (round ref updates) instead of appending; no
+   duplicate DIFFERS stacks. The event trail keeps every press
+   for audit; the card shows current evidence only.
+2. **Decided-card treatment: AWAITING SUNNY'S RULING** — (a) keep
+   in list, full colour, status chip + reopen, sunk; or (b) leave
+   the open queue for a "Resolved (N) — show" section/filter.
+   Review recommends (b) with a visible count: a steward inbox is
+   a work queue, not an archive. DO NOT BUILD until she rules.
+3. **Click feedback** — pressed state + inline "working…" on the
+   button during the op (also prevents the double-press that
+   produced find 1); clears when evidence renders.
