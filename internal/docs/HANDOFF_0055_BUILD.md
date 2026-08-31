@@ -3860,3 +3860,23 @@ had no correction guidance).
 **Gates:** 1,396 green + 5 xfailed, ruff clean; wheel 1.80.1.
 Report: internal/docs/DESC_CORPUS_REPORT.md. NEXT: P0-c (the real
 790-proc run + Sunny's hand-graded sample).
+
+### REVIEW VERDICT — P0-b DESC-CORPUS-1 (1.80.1): VERIFIED
+Gates 1,396 + ruff clean. The corpus is real (fragments → live
+generation → gate → grade) and the result is meaningful: 11 cases,
+6 clean, 5 recovered by the corrective retry, 0 fallbacks, 0
+fabrications surviving. Three things worth carrying forward:
+1. **The interpretive tail is now a named class** — accurate
+   description + appended clinical inference the SQL cannot
+   support. The gate caught all five as ungrounded filter claims;
+   fixture-pinned. This is the class most likely to embarrass us
+   in a customer's catalog, and it is the one a naive reader would
+   have called "a nice description".
+2. **The two dry-run gate defects were the day's cheapest finds**
+   (alias-as-grain, encounter-shaped keys): both would have
+   produced FALSE VIOLATIONS on honest text — i.e. the gate was
+   over-strict, not lax. Fixed before spending an LLM call.
+3. Scale caveat, stated for P0-c: 11 curated cases is a
+   smoke-test, not a rate. The 790-proc run is what produces
+   honest rates, and Sunny's hand-graded sample is what produces
+   the verdict.
