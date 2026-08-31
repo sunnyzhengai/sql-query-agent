@@ -3821,3 +3821,42 @@ new classes, dialect awareness intact.
 NEXT: P0-b (adversarial corpus over LIVE generation) — the real
 question is not whether the gate catches lies in isolation but
 what the LIVE generator actually produces at rate.
+
+### 2026-08-31 — P0-b (DESC-CORPUS-1) BUILT + RUN LIVE — release 1.80.1
+**devtools/desc_corpus.py:** real fragments → REAL generation →
+the gate → graded, over the ordered classes (inclusion, exclusion,
+patient/visit grain, >= vs >, NOT EXISTS, multi-join, aggregate,
+degenerate empty + literal). A `--dry` mode prints each case's
+PARSED facts (tables, grain) without spending a call.
+
+**LIVE RESULT (11 cases): clean 6 · recovered 5 · salvaged 0 ·
+emptied 0.** The generator never fabricated past the corrective
+retry, and no case needed the surgical fallback.
+
+**What the five catches actually were — a distinct failure class
+worth naming:** the model wrote an ACCURATE description and then
+appended an INTERPRETIVE tail — clinical inference the SQL cannot
+support ("helps identify patients who may require outreach for
+care coordination", "targeting individuals who may require further
+medical evaluation"). Not a value lie, not a table lie: a
+plausible-sounding recommendation. The gate caught every one as an
+ungrounded filter claim and the retry removed them. Pinned as a
+fixture so the class cannot regress.
+
+**Two gate defects the DRY RUN exposed before any LLM call (the
+cheapest finds of the day):**
+1. **Alias leak into grain:** `FROM ENCOUNTER_DIAGNOSIS ED` made
+   every column look encounter-grained, so a legitimate "patients"
+   claim would have violated. Keys are now read from KEY COLUMNS
+   (*_ID/_KEY/_NO/_NUM, alias stripped), never table names.
+2. **Encounter-shaped keys unseen:** `HOSP_ENC_ID` yielded NO
+   grain (the pattern only matched `_ID` with an entity word);
+   `enc_`/`_enc`/`appt` joined the visit tokens. Visit-grain
+   fragments now read as visit-grain.
+Both pinned as tests; the retry note now names all four classes
+(it only mentioned values and filters, so a table/grain violation
+had no correction guidance).
+
+**Gates:** 1,396 green + 5 xfailed, ruff clean; wheel 1.80.1.
+Report: internal/docs/DESC_CORPUS_REPORT.md. NEXT: P0-c (the real
+790-proc run + Sunny's hand-graded sample).

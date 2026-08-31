@@ -197,3 +197,46 @@ class TestGrainClaims:
                                      dialect=dialect)
             assert not any("grain claim" in x or "table claim" in x
                            for x in v), (dialect, v)
+
+
+class TestP0bCorpusFindings:
+    """P0-b live-run findings, pinned as fixtures so the classes the
+    corpus exposed cannot regress."""
+
+    def test_interpretive_tail_is_caught(self):
+        """The live generator's characteristic failure: an accurate
+        description followed by a CLINICAL INFERENCE the SQL does
+        not support ("helps identify patients who may require
+        outreach"). Caught as an ungrounded filter claim; the
+        corrective retry removed it in every live case."""
+        frag = ("SELECT LR.PATIENT_ID FROM LAB_RESULTS LR "
+                "WHERE LR.HBA1C_VALUE >= 6.5")
+        text = ("- selects PATIENT_ID from LAB_RESULTS\n"
+                "- the selection requires HBA1C_VALUE of at least "
+                "6.5\n"
+                "- By filtering on this threshold, the query helps "
+                "in targeting individuals who may require further "
+                "medical evaluation or intervention.")
+        v = grounding_violations(text, frag)
+        assert any("targeting individuals" in x for x in v), v
+
+    def test_alias_does_not_leak_into_grain(self):
+        """Dry-run find: FROM ENCOUNTER_DIAGNOSIS ED made every
+        column look encounter-grained, so a patient claim wrongly
+        violated. Keys are read from KEY COLUMNS, not table names."""
+        from src.descriptions import parsed_grain
+        frag = ("SELECT DISTINCT ED.PATIENT_ID FROM "
+                "ENCOUNTER_DIAGNOSIS ED WHERE ED.DX_CODE "
+                "LIKE 'E11%'")
+        assert parsed_grain(frag) == {"patient"}
+        v = grounding_violations("- counts patients", frag)
+        assert not any("grain claim" in x for x in v), v
+
+    def test_encounter_shaped_keys_are_visit_grain(self):
+        from src.descriptions import parsed_grain
+        frag = ("SELECT HE.HOSP_ENC_ID, HE.ADMIT_DATE FROM "
+                "HOSPITAL_ENCOUNTERS HE WHERE "
+                "HE.ENCOUNTER_TYPE = 'ED'")
+        assert parsed_grain(frag) == {"visit"}
+        assert any("grain claim" in x for x in
+                   grounding_violations("- counts patients", frag))

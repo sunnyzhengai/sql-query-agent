@@ -156,8 +156,8 @@ _CTE_NAMES = re.compile(r"(?is)(?:WITH|,)\s*([A-Za-z_][\w]*)\s+AS\s*\(")
 # tokens that evidence each. Word-grain, never question shapes.
 _GRAIN_WORDS = {
     "patient": ("patient", "member", "person", "mrn"),
-    "visit": ("visit", "encounter", "admission", "appointment",
-              "stay"),
+    "visit": ("visit", "encounter", "enc_", "_enc", "admission",
+              "appointment", "appt", "stay"),
     "order": ("order", "prescription", "med_order"),
     "claim": ("claim", "billing", "cpt", "charge"),
     "result": ("result", "lab", "observation"),
@@ -195,14 +195,15 @@ def parsed_grain(fragment: str) -> "set[str]":
     frag = fragment or ""
     explicit = " ".join(re.findall(
         r"(?is)\b(?:DISTINCT|GROUP\s+BY)\b(.{0,160})", frag))
-    if explicit.strip():
-        keys = explicit
-    else:
-        select_list = " ".join(re.findall(
-            r"(?is)\bSELECT\b(.*?)\bFROM\b", frag))
-        ids = re.findall(r"(?i)\b([\w.\[\]]*_ID)\b", select_list)
-        keys = " ".join(ids)
-    keys_low = keys.lower()
+    source = explicit if explicit.strip() else " ".join(re.findall(
+        r"(?is)\bSELECT\b(.*?)\bFROM\b", frag))
+    # KEY columns only — an *_ID / *_KEY / *_NO column names the row.
+    # The table alias is stripped first: FROM ENCOUNTER_DIAGNOSIS ED
+    # must not make every column look encounter-grained (dry-run find,
+    # P0-b corpus: the table NAME was leaking into key matching).
+    ids = re.findall(r"(?i)\b(?:[\w\[\]]+\.)?([\w\[\]]*"
+                     r"(?:_ID|_KEY|_NO|_NUM))\b", source)
+    keys_low = " ".join(ids).lower()
     found = set()
     for entity, tokens in _GRAIN_WORDS.items():
         if any(tok in keys_low for tok in tokens):
@@ -522,7 +523,10 @@ _RETRY_NOTE = (
     "check for these violations:\n{violations}\n"
     "Rewrite it. Every value must appear in the SQL above; describe a "
     "column as a filter ONLY if it appears in a WHERE / JOIN ON / "
-    "HAVING / CASE WHEN condition; drop any claim you cannot ground."
+    "HAVING / CASE WHEN condition; name ONLY tables the SQL reads; "
+    "state the counted entity ONLY as the key columns define it "
+    "(do not say patients when the row is a visit); drop any claim "
+    "you cannot ground."
 )
 
 

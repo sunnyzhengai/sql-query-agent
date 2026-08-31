@@ -28,10 +28,15 @@ order; nothing skips ahead.
       Recommend re-cutting this item as "extend the gate to table
       + grain claims, red-first fixture per class". Full survey in
       the handoff.
-- [ ] **DESC-CORPUS-1:** adversarial fixture corpus + fuzzer pass
-      over live generation (not palette fixtures): inclusion vs
-      exclusion, grain, thresholds, joins, negations, empty/odd
-      procs. Failures are lexicon/gate food, per the walk loop.
+- [x] **P0-b DESC-CORPUS-1 BUILT + RUN (08-31 dev, 1.80.1)** —
+      devtools/desc_corpus.py over 11 adversarial classes, live:
+      **clean 6 · recovered 5 · salvaged 0 · emptied 0** (never
+      fabricated past the retry). The 5 catches were one class:
+      an accurate description + an INTERPRETIVE clinical tail the
+      SQL cannot support — caught, retried away, pinned. The
+      --dry mode found 2 gate defects before any LLM call (alias
+      leaking into grain; encounter-shaped keys unseen) — both
+      fixed + pinned; retry note now names all four classes.
 - [ ] **DESC-LIVE-1:** run generation over the REAL 790-proc
       corpus (not the demo estate) and grade a sample by hand.
       HONEST STATE TODAY: demo descriptions came from the palette;
