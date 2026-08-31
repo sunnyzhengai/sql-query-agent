@@ -3624,3 +3624,22 @@ and it left no trace.
 **Gates:** 1,384 green + 5 xfailed, ruff clean; wheel 1.79.0.
 Ordered acceptance test-held: certify → refetch → decided with the
 actor.
+
+### REVIEW VERDICT — CONSOLE-5 (1.79.0): VERIFIED — and a REVIEW CORRECTION
+Gates 1,384 + ruff clean. Fold-back works end to end: 8
+dispositions visible (Sunny's yesterday certifies, a delegate, an
+official-designation, my probe deny), each with state/actor/
+timestamp, decided items sunk to the list tail (positions 18-23
+of 26) but visible. The cwd-relative event path was the real
+CONSOLE-5 bug and it is dead.
+**Correction to my own CONSOLE-5 report:** my first probe read
+keys `state`/`decided` and concluded "zero decided" — the payload
+ships `console_state`. The order's premise was partly wrong;
+dev's path fix was still a genuine (and worse) bug. Probes must
+read the CONTRACT's key names, not guessed ones — noted against
+review's own practice.
+**SUNNY: your yesterday certifies were never lost** — they are
+visible again at the bottom of the console, with your name and
+the time. The double read stands: the Diabetic Codeset pair now
+shows "official designated"; the Diabetic Patients ten remains
+open for the roster read.
