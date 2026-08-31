@@ -3659,3 +3659,31 @@ earlier."** Three fixes:
 3. **Click feedback** — pressed state + inline "working…" on the
    button during the op (also prevents the double-press that
    produced find 1); clears when evidence renders.
+
+### 2026-08-31 — CONSOLE-6 items 1+3 BUILT — release 1.79.1
+**Sunny's double read PASSED** ("much clearer than earlier"). Her
+two buildable finds, shipped; item 2 (decided-card treatment)
+NOT BUILT — it awaits her ruling, as ordered.
+1. **One evidence block per flag:** a fresh compare REPLACES the
+   card's evidence instead of appending (refusals and recorded-
+   act lines replace too) — no duplicate DIFFERS stacks. The
+   event trail keeps every press for audit; the card shows
+   current evidence only.
+3. **Click feedback:** the pressed verb disables, takes a
+   dashed "working…" style, and restores when the result renders
+   (or when the network fails — the failure path restores too and
+   says so). This also removes the double-press that produced
+   find 1.
+**A harness defect found while proving the case red-on-bug:** the
+DOM harness reported `ok` for ASYNC cases before their assertions
+ran — a green that could not fail. Fixed: async checks are
+collected and awaited before the verdict prints, and the element
+model gained the `classList` the page actually uses. Both new
+behaviours are now red-on-bug proven (strip the working text →
+red; strip the disable → red). The false-green class is dead for
+every future async case.
+**Gates:** 1,384 green + 5 xfailed, ruff clean; wheel 1.79.1.
+**AWAITING SUNNY:** decided-card treatment — (a) keep in list,
+sunk, full colour with chip+reopen, or (b) a "Resolved (N) — show"
+section (review recommends b: an inbox is a work queue, not an
+archive).

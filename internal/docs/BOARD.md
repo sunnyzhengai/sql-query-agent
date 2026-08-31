@@ -676,4 +676,18 @@ watcher) continue. Lifts only by Sunny's word, recorded here.
       a startup banner stating the fold count; decided cards sink
       visible w/ actor+date+target; REOPEN appends (never
       mutates), carries its reason, returns the flag to the open
-      queue. 1,384 green + ruff. AWAITS review.
+      queue. 1,384 green + ruff. **VERIFIED — fold-back live (8
+      dispositions, sunk-but-visible); Sunny's certifies were
+      never lost.**
+- [x] **SUNNY'S DOUBLE READ PASSED (08-31): "much clearer than
+      earlier"** — both cards read clearly.
+- [x] **CONSOLE-6 items 1+3 BUILT (08-31 dev, 1.79.1)** — one
+      evidence block per flag (replace, never stack); click
+      feedback (pressed + working…, restores on result or network
+      failure). Harness defect found + killed while proving
+      red-on-bug: async cases reported ok BEFORE their assertions
+      ran (a green that could not fail) — now awaited; classList
+      added. 1,384 green + ruff.
+- [ ] **CONSOLE-6 item 2 — SUNNY'S RULING (not built):** decided
+      cards (a) keep in list sunk w/ chip+reopen, or (b) move to a
+      "Resolved (N) — show" section (review recommends b).

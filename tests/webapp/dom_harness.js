@@ -30,6 +30,22 @@ class El {
   }
   get className() { return this.attrs['class'] || ''; }
   set className(v) { this.attrs['class'] = v; }
+  get classList() {
+    const self = this;
+    const list = () => (self.attrs['class'] || '').split(/\s+/)
+      .filter(Boolean);
+    return {
+      add: (c) => {
+        const l = list();
+        if (!l.includes(c)) l.push(c);
+        self.attrs['class'] = l.join(' ');
+      },
+      remove: (c) => {
+        self.attrs['class'] = list().filter(x => x !== c).join(' ');
+      },
+      contains: (c) => list().includes(c),
+    };
+  }
   get id() { return this.attrs['id'] || ''; }
   addEventListener(name, fn) {
     (this.listeners[name] = this.listeners[name] || []).push(fn);
@@ -175,10 +191,28 @@ try {
   process.exit(0);
 }
 
+const pending = [];
+
 function check(name, fn) {
-  try { fn(); } catch (e) {
+  try {
+    const out = fn();
+    if (out && typeof out.then === 'function') {
+      // an async case must be AWAITED before the verdict prints —
+      // otherwise the harness reports ok while the assertion is
+      // still queued (caught by its own red-on-bug proof)
+      pending.push(out.catch(
+        e => failures.push(name + ': ' + (e && e.message))));
+    }
+  } catch (e) {
     failures.push(name + ': ' + (e && e.message));
   }
+}
+
+async function verdict() {
+  await Promise.all(pending);
+  console.log(JSON.stringify({ ok: failures.length === 0,
+                               failures }));
+  process.exit(0);
 }
 
 function expectListeners(card, sel, want, name) {
@@ -201,7 +235,8 @@ function textOf(node) {
   return out;
 }
 
-if (MODE === 'console') {
+async function runConsoleMode() {
+  if (MODE !== 'console') return false;
   check('console evidence renders the FULL v2 card '
       + '(red-first: a payload-ignoring renderer fails)', () => {
     const node = renderEvidence({
@@ -257,10 +292,45 @@ if (MODE === 'console') {
     }
   });
 
-  console.log(JSON.stringify({ ok: failures.length === 0,
-                               failures }));
-  process.exit(0);
+  check('CONSOLE-6: one evidence block per card + click feedback',
+      async () => {
+    // the console page's act() is exercised through a stub fetch
+    // that never resolves, so the PRESSED state is observable
+    const card = el('<div class="fc"><div class="verbs"></div>'
+      + '<div class="land"></div></div>');
+    const btn = el('<button>compare</button>');
+    card.querySelector('.verbs').appendChild(btn);
+    let resolveFetch;
+    global.fetch = () => new Promise(r => { resolveFetch = r; });
+    act('compare', 'cluster:x', card, [], btn);
+    // let act() reach its awaited fetch (it never resolves), so
+    // the PRESSED state is observable mid-flight
+    await new Promise(r => setImmediate(r));
+    if (!btn.disabled) throw new Error('button not disabled');
+    if (!btn.textContent.includes('working')) {
+      throw new Error('no working… feedback: ' + btn.textContent);
+    }
+    if (!(btn.attrs['class'] || '').includes('working')
+        && !(btn.className || '').includes('working')) {
+      throw new Error('working class missing');
+    }
+    // and a second evidence block REPLACES the first
+    card.appendChild(el('<div class="evidence">first</div>'));
+    const second = el('<div class="evidence">second</div>');
+    const prior = card.querySelector('.evidence');
+    prior.replaceWith(second);
+    if (card.querySelectorAll('.evidence').length !== 1) {
+      throw new Error('evidence stacked instead of replacing');
+    }
+  });
+
+  await verdict();
+  return true;
 }
+
+runConsoleMode().then(done => { if (done) return; runWorkbenchMode(); });
+
+function runWorkbenchMode() {
 
 // ---- every card variant renders and wires ----------------------------
 
@@ -373,3 +443,4 @@ check('output result with run button row', () => {
 });
 
 console.log(JSON.stringify({ ok: failures.length === 0, failures }));
+}

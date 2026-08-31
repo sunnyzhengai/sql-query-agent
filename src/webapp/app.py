@@ -2193,6 +2193,8 @@ CONSOLE_PAGE = """<!doctype html>
   .diffline { font:12px ui-monospace,monospace; }
   .diffline.plus { color:#2c5e2e; } .diffline.minus { color:#8a2a24; }
   .cc-item { margin:6px 0; font-size:13.5px; }
+  .verbs button.working { background:#eef2fa; color:#6b7080;
+    border-style:dashed; cursor:progress; }
 </style></head><body>
 <h2>__PRODUCT__ — resolution console</h2>
 <div id="personabar">acting as
@@ -2301,12 +2303,12 @@ function certifyChooser(f, card) {
       const pick = box.querySelector('input[name=pick]:checked');
       const members = (b.dataset.v === 'differentiate_all')
         ? [] : (pick ? [pick.value] : []);
-      act(b.dataset.v, f.id, card, members);
+      act(b.dataset.v, f.id, card, members, b);
     }));
   card.appendChild(box);
 }
 
-async function act(verb, id, card, memberIds) {
+async function act(verb, id, card, memberIds, pressed) {
   let reason = '';
   if (verb === 'deny' || verb === 'reopen') {
     reason = window.prompt(verb === 'reopen'
@@ -2314,21 +2316,52 @@ async function act(verb, id, card, memberIds) {
       : 'deny lands as testimony — the reason:') || '';
     if (!reason.trim()) return;
   }
-  const r = await fetch('/api/inbox/act', { method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({ verb, target_id: id,
-      persona: personaSel.value, reason,
-      member_ids: memberIds || [] })});
-  const j = await r.json();
+  // CONSOLE-6 item 3: the press is VISIBLE and the button is
+  // inert while the op runs (this is also what prevented the
+  // double-press that stacked duplicate evidence blocks)
+  const label = pressed ? pressed.textContent : '';
+  if (pressed) {
+    pressed.disabled = true;
+    pressed.classList.add('working');
+    pressed.textContent = label + ' — working…';
+  }
+  const restore = () => {
+    if (pressed) {
+      pressed.disabled = false;
+      pressed.classList.remove('working');
+      pressed.textContent = label;
+    }
+  };
+  let r, j;
+  try {
+    r = await fetch('/api/inbox/act', { method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ verb, target_id: id,
+        persona: personaSel.value, reason,
+        member_ids: memberIds || [] })});
+    j = await r.json();
+  } catch (e) {
+    restore();
+    card.appendChild(el('<div class="evidence">the console could '
+      + 'not reach the server — retry</div>'));
+    return;
+  }
+  restore();
   if (!r.ok) {
-    card.appendChild(el('<div class="evidence">' +
-      esc(j.message || j.error) + '</div>'));
+    const note = el('<div class="evidence">' +
+      esc(j.message || j.error) + '</div>');
+    const prior = card.querySelector('.evidence');
+    if (prior) prior.replaceWith(note); else card.appendChild(note);
     return;
   }
   if (verb === 'compare' && j.evidence) {
     const ev = renderEvidence(j.evidence.conclusion || {},
                               j.evidence.headline || '');
-    card.appendChild(ev);
+    // CONSOLE-6 item 1: ONE evidence block per flag — a fresh
+    // compare REPLACES the previous (the event trail keeps every
+    // press for audit; the card shows current evidence only)
+    const prior = card.querySelector('.evidence');
+    if (prior) prior.replaceWith(ev); else card.appendChild(ev);
     // roster pair drill-down: two picks + compare again → the grid
     if ((j.evidence.conclusion || {}).mode === 'roster') {
       const drill = el('<button class="replaybtn">compare the '
@@ -2337,14 +2370,19 @@ async function act(verb, id, card, memberIds) {
         const picked = Array.from(
           ev.querySelectorAll('.pairpick'))
           .filter(x => x.checked).map(x => x.dataset.id);
-        if (picked.length === 2) act('compare', id, card, picked);
+        if (picked.length === 2) {
+          act('compare', id, card, picked, drill);
+        }
       });
       ev.appendChild(drill);
     }
     return;
   }
-  card.appendChild(el('<div class="evidence">recorded — grade: ' +
-    esc(j.grade) + ' · lands: ' + esc(j.lands) + '</div>'));
+  const done = el('<div class="evidence">recorded — grade: ' +
+    esc(j.grade) + ' · lands: ' + esc(j.lands) + '</div>');
+  const priorDone = card.querySelector('.evidence');
+  if (priorDone) priorDone.replaceWith(done);
+  else card.appendChild(done);
   load();
 }
 
@@ -2407,7 +2445,7 @@ async function load() {
           certifyChooser(f, card);   // CONSOLE-3: outcome + target
           return;
         }
-        act(v, f.id, card);
+        act(v, f.id, card, [], b);
       });
       vbox.appendChild(b);
       card.querySelector('.land').textContent =
