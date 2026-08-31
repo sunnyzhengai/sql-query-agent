@@ -37,10 +37,16 @@ order; nothing skips ahead.
       --dry mode found 2 gate defects before any LLM call (alias
       leaking into grain; encounter-shaped keys unseen) — both
       fixed + pinned; retry note now names all four classes.
-- [ ] **DESC-LIVE-1:** run generation over the REAL 790-proc
-      corpus (not the demo estate) and grade a sample by hand.
-      HONEST STATE TODAY: demo descriptions came from the palette;
-      the generation path has never been adversarially validated.
+- [ ] **P0-c DESC-LIVE-1 — BLOCKED AT THE WALL (dev, 08-31):**
+      the "790-proc corpus" is the WORK estate (Epic Clarity) —
+      the separation wall forbids it here, and 790 was always a
+      PARSE-RATE fact from the work deployment, never an
+      AIVIA-side artifact. Dev did NOT substitute a corpus.
+      Choose: (a) run on the 28-proc synthetic corpus + shapes
+      estate (~100 descriptions, honest rates on our own data —
+      dev recommends, unblocks P1); (b) Sunny runs at work and
+      reports aggregate rates only (no text crosses); (c) defer
+      to a design-partner tenant. Full note in the handoff.
 
 ### P1 — BUILD TERM PROPOSAL (Tier 1's actual product; unbuilt)
 - [ ] **TERM-PROPOSE-1:** cluster → PARENT CONCEPT term + child

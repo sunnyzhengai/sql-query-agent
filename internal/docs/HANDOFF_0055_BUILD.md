@@ -3880,3 +3880,36 @@ fabrications surviving. Three things worth carrying forward:
    smoke-test, not a rate. The 790-proc run is what produces
    honest rates, and Sunny's hand-graded sample is what produces
    the verdict.
+
+### 2026-08-31 — P0-c BLOCKED AT THE WALL (dev, reporting not substituting)
+Went to run DESC-LIVE-1 and hit a standing law, not a technical
+problem. **The "790-proc corpus" is the WORK estate (Epic Clarity
+procs).** The work/AIVIA separation wall is absolute: work SQL
+never enters AIVIA, and AIVIA never runs at work. It is not on
+this machine and must not be brought here. What IS here:
+- data/synthetic/sql — **28 de-dialected synthetic procs** (~26
+  CTE steps), the anonymized corpus the claims-scale rule already
+  binds our listing/demo claims to;
+- the shapes estate (37 metrics / 65 steps) in the tenant;
+- the 11-case adversarial corpus from P0-b.
+The 790 number is a PARSE-RATE fact from the work deployment
+(788/790, recorded in memory + the ScriptDom milestone). It was
+never an AIVIA-side artifact and cannot become the description
+sample.
+
+**I did not substitute a corpus and call it P0-c.** Options for
+the re-cut, Sunny/review to choose:
+(a) **Run P0-c on the 28-proc synthetic corpus + the shapes
+    estate** (~65 steps + 37 metric compositions ≈ 100
+    descriptions) — honest rates on OUR data, sample file for
+    Sunny, no wall crossing. Recommended: it is the corpus every
+    other claim already rests on.
+(b) **Sunny runs the generation at work herself** against Clarity
+    and hand-grades there, reporting only aggregate rates back
+    (no text crosses) — highest fidelity to real estate shapes,
+    but it is HER time and a work-side run.
+(c) Defer P0-c until a design-partner tenant exists (a real
+    customer estate, properly licensed).
+My recommendation is (a) now — it unblocks P1 with real measured
+rates — with (b) as an optional confirmation Sunny may choose at
+her convenience. Nothing built until the choice lands.
