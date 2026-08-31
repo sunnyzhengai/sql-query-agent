@@ -3952,3 +3952,45 @@ adversarial governance shapes — but it is a 28-proc estate, not a
 multi-thousand-proc enterprise; rates are measured, not
 extrapolated.** Sunny's optional work-side confirmation (option b)
 remains the fidelity check for scale, never for difficulty.
+
+### 2026-08-31 — P0-c (DESC-LIVE-1) RUN — release 1.81.0
+Ran option (a) as ruled: generation over OUR corpus, via the REAL
+parser (ScriptDom harvests every CTE step — no regex).
+
+**RESULT: 26 descriptions · clean 26 (100%) · recovered 0 ·
+salvaged 0 · emptied 0 · zero first-pass violations.**
+
+**Read that number with its two stated limits, both in the report
+itself:**
+1. **Coverage:** the pipeline describes CTE STEPS, and only 5 of
+   28 procs use CTEs — 23 stage through temp tables (15
+   explicitly). This run covers every CTE step the estate HAS,
+   which is NOT every proc. Temp-table staging is a real Clarity
+   pattern; describing it is a separate UNBUILT capability, not a
+   gap hidden inside these rates.
+2. **Scale** (review's corrected caveat, carried verbatim):
+   difficulty is real — this includes the 43-step USP_ED_SEPSIS
+   whose invented flowsheet IDs created the gate — but 28 procs
+   is not an enterprise. Measured, never extrapolated.
+
+**Three defects the run exposed BEFORE/DURING, all fixed:**
+- **Temp tables invisible to the gate:** `#Staging` did not match
+  the table pattern at all, so a description naming one would
+  have violated falsely on ANY Clarity-shaped estate. Now matched
+  (marker kept: #Staging and Staging are different objects).
+- **Sibling CTEs counted as base tables:** a step reading an
+  upstream CTE looked like it read an unknown warehouse table.
+  The harvester now passes the proc's other CTE names as context.
+- **A "23/23 clean" that silently covered 3 procs:** the first
+  harvest walked one level and missed every proc whose body is
+  wrapped in BEGIN…END (25 of 28). Fixed by recursive descent —
+  the corrected run covers 5 procs / 26 steps. **I nearly
+  reported a perfect score computed over a hidden fraction of the
+  corpus.**
+
+**Deliverable for Sunny:** internal/docs/DESC_LIVE_SAMPLE.md —
+every description beside its fragment and the PARSED FACTS the
+gate checked it against (tables, grain). She grades the
+DESCRIPTIONS; the rates are only the shape of the risk. Her
+optional work-side run (option b) remains the scale check.
+**Gates:** 1,396 green + 5 xfailed, ruff clean; wheel 1.81.0.

@@ -146,9 +146,11 @@ _CLAIM_STOPWORDS = frozenset(
 # FROM/JOIN/UPDATE/INTO targets — the tables a fragment actually
 # touches. Aliases and schema prefixes are stripped to the bare name
 # (the alias-never-faces-the-steward rule from CONSOLE-4c).
+# real estates read TEMP TABLES (#Staging) and bracketed identifiers
+# as often as plain names (P0-c corpus find on Clarity-shaped SQL)
 _FROM_TABLES = re.compile(
     r"(?is)\b(?:FROM|JOIN|APPLY|INTO|UPDATE)\s+"
-    r"([A-Za-z_][\w]*(?:\.[A-Za-z_][\w]*){0,2})")
+    r"([#@]?\[?[A-Za-z_][\w]*\]?(?:\.\[?[A-Za-z_][\w]*\]?){0,2})")
 # a CTE name is not a base table — it is defined in the same text
 _CTE_NAMES = re.compile(r"(?is)(?:WITH|,)\s*([A-Za-z_][\w]*)\s+AS\s*\(")
 
@@ -168,7 +170,11 @@ _GRAIN_CLAIM = re.compile(
 
 
 def _bare(name: str) -> str:
-    return name.strip("[]").split(".")[-1].strip("[]").lower()
+    """The comparable table name: schema and brackets stripped, the
+    temp-table marker KEPT (#Staging and Staging are different
+    objects to a reader, and both must be recognisable)."""
+    last = name.split(".")[-1].strip()
+    return last.strip("[]").lower()
 
 
 def parsed_tables(fragment: str) -> "set[str]":

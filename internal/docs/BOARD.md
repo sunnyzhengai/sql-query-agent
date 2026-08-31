@@ -37,7 +37,21 @@ order; nothing skips ahead.
       --dry mode found 2 gate defects before any LLM call (alias
       leaking into grain; encounter-shaped keys unseen) — both
       fixed + pinned; retry note now names all four classes.
-- [ ] **P0-c DESC-LIVE-1 — BLOCKED AT THE WALL (dev, 08-31):**
+- [x] **P0-c DESC-LIVE-1 RUN (08-31 dev, 1.81.0)** — option (a)
+      as ruled: **26 CTE-step descriptions, 26 clean (100%), zero
+      first-pass violations, zero fallbacks.** TWO LIMITS STATED
+      IN THE REPORT: coverage (only 5 of 28 procs use CTEs; 23
+      stage through temp tables — describing those is a separate
+      UNBUILT capability) and scale (28 procs, difficulty real,
+      never extrapolated). Three defects found and fixed en
+      route: temp tables invisible to the gate (would false-
+      violate on any Clarity estate), sibling CTEs read as base
+      tables, and a first harvest that scored 23/23 while
+      silently covering 3 of 28 procs (BEGIN…END bodies —
+      recursive descent now). **SAMPLE READY FOR SUNNY:**
+      internal/docs/DESC_LIVE_SAMPLE.md (description + fragment +
+      parsed facts, hand-gradable).
+- [ ] ~~P0-c blocked~~ (resolved by the option-(a) ruling):
       the "790-proc corpus" is the WORK estate (Epic Clarity) —
       the separation wall forbids it here, and 790 was always a
       PARSE-RATE fact from the work deployment, never an
