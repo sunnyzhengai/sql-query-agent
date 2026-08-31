@@ -3936,3 +3936,19 @@ Deliverables unchanged from the P0-c order:
 Optional later confirmation (Sunny's convenience, not a gate):
 run generation at work against Clarity and report aggregate rates
 only — no text crosses the wall.
+
+### CORRECTION to the P0-c caveat (review, after Sunny's question)
+The "synthetic corpus is simpler than a real estate" wording
+undersells it. data/synthetic/sql is the DE-DIALECTED SEPSIS
+estate: 21 procs in reporting/ alone, 14,114 lines, including
+USP_IP_SEPSIS (4,132 lines) and USP_ED_SEPSIS (3,448 lines — the
+43-step procedure whose invented flowsheet IDs CREATED the
+grounding gate). These are Clarity-shaped: deep nesting, long CTE
+chains, real-world messiness. The DIABETES/shapes estate is the
+simple one (minimal metrics, each isolating one governance shape).
+Revised caveat for anywhere we quote P0-c rates: **the corpus
+spans both ends — Clarity-shaped sepsis procs AND clean
+adversarial governance shapes — but it is a 28-proc estate, not a
+multi-thousand-proc enterprise; rates are measured, not
+extrapolated.** Sunny's optional work-side confirmation (option b)
+remains the fidelity check for scale, never for difficulty.
