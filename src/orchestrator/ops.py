@@ -719,6 +719,38 @@ def _shape_decision(d: dict) -> dict:
             "columns": sorted(str(x) for x in (cols or []) if x)}
 
 
+def _reachable_steps(ref: str, run_kql) -> "set[str] | None":
+    """CONSOLE-4d: the step names the metric's OUTPUT depends on —
+    canonical_to_transform target(s) + closure over the dep edges.
+    None when the store predates the edges (no filtering then;
+    absence of evidence is not evidence of deadness)."""
+    from src.orchestrator.tools import (
+        CANONICAL_TARGETS_QUERY,
+        STEP_DEP_EDGES_QUERY,
+    )
+    try:
+        targets = [str(r.get("target_id") or "")
+                   for r in run_kql(CANONICAL_TARGETS_QUERY,
+                                    {"p_ref": ref})]
+        if not targets:
+            return None
+        deps: "dict[str, list]" = {}
+        for e in run_kql(STEP_DEP_EDGES_QUERY, {"p_ref": ref}):
+            deps.setdefault(str(e.get("source_id")), []).append(
+                str(e.get("target_id")))
+        seen: "set[str]" = set()
+        stack = list(targets)
+        while stack:
+            nid = stack.pop()
+            if nid in seen:
+                continue
+            seen.add(nid)
+            stack.extend(deps.get(nid, []))
+        return {nid.split(":")[-1] for nid in seen}
+    except Exception:   # noqa: BLE001 — no filtering without facts
+        return None
+
+
 def _decisions_of(step_id: str, run_kql) -> "list[dict]":
     """The step's decision sites (ADR 0044 → ask-surface, ADR 0052
     backfill item 1)."""
@@ -1142,11 +1174,25 @@ def op_retrieve(ids: "list[str]", run_kql, session: OpsSession) -> ResultSet:
                 sites = [_shape_decision(d)
                          for d in run_kql(DECISIONS_OF_METRIC_QUERY,
                                           {"p_ref": an_id})]
+                # CONSOLE-4d (truth): only OUTPUT-REACHABLE steps'
+                # sites are the metric's criteria — dead CTEs are
+                # estate noise; their sites disclose, never phrase
+                reachable = _reachable_steps(an_id, run_kql)
+                if reachable is not None:
+                    unreached = sorted({str(s.get("step"))
+                                        for s in sites
+                                        if s.get("step")
+                                        not in reachable})
+                    sites = [s for s in sites
+                             if s.get("step") in reachable]
+                else:
+                    unreached = []
                 rows.append({"id": an_id, "kind": "metric", **fs.facts,
                              "steps": step_rows, "reports": reports,
                              "decision_count":
                                  (dc[0].get("Count", 0) if dc else 0),
-                             "decision_sites": sites})
+                             "decision_sites": sites,
+                             "unreached_steps": unreached})
                 # ADR 0054 variants-exist stamp: definition answers
                 # disclose recorded name-family flags — official-first
                 # once a certify disposition designates one; until

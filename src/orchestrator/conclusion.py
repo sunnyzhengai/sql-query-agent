@@ -138,11 +138,39 @@ def _business_words(kind: str, value: str,
                     columns: "list[str] | None" = None) -> str:
     """The ratified template vocabulary — deterministic English for
     a parsed element; the fallback names tables/columns and refers
-    to the developer view. SQL never leaks to the steward."""
+    to the developer view. SQL never leaks to the steward.
+
+    CONSOLE-4d item 3: a COMPOUND predicate phrases EVERY clause —
+    the gestational twins differ only in their second clause
+    (NOT LIKE 'O24.4%' vs OR LIKE 'O24.4%'), and phrasing the
+    first clause alone made them read identically."""
     import re as _re
     if kind == "read":
         return f"additionally reads {value}"
-    v = value
+    v = value.strip()
+    parts = _re.split(r"\s+(AND|OR)\s+", v, flags=_re.IGNORECASE)
+    if len(parts) >= 3:
+        phrases, i = [], 0
+        while i < len(parts):
+            clause = parts[i].strip().strip("()")
+            joiner = (parts[i - 1].lower()
+                      if i and parts[i - 1].upper() in ("AND", "OR")
+                      else "")
+            words = _business_words(kind, clause, columns)
+            if "additional recorded condition" in words:
+                words = ""
+            if words:
+                phrases.append(("also " if joiner == "or" else "")
+                               + words)
+            i += 2
+        if phrases:
+            return "; ".join(phrases)[:120]
+    return _single_predicate_words(v, columns)
+
+
+def _single_predicate_words(v: str,
+                            columns: "list[str] | None" = None) -> str:
+    import re as _re
     if _re.match(r"NOT\s+EXISTS", v, _re.IGNORECASE):
         m = _re.search(r"FROM\s+([\w.\[\]]+)", v, _re.IGNORECASE)
         src = m.group(1) if m else "the checked table"
@@ -168,6 +196,11 @@ def _business_words(kind: str, value: str,
                   "=": "exactly"}[m.group(2)]
         return (f"requires {_col(m.group(1))} {opword} "
                 f"{m.group(3).strip(chr(39))}")
+    m = _re.match(r"([\w.\[\]]+)\s+NOT\s+LIKE\s+(\S+)", v,
+                  _re.IGNORECASE)
+    if m:
+        return (f"excludes the pattern {m.group(2).strip(chr(39))} "
+                f"on {_col(m.group(1))}")
     m = _re.match(r"([\w.\[\]]+)\s+LIKE\s+(\S+)", v,
                   _re.IGNORECASE)
     if m:
@@ -260,15 +293,22 @@ def _member_display(retrieved: "dict[str, dict]", mid: str) -> str:
     surface): EVERY member-name render goes through this — a name
     another member shares renders QUALIFIED with its id; bare
     rendering of colliding members is unwritable (the collision
-    gate in tests holds every card field)."""
+    gate in tests holds every card field).
+
+    CONSOLE-4d item 2: the ONE label form is the business name;
+    a member the store never delivered (an empty row) still
+    renders as a name + ref, never a raw id alone."""
     row = retrieved.get(mid, {})
-    name = str(row.get("business_name") or row.get("name") or mid)
+    name = str(row.get("business_name") or row.get("name") or "")
+    if not name:
+        # unretrieved member — name it from its ref, never raw
+        return f"{mid.rsplit('.', 1)[-1]} ({mid})"
     for oid, other in retrieved.items():
         if oid == mid:
             continue
         oname = str(other.get("business_name")
-                    or other.get("name") or oid)
-        if oname == name:
+                    or other.get("name") or "")
+        if oname and oname == name:
             return f"{name} ({mid})"
     return name
 
@@ -381,6 +421,13 @@ def compose_conclusion(outputs: "list[dict]", caption: str,
                 if shared_n and len(bits) > 1:
                     set_summary = " · ".join(bits)
                 break
+        # CONSOLE-4d item 2: ONE label form per family — when ANY
+        # member needs qualification, EVERY member carries its ref,
+        # so a roster never mixes bare and qualified names
+        family_names = [str((member_rows.get(m) or {}).get(
+            "business_name") or (member_rows.get(m) or {}).get(
+            "name") or "") for m in member_ids]
+        uniform_qualify = len(family_names) != len(set(family_names))
         members = []
         for mid in member_ids:
             row = member_rows.get(mid, {})
@@ -388,9 +435,12 @@ def compose_conclusion(outputs: "list[dict]", caption: str,
             sites = row.get("decision_sites") or []
             cols = [str(c) for s in sites
                     for c in (s or {}).get("columns") or []]
+            disp = _member_display(retrieved, mid)
+            if uniform_qualify and not disp.endswith(f"({mid})"):
+                disp = f"{disp} ({mid})"
             members.append({
                 "id": mid,
-                "name": _member_display(retrieved, mid),
+                "name": disp,
                 "owner": (mid.split(":", 2)[1] if ":" in mid
                           else mid.rsplit(".", 1)[0]),
                 "description": str(row.get("description")
@@ -450,8 +500,18 @@ def compose_conclusion(outputs: "list[dict]", caption: str,
                 if degraded and m["description"]:
                     phrase = m["description"].split(".")[0][:70]
                 else:
-                    phrase = ("; ".join(plain)[:70]
-                              or "(shared logic only)")
+                    phrase = "; ".join(plain)[:70]
+                if not phrase:
+                    # CONSOLE-4d assertion: when the hash partition
+                    # proves all-distinct, "(shared logic only)" is
+                    # a LIE — the description or a typed pointer
+                    all_distinct = (len(groups) == len(members)
+                                    and len(groups) > 1)
+                    phrase = (m["description"].split(".")[0][:70]
+                              if m["description"] else
+                              ("distinct logic — see developer view"
+                               if all_distinct
+                               else "(shared logic only)"))
                 by_header.setdefault(header, []).append({
                     "id": m["id"], "name": m["name"],
                     "phrase": phrase,

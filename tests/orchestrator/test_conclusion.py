@@ -529,3 +529,149 @@ class TestConsole4c:
             for m in g["members"]:
                 assert len(m["phrase"]) <= 70
                 assert "developer view" not in m["phrase"]
+
+
+class TestConsole4dRosterTruth:
+    """CONSOLE-4d (roster truth defects): each member's elements
+    come from ITS OWN parsed steps only; every label is the
+    qualified business-name form; an all-distinct family never
+    phrases "(shared logic only)"; and the phrases match the real
+    SQL (spot-asserted against the seeded estate's shapes)."""
+
+    def _family(self):
+        """The shapes estate's real family, shaped as the store
+        delivers it: DX selects on ICD codes, Lab on HbA1c,
+        Billing on CPT — three distinct methods, one name."""
+        specs = [
+            ("reporting.USP_Diabetic_Patients_DX", "DIAGNOSIS_CODES",
+             "DC.ICD_CODE LIKE 'E11%'",
+             "Diabetic patients identified from diagnosis codes."),
+            ("reporting.USP_Diabetic_Patients_Lab", "LAB_RESULTS",
+             "LR.HBA1C_VALUE >= 6.5",
+             "Diabetic patients identified from lab results."),
+            ("reporting.USP_Diabetic_Billing", "BILLING_CLAIMS",
+             "CC.CPT_CODE IN ('99213', '99214', '99215', '99216')",
+             "Diabetic patients identified from billing claims."),
+        ]
+        rows, groups = [], []
+        for i, (mid, tbl, expr, desc) in enumerate(specs):
+            rows.append({
+                "id": mid, "kind": "metric",
+                "business_name": "Diabetic Patients",
+                "description": desc,
+                "source_tables": tbl, "steward": "",
+                "decision_sites": [{"expression_sql": expr,
+                                    "step": "Base_Cohort"}]})
+            groups.append({"group": i + 1, "members": [mid]})
+        return [
+            {"component": {"op": "retrieve", "params": {}},
+             "result": {"op": "retrieve", "params": {},
+                        "complete": True, "universe": "u",
+                        "rows": rows}},
+            {"component": {"op": "compare", "params": {}},
+             "result": {"op": "compare", "params": {},
+                        "complete": True, "universe": "u",
+                        "note": "3 hash groups — DIFFERS.",
+                        "rows": groups}},
+        ]
+
+    def _lines(self, card):
+        if card["mode"] == "roster":
+            return {m["id"]: m["phrase"]
+                    for g in card["roster"] for m in g["members"]}
+        return {m["id"]: "; ".join(m["distinguishing_plain"])
+                for m in card["members"]}
+
+    def test_no_cross_member_attribution(self):
+        """The truth bug: DX carried HbA1c and MED_NAME criteria.
+        Each phrase names only ITS member's own parsed predicate."""
+        c = compose_conclusion(self._family(), "", True)
+        lines = self._lines(c)
+        dx = lines["reporting.USP_Diabetic_Patients_DX"]
+        lab = lines["reporting.USP_Diabetic_Patients_Lab"]
+        bill = lines["reporting.USP_Diabetic_Billing"]
+        assert "ICD_CODE" in dx or "E11%" in dx
+        assert "HBA1C" not in dx.upper()
+        assert "CPT" not in dx.upper()
+        assert "HBA1C" in lab.upper()
+        assert "E11%" not in lab
+        assert "CPT_CODE" in bill.upper()
+        assert "HBA1C" not in bill.upper()
+
+    def test_spot_asserts_against_the_real_sql(self):
+        c = compose_conclusion(self._family(), "", True)
+        lines = self._lines(c)
+        assert "matches the pattern E11% on ICD_CODE" in \
+            lines["reporting.USP_Diabetic_Patients_DX"]
+        assert "requires HBA1C_VALUE at least 6.5" in \
+            lines["reporting.USP_Diabetic_Patients_Lab"]
+        assert "limits CPT_CODE to 4 listed value(s)" in \
+            lines["reporting.USP_Diabetic_Billing"]
+
+    def test_all_labels_are_qualified_business_names(self):
+        """Item 2: no raw ids, no bare colliding names — every
+        label is "<business name> (<ref>)" in one form."""
+        c = compose_conclusion(self._family(), "", True)
+        names = ([m["name"] for g in c["roster"]
+                  for m in g["members"]] if c["mode"] == "roster"
+                 else [m["name"] for m in c["members"]])
+        assert len(names) == 3
+        for n in names:
+            assert n.startswith("Diabetic Patients (")
+            assert n.endswith(")")
+
+    def test_all_distinct_family_never_says_shared_logic_only(self):
+        """The hash partition proved three groups for three members
+        — claiming shared logic would be a lie."""
+        c = compose_conclusion(self._family(), "", True)
+        for phrase in self._lines(c).values():
+            assert "(shared logic only)" not in phrase
+            assert phrase.strip()
+
+
+class TestConsole4dCompoundAndLabels:
+    """CONSOLE-4d items 2-3: compound predicates phrase EVERY
+    clause (the gestational twins' whole difference IS the second
+    clause), and one label form holds across a family."""
+
+    def test_gestational_twins_read_differently(self):
+        from src.orchestrator.conclusion import _business_words
+        excl = _business_words(
+            "pred", "ED.DX_CODE LIKE 'E11%' AND "
+                    "ED.DX_CODE NOT LIKE 'O24.4%'")
+        incl = _business_words(
+            "pred", "ED.DX_CODE LIKE 'E11%' OR "
+                    "ED.DX_CODE LIKE 'O24.4%'")
+        assert excl != incl
+        assert "excludes the pattern O24.4%" in excl
+        assert "also matches the pattern O24.4%" in incl
+
+    def test_one_label_form_across_a_family(self):
+        """A uniquely-named member beside colliding siblings still
+        carries its ref — no bare/qualified mixture in a roster."""
+        rows, groups = [], []
+        names = ["Diabetic Patients", "Diabetic Patients",
+                 "Diabetic Patients (Panel)", "D4", "D5", "D6"]
+        for i, nm in enumerate(names):
+            mid = f"reporting.USP_M{i}"
+            rows.append({"id": mid, "kind": "metric",
+                         "business_name": nm, "description": "d",
+                         "source_tables": f"T{i}", "steward": "",
+                         "decision_sites": [{
+                             "expression_sql": f"C{i} >= {i}"}]})
+            groups.append({"group": i + 1, "members": [mid]})
+        c = compose_conclusion([
+            {"component": {"op": "retrieve", "params": {}},
+             "result": {"op": "retrieve", "params": {},
+                        "complete": True, "universe": "u",
+                        "rows": rows}},
+            {"component": {"op": "compare", "params": {}},
+             "result": {"op": "compare", "params": {},
+                        "complete": True, "universe": "u",
+                        "note": "6 hash groups — DIFFERS.",
+                        "rows": groups}}], "", True)
+        labels = [m["name"] for g in c["roster"]
+                  for m in g["members"]]
+        assert len(labels) == 6
+        assert all(lb.endswith(")") and "(reporting.USP_M" in lb
+                   for lb in labels), labels

@@ -3477,3 +3477,40 @@ grouped by business-worded method, one line per member.
 4. Spot-assert three members' phrases against their real SQL in
    tests (DX = E11% only · Lab = HbA1c ≥ 6.5 · Billing = CPT).
 Sunny stays unpinged until the roster probe is truth-clean.
+
+### 2026-08-31 — CONSOLE-4d BUILT — release 1.78.0
+The roster's truth defects, each root-caused before fixing:
+1. **Cross-member attribution — the generator was DEAD CTEs.** The
+   live probe showed the DX metric's own store sites genuinely
+   include HbA1c and MED_NAME predicates: the seeded proc declares
+   Lab_Draws / Med_Orders_Cur / A1c_High CTEs that NOTHING selects
+   from. They are real parsed logic but not the metric's criteria.
+   Mechanism (parser-derived, never a heuristic): a metric's sites
+   now come from its OUTPUT-REACHABLE steps only —
+   canonical_to_transform target(s) + the transform_to_transform
+   closure — and unreachable steps ride the record as
+   `unreached_steps`, DISCLOSED never dropped silently. A store
+   without those edges filters NOTHING (absence of evidence is not
+   evidence of deadness). Live: DX now phrases diagnosis only, Lab
+   HbA1c only, Billing CPT only.
+2. **Label form unified:** ONE form per family — when any member
+   needs qualification, EVERY member carries its ref, so a roster
+   never mixes bare "Diabetic Patients" with qualified siblings;
+   an unretrieved member names itself from its ref, never a raw id.
+   The console act now retrieves ALL members (cap 6→16): the old
+   cap left four cousins as empty rows, which is what produced raw
+   ids and "(shared logic only)".
+3. **Gestational twins now read differently:** compound predicates
+   phrase EVERY clause — "matches E11%; excludes the pattern
+   O24.4%" vs "matches E11%; also matches the pattern O24.4%".
+   Their whole difference IS the second clause; phrasing only the
+   first made them identical.
+4. **All-distinct assertion:** when the hash partition proves N
+   groups for N members, no member may phrase "(shared logic
+   only)" — the description leads, else a typed pointer.
+5. Spot-asserts against the real SQL (DX = E11% · Lab = HbA1c ≥
+   6.5 · Billing = CPT list) test-held, plus no-cross-attribution
+   and label-uniformity gates.
+**Gates:** 1,373 green + 5 xfailed, ruff clean; wheel 1.78.0.
+**Live roster probe is truth-clean** — seven method groups, every
+member phrased from its own reachable logic, twins distinguished.

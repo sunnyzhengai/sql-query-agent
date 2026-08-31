@@ -7,7 +7,7 @@
 
 # Test Map — what every test proves
 
-118 modules, 1331 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
+118 modules, 1339 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
 
 ## By ADR
 
@@ -41,14 +41,14 @@
 | 0032 | Deterministic core, LLM edges | `tests/orchestrator/test_core.py` (10), `tests/test_grounding_evals.py` (6) |
 | 0033 | System of record + projections: Delta is the record | `tests/graph/test_backend_comparison.py` (11) |
 | 0035 | Agentic conversation over deterministic tools | `tests/orchestrator/test_agent.py` (6), `tests/orchestrator/test_tools.py` (21), `tests/webapp/test_app.py` (76) |
-| 0036 | Operations are the product: plan, confirm, execute, display | `tests/orchestrator/test_caption_gate.py` (33), `tests/orchestrator/test_conclusion.py` (32), `tests/test_methodology.py` (8) |
-| 0037 | The completed algebra: traverse + result-set kernels | `tests/graph/test_traversal.py` (2), `tests/orchestrator/test_ops.py` (78) |
+| 0036 | Operations are the product: plan, confirm, execute, display | `tests/orchestrator/test_caption_gate.py` (33), `tests/orchestrator/test_conclusion.py` (38), `tests/test_methodology.py` (8) |
+| 0037 | The completed algebra: traverse + result-set kernels | `tests/graph/test_traversal.py` (2), `tests/orchestrator/test_ops.py` (80) |
 | 0038 | The interaction layer: 'no' is input | `tests/orchestrator/test_events.py` (7), `tests/steps/test_agent_events.py` (5) |
 | 0039 | Every error links to its contract | `tests/governance/test_funnel.py` (8), `tests/governance/test_journey.py` (7), `tests/test_table_contracts.py` (10) |
 | 0040 | The consumption layer: reports and measures | `tests/adapters/test_devops_tmdl.py` (26), `tests/extractor/test_workspace_tmdl_source.py` (9), `tests/orchestrator/test_report_links.py` (6), `tests/steps/test_semantic_catalog.py` (9), `tests/steps/test_semantic_models.py` (23) |
 | 0041 | M mini-parser, shape registry, fallout capture | `tests/mquery/test_mquery.py` (16) |
 | 0042 | The notebook contract: a harness for the driver layer | `tests/test_docs_consistency.py` (10), `tests/test_notebook_contract.py` (12), `tests/test_replan.py` (9) |
-| 0043 | The diff kernel: the founding question's shape | `tests/graph/test_decomposition_diff.py` (11), `tests/orchestrator/test_ops.py` (78) |
+| 0043 | The diff kernel: the founding question's shape | `tests/graph/test_decomposition_diff.py` (11), `tests/orchestrator/test_ops.py` (80) |
 | 0044 | The tree contract: round-trip verified descriptions | `tests/graph/test_decision_wiring.py` (8), `tests/test_tree_contract.py` (13), `tests/tree/test_extract.py` (18) |
 | 0045 | The escalation contract: no silent residue | `tests/governance/test_leaf_grounding.py` (6), `tests/test_escalation_contract.py` (8) |
 | 0046 | Anchor, discover, match, rank — the human picks | `tests/test_derive_relationships.py` (7), `tests/test_spec_gates.py` (4) |
@@ -58,7 +58,7 @@
 | 0050 | Bounded read-only answer loop: plan to the answer, caption answers, auto-continue (amends 0036) | `tests/orchestrator/test_turn_engine.py` (31) |
 | 0051 | The one-mind turn: one conversation decides, the boundary enforces (supersedes 0036/0050's shape) | `tests/orchestrator/test_turn_engine.py` (31) |
 | 0052 | The reachability contract: every graph payload reachable by a named op or excluded with a reason | `tests/test_reachability.py` (8), `tests/test_reachability_audit.py` (6) |
-| 0053 | Projection-grain column lineage: transform_to_column edges, resolved-only, conservation-counted | `tests/graph/test_builder.py` (16), `tests/orchestrator/test_ops.py` (78) |
+| 0053 | Projection-grain column lineage: transform_to_column edges, resolved-only, conservation-counted | `tests/graph/test_builder.py` (16), `tests/orchestrator/test_ops.py` (80) |
 | 0054 | Governance red flags and governed plurality: misnomer/duplicate/cousin sweep over content hashes | `tests/governance/test_red_flags.py` (17), `tests/orchestrator/test_flag_ops.py` (11) |
 | 0055 | The designed shape corpus: spec-derived test data (category-partition over name x logic x scope) | `tests/shapes/test_shapes.py` (18) |
 | 0056 | The decision algebra: every answer ends in a decision (typed deny, usage weights) | `tests/test_flywheel.py` (7) |
@@ -110,7 +110,7 @@
 ### contract:suite-legibility — the suite explains itself to Sunny — the proof ledger and the run transcript (morning orders, 2026-08-27)
 
 - `tests/adapters/test_file_export.py` (9): BRIDGE-1 stage 1 (0063 §2 file-first): native import files from
-- `tests/orchestrator/test_conclusion.py` (32): The Answer Format Contract's composer (RW-10): card class is
+- `tests/orchestrator/test_conclusion.py` (38): The Answer Format Contract's composer (RW-10): card class is
 - `tests/orchestrator/test_parse_plan.py` (28): ADR 0060 prototype L0: closure is structural, grounding is exact,
 - `tests/shapes/test_seed.py` (7): The demo-source seed (shape-store tenant load, 2026-08-27):
 - `tests/test_flywheel.py` (7): FLYWHEEL-1 (0056 mechanism v1, Sunny-authorized 2026-08-29):

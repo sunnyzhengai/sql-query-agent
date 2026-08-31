@@ -317,6 +317,27 @@ DECISION_COUNT_QUERY = (
 # Top sites by predicate weight, deterministic order; the cap is
 # constant in the query text (today's lesson: nontrivial parameter
 # types need live probes) and DISCLOSED in the stamped headline (B3).
+# CONSOLE-4d: the OUTPUT-REACHABLE step set — canonical_to_transform
+# points at the output step(s) only (build-time, parser-derived);
+# closure over transform_to_transform gives the steps whose logic
+# the metric's RESULT actually depends on. Dead CTEs (seeded estate
+# noise) fall outside and their sites must never phrase as criteria.
+CANONICAL_TARGETS_QUERY = (
+    "declare query_parameters(p_ref:string);\n"
+    "graph_edges\n"
+    "| where edge_type == 'canonical_to_transform'\n"
+    "    and source_id == strcat('canonical:', p_ref)\n"
+    "| project target_id"
+)
+
+STEP_DEP_EDGES_QUERY = (
+    "declare query_parameters(p_ref:string);\n"
+    "graph_edges\n"
+    "| where edge_type == 'transform_to_transform'\n"
+    "    and source_id startswith strcat('transform:', p_ref, ':')\n"
+    "| project source_id, target_id"
+)
+
 DECISIONS_OF_METRIC_QUERY = (
     "declare query_parameters(p_ref:string);\n"
     "graph_nodes\n"

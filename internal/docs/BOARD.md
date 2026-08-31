@@ -651,5 +651,14 @@ watcher) continue. Lifts only by Sunny's word, recorded here.
       group headers ("By diagnosis codes"), equijoins filtered
       from the distinguishing set (structural, never criteria),
       aliases stripped, phrase caps, description-leads-on-degrade.
-      1,365 green + ruff. AWAITS review → Sunny reads BOTH cards
-      as steward, no SQL.
+      1,365 green + ruff. **Roster probe found CONSOLE-4d (truth
+      defects).**
+- [x] **CONSOLE-4d BUILT (08-31 dev, 1.78.0)** — cross-attribution
+      root-caused to DEAD CTEs: sites now come from OUTPUT-
+      REACHABLE steps only (canonical→transform + dep closure),
+      unreached disclosed; ALL members retrieve (cap 16); one
+      label form per family; compound predicates phrase every
+      clause (gestational twins now distinct); all-distinct never
+      says "shared logic only"; spot-asserts vs real SQL. Live
+      roster probe TRUTH-CLEAN. 1,373 green + ruff. AWAITS review
+      → Sunny reads BOTH cards as steward, no SQL.

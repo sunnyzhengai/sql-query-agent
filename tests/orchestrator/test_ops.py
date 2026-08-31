@@ -794,3 +794,75 @@ class TestCompareClusterExpansion:
         assert "table node" in msg
         assert "cluster id (its members expand)" in msg
         assert "capacity" not in msg and "shortcut" not in msg
+
+
+class TestConsole4dReachableSites:
+    """CONSOLE-4d (roster truth): a metric's criteria come from its
+    OUTPUT-REACHABLE steps only — canonical_to_transform target +
+    the dep-edge closure; dead CTEs (seeded estate noise) disclose
+    as unreached_steps and never phrase as criteria."""
+
+    def _kql(self, with_edges=True):
+        from src.orchestrator.tools import (
+            CANONICAL_TARGETS_QUERY,
+            DECISIONS_OF_METRIC_QUERY,
+            STEP_DEP_EDGES_QUERY,
+        )
+        ref = REF_A
+
+        def kql(query, params):
+            if query == CANONICAL_TARGETS_QUERY:
+                return ([{"target_id": f"transform:{ref}:Base"}]
+                        if with_edges else [])
+            if query == STEP_DEP_EDGES_QUERY:
+                return ([{"source_id": f"transform:{ref}:Base",
+                          "target_id": f"transform:{ref}:Feeder"}]
+                        if with_edges else [])
+            if query == DECISIONS_OF_METRIC_QUERY:
+                import json as _j
+                return [
+                    {"node_id": f"decision:{ref}:Base:site0",
+                     "name": "s", "description": "",
+                     "properties": _j.dumps({
+                         "step_name": "Base", "context": "where",
+                         "predicate_count": 1,
+                         "expression_sql":
+                             "DC.ICD_CODE LIKE 'E11%'"}),
+                     "columns": "[]"},
+                    {"node_id": f"decision:{ref}:Feeder:site0",
+                     "name": "s", "description": "",
+                     "properties": _j.dumps({
+                         "step_name": "Feeder", "context": "where",
+                         "predicate_count": 1,
+                         "expression_sql": "X.KEPT >= 1"}),
+                     "columns": "[]"},
+                    {"node_id": f"decision:{ref}:DeadCte:site0",
+                     "name": "s", "description": "",
+                     "properties": _j.dumps({
+                         "step_name": "DeadCte", "context": "where",
+                         "predicate_count": 1,
+                         "expression_sql":
+                             "LR.HBA1C_VALUE >= 6.5"}),
+                     "columns": "[]"},
+                ]
+            return fake_kql(query, params)
+        return kql
+
+    def test_dead_cte_sites_filter_and_disclose(self):
+        s = OpsSession()
+        s.note_user(REF_A)
+        rs = op_retrieve([REF_A], self._kql(), s)
+        row = rs.rows[0]
+        steps = {x.get("step") for x in row["decision_sites"]}
+        assert steps == {"Base", "Feeder"}    # closure, not just root
+        assert row["unreached_steps"] == ["DeadCte"]
+
+    def test_store_without_edges_filters_nothing(self):
+        # absence of evidence is not evidence of deadness
+        s = OpsSession()
+        s.note_user(REF_A)
+        rs = op_retrieve([REF_A], self._kql(with_edges=False), s)
+        row = rs.rows[0]
+        steps = {x.get("step") for x in row["decision_sites"]}
+        assert "DeadCte" in steps
+        assert row["unreached_steps"] == []

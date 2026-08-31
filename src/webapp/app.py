@@ -869,14 +869,19 @@ def create_app(
                 member_ids = [str(m) for row in rs.rows
                               for m in (row.get("members") or [])]
                 if member_ids:
+                    # CONSOLE-4d: ALL members retrieve (the [:6]
+                    # cap left four cousins as EMPTY rows — raw-id
+                    # labels, "(shared logic only)" phrases, and
+                    # misattributed distinctness); cap 16, disclosed
+                    ids16 = member_ids[:16]
                     from src.orchestrator.ops import op_retrieve
-                    ret = op_retrieve(member_ids[:6], run_kql,
+                    ret = op_retrieve(ids16, run_kql,
                                       conv.engine.ops)
                     rshown = ret.display()
                     rshown["headline"] = stamped_headline(rshown)
                     outputs.append({"component": {
                         "op": "retrieve",
-                        "params": {"ids": member_ids[:6]}},
+                        "params": {"ids": ids16}},
                         "result": rshown})
                 outputs.append({"component": {"op": "compare",
                                               "params": {"refs": [target]}},
