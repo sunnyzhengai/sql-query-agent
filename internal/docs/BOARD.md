@@ -691,18 +691,24 @@ watcher) continue. Lifts only by Sunny's word, recorded here.
 - [ ] **CONSOLE-6 item 2 — RESOLVED IN PRINCIPLE by the landing
       matrix §E (draft 08-31), awaiting Sunny's ratification of
       that doc:** decided cards become HANDOFF RECEIPTS — state
-      chip + approver + "written to <catalog> → [open in
-      catalog]" (or "queued for export" in file-first), sunk
-      beneath open work behind a Resolved (N) filter. Dev builds
-      on ratification; nothing built yet (the matrix is DRAFT and
-      carries four open calls).
-- [ ] **Decision landing matrix (DRAFT 08-31) — Sunny ratifies:**
-      docs/architecture/DECISION_LANDING_MATRIX.md maps every
-      decision to Purview/Collibra native-vs-customizable, with
-      the governing rule "assertions go to the customer's DG
-      tool; AIVIA keeps provenance + machine signals only — a
-      record with no reader is exhaust". Four open calls (§F):
-      Purview attribute names + preview-API vs file-first ·
-      Collibra relation types on her estates · delegate-queue
-      acceptability in Purview estates · denial suppression
-      window (recommend: until the SQL changes).
+      chip + approver + "proposed to <catalog> · <last seen
+      outcome> · [open in catalog]" (v2 §3 — the outcome comes
+      from the OUTBOX row, not a sync), sunk beneath open work
+      behind a Resolved (N) filter. Dev builds on ratification;
+      nothing built yet.
+- [ ] **Decision landing matrix — DRAFT v2 (08-31) — Sunny
+      ratifies:** rebuilt on her three rulings — (1) HIERARCHY
+      (parent CONCEPT + named children) replaces official/sibling;
+      (2) approval happens in the CUSTOMER'S workflow (Purview UC
+      publish workflow is native — corrects review's earlier
+      claim; AIVIA hosts NO approval queue); (3) NO SYNC — the
+      OUTBOX (logic-hash keyed, one row per proposal, no copy of
+      their catalog). Four workflow rules: act only on parse-
+      source change · never repeat a proposal · look before we
+      write (one object, at write time) · never police their
+      catalog between engagements (divergence = an X-RAY finding).
+      Open calls (§5): aivia_* attribute names + v1 transport ·
+      Collibra relation types · canonical-child marking · outbox
+      retention (recommend keep — it IS the anti-repeat memory).
+      **Bridge adapters + the console's receipt line build from
+      this table once ratified.**
