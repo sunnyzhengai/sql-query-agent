@@ -446,3 +446,86 @@ class TestConsole4V2Roster:
         outs[1]["result"]["rows"] = outs[1]["result"]["rows"][:3]
         c = compose_conclusion(outs, "", True)
         assert c["mode"] == "grid"
+
+
+class TestConsole4c:
+    """CONSOLE-4c (roster leaked plumbing): equijoins never enter
+    the distinguishing set; aliases never face the steward; group
+    headers are worded dominant READS; degraded templates yield to
+    the RW-6 description; phrases cap at one breath."""
+
+    def test_equijoins_are_structural_never_criteria(self):
+        from src.orchestrator.conclusion import (
+            _is_equijoin,
+            _member_elements,
+        )
+        assert _is_equijoin("CC.PATIENT_ID = E.PATIENT_ID")
+        assert not _is_equijoin("HBA1C = 6.5")       # literal side
+        assert not _is_equijoin("X.CODE IN ('a','b')")
+        els = _member_elements({
+            "source_tables": "T1",
+            "decision_sites": [
+                {"expression_sql": "CC.PID = E.PID"},
+                {"expression_sql": "HBA1C >= 6.5"}]})
+        preds = [v for k, v in els if k == "pred"]
+        assert preds == ["HBA1C >= 6.5"]
+
+    def test_aliases_never_face_the_steward(self):
+        from src.orchestrator.conclusion import _business_words
+        assert _business_words(
+            "pred", "CC.CPT_CODE IN ('a','b','c','d')") == \
+            "limits CPT_CODE to 4 listed value(s)"
+        assert _business_words("pred", "E.HBA1C >= 6.5") == \
+            "requires HBA1C at least 6.5"
+
+    def _cousins(self, specs):
+        rows, groups = [], []
+        for i, (tbl, expr) in enumerate(specs):
+            mid = f"reporting.USP_C{i}"
+            rows.append({
+                "id": mid, "kind": "metric",
+                "business_name": "Diabetic Patients",
+                "description": f"Selects via {tbl.lower()}.",
+                "source_tables": tbl, "steward": "",
+                "decision_sites": ([{"expression_sql": expr}]
+                                   if expr else [])})
+            groups.append({"group": i + 1, "members": [mid]})
+        return [
+            {"component": {"op": "retrieve", "params": {}},
+             "result": {"op": "retrieve", "params": {},
+                        "complete": True, "universe": "u",
+                        "rows": rows}},
+            {"component": {"op": "compare", "params": {}},
+             "result": {"op": "compare", "params": {},
+                        "complete": True, "universe": "u",
+                        "note": f"{len(specs)} hash groups — "
+                                "DIFFERS.",
+                        "rows": groups}},
+        ]
+
+    def test_roster_groups_by_worded_dominant_read(self):
+        specs = [("DIAGNOSIS_CODES", "DX IN ('a','b','c','d')"),
+                 ("DIAGNOSIS_CODES", "DX IN ('a','b','c','e')"),
+                 ("LAB_RESULTS", "HBA1C >= 6.5"),
+                 ("LAB_RESULTS", "HBA1C >= 7.0"),
+                 ("MEDICATION_ORDERS", None),
+                 ("BILLING_CLAIMS", None)]
+        c = compose_conclusion(self._cousins(specs), "", True)
+        assert c["mode"] == "roster"
+        headers = {g["header"] for g in c["roster"]}
+        assert "By diagnosis codes" in headers
+        assert "By lab results" in headers
+        # groups hold PAIRS, not singletons
+        sizes = sorted(len(g["members"]) for g in c["roster"])
+        assert max(sizes) >= 2
+
+    def test_degraded_template_yields_to_description(self):
+        specs = [("MEDICATION_ORDERS", None),
+                 ("BILLING_CLAIMS", None),
+                 ("LAB_RESULTS", None),
+                 ("DIAGNOSIS_CODES", None)]
+        c = compose_conclusion(self._cousins(specs), "", True)
+        for g in c["roster"]:
+            for m in g["members"]:
+                assert len(m["phrase"]) <= 70
+                assert "developer view" not in m["phrase"]

@@ -83,6 +83,15 @@ def _norm_el(s: str) -> str:
     return " ".join(str(s).split())
 
 
+def _is_equijoin(expr: str) -> bool:
+    """CONSOLE-4c item 2: COL = COL (identifier on BOTH sides, no
+    literal) is structural plumbing — a join, never a criterion."""
+    import re as _re
+    return bool(_re.fullmatch(
+        r"[\w.\[\]]+\s*=\s*[A-Za-z_][\w.\[\]]*",
+        expr.strip()))
+
+
 def _member_elements(row: dict) -> "list[tuple[str, str]]":
     els: "list[tuple[str, str]]" = []
     for tbl in _as_names(row.get("source_tables")):
@@ -91,9 +100,20 @@ def _member_elements(row: dict) -> "list[tuple[str, str]]":
         expr = str((site or {}).get("expression")
                    or (site or {}).get("expression_sql")
                    or (site or {}).get("predicate") or "")
-        if expr.strip():
-            els.append(("pred", _norm_el(expr)))
+        expr = _norm_el(expr)
+        if expr and not _is_equijoin(expr):
+            els.append(("pred", expr))
     return els
+
+
+def _col(token: str) -> str:
+    """CONSOLE-4c item 3: alias-qualified columns never face the
+    steward — CC.CPT_CODE renders CPT_CODE."""
+    return token.strip("[]").split(".")[-1].strip("[]")
+
+
+def _humanize(table: str) -> str:
+    return table.strip("[]").split(".")[-1].replace("_", " ").lower()
 
 
 def distinguishing_set(member_rows: "dict[str, dict]") -> dict:
@@ -135,7 +155,7 @@ def _business_words(kind: str, value: str,
         trunc = (not v.rstrip().endswith(")")
                  or v.count("'") % 2 == 1)
         count = f"\u2265{n}" if trunc else str(n)
-        return f"{neg} {m.group(1)} to {count} listed value(s)"
+        return f"{neg} {_col(m.group(1))} to {count} listed value(s)"
     m = _re.search(r"COUNT\s*\([^)]*\)\s*(>=|>)\s*(\d+)", v,
                    _re.IGNORECASE)
     if m:
@@ -146,13 +166,13 @@ def _business_words(kind: str, value: str,
         opword = {">=": "at least", "<=": "at most",
                   ">": "more than", "<": "under",
                   "=": "exactly"}[m.group(2)]
-        return (f"requires {m.group(1)} {opword} "
+        return (f"requires {_col(m.group(1))} {opword} "
                 f"{m.group(3).strip(chr(39))}")
     m = _re.match(r"([\w.\[\]]+)\s+LIKE\s+(\S+)", v,
                   _re.IGNORECASE)
     if m:
         return (f"matches the pattern {m.group(2).strip(chr(39))} "
-                f"on {m.group(1)}")
+                f"on {_col(m.group(1))}")
     if columns:
         return ("has an additional condition on "
                 + ", ".join(columns[:3])
@@ -399,15 +419,42 @@ def compose_conclusion(outputs: "list[dict]", caption: str,
                                   "cells": cells})
         roster_groups = []
         if mode == "roster":
+            # CONSOLE-4c: group key = the DOMINANT DISTINGUISHING
+            # READ, worded ("By diagnosis codes"); a member whose
+            # templates degrade leads with its RW-6 description;
+            # phrases cap at one breath
             by_header: "dict[str, list]" = {}
+            background = {v for k, v in dset["shared"]
+                          if k == "read"}
             for m in members:
-                header = (m["distinguishing_plain"][0]
-                          if m["distinguishing_plain"]
-                          else "no distinguishing element recorded")
+                # the METHOD read: the member's reads minus the
+                # ALL-shared background (a read two cousins share
+                # is exactly what groups them — the strictly-
+                # unique set is for the grid, not the key)
+                method_reads = [r for r in m["reads"]
+                                if r not in background]
+                els = dset["members"].get(m["id"], [])
+                preds = [v for k, v in els if k == "pred"]
+                if method_reads:
+                    header = f"By {_humanize(method_reads[0])}"
+                elif preds:
+                    import re as _re2
+                    cm = _re2.match(r"([\w.\[\]]+)", preds[0])
+                    header = (f"By {_humanize(_col(cm.group(1)))}"
+                              if cm else "By shared sources")
+                else:
+                    header = "By shared logic"
+                plain = m["distinguishing_plain"]
+                degraded = all("developer view" in ph
+                               for ph in plain) if plain else True
+                if degraded and m["description"]:
+                    phrase = m["description"].split(".")[0][:70]
+                else:
+                    phrase = ("; ".join(plain)[:70]
+                              or "(shared logic only)")
                 by_header.setdefault(header, []).append({
                     "id": m["id"], "name": m["name"],
-                    "phrase": "; ".join(m["distinguishing_plain"])
-                    or "(shared logic only)",
+                    "phrase": phrase,
                     "steward": m["steward"]})
             roster_groups = [
                 {"header": h, "members": ms}

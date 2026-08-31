@@ -645,5 +645,11 @@ watcher) continue. Lifts only by Sunny's word, recorded here.
       consequence notes; grouped roster >3 w/ pair drill-down;
       NO SQL in steward fields (test-held); snippets per member
       for developers; fragments display-retired (events keep
-      them). 1,361 green + ruff. AWAITS review → Sunny reads both
-      cards as steward and rules without SQL.
+      them). 1,361 green + ruff. **PAIR GRID VERIFIED; roster
+      needed CONSOLE-4c.**
+- [x] **CONSOLE-4c BUILT (08-30 night, 1.77.1)** — method-read
+      group headers ("By diagnosis codes"), equijoins filtered
+      from the distinguishing set (structural, never criteria),
+      aliases stripped, phrase caps, description-leads-on-degrade.
+      1,365 green + ruff. AWAITS review → Sunny reads BOTH cards
+      as steward, no SQL.

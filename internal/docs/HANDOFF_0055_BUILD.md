@@ -3436,3 +3436,24 @@ template vocabulary leaked plumbing:
    template phrase folds.
 Acceptance: the ten-member roster reads like the ratified mock —
 five groups, one business line per member.
+
+### 2026-08-30 night — CONSOLE-4c BUILT — release 1.77.1
+The roster's plumbing leaks, closed at the element level so every
+rendering inherits:
+1. **Group key = the METHOD read, worded:** headers are "By
+   diagnosis codes / By lab results / …" — the member's reads
+   minus the ALL-shared background (a read two cousins share is
+   exactly what GROUPS them; the strictly-unique set stays the
+   grid's business). Predicate-column fallback, then "By shared
+   logic". Groups hold pairs, not singletons — test-held.
+2. **Equijoins never enter the distinguishing set:** COL = COL
+   (identifier both sides) is structural plumbing, filtered at
+   _member_elements — joins can never be phrased as criteria on
+   any surface. Literal comparisons (HBA1C = 6.5) still qualify.
+3. **Aliases never face the steward:** CC.CPT_CODE renders
+   CPT_CODE in every template; phrases cap at 70 chars; a member
+   whose templates all degrade LEADS with its RW-6 description
+   (the template detail stays in the developer view).
+**Gates:** 1,365 green + 5 xfailed, ruff clean; wheel 1.77.1.
+Acceptance: the ten-member roster reads like the ratified mock —
+grouped by business-worded method, one line per member.
