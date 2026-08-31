@@ -4021,3 +4021,31 @@ the gate to P1 (term proposal).
 FOLLOW-ON (not blocking): TEMP-TABLE DESCRIPTION capability —
 23/28 procs stage through temp tables; Tier 1 on a Clarity estate
 needs it. Order after Sunny's grading.
+
+## ORDER DESC-VOICE-1 (Sunny's grading of the P0-c sample — three findings)
+Her verdict on accuracy: no fabrications found; the issues are
+VOICE and SUBJECT, i.e. who the description is written for.
+1. **No technical vocabulary in business descriptions.** Sample
+   "AllCultures" says "temporary table `#Labs_and_Cultures`",
+   "the join with the ORGANISMS table enriches the dataset" — a
+   developer's sentence in a steward's field. Ban from the
+   business description: table/temp table/join/select/CTE/column
+   names as subjects, `#`-prefixed object names, "dataset",
+   "records" as the subject. Source objects are already carried
+   by the RELATIONSHIP (landing matrix §1a) — the sentence does
+   not need them. Sample "All_LDAs" is the model doing it right
+   already, so this is a prompt/gate rule, not a capability gap.
+2. **Name the SUBJECT, not "membership".** We compute parsed
+   grain; use it: "encounters are included when…", "medication
+   orders are included when…", "patients are included when…".
+   Fall back to "records" ONLY when grain is (unknown) — and
+   that fallback is itself a signal worth logging.
+3. **Acronym expansion is the interpretation boundary.** ETT/IV/
+   CVL were GROUNDED (literal in the CASE labels and comments —
+   verified by review against the source), but "endotracheal
+   tubes (ETT)" is the model expanding an acronym from its own
+   medical knowledge. RULE: an acronym may be expanded only if
+   the expansion appears in the source or the data dictionary;
+   otherwise print the acronym as the source wrote it. Add the
+   gate check + a red-first fixture.
+Then re-run the sample so Sunny grades the corrected voice.
