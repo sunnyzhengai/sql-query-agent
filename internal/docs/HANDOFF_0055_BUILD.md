@@ -3577,3 +3577,20 @@ insulin glargine"); four panel-derived members share the
 "encounter records" group (their true method is the panel base —
 a deeper grouping question, park for Sunny's read to judge).
 **Sunny: ready for your double read.**
+
+## ORDER CONSOLE-5 (Sunny: "my certified cards fell off"; probe: they didn't — the state did)
+Probe on 1.78.1: /api/inbox serves all 26 flags with ZERO marked
+decided, though Sunny certified several yesterday (events exist).
+The CONSOLE-1 promise — decided items sink but stay visible with
+STATE and ACTOR — is not folding back.
+1. Fold decided state onto each flag from the [CONSOLE:*] events
+   (latest decision wins, per the shipped fold rule): state,
+   verb, actor, timestamp, target member where applicable.
+2. Render decided cards sunk-but-visible: state chip + "ruled by
+   <actor> on <date>", actions replaced by "reopen" (a new event,
+   never a mutation — the record is append-only).
+3. Governance consequence, not cosmetics: without fold-back two
+   stewards re-rule the same flag and the second overwrites the
+   first silently. Test: certify a flag → refetch inbox → that
+   flag reports decided with the actor.
+Sunny's double read is UNBLOCKED meanwhile (all flags present).
