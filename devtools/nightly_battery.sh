@@ -17,9 +17,12 @@ python3.11 devtools/walk_runner_0062.py http://127.0.0.1:8011 "$OUT" >/dev/null 
 FUZZ=$(PYTHONPATH=. python3.11 devtools/walk_fuzzer.py http://127.0.0.1:8011 3 2>/dev/null)
 FUZZV=$(echo "$FUZZ" | head -1)
 kill $WB 2>/dev/null
-Q=$(grep -c "^## " "$OUT" 2>/dev/null || echo 0)
-ERR=$(grep -c "BATTERY ERROR\|conclusion kind: None\|error" "$OUT" 2>/dev/null || echo 0)
-DIF=$(grep -c "verdict: DIFFERS" "$OUT" 2>/dev/null || echo 0)
+Q=$(grep -c "^## " "$OUT" 2>/dev/null | head -1)
+Q=${Q:-0}
+ERR=$(grep -c -E "BATTERY ERROR|conclusion kind: None" "$OUT" 2>/dev/null | head -1)
+ERR=${ERR:-0}
+DIF=$(grep -c "verdict: DIFFERS" "$OUT" 2>/dev/null | head -1)
+DIF=${DIF:-0}
 STAMP=$(date "+%Y-%m-%d %H:%M")
 if [ "$Q" -ge 22 ] && [ "$ERR" -eq 0 ] && [ "$DIF" -ge 3 ]; then V="PASS"; else V="FAIL"; fi
 echo "- $STAMP cold run: $V — questions:$Q errors:$ERR differs:$DIF (no warm-up; idle store is the test)" >> internal/docs/NIGHTLY_BATTERY.md
