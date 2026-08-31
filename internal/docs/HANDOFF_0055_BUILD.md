@@ -3514,3 +3514,23 @@ The roster's truth defects, each root-caused before fixing:
 **Gates:** 1,373 green + 5 xfailed, ruff clean; wheel 1.78.0.
 **Live roster probe is truth-clean** — seven method groups, every
 member phrased from its own reachable logic, twins distinguished.
+
+### REVIEW — CONSOLE-4d (1.78.0): TRUTH VERIFIED; two cosmetics before Sunny (CONSOLE-4e)
+Gates 1,373 + ruff clean. Roster now truth-clean: 10/10 members
+in own-method groups, phrases traceable to own SQL (gestational
+twins differ visibly: excludes vs also-matches O24.4%), no
+"shared logic only", labels uniform, dead-CTE root cause fixed
+(output-reachable sites only). **CONSOLE-4e (cosmetic, then
+Sunny):**
+1. Group headers still name COLUMNS not methods for three groups
+   ("By cpt codes"→"By billing records"; "By appointments"→
+   "By appointment records"; "By diagnosis codeset"/"By
+   encounters" collapse — panel-scoped members grouped by their
+   panel base, not their filter columns). Map table→business word
+   as ratified (diagnosis codes · lab results · medication orders
+   · billing records · panel-scoped).
+2. "additionally reads X" tails add nothing for a steward (the
+   reads row already exists in the grid; the roster line should
+   END at the criterion). Trim tails; cap the phrase at its
+   distinguishing clause(s).
+Then: probe → Sunny's double read.
