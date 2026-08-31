@@ -3778,3 +3778,33 @@ corpus, so the corpus measures the gate we intend to ship.
 
 Review verifies each; P1 (term proposal) waits on P0-c's sample
 passing Sunny's read. Nothing integrates before both.
+
+### 2026-08-31 — P0-a (DESC-GATE-2) BUILT — release 1.80.0
+**One gate, two new classes** — no new gate, exactly as ordered;
+the existing dialect awareness and retry+fallback wiring are
+untouched, so table/grain violations flow through the same
+corrective retry and surgical fallback as values and filters.
+- **TABLE claims:** `parsed_tables()` reads FROM/JOIN/APPLY/INTO
+  targets MINUS the CTE names the fragment defines itself (a CTE
+  is not a base table). A table-shaped token (UPPER_SNAKE) in the
+  text that the fragment never reads — and that the data
+  dictionary does not name — is a violation naming what the
+  fragment DOES read.
+- **GRAIN claims:** `parsed_grain()` reads the columns that DEFINE
+  a row, strongest evidence first: DISTINCT/GROUP BY columns,
+  else the SELECT list's *_ID keys. A claim to count patients
+  over a visit-keyed query violates. **Unknown grain refuses
+  nothing** (absence of evidence is not evidence), and a select
+  carrying BOTH keys evidences BOTH grains — the gate refuses only
+  what the SQL contradicts, test-held in that direction too.
+- SQL-only, like the selected-not-filtered heuristic: dax/prose
+  skip both (the DAX-CALCULATE lesson respected).
+**Red-first proven per class, as ordered:** disabling the table
+class fails 2 fixtures, disabling the grain class fails 1, both
+restored → 19 green. A test-writing correction worth recording:
+my first visit-grain fixture projected PATIENT_ID *and*
+ENCOUNTER_ID and asserted the patient claim must fail — the SQL
+supported it, so the FIXTURE was wrong, not the gate. Corrected,
+and the honest-both-grains case added as its own test.
+**Gates:** 1,393 green + 5 xfailed, ruff clean; wheel 1.80.0.
+NEXT: P0-b (adversarial corpus over LIVE generation).

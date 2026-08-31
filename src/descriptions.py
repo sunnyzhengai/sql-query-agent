@@ -137,6 +137,117 @@ _CLAIM_STOPWORDS = frozenset(
     "various".split())
 
 
+# --- P0-a (DESC-GATE-2, ordered 2026-08-31): TABLE + GRAIN claims --
+# The two classes the value/filter checks cannot see. A wrong GRAIN
+# claim is the most dangerous description error we can ship: it
+# reads fluent and it is false ("counts patients" over a visit-grain
+# query). A wrong TABLE claim invents provenance.
+
+# FROM/JOIN/UPDATE/INTO targets — the tables a fragment actually
+# touches. Aliases and schema prefixes are stripped to the bare name
+# (the alias-never-faces-the-steward rule from CONSOLE-4c).
+_FROM_TABLES = re.compile(
+    r"(?is)\b(?:FROM|JOIN|APPLY|INTO|UPDATE)\s+"
+    r"([A-Za-z_][\w]*(?:\.[A-Za-z_][\w]*){0,2})")
+# a CTE name is not a base table — it is defined in the same text
+_CTE_NAMES = re.compile(r"(?is)(?:WITH|,)\s*([A-Za-z_][\w]*)\s+AS\s*\(")
+
+# the entity words a description may claim to count, and the column
+# tokens that evidence each. Word-grain, never question shapes.
+_GRAIN_WORDS = {
+    "patient": ("patient", "member", "person", "mrn"),
+    "visit": ("visit", "encounter", "admission", "appointment",
+              "stay"),
+    "order": ("order", "prescription", "med_order"),
+    "claim": ("claim", "billing", "cpt", "charge"),
+    "result": ("result", "lab", "observation"),
+}
+_GRAIN_CLAIM = re.compile(
+    r"(?i)\b(?:counts?|per|one row per|number of|distinct)\s+"
+    r"(?:the\s+)?([a-z]+?)s?\b")
+
+
+def _bare(name: str) -> str:
+    return name.strip("[]").split(".")[-1].strip("[]").lower()
+
+
+def parsed_tables(fragment: str) -> "set[str]":
+    """The base tables a fragment reads — FROM/JOIN targets minus the
+    CTE names it defines itself. Approximate by design and used only
+    to REFUSE claims about tables that appear nowhere."""
+    ctes = {_bare(c) for c in _CTE_NAMES.findall(fragment or "")}
+    return {_bare(m) for m in _FROM_TABLES.findall(fragment or "")
+            if _bare(m) not in ctes}
+
+
+def parsed_grain(fragment: str) -> "set[str]":
+    """The entity grain(s) the fragment's KEY columns evidence.
+
+    Precedence, strongest evidence first (the parser decides which
+    columns define a row, not prose):
+      1. DISTINCT / GROUP BY columns — they DEFINE the row;
+      2. otherwise the SELECT list's *_ID columns — the row's keys;
+      3. otherwise nothing: an unknown grain refuses no claim
+         (absence of evidence is not evidence).
+    When (1) or (2) yields any entity, that set is the grain — a
+    PATIENT_ID also present in a visit-keyed select does not make
+    the query patient-grain."""
+    frag = fragment or ""
+    explicit = " ".join(re.findall(
+        r"(?is)\b(?:DISTINCT|GROUP\s+BY)\b(.{0,160})", frag))
+    if explicit.strip():
+        keys = explicit
+    else:
+        select_list = " ".join(re.findall(
+            r"(?is)\bSELECT\b(.*?)\bFROM\b", frag))
+        ids = re.findall(r"(?i)\b([\w.\[\]]*_ID)\b", select_list)
+        keys = " ".join(ids)
+    keys_low = keys.lower()
+    found = set()
+    for entity, tokens in _GRAIN_WORDS.items():
+        if any(tok in keys_low for tok in tokens):
+            found.add(entity)
+    return found
+
+
+def _grain_violations(text: str, fragment: str) -> "list[str]":
+    evidence = parsed_grain(fragment)
+    if not evidence:
+        return []          # unknown grain refuses nothing
+    out = []
+    for claim in set(_GRAIN_CLAIM.findall(text)):
+        claimed = claim.lower().rstrip("s")
+        if claimed not in _GRAIN_WORDS:
+            continue       # not a grain word — other checks own it
+        if claimed not in evidence:
+            out.append(
+                f"grain claim {claim!r} contradicts the parsed grain "
+                f"({', '.join(sorted(evidence))})")
+    return out
+
+
+def _table_violations(text: str, fragment: str,
+                      dict_lines: "list[str] | None") -> "list[str]":
+    reads = parsed_tables(fragment)
+    if not reads:
+        return []
+    # a claim names a table when it uses a TABLE-SHAPED token
+    # (UPPER_SNAKE or a known read) — prose nouns are not claims
+    dict_blob = " ".join(dict_lines or []).lower()
+    out = []
+    for token in set(re.findall(r"\b[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)+\b",
+                                text)):
+        bare = _bare(token)
+        if bare in reads:
+            continue
+        if bare in dict_blob or bare in (fragment or "").lower():
+            continue       # named in the source or its dictionary
+        out.append(
+            f"ungrounded table claim: {token!r} — the fragment reads "
+            f"{', '.join(sorted(reads)) or 'no table'}")
+    return out
+
+
 def _condition_text(fragment: str) -> str:
     """The parts of the SQL that actually DECIDE: windows of text after
     WHERE / ON / HAVING / AND / WHEN keywords. Approximate by design —
@@ -197,6 +308,12 @@ def grounding_violations(
             violations.append(
                 f"selected-not-filtered: {line!r} — the concept appears "
                 f"only in the SELECT list, never in a condition")
+
+    # 3) TABLE claims (P0-a): only tables the fragment reads
+    # 4) GRAIN claims (P0-a): the counted entity must match the keys
+    if dialect == "sql":
+        violations.extend(_table_violations(text, fragment, dict_lines))
+        violations.extend(_grain_violations(text, fragment))
     return violations
 
 

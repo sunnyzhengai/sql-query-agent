@@ -10,7 +10,15 @@ deliver wrong text faster. Everything below is in dependency
 order; nothing skips ahead.
 
 ### P0 — PROVE DESCRIPTION GENERATION (ORDERED 2026-08-31, re-cut: P0-a gate extension → P0-b live corpus → P0-c 790-proc run + Sunny's hand-graded sample)
-- [ ] **DESC-GATE-1 — PREMISE CORRECTED BY DEV SURVEY (08-31,
+- [x] **P0-a DESC-GATE-2 BUILT (08-31 dev, 1.80.0)** — the one
+      gate gained TABLE claims (FROM/JOIN minus own CTEs; the
+      violation names what the fragment does read) and GRAIN
+      claims (DISTINCT/GROUP BY keys, else SELECT *_ID; unknown
+      grain refuses nothing; both-keys evidences both). SQL-only,
+      retry+fallback wiring untouched. Red-first proven per class
+      (disable table → 2 red; disable grain → 1 red). 1,393 green
+      + ruff. AWAITS review → P0-b.
+- [ ] ~~DESC-GATE-1~~ — PREMISE CORRECTED BY DEV SURVEY (08-31,
       nothing built):** a grounding gate ALREADY EXISTS and is
       field-proven — src/descriptions.py `grounding_violations()`
       checks ungrounded VALUES + filter-CLAIMS against the SQL's

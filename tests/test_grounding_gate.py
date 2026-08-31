@@ -104,3 +104,96 @@ class TestDialectAwareness:
         assert grounding_violations(
             text, roots_ground, ["USP_Severe_Sepsis", "122", "FinalData"],
             dialect="prose") == []
+
+
+# --- P0-a (DESC-GATE-2): TABLE + GRAIN claims, red-first per class ---
+
+DX_FRAGMENT = """
+SELECT DISTINCT DC.PATIENT_ID
+FROM DIAGNOSIS_CODES DC
+JOIN ENCOUNTERS E ON E.PATIENT_ID = DC.PATIENT_ID
+WHERE DC.ICD_CODE LIKE 'E11%'
+"""
+
+# a TRUE visit-grain query: the row is the encounter, and no
+# patient key is projected (a select carrying BOTH keys evidences
+# both grains — the gate must not refuse a claim the SQL supports)
+VISIT_FRAGMENT = """
+SELECT E.ENCOUNTER_ID, E.DEPARTMENT
+FROM ENCOUNTERS E
+WHERE E.DEPARTMENT = 'ED'
+"""
+
+
+class TestTableClaims:
+    """A description may name only tables the fragment reads —
+    naming another invents provenance (P0-a)."""
+
+    def test_ungrounded_table_is_a_violation(self):
+        text = ("- Diabetic patients identified from DIAGNOSIS_CODES\n"
+                "- joined to LAB_RESULTS for confirmation")
+        v = grounding_violations(text, DX_FRAGMENT)
+        assert any("ungrounded table claim" in x and "LAB_RESULTS" in x
+                   for x in v), v
+
+    def test_read_tables_pass(self):
+        text = ("- Diabetic patients from DIAGNOSIS_CODES\n"
+                "- joined to ENCOUNTERS")
+        v = grounding_violations(text, DX_FRAGMENT)
+        assert not any("ungrounded table claim" in x for x in v), v
+
+    def test_a_cte_name_is_not_a_base_table(self):
+        frag = ("WITH BASE_COHORT AS (SELECT PATIENT_ID FROM "
+                "DIAGNOSIS_CODES) SELECT * FROM BASE_COHORT")
+        # naming the CTE is fine (it is in the text); naming an
+        # unrelated table is not
+        assert not any("ungrounded table claim" in x for x in
+                       grounding_violations("- from BASE_COHORT", frag))
+        assert any("ungrounded table claim" in x for x in
+                   grounding_violations("- from BILLING_CLAIMS", frag))
+
+    def test_dictionary_named_tables_are_grounded(self):
+        text = "- patients from DIAGNOSIS_CODES per PATIENT_ROSTER"
+        v = grounding_violations(text, DX_FRAGMENT,
+                                 dict_lines=["PATIENT_ROSTER: the panel"])
+        assert not any("ungrounded table claim" in x for x in v), v
+
+
+class TestGrainClaims:
+    """The counted entity must match the parsed keys — a wrong grain
+    claim reads fluent and is false (P0-a)."""
+
+    def test_visit_grain_claimed_as_patients_is_a_violation(self):
+        text = "- counts patients seen in the emergency department"
+        v = grounding_violations(text, VISIT_FRAGMENT)
+        assert any("grain claim" in x for x in v), v
+
+    def test_matching_grain_passes(self):
+        text = "- counts distinct patients with a diabetes diagnosis"
+        v = grounding_violations(text, DX_FRAGMENT)
+        assert not any("grain claim" in x for x in v), v
+
+    def test_both_keys_projected_evidences_both_grains(self):
+        """Honesty in the other direction: a select carrying
+        ENCOUNTER_ID *and* PATIENT_ID supports either claim — the
+        gate refuses only what the SQL contradicts."""
+        both = ("SELECT E.ENCOUNTER_ID, E.PATIENT_ID "
+                "FROM ENCOUNTERS E")
+        for claim in ("- counts patients", "- counts visits"):
+            v = grounding_violations(claim, both)
+            assert not any("grain claim" in x for x in v), (claim, v)
+
+    def test_unknown_grain_refuses_nothing(self):
+        # no key columns to read → the gate must not guess
+        frag = "SELECT 1 AS FLAG"
+        text = "- counts patients"
+        v = grounding_violations(text, frag)
+        assert not any("grain claim" in x for x in v), v
+
+    def test_dax_and_prose_skip_the_sql_only_classes(self):
+        text = "- counts patients from LAB_RESULTS"
+        for dialect in ("dax", "prose"):
+            v = grounding_violations(text, VISIT_FRAGMENT,
+                                     dialect=dialect)
+            assert not any("grain claim" in x or "table claim" in x
+                           for x in v), (dialect, v)
