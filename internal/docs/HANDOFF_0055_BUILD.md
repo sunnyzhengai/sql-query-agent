@@ -4982,3 +4982,45 @@ Two further facts worth having before the build:
 ~8 node types plus the plumbing change.** Nothing in it resembles the
 paren-balancing / clause-segmentation work the reverted regex patch
 required. Dev's own evidence and this probe agree.
+
+### REVIEW — SUNNY ASKED ME TO STOP DEV BUILDING THE REGEX COMPOSER. IT IS ALREADY DEAD; ONE REAL DEFECT FOUND INSTEAD (08-31)
+
+Sunny's instruction: "stop Dev from developing the regex composer."
+**Checked before writing any order — no stop is needed.** Dev's
+in-flight (uncommitted) work IS the AST re-cut she ruled:
+`_IN_LIST/_BETWEEN/_COMPARISON/_IS_NULL/_JOIN_KEYS` are GONE from
+`src/descriptions.py` (only a comment recording their deletion
+remains), `compose_skeleton` now calls `parse_fragment()` →
+`parse_tsql`, and the proving ground is stated in-file. Nothing to
+stop; the rejected path is not being built.
+
+**But the scope hazard I flagged is REAL and PARTIALLY PRESENT.**
+`compose_skeleton` iterates `_queries_of(tree)` — EVERY
+QuerySpecification in the parse — and pools their conditions into one
+flat bullet list. Probed live against the new code:
+
+| shape | result |
+|---|---|
+| `IN (SELECT … WHERE 3 inner filters)` | CLEAN — renders "the patient appears in patient pcp assignment"; the 3 inner filters do NOT leak |
+| `NOT EXISTS (… AND 2 inner filters)` | CLEAN — "excludes those with a matching pcp record" |
+| scalar subquery as a value | CLEAN (weak but honest: "the department is another value") |
+| **derived table in FROM** | **LEAKS** — `FROM (SELECT … WHERE ACTIVE_YN='Y') X` puts **"the active flag is 'Y'"** in the OUTER step's bullets |
+
+So predicate-bearing subqueries are handled, but a DERIVED TABLE's
+own WHERE is attributed to the step that reads it. Corpus evidence
+for why this matters: `QueryDerivedTable` appears **10 times**, and
+one `USP_ED_SEPSIS` WHERE clause has **3 own predicates vs 11 walked
+blindly** (`devtools/` scope probe, whole-corpus).
+
+**It is the decoy class again:** the leaked bullet is grounded (that
+value IS in the SQL), so `grounding_violations()` cannot see it, and
+it passes every counter. Only reading output against the SQL finds
+it — the standing note, holding for the third time.
+
+**ORDER — DESC-SKELETON-3a (before the re-cut lands):** conditions
+belong to the query that OWNS them. Compose per-scope, not pooled:
+the outer query's own deciding clauses become bullets; a derived
+table's internal filters either stay out or are attributed to the
+derived source explicitly ("drawn from encounters where the active
+flag is 'Y'") — never presented as the step's own membership rule.
+Fixture: the case above, red-first.
