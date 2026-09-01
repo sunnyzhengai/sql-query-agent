@@ -4414,3 +4414,56 @@ worst-case floor, not the product's behaviour. I did NOT re-run
 the 60-step sample again — the framing fix is proven on 6 steps
 and the honest thing is to say which evidence I have.
 **Gates:** 1,424 passed + 5 xfailed, ruff clean, docs regenerated.
+
+## ORDER DESC-MEANING-1 — THE REFRAME (Sunny, 2026-08-31): meaning-first composition, deterministic skeleton + model smoothing
+**This supersedes the voice-ban approach.** Sunny's diagnosis:
+we built "generate from SQL, then censor forbidden words." The
+correct design is "the SQL is a SKELETON OF RELATIONSHIPS; the
+DICTIONARY supplies MEANING; the description is their
+composition." Every symptom follows from the wrong frame:
+74 column-name violations, most empties, and the 'table' ban all
+exist because the censor removed the only vocabulary the model
+had. Fix by construction, not prohibition.
+
+**The pipeline (deterministic-first, RULED):**
+1. **PARSE → structure** (already have): subjects (grain), source
+   entities, predicates with their left-hand sides, operators,
+   values, joins, aggregations.
+2. **RESOLVE → meaning:** every table and column resolves through
+   the data dictionary to its documented business meaning. No
+   dictionary entry → minimally-transformed name (existing
+   behaviour) AND the step is marked as needing dictionary
+   coverage.
+3. **COMPOSE → skeleton, DETERMINISTICALLY** (code, no model):
+   the structured, pseudo-code-shaped statement Sunny ratified —
+   a lead line naming what this IS, then the conditions as
+   bullets, each naming the MEANING of its left-hand side, its
+   operator, and its CONCRETE VALUES (elided past ~6 with a
+   count). The skeleton is unfalsifiable by construction: every
+   element comes from the parse + the dictionary.
+4. **SMOOTH → readable English (model, bounded):** the model may
+   only rephrase the skeleton into fluent prose. It may not add
+   subjects, conditions, values, or purpose. The accuracy gate
+   (values/filters/tables/grain/attribution) runs on the result
+   as it does today; if smoothing violates, THE SKELETON SHIPS —
+   plain but true. **The skeleton is therefore also the fallback,
+   which answers the open empties ruling: nothing is ever empty
+   again.**
+5. **Voice rules stop being a censor:** the tech-vocabulary and
+   column-name bans become SKELETON PROPERTIES (the skeleton
+   never contains them) plus a light check on smoothing output.
+   The 'table' question dissolves — you do not say "table" when
+   you are saying "encounters".
+
+**Consequences to expect and report honestly:**
+- Description quality now depends on DICTIONARY COVERAGE. Thin
+  dictionary → thin (but true) descriptions. Coverage becomes a
+  REPORTED NUMBER per run and a Tier-1 finding for customers
+  ("N tables / M columns have no documented meaning").
+- Re-run the corpus after: clean/smoothed/skeleton-shipped rates
+  + dictionary-coverage rate. The old empty rate should approach
+  zero by construction.
+- Sample #4 for Sunny after the re-run.
+PARKED RULINGS RESOLVED BY THIS ORDER: empties (skeleton is the
+floor) and the 'table' ban (dissolved). Still open for Sunny:
+DESC-WHOLE-1 (the 13 single-SELECT procs with no steps at all).
