@@ -4282,3 +4282,33 @@ missing staged logic.
 saved as a standing memory (same disease as no-hardcoded-examples,
 new surface).
 **Gates:** 1,409 passed + 5 xfailed, ruff clean, docs regenerated.
+
+### REVIEW VERDICT — DESC-TEMP-1: VERIFIED, and the honest picture is now visible
+Gates 1,409 + ruff clean. Coverage 26→413 steps (5→15 procs)
+through the parser, with three defects fixed on the way that
+would each have produced FALSE violations on any Clarity estate —
+notably "write targets counted as reads" (a step appearing to
+read itself) and "a capped run reporting itself as coverage". The
+second is the one worth carrying forward as practice: **a rate
+must carry its own denominator, and the denominator is never the
+sample.** Stratifying the cap was the right correction, not a
+nicety.
+**The state of P0 in one honest paragraph, for Sunny's return:**
+description generation is gated, voiced (3 rounds of her
+findings), and now covers CTE + temp-staged steps — 60-step
+stratified sample: 30 clean / 17 recovered / 2 salvaged / 11
+empty. Empties are 18% and split into gate-working (invented
+values, correctly refused) and gate-over-firing (3 emptied solely
+on the banned word "table" while describing steps that literally
+write one). And 13 of 28 procs — 46% of the estate — are
+single-SELECT report procs the harvester finds NOTHING in, so
+they have no description at all.
+**THREE RULINGS NOW WAIT ON SUNNY (all voice/scope, none
+technical):**
+(a) empties: leave absent / machine-composed fallback from parsed
+    facts (review recommends) / loosen voice;
+(b) the word "table" when the step genuinely writes a temp table:
+    keep banned (accept the empties) or allow in that narrow case;
+(c) DESC-WHOLE-1: build whole-proc description for the 13 silent
+    procs — Tier 1 cannot describe 46% of a Clarity estate
+    without it, but it is NEW capability and parks for her word.
