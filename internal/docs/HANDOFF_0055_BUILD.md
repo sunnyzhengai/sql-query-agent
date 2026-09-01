@@ -4725,3 +4725,85 @@ per-file deliverable. Recording it so the work is not repeated:
   (48 base tables for `USP_ED_SEPSIS` once its 33 own `#temp`s are
   removed; 1-2 for the thin wrappers).
 No code was written for DESC-FILE-1; this is reconnaissance only.
+
+---
+
+## ⚖️ SUNNY'S RULING — HOLD #3 LIFTED: "lift, re-cut" (2026-08-31)
+
+Her exact words: **"lift, re-cut."** All development resumes. The
+regex-vs-AST question is CLOSED in favour of the AST re-cut; the
+reverted regex-deepening patch (`desc_skeleton_2_reverted.patch`,
+session scratchpad) is analysis material only and must not land.
+DESC-SKELETON-2 is retired — superseded by the order below.
+
+Context for the record: the regex composer entered under a
+DESC-MEANING-1 order that said "deterministic (code, no model)"
+without naming the parser. That omission is review's. It is also an
+ECHO of a recorded law (regex banned as an expedient default), so
+under the Echo Law the mechanism is mandatory, with this incident
+as its acceptance test — that is order 2 below.
+
+### ORDER — DESC-SKELETON-3: AST-first re-cut of compose_skeleton (1.84.0)
+
+**Goal.** `compose_skeleton()` reads the fragment's ScriptDom parse
+tree, not its text. The four decoy classes become structurally
+impossible, not patched.
+
+1. **Parse once, walk nodes.** The step fragment is already
+   parseable (the harvester proves it). Conditions come from
+   expression NODES in deciding clauses (WHERE / ON / HAVING):
+   - comparison, IN, BETWEEN, IS [NOT] NULL as their node types —
+     the five text patterns retire;
+   - join key vs literal filter by operand types (column-vs-column
+     vs column-vs-literal), replacing the `_JOIN_KEYS` blank-out;
+   - HAVING visited like WHERE — an aggregate LHS needs no special
+     case, it is just an expression node;
+   - NOT EXISTS / NOT IN carried as NEGATION on the node — render
+     the absence ("with no matching …" / "not among …"), never
+     silence;
+   - boolean STRUCTURE survives: top-level OR renders alternatives
+     as alternatives ("any of:"), never as sibling bullets that
+     read as AND;
+   - SELECT-list CASE is out of scope for conditions by
+     construction (it is not in a deciding clause); rendering it as
+     a derived label is permitted and welcome.
+2. **Delete the regex composer.** `_IN_LIST`, `_BETWEEN`,
+   `_COMPARISON`, `_IS_NULL`, `_JOIN_KEYS`, and any other
+   SQL-structure-by-pattern code in `src/descriptions.py` are
+   removed, not bypassed. Comment stripping moves to the parser
+   too (ScriptDom already discards comments) — the inline-comments-
+   become-values defect class dies with it.
+3. **Fixtures.** The eight probe cases land verbatim, red-first:
+   four must change behaviour (NOT EXISTS · HAVING · OR · CASE),
+   four must hold as regression. Add dev's two phrasing finds
+   ("records count that is at least 4", "recorded time is
+   recorded") if in reach; otherwise record them as open voice
+   items.
+4. **Prove.** Re-run the corpus, re-probe all eight, and do an
+   OUTPUT READ against the SQL — the standing note holds: counters
+   cannot see the decoy class.
+
+### ORDER — GATE-REGEX-1: mechanize the regex ban (same release)
+
+The law "no SQL-shaped regexes" must live in a TEST, not in memory —
+memory demonstrably loses to quota pressure and session swaps.
+
+- A pinned test scans `src/` for regex patterns that parse SQL
+  STRUCTURE (patterns whose literals contain SQL keyword tokens —
+  `IN (`, `BETWEEN`, `IS NULL`, `JOIN`, clause words — applied to
+  SQL text). Dev draws the mechanical line and STATES it in the
+  test's docstring; the line must distinguish structure-extraction
+  (banned) from verification substring checks against source SQL
+  (the grounding gate's honest use) and from description-text
+  regexes (voice gate — not SQL).
+- **Red-first against history:** the test must FAIL on the current
+  committed composer (78c8da0's five patterns) before the re-cut
+  lands, then pass after. That failure IS the acceptance test the
+  Echo Law requires.
+- If the line cannot be drawn mechanically without false positives,
+  say so in the ledger with the specific case — do not silently
+  narrow the scope.
+
+Sequencing: DESC-SKELETON-3 + GATE-REGEX-1 land together, then
+DESC-FILE-1 proceeds (recon above stands). Sample #4 regenerates
+for Sunny's read only after the re-cut corpus run.

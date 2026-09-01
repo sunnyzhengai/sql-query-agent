@@ -132,10 +132,22 @@ order; nothing skips ahead.
       filters. WHERE-only was too blunt — **56 of 413 steps put a
       real filter inside a JOIN ON**. Correct rule: join key
       (col=col) vs literal filter (col=value).
+- [ ] **DESC-SKELETON-3 (08-31, ORDERED — Sunny's "lift,
+      re-cut")** — compose_skeleton reads the ScriptDom parse
+      tree, not text; the five SQL regexes DELETED; NOT-EXISTS/
+      HAVING/OR/SELECT-CASE become structurally impossible; eight
+      probe cases land red-first. Ships with **GATE-REGEX-1**: a
+      pinned test making SQL-structure regexes in src/ unwritable
+      (Echo Law mechanism; must go red on the current composer
+      first). DESC-SKELETON-2 retired; reverted patch = analysis
+      only. Dev building next.
 - [ ] **DESC-FILE-1 (08-31, ordered)** — deliverable is a
       description per SQL FILE; steps are how, not what. Retires
       DESC-WHOLE-1. Coverage = files described / files present.
-      Dev building next.
+      Dev recon recorded in handoff (terminal statement must be
+      found by parser, not text position; 7 of 28 files deliver
+      via INSERT to a persistent table). Builds after
+      DESC-SKELETON-3.
 - [ ] **PARKED FOR SUNNY — the word "table" empties true
       descriptions.** 3 of the sampled empties had NO other
       violation: grounded, true sentences about steps that
@@ -947,3 +959,12 @@ reading the ScriptDom AST the rest of the system already uses
 of pause: patch four patterns, or re-cut as AST-first
 composition. Nothing decided, nothing built.
 Lifts only by Sunny's word, recorded here.
+
+## ✅ HOLD #3 LIFTED — Sunny's word, 2026-08-31: "lift, re-cut"
+AST re-cut ruled; regex patch rejected (reverted diff = analysis
+only, must not land). DESC-SKELETON-2 retired. Orders in the
+handoff: **DESC-SKELETON-3** (compose_skeleton reads the ScriptDom
+tree; the five regexes deleted, not bypassed; eight probe cases as
+red-first fixtures) + **GATE-REGEX-1** (Echo Law mechanism: pinned
+test banning SQL-structure regexes in src/, red-first against the
+current composer). Then DESC-FILE-1, then sample #4 for Sunny.
