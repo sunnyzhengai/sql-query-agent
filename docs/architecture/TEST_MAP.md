@@ -7,7 +7,7 @@
 
 # Test Map — what every test proves
 
-118 modules, 1382 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
+118 modules, 1383 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
 
 ## By ADR
 
@@ -49,7 +49,7 @@
 | 0041 | M mini-parser, shape registry, fallout capture | `tests/mquery/test_mquery.py` (16) |
 | 0042 | The notebook contract: a harness for the driver layer | `tests/test_docs_consistency.py` (10), `tests/test_notebook_contract.py` (12), `tests/test_replan.py` (9) |
 | 0043 | The diff kernel: the founding question's shape | `tests/graph/test_decomposition_diff.py` (11), `tests/orchestrator/test_ops.py` (80) |
-| 0044 | The tree contract: round-trip verified descriptions | `tests/graph/test_decision_wiring.py` (8), `tests/test_tree_contract.py` (13), `tests/tree/test_extract.py` (18) |
+| 0044 | The tree contract: round-trip verified descriptions | `tests/graph/test_decision_wiring.py` (8), `tests/test_tree_contract.py` (14), `tests/tree/test_extract.py` (18) |
 | 0045 | The escalation contract: no silent residue | `tests/governance/test_leaf_grounding.py` (6), `tests/test_escalation_contract.py` (8) |
 | 0046 | Anchor, discover, match, rank — the human picks | `tests/test_derive_relationships.py` (7), `tests/test_spec_gates.py` (4) |
 | 0047 | The shadow specification (the axiom system) | `tests/test_capability_registry.py` (4), `tests/test_extraction_registry.py` (6), `tests/test_spec_gates.py` (4) |

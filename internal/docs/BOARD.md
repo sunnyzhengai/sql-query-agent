@@ -99,6 +99,17 @@ order; nothing skips ahead.
       dictionary in this devtool run** — worst case by
       construction; the pipeline path supplies them.
       Sample ready for read #4.
+- [x] **DESC-VOICE-3.2 FRAMING FIX (08-31 dev)** — tested my own
+      claim that "the dictionary makes these better" and it was
+      HALF WRONG. Live A/B: the dictionary fixes the TRUTH problem
+      (misattribution 2→0) but NOT the voice one — the model
+      copies the dictionary's KEYS. Cause is FRAMING: a glossary
+      reads as vocabulary to cite, substitutions read as words to
+      use instead. **10 column-name violations → 0 across 6
+      steps.** Production `build_fact_prompt()` was using glossary
+      framing; now substitutions. FACT_PROMPT_VERSION → 5, pinned.
+      The 74 in read #4 was measured under the OLD framing with no
+      dictionary — a worst-case floor, not the product.
 - [ ] **PARKED FOR SUNNY — the word "table" empties true
       descriptions.** 3 of the sampled empties had NO other
       violation: grounded, true sentences about steps that

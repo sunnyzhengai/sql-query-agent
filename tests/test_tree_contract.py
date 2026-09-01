@@ -257,3 +257,27 @@ class TestContractIsLocked:
                     f"clause {n} has no exit-gate skeleton"
         assert "strict=True" in source, \
             "exit gates must be strict xfail — passing silently is drift"
+
+class TestDictionaryIsSubstitutionNotGlossary:
+    """DESC-VOICE-3.2 live find (08-31): supplying the dictionary is
+    NOT enough. Framed as a GLOSSARY ("translate identifiers using
+    these") the model treats it as vocabulary to CITE and copies the
+    dictionary's KEYS into the description — raw column names, the
+    exact thing the order bans. Framed as SUBSTITUTIONS ("when you
+    mean X, write Y; the identifier must never appear") it writes the
+    VALUES instead. Measured live: 10 column-name violations across
+    6 steps under glossary framing, 0 under substitution framing.
+    This pins the framing so it cannot silently regress."""
+
+    def test_prompt_frames_dictionary_as_substitution(self):
+        from src.tree.translate import build_fact_prompt
+
+        prompt = build_fact_prompt(
+            "#BPA", [], [],
+            dict_lines=["  - ALT_ACTION_INST: the time the alert "
+                        "was acted on"])
+        low = prompt.lower()
+        assert "never appear" in low or "must not appear" in low, (
+            "the dictionary block must forbid the identifier itself, "
+            "not merely offer a translation")
+        assert "the time the alert was acted on" in prompt

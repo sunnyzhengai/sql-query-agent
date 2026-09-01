@@ -4369,3 +4369,48 @@ stated ABSTRACTLY — no concrete example, per the
 prompt-examples-become-data law recorded this morning.
 **Gates:** 1,423 passed + 5 xfailed, ruff clean, docs regenerated.
 Sample regenerated for Sunny's read #4.
+
+### RESULTS — DESC-VOICE-3.2 follow-through (dev, 08-31): I TESTED MY OWN CLAIM AND IT WAS HALF WRONG
+In the DESC-VOICE-3 entry above I wrote that with the dictionary
+wired "these descriptions get materially better". That was an
+ASSERTION, not a measurement — exactly the kind the coverage
+lesson says to stop making — so I measured it.
+**Live A/B on the #BPA specimen, same SQL, same model:**
+- WITHOUT dictionary: 6 violations, including 2 misattributed
+  predicates.
+- WITH dictionary (glossary framing): **still 6 violations.** The
+  dictionary FIXED THE TRUTH PROBLEM — misattribution went 2 → 0
+  and the model wrote the correct subject — but it **still used
+  the raw column names**, because it copied the dictionary's KEYS
+  instead of writing its VALUES.
+So supplying the dictionary does NOT satisfy rule 2. My claim was
+half right (truth improves) and half wrong (voice does not).
+**The actual mechanism, then fixed:** framing. A block headed
+"Data dictionary (translate identifiers using these)" reads to the
+model as vocabulary to CITE. A block headed "SUBSTITUTIONS — write
+the meaning; the identifier itself must never appear" reads as
+words to USE INSTEAD.
+- one specimen: 6 violations → **1**, and the prose became
+  genuinely steward-readable ("The time the alert was acted on
+  must fall between the time the patient arrived and the time the
+  patient left the ED").
+- validated across 6 steps before claiming it: **10 column-name
+  violations under glossary framing → 0 under substitution
+  framing.**
+**Built:** `build_fact_prompt()` now emits the substitution block
+(the PRODUCTION path — it was using glossary framing), and the
+contradictory "adding the dictionary meaning beside a code"
+sentence in the header is gone. FACT_PROMPT_VERSION → 5.
+Pinned as `TestDictionaryIsSubstitutionNotGlossary`, which asserts
+the prompt FORBIDS the identifier rather than merely offering a
+translation — framing cannot silently regress to a glossary.
+One existing test asserted the literal heading "Data dictionary";
+its INTENT (dictionary lines reach the prompt) is still right, so
+the assertion now checks intent, not wording.
+**Bearing on read #4:** the 74 column-name violations in the
+re-run were produced under GLOSSARY framing and with no dictionary
+at all. Both causes are now addressed, so that number is a
+worst-case floor, not the product's behaviour. I did NOT re-run
+the 60-step sample again — the framing fix is proven on 6 steps
+and the honest thing is to say which evidence I have.
+**Gates:** 1,424 passed + 5 xfailed, ruff clean, docs regenerated.

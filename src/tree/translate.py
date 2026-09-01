@@ -25,7 +25,7 @@ from src.tree.render import render_fact
 
 # v2: DESC-VOICE-1 (steward voice, named subject, acronym rule) —
 # the version rides the cache key, so every description regenerates
-FACT_PROMPT_VERSION = "4"   # DESC-VOICE-3: predicate subject named, no column names
+FACT_PROMPT_VERSION = "5"   # DESC-VOICE-3.2: dictionary as substitutions, not glossary
 
 _MAX_DICT_LINES = 30
 
@@ -58,8 +58,8 @@ _FACT_HEADER = (
     "Then translate EVERY numbered decision into one line of plain "
     "business language, formatted exactly as 'N| translation' using the "
     "same number N. Keep every literal value (codes, numbers, statuses, "
-    "date tokens) exactly as given, adding the dictionary meaning beside "
-    "a code when provided. Decisions marked or-group are ALTERNATIVES — "
+    "date tokens) exactly as given, writing the substituted meaning in "
+    "place of any identifier. Decisions marked or-group are ALTERNATIVES — "
     "phrase them as either/or, never as combined requirements. Never "
     "show raw table/column identifiers or temp-table names — use the "
     "dictionary description or a plain phrase. Write for a STEWARD, "
@@ -162,8 +162,16 @@ def build_fact_prompt(name: str, facts: "list[dict]",
     dict_block = ""
     if dict_lines:
         entries = "\n".join(dict_lines[:_MAX_DICT_LINES])
-        dict_block = ("Data dictionary (translate identifiers using "
-                      f"these):\n{entries}\n\n")
+        # SUBSTITUTIONS, not a glossary. Framed as a glossary the
+        # model treats these as vocabulary to CITE and copies the
+        # KEYS — raw column names — straight into the description.
+        # Framed as substitutions it writes the VALUES. Measured
+        # live on 6 steps: 10 column-name violations under glossary
+        # framing, 0 under this one (DESC-VOICE-3.2).
+        dict_block = ("SUBSTITUTIONS — each line gives a SQL "
+                      "identifier and what it MEANS. Write the "
+                      "meaning; the identifier itself must never "
+                      f"appear in your answer:\n{entries}\n\n")
     facts_block = "\n".join(
         _fact_line(i + 1, f) for i, f in enumerate(facts)) or "(none)"
     return _FACT_HEADER.format(

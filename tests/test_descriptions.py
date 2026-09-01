@@ -163,7 +163,10 @@ class TestGeneration:
             return "ok"
         generate_descriptions(g.nodes_rows, g.edges_rows, capture)
         step_prompts = [p for p in prompts if "calculation step" in p]
-        assert any("Data dictionary" in p for p in step_prompts), (
+        # the block is headed SUBSTITUTIONS since DESC-VOICE-3.2 (a
+        # glossary framing made the model cite the KEYS); this test
+        # asserts the dictionary REACHES the prompt, not its heading
+        assert any("SUBSTITUTIONS" in p for p in step_prompts), (
             "no step prompt carried dictionary lines — check "
             "TRANSFORM_TO_TECHNICAL wiring")
 
