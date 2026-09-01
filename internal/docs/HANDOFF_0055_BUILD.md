@@ -4177,3 +4177,31 @@ purpose-free", and I am reporting the honest number rather than
 loosening the gate to look better.
 **Gates:** 1,407 green + 5 xfailed, ruff clean; wheel 1.83.0.
 Sample regenerated for Sunny's read #3.
+
+### REVIEW VERDICT — DESC-VOICE-2 (1.83.0): VERIFIED, with one open question for Sunny
+Gates 1,407 + ruff clean. The ruled shape is visibly working —
+SSOrderSetOSQ_PRL now reads: lead line ("This is a selection of
+encounters related to specific order sets."), concrete values
+(the seven ORD_OSQ_IDs, the two PRL_ORDERSET_IDs), zero purpose
+speculation. That is exactly the shape Sunny asked for and it
+answers her "I have no idea what the SQL looks like".
+**Dev's prompt-example finding is the day's most transferable
+lesson and should outlive this feature:** a concrete example in a
+prompt is treated as DATA — their illustrative order-set IDs were
+copied into unrelated steps (6 emptied, 41 ungrounded-value
+violations), reproduced on a second attempt with a different
+example, fixed by removing every concrete example from both
+prompts. Recommend recording as a standing law alongside the
+no-hardcoded-examples memory (same disease, new surface).
+**OPEN FOR SUNNY (the tradeoff, stated honestly):** the strict
+voice produced 3 EMPTIED descriptions (18 clean / 5 recovered / 3
+empty), including AllCultures — a step she personally flagged.
+Empty is HONEST (nothing grounded survived) but a blank field in
+a catalog is a poor artifact. Options: (a) accept empties as the
+floor and leave the field absent; (b) machine-composed fallback
+from parsed facts only ("Encounters from #Labs_and_Cultures where
+CULTURE_TYPE is recorded") — plain, true, never empty;
+(c) loosen the voice rules until they fill. Review recommends
+(b): the fallback already exists for the surgical path; extending
+it to the emptied path keeps every field populated and every
+sentence grounded. Sunny rules on her read #3.
