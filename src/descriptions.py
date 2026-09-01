@@ -578,6 +578,183 @@ def misattribution_violations(text: str, fragment: str) -> "list[str]":
     return out
 
 
+# --- DESC-MEANING-1 (THE REFRAME, ordered 08-31) ------------------
+# We were generating from SQL and then CENSORING forbidden words.
+# The right frame: the SQL is a SKELETON OF RELATIONSHIPS, the
+# dictionary supplies MEANING, and the description is their
+# COMPOSITION. Every symptom of the old frame — 74 column-name
+# violations, most empties, the 'table' ban — came from removing the
+# only vocabulary the model had. Fix by construction, not
+# prohibition.
+#
+# The skeleton is UNFALSIFIABLE BY CONSTRUCTION: every element comes
+# from the parse or the dictionary, so it cannot invent a value, a
+# subject, or a filter. That property is what lets it be the
+# FALLBACK when model smoothing violates the gate — and why nothing
+# is ever empty again.
+
+_IN_LIST = re.compile(
+    r"(?is)\b([A-Za-z_][\w]*)\s+IN\s*\(([^)]{1,400})\)")
+# operands may be @parameters or qualified columns — a date range
+# bound to @dStartDate/@dEndDate is THE filter on most cohort steps
+# and was being dropped entirely (live find on #Base_Pop)
+_BETWEEN = re.compile(
+    r"(?is)\b([A-Za-z_][\w]*)\s+BETWEEN\s+([@A-Za-z_][\w.]*)\s+"
+    r"AND\s+([@A-Za-z_][\w.]*)")
+_COMPARISON = re.compile(
+    r"(?is)\b([A-Za-z_][\w]*)\s*(=|>=|<=|<>|!=|>|<)\s*"
+    r"('[^']{1,60}'|\d+(?:\.\d+)?)")
+_IS_NULL = re.compile(
+    r"(?is)\b([A-Za-z_][\w]*)\s+IS\s+(NOT\s+)?NULL")
+
+_MAX_LISTED_VALUES = 6
+
+
+def meaning_of(column: str, meanings: "dict[str, str] | None") -> str:
+    """A column's documented business meaning, or the minimally
+    transformed name (Sunny's fallback ruling). Never the raw
+    identifier — that is the whole point of the reframe."""
+    key = (column or "").upper()
+    doc = (meanings or {}).get(key) or (meanings or {}).get(column or "")
+    return doc.strip() if doc and doc.strip() else readable_column(key)
+
+
+def _values_phrase(raw: str) -> str:
+    """The concrete values of an IN-list, elided past ~6 with a count
+    naming this list's OWN first and last values — never invented,
+    never an example (prompt-examples-become-data)."""
+    vals = [v.strip().strip("'\"") for v in raw.split(",") if v.strip()]
+    if len(vals) <= _MAX_LISTED_VALUES:
+        return ", ".join(f"'{v}'" for v in vals)
+    return (f"one of {len(vals)} values from '{vals[0]}' to "
+            f"'{vals[-1]}'")
+
+
+_SQL_COMMENTS = re.compile(r"(?m)--[^\n]*|/\*.*?\*/", re.S)
+# column = column: wires two tables together, decides nothing. This
+# is what made "line is 1" a headline condition on a 10-table step.
+_JOIN_KEYS = re.compile(
+    r"(?is)\b[A-Za-z_][\w]*\.[A-Za-z_][\w]*\s*=\s*"
+    r"[A-Za-z_][\w]*\.[A-Za-z_][\w]*")
+
+
+def compose_skeleton(fragment: str,
+                     meanings: "dict[str, str] | None" = None) -> str:
+    """DESC-MEANING-1 step 3: the deterministic composition. Code
+    only — no model. A lead line naming WHAT THIS IS, then one bullet
+    per condition, each naming the MEANING of its left-hand side, its
+    operator, and its CONCRETE VALUES."""
+    # Clarity SQL annotates IN-list items with trailing `-- name`
+    # comments; they were being swallowed into the values. A comment
+    # is documentation, not data (live find on #Pressors).
+    frag = _SQL_COMMENTS.sub(" ", fragment or "")
+    # What decides membership is a LITERAL FILTER (column = value),
+    # wherever it sits; what merely wires tables is a JOIN KEY
+    # (column = column). Restricting to WHERE was too blunt — 56 of
+    # 413 corpus steps put a real filter inside a JOIN ON. So keep
+    # the whole fragment and drop only column-to-column equality.
+    # (The _COMPARISON/_IN_LIST/_IS_NULL patterns already require a
+    # literal on the right; _BETWEEN is the exception, and a
+    # column-to-column range IS a real condition — #Pressors' "taken
+    # time between arrival and departure" — so it stays.)
+    deciding = _JOIN_KEYS.sub(" ", frag)
+    subject = subject_for(frag)
+    lines = [f"This is a selection of {subject}."]
+    seen: "set[str]" = set()
+
+    def add(col: str, text: str) -> None:
+        key = (col.upper(), text)
+        if key in seen:
+            return
+        seen.add(key)
+        lines.append(f"- {text}")
+
+    for col, raw in _IN_LIST.findall(deciding):
+        add(col, f"{meaning_of(col, meanings)} is "
+                 f"{_values_phrase(raw)}.")
+    for col, lo, hi in _BETWEEN.findall(deciding):
+        add(col, f"{meaning_of(col, meanings)} falls between "
+                 f"{meaning_of(lo.split('.')[-1], meanings)} and "
+                 f"{meaning_of(hi.split('.')[-1], meanings)}.")
+    for col, op, val in _COMPARISON.findall(deciding):
+        word = {"=": "is", ">=": "is at least", "<=": "is at most",
+                "<>": "is not", "!=": "is not", ">": "is more than",
+                "<": "is less than"}[op]
+        add(col, f"{meaning_of(col, meanings)} {word} "
+                 f"{val.strip()}.")
+    for col, neg in _IS_NULL.findall(deciding):
+        add(col, f"{meaning_of(col, meanings)} is "
+                 f"{'recorded' if neg else 'not recorded'}.")
+    return "\n".join(lines)
+
+
+_SMOOTH_PROMPT = """Rewrite the statement below as fluent English
+for a business steward.
+
+RULES — this is a REPHRASING, not a rewrite:
+- Keep every value, condition and subject EXACTLY as given.
+- Add NOTHING: no new conditions, no values not listed, no purpose
+  or benefit, no explanation of why it matters.
+- Drop nothing: every bullet must survive as a statement.
+- Do not name tables, columns, temp tables, joins or queries.
+
+STATEMENT:
+{skeleton}"""
+
+
+@dataclass
+class StepDescription:
+    text: str = ""
+    source: str = "skeleton"      # "smoothed" | "skeleton"
+    undocumented: "list[str]" = field(default_factory=list)
+    violations: "list[str]" = field(default_factory=list)
+
+
+def describe_step(
+    fragment: str, meanings: "dict[str, str] | None" = None,
+    smooth: "Callable[[str], str] | None" = None,
+) -> StepDescription:
+    """DESC-MEANING-1 steps 3-5: compose the skeleton
+    deterministically, let the model SMOOTH it, and keep the smoothed
+    text only if it still passes the accuracy gate. Otherwise THE
+    SKELETON SHIPS — plain but true.
+
+    The skeleton is the floor, so this never returns empty. That is
+    the constructive answer to the empties ruling: absence was only
+    ever the least-bad option when the alternative was fabrication;
+    with a grounded skeleton available, neither is needed."""
+    skeleton = compose_skeleton(fragment, meanings)
+    undoc = undocumented_columns_from(fragment, meanings)
+    if smooth is None:
+        return StepDescription(skeleton, "skeleton", undoc, [])
+    try:
+        candidate = str(smooth(_SMOOTH_PROMPT.format(
+            skeleton=skeleton)) or "").strip()
+    except Exception:  # noqa: BLE001 - deliberate: see below
+        # BROAD ON PURPOSE. Any failure in the smoothing call —
+        # timeout, auth, rate limit, malformed response — must
+        # degrade to the grounded skeleton, never cost the
+        # description. Narrowing this would trade a guaranteed floor
+        # for an unhandled class of outage.
+        return StepDescription(skeleton, "skeleton", undoc, [])
+    if not candidate:
+        return StepDescription(skeleton, "skeleton", undoc, [])
+    violations = grounding_violations(candidate, fragment)
+    if violations:
+        return StepDescription(skeleton, "skeleton", undoc, violations)
+    return StepDescription(candidate, "smoothed", undoc, [])
+
+
+def undocumented_columns_from(
+    fragment: str, meanings: "dict[str, str] | None" = None,
+) -> "list[str]":
+    """Referenced columns with no documented meaning — the reported
+    coverage gap (Sunny's fallback ruling), now keyed off the
+    meanings map rather than dictionary text lines."""
+    have = {k.upper() for k in (meanings or {})}
+    return sorted(parsed_columns(fragment) - have)
+
+
 def grounding_violations(
     text: str, fragment: str, dict_lines: "list[str] | None" = None,
     dialect: str = "sql", voice: bool = True,

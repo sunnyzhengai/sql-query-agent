@@ -4563,3 +4563,56 @@ SQL file."
    smoothing violates.
 5. Re-run the corpus after: report FILE coverage, plus the
    step-level rates as internal detail.
+
+### RESULTS — DESC-MEANING-1 steps 3-5 built (dev, 08-31): deterministic skeleton + bounded smoothing + skeleton-as-floor
+**`compose_skeleton()`** — step 3, code only, no model. Lead line
+naming what this IS, then one bullet per condition, each naming the
+MEANING of its left-hand side (dictionary, or the readable form),
+its operator, and its CONCRETE VALUES (elided past 6 with a count
+naming this list's OWN first and last values).
+**`describe_step()`** — steps 4-5. The model may only REPHRASE the
+skeleton; the accuracy gate runs on the result; **if smoothing
+violates, THE SKELETON SHIPS.** Also falls back on empty output and
+on model EXCEPTION (broad catch, deliberate and justified inline: a
+model outage must not cost a description).
+**Live: 20 steps, 20 smoothed, 0 skeleton-shipped, ZERO EMPTY.**
+The empties ruling is answered by construction, as ordered.
+**Three defects found by READING THE OUTPUT, not the counters** —
+each would have shipped a description that passed the gate while
+telling the steward nothing:
+1. **Inline comments became values.** Clarity annotates IN-list
+   items with trailing `-- EPINEPHRINE`; those were swallowed into
+   the value strings. A comment is documentation, not data.
+2. **The real filter was DROPPED.** `#Base_Pop` — a 10-table cohort
+   step — composed to the single line "line is 1". Its actual
+   filter, `ADT_ARRIVAL_DATE BETWEEN @dStartDate AND @dEndDate`, was
+   invisible because the range pattern required bare identifiers and
+   these are @parameters. A skeleton that is grounded but says
+   nothing true is not a floor, it is a DECOY: it passes the gate
+   and misinforms.
+3. **Join keys read as filters.** `column = column` wires tables and
+   decides nothing; it produced the "line is 1" headline. Now
+   excluded — but the first fix (compose from WHERE only) was TOO
+   BLUNT: **56 of 413 corpus steps put a real literal filter inside
+   a JOIN ON** (`ALT.BPA_LOCATOR_ID = '900130001'`), and WHERE-only
+   silently dropped every one. The correct distinction is JOIN KEY
+   (column = column) vs LITERAL FILTER (column = value), wherever it
+   sits.
+**One ambiguity accepted rather than guessed:** `RACE.LINE = 1` is
+structurally identical to a real filter but semantically a
+row-picker. Guessing intent from shape would be a heuristic that
+silently drops real filters, so it is STATED. I corrected my own
+test, which had asserted a stronger claim than I can defend.
+Result on the real specimens: `#Base_Pop` now states its date
+range, `#BPA` recovered its '900130001' filter, `#Pressors` carries
+clean values — all 0 violations.
+**Gates:** 1,442 passed + 5 xfailed, ruff clean, docs regenerated.
+
+### DEV ACK — DESC-FILE-1 received, building next
+The per-FILE deliverable is the right frame and it retires
+DESC-WHOLE-1 by reframing rather than by a special path — the 13
+single-statement procs are just one-block files. `compose_skeleton`
+already composes from any fragment, so a single-statement file
+needs no new machinery. Next: file-level composition (final output
+step's subject + entities, intermediate criteria rolled up),
+FILE-based coverage, then the re-run.

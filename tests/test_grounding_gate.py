@@ -568,3 +568,201 @@ class TestUnqualifiedColumnsAreStillColumns:
 
         cols = parsed_columns(self.FRAG)
         assert "BASE_POP" not in cols and "#BASE_POP" not in cols
+
+class TestSkeletonComposition:
+    """DESC-MEANING-1 (ordered 08-31, THE REFRAME): the description
+    is PARSE (structure) + DICTIONARY (meaning), composed
+    DETERMINISTICALLY in code. The skeleton is unfalsifiable by
+    construction — every element comes from the parse or the
+    dictionary, so it cannot invent a value, a subject or a filter.
+    It is also the FALLBACK: if model smoothing violates the gate,
+    the skeleton ships. Nothing is ever empty again."""
+
+    FRAG = ("SELECT DISTINCT ENCOUNTER_ID, TAKEN_TIME INTO #Pressors "
+            "FROM #Base_Pop "
+            "WHERE GROUPER_ID IN ('8000100', '8000101') "
+            "AND TAKEN_TIME BETWEEN ADT_ARRIVAL_TIME "
+            "AND ED_DEPARTURE_TIME")
+
+    MEANINGS = {
+        "GROUPER_ID": "the medication group",
+        "TAKEN_TIME": "the time the medication was given",
+        "ADT_ARRIVAL_TIME": "the time the patient arrived",
+        "ED_DEPARTURE_TIME": "the time the patient left the ED",
+    }
+
+    def test_skeleton_passes_its_own_gate(self):
+        """The property that makes it a safe fallback."""
+        from src.descriptions import compose_skeleton
+
+        sk = compose_skeleton(self.FRAG, self.MEANINGS)
+        assert sk.strip(), "the skeleton must never be empty"
+        assert grounding_violations(sk, self.FRAG) == [], sk
+
+    def test_skeleton_carries_the_concrete_values(self):
+        from src.descriptions import compose_skeleton
+
+        sk = compose_skeleton(self.FRAG, self.MEANINGS)
+        assert "8000100" in sk and "8000101" in sk, sk
+
+    def test_skeleton_uses_meaning_not_identifiers(self):
+        from src.descriptions import compose_skeleton
+
+        sk = compose_skeleton(self.FRAG, self.MEANINGS)
+        assert "GROUPER_ID" not in sk and "TAKEN_TIME" not in sk, sk
+        assert "the medication group" in sk, sk
+
+    def test_missing_meaning_falls_back_readably_and_is_reported(self):
+        from src.descriptions import compose_skeleton
+
+        sk = compose_skeleton(self.FRAG, {})
+        assert "grouper id" in sk.lower(), sk
+        assert "GROUPER_ID" not in sk, sk
+        assert grounding_violations(sk, self.FRAG) == [], sk
+
+    def test_inline_comments_are_not_values(self):
+        """Live find on #Pressors: Clarity SQL annotates IN-list
+        items with trailing `-- comment` text, which was being
+        swallowed into the value string. A comment is not data."""
+        from src.descriptions import compose_skeleton
+
+        frag = ("SELECT a INTO #x FROM t WHERE GROUPER_ID IN (\n"
+                "  '8000100'  -- EPINEPHRINE\n"
+                ", '8000101'  -- DOPAMINE\n)")
+        sk = compose_skeleton(frag, {})
+        assert "EPINEPHRINE" not in sk, sk
+        assert "'8000100'" in sk and "'8000101'" in sk, sk
+
+    def test_skeleton_never_speculates_purpose(self):
+        from src.descriptions import compose_skeleton
+
+        sk = compose_skeleton(self.FRAG, self.MEANINGS).lower()
+        for banned in ("ensuring", "critical for", "helps identify",
+                       "allowing", "in order to"):
+            assert banned not in sk, (banned, sk)
+
+class TestSmoothingWithSkeletonFallback:
+    """DESC-MEANING-1 step 4: the model may only REPHRASE the
+    skeleton — never add subjects, conditions, values or purpose. If
+    smoothing violates the gate, THE SKELETON SHIPS. This is what
+    resolves the parked empties ruling: the floor is plain-but-true,
+    never blank."""
+
+    FRAG = ("SELECT a INTO #x FROM t WHERE GROUPER_ID IN ('800008') "
+            "AND TAKEN_TIME IS NOT NULL")
+
+    def test_good_smoothing_is_kept(self):
+        from src.descriptions import describe_step
+
+        def smooth(_prompt):
+            return ("This is a selection of records.\n"
+                    "- the medication group is '800008'.\n"
+                    "- the time the medication was given is recorded.")
+
+        out = describe_step(self.FRAG, {"GROUPER_ID": "the medication group",
+                                        "TAKEN_TIME": "the time the "
+                                        "medication was given"}, smooth)
+        assert "medication group" in out.text
+        assert out.source == "smoothed"
+
+    def test_fabricating_smoothing_falls_back_to_skeleton(self):
+        from src.descriptions import compose_skeleton, describe_step
+
+        def smooth(_prompt):
+            return ("This is a selection of records.\n"
+                    "- the medication group is '999999'.")
+
+        out = describe_step(self.FRAG, {}, smooth)
+        assert out.source == "skeleton"
+        assert out.text == compose_skeleton(self.FRAG, {})
+        assert grounding_violations(out.text, self.FRAG) == []
+
+    def test_empty_model_output_falls_back_not_empty(self):
+        from src.descriptions import describe_step
+
+        out = describe_step(self.FRAG, {}, lambda _p: "")
+        assert out.text.strip(), "the skeleton is the floor"
+        assert out.source == "skeleton"
+
+    def test_model_failure_falls_back_not_empty(self):
+        from src.descriptions import describe_step
+
+        def boom(_prompt):
+            raise RuntimeError("model unavailable")
+
+        out = describe_step(self.FRAG, {}, boom)
+        assert out.source == "skeleton"
+        assert out.text.strip()
+
+    def test_reports_dictionary_coverage(self):
+        from src.descriptions import describe_step
+
+        out = describe_step(self.FRAG, {"GROUPER_ID": "the group"},
+                            lambda _p: "")
+        assert "TAKEN_TIME" in out.undocumented
+        assert "GROUPER_ID" not in out.undocumented
+
+class TestSkeletonSaysWhatDecides:
+    """Live find on #Base_Pop (08-31): the composer reduced a
+    10-table cohort step to "line is 1" — it DROPPED the only real
+    filter (a date range against @parameters) and SURFACED a join
+    qualifier as though it decided membership. A skeleton that is
+    grounded but says nothing true about the step is not a floor,
+    it is a decoy: it passes the gate while telling the steward
+    nothing."""
+
+    FRAG = ("SELECT DISTINCT HE.ENCOUNTER_ID INTO #Base_Pop "
+            "FROM ED_ENCOUNTERS_FACT EEF "
+            "INNER JOIN HOSPITAL_ENCOUNTERS HE "
+            "  ON EEF.ENCOUNTER_ID = HE.ENCOUNTER_ID "
+            "LEFT JOIN PATIENT_RACE RACE "
+            "  ON RACE.PATIENT_ID = HE.PATIENT_ID AND RACE.LINE = 1 "
+            "WHERE EEF.ADT_ARRIVAL_DATE BETWEEN @dStartDate "
+            "AND @dEndDate")
+
+    def test_parameterised_date_range_is_stated(self):
+        from src.descriptions import compose_skeleton
+
+        sk = compose_skeleton(self.FRAG, {}).lower()
+        assert "arrival date" in sk, sk
+        assert "range" in sk or "between" in sk, sk
+
+    def test_join_keys_are_not_presented_as_filters(self):
+        from src.descriptions import compose_skeleton
+
+        sk = compose_skeleton(self.FRAG, {}).lower()
+        assert "encounter id is" not in sk, sk
+        assert "patient id is" not in sk, sk
+
+    def test_literal_filter_inside_a_join_is_kept(self):
+        """56 of 413 corpus steps put a real filter in a JOIN ON
+        (ALT.BPA_LOCATOR_ID = '900130001'). The distinction is not
+        WHERE-vs-ON: it is JOIN KEY (column = column, wires tables)
+        vs LITERAL FILTER (column = value, decides membership)."""
+        from src.descriptions import compose_skeleton
+
+        frag = ("SELECT a INTO #x FROM t "
+                "INNER JOIN CLINICAL_ALERTS ALT "
+                "  ON ALT.VISIT_ID = t.ENCOUNTER_ID "
+                "  AND ALT.BPA_LOCATOR_ID = '900130001' "
+                "WHERE t.STATUS = 'A'")
+        sk = compose_skeleton(frag, {})
+        assert "900130001" in sk, sk
+        assert "'A'" in sk, sk
+        # the join KEY still must not appear as a filter
+        assert "visit id is" not in sk.lower(), sk
+
+    def test_join_qualifier_is_stated_but_never_alone(self):
+        """RACE.LINE = 1 picks one row per patient rather than
+        deciding the cohort — but it is STRUCTURALLY identical to a
+        real filter (column = literal), and guessing intent from
+        shape would be a heuristic that silently drops real filters.
+        Ruling: state it, but never as the ONLY thing said — the
+        original defect was a 10-table step reduced to "line is 1"
+        while its date range went unstated. Keeping the range is
+        what fixes that; suppressing the qualifier is not."""
+        from src.descriptions import compose_skeleton
+
+        sk = compose_skeleton(self.FRAG, {})
+        assert "arrival date" in sk.lower(), sk
+        assert sk.count("\n- ") >= 2, sk

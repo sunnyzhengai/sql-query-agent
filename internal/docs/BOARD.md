@@ -120,6 +120,22 @@ order; nothing skips ahead.
       invisible. Fixed red-first (bare underscored identifiers,
       tables subtracted). **The 50-clean number is flattered by
       that blind spot and must not be quoted as-is.**
+- [x] **DESC-MEANING-1 steps 3-5 BUILT (08-31 dev)** —
+      `compose_skeleton()` (deterministic) + `describe_step()`
+      (bounded smoothing, **skeleton ships if smoothing violates**,
+      also on empty output and model exception). Live: 20 steps,
+      **0 empty** — the empties ruling answered by construction.
+      Three defects found by reading OUTPUT not counters: inline
+      comments became values; the real filter was DROPPED
+      (`#Base_Pop` composed to "line is 1" while its date range
+      went unstated — a grounded decoy); join keys read as
+      filters. WHERE-only was too blunt — **56 of 413 steps put a
+      real filter inside a JOIN ON**. Correct rule: join key
+      (col=col) vs literal filter (col=value).
+- [ ] **DESC-FILE-1 (08-31, ordered)** — deliverable is a
+      description per SQL FILE; steps are how, not what. Retires
+      DESC-WHOLE-1. Coverage = files described / files present.
+      Dev building next.
 - [ ] **PARKED FOR SUNNY — the word "table" empties true
       descriptions.** 3 of the sampled empties had NO other
       violation: grounded, true sentences about steps that
