@@ -41,6 +41,7 @@ from src.descriptions import (  # noqa: E402
     grounding_violations,
     parsed_grain,
     parsed_tables,
+    subject_for,
 )
 
 HONEST_FLOOR = (
@@ -61,9 +62,13 @@ business audience.
 SQL:
 {sql}
 
-Write 1-3 bullet lines. State what this step selects and the
-conditions that decide membership. Use business words; never invent
-values, tables, or a counted entity the SQL does not support."""
+Write 1-3 bullet lines for a STEWARD, not a developer.
+Name the subject as "{subject}" — say "{subject} are included
+when …", never "membership" or "the dataset". Never mention
+tables, temp tables, joins, queries, columns or datasets: the
+source objects are recorded elsewhere. Never expand an acronym
+unless this SQL expands it — print it as written. Never invent
+values or a counted entity the SQL does not support."""
 
 
 def harvest_steps(limit: int = 0) -> "list[dict]":
@@ -138,7 +143,7 @@ def run(steps, describe) -> dict:
         if not sql.strip():
             counts["unparsed"] += 1
             continue
-        prompt = _PROMPT.format(sql=sql)
+        prompt = _PROMPT.format(sql=sql, subject=subject_for(sql))
         first = describe(prompt).strip()
         first_v = grounding_violations(first, sql) if first else []
         for v in first_v:

@@ -134,7 +134,14 @@ class TestGeneration:
         result = generate_descriptions(
             g.nodes_rows, g.edges_rows,
             lambda p: "Joins on ADT_DEPARTMENT_ID from #SDX.")
-        assert result.jargon
+        # DESC-VOICE-1 (2026-08-31) made this STRONGER than a flag:
+        # developer voice ("Joins on …", "#SDX") is now REJECTED by
+        # the gate, so the text never reaches the jargon check — it
+        # never reaches a steward's field at all.
+        assert result.jargon or result.ungrounded, (
+            "developer-voice text must be flagged or gated")
+        text = " ".join(result.descriptions.values())
+        assert "#SDX" not in text and "ADT_DEPARTMENT_ID" not in text
         # a CLEAN fake must voice every fact (ledger-shaped) — otherwise
         # the template floor honestly prints raw identifiers, which is
         # the floor working, not a jargon regression

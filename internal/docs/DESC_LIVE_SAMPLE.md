@@ -9,9 +9,8 @@ For each: the generated description, the fragment it describes, and the PARSED F
 
 **Description**
 
-- This step selects records of medication administration, specifically focusing on encounters involving antibiotics or antibiotic mixtures, capturing the encounter ID, order medication ID, administration time, and medication name.
-- Membership is determined by the condition that the administration time must occur before the patient's departure time from the emergency department, and the medication must either be classified as an antibiotic or be part of a mixture containing antibiotics.
-- Additionally, only the primary agent from antibiotic mixtures is included, ensuring that the analysis focuses on the most relevant medication administered during the encounter.
+- Encounters are included when the medication administered is an antibiotic or a mixture containing antibiotics, and the administration time occurs before the patient's departure from the emergency department (ED).
+- Encounters are also included if the medication falls under the therapeutic class of antibiotics, ensuring that all relevant antibiotic administrations are captured.
 
 **Fragment**
 
@@ -148,9 +147,9 @@ ABX AS
 
 **Description**
 
-- This step selects key laboratory culture data, including encounter identifiers, order processing details, timing metrics, and critical values, from the temporary table `#Labs_and_Cultures` and the `ORGANISMS` table.
-- It specifically filters the results to include only those records where the `CULTURE_TYPE` is not null, ensuring that only relevant culture types are considered for further analysis.
-- The join with the `ORGANISMS` table enriches the dataset by providing the external names of organisms associated with each culture, enhancing the contextual understanding of the laboratory results.
+- Encounters are included when the CULTURE_TYPE is specified, ensuring that only relevant cases are considered for analysis.
+- Encounters are included when they have associated ORDER_PROC_ID and ENCOUNTER_ID, providing a clear link to the procedures performed.
+- Encounters are included when they contain critical values, allowing for the identification of significant results in the laboratory processes.
 
 **Fragment**
 
@@ -199,8 +198,9 @@ AllCultures AS
 
 **Description**
 
-- This step selects encounter IDs along with specific airway device measurements and placement types from the base population, focusing on instances where the placement occurred within the defined arrival and departure times.
-- Membership is determined by the presence of valid placement timestamps and specific measurement IDs related to endotracheal tubes (ETT) and peripheral intravenous (IV) devices, as well as a distinct value set for central venous line (CVL) placements.
+- Records are included when the PLACEMENT_INSTANT is not null and falls between the ADT_ARRIVAL_TIME and ED_DEPARTURE_TIME.
+- Records are included when the FLO_MEAS_ID is either '900112' for ETT or '900111' for IV, or when the VALUE_SET_ID is 3022 for SEPSIS_CVL_PLACEMENT. 
+- Records are included when the LDA_PLACEMENT_TYPE is determined based on the specified FLO_MEAS_ID or VALUE_SET_ID criteria.
 
 **Fragment**
 
@@ -279,9 +279,9 @@ All_LDAs AS
 
 **Description**
 
-- This step selects unique encounter identifiers and culture types from the AllCultures dataset, focusing on instances where no positive critical values are recorded.
-- It aggregates the minimum order and collection times for each encounter and culture type, ensuring that only those with a maximum critical value of zero are included.
-- The resulting dataset is categorized under 'Negative' in the OrganismList, highlighting encounters that did not yield any positive culture results.
+- Encounters are included when they have a CULTURE_TYPE associated with a negative result, ensuring that only those with no positive CRITICAL_VALUE_01 are considered.
+- Encounters are included when the earliest MBOrderTime and CollectionTime are recorded, providing a clear timeline for negative cultures.
+- Encounters are included in the analysis to identify patterns and trends related to negative cultures, contributing to overall quality improvement efforts.
 
 **Fragment**
 
@@ -322,9 +322,9 @@ NegativeCultures AS
 
 **Description**
 
-- This step selects key identifiers and timestamps related to orders, specifically the encounter ID, order ID, order datetime, and order set ID from the base population dataset.
-- It filters the data to include only those orders that occurred within the timeframe defined by the patient's arrival and departure times, ensuring relevance to the specific patient encounters.
-- The inner join with the ORDER_TRACKING_METRICS table ensures that only orders associated with the relevant encounters are included in the final dataset.
+- Encounters are included when the ORDER_DTTM falls within the timeframe defined by ADT_ARRIVAL_TIME and ED_DEPARTURE_TIME.
+- Encounters are tracked by their unique ENCOUNTER_ID, ensuring accurate association with corresponding orders.
+- Encounters are linked to specific orders through the ORDER_ID, providing a clear timeline of order activity.
 
 **Fragment**
 
@@ -357,9 +357,9 @@ OrderMetricIDs AS
 
 **Description**
 
-- This step selects unique encounter identifiers and culture types from the AllCultures dataset, along with the earliest order and collection times for each combination.
-- It aggregates the names of organisms associated with each encounter, providing a comprehensive list while defaulting to 'Critical Value' if no organisms are present.
-- Membership is determined by the presence of at least one critical value, as indicated by the condition that the maximum value of CRITICAL_VALUE_01 must equal 1, ensuring only positive cultures are included.
+- Encounters are included when there is at least one positive culture result, indicated by a maximum critical value of 1.
+- Each encounter captures the earliest order and collection times, ensuring timely tracking of culture results.
+- The list of organisms associated with each encounter is aggregated, providing a comprehensive view of the identified organisms.
 
 **Fragment**
 
@@ -400,9 +400,8 @@ PositiveCultures AS
 
 **Description**
 
-- This step selects encounter IDs, order timestamps, and associated order set IDs from medication and procedure orders, focusing on specific order set IDs that are relevant to sepsis pathways and protocols.
-- Membership is determined by the inclusion of order IDs that match predefined order set IDs, ensuring that only relevant clinical orders related to sepsis are captured for analysis.
-- The query consolidates data from multiple sources, including medication and procedure orders, to provide a comprehensive view of orders associated with sepsis treatment protocols.
+- Encounters are included when they are associated with specific medication or procedure orders identified by the PRL_ORDERSET_IDs of 400002, 400007, 400003, 400004, 400006, 400005, and 4001326025.
+- Encounters are also included when they fall under the Sepsis Pathway or HS ED ONCOLOGY SEPSIS RN PROTOCOL, as indicated by the PRL_ORDERSET_IDs of 400001 and 4001326023.
 
 **Fragment**
 
@@ -471,11 +470,9 @@ SSOrderSetOSQ_PRL AS
 
 **Description**
 
-- This step selects encounter IDs and recorded times for blood pressure measurements from the #Flowsheets table, specifically focusing on entries where the measurement ID is '95' and the recorded time falls between the patient's arrival and departure times in the emergency department.
-
-- It calculates a hypotensive systolic blood pressure value by extracting and converting the systolic component from the measurement value, applying specific age-related criteria to determine if the patient meets the hypotension condition.
-
-- Membership in the hypotension category is determined based on age and systolic blood pressure thresholds, with distinct criteria for infants, young children, and adolescents, ensuring accurate assessment tailored to the patient's age group.
+- Encounters are included when the recorded blood pressure measurement indicates hypotensive systolic blood pressure based on age-specific thresholds.
+- Encounters for patients under 2 months are included if the systolic blood pressure is below 56, while those under 6 months are included if it is below 65.
+- For patients aged 13 years and older, encounters are included when the systolic blood pressure is below 100.
 
 **Fragment**
 
@@ -528,9 +525,9 @@ Systolic AS
 
 **Description**
 
-- This step selects all records from the `All_LDAs` table, enriching the dataset with a sequential identifier for each record based on the `ENCOUNTER_ID` and `LDA_PLACEMENT_TYPE`.
-- The `ROW_NUMBER()` function is utilized to create a unique timeline for each encounter and placement type, ordered by the `PLACEMENT_INSTANT`, ensuring that the sequence of placements is accurately represented.
-- Membership in this dataset is determined by the combination of `ENCOUNTER_ID` and `LDA_PLACEMENT_TYPE`, allowing for a detailed analysis of placement occurrences over time within each encounter.
+- Encounters are included when they are categorized by ENCOUNTER_ID and LDA_PLACEMENT_TYPE, ensuring each encounter is uniquely identified in the timeline.
+- Encounters are included when they are ordered by PLACEMENT_INSTANT, allowing for a chronological representation of events.
+- Encounters are included when they are assigned a TIME_LINE number, facilitating the tracking of their sequence within the specified categories.
 
 **Fragment**
 
@@ -555,9 +552,9 @@ FROM All_LDAs
 
 **Description**
 
-- This step selects all records from the `#Labs_and_Cultures` table, focusing specifically on entries where the `LAB_TEST_TYPE` is not null, ensuring that only relevant lab test data is included for analysis.
-- It utilizes the `ROW_NUMBER()` function to assign a sequential number to each lab test within the same `ENCOUNTER_ID` and `LAB_TEST_TYPE`, ordered by the `MBOrderTime`, thereby creating a timeline of lab tests for each encounter.
-- The result is a structured dataset that allows for the identification of the order in which lab tests were conducted, facilitating better insights into patient care timelines and lab test management.
+- Encounters are included when there is a valid LAB_TEST_TYPE associated with them, ensuring that only relevant lab tests are considered for analysis.  
+- Encounters are included when they are uniquely identified by ENCOUNTER_ID and LAB_TEST_TYPE, allowing for precise tracking of lab test timelines.  
+- Encounters are included when they are ordered by MBOrderTime, providing a chronological perspective on lab test administration.
 
 **Fragment**
 
@@ -582,8 +579,8 @@ TimeOrdered_Labs AS
 
 **Description**
 
-- This step selects the unique identifiers (FSD_ID) and recorded timestamps (Recorded_Time) of specific measurements from the flowsheet records associated with inpatient data.
-- Membership is determined by the inclusion of specific flow measurement IDs (FLO_MEAS_ID) and the requirement that the recorded time is not null, ensuring only valid and relevant data entries are considered.
+- Records are included when the FLO_MEAS_ID is one of the specified values: '9000613042', '9000613043', '9000613044', '9000613045', '9000613047', '9000613048', or '9000613050'.
+- Records are included when the RECORDED_TIME is not null, ensuring that only valid entries are considered.
 
 **Fragment**
 
@@ -616,9 +613,9 @@ AND RECORDED_TIME IS NOT NULL
 
 **Description**
 
-- This step selects encounter records along with their associated shift dates, department information, and patient details, focusing on encounters that are not in the emergency department (ER or P-ER) and have a specific departmental ranking (inDeptRN = 1).
-- It calculates the number of shifts per day based on the shift type (AM or PM) and the relationship between the in and out shift dates, ensuring that only relevant records are included based on defined conditions for both AM and PM shifts.
-- The selection criteria also include the expansion of dates for encounters that span multiple days, allowing for a comprehensive view of patient encounters across shifts while maintaining the integrity of the data by filtering out non-relevant departments.
+- Patients are included when they have an encounter recorded with a valid in-shift date and out-shift date, ensuring their time in the department is accurately captured.
+- Patients are included when their shifts span across multiple days, allowing for a comprehensive view of their care across different shifts.
+- Patients are included when they meet specific criteria related to their admission and discharge times, ensuring that only relevant encounters are considered for analysis.
 
 **Fragment**
 
@@ -757,9 +754,9 @@ dateCTE AS
 
 **Description**
 
-- This step selects patient encounter details, including encounter IDs, effective timestamps for admissions and transfers, and associated department information, ensuring a comprehensive view of patient movements within the hospital.
-- It filters the data to include only relevant "in" events, specifically admissions and transfers, while excluding any deleted or canceled events to maintain data integrity.
-- The query also handles potential missing department information by providing default labels for unspecified or unknown departments, ensuring clarity in reporting.
+- Encounters are included when they are associated with admission or transfer in events, ensuring that only relevant patient interactions are captured.
+- Encounters are included when they have a valid department ID, allowing for accurate departmental reporting and analysis.
+- Encounters are included when they occur within specified time frames, such as previous PM, AM, and current PM periods, facilitating time-based evaluations of patient flow.
 
 **Fragment**
 
@@ -834,9 +831,9 @@ vaplh AS
 
 **Description**
 
-- This step selects patient encounter data, including key identifiers such as ENCOUNTER_ID, PATIENT_ID, and departmental information, while focusing on inpatient stays that are not categorized under 'ER' or 'P-ER'.
-- It generates a date range for each encounter by expanding the initial admission date (Expansion Date) to include all days up to the discharge date (Expansion End Date), ensuring that only valid inpatient stays are considered.
-- The selection criteria ensure that only encounters with a defined duration between the Expansion Date and Expansion End Date are included, facilitating a comprehensive analysis of inpatient department utilization.
+- Patients are included when they have an encounter that falls within the specified department rollup, excluding 'ER' and 'P-ER'.
+- Patients are included when their expansion date is within the range defined by the expansion end date.
+- Patients are included when their in-department and out-department times are recorded accurately during their stay.
 
 **Fragment**
 
@@ -911,9 +908,9 @@ dateCTE AS
 
 **Description**
 
-- This step selects patient encounter records, including key details such as encounter ID, department information, and shift timings, from a temporary dataset while excluding emergency department cases.
-- It determines the number of shifts per day based on the shift start and end dates, categorizing them into AM and PM shifts, and includes conditions to identify whether the records are for the start or end of a shift.
-- The selection criteria ensure that only relevant records with a valid department rollup and specific shift conditions are included, facilitating accurate tracking of patient encounters across shifts.
+- Patients are included when they have an encounter recorded with a valid in-shift date and out-shift date, ensuring accurate tracking of their time in the department.
+- Patients are included when their shifts span across multiple days, allowing for comprehensive monitoring of their care across different shifts.
+- Patients are included when they meet specific criteria for AM and PM shifts, ensuring that all relevant timeframes are accounted for in the analysis.
 
 **Fragment**
 
@@ -1052,13 +1049,13 @@ dateCTE AS
 ```
 
 ## USP_IP_SepsisShiftCompliance.sql · vaplh
-*outcome: clean* · parsed tables: ip_sepsisencounterswlocations · parsed grain: visit
+*outcome: recovered* · parsed tables: ip_sepsisencounterswlocations · parsed grain: visit
 
 **Description**
 
-- This step selects key encounter details, including encounter ID, in and out department times, department identifiers, and calculated time intervals for both previous and current day shifts (AM and PM) from the `IP_SepsisEncountersWLocations` table.
-- Membership is determined by the presence of valid encounter records, with specific time calculations applied to both the in and out department times, ensuring that the data reflects accurate timeframes for patient encounters within the specified departments.
-- The use of `COALESCE` ensures that if an out department time is not available, the current date and time are used, allowing for a comprehensive view of encounters even when certain data points are missing.
+- Encounters are included when the InDepartmentTime and OutDepartmentTime are recorded, ensuring accurate tracking of patient movement within departments.
+- Encounters are included when they fall within specified time frames, such as the previous PM, AM, and current PM periods, allowing for effective analysis of patient flow.
+- Encounters are included when they have a unique identifier, ensuring each encounter is distinctly recognized for reporting and analysis purposes.
 
 **Fragment**
 
@@ -1110,14 +1107,16 @@ vaplh AS
 )
 ```
 
+first pass violated: technical vocabulary in a business description: 'Row' — say what is included, not how the SQL assembles it
+
 ## USP_RPTS_ED_Sepsis.sql · ABX
 *outcome: clean* · parsed tables: #base_pop, config_value_set, med_admin_records, med_mix_components, medication_orders, medications, or, previous, ref_generic_med · parsed grain: order, visit
 
 **Description**
 
-- This step selects records of administered antibiotics (ABX) for patients with a positive score, capturing details such as encounter ID, medication order ID, administration time, and medication name.
-- Membership is determined by ensuring that the antibiotics were administered within the emergency department before patient departure, specifically via intravenous route, and only includes records with valid administration actions (e.g., given, restarted, or applied).
-- The selection is further refined to include only those medications classified as antibiotics, based on predefined therapeutic class codes and a specific list of medications.
+- Encounters are included when patients have a positive score and have received antibiotics administered in the emergency department before their departure time.
+- Encounters are included when the antibiotics are given intravenously and the administration records indicate that the medication was either given, restarted, or applied during downtime.
+- Encounters are included when the administered antibiotics are classified under specific therapeutic classes, ensuring compliance with treatment protocols.
 
 **Fragment**
 
@@ -1344,9 +1343,9 @@ SELECT
 
 **Description**
 
-- This step selects key data related to blood culture results, including encounter IDs, order details, result times, and critical value indicators, to assess patient conditions effectively.
-- Membership is determined by filtering results based on specific procedure orders related to laboratory tests and ensuring that the order time falls within the patient's admission and departure times.
-- Additionally, it identifies abnormal or critical results by flagging them based on predefined criteria, enhancing the focus on significant clinical findings.
+- Encounters are included when the procedure orders fall within specific lab categories, ensuring relevance to critical lab results.
+- Encounters are included when the order time occurs between the patient's arrival and departure times, capturing the full scope of care during their visit.
+- Encounters are included when the results indicate abnormal or critical values, highlighting significant health concerns for timely intervention.
 
 **Fragment**
 
@@ -1403,9 +1402,9 @@ BloodCultureResults AS
 
 **Description**
 
-- This step selects critical laboratory results associated with patient encounters, including details such as encounter ID, order procedure ID, order time, result time, and the value of the results.
-- Membership is determined by filtering for specific procedure orders related to lumbar punctures and ensuring that the order time falls within the patient's arrival and departure times.
-- Additionally, it identifies results flagged as abnormal or critical based on predefined criteria, enhancing the focus on significant clinical findings.
+- Encounters are included when the procedure orders are related to specific lab tests, such as LAB006, LAB007, or LAB003, and the specimen source is a lumbar puncture.
+- Encounters are included when the order time falls between the patient's arrival and departure times.
+- Encounters are included when critical values are identified in the lab results, indicating abnormal or critical conditions.
 
 **Fragment**
 
@@ -1464,9 +1463,9 @@ CsfCultureResults AS
 
 **Description**
 
-- This step selects the earliest order time and collection time for each unique encounter in the BloodCultureResults dataset, identifying instances where no critical values were recorded.
-- It groups the results by encounter ID and filters the data to include only those encounters that have a maximum critical value of zero, indicating a lack of significant findings.
-- The output categorizes these encounters under a 'Negative' organism list, providing insights into cases that did not yield positive results.
+- Encounters are included when the maximum value of CRITICAL_VALUE_01 is zero, indicating no critical results were recorded.
+- Each encounter reflects the earliest order time and collection time for blood culture results, categorized under 'Negative' organisms.
+- This metric helps identify encounters that did not yield any critical findings, supporting quality assurance in patient care.
 
 **Fragment**
 
@@ -1505,9 +1504,9 @@ NegativeCultures AS
 
 **Description**
 
-- This step selects the earliest order time and collection time for each unique encounter in the UrineCultureResults dataset, identifying instances where no growth or contamination with normal flora is present.
-- Membership is determined by grouping the results by ENCOUNTER_ID and applying a condition that ensures the maximum critical value is zero, indicating a negative culture result.
-- The output categorizes these encounters under the label 'Negative', providing insights into cases that do not show significant microbial growth.
+- Encounters are included when the maximum critical value recorded is zero, indicating no significant growth or contamination.
+- Each encounter reflects the earliest order time and collection time associated with negative culture results.
+- Encounters are categorized under 'Negative' to signify instances of no growth or contamination with normal flora.
 
 **Fragment**
 
@@ -1546,9 +1545,9 @@ NegativeCultures AS
 
 **Description**
 
-- This step selects the unique `ENCOUNTER_ID` from the `CsfCultureResults` table, along with the earliest `ORDER_TIME` and `COMP_OBS_INST_TM` for each encounter.
-- Membership is determined by the condition that the maximum value of `CRITICAL_VALUE_01` for each encounter must equal zero, indicating no critical results were observed.
-- The results are categorized under the label 'Negative' in the `OrganismList`, signifying that these encounters did not yield any positive culture results.
+- Encounters are included when the maximum value of CRITICAL_VALUE_01 is 0, indicating no critical results were observed.
+- Each encounter reflects the earliest recorded order time and collection time for the associated results.
+- Encounters are categorized under 'Negative' to signify the absence of critical findings.
 
 **Fragment**
 
@@ -1587,9 +1586,9 @@ NegativeCultures AS
 
 **Description**
 
-- This step selects the earliest order time and collection time for each unique encounter in the BloodCultureResults dataset, ensuring a comprehensive view of the timing associated with each encounter.
-- It aggregates the external names of organisms detected during the blood culture process, providing a consolidated list of organisms for each encounter, which is crucial for clinical decision-making.
-- Membership in this dataset is determined by encounters that have at least one critical value flagged, as indicated by the condition that the maximum value of CRITICAL_VALUE_01 must equal 1.
+- Encounters are included when they have a recorded critical value indicating a significant finding in the blood culture results.
+- Each encounter reflects the earliest order time and collection time associated with the positive culture results.
+- The organism list for each encounter is compiled, highlighting the relevant external names of organisms identified during the testing process.
 
 **Fragment**
 
@@ -1628,9 +1627,9 @@ PositiveCultures AS
 
 **Description**
 
-- This step selects unique encounter identifiers (ENCOUNTER_ID) from the UrineCultureResults table, along with the earliest order time (MBOrderTime) and collection time (CollectionTime) for each encounter.
-- It aggregates the external names of organisms associated with each encounter into a single list (OrganismList), ensuring that only encounters with a maximum critical value of 1 are included in the results.
-- The use of the COALESCE function ensures that if no organisms are found, a default label of 'Critical Value' is assigned, maintaining clarity in the reporting of results.
+- Encounters are included when they have a recorded CRITICAL_VALUE_01 indicating a critical condition.
+- Each encounter captures the earliest ORDER_TIME and the corresponding CollectionTime for accurate tracking.
+- The list of organisms associated with each encounter is compiled, ensuring critical values are highlighted for review.
 
 **Fragment**
 
@@ -1669,9 +1668,9 @@ PositiveCultures AS
 
 **Description**
 
-- This step selects the earliest order time and collection time for each unique encounter, along with a consolidated list of organisms associated with that encounter.
-- Membership is determined by encounters that have at least one critical value flagged as positive, ensuring that only significant results are included in the analysis.
-- The output provides a focused view of critical culture results, facilitating targeted decision-making in clinical settings.
+- Encounters are included when they have a recorded critical value indicating a significant finding, ensuring that only relevant cases are considered for analysis.
+- Each encounter captures the earliest order time and collection time, providing a clear timeline for the events associated with the culture results.
+- The organism list for each encounter is compiled, highlighting the relevant organisms identified during the culture process, which aids in understanding the clinical context.
 
 **Fragment**
 
@@ -1710,9 +1709,9 @@ PositiveCultures AS
 
 **Description**
 
-- This step selects urine culture results associated with patient encounters, including key identifiers such as encounter ID, order procedure ID, and result timestamps, along with critical value indicators for abnormal or critical results.
-- Membership is determined by filtering results based on specific procedure IDs related to laboratory orders and ensuring that the order time falls within the patient's admission and departure times.
-- Additionally, it includes organism information by joining with the organisms table, allowing for a comprehensive view of the results linked to each encounter.
+- Encounters are included when the order time of the procedure falls between the patient's arrival and departure times.
+- Encounters are included when the results indicate a critical value, signifying an abnormal or critical condition.
+- Encounters are included when they are associated with specific laboratory procedures related to urine culture testing.
 
 **Fragment**
 

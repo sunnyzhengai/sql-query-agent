@@ -6,14 +6,14 @@
 
 **Coverage (stated, not implied):** the pipeline describes CTE STEPS, and only 5 of the corpus's 28 procs use CTEs — the other 23 stage through temp tables (15 of them explicitly). So this run covers every CTE step the estate HAS, which is not the same as every proc. Temp-table staging is a real Clarity pattern and describing it is a separate (unbuilt) capability, not a gap in these rates.
 
-- clean (passed first try): 26 (100%)
-- recovered (corrective retry fixed it): 0 (0%)
+- clean (passed first try): 25 (96%)
+- recovered (corrective retry fixed it): 1 (4%)
 - salvaged (surgical fallback kept grounded lines): 0 (0%)
 - emptied (absence over fabrication): 0 (0%)
 
 ## First-pass violations by class
 
-- none
+- technical vocabulary in a business description: 1
 
 ## Reading these numbers
 

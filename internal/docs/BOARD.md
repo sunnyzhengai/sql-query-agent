@@ -51,6 +51,16 @@ order; nothing skips ahead.
       recursive descent now). **SAMPLE READY FOR SUNNY:**
       internal/docs/DESC_LIVE_SAMPLE.md (description + fragment +
       parsed facts, hand-gradable).
+- [x] **DESC-VOICE-1 BUILT (08-31 dev, 1.82.0)** — Sunny's
+      grading: no fabrications, voice failures only. Three rules
+      now mechanical in the one gate (tech-vocabulary ban, subject
+      from parsed grain, grounded-or-absent acronym expansion);
+      voice=False spares the machine-composed template floor. A
+      row-number FALSE POSITIVE was caught by checking variance
+      (2 clean / 2 violating across re-drafts) — it had emptied an
+      honest description. **RE-RUN: 25 clean · 1 recovered · 0
+      emptied, zero technical vocabulary in all 26 descriptions.**
+      Sample regenerated for her grading.
 - [ ] ~~P0-c blocked~~ (resolved by the option-(a) ruling):
       the "790-proc corpus" is the WORK estate (Epic Clarity) —
       the separation wall forbids it here, and 790 was always a

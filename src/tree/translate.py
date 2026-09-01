@@ -23,7 +23,9 @@ from dataclasses import dataclass, field
 from src.tree.extract import DecisionTree
 from src.tree.render import render_fact
 
-FACT_PROMPT_VERSION = "1"
+# v2: DESC-VOICE-1 (steward voice, named subject, acronym rule) —
+# the version rides the cache key, so every description regenerates
+FACT_PROMPT_VERSION = "2"
 
 _MAX_DICT_LINES = 30
 
@@ -38,7 +40,9 @@ _FACT_HEADER = (
     "{facts_block}\n\n"
     "First write ONE sentence (max 30 words) stating what this step "
     "produces in business terms, grounded only in the decisions above "
-    "and the dependency descriptions.\n"
+    "and the dependency descriptions. Name the SUBJECT as "
+    "'{subject}' — say '{subject} are included when …', never "
+    "'membership' or 'the dataset' (DESC-VOICE-1).\n"
     "Then translate EVERY numbered decision into one line of plain "
     "business language, formatted exactly as 'N| translation' using the "
     "same number N. Keep every literal value (codes, numbers, statuses, "
@@ -46,7 +50,11 @@ _FACT_HEADER = (
     "a code when provided. Decisions marked or-group are ALTERNATIVES — "
     "phrase them as either/or, never as combined requirements. Never "
     "show raw table/column identifiers or temp-table names — use the "
-    "dictionary description or a plain phrase. Never invent a value, "
+    "dictionary description or a plain phrase. Write for a STEWARD, "
+    "not a developer: never mention tables, temp tables, joins, "
+    "queries, columns or 'the dataset'. Never expand an acronym "
+    "unless the source or dictionary expands it — print it as "
+    "written. Never invent a value, "
     "never drop a number, never add a decision that is not listed. "
     "No preamble, no markdown."
 )
@@ -102,6 +110,30 @@ def _fact_line(i: int, fact: dict) -> str:
     return " ".join(parts)
 
 
+def subject_from_facts(facts: "list[dict]",
+                       dict_lines: "list[str] | None" = None) -> str:
+    """DESC-VOICE-1 item 2: the SUBJECT to name, derived from the
+    typed FACTS (never from SQL — clause 2's guarantee holds). The
+    columns the decisions touch say what a row is; 'records' only
+    when nothing identifies it, and that fallback is a signal."""
+    blob = " ".join(
+        str(f.get("column") or "") + " " + str(f.get("text") or "")
+        + " " + str(f.get("expression") or "")
+        for f in (facts or [])).lower()
+    blob += " " + " ".join(dict_lines or []).lower()
+    for token, subject in (
+            ("encounter", "encounters"), ("visit", "encounters"),
+            ("admission", "encounters"), ("appt", "appointments"),
+            ("appointment", "appointments"),
+            ("order", "orders"), ("med", "medication orders"),
+            ("claim", "billing records"), ("cpt", "billing records"),
+            ("lab", "lab results"), ("result", "lab results"),
+            ("patient", "patients"), ("member", "patients")):
+        if token in blob:
+            return subject
+    return "records"
+
+
 def build_fact_prompt(name: str, facts: "list[dict]",
                       deps: "list[tuple[str, str]] | None" = None,
                       dict_lines: "list[str] | None" = None) -> str:
@@ -118,8 +150,10 @@ def build_fact_prompt(name: str, facts: "list[dict]",
                       f"these):\n{entries}\n\n")
     facts_block = "\n".join(
         _fact_line(i + 1, f) for i, f in enumerate(facts)) or "(none)"
-    return _FACT_HEADER.format(name=name, deps_block=deps_block,
-                               dict_block=dict_block, facts_block=facts_block)
+    return _FACT_HEADER.format(
+        name=name, deps_block=deps_block, dict_block=dict_block,
+        facts_block=facts_block,
+        subject=subject_from_facts(facts, dict_lines))
 
 
 _NUMBERED = re.compile(r"^\s*(\d+)\|\s*(.+?)\s*$")

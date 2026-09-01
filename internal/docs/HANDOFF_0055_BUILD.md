@@ -4079,3 +4079,39 @@ and on WHAT VALUES; it never says WHY the business does it —
 purpose is the steward's contribution, and claiming it is how a
 machine-written field starts lying politely.
 Re-generate the sample after; Sunny grades read #3.
+
+### 2026-08-31 — DESC-VOICE-1 BUILT + SAMPLE RE-RUN — release 1.82.0
+Sunny's grading found NO fabrications; the failures were VOICE.
+All three rules are now mechanical, in the ONE gate:
+1. **No technical vocabulary in a business description** —
+   table/temp table/join/select/CTE/column/row/dataset as a
+   subject, and any `#object`, are violations. Her two flagged
+   sentences are the fixture. The source objects are carried by
+   the RELATIONSHIP (landing matrix §1a), so the sentence never
+   needs them.
+2. **The SUBJECT comes from parsed grain** — "encounters are
+   included when…", "medication orders…", "patients…". Prompted
+   AND enforced; "records" only when grain is unknown, and that
+   fallback is visible in the sample. Derived from typed FACTS in
+   translate.py (clause 2 holds: no SQL can reach that prompt).
+3. **Acronym expansion is grounded or absent** — "endotracheal
+   tubes (ETT)" violates unless the source or dictionary says it;
+   the bare acronym always passes. Red-first fixture for each.
+**voice=False for MACHINE-composed text:** the template floor is
+stilted truth by design; policing its voice would floor the floor.
+**A false positive caught by variance, not by luck:** the first
+re-run EMPTIED one description. Four re-drafts showed 2 clean / 2
+violating — the model was saying "Row_Number" (a real ranking the
+SQL computes) and my `\brow\b` rule floored it. Fixed to exempt
+row-number/count phrasings, pinned as a test; "the rows" as a
+subject stays caught. Without checking the variance I would have
+reported an empty as a generation-quality finding when it was my
+gate's bug.
+**RE-RUN RESULT: 26 descriptions · clean 25 · recovered 1 ·
+salvaged 0 · emptied 0**, and a mechanical check of the sample
+finds ZERO technical vocabulary in any of the 26 descriptions
+(the 14 raw hits in the file are all inside the SQL fragments,
+where they belong). Voice verified: "Encounters are included
+when the medication administered is an antibiotic…".
+**Gates:** 1,402 green + 5 xfailed, ruff clean; wheel 1.82.0.
+Sample regenerated for Sunny: internal/docs/DESC_LIVE_SAMPLE.md

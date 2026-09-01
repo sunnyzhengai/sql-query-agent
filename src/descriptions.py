@@ -255,6 +255,83 @@ def _table_violations(text: str, fragment: str,
     return out
 
 
+# --- DESC-VOICE-1 (Sunny's grading, 2026-08-31) ---------------------
+# Her verdict on ACCURACY was clean; the failures were VOICE. A
+# steward's field must not carry a developer's sentence: the source
+# objects are already carried by the RELATIONSHIP (landing matrix
+# §1a), so the sentence never needs them.
+
+_TECH_WORDS = (
+    "temporary table", "temp table", "table", "cte",
+    "common table expression", "join", "joins", "joined", "select",
+    "subquery", "query", "dataset", "data set", "column", "columns",
+    "row", "rows", "schema", "index",
+)
+# the word must be the SUBJECT, not part of a computation's name:
+# "Row_Number" / "row number" describes a real ranking the SQL does,
+# while "the rows" is developer voice (P0-c variance find — the
+# false positive emptied an otherwise-honest description)
+_TECH_SUBJECT = re.compile(
+    r"(?i)(?:^|[-\s(])(?:the\s+)?(" + "|".join(_TECH_WORDS)
+    + r")\b(?![\s_-]*(?:number|num|count|numbering))")
+_HASH_OBJECT = re.compile(r"#\w+")
+# "X (ACRONYM)" or "ACRONYM (expansion)" — the model teaching us
+# medicine from its own knowledge rather than from the source
+_ACRONYM_GLOSS = re.compile(
+    r"([A-Za-z][A-Za-z\s/-]{3,40}?)\s*\(([A-Z]{2,6})\)"
+    r"|\b([A-Z]{2,6})\s*\(([A-Za-z][A-Za-z\s/-]{3,40}?)\)")
+
+
+def voice_violations(text: str, fragment: str,
+                     dict_lines: "list[str] | None" = None
+                     ) -> "list[str]":
+    """The business-voice rules. Not accuracy — AUDIENCE."""
+    out: "list[str]" = []
+    ground = ((fragment or "") + "\n"
+              + "\n".join(dict_lines or [])).lower()
+    for obj in set(_HASH_OBJECT.findall(text)):
+        out.append(
+            f"technical object in a business description: {obj!r} — "
+            "the source object is carried by the relationship, not "
+            "the sentence")
+    for m in _TECH_SUBJECT.finditer(text):
+        out.append(
+            f"technical vocabulary in a business description: "
+            f"{m.group(1)!r} — say what is included, not how the "
+            "SQL assembles it")
+    # an acronym may be EXPANDED only from the source or dictionary
+    for m in _ACRONYM_GLOSS.finditer(text):
+        expansion = (m.group(1) or m.group(4) or "").strip()
+        acronym = (m.group(2) or m.group(3) or "").strip()
+        if not expansion or not acronym:
+            continue
+        head = expansion.split()[0].lower().rstrip("s")
+        if len(head) >= 4 and head not in ground:
+            out.append(
+                f"ungrounded acronym expansion: {acronym!r} expanded "
+                f"as {expansion!r}, which appears nowhere in the "
+                "source or dictionary — print the acronym as written")
+    return out
+
+
+_GRAIN_SUBJECT = {
+    "patient": "patients", "visit": "encounters",
+    "order": "medication orders", "claim": "billing records",
+    "result": "lab results",
+}
+
+
+def subject_for(fragment: str) -> str:
+    """The SUBJECT a description should name, from the parsed grain
+    (DESC-VOICE-1 item 2). 'records' only when grain is unknown —
+    and that fallback is a signal worth logging."""
+    grain = parsed_grain(fragment)
+    for key in ("patient", "visit", "order", "claim", "result"):
+        if key in grain:
+            return _GRAIN_SUBJECT[key]
+    return "records"
+
+
 def _condition_text(fragment: str) -> str:
     """The parts of the SQL that actually DECIDE: windows of text after
     WHERE / ON / HAVING / AND / WHEN keywords. Approximate by design —
@@ -268,7 +345,7 @@ def _condition_text(fragment: str) -> str:
 
 def grounding_violations(
     text: str, fragment: str, dict_lines: "list[str] | None" = None,
-    dialect: str = "sql",
+    dialect: str = "sql", voice: bool = True,
 ) -> "list[str]":
     """Deterministic checks of a generated description against the ONE
     source it claims to describe. Returns human-readable violations;
@@ -321,6 +398,13 @@ def grounding_violations(
     if dialect == "sql":
         violations.extend(_table_violations(text, fragment, dict_lines))
         violations.extend(_grain_violations(text, fragment))
+    # 5) VOICE (DESC-VOICE-1): audience, not accuracy — a steward's
+    # field must not carry a developer's sentence. Skipped with
+    # voice=False for MACHINE-COMPOSED text (the template fallback
+    # is stilted truth by design; policing its voice would floor
+    # the floor).
+    if voice:
+        violations.extend(voice_violations(text, fragment, dict_lines))
     return violations
 
 
@@ -531,8 +615,11 @@ _RETRY_NOTE = (
     "column as a filter ONLY if it appears in a WHERE / JOIN ON / "
     "HAVING / CASE WHEN condition; name ONLY tables the SQL reads; "
     "state the counted entity ONLY as the key columns define it "
-    "(do not say patients when the row is a visit); drop any claim "
-    "you cannot ground."
+    "(do not say patients when the row is a visit); write for a "
+    "STEWARD, not a developer — never mention tables, temp tables, "
+    "joins, columns, queries or datasets, and never expand an "
+    "acronym the source does not expand; drop any claim you cannot "
+    "ground."
 )
 
 

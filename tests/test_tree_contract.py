@@ -207,7 +207,10 @@ class TestClause6FailurePolarityFloor:
         )
         assert provenance == "template_fallback"
         # the floor is stilted truth, never hope: fully grounded output
-        assert grounding_violations(text, GNARLY_FRAGMENT) == []
+        # the floor is MACHINE-composed stilted truth, not a business
+        # description — voice rules (DESC-VOICE-1) do not police it
+        assert grounding_violations(text, GNARLY_FRAGMENT,
+                                    voice=False) == []
         assert "pending or cancelled" not in text
 
     def test_version_binding_tree_contract_version_changes_cache_keys(self):

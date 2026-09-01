@@ -67,7 +67,9 @@ class TestGroundedTextPasses:
 
     def test_no_decision_lines_no_noise(self):
         fragment = "SELECT a, b FROM #prior"
-        text = "This step carries forward the prior result columns."
+        # DESC-VOICE-1: "columns" is developer vocabulary — the
+        # steward voice says what carries forward, not how
+        text = "This step carries forward the prior results."
         assert grounding_violations(text, fragment) == []
 
 
@@ -240,3 +242,79 @@ class TestP0bCorpusFindings:
         assert parsed_grain(frag) == {"visit"}
         assert any("grain claim" in x for x in
                    grounding_violations("- counts patients", frag))
+
+
+class TestDescVoice1:
+    """DESC-VOICE-1 (Sunny's grading, 2026-08-31): her verdict on
+    ACCURACY was clean — these are VOICE rules. A steward's field
+    must not carry a developer's sentence."""
+
+    CULTURES = ("SELECT ENCOUNTER_ID FROM #Labs_and_Cultures L "
+                "JOIN ORGANISMS O ON O.ID = L.ORG_ID "
+                "WHERE L.RESULT = 'POSITIVE'")
+
+    def test_her_exact_examples_are_caught(self):
+        """The two sentences she flagged in the P0-c sample."""
+        v = grounding_violations(
+            "- This step selects from the temporary table "
+            "#Labs_and_Cultures\n"
+            "- the join with the ORGANISMS table enriches the "
+            "dataset", self.CULTURES)
+        joined = " ".join(v)
+        assert "#Labs_and_Cultures" in joined
+        assert "'temporary table'" in joined
+        assert "'join'" in joined
+        assert "'dataset'" in joined
+
+    def test_the_steward_voice_passes(self):
+        """Her 'All_LDAs' example — the model already doing it
+        right — must not be floored."""
+        v = grounding_violations(
+            "- encounters are included when a culture result is "
+            "positive", self.CULTURES)
+        assert v == [], v
+
+    def test_subject_comes_from_parsed_grain(self):
+        from src.descriptions import subject_for
+        assert subject_for(self.CULTURES) == "encounters"
+        assert subject_for("SELECT DISTINCT PATIENT_ID FROM T") == \
+            "patients"
+        assert subject_for("SELECT ORDER_MED_ID FROM MEDS") == \
+            "medication orders"
+        # unknown grain falls back to 'records' — a signal, not a
+        # default we are comfortable with
+        assert subject_for("SELECT 1 AS FLAG") == "records"
+
+    def test_acronym_expansion_must_be_grounded(self):
+        frag = "CASE WHEN LINE_TYPE = 'ETT' THEN 1 END -- ETT lines"
+        bad = grounding_violations(
+            "- endotracheal tubes (ETT) are counted", frag)
+        assert any("ungrounded acronym expansion" in x for x in bad)
+        # the acronym alone is fine — it is what the source wrote
+        assert grounding_violations("- ETT lines are counted",
+                                    frag) == []
+        # and a dictionary expansion IS grounded
+        assert grounding_violations(
+            "- endotracheal tubes (ETT) are counted", frag,
+            dict_lines=["ETT: endotracheal tube"]) == []
+
+    def test_machine_composed_text_is_not_voice_policed(self):
+        """The template floor is stilted truth by design — policing
+        its voice would floor the floor."""
+        machine = "Rows from #Staging where STATUS = 'A'."
+        assert grounding_violations(machine, "SELECT * FROM #Staging "
+                                    "WHERE STATUS = 'A'",
+                                    voice=False) == []
+        assert grounding_violations(machine, "SELECT * FROM #Staging "
+                                    "WHERE STATUS = 'A'") != []
+
+    def test_row_number_is_a_computation_not_developer_voice(self):
+        """P0-c variance find: 'Row_Number' names a real ranking the
+        SQL computes; flooring it emptied an otherwise-honest
+        description. 'the rows', as a subject, stays caught."""
+        frag = "SELECT ROW_NUMBER() OVER (ORDER BY IN_DTTM) FROM X"
+        assert grounding_violations(
+            "- Row_Number orders each stay by arrival time",
+            frag) == []
+        assert any("'rows'" in x for x in grounding_violations(
+            "- the rows are filtered to positives", frag))
