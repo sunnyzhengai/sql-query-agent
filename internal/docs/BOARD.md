@@ -140,7 +140,15 @@ order; nothing skips ahead.
       pinned test making SQL-structure regexes in src/ unwritable
       (Echo Law mechanism; must go red on the current composer
       first). DESC-SKELETON-2 retired; reverted patch = analysis
-      only. Dev building next.
+      only. **REVIEW FINDING (pre-build): the parse was never
+      missing — it was DISCARDED.** descriptions.py imports no
+      parser at all, while desc_live_run.harvest_steps already
+      holds each step as a live ScriptDom node and passes down only
+      text. So the re-cut is PLUMBING + a renderer, not a parsing
+      project. Also verified: **ScriptDom cannot host on Sunny's
+      Mac** (hardened-runtime SIGKILL, no fallback) — dev must
+      state the proving ground and must NOT add a text fallback.
+      Dev building next.
 - [ ] **DESC-FILE-1 (08-31, ordered)** — deliverable is a
       description per SQL FILE; steps are how, not what. Retires
       DESC-WHOLE-1. Coverage = files described / files present.

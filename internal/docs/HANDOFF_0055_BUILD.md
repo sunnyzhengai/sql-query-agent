@@ -4807,3 +4807,61 @@ memory demonstrably loses to quota pressure and session swaps.
 Sequencing: DESC-SKELETON-3 + GATE-REGEX-1 land together, then
 DESC-FILE-1 proceeds (recon above stands). Sample #4 regenerates
 for Sunny's read only after the re-cut corpus run.
+
+### REVIEW FINDING — THE PARSE WAS NEVER MISSING; IT WAS DISCARDED (08-31, pre-build)
+
+Read the call path before dev starts DESC-SKELETON-3. This changes
+the order's shape and lowers its cost, so it lands BEFORE the build.
+
+**`src/descriptions.py` imports no parser at all.** Its imports are
+hashlib, re, dataclasses, typing, graph.serialization, models, tree.
+Nothing from `src/parser/`. That is the mechanical reason the
+composer scanned text: inside that module, a SQL *string* was the
+only thing in scope. My order's missing word ("from the ScriptDom
+parse") is the first cause; this import boundary is the second.
+
+**And the tree existed one call upstream.** `devtools/desc_live_run.py`
+`harvest_steps()` (line 95) parses each file with `parse_tsql`,
+descends the AST through BEGIN/END and IF/ELSE, and identifies each
+step as a live ScriptDom `SelectStatement` node — its own docstring
+reads "the same path the pipeline uses; **no regex**." It then puts
+the step's SQL TEXT in the dict and drops the node. `compose_skeleton`
+re-derives from that text, with regexes, the structure the harvester
+had already parsed and thrown away.
+
+**Consequence for the build: nobody is writing a parser.** Dev's
+revert evidence ("I had to hand-build paren balancing, top-level-OR
+detection, clause segmentation") was true of the REGEX path and is
+the strongest possible argument against it — every one of those is a
+property the ScriptDom node already carries:
+- balanced-paren subquery excision → the subquery IS a child node;
+- aggregate LHS in HAVING → `HavingClause.SearchCondition`, same
+  node types as WHERE, no special case;
+- top-level OR → `BooleanBinaryExpression.BinaryExpressionType`;
+- SELECT-list vs FROM scope → different properties of the statement.
+So the re-cut is a PLUMBING change plus a node-to-sentence renderer,
+not a parsing project.
+
+**REVISED ORDER — DESC-SKELETON-3 (supersedes the shape, not the goal):**
+1. **Pass the node, not the string.** `compose_skeleton` takes the
+   parsed statement (harvester already has it). Keep a text-accepting
+   entry point ONLY if it parses internally via `src/parser/` — never
+   by pattern.
+2. **Renderer over node types**, per the four defect classes above.
+3. **PLATFORM CONSTRAINT — STATE THE PROVING GROUND.** ScriptDom
+   cannot host on Sunny's Mac (verified today: hardened-runtime
+   SIGKILL on coreclr; `parse_sql` RAISES, there is no fallback). So
+   the eight probe fixtures cannot run on this machine against a live
+   parse. Dev must state where they were proven (Fabric/CI/Linux) and
+   must NOT introduce a text-mode fallback to make local tests pass —
+   that would reintroduce exactly what we are deleting. If fixtures
+   need to run locally, they run against RECORDED node structures
+   (captured where ScriptDom does host), not against re-parsed text.
+   Whatever is chosen, say so in the ledger.
+4. Everything else in the original order stands (delete the five
+   regexes; eight probes red-first; output read, not counters).
+
+**GATE-REGEX-1 gains one clause:** the ban must also catch the
+*shape* of this failure — a module that consumes SQL text and derives
+structure from it without importing `src/parser/`. If that is not
+mechanically checkable, dev says so with the specific obstacle.
