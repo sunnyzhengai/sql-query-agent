@@ -314,6 +314,64 @@ def voice_violations(text: str, fragment: str,
     return out
 
 
+# DESC-VOICE-2 (Sunny's second read): the gate stops LIES, it does
+# not stop EMPTINESS. A description that says "Encounters are
+# included when… critical for tracking treatment protocols" is
+# unfalsifiable purpose-speak. The rule: say WHAT is included and
+# on WHAT VALUES; never say WHY the business does it — purpose is
+# the steward's contribution, and claiming it is how a
+# machine-written field starts lying politely.
+_PURPOSE_TAIL = re.compile(
+    r"(?i)\b(?:"
+    r"critical (?:for|to)|essential (?:for|to)|important (?:for|to)|"
+    r"key (?:for|to)|vital (?:for|to)|"
+    r"ensur\w+|allow\w+ (?:for|us|them)|enabl\w+|facilitat\w+|"
+    r"align\w+ with|help\w* (?:to )?(?:identify|ensure|track|"
+    r"capture|target)|"
+    r"support\w* (?:the )?(?:analysis|tracking|monitoring|quality)|"
+    r"provid\w+ (?:a )?(?:clear|comprehensive|insight)|"
+    r"for (?:quality|reporting|analysis|tracking) (?:metrics|"
+    r"purposes)|"
+    r"so that|in order to|which is useful|thereby|"
+    r"relevant (?:cases|records|data) are (?:captured|considered)|"
+    r"comprehensive view|effective\w* (?:tracking|monitoring)"
+    r")\b")
+
+
+# a prompt placeholder echoed into the output is the instruction
+# leaking through as data (P0-c find: "(first: <first_value>, last:
+# <last_value>)" reached a steward-facing description)
+_PLACEHOLDER = re.compile(r"<[a-z_]{3,24}>")
+
+
+def placeholder_violations(text: str) -> "list[str]":
+    return [f"prompt placeholder echoed: {m!r} — the instruction "
+            "leaked into the description as data"
+            for m in set(_PLACEHOLDER.findall(text))]
+
+
+def purpose_violations(text: str, fragment: str) -> "list[str]":
+    """DESC-VOICE-2 item 3: purpose speculation is banned unless the
+    SOURCE states it (a comment we can quote)."""
+    ground = (fragment or "").lower()
+    out: "list[str]" = []
+    for line in text.splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        m = _PURPOSE_TAIL.search(line)
+        if not m:
+            continue
+        phrase = m.group(0).lower()
+        if phrase in ground:          # the source says it; quote ok
+            continue
+        out.append(
+            f"purpose speculation: {m.group(0)!r} in {line[:60]!r} — "
+            "say WHAT is included and on WHAT VALUES; why is the "
+            "steward's to write")
+    return out
+
+
 _GRAIN_SUBJECT = {
     "patient": "patients", "visit": "encounters",
     "order": "medication orders", "claim": "billing records",
@@ -405,6 +463,8 @@ def grounding_violations(
     # the floor).
     if voice:
         violations.extend(voice_violations(text, fragment, dict_lines))
+        violations.extend(purpose_violations(text, fragment))
+        violations.extend(placeholder_violations(text))
     return violations
 
 

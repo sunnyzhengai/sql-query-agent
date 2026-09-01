@@ -61,6 +61,18 @@ order; nothing skips ahead.
       honest description. **RE-RUN: 25 clean · 1 recovered · 0
       emptied, zero technical vocabulary in all 26 descriptions.**
       Sample regenerated for her grading.
+- [x] **DESC-VOICE-2 BUILT (08-31 dev, 1.83.0)** — lead line =
+      what this IS; concrete values (elided past ~6); purpose
+      speculation banned at the gate (source-stated purpose may
+      be quoted). **Two self-inflicted classes found live: my
+      prompt's EXAMPLE became data** (its literals copied into
+      unrelated steps — every concrete example removed from both
+      prompts) and prompt PLACEHOLDERS echoed into descriptions
+      (now its own gate class). **Re-run: 18 clean · 5 recovered
+      · 3 emptied** — the empties are the gate working (invented
+      organism names, verified absent from source). Bar moved
+      from "true" to "true AND concrete AND purpose-free";
+      reporting the honest number. Sample ready for read #3.
 - [ ] ~~P0-c blocked~~ (resolved by the option-(a) ruling):
       the "790-proc corpus" is the WORK estate (Epic Clarity) —
       the separation wall forbids it here, and 790 was always a

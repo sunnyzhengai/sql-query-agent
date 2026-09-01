@@ -9,8 +9,11 @@ For each: the generated description, the fragment it describes, and the PARSED F
 
 **Description**
 
-- Encounters are included when the medication administered is an antibiotic or a mixture containing antibiotics, and the administration time occurs before the patient's departure from the emergency department (ED).
-- Encounters are also included if the medication falls under the therapeutic class of antibiotics, ensuring that all relevant antibiotic administrations are captured.
+This SQL selects encounters with antibiotic administration times.
+
+- TAKEN_TIME must be less than ED_DEPARTURE_TIME.
+- MEDICATION_ID must be in a list derived from medications with mixtures that include antibiotics, where AGENT_ORDER equals 1.
+- THERA_CLASS_CODE must equal 11.
 
 **Fragment**
 
@@ -143,13 +146,11 @@ ABX AS
 ```
 
 ## USP_ED_SEPSIS.sql · AllCultures
-*outcome: clean* · parsed tables: #labs_and_cultures, organisms · parsed grain: order, visit
+*outcome: emptied* · parsed tables: #labs_and_cultures, organisms · parsed grain: order, visit
 
 **Description**
 
-- Encounters are included when the CULTURE_TYPE is specified, ensuring that only relevant cases are considered for analysis.
-- Encounters are included when they have associated ORDER_PROC_ID and ENCOUNTER_ID, providing a clear link to the procedures performed.
-- Encounters are included when they contain critical values, allowing for the identification of significant results in the laboratory processes.
+_(emptied — nothing grounded survived)_
 
 **Fragment**
 
@@ -193,14 +194,18 @@ AllCultures AS
 )
 ```
 
+first pass violated: technical vocabulary in a business description: 'table' — say what is included, not how the SQL assembles it
+
 ## USP_ED_SEPSIS.sql · All_LDAs
 *outcome: clean* · parsed tables: #base_pop, config_value_set, line_device_airway · parsed grain: (unknown)
 
 **Description**
 
-- Records are included when the PLACEMENT_INSTANT is not null and falls between the ADT_ARRIVAL_TIME and ED_DEPARTURE_TIME.
-- Records are included when the FLO_MEAS_ID is either '900112' for ETT or '900111' for IV, or when the VALUE_SET_ID is 3022 for SEPSIS_CVL_PLACEMENT. 
-- Records are included when the LDA_PLACEMENT_TYPE is determined based on the specified FLO_MEAS_ID or VALUE_SET_ID criteria.
+Records of LDA placements.
+
+- Inclusion is determined by FLO_MEAS_ID values: '900112', '900111', or a VALUE_SET_ID of 3022.
+- A placement time is recorded.
+- The placement time falls between ADT_ARRIVAL_TIME and ED_DEPARTURE_TIME.
 
 **Fragment**
 
@@ -279,9 +284,11 @@ All_LDAs AS
 
 **Description**
 
-- Encounters are included when they have a CULTURE_TYPE associated with a negative result, ensuring that only those with no positive CRITICAL_VALUE_01 are considered.
-- Encounters are included when the earliest MBOrderTime and CollectionTime are recorded, providing a clear timeline for negative cultures.
-- Encounters are included in the analysis to identify patterns and trends related to negative cultures, contributing to overall quality improvement efforts.
+NegativeCultures selects encounters with specific culture types that have no positive critical values.
+
+- Inclusion requires MAX(CRITICAL_VALUE_01) = 0.
+- Encounter_ID and CULTURE_TYPE must be grouped together.
+- The minimum MBOrderTime and CollectionTime are recorded.
 
 **Fragment**
 
@@ -318,13 +325,15 @@ NegativeCultures AS
 ```
 
 ## USP_ED_SEPSIS.sql · OrderMetricIDs
-*outcome: clean* · parsed tables: #base_pop, order_tracking_metrics · parsed grain: order, visit
+*outcome: recovered* · parsed tables: #base_pop, order_tracking_metrics · parsed grain: order, visit
 
 **Description**
 
-- Encounters are included when the ORDER_DTTM falls within the timeframe defined by ADT_ARRIVAL_TIME and ED_DEPARTURE_TIME.
-- Encounters are tracked by their unique ENCOUNTER_ID, ensuring accurate association with corresponding orders.
-- Encounters are linked to specific orders through the ORDER_ID, providing a clear timeline of order activity.
+OrderMetricIDs selects encounters with associated order metrics.
+
+- ORDER_DTTM falls between ADT_ARRIVAL_TIME and ED_DEPARTURE_TIME.
+- Encounter_ID must match between ORDER_TRACKING_METRICS and the source.
+- ORDER_ID and PRL_ORDERSET_ID are included without specific values listed.
 
 **Fragment**
 
@@ -352,14 +361,18 @@ OrderMetricIDs AS
 )
 ```
 
+first pass violated: technical vocabulary in a business description: 'table' — say what is included, not how the SQL assembles it; technical vocabulary in a business description: 'table' — say what is included, not how the SQL assembles it
+
 ## USP_ED_SEPSIS.sql · PositiveCultures
-*outcome: clean* · parsed tables: — · parsed grain: visit
+*outcome: recovered* · parsed tables: — · parsed grain: visit
 
 **Description**
 
-- Encounters are included when there is at least one positive culture result, indicated by a maximum critical value of 1.
-- Each encounter captures the earliest order and collection times, ensuring timely tracking of culture results.
-- The list of organisms associated with each encounter is aggregated, providing a comprehensive view of the identified organisms.
+PositiveCultures selects encounters with positive culture results.
+
+- Inclusion requires MAX(CRITICAL_VALUE_01) = 1, indicating any positives.
+- The selection includes ENCOUNTER_ID and CULTURE_TYPE.
+- OrganismList contains organism names aggregated with a semicolon, with a minimum of one organism listed, and the lowest value is 'Critical Value'.
 
 **Fragment**
 
@@ -395,13 +408,18 @@ PositiveCultures AS
 )
 ```
 
+first pass violated: ungrounded value: '100' not in the SQL
+
 ## USP_ED_SEPSIS.sql · SSOrderSetOSQ_PRL
 *outcome: clean* · parsed tables: medication_orders_ext, procedure_orders_ext · parsed grain: order, visit
 
 **Description**
 
-- Encounters are included when they are associated with specific medication or procedure orders identified by the PRL_ORDERSET_IDs of 400002, 400007, 400003, 400004, 400006, 400005, and 4001326025.
-- Encounters are also included when they fall under the Sepsis Pathway or HS ED ONCOLOGY SEPSIS RN PROTOCOL, as indicated by the PRL_ORDERSET_IDs of 400001 and 4001326023.
+This is a selection of encounters related to specific order sets.
+
+- Includes encounters with an ORDER_DTTM and an ORD_OSQ_ID of 400002, 400007, 400003, 400004, 400006, 400005, or 4001326025.
+- Includes encounters where the PRL_ORDERSET_ID is 400001 or 4001326023.
+- The selection is based on the presence of an ORDER_ID in the MEDICATION_ORDERS_EXT or PROCEDURE_ORDERS_EXT tables.
 
 **Fragment**
 
@@ -470,9 +488,11 @@ SSOrderSetOSQ_PRL AS
 
 **Description**
 
-- Encounters are included when the recorded blood pressure measurement indicates hypotensive systolic blood pressure based on age-specific thresholds.
-- Encounters for patients under 2 months are included if the systolic blood pressure is below 56, while those under 6 months are included if it is below 65.
-- For patients aged 13 years and older, encounters are included when the systolic blood pressure is below 100.
+This SQL selects encounters with recorded blood pressure measurements.
+
+- Inclusion requires a FLO_MEAS_ID of '95'.
+- Recorded time must fall between ADT_ARRIVAL_TIME and ED_DEPARTURE_TIME.
+- Hypotension status is determined by systolic blood pressure values: less than 56 for ages under 2 months, less than 65 for ages under 6 months, less than 70 for ages under 12 months, less than 70 for ages up to 13 years, and less than 100 for ages over 13 years.
 
 **Fragment**
 
@@ -525,9 +545,11 @@ Systolic AS
 
 **Description**
 
-- Encounters are included when they are categorized by ENCOUNTER_ID and LDA_PLACEMENT_TYPE, ensuring each encounter is uniquely identified in the timeline.
-- Encounters are included when they are ordered by PLACEMENT_INSTANT, allowing for a chronological representation of events.
-- Encounters are included when they are assigned a TIME_LINE number, facilitating the tracking of their sequence within the specified categories.
+This SQL selects TimeOrdered_LDAs.
+
+- Includes encounters with specific ENCOUNTER_IDs and LDA_PLACEMENT_TYPE values.
+- The TIME_LINE is determined by the PLACEMENT_INSTANT, ordered chronologically.
+- The SQL captures all records where a placement time is recorded.
 
 **Fragment**
 
@@ -552,9 +574,11 @@ FROM All_LDAs
 
 **Description**
 
-- Encounters are included when there is a valid LAB_TEST_TYPE associated with them, ensuring that only relevant lab tests are considered for analysis.  
-- Encounters are included when they are uniquely identified by ENCOUNTER_ID and LAB_TEST_TYPE, allowing for precise tracking of lab test timelines.  
-- Encounters are included when they are ordered by MBOrderTime, providing a chronological perspective on lab test administration.
+This SQL selects encounters with lab tests.
+
+- Includes encounters where LAB_TEST_TYPE is not null.
+- Assigns a TIME_LINE based on the order of MBOrderTime, partitioned by ENCOUNTER_ID and LAB_TEST_TYPE.
+- The TIME_LINE values range from 1 to the maximum number of lab tests per encounter, with the lowest value being 1.
 
 **Fragment**
 
@@ -579,8 +603,10 @@ TimeOrdered_Labs AS
 
 **Description**
 
-- Records are included when the FLO_MEAS_ID is one of the specified values: '9000613042', '9000613043', '9000613044', '9000613045', '9000613047', '9000613048', or '9000613050'.
-- Records are included when the RECORDED_TIME is not null, ensuring that only valid entries are considered.
+This SQL selects records of measurements.
+
+- Inclusion is determined by FLO_MEAS_ID values: '9000613042', '9000613043', '9000613044', '9000613045', '9000613047', '9000613048', '9000613050'.
+- RECORDED_TIME must be present and not null.
 
 **Fragment**
 
@@ -613,9 +639,11 @@ AND RECORDED_TIME IS NOT NULL
 
 **Description**
 
-- Patients are included when they have an encounter recorded with a valid in-shift date and out-shift date, ensuring their time in the department is accurately captured.
-- Patients are included when their shifts span across multiple days, allowing for a comprehensive view of their care across different shifts.
-- Patients are included when they meet specific criteria related to their admission and discharge times, ensuring that only relevant encounters are considered for analysis.
+This SQL selects patient encounter records.
+
+- Inclusion is determined by the condition that `inDeptRN = 1`.
+- The `DEPARTMENT_ROLLUP` must not be in ('ER', 'P-ER').
+- The `In Shift` must be either 'AM' or 'PM', and the `Out Shift Date` must be greater than or equal to the `In Shift Date`.
 
 **Fragment**
 
@@ -750,13 +778,15 @@ dateCTE AS
 ```
 
 ## USP_IP_SEPSIS.sql · vaplh
-*outcome: clean* · parsed tables: #mainadmdetails, adt_events, departments, hospital_encounters · parsed grain: visit
+*outcome: recovered* · parsed tables: #mainadmdetails, adt_events, departments, hospital_encounters · parsed grain: visit
 
 **Description**
 
-- Encounters are included when they are associated with admission or transfer in events, ensuring that only relevant patient interactions are captured.
-- Encounters are included when they have a valid department ID, allowing for accurate departmental reporting and analysis.
-- Encounters are included when they occur within specified time frames, such as previous PM, AM, and current PM periods, facilitating time-based evaluations of patient flow.
+This SQL selects encounters with specific admission and transfer events.
+
+- Includes encounters where the EVENT_TYPE_CODE is 1, 3, or 99.
+- Excludes encounters with an EVENT_SUBTYPE_CODE of 2.
+- Requires a valid DEPARTMENT_ID; if absent, it notes '*Department not specified', '*Unknown department', or '*Unnamed department'.
 
 **Fragment**
 
@@ -826,14 +856,18 @@ vaplh AS
 )
 ```
 
+first pass violated: purpose speculation: 'ensuring' in '- Includes encounters with a DEPARTMENT_ID that is not NULL,' — say WHAT is included and on WHAT VALUES; why is the steward's to write
+
 ## USP_IP_SepsisPatientDates.sql · dateCTE
 *outcome: clean* · parsed tables: #base_poptemp, datecte · parsed grain: patient, visit
 
 **Description**
 
-- Patients are included when they have an encounter that falls within the specified department rollup, excluding 'ER' and 'P-ER'.
-- Patients are included when their expansion date is within the range defined by the expansion end date.
-- Patients are included when their in-department and out-department times are recorded accurately during their stay.
+This SQL selects patient encounters.
+
+- Inclusion is determined by the DEPARTMENT_ROLLUP not being in ('ER', 'P-ER').
+- The EXPANSION DATE must be less than or equal to the EXPANSION END DATE.
+- A placement time is recorded for each encounter.
 
 **Fragment**
 
@@ -908,9 +942,11 @@ dateCTE AS
 
 **Description**
 
-- Patients are included when they have an encounter recorded with a valid in-shift date and out-shift date, ensuring accurate tracking of their time in the department.
-- Patients are included when their shifts span across multiple days, allowing for comprehensive monitoring of their care across different shifts.
-- Patients are included when they meet specific criteria for AM and PM shifts, ensuring that all relevant timeframes are accounted for in the analysis.
+This SQL selects patient encounter records.
+
+- Inclusion requires that `inDeptRN` equals 1.
+- The `DEPARTMENT_ROLLUP` must not be in ('ER', 'P-ER').
+- The `In Shift` must be either 'AM' or 'PM', and the `Out Shift Date` must be greater than or equal to the `In Shift Date`.
 
 **Fragment**
 
@@ -1053,9 +1089,11 @@ dateCTE AS
 
 **Description**
 
-- Encounters are included when the InDepartmentTime and OutDepartmentTime are recorded, ensuring accurate tracking of patient movement within departments.
-- Encounters are included when they fall within specified time frames, such as the previous PM, AM, and current PM periods, allowing for effective analysis of patient flow.
-- Encounters are included when they have a unique identifier, ensuring each encounter is distinctly recognized for reporting and analysis purposes.
+This SQL selects encounters.
+
+- Encounter IDs are included as recorded in the [PATENCENCID] field.
+- In-department times must be present, as indicated by the [InDepartmentTime] field.
+- Out-department times must be present or default to the current date and time, as indicated by the [OutDepartmentTime] field.
 
 **Fragment**
 
@@ -1107,16 +1145,18 @@ vaplh AS
 )
 ```
 
-first pass violated: technical vocabulary in a business description: 'Row' — say what is included, not how the SQL assembles it
+first pass violated: ungrounded value: '1000' not in the SQL
 
 ## USP_RPTS_ED_Sepsis.sql · ABX
 *outcome: clean* · parsed tables: #base_pop, config_value_set, med_admin_records, med_mix_components, medication_orders, medications, or, previous, ref_generic_med · parsed grain: order, visit
 
 **Description**
 
-- Encounters are included when patients have a positive score and have received antibiotics administered in the emergency department before their departure time.
-- Encounters are included when the antibiotics are given intravenously and the administration records indicate that the medication was either given, restarted, or applied during downtime.
-- Encounters are included when the administered antibiotics are classified under specific therapeutic classes, ensuring compliance with treatment protocols.
+This SQL selects administered antibiotics for encounters.
+
+- Administered antibiotics must have a taken time that is not null and occurs before the ED departure time.
+- The medication route code must be 11 (IV only).
+- The MAR action code must be one of the following: '1', '7', '102', '105', '113', '114', '115', '122', '124', '132', '143', '1604', '1605', '1607', '6', '99'.
 
 **Fragment**
 
@@ -1343,9 +1383,11 @@ SELECT
 
 **Description**
 
-- Encounters are included when the procedure orders fall within specific lab categories, ensuring relevance to critical lab results.
-- Encounters are included when the order time occurs between the patient's arrival and departure times, capturing the full scope of care during their visit.
-- Encounters are included when the results indicate abnormal or critical values, highlighting significant health concerns for timely intervention.
+Blood culture results for encounters.
+
+- Order procedure IDs must be in (600003, 600004, 600011, 600012).
+- Order time must be between ADT arrival time and ED departure time.
+- Critical value flag must be in (2, 218).
 
 **Fragment**
 
@@ -1402,9 +1444,12 @@ BloodCultureResults AS
 
 **Description**
 
-- Encounters are included when the procedure orders are related to specific lab tests, such as LAB006, LAB007, or LAB003, and the specimen source is a lumbar puncture.
-- Encounters are included when the order time falls between the patient's arrival and departure times.
-- Encounters are included when critical values are identified in the lab results, indicating abnormal or critical conditions.
+CsfCultureResults — a selection of lab order results related to encounters.
+
+- Includes ORDER_PROC_ID values of 600005, 600006, and 600002.
+- Includes SPECIMEN_SOURCE_CODE of 304.
+- Includes RESULT_FLAG_CODE values of 2 and 218, indicating abnormal or critical results.
+- The ORDER_TIME must fall between ADT_ARRIVAL_TIME and ED_DEPARTURE_TIME.
 
 **Fragment**
 
@@ -1463,9 +1508,12 @@ CsfCultureResults AS
 
 **Description**
 
-- Encounters are included when the maximum value of CRITICAL_VALUE_01 is zero, indicating no critical results were recorded.
-- Each encounter reflects the earliest order time and collection time for blood culture results, categorized under 'Negative' organisms.
-- This metric helps identify encounters that did not yield any critical findings, supporting quality assurance in patient care.
+NegativeCultures selects encounters with specific criteria.
+
+- Encounter_ID is included.
+- The minimum ORDER_TIME is recorded.
+- The minimum COMP_OBS_INST_TM is recorded.
+- The maximum CRITICAL_VALUE_01 equals 0.
 
 **Fragment**
 
@@ -1504,9 +1552,12 @@ NegativeCultures AS
 
 **Description**
 
-- Encounters are included when the maximum critical value recorded is zero, indicating no significant growth or contamination.
-- Each encounter reflects the earliest order time and collection time associated with negative culture results.
-- Encounters are categorized under 'Negative' to signify instances of no growth or contamination with normal flora.
+NegativeCultures selects encounters with no growth or contamination.
+
+- Encounter_ID is included.
+- The minimum ORDER_TIME is recorded.
+- The minimum COMP_OBS_INST_TM is recorded.
+- MAX(CRITICAL_VALUE_01) must equal 0.
 
 **Fragment**
 
@@ -1545,9 +1596,12 @@ NegativeCultures AS
 
 **Description**
 
-- Encounters are included when the maximum value of CRITICAL_VALUE_01 is 0, indicating no critical results were observed.
-- Each encounter reflects the earliest recorded order time and collection time for the associated results.
-- Encounters are categorized under 'Negative' to signify the absence of critical findings.
+NegativeCultures selects encounters with specific criteria.
+
+- Encounter_ID is included.
+- The minimum ORDER_TIME is recorded.
+- The minimum COMP_OBS_INST_TM is recorded.
+- The maximum CRITICAL_VALUE_01 equals 0.
 
 **Fragment**
 
@@ -1582,13 +1636,11 @@ NegativeCultures AS
 ```
 
 ## USP_RPTS_ED_Sepsis.sql · PositiveCultures
-*outcome: clean* · parsed tables: — · parsed grain: visit
+*outcome: emptied* · parsed tables: — · parsed grain: visit
 
 **Description**
 
-- Encounters are included when they have a recorded critical value indicating a significant finding in the blood culture results.
-- Each encounter reflects the earliest order time and collection time associated with the positive culture results.
-- The organism list for each encounter is compiled, highlighting the relevant external names of organisms identified during the testing process.
+_(emptied — nothing grounded survived)_
 
 **Fragment**
 
@@ -1622,14 +1674,14 @@ PositiveCultures AS
 )
 ```
 
+first pass violated: ungrounded value: 'Organism C' not in the SQL; ungrounded value: 'Organism A' not in the SQL; ungrounded value: 'Organism B' not in the SQL
+
 ## USP_RPTS_ED_Sepsis.sql · PositiveCultures
-*outcome: clean* · parsed tables: — · parsed grain: visit
+*outcome: emptied* · parsed tables: — · parsed grain: visit
 
 **Description**
 
-- Encounters are included when they have a recorded CRITICAL_VALUE_01 indicating a critical condition.
-- Each encounter captures the earliest ORDER_TIME and the corresponding CollectionTime for accurate tracking.
-- The list of organisms associated with each encounter is compiled, ensuring critical values are highlighted for review.
+_(emptied — nothing grounded survived)_
 
 **Fragment**
 
@@ -1663,14 +1715,19 @@ PositiveCultures AS
 )
 ```
 
+first pass violated: ungrounded value: 'P. mirabilis' not in the SQL; ungrounded value: 'E. coli' not in the SQL; ungrounded value: 'K. pneumoniae' not in the SQL
+
 ## USP_RPTS_ED_Sepsis.sql · PositiveCultures
 *outcome: clean* · parsed tables: — · parsed grain: visit
 
 **Description**
 
-- Encounters are included when they have a recorded critical value indicating a significant finding, ensuring that only relevant cases are considered for analysis.
-- Each encounter captures the earliest order time and collection time, providing a clear timeline for the events associated with the culture results.
-- The organism list for each encounter is compiled, highlighting the relevant organisms identified during the culture process, which aids in understanding the clinical context.
+This SQL selects encounters with positive cultures.
+
+- Inclusion requires that MAX(CRITICAL_VALUE_01) equals 1.
+- The minimum ORDER_TIME is recorded as [MBOrderTime].
+- The minimum COMP_OBS_INST_TM is recorded as [CollectionTime].
+- The organism list includes EXTERNAL_NAME values aggregated, with a minimum of 'Critical Value' if none are present.
 
 **Fragment**
 
@@ -1705,13 +1762,18 @@ PositiveCultures AS
 ```
 
 ## USP_RPTS_ED_Sepsis.sql · UrineCultureResults
-*outcome: clean* · parsed tables: #base_pop, lab_order_results, organisms, procedure_orders · parsed grain: order, visit
+*outcome: recovered* · parsed tables: #base_pop, lab_order_results, organisms, procedure_orders · parsed grain: order, visit
 
 **Description**
 
-- Encounters are included when the order time of the procedure falls between the patient's arrival and departure times.
-- Encounters are included when the results indicate a critical value, signifying an abnormal or critical condition.
-- Encounters are included when they are associated with specific laboratory procedures related to urine culture testing.
+Urine culture results for encounters.
+
+- Encounter IDs from the LAB_ORDER_RESULTS.
+- Procedure order IDs must be in (600001, 600007, 600008, 600009, 600010).
+- Order time must fall between ADT arrival time and ED departure time. 
+- Critical value flag codes must be in (2, 218). 
+- Organism IDs are linked to the results. 
+- Result times and observation times are recorded.
 
 **Fragment**
 
@@ -1766,3 +1828,5 @@ UrineCultureResults AS
 
 )
 ```
+
+first pass violated: technical object in a business description: '#Base_Pop' — the source object is carried by the relationship, not the sentence; technical vocabulary in a business description: 'table' — say what is included, not how the SQL assembles it

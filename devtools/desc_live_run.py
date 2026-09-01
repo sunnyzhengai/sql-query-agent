@@ -62,13 +62,31 @@ business audience.
 SQL:
 {sql}
 
-Write 1-3 bullet lines for a STEWARD, not a developer.
-Name the subject as "{subject}" — say "{subject} are included
-when …", never "membership" or "the dataset". Never mention
-tables, temp tables, joins, queries, columns or datasets: the
-source objects are recorded elsewhere. Never expand an acronym
-unless this SQL expands it — print it as written. Never invent
-values or a counted entity the SQL does not support."""
+Write for a STEWARD, not a developer.
+
+FIRST LINE: what this IS — a noun phrase about {subject}, not an
+inclusion sentence. Name the thing THIS SQL selects.
+
+THEN 1-3 bullets, each naming the CONCRETE VALUES that decide
+inclusion — codes, thresholds, statuses, ID lists EXACTLY as this
+SQL gives them and NEVER any other value. Past about six values,
+elide with a count that names the column and this SQL's own
+lowest and highest actual values.
+
+If a condition has NO literal values — it tests presence, a
+range, or another table — say so plainly ("a placement time is
+recorded", "the order time falls before departure") and give NO
+numbers. NEVER invent an example code, and never carry a number
+from this instruction into your answer: if a value is not in the
+SQL above, it does not exist.
+
+NEVER state a purpose or benefit ("critical for", "ensuring",
+"allowing", "helps identify", "for quality metrics") — say WHAT
+is included and on WHAT VALUES; why is the steward's to write.
+Never mention tables, temp tables, joins, queries, columns or
+datasets. Never expand an acronym unless this SQL expands it.
+Never invent values or a counted entity the SQL does not
+support."""
 
 
 def harvest_steps(limit: int = 0) -> "list[dict]":

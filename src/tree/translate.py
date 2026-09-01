@@ -25,7 +25,7 @@ from src.tree.render import render_fact
 
 # v2: DESC-VOICE-1 (steward voice, named subject, acronym rule) —
 # the version rides the cache key, so every description regenerates
-FACT_PROMPT_VERSION = "2"
+FACT_PROMPT_VERSION = "3"   # DESC-VOICE-2: lead line, concrete values, no purpose
 
 _MAX_DICT_LINES = 30
 
@@ -38,11 +38,23 @@ _FACT_HEADER = (
     "The step applies EXACTLY the numbered decisions below (extracted "
     "from the certified logic — there are no other decisions):\n"
     "{facts_block}\n\n"
-    "First write ONE sentence (max 30 words) stating what this step "
-    "produces in business terms, grounded only in the decisions above "
-    "and the dependency descriptions. Name the SUBJECT as "
-    "'{subject}' — say '{subject} are included when …', never "
-    "'membership' or 'the dataset' (DESC-VOICE-1).\n"
+    "First write ONE LEAD LINE naming WHAT THIS IS — a noun phrase "
+    "about {subject}, not an inclusion sentence: name the thing "
+    "these decisions select. Max 20 "
+    "words, grounded only in the decisions above and the "
+    "dependency descriptions.\n"
+    "Name CONCRETE VALUES in every condition — codes, thresholds, "
+    "statuses, ID lists EXACTLY as the decisions give them and "
+    "NEVER any other value; past about six values, elide with a "
+    "count naming the column and the decisions' own first and "
+    "last ACTUAL values. If a decision has "
+    "NO literal values — it tests presence, a range, or another "
+    "step — say so plainly and give NO numbers; never invent an "
+    "example code.\n"
+    "NEVER state a PURPOSE or benefit: no 'critical for', "
+    "'ensuring', 'allowing', 'helps identify', 'for quality "
+    "metrics'. Say WHAT is included and on WHAT VALUES; why is "
+    "the steward's to write (DESC-VOICE-2).\n"
     "Then translate EVERY numbered decision into one line of plain "
     "business language, formatted exactly as 'N| translation' using the "
     "same number N. Keep every literal value (codes, numbers, statuses, "

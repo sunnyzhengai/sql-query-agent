@@ -4136,3 +4136,44 @@ cannot ship without it.
 Voice work (DESC-VOICE-2) lands first; this rides after it.
 P1 (term proposal) stays HELD until Sunny grades the corrected
 sample — term names inherit description voice.
+
+### 2026-08-31 — DESC-VOICE-2 BUILT + SAMPLE RE-RUN — release 1.83.0
+Her diagnosis was exact: **the gate stops LIES, it does not stop
+EMPTINESS.** Three rules, plus two classes the run itself exposed.
+1. **Lead line = what this IS** (noun phrase, not an inclusion
+   sentence) — prompted in both paths.
+2. **Concrete values in every condition**, elided past ~6 with a
+   count. Concreteness is SAFER than prose: values are already
+   gate-grounded.
+3. **Purpose speculation BANNED at the gate** — "critical for",
+   "ensuring…", "allowing", "helps identify", "for quality
+   metrics" and kin, with a suffix-clause check. Her three
+   specimen bullets are the fixture. **If the SOURCE states a
+   purpose in a comment, quoting it is grounded** — the ban is on
+   INVENTED purpose, test-held in both directions.
+
+**Two classes the live re-runs exposed — both mine, not the
+model's:**
+- **My prompt's EXAMPLE became data.** Illustrating the shape with
+  "one of 7 sepsis order-set IDs (400002…4001326025)" made the
+  model copy those literals into unrelated steps: 6 emptied
+  descriptions, 41 ungrounded-value violations. Removing every
+  concrete example from BOTH prompts fixed it. A second attempt
+  ("antibiotic administered") reproduced the same failure — the
+  lesson is general: **an example in a prompt is treated as data.**
+- **Prompt placeholders echoed into output.** "(first:
+  <first_value>, last: <last_value>)" reached a steward-facing
+  description. Now a gate class of its own, red-first pinned.
+
+**FINAL RE-RUN: 26 descriptions · clean 18 · recovered 5 ·
+salvaged 0 · emptied 3.** The three empties are the gate WORKING:
+on `PositiveCultures` the model invented organism names ("E.
+coli", "K. pneumoniae", "Organism A/B/C") that appear NOWHERE in
+the SQL (verified against the source: it only aggregates
+EXTERNAL_NAME). Absence over fabrication — exactly the floor we
+built. The lower clean rate versus DESC-VOICE-1's 25/26 is not a
+regression: the bar moved from "true" to "true AND concrete AND
+purpose-free", and I am reporting the honest number rather than
+loosening the gate to look better.
+**Gates:** 1,407 green + 5 xfailed, ruff clean; wheel 1.83.0.
+Sample regenerated for Sunny's read #3.

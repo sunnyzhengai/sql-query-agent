@@ -318,3 +318,61 @@ class TestDescVoice1:
             frag) == []
         assert any("'rows'" in x for x in grounding_violations(
             "- the rows are filtered to positives", frag))
+
+
+class TestDescVoice2:
+    """DESC-VOICE-2 (Sunny's second read): "after reading the
+    description, I have no idea what the SQL should look like."
+    The gate stops LIES; this stops EMPTINESS. Say WHAT is
+    included and on WHAT VALUES — never WHY."""
+
+    FRAG = ("SELECT ENCOUNTER_ID FROM ORDERS "
+            "WHERE ORDER_SET_ID IN (400002, 4001326025) "
+            "AND CULTURE_TYPE IS NOT NULL")
+
+    def test_her_specimen_lines_are_caught(self):
+        """The SSOrderSetOSQ_PRL bullets she quoted."""
+        text = ("- Encounters are included when the CULTURE_TYPE is "
+                "specified, ensuring that only relevant cases are "
+                "considered for analysis.\n"
+                "- Encounters are included when they have an "
+                "order-set ID, providing a clear link to the "
+                "procedures performed.\n"
+                "- critical for tracking treatment protocols")
+        v = grounding_violations(text, self.FRAG)
+        purpose = [x for x in v if "purpose speculation" in x]
+        assert len(purpose) >= 3, v
+
+    def test_concrete_values_pass(self):
+        """Concreteness is SAFER than prose: values are already
+        gate-grounded."""
+        text = ("Encounters that had a sepsis order-set order.\n"
+                "- one of 2 order-set IDs (400002, 4001326025)\n"
+                "- a culture type is recorded")
+        assert grounding_violations(text, self.FRAG) == [], \
+            grounding_violations(text, self.FRAG)
+
+    def test_source_stated_purpose_may_be_quoted(self):
+        """If the SOURCE states a purpose in a comment, quoting it
+        is grounded — the ban is on INVENTED purpose."""
+        frag = (self.FRAG +
+                " -- ensuring sepsis bundle compliance is tracked")
+        text = "- ensuring sepsis bundle compliance is tracked"
+        assert not [x for x in grounding_violations(text, frag)
+                    if "purpose speculation" in x]
+
+    def test_machine_floor_is_exempt(self):
+        text = "- Rows where ORDER_SET_ID in (400002) ensuring x."
+        assert not [x for x in
+                    grounding_violations(text, self.FRAG,
+                                         voice=False)
+                    if "purpose speculation" in x]
+
+    def test_prompt_placeholders_never_reach_a_steward(self):
+        """P0-c find: the model echoed my own instruction's
+        '<first_value>' into a description. An instruction leaking
+        through as data is its own class."""
+        v = grounding_violations(
+            "- one of 7 IDs (first: <first_value>, last: "
+            "<last_value>)", "SELECT X FROM T WHERE ID IN (1,2)")
+        assert any("prompt placeholder echoed" in x for x in v), v

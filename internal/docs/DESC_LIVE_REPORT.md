@@ -6,14 +6,17 @@
 
 **Coverage (stated, not implied):** the pipeline describes CTE STEPS, and only 5 of the corpus's 28 procs use CTEs — the other 23 stage through temp tables (15 of them explicitly). So this run covers every CTE step the estate HAS, which is not the same as every proc. Temp-table staging is a real Clarity pattern and describing it is a separate (unbuilt) capability, not a gap in these rates.
 
-- clean (passed first try): 25 (96%)
-- recovered (corrective retry fixed it): 1 (4%)
+- clean (passed first try): 18 (69%)
+- recovered (corrective retry fixed it): 5 (19%)
 - salvaged (surgical fallback kept grounded lines): 0 (0%)
-- emptied (absence over fabrication): 0 (0%)
+- emptied (absence over fabrication): 3 (12%)
 
 ## First-pass violations by class
 
-- technical vocabulary in a business description: 1
+- ungrounded value: 8
+- technical vocabulary in a business description: 4
+- purpose speculation: 1
+- technical object in a business description: 1
 
 ## Reading these numbers
 
