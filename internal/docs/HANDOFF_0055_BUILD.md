@@ -4115,3 +4115,24 @@ where they belong). Voice verified: "Encounters are included
 when the medication administered is an antibiotic…".
 **Gates:** 1,402 green + 5 xfailed, ruff clean; wheel 1.82.0.
 Sample regenerated for Sunny: internal/docs/DESC_LIVE_SAMPLE.md
+
+## ORDER DESC-TEMP-1 (the real P0-c coverage gap; Sunny-authorized to proceed while she's out)
+P0-c covered every CTE step the estate has — but 23 of 28 procs
+stage through TEMP TABLES (15 explicitly), and we describe none of
+them. On a Clarity estate that is most of the logic. Tier 1
+cannot ship without it.
+1. **Harvest temp-table steps** as first-class describable units:
+   `SELECT … INTO #X` and `INSERT INTO #X SELECT …` become steps
+   with the same shape as CTE steps (name, fragment, reads,
+   grain), through the PARSER — never regex.
+2. Chained staging (#A feeds #B feeds the final SELECT) resolves
+   like sibling CTEs already do: an upstream temp table is
+   context, not an unknown base table (the P0-b fix generalizes).
+3. Gate parity: values/filters/tables/grain checks apply
+   unchanged; `#Staging` vs `Staging` distinction already handled.
+4. Re-run the corpus after: report coverage (steps described /
+   steps present) alongside the clean/recovered/fallback rates —
+   coverage is now a REPORTED NUMBER, not an assumption.
+Voice work (DESC-VOICE-2) lands first; this rides after it.
+P1 (term proposal) stays HELD until Sunny grades the corrected
+sample — term names inherit description voice.
