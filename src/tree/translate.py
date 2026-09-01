@@ -25,7 +25,7 @@ from src.tree.render import render_fact
 
 # v2: DESC-VOICE-1 (steward voice, named subject, acronym rule) —
 # the version rides the cache key, so every description regenerates
-FACT_PROMPT_VERSION = "3"   # DESC-VOICE-2: lead line, concrete values, no purpose
+FACT_PROMPT_VERSION = "4"   # DESC-VOICE-3: predicate subject named, no column names
 
 _MAX_DICT_LINES = 30
 
@@ -68,6 +68,10 @@ _FACT_HEADER = (
     "unless the source or dictionary expands it — print it as "
     "written. Never invent a value, "
     "never drop a number, never add a decision that is not listed. "
+    "When a condition compares one thing against others, name WHAT "
+    "IS BEING CONSTRAINED, not only the values it is compared "
+    "against — the thing being tested must be the subject of the "
+    "sentence, never one of the bounds (DESC-VOICE-3). "
     "No preamble, no markdown."
 )
 

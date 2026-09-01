@@ -54,14 +54,13 @@ WHERE 1=1
 ```
 
 ## USP_IP_SEPSIS.sql · #MedGroupers
-*outcome: clean* · parsed tables: grouper_groups · parsed grain: (unknown)
+*outcome: recovered* · parsed tables: grouper_groups · parsed grain: (unknown)
 
 **Description**
 
-Records of groupers identified by the GROUPER_ID.
+This SQL selects records of medical groupers.
 
-- Inclusion is determined by the GROUPER_ID value of '800011'.
-- No other values are specified for inclusion.
+- Inclusion is determined by the grouper id being exactly '800011'.
 
 **Fragment**
 
@@ -75,15 +74,18 @@ SELECT vcg.GROUPER_LIST VCG_ID
 	WHERE vcg.GROUPER_ID IN ('800011')
 ```
 
+first pass violated: column name in a business description: 'GROUPER_ID' — write from its dictionary description, or say 'grouper id'
+
 ## USP_IP_SEPSIS.sql · #RouteExclusions
-*outcome: clean* · parsed tables: config_grouper_categories · parsed grain: (unknown)
+*outcome: recovered* · parsed tables: config_grouper_categories · parsed grain: (unknown)
 
 **Description**
 
-This SQL selects records of category IDs.
+This SQL selects records of route exclusions.
 
-- The category ID must be from the GROUPER_ID '800008'.
-- The category ID can also be the literal value '11'.
+- Grouper ID must be '800008'.
+- Includes the code '11'.
+- The selection is based on the presence of these specific values.
 
 **Fragment**
 
@@ -100,6 +102,8 @@ SELECT vcg.LIST_CAT_VALUE_CODE CAT_ID
 
 	SELECT '11'
 ```
+
+first pass violated: column name in a business description: 'GROUPER_ID' — write from its dictionary description, or say 'grouper id'
 
 ## USP_IP_SepsisDetails.sql · #BolusMeds
 *outcome: clean* · parsed tables: grouper_compiled_list · parsed grain: (unknown)
@@ -126,14 +130,14 @@ SELECT vcg.GROUPER_RECORDS_NUMERIC_ID MED_ID
 ```
 
 ## USP_IP_SepsisDetails.sql · #RouteExclusions
-*outcome: clean* · parsed tables: config_grouper_categories · parsed grain: (unknown)
+*outcome: recovered* · parsed tables: config_grouper_categories · parsed grain: (unknown)
 
 **Description**
 
-This SQL selects records of category IDs.
+Records of route exclusions.
 
-- The category ID must be from the GROUPER_ID '800008'.
-- The category ID can also be the literal value '11'.
+- Grouper ID must be '800008'.
+- Includes the code '11'.
 
 **Fragment**
 
@@ -151,16 +155,17 @@ SELECT vcg.LIST_CAT_VALUE_CODE CAT_ID
 	SELECT '11'
 ```
 
+first pass violated: column name in a business description: 'GROUPER_ID' — write from its dictionary description, or say 'grouper id'
+
 ## USP_IP_SepsisEncounters.sql · #Base_Pop_ENC_Reason
-*outcome: clean* · parsed tables: diagnoses, encounter_diagnoses · parsed grain: visit
+*outcome: salvaged* · parsed tables: diagnoses, encounter_diagnoses · parsed grain: visit
 
 **Description**
 
-This SQL selects encounters with associated diagnoses.
+This SQL selects encounters with associated diagnosis names.
 
-- Inclusion is determined by encounters with an ID present in the ENCOUNTER_ID field.
-- Only diagnoses with a LINE value of 1 or greater are included.
-- The diagnoses are aggregated into a single string, separated by ' % ', with names drawn from the DX_NAME field.
+- Encounter IDs must be present.
+- Diagnosis names are aggregated, with a range of values from the lowest to the highest actual diagnosis names, with a total count of distinct diagnosis names included.
 
 **Fragment**
 
@@ -180,15 +185,17 @@ INNER JOIN [dbo].[DIAGNOSES] DIAG ON DIAG.DX_ID = EDX.DX_ID
 GROUP BY cat.ENCOUNTER_ID
 ```
 
+first pass violated: column name in a business description: 'DX_ID' — write from its dictionary description, or say 'dx id'
+
 ## USP_IP_SepsisEncounters.sql · #MainAdmDetails
 *outcome: salvaged* · parsed tables: calendar_dates, departments, hospital_encounters, hospital_transactions, locations, patient_demographics_race, patients, ref_discharge_disposition, ref_ethnic_group, ref_patient_race · parsed grain: patient, visit
 
 **Description**
 
-This SQL selects inpatient admission details.
+This SQL selects distinct inpatient admissions.
 
-- Service dates must fall between @dStartDate and @dEndDate.
-- Location must have a null POS_TYPE.
+- The service date of a charge falls between @dStartDate and @dEndDate.
+- The location's pos type is null.
 
 **Fragment**
 
@@ -264,18 +271,18 @@ AND sd.CALENDAR_DT BETWEEN @dStartDate AND @dEndDate /*Service data of a charge*
 AND loc.POS_TYPE IS NULL
 ```
 
-first pass violated: ungrounded filter claim: '- Inclusion requires that HE.INP_ADM_DATE is not null.'
+first pass violated: ungrounded filter claim: '- Inclusion requires that HE.INP_ADM_DATE is not null.'; column name in a business description: 'INP_ADM_DATE' — write from its dictionary description, or say 'inp adm date'; column name in a business description: 'POS_TYPE' — write from its dictionary description, or say '
 
 ## USP_IP_SepsisPatientDates.sql · #Base_PopTemp
 *outcome: recovered* · parsed tables: config_value_set, ip_sepsisencounterswlocations · parsed grain: patient, visit
 
 **Description**
 
-This SQL selects encounters related to inpatient data for sepsis.
+This SQL selects a set of patient encounters related to inpatient data.
 
-- Inclusion is determined by the ADTDepartmentID being in the value set with ID 3031.
+- Inclusion is determined by the ADTDepartmentID being part of the value set with ID 3031.
 - The InDepartmentTime and OutDepartmentTime must be recorded.
-- The ENCORDER must be present, and the PatientID must be distinct.
+- The BirthDate must be present for each patient.
 
 **Fragment**
 
@@ -323,14 +330,18 @@ INNER JOIN [reports].[CONFIG_VALUE_SET] cvs ON cvs.CODE = main.[ADTDepartmentID]
 			AND cvs.VALUE_SET_ID = 3031
 ```
 
-first pass violated: technical vocabulary in a business description: 'dataset' — say what is included, not how the SQL assembles it
+first pass violated: column name in a business description: 'VALUE_SET_ID' — write from its dictionary description, or say 'value set id'
 
 ## USP_IP_SepsisPatientDates.sql · #MainAdmDetails
-*outcome: emptied* · parsed tables: ip_sepsisencounters · parsed grain: patient, visit
+*outcome: recovered* · parsed tables: ip_sepsisencounters · parsed grain: patient, visit
 
 **Description**
 
-_(emptied — nothing grounded survived)_
+This SQL selects patient encounter details.
+
+- Inclusion is determined by distinct values of [PATENCENCID], [PatientID], and [InpatientDataID].
+- The [EthnicGroup] can include values such as [Ethnic Group] and [Race].
+- A placement time is recorded for [ADTArrivalTime], [HospAdmsnTime], and [HospDischTime].
 
 **Fragment**
 
@@ -378,18 +389,17 @@ INTO #MainAdmDetails
 FROM [reporting].[IP_SepsisEncounters]
 ```
 
-first pass violated: ungrounded value: '1001' not in the SQL; ungrounded value: '2000' not in the SQL; ungrounded value: 'Hispanic' not in the SQL; ungrounded value: 'Unknown' not in the SQL; ungrounded value: 'Discharged' not in the SQL; ungrounded value: 'Admitted' not in the SQL; ungrounded value: 'Non-Hispanic' not 
+first pass violated: ungrounded value: '2000' not in the SQL; ungrounded value: '1001' not in the SQL; ungrounded value: 'Hispanic' not in the SQL; ungrounded value: 'Admitted' not in the SQL; ungrounded value: 'Non-Hispanic' not in the SQL; ungrounded value: 'Unknown' not in the SQL; ungrounded value: 'Discharged' not 
 
 ## USP_IP_SepsisScreeningAudit.sql · #FlwshtLst
-*outcome: recovered* · parsed tables: flowsheet_measurements, flowsheet_records · parsed grain: visit
+*outcome: salvaged* · parsed tables: flowsheet_measurements, flowsheet_records · parsed grain: visit
 
 **Description**
 
 This SQL selects encounters with associated measurements.
 
-- Includes measurements where the FLO_MEAS_ID is in a specified list.
-- The recorded time falls between the In Dept Date and Out Dept Date.
-- The encounter ID is associated with inpatient data.
+- Recorded time must fall between in dept date and out dept date.
+- Encounter id must be present, and documented department id must be recorded.
 
 **Fragment**
 
@@ -431,7 +441,7 @@ SELECT main.ENCOUNTER_ID
 	WHERE meas.RECORDED_TIME BETWEEN main.[In Dept Date] AND main.[Out Dept Date]
 ```
 
-first pass violated: technical object in a business description: '#ODScores' — the source object is carried by the relationship, not the sentence
+first pass violated: column name in a business description: 'ENCOUNTER_ID' — write from its dictionary description, or say 'encounter id'; column name in a business description: 'FLO_MEAS_ID' — write from its dictionary description, or say 'flo meas id'; column name in a business description: 'RECORDED_TIME' — write fro
 
 ## USP_IP_SepsisScreeningAudit.sql · #FlwshtLstHuddleODScore
 *outcome: recovered* · parsed tables: flowsheet_measurements, flowsheet_records · parsed grain: visit
@@ -440,9 +450,9 @@ first pass violated: technical object in a business description: '#ODScores' —
 
 This SQL selects encounters with specific measurements.
 
-- Includes measurements with FLO_MEAS_IDs: '9000002705', '9000002732', '9000002733', '9000002706', '9000002734', '9000002707'.
-- MEAS_VALUE must be present (not NULL).
-- Recorded time of measurements must fall between the In Dept Date and Out Dept Date.
+- Only includes measurements where flo meas id is in ('9000002705', '9000002732', '9000002733', '9000002706', '9000002734', '9000002707').
+- Only includes measurements where recorded time is between the in dept date and out dept date.
+- Only includes measurements where recorded time is less than or equal to the recorded time of the corresponding encounter.
 
 **Fragment**
 
@@ -492,17 +502,17 @@ WHERE meas.RECORDED_TIME BETWEEN main.[In Dept Date] AND main.[Out Dept Date]
 ORDER BY main.ENCOUNTER_ID, meas.RECORDED_TIME
 ```
 
-first pass violated: selected-not-filtered: '- Only includes measurements where MEAS_VALUE is not NULL.' — the concept appears only in the SELECT list, never in a condition
+first pass violated: selected-not-filtered: '- Only includes measurements where MEAS_VALUE is not NULL.' — the concept appears only in the SELECT list, never in a condition; column name in a business description: 'FLO_MEAS_ID' — write from its dictionary description, or say 'flo meas id'; column name in a business descr
 
 ## USP_IP_SepsisScreeningAudit.sql · #ODScores
 *outcome: clean* · parsed tables: grouper_compiled_list · parsed grain: (unknown)
 
 **Description**
 
-This SQL selects records identified by the GROUPER_RECORDS_NUMERIC_ID.
+This SQL selects records identified by FLO_ID.
 
-- The COMPILED_CONTEXT must be 'FLO'.
-- The BASE_GROUPER_ID must be '800006'.
+- The compiled context must be 'FLO'.
+- The base grouper ID must be '800006'.
 
 **Fragment**
 
@@ -519,11 +529,16 @@ SELECT vcg.GROUPER_RECORDS_NUMERIC_ID FLO_ID
 ```
 
 ## USP_IP_SepsisShiftCompliance.sql · #Base_PopTemp
-*outcome: emptied* · parsed tables: config_value_set, ip_sepsisencounterswlocations · parsed grain: patient, visit
+*outcome: recovered* · parsed tables: config_value_set, ip_sepsisencounterswlocations · parsed grain: patient, visit
 
 **Description**
 
-_(emptied — nothing grounded survived)_
+This SQL selects encounters for patients in specific departments.
+
+- Inclusion is determined by the adt department id being present and not null.
+- The in dttm must fall within the defined time ranges: between the previous PM start and end, or between the AM start and end.
+- The out dttm must also fall within the defined time ranges: between the previous PM start and end, or between the AM start and end.
+- The value set id must equal 3031.
 
 **Fragment**
 
@@ -651,7 +666,7 @@ INNER JOIN [reports].[CONFIG_VALUE_SET] cvs ON cvs.CODE = vaplh.ADT_DEPARTMENT_I
 			AND cvs.VALUE_SET_ID = 3031
 ```
 
-first pass violated: technical vocabulary in a business description: 'table' — say what is included, not how the SQL assembles it
+first pass violated: column name in a business description: 'ADT_DEPARTMENT_ID' — write from its dictionary description, or say 'adt department id'; column name in a business description: 'IN_DTTM' — write from its dictionary description, or say 'in dttm'; column name in a business description: 'OUT_DTTM' — write from i
 
 ## USP_IP_SepsisShiftCompliance.sql · #FlwshtLst
 *outcome: recovered* · parsed tables: flowsheet_measurements, flowsheet_records · parsed grain: visit
@@ -660,11 +675,9 @@ first pass violated: technical vocabulary in a business description: 'table' —
 
 This SQL selects encounters with specific measurements.
 
-- Includes measurements where FLO_MEAS_ID is in a defined list.
-- Includes recorded times that fall between the shift start and shift end.
-- Includes documented department IDs that match the ADT_DEPARTMENT_ID from the source. 
-
-The recorded time must also be between the IN_DTTM and OUT_DTTM for the encounter.
+- Included measurements have a flo meas id that is in a defined list.
+- The recorded time falls between the shift start and shift end.
+- The recorded time is between the in dttm and out dttm for the documented department id.
 
 **Fragment**
 
@@ -716,7 +729,7 @@ FROM (
 WHERE a.RowNum = 1
 ```
 
-first pass violated: technical object in a business description: '#ODScores' — the source object is carried by the relationship, not the sentence; technical object in a business description: '#Base_PopTemp' — the source object is carried by the relationship, not the sentence
+first pass violated: column name in a business description: 'FLO_MEAS_ID' — write from its dictionary description, or say 'flo meas id'; column name in a business description: 'IN_DTTM' — write from its dictionary description, or say 'in dttm'; column name in a business description: 'OUT_DTTM' — write from its dictionar
 
 ## USP_RPTS_ED_Sepsis.sql · #BasePopABX
 *outcome: clean* · parsed tables: config_value_set, med_admin_records, med_mix_components, medication_orders, medications, or, previous, ref_generic_med · parsed grain: order, visit
@@ -726,8 +739,8 @@ first pass violated: technical object in a business description: '#ODScores' —
 This SQL selects encounters with administered antibiotics.
 
 - Inclusion requires that the medication administration time is recorded and falls before the patient's ED departure time.
-- Only intravenous medications are included, as indicated by a medication route code of 11.
-- The administration must have a MAR action code of '1', '7', '102', '105', '113', '114', '115', '122', '124', '132', '143', '1604', '1605', '1607', '6', or '99'.
+- Only IV medications are included, as indicated by a medication route code of 11.
+- The MAR action codes must be one of the following: '1', '7', '102', '105', '113', '114', '115', '122', '124', '132', '143', '1604', '1605', '1607', '6', or '99'.
 
 **Fragment**
 
@@ -972,11 +985,17 @@ FROM ABX
 ```
 
 ## USP_RPTS_ED_Sepsis.sql · #Base_Pop
-*outcome: emptied* · parsed tables: departments, ed_encounters_dm, ed_encounters_fact, hospital_encounters, locations, patient_demographics_race, patients, ref_ed_disposition, ref_ethnic_group, ref_patient_race · parsed grain: patient, visit
+*outcome: recovered* · parsed tables: departments, ed_encounters_dm, ed_encounters_fact, hospital_encounters, locations, patient_demographics_race, patients, ref_ed_disposition, ref_ethnic_group, ref_patient_race · parsed grain: patient, visit
 
 **Description**
 
-_(emptied — nothing grounded survived)_
+This SQL selects patient encounters.
+
+- Inclusion requires that the adt arrival date falls between the specified start and end dates.
+- The ed disposition code must match a recorded code in the reference for emergency department dispositions.
+- The ethnic group code must match a recorded code in the reference for ethnic groups. 
+
+Additional values include patient IDs, encounter IDs, and a range of ages at arrival in months and years.
 
 **Fragment**
 
@@ -1066,7 +1085,7 @@ WHERE 1=1
 ;
 ```
 
-first pass violated: technical vocabulary in a business description: 'table' — say what is included, not how the SQL assembles it; technical vocabulary in a business description: 'table' — say what is included, not how the SQL assembles it
+first pass violated: column name in a business description: 'ADT_ARRIVAL_DATE' — write from its dictionary description, or say 'adt arrival date'; column name in a business description: 'ED_DISPOSITION_CODE' — write from its dictionary description, or say 'ed disposition code'; column name in a business description: 'ET
 
 ## USP_RPTS_ED_Sepsis.sql · #Base_Pop_ENC_Reason
 *outcome: emptied* · parsed tables: encounter_visit_reasons, visit_reasons · parsed grain: visit
@@ -1107,18 +1126,14 @@ FROM  #Base_Pop CAT
 ;
 ```
 
-first pass violated: technical vocabulary in a business description: 'table' — say what is included, not how the SQL assembles it; technical vocabulary in a business description: 'table' — say what is included, not how the SQL assembles it
+first pass violated: column name in a business description: 'ENCOUNTER_ID' — write from its dictionary description, or say 'encounter id'; column name in a business description: 'REASON_VISIT_ID' — write from its dictionary description, or say 'reason visit id'; technical vocabulary in a business description: 'dataset' 
 
 ## USP_RPTS_IP_SEPSIS.sql · #Base_Pop
-*outcome: recovered* · parsed tables: config_value_set, patients · parsed grain: patient, visit
+*outcome: emptied* · parsed tables: config_value_set, patients · parsed grain: patient, visit
 
 **Description**
 
-This SQL selects patient encounters with specific department assignments.
-
-- Inclusion is determined by the ADT department ID, which can be 200108013 or other values based on the department assignment.
-- The effective time of admission must fall between '2022-03-29' and '2022-06-09' for certain bed IDs: '20010800423011', '20010800423021', '20010800423031', '20010800423041', '20010800423051', '20010800423061', '20010800423071', '20010800423081', '20010800423091', '20010800423101'.
-- Only "in" event types (codes 1 and 3) are considered, excluding event subtype code 2.
+_(emptied — nothing grounded survived)_
 
 **Fragment**
 
@@ -1255,15 +1270,11 @@ INNER JOIN reports.CONFIG_VALUE_SET CVS ON CVS.CODE = ADT.adt_DEPARTMENT_ID
 first pass violated: ungrounded table claim: 'ADT_EVENT_TYPE_CODE' — the fragment reads #main, config_value_set, patients; ungrounded table claim: 'ADT_EVENT_SUBTYPE_CODE' — the fragment reads #main, config_value_set, patients
 
 ## USP_RPTS_IP_SEPSIS.sql · #Base_Pop_ENC_Reason
-*outcome: recovered* · parsed tables: diagnoses, encounter_diagnoses · parsed grain: visit
+*outcome: emptied* · parsed tables: diagnoses, encounter_diagnoses · parsed grain: visit
 
 **Description**
 
-This SQL selects encounters with associated diagnoses.
-
-- Includes encounters where the LINE value is greater than 1.
-- Aggregates diagnosis names (DX_NAME) for each encounter, separated by '%'.
-- Encounter IDs (ENCOUNTER_ID) are included from the source data.
+_(emptied — nothing grounded survived)_
 
 **Fragment**
 
@@ -1285,18 +1296,18 @@ FROM  #Main sub
 group by sub.ENCOUNTER_ID
 ```
 
-first pass violated: technical object in a business description: '#Main' — the source object is carried by the relationship, not the sentence; technical vocabulary in a business description: 'dataset' — say what is included, not how the SQL assembles it
+first pass violated: column name in a business description: 'DX_NAME' — write from its dictionary description, or say 'dx name'; column name in a business description: 'ENCOUNTER_DIAGNOSES' — write from its dictionary description, or say 'encounter diagnoses'; technical object in a business description: '#Main' — the so
 
 ## USP_RPTS_IP_SEPSIS.sql · #Base_Pop_Severe_ED_Scores
 *outcome: recovered* · parsed tables: flowsheet_measurements, flowsheet_records, hospital_encounters · parsed grain: visit
 
 **Description**
 
-This SQL selects encounters related to severe ED scores.
+This SQL selects encounters with specific measurements related to sepsis scores.
 
-- Includes encounters with specific flow measurement IDs: '9000161709', '9000002613'.
-- Only considers recorded times that are on or before the ED departure time.
-- Includes encounters where the recorded time is ordered by the earliest time, with a row number assigned to each encounter.
+- Inclusion is determined by the following measurement IDs: '9000161709', '9000002613'.
+- The recorded time of measurements must be on or before the ED departure time.
+- The hours in the ED are calculated as a ceiling value of the difference between ADT arrival time and ED departure time, expressed in hours.
 
 **Fragment**
 
@@ -1409,20 +1420,14 @@ WHERE
 	AND CONVERT(DATE,HTR.SERVICE_DATE) BETWEEN @dStartDate AND @dEndDate
 ```
 
-first pass violated: ungrounded value: '1000' not in the SQL; ungrounded filter claim: '- Inclusion requires that HE.INP_ADM_DATE is not null.'
+first pass violated: ungrounded value: '9999' not in the SQL; ungrounded value: '1001' not in the SQL; ungrounded filter claim: '- Inclusion requires that HE.INP_ADM_DATE is not null.'; column name in a business description: 'ENCOUNTER_ID' — write from its dictionary description, or say 'encounter id'; column name in a 
 
 ## USP_RPTS_IP_SEPSIS_COMPLIANCE_BY_SHIFT_NURSES.sql · #Base_Pop_OD_Scores
-*outcome: clean* · parsed tables: config_value_set, flowsheet_measurements, flowsheet_records, fy_date_dimension, providers, treatment_teams · parsed grain: visit
+*outcome: emptied* · parsed tables: config_value_set, flowsheet_measurements, flowsheet_records, fy_date_dimension, providers, treatment_teams · parsed grain: visit
 
 **Description**
 
-This SQL selects patient encounters with sepsis scores and associated nursing staff information.
-
-- Inclusion is determined by the following codes: '9000161711', '9000002644' (Organ Dysfunction Score).
-- A recorded time for the first shift score must fall between 420 and 1139 minutes after the calendar date.
-- A recorded time for the second shift score must fall between 1140 minutes after the calendar date and 419 minutes after the next calendar date.
-- The treatment team must include Registered Nurses (TRTMNT_TEAM_REL_CODE = 2) and Charge Nurses (TRTMNT_TEAM_REL_CODE = 99) for both shifts.
-- The calendar date must match the treatment team's begin date, and the treatment times must fall within specified ranges for each shift.
+_(emptied — nothing grounded survived)_
 
 **Fragment**
 
@@ -1732,16 +1737,14 @@ FROM #Main PD
 	)Shift2_CNs
 ```
 
+first pass violated: column name in a business description: 'TRTMNT_TEAM_REL_CODE' — write from its dictionary description, or say 'trtmnt team rel code'
+
 ## USP_RPTS_IP_SEPSIS_REPORT.sql · #EncounterWeights
-*outcome: recovered* · parsed tables: flowsheet_measurements, flowsheet_records · parsed grain: visit
+*outcome: emptied* · parsed tables: flowsheet_measurements, flowsheet_records · parsed grain: visit
 
 **Description**
 
-Encounter weights for inpatient data.
-
-- Encounters must have a corresponding FLO_MEAS_ID of '94'.
-- The EncWeight is calculated from MEAS_VALUE, converted to a weight in pounds using a factor of 0.0283495, rounded to one decimal place.
-- The TIME_LINE is determined by the order of RECORDED_TIME, with values ranging from 1 to the highest row number assigned per ENCOUNTER_ID.
+_(emptied — nothing grounded survived)_
 
 **Fragment**
 
@@ -1767,14 +1770,17 @@ INNER JOIN dbo.FLOWSHEET_RECORDS B ON A.INPATIENT_DATA_ID = B.INPATIENT_DATA_ID
 INNER JOIN dbo.FLOWSHEET_MEASUREMENTS C ON B.FSD_ID = C.FSD_ID AND  C.FLO_MEAS_ID='94'
 ```
 
-first pass violated: technical object in a business description: '#Main' — the source object is carried by the relationship, not the sentence; technical vocabulary in a business description: 'table' — say what is included, not how the SQL assembles it
+first pass violated: column name in a business description: 'FLO_MEAS_ID' — write from its dictionary description, or say 'flo meas id'; technical object in a business description: '#Main' — the source object is carried by the relationship, not the sentence; technical vocabulary in a business description: 'table' — say 
 
 ## USP_RPTS_IP_SEPSIS_REPORT.sql · #Main
-*outcome: emptied* · parsed tables: departments, hospital_encounters, locations, patient_demographics_race, patients, ref_discharge_disposition, ref_ethnic_group, ref_patient_race, v_hospital_transactions · parsed grain: patient, visit
+*outcome: salvaged* · parsed tables: departments, hospital_encounters, locations, patient_demographics_race, patients, ref_discharge_disposition, ref_ethnic_group, ref_patient_race, v_hospital_transactions · parsed grain: patient, visit
 
 **Description**
 
-_(emptied — nothing grounded survived)_
+This SQL selects encounters for patients.
+
+- The service date falls between @dStartDate and @dEndDate.
+- The disposition is recorded in the ref discharge disposition, and the ethnic group is recorded in the ref ethnic group.
 
 **Fragment**
 
@@ -1852,18 +1858,17 @@ HE.INP_ADM_DATE IS NOT NULL
 AND CONVERT(DATE,HTR.SERVICE_DATE) BETWEEN @dStartDate AND @dEndDate
 ```
 
-first pass violated: ungrounded filter claim: '- Inclusion requires that HE.INP_ADM_DATE is not null.'; technical vocabulary in a business description: 'table' — say what is included, not how the SQL assembles it
+first pass violated: ungrounded filter claim: '- Inclusion requires that HE.INP_ADM_DATE is not null.'; column name in a business description: 'INP_ADM_DATE' — write from its dictionary description, or say 'inp adm date'; column name in a business description: 'REF_DISCHARGE_DISPOSITION' — write from its dictionary desc
 
 ## USP_RPTS_NonSevere_Sepsis.sql · #Base_Pop
 *outcome: recovered* · parsed tables: — · parsed grain: (unknown)
 
 **Description**
 
-This selects records from the base population.
+This SQL selects records from a population of encounters.
 
-- Inclusion is determined by the absence of an encounter ID in the NICU admissions.
-- Encounter IDs must match those in the base population.
-- The selection includes all records from the base population where the encounter ID is not present in the NICU admissions.
+- Inclusion is determined by the absence of an encounter id in the NICU admissions.
+- Encounter ids must not be present in the NICU admissions list.
 
 **Fragment**
 
@@ -1895,14 +1900,14 @@ WHERE
 	NA.ENCOUNTER_ID IS NULL
 ```
 
-first pass violated: technical object in a business description: '#NICUAdmissions' — the source object is carried by the relationship, not the sentence; technical object in a business description: '#Base_Pop_1' — the source object is carried by the relationship, not the sentence
+first pass violated: column name in a business description: 'ENCOUNTER_ID' — write from its dictionary description, or say 'encounter id'; technical object in a business description: '#Base_Pop_1' — the source object is carried by the relationship, not the sentence; technical object in a business description: '#NICUAdmi
 
 ## USP_RPTS_NonSevere_Sepsis.sql · #NICUAdmissions
-*outcome: clean* · parsed tables: adt_events · parsed grain: visit
+*outcome: recovered* · parsed tables: adt_events · parsed grain: visit
 
 **Description**
 
-This SQL selects distinct NICU admissions.
+This SQL selects NICU admissions.
 
 - Admission event type code: 1
 - Excludes cancelled event subtype code: 2
@@ -1942,6 +1947,8 @@ WHERE
 	AND ADT.DEPARTMENT_ID IN (200108002, 200108003, 200108004, 200108005, 200108006)
 ```
 
+first pass violated: column name in a business description: 'DEPARTMENT_ID' — write from its dictionary description, or say 'department id'; column name in a business description: 'EVENT_SUBTYPE_CODE' — write from its dictionary description, or say 'event subtype code'; column name in a business description: 'EVENT_TYPE
+
 ## USP_RPTS_Severe_Sepsis.sql · #AllICUDept
 *outcome: clean* · parsed tables: grouper_compiled_list · parsed grain: (unknown)
 
@@ -1949,8 +1956,8 @@ WHERE
 
 This SQL selects department records.
 
-- Compiled context must be 'DEP'.
-- Base grouper ID must be '800016'.
+- Inclusion is determined by the compiled context being 'DEP'.
+- Only records with a base grouper ID of '800016' are included.
 
 **Fragment**
 

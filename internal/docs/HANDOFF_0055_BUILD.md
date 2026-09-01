@@ -4312,3 +4312,60 @@ technical):**
 (c) DESC-WHOLE-1: build whole-proc description for the 13 silent
     procs — Tier 1 cannot describe 46% of a Clarity estate
     without it, but it is NEW capability and parks for her word.
+
+### RESULTS — DESC-VOICE-3 (dev, 08-31): both rules built, red-first, and re-run
+**1. MISATTRIBUTED PREDICATE (new truth class).** Built from the
+exact #BPA specimen. The gate now checks what a claim is
+PREDICATED OF, not merely that its parts occur: a sentence naming
+a predicate's OPERANDS must also name its SUBJECT. The graded lie
+("Encounter IDs must match the ADT_ARRIVAL_TIME and
+ED_DEPARTURE_TIME") is caught against the REAL fragment, and it
+fired **twice more** on freshly generated text — the class was
+not a one-off.
+Two things this forced, both worth keeping:
+- The class needed its OWN condition trigger. The shared
+  `_FILTER_CLAIM` pattern does not carry "must match", and it is
+  deliberately narrow because a false positive there empties an
+  honest description. Widening a pattern tuned for another job
+  would have been the expedient fix.
+- **Subject matching had to be on STEMS, not tokens.** Rule 2 of
+  this same order BANS raw column names, so the subject can only
+  ever appear in business words — demanding a literal
+  `ALT_ACTION_INST` match would demand the very thing the order
+  forbids. "the time the alert was acted on" now reads as
+  correctly attributed; "Encounter IDs" does not.
+Probed adversarially in BOTH directions (8/8) before I trusted
+it, and the probe is pinned as parametrized tests — the
+Row_Number lesson: never trust a single passing draft on a check
+that can empty true text.
+**2. NO COLUMN NAMES.** `column_name_violations` flags only
+columns the fragment actually references. First draft was WRONG
+and an existing steward-voice test caught it: it flagged the
+ordinary word "result" because a column happened to share the
+name. Banning plain English is the opposite of this order's
+intent, so the rule now fires only on developer-shaped tokens
+(underscored, matched case-sensitively).
+**Fallback ruling implemented as ordered:** `undocumented_columns()`
+reports every referenced column with no dictionary entry, and
+`readable_column()` gives the minimally-transformed wording.
+**Re-run for read #4 (60 of 413 steps, all 15 procs): clean 15 ·
+recovered 23 · salvaged 8 · emptied 14.** Clean fell from 30 and
+empties rose from 11 — the expected direction for a stricter bar,
+and I am reporting it rather than tuning to look better.
+**The number that explains the drop: `column name` violations =
+74, by far the largest class.** The model reaches for raw
+developer tokens constantly and NOTHING caught it before today.
+**But this run is the WORST CASE and says so: 156 of 156
+referenced columns have no dictionary description here** — the
+devtool has no graph nodes, so the model was told "don't use
+column names" with no alternative vocabulary to use instead.
+With the dictionary wired (the pipeline path, where
+`dictionary_for_step()` already supplies exactly the referenced
+columns' entries) these descriptions get materially better. The
+gap is now REPORTED in the report header, per the fallback
+ruling — it is the Tier-1 asset, not a silent degradation.
+**Prompt bumped to FACT_PROMPT_VERSION 4** with the subject rule
+stated ABSTRACTLY — no concrete example, per the
+prompt-examples-become-data law recorded this morning.
+**Gates:** 1,423 passed + 5 xfailed, ruff clean, docs regenerated.
+Sample regenerated for Sunny's read #4.

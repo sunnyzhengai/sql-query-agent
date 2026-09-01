@@ -39,9 +39,11 @@ from collections import Counter  # noqa: E402
 from src.descriptions import (  # noqa: E402
     _grounded_describe,
     grounding_violations,
+    parsed_columns,
     parsed_grain,
     parsed_tables,
     subject_for,
+    undocumented_columns,
 )
 
 HONEST_FLOOR = (
@@ -251,7 +253,8 @@ def run(steps, describe) -> dict:
                          parsed_tables(sql)
                          - {s.lower() for s in st.get("siblings", [])}
                          - {str(st.get("name", "")).lower()}),
-                     "grain": sorted(parsed_grain(sql))})
+                     "grain": sorted(parsed_grain(sql)),
+                     "undocumented": undocumented_columns(sql, None)})
     # Coverage is measured over the FULL corpus, never over the
     # (possibly --limit-ed) generation set: a capped run that
     # reported itself as coverage claimed "2 of 28 procs" while
@@ -265,7 +268,11 @@ def run(steps, describe) -> dict:
             "procs": len({r["proc"] for r in rows}),
             "cov_steps": len(full), "cov_procs": len(described),
             "cov_corpus": len(corpus),
-            "cov_silent": len(corpus) - len(described)}
+            "cov_silent": len(corpus) - len(described),
+            "undoc_cols": len({c for r in rows
+                               for c in r.get("undocumented", [])}),
+            "all_cols": len({c for r in rows
+                             for c in parsed_columns(r.get("sql") or "")})}
 
 
 def write_reports(result: dict, sample_n: int = 30) -> None:
@@ -290,6 +297,17 @@ def write_reports(result: dict, sample_n: int = 30) -> None:
         "(verified, not assumed): the step harvester finds nothing "
         "in them, so today they get NO description at all. That is "
         "a NAMED GAP (DESC-WHOLE-1), not a clean result.",
+        "",
+        "**Dictionary coverage (DESC-VOICE-3.2 fallback ruling):** "
+        f"{result.get('undoc_cols', 0)} of "
+        f"{result.get('all_cols', 0)} referenced columns have NO "
+        "dictionary description in this run — this runner has no "
+        "graph nodes to draw them from, so EVERY description here "
+        "was written without dictionary support and falls back to "
+        "readable column wording. Stated, not hidden: with the "
+        "dictionary wired these descriptions get materially better, "
+        "and the gap itself is the Tier-1 asset ('N columns your "
+        "catalog never documented').",
         "",
         f"- clean (passed first try): {c['clean']} ({pct('clean')})",
         f"- recovered (corrective retry fixed it): {c['recovered']} "

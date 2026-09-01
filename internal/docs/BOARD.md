@@ -84,6 +84,21 @@ order; nothing skips ahead.
       whole corpus, and the cap is stratified.
       **Stratified 60-step sample: 30 clean · 17 recovered · 2
       salvaged · 11 emptied.**
+- [x] **DESC-VOICE-3 BUILT (08-31 dev)** — (1) MISATTRIBUTED
+      PREDICATE: a sentence naming a predicate's operands must
+      name its SUBJECT; caught on the real #BPA specimen and
+      fired twice more on fresh text. Subject matching is by
+      STEM because rule 2 bans the raw tokens. Probed 8/8 both
+      directions, pinned. (2) NO COLUMN NAMES: developer-shaped
+      tokens only — first draft flagged the ordinary word
+      "result" and an existing test caught it. Fallback ruling
+      built: `undocumented_columns()` + `readable_column()`.
+      **Re-run: 15 clean · 23 recovered · 8 salvaged · 14
+      emptied**; `column name` = 74 first-pass violations, the
+      largest class. **Caveat REPORTED: 156/156 columns have no
+      dictionary in this devtool run** — worst case by
+      construction; the pipeline path supplies them.
+      Sample ready for read #4.
 - [ ] **PARKED FOR SUNNY — the word "table" empties true
       descriptions.** 3 of the sampled empties had NO other
       violation: grounded, true sentences about steps that

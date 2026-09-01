@@ -404,6 +404,163 @@ def _condition_text(fragment: str) -> str:
     )
 
 
+# --- DESC-VOICE-3.1 (ordered 08-31, specimen USP_ED_SEPSIS · #BPA) --
+# THE MISATTRIBUTED PREDICATE: right values, wrong subject. The
+# description said "Encounter IDs must match the ADT_ARRIVAL_TIME and
+# ED_DEPARTURE_TIME" where the SQL constrains ALT_ACTION_INST BETWEEN
+# those two. Every value was present, so a presence check passes it.
+# A description can be entirely built of true tokens and still assert
+# something the SQL never says — grounding must therefore check what
+# a claim is PREDICATED OF, not merely that its parts occur.
+_PREDICATES = re.compile(
+    r"(?is)([A-Za-z_][\w]*)\.([A-Za-z_][\w]*)\s*"
+    r"(?:(BETWEEN)\s+([A-Za-z_][\w.]*)\s+AND\s+([A-Za-z_][\w.]*)"
+    r"|(=|<>|!=|>=|<=|>|<)\s*([A-Za-z_][\w.]*))")
+
+
+# A misattribution can ride on any condition verb, and the shared
+# _FILTER_CLAIM pattern is deliberately narrow (it gates the
+# selected-not-filtered heuristic, where a false positive empties an
+# honest description). The #BPA lie used "must match", which that
+# pattern does not carry — so this class gets its OWN, wider trigger
+# rather than widening a pattern tuned for a different job.
+_CONDITION_VERB = re.compile(
+    r"(?i)\b(must|has to|have to|need(?:s)? to|should|only|between|"
+    r"within|matches?|match|falls?|fall|requir\w+|restrict\w*|"
+    r"limited to|exclud\w*|includ\w*)\b")
+
+
+def _column_words(col: str) -> "set[str]":
+    """The words a steward-facing sentence would use for a column.
+    ALT_ACTION_INST → {alt, action, inst}. Attribution is checked at
+    WORD grain because the description must NOT contain the raw token
+    (rule 2 of the same order bans column names outright)."""
+    return {w for w in re.split(r"[_\W]+", col.lower()) if len(w) > 2}
+
+
+# --- DESC-VOICE-3.2: NO COLUMN NAMES in a steward's field ---------
+# The table rule at COLUMN grain. BPA_LOCATOR_ID / ADT_ARRIVAL_TIME /
+# ALT_ACTION_INST are developer tokens; a steward reads them as
+# noise. The fix is not "strip them" but "write from the column's
+# DICTIONARY DESCRIPTION" — dictionary_for_step() already selects
+# exactly the referenced columns' entries, so this is wiring + a ban.
+# Where a column has NO entry: a readable form of the name AND the
+# column is REPORTED as a coverage gap (Sunny's fallback ruling) —
+# missing dictionary entries become a Tier-1 asset ("N columns your
+# catalog never documented"), never a silent degradation.
+_SQL_COLUMNS = re.compile(
+    r"(?i)\b[A-Za-z_][\w]*\.([A-Za-z_][\w]*)\b")
+
+
+def parsed_columns(fragment: str) -> "set[str]":
+    """Every column the fragment references by qualified name."""
+    return {c.upper() for c in _SQL_COLUMNS.findall(fragment or "")}
+
+
+def _documented(dict_lines: "list[str] | None") -> "set[str]":
+    out: "set[str]" = set()
+    for line in dict_lines or []:
+        head = line.strip().lstrip("- ").split(":", 1)[0].strip()
+        if head:
+            out.add(head.upper())
+    return out
+
+
+def undocumented_columns(
+    fragment: str, dict_lines: "list[str] | None" = None,
+) -> "list[str]":
+    """Columns the step references that the customer's dictionary does
+    NOT describe. Returned so callers can REPORT the gap."""
+    return sorted(parsed_columns(fragment) - _documented(dict_lines))
+
+
+def readable_column(col: str) -> str:
+    """The fallback wording when a column has no dictionary entry:
+    minimally transformed, never invented. ALT_ACTION_INST stays
+    honest as 'alt action inst' — deliberately plain, so a thin
+    description reads as thin rather than as confident prose."""
+    return re.sub(r"[_\W]+", " ", col).strip().lower()
+
+
+def column_name_violations(text: str, fragment: str) -> "list[str]":
+    """Raw column names in steward-facing text. Only columns the
+    fragment actually references are flagged, so an ordinary
+    capitalised word can never trip this."""
+    cols = parsed_columns(fragment)
+    out: "list[str]" = []
+    for col in sorted(cols):
+        # ONLY developer-shaped tokens. A single ordinary word that
+        # happens to be a column (RESULT, NAME, DEPARTMENT) is not a
+        # developer token, and banning it would push descriptions
+        # away from plain English — the opposite of this order's
+        # intent. Caught by an existing steward-voice test that this
+        # rule broke on first draft.
+        if "_" not in col:
+            continue
+        # match the developer casing, not the English word: the
+        # offence is BPA_LOCATOR_ID appearing verbatim
+        if re.search(r"\b" + re.escape(col) + r"\b", text):
+            out.append(
+                f"column name in a business description: {col!r} — "
+                f"write from its dictionary description, or say "
+                f"{readable_column(col)!r}")
+    return out
+
+
+def _stem(word: str) -> str:
+    """Crude, deliberate stem so 'acted'/'action', 'alert'/'alt' and
+    'arrival'/'arrive' collapse. Rule 2 of this same order BANS raw
+    column names in descriptions, so the subject can only ever appear
+    in business words — demanding a literal token match would demand
+    the very thing the order forbids. Prefix comparison is the
+    weakest test that still distinguishes 'the time the alert was
+    acted on' (right subject) from 'Encounter IDs' (wrong one)."""
+    w = re.sub(r"(?:ing|ed|es|s|ion|al)$", "", word.lower())
+    return w[:4]
+
+
+def _names_subject(line_words: "set[str]", subject: "set[str]") -> bool:
+    """True when the sentence names the predicate's subject in ANY
+    form — exact token, or a shared stem with any subject word."""
+    if subject & line_words:
+        return True
+    stems = {_stem(s) for s in subject if len(s) > 2}
+    return bool(stems & {_stem(w) for w in line_words})
+
+
+def misattribution_violations(text: str, fragment: str) -> "list[str]":
+    """A sentence that names the OPERANDS of a predicate must also name
+    its SUBJECT (the left-hand side). Only fires when a sentence
+    carries a condition claim AND names >=2 operand words while naming
+    NO word of the subject — an asymmetry that cannot happen by
+    accident and is exactly the #BPA failure."""
+    out: "list[str]" = []
+    preds = _PREDICATES.findall(fragment or "")
+    if not preds:
+        return out
+    for line in text.splitlines():
+        low = line.strip().lower()
+        if not low or not _CONDITION_VERB.search(low):
+            continue
+        for _tbl, lhs, is_btw, lo, hi, _op, rhs in preds:
+            operands = [x for x in ((lo, hi) if is_btw else (rhs,)) if x]
+            op_words: "set[str]" = set()
+            for o in operands:
+                op_words |= _column_words(o.split(".")[-1])
+            if len(op_words) < 2:
+                continue
+            named = {w for w in op_words if w in low}
+            subject = _column_words(lhs)
+            line_words = set(re.findall(r"[a-z]{3,}", low))
+            if len(named) >= 2 and not _names_subject(line_words, subject):
+                out.append(
+                    f"misattributed predicate: {line.strip()!r} — names "
+                    f"the values of the {lhs} condition but not what "
+                    f"they constrain")
+                break
+    return out
+
+
 def grounding_violations(
     text: str, fragment: str, dict_lines: "list[str] | None" = None,
     dialect: str = "sql", voice: bool = True,
@@ -459,6 +616,9 @@ def grounding_violations(
     if dialect == "sql":
         violations.extend(_table_violations(text, fragment, dict_lines))
         violations.extend(_grain_violations(text, fragment))
+        violations.extend(misattribution_violations(text, fragment))
+        if voice:
+            violations.extend(column_name_violations(text, fragment))
     # 5) VOICE (DESC-VOICE-1): audience, not accuracy — a steward's
     # field must not carry a developer's sentence. Skipped with
     # voice=False for MACHINE-COMPOSED text (the template fallback

@@ -8,6 +8,8 @@ Proves: law:honesty-floor
 import json
 from pathlib import Path
 
+import pytest
+
 from src.descriptions import (
     enforce_grounding,
     grounding_violations,
@@ -391,8 +393,6 @@ class TestDescWhole1Gap:
         import os
         import re
 
-        import pytest
-
         from devtools.desc_live_run import harvest_steps
 
         corpus = sorted(glob.glob("data/synthetic/sql/**/*.sql",
@@ -434,3 +434,106 @@ class TestTempStepVoiceCost:
         clean = ("This is a selection of encounters with a recorded "
                  "admission date.")
         assert grounding_violations(clean, sql) == []
+
+class TestDescVoice3Misattributed:
+    """DESC-VOICE-3.1 (ordered 08-31 from Sunny's read #3 on
+    USP_ED_SEPSIS · #BPA): the MISATTRIBUTED PREDICATE class.
+    The description used the right VALUES against the wrong
+    SUBJECT — "Encounter IDs must match the ADT_ARRIVAL_TIME and
+    ED_DEPARTURE_TIME" when the SQL constrains ALT_ACTION_INST
+    BETWEEN those two. It passed the old gate because the gate
+    asked whether facts were PRESENT, never what they were
+    PREDICATED OF. Red-first from the exact specimen."""
+
+    SPECIMEN = (
+        "SELECT B.ENCOUNTER_ID, AH.ALT_ACTION_INST INTO #BPA "
+        "FROM #Base_Pop B "
+        "INNER JOIN ALERT_HISTORY AH ON AH.ALT_ID = B.ALT_ID "
+        "WHERE AH.ALT_ACTION_INST BETWEEN B.ADT_ARRIVAL_TIME "
+        "AND B.ED_DEPARTURE_TIME")
+
+    def test_wrong_subject_is_caught(self):
+        bad = ("Encounter IDs must match the arrival time and the "
+               "departure time.")
+        v = grounding_violations(bad, self.SPECIMEN)
+        assert any("misattributed" in x.lower() for x in v), v
+
+    @pytest.mark.parametrize("line", [
+        "The alert action time must be between the arrival time and "
+        "the departure time.",
+        "Alerts are kept only when acted on between arrival and "
+        "departure times.",
+        "Encounters where the alert was acted on between arrival and "
+        "departure.",
+        "This is a selection of alerts.",
+        "- Includes encounters from the emergency department.",
+    ])
+    def test_honest_phrasings_do_not_fire(self, line):
+        """This class can EMPTY a true description, so it is probed
+        adversarially in both directions (the Row_Number
+        false-positive lesson: never trust a single passing draft)."""
+        v = [x for x in grounding_violations(line, self.SPECIMEN)
+             if "misattributed" in x.lower()]
+        assert v == [], v
+
+    @pytest.mark.parametrize("line", [
+        "Encounter IDs must match the arrival time and the departure "
+        "time.",
+        "Patients must be between the arrival time and the departure "
+        "time.",
+    ])
+    def test_wrong_subjects_fire(self, line):
+        v = [x for x in grounding_violations(line, self.SPECIMEN)
+             if "misattributed" in x.lower()]
+        assert v, line
+
+    def test_right_subject_passes(self):
+        good = ("The time the alert was acted on must fall between "
+                "the arrival time and the departure time.")
+        v = [x for x in grounding_violations(good, self.SPECIMEN)
+             if "misattributed" in x.lower()]
+        assert v == [], v
+
+class TestDescVoice3NoColumnNames:
+    """DESC-VOICE-3.2 (same order): raw COLUMN names are developer
+    tokens and must not reach a steward's field — the table rule at
+    column grain. BPA_LOCATOR_ID / ADT_ARRIVAL_TIME / ALT_ACTION_INST
+    are the specimen's offenders. Where a column HAS a dictionary
+    entry the model writes from that; where it does not, Sunny's
+    ruling is a readable form of the name AND a recorded coverage
+    gap — missing entries become a REPORTED Tier-1 asset, never a
+    silent degradation."""
+
+    # every flagged column must be one the fragment REFERENCES —
+    # an unreferenced name is not this gate's business (fixture
+    # corrected after ADT_ARRIVAL_TIME was asserted against a
+    # specimen that never mentioned it)
+    SPECIMEN = ("SELECT ALT.BPA_LOCATOR_ID, AH.ALT_ACTION_INST "
+                "FROM ALERT_HISTORY AH JOIN #Base_Pop B "
+                "ON B.ENCOUNTER_ID = AH.VISIT_ID "
+                "WHERE AH.ALT_ACTION_INST >= B.ADT_ARRIVAL_TIME")
+
+    @pytest.mark.parametrize("col", [
+        "BPA_LOCATOR_ID", "ADT_ARRIVAL_TIME", "ALT_ACTION_INST",
+    ])
+    def test_raw_column_name_is_caught(self, col):
+        bad = f"Encounters are filtered on {col} being recorded."
+        v = grounding_violations(bad, self.SPECIMEN)
+        assert any("column name" in x.lower() for x in v), (col, v)
+
+    def test_business_wording_passes(self):
+        good = ("Alerts are included when the time the alert was "
+                "acted on is recorded.")
+        v = [x for x in grounding_violations(good, self.SPECIMEN)
+             if "column name" in x.lower()]
+        assert v == [], v
+
+    def test_undocumented_columns_are_reported_not_silent(self):
+        """The fallback ruling: no dictionary entry => readable name
+        AND a coverage gap the caller can report."""
+        from src.descriptions import undocumented_columns
+
+        gaps = undocumented_columns(self.SPECIMEN, dict_lines=[
+            "  - ALT_ACTION_INST: the time the alert was acted on"])
+        assert "BPA_LOCATOR_ID" in gaps
+        assert "ALT_ACTION_INST" not in gaps
