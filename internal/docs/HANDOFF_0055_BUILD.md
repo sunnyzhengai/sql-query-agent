@@ -4533,3 +4533,33 @@ own words.
 DESC-MEANING-1 step 2 (resolve → meaning); do not rebuild it. The
 new work is steps 3-4 (deterministic skeleton + bounded
 smoothing, skeleton as the fallback).
+
+## ORDER DESC-FILE-1 (Sunny's correction, 2026-08-31): the DELIVERABLE is a description per SQL FILE
+**Structural correction, not a scope call.** We built step
+description and treated whole-proc as a special case for procs
+with no steps — backwards. Steps are HOW we build the file's
+description when they exist; they are not the deliverable.
+Sunny: "the goal is to generate a faithful description for each
+SQL file."
+1. **Single-statement proc:** describe the statement — that IS
+   the file's description. No special capability, no separate
+   path; it is one block read the way we read any block.
+   (This retires DESC-WHOLE-1 as a distinct order.)
+2. **Multi-step proc:** describe each step (current pipeline),
+   then COMPOSE the file-level description from the step
+   descriptions.
+3. **Coverage is redefined:** the reported number is FILES
+   DESCRIBED / FILES PRESENT — not steps found. 413 steps
+   alongside 13 undescribed files was a misleading metric; it
+   measured our machinery, not the deliverable.
+4. **File-level composition stays deterministic-first** (the
+   DESC-MEANING-1 discipline, applied one level up): the skeleton
+   is assembled from the FINAL OUTPUT step's subject and the
+   entities touched (what it produces, from what), with the
+   intermediate steps' criteria rolled up — then smoothed by the
+   model within the same bounds. The summary-of-summaries is the
+   layer furthest from parsed evidence, so it is exactly where
+   deterministic assembly matters most; skeleton ships if
+   smoothing violates.
+5. Re-run the corpus after: report FILE coverage, plus the
+   step-level rates as internal detail.
