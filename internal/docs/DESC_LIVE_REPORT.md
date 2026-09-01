@@ -6,22 +6,17 @@
 
 **Coverage (DESC-TEMP-1): 413 describable steps across 15 of 28 procs** — CTE steps AND temp-table staged steps (SELECT…INTO #X / INSERT INTO #X), harvested through the parser. Coverage counts the WHOLE corpus and is independent of any --limit on generation. The other 13 procs are single-SELECT report procs with no CTE and no temp staging (verified, not assumed): the step harvester finds nothing in them, so today they get NO description at all. That is a NAMED GAP (DESC-WHOLE-1), not a clean result.
 
-**Dictionary coverage (DESC-VOICE-3.2 fallback ruling):** 156 of 156 referenced columns have NO dictionary description in this run — this runner has no graph nodes to draw them from, so EVERY description here was written without dictionary support and falls back to readable column wording. Stated, not hidden: with the dictionary wired these descriptions get materially better, and the gap itself is the Tier-1 asset ('N columns your catalog never documented').
+**Dictionary coverage (DESC-VOICE-3.2 fallback ruling):** 156 of 156 referenced columns have NO customer dictionary description — this runner has no graph nodes, so it substitutes the PARSER-DERIVED readable form of each column name (Sunny's fallback ruling: readable wording AND a reported gap). Measured, not assumed: the dictionary fixes ATTRIBUTION but not VOICE on its own — framed as a glossary the model cites the identifiers; framed as SUBSTITUTIONS it writes the meanings (10 column-name violations to 0 across 6 steps). Real customer definitions read better than these readable forms, but the framing — not the dictionary's presence — is what removes the identifiers. The gap itself is the Tier-1 asset ('N columns your catalog never documented').
 
-- clean (passed first try): 15 (25%)
-- recovered (corrective retry fixed it): 23 (38%)
-- salvaged (surgical fallback kept grounded lines): 8 (13%)
-- emptied (absence over fabrication): 14 (23%)
+- clean (passed first try): 50 (83%)
+- recovered (corrective retry fixed it): 7 (12%)
+- salvaged (surgical fallback kept grounded lines): 1 (2%)
+- emptied (absence over fabrication): 2 (3%)
 
 ## First-pass violations by class
 
-- column name in a business description: 74
-- technical vocabulary in a business description: 17
-- ungrounded value: 15
-- technical object in a business description: 9
-- ungrounded filter claim: 5
-- ungrounded table claim: 3
-- selected-not-filtered: 2
+- ungrounded value: 13
+- technical vocabulary in a business description: 6
 - misattributed predicate: 2
 
 ## Reading these numbers

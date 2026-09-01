@@ -537,3 +537,34 @@ class TestDescVoice3NoColumnNames:
             "  - ALT_ACTION_INST: the time the alert was acted on"])
         assert "BPA_LOCATOR_ID" in gaps
         assert "ALT_ACTION_INST" not in gaps
+
+class TestUnqualifiedColumnsAreStillColumns:
+    """DESC-VOICE-3.2 blind spot (found 08-31 in my OWN re-run): the
+    first draft of parsed_columns matched only QUALIFIED references
+    (AH.ALT_ACTION_INST), so a fragment referencing columns bare —
+    common in SELECT…INTO staging — hid them from the ban. A
+    description full of raw column names was graded CLEAN. The
+    74-to-0 improvement was therefore part real, part blindness."""
+
+    FRAG = ("SELECT ENCOUNTER_ID, TAKEN_TIME INTO #Pressors "
+            "FROM #Base_Pop WHERE TAKEN_TIME BETWEEN "
+            "ADT_ARRIVAL_TIME AND ED_DEPARTURE_TIME")
+
+    def test_unqualified_columns_are_parsed(self):
+        from src.descriptions import parsed_columns
+
+        cols = parsed_columns(self.FRAG)
+        for c in ("TAKEN_TIME", "ADT_ARRIVAL_TIME", "ED_DEPARTURE_TIME"):
+            assert c in cols, (c, sorted(cols))
+
+    def test_raw_unqualified_name_is_flagged(self):
+        bad = ("- Encounter IDs are included where the TAKEN_TIME "
+               "falls between ADT_ARRIVAL_TIME and ED_DEPARTURE_TIME.")
+        v = grounding_violations(bad, self.FRAG)
+        assert any("column name" in x.lower() for x in v), v
+
+    def test_table_names_are_not_mistaken_for_columns(self):
+        from src.descriptions import parsed_columns
+
+        cols = parsed_columns(self.FRAG)
+        assert "BASE_POP" not in cols and "#BASE_POP" not in cols

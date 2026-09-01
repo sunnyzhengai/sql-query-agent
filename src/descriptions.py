@@ -450,11 +450,28 @@ def _column_words(col: str) -> "set[str]":
 # catalog never documented"), never a silent degradation.
 _SQL_COLUMNS = re.compile(
     r"(?i)\b[A-Za-z_][\w]*\.([A-Za-z_][\w]*)\b")
+# Unqualified UNDERSCORED identifiers are columns too. Staging SQL
+# (SELECT…INTO) references them bare constantly, and matching only
+# QUALIFIED names hid them from the ban — a description full of raw
+# column names graded CLEAN in my own re-run. Underscored-only keeps
+# this from swallowing keywords, and table names are subtracted
+# because FROM/JOIN targets are the other rule's business.
+_BARE_COLUMNS = re.compile(r"\b([A-Za-z]+(?:_[A-Za-z0-9]+)+)\b")
+_SQL_KEYWORDS = frozenset({
+    "ORDER_BY", "GROUP_BY", "INNER_JOIN", "LEFT_OUTER", "IS_NULL",
+})
 
 
 def parsed_columns(fragment: str) -> "set[str]":
-    """Every column the fragment references by qualified name."""
-    return {c.upper() for c in _SQL_COLUMNS.findall(fragment or "")}
+    """Every column the fragment references — qualified or bare."""
+    frag = fragment or ""
+    cols = {c.upper() for c in _SQL_COLUMNS.findall(frag)}
+    cols |= {c.upper() for c in _BARE_COLUMNS.findall(frag)}
+    # a table is not a column: strip FROM/JOIN targets (and their
+    # bare/temp forms) so the two rules stay in their own lanes
+    tables = {t.upper() for t in parsed_tables(frag)}
+    tables |= {t.upper().lstrip("#") for t in parsed_tables(frag)}
+    return {c for c in cols - tables - _SQL_KEYWORDS if "_" in c}
 
 
 def _documented(dict_lines: "list[str] | None") -> "set[str]":

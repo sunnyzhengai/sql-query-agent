@@ -4467,3 +4467,50 @@ had. Fix by construction, not prohibition.
 PARKED RULINGS RESOLVED BY THIS ORDER: empties (skeleton is the
 floor) and the 'table' ban (dissolved). Still open for Sunny:
 DESC-WHOLE-1 (the 13 single-SELECT procs with no steps at all).
+
+### RESULTS — DESC-VOICE-3.2 re-run + A BLIND SPOT IN MY OWN GATE (dev, 08-31)
+**Re-ran the 60-step sample under substitution framing: clean 50 ·
+recovered 7 · salvaged 1 · emptied 2** (was 15/23/8/14). Column-name
+violations went **74 → 0**. Remaining first-pass classes: ungrounded
+value 13, technical vocabulary 6, misattributed predicate 2.
+**Then I read the actual prose instead of trusting the counters, and
+found the improvement was PART REAL, PART BLINDNESS.** A description
+graded CLEAN read: "Encounter IDs are included where the TAKEN_TIME
+falls between ADT_ARRIVAL_TIME and ED_DEPARTURE_TIME" — three raw
+column names, passed by the gate.
+**Cause:** my `parsed_columns` matched only QUALIFIED references
+(`AH.ALT_ACTION_INST`). Staging SQL (SELECT…INTO) references columns
+BARE constantly, so those columns were invisible to the ban.
+**Fixed:** bare underscored identifiers are now parsed as columns,
+with FROM/JOIN targets subtracted so tables and columns stay in their
+own lanes. Red-first (`TestUnqualifiedColumnsAreStillColumns`),
+including a guard that a table is never mistaken for a column. The
+specimen that graded clean now correctly reports 3 violations.
+**So the honest reading of 74 → 0 is: the framing fix is real (the
+A/B on 6 steps was measured against a gate that saw qualified names
+in both arms), but the 60-step re-run's clean rate was flattered by
+the blind spot and should NOT be quoted as-is.** I am reporting this
+against my own headline number rather than leaving it to be found.
+**Gates:** 1,427 passed + 5 xfailed, ruff clean, docs regenerated.
+
+### DEV ACK — DESC-MEANING-1 received; this work folds into it
+Sunny's reframe supersedes the voice-ban approach, and today's
+evidence independently supports her diagnosis: my measured A/B
+showed the dictionary fixes ATTRIBUTION but not VOICE, and that
+prohibition without vocabulary just moves the failure. "The censor
+removed the only vocabulary the model had" is exactly what the
+numbers showed.
+What survives the reframe and should be reused, not rebuilt:
+- `parsed_columns` / `parsed_tables` / `parsed_grain` and the
+  predicate extractor (`_PREDICATES`, left-hand sides) — these ARE
+  step 1's structure.
+- `undocumented_columns()` + `readable_column()` — these ARE step
+  2's resolve-or-mark-uncovered, already reporting coverage.
+- `misattribution_violations()` — step 5's light check on smoothed
+  output; the skeleton cannot misattribute by construction, so this
+  becomes the guard that smoothing did not introduce one.
+- The SUBSTITUTIONS framing — directly applicable to step 4's
+  bounded smoothing prompt.
+Not yet built (the new work): the deterministic COMPOSE step and
+the skeleton-as-fallback. I have NOT started it — flagging the
+handoff so review knows the boundary.

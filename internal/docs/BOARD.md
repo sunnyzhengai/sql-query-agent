@@ -110,6 +110,16 @@ order; nothing skips ahead.
       framing; now substitutions. FACT_PROMPT_VERSION → 5, pinned.
       The 74 in read #4 was measured under the OLD framing with no
       dictionary — a worst-case floor, not the product.
+- [x] **DESC-VOICE-3.2 RE-RUN + SELF-CAUGHT BLIND SPOT (08-31
+      dev)** — re-run under substitution framing: **50 clean · 7
+      recovered · 1 salvaged · 2 emptied** (was 15/23/8/14),
+      column-name violations **74 → 0**. BUT reading the prose
+      showed a description graded CLEAN containing three raw
+      column names: `parsed_columns` matched only QUALIFIED
+      references, so bare columns in SELECT…INTO staging were
+      invisible. Fixed red-first (bare underscored identifiers,
+      tables subtracted). **The 50-clean number is flattered by
+      that blind spot and must not be quoted as-is.**
 - [ ] **PARKED FOR SUNNY — the word "table" empties true
       descriptions.** 3 of the sampled empties had NO other
       violation: grounded, true sentences about steps that

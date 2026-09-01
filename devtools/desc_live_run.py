@@ -42,6 +42,7 @@ from src.descriptions import (  # noqa: E402
     parsed_columns,
     parsed_grain,
     parsed_tables,
+    readable_column,
     subject_for,
     undocumented_columns,
 )
@@ -232,7 +233,19 @@ def run(steps, describe) -> dict:
         if not sql.strip():
             counts["unparsed"] += 1
             continue
+        # SUBSTITUTIONS, matching the production prompt's framing
+        # (DESC-VOICE-3.2). No graph nodes here, so the meanings are
+        # the parser-derived readable forms — thinner than a real
+        # customer definition, but the framing is what removes the
+        # identifiers, and this run must measure the shipped path.
+        subs = "\n".join(
+            f"  when you mean {c}, write: the {readable_column(c)}"
+            for c in sorted(parsed_columns(sql))[:30])
         prompt = _PROMPT.format(sql=sql, subject=subject_for(sql))
+        if subs:
+            prompt += ("\n\nSUBSTITUTIONS — write the MEANING; the "
+                       "identifier itself must never appear in your "
+                       f"answer:\n{subs}")
         first = describe(prompt).strip()
         first_v = grounding_violations(first, sql) if first else []
         for v in first_v:
@@ -301,13 +314,18 @@ def write_reports(result: dict, sample_n: int = 30) -> None:
         "**Dictionary coverage (DESC-VOICE-3.2 fallback ruling):** "
         f"{result.get('undoc_cols', 0)} of "
         f"{result.get('all_cols', 0)} referenced columns have NO "
-        "dictionary description in this run — this runner has no "
-        "graph nodes to draw them from, so EVERY description here "
-        "was written without dictionary support and falls back to "
-        "readable column wording. Stated, not hidden: with the "
-        "dictionary wired these descriptions get materially better, "
-        "and the gap itself is the Tier-1 asset ('N columns your "
-        "catalog never documented').",
+        "customer dictionary description — this runner has no graph "
+        "nodes, so it substitutes the PARSER-DERIVED readable form "
+        "of each column name (Sunny's fallback ruling: readable "
+        "wording AND a reported gap). Measured, not assumed: the "
+        "dictionary fixes ATTRIBUTION but not VOICE on its own — "
+        "framed as a glossary the model cites the identifiers; "
+        "framed as SUBSTITUTIONS it writes the meanings (10 "
+        "column-name violations to 0 across 6 steps). Real customer "
+        "definitions read better than these readable forms, but the "
+        "framing — not the dictionary's presence — is what removes "
+        "the identifiers. The gap itself is the Tier-1 asset ('N "
+        "columns your catalog never documented').",
         "",
         f"- clean (passed first try): {c['clean']} ({pct('clean')})",
         f"- recovered (corrective retry fixed it): {c['recovered']} "
