@@ -148,7 +148,13 @@ order; nothing skips ahead.
       project. Also verified: **ScriptDom cannot host on Sunny's
       Mac** (hardened-runtime SIGKILL, no fallback) — dev must
       state the proving ground and must NOT add a text fallback.
-      Dev building next.
+      **PROBES NOW EXECUTABLE:** `devtools/probe_skeleton_8.py`,
+      baseline captured — **1-4 FAIL, 5-8 PASS** on the committed
+      composer. Acceptance = 8/8 with 5-8 never regressing.
+      **FIFTH FINDING (output read, not counters):** `@dStartDate`
+      renders as "dstartdate" — a parameter shown to a steward as
+      if it were a value; ordered into the re-cut (render by NODE
+      TYPE: variable vs column vs literal). Dev building next.
 - [ ] **DESC-FILE-1 (08-31, ordered)** — deliverable is a
       description per SQL FILE; steps are how, not what. Retires
       DESC-WHOLE-1. Coverage = files described / files present.

@@ -4865,3 +4865,45 @@ not a parsing project.
 *shape* of this failure — a module that consumes SQL text and derives
 structure from it without importing `src/parser/`. If that is not
 mechanically checkable, dev says so with the specific obstacle.
+
+### REVIEW — THE EIGHT PROBES ARE NOW EXECUTABLE; BASELINE CAPTURED (08-31)
+
+`devtools/probe_skeleton_8.py` — the eight cases as a runnable
+harness, asserting on RENDERED TEXT so it works unmodified against
+the regex composer (red) and the AST one (green). Prints every
+skeleton so the OUTPUT READ is possible; exits non-zero on any fail.
+Placed in devtools/, NOT tests/, so it cannot collide with the
+fixtures dev pins.
+
+**BASELINE ON THE CURRENT COMMITTED COMPOSER (`.venv/bin/python
+devtools/probe_skeleton_8.py`): cases 1-4 FAIL, cases 5-8 PASS.**
+That is the red-first evidence, executable rather than asserted.
+Acceptance for DESC-SKELETON-3 is 8/8 — and 5-8 must never go red,
+which is what makes it a regression harness and not just a wish list.
+
+Verbatim baseline of the four defects, for the record:
+1. NOT EXISTS → `This is a selection of patients.` and NOTHING ELSE.
+   The exclusion that IS the metric renders as silence.
+2. HAVING COUNT(*) >= 4 → the date range only; the threshold that
+   defines a high utilizer is absent.
+3. `(A IN (…) OR B = 3022)` → two sibling bullets, textually
+   identical to a conjunction of two required filters.
+4. SELECT-list CASE → `the flowsheet measure is '900112'` as a
+   condition, beside the real one; a filter the query never applies.
+
+**A FIFTH FINDING, from reading the output rather than the counters
+(new — not in the original four).** Cases 2 and 8 render
+`@dStartDate` as **"dstartdate"** — the parameter name lowercased,
+presented to a steward as if it were a value. It is neither a value
+nor a meaning; `meaning_of()` falls through to `readable_column()`,
+which has no underscore to split on. So a date range reads "falls
+between dstartdate and denddate", which tells a steward nothing and
+looks like a typo in a customer-facing artifact. Not a decoy (it
+asserts nothing false) but it IS an emptiness the gate cannot see.
+**Ordered as part of DESC-SKELETON-3:** a bound parameter renders as
+a parameter — "a start date supplied at run time" or equivalent —
+and the renderer must distinguish literal / column / parameter by
+NODE TYPE, which the AST gives for free (`VariableReference` vs
+`ColumnReferenceExpression` vs `Literal`). Case 8's assertion is
+deliberately weak today (only checks "between"); dev should
+strengthen it once the parameter rendering is ruled.
