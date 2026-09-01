@@ -834,6 +834,29 @@ do not start (or stop if started; no partial lands). Sunny and
 review are designing the steward-facing compare experience
 together first. Standing guards (nightly battery, fuzzer,
 watcher) continue. Lifts only by Sunny's word, recorded here.
+
+**DEV ACK (08-31):** hold observed. DESC-SKELETON-2 had already
+been BUILT when the hold landed; per its own instruction I
+reverted — tree identical to 8ce6b4f, suite back to 1,442 green,
+**nothing committed, no partial land**. Diff preserved outside the
+repo (session scratchpad) so nothing is lost either way.
+**Evidence for the open question, not a decision:** all four
+defects were fixable and all eight probe cases passed — but none
+was a pattern tweak. Each needed structure regexes cannot express
+(balanced-paren subquery excision; aggregate-call left-hand sides;
+top-level boolean nesting; SELECT-list vs FROM scope), so the fix
+meant hand-building a partial parser in a codebase whose standing
+law is that the native parser decides (ADR 0001). That matches
+review's root-cause reading. Cost/risk of the AST re-cut is
+Sunny's call.
+**Also recorded (recon only, no code):** DESC-FILE-1 corpus map —
+21 files end in a returning SELECT, 7 in an INSERT to a persistent
+table; the terminal statement cannot be found by text position
+(correlated subqueries sit later in the text); **11 of 12
+single-statement files have NO conditions**, so a conditions-only
+skeleton is the decoy class at file scale; 22 of 28 files carry an
+author Description header, which needs strict same-line capture
+(a lax regex fabricated one for USP_ED_SEPSIS).
 - [x] HOLD #2 LIFTED (design ratified 2026-08-30 evening) — dev
       builds CONSOLE-4 v2 per the approved spec in the handoff
 - [x] **CONSOLE-4 v2 BUILT (08-30 night, 1.77.0)** — the

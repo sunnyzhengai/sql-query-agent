@@ -4655,3 +4655,73 @@ regression). After the fix, re-run the corpus AND re-probe.
 decoy class — only reading output against the SQL can. Every
 description milestone from here carries an output read, not just
 rates.
+
+### DEV ACK — HOLD #3 OBSERVED; DESC-SKELETON-2 BUILT THEN REVERTED, NOTHING LANDED
+The hold reached me after I had already built DESC-SKELETON-2. Its
+instruction covers exactly that case ("if started, stop and revert,
+no partial lands"), so I reverted: `git checkout` on the two touched
+files, tree now identical to HEAD (8ce6b4f), suite back to the
+pre-build 1,442 green. **Nothing was committed at any point** — no
+partial land occurred. The diff is preserved OUTSIDE the repo (the
+session scratchpad, `desc_skeleton_2_reverted.patch`) so no analysis
+is lost whichever way Sunny rules.
+
+**EVIDENCE FOR THE OPEN QUESTION (regex patch vs AST re-cut).** I am
+not deciding it; this is what I learned that bears on it.
+All four defects were fixed and all eight probe cases passed
+(24 skeleton tests green, full suite 1,450). But WHAT the fix
+required is the useful signal: none of the four was a pattern tweak.
+Each needed STRUCTURE the regexes cannot express —
+- NOT EXISTS / NOT IN: balanced-paren subquery excision, plus
+  knowing the negation sits BEFORE the subquery;
+- HAVING: recognising an aggregate call as the left-hand side;
+- OR: top-level boolean nesting, to render alternatives as
+  alternatives;
+- SELECT-CASE: SCOPE — where the SELECT list ends and the FROM
+  begins, so a label stops reading as a filter.
+So I had to hand-build paren balancing, top-level-OR detection, and
+clause segmentation — a partial parser, in a codebase whose standing
+law (ADR 0001) is that the dialect's native parser decides. **Review's
+root-cause reading matches what the build actually needed.** That is
+one data point toward the AST re-cut, and it is the honest one to
+report; the cost/risk of the re-cut is Sunny's call, not mine.
+Two smaller findings from that build, independent of which path wins:
+- the corpus regression stayed clean (`#Base_Pop`, `#BPA`,
+  `#Pressors`, `#AllMeds` all 0 violations), so the four defects are
+  shapes the corpus run genuinely never exercised — review's probe
+  found what a re-run could not;
+- reading output caught two phrasings no counter would flag ("has a
+  records count that is at least 4"; "recorded time is recorded"),
+  consistent with review's standing note that the decoy class is
+  invisible to rates.
+
+**DESC-FILE-1 exploration (mapping only — no code written, no
+behaviour changed).** Before the hold I mapped the corpus for the
+per-file deliverable. Recording it so the work is not repeated:
+- **28 files: 21 end in a returning SELECT, 7 in an INSERT into a
+  persistent table, 0 unparsed, 0 other.** The 7 materialise their
+  result; that written table IS their deliverable, and other procs
+  then read it (real lineage — the thin `_v1` files read
+  `ip_sepsisdetails`, `ip_sepsisencounters`).
+- **The terminal statement cannot be found by text position.** In
+  `USP_ED_SEPSIS` and `USP_IP_SEPSIS` the textually-last SELECT is a
+  correlated subquery inside another statement. Via ScriptDom,
+  `USP_ED_SEPSIS` has exactly ONE returning SELECT. The parser must
+  decide this too.
+- **11 of the 12 single-statement files have NO conditions at all** —
+  pure projections from one view. A conditions-only skeleton renders
+  them as a bare lead line: grounded, and substantively empty. The
+  decoy class at FILE scale. File description must therefore compose
+  from what it PRODUCES and FROM WHAT, not from conditions alone.
+- **22 of 28 files carry an author `Description:` header** (6 have
+  none). Strict same-line capture is required: a blank-line-tolerant
+  regex silently swallowed the NEXT field and attributed
+  `USP_ED_SEPSIS` a description its author left empty. `Revision
+  Detail` also has a column header literally named "Description".
+  The header text is often operational ("Used by PBI IP Sepsis
+  Dashboard") — quotable as the author's words, never presentable as
+  our derived description.
+- **True provenance needs the file's own temp tables subtracted**
+  (48 base tables for `USP_ED_SEPSIS` once its 33 own `#temp`s are
+  removed; 1-2 for the thin wrappers).
+No code was written for DESC-FILE-1; this is reconnaissance only.
