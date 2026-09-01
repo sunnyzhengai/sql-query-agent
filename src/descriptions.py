@@ -148,8 +148,11 @@ _CLAIM_STOPWORDS = frozenset(
 # (the alias-never-faces-the-steward rule from CONSOLE-4c).
 # real estates read TEMP TABLES (#Staging) and bracketed identifiers
 # as often as plain names (P0-c corpus find on Clarity-shaped SQL)
+# READS only. INTO/UPDATE name a WRITE TARGET, not a source — a
+# SELECT…INTO #X does not read #X, and listing it made a step
+# appear to read itself (DESC-TEMP-1 live find).
 _FROM_TABLES = re.compile(
-    r"(?is)\b(?:FROM|JOIN|APPLY|INTO|UPDATE)\s+"
+    r"(?is)\b(?:FROM|JOIN|APPLY)\s+"
     r"([#@]?\[?[A-Za-z_][\w]*\]?(?:\.\[?[A-Za-z_][\w]*\]?){0,2})")
 # a CTE name is not a base table — it is defined in the same text
 _CTE_NAMES = re.compile(r"(?is)(?:WITH|,)\s*([A-Za-z_][\w]*)\s+AS\s*\(")

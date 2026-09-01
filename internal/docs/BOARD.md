@@ -73,6 +73,28 @@ order; nothing skips ahead.
       organism names, verified absent from source). Bar moved
       from "true" to "true AND concrete AND purpose-free";
       reporting the honest number. Sample ready for read #3.
+- [x] **DESC-TEMP-1 BUILT (08-31 dev)** — temp-table staged
+      steps (`SELECT…INTO #X`, `INSERT INTO #X`) now harvest
+      through ScriptDom: **26 steps/5 procs → 413 steps/15
+      procs**. Three false-violation defects fixed: write targets
+      counted as READS (a step read itself), a `--limit`ed run
+      reporting itself as COVERAGE ("2 of 28" when the harvester
+      reaches 15), and `--limit` taking a contiguous head (60
+      steps from 2 procs). Coverage is now measured over the
+      whole corpus, and the cap is stratified.
+      **Stratified 60-step sample: 30 clean · 17 recovered · 2
+      salvaged · 11 emptied.**
+- [ ] **PARKED FOR SUNNY — the word "table" empties true
+      descriptions.** 3 of the sampled empties had NO other
+      violation: grounded, true sentences about steps that
+      literally write a temp table, killed by the vocabulary
+      rule. A VOICE ruling, not a dev call — lands with review's
+      open a/b/c on empties. Pinned `TestTempStepVoiceCost`.
+- [ ] **PARKED FOR SUNNY — DESC-WHOLE-1: 13 of 28 procs get NO
+      description.** They are single-SELECT report procs (no CTE,
+      no temp staging — verified per file). 46% of the estate is
+      silent. Whole-proc description is NEW capability, so it is
+      not built here. Pinned `TestDescWhole1Gap`.
 - [ ] ~~P0-c blocked~~ (resolved by the option-(a) ruling):
       the "790-proc corpus" is the WORK estate (Epic Clarity) —
       the separation wall forbids it here, and 790 was always a

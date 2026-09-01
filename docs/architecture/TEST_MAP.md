@@ -7,7 +7,7 @@
 
 # Test Map — what every test proves
 
-118 modules, 1373 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
+118 modules, 1375 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
 
 ## By ADR
 
@@ -94,7 +94,7 @@
 
 ### law:honesty-floor — honesty 1.00 is a build-stopper, never a metric
 
-- `tests/test_grounding_gate.py` (33): The grounding gate — acceptance fixtures are the REAL production
+- `tests/test_grounding_gate.py` (35): The grounding gate — acceptance fixtures are the REAL production
 
 ## By executable contract
 

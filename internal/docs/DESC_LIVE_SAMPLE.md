@@ -4,149 +4,329 @@
 
 For each: the generated description, the fragment it describes, and the PARSED FACTS the gate checked it against. Grade the DESCRIPTION, not the rates.
 
-## USP_ED_SEPSIS.sql · ABX
-*outcome: clean* · parsed tables: #allmeds, config_value_set, med_mix_components, medications, ref_generic_med · parsed grain: order, visit
+## USP_ED_SEPSIS.sql · #Pressors
+*outcome: clean* · parsed tables: grouper_med_records · parsed grain: visit
 
 **Description**
 
-This SQL selects encounters with antibiotic administration times.
+This SQL selects encounters related to specific medications administered during a defined time frame.
 
-- TAKEN_TIME must be less than ED_DEPARTURE_TIME.
-- MEDICATION_ID must be in a list derived from medications with mixtures that include antibiotics, where AGENT_ORDER equals 1.
-- THERA_CLASS_CODE must equal 11.
+- Encounter IDs are included where the TAKEN_TIME falls between ADT_ARRIVAL_TIME and ED_DEPARTURE_TIME.
+- Only medications with GROUPER_IDs of '8000100', '8000101', '8000102', '8000103', and '8000104' are considered.
+- The TAKEN_TIME is ordered to create a timeline for each encounter, with distinct entries based on ENCOUNTER_ID.
 
 **Fragment**
 
 ```sql
-ABX AS 
+SELECT DISTINCT	-- reduce cardinality
 
-(
+	ENCOUNTER_ID
 
-	SELECT
+	, TAKEN_TIME
 
-		ENCOUNTER_ID
+	, MEDICATION_NAME
 
-		, ORDER_MED_ID
+	, ROW_NUMBER() OVER(PARTITION BY ENCOUNTER_ID ORDER BY TAKEN_TIME) AS TIME_LINE
 
-		, TAKEN_TIME AS ABX_ADMIN_TIME
+INTO #Pressors 
 
-		, MEDICATION_NAME
+FROM #AllMeds
 
+	INNER JOIN [dbo].GROUPER_MED_RECORDS VCG ON [#AllMeds].MEDICATION_ID = [VCG].EXP_MEDS_LIST_ID
 
+WHERE 1=1
 
-	FROM #AllMeds
+	AND TAKEN_TIME BETWEEN ADT_ARRIVAL_TIME AND ED_DEPARTURE_TIME
 
+	AND [VCG].GROUPER_ID IN ('8000100'		-- HS RX EPINEPHRINE SEPSIS
 
+							, '8000101'		-- HS RX DOPAMINE SEPSIS
 
-	WHERE 1=1
+							, '8000102'		-- HS RX DOBUTAMINE SEPSIS
 
-		AND TAKEN_TIME < ED_DEPARTURE_TIME	-- including prior to "Arrival"
+							, '8000103'		-- HS RX MILRINONE SEPSIS
 
-		AND MEDICATION_ID IN 
+							, '8000104'		-- HS RX NOREPINEPHRINE SEPSIS
 
-			(
+						)
 
-				-- mixtures with antibiotics
-
-				select medlist.MEDICATION_ID
-
-					from
-
-						(
-
-							SELECT 
-
-								RXM.MEDICATION_ID
-
-								--,RXM.NAME
-
-								--,cntl.VALUE_SET_DISPLAY as AGENT
-
-								--,case when CHARINDEX('^',cntl.VALUE_SET_ABBR)>0 then SUBSTRING(cntl.VALUE_SET_ABBR,0,CHARINDEX('^',cntl.VALUE_SET_ABBR)) else cntl.VALUE_SET_ABBR end as AGENT_GROUP
-
-								--,case when cntl.VALUE_SET_ABBR like '%^Y' then 1 else 0 end as DOT_MONITORING
-
-								--,gen.TITLE
-
-								,ROW_NUMBER() OVER(PARTITION BY RXM.MEDICATION_ID ORDER BY [cntl].VALUE_SET_ABBR, [cntl].VALUE_SET_DISPLAY ASC) AS AGENT_ORDER
-
-
-
-							FROM [dbo].MEDICATIONS RXM
-
-								OUTER APPLY (
-
-									--Get the main medication's simple generic if its a mixture
-
-									SELECT TOP 1 
-
-										mix.DRUG_ID,
-
-										comp.SIMPLE_GENERIC_CODE 
-
-									FROM [dbo].MED_MIX_COMPONENTS mix
-
-										INNER JOIN [dbo].MEDICATIONS comp ON mix.DRUG_ID = comp.MEDICATION_ID
-
-									WHERE 1=1
-
-										AND mix.TYPE_CODE = 3 -- Medications 
-
-										AND mix.MEDICATION_ID = RXM.MEDICATION_ID
-
-									ORDER BY
-
-										mix.LINE
-
-								) mixture
-
-
-
-								INNER JOIN [dbo].REF_GENERIC_MED		gen ON gen.SIMPLE_GENERIC_CODE = COALESCE(RXM.SIMPLE_GENERIC_CODE, mixture.SIMPLE_GENERIC_CODE)
-
-								INNER JOIN [reports].CONFIG_VALUE_SET cntl ON cntl.VALUE_SET_ID=3016 AND cntl.CODE = gen.SIMPLE_GENERIC_CODE
-
-						) medlist
-
-					WHERE
-
-						medlist.AGENT_ORDER=1						
-
-			)
-
-
-
-	UNION
-
-
-
-	SELECT DISTINCT
-
-		ENCOUNTER_ID
-
-		, ORDER_MED_ID
-
-		, TAKEN_TIME AS ABX_ADMIN_TIME
-
-		, MEDICATION_NAME
-
-
-
-	FROM #AllMeds
-
-
-
-	WHERE 1=1
-
-		AND THERA_CLASS_CODE = 11 --Antibiotics
-
-		AND TAKEN_TIME < ED_DEPARTURE_TIME	-- including prior to "Arrival"
-
-)
+;
 ```
 
-## USP_ED_SEPSIS.sql · AllCultures
-*outcome: emptied* · parsed tables: #labs_and_cultures, organisms · parsed grain: order, visit
+## USP_IP_SEPSIS.sql · #MedGroupers
+*outcome: clean* · parsed tables: grouper_groups · parsed grain: (unknown)
+
+**Description**
+
+Records of groupers identified by the GROUPER_ID.
+
+- Inclusion is determined by the GROUPER_ID value of '800011'.
+- No other values are specified for inclusion.
+
+**Fragment**
+
+```sql
+SELECT vcg.GROUPER_LIST VCG_ID
+
+	INTO #MedGroupers
+
+	FROM [dbo].[GROUPER_GROUPS] vcg
+
+	WHERE vcg.GROUPER_ID IN ('800011')
+```
+
+## USP_IP_SEPSIS.sql · #RouteExclusions
+*outcome: clean* · parsed tables: config_grouper_categories · parsed grain: (unknown)
+
+**Description**
+
+This SQL selects records of category IDs.
+
+- The category ID must be from the GROUPER_ID '800008'.
+- The category ID can also be the literal value '11'.
+
+**Fragment**
+
+```sql
+SELECT vcg.LIST_CAT_VALUE_CODE CAT_ID
+
+	INTO #RouteExclusions
+
+	FROM [dbo].[CONFIG_GROUPER_CATEGORIES] vcg
+
+	WHERE vcg.GROUPER_ID IN ('800008')
+
+	UNION 
+
+	SELECT '11'
+```
+
+## USP_IP_SepsisDetails.sql · #BolusMeds
+*outcome: clean* · parsed tables: grouper_compiled_list · parsed grain: (unknown)
+
+**Description**
+
+This SQL selects bolus medication records.
+
+- Compiled context must be 'MEDS'.
+- Base grouper ID must be '800009'.
+
+**Fragment**
+
+```sql
+SELECT vcg.GROUPER_RECORDS_NUMERIC_ID MED_ID
+
+	INTO #BolusMeds
+
+	FROM [dbo].[GROUPER_COMPILED_LIST] vcg
+
+	WHERE vcg.COMPILED_CONTEXT = 'MEDS'
+
+	AND vcg.BASE_GROUPER_ID IN ('800009')
+```
+
+## USP_IP_SepsisDetails.sql · #RouteExclusions
+*outcome: clean* · parsed tables: config_grouper_categories · parsed grain: (unknown)
+
+**Description**
+
+This SQL selects records of category IDs.
+
+- The category ID must be from the GROUPER_ID '800008'.
+- The category ID can also be the literal value '11'.
+
+**Fragment**
+
+```sql
+SELECT vcg.LIST_CAT_VALUE_CODE CAT_ID
+
+	INTO #RouteExclusions
+
+	FROM [dbo].[CONFIG_GROUPER_CATEGORIES] vcg
+
+	WHERE vcg.GROUPER_ID IN ('800008')
+
+	UNION 
+
+	SELECT '11'
+```
+
+## USP_IP_SepsisEncounters.sql · #Base_Pop_ENC_Reason
+*outcome: clean* · parsed tables: diagnoses, encounter_diagnoses · parsed grain: visit
+
+**Description**
+
+This SQL selects encounters with associated diagnoses.
+
+- Inclusion is determined by encounters with an ID present in the ENCOUNTER_ID field.
+- Only diagnoses with a LINE value of 1 or greater are included.
+- The diagnoses are aggregated into a single string, separated by ' % ', with names drawn from the DX_NAME field.
+
+**Fragment**
+
+```sql
+SELECT DISTINCT cat.ENCOUNTER_ID
+
+	, STRING_AGG(DIAG.DX_NAME,  ' % ') AS [AllEncReasons]
+
+INTO #Base_Pop_ENC_Reason
+
+FROM #MainAdmDetails cat
+
+INNER JOIN [dbo].[ENCOUNTER_DIAGNOSES] EDX ON EDX.ENCOUNTER_ID = cat.ENCOUNTER_ID AND EDX.LINE >= 1
+
+INNER JOIN [dbo].[DIAGNOSES] DIAG ON DIAG.DX_ID = EDX.DX_ID
+
+GROUP BY cat.ENCOUNTER_ID
+```
+
+## USP_IP_SepsisEncounters.sql · #MainAdmDetails
+*outcome: salvaged* · parsed tables: calendar_dates, departments, hospital_encounters, hospital_transactions, locations, patient_demographics_race, patients, ref_discharge_disposition, ref_ethnic_group, ref_patient_race · parsed grain: patient, visit
+
+**Description**
+
+This SQL selects inpatient admission details.
+
+- Service dates must fall between @dStartDate and @dEndDate.
+- Location must have a null POS_TYPE.
+
+**Fragment**
+
+```sql
+SELECT DISTINCT
+
+	HE.ENCOUNTER_ID
+
+	, HE.PATIENT_ID
+
+	, pat.PATIENT_MRN
+
+	, pat.PATIENT_NAME
+
+	, REG.NAME AS [Ethnic Group]
+
+	, RPR.NAME AS [Race]
+
+	, HE.INPATIENT_DATA_ID
+
+	, HE.ADT_ARRIVAL_TIME
+
+	, HE.HOSP_ADMSN_TIME
+
+	, HE.HOSP_DISCH_TIME
+
+	, HE.INP_ADM_DATE
+
+	, HE.ED_DEPARTURE_TIME
+
+	, RDD.NAME AS [Disposition]
+
+	, loc.LOCATION_ABBR [Location]
+
+	, DATEDIFF(MM,pat.BIRTH_DATE,HE.HOSP_ADMSN_TIME) AS AGE_MONTHS
+
+	, FLOOR(DATEDIFF(DD,pat.BIRTH_DATE,HE.HOSP_ADMSN_TIME)/365.25) AS AGE_YEARS
+
+	, DATENAME(month, CONVERT(DATE,HE.HOSP_ADMSN_TIME)) + DATENAME(YEAR, CONVERT(DATE, HE.HOSP_ADMSN_TIME)) AS Admit_Date_stamp
+
+	, DATENAME(month, CONVERT(DATE,HE.HOSP_DISCH_TIME)) + DATENAME(YEAR, CONVERT(DATE, HE.HOSP_DISCH_TIME)) AS Disch_Date_stamp
+
+	, DATEDIFF(HH, HE.HOSP_ADMSN_TIME, HE.HOSP_DISCH_TIME) AS LOS_HRS
+
+	, CONVERT(DATE, pat.BIRTH_DATE) BIRTH_DATE
+
+INTO #MainAdmDetails
+
+FROM [dbo].[HOSPITAL_TRANSACTIONS] htr
+
+INNER JOIN [dbo].[CALENDAR_DATES] sd ON sd.CALENDAR_DT = CONVERT(DATE, htr.SERVICE_DATE)
+
+INNER JOIN [dbo].[HOSPITAL_ENCOUNTERS] HE ON htr.ENCOUNTER_ID = HE.ENCOUNTER_ID
+
+INNER JOIN [dbo].[PATIENTS] pat ON pat.PATIENT_ID = HE.PATIENT_ID
+
+LEFT OUTER JOIN [dbo].[REF_DISCHARGE_DISPOSITION] RDD ON RDD.DISCH_DISP_CODE = HE.DISCH_DISP_CODE
+
+LEFT OUTER JOIN [dbo].[REF_ETHNIC_GROUP] REG ON REG.ETHNIC_GROUP_CODE = pat.ETHNIC_GROUP_CODE
+
+LEFT OUTER JOIN [dbo].[PATIENT_DEMOGRAPHICS_RACE] race ON race.PATIENT_ID = pat.PATIENT_ID AND race.LINE = 1
+
+LEFT OUTER JOIN [dbo].[REF_PATIENT_RACE] RPR ON RPR.PATIENT_RACE_CODE = race.PATIENT_RACE_CODE
+
+LEFT OUTER JOIN [dbo].[DEPARTMENTS] dep ON dep.DEPARTMENT_ID = HE.DEPARTMENT_ID
+
+LEFT OUTER JOIN [dbo].[LOCATIONS] loc ON loc.LOC_ID = dep.REV_LOC_ID
+
+WHERE HE.INP_ADM_DATE IS NOT NULL  /*date time of inpatient admission*/
+
+AND sd.CALENDAR_DT BETWEEN @dStartDate AND @dEndDate /*Service data of a charge*/
+
+AND loc.POS_TYPE IS NULL
+```
+
+first pass violated: ungrounded filter claim: '- Inclusion requires that HE.INP_ADM_DATE is not null.'
+
+## USP_IP_SepsisPatientDates.sql · #Base_PopTemp
+*outcome: recovered* · parsed tables: config_value_set, ip_sepsisencounterswlocations · parsed grain: patient, visit
+
+**Description**
+
+This SQL selects encounters related to inpatient data for sepsis.
+
+- Inclusion is determined by the ADTDepartmentID being in the value set with ID 3031.
+- The InDepartmentTime and OutDepartmentTime must be recorded.
+- The ENCORDER must be present, and the PatientID must be distinct.
+
+**Fragment**
+
+```sql
+SELECT DISTINCT
+
+	main.[PATENCENCID] ENCOUNTER_ID
+
+	, main.[PatientID] PATIENT_ID
+
+	, main.[InpatientDataID] INPATIENT_DATA_ID
+
+	, main.InpatientDataID INP_ADM_DATE
+
+	, main.[ADTDepartmentID] ADT_DEPARTMENT_ID
+
+	, main.[ADTDepartmentName] ADT_DEPARTMENT_NAME
+
+	, cvs.CODE_DESC AS DEPARTMENT_ROLLUP
+
+	, main.[InDepartmentTime] IN_DTTM
+
+	, main.[OutDepartmentTime] OUT_DTTM
+
+	, main.BirthDate BIRTH_DATE
+
+	, main.[ADTArrivalTime] ADT_ARRIVAL_TIME
+
+	, main.[EDDepartureTime] ED_DEPARTURE_TIME
+
+	, CONVERT(DATE, main.[InDepartmentTime]) InDeptDate
+
+	, CONVERT(DATE, main.[OutDepartmentTime]) OutDeptDate
+
+	, main.ENCORDER [ENC_ID Order]
+
+	, main.UniqueRow
+
+INTO #Base_PopTemp
+
+FROM [reporting].[IP_SepsisEncountersWLocations] main
+
+INNER JOIN [reports].[CONFIG_VALUE_SET] cvs ON cvs.CODE = main.[ADTDepartmentID]
+
+			AND cvs.VALUE_SET_ID = 3031
+```
+
+first pass violated: technical vocabulary in a business description: 'dataset' — say what is included, not how the SQL assembles it
+
+## USP_IP_SepsisPatientDates.sql · #MainAdmDetails
+*outcome: emptied* · parsed tables: ip_sepsisencounters · parsed grain: patient, visit
 
 **Description**
 
@@ -155,950 +335,200 @@ _(emptied — nothing grounded survived)_
 **Fragment**
 
 ```sql
-AllCultures AS
+SELECT DISTINCT
 
-(
+	[PATENCENCID] ENCOUNTER_ID
 
-	SELECT
+	, [PatientID] PATIENT_ID
 
-		ENCOUNTER_ID
+	, [PATIENTMRN] PATIENT_MRN
 
-		, ORDER_PROC_ID
+	, [PatientName] PATIENT_NAME
 
-		, MBOrderTime
+	, [EthnicGroup] [Ethnic Group]
 
-		, RESULT_TIME
+	, [Race] [Race]
 
-		, CollectionTime
+	, [InpatientDataID] INPATIENT_DATA_ID
 
-		, ORD_VALUE
+	, [ADTArrivalTime] ADT_ARRIVAL_TIME
 
-		, CRITICAL_VALUE_01
+	, [HospAdmsnTime] HOSP_ADMSN_TIME
 
-		, CULTURE_TYPE
+	, [HospDischTime] HOSP_DISCH_TIME
 
-		, LRR_BASED_ORGAN_ID
+	, [InpAdmDate] INP_ADM_DATE
 
-		, [ORGANISMS].EXTERNAL_NAME AS [OrganismName]
+	, [EDDepartureTime] ED_DEPARTURE_TIME
 
-		
+	, [Disposition] [Disposition]
 
-	FROM #Labs_and_Cultures
+	, [Location] [Location]
 
-		LEFT JOIN [dbo].ORGANISMS ON [#Labs_and_Cultures].LRR_BASED_ORGAN_ID = [ORGANISMS].ORGANISM_ID
+	, [AgeMonths] AGE_MONTHS
 
+	, [AgeYears] AGE_YEARS
 
+	, [LosHours] LOS_HRS
 
-	WHERE CULTURE_TYPE IS NOT NULL
+	, [BirthDate] BIRTH_DATE
 
-)
+INTO #MainAdmDetails
+
+FROM [reporting].[IP_SepsisEncounters]
 ```
 
-first pass violated: technical vocabulary in a business description: 'table' — say what is included, not how the SQL assembles it
+first pass violated: ungrounded value: '1001' not in the SQL; ungrounded value: '2000' not in the SQL; ungrounded value: 'Hispanic' not in the SQL; ungrounded value: 'Unknown' not in the SQL; ungrounded value: 'Discharged' not in the SQL; ungrounded value: 'Admitted' not in the SQL; ungrounded value: 'Non-Hispanic' not 
 
-## USP_ED_SEPSIS.sql · All_LDAs
-*outcome: clean* · parsed tables: #base_pop, config_value_set, line_device_airway · parsed grain: (unknown)
+## USP_IP_SepsisScreeningAudit.sql · #FlwshtLst
+*outcome: recovered* · parsed tables: flowsheet_measurements, flowsheet_records · parsed grain: visit
 
 **Description**
 
-Records of LDA placements.
+This SQL selects encounters with associated measurements.
 
-- Inclusion is determined by FLO_MEAS_ID values: '900112', '900111', or a VALUE_SET_ID of 3022.
-- A placement time is recorded.
-- The placement time falls between ADT_ARRIVAL_TIME and ED_DEPARTURE_TIME.
+- Includes measurements where the FLO_MEAS_ID is in a specified list.
+- The recorded time falls between the In Dept Date and Out Dept Date.
+- The encounter ID is associated with inpatient data.
 
 **Fragment**
 
 ```sql
-All_LDAs AS
+SELECT main.ENCOUNTER_ID
 
-(
+		, meas.FLO_MEAS_ID
 
-	SELECT
+		, meas.RECORDED_TIME
 
-		[#Base_Pop].ENCOUNTER_ID
+		, meas.MEAS_VALUE
 
-		, IP_LDA_ID
+		, meas.FSD_ID
 
-		, FLO_MEAS_ID
+		, main.[In Dept Date] [IN_DTTM]
 
-		, PLACEMENT_INSTANT
+		, main.[Out Dept Date] [OUT_DTTM]
 
-		, [CVS].VALUE_SET_ID
+		, main.ADT_DEPARTMENT_ID [Documented Department ID]
 
+		, main.ADT_DEPARTMENT_NAME [Documented Department]
 
+		, CAST(meas.RECORDED_TIME AS DATE) AS [Score Date]
 
-		, CASE
+		, main.[ENC_ID Order]
 
-			WHEN FLO_MEAS_ID IN ('900112') THEN 'ETT'
+		, ROW_NUMBER() OVER(PARTITION BY main.ENCOUNTER_ID ORDER BY main.[ENC_ID Order], RECORDED_TIME) AS [ENC_ID Overall Score Order]
 
-			WHEN FLO_MEAS_ID IN ('900111') THEN 'IV'
+		, main.[Unique Row]
 
-			WHEN [CVS].VALUE_SET_ID IN (3022) THEN 'CVL'
+	INTO #FlwshtLst
 
-		  END AS LDA_PLACEMENT_TYPE
+	FROM #Base_Pop main
 
+	INNER JOIN [dbo].[FLOWSHEET_RECORDS] rec ON main.INPATIENT_DATA_ID = rec.INPATIENT_DATA_ID
 
+	INNER JOIN [dbo].[FLOWSHEET_MEASUREMENTS] meas ON rec.FSD_ID = meas.FSD_ID AND meas.FLO_MEAS_ID IN (SELECT * FROM #ODScores)
 
-	FROM #Base_Pop
-
-		INNER JOIN [dbo].LINE_DEVICE_AIRWAY LNA ON LNA.ENCOUNTER_ID = [#Base_Pop].ENCOUNTER_ID
-
-		LEFT JOIN (
-
-			SELECT DISTINCT VALUE_SET_ID, CODE
-
-			FROM [reports].CONFIG_VALUE_SET
-
-			WHERE VALUE_SET_ID = 3022	-- SEPSIS_CVL_PLACEMENT [3022]
-
-		) CVS ON LNA.FLO_MEAS_ID = [CVS].CODE
-
-
-
-	WHERE 1=1
-
-		AND PLACEMENT_INSTANT IS NOT NULL
-
-		AND PLACEMENT_INSTANT BETWEEN ADT_ARRIVAL_TIME AND ED_DEPARTURE_TIME
-
-		AND (
-
-				FLO_MEAS_ID IN ('900112'	-- LDA HS IP ETT
-
-								,'900111'	-- LDA HS IP PERIPHERAL IV
-
-								)
-
-				OR [CVS].VALUE_SET_ID = 3022	-- SEPSIS_CVL_PLACEMENT
-
-
-
-			)
-
-)
+	WHERE meas.RECORDED_TIME BETWEEN main.[In Dept Date] AND main.[Out Dept Date]
 ```
 
-## USP_ED_SEPSIS.sql · NegativeCultures
-*outcome: clean* · parsed tables: — · parsed grain: visit
+first pass violated: technical object in a business description: '#ODScores' — the source object is carried by the relationship, not the sentence
+
+## USP_IP_SepsisScreeningAudit.sql · #FlwshtLstHuddleODScore
+*outcome: recovered* · parsed tables: flowsheet_measurements, flowsheet_records · parsed grain: visit
 
 **Description**
 
-NegativeCultures selects encounters with specific culture types that have no positive critical values.
+This SQL selects encounters with specific measurements.
 
-- Inclusion requires MAX(CRITICAL_VALUE_01) = 0.
-- Encounter_ID and CULTURE_TYPE must be grouped together.
-- The minimum MBOrderTime and CollectionTime are recorded.
+- Includes measurements with FLO_MEAS_IDs: '9000002705', '9000002732', '9000002733', '9000002706', '9000002734', '9000002707'.
+- MEAS_VALUE must be present (not NULL).
+- Recorded time of measurements must fall between the In Dept Date and Out Dept Date.
 
 **Fragment**
 
 ```sql
-NegativeCultures AS
+SELECT main.ENCOUNTER_ID
+
+	, meas.FSD_ID
+
+	, meas.FLO_MEAS_ID
+
+	, meas.RECORDED_TIME
+
+	, meas.MEAS_VALUE
+
+	, flo.[ENC_ID Overall Score Order]
+
+	, main.[Unique Row]
+
+INTO #FlwshtLstHuddleODScore
+
+FROM #Base_Pop main
+
+INNER JOIN [dbo].[FLOWSHEET_RECORDS] rec ON main.INPATIENT_DATA_ID = rec.INPATIENT_DATA_ID
+
+INNER JOIN [dbo].[FLOWSHEET_MEASUREMENTS] meas ON rec.FSD_ID = meas.FSD_ID 
+
+	AND meas.FLO_MEAS_ID in ('9000002705','9000002732','9000002733','9000002706','9000002734','9000002707')
+
+	AND meas.MEAS_VALUE IS NOT NULL
+
+OUTER APPLY 
 
 (
 
-	SELECT
+	SELECT MAX(flo.[ENC_ID Overall Score Order]) [ENC_ID Overall Score Order]
 
-		ENCOUNTER_ID
+	FROM #FlwshtLst flo 
 
-		, CULTURE_TYPE
+	WHERE  flo.ENCOUNTER_ID = main.ENCOUNTER_ID 
 
+	AND flo.RECORDED_TIME <= meas.RECORDED_TIME
 
+) flo
 
-		, MIN(MBOrderTime)		AS [MBOrderTime]
+WHERE meas.RECORDED_TIME BETWEEN main.[In Dept Date] AND main.[Out Dept Date]
 
-		, MIN(CollectionTime)	AS [CollectionTime]
-
-
-
-		, 'Negative' AS [OrganismList]
-
-
-
-	FROM AllCultures
-
-	GROUP BY ENCOUNTER_ID, CULTURE_TYPE
-
-	HAVING MAX(CRITICAL_VALUE_01) = 0	-- only where no positives
-
-)
+ORDER BY main.ENCOUNTER_ID, meas.RECORDED_TIME
 ```
 
-## USP_ED_SEPSIS.sql · OrderMetricIDs
-*outcome: recovered* · parsed tables: #base_pop, order_tracking_metrics · parsed grain: order, visit
+first pass violated: selected-not-filtered: '- Only includes measurements where MEAS_VALUE is not NULL.' — the concept appears only in the SELECT list, never in a condition
+
+## USP_IP_SepsisScreeningAudit.sql · #ODScores
+*outcome: clean* · parsed tables: grouper_compiled_list · parsed grain: (unknown)
 
 **Description**
 
-OrderMetricIDs selects encounters with associated order metrics.
+This SQL selects records identified by the GROUPER_RECORDS_NUMERIC_ID.
 
-- ORDER_DTTM falls between ADT_ARRIVAL_TIME and ED_DEPARTURE_TIME.
-- Encounter_ID must match between ORDER_TRACKING_METRICS and the source.
-- ORDER_ID and PRL_ORDERSET_ID are included without specific values listed.
+- The COMPILED_CONTEXT must be 'FLO'.
+- The BASE_GROUPER_ID must be '800006'.
 
 **Fragment**
 
 ```sql
-OrderMetricIDs AS
+SELECT vcg.GROUPER_RECORDS_NUMERIC_ID FLO_ID
 
-(
+	INTO #ODScores
 
-	SELECT
+	FROM [dbo].[GROUPER_COMPILED_LIST] vcg
 
-		[#Base_Pop].ENCOUNTER_ID
+	WHERE vcg.COMPILED_CONTEXT = 'FLO'
 
-		, ORDER_ID
-
-		, ORDER_DTTM
-
-		, PRL_ORDERSET_ID
-
-	FROM #Base_Pop
-
-		INNER JOIN [dbo].ORDER_TRACKING_METRICS ON [ORDER_TRACKING_METRICS].ENCOUNTER_ID = [#Base_Pop].ENCOUNTER_ID
-
-	WHERE [ORDER_TRACKING_METRICS].ORDER_DTTM BETWEEN [#Base_Pop].ADT_ARRIVAL_TIME AND [#Base_Pop].ED_DEPARTURE_TIME
-
-)
+	AND vcg.BASE_GROUPER_ID IN ('800006')
 ```
 
-first pass violated: technical vocabulary in a business description: 'table' — say what is included, not how the SQL assembles it; technical vocabulary in a business description: 'table' — say what is included, not how the SQL assembles it
-
-## USP_ED_SEPSIS.sql · PositiveCultures
-*outcome: recovered* · parsed tables: — · parsed grain: visit
+## USP_IP_SepsisShiftCompliance.sql · #Base_PopTemp
+*outcome: emptied* · parsed tables: config_value_set, ip_sepsisencounterswlocations · parsed grain: patient, visit
 
 **Description**
 
-PositiveCultures selects encounters with positive culture results.
-
-- Inclusion requires MAX(CRITICAL_VALUE_01) = 1, indicating any positives.
-- The selection includes ENCOUNTER_ID and CULTURE_TYPE.
-- OrganismList contains organism names aggregated with a semicolon, with a minimum of one organism listed, and the lowest value is 'Critical Value'.
+_(emptied — nothing grounded survived)_
 
 **Fragment**
 
 ```sql
-PositiveCultures AS
-
-(
-
-	SELECT
-
-		ENCOUNTER_ID
-
-		, CULTURE_TYPE
-
-
-
-		, MIN(MBOrderTime)		AS [MBOrderTime]
-
-		, MIN(CollectionTime)	AS [CollectionTime]
-
-
-
-		, COALESCE(STRING_AGG(OrganismName, '; ') WITHIN GROUP(ORDER BY LRR_BASED_ORGAN_ID), 'Critical Value') AS [OrganismList]
-
-
-
-	FROM AllCultures
-
-	GROUP BY ENCOUNTER_ID, CULTURE_TYPE
-
-	HAVING MAX(CRITICAL_VALUE_01) = 1	-- any positives
-
-)
-```
-
-first pass violated: ungrounded value: '100' not in the SQL
-
-## USP_ED_SEPSIS.sql · SSOrderSetOSQ_PRL
-*outcome: clean* · parsed tables: medication_orders_ext, procedure_orders_ext · parsed grain: order, visit
-
-**Description**
-
-This is a selection of encounters related to specific order sets.
-
-- Includes encounters with an ORDER_DTTM and an ORD_OSQ_ID of 400002, 400007, 400003, 400004, 400006, 400005, or 4001326025.
-- Includes encounters where the PRL_ORDERSET_ID is 400001 or 4001326023.
-- The selection is based on the presence of an ORDER_ID in the MEDICATION_ORDERS_EXT or PROCEDURE_ORDERS_EXT tables.
-
-**Fragment**
-
-```sql
-SSOrderSetOSQ_PRL AS
-
-(
-
-	-- OSQ
-
-	SELECT
-
-		[OrderMetricIDs].ENCOUNTER_ID
-
-		, [OrderMetricIDs].ORDER_DTTM
-
-		, [MEDICATION_ORDERS_EXT].ORD_OSQ_ID AS PRL_ORDERSET_ID
-
-	FROM OrderMetricIDs
-
-		INNER JOIN [dbo].MEDICATION_ORDERS_EXT ON [OrderMetricIDs].ORDER_ID = [MEDICATION_ORDERS_EXT].ORDER_ID AND [MEDICATION_ORDERS_EXT].ORD_OSQ_ID IN (400002,400007,400003,400004,400006,400005,4001326025)
-
-
-
-	UNION
-
-
-
-		SELECT
-
-			[OrderMetricIDs].ENCOUNTER_ID
-
-			, [OrderMetricIDs].ORDER_DTTM
-
-			, [PROCEDURE_ORDERS_EXT].ORD_OSQ_ID AS PRL_ORDERSET_ID
-
-		FROM OrderMetricIDs
-
-			INNER JOIN [dbo].PROCEDURE_ORDERS_EXT ON [OrderMetricIDs].ORDER_ID =  [PROCEDURE_ORDERS_EXT].ORDER_ID AND [PROCEDURE_ORDERS_EXT].ORD_OSQ_ID IN (400002,400007,400003,400004,400006,400005,4001326025)
-
-
-
-	UNION
-
-
-
-		SELECT
-
-			[OrderMetricIDs].ENCOUNTER_ID
-
-			, [OrderMetricIDs].ORDER_DTTM
-
-			, [OrderMetricIDs].PRL_ORDERSET_ID
-
-		FROM OrderMetricIDs
-
-		-- see VCG 800018 -- HS BI SEPSIS PRL ORDERSETS (the entire Grouper is used by SSS Severe Sepsis; ED Sepsis only uses ED-specific PRLs)
-
-		WHERE [OrderMetricIDs].PRL_ORDERSET_ID IN (400001, 4001326023) -- Sepsis Pathway [400001]; HS ED ONCOLOGY SEPSIS RN PROTOCOL OPA [4001326023]
-
-)
-```
-
-## USP_ED_SEPSIS.sql · Systolic
-*outcome: clean* · parsed tables: #flowsheets · parsed grain: visit
-
-**Description**
-
-This SQL selects encounters with recorded blood pressure measurements.
-
-- Inclusion requires a FLO_MEAS_ID of '95'.
-- Recorded time must fall between ADT_ARRIVAL_TIME and ED_DEPARTURE_TIME.
-- Hypotension status is determined by systolic blood pressure values: less than 56 for ages under 2 months, less than 65 for ages under 6 months, less than 70 for ages under 12 months, less than 70 for ages up to 13 years, and less than 100 for ages over 13 years.
-
-**Fragment**
-
-```sql
-Systolic AS
-
-(
-
-	SELECT
-
-		ENCOUNTER_ID
-
-		, RECORDED_TIME
-
-
-
-		, TRY_CONVERT(INTEGER, LEFT(MEAS_VALUE, CHARINDEX('/', MEAS_VALUE)-1)) AS HYPOTENSIVE_SYSTOLIC_BP
-
-
-
-		-- policy as of 2025-11-05 per Stakeholder A
-
-		, CASE	WHEN AGE_MONTHS < 2 AND CONVERT(INTEGER, LEFT(MEAS_VALUE, CHARINDEX('/', MEAS_VALUE)-1)) < 56 THEN 'Y'
-
-				WHEN AGE_MONTHS < 6 AND CONVERT(INTEGER, LEFT(MEAS_VALUE, CHARINDEX('/', MEAS_VALUE)-1)) < 65 THEN 'Y'
-
-				WHEN AGE_MONTHS < 12 AND CONVERT(INTEGER, LEFT(MEAS_VALUE, CHARINDEX('/', MEAS_VALUE)-1)) < 70 THEN 'Y'
-
-				WHEN AGE_YEARS <= 13 AND CONVERT(INTEGER, LEFT(MEAS_VALUE, CHARINDEX('/', MEAS_VALUE)-1)) < 70 THEN 'See BP percentile'
-
-				WHEN AGE_YEARS > 13 AND CONVERT(INTEGER, LEFT(MEAS_VALUE, CHARINDEX('/', MEAS_VALUE)-1)) < 100 THEN 'Y'
-
-		 END AS HYPOTENSION_Y
-
-
-
-	FROM #Flowsheets
-
-	WHERE 1=1
-
-		AND FLO_MEAS_ID = '95'	-- Blood pressure
-
-		AND RECORDED_TIME BETWEEN ADT_ARRIVAL_TIME AND ED_DEPARTURE_TIME
-
-)
-```
-
-## USP_ED_SEPSIS.sql · TimeOrdered_LDAs
-*outcome: clean* · parsed tables: — · parsed grain: visit
-
-**Description**
-
-This SQL selects TimeOrdered_LDAs.
-
-- Includes encounters with specific ENCOUNTER_IDs and LDA_PLACEMENT_TYPE values.
-- The TIME_LINE is determined by the PLACEMENT_INSTANT, ordered chronologically.
-- The SQL captures all records where a placement time is recorded.
-
-**Fragment**
-
-```sql
-TimeOrdered_LDAs AS
-
-(
-
-
-
-SELECT *
-
-	, ROW_NUMBER() OVER(PARTITION BY ENCOUNTER_ID, LDA_PLACEMENT_TYPE ORDER BY PLACEMENT_INSTANT) AS TIME_LINE
-
-FROM All_LDAs
-
-)
-```
-
-## USP_ED_SEPSIS.sql · TimeOrdered_Labs
-*outcome: clean* · parsed tables: #labs_and_cultures · parsed grain: visit
-
-**Description**
-
-This SQL selects encounters with lab tests.
-
-- Includes encounters where LAB_TEST_TYPE is not null.
-- Assigns a TIME_LINE based on the order of MBOrderTime, partitioned by ENCOUNTER_ID and LAB_TEST_TYPE.
-- The TIME_LINE values range from 1 to the maximum number of lab tests per encounter, with the lowest value being 1.
-
-**Fragment**
-
-```sql
-TimeOrdered_Labs AS
-
-(
-
-	SELECT *
-
-		, ROW_NUMBER() OVER(PARTITION BY ENCOUNTER_ID, LAB_TEST_TYPE ORDER BY MBOrderTime ASC) AS TIME_LINE
-
-	FROM #Labs_and_Cultures
-
-	WHERE LAB_TEST_TYPE IS NOT NULL
-
-)
-```
-
-## USP_IP_SEPSIS.sql · FlwshtProp
-*outcome: clean* · parsed tables: #base_pop, #prophylaxisflo, flowsheet_measurements, flowsheet_records · parsed grain: (unknown)
-
-**Description**
-
-This SQL selects records of measurements.
-
-- Inclusion is determined by FLO_MEAS_ID values: '9000613042', '9000613043', '9000613044', '9000613045', '9000613047', '9000613048', '9000613050'.
-- RECORDED_TIME must be present and not null.
-
-**Fragment**
-
-```sql
-FlwshtProp AS
-
-(
-
-SELECT meas.FSD_ID
-
-	, meas.Recorded_Time
-
-FROM #Base_Pop base
-
-INNER JOIN [dbo].[FLOWSHEET_RECORDS] rec ON rec.INPATIENT_DATA_ID = base.INPATIENT_DATA_ID
-
-INNER JOIN [dbo].[FLOWSHEET_MEASUREMENTS] meas ON meas.FSD_ID = rec.FSD_ID
-
-/*Developer C VCG Grouper 800014 (SELECT * FROM #ProphylaxisFLO)*/
-
-WHERE FLO_MEAS_ID IN ('9000613042','9000613043','9000613044','9000613045','9000613047','9000613048','9000613050')
-
-AND RECORDED_TIME IS NOT NULL
-
-)
-```
-
-## USP_IP_SEPSIS.sql · dateCTE
-*outcome: clean* · parsed tables: #base_poptemp, datecte · parsed grain: patient, visit
-
-**Description**
-
-This SQL selects patient encounter records.
-
-- Inclusion is determined by the condition that `inDeptRN = 1`.
-- The `DEPARTMENT_ROLLUP` must not be in ('ER', 'P-ER').
-- The `In Shift` must be either 'AM' or 'PM', and the `Out Shift Date` must be greater than or equal to the `In Shift Date`.
-
-**Fragment**
-
-```sql
-dateCTE AS
-
-(
-
-	SELECT ENCOUNTER_ID
-
-		, [In Shift Date] [Expansion Start Date]
-
-		, [In Shift] [Expansion Start Shift]
-
-		, [Out Shift Date] [Expansion End Date]
-
-		, [Out Shift] [Expansion End Shift]
-
-		, [In Shift Date] [Expansion Date]
-
-		, IN_DTTM [InDepartmentTime]
-
-		, OUT_DTTM [OutDepartmentTime]
-
-		, CASE WHEN [In Shift] = 'AM' AND [Out Shift Date] >= [In Shift Date] THEN 2
-
-			ELSE 1
-
-		END [Shifts per Day]
-
-		, CASE WHEN [In Shift] = 'AM' AND [Out Shift Date] <> [In Shift Date] THEN 1
-
-			ELSE 0
-
-		END [AM Denom]
-
-		, CASE WHEN [In Shift] = 'PM' THEN 1
-
-			WHEN [In Shift Date] <> [Out Shift Date] THEN 1
-
-			ELSE 0
-
-		END [PM Denom]
-
-		, ADT_DEPARTMENT_ID
-
-		, ADT_DEPARTMENT_NAME
-
-		, PATIENT_ID
-
-		, DEPARTMENT_ROLLUP
-
-		, INPATIENT_DATA_ID
-
-		, BIRTH_DATE
-
-		, 1 [In Record]
-
-		, CASE WHEN [In Shift Date] = [Out Shift Date] THEN 1 ELSE 0 END [Out Record]
-
-		, [ENC_ID Order]
-
-	FROM #Base_PopTemp
-
-	WHERE inDeptRN = 1
-
-	AND DEPARTMENT_ROLLUP NOT IN ('ER', 'P-ER')
-
-	UNION ALL 
-
-	SELECT ENCOUNTER_ID
-
-		, d.[Expansion Start Date]
-
-		, d.[Expansion Start Shift]
-
-		, d.[Expansion End Date]
-
-		, d.[Expansion End Shift]
-
-		, DATEADD(d, 1, d.[Expansion Date]) [Expansion Date]
-
-		, d.[InDepartmentTime]
-
-		, d.[OutDepartmentTime]
-
-		, CASE WHEN DATEADD(d, 1, d.[Expansion Date]) = d.[Expansion End Date] AND d.[Expansion End Shift] = 'AM' THEN 1
-
-			ELSE 2
-
-		END [Shifts per Day]
-
-		, CASE WHEN DATEADD(d, 1, d.[Expansion Date]) = d.[Expansion End Date] AND d.[Expansion End Shift] = 'AM' THEN 1
-
-			WHEN DATEADD(d, 1, d.[Expansion Date]) BETWEEN d.[Expansion Start Date] AND d.[Expansion End Date] THEN 1
-
-			ELSE 0
-
-		END [AM Denom]
-
-		, CASE WHEN DATEADD(d, 1, d.[Expansion Date]) = d.[Expansion End Date] AND d.[Expansion End Shift] = 'PM' THEN 1
-
-			WHEN DATEADD(d, 1, d.[Expansion Date]) <> d.[Expansion End Date] THEN 1
-
-			ELSE 0
-
-		END [PM Denom]
-
-		, d.ADT_DEPARTMENT_ID
-
-		, d.ADT_DEPARTMENT_NAME
-
-		, d.PATIENT_ID
-
-		, d.DEPARTMENT_ROLLUP
-
-		, d.INPATIENT_DATA_ID
-
-		, BIRTH_DATE
-
-		, CASE WHEN DATEADD(d, 1, d.[Expansion Date]) = d.[Expansion Start Date] THEN 1 ELSE 0 END  [In Record]
-
-		, CASE WHEN DATEADD(d, 1, d.[Expansion Date]) = d.[Expansion End Date] THEN 1 ELSE 0 END [Out Record]
-
-		, [ENC_ID Order]
-
-	FROM dateCTE d 
-
-	WHERE DATEADD(d, 1, d.[Expansion Date]) <= d.[Expansion End Date]
-
-)
-```
-
-## USP_IP_SEPSIS.sql · vaplh
-*outcome: recovered* · parsed tables: #mainadmdetails, adt_events, departments, hospital_encounters · parsed grain: visit
-
-**Description**
-
-This SQL selects encounters with specific admission and transfer events.
-
-- Includes encounters where the EVENT_TYPE_CODE is 1, 3, or 99.
-- Excludes encounters with an EVENT_SUBTYPE_CODE of 2.
-- Requires a valid DEPARTMENT_ID; if absent, it notes '*Department not specified', '*Unknown department', or '*Unnamed department'.
-
-**Fragment**
-
-```sql
-vaplh AS
-
-(
-
-	SELECT 
-
-		adtIn.ENCOUNTER_ID
-
-		, adtIn.EFFECTIVE_TIME AS IN_DTTM
-
-		, COALESCE(adtOut.EFFECTIVE_TIME,GETDATE()) AS OUT_DTTM
-
-		, adtIn.DEPARTMENT_ID AS ADT_DEPARTMENT_ID
-
-		, CASE WHEN adtIn.DEPARTMENT_ID IS NULL THEN '*Department not specified'
-
-			 WHEN dep.DEPARTMENT_ID IS NULL THEN '*Unknown department'
-
-			 WHEN dep.DEPARTMENT_NAME IS NULL THEN '*Unnamed department'
-
-			 ELSE dep.DEPARTMENT_NAME
-
-		END AS ADT_DEPARTMENT_NAME
-
-		, DATEADD(MI, 1140, DATEADD(DD, -1, DATEDIFF(DD, 0, CONVERT(DATE, adtIn.EFFECTIVE_TIME)))) [In Previous PM Start]
-
-		, DATEADD(MI, 419, DATEADD(DD, 0, DATEDIFF(DD, 0, CONVERT(DATE, adtIn.EFFECTIVE_TIME)))) [In Previous PM End]
-
-		, DATEADD(MI, 420, DATEADD(DD, 0, DATEDIFF(DD, 0,  CONVERT(DATE, adtIn.EFFECTIVE_TIME)))) [In AM Start]
-
-		, DATEADD(MI, 1139, DATEADD(DD, 0, DATEDIFF(DD, 0, CONVERT(DATE, adtIn.EFFECTIVE_TIME)))) [In AM End]
-
-		, DATEADD(MI, 1140, DATEADD(DD, 0, DATEDIFF(DD, 0, CONVERT(DATE, adtIn.EFFECTIVE_TIME)))) [In PM Start]
-
-		, DATEADD(MI, 419, DATEADD(DD, 1, DATEDIFF(DD, 0, CONVERT(DATE, adtIn.EFFECTIVE_TIME)))) [In PM End]
-
-		, DATEADD(MI, 1140, DATEADD(DD, -1, DATEDIFF(DD, 0, CONVERT(DATE, COALESCE(adtOut.EFFECTIVE_TIME,GETDATE()))))) [Out Previous PM Start]
-
-		, DATEADD(MI, 419, DATEADD(DD, 0, DATEDIFF(DD, 0, CONVERT(DATE, COALESCE(adtOut.EFFECTIVE_TIME,GETDATE()))))) [Out Previous PM End]
-
-		, DATEADD(MI, 420, DATEADD(DD, 0, DATEDIFF(DD, 0,  CONVERT(DATE, COALESCE(adtOut.EFFECTIVE_TIME,GETDATE()))))) [Out AM Start]
-
-		, DATEADD(MI, 1139, DATEADD(DD, 0, DATEDIFF(DD, 0, CONVERT(DATE, COALESCE(adtOut.EFFECTIVE_TIME,GETDATE()))))) [Out AM End]
-
-		, DATEADD(MI, 1140, DATEADD(DD, 0, DATEDIFF(DD, 0, CONVERT(DATE, COALESCE(adtOut.EFFECTIVE_TIME,GETDATE()))))) [Out PM Start]
-
-		, DATEADD(MI, 419, DATEADD(DD, 1, DATEDIFF(DD, 0, CONVERT(DATE, COALESCE(adtOut.EFFECTIVE_TIME,GETDATE()))))) [Out PM End]
-
-	FROM #MainAdmDetails ENCS
-
-	INNER JOIN [dbo].[HOSPITAL_ENCOUNTERS] HENC ON ENCS.ENCOUNTER_ID = HENC.ENCOUNTER_ID /*Developer C minimize to ENC_ID's we are looking at*/
-
-	INNER JOIN [dbo].[ADT_EVENTS] adtIn ON adtIn.ENCOUNTER_ID = HENC.ENCOUNTER_ID
-
-	LEFT OUTER JOIN [dbo].[ADT_EVENTS] adtOut ON adtIn.NEXT_OUT_EVENT_ID = adtOut.EVENT_ID
-
-	LEFT OUTER JOIN [dbo].[DEPARTMENTS] dep ON adtIn.DEPARTMENT_ID = dep.DEPARTMENT_ID
-
-	WHERE adtIn.EVENT_TYPE_CODE IN (1, 3, 99) /*Only look at "in" events (Admission and Transfer In, LOA Return)*/
-
-	AND adtIn.EVENT_SUBTYPE_CODE <> 2 /*Exclude deleted/canceled events*/
-
-)
-```
-
-first pass violated: purpose speculation: 'ensuring' in '- Includes encounters with a DEPARTMENT_ID that is not NULL,' — say WHAT is included and on WHAT VALUES; why is the steward's to write
-
-## USP_IP_SepsisPatientDates.sql · dateCTE
-*outcome: clean* · parsed tables: #base_poptemp, datecte · parsed grain: patient, visit
-
-**Description**
-
-This SQL selects patient encounters.
-
-- Inclusion is determined by the DEPARTMENT_ROLLUP not being in ('ER', 'P-ER').
-- The EXPANSION DATE must be less than or equal to the EXPANSION END DATE.
-- A placement time is recorded for each encounter.
-
-**Fragment**
-
-```sql
-dateCTE AS
-
-(
-
-	SELECT ENCOUNTER_ID
-
-		, InDeptDate [Expansion Date]
-
-		, OutDeptDate [Expansion End Date]
-
-		, IN_DTTM [InDepartmentTime]
-
-		, OUT_DTTM [OutDepartmentTime]
-
-		, ADT_DEPARTMENT_ID
-
-		, ADT_DEPARTMENT_NAME
-
-		, PATIENT_ID
-
-		, DEPARTMENT_ROLLUP
-
-		, INPATIENT_DATA_ID
-
-		, BIRTH_DATE
-
-		, [ENC_ID Order]
-
-	FROM #Base_PopTemp
-
-	WHERE DEPARTMENT_ROLLUP NOT IN ('ER', 'P-ER')
-
-	UNION ALL 
-
-	SELECT ENCOUNTER_ID
-
-		, DATEADD(d, 1, d.[Expansion Date]) [Expansion Date]
-
-		, d.[Expansion End Date]
-
-		, d.[InDepartmentTime]
-
-		, d.[OutDepartmentTime]
-
-		, d.ADT_DEPARTMENT_ID
-
-		, d.ADT_DEPARTMENT_NAME
-
-		, d.PATIENT_ID
-
-		, d.DEPARTMENT_ROLLUP
-
-		, d.INPATIENT_DATA_ID
-
-		, BIRTH_DATE
-
-		, [ENC_ID Order]
-
-	FROM dateCTE d 
-
-	WHERE DATEADD(d, 1, d.[Expansion Date]) <= d.[Expansion End Date]
-
-)
-```
-
-## USP_IP_SepsisShiftCompliance.sql · dateCTE
-*outcome: clean* · parsed tables: #base_poptemp, datecte · parsed grain: patient, visit
-
-**Description**
-
-This SQL selects patient encounter records.
-
-- Inclusion requires that `inDeptRN` equals 1.
-- The `DEPARTMENT_ROLLUP` must not be in ('ER', 'P-ER').
-- The `In Shift` must be either 'AM' or 'PM', and the `Out Shift Date` must be greater than or equal to the `In Shift Date`.
-
-**Fragment**
-
-```sql
-dateCTE AS
-
-(
-
-	SELECT ENCOUNTER_ID
-
-		, [In Shift Date] [Expansion Start Date]
-
-		, [In Shift] [Expansion Start Shift]
-
-		, [Out Shift Date] [Expansion End Date]
-
-		, [Out Shift] [Expansion End Shift]
-
-		, [In Shift Date] [Expansion Date]
-
-		, IN_DTTM [InDepartmentTime]
-
-		, OUT_DTTM [OutDepartmentTime]
-
-		, CASE WHEN [In Shift] = 'AM' AND [Out Shift Date] >= [In Shift Date] THEN 2
-
-			ELSE 1
-
-		END [Shifts per Day]
-
-		, CASE WHEN [In Shift] = 'AM' AND [Out Shift Date] <> [In Shift Date] THEN 1
-
-			ELSE 0
-
-		END [AM Denom]
-
-		, CASE WHEN [In Shift] = 'PM' THEN 1
-
-			WHEN [In Shift Date] <> [Out Shift Date] THEN 1
-
-			ELSE 0
-
-		END [PM Denom]
-
-		, ADT_DEPARTMENT_ID
-
-		, ADT_DEPARTMENT_NAME
-
-		, PATIENT_ID
-
-		, DEPARTMENT_ROLLUP
-
-		, INPATIENT_DATA_ID
-
-		, BIRTH_DATE
-
-		, 1 [In Record]
-
-		, CASE WHEN [In Shift Date] = [Out Shift Date] THEN 1 ELSE 0 END [Out Record]
-
-		, [ENC_ID Order]
-
-		, [Unique Row]
-
-	FROM #Base_PopTemp
-
-	WHERE inDeptRN = 1
-
-	AND DEPARTMENT_ROLLUP NOT IN ('ER', 'P-ER')
-
-	UNION ALL 
-
-	SELECT ENCOUNTER_ID
-
-		, d.[Expansion Start Date]
-
-		, d.[Expansion Start Shift]
-
-		, d.[Expansion End Date]
-
-		, d.[Expansion End Shift]
-
-		, DATEADD(d, 1, d.[Expansion Date]) [Expansion Date]
-
-		, d.[InDepartmentTime]
-
-		, d.[OutDepartmentTime]
-
-		, CASE WHEN DATEADD(d, 1, d.[Expansion Date]) = d.[Expansion End Date] AND d.[Expansion End Shift] = 'AM' THEN 1
-
-			ELSE 2
-
-		END [Shifts per Day]
-
-		, CASE WHEN DATEADD(d, 1, d.[Expansion Date]) = d.[Expansion End Date] AND d.[Expansion End Shift] = 'AM' THEN 1
-
-			WHEN DATEADD(d, 1, d.[Expansion Date]) BETWEEN d.[Expansion Start Date] AND d.[Expansion End Date] THEN 1
-
-			ELSE 0
-
-		END [AM Denom]
-
-		, CASE WHEN DATEADD(d, 1, d.[Expansion Date]) = d.[Expansion End Date] AND d.[Expansion End Shift] = 'PM' THEN 1
-
-			WHEN DATEADD(d, 1, d.[Expansion Date]) <> d.[Expansion End Date] THEN 1
-
-			ELSE 0
-
-		END [PM Denom]
-
-		, d.ADT_DEPARTMENT_ID
-
-		, d.ADT_DEPARTMENT_NAME
-
-		, d.PATIENT_ID
-
-		, d.DEPARTMENT_ROLLUP
-
-		, d.INPATIENT_DATA_ID
-
-		, BIRTH_DATE
-
-		, CASE WHEN DATEADD(d, 1, d.[Expansion Date]) = d.[Expansion Start Date] THEN 1 ELSE 0 END  [In Record]
-
-		, CASE WHEN DATEADD(d, 1, d.[Expansion Date]) = d.[Expansion End Date] THEN 1 ELSE 0 END [Out Record]
-
-		, [ENC_ID Order]
-
-		, [Unique Row]
-
-	FROM dateCTE d 
-
-	WHERE DATEADD(d, 1, d.[Expansion Date]) <= d.[Expansion End Date]
-
-)
-```
-
-## USP_IP_SepsisShiftCompliance.sql · vaplh
-*outcome: recovered* · parsed tables: ip_sepsisencounterswlocations · parsed grain: visit
-
-**Description**
-
-This SQL selects encounters.
-
-- Encounter IDs are included as recorded in the [PATENCENCID] field.
-- In-department times must be present, as indicated by the [InDepartmentTime] field.
-- Out-department times must be present or default to the current date and time, as indicated by the [OutDepartmentTime] field.
-
-**Fragment**
-
-```sql
-vaplh AS
+WITH vaplh AS
 
 (
 
@@ -1143,25 +573,166 @@ vaplh AS
 	FROM [reporting].[IP_SepsisEncountersWLocations] enc
 
 )
+
+
+
+SELECT DISTINCT
+
+	main.ENCOUNTER_ID
+
+	, main.PATIENT_ID
+
+	, vaplh.ADT_DEPARTMENT_ID
+
+	, vaplh.ADT_DEPARTMENT_NAME
+
+	, cvs.CODE_DESC AS DEPARTMENT_ROLLUP
+
+	, vaplh.IN_DTTM
+
+	, vaplh.OUT_DTTM
+
+	, main.INPATIENT_DATA_ID
+
+	, main.BIRTH_DATE
+
+	, main.ADT_ARRIVAL_TIME
+
+	, main.ED_DEPARTURE_TIME
+
+	, CONVERT(DATE, vaplh.IN_DTTM) InDeptDate
+
+	, CONVERT(DATE, vaplh.OUT_DTTM) OutDeptDate
+
+	, CASE WHEN vaplh.IN_DTTM between vaplh.[In Previous PM Start] AND [In Previous PM End] THEN CONVERT(DATE, [In Previous PM Start])
+
+		ELSE CONVERT(DATE, [In AM Start])
+
+	END [In Shift Date]
+
+	, CASE WHEN vaplh.IN_DTTM between [In AM Start] AND [In AM End] THEN 'AM'
+
+		ELSE 'PM'
+
+	END [In Shift]
+
+	
+
+	, CASE WHEN vaplh.OUT_DTTM between vaplh.[Out Previous PM Start] AND [Out Previous PM End] THEN CONVERT(DATE, [Out Previous PM Start])
+
+		ELSE CONVERT(DATE, [Out AM Start])
+
+	END [Out Shift Date]
+
+	, CASE WHEN vaplh.OUT_DTTM between [Out AM Start] AND [Out AM End] THEN 'AM'
+
+		ELSE 'PM'
+
+	END [Out Shift]
+
+	, [Out Previous PM Start]
+
+	, [Out Previous PM End] 
+
+	, ROW_NUMBER() OVER (PARTITION BY main.ENCOUNTER_ID, vaplh.IN_DTTM ORDER BY vaplh.IN_DTTM, vaplh.OUT_DTTM) [inDeptRN]
+
+	, ROW_NUMBER() OVER (PARTITION BY main.ENCOUNTER_ID ORDER BY vaplh.IN_DTTM, vaplh.OUT_DTTM ) [ENC_ID Order]
+
+	, vaplh.[Unique Row]
+
+INTO #Base_PopTemp
+
+FROM #MainAdmDetails main
+
+INNER JOIN  vaplh ON vaplh.ENCOUNTER_ID = main.ENCOUNTER_ID AND vaplh.ADT_DEPARTMENT_ID IS NOT NULL /*[dbo].V_PATIENT_LOCATION_HISTORY*/
+
+INNER JOIN [reports].[CONFIG_VALUE_SET] cvs ON cvs.CODE = vaplh.ADT_DEPARTMENT_ID
+
+			AND cvs.VALUE_SET_ID = 3031
 ```
 
-first pass violated: ungrounded value: '1000' not in the SQL
+first pass violated: technical vocabulary in a business description: 'table' — say what is included, not how the SQL assembles it
 
-## USP_RPTS_ED_Sepsis.sql · ABX
-*outcome: clean* · parsed tables: #base_pop, config_value_set, med_admin_records, med_mix_components, medication_orders, medications, or, previous, ref_generic_med · parsed grain: order, visit
+## USP_IP_SepsisShiftCompliance.sql · #FlwshtLst
+*outcome: recovered* · parsed tables: flowsheet_measurements, flowsheet_records · parsed grain: visit
 
 **Description**
 
-This SQL selects administered antibiotics for encounters.
+This SQL selects encounters with specific measurements.
 
-- Administered antibiotics must have a taken time that is not null and occurs before the ED departure time.
-- The medication route code must be 11 (IV only).
-- The MAR action code must be one of the following: '1', '7', '102', '105', '113', '114', '115', '122', '124', '132', '143', '1604', '1605', '1607', '6', '99'.
+- Includes measurements where FLO_MEAS_ID is in a defined list.
+- Includes recorded times that fall between the shift start and shift end.
+- Includes documented department IDs that match the ADT_DEPARTMENT_ID from the source. 
+
+The recorded time must also be between the IN_DTTM and OUT_DTTM for the encounter.
 
 **Fragment**
 
 ```sql
-ABX AS
+SELECT ENCOUNTER_ID, FLO_MEAS_ID, RECORDED_TIME, MEAS_VALUE, FSD_ID, [Documented Department ID], [Documented Department], [ENC_ID Overall Order]
+
+INTO #FlwshtLst
+
+FROM (
+
+	SELECT main.ENCOUNTER_ID
+
+		, meas.FLO_MEAS_ID
+
+		, meas.RECORDED_TIME
+
+		, meas.MEAS_VALUE
+
+		, meas.FSD_ID
+
+		, bpt.IN_DTTM
+
+		, bpt.OUT_DTTM
+
+		, bpt.ADT_DEPARTMENT_ID [Documented Department ID]
+
+		, bpt.ADT_DEPARTMENT_NAME [Documented Department]
+
+		, main.[ENC_ID Order]
+
+		, main.[Unit Order]
+
+		, main.[ENC_ID Overall Order]
+
+		, ROW_NUMBER() OVER(PARTITION BY main.ENCOUNTER_ID, main.[ENC_ID Order], main.[Unit Order] ORDER BY [Shift Start], RECORDED_TIME) AS RowNum
+
+	FROM #Base_Pop main
+
+	INNER JOIN [dbo].[FLOWSHEET_RECORDS] rec ON main.INPATIENT_DATA_ID = rec.INPATIENT_DATA_ID
+
+	INNER JOIN [dbo].[FLOWSHEET_MEASUREMENTS] meas ON rec.FSD_ID = meas.FSD_ID AND meas.FLO_MEAS_ID IN (SELECT * FROM #ODScores)
+
+	INNER JOIN #Base_PopTemp bpt ON bpt.ENCOUNTER_ID = main.ENCOUNTER_ID AND meas.RECORDED_TIME BETWEEN bpt.IN_DTTM AND bpt.OUT_DTTM AND main.[ENC_ID Order] = bpt.[ENC_ID Order]
+
+	WHERE meas.RECORDED_TIME BETWEEN main.[Shift Start] AND main.[Shift End]
+
+) a
+
+WHERE a.RowNum = 1
+```
+
+first pass violated: technical object in a business description: '#ODScores' — the source object is carried by the relationship, not the sentence; technical object in a business description: '#Base_PopTemp' — the source object is carried by the relationship, not the sentence
+
+## USP_RPTS_ED_Sepsis.sql · #BasePopABX
+*outcome: clean* · parsed tables: config_value_set, med_admin_records, med_mix_components, medication_orders, medications, or, previous, ref_generic_med · parsed grain: order, visit
+
+**Description**
+
+This SQL selects encounters with administered antibiotics.
+
+- Inclusion requires that the medication administration time is recorded and falls before the patient's ED departure time.
+- Only intravenous medications are included, as indicated by a medication route code of 11.
+- The administration must have a MAR action code of '1', '7', '102', '105', '113', '114', '115', '122', '124', '132', '143', '1604', '1605', '1607', '6', or '99'.
+
+**Fragment**
+
+```sql
+WITH ABX AS
 
 (
 
@@ -1376,267 +947,32 @@ SELECT
 								)
 
 )
+
+
+
+SELECT
+
+	ABX.ENCOUNTER_ID
+
+	,ABX.ORDER_MED_ID
+
+	,ABX.NAME
+
+	,ABX.ABX_ADMIN_TIME
+
+	,ROW_NUMBER() OVER(PARTITION BY ABX.ENCOUNTER_ID ORDER BY ABX.ABX_ADMIN_TIME) TIME_LINE
+
+
+
+INTO #BasePopABX
+
+FROM ABX						
+
+;
 ```
 
-## USP_RPTS_ED_Sepsis.sql · BloodCultureResults
-*outcome: clean* · parsed tables: #base_pop, lab_order_results, organisms, procedure_orders · parsed grain: order, visit
-
-**Description**
-
-Blood culture results for encounters.
-
-- Order procedure IDs must be in (600003, 600004, 600011, 600012).
-- Order time must be between ADT arrival time and ED departure time.
-- Critical value flag must be in (2, 218).
-
-**Fragment**
-
-```sql
-BloodCultureResults AS
-
-(
-
-	SELECT
-
-		B.ENCOUNTER_ID
-
-		, PO.ORDER_PROC_ID
-
-		, PO.ORDER_TIME
-
-		, RESULTS.RESULT_TIME
-
-		, RESULTS.COMP_OBS_INST_TM
-
-		, RESULTS.ORD_VALUE
-
-		, CASE WHEN RESULTS.RESULT_FLAG_CODE IN (2, 218) THEN 1 ELSE 0 END AS CRITICAL_VALUE_01		-- Abnormal or Critical
-
-		, RESULTS.LRR_BASED_ORGAN_ID
-
-		, [ORGANISMS].EXTERNAL_NAME
-
-
-
-	FROM #Base_Pop B
-
-
-
-		INNER JOIN [dbo].LAB_ORDER_RESULTS RESULTS ON B.ENCOUNTER_ID = RESULTS.ENCOUNTER_ID
-
-		INNER JOIN [dbo].PROCEDURE_ORDERS	 PO		 ON RESULTS.ORDER_PROC_ID = PO.ORDER_PROC_ID 
-
-														AND PO.PROC_ID IN (600003,600004,600011,600012)	-- 'LAB001', 'NUR001', 'LAB012', 'LAB011'
-
-
-
-		LEFT JOIN [dbo].ORGANISMS ON [RESULTS].LRR_BASED_ORGAN_ID = [ORGANISMS].ORGANISM_ID
-
-
-
-	WHERE (PO.ORDER_TIME BETWEEN B.ADT_ARRIVAL_TIME AND B.ED_DEPARTURE_TIME)
-
-)
-```
-
-## USP_RPTS_ED_Sepsis.sql · CsfCultureResults
-*outcome: clean* · parsed tables: #base_pop, lab_order_results, organisms, procedure_orders · parsed grain: order, visit
-
-**Description**
-
-CsfCultureResults — a selection of lab order results related to encounters.
-
-- Includes ORDER_PROC_ID values of 600005, 600006, and 600002.
-- Includes SPECIMEN_SOURCE_CODE of 304.
-- Includes RESULT_FLAG_CODE values of 2 and 218, indicating abnormal or critical results.
-- The ORDER_TIME must fall between ADT_ARRIVAL_TIME and ED_DEPARTURE_TIME.
-
-**Fragment**
-
-```sql
-CsfCultureResults AS 
-
-(
-
-	SELECT
-
-		B.ENCOUNTER_ID
-
-		, PO.ORDER_PROC_ID
-
-		, PO.ORDER_TIME
-
-		, RESULTS.RESULT_TIME
-
-		, RESULTS.COMP_OBS_INST_TM
-
-		, RESULTS.ORD_VALUE
-
-		, RESULTS.RESULT_FLAG_CODE
-
-		, CASE WHEN RESULTS.RESULT_FLAG_CODE IN (2, 218) THEN 1 ELSE 0 END AS CRITICAL_VALUE_01		-- Abnormal or Critical
-
-		, RESULTS.LRR_BASED_ORGAN_ID
-
-		, [ORGANISMS].EXTERNAL_NAME
-
-
-
-	FROM #Base_Pop B
-
-		INNER JOIN [dbo].LAB_ORDER_RESULTS RESULTS ON B.ENCOUNTER_ID = RESULTS.ENCOUNTER_ID
-
-		INNER JOIN [dbo].PROCEDURE_ORDERS	 PO		 ON RESULTS.ORDER_PROC_ID = PO.ORDER_PROC_ID
-
-														AND PO.PROC_ID IN (600005,600006, 600002)		-- 'LAB006', 'LAB007', 'LAB003'
-
-														AND PO.SPECIMEN_SOURCE_CODE=304				-- Lumber puncture
-
-
-
-		LEFT JOIN [dbo].ORGANISMS ON [RESULTS].LRR_BASED_ORGAN_ID = [ORGANISMS].ORGANISM_ID
-
-
-
-	WHERE (PO.ORDER_TIME BETWEEN B.ADT_ARRIVAL_TIME AND B.ED_DEPARTURE_TIME)
-
-)
-```
-
-## USP_RPTS_ED_Sepsis.sql · NegativeCultures
-*outcome: clean* · parsed tables: — · parsed grain: visit
-
-**Description**
-
-NegativeCultures selects encounters with specific criteria.
-
-- Encounter_ID is included.
-- The minimum ORDER_TIME is recorded.
-- The minimum COMP_OBS_INST_TM is recorded.
-- The maximum CRITICAL_VALUE_01 equals 0.
-
-**Fragment**
-
-```sql
-NegativeCultures AS
-
-(
-
-	SELECT
-
-		ENCOUNTER_ID
-
-
-
-		, MIN(ORDER_TIME)		AS [MBOrderTime]
-
-		, MIN(COMP_OBS_INST_TM)	AS [CollectionTime]
-
-
-
-		, 'Negative' AS [OrganismList]
-
-
-
-	FROM BloodCultureResults
-
-	GROUP BY ENCOUNTER_ID
-
-	HAVING MAX(CRITICAL_VALUE_01) = 0
-
-)
-```
-
-## USP_RPTS_ED_Sepsis.sql · NegativeCultures
-*outcome: clean* · parsed tables: — · parsed grain: visit
-
-**Description**
-
-NegativeCultures selects encounters with no growth or contamination.
-
-- Encounter_ID is included.
-- The minimum ORDER_TIME is recorded.
-- The minimum COMP_OBS_INST_TM is recorded.
-- MAX(CRITICAL_VALUE_01) must equal 0.
-
-**Fragment**
-
-```sql
-NegativeCultures AS
-
-(
-
-	SELECT
-
-		ENCOUNTER_ID
-
-
-
-		, MIN(ORDER_TIME)		AS [MBOrderTime]
-
-		, MIN(COMP_OBS_INST_TM)	AS [CollectionTime]
-
-
-
-		, 'Negative' AS [OrganismList]		-- 'No Growth' or contamination with normal flora
-
-
-
-	FROM UrineCultureResults
-
-	GROUP BY ENCOUNTER_ID
-
-	HAVING MAX(CRITICAL_VALUE_01) = 0
-
-)
-```
-
-## USP_RPTS_ED_Sepsis.sql · NegativeCultures
-*outcome: clean* · parsed tables: — · parsed grain: visit
-
-**Description**
-
-NegativeCultures selects encounters with specific criteria.
-
-- Encounter_ID is included.
-- The minimum ORDER_TIME is recorded.
-- The minimum COMP_OBS_INST_TM is recorded.
-- The maximum CRITICAL_VALUE_01 equals 0.
-
-**Fragment**
-
-```sql
-NegativeCultures AS
-
-(
-
-	SELECT
-
-		ENCOUNTER_ID
-
-
-
-		, MIN(ORDER_TIME)		AS [MBOrderTime]
-
-		, MIN(COMP_OBS_INST_TM)	AS [CollectionTime]
-
-
-
-		, 'Negative' AS [OrganismList]
-
-
-
-	FROM CsfCultureResults
-
-	GROUP BY ENCOUNTER_ID
-
-	HAVING MAX(CRITICAL_VALUE_01) = 0
-
-)
-```
-
-## USP_RPTS_ED_Sepsis.sql · PositiveCultures
-*outcome: emptied* · parsed tables: — · parsed grain: visit
+## USP_RPTS_ED_Sepsis.sql · #Base_Pop
+*outcome: emptied* · parsed tables: departments, ed_encounters_dm, ed_encounters_fact, hospital_encounters, locations, patient_demographics_race, patients, ref_ed_disposition, ref_ethnic_group, ref_patient_race · parsed grain: patient, visit
 
 **Description**
 
@@ -1645,39 +981,95 @@ _(emptied — nothing grounded survived)_
 **Fragment**
 
 ```sql
-PositiveCultures AS
+SELECT DISTINCT
 
-(
+	HE.ENCOUNTER_ID
 
-	SELECT
+	, HE.PATIENT_ID
 
-		ENCOUNTER_ID
+	, PAT.PATIENT_MRN
+
+	, PAT.PATIENT_NAME
+
+	, REG.NAME AS [Ethnic Group]
+
+	, RPR.NAME AS [Race]
+
+	, EEF.AGE_AT_ARRIVAL_MONTHS
+
+	, EEF.AGE_AT_ARRIVAL_YEARS
+
+	, HE.INPATIENT_DATA_ID
+
+	, HE.ADT_ARRIVAL_TIME
+
+	, EED.TRIAGE_START_DTTM
+
+	, EED.TRIAGE_END_DTTM
+
+	, HE.HOSP_ADMSN_TIME
+
+	, HE.HOSP_DISCH_TIME
+
+	, HE.INP_ADM_DATE
+
+	, HE.ED_DEPARTURE_TIME
+
+	, HE.ED_DISPOSITION_CODE
+
+	, REDI.NAME AS [Disposition]
+
+	, LOC.LOCATION_ABBR [Location]
+
+	, FLOOR(DATEDIFF(day,PAT.BIRTH_DATE,HE.ADT_ARRIVAL_TIME)) AS AGE_IN_DAYS ---ADDED V_DEV003 6/15/2023 TKT-007 
+
+	, FLOOR(DATEDIFF(MM,PAT.BIRTH_DATE,COALESCE(HE.ADT_ARRIVAL_TIME,HE.ADT_ARRIVAL_TIME)) ) AS AGE_MONTHS  ---ADDED V_DEV003 6/15/2023 TKT-007  (AGE IN MONTHS IS SHOWING AS 1 WHEN ITS ONLY 2 WEEKS, ETC.)
+
+	, FLOOR(DATEDIFF(DD,PAT.BIRTH_DATE,HE.ADT_ARRIVAL_TIME)/365.25) AS AGE_YEARS
+
+	, DATENAME(month, CONVERT(DATE,HE.ADT_ARRIVAL_TIME)) + DATENAME(YEAR, CONVERT(DATE, HE.ADT_ARRIVAL_TIME)) AS DATE_STAMP
 
 
 
-		, MIN(ORDER_TIME)		AS [MBOrderTime]
-
-		, MIN(COMP_OBS_INST_TM)	AS [CollectionTime]
+INTO #Base_Pop
 
 
 
-		, COALESCE(STRING_AGG(EXTERNAL_NAME, '; ') WITHIN GROUP(ORDER BY LRR_BASED_ORGAN_ID), 'Critical Value') AS [OrganismList]
+FROM [dbo].ED_ENCOUNTERS_FACT EEF
 
 
 
-	FROM BloodCultureResults
+	INNER JOIN [dbo].HOSPITAL_ENCOUNTERS HE ON EEF.ENCOUNTER_ID = HE.ENCOUNTER_ID
 
-	GROUP BY ENCOUNTER_ID
+	INNER JOIN [dbo].ED_ENCOUNTERS_DM EED ON EED.ENCOUNTER_ID = EEF.ENCOUNTER_ID
 
-	HAVING MAX(CRITICAL_VALUE_01) = 1
+	INNER JOIN [dbo].PATIENTS PAT ON PAT.PATIENT_ID = HE.PATIENT_ID
 
-)
+	LEFT OUTER JOIN [dbo].REF_ED_DISPOSITION REDI ON REDI.ED_DISPOSITION_CODE = HE.ED_DISPOSITION_CODE
+
+	LEFT OUTER JOIN [dbo].REF_ETHNIC_GROUP REG ON REG.ETHNIC_GROUP_CODE = PAT.ETHNIC_GROUP_CODE
+
+	LEFT OUTER JOIN [dbo].PATIENT_DEMOGRAPHICS_RACE RACE ON RACE.PATIENT_ID = PAT.PATIENT_ID AND RACE.LINE=1
+
+	LEFT OUTER JOIN [dbo].REF_PATIENT_RACE RPR ON RPR.PATIENT_RACE_CODE = RACE.PATIENT_RACE_CODE
+
+	LEFT OUTER JOIN [dbo].DEPARTMENTS DEP ON DEP.DEPARTMENT_ID = HE.DEPARTMENT_ID
+
+	LEFT OUTER JOIN [dbo].LOCATIONS LOC ON LOC.LOC_ID = DEP.REV_LOC_ID
+
+
+
+WHERE 1=1
+
+	AND EEF.ADT_ARRIVAL_DATE BETWEEN @dStartDate AND @dEndDate
+
+;
 ```
 
-first pass violated: ungrounded value: 'Organism C' not in the SQL; ungrounded value: 'Organism A' not in the SQL; ungrounded value: 'Organism B' not in the SQL
+first pass violated: technical vocabulary in a business description: 'table' — say what is included, not how the SQL assembles it; technical vocabulary in a business description: 'table' — say what is included, not how the SQL assembles it
 
-## USP_RPTS_ED_Sepsis.sql · PositiveCultures
-*outcome: emptied* · parsed tables: — · parsed grain: visit
+## USP_RPTS_ED_Sepsis.sql · #Base_Pop_ENC_Reason
+*outcome: emptied* · parsed tables: encounter_visit_reasons, visit_reasons · parsed grain: visit
 
 **Description**
 
@@ -1686,147 +1078,962 @@ _(emptied — nothing grounded survived)_
 **Fragment**
 
 ```sql
-PositiveCultures AS
+SELECT DISTINCT   CAT.ENCOUNTER_ID,
 
-(
+        STUFF((	SELECT ';' + CONVERT(VARCHAR,VR.REASON_VISIT_NAME)-- AS [text()]
 
-	SELECT
+                FROM #Base_Pop SUB
 
-		ENCOUNTER_ID
+					INNER JOIN [dbo].ENCOUNTER_VISIT_REASONS RSN ON RSN.ENCOUNTER_ID = SUB.ENCOUNTER_ID AND RSN.LINE>1
 
+					INNER JOIN [dbo].VISIT_REASONS VR ON VR.REASON_VISIT_ID = RSN.ENC_REASON_ID
 
+				WHERE
 
-		, MIN(ORDER_TIME)		AS [MBOrderTime]
+                    SUB.ENCOUNTER_ID = CAT.ENCOUNTER_ID
 
-		, MIN(COMP_OBS_INST_TM)	AS [CollectionTime]
+				ORDER BY LINE
 
+                    FOR XML PATH('')
 
+               ), 1, 1, '' )
 
-		, COALESCE(STRING_AGG(EXTERNAL_NAME, '; ') WITHIN GROUP(ORDER BY LRR_BASED_ORGAN_ID), 'Critical Value') AS [OrganismList]
+            AS [AllEncReasons]
 
+INTO #Base_Pop_ENC_Reason
 
+FROM  #Base_Pop CAT
 
-	FROM UrineCultureResults
-
-	GROUP BY ENCOUNTER_ID
-
-	HAVING MAX(CRITICAL_VALUE_01) = 1
-
-)
+;
 ```
 
-first pass violated: ungrounded value: 'P. mirabilis' not in the SQL; ungrounded value: 'E. coli' not in the SQL; ungrounded value: 'K. pneumoniae' not in the SQL
+first pass violated: technical vocabulary in a business description: 'table' — say what is included, not how the SQL assembles it; technical vocabulary in a business description: 'table' — say what is included, not how the SQL assembles it
 
-## USP_RPTS_ED_Sepsis.sql · PositiveCultures
-*outcome: clean* · parsed tables: — · parsed grain: visit
+## USP_RPTS_IP_SEPSIS.sql · #Base_Pop
+*outcome: recovered* · parsed tables: config_value_set, patients · parsed grain: patient, visit
 
 **Description**
 
-This SQL selects encounters with positive cultures.
+This SQL selects patient encounters with specific department assignments.
 
-- Inclusion requires that MAX(CRITICAL_VALUE_01) equals 1.
-- The minimum ORDER_TIME is recorded as [MBOrderTime].
-- The minimum COMP_OBS_INST_TM is recorded as [CollectionTime].
-- The organism list includes EXTERNAL_NAME values aggregated, with a minimum of 'Critical Value' if none are present.
+- Inclusion is determined by the ADT department ID, which can be 200108013 or other values based on the department assignment.
+- The effective time of admission must fall between '2022-03-29' and '2022-06-09' for certain bed IDs: '20010800423011', '20010800423021', '20010800423031', '20010800423041', '20010800423051', '20010800423061', '20010800423071', '20010800423081', '20010800423091', '20010800423101'.
+- Only "in" event types (codes 1 and 3) are considered, excluding event subtype code 2.
 
 **Fragment**
 
 ```sql
-PositiveCultures AS
+SELECT 
 
-(
+	#Main.ENCOUNTER_ID
 
-	SELECT
+	, #Main.PATIENT_ID
 
-		ENCOUNTER_ID
+	, ADT.ADT_DEPARTMENT_ID
 
+	, ADT.ADT_DEPARTMENT_NAME
 
+	, CVS.CODE_DESC AS DEPARTMENT_ROLLUP
 
-		, MIN(ORDER_TIME)		AS [MBOrderTime]
+	, ADT.IN_DTTM
 
-		, MIN(COMP_OBS_INST_TM)	AS [CollectionTime]
+	, ADT.OUT_DTTM
 
+	, #Main.INPATIENT_DATA_ID
 
+	, #Main.AGE_MONTHS
 
-		, COALESCE(STRING_AGG(EXTERNAL_NAME, '; ') WITHIN GROUP(ORDER BY LRR_BASED_ORGAN_ID), 'Critical Value') AS [OrganismList]
+	, #Main.AGE_YEARS
 
+	, #Main.ADT_ARRIVAL_TIME
 
+	, #Main.ED_DEPARTURE_TIME
 
-	FROM CsfCultureResults
+INTO 
 
-	GROUP BY ENCOUNTER_ID
+	#Base_Pop
 
-	HAVING MAX(CRITICAL_VALUE_01) = 1
+FROM #Main
 
-)
+INNER JOIN dbo.PATIENTS PAT ON PAT.PATIENT_ID = #Main.PATIENT_ID
+
+cross apply (
+
+			SELECT
+
+				ADTIN.ENCOUNTER_ID,
+
+				ADTIN.EFFECTIVE_TIME AS IN_DTTM,
+
+				COALESCE(ADTOUT.EFFECTIVE_TIME,GETDATE()) AS OUT_DTTM,
+
+				case when (CONVERT(DATE,ADTIN.EFFECTIVE_TIME) between '2022-03-29' and '2022-06-09')/*******************************************************************
+
+																			NEW_UNIT construction 4/4-6/3:
+
+																			NEW_UNIT patients moved to TCU; TCU patients moved to NICU C BED 1-10
+
+																			*******************************************************************/
+
+						and bed.bed_id in ( '20010800423011',
+
+								'20010800423021',
+
+								'20010800423031',
+
+								'20010800423041',
+
+								'20010800423051',
+
+								'20010800423061',
+
+								'20010800423071',
+
+								'20010800423081',
+
+								'20010800423091',
+
+								'20010800423101'
+
+								)
+
+					then 200108013 else ADTIN.DEPARTMENT_ID end AS ADT_DEPARTMENT_ID,
+
+				case when (CONVERT(DATE,ADTIN.EFFECTIVE_TIME) between '2022-03-29' and '2022-06-09')
+
+						and bed.bed_id in ( '20010800423011',
+
+								'20010800423021',
+
+								'20010800423031',
+
+								'20010800423041',
+
+								'20010800423051',
+
+								'20010800423061',
+
+								'20010800423071',
+
+								'20010800423081',
+
+								'20010800423091',
+
+								'20010800423101'
+
+								)
+
+					then 'MAIN 4 TOWER EAST' else DEP.DEPARTMENT_NAME end ADT_DEPARTMENT_NAME
+
+			FROM
+
+				.HOSPITAL_ENCOUNTERS HENC
+
+				INNER JOIN .ADT_EVENTS ADTIN ON ADTIN.ENCOUNTER_ID = HENC.ENCOUNTER_ID
+
+				LEFT OUTER JOIN .ADT_EVENTS ADTOUT ON ADTIN.NEXT_OUT_EVENT_ID = ADTOUT.EVENT_ID
+
+				LEFT OUTER JOIN .DEPARTMENTS DEP ON ADTIN.DEPARTMENT_ID = DEP.DEPARTMENT_ID
+
+				left outer join .BED_CONFIG bed on bed.BED_STAY_ID = adtin.BED_STAY_ID
+
+			WHERE
+
+				HENC.ENCOUNTER_ID = #Main.ENCOUNTER_ID
+
+				and ADTIN.EVENT_TYPE_CODE IN (1, 3) --Only look at "in" events (Admission and Transfer In, LOA Return)
+
+				AND ADTIN.EVENT_SUBTYPE_CODE <> 2 --Exclude deleted/canceled events
+
+)ADT
+
+INNER JOIN reports.CONFIG_VALUE_SET CVS ON CVS.CODE = ADT.adt_DEPARTMENT_ID
+
+			AND CVS.VALUE_SET_ID = 3031
 ```
 
-## USP_RPTS_ED_Sepsis.sql · UrineCultureResults
-*outcome: recovered* · parsed tables: #base_pop, lab_order_results, organisms, procedure_orders · parsed grain: order, visit
+first pass violated: ungrounded table claim: 'ADT_EVENT_TYPE_CODE' — the fragment reads #main, config_value_set, patients; ungrounded table claim: 'ADT_EVENT_SUBTYPE_CODE' — the fragment reads #main, config_value_set, patients
+
+## USP_RPTS_IP_SEPSIS.sql · #Base_Pop_ENC_Reason
+*outcome: recovered* · parsed tables: diagnoses, encounter_diagnoses · parsed grain: visit
 
 **Description**
 
-Urine culture results for encounters.
+This SQL selects encounters with associated diagnoses.
 
-- Encounter IDs from the LAB_ORDER_RESULTS.
-- Procedure order IDs must be in (600001, 600007, 600008, 600009, 600010).
-- Order time must fall between ADT arrival time and ED departure time. 
-- Critical value flag codes must be in (2, 218). 
-- Organism IDs are linked to the results. 
-- Result times and observation times are recorded.
+- Includes encounters where the LINE value is greater than 1.
+- Aggregates diagnosis names (DX_NAME) for each encounter, separated by '%'.
+- Encounter IDs (ENCOUNTER_ID) are included from the source data.
 
 **Fragment**
 
 ```sql
-UrineCultureResults AS 
+SELECT
 
-(
+	sub.ENCOUNTER_ID,
 
-	SELECT
+	string_agg(DIAG.DX_NAME,'% ') AS [AllEncReasons]
 
-		B.ENCOUNTER_ID
+INTO #Base_Pop_ENC_Reason
 
-		, PO.ORDER_PROC_ID
+FROM  #Main sub
 
-		, PO.ORDER_TIME
+	INNER JOIN dbo.ENCOUNTER_DIAGNOSES EDX ON EDX.ENCOUNTER_ID = SUB.ENCOUNTER_ID AND EDX.LINE>1
 
-		, RESULTS.RESULT_TIME
+	INNER JOIN dbo.DIAGNOSES DIAG ON DIAG.DX_ID = EDX.DX_ID
 
-		, RESULTS.COMP_OBS_INST_TM
-
-		, RESULTS.ORD_VALUE
-
-		, RESULTS.RESULT_FLAG_CODE
-
-		, CASE WHEN RESULTS.RESULT_FLAG_CODE IN (2, 218) THEN 1 ELSE 0 END AS CRITICAL_VALUE_01		-- Abnormal or Critical
-
-		, RESULTS.LRR_BASED_ORGAN_ID
-
-		, [ORGANISMS].EXTERNAL_NAME
-
-
-
-	FROM #Base_Pop B
-
-
-
-		INNER JOIN [dbo].LAB_ORDER_RESULTS RESULTS ON B.ENCOUNTER_ID = RESULTS.ENCOUNTER_ID
-
-		INNER JOIN [dbo].PROCEDURE_ORDERS	 PO		 ON RESULTS.ORDER_PROC_ID = PO.ORDER_PROC_ID 
-
-														AND PO.PROC_ID IN (600001, 600007, 600008, 600009, 600010)	-- 'LAB002', 'LAB008', 'LAB009', 'LAB010', 'POC001'
-
-
-
-		LEFT JOIN [dbo].ORGANISMS ON [RESULTS].LRR_BASED_ORGAN_ID = [ORGANISMS].ORGANISM_ID
-
-
-
-	WHERE (PO.ORDER_TIME BETWEEN B.ADT_ARRIVAL_TIME AND B.ED_DEPARTURE_TIME)
-
-
-
-)
+group by sub.ENCOUNTER_ID
 ```
 
-first pass violated: technical object in a business description: '#Base_Pop' — the source object is carried by the relationship, not the sentence; technical vocabulary in a business description: 'table' — say what is included, not how the SQL assembles it
+first pass violated: technical object in a business description: '#Main' — the source object is carried by the relationship, not the sentence; technical vocabulary in a business description: 'dataset' — say what is included, not how the SQL assembles it
+
+## USP_RPTS_IP_SEPSIS.sql · #Base_Pop_Severe_ED_Scores
+*outcome: recovered* · parsed tables: flowsheet_measurements, flowsheet_records, hospital_encounters · parsed grain: visit
+
+**Description**
+
+This SQL selects encounters related to severe ED scores.
+
+- Includes encounters with specific flow measurement IDs: '9000161709', '9000002613'.
+- Only considers recorded times that are on or before the ED departure time.
+- Includes encounters where the recorded time is ordered by the earliest time, with a row number assigned to each encounter.
+
+**Fragment**
+
+```sql
+SELECT
+
+	BP.ENCOUNTER_ID
+
+	, CEILING(CONVERT(FLOAT,DATEDIFF(MI, BP.ADT_ARRIVAL_TIME,BP.ED_DEPARTURE_TIME))/60) HoursInED--CHECK WITH STEPHANIE ON 
+
+	, BP.ADT_ARRIVAL_TIME
+
+	, FM.MEAS_VALUE
+
+	, FM.RECORDED_TIME
+
+	, BP.ED_DEPARTURE_TIME
+
+	, ROW_NUMBER() OVER(PARTITION BY BP.ENCOUNTER_ID ORDER BY RECORDED_TIME ASC) AS TIME_LINE
+
+INTO 
+
+	#Base_Pop_Severe_ED_Scores 
+
+FROM #Main BP 
+
+	INNER JOIN dbo.HOSPITAL_ENCOUNTERS HE ON HE.ENCOUNTER_ID = BP.ENCOUNTER_ID --and bp.ENCOUNTER_ID=1016405505 
+
+	INNER JOIN dbo.FLOWSHEET_RECORDS FR ON FR.INPATIENT_DATA_ID = HE.INPATIENT_DATA_ID
+
+	INNER JOIN dbo.FLOWSHEET_MEASUREMENTS FM ON FM.FSD_ID = FR.FSD_ID and
+
+		FM.FLO_MEAS_ID IN ('9000161709','9000002613')--SEPSIS SCORE--ADDED NEW ED SEPSIS SCORE 9000002613 ON 10.01.2019
+
+		and (FM.RECORDED_TIME <=  BP.ED_DEPARTURE_TIME)
+```
+
+first pass violated: technical vocabulary in a business description: 'dataset' — say what is included, not how the SQL assembles it
+
+## USP_RPTS_IP_SEPSIS.sql · #Main
+*outcome: emptied* · parsed tables: hospital_encounters, patient_demographics_race, patients, ref_discharge_disposition, ref_ed_disposition, ref_ethnic_group, ref_patient_race, v_hospital_transactions · parsed grain: patient, visit
+
+**Description**
+
+_(emptied — nothing grounded survived)_
+
+**Fragment**
+
+```sql
+SELECT DISTINCT
+
+	HE.ENCOUNTER_ID
+
+	, HE.PATIENT_ID
+
+	, PAT.PATIENT_MRN
+
+	, PAT.PATIENT_NAME
+
+	, REG.NAME AS [Ethnic Group]
+
+	, RPR.NAME AS [Race]
+
+	, HE.INPATIENT_DATA_ID
+
+	, HE.ADT_ARRIVAL_TIME
+
+	, HE.HOSP_ADMSN_TIME
+
+	, HE.HOSP_DISCH_TIME
+
+	, HE.INP_ADM_DATE
+
+	, HE.ED_DEPARTURE_TIME
+
+	, RDD.NAME AS [Disposition]
+
+	, DATEDIFF(MM,PAT.BIRTH_DATE,HE.HOSP_ADMSN_TIME) AS AGE_MONTHS
+
+	, FLOOR(DATEDIFF(DD,PAT.BIRTH_DATE,HE.HOSP_ADMSN_TIME)/365.25) AS AGE_YEARS
+
+	, DATENAME(month, CONVERT(DATE,HE.HOSP_ADMSN_TIME)) + DATENAME(YEAR, CONVERT(DATE, HE.HOSP_ADMSN_TIME)) AS DATE_STAMP
+
+	, DATEDIFF(HH, HE.HOSP_ADMSN_TIME, HE.HOSP_DISCH_TIME) AS LOS_HRS
+
+INTO 
+
+	#Main
+
+FROM dbo.V_HOSPITAL_TRANSACTIONS HTR
+
+	INNER JOIN dbo.HOSPITAL_ENCOUNTERS HE ON HTR.ENCOUNTER_ID = HE.ENCOUNTER_ID
+
+	INNER JOIN dbo.PATIENTS PAT ON PAT.PATIENT_ID = HE.PATIENT_ID
+
+	LEFT OUTER JOIN dbo.REF_DISCHARGE_DISPOSITION RDD ON RDD.DISCH_DISP_CODE = HE.DISCH_DISP_CODE
+
+	LEFT OUTER JOIN dbo.REF_ETHNIC_GROUP REG ON REG.ETHNIC_GROUP_CODE = PAT.ETHNIC_GROUP_CODE
+
+	LEFT OUTER JOIN dbo.PATIENT_DEMOGRAPHICS_RACE RACE ON RACE.PATIENT_ID = PAT.PATIENT_ID AND RACE.LINE=1
+
+	LEFT OUTER JOIN dbo.REF_PATIENT_RACE RPR ON RPR.PATIENT_RACE_CODE = RACE.PATIENT_RACE_CODE
+
+	LEFT OUTER JOIN dbo.REF_ED_DISPOSITION REDI ON REDI.ED_DISPOSITION_CODE = HE.ED_DISPOSITION_CODE
+
+WHERE
+
+	HE.INP_ADM_DATE IS NOT NULL
+
+	AND CONVERT(DATE,HTR.SERVICE_DATE) BETWEEN @dStartDate AND @dEndDate
+```
+
+first pass violated: ungrounded value: '1000' not in the SQL; ungrounded filter claim: '- Inclusion requires that HE.INP_ADM_DATE is not null.'
+
+## USP_RPTS_IP_SEPSIS_COMPLIANCE_BY_SHIFT_NURSES.sql · #Base_Pop_OD_Scores
+*outcome: clean* · parsed tables: config_value_set, flowsheet_measurements, flowsheet_records, fy_date_dimension, providers, treatment_teams · parsed grain: visit
+
+**Description**
+
+This SQL selects patient encounters with sepsis scores and associated nursing staff information.
+
+- Inclusion is determined by the following codes: '9000161711', '9000002644' (Organ Dysfunction Score).
+- A recorded time for the first shift score must fall between 420 and 1139 minutes after the calendar date.
+- A recorded time for the second shift score must fall between 1140 minutes after the calendar date and 419 minutes after the next calendar date.
+- The treatment team must include Registered Nurses (TRTMNT_TEAM_REL_CODE = 2) and Charge Nurses (TRTMNT_TEAM_REL_CODE = 99) for both shifts.
+- The calendar date must match the treatment team's begin date, and the treatment times must fall within specified ranges for each shift.
+
+**Fragment**
+
+```sql
+SELECT
+
+	PD.[PATIENTS]
+
+	, PD.[MRN]
+
+	, PD.ENCOUNTER_ID
+
+	, PD.[IP Admit Time]
+
+	, COALESCE(CVS.CODE_DESC,'Rollup Not Available') AS DEPARTMENT_ROLLUP
+
+	, PD.ADT_DEPARTMENT_ID
+
+	, PD.ADT_DEPARTMENT_NAME
+
+	, PD.Location
+
+	, PD.IN_DTTM
+
+	, PD.OUT_DTTM
+
+	, SEPSIS_1sC0RE.RECORDED_TIME as [Shift 1 Score Time]
+
+	, SEPSIS_2sC0RE.RECORDED_TIME as [Shift 2 Score Time]	
+
+	, SEPSIS_1sC0RE.MEAS_VALUE as [Shift 1 Score]
+
+	, SEPSIS_2sC0RE.MEAS_VALUE as [Shift 2 Score]	
+
+	, DATEADD(MI,420,DATEADD(DD, 0, DATEDIFF(DD, 0, PD.CALENDAR_DT))) AS SHIFT1_START
+
+	, DATEADD(MI,1139,DATEADD(DD, 0, DATEDIFF(DD, 0, PD.CALENDAR_DT))) AS SHIFT1_END
+
+	, DATEADD(MI,419,DATEADD(DD, 1, DATEDIFF(DD, 0, PD.CALENDAR_DT))) AS SHIFT2_END
+
+	, PD.CALENDAR_DT
+
+	, FYDD.HS_FY
+
+	, FYDD.HS_FY_MONTH_NUMBER
+
+	, FYDD.MONTH_NAME
+
+	, FYDD.YEAR
+
+	, LEFT(FYDD.MONTH_NAME, 3 ) AS [Month Short Name]
+
+	, PD.HOSP_DISCH_TIME AS [Discharge Time]
+
+	, DATEADD(MI,719,DATEADD(DD, 0, DATEDIFF(DD, 0, PD.CALENDAR_DT))) as shift1time
+
+	, DATEADD(MI,1439,DATEADD(DD, 0, DATEDIFF(DD, 0, PD.CALENDAR_DT))) as shift2time
+
+	, Shift1_RNs.Shift1_RNs
+
+	, Shift2_RNs.Shift2_RNs
+
+	, Shift1_CNs.Shift1_CNs
+
+	, Shift2_CNs.Shift2_CNs
+
+	, ROW_NUMBER() OVER(PARTITION BY PD.ENCOUNTER_ID, PD.IN_DTTM,PD.OUT_DTTM ORDER BY SEPSIS_1sC0RE.RECORDED_TIME ASC) AS DEPT_TIME_LINE
+
+INTO 
+
+	#Base_Pop_OD_Scores 
+
+FROM #Main PD
+
+	INNER JOIN reports.FY_DATE_DIMENSION FYDD ON FYDD.CALENDAR_DT = PD.CALENDAR_DT
+
+	OUTER APPLY
+
+	(
+
+		SELECT
+
+			TOP 1 FM.RECORDED_TIME, FM.MEAS_VALUE
+
+		FROM dbo.FLOWSHEET_RECORDS FR
+
+			INNER JOIN dbo.FLOWSHEET_MEASUREMENTS FM ON FM.FSD_ID = FR.FSD_ID
+
+		WHERE FM.FLO_MEAS_ID IN ('9000161711','9000002644') --ORGAN DYSFUNCTION SCORE
+
+			AND FR.INPATIENT_DATA_ID= PD.INPATIENT_DATA_ID
+
+			AND (FM.RECORDED_TIME BETWEEN DATEADD(MI,420,DATEADD(DD, 0, DATEDIFF(DD, 0, PD.CALENDAR_DT))) AND DATEADD(MI,1139,DATEADD(DD, 0, DATEDIFF(DD, 0, PD.CALENDAR_DT))))
+
+			AND CONVERT(DATE,FM.RECORDED_TIME) = PD.CALENDAR_DT
+
+	)SEPSIS_1sC0RE
+
+	OUTER APPLY
+
+	(
+
+		SELECT
+
+			TOP 1 FM.RECORDED_TIME, FM.MEAS_VALUE
+
+		FROM dbo.FLOWSHEET_RECORDS FR
+
+			INNER JOIN dbo.FLOWSHEET_MEASUREMENTS FM ON FM.FSD_ID = FR.FSD_ID
+
+		WHERE FM.FLO_MEAS_ID IN ('9000161711','9000002644') --ORGAN DYSFUNCTION SCORE
+
+			AND FR.INPATIENT_DATA_ID= PD.INPATIENT_DATA_ID
+
+			AND (FM.RECORDED_TIME BETWEEN DATEADD(MI,1140,DATEADD(DD, 0, DATEDIFF(DD, 0, PD.CALENDAR_DT))) AND DATEADD(MI,419,DATEADD(DD, 1, DATEDIFF(DD, 0, PD.CALENDAR_DT))))
+
+			AND CONVERT(DATE,FM.RECORDED_TIME) = PD.CALENDAR_DT
+
+	)SEPSIS_2sC0RE
+
+	
+
+	LEFT OUTER JOIN reports.CONFIG_VALUE_SET CVS ON CVS.CODE = PD.ADT_DEPARTMENT_ID
+
+				AND CVS.VALUE_SET_ID = 3031 --DEPARTMENT ROLL UP
+
+	OUTER APPLY
+
+	(
+
+		SELECT  top 1
+
+            STUFF((    SELECT '; ' +PRV.PROV_NAME-- AS [text()]
+
+                        FROM dbo.TREATMENT_TEAMS SUB
+
+						INNER JOIN dbo.PROVIDERS PRV ON PRV.PROV_ID = SUB.PROV_ID
+
+						WHERE
+
+						SUB.ENCOUNTER_ID = CAT.ENCOUNTER_ID
+
+						AND (SUB.TRTMNT_TM_BEGIN_DT BETWEEN DATEADD(MI,360,DATEADD(DD, 0, DATEDIFF(DD, 0, PD.CALENDAR_DT))) AND DATEADD(MI,1020,DATEADD(DD, 0, DATEDIFF(DD, 0, PD.CALENDAR_DT))))---BEGIN BETWEEN 6AM AND 7 PM
+
+						AND SUB.TRTMNT_TEAM_REL_CODE=2
+
+                        FOR XML PATH('')
+
+                        ), 1, 1, '' )
+
+            AS [Shift1_RNs]	
+
+	FROM  dbo.TREATMENT_TEAMS CAT where CAT.ENCOUNTER_ID = PD.ENCOUNTER_ID
+
+	AND CONVERT(DATE, CAT.TRTMNT_TM_BEGIN_DT) = PD.CALENDAR_DT
+
+	AND (CAT.TRTMNT_TM_BEGIN_DT BETWEEN DATEADD(MI,360,DATEADD(DD, 0, DATEDIFF(DD, 0, PD.CALENDAR_DT))) AND DATEADD(MI,1020,DATEADD(DD, 0, DATEDIFF(DD, 0, PD.CALENDAR_DT))))---BEGIN BETWEEN 6AM AND 7 PM
+
+	AND cat.TRTMNT_TEAM_REL_CODE=2--Registered Nurse
+
+	group by cat.ENCOUNTER_ID
+
+	)Shift1_RNs
+
+	OUTER APPLY
+
+	(
+
+		SELECT  top 1
+
+            STUFF((    SELECT '; ' +PRV.PROV_NAME-- AS [text()]
+
+                        FROM dbo.TREATMENT_TEAMS SUB
+
+						INNER JOIN dbo.PROVIDERS PRV ON PRV.PROV_ID = SUB.PROV_ID
+
+						WHERE
+
+						SUB.ENCOUNTER_ID = CAT.ENCOUNTER_ID
+
+						AND (
+
+								(CONVERT(DATE, SUB.TRTMNT_TM_BEGIN_DT) = CONVERT(DATE,PD.CALENDAR_DT))
+
+								and
+
+								(SUB.TRTMNT_TM_BEGIN_DT BETWEEN DATEADD(MI,1080,DATEADD(DD, 0, DATEDIFF(DD, 0, PD.CALENDAR_DT))) AND DATEADD(MI,1439,DATEADD(DD, 0, DATEDIFF(DD, 0, PD.CALENDAR_DT))))
+
+							)
+
+						AND SUB.TRTMNT_TEAM_REL_CODE=2
+
+                        FOR XML PATH('')
+
+                        ), 1, 1, '' )
+
+            AS [Shift2_RNs]	
+
+	FROM  dbo.TREATMENT_TEAMS CAT where CAT.ENCOUNTER_ID = PD.ENCOUNTER_ID
+
+	AND (
+
+			(CONVERT(DATE, CAT.TRTMNT_TM_BEGIN_DT) = CONVERT(DATE,PD.CALENDAR_DT))
+
+			and
+
+			(CAT.TRTMNT_TM_BEGIN_DT BETWEEN DATEADD(MI,1080,DATEADD(DD, 0, DATEDIFF(DD, 0, PD.CALENDAR_DT))) AND DATEADD(MI,1439,DATEADD(DD, 0, DATEDIFF(DD, 0, PD.CALENDAR_DT))))
+
+		)	
+
+	AND cat.TRTMNT_TEAM_REL_CODE=2--Registered Nurse
+
+	group by cat.ENCOUNTER_ID
+
+	)Shift2_RNs
+
+	--CHARGE NURSE
+
+	OUTER APPLY
+
+	(
+
+		SELECT  top 1
+
+            STUFF((    SELECT '; ' +PRV.PROV_NAME-- AS [text()]
+
+                        FROM dbo.TREATMENT_TEAMS SUB
+
+						INNER JOIN dbo.PROVIDERS PRV ON PRV.PROV_ID = SUB.PROV_ID
+
+						WHERE
+
+						SUB.ENCOUNTER_ID = CAT.ENCOUNTER_ID
+
+						AND (SUB.TRTMNT_TM_BEGIN_DT BETWEEN DATEADD(MI,360,DATEADD(DD, 0, DATEDIFF(DD, 0, PD.CALENDAR_DT))) AND DATEADD(MI,1020,DATEADD(DD, 0, DATEDIFF(DD, 0, PD.CALENDAR_DT))))---BEGIN BETWEEN 6AM AND 7 PM
+
+						AND SUB.TRTMNT_TEAM_REL_CODE=99--Charge Nurse
+
+                        FOR XML PATH('')
+
+                        ), 1, 1, '' )
+
+            AS [Shift1_CNs]	
+
+	FROM  dbo.TREATMENT_TEAMS CAT where CAT.ENCOUNTER_ID = PD.ENCOUNTER_ID
+
+	AND CONVERT(DATE, CAT.TRTMNT_TM_BEGIN_DT) = PD.CALENDAR_DT
+
+	AND (CAT.TRTMNT_TM_BEGIN_DT BETWEEN DATEADD(MI,360,DATEADD(DD, 0, DATEDIFF(DD, 0, PD.CALENDAR_DT))) AND DATEADD(MI,1020,DATEADD(DD, 0, DATEDIFF(DD, 0, PD.CALENDAR_DT))))---BEGIN BETWEEN 6AM AND 7 PM
+
+	AND cat.TRTMNT_TEAM_REL_CODE=99--Charge Nurse
+
+	group by cat.ENCOUNTER_ID
+
+	)Shift1_CNs
+
+	OUTER APPLY
+
+	(
+
+		SELECT  top 1
+
+            STUFF((    SELECT '; ' +PRV.PROV_NAME-- AS [text()]
+
+                        FROM dbo.TREATMENT_TEAMS SUB
+
+						INNER JOIN dbo.PROVIDERS PRV ON PRV.PROV_ID = SUB.PROV_ID
+
+						WHERE
+
+						SUB.ENCOUNTER_ID = CAT.ENCOUNTER_ID
+
+						AND (
+
+								(CONVERT(DATE, SUB.TRTMNT_TM_BEGIN_DT) = CONVERT(DATE,PD.CALENDAR_DT))
+
+								and
+
+								(SUB.TRTMNT_TM_BEGIN_DT BETWEEN DATEADD(MI,1080,DATEADD(DD, 0, DATEDIFF(DD, 0, PD.CALENDAR_DT))) AND DATEADD(MI,1439,DATEADD(DD, 0, DATEDIFF(DD, 0, PD.CALENDAR_DT))))
+
+							)
+
+						AND SUB.TRTMNT_TEAM_REL_CODE=99--Charge Nurse
+
+                        FOR XML PATH('')
+
+                        ), 1, 1, '' )
+
+            AS [Shift2_CNs]	
+
+	FROM  dbo.TREATMENT_TEAMS CAT where CAT.ENCOUNTER_ID = PD.ENCOUNTER_ID
+
+	AND (
+
+			(CONVERT(DATE, CAT.TRTMNT_TM_BEGIN_DT) = CONVERT(DATE,PD.CALENDAR_DT))
+
+			and
+
+			(CAT.TRTMNT_TM_BEGIN_DT BETWEEN DATEADD(MI,1080,DATEADD(DD, 0, DATEDIFF(DD, 0, PD.CALENDAR_DT))) AND DATEADD(MI,1439,DATEADD(DD, 0, DATEDIFF(DD, 0, PD.CALENDAR_DT))))
+
+		)	
+
+	AND cat.TRTMNT_TEAM_REL_CODE=99--Charge Nurse
+
+	group by cat.ENCOUNTER_ID
+
+	)Shift2_CNs
+```
+
+## USP_RPTS_IP_SEPSIS_REPORT.sql · #EncounterWeights
+*outcome: recovered* · parsed tables: flowsheet_measurements, flowsheet_records · parsed grain: visit
+
+**Description**
+
+Encounter weights for inpatient data.
+
+- Encounters must have a corresponding FLO_MEAS_ID of '94'.
+- The EncWeight is calculated from MEAS_VALUE, converted to a weight in pounds using a factor of 0.0283495, rounded to one decimal place.
+- The TIME_LINE is determined by the order of RECORDED_TIME, with values ranging from 1 to the highest row number assigned per ENCOUNTER_ID.
+
+**Fragment**
+
+```sql
+SELECT
+
+	A.ENCOUNTER_ID
+
+	, CAST(ROUND(CONVERT(FLOAT, MEAS_VALUE) * 0.0283495, 2) AS DECIMAL(4, 1)) AS EncWeight
+
+	, ROW_NUMBER() OVER(PARTITION BY A.ENCOUNTER_ID ORDER BY C.RECORDED_TIME ASC) AS TIME_LINE
+
+INTO 
+
+	#EncounterWeights
+
+FROM 
+
+	#Main A
+
+INNER JOIN dbo.FLOWSHEET_RECORDS B ON A.INPATIENT_DATA_ID = B.INPATIENT_DATA_ID
+
+INNER JOIN dbo.FLOWSHEET_MEASUREMENTS C ON B.FSD_ID = C.FSD_ID AND  C.FLO_MEAS_ID='94'
+```
+
+first pass violated: technical object in a business description: '#Main' — the source object is carried by the relationship, not the sentence; technical vocabulary in a business description: 'table' — say what is included, not how the SQL assembles it
+
+## USP_RPTS_IP_SEPSIS_REPORT.sql · #Main
+*outcome: emptied* · parsed tables: departments, hospital_encounters, locations, patient_demographics_race, patients, ref_discharge_disposition, ref_ethnic_group, ref_patient_race, v_hospital_transactions · parsed grain: patient, visit
+
+**Description**
+
+_(emptied — nothing grounded survived)_
+
+**Fragment**
+
+```sql
+SELECT DISTINCT
+
+	HE.ENCOUNTER_ID
+
+	, HE.PATIENT_ID
+
+	, PAT.PATIENT_MRN
+
+	, PAT.PATIENT_NAME
+
+	, REG.NAME AS [Ethnic Group]
+
+	, RPR.NAME AS [Race]
+
+	--, EEF.AGE_AT_ARRIVAL_MONTHS
+
+	--, EEF.AGE_AT_ARRIVAL_YEARS
+
+	, HE.INPATIENT_DATA_ID
+
+	, HE.ADT_ARRIVAL_TIME
+
+	, HE.HOSP_ADMSN_TIME
+
+	, HE.HOSP_DISCH_TIME
+
+	, HE.INP_ADM_DATE
+
+	, HE.ED_DEPARTURE_TIME
+
+	, RDD.NAME AS [Disposition]
+
+	, LOC.LOC_NAME [Location]
+
+	, DATEDIFF(MM,PAT.BIRTH_DATE,HE.HOSP_ADMSN_TIME) AS AGE_MONTHS
+
+	, FLOOR(DATEDIFF(DD,PAT.BIRTH_DATE,HE.HOSP_ADMSN_TIME)/365.25) AS AGE_YEARS
+
+	, DATENAME(month, CONVERT(DATE,HE.HOSP_ADMSN_TIME)) + DATENAME(YEAR, CONVERT(DATE, HE.HOSP_ADMSN_TIME)) AS DATE_STAMP
+
+	, DATEDIFF(HH, HE.HOSP_ADMSN_TIME, HE.HOSP_DISCH_TIME) AS LOS_HRS
+
+INTO 
+
+	#Main
+
+FROM 
+
+dbo.V_HOSPITAL_TRANSACTIONS HTR
+
+INNER JOIN dbo.HOSPITAL_ENCOUNTERS HE ON HTR.ENCOUNTER_ID = HE.ENCOUNTER_ID
+
+INNER JOIN dbo.PATIENTS PAT ON PAT.PATIENT_ID = HE.PATIENT_ID
+
+LEFT OUTER JOIN dbo.REF_DISCHARGE_DISPOSITION RDD ON RDD.DISCH_DISP_CODE = HE.DISCH_DISP_CODE
+
+LEFT OUTER JOIN dbo.REF_ETHNIC_GROUP REG ON REG.ETHNIC_GROUP_CODE = PAT.ETHNIC_GROUP_CODE
+
+LEFT OUTER JOIN dbo.PATIENT_DEMOGRAPHICS_RACE RACE ON RACE.PATIENT_ID = PAT.PATIENT_ID AND RACE.LINE=1
+
+LEFT OUTER JOIN dbo.REF_PATIENT_RACE RPR ON RPR.PATIENT_RACE_CODE = RACE.PATIENT_RACE_CODE
+
+LEFT OUTER JOIN dbo.DEPARTMENTS DEP ON DEP.DEPARTMENT_ID = HE.DEPARTMENT_ID
+
+LEFT OUTER JOIN dbo.LOCATIONS LOC ON LOC.LOC_ID = DEP.REV_LOC_ID
+
+WHERE
+
+HE.INP_ADM_DATE IS NOT NULL
+
+AND CONVERT(DATE,HTR.SERVICE_DATE) BETWEEN @dStartDate AND @dEndDate
+```
+
+first pass violated: ungrounded filter claim: '- Inclusion requires that HE.INP_ADM_DATE is not null.'; technical vocabulary in a business description: 'table' — say what is included, not how the SQL assembles it
+
+## USP_RPTS_NonSevere_Sepsis.sql · #Base_Pop
+*outcome: recovered* · parsed tables: — · parsed grain: (unknown)
+
+**Description**
+
+This selects records from the base population.
+
+- Inclusion is determined by the absence of an encounter ID in the NICU admissions.
+- Encounter IDs must match those in the base population.
+- The selection includes all records from the base population where the encounter ID is not present in the NICU admissions.
+
+**Fragment**
+
+```sql
+SELECT 
+
+	FP.*
+
+
+
+INTO 
+
+	#Base_Pop
+
+
+
+FROM 
+
+	#Base_Pop_1 FP
+
+	LEFT JOIN #NICUAdmissions NA 
+
+		ON NA.ENCOUNTER_ID = FP.ENCOUNTER_ID
+
+
+
+WHERE 
+
+	NA.ENCOUNTER_ID IS NULL
+```
+
+first pass violated: technical object in a business description: '#NICUAdmissions' — the source object is carried by the relationship, not the sentence; technical object in a business description: '#Base_Pop_1' — the source object is carried by the relationship, not the sentence
+
+## USP_RPTS_NonSevere_Sepsis.sql · #NICUAdmissions
+*outcome: clean* · parsed tables: adt_events · parsed grain: visit
+
+**Description**
+
+This SQL selects distinct NICU admissions.
+
+- Admission event type code: 1
+- Excludes cancelled event subtype code: 2
+- Department IDs: 200108002, 200108003, 200108004, 200108005, 200108006
+
+**Fragment**
+
+```sql
+SELECT DISTINCT 
+
+	ADT.ENCOUNTER_ID 
+
+
+
+INTO 
+
+	#NICUAdmissions
+
+
+
+FROM
+
+	#Base_Pop_1 B
+
+	JOIN dbo.ADT_EVENTS ADT
+
+		ON ADT.ENCOUNTER_ID = B.ENCOUNTER_ID
+
+
+
+WHERE 
+
+	ADT.EVENT_TYPE_CODE = 1 --ADMISSION
+
+	AND ADT.EVENT_SUBTYPE_CODE <> 2 --CANCELLED
+
+	AND ADT.DEPARTMENT_ID IN (200108002, 200108003, 200108004, 200108005, 200108006)
+```
+
+## USP_RPTS_Severe_Sepsis.sql · #AllICUDept
+*outcome: clean* · parsed tables: grouper_compiled_list · parsed grain: (unknown)
+
+**Description**
+
+This SQL selects department records.
+
+- Compiled context must be 'DEP'.
+- Base grouper ID must be '800016'.
+
+**Fragment**
+
+```sql
+SELECT vcg.GROUPER_RECORDS_NUMERIC_ID DEPARTMENT_ID
+
+	INTO #AllICUDept
+
+	FROM [dbo].[GROUPER_COMPILED_LIST] vcg
+
+	WHERE vcg.COMPILED_CONTEXT = 'DEP'
+
+	AND vcg.BASE_GROUPER_ID IN ('800016')
+```
+
+## USP_RPTS_Severe_Sepsis.sql · #MedDept
+*outcome: clean* · parsed tables: grouper_compiled_list · parsed grain: (unknown)
+
+**Description**
+
+This SQL selects department records.
+
+- Compiled context must be 'DEP'.
+- Base grouper ID must be '800004'.
+
+**Fragment**
+
+```sql
+SELECT vcg.GROUPER_RECORDS_NUMERIC_ID DEPARTMENT_ID
+
+	INTO #MedDept
+
+	FROM [dbo].[GROUPER_COMPILED_LIST] vcg
+
+	WHERE vcg.COMPILED_CONTEXT = 'DEP'
+
+	AND vcg.BASE_GROUPER_ID IN ('800004')
+```
+
+## USP_RPTS_Severe_Sepsis.sql · #NICUCICUDept
+*outcome: clean* · parsed tables: grouper_compiled_list · parsed grain: (unknown)
+
+**Description**
+
+This SQL selects department records.
+
+- Inclusion is determined by the compiled context being 'DEP'.
+- The base grouper IDs must be one of the following: '800001', '800002', '800003'.
+
+**Fragment**
+
+```sql
+SELECT vcg.GROUPER_RECORDS_NUMERIC_ID DEPARTMENT_ID
+
+	INTO #NICUCICUDept
+
+	FROM [dbo].[GROUPER_COMPILED_LIST] vcg
+
+	WHERE vcg.COMPILED_CONTEXT = 'DEP'
+
+	AND vcg.BASE_GROUPER_ID IN ('800001', '800002', '800003')
+```
+
+## USP_RPTS_Severe_Sepsis.sql · #ODScores
+*outcome: clean* · parsed tables: grouper_compiled_list · parsed grain: (unknown)
+
+**Description**
+
+This SQL selects records identified by FLO_ID.
+
+- The compiled context must be 'FLO'.
+- The base grouper ID must be '800006'.
+
+**Fragment**
+
+```sql
+SELECT vcg.GROUPER_RECORDS_NUMERIC_ID FLO_ID
+
+	INTO #ODScores
+
+	FROM [dbo].[GROUPER_COMPILED_LIST] vcg
+
+	WHERE vcg.COMPILED_CONTEXT = 'FLO'
+
+	AND vcg.BASE_GROUPER_ID IN ('800006')
+```

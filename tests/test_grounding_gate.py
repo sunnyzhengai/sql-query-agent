@@ -376,3 +376,61 @@ class TestDescVoice2:
             "- one of 7 IDs (first: <first_value>, last: "
             "<last_value>)", "SELECT X FROM T WHERE ID IN (1,2)")
         assert any("prompt placeholder echoed" in x for x in v), v
+
+class TestDescWhole1Gap:
+    """DESC-WHOLE-1 (found 2026-08-31, PARKED for Sunny): 13 of the
+    28-proc corpus are single-SELECT report procs — no CTE, no temp
+    staging. The step harvester finds nothing in them, so they get
+    NO description at all. This test PINS the gap: it asserts the
+    shape is real and currently unharvested, so the day someone
+    builds whole-proc description it fails loudly and must be
+    updated deliberately."""
+
+    def test_single_select_procs_yield_no_steps(self):
+        import glob
+        import os
+        import re
+
+        import pytest
+
+        from devtools.desc_live_run import harvest_steps
+
+        corpus = sorted(glob.glob("data/synthetic/sql/**/*.sql",
+                                  recursive=True))
+        if not corpus:
+            pytest.skip("synthetic corpus not present")
+        described = {s["proc"] for s in harvest_steps()}
+        silent = [p for p in corpus
+                  if os.path.basename(p) not in described]
+        # the gap is non-empty today
+        assert silent, "whole-proc description may now be built"
+        # and every silent proc is genuinely single-SELECT, i.e. the
+        # harvester is not merely MISSING staged logic in them
+        for path in silent:
+            sql = open(path).read()
+            assert not re.search(r"(?i)\bINTO\s+#", sql), path
+            assert not re.search(r"(?i)\bINSERT\s+INTO\s+#", sql), path
+
+class TestTempStepVoiceCost:
+    """DESC-TEMP-1 live find (08-31, PARKED for Sunny's ruling):
+    on temp-table staged steps the vocabulary rule fires on the
+    bare word 'table' and empties descriptions that are otherwise
+    TRUE and grounded. 3 of 11 empties in the stratified 60-step
+    run had NO other violation. Whether 'table' should stay banned
+    on a step that literally writes one is a VOICE ruling, not a
+    dev call — this test pins the current behaviour so the ruling
+    changes it deliberately."""
+
+    def test_true_description_empties_on_the_word_table(self):
+        sql = ("SELECT DISTINCT E.PATIENT_ID, E.ENCOUNTER_ID "
+               "INTO #Base_Pop FROM HOSPITAL_ENCOUNTERS E "
+               "WHERE E.ADMIT_DATE IS NOT NULL")
+        honest = ("This is a table of encounters with a recorded "
+                  "admission date.")
+        v = grounding_violations(honest, sql)
+        assert any("technical vocabulary" in x and "'table'" in x
+                   for x in v), v
+        # and the SAME sentence without the one word is clean
+        clean = ("This is a selection of encounters with a recorded "
+                 "admission date.")
+        assert grounding_violations(clean, sql) == []

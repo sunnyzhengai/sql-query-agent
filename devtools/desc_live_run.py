@@ -107,24 +107,70 @@ def harvest_steps(limit: int = 0) -> "list[dict]":
         # a "23/23 clean" that silently covered 3 procs). Descend
         # through every statement container the parser exposes.
         def descend(node, depth=0):
-            if depth > 6 or node is None:
+            # DESC-TEMP-1: IF/ELSE branches hold the staging
+            # statements on a Clarity estate — walk every
+            # statement-bearing property the parser exposes
+            if depth > 12 or node is None:
                 return []
             out = [node]
-            body = getattr(node, "StatementList", None)
-            if body is not None:
-                for i in range(body.Statements.Count):
-                    out.extend(descend(body.Statements[i], depth + 1))
-            for attr in ("Statements",):
-                coll = getattr(node, attr, None)
-                if coll is not None and hasattr(coll, "Count"):
-                    for i in range(coll.Count):
-                        out.extend(descend(coll[i], depth + 1))
+            for attr in ("StatementList", "ThenStatement",
+                         "ElseStatement", "Statements", "Statement"):
+                child = getattr(node, attr, None)
+                if child is None:
+                    continue
+                if hasattr(child, "Statements"):
+                    for i in range(child.Statements.Count):
+                        out.extend(descend(child.Statements[i],
+                                           depth + 1))
+                elif hasattr(child, "Count"):
+                    for i in range(child.Count):
+                        out.extend(descend(child[i], depth + 1))
+                else:
+                    out.extend(descend(child, depth + 1))
             return out
+
+        def into_target(stmt):
+            """The temp table a SELECT…INTO writes. `Into` hangs off
+            the SelectStatement itself in this ScriptDom binding —
+            probed, not assumed (two wrong guesses cost a cycle)."""
+            into = getattr(stmt, "Into", None)
+            if into is None:
+                return None
+            ids = into.Identifiers
+            return ".".join(str(ids[i].Value)
+                            for i in range(ids.Count))
 
         for b in range(fragment.Batches.Count):
             batch = fragment.Batches[b]
             for s in range(batch.Statements.Count):
                 inner = descend(batch.Statements[s])
+                # temp-table staged steps (DESC-TEMP-1): SELECT…INTO
+                # #X and INSERT INTO #X SELECT… are describable
+                # units exactly like CTEs
+                staged = []
+                for st in inner:
+                    name = None
+                    if st.GetType().Name == "SelectStatement":
+                        name = into_target(st)
+                    elif st.GetType().Name == "InsertStatement":
+                        spec = getattr(st, "InsertSpecification", None)
+                        tgt = getattr(spec, "Target", None)
+                        obj = getattr(tgt, "SchemaObject", None)
+                        if obj is not None:
+                            ids = obj.Identifiers
+                            name = ".".join(str(ids[i].Value)
+                                            for i in range(ids.Count))
+                    if name and name.startswith("#"):
+                        staged.append((name, st))
+                staged_names = [n for n, _s in staged]
+                for name, st in staged:
+                    steps.append({
+                        "proc": _op.basename(path),
+                        "name": name,
+                        "siblings": [n for n in staged_names
+                                     if n != name],
+                        "sql": sql[st.StartOffset:
+                                   st.StartOffset + st.FragmentLength]})
                 for st in inner:
                     we = getattr(st, "WithCtesAndXmlNamespaces", None)
                     if we is None:
@@ -147,8 +193,31 @@ def harvest_steps(limit: int = 0) -> "list[dict]":
                                          if n != str(
                                              cte.ExpressionName.Value)],
                             "sql": text})
+    # the descent can reach a nested statement by two paths; a step
+    # is identified by (proc, name, offset)
+    seen: "set" = set()
+    unique = []
+    for s in steps:
+        key = (s["proc"], s["name"], (s.get("sql") or "")[:80])
+        if key in seen:
+            continue
+        seen.add(key)
+        unique.append(s)
+    steps = unique
     if limit:
-        steps = steps[:limit]
+        # STRATIFIED, not steps[:limit]: a contiguous head drew all
+        # 60 of a sample from 2 procs, and rates over 2 procs are
+        # not rates over the estate. Round-robin across procs so a
+        # capped run samples the whole corpus's difficulty range.
+        by_proc: "dict[str, list]" = {}
+        for s in steps:
+            by_proc.setdefault(s["proc"], []).append(s)
+        picked, queues = [], list(by_proc.values())
+        while len(picked) < limit and any(queues):
+            for q in queues:
+                if q and len(picked) < limit:
+                    picked.append(q.pop(0))
+        steps = picked
     return steps
 
 
@@ -180,9 +249,23 @@ def run(steps, describe) -> dict:
                      "first_violations": first_v,
                      "tables": sorted(
                          parsed_tables(sql)
-                         - {s.lower() for s in st.get("siblings", [])}),
+                         - {s.lower() for s in st.get("siblings", [])}
+                         - {str(st.get("name", "")).lower()}),
                      "grain": sorted(parsed_grain(sql))})
-    return {"counts": counts, "classes": classes, "rows": rows}
+    # Coverage is measured over the FULL corpus, never over the
+    # (possibly --limit-ed) generation set: a capped run that
+    # reported itself as coverage claimed "2 of 28 procs" while
+    # the harvester actually reaches 15. A rate must carry its
+    # own denominator, and the denominator is not the sample.
+    full = harvest_steps()
+    described = {s["proc"] for s in full if s.get("name") != "(unparsed)"}
+    corpus = sorted(glob.glob("data/synthetic/sql/**/*.sql",
+                              recursive=True))
+    return {"counts": counts, "classes": classes, "rows": rows,
+            "procs": len({r["proc"] for r in rows}),
+            "cov_steps": len(full), "cov_procs": len(described),
+            "cov_corpus": len(corpus),
+            "cov_silent": len(corpus) - len(described)}
 
 
 def write_reports(result: dict, sample_n: int = 30) -> None:
@@ -196,13 +279,17 @@ def write_reports(result: dict, sample_n: int = 30) -> None:
         HONEST_FLOOR, "",
         f"**{graded} description(s) generated** "
         f"(+{c['unparsed']} unparsed proc(s) skipped)", "",
-        "**Coverage (stated, not implied):** the pipeline describes "
-        "CTE STEPS, and only 5 of the corpus's 28 procs use CTEs — "
-        "the other 23 stage through temp tables (15 of them "
-        "explicitly). So this run covers every CTE step the estate "
-        "HAS, which is not the same as every proc. Temp-table "
-        "staging is a real Clarity pattern and describing it is a "
-        "separate (unbuilt) capability, not a gap in these rates.",
+        f"**Coverage (DESC-TEMP-1): {result.get('cov_steps', 0)} "
+        f"describable steps across {result.get('cov_procs', 0)} of "
+        f"{result.get('cov_corpus', 0)} procs** — CTE steps AND "
+        "temp-table staged steps (SELECT…INTO #X / INSERT INTO #X), "
+        "harvested through the parser. Coverage counts the WHOLE "
+        "corpus and is independent of any --limit on generation. "
+        f"The other {result.get('cov_silent', 0)} procs are "
+        "single-SELECT report procs with no CTE and no temp staging "
+        "(verified, not assumed): the step harvester finds nothing "
+        "in them, so today they get NO description at all. That is "
+        "a NAMED GAP (DESC-WHOLE-1), not a clean result.",
         "",
         f"- clean (passed first try): {c['clean']} ({pct('clean')})",
         f"- recovered (corrective retry fixed it): {c['recovered']} "

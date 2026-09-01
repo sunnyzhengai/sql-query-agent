@@ -4233,3 +4233,52 @@ Specimen: USP_ED_SEPSIS · #BPA.
    become a REPORTED COVERAGE GAP — a Tier-1 asset ("N columns
    your catalog never documented"), not a silent degradation.
 Re-run the sample after; Sunny grades read #4.
+
+### RESULTS — DESC-TEMP-1 (dev, 08-31): temp-table steps describable; coverage is now a measured number; TWO gaps named
+**Built:** the step harvester now finds TEMP-TABLE STAGED steps
+(`SELECT … INTO #X`, `INSERT INTO #X SELECT …`) through ScriptDom,
+not just CTEs. Coverage went from **26 steps / 5 procs → 413 steps
+/ 15 procs**. `Into` hangs off `SelectStatement` itself in this
+binding — probed, not assumed (two wrong guesses first).
+**Three defects found and fixed on the way, each of which would
+have produced FALSE violations on any Clarity-shaped estate:**
+1. **Write targets were counted as reads.** `parsed_tables` matched
+   `INTO`/`UPDATE`, so a step that writes `#Base_Pop` listed
+   `#base_pop` among the tables it READS — a step reading itself.
+   The regex now matches FROM/JOIN/APPLY only. (Found because the
+   dry run showed a step citing itself; I checked whether the SQL
+   really re-read it before touching anything — it did not.)
+2. **A capped run reported itself as coverage.** `--limit 60` made
+   the report claim "2 of 28 procs" while the harvester actually
+   reaches 15. Coverage is now measured over the WHOLE corpus,
+   independent of any generation cap. A rate must carry its own
+   denominator, and the denominator is never the sample.
+3. **`--limit` took a contiguous head**, drawing all 60 steps from
+   2 procs — rates over 2 procs are not rates over the estate. The
+   cap is now STRATIFIED (round-robin across procs).
+**Stratified 60-step run (60 of 413 steps, 15 of 15 procs — a
+SAMPLE, and it says so): clean 30 · recovered 17 · salvaged 2 ·
+emptied 11.** Empties are 18%, up sharply from CTE-only's 3/26,
+and they split into two DIFFERENT things:
+- **Gate working (8 of the sampled empties):** invented values
+  (`1001`, `2000`, `Hispanic`) and a filter claim the SQL does not
+  make. Absence over fabrication, correctly.
+- **Gate over-firing (3, PARKED):** emptied SOLELY on the word
+  **"table"** — otherwise true, grounded descriptions of steps that
+  literally write a temp table. Whether "table" stays banned there
+  is a VOICE ruling, not a dev call, and it lands next to review's
+  open a/b/c on empties. Pinned red-first as
+  `TestTempStepVoiceCost` so the ruling changes it deliberately.
+**NAMED GAP — DESC-WHOLE-1 (PARKED, not built):** 13 of the 28
+procs are single-SELECT report procs with no CTE and no temp
+staging (VERIFIED per file, not assumed). The step harvester finds
+nothing in them, so **they get no description at all** — 46% of
+the estate silent. Whole-proc description is NEW capability, so it
+parks for Sunny rather than being built here. Pinned as
+`TestDescWhole1Gap`, which also asserts they are genuinely
+single-SELECT so it fails loudly if the harvester is merely
+missing staged logic.
+**Also recorded:** review's prompt-examples-become-data lesson
+saved as a standing memory (same disease as no-hardcoded-examples,
+new surface).
+**Gates:** 1,409 passed + 5 xfailed, ruff clean, docs regenerated.
