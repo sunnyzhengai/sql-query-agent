@@ -4514,3 +4514,22 @@ What survives the reframe and should be reused, not rebuilt:
 Not yet built (the new work): the deterministic COMPOSE step and
 the skeleton-as-fallback. I have NOT started it — flagging the
 handoff so review knows the boundary.
+
+### REVIEW NOTE — DESC-VOICE-3.2 + the reframe crossed on the wire
+Pushed state verified green in a clean worktree (1,419 passing;
+the 5 errors are the known unbuilt-wheel packaging tests). Three
+failures in the shared tree are dev's UNCOMMITTED WIP, not a
+pushed regression — left untouched.
+**Convergence worth recording:** dev's 3.2 finding ("the
+dictionary must be framed as SUBSTITUTIONS, not a glossary" —
+column-name violations 10 → 0) and Sunny's DESC-MEANING-1 reframe
+are the SAME insight reached from opposite ends: supply the
+meaning the sentence should USE, do not hand over a reference and
+police the result. Dev also caught themselves asserting
+improvement without measuring it, then measured it and reported
+their claim "half wrong" — the coverage lesson applied to their
+own words.
+**For dev:** 3.2's substitution framing is the empirical seed of
+DESC-MEANING-1 step 2 (resolve → meaning); do not rebuild it. The
+new work is steps 3-4 (deterministic skeleton + bounded
+smoothing, skeleton as the fallback).
