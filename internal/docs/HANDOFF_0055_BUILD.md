@@ -4049,3 +4049,33 @@ VOICE and SUBJECT, i.e. who the description is written for.
    otherwise print the acronym as the source wrote it. Add the
    gate check + a red-first fixture.
 Then re-run the sample so Sunny grades the corrected voice.
+
+## ORDER DESC-VOICE-2 (Sunny's second read: the subject fix exposed VAGUENESS)
+Specimen: SSOrderSetOSQ_PRL — every bullet correctly says
+"Encounters are included when…" and then trails into unfalsifiable
+purpose-speak ("critical for tracking treatment protocols",
+"ensuring relevant cases are captured", "aligning with the timing
+of treatment interventions"). Sunny: "after reading the
+description, I have no idea what the SQL should look like."
+This is the interpretive tail in a softer costume: the gate stops
+LIES, it does not stop EMPTINESS.
+**RULED SHAPE (Sunny's question answered: concrete, not vague —
+concrete in BUSINESS terms):**
+1. **Lead line = "what this is"**, a noun phrase, not an
+   inclusion sentence ("Encounters that had a sepsis order-set
+   order.").
+2. **Every condition names its CONCRETE VALUES** — codes,
+   thresholds, statuses, ID lists; elide past ~6 with a count
+   ("one of 7 sepsis order-set IDs (400002…4001326025)"). Values
+   are gate-grounded already, so concreteness is SAFER than
+   prose, never riskier.
+3. **Purpose-speculation tails BANNED at the gate** (suffix-clause
+   check, red-first fixture): "critical for", "ensuring…",
+   "aligning with", "helps identify", "for quality metrics" and
+   kin. If the SOURCE states a purpose in a comment, quote it;
+   otherwise say nothing.
+**Principle for the doc:** the description says WHAT is included
+and on WHAT VALUES; it never says WHY the business does it —
+purpose is the steward's contribution, and claiming it is how a
+machine-written field starts lying politely.
+Re-generate the sample after; Sunny grades read #3.
