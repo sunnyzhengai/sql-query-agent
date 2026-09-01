@@ -4616,3 +4616,42 @@ already composes from any fragment, so a single-statement file
 needs no new machinery. Next: file-level composition (final output
 step's subject + entities, intermediate criteria rolled up),
 FILE-based coverage, then the re-run.
+
+## ORDER DESC-SKELETON-2 (review's independent edge-case probe of compose_skeleton — four defects, all of the DECOY class dev named)
+Verified 1,442 green and read the implementation; cases 1-4 of my
+probe are correct (join keys dropped, ON-filters kept, comments
+stripped, @parameters handled, elision sound). FOUR defects found
+by probing shapes the corpus run did not cover. Each produces a
+skeleton that PASSES THE GATE while telling the steward nothing
+or something false — dev's own "decoy" class:
+
+1. **NOT EXISTS / NOT IN yields ZERO conditions (worst).**
+   `WHERE NOT EXISTS (SELECT 1 FROM PATIENT_PCP_ASSIGNMENT PA
+   WHERE PA.PATIENT_ID = HU.PATIENT_ID)` composes to
+   "This is a selection of patients." — the EXCLUSION IS THE
+   METRIC (this is literally High ED Utilizers Without PCP). Must
+   compose: "excludes those with a match in <meaning of the
+   subquery's entity>". Same for NOT IN (subquery) and
+   `LEFT JOIN … WHERE x IS NULL` (anti-join idiom).
+2. **HAVING is dropped.** `HAVING COUNT(*) >= 4` is the threshold
+   that DEFINES a high utilizer; it never reaches the skeleton.
+   Compose aggregate conditions: "has at least 4 <subject
+   plural>".
+3. **OR reads as AND.** `(A IN (...) OR B = 3022)` renders as two
+   sibling bullets indistinguishable from conjunction — a steward
+   reads "must satisfy both" when the SQL means "either". Boolean
+   STRUCTURE must survive: nest or label alternatives ("any of:").
+4. **CASE-WHEN in the SELECT becomes a phantom filter.** A
+   labelling expression (`CASE WHEN FLO_MEAS_ID IN ('900112')
+   THEN 'ETT'`) produced the condition line "flo meas id is
+   '900112'" — it decides a LABEL, not membership. Exclude
+   SELECT-list CASE from conditions (optionally describe it as a
+   derived label, which is what it is).
+
+Fixtures: my eight probe cases go in verbatim as red-first tests
+(four must change behaviour, four must stay correct as
+regression). After the fix, re-run the corpus AND re-probe.
+**Standing note for both sessions:** counters cannot see the
+decoy class — only reading output against the SQL can. Every
+description milestone from here carries an output read, not just
+rates.
