@@ -4205,3 +4205,31 @@ CULTURE_TYPE is recorded") — plain, true, never empty;
 (b): the fallback already exists for the surgical path; extending
 it to the emptied path keeps every field populated and every
 sentence grounded. Sunny rules on her read #3.
+
+## ORDER DESC-VOICE-3 (Sunny's read #3 on #BPA — one truth bug, one voice rule)
+Specimen: USP_ED_SEPSIS · #BPA.
+1. **MISATTRIBUTED PREDICATE (truth class, new):** the
+   description says "Encounter IDs must match the ADT_ARRIVAL_TIME
+   and ED_DEPARTURE_TIME" — the SQL constrains
+   `AH.ALT_ACTION_INST BETWEEN B.ADT_ARRIVAL_TIME AND
+   B.ED_DEPARTURE_TIME`. Right values, WRONG SUBJECT. It passes
+   today because the gate checks whether facts are PRESENT, not
+   what they are PREDICATED OF.
+   **Gate extension:** for each condition sentence, the subject
+   the sentence names must match the LEFT-HAND SIDE of the
+   predicate it describes (column-level attribution). Red-first
+   fixture from this exact specimen.
+2. **NO COLUMN NAMES in business descriptions** (the table rule at
+   column grain): BPA_LOCATOR_ID / ADT_ARRIVAL_TIME /
+   ALT_ACTION_INST are developer tokens. Sunny's fix is the right
+   one: feed the model the COLUMN'S DICTIONARY DESCRIPTION and
+   have it write from that — "the time the alert was acted on
+   must fall between the patient's arrival and departure".
+   `dictionary_for_step()` already exists; this is wiring + a ban,
+   not new machinery.
+   **Fallback ruling:** where a column has NO dictionary entry,
+   use a minimally-transformed readable form of the name AND mark
+   the step as needing dictionary coverage. Missing entries then
+   become a REPORTED COVERAGE GAP — a Tier-1 asset ("N columns
+   your catalog never documented"), not a silent degradation.
+Re-run the sample after; Sunny grades read #4.
