@@ -4954,3 +4954,31 @@ reachable in the default dev loop:
 (proving ground / recorded structures) is RETRACTED. The eight
 fixtures run LOCALLY against a live parse, which is stronger
 evidence and a tighter loop than CI-only proof.
+
+### REVIEW — THE ORDER IS VERIFIED AGAINST A REAL PARSE (node-type contract for DESC-SKELETON-3)
+
+I asserted in the order that all four defect classes fall out of node
+STRUCTURE. Assertions are not evidence, so I probed a live parse
+(`devtools/ast_shape_probe.py`, run under Homebrew 3.11 + DOTNET_ROOT).
+**Every claim holds.** Dev builds against these measured node types,
+not against my prose:
+
+| defect | what the tree gives |
+|---|---|
+| 1 NOT EXISTS | `BooleanNotExpression` → `ExistsPredicate` → `ScalarSubquery`. The negation is its OWN NODE wrapping the predicate — no paren balancing, no "does NOT sit before the subquery" guesswork. |
+| 2 HAVING | `HavingClause.SearchCondition` = `BooleanComparisonExpression ComparisonType=GreaterThanOrEqualTo`, `FirstExpression=FunctionCall`, `SecondExpression=IntegerLiteral '4'`. Identical shape to WHERE. An aggregate LHS needs NO special case — it is just a FunctionCall where a column would be. |
+| 3 OR | `BooleanParenthesisExpression` → `BooleanBinaryExpression BinaryExpressionType=Or`, with `InPredicate` and `BooleanComparisonExpression` as its two branches. Conjunction vs disjunction is a labelled property, not an inference. |
+| 4 SELECT-CASE | `SelectElements` = `SelectScalarExpression(SearchedCaseExpression)`; the WHERE tree contains ONLY the real filter (`DEPARTMENT_ID = 3022`). The CASE is structurally OUTSIDE the deciding clauses — the phantom filter cannot be composed even by accident. |
+| 5 parameter | `VariableReference Name='@dStartDate'` — a distinct node type from `ColumnReferenceExpression` and from `IntegerLiteral`. The "dstartdate" defect is fixable by dispatch on node type, exactly as ordered. |
+
+Two further facts worth having before the build:
+- `BETWEEN` is a **`BooleanTernaryExpression`** (not a binary with a
+  range) — the renderer needs a ternary case, and `TernaryExpressionType`
+  distinguishes BETWEEN from NOT BETWEEN.
+- `InPredicate` carries **`NotDefined`** (False here) — so `NOT IN`
+  is the same node with a flag, not a separate shape to detect.
+
+**This makes the cost estimate concrete: the re-cut is a visitor over
+~8 node types plus the plumbing change.** Nothing in it resembles the
+paren-balancing / clause-segmentation work the reverted regex patch
+required. Dev's own evidence and this probe agree.
