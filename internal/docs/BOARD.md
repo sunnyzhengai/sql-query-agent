@@ -909,3 +909,18 @@ watcher) continue. Lifts only by Sunny's word, recorded here.
       retention (recommend keep — it IS the anti-repeat memory).
       **Bridge adapters + the console's receipt line build from
       this table once ratified.**
+
+## ⛔ DEVELOPMENT HOLD #3 — Sunny, 2026-08-31
+ALL code changes paused, effective immediately. DESC-SKELETON-2
+is SUSPENDED before build — do not start; if started, stop and
+revert (no partial lands), as with hold #2. Standing guards
+(nightly battery, fuzzer, watcher) continue.
+CONTEXT AT THE PAUSE: review's probe found four decoy-class
+defects in compose_skeleton (NOT EXISTS silent · HAVING dropped ·
+OR reads as AND · SELECT-CASE phantom filter) and traced them to
+ONE root cause — the composer scans SQL with REGEXES instead of
+reading the ScriptDom AST the rest of the system already uses
+(ADR 0001's native-parser law). The open question at the moment
+of pause: patch four patterns, or re-cut as AST-first
+composition. Nothing decided, nothing built.
+Lifts only by Sunny's word, recorded here.
