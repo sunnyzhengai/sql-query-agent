@@ -146,8 +146,13 @@ order; nothing skips ahead.
       holds each step as a live ScriptDom node and passes down only
       text. So the re-cut is PLUMBING + a renderer, not a parsing
       project. Also verified: **ScriptDom cannot host on Sunny's
-      Mac** (hardened-runtime SIGKILL, no fallback) — dev must
-      state the proving ground and must NOT add a text fallback.
+      Mac** — ~~RETRACTED, review was wrong (Sunny's question
+      caught it)~~. Truth: the **VENV is on Apple CLT Python 3.9.6**
+      (hardened); ScriptDom runs fine on Homebrew 3.11, verified
+      live today (TSqlScript, 0 errors) with pythonnet + .NET 8 +
+      the DLL all already installed. **ENV-SCRIPTDOM-1 ordered as a
+      prerequisite**: rebuild .venv on Homebrew 3.11, report the
+      test skip-count delta, no text fallback ever.
       **PROBES NOW EXECUTABLE:** `devtools/probe_skeleton_8.py`,
       baseline captured — **1-4 FAIL, 5-8 PASS** on the committed
       composer. Acceptance = 8/8 with 5-8 never regressing.

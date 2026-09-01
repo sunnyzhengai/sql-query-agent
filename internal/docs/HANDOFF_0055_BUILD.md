@@ -4907,3 +4907,50 @@ NODE TYPE, which the AST gives for free (`VariableReference` vs
 `ColumnReferenceExpression` vs `Literal`). Case 8's assertion is
 deliberately weak today (only checks "between"); dev should
 strengthen it once the parameter rendering is ruled.
+
+### REVIEW SELF-CORRECTION — SCRIPTDOM DOES RUN ON THIS MAC; THE VENV IS ON THE WRONG PYTHON (08-31)
+
+**I was wrong in the order above, and Sunny's question caught it.**
+I wrote "ScriptDom cannot host on Sunny's Mac" and ordered dev to
+prove the fixtures on Fabric/CI or against recorded structures.
+That conclusion overreached from one failed run.
+
+**What is actually true.** The failure is the INTERPRETER, not the
+machine. `.venv` is built on Apple's Command Line Tools Python 3.9.6
+(`home = /Library/Developer/CommandLineTools/usr/bin`), whose
+hardened runtime SIGKILLs coreclr — uncatchable, which is why the
+loader carries a subprocess probe just to detect it without dying.
+But every prerequisite for the supported path is ALREADY INSTALLED:
+Homebrew `python3.11`, pythonnet, .NET 8 runtimes (8.0.29, 8.0.30 in
+`~/.dotnet`), and `libs/Microsoft.SqlServer.TransactSql.ScriptDom.dll`.
+Verified live, this machine, today:
+```
+DOTNET_ROOT=~/.dotnet /opt/homebrew/bin/python3.11 -c "...parse_tsql(...)"
+  -> SCRIPTDOM OK: TSqlScript  errors: []
+```
+
+**Why the error mattered.** An order that says "you cannot verify
+locally" is precisely the pressure that tempts a text-mode fallback
+— the thing this whole re-cut exists to delete. My mistake pointed
+at the failure mode we are eliminating. Retracted in full.
+
+**ORDER — ENV-SCRIPTDOM-1 (prerequisite to DESC-SKELETON-3).**
+Rebuild the project venv on Homebrew 3.11 so the native parser is
+reachable in the default dev loop:
+- `.venv` recreated from `/opt/homebrew/bin/python3.11`, deps
+  reinstalled, `DOTNET_ROOT` exported for the session (document the
+  one-liner in the runbook — Sunny executes runbooks by hand, so
+  numbered concrete steps, per the plain-runbooks law).
+- Prove it: `parse_tsql` returns a TSqlScript with zero errors, and
+  the full suite runs on the new interpreter with the ScriptDom
+  tests EXECUTING rather than skipping. **Report the skip-count
+  delta** — if tests were silently skipping for want of a parser,
+  that number is a finding in its own right and belongs in the
+  ledger.
+- Do NOT add a text-mode fallback to make anything pass. If a test
+  cannot run without the parser, it fails loudly or it is fixed.
+
+**Consequence for DESC-SKELETON-3:** clause 3 of the revised order
+(proving ground / recorded structures) is RETRACTED. The eight
+fixtures run LOCALLY against a live parse, which is stronger
+evidence and a tighter loop than CI-only proof.
