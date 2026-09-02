@@ -82,3 +82,4 @@ never deleted — its status changes and it links to its replacement.
 | [0069](0069-source-connectors-retire.md) | SOURCE_CONNECTORS retires into the integration registry — 8 rows + change/identity doctrine as data; first file the ratchet deletes | Accepted |
 | [0070](0070-question-map-retires.md) | QUESTION_MAP retires into the notebook registry — FAMILY_RECORDS + cross-registry storage check + both-ways coverage | Accepted |
 | [0071](0071-user-flow-retires.md) | USER_FLOW retires — the flywheel folds into ARCHITECTURE; nothing else was law; FCOTS/RLS recorded as unbuilt roadmap | Accepted |
+| [0072](0072-crosswalk-goes-generated.md) | The crosswalk goes generated — Direction 1 from spec_registry (parents + why), Direction 2 from AXM_UNMAPPED | Accepted |

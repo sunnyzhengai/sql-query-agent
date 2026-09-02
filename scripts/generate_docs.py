@@ -378,6 +378,84 @@ def build_trace_map() -> str:
     return "\n".join(lines)
 
 
+def build_axiom_crosswalk() -> str:
+    """AXIOM_CROSSWALK.md — the bridge between the two axiom systems,
+    projected from the ledger (ADR 0072; mappings live in
+    src/spec_registry.py, exceptions in trace_registry.AXM_UNMAPPED)."""
+    from src.spec_registry import GROUPS, SPEC_REGISTRY
+    from src.trace_registry import AXM_UNMAPPED, TRACE_REGISTRY
+
+    axiom_adrs: "dict[str, list[str]]" = {}
+    for adr in sorted(TRACE_REGISTRY):
+        for ax in TRACE_REGISTRY[adr].get("axioms", []):
+            axiom_adrs.setdefault(ax, []).append(adr)
+
+    rows = []
+    for ax, rec in SPEC_REGISTRY.items():
+        parents = ", ".join(f"axm:{p}" for p in rec["parents"])
+        adrs = ", ".join(axiom_adrs.get(ax, [])) or "—"
+        rows.append(f"| spec:{ax} | {rec['title']} | {parents} | "
+                    f"{rec['parent_note']} | {adrs} |")
+
+    meta = [f"| **axm:{ax}** | {reason} |"
+            for ax, (kind, reason) in AXM_UNMAPPED.items()
+            if kind == "meta"]
+
+    n_spec = len(SPEC_REGISTRY)
+    return f"""<!-- GENERATED FILE — do not edit.
+     Sources: src/spec_registry.py (mappings + notes),
+     src/trace_registry.py (AXM_UNMAPPED, grounding ADRs).
+     Regenerate: python scripts/generate_docs.py
+     CI fails if stale (tests/test_axiom_crosswalk.py). -->
+
+<!-- TIER: BLUEPRINT — component key: crosswalk
+     src/trace_registry.py ARCHITECTURE_COMPONENTS -->
+
+# Axiom crosswalk — framework ↔ specification
+
+The bridge between the two axiom systems, generated from the ledger
+(ADR 0072; first audited by hand 2026-09-01, when the two systems were
+correlated only by claim). **Framework = law; spec = law applied
+here.** Not a bijection by design: one framework axiom legitimately
+spawns several spec axioms (axm:D2 becomes five mechanisms). The two
+id spaces collide on group letters B, D and R — always prefix
+(`axm:` vs `spec:`).
+
+**Scope:** the crosswalk maps SPEC's {n_spec} NUMBERED axioms. SPEC's
+remaining un-numbered normative prose is deliberately so: §3b (the
+design-review ritual — humans answer it at review) and §14d (testing
+strata — where axm:J3 lands). §13 was the exception and was promoted
+to Group T (ADR 0065); the two one-time gaps (axm:R2, axm:R4) were
+closed by Group L (ADR 0064).
+
+## Direction 1 — every numbered spec axiom traces up ({n_spec}/{n_spec})
+
+Groups: {" · ".join(f"{k}={v}" for k, v in GROUPS.items())}
+
+| Spec axiom | Title | Framework parent(s) | Why | Grounding ADR(s) |
+|---|---|---|---|---|
+{chr(10).join(rows)}
+
+**No orphans:** this codebase asserts no law the framework does not
+authorize — enforced, not asserted
+(tests/test_axiom_crosswalk.py::test_every_spec_axiom_has_a_framework_parent).
+
+## Direction 2 — every framework axiom reaches down, except 3 meta-axioms
+
+Laws ABOUT having a specification cannot be implemented AS spec axioms
+without circularity; SPEC satisfies them by existing and being kept:
+
+| Axiom | Why it cannot map / where it is satisfied |
+|---|---|
+{chr(10).join(meta)}
+
+Every other framework axiom is implemented by at least one spec axiom
+(test_every_framework_axiom_is_mapped_or_explained). A new spec axiom
+without a parent, or a framework axiom left silently unimplemented,
+is a red build.
+"""
+
+
 def build_landing_matrix() -> str:
     """DECISION_LANDING_MATRIX.md — the landing registry projected
     (ADR 0068, an ADR 0067 ratchet turn). The registry is the truth;
@@ -491,6 +569,8 @@ def build_landing_matrix() -> str:
     return "\n".join(lines)
 
 
+CROSSWALK_PATH = (PROJECT_ROOT / "docs" / "architecture"
+                  / "AXIOM_CROSSWALK.md")
 LANDING_MATRIX_PATH = (PROJECT_ROOT / "docs" / "architecture"
                        / "DECISION_LANDING_MATRIX.md")
 TEST_MAP_PATH = PROJECT_ROOT / "docs" / "architecture" / "TEST_MAP.md"
@@ -508,6 +588,8 @@ def main() -> None:
     print(f"Wrote {NOTEBOOK_MAP_PATH}")
     TRACE_MAP_PATH.write_text(build_trace_map())
     print(f"Wrote {TRACE_MAP_PATH}")
+    CROSSWALK_PATH.write_text(build_axiom_crosswalk())
+    print(f"Wrote {CROSSWALK_PATH}")
     LANDING_MATRIX_PATH.write_text(build_landing_matrix())
     print(f"Wrote {LANDING_MATRIX_PATH}")
 

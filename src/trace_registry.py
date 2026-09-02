@@ -178,7 +178,7 @@ ARCHITECTURE_COMPONENTS = {
     },
     "crosswalk": {
         "doc": "docs/architecture/AXIOM_CROSSWALK.md",
-        "current_through": "0065",
+        "current_through": "0072",
         "title": "Axiom crosswalk — framework to specification",
         "satisfies": ["S"],
         "governs": "The bridge between the two axiom systems: which "
@@ -736,6 +736,21 @@ TRACE_REGISTRY = {
                   "tests/test_term_hygiene.py", "tests/test_admin_graph.py",
                   "tests/test_companion.py"],
         "docs": ["docs/architecture/SPEC.md", "docs/architecture/TRACE_MAP.md"],
+    },
+    "0072": {
+        # ACCEPTED 2026-09-02 (ratchet turn 6): the crosswalk doc goes
+        # GENERATED — Direction 1 derives from spec_registry (parents
+        # + parent_note per record), Direction 2 from AXM_UNMAPPED.
+        # The hand prose's history (gaps found/closed) lives in
+        # 0064/0065; the doc now cannot disagree with the data.
+        "title": "The crosswalk goes generated (ratchet turn 6)",
+        "category": "architecture",
+        "component": "crosswalk",
+        "axioms": [],
+        "modules": ["src/spec_registry.py"],
+        "tests": ["tests/test_axiom_crosswalk.py"],
+        "docs": ["docs/decisions/0072-crosswalk-goes-generated.md",
+                 "docs/architecture/AXIOM_CROSSWALK.md"],
     },
     "0071": {
         # ACCEPTED 2026-09-02 (ratchet turn 5): USER_FLOW retires —

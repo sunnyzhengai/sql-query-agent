@@ -113,3 +113,15 @@ def test_known_gaps_stay_visible_in_the_crosswalk_document():
     missing = [a for a in gaps if f"axm:{a}" not in text]
     assert not missing, (
         f"gap(s) not documented in AXIOM_CROSSWALK.md: {missing}")
+
+
+def test_crosswalk_doc_on_disk_is_fresh():
+    """ADR 0072: the crosswalk doc is a generated projection of the
+    ledger — regeneration must produce zero diff."""
+    import importlib.util
+    spec = importlib.util.spec_from_file_location(
+        "gd", REPO / "scripts" / "generate_docs.py")
+    gd = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(gd)
+    assert gd.build_axiom_crosswalk() == CROSSWALK.read_text(), (
+        "AXIOM_CROSSWALK.md is stale — run: python scripts/generate_docs.py")

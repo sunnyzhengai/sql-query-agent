@@ -942,3 +942,15 @@ Two citation handles, because the axiom systems are distinct and their group let
 - **Summarized in:**
   - `docs/decisions/0071-user-flow-retires.md`
   - `docs/architecture/ARCHITECTURE.md`
+
+## ADR 0072 — The crosswalk goes generated (ratchet turn 6)
+
+- **Category:** architecture
+- **Component:** `crosswalk` → `docs/architecture/AXIOM_CROSSWALK.md` → axm:S
+- **Implemented by:**
+  - `src/spec_registry.py`
+- **Enforced by:**
+  - `tests/test_axiom_crosswalk.py`
+- **Summarized in:**
+  - `docs/decisions/0072-crosswalk-goes-generated.md`
+  - `docs/architecture/AXIOM_CROSSWALK.md`

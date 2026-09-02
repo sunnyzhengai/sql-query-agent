@@ -7,7 +7,7 @@
 
 # Test Map — what every test proves
 
-124 modules, 1421 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
+124 modules, 1422 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
 
 ## By ADR
 
@@ -52,7 +52,7 @@
 | 0044 | The tree contract: round-trip verified descriptions | `tests/graph/test_decision_wiring.py` (8), `tests/test_tree_contract.py` (14), `tests/tree/test_extract.py` (18) |
 | 0045 | The escalation contract: no silent residue | `tests/governance/test_leaf_grounding.py` (6), `tests/test_escalation_contract.py` (8) |
 | 0046 | Anchor, discover, match, rank — the human picks | `tests/test_derive_relationships.py` (7), `tests/test_spec_gates.py` (4) |
-| 0047 | The shadow specification (the axiom system) | `tests/test_axiom_crosswalk.py` (6), `tests/test_capability_registry.py` (4), `tests/test_extraction_registry.py` (6), `tests/test_spec_gates.py` (4) |
+| 0047 | The shadow specification (the axiom system) | `tests/test_axiom_crosswalk.py` (7), `tests/test_capability_registry.py` (4), `tests/test_extraction_registry.py` (6), `tests/test_spec_gates.py` (4) |
 | 0048 | Declared zones, trace registry, admin graph, companion | `tests/test_admin_graph.py` (9), `tests/test_companion.py` (7), `tests/test_term_hygiene.py` (2), `tests/test_trace_registry.py` (12), `tests/test_zones.py` (4) |
 | 0049 | Ingestion routes: filedrop, folders, live extractor | `tests/extractor/test_connection.py` (9), `tests/extractor/test_extractor.py` (15), `tests/extractor/test_proc_parity.py` (8) |
 | 0050 | Bounded read-only answer loop: plan to the answer, caption answers, auto-continue (amends 0036) | `tests/orchestrator/test_turn_engine.py` (31) |
@@ -73,6 +73,7 @@
 | 0068 | The landing matrix as data (ratchet turn 2) | `tests/test_landing_registry.py` (6) |
 | 0069 | SOURCE_CONNECTORS retires into the integration registry (ratchet turn 3) | `tests/test_integration_doctrine.py` (4) |
 | 0070 | QUESTION_MAP retires into the notebook registry (ratchet turn 4) | `tests/test_question_families.py` (4) |
+| 0072 | The crosswalk goes generated (ratchet turn 6) | `tests/test_axiom_crosswalk.py` (7) |
 
 ## By standing law
 
