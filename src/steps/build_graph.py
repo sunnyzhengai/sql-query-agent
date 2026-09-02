@@ -211,8 +211,14 @@ def build_graph_step(
     decision_rows: "list[dict]" = []
     tree_fallout_rows: "list[dict]" = []
     for pr in parse_results_rows:
-        builder.add_canonical_node(pr["metric_id"], pr["name"])
         parsed = parse_result_to_parsed_sql(pr)
+        builder.add_canonical_node(
+            pr["metric_id"], pr["name"],
+            # ADR 0074 D3: a no-step file is one block — its own
+            # statement rides the canonical node so 600 can describe
+            # the FILE (DESC-WHOLE-1's 46% were silent without this)
+            sql_fragment=(parsed.normalized_sql
+                          if not parsed.ctes else None))
         # W13a: projection minting moves into the tree loop below,
         # where the alias map exists (ED_DEPARTURE_TIME corpse: every
         # aliased qualifier died as unresolved_qualifier without it).

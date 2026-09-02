@@ -65,15 +65,19 @@ view are preserved history.
       corpus instrument; fabricated=0 = build_stopper; exit gate
       flipped). The standing nightly harness run stays with the
       demo-cadence work.
-- [ ] **D3 — metric/file-level composition**: metric <- terminal
-      steps (CTE or temp alike); deliverable per SQL FILE; coverage
-      = files described. EXIT: red-first skeletons flip green;
-      corpus coverage measured in files. Empties per the
-      (a) ruling: counted, absent, never loosened.
-- [ ] **D4 — the wedge sample**: run_xray gains the description
-      sample section with provenance chips. EXIT: XRAY_REPORT
-      fixture shows the section; PRODUCT_TIERS/XRAY_ENGAGEMENT gain
-      one line each.
+- [x] **D3 SHIPPED 09-02:** metric <- TERMINAL steps (computed from
+      the dep graph; CTE or temp alike; edge-roots as fallback);
+      no-step files describe their OWN statement — 300 mints
+      parsed.normalized_sql onto the canonical node, 600's
+      describe_step handles it with full gate/floor/emptied
+      semantics; result.file_descriptions = the per-FILE deliverable.
+      DESC-WHOLE-1's 46% now have a path end to end.
+- [x] **D4 SHIPPED 09-02:** compose_xray gains "Description sample
+      (hand-gradable)" — provenance chips, the grading note, absent
+      surface disclosed-not-zero; exit test runs the real composer
+      on a fixture store. THE D-QUEUE IS COMPLETE (D1-D5 + wiring):
+      the wedge's description half now matches its flag half —
+      designed, recorded, checked.
 - [x] **D5 SHIPPED 09-02 — and it became DESC-SKELETON-3 itself:**
       the AST-first composer (compose_skeleton consumes the faithful
       tree; scope-aware — DecisionSite gains scope, the walker bumps

@@ -930,6 +930,11 @@ class DescriptionResult:
     # skeleton floor > absent. (step_id, violations) — ABSENT rows,
     # counted, never stored, never silent.
     emptied: "list[tuple[str, list[str]]]" = field(default_factory=list)
+    # ADR 0074 D3 (DESC-FILE-1): the deliverable is a description per
+    # SQL FILE — metric node_id -> text; coverage is measured in
+    # files described. Multi-step files compose; single-statement
+    # files describe their own block.
+    file_descriptions: "dict[str, str]" = field(default_factory=dict)
 
     def fail(self, node_id: str, reason: str) -> None:
         self.failed.append(node_id)
@@ -1273,20 +1278,62 @@ def generate_descriptions(
         if node.layer != NodeLayer.CANONICAL:
             continue
         metric_id = node_id.replace("canonical:", "")
+        # ADR 0074 D3: compose from TERMINAL steps — the steps no
+        # other step of this metric depends on, CTE or temp alike.
+        # 0019's "root CTEs" premise broke on the real estate (23/28
+        # procs stage through temp tables). Edge-derived roots remain
+        # the fallback where the dep graph is absent.
+        metric_steps = [
+            sid for sid, n in nodes.items()
+            if n.layer == NodeLayer.TRANSFORMATION
+            and n.properties.get("metric_id", "") == metric_id
+        ]
+        depended = {t for s in metric_steps for t in dep_map.get(s, [])}
+        terminals = [s for s in metric_steps if s not in depended]
+        source_steps = terminals or roots_map.get(node_id, [])
         roots = [
             (nodes[r].name, described.get(r, ""))
-            for r in roots_map.get(node_id, []) if r in nodes
+            for r in source_steps if r in nodes
         ]
         if not roots:
+            # DESC-FILE-1: a no-step file is ONE BLOCK — describe its
+            # own statement (minted by 300 onto the canonical node).
+            frag = node.properties.get("sql_fragment", "")
+            if frag:
+                try:
+                    sd = describe_step(frag, None, smooth=describe)
+                except Exception as err:  # noqa: BLE001 — one bad file, not the batch
+                    result.fail(node_id,
+                                f"generation_error: {type(err).__name__}: {err}"[:300])
+                    continue
+                if sd.source == "skeleton":
+                    kill = grounding_violations(sd.text, frag)
+                    if kill:
+                        result.emptied.append((node_id, kill))
+                        continue
+                    prov = "skeleton_floor"
+                else:
+                    prov = "gate_passed"
+                result.descriptions[node_id] = sd.text
+                result.provenance[node_id] = prov
+                result.file_descriptions[node_id] = sd.text
+                result.generated += 1
+                continue
             result.fail(node_id, "no_root_steps: metric node has no "
-                                 "root-step edges to compose from")
+                                 "steps and no stored statement to "
+                                 "describe from")
             continue
         step_count = step_count_by_metric.get(metric_id, len(roots))
         decision_count = decision_count_by_metric.get(metric_id, 0)
         key = metric_content_hash(node.name, roots, step_count,
                                   decision_count)
         if key in cache:
-            result.descriptions[node_id] = cache[key]
+            entry = cache[key]
+            m_text, m_prov = (entry if isinstance(entry, tuple)
+                              else (entry, "gate_passed"))
+            result.descriptions[node_id] = m_text
+            result.provenance[node_id] = m_prov
+            result.file_descriptions[node_id] = m_text
             result.cache_hits += 1
             continue
         prompt = build_metric_prompt(node.name, roots, step_count,
@@ -1344,9 +1391,12 @@ def generate_descriptions(
             result.vague.append(node_id)
         if _RAW_IDENTIFIERS.search(text):
             result.jargon.append(node_id)
-        cache[key] = text
+        cache[key] = (text, "gate_passed")
         result.descriptions[node_id] = text
         result.provenance[node_id] = "gate_passed"
+        # the composed metric description IS the file description
+        # (DESC-FILE-1: multi-step files compose from steps)
+        result.file_descriptions[node_id] = text
         result.generated += 1
 
     return result

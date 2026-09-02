@@ -60,8 +60,9 @@ def test_d2_the_instrument_declares_its_build_stopper():
 
 
 # ---------------------------------------------------------------- D3
-@D
 def test_d3_single_statement_procs_get_a_file_description():
+    # FLIPPED 09-02 (D3 shipped: file_descriptions; no-step files
+    # describe their own minted statement; metric <- terminal steps)
     """Exit (DESC-WHOLE-1, 46% of the estate silent): the deliverable
     is a description per SQL FILE — a single-SELECT proc with no
     steps still yields one block; result exposes file-level
@@ -104,13 +105,20 @@ def test_wiring_voice_kill_beats_the_skeleton_and_is_counted():
 
 
 # ---------------------------------------------------------------- D4
-@D
 def test_d4_the_xray_report_carries_the_description_sample():
+    # FLIPPED 09-02 (D4 shipped: the sample section w/ chips)
     """Exit (the wedge contract, 0074 call 4): the report includes a
     hand-gradable description sample with provenance chips."""
-    src = open("devtools/run_xray.py").read()
-    assert "description sample" in src.lower()
-    assert "provenance" in src.lower()
+    from src.xray import compose_xray
+    report = compose_xray(
+        lambda q: ([{"description": "This is a selection of "
+                     "patients.", "provenance": "skeleton_floor"}]
+                   if "ops_description_cache" in q else []),
+        "TestOrg")
+    assert "## Description sample" in report
+    assert "`[skeleton_floor]`" in report
+    empty = compose_xray(lambda q: [], "TestOrg")
+    assert "disclosed, not zero" in empty
 
 
 # ------------------------------------------------- D5: FLIPPED 09-02

@@ -168,15 +168,25 @@ class GraphBuilder:
         description: str = "",
         steward: str | None = None,
         developer: str | None = None,
+        sql_fragment: "str | None" = None,
     ) -> str:
-        """Add a canonical-layer node (business metric)."""
+        """Add a canonical-layer node (business metric).
+
+        sql_fragment (ADR 0074 D3 / DESC-FILE-1): for a
+        SINGLE-STATEMENT proc — no CTEs, no staging — the file is one
+        block and its statement IS the fragment; storing it here is
+        what lets the file get a description at all (13/28 of the
+        corpus were silent for lack of it)."""
         node_id = f"canonical:{metric_id}"
+        props: dict = {"steward": steward, "developer": developer}
+        if sql_fragment:
+            props["sql_fragment"] = sql_fragment
         self.nodes[node_id] = GraphNode(
             node_id=node_id,
             layer=NodeLayer.CANONICAL,
             name=name,
             description=description,
-            properties={"steward": steward, "developer": developer},
+            properties=props,
         )
         return node_id
 

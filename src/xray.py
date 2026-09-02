@@ -85,6 +85,34 @@ def compose_xray(run_kql, org_name: str,
             f"- disposition: {f.get('disposition') or 'open'}",
             ""]
 
+    # ADR 0074 call 4 (the wedge description contract): a
+    # hand-gradable DESCRIPTION SAMPLE with provenance chips — the
+    # Bridge order form's evidence ("accurate descriptions your
+    # stewards never write"). Provenance vocabulary is spec:B2's.
+    lines += ["", "## Description sample (hand-gradable)", ""]
+    try:
+        sample = run_kql(
+            "ops_description_cache | where isnotempty(description) "
+            "| project description, provenance | take 5")
+    except Exception:   # noqa: BLE001 — absent surface is disclosed
+        sample = None
+    if not sample:
+        lines.append("- description surface not present in this "
+                     "store (disclosed, not zero)")
+    else:
+        for r in sample:
+            prov = str(r.get("provenance") or "gate_passed")
+            first = str(r.get("description") or "").splitlines()[0]
+            lines.append(f"- `[{prov}]` {first}")
+        lines.append("")
+        lines.append("Grade these against your own SQL: every claim "
+                     "is machine-checked before it lands "
+                     "(`gate_passed` = model prose that cleared the "
+                     "grounding gate; `skeleton_floor` = "
+                     "deterministic composition, unfalsifiable by "
+                     "construction). Absent descriptions are counted, "
+                     "never silent.")
+
     lines += ["", "## The AI-readiness verdict", ""]
     n_conf = len(conflicts)
     n_dup = len(duplicates)
