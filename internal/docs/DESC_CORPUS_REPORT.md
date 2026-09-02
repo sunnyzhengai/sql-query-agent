@@ -22,7 +22,7 @@ gate_passed = smoothed prose cleared the gate · skeleton_floor = the grounded s
 
 ### aggregate · High_Utilizer
 ```
-This is a selection of patients.
+This is a selection of patients.  
 - The number of encounter ID values is a minimum of 4.
 ```
 
@@ -48,7 +48,7 @@ This is a selection of patients.
 ### grain_patient · Patient_Grain
 ```
 This is a selection of patients.
-- The hba1c value is a minimum of 6.5.
+- The HbA1c value is at least 6.5.
 ```
 
 ### grain_visit · Visit_Grain
@@ -79,11 +79,11 @@ This is a selection of patients.
 ### threshold_ge · Threshold_GE
 ```
 This is a selection of patients.
-- The hba1c value is a minimum of 6.5.
+- The HbA1c value is at least 6.5.
 ```
 
 ### threshold_gt · Threshold_GT
 ```
-This is a selection of patients.  
-- The hba1c value is greater than 6.5.
+This is a selection of patients.
+- The HbA1c value is greater than 6.5.
 ```

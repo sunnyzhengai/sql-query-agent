@@ -7,7 +7,7 @@
 
 # Test Map — what every test proves
 
-128 modules, 1483 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
+129 modules, 1491 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
 
 ## By ADR
 
@@ -183,7 +183,7 @@ tests/test_docs_consistency.py).
 | spec:G1 | 0047 | — | `tests/test_axiom_crosswalk.py`, `tests/test_capability_registry.py`, `tests/test_extraction_registry.py`, `tests/test_spec_gates.py` |
 | spec:G2 | 0001, 0047 | `tests/test_skeleton_composer.py` | `tests/golden/test_parse_goldens.py`, `tests/parser/test_sql_parser.py`, `tests/test_axiom_crosswalk.py`, `tests/test_capability_registry.py`, `tests/test_extraction_registry.py`, `tests/test_native_parser_law.py`, `tests/test_spec_gates.py` |
 | spec:G3 | 0047 | — | `tests/test_axiom_crosswalk.py`, `tests/test_capability_registry.py`, `tests/test_extraction_registry.py`, `tests/test_spec_gates.py` |
-| spec:G4 | 0075 | `tests/test_check_contract.py`, `tests/test_gate_recut.py` | — |
+| spec:G4 | 0075 | `tests/test_check_contract.py`, `tests/test_gate_recut.py`, `tests/test_op_frontier.py` | — |
 | spec:H1 | 0045 | — | `tests/governance/test_leaf_grounding.py`, `tests/test_escalation_contract.py` |
 | spec:H2 | 0045, 0048 | — | `tests/governance/test_leaf_grounding.py`, `tests/test_admin_graph.py`, `tests/test_companion.py`, `tests/test_escalation_contract.py`, `tests/test_term_hygiene.py`, `tests/test_trace_registry.py`, `tests/test_zones.py` |
 | spec:L1 | 0064 | `tests/test_ledger_contract.py` | — |

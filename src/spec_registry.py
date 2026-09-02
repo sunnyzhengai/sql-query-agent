@@ -564,7 +564,8 @@ SPEC_REGISTRY = {
             'coverage matches type; correctness of checks is founder-'
             'defined too',
         "checks": ['tests/test_check_contract.py',
-                   'tests/test_skeleton_composer.py'],
+                   'tests/test_skeleton_composer.py',
+                   'tests/test_op_frontier.py'],
         "status": 'ENFORCED',
         "status_note":
             'by citation for standing instances (G2 inclusion, 0042 '

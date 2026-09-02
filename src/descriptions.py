@@ -488,7 +488,10 @@ def readable_column(col: str) -> str:
     """The fallback wording when a column has no dictionary entry:
     minimally transformed, never invented. ALT_ACTION_INST stays
     honest as 'alt action inst' — deliberately plain, so a thin
-    description reads as thin rather than as confident prose."""
+    description reads as thin rather than as confident prose.
+    CamelCase splits too ('@StartDate' voiced as 'dstartdate' was the
+    recorded 741bef2 find; parameters and TMDL names camel-case)."""
+    col = re.sub(r"(?<=[a-z0-9])(?=[A-Z])", " ", col)
     return re.sub(r"[_\W]+", " ", col).strip().lower()
 
 
@@ -596,7 +599,9 @@ def meaning_of(column: str, meanings: "dict[str, str] | None") -> str:
     bare = (column or "").split(".")[-1]
     key = bare.upper()
     doc = (meanings or {}).get(key) or (meanings or {}).get(bare)
-    return doc.strip() if doc and doc.strip() else readable_column(key)
+    # fallback gets the ORIGINAL casing — upper-casing first would
+    # destroy the camel boundaries readable_column splits on
+    return doc.strip() if doc and doc.strip() else readable_column(bare)
 
 
 def _values_from(operands: "list[str]") -> str:
@@ -611,6 +616,18 @@ def _values_from(operands: "list[str]") -> str:
 _OP_WORDS = {"EQ": "is", "NEQ": "is not", "GT": "is more than",
              "LT": "is less than", "GTE": "is at least",
              "LTE": "is at most"}
+
+# OP-FRONTIER-1 (spec:G4): the composer side of the seam, as data.
+# test_op_frontier holds EMITTED_OPS == VOICED_OPS ⊎ UNVOICED_OPS and
+# proves every VOICED op fires on a synthetic node — membership is
+# earned, not declared. An op entering the extractor without entering
+# a list here is a red build, not a corpus discovery.
+VOICED_OPS = frozenset({
+    "EQ", "NEQ", "GT", "LT", "GTE", "LTE",
+    "IN", "NOT_IN", "BETWEEN", "NOT_BETWEEN", "LIKE", "NOT_LIKE",
+    "IS", "IS_NOT", "EXISTS", "PARAMETER_DEFAULT",
+})
+UNVOICED_OPS: "dict[str, str]" = {}   # op -> recorded reason; empty is earned
 
 
 # DESC-LEAF-1: aggregate subjects, voiced from the parse's func fact.
@@ -745,6 +762,23 @@ def _leaf_phrase(n, meanings) -> "str | None":
             meaning_of(c, meanings)
             for c in n.columns[:2])) or "the linked records"
         return f"a matching record exists ({what})"
+    if op == "PARAMETER_DEFAULT":
+        # Sunny's 08-19 ruling: parameter-defaulting IF blocks exist
+        # so descriptions can voice them. Operands hold the @variable
+        # and the default literal(s) from the walked SET branches.
+        params = list(dict.fromkeys(
+            str(o).lstrip("@") for o in n.operands
+            if str(o).startswith("@")))
+        values = [str(o) for o in n.operands
+                  if not str(o).startswith("@")]
+        if params and values:
+            return (f"{meaning_of(params[0], meanings)} defaults to "
+                    f"{values[0]} when no value is supplied")
+        if params:
+            return (f"a default value is applied to "
+                    f"{meaning_of(params[0], meanings)} when none "
+                    f"is supplied")
+        return _raw_echo(n)
     # Unknown shape: the verbatim expression IS grounded — quote it.
     return _raw_echo(n)
 
@@ -754,6 +788,11 @@ def _render(n, meanings) -> "list[str]":
     ONE phrase (splitting it into bullets silently turns it into an
     AND — the LDA lesson at composer grain)."""
     if n.kind == "predicate":
+        if not n.must_voice:
+            # WHERE 1=1 scaffolding: extracted and counted, decides
+            # nothing — voicing it would raw-echo into a gate kill
+            # that empties the whole step (OP-FRONTIER-1 live find)
+            return []
         ph = _leaf_phrase(n, meanings)
         return [ph] if ph else []
     if n.kind == "and":

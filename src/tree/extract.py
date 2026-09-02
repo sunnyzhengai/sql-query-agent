@@ -42,7 +42,36 @@ _COMPARISON_OPS = {
     "LessThan": "LT",
     "GreaterThanOrEqualTo": "GTE",
     "LessThanOrEqualTo": "LTE",
+    # OP-FRONTIER-1: the legacy negated forms are exact synonyms
+    # (!<  means >=, !> means <=) — same op, same voice
+    "NotLessThan": "GTE",
+    "NotGreaterThan": "LTE",
+    "NotLike": "NOT_LIKE",
 }
+
+# OP-FRONTIER-1 (spec:G4): enum values RULED OUT of extraction, each
+# with its reason on the record. tests/test_op_frontier.py holds
+# _COMPARISON_OPS ⊎ DEFERRED_COMPARISONS == the ScriptDom enum, by
+# reflection, both directions — Microsoft owns the denominator.
+DEFERRED_COMPARISONS = {
+    "LeftOuterJoin": "legacy *= join predicate — join wiring, not a "
+                     "membership condition; falls to unextracted, counted",
+    "RightOuterJoin": "legacy =* join predicate — same ruling",
+    "IsDistinctFrom": "null-safe <> (SQL 2022) — the claim differs from "
+                      "NEQ exactly on missing values; unmodeled until a "
+                      "live specimen orders the phrase",
+    "IsNotDistinctFrom": "null-safe = (SQL 2022) — same ruling",
+}
+
+# The CLOSED set of op codes this extractor can emit — the seam's
+# extractor side, as data. test_op_frontier scans this module's own
+# source so the list can drift from the code in neither direction,
+# and holds EMITTED_OPS == VOICED_OPS ⊎ UNVOICED_OPS on the composer.
+EMITTED_OPS = frozenset({
+    "EQ", "NEQ", "GT", "LT", "GTE", "LTE",
+    "IN", "NOT_IN", "BETWEEN", "NOT_BETWEEN", "LIKE", "NOT_LIKE",
+    "IS", "IS_NOT", "EXISTS", "PARAMETER_DEFAULT",
+})
 
 # Node type names whose subtrees never hold decision contexts we want
 # and are expensive to reflect over.

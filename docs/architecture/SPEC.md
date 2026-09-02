@@ -518,7 +518,7 @@ plus per-capability sanctioned primitives `prims(c)`. Proposed home:
 *Gloss:* red-first proves a check CAN fire; only an enumerated, deny-by-default frontier proves it COVERS. The injected-violation proof is the mechanical second mind; the ancestry line makes prior art a recorded act.
 *Origin:* ADR 0075 — the sloppy-ban incident: GATE-REGEX-1 v1 checked one hand-picked function by substring, red-first and still wrong
 *Grounds in the framework:* axm:J3, axm:J1 — coverage matches type; correctness of checks is founder-defined too.
-*Checks:* `tests/test_check_contract.py`, `tests/test_skeleton_composer.py`
+*Checks:* `tests/test_check_contract.py`, `tests/test_skeleton_composer.py`, `tests/test_op_frontier.py`
 **Status: ENFORCED** — by citation for standing instances (G2 inclusion, 0042 planks, 0044 strict-xfail, TestRegexFrontier) + the scanner meta-test; the design protocol (INDEX step 4) carries it forward for new checks
 
 

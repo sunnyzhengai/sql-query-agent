@@ -171,6 +171,27 @@ view are preserved history.
       overstates quality. NOT successfully translated as shipped:
       High_Utilizer, Passthrough (Sunny's call, ruled by sample).
 
+### OP-FRONTIER-1 SHIPPED 09-03 (Sunny's "go" after the three-owner teach)
+- [x] **The enum-anchored totality check** (tests/test_op_frontier.py,
+      registered as a spec:G4 check): Microsoft owns the denominator —
+      ScriptDom's BooleanComparisonType is REFLECTED, never typed;
+      every enum value must be mapped or deferred-with-reason
+      (both directions). The extractor's EMITTED_OPS is data, held to
+      its own source by AST scan; the composer's VOICED_OPS ⊎
+      UNVOICED_OPS must equal it; every voiced op is injection-proven
+      on a synthetic node. THE SEAM DESC-LEAF-1 LACKED IS NOW A RED
+      BUILD, both directions. En route, the check flushed out and
+      forced closure of: (1) WHERE 1=1 raw-echoed → composer now
+      skips must_voice=False (was: whole step empties); (2)
+      PARAMETER_DEFAULT sites raw-echoed despite the 08-19 "so
+      descriptions can voice them" ruling → now voiced ("start date
+      defaults to '2024-01-01' when no value is supplied"), with the
+      recorded 'dstartdate' find fixed via camel-case splitting in
+      readable_column; (3) !< / !> mapped (GTE/LTE synonyms), legacy
+      *= joins and SQL-2022 IS [NOT] DISTINCT FROM deferred with
+      reasons on the record. Suite 1532 green; corpus stands 11/11
+      gate_passed · 0 emptied.
+
 ### RULINGS OPEN FOR SUNNY (carried + new)
 - [ ] Landing matrix v3 overall ratification (now generated from
       landing_registry; content unchanged, awaiting Bridge build)
