@@ -85,9 +85,35 @@ class TestGateRegex1:
     def test_the_composer_uses_no_regex_on_sql(self):
         """GATE-REGEX-1 (ruled with the re-cut, 7e506a5): parsing SQL
         with regex violates the native-parser law's spirit (spec:G2);
-        the composer walks the ScriptDom tree."""
-        src = inspect.getsource(compose_skeleton)
-        assert "re." not in src and "findall" not in src
+        the composer walks the ScriptDom tree. Coverage: the WHOLE
+        composer surface (helpers included), by AST — a substring scan
+        false-positives on names like `bare.upper()` (found while
+        answering Sunny's no-silent-fallback question, 09-02)."""
+        import ast
+
         import src.descriptions as d
-        for banned in ("_IN_LIST", "_BETWEEN", "_COMPARISON", "_IS_NULL"):
+        surface = (compose_skeleton, d._leaf_phrase, d._render,
+                   d._values_from, d.meaning_of, d.describe_step)
+        for fn in surface:
+            tree = ast.parse(inspect.getsource(fn).lstrip())
+            for node in ast.walk(tree):
+                if (isinstance(node, ast.Attribute)
+                        and isinstance(node.value, ast.Name)
+                        and node.value.id == "re"):
+                    raise AssertionError(
+                        f"{fn.__name__} uses re.{node.attr}")
+        for banned in ("_IN_LIST", "_BETWEEN", "_COMPARISON", "_IS_NULL",
+                       "_JOIN_KEYS"):
             assert not hasattr(d, banned), f"{banned} still exists"
+
+    def test_no_silent_regex_fallback_exists(self):
+        """Sunny's question, answered structurally: there is no code
+        path from the composer to any regex parser — the regex
+        composer was DELETED, not demoted to a fallback. The only
+        degradation on parse failure is CLAIMS OMITTED (the lead line
+        alone, grounded and true), never a different parser."""
+        src = inspect.getsource(compose_skeleton)
+        assert "sqlglot" not in src and "sqlparse" not in src
+        sk = compose_skeleton("THIS IS NOT SQL AT ALL ((((")
+        assert sk.startswith("This is a selection of")
+        assert "\n-" not in sk, "an unparseable fragment produced claims"
