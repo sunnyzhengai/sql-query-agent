@@ -7,7 +7,7 @@
 
 # Test Map — what every test proves
 
-126 modules, 1455 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
+127 modules, 1461 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
 
 ## By ADR
 
@@ -75,7 +75,8 @@
 | 0070 | QUESTION_MAP retires into the notebook registry (ratchet turn 4) | `tests/test_question_families.py` (4) |
 | 0072 | The crosswalk goes generated (ratchet turn 6) | `tests/test_axiom_crosswalk.py` (7) |
 | 0073 | SPEC v1.0: the spec becomes a projection of its own ledger (final ratchet turn) | `tests/test_spec_registry.py` (8) |
-| 0074 | The description architecture, ratified: skeleton floor, gate acceptance, metric-level design | `tests/test_desc_0074.py` (8), `tests/test_skeleton_composer.py` (7) |
+| 0074 | The description architecture, ratified: skeleton floor, gate acceptance, metric-level design | `tests/test_desc_0074.py` (8), `tests/test_skeleton_composer.py` (9) |
+| 0075 | The check contract: checks are claims (spec:G4) | `tests/test_check_contract.py` (4) |
 
 ## By standing law
 
@@ -182,6 +183,7 @@ tests/test_docs_consistency.py).
 | spec:G1 | 0047 | — | `tests/test_axiom_crosswalk.py`, `tests/test_capability_registry.py`, `tests/test_extraction_registry.py`, `tests/test_spec_gates.py` |
 | spec:G2 | 0001, 0047 | `tests/test_skeleton_composer.py` | `tests/golden/test_parse_goldens.py`, `tests/parser/test_sql_parser.py`, `tests/test_axiom_crosswalk.py`, `tests/test_capability_registry.py`, `tests/test_extraction_registry.py`, `tests/test_native_parser_law.py`, `tests/test_spec_gates.py` |
 | spec:G3 | 0047 | — | `tests/test_axiom_crosswalk.py`, `tests/test_capability_registry.py`, `tests/test_extraction_registry.py`, `tests/test_spec_gates.py` |
+| spec:G4 | 0075 | `tests/test_check_contract.py` | — |
 | spec:H1 | 0045 | — | `tests/governance/test_leaf_grounding.py`, `tests/test_escalation_contract.py` |
 | spec:H2 | 0045, 0048 | — | `tests/governance/test_leaf_grounding.py`, `tests/test_admin_graph.py`, `tests/test_companion.py`, `tests/test_escalation_contract.py`, `tests/test_term_hygiene.py`, `tests/test_trace_registry.py`, `tests/test_zones.py` |
 | spec:L1 | 0064 | `tests/test_ledger_contract.py` | — |

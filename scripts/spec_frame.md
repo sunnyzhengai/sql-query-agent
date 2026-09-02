@@ -279,7 +279,7 @@ Declare a **capability-ownership registry**: `own : Capabilities → Modules`,
 plus per-capability sanctioned primitives `prims(c)`. Proposed home:
 `CAPABILITY_REGISTRY` in src/, the fifth peer registry.
 
-{{AXIOMS:G1,G2,G3}}
+{{AXIOMS:G1,G2,G3,G4}}
 
 *Honest residue:* G-group catches the high-risk primitive classes. Two
 innocent pure-Python functions independently reimplementing the same logic

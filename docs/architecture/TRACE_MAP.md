@@ -979,3 +979,14 @@ Two citation handles, because the axiom systems are distinct and their group let
   - `tests/test_skeleton_composer.py`
 - **Summarized in:**
   - `docs/decisions/0074-description-architecture-ratified.md`
+
+## ADR 0075 — The check contract: checks are claims (spec:G4)
+
+- **Category:** architecture
+- **Component:** `spec` → `docs/architecture/SPEC.md` → axm:S, axm:J, axm:M, axm:B, axm:R
+- **Grounds:** spec:G4
+- **Enforced by:**
+  - `tests/test_check_contract.py`
+- **Summarized in:**
+  - `docs/decisions/0075-the-check-contract.md`
+  - `docs/architecture/SPEC.md`

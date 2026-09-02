@@ -143,17 +143,13 @@ class TestRegexFrontier:
                      "_condition_text"}
 
     def test_the_regex_frontier_is_enumerated_and_closed(self):
-        import ast as _ast
         from pathlib import Path
+
+        from tests.test_check_contract import regex_users  # G4: the
+        # scanner is shared and META-TESTED (the tester is tested)
         src = (Path(__file__).resolve().parent.parent
                / "src" / "descriptions.py").read_text()
-        users = set()
-        for fn in _ast.walk(_ast.parse(src)):
-            if isinstance(fn, (_ast.FunctionDef, _ast.AsyncFunctionDef)):
-                if any(isinstance(n, _ast.Attribute)
-                       and isinstance(n.value, _ast.Name)
-                       and n.value.id == "re" for n in _ast.walk(fn)):
-                    users.add(fn.name)
+        users = regex_users(src)
         allowed = self.SANCTIONED_TEXT_SIDE | self.DEBT_SQL_SIDE
         new = sorted(users - allowed)
         assert not new, (

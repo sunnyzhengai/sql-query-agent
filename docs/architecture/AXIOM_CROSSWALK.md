@@ -17,14 +17,14 @@ spawns several spec axioms (axm:D2 becomes five mechanisms). The two
 id spaces collide on group letters B, D and R — always prefix
 (`axm:` vs `spec:`).
 
-**Scope:** the crosswalk maps SPEC's 48 NUMBERED axioms. SPEC's
+**Scope:** the crosswalk maps SPEC's 49 NUMBERED axioms. SPEC's
 remaining un-numbered normative prose is deliberately so: §3b (the
 design-review ritual — humans answer it at review) and §14d (testing
 strata — where axm:J3 lands). §13 was the exception and was promoted
 to Group T (ADR 0065); the two one-time gaps (axm:R2, axm:R4) were
 closed by Group L (ADR 0064).
 
-## Direction 1 — every numbered spec axiom traces up (48/48)
+## Direction 1 — every numbered spec axiom traces up (49/49)
 
 Groups: A=Identity · B=Soundness · C=Completeness · D=Derived structure · E=Ask-time determinism · F=The round trip · G=Mechanism uniqueness · H=Escalation · L=The ledger · P=The one-mind turn · Q=Graph topology · R=Ask-time interpretation + run boundary · T=The double-sided function
 
@@ -52,6 +52,7 @@ Groups: A=Identity · B=Soundness · C=Completeness · D=Derived structure · E=
 | spec:G1 | one owner per capability | axm:D2 | one owner per capability, mechanized | 0047 |
 | spec:G2 | sanctioned powers only (import-graph inclusion) | axm:D2 | one owner per capability, mechanized | 0001, 0047 |
 | spec:G3 | no undeclared power | axm:D2 | one owner per capability, mechanized | 0047 |
+| spec:G4 | checks are claims: fire and cover | axm:J3, axm:J1 | coverage matches type; correctness of checks is founder-defined too | 0075 |
 | spec:H1 | fallout resolution is total and closed | axm:R3 | novelty escalates | 0045 |
 | spec:H2 | novelty always escalates | axm:R3 | novelty escalates | 0045, 0048 |
 | spec:L1 | append-only is declared AND obeyed | axm:R4 | the ledger may only grow | 0064 |
@@ -92,7 +93,6 @@ without circularity; SPEC satisfies them by existing and being kept:
 |---|---|
 | **axm:S1** | SPEC.md IS the Phi this axiom demands |
 | **axm:S2** | amendment authority; SPEC section 16 change discipline |
-| **axm:J3** | how to test; SPEC section 14d testing strata |
 
 Every other framework axiom is implemented by at least one spec axiom
 (test_every_framework_axiom_is_mapped_or_explained). A new spec axiom

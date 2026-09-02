@@ -44,7 +44,11 @@ law: a design review that cannot show them does not proceed.
 4. **Write the ADR with its checks declared** (§14d: every stratum,
    before shipping). Tests may land as strict-xfail skeletons — the
    ADR 0044 pattern, locked in red before implementation — but they
-   are NAMED now, not after.
+   are NAMED now, not after. **Every check obeys the check contract
+   (`spec:G4`):** its frontier enumerated as data, deny-by-default;
+   trusted only after an injected violation proved it fires (pinned
+   as a meta-test where feasible); its pattern ancestor named on the
+   record.
 5. **Register:** the trace-registry entry (component, axioms, planned
    modules/tests, docs) and **bump the component's `current_through`
    stamp** — the attestation that its blueprint was reconciled.

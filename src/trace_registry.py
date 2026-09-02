@@ -86,10 +86,13 @@ SPEC_TO_AXM = {ax: rec["parents"] for ax, rec in SPEC_REGISTRY.items()}
 # Only meta entries remain: the two `gap` rows (R2, R4) were CLOSED by
 # ADR 0064 / SPEC Group L on 2026-09-01. Direction 2 of the crosswalk
 # now holds — every non-meta framework axiom reaches a spec axiom.
+# J3 LEFT this list on 2026-09-02: spec:G4 (the check contract)
+# implements "coverage matches type" for checks themselves — the first
+# meta-axiom to become implementable, caught by the closure check when
+# G4 landed with parent J3.
 AXM_UNMAPPED = {
     "S1": ("meta", "SPEC.md IS the Phi this axiom demands"),
     "S2": ("meta", "amendment authority; SPEC section 16 change discipline"),
-    "J3": ("meta", "how to test; SPEC section 14d testing strata"),
 }
 
 # The BLUEPRINT tier: one row per architecture map. `satisfies` names
@@ -99,7 +102,7 @@ AXM_UNMAPPED = {
 ARCHITECTURE_COMPONENTS = {
     "spec": {
         "doc": "docs/architecture/SPEC.md",
-        "current_through": "0074",
+        "current_through": "0075",
         "title": "The shadow specification — the formal axiom system",
         "satisfies": ["S", "J", "M", "B", "R"],
         "governs": "The axiom system this codebase is checked against: "
@@ -736,6 +739,20 @@ TRACE_REGISTRY = {
                   "tests/test_term_hygiene.py", "tests/test_admin_graph.py",
                   "tests/test_companion.py"],
         "docs": ["docs/architecture/SPEC.md", "docs/architecture/TRACE_MAP.md"],
+    },
+    "0075": {
+        # ACCEPTED 2026-09-02: the check contract (spec:G4) — fire and
+        # cover are distinct claims; frontiers as data deny-by-default;
+        # injected-violation proofs pinned as meta-tests; pattern
+        # ancestry on the record. Born from the sloppy-ban incident.
+        "title": "The check contract: checks are claims (spec:G4)",
+        "category": "architecture",
+        "component": "spec",
+        "axioms": ["G4"],
+        "modules": [],
+        "tests": ["tests/test_check_contract.py"],
+        "docs": ["docs/decisions/0075-the-check-contract.md",
+                 "docs/architecture/SPEC.md"],
     },
     "0074": {
         # ACCEPTED 2026-09-02 (four calls ruled same day): the

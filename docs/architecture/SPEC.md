@@ -509,6 +509,18 @@ plus per-capability sanctioned primitives `prims(c)`. Proposed home:
 *Checks:* `tests/test_capability_registry.py`
 **Status: ENFORCED** — same inclusion check (an unowned use fails with the registry named) + `test_g3_banned_parsers_have_no_owner`. *Honest residue:* G-group catches the high-risk primitive classes. Two innocent pure-Python functions independently reimplementing the same logic (a second fold, a second hash) are not mechanically detectable — mitigated by owning primitive operations in single modules and by review. Stated so nobody mistakes the fence for a force field. ---
 
+**G4 — checks are claims: fire and cover.**
+
+    enforcement check => frontier enumerated AS DATA, deny-by-default
+    trusted check     => proven against an injected violation (pinned)
+    new mechanism     => names its pattern ancestor on the record
+
+*Gloss:* red-first proves a check CAN fire; only an enumerated, deny-by-default frontier proves it COVERS. The injected-violation proof is the mechanical second mind; the ancestry line makes prior art a recorded act.
+*Origin:* ADR 0075 — the sloppy-ban incident: GATE-REGEX-1 v1 checked one hand-picked function by substring, red-first and still wrong
+*Grounds in the framework:* axm:J3, axm:J1 — coverage matches type; correctness of checks is founder-defined too.
+*Checks:* `tests/test_check_contract.py`, `tests/test_skeleton_composer.py`
+**Status: ENFORCED** — by citation for standing instances (G2 inclusion, 0042 planks, 0044 strict-xfail, TestRegexFrontier) + the scanner meta-test; the design protocol (INDEX step 4) carries it forward for new checks
+
 
 *Honest residue:* G-group catches the high-risk primitive classes. Two
 innocent pure-Python functions independently reimplementing the same logic

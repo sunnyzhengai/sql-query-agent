@@ -544,6 +544,34 @@ SPEC_REGISTRY = {
             'operations in single modules and by review. Stated so nobody '
             'mistakes the fence for a force field.  ---',
     },
+    "G4": {
+        "title": 'checks are claims: fire and cover',
+        "law":
+            '    enforcement check => frontier enumerated AS DATA, deny-by-default\n'
+            '    trusted check     => proven against an injected violation (pinned)\n'
+            '    new mechanism     => names its pattern ancestor on the record',
+        "gloss":
+            'red-first proves a check CAN fire; only an enumerated, '
+            'deny-by-default frontier proves it COVERS. The injected-'
+            'violation proof is the mechanical second mind; the '
+            'ancestry line makes prior art a recorded act.',
+        "origin":
+            'ADR 0075 — the sloppy-ban incident: GATE-REGEX-1 v1 '
+            'checked one hand-picked function by substring, red-first '
+            'and still wrong',
+        "parents": ['J3', 'J1'],
+        "parent_note":
+            'coverage matches type; correctness of checks is founder-'
+            'defined too',
+        "checks": ['tests/test_check_contract.py',
+                   'tests/test_skeleton_composer.py'],
+        "status": 'ENFORCED',
+        "status_note":
+            'by citation for standing instances (G2 inclusion, 0042 '
+            'planks, 0044 strict-xfail, TestRegexFrontier) + the '
+            'scanner meta-test; the design protocol (INDEX step 4) '
+            'carries it forward for new checks',
+    },
     "H1": {
         "title": 'fallout resolution is total and closed',
         "law":
