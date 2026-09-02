@@ -43,12 +43,14 @@ view are preserved history.
 - [ ] landing_registry OPEN_ITEMS: Collibra relation types ·
       canonical-child marking · outbox retention
 
-### WORKING-TREE HYGIENE (uncommitted, Sunny's call)
-- [ ] internal/docs mass deletion — commit when satisfied
-- [ ] src/descriptions.py + tests/test_grounding_gate.py carry
-      uncommitted modifications from the aborted merge — diff,
-      then keep or discard
-- [ ] dist/: 42 untracked wheels (1.58.4→1.83.0) — add or prune
+### WORKING-TREE HYGIENE — ALL CLEARED (09-02, Sunny's "take care of it"; pushed fb8690d)
+- [x] internal/docs mass deletion committed (99 files + 2 probes)
+- [x] merge damage DISCARDED — the working-tree changes were
+      deletions of the shipped DESC-MEANING-1 skeleton + its test
+      file (the aborted merge's losing side); HEAD stands, suite
+      regained 14 grounding tests (1481 passing)
+- [x] dist/ wheels 1.58.4→1.83.0 committed (continues tracked series)
+- [x] working tree fully clean for the first time since 08-31
 
 ### DEFERRED BY DESIGN (re-enter via the protocol, not prose)
 - [ ] REFERENCE_ARCHITECTURE slim (at the listing push)
