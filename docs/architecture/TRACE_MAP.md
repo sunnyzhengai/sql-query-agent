@@ -23,7 +23,7 @@ Two citation handles, because the axiom systems are distinct and their group let
 
 | Component | File | Satisfies | Governs |
 |---|---|---|---|
-| `architecture` | [ARCHITECTURE.md](ARCHITECTURE.md) | axm:D, axm:S, axm:J, axm:R | What the system is and is becoming, in one file: the four shells, radial dynamics, data flow, the nervous system, the ownership economy, the contracts split — each section build-statused. |
+| `architecture` | [ARCHITECTURE.md](ARCHITECTURE.md) | axm:D, axm:S, axm:J, axm:M, axm:B, axm:R | What the system is and is becoming, in one file: the four shells, radial dynamics, data flow, the nervous system, the ownership economy, the contracts split — each section build-statused. |
 | `crosswalk` | [AXIOM_CROSSWALK.md](AXIOM_CROSSWALK.md) | axm:S | The bridge between the two axiom systems: which framework law each spec axiom applies here, and which framework laws are meta or unstated gaps. |
 | `integration` | [INTEGRATION_MAP.md](INTEGRATION_MAP.md) | axm:D, axm:B, axm:R | The connector and catalog landscape as data: every source configuration and write target, change detection, and object identity across re-ingests. |
 | `landing` | [DECISION_LANDING_MATRIX.md](DECISION_LANDING_MATRIX.md) | axm:B, axm:R | Which artifact each governance action produces in Purview/Collibra, and the OUTBOX that remembers it. |
@@ -34,14 +34,13 @@ Two citation handles, because the axiom systems are distinct and their group let
 | `spec` | [SPEC.md](SPEC.md) | axm:S, axm:J, axm:M, axm:B, axm:R | The axiom system this codebase is checked against: identity, soundness, completeness, derivation, ask-time determinism, interpretation, and the run-layer boundary. |
 | `test` | [TEST_MAP.md](TEST_MAP.md) | axm:J | The verification strata: which check carries which claim, by ADR, standing law, and contract. |
 | `trace` | [TRACE_MAP.md](TRACE_MAP.md) | axm:S, axm:J | This registry, projected: decision -> component -> axioms -> code -> tests. |
-| `user_flow` | [USER_FLOW.md](USER_FLOW.md) | axm:M, axm:B | How a question moves from ask to answer, and how usage feeds the governance flywheel. |
 
 ### The execution tier
 
 ## ADR 0001 — Native parsers per SQL dialect
 
 - **Category:** architecture
-- **Component:** `architecture` → `docs/architecture/ARCHITECTURE.md` → axm:D, axm:S, axm:J, axm:R
+- **Component:** `architecture` → `docs/architecture/ARCHITECTURE.md` → axm:D, axm:S, axm:J, axm:M, axm:B, axm:R
 - **Grounds:** spec:C1, spec:G2
 - **Implemented by:**
   - `src/parser/scriptdom_loader.py`
@@ -59,7 +58,7 @@ Two citation handles, because the axiom systems are distinct and their group let
 ## ADR 0002 — Delta tables over an external graph database
 
 - **Category:** architecture
-- **Component:** `architecture` → `docs/architecture/ARCHITECTURE.md` → axm:D, axm:S, axm:J, axm:R
+- **Component:** `architecture` → `docs/architecture/ARCHITECTURE.md` → axm:D, axm:S, axm:J, axm:M, axm:B, axm:R
 - **Implemented by:**
   - `src/graph/backend.py`
   - `src/graph/delta_backend.py`
@@ -76,7 +75,7 @@ Two citation handles, because the axiom systems are distinct and their group let
 ## ADR 0003 — Store sql_fragments, not full SQL blobs
 
 - **Category:** architecture
-- **Component:** `architecture` → `docs/architecture/ARCHITECTURE.md` → axm:D, axm:S, axm:J, axm:R
+- **Component:** `architecture` → `docs/architecture/ARCHITECTURE.md` → axm:D, axm:S, axm:J, axm:M, axm:B, axm:R
 - **Implemented by:**
   - `src/graph/builder.py`
   - `src/orchestrator/assemble.py`
@@ -89,7 +88,7 @@ Two citation handles, because the axiom systems are distinct and their group let
 ## ADR 0004 — Two-stage human-in-the-loop certification
 
 - **Category:** architecture
-- **Component:** `architecture` → `docs/architecture/ARCHITECTURE.md` → axm:D, axm:S, axm:J, axm:R
+- **Component:** `architecture` → `docs/architecture/ARCHITECTURE.md` → axm:D, axm:S, axm:J, axm:M, axm:B, axm:R
 - **Implemented by:**
   - `src/governance/steward.py`
 - **Enforced by:**
@@ -184,7 +183,7 @@ Two citation handles, because the axiom systems are distinct and their group let
 ## ADR 0012 — Build on the existing repo, no rewrite
 
 - **Category:** architecture
-- **Component:** `architecture` → `docs/architecture/ARCHITECTURE.md` → axm:D, axm:S, axm:J, axm:R
+- **Component:** `architecture` → `docs/architecture/ARCHITECTURE.md` → axm:D, axm:S, axm:J, axm:M, axm:B, axm:R
 - **Summarized in:**
   - `docs/architecture/ARCHITECTURE.md`
 
@@ -205,7 +204,7 @@ Two citation handles, because the axiom systems are distinct and their group let
 ## ADR 0014 — Ground the agent in metric_logic; dictionary is mandatory
 
 - **Category:** architecture
-- **Component:** `architecture` → `docs/architecture/ARCHITECTURE.md` → axm:D, axm:S, axm:J, axm:R
+- **Component:** `architecture` → `docs/architecture/ARCHITECTURE.md` → axm:D, axm:S, axm:J, axm:M, axm:B, axm:R
 - **Grounds:** spec:C4
 - **Implemented by:**
   - `src/graph/metric_logic.py`
@@ -251,7 +250,7 @@ Two citation handles, because the axiom systems are distinct and their group let
 ## ADR 0017 — Resolve-then-traverse agent retrieval
 
 - **Category:** architecture
-- **Component:** `architecture` → `docs/architecture/ARCHITECTURE.md` → axm:D, axm:S, axm:J, axm:R
+- **Component:** `architecture` → `docs/architecture/ARCHITECTURE.md` → axm:D, axm:S, axm:J, axm:M, axm:B, axm:R
 - **Implemented by:**
   - `src/graph/templates.py`
   - `src/adapters/fabric_agent.py`
@@ -304,7 +303,7 @@ Two citation handles, because the axiom systems are distinct and their group let
 ## ADR 0021 — Certification discloses, never gates
 
 - **Category:** architecture
-- **Component:** `architecture` → `docs/architecture/ARCHITECTURE.md` → axm:D, axm:S, axm:J, axm:R
+- **Component:** `architecture` → `docs/architecture/ARCHITECTURE.md` → axm:D, axm:S, axm:J, axm:M, axm:B, axm:R
 - **Enforced by:**
   - `tests/test_schemas.py`
 - **Summarized in:**
@@ -322,7 +321,7 @@ Two citation handles, because the axiom systems are distinct and their group let
 ## ADR 0023 — Usage-weighted governance flywheel
 
 - **Category:** architecture
-- **Component:** `architecture` → `docs/architecture/ARCHITECTURE.md` → axm:D, axm:S, axm:J, axm:R
+- **Component:** `architecture` → `docs/architecture/ARCHITECTURE.md` → axm:D, axm:S, axm:J, axm:M, axm:B, axm:R
 - **Implemented by:**
   - `src/orchestrator/events.py`
 - **Enforced by:**
@@ -333,7 +332,7 @@ Two citation handles, because the axiom systems are distinct and their group let
 ## ADR 0024 — Layered truth: personal beside enterprise definitions
 
 - **Category:** architecture
-- **Component:** `architecture` → `docs/architecture/ARCHITECTURE.md` → axm:D, axm:S, axm:J, axm:R
+- **Component:** `architecture` → `docs/architecture/ARCHITECTURE.md` → axm:D, axm:S, axm:J, axm:M, axm:B, axm:R
 - **Enforced by:**
   - `tests/test_schemas.py`
   - `tests/test_table_contracts.py`
@@ -372,7 +371,7 @@ Two citation handles, because the axiom systems are distinct and their group let
 ## ADR 0027 — Ownership attribution: manual floor, Entra ID enriches
 
 - **Category:** architecture
-- **Component:** `architecture` → `docs/architecture/ARCHITECTURE.md` → axm:D, axm:S, axm:J, axm:R
+- **Component:** `architecture` → `docs/architecture/ARCHITECTURE.md` → axm:D, axm:S, axm:J, axm:M, axm:B, axm:R
 - **Enforced by:**
   - `tests/governance/test_steward.py`
 - **Summarized in:**
@@ -395,7 +394,7 @@ Two citation handles, because the axiom systems are distinct and their group let
 ## ADR 0030 — Layered retrieval: search terms first, vectors where allowed
 
 - **Category:** architecture
-- **Component:** `architecture` → `docs/architecture/ARCHITECTURE.md` → axm:D, axm:S, axm:J, axm:R
+- **Component:** `architecture` → `docs/architecture/ARCHITECTURE.md` → axm:D, axm:S, axm:J, axm:M, axm:B, axm:R
 - **Implemented by:**
   - `src/steps/search_index.py`
   - `src/orchestrator/kusto.py`
@@ -407,7 +406,7 @@ Two citation handles, because the axiom systems are distinct and their group let
 ## ADR 0031 — Business terms: weighted plurality
 
 - **Category:** architecture
-- **Component:** `architecture` → `docs/architecture/ARCHITECTURE.md` → axm:D, axm:S, axm:J, axm:R
+- **Component:** `architecture` → `docs/architecture/ARCHITECTURE.md` → axm:D, axm:S, axm:J, axm:M, axm:B, axm:R
 - **Implemented by:**
   - `src/governance/business_terms.py`
 - **Enforced by:**
@@ -443,12 +442,12 @@ Two citation handles, because the axiom systems are distinct and their group let
 ## ADR 0034 — Conversational entry edge (superseded in part by 0035)
 
 - **Category:** architecture
-- **Component:** `user_flow` → `docs/architecture/USER_FLOW.md` → axm:M, axm:B
+- **Component:** `architecture` → `docs/architecture/ARCHITECTURE.md` → axm:D, axm:S, axm:J, axm:M, axm:B, axm:R
 
 ## ADR 0035 — Agentic conversation over deterministic tools
 
 - **Category:** architecture
-- **Component:** `user_flow` → `docs/architecture/USER_FLOW.md` → axm:M, axm:B
+- **Component:** `architecture` → `docs/architecture/ARCHITECTURE.md` → axm:D, axm:S, axm:J, axm:M, axm:B, axm:R
 - **Grounds:** spec:E3
 - **Implemented by:**
   - `src/orchestrator/agent.py`
@@ -466,7 +465,7 @@ Two citation handles, because the axiom systems are distinct and their group let
 ## ADR 0036 — Operations are the product: plan, confirm, execute, display
 
 - **Category:** architecture
-- **Component:** `user_flow` → `docs/architecture/USER_FLOW.md` → axm:M, axm:B
+- **Component:** `architecture` → `docs/architecture/ARCHITECTURE.md` → axm:D, axm:S, axm:J, axm:M, axm:B, axm:R
 - **Grounds:** spec:E6
 - **Implemented by:**
   - `src/methodology.py`
@@ -482,7 +481,7 @@ Two citation handles, because the axiom systems are distinct and their group let
 ## ADR 0037 — The completed algebra: traverse + result-set kernels
 
 - **Category:** architecture
-- **Component:** `architecture` → `docs/architecture/ARCHITECTURE.md` → axm:D, axm:S, axm:J, axm:R
+- **Component:** `architecture` → `docs/architecture/ARCHITECTURE.md` → axm:D, axm:S, axm:J, axm:M, axm:B, axm:R
 - **Grounds:** spec:D1
 - **Implemented by:**
   - `src/graph/traversal.py`
@@ -497,7 +496,7 @@ Two citation handles, because the axiom systems are distinct and their group let
 ## ADR 0038 — The interaction layer: 'no' is input
 
 - **Category:** architecture
-- **Component:** `user_flow` → `docs/architecture/USER_FLOW.md` → axm:M, axm:B
+- **Component:** `architecture` → `docs/architecture/ARCHITECTURE.md` → axm:D, axm:S, axm:J, axm:M, axm:B, axm:R
 - **Implemented by:**
   - `src/steps/agent_events.py`
 - **Enforced by:**
@@ -574,7 +573,7 @@ Two citation handles, because the axiom systems are distinct and their group let
 ## ADR 0043 — The diff kernel: the founding question's shape
 
 - **Category:** architecture
-- **Component:** `architecture` → `docs/architecture/ARCHITECTURE.md` → axm:D, axm:S, axm:J, axm:R
+- **Component:** `architecture` → `docs/architecture/ARCHITECTURE.md` → axm:D, axm:S, axm:J, axm:M, axm:B, axm:R
 - **Implemented by:**
   - `src/graph/decomposition_diff.py`
 - **Enforced by:**
@@ -619,7 +618,7 @@ Two citation handles, because the axiom systems are distinct and their group let
 ## ADR 0046 — Anchor, discover, match, rank — the human picks
 
 - **Category:** architecture
-- **Component:** `architecture` → `docs/architecture/ARCHITECTURE.md` → axm:D, axm:S, axm:J, axm:R
+- **Component:** `architecture` → `docs/architecture/ARCHITECTURE.md` → axm:D, axm:S, axm:J, axm:M, axm:B, axm:R
 - **Grounds:** spec:E1, spec:E4, spec:E5
 - **Implemented by:**
   - `src/discovery/paths.py`
@@ -687,7 +686,7 @@ Two citation handles, because the axiom systems are distinct and their group let
 ## ADR 0050 — Bounded read-only answer loop: plan to the answer, caption answers, auto-continue (amends 0036)
 
 - **Category:** architecture
-- **Component:** `user_flow` → `docs/architecture/USER_FLOW.md` → axm:M, axm:B
+- **Component:** `architecture` → `docs/architecture/ARCHITECTURE.md` → axm:D, axm:S, axm:J, axm:M, axm:B, axm:R
 - **Grounds:** spec:E3
 - **Implemented by:**
   - `src/orchestrator/turn_engine.py`
@@ -724,7 +723,7 @@ Two citation handles, because the axiom systems are distinct and their group let
 ## ADR 0053 — Projection-grain column lineage: transform_to_column edges, resolved-only, conservation-counted
 
 - **Category:** architecture
-- **Component:** `architecture` → `docs/architecture/ARCHITECTURE.md` → axm:D, axm:S, axm:J, axm:R
+- **Component:** `architecture` → `docs/architecture/ARCHITECTURE.md` → axm:D, axm:S, axm:J, axm:M, axm:B, axm:R
 - **Grounds:** spec:C1, spec:C2
 - **Implemented by:**
   - `src/graph/builder.py`
@@ -738,7 +737,7 @@ Two citation handles, because the axiom systems are distinct and their group let
 ## ADR 0054 — Governance red flags and governed plurality: misnomer/duplicate/cousin sweep over content hashes
 
 - **Category:** architecture
-- **Component:** `architecture` → `docs/architecture/ARCHITECTURE.md` → axm:D, axm:S, axm:J, axm:R
+- **Component:** `architecture` → `docs/architecture/ARCHITECTURE.md` → axm:D, axm:S, axm:J, axm:M, axm:B, axm:R
 - **Grounds:** spec:C1, spec:E2
 - **Implemented by:**
   - `src/governance/red_flags.py`
@@ -766,7 +765,7 @@ Two citation handles, because the axiom systems are distinct and their group let
 ## ADR 0056 — The decision algebra: every answer ends in a decision (typed deny, usage weights)
 
 - **Category:** architecture
-- **Component:** `architecture` → `docs/architecture/ARCHITECTURE.md` → axm:D, axm:S, axm:J, axm:R
+- **Component:** `architecture` → `docs/architecture/ARCHITECTURE.md` → axm:D, axm:S, axm:J, axm:M, axm:B, axm:R
 - **Implemented by:**
   - `src/flywheel.py`
 - **Enforced by:**
@@ -777,7 +776,7 @@ Two citation handles, because the axiom systems are distinct and their group let
 ## ADR 0057 — The Sphere: architecture model, ownership economy, contracts split
 
 - **Category:** architecture
-- **Component:** `architecture` → `docs/architecture/ARCHITECTURE.md` → axm:D, axm:S, axm:J, axm:R
+- **Component:** `architecture` → `docs/architecture/ARCHITECTURE.md` → axm:D, axm:S, axm:J, axm:M, axm:B, axm:R
 - **Summarized in:**
   - `docs/decisions/0057-the-sphere.md`
   - `docs/architecture/ARCHITECTURE.md`
@@ -831,7 +830,7 @@ Two citation handles, because the axiom systems are distinct and their group let
 ## ADR 0062 — The dialogue loop: show, propose, ask, execute
 
 - **Category:** architecture
-- **Component:** `user_flow` → `docs/architecture/USER_FLOW.md` → axm:M, axm:B
+- **Component:** `architecture` → `docs/architecture/ARCHITECTURE.md` → axm:D, axm:S, axm:J, axm:M, axm:B, axm:R
 - **Grounds:** spec:R2, spec:R3, spec:R4, spec:R5
 - **Implemented by:**
   - `src/webapp/app.py`
@@ -883,7 +882,7 @@ Two citation handles, because the axiom systems are distinct and their group let
 ## ADR 0066 — One system-model file: SPHERE merges into ARCHITECTURE
 
 - **Category:** architecture
-- **Component:** `architecture` → `docs/architecture/ARCHITECTURE.md` → axm:D, axm:S, axm:J, axm:R
+- **Component:** `architecture` → `docs/architecture/ARCHITECTURE.md` → axm:D, axm:S, axm:J, axm:M, axm:B, axm:R
 - **Summarized in:**
   - `docs/decisions/0066-merge-sphere-into-architecture.md`
   - `docs/architecture/ARCHITECTURE.md`
@@ -935,3 +934,11 @@ Two citation handles, because the axiom systems are distinct and their group let
 - **Summarized in:**
   - `docs/decisions/0070-question-map-retires.md`
   - `docs/architecture/NOTEBOOK_MAP.md`
+
+## ADR 0071 — USER_FLOW retires (ratchet turn 5)
+
+- **Category:** architecture
+- **Component:** `architecture` → `docs/architecture/ARCHITECTURE.md` → axm:D, axm:S, axm:J, axm:M, axm:B, axm:R
+- **Summarized in:**
+  - `docs/decisions/0071-user-flow-retires.md`
+  - `docs/architecture/ARCHITECTURE.md`

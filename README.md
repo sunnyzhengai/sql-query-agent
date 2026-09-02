@@ -90,7 +90,7 @@ SQL Sources → Parser → Graph Builder → Delta Tables → Data Agent
 - [Documentation Index](docs/README.md) — all documentation, organized by audience
 - [Architecture](docs/architecture/ARCHITECTURE.md) — three-layer graph model, data flow
 - [Decision Records](docs/decisions/README.md) — one ADR per architectural/product decision
-- [User Flow](docs/architecture/USER_FLOW.md) — how questions move through the system
+- [the system model](docs/architecture/ARCHITECTURE.md) — how questions move through the system
 - [Installation Guide](docs/deployment/INSTALLATION_GUIDE.md) — deploying to Microsoft Fabric
 - [Setup](docs/development/SETUP.md) — local development
 - [Testing](docs/development/TESTING.md) — test strategy

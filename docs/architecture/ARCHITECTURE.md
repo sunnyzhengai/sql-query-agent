@@ -132,6 +132,24 @@ ADR 0061 — rung-3 composition is not.)*
   EXECUTE → data. (Pro tier; the execution leg shipped read-only,
   gated — ADR 0061.) Three rungs as provenance grades (ADR 0058).
 
+### The flywheel — every question makes the system better — `BUILT`
+
+*(Folded in from the retired USER_FLOW.md, ADR 0071 — the ~15 lines
+that were law; the rest was duplication or story.)*
+
+- **Refusal is intake** (ADR 0005): "I don't have a certified
+  definition for that yet" logs the demand; certification turns the
+  next ask into a grounded answer. There are no wasted questions.
+- **Weights are derived, never stored** (`spec:L2`): confirms, runs,
+  prunes and escalations are append-only events (ADR 0023/0056);
+  every usage number is recomputed from the ledger.
+- **The escalation door stands at every round** (`spec:R4`): an
+  exhausted loop becomes a captured-demand handoff — the developer
+  arrives knowing what the user wanted and what the graph lacks.
+- **Weight patterns are promotion signals:** a metric asked
+  constantly is a dashboard candidate; a declining one is a staleness
+  flag; cross-department demand is a steward-alignment call.
+
 ## Data flow — `BUILT`
 
 ```

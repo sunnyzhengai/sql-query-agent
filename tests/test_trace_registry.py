@@ -77,6 +77,8 @@ def test_architecture_decisions_carry_code_or_tests():
                  # the build queue; no modules ever expected
         "0066",  # doc restructure (the SPHERE→ARCHITECTURE merge) —
                  # its artifact IS the blueprint; no code by nature
+        "0071",  # doc retirement (USER_FLOW folds into ARCHITECTURE)
+                 # — same nature as 0066
     }
     empty = [
         adr for adr, e in TRACE_REGISTRY.items()

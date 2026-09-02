@@ -112,9 +112,11 @@ ARCHITECTURE_COMPONENTS = {
         # component — one system-model file, organized by the Sphere,
         # every section carrying a build status.
         "doc": "docs/architecture/ARCHITECTURE.md",
-        "current_through": "0066",
+        "current_through": "0071",
         "title": "The system model — the Sphere",
-        "satisfies": ["D", "S", "J", "R"],
+        # all six groups since ADR 0071 (user_flow absorbed): the one
+        # system-model file legitimately spans the constitution.
+        "satisfies": ["D", "S", "J", "M", "B", "R"],
         "governs": "What the system is and is becoming, in one file: "
                    "the four shells, radial dynamics, data flow, the "
                    "nervous system, the ownership economy, the "
@@ -190,14 +192,6 @@ ARCHITECTURE_COMPONENTS = {
         "satisfies": ["S", "J"],
         "governs": "This registry, projected: decision -> component -> "
                    "axioms -> code -> tests.",
-    },
-    "user_flow": {
-        "doc": "docs/architecture/USER_FLOW.md",
-        "current_through": "0062",
-        "title": "User flow — the journey and the flywheel",
-        "satisfies": ["M", "B"],
-        "governs": "How a question moves from ask to answer, and how "
-                   "usage feeds the governance flywheel.",
     },
     # Product decisions are choices about the OFFER, not about a system
     # component — so they get their own blueprint, kept OUT of
@@ -576,7 +570,7 @@ TRACE_REGISTRY = {
     "0034": {
         "title": "Conversational entry edge (superseded in part by 0035)",
         "category": "architecture",
-        "component": "user_flow",
+        "component": "architecture",
         "axioms": [],
         "modules": [],
         "tests": [],
@@ -585,7 +579,7 @@ TRACE_REGISTRY = {
     "0035": {
         "title": "Agentic conversation over deterministic tools",
         "category": "architecture",
-        "component": "user_flow",
+        "component": "architecture",
         "axioms": ["E3"],
         "modules": ["src/orchestrator/agent.py", "src/orchestrator/tools.py",
                     "src/orchestrator/cli.py", "src/webapp/app.py",
@@ -597,7 +591,7 @@ TRACE_REGISTRY = {
     "0036": {
         "title": "Operations are the product: plan, confirm, execute, display",
         "category": "architecture",
-        "component": "user_flow",
+        "component": "architecture",
         "axioms": ["E6"],
         "modules": ["src/methodology.py",
                     "src/orchestrator/caption_gate.py",
@@ -621,7 +615,7 @@ TRACE_REGISTRY = {
     "0038": {
         "title": "The interaction layer: 'no' is input",
         "category": "architecture",
-        "component": "user_flow",
+        "component": "architecture",
         "axioms": [],
         "modules": ["src/steps/agent_events.py"],
         "tests": ["tests/steps/test_agent_events.py",
@@ -742,6 +736,21 @@ TRACE_REGISTRY = {
                   "tests/test_term_hygiene.py", "tests/test_admin_graph.py",
                   "tests/test_companion.py"],
         "docs": ["docs/architecture/SPEC.md", "docs/architecture/TRACE_MAP.md"],
+    },
+    "0071": {
+        # ACCEPTED 2026-09-02 (ratchet turn 5): USER_FLOW retires —
+        # nothing converts because nothing was agent-obeyable law;
+        # the flywheel's ~15 lines fold into ARCHITECTURE, the rest
+        # was duplication/story (FCOTS RLS verified unbuilt, recorded
+        # as roadmap in the ADR).
+        "title": "USER_FLOW retires (ratchet turn 5)",
+        "category": "architecture",
+        "component": "architecture",
+        "axioms": [],
+        "modules": [],
+        "tests": [],
+        "docs": ["docs/decisions/0071-user-flow-retires.md",
+                 "docs/architecture/ARCHITECTURE.md"],
     },
     "0070": {
         # ACCEPTED 2026-09-02 (ratchet turn 4): QUESTION_MAP.md
@@ -887,7 +896,7 @@ TRACE_REGISTRY = {
         # demand as a 0056 deny event).
         "title": "The dialogue loop: show, propose, ask, execute",
         "category": "architecture",
-        "component": "user_flow",
+        "component": "architecture",
         "axioms": ["R2", "R3", "R4", "R5"],
         "modules": ["src/webapp/app.py"],
         "tests": ["tests/webapp/test_app.py"],
@@ -1058,7 +1067,7 @@ TRACE_REGISTRY = {
         "title": "Bounded read-only answer loop: plan to the answer, "
                  "caption answers, auto-continue (amends 0036)",
         "category": "architecture",
-        "component": "user_flow",
+        "component": "architecture",
         "axioms": ["E3"],
         "modules": ["src/orchestrator/turn_engine.py"],
         "tests": ["tests/orchestrator/test_turn_engine.py"],

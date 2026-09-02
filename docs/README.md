@@ -7,7 +7,7 @@ sandboxes.** Everything else is safe to share.
 ## Architecture (public)
 - [ARCHITECTURE.md](architecture/ARCHITECTURE.md) — Three-layer graph model, module map, data flow, deployment models
 - [PIPELINE_MAP.md](architecture/PIPELINE_MAP.md) — **Generated** dataflow DAG projected from the data contracts (do not edit; `python scripts/generate_docs.py`)
-- [USER_FLOW.md](architecture/USER_FLOW.md) — End-to-end question flow (Path A/B, flywheel, row-level security, dual delivery)
+- [ARCHITECTURE.md](architecture/ARCHITECTURE.md) — the system model incl. the ask-time flywheel (USER_FLOW retired by ADR 0071; flywheel, row-level security, dual delivery)
 
 ## Decision Records (public)
 - [decisions/](decisions/README.md) — One ADR per architectural/product decision (native parsers, Delta over graph DB, BYOT, tiering, …). Canonical home for rationale.
