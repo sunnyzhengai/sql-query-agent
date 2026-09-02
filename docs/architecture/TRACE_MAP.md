@@ -976,5 +976,6 @@ Two citation handles, because the axiom systems are distinct and their group let
   - `src/descriptions.py`
 - **Enforced by:**
   - `tests/test_desc_0074.py`
+  - `tests/test_skeleton_composer.py`
 - **Summarized in:**
   - `docs/decisions/0074-description-architecture-ratified.md`

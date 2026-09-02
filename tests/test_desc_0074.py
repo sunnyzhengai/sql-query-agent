@@ -110,10 +110,10 @@ def test_d4_the_xray_report_carries_the_description_sample():
     assert "provenance" in src.lower()
 
 
-# ---------------------------------------------------------------- D5
-@D
+# ------------------------------------------------- D5: FLIPPED 09-02
 def test_d5_derived_table_filters_do_not_leak_into_the_outer_step():
-    """Exit (DESC-SKELETON-3a, the last pre-cleanup order): a filter
+    """GREEN (exit gate flipped 2026-09-02 — DESC-SKELETON-3 shipped:
+    scope-aware AST composer): a filter
     inside a derived table is the DERIVED step's decision; the outer
     step's skeleton must not claim it as its own."""
     from src.descriptions import compose_skeleton

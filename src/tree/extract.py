@@ -92,6 +92,11 @@ class DecisionSite:
     site_id: str
     context: str
     root: DecisionNode
+    # "outer" = the statement's own scope; "sub" = inside a derived
+    # table / subquery — ITS decision, not the outer step's claim
+    # (DESC-SKELETON-3a, the 8a8f13d leak). In-memory only: the
+    # persisted graph_decision_sites rows are unchanged this cut.
+    scope: str = "outer"
 
 
 @dataclass
@@ -149,6 +154,10 @@ class _Extractor:
         self.tree = tree
         self._site_n = 0
         self.suppressed = 0
+        self.sub_depth = 0          # >0 = inside a derived/subquery scope
+
+    def _scope(self) -> str:
+        return "outer" if self.sub_depth == 0 else "sub"
 
     # -- accounting ----------------------------------------------------
     def _next_site_id(self) -> str:
@@ -166,7 +175,8 @@ class _Extractor:
         root = self._convert(condition, context, f"{site_id}.0")
         if root is not None:
             self.tree.sites.append(DecisionSite(
-                site_id=site_id, context=context, root=root))
+                site_id=site_id, context=context, root=root,
+                scope=self._scope()))
 
     # -- generic reflection walk (the scriptdom_fabric idiom, with a
     # type-level property cache: thousands of AST nodes share ~50 types,
@@ -438,7 +448,8 @@ class _Extractor:
                     columns=[], operands=self._operands(node),
                     must_voice=True)
                 self.tree.sites.append(DecisionSite(
-                    site_id=site_id, context="parameter_default", root=leaf))
+                    site_id=site_id, context="parameter_default", root=leaf,
+                    scope=self._scope()))
             else:
                 self.add_unextracted(
                     "statement", "control_flow_if",
@@ -473,13 +484,21 @@ class _Extractor:
                         operands=self._operands(wc.WhenExpression),
                         must_voice=True)
                     self.tree.sites.append(DecisionSite(
-                        site_id=site_id, context="case_when", root=leaf))
+                        site_id=site_id, context="case_when", root=leaf,
+                        scope=self._scope()))
             except Exception:  # noqa: BLE001 — .NET reflection; counted, escalated
                 self.add_unextracted("case_when", "reflection_suppressed",
                                      _verbatim(node))
 
-        for child in self._children(node):
-            self.walk_statement(child, depth + 1)
+        nested = tn in ("QueryDerivedTable", "ScalarSubquery")
+        if nested:
+            self.sub_depth += 1
+        try:
+            for child in self._children(node):
+                self.walk_statement(child, depth + 1)
+        finally:
+            if nested:
+                self.sub_depth -= 1
 
 
 def build_decision_tree(fragment: str) -> DecisionTree:

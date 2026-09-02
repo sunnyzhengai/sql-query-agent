@@ -65,9 +65,16 @@ view are preserved history.
       sample section with provenance chips. EXIT: XRAY_REPORT
       fixture shows the section; PRODUCT_TIERS/XRAY_ENGAGEMENT gain
       one line each.
-- [ ] **D5 — DESC-SKELETON-3a** (carried from 8a8f13d): derived-table
-      filters leak into the outer step. EXIT: red-first fixture for
-      the leak class, then green.
+- [x] **D5 SHIPPED 09-02 — and it became DESC-SKELETON-3 itself:**
+      the AST-first composer (compose_skeleton consumes the faithful
+      tree; scope-aware — DecisionSite gains scope, the walker bumps
+      depth on QueryDerivedTable/ScalarSubquery). Regex composer
+      DELETED; GATE-REGEX-1 mechanized (no re. in the composer,
+      banned constants gone). All four 864af2f decoy corpses pinned
+      + green (NOT EXISTS voiced, HAVING kept, OR shape-preserved,
+      SELECT-CASE no phantom filter) + the 3a leak fixed BY NAME and
+      BY VALUE (IN-subquery literals no longer hoovered into outer
+      claims — found during the build). Exit marker flipped.
 - [x] **EMPTIES RULED (a) — Sunny, 09-02:** absence over
       fabrication; the field stays absent; the voice ban STAYS
       (rules the word-"table" item too). Precedence now law:

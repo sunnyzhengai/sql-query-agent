@@ -601,20 +601,6 @@ def misattribution_violations(text: str, fragment: str) -> "list[str]":
 # FALLBACK when model smoothing violates the gate — and why nothing
 # is ever empty again.
 
-_IN_LIST = re.compile(
-    r"(?is)\b([A-Za-z_][\w]*)\s+IN\s*\(([^)]{1,400})\)")
-# operands may be @parameters or qualified columns — a date range
-# bound to @dStartDate/@dEndDate is THE filter on most cohort steps
-# and was being dropped entirely (live find on #Base_Pop)
-_BETWEEN = re.compile(
-    r"(?is)\b([A-Za-z_][\w]*)\s+BETWEEN\s+([@A-Za-z_][\w.]*)\s+"
-    r"AND\s+([@A-Za-z_][\w.]*)")
-_COMPARISON = re.compile(
-    r"(?is)\b([A-Za-z_][\w]*)\s*(=|>=|<=|<>|!=|>|<)\s*"
-    r"('[^']{1,60}'|\d+(?:\.\d+)?)")
-_IS_NULL = re.compile(
-    r"(?is)\b([A-Za-z_][\w]*)\s+IS\s+(NOT\s+)?NULL")
-
 _MAX_LISTED_VALUES = 6
 
 
@@ -622,77 +608,127 @@ def meaning_of(column: str, meanings: "dict[str, str] | None") -> str:
     """A column's documented business meaning, or the minimally
     transformed name (Sunny's fallback ruling). Never the raw
     identifier — that is the whole point of the reframe."""
-    key = (column or "").upper()
-    doc = (meanings or {}).get(key) or (meanings or {}).get(column or "")
+    bare = (column or "").split(".")[-1]
+    key = bare.upper()
+    doc = (meanings or {}).get(key) or (meanings or {}).get(bare)
     return doc.strip() if doc and doc.strip() else readable_column(key)
 
 
-def _values_phrase(raw: str) -> str:
-    """The concrete values of an IN-list, elided past ~6 with a count
-    naming this list's OWN first and last values — never invented,
-    never an example (prompt-examples-become-data)."""
-    vals = [v.strip().strip("'\"") for v in raw.split(",") if v.strip()]
+def _values_from(operands: "list[str]") -> str:
+    """Concrete values, elided past ~6 with a count naming this list's
+    OWN first and last — never invented, never an example."""
+    vals = [str(v).strip().strip("'\"") for v in operands if str(v).strip()]
     if len(vals) <= _MAX_LISTED_VALUES:
         return ", ".join(f"'{v}'" for v in vals)
-    return (f"one of {len(vals)} values from '{vals[0]}' to "
-            f"'{vals[-1]}'")
+    return f"one of {len(vals)} values from '{vals[0]}' to '{vals[-1]}'"
 
 
-_SQL_COMMENTS = re.compile(r"(?m)--[^\n]*|/\*.*?\*/", re.S)
-# column = column: wires two tables together, decides nothing. This
-# is what made "line is 1" a headline condition on a 10-table step.
-_JOIN_KEYS = re.compile(
-    r"(?is)\b[A-Za-z_][\w]*\.[A-Za-z_][\w]*\s*=\s*"
-    r"[A-Za-z_][\w]*\.[A-Za-z_][\w]*")
+_OP_WORDS = {"EQ": "is", "NEQ": "is not", "GT": "is more than",
+             "LT": "is less than", "GTE": "is at least",
+             "LTE": "is at most"}
+
+
+def _leaf_phrase(n, meanings) -> "str | None":
+    """One predicate leaf -> one grounded phrase (no trailing period).
+    None = deliberately unvoiced here (join keys wire, they decide
+    nothing; case_when is a projection choice, not membership)."""
+    op = n.op or ""
+    col = meaning_of(n.column, meanings) if n.column else None
+    if op in _OP_WORDS:
+        if n.operands:
+            return f"{col or 'the value'} {_OP_WORDS[op]} {n.operands[0]}"
+        cols = [c for c in n.columns if c]
+        if op == "EQ" and len(cols) >= 2:
+            return None                      # column = column: a join key
+        if len(cols) >= 2:
+            return (f"{meaning_of(cols[0], meanings)} {_OP_WORDS[op]} "
+                    f"{meaning_of(cols[1], meanings)}")
+    if op == "IN":
+        if "SELECT" in (n.expression_sql or "").upper():
+            # subquery IN: its literals belong to the INNER scope —
+            # naming them here is the 3a leak by value
+            return (f"{col or 'the value'} is restricted to a "
+                    f"separately selected set")
+        if n.operands:
+            return f"{col or 'the value'} is {_values_from(n.operands)}"
+    if op == "BETWEEN":
+        if len(n.operands) >= 2:
+            lo, hi = n.operands[0], n.operands[1]
+            return (f"{col or 'the value'} falls between "
+                    f"{meaning_of(str(lo).lstrip('@'), meanings)} and "
+                    f"{meaning_of(str(hi).lstrip('@'), meanings)}")
+        cols = [c for c in n.columns if c]
+        if len(cols) >= 3:
+            return (f"{meaning_of(cols[0], meanings)} falls between "
+                    f"{meaning_of(cols[1], meanings)} and "
+                    f"{meaning_of(cols[2], meanings)}")
+    if op in ("IS", "IS_NOT"):
+        return (f"{col or 'the value'} is "
+                f"{'recorded' if op == 'IS_NOT' else 'not recorded'}")
+    if op == "EXISTS":
+        what = ", ".join(meaning_of(c, meanings)
+                         for c in n.columns[:2]) or "the linked records"
+        return f"a matching record exists ({what})"
+    # Unknown shape: the verbatim expression IS grounded — quote it.
+    return f"condition holds: `{n.expression_sql[:160]}`"
+
+
+def _render(n, meanings) -> "list[str]":
+    """A boolean subtree -> bullet phrases, SHAPE-PRESERVING: an OR is
+    ONE phrase (splitting it into bullets silently turns it into an
+    AND — the LDA lesson at composer grain)."""
+    if n.kind == "predicate":
+        ph = _leaf_phrase(n, meanings)
+        return [ph] if ph else []
+    if n.kind == "and":
+        out: "list[str]" = []
+        for c in n.children:
+            out.extend(_render(c, meanings))
+        return out
+    if n.kind == "or":
+        parts: "list[str]" = []
+        for c in n.children:
+            parts.extend(_render(c, meanings))
+        return [" or ".join(parts)] if parts else []
+    if n.kind == "not":
+        inner = [p for c in n.children for p in _render(c, meanings)]
+        if (len(n.children) == 1 and n.children[0].kind == "predicate"
+                and n.children[0].op == "EXISTS"):
+            return [inner[0].replace("a matching record exists",
+                                     "no matching record exists")]                 if inner else []
+        return [f"it is not the case that {p}" for p in inner]
+    return []
 
 
 def compose_skeleton(fragment: str,
                      meanings: "dict[str, str] | None" = None) -> str:
-    """DESC-MEANING-1 step 3: the deterministic composition. Code
-    only — no model. A lead line naming WHAT THIS IS, then one bullet
-    per condition, each naming the MEANING of its left-hand side, its
-    operator, and its CONCRETE VALUES."""
-    # Clarity SQL annotates IN-list items with trailing `-- name`
-    # comments; they were being swallowed into the values. A comment
-    # is documentation, not data (live find on #Pressors).
-    frag = _SQL_COMMENTS.sub(" ", fragment or "")
-    # What decides membership is a LITERAL FILTER (column = value),
-    # wherever it sits; what merely wires tables is a JOIN KEY
-    # (column = column). Restricting to WHERE was too blunt — 56 of
-    # 413 corpus steps put a real filter inside a JOIN ON. So keep
-    # the whole fragment and drop only column-to-column equality.
-    # (The _COMPARISON/_IN_LIST/_IS_NULL patterns already require a
-    # literal on the right; _BETWEEN is the exception, and a
-    # column-to-column range IS a real condition — #Pressors' "taken
-    # time between arrival and departure" — so it stays.)
-    deciding = _JOIN_KEYS.sub(" ", frag)
-    subject = subject_for(frag)
+    """DESC-SKELETON-3 (the ruled re-cut, ADR 0074): the deterministic
+    composition, AST-FIRST — the composer consumes the faithful
+    decision tree (ScriptDom, scope-aware), never regex over SQL text
+    (GATE-REGEX-1; the regex composer's four decoy-class defects and
+    the derived-table leak are pinned in test_skeleton_composer).
+
+    Scope law (DESC-SKELETON-3a): only OUTER-scope sites are this
+    step's claims — a filter inside a derived table or subquery is
+    THAT selection's decision, not this step's. case_when sites are
+    projection choices, never membership conditions (decoy 4); the
+    translate path's ledger still voices them (0044 clause 5)."""
+    subject = subject_for(fragment or "")
     lines = [f"This is a selection of {subject}."]
+    try:
+        tree = build_decision_tree(fragment or "")
+    except Exception:  # noqa: BLE001 — no parse, no claims: the lead
+        return "\n".join(lines)  # line alone is still grounded & true
     seen: "set[str]" = set()
-
-    def add(col: str, text: str) -> None:
-        key = (col.upper(), text)
-        if key in seen:
-            return
-        seen.add(key)
-        lines.append(f"- {text}")
-
-    for col, raw in _IN_LIST.findall(deciding):
-        add(col, f"{meaning_of(col, meanings)} is "
-                 f"{_values_phrase(raw)}.")
-    for col, lo, hi in _BETWEEN.findall(deciding):
-        add(col, f"{meaning_of(col, meanings)} falls between "
-                 f"{meaning_of(lo.split('.')[-1], meanings)} and "
-                 f"{meaning_of(hi.split('.')[-1], meanings)}.")
-    for col, op, val in _COMPARISON.findall(deciding):
-        word = {"=": "is", ">=": "is at least", "<=": "is at most",
-                "<>": "is not", "!=": "is not", ">": "is more than",
-                "<": "is less than"}[op]
-        add(col, f"{meaning_of(col, meanings)} {word} "
-                 f"{val.strip()}.")
-    for col, neg in _IS_NULL.findall(deciding):
-        add(col, f"{meaning_of(col, meanings)} is "
-                 f"{'recorded' if neg else 'not recorded'}.")
+    for site in tree.sites:
+        if site.scope != "outer" or site.context == "case_when":
+            continue
+        prefix = "after grouping, " if site.context == "having" else ""
+        for ph in _render(site.root, meanings):
+            text = f"- {prefix}{ph}."
+            if text not in seen:
+                seen.add(text)
+                lines.append(text)
     return "\n".join(lines)
 
 
