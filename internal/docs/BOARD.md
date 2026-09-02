@@ -105,6 +105,34 @@ view are preserved history.
       En route: the frontier scanner's own blind spot fixed
       (module-level compiled patterns — planted and pinned).
 
+### LIVE LEG RUN 09-02 — instrument re-cut + first real scorecard
+- [x] **INSTRUMENT RE-CUT (0074 call 1 completed in the field):**
+      the first live run graded a RETIRED path — desc_corpus still
+      drove a raw-SQL prompt through _grounded_describe (clean 1 /
+      emptied 5, meaningless for production). grade_case now runs
+      production's own acceptance verbatim (describe_step →
+      empties-(a) voice kill); report speaks spec:B2 vocabulary;
+      fabricated=0 threshold ENFORCED (exit 1). The T2 lesson
+      (checked ≠ shipping) applied to the instrument itself —
+      ancestry named in the module docstring per spec:G4.
+- [x] **Scorecard (dictionary-less worst-case leg):** 11 cases ·
+      gate_passed 8 · skeleton_floor 0 · emptied 3 · fabricated 0.
+      Report: internal/docs/DESC_CORPUS_REPORT.md (hand-gradable).
+- [ ] **DESC-LEAF-1 (ORDERABLE — found by the instrument's first
+      production-acceptance run):** the composer voices NONE of
+      {LIKE, NOT_LIKE, NOT_IN, NOT_BETWEEN} — the extractor emits
+      all four; each falls to the raw-echo fallback
+      (``condition holds: `ED.DX_CODE LIKE 'E11%'` ``), and raw echo
+      + voice gate = guaranteed empty. That is ALL three empties
+      (inclusion/exclusion/multi_join — the diabetic DX-code shapes,
+      the estate's bread and butter). Frontier enumerated: exactly
+      these four ops; the raw-echo fallback stays as the last resort
+      for truly unknown shapes (by design — it can never fabricate,
+      and the gate keeps it out of prose). Fix: four leaf phrases
+      ("starts with 'E11'" for prefix LIKE, pattern wording
+      otherwise; negations compose like IS_NOT). Exit: the three
+      emptied corpus classes ship as skeleton_floor or better.
+
 ### RULINGS OPEN FOR SUNNY (carried + new)
 - [ ] Landing matrix v3 overall ratification (now generated from
       landing_registry; content unchanged, awaiting Bridge build)

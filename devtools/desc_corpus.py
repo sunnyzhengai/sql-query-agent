@@ -1,20 +1,28 @@
-"""P0-b (DESC-CORPUS-1, ordered 2026-08-31): the adversarial corpus
-over LIVE description generation.
+"""P0-b (DESC-CORPUS-1, ordered 2026-08-31; re-cut to the ratified
+acceptance 2026-09-02): the adversarial corpus over LIVE description
+generation.
 
-Not fixtures of outputs: REAL fragments → REAL generation → the
-grounding gate → graded. The question this answers is not "does the
-gate catch a lie we hand it" (P0-a settled that) but "what does the
-live generator actually produce, at rate, on the shapes that break
-descriptions".
+THE INSTRUMENT MEASURES WHAT SHIPS (ADR 0074 call 1 — spec:F/T1 as
+the measurement instrument). Each case runs production's own
+acceptance — `describe_step` (deterministic skeleton → one smoothing
+attempt → grounding gate → skeleton floor) followed by the
+empties-(a) voice kill, the exact block `generate_descriptions`
+runs. Pattern ancestor (spec:G4 clause 3): the first cut of this
+harness drove a raw-SQL prompt through `_grounded_describe` — the
+pre-DESC-MEANING-1 acceptance — and kept grading that path after
+production moved; this re-cut is the T2 lesson (checked ≠ shipping)
+applied to the instrument itself.
 
-Per class we report: clean (passed the gate first try), recovered
-(the corrective retry fixed it), salvaged (surgical fallback kept
-grounded lines), emptied (absence over fabrication), and the
-violation classes seen. Failures are GATE FOOD — extend, re-run.
+Per class we report the PRODUCTION provenance vocabulary (spec:B2):
+gate_passed (smoothed prose cleared the gate) · skeleton_floor (the
+grounded skeleton shipped; the smoothing catch, if any, is listed) ·
+emptied (voice kill — absence over fabrication, counted never
+silent). Corpus cases carry NO dictionary, so this is the
+worst-case leg: every meaning falls back to readable column names.
 
 Usage:
   python devtools/desc_corpus.py            # live LLM (needs creds)
-  python devtools/desc_corpus.py --dry      # prompt shapes only
+  python devtools/desc_corpus.py --dry      # gate evidence only
 Writes: internal/docs/DESC_CORPUS_REPORT.md
 """
 
@@ -28,7 +36,7 @@ _sys.path.insert(0, _op.dirname(_op.dirname(_op.abspath(__file__))))
 from dataclasses import dataclass, field  # noqa: E402
 
 from src.descriptions import (  # noqa: E402
-    _grounded_describe,
+    describe_step,
     grounding_violations,
     parsed_grain,
     parsed_tables,
@@ -92,70 +100,70 @@ DAX_CASES = [
              "Registry[A1C] < 7), COUNTROWS(Registry))"},
 ]
 
-_PROMPT = """You are describing ONE step of a certified metric for a
-business audience.
-
-SQL:
-{sql}
-
-Write 1-3 bullet lines. State what this step selects and the
-conditions that decide membership. Use business words; never invent
-values, tables, or a counted entity the SQL does not support."""
-
-
 @dataclass
 class Tally:
-    clean: int = 0
-    recovered: int = 0
-    salvaged: int = 0
+    gate_passed: int = 0
+    skeleton_floor: int = 0
     emptied: int = 0
     violations: "list[str]" = field(default_factory=list)
     samples: "list[tuple]" = field(default_factory=list)
 
 
 def grade_case(case: dict, describe) -> "tuple[str, str, list]":
-    """Returns (outcome, final_text, first_pass_violations)."""
+    """Production acceptance, verbatim (descriptions.py, the
+    generate_descriptions step loop): describe_step → if the skeleton
+    ships, the empties-(a) voice kill decides shipped vs absent.
+
+    Returns (outcome, final_text, smoothing_catch_violations)."""
     sql = case["sql"]
-    prompt = _PROMPT.format(sql=sql)
-    first = describe(prompt).strip()
-    first_v = grounding_violations(first, sql) if first else []
-    text, removed = _grounded_describe(describe, prompt, sql, None)
-    if not first_v:
-        return "clean", text, []
-    if text and not removed:
-        return "recovered", text, first_v
-    if text:
-        return "salvaged", text, first_v
-    return "emptied", "", first_v
+    sd = describe_step(sql, None, smooth=describe)
+    if sd.source == "skeleton":
+        kill = grounding_violations(sd.text, sql)
+        if kill:
+            return "emptied", "", sd.violations + kill
+        return "skeleton_floor", sd.text, sd.violations
+    return "gate_passed", sd.text, sd.violations
 
 
 def run(describe, cases=None) -> "dict[str, Tally]":
     out: "dict[str, Tally]" = {}
     for case in (cases if cases is not None else CASES):
         t = out.setdefault(case["cls"], Tally())
-        outcome, text, first_v = grade_case(case, describe)
+        outcome, text, caught = grade_case(case, describe)
         setattr(t, outcome, getattr(t, outcome) + 1)
-        for v in first_v:
+        for v in caught:
             t.violations.append(v.split(":")[0])
-        t.samples.append((case["name"], text, first_v))
+        t.samples.append((case["name"], text, caught, case["sql"]))
     return out
 
 
+def fabricated_count(tallies: "dict[str, Tally]") -> int:
+    """THRESHOLDS['fabricated']: a violation surviving into FINAL
+    shipped text. Structurally impossible past the acceptance —
+    re-asserted from the outside (the instrument checks the checker)."""
+    return sum(len(grounding_violations(text, sql))
+               for t in tallies.values()
+               for _name, text, _caught, sql in t.samples if text)
+
+
 def report(tallies: "dict[str, Tally]") -> str:
-    lines = ["# P0-b — adversarial corpus over LIVE generation", ""]
-    tot = {"clean": 0, "recovered": 0, "salvaged": 0, "emptied": 0}
+    lines = ["# P0-b — adversarial corpus over LIVE generation "
+             "(production acceptance, ADR 0074)", ""]
+    tot = {"gate_passed": 0, "skeleton_floor": 0, "emptied": 0}
     for cls, t in tallies.items():
         for k in tot:
             tot[k] += getattr(t, k)
     n = sum(tot.values()) or 1
     lines += [
-        f"**{n} case(s)** · clean {tot['clean']} · recovered "
-        f"{tot['recovered']} · salvaged {tot['salvaged']} · emptied "
+        f"**{n} case(s)** · gate_passed {tot['gate_passed']} · "
+        f"skeleton_floor {tot['skeleton_floor']} · emptied "
         f"{tot['emptied']}",
         "",
-        "clean = passed the gate first try · recovered = the "
-        "corrective retry fixed it · salvaged = surgical fallback "
-        "kept grounded lines · emptied = absence over fabrication",
+        "gate_passed = smoothed prose cleared the gate · "
+        "skeleton_floor = the grounded skeleton shipped (the smoothing "
+        "catch, if any, is listed) · emptied = voice kill, absence "
+        "over fabrication (0074 §5.3a). Dictionary-less leg: meanings "
+        "fall back to readable column names.",
         "",
         "## Per class", "",
     ]
@@ -163,17 +171,18 @@ def report(tallies: "dict[str, Tally]") -> str:
         t = tallies[cls]
         vs = sorted(set(t.violations))
         lines.append(
-            f"- **{cls}** — clean {t.clean} · recovered {t.recovered}"
-            f" · salvaged {t.salvaged} · emptied {t.emptied}"
-            + (f" · first-pass violations: {', '.join(vs)}"
-               if vs else ""))
+            f"- **{cls}** — gate_passed {t.gate_passed} · "
+            f"skeleton_floor {t.skeleton_floor} · emptied {t.emptied}"
+            + (f" · smoothing catch: {', '.join(vs)}" if vs else ""))
     lines += ["", "## Samples (fragment → final description)", ""]
     for cls in sorted(tallies):
-        for name, text, first_v in tallies[cls].samples:
+        for name, text, caught, _sql in tallies[cls].samples:
             lines += [f"### {cls} · {name}",
                       "```", (text or "(emptied)").strip(), "```"]
-            if first_v:
-                lines.append(f"first pass: {len(first_v)} violation(s)")
+            if caught:
+                lines.append(
+                    f"smoothing catch: {len(caught)} violation(s) — "
+                    "the skeleton shipped instead")
             lines.append("")
     return "\n".join(lines)
 
@@ -209,6 +218,11 @@ def main() -> None:
         f.write(text)
     print(text.split("## Samples")[0])
     print(f"wrote {out}")
+    fab = fabricated_count(tallies)
+    if fab > THRESHOLDS["fabricated"]:
+        print(f"BUILD STOPPER: fabricated={fab} "
+              f"(threshold {THRESHOLDS['fabricated']})")
+        raise SystemExit(1)
 
 
 if __name__ == "__main__":
