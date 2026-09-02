@@ -18,7 +18,9 @@ working notes.**
 
 - **Belongs here** — evidence a standing ADR, spec axiom, or test cites
   as its proof; anything whose deletion would leave a decision
-  unsupported.
+  unsupported. Plus ONE sanctioned living file: **BOARD.md**, Sunny's
+  personal checklist (restored by her ruling 2026-09-02) — state
+  changes land there the moment they happen.
 - **Does not belong here** — handoffs, session logs, transcripts,
   briefs, checklists, and anything whose title contains a date or a
   round number. Those live in the conversation and die with it. If a

@@ -1,6 +1,67 @@
-# THE BOARD — living checklist (both sessions update ON EVERY STATE CHANGE)
+# THE BOARD — Sunny's personal checklist
 
-## ⭐ CURRENT VIEW — 2026-08-31 (rebuilt; supersedes older sections below)
+**Single-session since 2026-09-02** (the dev↔review relay is retired;
+restored as a PERSONAL checklist by Sunny's ruling the same day). The
+law is unchanged: state changes land here the moment they happen —
+conversation-held status doesn't exist. Sections below the current
+view are preserved history.
+
+## ⭐ CURRENT VIEW — 2026-09-02 (supersedes 08-31 below; that view's P0 completed, its P1/P2 queue stands)
+
+### DONE since 08-31 (the docs-are-data week; all pushed to dev, ADRs 0064–0073)
+- [x] Docs audit + three-tier hierarchy (axioms > blueprints >
+      decisions), mechanized in trace_registry w/ closure checks
+- [x] SPEC Groups L + T (crosswalk gaps closed; §13 promoted);
+      Group P registration bug found + fixed
+- [x] Blueprint staleness stamps (`current_through` — landing an
+      ADR forces reconciling its blueprint)
+- [x] Design-change protocol (docs/INDEX.md — the 6 steps before
+      a line of code)
+- [x] The prose ratchet, complete: SPHERE→ARCHITECTURE merge;
+      SOURCE_CONNECTORS/QUESTION_MAP/USER_FLOW retired into
+      registries; landing matrix + crosswalk + **SPEC v1.0 all
+      GENERATED**. docs/architecture = 10 files (2 authored + 8
+      generated); axiom statuses queryable (32E/13P/2G/1J)
+- [x] internal/docs cleanup policy (durable evidence only; 8
+      evidence files restored; this BOARD restored 09-02)
+
+### BUILD QUEUE (unchanged from 08-31 ruling: validate → integrate)
+- [ ] **P1 TERM-PROPOSE-1/2** — cluster → parent concept + child
+      terms; proposal payload w/ prefix, zero custom attributes
+      (now data-backed: landing_registry `organize_hierarchy` row)
+- [ ] **P2** — Bridge stage-1 hardening → PURVIEW-SPIKE-1 (her
+      tenant, hierarchy-by-REST is the risky call) → Collibra
+      Import API → outbox implementation (schema now in
+      landing_registry: OUTBOX_FIELDS/OUTCOMES)
+
+### RULINGS OPEN FOR SUNNY (carried + new)
+- [ ] Landing matrix v3 overall ratification (now generated from
+      landing_registry; content unchanged, awaiting Bridge build)
+- [ ] CONSOLE-6 item 2 — confirm handoff-receipts to unblock
+- [ ] X-Ray price + engagement length (listing time)
+- [ ] Film sequencing · capture day
+- [ ] landing_registry OPEN_ITEMS: Collibra relation types ·
+      canonical-child marking · outbox retention
+
+### WORKING-TREE HYGIENE (uncommitted, Sunny's call)
+- [ ] internal/docs mass deletion — commit when satisfied
+- [ ] src/descriptions.py + tests/test_grounding_gate.py carry
+      uncommitted modifications from the aborted merge — diff,
+      then keep or discard
+- [ ] dist/: 42 untracked wheels (1.58.4→1.83.0) — add or prune
+
+### DEFERRED BY DESIGN (re-enter via the protocol, not prose)
+- [ ] REFERENCE_ARCHITECTURE slim (at the listing push)
+- [ ] MARKETPLACE_LISTING — TABLED 2026-09-01
+- [ ] spec:T2 κ-diff — goes live when fragment stitching ships
+- [ ] FCOTS/RLS personalization — roadmap (ADR 0071; verified unbuilt)
+
+---
+
+## 🗄️ HISTORY — 2026-08-31 view and older (preserved)
+
+
+## CURRENT VIEW — 2026-08-31 (historical; P0 complete, P1/P2 carried forward above)
 
 **Sunny's ordering ruling (2026-08-31): validate before we
 integrate.** Rationale: Bridge's whole value claim is "accurate
