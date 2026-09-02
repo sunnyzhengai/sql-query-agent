@@ -4,9 +4,8 @@
 as recommended, same day ("ok to your recommendations"). Spec
 amendments landed with ratification: `spec:B2`'s vocabulary is now
 {gate_passed, skeleton_floor, flagged}; `spec:F`/`T1` are re-scoped
-as the MEASUREMENT INSTRUMENT. One sub-ruling remains open inside
-call 3 — the empties a/b/c options — on the BOARD; it blocks only
-D3's edge cases.
+as the MEASUREMENT INSTRUMENT. The call-3 sub-ruling
+landed 2026-09-02: **empties = (a)** — see §5.3a.
 
 ## 1. Context — how the design went unrecorded
 
@@ -115,6 +114,27 @@ fallback.
    still-parked empties ruling (BOARD: the word "table" empties true
    descriptions — options a/b/c) — it blocks the file-level
    composition's edge cases.
+
+   **3a. THE EMPTIES SUB-RULING — Sunny, 2026-09-02: option (a).**
+   Accept empties as the floor; the field stays absent. As posed
+   (08-31): (a) absence over fabrication · (b) machine-composed
+   fallback so nothing empties (review's recommendation) · (c)
+   loosen the voice rules. The world moved between posing and
+   ruling — DESC-MEANING-1 built the skeleton floor, which is (b)
+   system-wide for GROUNDING failures — so (a) governs the
+   RESIDUAL, and the precedence is now law:
+
+       voice/gate kill  >  skeleton floor  >  absent
+
+   Nothing empties for lack of grounding (the skeleton composes);
+   a description may empty by VOICE — a grounded, true sentence
+   killed by the vocabulary rule stays killed, and the field goes
+   absent rather than the ban loosening. This simultaneously rules
+   the sibling parked item (the word "table" on temp-staged steps):
+   the ban STAYS; `TestTempStepVoiceCost`'s pinned behaviour is now
+   the ruled behaviour. Empties are COUNTED (the DESC reports'
+   `emptied` column; D1 carries the count into the coverage
+   ledger), never silent — absence is honest only when visible.
 4. **The wedge sample.** RECOMMENDED: yes — the X-Ray report includes
    N sampled descriptions with provenance chips; it is the Bridge
    order form's evidence ("accurate descriptions your stewards never

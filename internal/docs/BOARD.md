@@ -51,8 +51,8 @@ view are preserved history.
 - [ ] **D3 — metric/file-level composition**: metric <- terminal
       steps (CTE or temp alike); deliverable per SQL FILE; coverage
       = files described. EXIT: red-first skeletons flip green;
-      corpus coverage measured in files. ⚠ edge cases BLOCKED on
-      the empties a/b/c sub-ruling (below).
+      corpus coverage measured in files. Empties per the
+      (a) ruling: counted, absent, never loosened.
 - [ ] **D4 — the wedge sample**: run_xray gains the description
       sample section with provenance chips. EXIT: XRAY_REPORT
       fixture shows the section; PRODUCT_TIERS/XRAY_ENGAGEMENT gain
@@ -60,9 +60,11 @@ view are preserved history.
 - [ ] **D5 — DESC-SKELETON-3a** (carried from 8a8f13d): derived-table
       filters leak into the outer step. EXIT: red-first fixture for
       the leak class, then green.
-- [ ] **SUB-RULING OPEN (Sunny): empties a/b/c** — the word "table"
-      empties true descriptions (3 of the sampled empties; pinned
-      TestTempStepVoiceCost). Blocks D3 edges only.
+- [x] **EMPTIES RULED (a) — Sunny, 09-02:** absence over
+      fabrication; the field stays absent; the voice ban STAYS
+      (rules the word-"table" item too). Precedence now law:
+      voice/gate kill > skeleton floor > absent; empties counted,
+      never silent. D3 fully unblocked.
 
 ### RULINGS OPEN FOR SUNNY (carried + new)
 - [ ] Landing matrix v3 overall ratification (now generated from
@@ -260,12 +262,9 @@ order; nothing skips ahead.
       found by parser, not text position; 7 of 28 files deliver
       via INSERT to a persistent table). Builds after
       DESC-SKELETON-3.
-- [ ] **PARKED FOR SUNNY — the word "table" empties true
-      descriptions.** 3 of the sampled empties had NO other
-      violation: grounded, true sentences about steps that
-      literally write a temp table, killed by the vocabulary
-      rule. A VOICE ruling, not a dev call — lands with review's
-      open a/b/c on empties. Pinned `TestTempStepVoiceCost`.
+- [x] ~~the word "table" empties true descriptions~~ — RULED by
+      the empties-(a) ruling (09-02, current view): ban stays,
+      absence stands, counted.
 - [ ] **PARKED FOR SUNNY — DESC-WHOLE-1: 13 of 28 procs get NO
       description.** They are single-SELECT report procs (no CTE,
       no temp staging — verified per file). 46% of the estate is

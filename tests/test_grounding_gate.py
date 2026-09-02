@@ -412,14 +412,13 @@ class TestDescWhole1Gap:
             assert not re.search(r"(?i)\bINSERT\s+INTO\s+#", sql), path
 
 class TestTempStepVoiceCost:
-    """DESC-TEMP-1 live find (08-31, PARKED for Sunny's ruling):
-    on temp-table staged steps the vocabulary rule fires on the
-    bare word 'table' and empties descriptions that are otherwise
-    TRUE and grounded. 3 of 11 empties in the stratified 60-step
-    run had NO other violation. Whether 'table' should stay banned
-    on a step that literally writes one is a VOICE ruling, not a
-    dev call — this test pins the current behaviour so the ruling
-    changes it deliberately."""
+    """DESC-TEMP-1 live find (08-31) — RULED by Sunny 2026-09-02,
+    empties option (a), ADR 0074 §5.3a: the vocabulary ban STAYS
+    even where it empties a TRUE, grounded sentence about a step
+    that literally writes a table. Absence over fabrication AND
+    over voice violation; precedence = voice/gate kill > skeleton
+    floor > absent; empties are counted, never silent. This test
+    pins the ruled behaviour."""
 
     def test_true_description_empties_on_the_word_table(self):
         sql = ("SELECT DISTINCT E.PATIENT_ID, E.ENCOUNTER_ID "
