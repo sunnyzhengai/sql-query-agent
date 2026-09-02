@@ -738,7 +738,8 @@ TRACE_REGISTRY = {
         "docs": ["docs/architecture/SPEC.md", "docs/architecture/TRACE_MAP.md"],
     },
     "0074": {
-        # PROPOSED 2026-09-02: ratify the field-evolved description
+        # ACCEPTED 2026-09-02 (four calls ruled same day): the
+        # field-evolved description
         # architecture (skeleton floor + gate acceptance) as 0044's
         # phase-3 amendment; fix 0019's metric premise (terminal steps,
         # not root CTEs; per-FILE deliverable); reopen the provenance
@@ -748,7 +749,7 @@ TRACE_REGISTRY = {
                  "floor, gate acceptance, metric-level design",
         "category": "architecture",
         "component": "spec",
-        "axioms": [],
+        "axioms": ["B2", "F", "T1"],
         "modules": [],
         "tests": [],
         "docs": ["docs/decisions/0074-description-architecture-ratified.md"],

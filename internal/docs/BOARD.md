@@ -34,15 +34,35 @@ view are preserved history.
       Import API → outbox implementation (schema now in
       landing_registry: OUTBOX_FIELDS/OUTCOMES)
 
-### THE WEDGE / DESCRIPTIONS (back on track, 09-02)
-- [ ] **ADR 0074 RATIFICATION — four calls** (verifier's fate ·
-      provenance names · metric/file-level + the parked empties
-      ruling · wedge sample in the X-Ray report). The ADR is the
-      reconstructed record of the DESC field evolution the cleanup
-      deleted; spec amendments land on ratification.
-- [ ] **DESC-SKELETON-3a (carried from 8a8f13d, the last pre-cleanup
-      order):** derived-table filters leak into the outer step —
-      unbuilt; resumes after 0074 rules.
+### THE WEDGE / DESCRIPTIONS — 0074 RATIFIED 09-02; the build queue
+- [x] **ADR 0074 RATIFIED (all four calls as recommended).** Spec
+      landed: B2 vocab = {gate_passed, skeleton_floor, flagged};
+      F/T1 = the measurement instrument. Design debt from the field
+      weeks is now record, not archaeology.
+- [ ] **D1 — provenance persistence** (the B2 stated gap): provenance
+      column on stored descriptions, closed-vocab invariant in
+      TABLE_REGISTRY, written by 600. EXIT: contract invariant green
+      + a red-first fixture per provenance value.
+- [ ] **D2 — the verifier becomes the instrument**: corpus harness
+      grading gate output (clean/recovered/emptied per class);
+      fabrications=0 is the build-stopper, emptied=0 the floor.
+      EXIT: scorecard emitted on the recorded corpus; thresholds
+      pinned as the honesty-floor pattern.
+- [ ] **D3 — metric/file-level composition**: metric <- terminal
+      steps (CTE or temp alike); deliverable per SQL FILE; coverage
+      = files described. EXIT: red-first skeletons flip green;
+      corpus coverage measured in files. ⚠ edge cases BLOCKED on
+      the empties a/b/c sub-ruling (below).
+- [ ] **D4 — the wedge sample**: run_xray gains the description
+      sample section with provenance chips. EXIT: XRAY_REPORT
+      fixture shows the section; PRODUCT_TIERS/XRAY_ENGAGEMENT gain
+      one line each.
+- [ ] **D5 — DESC-SKELETON-3a** (carried from 8a8f13d): derived-table
+      filters leak into the outer step. EXIT: red-first fixture for
+      the leak class, then green.
+- [ ] **SUB-RULING OPEN (Sunny): empties a/b/c** — the word "table"
+      empties true descriptions (3 of the sampled empties; pinned
+      TestTempStepVoiceCost). Blocks D3 edges only.
 
 ### RULINGS OPEN FOR SUNNY (carried + new)
 - [ ] Landing matrix v3 overall ratification (now generated from

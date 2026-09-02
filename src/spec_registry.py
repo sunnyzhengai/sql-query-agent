@@ -119,21 +119,24 @@ SPEC_REGISTRY = {
     "B2": {
         "title": 'description provenance is total and closed',
         "law":
-            '    ∀d ∈ Desc.  provenance(d) ∈ {round_trip_verified, '
-            'template_fallback, flagged}',
+            '    ∀d ∈ Desc.  provenance(d) ∈ {gate_passed, skeleton_floor, flagged}',
         "gloss":
             'no description exists without a stated epistemic status; no '
             'fourth value; no NULL.',
         "origin":
-            'ADR 0044 clause 6.',
+            'ADR 0044 clause 6; vocabulary amended by ADR 0074 call 2 '
+            '(gate_passed = smoothed prose that cleared the gate; '
+            'skeleton_floor = deterministic composition, unfalsifiable; '
+            'template_fallback retired with its mechanism)',
         "parents": ['B1', 'J4'],
         "parent_note":
             'provenance closed -> every description judged',
         "checks": ['tests/test_tree_contract.py'],
         "status": 'PARTIAL',
         "status_note":
-            'stated gap: provenance persistence on stored descriptions '
-            "lands with 600's phase-3b wiring.  ---",
+            'stated gap: provenance PERSISTENCE on stored '
+            'descriptions lands with the ADR 0074 D1 build (the '
+            'retired phase-3b anchor is superseded)',
     },
     "C1": {
         "title": 'the frontier is enumerated (no undeclared source kind)',
@@ -470,9 +473,10 @@ SPEC_REGISTRY = {
         "checks": ['tests/test_tree_contract.py'],
         "status": 'ENFORCED',
         "status_note":
-            "all six clause gates flipped 1.31.0-1.32.0; stated gap: 600's "
-            'production wiring of the verifier (reconstructor callback + '
-            'provenance persistence) is phase 3b',
+            'ENFORCED as the MEASUREMENT INSTRUMENT — ADR 0074 '
+            'call 1 re-scoped the round trip out of the production '
+            'path (acceptance there = gate + skeleton floor); it '
+            'grades gate output on corpus runs',
     },
     "G1": {
         "title": 'one owner per capability',
@@ -987,8 +991,10 @@ SPEC_REGISTRY = {
         "checks": ['tests/test_tree_contract.py'],
         "status": 'ENFORCED',
         "status_note":
-            'ENFORCED — `tests/test_tree_contract.py`, all six clause gates '
-            'green; this is `spec:F` stated as a member of the family',
+            'ENFORCED as the measurement instrument (ADR 0074 '
+            'call 1); the production judge for descriptions is the '
+            'grounding gate + skeleton floor. This is spec:F as a '
+            'family member',
     },
     "T2": {
         "title": 'SQL stitching',

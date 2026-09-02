@@ -263,13 +263,13 @@ the set of sentences below. The system is correct when `G ⊨ Φ`.
 
 **B2 — description provenance is total and closed.**
 
-    ∀d ∈ Desc.  provenance(d) ∈ {round_trip_verified, template_fallback, flagged}
+    ∀d ∈ Desc.  provenance(d) ∈ {gate_passed, skeleton_floor, flagged}
 
 *Gloss:* no description exists without a stated epistemic status; no fourth value; no NULL.
-*Origin:* ADR 0044 clause 6.
+*Origin:* ADR 0044 clause 6; vocabulary amended by ADR 0074 call 2 (gate_passed = smoothed prose that cleared the gate; skeleton_floor = deterministic composition, unfalsifiable; template_fallback retired with its mechanism)
 *Grounds in the framework:* axm:B1, axm:J4 — provenance closed -> every description judged.
 *Checks:* `tests/test_tree_contract.py`
-**Status: PARTIAL** — stated gap: provenance persistence on stored descriptions lands with 600's phase-3b wiring. ---
+**Status: PARTIAL** — stated gap: provenance PERSISTENCE on stored descriptions lands with the ADR 0074 D1 build (the retired phase-3b anchor is superseded)
 
 
 ---
@@ -466,7 +466,7 @@ layer being "the vendor's complete join map" is the k = J_D instance.
 *Origin:* ADR 0044 clauses 2-6
 *Grounds in the framework:* axm:J4 — the round trip is the description's oracle.
 *Checks:* `tests/test_tree_contract.py`
-**Status: ENFORCED** — all six clause gates flipped 1.31.0-1.32.0; stated gap: 600's production wiring of the verifier (reconstructor callback + provenance persistence) is phase 3b
+**Status: ENFORCED** — as the MEASUREMENT INSTRUMENT — ADR 0074 call 1 re-scoped the round trip out of the production path (acceptance there = gate + skeleton floor); it grades gate output on corpus runs
 
 
 ---
@@ -575,7 +575,7 @@ The law is instantiated **three times**, at three grains, with three judges:
 
 *Grounds in the framework:* axm:J4 — descriptions - blind verifier + kappa-diff.
 *Checks:* `tests/test_tree_contract.py`
-**Status: ENFORCED** — `tests/test_tree_contract.py`, all six clause gates green; this is `spec:F` stated as a member of the family
+**Status: ENFORCED** — as the measurement instrument (ADR 0074 call 1); the production judge for descriptions is the grounding gate + skeleton floor. This is spec:F as a family member
 
 **T2 — SQL stitching.**
 

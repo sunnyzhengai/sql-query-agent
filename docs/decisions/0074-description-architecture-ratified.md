@@ -1,8 +1,12 @@
 # ADR 0074 — The description architecture, ratified: skeleton floor, gate acceptance, and the metric-level design (amends 0044 phase 3, 0019)
 
-**Status:** PROPOSED 2026-09-02 — reconstructs the unrecorded field
-evolution of description generation and puts its four open calls to
-Sunny (§5). Spec amendments (§4) land on ratification, per §16.
+**Status:** ACCEPTED 2026-09-02 — Sunny ratified all four §5 calls
+as recommended, same day ("ok to your recommendations"). Spec
+amendments landed with ratification: `spec:B2`'s vocabulary is now
+{gate_passed, skeleton_floor, flagged}; `spec:F`/`T1` are re-scoped
+as the MEASUREMENT INSTRUMENT. One sub-ruling remains open inside
+call 3 — the empties a/b/c options — on the BOARD; it blocks only
+D3's edge cases.
 
 ## 1. Context — how the design went unrecorded
 
@@ -95,7 +99,7 @@ fallback.
   descriptions.
 - Ledger rows F/T1/B2 updated; TEST_MAP/crosswalk regenerate.
 
-## 5. Open calls (Sunny)
+## 5. Calls — ALL RULED 2026-09-02 (as recommended)
 
 1. **The blind verifier's fate.** (a) RECOMMENDED: retire from the
    production path, keep as a MEASUREMENT instrument (nightly/corpus

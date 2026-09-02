@@ -34,7 +34,7 @@ Groups: A=Identity · B=Soundness · C=Completeness · D=Derived structure · E=
 | spec:A2 | metric_id is a key | axm:D3 | identity -> exactly one owner per metric | 0015 |
 | spec:A3 | fold-collisions are rejected loudly | axm:D2 | one folding rule, one definition | 0016 |
 | spec:B1 | witness totality (the anti-fabrication axiom) | axm:B1 | witness totality IS 'no claim without a witness' | 0005, 0044, 0048 |
-| spec:B2 | description provenance is total and closed | axm:B1, axm:J4 | provenance closed -> every description judged | 0044 |
+| spec:B2 | description provenance is total and closed | axm:B1, axm:J4 | provenance closed -> every description judged | 0044, 0074 |
 | spec:C1 | the frontier is enumerated (no undeclared source kind) | axm:D1 | the enumerated frontier -> nothing unreachable | 0001, 0048, 0052, 0053, 0054 |
 | spec:C2 | conservation per extractor (no third bucket) | axm:R1 | handled + fallout = total (conservation) | 0041, 0044, 0045, 0053 |
 | spec:C3 | images land in the graph | axm:R1 | handled + fallout = total (conservation) | 0039, 0042 |
@@ -48,7 +48,7 @@ Groups: A=Identity · B=Soundness · C=Completeness · D=Derived structure · E=
 | spec:E4 | pick containment (the human picks, structurally) | axm:M5 | intent decisions bind to the human | 0044, 0046 |
 | spec:E5 | filter grounding (the 123/456 lesson) | axm:B1 | filter values need witnesses | 0044, 0046 |
 | spec:E6 | presentation honesty | axm:B2, axm:B3 | boundary honesty + bounded quantified claims | 0036, 0044, 0051 |
-| spec:F | the round trip (ADR 0044 as equations) | axm:J4 | the round trip is the description's oracle | 0044 |
+| spec:F | the round trip (ADR 0044 as equations) | axm:J4 | the round trip is the description's oracle | 0044, 0074 |
 | spec:G1 | one owner per capability | axm:D2 | one owner per capability, mechanized | 0047 |
 | spec:G2 | sanctioned powers only (import-graph inclusion) | axm:D2 | one owner per capability, mechanized | 0001, 0047 |
 | spec:G3 | no undeclared power | axm:D2 | one owner per capability, mechanized | 0047 |
@@ -75,7 +75,7 @@ Groups: A=Identity · B=Soundness · C=Completeness · D=Derived structure · E=
 | spec:R7 | Nothing is generated; the confirmed SQL is what runs | axm:B4 | confirmed-only execution | 0061 |
 | spec:R8 | Sampling is machine-labelled | axm:B3 | machine-labelled sampling | 0061 |
 | spec:T0 | the round-trip law | axm:J4 | the round-trip law: kappa(rho(tau(t))) = kappa(t) | 0065 |
-| spec:T1 | Descriptions | axm:J4 | descriptions - blind verifier + kappa-diff | 0065 |
+| spec:T1 | Descriptions | axm:J4 | descriptions - blind verifier + kappa-diff | 0065, 0074 |
 | spec:T2 | SQL stitching | axm:J4, axm:B1 | SQL stitching - parseability round-trips; kappa-diff is the stated gap | 0065 |
 | spec:T3 | Definition creation | axm:M5, axm:J2 | definition creation - the human is the judge (L3 stratum) | 0065 |
 

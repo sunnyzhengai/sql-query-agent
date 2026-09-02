@@ -163,7 +163,7 @@ tests/test_docs_consistency.py).
 | spec:A2 | 0015 | — | `tests/adapters/test_fabric_pbi.py`, `tests/test_schemas.py`, `tests/test_table_contracts.py` |
 | spec:A3 | 0016 | — | `tests/parser/test_identity.py`, `tests/test_dictionary.py` |
 | spec:B1 | 0005, 0044, 0048 | — | `tests/governance/test_display_names.py`, `tests/graph/test_decision_wiring.py`, `tests/test_admin_graph.py`, `tests/test_agent_backend.py`, `tests/test_companion.py`, `tests/test_graph_agent_harness.py`, `tests/test_term_hygiene.py`, `tests/test_trace_registry.py`, `tests/test_tree_contract.py`, `tests/test_zones.py`, `tests/tree/test_extract.py` |
-| spec:B2 | 0044 | — | `tests/graph/test_decision_wiring.py`, `tests/test_tree_contract.py`, `tests/tree/test_extract.py` |
+| spec:B2 | 0044, 0074 | — | `tests/graph/test_decision_wiring.py`, `tests/test_tree_contract.py`, `tests/tree/test_extract.py` |
 | spec:C1 | 0001, 0048, 0052, 0053, 0054 | — | `tests/golden/test_parse_goldens.py`, `tests/governance/test_red_flags.py`, `tests/graph/test_builder.py`, `tests/orchestrator/test_flag_ops.py`, `tests/orchestrator/test_ops.py`, `tests/parser/test_sql_parser.py`, `tests/test_admin_graph.py`, `tests/test_companion.py`, `tests/test_native_parser_law.py`, `tests/test_reachability.py`, `tests/test_reachability_audit.py`, `tests/test_term_hygiene.py`, `tests/test_trace_registry.py`, `tests/test_zones.py` |
 | spec:C2 | 0041, 0044, 0045, 0053 | — | `tests/governance/test_leaf_grounding.py`, `tests/graph/test_builder.py`, `tests/graph/test_decision_wiring.py`, `tests/mquery/test_mquery.py`, `tests/orchestrator/test_ops.py`, `tests/test_escalation_contract.py`, `tests/test_tree_contract.py`, `tests/tree/test_extract.py` |
 | spec:C3 | 0039, 0042 | — | `tests/governance/test_funnel.py`, `tests/governance/test_journey.py`, `tests/test_docs_consistency.py`, `tests/test_notebook_contract.py`, `tests/test_replan.py`, `tests/test_table_contracts.py` |
@@ -177,7 +177,7 @@ tests/test_docs_consistency.py).
 | spec:E4 | 0044, 0046 | — | `tests/graph/test_decision_wiring.py`, `tests/test_derive_relationships.py`, `tests/test_spec_gates.py`, `tests/test_tree_contract.py`, `tests/tree/test_extract.py` |
 | spec:E5 | 0044, 0046 | — | `tests/graph/test_decision_wiring.py`, `tests/test_derive_relationships.py`, `tests/test_spec_gates.py`, `tests/test_tree_contract.py`, `tests/tree/test_extract.py` |
 | spec:E6 | 0036, 0044, 0051 | — | `tests/graph/test_decision_wiring.py`, `tests/orchestrator/test_caption_gate.py`, `tests/orchestrator/test_conclusion.py`, `tests/orchestrator/test_turn_engine.py`, `tests/test_methodology.py`, `tests/test_tree_contract.py`, `tests/tree/test_extract.py` |
-| spec:F | 0044 | — | `tests/graph/test_decision_wiring.py`, `tests/test_tree_contract.py`, `tests/tree/test_extract.py` |
+| spec:F | 0044, 0074 | — | `tests/graph/test_decision_wiring.py`, `tests/test_tree_contract.py`, `tests/tree/test_extract.py` |
 | spec:G1 | 0047 | — | `tests/test_axiom_crosswalk.py`, `tests/test_capability_registry.py`, `tests/test_extraction_registry.py`, `tests/test_spec_gates.py` |
 | spec:G2 | 0001, 0047 | — | `tests/golden/test_parse_goldens.py`, `tests/parser/test_sql_parser.py`, `tests/test_axiom_crosswalk.py`, `tests/test_capability_registry.py`, `tests/test_extraction_registry.py`, `tests/test_native_parser_law.py`, `tests/test_spec_gates.py` |
 | spec:G3 | 0047 | — | `tests/test_axiom_crosswalk.py`, `tests/test_capability_registry.py`, `tests/test_extraction_registry.py`, `tests/test_spec_gates.py` |
@@ -204,6 +204,6 @@ tests/test_docs_consistency.py).
 | spec:R7 | 0061 | — | `tests/test_run_layer.py` |
 | spec:R8 | 0061 | — | `tests/test_run_layer.py` |
 | spec:T0 | 0065 | — | `tests/test_tree_contract.py` |
-| spec:T1 | 0065 | — | `tests/test_tree_contract.py` |
+| spec:T1 | 0065, 0074 | — | `tests/test_tree_contract.py` |
 | spec:T2 | 0065 | — | `tests/test_tree_contract.py` |
 | spec:T3 | 0065 | — | `tests/test_tree_contract.py` |

@@ -971,5 +971,6 @@ Two citation handles, because the axiom systems are distinct and their group let
 
 - **Category:** architecture
 - **Component:** `spec` → `docs/architecture/SPEC.md` → axm:S, axm:J, axm:M, axm:B, axm:R
+- **Grounds:** spec:B2, spec:F, spec:T1
 - **Summarized in:**
   - `docs/decisions/0074-description-architecture-ratified.md`
