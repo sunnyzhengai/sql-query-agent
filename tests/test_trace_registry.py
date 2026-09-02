@@ -79,6 +79,9 @@ def test_architecture_decisions_carry_code_or_tests():
                  # its artifact IS the blueprint; no code by nature
         "0071",  # doc retirement (USER_FLOW folds into ARCHITECTURE)
                  # — same nature as 0066
+        "0074",  # PROPOSED awaiting Sunny's four calls — the record
+                 # of the field-evolved description architecture; its
+                 # spec/ledger edits land on ratification
     }
     empty = [
         adr for adr, e in TRACE_REGISTRY.items()

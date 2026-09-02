@@ -966,3 +966,10 @@ Two citation handles, because the axiom systems are distinct and their group let
 - **Summarized in:**
   - `docs/decisions/0073-spec-goes-generated.md`
   - `docs/architecture/SPEC.md`
+
+## ADR 0074 — The description architecture, ratified: skeleton floor, gate acceptance, metric-level design
+
+- **Category:** architecture
+- **Component:** `spec` → `docs/architecture/SPEC.md` → axm:S, axm:J, axm:M, axm:B, axm:R
+- **Summarized in:**
+  - `docs/decisions/0074-description-architecture-ratified.md`

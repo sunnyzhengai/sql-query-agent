@@ -99,7 +99,7 @@ AXM_UNMAPPED = {
 ARCHITECTURE_COMPONENTS = {
     "spec": {
         "doc": "docs/architecture/SPEC.md",
-        "current_through": "0073",
+        "current_through": "0074",
         "title": "The shadow specification — the formal axiom system",
         "satisfies": ["S", "J", "M", "B", "R"],
         "governs": "The axiom system this codebase is checked against: "
@@ -736,6 +736,22 @@ TRACE_REGISTRY = {
                   "tests/test_term_hygiene.py", "tests/test_admin_graph.py",
                   "tests/test_companion.py"],
         "docs": ["docs/architecture/SPEC.md", "docs/architecture/TRACE_MAP.md"],
+    },
+    "0074": {
+        # PROPOSED 2026-09-02: ratify the field-evolved description
+        # architecture (skeleton floor + gate acceptance) as 0044's
+        # phase-3 amendment; fix 0019's metric premise (terminal steps,
+        # not root CTEs; per-FILE deliverable); reopen the provenance
+        # vocabulary; state the wedge description contract. Four calls
+        # await Sunny; spec amendments land on ratification.
+        "title": "The description architecture, ratified: skeleton "
+                 "floor, gate acceptance, metric-level design",
+        "category": "architecture",
+        "component": "spec",
+        "axioms": [],
+        "modules": [],
+        "tests": [],
+        "docs": ["docs/decisions/0074-description-architecture-ratified.md"],
     },
     "0073": {
         # ACCEPTED 2026-09-02 (the final ratchet turn): SPEC v1.0 —

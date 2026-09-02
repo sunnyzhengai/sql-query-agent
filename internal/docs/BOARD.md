@@ -34,6 +34,16 @@ view are preserved history.
       Import API → outbox implementation (schema now in
       landing_registry: OUTBOX_FIELDS/OUTCOMES)
 
+### THE WEDGE / DESCRIPTIONS (back on track, 09-02)
+- [ ] **ADR 0074 RATIFICATION — four calls** (verifier's fate ·
+      provenance names · metric/file-level + the parked empties
+      ruling · wedge sample in the X-Ray report). The ADR is the
+      reconstructed record of the DESC field evolution the cleanup
+      deleted; spec amendments land on ratification.
+- [ ] **DESC-SKELETON-3a (carried from 8a8f13d, the last pre-cleanup
+      order):** derived-table filters leak into the outer step —
+      unbuilt; resumes after 0074 rules.
+
 ### RULINGS OPEN FOR SUNNY (carried + new)
 - [ ] Landing matrix v3 overall ratification (now generated from
       landing_registry; content unchanged, awaiting Bridge build)
