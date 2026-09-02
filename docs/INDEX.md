@@ -2,6 +2,23 @@
 
 Summaries describe what each document governs, not its full contents.
 
+## Which file do I open?
+
+The folder is a graph, not a sequence — so navigation is a lookup rule,
+not a filename convention (naming ruled kept as-is, 2026-09-02):
+
+| You want… | Open |
+| --- | --- |
+| **why** the law exists — portable to any agentic system | [AI_VIA_AXIOMS.md](AI_VIA_AXIOMS.md) |
+| **what must hold here** — the law, with per-axiom status | [architecture/SPEC.md](architecture/SPEC.md) |
+| **the bridge** — which framework law each spec axiom applies | [architecture/AXIOM_CROSSWALK.md](architecture/AXIOM_CROSSWALK.md) |
+| **the receipts** — which tests make each status true | [architecture/TEST_MAP.md](architecture/TEST_MAP.md) |
+| **a decision's lineage** — component → axioms → code → tests | [architecture/TRACE_MAP.md](architecture/TRACE_MAP.md) |
+| **the big-picture model** — shells, ownership, change propagation | [architecture/SPHERE.md](architecture/SPHERE.md) |
+| **what the system is made of** — layers, parse spine, modules | [architecture/ARCHITECTURE.md](architecture/ARCHITECTURE.md) |
+| **what is sold** — tiers, packaging, positioning | [product/PRODUCT_TIERS.md](product/PRODUCT_TIERS.md) |
+| **the rationale for any choice** | [decisions/](decisions/README.md) — always the canonical home |
+
 ## The dependency hierarchy (ruled 2026-09-01)
 
 A strict three-tier chain, one direction, no cycles:
