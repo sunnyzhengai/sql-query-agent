@@ -24,7 +24,7 @@ a bijection:
 - **`AI_VIA_AXIOMS.md` is general.** 24 axioms about how *any* agentic
   system should be built. It is portable — nothing in it is specific to
   SQL, Fabric, or healthcare.
-- **`SPEC.md` (Φ_AIVIA) is particular.** 44 axioms about *this*
+- **`SPEC.md` (Φ_AIVIA) is particular.** 48 axioms about *this*
   codebase, each binding to a mechanical check over these tables and
   these modules.
 
@@ -37,7 +37,7 @@ and healthy: the spec is where a general principle acquires teeth.
 ## What "every entry" covers — and what it doesn't
 
 **Scope, stated before the tables so nobody over-reads them.** The
-crosswalk maps SPEC's **44 numbered axioms**. SPEC.md also contains
+crosswalk maps SPEC's **48 numbered axioms**. SPEC.md also contains
 normative content that carries no axiom ID, and that content is **not**
 covered by the checks below:
 
@@ -45,17 +45,19 @@ covered by the checks below:
 |---|---|---|
 | §3b — the design-review clause | Three questions every new artifact class MUST answer before its first line of code | **Not by ID.** Its substance is `axm:D1` (inventory), `axm:R1` (conservation), `axm:R2` (drift) — and `spec:L3` now makes the drift question an axiom. The clause itself is a *ritual*, enforced by review, not a checkable sentence. |
 | §7 — the graph identity theorem | `G = ⋃ F_k(handled_k)` — derived from B1 + C1 + C3 | **Yes, transitively.** A theorem, not an axiom: it inherits its parents from the axioms it is proved from. |
-| §13 — the double-sided function | `κ(ρ(τ(t))) = κ(t)`, labelled "**THE LAW**" | **Only partly.** Instance 1 is `spec:F` → `axm:J4`. Instances 2 (SQL stitching) and 3 (definition creation) have no axiom ID, so no check binds them. |
+| §13 — the double-sided function | `κ(ρ(τ(t))) = κ(t)`, labelled "**THE LAW**" | **Yes, since 2026-09-01** — PROMOTED to **Group T** by ADR 0065 (T0 the law, T1–T3 the instances). Was the clearest un-numbered law: only instance 1 had an id, so the crosswalk covered a third of a section calling itself THE LAW. |
 | §14b — the admin Σ-structure | A second model of the same groups | **Yes, by inheritance** — it explicitly carries over B1, C1, D3, H. |
 | §14d — testing strata | L0–L3 verification levels | **Not by ID** — it is where `axm:J3` lands (recorded as meta). |
 
-So the precise claim is: **every numbered axiom traces up; the spec's
-un-numbered normative prose does not, and cannot until it is either
-promoted to an axiom or explicitly declared non-normative.** §13's
-instances 2 and 3 are the clearest candidates for promotion — they are
-called "THE LAW" and nothing checks them.
+So the precise claim is: **every numbered axiom traces up; what remains
+un-numbered is deliberately so.** After ADR 0065 promoted §13 to Group
+T, exactly two sections carry normative weight without an id, and both
+are correctly ritual rather than law: §3b (the design-review clause —
+three questions a human answers at review, enforced by refusing to
+proceed) and §14d (testing strata — where `axm:J3` lands). Neither can
+become a checkable sentence without becoming something it isn't.
 
-## Direction 1 — does every numbered SPEC axiom trace up? **Yes, all 44.**
+## Direction 1 — does every numbered SPEC axiom trace up? **Yes, all 48.**
 
 | SPEC | Framework parent | Note |
 |---|---|---|
@@ -81,6 +83,10 @@ called "THE LAW" and nothing checks them.
 | L1 | axm:R4 | the ledger may only grow |
 | L2 | axm:R4, axm:D3 | aggregates derived, never stored |
 | L3 | axm:R2 | every declaration has a firing mechanism |
+| T0 | axm:J4 | the round-trip law: κ(ρ(τ(t))) = κ(t) |
+| T1 | axm:J4 | descriptions — blind verifier + κ-diff (ENFORCED) |
+| T2 | axm:J4, axm:B1 | SQL stitching — parseability round-trips; κ-diff is the stated gap |
+| T3 | axm:M5, axm:J2 | definition creation — the human is the judge (JUDGED, L3) |
 | P1, P2 | axm:M2 | one mind, full evidence |
 | P3 | axm:M3 | thinking room |
 | P4 | axm:M4 | no question-shaped control flow |

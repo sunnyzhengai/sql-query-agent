@@ -868,3 +868,15 @@ Two citation handles, because the axiom systems are distinct and their group let
 - **Summarized in:**
   - `docs/decisions/0064-the-ledger-and-drift-axioms.md`
   - `docs/architecture/AXIOM_CROSSWALK.md`
+
+## ADR 0065 — Promote section 13 to Group T: the double-sided function as numbered law
+
+- **Category:** architecture
+- **Component:** `crosswalk` → `docs/architecture/AXIOM_CROSSWALK.md` → axm:S
+- **Grounds:** spec:T0, spec:T1, spec:T2, spec:T3
+- **Enforced by:**
+  - `tests/test_tree_contract.py`
+- **Summarized in:**
+  - `docs/decisions/0065-promote-the-double-sided-function.md`
+  - `docs/architecture/SPEC.md`
+  - `docs/architecture/AXIOM_CROSSWALK.md`

@@ -12,11 +12,12 @@
 > (see [TRACE_MAP.md](TRACE_MAP.md#the-blueprint-tier) for the full
 > chain: decision → component → axioms → code → tests).
 
-**Version:** 0.8 (adopted; ADR 0047, extended by ADR 0048, 0051, 0059, 0064;
+**Version:** 0.9 (adopted; ADR 0047, extended by ADR 0048, 0051, 0059, 0064, 0065;
 §3b ratified by ADR 0052, first live use: the reachability contract;
 v0.7 adds Group R — the ask-time interpretation axioms of ADR
 0060/0062 — and the run-layer boundary of ADR 0061; v0.8 adds Group L,
-the ledger, closing the crosswalk's two gaps)
+the ledger, closing the crosswalk's two gaps; v0.9 promotes §13 to
+Group T)
 **Date:** 2026-08-19 (v0.5: 2026-08-21; v0.6: 2026-08-26; v0.7/v0.8: 2026-09-01)
 **Origin:** review session with Sunny; motivated by three recurring deviation
 classes discovered by code-walking: (1) missing EMR join edges — the technical
@@ -608,7 +609,12 @@ pipeline or lands on a human's checklist — counted is not the same as owned.
 
 ---
 
-## 13. The double-sided function (one law, three instances, two tiers)
+## 13. Group T — the double-sided function (one law, three instances, two tiers)
+
+*(Promoted to a numbered group 2026-09-01, ADR 0065. This section
+called itself "THE LAW" and stated three instances, but only instance 1
+had an axiom id — so the crosswalk covered a third of it and nothing
+checked the rest. T = the τ/ρ transform pair.)*
 
 The product's two tiers are built from one pair of functions over the same
 three-layer structure:
@@ -616,15 +622,38 @@ three-layer structure:
     τ : Tree → Language        render structure into meaning (describe, caption)
     ρ : Language → Tree        translate intent into structure (anchor, propose)
 
-    THE LAW:   κ(ρ(τ(t))) = κ(t)      round-trip identity, modulo canonicalization
+**T0 — the round-trip law.**
+
+    ∀t ∈ Tree.  κ(ρ(τ(t))) = κ(t)        modulo canonicalization
+
+*Gloss:* meaning rendered from structure must translate back to the
+same structure. Each direction's correctness is certified by running
+the opposite direction — which is why no instance may be checked by
+inspecting only its own output.
+*Origin:* ADR 0044 (instance 1), generalized here.
+**Status: PARTIAL** — instantiated three times below with three
+different judges; T1 is ENFORCED, T2 PARTIAL, T3 human-judged by
+construction. The law is only as strong as its weakest instance, and
+that is stated rather than averaged away.
 
 The law is instantiated **three times**, at three grains, with three judges:
 
-| # | Instance | τ | ρ | Judge |
-|---|---|---|---|---|
-| 1 | Descriptions (ADR 0044) | translator | blind verifier | deterministic tree diff (κ-equality) |
-| 2 | SQL stitching (ADR 0033, tier 2) | compile fragments → SQL text | parse back through ScriptDom | tree equality (the parser) |
-| 3 | Definition creation (ADR 0038, tier 1) | render proposal back for confirmation | user prose → proposed canonical tree | **the human** |
+| # | Instance | τ | ρ | Judge | Status |
+|---|---|---|---|---|---|
+| **T1** | Descriptions (ADR 0044) | translator | blind verifier | deterministic tree diff (κ-equality) | **ENFORCED** — `tests/test_tree_contract.py`, all six clause gates green; this is `spec:F` stated as a member of the family |
+| **T2** | SQL stitching (ADR 0033/0061, tier 2) | compile fragments → SQL text | parse back through ScriptDom | tree equality (the parser) | **PARTIAL** — `src/run_layer.py::check_single_select` parses every executed statement through ScriptDom, so PARSEABILITY round-trips and a malformed compile fails closed. **Stated gap:** no κ-equality diff between the compiled tree and the source tree; the parser confirms the SQL is well-formed, not that it means the same thing |
+| **T3** | Definition creation (ADR 0038/0062, tier 1) | render proposal back for confirmation | user prose → proposed canonical tree | **the human** | **JUDGED, not tested** (§14d L3) — the confirm step (`spec:R3`) is the mechanism; correctness is the human's click. Recorded as judged so nobody mistakes a rendered proposal for a verified one |
+
+**Why T2's gap matters and is not quietly closed.** Instance 1 earned
+its judge — a blind verifier plus κ-equality — because a fabricated
+description corrupts the human's pick (the E4 dependency). Instance 2
+executes SQL against patient data; its current judge answers "does this
+parse?" and not "is this the tree the user confirmed?" `spec:R7`
+narrows the exposure to near zero by requiring the executed SQL be
+byte-for-byte the confirmed step — nothing is compiled at run time
+today — so the gap is latent, not live. It becomes live the moment
+fragment stitching ships, and T2 is the axiom that will then need its
+κ-diff.
 
 And the tiers are the two directions of one correspondence:
 
@@ -897,6 +926,21 @@ governs generated artifacts revs the relevant `*_CONTRACT_VERSION` cache keys
 ---
 
 ## Changelog
+
+- **0.9 (2026-09-01)** — §13 promoted to **Group T** (ADR 0065), on
+  Sunny's ruling from the crosswalk's scope finding. The section called
+  itself "THE LAW" and named three instances, but only instance 1 had
+  an axiom id, so the crosswalk covered a third of it. Now T0 (the
+  round-trip law, PARTIAL — a law is only as strong as its weakest
+  instance), T1 (descriptions, ENFORCED — `spec:F` seen as a family
+  member), T2 (SQL stitching, PARTIAL — parseability round-trips
+  through ScriptDom, but no κ-equality diff between compiled and source
+  trees; latent because `spec:R7` executes only byte-for-byte confirmed
+  SQL, live the moment fragment stitching ships), T3 (definition
+  creation, JUDGED not tested — the human is the judge by
+  construction). Zero new mechanisms: T1/T3 cite what exists, T2 states
+  a gap. SPEC's un-numbered normative prose now reduces to §3b and
+  §14d, both correctly rituals rather than axioms.
 
 - **0.8 (2026-09-01)** — Group L, the ledger (§14h, ADR 0064): L1
   append-only declared AND obeyed, L2 aggregates derived never stored,

@@ -75,3 +75,4 @@ never deleted — its status changes and it links to its replacement.
 | [0062](0062-the-dialogue-loop.md) | The dialogue loop: show, propose, ask, execute — there are no question types | Accepted (supersedes 0060's one-shot confirm) |
 | [0063](0063-product-tiers.md) | The product tiers: X-Ray, Bridge, Workbench, Run — artifacts land, chat doesn't | Accepted (TIER LOCK + scope lock) |
 | [0064](0064-the-ledger-and-drift-axioms.md) | Group L: the ledger (append-only obeyed, aggregates derived) and drift-fires — closes the two crosswalk gaps | Accepted (all three calls ruled 2026-09-01; SPEC v0.8) |
+| [0065](0065-promote-the-double-sided-function.md) | Promote §13 to Group T: the double-sided function as numbered law (T0 the law, T1–T3 the instances) | Accepted (SPEC v0.9) |

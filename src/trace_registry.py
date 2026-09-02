@@ -39,6 +39,12 @@ SPEC_AXIOMS = frozenset({
     # 2026-09-01): append-only obeyed, aggregates derived, every
     # declaration has a firing mechanism. Closes axm:R4 and axm:R2.
     "L1", "L2", "L3",
+    # Group T — the double-sided function (SPEC section 13, ADR 0065,
+    # promoted 2026-09-01). The section called itself "THE LAW" and
+    # named three instances, but only instance 1 had an id (F), so the
+    # crosswalk covered a third of it. T0 = the law, T1-T3 = the
+    # instances, each with its own judge and its own honest status.
+    "T0", "T1", "T2", "T3",
     # Group Q — graph topology (ADR 0059, ratified 2026-08-26; the
     # ADR's G1-G3, renamed on entry because spec group G was taken)
     "Q1", "Q2", "Q3",
@@ -109,6 +115,7 @@ SPEC_TO_AXM = {
     "P1": ["M2"], "P2": ["M2"], "P3": ["M3"], "P4": ["M4"],
     "P5": ["B2"], "P6": ["M1"],
     "L1": ["R4"], "L2": ["R4", "D3"], "L3": ["R2"],
+    "T0": ["J4"], "T1": ["J4"], "T2": ["J4", "B1"], "T3": ["M5", "J2"],
     "Q1": ["D1"], "Q2": ["B1"], "Q3": ["B3"],
     "R1": ["M4", "M5"], "R2": ["M4"], "R3": ["B4"], "R4": ["R3"],
     "R5": ["B3"], "R6": ["B2"], "R7": ["B4"], "R8": ["B3"],
@@ -778,6 +785,23 @@ TRACE_REGISTRY = {
                   "tests/test_term_hygiene.py", "tests/test_admin_graph.py",
                   "tests/test_companion.py"],
         "docs": ["docs/architecture/SPEC.md", "docs/architecture/TRACE_MAP.md"],
+    },
+    "0065": {
+        # ACCEPTED 2026-09-01 (Sunny: "we should promote 13"): SPEC
+        # section 13 becomes Group T. Zero new mechanisms — T1 and T3
+        # cite what exists, T2 states the kappa-diff gap that goes live
+        # when fragment stitching ships. The value is that three
+        # previously-unnumbered laws are citable and statused.
+        "title": "Promote section 13 to Group T: the double-sided "
+                 "function as numbered law",
+        "category": "architecture",
+        "component": "crosswalk",
+        "axioms": ["T0", "T1", "T2", "T3"],
+        "modules": [],
+        "tests": ["tests/test_tree_contract.py"],
+        "docs": ["docs/decisions/0065-promote-the-double-sided-function.md",
+                 "docs/architecture/SPEC.md",
+                 "docs/architecture/AXIOM_CROSSWALK.md"],
     },
     "0064": {
         # DRAFT 2026-09-01 (review-authored from the crosswalk audit):
