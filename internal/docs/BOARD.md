@@ -81,14 +81,16 @@ view are preserved history.
       voice/gate kill > skeleton floor > absent; empties counted,
       never silent. D3 fully unblocked.
 
-### ORDERABLE (found 09-02, not ordered)
-- [ ] **GATE-RECUT (the SQL side of the gate):** three gate functions
-      still regex the FRAGMENT (parsed_grain — whose docstring claims
-      the parser decides — _table_violations, _condition_text's
-      240-char deciding windows). Now that DecisionSite carries
-      scope, the deciding set can come from tree sites instead.
-      Frontier pinned deny-by-default (TestRegexFrontier); grows only
-      on the record.
+### ~~ORDERABLE~~ → GATE-RECUT SHIPPED (ordered + built 09-02)
+- [x] **GATE-RECUT:** query_shape() in the tree (closed outcomes,
+      parse_ok visible, scope-aware) now feeds parsed_grain /
+      parsed_tables / parsed_columns / the deciding set; the 240-char
+      windows and 4 SQL regexes DELETED. The checker-side 3a mirror
+      is closed (claiming a derived table's filter now violates);
+      a subquery GROUP BY no longer sets the outer grain. SQL-side
+      regex debt: EMPTY. All 78 prior gate tests unchanged-green.
+      En route: the frontier scanner's own blind spot fixed
+      (module-level compiled patterns — planted and pinned).
 
 ### RULINGS OPEN FOR SUNNY (carried + new)
 - [ ] Landing matrix v3 overall ratification (now generated from

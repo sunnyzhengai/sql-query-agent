@@ -129,18 +129,21 @@ class TestRegexFrontier:
     at module grain)."""
 
     # English/identifier munging — regex on TEXT is legitimate here.
+    # (The list grew 09-02 when the scanner learned to see
+    # module-level compiled patterns — its own first blind spot.)
     SANCTIONED_TEXT_SIDE = {
         "_column_words", "readable_column", "_stem",
         "column_name_violations", "misattribution_violations",
-        "grounding_violations",
+        "grounding_violations", "_grain_violations",
+        "_table_violations", "generate_descriptions",
+        "metric_scope_violations", "placeholder_violations",
+        "purpose_violations", "voice_violations",
     }
-    # Regex ON SQL — NAMED DEBT (the gate-side re-cut, orderable now
-    # that DecisionSite carries scope): approximate deciding-windows
-    # and text-derived grain/tables instead of tree sites. Includes a
-    # find from this enumeration: parsed_grain's docstring says "the
-    # parser decides" while the code regexes the fragment.
-    DEBT_SQL_SIDE = {"parsed_grain", "_table_violations",
-                     "_condition_text"}
+    # Regex ON SQL: EMPTY since the gate recut (2026-09-02) —
+    # parsed_grain / parsed_tables / parsed_columns / _condition_text
+    # all consume tree.query_shape now; their regexes are deleted.
+    # A new entry here requires its own recorded reason.
+    DEBT_SQL_SIDE: "set[str]" = set()
 
     def test_the_regex_frontier_is_enumerated_and_closed(self):
         from pathlib import Path

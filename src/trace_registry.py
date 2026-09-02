@@ -769,7 +769,8 @@ TRACE_REGISTRY = {
         "axioms": ["B2", "F", "T1"],
         "modules": ["src/descriptions.py"],
         "tests": ["tests/test_desc_0074.py",
-                  "tests/test_skeleton_composer.py"],
+                  "tests/test_skeleton_composer.py",
+                  "tests/test_gate_recut.py"],
         "docs": ["docs/decisions/0074-description-architecture-ratified.md"],
     },
     "0073": {

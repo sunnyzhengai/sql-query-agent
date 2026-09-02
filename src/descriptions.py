@@ -159,12 +159,6 @@ _CLAIM_STOPWORDS = frozenset(
 # READS only. INTO/UPDATE name a WRITE TARGET, not a source — a
 # SELECT…INTO #X does not read #X, and listing it made a step
 # appear to read itself (DESC-TEMP-1 live find).
-_FROM_TABLES = re.compile(
-    r"(?is)\b(?:FROM|JOIN|APPLY)\s+"
-    r"([#@]?\[?[A-Za-z_][\w]*\]?(?:\.\[?[A-Za-z_][\w]*\]?){0,2})")
-# a CTE name is not a base table — it is defined in the same text
-_CTE_NAMES = re.compile(r"(?is)(?:WITH|,)\s*([A-Za-z_][\w]*)\s+AS\s*\(")
-
 # the entity words a description may claim to count, and the column
 # tokens that evidence each. Word-grain, never question shapes.
 _GRAIN_WORDS = {
@@ -189,12 +183,13 @@ def _bare(name: str) -> str:
 
 
 def parsed_tables(fragment: str) -> "set[str]":
-    """The base tables a fragment reads — FROM/JOIN targets minus the
-    CTE names it defines itself. Approximate by design and used only
-    to REFUSE claims about tables that appear nowhere."""
-    ctes = {_bare(c) for c in _CTE_NAMES.findall(fragment or "")}
-    return {_bare(m) for m in _FROM_TABLES.findall(fragment or "")
-            if _bare(m) not in ctes}
+    """The base tables a fragment reads — named references minus the
+    CTE names it defines itself. PARSER-NATIVE since the gate recut
+    (2026-09-02, spec:G4 ancestry: DESC-SKELETON-3's tree
+    consumption). parse_ok False => empty set: the closed-outcome
+    law — no evidence refuses no claim; no regex fallback exists."""
+    from src.tree.extract import query_shape
+    return {_bare(x) for x in query_shape(fragment or "").base_tables}
 
 
 def parsed_grain(fragment: str) -> "set[str]":
@@ -209,17 +204,15 @@ def parsed_grain(fragment: str) -> "set[str]":
     When (1) or (2) yields any entity, that set is the grain — a
     PATIENT_ID also present in a visit-keyed select does not make
     the query patient-grain."""
-    frag = fragment or ""
-    explicit = " ".join(re.findall(
-        r"(?is)\b(?:DISTINCT|GROUP\s+BY)\b(.{0,160})", frag))
-    source = explicit if explicit.strip() else " ".join(re.findall(
-        r"(?is)\bSELECT\b(.*?)\bFROM\b", frag))
-    # KEY columns only — an *_ID / *_KEY / *_NO column names the row.
-    # The table alias is stripped first: FROM ENCOUNTER_DIAGNOSIS ED
-    # must not make every column look encounter-grained (dry-run find,
-    # P0-b corpus: the table NAME was leaking into key matching).
-    ids = re.findall(r"(?i)\b(?:[\w\[\]]+\.)?([\w\[\]]*"
-                     r"(?:_ID|_KEY|_NO|_NUM))\b", source)
+    # PARSER-NATIVE since the gate recut (2026-09-02): the docstring
+    # said "the parser decides" — now the code agrees. OUTER-scope
+    # keys only: a derived table's GROUP BY defines ITS rows, not the
+    # step's (the 3a scope law, checker side).
+    from src.tree.extract import query_shape
+    shape = query_shape(fragment or "")
+    source_cols = shape.key_cols or shape.select_cols
+    ids = [c.split(".")[-1] for c in source_cols
+           if c.upper().endswith(("_ID", "_KEY", "_NO", "_NUM"))]
     keys_low = " ".join(ids).lower()
     found = set()
     for entity, tokens in _GRAIN_WORDS.items():
@@ -401,17 +394,6 @@ def subject_for(fragment: str) -> str:
     return "records"
 
 
-def _condition_text(fragment: str) -> str:
-    """The parts of the SQL that actually DECIDE: windows of text after
-    WHERE / ON / HAVING / AND / WHEN keywords. Approximate by design —
-    used to tell 'filtered on' apart from 'merely selected'."""
-    return " ".join(
-        m.group(1)
-        for m in re.finditer(
-            r"(?is)\b(?:WHERE|HAVING|ON|AND|WHEN)\b(.{0,240})", fragment)
-    )
-
-
 # --- DESC-VOICE-3.1 (ordered 08-31, specimen USP_ED_SEPSIS · #BPA) --
 # THE MISATTRIBUTED PREDICATE: right values, wrong subject. The
 # description said "Encounter IDs must match the ADT_ARRIVAL_TIME and
@@ -456,30 +438,17 @@ def _column_words(col: str) -> "set[str]":
 # column is REPORTED as a coverage gap (Sunny's fallback ruling) —
 # missing dictionary entries become a Tier-1 asset ("N columns your
 # catalog never documented"), never a silent degradation.
-_SQL_COLUMNS = re.compile(
-    r"(?i)\b[A-Za-z_][\w]*\.([A-Za-z_][\w]*)\b")
-# Unqualified UNDERSCORED identifiers are columns too. Staging SQL
-# (SELECT…INTO) references them bare constantly, and matching only
-# QUALIFIED names hid them from the ban — a description full of raw
-# column names graded CLEAN in my own re-run. Underscored-only keeps
-# this from swallowing keywords, and table names are subtracted
-# because FROM/JOIN targets are the other rule's business.
-_BARE_COLUMNS = re.compile(r"\b([A-Za-z]+(?:_[A-Za-z0-9]+)+)\b")
-_SQL_KEYWORDS = frozenset({
-    "ORDER_BY", "GROUP_BY", "INNER_JOIN", "LEFT_OUTER", "IS_NULL",
-})
-
 
 def parsed_columns(fragment: str) -> "set[str]":
-    """Every column the fragment references — qualified or bare."""
-    frag = fragment or ""
-    cols = {c.upper() for c in _SQL_COLUMNS.findall(frag)}
-    cols |= {c.upper() for c in _BARE_COLUMNS.findall(frag)}
-    # a table is not a column: strip FROM/JOIN targets (and their
-    # bare/temp forms) so the two rules stay in their own lanes
-    tables = {t.upper() for t in parsed_tables(frag)}
-    tables |= {t.upper().lstrip("#") for t in parsed_tables(frag)}
-    return {c for c in cols - tables - _SQL_KEYWORDS if "_" in c}
+    """Every column the fragment's OUTER scope evidences — select
+    list + deciding sites + keys. Parser-native since the gate
+    recut; same closed-outcome law as parsed_tables."""
+    from src.tree.extract import query_shape
+    shape = query_shape(fragment or "")
+    cols = {c.split(".")[-1].upper() for c in shape.select_cols}
+    cols |= set(shape.deciding_cols)
+    cols |= {c.split(".")[-1].upper() for c in shape.key_cols}
+    return {c for c in cols if "_" in c}
 
 
 def _documented(dict_lines: "list[str] | None") -> "set[str]":
@@ -817,8 +786,16 @@ def grounding_violations(
     violations: "list[str]" = []
     ground = (fragment or "") + "\n" + "\n".join(dict_lines or [])
     ground_low = ground.lower()
-    conditions = (ground_low if dialect != "sql"
-                  else _condition_text(fragment or "").lower())
+    if dialect != "sql":
+        conditions = ground_low
+    else:
+        # OUTER-scope deciding facts from the tree (the gate recut):
+        # the 240-char keyword windows are gone, and a derived
+        # table's text no longer counts as this step's deciding
+        # evidence — the 3a scope law on the checker side.
+        from src.tree.extract import query_shape
+        conditions = " ".join(
+            query_shape(fragment or "").deciding_exprs).lower()
 
     # 1) every literal value in the output must exist in the source
     for num in set(_OUT_NUMBERS.findall(text)):

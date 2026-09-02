@@ -18,14 +18,32 @@ REPO = Path(__file__).resolve().parent.parent
 
 
 def regex_users(source: str) -> "set[str]":
-    """Every function in `source` whose body references `re.*` — the
-    frontier scanner, factored pure so it can be tested on fixtures."""
+    """Every function in `source` that uses regex — direct `re.*`
+    calls OR names bound at module level to `re.compile(...)` (the
+    scanner's own first hole: `_FROM_TABLES.findall(...)` inside a
+    function shows no `re.` attribute at all — found designing the
+    gate recut, 09-02, and pinned below)."""
+    tree = ast.parse(source)
+    compiled: "set[str]" = set()
+    for node in tree.body:
+        if (isinstance(node, ast.Assign)
+                and isinstance(node.value, ast.Call)
+                and isinstance(node.value.func, ast.Attribute)
+                and isinstance(node.value.func.value, ast.Name)
+                and node.value.func.value.id == "re"):
+            for tgt in node.targets:
+                if isinstance(tgt, ast.Name):
+                    compiled.add(tgt.id)
     users: "set[str]" = set()
-    for fn in ast.walk(ast.parse(source)):
+    for fn in ast.walk(tree):
         if isinstance(fn, (ast.FunctionDef, ast.AsyncFunctionDef)):
-            if any(isinstance(n, ast.Attribute)
-                   and isinstance(n.value, ast.Name)
-                   and n.value.id == "re" for n in ast.walk(fn)):
+            direct = any(isinstance(n, ast.Attribute)
+                         and isinstance(n.value, ast.Name)
+                         and n.value.id == "re" for n in ast.walk(fn))
+            via_pattern = any(isinstance(n, ast.Name)
+                              and n.id in compiled
+                              for n in ast.walk(fn))
+            if direct or via_pattern:
                 users.add(fn.name)
     return users
 
@@ -44,12 +62,18 @@ def planted_violation(sql):
 
 def false_positive_bait(bare):
     return bare.upper()   # contains the substring "re." — must NOT hit
+
+_HIDDEN = re.compile(r"FROM (.*)")
+
+def planted_module_pattern_user(sql):
+    return _HIDDEN.findall(sql)   # no `re.` attribute in this body
 '''
 
     def test_scanner_catches_the_planted_violation(self):
-        assert regex_users(self.PLANTED) == {"planted_violation"}, (
-            "the scanner missed the plant or false-positived on "
-            "`bare.upper()` — the substring-scan defect, pinned")
+        assert regex_users(self.PLANTED) == {
+            "planted_violation", "planted_module_pattern_user"}, (
+            "the scanner missed a plant (direct or via module-level "
+            "compiled pattern) or false-positived on `bare.upper()`")
 
     def test_scanner_reports_nothing_on_a_clean_module(self):
         assert regex_users("def f(x):\n    return x + 1\n") == set()

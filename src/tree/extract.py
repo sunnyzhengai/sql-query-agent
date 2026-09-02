@@ -25,6 +25,7 @@ reviewer question 3) is made.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from functools import lru_cache
 
 from src.parser.scriptdom_loader import parse_tsql
 from src.parser.sql_parser import normalize_sql_whitespace
@@ -641,3 +642,136 @@ def unextracted_fallout_rows(tree: DecisionTree, metric_id: str,
         "contract_id": CONTRACT_ID,
         "resolution": "escalated",
     } for u in tree.unextracted]
+
+# --- query shape (GATE-RECUT, 2026-09-02) ---------------------------
+# The gate's SQL-side evidence, parser-native — the composer's cut
+# (DESC-SKELETON-3) applied to the checker. Outcome vocabulary is
+# CLOSED (spec:G4 discipline): parse_ok False ⇒ every field empty ⇒
+# callers' standing law applies (absence of evidence refuses no
+# claim) and the failure is visible on the shape — no silent third
+# state, no regex fallback.
+
+
+
+@dataclass(frozen=True)
+class QueryShape:
+    parse_ok: bool
+    base_tables: "frozenset[str]"      # named refs (any scope, '#'
+                                       # kept) minus self-defined CTEs
+    own_ctes: "frozenset[str]"
+    select_cols: "tuple[str, ...]"     # OUTER select list columns
+    key_cols: "tuple[str, ...]"        # OUTER DISTINCT/GROUP BY cols
+    deciding_exprs: "tuple[str, ...]"  # OUTER-scope site expressions
+    deciding_cols: "frozenset[str]"    # columns those sites touch
+
+
+_EMPTY_SHAPE = QueryShape(False, frozenset(), frozenset(), (), (), (),
+                          frozenset())
+
+_SUBSCOPE_TYPES = ("QueryDerivedTable", "ScalarSubquery")
+
+
+def _last_identifier(node) -> "str | None":
+    try:
+        ids = node.MultiPartIdentifier.Identifiers
+        return ids[ids.Count - 1].Value
+    except Exception:  # noqa: BLE001 — .NET reflection
+        return None
+
+
+@lru_cache(maxsize=512)
+def query_shape(fragment: str) -> QueryShape:
+    try:
+        tree = build_decision_tree(fragment or "")
+        parsed, errors = parse_tsql(
+            normalize_sql_whitespace(fragment or ""))
+        if errors:
+            return _EMPTY_SHAPE
+    except Exception:  # noqa: BLE001 — closed outcome: parse_ok False
+        return _EMPTY_SHAPE
+
+    tables: "set[str]" = set()
+    ctes: "set[str]" = set()
+    select_cols: "list[str]" = []
+    key_cols: "list[str]" = []
+
+    def walk(node, sub: int, depth: int = 0) -> None:
+        if node is None or depth > 60:
+            return
+        tn = _type_name(node)
+        if tn == "NamedTableReference":
+            try:
+                tables.add(node.SchemaObject.BaseIdentifier.Value)
+            except Exception:  # noqa: BLE001, S110 — reflection
+                pass           # miss = no evidence, by design
+        elif tn == "CommonTableExpression":
+            try:
+                ctes.add(node.ExpressionName.Value)
+            except Exception:  # noqa: BLE001, S110 — reflection
+                pass           # miss = no evidence, by design
+        elif tn == "QuerySpecification" and sub == 0:
+            try:
+                if (node.UniqueRowFilter is not None
+                        and "Distinct" in str(node.UniqueRowFilter)):
+                    for i in range(node.SelectElements.Count):
+                        col = _select_col(node.SelectElements[i])
+                        if col:
+                            key_cols.append(col)
+            except Exception:  # noqa: BLE001, S110 — reflection
+                pass           # miss = no evidence, by design
+        elif tn == "SelectScalarExpression" and sub == 0:
+            expr = getattr(node, "Expression", None)
+            col = (_last_identifier(expr)
+                   if _type_name(expr) == "ColumnReferenceExpression"
+                   else None)
+            if col:
+                select_cols.append(col)
+        elif tn == "ExpressionGroupingSpecification" and sub == 0:
+            expr = getattr(node, "Expression", None)
+            if _type_name(expr) == "ColumnReferenceExpression":
+                col = _last_identifier(expr)
+                if col:
+                    key_cols.append(col)
+        bump = 1 if tn in _SUBSCOPE_TYPES else 0
+        for child in _shape_children(node):
+            walk(child, sub + bump, depth + 1)
+
+    def _select_col(el):
+        expr = getattr(el, "Expression", None)
+        if _type_name(expr) == "ColumnReferenceExpression":
+            return _last_identifier(expr)
+        return None
+
+    for b in range(parsed.Batches.Count):
+        for s in range(parsed.Batches[b].Statements.Count):
+            walk(parsed.Batches[b].Statements[s], 0)
+
+    outer_sites = [s for s in tree.sites if s.scope == "outer"]
+    deciding_cols = frozenset(
+        c.split(".")[-1].upper()
+        for site in outer_sites
+        for n in _flatten(site.root) for c in n.columns if c)
+    return QueryShape(
+        parse_ok=True,
+        base_tables=frozenset(t for t in tables
+                              if t.upper() not in
+                              {c.upper() for c in ctes}),
+        own_ctes=frozenset(ctes),
+        select_cols=tuple(select_cols),
+        key_cols=tuple(key_cols),
+        deciding_exprs=tuple(s.root.expression_sql for s in outer_sites),
+        deciding_cols=deciding_cols,
+    )
+
+
+_shape_children = None  # bound below to the extractor's reflection walk
+
+
+def _bind_shape_children():
+    global _shape_children
+    ex = _Extractor(DecisionTree(fragment=""))
+    _shape_children = ex._children
+
+
+_bind_shape_children()
+
