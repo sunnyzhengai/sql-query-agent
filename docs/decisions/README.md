@@ -67,7 +67,7 @@ never deleted — its status changes and it links to its replacement.
 | [0054](0054-governance-red-flags-governed-plurality.md) | Governance red flags and governed plurality: misnomer/duplicate/cousin sweep over content hashes; citizen-stewardship disposition | Accepted |
 | [0055](0055-designed-shape-corpus.md) | The designed shape corpus: spec-derived test data, category-partition over name × logic × scope | Accepted |
 | [0056](0056-decision-algebra.md) | The decision algebra: every answer ends in a decision (typed deny, usage weights) | Accepted (typed deny amended by 0057) |
-| [0057](0057-the-sphere.md) | The Sphere: four shells, the nervous system, the ownership economy, the contracts split | Accepted (design record; full model in ../architecture/SPHERE.md) |
+| [0057](0057-the-sphere.md) | The Sphere: four shells, the nervous system, the ownership economy, the contracts split | Accepted (design record; model re-homed to ../architecture/ARCHITECTURE.md by 0066) |
 | [0058](0058-self-service-contracts.md) | The self-service contracts: provenance rungs, parameterization, execution floors for the Pro pillar | Accepted (builds with Pro) |
 | [0059](0059-graph-topology-axioms.md) | The graph topology axioms: connected, sound, complete — measured, then formalized as SPEC Group Q | Accepted |
 | [0060](0060-parse-is-the-plan.md) | The parse is the plan: parser-only LLM, deterministic traversal, correction flywheel | Accepted (one-shot confirm superseded by 0062; parse-never-generate core stands) |
@@ -76,3 +76,4 @@ never deleted — its status changes and it links to its replacement.
 | [0063](0063-product-tiers.md) | The product tiers: X-Ray, Bridge, Workbench, Run — artifacts land, chat doesn't | Accepted (TIER LOCK + scope lock) |
 | [0064](0064-the-ledger-and-drift-axioms.md) | Group L: the ledger (append-only obeyed, aggregates derived) and drift-fires — closes the two crosswalk gaps | Accepted (all three calls ruled 2026-09-01; SPEC v0.8) |
 | [0065](0065-promote-the-double-sided-function.md) | Promote §13 to Group T: the double-sided function as numbered law (T0 the law, T1–T3 the instances) | Accepted (SPEC v0.9) |
+| [0066](0066-merge-sphere-into-architecture.md) | One system-model file: SPHERE merges into ARCHITECTURE — build status per section; kills the rival layer models | Accepted |

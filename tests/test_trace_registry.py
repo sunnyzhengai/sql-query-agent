@@ -75,6 +75,8 @@ def test_architecture_decisions_carry_code_or_tests():
                  # release C4) — build still lands WITH Pro
         "0057",  # design record by construction — binds design, never
                  # the build queue; no modules ever expected
+        "0066",  # doc restructure (the SPHERE→ARCHITECTURE merge) —
+                 # its artifact IS the blueprint; no code by nature
     }
     empty = [
         adr for adr, e in TRACE_REGISTRY.items()

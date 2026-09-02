@@ -5,7 +5,9 @@ review-session design debates (five rounds), ratified by Sunny in
 session ("yes, crystallize"). Design record: this ADR changes the
 BUILD QUEUE not at all; it binds future design.
 
-**The full model lives in docs/architecture/SPHERE.md. This ADR
+**The full model lives in docs/architecture/ARCHITECTURE.md**
+*(location note, 2026-09-02: originally SPHERE.md; merged by ADR 0066
+— one system-model file, the model itself unchanged)*. **This ADR
 records the decisions:**
 
 1. **Four shells:** foundation (sovereign EMR reality; built at BYOT

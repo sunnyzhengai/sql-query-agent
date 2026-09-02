@@ -14,8 +14,7 @@ not a filename convention (naming ruled kept as-is, 2026-09-02):
 | **the bridge** — which framework law each spec axiom applies | [architecture/AXIOM_CROSSWALK.md](architecture/AXIOM_CROSSWALK.md) |
 | **the receipts** — which tests make each status true | [architecture/TEST_MAP.md](architecture/TEST_MAP.md) |
 | **a decision's lineage** — component → axioms → code → tests | [architecture/TRACE_MAP.md](architecture/TRACE_MAP.md) |
-| **the big-picture model** — shells, ownership, change propagation | [architecture/SPHERE.md](architecture/SPHERE.md) |
-| **what the system is made of** — layers, parse spine, modules | [architecture/ARCHITECTURE.md](architecture/ARCHITECTURE.md) |
+| **the system model** — the Sphere: shells, ownership, dataflow, modules — each section build-statused | [architecture/ARCHITECTURE.md](architecture/ARCHITECTURE.md) |
 | **what is sold** — tiers, packaging, positioning | [product/PRODUCT_TIERS.md](product/PRODUCT_TIERS.md) |
 | **the rationale for any choice** | [decisions/](decisions/README.md) — always the canonical home |
 
@@ -114,16 +113,16 @@ nothing referenced them.
 Files are grouped by *what kind of thing they are*, which is also how
 they behave under change.
 
-### Authored — the design record (7)
+### Authored — the design record (8)
 
 Hand-written, highest interpretive value, lowest churn. These state
 intent; they are audited, not generated.
 
 | Document | ADRs | Governs |
 | --- | --- | --- |
-| [SPEC.md](architecture/SPEC.md) | 14 | The formal axiom system (groups A–H, P, Q, R), its notation, and the enforcement status of every axiom. **v0.7 — the standing instrument; cite as `spec:<id>`.** |
-| [SPHERE.md](architecture/SPHERE.md) | 9 | The four shells inside→out, the change-propagation nervous system, the ownership economy, and the contracts split. |
-| [ARCHITECTURE.md](architecture/ARCHITECTURE.md) | 6 | What the system is made of: the graph layers, the parse spine, the module map. The orientation document. |
+| [SPEC.md](architecture/SPEC.md) | 13 | The formal axiom system (groups A–H, L, P, Q, R, T — 48 axioms), its notation, and the enforcement status of each. **v0.9 — the standing instrument; cite as `spec:<id>`.** |
+| [AXIOM_CROSSWALK.md](architecture/AXIOM_CROSSWALK.md) | 3 | The bridge between the two axiom systems: every spec axiom's framework parent, and the three meta-axioms that cannot map by construction. |
+| [ARCHITECTURE.md](architecture/ARCHITECTURE.md) | 16 | The system model, organized by the Sphere (ADR 0066 merged SPHERE.md in): four shells, radial dynamics, data flow, ownership economy, contracts split — every section carrying a `BUILT`/`PARTIAL`/`DESIGN` status. |
 | [USER_FLOW.md](architecture/USER_FLOW.md) | 6 | How a question moves from ask to answer, and how usage feeds the flywheel. |
 | [QUESTION_MAP.md](architecture/QUESTION_MAP.md) | 5 | What the storage must support, audited by question family. *Not* a runtime routing table (ADR 0062). |
 | [REFERENCE_ARCHITECTURE.md](architecture/REFERENCE_ARCHITECTURE.md) | 4 | The deployable reference: connector tiers, what runs per product tier, and the Azure consumption footprint. |
@@ -145,7 +144,7 @@ authority comes from the code they project.
 | [INTEGRATION_MAP.md](architecture/INTEGRATION_MAP.md) | `integration_registry.py` | What we parse in and publish out, with each write target's direction. |
 | [NOTEBOOK_MAP.md](architecture/NOTEBOOK_MAP.md) | `notebook_registry.py` | Every notebook's contract entry and the question families it serves. |
 
-> **Why the ADR counts are uneven.** SPEC and SPHERE carry 14 and 9
+> **Why the ADR counts are uneven.** ARCHITECTURE and SPEC carry 16 and 13
 > because they are where cross-cutting law lands; the generated maps
 > carry 1–2 because they *project* decisions rather than hold them. A
 > low count is not a sign of an unimportant file — but a file with

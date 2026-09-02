@@ -152,13 +152,17 @@ ARCHITECTURE_COMPONENTS = {
                    "run-layer boundary.",
     },
     "architecture": {
+        # ADR 0066 (2026-09-02): absorbed the former `sphere`
+        # component — one system-model file, organized by the Sphere,
+        # every section carrying a build status.
         "doc": "docs/architecture/ARCHITECTURE.md",
-        "current_through": "0053",
-        "title": "System topology — the layered graph",
-        "satisfies": ["D", "S"],
-        "governs": "What the system is made of and how data moves "
-                   "through it: the graph layers, the parse spine, "
-                   "the module map.",
+        "current_through": "0066",
+        "title": "The system model — the Sphere",
+        "satisfies": ["D", "S", "J", "R"],
+        "governs": "What the system is and is becoming, in one file: "
+                   "the four shells, radial dynamics, data flow, the "
+                   "nervous system, the ownership economy, the "
+                   "contracts split — each section build-statused.",
     },
     "pipeline": {
         "doc": "docs/architecture/PIPELINE_MAP.md",
@@ -168,14 +172,6 @@ ARCHITECTURE_COMPONENTS = {
         "governs": "The notebook/stage sequence, each stage's inputs "
                    "and outputs, and the conservation of rows across "
                    "them.",
-    },
-    "sphere": {
-        "doc": "docs/architecture/SPHERE.md",
-        "current_through": "0057",
-        "title": "The Sphere — shells, ownership, change propagation",
-        "satisfies": ["D", "J", "R"],
-        "governs": "The four shells, the nervous system, the ownership "
-                   "economy, and the static/dynamic contracts split.",
     },
     "question": {
         "doc": "docs/architecture/QUESTION_MAP.md",
@@ -318,7 +314,7 @@ TRACE_REGISTRY = {
     "0004": {
         "title": "Two-stage human-in-the-loop certification",
         "category": "architecture",
-        "component": "sphere",
+        "component": "architecture",
         "axioms": [],
         "modules": ["src/governance/steward.py"],
         "tests": ["tests/governance/test_steward.py"],
@@ -511,7 +507,7 @@ TRACE_REGISTRY = {
     "0021": {
         "title": "Certification discloses, never gates",
         "category": "architecture",
-        "component": "sphere",
+        "component": "architecture",
         "axioms": [],
         "modules": [],
         "tests": ["tests/test_schemas.py"],
@@ -529,7 +525,7 @@ TRACE_REGISTRY = {
     "0023": {
         "title": "Usage-weighted governance flywheel",
         "category": "architecture",
-        "component": "sphere",
+        "component": "architecture",
         "axioms": [],
         "modules": ["src/orchestrator/events.py"],
         "tests": ["tests/orchestrator/test_events.py"],
@@ -538,7 +534,7 @@ TRACE_REGISTRY = {
     "0024": {
         "title": "Layered truth: personal beside enterprise definitions",
         "category": "architecture",
-        "component": "sphere",
+        "component": "architecture",
         "axioms": [],
         "modules": [],
         "tests": ["tests/test_schemas.py", "tests/test_table_contracts.py"],
@@ -573,7 +569,7 @@ TRACE_REGISTRY = {
     "0027": {
         "title": "Ownership attribution: manual floor, Entra ID enriches",
         "category": "architecture",
-        "component": "sphere",
+        "component": "architecture",
         "axioms": [],
         "modules": [],
         "tests": ["tests/governance/test_steward.py"],
@@ -609,7 +605,7 @@ TRACE_REGISTRY = {
     "0031": {
         "title": "Business terms: weighted plurality",
         "category": "architecture",
-        "component": "sphere",
+        "component": "architecture",
         "axioms": [],
         "modules": ["src/governance/business_terms.py"],
         "tests": ["tests/governance/test_business_terms.py"],
@@ -803,6 +799,22 @@ TRACE_REGISTRY = {
                   "tests/test_companion.py"],
         "docs": ["docs/architecture/SPEC.md", "docs/architecture/TRACE_MAP.md"],
     },
+    "0066": {
+        # ACCEPTED 2026-09-02 (Sunny: "we only need one"): SPHERE.md
+        # merged into ARCHITECTURE.md — one system-model blueprint,
+        # organized by the Sphere, build status per section. Kills the
+        # three-rival-layer-models drift (3 layers / 4 shells / SPEC
+        # section-4 sorts). ADR 0057's model unchanged, re-homed.
+        "title": "One system-model file: SPHERE merges into "
+                 "ARCHITECTURE",
+        "category": "architecture",
+        "component": "architecture",
+        "axioms": [],
+        "modules": [],
+        "tests": [],
+        "docs": ["docs/decisions/0066-merge-sphere-into-architecture.md",
+                 "docs/architecture/ARCHITECTURE.md"],
+    },
     "0065": {
         # ACCEPTED 2026-09-01 (Sunny: "we should promote 13"): SPEC
         # section 13 becomes Group T. Zero new mechanisms — T1 and T3
@@ -944,12 +956,12 @@ TRACE_REGISTRY = {
         "title": "The Sphere: architecture model, ownership economy, "
                  "contracts split",
         "category": "architecture",
-        "component": "sphere",
+        "component": "architecture",
         "axioms": [],
         "modules": [],
         "tests": [],
         "docs": ["docs/decisions/0057-the-sphere.md",
-                 "docs/architecture/SPHERE.md"],
+                 "docs/architecture/ARCHITECTURE.md"],
     },
     "0056": {
         # ACCEPTED 2026-08-25; FLYWHEEL-1 (Sunny-authorized
@@ -961,7 +973,7 @@ TRACE_REGISTRY = {
         "title": "The decision algebra: every answer ends in a "
                  "decision (typed deny, usage weights)",
         "category": "architecture",
-        "component": "sphere",
+        "component": "architecture",
         "axioms": [],
         "modules": ["src/flywheel.py"],
         "tests": ["tests/test_flywheel.py"],
@@ -990,7 +1002,7 @@ TRACE_REGISTRY = {
         "title": "Governance red flags and governed plurality: "
                  "misnomer/duplicate/cousin sweep over content hashes",
         "category": "architecture",
-        "component": "sphere",
+        "component": "architecture",
         "axioms": ["C1", "E2"],
         "modules": ["src/governance/red_flags.py",
                     "src/steps/red_flag_sweep.py"],
