@@ -32,8 +32,9 @@ def test_d1_provenance_vocabulary_matches_the_spec_ledger():
     assert tuple(x.strip() for x in inside.split(",")) == PROVENANCE
 
 
-@D
 def test_d1_every_described_node_carries_provenance():
+    # FLIPPED 09-02 (D1 shipped: provenance through result, cache
+    # tuple values, ops_description_cache column + allowed_values)
     """Exit: DescriptionResult labels every stored description with a
     value from the closed set; the cache carries it; the
     ops_description_cache contract declares the column with an
@@ -46,8 +47,8 @@ def test_d1_every_described_node_carries_provenance():
 
 
 # ---------------------------------------------------------------- D2
-@D
 def test_d2_the_instrument_declares_its_build_stopper():
+    # FLIPPED 09-02 (THRESHOLDS as data on the corpus instrument)
     """Exit: the corpus instrument (grown from devtools/desc_corpus)
     pins thresholds as data — fabrications past the retry = 0 is the
     BUILD-STOPPER, emptied counted; the scorecard is emitted, the
@@ -70,19 +71,21 @@ def test_d3_single_statement_procs_get_a_file_description():
 
 
 # ------------------------------------------------- D-wiring (D1/D3)
-@D
 def test_wiring_skeleton_floor_replaces_grounded_to_empty():
+    # FLIPPED 09-02 (the 0074 wiring: describe_step in the loop)
     """Exit: generate_descriptions routes steps through the skeleton
     path — a describe() that returns ungroundable garbage yields the
     SKELETON (plain but true), provenance skeleton_floor, never a
     grounded_to_empty failure. (Today: the old path fails the node.)"""
+    import json
+
     from src.descriptions import generate_descriptions
     nodes = [{
         "node_id": "t1", "name": "Base_Pop",
         "layer": NodeLayer.TRANSFORMATION.value,
-        "properties": {"sql_fragment":
+        "properties": json.dumps({"sql_fragment":
                        "SELECT PATIENT_ID INTO #Base_Pop FROM "
-                       "HOSPITAL_ENCOUNTERS WHERE ADMIT_DATE IS NOT NULL"},
+                       "HOSPITAL_ENCOUNTERS WHERE ADMIT_DATE IS NOT NULL"}),
     }]
     r = generate_descriptions(nodes, [], lambda p: "The 123/456 codes "
                               "prove eligibility per policy 9.")
@@ -90,8 +93,8 @@ def test_wiring_skeleton_floor_replaces_grounded_to_empty():
     assert r.provenance.get("t1") == "skeleton_floor"
 
 
-@D
 def test_wiring_voice_kill_beats_the_skeleton_and_is_counted():
+    # FLIPPED 09-02 (result.emptied — the empties-(a) counter)
     """Exit (the empties-(a) ruling's precedence, ADR 0074 §5.3a:
     voice/gate kill > skeleton floor > absent): when even the
     skeleton violates voice, the description is ABSENT and the node

@@ -35,6 +35,15 @@ view are preserved history.
       landing_registry: OUTBOX_FIELDS/OUTCOMES)
 
 ### THE WEDGE / DESCRIPTIONS — 0074 RATIFIED 09-02; the build queue
+- [x] **THE WIRING SHIPPED 09-02 (the queue's core):**
+      generate_descriptions now runs the ratified acceptance —
+      skeleton composed from the tree, ONE smoothing attempt, gate on
+      the candidate, SKELETON FLOOR on violation; voice-killed
+      skeletons go ABSENT and COUNTED (result.emptied — the
+      empties-(a) precedence, live). A transient model failure now
+      costs NOTHING (skeleton ships; the old failed-node expectation
+      is re-founded with 0074 cited). Two legacy tests updated with
+      their principles carried to new mechanisms.
 - [x] **THE RED CONTRACT LANDED (09-02):** tests/test_desc_0074.py —
       every D-item's exit gate as a strict-xfail test (1 green:
       provenance vocab == spec:B2, cross-checked; 7 red by design).
@@ -47,15 +56,15 @@ view are preserved history.
       landed: B2 vocab = {gate_passed, skeleton_floor, flagged};
       F/T1 = the measurement instrument. Design debt from the field
       weeks is now record, not archaeology.
-- [ ] **D1 — provenance persistence** (the B2 stated gap): provenance
-      column on stored descriptions, closed-vocab invariant in
-      TABLE_REGISTRY, written by 600. EXIT: contract invariant green
-      + a red-first fixture per provenance value.
-- [ ] **D2 — the verifier becomes the instrument**: corpus harness
-      grading gate output (clean/recovered/emptied per class);
-      fabrications=0 is the build-stopper, emptied=0 the floor.
-      EXIT: scorecard emitted on the recorded corpus; thresholds
-      pinned as the honesty-floor pattern.
+- [x] **D1 SHIPPED 09-02:** provenance through the result, the cache
+      (tuple values, tolerant legacy read), the ops_description_cache
+      contract (column + allowed_values invariant), and 600's rows.
+      PROMPT_VERSION 6→7 — every description regenerates under the
+      ratified acceptance (0044 version binding). Exit gate flipped.
+- [x] **D2 thresholds SHIPPED 09-02** (THRESHOLDS as data on the
+      corpus instrument; fabricated=0 = build_stopper; exit gate
+      flipped). The standing nightly harness run stays with the
+      demo-cadence work.
 - [ ] **D3 — metric/file-level composition**: metric <- terminal
       steps (CTE or temp alike); deliverable per SQL FILE; coverage
       = files described. EXIT: red-first skeletons flip green;

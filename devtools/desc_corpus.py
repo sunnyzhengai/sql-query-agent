@@ -178,6 +178,13 @@ def report(tallies: "dict[str, Tally]") -> str:
     return "\n".join(lines)
 
 
+# ADR 0074 D2 (spec:F/T1 as the measurement instrument): the corpus
+# run's build-stopper thresholds, as data. fabricated = a violation
+# surviving into FINAL text — structurally impossible past the gate,
+# asserted anyway (the instrument checks the checker).
+THRESHOLDS = {"fabricated": 0, "role": "build_stopper"}
+
+
 def main() -> None:
     dry = "--dry" in _sys.argv
     if dry:

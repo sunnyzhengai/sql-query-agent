@@ -44,12 +44,14 @@ from src.models import EdgeType, NodeLayer
 # contract regenerates everything it governs.
 from src.tree import TREE_CONTRACT_VERSION
 from src.tree.extract import build_decision_tree
-from src.tree.translate import translate_tree
 
 # v6 (2026-08-21, walk find 2): the metric-grain scope rule — the
 # bump invalidates every cached description so poisoned "without
 # applying any filtering decisions" text cannot survive the next run.
-PROMPT_VERSION = f"6.t{TREE_CONTRACT_VERSION}"
+# 7: the ADR 0074 wiring — skeleton-floor acceptance replaced the
+# translate/enforce path in the step loop; every description
+# regenerates under the ratified architecture (0044 version binding).
+PROMPT_VERSION = f"7.t{TREE_CONTRACT_VERSION}"
 
 # ADR 0074 call 2 (ratified 2026-09-02): the provenance vocabulary for
 # stored descriptions — spec:B2's closed set, code home. gate_passed =
@@ -921,6 +923,13 @@ class DescriptionResult:
     # lines came from the deterministic template floor (clause 5); the
     # text stays complete, the miss stays counted.
     unvoiced: "list[tuple[str, int]]" = field(default_factory=list)
+    # ADR 0074 D1: node_id -> PROVENANCE value for every STORED
+    # description; total over descriptions, closed vocabulary.
+    provenance: "dict[str, str]" = field(default_factory=dict)
+    # The empties-(a) ruling (0074 section 5.3a): voice/gate kill >
+    # skeleton floor > absent. (step_id, violations) — ABSENT rows,
+    # counted, never stored, never silent.
+    emptied: "list[tuple[str, list[str]]]" = field(default_factory=list)
 
     def fail(self, node_id: str, reason: str) -> None:
         self.failed.append(node_id)
@@ -960,6 +969,25 @@ def topological_step_order(nodes: dict, edges: list) -> "list[str]":
 
 
 MAX_DICT_LINES = 30
+
+
+def meanings_for_step(
+    step_id: str, nodes: dict, tech_map: "dict[str, list[str]]",
+    columns_map: "dict[str, list[str]]", fragment: str,
+) -> "dict[str, str]":
+    """Column -> business meaning for the columns the fragment
+    references — the skeleton composer's vocabulary (same selection
+    rule as dictionary_for_step, keyed for composition)."""
+    frag = (fragment or "").lower()
+    meanings: "dict[str, str]" = {}
+    for table_id in tech_map.get(step_id, []):
+        for col_id in columns_map.get(table_id, []):
+            col = nodes.get(col_id)
+            if col is None or not (col.description or "").strip():
+                continue
+            if col.name.lower() in frag:
+                meanings[col.name.upper()] = col.description.strip()
+    return meanings
 
 
 def dictionary_for_step(
@@ -1130,41 +1158,50 @@ def generate_descriptions(
             step_id, nodes, tech_map, columns_map, fragment)
         key = step_content_hash(fragment, dep_names, dict_lines)
         if key in cache:
-            described[step_id] = cache[key]
-            result.descriptions[step_id] = cache[key]
+            entry = cache[key]
+            text, prov = (entry if isinstance(entry, tuple)
+                          else (entry, "gate_passed"))
+            described[step_id] = text
+            result.descriptions[step_id] = text
+            result.provenance[step_id] = prov
             result.cache_hits += 1
             continue
-        deps = [
-            (nodes[d].name, described.get(d, ""))
-            for d in dep_map.get(step_id, []) if d in nodes
-        ]
         try:
-            # Phase 2 (ADR 0044 clauses 2+5): the LLM translates typed
-            # tree facts — it never sees the SQL statement. The ledger
-            # guarantees completeness: unvoiced facts appear via the
-            # deterministic template floor and are counted.
-            tree = build_decision_tree(fragment)
-            tr = translate_tree(tree, dict_lines, describe,
-                                name=node.name, deps=deps)
-            if tr.unvoiced:
-                result.unvoiced.append((step_id, len(tr.unvoiced)))
-            text, removed = enforce_grounding(tr.text, fragment, dict_lines)
+            # ADR 0074 acceptance (the ratified field architecture):
+            # deterministic skeleton from the tree (translator
+            # blindness by construction — the smooth prompt carries
+            # ONLY the skeleton, never SQL), one smoothing attempt,
+            # gate on the candidate, SKELETON FLOOR on violation.
+            meanings = meanings_for_step(
+                step_id, nodes, tech_map, columns_map, fragment)
+            sd = describe_step(fragment, meanings, smooth=describe)
+            text = sd.text
         except Exception as err:  # noqa: BLE001 — one bad step must not kill the batch
             result.fail(step_id, f"generation_error: {type(err).__name__}: {err}"[:300])
             continue
-        if removed:
-            result.ungrounded.append((step_id, removed))
-        if not text:
-            result.fail(step_id, "grounded_to_empty: every generated line "
-                                 "failed the grounding check")
-            continue
+        if sd.source == "skeleton":
+            # empties-(a) precedence: voice/gate kill > skeleton >
+            # absent. A skeleton killed by voice ships NOTHING and
+            # is COUNTED (0074 section 5.3a).
+            kill = grounding_violations(text, fragment, dict_lines)
+            if kill:
+                result.emptied.append((step_id, kill))
+                continue
+            prov = "skeleton_floor"
+        else:
+            prov = "gate_passed"
+        if sd.violations:
+            # the smoothing candidate's violations — the skeleton
+            # shipped instead; the catch stays counted
+            result.ungrounded.append((step_id, sd.violations))
         if _VAGUE_FILLERS.search(text):
             result.vague.append(step_id)
         if _RAW_IDENTIFIERS.search(text):
             result.jargon.append(step_id)
-        cache[key] = text
+        cache[key] = (text, prov)
         described[step_id] = text
         result.descriptions[step_id] = text
+        result.provenance[step_id] = prov
         result.generated += 1
 
     # Measures (ADR 0040): DAX is business logic — same treatment as SQL
@@ -1217,6 +1254,7 @@ def generate_descriptions(
             result.jargon.append(node_id)
         cache[key] = text
         result.descriptions[node_id] = text
+        result.provenance[node_id] = "gate_passed"
         result.generated += 1
 
     # Metrics: composed from ROOT step descriptions (raw roots-only edges)
@@ -1308,6 +1346,7 @@ def generate_descriptions(
             result.jargon.append(node_id)
         cache[key] = text
         result.descriptions[node_id] = text
+        result.provenance[node_id] = "gate_passed"
         result.generated += 1
 
     return result

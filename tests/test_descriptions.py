@@ -154,7 +154,11 @@ class TestGeneration:
 
     def test_step_prompt_carries_the_data_dictionary(self):
         """The graph's own dictionary is the translation material —
-        the model is never asked to invent business meanings."""
+        the model is never asked to invent business meanings.
+        CARRIER UPDATED for the 0074 wiring: meanings are COMPOSED
+        into the skeleton (meanings_for_step), and the smooth prompt
+        carries the skeleton — so the dictionary reaches the model as
+        substituted MEANING TEXT, not as a glossary block."""
         g = _graph()
         prompts = []
 
@@ -162,33 +166,60 @@ class TestGeneration:
             prompts.append(p)
             return "ok"
         generate_descriptions(g.nodes_rows, g.edges_rows, capture)
-        step_prompts = [p for p in prompts if "calculation step" in p]
-        # the block is headed SUBSTITUTIONS since DESC-VOICE-3.2 (a
-        # glossary framing made the model cite the KEYS); this test
-        # asserts the dictionary REACHES the prompt, not its heading
-        assert any("SUBSTITUTIONS" in p for p in step_prompts), (
-            "no step prompt carried dictionary lines — check "
-            "TRANSFORM_TO_TECHNICAL wiring")
+        step_prompts = [p for p in prompts if "STATEMENT:" in p]
+        assert step_prompts, "no smoothing prompt captured"
+        assert any("department display name" in p.lower()
+                   for p in step_prompts), (
+            "no dictionary MEANING reached a step prompt — check "
+            "meanings_for_step / TRANSFORM_TO_TECHNICAL wiring")
 
     def test_dictionary_changes_regenerate(self):
         assert step_content_hash("SELECT 1", ["a"], ["- T: patients"]) \
             != step_content_hash("SELECT 1", ["a"], ["- T: encounters"])
 
-    def test_one_bad_step_does_not_kill_the_batch(self):
+    def test_transient_smoothing_failure_costs_nothing(self):
+        """RE-FOUNDED by the 0074 wiring: a transient describe()
+        failure no longer FAILS the step — it degrades to the
+        grounded skeleton (describe_step's documented broad-except:
+        'must degrade to the grounded skeleton, never cost the
+        description'). The old expectation (failed == 1) tested the
+        pre-skeleton acceptance."""
         g = _graph()
         flaky = {"n": 0}
+
         def sometimes(prompt):
             flaky["n"] += 1
             if flaky["n"] == 1:
                 raise RuntimeError("transient")
             return "ok"
-        result = generate_descriptions(g.nodes_rows, g.edges_rows, sometimes)
+        result = generate_descriptions(g.nodes_rows, g.edges_rows,
+                                       sometimes)
+        assert result.failed == []
+        assert result.generated > 0
+        assert "skeleton_floor" in result.provenance.values()
+
+    def test_one_bad_step_does_not_kill_the_batch(self, monkeypatch):
+        """The batch-resilience guarantee survives 0074 for the
+        classes that CAN still raise; the WHY stays captured (field
+        find 2026-08-20)."""
+        import src.descriptions as d
+        g = _graph()
+        real = d.describe_step
+        calls = {"n": 0}
+
+        def exploding(fragment, meanings=None, smooth=None):
+            calls["n"] += 1
+            if calls["n"] == 1:
+                raise RuntimeError("boom")
+            return real(fragment, meanings, smooth)
+        monkeypatch.setattr(d, "describe_step", exploding)
+        result = d.generate_descriptions(g.nodes_rows, g.edges_rows,
+                                         lambda p: "ok")
         assert len(result.failed) == 1
         assert result.generated > 0
-        # the WHY is captured, not just the fact (field find 2026-08-20)
         nid, reason = result.failed_reasons[0]
         assert nid == result.failed[0]
-        assert reason.startswith("generation_error: RuntimeError: transient")
+        assert reason.startswith("generation_error: RuntimeError: boom")
 
 
 class TestPrompts:

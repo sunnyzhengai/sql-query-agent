@@ -1234,15 +1234,26 @@ DESCRIPTION_CACHE = {
         ("node_id", "string", False),
         ("description", "string", False),
         ("generated_at", "string", False),
+        # ADR 0074 D1 (spec:B2): every stored description carries its
+        # epistemic status from the closed vocabulary.
+        ("provenance", "string", False),
     ],
     "column_descriptions": {
         "content_hash": "step_content_hash(sql_fragment, direct dependency names)",
         "node_id": "Transformation node the description was generated for",
         "description": "Generated one-sentence business description",
         "generated_at": "ISO timestamp of generation",
+        "provenance": (
+            "Epistemic status (spec:B2, ADR 0074): gate_passed = "
+            "smoothed prose that cleared the gate; skeleton_floor = "
+            "deterministic composition (unfalsifiable); flagged = "
+            "kept but marked. Emptied descriptions are ABSENT rows."
+        ),
     },
     "invariants": [
         {"kind": "unique", "columns": ["content_hash"]},
+        {"kind": "allowed_values", "column": "provenance",
+         "values": ["gate_passed", "skeleton_floor", "flagged"]},
     ],
 }
 

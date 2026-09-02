@@ -146,7 +146,11 @@ print(f"PHI gate (DAX): {dax_findings} findings, {dax_redacted} expressions reda
 cache: dict = {}
 if spark.catalog.tableExists("ops_description_cache"):
     for r in spark.table("ops_description_cache").collect():
-        cache[r["content_hash"]] = r["description"]
+        row = r.asDict()
+        # pre-0074 rows lack provenance; their PROMPT_VERSION-6 keys
+        # are dead after the bump, so the placeholder is never served
+        cache[row["content_hash"]] = (
+            row["description"], row.get("provenance", "gate_passed"))
 print(f"Nodes: {len(nodes_rows)}, edges: {len(edges_rows)}, cached steps: {len(cache)}")
 
 result = generate_descriptions(nodes_rows, edges_rows, describe, cache=cache)
@@ -202,8 +206,11 @@ if result.descriptions:
 
     now = datetime.now(timezone.utc).isoformat()
     cache_rows = [
-        {"content_hash": h, "node_id": "", "description": d, "generated_at": now}
-        for h, d in cache.items()
+        {"content_hash": h, "node_id": "",
+         "description": (e[0] if isinstance(e, tuple) else e),
+         "generated_at": now,
+         "provenance": (e[1] if isinstance(e, tuple) else "gate_passed")}
+        for h, e in cache.items()
     ]
     spark.createDataFrame(cache_rows, schema=to_spark_schema(DESCRIPTION_CACHE)) \
         .write.format("delta").mode("overwrite").option("overwriteSchema", "true") \
