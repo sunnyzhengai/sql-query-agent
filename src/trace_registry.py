@@ -138,12 +138,16 @@ ARCHITECTURE_COMPONENTS = {
                    "family. NOT a runtime routing table (ADR 0062).",
     },
     "integration": {
+        # ADR 0069: absorbed the former `connectors` component —
+        # SOURCE_CONNECTORS.md retired; its configurations are rows,
+        # its change/identity doctrine is registry data.
         "doc": "docs/architecture/INTEGRATION_MAP.md",
-        "current_through": "0040",
-        "title": "Integrations — what we parse in, what we publish out",
-        "satisfies": ["D", "B"],
-        "governs": "The connector and catalog landscape as data, "
-                   "including every write target and its direction.",
+        "current_through": "0069",
+        "title": "Integrations — acquisition, publication, identity",
+        "satisfies": ["D", "B", "R"],
+        "governs": "The connector and catalog landscape as data: every "
+                   "source configuration and write target, change "
+                   "detection, and object identity across re-ingests.",
     },
     "notebook": {
         "doc": "docs/architecture/NOTEBOOK_MAP.md",
@@ -201,14 +205,6 @@ ARCHITECTURE_COMPONENTS = {
         "satisfies": ["M", "B"],
         "governs": "How a question moves from ask to answer, and how "
                    "usage feeds the governance flywheel.",
-    },
-    "connectors": {
-        "doc": "docs/architecture/SOURCE_CONNECTORS.md",
-        "current_through": "0049",
-        "title": "Source connectors — acquisition and change detection",
-        "satisfies": ["D", "R"],
-        "governs": "Where customer logic lives, how it is collected, "
-                   "and how change is detected across re-ingests.",
     },
     # Product decisions are choices about the OFFER, not about a system
     # component — so they get their own blueprint, kept OUT of
@@ -343,8 +339,7 @@ TRACE_REGISTRY = {
             "tests/governance/test_publish_log.py",
             "tests/test_docs_consistency.py",
         ],
-        "docs": ["docs/architecture/INTEGRATION_MAP.md",
-                 "docs/architecture/SOURCE_CONNECTORS.md"],
+        "docs": ["docs/architecture/INTEGRATION_MAP.md"],
     },
     "0010": {
         "title": "Skip Founders Hub Level 3, go direct to Partner Center",
@@ -472,11 +467,11 @@ TRACE_REGISTRY = {
     "0022": {
         "title": "Definition versioning: certification pins a content hash",
         "category": "architecture",
-        "component": "connectors",
+        "component": "integration",
         "axioms": [],
         "modules": [],
         "tests": ["tests/test_schemas.py"],
-        "docs": ["docs/architecture/SOURCE_CONNECTORS.md"],
+        "docs": ["docs/architecture/INTEGRATION_MAP.md"],
     },
     "0023": {
         "title": "Usage-weighted governance flywheel",
@@ -670,12 +665,12 @@ TRACE_REGISTRY = {
     "0041": {
         "title": "M mini-parser, shape registry, fallout capture",
         "category": "architecture",
-        "component": "connectors",
+        "component": "integration",
         "axioms": ["C2"],
         "modules": ["src/mquery/parser.py", "src/mquery/signature.py",
                     "src/mquery/registry.py", "src/mquery/census.py"],
         "tests": ["tests/mquery/test_mquery.py"],
-        "docs": ["docs/architecture/SOURCE_CONNECTORS.md"],
+        "docs": ["docs/architecture/INTEGRATION_MAP.md"],
     },
     "0042": {
         "title": "The notebook contract: a harness for the driver layer",
@@ -754,6 +749,22 @@ TRACE_REGISTRY = {
                   "tests/test_term_hygiene.py", "tests/test_admin_graph.py",
                   "tests/test_companion.py"],
         "docs": ["docs/architecture/SPEC.md", "docs/architecture/TRACE_MAP.md"],
+    },
+    "0069": {
+        # ACCEPTED 2026-09-02 (ratchet turn 3): SOURCE_CONNECTORS.md
+        # RETIRES into the integration registry — a parallel
+        # connector_registry would have minted a rival truth (D2, one
+        # owner). 8 configuration rows added, change/identity doctrine
+        # as data, the stale sqlglot mechanism notes fixed at source.
+        "title": "SOURCE_CONNECTORS retires into the integration "
+                 "registry (ratchet turn 3)",
+        "category": "architecture",
+        "component": "integration",
+        "axioms": [],
+        "modules": ["src/integration_registry.py"],
+        "tests": ["tests/test_integration_doctrine.py"],
+        "docs": ["docs/decisions/0069-source-connectors-retire.md",
+                 "docs/architecture/INTEGRATION_MAP.md"],
     },
     "0068": {
         # ACCEPTED 2026-09-02 (ratchet turn 2): the landing matrix as
@@ -1045,14 +1056,14 @@ TRACE_REGISTRY = {
     "0049": {
         "title": "Ingestion routes: filedrop, folders, live extractor",
         "category": "architecture",
-        "component": "connectors",
+        "component": "integration",
         "axioms": [],
         "modules": ["src/extractor/connection.py", "src/extractor/discovery.py",
                     "src/extractor/extractor.py", "src/extractor/tracker.py"],
         "tests": ["tests/extractor/test_connection.py",
                   "tests/extractor/test_extractor.py",
                   "tests/extractor/test_proc_parity.py"],
-        "docs": ["docs/architecture/SOURCE_CONNECTORS.md"],
+        "docs": ["docs/architecture/INTEGRATION_MAP.md"],
     },
 }
 

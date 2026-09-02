@@ -4,7 +4,7 @@
 finding of the ADR 0048 totality check)
 **Date:** 2026-08-20 (decision made earlier via
 internal/docs/HANDOFF_INGESTION_ROUTES.md and
-docs/architecture/SOURCE_CONNECTORS.md; recorded as an ADR when the
+docs/architecture/SOURCE_CONNECTORS.md (location note 2026-09-02: retired into src/integration_registry.py by ADR 0069; git keeps the original); recorded as an ADR when the
 trace registry's ghost rule flagged the implementing modules as
 uncited by any decision)
 
@@ -15,7 +15,7 @@ customers drop .sql files (010), point at OneLake folders (020), or
 connect live to a database and extract view/procedure definitions from
 system catalogs (030). The route landscape — including the on-prem
 extractor-script route for hospitals with zero inbound connectivity —
-is designed in docs/architecture/SOURCE_CONNECTORS.md. The live
+is designed in docs/architecture/SOURCE_CONNECTORS.md (location note 2026-09-02: retired into src/integration_registry.py by ADR 0069; git keeps the original). The live
 extractor was built against that design but the decision was never
 recorded as an ADR.
 

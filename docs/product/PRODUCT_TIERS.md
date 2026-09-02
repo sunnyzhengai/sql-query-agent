@@ -102,7 +102,7 @@ gated** on the output-side PHI gate and dedicated read-only principals
 
 | Offer claim | Architecture that backs it |
 |---|---|
-| Parses the real estate | [ARCHITECTURE.md](../architecture/ARCHITECTURE.md), [SOURCE_CONNECTORS.md](../architecture/SOURCE_CONNECTORS.md) |
+| Parses the real estate | [ARCHITECTURE.md](../architecture/ARCHITECTURE.md), [INTEGRATION_MAP.md](../architecture/INTEGRATION_MAP.md) |
 | Finds contradictory definitions | ADR 0054 (the red-flag sweep) |
 | Writes only what a human approved | [DECISION_LANDING_MATRIX.md](../architecture/DECISION_LANDING_MATRIX.md) |
 | Never fabricates an answer | [SPEC.md](../architecture/SPEC.md) — `spec:B1`, `spec:E6` |

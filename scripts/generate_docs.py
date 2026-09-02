@@ -155,17 +155,37 @@ def build_integration_map() -> str:
         for r in INTEGRATION_REGISTRY if r["notes"]
     ]
 
+    from src.integration_registry import (
+        CHANGE_PAYOFF,
+        CHANGE_TRIGGERS,
+        IDENTITY_LADDER,
+        IDENTITY_RULE,
+        IDENTITY_SHIPPING_DECISION,
+        NATIVE_STABLE_IDS,
+    )
+    triggers = [f"- **{name}** ({role}): {what}"
+                for name, role, what in CHANGE_TRIGGERS]
+    ladder = [f"{i}. **{name}** ({kind}): {what}"
+              for i, (name, kind, what) in enumerate(IDENTITY_LADDER, 1)]
+    stable = [f"| {src_} | {'yes' if flag else 'partial' if flag is None else 'NO'} | {use} |"
+              for src_, flag, use in NATIVE_STABLE_IDS]
+
     return f"""<!-- GENERATED FILE — do not edit.
      Source: INTEGRATION_REGISTRY in src/integration_registry.py
      Regenerate: python scripts/generate_docs.py
      CI fails if this file differs from regeneration. -->
 
+<!-- TIER: BLUEPRINT — component key: integration
+     src/trace_registry.py ARCHITECTURE_COMPONENTS -->
+
 # Integration Map
 
-The tool/connector landscape as data: what AIVIA parses on the way in
-(always via each layer's native parser) and what it publishes on the way
-out. Supersedes the ROADMAP connector table (2026-08-07) and the
-REFERENCE_ARCHITECTURE tier table as source of truth.
+The tool/connector landscape as data: what we parse on the way in
+(always via each layer's native parser, ADR 0001) and what we publish
+on the way out. Supersedes the ROADMAP connector table (2026-08-07),
+the REFERENCE_ARCHITECTURE tier table, and — since ADR 0069 —
+SOURCE_CONNECTORS.md, whose configurations became rows here and whose
+standing doctrine follows below.
 
 ```mermaid
 {mermaid}
@@ -177,6 +197,34 @@ REFERENCE_ARCHITECTURE tier table as source of truth.
 ## Notes
 
 {chr(10).join(notes)}
+
+## Change monitoring (shipped mechanism, three triggers)
+
+ETL and CI/CD are just TRIGGERS; the core is one mechanism we own:
+re-collect + content-hash diff (ADR 0022, `src/extractor/tracker.py`)
+— per object, deterministic, source-agnostic.
+
+{chr(10).join(triggers)}
+
+**The governance payoff:** {CHANGE_PAYOFF}
+
+## Object identity across re-ingests
+
+{IDENTITY_RULE}
+
+**The rename ladder** (each step typed per spec:E3 — computable steps
+are code's, judgment steps are the steward's, never auto-merged):
+
+{chr(10).join(ladder)}
+
+| Source | Stable id? | Use |
+|---|---|---|
+{chr(10).join(stable)}
+
+**Shipping decision (Sunny, 2026-08-11):** {IDENTITY_SHIPPING_DECISION}
+— renames reset governance history; the install guide warns admins.
+Ladder steps 1–2 are built only if rename-loss blocks more than a
+one-off customer.
 """
 
 

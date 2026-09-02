@@ -7,7 +7,7 @@
 
 # Test Map — what every test proves
 
-122 modules, 1413 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
+123 modules, 1417 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
 
 ## By ADR
 
@@ -71,6 +71,7 @@
 | 0065 | Promote section 13 to Group T: the double-sided function as numbered law | `tests/test_tree_contract.py` (14) |
 | 0067 | Docs are data: the record invariant and the prose ratchet | `tests/test_spec_registry.py` (5) |
 | 0068 | The landing matrix as data (ratchet turn 2) | `tests/test_landing_registry.py` (6) |
+| 0069 | SOURCE_CONNECTORS retires into the integration registry (ratchet turn 3) | `tests/test_integration_doctrine.py` (4) |
 
 ## By standing law
 
@@ -169,7 +170,7 @@ tests/test_docs_consistency.py).
 | spec:D3 | 0033, 0048 | — | `tests/graph/test_backend_comparison.py`, `tests/test_admin_graph.py`, `tests/test_companion.py`, `tests/test_term_hygiene.py`, `tests/test_trace_registry.py`, `tests/test_zones.py` |
 | spec:E1 | 0046 | — | `tests/test_derive_relationships.py`, `tests/test_spec_gates.py` |
 | spec:E2 | 0032, 0054, 0055 | — | `tests/governance/test_red_flags.py`, `tests/orchestrator/test_core.py`, `tests/orchestrator/test_flag_ops.py`, `tests/shapes/test_shapes.py`, `tests/test_grounding_evals.py` |
-| spec:E3 | 0035, 0050, 0051 | — | `tests/orchestrator/test_agent.py`, `tests/orchestrator/test_tools.py`, `tests/orchestrator/test_turn_engine.py`, `tests/webapp/test_app.py` |
+| spec:E3 | 0035, 0050, 0051 | `tests/test_integration_doctrine.py` | `tests/orchestrator/test_agent.py`, `tests/orchestrator/test_tools.py`, `tests/orchestrator/test_turn_engine.py`, `tests/webapp/test_app.py` |
 | spec:E4 | 0044, 0046 | — | `tests/graph/test_decision_wiring.py`, `tests/test_derive_relationships.py`, `tests/test_spec_gates.py`, `tests/test_tree_contract.py`, `tests/tree/test_extract.py` |
 | spec:E5 | 0044, 0046 | — | `tests/graph/test_decision_wiring.py`, `tests/test_derive_relationships.py`, `tests/test_spec_gates.py`, `tests/test_tree_contract.py`, `tests/tree/test_extract.py` |
 | spec:E6 | 0036, 0044, 0051 | — | `tests/graph/test_decision_wiring.py`, `tests/orchestrator/test_caption_gate.py`, `tests/orchestrator/test_conclusion.py`, `tests/orchestrator/test_turn_engine.py`, `tests/test_methodology.py`, `tests/test_tree_contract.py`, `tests/tree/test_extract.py` |
@@ -181,7 +182,7 @@ tests/test_docs_consistency.py).
 | spec:H2 | 0045, 0048 | — | `tests/governance/test_leaf_grounding.py`, `tests/test_admin_graph.py`, `tests/test_companion.py`, `tests/test_escalation_contract.py`, `tests/test_term_hygiene.py`, `tests/test_trace_registry.py`, `tests/test_zones.py` |
 | spec:L1 | 0064 | `tests/test_ledger_contract.py` | — |
 | spec:L2 | 0064 | `tests/test_ledger_contract.py` | — |
-| spec:L3 | 0064 | `tests/test_landing_registry.py`, `tests/test_spec_registry.py` | `tests/test_ledger_contract.py` |
+| spec:L3 | 0064 | `tests/test_integration_doctrine.py`, `tests/test_landing_registry.py`, `tests/test_spec_registry.py` | `tests/test_ledger_contract.py` |
 | spec:P1 | 0051 | — | `tests/orchestrator/test_turn_engine.py` |
 | spec:P2 | 0051 | — | `tests/orchestrator/test_turn_engine.py` |
 | spec:P3 | 0051 | — | `tests/orchestrator/test_turn_engine.py` |

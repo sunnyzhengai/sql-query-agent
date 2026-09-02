@@ -79,3 +79,4 @@ never deleted — its status changes and it links to its replacement.
 | [0066](0066-merge-sphere-into-architecture.md) | One system-model file: SPHERE merges into ARCHITECTURE — build status per section; kills the rival layer models | Accepted |
 | [0067](0067-docs-are-data.md) | Docs are data: the record invariant + the prose ratchet; turn 1 = the axiom ledger (spec_registry) | Accepted |
 | [0068](0068-landing-matrix-as-data.md) | The landing matrix as data: landing_registry + generated projection; 0063's two invariants mechanized | Accepted (content stays DRAFT v3 pending Bridge build) |
+| [0069](0069-source-connectors-retire.md) | SOURCE_CONNECTORS retires into the integration registry — 8 rows + change/identity doctrine as data; first file the ratchet deletes | Accepted |

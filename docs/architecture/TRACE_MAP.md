@@ -24,9 +24,8 @@ Two citation handles, because the axiom systems are distinct and their group let
 | Component | File | Satisfies | Governs |
 |---|---|---|---|
 | `architecture` | [ARCHITECTURE.md](ARCHITECTURE.md) | axm:D, axm:S, axm:J, axm:R | What the system is and is becoming, in one file: the four shells, radial dynamics, data flow, the nervous system, the ownership economy, the contracts split — each section build-statused. |
-| `connectors` | [SOURCE_CONNECTORS.md](SOURCE_CONNECTORS.md) | axm:D, axm:R | Where customer logic lives, how it is collected, and how change is detected across re-ingests. |
 | `crosswalk` | [AXIOM_CROSSWALK.md](AXIOM_CROSSWALK.md) | axm:S | The bridge between the two axiom systems: which framework law each spec axiom applies here, and which framework laws are meta or unstated gaps. |
-| `integration` | [INTEGRATION_MAP.md](INTEGRATION_MAP.md) | axm:D, axm:B | The connector and catalog landscape as data, including every write target and its direction. |
+| `integration` | [INTEGRATION_MAP.md](INTEGRATION_MAP.md) | axm:D, axm:B, axm:R | The connector and catalog landscape as data: every source configuration and write target, change detection, and object identity across re-ingests. |
 | `landing` | [DECISION_LANDING_MATRIX.md](DECISION_LANDING_MATRIX.md) | axm:B, axm:R | Which artifact each governance action produces in Purview/Collibra, and the OUTBOX that remembers it. |
 | `notebook` | [NOTEBOOK_MAP.md](NOTEBOOK_MAP.md) | axm:S, axm:J | Every notebook's registry entry, its served question families, and the AST-enforced planks. |
 | `pipeline` | [PIPELINE_MAP.md](PIPELINE_MAP.md) | axm:D, axm:R | The notebook/stage sequence, each stage's inputs and outputs, and the conservation of rows across them. |
@@ -118,7 +117,7 @@ Two citation handles, because the axiom systems are distinct and their group let
 ## ADR 0006 — Knowledge graph answers questions; Purview discovers reports
 
 - **Category:** architecture
-- **Component:** `integration` → `docs/architecture/INTEGRATION_MAP.md` → axm:D, axm:B
+- **Component:** `integration` → `docs/architecture/INTEGRATION_MAP.md` → axm:D, axm:B, axm:R
 - **Implemented by:**
   - `src/adapters/purview.py`
 - **Enforced by:**
@@ -154,7 +153,7 @@ Two citation handles, because the axiom systems are distinct and their group let
 ## ADR 0009 — Catalog integrations are optional adapters
 
 - **Category:** architecture
-- **Component:** `integration` → `docs/architecture/INTEGRATION_MAP.md` → axm:D, axm:B
+- **Component:** `integration` → `docs/architecture/INTEGRATION_MAP.md` → axm:D, axm:B, axm:R
 - **Implemented by:**
   - `src/adapters/base.py`
   - `src/adapters/publisher.py`
@@ -170,7 +169,6 @@ Two citation handles, because the axiom systems are distinct and their group let
   - `tests/test_docs_consistency.py`
 - **Summarized in:**
   - `docs/architecture/INTEGRATION_MAP.md`
-  - `docs/architecture/SOURCE_CONNECTORS.md`
 
 ## ADR 0010 — Skip Founders Hub Level 3, go direct to Partner Center
 
@@ -316,11 +314,11 @@ Two citation handles, because the axiom systems are distinct and their group let
 ## ADR 0022 — Definition versioning: certification pins a content hash
 
 - **Category:** architecture
-- **Component:** `connectors` → `docs/architecture/SOURCE_CONNECTORS.md` → axm:D, axm:R
+- **Component:** `integration` → `docs/architecture/INTEGRATION_MAP.md` → axm:D, axm:B, axm:R
 - **Enforced by:**
   - `tests/test_schemas.py`
 - **Summarized in:**
-  - `docs/architecture/SOURCE_CONNECTORS.md`
+  - `docs/architecture/INTEGRATION_MAP.md`
 
 ## ADR 0023 — Usage-weighted governance flywheel
 
@@ -528,7 +526,7 @@ Two citation handles, because the axiom systems are distinct and their group let
 ## ADR 0040 — The consumption layer: reports and measures
 
 - **Category:** architecture
-- **Component:** `integration` → `docs/architecture/INTEGRATION_MAP.md` → axm:D, axm:B
+- **Component:** `integration` → `docs/architecture/INTEGRATION_MAP.md` → axm:D, axm:B, axm:R
 - **Implemented by:**
   - `src/graph/consumption.py`
   - `src/steps/semantic_models.py`
@@ -547,7 +545,7 @@ Two citation handles, because the axiom systems are distinct and their group let
 ## ADR 0041 — M mini-parser, shape registry, fallout capture
 
 - **Category:** architecture
-- **Component:** `connectors` → `docs/architecture/SOURCE_CONNECTORS.md` → axm:D, axm:R
+- **Component:** `integration` → `docs/architecture/INTEGRATION_MAP.md` → axm:D, axm:B, axm:R
 - **Grounds:** spec:C2
 - **Implemented by:**
   - `src/mquery/parser.py`
@@ -557,7 +555,7 @@ Two citation handles, because the axiom systems are distinct and their group let
 - **Enforced by:**
   - `tests/mquery/test_mquery.py`
 - **Summarized in:**
-  - `docs/architecture/SOURCE_CONNECTORS.md`
+  - `docs/architecture/INTEGRATION_MAP.md`
 
 ## ADR 0042 — The notebook contract: a harness for the driver layer
 
@@ -674,7 +672,7 @@ Two citation handles, because the axiom systems are distinct and their group let
 ## ADR 0049 — Ingestion routes: filedrop, folders, live extractor
 
 - **Category:** architecture
-- **Component:** `connectors` → `docs/architecture/SOURCE_CONNECTORS.md` → axm:D, axm:R
+- **Component:** `integration` → `docs/architecture/INTEGRATION_MAP.md` → axm:D, axm:B, axm:R
 - **Implemented by:**
   - `src/extractor/connection.py`
   - `src/extractor/discovery.py`
@@ -685,7 +683,7 @@ Two citation handles, because the axiom systems are distinct and their group let
   - `tests/extractor/test_extractor.py`
   - `tests/extractor/test_proc_parity.py`
 - **Summarized in:**
-  - `docs/architecture/SOURCE_CONNECTORS.md`
+  - `docs/architecture/INTEGRATION_MAP.md`
 
 ## ADR 0050 — Bounded read-only answer loop: plan to the answer, caption answers, auto-continue (amends 0036)
 
@@ -914,3 +912,15 @@ Two citation handles, because the axiom systems are distinct and their group let
 - **Summarized in:**
   - `docs/decisions/0068-landing-matrix-as-data.md`
   - `docs/architecture/DECISION_LANDING_MATRIX.md`
+
+## ADR 0069 — SOURCE_CONNECTORS retires into the integration registry (ratchet turn 3)
+
+- **Category:** architecture
+- **Component:** `integration` → `docs/architecture/INTEGRATION_MAP.md` → axm:D, axm:B, axm:R
+- **Implemented by:**
+  - `src/integration_registry.py`
+- **Enforced by:**
+  - `tests/test_integration_doctrine.py`
+- **Summarized in:**
+  - `docs/decisions/0069-source-connectors-retire.md`
+  - `docs/architecture/INTEGRATION_MAP.md`

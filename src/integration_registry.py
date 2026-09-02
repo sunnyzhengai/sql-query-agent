@@ -134,17 +134,99 @@ INTEGRATION_REGISTRY = [
         "status": "watchlist",
         "tier": "Pro",
         "direction": "ingest",
-        "notes": "post-v1; 2026-08-07 'sqlglot dialect' note predates sqlglot retirement — re-decide",
+        "notes": "post-v1; 2026-08-07 parser note updated 2026-09-02: ADR 0001 total, ANTLR grammar when built",
     },
     {
         "from_tool": "Snowflake",
         "to_tool": "core",
         "artifact_parsed": "GET_DDL() over views / materialized views / tasks / dynamic tables",
-        "mechanism": "PARSER TBD at build time: documented doctrine exception (sqlglot dialect) vs ANTLR grammar",
+        "mechanism": "native parser per ADR 0001 (ANTLR grammar); "
+                     "sqlglot is banned repo-wide (spec:G2)",
         "status": "watchlist",
         "tier": "Pro",
         "direction": "ingest",
         "notes": "post-v1; same stale-parser caveat as Databricks — record decision here when made",
+    },
+    {
+        "from_tool": "Synapse dedicated SQL pool",
+        "to_tool": "core",
+        "artifact_parsed": "procs + views (sys.sql_modules, legacy estates)",
+        "mechanism": "same T-SQL catalog as Azure SQL -> ScriptDom",
+        "status": "planned",
+        "tier": "Basic",
+        "direction": "ingest",
+        "notes": "ex-SOURCE_CONNECTORS A7 (P3); legacy healthcare estates",
+    },
+    {
+        "from_tool": "Power BI paginated reports (RDL)",
+        "to_tool": "core",
+        "artifact_parsed": "dataset CommandText = raw SQL inside report XML",
+        "mechanism": "XML walk -> ScriptDom",
+        "status": "planned",
+        "tier": "Basic",
+        "direction": "ingest",
+        "notes": "ex-SOURCE_CONNECTORS B5 (P3); trivial walk, legacy-heavy verticals",
+    },
+    {
+        "from_tool": "Power BI dataflows (Gen1/Gen2)",
+        "to_tool": "core",
+        "artifact_parsed": "M documents (model.json / definition API), often with native queries",
+        "mechanism": "fetch document -> native-query extraction -> ScriptDom",
+        "status": "planned",
+        "tier": "Basic",
+        "direction": "ingest",
+        "notes": "ex-SOURCE_CONNECTORS B4 (P3); verify definition API shape before build",
+    },
+    {
+        "from_tool": "Power BI (non-git tenants, XMLA)",
+        "to_tool": "core",
+        "artifact_parsed": "same TMDL content as the git route",
+        "mechanism": "XMLA read-only endpoint export instead of DevOps git",
+        "status": "planned",
+        "tier": "Basic",
+        "direction": "ingest",
+        "notes": "ex-SOURCE_CONNECTORS B6 (P3); verify export format before build",
+    },
+    {
+        "from_tool": "Fabric Data Factory / ADF pipelines",
+        "to_tool": "core",
+        "artifact_parsed": "SQL inside Script / Stored-Proc-call / Copy activities (pipeline JSON)",
+        "mechanism": "definitions via git or REST -> walk activities -> ScriptDom",
+        "status": "planned",
+        "tier": "Basic",
+        "direction": "ingest",
+        "notes": "ex-SOURCE_CONNECTORS C1 (P3)",
+    },
+    {
+        "from_tool": "SSIS packages (.dtsx)",
+        "to_tool": "core",
+        "artifact_parsed": "SQL in Execute-SQL tasks and sources (XML)",
+        "mechanism": "XML walk -> ScriptDom",
+        "status": "watchlist",
+        "tier": "Basic",
+        "direction": "ingest",
+        "notes": "ex-SOURCE_CONNECTORS C2 (P4); legacy-heavy verticals only",
+    },
+    {
+        "from_tool": "Power BI pure-M transformations",
+        "to_tool": "core",
+        "artifact_parsed": "folding/merging logic written in M itself (no SQL string)",
+        "mechanism": "needs the M dialect tier beyond the ADR 0041 mini-parser",
+        "status": "watchlist",
+        "tier": "Basic",
+        "direction": "ingest",
+        "notes": "ex-SOURCE_CONNECTORS B2 (P4); until built these partitions are "
+                 "counted as known-unparsed in ops tracking — disclosed, never silent",
+    },
+    {
+        "from_tool": "Oracle (PL/SQL)",
+        "to_tool": "core",
+        "artifact_parsed": "packages / procedures / views",
+        "mechanism": "native parser per ADR 0001 (ANTLR PL/SQL grammar)",
+        "status": "watchlist",
+        "tier": "Basic",
+        "direction": "ingest",
+        "notes": "ex-SOURCE_CONNECTORS part D; dialect tier + connector when demanded",
     },
 ]
 
@@ -158,3 +240,69 @@ def _validate() -> None:
 
 
 _validate()
+
+
+# ---------------------------------------------------------------------
+# Connector doctrine (ADR 0069: SOURCE_CONNECTORS.md retired into this
+# registry — the configurations became rows above; the standing
+# doctrine of change detection and object identity lives here).
+# ---------------------------------------------------------------------
+
+# Change monitoring: ETL and CI/CD are just TRIGGERS; the core is one
+# shipped mechanism — re-collect + content-hash diff (ADR 0022 hashes,
+# src/extractor/tracker.py). Detection is deterministic per object.
+CHANGE_TRIGGERS = (
+    ("scheduled_sweep", "the universal floor",
+     "nightly/weekly pipeline re-collects (modify_date prefilters), "
+     "diffs hashes, re-parses only changed objects; works for every "
+     "connector incl. file drop, no customer CI required"),
+    ("cicd_hook", "the fast path where git exists",
+     "a pipeline step on merge calls the same collect+diff; instant "
+     "freshness for DevOps-managed sources; never required"),
+    ("etl_posthook", "the third doorway",
+     "shops whose procs deploy via ETL call the same entry as a final "
+     "step; same mechanism"),
+)
+CHANGE_PAYOFF = (
+    "certification pins a version (ADR 0022), so a drifted object "
+    "flips its dependents to 'definition changed since certification' "
+    "— disclosed in every answer (ADR 0021), a DriftEvent lands, the "
+    "steward gets a diff. The certification lifecycle closing its loop.")
+
+# Object identity across re-ingests (Sunny's question, 2026-08-11):
+# name says WHICH object, hash says WHICH REVISION.
+IDENTITY_RULE = (
+    "identity is the fully qualified name DECLARED IN THE SQL "
+    "(schema.object, case-folded per ADR 0016) — never the file name; "
+    "metric_id (ADR 0015) is that name; the content hash (ADR 0022) "
+    "is its version. Same name + new hash = drift (the normal case).")
+# The rename ladder: each step typed per the decision-typing rule
+# (spec:E3) — computable steps are code's, judgment steps are the
+# steward's, never auto-merged.
+IDENTITY_LADDER = (
+    ("exact_hash_rename", "computable",
+     "a new name whose content hash equals a vanished name's hash "
+     "auto-maps, disclosed as 'renamed from X'"),
+    ("step_overlap_similarity", "judgment",
+     "per-step fragment hashes score candidate rename+edits; the "
+     "system PROPOSES with evidence, the steward CONFIRMS; confirmed "
+     "mappings land as append-only alias records carrying history"),
+    ("no_match", "computable",
+     "genuinely new object; the vanished one is archived"),
+)
+NATIVE_STABLE_IDS = (
+    ("SQL Server / Azure SQL object_id", False,
+     "DROP+CREATE deployments mint new ones — declared name only"),
+    ("file drop paths", False,
+     "customers reorganize folders — declared name only"),
+    ("Power BI artifacts", True, "stable GUIDs are the identity"),
+    ("DevOps git sources", None,
+     "partial — git rename detection feeds ladder step 1"),
+    ("dbt", True, "unique_id is the identity"),
+)
+# Sunny's shipping decision, 2026-08-11: v1 ships the LIMITATION,
+# loudly — renames reset governance history; the install guide and the
+# packaged CONNECTIVITY_AND_CHANGE_MANAGEMENT.md warn admins. Ladder
+# steps 1-2 are built ONLY if rename-loss blocks more than a one-off
+# customer.
+IDENTITY_SHIPPING_DECISION = "v1 ships the limitation, loudly"

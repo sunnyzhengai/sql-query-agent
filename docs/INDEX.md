@@ -101,7 +101,7 @@ and link, never restate. Two further rules:
 
 ---
 
-## The blueprint tier — `docs/architecture/` (13 files)
+## The blueprint tier — `docs/architecture/` (12 files)
 
 Every file here is a blueprint: it owns a slice of the system and
 declares which axiom groups it satisfies. **The whole folder is listed
@@ -113,7 +113,7 @@ nothing referenced them.
 Files are grouped by *what kind of thing they are*, which is also how
 they behave under change.
 
-### Authored — the design record (7)
+### Authored — the design record (6)
 
 Hand-written, highest interpretive value, lowest churn. These state
 intent; they are audited, not generated.
@@ -126,7 +126,6 @@ intent; they are audited, not generated.
 | [USER_FLOW.md](architecture/USER_FLOW.md) | 6 | How a question moves from ask to answer, and how usage feeds the flywheel. |
 | [QUESTION_MAP.md](architecture/QUESTION_MAP.md) | 5 | What the storage must support, audited by question family. *Not* a runtime routing table (ADR 0062). |
 | [REFERENCE_ARCHITECTURE.md](architecture/REFERENCE_ARCHITECTURE.md) | 4 | The deployable reference: connector tiers, what runs per product tier, and the Azure consumption footprint. |
-| [SOURCE_CONNECTORS.md](architecture/SOURCE_CONNECTORS.md) | 3 | Where customer logic lives, how it is collected, and how change is detected across re-ingests. |
 
 ### Generated — projections of the registries (6)
 
@@ -141,7 +140,7 @@ authority comes from the code they project.
 | [DECISION_LANDING_MATRIX.md](architecture/DECISION_LANDING_MATRIX.md) | `landing_registry.py` | Every governance action's per-tool landing, grade, and what stays home (ADR 0068). |
 | [TEST_MAP.md](architecture/TEST_MAP.md) | `devtools/suite_map.py` | What every test proves, by ADR, standing law, and contract. |
 | [PIPELINE_MAP.md](architecture/PIPELINE_MAP.md) | `notebook_registry.py` | The stage sequence, each stage's inputs/outputs, and row conservation across them. |
-| [INTEGRATION_MAP.md](architecture/INTEGRATION_MAP.md) | `integration_registry.py` | What we parse in and publish out, with each write target's direction. |
+| [INTEGRATION_MAP.md](architecture/INTEGRATION_MAP.md) | `integration_registry.py` | Every source configuration and write target, plus change-detection and object-identity doctrine (absorbed SOURCE_CONNECTORS, ADR 0069). |
 | [NOTEBOOK_MAP.md](architecture/NOTEBOOK_MAP.md) | `notebook_registry.py` | Every notebook's contract entry and the question families it serves. |
 
 > **Why the ADR counts are uneven.** ARCHITECTURE and SPEC carry 16 and 13
