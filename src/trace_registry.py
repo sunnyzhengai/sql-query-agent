@@ -750,8 +750,8 @@ TRACE_REGISTRY = {
         "category": "architecture",
         "component": "spec",
         "axioms": ["B2", "F", "T1"],
-        "modules": [],
-        "tests": [],
+        "modules": ["src/descriptions.py"],
+        "tests": ["tests/test_desc_0074.py"],
         "docs": ["docs/decisions/0074-description-architecture-ratified.md"],
     },
     "0073": {

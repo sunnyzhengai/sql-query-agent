@@ -35,6 +35,14 @@ view are preserved history.
       landing_registry: OUTBOX_FIELDS/OUTCOMES)
 
 ### THE WEDGE / DESCRIPTIONS — 0074 RATIFIED 09-02; the build queue
+- [x] **THE RED CONTRACT LANDED (09-02):** tests/test_desc_0074.py —
+      every D-item's exit gate as a strict-xfail test (1 green:
+      provenance vocab == spec:B2, cross-checked; 7 red by design).
+      Flipping a marker IS the exit gate. Two facts the lock-down
+      surfaced: describe_step (the skeleton path) is NOT yet wired
+      into generate_descriptions (the loop still fails
+      grounded_to_empty), and D5's red EMPIRICALLY CONFIRMS the
+      derived-table leak on a live compose_skeleton call.
 - [x] **ADR 0074 RATIFIED (all four calls as recommended).** Spec
       landed: B2 vocab = {gate_passed, skeleton_floor, flagged};
       F/T1 = the measurement instrument. Design debt from the field

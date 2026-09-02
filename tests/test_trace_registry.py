@@ -79,9 +79,6 @@ def test_architecture_decisions_carry_code_or_tests():
                  # its artifact IS the blueprint; no code by nature
         "0071",  # doc retirement (USER_FLOW folds into ARCHITECTURE)
                  # — same nature as 0066
-        "0074",  # ACCEPTED design record — the spec/ledger amendments
-                 # ARE its artifact; the D1-D5 build items carry their
-                 # own tests as they land (BOARD queue)
     }
     empty = [
         adr for adr, e in TRACE_REGISTRY.items()

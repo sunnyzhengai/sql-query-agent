@@ -51,6 +51,14 @@ from src.tree.translate import translate_tree
 # applying any filtering decisions" text cannot survive the next run.
 PROMPT_VERSION = f"6.t{TREE_CONTRACT_VERSION}"
 
+# ADR 0074 call 2 (ratified 2026-09-02): the provenance vocabulary for
+# stored descriptions — spec:B2's closed set, code home. gate_passed =
+# smoothed prose that cleared the gate; skeleton_floor = deterministic
+# composition (unfalsifiable); flagged = kept but marked. Emptied
+# descriptions are ABSENT rows (the empties-(a) ruling): counted,
+# never stored, never silent.
+PROVENANCE = ("gate_passed", "skeleton_floor", "flagged")
+
 MEASURE_PROMPT = (
     "You are documenting a Power BI DAX {expression_type} for a business "
     "audience of clinicians and executives.\n"
