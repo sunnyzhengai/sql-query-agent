@@ -99,7 +99,7 @@ AXM_UNMAPPED = {
 ARCHITECTURE_COMPONENTS = {
     "spec": {
         "doc": "docs/architecture/SPEC.md",
-        "current_through": "0067",
+        "current_through": "0073",
         "title": "The shadow specification — the formal axiom system",
         "satisfies": ["S", "J", "M", "B", "R"],
         "governs": "The axiom system this codebase is checked against: "
@@ -736,6 +736,22 @@ TRACE_REGISTRY = {
                   "tests/test_term_hygiene.py", "tests/test_admin_graph.py",
                   "tests/test_companion.py"],
         "docs": ["docs/architecture/SPEC.md", "docs/architecture/TRACE_MAP.md"],
+    },
+    "0073": {
+        # ACCEPTED 2026-09-02 (the final ratchet turn): SPEC v1.0 —
+        # laws, glosses, origins and STATUSES join the ledger; SPEC.md
+        # is generated from scripts/spec_frame.md + the records. The
+        # changelog freezes ("the ADRs are the changelog", now
+        # literal). Status vocabulary closed at four incl. JUDGED.
+        "title": "SPEC v1.0: the spec becomes a projection of its "
+                 "own ledger (final ratchet turn)",
+        "category": "architecture",
+        "component": "spec",
+        "axioms": [],
+        "modules": ["src/spec_registry.py"],
+        "tests": ["tests/test_spec_registry.py"],
+        "docs": ["docs/decisions/0073-spec-goes-generated.md",
+                 "docs/architecture/SPEC.md"],
     },
     "0072": {
         # ACCEPTED 2026-09-02 (ratchet turn 6): the crosswalk doc goes

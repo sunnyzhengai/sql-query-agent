@@ -954,3 +954,15 @@ Two citation handles, because the axiom systems are distinct and their group let
 - **Summarized in:**
   - `docs/decisions/0072-crosswalk-goes-generated.md`
   - `docs/architecture/AXIOM_CROSSWALK.md`
+
+## ADR 0073 — SPEC v1.0: the spec becomes a projection of its own ledger (final ratchet turn)
+
+- **Category:** architecture
+- **Component:** `spec` → `docs/architecture/SPEC.md` → axm:S, axm:J, axm:M, axm:B, axm:R
+- **Implemented by:**
+  - `src/spec_registry.py`
+- **Enforced by:**
+  - `tests/test_spec_registry.py`
+- **Summarized in:**
+  - `docs/decisions/0073-spec-goes-generated.md`
+  - `docs/architecture/SPEC.md`

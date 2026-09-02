@@ -67,12 +67,41 @@ def test_every_record_has_checks_or_a_reason():
     """No silent unbound: an axiom either names its check files or
     states, in SPEC's own words, why it cannot yet."""
     silent = [ax for ax, rec in SPEC_REGISTRY.items()
-              if not rec["checks"] and not rec.get("reason", "").strip()]
+              if not rec["checks"]
+              and not rec.get("checks_note", "").strip()
+              and not rec.get("status_note", "").strip()]
     assert not silent, (
         f"axiom(s) with neither checks nor a recorded reason: {silent}")
+
+
+def test_status_vocabulary_is_closed():
+    from src.spec_registry import STATUSES
+    bad = [(ax, r["status"]) for ax, r in SPEC_REGISTRY.items()
+           if r["status"] not in STATUSES]
+    assert not bad, f"status outside the closed vocabulary: {bad}"
+
+
+def test_every_record_carries_its_law():
+    lawless = [ax for ax, r in SPEC_REGISTRY.items()
+               if not r.get("law", "").strip()]
+    assert not lawless, f"record(s) without a law: {lawless}"
 
 
 def test_groups_are_closed_and_every_record_belongs_to_one():
     bad = [ax for ax in SPEC_REGISTRY
            if (ax[0] if ax != "F" else "F") not in GROUPS]
     assert not bad, f"record(s) outside the declared groups: {bad}"
+
+
+def test_spec_doc_on_disk_is_fresh():
+    """ADR 0073: SPEC.md is the ledger rendered into its frame —
+    regeneration must produce zero diff. Hand-editing the doc is a
+    red build; axioms change via the ledger + an ADR."""
+    import importlib.util
+    spec = importlib.util.spec_from_file_location(
+        "gd", REPO / "scripts" / "generate_docs.py")
+    gd = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(gd)
+    on_disk = (REPO / "docs" / "architecture" / "SPEC.md").read_text()
+    assert gd.build_spec() == on_disk, (
+        "SPEC.md is stale — run: python scripts/generate_docs.py")

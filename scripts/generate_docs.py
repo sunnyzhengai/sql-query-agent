@@ -378,6 +378,56 @@ def build_trace_map() -> str:
     return "\n".join(lines)
 
 
+def build_spec() -> str:
+    """SPEC.md — Φ_AIVIA rendered from the axiom ledger (ADR 0073).
+    Frame prose lives in scripts/spec_frame.md; each {{AXIOMS:...}}
+    placeholder expands to uniform per-axiom blocks."""
+    import re as _re
+    import textwrap as _tw
+
+    from src.spec_registry import SPEC_REGISTRY
+
+    frame = (PROJECT_ROOT / "scripts" / "spec_frame.md").read_text()
+
+    def render(ax: str) -> str:
+        r = SPEC_REGISTRY[ax]
+        out = [f"**{ax} — {r['title']}.**", ""]
+        law = r["law"]
+        if not law.startswith("    "):
+            law = "\n".join("    " + ln for ln in
+                             _tw.wrap(law, width=64) or [law])
+        out += [law, ""]
+        if r.get("gloss"):
+            out.append("*Gloss:* " + " ".join(r["gloss"].split()))
+        if r.get("origin"):
+            out.append("*Origin:* " + " ".join(r["origin"].split()))
+        parents = ", ".join(f"axm:{x}" for x in r["parents"])
+        out.append(f"*Grounds in the framework:* {parents} — "
+                   + r["parent_note"].strip() + ".")
+        if r["checks"]:
+            out.append("*Checks:* "
+                       + ", ".join(f"`{c}`" for c in r["checks"])
+                       + (" — " + " ".join(r["checks_note"].split())
+                          if r.get("checks_note") else ""))
+        elif r.get("checks_note"):
+            out.append("*Checks:* (none declared) — "
+                       + " ".join(r["checks_note"].split()))
+        status = f"**Status: {r['status']}**"
+        note = " ".join(r.get("status_note", "").split())
+        # table-derived notes duplicated the status word; normalize
+        if note.startswith(r["status"]):
+            note = note[len(r["status"]):].lstrip(" —-–")
+        if note:
+            status += " — " + note
+        out += [status, ""]
+        return "\n".join(out)
+
+    def expand(m: "re.Match") -> str:
+        return "\n".join(render(ax) for ax in m.group(1).split(","))
+
+    return _re.sub(r"\{\{AXIOMS:([^}]*)\}\}", expand, frame)
+
+
 def build_axiom_crosswalk() -> str:
     """AXIOM_CROSSWALK.md — the bridge between the two axiom systems,
     projected from the ledger (ADR 0072; mappings live in
@@ -569,6 +619,7 @@ def build_landing_matrix() -> str:
     return "\n".join(lines)
 
 
+SPEC_PATH = PROJECT_ROOT / "docs" / "architecture" / "SPEC.md"
 CROSSWALK_PATH = (PROJECT_ROOT / "docs" / "architecture"
                   / "AXIOM_CROSSWALK.md")
 LANDING_MATRIX_PATH = (PROJECT_ROOT / "docs" / "architecture"
@@ -588,6 +639,8 @@ def main() -> None:
     print(f"Wrote {NOTEBOOK_MAP_PATH}")
     TRACE_MAP_PATH.write_text(build_trace_map())
     print(f"Wrote {TRACE_MAP_PATH}")
+    SPEC_PATH.write_text(build_spec())
+    print(f"Wrote {SPEC_PATH}")
     CROSSWALK_PATH.write_text(build_axiom_crosswalk())
     print(f"Wrote {CROSSWALK_PATH}")
     LANDING_MATRIX_PATH.write_text(build_landing_matrix())

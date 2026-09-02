@@ -83,3 +83,4 @@ never deleted — its status changes and it links to its replacement.
 | [0070](0070-question-map-retires.md) | QUESTION_MAP retires into the notebook registry — FAMILY_RECORDS + cross-registry storage check + both-ways coverage | Accepted |
 | [0071](0071-user-flow-retires.md) | USER_FLOW retires — the flywheel folds into ARCHITECTURE; nothing else was law; FCOTS/RLS recorded as unbuilt roadmap | Accepted |
 | [0072](0072-crosswalk-goes-generated.md) | The crosswalk goes generated — Direction 1 from spec_registry (parents + why), Direction 2 from AXM_UNMAPPED | Accepted |
+| [0073](0073-spec-goes-generated.md) | SPEC v1.0 — the spec becomes a projection of its own ledger; changelog freezes; statuses are data (final ratchet turn) | Accepted |

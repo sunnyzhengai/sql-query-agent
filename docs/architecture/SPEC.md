@@ -1,3 +1,10 @@
+<!-- GENERATED FILE — do not edit.
+     Sources: src/spec_registry.py (the axiom ledger) rendered into
+     scripts/spec_frame.md (the frame prose — edit THAT for frame
+     changes; edit the LEDGER for axiom changes, via an ADR).
+     Regenerate: python scripts/generate_docs.py
+     CI fails if stale (tests/test_spec_registry.py). -->
+
 # Φ_AIVIA — The Shadow Specification
 
 <!-- TIER: BLUEPRINT — generated marker, do not remove.
@@ -12,12 +19,12 @@
 > (see [TRACE_MAP.md](TRACE_MAP.md#the-blueprint-tier) for the full
 > chain: decision → component → axioms → code → tests).
 
-**Version:** 0.9 (adopted; ADR 0047, extended by ADR 0048, 0051, 0059, 0064, 0065, 0067;
-§3b ratified by ADR 0052, first live use: the reachability contract;
-v0.7 adds Group R — the ask-time interpretation axioms of ADR
-0060/0062 — and the run-layer boundary of ADR 0061; v0.8 adds Group L,
-the ledger, closing the crosswalk's two gaps; v0.9 promotes §13 to
-Group T)
+**Version:** 1.0 (ADR 0073 — the spec becomes a projection of its own
+ledger: every axiom's law, gloss, origin, parents, checks and status
+live as records in `src/spec_registry.py`, and this document is
+GENERATED from them. Ratified content unchanged. Lineage: adopted v0.3
+by ADR 0047; extended by 0048, 0051, 0059, 0064, 0065, 0067; §3b
+ratified by 0052.)
 **Date:** 2026-08-19 (v0.5: 2026-08-21; v0.6: 2026-08-26; v0.7/v0.8: 2026-09-01)
 **Origin:** review session with Sunny; motivated by three recurring deviation
 classes discovered by code-walking: (1) missing EMR join edges — the technical
@@ -213,30 +220,32 @@ the set of sentences below. The system is correct when `G ⊨ Φ`.
 
     ∀x ∈ Ident.  fold(fold(x)) = fold(x)
 
-*Gloss:* folding twice changes nothing — so it never matters how many times a
-value has been folded before matching.
-*Origin:* ADR 0016. *Binding:*
-`tests/parser/test_identity.py::test_fold_is_idempotent` (added at
-adoption — the v0.2 label cited a test that did not exist; audit find).
+*Gloss:* folding twice changes nothing — so it never matters how many times a value has been folded before matching.
+*Origin:* ADR 0016.
+*Grounds in the framework:* axm:D2 — one folding rule, one definition.
+*Checks:* `tests/parser/test_identity.py`
 **Status: ENFORCED**
 
 **A2 — metric_id is a key.**
 
     ∀m, m′ ∈ Metric.  id(m) = id(m′) → m = m′
 
-*Gloss:* two metrics with the same id are the same metric, everywhere,
-including every downstream projection (Purview qualifiedName, exports).
-*Origin:* ADR 0015. *Binding:* `unique` invariants in TABLE_REGISTRY, checked
-by `tests/test_invariants.py` / `test_table_contracts.py`. **Status: ENFORCED**
+*Gloss:* two metrics with the same id are the same metric, everywhere, including every downstream projection (Purview qualifiedName, exports).
+*Origin:* ADR 0015.
+*Grounds in the framework:* axm:D3 — identity -> exactly one owner per metric.
+*Checks:* `tests/test_invariants.py`, `tests/test_table_contracts.py`
+**Status: ENFORCED**
 
 **A3 — fold-collisions are rejected loudly.**
 
     ∀s, s′ ∈ SourceRow.  fold(name(s)) = fold(name(s′)) ∧ s ≠ s′  →  reject(load)
 
-*Gloss:* two inputs whose identities differ only by case are one object in a
-case-insensitive database — a data error, never two entries.
-*Origin:* ADR 0016. *Binding:* fold-case unique invariant
-(`test_fold_case_unique_catches_case_variant_duplicates`). **Status: ENFORCED**
+*Gloss:* two inputs whose identities differ only by case are one object in a case-insensitive database — a data error, never two entries.
+*Origin:* ADR 0016.
+*Grounds in the framework:* axm:D2 — one folding rule, one definition.
+*Checks:* `tests/test_invariants.py`
+**Status: ENFORCED**
+
 
 ---
 
@@ -246,26 +255,22 @@ case-insensitive database — a data error, never two entries.
 
     ∀e ∈ E_G.  ∃w ∈ D ∪ P ∪ M ∪ O ∪ Gov.  justifies(w, e)
 
-*Gloss:* every edge in the graph traces to a source fact — a dictionary row
-(join edges: a (PK, FK) pair), an AST node, a TMDL partition, an org
-declaration, a governance record. No edge is ever asserted from model memory
-or heuristic guess. (Refuse-over-guess, ADR 0005, stated as structure.)
-*Origin:* ADRs 0005, 0032, 0044. *Binding:* `reference` invariants +
-deterministic builders (03 builds only from parsed inputs); ADR 0044 clause 1
-is B1 for decision sites. **Status: PARTIAL** — holds by construction for
-edges built in 03; not yet a uniform declared invariant on every edge table.
-Debt: every edge-table contract declares its witness reference.
+*Gloss:* every edge in the graph traces to a source fact — a dictionary row (join edges: a (PK, FK) pair), an AST node, a TMDL partition, an org declaration, a governance record. No edge is ever asserted from model memory or heuristic guess. (Refuse- over-guess, ADR 0005, stated as structure.)
+*Origin:* ADRs 0005, 0032, 0044.
+*Grounds in the framework:* axm:B1 — witness totality IS 'no claim without a witness'.
+*Checks:* `tests/test_invariants.py`, `tests/test_tree_contract.py` — PARTIAL by construction in builders; not yet a uniform declared invariant on every edge table
+**Status: PARTIAL** — holds by construction for edges built in 03; not yet a uniform declared invariant on every edge table. Debt: every edge-table contract declares its witness reference.
 
 **B2 — description provenance is total and closed.**
 
     ∀d ∈ Desc.  provenance(d) ∈ {round_trip_verified, template_fallback, flagged}
 
-*Gloss:* no description exists without a stated epistemic status; no fourth
-value; no NULL.
-*Origin:* ADR 0044 clause 6. *Binding:* `verified_describe` returns only
-the closed set (clause 6 gate green, 1.32.0). **Status: PARTIAL** —
-stated gap: provenance persistence on stored descriptions lands with
-600's phase-3b wiring.
+*Gloss:* no description exists without a stated epistemic status; no fourth value; no NULL.
+*Origin:* ADR 0044 clause 6.
+*Grounds in the framework:* axm:B1, axm:J4 — provenance closed -> every description judged.
+*Checks:* `tests/test_tree_contract.py`
+**Status: PARTIAL** — stated gap: provenance persistence on stored descriptions lands with 600's phase-3b wiring. ---
+
 
 ---
 
@@ -285,67 +290,42 @@ SHAPE_REGISTRY.
 
     ∀k ∈ SourceKinds.  (∃ F_k)  ∨  (∃ exclusion(k))
 
-*Gloss:* every kind of source fact — dictionary join rows, dictionary
-descriptions, SQL decision sites, TMDL partitions, DAX column refs, org
-reference tables — either has a declared extractor or a recorded
-"deliberately not extracted, because…". There is no third state ("nobody
-thought about it").
-*Origin:* the EMR-joins incident: `J_D` (the dictionary's join map) had no
-functor and no exclusion — the violation existed at the inventory level
-before any code ran, which is why only a code-walk found it.
-*Seeded exclusion rows (ruled by Sunny 2026-08-19):* Snowflake views and
-Databricks/dbt models are **excluded for the Fabric-native v1** — real
-hospital estates increasingly run them, so the rows exist to make the
-roadmap pressure visible, per ADR 0001 each future dialect gets its own
-native parser. **Status: ENFORCED** — `src/extraction_registry.py` +
-`tests/test_extraction_registry.py` (functor XOR exclusion per row;
-conservation citations resolve; the joins incident pinned as the
-acceptance test; every reference structure D/P/M/O/Gov covered).
+*Gloss:* every kind of source fact — dictionary join rows, dictionary descriptions, SQL decision sites, TMDL partitions, DAX column refs, org reference tables — either has a declared extractor or a recorded "deliberately not extracted, because…". There is no third state ("nobody thought about it").
+*Origin:* the EMR-joins incident: `J_D` (the dictionary's join map) had no functor and no exclusion — the violation existed at the inventory level before any code ran, which is why only a code- walk found it. *Seeded exclusion rows (ruled by Sunny 2026-08-19):* Snowflake views and Databricks/dbt models are **excluded for the Fabric-native v1** — real hospital estates increasingly run them, so the rows exist to make the roadmap pressure visible, per ADR 0001 each future dialect gets its own native parser.
+*Grounds in the framework:* axm:D1 — the enumerated frontier -> nothing unreachable.
+*Checks:* `tests/test_extraction_registry.py`
+**Status: ENFORCED** — `src/extraction_registry.py` + `tests/test_extraction_registry.py` (functor XOR exclusion per row; conservation citations resolve; the joins incident pinned as the acceptance test; every reference structure D/P/M/O/Gov covered).
 
 **C2 — conservation per extractor (no third bucket).**
 
     ∀k.  dom(R_k) = handled_k ⊎ fallout_k
 
-*Gloss:* every source row is either extracted or counted as fallout — the sum
-matches the total, and nothing vanishes.
-*Origin:* ADR 0044 clause 1 (decision sites: `handled + unextracted == total`),
-ADR 0041 (M shapes), ADR 0045 (fallout resolution). *Binding:*
-`tests/test_tree_contract.py` clause 1 (**green, 1.26.0**); `ops_fallout`
-writers; shape-census fixtures. **Status: PARTIAL** — enforced for trees and
-M shapes; C1's registry (now ENFORCED) carries a conservation citation per
-row and the citations are checked to resolve — full per-row equation
-checks remain the stated gap.
+*Gloss:* every source row is either extracted or counted as fallout — the sum matches the total, and nothing vanishes.
+*Origin:* ADR 0044 clause 1 (decision sites: `handled + unextracted == total`), ADR 0041 (M shapes), ADR 0045 (fallout resolution).
+*Grounds in the framework:* axm:R1 — handled + fallout = total (conservation).
+*Checks:* `tests/test_tree_contract.py`, `tests/mquery/test_mquery.py`
+**Status: PARTIAL** — enforced for trees and M shapes; C1's registry (now ENFORCED) carries a conservation citation per row and the citations are checked to resolve — full per-row equation checks remain the stated gap.
 
 **C3 — images land in the graph.**
 
     ∀k.  F_k(handled_k) ⊆ G
 
-*Gloss:* what an extractor extracts actually arrives — no silent drops between
-extraction and the graph.
-*Binding:* postcondition gates + count-equals-relation invariants
-(`test_count_equals_relation_*`). **Status: PARTIAL** (same universality note
-as C2).
+*Gloss:* what an extractor extracts actually arrives — no silent drops between extraction and the graph.
+*Grounds in the framework:* axm:R1 — handled + fallout = total (conservation).
+*Checks:* `tests/test_invariants.py`
+**Status: PARTIAL** — (same universality note as C2).
 
 **C4 — leaf grounding (the termination axiom).**
 
     ∀f ∈ P.  ∀ℓ ∈ leaves(tree(f)).   ℓ ∈ T_D ∪ T_org   ∨   ℓ ∈ fallout(f)
-
     completely_parsed(f)  ⟺  fallout(f) = ∅
 
-*Gloss:* after internal references resolve (CTEs and temp tables resolve to
-their defining steps), every remaining leaf of every parsed tree must bottom
-out on a vendor table or an org reference table. Anything else — an
-unresolvable name, a dynamic-SQL branch — is counted fallout, and
-"completely parsed" is a **computed per-file verdict**, never an impression.
-Gives the funnel a new honest number: fraction of files fully grounded.
-*Origin:* Sunny's blind reconstruction, 2026-08-19 ("any AST tree branch that
-does not end in EMR tables or org's custom reference table is not a
-completely parsed sql file"). **Status: ENFORCED** —
-`src/governance/leaf_grounding.py` (verdict + fraction + escalated
-fallout, stage `500_leaf_grounding`), wired into 500;
-`tests/governance/test_leaf_grounding.py`. First recorded-corpus verdict:
-27/28 files completely parsed (USP_Severe_Sepsis reads 6 tables absent
-from the dictionary — the number is already working).
+*Gloss:* after internal references resolve (CTEs and temp tables resolve to their defining steps), every remaining leaf of every parsed tree must bottom out on a vendor table or an org reference table. Anything else — an unresolvable name, a dynamic-SQL branch — is counted fallout, and "completely parsed" is a **computed per-file verdict**, never an impression. Gives the funnel a new honest number: fraction of files fully grounded.
+*Origin:* Sunny's blind reconstruction, 2026-08-19 ("any AST tree branch that does not end in EMR tables or org's custom reference table is not a completely parsed sql file").
+*Grounds in the framework:* axm:R1, axm:D1 — leaf grounding: termination + reachability.
+*Checks:* `tests/governance/test_leaf_grounding.py`
+**Status: ENFORCED** — `src/governance/leaf_grounding.py` (verdict + fraction + escalated fallout, stage `500_leaf_grounding`), wired into 500; `tests/governance/test_leaf_grounding.py`. First recorded-corpus verdict: 27/28 files completely parsed (USP_Severe_Sepsis reads 6 tables absent from the dictionary — the number is already working).
+
 
 **THE GRAPH IDENTITY THEOREM** (what B and C jointly force):
 
@@ -363,31 +343,25 @@ layer being "the vendor's complete join map" is the k = J_D instance.
 
 **D1 — materialized closures equal the fixpoint.**
 
-Datalog definition (the rule applied until nothing new appears):
-
     reach(x,y) ← dep(x,y)
     reach(x,z) ← reach(x,y) ∧ dep(y,z)
     uses(m,t)  ← calc(m,s) ∧ reach(s,s′) ∧ reads(s′,t)
-
     Axiom:  uses_materialized = lfp(uses)
 
-*Gloss:* the precomputed USES_TABLE / closure edges must equal what a live
-traversal would compute. The closure is a **cache with a proof obligation**,
-not a second truth.
-*Origin:* ADRs 0018, 0033, 0037 (closures reclassified as checkable cache;
-the 5-of-13 undercount was an unstated D1 violation). *Binding:* count
-oracles pin known instances; the general closure-vs-live-traverse consistency
-diff is planned (ADR 0037). **Status: PARTIAL** (oracles ENFORCED; general
-diff UNBOUND).
+*Gloss:* the precomputed USES_TABLE / closure edges must equal what a live traversal would compute. The closure is a **cache with a proof obligation**, not a second truth.
+*Origin:* ADRs 0018, 0033, 0037 (closures reclassified as checkable cache; the 5-of-13 undercount was an unstated D1 violation).
+*Grounds in the framework:* axm:D4 — closure = shape-defined derivation.
+*Checks:* `tests/test_recorded_pipeline.py` — oracles ENFORCED; the general closure-vs-live diff is UNBOUND (ADR 0037 stated gap)
+**Status: PARTIAL** — (oracles ENFORCED; general diff UNBOUND).
 
 **D2 — count oracles.**
 
     |{m : uses(m, HOSPITAL_ENCOUNTERS)}| = 13,   … (fixture constants)
 
-*Gloss:* certified cardinalities from recorded fixtures pin the truth; a
-derivation change that alters a known count is a red build, never a silent
-undercount.
-*Origin:* ADR 0018. *Binding:* recorded-fixture count-oracle tests.
+*Gloss:* certified cardinalities from recorded fixtures pin the truth; a derivation change that alters a known count is a red build, never a silent undercount.
+*Origin:* ADR 0018.
+*Grounds in the framework:* axm:J1 — count oracles = founder-defined correctness.
+*Checks:* `tests/test_recorded_pipeline.py`
 **Status: ENFORCED**
 
 **D3 — projections are functions of the record.**
@@ -396,18 +370,12 @@ undercount.
                       usage-layer edges, Fabric Graph read model}.
         Π = f_Π(Record),   f_Π deterministic and recomputable
 
-*Gloss:* no projection carries information absent from the Delta record;
-every projection can be rebuilt at will and can never drift into a second
-source of truth. This is why business terms live in `gov_business_terms`
-(durable, human-owned) and are *designed to be projected* into the graph
-each build — the graph is overwritten every run, so anything living only
-in it would be destroyed. AUDIT FIND (2026-08-19): the Term projection is
-not yet implemented (no Term nodes, no implements edges) — recorded as an
-EXTRACTION_REGISTRY exclusion until the builder lands; the gov record and
-candidate mining exist.
-*Origin:* ADRs 0031, 0033, 0038 (usage-layer discipline). *Binding:* by
-construction in the builders; no general recompute-and-diff check yet.
+*Gloss:* no projection carries information absent from the Delta record; every projection can be rebuilt at will and can never drift into a second source of truth. This is why business terms live in `gov_business_terms` (durable, human-owned) and are *designed to be projected* into the graph each build — the graph is overwritten every run, so anything living only in it would be destroyed. AUDIT FIND (2026-08-19): the Term projection is not yet implemented (no Term nodes, no implements edges) — recorded as an EXTRACTION_REGISTRY exclusion until the builder lands; the gov record and candidate mining exist.
+*Origin:* ADRs 0031, 0033, 0038 (usage-layer discipline).
+*Grounds in the framework:* axm:D3 — projections have one owning record.
+*Checks:* (none declared) — by construction in the builders; no general recompute-and-diff check yet (SPEC stated gap)
 **Status: PARTIAL**
+
 
 ---
 
@@ -419,29 +387,22 @@ construction in the builders; no general recompute-and-diff check yet.
       ⟹  Paths_k(A) = { walks of length ≤ k over joinable, connecting A }
           is finite and mechanically enumerable, for any anchor set A
 
-*Gloss:* the vendor's join map is a known, finite structure. Given anchored
-nodes, all candidate paths between them are **facts waiting to be
-enumerated** — a search problem, not a synthesis problem. Nothing needs to
-"generate" a path, so nothing stochastic may.
+*Gloss:* the vendor's join map is a known, finite structure. Given anchored nodes, all candidate paths between them are **facts waiting to be enumerated** — a search problem, not a synthesis problem. Nothing needs to "generate" a path, so nothing stochastic may.
 *Origin:* ADR 0046 (Sunny's position, settled 2026-08-19).
-**Status: PARTIAL** — the deterministic primitive is ENFORCED
-(`src/discovery/paths.py` + `tests/test_spec_gates.py`, 1.33.0:
-replay-deterministic simple-path enumeration over the join map, both
-orientations, hop-capped presentation-never-pruning). Stated gap: the
-composed 0046 engine (anchor→discover+match→rank→pick) is not built.
+*Grounds in the framework:* axm:S3 — the path space is data-shaped, hence enumerable.
+*Checks:* `tests/test_spec_gates.py`
+**Status: PARTIAL** — the deterministic primitive is ENFORCED (`src/discovery/paths.py` + `tests/test_spec_gates.py`, 1.33.0: replay-deterministic simple-path enumeration over the join map, both orientations, hop-capped presentation-never- pruning). Stated gap: the composed 0046 engine (anchor→discover+match→rank→pick) is not built.
 
 **E2 — replay determinism for retrieval components.**
 
     resolve, discover, rank are functions:
       same (token, catalog_state)  ⟹  byte-identical output
 
-*Gloss:* an LLM fails this **by construction** (it samples) — so it is
-excluded from these seats by type, not by policy. The recurring "should the
-LLM help compose the query" debate terminates here: the component violates E2.
+*Gloss:* an LLM fails this **by construction** (it samples) — so it is excluded from these seats by type, not by policy. The recurring "should the LLM help compose the query" debate terminates here: the component violates E2.
 *Origin:* ADRs 0032 (the testable definition of deterministic), 0046.
-*Binding:* replay property in CI for the orchestrator's resolve path
-(ADR 0032: "replay stable 7/7"); extends to discover/rank with the 0046
-engine. **Status: PARTIAL**
+*Grounds in the framework:* axm:J2 — replay determinism = the computable type.
+*Checks:* `tests/orchestrator/test_core.py`
+**Status: PARTIAL**
 
 **E3 — the decision typing rule (which decider is legal where).**
 
@@ -449,43 +410,32 @@ engine. **Status: PARTIAL**
       ⟺  codomain(d) is language  ∨  ground_truth(d) is human intent
     a right answer computable from data  ⟹  decider(d) must satisfy E2
 
-*Gloss:* three kinds of decision — computable (code only), judgment (human),
-linguistic (LLM). An LLM decision is acceptable only where its error mode is
-visible and bounded. You TEST code; you can only MEASURE models.
-*Origin:* ADR 0035 (the taxonomy), 0032, 0046. *Binding:*
-`tests/test_methodology.py` (control ops registered and justified;
-question-shaped names banned in the control path; language patterns banned in
-control files). **Status: ENFORCED** for the control path; each new component
-declares its decider kind at review.
+*Gloss:* three kinds of decision — computable (code only), judgment (human), linguistic (LLM). An LLM decision is acceptable only where its error mode is visible and bounded. You TEST code; you can only MEASURE models.
+*Origin:* ADR 0035 (the taxonomy), 0032, 0046.
+*Grounds in the framework:* axm:M5, axm:J2 — the decision-typing rule, verbatim.
+*Checks:* `tests/test_methodology.py`
+**Status: ENFORCED** — for the control path; each new component declares its decider kind at review.
 
 **E4 — pick containment (the human picks, structurally).**
 
     pick_human(S) ∈ S        and  no auto-pick:  |S| = 1 does not bypass
 
-*Gloss:* the chosen candidate must be one of those presented — enforced by
-code, so a silent top-1 pick or an out-of-list answer is impossible, not just
-discouraged. One candidate is treated the same as ten.
-*Dependency:* the human picks **by reading descriptions** — so Group F is
-load-bearing for E4: a fabricated description corrupts the pick. This is the
-formal reason ADR 0044 had to precede ADR 0046.
-*Origin:* ADRs 0032, 0046 (reaffirmed in strongest form). *Binding:*
-structural pick validation in the orchestrator. **Status: PARTIAL** (enforced
-where the orchestrator surface runs; the 0046 engine re-binds it).
+*Gloss:* the chosen candidate must be one of those presented — enforced by code, so a silent top-1 pick or an out-of-list answer is impossible, not just discouraged. One candidate is treated the same as ten.
+*Origin:* ADRs 0032, 0046 (reaffirmed in strongest form).
+*Grounds in the framework:* axm:M5 — intent decisions bind to the human.
+*Checks:* (none declared) — structural pick validation in the orchestrator (prose binding, no file named; 0046 re-binds)
+**Status: PARTIAL** — (enforced where the orchestrator surface runs; the 0046 engine re-binds it).
 
 **E5 — filter grounding (the 123/456 lesson).**
 
     ∀v ∈ FilterValues(answer ∪ executed SQL).
         v ∈ Sites ∪ ValueSets ∪ HumanInput
 
-*Gloss:* every literal value in any presented or executed filter comes from a
-stored decision site, a value-set table (T_org), or the human — never from
-model memory. Carries the shared-schema/varying-values fact: the EMR schema
-travels between hospitals; the values never do.
+*Gloss:* every literal value in any presented or executed filter comes from a stored decision site, a value-set table (T_org), or the human — never from model memory. Carries the shared- schema/varying-values fact: the EMR schema travels between hospitals; the values never do.
 *Origin:* ADR 0046 grounding rules; ADR 0044's captured fabrications.
-**Status: PARTIAL** — the deterministic primitive is ENFORCED
-(`src/discovery/grounding.py`, 1.33.0: refuse-over-guess on any value
-without a source). Stated gap: binds to real presented/executed filters
-when the 0046 engine composes them.
+*Grounds in the framework:* axm:B1 — filter values need witnesses.
+*Checks:* `tests/test_spec_gates.py`
+**Status: PARTIAL** — the deterministic primitive is ENFORCED (`src/discovery/grounding.py`, 1.33.0: refuse-over-guess on any value without a source). Stated gap: binds to real presented/executed filters when the 0046 engine composes them.
 
 **E6 — presentation honesty.**
 
@@ -494,51 +444,30 @@ when the 0046 engine composes them.
                           certification status }
     probabilities are banned display vocabulary
 
-*Gloss:* "confidence" in conversation always means derived edge/usage
-weights — never a probability the model invented. Closeness is relative
-geometry, not a likelihood.
-*Origin:* ADRs 0032 (threshold is a volume control), 0046 (ranking presents,
-never prunes). *Binding:* the fixed render template + basis stamped by code
-(`tests/orchestrator/test_core.py::test_basis_is_stamped_by_code`).
-**E6 amendment (2026-08-20, Sunny's verdict via the review session —
-stamp, don't audit):** the quantitative/existential sentence on every
-result panel is the STAMPED HEADLINE — rendered by code from the
-result's own typed metadata (count, scope, completeness, kind-vs-name
-redirect), the ADR 0032 provenance pattern. The LLM caption is
-commentary beneath it, visually subordinate; a lying caption is not
-caught, it is contradicted on screen. Guarantee: no quantitative or
-existential claim reaches the user only through LLM prose.
-**Status: ENFORCED** (plan surface) —
-`src/orchestrator/caption_gate.py::stamped_headline`, stamped at the
-protocol layer onto every result; fixture = the 2026-08-20 transcript
-("no metrics available" over a names-only empty result). The caption
-LINT (claim-shape checks + template floor) is retained as
-defense-in-depth and classified MEASURED, not tested — a lexicon
-cannot bound English (the ADR 0036 rejection stands); no soundness
-claim rests on it. Stated residue: the superseded agent-loop surface
-(ADR 0035) is unstamped pending its demolition.
+*Gloss:* "confidence" in conversation always means derived edge/usage weights — never a probability the model invented. Closeness is relative geometry, not a likelihood.
+*Origin:* ADRs 0032 (threshold is a volume control), 0046 (ranking presents, never prunes)
+*Grounds in the framework:* axm:B2, axm:B3 — boundary honesty + bounded quantified claims.
+*Checks:* `tests/orchestrator/test_core.py`, `tests/orchestrator/test_caption_gate.py`
+**Status: ENFORCED** — (plan surface) — the STAMPED HEADLINE is rendered by code from typed metadata (E6 amendment 2026-08-20, stamp don't audit); the caption LINT is retained as defense-in-depth, MEASURED not tested; stated residue: the superseded agent-loop surface (ADR 0035) is unstamped pending its demolition
+
 
 ---
 
 ## 10. Group F — The round trip (ADR 0044 as equations)
+
+**F — the round trip (ADR 0044 as equations).**
 
     desc  = τ(facts(tree), dict)          τ = translator;  SQL ∉ inputs(τ)
     tree′ = ρ(desc, dict)                 ρ = verifier;    SQL, tree ∉ inputs(ρ)
     ACCEPT(desc)  ⟺  κ(tree′) = κ(tree)   κ and = are deterministic code
     after N rejections:  desc := τ₀(tree),  provenance := template_fallback
 
-*Gloss:* the translator renders typed tree facts (never raw SQL) into prose; a
-blind verifier reconstructs a tree from the prose alone; a deterministic judge
-compares canonicalized trees; exhausted retries degrade to the stilted-but-true
-template. The blindness clauses are **information-flow constraints**: the SQL
-is not merely ignored — it is unreachable from the function's inputs
-(enforced at the signature, the noninterference trick).
-*Origin:* ADR 0044 clauses 2–6. *Binding:* `tests/test_tree_contract.py`
-(prompt-capture + signature + AST planks + never-converging acceptance test).
-**Status: ENFORCED** (all six clause gates flipped 1.31.0–1.32.0:
-src/tree/{translate,render,verify,diff,pipeline}.py; live round trips
-verified on real steps). Stated gap: 600's production wiring of the
-verifier (reconstructor callback + provenance persistence) is phase 3b.
+*Gloss:* the translator renders typed tree facts (never raw SQL) into prose; a blind verifier reconstructs a tree from the prose alone; a deterministic judge compares canonicalized trees; exhausted retries degrade to the stilted-but-true template. The blindness clauses are **information-flow constraints**: the SQL is not merely ignored — it is unreachable from the function's inputs (enforced at the signature, the noninterference trick).
+*Origin:* ADR 0044 clauses 2-6
+*Grounds in the framework:* axm:J4 — the round trip is the description's oracle.
+*Checks:* `tests/test_tree_contract.py`
+**Status: ENFORCED** — all six clause gates flipped 1.31.0-1.32.0; stated gap: 600's production wiring of the verifier (reconstructor callback + provenance persistence) is phase 3b
+
 
 ---
 
@@ -556,42 +485,30 @@ plus per-capability sanctioned primitives `prims(c)`. Proposed home:
     own : C → M  is a function            (single-valued: no capability
                                            has two implementing modules)
 
-*Gloss:* the registry itself is the proof — a second row claiming an owned
-capability is a registry validation error, caught before any code review.
-**Status: ENFORCED** — `src/capability_registry.py` (unique keys, one
-owner prefix per row) + `tests/test_capability_registry.py`.
+*Gloss:* the registry itself is the proof — a second row claiming an owned capability is a registry validation error, caught before any code review.
+*Grounds in the framework:* axm:D2 — one owner per capability, mechanized.
+*Checks:* `tests/test_capability_registry.py`
+**Status: ENFORCED** — `src/capability_registry.py` (unique keys, one owner prefix per row) + `tests/test_capability_registry.py`.
 
 **G2 — sanctioned powers only (import-graph inclusion).**
 
     Uses ⊆ S,   where  S = { (own(c), p) : c ∈ C, p ∈ prims(c) }
     equivalently:  Uses ∖ S = ∅
 
-*Gloss:* `Uses` = every (module, powerful-primitive) pair actually present in
-the code, computed from the AST. `S` = the sanctioned pairs. The check is set
-difference = empty. Powerful primitives: regex, SQL/M parsers, LLM clients,
-embedding calls, Delta writes.
-*Existing instances (the axiom is already real, piecewise):*
-- `tests/test_native_parser_law.py` — sqlglot/sqlparse **deleted repo-wide
-  and CI-banned** (2026-08-19, Sunny verbatim: "under no circumstances";
-  ScriptDom port shipped 1.28.0, HANDOFF_TREE_PHASE_1B). ADR 0001 amended
-  same day: the law is total, no fallback zone.
-- `tests/test_notebook_contract.py` — regex banned in notebooks; imports and
-  entry points whitelisted per NOTEBOOK_REGISTRY.
-- `tests/test_methodology.py` — control-path vocabulary and op registration.
-**Status: ENFORCED** — the general registry + whole-`src/` inclusion check
-shipped at adoption: `test_capability_registry.py::test_g2_sanctioned_powers_only`
-computes Uses from the AST and asserts `Uses ∖ S = ∅` for
-pythonnet/clr/requests/httpx (+ the absolute sqlglot/sqlparse ban, which
-no row may ever sanction).
+*Gloss:* `Uses` = every (module, powerful-primitive) pair actually present in the code, computed from the AST. `S` = the sanctioned pairs. The check is set difference = empty. Powerful primitives: regex, SQL/M parsers, LLM clients, embedding calls, Delta writes.
+*Grounds in the framework:* axm:D2 — one owner per capability, mechanized.
+*Checks:* `tests/test_capability_registry.py`, `tests/test_native_parser_law.py`, `tests/test_notebook_contract.py`
+**Status: ENFORCED** — the general registry + whole-`src/` inclusion check shipped at adoption: `test_capability_registry.py::test_g2_sanctioned_powers_only` computes Uses from the AST and asserts `Uses ∖ S = ∅` for pythonnet/clr/requests/httpx (+ the absolute sqlglot/sqlparse ban, which no row may ever sanction).
 
 **G3 — no undeclared power.**
 
     ∀ use of p ∈ PowerPrims.  ∃c.  p ∈ prims(c)
 
-*Gloss:* every use of a dangerous primitive maps back to a declared
-capability — nothing powerful is used "off the books."
-**Status: ENFORCED** — same inclusion check (an unowned use fails with
-the registry named) + `test_g3_banned_parsers_have_no_owner`.
+*Gloss:* every use of a dangerous primitive maps back to a declared capability — nothing powerful is used "off the books."
+*Grounds in the framework:* axm:D2 — one owner per capability, mechanized.
+*Checks:* `tests/test_capability_registry.py`
+**Status: ENFORCED** — same inclusion check (an unowned use fails with the registry named) + `test_g3_banned_parsers_have_no_owner`. *Honest residue:* G-group catches the high-risk primitive classes. Two innocent pure-Python functions independently reimplementing the same logic (a second fold, a second hash) are not mechanically detectable — mitigated by owning primitive operations in single modules and by review. Stated so nobody mistakes the fence for a force field. ---
+
 
 *Honest residue:* G-group catches the high-risk primitive classes. Two
 innocent pure-Python functions independently reimplementing the same logic
@@ -605,16 +522,24 @@ mistakes the fence for a force field.
 
 **H1 — fallout resolution is total and closed.**
 
-    resolution : FalloutRow → {auto_resolved, escalated}     (total; no NULL)
+    resolution : FalloutRow → {auto_resolved, escalated} (total; no NULL)
+
+*Gloss:* everything the pipeline cannot resolve is either recovered by the pipeline or lands on a human's checklist — counted is not the same as owned.
+*Origin:* ADR 0045
+*Grounds in the framework:* axm:R3 — novelty escalates.
+*Checks:* `tests/test_escalation_contract.py`
+**Status: GATED** — strict-xfail skeletons, 4 clauses (status shared with H2)
 
 **H2 — novelty always escalates.**
 
     outcome(x) = unknown  →  resolution(x) = escalated
 
-*Gloss:* everything the pipeline cannot resolve is either recovered by the
-pipeline or lands on a human's checklist — counted is not the same as owned.
-*Origin:* ADR 0045. *Binding:* `tests/test_escalation_contract.py`
-(strict-xfail skeletons, 4 clauses). **Status: GATED**
+*Gloss:* everything the pipeline cannot resolve is either recovered by the pipeline or lands on a human's checklist — counted is not the same as owned.
+*Origin:* ADR 0045.
+*Grounds in the framework:* axm:R3 — novelty escalates.
+*Checks:* `tests/test_escalation_contract.py`
+**Status: GATED**
+
 
 ---
 
@@ -631,27 +556,45 @@ three-layer structure:
     τ : Tree → Language        render structure into meaning (describe, caption)
     ρ : Language → Tree        translate intent into structure (anchor, propose)
 
+The law is instantiated **three times**, at three grains, with three judges:
+
 **T0 — the round-trip law.**
 
     ∀t ∈ Tree.  κ(ρ(τ(t))) = κ(t)        modulo canonicalization
 
-*Gloss:* meaning rendered from structure must translate back to the
-same structure. Each direction's correctness is certified by running
-the opposite direction — which is why no instance may be checked by
-inspecting only its own output.
+*Gloss:* meaning rendered from structure must translate back to the same structure. Each direction's correctness is certified by running the opposite direction — which is why no instance may be checked by inspecting only its own output.
 *Origin:* ADR 0044 (instance 1), generalized here.
-**Status: PARTIAL** — instantiated three times below with three
-different judges; T1 is ENFORCED, T2 PARTIAL, T3 human-judged by
-construction. The law is only as strong as its weakest instance, and
-that is stated rather than averaged away.
+*Grounds in the framework:* axm:J4 — the round-trip law: kappa(rho(tau(t))) = kappa(t).
+*Checks:* (none declared) — instantiated as T1-T3, each with its own judge; no single check by design (ADR 0065)
+**Status: PARTIAL** — instantiated three times below with three different judges; T1 is ENFORCED, T2 PARTIAL, T3 human-judged by construction. The law is only as strong as its weakest instance, and that is stated rather than averaged away. The law is instantiated **three times**, at three grains, with three judges: | # | Instance | τ | ρ | Judge | Status | |---|---|---|---|---|---| | **T1** | Descriptions (ADR 0044) | translator | blind verifier | deterministic tree diff (κ-equality) | **ENFORCED** — `tests/test_tree_contract.py`, all six clause gates green; this is `spec:F` stated as a member of the family | | **T2** | SQL stitching (ADR 0033/0061, tier 2) | compile fragments → SQL text | parse back through ScriptDom | tree equality (the parser) | **PARTIAL** — `src/run_layer.py::check_single_select` parses every executed statement through ScriptDom, so PARSEABILITY round-trips and a malformed compile fails closed. **Stated gap:** no κ-equality diff between the compiled tree and the source tree; the parser confirms the SQL is well-formed, not that it means the same thing | | **T3** | Definition creation (ADR 0038/0062, tier 1) | render proposal back for confirmation | user prose → proposed canonical tree | **the human** | **JUDGED, not tested** (§14d L3) — the confirm step (`spec:R3`) is the mechanism; correctness is the human's click. Recorded as judged so nobody mistakes a rendered proposal for a verified one | **Why T2's gap matters and is not quietly closed.** Instance 1 earned its judge — a blind verifier plus κ-equality — because a fabricated description corrupts the human's pick (the E4 dependency). Instance 2 executes SQL against patient data; its current judge answers "does this parse?" and not "is this the tree the user confirmed?" `spec:R7` narrows the exposure to near zero by requiring the executed SQL be byte- for-byte the confirmed step — nothing is compiled at run time today — so the gap is latent, not live. It becomes live the moment fragment stitching ships, and T2 is the axiom that will then need its κ-diff. And the tiers are the two directions of one correspondence: Tier 1 (metadata): Question --ρ--> anchors --enumerate/match/rank--> shapes --τ--> captions --human picks--> answer Tier 2 (self-service): same prefix, then: picked shape --compile--> SQL --execute--> data --human approves--> stamped canonical **Tier 2 = Tier 1 + exactly one arrow** (compile∘execute) — ADR 0046's "Pro adds exactly ONE layer" as a formula. Tier 1 moves structure→meaning; tier 2 moves meaning→structure→data; each direction's correctness is certified by running the opposite direction. Every human approval in either direction is an appended Event, which is how the flywheel (ADR 0023) is the same object as the verification machinery: **verification events ARE governance data.** ---
 
-The law is instantiated **three times**, at three grains, with three judges:
+**T1 — Descriptions.**
 
-| # | Instance | τ | ρ | Judge | Status |
-|---|---|---|---|---|---|
-| **T1** | Descriptions (ADR 0044) | translator | blind verifier | deterministic tree diff (κ-equality) | **ENFORCED** — `tests/test_tree_contract.py`, all six clause gates green; this is `spec:F` stated as a member of the family |
-| **T2** | SQL stitching (ADR 0033/0061, tier 2) | compile fragments → SQL text | parse back through ScriptDom | tree equality (the parser) | **PARTIAL** — `src/run_layer.py::check_single_select` parses every executed statement through ScriptDom, so PARSEABILITY round-trips and a malformed compile fails closed. **Stated gap:** no κ-equality diff between the compiled tree and the source tree; the parser confirms the SQL is well-formed, not that it means the same thing |
-| **T3** | Definition creation (ADR 0038/0062, tier 1) | render proposal back for confirmation | user prose → proposed canonical tree | **the human** | **JUDGED, not tested** (§14d L3) — the confirm step (`spec:R3`) is the mechanism; correctness is the human's click. Recorded as judged so nobody mistakes a rendered proposal for a verified one |
+    tau=translator; rho=blind verifier; judge=deterministic tree
+    diff (κ-equality)
+
+*Grounds in the framework:* axm:J4 — descriptions - blind verifier + kappa-diff.
+*Checks:* `tests/test_tree_contract.py`
+**Status: ENFORCED** — `tests/test_tree_contract.py`, all six clause gates green; this is `spec:F` stated as a member of the family
+
+**T2 — SQL stitching.**
+
+    tau=compile fragments → SQL text; rho=parse back through
+    ScriptDom; judge=tree equality (the parser)
+
+*Grounds in the framework:* axm:J4, axm:B1 — SQL stitching - parseability round-trips; kappa-diff is the stated gap.
+*Checks:* `tests/test_run_layer.py` — parseability round-trips; the kappa-equality diff is the stated gap, live when stitching ships
+**Status: PARTIAL** — `src/run_layer.py::check_single_select` parses every executed statement through ScriptDom, so PARSEABILITY round- trips and a malformed compile fails closed. Stated gap: no κ-equality diff between the compiled tree and the source tree; the parser confirms the SQL is well-formed, not that it means the same thing
+
+**T3 — Definition creation.**
+
+    tau=render proposal back for confirmation; rho=user prose →
+    proposed canonical tree; judge=**the human**
+
+*Grounds in the framework:* axm:M5, axm:J2 — definition creation - the human is the judge (L3 stratum).
+*Checks:* (none declared) — JUDGED, not tested — the human is the judge by construction (SPEC 14d, L3 stratum)
+**Status: JUDGED** — , not tested (§14d L3) — the confirm step (`spec:R3`) is the mechanism; correctness is the human's click. Recorded as judged so nobody mistakes a rendered proposal for a verified one
+
 
 **Why T2's gap matters and is not quietly closed.** Instance 1 earned
 its judge — a blind verifier plus κ-equality — because a fabricated
@@ -740,14 +683,62 @@ The six principles of the merged turn engine, each bound to a check
 (instrument: prompt capture — assert what the model MUST see; the
 0044 clause-2/3 instrument, inverted):
 
-| axiom | statement | binding | status |
-|---|---|---|---|
-| P1 | one conversation decides a turn; no separate planner/judge/captioner minds | one EngineSession/history on the ask path; retired-prompt ghost grep (tests/test_turn_engine + methodology scans) | ENFORCED |
-| P2 | full tool results enter the SAME history and persist across rounds and turns; compaction degrades oldest to stamped headline + totals, never drops | prompt capture: round-2 request carries round-1 FULL rows; compaction test pins headline+totals survival | ENFORCED |
-| P3 | thinking room — no forced tool_choice except the final typed verdict | captured tool_choice per request: None in-loop, forced exactly once | ENFORCED |
-| P4 | no question-family casebook anywhere — invariants + tool semantics only | control-path lexicon scan + prompt line budget (auto-discovered SYSTEM_PROMPT) + banned-vocabulary pin + thesis prompt content-hash PINNED (suite refuses to grade a changed prompt) | ENFORCED |
-| P5 | honesty at the boundary only: headlines, caption gate, machine-verified evidence-quote verdict, read-only dispatch, write plan-confirm, caps as code | cage tests (gate/verdict/whitelist/caps/anti-flail) | ENFORCED |
-| P6 | failure is observation: tool errors return into the conversation; caps bound flailing | cage test: scripted error appears as a tool-result message; turn continues within caps | ENFORCED |
+**P1 — one conversation decides a turn; no separate planner/judge/c.**
+
+    one conversation decides a turn; no separate
+    planner/judge/captioner minds
+
+*Grounds in the framework:* axm:M2 — one mind, full evidence.
+*Checks:* `tests/orchestrator/test_turn_engine.py`
+**Status: ENFORCED**
+
+**P2 — full tool results enter the SAME history and persist across .**
+
+    full tool results enter the SAME history and persist across
+    rounds and turns; compaction degrades oldest to stamped headline
+    + totals, never drops
+
+*Grounds in the framework:* axm:M2 — one mind, full evidence.
+*Checks:* `tests/orchestrator/test_turn_engine.py`
+**Status: ENFORCED**
+
+**P3 — thinking room — no forced tool_choice except the final typed.**
+
+    thinking room — no forced tool_choice except the final typed
+    verdict
+
+*Grounds in the framework:* axm:M3 — thinking room.
+*Checks:* `tests/orchestrator/test_turn_engine.py`
+**Status: ENFORCED**
+
+**P4 — no question-family casebook anywhere — invariants + tool sem.**
+
+    no question-family casebook anywhere — invariants + tool
+    semantics only
+
+*Grounds in the framework:* axm:M4 — no question-shaped control flow.
+*Checks:* `tests/orchestrator/test_turn_engine.py`, `tests/test_methodology.py`
+**Status: ENFORCED**
+
+**P5 — honesty at the boundary only.**
+
+    honesty at the boundary only: headlines, caption gate, machine-
+    verified evidence-quote verdict, read-only dispatch, write plan-
+    confirm, caps as code
+
+*Grounds in the framework:* axm:B2 — honesty at the boundary, never the interior.
+*Checks:* `tests/orchestrator/test_turn_engine.py`
+**Status: ENFORCED**
+
+**P6 — failure is observation.**
+
+    failure is observation: tool errors return into the
+    conversation; caps bound flailing
+
+*Grounds in the framework:* axm:M1 — failure as observation = loop-shape capability.
+*Checks:* `tests/orchestrator/test_turn_engine.py`
+**Status: ENFORCED**
+
 
 **Interior vs boundary (the E-group note, restated):** which tool,
 when to stop, how to compose — linguistic, MEASURED (suite thresholds,
@@ -775,11 +766,39 @@ drafted: 1 component / 0 orphans / 0 dangling at 6,669 nodes /
 14,994 edges on the recorded corpus (2026-08-26); the measurement is
 now the permanent CI baseline.
 
-| axiom | statement | binding | status |
-|---|---|---|---|
-| Q1 (ADR G1) | accounted connectivity: components enumerated every build; exactly one PRINCIPAL derived component; foundation-only islands legitimate under the FOUNDATION EXCEPTION (enumerated, never findings); degree-0 forbidden (enumerated exclusion: the govmeta:sweep receipt) | src/graph/topology.py union-find — 300 postcondition assert + tests/graph/test_topology.py (recorded + shape corpora) + the live-audit topology leg | ENFORCED |
-| Q2 (ADR G2) | edge soundness: every edge referential AND provenance-mapped — parsed / declared / derived / asserted, exactly one class per edge type (EDGE_PROVENANCE, 0052-pattern totality) | models.EDGE_PROVENANCE + G2-totality CI test + unmapped-type detection in every analyze() run | ENFORCED |
-| Q3 (ADR G3) | relative completeness: every completeness claim is a conservation equation (refs = minted ⊎ dropped; swept = flagged ⊎ clean ⊎ excluded; matrix/reachability totality) with ask-time boundary disclosure; absolute completeness claims forbidden | the existing conservation asserts, cited: ADR 0053 projection sums, sweep partition + reification count, shape-matrix totality, 0052 reachability, coverage-absent stamps | ENFORCED (by citation — no new mechanism needed; the equations predate the axiom) |
+**Q1 — accounted connectivity.**
+
+    accounted connectivity: components enumerated every build;
+    exactly one PRINCIPAL derived component; foundation-only islands
+    legitimate under the FOUNDATION EXCEPTION (enumerated, never
+    findings); degree-0 forbidden (enumerated exclusion: the
+    govmeta:sweep receipt)
+
+*Grounds in the framework:* axm:D1 — accounted connectivity -> nothing unreachable.
+*Checks:* `tests/graph/test_topology.py`
+**Status: ENFORCED**
+
+**Q2 — edge soundness.**
+
+    edge soundness: every edge referential AND provenance-mapped —
+    parsed / declared / derived / asserted, exactly one class per
+    edge type (EDGE_PROVENANCE, 0052-pattern totality)
+
+*Grounds in the framework:* axm:B1 — every edge provenance-mapped.
+*Checks:* `tests/graph/test_topology.py`
+**Status: ENFORCED**
+
+**Q3 — relative completeness.**
+
+    relative completeness: every completeness claim is a
+    conservation equation (refs = minted ⊎ dropped; swept = flagged
+    ⊎ clean ⊎ excluded; matrix/reachability totality) with ask-time
+    boundary disclosure; absolute completeness claims forbidden
+
+*Grounds in the framework:* axm:B3 — completeness claims are conservation equations.
+*Checks:* (none declared) — ENFORCED by citation — the existing conservation asserts predate the axiom (ADR 0059)
+**Status: ENFORCED** — (by citation — no new mechanism needed; the equations predate the axiom)
+
 
 **The foundation exception (Sunny, 2026-08-26, verbatim force):**
 the dictionary is a source of truth — foundation nodes exist as is;
@@ -801,13 +820,63 @@ unchanged; R constrains what that conversation may DECIDE. P3's
 thinking room survives; R2 removes route choice from the set of
 things thinking may land on.
 
-| axiom | statement | binding | status |
-|---|---|---|---|
-| R1 | **Parse, never generate.** The LLM maps the sentence to entity phrases + relation words drawn from a closed lexicon; it never composes a query, never selects a route, never authors a verdict. A model-composed query cannot be stamped; a parse can be confirmed. | `src/orchestrator/parse_plan.py` + `tests/orchestrator/test_parse_plan.py`; the closed-vocabulary lexicon is data, not prose | ENFORCED (prototype + measured gate: PARSE_EXPERIMENT, 7/7 oracles vs 5/7) |
-| R2 | **No question types.** The answer's shape EMERGES from the matched subgraph; no enumeration of question shapes, classes, or families may exist in the control path. (0062's abolition; the P4 casebook ban generalized from prompts to structure.) | control-path lexicon scan (`tests/test_methodology.py`) + the P4 banned-vocabulary pin | ENFORCED for the control path |
-| R3 | **Interpretation confirms before it executes.** Every reading renders on glass and waits for the click; fuzzy grounding may NOMINATE, only the human's click EXECUTES. Plan-confirm-execute-display applied to the interpretation itself (0060 call 1, RULED: confirm every parse). | the iteration card (`src/webapp/app.py` + `tests/webapp/test_app.py`) | ENFORCED |
-| R4 | **No dead ends.** Every state — failure, empty, ambiguity, exhaustion — renders as action items; an exhausted loop becomes a CAPTURED DEMAND handoff to a developer, never a shrug. The escalation door stands at every round. | `/api/escalate` capture as a 0056 deny event; `tests/webapp/test_app.py` | ENFORCED |
-| R5 | **Certain answers.** Under ambiguity, execute only what every surviving reading supports; only genuine ambiguity spawns a clarify item. We iterate on UNDERSTANDING, never on mechanical execution steps. | the no-nag boundary in the loop; 0062:A6 (database-theory certain answers) | PARTIAL — the rule is implemented in the loop; no general multi-reading intersection check |
+**R1 — Parse, never generate.**
+
+    **Parse, never generate.** The LLM maps the sentence to entity
+    phrases + relation words drawn from a closed lexicon; it never
+    composes a query, never selects a route, never authors a
+    verdict. A model-composed query cannot be stamped; a parse can
+    be confirmed.
+
+*Grounds in the framework:* axm:M4, axm:M5 — parse-never-generate: free composition + typing.
+*Checks:* `tests/orchestrator/test_parse_plan.py`
+**Status: ENFORCED** — (prototype + measured gate: PARSE_EXPERIMENT, 7/7 oracles vs 5/7)
+
+**R2 — No question types.**
+
+    **No question types.** The answer's shape EMERGES from the
+    matched subgraph; no enumeration of question shapes, classes, or
+    families may exist in the control path. (0062's abolition; the
+    P4 casebook ban generalized from prompts to structure.)
+
+*Grounds in the framework:* axm:M4 — no question types.
+*Checks:* `tests/test_methodology.py`
+**Status: ENFORCED** — for the control path
+
+**R3 — Interpretation confirms before it executes.**
+
+    **Interpretation confirms before it executes.** Every reading
+    renders on glass and waits for the click; fuzzy grounding may
+    NOMINATE, only the human's click EXECUTES. Plan-confirm-
+    execute-display applied to the interpretation itself (0060 call
+    1, RULED: confirm every parse).
+
+*Grounds in the framework:* axm:B4 — irreversible acts confirm - applied to interpretation.
+*Checks:* `tests/webapp/test_app.py`
+**Status: ENFORCED**
+
+**R4 — No dead ends.**
+
+    **No dead ends.** Every state — failure, empty, ambiguity,
+    exhaustion — renders as action items; an exhausted loop becomes
+    a CAPTURED DEMAND handoff to a developer, never a shrug. The
+    escalation door stands at every round.
+
+*Grounds in the framework:* axm:R3 — no dead ends -> novelty escalates.
+*Checks:* `tests/webapp/test_app.py`
+**Status: ENFORCED**
+
+**R5 — Certain answers.**
+
+    **Certain answers.** Under ambiguity, execute only what every
+    surviving reading supports; only genuine ambiguity spawns a
+    clarify item. We iterate on UNDERSTANDING, never on mechanical
+    execution steps.
+
+*Grounds in the framework:* axm:B3 — certain answers = bounded claims under ambiguity.
+*Checks:* (none declared) — the no-nag boundary in the loop; no general multi-reading intersection check (SPEC: PARTIAL)
+**Status: PARTIAL** — the rule is implemented in the loop; no general multi-reading intersection check
+
 
 **The R-group's pedigree** is ADR 0062 §3, the standing axiom
 register `0062:A1…A6` (compositionality, small algebras, formal-layer
@@ -823,11 +892,42 @@ the boundary) to DATA, and they are the reason the tier is
 sayable out loud: *the AI governs the question; the database
 answers it; the model never touches a patient.*
 
-| axiom | statement | binding | status |
-|---|---|---|---|
-| R6 | **Rows never enter model context.** Results render to the USER'S GLASS; the model sees machine stamps only — row count, column schema, elapsed, as-of, source. P5 absolute, extended to result sets. | cage tests in `tests/test_run_layer.py` | ENFORCED |
-| R7 | **Nothing is generated; the confirmed SQL is what runs.** Byte-for-byte the parsed, displayed step the user confirmed — not NL2SQL. Read-only by construction: a dedicated read-only credential AND a ScriptDom statement-type check (the native-parser law: the parser decides, never regex). DML/DDL/EXEC → typed refusal. | `src/run_layer.py` single-SELECT gate | ENFORCED |
-| R8 | **Sampling is machine-labelled.** Every result carries `N rows · TOP <cap> · as of <timestamp> · source <db> · read-only`, composed by code, never model-written. The cap is a disclosed fact, not a hidden truncation (E6's presentation honesty, applied to data). | run stamps in `src/run_layer.py` | ENFORCED |
+**R6 — Rows never enter model context.**
+
+    **Rows never enter model context.** Results render to the USER'S
+    GLASS; the model sees machine stamps only — row count, column
+    schema, elapsed, as-of, source. P5 absolute, extended to result
+    sets.
+
+*Grounds in the framework:* axm:B2 — rows never enter model context.
+*Checks:* `tests/test_run_layer.py`
+**Status: ENFORCED**
+
+**R7 — Nothing is generated; the confirmed SQL is what runs.**
+
+    **Nothing is generated; the confirmed SQL is what runs.** Byte-
+    for-byte the parsed, displayed step the user confirmed — not
+    NL2SQL. Read-only by construction: a dedicated read-only
+    credential AND a ScriptDom statement-type check (the native-
+    parser law: the parser decides, never regex). DML/DDL/EXEC →
+    typed refusal.
+
+*Grounds in the framework:* axm:B4 — confirmed-only execution.
+*Checks:* `tests/test_run_layer.py`
+**Status: ENFORCED**
+
+**R8 — Sampling is machine-labelled.**
+
+    **Sampling is machine-labelled.** Every result carries `N rows ·
+    TOP <cap> · as of <timestamp> · source <db> · read-only`,
+    composed by code, never model-written. The cap is a disclosed
+    fact, not a hidden truncation (E6's presentation honesty,
+    applied to data).
+
+*Grounds in the framework:* axm:B3 — machine-labelled sampling.
+*Checks:* `tests/test_run_layer.py`
+**Status: ENFORCED**
+
 
 **Stated gap (listing-blocking, recorded in ADR 0061 §3):** slice 1
 runs on the synthetic demo estate only. The **output-side PHI gate**
@@ -850,53 +950,33 @@ left.
     ∀t ∈ Tables.  write_mode(t) ∈ {overwrite, append}
     ∧  write_mode(t) = append  →  no writer of t uses overwrite semantics
 
-*Gloss:* a table that declares itself a ledger may only ever grow. The
-declaration existed since the beginning (`TABLE_REGISTRY.write_mode`;
-39 overwrite / 10 append) and the label's legality was checked — but
-nothing checked the label was HONOURED. An append flipped to overwrite
-destroys every prior run's telemetry silently.
-*Origin:* ADR 0064; the 2026-08-15 audit note in 500_validate ("a
-failing append must RAISE — never silently become an overwrite").
-*Binding:* `tests/test_table_contracts.py` (label legality) +
-`tests/test_ledger_contract.py::test_l1_append_tables_are_never_overwritten`
-— scans every `*.Notebook/notebook-content.py` for
-`.write…saveAsTable()` against an append-declared table, rejecting
-`mode("overwrite")` and unguarded no-mode writes (first-creation is
-legal only behind a `tableExists()` guard). **Status: ENFORCED**
+*Gloss:* a table that declares itself a ledger may only ever grow. The declaration existed since the beginning (`TABLE_REGISTRY.write_mode`; 39 overwrite / 10 append) and the label's legality was checked — but nothing checked the label was HONOURED. An append flipped to overwrite destroys every prior run's telemetry silently.
+*Origin:* ADR 0064; the 2026-08-15 audit note in 500_validate ("a failing append must RAISE — never silently become an overwrite").
+*Grounds in the framework:* axm:R4 — the ledger may only grow.
+*Checks:* `tests/test_ledger_contract.py`, `tests/test_table_contracts.py`
+**Status: ENFORCED**
 
 **L2 — aggregates are derived, never stored.**
 
     ∀a ∈ Aggregates.  a = f(Events),  f deterministic and recomputable
     no counter is mutated in place
 
-*Gloss:* usage weights, funnel counts, and every governance number are
-recomputed from the append-only log — never incremented on a stored
-row. This is D3 (projections are functions of the record) applied to
-COUNTS, and it is the law the purged UsageTracker broke.
-*Origin:* ADR 0064; the purged in-place usage counter (`axm:R4`'s
-descent), which had no regression guard until now — the corpse-to-
-fixture rule (`axm:J3`) applied retroactively.
-*Binding:* `tests/test_ledger_contract.py::test_l2_no_stored_aggregate_is_mutated_in_place`
-(AST-adjacent scan over `src/`) +
-`::test_l2_event_tables_are_append_mode`. **Status: ENFORCED**
+*Gloss:* usage weights, funnel counts, and every governance number are recomputed from the append-only log — never incremented on a stored row. This is D3 (projections are functions of the record) applied to COUNTS, and it is the law the purged UsageTracker broke.
+*Origin:* ADR 0064; the purged in-place usage counter (`axm:R4`'s descent), which had no regression guard until now — the corpse-to- fixture rule (`axm:J3`) applied retroactively.
+*Grounds in the framework:* axm:R4, axm:D3 — aggregates derived, never stored.
+*Checks:* `tests/test_ledger_contract.py`
+**Status: ENFORCED**
 
 **L3 — every declaration has a firing mechanism.**
 
     ∀d ∈ Declarations.  ∃m.  fires(m, divergence(d))
 
-*Gloss:* §3b's third question, promoted from a review ritual to an
-axiom: when reality diverges from a declaration, something MECHANICAL
-fires — a red build, a checklist row, a funnel bar. "Someone would
-notice" is the definition of a missing feedback loop.
-*Origin:* ADR 0064, closing `axm:R2`.
-*Binding:* **by citation** — the ADR 0059 Q3 precedent, where the
-equations predated the axiom and no new mechanism was needed: the seven
-registry closure checks (extraction, capability, notebook, trace,
-integration, shape, table), `src/governance/funnel.py`, and
-`src/reachability.py` ARE the firing mechanisms. Each registry's
-closure test is its declaration's tripwire. **Status: ENFORCED (by
-citation)** — stated gap: a NEW declaration acquires its mechanism by
-review (§3b), not yet by a mechanical check that one exists.
+*Gloss:* §3b's third question, promoted from a review ritual to an axiom: when reality diverges from a declaration, something MECHANICAL fires — a red build, a checklist row, a funnel bar. "Someone would notice" is the definition of a missing feedback loop.
+*Origin:* ADR 0064, closing axm:R2
+*Grounds in the framework:* axm:R2 — every declaration has a firing mechanism.
+*Checks:* `tests/test_spec_gates.py` — ENFORCED by citation (0059 Q3 precedent): the registry closure checks, funnel, reachability
+**Status: ENFORCED** — (by citation — the 0059 Q3 precedent): the seven registry closure checks, the funnel, and reachability ARE the firing mechanisms; stated gap: a NEW declaration acquires its mechanism by review (section 3b), not yet by a mechanical check that one exists
+
 
 ## 15. Honest limits
 
@@ -935,6 +1015,11 @@ governs generated artifacts revs the relevant `*_CONTRACT_VERSION` cache keys
 ---
 
 ## Changelog
+
+**Frozen at v1.0 (ADR 0073).** §1 has said it since v0.1: "the ADRs
+are the changelog of this theory." From here that is literal — spec
+changes are ADRs; this section is preserved history.
+
 
 - **0.9 + ledger (2026-09-02, ADR 0067)** — the axiom ledger:
   ids/parents/checks as records in `src/spec_registry.py`, this

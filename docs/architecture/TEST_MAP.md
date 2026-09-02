@@ -7,7 +7,7 @@
 
 # Test Map — what every test proves
 
-124 modules, 1422 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
+124 modules, 1425 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
 
 ## By ADR
 
@@ -69,11 +69,12 @@
 | 0063 | The product tiers: X-Ray, Bridge, Workbench, Run | `tests/adapters/test_file_export.py` (9), `tests/test_console.py` (20), `tests/test_xray.py` (7) |
 | 0064 | Group L: the ledger and drift axioms (closing the crosswalk gaps) | `tests/test_ledger_contract.py` (4) |
 | 0065 | Promote section 13 to Group T: the double-sided function as numbered law | `tests/test_tree_contract.py` (14) |
-| 0067 | Docs are data: the record invariant and the prose ratchet | `tests/test_spec_registry.py` (5) |
+| 0067 | Docs are data: the record invariant and the prose ratchet | `tests/test_spec_registry.py` (8) |
 | 0068 | The landing matrix as data (ratchet turn 2) | `tests/test_landing_registry.py` (6) |
 | 0069 | SOURCE_CONNECTORS retires into the integration registry (ratchet turn 3) | `tests/test_integration_doctrine.py` (4) |
 | 0070 | QUESTION_MAP retires into the notebook registry (ratchet turn 4) | `tests/test_question_families.py` (4) |
 | 0072 | The crosswalk goes generated (ratchet turn 6) | `tests/test_axiom_crosswalk.py` (7) |
+| 0073 | SPEC v1.0: the spec becomes a projection of its own ledger (final ratchet turn) | `tests/test_spec_registry.py` (8) |
 
 ## By standing law
 

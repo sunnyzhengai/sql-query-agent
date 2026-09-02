@@ -113,18 +113,17 @@ nothing referenced them.
 Files are grouped by *what kind of thing they are*, which is also how
 they behave under change.
 
-### Authored — the design record (3)
+### Authored — the design record (2)
 
 Hand-written, highest interpretive value, lowest churn. These state
 intent; they are audited, not generated.
 
 | Document | ADRs | Governs |
 | --- | --- | --- |
-| [SPEC.md](architecture/SPEC.md) | 14 | The formal axiom system (groups A–H, L, P, Q, R, T — 48 axioms), its notation, and the enforcement status of each. **v0.9 — the standing instrument; cite as `spec:<id>`.** |
 | [ARCHITECTURE.md](architecture/ARCHITECTURE.md) | 16 | The system model, organized by the Sphere (ADR 0066 merged SPHERE.md in): four shells, radial dynamics, data flow, ownership economy, contracts split — every section carrying a `BUILT`/`PARTIAL`/`DESIGN` status. |
 | [REFERENCE_ARCHITECTURE.md](architecture/REFERENCE_ARCHITECTURE.md) | 4 | The deployable reference: connector tiers, what runs per product tier, and the Azure consumption footprint. |
 
-### Generated — projections of the registries (7)
+### Generated — projections of the registries (8)
 
 Compiled from `src/` registries by `scripts/generate_docs.py` and
 CI-checked for staleness. **Never edit by hand** — fix the registry and
@@ -133,6 +132,7 @@ authority comes from the code they project.
 
 | Document | Source registry | Governs |
 | --- | --- | --- |
+| [SPEC.md](architecture/SPEC.md) | `spec_registry.py` | **The standing instrument, v1.0** — 48 axioms with law, gloss, origin, framework grounds, checks and status, rendered into the frame (`scripts/spec_frame.md`). Cite as `spec:<id>`; amend via ADR. |
 | [TRACE_MAP.md](architecture/TRACE_MAP.md) | `trace_registry.py` | The full chain: decision → component → axioms → code → tests. |
 | [DECISION_LANDING_MATRIX.md](architecture/DECISION_LANDING_MATRIX.md) | `landing_registry.py` | Every governance action's per-tool landing, grade, and what stays home (ADR 0068). |
 | [AXIOM_CROSSWALK.md](architecture/AXIOM_CROSSWALK.md) | `spec_registry.py` | The framework↔spec bridge: every axiom's parent + why, and the three meta-axioms (ADR 0072). |
