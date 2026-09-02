@@ -7,7 +7,7 @@
 
 # Test Map — what every test proves
 
-118 modules, 1401 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
+120 modules, 1400 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
 
 ## By ADR
 
@@ -52,8 +52,8 @@
 | 0044 | The tree contract: round-trip verified descriptions | `tests/graph/test_decision_wiring.py` (8), `tests/test_tree_contract.py` (14), `tests/tree/test_extract.py` (18) |
 | 0045 | The escalation contract: no silent residue | `tests/governance/test_leaf_grounding.py` (6), `tests/test_escalation_contract.py` (8) |
 | 0046 | Anchor, discover, match, rank — the human picks | `tests/test_derive_relationships.py` (7), `tests/test_spec_gates.py` (4) |
-| 0047 | The shadow specification (the axiom system) | `tests/test_capability_registry.py` (4), `tests/test_extraction_registry.py` (6), `tests/test_spec_gates.py` (4) |
-| 0048 | Declared zones, trace registry, admin graph, companion | `tests/test_admin_graph.py` (9), `tests/test_companion.py` (7), `tests/test_term_hygiene.py` (2), `tests/test_trace_registry.py` (7), `tests/test_zones.py` (4) |
+| 0047 | The shadow specification (the axiom system) | `tests/test_axiom_crosswalk.py` (6), `tests/test_capability_registry.py` (4), `tests/test_extraction_registry.py` (6), `tests/test_spec_gates.py` (4) |
+| 0048 | Declared zones, trace registry, admin graph, companion | `tests/test_admin_graph.py` (9), `tests/test_companion.py` (7), `tests/test_term_hygiene.py` (2), `tests/test_trace_registry.py` (11), `tests/test_zones.py` (4) |
 | 0049 | Ingestion routes: filedrop, folders, live extractor | `tests/extractor/test_connection.py` (9), `tests/extractor/test_extractor.py` (15), `tests/extractor/test_proc_parity.py` (8) |
 | 0050 | Bounded read-only answer loop: plan to the answer, caption answers, auto-continue (amends 0036) | `tests/orchestrator/test_turn_engine.py` (31) |
 | 0051 | The one-mind turn: one conversation decides, the boundary enforces (supersedes 0036/0050's shape) | `tests/orchestrator/test_turn_engine.py` (31) |
@@ -67,6 +67,7 @@
 | 0061 | The run layer: Pro runs the confirmed definition | `tests/test_run_layer.py` (25) |
 | 0062 | The dialogue loop: show, propose, ask, execute | `tests/webapp/test_app.py` (79) |
 | 0063 | The product tiers: X-Ray, Bridge, Workbench, Run | `tests/adapters/test_file_export.py` (9), `tests/test_console.py` (20), `tests/test_xray.py` (7) |
+| 0064 | Group L: the ledger and drift axioms (closing the crosswalk gaps) | `tests/test_ledger_contract.py` (4) |
 
 ## By standing law
 
@@ -94,7 +95,7 @@
 
 ### law:honesty-floor — honesty 1.00 is a build-stopper, never a metric
 
-- `tests/test_grounding_gate.py` (60): The grounding gate — acceptance fixtures are the REAL production
+- `tests/test_grounding_gate.py` (45): The grounding gate — acceptance fixtures are the REAL production
 
 ## By executable contract
 
@@ -149,7 +150,7 @@
 | spec:C1 | 0001, 0048, 0052, 0053, 0054 | `tests/golden/test_parse_goldens.py`, `tests/governance/test_red_flags.py`, `tests/graph/test_builder.py`, `tests/orchestrator/test_flag_ops.py`, `tests/orchestrator/test_ops.py`, `tests/parser/test_sql_parser.py`, `tests/test_admin_graph.py`, `tests/test_companion.py`, `tests/test_native_parser_law.py`, `tests/test_reachability.py`, `tests/test_reachability_audit.py`, `tests/test_term_hygiene.py`, `tests/test_trace_registry.py`, `tests/test_zones.py` |
 | spec:C2 | 0041, 0044, 0045, 0053 | `tests/governance/test_leaf_grounding.py`, `tests/graph/test_builder.py`, `tests/graph/test_decision_wiring.py`, `tests/mquery/test_mquery.py`, `tests/orchestrator/test_ops.py`, `tests/test_escalation_contract.py`, `tests/test_tree_contract.py`, `tests/tree/test_extract.py` |
 | spec:C3 | 0039, 0042 | `tests/governance/test_funnel.py`, `tests/governance/test_journey.py`, `tests/test_docs_consistency.py`, `tests/test_notebook_contract.py`, `tests/test_replan.py`, `tests/test_table_contracts.py` |
-| spec:C4 | 0014, 0047 | `tests/governance/test_validation.py`, `tests/steps/test_steps.py`, `tests/test_capability_registry.py`, `tests/test_dictionary.py`, `tests/test_extraction_registry.py`, `tests/test_spec_gates.py` |
+| spec:C4 | 0014, 0047 | `tests/governance/test_validation.py`, `tests/steps/test_steps.py`, `tests/test_axiom_crosswalk.py`, `tests/test_capability_registry.py`, `tests/test_dictionary.py`, `tests/test_extraction_registry.py`, `tests/test_spec_gates.py` |
 | spec:D1 | 0037 | `tests/graph/test_traversal.py`, `tests/orchestrator/test_ops.py` |
 | spec:D2 | 0018 | `tests/steps/test_steps.py`, `tests/test_recorded_pipeline.py` |
 | spec:D3 | 0033, 0048 | `tests/graph/test_backend_comparison.py`, `tests/test_admin_graph.py`, `tests/test_companion.py`, `tests/test_term_hygiene.py`, `tests/test_trace_registry.py`, `tests/test_zones.py` |
@@ -160,11 +161,28 @@
 | spec:E5 | 0044, 0046 | `tests/graph/test_decision_wiring.py`, `tests/test_derive_relationships.py`, `tests/test_spec_gates.py`, `tests/test_tree_contract.py`, `tests/tree/test_extract.py` |
 | spec:E6 | 0036, 0044, 0051 | `tests/graph/test_decision_wiring.py`, `tests/orchestrator/test_caption_gate.py`, `tests/orchestrator/test_conclusion.py`, `tests/orchestrator/test_turn_engine.py`, `tests/test_methodology.py`, `tests/test_tree_contract.py`, `tests/tree/test_extract.py` |
 | spec:F | 0044 | `tests/graph/test_decision_wiring.py`, `tests/test_tree_contract.py`, `tests/tree/test_extract.py` |
-| spec:G1 | 0047 | `tests/test_capability_registry.py`, `tests/test_extraction_registry.py`, `tests/test_spec_gates.py` |
-| spec:G2 | 0001, 0047 | `tests/golden/test_parse_goldens.py`, `tests/parser/test_sql_parser.py`, `tests/test_capability_registry.py`, `tests/test_extraction_registry.py`, `tests/test_native_parser_law.py`, `tests/test_spec_gates.py` |
-| spec:G3 | 0047 | `tests/test_capability_registry.py`, `tests/test_extraction_registry.py`, `tests/test_spec_gates.py` |
+| spec:G1 | 0047 | `tests/test_axiom_crosswalk.py`, `tests/test_capability_registry.py`, `tests/test_extraction_registry.py`, `tests/test_spec_gates.py` |
+| spec:G2 | 0001, 0047 | `tests/golden/test_parse_goldens.py`, `tests/parser/test_sql_parser.py`, `tests/test_axiom_crosswalk.py`, `tests/test_capability_registry.py`, `tests/test_extraction_registry.py`, `tests/test_native_parser_law.py`, `tests/test_spec_gates.py` |
+| spec:G3 | 0047 | `tests/test_axiom_crosswalk.py`, `tests/test_capability_registry.py`, `tests/test_extraction_registry.py`, `tests/test_spec_gates.py` |
 | spec:H1 | 0045 | `tests/governance/test_leaf_grounding.py`, `tests/test_escalation_contract.py` |
 | spec:H2 | 0045, 0048 | `tests/governance/test_leaf_grounding.py`, `tests/test_admin_graph.py`, `tests/test_companion.py`, `tests/test_escalation_contract.py`, `tests/test_term_hygiene.py`, `tests/test_trace_registry.py`, `tests/test_zones.py` |
+| spec:L1 | 0064 | `tests/test_ledger_contract.py` |
+| spec:L2 | 0064 | `tests/test_ledger_contract.py` |
+| spec:L3 | 0064 | `tests/test_ledger_contract.py` |
+| spec:P1 | 0051 | `tests/orchestrator/test_turn_engine.py` |
+| spec:P2 | 0051 | `tests/orchestrator/test_turn_engine.py` |
+| spec:P3 | 0051 | `tests/orchestrator/test_turn_engine.py` |
+| spec:P4 | 0051 | `tests/orchestrator/test_turn_engine.py` |
+| spec:P5 | 0051 | `tests/orchestrator/test_turn_engine.py` |
+| spec:P6 | 0051 | `tests/orchestrator/test_turn_engine.py` |
 | spec:Q1 | 0059 | `tests/graph/test_topology.py` |
 | spec:Q2 | 0059 | `tests/graph/test_topology.py` |
 | spec:Q3 | 0059 | `tests/graph/test_topology.py` |
+| spec:R1 | 0060 | `tests/orchestrator/test_parse_plan.py` |
+| spec:R2 | 0062 | `tests/webapp/test_app.py` |
+| spec:R3 | 0060, 0062 | `tests/orchestrator/test_parse_plan.py`, `tests/webapp/test_app.py` |
+| spec:R4 | 0062 | `tests/webapp/test_app.py` |
+| spec:R5 | 0062 | `tests/webapp/test_app.py` |
+| spec:R6 | 0061 | `tests/test_run_layer.py` |
+| spec:R7 | 0061 | `tests/test_run_layer.py` |
+| spec:R8 | 0061 | `tests/test_run_layer.py` |

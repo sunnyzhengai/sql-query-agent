@@ -73,8 +73,8 @@ def _run_executor():
     + msodbcsql18 all absent and the bind failed silently — every
     state distinguishes itself per the error-contract law)."""
     unbound = ("the run layer is unbound: add a run: block (server, "
-               "database) to org_config.yaml — the runbook line is in "
-               "internal/docs/HANDOFF_0055_BUILD.md")
+               "database) to org_config.yaml — the execution contract "
+               "is docs/decisions/0061-the-run-layer.md §3")
     cfg = Path("org_config.yaml")
     if not cfg.exists():
         return None, 200, "", unbound

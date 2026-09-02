@@ -57,7 +57,10 @@ KNOWN_CONTRACTS = {
 }
 
 _PROVES = re.compile(r"^Proves:\s*(.+)$", re.M)
-_TAG = re.compile(r"^(law|contract|spec|family):[\w.-]+$")
+# `axm:` joined 2026-09-01 (ADR 0064 / the crosswalk audit): framework
+# axioms are a distinct citation space from `spec:` — the group letters
+# B, D and R collide across the two, so the prefix is load-bearing.
+_TAG = re.compile(r"^(law|contract|spec|family|axm):[\w.-]+$")
 
 
 def parse_proves(docstring: str) -> "list[str]":
@@ -100,7 +103,7 @@ def accounting(mods: "list[dict]",
                claims: "dict[str, list[str]]"
                ) -> "tuple[list[str], list[str]]":
     """(unaccounted modules, invalid tags) — both empty = totality."""
-    from src.trace_registry import SPEC_AXIOMS
+    from src.trace_registry import AXM_AXIOMS, SPEC_AXIOMS
     unaccounted, invalid = [], []
     for m in mods:
         for tag in m["tags"]:
@@ -119,6 +122,9 @@ def accounting(mods: "list[dict]",
                     f"{m['path']}: unknown contract {slug!r}")
             elif kind == "spec" and slug not in SPEC_AXIOMS:
                 invalid.append(f"{m['path']}: unknown axiom {slug!r}")
+            elif kind == "axm" and slug not in AXM_AXIOMS:
+                invalid.append(
+                    f"{m['path']}: unknown framework axiom {slug!r}")
         if not m["tags"] and m["path"] not in claims:
             unaccounted.append(m["path"])
     return unaccounted, invalid

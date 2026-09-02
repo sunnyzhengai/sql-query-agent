@@ -1,6 +1,50 @@
 # User Flow
 
+<!-- TIER: BLUEPRINT — generated marker, do not remove.
+     Component key: user_flow (src/trace_registry.py ARCHITECTURE_COMPONENTS)
+     Enforced by tests/test_trace_registry.py hierarchy checks. -->
+
+> **Blueprint tier.** This file satisfies axiom groups **axm:M** (Mind)
+> · **axm:B** (Boundary) from
+> [AI_VIA_AXIOMS.md](../AI_VIA_AXIOMS.md), and is the architecture home
+> for 6 decisions
+> (see [TRACE_MAP.md](TRACE_MAP.md#the-blueprint-tier) for the full
+> chain: decision → component → axioms → code → tests).
+
 How questions move through the system — from user input to answer delivery.
+
+> **STANDING DESIGN (reconciled 2026-09-01).** This document was written
+> 2026-07-18 and describes a shape that later decisions replaced. Three
+> corrections govern everything below; where the older text conflicts,
+> these win:
+>
+> 1. **There are no question types, and no two-path branch.** A question
+>    is understood by composition — entity phrases + relation words over
+>    a closed lexicon — and answered through the loop **show → propose →
+>    ask → execute**, iterating as needed. The LLM parses; it never
+>    routes, never composes a query, never authors a verdict (ADR 0060,
+>    0062; `spec:R1`, `spec:R2`). Failure is not a dead end: an
+>    exhausted loop becomes a captured demand handed to a developer,
+>    and the escalation door stands at every round (`spec:R4`).
+> 2. **Execution is a separate, gated tier.** The Basic tier answers
+>    about definitions and does not run queries. Running the confirmed
+>    logic against customer data is Tier 3 (AIVIA Run, ADR 0061): only
+>    the byte-for-byte SQL the user confirmed on glass, read-only,
+>    ScriptDom-gated, TOP-capped, and with rows rendered to the user's
+>    screen and NEVER into the model's context (`spec:R6`–`R8`). It is
+>    **GA-blocked** on the output-side PHI gate. The "Agent assembles
+>    and executes the query → 4.2 hours" step in Path A below therefore
+>    describes an unshipped, gated capability — not current behavior.
+> 3. **Purview is not a parallel answer path.** Report discovery lives
+>    in the graph itself since ADR 0040 (Report/Measure nodes from
+>    TMDL). Purview and Collibra are WRITE targets, reached through the
+>    Write-Back Queue — every proposal approved by a named human before
+>    it lands (ADR 0063). Nothing machine-authored enters an enterprise
+>    record unapproved.
+>
+> The **flywheel** (every question makes the system better) and the
+> **refusal posture** (never guess) are unchanged and remain law —
+> they are the parts of this document that aged well.
 
 ## The Flywheel
 
@@ -63,18 +107,28 @@ The knowledge graph has a certified answer for this question.
    - CTE step 2: `los_calc` — compute hours between admit and discharge
    - Each step stored as a minimal sql_fragment
 
-4. **Agent assembles and executes the query**
-   - Combines sql_fragments into a complete query
-   - Applies dimension filters (e.g., date_range = this quarter)
-   - Executes against source tables: `encounter`, `department`
+4. **Agent shows the definition** *(execution is Tier 3, gated)*
+   - Renders the parsed logic as a stamped map — steps, criteria,
+     source tables — the map IS the answer (ADR 0057 presentation
+     doctrine: AIVIA delivers the map, not the verdict)
+   - Running it against data requires an explicit confirm and the
+     AIVIA Run tier (ADR 0061); nothing is assembled or generated —
+     the SQL that would run is the confirmed step, byte-for-byte
+   - Fragments are provenance, no longer the LLM's input (ADR 0003 as
+     amended by 0044)
 
-5. **Agent checks Purview for existing reports**
-   - Searches Purview catalog for reports covering ER_LOS
+5. **Report links come from the graph, not a Purview lookup**
+   - Report and Measure nodes are in-graph since ADR 0040, so
+     "which report already covers this?" is a traversal
    - If found: "The Monthly ED Dashboard already tracks this — [link]"
-   - If not found: noted as a candidate for future dashboard
 
 6. **Agent returns the answer**
-   - Answer: 4.2 hours (with full lineage showing source tables, logic steps, and certifier)
+   - The stamped map: source tables, logic steps, criteria, and
+     certifier — with a code-stamped headline no LLM prose can
+     contradict (`spec:E6`)
+   - A data value (e.g. "4.2 hours") appears only via the gated Run
+     tier, after an explicit confirm, labelled `N rows · TOP <cap> ·
+     as of <timestamp> · source <db> · read-only`
    - Optional: link to existing dashboard
 
 7. **Usage weight incremented**
@@ -108,9 +162,12 @@ The knowledge graph does not have a certified answer. The agent refuses to guess
    - "I don't have a certified definition for surgical turnover time yet."
    - "I've sent a request to the data steward to review this."
 
-4. **Agent still checks Purview**
-   - Even without a certified graph path, Purview may have an existing report
-   - If found: "I can't calculate this from certified logic, but the OR Efficiency Dashboard may have what you need — [link]"
+4. **Agent still offers what the graph does hold**
+   - Report/Measure nodes (ADR 0040) may cover it even with no
+     certified metric: "I can't compute this from certified logic, but
+     the OR Efficiency Dashboard may have what you need — [link]"
+   - And the escalation door stands: "none of this is right" hands the
+     whole conversation to a developer as captured demand (`spec:R4`)
 
 5. **Steward notification triggered**
    - The question is logged with context:

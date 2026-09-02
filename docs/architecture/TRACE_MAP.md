@@ -1,13 +1,50 @@
-# Trace Map — decision → axioms → code → tests (generated)
+# Trace Map — decision → component → axioms → code → tests (generated)
 
 Generated from `src/trace_registry.py` (ADR 0048).
 Regenerate: `python scripts/generate_docs.py`. Closure checks:
-`tests/test_trace_registry.py` (totality / existence / single
-classification).
+`tests/test_trace_registry.py` (totality / existence / hierarchy /
+single classification).
+
+## The dependency hierarchy
+
+Decisions map **first to an architecture component, and then upward to the axioms** (Sunny's ruling, 2026-09-01). A decision is an engineering choice about a system component; routing through the blueprint says *where* in the system it lives, and keeps decision logs free of repeated philosophical preamble.
+
+```
+  ROOT       docs/AI_VIA_AXIOMS.md      the constitution (axm:*)
+    ^
+  BLUEPRINT  docs/architecture/*.md     topology + boundaries
+    ^                                   (declares axiom GROUPS)
+  EXECUTION  docs/decisions/*.md        one component each
+```
+
+Two citation handles, because the axiom systems are distinct and their group letters (B, D, R) collide: **`axm:M5`** = the framework in `docs/AI_VIA_AXIOMS.md`; **`spec:C1`** = Φ_AIVIA in `docs/architecture/SPEC.md`.
+
+### The blueprint tier
+
+| Component | File | Satisfies | Governs |
+|---|---|---|---|
+| `architecture` | [ARCHITECTURE.md](ARCHITECTURE.md) | axm:D, axm:S | What the system is made of and how data moves through it: the graph layers, the parse spine, the module map. |
+| `connectors` | [SOURCE_CONNECTORS.md](SOURCE_CONNECTORS.md) | axm:D, axm:R | Where customer logic lives, how it is collected, and how change is detected across re-ingests. |
+| `crosswalk` | [AXIOM_CROSSWALK.md](AXIOM_CROSSWALK.md) | axm:S | The bridge between the two axiom systems: which framework law each spec axiom applies here, and which framework laws are meta or unstated gaps. |
+| `integration` | [INTEGRATION_MAP.md](INTEGRATION_MAP.md) | axm:D, axm:B | The connector and catalog landscape as data, including every write target and its direction. |
+| `landing` | [DECISION_LANDING_MATRIX.md](DECISION_LANDING_MATRIX.md) | axm:B, axm:R | Which artifact each governance action produces in Purview/Collibra, and the OUTBOX that remembers it. |
+| `notebook` | [NOTEBOOK_MAP.md](NOTEBOOK_MAP.md) | axm:S, axm:J | Every notebook's registry entry, its served question families, and the AST-enforced planks. |
+| `pipeline` | [PIPELINE_MAP.md](PIPELINE_MAP.md) | axm:D, axm:R | The notebook/stage sequence, each stage's inputs and outputs, and the conservation of rows across them. |
+| `product` | [PRODUCT_TIERS.md](../product/PRODUCT_TIERS.md) | axm:S | What is sold, in what tiers, with which claims and which gates. Bounded by ADR 0063's tier lock; pricing and naming are parked, never invented. |
+| `question` | [QUESTION_MAP.md](QUESTION_MAP.md) | axm:S, axm:M | What the storage must support, audited by question family. NOT a runtime routing table (ADR 0062). |
+| `reference` | [REFERENCE_ARCHITECTURE.md](REFERENCE_ARCHITECTURE.md) | axm:S, axm:B | The product tiers, source connectors, and the customer-tenant deployment footprint. |
+| `spec` | [SPEC.md](SPEC.md) | axm:S, axm:J, axm:M, axm:B, axm:R | The axiom system this codebase is checked against: identity, soundness, completeness, derivation, ask-time determinism, interpretation, and the run-layer boundary. |
+| `sphere` | [SPHERE.md](SPHERE.md) | axm:D, axm:J, axm:R | The four shells, the nervous system, the ownership economy, and the static/dynamic contracts split. |
+| `test` | [TEST_MAP.md](TEST_MAP.md) | axm:J | The verification strata: which check carries which claim, by ADR, standing law, and contract. |
+| `trace` | [TRACE_MAP.md](TRACE_MAP.md) | axm:S, axm:J | This registry, projected: decision -> component -> axioms -> code -> tests. |
+| `user_flow` | [USER_FLOW.md](USER_FLOW.md) | axm:M, axm:B | How a question moves from ask to answer, and how usage feeds the governance flywheel. |
+
+### The execution tier
 
 ## ADR 0001 — Native parsers per SQL dialect
 
 - **Category:** architecture
+- **Component:** `architecture` → `docs/architecture/ARCHITECTURE.md` → axm:D, axm:S
 - **Grounds:** spec:C1, spec:G2
 - **Implemented by:**
   - `src/parser/scriptdom_loader.py`
@@ -25,6 +62,7 @@ classification).
 ## ADR 0002 — Delta tables over an external graph database
 
 - **Category:** architecture
+- **Component:** `architecture` → `docs/architecture/ARCHITECTURE.md` → axm:D, axm:S
 - **Implemented by:**
   - `src/graph/backend.py`
   - `src/graph/delta_backend.py`
@@ -41,6 +79,7 @@ classification).
 ## ADR 0003 — Store sql_fragments, not full SQL blobs
 
 - **Category:** architecture
+- **Component:** `architecture` → `docs/architecture/ARCHITECTURE.md` → axm:D, axm:S
 - **Implemented by:**
   - `src/graph/builder.py`
   - `src/orchestrator/assemble.py`
@@ -53,6 +92,7 @@ classification).
 ## ADR 0004 — Two-stage human-in-the-loop certification
 
 - **Category:** architecture
+- **Component:** `sphere` → `docs/architecture/SPHERE.md` → axm:D, axm:J, axm:R
 - **Implemented by:**
   - `src/governance/steward.py`
 - **Enforced by:**
@@ -63,6 +103,7 @@ classification).
 ## ADR 0005 — Agent refuses when no certified path exists
 
 - **Category:** architecture
+- **Component:** `spec` → `docs/architecture/SPEC.md` → axm:S, axm:J, axm:M, axm:B, axm:R
 - **Grounds:** spec:B1
 - **Implemented by:**
   - `src/agent_backend.py`
@@ -78,6 +119,7 @@ classification).
 ## ADR 0006 — Knowledge graph answers questions; Purview discovers reports
 
 - **Category:** architecture
+- **Component:** `integration` → `docs/architecture/INTEGRATION_MAP.md` → axm:D, axm:B
 - **Implemented by:**
   - `src/adapters/purview.py`
 - **Enforced by:**
@@ -88,6 +130,7 @@ classification).
 ## ADR 0007 — BYOT deployment as a Python library (.whl)
 
 - **Category:** architecture
+- **Component:** `reference` → `docs/architecture/REFERENCE_ARCHITECTURE.md` → axm:S, axm:B
 - **Implemented by:**
   - `src/config.py`
   - `src/engine_floor.py`
@@ -105,12 +148,14 @@ classification).
 ## ADR 0008 — Ship Tier 1 (core agent) first
 
 - **Category:** product
+- **Component:** `product` → `docs/product/PRODUCT_TIERS.md` → axm:S
 - **Summarized in:**
   - `docs/product/MARKETPLACE_LISTING.md`
 
 ## ADR 0009 — Catalog integrations are optional adapters
 
 - **Category:** architecture
+- **Component:** `integration` → `docs/architecture/INTEGRATION_MAP.md` → axm:D, axm:B
 - **Implemented by:**
   - `src/adapters/base.py`
   - `src/adapters/publisher.py`
@@ -131,22 +176,26 @@ classification).
 ## ADR 0010 — Skip Founders Hub Level 3, go direct to Partner Center
 
 - **Category:** product
+- **Component:** `product` → `docs/product/PRODUCT_TIERS.md` → axm:S
 
 ## ADR 0011 — Static install guide for v1; companion trigger now 'admin graph projected' (amended, ADR 0048)
 
 - **Category:** product
+- **Component:** `product` → `docs/product/PRODUCT_TIERS.md` → axm:S
 - **Summarized in:**
   - `docs/deployment/INSTALLATION_GUIDE.md`
 
 ## ADR 0012 — Build on the existing repo, no rewrite
 
-- **Category:** product
+- **Category:** architecture
+- **Component:** `architecture` → `docs/architecture/ARCHITECTURE.md` → axm:D, axm:S
 - **Summarized in:**
   - `docs/architecture/ARCHITECTURE.md`
 
 ## ADR 0013 — List as transactable SaaS on the commercial marketplace
 
 - **Category:** product
+- **Component:** `product` → `docs/product/PRODUCT_TIERS.md` → axm:S
 - **Implemented by:**
   - `src/marketplace/fulfillment.py`
 - **Enforced by:**
@@ -159,6 +208,7 @@ classification).
 ## ADR 0014 — Ground the agent in metric_logic; dictionary is mandatory
 
 - **Category:** architecture
+- **Component:** `architecture` → `docs/architecture/ARCHITECTURE.md` → axm:D, axm:S
 - **Grounds:** spec:C4
 - **Implemented by:**
   - `src/graph/metric_logic.py`
@@ -176,6 +226,7 @@ classification).
 ## ADR 0015 — metric_id is the universal identity
 
 - **Category:** architecture
+- **Component:** `spec` → `docs/architecture/SPEC.md` → axm:S, axm:J, axm:M, axm:B, axm:R
 - **Grounds:** spec:A2
 - **Implemented by:**
   - `src/schemas.py`
@@ -190,6 +241,7 @@ classification).
 ## ADR 0016 — Case-insensitive identifier matching, folded uppercase
 
 - **Category:** architecture
+- **Component:** `spec` → `docs/architecture/SPEC.md` → axm:S, axm:J, axm:M, axm:B, axm:R
 - **Grounds:** spec:A1, spec:A3
 - **Implemented by:**
   - `src/parser/identity.py`
@@ -202,6 +254,7 @@ classification).
 ## ADR 0017 — Resolve-then-traverse agent retrieval
 
 - **Category:** architecture
+- **Component:** `question` → `docs/architecture/QUESTION_MAP.md` → axm:S, axm:M
 - **Implemented by:**
   - `src/graph/templates.py`
   - `src/adapters/fabric_agent.py`
@@ -214,6 +267,7 @@ classification).
 ## ADR 0018 — Materialized closure edges (USES_TABLE)
 
 - **Category:** architecture
+- **Component:** `spec` → `docs/architecture/SPEC.md` → axm:S, axm:J, axm:M, axm:B, axm:R
 - **Grounds:** spec:D2
 - **Implemented by:**
   - `src/graph/export.py`
@@ -227,6 +281,7 @@ classification).
 ## ADR 0019 — CTE descriptions bottom-up, before metric descriptions
 
 - **Category:** architecture
+- **Component:** `pipeline` → `docs/architecture/PIPELINE_MAP.md` → axm:D, axm:R
 - **Implemented by:**
   - `src/descriptions.py`
   - `src/llm_client.py`
@@ -241,6 +296,7 @@ classification).
 ## ADR 0020 — Generator-compatibility LPG export shape
 
 - **Category:** architecture
+- **Component:** `reference` → `docs/architecture/REFERENCE_ARCHITECTURE.md` → axm:S, axm:B
 - **Implemented by:**
   - `src/adapters/collibra_lineage_match.py`
 - **Enforced by:**
@@ -251,6 +307,7 @@ classification).
 ## ADR 0021 — Certification discloses, never gates
 
 - **Category:** architecture
+- **Component:** `sphere` → `docs/architecture/SPHERE.md` → axm:D, axm:J, axm:R
 - **Enforced by:**
   - `tests/test_schemas.py`
 - **Summarized in:**
@@ -259,6 +316,7 @@ classification).
 ## ADR 0022 — Definition versioning: certification pins a content hash
 
 - **Category:** architecture
+- **Component:** `connectors` → `docs/architecture/SOURCE_CONNECTORS.md` → axm:D, axm:R
 - **Enforced by:**
   - `tests/test_schemas.py`
 - **Summarized in:**
@@ -267,6 +325,7 @@ classification).
 ## ADR 0023 — Usage-weighted governance flywheel
 
 - **Category:** architecture
+- **Component:** `sphere` → `docs/architecture/SPHERE.md` → axm:D, axm:J, axm:R
 - **Implemented by:**
   - `src/orchestrator/events.py`
 - **Enforced by:**
@@ -277,6 +336,7 @@ classification).
 ## ADR 0024 — Layered truth: personal beside enterprise definitions
 
 - **Category:** architecture
+- **Component:** `sphere` → `docs/architecture/SPHERE.md` → axm:D, axm:J, axm:R
 - **Enforced by:**
   - `tests/test_schemas.py`
   - `tests/test_table_contracts.py`
@@ -284,6 +344,7 @@ classification).
 ## ADR 0025 — PHI scanning at ingestion; the LLM boundary is the gate
 
 - **Category:** architecture
+- **Component:** `pipeline` → `docs/architecture/PIPELINE_MAP.md` → axm:D, axm:R
 - **Implemented by:**
   - `src/phi_scan.py`
   - `src/steps/parse.py`
@@ -299,6 +360,7 @@ classification).
 ## ADR 0026 — Error-to-data lineage
 
 - **Category:** architecture
+- **Component:** `landing` → `docs/architecture/DECISION_LANDING_MATRIX.md` → axm:B, axm:R
 - **Implemented by:**
   - `src/governance/error_log.py`
   - `src/governance/installation_errors.py`
@@ -313,6 +375,7 @@ classification).
 ## ADR 0027 — Ownership attribution: manual floor, Entra ID enriches
 
 - **Category:** architecture
+- **Component:** `sphere` → `docs/architecture/SPHERE.md` → axm:D, axm:J, axm:R
 - **Enforced by:**
   - `tests/governance/test_steward.py`
 - **Summarized in:**
@@ -321,18 +384,21 @@ classification).
 ## ADR 0028 — Contact-me first; transactable at first-buyer signal
 
 - **Category:** product
+- **Component:** `product` → `docs/product/PRODUCT_TIERS.md` → axm:S
 - **Summarized in:**
   - `docs/product/MARKETPLACE_LISTING.md`
 
 ## ADR 0029 — Dimension layer activation (design pass, unimplemented)
 
 - **Category:** architecture
+- **Component:** `reference` → `docs/architecture/REFERENCE_ARCHITECTURE.md` → axm:S, axm:B
 - **Summarized in:**
   - `docs/architecture/REFERENCE_ARCHITECTURE.md`
 
 ## ADR 0030 — Layered retrieval: search terms first, vectors where allowed
 
 - **Category:** architecture
+- **Component:** `question` → `docs/architecture/QUESTION_MAP.md` → axm:S, axm:M
 - **Implemented by:**
   - `src/steps/search_index.py`
   - `src/orchestrator/kusto.py`
@@ -344,6 +410,7 @@ classification).
 ## ADR 0031 — Business terms: weighted plurality
 
 - **Category:** architecture
+- **Component:** `sphere` → `docs/architecture/SPHERE.md` → axm:D, axm:J, axm:R
 - **Implemented by:**
   - `src/governance/business_terms.py`
 - **Enforced by:**
@@ -352,6 +419,7 @@ classification).
 ## ADR 0032 — Deterministic core, LLM edges
 
 - **Category:** architecture
+- **Component:** `spec` → `docs/architecture/SPEC.md` → axm:S, axm:J, axm:M, axm:B, axm:R
 - **Grounds:** spec:E2
 - **Implemented by:**
   - `src/orchestrator/core.py`
@@ -365,6 +433,7 @@ classification).
 ## ADR 0033 — System of record + projections: Delta is the record
 
 - **Category:** architecture
+- **Component:** `spec` → `docs/architecture/SPEC.md` → axm:S, axm:J, axm:M, axm:B, axm:R
 - **Grounds:** spec:D3
 - **Implemented by:**
   - `src/graph/fabric_graph_backend.py`
@@ -377,10 +446,12 @@ classification).
 ## ADR 0034 — Conversational entry edge (superseded in part by 0035)
 
 - **Category:** architecture
+- **Component:** `user_flow` → `docs/architecture/USER_FLOW.md` → axm:M, axm:B
 
 ## ADR 0035 — Agentic conversation over deterministic tools
 
 - **Category:** architecture
+- **Component:** `user_flow` → `docs/architecture/USER_FLOW.md` → axm:M, axm:B
 - **Grounds:** spec:E3
 - **Implemented by:**
   - `src/orchestrator/agent.py`
@@ -397,7 +468,8 @@ classification).
 
 ## ADR 0036 — Operations are the product: plan, confirm, execute, display
 
-- **Category:** product
+- **Category:** architecture
+- **Component:** `user_flow` → `docs/architecture/USER_FLOW.md` → axm:M, axm:B
 - **Grounds:** spec:E6
 - **Implemented by:**
   - `src/methodology.py`
@@ -413,6 +485,7 @@ classification).
 ## ADR 0037 — The completed algebra: traverse + result-set kernels
 
 - **Category:** architecture
+- **Component:** `question` → `docs/architecture/QUESTION_MAP.md` → axm:S, axm:M
 - **Grounds:** spec:D1
 - **Implemented by:**
   - `src/graph/traversal.py`
@@ -426,7 +499,8 @@ classification).
 
 ## ADR 0038 — The interaction layer: 'no' is input
 
-- **Category:** product
+- **Category:** architecture
+- **Component:** `user_flow` → `docs/architecture/USER_FLOW.md` → axm:M, axm:B
 - **Implemented by:**
   - `src/steps/agent_events.py`
 - **Enforced by:**
@@ -438,6 +512,7 @@ classification).
 ## ADR 0039 — Every error links to its contract
 
 - **Category:** architecture
+- **Component:** `landing` → `docs/architecture/DECISION_LANDING_MATRIX.md` → axm:B, axm:R
 - **Grounds:** spec:C3
 - **Implemented by:**
   - `src/steps/gates.py`
@@ -453,6 +528,7 @@ classification).
 ## ADR 0040 — The consumption layer: reports and measures
 
 - **Category:** architecture
+- **Component:** `integration` → `docs/architecture/INTEGRATION_MAP.md` → axm:D, axm:B
 - **Implemented by:**
   - `src/graph/consumption.py`
   - `src/steps/semantic_models.py`
@@ -471,6 +547,7 @@ classification).
 ## ADR 0041 — M mini-parser, shape registry, fallout capture
 
 - **Category:** architecture
+- **Component:** `connectors` → `docs/architecture/SOURCE_CONNECTORS.md` → axm:D, axm:R
 - **Grounds:** spec:C2
 - **Implemented by:**
   - `src/mquery/parser.py`
@@ -485,6 +562,7 @@ classification).
 ## ADR 0042 — The notebook contract: a harness for the driver layer
 
 - **Category:** architecture
+- **Component:** `notebook` → `docs/architecture/NOTEBOOK_MAP.md` → axm:S, axm:J
 - **Grounds:** spec:C3
 - **Implemented by:**
   - `src/notebook_registry.py`
@@ -499,6 +577,7 @@ classification).
 ## ADR 0043 — The diff kernel: the founding question's shape
 
 - **Category:** architecture
+- **Component:** `question` → `docs/architecture/QUESTION_MAP.md` → axm:S, axm:M
 - **Implemented by:**
   - `src/graph/decomposition_diff.py`
 - **Enforced by:**
@@ -510,6 +589,7 @@ classification).
 ## ADR 0044 — The tree contract: round-trip verified descriptions
 
 - **Category:** architecture
+- **Component:** `spec` → `docs/architecture/SPEC.md` → axm:S, axm:J, axm:M, axm:B, axm:R
 - **Grounds:** spec:B1, spec:B2, spec:C2, spec:E4, spec:E5, spec:E6, spec:F
 - **Implemented by:**
   - `src/tree/extract.py`
@@ -529,6 +609,7 @@ classification).
 ## ADR 0045 — The escalation contract: no silent residue
 
 - **Category:** architecture
+- **Component:** `spec` → `docs/architecture/SPEC.md` → axm:S, axm:J, axm:M, axm:B, axm:R
 - **Grounds:** spec:C2, spec:H1, spec:H2
 - **Implemented by:**
   - `src/governance/leaf_grounding.py`
@@ -541,6 +622,7 @@ classification).
 ## ADR 0046 — Anchor, discover, match, rank — the human picks
 
 - **Category:** architecture
+- **Component:** `question` → `docs/architecture/QUESTION_MAP.md` → axm:S, axm:M
 - **Grounds:** spec:E1, spec:E4, spec:E5
 - **Implemented by:**
   - `src/discovery/paths.py`
@@ -554,6 +636,7 @@ classification).
 ## ADR 0047 — The shadow specification (the axiom system)
 
 - **Category:** architecture
+- **Component:** `crosswalk` → `docs/architecture/AXIOM_CROSSWALK.md` → axm:S
 - **Grounds:** spec:C4, spec:G1, spec:G3, spec:G2
 - **Implemented by:**
   - `src/extraction_registry.py`
@@ -562,12 +645,15 @@ classification).
   - `tests/test_extraction_registry.py`
   - `tests/test_capability_registry.py`
   - `tests/test_spec_gates.py`
+  - `tests/test_axiom_crosswalk.py`
 - **Summarized in:**
   - `docs/architecture/SPEC.md`
+  - `docs/architecture/AXIOM_CROSSWALK.md`
 
 ## ADR 0048 — Declared zones, trace registry, admin graph, companion
 
 - **Category:** architecture
+- **Component:** `trace` → `docs/architecture/TRACE_MAP.md` → axm:S, axm:J
 - **Grounds:** spec:B1, spec:C1, spec:D3, spec:H2
 - **Implemented by:**
   - `src/zones.py`
@@ -587,6 +673,7 @@ classification).
 ## ADR 0049 — Ingestion routes: filedrop, folders, live extractor
 
 - **Category:** architecture
+- **Component:** `connectors` → `docs/architecture/SOURCE_CONNECTORS.md` → axm:D, axm:R
 - **Implemented by:**
   - `src/extractor/connection.py`
   - `src/extractor/discovery.py`
@@ -602,6 +689,7 @@ classification).
 ## ADR 0050 — Bounded read-only answer loop: plan to the answer, caption answers, auto-continue (amends 0036)
 
 - **Category:** architecture
+- **Component:** `user_flow` → `docs/architecture/USER_FLOW.md` → axm:M, axm:B
 - **Grounds:** spec:E3
 - **Implemented by:**
   - `src/orchestrator/turn_engine.py`
@@ -611,7 +699,8 @@ classification).
 ## ADR 0051 — The one-mind turn: one conversation decides, the boundary enforces (supersedes 0036/0050's shape)
 
 - **Category:** architecture
-- **Grounds:** spec:E3, spec:E6
+- **Component:** `spec` → `docs/architecture/SPEC.md` → axm:S, axm:J, axm:M, axm:B, axm:R
+- **Grounds:** spec:E3, spec:E6, spec:P1, spec:P2, spec:P3, spec:P4, spec:P5, spec:P6
 - **Implemented by:**
   - `src/orchestrator/turn_engine.py`
 - **Enforced by:**
@@ -622,6 +711,7 @@ classification).
 ## ADR 0052 — The reachability contract: every graph payload reachable by a named op or excluded with a reason
 
 - **Category:** architecture
+- **Component:** `spec` → `docs/architecture/SPEC.md` → axm:S, axm:J, axm:M, axm:B, axm:R
 - **Grounds:** spec:C1
 - **Implemented by:**
   - `src/reachability.py`
@@ -636,6 +726,7 @@ classification).
 ## ADR 0053 — Projection-grain column lineage: transform_to_column edges, resolved-only, conservation-counted
 
 - **Category:** architecture
+- **Component:** `architecture` → `docs/architecture/ARCHITECTURE.md` → axm:D, axm:S
 - **Grounds:** spec:C1, spec:C2
 - **Implemented by:**
   - `src/graph/builder.py`
@@ -649,6 +740,7 @@ classification).
 ## ADR 0054 — Governance red flags and governed plurality: misnomer/duplicate/cousin sweep over content hashes
 
 - **Category:** architecture
+- **Component:** `sphere` → `docs/architecture/SPHERE.md` → axm:D, axm:J, axm:R
 - **Grounds:** spec:C1, spec:E2
 - **Implemented by:**
   - `src/governance/red_flags.py`
@@ -662,6 +754,7 @@ classification).
 ## ADR 0055 — The designed shape corpus: spec-derived test data (category-partition over name x logic x scope)
 
 - **Category:** architecture
+- **Component:** `test` → `docs/architecture/TEST_MAP.md` → axm:J
 - **Grounds:** spec:E2
 - **Implemented by:**
   - `src/shapes/generator.py`
@@ -675,6 +768,7 @@ classification).
 ## ADR 0056 — The decision algebra: every answer ends in a decision (typed deny, usage weights)
 
 - **Category:** architecture
+- **Component:** `sphere` → `docs/architecture/SPHERE.md` → axm:D, axm:J, axm:R
 - **Implemented by:**
   - `src/flywheel.py`
 - **Enforced by:**
@@ -685,6 +779,7 @@ classification).
 ## ADR 0057 — The Sphere: architecture model, ownership economy, contracts split
 
 - **Category:** architecture
+- **Component:** `sphere` → `docs/architecture/SPHERE.md` → axm:D, axm:J, axm:R
 - **Summarized in:**
   - `docs/decisions/0057-the-sphere.md`
   - `docs/architecture/SPHERE.md`
@@ -692,12 +787,14 @@ classification).
 ## ADR 0058 — The self-service contracts: contracts-first for the Pro pillar (provenance rungs, execution floors)
 
 - **Category:** architecture
+- **Component:** `reference` → `docs/architecture/REFERENCE_ARCHITECTURE.md` → axm:S, axm:B
 - **Summarized in:**
   - `docs/decisions/0058-self-service-contracts.md`
 
 ## ADR 0059 — The graph topology axioms: connected, sound, complete (measured, then formalized)
 
 - **Category:** architecture
+- **Component:** `spec` → `docs/architecture/SPEC.md` → axm:S, axm:J, axm:M, axm:B, axm:R
 - **Grounds:** spec:Q1, spec:Q2, spec:Q3
 - **Implemented by:**
   - `src/graph/topology.py`
@@ -710,36 +807,46 @@ classification).
 ## ADR 0060 — The parse is the plan: parser-only LLM, deterministic traversal, correction flywheel
 
 - **Category:** architecture
+- **Component:** `spec` → `docs/architecture/SPEC.md` → axm:S, axm:J, axm:M, axm:B, axm:R
+- **Grounds:** spec:R1, spec:R3
 - **Implemented by:**
   - `src/orchestrator/parse_plan.py`
 - **Enforced by:**
   - `tests/orchestrator/test_parse_plan.py`
 - **Summarized in:**
   - `docs/decisions/0060-parse-is-the-plan.md`
+  - `docs/architecture/SPEC.md`
 
 ## ADR 0061 — The run layer: Pro runs the confirmed definition
 
 - **Category:** architecture
+- **Component:** `spec` → `docs/architecture/SPEC.md` → axm:S, axm:J, axm:M, axm:B, axm:R
+- **Grounds:** spec:R6, spec:R7, spec:R8
 - **Implemented by:**
   - `src/run_layer.py`
 - **Enforced by:**
   - `tests/test_run_layer.py`
 - **Summarized in:**
   - `docs/decisions/0061-the-run-layer.md`
+  - `docs/architecture/SPEC.md`
 
 ## ADR 0062 — The dialogue loop: show, propose, ask, execute
 
 - **Category:** architecture
+- **Component:** `user_flow` → `docs/architecture/USER_FLOW.md` → axm:M, axm:B
+- **Grounds:** spec:R2, spec:R3, spec:R4, spec:R5
 - **Implemented by:**
   - `src/webapp/app.py`
 - **Enforced by:**
   - `tests/webapp/test_app.py`
 - **Summarized in:**
   - `docs/decisions/0062-the-dialogue-loop.md`
+  - `docs/architecture/SPEC.md`
 
 ## ADR 0063 — The product tiers: X-Ray, Bridge, Workbench, Run
 
 - **Category:** product
+- **Component:** `product` → `docs/product/PRODUCT_TIERS.md` → axm:S
 - **Implemented by:**
   - `src/xray.py`
   - `src/adapters/file_export.py`
@@ -750,3 +857,14 @@ classification).
   - `tests/test_console.py`
 - **Summarized in:**
   - `docs/decisions/0063-product-tiers.md`
+
+## ADR 0064 — Group L: the ledger and drift axioms (closing the crosswalk gaps)
+
+- **Category:** architecture
+- **Component:** `crosswalk` → `docs/architecture/AXIOM_CROSSWALK.md` → axm:S
+- **Grounds:** spec:L1, spec:L2, spec:L3
+- **Enforced by:**
+  - `tests/test_ledger_contract.py`
+- **Summarized in:**
+  - `docs/decisions/0064-the-ledger-and-drift-axioms.md`
+  - `docs/architecture/AXIOM_CROSSWALK.md`

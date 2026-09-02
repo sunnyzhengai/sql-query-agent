@@ -62,3 +62,16 @@ never deleted — its status changes and it links to its replacement.
 | [0049](0049-ingestion-routes-live-extractor.md) | Ingestion routes: filedrop, folders, and the live extractor are peer front doors | Accepted (retroactive record — first ghost finding of the 0048 totality check) |
 | [0050](0050-bounded-read-only-answer-loop.md) | The bounded read-only answer loop: plan to the answer, caption answers, read-only auto-continue — 0035's shape in 0036's frame | Accepted (amends 0036) |
 | [0051](0051-one-mind-turn.md) | The one-mind turn: one conversation decides, the boundary enforces — supersedes the three-call shape of 0036/0050, keeps their floors | Accepted |
+| [0052](0052-reachability-contract.md) | The reachability contract: every graph payload reachable by a named op or excluded with a reason; ratifies SPEC §3b | Accepted |
+| [0053](0053-projection-column-lineage.md) | Projection-grain column lineage: transform_to_column edges, resolved-only, conservation-counted | Accepted |
+| [0054](0054-governance-red-flags-governed-plurality.md) | Governance red flags and governed plurality: misnomer/duplicate/cousin sweep over content hashes; citizen-stewardship disposition | Accepted |
+| [0055](0055-designed-shape-corpus.md) | The designed shape corpus: spec-derived test data, category-partition over name × logic × scope | Accepted |
+| [0056](0056-decision-algebra.md) | The decision algebra: every answer ends in a decision (typed deny, usage weights) | Accepted (typed deny amended by 0057) |
+| [0057](0057-the-sphere.md) | The Sphere: four shells, the nervous system, the ownership economy, the contracts split | Accepted (design record; full model in ../architecture/SPHERE.md) |
+| [0058](0058-self-service-contracts.md) | The self-service contracts: provenance rungs, parameterization, execution floors for the Pro pillar | Accepted (builds with Pro) |
+| [0059](0059-graph-topology-axioms.md) | The graph topology axioms: connected, sound, complete — measured, then formalized as SPEC Group Q | Accepted |
+| [0060](0060-parse-is-the-plan.md) | The parse is the plan: parser-only LLM, deterministic traversal, correction flywheel | Accepted (one-shot confirm superseded by 0062; parse-never-generate core stands) |
+| [0061](0061-the-run-layer.md) | The run layer: Pro runs the confirmed definition — read-only, ScriptDom-gated, rows never enter model context | Accepted (slice 1 built; GA gated on the output-side PHI gate) |
+| [0062](0062-the-dialogue-loop.md) | The dialogue loop: show, propose, ask, execute — there are no question types | Accepted (supersedes 0060's one-shot confirm) |
+| [0063](0063-product-tiers.md) | The product tiers: X-Ray, Bridge, Workbench, Run — artifacts land, chat doesn't | Accepted (TIER LOCK + scope lock) |
+| [0064](0064-the-ledger-and-drift-axioms.md) | Group L: the ledger (append-only obeyed, aggregates derived) and drift-fires — closes the two crosswalk gaps | Accepted (all three calls ruled 2026-09-01; SPEC v0.8) |

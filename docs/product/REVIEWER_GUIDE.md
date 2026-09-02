@@ -55,7 +55,12 @@ The SQL Intelligence Agent automatically:
 1. **Parses** SQL stored procedures and views using Microsoft's native ScriptDom parser (100% accuracy on T-SQL)
 2. **Builds** a three-layer knowledge graph in Delta tables: Business Metrics → Calculation Logic → Source Tables
 3. **Generates** AI-powered business descriptions for each metric
-4. **Enables** a Fabric Data Agent to answer natural language questions about any metric's business logic, data lineage, and governance status
+4. **Answers** natural-language questions about any metric's business
+   logic, data lineage, and governance status — through AIVIA's own
+   dialogue loop (show → propose → ask → execute, ADR 0062), where the
+   model parses the question and deterministic code composes every
+   answer. A Fabric Data Agent may optionally be pointed at the same
+   certified tables, but it is not the product's answer path (ADR 0060).
 
 **The problem it solves:** Organizations have thousands of SQL-based reports with business logic buried in code. Nobody documents them. Analysts wait weeks for answers. This product extracts, organizes, and describes that knowledge automatically.
 

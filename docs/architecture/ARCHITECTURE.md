@@ -1,5 +1,16 @@
 # Architecture
 
+<!-- TIER: BLUEPRINT — generated marker, do not remove.
+     Component key: architecture (src/trace_registry.py ARCHITECTURE_COMPONENTS)
+     Enforced by tests/test_trace_registry.py hierarchy checks. -->
+
+> **Blueprint tier.** This file satisfies axiom groups **axm:D** (Data)
+> · **axm:S** (Specification) from
+> [AI_VIA_AXIOMS.md](../AI_VIA_AXIOMS.md), and is the architecture home
+> for 6 decisions
+> (see [TRACE_MAP.md](TRACE_MAP.md#the-blueprint-tier) for the full
+> chain: decision → component → axioms → code → tests).
+
 ## The System at a Glance
 
 Everything runs inside the customer's tenant. The only service any data
@@ -53,7 +64,17 @@ the product's answer path.)
 
 ## Three-Layer Graph Model
 
-This system builds a **graph of business logic** from SQL, stored in Delta tables, and uses it to ground a Fabric Data Agent so it can answer metric questions with 100% traceable accuracy.
+This system builds a **graph of business logic** from SQL, stored in
+Delta tables, and answers metric questions from it with full
+traceability — every claim carrying the source it came from.
+
+The three layers below are the spine. Two more layers have since joined
+them and are equally load-bearing: the **consumption layer** (Report and
+Measure nodes from TMDL/DAX, ADR 0040) sitting above canonical, and the
+**governance record** (terms, decisions, ownership) alongside. The
+complete four-shell model — foundation → org artifacts → canonical →
+human shell — is [SPHERE.md](SPHERE.md) (ADR 0057); the formal node
+sorts are [SPEC.md](SPEC.md) §4.
 
 ```
 ┌─────────────────────────────────┐
@@ -85,7 +106,17 @@ This system builds a **graph of business logic** from SQL, stored in Delta table
 
 ## User Question Flow
 
-When a user asks the Data Agent a question, two things happen in parallel:
+> **Superseded shape, retained for lineage.** The two-path branch below
+> (certified-path-exists → answer; else → refuse) was the July model. It
+> is no longer how a question is handled: ADR 0062 ABOLISHED question
+> types outright, and the loop is now show → propose → ask → execute,
+> iterating until the user stops or escalates to a developer. What
+> survives from this section is the *refusal posture* (ADR 0005) and the
+> *usage-weight flywheel* (ADR 0023) — both still law. For the current
+> ask-time behavior see SPEC.md §14f (Group R) and ADR 0062; for the
+> current user-facing journey see [USER_FLOW.md](USER_FLOW.md).
+
+When a user asked the Data Agent a question, two things happened in parallel:
 
 ```
 User asks: "What is the average ER length of stay?"
@@ -174,14 +205,21 @@ Native dialect parser (ScriptDom, ANTLR, etc.)
     │ Understands EVERYTHING: DECLARE, IF, WHILE, SELECT, temp tables
     │ Produces a complete, typed AST
     ▼
-Walk AST: extract only SelectStatement / InsertStatement nodes
-    │ Verbatim SQL — zero text corruption
-    ▼
-sqlglot: structural extraction (CTEs, tables, columns, joins)
-    │ Works perfectly on clean, isolated SQL statements
+Walk the SAME AST: CTEs, tables, columns, joins, decision sites
+    │ The parse node is held and passed down — never re-parsed,
+    │ never re-extracted from text
     ▼
 Graph builder: wire nodes and edges
 ```
+
+**The law is total (ADR 0001, amended 2026-08-19).** There is no
+second parser and no fallback zone: `sqlglot` and `sqlparse` are
+deleted repo-wide and CI-banned (`tests/test_native_parser_law.py`;
+`spec:G2` — no registry row may ever sanction them). Earlier revisions
+of this document described a two-stage parse in which ScriptDom
+isolated statements and sqlglot extracted structure from them; that
+stage no longer exists. Structure comes off the ScriptDom AST
+directly.
 
 ### Why this works
 
@@ -222,6 +260,18 @@ decision. Summary:
 
 ## Module Map
 
+> **Orientation, not inventory.** This map shows the ingest→graph spine
+> only. The AUTHORITATIVE, generated module list is
+> [TRACE_MAP.md](TRACE_MAP.md) (every module cited by the decision that
+> owns it — an uncited module is a CI finding, per ADR 0048's totality
+> check). Subsystems deliberately not drawn below, each with its own
+> lineage in TRACE_MAP: `orchestrator/` (the turn engine, ops, the
+> parse plan), `tree/` (the round-trip contract, ADR 0044), `webapp/`
+> (the dialogue loop, ADR 0062), `discovery/`, `shapes/`, `mquery/`,
+> `marketplace/`, plus the seven peer registries and the run layer
+> (`run_layer.py`, ADR 0061), X-Ray (`xray.py`) and console
+> (`console.py`) of the ADR 0063 tiers.
+
 ```
 src/
 ├── config.py              # Load org_config.yaml (pydantic models, gitignored file)
@@ -239,10 +289,9 @@ src/
 │   ├── readiness.py           # 06: deployment gate decision (pure)
 │   └── gates.py               # Registry-driven postcondition gate per notebook
 ├── parser/
-│   ├── sql_parser.py          # SQL -> ParsedSQL (CTEs, table/column refs; sqlglot)
-│   ├── scriptdom_fabric.py    # ScriptDom via pythonnet in Fabric (primary parser)
-│   ├── scriptdom_extractor.py # ScriptDom client wrapper
-│   ├── sql_extractor.py       # sqlparse-based fallback extractor
+│   ├── sql_parser.py          # SQL -> ParsedSQL (CTEs, table/column refs)
+│   ├── scriptdom_fabric.py    # ScriptDom via pythonnet in Fabric (the parser)
+│   ├── scriptdom_loader.py    # ScriptDom assembly load (.NET via pythonnet)
 │   ├── identity.py            # metric_id extraction, case folding, dup detection
 │   └── error_classifier.py    # Parse errors -> user-facing categories/fixes
 ├── graph/
@@ -281,29 +330,38 @@ src/
 ## Data Flow
 
 ```
-SQL Sources ──► sql_parser ──► ParsedSQL
+SQL Sources ──► ScriptDom parse ──► ParsedSQL (+ decision trees)
                                   │
 Data Dictionary ──────────────────┤
                                   ▼
                            GraphBuilder
                                   │
-                    ┌─────────────┼─────────────┐
+                    ┌─────────────┼──────────────┐
                     ▼             ▼              ▼
-             Delta Tables   MetadataGenerator   (future: more)
-            (nodes + edges)       │
-                    │        ┌────┴────┐
-                    ▼        ▼         ▼
-             GraphTraverser  Purview   Collibra
-                    │        Adapter   Adapter
+             Delta Tables   MetadataGenerator  Eventhouse
+            (the RECORD,          │            semantic catalog
+             ADR 0033)       ┌────┴────┐       (a PROJECTION)
+                    │        ▼         ▼
+                    │     Purview   Collibra
+                    │     adapter   adapter
+                    │        └────┬────┘
+                    │             ▼
+                    │      Write-Back Queue (ADR 0063)
+                    │      proposals → human approval → land
                     ▼
-             Fabric Data Agent
-              (user questions)
+             the dialogue loop (ADR 0062)
+             show → propose → ask → execute
                     │
-              ┌─────┴─────┐
-              ▼            ▼
-        Knowledge     Purview Lookup
-        Graph Answer   (existing reports)
+                    ▼
+             stamped map on glass
+             (+ optional run of the CONFIRMED
+              step SQL, read-only — ADR 0061)
 ```
+
+Every non-Delta store above is a **projection** and is rebuilt from the
+record each run (`spec:D3`); none is a second source of truth. The
+Fabric Data Agent can be pointed at the same certified tables as an
+optional surface — it is not the product's answer path (ADR 0060 §3).
 
 ## Deployment Models
 

@@ -10,6 +10,8 @@ caught by hand: a cited test that didn't exist). single classification
 from pathlib import Path
 
 from src.trace_registry import (
+    ARCHITECTURE_COMPONENTS,
+    AXM_GROUPS,
     CATEGORIES,
     SPEC_AXIOMS,
     TRACE_REGISTRY,
@@ -62,6 +64,11 @@ def test_architecture_decisions_carry_code_or_tests():
     either miscategorized or an unimplemented design pass — the only
     sanctioned exceptions are recorded here with their reason."""
     sanctioned = {
+        "0012",  # "build on the existing repo, no rewrite" — a
+                 # decision NOT to act; the whole repo is its artifact,
+                 # so no module can be cited (recategorized from
+                 # product 2026-09-01: it is a build choice, not an
+                 # offer choice)
         "0029",  # design pass, explicitly unimplemented (status line)
         "0034",  # superseded in part by 0035; its artifacts were deleted
         "0058",  # ACCEPTED 2026-08-29 (types-only C2, creator-
@@ -75,6 +82,79 @@ def test_architecture_decisions_carry_code_or_tests():
         and adr not in sanctioned
     ]
     assert not empty, f"architecture ADR(s) with no code and no tests: {empty}"
+
+
+def test_hierarchy_every_decision_names_one_architecture_component():
+    """The DOWNWARD edge (Sunny's ruling, 2026-09-01): a decision is an
+    engineering choice about a system COMPONENT, so every ADR names
+    exactly one — never zero, never a list. This is what routes an ADR's
+    authority up through the blueprint tier instead of straight to the
+    axioms."""
+    bad = []
+    for adr, entry in TRACE_REGISTRY.items():
+        comp = entry.get("component")
+        if not comp:
+            bad.append(f"{adr}: no component — which architecture file "
+                       f"does this decision modify?")
+        elif comp not in ARCHITECTURE_COMPONENTS:
+            bad.append(f"{adr}: component {comp!r} is not in "
+                       f"ARCHITECTURE_COMPONENTS")
+    assert not bad, ("decision(s) not grounded in the blueprint tier:\n  "
+                     + "\n  ".join(bad))
+
+
+def test_hierarchy_every_component_declares_its_axiom_groups():
+    """The UPWARD edge: each architecture file declares which
+    AI_VIA_AXIOMS groups it translates into topology. A blueprint that
+    satisfies nothing is either mis-scoped or not a blueprint."""
+    bad = []
+    for key, comp in ARCHITECTURE_COMPONENTS.items():
+        if not (REPO / comp["doc"]).exists():
+            bad.append(f"{key}: doc {comp['doc']} does not exist")
+        if not comp["satisfies"]:
+            bad.append(f"{key}: declares no axiom group")
+        for g in comp["satisfies"]:
+            if g not in AXM_GROUPS:
+                bad.append(f"{key}: {g!r} is not an AI_VIA_AXIOMS group")
+    assert not bad, "blueprint tier defect(s):\n  " + "\n  ".join(bad)
+
+
+def test_product_and_architecture_stay_separated():
+    """Sunny's ruling, 2026-09-01: the product offering lives in its own
+    folder. A category=product decision may not claim an architecture
+    file as its blueprint — 'what we sell' and 'what we built' are
+    different questions, and mixing them is how pricing language ends
+    up in a topology document."""
+    misfiled = []
+    for adr, entry in TRACE_REGISTRY.items():
+        doc = ARCHITECTURE_COMPONENTS[entry["component"]]["doc"]
+        if entry["category"] == "product" and doc.startswith(
+                "docs/architecture/"):
+            misfiled.append(
+                f"{adr} ({entry['title'][:40]}) -> {doc}: a product "
+                f"decision must route through a docs/product/ blueprint")
+    assert not misfiled, ("product/architecture separation violated:\n  "
+                          + "\n  ".join(misfiled))
+
+
+def test_hierarchy_is_acyclic_and_totally_covered():
+    """No cycles by construction (the tiers are distinct file sets), and
+    every axiom group is reached by at least one blueprint — an
+    unreachable group means the framework declares law the architecture
+    never translates."""
+    architecture_docs = {c["doc"] for c in ARCHITECTURE_COMPONENTS.values()}
+    decision_docs = {f"docs/decisions/{p.name}"
+                     for p in (REPO / "docs" / "decisions").glob("0*.md")}
+    assert not (architecture_docs & decision_docs), (
+        "tier violation: a file is both blueprint and execution tier")
+
+    covered = {g for c in ARCHITECTURE_COMPONENTS.values()
+               for g in c["satisfies"]}
+    missing = sorted(AXM_GROUPS - covered)
+    assert not missing, (
+        f"axiom group(s) no architecture file claims to satisfy: {missing} "
+        f"— either a blueprint is missing the declaration, or the group is "
+        f"aspirational and should say so in docs/AI_VIA_AXIOMS.md")
 
 
 def test_single_classification_governed_or_internal():

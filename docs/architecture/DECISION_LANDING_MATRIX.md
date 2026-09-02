@@ -1,5 +1,16 @@
 # The decision landing matrix — AIVIA · Purview · Collibra
 
+<!-- TIER: BLUEPRINT — generated marker, do not remove.
+     Component key: landing (src/trace_registry.py ARCHITECTURE_COMPONENTS)
+     Enforced by tests/test_trace_registry.py hierarchy checks. -->
+
+> **Blueprint tier.** This file satisfies axiom groups **axm:B**
+> (Boundary) · **axm:R** (Residue & Ledger) from
+> [AI_VIA_AXIOMS.md](../AI_VIA_AXIOMS.md), and is the architecture home
+> for 2 decisions
+> (see [TRACE_MAP.md](TRACE_MAP.md#the-blueprint-tier) for the full
+> chain: decision → component → axioms → code → tests).
+
 **Status:** DRAFT v3 2026-08-31 — rebuilt on Sunny's three
 rulings: (1) HIERARCHY replaces official/sibling, parent is a
 CONCEPT node, never a promoted child; (2) approval happens in the

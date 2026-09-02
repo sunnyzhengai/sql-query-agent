@@ -1,5 +1,16 @@
 # The Sphere — AIVIA's complete architecture model
 
+<!-- TIER: BLUEPRINT — generated marker, do not remove.
+     Component key: sphere (src/trace_registry.py ARCHITECTURE_COMPONENTS)
+     Enforced by tests/test_trace_registry.py hierarchy checks. -->
+
+> **Blueprint tier.** This file satisfies axiom groups **axm:D** (Data)
+> · **axm:J** (Judgment) · **axm:R** (Residue & Ledger) from
+> [AI_VIA_AXIOMS.md](../AI_VIA_AXIOMS.md), and is the architecture home
+> for 9 decisions
+> (see [TRACE_MAP.md](TRACE_MAP.md#the-blueprint-tier) for the full
+> chain: decision → component → axioms → code → tests).
+
 **Design record of the Sunny + review-session debates, 2026-08-25.
 Ratified by ADR 0057. This is the big picture the product answers
 to; the build queue is governed separately.**

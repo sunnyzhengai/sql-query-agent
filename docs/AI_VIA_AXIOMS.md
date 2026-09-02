@@ -9,6 +9,39 @@ axiom below descends from a documented incident in its construction or
 a proof in its specification (`docs/architecture/SPEC.md`). The name is
 the thesis: **AI VIa Axioms** — the product is the framework's proof.
 
+<!-- TIER: ROOT — the constitution. Nothing above this file. -->
+
+> **Root tier — the constitution.** This document is the top of a
+> strict three-tier dependency chain (Sunny's ruling, 2026-09-01).
+> Nothing sits above it; it depends on nothing below it.
+>
+> ```
+>   ROOT       docs/AI_VIA_AXIOMS.md      this file (axm:*)
+>     ^
+>   BLUEPRINT  docs/architecture/*.md     topology + boundaries; each
+>     ^                                   file declares the axiom
+>     |                                   GROUPS it satisfies
+>   EXECUTION  docs/decisions/*.md        each ADR names ONE component
+> ```
+>
+> **Citation handle: `axm:M5`** — this file's axioms. Distinct from
+> **`spec:C1`**, which cites Φ_AIVIA in
+> [architecture/SPEC.md](architecture/SPEC.md). The two systems are
+> separate and their group letters (**B**, **D**, **R**) collide, so a
+> bare id is ambiguous — always prefix.
+>
+> A decision record reaches these axioms *through* its architecture
+> file, never directly: an ADR is an engineering choice about a system
+> component, and routing through the blueprint says *where* the change
+> lives. The full chain is generated at
+> [architecture/TRACE_MAP.md](architecture/TRACE_MAP.md#the-dependency-hierarchy)
+> and enforced by `tests/test_trace_registry.py`.
+>
+> Which blueprint translates which group is declared in each
+> architecture file's own header — and every group here is claimed by
+> at least one of them (a CI-checked totality: an axiom no blueprint
+> translates is either an undeclared gap or aspirational law).
+
 ## The claim, honestly scoped
 
 This framework offers **conditional guarantees**: *if* a system

@@ -10,9 +10,35 @@
 
 ## Executive Summary
 
-AIVIA Data Empowerment Suite is a Fabric-native data governance platform that extracts business logic from SQL stored procedures, builds a certified knowledge graph, and enables self-service analytics through a Microsoft Fabric Data Agent. This document describes AIVIA's security architecture, data handling practices, and compliance posture.
+AIVIA Data Empowerment Suite is a Fabric-native data governance platform that extracts business logic from SQL stored procedures, builds a certified knowledge graph, and answers questions about how metrics are defined. This document describes AIVIA's security architecture, data handling practices, and compliance posture.
 
 **Key security principle:** AIVIA operates on a **Bring Your Own Tenant (BYOT)** model. All customer data remains within the customer's own Microsoft Fabric environment. AIVIA does not host, store, transmit, or access customer data outside of the customer's tenant.
+
+**The data boundary (ADR 0061, added 2026-09-01).** Where AIVIA
+executes logic against customer data at all — the gated Run tier — the
+boundary is architectural, not procedural:
+
+- **Result rows never enter the language model's context.** Rows render
+  to the user's screen; the model receives machine-composed stamps only
+  (row count, column schema, elapsed time, as-of timestamp, source).
+  The AI governs the question; the database answers it; the model never
+  touches a patient record. This is cage-tested, not policy.
+- **Nothing is generated.** The SQL that executes is byte-for-byte the
+  parsed, displayed statement the user confirmed on screen — this is
+  not NL2SQL.
+- **Read-only by construction:** a dedicated read-only credential AND a
+  Microsoft ScriptDom statement-type check that admits a single SELECT.
+  DML/DDL/EXEC are refused by the parser, never by pattern matching.
+- **Bounded:** statement timeout, TOP-N row cap, and result-size cap,
+  with the cap disclosed in the result label rather than silently
+  truncating.
+- **Gate, not a promise:** execution against real customer estates is
+  GA-blocked pending the output-side PHI gate and dedicated read-only
+  principals. Current capability runs on synthetic data only.
+
+**Scope note:** the Microsoft Fabric Data Agent appears in this
+document as an optional customer-configured surface over the same
+certified tables. It is not AIVIA's answer path (ADR 0060).
 
 ---
 

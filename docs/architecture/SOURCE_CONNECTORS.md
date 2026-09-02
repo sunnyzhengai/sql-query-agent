@@ -1,5 +1,16 @@
 # Source Connectors & Change Monitoring
 
+<!-- TIER: BLUEPRINT — generated marker, do not remove.
+     Component key: connectors (src/trace_registry.py ARCHITECTURE_COMPONENTS)
+     Enforced by tests/test_trace_registry.py hierarchy checks. -->
+
+> **Blueprint tier.** This file satisfies axiom groups **axm:D** (Data)
+> · **axm:R** (Residue & Ledger) from
+> [AI_VIA_AXIOMS.md](../AI_VIA_AXIOMS.md), and is the architecture home
+> for 3 decisions
+> (see [TRACE_MAP.md](TRACE_MAP.md#the-blueprint-tier) for the full
+> chain: decision → component → axioms → code → tests).
+
 **Date:** 2026-08-11 · **Status:** research + modular plan (Sunny's ask:
 "we can't assume every customer uploads SQL files like I do")
 

@@ -1,7 +1,23 @@
 # Φ_AIVIA — The Shadow Specification
 
-**Version:** 0.6 (adopted; ADR 0047, extended by ADR 0048, 0051; §3b ratified by ADR 0052, first live use: the reachability contract)
-**Date:** 2026-08-19 (v0.5: 2026-08-21)
+<!-- TIER: BLUEPRINT — generated marker, do not remove.
+     Component key: spec (src/trace_registry.py ARCHITECTURE_COMPONENTS)
+     Enforced by tests/test_trace_registry.py hierarchy checks. -->
+
+> **Blueprint tier.** This file satisfies axiom groups **axm:S**
+> (Specification) · **axm:J** (Judgment) · **axm:M** (Mind) · **axm:B**
+> (Boundary) · **axm:R** (Residue & Ledger) from
+> [AI_VIA_AXIOMS.md](../AI_VIA_AXIOMS.md), and is the architecture home
+> for 14 decisions
+> (see [TRACE_MAP.md](TRACE_MAP.md#the-blueprint-tier) for the full
+> chain: decision → component → axioms → code → tests).
+
+**Version:** 0.8 (adopted; ADR 0047, extended by ADR 0048, 0051, 0059, 0064;
+§3b ratified by ADR 0052, first live use: the reachability contract;
+v0.7 adds Group R — the ask-time interpretation axioms of ADR
+0060/0062 — and the run-layer boundary of ADR 0061; v0.8 adds Group L,
+the ledger, closing the crosswalk's two gaps)
+**Date:** 2026-08-19 (v0.5: 2026-08-21; v0.6: 2026-08-26; v0.7/v0.8: 2026-09-01)
 **Origin:** review session with Sunny; motivated by three recurring deviation
 classes discovered by code-walking: (1) missing EMR join edges — the technical
 layer was not the complete vendor join map; (2) LLM components repeatedly
@@ -38,6 +54,16 @@ this theory.
 
 Citation handle: `spec:<axiom-id>` (e.g. `spec:C1`), the ADR 0039 pattern
 applied to the spec itself.
+
+**Relationship to the framework (the tier above).** Φ_AIVIA is *this
+system's* theory; [AI_VIA_AXIOMS.md](../AI_VIA_AXIOMS.md) is the
+general framework AIVIA is the reference implementation of. This file
+translates framework groups **axm:S** (Specification), **axm:J**
+(Judgment), **axm:M** (Mind), **axm:B** (Boundary) and **axm:R**
+(Residue & Ledger) into checkable sentences about this codebase. The
+two ID spaces are distinct and their group letters collide — `spec:B1`
+(witness totality, here) is not `axm:B1` (no claim without a witness,
+there), though the first is the second made mechanical. Always prefix.
 
 ---
 
@@ -723,6 +749,117 @@ their islands are legitimate states enumerated for visibility, never
 findings, never queue entries, never flags. Q1's principal-component
 requirement binds derived layers only.
 
+## 14f. Group R — ask-time interpretation (v0.7, ADRs 0060 + 0062)
+
+Groups E and P govern what happens once a question is understood.
+Group R governs the UNDERSTANDING itself — the seam ADR 0060 found
+open (the LLM chose the route) and ADR 0062 closed (there are no
+routes to choose). The E-group's "which decider is legal where"
+(E3) now has a fourth seat with a stated occupant: interpretation
+is the LLM's ONLY authorship, and it is bounded by confirmation.
+
+**Relation to Group P.** P1 ("one conversation decides a turn") is
+unchanged; R constrains what that conversation may DECIDE. P3's
+thinking room survives; R2 removes route choice from the set of
+things thinking may land on.
+
+| axiom | statement | binding | status |
+|---|---|---|---|
+| R1 | **Parse, never generate.** The LLM maps the sentence to entity phrases + relation words drawn from a closed lexicon; it never composes a query, never selects a route, never authors a verdict. A model-composed query cannot be stamped; a parse can be confirmed. | `src/orchestrator/parse_plan.py` + `tests/orchestrator/test_parse_plan.py`; the closed-vocabulary lexicon is data, not prose | ENFORCED (prototype + measured gate: PARSE_EXPERIMENT, 7/7 oracles vs 5/7) |
+| R2 | **No question types.** The answer's shape EMERGES from the matched subgraph; no enumeration of question shapes, classes, or families may exist in the control path. (0062's abolition; the P4 casebook ban generalized from prompts to structure.) | control-path lexicon scan (`tests/test_methodology.py`) + the P4 banned-vocabulary pin | ENFORCED for the control path |
+| R3 | **Interpretation confirms before it executes.** Every reading renders on glass and waits for the click; fuzzy grounding may NOMINATE, only the human's click EXECUTES. Plan-confirm-execute-display applied to the interpretation itself (0060 call 1, RULED: confirm every parse). | the iteration card (`src/webapp/app.py` + `tests/webapp/test_app.py`) | ENFORCED |
+| R4 | **No dead ends.** Every state — failure, empty, ambiguity, exhaustion — renders as action items; an exhausted loop becomes a CAPTURED DEMAND handoff to a developer, never a shrug. The escalation door stands at every round. | `/api/escalate` capture as a 0056 deny event; `tests/webapp/test_app.py` | ENFORCED |
+| R5 | **Certain answers.** Under ambiguity, execute only what every surviving reading supports; only genuine ambiguity spawns a clarify item. We iterate on UNDERSTANDING, never on mechanical execution steps. | the no-nag boundary in the loop; 0062:A6 (database-theory certain answers) | PARTIAL — the rule is implemented in the loop; no general multi-reading intersection check |
+
+**The R-group's pedigree** is ADR 0062 §3, the standing axiom
+register `0062:A1…A6` (compositionality, small algebras, formal-layer
+completeness, irreducible ambiguity, interaction-closes-the-gap,
+certain answers). Cite `0062:A<n>` alongside `spec:R<n>` in drift
+debates — the ADR carries the literature, this group carries the law.
+
+## 14g. The run-layer boundary (v0.7, ADR 0061)
+
+The Pro tier executes confirmed logic against the customer's
+source. Its axioms are boundary axioms — they extend P5 (honesty at
+the boundary) to DATA, and they are the reason the tier is
+sayable out loud: *the AI governs the question; the database
+answers it; the model never touches a patient.*
+
+| axiom | statement | binding | status |
+|---|---|---|---|
+| R6 | **Rows never enter model context.** Results render to the USER'S GLASS; the model sees machine stamps only — row count, column schema, elapsed, as-of, source. P5 absolute, extended to result sets. | cage tests in `tests/test_run_layer.py` | ENFORCED |
+| R7 | **Nothing is generated; the confirmed SQL is what runs.** Byte-for-byte the parsed, displayed step the user confirmed — not NL2SQL. Read-only by construction: a dedicated read-only credential AND a ScriptDom statement-type check (the native-parser law: the parser decides, never regex). DML/DDL/EXEC → typed refusal. | `src/run_layer.py` single-SELECT gate | ENFORCED |
+| R8 | **Sampling is machine-labelled.** Every result carries `N rows · TOP <cap> · as of <timestamp> · source <db> · read-only`, composed by code, never model-written. The cap is a disclosed fact, not a hidden truncation (E6's presentation honesty, applied to data). | run stamps in `src/run_layer.py` | ENFORCED |
+
+**Stated gap (listing-blocking, recorded in ADR 0061 §3):** slice 1
+runs on the synthetic demo estate only. The **output-side PHI gate**
+and dedicated read-only principals are DESIGN-REQUIRED before any
+customer source is ever bound. This is a gate, not a debt — Tier 3
+GA is blocked on it.
+
+## 14h. Group L — the ledger (v0.8, ADR 0064; ratified 2026-09-01)
+
+Found by the crosswalk audit (`AXIOM_CROSSWALK.md`): two framework
+laws — `axm:R4` (the ledger) and `axm:R2` (drift fires mechanically) —
+were **enforced in code but stated in no axiom**. §4's signature Σ even
+lists `Event (append-only)`, so the spec *presumed* the law it never
+wrote down. That is precisely the failure §1's closure claim promises
+to prevent, so the axioms join here rather than the gap being noted and
+left.
+
+**L1 — append-only is declared AND obeyed.**
+
+    ∀t ∈ Tables.  write_mode(t) ∈ {overwrite, append}
+    ∧  write_mode(t) = append  →  no writer of t uses overwrite semantics
+
+*Gloss:* a table that declares itself a ledger may only ever grow. The
+declaration existed since the beginning (`TABLE_REGISTRY.write_mode`;
+39 overwrite / 10 append) and the label's legality was checked — but
+nothing checked the label was HONOURED. An append flipped to overwrite
+destroys every prior run's telemetry silently.
+*Origin:* ADR 0064; the 2026-08-15 audit note in 500_validate ("a
+failing append must RAISE — never silently become an overwrite").
+*Binding:* `tests/test_table_contracts.py` (label legality) +
+`tests/test_ledger_contract.py::test_l1_append_tables_are_never_overwritten`
+— scans every `*.Notebook/notebook-content.py` for
+`.write…saveAsTable()` against an append-declared table, rejecting
+`mode("overwrite")` and unguarded no-mode writes (first-creation is
+legal only behind a `tableExists()` guard). **Status: ENFORCED**
+
+**L2 — aggregates are derived, never stored.**
+
+    ∀a ∈ Aggregates.  a = f(Events),  f deterministic and recomputable
+    no counter is mutated in place
+
+*Gloss:* usage weights, funnel counts, and every governance number are
+recomputed from the append-only log — never incremented on a stored
+row. This is D3 (projections are functions of the record) applied to
+COUNTS, and it is the law the purged UsageTracker broke.
+*Origin:* ADR 0064; the purged in-place usage counter (`axm:R4`'s
+descent), which had no regression guard until now — the corpse-to-
+fixture rule (`axm:J3`) applied retroactively.
+*Binding:* `tests/test_ledger_contract.py::test_l2_no_stored_aggregate_is_mutated_in_place`
+(AST-adjacent scan over `src/`) +
+`::test_l2_event_tables_are_append_mode`. **Status: ENFORCED**
+
+**L3 — every declaration has a firing mechanism.**
+
+    ∀d ∈ Declarations.  ∃m.  fires(m, divergence(d))
+
+*Gloss:* §3b's third question, promoted from a review ritual to an
+axiom: when reality diverges from a declaration, something MECHANICAL
+fires — a red build, a checklist row, a funnel bar. "Someone would
+notice" is the definition of a missing feedback loop.
+*Origin:* ADR 0064, closing `axm:R2`.
+*Binding:* **by citation** — the ADR 0059 Q3 precedent, where the
+equations predated the axiom and no new mechanism was needed: the seven
+registry closure checks (extraction, capability, notebook, trace,
+integration, shape, table), `src/governance/funnel.py`, and
+`src/reachability.py` ARE the firing mechanisms. Each registry's
+closure test is its declaration's tripwire. **Status: ENFORCED (by
+citation)** — stated gap: a NEW declaration acquires its mechanism by
+review (§3b), not yet by a mechanical check that one exists.
+
 ## 15. Honest limits
 
 1. **C1 cannot force conception.** The inventory makes "sources we haven't
@@ -760,6 +897,32 @@ governs generated artifacts revs the relevant `*_CONTRACT_VERSION` cache keys
 ---
 
 ## Changelog
+
+- **0.8 (2026-09-01)** — Group L, the ledger (§14h, ADR 0064): L1
+  append-only declared AND obeyed, L2 aggregates derived never stored,
+  L3 every declaration has a firing mechanism. Closes the two real gaps
+  the crosswalk audit found (`axm:R4`, `axm:R2`) — laws this codebase
+  enforced but the spec never stated, which contradicted §1's closure
+  claim. L1 and L2 ship ENFORCED with new checks
+  (`tests/test_ledger_contract.py`, verified against injected
+  violations); L3 is ENFORCED by citation of the existing registry
+  closure checks (the 0059 Q3 precedent). Also recorded: Group P
+  (P1–P6, ADR 0051) had been ratified in §14c since 2026-08-21 but was
+  never registered in `SPEC_AXIOMS`, so no ADR could cite `spec:P1` —
+  found by the same audit, now fixed and wired to 0051.
+
+- **0.7 (2026-09-01)** — architectural audit + reconciliation. Group R
+  (§14f) — ask-time interpretation, from ADR 0060 (parse, never
+  generate) and ADR 0062 (there are no question types; show, propose,
+  ask, execute): R1 parse-never-generate, R2 no-question-types, R3
+  confirm-before-execute, R4 no-dead-ends, R5 certain answers. The
+  run-layer boundary (§14g) from ADR 0061: R6 rows-never-in-context,
+  R7 confirmed-SQL-only + read-only by ScriptDom check, R8 machine-
+  labelled sampling; the output-side PHI gate recorded as a
+  GA-blocking gate. The 0062:A1–A6 axiom register is recorded as
+  citable pedigree alongside spec:IDs. No existing axiom changed —
+  Group R constrains the interpretation seat that E3 typed and P1
+  seated; E and P are unamended.
 
 - **0.6 (2026-08-21)** — §3b the design-review clause (Sunny's
   mandate, review-session authored, dev ratifies with the next ADR):

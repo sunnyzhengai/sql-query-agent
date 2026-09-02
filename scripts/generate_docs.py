@@ -236,22 +236,68 @@ TRACE_MAP_PATH = PROJECT_ROOT / "docs" / "architecture" / "TRACE_MAP.md"
 def build_trace_map() -> str:
     """TRACE_MAP.md — the trace registry projected as a readable map
     (ADR 0048 item 2): open any ADR, see its axioms, code, tests."""
-    from src.trace_registry import TRACE_REGISTRY
+    from src.trace_registry import ARCHITECTURE_COMPONENTS, TRACE_REGISTRY
 
     lines = [
-        "# Trace Map — decision → axioms → code → tests (generated)",
+        "# Trace Map — decision → component → axioms → code → tests "
+        "(generated)",
         "",
         "Generated from `src/trace_registry.py` (ADR 0048).",
         "Regenerate: `python scripts/generate_docs.py`. Closure checks:",
-        "`tests/test_trace_registry.py` (totality / existence / single",
-        "classification).",
+        "`tests/test_trace_registry.py` (totality / existence / hierarchy /",
+        "single classification).",
         "",
+        "## The dependency hierarchy",
+        "",
+        "Decisions map **first to an architecture component, and then "
+        "upward to the axioms** (Sunny's ruling, 2026-09-01). A decision "
+        "is an engineering choice about a system component; routing "
+        "through the blueprint says *where* in the system it lives, and "
+        "keeps decision logs free of repeated philosophical preamble.",
+        "",
+        "```",
+        "  ROOT       docs/AI_VIA_AXIOMS.md      the constitution (axm:*)",
+        "    ^",
+        "  BLUEPRINT  docs/architecture/*.md     topology + boundaries",
+        "    ^                                   (declares axiom GROUPS)",
+        "  EXECUTION  docs/decisions/*.md        one component each",
+        "```",
+        "",
+        "Two citation handles, because the axiom systems are distinct and "
+        "their group letters (B, D, R) collide: **`axm:M5`** = the "
+        "framework in `docs/AI_VIA_AXIOMS.md`; **`spec:C1`** = Φ_AIVIA in "
+        "`docs/architecture/SPEC.md`.",
+        "",
+        "### The blueprint tier",
+        "",
+        "| Component | File | Satisfies | Governs |",
+        "|---|---|---|---|",
     ]
+    for key in sorted(ARCHITECTURE_COMPONENTS):
+        c = ARCHITECTURE_COMPONENTS[key]
+        groups = ", ".join(f"axm:{g}" for g in c["satisfies"])
+        # TRACE_MAP.md lives in docs/architecture/, so a doc path
+        # "docs/architecture/X.md" is a sibling and "docs/product/X.md"
+        # is one level up.
+        rel = c["doc"].replace("docs/architecture/", "").replace(
+            "docs/", "../")
+        lines.append(
+            f"| `{key}` | [{c['doc'].split('/')[-1]}]"
+            f"({rel}) | {groups} | {c['governs']} |")
+    lines.append("")
+    lines.append("### The execution tier")
+    lines.append("")
+
     for adr in sorted(TRACE_REGISTRY):
         e = TRACE_REGISTRY[adr]
         lines.append(f"## ADR {adr} — {e['title']}")
         lines.append("")
         lines.append(f"- **Category:** {e['category']}")
+        comp = ARCHITECTURE_COMPONENTS[e["component"]]
+        groups = ", ".join(f"axm:{g}" for g in comp["satisfies"])
+        lines.append(
+            f"- **Component:** `{e['component']}` → "
+            f"`{comp['doc']}` → {groups}")
         if e["axioms"]:
             axioms = ", ".join(f"spec:{a}" for a in e["axioms"])
             lines.append(f"- **Grounds:** {axioms}")

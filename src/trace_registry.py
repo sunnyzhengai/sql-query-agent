@@ -29,17 +29,235 @@ SPEC_AXIOMS = frozenset({
     "A1", "A2", "A3", "B1", "B2", "C1", "C2", "C3", "C4",
     "D1", "D2", "D3", "E1", "E2", "E3", "E4", "E5", "E6", "F",
     "G1", "G2", "G3", "H1", "H2",
+    # Group P — the one-mind turn (SPEC section 14c, ADR 0051,
+    # ratified 2026-08-21). MISSING from this set until 2026-09-01 —
+    # found by the crosswalk audit: the axioms were ENFORCED and cited
+    # in SPEC, but no ADR could reference spec:P1..P6 because the ids
+    # did not exist here. Group Q was registered on arrival; P was not.
+    "P1", "P2", "P3", "P4", "P5", "P6",
+    # Group L — the ledger (SPEC section 14h, ADR 0064, ratified
+    # 2026-09-01): append-only obeyed, aggregates derived, every
+    # declaration has a firing mechanism. Closes axm:R4 and axm:R2.
+    "L1", "L2", "L3",
     # Group Q — graph topology (ADR 0059, ratified 2026-08-26; the
     # ADR's G1-G3, renamed on entry because spec group G was taken)
     "Q1", "Q2", "Q3",
+    # Group R — ask-time interpretation (ADRs 0060 + 0062) and the
+    # run-layer boundary (ADR 0061), spec v0.7 §14f/§14g. R1-R5 govern
+    # how a question is UNDERSTOOD (the seat E3 typed, P1 seated);
+    # R6-R8 extend P5's boundary honesty to executed data.
+    "R1", "R2", "R3", "R4", "R5", "R6", "R7", "R8",
 })
 
 CATEGORIES = ("architecture", "product")
+
+# ---------------------------------------------------------------------
+# The documentation dependency hierarchy (Sunny's ruling, 2026-09-01)
+# ---------------------------------------------------------------------
+# Three tiers, one direction — a strict chain, no cycles:
+#
+#   ROOT       docs/AI_VIA_AXIOMS.md      the constitution (axm:*)
+#     ^
+#   BLUEPRINT  docs/architecture/*.md     system topology + boundaries
+#     ^        docs/product/PRODUCT_TIERS  the OFFER (kept separate:
+#     |                                    Sunny's ruling 2026-09-01)
+#     |                                   (each declares the axiom
+#     |                                    GROUPS it satisfies)
+#   EXECUTION  docs/decisions/*.md        one component each; authority
+#                                         reaches the axioms THROUGH
+#                                         its blueprint file
+#
+# Why the indirection: an ADR is an engineering choice about a SYSTEM
+# COMPONENT. Routing through the blueprint says WHERE the change lives,
+# and keeps decision logs free of repeated philosophical preamble. The
+# audit trail reads: ADR 0061 changes the run layer -> the run layer is
+# specified in SPEC.md -> SPEC.md satisfies axiom groups M and B.
+#
+# CITATION HANDLES (the two axiom systems are DISTINCT — group letters
+# B, D and R collide across them, so a bare id is ambiguous):
+#   axm:M5   -> docs/AI_VIA_AXIOMS.md   the framework (root law)
+#   spec:C1  -> docs/architecture/SPEC.md  the shadow spec (this system)
+
+# Framework axiom ids defined by docs/AI_VIA_AXIOMS.md.
+AXM_AXIOMS = frozenset({
+    "D1", "D2", "D3", "D4",          # Data
+    "S1", "S2", "S3",                # Specification
+    "J1", "J2", "J3", "J4",          # Judgment
+    "M1", "M2", "M3", "M4", "M5",    # Mind
+    "B1", "B2", "B3", "B4",          # Boundary
+    "R1", "R2", "R3", "R4",          # Residue & Ledger
+})
+
+AXM_GROUPS = frozenset({"D", "S", "J", "M", "B", "R"})
+
+# The CROSSWALK: every spec axiom -> the framework axiom(s) it applies
+# here. Audited 2026-09-01; the prose lives in
+# docs/architecture/AXIOM_CROSSWALK.md, this is the checkable form.
+# NOT a bijection by design: the framework is general law, the spec is
+# that law made mechanical for THIS codebase, so one framework axiom
+# legitimately spawns several spec axioms (axm:D2 -> A1, A3, G1-G3).
+SPEC_TO_AXM = {
+    "A1": ["D2"], "A2": ["D3"], "A3": ["D2"],
+    "B1": ["B1"], "B2": ["B1", "J4"],
+    "C1": ["D1"], "C2": ["R1"], "C3": ["R1"], "C4": ["R1", "D1"],
+    "D1": ["D4"], "D2": ["J1"], "D3": ["D3"],
+    "E1": ["S3"], "E2": ["J2"], "E3": ["M5", "J2"], "E4": ["M5"],
+    "E5": ["B1"], "E6": ["B2", "B3"],
+    "F": ["J4"],
+    "G1": ["D2"], "G2": ["D2"], "G3": ["D2"],
+    "H1": ["R3"], "H2": ["R3"],
+    "P1": ["M2"], "P2": ["M2"], "P3": ["M3"], "P4": ["M4"],
+    "P5": ["B2"], "P6": ["M1"],
+    "L1": ["R4"], "L2": ["R4", "D3"], "L3": ["R2"],
+    "Q1": ["D1"], "Q2": ["B1"], "Q3": ["B3"],
+    "R1": ["M4", "M5"], "R2": ["M4"], "R3": ["B4"], "R4": ["R3"],
+    "R5": ["B3"], "R6": ["B2"], "R7": ["B4"], "R8": ["B3"],
+}
+
+# Framework axioms with NO spec axiom, each with its recorded reason.
+# meta  = a law ABOUT having a spec; implementing it as a spec axiom
+#         would be circular. Satisfied by the spec existing/being kept.
+# gap   = REAL LAW, enforced in code, but never stated as an axiom —
+#         a finding against SPEC's own closure claim (§1), not an
+#         artifact of the mapping. Closing these needs an ADR (§16).
+# Only meta entries remain: the two `gap` rows (R2, R4) were CLOSED by
+# ADR 0064 / SPEC Group L on 2026-09-01. Direction 2 of the crosswalk
+# now holds — every non-meta framework axiom reaches a spec axiom.
+AXM_UNMAPPED = {
+    "S1": ("meta", "SPEC.md IS the Phi this axiom demands"),
+    "S2": ("meta", "amendment authority; SPEC section 16 change discipline"),
+    "J3": ("meta", "how to test; SPEC section 14d testing strata"),
+}
+
+# The BLUEPRINT tier: one row per architecture map. `satisfies` names
+# the framework axiom GROUPS the file translates into topology — the
+# upward edge to the root layer. Every ADR must name a component whose
+# `doc` is one of these (the downward edge).
+ARCHITECTURE_COMPONENTS = {
+    "spec": {
+        "doc": "docs/architecture/SPEC.md",
+        "title": "The shadow specification — the formal axiom system",
+        "satisfies": ["S", "J", "M", "B", "R"],
+        "governs": "The axiom system this codebase is checked against: "
+                   "identity, soundness, completeness, derivation, "
+                   "ask-time determinism, interpretation, and the "
+                   "run-layer boundary.",
+    },
+    "architecture": {
+        "doc": "docs/architecture/ARCHITECTURE.md",
+        "title": "System topology — the layered graph",
+        "satisfies": ["D", "S"],
+        "governs": "What the system is made of and how data moves "
+                   "through it: the graph layers, the parse spine, "
+                   "the module map.",
+    },
+    "pipeline": {
+        "doc": "docs/architecture/PIPELINE_MAP.md",
+        "title": "Pipeline dataflow — stages and contracts",
+        "satisfies": ["D", "R"],
+        "governs": "The notebook/stage sequence, each stage's inputs "
+                   "and outputs, and the conservation of rows across "
+                   "them.",
+    },
+    "sphere": {
+        "doc": "docs/architecture/SPHERE.md",
+        "title": "The Sphere — shells, ownership, change propagation",
+        "satisfies": ["D", "J", "R"],
+        "governs": "The four shells, the nervous system, the ownership "
+                   "economy, and the static/dynamic contracts split.",
+    },
+    "question": {
+        "doc": "docs/architecture/QUESTION_MAP.md",
+        "title": "Question families — storage coverage",
+        "satisfies": ["S", "M"],
+        "governs": "What the storage must support, audited by question "
+                   "family. NOT a runtime routing table (ADR 0062).",
+    },
+    "integration": {
+        "doc": "docs/architecture/INTEGRATION_MAP.md",
+        "title": "Integrations — what we parse in, what we publish out",
+        "satisfies": ["D", "B"],
+        "governs": "The connector and catalog landscape as data, "
+                   "including every write target and its direction.",
+    },
+    "notebook": {
+        "doc": "docs/architecture/NOTEBOOK_MAP.md",
+        "title": "The notebook contract — the driver layer",
+        "satisfies": ["S", "J"],
+        "governs": "Every notebook's registry entry, its served "
+                   "question families, and the AST-enforced planks.",
+    },
+    "reference": {
+        "doc": "docs/architecture/REFERENCE_ARCHITECTURE.md",
+        "title": "Reference architecture — tiers and deployment",
+        "satisfies": ["S", "B"],
+        "governs": "The product tiers, source connectors, and the "
+                   "customer-tenant deployment footprint.",
+    },
+    "landing": {
+        "doc": "docs/architecture/DECISION_LANDING_MATRIX.md",
+        "title": "Decision landing — where every action lands",
+        "satisfies": ["B", "R"],
+        "governs": "Which artifact each governance action produces in "
+                   "Purview/Collibra, and the OUTBOX that remembers it.",
+    },
+    "test": {
+        "doc": "docs/architecture/TEST_MAP.md",
+        "title": "Test map — what every test proves",
+        "satisfies": ["J"],
+        "governs": "The verification strata: which check carries which "
+                   "claim, by ADR, standing law, and contract.",
+    },
+    "crosswalk": {
+        "doc": "docs/architecture/AXIOM_CROSSWALK.md",
+        "title": "Axiom crosswalk — framework to specification",
+        "satisfies": ["S"],
+        "governs": "The bridge between the two axiom systems: which "
+                   "framework law each spec axiom applies here, and "
+                   "which framework laws are meta or unstated gaps.",
+    },
+    "trace": {
+        "doc": "docs/architecture/TRACE_MAP.md",
+        "title": "Trace map — the lineage projection",
+        "satisfies": ["S", "J"],
+        "governs": "This registry, projected: decision -> component -> "
+                   "axioms -> code -> tests.",
+    },
+    "user_flow": {
+        "doc": "docs/architecture/USER_FLOW.md",
+        "title": "User flow — the journey and the flywheel",
+        "satisfies": ["M", "B"],
+        "governs": "How a question moves from ask to answer, and how "
+                   "usage feeds the governance flywheel.",
+    },
+    "connectors": {
+        "doc": "docs/architecture/SOURCE_CONNECTORS.md",
+        "title": "Source connectors — acquisition and change detection",
+        "satisfies": ["D", "R"],
+        "governs": "Where customer logic lives, how it is collected, "
+                   "and how change is detected across re-ingests.",
+    },
+    # Product decisions are choices about the OFFER, not about a system
+    # component — so they get their own blueprint, kept OUT of
+    # docs/architecture/ (Sunny's ruling, 2026-09-01: separate the
+    # product offering into its own folder). PRODUCT_TIERS.md is the
+    # blueprint; the marketplace listing is a downstream sales artifact
+    # that expresses it for one audience, never the blueprint itself.
+    "product": {
+        "doc": "docs/product/PRODUCT_TIERS.md",
+        "title": "Product tiers — the offer structure",
+        "satisfies": ["S"],
+        "governs": "What is sold, in what tiers, with which claims and "
+                   "which gates. Bounded by ADR 0063's tier lock; "
+                   "pricing and naming are parked, never invented.",
+    },
+}
 
 TRACE_REGISTRY = {
     "0001": {
         "title": "Native parsers per SQL dialect",
         "category": "architecture",
+        "component": "architecture",
         "axioms": ["C1", "G2"],
         "modules": [
             "src/parser/scriptdom_loader.py", "src/parser/scriptdom_fabric.py",
@@ -54,6 +272,7 @@ TRACE_REGISTRY = {
     "0002": {
         "title": "Delta tables over an external graph database",
         "category": "architecture",
+        "component": "architecture",
         "axioms": [],
         "modules": [
             "src/graph/backend.py", "src/graph/delta_backend.py",
@@ -68,6 +287,7 @@ TRACE_REGISTRY = {
     "0003": {
         "title": "Store sql_fragments, not full SQL blobs",
         "category": "architecture",
+        "component": "architecture",
         "axioms": [],
         "modules": ["src/graph/builder.py", "src/orchestrator/assemble.py"],
         "tests": ["tests/graph/test_serialization.py", "tests/graph/test_builder.py"],
@@ -76,6 +296,7 @@ TRACE_REGISTRY = {
     "0004": {
         "title": "Two-stage human-in-the-loop certification",
         "category": "architecture",
+        "component": "sphere",
         "axioms": [],
         "modules": ["src/governance/steward.py"],
         "tests": ["tests/governance/test_steward.py"],
@@ -84,6 +305,7 @@ TRACE_REGISTRY = {
     "0005": {
         "title": "Agent refuses when no certified path exists",
         "category": "architecture",
+        "component": "spec",
         "axioms": ["B1"],
         "modules": [
             "src/agent_backend.py", "src/graph/consumption.py",
@@ -98,6 +320,7 @@ TRACE_REGISTRY = {
     "0006": {
         "title": "Knowledge graph answers questions; Purview discovers reports",
         "category": "architecture",
+        "component": "integration",
         "axioms": [],
         "modules": ["src/adapters/purview.py"],
         "tests": ["tests/adapters/test_adapters.py"],
@@ -106,6 +329,7 @@ TRACE_REGISTRY = {
     "0007": {
         "title": "BYOT deployment as a Python library (.whl)",
         "category": "architecture",
+        "component": "reference",
         "axioms": [],
         # secrets_vault joined 2026-08-29 (KEYVAULT-1 code-side):
         # config-load secret resolution is a deployment concern —
@@ -123,6 +347,7 @@ TRACE_REGISTRY = {
     "0008": {
         "title": "Ship Tier 1 (core agent) first",
         "category": "product",
+        "component": "product",
         "axioms": [],
         "modules": [],
         "tests": [],
@@ -131,6 +356,7 @@ TRACE_REGISTRY = {
     "0009": {
         "title": "Catalog integrations are optional adapters",
         "category": "architecture",
+        "component": "integration",
         "axioms": [],
         "modules": [
             "src/adapters/base.py", "src/adapters/publisher.py",
@@ -149,6 +375,7 @@ TRACE_REGISTRY = {
     "0010": {
         "title": "Skip Founders Hub Level 3, go direct to Partner Center",
         "category": "product",
+        "component": "product",
         "axioms": [],
         "modules": [],
         "tests": [],
@@ -158,6 +385,7 @@ TRACE_REGISTRY = {
         "title": "Static install guide for v1; companion trigger now "
                  "'admin graph projected' (amended, ADR 0048)",
         "category": "product",
+        "component": "product",
         "axioms": [],
         "modules": [],
         "tests": [],
@@ -165,7 +393,8 @@ TRACE_REGISTRY = {
     },
     "0012": {
         "title": "Build on the existing repo, no rewrite",
-        "category": "product",
+        "category": "architecture",
+        "component": "architecture",
         "axioms": [],
         "modules": [],
         "tests": [],
@@ -174,6 +403,7 @@ TRACE_REGISTRY = {
     "0013": {
         "title": "List as transactable SaaS on the commercial marketplace",
         "category": "product",
+        "component": "product",
         "axioms": [],
         "modules": ["src/marketplace/fulfillment.py"],
         "tests": ["tests/marketplace/test_fulfillment.py",
@@ -184,6 +414,7 @@ TRACE_REGISTRY = {
     "0014": {
         "title": "Ground the agent in metric_logic; dictionary is mandatory",
         "category": "architecture",
+        "component": "architecture",
         "axioms": ["C4"],
         "modules": [
             "src/graph/metric_logic.py", "src/steps/metric_logic.py",
@@ -199,6 +430,7 @@ TRACE_REGISTRY = {
     "0015": {
         "title": "metric_id is the universal identity",
         "category": "architecture",
+        "component": "spec",
         "axioms": ["A2"],
         "modules": ["src/schemas.py", "src/adapters/fabric_pbi.py"],
         "tests": ["tests/test_schemas.py", "tests/adapters/test_fabric_pbi.py",
@@ -208,6 +440,7 @@ TRACE_REGISTRY = {
     "0016": {
         "title": "Case-insensitive identifier matching, folded uppercase",
         "category": "architecture",
+        "component": "spec",
         "axioms": ["A1", "A3"],
         "modules": ["src/parser/identity.py"],
         "tests": ["tests/parser/test_identity.py", "tests/test_dictionary.py"],
@@ -216,6 +449,7 @@ TRACE_REGISTRY = {
     "0017": {
         "title": "Resolve-then-traverse agent retrieval",
         "category": "architecture",
+        "component": "question",
         "axioms": [],
         "modules": ["src/graph/templates.py", "src/adapters/fabric_agent.py"],
         "tests": ["tests/test_graph_templates.py",
@@ -225,6 +459,7 @@ TRACE_REGISTRY = {
     "0018": {
         "title": "Materialized closure edges (USES_TABLE)",
         "category": "architecture",
+        "component": "spec",
         "axioms": ["D2"],
         "modules": ["src/graph/export.py", "src/steps/export.py"],
         "tests": ["tests/test_recorded_pipeline.py", "tests/steps/test_steps.py"],
@@ -233,6 +468,7 @@ TRACE_REGISTRY = {
     "0019": {
         "title": "CTE descriptions bottom-up, before metric descriptions",
         "category": "architecture",
+        "component": "pipeline",
         "axioms": [],
         "modules": ["src/descriptions.py", "src/llm_client.py",
                     "src/steps/agent_descriptions.py"],
@@ -243,6 +479,7 @@ TRACE_REGISTRY = {
     "0020": {
         "title": "Generator-compatibility LPG export shape",
         "category": "architecture",
+        "component": "reference",
         "axioms": [],
         "modules": ["src/adapters/collibra_lineage_match.py"],
         "tests": ["tests/adapters/test_lineage_match.py"],
@@ -251,6 +488,7 @@ TRACE_REGISTRY = {
     "0021": {
         "title": "Certification discloses, never gates",
         "category": "architecture",
+        "component": "sphere",
         "axioms": [],
         "modules": [],
         "tests": ["tests/test_schemas.py"],
@@ -259,6 +497,7 @@ TRACE_REGISTRY = {
     "0022": {
         "title": "Definition versioning: certification pins a content hash",
         "category": "architecture",
+        "component": "connectors",
         "axioms": [],
         "modules": [],
         "tests": ["tests/test_schemas.py"],
@@ -267,6 +506,7 @@ TRACE_REGISTRY = {
     "0023": {
         "title": "Usage-weighted governance flywheel",
         "category": "architecture",
+        "component": "sphere",
         "axioms": [],
         "modules": ["src/orchestrator/events.py"],
         "tests": ["tests/orchestrator/test_events.py"],
@@ -275,6 +515,7 @@ TRACE_REGISTRY = {
     "0024": {
         "title": "Layered truth: personal beside enterprise definitions",
         "category": "architecture",
+        "component": "sphere",
         "axioms": [],
         "modules": [],
         "tests": ["tests/test_schemas.py", "tests/test_table_contracts.py"],
@@ -283,6 +524,7 @@ TRACE_REGISTRY = {
     "0025": {
         "title": "PHI scanning at ingestion; the LLM boundary is the gate",
         "category": "architecture",
+        "component": "pipeline",
         "axioms": [],
         "modules": ["src/phi_scan.py", "src/steps/parse.py",
                     "src/anonymization.py"],
@@ -294,6 +536,7 @@ TRACE_REGISTRY = {
     "0026": {
         "title": "Error-to-data lineage",
         "category": "architecture",
+        "component": "landing",
         "axioms": [],
         "modules": ["src/governance/error_log.py",
                     "src/governance/installation_errors.py",
@@ -307,6 +550,7 @@ TRACE_REGISTRY = {
     "0027": {
         "title": "Ownership attribution: manual floor, Entra ID enriches",
         "category": "architecture",
+        "component": "sphere",
         "axioms": [],
         "modules": [],
         "tests": ["tests/governance/test_steward.py"],
@@ -315,6 +559,7 @@ TRACE_REGISTRY = {
     "0028": {
         "title": "Contact-me first; transactable at first-buyer signal",
         "category": "product",
+        "component": "product",
         "axioms": [],
         "modules": [],
         "tests": [],
@@ -323,6 +568,7 @@ TRACE_REGISTRY = {
     "0029": {
         "title": "Dimension layer activation (design pass, unimplemented)",
         "category": "architecture",
+        "component": "reference",
         "axioms": [],
         "modules": [],
         "tests": [],
@@ -331,6 +577,7 @@ TRACE_REGISTRY = {
     "0030": {
         "title": "Layered retrieval: search terms first, vectors where allowed",
         "category": "architecture",
+        "component": "question",
         "axioms": [],
         "modules": ["src/steps/search_index.py", "src/orchestrator/kusto.py"],
         "tests": ["tests/steps/test_search_index.py"],
@@ -339,6 +586,7 @@ TRACE_REGISTRY = {
     "0031": {
         "title": "Business terms: weighted plurality",
         "category": "architecture",
+        "component": "sphere",
         "axioms": [],
         "modules": ["src/governance/business_terms.py"],
         "tests": ["tests/governance/test_business_terms.py"],
@@ -347,6 +595,7 @@ TRACE_REGISTRY = {
     "0032": {
         "title": "Deterministic core, LLM edges",
         "category": "architecture",
+        "component": "spec",
         "axioms": ["E2"],
         "modules": ["src/orchestrator/core.py", "src/orchestrator/assemble.py"],
         "tests": ["tests/orchestrator/test_core.py", "tests/test_grounding_evals.py"],
@@ -355,6 +604,7 @@ TRACE_REGISTRY = {
     "0033": {
         "title": "System of record + projections: Delta is the record",
         "category": "architecture",
+        "component": "spec",
         "axioms": ["D3"],
         "modules": ["src/graph/fabric_graph_backend.py", "src/graph/gql_client.py"],
         "tests": ["tests/graph/test_backend_comparison.py"],
@@ -363,6 +613,7 @@ TRACE_REGISTRY = {
     "0034": {
         "title": "Conversational entry edge (superseded in part by 0035)",
         "category": "architecture",
+        "component": "user_flow",
         "axioms": [],
         "modules": [],
         "tests": [],
@@ -371,6 +622,7 @@ TRACE_REGISTRY = {
     "0035": {
         "title": "Agentic conversation over deterministic tools",
         "category": "architecture",
+        "component": "user_flow",
         "axioms": ["E3"],
         "modules": ["src/orchestrator/agent.py", "src/orchestrator/tools.py",
                     "src/orchestrator/cli.py", "src/webapp/app.py",
@@ -381,7 +633,8 @@ TRACE_REGISTRY = {
     },
     "0036": {
         "title": "Operations are the product: plan, confirm, execute, display",
-        "category": "product",
+        "category": "architecture",
+        "component": "user_flow",
         "axioms": ["E6"],
         "modules": ["src/methodology.py",
                     "src/orchestrator/caption_gate.py",
@@ -396,6 +649,7 @@ TRACE_REGISTRY = {
     "0037": {
         "title": "The completed algebra: traverse + result-set kernels",
         "category": "architecture",
+        "component": "question",
         "axioms": ["D1"],
         "modules": ["src/graph/traversal.py", "src/orchestrator/ops.py"],
         "tests": ["tests/graph/test_traversal.py", "tests/orchestrator/test_ops.py"],
@@ -403,7 +657,8 @@ TRACE_REGISTRY = {
     },
     "0038": {
         "title": "The interaction layer: 'no' is input",
-        "category": "product",
+        "category": "architecture",
+        "component": "user_flow",
         "axioms": [],
         "modules": ["src/steps/agent_events.py"],
         "tests": ["tests/steps/test_agent_events.py",
@@ -413,6 +668,7 @@ TRACE_REGISTRY = {
     "0039": {
         "title": "Every error links to its contract",
         "category": "architecture",
+        "component": "landing",
         "axioms": ["C3"],
         "modules": ["src/steps/gates.py", "src/governance/funnel.py",
                     "src/governance/journey.py"],
@@ -424,6 +680,7 @@ TRACE_REGISTRY = {
     "0040": {
         "title": "The consumption layer: reports and measures",
         "category": "architecture",
+        "component": "integration",
         "axioms": [],
         "modules": ["src/graph/consumption.py", "src/steps/semantic_models.py",
                     "src/steps/semantic_catalog.py", "src/extractor/devops_tmdl.py",
@@ -438,6 +695,7 @@ TRACE_REGISTRY = {
     "0041": {
         "title": "M mini-parser, shape registry, fallout capture",
         "category": "architecture",
+        "component": "connectors",
         "axioms": ["C2"],
         "modules": ["src/mquery/parser.py", "src/mquery/signature.py",
                     "src/mquery/registry.py", "src/mquery/census.py"],
@@ -447,6 +705,7 @@ TRACE_REGISTRY = {
     "0042": {
         "title": "The notebook contract: a harness for the driver layer",
         "category": "architecture",
+        "component": "notebook",
         "axioms": ["C3"],
         "modules": ["src/notebook_registry.py", "src/replan.py"],
         "tests": ["tests/test_notebook_contract.py", "tests/test_replan.py",
@@ -456,6 +715,7 @@ TRACE_REGISTRY = {
     "0043": {
         "title": "The diff kernel: the founding question's shape",
         "category": "architecture",
+        "component": "question",
         "axioms": [],
         "modules": ["src/graph/decomposition_diff.py"],
         "tests": ["tests/graph/test_decomposition_diff.py",
@@ -465,6 +725,7 @@ TRACE_REGISTRY = {
     "0044": {
         "title": "The tree contract: round-trip verified descriptions",
         "category": "architecture",
+        "component": "spec",
         "axioms": ["B1", "B2", "C2", "E4", "E5", "E6", "F"],
         "modules": ["src/tree/extract.py", "src/tree/translate.py",
                     "src/tree/verify.py", "src/tree/diff.py",
@@ -477,6 +738,7 @@ TRACE_REGISTRY = {
     "0045": {
         "title": "The escalation contract: no silent residue",
         "category": "architecture",
+        "component": "spec",
         "axioms": ["C2", "H1", "H2"],
         "modules": ["src/governance/leaf_grounding.py"],
         "tests": ["tests/test_escalation_contract.py",
@@ -486,6 +748,7 @@ TRACE_REGISTRY = {
     "0046": {
         "title": "Anchor, discover, match, rank — the human picks",
         "category": "architecture",
+        "component": "question",
         "axioms": ["E1", "E4", "E5"],
         "modules": ["src/discovery/paths.py", "src/discovery/grounding.py"],
         "tests": ["tests/test_spec_gates.py", "tests/test_derive_relationships.py"],
@@ -494,15 +757,20 @@ TRACE_REGISTRY = {
     "0047": {
         "title": "The shadow specification (the axiom system)",
         "category": "architecture",
+        "component": "crosswalk",
         "axioms": ["C4", "G1", "G3", "G2"],
         "modules": ["src/extraction_registry.py", "src/capability_registry.py"],
         "tests": ["tests/test_extraction_registry.py",
-                  "tests/test_capability_registry.py", "tests/test_spec_gates.py"],
-        "docs": ["docs/architecture/SPEC.md"],
+                  "tests/test_capability_registry.py",
+                  "tests/test_spec_gates.py",
+                  "tests/test_axiom_crosswalk.py"],
+        "docs": ["docs/architecture/SPEC.md",
+                 "docs/architecture/AXIOM_CROSSWALK.md"],
     },
     "0048": {
         "title": "Declared zones, trace registry, admin graph, companion",
         "category": "architecture",
+        "component": "trace",
         "axioms": ["B1", "C1", "D3", "H2"],
         "modules": ["src/zones.py", "src/trace_registry.py",
                     "src/admin_graph.py", "src/companion.py"],
@@ -510,6 +778,22 @@ TRACE_REGISTRY = {
                   "tests/test_term_hygiene.py", "tests/test_admin_graph.py",
                   "tests/test_companion.py"],
         "docs": ["docs/architecture/SPEC.md", "docs/architecture/TRACE_MAP.md"],
+    },
+    "0064": {
+        # DRAFT 2026-09-01 (review-authored from the crosswalk audit):
+        # SPEC Group L — the ledger (append-only, derived aggregates)
+        # and drift-fires. Closes the two real axm gaps (R2, R4).
+        # No modules yet: L1's AST check and L2's regression pin are
+        # the build; L3 is ENFORCED by citation (0059 Q3 precedent).
+        "title": "Group L: the ledger and drift axioms "
+                 "(closing the crosswalk gaps)",
+        "category": "architecture",
+        "component": "crosswalk",
+        "axioms": ["L1", "L2", "L3"],
+        "modules": [],
+        "tests": ["tests/test_ledger_contract.py"],
+        "docs": ["docs/decisions/0064-the-ledger-and-drift-axioms.md",
+                 "docs/architecture/AXIOM_CROSSWALK.md"],
     },
     "0063": {
         # ACCEPTED 2026-08-30 (Resolution Console v1, file-first,
@@ -519,6 +803,7 @@ TRACE_REGISTRY = {
         # tier-locked queue.
         "title": "The product tiers: X-Ray, Bridge, Workbench, Run",
         "category": "product",
+        "component": "product",
         "axioms": [],
         "modules": ["src/xray.py", "src/adapters/file_export.py",
                     "src/console.py"],
@@ -537,10 +822,12 @@ TRACE_REGISTRY = {
         # demand as a 0056 deny event).
         "title": "The dialogue loop: show, propose, ask, execute",
         "category": "architecture",
-        "axioms": [],
+        "component": "user_flow",
+        "axioms": ["R2", "R3", "R4", "R5"],
         "modules": ["src/webapp/app.py"],
         "tests": ["tests/webapp/test_app.py"],
-        "docs": ["docs/decisions/0062-the-dialogue-loop.md"],
+        "docs": ["docs/decisions/0062-the-dialogue-loop.md",
+                 "docs/architecture/SPEC.md"],
     },
     "0061": {
         # DRAFT 2026-08-28 (overnight, review-authored): the run
@@ -551,10 +838,12 @@ TRACE_REGISTRY = {
         # open calls await Sunny; defaults stand until relaxed.
         "title": "The run layer: Pro runs the confirmed definition",
         "category": "architecture",
-        "axioms": [],
+        "component": "spec",
+        "axioms": ["R6", "R7", "R8"],
         "modules": ["src/run_layer.py"],
         "tests": ["tests/test_run_layer.py"],
-        "docs": ["docs/decisions/0061-the-run-layer.md"],
+        "docs": ["docs/decisions/0061-the-run-layer.md",
+                 "docs/architecture/SPEC.md"],
     },
     "0060": {
         # ACCEPTED 2026-08-28 (all three calls ruled same-day:
@@ -566,10 +855,12 @@ TRACE_REGISTRY = {
         "title": "The parse is the plan: parser-only LLM, "
                  "deterministic traversal, correction flywheel",
         "category": "architecture",
-        "axioms": [],
+        "component": "spec",
+        "axioms": ["R1", "R3"],
         "modules": ["src/orchestrator/parse_plan.py"],
         "tests": ["tests/orchestrator/test_parse_plan.py"],
-        "docs": ["docs/decisions/0060-parse-is-the-plan.md"],
+        "docs": ["docs/decisions/0060-parse-is-the-plan.md",
+                 "docs/architecture/SPEC.md"],
     },
     "0059": {
         # ACCEPTED + MECHANIZED 2026-08-26: union-find analyzer
@@ -580,6 +871,7 @@ TRACE_REGISTRY = {
         "title": "The graph topology axioms: connected, sound, "
                  "complete (measured, then formalized)",
         "category": "architecture",
+        "component": "spec",
         "axioms": ["Q1", "Q2", "Q3"],
         "modules": ["src/graph/topology.py"],
         "tests": ["tests/graph/test_topology.py"],
@@ -593,6 +885,7 @@ TRACE_REGISTRY = {
         "title": "The self-service contracts: contracts-first for "
                  "the Pro pillar (provenance rungs, execution floors)",
         "category": "architecture",
+        "component": "reference",
         "axioms": [],
         "modules": [],
         "tests": [],
@@ -607,6 +900,7 @@ TRACE_REGISTRY = {
         "title": "The Sphere: architecture model, ownership economy, "
                  "contracts split",
         "category": "architecture",
+        "component": "sphere",
         "axioms": [],
         "modules": [],
         "tests": [],
@@ -623,6 +917,7 @@ TRACE_REGISTRY = {
         "title": "The decision algebra: every answer ends in a "
                  "decision (typed deny, usage weights)",
         "category": "architecture",
+        "component": "sphere",
         "axioms": [],
         "modules": ["src/flywheel.py"],
         "tests": ["tests/test_flywheel.py"],
@@ -636,6 +931,7 @@ TRACE_REGISTRY = {
         "title": "The designed shape corpus: spec-derived test data "
                  "(category-partition over name x logic x scope)",
         "category": "architecture",
+        "component": "test",
         "axioms": ["E2"],
         "modules": ["src/shapes/generator.py", "src/shapes/matrix.py",
                     "src/shapes/checker.py"],
@@ -650,6 +946,7 @@ TRACE_REGISTRY = {
         "title": "Governance red flags and governed plurality: "
                  "misnomer/duplicate/cousin sweep over content hashes",
         "category": "architecture",
+        "component": "sphere",
         "axioms": ["C1", "E2"],
         "modules": ["src/governance/red_flags.py",
                     "src/steps/red_flag_sweep.py"],
@@ -662,6 +959,7 @@ TRACE_REGISTRY = {
         "title": "Projection-grain column lineage: transform_to_column "
                  "edges, resolved-only, conservation-counted",
         "category": "architecture",
+        "component": "architecture",
         "axioms": ["C1", "C2"],
         "modules": ["src/graph/builder.py", "src/steps/build_graph.py"],
         "tests": ["tests/graph/test_builder.py",
@@ -672,6 +970,7 @@ TRACE_REGISTRY = {
         "title": "The reachability contract: every graph payload "
                  "reachable by a named op or excluded with a reason",
         "category": "architecture",
+        "component": "spec",
         "axioms": ["C1"],
         "modules": ["src/reachability.py",
                     "devtools/reachability_audit.py"],
@@ -684,7 +983,8 @@ TRACE_REGISTRY = {
         "title": "The one-mind turn: one conversation decides, the "
                  "boundary enforces (supersedes 0036/0050's shape)",
         "category": "architecture",
-        "axioms": ["E3", "E6"],
+        "component": "spec",
+        "axioms": ["E3", "E6", "P1", "P2", "P3", "P4", "P5", "P6"],
         "modules": ["src/orchestrator/turn_engine.py"],
         "tests": ["tests/orchestrator/test_turn_engine.py"],
         "docs": ["docs/architecture/SPEC.md"],
@@ -693,6 +993,7 @@ TRACE_REGISTRY = {
         "title": "Bounded read-only answer loop: plan to the answer, "
                  "caption answers, auto-continue (amends 0036)",
         "category": "architecture",
+        "component": "user_flow",
         "axioms": ["E3"],
         "modules": ["src/orchestrator/turn_engine.py"],
         "tests": ["tests/orchestrator/test_turn_engine.py"],
@@ -701,6 +1002,7 @@ TRACE_REGISTRY = {
     "0049": {
         "title": "Ingestion routes: filedrop, folders, live extractor",
         "category": "architecture",
+        "component": "connectors",
         "axioms": [],
         "modules": ["src/extractor/connection.py", "src/extractor/discovery.py",
                     "src/extractor/extractor.py", "src/extractor/tracker.py"],
