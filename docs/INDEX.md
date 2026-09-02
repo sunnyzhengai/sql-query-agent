@@ -19,6 +19,44 @@ not a filename convention (naming ruled kept as-is, 2026-09-02):
 | **what is sold** — tiers, packaging, positioning | [product/PRODUCT_TIERS.md](product/PRODUCT_TIERS.md) |
 | **the rationale for any choice** | [decisions/](decisions/README.md) — always the canonical home |
 
+## The design-change protocol (before a single line of code)
+
+Assembled 2026-09-02 from rules that already bound us — SPEC §3b
+(Sunny's mandate), §14d, §16, and the registry workflow — into one
+numbered runbook. CI enforces steps 1, 5 and 6; steps 2–4 are review
+law: a design review that cannot show them does not proceed.
+
+1. **Name the component.** Which blueprint does this change live in?
+   One answer, not a list. If nothing fits, that is the finding — a
+   blueprint is missing, and creating it is part of the design.
+   *(Enforced: every ADR must carry a `component`.)*
+2. **Answer §3b's three questions**, and record the answers as
+   registry rows: **inventory** (the complete frontier, with exclusion
+   rows for what's deliberately out), **conservation** (what equation
+   proves nothing vanished — `handled ⊎ fallout = total`), **drift**
+   (what MECHANICALLY fires when reality diverges — `spec:L3`).
+3. **Vet against the axioms.** Read the component's `satisfies` groups
+   in [AXIOM_CROSSWALK.md](architecture/AXIOM_CROSSWALK.md), then the
+   relevant SPEC groups. Three outcomes: the design complies; it
+   needs a NEW axiom (→ an ADR per SPEC §16, and the crosswalk must
+   map it to a framework parent or CI fails); or it conflicts — stop
+   and resolve, because code that disagrees with the spec is wrong by
+   definition (`axm:S2`).
+4. **Write the ADR with its checks declared** (§14d: every stratum,
+   before shipping). Tests may land as strict-xfail skeletons — the
+   ADR 0044 pattern, locked in red before implementation — but they
+   are NAMED now, not after.
+5. **Register:** the trace-registry entry (component, axioms, planned
+   modules/tests, docs) and **bump the component's `current_through`
+   stamp** — the attestation that its blueprint was reconciled.
+6. **Then code.** CI holds the line behind you: ghost rule, existence,
+   hierarchy closure, product separation, stamp check, generated-map
+   freshness, SPEC citation resolution.
+
+The order is the point: by step 6 the design has a home, a frontier, a
+conservation equation, a drift alarm, its axioms, and its named tests
+— *before* the first line of code.
+
 ## The dependency hierarchy (ruled 2026-09-01)
 
 A strict three-tier chain, one direction, no cycles:
