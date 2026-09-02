@@ -7,7 +7,7 @@
 
 # Test Map — what every test proves
 
-123 modules, 1417 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
+124 modules, 1421 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
 
 ## By ADR
 
@@ -72,6 +72,7 @@
 | 0067 | Docs are data: the record invariant and the prose ratchet | `tests/test_spec_registry.py` (5) |
 | 0068 | The landing matrix as data (ratchet turn 2) | `tests/test_landing_registry.py` (6) |
 | 0069 | SOURCE_CONNECTORS retires into the integration registry (ratchet turn 3) | `tests/test_integration_doctrine.py` (4) |
+| 0070 | QUESTION_MAP retires into the notebook registry (ratchet turn 4) | `tests/test_question_families.py` (4) |
 
 ## By standing law
 
@@ -165,7 +166,7 @@ tests/test_docs_consistency.py).
 | spec:C2 | 0041, 0044, 0045, 0053 | — | `tests/governance/test_leaf_grounding.py`, `tests/graph/test_builder.py`, `tests/graph/test_decision_wiring.py`, `tests/mquery/test_mquery.py`, `tests/orchestrator/test_ops.py`, `tests/test_escalation_contract.py`, `tests/test_tree_contract.py`, `tests/tree/test_extract.py` |
 | spec:C3 | 0039, 0042 | — | `tests/governance/test_funnel.py`, `tests/governance/test_journey.py`, `tests/test_docs_consistency.py`, `tests/test_notebook_contract.py`, `tests/test_replan.py`, `tests/test_table_contracts.py` |
 | spec:C4 | 0014, 0047 | — | `tests/governance/test_validation.py`, `tests/steps/test_steps.py`, `tests/test_axiom_crosswalk.py`, `tests/test_capability_registry.py`, `tests/test_dictionary.py`, `tests/test_extraction_registry.py`, `tests/test_spec_gates.py` |
-| spec:D1 | 0037 | — | `tests/graph/test_traversal.py`, `tests/orchestrator/test_ops.py` |
+| spec:D1 | 0037 | `tests/test_question_families.py` | `tests/graph/test_traversal.py`, `tests/orchestrator/test_ops.py` |
 | spec:D2 | 0018 | — | `tests/steps/test_steps.py`, `tests/test_recorded_pipeline.py` |
 | spec:D3 | 0033, 0048 | — | `tests/graph/test_backend_comparison.py`, `tests/test_admin_graph.py`, `tests/test_companion.py`, `tests/test_term_hygiene.py`, `tests/test_trace_registry.py`, `tests/test_zones.py` |
 | spec:E1 | 0046 | — | `tests/test_derive_relationships.py`, `tests/test_spec_gates.py` |

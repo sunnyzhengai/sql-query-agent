@@ -12,7 +12,7 @@ field below against the notebook sources.
 
 Fields per notebook:
   family          acquisition | derivation | publisher | verification
-  serves          Layer-0 question families (A-G, QUESTION_MAP.md) the
+  serves          Layer-0 question families (A-G, FAMILY_RECORDS below) the
                   notebook ultimately exists for. >=1 required — a
                   notebook serving no family is by definition a ghost.
   purpose         one line, human
@@ -43,7 +43,73 @@ B Provenance, C Impact, D Discovery, E Trust, F Consistency, G Health.
 from __future__ import annotations
 
 FAMILIES = ("acquisition", "derivation", "publisher", "verification")
-QUESTION_FAMILIES = ("A", "B", "C", "D", "E", "F", "G")
+# The question families as records (ADR 0070: QUESTION_MAP.md retired
+# into this registry — layer 0 approved by Sunny 2026-08-18, statuses
+# reconciled by the 2026-09-01 audit). These are a STORAGE-COVERAGE
+# audit, never a runtime routing table: ADR 0062 abolished question
+# types outright (spec:R2); the answer's shape EMERGES from the matched
+# subgraph. What stands from the July doctrine: shape classes shape the
+# STORAGE (questions are unbounded, answer shapes are few), and
+# precomputation is only verifiable cache (spec:D1).
+FAMILY_RECORDS = {
+    "A": {"title": "Meaning",
+          "archetype": "What does this report/metric measure, exactly?",
+          "asked_by": "analyst, clinician",
+          "shape": "card (prose + quoted criteria)",
+          "storage_tables": ["output_metric_logic"],
+          "grounds": "ADR 0014/0019", "status": "shipped"},
+    "B": {"title": "Provenance",
+          "archetype": "Where does this number come from?",
+          "asked_by": "analyst, auditor",
+          "shape": "path (report -> proc -> steps -> tables)",
+          "storage_tables": ["graph_nodes", "graph_edges"],
+          "grounds": "ADR 0040/0053", "status": "shipped"},
+    "C": {"title": "Impact",
+          "archetype": "If I change this table/column/proc, what breaks?",
+          "asked_by": "developer, admin",
+          "shape": "closure (reachable set)",
+          "storage_tables": ["graph_edges"],
+          "grounds": "ADR 0018/0037 (materialized closures as cache)",
+          "status": "shipped"},
+    "D": {"title": "Discovery",
+          "archetype": "Does a report for X already exist? "
+                       "What exists about Y?",
+          "asked_by": "everyone",
+          "shape": "ranked list (semantic)",
+          "storage_tables": [],
+          "grounds": "ADR 0030 — Eventhouse semantic catalog "
+                     "(a projection, not a Delta table)",
+          "status": "shipped"},
+    "E": {"title": "Trust",
+          "archetype": "Who owns this? Certified? When did it last "
+                       "change? Stale?",
+          "asked_by": "steward, leadership",
+          "shape": "card + timeline",
+          "storage_tables": ["gov_publish_log"],
+          "grounds": "ADR 0021/0022 — freshness via the content-hash "
+                     "lifecycle (the 2026-08-18 gap, closed)",
+          "status": "shipped"},
+    "F": {"title": "Consistency",
+          "archetype": "Are these definitions the same? Why do A and "
+                       "B disagree? (the founding demo question)",
+          "asked_by": "the founding demo question",
+          "shape": "aligned diff of decompositions",
+          "storage_tables": ["graph_nodes"],
+          "grounds": "ADR 0043 (the diff kernel) + 0054 (the sweep) — "
+                     "the 2026-08-18 gap, closed; now the product's "
+                     "wedge",
+          "status": "shipped"},
+    "G": {"title": "Health",
+          "archetype": "What failed, what fell off, what's the "
+                       "coverage?",
+          "asked_by": "admin",
+          "shape": "funnel (counts -> reasons)",
+          "storage_tables": ["ops_fallout", "ops_funnel"],
+          "grounds": "ADR 0039 (error-to-contract lineage)",
+          "status": "shipped"},
+}
+
+QUESTION_FAMILIES = tuple(FAMILY_RECORDS)
 
 # The engine floor asserted by every notebook this release. Raise it
 # when a notebook starts depending on newer src/ surface.

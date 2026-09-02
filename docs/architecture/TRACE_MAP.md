@@ -27,10 +27,9 @@ Two citation handles, because the axiom systems are distinct and their group let
 | `crosswalk` | [AXIOM_CROSSWALK.md](AXIOM_CROSSWALK.md) | axm:S | The bridge between the two axiom systems: which framework law each spec axiom applies here, and which framework laws are meta or unstated gaps. |
 | `integration` | [INTEGRATION_MAP.md](INTEGRATION_MAP.md) | axm:D, axm:B, axm:R | The connector and catalog landscape as data: every source configuration and write target, change detection, and object identity across re-ingests. |
 | `landing` | [DECISION_LANDING_MATRIX.md](DECISION_LANDING_MATRIX.md) | axm:B, axm:R | Which artifact each governance action produces in Purview/Collibra, and the OUTBOX that remembers it. |
-| `notebook` | [NOTEBOOK_MAP.md](NOTEBOOK_MAP.md) | axm:S, axm:J | Every notebook's registry entry, its served question families, and the AST-enforced planks. |
+| `notebook` | [NOTEBOOK_MAP.md](NOTEBOOK_MAP.md) | axm:S, axm:J | The layer-0 question families as records (ADR 0070), every notebook's registry entry with its served families, and the AST-enforced planks. |
 | `pipeline` | [PIPELINE_MAP.md](PIPELINE_MAP.md) | axm:D, axm:R | The notebook/stage sequence, each stage's inputs and outputs, and the conservation of rows across them. |
 | `product` | [PRODUCT_TIERS.md](../product/PRODUCT_TIERS.md) | axm:S | What is sold, in what tiers, with which claims and which gates. Bounded by ADR 0063's tier lock; pricing and naming are parked, never invented. |
-| `question` | [QUESTION_MAP.md](QUESTION_MAP.md) | axm:S, axm:M | What the storage must support, audited by question family. NOT a runtime routing table (ADR 0062). |
 | `reference` | [REFERENCE_ARCHITECTURE.md](REFERENCE_ARCHITECTURE.md) | axm:S, axm:B | The product tiers, source connectors, and the customer-tenant deployment footprint. |
 | `spec` | [SPEC.md](SPEC.md) | axm:S, axm:J, axm:M, axm:B, axm:R | The axiom system this codebase is checked against: identity, soundness, completeness, derivation, ask-time determinism, interpretation, and the run-layer boundary. |
 | `test` | [TEST_MAP.md](TEST_MAP.md) | axm:J | The verification strata: which check carries which claim, by ADR, standing law, and contract. |
@@ -252,7 +251,7 @@ Two citation handles, because the axiom systems are distinct and their group let
 ## ADR 0017 — Resolve-then-traverse agent retrieval
 
 - **Category:** architecture
-- **Component:** `question` → `docs/architecture/QUESTION_MAP.md` → axm:S, axm:M
+- **Component:** `architecture` → `docs/architecture/ARCHITECTURE.md` → axm:D, axm:S, axm:J, axm:R
 - **Implemented by:**
   - `src/graph/templates.py`
   - `src/adapters/fabric_agent.py`
@@ -260,7 +259,7 @@ Two citation handles, because the axiom systems are distinct and their group let
   - `tests/test_graph_templates.py`
   - `tests/adapters/test_fabric_agent.py`
 - **Summarized in:**
-  - `docs/architecture/QUESTION_MAP.md`
+  - `docs/architecture/ARCHITECTURE.md`
 
 ## ADR 0018 — Materialized closure edges (USES_TABLE)
 
@@ -396,7 +395,7 @@ Two citation handles, because the axiom systems are distinct and their group let
 ## ADR 0030 — Layered retrieval: search terms first, vectors where allowed
 
 - **Category:** architecture
-- **Component:** `question` → `docs/architecture/QUESTION_MAP.md` → axm:S, axm:M
+- **Component:** `architecture` → `docs/architecture/ARCHITECTURE.md` → axm:D, axm:S, axm:J, axm:R
 - **Implemented by:**
   - `src/steps/search_index.py`
   - `src/orchestrator/kusto.py`
@@ -483,7 +482,7 @@ Two citation handles, because the axiom systems are distinct and their group let
 ## ADR 0037 — The completed algebra: traverse + result-set kernels
 
 - **Category:** architecture
-- **Component:** `question` → `docs/architecture/QUESTION_MAP.md` → axm:S, axm:M
+- **Component:** `architecture` → `docs/architecture/ARCHITECTURE.md` → axm:D, axm:S, axm:J, axm:R
 - **Grounds:** spec:D1
 - **Implemented by:**
   - `src/graph/traversal.py`
@@ -492,7 +491,7 @@ Two citation handles, because the axiom systems are distinct and their group let
   - `tests/graph/test_traversal.py`
   - `tests/orchestrator/test_ops.py`
 - **Summarized in:**
-  - `docs/architecture/QUESTION_MAP.md`
+  - `docs/architecture/ARCHITECTURE.md`
   - `docs/METHODOLOGY.md`
 
 ## ADR 0038 — The interaction layer: 'no' is input
@@ -575,14 +574,14 @@ Two citation handles, because the axiom systems are distinct and their group let
 ## ADR 0043 — The diff kernel: the founding question's shape
 
 - **Category:** architecture
-- **Component:** `question` → `docs/architecture/QUESTION_MAP.md` → axm:S, axm:M
+- **Component:** `architecture` → `docs/architecture/ARCHITECTURE.md` → axm:D, axm:S, axm:J, axm:R
 - **Implemented by:**
   - `src/graph/decomposition_diff.py`
 - **Enforced by:**
   - `tests/graph/test_decomposition_diff.py`
   - `tests/orchestrator/test_ops.py`
 - **Summarized in:**
-  - `docs/architecture/QUESTION_MAP.md`
+  - `docs/architecture/ARCHITECTURE.md`
 
 ## ADR 0044 — The tree contract: round-trip verified descriptions
 
@@ -620,7 +619,7 @@ Two citation handles, because the axiom systems are distinct and their group let
 ## ADR 0046 — Anchor, discover, match, rank — the human picks
 
 - **Category:** architecture
-- **Component:** `question` → `docs/architecture/QUESTION_MAP.md` → axm:S, axm:M
+- **Component:** `architecture` → `docs/architecture/ARCHITECTURE.md` → axm:D, axm:S, axm:J, axm:R
 - **Grounds:** spec:E1, spec:E4, spec:E5
 - **Implemented by:**
   - `src/discovery/paths.py`
@@ -924,3 +923,15 @@ Two citation handles, because the axiom systems are distinct and their group let
 - **Summarized in:**
   - `docs/decisions/0069-source-connectors-retire.md`
   - `docs/architecture/INTEGRATION_MAP.md`
+
+## ADR 0070 — QUESTION_MAP retires into the notebook registry (ratchet turn 4)
+
+- **Category:** architecture
+- **Component:** `notebook` → `docs/architecture/NOTEBOOK_MAP.md` → axm:S, axm:J
+- **Implemented by:**
+  - `src/notebook_registry.py`
+- **Enforced by:**
+  - `tests/test_question_families.py`
+- **Summarized in:**
+  - `docs/decisions/0070-question-map-retires.md`
+  - `docs/architecture/NOTEBOOK_MAP.md`

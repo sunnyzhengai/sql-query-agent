@@ -66,7 +66,7 @@ def test_registry_fields_valid():
 
 
 def test_every_notebook_serves_a_question_family():
-    """The traceability rule (QUESTION_MAP, approved): a notebook serving
+    """The traceability rule (FAMILY_RECORDS, ADR 0070): a notebook serving
     no Layer-0 family is by definition a ghost."""
     for nb, entry in NOTEBOOK_REGISTRY.items():
         served = entry["serves"]

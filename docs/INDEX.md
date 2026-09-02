@@ -101,7 +101,7 @@ and link, never restate. Two further rules:
 
 ---
 
-## The blueprint tier — `docs/architecture/` (12 files)
+## The blueprint tier — `docs/architecture/` (11 files)
 
 Every file here is a blueprint: it owns a slice of the system and
 declares which axiom groups it satisfies. **The whole folder is listed
@@ -113,7 +113,7 @@ nothing referenced them.
 Files are grouped by *what kind of thing they are*, which is also how
 they behave under change.
 
-### Authored — the design record (6)
+### Authored — the design record (5)
 
 Hand-written, highest interpretive value, lowest churn. These state
 intent; they are audited, not generated.
@@ -124,7 +124,6 @@ intent; they are audited, not generated.
 | [AXIOM_CROSSWALK.md](architecture/AXIOM_CROSSWALK.md) | 3 | The bridge between the two axiom systems: every spec axiom's framework parent, and the three meta-axioms that cannot map by construction. |
 | [ARCHITECTURE.md](architecture/ARCHITECTURE.md) | 16 | The system model, organized by the Sphere (ADR 0066 merged SPHERE.md in): four shells, radial dynamics, data flow, ownership economy, contracts split — every section carrying a `BUILT`/`PARTIAL`/`DESIGN` status. |
 | [USER_FLOW.md](architecture/USER_FLOW.md) | 6 | How a question moves from ask to answer, and how usage feeds the flywheel. |
-| [QUESTION_MAP.md](architecture/QUESTION_MAP.md) | 5 | What the storage must support, audited by question family. *Not* a runtime routing table (ADR 0062). |
 | [REFERENCE_ARCHITECTURE.md](architecture/REFERENCE_ARCHITECTURE.md) | 4 | The deployable reference: connector tiers, what runs per product tier, and the Azure consumption footprint. |
 
 ### Generated — projections of the registries (6)
@@ -141,7 +140,7 @@ authority comes from the code they project.
 | [TEST_MAP.md](architecture/TEST_MAP.md) | `devtools/suite_map.py` | What every test proves, by ADR, standing law, and contract. |
 | [PIPELINE_MAP.md](architecture/PIPELINE_MAP.md) | `notebook_registry.py` | The stage sequence, each stage's inputs/outputs, and row conservation across them. |
 | [INTEGRATION_MAP.md](architecture/INTEGRATION_MAP.md) | `integration_registry.py` | Every source configuration and write target, plus change-detection and object-identity doctrine (absorbed SOURCE_CONNECTORS, ADR 0069). |
-| [NOTEBOOK_MAP.md](architecture/NOTEBOOK_MAP.md) | `notebook_registry.py` | Every notebook's contract entry and the question families it serves. |
+| [NOTEBOOK_MAP.md](architecture/NOTEBOOK_MAP.md) | `notebook_registry.py` | The layer-0 question families as records (absorbed QUESTION_MAP, ADR 0070) + every notebook's contract entry and coverage. |
 
 > **Why the ADR counts are uneven.** ARCHITECTURE and SPEC carry 16 and 13
 > because they are where cross-cutting law lands; the generated maps

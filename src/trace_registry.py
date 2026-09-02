@@ -129,14 +129,6 @@ ARCHITECTURE_COMPONENTS = {
                    "and outputs, and the conservation of rows across "
                    "them.",
     },
-    "question": {
-        "doc": "docs/architecture/QUESTION_MAP.md",
-        "current_through": "0046",
-        "title": "Question families — storage coverage",
-        "satisfies": ["S", "M"],
-        "governs": "What the storage must support, audited by question "
-                   "family. NOT a runtime routing table (ADR 0062).",
-    },
     "integration": {
         # ADR 0069: absorbed the former `connectors` component —
         # SOURCE_CONNECTORS.md retired; its configurations are rows,
@@ -151,11 +143,12 @@ ARCHITECTURE_COMPONENTS = {
     },
     "notebook": {
         "doc": "docs/architecture/NOTEBOOK_MAP.md",
-        "current_through": "0042",
-        "title": "The notebook contract — the driver layer",
+        "current_through": "0070",
+        "title": "The notebook contract + the question families",
         "satisfies": ["S", "J"],
-        "governs": "Every notebook's registry entry, its served "
-                   "question families, and the AST-enforced planks.",
+        "governs": "The layer-0 question families as records (ADR "
+                   "0070), every notebook's registry entry with its "
+                   "served families, and the AST-enforced planks.",
     },
     "reference": {
         "doc": "docs/architecture/REFERENCE_ARCHITECTURE.md",
@@ -419,12 +412,12 @@ TRACE_REGISTRY = {
     "0017": {
         "title": "Resolve-then-traverse agent retrieval",
         "category": "architecture",
-        "component": "question",
+        "component": "architecture",
         "axioms": [],
         "modules": ["src/graph/templates.py", "src/adapters/fabric_agent.py"],
         "tests": ["tests/test_graph_templates.py",
                   "tests/adapters/test_fabric_agent.py"],
-        "docs": ["docs/architecture/QUESTION_MAP.md"],
+        "docs": ["docs/architecture/ARCHITECTURE.md"],
     },
     "0018": {
         "title": "Materialized closure edges (USES_TABLE)",
@@ -547,7 +540,7 @@ TRACE_REGISTRY = {
     "0030": {
         "title": "Layered retrieval: search terms first, vectors where allowed",
         "category": "architecture",
-        "component": "question",
+        "component": "architecture",
         "axioms": [],
         "modules": ["src/steps/search_index.py", "src/orchestrator/kusto.py"],
         "tests": ["tests/steps/test_search_index.py"],
@@ -619,11 +612,11 @@ TRACE_REGISTRY = {
     "0037": {
         "title": "The completed algebra: traverse + result-set kernels",
         "category": "architecture",
-        "component": "question",
+        "component": "architecture",
         "axioms": ["D1"],
         "modules": ["src/graph/traversal.py", "src/orchestrator/ops.py"],
         "tests": ["tests/graph/test_traversal.py", "tests/orchestrator/test_ops.py"],
-        "docs": ["docs/architecture/QUESTION_MAP.md", "docs/METHODOLOGY.md"],
+        "docs": ["docs/architecture/ARCHITECTURE.md", "docs/METHODOLOGY.md"],
     },
     "0038": {
         "title": "The interaction layer: 'no' is input",
@@ -685,12 +678,12 @@ TRACE_REGISTRY = {
     "0043": {
         "title": "The diff kernel: the founding question's shape",
         "category": "architecture",
-        "component": "question",
+        "component": "architecture",
         "axioms": [],
         "modules": ["src/graph/decomposition_diff.py"],
         "tests": ["tests/graph/test_decomposition_diff.py",
                   "tests/orchestrator/test_ops.py"],
-        "docs": ["docs/architecture/QUESTION_MAP.md"],
+        "docs": ["docs/architecture/ARCHITECTURE.md"],
     },
     "0044": {
         "title": "The tree contract: round-trip verified descriptions",
@@ -718,7 +711,7 @@ TRACE_REGISTRY = {
     "0046": {
         "title": "Anchor, discover, match, rank — the human picks",
         "category": "architecture",
-        "component": "question",
+        "component": "architecture",
         "axioms": ["E1", "E4", "E5"],
         "modules": ["src/discovery/paths.py", "src/discovery/grounding.py"],
         "tests": ["tests/test_spec_gates.py", "tests/test_derive_relationships.py"],
@@ -749,6 +742,24 @@ TRACE_REGISTRY = {
                   "tests/test_term_hygiene.py", "tests/test_admin_graph.py",
                   "tests/test_companion.py"],
         "docs": ["docs/architecture/SPEC.md", "docs/architecture/TRACE_MAP.md"],
+    },
+    "0070": {
+        # ACCEPTED 2026-09-02 (ratchet turn 4): QUESTION_MAP.md
+        # retires — the families were already half-data (serves,
+        # coverage); layer 0 + shapes/storage/status become
+        # FAMILY_RECORDS in notebook_registry, rendered into
+        # NOTEBOOK_MAP. Storage names cross-checked against
+        # TABLE_REGISTRY; runtime-routing abolition (spec:R2) stated
+        # in the data, not just prose.
+        "title": "QUESTION_MAP retires into the notebook registry "
+                 "(ratchet turn 4)",
+        "category": "architecture",
+        "component": "notebook",
+        "axioms": [],
+        "modules": ["src/notebook_registry.py"],
+        "tests": ["tests/test_question_families.py"],
+        "docs": ["docs/decisions/0070-question-map-retires.md",
+                 "docs/architecture/NOTEBOOK_MAP.md"],
     },
     "0069": {
         # ACCEPTED 2026-09-02 (ratchet turn 3): SOURCE_CONNECTORS.md

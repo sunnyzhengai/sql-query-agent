@@ -229,22 +229,39 @@ one-off customer.
 
 
 
-FAMILY_TITLES = {
-    "A": "Meaning", "B": "Provenance", "C": "Impact", "D": "Discovery",
-    "E": "Trust", "F": "Consistency", "G": "Health",
-}
-
-
 def build_notebook_map() -> str:
-    """Project NOTEBOOK_REGISTRY: the notebook contract table + the
-    QUESTION_MAP layer-4 coverage (family -> notebooks) — generated,
-    never hand-edited (ADR 0042)."""
+    """Project NOTEBOOK_REGISTRY: the question families (layer 0, ADR
+    0070 — the QUESTION_MAP content as data), the notebook contract
+    table, and the coverage projection — generated, never hand-edited
+    (ADR 0042)."""
+    from src.notebook_registry import FAMILY_RECORDS
     lines = [
         "# Notebook Map",
         "",
         "**GENERATED from `src/notebook_registry.py` — do not edit.**",
         "Regenerate: `python scripts/generate_docs.py`. The contract is",
-        "enforced by tests/test_notebook_contract.py (ADR 0042).",
+        "enforced by tests/test_notebook_contract.py (ADR 0042); the",
+        "family records by tests/test_question_families.py (ADR 0070).",
+        "",
+        "## The question families (layer 0 — approved 2026-08-18)",
+        "",
+        "A STORAGE-COVERAGE audit, never a runtime routing table:",
+        "ADR 0062 abolished question types (`spec:R2`) — the answer's",
+        "shape EMERGES from the matched subgraph. What stands from the",
+        "July doctrine: shape classes shape the STORAGE, and",
+        "precomputation is only verifiable cache (`spec:D1`).",
+        "",
+        "| Family | Archetype question | Asked by | Answer shape | "
+        "Storage | Grounds | Status |",
+        "|---|---|---|---|---|---|---|",
+    ]
+    for fam, r in FAMILY_RECORDS.items():
+        storage = ", ".join(f"`{s}`" for s in r["storage_tables"]) or "—"
+        lines.append(
+            f"| **{fam}. {r['title']}** | {r['archetype']} | "
+            f"{r['asked_by']} | {r['shape']} | {storage} | "
+            f"{r['grounds']} | {r['status']} |")
+    lines += [
         "",
         "## The notebook contract",
         "",
@@ -258,7 +275,7 @@ def build_notebook_map() -> str:
         )
     lines += [
         "",
-        "## Question-family coverage (QUESTION_MAP layer 4, generated)",
+        "## Question-family coverage (generated)",
         "",
         "| Family | Served by |",
         "|---|---|",
@@ -267,12 +284,14 @@ def build_notebook_map() -> str:
         served_by = [nb for nb, e in sorted(NOTEBOOK_REGISTRY.items())
                      if fam in e["serves"]]
         lines.append(
-            f"| {fam}. {FAMILY_TITLES[fam]} | {', '.join(served_by) or '(GAP)'} |"
+            f"| {fam}. {FAMILY_RECORDS[fam]['title']} | "
+            f"{', '.join(served_by) or '(GAP)'} |"
         )
     lines += [
         "",
-        "Every notebook must serve >=1 family — a notebook serving none",
-        "is by definition a ghost (traceability rule, QUESTION_MAP.md).",
+        "Every notebook must serve >=1 family, and every family must be",
+        "served — a notebook serving none is a ghost (the traceability",
+        "rule, mechanized by ADRs 0042 + 0070).",
         "",
     ]
     return "\n".join(lines)

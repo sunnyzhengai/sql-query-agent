@@ -2,7 +2,26 @@
 
 **GENERATED from `src/notebook_registry.py` — do not edit.**
 Regenerate: `python scripts/generate_docs.py`. The contract is
-enforced by tests/test_notebook_contract.py (ADR 0042).
+enforced by tests/test_notebook_contract.py (ADR 0042); the
+family records by tests/test_question_families.py (ADR 0070).
+
+## The question families (layer 0 — approved 2026-08-18)
+
+A STORAGE-COVERAGE audit, never a runtime routing table:
+ADR 0062 abolished question types (`spec:R2`) — the answer's
+shape EMERGES from the matched subgraph. What stands from the
+July doctrine: shape classes shape the STORAGE, and
+precomputation is only verifiable cache (`spec:D1`).
+
+| Family | Archetype question | Asked by | Answer shape | Storage | Grounds | Status |
+|---|---|---|---|---|---|---|
+| **A. Meaning** | What does this report/metric measure, exactly? | analyst, clinician | card (prose + quoted criteria) | `output_metric_logic` | ADR 0014/0019 | shipped |
+| **B. Provenance** | Where does this number come from? | analyst, auditor | path (report -> proc -> steps -> tables) | `graph_nodes`, `graph_edges` | ADR 0040/0053 | shipped |
+| **C. Impact** | If I change this table/column/proc, what breaks? | developer, admin | closure (reachable set) | `graph_edges` | ADR 0018/0037 (materialized closures as cache) | shipped |
+| **D. Discovery** | Does a report for X already exist? What exists about Y? | everyone | ranked list (semantic) | — | ADR 0030 — Eventhouse semantic catalog (a projection, not a Delta table) | shipped |
+| **E. Trust** | Who owns this? Certified? When did it last change? Stale? | steward, leadership | card + timeline | `gov_publish_log` | ADR 0021/0022 — freshness via the content-hash lifecycle (the 2026-08-18 gap, closed) | shipped |
+| **F. Consistency** | Are these definitions the same? Why do A and B disagree? (the founding demo question) | the founding demo question | aligned diff of decompositions | `graph_nodes` | ADR 0043 (the diff kernel) + 0054 (the sweep) — the 2026-08-18 gap, closed; now the product's wedge | shipped |
+| **G. Health** | What failed, what fell off, what's the coverage? | admin | funnel (counts -> reasons) | `ops_fallout`, `ops_funnel` | ADR 0039 (error-to-contract lineage) | shipped |
 
 ## The notebook contract
 
@@ -28,7 +47,7 @@ enforced by tests/test_notebook_contract.py (ADR 0042).
 | 920_publish_pbi | publisher | A, E | >=1.24 | Publish certified descriptions onto PBI reports |
 | 950_ingest_agent_events | acquisition | G | >=1.24 | Fold agent conversation events into gov_* telemetry |
 
-## Question-family coverage (QUESTION_MAP layer 4, generated)
+## Question-family coverage (generated)
 
 | Family | Served by |
 |---|---|
@@ -40,5 +59,6 @@ enforced by tests/test_notebook_contract.py (ADR 0042).
 | F. Consistency | 010_ingest_sql_filedrop, 020_ingest_sql_folders, 030_ingest_sql_live, 200_parse, 300_build_graph |
 | G. Health | 060_ingest_semantic_models, 100_install, 200_parse, 500_validate, 950_ingest_agent_events |
 
-Every notebook must serve >=1 family — a notebook serving none
-is by definition a ghost (traceability rule, QUESTION_MAP.md).
+Every notebook must serve >=1 family, and every family must be
+served — a notebook serving none is a ghost (the traceability
+rule, mechanized by ADRs 0042 + 0070).
