@@ -132,6 +132,25 @@ view are preserved history.
       ("starts with 'E11'" for prefix LIKE, pattern wording
       otherwise; negations compose like IS_NOT). Exit: the three
       emptied corpus classes ship as skeleton_floor or better.
+      **EXTENDED 09-02 (Sunny's hand-grade of the samples — the
+      GENERATOR CLAUSE fires):** second failure on the same beat,
+      different symptom. Aggregate leaves degrade to "the value"
+      (High_Utilizer ships "After grouping, the value is no less
+      than 4" — counted entity dropped, and it GATE-PASSES: the
+      invisible twin of the raw-echo empty); degenerate pass-through
+      ships content-free filler instead of the voicable fact ("all
+      records from one source, no conditions applied"). One level
+      up: _leaf_phrase's fallback DESIGN — an unvoicable shape
+      substitutes a placeholder whose fate depends on whether it
+      happens to trip the gate. Closed-outcomes law applies: every
+      leaf voices fully OR is counted as unvoiced; no placeholder
+      ships uncounted. Three parts, in order: (1) voice aggregates +
+      the four ops + the pass-through fact; (2) THEN pin the
+      placeholder class in the gate (the composer's own fallback
+      strings — frontier as data per G4); (3) the corpus scorecard
+      grades gate_passed-but-placeholder separately — today's 8/11
+      overstates quality. NOT successfully translated as shipped:
+      High_Utilizer, Passthrough (Sunny's call, ruled by sample).
 
 ### RULINGS OPEN FOR SUNNY (carried + new)
 - [ ] Landing matrix v3 overall ratification (now generated from
