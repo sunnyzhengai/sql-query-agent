@@ -23,37 +23,14 @@ texts and in-file citations; evidence lives in each ADR.
 
 from __future__ import annotations
 
-# Axiom ids defined by docs/architecture/SPEC.md (F is the round-trip
-# group, stated as one equation block rather than numbered axioms).
-SPEC_AXIOMS = frozenset({
-    "A1", "A2", "A3", "B1", "B2", "C1", "C2", "C3", "C4",
-    "D1", "D2", "D3", "E1", "E2", "E3", "E4", "E5", "E6", "F",
-    "G1", "G2", "G3", "H1", "H2",
-    # Group P — the one-mind turn (SPEC section 14c, ADR 0051,
-    # ratified 2026-08-21). MISSING from this set until 2026-09-01 —
-    # found by the crosswalk audit: the axioms were ENFORCED and cited
-    # in SPEC, but no ADR could reference spec:P1..P6 because the ids
-    # did not exist here. Group Q was registered on arrival; P was not.
-    "P1", "P2", "P3", "P4", "P5", "P6",
-    # Group L — the ledger (SPEC section 14h, ADR 0064, ratified
-    # 2026-09-01): append-only obeyed, aggregates derived, every
-    # declaration has a firing mechanism. Closes axm:R4 and axm:R2.
-    "L1", "L2", "L3",
-    # Group T — the double-sided function (SPEC section 13, ADR 0065,
-    # promoted 2026-09-01). The section called itself "THE LAW" and
-    # named three instances, but only instance 1 had an id (F), so the
-    # crosswalk covered a third of it. T0 = the law, T1-T3 = the
-    # instances, each with its own judge and its own honest status.
-    "T0", "T1", "T2", "T3",
-    # Group Q — graph topology (ADR 0059, ratified 2026-08-26; the
-    # ADR's G1-G3, renamed on entry because spec group G was taken)
-    "Q1", "Q2", "Q3",
-    # Group R — ask-time interpretation (ADRs 0060 + 0062) and the
-    # run-layer boundary (ADR 0061), spec v0.7 §14f/§14g. R1-R5 govern
-    # how a question is UNDERSTOOD (the seat E3 typed, P1 seated);
-    # R6-R8 extend P5's boundary honesty to executed data.
-    "R1", "R2", "R3", "R4", "R5", "R6", "R7", "R8",
-})
+# Axiom ids and framework parents are DERIVED from the axiom ledger
+# (src/spec_registry.py, ADR 0067 turn 1) — the single writer. The two
+# hand-maintained structures this replaced had already drifted once
+# each (Group P unregistered for 11 days; the crosswalk lived only in
+# a doc until 2026-09-01).
+from src.spec_registry import SPEC_REGISTRY
+
+SPEC_AXIOMS = frozenset(SPEC_REGISTRY)
 
 CATEGORIES = ("architecture", "product")
 
@@ -96,30 +73,9 @@ AXM_AXIOMS = frozenset({
 
 AXM_GROUPS = frozenset({"D", "S", "J", "M", "B", "R"})
 
-# The CROSSWALK: every spec axiom -> the framework axiom(s) it applies
-# here. Audited 2026-09-01; the prose lives in
-# docs/architecture/AXIOM_CROSSWALK.md, this is the checkable form.
-# NOT a bijection by design: the framework is general law, the spec is
-# that law made mechanical for THIS codebase, so one framework axiom
-# legitimately spawns several spec axioms (axm:D2 -> A1, A3, G1-G3).
-SPEC_TO_AXM = {
-    "A1": ["D2"], "A2": ["D3"], "A3": ["D2"],
-    "B1": ["B1"], "B2": ["B1", "J4"],
-    "C1": ["D1"], "C2": ["R1"], "C3": ["R1"], "C4": ["R1", "D1"],
-    "D1": ["D4"], "D2": ["J1"], "D3": ["D3"],
-    "E1": ["S3"], "E2": ["J2"], "E3": ["M5", "J2"], "E4": ["M5"],
-    "E5": ["B1"], "E6": ["B2", "B3"],
-    "F": ["J4"],
-    "G1": ["D2"], "G2": ["D2"], "G3": ["D2"],
-    "H1": ["R3"], "H2": ["R3"],
-    "P1": ["M2"], "P2": ["M2"], "P3": ["M3"], "P4": ["M4"],
-    "P5": ["B2"], "P6": ["M1"],
-    "L1": ["R4"], "L2": ["R4", "D3"], "L3": ["R2"],
-    "T0": ["J4"], "T1": ["J4"], "T2": ["J4", "B1"], "T3": ["M5", "J2"],
-    "Q1": ["D1"], "Q2": ["B1"], "Q3": ["B3"],
-    "R1": ["M4", "M5"], "R2": ["M4"], "R3": ["B4"], "R4": ["R3"],
-    "R5": ["B3"], "R6": ["B2"], "R7": ["B4"], "R8": ["B3"],
-}
+# The crosswalk mapping, derived per record (prose narrative stays in
+# docs/architecture/AXIOM_CROSSWALK.md; the data decides here).
+SPEC_TO_AXM = {ax: rec["parents"] for ax, rec in SPEC_REGISTRY.items()}
 
 # Framework axioms with NO spec axiom, each with its recorded reason.
 # meta  = a law ABOUT having a spec; implementing it as a spec axiom
@@ -143,7 +99,7 @@ AXM_UNMAPPED = {
 ARCHITECTURE_COMPONENTS = {
     "spec": {
         "doc": "docs/architecture/SPEC.md",
-        "current_through": "0061",
+        "current_through": "0067",
         "title": "The shadow specification — the formal axiom system",
         "satisfies": ["S", "J", "M", "B", "R"],
         "governs": "The axiom system this codebase is checked against: "
@@ -798,6 +754,22 @@ TRACE_REGISTRY = {
                   "tests/test_term_hygiene.py", "tests/test_admin_graph.py",
                   "tests/test_companion.py"],
         "docs": ["docs/architecture/SPEC.md", "docs/architecture/TRACE_MAP.md"],
+    },
+    "0067": {
+        # ACCEPTED 2026-09-02 (Sunny: docs are data): the record
+        # invariant + the prose ratchet. Turn 1 = the axiom ledger
+        # (spec_registry, eighth peer): SPEC_AXIOMS and SPEC_TO_AXM
+        # now DERIVED from it; per-axiom checks are data; totality
+        # locked both ways to SPEC.md at the id level.
+        "title": "Docs are data: the record invariant and the "
+                 "prose ratchet",
+        "category": "architecture",
+        "component": "spec",
+        "axioms": [],
+        "modules": ["src/spec_registry.py"],
+        "tests": ["tests/test_spec_registry.py"],
+        "docs": ["docs/decisions/0067-docs-are-data.md",
+                 "docs/architecture/SPEC.md"],
     },
     "0066": {
         # ACCEPTED 2026-09-02 (Sunny: "we only need one"): SPHERE.md

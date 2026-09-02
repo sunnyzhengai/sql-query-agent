@@ -890,3 +890,15 @@ Two citation handles, because the axiom systems are distinct and their group let
 - **Summarized in:**
   - `docs/decisions/0066-merge-sphere-into-architecture.md`
   - `docs/architecture/ARCHITECTURE.md`
+
+## ADR 0067 — Docs are data: the record invariant and the prose ratchet
+
+- **Category:** architecture
+- **Component:** `spec` → `docs/architecture/SPEC.md` → axm:S, axm:J, axm:M, axm:B, axm:R
+- **Implemented by:**
+  - `src/spec_registry.py`
+- **Enforced by:**
+  - `tests/test_spec_registry.py`
+- **Summarized in:**
+  - `docs/decisions/0067-docs-are-data.md`
+  - `docs/architecture/SPEC.md`

@@ -77,3 +77,4 @@ never deleted — its status changes and it links to its replacement.
 | [0064](0064-the-ledger-and-drift-axioms.md) | Group L: the ledger (append-only obeyed, aggregates derived) and drift-fires — closes the two crosswalk gaps | Accepted (all three calls ruled 2026-09-01; SPEC v0.8) |
 | [0065](0065-promote-the-double-sided-function.md) | Promote §13 to Group T: the double-sided function as numbered law (T0 the law, T1–T3 the instances) | Accepted (SPEC v0.9) |
 | [0066](0066-merge-sphere-into-architecture.md) | One system-model file: SPHERE merges into ARCHITECTURE — build status per section; kills the rival layer models | Accepted |
+| [0067](0067-docs-are-data.md) | Docs are data: the record invariant + the prose ratchet; turn 1 = the axiom ledger (spec_registry) | Accepted |

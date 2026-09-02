@@ -120,7 +120,7 @@ intent; they are audited, not generated.
 
 | Document | ADRs | Governs |
 | --- | --- | --- |
-| [SPEC.md](architecture/SPEC.md) | 13 | The formal axiom system (groups A–H, L, P, Q, R, T — 48 axioms), its notation, and the enforcement status of each. **v0.9 — the standing instrument; cite as `spec:<id>`.** |
+| [SPEC.md](architecture/SPEC.md) | 14 | The formal axiom system (groups A–H, L, P, Q, R, T — 48 axioms), its notation, and the enforcement status of each. **v0.9 — the standing instrument; cite as `spec:<id>`.** |
 | [AXIOM_CROSSWALK.md](architecture/AXIOM_CROSSWALK.md) | 3 | The bridge between the two axiom systems: every spec axiom's framework parent, and the three meta-axioms that cannot map by construction. |
 | [ARCHITECTURE.md](architecture/ARCHITECTURE.md) | 16 | The system model, organized by the Sphere (ADR 0066 merged SPHERE.md in): four shells, radial dynamics, data flow, ownership economy, contracts split — every section carrying a `BUILT`/`PARTIAL`/`DESIGN` status. |
 | [USER_FLOW.md](architecture/USER_FLOW.md) | 6 | How a question moves from ask to answer, and how usage feeds the flywheel. |

@@ -12,7 +12,7 @@
 > (see [TRACE_MAP.md](TRACE_MAP.md#the-blueprint-tier) for the full
 > chain: decision → component → axioms → code → tests).
 
-**Version:** 0.9 (adopted; ADR 0047, extended by ADR 0048, 0051, 0059, 0064, 0065;
+**Version:** 0.9 (adopted; ADR 0047, extended by ADR 0048, 0051, 0059, 0064, 0065, 0067;
 §3b ratified by ADR 0052, first live use: the reachability contract;
 v0.7 adds Group R — the ask-time interpretation axioms of ADR
 0060/0062 — and the run-layer boundary of ADR 0061; v0.8 adds Group L,
@@ -55,6 +55,15 @@ this theory.
 
 Citation handle: `spec:<axiom-id>` (e.g. `spec:C1`), the ADR 0039 pattern
 applied to the spec itself.
+
+**The machine-readable ledger (ADR 0067).** Every axiom's id, group,
+framework parents, and declared check files live as records in
+`src/spec_registry.py` — the single writer, locked to this document at
+the id level in both directions (`tests/test_spec_registry.py`; an
+axiom cannot exist in only one place). Law formulas and per-axiom
+statuses remain HERE, their one home, until the ratchet retires that
+prose into the ADRs. The invariant: if an agent must obey it, it is a
+record with a check; if a human must understand why, it is an ADR.
 
 **Relationship to the framework (the tier above).** Φ_AIVIA is *this
 system's* theory; [AI_VIA_AXIOMS.md](../AI_VIA_AXIOMS.md) is the
@@ -926,6 +935,11 @@ governs generated artifacts revs the relevant `*_CONTRACT_VERSION` cache keys
 ---
 
 ## Changelog
+
+- **0.9 + ledger (2026-09-02, ADR 0067)** — the axiom ledger:
+  ids/parents/checks as records in `src/spec_registry.py`, this
+  document locked to it at the id level both ways. No axiom changed;
+  format governance only.
 
 - **0.9 (2026-09-01)** — §13 promoted to **Group T** (ADR 0065), on
   Sunny's ruling from the crosswalk's scope finding. The section called

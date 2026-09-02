@@ -7,7 +7,7 @@
 
 # Test Map — what every test proves
 
-120 modules, 1402 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
+121 modules, 1407 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
 
 ## By ADR
 
@@ -69,6 +69,7 @@
 | 0063 | The product tiers: X-Ray, Bridge, Workbench, Run | `tests/adapters/test_file_export.py` (9), `tests/test_console.py` (20), `tests/test_xray.py` (7) |
 | 0064 | Group L: the ledger and drift axioms (closing the crosswalk gaps) | `tests/test_ledger_contract.py` (4) |
 | 0065 | Promote section 13 to Group T: the double-sided function as numbered law | `tests/test_tree_contract.py` (14) |
+| 0067 | Docs are data: the record invariant and the prose ratchet | `tests/test_spec_registry.py` (5) |
 
 ## By standing law
 
@@ -179,7 +180,7 @@ tests/test_docs_consistency.py).
 | spec:H2 | 0045, 0048 | — | `tests/governance/test_leaf_grounding.py`, `tests/test_admin_graph.py`, `tests/test_companion.py`, `tests/test_escalation_contract.py`, `tests/test_term_hygiene.py`, `tests/test_trace_registry.py`, `tests/test_zones.py` |
 | spec:L1 | 0064 | `tests/test_ledger_contract.py` | — |
 | spec:L2 | 0064 | `tests/test_ledger_contract.py` | — |
-| spec:L3 | 0064 | — | `tests/test_ledger_contract.py` |
+| spec:L3 | 0064 | `tests/test_spec_registry.py` | `tests/test_ledger_contract.py` |
 | spec:P1 | 0051 | — | `tests/orchestrator/test_turn_engine.py` |
 | spec:P2 | 0051 | — | `tests/orchestrator/test_turn_engine.py` |
 | spec:P3 | 0051 | — | `tests/orchestrator/test_turn_engine.py` |
