@@ -28,6 +28,24 @@ def test_every_relative_doc_link_resolves():
     assert not broken, "broken doc links:\n  " + "\n  ".join(broken)
 
 
+def test_spec_binding_citations_resolve():
+    """Every src/tests path SPEC.md cites in its Binding: lines must
+    exist. Closes the failure class the v0.3 spec audit caught BY HAND
+    ("A1's cited test did not exist") — an axiom's ENFORCED status is
+    only as good as the file it points at. (Seam-tightening ruled by
+    Sunny 2026-09-02; TRACE_REGISTRY's existence check covers the
+    registry's citations, but SPEC's inline prose citations had no
+    guard until this test.)"""
+    spec = (REPO_ROOT / "docs" / "architecture" / "SPEC.md").read_text()
+    cited = sorted(set(re.findall(r"\b(?:tests|src|devtools)/[\w/]+\.py\b",
+                                  spec)))
+    assert cited, "SPEC.md cites no code paths — the regex broke"
+    dangling = [p for p in cited if not (REPO_ROOT / p).exists()]
+    assert not dangling, (
+        "SPEC.md Binding: citation(s) name files that do not exist "
+        "(the A1 failure class):\n  " + "\n  ".join(dangling))
+
+
 def test_install_guide_covers_every_pipeline_notebook():
     guide = INSTALL_GUIDE.read_text()
     stems = [

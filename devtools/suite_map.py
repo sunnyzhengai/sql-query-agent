@@ -188,20 +188,36 @@ def build_test_map() -> str:
         lines.append("")
 
     lines += [
-        "## By spec axiom (derived: axiom → grounding ADRs → tests)",
+        "## By spec axiom",
         "",
-        "| Axiom | ADRs | Test modules |",
-        "|---|---|---|",
+        "Two evidence grades, direct always preferred (2026-09-02):",
+        "**direct** = the module's docstring declares `Proves: spec:<id>`",
+        "— a named, per-axiom claim. **Inferred** = the coarse join",
+        "axiom → grounding ADRs → everything those ADRs claim; it says",
+        "the axiom's decisions are tested, not that this module tests",
+        "this axiom. Precision migrates left as `Proves:` lines are",
+        "added; SPEC.md's own `Binding:` citations stay the per-axiom",
+        "source of truth (checked to resolve by",
+        "tests/test_docs_consistency.py).",
+        "",
+        "| Axiom | ADRs | Direct proof | Inferred via ADR claims |",
+        "|---|---|---|---|",
     ]
+    from src.trace_registry import SPEC_AXIOMS
     axiom_adrs: "dict[str, list[str]]" = {}
     for adr in sorted(TRACE_REGISTRY):
         for ax in TRACE_REGISTRY[adr].get("axioms", []):
             axiom_adrs.setdefault(ax, []).append(adr)
-    for ax in sorted(axiom_adrs):
-        adrs = axiom_adrs[ax]
-        paths = sorted({p for p, cl in claims.items()
-                        for a in cl if a in adrs})
-        cells = ", ".join(f"`{p}`" for p in paths) or "(spec gate only)"
-        lines.append(f"| spec:{ax} | {', '.join(adrs)} | {cells} |")
+    for ax in sorted(SPEC_AXIOMS):
+        adrs = axiom_adrs.get(ax, [])
+        direct = sorted(m["path"] for m in mods
+                        if f"spec:{ax}" in m["tags"])
+        inferred = sorted({p for p, cl in claims.items()
+                           for a in cl if a in adrs} - set(direct))
+        direct_cell = ", ".join(f"`{p}`" for p in direct) or "—"
+        inferred_cell = ", ".join(f"`{p}`" for p in inferred) or (
+            "—" if direct else "**(no recorded proof)**")
+        lines.append(f"| spec:{ax} | {', '.join(adrs) or '—'} "
+                     f"| {direct_cell} | {inferred_cell} |")
     lines.append("")
     return "\n".join(lines)
