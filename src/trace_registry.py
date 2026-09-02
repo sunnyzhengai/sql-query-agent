@@ -143,6 +143,7 @@ AXM_UNMAPPED = {
 ARCHITECTURE_COMPONENTS = {
     "spec": {
         "doc": "docs/architecture/SPEC.md",
+        "current_through": "0061",
         "title": "The shadow specification — the formal axiom system",
         "satisfies": ["S", "J", "M", "B", "R"],
         "governs": "The axiom system this codebase is checked against: "
@@ -152,6 +153,7 @@ ARCHITECTURE_COMPONENTS = {
     },
     "architecture": {
         "doc": "docs/architecture/ARCHITECTURE.md",
+        "current_through": "0053",
         "title": "System topology — the layered graph",
         "satisfies": ["D", "S"],
         "governs": "What the system is made of and how data moves "
@@ -160,6 +162,7 @@ ARCHITECTURE_COMPONENTS = {
     },
     "pipeline": {
         "doc": "docs/architecture/PIPELINE_MAP.md",
+        "current_through": "0025",
         "title": "Pipeline dataflow — stages and contracts",
         "satisfies": ["D", "R"],
         "governs": "The notebook/stage sequence, each stage's inputs "
@@ -168,6 +171,7 @@ ARCHITECTURE_COMPONENTS = {
     },
     "sphere": {
         "doc": "docs/architecture/SPHERE.md",
+        "current_through": "0057",
         "title": "The Sphere — shells, ownership, change propagation",
         "satisfies": ["D", "J", "R"],
         "governs": "The four shells, the nervous system, the ownership "
@@ -175,6 +179,7 @@ ARCHITECTURE_COMPONENTS = {
     },
     "question": {
         "doc": "docs/architecture/QUESTION_MAP.md",
+        "current_through": "0046",
         "title": "Question families — storage coverage",
         "satisfies": ["S", "M"],
         "governs": "What the storage must support, audited by question "
@@ -182,6 +187,7 @@ ARCHITECTURE_COMPONENTS = {
     },
     "integration": {
         "doc": "docs/architecture/INTEGRATION_MAP.md",
+        "current_through": "0040",
         "title": "Integrations — what we parse in, what we publish out",
         "satisfies": ["D", "B"],
         "governs": "The connector and catalog landscape as data, "
@@ -189,6 +195,7 @@ ARCHITECTURE_COMPONENTS = {
     },
     "notebook": {
         "doc": "docs/architecture/NOTEBOOK_MAP.md",
+        "current_through": "0042",
         "title": "The notebook contract — the driver layer",
         "satisfies": ["S", "J"],
         "governs": "Every notebook's registry entry, its served "
@@ -196,6 +203,7 @@ ARCHITECTURE_COMPONENTS = {
     },
     "reference": {
         "doc": "docs/architecture/REFERENCE_ARCHITECTURE.md",
+        "current_through": "0058",
         "title": "Reference architecture — tiers and deployment",
         "satisfies": ["S", "B"],
         "governs": "The product tiers, source connectors, and the "
@@ -203,6 +211,7 @@ ARCHITECTURE_COMPONENTS = {
     },
     "landing": {
         "doc": "docs/architecture/DECISION_LANDING_MATRIX.md",
+        "current_through": "0039",
         "title": "Decision landing — where every action lands",
         "satisfies": ["B", "R"],
         "governs": "Which artifact each governance action produces in "
@@ -210,6 +219,7 @@ ARCHITECTURE_COMPONENTS = {
     },
     "test": {
         "doc": "docs/architecture/TEST_MAP.md",
+        "current_through": "0055",
         "title": "Test map — what every test proves",
         "satisfies": ["J"],
         "governs": "The verification strata: which check carries which "
@@ -217,6 +227,7 @@ ARCHITECTURE_COMPONENTS = {
     },
     "crosswalk": {
         "doc": "docs/architecture/AXIOM_CROSSWALK.md",
+        "current_through": "0065",
         "title": "Axiom crosswalk — framework to specification",
         "satisfies": ["S"],
         "governs": "The bridge between the two axiom systems: which "
@@ -225,6 +236,7 @@ ARCHITECTURE_COMPONENTS = {
     },
     "trace": {
         "doc": "docs/architecture/TRACE_MAP.md",
+        "current_through": "0048",
         "title": "Trace map — the lineage projection",
         "satisfies": ["S", "J"],
         "governs": "This registry, projected: decision -> component -> "
@@ -232,6 +244,7 @@ ARCHITECTURE_COMPONENTS = {
     },
     "user_flow": {
         "doc": "docs/architecture/USER_FLOW.md",
+        "current_through": "0062",
         "title": "User flow — the journey and the flywheel",
         "satisfies": ["M", "B"],
         "governs": "How a question moves from ask to answer, and how "
@@ -239,6 +252,7 @@ ARCHITECTURE_COMPONENTS = {
     },
     "connectors": {
         "doc": "docs/architecture/SOURCE_CONNECTORS.md",
+        "current_through": "0049",
         "title": "Source connectors — acquisition and change detection",
         "satisfies": ["D", "R"],
         "governs": "Where customer logic lives, how it is collected, "
@@ -252,6 +266,7 @@ ARCHITECTURE_COMPONENTS = {
     # that expresses it for one audience, never the blueprint itself.
     "product": {
         "doc": "docs/product/PRODUCT_TIERS.md",
+        "current_through": "0063",
         "title": "Product tiers — the offer structure",
         "satisfies": ["S"],
         "governs": "What is sold, in what tiers, with which claims and "
@@ -416,7 +431,8 @@ TRACE_REGISTRY = {
         "tests": ["tests/marketplace/test_fulfillment.py",
                   "tests/marketplace/test_host.py"],
         "docs": ["docs/product/MARKETPLACE_LISTING.md",
-                 "docs/legal/terms-of-service.md"],
+                 "docs/legal/terms-of-service.md",
+                 "docs/product/REVIEWER_GUIDE.md"],
     },
     "0014": {
         "title": "Ground the agent in metric_logic; dictionary is mandatory",
@@ -772,7 +788,8 @@ TRACE_REGISTRY = {
                   "tests/test_spec_gates.py",
                   "tests/test_axiom_crosswalk.py"],
         "docs": ["docs/architecture/SPEC.md",
-                 "docs/architecture/AXIOM_CROSSWALK.md"],
+                 "docs/architecture/AXIOM_CROSSWALK.md",
+                 "docs/AI_VIA_AXIOMS.md"],
     },
     "0048": {
         "title": "Declared zones, trace registry, admin graph, companion",
@@ -804,11 +821,13 @@ TRACE_REGISTRY = {
                  "docs/architecture/AXIOM_CROSSWALK.md"],
     },
     "0064": {
-        # DRAFT 2026-09-01 (review-authored from the crosswalk audit):
-        # SPEC Group L — the ledger (append-only, derived aggregates)
-        # and drift-fires. Closes the two real axm gaps (R2, R4).
-        # No modules yet: L1's AST check and L2's regression pin are
-        # the build; L3 is ENFORCED by citation (0059 Q3 precedent).
+        # ACCEPTED 2026-09-01, all three calls ruled same-day (targeted
+        # L1 scan · pin L2 immediately · letter L): SPEC Group L — the
+        # ledger (append-only OBEYED, derived aggregates) and
+        # drift-fires. Closes the two real axm gaps (R2, R4). L1/L2
+        # ENFORCED via test_ledger_contract (proven against injected
+        # violations); L3 by citation (0059 Q3 precedent). No modules
+        # by design — the axioms bind existing machinery.
         "title": "Group L: the ledger and drift axioms "
                  "(closing the crosswalk gaps)",
         "category": "architecture",
@@ -834,7 +853,8 @@ TRACE_REGISTRY = {
         "tests": ["tests/test_xray.py",
                   "tests/adapters/test_file_export.py",
                   "tests/test_console.py"],
-        "docs": ["docs/decisions/0063-product-tiers.md"],
+        "docs": ["docs/decisions/0063-product-tiers.md",
+                 "docs/product/XRAY_ENGAGEMENT.md"],
     },
     "0062": {
         # ACCEPTED 2026-08-29, all calls ruled same-day (developer

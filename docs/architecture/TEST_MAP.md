@@ -7,7 +7,7 @@
 
 # Test Map — what every test proves
 
-120 modules, 1401 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
+120 modules, 1402 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
 
 ## By ADR
 
@@ -53,7 +53,7 @@
 | 0045 | The escalation contract: no silent residue | `tests/governance/test_leaf_grounding.py` (6), `tests/test_escalation_contract.py` (8) |
 | 0046 | Anchor, discover, match, rank — the human picks | `tests/test_derive_relationships.py` (7), `tests/test_spec_gates.py` (4) |
 | 0047 | The shadow specification (the axiom system) | `tests/test_axiom_crosswalk.py` (6), `tests/test_capability_registry.py` (4), `tests/test_extraction_registry.py` (6), `tests/test_spec_gates.py` (4) |
-| 0048 | Declared zones, trace registry, admin graph, companion | `tests/test_admin_graph.py` (9), `tests/test_companion.py` (7), `tests/test_term_hygiene.py` (2), `tests/test_trace_registry.py` (11), `tests/test_zones.py` (4) |
+| 0048 | Declared zones, trace registry, admin graph, companion | `tests/test_admin_graph.py` (9), `tests/test_companion.py` (7), `tests/test_term_hygiene.py` (2), `tests/test_trace_registry.py` (12), `tests/test_zones.py` (4) |
 | 0049 | Ingestion routes: filedrop, folders, live extractor | `tests/extractor/test_connection.py` (9), `tests/extractor/test_extractor.py` (15), `tests/extractor/test_proc_parity.py` (8) |
 | 0050 | Bounded read-only answer loop: plan to the answer, caption answers, auto-continue (amends 0036) | `tests/orchestrator/test_turn_engine.py` (31) |
 | 0051 | The one-mind turn: one conversation decides, the boundary enforces (supersedes 0036/0050's shape) | `tests/orchestrator/test_turn_engine.py` (31) |

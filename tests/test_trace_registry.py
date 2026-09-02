@@ -119,6 +119,40 @@ def test_hierarchy_every_component_declares_its_axiom_groups():
     assert not bad, "blueprint tier defect(s):\n  " + "\n  ".join(bad)
 
 
+def test_blueprints_are_reconciled_through_their_newest_decision():
+    """The staleness stamp (Sunny's ruling, 2026-09-02). Narrative
+    blueprints have no mechanical drift guard — every drift the
+    2026-09-01 audit fixed (sqlglot in ARCHITECTURE, the execute story
+    in USER_FLOW) was found by reading, not CI. This check makes
+    acknowledgment mandatory: each component carries current_through,
+    and landing an ADR on component X with a higher number than X's
+    stamp is a red build until the stamp is bumped. Bumping it is an
+    ATTESTATION that the blueprint was reconciled against the decision
+    — the handoff-verdicts law applied to blueprints: the doc
+    acknowledges the change the moment it lands, or the build is red."""
+    bad = []
+    for key, comp in ARCHITECTURE_COMPONENTS.items():
+        stamp = comp.get("current_through")
+        if not stamp:
+            bad.append(f"{key}: no current_through stamp")
+            continue
+        if stamp not in TRACE_REGISTRY:
+            bad.append(f"{key}: current_through {stamp!r} is not an ADR")
+            continue
+        newer = sorted(
+            adr for adr, e in TRACE_REGISTRY.items()
+            if e["component"] == key and adr > stamp
+        )
+        if newer:
+            bad.append(
+                f"{key}: ADR(s) {newer} landed after its stamp "
+                f"({stamp}) — reconcile {comp['doc']} against them, "
+                f"then bump current_through (the bump IS the "
+                f"attestation)")
+    assert not bad, ("blueprint(s) not reconciled with their newest "
+                     "decision:\n  " + "\n  ".join(bad))
+
+
 def test_product_and_architecture_stay_separated():
     """Sunny's ruling, 2026-09-01: the product offering lives in its own
     folder. A category=product decision may not claim an architecture

@@ -204,6 +204,7 @@ Two citation handles, because the axiom systems are distinct and their group let
 - **Summarized in:**
   - `docs/product/MARKETPLACE_LISTING.md`
   - `docs/legal/terms-of-service.md`
+  - `docs/product/REVIEWER_GUIDE.md`
 
 ## ADR 0014 — Ground the agent in metric_logic; dictionary is mandatory
 
@@ -649,6 +650,7 @@ Two citation handles, because the axiom systems are distinct and their group let
 - **Summarized in:**
   - `docs/architecture/SPEC.md`
   - `docs/architecture/AXIOM_CROSSWALK.md`
+  - `docs/AI_VIA_AXIOMS.md`
 
 ## ADR 0048 — Declared zones, trace registry, admin graph, companion
 
@@ -857,6 +859,7 @@ Two citation handles, because the axiom systems are distinct and their group let
   - `tests/test_console.py`
 - **Summarized in:**
   - `docs/decisions/0063-product-tiers.md`
+  - `docs/product/XRAY_ENGAGEMENT.md`
 
 ## ADR 0064 — Group L: the ledger and drift axioms (closing the crosswalk gaps)
 
