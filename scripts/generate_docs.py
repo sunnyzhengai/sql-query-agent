@@ -311,6 +311,121 @@ def build_trace_map() -> str:
     return "\n".join(lines)
 
 
+def build_landing_matrix() -> str:
+    """DECISION_LANDING_MATRIX.md — the landing registry projected
+    (ADR 0068, an ADR 0067 ratchet turn). The registry is the truth;
+    this doc is its human view."""
+    # DEFAULT_PRODUCT_NAME, not product_name(): the committed artifact
+    # must be replay-deterministic — product_name() reads an env var
+    # and would make generation differ per machine (freshness CI).
+    from src.branding import DEFAULT_PRODUCT_NAME
+    brand = DEFAULT_PRODUCT_NAME
+    from src.landing_registry import (
+        CONSEQUENCES,
+        LANDING_ACTIONS,
+        OPEN_ITEMS,
+        OUTBOX_FIELDS,
+        OUTBOX_NOTE,
+        OUTBOX_OUTCOMES,
+        WORKFLOW_RULES,
+        ZERO_SCHEMA_FOOTPRINT,
+    )
+    def r(text: str) -> str:
+        return text.replace("{product}", brand)
+
+    lines = [
+        "<!-- GENERATED FILE — do not edit.",
+        "     Source: LANDING_REGISTRY in src/landing_registry.py",
+        "     Regenerate: python scripts/generate_docs.py",
+        "     CI fails if stale (tests/test_landing_registry.py). -->",
+        "",
+        "<!-- TIER: BLUEPRINT — component key: landing",
+        "     src/trace_registry.py ARCHITECTURE_COMPONENTS -->",
+        "",
+        f"# The decision landing matrix — {brand} · Purview · Collibra",
+        "",
+        "Converted to data by ADR 0068 (the ADR 0067 ratchet): the",
+        "registry is the truth, this file is its projection. Content",
+        "carries the source document's status — Sunny's four rulings",
+        "of 2026-08-31 are RULED; the matrix as a whole awaits",
+        "Bridge-build ratification. Rationale: the ADRs, never here.",
+        "",
+        "Support legend: `[native]` ships in the tool · `[config]`",
+        f"needs configuration · `[absent]` no surface — {brand} holds",
+        "it.",
+        "",
+        "## The four workflow rules",
+        "",
+    ]
+    for rid, rule in WORKFLOW_RULES:
+        lines.append(f"- **{rid}.** {rule}")
+    lines += ["", "## Zero schema footprint (ruled 2026-08-31)", ""]
+    zs = ZERO_SCHEMA_FOOTPRINT
+    lines += [
+        f"- **Source is a relationship, never a field** — "
+        f"{zs['source_is_a_relationship']}.",
+        f"- **Attribution is a prefix in the description text**: "
+        f"`{zs['attribution_prefix']}` (rendered with the "
+        f"deployment's product name) — {zs['attribution_note']}.",
+        f"- **Logic identity stays home** — {zs['logic_hash_stays_home']}.",
+        f"- **Accepted limit:** {zs['accepted_limit']}.",
+        "",
+        "## The OUTBOX (replaces \"sync\")",
+        "",
+        "One row per thing we ever proposed: "
+        + " · ".join(f"`{f}`" for f in OUTBOX_FIELDS),
+        "",
+        "Outcomes: " + " | ".join(OUTBOX_OUTCOMES) + ".",
+        "",
+        OUTBOX_NOTE + ".",
+        "",
+        "## The landing matrix",
+        "",
+    ]
+    for key, a in LANDING_ACTIONS.items():
+        flag = " *(UNBUILT — no authoring surface today)*" \
+            if a.get("unbuilt") else ""
+        lines.append(f"### {a['title']}{flag}")
+        lines.append("")
+        lines.append(f"- **Grade:** {r(a['grade'])}")
+        if a.get("own_only"):
+            lines.append(f"- **Lands:** {brand} only — neither "
+                         f"catalog has a surface for this")
+        else:
+            for system in ("purview", "collibra"):
+                s = a[system]
+                cells = []
+                if s.get("assets"):
+                    cells.append("assets: " + "; ".join(s["assets"]))
+                if s.get("relationships"):
+                    cells.append("relations: "
+                                 + "; ".join(s["relationships"]))
+                if s.get("status"):
+                    cells.append("status: " + s["status"])
+                for extra in ("reason", "rename_work"):
+                    if s.get(extra):
+                        cells.append(f"{extra}: {s[extra]}")
+                lines.append(f"- **{system.capitalize()}:** "
+                             + " · ".join(cells))
+        lines.append(f"- **{brand} keeps:** {r(a['keeps'])}")
+        lines.append("")
+    lines += [
+        "## Consequences",
+        "",
+        f"- **Console:** {CONSEQUENCES['console']}.",
+        f"- **Divergence:** {CONSEQUENCES['divergence']}.",
+        "",
+        "## Open at ratification",
+        "",
+    ]
+    for name, status, note in OPEN_ITEMS:
+        lines.append(f"- **{name}** ({status}): {note}")
+    lines.append("")
+    return "\n".join(lines)
+
+
+LANDING_MATRIX_PATH = (PROJECT_ROOT / "docs" / "architecture"
+                       / "DECISION_LANDING_MATRIX.md")
 TEST_MAP_PATH = PROJECT_ROOT / "docs" / "architecture" / "TEST_MAP.md"
 
 
@@ -326,6 +441,8 @@ def main() -> None:
     print(f"Wrote {NOTEBOOK_MAP_PATH}")
     TRACE_MAP_PATH.write_text(build_trace_map())
     print(f"Wrote {TRACE_MAP_PATH}")
+    LANDING_MATRIX_PATH.write_text(build_landing_matrix())
+    print(f"Wrote {LANDING_MATRIX_PATH}")
 
 
 if __name__ == "__main__":

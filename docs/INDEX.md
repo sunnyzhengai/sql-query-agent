@@ -113,7 +113,7 @@ nothing referenced them.
 Files are grouped by *what kind of thing they are*, which is also how
 they behave under change.
 
-### Authored — the design record (8)
+### Authored — the design record (7)
 
 Hand-written, highest interpretive value, lowest churn. These state
 intent; they are audited, not generated.
@@ -127,9 +127,8 @@ intent; they are audited, not generated.
 | [QUESTION_MAP.md](architecture/QUESTION_MAP.md) | 5 | What the storage must support, audited by question family. *Not* a runtime routing table (ADR 0062). |
 | [REFERENCE_ARCHITECTURE.md](architecture/REFERENCE_ARCHITECTURE.md) | 4 | The deployable reference: connector tiers, what runs per product tier, and the Azure consumption footprint. |
 | [SOURCE_CONNECTORS.md](architecture/SOURCE_CONNECTORS.md) | 3 | Where customer logic lives, how it is collected, and how change is detected across re-ingests. |
-| [DECISION_LANDING_MATRIX.md](architecture/DECISION_LANDING_MATRIX.md) | 2 | Which artifact each governance action produces in Purview/Collibra, and the OUTBOX that remembers it. |
 
-### Generated — projections of the registries (5)
+### Generated — projections of the registries (6)
 
 Compiled from `src/` registries by `scripts/generate_docs.py` and
 CI-checked for staleness. **Never edit by hand** — fix the registry and
@@ -139,6 +138,7 @@ authority comes from the code they project.
 | Document | Source registry | Governs |
 | --- | --- | --- |
 | [TRACE_MAP.md](architecture/TRACE_MAP.md) | `trace_registry.py` | The full chain: decision → component → axioms → code → tests. |
+| [DECISION_LANDING_MATRIX.md](architecture/DECISION_LANDING_MATRIX.md) | `landing_registry.py` | Every governance action's per-tool landing, grade, and what stays home (ADR 0068). |
 | [TEST_MAP.md](architecture/TEST_MAP.md) | `devtools/suite_map.py` | What every test proves, by ADR, standing law, and contract. |
 | [PIPELINE_MAP.md](architecture/PIPELINE_MAP.md) | `notebook_registry.py` | The stage sequence, each stage's inputs/outputs, and row conservation across them. |
 | [INTEGRATION_MAP.md](architecture/INTEGRATION_MAP.md) | `integration_registry.py` | What we parse in and publish out, with each write target's direction. |

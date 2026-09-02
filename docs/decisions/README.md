@@ -78,3 +78,4 @@ never deleted — its status changes and it links to its replacement.
 | [0065](0065-promote-the-double-sided-function.md) | Promote §13 to Group T: the double-sided function as numbered law (T0 the law, T1–T3 the instances) | Accepted (SPEC v0.9) |
 | [0066](0066-merge-sphere-into-architecture.md) | One system-model file: SPHERE merges into ARCHITECTURE — build status per section; kills the rival layer models | Accepted |
 | [0067](0067-docs-are-data.md) | Docs are data: the record invariant + the prose ratchet; turn 1 = the axiom ledger (spec_registry) | Accepted |
+| [0068](0068-landing-matrix-as-data.md) | The landing matrix as data: landing_registry + generated projection; 0063's two invariants mechanized | Accepted (content stays DRAFT v3 pending Bridge build) |

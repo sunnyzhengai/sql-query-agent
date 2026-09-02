@@ -163,7 +163,7 @@ ARCHITECTURE_COMPONENTS = {
     },
     "landing": {
         "doc": "docs/architecture/DECISION_LANDING_MATRIX.md",
-        "current_through": "0039",
+        "current_through": "0068",
         "title": "Decision landing — where every action lands",
         "satisfies": ["B", "R"],
         "governs": "Which artifact each governance action produces in "
@@ -754,6 +754,21 @@ TRACE_REGISTRY = {
                   "tests/test_term_hygiene.py", "tests/test_admin_graph.py",
                   "tests/test_companion.py"],
         "docs": ["docs/architecture/SPEC.md", "docs/architecture/TRACE_MAP.md"],
+    },
+    "0068": {
+        # ACCEPTED 2026-09-02 (ratchet turn 2): the landing matrix as
+        # data — landing_registry (ninth peer), the doc now generated.
+        # 0063's two invariants (no action without a landing, no
+        # landing without a grade) mechanized. Content keeps its DRAFT
+        # v3 status; the four 2026-08-31 rulings stay RULED.
+        "title": "The landing matrix as data (ratchet turn 2)",
+        "category": "architecture",
+        "component": "landing",
+        "axioms": [],
+        "modules": ["src/landing_registry.py"],
+        "tests": ["tests/test_landing_registry.py"],
+        "docs": ["docs/decisions/0068-landing-matrix-as-data.md",
+                 "docs/architecture/DECISION_LANDING_MATRIX.md"],
     },
     "0067": {
         # ACCEPTED 2026-09-02 (Sunny: docs are data): the record

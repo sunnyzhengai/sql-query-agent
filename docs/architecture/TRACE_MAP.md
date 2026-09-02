@@ -902,3 +902,15 @@ Two citation handles, because the axiom systems are distinct and their group let
 - **Summarized in:**
   - `docs/decisions/0067-docs-are-data.md`
   - `docs/architecture/SPEC.md`
+
+## ADR 0068 — The landing matrix as data (ratchet turn 2)
+
+- **Category:** architecture
+- **Component:** `landing` → `docs/architecture/DECISION_LANDING_MATRIX.md` → axm:B, axm:R
+- **Implemented by:**
+  - `src/landing_registry.py`
+- **Enforced by:**
+  - `tests/test_landing_registry.py`
+- **Summarized in:**
+  - `docs/decisions/0068-landing-matrix-as-data.md`
+  - `docs/architecture/DECISION_LANDING_MATRIX.md`

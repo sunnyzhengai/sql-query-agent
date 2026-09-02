@@ -1,180 +1,116 @@
-# The decision landing matrix — AIVIA · Purview · Collibra
+<!-- GENERATED FILE — do not edit.
+     Source: LANDING_REGISTRY in src/landing_registry.py
+     Regenerate: python scripts/generate_docs.py
+     CI fails if stale (tests/test_landing_registry.py). -->
 
-<!-- TIER: BLUEPRINT — generated marker, do not remove.
-     Component key: landing (src/trace_registry.py ARCHITECTURE_COMPONENTS)
-     Enforced by tests/test_trace_registry.py hierarchy checks. -->
+<!-- TIER: BLUEPRINT — component key: landing
+     src/trace_registry.py ARCHITECTURE_COMPONENTS -->
 
-> **Blueprint tier.** This file satisfies axiom groups **axm:B**
-> (Boundary) · **axm:R** (Residue & Ledger) from
-> [AI_VIA_AXIOMS.md](../AI_VIA_AXIOMS.md), and is the architecture home
-> for 2 decisions
-> (see [TRACE_MAP.md](TRACE_MAP.md#the-blueprint-tier) for the full
-> chain: decision → component → axioms → code → tests).
+# The decision landing matrix — SQL Intelligence Agent · Purview · Collibra
 
-**Status:** DRAFT v3 2026-08-31 — rebuilt on Sunny's three
-rulings: (1) HIERARCHY replaces official/sibling, parent is a
-CONCEPT node, never a promoted child; (2) approval happens in the
-customer's DG workflow — Purview's Unified Catalog publish
-workflow (author → steward → expert → owner → published) is
-native, correcting review's earlier claim; (3) NO SYNC — the
-OUTBOX model; and (4, this revision) **ZERO SCHEMA FOOTPRINT** in
-the customer's tenant (§1a). Sunny ratifies; the Bridge adapters
-build from this.
+Converted to data by ADR 0068 (the ADR 0067 ratchet): the
+registry is the truth, this file is its projection. Content
+carries the source document's status — Sunny's four rulings
+of 2026-08-31 are RULED; the matrix as a whole awaits
+Bridge-build ratification. Rationale: the ADRs, never here.
 
-## 0. The four workflow rules (crystal, no ambiguity)
+Support legend: `[native]` ships in the tool · `[config]`
+needs configuration · `[absent]` no surface — SQL Intelligence Agent holds
+it.
 
-1. **We act only when a PARSE SOURCE changes** — SQL, TMDL, or the
-   dictionary. No change, no proposal, no noise.
-2. **We never repeat a proposal we have already made** — the
-   OUTBOX (§1) is keyed by logic-hash, not by name.
-3. **We look before we write** — at write time we read the ONE
-   object we are about to touch (never the catalog at large).
-4. **We do not police their catalog between engagements** —
-   divergence between catalog text and parsed truth is an X-RAY
-   finding (a diagnostic engagement), not a live subsystem.
+## The four workflow rules
 
-## 1a. Zero schema footprint (Sunny's ruling, 2026-08-31)
+- **R1.** We act only when a PARSE SOURCE changes — SQL, TMDL, or the dictionary. No change, no proposal, no noise.
+- **R2.** We never repeat a proposal we have already made — the OUTBOX is keyed by logic-hash, not by name.
+- **R3.** We look before we write — at write time we read the ONE object we are about to touch, never the catalog at large.
+- **R4.** We do not police their catalog between engagements — divergence is an X-Ray finding, not a live subsystem.
 
-**AIVIA creates NO custom attributes in the customer's catalog.**
-Three consequences, and they replace every `aivia_*` field the
-earlier drafts proposed:
-- **Source is a RELATIONSHIP, never a field** — the term↔asset
-  link (Collibra *governs* / Purview term assignment) IS the
-  statement "this definition comes from that procedure," and it
-  stays correct when objects move. No `aivia_source`, no basis
-  string, no code fragment, no line pointer frozen in their
-  record.
-- **Attribution is a PREFIX in the description text** — every
-  machine-authored description begins `AIVIA agent generated: …`.
-  Honest to every reader in their native UI; needs no schema, no
-  admin setup, survives CSV import; and when a steward rewrites
-  the text, dropping the prefix is itself the signal of human
-  authorship.
-- **Logic identity (the parse hash) stays in AIVIA's OUTBOX** —
-  never written to their catalog. The hash is a normalized
-  fingerprint of a logical unit (not the snippet itself): stable
-  identity for LOGIC, where names are not. We are the party
-  proposing, so we are the party that must remember.
-- Technical explanation, where wanted, is PROSE in the technical
-  description (Collibra) / data-asset description (Purview) — a
-  readable sentence, never a snippet with pointers.
-- **Accepted limit:** with no marker in their catalog, a lost
-  outbox means we can only recognise our own artifacts by the
-  prefix text. Therefore the outbox is a BACKED-UP asset (it is
-  tiny), and the prefix is the human-readable fallback.
+## Zero schema footprint (ruled 2026-08-31)
 
-## 1. The OUTBOX (replaces "sync"; AIVIA-local, small)
+- **Source is a relationship, never a field** — the term-to-asset link (Collibra `governs` / Purview term assignment) IS the statement 'this definition comes from that procedure' — no source field, no code fragment, no frozen line pointer.
+- **Attribution is a prefix in the description text**: `{product} agent generated: ` (rendered with the deployment's product name) — machine-authored descriptions begin with the prefix; a steward rewriting the text and dropping it is itself the signal of human authorship.
+- **Logic identity stays home** — the parse hash (normalized fingerprint of a logical unit) lives only in the OUTBOX — we are the party proposing, so we are the party that must remember.
+- **Accepted limit:** with no marker in their catalog, a lost outbox means our artifacts are recognisable only by the prefix text — so the outbox is a BACKED-UP asset and the prefix is the fallback.
 
-One row per thing we ever proposed:
-`logic_hash · proposal_kind · target_system · target_object_id ·
-proposed_at · last_seen_outcome (published | denied | edited |
-missing) · outcome_seen_at`.
-- Prevents repeat proposals (rule 2) and records where the fact
-  now lives (the handoff receipt the console renders).
-- It is NOT a copy of their catalog: no term text, no
-  relationships, no status stream — only what WE asserted and
-  what we last observed at write time.
-- Outcome refreshes only when rule 3 fires (we're touching that
-  object anyway) or during an X-Ray.
+## The OUTBOX (replaces "sync")
 
-## 2. The asset & relationship matrix
+One row per thing we ever proposed: `logic_hash` · `proposal_kind` · `target_system` · `target_object_id` · `proposed_at` · `last_seen_outcome` · `outcome_seen_at`
 
-Every AIVIA action, mapped to the assets it creates/updates and
-the relationships it draws, in both tools.
-Legend: ✅ native · 🔧 customizable (custom attribute / relation
-type) · ❌ absent → AIVIA holds it.
+Outcomes: published | denied | edited | missing.
 
-### A1 · certify one definition
-| | Purview (Unified Catalog) | Collibra |
-|---|---|---|
-| assets | ✅ Glossary term (name + definition) · ✅ data asset (proc/view) | ✅ Business Term · ✅ Data Asset (proc/view) |
-| relationships | ✅ term → data asset (term assignment) · ✅ term → steward/expert (contacts) · ✅ term → report asset | ✅ term *governs* asset · ✅ term *responsible* steward (responsibility) · ✅ term → report relation |
-| status | ✅ Draft → Published via publish workflow | ✅ Candidate → Certified (configurable statuses) |
-| attribution | description text begins `AIVIA agent generated: …` (no custom fields) | same |
-| AIVIA keeps | outbox row only | outbox row only |
+NOT a copy of their catalog: no term text, no relationships, no status stream — only what WE asserted and what we last observed at write time; outcomes refresh only when rule R3 fires or during an X-Ray.
 
-### A2+A3 · organize into hierarchy  *(supersedes "designate official" and "differentiate all")*
-*The steward's real act on a name family: create the PARENT
-CONCEPT, give each variant its own distinct name + definition,
-attach as children. Optionally mark one child canonical.*
-| | Purview | Collibra |
-|---|---|---|
-| assets | ✅ parent glossary term (concept, no proc behind it) · ✅ N child terms (one per variant) | ✅ parent Business Term · ✅ N child Business Terms |
-| relationships | ✅ parent-child term hierarchy · ✅ each child → its proc (term assignment) · ✅ child → report/steward | ✅ hierarchical relation (parent/child) · ✅ child *governs* its proc · ✅ steward responsibility per child |
-| canonical child (optional) | ✅ expressed by the hierarchy itself + description wording (Purview has no native "official one"; no custom field is added) | ✅ a configured relation type (`is preferred term`) where the estate already has one |
-| rename work | ❌ no native task → **AIVIA console work list** | ✅ native workflow task assignment |
-| AIVIA keeps | outbox rows + open rename list where the tool has no task surface | outbox rows |
+## The landing matrix
 
-### A4 · deny with reason
-| | Purview | Collibra |
-|---|---|---|
-| assets | ✅ the term (stays, not published) | ✅ the term |
-| status | ✅ workflow rejection (the term is not published) — Purview's status set is not user-configurable, and we add no field; the rejection IS the record | ✅ status = Rejected/Denied (configurable) |
-| reason | ✅ workflow rejection comment | ✅ native comment / workflow reason |
-| AIVIA keeps | outbox row with `last_seen_outcome = denied` — **rule 2 then prevents re-proposal for that logic-hash** (no "memory" beyond this) | same |
+### certify one definition
 
-### A5 · approve technical write  *(NOTE: approval happens in THEIR workflow)*
-*Flow: Bridge parses → proposes Draft term/description →
-**their** publish workflow routes author → steward → expert →
-owner → published. AIVIA does not host an approval queue.*
-| | Purview | Collibra |
-|---|---|---|
-| assets | ✅ data asset description · ✅ column descriptions · ✅ glossary term (Draft) | ✅ asset attributes · ✅ Business Term (Candidate) |
-| relationships | ✅ lineage (process entities / scanned sources) · ✅ term → asset | ✅ *is derived from* / lineage relations · ✅ term *governs* asset |
-| approvers | ✅ workflow roles (steward/expert/owner) | ✅ workflow roles + responsibilities |
-| AIVIA keeps | outbox row (proposed → published/denied as last seen) | same |
+- **Grade:** steward-certified, approver named
+- **Purview:** assets: [native] glossary term (name + definition); [native] data asset (proc/view) · relations: [native] term -> data asset (term assignment); [native] term -> steward/expert (contacts); [native] term -> report asset · status: [native] Draft -> Published via publish workflow
+- **Collibra:** assets: [native] Business Term; [native] Data Asset (proc/view) · relations: [native] term `governs` asset; [native] term `responsible` steward; [native] term -> report relation · status: [native] Candidate -> Certified (configurable statuses)
+- **SQL Intelligence Agent keeps:** outbox row only
 
-### A6 · fork (developer authors a variant)  *(UNBUILT — no authoring surface today)*
-| | Purview | Collibra |
-|---|---|---|
-| assets | ✅ the new proc becomes an asset once parsed; ✅ its term Draft | ✅ same |
-| relationships | ✅ lineage child → parent proc; ✅ term hierarchy under the concept parent | ✅ same |
-| AIVIA keeps | the draft ONLY until it re-enters through the parser (0058-C4: claimed = parsed) | same |
+### organize a name family into hierarchy
 
-### A7 · reopen a ruling
-*Under the outbox model this is simply a NEW proposal cycle: the
-underlying SQL changed (rule 1) or a human reopens in their tool.*
-| | Purview | Collibra |
-|---|---|---|
-| assets/relations | ✅ the term returns to Draft via workflow | ✅ status back to Candidate; ✅ native history |
-| AIVIA keeps | outbox row updated at next write-time read (rule 3) | same |
+- **Grade:** steward-certified per child
+- **Purview:** assets: [native] parent glossary term (concept, no proc behind it); [native] N child terms (one per variant) · relations: [native] parent-child term hierarchy; [native] each child -> its proc; [native] child -> report/steward · status: [native] hierarchy + description wording — no native 'official one', no custom field added · rename_work: [absent] no native task -> console work list
+- **Collibra:** assets: [native] parent Business Term; [native] N child Business Terms · relations: [native] hierarchical relation; [native] child `governs` its proc; [native] steward responsibility per child · status: [config] `is preferred term` relation where the estate has one · rename_work: [native] workflow task assignment
+- **SQL Intelligence Agent keeps:** outbox rows + open rename list where the tool has no task surface
 
-### B · tasks & requests
-| action | Purview | Collibra | AIVIA |
-|---|---|---|---|
-| delegate to citizen steward | ✅ workflow assignment (publish workflow roles) | ✅ native workflow task | queue only where the tool lacks one |
-| escalate ("none of these is right") | ❌ not a demand system | ❌ | **AIVIA** (+ optional ticketing export later) |
+### deny with reason
 
-### C · machine signals — AIVIA only
-user confirm (usage weight) · run telemetry + rung stamps · parse
-corrections / lexicon growth · sweep state · outbox itself.
-A catalog cannot consume these; they never leave.
+- **Grade:** asserted (testimony; disposition recorded)
+- **Purview:** assets: [native] the term (stays, not published) · status: [native] workflow rejection — the rejection IS the record; no field added · reason: [native] workflow rejection comment
+- **Collibra:** assets: [native] the term · status: [native] Rejected/Denied (configurable) · reason: [native] comment / workflow reason
+- **SQL Intelligence Agent keeps:** outbox row outcome=denied — rule R2 then prevents re-proposal for that logic-hash
 
-## 3. Console consequence
+### approve technical write
 
-Decided cards are **handoff receipts**: state chip + approver +
-"proposed to <Purview|Collibra> · <last seen outcome> · [open in
-catalog]". They sink beneath open work with a Resolved (N)
-filter. Governance is reviewed IN THE CATALOG; the console proves
-the handoff and points there.
+- **Grade:** parsed-by-SQL Intelligence Agent, approved-by developer
+- **Purview:** assets: [native] data asset description; [native] column descriptions; [native] glossary term (Draft) · relations: [native] lineage (process entities); [native] term -> asset · status: [native] workflow roles (steward/expert/owner) approve
+- **Collibra:** assets: [native] asset attributes; [native] Business Term (Candidate) · relations: [native] `is derived from` / lineage; [native] term `governs` asset · status: [native] workflow roles + responsibilities
+- **SQL Intelligence Agent keeps:** outbox row (proposed -> published/denied as last seen)
 
-## 4. Divergence (catalog text vs parsed truth)
+### fork (developer authors a variant) *(UNBUILT — no authoring surface today)*
 
-Not a live subsystem. It is an **X-Ray finding**: at engagement
-time we read the objects in our outbox and report "N terms whose
-catalog text no longer matches the code that computes them." A
-paid diagnostic, consistent with rule 4.
+- **Grade:** asserted, owner = creator
+- **Purview:** assets: [native] the new proc becomes an asset once parsed; [native] its term Draft · relations: [native] lineage child -> parent proc; [native] term hierarchy under the concept parent · status: [native] as certify, once parsed
+- **Collibra:** assets: [native] same · relations: [native] same · status: [native] same
+- **SQL Intelligence Agent keeps:** the draft ONLY until it re-enters through the parser (0058-C4: claimed = parsed)
 
-## 5. Open at ratification
+### reopen a ruling
 
-1. CLOSED 2026-08-31 (zero schema footprint, §1a): no attribute
-   names to decide. Remaining sub-question — v1 transport:
-   file-first (ruled) for v1; the Unified Catalog API (public
-   preview) evaluated for stage 2 against a design-partner
-   tenant.
-2. Collibra operating-model relation types on Sunny's target
-   estates (her expertise).
-3. Canonical-child marking: attribute (both tools) vs a
-   configured Collibra relation type — cosmetic, decide at build.
-4. Outbox retention: keep forever (recommended — it is small and
-   it is the anti-repeat memory) vs prune with the estate.
+- **Grade:** new cycle — inherits the fresh proposal's grade
+- **Purview:** status: [native] term returns to Draft via workflow
+- **Collibra:** status: [native] back to Candidate; native history
+- **SQL Intelligence Agent keeps:** outbox row updated at next write-time read (R3)
+
+### delegate to citizen steward
+
+- **Grade:** delegate's answer returns as testimony; the STEWARD lands the conclusion
+- **Purview:** status: [native] workflow assignment (publish workflow roles)
+- **Collibra:** status: [native] workflow task
+- **SQL Intelligence Agent keeps:** queue only where the tool lacks one
+
+### escalate — none of these is right
+
+- **Grade:** demand artifact; the conversation attaches
+- **Lands:** SQL Intelligence Agent only — neither catalog has a surface for this
+- **SQL Intelligence Agent keeps:** the demand queue (+ optional ticketing export later)
+
+### machine signals (never leave)
+
+- **Grade:** machine weights (0056 w3/w8); rung stamps
+- **Lands:** SQL Intelligence Agent only — neither catalog has a surface for this
+- **SQL Intelligence Agent keeps:** user confirms (usage weight) - run telemetry + rung stamps - parse corrections / lexicon growth - sweep state - the outbox itself. A catalog cannot consume these.
+
+## Consequences
+
+- **Console:** decided cards are HANDOFF RECEIPTS: state chip + approver + 'proposed to <tool> - <last seen outcome> - [open in catalog]'; they sink beneath open work with a Resolved (N) filter — governance is reviewed IN THE CATALOG; the console proves the handoff.
+- **Divergence:** catalog text vs parsed truth is NOT a live subsystem: it is an X-Ray finding — at engagement time we read the objects in our outbox and report the mismatch count. A paid diagnostic (rule R4)..
+
+## Open at ratification
+
+- **attribute names** (closed): CLOSED 2026-08-31 by zero schema footprint — no names to decide; v1 transport file-first (ruled), Unified Catalog API evaluated at stage 2
+- **collibra relation types** (open): operating-model relation types on the target estates (Sunny's expertise)
+- **canonical-child marking** (open): attribute vs configured Collibra relation type — cosmetic, decide at build
+- **outbox retention** (open): keep forever (recommended: small, and it is the anti-repeat memory) vs prune with the estate
