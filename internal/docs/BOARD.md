@@ -81,6 +81,15 @@ view are preserved history.
       voice/gate kill > skeleton floor > absent; empties counted,
       never silent. D3 fully unblocked.
 
+### ORDERABLE (found 09-02, not ordered)
+- [ ] **GATE-RECUT (the SQL side of the gate):** three gate functions
+      still regex the FRAGMENT (parsed_grain — whose docstring claims
+      the parser decides — _table_violations, _condition_text's
+      240-char deciding windows). Now that DecisionSite carries
+      scope, the deciding set can come from tree sites instead.
+      Frontier pinned deny-by-default (TestRegexFrontier); grows only
+      on the record.
+
 ### RULINGS OPEN FOR SUNNY (carried + new)
 - [ ] Landing matrix v3 overall ratification (now generated from
       landing_registry; content unchanged, awaiting Bridge build)

@@ -117,3 +117,50 @@ class TestGateRegex1:
         sk = compose_skeleton("THIS IS NOT SQL AT ALL ((((")
         assert sk.startswith("This is a selection of")
         assert "\n-" not in sk, "an unparseable fragment produced claims"
+
+
+class TestRegexFrontier:
+    """Q1's lesson (Sunny, 09-02), mechanized: a ban is a FRONTIER plus
+    a mechanism. The sloppy first ban checked a hand-picked function by
+    substring; this check enumerates descriptions.py's ENTIRE regex
+    surface as data, deny-by-default — a new function reaching for `re`
+    fails CI until it is deliberately sanctioned or the debt list
+    grows on the record (the capability-registry G2 pattern, applied
+    at module grain)."""
+
+    # English/identifier munging — regex on TEXT is legitimate here.
+    SANCTIONED_TEXT_SIDE = {
+        "_column_words", "readable_column", "_stem",
+        "column_name_violations", "misattribution_violations",
+        "grounding_violations",
+    }
+    # Regex ON SQL — NAMED DEBT (the gate-side re-cut, orderable now
+    # that DecisionSite carries scope): approximate deciding-windows
+    # and text-derived grain/tables instead of tree sites. Includes a
+    # find from this enumeration: parsed_grain's docstring says "the
+    # parser decides" while the code regexes the fragment.
+    DEBT_SQL_SIDE = {"parsed_grain", "_table_violations",
+                     "_condition_text"}
+
+    def test_the_regex_frontier_is_enumerated_and_closed(self):
+        import ast as _ast
+        from pathlib import Path
+        src = (Path(__file__).resolve().parent.parent
+               / "src" / "descriptions.py").read_text()
+        users = set()
+        for fn in _ast.walk(_ast.parse(src)):
+            if isinstance(fn, (_ast.FunctionDef, _ast.AsyncFunctionDef)):
+                if any(isinstance(n, _ast.Attribute)
+                       and isinstance(n.value, _ast.Name)
+                       and n.value.id == "re" for n in _ast.walk(fn)):
+                    users.add(fn.name)
+        allowed = self.SANCTIONED_TEXT_SIDE | self.DEBT_SQL_SIDE
+        new = sorted(users - allowed)
+        assert not new, (
+            f"NEW regex user(s) in descriptions.py: {new} — sanction "
+            f"deliberately (text-side) or record as SQL-side debt; "
+            f"never silently")
+        gone = sorted(allowed - users)
+        assert not gone, (
+            f"frontier stale — no longer using re: {gone} (a debt item "
+            f"retired? update the list so the record matches reality)")
