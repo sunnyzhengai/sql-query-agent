@@ -118,8 +118,27 @@ view are preserved history.
 - [x] **Scorecard (dictionary-less worst-case leg):** 11 cases ·
       gate_passed 8 · skeleton_floor 0 · emptied 3 · fabricated 0.
       Report: internal/docs/DESC_CORPUS_REPORT.md (hand-gradable).
-- [ ] **DESC-LEAF-1 (ORDERABLE — found by the instrument's first
-      production-acceptance run):** the composer voices NONE of
+- [x] **DESC-LEAF-1 SHIPPED 09-02 (Sunny's "go"; all three ruled
+      parts):** (1) full leaf frontier voiced — LIKE family
+      ("begins with 'E11'" / contains / ends with / verbatim
+      pattern for irregular shapes), NOT_IN, NOT_BETWEEN, aggregate
+      subjects from a NEW structured fact (DecisionNode.func +
+      func_distinct, ScriptDom-extracted; TREE_CONTRACT_VERSION
+      1→2 regenerates everything governed), meaning-preserving
+      wrappers (UPPER et al.) pass the column's meaning through,
+      "after grouping" prefix retired; (2) placeholder ban in the
+      gate — _COMPOSER_PLACEHOLDERS frontier as data,
+      injection-proven per entry (TestPlaceholderBan); an
+      unvoicable leaf now raw-echoes and the gate REFUSES it =
+      counted empty, closed outcomes end-to-end; (3) the corpus
+      shows the class by name. EN ROUTE, red-first: the BETWEEN
+      literal-through-meaning_of defect ('between 4 and 5.6'
+      claimed 'between 4 and 6' — split at the dot) fixed via
+      _operand_phrase; EXISTS correlation stutter deduped. LIVE
+      RERUN: 11/11 gate_passed · 0 emptied · fabricated 0 —
+      High_Utilizer now voices the counted entity, Passthrough
+      voices the no-conditions fact. Suite 1524 green.
+      Original finding (kept for the record): the composer voiced NONE of
       {LIKE, NOT_LIKE, NOT_IN, NOT_BETWEEN} — the extractor emits
       all four; each falls to the raw-echo fallback
       (``condition holds: `ED.DX_CODE LIKE 'E11%'` ``), and raw echo

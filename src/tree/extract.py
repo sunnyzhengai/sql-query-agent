@@ -62,6 +62,8 @@ class DecisionNode:
     expression_sql: str             # VERBATIM token-stream text, whitespace-normalized
     op: "str | None" = None         # EQ / IN / BETWEEN / EXISTS / ... (leaves)
     column: "str | None" = None     # principal (left-side) column, if simple
+    func: "str | None" = None       # principal-side function name (DESC-LEAF-1:
+    func_distinct: bool = False     # COUNT(DISTINCT x) vs COUNT(x) — a claim)
     columns: "list[str]" = field(default_factory=list)
     operands: "list[str]" = field(default_factory=list)  # literals + @params
     children: "list[DecisionNode]" = field(default_factory=list)
@@ -71,6 +73,7 @@ class DecisionNode:
         return {
             "node_id": self.node_id, "kind": self.kind, "op": self.op,
             "context": self.context, "column": self.column,
+            "func": self.func, "func_distinct": self.func_distinct,
             "columns": self.columns, "operands": self.operands,
             "expression_sql": self.expression_sql,
             "must_voice": self.must_voice,
@@ -277,6 +280,25 @@ class _Extractor:
             return names[0] if names else None
         return None
 
+    def _principal_func(self, side) -> "tuple[str | None, bool]":
+        """Function name (+ DISTINCT flag) when the principal side is a
+        function call — the structured fact leaf voicing needs
+        (DESC-LEAF-1: COUNT(x) >= 4 must voice the counted entity, and
+        the name must come from the parse, never from text)."""
+        if side is None or _type_name(side) != "FunctionCall":
+            return None, False
+        try:
+            name = str(side.FunctionName.Value).upper()
+        except Exception:  # noqa: BLE001 — .NET reflection; counted via suppressed
+            self.suppressed += 1
+            return None, False
+        distinct = False
+        try:
+            distinct = str(side.UniqueRowFilter) == "Distinct"
+        except Exception:  # noqa: BLE001 — property absent on some node versions
+            self.suppressed += 1
+        return name, distinct
+
     def _leaf(self, node, context: str, path: str, op: str,
               principal_side=None) -> DecisionNode:
         self.tree.decision_sites_total += 1
@@ -287,10 +309,12 @@ class _Extractor:
         # counted but carry no decision content — not voice-worthy, not
         # part of the round-trip meaning (live find 2026-08-20).
         trivial = (op == "EQ" and not columns and len(set(operands)) <= 1)
+        func, distinct = self._principal_func(principal_side)
         return DecisionNode(
             node_id=path, kind="predicate", op=op, context=context,
             expression_sql=_verbatim(node),
             column=self._principal_column(principal_side),
+            func=func, func_distinct=distinct,
             columns=columns,
             operands=operands,
             must_voice=not trivial)

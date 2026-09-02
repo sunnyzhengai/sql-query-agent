@@ -288,6 +288,14 @@ _ACRONYM_GLOSS = re.compile(
     r"|\b([A-Z]{2,6})\s*\(([A-Za-z][A-Za-z\s/-]{3,40}?)\)")
 
 
+# DESC-LEAF-1 part 2 — the composer's own fallback strings, frontier
+# AS DATA (spec:G4 clause 1). A placeholder in prose means a leaf went
+# unvoiced; the ruled outcome (empties-(a) precedence) is a COUNTED
+# empty, never shipped mush. Each entry is injection-proven in
+# TestPlaceholderBan (clause 2). Extend the tuple, never special-case.
+_COMPOSER_PLACEHOLDERS = ("condition holds:", "the value")
+
+
 def voice_violations(text: str, fragment: str,
                      dict_lines: "list[str] | None" = None
                      ) -> "list[str]":
@@ -295,6 +303,12 @@ def voice_violations(text: str, fragment: str,
     out: "list[str]" = []
     ground = ((fragment or "") + "\n"
               + "\n".join(dict_lines or [])).lower()
+    for p in _COMPOSER_PLACEHOLDERS:
+        if re.search(rf"\b{re.escape(p)}", text, re.IGNORECASE):
+            out.append(
+                f"composer placeholder in a business description: "
+                f"{p!r} — an unvoiced leaf must become a counted "
+                "empty, not shipped mush")
     for obj in set(_HASH_OBJECT.findall(text)):
         out.append(
             f"technical object in a business description: {obj!r} — "
@@ -599,49 +613,140 @@ _OP_WORDS = {"EQ": "is", "NEQ": "is not", "GT": "is more than",
              "LTE": "is at most"}
 
 
+# DESC-LEAF-1: aggregate subjects, voiced from the parse's func fact.
+# Wrappers that do not change what a value MEANS pass the column's own
+# meaning through; anything outside these frontiers is unvoicable and
+# falls to the raw echo (which the gate refuses — a counted empty).
+_AGG_WORDS = {"SUM": "the total", "AVG": "the average",
+              "MIN": "the lowest", "MAX": "the highest"}
+_MEANING_PRESERVING = {"UPPER", "LOWER", "TRIM", "LTRIM", "RTRIM"}
+
+
+def _subject_phrase(n, meanings) -> "str | None":
+    """The grounded SUBJECT of a predicate leaf, or None when the
+    parse offers no voicable subject. Never a placeholder — 'the
+    value is at least 4' shipped as mush (the High_Utilizer grade);
+    the closed outcomes are voice-fully or counted-unvoiced."""
+    if n.column:
+        return meaning_of(n.column, meanings)
+    func = (getattr(n, "func", None) or "").upper()
+    inner_cols = [c for c in n.columns if c]
+    inner = inner_cols[0] if len(inner_cols) == 1 else None
+    if func in ("COUNT", "COUNT_BIG"):
+        d = "distinct " if getattr(n, "func_distinct", False) else ""
+        if inner:
+            return f"the number of {d}{meaning_of(inner, meanings)} values"
+        return f"the number of {d}records"
+    if func in _AGG_WORDS and inner:
+        return f"{_AGG_WORDS[func]} {meaning_of(inner, meanings)}"
+    if func in _MEANING_PRESERVING and inner:
+        return meaning_of(inner, meanings)
+    return None
+
+
+def _pattern_phrase(raw: str, negated: bool) -> str:
+    """A LIKE pattern -> a business verb, ONLY where the pattern shape
+    proves the verb (prefix/suffix/infix with no other wildcards);
+    anything irregular stays verbatim as 'matches the pattern' —
+    never simplified into a claim the SQL does not make."""
+    p = str(raw).strip().strip("'\"")
+    wild = set("%_[")
+    if p.endswith("%") and len(p) > 1 and not (set(p[:-1]) & wild):
+        verb, core = "starts with", p[:-1]
+    elif (p.startswith("%") and p.endswith("%") and len(p) > 2
+            and not (set(p[1:-1]) & wild)):
+        verb, core = "contains", p[1:-1]
+    elif p.startswith("%") and len(p) > 1 and not (set(p[1:]) & wild):
+        verb, core = "ends with", p[1:]
+    else:
+        verb, core = "matches the pattern", p
+    if negated:
+        verb = "does not " + {"starts with": "start with",
+                              "contains": "contain",
+                              "ends with": "end with",
+                              "matches the pattern": "match the pattern",
+                              }[verb]
+    return f"{verb} '{core}'"
+
+
+def _operand_phrase(v, meanings) -> str:
+    """A comparison operand: @parameters voice as their documented
+    meaning; literals stay VERBATIM. (Routing literals through
+    meaning_of split '5.6' at the dot and claimed 'between 4 and 6' —
+    a false claim found red-first by the NOT_BETWEEN exit test.)"""
+    s = str(v).strip()
+    if s.startswith("@"):
+        return meaning_of(s.lstrip("@"), meanings)
+    return s
+
+
+def _raw_echo(n) -> str:
+    # The honest last resort: verbatim, grounded, and UNSHIPPABLE —
+    # the gate's placeholder ban refuses it, so an unvoicable leaf
+    # becomes a counted empty, never silent mush (DESC-LEAF-1's
+    # closed-outcomes ruling).
+    return f"condition holds: `{n.expression_sql[:160]}`"
+
+
 def _leaf_phrase(n, meanings) -> "str | None":
     """One predicate leaf -> one grounded phrase (no trailing period).
     None = deliberately unvoiced here (join keys wire, they decide
     nothing; case_when is a projection choice, not membership)."""
     op = n.op or ""
-    col = meaning_of(n.column, meanings) if n.column else None
+    subj = _subject_phrase(n, meanings)
     if op in _OP_WORDS:
         if n.operands:
-            return f"{col or 'the value'} {_OP_WORDS[op]} {n.operands[0]}"
+            if subj is None:
+                return _raw_echo(n)
+            return f"{subj} {_OP_WORDS[op]} {n.operands[0]}"
         cols = [c for c in n.columns if c]
         if op == "EQ" and len(cols) >= 2:
             return None                      # column = column: a join key
         if len(cols) >= 2:
             return (f"{meaning_of(cols[0], meanings)} {_OP_WORDS[op]} "
                     f"{meaning_of(cols[1], meanings)}")
-    if op == "IN":
+    if op in ("IN", "NOT_IN"):
+        neg = op == "NOT_IN"
+        if subj is None:
+            return _raw_echo(n)
         if "SELECT" in (n.expression_sql or "").upper():
             # subquery IN: its literals belong to the INNER scope —
             # naming them here is the 3a leak by value
-            return (f"{col or 'the value'} is restricted to a "
-                    f"separately selected set")
+            return (f"{subj} is {'excluded from' if neg else 'restricted to'}"
+                    f" a separately selected set")
         if n.operands:
-            return f"{col or 'the value'} is {_values_from(n.operands)}"
-    if op == "BETWEEN":
+            return f"{subj} is {'not ' if neg else ''}{_values_from(n.operands)}"
+    if op in ("BETWEEN", "NOT_BETWEEN"):
+        falls = "does not fall" if op == "NOT_BETWEEN" else "falls"
         if len(n.operands) >= 2:
-            lo, hi = n.operands[0], n.operands[1]
-            return (f"{col or 'the value'} falls between "
-                    f"{meaning_of(str(lo).lstrip('@'), meanings)} and "
-                    f"{meaning_of(str(hi).lstrip('@'), meanings)}")
+            if subj is None:
+                return _raw_echo(n)
+            return (f"{subj} {falls} between "
+                    f"{_operand_phrase(n.operands[0], meanings)} and "
+                    f"{_operand_phrase(n.operands[1], meanings)}")
         cols = [c for c in n.columns if c]
         if len(cols) >= 3:
-            return (f"{meaning_of(cols[0], meanings)} falls between "
+            return (f"{meaning_of(cols[0], meanings)} {falls} between "
                     f"{meaning_of(cols[1], meanings)} and "
                     f"{meaning_of(cols[2], meanings)}")
+    if op in ("LIKE", "NOT_LIKE"):
+        if subj is None or not n.operands:
+            return _raw_echo(n)
+        return f"{subj} {_pattern_phrase(n.operands[0], op == 'NOT_LIKE')}"
     if op in ("IS", "IS_NOT"):
-        return (f"{col or 'the value'} is "
+        if subj is None:
+            return _raw_echo(n)
+        return (f"{subj} is "
                 f"{'recorded' if op == 'IS_NOT' else 'not recorded'}")
     if op == "EXISTS":
-        what = ", ".join(meaning_of(c, meanings)
-                         for c in n.columns[:2]) or "the linked records"
+        # dict.fromkeys: both sides of a correlation key usually carry
+        # the SAME meaning — '(patient id, patient id)' is a stutter
+        what = ", ".join(dict.fromkeys(
+            meaning_of(c, meanings)
+            for c in n.columns[:2])) or "the linked records"
         return f"a matching record exists ({what})"
     # Unknown shape: the verbatim expression IS grounded — quote it.
-    return f"condition holds: `{n.expression_sql[:160]}`"
+    return _raw_echo(n)
 
 
 def _render(n, meanings) -> "list[str]":
@@ -694,12 +799,25 @@ def compose_skeleton(fragment: str,
     for site in tree.sites:
         if site.scope != "outer" or site.context == "case_when":
             continue
-        prefix = "after grouping, " if site.context == "having" else ""
         for ph in _render(site.root, meanings):
-            text = f"- {prefix}{ph}."
+            text = f"- {ph}."
             if text not in seen:
                 seen.add(text)
                 lines.append(text)
+    if not tree.sites and not tree.unextracted:
+        # DESC-LEAF-1 (the Passthrough grade): ZERO decision sites at
+        # ANY scope is itself a voicable, grounded fact — 'a
+        # collection of records' said nothing. Any-scope on purpose:
+        # a filter in a derived table would make 'no filtering
+        # conditions' read as a lie to a human, whoever's claim it is.
+        from src.tree.extract import query_shape
+        shape = query_shape(fragment or "")
+        if shape.parse_ok:
+            lines.append(
+                "- No filtering conditions are applied in this step."
+                if shape.base_tables else
+                "- No source records are read; this step produces "
+                "derived values.")
     return "\n".join(lines)
 
 

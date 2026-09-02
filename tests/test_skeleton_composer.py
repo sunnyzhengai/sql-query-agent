@@ -163,3 +163,155 @@ class TestRegexFrontier:
         assert not gone, (
             f"frontier stale — no longer using re: {gone} (a debt item "
             f"retired? update the list so the record matches reality)")
+
+
+class TestLeafVoicing:
+    """DESC-LEAF-1 (ordered 09-02, extended by Sunny's hand-grade of
+    the live corpus): the composer voices the full leaf frontier —
+    {LIKE, NOT_LIKE, NOT_IN, NOT_BETWEEN} plus aggregate subjects —
+    instead of degrading to placeholders. Pattern ancestor (spec:G4
+    clause 3): the four decoy corpses above; these are the corpus
+    run's three empties and one mush-pass, red-first."""
+
+    DX = {"DX_CODE": "diagnosis code", "MED_NAME": "medication name",
+          "ENCOUNTER_ID": "encounter id", "HBA1C_VALUE": "hba1c value"}
+
+    def test_prefix_like_voices_starts_with(self):
+        frag = ("SELECT PATIENT_ID FROM ENCOUNTER_DIAGNOSIS "
+                "WHERE DX_CODE LIKE 'E11%'")
+        sk = compose_skeleton(frag, self.DX)
+        assert "diagnosis code starts with 'E11'" in sk
+        assert "condition holds" not in sk and "`" not in sk
+
+    def test_not_like_voices_the_negation(self):
+        frag = ("SELECT PATIENT_ID FROM ENCOUNTER_DIAGNOSIS "
+                "WHERE DX_CODE NOT LIKE 'O24.4%'")
+        sk = compose_skeleton(frag, self.DX)
+        assert "diagnosis code does not start with 'O24.4'" in sk
+
+    def test_contains_and_ends_with_patterns(self):
+        sk1 = compose_skeleton(
+            "SELECT PATIENT_ID FROM ENCOUNTER_DIAGNOSIS "
+            "WHERE DX_CODE LIKE '%KETO%'", self.DX)
+        assert "diagnosis code contains 'KETO'" in sk1
+        sk2 = compose_skeleton(
+            "SELECT PATIENT_ID FROM ENCOUNTER_DIAGNOSIS "
+            "WHERE DX_CODE LIKE '%.9'", self.DX)
+        assert "diagnosis code ends with '.9'" in sk2
+
+    def test_irregular_pattern_stays_verbatim(self):
+        """A pattern with interior wildcards is voiced AS a pattern —
+        never simplified into a claim the SQL does not make."""
+        sk = compose_skeleton(
+            "SELECT PATIENT_ID FROM ENCOUNTER_DIAGNOSIS "
+            "WHERE DX_CODE LIKE 'E1_.3%'", self.DX)
+        assert "diagnosis code matches the pattern 'E1_.3%'" in sk
+
+    def test_not_in_voices_the_exclusion(self):
+        frag = ("SELECT PATIENT_ID FROM MEDICATION_ORDERS "
+                "WHERE MED_NAME NOT IN ('METFORMIN', 'INSULIN')")
+        sk = compose_skeleton(frag, self.DX)
+        assert "medication name is not 'METFORMIN', 'INSULIN'" in sk
+
+    def test_not_between_voices_the_negation(self):
+        frag = ("SELECT PATIENT_ID FROM LAB_RESULTS "
+                "WHERE HBA1C_VALUE NOT BETWEEN 4 AND 5.6")
+        sk = compose_skeleton(frag, self.DX)
+        assert "hba1c value does not fall between 4 and 5.6" in sk
+
+    def test_having_count_voices_the_counted_entity(self):
+        """The High_Utilizer mush-pass: 'the value is at least 4'
+        dropped the load-bearing content. The tree HAS the fact."""
+        frag = ("SELECT E.PATIENT_ID, COUNT(E.ENCOUNTER_ID) AS V "
+                "FROM ENCOUNTERS E GROUP BY E.PATIENT_ID "
+                "HAVING COUNT(E.ENCOUNTER_ID) >= 4")
+        sk = compose_skeleton(frag, self.DX)
+        assert "the number of encounter id values is at least 4" in sk
+        assert "the value" not in sk
+        assert "after grouping" not in sk
+
+    def test_count_star_and_distinct(self):
+        sk1 = compose_skeleton(
+            "SELECT PATIENT_ID FROM ENCOUNTERS "
+            "GROUP BY PATIENT_ID HAVING COUNT(*) > 2", self.DX)
+        assert "the number of records is more than 2" in sk1
+        sk2 = compose_skeleton(
+            "SELECT PATIENT_ID FROM ENCOUNTERS GROUP BY PATIENT_ID "
+            "HAVING COUNT(DISTINCT ENCOUNTER_ID) > 2", self.DX)
+        assert ("the number of distinct encounter id values "
+                "is more than 2") in sk2
+
+    def test_sum_and_meaning_preserving_wrappers(self):
+        sk1 = compose_skeleton(
+            "SELECT PATIENT_ID FROM CHARGES GROUP BY PATIENT_ID "
+            "HAVING SUM(AMOUNT) > 1000", {"AMOUNT": "charge amount"})
+        assert "the total charge amount is more than 1000" in sk1
+        sk2 = compose_skeleton(
+            "SELECT PATIENT_ID FROM ENCOUNTER_DIAGNOSIS "
+            "WHERE UPPER(DX_CODE) = 'E11'", self.DX)
+        assert "diagnosis code is 'E11'" in sk2
+
+
+class TestPassThroughFact:
+    """The Passthrough grade: 'a collection of records' says nothing.
+    Zero decision sites is itself a voicable, grounded fact."""
+
+    def test_select_star_states_no_conditions(self):
+        sk = compose_skeleton("SELECT * FROM DM_REGISTRY", None)
+        assert "No filtering conditions are applied in this step." in sk
+
+    def test_constant_select_states_no_source(self):
+        sk = compose_skeleton("SELECT 1 AS ALWAYS_TRUE", None)
+        assert ("No source records are read; this step produces "
+                "derived values.") in sk
+
+    def test_filtered_step_gets_no_passthrough_line(self):
+        sk = compose_skeleton(
+            "SELECT PATIENT_ID FROM LAB_RESULTS WHERE HBA1C_VALUE > 7",
+            {"HBA1C_VALUE": "hba1c value"})
+        assert "No filtering conditions" not in sk
+
+
+class TestPlaceholderBan:
+    """DESC-LEAF-1 part 2 — no placeholder ships uncounted. The gate
+    learns the composer's own fallback strings, frontier AS DATA
+    (spec:G4 clause 1); each entry is proven by injection here
+    (clause 2, the pinned meta-test)."""
+
+    def test_frontier_is_data_and_each_entry_fires(self):
+        from src.descriptions import _COMPOSER_PLACEHOLDERS, grounding_violations
+        frag = "SELECT PATIENT_ID FROM ENCOUNTERS"
+        assert _COMPOSER_PLACEHOLDERS  # deny-by-default: never empty
+        for p in _COMPOSER_PLACEHOLDERS:
+            v = grounding_violations(f"This step keeps rows where "
+                                     f"{p} something.", frag)
+            assert any("placeholder" in x for x in v), p
+
+    def test_clean_prose_does_not_trip_the_ban(self):
+        from src.descriptions import grounding_violations
+        v = grounding_violations(
+            "This is a selection of patients.\n"
+            "- The hba1c value exceeds 6.5.",
+            "SELECT PATIENT_ID FROM LAB_RESULTS WHERE HBA1C_VALUE > 6.5")
+        assert not any("placeholder" in x for x in v)
+
+    def test_unvoicable_leaf_is_a_counted_empty_not_mush(self):
+        """The closed outcome, end to end: a leaf the composer cannot
+        voice falls to the raw echo, and the gate REFUSES it — the
+        step empties and is counted, never shipped as mush."""
+        from src.descriptions import grounding_violations
+        frag = ("SELECT PATIENT_ID FROM ENCOUNTERS "
+                "WHERE DATEDIFF(day, ADMIT_DATE, DISCHARGE_DATE) > 5")
+        sk = compose_skeleton(frag, None)
+        assert "condition holds" in sk          # the honest last resort
+        assert grounding_violations(sk, frag)   # ...and it cannot ship
+
+    def test_exists_correlation_keys_dedupe(self):
+        """P.PATIENT_ID = E.PATIENT_ID is ONE meaning — '(patient id,
+        patient id)' read as a stutter in the live sample."""
+        sk = compose_skeleton(
+            "SELECT E.PATIENT_ID FROM ENCOUNTERS E WHERE NOT EXISTS "
+            "(SELECT 1 FROM PCP P WHERE P.PATIENT_ID = E.PATIENT_ID)",
+            None)
+        assert "(patient id)" in sk
+        assert "patient id, patient id" not in sk
