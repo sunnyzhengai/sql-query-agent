@@ -7,7 +7,7 @@
 
 # Test Map — what every test proves
 
-130 modules, 1512 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
+131 modules, 1527 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
 
 ## By ADR
 
@@ -66,7 +66,7 @@
 | 0060 | The parse is the plan: parser-only LLM, deterministic traversal, correction flywheel | `tests/orchestrator/test_parse_plan.py` (28) |
 | 0061 | The run layer: Pro runs the confirmed definition | `tests/test_run_layer.py` (25) |
 | 0062 | The dialogue loop: show, propose, ask, execute | `tests/webapp/test_app.py` (79) |
-| 0063 | The product tiers: X-Ray, Bridge, Workbench, Run | `tests/adapters/test_file_export.py` (9), `tests/test_console.py` (20), `tests/test_xray.py` (7) |
+| 0063 | The product tiers: X-Ray, Bridge, Workbench, Run | `tests/adapters/test_file_export.py` (9), `tests/test_console.py` (20), `tests/test_term_propose.py` (15), `tests/test_xray.py` (7) |
 | 0064 | Group L: the ledger and drift axioms (closing the crosswalk gaps) | `tests/test_ledger_contract.py` (4) |
 | 0065 | Promote section 13 to Group T: the double-sided function as numbered law | `tests/test_tree_contract.py` (14) |
 | 0067 | Docs are data: the record invariant and the prose ratchet | `tests/test_spec_registry.py` (8) |
@@ -129,6 +129,7 @@
 - `tests/test_secrets_vault.py` (6): KEYVAULT-1 (code-side): "keyvault:<name>" refs resolve through
 - `tests/test_suite_map.py` (9): TEST_MAP totality (morning order 1, 2026-08-27): every test module
 - `tests/test_suite_transcript.py` (7): Suite transcript emission (morning order 2, 2026-08-27): every
+- `tests/test_term_propose.py` (15): TERM-PROPOSE-1/2 — the answer key, authored BEFORE the module
 - `tests/test_xray.py` (7): X-RAY-1 (0063 §1, the wedge): the Estate X-Ray report — real
 
 ### contract:org-config — org_config referential integrity, LOCAL and TENANT copies together

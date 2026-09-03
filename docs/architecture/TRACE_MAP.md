@@ -848,10 +848,12 @@ Two citation handles, because the axiom systems are distinct and their group let
   - `src/xray.py`
   - `src/adapters/file_export.py`
   - `src/console.py`
+  - `src/term_propose.py`
 - **Enforced by:**
   - `tests/test_xray.py`
   - `tests/adapters/test_file_export.py`
   - `tests/test_console.py`
+  - `tests/test_term_propose.py`
 - **Summarized in:**
   - `docs/decisions/0063-product-tiers.md`
   - `docs/product/XRAY_ENGAGEMENT.md`

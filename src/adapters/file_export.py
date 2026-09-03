@@ -210,10 +210,22 @@ def to_csv(rows: "list[dict]") -> str:
 def export_bridge_files(run_kql, approver: str, out_dir: str,
                         domain: str = "",
                         expert: str = "") -> "dict[str, int]":
-    """Write the three stage-1 files; returns {filename: rows} —
-    the postcondition the caller prints (an acknowledgment is a
-    claim; the row counts are the fact)."""
+    """Write the stage-1 files; returns {filename: rows} — the
+    postcondition the caller prints (an acknowledgment is a claim;
+    the row counts are the fact).
+
+    TERM-PROPOSE-1/2 (09-04): the hierarchy set rides the same
+    export — every OPEN conflict-class name family as parent
+    concept + child terms (landing_registry organize_hierarchy)."""
     from pathlib import Path
+
+    from src.term_propose import (
+        hierarchy_collibra_asset_rows,
+        hierarchy_collibra_relation_rows,
+        hierarchy_purview_rows,
+        term_hierarchy_payloads,
+    )
+    payloads = term_hierarchy_payloads(run_kql)
     outputs = {
         "collibra_assets.csv":
             collibra_asset_rows(run_kql, approver, domain),
@@ -221,6 +233,12 @@ def export_bridge_files(run_kql, approver: str, out_dir: str,
             collibra_relation_rows(run_kql, approver),
         "purview_glossary.csv":
             purview_glossary_rows(run_kql, approver, expert),
+        "purview_term_hierarchy.csv":
+            hierarchy_purview_rows(payloads),
+        "collibra_term_hierarchy_assets.csv":
+            hierarchy_collibra_asset_rows(payloads, domain),
+        "collibra_term_hierarchy_relations.csv":
+            hierarchy_collibra_relation_rows(payloads),
     }
     counts = {}
     for fname, rows in outputs.items():

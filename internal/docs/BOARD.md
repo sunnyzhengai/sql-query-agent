@@ -283,18 +283,22 @@ record why here and move on — do not stall the queue.
        (600_voice_kill rows). Suite 1594 green. Estate-rerun
        evidence lands with item 5's single regeneration (item 3
        changes composition again — one paid run covers both exits).
-3. [ ] **Report-review trio** (each answer-key-first):
-       a. Constant lead line: no-table steps must not open with
-          'This is a selection of records' — adapt the lead to the
-          derived-values fact; update degenerate_literal's expect.
-       b. EXISTS names the missing record: use the inner table's
-          dictionary meaning ('no primary-care assignment record
-          exists for the patient'); dictionary-less fallback stays
-          current phrasing; extend No_PCP + add a with-dictionary
-          negation case.
-       c. DAX_CASES: dead corpus — either wire a dax leg through the
-          measure path with authored answers, or delete with a
-          recorded reason. Pick one, on the record.
+3. [x] **Report-review trio DONE (09-04 overnight, 383fb3e; each
+       answer-key-first):**
+       a. Lead line: a no-table step's LEAD now IS the derived-values
+          fact; Constant's authored answer updated; legacy test
+          carries its principle.
+       b. EXISTS names the missing record: leaves capture the
+          subquery's first FROM table (TREE_CONTRACT_VERSION 3→4),
+          meanings_for_step carries TABLE descriptions, phrase =
+          'no primary-care assignment record exists for the patient'
+          w/ dictionary; dictionary-less fallback unchanged
+          (No_PCP_Dict authored red-first; No_PCP stands).
+       c. DAX_CASES DELETED, reason on the record (dead data, never
+          wired; the corpus grades the deterministic skeleton
+          acceptance, which DAX never passes through — re-enters if
+          the measure path gains a deterministic floor).
+       PROMPT_VERSION 10.t4. Suite 1597 green.
 4. [ ] **P1 TERM-PROPOSE-1/2** (see P1 section below): execute per
        its standing spec; contracts-first; if the spec is too thin
        to build safely overnight, write the contract + red tests

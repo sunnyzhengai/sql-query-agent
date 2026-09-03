@@ -964,11 +964,16 @@ TRACE_REGISTRY = {
         "category": "product",
         "component": "product",
         "axioms": [],
+        # TERM-PROPOSE-1/2 built 2026-09-04 (P1 of the 08-31 build
+        # queue): name families -> parent-concept + child-term
+        # hierarchy proposals, rendered file-first
+        # (landing_registry organize_hierarchy row).
         "modules": ["src/xray.py", "src/adapters/file_export.py",
-                    "src/console.py"],
+                    "src/console.py", "src/term_propose.py"],
         "tests": ["tests/test_xray.py",
                   "tests/adapters/test_file_export.py",
-                  "tests/test_console.py"],
+                  "tests/test_console.py",
+                  "tests/test_term_propose.py"],
         "docs": ["docs/decisions/0063-product-tiers.md",
                  "docs/product/XRAY_ENGAGEMENT.md"],
     },
