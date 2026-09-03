@@ -138,6 +138,7 @@ class TestRegexFrontier:
         "_table_violations", "generate_descriptions",
         "metric_scope_violations", "placeholder_violations",
         "purpose_violations", "voice_violations",
+        "_dict_meanings",   # parses '- NAME: desc' dictionary LINES
     }
     # Regex ON SQL: EMPTY since the gate recut (2026-09-02) —
     # parsed_grain / parsed_tables / parsed_columns / _condition_text
@@ -300,10 +301,14 @@ class TestPlaceholderBan:
     def test_unvoicable_leaf_is_a_counted_empty_not_mush(self):
         """The closed outcome, end to end: a leaf the composer cannot
         voice falls to the raw echo, and the gate REFUSES it — the
-        step empties and is counted, never shipped as mush."""
+        step empties and is counted, never shipped as mush. (The
+        original corpse here was a DATEDIFF comparison — EXPR-IR-1's
+        compositional renderer now voices it, so the corpse advanced
+        to a CASE-in-predicate, the ruled unrendered kind.)"""
         from src.descriptions import grounding_violations
-        frag = ("SELECT PATIENT_ID FROM ENCOUNTERS "
-                "WHERE DATEDIFF(day, ADMIT_DATE, DISCHARGE_DATE) > 5")
+        frag = ("SELECT PATIENT_ID FROM ENCOUNTERS WHERE "
+                "CASE WHEN ADMIT_DATE > DISCHARGE_DATE THEN 1 "
+                "ELSE 0 END = 1")
         sk = compose_skeleton(frag, None)
         assert "condition holds" in sk          # the honest last resort
         assert grounding_violations(sk, frag)   # ...and it cannot ship
@@ -365,3 +370,117 @@ class TestEstateScaleCorpses:
         assert not any("placeholder" in x for x in ok), ok
         bad = grounding_violations("The value is at least 3022.", frag)
         assert any("placeholder" in x for x in bad)
+
+
+class TestCompositionalRenderer:
+    """EXPR-IR-1 (Sunny's ruling 09-03, first principles): interpret
+    the AST the way it was built — structural recursion, one rule per
+    GRAMMAR node type, never a rule per shape. The extractor CAPTURES
+    the scalar subtree in the walk it already runs (the depth-1 cliff
+    dies); the composer renders the captured record with the
+    dictionary at composition time. Pattern ancestor (spec:G4):
+    _convert/_render's boolean recursion — this extends it through
+    the leaf it used to stop at."""
+
+    M = {"TAKEN_TIME": "the antibiotic administration time",
+         "BLOOD_CULTURE_ORDER_TIME": "the blood culture order time",
+         "AMOUNT": "charge amount", "WEIGHT_KG": "weight in kilograms"}
+
+    def test_the_36_empties_shape_renders_at_any_depth(self):
+        """The live ABX corpse: depth-3 ABS(DATEDIFF)/60 <= 72 —
+        raw-echoed and emptied under the depth-1 probes."""
+        frag = ("SELECT ENCOUNTER_ID FROM MED_ADMIN MA WHERE "
+                "(ABS(DATEDIFF(MI, MA.TAKEN_TIME, "
+                "BC.BLOOD_CULTURE_ORDER_TIME)) / 60.00) <= 72.0")
+        sk = compose_skeleton(frag, self.M)
+        assert "condition holds" not in sk and "`" not in sk
+        assert ("the absolute value of the minutes between the "
+                "antibiotic administration time and the blood culture "
+                "order time, divided by 60.00 is at most 72.0") in sk
+
+    def test_arithmetic_composes_without_a_function(self):
+        frag = ("SELECT PATIENT_ID FROM VITALS WHERE "
+                "WEIGHT_KG * 2.2 > 300")
+        sk = compose_skeleton(frag, self.M)
+        assert ("weight in kilograms times 2.2 is more than 300") in sk
+
+    def test_generic_function_rule_covers_the_unknown(self):
+        """No SQUARE overlay exists and never will — the GENERIC rule
+        must cover it (coverage by composition, quality by evidence)."""
+        frag = "SELECT PATIENT_ID FROM VITALS WHERE SQUARE(AMOUNT) > 100"
+        sk = compose_skeleton(frag, self.M)
+        assert "the square of charge amount is more than 100" in sk
+        assert "condition holds" not in sk
+
+    def test_comparand_is_role_exact_not_first_flat_operand(self):
+        """The wrong-number corpse: the flat operand list once put the
+        DIVISOR where the threshold belongs ('at most 60.00'). The
+        captured record keeps roles: the right side is the comparand."""
+        frag = ("SELECT ENCOUNTER_ID FROM MED_ADMIN WHERE "
+                "(ABS(DATEDIFF(MI, TAKEN_TIME, "
+                "BLOOD_CULTURE_ORDER_TIME)) / 60.00) <= 72.0")
+        sk = compose_skeleton(frag, self.M)
+        assert "is at most 72.0" in sk
+        assert "is at most 60.00" not in sk
+
+    def test_unrenderable_kind_still_dies_counted(self):
+        """CASE inside a predicate stays outside the rule table —
+        closed outcomes: raw echo, gate-refused, counted."""
+        from src.descriptions import grounding_violations
+        frag = ("SELECT A FROM T WHERE "
+                "CASE WHEN B > 1 THEN 1 ELSE 0 END = 1")
+        sk = compose_skeleton(frag, None)
+        assert "condition holds" in sk
+        assert grounding_violations(sk, frag)
+
+    def test_kind_frontier_is_data_and_total(self):
+        """spec:G4: every capture kind the extractor can produce has a
+        render rule or a recorded unrendered reason — both directions."""
+        from src.descriptions import RENDERED_KINDS, UNRENDERED_KINDS
+        from src.tree.extract import EXPR_KINDS
+        covered = set(RENDERED_KINDS) | set(UNRENDERED_KINDS)
+        assert set(EXPR_KINDS) == covered, (
+            set(EXPR_KINDS) ^ covered)
+        assert all(str(v).strip() for v in UNRENDERED_KINDS.values())
+
+
+class TestCheckerMeaningsBridge:
+    """The ~15 estate false kills: two checkers predate the meanings
+    reframe — a TRUE claim voiced via a column's dictionary meaning
+    was unrecognizable to them. The bridge: a deciding column's
+    dictionary words count as naming it; a SELECT-only column's do
+    not (role-faithful, not a loosening)."""
+
+    def test_deciding_columns_meaning_grounds_a_filter_claim(self):
+        from src.descriptions import grounding_violations
+        frag = ("SELECT ENCOUNTER_ID FROM FLOWSHEET_RECORDED WHERE "
+                "FLO_MEAS_ID IN (SELECT MEAS_ID FROM VALUE_SETS)")
+        dl = ["- FLO_MEAS_ID: The unique ID for the flowsheet group "
+              "associated with this reading."]
+        text = ("This is a selection of encounters.\n"
+                "- The unique ID for the flowsheet group associated "
+                "with this reading is restricted to a separately "
+                "selected set.")
+        assert not grounding_violations(text, frag, dl)
+
+    def test_select_only_columns_meaning_still_fails(self):
+        from src.descriptions import grounding_violations
+        frag = ("SELECT FLO_MEAS_ID FROM FLOWSHEET_RECORDED "
+                "WHERE ENCOUNTER_TYPE = 'ED'")
+        dl = ["- FLO_MEAS_ID: The unique ID for the flowsheet group "
+              "associated with this reading."]
+        text = ("- The unique ID for the flowsheet group associated "
+                "with this reading is restricted to a separately "
+                "selected set.")
+        v = grounding_violations(text, frag, dl)
+        assert any("selected-not-filtered" in x
+                   or "ungrounded filter" in x for x in v), v
+
+    def test_misattribution_accepts_the_meaning_as_subject(self):
+        from src.descriptions import grounding_violations
+        frag = ("SELECT A FROM T WHERE meas.RECORDED_TIME BETWEEN "
+                "base.IN_DTTM AND base.OUT_DTTM")
+        dl = ["- RECORDED_TIME: The instant the reading was taken."]
+        text = ("- The instant the reading was taken falls between "
+                "in dttm and out dttm.")
+        assert not grounding_violations(text, frag, dl)

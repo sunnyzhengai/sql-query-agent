@@ -7,4 +7,6 @@ regenerates everything it governs.
 
 # "2": DESC-LEAF-1 — leaves carry the principal-side function
 # (func/func_distinct); the composer voices the full leaf frontier.
-TREE_CONTRACT_VERSION = "2"
+# "3": EXPR-IR-1 — leaves carry role-ordered captured expression
+# trees (exprs); the composer interprets them compositionally.
+TREE_CONTRACT_VERSION = "3"

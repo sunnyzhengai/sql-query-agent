@@ -73,6 +73,17 @@ EMITTED_OPS = frozenset({
     "IS", "IS_NOT", "EXISTS", "PARAMETER_DEFAULT",
 })
 
+# EXPR-IR-1 (ruled 09-03): the closed vocabulary of captured scalar-
+# expression kinds — one per GRAMMAR node family, never per shape.
+# The renderer holds RENDERED_KINDS ⊎ UNRENDERED_KINDS == this set
+# (test_skeleton_composer's kind-frontier check, the G4 form).
+EXPR_KINDS = ("column", "literal", "variable", "function",
+              "arithmetic", "unary", "cast", "case", "subquery",
+              "unknown")
+
+_ARITH_SYMBOLS = {"Add": "+", "Subtract": "-", "Multiply": "*",
+                  "Divide": "/", "Modulo": "%"}
+
 # Node type names whose subtrees never hold decision contexts we want
 # and are expensive to reflect over.
 _SKIP_PROPERTIES = frozenset({
@@ -81,6 +92,25 @@ _SKIP_PROPERTIES = frozenset({
     "Value", "LargeValue", "IsNot", "IsPrimaryExpression",
     "Collation",
 })
+
+
+@dataclass
+class ExprNode:
+    """One captured scalar-expression node (EXPR-IR-1): the IR the
+    composer and checkers interpret. kind ∈ EXPR_KINDS (closed);
+    name holds the column/literal/variable/function/operator token;
+    children carry the composition. Captured ONCE, in the extractor
+    walk that is already standing on the ScriptDom node — never
+    re-parsed, never flattened."""
+    kind: str
+    name: str = ""
+    distinct: bool = False
+    children: "list[ExprNode]" = field(default_factory=list)
+
+    def to_dict(self) -> dict:
+        return {"kind": self.kind, "name": self.name,
+                "distinct": self.distinct,
+                "children": [c.to_dict() for c in self.children]}
 
 
 @dataclass
@@ -93,6 +123,10 @@ class DecisionNode:
     column: "str | None" = None     # principal (left-side) column, if simple
     func: "str | None" = None       # principal-side function name (DESC-LEAF-1:
     func_distinct: bool = False     # COUNT(DISTINCT x) vs COUNT(x) — a claim)
+    exprs: "list[ExprNode]" = field(default_factory=list)  # EXPR-IR-1:
+    # role-ordered captured sides (subject first, then comparands /
+    # bounds) — the walk keeps the tree it is standing on instead of
+    # flattening it (the depth-1 cliff, ruled dead 09-03)
     columns: "list[str]" = field(default_factory=list)
     operands: "list[str]" = field(default_factory=list)  # literals + @params
     children: "list[DecisionNode]" = field(default_factory=list)
@@ -103,6 +137,7 @@ class DecisionNode:
             "node_id": self.node_id, "kind": self.kind, "op": self.op,
             "context": self.context, "column": self.column,
             "func": self.func, "func_distinct": self.func_distinct,
+            "exprs": [x.to_dict() for x in self.exprs],
             "columns": self.columns, "operands": self.operands,
             "expression_sql": self.expression_sql,
             "must_voice": self.must_voice,
@@ -309,6 +344,80 @@ class _Extractor:
             return names[0] if names else None
         return None
 
+    _CAPTURE_LIMIT = 24   # recursion guard; past this, honesty > detail
+
+    def _capture_expr(self, node, depth: int = 0) -> ExprNode:
+        """EXPR-IR-1: structural capture of a scalar expression — one
+        branch per GRAMMAR family; recursion handles depth, so no
+        shape is ever enumerated. An unknown family becomes
+        kind='unknown' (the renderer's counted outcome), never
+        dropped — the conservation law at expression grain."""
+        if node is None:
+            return ExprNode("unknown", "")
+        if depth > self._CAPTURE_LIMIT:
+            return ExprNode("unknown", _verbatim(node)[:160])
+        tn = _type_name(node)
+        try:
+            if tn == "ColumnReferenceExpression":
+                names = self._column_names(node)
+                return ExprNode(
+                    "column", names[0] if names else _verbatim(node)[:80])
+            if tn == "StringLiteral":
+                return ExprNode("literal", f"'{node.Value}'")
+            if tn == "NullLiteral":
+                return ExprNode("literal", "NULL")
+            if tn.endswith("Literal"):
+                return ExprNode("literal", str(node.Value))
+            if tn == "VariableReference":
+                return ExprNode("variable", str(node.Name))
+            if tn == "FunctionCall":
+                name = str(node.FunctionName.Value).upper()
+                distinct = str(getattr(node, "UniqueRowFilter",
+                                       "")) == "Distinct"
+                kids = [self._capture_expr(p, depth + 1)
+                        for p in list(node.Parameters or [])]
+                return ExprNode("function", name, distinct, kids)
+            if tn in ("LeftFunctionCall", "RightFunctionCall"):
+                kids = [self._capture_expr(p, depth + 1)
+                        for p in list(node.Parameters or [])]
+                return ExprNode("function",
+                                tn[:-len("FunctionCall")].upper(),
+                                False, kids)
+            if tn == "CoalesceExpression":
+                kids = [self._capture_expr(p, depth + 1)
+                        for p in list(node.Expressions or [])]
+                return ExprNode("function", "COALESCE", False, kids)
+            if tn == "NullIfExpression":
+                return ExprNode("function", "NULLIF", False, [
+                    self._capture_expr(node.FirstExpression, depth + 1),
+                    self._capture_expr(node.SecondExpression, depth + 1)])
+            if tn == "BinaryExpression":
+                sym = _ARITH_SYMBOLS.get(
+                    str(node.BinaryExpressionType), "?")
+                return ExprNode("arithmetic", sym, False, [
+                    self._capture_expr(node.FirstExpression, depth + 1),
+                    self._capture_expr(node.SecondExpression, depth + 1)])
+            if tn == "UnaryExpression":
+                sym = {"Negative": "-", "Positive": "+"}.get(
+                    str(node.UnaryExpressionType), "?")
+                return ExprNode("unary", sym, False, [
+                    self._capture_expr(node.Expression, depth + 1)])
+            if tn == "ParenthesisExpression":
+                return self._capture_expr(node.Expression, depth)
+            if tn in ("CastCall", "TryCastCall", "ConvertCall",
+                      "TryConvertCall"):
+                inner = getattr(node, "Parameter", None)
+                return ExprNode("cast", "", False,
+                                [self._capture_expr(inner, depth + 1)])
+            if tn.endswith("CaseExpression"):
+                return ExprNode("case", _verbatim(node)[:160])
+            if tn == "ScalarSubquery":
+                return ExprNode("subquery", "")
+        except Exception:  # noqa: BLE001 — .NET reflection; counted via suppressed
+            self.suppressed += 1
+            return ExprNode("unknown", "")
+        return ExprNode("unknown", _verbatim(node)[:160])
+
     def _principal_func(self, side) -> "tuple[str | None, bool]":
         """Function name (+ DISTINCT flag) when the principal side is a
         function call — the structured fact leaf voicing needs
@@ -329,7 +438,7 @@ class _Extractor:
         return name, distinct
 
     def _leaf(self, node, context: str, path: str, op: str,
-              principal_side=None) -> DecisionNode:
+              principal_side=None, sides=None) -> DecisionNode:
         self.tree.decision_sites_total += 1
         self.tree.handled_count += 1
         columns = self._column_names(node)
@@ -339,11 +448,17 @@ class _Extractor:
         # part of the round-trip meaning (live find 2026-08-20).
         trivial = (op == "EQ" and not columns and len(set(operands)) <= 1)
         func, distinct = self._principal_func(principal_side)
+        # EXPR-IR-1: capture the sides we are already standing on —
+        # role-ordered (subject first), full depth, one walk.
+        capture = sides if sides is not None else (
+            [principal_side] if principal_side is not None else [])
+        exprs = [self._capture_expr(s) for s in capture if s is not None]
         return DecisionNode(
             node_id=path, kind="predicate", op=op, context=context,
             expression_sql=_verbatim(node),
             column=self._principal_column(principal_side),
             func=func, func_distinct=distinct,
+            exprs=exprs,
             columns=columns,
             operands=operands,
             must_voice=not trivial)
@@ -392,12 +507,15 @@ class _Extractor:
                     expression_sql=_verbatim(node)[:4000]))
                 return None
             return self._leaf(node, context, path, op,
-                              principal_side=node.FirstExpression)
+                              principal_side=node.FirstExpression,
+                              sides=[node.FirstExpression,
+                                     node.SecondExpression])
 
         if tn == "InPredicate":
             op = "NOT_IN" if node.NotDefined else "IN"
             return self._leaf(node, context, path, op,
-                              principal_side=node.Expression)
+                              principal_side=node.Expression,
+                              sides=[node.Expression])
 
         if tn == "BooleanTernaryExpression":
             # ScriptDom's BETWEEN: TernaryExpressionType Between/NotBetween
@@ -407,7 +525,10 @@ class _Extractor:
             if kind in ("Between", "NotBetween"):
                 op = "BETWEEN" if kind == "Between" else "NOT_BETWEEN"
                 return self._leaf(node, context, path, op,
-                                  principal_side=node.FirstExpression)
+                                  principal_side=node.FirstExpression,
+                                  sides=[node.FirstExpression,
+                                         node.SecondExpression,
+                                         node.ThirdExpression])
             self.tree.decision_sites_total += 1
             self.tree.unextracted.append(UnextractedSite(
                 site_id=path, context=context,
@@ -418,12 +539,14 @@ class _Extractor:
         if tn == "LikePredicate":
             op = "NOT_LIKE" if node.NotDefined else "LIKE"
             return self._leaf(node, context, path, op,
-                              principal_side=node.FirstExpression)
+                              principal_side=node.FirstExpression,
+                              sides=[node.FirstExpression])
 
         if tn == "BooleanIsNullExpression":
             op = "IS_NOT" if node.IsNot else "IS"
             return self._leaf(node, context, path, op,
-                              principal_side=node.Expression)
+                              principal_side=node.Expression,
+                              sides=[node.Expression])
 
         if tn == "ExistsPredicate":
             # The subquery's own WHERE becomes its own site via the

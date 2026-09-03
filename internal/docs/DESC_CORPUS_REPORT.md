@@ -34,7 +34,7 @@ This is a selection of records.
 
 ### degenerate_literal · Constant
 ```
-This is a selection of records.
+This is a selection of records.  
 - No source records are read; this step generates derived values.
 ```
 

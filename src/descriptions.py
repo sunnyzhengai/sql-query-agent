@@ -551,16 +551,37 @@ def _names_subject(line_words: "set[str]", subject: "set[str]") -> bool:
     return bool(stems & {_stem(w) for w in line_words})
 
 
-def misattribution_violations(text: str, fragment: str) -> "list[str]":
+def _dict_meanings(dict_lines: "list[str] | None") -> "dict[str, str]":
+    """dict_lines ('- NAME: description') -> {NAME_upper: description}.
+    The checkers' bridge to the meanings reframe: a claim voiced via a
+    column's dictionary words must be recognizable as naming it."""
+    out: "dict[str, str]" = {}
+    for line in dict_lines or []:
+        m = re.match(r"^-\s*([^:]+):\s*(.+)$", line.strip())
+        if m:
+            out[m.group(1).strip().split(".")[-1].upper()] = m.group(2)
+    return out
+
+
+def misattribution_violations(
+    text: str, fragment: str,
+    dict_lines: "list[str] | None" = None,
+) -> "list[str]":
     """A sentence that names the OPERANDS of a predicate must also name
     its SUBJECT (the left-hand side). Only fires when a sentence
     carries a condition claim AND names >=2 operand words while naming
     NO word of the subject — an asymmetry that cannot happen by
-    accident and is exactly the #BPA failure."""
+    accident and is exactly the #BPA failure.
+
+    Meanings bridge (09-03 estate find, ~15 true claims killed): the
+    subject may be named by its DICTIONARY words, not only its column
+    words — the composer voices meanings, and a checker that cannot
+    read them kills the truth."""
     out: "list[str]" = []
     preds = _PREDICATES.findall(fragment or "")
     if not preds:
         return out
+    docs = _dict_meanings(dict_lines)
     for line in text.splitlines():
         low = line.strip().lower()
         if not low or not _CONDITION_VERB.search(low):
@@ -576,6 +597,14 @@ def misattribution_violations(text: str, fragment: str) -> "list[str]":
             subject = _column_words(lhs)
             line_words = set(re.findall(r"[a-z]{3,}", low))
             if len(named) >= 2 and not _names_subject(line_words, subject):
+                doc = docs.get(lhs.split(".")[-1].upper(), "")
+                doc_words = {w for w in re.findall(
+                    r"[a-z]{3,}", doc.lower().split(". ")[0])
+                    if w not in ("the", "this", "that", "with", "for",
+                                 "was", "which", "are")}
+                if doc_words and len(doc_words & line_words) >= min(
+                        2, len(doc_words)):
+                    continue        # subject named via its meaning
                 out.append(
                     f"misattributed predicate: {line.strip()!r} — names "
                     f"the values of the {lhs} condition but not what "
@@ -660,11 +689,123 @@ _AGG_WORDS = {"SUM": "the total", "AVG": "the average",
 _MEANING_PRESERVING = {"UPPER", "LOWER", "TRIM", "LTRIM", "RTRIM"}
 
 
+# --- EXPR-IR-1 (ruled 09-03): compositional interpretation ---------
+# One rule per captured GRAMMAR kind — recursion handles depth, so no
+# expression shape is ever enumerated. Coverage comes from the
+# generic rules; per-function phrasing is an EVIDENCE-ORDERED overlay
+# (DATEDIFF earned its phrase via 36 counted empties on the estate).
+# The kind frontier is data: RENDERED ⊎ UNRENDERED == EXPR_KINDS.
+RENDERED_KINDS = ("column", "literal", "variable", "function",
+                  "arithmetic", "unary", "cast")
+UNRENDERED_KINDS = {
+    "case": "a projection choice embedded in a predicate — no "
+            "faithful one-phrase reading; counted, never guessed",
+    "subquery": "its meaning is the inner selection's own "
+                "description — naming it here is the 3a leak",
+    "unknown": "outside the captured grammar — counted, never guessed",
+}
+
+_ARITH_WORDS = {"+": "plus", "-": "minus", "*": "times",
+                "/": "divided by", "%": "modulo"}
+_DATEPART_WORDS = {
+    "YY": "years", "YYYY": "years", "YEAR": "years",
+    "QQ": "quarters", "QUARTER": "quarters",
+    "MM": "months", "MONTH": "months", "WK": "weeks", "WW": "weeks",
+    "WEEK": "weeks", "DD": "days", "DY": "days", "DAY": "days",
+    "HH": "hours", "HOUR": "hours",
+    "MI": "minutes", "N": "minutes", "MINUTE": "minutes",
+    "SS": "seconds", "S": "seconds", "SECOND": "seconds"}
+
+
+def _expr_phrase(x, meanings) -> "str | None":
+    """Interpret one captured expression node. None = unrenderable —
+    the caller falls to the raw echo, which the gate refuses: the
+    counted outcome, never a guess."""
+    kind = x.kind
+    if kind == "column":
+        return meaning_of(x.name, meanings)
+    if kind == "literal":
+        return x.name
+    if kind == "variable":
+        return meaning_of(x.name.lstrip("@"), meanings)
+    if kind == "unary":
+        inner = (_expr_phrase(x.children[0], meanings)
+                 if x.children else None)
+        if inner is None:
+            return None
+        return f"negative {inner}" if x.name == "-" else inner
+    if kind == "cast":
+        # a cast changes representation, not meaning — pass through
+        return (_expr_phrase(x.children[0], meanings)
+                if x.children else None)
+    if kind == "arithmetic":
+        if len(x.children) != 2:
+            return None
+        left = _expr_phrase(x.children[0], meanings)
+        right = _expr_phrase(x.children[1], meanings)
+        if left is None or right is None:
+            return None
+        sep = (", " if x.children[0].kind in ("function", "arithmetic")
+               else " ")
+        return f"{left}{sep}{_ARITH_WORDS.get(x.name, x.name)} {right}"
+    if kind == "function":
+        return _function_phrase(x, meanings)
+    return None                       # case / subquery / unknown
+
+
+def _function_phrase(x, meanings) -> "str | None":
+    name = (x.name or "").upper()
+    kids = x.children
+
+    def ph(i):
+        return (_expr_phrase(kids[i], meanings)
+                if i < len(kids) else None)
+
+    if name in ("COUNT", "COUNT_BIG"):
+        d = "distinct " if x.distinct else ""
+        inner = ph(0) if kids and kids[0].kind == "column" else None
+        return (f"the number of {d}{inner} values" if inner
+                else f"the number of {d}records")
+    if name in _AGG_WORDS:
+        inner = ph(0)
+        return None if inner is None else f"{_AGG_WORDS[name]} {inner}"
+    if name in _MEANING_PRESERVING:
+        return ph(0)
+    if name == "DATEDIFF" and len(kids) == 3:
+        unit = _DATEPART_WORDS.get(
+            (kids[0].name or "").strip("'").upper())
+        a, b = ph(1), ph(2)
+        if unit and a and b:
+            return f"the {unit} between {a} and {b}"
+        return None
+    if name == "ABS":
+        inner = ph(0)
+        return None if inner is None else f"the absolute value of {inner}"
+    # The GENERIC rule: grounded coverage for every function, at any
+    # depth — quality overlays are added only on estate evidence.
+    parts = [ph(i) for i in range(len(kids))]
+    if any(p is None for p in parts):
+        return None
+    if not parts:
+        return f"the {name.lower()} value"
+    joined = (" and ".join(parts) if len(parts) == 2
+              else ", ".join(parts))
+    return f"the {name.lower()} of {joined}"
+
+
 def _subject_phrase(n, meanings) -> "str | None":
     """The grounded SUBJECT of a predicate leaf, or None when the
     parse offers no voicable subject. Never a placeholder — 'the
     value is at least 4' shipped as mush (the High_Utilizer grade);
-    the closed outcomes are voice-fully or counted-unvoiced."""
+    the closed outcomes are voice-fully or counted-unvoiced.
+
+    EXPR-IR-1: when the leaf carries a captured expression record,
+    the compositional interpreter IS the subject rule — any depth,
+    no shape enumeration. The flat-field path survives only as the
+    fallback for leaves with no capture."""
+    exprs = getattr(n, "exprs", None) or []
+    if exprs:
+        return _expr_phrase(exprs[0], meanings)
     if n.column:
         return meaning_of(n.column, meanings)
     func = (getattr(n, "func", None) or "").upper()
@@ -732,7 +873,18 @@ def _leaf_phrase(n, meanings) -> "str | None":
     nothing; case_when is a projection choice, not membership)."""
     op = n.op or ""
     subj = _subject_phrase(n, meanings)
+    exprs = getattr(n, "exprs", None) or []
     if op in _OP_WORDS:
+        if (op == "EQ" and len(exprs) == 2
+                and all(x.kind == "column" for x in exprs)):
+            return None                      # column = column: a join key
+        if len(exprs) == 2:
+            # EXPR-IR-1: role-exact comparand (the flat operand list
+            # once put the DIVISOR where the threshold belongs)
+            comp = _expr_phrase(exprs[1], meanings)
+            if subj is None or comp is None:
+                return _raw_echo(n)
+            return f"{subj} {_OP_WORDS[op]} {comp}"
         if n.operands:
             if subj is None:
                 return _raw_echo(n)
@@ -756,6 +908,12 @@ def _leaf_phrase(n, meanings) -> "str | None":
             return f"{subj} is {'not ' if neg else ''}{_values_from(n.operands)}"
     if op in ("BETWEEN", "NOT_BETWEEN"):
         falls = "does not fall" if op == "NOT_BETWEEN" else "falls"
+        if len(exprs) >= 3:
+            lo = _expr_phrase(exprs[1], meanings)
+            hi = _expr_phrase(exprs[2], meanings)
+            if subj is None or lo is None or hi is None:
+                return _raw_echo(n)
+            return f"{subj} {falls} between {lo} and {hi}"
         if len(n.operands) >= 2:
             if subj is None:
                 return _raw_echo(n)
@@ -976,6 +1134,14 @@ def grounding_violations(
         from src.tree.extract import query_shape
         conditions = " ".join(
             query_shape(fragment or "").deciding_exprs).lower()
+        # Meanings bridge (09-03): a DECIDING column's dictionary
+        # words count as condition vocabulary — the composer voices
+        # meanings, so the checker must read them. A SELECT-only
+        # column's meaning is deliberately NOT added: claiming it
+        # filters stays a violation (role-faithful, not a loosening).
+        for name, desc in _dict_meanings(dict_lines).items():
+            if name.lower() in conditions:
+                conditions += " " + desc.lower()
 
     # 1) every literal value in the output must exist in the source.
     # The composer's own elision idiom is exempt: in 'one of 25 values
@@ -1016,7 +1182,8 @@ def grounding_violations(
     if dialect == "sql":
         violations.extend(_table_violations(text, fragment, dict_lines))
         violations.extend(_grain_violations(text, fragment))
-        violations.extend(misattribution_violations(text, fragment))
+        violations.extend(
+            misattribution_violations(text, fragment, dict_lines))
         if voice:
             violations.extend(column_name_violations(text, fragment))
     # 5) VOICE (DESC-VOICE-1): audience, not accuracy — a steward's

@@ -7,7 +7,7 @@
 
 # Test Map — what every test proves
 
-129 modules, 1495 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
+129 modules, 1504 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
 
 ## By ADR
 
@@ -75,7 +75,7 @@
 | 0070 | QUESTION_MAP retires into the notebook registry (ratchet turn 4) | `tests/test_question_families.py` (4) |
 | 0072 | The crosswalk goes generated (ratchet turn 6) | `tests/test_axiom_crosswalk.py` (7) |
 | 0073 | SPEC v1.0: the spec becomes a projection of its own ledger (final ratchet turn) | `tests/test_spec_registry.py` (8) |
-| 0074 | The description architecture, ratified: skeleton floor, gate acceptance, metric-level design | `tests/test_desc_0074.py` (8), `tests/test_gate_recut.py` (5), `tests/test_skeleton_composer.py` (28) |
+| 0074 | The description architecture, ratified: skeleton floor, gate acceptance, metric-level design | `tests/test_desc_0074.py` (8), `tests/test_gate_recut.py` (5), `tests/test_skeleton_composer.py` (37) |
 | 0075 | The check contract: checks are claims (spec:G4) | `tests/test_check_contract.py` (4) |
 
 ## By standing law
