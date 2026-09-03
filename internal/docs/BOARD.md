@@ -6,6 +6,75 @@ law is unchanged: state changes land here the moment they happen —
 conversation-held status doesn't exist. Sections below the current
 view are preserved history.
 
+## ☀️ MORNING REPORT — 2026-09-04 overnight run (queue executed top to bottom; all four items complete, nothing blocked)
+
+**Commits on dev, in order:** a25e006 (item 2) · 383fb3e (item 3) ·
+6d9ce58 (item 4) · 6c60628 (item 5). Tree clean, pushed. Suite
+**1613 green** + ruff; docs/registries regenerated; TEST_MAP fresh.
+
+### What shipped
+1. **§5.3a-1 VOICE-KILL-GRANULARITY** (answer-key-first): the
+   violating LINE dies, true lines ship, every drop counted
+   (`killed_lines` beside `emptied`; stored beside provenance so
+   cached reruns keep the accounting; X-Ray sample + corpus report
+   disclose partial ships). One reconciliation, recorded in 0074
+   §5.3a-1's build note: "no line survives" = no DECISION line
+   survives — a bare lead alone is the Passthrough filler class,
+   and the authored Case_Predicate 'emptied' answer stays right.
+2. **Report-review trio:** (a) no-table lead now IS the
+   derived-values fact; (b) EXISTS names the missing record via the
+   inner table's dictionary meaning (TREE_CONTRACT_VERSION 3→4;
+   'no primary-care assignment record exists for the patient');
+   (c) DAX_CASES deleted with the reason on the record (dead data;
+   the corpus grades the deterministic acceptance, which DAX never
+   passes through). PROMPT_VERSION → 10.t4.
+3. **P1 TERM-PROPOSE-1/2 BUILT** (the spec held): open metric-grain
+   conflict families → parent concept + child terms, deterministic
+   BR-1 naming, zero custom attributes (native column sets as
+   data), attribution prefix from landing_registry;
+   export_bridge_files writes 3 hierarchy files beside the certify
+   set. 24 tests, store leg over the shared fakes.
+
+### The numbers (hand-gradable pointers)
+- **Live corpus:** 23 cases · 21 gate_passed · 1 skeleton_floor
+  (the authored mixed partial ship, 1 line killed+counted) · 1
+  emptied (authored) · fabricated 0 →
+  internal/docs/DESC_CORPUS_REPORT.md
+- **Estate (461 desc, full v10 regen):** failed 0 · **emptied
+  17 → 7** · 8 partial ships / 10 killed lines →
+  internal/docs/DESC_ESTATE_SAMPLE.md (recoveries on top,
+  09-03 record preserved below)
+
+### Found + fixed en route (Echo Law)
+- The filter-claim check emptied HRC6/HRC98 over the composer's
+  OWN subquery-IN idiom — the ECHO of the elision-count class
+  (gate kills composed-by-construction idiom). Exemption built
+  red-first w/ injection twin. 2 empties recovered.
+- 600 never persisted `emptied` fallout (09-02 wiring gap) —
+  closed (600_voice_kill rows; kills land as 600_line_kill).
+
+### Needs Sunny (new, small)
+- **7 residual empties**: 2 ruled 'row' kills (empties-(a) stands,
+  no action) + **5 where the customer's dictionary text itself
+  carries raw column tokens** (ENCOUNTER_ID/ABX_LINE) — true kills
+  per the ban; the finding is DICTIONARY hygiene. Options: leave
+  (honest), or extend meaning_of to strip/replace raw tokens in
+  dictionary text (a build order if you want it).
+- **Provenance column question** (found in item 4): certify's
+  collibra_assets.csv carries a 'Provenance' COLUMN — under
+  zero-schema-footprint that lands as a custom attribute; the new
+  hierarchy files deliberately use the prefix instead. Align or
+  accept.
+- Standing open rulings unchanged (landing matrix v3, CONSOLE-6,
+  X-Ray price, film, OPEN_ITEMS).
+
+### Red / debt
+- None red in the suite; the 5 xfails are pre-existing by-design
+  markers (none introduced tonight).
+- Tenant stores are one 600 run behind these changes (local
+  fixtures regenerated; tenant regen rides the next pipeline run —
+  killed_lines column lands there on overwrite).
+
 ## ⭐ CURRENT VIEW — 2026-09-02 (supersedes 08-31 below; that view's P0 completed, its P1/P2 queue stands)
 
 ### DONE since 08-31 (the docs-are-data week; all pushed to dev, ADRs 0064–0073)
