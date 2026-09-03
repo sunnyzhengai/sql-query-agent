@@ -52,9 +52,10 @@ from src.tree.extract import build_decision_tree
 # translate/enforce path in the step loop; every description
 # regenerates under the ratified architecture (0044 version binding).
 # 8: DESC-LEAF-1 + the 09-03 estate-scale fixes (subject-phrase
-# meanings, elision-count exemption, claim-shaped placeholder ban) —
-# composition changed, so every governed description regenerates
-PROMPT_VERSION = f"8.t{TREE_CONTRACT_VERSION}"
+# meanings, elision-count exemption, claim-shaped placeholder ban).
+# 9: the digit-boundary camel fix ('hba1 c' — the answer key's first
+# catch); composition changed, every governed description regenerates
+PROMPT_VERSION = f"9.t{TREE_CONTRACT_VERSION}"
 
 # ADR 0074 call 2 (ratified 2026-09-02): the provenance vocabulary for
 # stored descriptions — spec:B2's closed set, code home. gate_passed =
@@ -500,8 +501,11 @@ def readable_column(col: str) -> str:
     honest as 'alt action inst' — deliberately plain, so a thin
     description reads as thin rather than as confident prose.
     CamelCase splits too ('@StartDate' voiced as 'dstartdate' was the
-    recorded 741bef2 find; parameters and TMDL names camel-case)."""
-    col = re.sub(r"(?<=[a-z0-9])(?=[A-Z])", " ", col)
+    recorded 741bef2 find; parameters and TMDL names camel-case).
+    Lowercase-to-uppercase boundaries ONLY: a digit boundary split
+    'HBA1C' into 'hba1 c' (caught by the corpus answer key on its
+    first run — the LLM had been silently smoothing the mangle)."""
+    col = re.sub(r"(?<=[a-z])(?=[A-Z])", " ", col)
     return re.sub(r"[_\W]+", " ", col).strip().lower()
 
 

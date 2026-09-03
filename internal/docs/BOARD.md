@@ -255,6 +255,32 @@ view are preserved history.
 - [ ] Still open for Sunny: whole-step vs line-level voice kill
       (now decides only the last ~14 dictionary-text empties).
 
+### CORPUS ANSWER KEY 09-03 (Sunny's retro test-first order)
+- [x] **Right answers as data:** every corpus case now carries its
+      authored answer (expect / forbid / outcome), asserted WITHOUT
+      an LLM against the deterministic skeleton + the production
+      acceptance (tests/test_corpus_answers.py; the one authored
+      'emptied' — CASE-in-predicate — is asserted as the RIGHT
+      answer). Corpus grown 11 → 21 cases with the week's gate food:
+      expr depth, arithmetic, NOT_IN, NOT_BETWEEN (pins the decimal
+      corpse), 1=1 scaffolding, parameter defaults, elision counts,
+      sentence-shaped meanings, 'value set' placeholder FP,
+      unrenderable CASE. With-dictionary leg added (grade_case takes
+      case meanings — production parity; the dictionary-less leg
+      alone could not see the sentence-meanings bug class).
+- [x] **First-run catch:** the answer key immediately exposed a real
+      regression the LIVE leg had been masking — the camel splitter's
+      digit boundary mangled 'HBA1C' to 'hba1 c', and the smoothing
+      LLM silently repaired it in every live sample. Splitter fixed
+      (lowercase→uppercase only), PROMPT_VERSION 8→9, store
+      regenerated (461 desc · 430 gate_passed + 13 floor · 17
+      emptied · 0 failed). Live corpus: 21 cases · 20 gate_passed ·
+      1 emptied (the authored one). Suite 1588 green.
+- [ ] Report-review remainders (orderable): Constant lead-line
+      contradiction ('selection of records' + 'no source records');
+      EXISTS should name the missing record via the inner table's
+      dictionary meaning (No_PCP reads near-empty); DAX_CASES dead.
+
 ### RULINGS OPEN FOR SUNNY (carried + new)
 - [ ] Landing matrix v3 overall ratification (now generated from
       landing_registry; content unchanged, awaiting Bridge build)
