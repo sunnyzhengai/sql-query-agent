@@ -669,6 +669,16 @@ def _values_from(operands: "list[str]") -> str:
 # by-construction (it is len() of the SQL's own list, never a literal)
 _ELISION_COUNT = re.compile(r"\bone of (\d+) values from\b")
 
+# The subquery-IN idiom (the 3a-safe voicing: no inner value is ever
+# named), recognized by the filter-claim check as composed-by-
+# construction WHEN a subquery decides the step — 09-04 estate find
+# (HRC6/HRC98 emptied over the composer's own phrase), the echo of
+# the elision-count class; injection twin pinned in
+# TestEstateScaleCorpses (a fragment with no subquery still refuses
+# the fabricated idiom).
+_SUBQUERY_IDIOM = re.compile(
+    r"\bis (?:restricted to|excluded from) a separately selected set\b")
+
 
 _OP_WORDS = {"EQ": "is", "NEQ": "is not", "GT": "is more than",
              "LT": "is less than", "GTE": "is at least",
@@ -1191,6 +1201,11 @@ def grounding_violations(
     for line in text.splitlines():
         line = line.strip()
         if not line.startswith("- ") or not _FILTER_CLAIM.search(line):
+            continue
+        if _SUBQUERY_IDIOM.search(line) and "select" in conditions:
+            # composed-by-construction: the idiom names no value and
+            # is grounded whenever a subquery decides this step (the
+            # elision-count exemption's pattern at sentence grain)
             continue
         terms = [w for w in re.findall(r"[a-z]{5,}", line.lower())
                  if w not in _CLAIM_STOPWORDS]

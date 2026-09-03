@@ -1,8 +1,8 @@
 # P0-b — adversarial corpus over LIVE generation (production acceptance, ADR 0074)
 
-**21 case(s)** · gate_passed 20 · skeleton_floor 0 · emptied 1
+**23 case(s)** · gate_passed 21 · skeleton_floor 1 · emptied 1 · killed lines 1
 
-gate_passed = smoothed prose cleared the gate · skeleton_floor = the grounded skeleton shipped (the smoothing catch, if any, is listed) · emptied = voice kill, absence over fabrication (0074 §5.3a). Dictionary-less leg: meanings fall back to readable column names.
+gate_passed = smoothed prose cleared the gate · skeleton_floor = the grounded skeleton shipped (the smoothing catch, if any, is listed) · emptied = voice kill, absence over fabrication (0074 §5.3a) · killed lines = §5.3a-1 SENTENCE-grain kills on partial ships (the violating line died, the true lines shipped, every drop counted). Dictionary-less leg: meanings fall back to readable column names.
 
 ## Per class
 
@@ -17,8 +17,10 @@ gate_passed = smoothed prose cleared the gate · skeleton_floor = the grounded s
 - **grain_patient** — gate_passed 1 · skeleton_floor 0 · emptied 0
 - **grain_visit** — gate_passed 1 · skeleton_floor 0 · emptied 0
 - **inclusion** — gate_passed 1 · skeleton_floor 0 · emptied 0
+- **mixed_kill** — gate_passed 0 · skeleton_floor 1 · emptied 0 · killed lines 1 · smoothing catch: column name in a business description, composer placeholder in a business description
 - **multi_join** — gate_passed 1 · skeleton_floor 0 · emptied 0
 - **negation** — gate_passed 1 · skeleton_floor 0 · emptied 0
+- **negation_dict** — gate_passed 1 · skeleton_floor 0 · emptied 0
 - **not_between** — gate_passed 1 · skeleton_floor 0 · emptied 0
 - **not_in** — gate_passed 1 · skeleton_floor 0 · emptied 0
 - **param_default** — gate_passed 1 · skeleton_floor 0 · emptied 0
@@ -32,7 +34,7 @@ gate_passed = smoothed prose cleared the gate · skeleton_floor = the grounded s
 
 ### aggregate · High_Utilizer
 ```
-This is a selection of patients.
+This is a selection of patients.  
 - The number of encounter ID values is a minimum of 4.
 ```
 
@@ -44,8 +46,7 @@ This is a selection of records.
 
 ### degenerate_literal · Constant
 ```
-This is a selection of records.  
-- No source records are read; this step generates derived values.
+This step generates derived values; no source records are accessed.
 ```
 
 ### dict_sentence · Steward_Prose
@@ -57,7 +58,7 @@ This is a selection of encounters.
 ### elision · Long_Code_List
 ```
 This is a selection of encounters.
-- The flowsheet measure consists of one of the 8 values ranging from 'A1' to 'A8'.
+- The flowsheet measure is one of eight values from 'A1' to 'A8'.
 ```
 
 ### exclusion · Diabetic_Excl
@@ -69,7 +70,7 @@ This is a selection of patients.
 
 ### expr_arith · Weight_Convert
 ```
-This is a selection of patients.
+This is a selection of patients.  
 - The weight in kilograms multiplied by 2.2 exceeds 300.
 ```
 
@@ -97,6 +98,15 @@ This is a selection of patients.
 - The diagnosis code begins with 'E11' or the diagnosis code begins with 'O24.4'.
 ```
 
+### mixed_kill · Mixed_Step
+```
+This is a selection of patients.
+- encounter type is 'ED'.
+- admit date is recorded.
+```
+smoothing catch: 3 violation(s) — the skeleton shipped instead
+killed line(s) (1, counted — never shipped): `- condition holds: `CASE WHEN E.ADMIT_DATE > E.DISCHARGE_DATE THEN 1 ELSE 0 END = 1`.`
+
 ### multi_join · Three_Table
 ```
 This is a selection of patients.
@@ -110,16 +120,22 @@ This is a selection of patients.
 - No matching record exists for the patient ID.
 ```
 
-### not_between · A1c_Abnormal
+### negation_dict · No_PCP_Dict
 ```
 This is a selection of patients.
-- The hba1c value does not fall within the range of 4 to 5.6.
+- There is no primary-care assignment record for the patient.
+```
+
+### not_between · A1c_Abnormal
+```
+This is a selection of patients.  
+- The hba1c value does not fall between 4 and 5.6.
 ```
 
 ### not_in · Med_Exclusion
 ```
 This is a selection of patients.
-- The medication name is not 'METFORMIN' or 'INSULIN'.
+- The medication name is neither 'METFORMIN' nor 'INSULIN'.
 ```
 
 ### param_default · Reporting_Window
@@ -149,7 +165,7 @@ This is a selection of patients.
 
 ### threshold_gt · Threshold_GT
 ```
-This is a selection of patients.
+This is a selection of patients.  
 - The hba1c value exceeds 6.5.
 ```
 

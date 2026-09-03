@@ -299,10 +299,25 @@ record why here and move on — do not stall the queue.
           acceptance, which DAX never passes through — re-enters if
           the measure path gains a deterministic floor).
        PROMPT_VERSION 10.t4. Suite 1597 green.
-4. [ ] **P1 TERM-PROPOSE-1/2** (see P1 section below): execute per
-       its standing spec; contracts-first; if the spec is too thin
-       to build safely overnight, write the contract + red tests
-       only and record the stop reason here.
+4. [x] **P1 TERM-PROPOSE-1/2 BUILT (09-04 overnight, 6d9ce58;
+       answer-key-first, spec was thick enough — the
+       landing_registry organize_hierarchy row pinned the shape):**
+       src/term_propose.py — OPEN metric-grain conflict flags →
+       parent concept + child terms; deterministic naming (own
+       distinct name, BR-1 ref-qualification on collision w/
+       sibling or parent); child definitions = disclosure + the
+       member's certified description (never authored); payload =
+       hierarchy/governs/report/steward relations, attribution
+       PREFIX, zero custom attributes (native column sets held as
+       data). export_bridge_files writes 3 hierarchy files beside
+       the certify set. Step-grain families excluded (console
+       rename work). Collibra relation-type names = the registry's
+       words; operating-model mapping stays an OPEN item for Sunny.
+       NOTE FOR SUNNY (found en route, not changed): the certify
+       set's collibra_assets.csv carries a 'Provenance' COLUMN —
+       under zero-schema-footprint that would land as a custom
+       attribute; the hierarchy files deliberately use the prefix
+       instead. Ruling wanted: align certify or accept the column.
 5. [ ] **VERIFY + CONSOLIDATE (always last):** full suite; live
        corpus leg; estate regeneration (v-bump if composition
        changed); refresh internal/docs/DESC_ESTATE_SAMPLE.md

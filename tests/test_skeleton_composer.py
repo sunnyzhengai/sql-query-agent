@@ -363,6 +363,28 @@ class TestEstateScaleCorpses:
         v = grounding_violations(text, frag)
         assert not any("'25'" in x for x in v), v
 
+    def test_subquery_idiom_is_not_an_ungrounded_filter_claim(self):
+        """09-04 estate find (HRC6/HRC98, live — an ECHO of the
+        elision-count class: the gate killing the composer's own
+        composed-by-construction idiom): 'code is restricted to a
+        separately selected set' is the 3a-safe voicing of a
+        subquery IN — it names NO value and is grounded whenever a
+        subquery decides the step. The filter-claim check emptied it
+        because none of the idiom's own words appear in the SQL."""
+        from src.descriptions import grounding_violations
+        frag = ("SELECT ENCOUNTER_ID FROM FLOWSHEET_RECORDED WHERE "
+                "CODE IN (SELECT CODE FROM CODE_SETS WHERE "
+                "GROUP_ID = 7)")
+        text = ("This is a selection of encounters.\n"
+                "- code is restricted to a separately selected set.")
+        v = grounding_violations(text, frag)
+        assert not any("ungrounded filter claim" in x for x in v), v
+        # the injection twin: the same idiom FABRICATED onto a
+        # fragment with no subquery anywhere still dies
+        bare = "SELECT ENCOUNTER_ID FROM FLOWSHEET_RECORDED"
+        bad = grounding_violations(text, bare)
+        assert any("ungrounded filter claim" in x for x in bad), bad
+
     def test_value_set_is_not_the_value_placeholder(self):
         """FP corpse: the customer's own phrase 'the value set'
         tripped the mush ban and emptied All_LDAs. The ban must match

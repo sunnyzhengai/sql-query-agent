@@ -1,9 +1,75 @@
-# Estate before/after — the 09-03 rebuild, hand-gradable
+# Estate before/after — hand-gradable
 
 Grade like an L3 walk: is each sentence TRUE of its SQL, and would
-a steward learn the membership conditions? 'Before' = the fate of
-the same node on the first v7 store run (09-03 morning, from the
-run log). Store: 461 descriptions | emptied 124 -> 17 | failed 2 -> 0.
+a steward learn the membership conditions?
+
+**Current store (09-04 overnight, v10.t4 — §5.3a-1 sentence-grain
+kill live):** 461 descriptions | failed 0 | **emptied 17 → 7** |
+**partial ships 8 (10 lines killed, counted)**. The 7 residual
+empties: 2 ruled 'row' voice kills (dictionary text — empties-(a)
+stands) + 5 where the customer's own dictionary text carries raw
+column tokens (ENCOUNTER_ID / ABX_LINE), so every bullet dies —
+true kills per the ban, and a dictionary-hygiene finding.
+
+## 09-04 LINE-KILL RECOVERIES (0074 §5.3a-1: kill unit = the SENTENCE)
+
+'Before' = whole-step EMPTIED on the 09-03 v9 store (one raw-echo
+or voice-violating line destroyed the step's true bullets).
+'Now' = the violating line is dropped AND COUNTED; the true lines
+ship. Nothing formerly-killed appears below — that is the point.
+
+### reports.USP_Severe_Sepsis:Base_Pop_1 (3 lines killed, counted)
+
+```
+This is a selection of patients.
+- The date in normal date format is The hospital discharge date and time for this PATIENTS contact.
+- The category value corresponding to the (admission) confirmation status for this PATIENTS contact is '1', '4'.
+- The date and time that the PATIENTS was first admitted to the facility, bedded in the ED, or confirmed for an HOV for this contact, regardless of PATIENTS's base PATIENTS class is recorded.
+- The category value corresponding to the PATIENTS classification for this PATIENTS contact is not 102.
+- The service date of a charge, the deposit date of a payment, or the creation date of an adjustment falls between start date and end date.
+- The transaction type, i.e is 1.
+- The date in normal date format falls between start date and end date.
+- The unique identifier  for the hospital account record is excluded from a separately selected set.
+```
+
+### reporting.USP_ED_Sepsis:BPA (1 line killed, counted)
+
+```
+This is a selection of encounters.
+- The Line Count is 1.
+- The instant when the warning is gone after some actions falls between adt arrival time and ed departure time.
+```
+
+### reports.USP_Severe_Sepsis:BC (1 line killed, counted)
+
+```
+This is a selection of encounters.
+- The unique ID of the procedure record corresponding to this order is restricted to a separately selected set.
+- The date and time of instantiation when a child order is generated from a standing or future order is recorded.
+```
+
+## 09-04 IDIOM RECOVERY (the Echo Law build during verification)
+
+HRC6/HRC98 emptied over the composer's OWN subquery-IN idiom — the
+filter-claim check could not find the idiom's words in the SQL (the
+echo of the elision-count class; exemption built red-first with an
+injection twin: the idiom fabricated onto a subquery-free fragment
+still dies).
+
+### reports.USP_Severe_Sepsis:HRC6 (was EMPTIED — false kill)
+
+```
+This is a selection of encounters.
+- code is restricted to a separately selected set.
+```
+
+---
+
+# The 09-03 rebuild record (v9 store, preserved)
+
+'Before' = the fate of the same node on the first v7 store run
+(09-03 morning, from the run log). Store then: 461 descriptions |
+emptied 124 -> 17 | failed 2 -> 0.
 
 ## reports.USP_Severe_Sepsis:ABX
 
