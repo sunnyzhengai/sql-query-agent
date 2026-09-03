@@ -7,7 +7,7 @@
 
 # Test Map — what every test proves
 
-129 modules, 1491 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
+129 modules, 1495 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
 
 ## By ADR
 
@@ -27,7 +27,7 @@
 | 0016 | Case-insensitive identifier matching, folded uppercase | `tests/parser/test_identity.py` (12), `tests/test_dictionary.py` (8) |
 | 0017 | Resolve-then-traverse agent retrieval | `tests/adapters/test_fabric_agent.py` (4), `tests/test_graph_templates.py` (13) |
 | 0018 | Materialized closure edges (USES_TABLE) | `tests/steps/test_steps.py` (41), `tests/test_recorded_pipeline.py` (3) |
-| 0019 | CTE descriptions bottom-up, before metric descriptions | `tests/steps/test_agent_descriptions.py` (15), `tests/test_descriptions.py` (24), `tests/test_llm_client.py` (14) |
+| 0019 | CTE descriptions bottom-up, before metric descriptions | `tests/steps/test_agent_descriptions.py` (15), `tests/test_descriptions.py` (25), `tests/test_llm_client.py` (14) |
 | 0020 | Generator-compatibility LPG export shape | `tests/adapters/test_lineage_match.py` (26) |
 | 0021 | Certification discloses, never gates | `tests/test_schemas.py` (8) |
 | 0022 | Definition versioning: certification pins a content hash | `tests/test_schemas.py` (8) |
@@ -75,7 +75,7 @@
 | 0070 | QUESTION_MAP retires into the notebook registry (ratchet turn 4) | `tests/test_question_families.py` (4) |
 | 0072 | The crosswalk goes generated (ratchet turn 6) | `tests/test_axiom_crosswalk.py` (7) |
 | 0073 | SPEC v1.0: the spec becomes a projection of its own ledger (final ratchet turn) | `tests/test_spec_registry.py` (8) |
-| 0074 | The description architecture, ratified: skeleton floor, gate acceptance, metric-level design | `tests/test_desc_0074.py` (8), `tests/test_gate_recut.py` (5), `tests/test_skeleton_composer.py` (25) |
+| 0074 | The description architecture, ratified: skeleton floor, gate acceptance, metric-level design | `tests/test_desc_0074.py` (8), `tests/test_gate_recut.py` (5), `tests/test_skeleton_composer.py` (28) |
 | 0075 | The check contract: checks are claims (spec:G4) | `tests/test_check_contract.py` (4) |
 
 ## By standing law

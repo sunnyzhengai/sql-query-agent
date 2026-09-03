@@ -279,13 +279,15 @@ class TestPlaceholderBan:
     (clause 2, the pinned meta-test)."""
 
     def test_frontier_is_data_and_each_entry_fires(self):
+        """Each pattern carries its own injection exemplar — the data
+        proves itself (spec:G4 clause 2)."""
         from src.descriptions import _COMPOSER_PLACEHOLDERS, grounding_violations
         frag = "SELECT PATIENT_ID FROM ENCOUNTERS"
         assert _COMPOSER_PLACEHOLDERS  # deny-by-default: never empty
-        for p in _COMPOSER_PLACEHOLDERS:
-            v = grounding_violations(f"This step keeps rows where "
-                                     f"{p} something.", frag)
-            assert any("placeholder" in x for x in v), p
+        for pat, exemplar in _COMPOSER_PLACEHOLDERS.items():
+            v = grounding_violations(f"This step keeps records where "
+                                     f"{exemplar}.", frag)
+            assert any("placeholder" in x for x in v), pat
 
     def test_clean_prose_does_not_trip_the_ban(self):
         from src.descriptions import grounding_violations
@@ -315,3 +317,51 @@ class TestPlaceholderBan:
             None)
         assert "(patient id)" in sk
         assert "patient id, patient id" not in sk
+
+
+class TestEstateScaleCorpses:
+    """The 09-03 store rerun (local 600, 450 steps of Clarity-shaped
+    SQL): 124 empties, of which three classes were OUR machinery's
+    bugs, pinned here from live node reproductions — not ruled voice
+    kills."""
+
+    def test_sentence_shaped_meaning_becomes_a_subject_phrase(self):
+        """Steward dictionaries hold SENTENCES; splicing one in whole
+        produced 'took place. is recorded' and defeated the
+        misattribution checker. meaning_of must yield the first
+        sentence, unterminated."""
+        from src.descriptions import meaning_of
+        m = {"TAKEN_TIME": "The user-specified time that the action "
+                           "took place. Multiple actions may exist."}
+        assert (meaning_of("TAKEN_TIME", m)
+                == "The user-specified time that the action took place")
+        sk = compose_skeleton(
+            "SELECT ENCOUNTER_ID FROM MED_ADMIN WHERE TAKEN_TIME IS "
+            "NOT NULL", m)
+        assert "took place is recorded" in sk
+        assert ". is recorded" not in sk
+
+    def test_own_elision_count_is_not_an_ungrounded_value(self):
+        """'is one of 25 values from X to Y' — the 25 is composed BY
+        the composer from the SQL's own list; the value gate flagged
+        it and emptied the step (SepsisAuditTemp, live)."""
+        from src.descriptions import grounding_violations
+        frag = ("SELECT A FROM T WHERE FLO_ID IN (" +
+                ",".join(f"'{9000000000 + i}'" for i in range(25)) + ")")
+        text = ("This is a selection of records.\n- The flowsheet group "
+                "is one of 25 values from '9000000000' to '9000000024'.")
+        v = grounding_violations(text, frag)
+        assert not any("'25'" in x for x in v), v
+
+    def test_value_set_is_not_the_value_placeholder(self):
+        """FP corpse: the customer's own phrase 'the value set'
+        tripped the mush ban and emptied All_LDAs. The ban must match
+        the placeholder CLAIM (the value is/falls/...), not the two
+        words wherever they occur."""
+        from src.descriptions import grounding_violations
+        frag = "SELECT A FROM T WHERE VALUE_SET_ID = 3022"
+        ok = grounding_violations(
+            "Unique identifier for the value set is 3022.", frag)
+        assert not any("placeholder" in x for x in ok), ok
+        bad = grounding_violations("The value is at least 3022.", frag)
+        assert any("placeholder" in x for x in bad)

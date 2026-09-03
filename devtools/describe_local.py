@@ -87,7 +87,10 @@ def main() -> None:
 
     # Leak gate — defense in depth even though fixtures are anonymized
     terms = get_scan_terms(load_crosswalk(CROSSWALK))
-    all_text = "\n".join(result.descriptions.values()) + "\n" + "\n".join(cache.values())
+    # cache values are (text, provenance) pairs since v7 — scan the text
+    cache_texts = [v[0] if isinstance(v, (list, tuple)) else v
+                   for v in cache.values()]
+    all_text = "\n".join(result.descriptions.values()) + "\n" + "\n".join(cache_texts)
     leaks = scan_for_missed(all_text, terms)
     if leaks:
         # Quarantine (gitignored) so a false-positive gate doesn't discard

@@ -51,7 +51,10 @@ from src.tree.extract import build_decision_tree
 # 7: the ADR 0074 wiring — skeleton-floor acceptance replaced the
 # translate/enforce path in the step loop; every description
 # regenerates under the ratified architecture (0044 version binding).
-PROMPT_VERSION = f"7.t{TREE_CONTRACT_VERSION}"
+# 8: DESC-LEAF-1 + the 09-03 estate-scale fixes (subject-phrase
+# meanings, elision-count exemption, claim-shaped placeholder ban) —
+# composition changed, so every governed description regenerates
+PROMPT_VERSION = f"8.t{TREE_CONTRACT_VERSION}"
 
 # ADR 0074 call 2 (ratified 2026-09-02): the provenance vocabulary for
 # stored descriptions — spec:B2's closed set, code home. gate_passed =
@@ -289,11 +292,18 @@ _ACRONYM_GLOSS = re.compile(
 
 
 # DESC-LEAF-1 part 2 — the composer's own fallback strings, frontier
-# AS DATA (spec:G4 clause 1). A placeholder in prose means a leaf went
-# unvoiced; the ruled outcome (empties-(a) precedence) is a COUNTED
-# empty, never shipped mush. Each entry is injection-proven in
-# TestPlaceholderBan (clause 2). Extend the tuple, never special-case.
-_COMPOSER_PLACEHOLDERS = ("condition holds:", "the value")
+# AS DATA (spec:G4 clause 1): pattern -> injection exemplar, each
+# proven to fire in TestPlaceholderBan (clause 2). The pattern matches
+# the placeholder CLAIM, not its words anywhere — '\bthe value\b'
+# alone false-positived on the customer's own 'the value set' and
+# emptied a true description (09-03 estate find). A placeholder in
+# prose means a leaf went unvoiced; the ruled outcome (empties-(a)
+# precedence) is a COUNTED empty, never shipped mush.
+_COMPOSER_PLACEHOLDERS = {
+    r"condition holds:": "condition holds: `X > 1`",
+    r"\bthe value\b\s+(?:is|falls|does|exceeds|matches|contains"
+    r"|starts|ends)": "the value is at least 4",
+}
 
 
 def voice_violations(text: str, fragment: str,
@@ -303,11 +313,11 @@ def voice_violations(text: str, fragment: str,
     out: "list[str]" = []
     ground = ((fragment or "") + "\n"
               + "\n".join(dict_lines or [])).lower()
-    for p in _COMPOSER_PLACEHOLDERS:
-        if re.search(rf"\b{re.escape(p)}", text, re.IGNORECASE):
+    for pat in _COMPOSER_PLACEHOLDERS:
+        if re.search(pat, text, re.IGNORECASE):
             out.append(
                 f"composer placeholder in a business description: "
-                f"{p!r} — an unvoiced leaf must become a counted "
+                f"{pat!r} — an unvoiced leaf must become a counted "
                 "empty, not shipped mush")
     for obj in set(_HASH_OBJECT.findall(text)):
         out.append(
@@ -599,9 +609,15 @@ def meaning_of(column: str, meanings: "dict[str, str] | None") -> str:
     bare = (column or "").split(".")[-1]
     key = bare.upper()
     doc = (meanings or {}).get(key) or (meanings or {}).get(bare)
+    if doc and doc.strip():
+        # Steward dictionaries hold SENTENCES; a subject must be the
+        # FIRST sentence, unterminated — splicing the full text
+        # produced 'took place. is recorded' and defeated the
+        # misattribution checker (09-03 estate-scale find)
+        return doc.strip().split(". ")[0].rstrip(".").strip()
     # fallback gets the ORIGINAL casing — upper-casing first would
     # destroy the camel boundaries readable_column splits on
-    return doc.strip() if doc and doc.strip() else readable_column(bare)
+    return readable_column(bare)
 
 
 def _values_from(operands: "list[str]") -> str:
@@ -611,6 +627,11 @@ def _values_from(operands: "list[str]") -> str:
     if len(vals) <= _MAX_LISTED_VALUES:
         return ", ".join(f"'{v}'" for v in vals)
     return f"one of {len(vals)} values from '{vals[0]}' to '{vals[-1]}'"
+
+
+# The elision idiom's count, recognized by the value gate as composed-
+# by-construction (it is len() of the SQL's own list, never a literal)
+_ELISION_COUNT = re.compile(r"\bone of (\d+) values from\b")
 
 
 _OP_WORDS = {"EQ": "is", "NEQ": "is not", "GT": "is more than",
@@ -956,9 +977,14 @@ def grounding_violations(
         conditions = " ".join(
             query_shape(fragment or "").deciding_exprs).lower()
 
-    # 1) every literal value in the output must exist in the source
+    # 1) every literal value in the output must exist in the source.
+    # The composer's own elision idiom is exempt: in 'one of 25 values
+    # from X to Y' the 25 is COUNTED from the SQL's own list, true by
+    # construction, not a literal (09-03 estate find: the gate emptied
+    # a step over its own composed count).
+    elision_counts = set(_ELISION_COUNT.findall(text))
     for num in set(_OUT_NUMBERS.findall(text)):
-        if num not in ground:
+        if num not in ground and num not in elision_counts:
             violations.append(f"ungrounded value: {num!r} not in the SQL")
     for quoted in set(_OUT_QUOTED.findall(text)):
         toks = _OUT_NUMBERS.findall(quoted)
@@ -1029,6 +1055,17 @@ def enforce_grounding(
                                             dialect):
         return cleaned, violations
     return "", violations
+
+
+def _cache_entry(entry) -> "tuple[str, str]":
+    """Normalize a cache value at the boundary: (text, provenance) —
+    written as a tuple, but ANY JSON round-trip returns a LIST, and a
+    v6 cache holds bare strings. The generator lesson (second
+    tuple-vs-JSON trap in one week): normalize where the data enters,
+    not at each use site."""
+    if isinstance(entry, (list, tuple)) and len(entry) >= 2:
+        return str(entry[0]), str(entry[1])
+    return str(entry), "gate_passed"
 
 
 def step_content_hash(fragment: str, dep_names: "list[str]",
@@ -1320,9 +1357,7 @@ def generate_descriptions(
             step_id, nodes, tech_map, columns_map, fragment)
         key = step_content_hash(fragment, dep_names, dict_lines)
         if key in cache:
-            entry = cache[key]
-            text, prov = (entry if isinstance(entry, tuple)
-                          else (entry, "gate_passed"))
+            text, prov = _cache_entry(cache[key])
             described[step_id] = text
             result.descriptions[step_id] = text
             result.provenance[step_id] = prov
@@ -1390,7 +1425,9 @@ def generate_descriptions(
                 dict_lines.append(f"- {col.name}: {col.description.strip()}")
         key = measure_content_hash(node.name, expression, dict_lines)
         if key in cache:
-            result.descriptions[node_id] = cache[key]
+            m_text, m_prov = _cache_entry(cache[key])
+            result.descriptions[node_id] = m_text
+            result.provenance[node_id] = m_prov
             result.cache_hits += 1
             continue
         prompt = build_measure_prompt(
@@ -1485,9 +1522,7 @@ def generate_descriptions(
         key = metric_content_hash(node.name, roots, step_count,
                                   decision_count)
         if key in cache:
-            entry = cache[key]
-            m_text, m_prov = (entry if isinstance(entry, tuple)
-                              else (entry, "gate_passed"))
+            m_text, m_prov = _cache_entry(cache[key])
             result.descriptions[node_id] = m_text
             result.provenance[node_id] = m_prov
             result.file_descriptions[node_id] = m_text

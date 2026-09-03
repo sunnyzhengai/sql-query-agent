@@ -88,6 +88,31 @@ class TestGeneration:
         assert second.cache_hits == first.generated
         assert len(calls) == 0
 
+    def test_cache_survives_a_json_round_trip(self):
+        """The 09-03 store-rerun corpse: cache values are written as
+        (text, provenance) TUPLES, but json load returns LISTS —
+        `isinstance(entry, tuple)` silently treated every v7 entry as
+        legacy and passed the raw list into descriptions (crashed the
+        metric join; would have poisoned the store). Second
+        tuple-vs-JSON trap in a week → normalized at the boundary
+        (_cache_entry), pinned here across step, metric AND measure
+        cache hits."""
+        import json
+        g = _graph()
+        cache: dict = {}
+        first = generate_descriptions(g.nodes_rows, g.edges_rows,
+                                      fake_describe, cache=cache)
+        round_tripped = json.loads(json.dumps(cache))
+        second = generate_descriptions(g.nodes_rows, g.edges_rows,
+                                       fake_describe, cache=round_tripped)
+        assert second.cache_hits == first.generated
+        bad = {k: v for k, v in second.descriptions.items()
+               if not isinstance(v, str)}
+        assert not bad, f"non-string description(s) from cache: {bad}"
+        bad_prov = {k: v for k, v in second.provenance.items()
+                    if not isinstance(v, str)}
+        assert not bad_prov, f"non-string provenance: {bad_prov}"
+
     def test_changed_fragment_changes_hash(self):
         assert step_content_hash("SELECT 1", ["a"]) != step_content_hash("SELECT 2", ["a"])
         assert step_content_hash("SELECT 1", ["a"]) != step_content_hash("SELECT 1", ["b"])

@@ -192,6 +192,46 @@ view are preserved history.
       reasons on the record. Suite 1532 green; corpus stands 11/11
       gate_passed · 0 emptied.
 
+### STORE RERUN 09-03 (Sunny's order) — v8, estate-scale truth
+- [x] **Local 600 rerun under the new contract** (describe_local →
+      generate_descriptions over the 28-proc recorded estate,
+      PROMPT_VERSION 8.t2): **461 descriptions · 401 gate_passed ·
+      0 failed · 59 counted empties** (was 124 empties + 2 failed
+      metrics on the first v7 pass). Leak gate clean both runs.
+- [x] **Three machinery bugs found at estate scale, pinned + fixed**
+      (TestEstateScaleCorpses, red-first from live node repros):
+      (1) steward dictionaries hold SENTENCES — splicing one in
+      whole made 'took place. is recorded' and defeated the
+      misattribution checker; meaning_of now takes the first
+      sentence, unterminated; (2) the value gate emptied a step over
+      the composer's OWN elision count ('one of 25 values from…') —
+      counts of the SQL's own list are composed-by-construction,
+      exempted by idiom; (3) the placeholder ban's '\bthe value\b'
+      false-positived on the customer's 'the value set' — ban is now
+      claim-shaped (pattern + injection exemplar as paired data).
+      Plus: cache entries survive JSON round-trips (tuple→list at
+      every boundary — _cache_entry; third site was the MEASURE
+      read, which dropped provenance entirely).
+- [x] Suite 1536 green · TEST_MAP regenerated · corpus 11/11 holds.
+- [ ] **REMAINING 59 EMPTIES, classified (next frontier, orderable):**
+      ~36 = unvoicable-leaf raw echoes, dominated by DATEDIFF/
+      arithmetic time-window comparisons (Clarity's bread and
+      butter: 'ABS(DATEDIFF(MI,taken,ordered))/60 <= 72') — voicing
+      the DATEDIFF family is the next DESC-LEAF extension;
+      ~15 = checker-side false kills where misattributed-predicate /
+      selected-not-filtered can't match a dictionary-sentence
+      subject to its column (the CLAIMS are true) — those checks
+      predate the meanings reframe and should match via the
+      meanings map; ~8 = ruled voice kills (dictionary text says
+      'row'/'table' — empties-(a) stands).
+- [ ] **GRANULARITY RULING NEEDED (Sunny):** the voice kill is
+      whole-step — one raw-echo line empties a step whose other
+      five bullets are true. Option: line-level kill (drop the
+      violating SENTENCE, ship the rest, count dropped lines —
+      arguably the ruling's own words: 'a grounded, true sentence
+      killed by the vocabulary rule stays killed'). Would recover
+      most of the ~36 raw-echo empties at no honesty cost.
+
 ### RULINGS OPEN FOR SUNNY (carried + new)
 - [ ] Landing matrix v3 overall ratification (now generated from
       landing_registry; content unchanged, awaiting Bridge build)
