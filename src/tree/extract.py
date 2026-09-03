@@ -131,6 +131,11 @@ class DecisionNode:
     operands: "list[str]" = field(default_factory=list)  # literals + @params
     children: "list[DecisionNode]" = field(default_factory=list)
     must_voice: bool = False        # predicate leaves must be voiced (clause 5)
+    # EXISTS only (report-review 3b, 09-04): the subquery's first
+    # FROM table — captured so the composer can name the MISSING
+    # RECORD by the table's dictionary meaning instead of the
+    # generic 'matching record'.
+    inner_table: "str | None" = None
 
     def to_dict(self) -> dict:
         return {
@@ -141,6 +146,7 @@ class DecisionNode:
             "columns": self.columns, "operands": self.operands,
             "expression_sql": self.expression_sql,
             "must_voice": self.must_voice,
+            "inner_table": self.inner_table,
             "children": [c.to_dict() for c in self.children],
         }
 
@@ -553,11 +559,24 @@ class _Extractor:
             # context walk; the EXISTS itself is one existence decision.
             self.tree.decision_sites_total += 1
             self.tree.handled_count += 1
+            # 3b (09-04): the subquery's first FROM table, so the
+            # composer can name the missing record by its dictionary
+            # meaning ('no primary-care assignment record exists')
+            refs: list = []
+            self._walk_scalars(node, {"NamedTableReference"}, refs)
+            inner_table = None
+            for t in refs:
+                try:
+                    inner_table = t.SchemaObject.BaseIdentifier.Value
+                    break
+                except Exception:  # noqa: BLE001 — .NET reflection; counted via suppressed
+                    self.suppressed += 1
             return DecisionNode(
                 node_id=path, kind="predicate", op="EXISTS", context=context,
                 expression_sql=_verbatim(node),
                 columns=self._column_names(node),
-                operands=self._operands(node), must_voice=True)
+                operands=self._operands(node), must_voice=True,
+                inner_table=inner_table)
 
         # A boolean position we do not model — counted, never dropped.
         self.tree.decision_sites_total += 1

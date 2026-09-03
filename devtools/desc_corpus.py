@@ -96,6 +96,20 @@ WHERE NOT EXISTS (SELECT 1 FROM PATIENT_PCP_ASSIGNMENT P
                   WHERE P.PATIENT_ID = E.PATIENT_ID)""",
      "expect": ["no matching record exists (patient id)"],
      "outcome": "ships"},
+    # 09-04 report-review 3b: EXISTS names the MISSING RECORD via the
+    # inner table's dictionary meaning; the dictionary-less fallback
+    # (No_PCP above) stays the current phrasing.
+    {"cls": "negation_dict", "name": "No_PCP_Dict",
+     "sql": """SELECT E.PATIENT_ID
+FROM ENCOUNTERS E
+WHERE NOT EXISTS (SELECT 1 FROM PATIENT_PCP_ASSIGNMENT P
+                  WHERE P.PATIENT_ID = E.PATIENT_ID)""",
+     "meanings": {"PATIENT_PCP_ASSIGNMENT": "primary-care assignment",
+                  "PATIENT_ID": "the patient"},
+     "expect": ["no primary-care assignment record exists for "
+                "the patient"],
+     "forbid": ["no matching record exists"],
+     "outcome": "ships"},
     {"cls": "multi_join", "name": "Three_Table",
      "sql": """SELECT DISTINCT P.PATIENT_ID
 FROM PATIENTS P
@@ -118,10 +132,14 @@ HAVING COUNT(E.ENCOUNTER_ID) >= 4""",
      "sql": "SELECT * FROM DM_REGISTRY",
      "expect": ["No filtering conditions are applied in this step."],
      "outcome": "ships"},
+    # 09-04 report-review 3a: the old lead ('This is a selection of
+    # records') CONTRADICTED the no-source fact on the same card —
+    # the lead now IS the derived-values fact.
     {"cls": "degenerate_literal", "name": "Constant",
      "sql": "SELECT 1 AS ALWAYS_TRUE",
-     "expect": ["No source records are read; this step produces "
-                "derived values."],
+     "expect": ["This step produces derived values; no source "
+                "records are read."],
+     "forbid": ["This is a selection"],
      "outcome": "ships"},
     # ---- grown 2026-09-03 (Sunny's retro test-first order): the
     # week's gate food, each with its AUTHORED right answer. expect =
@@ -235,11 +253,17 @@ WHERE (ABS(DATEDIFF(MI, MA.TAKEN_TIME,
      "killed": 1},                        # exactly the raw-echo line
 ]
 
-DAX_CASES = [
-    {"cls": "dax_measure", "name": "Control Rate",
-     "expr": "DIVIDE(CALCULATE(COUNTROWS(Registry), "
-             "Registry[A1C] < 7), COUNTROWS(Registry))"},
-]
+# DAX_CASES DELETED 2026-09-04 (report-review 3c, on the record): the
+# one case was dead data — defined here since P0-b, never wired into
+# run()/main(), so it graded nothing while reading as coverage. This
+# instrument grades the DETERMINISTIC skeleton acceptance
+# (describe_step), which DAX never passes through: measures ride
+# _grounded_describe (LLM + gate, dialect="dax") — a different
+# acceptance with its own pinned tests (TestMeasureDescriptions and
+# the tenant-600 CALCULATE find). A dax leg here would need an LLM
+# for every assertion, violating the answer-key law (right answers
+# asserted WITHOUT a model). If the measure path ever gains a
+# deterministic floor, DAX cases re-enter WITH authored answers.
 
 @dataclass
 class Tally:

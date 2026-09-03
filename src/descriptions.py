@@ -55,7 +55,10 @@ from src.tree.extract import build_decision_tree
 # meanings, elision-count exemption, claim-shaped placeholder ban).
 # 9: the digit-boundary camel fix ('hba1 c' — the answer key's first
 # catch); composition changed, every governed description regenerates
-PROMPT_VERSION = f"9.t{TREE_CONTRACT_VERSION}"
+# 10: the 09-04 overnight queue — §5.3a-1 sentence-grain kill (what
+# ships changed), the derived-values lead (3a), EXISTS naming the
+# missing record via the inner table's meaning (3b, rides t4)
+PROMPT_VERSION = f"10.t{TREE_CONTRACT_VERSION}"
 
 # ADR 0074 call 2 (ratified 2026-09-02): the provenance vocabulary for
 # stored descriptions — spec:B2's closed set, code home. gate_passed =
@@ -944,6 +947,18 @@ def _leaf_phrase(n, meanings) -> "str | None":
         what = ", ".join(dict.fromkeys(
             meaning_of(c, meanings)
             for c in n.columns[:2])) or "the linked records"
+        # 3b (09-04): name the record by the inner table's DICTIONARY
+        # meaning where one exists ('a primary-care assignment record
+        # exists for the patient'); the dictionary-less fallback
+        # keeps the generic phrasing. Documented meanings only — the
+        # readable-name fallback would splice a raw-ish table name
+        # into steward prose.
+        inner = getattr(n, "inner_table", None) or ""
+        tm = (meanings or {}).get(inner.upper()) or (
+            meanings or {}).get(inner)
+        if tm and tm.strip():
+            record = tm.strip().split(". ")[0].rstrip(".").strip()
+            return f"a {record} record exists for {what}"
         return f"a matching record exists ({what})"
     if op == "PARAMETER_DEFAULT":
         # Sunny's 08-19 ruling: parameter-defaulting IF blocks exist
@@ -992,8 +1007,12 @@ def _render(n, meanings) -> "list[str]":
         inner = [p for c in n.children for p in _render(c, meanings)]
         if (len(n.children) == 1 and n.children[0].kind == "predicate"
                 and n.children[0].op == "EXISTS"):
-            return [inner[0].replace("a matching record exists",
-                                     "no matching record exists")]                 if inner else []
+            # every EXISTS phrase starts 'a … exists' by construction
+            # (generic or dictionary-named), so negation is uniform:
+            # 'a X record exists…' -> 'no X record exists…'
+            if inner and inner[0].startswith("a "):
+                return ["no " + inner[0][2:]]
+            return inner
         return [f"it is not the case that {p}" for p in inner]
     return []
 
@@ -1011,8 +1030,17 @@ def compose_skeleton(fragment: str,
     THAT selection's decision, not this step's. case_when sites are
     projection choices, never membership conditions (decoy 4); the
     translate path's ledger still voices them (0044 clause 5)."""
-    subject = subject_for(fragment or "")
-    lines = [f"This is a selection of {subject}."]
+    from src.tree.extract import query_shape
+    shape = query_shape(fragment or "")
+    # Report-review 3a (09-04): a no-table step must not open with
+    # 'This is a selection of records' — the lead IS the
+    # derived-values fact, instead of contradicting it one bullet
+    # later ('Constant' corpus find).
+    if shape.parse_ok and not shape.base_tables:
+        lines = ["This step produces derived values; no source "
+                 "records are read."]
+    else:
+        lines = [f"This is a selection of {subject_for(fragment or '')}."]
     try:
         tree = build_decision_tree(fragment or "")
     except Exception:  # noqa: BLE001 — no parse, no claims: the lead
@@ -1032,14 +1060,11 @@ def compose_skeleton(fragment: str,
         # collection of records' said nothing. Any-scope on purpose:
         # a filter in a derived table would make 'no filtering
         # conditions' read as a lie to a human, whoever's claim it is.
-        from src.tree.extract import query_shape
-        shape = query_shape(fragment or "")
-        if shape.parse_ok:
+        # (The no-table fact now lives in the LEAD — 3a — so only
+        # table-reading steps need the bullet.)
+        if shape.parse_ok and shape.base_tables:
             lines.append(
-                "- No filtering conditions are applied in this step."
-                if shape.base_tables else
-                "- No source records are read; this step produces "
-                "derived values.")
+                "- No filtering conditions are applied in this step.")
     return "\n".join(lines)
 
 
@@ -1399,10 +1424,18 @@ def meanings_for_step(
 ) -> "dict[str, str]":
     """Column -> business meaning for the columns the fragment
     references — the skeleton composer's vocabulary (same selection
-    rule as dictionary_for_step, keyed for composition)."""
+    rule as dictionary_for_step, keyed for composition).
+
+    TABLE descriptions ride in the same map (3b, 09-04): the EXISTS
+    phrase names the missing record by the inner TABLE's meaning,
+    which the composer can only see if tables are vocabulary too."""
     frag = (fragment or "").lower()
     meanings: "dict[str, str]" = {}
     for table_id in tech_map.get(step_id, []):
+        table = nodes.get(table_id)
+        if (table is not None and (table.description or "").strip()
+                and table.name.lower() in frag):
+            meanings[table.name.upper()] = table.description.strip()
         for col_id in columns_map.get(table_id, []):
             col = nodes.get(col_id)
             if col is None or not (col.description or "").strip():

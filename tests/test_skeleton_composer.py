@@ -262,9 +262,14 @@ class TestPassThroughFact:
         assert "No filtering conditions are applied in this step." in sk
 
     def test_constant_select_states_no_source(self):
+        # principle carried (report-review 3a, 09-04): the no-source
+        # fact moved from a bullet into the LEAD, because the old
+        # 'This is a selection of records' lead contradicted it on
+        # the same card
         sk = compose_skeleton("SELECT 1 AS ALWAYS_TRUE", None)
-        assert ("No source records are read; this step produces "
-                "derived values.") in sk
+        assert ("This step produces derived values; no source "
+                "records are read.") in sk
+        assert "This is a selection" not in sk
 
     def test_filtered_step_gets_no_passthrough_line(self):
         sk = compose_skeleton(

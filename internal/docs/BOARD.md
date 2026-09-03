@@ -268,15 +268,21 @@ record why here and move on — do not stall the queue.
 
 1. [x] **RULING LANDED (before sleep): kill unit = the SENTENCE**
        (0074 §5.3a-1). Ratified by Sunny 09-04.
-2. [ ] **VOICE-KILL-GRANULARITY build:** implement line-level kill in
-       the acceptance (generate_descriptions step loop + no-roots
-       path): drop violating lines, ship survivors, count dropped
-       lines per step (`killed_lines` on DescriptionResult; surface
-       in X-Ray sample + corpus report). Answer key first: author
-       expected outcomes for a mixed step (one raw-echo line + true
-       lines → ships the true lines, kill counted). Exit: estate
-       rerun shows the 17 whole-step empties mostly recovered to
-       partial ships; nothing formerly-killed leaks into prose.
+2. [x] **VOICE-KILL-GRANULARITY BUILT (09-04 overnight, a25e006):**
+       answer key first (mixed_kill corpus case + shipped-text
+       answers authored before code). line_level_kill() wired in the
+       step loop + no-roots path; killed_lines/killed_reasons on
+       DescriptionResult; count stored beside provenance
+       (ops_description_cache.killed_lines) so cached reruns keep
+       the accounting; X-Ray sample + corpus report surface partial
+       ships. RECONCILIATION RECORDED (0074 §5.3a-1 build note):
+       "no line survives" = no DECISION line survives — a bare lead
+       line is the Passthrough filler class, so the authored
+       Case_Predicate 'emptied' answer stays right. En-route find:
+       600 never persisted emptied fallout (09-02 gap) — closed
+       (600_voice_kill rows). Suite 1594 green. Estate-rerun
+       evidence lands with item 5's single regeneration (item 3
+       changes composition again — one paid run covers both exits).
 3. [ ] **Report-review trio** (each answer-key-first):
        a. Constant lead line: no-table steps must not open with
           'This is a selection of records' — adapt the lead to the

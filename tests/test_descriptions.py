@@ -107,6 +107,35 @@ class TestSentenceGrainKill:
             "t1") == 1
 
 
+class TestExistsNamesTheMissingRecord:
+    """Report-review 3b (ordered 09-04): an EXISTS/NOT-EXISTS phrase
+    names the MISSING RECORD via the inner table's dictionary
+    meaning; the dictionary-less fallback keeps the current
+    phrasing. Production parity: meanings_for_step must carry TABLE
+    descriptions, not only columns, or the composer can never see
+    the inner table's meaning."""
+
+    def test_meanings_for_step_includes_table_descriptions(self):
+        import json
+
+        from src.descriptions import meanings_for_step
+        nodes = rows_to_nodes([
+            {"node_id": "tbl:PATIENT_PCP_ASSIGNMENT",
+             "name": "PATIENT_PCP_ASSIGNMENT",
+             "layer": NodeLayer.TECHNICAL.value,
+             "description": "primary-care assignment",
+             "properties": json.dumps({})},
+        ])
+        frag = ("SELECT E.PATIENT_ID FROM ENCOUNTERS E WHERE NOT "
+                "EXISTS (SELECT 1 FROM PATIENT_PCP_ASSIGNMENT P "
+                "WHERE P.PATIENT_ID = E.PATIENT_ID)")
+        m = meanings_for_step(
+            "t1", nodes, {"t1": ["tbl:PATIENT_PCP_ASSIGNMENT"]},
+            {}, frag)
+        assert m.get("PATIENT_PCP_ASSIGNMENT") == (
+            "primary-care assignment")
+
+
 class TestTopologicalOrder:
     def test_dependencies_come_before_dependents(self):
         g = _graph()

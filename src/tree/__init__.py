@@ -9,4 +9,7 @@ regenerates everything it governs.
 # (func/func_distinct); the composer voices the full leaf frontier.
 # "3": EXPR-IR-1 — leaves carry role-ordered captured expression
 # trees (exprs); the composer interprets them compositionally.
-TREE_CONTRACT_VERSION = "3"
+# "4": report-review 3b (09-04) — EXISTS leaves carry the subquery's
+# first FROM table (inner_table) so the composer names the missing
+# record by its dictionary meaning.
+TREE_CONTRACT_VERSION = "4"
