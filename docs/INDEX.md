@@ -48,7 +48,10 @@ law: a design review that cannot show them does not proceed.
    (`spec:G4`):** its frontier enumerated as data, deny-by-default;
    trusted only after an injected violation proved it fires (pinned
    as a meta-test where feasible); its pattern ancestor named on the
-   record.
+   record. **Every interpreter obeys `spec:G5`:** state whether it
+   works per GRAMMAR PRODUCTION or per shape — per-shape requires a
+   recorded reason (the depth-1 cliff was three unrecorded per-shape
+   choices in a row; ADR 0076 §2).
 5. **Register:** the trace-registry entry (component, axioms, planned
    modules/tests, docs) and **bump the component's `current_through`
    stamp** — the attestation that its blueprint was reconciled.

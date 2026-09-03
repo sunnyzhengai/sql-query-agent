@@ -102,7 +102,7 @@ AXM_UNMAPPED = {
 ARCHITECTURE_COMPONENTS = {
     "spec": {
         "doc": "docs/architecture/SPEC.md",
-        "current_through": "0075",
+        "current_through": "0076",
         "title": "The shadow specification — the formal axiom system",
         "satisfies": ["S", "J", "M", "B", "R"],
         "governs": "The axiom system this codebase is checked against: "
@@ -739,6 +739,25 @@ TRACE_REGISTRY = {
                   "tests/test_term_hygiene.py", "tests/test_admin_graph.py",
                   "tests/test_companion.py"],
         "docs": ["docs/architecture/SPEC.md", "docs/architecture/TRACE_MAP.md"],
+    },
+    "0076": {
+        # ACCEPTED 2026-09-03: compositional interpretation (spec:G5)
+        # — capture the scalar subtree once in the existing walk
+        # (ExprNode IR), interpret by structural recursion (one rule
+        # per grammar kind), checkers read the same meanings truth.
+        # Carries the ordered post-mortem: conservation was quantified
+        # at site grain; G2 governed the entry point, not the path;
+        # the composer's input was never a named component.
+        "title": "Compositional interpretation: capture once, "
+                 "interpret by grammar (spec:G5)",
+        "category": "architecture",
+        "component": "spec",
+        "axioms": ["G5"],
+        "modules": ["src/tree/extract.py", "src/descriptions.py"],
+        "tests": ["tests/test_skeleton_composer.py",
+                  "tests/test_op_frontier.py"],
+        "docs": ["docs/decisions/0076-compositional-interpretation.md",
+                 "docs/architecture/SPEC.md"],
     },
     "0075": {
         # ACCEPTED 2026-09-02: the check contract (spec:G4) — fire and

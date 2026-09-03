@@ -521,6 +521,19 @@ plus per-capability sanctioned primitives `prims(c)`. Proposed home:
 *Checks:* `tests/test_check_contract.py`, `tests/test_skeleton_composer.py`, `tests/test_op_frontier.py`
 **Status: ENFORCED** — by citation for standing instances (G2 inclusion, 0042 planks, 0044 strict-xfail, TestRegexFrontier) + the scanner meta-test; the design protocol (INDEX step 4) carries it forward for new checks
 
+**G5 — structure carried, never lowered.**
+
+    parsed structure  ⇒  carried AS STRUCTURE to every consumer
+    interpretation    ⇒  one rule per grammar production,
+                         never per shape (per-shape needs a
+                         recorded reason)
+
+*Gloss:* G2's law extended from the entry point to the whole path: token bags are text-shaped data, and lowering structure to them before its point of use recreates the regex era downstream of a compliant parser. Recursion handles depth; no shape or combination is ever enumerated. Kinds outside the rule table die counted (closed outcomes at every grain the parser provides).
+*Origin:* ADR 0076 — Sunny's first-principles ruling after the depth-1 cliff: three shape-by-shape beats (LIKE ops, aggregates, DATEDIFF) on one generator, ended by compositional interpretation (capture once, interpret by grammar)
+*Grounds in the framework:* axm:D2 — the same parent as G2 — both are the founder's sanctioned-powers doctrine applied to representation: meaning lives in structure, and discarding structure is an unsanctioned lowering.
+*Checks:* `tests/test_skeleton_composer.py`, `tests/test_op_frontier.py` — the kind-frontier totality (RENDERED ⊎ UNRENDERED == EXPR_KINDS) and the compositional-renderer corpses; the op frontier is the layer-1 instance of the same form
+**Status: ENFORCED**
+
 
 *Honest residue:* G-group catches the high-risk primitive classes. Two
 innocent pure-Python functions independently reimplementing the same logic

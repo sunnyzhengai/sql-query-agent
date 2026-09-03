@@ -573,6 +573,41 @@ SPEC_REGISTRY = {
             'scanner meta-test; the design protocol (INDEX step 4) '
             'carries it forward for new checks',
     },
+    "G5": {
+        "title": 'structure carried, never lowered',
+        "law":
+            '    parsed structure  ⇒  carried AS STRUCTURE to every consumer\n'
+            '    interpretation    ⇒  one rule per grammar production,\n'
+            '                         never per shape (per-shape needs a\n'
+            '                         recorded reason)',
+        "gloss":
+            "G2's law extended from the entry point to the whole "
+            'path: token bags are text-shaped data, and lowering '
+            'structure to them before its point of use recreates the '
+            'regex era downstream of a compliant parser. Recursion '
+            'handles depth; no shape or combination is ever '
+            'enumerated. Kinds outside the rule table die counted '
+            '(closed outcomes at every grain the parser provides).',
+        "origin":
+            "ADR 0076 — Sunny's first-principles ruling after the "
+            'depth-1 cliff: three shape-by-shape beats (LIKE ops, '
+            'aggregates, DATEDIFF) on one generator, ended by '
+            'compositional interpretation (capture once, interpret '
+            'by grammar)',
+        "parents": ['D2'],
+        "parent_note":
+            "the same parent as G2 — both are the founder's "
+            'sanctioned-powers doctrine applied to representation: '
+            'meaning lives in structure, and discarding structure is '
+            'an unsanctioned lowering',
+        "checks": ['tests/test_skeleton_composer.py',
+                   'tests/test_op_frontier.py'],
+        "checks_note":
+            'the kind-frontier totality (RENDERED ⊎ UNRENDERED == '
+            'EXPR_KINDS) and the compositional-renderer corpses; the '
+            'op frontier is the layer-1 instance of the same form',
+        "status": 'ENFORCED',
+    },
     "H1": {
         "title": 'fallout resolution is total and closed',
         "law":

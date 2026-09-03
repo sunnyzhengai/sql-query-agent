@@ -991,3 +991,18 @@ Two citation handles, because the axiom systems are distinct and their group let
 - **Summarized in:**
   - `docs/decisions/0075-the-check-contract.md`
   - `docs/architecture/SPEC.md`
+
+## ADR 0076 — Compositional interpretation: capture once, interpret by grammar (spec:G5)
+
+- **Category:** architecture
+- **Component:** `spec` → `docs/architecture/SPEC.md` → axm:S, axm:J, axm:M, axm:B, axm:R
+- **Grounds:** spec:G5
+- **Implemented by:**
+  - `src/tree/extract.py`
+  - `src/descriptions.py`
+- **Enforced by:**
+  - `tests/test_skeleton_composer.py`
+  - `tests/test_op_frontier.py`
+- **Summarized in:**
+  - `docs/decisions/0076-compositional-interpretation.md`
+  - `docs/architecture/SPEC.md`

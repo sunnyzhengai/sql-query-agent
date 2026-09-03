@@ -232,6 +232,29 @@ view are preserved history.
       killed by the vocabulary rule stays killed'). Would recover
       most of the ~36 raw-echo empties at no honesty cost.
 
+### EXPR-IR-1 SHIPPED 09-03 (Sunny's first-principles ruling + ADR 0076/spec:G5)
+- [x] **Compositional interpretation:** the walk captures the scalar
+      subtree it stands on (ExprNode IR, one walk, zero re-parses);
+      the composer interprets by structural recursion — one rule per
+      grammar kind, recursion handles depth, nothing enumerated.
+      DATEDIFF/ABS = evidence-ordered overlay; generic rule covers
+      the rest; case/subquery/unknown die counted. Kind frontier as
+      data. Checkers read the meanings truth (_dict_meanings bridge;
+      deciding columns only). ESTATE: emptied 124→17 (all ruled
+      voice kills + 3 residual), failed 0. Corpus 11/11 unchanged.
+- [x] **Post-mortem landed as ADR 0076 §2** (Sunny's order): (1)
+      conservation quantified at SITE grain hid flattening inside
+      handled sites; (2) G2 governed the entry point, not the path —
+      token bags are text-shaped data downstream of a compliant
+      parser; (3) the composer's input was never a named component,
+      so its representation accreted instead of being designed; and
+      the Generator Clause never fired because the instrument counts
+      outcomes, not interpretation principles. TIGHTENED: spec:G5
+      (structure carried, never lowered; per-shape needs a recorded
+      reason) + the INDEX protocol question + checks bound.
+- [ ] Still open for Sunny: whole-step vs line-level voice kill
+      (now decides only the last ~14 dictionary-text empties).
+
 ### RULINGS OPEN FOR SUNNY (carried + new)
 - [ ] Landing matrix v3 overall ratification (now generated from
       landing_registry; content unchanged, awaiting Bridge build)
