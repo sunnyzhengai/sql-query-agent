@@ -146,6 +146,23 @@ fallback.
    the ruled behaviour. Empties are COUNTED (the DESC reports'
    `emptied` column; D1 carries the count into the coverage
    ledger), never silent — absence is honest only when visible.
+
+   **BUILT 2026-09-04 (overnight, answer-key-first):**
+   `line_level_kill()` + `DescriptionResult.killed_lines` /
+   `killed_reasons`; wired in the step loop AND the no-roots file
+   path; the count is stored beside provenance
+   (`ops_description_cache.killed_lines`) so cached reruns report
+   the same accounting, and X-Ray's description sample discloses
+   partial ships. One reconciliation recorded: "no line survives"
+   is implemented as **no DECISION line survives** — a lead line
+   alone ("This is a selection of patients.") is not a partial
+   ship, because a bare lead is the Passthrough filler class by
+   another door, and the corpus's authored `Case_Predicate`
+   "emptied" answer (asserted 09-03 as the RIGHT answer) stays
+   right. The dropped TEXT is never stored anywhere; the WHY lands
+   in ops_fallout (`600_line_kill`), and the same build closed a
+   09-02 gap found en route: 600 never persisted `emptied` fallout
+   rows (now `600_voice_kill`).
 4. **The wedge sample.** RECOMMENDED: yes — the X-Ray report includes
    N sampled descriptions with provenance chips; it is the Bridge
    order form's evidence ("accurate descriptions your stewards never

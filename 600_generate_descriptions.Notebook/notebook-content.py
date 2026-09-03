@@ -148,13 +148,18 @@ if spark.catalog.tableExists("ops_description_cache"):
     for r in spark.table("ops_description_cache").collect():
         row = r.asDict()
         # pre-0074 rows lack provenance; their PROMPT_VERSION-6 keys
-        # are dead after the bump, so the placeholder is never served
+        # are dead after the bump, so the placeholder is never served.
+        # killed_lines (0074 §5.3a-1) defaults 0 on pre-ruling stores.
         cache[row["content_hash"]] = (
-            row["description"], row.get("provenance", "gate_passed"))
+            row["description"], row.get("provenance", "gate_passed"),
+            row.get("killed_lines", 0) or 0)
 print(f"Nodes: {len(nodes_rows)}, edges: {len(edges_rows)}, cached steps: {len(cache)}")
 
 result = generate_descriptions(nodes_rows, edges_rows, describe, cache=cache)
 print(f"Generated: {result.generated}  cache hits: {result.cache_hits}  failed: {len(result.failed)}")
+print(f"Emptied (voice kill, absent + counted): {len(result.emptied)}  "
+      f"partial ships (killed lines, §5.3a-1): {len(result.killed_lines)} "
+      f"step(s) / {sum(result.killed_lines.values())} line(s)")
 if result.failed_reasons:
     for nid, reason in result.failed_reasons[:10]:
         print(f"  failed: {nid} — {reason}")
@@ -209,7 +214,11 @@ if result.descriptions:
         {"content_hash": h, "node_id": "",
          "description": (e[0] if isinstance(e, tuple) else e),
          "generated_at": now,
-         "provenance": (e[1] if isinstance(e, tuple) else "gate_passed")}
+         "provenance": (e[1] if isinstance(e, tuple) else "gate_passed"),
+         # 0074 §5.3a-1: the sentence-grain kill count rides beside
+         # provenance so X-Ray can disclose partial ships
+         "killed_lines": (int(e[2]) if isinstance(e, tuple)
+                          and len(e) > 2 else 0)}
         for h, e in cache.items()
     ]
     spark.createDataFrame(cache_rows, schema=to_spark_schema(DESCRIPTION_CACHE)) \
@@ -229,6 +238,35 @@ if result.descriptions:
         spark.createDataFrame(_g_rows, schema=to_spark_schema(FALLOUT)) \
             .write.format("delta").mode("append").saveAsTable("ops_fallout")
         print(f"[+] ops_fallout: {len(_g_rows)} grounding rows appended")
+
+    # §5.3a-1 kill fallout (ruled 2026-09-04): every partial ship's
+    # dropped-line violations are queryable state — the killed TEXT
+    # never lands anywhere, the WHY does.
+    if result.killed_reasons:
+        from src.schemas import FALLOUT
+
+        _k_rows = [(now, "600_line_kill", nid,
+                    "killed_lines",
+                    "; ".join(v)[:500], "contract:graph_nodes")
+                   for nid, v in result.killed_reasons]
+        spark.createDataFrame(_k_rows, schema=to_spark_schema(FALLOUT)) \
+            .write.format("delta").mode("append").saveAsTable("ops_fallout")
+        print(f"[+] ops_fallout: {len(_k_rows)} line-kill rows appended")
+
+    # Emptied-step fallout (0074 §5.3a: counted, never silent) — the
+    # absent rows' WHY (found missing during the §5.3a-1 build: the
+    # 09-02 wiring counted empties in the result but never persisted
+    # them here).
+    if result.emptied:
+        from src.schemas import FALLOUT
+
+        _e_rows = [(now, "600_voice_kill", nid,
+                    "emptied",
+                    "; ".join(v)[:500], "contract:graph_nodes")
+                   for nid, v in result.emptied]
+        spark.createDataFrame(_e_rows, schema=to_spark_schema(FALLOUT)) \
+            .write.format("delta").mode("append").saveAsTable("ops_fallout")
+        print(f"[+] ops_fallout: {len(_e_rows)} emptied-step rows appended")
 
     # Failed-node fallout (field find 2026-08-20): every failed node's
     # WHY is queryable state, never only a printed line.

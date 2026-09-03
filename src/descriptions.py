@@ -1228,15 +1228,57 @@ def enforce_grounding(
     return "", violations
 
 
-def _cache_entry(entry) -> "tuple[str, str]":
-    """Normalize a cache value at the boundary: (text, provenance) —
-    written as a tuple, but ANY JSON round-trip returns a LIST, and a
-    v6 cache holds bare strings. The generator lesson (second
-    tuple-vs-JSON trap in one week): normalize where the data enters,
-    not at each use site."""
+def line_level_kill(
+    text: str, fragment: str, dict_lines: "list[str] | None" = None,
+) -> "tuple[str, list[str], list[str]]":
+    """0074 §5.3a-1 (Sunny, 2026-09-04): the kill unit is the
+    SENTENCE. A voice/gate violation kills the violating LINE; the
+    surviving true lines ship; every dropped line is counted by the
+    caller. Returns (shipped_text, killed_line_texts, violations) —
+    shipped_text == text and killed empty when nothing violates;
+    shipped_text == "" when the step must empty.
+
+    The step empties when no DECISION line ('- ' bullet) survives: a
+    lead line alone is content-free filler (the Passthrough grade by
+    another door), and the authored Case_Predicate 'emptied' answer
+    stays the right answer. The ban itself never loosens — survivors
+    are re-checked whole, and a set that still violates empties."""
+    violations = grounding_violations(text, fragment, dict_lines)
+    if not violations:
+        return text, [], []
+    kept: "list[str]" = []
+    killed: "list[str]" = []
+    for line in text.splitlines():
+        if line.strip() and grounding_violations(line, fragment,
+                                                 dict_lines):
+            killed.append(line.strip())
+        else:
+            kept.append(line)
+    shipped = "\n".join(kept).strip()
+    if not any(ln.strip().startswith("- ") for ln in kept):
+        return "", killed, violations
+    if shipped and not grounding_violations(shipped, fragment,
+                                            dict_lines):
+        return shipped, killed, violations
+    return "", killed, violations
+
+
+def _cache_entry(entry) -> "tuple[str, str, int]":
+    """Normalize a cache value at the boundary: (text, provenance,
+    killed_lines) — written as a tuple, but ANY JSON round-trip
+    returns a LIST; a v6 cache holds bare strings and a v7-v9 cache
+    holds pairs. The generator lesson (second tuple-vs-JSON trap in
+    one week): normalize where the data enters, not at each use
+    site."""
     if isinstance(entry, (list, tuple)) and len(entry) >= 2:
-        return str(entry[0]), str(entry[1])
-    return str(entry), "gate_passed"
+        killed = 0
+        if len(entry) >= 3:
+            try:
+                killed = int(entry[2])
+            except (TypeError, ValueError):
+                killed = 0
+        return str(entry[0]), str(entry[1]), killed
+    return str(entry), "gate_passed", 0
 
 
 def step_content_hash(fragment: str, dep_names: "list[str]",
@@ -1295,6 +1337,16 @@ class DescriptionResult:
     # skeleton floor > absent. (step_id, violations) — ABSENT rows,
     # counted, never stored, never silent.
     emptied: "list[tuple[str, list[str]]]" = field(default_factory=list)
+    # 0074 §5.3a-1 (kill unit = the SENTENCE, ruled 09-04): partial
+    # ships — node_id -> count of dropped lines. Stored beside
+    # provenance in the cache so a cached rerun reports the same
+    # accounting; the dropped TEXT is never stored (absent lines are
+    # counted, never kept). The failed/failed_reasons pattern:
+    # killed_reasons carries this run's fresh kill violations for
+    # ops_fallout.
+    killed_lines: "dict[str, int]" = field(default_factory=dict)
+    killed_reasons: "list[tuple[str, list[str]]]" = field(
+        default_factory=list)
     # ADR 0074 D3 (DESC-FILE-1): the deliverable is a description per
     # SQL FILE — metric node_id -> text; coverage is measured in
     # files described. Multi-step files compose; single-statement
@@ -1528,10 +1580,12 @@ def generate_descriptions(
             step_id, nodes, tech_map, columns_map, fragment)
         key = step_content_hash(fragment, dep_names, dict_lines)
         if key in cache:
-            text, prov = _cache_entry(cache[key])
+            text, prov, killed_n = _cache_entry(cache[key])
             described[step_id] = text
             result.descriptions[step_id] = text
             result.provenance[step_id] = prov
+            if killed_n:
+                result.killed_lines[step_id] = killed_n
             result.cache_hits += 1
             continue
         try:
@@ -1549,12 +1603,19 @@ def generate_descriptions(
             continue
         if sd.source == "skeleton":
             # empties-(a) precedence: voice/gate kill > skeleton >
-            # absent. A skeleton killed by voice ships NOTHING and
-            # is COUNTED (0074 section 5.3a).
-            kill = grounding_violations(text, fragment, dict_lines)
-            if kill:
+            # absent — at SENTENCE grain (0074 §5.3a-1): the
+            # violating line dies, survivors ship, every drop is
+            # counted; the step empties only when no decision line
+            # survives.
+            shipped, killed, kill = line_level_kill(
+                text, fragment, dict_lines)
+            if kill and not shipped:
                 result.emptied.append((step_id, kill))
                 continue
+            if killed:
+                result.killed_lines[step_id] = len(killed)
+                result.killed_reasons.append((step_id, kill))
+                text = shipped
             prov = "skeleton_floor"
         else:
             prov = "gate_passed"
@@ -1566,7 +1627,7 @@ def generate_descriptions(
             result.vague.append(step_id)
         if _RAW_IDENTIFIERS.search(text):
             result.jargon.append(step_id)
-        cache[key] = (text, prov)
+        cache[key] = (text, prov, result.killed_lines.get(step_id, 0))
         described[step_id] = text
         result.descriptions[step_id] = text
         result.provenance[step_id] = prov
@@ -1596,7 +1657,7 @@ def generate_descriptions(
                 dict_lines.append(f"- {col.name}: {col.description.strip()}")
         key = measure_content_hash(node.name, expression, dict_lines)
         if key in cache:
-            m_text, m_prov = _cache_entry(cache[key])
+            m_text, m_prov, _mk = _cache_entry(cache[key])
             result.descriptions[node_id] = m_text
             result.provenance[node_id] = m_prov
             result.cache_hits += 1
@@ -1622,7 +1683,7 @@ def generate_descriptions(
             result.vague.append(node_id)
         if _RAW_IDENTIFIERS.search(text):
             result.jargon.append(node_id)
-        cache[key] = text
+        cache[key] = (text, "gate_passed", 0)
         result.descriptions[node_id] = text
         result.provenance[node_id] = "gate_passed"
         result.generated += 1
@@ -1672,10 +1733,18 @@ def generate_descriptions(
                                 f"generation_error: {type(err).__name__}: {err}"[:300])
                     continue
                 if sd.source == "skeleton":
-                    kill = grounding_violations(sd.text, frag)
-                    if kill:
+                    # §5.3a-1 sentence-grain kill, same as the step
+                    # loop — the no-roots file path is the same
+                    # acceptance
+                    shipped, killed, kill = line_level_kill(
+                        sd.text, frag)
+                    if kill and not shipped:
                         result.emptied.append((node_id, kill))
                         continue
+                    if killed:
+                        result.killed_lines[node_id] = len(killed)
+                        result.killed_reasons.append((node_id, kill))
+                        sd.text = shipped
                     prov = "skeleton_floor"
                 else:
                     prov = "gate_passed"
@@ -1693,7 +1762,7 @@ def generate_descriptions(
         key = metric_content_hash(node.name, roots, step_count,
                                   decision_count)
         if key in cache:
-            m_text, m_prov = _cache_entry(cache[key])
+            m_text, m_prov, _mk = _cache_entry(cache[key])
             result.descriptions[node_id] = m_text
             result.provenance[node_id] = m_prov
             result.file_descriptions[node_id] = m_text
@@ -1754,7 +1823,7 @@ def generate_descriptions(
             result.vague.append(node_id)
         if _RAW_IDENTIFIERS.search(text):
             result.jargon.append(node_id)
-        cache[key] = (text, "gate_passed")
+        cache[key] = (text, "gate_passed", 0)
         result.descriptions[node_id] = text
         result.provenance[node_id] = "gate_passed"
         # the composed metric description IS the file description

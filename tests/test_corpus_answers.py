@@ -32,6 +32,7 @@ from src.descriptions import (
     compose_skeleton,
     describe_step,
     grounding_violations,
+    line_level_kill,
 )
 
 
@@ -64,13 +65,40 @@ def test_skeleton_matches_the_authored_answer(case):
 @pytest.mark.parametrize("case", CASES, ids=_ids())
 def test_acceptance_verdict_matches_the_authored_outcome(case):
     """The production acceptance on the un-smoothed skeleton
-    (describe_step with no model + the empties-(a) voice kill) must
-    reach the authored verdict — including 'emptied' where absence
-    IS the right answer."""
+    (describe_step with no model + the §5.3a-1 SENTENCE-grain voice
+    kill) must reach the authored verdict — including 'emptied'
+    where absence IS the right answer."""
     sd = describe_step(case["sql"], case.get("meanings"), smooth=None)
-    kill = grounding_violations(sd.text, case["sql"],
-                                case_dict_lines(case))
-    got = "emptied" if kill else "ships"
+    shipped, killed, kill = line_level_kill(
+        sd.text, case["sql"], case_dict_lines(case))
+    got = "ships" if shipped else "emptied"
     assert got == case["outcome"], (
         f"{case['name']}: expected {case['outcome']}, got {got}"
         + (f" — kill: {kill[:2]}" if kill else f"\n{sd.text}"))
+
+
+@pytest.mark.parametrize(
+    "case", [c for c in CASES if "expect_shipped" in c],
+    ids=lambda c: f"{c['cls']}:{c['name']}")
+def test_shipped_text_matches_the_authored_answer(case):
+    """0074 §5.3a-1 (kill unit = the SENTENCE, ruled 09-04): on a
+    MIXED step the violating line dies, the true lines ship, and
+    every dropped line is counted. Nothing formerly-killed may leak
+    into shipped prose."""
+    sd = describe_step(case["sql"], case.get("meanings"), smooth=None)
+    shipped, killed, _kill = line_level_kill(
+        sd.text, case["sql"], case_dict_lines(case))
+    for want in case["expect_shipped"]:
+        assert want in shipped, (
+            f"{case['name']}: expected {want!r} in shipped:\n{shipped}")
+    for bad in case.get("forbid_shipped", []):
+        assert bad not in shipped, (
+            f"{case['name']}: formerly-killed content leaked "
+            f"({bad!r}) into:\n{shipped}")
+    assert len(killed) == case["killed"], (
+        f"{case['name']}: expected {case['killed']} killed line(s), "
+        f"got {len(killed)}: {killed}")
+    # and the surviving text is clean by the SAME gate — a partial
+    # ship is never a loosened ship
+    assert grounding_violations(shipped, case["sql"],
+                                case_dict_lines(case)) == []

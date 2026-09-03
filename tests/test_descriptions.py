@@ -39,6 +39,74 @@ def fake_describe(prompt: str) -> str:
     return "\n".join([intro] + [f"{i}| applies the {tag} rule" for i in range(1, 10)])
 
 
+class TestSentenceGrainKill:
+    """0074 §5.3a-1 (Sunny, 2026-09-04): the kill unit is the
+    SENTENCE. A voice/gate violation kills the violating LINE; the
+    remaining true bullets ship; every dropped line is COUNTED
+    (killed_lines beside emptied). A step empties only when no
+    DECISION line survives — a lead line alone is not a survivor
+    (that would be the Passthrough filler class by another door,
+    and the authored Case_Predicate 'emptied' answer stays right).
+    Answer key authored before the build (the standing law)."""
+
+    MIXED = ("SELECT E.PATIENT_ID FROM ENCOUNTERS E WHERE "
+             "CASE WHEN E.ADMIT_DATE > E.DISCHARGE_DATE THEN 1 "
+             "ELSE 0 END = 1 "
+             "AND E.ENCOUNTER_TYPE = 'ED' "
+             "AND E.ADMIT_DATE IS NOT NULL")
+    ALL_KILLED = ("SELECT PATIENT_ID FROM ENCOUNTERS WHERE "
+                  "CASE WHEN ADMIT_DATE > DISCHARGE_DATE THEN 1 "
+                  "ELSE 0 END = 1")
+
+    @staticmethod
+    def _nodes(sql):
+        import json
+        return [{"node_id": "t1", "name": "Mixed",
+                 "layer": NodeLayer.TRANSFORMATION.value,
+                 "properties": json.dumps({"sql_fragment": sql})}]
+
+    @staticmethod
+    def _garbage(prompt):
+        # ungroundable smoothing → the skeleton path decides the fate
+        return "The 987 codes prove eligibility per policy 654."
+
+    def test_mixed_step_ships_survivors_and_counts_the_kill(self):
+        r = generate_descriptions(self._nodes(self.MIXED), [],
+                                  self._garbage)
+        text = r.descriptions.get("t1", "")
+        assert "encounter type is 'ED'" in text, text
+        assert "admit date is recorded" in text, text
+        assert "condition holds" not in text, (
+            f"killed content leaked into prose: {text}")
+        assert r.provenance.get("t1") == "skeleton_floor"
+        assert r.killed_lines.get("t1") == 1, r.killed_lines
+        assert not r.emptied, r.emptied
+
+    def test_no_surviving_decision_line_still_empties(self):
+        r = generate_descriptions(self._nodes(self.ALL_KILLED), [],
+                                  self._garbage)
+        assert "t1" not in r.descriptions
+        assert r.emptied and r.emptied[0][0] == "t1"
+        assert not r.killed_lines, (
+            "an emptied step must not double-count as a partial ship")
+
+    def test_killed_count_survives_the_cache(self):
+        """The count is a stored fact beside provenance — a cached
+        rerun must report the same accounting, not silently drop to
+        zero (scoreboard stability across cache-hit reruns)."""
+        import json
+        cache: dict = {}
+        first = generate_descriptions(self._nodes(self.MIXED), [],
+                                      self._garbage, cache=cache)
+        round_tripped = json.loads(json.dumps(cache))
+        second = generate_descriptions(self._nodes(self.MIXED), [],
+                                       self._garbage,
+                                       cache=round_tripped)
+        assert second.cache_hits == 1
+        assert second.killed_lines.get("t1") == first.killed_lines.get(
+            "t1") == 1
+
+
 class TestTopologicalOrder:
     def test_dependencies_come_before_dependents(self):
         g = _graph()

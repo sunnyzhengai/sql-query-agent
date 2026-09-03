@@ -1237,6 +1237,10 @@ DESCRIPTION_CACHE = {
         # ADR 0074 D1 (spec:B2): every stored description carries its
         # epistemic status from the closed vocabulary.
         ("provenance", "string", False),
+        # 0074 §5.3a-1 (kill unit = the SENTENCE, ruled 09-04): how
+        # many lines died at generation. The dropped TEXT is never
+        # stored — absent lines are counted, never kept.
+        ("killed_lines", "integer", False),
     ],
     "column_descriptions": {
         "content_hash": "step_content_hash(sql_fragment, direct dependency names)",
@@ -1248,6 +1252,12 @@ DESCRIPTION_CACHE = {
             "smoothed prose that cleared the gate; skeleton_floor = "
             "deterministic composition (unfalsifiable); flagged = "
             "kept but marked. Emptied descriptions are ABSENT rows."
+        ),
+        "killed_lines": (
+            "Count of lines dropped by the §5.3a-1 sentence-grain "
+            "voice kill before this description shipped (0 = shipped "
+            "whole). Counted, never silent; the text of a killed "
+            "line is never stored."
         ),
     },
     "invariants": [

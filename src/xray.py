@@ -91,9 +91,12 @@ def compose_xray(run_kql, org_name: str,
     # stewards never write"). Provenance vocabulary is spec:B2's.
     lines += ["", "## Description sample (hand-gradable)", ""]
     try:
+        # column_ifexists: pre-§5.3a-1 stores have no killed_lines
+        # column and must still render their sample
         sample = run_kql(
             "ops_description_cache | where isnotempty(description) "
-            "| project description, provenance | take 5")
+            "| extend killed_lines = column_ifexists('killed_lines', 0) "
+            "| project description, provenance, killed_lines | take 5")
     except Exception:   # noqa: BLE001 — absent surface is disclosed
         sample = None
     if not sample:
@@ -103,7 +106,13 @@ def compose_xray(run_kql, org_name: str,
         for r in sample:
             prov = str(r.get("provenance") or "gate_passed")
             first = str(r.get("description") or "").splitlines()[0]
-            lines.append(f"- `[{prov}]` {first}")
+            try:
+                killed = int(r.get("killed_lines") or 0)
+            except (TypeError, ValueError):
+                killed = 0
+            tail = (f" · {killed} line(s) killed at generation"
+                    if killed else "")
+            lines.append(f"- `[{prov}]` {first}{tail}")
         lines.append("")
         lines.append("Grade these against your own SQL: every claim "
                      "is machine-checked before it lands "
@@ -111,7 +120,9 @@ def compose_xray(run_kql, org_name: str,
                      "grounding gate; `skeleton_floor` = "
                      "deterministic composition, unfalsifiable by "
                      "construction). Absent descriptions are counted, "
-                     "never silent.")
+                     "never silent — and where a single sentence "
+                     "failed the voice rules, that line was dropped "
+                     "and counted while the true lines shipped.")
 
     lines += ["", "## The AI-readiness verdict", ""]
     n_conf = len(conflicts)

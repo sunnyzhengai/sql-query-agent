@@ -38,6 +38,7 @@ from dataclasses import dataclass, field  # noqa: E402
 from src.descriptions import (  # noqa: E402
     describe_step,
     grounding_violations,
+    line_level_kill,
     parsed_grain,
     parsed_tables,
 )
@@ -206,7 +207,32 @@ WHERE (ABS(DATEDIFF(MI, MA.TAKEN_TIME,
      "expect": [],
      "outcome": "emptied"},  # the RIGHT answer is a counted empty:
                              # CASE-in-predicate is a ruled unrendered
-                             # kind; raw echo, gate-refused, counted
+                             # kind; raw echo, gate-refused, counted —
+                             # and under §5.3a-1 a lead line alone is
+                             # NOT a survivor (no decision bullet
+                             # ships => the step still empties)
+    # ---- grown 2026-09-04 (0074 §5.3a-1, kill unit = the SENTENCE;
+    # authored BEFORE the build, per the answer-key law): a MIXED step
+    # — one unvoicable raw-echo line beside true lines. The ruled
+    # outcome: the violating LINE dies, the true lines SHIP, every
+    # drop is counted. expect/forbid grade the SKELETON (which
+    # rightly still carries the raw echo); expect_shipped /
+    # forbid_shipped / killed grade what the ACCEPTANCE ships.
+    {"cls": "mixed_kill", "name": "Mixed_Step",
+     "sql": ("SELECT E.PATIENT_ID FROM ENCOUNTERS E WHERE "
+             "CASE WHEN E.ADMIT_DATE > E.DISCHARGE_DATE THEN 1 "
+             "ELSE 0 END = 1 "
+             "AND E.ENCOUNTER_TYPE = 'ED' "
+             "AND E.ADMIT_DATE IS NOT NULL"),
+     "expect": ["encounter type is 'ED'",
+                "admit date is recorded",
+                "condition holds"],       # the skeleton is honest
+     "outcome": "ships",                  # ...and the acceptance ships
+     "expect_shipped": ["This is a selection of patients.",
+                        "encounter type is 'ED'",
+                        "admit date is recorded"],
+     "forbid_shipped": ["condition holds", "`", "CASE WHEN"],
+     "killed": 1},                        # exactly the raw-echo line
 ]
 
 DAX_CASES = [
@@ -220,6 +246,7 @@ class Tally:
     gate_passed: int = 0
     skeleton_floor: int = 0
     emptied: int = 0
+    killed_lines: int = 0     # §5.3a-1: dropped lines across the class
     violations: "list[str]" = field(default_factory=list)
     samples: "list[tuple]" = field(default_factory=list)
 
@@ -231,34 +258,41 @@ def case_dict_lines(case: dict) -> "list[str] | None":
     return [f"- {k}: {v}" for k, v in m.items()] if m else None
 
 
-def grade_case(case: dict, describe) -> "tuple[str, str, list]":
+def grade_case(case: dict, describe) -> "tuple[str, str, list, list]":
     """Production acceptance, verbatim (descriptions.py, the
     generate_descriptions step loop): describe_step → if the skeleton
-    ships, the empties-(a) voice kill decides shipped vs absent.
+    ships, the §5.3a-1 SENTENCE-grain voice kill decides what ships —
+    the violating line dies, survivors ship, drops are counted; the
+    step empties only when no decision line survives.
     Cases with a 'meanings' map run the with-dictionary leg — what
     production always has (grown 09-03; the dictionary-less leg alone
-    could not see the sentence-shaped-meanings bug class).
+    could not see the sentence-meanings bug class).
 
-    Returns (outcome, final_text, smoothing_catch_violations)."""
+    Returns (outcome, final_text, smoothing_catch_violations,
+    killed_line_texts)."""
     sql = case["sql"]
     sd = describe_step(sql, case.get("meanings"), smooth=describe)
     if sd.source == "skeleton":
-        kill = grounding_violations(sd.text, sql, case_dict_lines(case))
-        if kill:
-            return "emptied", "", sd.violations + kill
-        return "skeleton_floor", sd.text, sd.violations
-    return "gate_passed", sd.text, sd.violations
+        shipped, killed, kill = line_level_kill(
+            sd.text, sql, case_dict_lines(case))
+        if kill and not shipped:
+            return "emptied", "", sd.violations + kill, killed
+        return "skeleton_floor", shipped, sd.violations, killed
+    return "gate_passed", sd.text, sd.violations, []
 
 
 def run(describe, cases=None) -> "dict[str, Tally]":
     out: "dict[str, Tally]" = {}
     for case in (cases if cases is not None else CASES):
         t = out.setdefault(case["cls"], Tally())
-        outcome, text, caught = grade_case(case, describe)
+        outcome, text, caught, killed = grade_case(case, describe)
         setattr(t, outcome, getattr(t, outcome) + 1)
+        if outcome != "emptied":
+            t.killed_lines += len(killed)
         for v in caught:
             t.violations.append(v.split(":")[0])
-        t.samples.append((case["name"], text, caught, case["sql"]))
+        t.samples.append((case["name"], text, caught, case["sql"],
+                          killed if outcome != "emptied" else []))
     return out
 
 
@@ -268,27 +302,33 @@ def fabricated_count(tallies: "dict[str, Tally]") -> int:
     re-asserted from the outside (the instrument checks the checker)."""
     return sum(len(grounding_violations(text, sql))
                for t in tallies.values()
-               for _name, text, _caught, sql in t.samples if text)
+               for _name, text, _caught, sql, _killed in t.samples
+               if text)
 
 
 def report(tallies: "dict[str, Tally]") -> str:
     lines = ["# P0-b — adversarial corpus over LIVE generation "
              "(production acceptance, ADR 0074)", ""]
     tot = {"gate_passed": 0, "skeleton_floor": 0, "emptied": 0}
+    tot_killed = 0
     for cls, t in tallies.items():
         for k in tot:
             tot[k] += getattr(t, k)
+        tot_killed += t.killed_lines
     n = sum(tot.values()) or 1
     lines += [
         f"**{n} case(s)** · gate_passed {tot['gate_passed']} · "
         f"skeleton_floor {tot['skeleton_floor']} · emptied "
-        f"{tot['emptied']}",
+        f"{tot['emptied']} · killed lines {tot_killed}",
         "",
         "gate_passed = smoothed prose cleared the gate · "
         "skeleton_floor = the grounded skeleton shipped (the smoothing "
         "catch, if any, is listed) · emptied = voice kill, absence "
-        "over fabrication (0074 §5.3a). Dictionary-less leg: meanings "
-        "fall back to readable column names.",
+        "over fabrication (0074 §5.3a) · killed lines = §5.3a-1 "
+        "SENTENCE-grain kills on partial ships (the violating line "
+        "died, the true lines shipped, every drop counted). "
+        "Dictionary-less leg: meanings fall back to readable column "
+        "names.",
         "",
         "## Per class", "",
     ]
@@ -298,16 +338,22 @@ def report(tallies: "dict[str, Tally]") -> str:
         lines.append(
             f"- **{cls}** — gate_passed {t.gate_passed} · "
             f"skeleton_floor {t.skeleton_floor} · emptied {t.emptied}"
+            + (f" · killed lines {t.killed_lines}"
+               if t.killed_lines else "")
             + (f" · smoothing catch: {', '.join(vs)}" if vs else ""))
     lines += ["", "## Samples (fragment → final description)", ""]
     for cls in sorted(tallies):
-        for name, text, caught, _sql in tallies[cls].samples:
+        for name, text, caught, _sql, killed in tallies[cls].samples:
             lines += [f"### {cls} · {name}",
                       "```", (text or "(emptied)").strip(), "```"]
             if caught:
                 lines.append(
                     f"smoothing catch: {len(caught)} violation(s) — "
                     "the skeleton shipped instead")
+            if killed:
+                lines.append(
+                    f"killed line(s) ({len(killed)}, counted — never "
+                    "shipped): " + " · ".join(f"`{k}`" for k in killed))
             lines.append("")
     return "\n".join(lines)
 

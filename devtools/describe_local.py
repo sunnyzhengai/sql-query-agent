@@ -84,6 +84,14 @@ def main() -> None:
 
     result = generate_descriptions(graph.nodes_rows, graph.edges_rows, describe, cache=cache)
     print(f"Generated {result.generated}, cache hits {result.cache_hits}, failed {len(result.failed)}")
+    print(f"Emptied (voice kill, counted): {len(result.emptied)}  |  "
+          f"partial ships (killed lines, 0074 §5.3a-1): "
+          f"{len(result.killed_lines)} step(s) / "
+          f"{sum(result.killed_lines.values())} line(s)")
+    for nid, n in list(result.killed_lines.items())[:10]:
+        print(f"  killed {n}: {nid}")
+    for nid, v in result.emptied[:10]:
+        print(f"  emptied: {nid} — {v[0][:100]}")
 
     # Leak gate — defense in depth even though fixtures are anonymized
     terms = get_scan_terms(load_crosswalk(CROSSWALK))

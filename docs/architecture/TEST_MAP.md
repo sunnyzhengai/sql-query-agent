@@ -7,7 +7,7 @@
 
 # Test Map — what every test proves
 
-130 modules, 1507 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
+130 modules, 1511 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
 
 ## By ADR
 
@@ -27,7 +27,7 @@
 | 0016 | Case-insensitive identifier matching, folded uppercase | `tests/parser/test_identity.py` (12), `tests/test_dictionary.py` (8) |
 | 0017 | Resolve-then-traverse agent retrieval | `tests/adapters/test_fabric_agent.py` (4), `tests/test_graph_templates.py` (13) |
 | 0018 | Materialized closure edges (USES_TABLE) | `tests/steps/test_steps.py` (41), `tests/test_recorded_pipeline.py` (3) |
-| 0019 | CTE descriptions bottom-up, before metric descriptions | `tests/steps/test_agent_descriptions.py` (15), `tests/test_descriptions.py` (25), `tests/test_llm_client.py` (14) |
+| 0019 | CTE descriptions bottom-up, before metric descriptions | `tests/steps/test_agent_descriptions.py` (15), `tests/test_descriptions.py` (28), `tests/test_llm_client.py` (14) |
 | 0020 | Generator-compatibility LPG export shape | `tests/adapters/test_lineage_match.py` (26) |
 | 0021 | Certification discloses, never gates | `tests/test_schemas.py` (8) |
 | 0022 | Definition versioning: certification pins a content hash | `tests/test_schemas.py` (8) |
