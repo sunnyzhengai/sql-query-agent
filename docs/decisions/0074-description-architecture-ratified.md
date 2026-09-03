@@ -129,7 +129,18 @@ fallback.
    Nothing empties for lack of grounding (the skeleton composes);
    a description may empty by VOICE — a grounded, true sentence
    killed by the vocabulary rule stays killed, and the field goes
-   absent rather than the ban loosening. This simultaneously rules
+   absent rather than the ban loosening.
+
+   **3a-1. THE KILL UNIT — Sunny, 2026-09-04: the SENTENCE.** A
+   voice violation kills the violating LINE; the remaining true
+   bullets ship; every dropped line is COUNTED (a per-step
+   `killed_lines` accounting beside `emptied`). The whole step
+   empties only when no line survives. This is the ruling's own
+   wording taken literally ("a grounded, true sentence ... stays
+   killed") — the ban never loosens, but one unvoicable line no
+   longer destroys five true ones. Ordered with the 09-03 estate
+   evidence: 17 residual whole-step empties, most carrying
+   majority-true bullets. This simultaneously rules
    the sibling parked item (the word "table" on temp-staged steps):
    the ban STAYS; `TestTempStepVoiceCost`'s pinned behaviour is now
    the ruled behaviour. Empties are COUNTED (the DESC reports'

@@ -255,6 +255,53 @@ view are preserved history.
 - [ ] Still open for Sunny: whole-step vs line-level voice kill
       (now decides only the last ~14 dictionary-text empties).
 
+### 🌙 OVERNIGHT ORDERS 2026-09-04 (Sunny ruled + ordered before sleep; execute top to bottom)
+
+**Standing laws for the run:** test-first with AUTHORED answers
+(corpus answer-key pattern — expect/forbid/outcome before code);
+ruff before every commit; all runs via
+`DOTNET_ROOT="$HOME/.dotnet" /opt/homebrew/bin/python3.11`; verdicts
+land in ADRs/registries/BOARD the moment they exist; commit + push
+to dev per completed item; NEVER validate via Fabric Data Agent;
+work stays in this repo (no wall crossing). If an item is blocked,
+record why here and move on — do not stall the queue.
+
+1. [x] **RULING LANDED (before sleep): kill unit = the SENTENCE**
+       (0074 §5.3a-1). Ratified by Sunny 09-04.
+2. [ ] **VOICE-KILL-GRANULARITY build:** implement line-level kill in
+       the acceptance (generate_descriptions step loop + no-roots
+       path): drop violating lines, ship survivors, count dropped
+       lines per step (`killed_lines` on DescriptionResult; surface
+       in X-Ray sample + corpus report). Answer key first: author
+       expected outcomes for a mixed step (one raw-echo line + true
+       lines → ships the true lines, kill counted). Exit: estate
+       rerun shows the 17 whole-step empties mostly recovered to
+       partial ships; nothing formerly-killed leaks into prose.
+3. [ ] **Report-review trio** (each answer-key-first):
+       a. Constant lead line: no-table steps must not open with
+          'This is a selection of records' — adapt the lead to the
+          derived-values fact; update degenerate_literal's expect.
+       b. EXISTS names the missing record: use the inner table's
+          dictionary meaning ('no primary-care assignment record
+          exists for the patient'); dictionary-less fallback stays
+          current phrasing; extend No_PCP + add a with-dictionary
+          negation case.
+       c. DAX_CASES: dead corpus — either wire a dax leg through the
+          measure path with authored answers, or delete with a
+          recorded reason. Pick one, on the record.
+4. [ ] **P1 TERM-PROPOSE-1/2** (see P1 section below): execute per
+       its standing spec; contracts-first; if the spec is too thin
+       to build safely overnight, write the contract + red tests
+       only and record the stop reason here.
+5. [ ] **VERIFY + CONSOLIDATE (always last):** full suite; live
+       corpus leg; estate regeneration (v-bump if composition
+       changed); refresh internal/docs/DESC_ESTATE_SAMPLE.md
+       (before/after incl. line-kill recoveries); regenerate docs;
+       registries/stamps reconciled; ensure working tree clean and
+       pushed. Write **☀️ MORNING REPORT** at the top of this file:
+       what shipped, what's red, what needs Sunny, hand-gradable
+       pointers.
+
 ### CORPUS ANSWER KEY 09-03 (Sunny's retro test-first order)
 - [x] **Right answers as data:** every corpus case now carries its
       authored answer (expect / forbid / outcome), asserted WITHOUT
