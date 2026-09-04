@@ -198,7 +198,10 @@ KG Layer 3 — artifact layer                            [in design]
        point at what they describe, never the reverse — layers
        1-2 never know layer 3 exists
     -- author: edge to an identity node
-    -- authorship: machine | human — explicit, never inferred
+    -- authorship (DERIVED, never stored — ruled 2026-09-04):
+       machine iff the author edge targets an agent identity;
+       human otherwise (killed as a stored field: it restated the
+       author's identity kind)
     -- ownership (DERIVED, never stored — ruled 2026-09-04):
        human iff any version has a human author OR a certifying
        disposition targets the artifact; otherwise machine. Once
@@ -216,12 +219,13 @@ KG Layer 3 — artifact layer                            [in design]
        conformance failure
     -- created_at (events: occurred_at — when it happened, not
        when recorded)
-    -- version + supersedes (ruled: NOTHING in this layer is ever
-       edited in place — an edit appends a new version with a
-       supersedes edge; "current" is derived. State-shaped =
-       chains with a derived current pointer; event-shaped =
-       chains without supersession. The layer is append-only
-       because it is not regenerable) [axm:D3, axm:R4]
+    -- supersedes (ruled: NOTHING in this layer is ever edited in
+       place — an edit appends a new version with a supersedes
+       edge; "current" is derived. State-shaped = chains with a
+       derived current pointer; event-shaped = chains without
+       supersession. The layer is append-only because it is not
+       regenerable. Version NUMBER is DERIVED — chain depth,
+       never stored; ruled 2026-09-04) [axm:D3, axm:R4]
     -- basis (machine-authored only): the version stamps of
        everything the artifact derived from — tree version,
        metamodel version, source-pack version, prompt/gate
