@@ -84,8 +84,37 @@ check; extract format — the layer's input contract, next design
 conversation before any code.
 
 
-KG Layer 2 — logic layer (per-file semantic trees)     [next]
+KG Layer 2 — logic layer (one tree per SQL file)       [in design]
       L1 companions: Kind_Library_TSQL_Predicates, logic contract (tbd)
+- The unit (ruled 2026-09-04): the whole FILE is one tree. All
+  logic is a natural result of walking the tree; no "smallest unit
+  of logic" is ever defined. A #temp table is internal structure of
+  its file's tree — a named intermediate scope, like a CTE — never
+  a technical-layer citizen.
+- Node types:
+    -- file (the tree's root)
+        --- physical name, source path
+        --- dialect
+        --- parsed_at, parser/metamodel versions
+    -- statement (children of file, in order — the staging chain)
+    -- scope (a SELECT with its clauses; also: CTE, subquery,
+       temp-table scope — every place logic has its own boundary)
+        --- name (CTE/temp name where one exists)
+    -- structure (FROM, JOIN w/ type, WHERE, HAVING, GROUP BY,
+       ORDER BY/TOP, UNION w/ dedup flag, CASE)
+    -- predicate (one condition; kind from the metamodel's
+       closed set)
+    -- expression (column_ref | literal | parameter_ref | function
+       | arithmetic | case | cast | subquery_ref)
+    -- parameter (file-scope; declared name, default logic)
+- Every node carries: evidence (verbatim source fragment +
+  location) and the version stamps
+- column_ref is the ONLY pointer into KG layer 1 (resolved;
+  unresolved refs are counted, never dropped)
+- Not node types, on purpose: decisions (derived by lenses);
+  anything the technical layer owns.
+- Edge types: [next]
+- Rules: [next]
 KG Layer 3 — artifact layer                            [undesigned]
 KG Layer 4 — concept layer                             [undesigned]
 Lenses                                                 [named, undesigned]
