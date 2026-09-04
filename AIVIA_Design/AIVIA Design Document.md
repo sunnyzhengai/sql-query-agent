@@ -58,7 +58,7 @@ KG Layer 1 — source dictionaries technical layer      [ratified]
    compliance finding, not a graph edit.
    -- source inheritance: a schema belongs to exactly one source; tables/columns inherit source from the containment chain; a mixed schema is the recorded trigger to push source down a level.
 
-KG Layer 2 — logic layer (one tree per SQL file)       [in design]
+KG Layer 2 — logic layer (one tree per SQL file)       [ratified]
       L1 companions: Kind_Library_TSQL_Predicates, logic contract (tbd)
 - The unit (ruled 2026-09-04): the whole FILE is one tree. All
   logic is a natural result of walking the tree; no "smallest unit
