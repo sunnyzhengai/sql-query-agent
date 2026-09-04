@@ -417,7 +417,48 @@ Lenses                                                 [ratified]
   Completeness swept both directions: every derived-never-stored
   ruling from layers 2-4 has its lens; no lens lacks a ratified
   origin.
-The two flows                                          [later]
+The flows                                              [in design]
+- The map (ruled 2026-09-04): THREE flows; one already contracted.
+  Inbound (estate → graph) = CONTRACT_DATALOAD + layer 2's mapper
+  rules, complete. This section designs outward (graph → catalog)
+  and inward (inquiry → graph → estate, generating new estate when
+  none matches — which re-enters through the parser).
+
+- OUTWARD FLOW — three stages: produce → approve → land.
+
+  Stage 1: PRODUCE (ratified 2026-09-04) — graph → layer-3
+  machine versions:
+    -- deterministic composition (lenses + tree evidence) +
+       bounded model smoothing (linguistic seat only) + the class
+       gate; the model never adds a fact — the gate enforces it
+       [axm:B1, axm:M5/J2]; model failure degrades to the
+       deterministic floor — an outage costs polish, never truth
+    -- the trigger: the STALENESS LENS is the worklist (basis
+       moved, no artifact yet, or explicit human request). No
+       change, no production, no noise; nobody hand-picks; full
+       regeneration = a version bump making everything stale —
+       the same rule, not an exception
+    -- writes: layer-3 machine versions ONLY; against human-owned
+       artifacts it may APPEND a superseding version — rendered
+       "proposed" by the ownership lens, never current
+    -- every run lands the GENERATION-RUN EVENT: author = agent
+       identity; basis = model/prompt/lens/metamodel versions +
+       worklist; accounting shipped ⊎ absent = attempted, with
+       killed-lines counted per shipped artifact [axm:R1]. The
+       run event is the ONLY production ledger — quality numbers
+       are lenses over run events, never separate bookkeeping
+    -- replay floor: same graph + same versions → identical
+       skeletons and gate verdicts; prose may vary, truth may not
+       [axm:M5]
+    -- checks: PROD-1 conservation event per run · PROD-2
+       worklist = staleness-lens output · PROD-3 gate outcomes in
+       closed vocabularies · PROD-4 human-owned never overwritten
+       · PROD-5 replay determinism of the floor
+
+  Stage 2: APPROVE — [next]
+  Stage 3: LAND — [next]
+
+- INWARD FLOW — [next]
 
 **** Design-to-Code Protocol (Level 0 law)
 
