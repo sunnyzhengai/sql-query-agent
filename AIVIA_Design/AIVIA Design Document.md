@@ -257,7 +257,26 @@ KG Layer 3 — artifact layer                            [in design]
        version or revoking disposition; "currently responsible"
        is derived (and the identity node's own status feeds the
        lens — the person-left-the-org case).
-    -- event classes: [next]
+    -- disposition: ruling (closed set: accept | reject | certify
+       | revoke | acknowledge) + optional reason text. RULE:
+       authorship is always HUMAN — machines never rule. Machine
+       "findings" (divergence, staleness, human text contradicted
+       by moved reality) need NO stored class: they are derived
+       states computed by lenses on read — the machine never
+       writes a judgment; it computes one when asked (completes
+       the retirement of stored "conflict" verdicts).
+    -- usage event: action (closed set: asked | ran | confirmed |
+       relied_on); about = the node touched, author = the user,
+       occurred_at = when. Nothing else — the flywheel is lenses
+       over exactly this.
+    -- proposal: kind (sent | observed).
+       sent: target_system (closed set: purview | collibra | ...);
+       about → the artifact version proposed.
+       observed: outcome (closed set: published | denied | edited
+       | missing); about → the sent event it observes.
+       Current outcome is DERIVED (latest observation) — append-
+       only forces sends and sightings apart; each look is its
+       own fact.
 - Edge types, rules: [next]
 KG Layer 4 — concept layer                             [undesigned]
 Lenses                                                 [named, undesigned]
