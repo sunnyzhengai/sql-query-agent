@@ -236,6 +236,16 @@ KG Layer 3 — artifact layer                            [in design]
        (a failed description is NO artifact, counted in the run's
        ledger) relocate to the GENERATION RUN EVENT — lands with
        layer rules or the outward flow, whichever first
+    -- term: name, definition
+       status vocabulary: machine versions nominated; human
+       versions authored
+       one class-specific edge: parent → term (hierarchy between
+       term artifacts; can't ride about, which points at the
+       estate). Accepted/rejected are NOT statuses — they are
+       dispositions; current standing is derived (nominated +
+       accepting disposition = accepted; nothing stored). The
+       machine's evidence (the name family, member tree versions)
+       rides basis; what the term governs rides about.
     -- remaining classes: [next]
 - Edge types, rules: [next]
 KG Layer 4 — concept layer                             [undesigned]
