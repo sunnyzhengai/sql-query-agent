@@ -118,10 +118,47 @@ KG Layer 2 — logic layer (one tree per SQL file)       [in design]
         --- subquery_ref  → its scope node
         --- an unresolvable ref gets NO edge — counted, never
             guessed
-- Rules: [next]
+- Rules (ratified 2026-09-04; each cites its axiom in
+  docs/AI_VIA_AXIOMS.md):
+    -- parser authority: tree structure comes from the dialect's
+       parser and nowhere else — never punctuation, never regex,
+       never text heuristics [axm:D2, axm:M5]
+    -- conservation: every construct in the source file maps into
+       the tree or lands in the counted remainder with reason and
+       location — handled ⊎ remainder = total, no third bucket;
+       unknown vendor constructs are a red build via the reflected
+       denominator; the remainder aggregates to a human ruling
+       [axm:R1, axm:R2, axm:R3]
+    -- evidence: every node carries its verbatim source fragment
+       and location — the tree is the witness chain for everything
+       downstream [axm:B1]
+    -- scope ownership: every predicate belongs to exactly one
+       scope; a nested scope's logic is its own, never the
+       parent's [axm:D3]
+    -- resolution honesty: a reference resolves via resolves_to or
+       carries no edge; unresolved references are counted, never
+       guessed; resolution results declare completeness
+       [axm:B3, axm:R1]
+    -- single writer, regenerable: only the mapper writes this
+       layer; trees are derived artifacts, rebuilt from source
+       files + KG layer 1 alone, never hand-edited
+       [axm:D3, axm:S3]
+    -- metamodel conformance: every node and edge validates
+       against the versioned registry; kinds are closed; a new
+       kind goes doc -> registry -> code, never code-first
+       [axm:S2, axm:D4]
+    -- structure carried, never lowered: the tree is the ONLY
+       representation of a file's logic; downstream consumers read
+       the tree, never the source text (evidence is for display
+       and audit, not re-parsing) [axm:S1, axm:M5; = spec:G5 in
+       the code record]
 KG Layer 3 — artifact layer                            [undesigned]
 KG Layer 4 — concept layer                             [undesigned]
 Lenses                                                 [named, undesigned]
+      IOU (recorded 2026-09-04): axm:D1 — when lenses are
+      designed, a reachability accounting over KG layer 2 node
+      classes is required (every node class reachable through a
+      declared operation or carrying an explicit exclusion).
 The two flows                                          [later]
 
 **** Design-to-Code Protocol (Level 0 law)
