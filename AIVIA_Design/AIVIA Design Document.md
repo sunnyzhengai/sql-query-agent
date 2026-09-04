@@ -225,7 +225,19 @@ KG Layer 3 — artifact layer                            [in design]
        trigger: any basis version moving marks the artifact
        stale. Human-authored artifacts may carry a free-text
        reason; nothing is demanded of humans.
-- Per-class properties, edge types, rules: [next]
+- Per-class properties (minimal by ruling — the spine does the
+  work; anything derivable is a lens, anything event-shaped lives
+  in events):
+    -- description: text
+       status vocabulary: machine versions gate_passed |
+       skeleton_floor | flagged; human versions authored
+       IOU (recorded 2026-09-04): kill accounting (dropped
+       sentences counted, text never kept) and the absence rule
+       (a failed description is NO artifact, counted in the run's
+       ledger) relocate to the GENERATION RUN EVENT — lands with
+       layer rules or the outward flow, whichever first
+    -- remaining classes: [next]
+- Edge types, rules: [next]
 KG Layer 4 — concept layer                             [undesigned]
 Lenses                                                 [named, undesigned]
       IOU (recorded 2026-09-04): axm:D1 — when lenses are
