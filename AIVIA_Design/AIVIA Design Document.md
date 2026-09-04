@@ -152,7 +152,42 @@ KG Layer 2 — logic layer (one tree per SQL file)       [ratified]
        the tree, never the source text (evidence is for display
        and audit, not re-parsing) [axm:S1, axm:M5; = spec:G5 in
        the code record]
-KG Layer 3 — artifact layer                            [undesigned]
+KG Layer 3 — artifact layer                            [in design]
+- The defining property: NOT regenerable. Layers 1-2 rebuild from
+  sources; this layer holds human judgment and gated machine
+  output that exist nowhere else. Human-owned artifacts are never
+  overwritten by pipelines [axm:D3]; machine-owned artifacts
+  regenerate freely until a human edit flips ownership (the
+  attribution prefix dropping IS the observable flip).
+- Artifact classes (ruled 2026-09-04), split by shape:
+    state-shaped (versioned, owned transitions):
+    -- description (LLM-generated, gated, provenance-stamped;
+       owner flips machine->human exactly once)
+    -- term (machine-NOMINATED from graph shape w/ evidence, or
+       human-authored; only human ratification makes it a term;
+       nothing gates on certification — status tells the truth)
+    -- responsibility ((person-or-role, kind, target node); kinds:
+       steward | owner | expert | dba | ...; multiples allowed —
+       one-steward-per-asset is an org policy, never our structure)
+    event-shaped (append-only; current state DERIVED by lens,
+    never stored) [axm:R4]:
+    -- disposition (a human ruling on a target; multiple rulers
+       allowed; conflicting rulings surface as a disagreement
+       state with names — never silent last-write-wins)
+    -- usage event (who asked/ran/confirmed/relied-on which node,
+       when — the flywheel's ledger; lenses derive de-facto
+       expertise, blast radius in people, personal truth layers,
+       usage-weighted priority; usage NOMINATES governance,
+       humans ratify — never silent promotion)
+    -- proposal record (what was proposed to which catalog and
+       the last observed outcome: published | denied | edited |
+       missing; buys anti-repeat, divergence detection, honest
+       engagement accounting — we leave no marker in their
+       catalog, so this is our only memory)
+- Parked for the properties pass: identity (person/role) likely
+  earns nodehood — both responsibility and usage reference it,
+  and "everything this person touches" is a scoping query.
+- Node/edge properties, edge types, rules: [next]
 KG Layer 4 — concept layer                             [undesigned]
 Lenses                                                 [named, undesigned]
       IOU (recorded 2026-09-04): axm:D1 — when lenses are
