@@ -53,3 +53,6 @@ llm_api_key.txt
 data/events/
 internal/learning/
 internal/private/
+
+# Vendor-derived material — never leaves this machine
+AIVIA_Protected/
