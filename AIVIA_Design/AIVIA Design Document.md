@@ -520,7 +520,31 @@ The flows                                              [in design]
        · MATCH-4 candidates are ids + evidence, never text ·
        MATCH-5 ambiguity reaches the human
 
-  Stage 2: GROUND — [next]
+  Stage 2: GROUND (ratified 2026-09-04) — matched objects → the
+  answer:
+    -- the answer is ARRANGED EVIDENCE: the matched logic, its
+       tree, its artifacts, its lens readings — rendered; the
+       answer text is a CAPTION over them, composed by the mind
+       but adding no claim the evidence doesn't carry; headlines
+       and counts are rendered by code from result metadata,
+       never model-written [axm:B1, axm:B2 — the standing slogan
+       as contract: operations are the product, the answer is a
+       caption]
+    -- quantified claims inherit the match's declared
+       completeness — "all" and counts only over results declared
+       total [axm:B3]
+    -- execution (the Run act) is a CONSUMER of this stage, not
+       part of it: gated, human-confirmed [axm:B4], governed by
+       the ruled run machinery; result rows are DISPLAY-ONLY —
+       they never enter the graph or the mind's evidence for
+       claims. Data values and logic truth stay separate worlds
+    -- writes: usage events only — `confirmed` when the human
+       accepts an answer; `ran` when they execute. Nothing else
+    -- checks: GRND-1 writer census (confirmed | ran only) ·
+       GRND-2 caption gate — no ungrounded claim in answer text ·
+       GRND-3 quantifiers only over declared-complete results ·
+       GRND-4 headlines/counts rendered by code
+
   Stage 3: GENERATE — [next]
 
 **** Design-to-Code Protocol (Level 0 law)
