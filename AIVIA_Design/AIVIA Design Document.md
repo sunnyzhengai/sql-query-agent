@@ -199,9 +199,15 @@ KG Layer 3 — artifact layer                            [in design]
        1-2 never know layer 3 exists
     -- author: edge to an identity node
     -- authorship: machine | human — explicit, never inferred
-    -- owner: state-shaped artifacts start machine-owned and flip
-       to human exactly once, never back; event-shaped artifacts:
-       owner = author, immutable
+    -- ownership (DERIVED, never stored — ruled 2026-09-04):
+       human iff any version has a human author OR a certifying
+       disposition targets the artifact; otherwise machine. Once
+       human, pipelines may only propose. The flip is one-way BY
+       CONSTRUCTION — append-only history cannot be un-happened,
+       so no rule needs enforcing. (Supersedes the earlier stored
+       owner field: authorship alone misses
+       certification-without-edit; a stored owner could drift
+       from the history it summarizes.)
     -- status: closed set, DECLARED per class; an undeclared
        status value is a conformance failure
     -- created_at (events: occurred_at — when it happened, not
