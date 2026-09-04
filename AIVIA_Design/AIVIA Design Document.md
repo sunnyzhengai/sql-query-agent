@@ -58,32 +58,6 @@ KG Layer 1 — source dictionaries technical layer      [ratified]
    compliance finding, not a graph edit.
    -- source inheritance: a schema belongs to exactly one source; tables/columns inherit source from the containment chain; a mixed schema is the recorded trigger to push source down a level.
 
-**** Design-to-Code Protocol (Level 0 law; appended by Claude at Sunny's request, 2026-09-04 night — edit freely)
-
-Six steps, in order, for every component; no step skipped:
-1. Doc section ratified here first — the doc is the design authority.
-2. Metamodel registry updated: the doc's node/edge/property
-   definitions restated as a machine-readable data file. Code and
-   tests consume the registry, never the prose; any doc change
-   updates the registry in the same breath.
-3. Every rule gets named checks, enumerated before code — a rule
-   with no check is a hope (the rule-to-check map).
-4. Fixtures authored: synthetic input + hand-authored expected
-   output (the answer key), written before any builder exists.
-5. Only then code — until the checks are green. Code never
-   introduces a concept the registry doesn't have.
-6. Discoveries flow backward: anything code reveals goes to the DOC
-   first, then registry, then code — never patched in place.
-
-Companion artifacts are indexed to this doc's levels and live
-beside it (L2_* files); the doc holds WHAT and the rules, the
-companions hold the machine-readable and test-facing detail.
-
-Open items (technical layer): grain — pending Sunny's dictionary
-check; extract format — the layer's input contract, next design
-conversation before any code.
-
-
 KG Layer 2 — logic layer (one tree per SQL file)       [in design]
       L1 companions: Kind_Library_TSQL_Predicates, logic contract (tbd)
 - The unit (ruled 2026-09-04): the whole FILE is one tree. All
@@ -119,3 +93,25 @@ KG Layer 3 — artifact layer                            [undesigned]
 KG Layer 4 — concept layer                             [undesigned]
 Lenses                                                 [named, undesigned]
 The two flows                                          [later]
+
+**** Design-to-Code Protocol (Level 0 law)
+
+Six steps, in order, for every component; no step skipped:
+1. Doc section ratified here first — the doc is the design authority.
+2. Metamodel registry updated: the doc's node/edge/property
+   definitions restated as a machine-readable data file. Code and
+   tests consume the registry, never the prose; any doc change
+   updates the registry in the same breath.
+3. Every rule gets named checks, enumerated before code — a rule
+   with no check is a hope (the rule-to-check map).
+4. Fixtures authored: synthetic input + hand-authored expected
+   output (the answer key), written before any builder exists.
+5. Only then code — until the checks are green. Code never
+   introduces a concept the registry doesn't have.
+6. Discoveries flow backward: anything code reveals goes to the DOC
+   first, then registry, then code — never patched in place.
+
+Companion artifacts are indexed to this doc's levels and live
+beside it (L1_KGn_* files, named for the Level-1 section they
+attach to); the doc holds WHAT and the rules, the companions hold
+the machine-readable and test-facing detail.
