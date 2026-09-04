@@ -82,7 +82,7 @@ KG Layer 2 — logic layer (one tree per SQL file)       [ratified]
     -- predicate (one condition; kind from the metamodel's
        closed set)
     -- expression (column_ref | table_ref | literal | parameter_ref
-       | function | arithmetic | case | cast | subquery_ref)
+       | function | arithmetic | unary | case | cast | subquery_ref)
     -- parameter (file-scope; declared name, default logic)
 - Every node carries: evidence (verbatim source fragment +
   location) and the version stamps
