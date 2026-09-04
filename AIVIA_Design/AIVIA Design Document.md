@@ -184,10 +184,42 @@ KG Layer 3 — artifact layer                            [in design]
        missing; buys anti-repeat, divergence detection, honest
        engagement accounting — we leave no marker in their
        catalog, so this is our only memory)
-- Parked for the properties pass: identity (person/role) likely
-  earns nodehood — both responsibility and usage reference it,
-  and "everything this person touches" is a scoping query.
-- Node/edge properties, edge types, rules: [next]
+- Identity (ruled 2026-09-04): a NODE kind — person | role |
+  agent (the machine is an identity too: pipeline + model,
+  versioned). A thin local proxy for the directory entry, keyed by
+  the immutable Entra object ID; Entra stays the authority on who
+  people are. Note: the regenerable-layer property-vs-node
+  principle does NOT transfer here — this layer is not
+  regenerable, so promote-later would be a migration of
+  irreplaceable history.
+- The shared property spine (ruled 2026-09-04; every artifact
+  class carries it):
+    -- about: edge to >=1 target node in KG layers 1-2; artifacts
+       point at what they describe, never the reverse — layers
+       1-2 never know layer 3 exists
+    -- author: edge to an identity node
+    -- authorship: machine | human — explicit, never inferred
+    -- owner: state-shaped artifacts start machine-owned and flip
+       to human exactly once, never back; event-shaped artifacts:
+       owner = author, immutable
+    -- status: closed set, DECLARED per class; an undeclared
+       status value is a conformance failure
+    -- created_at (events: occurred_at — when it happened, not
+       when recorded)
+    -- version + supersedes (ruled: NOTHING in this layer is ever
+       edited in place — an edit appends a new version with a
+       supersedes edge; "current" is derived. State-shaped =
+       chains with a derived current pointer; event-shaped =
+       chains without supersession. The layer is append-only
+       because it is not regenerable) [axm:D3, axm:R4]
+    -- basis (machine-authored only): the version stamps of
+       everything the artifact derived from — tree version,
+       metamodel version, source-pack version, prompt/gate
+       version. The witness chain [axm:B1] AND the regeneration
+       trigger: any basis version moving marks the artifact
+       stale. Human-authored artifacts may carry a free-text
+       reason; nothing is demanded of humans.
+- Per-class properties, edge types, rules: [next]
 KG Layer 4 — concept layer                             [undesigned]
 Lenses                                                 [named, undesigned]
       IOU (recorded 2026-09-04): axm:D1 — when lenses are
