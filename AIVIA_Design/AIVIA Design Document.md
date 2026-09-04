@@ -455,8 +455,38 @@ The flows                                              [in design]
        closed vocabularies · PROD-4 human-owned never overwritten
        · PROD-5 replay determinism of the floor
 
-  Stage 2: APPROVE — [next]
-  Stage 3: LAND — [next]
+  Stage 2: APPROVE (ratified 2026-09-04) — fully covered by layer
+  3's machinery (dispositions human-only; standing/ownership
+  derived; the review queue is a lens). One stage rule: the
+  approval surface WRITES DISPOSITIONS ONLY — it renders lenses,
+  never touches artifacts, trees, or the technical layer
+  [axm:D3]. Check: APPR-1 writer census.
+
+  Stage 3: LAND (ratified 2026-09-04) — accepted artifacts → the
+  customer's catalog:
+    -- rendering: target-native forms only (file-first now, API
+       later — the ruled transport order); ZERO custom attributes
+       — native column sets held as data; attribution is the
+       prefix in text, never a schema footprint
+    -- the B4 clause (IOU due): a send is an outward, irreversible
+       act — it requires an accepting disposition on the artifact
+       AND a named human confirmation of the send itself; no
+       autonomy mode exempts it [axm:B4]
+    -- every send lands a proposal SENT event before transport;
+       every later look lands an OBSERVED event; current outcome
+       is the lens
+    -- anti-repeat: no send for logic whose current outcome is
+       denied unless a new version exists (standing rule R2, read
+       from the current-outcome lens)
+    -- look-before-write: at send time, read the ONE object about
+       to be touched — never the catalog at large (standing rule
+       R3); what was seen lands as an observed event
+    -- checks: LAND-1 no send without accepting disposition +
+       human confirmation · LAND-2 anti-repeat · LAND-3 sent
+       event precedes transport · LAND-4 zero custom attributes
+       in payloads · LAND-5 observations append-only
+  The outward flow adds no new node types and no new classes —
+  choreography over ratified contracts, nothing else.
 
 - INWARD FLOW — [next]
 
