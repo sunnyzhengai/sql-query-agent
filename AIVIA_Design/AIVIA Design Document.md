@@ -417,7 +417,7 @@ Lenses                                                 [ratified]
   Completeness swept both directions: every derived-never-stored
   ruling from layers 2-4 has its lens; no lens lacks a ratified
   origin.
-The flows                                              [in design]
+The flows                                              [ratified]
 - The map (ruled 2026-09-04): THREE flows; one already contracted.
   Inbound (estate → graph) = CONTRACT_DATALOAD + layer 2's mapper
   rules, complete. This section designs outward (graph → catalog)
@@ -545,7 +545,38 @@ The flows                                              [in design]
        GRND-3 quantifiers only over declared-complete results ·
        GRND-4 headlines/counts rendered by code
 
-  Stage 3: GENERATE — [next]
+  Stage 3: GENERATE (ratified 2026-09-04) — no-match → new
+  estate, through the front door:
+    -- trigger: a no-match outcome AND an explicit human request —
+       generation is an act someone asks for, never an automatic
+       consolation
+    -- the builder's grounding — layer 1 is the whole vocabulary:
+       generated SQL composes only from declared reality —
+       existing tables/columns, joins along declared joins_to
+       paths (the legality rule pays forward: the builder WALKS
+       the join graph; an unjoinable pair is an honest refusal
+       naming the missing declared path), documented value sets
+       for category filters. The model drafts; a DETERMINISTIC
+       validator checks every reference and join against layer 1
+       before the draft reaches the human [axm:B1, axm:M5]
+    -- the draft is DISPLAY-ONLY: delivered through the answer
+       surface, writes nothing; a discarded draft leaves no
+       residue (demand was captured by asked + no-match)
+    -- the parser door (the L0 ruling): a draft becomes estate
+       ONLY by the human adopting it into their source and the
+       inbound flow parsing it like any customer file — zero
+       trust shortcuts; from then on descriptions, terms,
+       governance work on it with no special cases
+    -- adoption and execution are human-confirmed acts [axm:B4]
+    -- generated-file provenance (ruled 2026-09-04, option c):
+       unmarked in v1 — the org's repo history carries it;
+       revisit trigger: an adoption mechanism that can feed an
+       origin property structurally
+    -- checks: GEN-1 validator totality (references resolve,
+       joins declared; refusals name the missing path) · GEN-2 no
+       side channel — the inbound door is the only door · GEN-3
+       drafts write nothing · GEN-4 generation only on no-match +
+       human request
 
 **** Design-to-Code Protocol (Level 0 law)
 
