@@ -182,3 +182,19 @@ Companion artifacts are indexed to this doc's levels and live
 beside it (L1_KGn_* files, named for the Level-1 section they
 attach to); the doc holds WHAT and the rules, the companions hold
 the machine-readable and test-facing detail.
+
+Binding mechanisms (ratified 2026-09-04 — what makes steps 2-3
+physics instead of discipline; all build deferred with the rest):
+a. Registries are code-consumed data, version-bound to the doc:
+   each doc section carries a version stamp, its registry declares
+   the same stamp, a CI check compares — the same-breath rule made
+   mechanical.
+b. The rule-to-check closure meta-test: every rule in every
+   registry must name at least one existing check — "a rule with
+   no check is a hope" enforced as arithmetic.
+c. Banned-construct planks: parser-authority and
+   structure-never-lowered get AST-level guards on the modules
+   they govern (the proven plank pattern, new scope).
+d. The metamodel version rides every stamp: stored trees and
+   derived artifacts carry the registry version they conform to;
+   a metamodel change regenerates everything it governs.
