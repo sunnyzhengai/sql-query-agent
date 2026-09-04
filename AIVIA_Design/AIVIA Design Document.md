@@ -327,7 +327,7 @@ KG Layer 3 — artifact layer                            [ratified]
 - Forward note [axm:B4]: a proposal SENT event is an outward,
   irreversible act — the outward flow's contract owes a
   human-confirmation clause.
-KG Layer 4 — concept layer                             [in design]
+KG Layer 4 — concept layer                             [ratified]
 - The founding ruling (Sunny, 2026-09-04, option c): THE LENS
   COMPUTES; A HUMAN TOUCH MINTS. Relatedness (same-name families,
   similar logic, shared targets) is a lens over layers 1-3 —
@@ -340,7 +340,29 @@ KG Layer 4 — concept layer                             [in design]
   every concept a human has engaged — not every cluster the math
   can find. Minted nodes share layer 3's nature: non-regenerable,
   because they exist exactly because a human touched them.
-- Node types, edges, rules: [next]
+- Node type (ratified 2026-09-04): concept — id (content-keyed at
+  minting) + basis (the family snapshot: member tree versions, the
+  lens version that computed it). NOTHING else — no name, no
+  description. The concept's human-facing identity IS its accepted
+  parent term (layer 3, about → concept); naming the concept twice
+  is the drift class. Before a term exists, the concept is known
+  by its evidence.
+- Edges (all point AT it; it points at nothing new):
+    -- term.about → concept (the ratified name-and-definition)
+    -- disposition.about → concept (rulings on the family)
+    -- lens reports reference it by id — reports are derived, not
+       edges
+- Membership is NEVER stored: the lens recomputes it each run
+  against current reality; basis holds what was seen at minting;
+  the difference between them is itself a derived finding ("two
+  definitions joined this family since the ruling").
+- Rules (ratified 2026-09-04):
+    -- human-mint-only: a concept node exists only as the anchor
+       of a human act — machines compute families, never mint
+       concepts [axm:M5, axm:D3]
+    -- append-only: minted concepts are never edited or deleted;
+       they share layer 3's non-regenerable nature [axm:R4]
+    -- metamodel conformance [axm:S2, axm:D4]
 Lenses                                                 [named, undesigned]
       IOU (recorded 2026-09-04): axm:D1 — when lenses are
       designed, a reachability accounting over KG layers 2-3 node
