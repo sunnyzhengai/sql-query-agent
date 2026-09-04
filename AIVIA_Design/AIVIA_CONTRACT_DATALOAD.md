@@ -39,13 +39,23 @@ customers, never in public/demo assets.
    Captured fields (emitted by the scripts themselves, never
    typed): database name, server, run timestamp (= as_of),
    source-pack version.
-2. **tables + columns** — physical names, declared descriptions.
-3. **joins** — declared column-pair rows with ordinal positions,
-   as the source's own metadata states them.
+2. **tables + columns** — physical names, declared descriptions,
+   and each table's SCHEMA (ruled 2026-09-04: containment is an
+   explicit extract field — the manifest's captured db plus the
+   per-table schema close the db -> schema -> table chain; a
+   single-schema source still states it).
+3. **joins** — declared column-pair rows with group identifiers
+   and ordinal positions, as the source's own metadata states them.
 4. **values** — (code, meaning) rows per value-carrying table,
    produced by the generated uniform dump; which tables to dump is
    read from the declared joins (a value table is a join
    destination), never from naming conventions.
+
+**Data boundary (ruled 2026-09-04):** an extract contains METADATA
+AND CONFIGURATION VALUES ONLY — dictionary text and value-table
+(code, meaning) rows — never clinical/transactional rows. The
+runbook states this to the DBA; intake may additionally scan
+incoming text as defense in depth (build deferred).
 
 ## 4. Phrase rules (declared prose -> structured properties)
 
@@ -117,6 +127,8 @@ anything touches the graph. Every check has a name; every refusal
 names its violated rule (the error-contract law: a failed intake is
 self-serviceable by the customer's DBA without a support call).
 
+- INTAKE-0 parts presence (all four parts arrived; a missing part
+  is a named refusal, not a partial load)
 - INTAKE-1 manifest completeness (two human fields present; all
   captured fields present and internally consistent)
 - INTAKE-2 dedup assertion (§5) — hard refusal on failure
@@ -140,7 +152,7 @@ customer's licensed estate and stays in their tenant; the engagement
 operator reads it there. Only de-identified aggregates may ever
 leave, and only by explicit decision.
 
-## 9. Versioning
+## 9. Versioning and succession
 
 Every extract is stamped (source, as_of, source-pack version).
 Every technical-layer node/edge carries the extract identity it
@@ -148,7 +160,25 @@ derives from (per-object authority). A source-pack change
 regenerates everything it governs — same mechanism as every other
 versioned definition in AIVIA.
 
-## 10. Open items
+**Succession (ruled 2026-09-04):** a new extract SUPERSEDES its
+predecessor for that source. Intake produces a CHANGE REPORT —
+added / removed / changed objects and meanings. A removed object
+that has artifacts pointing at it is FLAGGED, never silently
+deleted; changed meanings trigger regeneration of the artifacts
+that cite them (the standing version-stamp mechanism). Development
+of succession handling is deferred; the rule is ratified now so the
+second extract ever loaded is a designed event, not an improvised
+one.
+
+## 10. Status and open items
+
+**CONTRACT COMPLETE (Sunny, 2026-09-04):** all four completeness
+gaps ruled and documented (schema containment §3, data boundary §3,
+succession §9, INTAKE-0 §7). ALL DEVELOPMENT DEFERRED by ruling —
+the current phase completes contracts layer by layer before any
+build. Deferred-to-build with reason: file-format minutiae
+(encoding/delimiters/size — build-time detail); multi-db sources
+(no real case yet); intake text scan (defense in depth).
 
 - ~~FK grouping identifier confirm (§6)~~ — CLOSED 2026-09-04:
   explicit group id exists; §6 rewritten to use it
