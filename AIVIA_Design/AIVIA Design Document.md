@@ -488,7 +488,40 @@ The flows                                              [in design]
   The outward flow adds no new node types and no new classes —
   choreography over ratified contracts, nothing else.
 
-- INWARD FLOW — [next]
+- INWARD FLOW — three stages: match → ground →
+  generate-when-missing. Adds no new layers or classes: match
+  reads, ground arranges and appends usage events, generate feeds
+  the existing inbound door.
+
+  Stage 1: MATCH (ratified 2026-09-04) — inquiry → candidate
+  graph objects + evidence:
+    -- the seat: interpretation is the model's [axm:J2]; ONE mind
+       composes freely over declared operations — lens reads,
+       graph traversals, enumeration primitives — with full
+       results in context; no question-shaped control flow
+       [axm:M2, axm:M3, axm:M4]
+    -- match proposes, evidence disposes: output is candidate
+       GRAPH OBJECTS (ids) + the evidence trail — never generated
+       text posing as fact; nothing model-said becomes a claim
+       downstream [axm:B1, axm:B2]
+    -- completeness declared on every result: top-K is never "all
+       that exists"; enumeration questions use enumeration
+       primitives that declare totality [axm:B3]
+    -- outcomes, closed set: matched | ambiguous | no-match.
+       Ambiguous goes to the HUMAN with candidates (intent
+       judgment is human's [axm:M5]; no silent pick among
+       near-ties). No-match is typed and counted — the honest
+       empty, and stage 3's trigger, never a shrug
+    -- writes: ONE thing — usage event `asked`, at inquiry
+       arrival (every inquiry is a fact, especially unanswerable
+       ones — the demand signal). Nothing else, ever
+    -- checks: MATCH-1 writer census (asked only) · MATCH-2
+       closed outcome set · MATCH-3 completeness on every result
+       · MATCH-4 candidates are ids + evidence, never text ·
+       MATCH-5 ambiguity reaches the human
+
+  Stage 2: GROUND — [next]
+  Stage 3: GENERATE — [next]
 
 **** Design-to-Code Protocol (Level 0 law)
 
