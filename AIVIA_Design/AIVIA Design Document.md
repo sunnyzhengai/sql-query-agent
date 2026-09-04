@@ -327,7 +327,20 @@ KG Layer 3 — artifact layer                            [ratified]
 - Forward note [axm:B4]: a proposal SENT event is an outward,
   irreversible act — the outward flow's contract owes a
   human-confirmation clause.
-KG Layer 4 — concept layer                             [undesigned]
+KG Layer 4 — concept layer                             [in design]
+- The founding ruling (Sunny, 2026-09-04, option c): THE LENS
+  COMPUTES; A HUMAN TOUCH MINTS. Relatedness (same-name families,
+  similar logic, shared targets) is a lens over layers 1-3 —
+  recomputed freely, never stored. A CONCEPT NODE is minted only
+  at the first human act on a family (a ruling, or accepting a
+  term nominated from it): identity + basis (the shape evidence
+  at minting time), nothing else. Future lens runs REPORT AGAINST
+  minted concepts ("this family gained two members"), never
+  replace them. The layer is sparse by design: its population is
+  every concept a human has engaged — not every cluster the math
+  can find. Minted nodes share layer 3's nature: non-regenerable,
+  because they exist exactly because a human touched them.
+- Node types, edges, rules: [next]
 Lenses                                                 [named, undesigned]
       IOU (recorded 2026-09-04): axm:D1 — when lenses are
       designed, a reachability accounting over KG layers 2-3 node
