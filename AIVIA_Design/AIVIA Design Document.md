@@ -363,7 +363,7 @@ KG Layer 4 — concept layer                             [ratified]
     -- append-only: minted concepts are never edited or deleted;
        they share layer 3's non-regenerable nature [axm:R4]
     -- metamodel conformance [axm:S2, axm:D4]
-Lenses                                                 [in design]
+Lenses                                                 [ratified]
 - Definition: a lens is a named, versioned, DERIVED reading of the
   graph — the graph stores what is; lenses say what it means for
   one consumer; no consumer's lens constrains another's.
@@ -388,7 +388,35 @@ Lenses                                                 [in design]
        in regenerable report surfaces; layers 1-4 are never
        touched (the layer-4 mint is a HUMAN act citing lens
        output; the lens never mints)
-- Catalog: [next]
+- Catalog v1 (ratified 2026-09-04; each a registry entry under the
+  lens contract; reads/yields formalized in the registry at build):
+    -- ownership: version chains + dispositions → machine|human
+    -- authorship: author edges + identity kind → machine|human
+    -- version: supersedes chains → number per version
+    -- standing: artifacts + dispositions →
+       pending|accepted|rejected|revoked
+    -- current-outcome: proposal sent+observed → latest outcome
+    -- staleness: basis stamps vs current layer versions → stale set
+    -- decisions(class): L2 predicates by tree position →
+       membership|grain|value|path decision sets per scope
+    -- degenerate: both-sides-literal predicates → decides-nothing
+    -- join-compliance: L2 practiced vs L1 declared joins →
+       violation findings (computed, never stored)
+    -- divergence: human-owned artifacts vs moved reality →
+       steward flags
+    -- relatedness: names + tree content keys → families w/
+       content-keyed ids (feeds concept minting + nomination)
+    -- concept-drift: concept basis vs current relatedness →
+       membership changes since minting
+    -- expertise: usage events per node → de-facto experts
+    -- blast-radius: usage + graph edges → dependents (people +
+       consumers)
+    -- working-set: L2 resolves_to → tables the estate touches
+    -- gap-census: unresolved refs, keyless tables, unmapped
+       remainder → the counted-absence surfaces, queryable
+  Completeness swept both directions: every derived-never-stored
+  ruling from layers 2-4 has its lens; no lens lacks a ratified
+  origin.
 The two flows                                          [later]
 
 **** Design-to-Code Protocol (Level 0 law)
