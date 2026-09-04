@@ -208,8 +208,12 @@ KG Layer 3 — artifact layer                            [in design]
        owner field: authorship alone misses
        certification-without-edit; a stored owner could drift
        from the history it summarizes.)
-    -- status: closed set, DECLARED per class; an undeclared
-       status value is a conformance failure
+    -- status: OPTIONAL, machine versions only (amended
+       2026-09-04): declared per class only where it says
+       something authorship cannot; a class with nothing to say
+       declares none (a status restating authorship is drift
+       waiting to happen); an undeclared status value is a
+       conformance failure
     -- created_at (events: occurred_at — when it happened, not
        when recorded)
     -- version + supersedes (ruled: NOTHING in this layer is ever
@@ -236,17 +240,24 @@ KG Layer 3 — artifact layer                            [in design]
        (a failed description is NO artifact, counted in the run's
        ledger) relocate to the GENERATION RUN EVENT — lands with
        layer rules or the outward flow, whichever first
-    -- term: name, definition
-       status vocabulary: machine versions nominated; human
-       versions authored
-       one class-specific edge: parent → term (hierarchy between
-       term artifacts; can't ride about, which points at the
-       estate). Accepted/rejected are NOT statuses — they are
-       dispositions; current standing is derived (nominated +
-       accepting disposition = accepted; nothing stored). The
-       machine's evidence (the name family, member tree versions)
-       rides basis; what the term governs rides about.
-    -- remaining classes: [next]
+    -- term: name, definition; one class-specific edge:
+       parent → term (hierarchy between term artifacts; can't
+       ride about, which points at the estate). NO status —
+       machine-nominated vs human-authored is the spine's
+       authorship; accepted/rejected are dispositions; current
+       standing is derived. Evidence (the name family, member
+       tree versions) rides basis; what the term governs rides
+       about.
+    -- responsibility: kind (closed set: steward | owner |
+       expert | dba | ...); holder → identity edge (the bearer —
+       distinct from author, who recorded the assignment). NO
+       status — usage-derived nominations are machine-authored
+       versions w/ evidence in basis; a human's accepting
+       disposition makes them real; ending/transfer = superseding
+       version or revoking disposition; "currently responsible"
+       is derived (and the identity node's own status feeds the
+       lens — the person-left-the-org case).
+    -- event classes: [next]
 - Edge types, rules: [next]
 KG Layer 4 — concept layer                             [undesigned]
 Lenses                                                 [named, undesigned]
