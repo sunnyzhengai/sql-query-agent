@@ -4,7 +4,8 @@ AIVIA is a knowledge graph of a customer's analytical logic — built from per-f
 
 **** Content Descriptions Level 1
 
-The knowledge graph layer 1 - source dictionaries technical layer
+KG Layer 1 — source dictionaries technical layer      [ratified]
+      L1 companions: Technical_Layer_Registry, CONTRACT_DATALOAD
 - Node types: 
     -- db
         --- description
@@ -81,3 +82,11 @@ companions hold the machine-readable and test-facing detail.
 Open items (technical layer): grain — pending Sunny's dictionary
 check; extract format — the layer's input contract, next design
 conversation before any code.
+
+
+KG Layer 2 — logic layer (per-file semantic trees)     [next]
+      L1 companions: Kind_Library_TSQL_Predicates, logic contract (tbd)
+KG Layer 3 — artifact layer                            [undesigned]
+KG Layer 4 — concept layer                             [undesigned]
+Lenses                                                 [named, undesigned]
+The two flows                                          [later]
