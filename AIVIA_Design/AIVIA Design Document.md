@@ -363,11 +363,32 @@ KG Layer 4 — concept layer                             [ratified]
     -- append-only: minted concepts are never edited or deleted;
        they share layer 3's non-regenerable nature [axm:R4]
     -- metamodel conformance [axm:S2, axm:D4]
-Lenses                                                 [named, undesigned]
-      IOU (recorded 2026-09-04): axm:D1 — when lenses are
-      designed, a reachability accounting over KG layers 2-3 node
-      classes is required (every node class reachable through a
-      declared operation or carrying an explicit exclusion).
+Lenses                                                 [in design]
+- Definition: a lens is a named, versioned, DERIVED reading of the
+  graph — the graph stores what is; lenses say what it means for
+  one consumer; no consumer's lens constrains another's.
+- The determinism rule (ratified 2026-09-04): A LENS IS
+  DETERMINISTIC — same inputs, same graph state, same answer,
+  replayable. If it needs a model, it is not a lens: model-shaped
+  reading is MATCHING and belongs to the inward flow, with its own
+  honesty machinery. Derivation and interpretation stay separate
+  [axm:M5].
+- The lens contract (ratified 2026-09-04) — every lens declares:
+    -- name + version (results cite the lens version that computed
+       them)
+    -- reads: the node/edge classes consumed — declared, closed.
+       The registry's union of reads, held against all layer 2-3
+       classes, IS axm:D1's reachability accounting: every class
+       read by some lens or carrying a recorded exclusion (IOU
+       closed by mechanism)
+    -- yields: the output shape, declared before code [axm:D4]
+    -- completeness: whether the answer is total over what it
+       read; downstream quantified claims inherit it [axm:B3]
+    -- writes: NOTHING, ever — results return to consumers or land
+       in regenerable report surfaces; layers 1-4 are never
+       touched (the layer-4 mint is a HUMAN act citing lens
+       output; the lens never mints)
+- Catalog: [next]
 The two flows                                          [later]
 
 **** Design-to-Code Protocol (Level 0 law)
