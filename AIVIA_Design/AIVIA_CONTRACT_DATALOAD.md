@@ -67,6 +67,18 @@ a counted gap-list entry — never a guess. Phrase rules are part of
 the versioned source pack: when the vendor's boilerplate changes,
 the pack version changes, and every governed extract regenerates.
 
+**Field-calibrated 2026-09-04:** phrase rules are OPPORTUNISTIC,
+not primary — real-estate measurement showed the boilerplate lives
+on core tables only (~0.5% of all tables, disproportionately the
+ones estates actually use). Each rule carries its variant-pattern
+list as source-pack data. The PRIMARY structural source for keys
+is **referenced_keys**, derived from the declared join data: every
+inbound FK's destination column-set is a declared reference key of
+that table — vendor-declared, no prose involved, and it covers
+every table anything joins to. Phrase-rule coverage is reported
+against two denominators: all tables (honest) and, once the logic
+layer exists, the estate's working set (meaningful).
+
 ## 5. Dedup rule (empirical rules get guards)
 
 A source pack may include an empirically-chosen filter (e.g. to
@@ -74,27 +86,29 @@ remove duplicated metadata rows). Every such filter ships with an
 INTAKE ASSERTION of the outcome it exists to produce (e.g. exactly
 one row per table, zero tables lost). The filter is the rule; the
 assertion is what makes an imperfectly-understood filter safe.
+(Field-confirmed 2026-09-04: the first source's dedup filter passed
+its assertion exactly — one row per table — on a live estate.)
 
 ## 6. Join grouping rule
 
-Declared join rows group into joins_to edges as follows: rows
-sharing (source table, destination table) form ONE edge while their
-ordinal positions run 1, 2, ..., n consecutively; a fresh ordinal 1
-starts a NEW edge. Consequences:
+Declared join rows group into joins_to edges by their EXPLICIT
+GROUP IDENTIFIER (field-confirmed 2026-09-04: the first source's
+join metadata carries one, repeated across a composite key's rows);
+ordinal position orders the pairs within a group. Consequences:
 
-- single-column join: a lone ordinal 1 -> one edge, one pair
-- composite join: ordinals 1..n -> one edge, n ordered pairs
-- multiple distinct joins between the same two tables: each starts
-  at ordinal 1 -> parallel edges, each identified by its `on` set
-- rows with non-consecutive ordinals: QUARANTINED and counted,
+- single-column join: one group, one pair -> one edge
+- composite join: one group, n ordered pairs -> one edge
+- multiple distinct joins between the same two tables: different
+  groups -> parallel edges, each identified by its `on` set
+- rows whose group/ordinals are malformed: QUARANTINED and counted,
   named in the intake report — never silently grouped
 - a value-table link declared twice (once to the category column,
   once to the internal id, same values): deduplicated to one edge
   by stated rule
-
-OPEN (confirm on real data): whether the join metadata carries an
-explicit constraint/group identifier; if so it replaces the
-consecutive-ordinal reading and the quarantine class shrinks.
+- **referenced_keys** (see §4): each table's declared reference
+  keys are derived at intake from its inbound join groups — the
+  destination column-set of each group is a declared key of the
+  destination table
 
 ## 7. Intake: checks and refusal semantics
 
@@ -136,6 +150,10 @@ versioned definition in AIVIA.
 
 ## 10. Open items
 
-- FK grouping identifier confirm (§6) — Sunny, on real data
-- grain-phrase consistency confirm (§4) — Sunny, on real data
-- whether AIVIA_Design/ is tracked in git or stays local — Sunny
+- ~~FK grouping identifier confirm (§6)~~ — CLOSED 2026-09-04:
+  explicit group id exists; §6 rewritten to use it
+- ~~grain-phrase consistency confirm (§4)~~ — CLOSED 2026-09-04:
+  boilerplate real but rare (~0.5% of all tables); phrase rules
+  demoted to opportunistic, referenced_keys promoted to primary
+- ~~AIVIA_Design/ tracking~~ — CLOSED 2026-09-04: tracked in git;
+  AIVIA_Protected/ stays local-only
