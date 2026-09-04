@@ -70,7 +70,10 @@ KG Layer 2 — logic layer (one tree per SQL file)       [in design]
         --- physical name, source path
         --- dialect
         --- parsed_at, parser/metamodel versions
-    -- statement (children of file, in order — the staging chain)
+    -- statement (children of file, in order — the staging chain;
+       a statement is what the dialect's parser says is one
+       executable command — never punctuation-defined; control-flow
+       blocks nest statements inside statements)
     -- scope (a SELECT with its clauses; also: CTE, subquery,
        temp-table scope — every place logic has its own boundary)
         --- name (CTE/temp name where one exists)
@@ -78,16 +81,43 @@ KG Layer 2 — logic layer (one tree per SQL file)       [in design]
        ORDER BY/TOP, UNION w/ dedup flag, CASE)
     -- predicate (one condition; kind from the metamodel's
        closed set)
-    -- expression (column_ref | literal | parameter_ref | function
-       | arithmetic | case | cast | subquery_ref)
+    -- expression (column_ref | table_ref | literal | parameter_ref
+       | function | arithmetic | case | cast | subquery_ref)
     -- parameter (file-scope; declared name, default logic)
 - Every node carries: evidence (verbatim source fragment +
   location) and the version stamps
-- column_ref is the ONLY pointer into KG layer 1 (resolved;
-  unresolved refs are counted, never dropped)
+- Reference nodes (column_ref, table_ref) are the ONLY pointers
+  into KG layer 1, always via resolves_to; unresolved refs are
+  counted, never dropped (ruled 2026-09-04; supersedes the earlier
+  column_ref-only wording — a FROM clause references tables)
 - Not node types, on purpose: decisions (derived by lenses);
-  anything the technical layer owns.
-- Edge types: [next]
+  anything the technical layer owns; CTEs-as-statements (a CTE is
+  a scope INSIDE its one declaring statement — it cannot stand
+  alone; a #temp stage is its own statement — both become SCOPE
+  nodes, so downstream consumers never care which staging style
+  the author used)
+- Edge types (ruled 2026-09-04 — two families):
+    -- contains: parent → child through the whole tree
+       (file→statement, statement→statement for control-flow
+        blocks, statement→scope, scope→structure,
+        structure→predicate, predicate→expression,
+        expression→expression)
+        --- position: where sibling order carries meaning
+            (statements in the staging chain, function arguments,
+             CASE branches, IN-list members)
+        --- role: on predicate→expression children only —
+            subject | comparand | lower_bound | upper_bound |
+            pattern | escape | selection | quantifier
+    -- resolves_to: every *_ref node → the thing it names
+       (mention → meaning; points toward the more stable node)
+        --- column_ref  → KG1 column
+        --- table_ref   → KG1 table OR a scope in the SAME tree
+            (a CTE or #temp stage — the staging chain becomes
+             graph structure with no special machinery)
+        --- parameter_ref → the file's parameter node
+        --- subquery_ref  → its scope node
+        --- an unresolvable ref gets NO edge — counted, never
+            guessed
 - Rules: [next]
 KG Layer 3 — artifact layer                            [undesigned]
 KG Layer 4 — concept layer                             [undesigned]
