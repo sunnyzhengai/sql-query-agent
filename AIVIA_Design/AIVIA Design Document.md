@@ -152,7 +152,7 @@ KG Layer 2 — logic layer (one tree per SQL file)       [ratified]
        the tree, never the source text (evidence is for display
        and audit, not re-parsing) [axm:S1, axm:M5; = spec:G5 in
        the code record]
-KG Layer 3 — artifact layer                            [in design]
+KG Layer 3 — artifact layer                            [ratified]
 - The defining property: NOT regenerable. Layers 1-2 rebuild from
   sources; this layer holds human judgment and gated machine
   output that exist nowhere else. Human-owned artifacts are never
@@ -203,7 +203,7 @@ KG Layer 3 — artifact layer                            [in design]
        human otherwise (killed as a stored field: it restated the
        author's identity kind)
     -- ownership (DERIVED, never stored — ruled 2026-09-04):
-       human iff any version has a human author OR a certifying
+       human iff any version has a human author OR an accepting
        disposition targets the artifact; otherwise machine. Once
        human, pipelines may only propose. The flip is one-way BY
        CONSTRUCTION — append-only history cannot be un-happened,
@@ -261,18 +261,21 @@ KG Layer 3 — artifact layer                            [in design]
        version or revoking disposition; "currently responsible"
        is derived (and the identity node's own status feeds the
        lens — the person-left-the-org case).
-    -- disposition: ruling (closed set: accept | reject | certify
-       | revoke | acknowledge) + optional reason text. RULE:
+    -- disposition: ruling (closed set: accept | reject | revoke
+       | acknowledge — 'certify' merged into 'accept' 2026-09-04:
+       one meaning, one verb — a human blessing machine output,
+       whatever the class) + optional reason text. RULE:
        authorship is always HUMAN — machines never rule. Machine
        "findings" (divergence, staleness, human text contradicted
        by moved reality) need NO stored class: they are derived
        states computed by lenses on read — the machine never
        writes a judgment; it computes one when asked (completes
        the retirement of stored "conflict" verdicts).
-    -- usage event: action (closed set: asked | ran | confirmed |
-       relied_on); about = the node touched, author = the user,
-       occurred_at = when. Nothing else — the flywheel is lenses
-       over exactly this.
+    -- usage event: action (closed set: asked | ran | confirmed —
+       'relied_on' cut 2026-09-04: no concrete capture point yet;
+       enters by ratification when one exists); about = the node
+       touched, author = the user, occurred_at = when. Nothing
+       else — the flywheel is lenses over exactly this.
     -- proposal: kind (sent | observed).
        sent: target_system (closed set: purview | collibra | ...);
        about → the artifact version proposed.
@@ -281,11 +284,53 @@ KG Layer 3 — artifact layer                            [in design]
        Current outcome is DERIVED (latest observation) — append-
        only forces sends and sightings apart; each look is its
        own fact.
-- Edge types, rules: [next]
+- Edge types (ratified 2026-09-04 — five, all pointing at things
+  that existed first; layers 1-2 never point up):
+    -- about: artifact/event → what it concerns — a KG1/KG2 node,
+       OR a layer-3 citizen (a disposition about a description; an
+       observation about its sent event)
+    -- author: any artifact/event → identity node
+    -- holder: responsibility → identity node (the bearer — the
+       governed node rides about; two different facts, two edges)
+    -- parent: term → term (the hierarchy)
+    -- supersedes: version → its predecessor
+- Rules (ratified 2026-09-04; axiom citations per the standing
+  practice):
+    -- the ledger law: nothing edited or deleted in place — change
+       is a superseding version, history is the truth; and
+       anything computable from accumulated facts is a LENS, never
+       a stored field (ownership, authorship, version, standing,
+       findings) [axm:R4, axm:D3, axm:S3]
+    -- human sovereignty: human-owned artifacts are never
+       overwritten by pipelines — machines only propose;
+       dispositions are human-only — machines never rule
+       [axm:D3, axm:M5]
+    -- witness: every machine-authored version carries basis (full
+       input version stamps); every machine claim traces to the
+       graph [axm:B1]
+    -- gate at the boundary, absence over fabrication: machine
+       text enters only through its class's gate with its closed
+       vocabulary; total failure produces NO artifact. Every
+       production run lands a GENERATION-RUN EVENT with
+       conservation accounting: shipped ⊎ killed-lines ⊎ absent =
+       attempted [axm:B2, axm:R1]
+    -- durability: the layer is not regenerable — a backed-up
+       asset, retention forever by default; loss is unrecoverable
+       by definition [axm:S3]
+    -- single writer per class: descriptions from the generation
+       pipeline, dispositions from the human surface, usage from
+       the ask surface, proposals from the bridge — one producing
+       component each, writer-census checkable [axm:D3]
+    -- metamodel conformance: every node/edge validates against
+       the versioned registry; closed sets stay closed; identity
+       edges resolve to identity nodes [axm:S2, axm:D4]
+- Forward note [axm:B4]: a proposal SENT event is an outward,
+  irreversible act — the outward flow's contract owes a
+  human-confirmation clause.
 KG Layer 4 — concept layer                             [undesigned]
 Lenses                                                 [named, undesigned]
       IOU (recorded 2026-09-04): axm:D1 — when lenses are
-      designed, a reachability accounting over KG layer 2 node
+      designed, a reachability accounting over KG layers 2-3 node
       classes is required (every node class reachable through a
       declared operation or carrying an explicit exclusion).
 The two flows                                          [later]
