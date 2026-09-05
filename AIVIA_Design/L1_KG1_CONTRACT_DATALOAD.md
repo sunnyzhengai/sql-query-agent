@@ -220,8 +220,12 @@ registries).
 ## 12. Registration prerequisite (ruled 2026-09-05, A1 refined)
 
 The db is never extract-derived. Registration = a DBA-completed
-prerequisite (db name, server, DBA team, registered sources),
-existing BEFORE any intake; the db node and its layer-3 dba
+prerequisite (db name, server, DBA team, registered sources, and
+the SCHEMA MAPPING: schema -> source system — organizational
+knowledge no system view holds; ruled 2026-09-05), existing
+BEFORE any intake; an extract's schemas must appear in the
+mapping under that extract's source (mismatch = named refusal,
+folded into INTAKE-8); the db node and its layer-3 dba
 responsibility mint from it. Extracts attach schemas downward into
 a pre-registered db only. New checks: INTAKE-8 unregistered db =
 named refusal · INTAKE-9 declared-vs-captured db agreement (the

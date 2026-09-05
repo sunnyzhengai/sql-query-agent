@@ -12,12 +12,11 @@
     "schemas": [
       {
         "id": "simemr|dbo",
-        "source": "simemr",
-        "as_of": "2026-08-01T00:00:00Z"
+        "as_of": "2026-08-01T00:00:00Z",
+        "_witness": "source = the identity's first component, from the registration's schema mapping \u2014 never a second stored field"
       },
       {
         "id": "org|org_custom",
-        "source": "org",
         "as_of": "2026-09-01T00:00:00Z"
       }
     ],

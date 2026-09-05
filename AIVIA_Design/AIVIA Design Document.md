@@ -25,7 +25,18 @@ KG Layer 1 — source dictionaries technical layer      [ratified]
     -- schema
         --- description
         --- as_of
-        --- source
+        --- source (DEFINED, ruled 2026-09-05: the registered
+            SOURCE SYSTEM that put this schema's tables there —
+            organizational knowledge SQL Server does not hold; no
+            system view records which vendor installed a table.
+            Declared by the DBA in the registration prerequisite's
+            SCHEMA MAPPING (dbo -> the EMR vendor; org_custom ->
+            org), never extracted. Since A2, source is the FIRST
+            COMPONENT OF IDENTITY — never stored as a second
+            field. Deciding example, Sunny's: in SSMS you see
+            SIMDB and its schemas; 'simemr' appears nowhere in
+            SSMS — it is what only the org knows, and registration
+            is where the org tells us)
     -- table
         --- description
         --- as_of
@@ -782,7 +793,9 @@ A1 containers (REFINED by Sunny 2026-09-05, from the F1
    hand-check): the db is a PREREQUISITE, declared by the DBA at
    registration — never derived from extract files. mint(db) :=
    at registration, from the DBA-completed prereq (db name,
-   server, DBA team, registered sources), BEFORE any intake.
+   server, DBA team, registered sources, AND the schema->source
+   mapping — the second ruling from the same hand-check), BEFORE
+   any intake.
    Extracts attach schemas downward into a pre-registered db
    only; an extract naming an unregistered db is a NAMED REFUSAL.
    The script's captured DB_NAME() becomes VERIFICATION: intake

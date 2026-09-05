@@ -1,8 +1,15 @@
 {
-  "_comment": "The DBA-completed prerequisite (A1 refined): exists BEFORE any intake.",
+  "_comment": "The DBA-completed prerequisite (A1 refined): exists BEFORE any intake. schema_sources is the org's declaration of which system put each schema's tables there \u2014 knowledge SSMS does not hold.",
   "db_name": "SIMDB",
   "server": "SIMSERVER",
   "dba_team": "role:sim-dba-team",
-  "registered_sources": ["simemr", "org"],
-  "registered_at": "2026-07-15T00:00:00Z"
+  "registered_sources": [
+    "simemr",
+    "org"
+  ],
+  "registered_at": "2026-07-15T00:00:00Z",
+  "schema_sources": {
+    "dbo": "simemr",
+    "org_custom": "org"
+  }
 }
