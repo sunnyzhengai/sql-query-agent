@@ -4,6 +4,11 @@ AIVIA is a knowledge graph of a customer's analytical logic — built from per-f
 
 **** Content Descriptions Level 1
 
+Edge direction convention (ratified 2026-09-05, closing the open
+question): REFERENCE edges point toward the more stable node;
+CONTAINMENT edges point parent → child. Both layers already obey
+this; it is now law, not accident.
+
 KG Layer 1 — source dictionaries technical layer      [ratified]
       L1 companions: Technical_Layer_Registry, CONTRACT_DATALOAD
 - Node types: 
@@ -18,7 +23,9 @@ KG Layer 1 — source dictionaries technical layer      [ratified]
         --- description
         --- as_of
         --- pk_columns
-        --- grain
+        --- grain (opportunistic — field-calibrated 2026-09-04:
+            declared by phrase on core tables only; absent +
+            gap-listed elsewhere, never guessed)
     -- column
         --- description
         --- as_of
@@ -49,7 +56,7 @@ KG Layer 1 — source dictionaries technical layer      [ratified]
     -- regenerability: the layer rebuilds from extracts alone  
     -- metamodel conformance: every node/edge matches the declared kinds and properties
     -- property-vs-node: in the regenerable technical layer, prefer properties; promote to nodes only on demonstrated need — promotion is a re-extract, not a migration.
-    -- primary key: every table carries pk_columns when the dictionary declares one; tables without a declared key land in a counted gap list — never guessed. 
+    -- primary key: every table carries pk_columns when the dictionary declares one; tables without a declared key land in a counted gap list — never guessed. referenced_keys (each table's declared reference keys, from inbound FK groups) is DERIVED from joins_to edges — a lens, never a stored property (ruled 2026-09-05).
     -- join legality: a joins_to edge is legal only if declared by the
    dictionary of the source that owns its dependent (FK) side. Joins
    between two vendor tables must be vendor-declared — never invented
@@ -59,7 +66,8 @@ KG Layer 1 — source dictionaries technical layer      [ratified]
    -- source inheritance: a schema belongs to exactly one source; tables/columns inherit source from the containment chain; a mixed schema is the recorded trigger to push source down a level.
 
 KG Layer 2 — logic layer (one tree per SQL file)       [ratified]
-      L1 companions: Kind_Library_TSQL_Predicates, logic contract (tbd)
+      L1 companions: Logic_Layer_Registry (subsumes the mapper's
+      seam contract), Kind_Library_TSQL_Predicates
 - The unit (ruled 2026-09-04): the whole FILE is one tree. All
   logic is a natural result of walking the tree; no "smallest unit
   of logic" is ever defined. A #temp table is internal structure of
@@ -153,37 +161,19 @@ KG Layer 2 — logic layer (one tree per SQL file)       [ratified]
        and audit, not re-parsing) [axm:S1, axm:M5; = spec:G5 in
        the code record]
 KG Layer 3 — artifact layer                            [ratified]
+      L1 companions: Artifact_Layer_Registry
 - The defining property: NOT regenerable. Layers 1-2 rebuild from
   sources; this layer holds human judgment and gated machine
   output that exist nowhere else. Human-owned artifacts are never
   overwritten by pipelines [axm:D3]; machine-owned artifacts
-  regenerate freely until a human edit flips ownership (the
-  attribution prefix dropping IS the observable flip).
-- Artifact classes (ruled 2026-09-04), split by shape:
-    state-shaped (versioned, owned transitions):
-    -- description (LLM-generated, gated, provenance-stamped;
-       owner flips machine->human exactly once)
-    -- term (machine-NOMINATED from graph shape w/ evidence, or
-       human-authored; only human ratification makes it a term;
-       nothing gates on certification — status tells the truth)
-    -- responsibility ((person-or-role, kind, target node); kinds:
-       steward | owner | expert | dba | ...; multiples allowed —
-       one-steward-per-asset is an org policy, never our structure)
-    event-shaped (append-only; current state DERIVED by lens,
-    never stored) [axm:R4]:
-    -- disposition (a human ruling on a target; multiple rulers
-       allowed; conflicting rulings surface as a disagreement
-       state with names — never silent last-write-wins)
-    -- usage event (who asked/ran/confirmed/relied-on which node,
-       when — the flywheel's ledger; lenses derive de-facto
-       expertise, blast radius in people, personal truth layers,
-       usage-weighted priority; usage NOMINATES governance,
-       humans ratify — never silent promotion)
-    -- proposal record (what was proposed to which catalog and
-       the last observed outcome: published | denied | edited |
-       missing; buys anti-repeat, divergence detection, honest
-       engagement accounting — we leave no marker in their
-       catalog, so this is our only memory)
+  regenerate freely until a human edit or acceptance flips
+  ownership (derived — see the spine's ownership lens; the
+  2026-09-04 drift sweep retired the older prefix-drop wording).
+- Artifact classes (ruled 2026-09-04; one line each — the
+  PER-CLASS SECTION BELOW IS THE TRUTH):
+    state-shaped: description · term · responsibility
+    event-shaped (append-only; current state DERIVED) [axm:R4]:
+    disposition · usage event · proposal
 - Identity (ruled 2026-09-04): a NODE kind — person | role |
   agent (the machine is an identity too: pipeline + model,
   versioned). A thin local proxy for the directory entry, keyed by
@@ -194,9 +184,11 @@ KG Layer 3 — artifact layer                            [ratified]
   irreplaceable history.
 - The shared property spine (ruled 2026-09-04; every artifact
   class carries it):
-    -- about: edge to >=1 target node in KG layers 1-2; artifacts
-       point at what they describe, never the reverse — layers
-       1-2 never know layer 3 exists
+    -- about: edge to >=1 target in any LOWER-OR-SAME layer — a
+       KG1/KG2 node, a layer-3 citizen, or a minted concept
+       (reworded 2026-09-05: the ratified edge sections already
+       target all three); artifacts point at what they describe,
+       never the reverse — layers 1-2 never know layer 3 exists
     -- author: edge to an identity node
     -- authorship (DERIVED, never stored — ruled 2026-09-04):
        machine iff the author edge targets an agent identity;
@@ -237,13 +229,11 @@ KG Layer 3 — artifact layer                            [ratified]
   work; anything derivable is a lens, anything event-shaped lives
   in events):
     -- description: text
-       status vocabulary: machine versions gate_passed |
-       skeleton_floor | flagged; human versions authored
-       IOU (recorded 2026-09-04): kill accounting (dropped
-       sentences counted, text never kept) and the absence rule
-       (a failed description is NO artifact, counted in the run's
-       ledger) relocate to the GENERATION RUN EVENT — lands with
-       layer rules or the outward flow, whichever first
+       status vocabulary (machine versions only, per the amended
+       spine): gate_passed | skeleton_floor | flagged
+       (IOU CLOSED 2026-09-04: kill accounting + absence rule
+       landed in the layer rules AND the produce stage — the
+       generation-run event)
     -- term: name, definition; one class-specific edge:
        parent → term (hierarchy between term artifacts; can't
        ride about, which points at the estate). NO status —
@@ -312,8 +302,11 @@ KG Layer 3 — artifact layer                            [ratified]
        text enters only through its class's gate with its closed
        vocabulary; total failure produces NO artifact. Every
        production run lands a GENERATION-RUN EVENT with
-       conservation accounting: shipped ⊎ killed-lines ⊎ absent =
-       attempted [axm:B2, axm:R1]
+       conservation accounting: shipped ⊎ absent = attempted,
+       killed-lines counted per shipped artifact (aligned
+       2026-09-05 to the produce stage — a kill drops a sentence
+       inside a shipped artifact, not the artifact)
+       [axm:B2, axm:R1]
     -- durability: the layer is not regenerable — a backed-up
        asset, retention forever by default; loss is unrecoverable
        by definition [axm:S3]
@@ -324,10 +317,10 @@ KG Layer 3 — artifact layer                            [ratified]
     -- metamodel conformance: every node/edge validates against
        the versioned registry; closed sets stay closed; identity
        edges resolve to identity nodes [axm:S2, axm:D4]
-- Forward note [axm:B4]: a proposal SENT event is an outward,
-  irreversible act — the outward flow's contract owes a
+- Forward note [axm:B4] — DELIVERED: the LAND stage carries the
   human-confirmation clause.
 KG Layer 4 — concept layer                             [ratified]
+      L1 companions: Concept_Layer_Registry
 - The founding ruling (Sunny, 2026-09-04, option c): THE LENS
   COMPUTES; A HUMAN TOUCH MINTS. Relatedness (same-name families,
   similar logic, shared targets) is a lens over layers 1-3 —
@@ -364,6 +357,7 @@ KG Layer 4 — concept layer                             [ratified]
        they share layer 3's non-regenerable nature [axm:R4]
     -- metamodel conformance [axm:S2, axm:D4]
 Lenses                                                 [ratified]
+      L1 companions: Lenses_Registry
 - Definition: a lens is a named, versioned, DERIVED reading of the
   graph — the graph stores what is; lenses say what it means for
   one consumer; no consumer's lens constrains another's.
@@ -377,10 +371,11 @@ Lenses                                                 [ratified]
     -- name + version (results cite the lens version that computed
        them)
     -- reads: the node/edge classes consumed — declared, closed.
-       The registry's union of reads, held against all layer 2-3
-       classes, IS axm:D1's reachability accounting: every class
-       read by some lens or carrying a recorded exclusion (IOU
-       closed by mechanism)
+       The registry's union of reads, held against all layer 2-4
+       classes (widened 2026-09-05: layer 4 exists and is read),
+       IS axm:D1's reachability accounting: every class read by
+       some lens or carrying a recorded exclusion (IOU closed by
+       mechanism)
     -- yields: the output shape, declared before code [axm:D4]
     -- completeness: whether the answer is total over what it
        read; downstream quantified claims inherit it [axm:B3]
@@ -414,11 +409,17 @@ Lenses                                                 [ratified]
     -- working-set: L2 resolves_to → tables the estate touches
     -- gap-census: unresolved refs, keyless tables, unmapped
        remainder → the counted-absence surfaces, queryable
+    -- referenced-keys: inbound joins_to groups per table → each
+       table's declared reference keys (added 2026-09-05, ruled
+       derived-not-stored — D12)
   Completeness swept both directions: every derived-never-stored
   ruling from layers 2-4 has its lens; no lens lacks a ratified
   origin.
 The flows                                              [ratified]
-- The map (ruled 2026-09-04): THREE flows; one already contracted.
+      L1 companions: Flows_Registry
+- The map (ruled 2026-09-04): THREE flows — L0's "two directions"
+  are the two SERVICE flows; inbound is how the graph is built.
+  One already contracted.
   Inbound (estate → graph) = CONTRACT_DATALOAD + layer 2's mapper
   rules, complete. This section designs outward (graph → catalog)
   and inward (inquiry → graph → estate, generating new estate when
@@ -596,9 +597,9 @@ Six steps, in order, for every component; no step skipped:
    first, then registry, then code — never patched in place.
 
 Companion artifacts are indexed to this doc's levels and live
-beside it (L1_KGn_* files, named for the Level-1 section they
-attach to); the doc holds WHAT and the rules, the companions hold
-the machine-readable and test-facing detail.
+beside it (L1_* files, named for the Level-1 section they attach
+to); the doc holds WHAT and the rules, the companions hold the
+machine-readable and test-facing detail.
 
 Binding mechanisms (ratified 2026-09-04 — what makes steps 2-3
 physics instead of discipline; all build deferred with the rest):
