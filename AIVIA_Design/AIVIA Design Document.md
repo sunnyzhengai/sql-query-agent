@@ -579,6 +579,35 @@ The flows                                              [ratified]
        drafts write nothing · GEN-4 generation only on no-match +
        human request
 
+The CHANGE pass — what survives change            [in design]
+- Method: scenario-driven (scenarios are the answer key of
+  architecture — authored expected outcomes, then the design is
+  walked against them). Scenarios blessed 2026-09-05:
+    S1 edited file: a certified description's scope gains a
+       predicate and the file re-parses → the description
+       survives, attached to the SAME scope; divergence flags it;
+       nothing dangles or silently re-attaches
+    S2 deleted scope: the scope is removed entirely → the
+       description neither vanishes nor dangles silently — a
+       counted orphan state a steward can see and rule on
+    S3 auditor's question: "why did Maria certify this?" a year
+       later → the basis chain produces the evidence she saw
+       (forces the retention ruling)
+    S4 drifted family: a minted concept's family changes → the
+       drift lens reports against the minted concept (forces the
+       correspondence rule)
+    S5 version bump: everything goes stale at once → regeneration
+       by declared priority within a budget; proposals at a pace
+       a steward survives
+- RULING (2026-09-05): Layer-2 node identity is NAME-KEYED for
+  the nodes artifacts attach to — file (source path) and scope
+  (file :: scope name) — so an attachment survives edits INSIDE
+  the named thing; content keys are DRIFT EVIDENCE, not identity.
+  S1's expected outcome (survives the edit, gets flagged) is
+  exactly name-keyed identity + content-drift detection.
+- Open in this pass: S2 orphan semantics · S3 retention ·
+  S4 correspondence rule · S5 staleness economics
+
 **** Design-to-Code Protocol (Level 0 law)
 
 Six steps, in order, for every component; no step skipped:
