@@ -885,6 +885,40 @@ keeps running untouched (the demo path) while the new build grows
 — the port manifest (per module: port | rework | new) is the
 comparison artifact, drawn from the 09-04 audit.
 
+The Graph Validity Contract — GV (ratified 2026-09-05: "complete
+and correct" is DEFINED, not eyeballed)
+
+A graph is complete and correct iff all five families pass; every
+rule is a total predicate over (graph, inputs, metamodel) yielding
+pass | named violations.
+  GV-A SHAPE: node/edge kinds + properties validate; edge endpoint
+    kinds within each edge's declared domain->range pairs (a file
+    with no statements is a violation, not a style choice);
+    direction conventions hold.
+  GV-B STRUCTURE: the containment forest (one parent each, no
+    cycles, all reachable from declared roots db|file);
+    role-completeness per predicate kind (the kind library's roles
+    column IS the rule table); contiguous positions; <=1
+    resolves_to per ref.
+  GV-C CONSERVATION: bijective reconciliation per extract part
+    (both directions — nothing missing, nothing invented); KG2
+    conservation (handled ⊎ remainder; acquired ⊎ excluded;
+    resolved ⊎ counted); gap lists RECOMPUTED, never trusted.
+  GV-D CONSISTENCY: every derived value recomputes identically
+    from primitives; no banned stored summary exists; legality
+    invariants pointwise (join declarer owns dependent side;
+    single-source schemas; INTAKE-10).
+  GV-E EVIDENCE: every KG2 node's fragment locatable at its
+    recorded position; children's fragments TILE their statement
+    (cover it minus counted remainder) — text-level conservation.
+  BOUNDARY (honest): GV proves structure, conservation,
+  consistency, and textual fidelity. It cannot prove authored
+  MEANING — that is J1, ratified by Sunny once per answer key;
+  GV judges every graph thereafter.
+  Validator: AIVIA_Product/fixtures/validate_fixtures.py (the
+  embryo of the build-phase validator — likely the FIRST real
+  code of the build).
+
 **** Design-to-Code Protocol (Level 0 law)
 
 Six steps, in order, for every component; no step skipped:
