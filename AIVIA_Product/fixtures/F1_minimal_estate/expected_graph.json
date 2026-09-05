@@ -23,16 +23,14 @@
     "tables": [
       {
         "id": "simemr|dbo|PATIENT",
-        "business_name": "patient",
         "grain": "patient",
         "pk_columns": [
           "PATIENT_ID"
         ],
-        "_witness": "phrase rules hit: bname+grain+pk"
+        "_witness": "phrase rule yields grain only (business_name CUT 2026-09-05 \u2014 derivable from the stored description at read time)"
       },
       {
         "id": "simemr|dbo|ENCOUNTER",
-        "business_name": "encounter",
         "grain": "patient encounter",
         "pk_columns": [
           "ENCOUNTER_ID"
@@ -40,7 +38,6 @@
       },
       {
         "id": "simemr|dbo|ENCOUNTER_DX",
-        "business_name": "encounter diagnosis",
         "grain": "diagnosis on an encounter",
         "pk_columns": [
           "ENCOUNTER_DX_ID"
@@ -49,7 +46,6 @@
       },
       {
         "id": "simemr|dbo|DX_COMMENT",
-        "business_name": null,
         "grain": null,
         "pk_columns": [
           "COMMENT_ID"
@@ -57,7 +53,6 @@
       },
       {
         "id": "simemr|dbo|VAL_APPT_STATUS",
-        "business_name": null,
         "grain": null,
         "pk_columns": [
           "APPT_STATUS_C"
@@ -65,7 +60,6 @@
       },
       {
         "id": "simemr|dbo|STAGING_LOG",
-        "business_name": null,
         "grain": null,
         "pk_columns": [
           "LOAD_ID"
@@ -73,7 +67,6 @@
       },
       {
         "id": "org|org_custom|ORG_READMIT",
-        "business_name": null,
         "grain": null,
         "pk_columns": [
           "ENC_ID"

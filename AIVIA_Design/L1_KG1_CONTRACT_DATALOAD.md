@@ -68,8 +68,10 @@ Where a source declares facts inside fixed-boilerplate description
 text, the source pack states one PHRASE RULE per fact. v0.1 rules
 for the first source:
 
-- **business_name** — the friendly name inside the description's
-  standard opening.
+- ~~business_name~~ — CUT 2026-09-05 (Sunny): stored derivation
+  of the stored description; no ratified consumer. If display
+  demand materializes, it becomes a read-time lens over the
+  description, by ratification.
 - **grain** — the description's standard grain-declaration clause
   ("one record per X" in spirit; the vendor's exact phrasing lives
   in the source pack).
