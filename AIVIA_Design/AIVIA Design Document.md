@@ -2,7 +2,14 @@
 
 AIVIA is a knowledge graph of a customer's analytical logic — built from per-file semantic trees over a shared technical vocabulary, from which decisions are derived as lenses, holding all metadata and governance artifacts as citizens of the graph itself — and it serves two directions: outward, generating catalog metadata from the estate; inward, matching user inquiries to the estate logic that answers them — and generating new estate when none exists, which enters the graph the same way everything else does.
 
-**** Content Descriptions Level 1
+**** Content Descriptions — Levels 1-3 (restratified 2026-09-05)
+
+Level = CONSUMPTION STRATUM (Sunny's ruling): each level may only
+reference lower levels — the import law, plank-checkable. "KG
+Layer" = anatomy WITHIN level 1's graph; the two words never
+substitute.
+
+**** Level 1 — the knowledge graph [stores]
 
 Edge direction convention (ratified 2026-09-05, closing the open
 question): REFERENCE edges point toward the more stable node;
@@ -360,8 +367,10 @@ KG Layer 4 — concept layer                             [ratified]
     -- append-only: minted concepts are never edited or deleted;
        they share layer 3's non-regenerable nature [axm:R4]
     -- metamodel conformance [axm:S2, axm:D4]
+**** Level 2 — lenses [read level 1, write nothing]
+
 Lenses                                                 [ratified]
-      L1 companions: Lenses_Registry
+      L2 companions: Lenses_Registry
 - Definition: a lens is a named, versioned, DERIVED reading of the
   graph — the graph stores what is; lenses say what it means for
   one consumer; no consumer's lens constrains another's.
@@ -419,8 +428,10 @@ Lenses                                                 [ratified]
   Completeness swept both directions: every derived-never-stored
   ruling from layers 2-4 has its lens; no lens lacks a ratified
   origin.
+**** Level 3 — the flows [orchestrate: read via level 2, write via level 1's contracts]
+
 The flows                                              [ratified]
-      L1 companions: Flows_Registry
+      L3 companions: Flows_Registry
 - The map (ruled 2026-09-04): THREE flows — L0's "two directions"
   are the two SERVICE flows; inbound is how the graph is built.
   One already contracted.
@@ -582,6 +593,8 @@ The flows                                              [ratified]
        side channel — the inbound door is the only door · GEN-3
        drafts write nothing · GEN-4 generation only on no-match +
        human request
+
+**** Hardening passes (cross-level law)
 
 The CHANGE pass — what survives change            [ratified]
 - Method: scenario-driven (scenarios are the answer key of
