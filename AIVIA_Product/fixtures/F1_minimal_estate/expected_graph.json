@@ -45,31 +45,39 @@
         "pk_columns": [
           "ENCOUNTER_DX_ID"
         ],
-        "_witness": "Sunny's F1 correction: surrogate pk from prose; the composite (ENCOUNTER_ID, LINE) remains a REFERENCED candidate key (inbound from DX_COMMENT) \u2014 pk_columns and referenced_keys now provably differ, the referenced-keys lens's first honest case. Also witnesses: surrogate keys are why grain-from-pk is unreliable; grain comes from the phrase."
+        "_witness": "pk from DECLARED pk data (Sunny's CLARITY_TBL_PK-style ruling) = the surrogate; the composite (ENCOUNTER_ID, LINE) remains an inbound REFERENCED key \u2014 pk_columns and referenced_keys provably differ. Surrogate pks are also why grain-from-pk is unreliable; grain stays phrase-derived, opportunistic."
       },
       {
         "id": "simemr|dbo|DX_COMMENT",
         "business_name": null,
         "grain": null,
-        "pk_columns": null
+        "pk_columns": [
+          "COMMENT_ID"
+        ]
       },
       {
         "id": "simemr|dbo|VAL_APPT_STATUS",
         "business_name": null,
         "grain": null,
-        "pk_columns": null
+        "pk_columns": [
+          "APPT_STATUS_C"
+        ]
       },
       {
         "id": "simemr|dbo|STAGING_LOG",
         "business_name": null,
         "grain": null,
-        "pk_columns": null
+        "pk_columns": [
+          "LOAD_ID"
+        ]
       },
       {
         "id": "org|org_custom|ORG_READMIT",
         "business_name": null,
         "grain": null,
-        "pk_columns": null
+        "pk_columns": [
+          "ENC_ID"
+        ]
       }
     ],
     "columns": {
@@ -91,7 +99,31 @@
         "about": "db SIMDB",
         "_witness": "organizational ownership minted from the prereq (the earlier dba option-B ruling, now with its mechanism)"
       }
-    ]
+    ],
+    "referenced_keys_expected": {
+      "simemr|dbo|PATIENT": [
+        [
+          "PATIENT_ID"
+        ]
+      ],
+      "simemr|dbo|ENCOUNTER": [
+        [
+          "ENCOUNTER_ID"
+        ]
+      ],
+      "simemr|dbo|ENCOUNTER_DX": [
+        [
+          "ENCOUNTER_ID",
+          "LINE"
+        ]
+      ],
+      "simemr|dbo|VAL_APPT_STATUS": [
+        [
+          "APPT_STATUS_C"
+        ]
+      ],
+      "_witness": "the referenced-keys LENS (derived from inbound joins_to; never stored): total over referenced tables; leaves (DX_COMMENT, STAGING_LOG, ORG_READMIT) honestly absent"
+    }
   },
   "edges": {
     "joins_to": [
@@ -149,19 +181,15 @@
     ]
   },
   "gap_lists": {
-    "pk_missing": [
-      "simemr|dbo|DX_COMMENT",
-      "simemr|dbo|VAL_APPT_STATUS",
-      "simemr|dbo|STAGING_LOG",
-      "org|org_custom|ORG_READMIT"
-    ],
+    "pk_missing": [],
     "phrase_no_match": [
       "simemr|dbo|DX_COMMENT",
       "simemr|dbo|VAL_APPT_STATUS",
       "simemr|dbo|STAGING_LOG",
       "org|org_custom|ORG_READMIT"
     ],
-    "pending_references": []
+    "pending_references": [],
+    "_pk_note": "empty BY STRUCTURE: INTAKE-10 refuses extracts with keyless tables (Sunny's integrity ruling)"
   },
   "intake_expectations": {
     "simemr": {

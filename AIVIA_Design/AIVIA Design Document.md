@@ -78,7 +78,7 @@ KG Layer 1 — source dictionaries technical layer      [ratified]
     -- regenerability: the layer rebuilds from extracts alone  
     -- metamodel conformance: every node/edge matches the declared kinds and properties
     -- property-vs-node: in the regenerable technical layer, prefer properties; promote to nodes only on demonstrated need — promotion is a re-extract, not a migration.
-    -- primary key: every table carries pk_columns when the dictionary declares one; tables without a declared key land in a counted gap list — never guessed. referenced_keys (each table's declared reference keys, from inbound FK groups) is DERIVED from joins_to edges — a lens, never a stored property (ruled 2026-09-05).
+    -- primary key (SUPERSEDED 2026-09-05, Sunny's ruling): pk_columns is DECLARED DATA, loaded from the source's pk metadata table — never prose-derived, never guessed. Referential integrity at intake: every table must have declared pk rows (INTAKE-10, named refusal). The prose phrase rule and the pk gap list retire. referenced_keys (each table's declared reference keys, from inbound FK groups) is DERIVED from joins_to edges — a lens, never a stored property (ruled 2026-09-05).
     -- join legality: a joins_to edge is legal only if declared by the
    dictionary of the source that owns its dependent (FK) side. Joins
    between two vendor tables must be vendor-declared — never invented

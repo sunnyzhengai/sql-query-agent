@@ -46,6 +46,11 @@ customers, never in public/demo assets.
    single-schema source still states it).
 3. **joins** — declared column-pair rows with group identifiers
    and ordinal positions, as the source's own metadata states them.
+3b. **primary keys** (added 2026-09-05, Sunny's ruling — the
+   source's pk metadata table): declared pk rows per table.
+   INTEGRITY: every table in part 2 must have pk rows here —
+   violation is a named refusal (INTAKE-10). pk is DECLARED DATA,
+   never prose-derived.
 4. **values** — (code, meaning) rows per value-carrying table,
    produced by the generated uniform dump; which tables to dump is
    read from the declared joins (a value table is a join
@@ -68,8 +73,9 @@ for the first source:
 - **grain** — the description's standard grain-declaration clause
   ("one record per X" in spirit; the vendor's exact phrasing lives
   in the source pack).
-- **pk_columns** — the key columns as called out in the table
-  description.
+- ~~pk_columns by phrase~~ — RETIRED 2026-09-05: pk loads from
+  the source's pk metadata table (part 3b), declared data. The
+  historical prose mentions (89 of 39,565) stay historical.
 
 Phrase-rule law: deterministic pattern against declared text only;
 a description that does not match the pattern yields ABSENT +
@@ -146,6 +152,9 @@ self-serviceable by the customer's DBA without a support call).
 - INTAKE-9 declared-vs-captured agreement (added 2026-09-05): the
   script's captured db name must match the registration prereq;
   disagreement is a refusal naming both values
+- INTAKE-10 pk integrity (added 2026-09-05, Sunny's ruling): every
+  table in the extract has >=1 declared pk row; violation is a
+  named refusal listing the keyless tables
 
 ## 8. The intake report
 
@@ -202,7 +211,7 @@ and no delete (RETIRE).
 
 | Action | Trigger | Postconditions | Tests |
 |---|---|---|---|
-| CREATE | object in a registered extract, not in graph | metamodel conformance (structured values map, ordered pk_columns); as_of + extract identity; containment chain complete; source inherited; missing pk -> gap row, never guessed | LC-C1 minimal extract -> authored nodes (F1) · LC-C2 keyless table -> node + gap row · LC-C3 orphan column (no parent) -> refused + counted, not half-created |
+| CREATE | object in a registered extract, not in graph | metamodel conformance (structured values map, ordered pk_columns); as_of + extract identity; containment chain complete; source inherited; pk loaded from declared pk rows (INTAKE-10 guarantees presence) | LC-C1 minimal extract -> authored nodes (F1) · LC-C2 keyless table -> node + gap row · LC-C3 orphan column (no parent) -> refused + counted, not half-created |
 | SUPERSEDE | object changed in a new extract | never in place: new version appended, prior retired (valid_to = new as_of); identity (db.schema.table) stable; change-report row; prior version still resolvable (basis + resolves_to bind to IDENTITY, not version); dependent staleness derivable | LC-S1 changed description -> two versions, current derived, change row · LC-S2 artifact citing prior still resolves · LC-S3 unchanged object -> NO new version (idempotent) |
 | RETIRE | object absent from the new extract | marked retired, never removed; inbound references stay valid; change-report row; attached artifacts surface in the steward queue | LC-R1 dropped table -> retired + flag + attachments surfaced · LC-R2 retired readable, excluded from current |
 | READ | anyone (lenses, L2 resolver) | completeness declared; current-vs-including-retired is an explicit parameter, never a default surprise | LC-D1 current excludes retired; full read includes with status |
