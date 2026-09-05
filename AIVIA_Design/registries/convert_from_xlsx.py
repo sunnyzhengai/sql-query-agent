@@ -103,6 +103,15 @@ PATCHES = [
       "per-table containment field) and the F1 answer key's schema nodes "
       "carry none. The draft row contradicted both ratified artifacts."},
      "CONTRACT_DATALOAD §3 + F1 answer key (CHECK-TL-4 catch)"),
+    ("kg2_kind_library", "TSQL_Denominator",
+     {"ScriptDom type": "BooleanIsDistinctFromExpression"},
+     {"ScriptDom type": "DistinctPredicate",
+      "Detail / reason": "SQL 2022 null-safe equality; revisit on first "
+      "estate sighting. CORRECTED at conversion 2026-09-05: ScriptDom "
+      "actually emits DistinctPredicate — the draft's guessed type name "
+      "would have broken the reflected-denominator check; caught by the "
+      "F7 remainder case at the slice-2 build."},
+     "F7 remainder case catch (2026-09-05)"),
     ("kg2_kind_library", "Predicate_Kinds",
      {"Kind": "QUANTIFIED_COMPARE"},
      {"Roles": "subject, selection",

@@ -9,6 +9,7 @@
   "converted_from": "L1_KG2_Kind_Library_TSQL_Predicates_DRAFT.xlsx"
  },
  "rulings_applied_at_conversion": [
+  "F7 remainder case catch (2026-09-05)",
   "RG-1 ruling (2026-09-05)",
   "RG-1 ruling (2026-09-05): quantifier is a predicate property"
  ],
@@ -281,9 +282,9 @@
     "Detail / reason": "pre-1992 outer-join syntax, removed from modern SQL Server; counted remainder if ever seen"
    },
    {
-    "ScriptDom type": "BooleanIsDistinctFromExpression",
+    "ScriptDom type": "DistinctPredicate",
     "Disposition": "DEFERRED — R2 RATIFIED 2026-09-04",
-    "Detail / reason": "SQL 2022 null-safe equality; revisit on first estate sighting"
+    "Detail / reason": "SQL 2022 null-safe equality; revisit on first estate sighting. CORRECTED at conversion 2026-09-05: ScriptDom actually emits DistinctPredicate — the draft's guessed type name would have broken the reflected-denominator check; caught by the F7 remainder case at the slice-2 build."
    },
    {
     "ScriptDom type": "FullTextPredicate (CONTAINS/FREETEXT)",

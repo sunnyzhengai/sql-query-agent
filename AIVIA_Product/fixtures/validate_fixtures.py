@@ -178,8 +178,9 @@ rule("F2", "GV-C2 resolution census recount",
      * (cen["resolved_refs"] != res_ext[0]) +
      [f"same-tree: census {cen['same_tree_refs']} vs recount {res_same[0]}"]
      * (cen["same_tree_refs"] != res_same[0]))
-NR.append("F2: GV-E evidence tiling — fixture asserts evidence by rule, "
-          "fragments not enumerated; runnable only against the built mapper")
+NR.append("F2: GV-E evidence tiling — fixture asserts evidence by rule; "
+          "RUNS LIVE against the built mapper since slice 2: "
+          "tests/aivia/test_kg2_mapper.py::test_gv_e_evidence_tiling_now_runnable")
 
 # ---------- F3 ----------
 f3 = json.load(open(BASE + "F3_lenses/expected_lenses.json"))

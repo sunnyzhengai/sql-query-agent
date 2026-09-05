@@ -1,0 +1,245 @@
+{
+  "_comment": "Kind-library test artifacts (protocol step 4, authored BEFORE mapper code \u2014 slice 2 entry obligation). Three families per the ratified Test_Artifacts sheet: construct (one smallest file per kind, empty remainder), adversarial (the corpse catalog \u2014 where PM-4's clean-room bet is secured), remainder (each deferred construct -> exactly that counted remainder). Every case: sql + expected assertions the mapper test walks.",
+  "construct": [
+    {
+      "id": "eq",
+      "sql": "SELECT A FROM dbo.T WHERE A = 1",
+      "where_kind": "COMPARE_EQ",
+      "roles": {
+        "subject": "column_ref",
+        "comparand": "literal"
+      }
+    },
+    {
+      "id": "neq_brackets",
+      "sql": "SELECT A FROM dbo.T WHERE A <> 1",
+      "where_kind": "COMPARE_NEQ"
+    },
+    {
+      "id": "neq_bang",
+      "sql": "SELECT A FROM dbo.T WHERE A != 1",
+      "where_kind": "COMPARE_NEQ",
+      "_witness": "two syntaxes, ONE kind \u2014 syntax lives in evidence"
+    },
+    {
+      "id": "gt",
+      "sql": "SELECT A FROM dbo.T WHERE A > 1",
+      "where_kind": "COMPARE_GT"
+    },
+    {
+      "id": "gte",
+      "sql": "SELECT A FROM dbo.T WHERE A >= 1",
+      "where_kind": "COMPARE_GTE"
+    },
+    {
+      "id": "lt",
+      "sql": "SELECT A FROM dbo.T WHERE A < 1",
+      "where_kind": "COMPARE_LT"
+    },
+    {
+      "id": "lte",
+      "sql": "SELECT A FROM dbo.T WHERE A <= 1",
+      "where_kind": "COMPARE_LTE"
+    },
+    {
+      "id": "legacy_notless",
+      "sql": "SELECT A FROM dbo.T WHERE A !< 1",
+      "where_kind": "COMPARE_GTE",
+      "_witness": "legacy synonym normalizes to the meaning"
+    },
+    {
+      "id": "legacy_notgreater",
+      "sql": "SELECT A FROM dbo.T WHERE A !> 1",
+      "where_kind": "COMPARE_LTE"
+    },
+    {
+      "id": "like",
+      "sql": "SELECT A FROM dbo.T WHERE A LIKE 'X%'",
+      "where_kind": "PATTERN_MATCH",
+      "roles": {
+        "subject": "column_ref",
+        "pattern": "literal"
+      }
+    },
+    {
+      "id": "in_list",
+      "sql": "SELECT A FROM dbo.T WHERE A IN (1, 2, 3)",
+      "where_kind": "IN_LIST",
+      "comparand_count": 3,
+      "_witness": "members are one comparand edge each, ordered by position"
+    },
+    {
+      "id": "in_selection",
+      "sql": "SELECT A FROM dbo.T WHERE A IN (SELECT B FROM dbo.U)",
+      "where_kind": "IN_SELECTION",
+      "_witness": "structural split: the comparand is a subquery_ref, never string-matched"
+    },
+    {
+      "id": "range",
+      "sql": "SELECT A FROM dbo.T WHERE A BETWEEN 1 AND 9",
+      "where_kind": "RANGE",
+      "roles": {
+        "subject": "column_ref",
+        "lower_bound": "literal",
+        "upper_bound": "literal"
+      }
+    },
+    {
+      "id": "null_check",
+      "sql": "SELECT A FROM dbo.T WHERE A IS NULL",
+      "where_kind": "NULL_CHECK"
+    },
+    {
+      "id": "exists",
+      "sql": "SELECT A FROM dbo.T WHERE EXISTS (SELECT 1 FROM dbo.U)",
+      "where_kind": "EXISTS_SELECTION"
+    },
+    {
+      "id": "quantified",
+      "sql": "SELECT A FROM dbo.T WHERE A > ALL (SELECT B FROM dbo.U)",
+      "where_kind": "QUANTIFIED_COMPARE",
+      "properties": {
+        "comparison_op": "GreaterThan",
+        "quantifier": "All"
+      },
+      "_witness": "RG-1 ruling: operator + quantifier are node PROPERTIES, not roles; property values are ScriptDom's own enum names \u2014 dialect-labeled evidence"
+    },
+    {
+      "id": "and_structure",
+      "sql": "SELECT A FROM dbo.T WHERE A = 1 AND B = 2",
+      "where_kind": "AND",
+      "child_kinds": [
+        "COMPARE_EQ",
+        "COMPARE_EQ"
+      ]
+    },
+    {
+      "id": "or_structure",
+      "sql": "SELECT A FROM dbo.T WHERE A = 1 OR B = 2",
+      "where_kind": "OR",
+      "child_kinds": [
+        "COMPARE_EQ",
+        "COMPARE_EQ"
+      ],
+      "_witness": "an OR is a NODE \u2014 no walk can silently read it as AND"
+    },
+    {
+      "id": "not_like",
+      "sql": "SELECT A FROM dbo.T WHERE A NOT LIKE 'X%'",
+      "where_kind": "NOT",
+      "child_kinds": [
+        "PATTERN_MATCH"
+      ],
+      "_witness": "R1: ALL negated syntax normalizes to structural NOT over the positive kind"
+    },
+    {
+      "id": "not_in",
+      "sql": "SELECT A FROM dbo.T WHERE A NOT IN (1, 2)",
+      "where_kind": "NOT",
+      "child_kinds": [
+        "IN_LIST"
+      ]
+    },
+    {
+      "id": "is_not_null",
+      "sql": "SELECT A FROM dbo.T WHERE A IS NOT NULL",
+      "where_kind": "NOT",
+      "child_kinds": [
+        "NULL_CHECK"
+      ]
+    },
+    {
+      "id": "not_between",
+      "sql": "SELECT A FROM dbo.T WHERE A NOT BETWEEN 1 AND 9",
+      "where_kind": "NOT",
+      "child_kinds": [
+        "RANGE"
+      ]
+    },
+    {
+      "id": "parens_dissolve",
+      "sql": "SELECT A FROM dbo.T WHERE (A = 1)",
+      "where_kind": "COMPARE_EQ",
+      "_witness": "parentheses shape the tree, then dissolve \u2014 the structure IS the grouping"
+    }
+  ],
+  "adversarial": [
+    {
+      "id": "or_shape_precedence",
+      "sql": "SELECT A FROM dbo.T WHERE A = 1 OR B = 2 AND C = 3",
+      "where_kind": "OR",
+      "child_kinds": [
+        "COMPARE_EQ",
+        "AND"
+      ],
+      "_witness": "corpse: AND binds tighter; a flat walk would misread membership"
+    },
+    {
+      "id": "parens_change_meaning",
+      "sql": "SELECT A FROM dbo.T WHERE (A = 1 OR B = 2) AND C = 3",
+      "where_kind": "AND",
+      "child_kinds": [
+        "OR",
+        "COMPARE_EQ"
+      ],
+      "_witness": "corpse: same predicates, different tree \u2014 the parens dissolve but their SHAPE stays"
+    },
+    {
+      "id": "derived_table_scope",
+      "sql": "SELECT X.A FROM (SELECT A FROM dbo.T WHERE A = 1) X WHERE X.A > 5",
+      "expect": {
+        "inner_scope_predicates": [
+          "COMPARE_EQ"
+        ],
+        "outer_scope_predicates": [
+          "COMPARE_GT"
+        ]
+      },
+      "_witness": "CHECK-KG2-4: the inner predicate is owned by the inner scope, never hoisted"
+    },
+    {
+      "id": "range_over_columns",
+      "sql": "SELECT A FROM dbo.T WHERE A BETWEEN B AND C",
+      "where_kind": "RANGE",
+      "roles": {
+        "subject": "column_ref",
+        "lower_bound": "column_ref",
+        "upper_bound": "column_ref"
+      },
+      "_witness": "corpse: bounds need not be literals"
+    },
+    {
+      "id": "in_selection_value_set",
+      "sql": "SELECT A FROM dbo.T WHERE A IN (SELECT CODE FROM dbo.VALUE_SET WHERE SET_ID = 7)",
+      "where_kind": "IN_SELECTION",
+      "_witness": "the clinical value-set pattern: the decision's content lives in DATA"
+    },
+    {
+      "id": "cte_reference",
+      "sql": "WITH Base AS (SELECT A FROM dbo.T WHERE A = 1) SELECT B.A FROM Base B",
+      "expect": {
+        "scope_names": [
+          "Base"
+        ],
+        "same_tree_from_refs": 1
+      },
+      "_witness": "the staging chain as graph structure \u2014 Base resolves within the tree"
+    }
+  ],
+  "remainder": [
+    {
+      "id": "is_distinct_from",
+      "sql": "SELECT A FROM dbo.T WHERE A IS DISTINCT FROM 1",
+      "expect_remainder": 1,
+      "remainder_contains": "DistinctPredicate",
+      "_witness": "R2 deferred: SQL 2022 null-safe equality; counted, revisit on first estate sighting. CAUGHT AT BUILD: ScriptDom emits DistinctPredicate, not the draft registry's BooleanIsDistinctFromExpression"
+    },
+    {
+      "id": "fulltext_contains",
+      "sql": "SELECT A FROM dbo.T WHERE CONTAINS(A, 'x')",
+      "expect_remainder": 1,
+      "remainder_contains": "FullText",
+      "_witness": "R3 deferred: full-text predicate; counted, never guessed"
+    }
+  ]
+}

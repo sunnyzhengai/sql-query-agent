@@ -1,0 +1,26 @@
+{
+  "_comment": "PM-1 RULED 2026-09-05: phi_gate is a REWORK and door-2 fixtures are owed BEFORE code. Door 2 = free-typed usage payloads (inquiry text from the ask surface) — no column context exists, so the SQL-anchored id/name rules cannot fire; door 2 needs keyword-adjacent and shape rules. Authored at slice 2 (the gate is pure, so these exercise now); the flow that feeds door 2 arrives with the deferred inward build.",
+  "cases": [
+    {"id": "ssn_shape", "payload": "why was 123-45-6789 excluded from the sepsis cohort",
+     "redacted": "why was <CONTACT> excluded from the sepsis cohort", "count": 1},
+    {"id": "email_shape", "payload": "report sent to jane.doe@example.org bounced",
+     "redacted": "report sent to <CONTACT> bounced", "count": 1},
+    {"id": "phone_shape", "payload": "callback number (555) 867-5309 in the note",
+     "redacted": "callback number <CONTACT> in the note", "count": 1},
+    {"id": "mrn_keyword", "payload": "patient MRN 12345678 shows two open encounters",
+     "redacted": "patient MRN <ID> shows two open encounters", "count": 1,
+     "_witness": "keyword-adjacent id: no '=' exists in free text — the door-2 rule PM-1 anticipated"},
+    {"id": "csn_keyword", "payload": "duplicate rows for CSN 987654321",
+     "redacted": "duplicate rows for CSN <ID>", "count": 1},
+    {"id": "dob_phrase", "payload": "member born 1987-03-14 appears twice",
+     "redacted": "member born <DATE> appears twice", "count": 1},
+    {"id": "multiple_hits", "payload": "MRN 12345678 reachable at jane@x.org or 555-123-4567",
+     "redacted": "MRN <ID> reachable at <CONTACT> or <CONTACT>", "count": 3},
+    {"id": "clean_text", "payload": "which view feeds the readmission dashboard",
+     "redacted": "which view feeds the readmission dashboard", "count": 0,
+     "_witness": "an ordinary analytical question passes untouched — the gate is not a shredder"},
+    {"id": "bare_number_not_id", "payload": "the count dropped from 40 to 12 last month",
+     "redacted": "the count dropped from 40 to 12 last month", "count": 0,
+     "_witness": "short bare numerics are analytics, not identifiers; only keyword-adjacent long numerics redact"}
+  ]
+}

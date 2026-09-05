@@ -73,7 +73,8 @@ def test_plank_import_law():
 
 
 def test_plank_store_writers():
-    lifecycle = {"aivia/graph/kg1_intake.py", "aivia/graph/kg2_mapper.py",
+    lifecycle = {"aivia/graph/kg1_intake.py",
+                 "aivia/graph/kg2_mapper/__init__.py",
                  "aivia/graph/kg3_artifacts.py", "aivia/graph/kg4_concepts.py",
                  "aivia/graph/read_api.py"}
 
@@ -88,7 +89,7 @@ def test_plank_parser_authority():
     def rule(mod, imp):
         root = imp.split(".")[0]
         hit = root in PARSER_TOKENS or imp in PARSER_TOKENS
-        if hit and mod != "aivia/graph/kg2_mapper.py":
+        if hit and not mod.startswith("aivia/graph/kg2_mapper/"):
             return "parser machinery lives in kg2_mapper ONLY (CHECK-KG2-1)"
         return None
     assert _violations(rule) == []
