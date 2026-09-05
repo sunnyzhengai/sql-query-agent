@@ -1,0 +1,251 @@
+{
+ "registry": "kg1_technical",
+ "stamp": {
+  "version": "0.2-draft",
+  "doc_section": "Level 1 / KG Layer 1 — source dictionaries technical layer",
+  "doc_stamp": "NOT YET STAMPED — Sunny action: doc sections carry no version stamps; compare is NOT-RUNNABLE until they do",
+  "ratified": false,
+  "converted_on": "2026-09-05",
+  "converted_from": "L1_KG1_Technical_Layer_Registry_DRAFT.xlsx"
+ },
+ "rulings_applied_at_conversion": [
+  "doc §KG1 grain (2026-09-04) + register D11",
+  "doc edge-direction convention (2026-09-05) + register D13"
+ ],
+ "_open": [],
+ "sheets": {
+  "ReadMe": [
+   {
+    "Item": "Status",
+    "Statement": "DRAFT v0.1 — the technical layer's METAMODEL REGISTRY: the executable twin of 'Content Descriptions Level 1' in the AIVIA Design Document. The DOC is the design authority; this registry is what code and tests will consume. Protocol rule: any doc change to L1 updates this registry in the same breath."
+   },
+   {
+    "Item": "Ratified by",
+    "Statement": "Sunny, 2026-09-04 design session (doc); this workbook transcribed by Claude the same night at her request."
+   },
+   {
+    "Item": "Open items",
+    "Statement": "ALL CLOSED as of 2026-09-05: grain ruled opportunistic (field-calibrated); extract format = CONTRACT_DATALOAD (complete, v0.1 file format pinned by F1); containment direction ratified (references point toward stability, containment parent->child)."
+   }
+  ],
+  "Node_Types": [
+   {
+    "Node kind": "db",
+    "Property": "description",
+    "Required": "yes",
+    "Shape / allowed values": "text",
+    "Notes": "from the registered extract"
+   },
+   {
+    "Node kind": "db",
+    "Property": "as_of",
+    "Required": "yes",
+    "Shape / allowed values": "date",
+    "Notes": "extract vintage"
+   },
+   {
+    "Node kind": "schema",
+    "Property": "description",
+    "Required": "yes",
+    "Shape / allowed values": "text"
+   },
+   {
+    "Node kind": "schema",
+    "Property": "as_of",
+    "Required": "yes",
+    "Shape / allowed values": "date"
+   },
+   {
+    "Node kind": "schema",
+    "Property": "source",
+    "Required": "yes",
+    "Shape / allowed values": "registered source system; declared in the registration prereq's SCHEMA MAPPING, never extracted; since A2 the first component of identity — never stored as a second field",
+    "Notes": "one source per schema (source-inheritance rule); tables/columns inherit via containment"
+   },
+   {
+    "Node kind": "table",
+    "Property": "description",
+    "Required": "yes",
+    "Shape / allowed values": "text"
+   },
+   {
+    "Node kind": "table",
+    "Property": "as_of",
+    "Required": "yes",
+    "Shape / allowed values": "date"
+   },
+   {
+    "Node kind": "table",
+    "Property": "pk_columns",
+    "Required": "yes (INTAKE-10 guarantees)",
+    "Shape / allowed values": "ORDERED list, loaded from the source's declared pk metadata",
+    "Notes": "Sunny's ruling 2026-09-05: declared data, never prose; the phrase rule + gap list retired; referential integrity at intake"
+   },
+   {
+    "Node kind": "table",
+    "Property": "grain",
+    "Required": "opportunistic — never required",
+    "Shape / allowed values": "declared by grain phrase on core tables only; absent + gap-listed elsewhere, never guessed",
+    "Notes": "RULING APPLIED at conversion: doc ratified grain opportunistic (field-calibrated 2026-09-04); register D11 CLOSED 2026-09-05. Supersedes the xlsx OPEN/tbd row."
+   },
+   {
+    "Node kind": "column",
+    "Property": "description",
+    "Required": "yes",
+    "Shape / allowed values": "text"
+   },
+   {
+    "Node kind": "column",
+    "Property": "as_of",
+    "Required": "yes",
+    "Shape / allowed values": "date"
+   },
+   {
+    "Node kind": "column",
+    "Property": "values",
+    "Required": "when documented",
+    "Shape / allowed values": "STRUCTURED map {code: meaning} + as_of — never prose",
+    "Notes": "dictionary-documented values only (ZC-style, org control_ tables); revisit trigger for value NODES = cross-column code identity"
+   }
+  ],
+  "Edge_Types": [
+   {
+    "Edge": "contains",
+    "From": "db",
+    "To": "schema",
+    "Direction rationale": "parent->child per the ratified two-part convention: CONTAINMENT points parent->child; REFERENCE points toward the more stable node (doc edge-direction convention, ratified 2026-09-05; register D13 CLOSED). Supersedes the xlsx 'unresolved' note.",
+    "Properties": "as_of"
+   },
+   {
+    "Edge": "contains",
+    "From": "schema",
+    "To": "table",
+    "Direction rationale": "same as above",
+    "Properties": "as_of"
+   },
+   {
+    "Edge": "contains",
+    "From": "table",
+    "To": "column",
+    "Direction rationale": "same as above",
+    "Properties": "as_of"
+   },
+   {
+    "Edge": "joins_to",
+    "From": "table (FK side)",
+    "To": "table (PK side)",
+    "Direction rationale": "FK side points at PK side — SQL's own REFERENCES direction; the stable node never changes when dependents arrive",
+    "Properties": "on: ORDERED list of [fk_column, pk_column] pairs (composite = more pairs, same single edge) · cardinality · as_of"
+   }
+  ],
+  "Rules_to_Checks": [
+   {
+    "Doc rule": "single source of authority, per object",
+    "Named check(s)": "CHECK-TL-1 writer census; CHECK-TL-2 provenance totality",
+    "What the check asserts": "TL-1: exactly one component (the extract builder) writes this layer — no other writer exists in the codebase. TL-2: every node/edge carries a registered extract id it derives from.",
+    "Fixture case(s)": "F1, F3",
+    "Status": "to build"
+   },
+   {
+    "Doc rule": "regenerability",
+    "Named check(s)": "CHECK-TL-3 rebuild determinism",
+    "What the check asserts": "building twice from the same extracts yields a deep-equal graph; deleting the layer and rebuilding restores it exactly.",
+    "Fixture case(s)": "F5",
+    "Status": "to build"
+   },
+   {
+    "Doc rule": "metamodel conformance",
+    "Named check(s)": "CHECK-TL-4 registry validation",
+    "What the check asserts": "every node/edge validates against Node_Types/Edge_Types here — kinds, required properties, shapes (values is a map, pk_columns is an ordered list). Unknown kind = red.",
+    "Fixture case(s)": "F1",
+    "Status": "to build"
+   },
+   {
+    "Doc rule": "property-vs-node",
+    "Named check(s)": "(design-review rule — no runtime check)",
+    "What the check asserts": "enforced at protocol steps 1-2: a new node kind in this layer must cite its demonstrated need in the doc first.",
+    "Fixture case(s)": "—",
+    "Status": "standing"
+   },
+   {
+    "Doc rule": "primary key",
+    "Named check(s)": "CHECK-TL-5 pk gap accounting",
+    "What the check asserts": "a table without declared pk_columns appears in the counted gap list; nothing ever synthesizes a key.",
+    "Fixture case(s)": "F2",
+    "Status": "to build"
+   },
+   {
+    "Doc rule": "join legality",
+    "Named check(s)": "CHECK-TL-6 declared-vs-practiced (DEFERRED); CHECK-TL-6a extract-side legality",
+    "What the check asserts": "6a (buildable now): a registered extract may not declare a join whose dependent side it does not own — an org extract declaring an epic->epic join is refused and counted. 6 (deferred): practiced joins from the logic layer compared against declared joins_to edges — a compliance finding, not a graph edit. Deferral reason: logic layer undesigned.",
+    "Fixture case(s)": "F6 (6a); F7 placeholder (6)",
+    "Status": "6a to build; 6 deferred"
+   },
+   {
+    "Doc rule": "source inheritance",
+    "Named check(s)": "CHECK-TL-7 mixed-schema detector",
+    "What the check asserts": "two sources claimed within one schema = red; the recorded trigger to push source down a level.",
+    "Fixture case(s)": "F4",
+    "Status": "to build"
+   },
+   {
+    "Doc rule": "registration prerequisite (A1 refined 2026-09-05)",
+    "Named check(s)": "INTAKE-8 unregistered-db refusal; INTAKE-9 declared-vs-captured db agreement",
+    "What the check asserts": "the db is a DBA-completed prereq, never extract-derived; extracts attach schemas downward into a pre-registered db only; the dba responsibility mints from the prereq",
+    "Fixture case(s)": "F1 (registration.json; both snapshots pass); an unregistered-db refusal case (fixture to author)",
+    "Status": "to build"
+   },
+   {
+    "Doc rule": "pk integrity (Sunny 2026-09-05)",
+    "Named check(s)": "INTAKE-10",
+    "What the check asserts": "every extracted table has >=1 declared pk row; violation = named refusal listing keyless tables",
+    "Fixture case(s)": "F1 (all 7 tables carry pk rows); keyless-table refusal fixture (to author, with the unregistered-db one)",
+    "Status": "to build"
+   }
+  ],
+  "Fixture_Cases": [
+   {
+    "Case": "F1 minimal estate",
+    "Input (authored synthetic extract)": "1 db, 2 schemas (source epic + source org), 3 tables w/ descriptions + pk_columns, columns w/ descriptions, one ZC-style values map, 1 normal join, 1 composite join",
+    "Expected output (authored answer)": "the full expected graph, hand-authored node by node, edge by edge (the answer key)",
+    "Exercises": "TL-2, TL-4"
+   },
+   {
+    "Case": "F2 keyless table",
+    "Input (authored synthetic extract)": "one table with no declared pk",
+    "Expected output (authored answer)": "table present; gap-list entry present; no invented key",
+    "Exercises": "TL-5"
+   },
+   {
+    "Case": "F3 org control_ values",
+    "Input (authored synthetic extract)": "an org-source control_ table enumerating values for one of its columns",
+    "Expected output (authored answer)": "values map filled on the org column, sourced from the org extract",
+    "Exercises": "TL-1, TL-2"
+   },
+   {
+    "Case": "F4 mixed schema (invalid on purpose)",
+    "Input (authored synthetic extract)": "one schema whose extract claims two sources",
+    "Expected output (authored answer)": "CHECK-TL-7 fires; build refuses or counts per ruling",
+    "Exercises": "TL-7"
+   },
+   {
+    "Case": "F5 rebuild twice",
+    "Input (authored synthetic extract)": "F1's extract, built twice",
+    "Expected output (authored answer)": "deep-equal graphs",
+    "Exercises": "TL-3"
+   },
+   {
+    "Case": "F6 illegal declaration (invalid on purpose)",
+    "Input (authored synthetic extract)": "org extract declaring a join between two epic tables",
+    "Expected output (authored answer)": "declaration refused + counted; no joins_to edge minted",
+    "Exercises": "TL-6a"
+   },
+   {
+    "Case": "F7 placeholder",
+    "Input (authored synthetic extract)": "(arrives with the logic layer) estate SQL joining outside declared paths",
+    "Expected output (authored answer)": "compliance finding emitted",
+    "Exercises": "TL-6"
+   }
+  ]
+ }
+}

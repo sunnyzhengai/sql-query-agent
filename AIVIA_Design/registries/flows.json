@@ -1,0 +1,77 @@
+{
+ "registry": "flows",
+ "stamp": {
+  "version": "0.2-draft",
+  "doc_section": "Level 3 — the flows",
+  "doc_stamp": "NOT YET STAMPED — Sunny action: doc sections carry no version stamps; compare is NOT-RUNNABLE until they do",
+  "ratified": false,
+  "converted_on": "2026-09-05",
+  "converted_from": "L3_Flows_Registry_DRAFT.xlsx"
+ },
+ "rulings_applied_at_conversion": [],
+ "_open": [
+  "Stages_and_Checks compresses the doc rules by design ('doc is authority'); the ratification pass decides whether flow rules get row-per-rule treatment like the KG registries"
+ ],
+ "sheets": {
+  "ReadMe": [
+   {
+    "Item": "STATUS",
+    "Statement": "DRAFT v0.1 — companion registry authored 2026-09-05 from the RATIFIED The flows section of the AIVIA Design Document (protocol step 2). The doc is the authority; any doc change updates this registry in the same breath. All build deferred by the phase ruling."
+   },
+   {
+    "Item": "MAP",
+    "Statement": "Three flows. Inbound = CONTRACT_DATALOAD + KG2 mapper rules (complete). Outward = produce/approve/land. Inward = match/ground/generate. No new node types or classes anywhere — choreography over ratified contracts."
+   }
+  ],
+  "Stages_and_Checks": [
+   {
+    "Stage": "OUT-1 produce",
+    "Core rules (compressed; doc is authority)": "deterministic composition + bounded smoothing + class gate; staleness lens IS the worklist; writes machine versions only (append-as-proposal vs human-owned); generation-run event = only production ledger; replay floor",
+    "Checks": "PROD-1..5"
+   },
+   {
+    "Stage": "OUT-2 approve",
+    "Core rules (compressed; doc is authority)": "layer 3 machinery; surface writes dispositions ONLY",
+    "Checks": "APPR-1"
+   },
+   {
+    "Stage": "OUT-3 land",
+    "Core rules (compressed; doc is authority)": "target-native rendering, zero custom attributes; B4: accepting disposition + named human confirmation per send; sent before transport; anti-repeat (R2); look-before-write (R3); observations append-only",
+    "Checks": "LAND-1..5"
+   },
+   {
+    "Stage": "IN-1 match",
+    "Core rules (compressed; doc is authority)": "one mind, free composition [M2,M3,M4]; match proposes evidence disposes [B1,B2]; completeness declared [B3]; outcomes matched|ambiguous|no-match (closed); ambiguity -> human [M5]; writes usage(asked) only",
+    "Checks": "MATCH-1..5"
+   },
+   {
+    "Stage": "IN-2 ground",
+    "Core rules (compressed; doc is authority)": "answer = arranged evidence, text is a caption; headlines/counts rendered by code; run rows DISPLAY-ONLY, never graph truth; writes usage(confirmed|ran) only",
+    "Checks": "GRND-1..4"
+   },
+   {
+    "Stage": "IN-3 generate",
+    "Core rules (compressed; doc is authority)": "trigger = no-match + human request; drafts compose from L1 declared reality only (walk joins_to; deterministic validator); drafts display-only; the parser door is the only door; adoption/execution human-confirmed [B4]; provenance option c (unmarked v1)",
+    "Checks": "GEN-1..4"
+   }
+  ],
+  "CrossLayer_Acceptance": [
+   {
+    "Family": "end-to-end",
+    "Cases": "synthetic extract + synthetic estate -> layers 1-2 built -> produce -> approve -> land -> files match authored expectations"
+   },
+   {
+    "Family": "inward round-trip",
+    "Cases": "authored inquiry -> match -> ground -> answer cites only graph evidence; no-match case -> generate -> draft validates -> adopted file re-enters -> now matches"
+   },
+   {
+    "Family": "working-set coverage",
+    "Cases": "the two-denominator metric computable from working-set lens + L1"
+   },
+   {
+    "Family": "twin-dialect",
+    "Cases": "arrives with dialect #2 (deferred, recorded)"
+   }
+  ]
+ }
+}

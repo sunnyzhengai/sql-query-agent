@@ -1,0 +1,191 @@
+{
+ "registry": "kg2_logic",
+ "stamp": {
+  "version": "0.2-draft",
+  "doc_section": "Level 1 / KG Layer 2 — logic layer",
+  "doc_stamp": "NOT YET STAMPED — Sunny action: doc sections carry no version stamps; compare is NOT-RUNNABLE until they do",
+  "ratified": false,
+  "converted_on": "2026-09-05",
+  "converted_from": "L1_KG2_Logic_Layer_Registry_DRAFT.xlsx"
+ },
+ "rulings_applied_at_conversion": [],
+ "_open": [
+  "scope identity name-key detail (A3 collision-counted, A4 unnamed forbidden-for-attachment, A11 ::delivery emitters) is ruled in the doc but not yet restated as registry rows — ratification pass item"
+ ],
+ "sheets": {
+  "ReadMe": [
+   {
+    "Item": "STATUS",
+    "Statement": "DRAFT v0.1 — companion registry authored 2026-09-05 from the RATIFIED KG Layer 2 section of the AIVIA Design Document (protocol step 2). The doc is the authority; any doc change updates this registry in the same breath. All build deferred by the phase ruling."
+   },
+   {
+    "Item": "UNIT",
+    "Statement": "One tree per SQL FILE; #temp = internal scope; no smallest-unit-of-logic ever defined."
+   },
+   {
+    "Item": "NOTE",
+    "Statement": "Subsumes the doc's 'logic contract (tbd)' pointer: the mapper's seam obligations are the Rules_to_Checks sheet."
+   },
+   {
+    "Item": "COMPANION",
+    "Statement": "L1_KG2_Kind_Library_TSQL_Predicates (predicate kind detail, reconciled v0.2)."
+   }
+  ],
+  "Node_Types": [
+   {
+    "Kind": "file",
+    "Properties": "physical name, source path, dialect, parsed_at, parser/metamodel versions",
+    "Notes": "the tree's root"
+   },
+   {
+    "Kind": "statement",
+    "Properties": "—",
+    "Notes": "parser-defined executable command; ordered; control-flow blocks nest statements"
+   },
+   {
+    "Kind": "scope",
+    "Properties": "name (CTE/temp where one exists)",
+    "Notes": "SELECT+clauses, CTE, subquery, temp-table stage — every logic boundary"
+   },
+   {
+    "Kind": "structure",
+    "Properties": "kind detail per metamodel",
+    "Notes": "FROM, JOIN w/ type, WHERE, HAVING, GROUP BY, ORDER BY/TOP, UNION w/ dedup, CASE"
+   },
+   {
+    "Kind": "predicate",
+    "Properties": "kind (closed set — kind library)",
+    "Notes": "one condition"
+   },
+   {
+    "Kind": "expression",
+    "Properties": "kind: column_ref | table_ref | literal | parameter_ref | function | arithmetic | unary | case | cast | subquery_ref",
+    "Notes": "refs are mentions; resolution is an edge"
+   },
+   {
+    "Kind": "parameter",
+    "Properties": "declared name, default logic",
+    "Notes": "file-scope"
+   },
+   {
+    "Kind": "(every node)",
+    "Properties": "evidence (verbatim fragment + location), version stamps",
+    "Notes": "the witness chain"
+   }
+  ],
+  "Edge_Types": [
+   {
+    "Family": "contains",
+    "From -> To": "parent -> child through the whole tree (incl. statement->statement for control flow)",
+    "Properties": "position (where order is meaning); role (predicate->expression only: subject|comparand|lower_bound|upper_bound|pattern|escape|selection|quantifier)",
+    "Notes": "one structural family"
+   },
+   {
+    "Family": "resolves_to",
+    "From -> To": "*_ref -> the thing it names",
+    "Properties": "—",
+    "Notes": "column_ref->KG1 column; table_ref->KG1 table OR same-tree scope (staging chain for free); parameter_ref->parameter; subquery_ref->scope; unresolvable = NO edge, counted"
+   }
+  ],
+  "Rules_to_Checks": [
+   {
+    "Rule": "parser authority",
+    "Axioms": "D2, M5",
+    "Named check(s)": "CHECK-KG2-1",
+    "Check asserts": "no text-parsing constructs in the mapper's dependency graph (AST plank)"
+   },
+   {
+    "Rule": "conservation",
+    "Axioms": "R1, R2, R3",
+    "Named check(s)": "CHECK-KG2-2",
+    "Check asserts": "handled ⊎ remainder = total per file; unknown vendor construct = red build via reflected denominator"
+   },
+   {
+    "Rule": "evidence",
+    "Axioms": "B1",
+    "Named check(s)": "CHECK-KG2-3",
+    "Check asserts": "every node carries verbatim fragment + location"
+   },
+   {
+    "Rule": "scope ownership",
+    "Axioms": "D3",
+    "Named check(s)": "CHECK-KG2-4",
+    "Check asserts": "derived-table fixture: inner predicate owned by inner scope"
+   },
+   {
+    "Rule": "resolution honesty",
+    "Axioms": "B3, R1",
+    "Named check(s)": "CHECK-KG2-5",
+    "Check asserts": "resolution census per file; unresolved counted; completeness declared"
+   },
+   {
+    "Rule": "single writer, regenerable",
+    "Axioms": "D3, S3",
+    "Named check(s)": "CHECK-KG2-6",
+    "Check asserts": "writer census; rebuild from sources+KG1 = deep-equal"
+   },
+   {
+    "Rule": "metamodel conformance",
+    "Axioms": "S2, D4",
+    "Named check(s)": "CHECK-KG2-7",
+    "Check asserts": "every node/edge validates against this registry"
+   },
+   {
+    "Rule": "structure carried, never lowered",
+    "Axioms": "S1, M5 (= spec:G5)",
+    "Named check(s)": "CHECK-KG2-8",
+    "Check asserts": "no consumer parses fragment text outside the mapper (AST plank)"
+   }
+  ],
+  "Fixture_Families": [
+   {
+    "Family": "construct",
+    "Cases": "one smallest file per grammar kind -> authored expected tree + empty remainder"
+   },
+   {
+    "Family": "adversarial",
+    "Cases": "OR shapes · derived-table scope · RANGE over columns · IN_SELECTION value sets · CTE referenced twice (DAG) · temp staging chain · 1=1 · CASE-in-predicate · negated forms (R1) · nested control flow"
+   },
+   {
+    "Family": "remainder",
+    "Cases": "each deferred construct -> exactly that counted remainder"
+   },
+   {
+    "Family": "twin",
+    "Cases": "same meaning, two dialects -> identical trees modulo evidence (arrives with dialect #2)"
+   }
+  ],
+  "Lifecycle": [
+   {
+    "Action": "CREATE",
+    "Writer / trigger": "the MAPPER only; estate file intake (trigger cites the estate-source seam — H3 uncontracted)",
+    "Postconditions": "full tree per metamodel; conservation handled ⊎ remainder = total; evidence on every node; resolution complete (edges or counted); name-keyed identities minted",
+    "Tests": "LC2-C1 authored file -> authored tree · LC2-C2 unmappable construct -> counted remainder, tree whole · LC2-C3 unresolvable ref -> no edge, counted"
+   },
+   {
+    "Action": "SUPERSEDE",
+    "Writer / trigger": "the mapper; re-parse of a known source path",
+    "Postconditions": "new tree version appended, prior retired; name-keyed identities stable where names persist; content-key drift as evidence; attachments to persisting names undisturbed. resolves_to binds to IDENTITY not version — L1 supersession needs zero re-resolution",
+    "Tests": "LC2-S1 edit inside scope -> identity + attachment survive, drift flagged (= scenario S1) · LC2-S2 rename -> old retired, new minted, attachment surfaces for human re-attach · LC2-S3 unchanged file -> no new version"
+   },
+   {
+    "Action": "RETIRE",
+    "Writer / trigger": "the mapper; source path absent from estate",
+    "Postconditions": "whole tree retired, never removed; attachments surface",
+    "Tests": "LC2-R1 deleted file -> retired tree + surfaced attachments"
+   },
+   {
+    "Action": "READ",
+    "Writer / trigger": "anyone",
+    "Postconditions": "current-vs-retired explicit; completeness declared",
+    "Tests": "LC2-D1"
+   },
+   {
+    "Action": "FORBIDDEN",
+    "Writer / trigger": "—",
+    "Postconditions": "any writer but mapper (LC2-F1 census) · text-derived structure (LC2-F2 parser-authority plank) · hand edits (LC2-F3) · physical delete (LC2-F4) · partial parse shipped whole (LC2-F5 — conservation IS the atomicity)",
+    "Tests": "—"
+   }
+  ]
+ }
+}

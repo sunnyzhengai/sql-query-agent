@@ -1,0 +1,212 @@
+{
+ "registry": "kg3_artifacts",
+ "stamp": {
+  "version": "0.2-draft",
+  "doc_section": "Level 1 / KG Layer 3 — artifact layer",
+  "doc_stamp": "NOT YET STAMPED — Sunny action: doc sections carry no version stamps; compare is NOT-RUNNABLE until they do",
+  "ratified": false,
+  "converted_on": "2026-09-05",
+  "converted_from": "L1_KG3_Artifact_Layer_Registry_DRAFT.xlsx"
+ },
+ "rulings_applied_at_conversion": [
+  "register H5 (2026-09-05)"
+ ],
+ "_open": [],
+ "sheets": {
+  "ReadMe": [
+   {
+    "Item": "STATUS",
+    "Statement": "DRAFT v0.1 — companion registry authored 2026-09-05 from the RATIFIED KG Layer 3 section of the AIVIA Design Document (protocol step 2). The doc is the authority; any doc change updates this registry in the same breath. All build deferred by the phase ruling."
+   },
+   {
+    "Item": "NATURE",
+    "Statement": "NOT regenerable — human judgment + gated machine output existing nowhere else; append-only; backed-up asset."
+   }
+  ],
+  "Spine": [
+   {
+    "Part": "about",
+    "Kind": "edge",
+    "Definition": ">=1 target: KG1/KG2 node or layer-3 citizen"
+   },
+   {
+    "Part": "author",
+    "Kind": "edge",
+    "Definition": "-> identity node (person | role | agent)"
+   },
+   {
+    "Part": "status",
+    "Kind": "property (optional, machine versions only)",
+    "Definition": "declared per class only where authorship cannot say it; only description declares one"
+   },
+   {
+    "Part": "created_at / occurred_at",
+    "Kind": "property",
+    "Definition": "record time / event time (batch imports may differ)"
+   },
+   {
+    "Part": "supersedes",
+    "Kind": "edge",
+    "Definition": "version -> predecessor; nothing edited in place; version NUMBER derived (chain depth)"
+   },
+   {
+    "Part": "basis",
+    "Kind": "property (machine-authored only)",
+    "Definition": "input version stamps: witness chain + staleness trigger"
+   },
+   {
+    "Part": "id",
+    "Kind": "property",
+    "Definition": "identity"
+   },
+   {
+    "Part": "ownership",
+    "Kind": "DERIVED — never stored",
+    "Definition": "human iff any human-authored version OR accepting disposition; one-way by construction"
+   },
+   {
+    "Part": "authorship",
+    "Kind": "DERIVED — never stored",
+    "Definition": "machine iff author edge targets an agent identity"
+   }
+  ],
+  "Classes": [
+   {
+    "Class": "description",
+    "Shape": "state",
+    "Payload": "text; status: gate_passed | skeleton_floor | flagged (machine) / authored implicit (human)",
+    "Notes": "kill accounting + absence rule live in the GENERATION-RUN EVENT"
+   },
+   {
+    "Class": "term",
+    "Shape": "state",
+    "Payload": "name, definition; parent -> term edge",
+    "Notes": "no status; standing derived from dispositions"
+   },
+   {
+    "Class": "responsibility",
+    "Shape": "state",
+    "Payload": "kind: steward|owner|expert|dba|...; holder -> identity edge",
+    "Notes": "no status; multiples allowed"
+   },
+   {
+    "Class": "disposition",
+    "Shape": "event",
+    "Payload": "ruling: accept|reject|revoke|acknowledge; optional reason",
+    "Notes": "HUMAN-ONLY — machines never rule; machine findings are lenses"
+   },
+   {
+    "Class": "usage event",
+    "Shape": "event",
+    "Payload": "action: asked|ran|confirmed; asked carries OUTCOME (matched|ambiguous|no-match); no about edge on no-match; inquiry text as payload post phi_gate",
+    "Notes": "RULING APPLIED at conversion: register H5 CLOSED 2026-09-05 (asked carries outcome; no about on no-match). relied_on cut stands."
+   },
+   {
+    "Class": "proposal",
+    "Shape": "event",
+    "Payload": "kind sent (target_system) | observed (outcome: published|denied|edited|missing)",
+    "Notes": "current outcome derived (latest observation)"
+   },
+   {
+    "Class": "identity",
+    "Shape": "node",
+    "Payload": "entra object id (key), kind: person|role|agent, display name, status",
+    "Notes": "thin proxy; Entra is authority"
+   }
+  ],
+  "Rules_to_Checks": [
+   {
+    "Rule": "ledger law",
+    "Axioms": "R4, D3, S3",
+    "Named check(s)": "CHECK-KG3-1",
+    "Check asserts": "no in-place edit path exists; summaries (ownership, authorship, version, standing, findings) have no stored field"
+   },
+   {
+    "Rule": "human sovereignty",
+    "Axioms": "D3, M5",
+    "Named check(s)": "CHECK-KG3-2",
+    "Check asserts": "pipeline cannot supersede-as-current a human-owned artifact; dispositions reject agent authors"
+   },
+   {
+    "Rule": "witness",
+    "Axioms": "B1",
+    "Named check(s)": "CHECK-KG3-3",
+    "Check asserts": "machine-authored versions carry complete basis"
+   },
+   {
+    "Rule": "gate at boundary + absence",
+    "Axioms": "B2, R1",
+    "Named check(s)": "CHECK-KG3-4",
+    "Check asserts": "generation-run event per run; shipped ⊎ absent = attempted; no empty-shell artifacts"
+   },
+   {
+    "Rule": "durability",
+    "Axioms": "S3",
+    "Named check(s)": "CHECK-KG3-5",
+    "Check asserts": "backup/retention configuration asserted (build-time form tbd)"
+   },
+   {
+    "Rule": "single writer per class",
+    "Axioms": "D3",
+    "Named check(s)": "CHECK-KG3-6",
+    "Check asserts": "writer census: descriptions<-generation, dispositions<-human surface, usage<-ask surface, proposals<-bridge"
+   },
+   {
+    "Rule": "metamodel conformance",
+    "Axioms": "S2, D4",
+    "Named check(s)": "CHECK-KG3-7",
+    "Check asserts": "classes/edges/closed sets validate; identity edges resolve"
+   }
+  ],
+  "Fixture_Families": [
+   {
+    "Family": "ownership flip",
+    "Cases": "machine chain -> human edit -> pipeline append renders proposed; certify-without-edit flips too"
+   },
+   {
+    "Family": "disagreement",
+    "Cases": "two rulers, conflicting dispositions -> disagreement state with names, no winner"
+   },
+   {
+    "Family": "succession",
+    "Cases": "superseding chains; current derived; version = depth"
+   },
+   {
+    "Family": "conservation",
+    "Cases": "a run with ships, kills, and absences -> event accounting exact"
+   }
+  ],
+  "Lifecycle": [
+   {
+    "Action": "CREATE",
+    "Writer / trigger": "per class: descriptions+nominations <- generation pipeline (agent identity); dispositions <- human surface (HUMAN ONLY); usage <- ask surface; proposals <- bridge; human-authored terms/responsibilities <- human surface",
+    "Postconditions": "spine complete (about resolves any lower-or-same layer; author -> identity node; basis on machine versions; status in closed vocab); machine text gated; total gate failure -> NO artifact + run-event accounting",
+    "Tests": "LC3-C1 per class authored input -> authored artifact · LC3-C2 gate failure -> absence + counted · LC3-C3 disposition w/ agent author -> refused"
+   },
+   {
+    "Action": "SUPERSEDE",
+    "Writer / trigger": "state-shaped only; same writers; humans via the human surface",
+    "Postconditions": "new version + supersedes edge; machine append on human-owned renders PROPOSED, never current",
+    "Tests": "LC3-S1 human edit -> ownership flips (derived) · LC3-S2 machine append on human-owned -> proposed · LC3-S3 events never supersede (no path)"
+   },
+   {
+    "Action": "RETIRE",
+    "Writer / trigger": "NOBODY — the action does not exist in this layer; ending is done BY WRITING (revoking disposition, superseding version)",
+    "Postconditions": "—",
+    "Tests": "LC3-R1 no retire path exists (structural)"
+   },
+   {
+    "Action": "READ",
+    "Writer / trigger": "anyone",
+    "Postconditions": "current/standing/ownership via lenses only",
+    "Tests": "LC3-D1"
+   },
+   {
+    "Action": "FORBIDDEN",
+    "Writer / trigger": "—",
+    "Postconditions": "machine dispositions (LC3-F1) · pipeline current over human-owned (LC3-F2) · in-place edit (LC3-F3) · ANY deletion (LC3-F4 — absolute; PHI tension recorded as H6, SAFETY pass owes reconciliation) · empty shells (LC3-F5)",
+    "Tests": "—"
+   }
+  ]
+ }
+}

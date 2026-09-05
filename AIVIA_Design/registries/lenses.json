@@ -1,0 +1,155 @@
+{
+ "registry": "lenses",
+ "stamp": {
+  "version": "0.2-draft",
+  "doc_section": "Level 2 — lenses",
+  "doc_stamp": "NOT YET STAMPED — Sunny action: doc sections carry no version stamps; compare is NOT-RUNNABLE until they do",
+  "ratified": false,
+  "converted_on": "2026-09-05",
+  "converted_from": "L2_Lenses_Registry_DRAFT.xlsx"
+ },
+ "rulings_applied_at_conversion": [
+  "register D12 (2026-09-05)",
+  "register H7 (2026-09-05)",
+  "register H5 (2026-09-05)"
+ ],
+ "_open": [
+  "MVP v1 'eleven lenses' count vs this catalog's granularity (6 spine derivations + 7 named = 13 rows in v1 scope) — naming/counting question for the ratification pass, not a content gap"
+ ],
+ "sheets": {
+  "ReadMe": [
+   {
+    "Item": "STATUS",
+    "Statement": "DRAFT v0.1 — companion registry authored 2026-09-05 from the RATIFIED Lenses section of the AIVIA Design Document (protocol step 2). The doc is the authority; any doc change updates this registry in the same breath. All build deferred by the phase ruling."
+   },
+   {
+    "Item": "DETERMINISM RULE",
+    "Statement": "A lens is deterministic — same inputs, same graph state, same answer, replayable [M5]. If it needs a model it is not a lens (that is MATCHING — inward flow)."
+   },
+   {
+    "Item": "CONTRACT",
+    "Statement": "Every lens declares: name+version · reads (closed) · yields (declared shape) · completeness · writes NOTHING ever."
+   },
+   {
+    "Item": "D1 ACCOUNTING",
+    "Statement": "The union of all reads columns, held against all layer 2-3 node classes, IS the reachability accounting: every class read by some lens or carrying a recorded exclusion. Built as CHECK-LENS-D1."
+   }
+  ],
+  "Catalog_v1": [
+   {
+    "Lens": "ownership",
+    "Reads": "version chains, dispositions",
+    "Yields": "machine|human per artifact",
+    "Completeness note": "total"
+   },
+   {
+    "Lens": "authorship",
+    "Reads": "author edges, identity kind",
+    "Yields": "machine|human per version",
+    "Completeness note": "total"
+   },
+   {
+    "Lens": "version",
+    "Reads": "supersedes chains",
+    "Yields": "number per version",
+    "Completeness note": "total"
+   },
+   {
+    "Lens": "standing",
+    "Reads": "artifacts, dispositions",
+    "Yields": "pending|accepted|rejected|revoked",
+    "Completeness note": "total"
+   },
+   {
+    "Lens": "current-outcome",
+    "Reads": "proposal sent+observed events",
+    "Yields": "latest outcome per proposal",
+    "Completeness note": "total over observations"
+   },
+   {
+    "Lens": "staleness",
+    "Reads": "basis stamps, current layer versions",
+    "Yields": "stale artifact set",
+    "Completeness note": "total"
+   },
+   {
+    "Lens": "decisions(class)",
+    "Reads": "L2 predicates + tree positions",
+    "Yields": "membership|grain|value|path sets per scope",
+    "Completeness note": "total per tree"
+   },
+   {
+    "Lens": "degenerate",
+    "Reads": "L2 predicates (literal-literal)",
+    "Yields": "decides-nothing set",
+    "Completeness note": "total"
+   },
+   {
+    "Lens": "join-compliance",
+    "Reads": "L2 practiced joins, L1 declared joins_to",
+    "Yields": "violation findings",
+    "Completeness note": "total over resolved joins"
+   },
+   {
+    "Lens": "divergence",
+    "Reads": "human-owned artifacts, current graph",
+    "Yields": "steward flags",
+    "Completeness note": "total over human-owned"
+   },
+   {
+    "Lens": "relatedness",
+    "Reads": "names + tree content keys (L2), L1 targets",
+    "Yields": "families w/ content-keyed ids",
+    "Completeness note": "total over parsed estate"
+   },
+   {
+    "Lens": "concept-drift",
+    "Reads": "concept basis, current relatedness",
+    "Yields": "membership changes since minting",
+    "Completeness note": "total over minted"
+   },
+   {
+    "Lens": "expertise",
+    "Reads": "usage events",
+    "Yields": "de-facto experts per node",
+    "Completeness note": "total over ledger"
+   },
+   {
+    "Lens": "blast-radius",
+    "Reads": "usage events, graph edges",
+    "Yields": "dependents (people + consumers) per node",
+    "Completeness note": "total"
+   },
+   {
+    "Lens": "working-set",
+    "Reads": "L2 resolves_to edges",
+    "Yields": "tables the estate touches",
+    "Completeness note": "total over resolved refs"
+   },
+   {
+    "Lens": "gap-census",
+    "Reads": "unresolved refs, keyless tables, unmapped remainder",
+    "Yields": "counted-absence surfaces",
+    "Completeness note": "total"
+   },
+   {
+    "Lens": "referenced-keys",
+    "Reads": "inbound joins_to groups per table (L1)",
+    "Yields": "declared reference keys per table (distinct column-sets)",
+    "Completeness note": "total — RULING APPLIED at conversion: register D12 CLOSED 2026-09-05 (derived from inbound joins_to, never stored)"
+   },
+   {
+    "Lens": "correspondence",
+    "Reads": "minted concepts (basis), current relatedness families",
+    "Yields": "corresponds|dispersed|merged|new per family",
+    "Completeness note": "total over minted — RULING APPLIED at conversion: register H7 CLOSED 2026-09-05 (S4 overlap-maximal rule; ties -> ambiguous, human rules). DEFERRED from v1 (compares prior state)"
+   },
+   {
+    "Lens": "demand",
+    "Reads": "no-match asked events (redacted payloads)",
+    "Yields": "unanswered-question themes + counts",
+    "Completeness note": "total over ledger — RULING APPLIED at conversion: register H5 CLOSED 2026-09-05. DEFERRED from v1 (reads the ask surface)"
+   }
+  ]
+ }
+}

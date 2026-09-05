@@ -1,0 +1,367 @@
+{
+ "registry": "kg2_kind_library",
+ "stamp": {
+  "version": "0.2-draft",
+  "doc_section": "Level 1 / KG Layer 2 — kind library (T-SQL predicates)",
+  "doc_stamp": "NOT YET STAMPED — Sunny action: doc sections carry no version stamps; compare is NOT-RUNNABLE until they do",
+  "ratified": false,
+  "converted_on": "2026-09-05",
+  "converted_from": "L1_KG2_Kind_Library_TSQL_Predicates_DRAFT.xlsx"
+ },
+ "rulings_applied_at_conversion": [],
+ "_open": [
+  "RG-1 (caught by validate_registries RG-C1): QUANTIFIED_COMPARE declares role 'comparison-op' but the Roles sheet never defines it. Two compliant readings — define comparison-op as a role, or model the operator as a predicate PROPERTY (roles are edges to expression children; an operator is not an expression). Sunny rules."
+ ],
+ "sheets": {
+  "ReadMe_Rules": [
+   {
+    "#": "STATUS",
+    "Design rule / note": "v0.2 — RECONCILED 2026-09-04 against the ratified design doc (KG Layer 2: unit, node types, edge families, 8 rules) and Sunny's rulings R1-R5. Companion of the doc's KG Layer 2 section; the doc is the authority."
+   },
+   {
+    "#": "1",
+    "Design rule / note": "One meaning, one kind. Kinds name meanings, never syntax. Two syntaxes with the same meaning map to one kind; the syntax difference survives only in evidence."
+   },
+   {
+    "#": "2",
+    "Design rule / note": "Finite and versioned. Closed set; grows only by versioned change (doc -> registry -> code, never code-first) with a conformance case authored BEFORE the change."
+   },
+   {
+    "#": "3",
+    "Design rule / note": "Totality against the vendor denominator (reflected, never hand-typed): every vendor construct mapped or deferred-with-reason, both directions."
+   },
+   {
+    "#": "4",
+    "Design rule / note": "The mapper never guesses. No kind -> counted remainder (reason + location + raw evidence)."
+   },
+   {
+    "#": "5",
+    "Design rule / note": "Dialect-neutral kinds, dialect-labeled evidence."
+   },
+   {
+    "#": "NODE",
+    "Design rule / note": "Per the ratified doc: predicates are nodes owned by exactly one scope; role-labeled contains edges to their expression children; evidence + version stamps on every node."
+   }
+  ],
+  "Structure_Kinds": [
+   {
+    "Kind": "AND",
+    "Meaning": "all children must hold",
+    "T-SQL sources": "AND (BooleanBinaryExpression)"
+   },
+   {
+    "Kind": "OR",
+    "Meaning": "any child may hold",
+    "T-SQL sources": "OR (BooleanBinaryExpression)",
+    "Notes": "An OR is a NODE — no walk can silently read it as AND."
+   },
+   {
+    "Kind": "NOT",
+    "Meaning": "the child's meaning, negated",
+    "T-SQL sources": "NOT (BooleanNotExpression); ALL negated syntax forms",
+    "Notes": "R1 RATIFIED 2026-09-04: NOT LIKE / NOT IN / NOT BETWEEN / IS NOT NULL / NOT EXISTS normalize to NOT over the positive kind; original syntax kept in evidence. One meaning, one kind; 'all pattern-match decisions' is one graph query."
+   },
+   {
+    "Kind": "(parentheses)",
+    "Meaning": "syntax only — shapes the tree, then dissolves",
+    "T-SQL sources": "BooleanParenthesisExpression",
+    "Notes": "The tree structure IS the grouping."
+   }
+  ],
+  "Predicate_Kinds": [
+   {
+    "Kind": "COMPARE_EQ",
+    "Meaning (one sentence)": "subject equals comparand",
+    "Roles": "subject, comparand",
+    "T-SQL syntax -> this kind": "="
+   },
+   {
+    "Kind": "COMPARE_NEQ",
+    "Meaning (one sentence)": "subject differs from comparand",
+    "Roles": "subject, comparand",
+    "T-SQL syntax -> this kind": "<>  and  != (two syntaxes, one kind)"
+   },
+   {
+    "Kind": "COMPARE_GT",
+    "Meaning (one sentence)": "subject exceeds comparand",
+    "Roles": "subject, comparand",
+    "T-SQL syntax -> this kind": ">"
+   },
+   {
+    "Kind": "COMPARE_GTE",
+    "Meaning (one sentence)": "subject is at least comparand",
+    "Roles": "subject, comparand",
+    "T-SQL syntax -> this kind": ">=  and  !< (legacy synonym)"
+   },
+   {
+    "Kind": "COMPARE_LT",
+    "Meaning (one sentence)": "subject is below comparand",
+    "Roles": "subject, comparand",
+    "T-SQL syntax -> this kind": "<"
+   },
+   {
+    "Kind": "COMPARE_LTE",
+    "Meaning (one sentence)": "subject is at most comparand",
+    "Roles": "subject, comparand",
+    "T-SQL syntax -> this kind": "<=  and  !> (legacy synonym)"
+   },
+   {
+    "Kind": "PATTERN_MATCH",
+    "Meaning (one sentence)": "subject's text matches a pattern",
+    "Roles": "subject, pattern, escape?",
+    "T-SQL syntax -> this kind": "LIKE (negation via NOT, R1 ratified)"
+   },
+   {
+    "Kind": "IN_LIST",
+    "Meaning (one sentence)": "subject is one of an enumerated set of values",
+    "Roles": "subject, comparand (one per member, ordered by position)",
+    "T-SQL syntax -> this kind": "IN (v1, v2, ...)",
+    "Notes": "A DIFFERENT kind from IN_SELECTION: enumerated values vs delegation to data."
+   },
+   {
+    "Kind": "IN_SELECTION",
+    "Meaning (one sentence)": "subject is a member of another selection's result — the decision's content lives in DATA (the value-set case)",
+    "Roles": "subject, selection",
+    "T-SQL syntax -> this kind": "IN (SELECT ...)",
+    "Notes": "The clinical value-set pattern; queryable on its own. Detection is STRUCTURAL (the comparand is a subquery_ref), never string-matching."
+   },
+   {
+    "Kind": "RANGE",
+    "Meaning (one sentence)": "subject falls between a lower and an upper bound, inclusive",
+    "Roles": "subject, lower_bound, upper_bound",
+    "T-SQL syntax -> this kind": "BETWEEN ... AND ... (negation via NOT)"
+   },
+   {
+    "Kind": "NULL_CHECK",
+    "Meaning (one sentence)": "subject has no recorded value",
+    "Roles": "subject",
+    "T-SQL syntax -> this kind": "IS NULL (IS NOT NULL via NOT)"
+   },
+   {
+    "Kind": "EXISTS_SELECTION",
+    "Meaning (one sentence)": "at least one row exists in another selection (usually correlated)",
+    "Roles": "selection",
+    "T-SQL syntax -> this kind": "EXISTS (SELECT ...) (NOT EXISTS via NOT)"
+   },
+   {
+    "Kind": "QUANTIFIED_COMPARE",
+    "Meaning (one sentence)": "subject compares against every/any row of a selection",
+    "Roles": "subject, comparison-op, quantifier, selection",
+    "T-SQL syntax -> this kind": "= ANY (...), > ALL (...), SOME (SubqueryComparisonPredicate)"
+   },
+   {
+    "Kind": "(not kinds)",
+    "Meaning (one sentence)": "Degenerate predicates (1=1): map to their comparison kind; 'decides nothing' is a DERIVED fact (lens). CASE in predicate position: a comparison whose subject is a case expression node. Parameter defaults: IF structure + NULL_CHECK + assignment; 'parameter default' is a derived pattern. Decisions themselves: LENSES, never kinds (graph-leads ruling)."
+   }
+  ],
+  "Roles": [
+   {
+    "Role": "subject",
+    "Meaning": "what the predicate speaks about (the left-hand meaning)"
+   },
+   {
+    "Role": "comparand",
+    "Meaning": "the value/expression compared against; IN-list members are one comparand edge each, ordered by the contains edge's position property (reconciled: the former comparand-list role is retired — position owns order)"
+   },
+   {
+    "Role": "lower_bound / upper_bound",
+    "Meaning": "the two ends of a RANGE"
+   },
+   {
+    "Role": "pattern / escape",
+    "Meaning": "the match pattern (and optional escape) of PATTERN_MATCH"
+   },
+   {
+    "Role": "selection",
+    "Meaning": "a subquery scope used as the comparand (IN_SELECTION, EXISTS_SELECTION, QUANTIFIED_COMPARE) — reached via a subquery_ref child's resolves_to"
+   },
+   {
+    "Role": "quantifier",
+    "Meaning": "ANY / ALL / SOME on QUANTIFIED_COMPARE"
+   },
+   {
+    "Role": "(why roles)",
+    "Meaning": "Role labels ride the contains edges from predicate to expression children (ratified edge design). Without them a predicate knows which columns participate but not what it SAYS about them — the recorded misattribution bug class."
+   }
+  ],
+  "Expression_Kinds": [
+   {
+    "Kind": "column_ref",
+    "Meaning": "a MENTION of a column; resolves_to a KG layer 1 column node (or no edge = counted unresolved)"
+   },
+   {
+    "Kind": "table_ref",
+    "Meaning": "a MENTION of a table; resolves_to a KG layer 1 table OR a scope in the same tree (CTE / #temp stage) — ADDED in the ratified doc (a FROM references tables)"
+   },
+   {
+    "Kind": "literal",
+    "Meaning": "a constant value, owned by the predicate side"
+   },
+   {
+    "Kind": "parameter_ref",
+    "Meaning": "a mention of a parameter; resolves_to the file's parameter node"
+   },
+   {
+    "Kind": "function",
+    "Meaning": "function application over ordered child expressions"
+   },
+   {
+    "Kind": "arithmetic",
+    "Meaning": "arithmetic over child expressions"
+   },
+   {
+    "Kind": "case",
+    "Meaning": "value branching (WHENs hold predicates, THENs hold expressions)"
+   },
+   {
+    "Kind": "cast",
+    "Meaning": "representation change, not meaning change"
+   },
+   {
+    "Kind": "unary",
+    "Meaning": "sign/negation on a value (in the ratified doc list — R6 ratified 2026-09-04)"
+   },
+   {
+    "Kind": "subquery_ref",
+    "Meaning": "a mention of a nested selection used as a value; resolves_to its scope node"
+   }
+  ],
+  "TSQL_Denominator": [
+   {
+    "ScriptDom type": "BooleanBinaryExpression",
+    "Disposition": "mapped",
+    "Detail / reason": "AND / OR"
+   },
+   {
+    "ScriptDom type": "BooleanNotExpression",
+    "Disposition": "mapped",
+    "Detail / reason": "NOT (all negated syntax normalizes here — R1 ratified)"
+   },
+   {
+    "ScriptDom type": "BooleanParenthesisExpression",
+    "Disposition": "mapped",
+    "Detail / reason": "tree shape; node dissolves"
+   },
+   {
+    "ScriptDom type": "BooleanComparisonExpression",
+    "Disposition": "mapped",
+    "Detail / reason": "COMPARE_* — all 11 enum values: 6 operators + 2 NEQ syntaxes + 2 legacy synonyms; *= / =* deferred (row below)"
+   },
+   {
+    "ScriptDom type": "LikePredicate",
+    "Disposition": "mapped",
+    "Detail / reason": "PATTERN_MATCH"
+   },
+   {
+    "ScriptDom type": "InPredicate",
+    "Disposition": "mapped",
+    "Detail / reason": "IN_LIST / IN_SELECTION (structural split: subquery_ref comparand vs literal members)"
+   },
+   {
+    "ScriptDom type": "BooleanTernaryExpression",
+    "Disposition": "mapped",
+    "Detail / reason": "RANGE"
+   },
+   {
+    "ScriptDom type": "BooleanIsNullExpression",
+    "Disposition": "mapped",
+    "Detail / reason": "NULL_CHECK"
+   },
+   {
+    "ScriptDom type": "ExistsPredicate",
+    "Disposition": "mapped",
+    "Detail / reason": "EXISTS_SELECTION"
+   },
+   {
+    "ScriptDom type": "SubqueryComparisonPredicate",
+    "Disposition": "mapped",
+    "Detail / reason": "QUANTIFIED_COMPARE"
+   },
+   {
+    "ScriptDom type": "BooleanComparisonExpression *= / =*",
+    "Disposition": "DEFERRED",
+    "Detail / reason": "pre-1992 outer-join syntax, removed from modern SQL Server; counted remainder if ever seen"
+   },
+   {
+    "ScriptDom type": "BooleanIsDistinctFromExpression",
+    "Disposition": "DEFERRED — R2 RATIFIED 2026-09-04",
+    "Detail / reason": "SQL 2022 null-safe equality; revisit on first estate sighting"
+   },
+   {
+    "ScriptDom type": "FullTextPredicate (CONTAINS/FREETEXT)",
+    "Disposition": "DEFERRED — R3 RATIFIED 2026-09-04",
+    "Detail / reason": "full-text search; rare in analytical estates"
+   },
+   {
+    "ScriptDom type": "GraphMatchPredicate (MATCH)",
+    "Disposition": "DEFERRED",
+    "Detail / reason": "SQL graph tables, out of scope"
+   },
+   {
+    "ScriptDom type": "UpdateCall / TSEqualCall",
+    "Disposition": "DEFERRED",
+    "Detail / reason": "trigger-context / legacy constructs, not analytical logic"
+   },
+   {
+    "ScriptDom type": "(anything beyond this table)",
+    "Disposition": "RED BUILD",
+    "Detail / reason": "the reflection check fails until the new type is mapped or deferred here with a reason"
+   },
+   {
+    "ScriptDom type": "EXEC(@sql) dynamic SQL",
+    "Disposition": "permanent counted gap",
+    "Detail / reason": "upstream of predicates entirely"
+   }
+  ],
+  "Test_Artifacts": [
+   {
+    "Family": "Construct cases",
+    "What is authored (BEFORE any mapper code — protocol step 4)": "one smallest SQL file per kind + authored expected tree + expected remainder (empty)"
+   },
+   {
+    "Family": "Adversarial cases",
+    "What is authored (BEFORE any mapper code — protocol step 4)": "the recorded corpse catalog: OR shapes, derived-table scope, RANGE over columns, IN_SELECTION value sets, CTE referenced twice, 1=1, CASE-in-predicate, temp-table staging chains, negated forms (R1), nested control-flow statements"
+   },
+   {
+    "Family": "Remainder cases",
+    "What is authored (BEFORE any mapper code — protocol step 4)": "files containing each deferred construct, expecting exactly that counted remainder"
+   },
+   {
+    "Family": "Twin cases",
+    "What is authored (BEFORE any mapper code — protocol step 4)": "same meaning in two dialects -> identical trees modulo evidence (arrives with dialect #2)"
+   }
+  ],
+  "Open_Rulings": [
+   {
+    "ID": "R1",
+    "Question": "Negation normalization",
+    "Status": "RATIFIED 2026-09-04: structural NOT over the positive kind; syntax in evidence"
+   },
+   {
+    "ID": "R2",
+    "Question": "IS [NOT] DISTINCT FROM",
+    "Status": "RATIFIED 2026-09-04: deferred; revisit on first estate sighting"
+   },
+   {
+    "ID": "R3",
+    "Question": "Full-text predicates",
+    "Status": "RATIFIED 2026-09-04: deferred"
+   },
+   {
+    "ID": "R4",
+    "Question": "'lens' for derived readings",
+    "Status": "RATIFIED (landed in the doc's Level 0)"
+   },
+   {
+    "ID": "R5",
+    "Question": "'metamodel' for the kind/role/rule layer",
+    "Status": "RATIFIED (in use throughout the doc)"
+   },
+   {
+    "ID": "R6",
+    "Question": "unary expression kind: in this library but NOT in the ratified doc's expression list — add 'unary' to the doc, or fold sign-negation into arithmetic?",
+    "Status": "RATIFIED 2026-09-04: 'unary' added to the doc's expression list"
+   }
+  ]
+ }
+}

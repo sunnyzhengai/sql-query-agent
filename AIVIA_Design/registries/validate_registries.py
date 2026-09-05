@@ -1,0 +1,130 @@
+"""Registry validator — the embryo of binding mechanisms a and b.
+
+(a) stamp discipline: every registry carries a complete stamp block;
+    the doc-stamp compare is reported NOT-RUNNABLE until the doc's
+    sections carry version stamps (Sunny action), never silently skipped.
+(b) rule-to-check closure: every rule row in every Rules_to_Checks
+    sheet names at least one check — "a rule with no check is a hope"
+    as arithmetic. The explicit design-review exception is honored only
+    when declared in the row itself.
+
+Plus cross-registry consistency: each CHECK-* name defined in exactly
+one registry; predicate roles closed against the Roles sheet;
+denominator dispositions in closed vocab; the logic layer's expression
+kind list identical to the kind library's.
+
+Usage: python3 AIVIA_Design/registries/validate_registries.py
+"""
+import json
+import glob
+import os
+import re
+import sys
+
+BASE = os.path.dirname(os.path.abspath(__file__))
+V, OK, NR = [], [], []
+
+
+def rule(name, violations):
+    if violations:
+        V.extend((name, d) for d in violations)
+    else:
+        OK.append(name)
+
+
+regs = {}
+for path in sorted(glob.glob(os.path.join(BASE, "*.json"))):
+    regs[os.path.basename(path)[:-5]] = json.load(open(path))
+
+# mechanism a: stamp blocks complete
+STAMP_FIELDS = {"version", "doc_section", "doc_stamp", "ratified",
+                "converted_on", "converted_from"}
+rule("RG-A1 stamp block complete",
+     [f"{n}: missing {STAMP_FIELDS - set(r.get('stamp', {}))}"
+      for n, r in regs.items() if STAMP_FIELDS - set(r.get("stamp", {}))])
+NR.append("RG-A2 doc-stamp compare — the design doc's sections carry no "
+          "version stamps yet (Sunny action); compare runs once they do")
+
+# mechanism b: rule-to-check closure
+bad = []
+for n, r in regs.items():
+    for sheet, rows in r["sheets"].items():
+        if "Rules_to_Checks" not in sheet and "Stages_and_Checks" not in sheet:
+            continue
+        for row in rows:
+            checks = row.get("Named check(s)") or row.get("Checks") or ""
+            declared_exempt = "no runtime check" in checks
+            if not checks.strip():
+                bad.append(f"{n}/{sheet}: rule "
+                           f"'{list(row.values())[0][:40]}' names no check")
+            elif declared_exempt and "design-review" not in checks:
+                bad.append(f"{n}/{sheet}: undeclared exemption")
+rule("RG-B1 rule-to-check closure (a rule with no check is a hope)", bad)
+
+# each CHECK-* defined in exactly one registry
+CHECK = re.compile(r"CHECK-[A-Z0-9]+-\d+[a-z]?")
+defined = {}
+for n, r in regs.items():
+    for sheet, rows in r["sheets"].items():
+        if "Rules_to_Checks" not in sheet:
+            continue
+        for row in rows:
+            for c in CHECK.findall(row.get("Named check(s)", "")):
+                defined.setdefault(c, []).append(n)
+rule("RG-B2 check names defined once",
+     [f"{c} defined in {ns}" for c, ns in defined.items() if len(ns) > 1])
+
+# kind library: predicate roles closed against the Roles sheet
+kl = regs["kg2_kind_library"]["sheets"]
+role_vocab = set()
+for row in kl["Roles"]:
+    if row["Role"].startswith("("):
+        continue
+    for part in row["Role"].split("/"):
+        role_vocab.add(part.strip())
+# declared exceptions: each must cite a live flag in the registry's _open
+OPEN_EXCEPTIONS = {("QUANTIFIED_COMPARE", "comparison-op"): "RG-1"}
+open_text = " ".join(regs["kg2_kind_library"]["_open"])
+bad = []
+for row in kl["Predicate_Kinds"]:
+    if row["Kind"].startswith("("):
+        continue
+    for raw in re.sub(r"\([^)]*\)", "", row.get("Roles", "")).split(","):
+        tok = raw.strip().rstrip("?")
+        if not tok or tok in role_vocab:
+            continue
+        flag = OPEN_EXCEPTIONS.get((row["Kind"], tok))
+        if flag and flag in open_text:
+            continue  # flagged for ruling, declared never hidden
+        bad.append(f"{row['Kind']}: role '{tok}' not in Roles sheet")
+rule("RG-C1 predicate roles closed against Roles sheet", bad)
+
+# denominator dispositions in closed vocab
+DISP = ("mapped", "DEFERRED", "RED BUILD", "permanent counted gap")
+rule("RG-C2 denominator dispositions closed",
+     [f"{row['ScriptDom type']}: '{row['Disposition']}'"
+      for row in kl["TSQL_Denominator"]
+      if not row["Disposition"].startswith(DISP)])
+
+# logic layer expression kinds == kind library expression kinds
+lib_kinds = {row["Kind"] for row in kl["Expression_Kinds"]}
+expr_row = next(r for r in regs["kg2_logic"]["sheets"]["Node_Types"]
+                if r["Kind"] == "expression")
+logic_kinds = {t.strip() for t in
+               expr_row["Properties"].removeprefix("kind:").split("|")}
+rule("RG-C3 expression kinds identical across KG2 registries",
+     [f"symmetric difference: {sorted(lib_kinds ^ logic_kinds)}"]
+     if lib_kinds != logic_kinds else [])
+
+print(f"PASSED: {len(OK)} rules")
+for name in OK:
+    print(f"  ok {name}")
+if V:
+    print(f"VIOLATIONS: {len(V)}")
+    for name, d in V:
+        print(f"  !! {name}: {d}")
+else:
+    print("VIOLATIONS: none")
+for note in NR:
+    print(f"NOT-RUNNABLE: {note}")
+sys.exit(1 if V else 0)

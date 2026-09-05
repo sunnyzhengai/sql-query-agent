@@ -1,0 +1,59 @@
+{
+ "registry": "kg4_concepts",
+ "stamp": {
+  "version": "0.2-draft",
+  "doc_section": "Level 1 / KG Layer 4 — concept layer",
+  "doc_stamp": "NOT YET STAMPED — Sunny action: doc sections carry no version stamps; compare is NOT-RUNNABLE until they do",
+  "ratified": false,
+  "converted_on": "2026-09-05",
+  "converted_from": "L1_KG4_Concept_Layer_Registry_DRAFT.xlsx"
+ },
+ "rulings_applied_at_conversion": [],
+ "_open": [],
+ "sheets": {
+  "ReadMe": [
+   {
+    "Item": "STATUS",
+    "Statement": "DRAFT v0.1 — companion registry authored 2026-09-05 from the RATIFIED KG Layer 4 section of the AIVIA Design Document (protocol step 2). The doc is the authority; any doc change updates this registry in the same breath. All build deferred by the phase ruling."
+   },
+   {
+    "Item": "FOUNDING RULING",
+    "Statement": "The lens computes; a human touch mints. Sparse by design: every concept a human has engaged, never every cluster the math can find."
+   }
+  ],
+  "Node_and_Edges": [
+   {
+    "Item": "concept node",
+    "Definition": "id (content-keyed at minting) + basis (family snapshot: member tree versions, lens version). NO name, NO description — the accepted parent term IS its identity"
+   },
+   {
+    "Item": "inbound edges",
+    "Definition": "term.about -> concept; disposition.about -> concept; lens reports reference by id (not edges)"
+   },
+   {
+    "Item": "membership",
+    "Definition": "NEVER stored — the relatedness lens recomputes; basis-vs-now divergence is the concept-drift lens"
+   }
+  ],
+  "Rules_to_Checks": [
+   {
+    "Rule": "human-mint-only",
+    "Axioms": "M5, D3",
+    "Named check(s)": "CHECK-KG4-1",
+    "Check asserts": "every concept's minting act traces to a human ruling or acceptance; no machine mint path exists"
+   },
+   {
+    "Rule": "append-only",
+    "Axioms": "R4",
+    "Named check(s)": "CHECK-KG4-2",
+    "Check asserts": "no edit/delete path on minted concepts"
+   },
+   {
+    "Rule": "metamodel conformance",
+    "Axioms": "S2, D4",
+    "Named check(s)": "CHECK-KG4-3",
+    "Check asserts": "node shape validates; no member edges exist"
+   }
+  ]
+ }
+}
