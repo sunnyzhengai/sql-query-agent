@@ -8,10 +8,10 @@
   "converted_on": "2026-09-05",
   "converted_from": "L3_Flows_Registry_DRAFT.xlsx"
  },
- "rulings_applied_at_conversion": [],
- "_open": [
-  "Stages_and_Checks compresses the doc rules by design ('doc is authority'); the ratification pass decides whether flow rules get row-per-rule treatment like the KG registries"
+ "rulings_applied_at_conversion": [
+  "sheet Rules_to_Checks added (all-eight ruling 2026-09-05)"
  ],
+ "_open": [],
  "sheets": {
   "ReadMe": [
    {
@@ -71,6 +71,176 @@
    {
     "Family": "twin-dialect",
     "Cases": "arrives with dialect #2 (deferred, recorded)"
+   }
+  ],
+  "Rules_to_Checks": [
+   {
+    "Stage": "OUT-1 produce",
+    "Named check(s)": "PROD-1",
+    "Doc rule": "every run lands the GENERATION-RUN EVENT: author = agent identity; basis = model/prompt/lens/metamodel versions + worklist; accounting shipped u absent = attempted, one conservation line per class attempted (A9), killed-lines counted per shipped artifact",
+    "Check asserts": "conservation event per run; the run event is the ONLY production ledger",
+    "v1": "yes"
+   },
+   {
+    "Stage": "OUT-1 produce",
+    "Named check(s)": "PROD-2",
+    "Doc rule": "the STALENESS LENS is the worklist (basis moved, no artifact yet, or explicit human request); nobody hand-picks; full regeneration = a version bump making everything stale — the same rule",
+    "Check asserts": "worklist == staleness-lens output",
+    "v1": "yes"
+   },
+   {
+    "Stage": "OUT-1 produce",
+    "Named check(s)": "PROD-3",
+    "Doc rule": "deterministic composition + bounded model smoothing (linguistic seat only) + the class gate; the model never adds a fact",
+    "Check asserts": "gate outcomes in closed vocabularies",
+    "v1": "yes"
+   },
+   {
+    "Stage": "OUT-1 produce",
+    "Named check(s)": "PROD-4",
+    "Doc rule": "writes layer-3 machine versions ONLY; against human-owned artifacts it may APPEND a superseding version — rendered proposed by the ownership lens, never current",
+    "Check asserts": "human-owned never overwritten",
+    "v1": "yes"
+   },
+   {
+    "Stage": "OUT-1 produce",
+    "Named check(s)": "PROD-5",
+    "Doc rule": "replay floor: same graph + same versions -> identical skeletons and gate verdicts; prose may vary, truth may not; model failure degrades to the deterministic floor",
+    "Check asserts": "replay determinism of the floor",
+    "v1": "yes"
+   },
+   {
+    "Stage": "OUT-2 approve",
+    "Named check(s)": "APPR-1",
+    "Doc rule": "the approval surface WRITES DISPOSITIONS ONLY — it renders lenses, never touches artifacts, trees, or the technical layer",
+    "Check asserts": "writer census",
+    "v1": "yes"
+   },
+   {
+    "Stage": "OUT-3 land",
+    "Named check(s)": "LAND-1",
+    "Doc rule": "a send is an outward, irreversible act — it requires an accepting disposition on the artifact AND a named human confirmation of the send itself; no autonomy mode exempts it (B4)",
+    "Check asserts": "no send without accepting disposition + human confirmation",
+    "v1": "yes"
+   },
+   {
+    "Stage": "OUT-3 land",
+    "Named check(s)": "LAND-2",
+    "Doc rule": "anti-repeat: no send for logic whose current outcome is denied unless a new version exists (standing rule R2, read from the current-outcome lens)",
+    "Check asserts": "anti-repeat enforced via current-outcome lens",
+    "v1": "yes"
+   },
+   {
+    "Stage": "OUT-3 land",
+    "Named check(s)": "LAND-3",
+    "Doc rule": "every send lands a proposal SENT event before transport; every later look lands an OBSERVED event; current outcome is the lens",
+    "Check asserts": "sent event precedes transport",
+    "v1": "yes"
+   },
+   {
+    "Stage": "OUT-3 land",
+    "Named check(s)": "LAND-4",
+    "Doc rule": "target-native forms only; ZERO custom attributes — native column sets held as data; attribution is the prefix in text, never a schema footprint",
+    "Check asserts": "zero custom attributes in payloads",
+    "v1": "yes"
+   },
+   {
+    "Stage": "OUT-3 land",
+    "Named check(s)": "LAND-5",
+    "Doc rule": "look-before-write: at send time read the ONE object about to be touched, never the catalog at large (R3); what was seen lands as an observed event",
+    "Check asserts": "observations append-only",
+    "v1": "yes"
+   },
+   {
+    "Stage": "IN-1 match",
+    "Named check(s)": "MATCH-1",
+    "Doc rule": "writes ONE thing — usage event asked, at inquiry arrival (every inquiry is a fact, especially unanswerable ones); nothing else, ever",
+    "Check asserts": "writer census (asked only)",
+    "v1": "deferred (inward flow entire — no ask surface in v1)"
+   },
+   {
+    "Stage": "IN-1 match",
+    "Named check(s)": "MATCH-2",
+    "Doc rule": "outcomes, closed set: matched | ambiguous | no-match; no-match is typed and counted — the honest empty, never a shrug",
+    "Check asserts": "closed outcome set",
+    "v1": "deferred (inward flow entire — no ask surface in v1)"
+   },
+   {
+    "Stage": "IN-1 match",
+    "Named check(s)": "MATCH-3",
+    "Doc rule": "completeness declared on every result: top-K is never 'all that exists'; enumeration questions use primitives that declare totality (B3)",
+    "Check asserts": "completeness on every result",
+    "v1": "deferred (inward flow entire — no ask surface in v1)"
+   },
+   {
+    "Stage": "IN-1 match",
+    "Named check(s)": "MATCH-4",
+    "Doc rule": "match proposes, evidence disposes: output is candidate GRAPH OBJECTS (ids) + the evidence trail — never generated text posing as fact",
+    "Check asserts": "candidates are ids + evidence, never text",
+    "v1": "deferred (inward flow entire — no ask surface in v1)"
+   },
+   {
+    "Stage": "IN-1 match",
+    "Named check(s)": "MATCH-5",
+    "Doc rule": "ambiguous goes to the HUMAN with candidates (intent judgment is human's); no silent pick among near-ties",
+    "Check asserts": "ambiguity reaches the human",
+    "v1": "deferred (inward flow entire — no ask surface in v1)"
+   },
+   {
+    "Stage": "IN-2 ground",
+    "Named check(s)": "GRND-1",
+    "Doc rule": "writes usage events only — confirmed when the human accepts, ran when they execute; run result rows are DISPLAY-ONLY and never enter the graph or the mind's evidence",
+    "Check asserts": "writer census (confirmed | ran only)",
+    "v1": "deferred (inward flow entire — no ask surface in v1)"
+   },
+   {
+    "Stage": "IN-2 ground",
+    "Named check(s)": "GRND-2",
+    "Doc rule": "the answer is ARRANGED EVIDENCE; the answer text is a CAPTION adding no claim the evidence doesn't carry",
+    "Check asserts": "caption gate — no ungrounded claim in answer text",
+    "v1": "deferred (inward flow entire — no ask surface in v1)"
+   },
+   {
+    "Stage": "IN-2 ground",
+    "Named check(s)": "GRND-3",
+    "Doc rule": "quantified claims inherit the match's declared completeness — 'all' and counts only over results declared total (B3)",
+    "Check asserts": "quantifiers only over declared-complete results",
+    "v1": "deferred (inward flow entire — no ask surface in v1)"
+   },
+   {
+    "Stage": "IN-2 ground",
+    "Named check(s)": "GRND-4",
+    "Doc rule": "headlines and counts are rendered by code from result metadata, never model-written",
+    "Check asserts": "headlines/counts rendered by code",
+    "v1": "deferred (inward flow entire — no ask surface in v1)"
+   },
+   {
+    "Stage": "IN-3 generate",
+    "Named check(s)": "GEN-1",
+    "Doc rule": "generated SQL composes only from declared reality — existing tables/columns, joins along declared joins_to paths (the builder WALKS the join graph), documented value sets; a deterministic validator checks every reference and join against layer 1 before the draft reaches the human",
+    "Check asserts": "validator totality; refusals name the missing declared path",
+    "v1": "deferred (inward flow entire — no ask surface in v1)"
+   },
+   {
+    "Stage": "IN-3 generate",
+    "Named check(s)": "GEN-2",
+    "Doc rule": "the parser door: a draft becomes estate ONLY by the human adopting it into their source and the inbound flow parsing it like any customer file — zero trust shortcuts",
+    "Check asserts": "no side channel — the inbound door is the only door",
+    "v1": "deferred (inward flow entire — no ask surface in v1)"
+   },
+   {
+    "Stage": "IN-3 generate",
+    "Named check(s)": "GEN-3",
+    "Doc rule": "the draft is DISPLAY-ONLY: delivered through the answer surface, writes nothing; a discarded draft leaves no residue",
+    "Check asserts": "drafts write nothing",
+    "v1": "deferred (inward flow entire — no ask surface in v1)"
+   },
+   {
+    "Stage": "IN-3 generate",
+    "Named check(s)": "GEN-4",
+    "Doc rule": "trigger: a no-match outcome AND an explicit human request — generation is an act someone asks for, never an automatic consolation",
+    "Check asserts": "generation only on no-match + human request",
+    "v1": "deferred (inward flow entire — no ask surface in v1)"
    }
   ]
  }

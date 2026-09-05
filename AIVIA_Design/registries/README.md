@@ -23,15 +23,23 @@ after reviewing the conversion log below.
   - lenses: three catalog rows added — referenced-keys (D12),
     correspondence (H7, deferred from v1), demand (H5, deferred
     from v1) — reads/yields from the L2 Code Structure Map.
-- **Open flags** (undecided, filed in each file's `_open`):
-  - kg2_kind_library RG-1: QUANTIFIED_COMPARE's `comparison-op` role
-    is undefined in the Roles sheet — role vs property, Sunny rules.
-    (Caught by the validator; declared exception until ruled.)
-  - kg2_logic: A3/A4/A11 scope-identity rulings not yet restated as
-    registry rows.
-  - lenses: the v1 "eleven lenses" count vs catalog granularity.
-  - flows: whether flow rules get row-per-rule treatment at
-    ratification.
+- **All conversion flags RULED 2026-09-05** (Sunny, adopting the
+  draft reads) and landed the same day:
+  - RG-1: comparison-op AND quantifier are predicate-node
+    PROPERTIES, never roles — roles stay a pure edge vocabulary;
+    the Roles sheet's quantifier row retired.
+  - kg2_logic gains the `Scope_Identity` sheet: A3 name-key model
+    (`file::name` / `file::name#i`, counted retirement branch),
+    A11 `::delivery` emitters, A4 attachment domain — transcribed
+    from the doc's Disambiguation models + register A11.
+  - lenses Catalog_v1 gains the `v1` flag column — the registry's
+    flag is the authority; the doc's prose lens-count retired
+    (doc sentence amended same ruling).
+  - flows gains `Rules_to_Checks`: row per check, all 24 flow
+    checks (PROD/APPR/LAND/MATCH/GRND/GEN) with doc-transcribed
+    rules; inward rows carry their deferral inline.
+  Every registry's `_open` is now empty; PM-1..PM-4 are ruled in
+  the Port Manifest the same day.
 
 ## Validation
 

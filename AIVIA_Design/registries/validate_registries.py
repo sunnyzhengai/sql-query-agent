@@ -82,22 +82,23 @@ for row in kl["Roles"]:
         continue
     for part in row["Role"].split("/"):
         role_vocab.add(part.strip())
-# declared exceptions: each must cite a live flag in the registry's _open
-OPEN_EXCEPTIONS = {("QUANTIFIED_COMPARE", "comparison-op"): "RG-1"}
-open_text = " ".join(regs["kg2_kind_library"]["_open"])
 bad = []
 for row in kl["Predicate_Kinds"]:
     if row["Kind"].startswith("("):
         continue
     for raw in re.sub(r"\([^)]*\)", "", row.get("Roles", "")).split(","):
         tok = raw.strip().rstrip("?")
-        if not tok or tok in role_vocab:
-            continue
-        flag = OPEN_EXCEPTIONS.get((row["Kind"], tok))
-        if flag and flag in open_text:
-            continue  # flagged for ruling, declared never hidden
-        bad.append(f"{row['Kind']}: role '{tok}' not in Roles sheet")
-rule("RG-C1 predicate roles closed against Roles sheet", bad)
+        if tok and tok not in role_vocab:
+            bad.append(f"{row['Kind']}: role '{tok}' not in Roles sheet")
+rule("RG-C1 predicate roles closed against Roles sheet (RG-1 ruled: "
+     "operators/quantifiers are properties)", bad)
+
+# v1 flag column: every catalog row flagged, closed vocab
+rule("RG-C4 lens catalog v1 flags total and closed",
+     [f"{row['Lens']}: '{row.get('v1', '')}'"
+      for row in regs["lenses"]["sheets"]["Catalog_v1"]
+      if not (row.get("v1") == "yes" or
+              str(row.get("v1", "")).startswith("deferred ("))])
 
 # denominator dispositions in closed vocab
 DISP = ("mapped", "DEFERRED", "RED BUILD", "permanent counted gap")

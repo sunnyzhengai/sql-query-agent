@@ -18,9 +18,10 @@ Authored 2026-09-05.*
    as the *behavioral floor* — new-shape tests come from fixtures F1–F6.
 3. The existing repo keeps running untouched (the demo path). "Not
    carried" means *not copied into the new skeleton* — never deleted.
-4. Verdicts here are my draft; port-vs-rework calls I could not decide
-   from the record are flagged PM-1..PM-4 at the bottom (the HITL law:
-   flagged, never decided).
+4. PM-1..PM-4 were flagged, never decided, per the HITL law — then
+   RULED 2026-09-05 (Sunny, adopting the draft reads); rulings and
+   updated rows are landed in place. Formal ratification of the whole
+   manifest rides the registry ratification pass.
 
 ---
 
@@ -30,7 +31,7 @@ Authored 2026-09-05.*
 |---|---|---|---|---|
 | `graph/store.py` | NEW | consult-only: `src/graph/delta_backend.py`, `src/graph/backend.py` | GV via fixture validator | append-only substrate is foundationally new; old backends assume mutable current-state tables |
 | `graph/metamodel.py` | NEW | pattern donor: `src/spec_registry.py` (registry-as-code + stale-doc CI, the proven shape) | binding-mechanism-a stamp tests (new) | loads the ratified L1–L3 registries; code never sees the prose |
-| `graph/phi_gate.py` | PORT | `src/phi_scan.py` | `tests/test_phi_scan.py` (25 tests) | scan rules carry verbatim; signature narrows to pure text → (redacted, count) — see PM-1 |
+| `graph/phi_gate.py` | REWORK | `src/phi_scan.py` | `tests/test_phi_scan.py` (25 tests) as behavioral floor; door-2 fixtures owed to F6 before code | PM-1 RULED 2026-09-05: door 2 (free-typed usage payloads) is unproven territory for the SQL-hardened scan rules — conservative REWORK; signature narrows to pure text → (redacted, count) |
 | `graph/kg1_intake.py` | NEW | donors: `src/dictionary.py`, `src/extraction_registry.py` | F1 fixtures + validator (GV-C conservation) | CONTRACT_DATALOAD intake never existed; A1/A2 identity, A14 quarantine, INTAKE-0..10 all new law |
 | `graph/kg2_mapper.py` | REWORK | parser adapter PORTS whole: `src/parser/` (scriptdom_loader, sql_parser, identity, error_classifier); IR extraction REWORKS: `src/tree/extract.py`, `src/tree/translate.py` → the KG2 kind library | parser: `tests/parser/` + `tests/test_native_parser_law.py` port as-is; extraction floor: `tests/tree/test_extract.py` (18); new shape: F2 fixtures | ScriptDom authority is the proven organ (99%, 788/790); only the IR it feeds changes |
 | `graph/kg3_artifacts.py` | NEW | donors: `src/governance/steward.py` (dispositions), `src/governance/publish_log.py` | F5 fixtures | the spine + lifecycle model changed at the foundation |
@@ -55,7 +56,7 @@ Authored 2026-09-05.*
 |---|---|---|---|---|
 | `flows/inbound.py` | NEW | thin: wraps kg1_intake + kg2_mapper | F1/F2 fixtures + F6 refusals | the two doors; refusal-names-the-rule is the error contract |
 | `flows/produce.py` | REWORK | `src/descriptions.py` produce machinery incl. the skeleton composer (A13's ratified floor-grammar SEED) + `src/steps/agent_descriptions.py` | floor: `tests/test_descriptions.py` (29) + `tests/test_skeleton_composer.py` (38); new shape: F4 (interim substring-grade until A13 lands at this slice) | worklist becomes the staleness lens output (PROD-2); per-artifact atomicity (H10) is new |
-| `flows/gates.py` | PORT | `src/steps/gates.py` + grounding/caption gates (`src/governance/leaf_grounding.py`, `src/orchestrator/caption_gate.py`) + injection fixtures | `tests/test_gate_recut.py`, `tests/test_grounding_gate.py`, injection cases in `tests/test_skeleton_composer.py` | pure checkers port cleanly — see PM-2 for the assembly question |
+| `flows/gates.py` | PORT | `src/steps/gates.py` (produce text gates) + injection fixtures; caption gate (`src/orchestrator/caption_gate.py`, `src/governance/leaf_grounding.py`) DEFERS with the inward flow | `tests/test_gate_recut.py`, injection cases in `tests/test_skeleton_composer.py`; grounding-gate suite defers with its flow | PM-2 RULED 2026-09-05: v1 ports only what v1 runs — a ported-but-unused gate family muddies the imports-nothing-deferred check for zero v1 value; GRND-2 sharing lands at the inward slice |
 | `flows/approve.py` | NEW | donor: `src/governance/steward.py` | F5 approve scripts | dispositions-only write path (APPR-1, LC3-C3) |
 | `flows/land.py` | REWORK | `src/adapters/file_export.py` (+ flow shape from `src/adapters/publisher.py`) | `tests/adapters/test_file_export.py` (9); new shape: F5 land scripts | v1 file-first ONLY; A15 export headers bind at THIS slice; render/confirm/send/observe staging is new; API adapters (collibra, purview) stay behind for the transport phase |
 | `flows/materialize.py` | NEW | — | OPS-1 stamped-report tests (to author) | |
@@ -85,18 +86,22 @@ Authored 2026-09-05.*
   misc. single-file modules) — not carried; each stays runnable where
   it is.
 
-## Flagged for ruling (register rows, not choices)
+## Flag rulings (all four RULED 2026-09-05, Sunny — adopting the draft reads)
 
-- **PM-1** `phi_gate`: drafted PORT, but the signature narrows to pure
-  and gains door-2 (usage payloads). If the scan RULES change (not just
-  the wrapper), it's a REWORK and F-fixture coverage is owed.
-- **PM-2** `gates.py`: three donor gate families (produce text gates,
-  leaf grounding, caption gate) merge into one pure module. Which
-  families are v1 law vs inward-flow baggage that defers with match/ground?
-- **PM-3** `src/extractor/`: v1 intake takes DBA-delivered CSV snapshots
-  per the SOP runbook — drafted NOT CARRIED (connection-based extraction
-  retires; `devops_tmdl.py` recorded as the H4 donor for later). Confirm
-  the source-pack scripts fully replace it.
-- **PM-4** `lenses/decisions.py`: drafted clean-room NEW against the F3
-  answer key rather than salvaging tree-walk code — cheaper and the
-  answer key is total. Confirm no organ is owed a port here.
+- **PM-1 RULED — REWORK.** `phi_gate` gains door 2 (free-typed usage
+  payloads), which the SQL-hardened scan rules have never seen; the
+  conservative verdict is rework, old suite as behavioral floor,
+  door-2 redaction fixtures owed to F6 before code. Row updated above.
+- **PM-2 RULED — split.** Produce text gates + injection fixtures port
+  now; the caption/grounding gate family DEFERS with the inward flow.
+  v1 ports only what v1 runs — the imports-nothing-deferred check
+  stays clean. Row updated above.
+- **PM-3 RULED — extractor retires.** File-first covers intake as
+  absolutely as landing: v1 receives DBA-delivered snapshots per the
+  SOP runbook; no direct-connection scenario exists in a v1
+  engagement. `devops_tmdl.py` stays parked as the H4 donor.
+- **PM-4 RULED — clean-room stands.** The corpse catalog transfers
+  through the kind library's adversarial fixture families (authored
+  before mapper code, per protocol step 4), not through salvaged
+  tree-walk code. `lenses/decisions.py` is written NEW against the F3
+  answer key.

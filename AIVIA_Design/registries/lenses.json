@@ -11,11 +11,10 @@
  "rulings_applied_at_conversion": [
   "register D12 (2026-09-05)",
   "register H7 (2026-09-05)",
-  "register H5 (2026-09-05)"
+  "register H5 (2026-09-05)",
+  "v1 flag column (ruled 2026-09-05: registry v1 flag is the authority; prose lens-counts retired)"
  ],
- "_open": [
-  "MVP v1 'eleven lenses' count vs this catalog's granularity (6 spine derivations + 7 named = 13 rows in v1 scope) — naming/counting question for the ratification pass, not a content gap"
- ],
+ "_open": [],
  "sheets": {
   "ReadMe": [
    {
@@ -40,115 +39,134 @@
     "Lens": "ownership",
     "Reads": "version chains, dispositions",
     "Yields": "machine|human per artifact",
-    "Completeness note": "total"
+    "Completeness note": "total",
+    "v1": "yes"
    },
    {
     "Lens": "authorship",
     "Reads": "author edges, identity kind",
     "Yields": "machine|human per version",
-    "Completeness note": "total"
+    "Completeness note": "total",
+    "v1": "yes"
    },
    {
     "Lens": "version",
     "Reads": "supersedes chains",
     "Yields": "number per version",
-    "Completeness note": "total"
+    "Completeness note": "total",
+    "v1": "yes"
    },
    {
     "Lens": "standing",
     "Reads": "artifacts, dispositions",
     "Yields": "pending|accepted|rejected|revoked",
-    "Completeness note": "total"
+    "Completeness note": "total",
+    "v1": "yes"
    },
    {
     "Lens": "current-outcome",
     "Reads": "proposal sent+observed events",
     "Yields": "latest outcome per proposal",
-    "Completeness note": "total over observations"
+    "Completeness note": "total over observations",
+    "v1": "yes"
    },
    {
     "Lens": "staleness",
     "Reads": "basis stamps, current layer versions",
     "Yields": "stale artifact set",
-    "Completeness note": "total"
+    "Completeness note": "total",
+    "v1": "yes"
    },
    {
     "Lens": "decisions(class)",
     "Reads": "L2 predicates + tree positions",
     "Yields": "membership|grain|value|path sets per scope",
-    "Completeness note": "total per tree"
+    "Completeness note": "total per tree",
+    "v1": "yes"
    },
    {
     "Lens": "degenerate",
     "Reads": "L2 predicates (literal-literal)",
     "Yields": "decides-nothing set",
-    "Completeness note": "total"
+    "Completeness note": "total",
+    "v1": "yes"
    },
    {
     "Lens": "join-compliance",
     "Reads": "L2 practiced joins, L1 declared joins_to",
     "Yields": "violation findings",
-    "Completeness note": "total over resolved joins"
+    "Completeness note": "total over resolved joins",
+    "v1": "yes"
    },
    {
     "Lens": "divergence",
     "Reads": "human-owned artifacts, current graph",
     "Yields": "steward flags",
-    "Completeness note": "total over human-owned"
+    "Completeness note": "total over human-owned",
+    "v1": "deferred (compares prior state; v1 is first contact)"
    },
    {
     "Lens": "relatedness",
     "Reads": "names + tree content keys (L2), L1 targets",
     "Yields": "families w/ content-keyed ids",
-    "Completeness note": "total over parsed estate"
+    "Completeness note": "total over parsed estate",
+    "v1": "yes"
    },
    {
     "Lens": "concept-drift",
     "Reads": "concept basis, current relatedness",
     "Yields": "membership changes since minting",
-    "Completeness note": "total over minted"
+    "Completeness note": "total over minted",
+    "v1": "deferred (compares prior state; v1 is first contact)"
    },
    {
     "Lens": "expertise",
     "Reads": "usage events",
     "Yields": "de-facto experts per node",
-    "Completeness note": "total over ledger"
+    "Completeness note": "total over ledger",
+    "v1": "deferred (reads the deferred ask surface)"
    },
    {
     "Lens": "blast-radius",
     "Reads": "usage events, graph edges",
     "Yields": "dependents (people + consumers) per node",
-    "Completeness note": "total"
+    "Completeness note": "total",
+    "v1": "deferred (reads the deferred ask surface)"
    },
    {
     "Lens": "working-set",
     "Reads": "L2 resolves_to edges",
     "Yields": "tables the estate touches",
-    "Completeness note": "total over resolved refs"
+    "Completeness note": "total over resolved refs",
+    "v1": "yes"
    },
    {
     "Lens": "gap-census",
     "Reads": "unresolved refs, keyless tables, unmapped remainder",
     "Yields": "counted-absence surfaces",
-    "Completeness note": "total"
+    "Completeness note": "total",
+    "v1": "yes"
    },
    {
     "Lens": "referenced-keys",
     "Reads": "inbound joins_to groups per table (L1)",
     "Yields": "declared reference keys per table (distinct column-sets)",
-    "Completeness note": "total — RULING APPLIED at conversion: register D12 CLOSED 2026-09-05 (derived from inbound joins_to, never stored)"
+    "Completeness note": "total — RULING APPLIED at conversion: register D12 CLOSED 2026-09-05 (derived from inbound joins_to, never stored)",
+    "v1": "yes"
    },
    {
     "Lens": "correspondence",
     "Reads": "minted concepts (basis), current relatedness families",
     "Yields": "corresponds|dispersed|merged|new per family",
-    "Completeness note": "total over minted — RULING APPLIED at conversion: register H7 CLOSED 2026-09-05 (S4 overlap-maximal rule; ties -> ambiguous, human rules). DEFERRED from v1 (compares prior state)"
+    "Completeness note": "total over minted — RULING APPLIED at conversion: register H7 CLOSED 2026-09-05 (S4 overlap-maximal rule; ties -> ambiguous, human rules). DEFERRED from v1 (compares prior state)",
+    "v1": "deferred (compares prior state; v1 is first contact)"
    },
    {
     "Lens": "demand",
     "Reads": "no-match asked events (redacted payloads)",
     "Yields": "unanswered-question themes + counts",
-    "Completeness note": "total over ledger — RULING APPLIED at conversion: register H5 CLOSED 2026-09-05. DEFERRED from v1 (reads the ask surface)"
+    "Completeness note": "total over ledger — RULING APPLIED at conversion: register H5 CLOSED 2026-09-05. DEFERRED from v1 (reads the ask surface)",
+    "v1": "deferred (reads the deferred ask surface)"
    }
   ]
  }

@@ -8,10 +8,10 @@
   "converted_on": "2026-09-05",
   "converted_from": "L1_KG2_Logic_Layer_Registry_DRAFT.xlsx"
  },
- "rulings_applied_at_conversion": [],
- "_open": [
-  "scope identity name-key detail (A3 collision-counted, A4 unnamed forbidden-for-attachment, A11 ::delivery emitters) is ruled in the doc but not yet restated as registry rows — ratification pass item"
+ "rulings_applied_at_conversion": [
+  "sheet Scope_Identity added (all-eight ruling 2026-09-05)"
  ],
+ "_open": [],
  "sheets": {
   "ReadMe": [
    {
@@ -185,6 +185,27 @@
     "Writer / trigger": "—",
     "Postconditions": "any writer but mapper (LC2-F1 census) · text-derived structure (LC2-F2 parser-authority plank) · hand edits (LC2-F3) · physical delete (LC2-F4) · partial parse shipped whole (LC2-F5 — conservation IS the atomicity)",
     "Tests": "—"
+   }
+  ],
+  "Scope_Identity": [
+   {
+    "Item": "_ruling",
+    "Definition": "All eight flags RULED 2026-09-05 (Sunny): this sheet restates the doc's Disambiguation models A3/A4 and register row A11 as registry rows. Doc is authority; transcribed verbatim-in-substance."
+   },
+   {
+    "Item": "name_key (A3)",
+    "Definition": "key(scope_i) := file :: name if i = 1st occurrence of name in file order; file :: name#i otherwise. Total over all scopes with names.",
+    "Branch / witness": "Branch (explicit, counted): removing occurrence 1 retires ALL keys of that name; survivors re-mint; displaced attachments surface for re-attach. Witness: two WITH Base -> Base, Base#2; edit elsewhere changes neither."
+   },
+   {
+    "Item": "delivery scopes (A11)",
+    "Definition": "the file's final emitter scope mints file :: delivery (single emitter); plural emitters mint file :: delivery_1..n in statement order AND surface on the DBA list.",
+    "Branch / witness": "register A11 (RULED 2026-09-05); witnessed by fixtures F2 expected_trees + F3 decisions_membership keys."
+   },
+   {
+    "Item": "attachment domain (A4)",
+    "Definition": "about-targets := named nodes only (file, named scope, KG1 nodes, layer-3 citizens, concepts). Unnamed nodes are outside the domain — a domain bound, not a branch.",
+    "Branch / witness": "Witness: subquery logic is described at its named ancestor."
    }
   ]
  }

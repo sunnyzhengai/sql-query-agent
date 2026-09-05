@@ -8,10 +8,11 @@
   "converted_on": "2026-09-05",
   "converted_from": "L1_KG2_Kind_Library_TSQL_Predicates_DRAFT.xlsx"
  },
- "rulings_applied_at_conversion": [],
- "_open": [
-  "RG-1 (caught by validate_registries RG-C1): QUANTIFIED_COMPARE declares role 'comparison-op' but the Roles sheet never defines it. Two compliant readings — define comparison-op as a role, or model the operator as a predicate PROPERTY (roles are edges to expression children; an operator is not an expression). Sunny rules."
+ "rulings_applied_at_conversion": [
+  "RG-1 ruling (2026-09-05)",
+  "RG-1 ruling (2026-09-05): quantifier is a predicate property"
  ],
+ "_open": [],
  "sheets": {
   "ReadMe_Rules": [
    {
@@ -146,8 +147,9 @@
    {
     "Kind": "QUANTIFIED_COMPARE",
     "Meaning (one sentence)": "subject compares against every/any row of a selection",
-    "Roles": "subject, comparison-op, quantifier, selection",
-    "T-SQL syntax -> this kind": "= ANY (...), > ALL (...), SOME (SubqueryComparisonPredicate)"
+    "Roles": "subject, selection",
+    "T-SQL syntax -> this kind": "= ANY (...), > ALL (...), SOME (SubqueryComparisonPredicate)",
+    "Notes": "RG-1 RULED 2026-09-05 (Sunny): comparison-op and quantifier are PROPERTIES of the predicate node, never roles — roles are edges to expression children, and an operator/quantifier is not an expression. The Roles sheet's quantifier row retires under the same ruling; roles stay a pure edge vocabulary."
    },
    {
     "Kind": "(not kinds)",
@@ -174,10 +176,6 @@
    {
     "Role": "selection",
     "Meaning": "a subquery scope used as the comparand (IN_SELECTION, EXISTS_SELECTION, QUANTIFIED_COMPARE) — reached via a subquery_ref child's resolves_to"
-   },
-   {
-    "Role": "quantifier",
-    "Meaning": "ANY / ALL / SOME on QUANTIFIED_COMPARE"
    },
    {
     "Role": "(why roles)",

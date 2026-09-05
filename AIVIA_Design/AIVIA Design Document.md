@@ -863,9 +863,12 @@ estate in, descriptions + findings out, file-first exports landed.
 
 IN v1: Level 1 entire (store, metamodel, phi_gate, kg1_intake,
 kg2_mapper, kg3_artifacts, kg4 mint, read_api — the graph is the
-product, not scopeable) · Level 2: eleven lenses (spine
-derivations, decisions, degenerate, join-compliance, relatedness,
-working-set, gap-census, referenced-keys) · Level 3: the outward
+product, not scopeable) · Level 2: the catalog rows flagged v1 in
+the Lenses_Registry — the six spine derivations + decisions,
+degenerate, join-compliance, relatedness, working-set, gap-census,
+referenced-keys (ruled 2026-09-05: the registry's v1 flag is the
+authority; prose lens-counts retired — a count in a sentence
+drifts, a flag column is checkable) · Level 3: the outward
 flow whole (inbound, produce + gates, approve, land file-first,
 materialize, run_events) · dialect: T-SQL only.
 
