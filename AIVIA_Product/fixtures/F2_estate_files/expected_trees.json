@@ -80,7 +80,6 @@
         {
           "position": 3,
           "scope": {
-            "name_key_OPEN": "the final SELECT of a file has NO name \u2014 per ruling A4 artifacts attach to named nodes only. _OPEN(F2-A): what is the attachment target for a final unnamed statement scope: the FILE node (reading 1) or a conventional name like ::final (reading 2)? Both comply. Register row filed; drafts use reading 1 (attach to file) UNRULED.",
             "from_refs": [
               {
                 "table_ref": "#Recent",
@@ -111,7 +110,9 @@
                   }
                 }
               ]
-            }
+            },
+            "name_key": "usp_diabetic_visits.sql::delivery",
+            "_witness": "A11 ruling: the file's single result-set-emitting SELECT -> ::delivery (SELECT INTO emits nothing; the IF emits nothing -> exactly one emitter)"
           },
           "statement_kind": "SELECT"
         }
@@ -217,5 +218,9 @@
     "same_tree_refs": 1,
     "unresolved_refs": 1,
     "_witness": "counts are the completeness declaration (B3); unresolved = L.NOTE_TXT; same-tree = #Recent. CORRECTED 2026-09-05: the validator's recount caught the author's hand-count (14 -> 12)"
+  },
+  "multi_result_set_files": {
+    "expected": [],
+    "_witness": "A11: none in this estate; a plural-emitter file would name delivery_1..n AND land on the DBA ruling list"
   }
 }

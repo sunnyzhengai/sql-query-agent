@@ -5,14 +5,14 @@
       "VISIT_DATE >= @StartDate",
       "APPT_STATUS_C = 2"
     ],
-    "usp_diabetic_visits.sql (final scope \u2014 attachment per _OPEN F2-A)": [
+    "usp_diabetic_visits.sql::delivery": [
       "DX_CODE LIKE 'E11%'"
     ],
-    "vw_completed_visits.sql": [
+    "vw_completed_visits.sql::delivery": [
       "1 = 1",
       "APPT_STATUS_C IN (1, 2)"
     ],
-    "usp_odd_join.sql": [],
+    "usp_odd_join.sql::delivery": [],
     "completeness": "total per tree",
     "_witness": "join keys (col=col) are NOT membership decisions; the 1=1 IS captured here and judged by the degenerate lens"
   },

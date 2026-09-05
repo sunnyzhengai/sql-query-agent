@@ -1,47 +1,82 @@
 {
-  "_comment": "AUTHORED produce-stage expectations over the F2 worklist, in the proven expect/forbid-substring style (the corpus answer-key format). The deterministic FLOOR is fully authorable at the FACT level; exact floor PHRASING is _OPEN (F4-A): the new design ratifies WHAT the floor must state (facts, meanings, values), not its sentence grammar — that grammar is a build-slice design piece for Sunny to ratify, seeded by the field-proven composer. Drafts below assert facts via expect-substrings only.",
-
+  "_comment": "AUTHORED produce-stage expectations over the F2 worklist, in the proven expect/forbid-substring style (the corpus answer-key format). The deterministic FLOOR is fully authorable at the FACT level; exact floor PHRASING is _OPEN (F4-A): the new design ratifies WHAT the floor must state (facts, meanings, values), not its sentence grammar \u2014 that grammar is a build-slice design piece for Sunny to ratify, seeded by the field-proven composer. Drafts below assert facts via expect-substrings only.",
   "worklist": "= staleness_t0 (PROD-2); priority order deferred to ECON params",
-
   "targets": {
     "usp_diabetic_visits.sql::#Recent": {
       "expect_facts": [
         "the visit date threshold references the start date parameter (default '2026-01-01' when none supplied)",
         "appointment status value 2 voiced WITH its meaning 'Completed' (values map)",
-        "no invented values; nothing beyond the two conditions"],
-      "expect_substrings": ["2026-01-01", "Completed"],
-      "forbid_substrings": ["APPT_STATUS_C", "#Recent", "E."],
-      "gate_outcome_allowed": ["gate_passed", "skeleton_floor"],
+        "no invented values; nothing beyond the two conditions"
+      ],
+      "expect_substrings": [
+        "2026-01-01",
+        "Completed"
+      ],
+      "forbid_substrings": [
+        "APPT_STATUS_C",
+        "#Recent",
+        "E."
+      ],
+      "gate_outcome_allowed": [
+        "gate_passed",
+        "skeleton_floor"
+      ],
       "_witness": "raw identifiers never reach steward prose; model failure costs polish, never truth"
     },
-    "usp_diabetic_visits.sql (final scope)": {
-      "expect_facts": ["diagnosis code starts with 'E11'"],
-      "expect_substrings": ["E11"],
-      "forbid_substrings": ["DX_CODE"],
-      "gate_outcome_allowed": ["gate_passed", "skeleton_floor"]
+    "usp_diabetic_visits.sql::delivery": {
+      "expect_facts": [
+        "diagnosis code starts with 'E11'"
+      ],
+      "expect_substrings": [
+        "E11"
+      ],
+      "forbid_substrings": [
+        "DX_CODE"
+      ],
+      "gate_outcome_allowed": [
+        "gate_passed",
+        "skeleton_floor"
+      ]
     },
-    "vw_completed_visits.sql": {
+    "vw_completed_visits.sql::delivery": {
       "expect_facts": [
         "appointment status is one of the values 1 ('Scheduled'), 2 ('Completed')",
-        "the 1=1 scaffolding NEVER voiced (degenerate — decides nothing)"],
-      "forbid_substrings": ["1 = 1", "1=1"],
-      "gate_outcome_allowed": ["gate_passed", "skeleton_floor"]
+        "the 1=1 scaffolding NEVER voiced (degenerate \u2014 decides nothing)"
+      ],
+      "forbid_substrings": [
+        "1 = 1",
+        "1=1"
+      ],
+      "gate_outcome_allowed": [
+        "gate_passed",
+        "skeleton_floor"
+      ]
     },
-    "usp_odd_join.sql": {
-      "expect_facts": ["no membership conditions exist — the honest no-conditions fact"],
+    "usp_odd_join.sql::delivery": {
+      "expect_facts": [
+        "no membership conditions exist \u2014 the honest no-conditions fact"
+      ],
       "note": "the unresolved NOTE_TXT ref must not surface as prose; it lives in gap-census",
-      "gate_outcome_allowed": ["gate_passed", "skeleton_floor"]
+      "gate_outcome_allowed": [
+        "gate_passed",
+        "skeleton_floor"
+      ]
     }
   },
-
   "run_event_expected": {
     "author": "agent identity (produce pipeline)",
     "basis": "model/prompt/lens/metamodel versions + the worklist",
     "accounting_per_class": {
-      "descriptions": {"attempted": 4, "shipped": 4, "absent": 0,
-        "killed_lines": "0 expected on this estate; any kill must be counted, never silent"},
-      "terms": {"attempted": 0,
-        "_witness": "no name families in this estate (relatedness yields none) -> no nominations; per-class lines never fabricate a class"}
+      "descriptions": {
+        "attempted": 4,
+        "shipped": 4,
+        "absent": 0,
+        "killed_lines": "0 expected on this estate; any kill must be counted, never silent"
+      },
+      "terms": {
+        "attempted": 0,
+        "_witness": "no name families in this estate (relatedness yields none) -> no nominations; per-class lines never fabricate a class"
+      }
     },
     "replay_floor": "same graph + versions -> identical floors and gate verdicts; smoothed prose may vary"
   }
