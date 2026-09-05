@@ -140,6 +140,12 @@ self-serviceable by the customer's DBA without a support call).
   whose dependent side belongs to another source (refused + counted)
 - INTAKE-7 source-pack version match — extract produced by an
   unknown/retired pack version is refused
+- INTAKE-8 registered db (added 2026-09-05, A1 refined): an
+  extract naming a db not in the DBA registration prerequisite is
+  a named refusal
+- INTAKE-9 declared-vs-captured agreement (added 2026-09-05): the
+  script's captured db name must match the registration prereq;
+  disagreement is a refusal naming both values
 
 ## 8. The intake report
 
