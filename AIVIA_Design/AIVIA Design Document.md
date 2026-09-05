@@ -797,6 +797,22 @@ beside it (L1_* files, named for the Level-1 section they attach
 to); the doc holds WHAT and the rules, the companions hold the
 machine-readable and test-facing detail.
 
+The Disambiguation clause (ratified 2026-09-05 — ambiguity dies
+in examples and procedures, never in more prose):
+1. DECIDING EXAMPLES: a rule is ratifiable only with at least one
+   deciding example — a concrete case + its single expected
+   outcome, landed beside the rule. Prose and example must agree;
+   the example wins disputes.
+2. SELECTION AS PROCEDURE: any rule that picks — "current",
+   "stable", "corresponds", "owns" — states its selection as a
+   deterministic procedure (or names the lens/function embodying
+   it), never as an adjective.
+3. TWO-READINGS ESCALATION (the HITL law): anyone — human or
+   build agent — finding a point where two readings both comply
+   must NOT choose. Both readings land as a register row; the
+   ruling is Sunny's. An implementer's uncertainty is a register
+   row, not a decision [axm:R3 applied to design gaps].
+
 Binding mechanisms (ratified 2026-09-04 — what makes steps 2-3
 physics instead of discipline; all build deferred with the rest):
 a. Registries are code-consumed data, version-bound to the doc:
