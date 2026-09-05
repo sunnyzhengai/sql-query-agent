@@ -213,9 +213,9 @@
     }
   ],
   "resolution_census": {
-    "resolved_refs": 14,
-    "unresolved_refs": 1,
+    "resolved_refs": 12,
     "same_tree_refs": 1,
-    "_witness": "counts are the completeness declaration (B3); unresolved = L.NOTE_TXT"
+    "unresolved_refs": 1,
+    "_witness": "counts are the completeness declaration (B3); unresolved = L.NOTE_TXT; same-tree = #Recent. CORRECTED 2026-09-05: the validator's recount caught the author's hand-count (14 -> 12)"
   }
 }
