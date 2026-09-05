@@ -108,10 +108,10 @@ KG Layer 2 — logic layer (one tree per SQL file)       [ratified]
        temp-table scope — every place logic has its own boundary)
         --- name (CTE/temp name where one exists)
     -- structure (FROM, JOIN w/ type, WHERE, HAVING, GROUP BY,
-       ORDER BY/TOP, UNION w/ dedup flag, CASE, and PROJECTION —
-       added 2026-09-05, entailed by the A12 ruling: the SELECT
-       list as output columns (position + name) containing their
-       source expressions, so scope lineage is walkable)
+       ORDER BY/TOP, UNION w/ dedup flag, CASE. PROJECTION
+       capture DEFERRED by the final A12 ruling — see the
+       ambiguity rulings; regenerability makes it recoverable by
+       metamodel bump + re-parse)
     -- predicate (one condition; kind from the metamodel's
        closed set)
     -- expression (column_ref | table_ref | literal | parameter_ref

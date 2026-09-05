@@ -34,10 +34,12 @@
     ],
     "compliant_practiced": [
       "ENCOUNTER-PATIENT (vw)",
-      "ORG_READMIT-ENCOUNTER (vw, cross-source, declared)",
-      "ENCOUNTER_DX-ENCOUNTER (usp_diabetic_visits, RESOLVED THROUGH #Recent per the A12 through-scope ruling: #Recent.ENCOUNTER_ID descends from ENCOUNTER.ENCOUNTER_ID via the projection; the declared path exists -> compliant)"
+      "ORG_READMIT-ENCOUNTER (vw, cross-source, declared)"
     ],
-    "completeness": "total over practiced joins, INCLUDING scope-resolved (A12 through-scope ruling)"
+    "completeness": "direct table-table ON pairs ONLY; scope-mediated joins not judged (A12 deferral, declared on every result)",
+    "not_judged": [
+      "ENCOUNTER_DX-#Recent (usp_diabetic_visits): scope-mediated \u2014 NOT JUDGED per the final A12 ruling (defer everything); the loophole is declared, never hidden"
+    ]
   },
   "working_set": {
     "yield": [
