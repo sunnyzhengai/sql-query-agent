@@ -194,14 +194,15 @@
   },
   "gap_lists": {
     "pk_missing": [],
-    "phrase_no_match": [
+    "pending_references": [],
+    "_pk_note": "empty BY STRUCTURE: INTAKE-10 refuses extracts with keyless tables (Sunny's integrity ruling)",
+    "grain_not_declared": [
       "simemr|dbo|DX_COMMENT",
       "simemr|dbo|VAL_APPT_STATUS",
       "simemr|dbo|STAGING_LOG",
       "org|org_custom|ORG_READMIT"
     ],
-    "pending_references": [],
-    "_pk_note": "empty BY STRUCTURE: INTAKE-10 refuses extracts with keyless tables (Sunny's integrity ruling)"
+    "_grain_note": "grain is the phrase rules' sole surviving yield (pk = declared data; business_name cut); these four descriptions lack the grain boilerplate \u2014 absent + counted, ruled acceptable"
   },
   "intake_expectations": {
     "simemr": {
