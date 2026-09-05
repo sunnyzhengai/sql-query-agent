@@ -1,5 +1,5 @@
 {
-  "_comment": "AUTHORED produce-stage expectations over the F2 worklist, in the proven expect/forbid-substring style (the corpus answer-key format). The deterministic FLOOR is fully authorable at the FACT level; exact floor PHRASING is _OPEN (F4-A): the new design ratifies WHAT the floor must state (facts, meanings, values), not its sentence grammar \u2014 that grammar is a build-slice design piece for Sunny to ratify, seeded by the field-proven composer. Drafts below assert facts via expect-substrings only.",
+  "_comment": "AUTHORED produce-stage expectations over the F2 worklist, expect/forbid-substring style. A13 RULED 2026-09-05: the floor grammar becomes a RATIFIED versioned design artifact at the produce build slice; these substring expectations are INTERIM and upgrade to exact floor text when the grammar lands.",
   "worklist": "= staleness_t0 (PROD-2); priority order deferred to ECON params",
   "targets": {
     "usp_diabetic_visits.sql::#Recent": {
