@@ -583,7 +583,7 @@ The flows                                              [ratified]
        drafts write nothing · GEN-4 generation only on no-match +
        human request
 
-The CHANGE pass — what survives change            [in design]
+The CHANGE pass — what survives change            [ratified]
 - Method: scenario-driven (scenarios are the answer key of
   architecture — authored expected outcomes, then the design is
   walked against them). Scenarios blessed 2026-09-05:
@@ -626,8 +626,32 @@ The CHANGE pass — what survives change            [in design]
   a human disposition. S3 REDUCED to a retention line: retained
   versions ARE the evidence basis cites; default retention
   forever; pruning is a ruled act, never automatic.
-- Open in this pass: S4 correspondence rule · S5 staleness
-  economics
+- RULING S4 (2026-09-05, correspondence): each recomputed family
+  corresponds to the minted concept whose basis members it
+  overlaps MOST, measured on name-keyed member ids (the one law
+  guarantees they still exist). Closed outcomes: corresponds
+  (drift lens reports against it) · dispersed (surfaced finding)
+  · merged (one family, two+ concepts — AMBIGUOUS, both named,
+  human rules, never auto-merged) · new territory. Ties →
+  ambiguous. The machine never re-anchors; correspondence is a
+  REPORT.
+- RULING S5 (2026-09-05, staleness economics): staleness is a
+  STATE; regeneration is a BUDGETED QUEUE — consumed in
+  usage-weighted priority order (blast-radius + expertise lenses
+  are the ranking); every produce run has a registered budget and
+  records consumed + remaining backlog ("stale but not
+  regenerated" is visible and counted, never silent, never a
+  stampede); proposals to human-owned artifacts pace at the
+  steward's pull. A version bump is an economic event with knobs,
+  not an emergency. Checks: ECON-1 worklist order =
+  priority-lens output · ECON-2 budget respected · ECON-3
+  backlog counted in the run event.
+- Node lifecycle contracts (ratified 2026-09-05, the
+  operation-grain complement to these scenarios): layer 1 in
+  CONTRACT_DATALOAD §11; layers 2-3 as Lifecycle sheets in their
+  registries; layer 4 inherits (human-mint CREATE only).
+- PASS CLOSED: S1-S5 all pass by construction against the
+  ratified rulings.
 
 **** Design-to-Code Protocol (Level 0 law)
 
