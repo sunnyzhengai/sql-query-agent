@@ -1,0 +1,8 @@
+{
+  "source_kind": "estate",
+  "org": "simorg",
+  "location": "repo://analytics-sql/",
+  "declared_dialects": ["tsql"],
+  "as_of": "2026-09-10T00:00:00Z",
+  "operator": "fixture.author"
+}

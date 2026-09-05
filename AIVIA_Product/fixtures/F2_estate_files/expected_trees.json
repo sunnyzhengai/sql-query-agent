@@ -1,0 +1,111 @@
+{
+  "_comment": "AUTHORED expected semantic trees (KG layer 2) for the estate snapshot, per the ratified metamodel. Node kinds: file|statement|scope|structure|predicate|expression|parameter. Edges: contains(position, role) + resolves_to. Evidence (verbatim fragments) expected on EVERY node — asserted as a rule, not repeated per node. _OPEN items are flagged, never decided (the HITL law).",
+
+  "estate_conservation": {
+    "acquired": ["usp_diabetic_visits.sql", "vw_completed_visits.sql", "usp_odd_join.sql"],
+    "counted_excluded": [{"file": "dashboard.tmdl", "reason": "unsupported-dialect (tmdl placeholder)"}],
+    "_witness": "E5: acquired ⊎ counted-excluded = every file in scope"
+  },
+
+  "files": [
+    {
+      "id": "repo://analytics-sql/usp_diabetic_visits.sql",
+      "dialect": "tsql",
+      "statements": [
+        {
+          "position": 1,
+          "kind": "IF (control-flow: nests one inner statement)",
+          "shape": "IF <predicate> THEN SET @StartDate = '2026-01-01'",
+          "predicate": {"kind": "NULL_CHECK", "subject": "parameter_ref @StartDate -> resolves_to file parameter StartDate"},
+          "_witness": "the parameter-default pattern is STRUCTURAL (IF + NULL_CHECK + assignment), never a pseudo-op",
+          "parameter_node": {"name": "StartDate", "default_logic": "'2026-01-01'"}
+        },
+        {
+          "position": 2,
+          "kind": "SELECT INTO (mints scope #Recent)",
+          "scope": {
+            "name_key": "usp_diabetic_visits.sql::#Recent",
+            "structures": ["FROM", "WHERE"],
+            "from_refs": [{"table_ref": "dbo.ENCOUNTER", "resolves_to": "simemr|dbo|ENCOUNTER"}],
+            "where": {
+              "boolean": "AND",
+              "predicates": [
+                {"kind": "COMPARE_GTE",
+                 "subject": {"column_ref": "E.VISIT_DATE", "resolves_to": "simemr|dbo|ENCOUNTER|VISIT_DATE"},
+                 "comparand": {"parameter_ref": "@StartDate", "resolves_to": "file parameter StartDate"}},
+                {"kind": "COMPARE_EQ",
+                 "subject": {"column_ref": "E.APPT_STATUS_C", "resolves_to": "simemr|dbo|ENCOUNTER|APPT_STATUS_C"},
+                 "comparand": {"literal": "2"},
+                 "_witness": "literal 2 is resolvable AT READ TIME to 'Completed' via the column's values map — no edge stored (values-as-properties ruling)"}
+              ]
+            }
+          }
+        },
+        {
+          "position": 3,
+          "kind": "SELECT",
+          "scope": {
+            "name_key_OPEN": "the final SELECT of a file has NO name — per ruling A4 artifacts attach to named nodes only. _OPEN(F2-A): what is the attachment target for a final unnamed statement scope: the FILE node (reading 1) or a conventional name like ::final (reading 2)? Both comply. Register row filed; drafts use reading 1 (attach to file) UNRULED.",
+            "from_refs": [
+              {"table_ref": "#Recent", "resolves_to": "SAME-TREE scope usp_diabetic_visits.sql::#Recent", "_witness": "the staging chain as graph structure"},
+              {"table_ref": "dbo.ENCOUNTER_DX", "resolves_to": "simemr|dbo|ENCOUNTER_DX"}
+            ],
+            "join_on": [{"kind": "COMPARE_EQ", "note": "col=col join key: D.ENCOUNTER_ID = R.ENCOUNTER_ID; a structure fact, not a filter"}],
+            "where": {"predicates": [
+              {"kind": "PATTERN_MATCH",
+               "subject": {"column_ref": "D.DX_CODE", "resolves_to": "simemr|dbo|ENCOUNTER_DX|DX_CODE"},
+               "pattern": {"literal": "'E11%'"}}
+            ]}
+          }
+        }
+      ]
+    },
+    {
+      "id": "repo://analytics-sql/vw_completed_visits.sql",
+      "dialect": "tsql",
+      "statements": [
+        {
+          "position": 1, "kind": "SELECT",
+          "scope": {
+            "from_refs": [
+              {"table_ref": "dbo.ENCOUNTER", "resolves_to": "simemr|dbo|ENCOUNTER"},
+              {"table_ref": "dbo.PATIENT", "resolves_to": "simemr|dbo|PATIENT"},
+              {"table_ref": "org_custom.ORG_READMIT", "resolves_to": "org|org_custom|ORG_READMIT"}
+            ],
+            "where": {"boolean": "AND", "predicates": [
+              {"kind": "COMPARE_EQ", "subject": {"literal": "1"}, "comparand": {"literal": "1"},
+               "_witness": "captured faithfully; 'decides nothing' is the DEGENERATE LENS's judgment, never the mapper's"},
+              {"kind": "IN_LIST",
+               "subject": {"column_ref": "E.APPT_STATUS_C", "resolves_to": "simemr|dbo|ENCOUNTER|APPT_STATUS_C"},
+               "comparand_list": [{"literal": "1", "position": 1}, {"literal": "2", "position": 2}],
+               "_witness": "IN_LIST vs IN_SELECTION decided STRUCTURALLY (no subquery_ref child)"}
+            ]}
+          }
+        }
+      ]
+    },
+    {
+      "id": "repo://analytics-sql/usp_odd_join.sql",
+      "dialect": "tsql",
+      "statements": [
+        {
+          "position": 1, "kind": "SELECT",
+          "scope": {
+            "from_refs": [
+              {"table_ref": "dbo.PATIENT", "resolves_to": "simemr|dbo|PATIENT"},
+              {"table_ref": "dbo.STAGING_LOG", "resolves_to": "simemr|dbo|STAGING_LOG"}
+            ],
+            "select_refs": [
+              {"column_ref": "L.NOTE_TXT", "resolves_to": null,
+               "_witness": "UNRESOLVED — NOTE_TXT is not in the dictionary: no edge, counted (resolution honesty)"}
+            ],
+            "join_on": [{"kind": "COMPARE_EQ", "note": "L.LOAD_ID = P.PATIENT_ID — a PRACTICED table-table join along NO declared path; the JOIN-COMPLIANCE LENS's expected violation"}]
+          }
+        }
+      ]
+    }
+  ],
+
+  "resolution_census": {"resolved_refs": 14, "unresolved_refs": 1, "same_tree_refs": 1,
+    "_witness": "counts are the completeness declaration (B3); unresolved = L.NOTE_TXT"}
+}
