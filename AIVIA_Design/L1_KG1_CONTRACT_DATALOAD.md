@@ -89,11 +89,12 @@ the pack version changes, and every governed extract regenerates.
 not primary — real-estate measurement showed the boilerplate lives
 on core tables only (~0.5% of all tables, disproportionately the
 ones estates actually use). Each rule carries its variant-pattern
-list as source-pack data. The PRIMARY structural source for keys
-is **referenced_keys**, derived from the declared join data: every
-inbound FK's destination column-set is a declared reference key of
-that table — vendor-declared, no prose involved, and it covers
-every table anything joins to. Phrase-rule coverage is reported
+list as source-pack data. (Updated 2026-09-05: pk is now DECLARED DATA from the source's
+pk metadata table — part 3b. **referenced_keys** remains the
+COMPLEMENTARY candidate-key lens, derived from the declared join
+data: every inbound FK group's destination column-set is a
+declared reference key — it covers every table anything joins to,
+and it can differ from the pk, as surrogate-keyed tables prove.) Phrase-rule coverage is reported
 against two denominators: all tables (honest) and, once the logic
 layer exists, the estate's working set (meaningful).
 
