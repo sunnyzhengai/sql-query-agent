@@ -778,10 +778,19 @@ lifecycle contracted, every hole ruled.
 The AMBIGUITY rulings (A1-A10, ruled 2026-09-05, model-first;
 witness examples abbreviated — full cases in the register)
 
-A1 containers: mint(db) := by the REGISTRATION, source-neutral;
-   each source asserts only its schemas downward. Domain: every
-   db any extract names. Witness: epic + org both name CLARITY ->
-   one node, schemas owned per source.
+A1 containers (REFINED by Sunny 2026-09-05, from the F1
+   hand-check): the db is a PREREQUISITE, declared by the DBA at
+   registration — never derived from extract files. mint(db) :=
+   at registration, from the DBA-completed prereq (db name,
+   server, DBA team, registered sources), BEFORE any intake.
+   Extracts attach schemas downward into a pre-registered db
+   only; an extract naming an unregistered db is a NAMED REFUSAL.
+   The script's captured DB_NAME() becomes VERIFICATION: intake
+   checks declared-vs-captured agreement. Organizational
+   ownership = a layer-3 responsibility (dba, DBA-team role,
+   about the db), minted from the prereq. Witness: two sources
+   name one registered db -> one node; an unregistered db ->
+   refused by name.
 A2 identity: id_L1 := (source, schema, table[, column]); db is a
    property. match(a,b) := fold_upper(strip_brackets_quotes(a)) =
    fold_upper(strip_brackets_quotes(b)); values keys compare as

@@ -1,0 +1,8 @@
+{
+  "_comment": "The DBA-completed prerequisite (A1 refined): exists BEFORE any intake.",
+  "db_name": "SIMDB",
+  "server": "SIMSERVER",
+  "dba_team": "role:sim-dba-team",
+  "registered_sources": ["simemr", "org"],
+  "registered_at": "2026-07-15T00:00:00Z"
+}
