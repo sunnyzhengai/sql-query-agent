@@ -43,10 +43,9 @@
         "business_name": "encounter diagnosis",
         "grain": "diagnosis on an encounter",
         "pk_columns": [
-          "ENCOUNTER_ID",
-          "LINE"
+          "ENCOUNTER_DX_ID"
         ],
-        "_witness": "composite pk from prose, ordered"
+        "_witness": "Sunny's F1 correction: surrogate pk from prose; the composite (ENCOUNTER_ID, LINE) remains a REFERENCED candidate key (inbound from DX_COMMENT) \u2014 pk_columns and referenced_keys now provably differ, the referenced-keys lens's first honest case. Also witnesses: surrogate keys are why grain-from-pk is unreliable; grain comes from the phrase."
       },
       {
         "id": "simemr|dbo|DX_COMMENT",

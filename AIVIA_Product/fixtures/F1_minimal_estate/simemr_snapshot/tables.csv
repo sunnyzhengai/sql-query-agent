@@ -1,7 +1,7 @@
 schema,table,description
 dbo,PATIENT,"The patient table contains one record for each patient in your system. The primary key for the patient table is PATIENT_ID."
 dbo,ENCOUNTER,"The encounter table contains one record for each patient encounter in your system. The primary key for the encounter table is ENCOUNTER_ID."
-dbo,ENCOUNTER_DX,"The encounter diagnosis table contains one record for each diagnosis on an encounter in your system. The primary key for the encounter diagnosis table is ENCOUNTER_ID, LINE."
+dbo,ENCOUNTER_DX,"The encounter diagnosis table contains one record for each diagnosis on an encounter in your system. The primary key for the encounter diagnosis table is ENCOUNTER_DX_ID."
 dbo,DX_COMMENT,"Comments entered for encounter diagnoses."
 dbo,VAL_APPT_STATUS,"Values for appointment status."
 dbo,STAGING_LOG,"Load audit rows."

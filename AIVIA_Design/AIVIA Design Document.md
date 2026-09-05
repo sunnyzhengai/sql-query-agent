@@ -61,7 +61,11 @@ KG Layer 1 — source dictionaries technical layer      [ratified]
 
         Composite join — still one edge, two pairs:
 
-        DX_COMMENT ──joins_to──▶ ENCOUNTER_DX        (pk_columns: [ENCOUNTER_ID, LINE])
+        DX_COMMENT ──joins_to──▶ ENCOUNTER_DX   (targets the composite
+           candidate key — which need NOT be the pk; fixed
+           2026-09-05 after Sunny's F1 correction exposed the
+           pk-equals-join-key conflation the old parenthetical
+           taught)
            on: [[ENCOUNTER_ID, ENCOUNTER_ID], [DX_LINE, LINE]]
            cardinality: many_to_one
 - Rules
