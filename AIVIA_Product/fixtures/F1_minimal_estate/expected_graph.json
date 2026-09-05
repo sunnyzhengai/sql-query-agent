@@ -27,14 +27,16 @@
         "pk_columns": [
           "PATIENT_ID"
         ],
-        "_witness": "phrase rule yields grain only (business_name CUT 2026-09-05 \u2014 derivable from the stored description at read time)"
+        "_witness": "phrase rule yields grain only (business_name CUT 2026-09-05 \u2014 derivable from the stored description at read time)",
+        "description": "The patient table contains one record for each patient in your system. The primary key for the patient table is PATIENT_ID."
       },
       {
         "id": "simemr|dbo|ENCOUNTER",
         "grain": "patient encounter",
         "pk_columns": [
           "ENCOUNTER_ID"
-        ]
+        ],
+        "description": "The encounter table contains one record for each patient encounter in your system. The primary key for the encounter table is ENCOUNTER_ID."
       },
       {
         "id": "simemr|dbo|ENCOUNTER_DX",
@@ -42,39 +44,44 @@
         "pk_columns": [
           "ENCOUNTER_DX_ID"
         ],
-        "_witness": "pk from DECLARED pk data (Sunny's CLARITY_TBL_PK-style ruling) = the surrogate; the composite (ENCOUNTER_ID, LINE) remains an inbound REFERENCED key \u2014 pk_columns and referenced_keys provably differ. Surrogate pks are also why grain-from-pk is unreliable; grain stays phrase-derived, opportunistic."
+        "_witness": "pk from DECLARED pk data (Sunny's CLARITY_TBL_PK-style ruling) = the surrogate; the composite (ENCOUNTER_ID, LINE) remains an inbound REFERENCED key \u2014 pk_columns and referenced_keys provably differ. Surrogate pks are also why grain-from-pk is unreliable; grain stays phrase-derived, opportunistic.",
+        "description": "The encounter diagnosis table contains one record for each diagnosis on an encounter in your system. The primary key for the encounter diagnosis table is ENCOUNTER_DX_ID."
       },
       {
         "id": "simemr|dbo|DX_COMMENT",
         "grain": null,
         "pk_columns": [
           "COMMENT_ID"
-        ]
+        ],
+        "description": "Comments entered for encounter diagnoses."
       },
       {
         "id": "simemr|dbo|VAL_APPT_STATUS",
         "grain": null,
         "pk_columns": [
           "APPT_STATUS_C"
-        ]
+        ],
+        "description": "Values for appointment status."
       },
       {
         "id": "simemr|dbo|STAGING_LOG",
         "grain": null,
         "pk_columns": [
           "LOAD_ID"
-        ]
+        ],
+        "description": "Load audit rows."
       },
       {
         "id": "org|org_custom|ORG_READMIT",
         "grain": null,
         "pk_columns": [
           "ENC_ID"
-        ]
+        ],
+        "description": "Org readmission tracking."
       }
     ],
     "columns": {
-      "_comment": "18 simemr + 2 org columns, each with its description and as_of; enumerated by the conformance check from columns.csv \u2014 descriptions verbatim",
+      "_expectation": "EVERY column from both snapshots' columns.csv exists as a column node with its description VERBATIM and its as_of \u2014 19 simemr + 2 org. Enumerated here by rule rather than repetition; the conformance check compares against the csv directly (single source, no drift).",
       "values_map": {
         "simemr|dbo|ENCOUNTER|APPT_STATUS_C": {
           "1": "Scheduled",
