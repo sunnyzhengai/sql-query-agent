@@ -1,0 +1,22 @@
+{
+  "_comment": "The refusal set — every negative case is a NAMED refusal a DBA can self-serve (the error-contract law). Each case: a minimal delta from F1's accepted snapshots + the exact expected refusal.",
+  "cases": [
+    {"id": "R-DB", "delta": "simemr manifest/captured db = 'OTHERDB' (not in any registration)",
+     "expect_refusal": "INTAKE-8: db 'OTHERDB' is not registered; registration prerequisite lists: SIMDB",
+     "graph_effect": "NOTHING written (LC-F5 atomicity)"},
+    {"id": "R-CAPTURE", "delta": "manifest declares SIMDB but the script-captured db name is 'SIMDB_TEST'",
+     "expect_refusal": "INTAKE-9: declared 'SIMDB' vs captured 'SIMDB_TEST' — both values named",
+     "graph_effect": "nothing written"},
+    {"id": "R-KEYLESS", "delta": "remove STAGING_LOG's row from pk.csv",
+     "expect_refusal": "INTAKE-10: keyless table(s): dbo.STAGING_LOG",
+     "graph_effect": "nothing written — the WHOLE extract refuses (atomic), not just the table"},
+    {"id": "R-FKGROUP", "delta": "joins.csv fk_num 2 given ordinals 1 and 3 (non-consecutive)",
+     "expect_refusal_OR_quarantine_OPEN": "_OPEN(F6-A): contract §6 says malformed groups are QUARANTINED and the load PROCEEDS; the lifecycle's LC-F5 atomicity instinct might read refusal. Both readings comply. Register row filed; drafted per §6 (quarantine + proceed) UNRULED.",
+     "graph_effect_drafted": "extract accepted; fk group 2 quarantined + counted + named in the intake report"},
+    {"id": "R-ORPHANCOL", "delta": "columns.csv gains a row for table 'GHOST' absent from tables.csv",
+     "expect_refusal": "LC-C3: orphan column dbo.GHOST.X — refused + counted, not half-created"},
+    {"id": "R-MIXEDSCHEMA", "delta": "org extract declares a table in schema dbo (owned by simemr per the registration mapping)",
+     "expect_refusal": "INTAKE-8 (schema mapping): schema 'dbo' is not mapped to source 'org'",
+     "_witness": "the source-inheritance rule enforced at the door"}
+  ]
+}
