@@ -1,0 +1,48 @@
+{
+  "_comment": "AUTHORED lens expectations over the F1+F2 graph (deterministic — every one replayable). Each entry: lens -> expected yield + declared completeness.",
+
+  "decisions_membership": {
+    "usp_diabetic_visits.sql::#Recent": [
+      "VISIT_DATE >= @StartDate", "APPT_STATUS_C = 2"],
+    "usp_diabetic_visits.sql (final scope — attachment per _OPEN F2-A)": [
+      "DX_CODE LIKE 'E11%'"],
+    "vw_completed_visits.sql": ["1 = 1", "APPT_STATUS_C IN (1, 2)"],
+    "usp_odd_join.sql": [],
+    "completeness": "total per tree",
+    "_witness": "join keys (col=col) are NOT membership decisions; the 1=1 IS captured here and judged by the degenerate lens"
+  },
+  "degenerate": {
+    "yield": ["vw_completed_visits.sql :: 1 = 1"],
+    "completeness": "total",
+    "_witness": "both-sides-literal; captured by the mapper, judged by the lens"
+  },
+  "join_compliance": {
+    "violations": [{
+      "file": "usp_odd_join.sql",
+      "practiced": "PATIENT <-> STAGING_LOG on LOAD_ID = PATIENT_ID",
+      "declared_path": "NONE",
+      "finding": "practiced join along no declared path — a compliance finding, not a graph edit"}],
+    "compliant_practiced": [
+      "ENCOUNTER-PATIENT (vw)", "ORG_READMIT-ENCOUNTER (vw, cross-source, declared)",
+      "_OPEN(F3-A): usp_diabetic_visits joins ENCOUNTER_DX to #Recent (a temp holding ENCOUNTER ids). Reading 1: compliance judges only DIRECT table-table ON pairs (this join is scope-mediated -> not judged). Reading 2: the lens resolves THROUGH scopes to the underlying tables (ENCOUNTER_DX-ENCOUNTER, declared, compliant). Both comply with the ratified lens text. Register row filed; expectation drafted per reading 1 UNRULED."],
+    "completeness": "total over resolved table-table ON pairs"
+  },
+  "working_set": {
+    "yield": ["simemr|dbo|ENCOUNTER", "simemr|dbo|ENCOUNTER_DX", "simemr|dbo|PATIENT",
+              "simemr|dbo|STAGING_LOG", "org|org_custom|ORG_READMIT"],
+    "not_touched": ["simemr|dbo|DX_COMMENT", "simemr|dbo|VAL_APPT_STATUS"],
+    "completeness": "total over resolved refs",
+    "_witness": "the two-denominator coverage metric's numerator: 5 of 7 dictionary tables touched"
+  },
+  "gap_census": {
+    "unresolved_refs": [{"file": "usp_odd_join.sql", "ref": "L.NOTE_TXT"}],
+    "grain_not_declared": 4, "keyless_tables": 0,
+    "unmapped_remainder": 0,
+    "unsupported_dialect_files": ["dashboard.tmdl"],
+    "completeness": "total"
+  },
+  "staleness_t0": {
+    "yield": "every F2 scope/file lacking a description artifact (nothing produced yet) = the ENTIRE produce worklist at t0",
+    "_witness": "PROD-2: the worklist IS this lens's output"
+  }
+}
