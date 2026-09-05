@@ -10,7 +10,9 @@
  },
  "rulings_applied_at_conversion": [
   "doc §KG1 grain (2026-09-04) + register D11",
-  "doc edge-direction convention (2026-09-05) + register D13"
+  "doc edge-direction convention (2026-09-05) + register D13",
+  "register A1 refined (2026-09-05)",
+  "CONTRACT_DATALOAD §3 + F1 answer key (CHECK-TL-4 catch)"
  ],
  "_open": [],
  "sheets": {
@@ -32,7 +34,7 @@
    {
     "Node kind": "db",
     "Property": "description",
-    "Required": "yes",
+    "Required": "no — RULING APPLIED at conversion (A1 refined 2026-09-05): the db is minted from the DBA registration prerequisite, never extract-derived; no extract description exists at minting. An org-supplied description may supersede later through the normal lifecycle.",
     "Shape / allowed values": "text",
     "Notes": "from the registered extract"
    },
@@ -46,7 +48,7 @@
    {
     "Node kind": "schema",
     "Property": "description",
-    "Required": "yes",
+    "Required": "no — CORRECTION APPLIED at conversion (caught by CHECK-TL-4 over the F1 build, 2026-09-05): the ratified contract has no schema-description extract part (§3: schema arrives as the per-table containment field) and the F1 answer key's schema nodes carry none. The draft row contradicted both ratified artifacts.",
     "Shape / allowed values": "text"
    },
    {

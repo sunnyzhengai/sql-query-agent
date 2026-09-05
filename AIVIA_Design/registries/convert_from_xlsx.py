@@ -87,6 +87,22 @@ PATCHES = [
       "the more stable node (doc edge-direction convention, ratified "
       "2026-09-05; register D13 CLOSED). Supersedes the xlsx 'unresolved' note."},
      "doc edge-direction convention (2026-09-05) + register D13"),
+    ("kg1_technical", "Node_Types",
+     {"Node kind": "db", "Property": "description"},
+     {"Required": "no — RULING APPLIED at conversion (A1 refined "
+      "2026-09-05): the db is minted from the DBA registration "
+      "prerequisite, never extract-derived; no extract description "
+      "exists at minting. An org-supplied description may supersede "
+      "later through the normal lifecycle."},
+     "register A1 refined (2026-09-05)"),
+    ("kg1_technical", "Node_Types",
+     {"Node kind": "schema", "Property": "description"},
+     {"Required": "no — CORRECTION APPLIED at conversion (caught by "
+      "CHECK-TL-4 over the F1 build, 2026-09-05): the ratified contract "
+      "has no schema-description extract part (§3: schema arrives as the "
+      "per-table containment field) and the F1 answer key's schema nodes "
+      "carry none. The draft row contradicted both ratified artifacts."},
+     "CONTRACT_DATALOAD §3 + F1 answer key (CHECK-TL-4 catch)"),
     ("kg2_kind_library", "Predicate_Kinds",
      {"Kind": "QUANTIFIED_COMPARE"},
      {"Roles": "subject, selection",

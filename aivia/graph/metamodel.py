@@ -54,3 +54,63 @@ def load(name: str) -> Registry:
 
 def load_all() -> Dict[str, Registry]:
     return {name: load(name) for name in REGISTRY_NAMES}
+
+
+# ---- validate side (slice 1): CHECK-TL-4 conformance ----
+# Properties satisfied structurally rather than as stored fields:
+# as_of rides every NodeVersion/Edge (the store's shape); source is the
+# identity's FIRST component (A2 — never stored as a second field).
+_STRUCTURAL = {"as_of", "source"}
+_CONTAINS_DOMAIN = {("db", "schema"), ("schema", "table"),
+                    ("table", "column")}
+
+
+def _required_by_kind(reg: Registry) -> Dict[str, List[str]]:
+    out: Dict[str, List[str]] = {}
+    for row in reg.sheets["Node_Types"]:
+        kind = row["Node kind"]
+        out.setdefault(kind, [])  # every declared kind, even all-optional
+        if row.get("Required", "").startswith("yes") \
+                and row["Property"] not in _STRUCTURAL:
+            out[kind].append(row["Property"])
+    return out
+
+
+def validate_technical_layer(store) -> List[str]:
+    """Every current KG1 node/edge validates against the ratified
+    kg1_technical registry — kinds, required properties, edge
+    endpoint domains. Returns named problems ([] = conformant)."""
+    reg = load("kg1_technical")
+    required = _required_by_kind(reg)
+    problems = []
+    kind_of: Dict[str, str] = {}
+    for node in store.current_nodes():
+        kind_of[node.identity] = node.kind
+        if node.kind == "responsibility":
+            continue  # layer 3; validated by its own registry (slice 4)
+        if node.kind not in required:
+            problems.append(f"unknown node kind '{node.kind}' "
+                            f"({node.identity})")
+            continue
+        for prop in required[node.kind]:
+            if node.properties.get(prop) in (None, "", []):
+                problems.append(
+                    f"{node.identity}: required property '{prop}' absent")
+    for edge in store.current_edges("contains"):
+        pair = (kind_of.get(edge.from_id), kind_of.get(edge.to_id))
+        if pair not in _CONTAINS_DOMAIN:
+            problems.append(f"contains {edge.from_id} -> {edge.to_id}: "
+                            f"endpoint kinds {pair} outside domain")
+    for edge in store.current_edges("joins_to"):
+        pair = (kind_of.get(edge.from_id), kind_of.get(edge.to_id))
+        if pair != ("table", "table"):
+            problems.append(f"joins_to {edge.from_id} -> {edge.to_id}: "
+                            f"endpoint kinds {pair}, must be table->table")
+        on = edge.properties.get("on")
+        if not on or any(len(pair) != 2 for pair in on):
+            problems.append(f"joins_to {edge.from_id} -> {edge.to_id}: "
+                            "'on' must be ordered [src, dest] pairs")
+        if edge.properties.get("cardinality") != "many_to_one":
+            problems.append(f"joins_to {edge.from_id} -> {edge.to_id}: "
+                            "cardinality outside closed vocab")
+    return problems
