@@ -1,0 +1,2 @@
+fk_num,ordinal,src_schema,src_table,src_column,dest_schema,dest_table,dest_column
+1,1,org_custom,ORG_READMIT,ENC_ID,dbo,ENCOUNTER,ENCOUNTER_ID

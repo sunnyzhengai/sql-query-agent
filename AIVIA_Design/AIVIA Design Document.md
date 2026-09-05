@@ -826,6 +826,39 @@ A10 send confirmation: confirm(send) requires author ∈ humans
    Maria accepts, admin confirms -> both identities forever;
    agent-only send refused.
 
+**** MVP v1 scope (ratified 2026-09-05 — a ruled route through
+the map; every exclusion recorded)
+
+Goal: deliver a full X-Ray engagement on the new architecture —
+estate in, descriptions + findings out, file-first exports landed.
+
+IN v1: Level 1 entire (store, metamodel, phi_gate, kg1_intake,
+kg2_mapper, kg3_artifacts, kg4 mint, read_api — the graph is the
+product, not scopeable) · Level 2: eleven lenses (spine
+derivations, decisions, degenerate, join-compliance, relatedness,
+working-set, gap-census, referenced-keys) · Level 3: the outward
+flow whole (inbound, produce + gates, approve, land file-first,
+materialize, run_events) · dialect: T-SQL only.
+
+DEFERRED, with reasons: the inward flow entire (no ask surface in
+an X-Ray engagement; cleanest seam) · usage ledger + expertise/
+blast-radius/demand lenses (they read the deferred ask surface) ·
+divergence, concept-drift, correspondence (they compare against
+prior state; v1 engagements are first contact) · API transport
+(file-first is the ruled order) · TMDL/Snowflake (counted
+placeholders per E5). The import law makes every deferral
+checkable: nothing in v1 imports anything deferred.
+
+Build approach (ruled): new skeleton, ported organs — the graph
+packages grow fresh (the data model changed at the foundation);
+proven components port into their mapped addresses WITH their
+test suites as porting acceptance (parser adapter, IR extractor
+reworked to the kind library, text gates + injection fixtures,
+PHI scan, bridge exporters, produce machinery). The existing repo
+keeps running untouched (the demo path) while the new build grows
+— the port manifest (per module: port | rework | new) is the
+comparison artifact, drawn from the 09-04 audit.
+
 **** Design-to-Code Protocol (Level 0 law)
 
 Six steps, in order, for every component; no step skipped:

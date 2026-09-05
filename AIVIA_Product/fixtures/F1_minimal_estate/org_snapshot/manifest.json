@@ -1,0 +1,8 @@
+{
+  "source": "org",
+  "operator": "fixture.author",
+  "db_name": "SIMDB",
+  "server": "SIMSERVER",
+  "as_of": "2026-09-01T00:00:00Z",
+  "source_pack_version": "org-pack-0.1"
+}

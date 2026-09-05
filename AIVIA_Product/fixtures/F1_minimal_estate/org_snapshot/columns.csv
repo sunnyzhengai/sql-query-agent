@@ -1,0 +1,3 @@
+schema,table,column,description
+org_custom,ORG_READMIT,ENC_ID,"The encounter being tracked."
+org_custom,ORG_READMIT,READMIT_FLAG,"Whether this encounter was a readmission."

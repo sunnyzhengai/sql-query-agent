@@ -1,0 +1,4 @@
+table,code,meaning
+VAL_APPT_STATUS,1,Scheduled
+VAL_APPT_STATUS,2,Completed
+VAL_APPT_STATUS,3,Canceled

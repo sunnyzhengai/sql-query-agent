@@ -1,0 +1,58 @@
+{
+  "_comment": "F1's AUTHORED ANSWER (hand-written before any builder exists). Identities per A2: (source, schema, table[, column]). Apply order: simemr then org.",
+  "nodes": {
+    "db": [
+      {"name": "SIMDB", "owner": "registration", "as_of": "2026-09-01T00:00:00Z",
+       "_witness": "A1: ONE db node though two extracts declare it; as_of = latest registration touch"}
+    ],
+    "schemas": [
+      {"id": "simemr|dbo", "source": "simemr", "as_of": "2026-08-01T00:00:00Z"},
+      {"id": "org|org_custom", "source": "org", "as_of": "2026-09-01T00:00:00Z"}
+    ],
+    "tables": [
+      {"id": "simemr|dbo|PATIENT", "business_name": "patient", "grain": "patient",
+       "pk_columns": ["PATIENT_ID"], "_witness": "phrase rules hit: bname+grain+pk"},
+      {"id": "simemr|dbo|ENCOUNTER", "business_name": "encounter", "grain": "patient encounter",
+       "pk_columns": ["ENCOUNTER_ID"]},
+      {"id": "simemr|dbo|ENCOUNTER_DX", "business_name": "encounter diagnosis",
+       "grain": "diagnosis on an encounter", "pk_columns": ["ENCOUNTER_ID", "LINE"],
+       "_witness": "composite pk from prose, ordered"},
+      {"id": "simemr|dbo|DX_COMMENT", "business_name": null, "grain": null, "pk_columns": null},
+      {"id": "simemr|dbo|VAL_APPT_STATUS", "business_name": null, "grain": null, "pk_columns": null},
+      {"id": "simemr|dbo|STAGING_LOG", "business_name": null, "grain": null, "pk_columns": null},
+      {"id": "org|org_custom|ORG_READMIT", "business_name": null, "grain": null, "pk_columns": null}
+    ],
+    "columns": {"_comment": "18 simemr + 2 org columns, each with its description and as_of; enumerated by the conformance check from columns.csv — descriptions verbatim",
+      "values_map": {"simemr|dbo|ENCOUNTER|APPT_STATUS_C":
+        {"1": "Scheduled", "2": "Completed", "3": "Canceled",
+         "_witness": "values via DECLARED join to a value table, keys as trimmed strings"}}}
+  },
+  "edges": {
+    "joins_to": [
+      {"from": "simemr|dbo|ENCOUNTER", "to": "simemr|dbo|PATIENT",
+       "on": [["PATIENT_ID", "PATIENT_ID"]], "cardinality": "many_to_one"},
+      {"from": "simemr|dbo|DX_COMMENT", "to": "simemr|dbo|ENCOUNTER_DX",
+       "on": [["ENCOUNTER_ID", "ENCOUNTER_ID"], ["DX_LINE", "LINE"]],
+       "cardinality": "many_to_one", "_witness": "fk_num groups the composite; ordinal orders pairs"},
+      {"from": "simemr|dbo|ENCOUNTER", "to": "simemr|dbo|VAL_APPT_STATUS",
+       "on": [["APPT_STATUS_C", "APPT_STATUS_C"]], "cardinality": "many_to_one",
+       "_witness": "fk_num 3+4 DEDUPED to one edge (double-declared value link, category column wins)"},
+      {"from": "org|org_custom|ORG_READMIT", "to": "simemr|dbo|ENCOUNTER",
+       "on": [["ENC_ID", "ENCOUNTER_ID"]], "cardinality": "many_to_one",
+       "_witness": "INTAKE-6 legal: declarer (org) owns the dependent side; cross-source join"}
+    ]
+  },
+  "gap_lists": {
+    "pk_missing": ["simemr|dbo|DX_COMMENT", "simemr|dbo|VAL_APPT_STATUS",
+                   "simemr|dbo|STAGING_LOG", "org|org_custom|ORG_READMIT"],
+    "phrase_no_match": ["simemr|dbo|DX_COMMENT", "simemr|dbo|VAL_APPT_STATUS",
+                        "simemr|dbo|STAGING_LOG", "org|org_custom|ORG_READMIT"],
+    "pending_references": []
+  },
+  "intake_expectations": {
+    "simemr": {"INTAKE-0..7": "pass", "dedup_assertion": "6 tables, 6 distinct",
+               "change_report": "7-of-7 objects created (6 tables + db/schema chain)"},
+    "org": {"INTAKE-0..7": "pass", "change_report": "org_custom chain + 1 table created; db node NOT re-created (A1)"}
+  },
+  "rebuild_expectation": "applying both snapshots twice in the same order yields a deep-equal graph (LC-S3 idempotence, CHECK-TL-3)"
+}
