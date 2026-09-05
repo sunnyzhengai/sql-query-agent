@@ -1,0 +1,28 @@
+{
+  "_comment": "AUTHORED approve + land expectations. Script: steward maria accepts the #Recent description; admin confirms one send to a catalog.",
+
+  "approve_script": [
+    {"act": "disposition", "author": "person:maria", "ruling": "accept",
+     "about": "description artifact of usp_diabetic_visits.sql::#Recent"}],
+  "derived_after_approve": {
+    "standing(#Recent description)": "accepted",
+    "ownership(#Recent description)": "human — via accepting disposition, though every version is machine-authored (the certification-without-edit branch of the ownership lens)",
+    "pipeline_behavior": "future produce versions for this target render as PROPOSED, never current",
+    "refusal_case": "a disposition authored by an agent identity -> REFUSED (LC3-C3)"
+  },
+
+  "land_script": [
+    {"act": "render", "target_system": "catalog_a",
+     "expect": "native columns only; ZERO custom attributes; machine text definitions open with the attribution prefix"},
+    {"act": "send", "human_confirmation": "person:admin",
+     "expect_order": "proposal SENT event lands BEFORE transport (LAND-3)",
+     "expect_event": {"author": "person:admin", "about": "the accepted artifact version"}},
+    {"act": "observe", "expect_event": {"kind": "observed", "outcome": "published",
+     "about": "the sent event"}}],
+  "derived_after_land": {
+    "current_outcome(the proposal)": "published (latest observation)",
+    "anti_repeat": "a re-send of the SAME artifact version -> refused by LAND-2 unless a new version exists",
+    "refusal_case": "send without accepting disposition OR without human confirmation -> refused (LAND-1/B4)"
+  },
+  "_OPEN": "F5-A: the rendered export's exact column sets per target system are build-slice bindings (the term-propose native sets are the ratified precedent); expectations here assert the RULES (zero custom attrs, prefix), not final headers."
+}
