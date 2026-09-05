@@ -149,8 +149,12 @@ KG Layer 2 — logic layer (one tree per SQL file)       [ratified]
        [axm:B3, axm:R1]
     -- single writer, regenerable: only the mapper writes this
        layer; trees are derived artifacts, rebuilt from source
-       files + KG layer 1 alone, never hand-edited
-       [axm:D3, axm:S3]
+       files + KG layer 1 alone, never hand-edited. Rebuild
+       SUPERSEDES, never deletes (the one-law ruling, 2026-09-05):
+       a re-parse appends the new tree version and retires the
+       prior; current is derived; retired nodes remain valid
+       targets for layer-3 attachments and basis citations
+       [axm:D3, axm:S3, axm:R4]
     -- metamodel conformance: every node and edge validates
        against the versioned registry; kinds are closed; a new
        kind goes doc -> registry -> code, never code-first
@@ -605,8 +609,25 @@ The CHANGE pass — what survives change            [in design]
   the named thing; content keys are DRIFT EVIDENCE, not identity.
   S1's expected outcome (survives the edit, gets flagged) is
   exactly name-keyed identity + content-drift detection.
-- Open in this pass: S2 orphan semantics · S3 retention ·
-  S4 correspondence rule · S5 staleness economics
+- RULING (2026-09-05, Sunny's call — the one law): NOTHING IN THE
+  GRAPH IS EVER PHYSICALLY DELETED. Change supersedes; current is
+  derived; retired nodes remain valid targets. A re-parse appends
+  the new tree version and retires the prior (valid_to); same for
+  extract succession (which already ruled this for layer 1). The
+  whole graph is append-and-supersede with derived current —
+  layers differ only in AUTHORITY (rebuildable from source vs
+  irreplaceable), never in mutation style. Industry basis: SCD
+  Type 2; catalog soft-delete (consumers hold references into
+  us); event-sourced projections. Known cost, accepted: storage
+  grows monotonically — trivial at metadata scale.
+  CONSEQUENCES: S2 CLOSED — no orphans exist; artifacts attached
+  to a retired node surface in the steward queue ("attached to
+  retired scope") with similarity candidates; re-attachment stays
+  a human disposition. S3 REDUCED to a retention line: retained
+  versions ARE the evidence basis cites; default retention
+  forever; pruning is a ruled act, never automatic.
+- Open in this pass: S4 correspondence rule · S5 staleness
+  economics
 
 **** Design-to-Code Protocol (Level 0 law)
 
