@@ -122,7 +122,7 @@
           "APPT_STATUS_C"
         ]
       ],
-      "_witness": "the referenced-keys LENS (derived from inbound joins_to; never stored): total over referenced tables; leaves (DX_COMMENT, STAGING_LOG, ORG_READMIT) honestly absent"
+      "_witness": "the referenced-keys LENS (derived from inbound joins_to; never stored): total over referenced tables; leaves (DX_COMMENT, STAGING_LOG, ORG_READMIT) honestly absent. ENCOUNTER now has TWO inbound groups (ORG_READMIT and ENCOUNTER_DX) referencing ONE column-set -> one distinct key: the lens yields distinct sets, not one row per FK"
     }
   },
   "edges": {
@@ -177,6 +177,18 @@
         ],
         "cardinality": "many_to_one",
         "_witness": "INTAKE-6 legal: declarer (org) owns the dependent side; cross-source join"
+      },
+      {
+        "from": "simemr|dbo|ENCOUNTER_DX",
+        "to": "simemr|dbo|ENCOUNTER",
+        "on": [
+          [
+            "ENCOUNTER_ID",
+            "ENCOUNTER_ID"
+          ]
+        ],
+        "cardinality": "many_to_one",
+        "_witness": "Sunny's fixture catch: the documented parent relationship, now declared"
       }
     ]
   },
