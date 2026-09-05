@@ -704,6 +704,31 @@ The EDGES pass — the system's outer boundary       [ratified]
   declares completeness.
 - PASS CLOSED: E1-E5 pass by construction; H3, H4, H5 closed.
 
+The SAFETY pass — PHI and residency                [ratified]
+- Scenarios blessed 2026-09-05: SF1 the MRN in a WHERE clause ·
+  SF2 the patient name in a question · SF3 the late discovery.
+- RULING 1 (the PHI boundary): all inbound text — estate files at
+  acquisition, inquiry text at event landing — passes the PHI
+  scan/redact gate BEFORE entering any layer; redactions counted,
+  never silent; the layer-2 evidence law is amended one word:
+  verbatim-AFTER-REDACTION. PHI never stored is PHI never voiced.
+  Checks: SAFE-1 both doors gated · SAFE-2 redactions counted.
+- RULING 2 (the ONE exception to the one law, stated narrowly):
+  for late-discovered PHI or a legal obligation, a RULED
+  REDACTION ACT may destroy content in place — human-confirmed
+  [axm:B4], scoped to the offending field — and it appends a
+  permanent REDACTION EVENT (who, why, what shape was removed,
+  never the content). The content dies; the fact that it died is
+  forever. Boundary-first means this path should almost never
+  run; a design with no lawful path forces improvisation on the
+  worst day. Check: SAFE-3 — redaction acts are human-ruled,
+  tombstoned, and the ONLY destruction path in the codebase.
+- RULING 3 (tenancy, H11): one graph = one org, resident in the
+  customer's tenant; nothing crosses out except de-identified
+  aggregates, by explicit decision — the intake report's
+  residency clause generalized. Check: SAFE-4 egress census.
+- PASS CLOSED: SF1-SF3 pass by construction; H6, H11 closed.
+
 **** Design-to-Code Protocol (Level 0 law)
 
 Six steps, in order, for every component; no step skipped:
