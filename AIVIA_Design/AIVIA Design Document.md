@@ -653,6 +653,34 @@ The CHANGE pass — what survives change            [ratified]
 - PASS CLOSED: S1-S5 all pass by construction against the
   ratified rulings.
 
+The EDGES pass — the system's outer boundary       [in design]
+- Scenarios blessed 2026-09-05:
+    E1 day one: the SQL estate arrives → a REGISTERED estate
+       source; every in-scope file acquired ⊎ counted-excluded;
+       nothing silently skipped
+    E2 nightly refresh: changed file → supersede; deleted file →
+       retire; cadence is a registered property
+    E3 the report: blast-radius must answer "what breaks?"
+       including reports — or narrow honestly (forces H4)
+    E4 the unanswerable question: demand captured; "top
+       unanswered questions" answerable later; inquiry shape
+       ruled here, PHI treatment deferred to the SAFETY pass
+       (recorded coupling)
+    E5 the non-SQL file: counted unsupported-dialect with its
+       placeholder named — conservation at estate grain
+- RULING (2026-09-05, H3 — the estate source contract, the
+  inbound door's twin): a registered estate source = (org, kind,
+  location/scope declaration, declared dialect(s), cadence),
+  producing SELF-CONTAINED SNAPSHOTS identified by (source,
+  as_of). File identity = stable source path (the name-key layer
+  2 already uses). Scope conservation: acquired ⊎ counted-
+  excluded (reason: out-of-scope | unsupported dialect |
+  unreadable). Succession per the one law: changed supersedes,
+  absent retires, the change report says so. Intake checks mirror
+  INTAKE-0..7. Deliberately the same shape as CONTRACT_DATALOAD —
+  the two inbound doors are the same door twice.
+- Open in this pass: H4 consumption · H5 no-match demand
+
 **** Design-to-Code Protocol (Level 0 law)
 
 Six steps, in order, for every component; no step skipped:
