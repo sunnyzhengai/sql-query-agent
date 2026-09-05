@@ -1,8 +1,9 @@
 """Registry validator — the embryo of binding mechanisms a and b.
 
 (a) stamp discipline: every registry carries a complete stamp block;
-    the doc-stamp compare is reported NOT-RUNNABLE until the doc's
-    sections carry version stamps (Sunny action), never silently skipped.
+    LIVE since the ratification pass (2026-09-05) — every registry
+    version must match its [registry stamp: ...] marker in the doc,
+    and only ratified registries may exist here.
 (b) rule-to-check closure: every rule row in every Rules_to_Checks
     sheet names at least one check — "a rule with no check is a hope"
     as arithmetic. The explicit design-review exception is honored only
@@ -15,8 +16,8 @@ kind list identical to the kind library's.
 
 Usage: python3 AIVIA_Design/registries/validate_registries.py
 """
-import json
 import glob
+import json
 import os
 import re
 import sys
@@ -42,8 +43,24 @@ STAMP_FIELDS = {"version", "doc_section", "doc_stamp", "ratified",
 rule("RG-A1 stamp block complete",
      [f"{n}: missing {STAMP_FIELDS - set(r.get('stamp', {}))}"
       for n, r in regs.items() if STAMP_FIELDS - set(r.get("stamp", {}))])
-NR.append("RG-A2 doc-stamp compare — the design doc's sections carry no "
-          "version stamps yet (Sunny action); compare runs once they do")
+
+# mechanism a LIVE (ratification pass done 2026-09-05): every registry's
+# version must appear as a [registry stamp: ...] marker in the doc
+doc_text = open(os.path.join(os.path.dirname(BASE),
+                             "AIVIA Design Document.md")).read()
+doc_stamps = {}
+for block in re.findall(r"\[registry stamps?: ([^\]]+)\]", doc_text):
+    for part in block.split("·"):
+        name, _, ver = part.strip().rpartition(" v")
+        doc_stamps[name] = ver
+rule("RG-A2 doc-stamp compare (same-breath rule as mechanics)",
+     [f"{n}: registry v{r['stamp']['version']} vs doc "
+      f"{'v' + doc_stamps[n] if n in doc_stamps else 'UNSTAMPED'}"
+      for n, r in regs.items()
+      if doc_stamps.get(n) != r["stamp"]["version"]])
+rule("RG-A3 ratified registries only",
+     [f"{n}: ratified={r['stamp']['ratified']}" for n, r in regs.items()
+      if r["stamp"]["ratified"] is not True])
 
 # mechanism b: rule-to-check closure
 bad = []

@@ -1,10 +1,10 @@
 {
  "registry": "lenses",
  "stamp": {
-  "version": "0.2-draft",
+  "version": "1.0.0",
   "doc_section": "Level 2 — lenses",
-  "doc_stamp": "NOT YET STAMPED — Sunny action: doc sections carry no version stamps; compare is NOT-RUNNABLE until they do",
-  "ratified": false,
+  "doc_stamp": "v1.0.0 (ratified 2026-09-05, Sunny)",
+  "ratified": true,
   "converted_on": "2026-09-05",
   "converted_from": "L2_Lenses_Registry_DRAFT.xlsx"
  },

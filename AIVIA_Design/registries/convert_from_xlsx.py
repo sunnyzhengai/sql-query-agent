@@ -39,7 +39,11 @@ SOURCES = {
     "flows": ("L3_Flows_Registry_DRAFT.xlsx", "Level 3 — the flows"),
 }
 
-STAMP_VERSION = "0.2-draft"  # xlsx were 0.1/0.2; this conversion is one step
+# Ratification pass DONE 2026-09-05 (Sunny): drafts 0.1/0.2 -> 1.0.0,
+# ratified flips true, doc headings stamped the same breath.
+STAMP_VERSION = "1.0.0"
+RATIFIED = True
+DOC_STAMP = "v1.0.0 (ratified 2026-09-05, Sunny)"
 CONVERTED_ON = "2026-09-05"
 
 
@@ -365,9 +369,8 @@ def convert():
             "stamp": {
                 "version": STAMP_VERSION,
                 "doc_section": doc_section,
-                "doc_stamp": "NOT YET STAMPED — Sunny action: doc sections "
-                "carry no version stamps; compare is NOT-RUNNABLE until they do",
-                "ratified": False,
+                "doc_stamp": DOC_STAMP,
+                "ratified": RATIFIED,
                 "converted_on": CONVERTED_ON,
                 "converted_from": xlsx,
             },

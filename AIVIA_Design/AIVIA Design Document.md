@@ -17,6 +17,7 @@ CONTAINMENT edges point parent → child. Both layers already obey
 this; it is now law, not accident.
 
 KG Layer 1 — source dictionaries technical layer      [ratified]
+      [registry stamp: kg1_technical v1.0.0]
       L1 companions: Technical_Layer_Registry, CONTRACT_DATALOAD
 - Node types: 
     -- db
@@ -88,6 +89,7 @@ KG Layer 1 — source dictionaries technical layer      [ratified]
    -- source inheritance: a schema belongs to exactly one source; tables/columns inherit source from the containment chain; a mixed schema is the recorded trigger to push source down a level.
 
 KG Layer 2 — logic layer (one tree per SQL file)       [ratified]
+      [registry stamp: kg2_logic v1.0.0 · kg2_kind_library v1.0.0]
       L1 companions: Logic_Layer_Registry (subsumes the mapper's
       seam contract), Kind_Library_TSQL_Predicates
 - The unit (ruled 2026-09-04): the whole FILE is one tree. All
@@ -190,6 +192,7 @@ KG Layer 2 — logic layer (one tree per SQL file)       [ratified]
        and audit, not re-parsing) [axm:S1, axm:M5; = spec:G5 in
        the code record]
 KG Layer 3 — artifact layer                            [ratified]
+      [registry stamp: kg3_artifacts v1.0.0]
       L1 companions: Artifact_Layer_Registry
 - The defining property: NOT regenerable. Layers 1-2 rebuild from
   sources; this layer holds human judgment and gated machine
@@ -349,6 +352,7 @@ KG Layer 3 — artifact layer                            [ratified]
 - Forward note [axm:B4] — DELIVERED: the LAND stage carries the
   human-confirmation clause.
 KG Layer 4 — concept layer                             [ratified]
+      [registry stamp: kg4_concepts v1.0.0]
       L1 companions: Concept_Layer_Registry
 - The founding ruling (Sunny, 2026-09-04, option c): THE LENS
   COMPUTES; A HUMAN TOUCH MINTS. Relatedness (same-name families,
@@ -386,6 +390,7 @@ KG Layer 4 — concept layer                             [ratified]
        they share layer 3's non-regenerable nature [axm:R4]
     -- metamodel conformance [axm:S2, axm:D4]
 **** Level 2 — lenses [read level 1, write nothing]
+      [registry stamp: lenses v1.0.0]
 
 Lenses                                                 [ratified]
       L2 companions: Lenses_Registry
@@ -447,6 +452,7 @@ Lenses                                                 [ratified]
   ruling from layers 2-4 has its lens; no lens lacks a ratified
   origin.
 **** Level 3 — the flows [orchestrate: read via level 2, write via level 1's contracts]
+      [registry stamp: flows v1.0.0]
 
 The flows                                              [ratified]
       L3 companions: Flows_Registry

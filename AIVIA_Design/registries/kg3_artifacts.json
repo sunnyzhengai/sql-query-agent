@@ -1,10 +1,10 @@
 {
  "registry": "kg3_artifacts",
  "stamp": {
-  "version": "0.2-draft",
+  "version": "1.0.0",
   "doc_section": "Level 1 / KG Layer 3 — artifact layer",
-  "doc_stamp": "NOT YET STAMPED — Sunny action: doc sections carry no version stamps; compare is NOT-RUNNABLE until they do",
-  "ratified": false,
+  "doc_stamp": "v1.0.0 (ratified 2026-09-05, Sunny)",
+  "ratified": true,
   "converted_on": "2026-09-05",
   "converted_from": "L1_KG3_Artifact_Layer_Registry_DRAFT.xlsx"
  },
