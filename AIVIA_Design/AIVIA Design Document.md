@@ -679,7 +679,17 @@ The EDGES pass — the system's outer boundary       [in design]
   absent retires, the change report says so. Intake checks mirror
   INTAKE-0..7. Deliberately the same shape as CONTRACT_DATALOAD —
   the two inbound doors are the same door twice.
-- Open in this pass: H4 consumption · H5 no-match demand
+- RULING (2026-09-05, H4 — consumption): NOT a new layer. Reports
+  are estate files in a placeholder dialect (TMDL), entering
+  through the registered estate source; consumption edges are
+  resolves_to from report trees — to L1 tables (DirectLake) or to
+  L2 FILE nodes (proc-backed datasets; a new resolves_to target,
+  ruled now so the mapper needs no design change later). UNTIL
+  the TMDL mapper is built: report files land as counted
+  unsupported-dialect (E5's law), and the blast-radius lens
+  DECLARES its completeness as people-only — honest narrowing,
+  visible in every result [axm:B3].
+- Open in this pass: H5 no-match demand
 
 **** Design-to-Code Protocol (Level 0 law)
 
