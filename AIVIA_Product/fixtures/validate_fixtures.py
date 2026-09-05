@@ -228,9 +228,28 @@ bad = [k for k in dec_keys
        if "::" in k and k not in scope_keys and "OPEN" not in k
        and not k.endswith(".sql")]
 rule("F3", "GV-A2 decisions keys reference existing scopes", bad)
+# GV-D1 compliant_practiced paths must each name a declared F1 edge
+declared_ft = {(frm, to) for (frm, to, _) in csv_e}
+bad = []
+for c in f3["join_compliance"]["compliant_practiced"]:
+    frm, _, to = c["declared_path"].partition(" -> ")
+    if (frm, to) not in declared_ft and (to, frm) not in declared_ft:
+        bad.append(f"{c['file']}: {c['declared_path']} not a declared edge")
+rule("F3", "GV-D1 compliant paths exist in declared edges", bad)
+# ruled 2026-09-05: both-sides-literal predicates (1=1, 0=0) are NOT
+# membership decisions — degenerate lens only, never in membership yield
+LIT = re.compile(r"^\s*(\d+|'[^']*')\s*(=|<>|!=|<=|>=|<|>)\s*(\d+|'[^']*')\s*$")
+bad = [f"{k}: {p}" for k in dec_keys
+       for p in f3["decisions_membership"][k] if LIT.match(p)]
+rule("F3", "GV-B degenerate literals excluded from membership", bad)
 
 # ---------- F4 ----------
 f4 = json.load(open(BASE + "F4_produce/expected_produce.json"))
+# PROD-2: staleness_t0 yield IS the produce worklist — must equal F4 targets
+st = set(f3["staleness_t0"]["yield"])
+tg = set(f4["targets"])
+rule("F3", "PROD-2 staleness_t0 yield == F4 targets",
+     [f"mismatch: {st ^ tg}"] if st != tg else [])
 GATE = {"gate_passed", "skeleton_floor", "flagged"}
 bad = []
 for t, spec in f4["targets"].items():

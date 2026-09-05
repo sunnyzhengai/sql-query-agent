@@ -9,19 +9,18 @@
       "DX_CODE LIKE 'E11%'"
     ],
     "vw_completed_visits.sql::delivery": [
-      "1 = 1",
       "APPT_STATUS_C IN (1, 2)"
     ],
     "usp_odd_join.sql::delivery": [],
     "completeness": "total per tree",
-    "_witness": "join keys (col=col) are NOT membership decisions; the 1=1 IS captured here and judged by the degenerate lens"
+    "_witness": "join keys (col=col) are NOT membership decisions; both-sides-literal predicates (1=1, 0=0) are NOT membership either — routed to the degenerate lens only (ruled 2026-09-05)"
   },
   "degenerate": {
     "yield": [
       "vw_completed_visits.sql :: 1 = 1"
     ],
     "completeness": "total",
-    "_witness": "both-sides-literal; captured by the mapper, judged by the lens"
+    "_witness": "both-sides-literal; the ONLY place these land — never counted toward membership yield (ruled 2026-09-05)"
   },
   "join_compliance": {
     "violations": [
@@ -33,8 +32,17 @@
       }
     ],
     "compliant_practiced": [
-      "ENCOUNTER-PATIENT (vw)",
-      "ORG_READMIT-ENCOUNTER (vw, cross-source, declared)"
+      {
+        "file": "vw_completed_visits.sql",
+        "practiced": "ENCOUNTER <-> PATIENT on PATIENT_ID = PATIENT_ID",
+        "declared_path": "simemr|dbo|ENCOUNTER -> simemr|dbo|PATIENT"
+      },
+      {
+        "file": "vw_completed_visits.sql",
+        "practiced": "ORG_READMIT <-> ENCOUNTER on ENC_ID = ENCOUNTER_ID",
+        "declared_path": "org|org_custom|ORG_READMIT -> simemr|dbo|ENCOUNTER",
+        "_witness": "cross-source; the declarer (org) owns the dependent side"
+      }
     ],
     "completeness": "direct table-table ON pairs ONLY; scope-mediated joins not judged (A12 deferral, declared on every result)",
     "not_judged": [
@@ -72,7 +80,17 @@
     "completeness": "total"
   },
   "staleness_t0": {
-    "yield": "every F2 scope/file lacking a description artifact (nothing produced yet) = the ENTIRE produce worklist at t0",
-    "_witness": "PROD-2: the worklist IS this lens's output"
+    "yield": [
+      "usp_diabetic_visits.sql::#Recent",
+      "usp_diabetic_visits.sql::delivery",
+      "vw_completed_visits.sql::delivery",
+      "usp_odd_join.sql::delivery"
+    ],
+    "rule": "every F2 scope lacking a description artifact (nothing produced yet) = the ENTIRE produce worklist at t0",
+    "not_on_worklist": [
+      "dashboard.tmdl: unsupported dialect (gap_census), no scopes to produce against"
+    ],
+    "completeness": "total",
+    "_witness": "PROD-2: the worklist IS this lens's output; must equal F4 targets exactly"
   }
 }
