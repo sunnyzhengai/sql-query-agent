@@ -653,7 +653,7 @@ The CHANGE pass — what survives change            [ratified]
 - PASS CLOSED: S1-S5 all pass by construction against the
   ratified rulings.
 
-The EDGES pass — the system's outer boundary       [in design]
+The EDGES pass — the system's outer boundary       [ratified]
 - Scenarios blessed 2026-09-05:
     E1 day one: the SQL estate arrives → a REGISTERED estate
        source; every in-scope file acquired ⊎ counted-excluded;
@@ -689,7 +689,20 @@ The EDGES pass — the system's outer boundary       [in design]
   unsupported-dialect (E5's law), and the blast-radius lens
   DECLARES its completeness as people-only — honest narrowing,
   visible in every result [axm:B3].
-- Open in this pass: H5 no-match demand
+- RULING (2026-09-05, H5 — no-match demand): the asked usage
+  event gains outcome (matched | ambiguous | no-match — the match
+  stage's own closed set) and, on matched/ambiguous, about → the
+  candidate node(s); on no-match, NO about edge — nothing was
+  touched, and the absence IS the fact. The inquiry TEXT rides
+  the asked event as payload (the only place demand content can
+  live); its PHI treatment is an explicit SAFETY-pass obligation
+  on this field. "Top unanswered questions" = the DEMAND lens
+  (catalog #18): no-match asked events → clustered themes +
+  counts, feeding generate offers and governance priority. Not an
+  inquiry class: demand IS usage — one ledger, never two.
+  Checks: MATCH-1 amended (asked carries outcome); DEMAND lens
+  declares completeness.
+- PASS CLOSED: E1-E5 pass by construction; H3, H4, H5 closed.
 
 **** Design-to-Code Protocol (Level 0 law)
 
