@@ -775,6 +775,57 @@ ALL FOUR PASSES CLOSED (2026-09-05): the open register stands at
 hardened: every room ratified, every seam contracted, every
 lifecycle contracted, every hole ruled.
 
+The AMBIGUITY rulings (A1-A10, ruled 2026-09-05, model-first;
+witness examples abbreviated — full cases in the register)
+
+A1 containers: mint(db) := by the REGISTRATION, source-neutral;
+   each source asserts only its schemas downward. Domain: every
+   db any extract names. Witness: epic + org both name CLARITY ->
+   one node, schemas owned per source.
+A2 identity: id_L1 := (source, schema, table[, column]); db is a
+   property. match(a,b) := fold_upper(strip_brackets_quotes(a)) =
+   fold_upper(strip_brackets_quotes(b)); values keys compare as
+   trimmed strings. Total over all references. Witness: db rename
+   -> zero identity changes; pat_enc -> PAT_ENC; 3 matches "3".
+A3 scope keys: key(scope_i) := file :: name        if i = 1st
+   occurrence of name in file order; file :: name#i otherwise.
+   Total over all scopes w/ names. Branch (explicit, counted):
+   removing occurrence 1 retires ALL keys of that name; survivors
+   re-mint; displaced attachments surface for re-attach. Witness:
+   two WITH Base -> Base, Base#2; edit elsewhere changes neither.
+A4 attachment domain: about-targets := named nodes only (file,
+   named scope, KG1 nodes, layer-3 citizens, concepts). Unnamed
+   nodes are outside the domain — not a branch, a domain bound.
+   Witness: subquery logic is described at its named ancestor.
+A5 asked edges: edges(outcome) := {matched -> about(the node),
+   ambiguous -> none, no-match -> none}. Total over the closed
+   outcome set. The pick lands as confirmed(about chosen).
+   Witness: 5 candidates + pick -> one expertise touch.
+A6 current: current(A) := max(versions(A))            if
+   ownership(A) = machine; max({v : human_authored(v) or
+   accepted(v)})                                       otherwise.
+   Non-empty by construction: human ownership derives from such a
+   v existing. Witness: m1,h2,m3 -> h2; accept(m3) -> m3.
+A7 retention: retained := every ACCEPTED snapshot, in the
+   customer-tenant store (durability's backed-up asset). rebuild
+   := from retained (byte-identical); a fresh extract is a NEW
+   SUPERSESSION, never called rebuild. Witness: year-2 rebuild
+   from 2026-08 snapshot reproduces the graph exactly.
+A8 pending references: legality(declared join) checks the
+   DECLARER's ownership only; target_exists ∈ {yes -> edge,
+   no -> counted pending set}; pending resolves on target
+   arrival. Total; no intake order exists. Witness: org-first ->
+   pending 1; epic arrives -> pending 0.
+A9 run accounting: accounting(run) := one conservation line PER
+   CLASS attempted; killed-lines exists only where the class's
+   gate drops sentences. Witness: 42 desc + 3 noms -> two lines.
+A10 send confirmation: confirm(send) requires author ∈ humans
+   (never agents) ∧ recorded on the sent event; role qualification
+   := the org's role model (their workflow owns promotion) — an
+   INTENT judgment, declared as such [clause pt 3]. Witness:
+   Maria accepts, admin confirms -> both identities forever;
+   agent-only send refused.
+
 **** Design-to-Code Protocol (Level 0 law)
 
 Six steps, in order, for every component; no step skipped:
@@ -797,21 +848,24 @@ beside it (L1_* files, named for the Level-1 section they attach
 to); the doc holds WHAT and the rules, the companions hold the
 machine-readable and test-facing detail.
 
-The Disambiguation clause (ratified 2026-09-05 — ambiguity dies
-in examples and procedures, never in more prose):
-1. DECIDING EXAMPLES: a rule is ratifiable only with at least one
-   deciding example — a concrete case + its single expected
-   outcome, landed beside the rule. Prose and example must agree;
-   the example wins disputes.
-2. SELECTION AS PROCEDURE: any rule that picks — "current",
-   "stable", "corresponds", "owns" — states its selection as a
-   deterministic procedure (or names the lens/function embodying
-   it), never as an adjective.
-3. TWO-READINGS ESCALATION (the HITL law): anyone — human or
-   build agent — finding a point where two readings both comply
-   must NOT choose. Both readings land as a register row; the
-   ruling is Sunny's. An implementer's uncertainty is a register
-   row, not a decision [axm:R3 applied to design gaps].
+The Disambiguation clause (ratified 2026-09-05; AMENDED same day
+— models first, Sunny's totality ruling):
+1. MODEL FIRST: every rule is stated as a mathematical definition
+   — a TOTAL mapping over a declared domain: every input case
+   covered; partiality only as an explicit, counted branch, never
+   silence [axm:J2 — mathematical definition is MANDATORY for
+   computable judgments].
+2. EXAMPLES ARE WITNESSES, never definitions: one deciding example
+   per rule remains mandatory, but it TESTS the model (and becomes
+   a fixture at build). The model decides cases; the example
+   checks the model; a disagreement between them is the finding.
+3. THE TYPED EXCEPTION: linguistic/intent judgments [axm:J2 types]
+   admit no total model BY TYPE — there, examples + measurement
+   protocols + HITL carry the rule, and the rule DECLARES its
+   type. Misfiling in either direction is the violation.
+4. TWO-READINGS ESCALATION (the HITL law): two compliant readings
+   = a register row, never a choice. The ruling is Sunny's
+   [axm:R3 applied to design gaps].
 
 Binding mechanisms (ratified 2026-09-04 — what makes steps 2-3
 physics instead of discipline; all build deferred with the rest):
