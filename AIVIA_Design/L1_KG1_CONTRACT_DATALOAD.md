@@ -187,3 +187,26 @@ build. Deferred-to-build with reason: file-format minutiae
   demoted to opportunistic, referenced_keys promoted to primary
 - ~~AIVIA_Design/ tracking~~ — CLOSED 2026-09-04: tracked in git;
   AIVIA_Protected/ stays local-only
+
+## 11. Node lifecycle contract (ratified 2026-09-05)
+
+One actor, period: the EXTRACT BUILDER, acting only on a registered
+extract intake. Under the one law there is no update (SUPERSEDE)
+and no delete (RETIRE).
+
+| Action | Trigger | Postconditions | Tests |
+|---|---|---|---|
+| CREATE | object in a registered extract, not in graph | metamodel conformance (structured values map, ordered pk_columns); as_of + extract identity; containment chain complete; source inherited; missing pk -> gap row, never guessed | LC-C1 minimal extract -> authored nodes (F1) · LC-C2 keyless table -> node + gap row · LC-C3 orphan column (no parent) -> refused + counted, not half-created |
+| SUPERSEDE | object changed in a new extract | never in place: new version appended, prior retired (valid_to = new as_of); identity (db.schema.table) stable; change-report row; prior version still resolvable (basis + resolves_to bind to IDENTITY, not version); dependent staleness derivable | LC-S1 changed description -> two versions, current derived, change row · LC-S2 artifact citing prior still resolves · LC-S3 unchanged object -> NO new version (idempotent) |
+| RETIRE | object absent from the new extract | marked retired, never removed; inbound references stay valid; change-report row; attached artifacts surface in the steward queue | LC-R1 dropped table -> retired + flag + attachments surfaced · LC-R2 retired readable, excluded from current |
+| READ | anyone (lenses, L2 resolver) | completeness declared; current-vs-including-retired is an explicit parameter, never a default surprise | LC-D1 current excludes retired; full read includes with status |
+
+Forbidden paths, each structurally checked: any second writer
+(LC-F1 writer census) · in-place mutation (LC-F2 no update op
+exists) · physical delete (LC-F3 no delete op exists) · hand-typed
+content (LC-F4 every version traces to an extract id) · partial
+intake (LC-F5 an extract applies atomically or not at all).
+
+This table is the TEMPLATE: the same lifecycle exercise repeats
+for layers 2 and 3 (their tables live in the design doc / their
+registries).
