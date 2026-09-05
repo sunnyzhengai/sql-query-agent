@@ -171,7 +171,9 @@
                   "_witness": "IN_LIST vs IN_SELECTION decided STRUCTURALLY (no subquery_ref child)"
                 }
               ]
-            }
+            },
+            "name_key": "vw_completed_visits.sql::delivery",
+            "_witness": "A11: the file's single result-set emitter -> ::delivery"
           },
           "statement_kind": "SELECT"
         }
@@ -206,7 +208,9 @@
                 "kind": "COMPARE_EQ",
                 "note": "L.LOAD_ID = P.PATIENT_ID \u2014 a PRACTICED table-table join along NO declared path; the JOIN-COMPLIANCE LENS's expected violation"
               }
-            ]
+            ],
+            "name_key": "usp_odd_join.sql::delivery",
+            "_witness": "A11: the file's single result-set emitter -> ::delivery"
           },
           "statement_kind": "SELECT"
         }
