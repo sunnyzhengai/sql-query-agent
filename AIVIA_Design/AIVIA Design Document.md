@@ -729,6 +729,39 @@ The SAFETY pass — PHI and residency                [ratified]
   residency clause generalized. Check: SAFE-4 egress census.
 - PASS CLOSED: SF1-SF3 pass by construction; H6, H11 closed.
 
+The SCALE/OPS pass — envelope and failure          [ratified]
+- Scenarios blessed 2026-09-05: SO1 the 39k-table estate · SO2
+  the run that dies at artifact 200 of 460 · SO3 the question
+  during the batch.
+- RULINGS (2026-09-05, H9 + H10):
+    -- the ENVELOPE is registry data, not vibes — calibration
+       targets (revalidated at first build measurements): estates
+       to ~50k tables / ~100k columns / low-thousands of files;
+       trees to ~10M nodes; interactive surfaces in seconds;
+       batch sweeps in minutes-to-hours, budgeted per S5
+    -- lens MATERIALIZATION MODE declared per lens: on-demand
+       (cheap derivations) | materialized (estate-scale sweeps —
+       relatedness, working-set, gap-census, demand); a
+       materialized result is a REGENERABLE report surface
+       stamped with lens version + graph state — a cache with a
+       birth certificate, never a second truth
+    -- run events carry outcome (completed | aborted + progress);
+       PER-ARTIFACT ATOMICITY (an artifact lands whole or not at
+       all); RESUME = the staleness worklist — landed artifacts
+       fall out of it, so no checkpoint machinery exists
+    -- readers never block on writers (append-only makes this
+       nearly free); a consistent read = a graph-state stamp
+  Checks: OPS-1 materialized surfaces regenerable + stamped ·
+  OPS-2 no partial artifacts · OPS-3 aborted + rerun = identical
+  end state to one completed run · OPS-4 envelope numbers in the
+  registry, cited by capacity tests.
+- PASS CLOSED: SO1-SO3 pass by construction; H9, H10 closed.
+
+ALL FOUR PASSES CLOSED (2026-09-05): the open register stands at
+15/15 drifts and 11/11 holes closed. The Level-1 design is
+hardened: every room ratified, every seam contracted, every
+lifecycle contracted, every hole ruled.
+
 **** Design-to-Code Protocol (Level 0 law)
 
 Six steps, in order, for every component; no step skipped:
