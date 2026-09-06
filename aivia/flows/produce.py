@@ -1,7 +1,7 @@
 """Outward stage 1: PRODUCE — graph -> layer-3 machine versions.
 
-The floor composer implements the RATIFIED Floor Grammar v1.0.0
-(AIVIA_Design/Floor_Grammar.md) rule by rule; the grammar version
+The floor composer implements the RATIFIED Floor Grammar
+(AIVIA_Design/Floor_Grammar.md, FLOOR_GRAMMAR_VERSION) rule by rule; the grammar version
 stamps into every run's basis. The staleness lens IS the worklist
 (PROD-2) — nobody hand-picks; ECON v1 (aivia/flows/econ_params.json,
 ruled 2026-09-05) paces it: batch, budget, usage-weighted priority
@@ -24,7 +24,7 @@ from aivia.lenses import decisions, derivation
 
 ECON = json.loads((pathlib.Path(__file__).parent / "econ_params.json")
                   .read_text())
-FLOOR_GRAMMAR_VERSION = "1.0.0"
+FLOOR_GRAMMAR_VERSION = "1.1.0"
 _PREPOSITIONS = ("of", "on", "per", "for", "in", "at", "by", "with")
 
 
@@ -194,14 +194,37 @@ def compose_floor(read: ReadApi, target: str) -> str:
         lines = [f"This is a selection of {_pluralize(lead_grain)}."]
     else:
         lines = ["This is a selection of records."]
-    # R2 + R6 — one bullet per membership decision, degenerate silent
+    # R2 + R6 — one bullet per membership decision (dedup at PREDICATE
+    # IDENTITY grain, v1.1.0 — the ED-sepsis two-alias corpse: two
+    # predicates that render alike are still two decisions), degenerate
+    # silent. Multi-instance reads carry the instance marker.
+    alias_instance: Dict[str, str] = {}
+    reads_per_table: Dict[str, List[str]] = {}
+    for ref in scope.get("from_refs", []):
+        rt = ref.get("resolves_to") or ""
+        if rt in tables and ref.get("alias"):
+            reads_per_table.setdefault(rt, []).append(ref["alias"])
+    ordinals = ("first", "second", "third", "fourth", "fifth", "sixth")
+    for rt, aliases in reads_per_table.items():
+        if len(aliases) < 2:
+            continue
+        words = re.sub(r"[_\W]+", " ", rt.rsplit("|", 1)[-1]).strip().lower()
+        for i, alias in enumerate(aliases):
+            marker = ordinals[i] if i < len(ordinals) else f"#{i + 1}"
+            alias_instance[alias] = f"For the {marker} {words} record read: "
     bullets = []
     for pred in decisions.flatten_where(scope.get("where")):
         if decisions.is_degenerate(pred):
             continue
         phrase = _voice_predicate(pred, voice)
-        if phrase and f"- {phrase}" not in bullets:
-            bullets.append(f"- {phrase}")
+        if not phrase:
+            continue
+        subject_ref = pred.get("subject", {}).get("ref", "")
+        alias = subject_ref.split(".")[0] if "." in subject_ref else None
+        prefix = alias_instance.get(alias, "")
+        if prefix:
+            phrase = prefix + phrase[0].lower() + phrase[1:]
+        bullets.append(f"- {phrase}")
     # R7 — the honest no-conditions fact
     if not bullets and reads_tables:
         bullets = ["- No membership conditions are applied in this "

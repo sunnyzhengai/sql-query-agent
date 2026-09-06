@@ -73,3 +73,20 @@ def test_lens_counters_and_produce_drains(shaken):
     assert shipped == EXPECTED["produce_total"]
     for d in store.current_nodes("description"):
         assert d.properties["text"].strip()
+
+
+def test_two_alias_corpse_voices_both_filters(shaken):
+    """Sunny's ED-sepsis gap-check, finding 2 (grammar v1.1.0): the
+    same table read under two aliases, each filtered EVENT_SUBTYPE_CODE
+    <> 2 — TWO decisions about two different events. The floor voices
+    BOTH, instance-marked, never merged (dedup at predicate identity,
+    not rendered-string, grain)."""
+    from aivia.flows import produce as _produce
+    store, _, _ = shaken
+    floor = _produce.compose_floor(ReadApi(store),
+                                   "reporting/USP_ED_SEPSIS.sql::#ADT")
+    both = [line for line in floor.splitlines()
+            if "modified or removed is not 2" in line]
+    assert len(both) == 2
+    assert any(line.startswith("- For the first") for line in both)
+    assert any(line.startswith("- For the second") for line in both)

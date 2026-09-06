@@ -1,9 +1,10 @@
 # ED Sepsis Gap-Check Report (round 2 — the truth check)
 
-*Generated 2026-09-06, pack 1.2 (org-catalog part landed).
-Sunny: every floor is a machine claim about logic you know
-cold — mark anything untrue. DBA result tables (CSV + xlsx)
-live in intake_result_tables/ beside this file.*
+*Generated 2026-09-06, pack 1.2 + floor grammar v1.1.0 (the
+two-alias corpse from Sunny's finding 2 is fixed: multi-
+instance reads voice per instance, dedup at predicate
+identity). Finding 1 (code meanings) is OPEN — design options
+with Sunny. DBA result tables in intake_result_tables/.*
 
 ## Intake report (as the DBA receives it)
 ```
@@ -32,11 +33,12 @@ Registered db: aivia_demo_src (server SEPSISSERVER); sources: emr; DBA: role:emr
 ### `reporting/USP_ED_SEPSIS.sql::#ADT`
 ```
 This is a selection of records.
-- The event record category is 4.
-- The category value that indicates if the event record has been modified or removed is not 2.
-- The unit associated with the event record at the time it became effective id is one of the values 200108022.
-- The event record category is 3.
-- The unit associated with the event record at the time it became effective id is one of the values 200108015, 200108016, 200108019, 200108001, 200108070, 200108115, 200108183, 200108008, 200108009, 200108010, 200108011, 200108012, 200108017, 200108018, 200108020, 200108021, 200108110.
+- For the first adt events record read: the event record category is 4.
+- For the first adt events record read: the category value that indicates if the event record has been modified or removed is not 2.
+- For the first adt events record read: the unit associated with the event record at the time it became effective id is one of the values 200108022.
+- For the second adt events record read: the event record category is 3.
+- For the second adt events record read: the category value that indicates if the event record has been modified or removed is not 2.
+- For the second adt events record read: the unit associated with the event record at the time it became effective id is one of the values 200108015, 200108016, 200108019, 200108001, 200108070, 200108115, 200108183, 200108008, 200108009, 200108010, 200108011, 200108012, 200108017, 200108018, 200108020, 200108021, 200108110.
 ```
 
 ### `reporting/USP_ED_SEPSIS.sql::#AllMeds`
@@ -563,8 +565,8 @@ This step produces derived values; no source records are read.
 ```
 
 ## Findings
-- READER/WRITER DRIFT (the silently-failing-report class): 9 refs, 7 distinct — SQL reads columns that neither the dictionary nor the database catalog carries: NONSEVERE.DATE_STAMP, NONSEVERE.ENCOUNTER_ID, SEVERE.DATE_STAMP, SEVERE.ENCOUNTER_ID, SSS.ENCOUNTER_ID, fyDate.HS_FY, fyDate.HS_FY_MONTH_NUMBER
-- undocumented org-catalog columns (documentation gaps, counted): 242
+- READER/WRITER DRIFT (silently-failing-report class): 9 refs, 7 distinct: NONSEVERE.DATE_STAMP, NONSEVERE.ENCOUNTER_ID, SEVERE.DATE_STAMP, SEVERE.ENCOUNTER_ID, SSS.ENCOUNTER_ID, fyDate.HS_FY, fyDate.HS_FY_MONTH_NUMBER
+- undocumented org-catalog columns (counted): 242
 - join compliance: 10 violations, 203 compliant, 461 not judged (lineage-derived declarations — near-vacuous, see pack caveat)
 - working set: 63 of 90 dictionary tables touched
-- descriptions produced: 303 scopes, all skeleton_floor
+- descriptions produced: 303 scopes, all skeleton_floor, grammar v1.1.0 in every basis

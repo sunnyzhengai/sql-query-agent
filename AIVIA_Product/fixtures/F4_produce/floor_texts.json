@@ -1,6 +1,6 @@
 {
   "_comment": "The floor-grammar payload (companion to AIVIA_Design/Floor_Grammar.md, RATIFIED 2026-09-05): the EXACT deterministic floor text per F4 target. BINDING \u2014 F4 acceptance is byte-exact against these texts; the interim substring expectations are retired from service (kept as historical witnesses).",
-  "floor_grammar_version": "1.0.0",
+  "floor_grammar_version": "1.1.0",
   "texts": {
     "usp_diabetic_visits.sql::#Recent": "This is a selection of patient encounters.\n- The visit date is on or after the start date parameter (default '2026-01-01' when none is supplied).\n- The appointment status is 2 ('Completed').",
     "usp_diabetic_visits.sql::delivery": "This is a selection of diagnoses on an encounter.\n- The diagnosis code starts with 'E11'.",

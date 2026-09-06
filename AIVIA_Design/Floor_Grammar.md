@@ -1,4 +1,12 @@
-# The Floor Grammar — v1.0.0 (RATIFIED, Sunny, 2026-09-05)
+# The Floor Grammar — v1.1.0 (RATIFIED, Sunny, 2026-09-05; amended 2026-09-06)
+
+*v1.1.0 (Sunny's ED-sepsis gap-check, finding 2): R2's dedup ran at
+RENDERED-STRING grain and merged two distinct decisions — the same
+table read under two aliases (transfer-out event vs transfer-in
+event), each filtered `EVENT_SUBTYPE_CODE <> 2`, voiced once. Dedup
+now runs at PREDICATE IDENTITY grain, and multi-instance reads carry
+an instance marker. A version bump makes every floor-derived artifact
+stale — the standing mechanism regenerates them.*
 
 *A13 CLOSED: ratified by Sunny 2026-09-05 at slice-5 entry, per the
 ruling's own schedule. This version stamps into every produce run's
@@ -44,11 +52,21 @@ selection claim contradicted one bullet later.
 ## R2 — one bullet per membership decision
 
 bullets(scope) := one line per decision in the scope's MEMBERSHIP set
-(the decisions lens's yield — outer scope only, position order,
-deduplicated). A filter inside a derived table or subquery is THAT
-selection's decision, never this one's (the derived-table leak
-corpse). Join keys never appear (they are join_on structures, outside
-the membership set by construction).
+(the decisions lens's yield — outer scope only, position order).
+Dedup runs at PREDICATE IDENTITY grain, never at rendered-string
+grain (v1.1.0: two predicates that render alike are still two
+decisions — the ED-sepsis two-alias corpse). A filter inside a
+derived table or subquery is THAT selection's decision, never this
+one's (the derived-table leak corpse). Join keys never appear (they
+are join_on structures, outside the membership set by construction).
+
+Instance marking (v1.1.0): when a scope reads ONE table under
+MULTIPLE aliases, each bullet whose subject binds to that table is
+prefixed "For the {first|second|...} {table words} record read:" —
+the instance index is the alias's declaration order among that
+table's reads. Deciding example: ADT01 (transfer-out) and ADT02
+(transfer-in) both filter the event subtype; the floor voices BOTH,
+distinguished by instance, never merged.
 
 ## R3 — shape preservation
 
