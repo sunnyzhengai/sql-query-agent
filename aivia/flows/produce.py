@@ -24,22 +24,51 @@ from aivia.lenses import decisions, derivation
 
 ECON = json.loads((pathlib.Path(__file__).parent / "econ_params.json")
                   .read_text())
-FLOOR_GRAMMAR_VERSION = "1.3.0"
+FLOOR_GRAMMAR_VERSION = "1.3.1"
 _PREPOSITIONS = ("of", "on", "per", "for", "in", "at", "by", "with")
 
 
-# ---- R5: steward words, graph-sourced ----
+# ---- R5: steward words, graph-sourced (v1.3.1 rendering) ----
+_BOILERPLATE = re.compile(
+    r"(?i)^this\s+(?:column|item|field|table)\s+"
+    r"(?:holds|contains|stores|indicates|captures|is)"
+    r"(?:\s+details|\s+information)?(?:\s+about)?\s+")
+_TOKEN_HEADS = {"id", "code", "number", "identifier", "key", "nbr"}
+
+
 def _noun_phrase(description: str, column: str) -> str:
-    """The ratified R5 rendering: first sentence, article stripped;
-    '<X> of|for the <Y>' reorders to '<Y> <head(X)>'."""
+    """The R5 rendering, v1.3.1 (the ED-sepsis phrasing corpses):
+    1. strip meta-boilerplate leads ('This column holds details
+       about ...' describes the column, not the thing);
+    2. first sentence, comma-truncated (a trailing clause after a
+       comma is commentary, not the subject), article stripped;
+    3. '<X> of|for the <Y>': when head(X) is a TOKEN word (id, code,
+       number...) the subject IS Y — 'The ID number of the unit ...'
+       speaks about the unit; reorder to '<Y> <head(X)>' only when
+       BOTH sides are short (visit date, appointment status); long
+       phrases stand as written — gluing a head onto them made
+       '...it became effective id';
+    4. backstop: cut a reduced relative clause at a non-initial
+       ' this ' and strip dangling prepositions."""
     first = (description or "").strip().split(". ")[0].rstrip(".").strip()
     if not first:
         return re.sub(r"[_\W]+", " ", column).strip().lower()
-    phrase = re.sub(r"^(the|a|an)\s+", "", first, flags=re.I)
+    phrase = _BOILERPLATE.sub("", first)
+    phrase = phrase.split(",")[0].strip()
+    phrase = re.sub(r"^(the|a|an)\s+", "", phrase, flags=re.I)
     m = re.match(r"(?i)^(.*?)\s+(?:of|for)\s+the\s+(.+)$", phrase)
     if m:
-        head = m.group(1).split()[0]
-        return f"{m.group(2)} {head}".lower()
+        x, y = m.group(1), m.group(2)
+        head = x.split()[0].lower()
+        if head in _TOKEN_HEADS:
+            phrase = y  # the token names the column; Y names the thing
+        elif len(x.split()) <= 3 and len(y.split()) <= 3:
+            phrase = f"{y} {head}"
+    cut = re.search(r"\s+this\s+", phrase)
+    if cut and cut.start() > 0:
+        phrase = phrase[:cut.start()]
+        phrase = re.sub(
+            r"\s+(?:in|on|of|for|to|at|by|with|from)$", "", phrase)
     return phrase.lower()
 
 

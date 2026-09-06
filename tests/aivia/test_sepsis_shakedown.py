@@ -120,3 +120,20 @@ def test_bpa_corpse_on_clause_filter_is_membership(shaken):
     assert "'900130001'" in floor  # the recovered ON-clause filter
     gc = _census.lens_gap_census(ReadApi(store), None)
     assert gc["outer_join_conditions_not_voiced"] == 87  # counted, declared
+
+
+def test_r5_phrasing_corpses(shaken):
+    """v1.3.1: the two rendering corpses from Sunny's gap-check —
+    token-head glue ('...it became effective id') and boilerplate
+    leakage ('the best practice alert this') — never regress."""
+    from aivia.flows import produce as _produce
+    store, _, _ = shaken
+    adt = _produce.compose_floor(ReadApi(store),
+                                 "reporting/USP_ED_SEPSIS.sql::#ADT")
+    assert "effective id" not in adt
+    assert ("the unit associated with the event record at the time "
+            "it became effective is one of the values 200108022") in adt
+    bpa = _produce.compose_floor(ReadApi(store),
+                                 "reporting/USP_ED_SEPSIS.sql::#BPA")
+    assert "alert this" not in bpa
+    assert "'900130001'" in bpa

@@ -1,4 +1,13 @@
-# The Floor Grammar — v1.3.0 (RATIFIED, Sunny, 2026-09-05; amended 2026-09-06 ×3)
+# The Floor Grammar — v1.3.1 (RATIFIED, Sunny, 2026-09-05; amended 2026-09-06 ×4)
+
+*v1.3.1 (phrasing only, no truth change — the R5 artifact corpses):
+the noun-phrase rendering gains meta-boilerplate stripping ('This
+column holds details about...'), comma truncation, the token-head
+drop ('The ID number of the unit...' speaks about the UNIT), a
+short-both-sides guard on the of/for reorder, and the reduced
+relative-clause backstop. Deciding corpses: '...it became effective
+id' and 'the best practice alert this'. Residual awkwardness is the
+smoothing seat's job — an outage costs polish, never truth.*
 
 *v1.3.0 (Sunny's ED-sepsis gap-check, finding 3 — the #BPA corpse):
 ON-clause FILTERS of INNER joins are membership. The old build
