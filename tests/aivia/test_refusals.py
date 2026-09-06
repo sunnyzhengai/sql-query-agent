@@ -5,6 +5,8 @@ customer's DBA without a support call. Each case is a minimal delta
 from F1's accepted snapshots; refused extracts write NOTHING (LC-F5
 atomicity). A14's malformed fk group is the one non-refusal: it
 quarantines, counts, alerts the DBA, and the load proceeds.
+
+Proves: contract:aivia-design-to-code
 """
 import json
 import pathlib

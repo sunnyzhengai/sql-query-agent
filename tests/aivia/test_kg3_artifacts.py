@@ -7,6 +7,8 @@ derived), plus the structural laws: no retire path EXISTS, events
 refuse supersede, empty shells refused, machine versions carry basis,
 dispositions are HUMAN-ONLY (LC3-C3), usage events obey H5/A5, and
 redaction is the ONE destruction path — human-ruled, tombstoned.
+
+Proves: contract:aivia-design-to-code
 """
 import pytest
 

@@ -1008,3 +1008,19 @@ Two citation handles, because the axiom systems are distinct and their group let
 - **Summarized in:**
   - `docs/decisions/0076-compositional-interpretation.md`
   - `docs/architecture/SPEC.md`
+
+## ADR 0077 — The twin-graph KG: meaning is a stored homomorphic twin
+
+- **Category:** architecture
+- **Component:** `spec` → `docs/architecture/SPEC.md` → axm:S, axm:J, axm:M, axm:B, axm:R
+- **Implemented by:**
+  - `aivia/graph/kg2_mapper/__init__.py`
+  - `aivia/graph/metamodel.py`
+  - `AIVIA_Design/registries/convert_from_xlsx.py`
+- **Enforced by:**
+  - `tests/aivia/test_phase_a_projection.py`
+  - `tests/aivia/test_metamodel.py`
+  - `tests/aivia/test_design_validators.py`
+- **Summarized in:**
+  - `docs/decisions/0077-twin-graph-kg.md`
+  - `docs/architecture/SPEC.md`

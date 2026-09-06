@@ -2,6 +2,8 @@
 adversarial (the corpse catalog securing PM-4's clean-room bet), and
 remainder (conservation: a deferred construct is COUNTED, never
 guessed). Requires ScriptDom (no fallback grammar exists, ADR 0001).
+
+Proves: contract:aivia-design-to-code
 """
 import json
 import pathlib

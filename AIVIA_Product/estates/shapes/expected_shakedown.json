@@ -15,13 +15,15 @@
     "same_tree_refs": 50,
     "unresolved_refs": 0,
     "phi_redactions": 0,
-    "remainder_total": 6,
+    "remainder_total": 43,
     "remainder_types": {
       "DeclareVariableStatement": 1,
       "ExecuteStatement": 1,
       "SearchedCaseExpression": 3,
-      "BinaryQueryExpression": 1
+      "BinaryQueryExpression": 1,
+      "SelectStarExpression": 37
     },
+    "_phase_a_note": "was 6 before the Phase A build (ADR 0077, 2026-09-06): SELECT * elements were previously SKIPPED SILENTLY by the select walk — projection capture closed the hole; 37 stars now COUNT as star_projection remainder until star expansion is ruled",
     "_phi_note": "was 2 before the ADR 0025 posture landed at the sepsis shakedown (2026-09-06): the probe's id/name literals now COUNT at door 1 and redact at egress; only context-free contact shapes redact at intake"
   },
   "lenses": {

@@ -14,6 +14,8 @@ client fails THIS suite, written before that module existed. Rules:
   sheet: the three seats live in flows; NOWHERE ELSE is a plank).
 - imports-nothing-deferred (MVP ruling): the deferred inward/usage
   modules neither exist in aivia/ nor are imported by it.
+
+Proves: contract:aivia-design-to-code
 """
 import ast
 import pathlib

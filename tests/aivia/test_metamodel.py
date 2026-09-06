@@ -3,6 +3,8 @@
 Protocol step 5's enforcement point: aivia code never sees the doc's
 prose; it sees these loaded, stamped, ratified registries. The loader
 refuses anything unratified — a draft registry cannot feed a build.
+
+Proves: contract:aivia-design-to-code
 """
 import dataclasses
 
@@ -21,9 +23,10 @@ def test_load_all_returns_exactly_the_seven():
 
 def test_every_loaded_registry_is_ratified_v1():
     # 1.1.0 = the twin-graph ruling amendments (ADR 0077, 2026-09-06)
+    # 1.2.0 = the Phase A metamodel bump (PROJECTION, same day)
     for reg in metamodel.load_all().values():
         assert reg.ratified is True
-        assert reg.version == "1.1.0"
+        assert reg.version == "1.2.0"
 
 
 def test_load_single_exposes_sheets_and_stamp():

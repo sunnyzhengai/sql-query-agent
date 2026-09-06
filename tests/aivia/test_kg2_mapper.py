@@ -11,6 +11,8 @@ Also here: GV-E evidence tiling goes RUNNABLE (every node's fragment
 locatable at its recorded offset; child spans nested in statement
 spans) and CHECK-KG2-7 conformance (built kinds validate against the
 ratified kind library). Requires ScriptDom — no fallback (ADR 0001).
+
+Proves: contract:aivia-design-to-code
 """
 import json
 import pathlib

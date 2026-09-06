@@ -6,6 +6,8 @@ fixture rules into pytest: RG (registries: stamps, doc compare,
 rule-to-check closure) and GV (fixtures F1-F6). A red here means the
 design data and the code no longer describe the same system — the
 same-breath rule as a build failure, not a review comment.
+
+Proves: contract:aivia-design-to-code
 """
 import pathlib
 import subprocess

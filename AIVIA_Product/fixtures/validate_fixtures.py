@@ -339,8 +339,9 @@ rule("F8", "GV-A2 case ids unique and phase-prefixed",
 rule("F8", "GV-B1 every case has input + non-empty expectations",
      [c["id"] for f in fams for c in f8[f]
       if not (("sql" in c or "scenario" in c) and c.get("expected"))])
-NR.append("F8: all cases NOT-RUNNABLE until their phase builds "
-          "(the tests-first entry obligation, per F7's pattern)")
+NR.append("F8: phase A cases RUN LIVE since the Phase A build "
+          "(tests/aivia/test_phase_a_projection.py); phases B-D "
+          "NOT-RUNNABLE until their phase builds")
 
 # ---------- report ----------
 print(f"PASSED: {len(OK)} rules")

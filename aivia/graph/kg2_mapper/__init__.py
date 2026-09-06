@@ -18,9 +18,15 @@ import bisect
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
 
-from aivia.graph import phi_gate
+from aivia.graph import metamodel, phi_gate
 from aivia.graph.kg2_mapper.scriptdom_loader import parse_tsql
 from aivia.graph.store import Store
+
+# Phase A (ADR 0077): trees stamp the metamodel version they were
+# mapped under — the bump IS the re-parse trigger (a stamped tree
+# under an old version differs from its re-map, so apply_file's
+# idempotence check regenerates it; nothing improvises).
+METAMODEL_VERSION = metamodel.load("kg2_kind_library").version
 
 COMPARISON_KINDS = {
     "Equals": "COMPARE_EQ",
@@ -83,7 +89,11 @@ def _map_expression(ctx, expr) -> Dict[str, Any]:
     if t == "FunctionCall":
         return _node(ctx, "expression", "function", expr,
                      name=expr.FunctionName.Value,
-                     args=[_map_expression(ctx, p) for p in expr.Parameters])
+                     args=[_map_expression(ctx, p) for p in expr.Parameters],
+                     # Phase A: an OVER clause marks a window function —
+                     # a property, not a new expression kind (the
+                     # Expression_Kinds set stays closed; RG-C3)
+                     over=(True if expr.OverClause is not None else None))
     if t == "BinaryExpression":
         return _node(ctx, "expression", "arithmetic", expr,
                      args=[_map_expression(ctx, expr.FirstExpression),
@@ -243,10 +253,35 @@ def _map_query(ctx, query) -> Dict[str, Any]:
             _collect_from(ctx, tr, refs, join_on)
     where = (_map_predicate(ctx, query.WhereClause.SearchCondition)
              if query.WhereClause else None)
-    select_refs = []
-    for el in query.SelectElements:
-        if _type_name(el) == "SelectScalarExpression":
-            select_refs.append(_map_expression(ctx, el.Expression))
+    # Phase A (ADR 0077, A12 un-deferral): the SELECT list is a
+    # PROJECTION structure — one member per output column (name +
+    # expression subtree, position-ordered). Non-scalar elements were
+    # previously SKIPPED SILENTLY; conservation now counts them: a
+    # star is a counted remainder until star expansion is ruled.
+    projection = []
+    for i, el in enumerate(query.SelectElements):
+        et = _type_name(el)
+        if et == "SelectScalarExpression":
+            expr = _map_expression(ctx, el.Expression)
+            if el.ColumnName is not None:
+                name = el.ColumnName.Value
+            elif expr["kind"] == "column_ref":
+                name = expr["ref"].rsplit(".", 1)[-1]
+            else:
+                name = None  # anonymous output column — legal T-SQL
+            projection.append({"node": "projection_member",
+                               "position": i + 1, "name": name,
+                               "expression": expr,
+                               "evidence": _evidence(ctx, el)})
+        elif et == "SelectStarExpression":
+            ctx.remainder.append({"type": et, **_evidence(ctx, el),
+                                  "reason": "star_projection"})
+        else:
+            ctx.remainder.append({"type": et, **_evidence(ctx, el),
+                                  "reason": "unmapped select element"})
+    # select_refs alias the member expressions (same dicts) so the
+    # resolver annotates projection subtrees like everything else
+    select_refs = [m["expression"] for m in projection]
     structures = []
     if refs:
         structures.append("FROM")
@@ -258,9 +293,11 @@ def _map_query(ctx, query) -> Dict[str, Any]:
         structures.append("GROUP BY")
     if query.OrderByClause:
         structures.append("ORDER BY")
+    if projection:
+        structures.append("PROJECTION")
     return {"node": "scope", "structures": structures, "from_refs": refs,
             "join_on": join_on, "where": where, "select_refs": select_refs,
-            "evidence": _evidence(ctx, query)}
+            "projection": projection, "evidence": _evidence(ctx, query)}
 
 
 # ---- statements & the file tree ----
@@ -420,6 +457,7 @@ def map_tree(file_name: str, text: str, dialect: str = "tsql"
                 n = emitters.index(stmt) + 1
                 scope["name_key"] = f"{file_name}::delivery_{n}"
     return {"node": "file", "name": file_name, "dialect": dialect,
+            "metamodel_version": METAMODEL_VERSION,
             "statements": statements,
             "parameters": sorted(parameters.values(),
                                  key=lambda p: p["name"]),

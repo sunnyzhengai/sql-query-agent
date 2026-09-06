@@ -1,9 +1,9 @@
 {
  "registry": "kg2_kind_library",
  "stamp": {
-  "version": "1.1.0",
+  "version": "1.2.0",
   "doc_section": "Level 1 / KG Layer 2 — kind library (T-SQL predicates)",
-  "doc_stamp": "v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 amendments per the twin-graph ruling, ADR 0077 (2026-09-06)",
+  "doc_stamp": "v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 twin-graph ruling ADR 0077; v1.2.0 Phase A metamodel bump (both 2026-09-06)",
   "ratified": true,
   "converted_on": "2026-09-05",
   "converted_from": "L1_KG2_Kind_Library_TSQL_Predicates_DRAFT.xlsx"
@@ -12,6 +12,7 @@
   "F7 remainder case catch (2026-09-05)",
   "RG-1 ruling (2026-09-05)",
   "RG-1 ruling (2026-09-05): quantifier is a predicate property",
+  "sheet Structure_Kinds_Phase_A added (twin-graph ruling (2026-09-06), ADR 0077)",
   "sheet Meaning_Node_Kinds added (twin-graph ruling (2026-09-06), ADR 0077)"
  ],
  "_open": [],
@@ -361,6 +362,14 @@
     "ID": "R6",
     "Question": "unary expression kind: in this library but NOT in the ratified doc's expression list — add 'unary' to the doc, or fold sign-negation into arithmetic?",
     "Status": "RATIFIED 2026-09-04: 'unary' added to the doc's expression list"
+   }
+  ],
+  "Structure_Kinds_Phase_A": [
+   {
+    "Kind": "PROJECTION",
+    "Meaning": "the SELECT list — what the scope outputs; one member per output column (name + expression subtree, position-ordered)",
+    "T-SQL sources": "SelectScalarExpression per member; SelectStarExpression -> COUNTED remainder (star_projection) until star expansion is ruled; any other select element -> counted remainder (closes the silent-skip hole the Phase A build found)",
+    "Notes": "Phase A build 2026-09-06 (ADR 0077): the A12 deferral lifted by its own planned recovery path — metamodel bump + re-parse. Lives beside Structure_Kinds (sheet-add keeps the xlsx untouched; merge at next draft-workbook revision)."
    }
   ],
   "Meaning_Node_Kinds": [

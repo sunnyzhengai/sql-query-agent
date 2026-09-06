@@ -1,6 +1,8 @@
 """The sepsis shakedown (round 2) — conservation counters pinned;
 the floors themselves are the HUMAN deliverable (gap_check_report.md,
 per the ED-sepsis acceptance law) and pin after Sunny's verdict.
+
+Proves: contract:aivia-design-to-code
 """
 import json
 import pathlib

@@ -3,6 +3,8 @@
 The store has no update and no delete: supersede appends + retires,
 retire marks, read declares. These tests pin the shape before
 kg1_intake exists (protocol step 4 ordering).
+
+Proves: contract:aivia-design-to-code
 """
 import pytest
 

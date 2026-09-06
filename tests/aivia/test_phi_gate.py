@@ -5,6 +5,8 @@ redact on SQL text; dates/thresholds counted, deferred to egress —
 derived from the ratified F2 key keeping analytical dates verbatim).
 Door 2 acceptance: the authored phi_door2.json fixtures (PM-1's owed
 fixtures), exercised now because the gate is pure.
+
+Proves: contract:aivia-design-to-code
 """
 import json
 import pathlib

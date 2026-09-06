@@ -7,7 +7,7 @@
 
 # Test Map — what every test proves
 
-131 modules, 1528 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
+148 modules, 1665 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
 
 ## By ADR
 
@@ -78,6 +78,7 @@
 | 0074 | The description architecture, ratified: skeleton floor, gate acceptance, metric-level design | `tests/test_desc_0074.py` (8), `tests/test_gate_recut.py` (5), `tests/test_skeleton_composer.py` (38) |
 | 0075 | The check contract: checks are claims (spec:G4) | `tests/test_check_contract.py` (4) |
 | 0076 | Compositional interpretation: capture once, interpret by grammar (spec:G5) | `tests/test_op_frontier.py` (8), `tests/test_skeleton_composer.py` (38) |
+| 0077 | The twin-graph KG: meaning is a stored homomorphic twin | `tests/aivia/test_design_validators.py` (4), `tests/aivia/test_metamodel.py` (7), `tests/aivia/test_phase_a_projection.py` (6) |
 
 ## By standing law
 
@@ -148,6 +149,26 @@
 ### contract:web-surface — the served page works AS SERVED
 
 - `tests/webapp/test_page_js.py` (2): The served page's JS must parse AS SERVED (live find 2026-08-13:
+
+### contract:aivia-design-to-code — aivia code and tests consume the ratified registries and fixture answer keys, never the doc's prose (Design-to-Code protocol, slices 0-8; claimed per-module 2026-09-06 when the suite-map gate reached the aivia suite)
+
+- `tests/aivia/test_approve_land.py` (10): Slice 6 exit: the F5 script against the BUILT approve/land flows.
+- `tests/aivia/test_design_validators.py` (4): Slice 0: the design validators run in CI — every push re-proves the
+- `tests/aivia/test_full_circle.py` (7): Slice 7: FULL CIRCLE — one run from empty, every family proven.
+- `tests/aivia/test_kg1_intake.py` (12): Slice 1: KG1 intake vs the F1 answer key — the graph, node by node.
+- `tests/aivia/test_kg2_mapper.py` (8): Slice 2 exit: the F2 answer key against the BUILT trees.
+- `tests/aivia/test_kg3_artifacts.py` (18): Slice 4: the ledger — KG3 artifact layer lifecycle + derived states.
+- `tests/aivia/test_kind_library.py` (4): Slice 2: the kind-library case families (F7) — construct,
+- `tests/aivia/test_lenses.py` (11): Slice 3 exit: the F3 answer key against the BUILT lenses.
+- `tests/aivia/test_metamodel.py` (7): Slice 0: the registry loader — code consumes ratified registries only.
+- `tests/aivia/test_phase_a_projection.py` (6): Phase A exit (ADR 0077): the F8 phase-A answer keys go RUNNABLE.
+- `tests/aivia/test_phi_gate.py` (8): Slice 2: the PHI boundary — both doors, fixture-driven.
+- `tests/aivia/test_planks.py` (6): Slice 0: the planks — the import law and banned constructs as physics.
+- `tests/aivia/test_produce.py` (10): Slice 5 exit: produce vs the RATIFIED floor grammar — F4 upgraded
+- `tests/aivia/test_refusals.py` (9): Slice 1: the F6 refusal set — every refusal NAMES its rule.
+- `tests/aivia/test_sepsis_shakedown.py` (7): The sepsis shakedown (round 2) — conservation counters pinned;
+- `tests/aivia/test_shapes_shakedown.py` (4): The shapes shakedown — the engine over the 38-file ADR 0055 corpus,
+- `tests/aivia/test_store.py` (6): Slice 1: the append-only substrate — LC-F2/F3 as structure.
 
 ## By spec axiom
 

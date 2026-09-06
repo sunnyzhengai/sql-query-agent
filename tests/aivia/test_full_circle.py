@@ -9,6 +9,8 @@ coverage metric, the DBA-facing intake report, and the self-
 containment law (no aivia module imports the old src tree).
 
 This is the moment the new architecture can run an X-Ray engagement.
+
+Proves: contract:aivia-design-to-code
 """
 import ast
 import csv

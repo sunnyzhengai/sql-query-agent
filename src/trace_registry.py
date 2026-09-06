@@ -102,7 +102,7 @@ AXM_UNMAPPED = {
 ARCHITECTURE_COMPONENTS = {
     "spec": {
         "doc": "docs/architecture/SPEC.md",
-        "current_through": "0076",
+        "current_through": "0077",
         "title": "The shadow specification — the formal axiom system",
         "satisfies": ["S", "J", "M", "B", "R"],
         "governs": "The axiom system this codebase is checked against: "
@@ -739,6 +739,28 @@ TRACE_REGISTRY = {
                   "tests/test_term_hygiene.py", "tests/test_admin_graph.py",
                   "tests/test_companion.py"],
         "docs": ["docs/architecture/SPEC.md", "docs/architecture/TRACE_MAP.md"],
+    },
+    "0077": {
+        # ACCEPTED 2026-09-06: the twin-graph KG — meaning becomes a
+        # stored homomorphic twin (KG2b); three builders replace the
+        # lens stratum; voicing is policy (the voicing ledger); change
+        # quanta (data incremental, rules total). Spec-ledger plan:
+        # each phase lands its axioms with real statuses (0073 rule).
+        # Phase A built same day: PROJECTION capture, metamodel 1.2.0,
+        # the silent-skip hole closed (stars counted).
+        "title": "The twin-graph KG: meaning is a stored homomorphic "
+                 "twin",
+        "category": "architecture",
+        "component": "spec",
+        "axioms": [],
+        "modules": ["aivia/graph/kg2_mapper/__init__.py",
+                    "aivia/graph/metamodel.py",
+                    "AIVIA_Design/registries/convert_from_xlsx.py"],
+        "tests": ["tests/aivia/test_phase_a_projection.py",
+                  "tests/aivia/test_metamodel.py",
+                  "tests/aivia/test_design_validators.py"],
+        "docs": ["docs/decisions/0077-twin-graph-kg.md",
+                 "docs/architecture/SPEC.md"],
     },
     "0076": {
         # ACCEPTED 2026-09-03: compositional interpretation (spec:G5)

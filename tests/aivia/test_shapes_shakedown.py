@@ -6,6 +6,8 @@ the mechanical job (scale, conservation counters, pacing); the ED
 sepsis suite does the truth job (Sunny's gap-check) in round 2. Every
 counter here recomputes from a fresh build — drift in the mapper, the
 resolver, the gate, or the pack fails this suite by number.
+
+Proves: contract:aivia-design-to-code
 """
 import json
 import pathlib

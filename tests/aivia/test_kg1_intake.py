@@ -4,6 +4,8 @@ The exit criterion is the fixture: applying registration + both F1
 snapshots must reproduce expected_graph.json exactly (nodes, edges,
 values, gap lists, the layer-3 dba responsibility), pass INTAKE-0..10,
 and be idempotent on re-apply (LC-S3 / CHECK-TL-3).
+
+Proves: contract:aivia-design-to-code
 """
 import csv
 import json

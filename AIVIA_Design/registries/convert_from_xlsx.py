@@ -44,10 +44,14 @@ SOURCES = {
 # v1.1.0 (2026-09-06): the twin-graph ruling (ADR 0077,
 # AIVIA_Design/Twin_Graph_KG_RULING.md) lands as TWIN_SHEETS below —
 # doc headings bumped the same breath (RG-A2).
-STAMP_VERSION = "1.1.0"
+# v1.2.0 (2026-09-06): PHASE A METAMODEL BUMP — PROJECTION joins
+# Structure_Kinds (the A12 un-deferral built); the bump is what makes
+# the estate re-parse a versioned regeneration, not an improvisation.
+STAMP_VERSION = "1.2.0"
 RATIFIED = True
-DOC_STAMP = ("v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 amendments "
-             "per the twin-graph ruling, ADR 0077 (2026-09-06)")
+DOC_STAMP = ("v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 twin-graph "
+             "ruling ADR 0077; v1.2.0 Phase A metamodel bump "
+             "(both 2026-09-06)")
 CONVERTED_ON = "2026-09-05"
 
 
@@ -371,6 +375,22 @@ DEFER_WHY = {
 _TG = "twin-graph ruling (2026-09-06)"
 TWIN_SHEETS = {
     "kg2_kind_library": {
+        "Structure_Kinds_Phase_A": [
+            {"Kind": "PROJECTION",
+             "Meaning": "the SELECT list — what the scope outputs; one "
+             "member per output column (name + expression subtree, "
+             "position-ordered)",
+             "T-SQL sources": "SelectScalarExpression per member; "
+             "SelectStarExpression -> COUNTED remainder "
+             "(star_projection) until star expansion is ruled; any "
+             "other select element -> counted remainder (closes the "
+             "silent-skip hole the Phase A build found)",
+             "Notes": "Phase A build 2026-09-06 (ADR 0077): the A12 "
+             "deferral lifted by its own planned recovery path — "
+             "metamodel bump + re-parse. Lives beside Structure_Kinds "
+             "(sheet-add keeps the xlsx untouched; merge at next "
+             "draft-workbook revision)."},
+        ],
         "Meaning_Node_Kinds": [
             {"Kind": "_ruling", "Definition": _TG + " 2d: the closed "
              "meaning-node library — one kind per translated node in KG2b, "

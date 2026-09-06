@@ -8,6 +8,8 @@ direct-only boundary and its declared loophole, the working set, the
 gap census, and staleness_t0 == the F4 produce worklist. Referenced
 keys check against F1's expected map. Derivation lenses run total
 over the (empty until slice 4) artifact layer.
+
+Proves: contract:aivia-design-to-code
 """
 import json
 import pathlib

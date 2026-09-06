@@ -54,6 +54,12 @@ KNOWN_CONTRACTS = {
                      "is a claim; only the postcondition is a fact "
                      "(ordered 2026-08-27)",
     "web-surface": "the served page works AS SERVED",
+    "aivia-design-to-code": "aivia code and tests consume the ratified "
+                            "registries and fixture answer keys, never "
+                            "the doc's prose (Design-to-Code protocol, "
+                            "slices 0-8; claimed per-module 2026-09-06 "
+                            "when the suite-map gate reached the aivia "
+                            "suite)",
 }
 
 _PROVES = re.compile(r"^Proves:\s*(.+)$", re.M)

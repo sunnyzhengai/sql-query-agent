@@ -8,6 +8,8 @@ run finds nothing stale, producing NO noise); gate outcomes stay in
 the closed vocabulary (PROD-3); human-owned artifacts render proposed,
 never current (PROD-4, via A6); replay: two fresh builds produce
 identical floors (PROD-5).
+
+Proves: contract:aivia-design-to-code
 """
 import json
 import pathlib

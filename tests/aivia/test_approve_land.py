@@ -6,6 +6,8 @@ refusal F5 authors must hold: certification-without-edit ownership,
 dispositions-only surface, A15-bound headers with zero custom
 attributes, the attribution prefix, sent-before-transport ordering,
 anti-repeat via the current-outcome lens, append-only observations.
+
+Proves: contract:aivia-design-to-code
 """
 import json
 import pathlib
