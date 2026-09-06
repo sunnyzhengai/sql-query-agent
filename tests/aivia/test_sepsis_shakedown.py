@@ -52,6 +52,22 @@ def test_estate_conservation(shaken):
         == want["remainder_total"]
 
 
+def test_twin_conservation(shaken):
+    """Phase B (ADR 0077): the meaning twin over the whole corpus —
+    homomorphism already asserted inside translate() per file; here
+    the corpus-wide census pins and the stored twins count."""
+    store, _, estate = shaken
+    want = EXPECTED["twin"]
+    totals = {k: sum(t["census"][k] for t in estate.twins.values())
+              for k in ("twin_nodes", "translated", "gaps",
+                        "degenerate", "coverage_gaps")}
+    for key, value in totals.items():
+        assert value == want[key], key
+    assert totals["translated"] + totals["gaps"] == totals["twin_nodes"]
+    assert len(store.current_nodes("meaning_twin")) \
+        == want["stored_twins"]
+
+
 def test_lens_counters_and_produce_drains(shaken):
     store, _, _ = shaken
     read = ReadApi(store)

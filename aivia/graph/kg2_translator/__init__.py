@@ -1,0 +1,422 @@
+"""KG2b's ONE writer — the translator (the parser's twin, the second
+derived-layer builder; twin-graph ruling / ADR 0077, Phase B).
+
+parser : KG2a :: translator : KG2b. Walks a resolved parsed tree and
+builds its homomorphic meaning twin: every tree node yields exactly
+one meaning node — translated or a reason-coded gap, no third bucket
+(the conservation equation, generalized). Composite nodes (file,
+statement, selection) compose their children's meanings; they never
+invent. Derived meaning cites its sources: draws_from names every
+KG1 node consulted; a column with no dictionary words translates as
+its readable name AND lands a counted coverage gap — never silence.
+
+content_key is MEANING IDENTITY (ruling 2e — the law of when a
+certification survives): hash over (kind, operand identities resolved
+to KG1 ids or scope paths, literal values, children's content_keys,
+join kind). INVARIANT to formatting/whitespace (evidence never keys),
+alias names (unresolved refs key by the folded column name, resolved
+refs by KG1 identity), AND/join order (commutative sets sort), and
+comments (R8 annotations are evidence, never truth). SENSITIVE to any
+column, operator, literal value, join kind, or structural change.
+
+Degenerate predicates (both sides literal) are TRANSLATED with
+subkind 'degenerate' and voiced never — presence in the twin is the
+homomorphism law; silence is the voicing policy's explicit choice.
+"""
+import hashlib
+import json
+from typing import Any, Dict, List, Optional
+
+from aivia.graph.kg2_mapper import METAMODEL_VERSION
+
+TRANSLATOR_VERSION = "1.0.0"
+
+# roles in a predicate, keyed in THIS order (role identity, never
+# source position — a BETWEEN's bounds are lower/upper wherever the
+# parser met them)
+_PRED_ROLES = ("subject", "comparand", "lower_bound", "upper_bound",
+               "pattern", "escape", "selection")
+_COMMUTATIVE = {"AND", "OR"}  # arm order is syntax, not meaning
+
+
+def _h(*parts: str) -> str:
+    return hashlib.sha256("|".join(parts).encode()).hexdigest()[:16]
+
+
+def _fold(name: str) -> str:
+    return name.strip("[]\"'").upper()
+
+
+def _readable(name: str) -> str:
+    import re
+    return re.sub(r"[_\W]+", " ", name).strip().lower()
+
+
+class _Walk:
+    """One pass over a parsed tree; accumulates the twin's nodes and
+    the census. Total by construction: every branch of the tree shape
+    either translates or gaps — an unrecognized shape is a gap with
+    its own reason, never a skip."""
+
+    def __init__(self, columns: Dict[str, Dict[str, Any]]):
+        self.columns = columns          # KG1 column identity -> props
+        self.nodes: List[Dict[str, Any]] = []
+        self.coverage_gaps: List[str] = []
+
+    def add(self, kind: str, path: str, content: Any,
+            key_parts: List[str], draws_from: Optional[List[str]] = None,
+            child_keys: Optional[List[str]] = None,
+            **extra) -> Dict[str, Any]:
+        key = _h(kind, *key_parts, *(child_keys or []))
+        node = {"kind": kind, "points_at": path, "content": content,
+                "content_key": key,
+                "draws_from": sorted(draws_from or [])}
+        node.update(extra)
+        self.nodes.append(node)
+        return node
+
+    def gap(self, path: str, reason: str) -> Dict[str, Any]:
+        return self.add("gap", path, {"reason": reason}, [reason])
+
+    # ---- expressions (meaning kind: reference) ----
+    def expression(self, expr, path) -> Dict[str, Any]:
+        kind = expr.get("kind")
+        if kind == "column_ref":
+            resolved = expr.get("resolves_to")
+            identity = (resolved if resolved
+                        else _fold(expr["ref"].rsplit(".", 1)[-1]))
+            if resolved and not str(resolved).startswith("SAME-TREE"):
+                props = self.columns.get(resolved, {})
+                words = (props.get("description") or "").split(". ")[0]
+                if words:
+                    content = {"words": words.rstrip("."),
+                               "words_source": "dictionary"}
+                    draws = [resolved]
+                else:
+                    content = {"words": _readable(expr["ref"]
+                                                  .rsplit(".", 1)[-1]),
+                               "words_source": "readable_name"}
+                    draws = [resolved]
+                    self.coverage_gaps.append(resolved)
+            else:
+                content = {"words": _readable(expr["ref"]
+                                              .rsplit(".", 1)[-1]),
+                           "words_source": "readable_name"}
+                draws = []
+                self.coverage_gaps.append(expr["ref"])
+            return self.add("reference", path, content,
+                            ["column_ref", str(identity)], draws)
+        if kind == "literal":
+            return self.add("reference", path,
+                            {"value": expr.get("value")},
+                            ["literal", str(expr.get("value"))])
+        if kind == "parameter_ref":
+            return self.add("reference", path,
+                            {"parameter": expr.get("ref")},
+                            ["parameter", expr.get("ref", "")])
+        if kind in ("function", "arithmetic", "unary", "cast"):
+            child_keys = []
+            for i, a in enumerate(expr.get("args", [])):
+                child_keys.append(
+                    self.expression(a, f"{path}/args/{i}")["content_key"])
+            salient = expr.get("name", kind)
+            over = "over" if expr.get("over") else ""
+            return self.add("reference", path,
+                            {"operation": salient,
+                             "window": bool(expr.get("over"))},
+                            [kind, salient, over], child_keys=child_keys)
+        if kind == "subquery_ref":
+            return self.add("reference", path,
+                            {"selection": "separately defined"},
+                            ["subquery_ref"])
+        if kind == "remainder_ref":
+            return self.gap(path, "unmapped_expression")
+        return self.gap(path, f"unrecognized_expression:{kind}")
+
+    # ---- predicates and boolean structure (meaning kind: condition) --
+    def condition(self, pred, path, join_type: Optional[str] = None
+                  ) -> Dict[str, Any]:
+        node_family = pred.get("node")
+        kind = pred.get("kind")
+        if node_family == "structure":         # AND | OR | NOT
+            child_keys = []
+            for i, c in enumerate(pred.get("children", [])):
+                child_keys.append(
+                    self.condition(c, f"{path}/children/{i}")
+                    ["content_key"])
+            if kind in _COMMUTATIVE:
+                child_keys = sorted(child_keys)
+            parts = [kind] + ([f"join:{join_type}"] if join_type else [])
+            return self.add("condition", path, {"shape": kind},
+                            parts, child_keys=child_keys)
+        if kind == "remainder":
+            return self.gap(path, "unmapped_predicate")
+        # a predicate leaf
+        role_keys, draws = [], []
+        subject = pred.get("subject") or {}
+        for role in _PRED_ROLES:
+            child = pred.get(role)
+            if child is None:
+                continue
+            meaning = self.expression(child, f"{path}/{role}")
+            role_keys.append(f"{role}={meaning['content_key']}")
+            draws.extend(meaning["draws_from"])
+        member_keys = []
+        for i, member in enumerate(pred.get("comparand_list", [])):
+            meaning = self.expression(member,
+                                      f"{path}/comparand_list/{i}")
+            member_keys.append(meaning["content_key"])
+            draws.extend(meaning["draws_from"])
+        # a literal against a values-mapped subject cites the map
+        content: Dict[str, Any] = {"predicate": kind}
+        for value_role in ("comparand",):
+            comparand = pred.get(value_role)
+            if (comparand is not None
+                    and comparand.get("kind") == "literal"
+                    and subject.get("resolves_to")):
+                col = subject["resolves_to"]
+                values = (self.columns.get(col, {}).get("values")
+                          or {})
+                raw = str(comparand.get("value", "")).strip("'")
+                if raw in values:
+                    content["value_meaning"] = values[raw]
+                    draws.append(f"{col}|values:{raw}")
+        both_literal = (subject.get("kind") == "literal"
+                        and (pred.get("comparand") or {}).get("kind")
+                        == "literal")
+        parts = ([kind] + role_keys + member_keys
+                 + [str(pred.get("comparison_op", "")),
+                    str(pred.get("quantifier", ""))]
+                 + ([f"join:{join_type}"] if join_type else []))
+        extra: Dict[str, Any] = {}
+        if both_literal:
+            extra = {"subkind": "degenerate", "voiced": "never"}
+        if join_type:
+            extra["join_type"] = join_type
+        return self.add("condition", path, content, parts,
+                        draws_from=draws, **extra)
+
+    # ---- sources, projection, scope (selection) ----
+    def source(self, ref, path) -> Dict[str, Any]:
+        if "derived_scope" in ref:
+            inner = self.scope(ref["derived_scope"],
+                               f"{path}/derived_scope")
+            return self.add("source", path,
+                            {"reads": "an inline selection"},
+                            ["derived"], child_keys=[inner["content_key"]])
+        target = ref.get("resolves_to") or _fold(ref.get("table_ref", ""))
+        draws = ([ref["resolves_to"]]
+                 if ref.get("resolves_to")
+                 and not str(ref["resolves_to"]).startswith("SAME-TREE")
+                 else [])
+        return self.add("source", path,
+                        {"reads": ref.get("table_ref"),
+                         "resolved": ref.get("resolves_to")},
+                        ["source", str(target)], draws)
+
+    def projection_member(self, member, path) -> Dict[str, Any]:
+        expr = self.expression(member["expression"], f"{path}/expression")
+        return self.add("projection", path,
+                        {"output": member.get("name"),
+                         "derivation": expr["content"]},
+                        [str(member.get("name")),
+                         str(member.get("position"))],
+                        child_keys=[expr["content_key"]])
+
+    def scope(self, scope, path) -> Dict[str, Any]:
+        source_keys = []
+        for i, ref in enumerate(scope.get("from_refs", [])):
+            source_keys.append(
+                self.source(ref, f"{path}/from_refs/{i}")["content_key"])
+        join_keys = []
+        for i, on in enumerate(scope.get("join_on", [])):
+            join_keys.append(
+                self.condition(on, f"{path}/join_on/{i}",
+                               join_type=on.get("join_type"))
+                ["content_key"])
+        where_key = []
+        if scope.get("where") is not None:
+            where_key = [self.condition(scope["where"], f"{path}/where")
+                         ["content_key"]]
+        member_keys = []
+        for i, m in enumerate(scope.get("projection", [])):
+            member_keys.append(
+                self.projection_member(m, f"{path}/projection/{i}")
+                ["content_key"])
+        # joins/sources sort (join ORDER is syntax); projection stays
+        # ordered (output column order is meaning)
+        child_keys = (sorted(source_keys) + sorted(join_keys)
+                      + where_key + member_keys)
+        content = {"selection": scope.get("name") or scope.get("name_key")
+                   or "(anonymous)",
+                   "reads": len(source_keys),
+                   "conditions": len(join_keys) + len(where_key),
+                   "outputs": len(member_keys)}
+        return self.add("selection", path, content,
+                        ["selection"], child_keys=child_keys)
+
+    def statement(self, stmt, path) -> Dict[str, Any]:
+        child_keys = []
+        for i, cte in enumerate(stmt.get("ctes", [])):
+            child_keys.append(
+                self.scope(cte, f"{path}/ctes/{i}")["content_key"])
+        if stmt.get("scope"):
+            child_keys.append(
+                self.scope(stmt["scope"], f"{path}/scope")["content_key"])
+        if stmt.get("predicate") is not None:
+            child_keys.append(
+                self.condition(stmt["predicate"], f"{path}/predicate")
+                ["content_key"])
+        kind_label = stmt.get("statement_kind", "?")
+        if not child_keys and kind_label not in ("SELECT", "SELECT INTO",
+                                                 "IF"):
+            # a statement the mapper counted as unmapped — its twin is
+            # the gap, same reason class, homomorphism intact
+            return self.gap(path, f"unmapped_statement:{kind_label}")
+        return self.add("statement", path,
+                        {"does": kind_label},
+                        [kind_label], child_keys=child_keys)
+
+    def file(self, tree) -> Dict[str, Any]:
+        child_keys = []
+        for i, stmt in enumerate(tree.get("statements", [])):
+            child_keys.append(
+                self.statement(stmt, f"/statements/{i}")["content_key"])
+        for i, p in enumerate(tree.get("parameters", [])):
+            meaning = self.add(
+                "reference", f"/parameters/{i}",
+                {"parameter": p["name"],
+                 "default": p.get("default_logic")},
+                ["file_parameter", p["name"],
+                 str(p.get("default_logic"))])
+            child_keys.append(meaning["content_key"])
+        return self.add("file", "/",
+                        {"file": tree.get("name"),
+                         "statements": len(tree.get("statements", []))},
+                        [tree.get("name", "")], child_keys=child_keys)
+
+
+def parsed_census(tree: Dict[str, Any]) -> int:
+    """The parsed side of the conservation equation, computed
+    INDEPENDENTLY of the twin walk: counts every node the twin must
+    mirror (file, statements, scopes incl. CTEs + derived, sources,
+    join-ON subtrees, WHERE subtrees, IF predicates, projection
+    members + their expression subtrees, parameters)."""
+    count = 0
+
+    def expr(e):
+        nonlocal count
+        count += 1
+        for a in e.get("args", []):
+            expr(a)
+
+    def cond(p):
+        nonlocal count
+        count += 1
+        for c in p.get("children", []):
+            cond(c)
+        for role in _PRED_ROLES:
+            if p.get(role) is not None:
+                expr(p[role])
+        for m in p.get("comparand_list", []):
+            expr(m)
+
+    def scope(s):
+        nonlocal count
+        count += 1
+        for ref in s.get("from_refs", []):
+            count += 1
+            if "derived_scope" in ref:
+                scope(ref["derived_scope"])
+        for on in s.get("join_on", []):
+            cond(on)
+        if s.get("where") is not None:
+            cond(s["where"])
+        for m in s.get("projection", []):
+            count += 1
+            expr(m["expression"])
+
+    count += 1  # the file root
+    for stmt in tree.get("statements", []):
+        count += 1
+        for cte in stmt.get("ctes", []):
+            scope(cte)
+        if stmt.get("scope"):
+            scope(stmt["scope"])
+        if stmt.get("predicate") is not None:
+            cond(stmt["predicate"])
+    count += len(tree.get("parameters", []))
+    return count
+
+
+def translate(tree: Dict[str, Any],
+              columns: Optional[Dict[str, Dict[str, Any]]] = None
+              ) -> Dict[str, Any]:
+    """Parsed tree -> its meaning twin. `columns` is KG1 material
+    (identity -> properties with description/values); omit it and
+    every reference translates by readable name with a counted
+    coverage gap — grounded, never silent, never invented."""
+    walk = _Walk(columns or {})
+    walk.file(tree)
+    gaps = [n for n in walk.nodes if n["kind"] == "gap"]
+    twin = {
+        "file": tree.get("name"),
+        "translator_version": TRANSLATOR_VERSION,
+        "metamodel_version": METAMODEL_VERSION,
+        "nodes": walk.nodes,
+        "census": {
+            "twin_nodes": len(walk.nodes),
+            "translated": len(walk.nodes) - len(gaps),
+            "gaps": len(gaps),
+            "gap_reasons": sorted({n["content"]["reason"] for n in gaps}),
+            "parsed_nodes": parsed_census(tree),
+            "degenerate": sum(1 for n in walk.nodes
+                              if n.get("subkind") == "degenerate"),
+            "coverage_gaps": len(walk.coverage_gaps),
+        },
+    }
+    # THE HOMOMORPHISM LAW, checked at build time, every run: the twin
+    # mirrors the parse exactly — translated + gap == every parsed
+    # node, no third bucket. A mismatch is a build failure, never a
+    # warning (the conservation lineage, ADR 0044 -> ADR 0077).
+    census = twin["census"]
+    if census["twin_nodes"] != census["parsed_nodes"]:
+        raise AssertionError(
+            f"homomorphism broken for {tree.get('name')}: "
+            f"{census['twin_nodes']} twin nodes vs "
+            f"{census['parsed_nodes']} parsed nodes")
+    return twin
+
+
+def column_material(store) -> Dict[str, Dict[str, Any]]:
+    """KG1 material for translation: column identity -> properties.
+    A read the builder performs against its own layer's inputs —
+    same posture as the mapper's resolve()."""
+    return {n.identity: n.properties
+            for n in store.current_nodes("column")}
+
+
+def apply_twin(store, file_id: str, tree: Dict[str, Any],
+               as_of: str) -> Dict[str, Any]:
+    """Store the meaning twin — KG2b's lifecycle write. File-quantum
+    rebuild: the twin for a changed file is replaced WHOLE (supersede,
+    never patched); an unchanged twin writes nothing (idempotent at
+    the content grain, the LC-S3 discipline)."""
+    twin = translate(tree, column_material(store))
+    identity = f"twin::{file_id}"
+    current = [n for n in store.current_nodes("meaning_twin")
+               if n.identity == identity]
+    if current and current[0].properties.get("twin") == twin:
+        return twin
+    store.append_node("meaning_twin", identity, {"twin": twin},
+                      as_of, file_id)
+    return twin
+
+
+def content_keys(twin: Dict[str, Any]) -> Dict[str, str]:
+    """points_at path -> content_key, for anchor checks and tests."""
+    return {n["points_at"]: n["content_key"] for n in twin["nodes"]}
+
+
+def stable_json(twin: Dict[str, Any]) -> str:
+    return json.dumps(twin, sort_keys=True)

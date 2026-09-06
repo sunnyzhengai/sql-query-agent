@@ -11,7 +11,7 @@ import pathlib
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Set
 
-from aivia.graph import kg1_intake, kg2_mapper
+from aivia.graph import kg1_intake, kg2_mapper, kg2_translator
 
 
 def receive_extract(store, reg: Dict[str, Any],
@@ -197,6 +197,7 @@ class EstateReport:
     acquired: List[str] = field(default_factory=list)
     counted_excluded: List[Dict[str, str]] = field(default_factory=list)
     trees: Dict[str, Dict[str, Any]] = field(default_factory=dict)
+    twins: Dict[str, Dict[str, Any]] = field(default_factory=dict)
 
 
 def receive_estate(store, reg: Dict[str, Any], estate_dir) -> EstateReport:
@@ -233,4 +234,9 @@ def receive_estate(store, reg: Dict[str, Any], estate_dir) -> EstateReport:
             continue
         report.acquired.append(name)
         report.trees[name] = tree
+        # Phase B (ADR 0077): parse and translate in the SAME RUN,
+        # atomic — the twin regenerates with its tree at the file
+        # quantum; the homomorphism law is asserted inside translate()
+        report.twins[name] = kg2_translator.apply_twin(
+            store, f"{location}{name}", tree, manifest["as_of"])
     return report

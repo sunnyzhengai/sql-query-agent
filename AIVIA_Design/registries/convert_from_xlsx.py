@@ -47,11 +47,17 @@ SOURCES = {
 # v1.2.0 (2026-09-06): PHASE A METAMODEL BUMP — PROJECTION joins
 # Structure_Kinds (the A12 un-deferral built); the bump is what makes
 # the estate re-parse a versioned regeneration, not an improvisation.
-STAMP_VERSION = "1.2.0"
+# v1.3.0 (2026-09-06): PHASE B CORRECTION — the meaning-kind library
+# gains the two COMPOSITE kinds (file, statement) the nine-kind draft
+# missed: the homomorphism law covers EVERY parsed grain, and file/
+# statement nodes need kinds too. Caught at the Phase B build when
+# PB-1's "every meaning node carries a library kind" met the file
+# root (the F7 DistinctPredicate pattern: build-time catch, cited).
+STAMP_VERSION = "1.3.0"
 RATIFIED = True
 DOC_STAMP = ("v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 twin-graph "
-             "ruling ADR 0077; v1.2.0 Phase A metamodel bump "
-             "(both 2026-09-06)")
+             "ruling ADR 0077; v1.2.0 Phase A metamodel bump; v1.3.0 "
+             "Phase B composite-kinds correction (all 2026-09-06)")
 CONVERTED_ON = "2026-09-05"
 
 
@@ -429,6 +435,18 @@ TWIN_SHEETS = {
             {"Kind": "gap", "Definition": "a counted untranslated node; "
              "reason-coded per the 0044 pattern",
              "Deciding example": "dynamic SQL body -> gap(dynamic_sql)"},
+            {"Kind": "file", "Definition": "COMPOSITE (Phase B "
+             "correction, 2026-09-06): the file's meaning, composed "
+             "from its statements' meanings — the homomorphism law "
+             "reaches the root; never a separate invention",
+             "Deciding example": "USP_ED_SEPSIS -> composed from its "
+             "staging chain"},
+            {"Kind": "statement", "Definition": "COMPOSITE (Phase B "
+             "correction, 2026-09-06): one executable command's "
+             "meaning, composed from its scopes/predicates; a "
+             "statement the mapper counted unmapped twins as a gap",
+             "Deciding example": "SELECT INTO -> composed from its "
+             "selection; UPDATE (unmapped) -> gap(unmapped_statement)"},
         ],
     },
     "kg2_logic": {

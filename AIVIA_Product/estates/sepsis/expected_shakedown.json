@@ -14,6 +14,15 @@
     "unresolved_refs": 9,
     "remainder_total": 998
   },
+  "twin": {
+    "_note": "PHASE B (ADR 0077, 2026-09-06): the meaning twin over the corpus — homomorphism asserted inside translate() every run (twin_nodes == parsed_nodes per file, no third bucket). gaps mirror the mapper's unmapped statements/expressions 1:1 by reason class. coverage_gaps = references translating by readable name for want of dictionary words (the 242 undocumented org-catalog columns + unresolved refs, counted never silent). values-map citations are 0 because the sepsis KG1 extract carries NO values maps — the mechanism is proven at unit grain (PB-5).",
+    "twin_nodes": 14865,
+    "translated": 13993,
+    "gaps": 872,
+    "degenerate": 24,
+    "coverage_gaps": 3208,
+    "stored_twins": 28
+  },
   "lenses": {
     "scopes": 303,
     "scopes_with_decisions": 182,

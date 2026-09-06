@@ -42,7 +42,7 @@
    "expected": [
     "every KG2a node has exactly one KG2b node: translated + gap == parsed total, no third bucket",
     "every meaning node points_at exactly one KG2a node",
-    "every meaning node carries kind from the nine-kind library, content_key, translator+metamodel stamps",
+    "every meaning node carries kind from the closed meaning-kind library (nine + the two COMPOSITE kinds file/statement - Phase B build correction 2026-09-06: the draft library missed the composite grains the homomorphism law reaches), content_key, translator+metamodel stamps",
     "composite nodes (scope, statement, file) have content composed from children's meanings"
    ]
   },

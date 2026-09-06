@@ -83,6 +83,9 @@ def test_plank_import_law():
 def test_plank_store_writers():
     lifecycle = {"aivia/graph/kg1_intake.py",
                  "aivia/graph/kg2_mapper/__init__.py",
+                 # Phase B (ADR 0077): the translator is the second
+                 # derived-layer builder — KG2b's ONE writer
+                 "aivia/graph/kg2_translator/__init__.py",
                  "aivia/graph/kg3_artifacts.py", "aivia/graph/kg4_concepts.py",
                  "aivia/graph/read_api.py"}
 
