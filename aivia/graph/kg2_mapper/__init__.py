@@ -200,7 +200,9 @@ def _collect_from(ctx, table_ref, refs, join_on):
     elif t == "QualifiedJoin":
         _collect_from(ctx, table_ref.FirstTableReference, refs, join_on)
         _collect_from(ctx, table_ref.SecondTableReference, refs, join_on)
-        join_on.append(_map_predicate(ctx, table_ref.SearchCondition))
+        on_pred = _map_predicate(ctx, table_ref.SearchCondition)
+        on_pred["join_type"] = str(table_ref.QualifiedJoinType)
+        join_on.append(on_pred)
     elif t == "QueryDerivedTable":
         refs.append({
             "derived_scope": _map_query(ctx, table_ref.QueryExpression),

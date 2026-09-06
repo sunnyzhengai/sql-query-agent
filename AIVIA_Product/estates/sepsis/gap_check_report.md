@@ -1,9 +1,10 @@
 # ED Sepsis Gap-Check Report (round 2 — the truth check)
 
-*Generated 2026-09-06, pack 1.2 + floor grammar v1.2.0: both
-gap-check findings landed — instance-marked bullets (no more
-merged filters) and R8 source annotations (developer comments
-voiced with attribution). DBA tables in intake_result_tables/.*
+*Generated 2026-09-06, pack 1.2 + floor grammar v1.3.0: all
+three gap-check findings landed — instance-marked bullets, R8
+source annotations, and INNER-join ON filters recovered as
+membership (40 scopes' only filters lived there). DBA tables
+in intake_result_tables/.*
 
 ## Intake report (as the DBA receives it)
 ```
@@ -52,6 +53,7 @@ This is a selection of records.
 ### `reporting/USP_ED_SEPSIS.sql::#BPA`
 ```
 This is a selection of records.
+- The best practice alert this is '900130001'.
 - The moment when the warning is dismissed following certain actions is between adt_arrival_time and ed_departure_time (inclusive).
 ```
 
@@ -78,13 +80,14 @@ This is a selection of records.
 ### `reporting/USP_ED_SEPSIS.sql::#Base_Pop_ED_Readmit`
 ```
 This is a selection of records.
+- The date and time when the patient arrives at the emergency department is between ed_departure_time and dateadd(hh, 24, [#base_pop].ed_departure_time) (inclusive).
 - The first time line is 1.
 ```
 
 ### `reporting/USP_ED_SEPSIS.sql::#Base_Pop_ED_Readmit_All`
 ```
 This is a selection of records.
-- No membership conditions are applied in this selection.
+- The date and time when the patient arrives at the emergency department is between ed_departure_time and dateadd(hh, 24, ed_departure_time) (inclusive).
 ```
 
 ### `reporting/USP_ED_SEPSIS.sql::#Base_Pop_ENC_Reason`
@@ -107,7 +110,7 @@ This step produces derived values; no source records are read.
 ### `reporting/USP_ED_SEPSIS.sql::#BedEvents`
 ```
 This is a selection of records.
-- No membership conditions are applied in this selection.
+- The this column represents the event template linked to the event record is one of the values '2600000347', '2600000346'.
 ```
 
 ### `reporting/USP_ED_SEPSIS.sql::#BloodPressure`
@@ -175,7 +178,10 @@ This is a selection of records.
 ### `reporting/USP_ED_SEPSIS.sql::#FirstABXAdminTimeDetails`
 ```
 This is a selection of records.
-- No membership conditions are applied in this selection.
+- The time line is 1 (annotated 'LOOK FOR FIRST ANTIBIOTIC ADMINISTRATION ONLY' in the source).
+- The myline is 1.
+- The myline is 1.
+- The action instant is below abx_admin_time (annotated 'MAKE SURE WE ARE LOOKING AT THE RIGHT MEDICATION ADMIN TIME.' in the source).
 ```
 
 ### `reporting/USP_ED_SEPSIS.sql::#FirstPositiveOD_To_ABXAdminTime`
@@ -310,12 +316,14 @@ This step produces derived values; no source records are read.
 ### `reports/USP_RPTS_ED_Sepsis.sql::#ALLCVLTime`
 ```
 This is a selection of records.
+- The value_set unique is 3022 (annotated 'CVL CODES' in the source).
 - The this item records the exact moment the record was placed is between adt_arrival_time and ed_departure_time (inclusive).
 ```
 
 ### `reports/USP_RPTS_ED_Sepsis.sql::#BPA`
 ```
 This is a selection of records.
+- The best practice alert this is '900130001'.
 - The moment when the warning is dismissed following certain actions is between adt_arrival_time and ed_departure_time (inclusive).
 ```
 
@@ -343,13 +351,14 @@ This is a selection of records.
 ### `reports/USP_RPTS_ED_Sepsis.sql::#Base_Pop_ED_Readmit`
 ```
 This is a selection of records.
-- No membership conditions are applied in this selection.
+- The first time line is 1.
+- The date and time when the patient arrives at the emergency department is between ed_departure_time and dateadd(hh,24,bp.ed_departure_time) (inclusive).
 ```
 
 ### `reports/USP_RPTS_ED_Sepsis.sql::#Base_Pop_ED_Readmit_All`
 ```
 This is a selection of records.
-- No membership conditions are applied in this selection.
+- The date and time when the patient arrives at the emergency department is between ed_departure_time and dateadd(hh,24,bp.ed_departure_time) (inclusive).
 ```
 
 ### `reports/USP_RPTS_ED_Sepsis.sql::#Base_Pop_ENC_Reason`
@@ -372,7 +381,7 @@ This is a selection of records.
 ### `reports/USP_RPTS_ED_Sepsis.sql::#BedEvents`
 ```
 This is a selection of records.
-- No membership conditions are applied in this selection.
+- The this column represents the event template linked to the event record is one of the values '2600000347', '2600000346'.
 ```
 
 ### `reports/USP_RPTS_ED_Sepsis.sql::#BloodCultureValue`
@@ -393,13 +402,23 @@ This step produces derived values; no source records are read.
 ### `reports/USP_RPTS_ED_Sepsis.sql::#ED2HEMONC`
 ```
 This is a selection of records.
-- No membership conditions are applied in this selection.
+- For the first adt events record read: the unit associated with the event record at the time it became effective id is one of the values 200108022.
+- For the first adt events record read: the event record category is 4 (annotated 'TRANSFER OUT' in the source).
+- For the first adt events record read: the category value that indicates if the event record has been modified or removed is not 2 (annotated 'CANCELED' in the source).
+- For the second adt events record read: the unit associated with the event record at the time it became effective id is one of the values 200108001, 200108115, 20120106, 20101124, 20108007.
+- For the second adt events record read: the event record category is 3 (annotated 'TRANSFER IN' in the source).
+- For the second adt events record read: the category value that indicates if the event record has been modified or removed is not 2 (annotated 'CANCELED' in the source).
 ```
 
 ### `reports/USP_RPTS_ED_Sepsis.sql::#ED2ICU`
 ```
 This is a selection of records.
-- No membership conditions are applied in this selection.
+- For the first adt events record read: the unit associated with the event record at the time it became effective id is one of the values 200108022.
+- For the first adt events record read: the event record category is 4 (annotated 'TRANSFER OUT' in the source).
+- For the first adt events record read: the category value that indicates if the event record has been modified or removed is not 2 (annotated 'CANCELED' in the source).
+- For the second adt events record read: the unit associated with the event record at the time it became effective id is one of the values 20101116 (noted 'EAST ICU'), 20101124 (noted 'EAST CARDIAC ICU'), 20101126 (noted 'EAST NEURO ICU'), 20101127 (noted 'EAST PEDIATRIC ICU'), 20101128 (noted 'EAST SURGICAL ICU'), 20101165 (noted 'EAST REMOTE ICU'), 20120106 (noted 'WEST CARDIAC ICU'), 20120121 (noted 'WEST ICU'), 200108001 (noted 'MAIN 2 PAVILION PICU'), 200108070 (noted 'MAIN 3 CICU'), 200108115 (noted 'MAIN 2 PICU NEURO'), 200108147 (noted 'MAIN PHARMACY ICU').
+- For the second adt events record read: the event record category is 3 (annotated 'TRANSFER IN' in the source).
+- For the second adt events record read: the category value that indicates if the event record has been modified or removed is not 2 (annotated 'CANCELED' in the source).
 ```
 
 ### `reports/USP_RPTS_ED_Sepsis.sql::#ED_PositiveScores`
@@ -419,13 +438,16 @@ This is a selection of records.
 ### `reports/USP_RPTS_ED_Sepsis.sql::#EncounterWeights`
 ```
 This is a selection of records.
-- No membership conditions are applied in this selection.
+- The flowsheet group or row linked to this reading unique is '94'.
 ```
 
 ### `reports/USP_RPTS_ED_Sepsis.sql::#FirstABXAdminTimeDetails`
 ```
 This is a selection of records.
-- No membership conditions are applied in this selection.
+- The time line is 1 (annotated 'LOOK FOR FIRST ANTIBIOTIC ADMINISTRATION ONLY' in the source).
+- The myline is 1.
+- The myline is 1.
+- The action instant is below abx_admin_time (annotated 'MAKE SURE WE ARE LOOKING AT THE RIGHT MEDICATION ADMINT TIME' in the source).
 ```
 
 ### `reports/USP_RPTS_ED_Sepsis.sql::#FirstPositiveOD_To_ABXAdminTime`
@@ -513,12 +535,15 @@ This step produces derived values; no source records are read.
 ### `reports/USP_RPTS_ED_Sepsis.sql::BloodCultureResults`
 ```
 This is a selection of records.
+- The procedure record associated with this order, which can be used to reference procedures_catalog unique is one of the values 600003, 600004, 600011, 600012 (annotated ''LAB001', 'NUR001', 'LAB012', 'LAB011'' in the source).
 - The date and time at which the procedure_order was submitted is between adt_arrival_time and ed_departure_time (inclusive).
 ```
 
 ### `reports/USP_RPTS_ED_Sepsis.sql::CsfCultureResults`
 ```
 This is a selection of records.
+- The procedure record associated with this order, which can be used to reference procedures_catalog unique is one of the values 600005, 600006, 600002 (annotated ''LAB006', 'LAB007', 'LAB003'' in the source).
+- The source category of the procedure order identifier is 304 (annotated 'Lumber puncture' in the source).
 - The date and time at which the procedure_order was submitted is between adt_arrival_time and ed_departure_time (inclusive).
 ```
 
@@ -555,6 +580,7 @@ This step produces derived values; no source records are read.
 ### `reports/USP_RPTS_ED_Sepsis.sql::UrineCultureResults`
 ```
 This is a selection of records.
+- The procedure record associated with this order, which can be used to reference procedures_catalog unique is one of the values 600001, 600007, 600008, 600009, 600010 (annotated ''LAB002', 'LAB008', 'LAB009', 'LAB010', 'POC001'' in the source).
 - The date and time at which the procedure_order was submitted is between adt_arrival_time and ed_departure_time (inclusive).
 ```
 
@@ -566,6 +592,7 @@ This step produces derived values; no source records are read.
 ## Findings
 - READER/WRITER DRIFT (silently-failing-report class): 9 refs, 7 distinct: NONSEVERE.DATE_STAMP, NONSEVERE.ENCOUNTER_ID, SEVERE.DATE_STAMP, SEVERE.ENCOUNTER_ID, SSS.ENCOUNTER_ID, fyDate.HS_FY, fyDate.HS_FY_MONTH_NUMBER
 - undocumented org-catalog columns (counted): 242
+- outer-join match conditions (counted, never voiced as filters): 87
 - join compliance: 10 violations, 203 compliant, 461 not judged
 - working set: 63 of 90 dictionary tables touched
-- descriptions produced: 303 scopes, grammar v1.2.0 in every basis
+- descriptions produced: 303 scopes, grammar v1.3.0 in every basis

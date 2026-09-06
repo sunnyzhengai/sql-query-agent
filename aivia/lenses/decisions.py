@@ -61,6 +61,34 @@ def flatten_where(where) -> List[Dict[str, Any]]:
     return [where]
 
 
+def is_join_key(pred: Dict[str, Any]) -> bool:
+    """col = col between two references — structure, never membership."""
+    return (pred.get("kind") == "COMPARE_EQ"
+            and pred.get("subject", {}).get("kind") == "column_ref"
+            and pred.get("comparand", {}).get("kind") == "column_ref")
+
+
+def inner_join_residues(scope) -> List[Dict[str, Any]]:
+    """Grammar v1.3.0 (the #BPA corpse): non-key predicates in an
+    INNER join's ON clause are MEMBERSHIP — a filter is a filter
+    wherever the developer parked it. OUTER-join residues are match
+    conditions, not membership: excluded here, counted by gap-census."""
+    out = []
+    for join_pred in scope.get("join_on", []):
+        if join_pred.get("join_type", "Inner") != "Inner":
+            continue
+        for leaf in flatten_where(join_pred):
+            if not is_join_key(leaf):
+                out.append(leaf)
+    return out
+
+
+def membership_predicates(scope) -> List[Dict[str, Any]]:
+    """The scope's full membership set: INNER-join ON residues (join
+    order precedes WHERE in the source) + WHERE predicates."""
+    return inner_join_residues(scope) + flatten_where(scope.get("where"))
+
+
 def named_scopes(tree):
     for stmt in tree["statements"]:
         for cte in stmt.get("ctes", []):
@@ -78,7 +106,7 @@ def lens_decisions(read, params) -> Dict[str, Any]:
     for tree in read.trees().values():
         for scope in named_scopes(tree):
             out[scope["name_key"]] = [
-                render_predicate(p) for p in flatten_where(scope.get("where"))
+                render_predicate(p) for p in membership_predicates(scope)
                 if not is_degenerate(p)]
     return {"yield": out, "completeness": "total per tree",
             "stamp": read.stamp()}

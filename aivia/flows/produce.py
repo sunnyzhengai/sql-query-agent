@@ -24,7 +24,7 @@ from aivia.lenses import decisions, derivation
 
 ECON = json.loads((pathlib.Path(__file__).parent / "econ_params.json")
                   .read_text())
-FLOOR_GRAMMAR_VERSION = "1.2.0"
+FLOOR_GRAMMAR_VERSION = "1.3.0"
 _PREPOSITIONS = ("of", "on", "per", "for", "in", "at", "by", "with")
 
 
@@ -223,7 +223,7 @@ def compose_floor(read: ReadApi, target: str) -> str:
             marker = ordinals[i] if i < len(ordinals) else f"#{i + 1}"
             alias_instance[alias] = f"For the {marker} {words} record read: "
     bullets = []
-    for pred in decisions.flatten_where(scope.get("where")):
+    for pred in decisions.membership_predicates(scope):
         if decisions.is_degenerate(pred):
             continue
         phrase = _voice_predicate(pred, voice)

@@ -105,3 +105,18 @@ def test_r8_annotations_attributed_never_bare(shaken):
     assert "200108022 (annotated 'Emergency' in the source)" in floor
     assert "200108015 (noted 'MAIN 95 TOWER EAST')" in floor
     assert "TRANSFER OUT." not in floor  # attributed, never bare fact
+
+
+def test_bpa_corpse_on_clause_filter_is_membership(shaken):
+    """Sunny's gap-check finding 3 (grammar v1.3.0): a col=literal
+    filter riding an INNER JOIN's ON clause is MEMBERSHIP — the old
+    build over-applied the join-key exclusion to the whole ON clause.
+    OUTER-join residues stay out (match conditions) and are counted."""
+    from aivia.flows import produce as _produce
+    from aivia.lenses import census as _census
+    store, _, _ = shaken
+    floor = _produce.compose_floor(ReadApi(store),
+                                   "reporting/USP_ED_SEPSIS.sql::#BPA")
+    assert "'900130001'" in floor  # the recovered ON-clause filter
+    gc = _census.lens_gap_census(ReadApi(store), None)
+    assert gc["outer_join_conditions_not_voiced"] == 87  # counted, declared

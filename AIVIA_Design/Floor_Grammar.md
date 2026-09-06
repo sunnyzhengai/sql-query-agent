@@ -1,4 +1,14 @@
-# The Floor Grammar — v1.2.0 (RATIFIED, Sunny, 2026-09-05; amended 2026-09-06 ×2)
+# The Floor Grammar — v1.3.0 (RATIFIED, Sunny, 2026-09-05; amended 2026-09-06 ×3)
+
+*v1.3.0 (Sunny's ED-sepsis gap-check, finding 3 — the #BPA corpse):
+ON-clause FILTERS of INNER joins are membership. The old build
+over-applied the join-key exclusion to the whole ON clause; but only
+`col = col` pairs are structure — `ALT.BPA_LOCATOR_ID = '900130001'`
+riding an INNER JOIN's ON is a row filter wherever the developer
+parked it (kinds name meanings, never syntax placement). OUTER-join
+ON residues are NOT membership (rows survive without a match) — they
+are COUNTED, never voiced as filters; the revisit trigger is a
+gap-check finding that needs them voiced.*
 
 *v1.2.0 (Sunny's ED-sepsis gap-check, finding 1 — tier 3 of the
 meaning ruling): R8 added — developer comments captured as EVIDENCE

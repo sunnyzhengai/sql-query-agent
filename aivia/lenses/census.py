@@ -53,12 +53,24 @@ def lens_gap_census(read, params) -> Dict[str, Any]:
     undocumented = sum(1 for n in read.nodes("column")
                        if not (n.properties.get("description")
                                or "").strip())
+    # grammar v1.3.0: OUTER-join ON residues are match conditions —
+    # never voiced as membership, counted here (declared, not silent)
+    from aivia.lenses.decisions import flatten_where, is_join_key, named_scopes
+    outer_residues = 0
+    for tree in read.trees().values():
+        for scope in named_scopes(tree):
+            for jp in scope.get("join_on", []):
+                if jp.get("join_type", "Inner") == "Inner":
+                    continue
+                outer_residues += sum(1 for leaf in flatten_where(jp)
+                                      if not is_join_key(leaf))
     excluded = sorted(n.identity for n in read.nodes("excluded_file"))
     return {"unresolved_refs": unresolved,
             "grain_not_declared": grain_gap,
             "keyless_tables": keyless,
             "undocumented_columns": undocumented,
             "unmapped_remainder": unmapped,
+            "outer_join_conditions_not_voiced": outer_residues,
             "unsupported_dialect_files": excluded,
             "completeness": "total", "stamp": read.stamp()}
 
