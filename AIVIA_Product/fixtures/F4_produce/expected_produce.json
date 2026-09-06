@@ -1,5 +1,5 @@
 {
-  "_comment": "AUTHORED produce-stage expectations over the F2 worklist, expect/forbid-substring style. A13 RULED 2026-09-05: the floor grammar becomes a RATIFIED versioned design artifact at the produce build slice; these substring expectations are INTERIM and upgrade to exact floor text when the grammar lands.",
+  "_comment": "AUTHORED produce-stage expectations over the F2 worklist. A13 CLOSED 2026-09-05: the floor grammar is RATIFIED (AIVIA_Design/Floor_Grammar.md v1.0.0) and acceptance is BYTE-EXACT against floor_texts.json; the expect/forbid substrings below are retired interim contracts, kept as witnesses and still validated for consistency.",
   "worklist": "= staleness_t0 (PROD-2); priority order deferred to ECON params",
   "targets": {
     "usp_diabetic_visits.sql::#Recent": {

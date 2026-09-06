@@ -1,0 +1,8 @@
+{
+  "_comment": "ECON v1 — RULED by Sunny 2026-09-05. Declared data, never code defaults (the slice-5 entry obligation). The produce flow consumes this file; changing pace policy is an edit HERE, versioned, not a code change. usage-weighted priority reads the usage ledger's touch counts per target; an empty ledger (first contact) degrades to worklist order — declared, not silent.",
+  "version": "econ-v1",
+  "ruled": "2026-09-05 (Sunny)",
+  "batch_size": 50,
+  "run_budget": 500,
+  "priority": "usage-weighted"
+}

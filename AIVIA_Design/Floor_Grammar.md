@@ -1,8 +1,9 @@
-# The Floor Grammar — DRAFT v1.0.0 (A13's deliverable, for Sunny's ratification)
+# The Floor Grammar — v1.0.0 (RATIFIED, Sunny, 2026-09-05)
 
-*A13 RULED 2026-09-05: the deterministic floor's sentence grammar
-becomes a RATIFIED, VERSIONED design artifact at the produce slice.
-This is that artifact, drafted at slice-5 entry. Seed: the field-proven
+*A13 CLOSED: ratified by Sunny 2026-09-05 at slice-5 entry, per the
+ruling's own schedule. This version stamps into every produce run's
+basis; a grammar change is a version bump that makes every
+floor-derived artifact stale. Seed: the field-proven
 skeleton composer (`src/descriptions.py`, DESC-SKELETON-3 / ADR 0074,
 38-test suite) — its corpus-hardened rules restated as total mappings
 over the ratified kind library. Companion payload (code-consumed):
@@ -91,6 +92,14 @@ starts with 'E11'."
 
 - subject words := the column's DICTIONARY DESCRIPTION rendered as a
   noun phrase; raw column tokens NEVER reach prose (DESC-VOICE-3.2).
+  Rendering algorithm (entailed by the ratified payload; landed at
+  build per protocol step 6): take the description's FIRST sentence,
+  strip the article and terminal period; if it has the shape
+  "<X> of|for the <Y>", reorder to "<Y> <head(X)>" with head(X) = the
+  first word of X — "date of the visit" → "visit date", "status
+  category for the appointment" → "appointment status"; otherwise the
+  phrase stands as written — "diagnosis code". Total; ill-fitting
+  descriptions produce awkward-but-grounded words, never raw tokens.
   A column with no dictionary entry voices as the readable form of
   its name AND lands as a counted coverage gap — never silent.
 - parameter := "the {name words} parameter (default {literal} when

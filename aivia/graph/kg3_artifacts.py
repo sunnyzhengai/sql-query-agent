@@ -22,7 +22,9 @@ from aivia.graph import phi_gate
 from aivia.graph.store import NodeVersion, Store
 
 STATE_CLASSES = ("description", "term", "responsibility")
-EVENT_CLASSES = ("disposition", "usage", "proposal", "redaction")
+EVENT_CLASSES = ("disposition", "usage", "proposal", "redaction",
+                 "run_event")
+RUN_OUTCOMES = ("completed", "aborted")
 DESCRIPTION_STATUS = ("gate_passed", "skeleton_floor", "flagged")
 RULINGS = ("accept", "reject", "revoke", "acknowledge")
 USAGE_ACTIONS = ("asked", "ran", "confirmed")
@@ -187,6 +189,31 @@ def append_proposal(store: Store, kind: str, about: str, author: str,
     seq = len(store.current_nodes("proposal")) + 1
     return store.append_node("proposal", f"proposal:{seq}", props,
                              occurred_at, f"kg3@{occurred_at}")
+
+
+def append_run_event(store: Store, author: str, basis: Dict[str, Any],
+                     accounting: Dict[str, Any], outcome: str,
+                     occurred_at: str) -> NodeVersion:
+    """The GENERATION-RUN EVENT — the ONLY production ledger (PROD-1).
+    Quality numbers are lenses over run events, never separate
+    bookkeeping. Author is the agent identity; basis is the witness
+    chain (grammar/lens/metamodel versions + the worklist)."""
+    _check_identity(author)
+    if not is_machine(author):
+        raise RefusalKG3("PROD-1", "the run event's author is the produce "
+                         "pipeline's AGENT identity")
+    if not basis:
+        raise RefusalKG3("KG3-3", "a run event carries its basis")
+    if outcome not in RUN_OUTCOMES:
+        raise RefusalKG3("OPS-3", f"outcome '{outcome}' outside "
+                         f"{RUN_OUTCOMES}")
+    seq = len(store.current_nodes("run_event")) + 1
+    return store.append_node(
+        "run_event", f"run:{seq}",
+        {"author": author, "basis": dict(basis),
+         "accounting": dict(accounting), "outcome": outcome,
+         "occurred_at": occurred_at},
+        occurred_at, f"kg3@{occurred_at}")
 
 
 def supersede(store: Store, prior_version_id: str,
