@@ -21,6 +21,50 @@ def receive_extract(store, reg: Dict[str, Any],
     return kg1_intake.apply_extract(store, reg, snap)
 
 
+def render_intake_report(reg: Dict[str, Any], extract_reports,
+                         estate_report, read) -> str:
+    """The DBA-facing rendering of the intake result data (SOP: what
+    loaded, what was counted as missing, anything quarantined; a
+    refusal would have named its rule before this ever rendered).
+    DATA FIRST — every number here is recomputed from the graph and
+    the reports, never hand-written."""
+    lines = ["AIVIA INTAKE REPORT",
+             f"Registered db: {reg['db_name']} (server {reg['server']}); "
+             f"sources: {', '.join(reg['registered_sources'])}; "
+             f"DBA: {reg['dba_team']}", ""]
+    tables = read.nodes("table")
+    columns = read.nodes("column")
+    for rep in extract_reports:
+        src = rep.source
+        n_tables = sum(1 for t in tables if t.identity.startswith(f"{src}|"))
+        n_cols = sum(1 for c in columns if c.identity.startswith(f"{src}|"))
+        lines.append(f"[extract: {src}] loaded {n_tables} tables, "
+                     f"{n_cols} columns; checks: "
+                     f"{rep.check_outcomes.get('INTAKE-0..10', '?')}")
+        grain_gap = rep.gap_lists.get("grain_not_declared", [])
+        lines.append(f"  counted missing: {len(grain_gap)} table(s) with "
+                     "no declared grain"
+                     + (f" ({', '.join(grain_gap)})" if grain_gap else ""))
+        for alert in rep.dba_alerts:
+            lines.append(f"  QUARANTINED (needs your confirmation): {alert}")
+        for decl in rep.illegal_declarations:
+            lines.append(f"  refused declaration: {decl}")
+        for pend in rep.pending_references:
+            lines.append(f"  pending reference: {pend}")
+    lines.append("")
+    lines.append(f"[estate] acquired {len(estate_report.acquired)} file(s): "
+                 f"{', '.join(sorted(estate_report.acquired))}")
+    for exc in estate_report.counted_excluded:
+        lines.append(f"  excluded (counted): {exc['file']} — {exc['reason']}")
+    unresolved = [(t['name'], r)
+                  for t in estate_report.trees.values()
+                  for r in t['resolution_census']['unresolved']]
+    for fname, ref in unresolved:
+        lines.append(f"  unresolved reference: {ref} in {fname} — not in "
+                     "the dictionary (counted, never guessed)")
+    return "\n".join(lines)
+
+
 @dataclass
 class EstateReport:
     acquired: List[str] = field(default_factory=list)
