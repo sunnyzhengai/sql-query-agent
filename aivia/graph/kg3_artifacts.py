@@ -83,11 +83,20 @@ def _append_version(store: Store, kind: str, artifact_id: str,
 def append_description(store: Store, artifact_id: str, about: List[str],
                        text: str, status: Optional[str], author: str,
                        basis: Optional[Dict[str, Any]],
-                       created_at: str) -> NodeVersion:
+                       created_at: str,
+                       anchor: Optional[Dict[str, Any]] = None
+                       ) -> NodeVersion:
     if not (text or "").strip():
         raise RefusalKG3("LC3-F5", "no empty shells — a description "
                          "version must carry text")
     payload: Dict[str, Any] = {"text": text}
+    if anchor:
+        # THE ANCHOR RULE (twin-graph ruling 2f, Phase D): about
+        # targets a MEANING IDENTITY — a KG2b content_key at a scope
+        # path — never a syntax node, never a node instance. Same key
+        # after regeneration -> the artifact survives silently (S1);
+        # changed key -> flagged orphan (S2, the drift finding).
+        payload["anchor"] = dict(anchor)
     if is_machine(author):
         if status not in DESCRIPTION_STATUS:
             raise RefusalKG3("PROD-3", f"status '{status}' outside the "
@@ -259,3 +268,55 @@ def redaction_act(store: Store, version_id: str, field: str, why: str,
                       {"about": version_id, "field": field, "why": why,
                        "author": human_confirmation},
                       "redaction", f"kg3@redaction:{seq}")
+
+
+# ---- Phase D (twin-graph ruling 2f): the anchor migration ----------
+def _is_human_owned(store: Store, artifact_id: str) -> bool:
+    versions = _versions_of(store, artifact_id)
+    if any(not is_machine(v.properties["author"]) for v in versions):
+        return True
+    version_ids = {v.identity for v in versions} | {artifact_id}
+    return any(d.properties.get("ruling") == "accept"
+               and d.properties.get("about") in version_ids
+               for d in store.current_nodes("disposition"))
+
+
+def migrate_anchors(store: Store, selection_keys: Dict[str, str],
+                    occurred_at: str) -> Dict[str, Any]:
+    """One-time Phase D act: every current description without an
+    anchor gains one — a new version citing the migration basis,
+    anchored to its scope's selection content_key. The equation is
+    the acceptance: migrated + orphaned + human_held == candidates.
+    Orphans (about-target absent from the twins) are FINDINGS, never
+    errors; human-owned artifacts are never touched by a pipeline —
+    they surface for the steward instead."""
+    latest: Dict[str, NodeVersion] = {}
+    for v in store.current_nodes("description"):
+        latest[v.properties["artifact_id"]] = v
+    report: Dict[str, Any] = {"candidates": 0, "migrated": 0,
+                              "orphaned": [], "human_held": []}
+    for artifact_id, version in sorted(latest.items()):
+        if version.properties.get("anchor"):
+            continue
+        report["candidates"] += 1
+        target = version.properties["about"][0]
+        key = selection_keys.get(target)
+        if key is None:
+            report["orphaned"].append(target)
+            continue
+        if _is_human_owned(store, artifact_id):
+            report["human_held"].append(target)
+            continue
+        _append_version(
+            store, "description", artifact_id,
+            version.properties["about"], "agent:anchor-migration",
+            occurred_at,
+            {"migration": "phase-d anchor (ADR 0077)",
+             "from_version": version.identity},
+            {"text": version.properties["text"],
+             "status": version.properties.get("status"),
+             "anchor": {"scope": target, "content_key": key}})
+        report["migrated"] += 1
+    assert (report["migrated"] + len(report["orphaned"])
+            + len(report["human_held"]) == report["candidates"])
+    return report

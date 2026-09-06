@@ -366,6 +366,7 @@ class _Walk:
                 for i, arm in enumerate(scope["combination_arms"])]
             content = {"selection": scope.get("name")
                        or scope.get("name_key") or "(anonymous)",
+                       "name_key": scope.get("name_key"),
                        "combines": len(arm_keys),
                        "combination": scope.get("combination"),
                        "duplicates_kept": bool(
@@ -404,6 +405,7 @@ class _Walk:
                       + where_key + member_keys)
         content = {"selection": scope.get("name") or scope.get("name_key")
                    or "(anonymous)",
+                   "name_key": scope.get("name_key"),
                    "reads": len(source_keys),
                    "conditions": len(join_keys) + len(where_key),
                    "outputs": len(member_keys)}

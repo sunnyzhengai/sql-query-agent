@@ -7,7 +7,7 @@
 
 # Test Map — what every test proves
 
-150 modules, 1682 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
+151 modules, 1687 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
 
 ## By ADR
 
@@ -164,6 +164,7 @@
 - `tests/aivia/test_phase_a_projection.py` (6): Phase A exit (ADR 0077): the F8 phase-A answer keys go RUNNABLE.
 - `tests/aivia/test_phase_b_translator.py` (10): Phase B exit (ADR 0077): the F8 phase-B answer keys go RUNNABLE.
 - `tests/aivia/test_phase_c_voicing.py` (5): Phase C exit (ADR 0077): the F8 phase-C answer keys go RUNNABLE.
+- `tests/aivia/test_phase_d_anchors.py` (5): Phase D exit (ADR 0077): the F8 phase-D answer keys go RUNNABLE.
 - `tests/aivia/test_phi_gate.py` (8): Slice 2: the PHI boundary — both doors, fixture-driven.
 - `tests/aivia/test_planks.py` (6): Slice 0: the planks — the import law and banned constructs as physics.
 - `tests/aivia/test_produce.py` (10): Slice 5 exit: produce vs the RATIFIED floor grammar — F4 upgraded

@@ -20,7 +20,7 @@ from typing import Any, Callable, Dict, List, Optional
 from aivia.flows import gates, run_events
 from aivia.graph import kg3_artifacts
 from aivia.graph.read_api import ReadApi
-from aivia.lenses import decisions, derivation
+from aivia.lenses import anchors, decisions, derivation
 
 ECON = json.loads((pathlib.Path(__file__).parent / "econ_params.json")
                   .read_text())
@@ -550,6 +550,9 @@ def run(store, occurred_at: str,
                "worklist": list(batch)},
         occurred_at=occurred_at)
     shipped, absent, killed = 0, [], 0
+    # Phase D: every new machine description anchors to its scope's
+    # MEANING identity at write time (the anchor rule, ruling 2f)
+    keys = anchors.selection_keys(read)
     for target in batch:
         try:  # OPS-2: one append or a counted absence, never half
             floor = compose_floor(read, target)
@@ -568,10 +571,12 @@ def run(store, occurred_at: str,
                     text, status = candidate, "gate_passed"
                 else:
                     killed += len(violations)  # counted, never silent
+            anchor = ({"scope": target, "content_key": keys[target]}
+                      if target in keys else None)
             kg3_artifacts.append_description(
                 store, artifact_id=f"description:{target}", about=[target],
                 text=text, status=status, author="agent:produce",
-                basis=run.basis, created_at=occurred_at)
+                basis=run.basis, created_at=occurred_at, anchor=anchor)
             shipped += 1
         except Exception as err:  # noqa: BLE001 — OPS-2: absence counted w/ reason, run continues
             absent.append({"target": target, "reason": str(err)})
