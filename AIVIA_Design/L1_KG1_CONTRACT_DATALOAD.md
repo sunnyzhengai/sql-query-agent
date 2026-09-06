@@ -51,8 +51,8 @@ customers, never in public/demo assets.
    INTEGRITY: every table in part 2 must have pk rows here —
    violation is a named refusal (INTAKE-10). pk is DECLARED DATA,
    never prose-derived.
-3c. **org-catalog columns** (added 2026-09-06, from the sepsis
-   shakedown finding; ratification Sunny's): the vendor's dictionary
+3c. **org-catalog columns** (added 2026-09-06 from the sepsis
+   shakedown finding; RATIFIED by Sunny 2026-09-06): the vendor's dictionary
    NEVER documents the org's own tables (report/staging tables in
    org schemas) — that gap is structural, every customer has it. The
    extract therefore includes a catalog part: tables + columns for

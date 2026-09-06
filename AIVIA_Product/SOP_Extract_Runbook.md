@@ -30,6 +30,13 @@ only your system's own data dictionary.*
 4. **Run Script 2 (values dump).** It generates and runs one
    uniform SELECT per value table. Save the single combined result
    as a CSV.
+4b. **Run Script 3 (your own schemas).** Your teams' report and
+   staging tables don't appear in the vendor's dictionary — Script 3
+   reads them from the database's own catalog instead
+   (INFORMATION_SCHEMA), for the non-vendor schemas the source pack
+   lists. Save the result as a CSV. *These columns won't have
+   descriptions — that's expected; the intake report will show you
+   which of them your reports actually depend on.*
 5. **Fill in the two manifest fields** in the provided manifest
    file: the source label (given in the source pack) and your name.
    Everything else in the manifest was captured by Script 1 —
