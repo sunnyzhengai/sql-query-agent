@@ -455,6 +455,18 @@ def resolve(tree: Dict[str, Any], store: Store,
 
 
 # ---- lifecycle ----
+def record_exclusion(store: Store, file_name: str, reason: str,
+                     as_of: str) -> None:
+    """E5 conservation citizen: an unsupported-dialect file lands as a
+    COUNTED exclusion in the graph — never parsed, never silent."""
+    current = [n for n in store.current_nodes("excluded_file")
+               if n.identity == file_name]
+    if current and current[0].properties.get("reason") == reason:
+        return
+    store.append_node("excluded_file", file_name, {"reason": reason},
+                      as_of, f"estate@{as_of}")
+
+
 def apply_file(store: Store, reg: Dict[str, Any], file_id: str,
                file_name: str, text: str, as_of: str,
                dialect: str = "tsql") -> Dict[str, Any]:

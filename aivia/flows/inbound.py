@@ -37,10 +37,12 @@ def receive_estate(store, reg: Dict[str, Any], estate_dir) -> EstateReport:
         if path.name == "manifest.json":
             continue
         if path.suffix != ".sql":
-            report.counted_excluded.append({
-                "file": path.name,
-                "reason": f"unsupported-dialect ({path.suffix.lstrip('.')} "
-                          "placeholder)"})
+            reason = (f"unsupported-dialect ({path.suffix.lstrip('.')} "
+                      "placeholder)")
+            kg2_mapper.record_exclusion(store, path.name, reason,
+                                        manifest["as_of"])
+            report.counted_excluded.append({"file": path.name,
+                                            "reason": reason})
             continue
         tree = kg2_mapper.apply_file(
             store, reg, file_id=f"{location}{path.name}",

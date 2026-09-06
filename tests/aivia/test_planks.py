@@ -60,8 +60,14 @@ def test_plank_import_law():
         if not imp.startswith("aivia."):
             return None
         if mod.startswith("aivia/lenses/"):
-            if imp != "aivia.graph.read_api" and not imp.startswith("aivia.lenses"):
-                return "lenses may import graph.read_api ONLY"
+            allowed = imp == "aivia.graph.read_api" \
+                or imp.startswith("aivia.lenses") \
+                or (mod == "aivia/lenses/registry.py"
+                    and imp.startswith("aivia.graph.metamodel"))
+            if not allowed:
+                return ("lenses may import graph.read_api ONLY "
+                        "(+ metamodel in registry.py — design data, "
+                        "not graph state)")
         if mod.startswith("aivia/flows/"):
             if imp.startswith("aivia.graph.store"):
                 return "flows use lifecycle APIs, never the store"
