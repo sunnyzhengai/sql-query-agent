@@ -18,7 +18,7 @@ import json
 import pathlib
 from typing import Any, Callable, Dict
 
-from aivia.graph import kg3_artifacts
+from aivia.graph import kg3_artifacts, phi_gate
 from aivia.lenses import derivation
 
 HEADERS = json.loads((pathlib.Path(__file__).parent /
@@ -39,7 +39,7 @@ def render(read, artifact_id: str, target_system: str) -> Dict[str, Any]:
                           f"'{target_system}' — headers bind as data, "
                           "never improvised")
     current = derivation.lens_current(read, None)["yield"][artifact_id]
-    text = current["text"]
+    text = phi_gate.egress_redact(current["text"]).text  # leaving tenant
     if str(current.get("author", "")).startswith("agent:"):
         text = HEADERS["attribution_prefix"] + text
     scope_key = current["about"][0]

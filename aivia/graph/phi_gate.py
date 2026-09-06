@@ -38,19 +38,30 @@ _CONTACT_SHAPES = [
     ("contact_literal", re.compile(
         r"\(\d{3}\)\s?\d{3}[-.]\d{4}|\b\d{3}[-. ]\d{3}[-.]\d{4}\b"), 0),
 ]
-_DOOR1_REDACT = _CONTACT_SHAPES + [
+# The ADR 0025 posture, landed at the sepsis shakedown (2026-09-06):
+# the graph keeps the original fragment — nothing inside the tenant is
+# blocked; redaction applies where text LEAVES the tenant. So door 1
+# redacts only the context-free contact shapes (never analytical),
+# and COUNTS id/name/date/threshold literals; the egress gate redacts
+# them where they exit. The sepsis corpus proved the alternative
+# destroys meaning: FLO_MEAS_ID = '9000002705' is CONFIG — the logic
+# itself — not PHI; redacting it at intake made floors lie and broke
+# the parse (unquoted numerics).
+_ID_NAME_DATE = [
     ("id_literal", re.compile(
         rf"(?i)\b({ID_COLUMN})\s*(?:=|!=|<>)\s*'?(\d{{5,}})'?"), 2),
     ("name_literal", re.compile(
         rf"(?i)\b({NAME_COLUMN})\s*(?:=|<>|!=|LIKE)\s*('[^']+')"), 2),
-]
-_DOOR1_COUNT_ONLY = [
     ("date_literal", re.compile(
         r"'(\d{4}-\d{1,2}-\d{1,2}(?:[ T][\d:.]+)?)'"), 0),
     ("date_literal", re.compile(r"'(\d{1,2}/\d{1,2}/\d{2,4})'"), 0),
+]
+_DOOR1_REDACT = list(_CONTACT_SHAPES)
+_DOOR1_COUNT_ONLY = _ID_NAME_DATE + [
     ("threshold_literal", re.compile(
         r"(?i)\b([\w\[\]\.]+)\s*(?:>=|<=|>|<)\s*(\d+(?:\.\d+)?)\b"), 2),
 ]
+_EGRESS_REDACT = _CONTACT_SHAPES + _ID_NAME_DATE
 _DOOR2_REDACT = _CONTACT_SHAPES + [
     ("id_literal", re.compile(
         r"(?i)\b(?:MRN|CSN)\s*#?\s*(\d{5,})\b"), 1),
@@ -107,3 +118,9 @@ def door2_redact(text: str) -> GateResult:
     """Free-typed usage payloads — SAFE-1's second door (exercised by
     the deferred inward flow; the gate itself is live and tested now)."""
     return _apply(text, _DOOR2_REDACT, [])
+
+
+def egress_redact(text: str) -> GateResult:
+    """Text LEAVING the tenant (landed exports, prompts): the full
+    rule set redacts here — ADR 0025's boundary, unchanged."""
+    return _apply(text, _EGRESS_REDACT, [])

@@ -1,0 +1,9 @@
+{
+ "source": "emr",
+ "operator": "sepsis.pack",
+ "db_name": "aivia_demo_src",
+ "server": "SEPSISSERVER",
+ "as_of": "2026-09-06T00:00:00Z",
+ "source_pack_version": "sepsis-pack-1.0",
+ "default_schema": "dbo"
+}

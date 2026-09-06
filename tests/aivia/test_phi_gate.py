@@ -15,14 +15,39 @@ DOOR2 = pathlib.Path(__file__).resolve().parents[2] / \
     "AIVIA_Product" / "fixtures" / "F6_refusals" / "phi_door2.json"
 
 
-def test_door1_redacts_high_severity_literals():
+def test_door1_redacts_contact_shapes_and_counts_the_rest():
+    """ADR 0025 posture (landed at the sepsis shakedown): the graph
+    keeps original fragments in-tenant; door 1 redacts only the
+    context-free contact shapes. Id/name literals are COUNTED — their
+    redaction belongs to egress, where text leaves the tenant."""
     sql = ("SELECT * FROM PT WHERE PAT_MRN = '12345678' "
            "AND PATIENT_NAME = 'JANE DOE' AND SSN = '123-45-6789'")
     result = phi_gate.door1_redact(sql)
+    assert "123-45-6789" not in result.text  # contact shape: redacted
+    assert "12345678" in result.text         # counted, kept in-tenant
+    assert "JANE DOE" in result.text
+    assert result.redaction_count == 1
+    assert result.counted_findings.get("id_literal") == 1
+    assert result.counted_findings.get("name_literal") == 1
+
+
+def test_egress_redacts_the_full_rule_set():
+    text = ("AIVIA agent generated: The patient MRN_ID = '12345678' and "
+            "PATIENT_NAME = 'JANE DOE' visited on '2026-01-01'.")
+    result = phi_gate.egress_redact(text)
     assert "12345678" not in result.text
     assert "JANE DOE" not in result.text
-    assert "123-45-6789" not in result.text
+    assert "2026-01-01" not in result.text
     assert result.redaction_count == 3
+
+
+def test_door1_redaction_keeps_sql_parseable():
+    """The sepsis catch: a redacted literal must stay a VALID literal
+    — quoted spans keep their quotes."""
+    sql = "WHERE SSN = '123-45-6789' AND CALLBACK = 555-123-4567"
+    result = phi_gate.door1_redact(sql)
+    assert "'<CONTACT>'" in result.text
+    assert "= <CONTACT>" in result.text
 
 
 def test_door1_keeps_analytical_dates_verbatim_but_counts_them():

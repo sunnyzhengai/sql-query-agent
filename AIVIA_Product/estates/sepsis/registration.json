@@ -1,0 +1,15 @@
+{
+ "_comment": "DBA prerequisite (A1) for the anonymized sepsis source; one source owns every schema.",
+ "db_name": "aivia_demo_src",
+ "server": "SEPSISSERVER",
+ "dba_team": "role:emr-dba",
+ "registered_sources": [
+  "emr"
+ ],
+ "registered_at": "2026-09-06T00:00:00Z",
+ "schema_sources": {
+  "dbo": "emr",
+  "reporting": "emr",
+  "reports": "emr"
+ }
+}
