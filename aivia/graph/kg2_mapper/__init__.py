@@ -270,8 +270,15 @@ def _collect_from(ctx, table_ref, refs, join_on):
         # reads were invisible to from_refs until the ABX sweep found
         # the class (2026-09-06). No ON clause: the link lives in the
         # WHERE as col=col keys, already structure by the v1.3.0 law.
+        # OUTER APPLY's right side is an OPTIONAL lookup — rows
+        # survive without a match — so its refs carry the marker the
+        # v1.3.0 inner/outer law needs downstream.
         _collect_from(ctx, table_ref.FirstTableReference, refs, join_on)
+        before = len(refs)
         _collect_from(ctx, table_ref.SecondTableReference, refs, join_on)
+        if str(table_ref.UnqualifiedJoinType) == "OuterApply":
+            for ref in refs[before:]:
+                ref["outer_apply"] = True
     elif t == "QueryDerivedTable":
         refs.append({
             "derived_scope": _map_query(ctx, table_ref.QueryExpression),

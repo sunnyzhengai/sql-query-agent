@@ -97,6 +97,35 @@ def membership_predicates(scope) -> List[Dict[str, Any]]:
     return inner_join_residues(scope) + flatten_where(scope.get("where"))
 
 
+def nested_membership(scope) -> List[Dict[str, Any]]:
+    """The RESTRICTIVE-SPINE membership of a subselection (grammar
+    2.2.0, the ABX first-leg find): this scope's membership plus every
+    derived source's, recursively — EXCEPT arms of OUTER APPLY (an
+    optional lookup's interior never restricts the producing rows) and
+    combination arms (alternatives cannot flatten as conjunction).
+    Truthful because restrictive-spine composition is conjunctive."""
+    if "combination_arms" in scope:
+        return []
+    out = list(membership_predicates(scope))
+    for ref in scope.get("from_refs", []):
+        if "derived_scope" in ref and not ref.get("outer_apply"):
+            out.extend(nested_membership(ref["derived_scope"]))
+    return [p for p in out if not is_join_key(p)]
+
+
+def nested_sources(scope) -> List[Dict[str, Any]]:
+    """Every table/scope READ of a subselection, all depths, in
+    appearance order — lookups included (a read is a read)."""
+    out: List[Dict[str, Any]] = []
+    for s in ([scope] + scope.get("combination_arms", [])):
+        for ref in s.get("from_refs", []):
+            if "derived_scope" in ref:
+                out.extend(nested_sources(ref["derived_scope"]))
+            else:
+                out.append(ref)
+    return out
+
+
 def named_scopes(tree):
     for stmt in tree["statements"]:
         for cte in stmt.get("ctes", []):

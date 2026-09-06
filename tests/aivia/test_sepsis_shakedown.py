@@ -176,5 +176,12 @@ def test_abx_corpse_union_cte_voices_both_arms(shaken):
     assert "duplicates removed" in floor
     assert floor.count("allmeds selection defined earlier") == 2
     assert "The thera class code is 11 (annotated 'Antibiotics'" in floor
-    assert "defined by another selection" in floor  # the value set
     assert "The taken time is before the ed departure time" in floor
+    # grammar 2.2.0 (the first-leg find): the value-set pointer gained
+    # its content — reads + restrictive-spine conditions; the OUTER
+    # APPLY's interior (TYPE_CODE = 3) stays excluded: an optional
+    # lookup never restricts the producing rows
+    assert "a nested selection reading medications records" in floor
+    assert "3016" in floor
+    assert "the agent order is 1" in floor
+    assert "type code is 3" not in floor.lower()

@@ -30,11 +30,14 @@ ECON = json.loads((pathlib.Path(__file__).parent / "econ_params.json")
 # 24-hour-window bound gains the DATEADD phrase (ADR 0076's
 # evidence-ordered overlay: 12 estate uses ordered it) — the line-83
 # raw-token corpse from Sunny's gap-check dies here.
+# 2.2.0: the ABX FIRST LEG (Sunny): IN/EXISTS subselections voice
+# their aggregate reads + restrictive-spine conditions (nested
+# membership; OUTER-APPLY interiors and combination arms excluded).
 # 2.1.0: the ABX corpse (Sunny's Phase-C gap-check find) — a UNION
 # CTE floored as 'no source records are read': COMBINATION scopes now
 # map (arms in order, dedup flag), voice per arm, and an unmapped
 # query shape floors as its honest counted state, never a claim.
-FLOOR_GRAMMAR_VERSION = "2.1.0"
+FLOOR_GRAMMAR_VERSION = "2.2.0"
 _PREPOSITIONS = ("of", "on", "per", "for", "in", "at", "by", "with")
 
 
@@ -197,6 +200,39 @@ class _Voice:
         return tokens
 
 
+def _nested_selection_phrase(selection, voice: "_Voice") -> str:
+    """Grammar 2.2.0: an IN/EXISTS subselection voices its aggregate
+    reads + restrictive-spine conditions in one phrase. Returns ''
+    when there is no mapped interior (the pre-sweep pointer wording
+    stands) or when the interior is a combination (alternatives
+    cannot flatten; the pointer wording stays honest)."""
+    scope = (selection or {}).get("scope")
+    if not scope or "combination_arms" in scope:
+        return ""
+    sources = decisions.nested_sources(scope)
+    if not sources:
+        return ""
+    phrases = []
+    for ref in sources:
+        p = _source_phrase(ref.get("table_ref"),
+                           ref.get("resolves_to"), [])
+        if p not in phrases:
+            phrases.append(p)
+    conds = []
+    for pred in decisions.nested_membership(scope):
+        if decisions.is_degenerate(pred):
+            continue
+        phrase = _voice_predicate(pred, voice)
+        if phrase and phrase not in conds:
+            conds.append(phrase)
+    out = "a nested selection reading " + ", ".join(phrases)
+    if conds:
+        joined = "; and ".join(p.rstrip(".")[0].lower() + p.rstrip(".")[1:]
+                               for p in conds)
+        out += f", where {joined}"
+    return out
+
+
 def _voice_predicate(pred, voice: _Voice) -> str:
     kind = pred["kind"]
     subj_expr = pred.get("subject", {})
@@ -238,8 +274,19 @@ def _voice_predicate(pred, voice: _Voice) -> str:
     if kind == "NULL_CHECK":
         return f"The {subj} has no recorded value."
     if kind == "EXISTS_SELECTION":
+        detail = _nested_selection_phrase(pred.get("selection"), voice)
+        if detail:
+            return f"A matching record exists in {detail}."
         return "A matching record exists in a separately defined selection."
     if kind == "IN_SELECTION":
+        # grammar 2.2.0 (Sunny's ABX first-leg find): the value-set
+        # pointer gains its CONTENT now that subquery interiors are
+        # mapped — the nested selection's reads and its restrictive-
+        # spine conditions; OUTER-APPLY interiors stay excluded (an
+        # optional lookup never restricts the producing rows)
+        detail = _nested_selection_phrase(pred.get("selection"), voice)
+        if detail:
+            return f"The {subj} is one of the values from {detail}."
         return (f"The {subj} is one of the values defined by another "
                 "selection.")
     if kind == "QUANTIFIED_COMPARE":
