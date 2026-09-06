@@ -270,6 +270,23 @@ srcs = " ".join(open(snapdir + f).read() for f in acq) + " " + json.dumps(vals)
 bad = [s for t, spec in f4["targets"].items()
        for s in spec.get("expect_substrings", []) if s not in srcs]
 rule("F4", "GV-E expect_substrings grounded in inputs", bad)
+# floor-texts payload (A13 draft): every target has a text satisfying
+# the interim expect/forbid contract — checked NOW, binding at ratification
+ft = json.load(open(BASE + "F4_produce/floor_texts.json"))["texts"]
+bad = []
+for t, spec in f4["targets"].items():
+    if t not in ft:
+        bad.append(f"{t}: no floor text in payload")
+        continue
+    for s in spec.get("expect_substrings", []):
+        if s not in ft[t]:
+            bad.append(f"{t}: floor text lacks expected '{s}'")
+    for s in spec.get("forbid_substrings", []):
+        if s in ft[t]:
+            bad.append(f"{t}: floor text contains forbidden '{s}'")
+rule("F4", "A13 floor-text payload satisfies the interim contract",
+     bad + ([f"payload names unknown target(s): {set(ft) - set(f4['targets'])}"]
+            if set(ft) - set(f4["targets"]) else []))
 
 # ---------- F5 ----------
 f5 = json.load(open(BASE + "F5_approve_land/expected_approve_land.json"))

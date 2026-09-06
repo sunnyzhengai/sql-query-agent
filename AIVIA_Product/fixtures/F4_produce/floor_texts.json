@@ -1,0 +1,16 @@
+{
+  "_comment": "The floor-grammar payload (companion to AIVIA_Design/Floor_Grammar_DRAFT.md): the EXACT deterministic floor text per F4 target, derived rule-by-rule from the draft grammar over the graph's facts. STATUS: pending ratification (A13) — until Sunny ratifies the grammar, F4's expect/forbid substrings remain the acceptance and this file binds nothing; at ratification F4 upgrades to byte-exact against these texts.",
+  "floor_grammar_version": "1.0.0-draft",
+  "texts": {
+    "usp_diabetic_visits.sql::#Recent": "This is a selection of patient encounters.\n- The visit date is on or after the start date parameter (default '2026-01-01' when none is supplied).\n- The appointment status is 2 ('Completed').",
+    "usp_diabetic_visits.sql::delivery": "This is a selection of diagnoses on an encounter.\n- The diagnosis code starts with 'E11'.",
+    "vw_completed_visits.sql::delivery": "This is a selection of patient encounters.\n- The appointment status is one of the values 1 ('Scheduled'), 2 ('Completed').",
+    "usp_odd_join.sql::delivery": "This is a selection of patients.\n- No membership conditions are applied in this selection."
+  },
+  "_derivations": {
+    "usp_diabetic_visits.sql::#Recent": "R1 lead from ENCOUNTER.grain 'patient encounter' (last-word pluralization); R4 temporal GTE ('visit date' contains 'date'); R5 parameter w/ structural default + value 2 voiced with its map meaning",
+    "usp_diabetic_visits.sql::delivery": "R1 first grain-bearing FROM ref: #Recent carries no grain -> ENCOUNTER_DX 'diagnosis on an encounter' (head-noun pluralization before 'on'); R4 trailing-%% pattern -> starts with",
+    "vw_completed_visits.sql::delivery": "R6: the 1=1 contributes nothing (degenerate lens); R4 IN_LIST with both meanings from the values map, position order",
+    "usp_odd_join.sql::delivery": "R1 first grain-bearing: PATIENT 'patient'; R7 honest no-conditions (join key is structure, NOTE_TXT lives in gap-census, never prose)"
+  }
+}
