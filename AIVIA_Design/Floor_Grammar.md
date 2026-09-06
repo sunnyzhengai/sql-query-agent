@@ -1,4 +1,8 @@
-# The Floor Grammar — v1.1.0 (RATIFIED, Sunny, 2026-09-05; amended 2026-09-06)
+# The Floor Grammar — v1.2.0 (RATIFIED, Sunny, 2026-09-05; amended 2026-09-06 ×2)
+
+*v1.2.0 (Sunny's ED-sepsis gap-check, finding 1 — tier 3 of the
+meaning ruling): R8 added — developer comments captured as EVIDENCE
+and voiced WITH ATTRIBUTION, never as bare fact.*
 
 *v1.1.0 (Sunny's ED-sepsis gap-check, finding 2): R2's dedup ran at
 RENDERED-STRING grain and merged two distinct decisions — the same
@@ -146,6 +150,31 @@ A scope that reads tables and has an EMPTY membership set voices:
 decisions is itself a voicable, grounded fact ("a collection of
 records" said nothing). Unresolved refs never surface as prose; they
 live in gap-census. Deciding example: `usp_odd_join.sql::delivery`.
+
+## R8 — source annotations (v1.2.0; evidence, never fact)
+
+The mapper captures a TRAILING SAME-LINE comment as the predicate's
+(or IN-list member's) ANNOTATION — it is verbatim estate text, so
+citing it is grounded (B1); it is an unverified developer claim, so
+it never voices as bare fact. Voicing:
+
+- predicate-level: the bullet gains " (annotated '<text>' in the
+  source)". Deciding example: `EVENT_TYPE_CODE = 4  --TRANSFER OUT`
+  → "The event record category is 4 (annotated 'TRANSFER OUT' in
+  the source)."
+- IN-list member-level: the value renders "<value> (noted '<text>')".
+  Deciding example: `200108015 --MAIN 95 TOWER EAST` → "200108015
+  (noted 'MAIN 95 TOWER EAST')".
+
+Precedence: a DECLARED meaning (tier 1 values map; tier 2 confirmed
+pairs) always wins the voicing; when a declared meaning and an
+annotation BOTH exist and disagree, the floor voices the declared
+meaning and the disagreement is COUNTED — a stale comment or a wrong
+lookup, either way a steward's finding. Only trailing same-line
+comments annotate (a block comment above a WHERE belongs to nothing,
+deterministically); annotations cap at 60 characters, whitespace
+collapsed. Annotations ride door-1-redacted text (H6) and pass
+egress redaction at land like all outbound prose.
 
 ---
 

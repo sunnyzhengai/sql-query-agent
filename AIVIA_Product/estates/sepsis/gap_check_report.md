@@ -1,10 +1,9 @@
 # ED Sepsis Gap-Check Report (round 2 — the truth check)
 
-*Generated 2026-09-06, pack 1.2 + floor grammar v1.1.0 (the
-two-alias corpse from Sunny's finding 2 is fixed: multi-
-instance reads voice per instance, dedup at predicate
-identity). Finding 1 (code meanings) is OPEN — design options
-with Sunny. DBA result tables in intake_result_tables/.*
+*Generated 2026-09-06, pack 1.2 + floor grammar v1.2.0: both
+gap-check findings landed — instance-marked bullets (no more
+merged filters) and R8 source annotations (developer comments
+voiced with attribution). DBA tables in intake_result_tables/.*
 
 ## Intake report (as the DBA receives it)
 ```
@@ -33,21 +32,21 @@ Registered db: aivia_demo_src (server SEPSISSERVER); sources: emr; DBA: role:emr
 ### `reporting/USP_ED_SEPSIS.sql::#ADT`
 ```
 This is a selection of records.
-- For the first adt events record read: the event record category is 4.
-- For the first adt events record read: the category value that indicates if the event record has been modified or removed is not 2.
-- For the first adt events record read: the unit associated with the event record at the time it became effective id is one of the values 200108022.
-- For the second adt events record read: the event record category is 3.
-- For the second adt events record read: the category value that indicates if the event record has been modified or removed is not 2.
-- For the second adt events record read: the unit associated with the event record at the time it became effective id is one of the values 200108015, 200108016, 200108019, 200108001, 200108070, 200108115, 200108183, 200108008, 200108009, 200108010, 200108011, 200108012, 200108017, 200108018, 200108020, 200108021, 200108110.
+- For the first adt events record read: the event record category is 4 (annotated 'TRANSFER OUT' in the source).
+- For the first adt events record read: the category value that indicates if the event record has been modified or removed is not 2 (annotated 'CANCELED' in the source).
+- For the first adt events record read: the unit associated with the event record at the time it became effective id is one of the values 200108022 (annotated 'Emergency' in the source).
+- For the second adt events record read: the event record category is 3 (annotated 'TRANSFER IN' in the source).
+- For the second adt events record read: the category value that indicates if the event record has been modified or removed is not 2 (annotated 'CANCELED' in the source).
+- For the second adt events record read: the unit associated with the event record at the time it became effective id is one of the values 200108015 (noted 'MAIN 95 TOWER EAST'), 200108016 (noted 'MAIN 95 TOWER WEST'), 200108019 (noted 'MAIN 95 PAVILION'), 200108001 (noted 'MAIN 2 PAVILION PICU'), 200108070 (noted 'MAIN 3 CICU'), 200108115 (noted 'MAIN 2 PICU NEURO'), 200108183 (noted 'MAIN 2 TOWER PICU'), 200108008 (noted 'MAIN 3 NORTH'), 200108009 (noted 'MAIN 3 PAVILION'), 200108010 (noted 'MAIN 4 NORTH'), 200108011 (noted 'MAIN 4 SOUTH'), 200108012 (noted 'MAIN 4 PAVILION'), 200108017 (noted 'MAIN 95 NORTH'), 200108018 (noted 'MAIN 95 SOUTH'), 200108020 (noted 'MAIN 6 NORTH'), 200108021 (noted 'MAIN 6 SOUTH'), 200108110 (noted 'MAIN 4 PAVILION EMU').
 ```
 
 ### `reporting/USP_ED_SEPSIS.sql::#AllMeds`
 ```
 This is a selection of records.
 - It is not the case that the time designated by the user when the action occurred has no recorded value.
-- The time designated by the user when the action occurred is before ed_departure_time.
-- The med route code is 11.
-- The mar action code is one of the values '1', '7', '102', '105', '113', '114', '115', '122', '124', '132', '143', '1604', '1605', '1607', '6', '99'.
+- The time designated by the user when the action occurred is before ed_departure_time (annotated 'while in ED' in the source).
+- The med route code is 11 (annotated 'intravenous' in the source).
+- The mar action code is one of the values '1' (noted 'GIVEN'), '7' (noted 'RESTARTED'), '102' (noted 'GIVEN BY OTHER'), '105' (noted 'NEW CARTRIDGE'), '113' (noted 'GIVEN DURING DOWNTIME'), '114' (noted 'STARTED DURING DOWNTIME'), '115' (noted 'MEDICATION APPLIED'), '122' (noted 'CONTINUED FROM OR'), '124' (noted 'SELF ADMINISTERED VIA PUMP'), '132' (noted 'CONTINUED FROM PREVIOUS ORDER'), '143' (noted 'REDOSE'), '1604' (noted 'INFUSION GREATER THAN 15 MIN'), '1605' (noted 'INFUSION LESS THAN 15 MIN'), '1607' (noted 'NEW CARTRIDGE'), '6' (noted 'NEW BAG'), '99' (noted 'RATE CHANGE').
 ```
 
 ### `reporting/USP_ED_SEPSIS.sql::#BPA`
@@ -65,9 +64,9 @@ This step produces derived values; no source records are read.
 ```
 This step produces derived values; no source records are read.
 - The taken time is between adt_arrival_time and ed_departure_time (inclusive).
-- The hv discr freq id is '300902'.
+- The hv discr freq id is '300902' (annotated 'EFQ .1 (frequency = once)' in the source).
 - The convert(numeric, sig) exceeds 95.0.
-- The medication id is one of the values 700001, 7000739, 700003, 7006331, 700002, 700004.
+- The medication id is one of the values 700001 (noted 'SODIUM CHLORIDE 0.99 % IV BOLUS'), 7000739 (noted 'LACTATED RINGERS IV BOLUS'), 700003 (noted 'ALBUMIN, HUMAN 95 % INTRAVENOUS SOLUTION'), 7006331 (noted 'ELECTROLYE-A IV Bolus (PLASMALYTE)'), 700002 (noted 'SODIUM CHLORIDE 0.99 % INJECTION SYRINGE'), 700004 (noted 'SODIUM CHLORIDE 0.99 % INJECTION SOLUTION').
 ```
 
 ### `reporting/USP_ED_SEPSIS.sql::#Base_Pop`
@@ -102,7 +101,7 @@ This step produces derived values; no source records are read.
 ```
 This step produces derived values; no source records are read.
 - The recorded time is between adt_arrival_time and ed_departure_time (inclusive).
-- The flo meas id is one of the values '9000161709', '9000002613'.
+- The flo meas id is one of the values '9000161709' (noted 'SEPSIS SCREENING SCORE (RETIRED)'), '9000002613' (noted 'R HS IP SEPSIS SCORE 2019').
 ```
 
 ### `reporting/USP_ED_SEPSIS.sql::#BedEvents`
@@ -115,7 +114,7 @@ This is a selection of records.
 ```
 This step produces derived values; no source records are read.
 - The recorded time is between adt_arrival_time and ed_departure_time (inclusive).
-- The flo meas id is one of the values '95', '9001140203', '9001140205'.
+- The flo meas id is one of the values '95' (noted 'Blood Pressure'), '9001140203' (noted 'R EDX GIRLS SYSTOLIC BP PERCENTILE'), '9001140205' (noted 'R EDX BOYS SYSTOLIC BP PERCENTILE').
 ```
 
 ### `reporting/USP_ED_SEPSIS.sql::#Cultures`
@@ -145,7 +144,7 @@ This step produces derived values; no source records are read.
 ```
 This is a selection of records.
 - A matching record exists in a separately defined selection.
-- The this column represents the event template linked to the event record is one of the values '2600000007'.
+- The this column represents the event template linked to the event record is one of the values '2600000007' (annotated 'ED BOARDER PATIENTS' in the source).
 ```
 
 ### `reporting/USP_ED_SEPSIS.sql::#ED_NegativeScores`
@@ -164,7 +163,7 @@ This step produces derived values; no source records are read.
 ### `reporting/USP_ED_SEPSIS.sql::#EncounterWeights`
 ```
 This step produces derived values; no source records are read.
-- The flo meas id is '94'.
+- The flo meas id is '94' (annotated 'Weight' in the source).
 ```
 
 ### `reporting/USP_ED_SEPSIS.sql::#Final`
@@ -191,7 +190,7 @@ This is a selection of records.
 - It is not the case that the recorded time has no recorded value.
 - It is not the case that the meas value has no recorded value.
 - The recorded time is on or before ed_departure_time.
-- The flo meas id is one of the values '94', '95', '9001140203', '9001140205', '9001125002', '9000161709', '9000002613'.
+- The flo meas id is one of the values '94' (noted 'Weight'), '95' (noted 'Blood pressure'), '9001140203' (noted 'R EDX GIRLS SYSTOLIC BP PERCENTILE'), '9001140205' (noted 'R EDX BOYS SYSTOLIC BP PERCENTILE'), '9001125002' (noted 'R HS ED SEPSIS CLINICAL_ALERTS CANCELLED'), '9000161709' (noted 'SEPSIS SCREENING SCORE (RETIRED)'), '9000002613' (noted 'R HS IP SEPSIS SCORE 2019').
 ```
 
 ### `reporting/USP_ED_SEPSIS.sql::#Hypotension`
@@ -216,7 +215,7 @@ This step produces derived values; no source records are read.
 ```
 This is a selection of records.
 - The date and time at which the procedure_order was submitted is between adt_arrival_time and ed_departure_time (inclusive).
-- The unique identifier for each result component associated with every result is one of the values 5000001861, 5000000478, 5000000446, 5000000447, 5000000449, 500001 or The procedure record associated with this order, which can be used to reference procedures_catalog unique is one of the values 600003, 600004, 600011, 600012, 600001, 600007, 600008, 600009, 600010 or .
+- The unique identifier for each result component associated with every result is one of the values 5000001861 (noted 'O2 SATURATION VENOUS, GEM CALC'), 5000000478 (noted 'O2 SATURATION VENOUS'), 5000000446 (noted 'LACTIC ACID ISTAT'), 5000000447 (noted 'LACTIC ACID, GEM RESPIRATORY'), 5000000449 (noted 'LACTIC ACID LEVEL'), 500001 (noted 'PROCALCITONIN') or The procedure record associated with this order, which can be used to reference procedures_catalog unique is one of the values 600003 (noted 'BLOOD CULTURE'), 600004 (noted 'SEND BLOOD CULTURE IF TEMP'), 600011 (noted 'BLOOD CULTURE, QUEST'), 600012 (noted 'BLOOD CULTURE, LABCORP'), 600001 (noted 'URINE CULTURE'), 600007 (noted 'REFLEXIVE URINE CULTURE, QUEST'), 600008 (noted 'REFLEXIVE URINE CULTURE, QUEST'), 600009 (noted 'URINE CULTURE COMPREHENSIVE, LABCORP'), 600010 (noted 'HS POCT URINE CULTURE') or .
 ```
 
 ### `reporting/USP_ED_SEPSIS.sql::#PatientLocation`
@@ -230,7 +229,7 @@ This is a selection of records.
 ```
 This is a selection of records.
 - The taken time is between adt_arrival_time and ed_departure_time (inclusive).
-- The base grouper record is vcg-.1 unique is one of the values '8000100', '8000101', '8000102', '8000103', '8000104'.
+- The base grouper record is vcg-.1 unique is one of the values '8000100' (noted 'HS RX EPINEPHRINE SEPSIS'), '8000101' (noted 'HS RX DOPAMINE SEPSIS'), '8000102' (noted 'HS RX DOBUTAMINE SEPSIS'), '8000103' (noted 'HS RX MILRINONE SEPSIS'), '8000104' (noted 'HS RX NOREPINEPHRINE SEPSIS').
 ```
 
 ### `reporting/USP_ED_SEPSIS.sql::#SSOrderSet`
@@ -241,7 +240,7 @@ This step produces derived values; no source records are read.
 ### `reporting/USP_ED_SEPSIS.sql::#SepsisAlertCancelled`
 ```
 This step produces derived values; no source records are read.
-- The flo meas id is '9001125002'.
+- The flo meas id is '9001125002' (annotated 'R HS ED SEPSIS CLINICAL_ALERTS CANCELLED' in the source).
 - The recorded time is between adt_arrival_time and ed_departure_time (inclusive).
 ```
 
@@ -261,7 +260,7 @@ This is a selection of records.
 This is a selection of records.
 - It is not the case that the placement instant has no recorded value.
 - The placement instant is between adt_arrival_time and ed_departure_time (inclusive).
-- The flo meas id is one of the values '900112', '900111' or The value set id is 3022.
+- The flo meas id is one of the values '900112' (noted 'LDA HS IP ETT'), '900111' (noted 'LDA HS IP PERIPHERAL IV') or The value set id is 3022.
 ```
 
 ### `reporting/USP_ED_SEPSIS.sql::NegativeCultures`
@@ -288,7 +287,7 @@ This step produces derived values; no source records are read.
 ### `reporting/USP_ED_SEPSIS.sql::Systolic`
 ```
 This step produces derived values; no source records are read.
-- The flo meas id is '95'.
+- The flo meas id is '95' (annotated 'Blood pressure' in the source).
 - The recorded time is between adt_arrival_time and ed_departure_time (inclusive).
 ```
 
@@ -330,8 +329,8 @@ This step produces derived values; no source records are read.
 This is a selection of records.
 - It is not the case that the time designated by the user when the action occurred has no recorded value.
 - The time designated by the user when the action occurred is between adt_arrival_time and ed_departure_time (inclusive).
-- The medication record linked to this order unique is one of the values 700001, 7000739, 700003, 7006331, 700002 or .
-- The mar_action_category_number linked to this administration is one of the values '1', '7', '102', '105', '113', '114', '115', '122', '124', '132', '143', '1604', '1605', '1607', '6'.
+- The medication record linked to this order unique is one of the values 700001 (noted 'SODIUM CHLORIDE 0.99 % IV BOLUS'), 7000739 (noted 'LACTATED RINGERS IV BOLUS'), 700003 (noted 'ALBUMIN, HUMAN 95 % INTRAVENOUS SOLUTION'), 7006331 (noted 'ELECTROLYE-A IV Bolus (PLASMALYTE)'), 700002 (noted 'SODIUM CHLORIDE 0.99 % INJECTION SYRINGE--ADDED ON 04.02.201') or .
+- The mar_action_category_number linked to this administration is one of the values '1' (noted 'GIVEN'), '7' (noted 'RESTARTED'), '102' (noted 'GIVEN BY OTHER'), '105' (noted 'NEW CARTRIDGE'), '113' (noted 'GIVEN DURING DOWNTIME'), '114' (noted 'STARTED DURING DOWNTIME'), '115' (noted 'MEDICATION APPLIED'), '122' (noted 'CONTINUED FROM OR'), '124' (noted 'SELF ADMINISTERED VIA PUMP'), '132' (noted 'CONTINUED FROM PREVIOUS ORDER'), '143' (noted 'REDOSE'), '1604' (noted 'INFUSION GREATER THAN 15 MIN'), '1605' (noted 'INFUSION LESS THAN 15 MIN'), '1607' (noted 'NEW CARTRIDGE'), '6' (noted 'NEW BAG').
 - The convert(numeric, ma.sig ) exceeds 95.0.
 ```
 
@@ -366,7 +365,7 @@ This step produces derived values; no source records are read.
 ### `reports/USP_RPTS_ED_Sepsis.sql::#Base_Pop_Severe_ED_Scores`
 ```
 This is a selection of records.
-- The flowsheet group or row linked to this reading unique is one of the values '9000161709', '9000002613'.
+- The flowsheet group or row linked to this reading unique is one of the values '9000161709', '9000002613' (annotated 'SEPSIS SCORE--ADDED NEW ED SEPSIS SCORE 9000002613 ON 10.01.' in the source).
 - The exact moment when the reading was recorded is between adt_arrival_time and ed_departure_time (inclusive).
 ```
 
@@ -462,16 +461,16 @@ This is a selection of records.
 ### `reports/USP_RPTS_ED_Sepsis.sql::#Pressors`
 ```
 This is a selection of records.
-- The base grouper record is vcg-.1 unique is one of the values '8000100', '8000101', '8000102', '8000103', '8000104'.
-- The mar_action_category_number linked to this administration is one of the values '1', '7', '102', '105', '113', '114', '115', '122', '124', '132', '143', '1604', '1605', '1607', '6'.
-- The route_category_number linked to this administration is 11.
+- The base grouper record is vcg-.1 unique is one of the values '8000100' (noted 'HS RX EPINEPHRINE SEPSIS'), '8000101' (noted 'HS RX DOPAMINE SEPSIS'), '8000102' (noted 'HS RX DOBUTAMINE SEPSIS'), '8000103' (noted 'HS RX MILRINONE SEPSIS'), '8000104' (noted 'HS RX NOREPINEPHRINE SEPSIS').
+- The mar_action_category_number linked to this administration is one of the values '1' (noted 'GIVEN'), '7' (noted 'RESTARTED'), '102' (noted 'GIVEN BY OTHER'), '105' (noted 'NEW CARTRIDGE'), '113' (noted 'GIVEN DURING DOWNTIME'), '114' (noted 'STARTED DURING DOWNTIME'), '115' (noted 'MEDICATION APPLIED'), '122' (noted 'CONTINUED FROM OR'), '124' (noted 'SELF ADMINISTERED VIA PUMP'), '132' (noted 'CONTINUED FROM PREVIOUS ORDER'), '143' (noted 'REDOSE'), '1604' (noted 'INFUSION GREATER THAN 15 MIN'), '1605' (noted 'INFUSION LESS THAN 15 MIN'), '1607' (noted 'NEW CARTRIDGE'), '6' (noted 'NEW BAG').
+- The route_category_number linked to this administration is 11 (annotated 'INTRAVENOUS' in the source).
 - The time designated by the user when the action occurred is between adt_arrival_time and ed_departure_time (inclusive).
 ```
 
 ### `reports/USP_RPTS_ED_Sepsis.sql::#Procalcitonin`
 ```
 This is a selection of records.
-- The unique identifier for each result component associated with every result is 500001.
+- The unique identifier for each result component associated with every result is 500001 (annotated ''LAB014'' in the source).
 - The date and time at which the procedure_order was submitted is between adt_arrival_time and ed_departure_time (inclusive).
 ```
 
@@ -495,7 +494,7 @@ This is a selection of records.
 ### `reports/USP_RPTS_ED_Sepsis.sql::#SepsisAlertCancelled`
 ```
 This is a selection of records.
-- The flowsheet group or row linked to this reading unique is '9001125002'.
+- The flowsheet group or row linked to this reading unique is '9001125002' (annotated 'R HS ED SEPSIS CLINICAL_ALERTS CANCELLED' in the source).
 - It is not the case that the exact moment when the reading was recorded has no recorded value.
 - The exact moment when the reading was recorded is between adt_arrival_time and ed_departure_time (inclusive).
 - It is not the case that the flowsheet reading real has no recorded value.
@@ -567,6 +566,6 @@ This step produces derived values; no source records are read.
 ## Findings
 - READER/WRITER DRIFT (silently-failing-report class): 9 refs, 7 distinct: NONSEVERE.DATE_STAMP, NONSEVERE.ENCOUNTER_ID, SEVERE.DATE_STAMP, SEVERE.ENCOUNTER_ID, SSS.ENCOUNTER_ID, fyDate.HS_FY, fyDate.HS_FY_MONTH_NUMBER
 - undocumented org-catalog columns (counted): 242
-- join compliance: 10 violations, 203 compliant, 461 not judged (lineage-derived declarations — near-vacuous, see pack caveat)
+- join compliance: 10 violations, 203 compliant, 461 not judged
 - working set: 63 of 90 dictionary tables touched
-- descriptions produced: 303 scopes, all skeleton_floor, grammar v1.1.0 in every basis
+- descriptions produced: 303 scopes, grammar v1.2.0 in every basis

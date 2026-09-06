@@ -24,7 +24,7 @@ from aivia.lenses import decisions, derivation
 
 ECON = json.loads((pathlib.Path(__file__).parent / "econ_params.json")
                   .read_text())
-FLOOR_GRAMMAR_VERSION = "1.1.0"
+FLOOR_GRAMMAR_VERSION = "1.2.0"
 _PREPOSITIONS = ("of", "on", "per", "for", "in", "at", "by", "with")
 
 
@@ -68,6 +68,7 @@ class _Voice:
         self._tables = {n.identity: n.properties
                         for n in read.nodes("table")}
         self._params = {p["name"]: p for p in tree.get("parameters", [])}
+        self.disagreements: List[str] = []  # declared vs annotation (R8)
 
     def subject(self, expr) -> str:
         if expr.get("kind") == "column_ref":
@@ -91,7 +92,16 @@ class _Voice:
             col_id = subject_expr.get("resolves_to") or ""
             values_map = self._columns.get(col_id, {}).get("values") or {}
             meaning = values_map.get(raw.strip("'"))
-            return f"{raw} ('{meaning}')" if meaning else raw
+            note = expr.get("annotation")
+            if meaning:  # R8 precedence: the DECLARED meaning wins
+                if note and note.lower() != meaning.lower():
+                    self.disagreements.append(
+                        f"{raw}: declared '{meaning}' vs source note "
+                        f"'{note}'")
+                return f"{raw} ('{meaning}')"
+            if note:
+                return f"{raw} (noted '{note}')"
+            return raw
         return decisions.render_expr(expr).lower()
 
     def forbidden_tokens(self, scope) -> List[str]:
@@ -219,6 +229,10 @@ def compose_floor(read: ReadApi, target: str) -> str:
         phrase = _voice_predicate(pred, voice)
         if not phrase:
             continue
+        note = pred.get("annotation")
+        if note:  # R8: attributed, never bare fact
+            phrase = (phrase.rstrip(".")
+                      + f" (annotated '{note}' in the source).")
         subject_ref = pred.get("subject", {}).get("ref", "")
         alias = subject_ref.split(".")[0] if "." in subject_ref else None
         prefix = alias_instance.get(alias, "")

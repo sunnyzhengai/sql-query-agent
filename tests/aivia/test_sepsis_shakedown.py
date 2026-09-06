@@ -90,3 +90,18 @@ def test_two_alias_corpse_voices_both_filters(shaken):
     assert len(both) == 2
     assert any(line.startswith("- For the first") for line in both)
     assert any(line.startswith("- For the second") for line in both)
+
+
+def test_r8_annotations_attributed_never_bare(shaken):
+    """Sunny's gap-check finding 1, tier 3 (grammar v1.2.0): trailing
+    comments voice WITH attribution — predicate-level and IN-member-
+    level — never as bare fact."""
+    from aivia.flows import produce as _produce
+    store, _, _ = shaken
+    floor = _produce.compose_floor(ReadApi(store),
+                                   "reporting/USP_ED_SEPSIS.sql::#ADT")
+    assert "(annotated 'TRANSFER OUT' in the source)" in floor
+    assert "(annotated 'TRANSFER IN' in the source)" in floor
+    assert "200108022 (annotated 'Emergency' in the source)" in floor
+    assert "200108015 (noted 'MAIN 95 TOWER EAST')" in floor
+    assert "TRANSFER OUT." not in floor  # attributed, never bare fact

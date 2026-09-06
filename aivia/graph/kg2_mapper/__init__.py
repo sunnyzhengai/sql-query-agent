@@ -14,6 +14,7 @@ Scope identity follows the ratified Scope_Identity sheet: named scopes
 key file::name (dupes file::name#i), the single result-set emitter
 keys file::delivery (A11), unnamed scopes take no name_key (A4).
 """
+import bisect
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
 
@@ -341,6 +342,58 @@ def map_tree(file_name: str, text: str, dialect: str = "tsql"
                 ctx.remainder.append({"type": t, **_evidence(ctx, stmt),
                                       "reason": "unmapped statement kind"})
             statements.append(entry)
+
+    # R8 annotations (grammar v1.2.0): a TRAILING SAME-LINE comment is
+    # the predicate's (or IN-member's) annotation — verbatim estate
+    # text, evidence-grade; the floor voices it WITH ATTRIBUTION only.
+    lines = text.split("\n")
+    line_starts = [0]
+    for ln in lines[:-1]:
+        line_starts.append(line_starts[-1] + len(ln) + 1)
+
+    def trailing_comment(node):
+        ev = node.get("evidence")
+        if not ev:
+            return None
+        end = ev["offset"] + len(ev["fragment"])
+        idx = bisect.bisect_right(line_starts, end - 1) - 1
+        line = lines[idx]
+        col = end - line_starts[idx]
+        pos = line.find("--", col)
+        if pos < 0:
+            return None
+        note = " ".join(line[pos + 2:].split()).strip()
+        return note[:60] if note else None
+
+    def annotate(node, pred_end_line=None):
+        if isinstance(node, dict):
+            if node.get("node") == "predicate":
+                note = trailing_comment(node)
+                if note:
+                    node["annotation"] = note
+                ev = node.get("evidence")
+                end_line = None
+                if ev:
+                    end_line = bisect.bisect_right(
+                        line_starts,
+                        ev["offset"] + len(ev["fragment"]) - 1) - 1
+                for member in node.get("comparand_list", []):
+                    mev = member.get("evidence")
+                    if not mev:
+                        continue
+                    m_line = bisect.bisect_right(
+                        line_starts, mev["offset"] - 1) - 1
+                    if m_line == end_line:
+                        continue  # the predicate owns that line's note
+                    note = trailing_comment(member)
+                    if note:
+                        member["annotation"] = note
+            for v in node.values():
+                annotate(v)
+        elif isinstance(node, list):
+            for v in node:
+                annotate(v)
+    annotate(statements)
 
     # Scope_Identity: name_key per A3 (#i on dupes) + A11 (::delivery)
     seen: Dict[str, int] = {}

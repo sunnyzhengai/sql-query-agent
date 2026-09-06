@@ -25,6 +25,13 @@ registered definition of how that source is read:
 - the metadata extraction script(s) (tables/columns + joins)
 - the values-dump generator (uniform per-table SELECTs)
 - the phrase rules (see §4)
+- the VALUE-SOURCE PAIRS (RULED by Sunny 2026-09-06, the tier-2
+  meaning ruling): dimension lookups — (table, code column, name
+  column) triples like CLARITY_DEP (DEPARTMENT_ID, DEPARTMENT_NAME)
+  — are stable VENDOR knowledge and ship as pack data; org-table
+  candidates are NOMINATED by the engine but voiced only after DBA
+  CONFIRMATION (the A14 HITL shape — a confirmation sheet, never a
+  silent name-ish guess)
 - the dedup rule and its assertion (see §5)
 - the join grouping rule parameters (see §6)
 - the source-pack version — stamped into every extract it produces
