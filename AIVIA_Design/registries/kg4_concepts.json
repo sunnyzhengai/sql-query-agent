@@ -1,14 +1,16 @@
 {
  "registry": "kg4_concepts",
  "stamp": {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "doc_section": "Level 1 / KG Layer 4 — concept layer",
-  "doc_stamp": "v1.0.0 (ratified 2026-09-05, Sunny)",
+  "doc_stamp": "v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 amendments per the twin-graph ruling, ADR 0077 (2026-09-06)",
   "ratified": true,
   "converted_on": "2026-09-05",
   "converted_from": "L1_KG4_Concept_Layer_Registry_DRAFT.xlsx"
  },
- "rulings_applied_at_conversion": [],
+ "rulings_applied_at_conversion": [
+  "sheet Merged_Into_Governance added (twin-graph ruling (2026-09-06), ADR 0077)"
+ ],
  "_open": [],
  "sheets": {
   "ReadMe": [
@@ -53,6 +55,12 @@
     "Axioms": "S2, D4",
     "Named check(s)": "CHECK-KG4-3",
     "Check asserts": "node shape validates; no member edges exist"
+   }
+  ],
+  "Merged_Into_Governance": [
+   {
+    "Item": "_ruling",
+    "Definition": "twin-graph ruling (2026-09-06) 2f: SUPERSEDED AS A LAYER — concept is a citizen class of the governance overlay (kg3_artifacts Governance_Overlay sheet). Sheets below stand as the ratified class-rule record."
    }
   ]
  }

@@ -1,8 +1,9 @@
 **** AIVIA Description Level 0
 (REWRITTEN 2026-09-06 — the twin-graph ruling, ratified; full
 ruling + change ledger: AIVIA_Design/Twin_Graph_KG_RULING.md.
-The body sections below predate this rewrite where they conflict,
-the ruling governs until the section-by-section amendment pass.)
+Body sections carry dated AMENDED/SUPERSEDED blocks from the
+same-day amendment pass; where an unamended line conflicts with
+the ruling, the ruling governs.)
 
 AIVIA is a TWO-WAY ENGINE over a customer's analytical estate,
 built on one knowledge graph with three layers. Syntax is PARSED
@@ -89,14 +90,22 @@ graph; it is a query over edges the laws guarantee exist.
             └───────────────────── INWARD ────────────────────────────┘
 ```
 
-**** Content Descriptions — Levels 1-3 (restratified 2026-09-05)
+**** Content Descriptions — the strata (renamed 2026-09-06, the
+twin-graph ruling 6a; restratified 2026-09-05)
 
-Level = CONSUMPTION STRATUM (Sunny's ruling): each level may only
-reference lower levels — the import law, plank-checkable. "KG
-Layer" = anatomy WITHIN level 1's graph; the two words never
-substitute.
+STRATA RENAMED (ruled 2026-09-06): the numbered levels retire —
+strata are **Blueprint · The Graph · The Flows**; digits are
+KG-exclusive (KG1/KG2a/KG2b/KG3). The LENS STRATUM RETIRED into
+two contracts (ruling piece 3): BUILDERS write the graph (loader →
+KG1, parser → KG2a, translator → KG2b; governance has no builder);
+READINGS consume it (named, versioned, deterministic, write
+nothing). The import law restates: The Flows write The Graph only
+through builders and read it only through readings; readings write
+nothing; The Graph references only itself and its sources — still
+plank-checkable. Section headers below keep their historical
+numbering as record; the strata names govern.
 
-**** Level 1 — the knowledge graph [stores]
+**** The Graph (was: Level 1 — the knowledge graph) [stores]
 
 Edge direction convention (ratified 2026-09-05, closing the open
 question): REFERENCE edges point toward the more stable node;
@@ -104,8 +113,19 @@ CONTAINMENT edges point parent → child. Both layers already obey
 this; it is now law, not accident.
 
 KG Layer 1 — source dictionaries technical layer      [ratified]
-      [registry stamp: kg1_technical v1.0.0]
+      [registry stamp: kg1_technical v1.1.0]
       L1 companions: Technical_Layer_Registry, CONTRACT_DATALOAD
+      AMENDED 2026-09-06 (twin-graph ruling 2a, 5a): KG1 is the
+      DECLARED layer — syntax and semantics FUSED on one node.
+      Every object (db/schema/table/column) gains content_hash
+      (over its declared syntax + semantics as loaded) +
+      load-stamp. Intake goes INCREMENTAL: hash-diff per object,
+      only changed objects write; equivalence to full reload is
+      MECHANICAL — a scheduled full parallel load compares against
+      incremental state, any delta is a counted finding.
+      Mechanics land in CONTRACT_DATALOAD. Object-grain hashes
+      are also the staleness basis: a changed KG1 object
+      retranslates only the KG2b meaning nodes drawing from it.
 - Node types: 
     -- db
         --- description
@@ -176,9 +196,44 @@ KG Layer 1 — source dictionaries technical layer      [ratified]
    -- source inheritance: a schema belongs to exactly one source; tables/columns inherit source from the containment chain; a mixed schema is the recorded trigger to push source down a level.
 
 KG Layer 2 — logic layer (one tree per SQL file)       [ratified]
-      [registry stamp: kg2_logic v1.0.0 · kg2_kind_library v1.0.0]
+      [registry stamp: kg2_logic v1.1.0 · kg2_kind_library v1.1.0]
       L1 companions: Logic_Layer_Registry (subsumes the mapper's
       seam contract), Kind_Library_TSQL_Predicates
+      AMENDED 2026-09-06 (twin-graph ruling 2b-2e): this layer is
+      now the DERIVED layer, built as TWINS. The section below
+      describes KG2a, THE PARSED GRAPH (unchanged except the
+      projection un-deferral). Its twin:
+
+      KG2b — THE MEANING GRAPH (new, ruled 2026-09-06):
+      - one meaning node per KG2a node, carrying: kind (closed
+        library, nine kinds: selection · source · condition w/
+        degenerate subkind · projection · grouping · window ·
+        combination · reference · gap) · content (the translated
+        meaning) · points_at → exactly ONE KG2a node (the
+        homomorphism) · draws_from → every KG1 node consulted ·
+        content_key (meaning identity) · basis stamps (translator
+        + metamodel versions)
+      - HOMOMORPHISM LAW: translated + gap == every KG2a node, no
+        third bucket — the conservation equation generalized,
+        queryable. Composite nodes (scope, statement, file)
+        translate by COMPOSING children's meanings.
+      - content_key (the certification-survival law): hash over
+        (kind, operand identities resolved to KG1 ids or scope
+        paths, literal values, children's content_keys, join
+        kind). INVARIANT to formatting, aliases, AND/join order,
+        comments; SENSITIVE to any column, operator, value, join
+        kind, or structural change.
+      - built ONLY by the TRANSLATOR (the parser's twin — the
+        second builder); regenerates with KG2a at the FILE
+        quantum; version bump regenerates the whole layer.
+      - PROJECTION DEFERRAL LIFTED (was A12): the SELECT list
+        enters KG2a as a structure kind with one projection-member
+        node per output column — the meaning twin needs it (a
+        derived column's meaning resolves through the defining
+        scope's projection node).
+      - "decisions derived by lenses" SUPERSEDED: membership,
+        grain, value, path are meaning-node kinds now, not lens
+        yields (ruling 3a/3c).
 - The unit (ruled 2026-09-04): the whole FILE is one tree. All
   logic is a natural result of walking the tree; no "smallest unit
   of logic" is ever defined. A #temp table is internal structure of
@@ -197,10 +252,11 @@ KG Layer 2 — logic layer (one tree per SQL file)       [ratified]
        temp-table scope — every place logic has its own boundary)
         --- name (CTE/temp name where one exists)
     -- structure (FROM, JOIN w/ type, WHERE, HAVING, GROUP BY,
-       ORDER BY/TOP, UNION w/ dedup flag, CASE. PROJECTION
-       capture DEFERRED by the final A12 ruling — see the
-       ambiguity rulings; regenerability makes it recoverable by
-       metamodel bump + re-parse)
+       ORDER BY/TOP, UNION w/ dedup flag, CASE, PROJECTION.
+       The A12 deferral LIFTED 2026-09-06 by the twin-graph
+       ruling 2b: PROJECTION enters via the planned recovery
+       path — metamodel bump + re-parse; one projection-member
+       node per output column, name + expression subtree)
     -- predicate (one condition; kind from the metamodel's
        closed set)
     -- expression (column_ref | table_ref | literal | parameter_ref
@@ -279,8 +335,22 @@ KG Layer 2 — logic layer (one tree per SQL file)       [ratified]
        and audit, not re-parsing) [axm:S1, axm:M5; = spec:G5 in
        the code record]
 KG Layer 3 — artifact layer                            [ratified]
-      [registry stamp: kg3_artifacts v1.0.0]
+      [registry stamp: kg3_artifacts v1.1.0]
       L1 companions: Artifact_Layer_Registry
+      AMENDED 2026-09-06 (twin-graph ruling 2f): this layer and
+      KG Layer 4 MERGE into KG3, THE GOVERNANCE OVERLAY — sparse
+      (citizens exist only where someone acted), non-regenerable
+      (unchanged), with CONCEPT joining the citizen classes
+      keeping all four of its ratified rules. THE ANCHOR RULE
+      (new): about targets a MEANING IDENTITY — a KG2b
+      content_key at a scope path, or a KG1 object — never a
+      KG2a syntax node, never a node instance. Corollaries
+      (S1/S2 demoted from rules): same content_key after
+      regeneration → the artifact survives silently; changed →
+      flagged orphan (the drift finding); deleted scope →
+      orphaned with similarity candidates. Registries merge into
+      one Governance_Layer_Registry. Everything below not
+      contradicted by this block stands as written.
 - The defining property: NOT regenerable. Layers 1-2 rebuild from
   sources; this layer holds human judgment and gated machine
   output that exist nowhere else. Human-owned artifacts are never
@@ -438,9 +508,17 @@ KG Layer 3 — artifact layer                            [ratified]
        edges resolve to identity nodes [axm:S2, axm:D4]
 - Forward note [axm:B4] — DELIVERED: the LAND stage carries the
   human-confirmation clause.
-KG Layer 4 — concept layer                             [ratified]
-      [registry stamp: kg4_concepts v1.0.0]
-      L1 companions: Concept_Layer_Registry
+KG Layer 4 — concept layer            [MERGED INTO KG3 2026-09-06]
+      [registry stamp: kg4_concepts v1.1.0]
+      L1 companions: Concept_Layer_Registry (merging into
+      Governance_Layer_Registry)
+      SUPERSEDED AS A LAYER (twin-graph ruling 2f): concept is now
+      a CITIZEN CLASS of the governance overlay. Every rule below
+      SURVIVES as a class rule (human-mint-only · append-only ·
+      nameless, the term carries the name · basis snapshot); a
+      concept's about-edges now target a SET of meaning anchors
+      (the family members, by content_key). Text kept as the
+      ratified record of those rules.
 - The founding ruling (Sunny, 2026-09-04, option c): THE LENS
   COMPUTES; A HUMAN TOUCH MINTS. Relatedness (same-name families,
   similar logic, shared targets) is a lens over layers 1-3 —
@@ -476,8 +554,37 @@ KG Layer 4 — concept layer                             [ratified]
     -- append-only: minted concepts are never edited or deleted;
        they share layer 3's non-regenerable nature [axm:R4]
     -- metamodel conformance [axm:S2, axm:D4]
-**** Level 2 — lenses [read level 1, write nothing]
-      [registry stamp: lenses v1.0.0]
+**** Level 2 — lenses      [STRATUM RETIRED 2026-09-06 — ruling 3]
+
+RETIRED AS A STRATUM (twin-graph ruling piece 3): once KG2b is
+stored graph, "translation is a lens" contradicts the lens law
+itself (lenses write nothing), and most remaining lenses are
+queries over edges that now exist. The stratum dissolves into two
+CONTRACTS:
+- BUILDERS (write the graph): loader → KG1 · parser → KG2a ·
+  TRANSLATOR → KG2b (the parser's twin — the "translation lens"
+  renamed to what it is). Builder contract: deterministic (needs
+  a model → not a builder step) · versioned, stamps every node
+  written · writes ONLY its own layer · total with counted gaps ·
+  version bump rebuilds everything it governs. Governance has NO
+  builder.
+- READINGS (consume the graph): named, versioned, deterministic,
+  write nothing — kept for CITABILITY (dispositions and concept
+  bases quote reading output by version). Survival principle: a
+  reading exists iff its yield is ABOUT the graph — status,
+  aggregation, comparison — never meaning itself. Catalog
+  migration: decisions(class) RETIRED into the translator ·
+  degenerate RELOCATED as the condition subkind · concept-drift,
+  divergence, gap-census, staleness, ownership/authorship/
+  version/standing/current-outcome, expertise, blast-radius,
+  working-set, referenced-keys → versioned QUERIES · relatedness
+  stays the one COMPUTED reading (over KG2b content_keys) ·
+  join-compliance a comparison query.
+The catalog below stands as the ratified record of each entry's
+rules; the contract text above governs where they differ.
+
+[historical header: read level 1, write nothing]
+      [registry stamp: lenses v1.1.0]
 
 Lenses                                                 [ratified]
       L2 companions: Lenses_Registry
@@ -538,8 +645,34 @@ Lenses                                                 [ratified]
   Completeness swept both directions: every derived-never-stored
   ruling from layers 2-4 has its lens; no lens lacks a ratified
   origin.
-**** Level 3 — the flows [orchestrate: read via level 2, write via level 1's contracts]
-      [registry stamp: flows v1.0.0]
+**** The Flows (was: Level 3) [orchestrate: write The Graph only
+through builders, read it only through readings — restated
+2026-09-06, twin-graph ruling 6a]
+
+AMENDED 2026-09-06 (twin-graph ruling 5):
+- INBOUND gains the translate step: ingest → parse (KG2a) →
+  resolve → TRANSLATE (the translator builds KG2b), same run,
+  ATOMIC — a failed run leaves no readable half-state (stamp
+  check) → voice per policy → land artifacts.
+- THE CHANGE QUANTA: data changes are INCREMENTAL per layer
+  quantum (KG1: object hash-diff · KG2: file hash + the
+  draws_from dependency ripple · KG3: never regenerates, anchors
+  re-check by content_key). RULE changes stay TOTAL by design —
+  a version bump regenerates everything it governs; partial
+  regeneration under a new rule is the grandfathering hazard in
+  pipeline form.
+- VOICING is policy over KG2b (Floor Grammar next major = the
+  policy walk): SELECT-never-compress; the voicing ledger —
+  voiced ∪ counted == total, silent omission has no constructible
+  path; LLM caged to gated smoothing, never selection.
+- OUTWARD publishes from KG2b + KG3. INWARD matches against KG2b
+  (meaning, never syntax); generation re-enters the parser door:
+  parsed, twinned, voiced, governed.
+- PHASING (ruled): A metamodel bump + projection re-parse → B
+  translator + stored KG2b + conservation green → C voicing-
+  policy port + gap-check rerun → D governance merge + anchor
+  migration; each phase gated by a real ED-sepsis gap-check.
+      [registry stamp: flows v1.1.0]
 
 The flows                                              [ratified]
       L3 companions: Flows_Registry

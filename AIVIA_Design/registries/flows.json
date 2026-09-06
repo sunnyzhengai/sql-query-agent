@@ -1,15 +1,17 @@
 {
  "registry": "flows",
  "stamp": {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "doc_section": "Level 3 — the flows",
-  "doc_stamp": "v1.0.0 (ratified 2026-09-05, Sunny)",
+  "doc_stamp": "v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 amendments per the twin-graph ruling, ADR 0077 (2026-09-06)",
   "ratified": true,
   "converted_on": "2026-09-05",
   "converted_from": "L3_Flows_Registry_DRAFT.xlsx"
  },
  "rulings_applied_at_conversion": [
-  "sheet Rules_to_Checks added (all-eight ruling 2026-09-05)"
+  "sheet Rules_to_Checks added (all-eight ruling 2026-09-05)",
+  "sheet Change_Quanta added (twin-graph ruling (2026-09-06), ADR 0077)",
+  "sheet Twin_Graph_Phasing added (twin-graph ruling (2026-09-06), ADR 0077)"
  ],
  "_open": [],
  "sheets": {
@@ -241,6 +243,60 @@
     "Doc rule": "trigger: a no-match outcome AND an explicit human request — generation is an act someone asks for, never an automatic consolation",
     "Check asserts": "generation only on no-match + human request",
     "v1": "deferred (inward flow entire — no ask surface in v1)"
+   }
+  ],
+  "Change_Quanta": [
+   {
+    "Layer": "_ruling",
+    "Data-change quantum": "twin-graph ruling (2026-09-06) 5a",
+    "Note": "changes trigger updates; total reload retires as the DATA path but stays as the RULE path. Doc is authority."
+   },
+   {
+    "Layer": "KG1",
+    "Data-change quantum": "object (content_hash diff)",
+    "Note": "only changed objects write; mechanical equivalence audit (INTAKE-12)"
+   },
+   {
+    "Layer": "KG2 (both twins)",
+    "Data-change quantum": "file (content hash) + the draws_from ripple from KG1 changes",
+    "Note": "parse + translate same run, atomic; stamp check forbids readable half-state"
+   },
+   {
+    "Layer": "KG3",
+    "Data-change quantum": "never regenerates",
+    "Note": "anchors re-check by content_key after any KG2b change: survive silently or flag as drift"
+   },
+   {
+    "Layer": "ALL",
+    "Data-change quantum": "RULE changes are TOTAL by design",
+    "Note": "a version bump regenerates everything it governs — partial regeneration under a new rule is the grandfathering hazard in pipeline form"
+   }
+  ],
+  "Twin_Graph_Phasing": [
+   {
+    "Phase": "A",
+    "Ships": "metamodel bump + A12 projection re-parse (KG2a complete)",
+    "Gate": "real ED-sepsis gap-check output"
+   },
+   {
+    "Phase": "B",
+    "Ships": "the translator + stored KG2b + conservation equation green over the sepsis corpus",
+    "Gate": "real ED-sepsis gap-check output"
+   },
+   {
+    "Phase": "C",
+    "Ships": "voicing-policy port (Floor Grammar major) + full gap-check rerun; findings 1-4 corpses become standing tests",
+    "Gate": "Sunny's gap-check verdict"
+   },
+   {
+    "Phase": "D",
+    "Ships": "governance registry merge + anchor migration (orphans are FINDINGS, not errors)",
+    "Gate": "real ED-sepsis gap-check output"
+   },
+   {
+    "Phase": "independent",
+    "Ships": "KG1 incremental intake — any time after A",
+    "Gate": "mechanical equivalence audit green (INTAKE-12)"
    }
   ]
  }

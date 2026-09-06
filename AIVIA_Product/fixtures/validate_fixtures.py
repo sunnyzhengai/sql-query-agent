@@ -324,6 +324,24 @@ rule("F6", "GV-B open cases flagged not decided",
       if "OPEN" in json.dumps(c) and "Register row filed" not in json.dumps(c)
       and "_OPEN" in json.dumps(c) and "UNRULED" not in json.dumps(c)])
 
+# ---------- F8 (twin-graph phases, ADR 0077 — answer keys authored
+# before any phase code; runnable tests arrive with each phase) ----
+f8 = json.load(open(BASE + "F8_twin_graph/cases.json"))
+fams = [k for k in f8 if not k.startswith("_")]
+rule("F8", "GV-A1 four phase families, A-D",
+     [] if [f.split("_")[1] for f in fams] == ["A", "B", "C", "D"]
+     else [f"families: {fams}"])
+ids = [c["id"] for f in fams for c in f8[f]]
+rule("F8", "GV-A2 case ids unique and phase-prefixed",
+     ([f"dup: {i}" for i in ids if ids.count(i) > 1] +
+      [f"prefix: {c['id']}" for f in fams for c in f8[f]
+       if not c["id"].startswith("P" + f.split("_")[1] + "-")]))
+rule("F8", "GV-B1 every case has input + non-empty expectations",
+     [c["id"] for f in fams for c in f8[f]
+      if not (("sql" in c or "scenario" in c) and c.get("expected"))])
+NR.append("F8: all cases NOT-RUNNABLE until their phase builds "
+          "(the tests-first entry obligation, per F7's pattern)")
+
 # ---------- report ----------
 print(f"PASSED: {len(OK)} rules")
 if V:

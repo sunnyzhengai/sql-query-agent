@@ -1,9 +1,9 @@
 {
  "registry": "lenses",
  "stamp": {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "doc_section": "Level 2 — lenses",
-  "doc_stamp": "v1.0.0 (ratified 2026-09-05, Sunny)",
+  "doc_stamp": "v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 amendments per the twin-graph ruling, ADR 0077 (2026-09-06)",
   "ratified": true,
   "converted_on": "2026-09-05",
   "converted_from": "L2_Lenses_Registry_DRAFT.xlsx"
@@ -13,6 +13,8 @@
   "register H7 (2026-09-05)",
   "register A6 (2026-09-05)",
   "register H5 (2026-09-05)",
+  "sheet Builders_and_Readings added (twin-graph ruling (2026-09-06), ADR 0077)",
+  "sheet Reclassification_2026_09_06 added (twin-graph ruling (2026-09-06), ADR 0077)",
   "v1 flag column (ruled 2026-09-05: registry v1 flag is the authority; prose lens-counts retired)"
  ],
  "_open": [],
@@ -175,6 +177,106 @@
     "Yields": "unanswered-question themes + counts",
     "Completeness note": "total over ledger — RULING APPLIED at conversion: register H5 CLOSED 2026-09-05. DEFERRED from v1 (reads the ask surface)",
     "v1": "deferred (reads the deferred ask surface)"
+   }
+  ],
+  "Builders_and_Readings": [
+   {
+    "Item": "_ruling",
+    "Definition": "twin-graph ruling (2026-09-06) 3: the lens STRATUM retires into two contracts; this sheet + Reclassification are the authority over the Catalog_v1 rows where they differ. Doc is authority."
+   },
+   {
+    "Item": "BUILDER contract",
+    "Definition": "loader -> KG1 · parser -> KG2a · TRANSLATOR -> KG2b (the 'translation lens' renamed to what it is). Deterministic; versioned, stamps every node written; writes ONLY its own layer; total with counted gaps; version bump rebuilds everything it governs. Governance has NO builder."
+   },
+   {
+    "Item": "READING contract",
+    "Definition": "named, versioned, deterministic, writes nothing; kept for citability (dispositions and concept bases quote reading output by version); most are versioned queries"
+   },
+   {
+    "Item": "survival principle",
+    "Definition": "a reading exists iff its yield is ABOUT the graph for one consumer — status, aggregation, comparison — never meaning itself; the translator absorbed everything secretly computing meaning"
+   }
+  ],
+  "Reclassification_2026_09_06": [
+   {
+    "Entry": "decisions(class)",
+    "Class": "RETIRED — subsumed by the translator (membership/grain/value/path become meaning-node kinds)"
+   },
+   {
+    "Entry": "degenerate",
+    "Class": "RELOCATED — the condition subkind in the meaning twin"
+   },
+   {
+    "Entry": "relatedness",
+    "Class": "COMPUTED READING (over KG2b content_keys; feeds concept minting; full contract entry)"
+   },
+   {
+    "Entry": "ownership",
+    "Class": "query (event-derivation; rules unchanged)"
+   },
+   {
+    "Entry": "authorship",
+    "Class": "query (event-derivation; rules unchanged)"
+   },
+   {
+    "Entry": "version",
+    "Class": "query (chain depth)"
+   },
+   {
+    "Entry": "standing",
+    "Class": "query (event-derivation)"
+   },
+   {
+    "Entry": "current",
+    "Class": "query (derived current pointers)"
+   },
+   {
+    "Entry": "current-outcome",
+    "Class": "query (latest observation)"
+   },
+   {
+    "Entry": "staleness",
+    "Class": "query (stamp arithmetic; gains KG1 object grain)"
+   },
+   {
+    "Entry": "join-compliance",
+    "Class": "query (comparison: KG2b source nodes vs KG1 declared paths)"
+   },
+   {
+    "Entry": "divergence",
+    "Class": "query (anchor mismatch)"
+   },
+   {
+    "Entry": "concept-drift",
+    "Class": "query (anchor mismatch vs concept basis)"
+   },
+   {
+    "Entry": "expertise",
+    "Class": "query (usage aggregation)"
+   },
+   {
+    "Entry": "blast-radius",
+    "Class": "query (traversal + usage)"
+   },
+   {
+    "Entry": "working-set",
+    "Class": "query (resolves_to aggregation)"
+   },
+   {
+    "Entry": "gap-census",
+    "Class": "query (gap-node counting; gains untranslated counts)"
+   },
+   {
+    "Entry": "referenced-keys",
+    "Class": "query (inbound joins_to groups)"
+   },
+   {
+    "Entry": "correspondence",
+    "Class": "deferred (unchanged posture); query-shaped when it lands"
+   },
+   {
+    "Entry": "demand",
+    "Class": "deferred (unchanged posture); query-shaped when it lands"
    }
   ]
  }

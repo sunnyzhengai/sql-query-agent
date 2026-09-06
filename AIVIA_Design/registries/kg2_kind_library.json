@@ -1,9 +1,9 @@
 {
  "registry": "kg2_kind_library",
  "stamp": {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "doc_section": "Level 1 / KG Layer 2 — kind library (T-SQL predicates)",
-  "doc_stamp": "v1.0.0 (ratified 2026-09-05, Sunny)",
+  "doc_stamp": "v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 amendments per the twin-graph ruling, ADR 0077 (2026-09-06)",
   "ratified": true,
   "converted_on": "2026-09-05",
   "converted_from": "L1_KG2_Kind_Library_TSQL_Predicates_DRAFT.xlsx"
@@ -11,7 +11,8 @@
  "rulings_applied_at_conversion": [
   "F7 remainder case catch (2026-09-05)",
   "RG-1 ruling (2026-09-05)",
-  "RG-1 ruling (2026-09-05): quantifier is a predicate property"
+  "RG-1 ruling (2026-09-05): quantifier is a predicate property",
+  "sheet Meaning_Node_Kinds added (twin-graph ruling (2026-09-06), ADR 0077)"
  ],
  "_open": [],
  "sheets": {
@@ -360,6 +361,57 @@
     "ID": "R6",
     "Question": "unary expression kind: in this library but NOT in the ratified doc's expression list — add 'unary' to the doc, or fold sign-negation into arithmetic?",
     "Status": "RATIFIED 2026-09-04: 'unary' added to the doc's expression list"
+   }
+  ],
+  "Meaning_Node_Kinds": [
+   {
+    "Kind": "_ruling",
+    "Definition": "twin-graph ruling (2026-09-06) 2d: the closed meaning-node library — one kind per translated node in KG2b, the meaning twin. Doc is authority."
+   },
+   {
+    "Kind": "selection",
+    "Definition": "a scope's meaning; carries grain where derivable",
+    "Deciding example": "#Base_Pop -> 'a selection of patient encounters'"
+   },
+   {
+    "Kind": "source",
+    "Definition": "a FROM/JOIN ref w/ join kind; resolves to a KG1 table or a same-tree selection node (the handle)",
+    "Deciding example": "INNER JOIN #Base_Pop -> 'restricted to records also present in the base-population selection'"
+   },
+   {
+    "Kind": "condition",
+    "Definition": "a predicate's meaning; kinds = the ratified R4 closed set; DEGENERATE is a subkind — translated always, voiced never",
+    "Deciding example": "DX_CODE LIKE 'E11%' -> 'the diagnosis code starts with E11'; WHERE 1=1 -> degenerate"
+   },
+   {
+    "Kind": "projection",
+    "Definition": "what an output column IS (rides the A12 un-deferral)",
+    "Deciding example": "FIRST_TIME_LINE = ROW_NUMBER() OVER (...) -> 'the first scored row per encounter'"
+   },
+   {
+    "Kind": "grouping",
+    "Definition": "GROUP BY/HAVING context; shapes grain",
+    "Deciding example": "GROUP BY ENCOUNTER_ID -> 'one row per encounter'"
+   },
+   {
+    "Kind": "window",
+    "Definition": "ORDER BY/TOP/window functions; shapes which rows",
+    "Deciding example": "TOP 1 ORDER BY SCORE DESC -> 'the highest-scoring row'"
+   },
+   {
+    "Kind": "combination",
+    "Definition": "UNION w/ dedup flag",
+    "Deciding example": "UNION ALL -> 'combined, duplicates kept'"
+   },
+   {
+    "Kind": "reference",
+    "Definition": "an operand's meaning (the R5 material as nodes)",
+    "Deciding example": "E.APPT_STATUS_C -> 'the appointment status'"
+   },
+   {
+    "Kind": "gap",
+    "Definition": "a counted untranslated node; reason-coded per the 0044 pattern",
+    "Deciding example": "dynamic SQL body -> gap(dynamic_sql)"
    }
   ]
  }

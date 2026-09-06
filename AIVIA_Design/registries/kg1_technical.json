@@ -1,9 +1,9 @@
 {
  "registry": "kg1_technical",
  "stamp": {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "doc_section": "Level 1 / KG Layer 1 — source dictionaries technical layer",
-  "doc_stamp": "v1.0.0 (ratified 2026-09-05, Sunny)",
+  "doc_stamp": "v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 amendments per the twin-graph ruling, ADR 0077 (2026-09-06)",
   "ratified": true,
   "converted_on": "2026-09-05",
   "converted_from": "L1_KG1_Technical_Layer_Registry_DRAFT.xlsx"
@@ -13,7 +13,8 @@
   "doc edge-direction convention (2026-09-05) + register D13",
   "register A1 refined (2026-09-05)",
   "CONTRACT_DATALOAD §3 + F1 answer key (CHECK-TL-4 catch)",
-  "sepsis shakedown finding + the ruled fallback posture (2026-09-06)"
+  "sepsis shakedown finding + the ruled fallback posture (2026-09-06)",
+  "sheet Incremental_Intake added (twin-graph ruling (2026-09-06), ADR 0077)"
  ],
  "_open": [],
  "sheets": {
@@ -248,6 +249,32 @@
     "Input (authored synthetic extract)": "(arrives with the logic layer) estate SQL joining outside declared paths",
     "Expected output (authored answer)": "compliance finding emitted",
     "Exercises": "TL-6"
+   }
+  ],
+  "Incremental_Intake": [
+   {
+    "Item": "_ruling",
+    "Definition": "twin-graph ruling (2026-09-06) 2a/5a + CONTRACT_DATALOAD §13. Doc is authority."
+   },
+   {
+    "Item": "content_hash",
+    "Definition": "on every KG1 object (db/schema/table/column): hash over the object's declared syntax + semantics as loaded"
+   },
+   {
+    "Item": "loaded_at",
+    "Definition": "load stamp + source-snapshot identity on every object"
+   },
+   {
+    "Item": "rule: incremental mode",
+    "Definition": "intake diffs by hash; only changed objects write; unchanged hash writes nothing (INTAKE-13)"
+   },
+   {
+    "Item": "rule: equivalence audit",
+    "Definition": "scheduled full parallel load compares against incremental state; any delta is a COUNTED finding (INTAKE-12), never silently reconciled"
+   },
+   {
+    "Item": "rule: staleness export",
+    "Definition": "the changed-object set feeds object-grain staleness — only KG2b meaning nodes whose draws_from cite a changed object retranslate"
    }
   ]
  }

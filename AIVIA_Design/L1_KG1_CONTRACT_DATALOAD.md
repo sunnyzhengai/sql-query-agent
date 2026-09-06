@@ -265,3 +265,33 @@ a pre-registered db only. New checks: INTAKE-8 unregistered db =
 named refusal · INTAKE-9 declared-vs-captured db agreement (the
 script's DB_NAME() capture corroborates the prereq; disagreement
 is a refusal naming both values).
+
+## 13. Incremental intake (ruled 2026-09-06 — the twin-graph
+## ruling 2a/5a; supersedes full-reload as the intake MODE)
+
+The lifecycle table (§11) already carries the semantics — per-object
+SUPERSEDE, LC-S3 idempotency. This section adds the mechanical basis
+and the mode:
+
+- **content_hash** on every KG1 object (db/schema/table/column):
+  hash over the object's declared syntax + semantics as loaded
+  (name, structure, description, values map, pk rows). **loaded_at**
+  + extract identity stay as ruled (§9).
+- **Incremental mode:** intake diffs the new extract against current
+  graph state BY HASH; only changed objects write (CREATE /
+  SUPERSEDE / RETIRE per §11). An unchanged hash writes nothing —
+  LC-S3 becomes a hash compare, never a field-by-field one.
+- **The equivalence audit (mechanical, never trusted):** on a
+  schedule, a full parallel load runs beside incremental state and
+  compares; any delta is a COUNTED FINDING naming the object and
+  the divergence — never silently reconciled. The audit is the
+  5-rule-gate answer to "how do you know incremental didn't drift."
+- **Staleness export:** the changed-object set (by hash) is the
+  object-grain staleness feed — a changed KG1 object retranslates
+  only the KG2b meaning nodes whose draws_from edges cite it (the
+  twin-graph change quanta; flows registry `Change_Quanta`).
+- New checks: INTAKE-11 hash present on every object at intake ·
+  INTAKE-12 incremental-vs-full audit delta = counted finding ·
+  INTAKE-13 unchanged hash writes nothing (idempotency witnessed
+  at the hash grain).
+

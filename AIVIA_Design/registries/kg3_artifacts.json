@@ -1,15 +1,16 @@
 {
  "registry": "kg3_artifacts",
  "stamp": {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "doc_section": "Level 1 / KG Layer 3 — artifact layer",
-  "doc_stamp": "v1.0.0 (ratified 2026-09-05, Sunny)",
+  "doc_stamp": "v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 amendments per the twin-graph ruling, ADR 0077 (2026-09-06)",
   "ratified": true,
   "converted_on": "2026-09-05",
   "converted_from": "L1_KG3_Artifact_Layer_Registry_DRAFT.xlsx"
  },
  "rulings_applied_at_conversion": [
-  "register H5 (2026-09-05)"
+  "register H5 (2026-09-05)",
+  "sheet Governance_Overlay added (twin-graph ruling (2026-09-06), ADR 0077)"
  ],
  "_open": [],
  "sheets": {
@@ -206,6 +207,32 @@
     "Writer / trigger": "—",
     "Postconditions": "machine dispositions (LC3-F1) · pipeline current over human-owned (LC3-F2) · in-place edit (LC3-F3) · ANY deletion (LC3-F4 — absolute; PHI tension recorded as H6, SAFETY pass owes reconciliation) · empty shells (LC3-F5)",
     "Tests": "—"
+   }
+  ],
+  "Governance_Overlay": [
+   {
+    "Item": "_ruling",
+    "Definition": "twin-graph ruling (2026-09-06) 2f: kg3_artifacts + kg4_concepts merge into KG3, the governance overlay — one Governance_Layer_Registry. Doc is authority."
+   },
+   {
+    "Item": "concept joins the classes",
+    "Definition": "keeping its four ratified rules (human-mint-only, append-only, nameless — the term carries the name, basis snapshot); a concept's about-edges target a SET of meaning anchors (the family, by content_key)"
+   },
+   {
+    "Item": "THE ANCHOR RULE",
+    "Definition": "about targets a MEANING IDENTITY — a KG2b content_key at a scope path, or a KG1 object — never a KG2a syntax node, never a node instance"
+   },
+   {
+    "Item": "corollary S1",
+    "Definition": "same content_key after regeneration -> the artifact survives silently (was a rule)"
+   },
+   {
+    "Item": "corollary S2",
+    "Definition": "changed content_key -> flagged orphan (the drift finding); deleted scope -> orphaned with similarity candidates (was a rule)"
+   },
+   {
+    "Item": "corollary: free churn",
+    "Definition": "syntax-only churn (reformat, alias rename) costs zero governance"
    }
   ]
  }

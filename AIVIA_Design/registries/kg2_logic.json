@@ -1,15 +1,16 @@
 {
  "registry": "kg2_logic",
  "stamp": {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "doc_section": "Level 1 / KG Layer 2 — logic layer",
-  "doc_stamp": "v1.0.0 (ratified 2026-09-05, Sunny)",
+  "doc_stamp": "v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 amendments per the twin-graph ruling, ADR 0077 (2026-09-06)",
   "ratified": true,
   "converted_on": "2026-09-05",
   "converted_from": "L1_KG2_Logic_Layer_Registry_DRAFT.xlsx"
  },
  "rulings_applied_at_conversion": [
-  "sheet Scope_Identity added (all-eight ruling 2026-09-05)"
+  "sheet Scope_Identity added (all-eight ruling 2026-09-05)",
+  "sheet Meaning_Twin added (twin-graph ruling (2026-09-06), ADR 0077)"
  ],
  "_open": [],
  "sheets": {
@@ -206,6 +207,56 @@
     "Item": "attachment domain (A4)",
     "Definition": "about-targets := named nodes only (file, named scope, KG1 nodes, layer-3 citizens, concepts). Unnamed nodes are outside the domain — a domain bound, not a branch.",
     "Branch / witness": "Witness: subquery logic is described at its named ancestor."
+   }
+  ],
+  "Meaning_Twin": [
+   {
+    "Item": "_ruling",
+    "Definition": "twin-graph ruling (2026-09-06) 2c/2e: KG2b, the meaning graph — the parsed graph's homomorphic twin, built only by the TRANSLATOR. Doc is authority."
+   },
+   {
+    "Item": "kind",
+    "Definition": "from the closed Meaning_Node_Kinds library (kg2_kind_library)"
+   },
+   {
+    "Item": "content",
+    "Definition": "the translated meaning material (steward-voiced words, resolved value meanings, composed phrases)"
+   },
+   {
+    "Item": "points_at",
+    "Definition": "edge to exactly ONE KG2a node — the homomorphism; gap nodes point at the counted site, reason-coded"
+   },
+   {
+    "Item": "draws_from",
+    "Definition": "edges to every KG1 node consulted — derived meaning cites its sources; the object-grain staleness basis"
+   },
+   {
+    "Item": "content_key",
+    "Definition": "meaning identity: hash over (kind, operand identities resolved to KG1 ids or scope paths, literal values, children's content_keys, join kind)"
+   },
+   {
+    "Item": "basis",
+    "Definition": "translator + metamodel version stamps"
+   },
+   {
+    "Item": "law: homomorphism",
+    "Definition": "translated + gap == every KG2a node, no third bucket — queryable"
+   },
+   {
+    "Item": "law: composition",
+    "Definition": "composite nodes (scope, statement, file) translate by composing children's meanings — never a separate invention"
+   },
+   {
+    "Item": "law: content_key invariance",
+    "Definition": "INVARIANT to formatting/whitespace, alias names, AND/join order, comments; SENSITIVE to any column, operator, literal value, join kind, or structural change"
+   },
+   {
+    "Item": "law: regeneration",
+    "Definition": "regenerates with KG2a at the FILE quantum; a version bump regenerates the whole layer"
+   },
+   {
+    "Item": "law: projection un-deferral",
+    "Definition": "the A12 deferral LIFTED — SELECT list enters KG2a as a structure kind, one projection-member node per output column"
    }
   ]
  }

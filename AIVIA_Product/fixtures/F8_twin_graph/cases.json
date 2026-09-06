@@ -1,0 +1,178 @@
+{
+ "_comment": "Twin-graph ruling answer keys (ADR 0077; ruling: AIVIA_Design/Twin_Graph_KG_RULING.md). Authored BEFORE any phase code — the tests-first entry obligation. Four families = the four ruled phases; every case: input (sql or scenario) + expected assertions the phase build's tests walk. Deciding examples reuse Sunny-ratified material from the ruling and Floor_Grammar v1.1-1.3; corpse cases cite their gap-check finding. Status until each phase builds: NOT-RUNNABLE by design.",
+ "phase_A_projection": [
+  {
+   "id": "PA-1-derived-column-corpse",
+   "title": "ROW_NUMBER projection member captured (the FIRST_TIME_LINE / Gap B corpse)",
+   "sql": "SELECT ENCOUNTER_ID, ROW_NUMBER() OVER (PARTITION BY ENCOUNTER_ID ORDER BY SCORE_DTTM) AS FIRST_TIME_LINE INTO #ED_PositiveScores FROM SEPSIS_SCORES WHERE SCORE >= 4",
+   "expected": [
+    "scope #ED_PositiveScores has a PROJECTION structure node",
+    "projection has exactly 2 member nodes, position-ordered",
+    "member 2 name == FIRST_TIME_LINE, expression subtree kind == window function",
+    "member 1 name == ENCOUNTER_ID, expression subtree kind == column_ref resolving to KG1",
+    "conservation equation unchanged: handled + counted == AST total"
+   ]
+  },
+  {
+   "id": "PA-2-select-into",
+   "title": "single-column SELECT DISTINCT ... INTO (the readmit block, finding 4's carrier)",
+   "sql": "SELECT DISTINCT [#Base_Pop].ENCOUNTER_ID INTO #Base_Pop_ED_Readmit FROM #ED_PositiveScores INNER JOIN #Base_Pop ON [#ED_PositiveScores].ENCOUNTER_ID = [#Base_Pop].ENCOUNTER_ID WHERE [#ED_PositiveScores].FIRST_TIME_LINE = 1",
+   "expected": [
+    "projection has exactly 1 member node (ENCOUNTER_ID)",
+    "INTO target is a write target, never a read (DESC-TEMP-1 law holds)",
+    "member's column_ref resolves to the #Base_Pop scope, not KG1"
+   ]
+  },
+  {
+   "id": "PA-3-star-remainder",
+   "title": "SELECT * is a counted branch until ruled (no silent expansion)",
+   "sql": "SELECT * FROM PATIENT",
+   "expected": [
+    "star projection lands as a COUNTED remainder row with reason star_projection",
+    "no invented member nodes",
+    "conservation holds with the counted row"
+   ]
+  }
+ ],
+ "phase_B_translator": [
+  {
+   "id": "PB-1-homomorphism",
+   "title": "the conservation equation, generalized",
+   "scenario": "translate any Phase-A-parsed file",
+   "expected": [
+    "every KG2a node has exactly one KG2b node: translated + gap == parsed total, no third bucket",
+    "every meaning node points_at exactly one KG2a node",
+    "every meaning node carries kind from the nine-kind library, content_key, translator+metamodel stamps",
+    "composite nodes (scope, statement, file) have content composed from children's meanings"
+   ]
+  },
+  {
+   "id": "PB-2-content-key-invariance",
+   "title": "syntax-only churn keeps the key",
+   "scenario": "same predicate three ways: (a) reformatted whitespace, (b) alias renamed E->ENC, (c) AND arms reordered",
+   "sql": "WHERE E.APPT_STATUS_C = 2 AND E.DEPT_ID = 900112",
+   "expected": [
+    "all three variants yield IDENTICAL content_keys for every meaning node",
+    "trailing comment changes never change a key"
+   ]
+  },
+  {
+   "id": "PB-3-content-key-sensitivity",
+   "title": "a truth change changes the key (the 24->48 readmit window)",
+   "sql": "AND EED.ARRIVAL_DTTM BETWEEN [#Base_Pop].ED_DEPARTURE_TIME AND DATEADD(HH, 24, [#Base_Pop].ED_DEPARTURE_TIME)",
+   "expected": [
+    "changing 24 to 48 changes the RANGE condition node's content_key",
+    "changing BETWEEN bounds' columns changes the key",
+    "changing INNER to LEFT on the carrying join changes the source node's key"
+   ]
+  },
+  {
+   "id": "PB-4-degenerate-translated",
+   "title": "1=1 is translated, subkinded, never lost",
+   "sql": "WHERE 1 = 1 AND D.DX_CODE LIKE 'E11%'",
+   "expected": [
+    "1=1 yields a condition node with subkind degenerate",
+    "it is present in the twin (homomorphism holds), flagged voiced=never",
+    "the LIKE predicate translates normally beside it"
+   ]
+  },
+  {
+   "id": "PB-5-draws-from",
+   "title": "derived meaning cites its sources",
+   "sql": "WHERE E.APPT_STATUS_C = 2",
+   "expected": [
+    "the condition node's draws_from cites the KG1 column (dictionary words) AND its values map entry (2 -> 'Completed')",
+    "a column with no dictionary entry yields readable-name content + a counted coverage gap, never silence"
+   ]
+  }
+ ],
+ "phase_C_voicing": [
+  {
+   "id": "PC-1-composition-sentence",
+   "title": "the finding-4 corpse voices (composition over source nodes)",
+   "scenario": "voice scope #Base_Pop_ED_Readmit from the sepsis corpus",
+   "expect_substrings": [
+    "restricted to",
+    "defined earlier in this procedure"
+   ],
+   "forbid_substrings": [
+    "#ED_PositiveScores",
+    "#Base_Pop",
+    "dateadd("
+   ],
+   "expected": [
+    "composition sentence names all three sources: the positive-scores selection, the base-population selection, the ED encounter read",
+    "INNER joins voice as restriction; the 24-hour RANGE voices as the match window",
+    "no raw identifier reaches prose (R5 law, now covering RANGE bounds - the line-83 side-find)"
+   ]
+  },
+  {
+   "id": "PC-2-voicing-ledger",
+   "title": "voiced union counted == total, disjoint",
+   "scenario": "any voiced surface over any translated scope",
+   "expected": [
+    "every meaning node in the surface's scope is voiced or counted, never absent from both",
+    "each omission traces to a policy line or a gap-census row",
+    "degenerate nodes counted under policy-silence, never voiced"
+   ]
+  },
+  {
+   "id": "PC-3-standing-corpses",
+   "title": "findings 1-3 stay dead (byte-exact once floors regenerate)",
+   "scenario": "the ED-sepsis corpus, voiced",
+   "expected": [
+    "finding 1 (R8): trailing comments voice WITH attribution, never bare fact",
+    "finding 2 (v1.1.0): the ADT two-alias scope voices BOTH event-subtype filters, instance-marked",
+    "finding 3 (v1.3.0): INNER-ON filters voice as membership; OUTER-ON residues counted, never voiced as filters"
+   ]
+  },
+  {
+   "id": "PC-4-depth-cap",
+   "title": "anonymous derived tables inline at depth 1; deeper counts",
+   "sql": "FROM A INNER JOIN (SELECT ENCOUNTER_ID FROM B INNER JOIN (SELECT PATIENT_ID FROM C WHERE X = 1) c2 ON c2.PATIENT_ID = B.PATIENT_ID) b2 ON b2.ENCOUNTER_ID = A.ENCOUNTER_ID",
+   "expected": [
+    "depth-1 anonymous scope (b2) renders inline in the composition sentence",
+    "depth-2 scope (c2) lands in gap-census with the revisit trigger declared",
+    "translation of c2 is still TOTAL - the cap is on prose only"
+   ]
+  }
+ ],
+ "phase_D_anchors": [
+  {
+   "id": "PD-1-survival",
+   "title": "certification survives syntax-only churn",
+   "scenario": "certify a scope description; reformat the file + rename an alias; re-run the pipeline",
+   "expected": [
+    "content_keys unchanged -> the certification survives silently, zero steward touches",
+    "no new artifact version is created"
+   ]
+  },
+  {
+   "id": "PD-2-orphan-on-truth-change",
+   "title": "a meaning change visibly orphans (24->48)",
+   "scenario": "certify the readmit description; change the window to 48 hours; re-run",
+   "expected": [
+    "the anchor's content_key mismatches -> the artifact flags as orphaned (a drift FINDING)",
+    "the artifact is never deleted and never silently re-attached"
+   ]
+  },
+  {
+   "id": "PD-3-deleted-scope",
+   "title": "S2 corollary: deletion orphans with candidates",
+   "scenario": "certify a scope; delete the scope from the file; re-run",
+   "expected": [
+    "artifact orphaned with similarity candidates from relatedness",
+    "re-attachment stays a human act"
+   ]
+  },
+  {
+   "id": "PD-4-migration",
+   "title": "the anchor migration itself (Phase D entry)",
+   "scenario": "migrate existing KG3 artifacts from file::scope-name anchors to content_key anchors",
+   "expected": [
+    "every migrated artifact resolves to exactly one meaning identity or lands as a counted migration orphan (a FINDING, not an error)",
+    "migrated + orphaned == pre-migration artifact count"
+   ]
+  }
+ ]
+}

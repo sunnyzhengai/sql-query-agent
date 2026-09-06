@@ -41,9 +41,13 @@ SOURCES = {
 
 # Ratification pass DONE 2026-09-05 (Sunny): drafts 0.1/0.2 -> 1.0.0,
 # ratified flips true, doc headings stamped the same breath.
-STAMP_VERSION = "1.0.0"
+# v1.1.0 (2026-09-06): the twin-graph ruling (ADR 0077,
+# AIVIA_Design/Twin_Graph_KG_RULING.md) lands as TWIN_SHEETS below —
+# doc headings bumped the same breath (RG-A2).
+STAMP_VERSION = "1.1.0"
 RATIFIED = True
-DOC_STAMP = "v1.0.0 (ratified 2026-09-05, Sunny)"
+DOC_STAMP = ("v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 amendments "
+             "per the twin-graph ruling, ADR 0077 (2026-09-06)")
 CONVERTED_ON = "2026-09-05"
 
 
@@ -361,6 +365,244 @@ DEFER_WHY = {
     "demand": "reads the deferred ask surface",
 }
 
+# Whole sheets added by the TWIN-GRAPH RULING (ratified 2026-09-06,
+# Sunny; ADR 0077; full ruling AIVIA_Design/Twin_Graph_KG_RULING.md).
+# Landing recorded verdicts only, per this file's charter.
+_TG = "twin-graph ruling (2026-09-06)"
+TWIN_SHEETS = {
+    "kg2_kind_library": {
+        "Meaning_Node_Kinds": [
+            {"Kind": "_ruling", "Definition": _TG + " 2d: the closed "
+             "meaning-node library — one kind per translated node in KG2b, "
+             "the meaning twin. Doc is authority."},
+            {"Kind": "selection", "Definition": "a scope's meaning; carries "
+             "grain where derivable", "Deciding example": "#Base_Pop -> 'a "
+             "selection of patient encounters'"},
+            {"Kind": "source", "Definition": "a FROM/JOIN ref w/ join kind; "
+             "resolves to a KG1 table or a same-tree selection node (the "
+             "handle)", "Deciding example": "INNER JOIN #Base_Pop -> "
+             "'restricted to records also present in the base-population "
+             "selection'"},
+            {"Kind": "condition", "Definition": "a predicate's meaning; "
+             "kinds = the ratified R4 closed set; DEGENERATE is a subkind — "
+             "translated always, voiced never",
+             "Deciding example": "DX_CODE LIKE 'E11%' -> 'the diagnosis "
+             "code starts with E11'; WHERE 1=1 -> degenerate"},
+            {"Kind": "projection", "Definition": "what an output column IS "
+             "(rides the A12 un-deferral)",
+             "Deciding example": "FIRST_TIME_LINE = ROW_NUMBER() OVER (...) "
+             "-> 'the first scored row per encounter'"},
+            {"Kind": "grouping", "Definition": "GROUP BY/HAVING context; "
+             "shapes grain",
+             "Deciding example": "GROUP BY ENCOUNTER_ID -> 'one row per "
+             "encounter'"},
+            {"Kind": "window", "Definition": "ORDER BY/TOP/window functions; "
+             "shapes which rows",
+             "Deciding example": "TOP 1 ORDER BY SCORE DESC -> 'the "
+             "highest-scoring row'"},
+            {"Kind": "combination", "Definition": "UNION w/ dedup flag",
+             "Deciding example": "UNION ALL -> 'combined, duplicates kept'"},
+            {"Kind": "reference", "Definition": "an operand's meaning (the "
+             "R5 material as nodes)",
+             "Deciding example": "E.APPT_STATUS_C -> 'the appointment "
+             "status'"},
+            {"Kind": "gap", "Definition": "a counted untranslated node; "
+             "reason-coded per the 0044 pattern",
+             "Deciding example": "dynamic SQL body -> gap(dynamic_sql)"},
+        ],
+    },
+    "kg2_logic": {
+        "Meaning_Twin": [
+            {"Item": "_ruling", "Definition": _TG + " 2c/2e: KG2b, the "
+             "meaning graph — the parsed graph's homomorphic twin, built "
+             "only by the TRANSLATOR. Doc is authority."},
+            {"Item": "kind", "Definition": "from the closed "
+             "Meaning_Node_Kinds library (kg2_kind_library)"},
+            {"Item": "content", "Definition": "the translated meaning "
+             "material (steward-voiced words, resolved value meanings, "
+             "composed phrases)"},
+            {"Item": "points_at", "Definition": "edge to exactly ONE KG2a "
+             "node — the homomorphism; gap nodes point at the counted "
+             "site, reason-coded"},
+            {"Item": "draws_from", "Definition": "edges to every KG1 node "
+             "consulted — derived meaning cites its sources; the "
+             "object-grain staleness basis"},
+            {"Item": "content_key", "Definition": "meaning identity: hash "
+             "over (kind, operand identities resolved to KG1 ids or scope "
+             "paths, literal values, children's content_keys, join kind)"},
+            {"Item": "basis", "Definition": "translator + metamodel "
+             "version stamps"},
+            {"Item": "law: homomorphism", "Definition": "translated + gap "
+             "== every KG2a node, no third bucket — queryable"},
+            {"Item": "law: composition", "Definition": "composite nodes "
+             "(scope, statement, file) translate by composing children's "
+             "meanings — never a separate invention"},
+            {"Item": "law: content_key invariance", "Definition":
+             "INVARIANT to formatting/whitespace, alias names, AND/join "
+             "order, comments; SENSITIVE to any column, operator, literal "
+             "value, join kind, or structural change"},
+            {"Item": "law: regeneration", "Definition": "regenerates with "
+             "KG2a at the FILE quantum; a version bump regenerates the "
+             "whole layer"},
+            {"Item": "law: projection un-deferral", "Definition": "the A12 "
+             "deferral LIFTED — SELECT list enters KG2a as a structure "
+             "kind, one projection-member node per output column"},
+        ],
+    },
+    "kg1_technical": {
+        "Incremental_Intake": [
+            {"Item": "_ruling", "Definition": _TG + " 2a/5a + "
+             "CONTRACT_DATALOAD §13. Doc is authority."},
+            {"Item": "content_hash", "Definition": "on every KG1 object "
+             "(db/schema/table/column): hash over the object's declared "
+             "syntax + semantics as loaded"},
+            {"Item": "loaded_at", "Definition": "load stamp + "
+             "source-snapshot identity on every object"},
+            {"Item": "rule: incremental mode", "Definition": "intake diffs "
+             "by hash; only changed objects write; unchanged hash writes "
+             "nothing (INTAKE-13)"},
+            {"Item": "rule: equivalence audit", "Definition": "scheduled "
+             "full parallel load compares against incremental state; any "
+             "delta is a COUNTED finding (INTAKE-12), never silently "
+             "reconciled"},
+            {"Item": "rule: staleness export", "Definition": "the "
+             "changed-object set feeds object-grain staleness — only "
+             "KG2b meaning nodes whose draws_from cite a changed object "
+             "retranslate"},
+        ],
+    },
+    "lenses": {
+        "Builders_and_Readings": [
+            {"Item": "_ruling", "Definition": _TG + " 3: the lens STRATUM "
+             "retires into two contracts; this sheet + Reclassification "
+             "are the authority over the Catalog_v1 rows where they "
+             "differ. Doc is authority."},
+            {"Item": "BUILDER contract", "Definition": "loader -> KG1 · "
+             "parser -> KG2a · TRANSLATOR -> KG2b (the 'translation lens' "
+             "renamed to what it is). Deterministic; versioned, stamps "
+             "every node written; writes ONLY its own layer; total with "
+             "counted gaps; version bump rebuilds everything it governs. "
+             "Governance has NO builder."},
+            {"Item": "READING contract", "Definition": "named, versioned, "
+             "deterministic, writes nothing; kept for citability "
+             "(dispositions and concept bases quote reading output by "
+             "version); most are versioned queries"},
+            {"Item": "survival principle", "Definition": "a reading exists "
+             "iff its yield is ABOUT the graph for one consumer — status, "
+             "aggregation, comparison — never meaning itself; the "
+             "translator absorbed everything secretly computing meaning"},
+        ],
+        "Reclassification_2026_09_06": [
+            {"Entry": "decisions(class)", "Class": "RETIRED — subsumed by "
+             "the translator (membership/grain/value/path become "
+             "meaning-node kinds)"},
+            {"Entry": "degenerate", "Class": "RELOCATED — the condition "
+             "subkind in the meaning twin"},
+            {"Entry": "relatedness", "Class": "COMPUTED READING (over KG2b "
+             "content_keys; feeds concept minting; full contract entry)"},
+            {"Entry": "ownership", "Class": "query (event-derivation; "
+             "rules unchanged)"},
+            {"Entry": "authorship", "Class": "query (event-derivation; "
+             "rules unchanged)"},
+            {"Entry": "version", "Class": "query (chain depth)"},
+            {"Entry": "standing", "Class": "query (event-derivation)"},
+            {"Entry": "current", "Class": "query (derived current "
+             "pointers)"},
+            {"Entry": "current-outcome", "Class": "query (latest "
+             "observation)"},
+            {"Entry": "staleness", "Class": "query (stamp arithmetic; "
+             "gains KG1 object grain)"},
+            {"Entry": "join-compliance", "Class": "query (comparison: KG2b "
+             "source nodes vs KG1 declared paths)"},
+            {"Entry": "divergence", "Class": "query (anchor mismatch)"},
+            {"Entry": "concept-drift", "Class": "query (anchor mismatch vs "
+             "concept basis)"},
+            {"Entry": "expertise", "Class": "query (usage aggregation)"},
+            {"Entry": "blast-radius", "Class": "query (traversal + usage)"},
+            {"Entry": "working-set", "Class": "query (resolves_to "
+             "aggregation)"},
+            {"Entry": "gap-census", "Class": "query (gap-node counting; "
+             "gains untranslated counts)"},
+            {"Entry": "referenced-keys", "Class": "query (inbound joins_to "
+             "groups)"},
+            {"Entry": "correspondence", "Class": "deferred (unchanged "
+             "posture); query-shaped when it lands"},
+            {"Entry": "demand", "Class": "deferred (unchanged posture); "
+             "query-shaped when it lands"},
+        ],
+    },
+    "kg3_artifacts": {
+        "Governance_Overlay": [
+            {"Item": "_ruling", "Definition": _TG + " 2f: kg3_artifacts + "
+             "kg4_concepts merge into KG3, the governance overlay — one "
+             "Governance_Layer_Registry. Doc is authority."},
+            {"Item": "concept joins the classes", "Definition": "keeping "
+             "its four ratified rules (human-mint-only, append-only, "
+             "nameless — the term carries the name, basis snapshot); a "
+             "concept's about-edges target a SET of meaning anchors (the "
+             "family, by content_key)"},
+            {"Item": "THE ANCHOR RULE", "Definition": "about targets a "
+             "MEANING IDENTITY — a KG2b content_key at a scope path, or a "
+             "KG1 object — never a KG2a syntax node, never a node "
+             "instance"},
+            {"Item": "corollary S1", "Definition": "same content_key after "
+             "regeneration -> the artifact survives silently (was a "
+             "rule)"},
+            {"Item": "corollary S2", "Definition": "changed content_key -> "
+             "flagged orphan (the drift finding); deleted scope -> "
+             "orphaned with similarity candidates (was a rule)"},
+            {"Item": "corollary: free churn", "Definition": "syntax-only "
+             "churn (reformat, alias rename) costs zero governance"},
+        ],
+    },
+    "kg4_concepts": {
+        "Merged_Into_Governance": [
+            {"Item": "_ruling", "Definition": _TG + " 2f: SUPERSEDED AS A "
+             "LAYER — concept is a citizen class of the governance overlay "
+             "(kg3_artifacts Governance_Overlay sheet). Sheets below stand "
+             "as the ratified class-rule record."},
+        ],
+    },
+    "flows": {
+        "Change_Quanta": [
+            {"Layer": "_ruling", "Data-change quantum": _TG + " 5a",
+             "Note": "changes trigger updates; total reload retires as the "
+             "DATA path but stays as the RULE path. Doc is authority."},
+            {"Layer": "KG1", "Data-change quantum": "object (content_hash "
+             "diff)", "Note": "only changed objects write; mechanical "
+             "equivalence audit (INTAKE-12)"},
+            {"Layer": "KG2 (both twins)", "Data-change quantum": "file "
+             "(content hash) + the draws_from ripple from KG1 changes",
+             "Note": "parse + translate same run, atomic; stamp check "
+             "forbids readable half-state"},
+            {"Layer": "KG3", "Data-change quantum": "never regenerates",
+             "Note": "anchors re-check by content_key after any KG2b "
+             "change: survive silently or flag as drift"},
+            {"Layer": "ALL", "Data-change quantum": "RULE changes are "
+             "TOTAL by design", "Note": "a version bump regenerates "
+             "everything it governs — partial regeneration under a new "
+             "rule is the grandfathering hazard in pipeline form"},
+        ],
+        "Twin_Graph_Phasing": [
+            {"Phase": "A", "Ships": "metamodel bump + A12 projection "
+             "re-parse (KG2a complete)",
+             "Gate": "real ED-sepsis gap-check output"},
+            {"Phase": "B", "Ships": "the translator + stored KG2b + "
+             "conservation equation green over the sepsis corpus",
+             "Gate": "real ED-sepsis gap-check output"},
+            {"Phase": "C", "Ships": "voicing-policy port (Floor Grammar "
+             "major) + full gap-check rerun; findings 1-4 corpses become "
+             "standing tests", "Gate": "Sunny's gap-check verdict"},
+            {"Phase": "D", "Ships": "governance registry merge + anchor "
+             "migration (orphans are FINDINGS, not errors)",
+             "Gate": "real ED-sepsis gap-check output"},
+            {"Phase": "independent", "Ships": "KG1 incremental intake — "
+             "any time after A", "Gate": "mechanical equivalence audit "
+             "green (INTAKE-12)"},
+        ],
+    },
+}
+
 # Undecided items carried forward as flags, never resolved here.
 OPEN_FLAGS = {}
 
@@ -398,6 +640,10 @@ def convert():
             assert sheet not in sheets, f"{name}: sheet {sheet} exists"
             sheets[sheet] = [dict(r) for r in rows]
             applied.append(f"sheet {sheet} added (all-eight ruling 2026-09-05)")
+        for sheet, rows in TWIN_SHEETS.get(name, {}).items():
+            assert sheet not in sheets, f"{name}: sheet {sheet} exists"
+            sheets[sheet] = [dict(r) for r in rows]
+            applied.append(f"sheet {sheet} added ({_TG}, ADR 0077)")
         if name == "lenses":
             for row in sheets["Catalog_v1"]:
                 lens = row["Lens"]
