@@ -85,7 +85,15 @@ def inner_join_residues(scope) -> List[Dict[str, Any]]:
 
 def membership_predicates(scope) -> List[Dict[str, Any]]:
     """The scope's full membership set: INNER-join ON residues (join
-    order precedes WHERE in the source) + WHERE predicates."""
+    order precedes WHERE in the source) + WHERE predicates. A
+    COMBINATION scope's membership is its arms' union, arm order kept
+    (the ABX corpse, 2026-09-06: a UNION CTE's filters were invisible
+    because the empty top scope had no WHERE)."""
+    if "combination_arms" in scope:
+        out: List[Dict[str, Any]] = []
+        for arm in scope["combination_arms"]:
+            out.extend(membership_predicates(arm))
+        return out
     return inner_join_residues(scope) + flatten_where(scope.get("where"))
 
 

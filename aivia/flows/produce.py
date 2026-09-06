@@ -30,7 +30,11 @@ ECON = json.loads((pathlib.Path(__file__).parent / "econ_params.json")
 # 24-hour-window bound gains the DATEADD phrase (ADR 0076's
 # evidence-ordered overlay: 12 estate uses ordered it) — the line-83
 # raw-token corpse from Sunny's gap-check dies here.
-FLOOR_GRAMMAR_VERSION = "2.0.0"
+# 2.1.0: the ABX corpse (Sunny's Phase-C gap-check find) — a UNION
+# CTE floored as 'no source records are read': COMBINATION scopes now
+# map (arms in order, dedup flag), voice per arm, and an unmapped
+# query shape floors as its honest counted state, never a claim.
+FLOOR_GRAMMAR_VERSION = "2.1.0"
 _PREPOSITIONS = ("of", "on", "per", "for", "in", "at", "by", "with")
 
 
@@ -110,7 +114,10 @@ class _Voice:
             col_id = expr.get("resolves_to") or ""
             desc = self._columns.get(col_id, {}).get("description", "")
             return _noun_phrase(desc, expr["ref"].split(".")[-1])
-        return decisions.render_expr(expr).lower()
+        # a computed subject voices through the value path (DATEADD
+        # overlay, steward words) — raw tokens never face the steward
+        phrase = self.value(expr, expr)
+        return phrase[4:] if phrase.startswith("the ") else phrase
 
     def value(self, expr, subject_expr) -> str:
         kind = expr.get("kind")
@@ -147,18 +154,19 @@ class _Voice:
             # ADR 0076 evidence-ordered overlay: DATEADD earned its
             # phrase (12 estate uses). Unit arg arrives as a column_ref
             # token (HH) — read its raw name, never its resolution.
-            unit_words = {"HH": "hours", "HOUR": "hours", "DD": "days",
-                          "DAY": "days", "MI": "minutes",
-                          "MINUTE": "minutes", "SS": "seconds",
-                          "WK": "weeks", "MM": "months", "MONTH": "months",
-                          "YY": "years", "YEAR": "years"}
+            unit_words = {"HH": "hour", "HOUR": "hour", "DD": "day",
+                          "D": "day", "DAY": "day", "MI": "minute",
+                          "MINUTE": "minute", "SS": "second",
+                          "WK": "week", "MM": "month", "MONTH": "month",
+                          "YY": "year", "YEAR": "year"}
             first = expr["args"][0]
             unit = str(first.get("value") or first.get("ref", "")
                        ).split(".")[-1].upper()
             n = expr["args"][1].get("value")
             base = self.value(expr["args"][2], expr["args"][2])
             if unit in unit_words and n is not None:
-                return f"{n} {unit_words[unit]} after {base}"
+                word = unit_words[unit] + ("" if str(n) == "1" else "s")
+                return f"{n} {word} after {base}"
         return decisions.render_expr(expr).lower()
 
     def forbidden_tokens(self, scope) -> List[str]:
@@ -325,7 +333,8 @@ def voicing_ledger(read: ReadApi, target: str) -> Dict[str, int]:
             counted += 1
             detail["remainder_unvoiced"] = \
                 detail.get("remainder_unvoiced", 0) + 1
-    outer = sum(1 for on in scope.get("join_on", [])
+    arms = [scope] + scope.get("combination_arms", [])
+    outer = sum(1 for s in arms for on in s.get("join_on", [])
                 if str(on.get("join_type")) != "Inner")
     counted += outer
     if outer:
@@ -344,6 +353,43 @@ def compose_floor(read: ReadApi, target: str) -> str:
                 tree, scope = t, s
     if scope is None:
         raise KeyError(f"no scope {target} in the parsed estate")
+    return _compose_scope(read, tree, scope)
+
+
+def _compose_scope(read: ReadApi, tree, scope,
+                   include_lead: bool = True) -> str:
+    # An unmapped query shape NEVER floors as a claim — the old walk
+    # laundered the counted gap into 'no source records are read'
+    # (Sunny's ABX corpse). Absence over fabrication.
+    if scope.get("unmapped_shape"):
+        return ("The logic of this selection is not yet modeled "
+                f"(unmapped query shape: {scope['unmapped_shape']}); "
+                "its contents are counted for engineering review, "
+                "never described by guess.")
+    # COMBINATION (grammar 2.1.0, the ABX corpse): lead from the first
+    # arm, the combination fact voiced, each arm's composition and
+    # conditions voiced in arm order (arm order is meaning)
+    if "combination_arms" in scope:
+        arms = scope["combination_arms"]
+        dupes = ("duplicates kept" if scope.get("combination_all")
+                 else "duplicates removed")
+        kind_words = {"Union": "combination",
+                      "Except": "difference",
+                      "Intersect": "intersection"}
+        word = kind_words.get(str(scope.get("combination")),
+                              "combination")
+        first_arm_lines = _compose_scope(read, tree, arms[0],
+                                         include_lead=True).split("\n")
+        lines = [first_arm_lines[0],
+                 f"This selection is the {word} of {len(arms)} "
+                 f"alternative selections ({dupes})."]
+        ordinals = ("first", "second", "third", "fourth", "fifth")
+        for i, arm in enumerate(arms):
+            marker = ordinals[i] if i < len(ordinals) else f"#{i + 1}"
+            body = _compose_scope(read, tree, arm, include_lead=False)
+            lines.append(f"The {marker} alternative:")
+            lines.extend(body.split("\n"))
+        return "\n".join(line for line in lines if line)
     voice = _Voice(read, tree)
     tables = {n.identity: n.properties for n in read.nodes("table")}
     # R1 — the lead
@@ -354,7 +400,9 @@ def compose_floor(read: ReadApi, target: str) -> str:
             reads_tables = True
             if lead_grain is None and tables[rt].get("grain"):
                 lead_grain = tables[rt]["grain"]
-    if not reads_tables and not scope.get("from_refs"):
+    if not include_lead:
+        lines = []
+    elif not reads_tables and not scope.get("from_refs"):
         lines = ["This step produces derived values; no source records "
                  "are read."]
     elif lead_grain:

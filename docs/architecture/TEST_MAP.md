@@ -7,7 +7,7 @@
 
 # Test Map — what every test proves
 
-150 modules, 1681 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
+150 modules, 1682 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
 
 ## By ADR
 
@@ -168,7 +168,7 @@
 - `tests/aivia/test_planks.py` (6): Slice 0: the planks — the import law and banned constructs as physics.
 - `tests/aivia/test_produce.py` (10): Slice 5 exit: produce vs the RATIFIED floor grammar — F4 upgraded
 - `tests/aivia/test_refusals.py` (9): Slice 1: the F6 refusal set — every refusal NAMES its rule.
-- `tests/aivia/test_sepsis_shakedown.py` (8): The sepsis shakedown (round 2) — conservation counters pinned;
+- `tests/aivia/test_sepsis_shakedown.py` (9): The sepsis shakedown (round 2) — conservation counters pinned;
 - `tests/aivia/test_shapes_shakedown.py` (4): The shapes shakedown — the engine over the 38-file ADR 0055 corpus,
 - `tests/aivia/test_store.py` (6): Slice 1: the append-only substrate — LC-F2/F3 as structure.
 

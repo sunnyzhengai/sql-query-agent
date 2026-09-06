@@ -247,10 +247,31 @@ def _map_query(ctx, query) -> Dict[str, Any]:
     t = _type_name(query)
     if t == "QueryParenthesisExpression":
         return _map_query(ctx, query.QueryExpression)
+    if t == "BinaryQueryExpression":
+        # UNION/EXCEPT/INTERSECT — the COMBINATION structure (Sunny's
+        # ABX corpse, 2026-09-06: the old walk counted the shape but
+        # returned an EMPTY scope, and the floor read 'no sources' as
+        # 'no source records are read' — a counted gap laundered into
+        # a false claim). Arms map as full scopes; nested combinations
+        # flatten in order.
+        arms = []
+        for side in (query.FirstQueryExpression,
+                     query.SecondQueryExpression):
+            arm = _map_query(ctx, side)
+            if arm.get("combination") == str(query.BinaryQueryExpressionType) \
+                    and arm.get("combination_all") == bool(query.All):
+                arms.extend(arm["combination_arms"])
+            else:
+                arms.append(arm)
+        return {"node": "scope", "structures": ["COMBINATION"],
+                "combination": str(query.BinaryQueryExpressionType),
+                "combination_all": bool(query.All),
+                "combination_arms": arms,
+                "evidence": _evidence(ctx, query)}
     if t != "QuerySpecification":
         ctx.remainder.append({"type": t, **_evidence(ctx, query),
                               "reason": "unmapped query shape"})
-        return {"node": "scope", "structures": [],
+        return {"node": "scope", "structures": [], "unmapped_shape": t,
                 "evidence": _evidence(ctx, query)}
     refs, join_on = [], []
     if query.FromClause:
@@ -502,6 +523,8 @@ def resolve(tree: Dict[str, Any], store: Store, reg: Dict[str, Any],
               "unresolved_refs": 0, "unresolved": []}
 
     def resolve_scope(scope):
+        for arm in scope.get("combination_arms", []):
+            resolve_scope(arm)
         alias_to = {}
         for ref in scope.get("from_refs", []):
             if "derived_scope" in ref:

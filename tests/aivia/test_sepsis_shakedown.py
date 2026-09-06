@@ -155,3 +155,24 @@ def test_r5_phrasing_corpses(shaken):
                                  "reporting/USP_ED_SEPSIS.sql::#BPA")
     assert "alert this" not in bpa
     assert "'900130001'" in bpa
+
+
+def test_abx_corpse_union_cte_voices_both_arms(shaken):
+    """Sunny's Phase-C gap-check find (2026-09-06): the ABX CTE — a
+    UNION of two selections — floored as 'This step produces derived
+    values; no source records are read': the counted unmapped-query-
+    shape gap LAUNDERED into a false claim. Standing law: COMBINATION
+    scopes voice per arm; an unmapped shape floors as its honest
+    counted state, never as a claim."""
+    from aivia.flows import produce
+    from aivia.graph.read_api import ReadApi
+    store, _, _ = shaken
+    floor = produce.compose_floor(
+        ReadApi(store), "reporting/USP_ED_SEPSIS.sql::ABX")
+    assert "no source records are read" not in floor
+    assert "combination of 2 alternative selections" in floor
+    assert "duplicates removed" in floor
+    assert floor.count("allmeds selection defined earlier") == 2
+    assert "The thera class code is 11 (annotated 'Antibiotics'" in floor
+    assert "defined by another selection" in floor  # the value set
+    assert "The taken time is before the ed departure time" in floor

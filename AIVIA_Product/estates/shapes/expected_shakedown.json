@@ -1,5 +1,5 @@
 {
-  "_comment": "AUTHORED shakedown expectations for the shapes estate (pinned 2026-09-06 from the first honest run, hand-sanity-checked). The corpus-of-record law: same corpus + same pack -> these exact counters. Three findings this run surfaced, on the record: (1) the PHI probe file forced the H6 quoting fix \u2014 a redacted literal must stay a valid literal; (2) A2's fold_upper matching landed in the resolver (three lowercase refs were honest casualties until the ruled model was code); (3) MED_CODE = MED_NAME is the corpus's deliberate join smell and the compliance lens caught it.",
+  "_comment": "AUTHORED shakedown expectations for the shapes estate (pinned 2026-09-06 from the first honest run, hand-sanity-checked). The corpus-of-record law: same corpus + same pack -> these exact counters. Three findings this run surfaced, on the record: (1) the PHI probe file forced the H6 quoting fix — a redacted literal must stay a valid literal; (2) A2's fold_upper matching landed in the resolver (three lowercase refs were honest casualties until the ruled model was code); (3) MED_CODE = MED_NAME is the corpus's deliberate join smell and the compliance lens caught it.",
   "extract": {
     "tables": 22,
     "columns": 76,
@@ -11,20 +11,20 @@
   "estate": {
     "acquired": 38,
     "counted_excluded": 0,
-    "resolved_refs": 242,
-    "same_tree_refs": 50,
+    "resolved_refs": 245,
+    "same_tree_refs": 51,
     "unresolved_refs": 0,
     "phi_redactions": 0,
-    "remainder_total": 43,
+    "remainder_total": 42,
     "remainder_types": {
       "DeclareVariableStatement": 1,
       "ExecuteStatement": 1,
       "SearchedCaseExpression": 3,
-      "BinaryQueryExpression": 1,
       "SelectStarExpression": 37
     },
     "_phase_a_note": "was 6 before the Phase A build (ADR 0077, 2026-09-06): SELECT * elements were previously SKIPPED SILENTLY by the select walk — projection capture closed the hole; 37 stars now COUNT as star_projection remainder until star expansion is ruled",
-    "_phi_note": "was 2 before the ADR 0025 posture landed at the sepsis shakedown (2026-09-06): the probe's id/name literals now COUNT at door 1 and redact at egress; only context-free contact shapes redact at intake"
+    "_phi_note": "was 2 before the ADR 0025 posture landed at the sepsis shakedown (2026-09-06): the probe's id/name literals now COUNT at door 1 and redact at egress; only context-free contact shapes redact at intake",
+    "_abx_note": "ABX-corpse build (2026-09-06): COMBINATION scopes map; BinaryQueryExpression leaves the remainder; arm refs resolve"
   },
   "lenses": {
     "working_set_touched": 16,
@@ -42,7 +42,7 @@
     "compliance_compliant": 12,
     "compliance_not_judged": 6,
     "scopes": 102,
-    "scopes_with_decisions": 62,
+    "scopes_with_decisions": 63,
     "degenerate": 0,
     "grain_not_declared": 22
   },
@@ -52,5 +52,5 @@
     2,
     0
   ],
-  "_witness": "ECON v1 pacing visible end-to-end: batch 50 drains the 102-scope worklist in three waves, then the staleness lens goes quiet \u2014 no change, no production, no noise"
+  "_witness": "ECON v1 pacing visible end-to-end: batch 50 drains the 102-scope worklist in three waves, then the staleness lens goes quiet — no change, no production, no noise"
 }

@@ -100,7 +100,12 @@ def _collect_scope_members(tree: Dict[str, Any]
             if not name:
                 continue
             table = members.setdefault(_fold(name), {})
-            for m in scope.get("projection", []):
+            # a COMBINATION's output columns are its first arm's
+            # projection (UNION arms share the output shape)
+            arms = scope.get("combination_arms")
+            projection = (arms[0].get("projection", []) if arms
+                          else scope.get("projection", []))
+            for m in projection:
                 if m.get("name"):
                     table.setdefault(_fold(m["name"]), m)
     return members
@@ -318,6 +323,29 @@ class _Walk:
                         child_keys=[expr["content_key"]])
 
     def scope(self, scope, path) -> Dict[str, Any]:
+        if "combination_arms" in scope:
+            # the COMBINATION meaning kind (the ABX corpse build):
+            # arm ORDER is meaning (UNION arms differ in filters) —
+            # keys stay ordered, never sorted
+            arm_keys = [
+                self.scope(arm, f"{path}/combination_arms/{i}")
+                ["content_key"]
+                for i, arm in enumerate(scope["combination_arms"])]
+            content = {"selection": scope.get("name")
+                       or scope.get("name_key") or "(anonymous)",
+                       "combines": len(arm_keys),
+                       "combination": scope.get("combination"),
+                       "duplicates_kept": bool(
+                           scope.get("combination_all"))}
+            return self.add("combination", path, content,
+                            ["combination",
+                             str(scope.get("combination")),
+                             str(bool(scope.get("combination_all")))],
+                            child_keys=arm_keys)
+        if scope.get("unmapped_shape"):
+            return self.gap(path,
+                            f"unmapped_query_shape:"
+                            f"{scope['unmapped_shape']}")
         source_keys = []
         for i, ref in enumerate(scope.get("from_refs", [])):
             source_keys.append(
@@ -425,6 +453,8 @@ def parsed_census(tree: Dict[str, Any]) -> int:
     def scope(s):
         nonlocal count
         count += 1
+        for arm in s.get("combination_arms", []):
+            scope(arm)
         for ref in s.get("from_refs", []):
             count += 1
             if "derived_scope" in ref:
