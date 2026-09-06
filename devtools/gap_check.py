@@ -65,6 +65,26 @@ def render(read: ReadApi) -> str:
                  f"{totals['voiced'] + totals['counted']} total "
                  "(disjoint; every omission traces to a policy line "
                  "or a census row).")
+    # THE GAP TAXONOMY rollup (registry Gap_Classes, ruled
+    # 2026-09-06): ruled-silent vs open, owner engine|estate
+    cls = {"ruled_silent": 0, "open_engine": 0, "open_estate": 0}
+    for n in read.nodes("meaning_twin"):
+        for k, v in n.properties["twin"]["census"]["by_class"].items():
+            cls[k] += v
+    drift = sum(t["resolution_census"].get("unresolved_refs", 0)
+                for t in read.trees().values())
+    lines += ["",
+              "**The gap taxonomy** (ruled-silent = ok forever, by "
+              "ruling; open = needs resolution):",
+              f"- RULED-SILENT: {cls['ruled_silent']} "
+              "(operational statements, degenerate predicates)",
+              f"- OPEN, engine debt (ours): {cls['open_engine']} "
+              "(unmapped kinds + unbound reference classes — shrinks "
+              "with builds)",
+              f"- OPEN, estate findings (the customer's): "
+              f"{cls['open_estate']} documentation gaps + "
+              f"{drift} drift refs (columns nowhere declared — "
+              "silently-failing reports, kept counted forever)"]
     return "\n".join(lines + sections)
 
 

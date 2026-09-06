@@ -30,10 +30,14 @@ from typing import Any, Dict, List, Optional
 from aivia.graph import metamodel
 from aivia.graph.kg2_mapper import METAMODEL_VERSION
 
-TRANSLATOR_VERSION = "1.1.0"
+TRANSLATOR_VERSION = "1.2.0"
 # 1.1.0 (Phase C): the T-2 operational class (ruled list from the
 # registry) + Gap B cross-scope resolution (temp/CTE columns resolve
 # through the defining scope's projection member).
+# 1.2.0 (the gap taxonomy, Sunny's Phase-C review ruling): every
+# coverage gap carries its CAUSE, and the census rolls up by class —
+# ruled_silent vs open(engine) vs open(estate). Registry Gap_Classes
+# is the taxonomy's law.
 
 # T-2 RULED (Sunny, 2026-09-06): operational statement kinds carry no
 # analytic meaning BY RULING — the closed list lives in the registry,
@@ -150,7 +154,9 @@ class _Walk:
                                                   .rsplit(".", 1)[-1]),
                                "words_source": "readable_name"}
                     draws = [resolved]
-                    self.coverage_gaps.append(resolved)
+                    self.coverage_gaps.append(
+                        {"ref": resolved,
+                         "cause": "no_dictionary_words"})
             elif resolved and str(resolved).startswith("SAME-TREE"):
                 # Gap B (Phase C): a temp/CTE column's meaning lives in
                 # the defining scope's PROJECTION member — resolve
@@ -181,13 +187,17 @@ class _Walk:
                                                   .rsplit(".", 1)[-1]),
                                "words_source": "readable_name"}
                     draws = []
-                    self.coverage_gaps.append(expr["ref"])
+                    self.coverage_gaps.append(
+                        {"ref": expr["ref"],
+                         "cause": "built_by_unmapped_statement"})
             else:
                 content = {"words": _readable(expr["ref"]
                                               .rsplit(".", 1)[-1]),
                            "words_source": "readable_name"}
                 draws = []
-                self.coverage_gaps.append(expr["ref"])
+                self.coverage_gaps.append(
+                    {"ref": expr["ref"],
+                     "cause": "unresolved_reference"})
             return self.add("reference", path, content,
                             ["column_ref", str(identity)], draws)
         if kind == "literal":
@@ -470,7 +480,28 @@ def translate(tree: Dict[str, Any],
                 if n["content"].get("words_source")
                 == "defining_projection"),
             "coverage_gaps": len(walk.coverage_gaps),
+            "coverage_by_cause": {
+                cause: sum(1 for g in walk.coverage_gaps
+                           if g["cause"] == cause)
+                for cause in sorted({g["cause"]
+                                     for g in walk.coverage_gaps})},
         },
+    }
+    # THE GAP TAXONOMY (registry Gap_Classes; Sunny's Phase-C ruling):
+    # RULED-SILENT (ok forever) vs OPEN (needs resolution), owner
+    # engine|estate. At TWIN grain: estate findings are doc-word
+    # gaps only; every unbound reference class (ambiguous, correlated,
+    # unattempted) is ENGINE debt. The estate's drift refs (columns
+    # nowhere declared) are counted at RESOLUTION grain and reported
+    # there — the two grains sum in the gap-check report.
+    census = twin["census"]
+    cov = census["coverage_by_cause"]
+    census["by_class"] = {
+        "ruled_silent": census["degenerate"] + census["operational"],
+        "open_engine": census["gaps"]
+        + cov.get("built_by_unmapped_statement", 0)
+        + cov.get("unresolved_reference", 0),
+        "open_estate": cov.get("no_dictionary_words", 0),
     }
     # THE HOMOMORPHISM LAW, checked at build time, every run: the twin
     # mirrors the parse exactly — translated + gap == every parsed

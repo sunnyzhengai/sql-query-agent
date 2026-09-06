@@ -60,12 +60,21 @@ SOURCES = {
 # degenerate pattern at statement grain; true debt shrinks to the
 # kinds that DO carry meaning (INSERT, WHILE, SET @var, unmapped
 # expressions).
-STAMP_VERSION = "1.4.0"
+# v1.5.0 (2026-09-06): THE GAP TAXONOMY (Sunny's Phase-C review
+# ruling: "what gaps are ok to have vs what gaps need resolution —
+# name the two kinds differently"): every counted class is
+# RULED-SILENT (ok forever, contributes no meaning, by ratified
+# ruling) or OPEN (needs resolution) with an OWNER — engine (ours,
+# shrinks with builds) or estate (the customer's; the product's
+# findings). Gap_Classes is the closed assignment; a new counted
+# class must join it at birth.
+STAMP_VERSION = "1.5.0"
 RATIFIED = True
 DOC_STAMP = ("v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 twin-graph "
              "ruling ADR 0077; v1.2.0 Phase A metamodel bump; v1.3.0 "
              "Phase B composite-kinds correction; v1.4.0 T-2 "
-             "operational-statements ruling (all 2026-09-06)")
+             "operational-statements ruling; v1.5.0 the gap taxonomy "
+             "(all 2026-09-06)")
 CONVERTED_ON = "2026-09-05"
 
 
@@ -482,6 +491,56 @@ TWIN_SHEETS = {
              "Rationale": "plumbing declaration; a variable's MEANING "
              "arrives where it is assigned/used (SET @var stays DEBT "
              "— assignments can carry logic)"},
+        ],
+        "Gap_Classes": [
+            {"Counted class": "_ruling", "Kind": "-", "Owner": "-",
+             "Meaning": "Sunny's Phase-C taxonomy ruling (2026-09-06): "
+             "RULED-SILENT = ok to have forever, contributes no "
+             "meaning, by ratified ruling; OPEN = needs resolution, "
+             "owner engine (ours) or estate (the customer's finding). "
+             "Closed: a new counted class joins this sheet at birth."},
+            {"Counted class": "operational statements",
+             "Kind": "RULED-SILENT", "Owner": "-",
+             "Meaning": "engine tuning / staging lifecycle / plumbing "
+             "(the v1.4.0 closed list); translated, voiced never"},
+            {"Counted class": "degenerate predicates",
+             "Kind": "RULED-SILENT", "Owner": "-",
+             "Meaning": "both-sides-literal (1=1); decides nothing"},
+            {"Counted class": "outer-join match conditions",
+             "Kind": "RULED-SILENT", "Owner": "-",
+             "Meaning": "rows survive without a match — voicing as a "
+             "filter would lie (v1.3.0); counted in the ledger"},
+            {"Counted class": "unmapped statement kinds "
+             "(INSERT, WHILE, SET @var)",
+             "Kind": "OPEN", "Owner": "engine",
+             "Meaning": "carry real meaning (population writes, loop "
+             "logic, value flow); map evidence-ordered as estate "
+             "demand shows them"},
+            {"Counted class": "unmapped query shapes (UNION ...) and "
+             "table references (PIVOT ...)",
+             "Kind": "OPEN", "Owner": "engine",
+             "Meaning": "the combination meaning kind awaits them"},
+            {"Counted class": "star projection",
+             "Kind": "OPEN", "Owner": "engine",
+             "Meaning": "counted until star expansion is ruled (the "
+             "drift-interaction question)"},
+            {"Counted class": "ambiguous unqualified refs",
+             "Kind": "OPEN", "Owner": "engine",
+             "Meaning": "multi-source scopes; column-membership "
+             "disambiguation is buildable"},
+            {"Counted class": "refs into unmapped-statement scopes",
+             "Kind": "OPEN", "Owner": "engine",
+             "Meaning": "downstream of the unmapped kinds; close "
+             "those and these close free"},
+            {"Counted class": "documentation gaps (no dictionary "
+             "words)", "Kind": "OPEN", "Owner": "estate",
+             "Meaning": "the customer's doc debt; runbook 4c + the "
+             "steward description workflow work it down"},
+            {"Counted class": "drift refs (columns nowhere declared)",
+             "Kind": "OPEN", "Owner": "estate",
+             "Meaning": "silently-failing reports — THE product "
+             "finding; resolution is a human act (fix the report or "
+             "the dictionary), kept counted forever"},
         ],
     },
     "kg2_logic": {

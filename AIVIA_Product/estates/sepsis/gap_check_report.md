@@ -4,6 +4,11 @@ Every named scope's floor text, for Sunny's gap-check (the ED-sepsis acceptance 
 
 **Voicing ledger, corpus-wide:** 427 decisions voiced + 203 counted == 630 total (disjoint; every omission traces to a policy line or a census row).
 
+**The gap taxonomy** (ruled-silent = ok forever, by ruling; open = needs resolution):
+- RULED-SILENT: 299 (operational statements, degenerate predicates)
+- OPEN, engine debt (ours): 1855 (unmapped kinds + unbound reference classes — shrinks with builds)
+- OPEN, estate findings (the customer's): 0 documentation gaps + 27 drift refs (columns nowhere declared — silently-failing reports, kept counted forever)
+
 ## reporting/USP_ED_SEPSIS.sql
 
 ### `reporting/USP_ED_SEPSIS.sql::#Base_Pop`
