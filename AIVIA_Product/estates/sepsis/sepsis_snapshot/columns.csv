@@ -4137,245 +4137,419 @@ dbo,ICU_STAY_SUMMARY,ENCOUNTER_ID,The encounter during which the ICU stay occurr
 dbo,ICU_STAY_SUMMARY,PATIENT_ID,The patient who had the ICU stay.
 dbo,ICU_STAY_SUMMARY,ICU_STAY_START_DT,The date the ICU stay began.
 dbo,ICU_STAY_SUMMARY,ICU_STAY_END_DT,"The date the ICU stay ended, NULL while the stay is ongoing."
-reporting,IP_SepsisDetails,ABXName,
-reporting,IP_SepsisDetails,ABXTime,
-reporting,IP_SepsisDetails,ABXVolume,
-reporting,IP_SepsisDetails,BPPercentile,
-reporting,IP_SepsisDetails,BloodCultureOrderTime,
-reporting,IP_SepsisDetails,BloodCultureProcedureOrdered,
-reporting,IP_SepsisDetails,BloodCultureResult,
-reporting,IP_SepsisDetails,Bolus,
-reporting,IP_SepsisDetails,BolusTime,
-reporting,IP_SepsisDetails,BolusVolume,
-reporting,IP_SepsisDetails,CALENDAR_DT,
-reporting,IP_SepsisDetails,CSFOrderTime,
-reporting,IP_SepsisDetails,CSFOrdered,
-reporting,IP_SepsisDetails,CSFValue,
-reporting,IP_SepsisDetails,CVVHYN,
-reporting,IP_SepsisDetails,DobutamineYN,
-reporting,IP_SepsisDetails,DopamineYN,
-reporting,IP_SepsisDetails,ECMOYN,
-reporting,IP_SepsisDetails,EDLosHours,
-reporting,IP_SepsisDetails,ENCORDER,
-reporting,IP_SepsisDetails,ENCOVERALLORDER,
-reporting,IP_SepsisDetails,EncounterWeight,
-reporting,IP_SepsisDetails,EpinephrineYN,
-reporting,IP_SepsisDetails,FirstPositiveScoreInED,
-reporting,IP_SepsisDetails,FirstPositiveScoreTimeInED,
-reporting,IP_SepsisDetails,HypotensionTime,
-reporting,IP_SepsisDetails,HypotensionValue,
-reporting,IP_SepsisDetails,IPSOSevereSepsisYN,
-reporting,IP_SepsisDetails,IntubationTime,
-reporting,IP_SepsisDetails,LacticAcidOrderTime,
-reporting,IP_SepsisDetails,LacticAcidResult,
-reporting,IP_SepsisDetails,MilrinoneYN,
-reporting,IP_SepsisDetails,NorepinephrineYN,
-reporting,IP_SepsisDetails,OXYN,
-reporting,IP_SepsisDetails,OrderSetID,
-reporting,IP_SepsisDetails,OrderSetTime,
-reporting,IP_SepsisDetails,PATENCENCID,
-reporting,IP_SepsisDetails,PIVPlacementTime,
-reporting,IP_SepsisDetails,PositiveODScore,
-reporting,IP_SepsisDetails,PressorYN,
-reporting,IP_SepsisDetails,ProcalcitoninOrderTime,
-reporting,IP_SepsisDetails,ProcalcitoninResult,
-reporting,IP_SepsisDetails,RefreshDate,
-reporting,IP_SepsisDetails,SepsisDate,
-reporting,IP_SepsisDetails,UniqueRow,
-reporting,IP_SepsisDetails,UnitOrder,
-reporting,IP_SepsisEncounters,ADTArrivalTime,
-reporting,IP_SepsisEncounters,ADTDepartmentID,
-reporting,IP_SepsisEncounters,ADTDepartmentName,
-reporting,IP_SepsisEncounters,AgeMonths,
-reporting,IP_SepsisEncounters,AgeYears,
-reporting,IP_SepsisEncounters,AllEncDx,
-reporting,IP_SepsisEncounters,AllEncReasons,
-reporting,IP_SepsisEncounters,BirthDate,
-reporting,IP_SepsisEncounters,Disposition,
-reporting,IP_SepsisEncounters,EDDepartureTime,
-reporting,IP_SepsisEncounters,ENCOUNTER_ID,
-reporting,IP_SepsisEncounters,EthnicGroup,
-reporting,IP_SepsisEncounters,HospAdmsnTime,
-reporting,IP_SepsisEncounters,HospDischTime,
-reporting,IP_SepsisEncounters,INPATIENT_DATA_ID,
-reporting,IP_SepsisEncounters,InDepartmentTime,
-reporting,IP_SepsisEncounters,InpAdmDate,
-reporting,IP_SepsisEncounters,InpatientDataID,
-reporting,IP_SepsisEncounters,Location,
-reporting,IP_SepsisEncounters,LosHours,
-reporting,IP_SepsisEncounters,OutDepartmentTime,
-reporting,IP_SepsisEncounters,PATENCENCID,
-reporting,IP_SepsisEncounters,PATIENTMRN,
-reporting,IP_SepsisEncounters,PatientID,
-reporting,IP_SepsisEncounters,PatientName,
-reporting,IP_SepsisEncounters,Race,
-reporting,IP_SepsisEncounters,RefreshDate,
-reporting,IP_SepsisEncounters,UniqueRow,
-reporting,IP_SepsisEncountersWLocations,ADTArrivalTime,
-reporting,IP_SepsisEncountersWLocations,ADTDepartmentID,
-reporting,IP_SepsisEncountersWLocations,ADTDepartmentName,
-reporting,IP_SepsisEncountersWLocations,ADT_ARRIVAL_TIME,
-reporting,IP_SepsisEncountersWLocations,ADT_DEPARTMENT_ID,
-reporting,IP_SepsisEncountersWLocations,ADT_DEPARTMENT_NAME,
-reporting,IP_SepsisEncountersWLocations,AGE_MONTHS,
-reporting,IP_SepsisEncountersWLocations,AGE_YEARS,
-reporting,IP_SepsisEncountersWLocations,AgeMonths,
-reporting,IP_SepsisEncountersWLocations,AgeYears,
-reporting,IP_SepsisEncountersWLocations,AllEncDx,
-reporting,IP_SepsisEncountersWLocations,AllEncReasons,
-reporting,IP_SepsisEncountersWLocations,BIRTH_DATE,
-reporting,IP_SepsisEncountersWLocations,BirthDate,
-reporting,IP_SepsisEncountersWLocations,DEPARTMENT_ROLLUP,
-reporting,IP_SepsisEncountersWLocations,DepartmentRollup,
-reporting,IP_SepsisEncountersWLocations,Disposition,
-reporting,IP_SepsisEncountersWLocations,EDDepartureTime,
-reporting,IP_SepsisEncountersWLocations,ED_DEPARTURE_TIME,
-reporting,IP_SepsisEncountersWLocations,ENCORDER,
-reporting,IP_SepsisEncountersWLocations,ENCOUNTER_ID,
-reporting,IP_SepsisEncountersWLocations,ENC_ID,
-reporting,IP_SepsisEncountersWLocations,Ethnic,
-reporting,IP_SepsisEncountersWLocations,EthnicGroup,
-reporting,IP_SepsisEncountersWLocations,HOSP_ADMSN_TIME,
-reporting,IP_SepsisEncountersWLocations,HOSP_DISCH_TIME,
-reporting,IP_SepsisEncountersWLocations,HospAdmsnTime,
-reporting,IP_SepsisEncountersWLocations,HospDischTime,
-reporting,IP_SepsisEncountersWLocations,INPATIENT_DATA_ID,
-reporting,IP_SepsisEncountersWLocations,INP_ADM_DATE,
-reporting,IP_SepsisEncountersWLocations,In,
-reporting,IP_SepsisEncountersWLocations,InDepartmentTime,
-reporting,IP_SepsisEncountersWLocations,In_DTTM,
-reporting,IP_SepsisEncountersWLocations,InpAdmDate,
-reporting,IP_SepsisEncountersWLocations,InpatientDataID,
-reporting,IP_SepsisEncountersWLocations,LOCATION_ABBR,
-reporting,IP_SepsisEncountersWLocations,LOC_ID,
-reporting,IP_SepsisEncountersWLocations,LOC_NAME,
-reporting,IP_SepsisEncountersWLocations,LOS_HRS,
-reporting,IP_SepsisEncountersWLocations,Location,
-reporting,IP_SepsisEncountersWLocations,LosHours,
-reporting,IP_SepsisEncountersWLocations,Out,
-reporting,IP_SepsisEncountersWLocations,OutDepartmentTime,
-reporting,IP_SepsisEncountersWLocations,Out_DTTM,
-reporting,IP_SepsisEncountersWLocations,PATENCENCID,
-reporting,IP_SepsisEncountersWLocations,PATIENTMRN,
-reporting,IP_SepsisEncountersWLocations,PATIENT_ID,
-reporting,IP_SepsisEncountersWLocations,PATIENT_MRN,
-reporting,IP_SepsisEncountersWLocations,PATIENT_NAME,
-reporting,IP_SepsisEncountersWLocations,POS_TYPE,
-reporting,IP_SepsisEncountersWLocations,PatientID,
-reporting,IP_SepsisEncountersWLocations,PatientName,
-reporting,IP_SepsisEncountersWLocations,Race,
-reporting,IP_SepsisEncountersWLocations,RefreshDate,
-reporting,IP_SepsisEncountersWLocations,Sepsis,
-reporting,IP_SepsisEncountersWLocations,Service,
-reporting,IP_SepsisEncountersWLocations,Shift,
-reporting,IP_SepsisEncountersWLocations,Unique,
-reporting,IP_SepsisEncountersWLocations,UniqueRow,
-reporting,IP_SepsisEncountersWLocations,Unit,
-reporting,IP_SepsisPatientDates,ADTDepartmentID,
-reporting,IP_SepsisPatientDates,ADTDepartmentName,
-reporting,IP_SepsisPatientDates,AgeOnDateMonths,
-reporting,IP_SepsisPatientDates,AgeOnDateYears,
-reporting,IP_SepsisPatientDates,DepartmentRollup,
-reporting,IP_SepsisPatientDates,ENCORDER,
-reporting,IP_SepsisPatientDates,ENCOVERALLORDER,
-reporting,IP_SepsisPatientDates,InDepartmentTime,
-reporting,IP_SepsisPatientDates,InpatientDataID,
-reporting,IP_SepsisPatientDates,OutDepartmentTime,
-reporting,IP_SepsisPatientDates,PATENCENCID,
-reporting,IP_SepsisPatientDates,PatientID,
-reporting,IP_SepsisPatientDates,RefreshDate,
-reporting,IP_SepsisPatientDates,SepsisPatientDate,
-reporting,IP_SepsisPatientDates,UniqueRow,
-reporting,IP_SepsisPatientDates,UnitOrder,
-reporting,IP_SepsisScreeningAudit,AddOrdersReceivedPlacedByMDPNP,
-reporting,IP_SepsisScreeningAudit,AlertActivatedComment,
-reporting,IP_SepsisScreeningAudit,AlertNotActivatedComment,
-reporting,IP_SepsisScreeningAudit,AlertNotActivatedReason,
-reporting,IP_SepsisScreeningAudit,BP,
-reporting,IP_SepsisScreeningAudit,BPBoysPercentile,
-reporting,IP_SepsisScreeningAudit,BPGirlsPercentile,
-reporting,IP_SepsisScreeningAudit,CapillaryRefill,
-reporting,IP_SepsisScreeningAudit,CirculatoryDysfunction,
-reporting,IP_SepsisScreeningAudit,ExternalCreatinine,
-reporting,IP_SepsisScreeningAudit,ExternalLactateResult,
-reporting,IP_SepsisScreeningAudit,ExternalPlatelets,
-reporting,IP_SepsisScreeningAudit,FifteenthOrEOM,
-reporting,IP_SepsisScreeningAudit,HematologicDysfunction,
-reporting,IP_SepsisScreeningAudit,HuddleDate,
-reporting,IP_SepsisScreeningAudit,HuddleTime,
-reporting,IP_SepsisScreeningAudit,InfectiousSymptoms,
-reporting,IP_SepsisScreeningAudit,LBrachialPulse,
-reporting,IP_SepsisScreeningAudit,LPedalPulse,
-reporting,IP_SepsisScreeningAudit,LPosteriorTibialPulse,
-reporting,IP_SepsisScreeningAudit,LRadialPulse,
-reporting,IP_SepsisScreeningAudit,NeurologicalDysfunction,
-reporting,IP_SepsisScreeningAudit,NoteAuthor,
-reporting,IP_SepsisScreeningAudit,NoteCreatedTime,
-reporting,IP_SepsisScreeningAudit,Notification,
-reporting,IP_SepsisScreeningAudit,ODScore,
-reporting,IP_SepsisScreeningAudit,ODScoreIs2,
-reporting,IP_SepsisScreeningAudit,PATENCENCID,
-reporting,IP_SepsisScreeningAudit,PatientAssessedByMDPNP,
-reporting,IP_SepsisScreeningAudit,PerfusionWDL,
-reporting,IP_SepsisScreeningAudit,PhysicianName,
-reporting,IP_SepsisScreeningAudit,PosODScore,
-reporting,IP_SepsisScreeningAudit,Predisposition,
-reporting,IP_SepsisScreeningAudit,Pulse,
-reporting,IP_SepsisScreeningAudit,RBrachialPulse,
-reporting,IP_SepsisScreeningAudit,RPedalPulse,
-reporting,IP_SepsisScreeningAudit,RPosteriorTibialPulse,
-reporting,IP_SepsisScreeningAudit,RRadialPulse,
-reporting,IP_SepsisScreeningAudit,RefreshDate,
-reporting,IP_SepsisScreeningAudit,RenalDysfunction,
-reporting,IP_SepsisScreeningAudit,Resp,
-reporting,IP_SepsisScreeningAudit,RespiratoryDysfunction,
-reporting,IP_SepsisScreeningAudit,ScoreDate,
-reporting,IP_SepsisScreeningAudit,ScoreTime,
-reporting,IP_SepsisScreeningAudit,SepsisPatientHuddleorAlertWithMDPNP,
-reporting,IP_SepsisScreeningAudit,ShiftColorDisplay,
-reporting,IP_SepsisScreeningAudit,SkinColor,
-reporting,IP_SepsisScreeningAudit,SkinConditionTemp,
-reporting,IP_SepsisScreeningAudit,UniqueRow,
-reporting,IP_SepsisShiftCompliance,AMDenom,
-reporting,IP_SepsisShiftCompliance,AlertActivatedComment,
-reporting,IP_SepsisShiftCompliance,AlertNotActivatedComment,
-reporting,IP_SepsisShiftCompliance,AlertNotActivatedReason,
-reporting,IP_SepsisShiftCompliance,Denominator,
-reporting,IP_SepsisShiftCompliance,ENCORDER,
-reporting,IP_SepsisShiftCompliance,ENCOVERALLORDER,
-reporting,IP_SepsisShiftCompliance,FY,
-reporting,IP_SepsisShiftCompliance,FYDate,
-reporting,IP_SepsisShiftCompliance,FYMonthName,
-reporting,IP_SepsisShiftCompliance,FYMonthNumber,
-reporting,IP_SepsisShiftCompliance,FYMonthShortName,
-reporting,IP_SepsisShiftCompliance,FYYear,
-reporting,IP_SepsisShiftCompliance,FifteenthOrEOM,
-reporting,IP_SepsisShiftCompliance,NoteAuthor,
-reporting,IP_SepsisShiftCompliance,NoteCreatedTime,
-reporting,IP_SepsisShiftCompliance,ODScore,
-reporting,IP_SepsisShiftCompliance,PATENCENCID,
-reporting,IP_SepsisShiftCompliance,PMDenom,
-reporting,IP_SepsisShiftCompliance,PositiveODScore,
-reporting,IP_SepsisShiftCompliance,RefreshDate,
-reporting,IP_SepsisShiftCompliance,ScoreTime,
-reporting,IP_SepsisShiftCompliance,Shift1Color,
-reporting,IP_SepsisShiftCompliance,Shift1Compliance,
-reporting,IP_SepsisShiftCompliance,Shift1ComplianceYN,
-reporting,IP_SepsisShiftCompliance,Shift1NonCompliance,
-reporting,IP_SepsisShiftCompliance,Shift2Color,
-reporting,IP_SepsisShiftCompliance,Shift2Compliance,
-reporting,IP_SepsisShiftCompliance,Shift2ComplianceYN,
-reporting,IP_SepsisShiftCompliance,Shift2NonCompliance,
-reporting,IP_SepsisShiftCompliance,ShiftAMPM,
-reporting,IP_SepsisShiftCompliance,ShiftCNs,
-reporting,IP_SepsisShiftCompliance,ShiftColor,
-reporting,IP_SepsisShiftCompliance,ShiftColorDisplay,
-reporting,IP_SepsisShiftCompliance,ShiftCompliance,
-reporting,IP_SepsisShiftCompliance,ShiftComplianceFlag,
-reporting,IP_SepsisShiftCompliance,ShiftDate,
-reporting,IP_SepsisShiftCompliance,ShiftEnd,
-reporting,IP_SepsisShiftCompliance,ShiftNonCompliance,
-reporting,IP_SepsisShiftCompliance,ShiftRNs,
-reporting,IP_SepsisShiftCompliance,ShiftStart,
-reporting,IP_SepsisShiftCompliance,UniqueRow,
-reporting,IP_SepsisShiftCompliance,UnitOrder,
+reporting,IP_SepsisDetails,ABXName,The a b x name recorded for sepsis cases.
+reporting,IP_SepsisDetails,ABXTime,The a b x time recorded for sepsis cases.
+reporting,IP_SepsisDetails,ABXVolume,The a b x volume recorded for sepsis cases.
+reporting,IP_SepsisDetails,BPPercentile,The b p percentile recorded for sepsis cases.
+reporting,IP_SepsisDetails,BloodCultureOrderTime,The blood culture order time recorded for sepsis cases.
+reporting,IP_SepsisDetails,BloodCultureProcedureOrdered,The blood culture procedure ordered recorded for sepsis cases.
+reporting,IP_SepsisDetails,BloodCultureResult,The blood culture result recorded for sepsis cases.
+reporting,IP_SepsisDetails,Bolus,The bolus recorded for sepsis cases.
+reporting,IP_SepsisDetails,BolusTime,The bolus time recorded for sepsis cases.
+reporting,IP_SepsisDetails,BolusVolume,The bolus volume recorded for sepsis cases.
+reporting,IP_SepsisDetails,CALENDAR_DT,The date presented in standard date format.
+reporting,IP_SepsisDetails,CSFOrderTime,The c s f order time recorded for sepsis cases.
+reporting,IP_SepsisDetails,CSFOrdered,The c s f ordered recorded for sepsis cases.
+reporting,IP_SepsisDetails,CSFValue,The c s f value recorded for sepsis cases.
+reporting,IP_SepsisDetails,CVVHYN,The c v v h y n recorded for sepsis cases.
+reporting,IP_SepsisDetails,DobutamineYN,The dobutamine y n recorded for sepsis cases.
+reporting,IP_SepsisDetails,DopamineYN,The dopamine y n recorded for sepsis cases.
+reporting,IP_SepsisDetails,ECMOYN,The e c m o y n recorded for sepsis cases.
+reporting,IP_SepsisDetails,EDLosHours,The e d los hours recorded for sepsis cases.
+reporting,IP_SepsisDetails,ENCORDER,The e n c o r d e r recorded for sepsis cases.
+reporting,IP_SepsisDetails,ENCOVERALLORDER,The e n c o v e r a l l o r d e r recorded for sepsis cases.
+reporting,IP_SepsisDetails,EncounterWeight,The encounter weight recorded for sepsis cases.
+reporting,IP_SepsisDetails,EpinephrineYN,The epinephrine y n recorded for sepsis cases.
+reporting,IP_SepsisDetails,FirstPositiveScoreInED,The first positive score in e d recorded for sepsis cases.
+reporting,IP_SepsisDetails,FirstPositiveScoreTimeInED,The first positive score time in e d recorded for sepsis cases.
+reporting,IP_SepsisDetails,HypotensionTime,The hypotension time recorded for sepsis cases.
+reporting,IP_SepsisDetails,HypotensionValue,The hypotension value recorded for sepsis cases.
+reporting,IP_SepsisDetails,IPSOSevereSepsisYN,The i p s o severe sepsis y n recorded for sepsis cases.
+reporting,IP_SepsisDetails,IntubationTime,The intubation time recorded for sepsis cases.
+reporting,IP_SepsisDetails,LacticAcidOrderTime,The lactic acid order time recorded for sepsis cases.
+reporting,IP_SepsisDetails,LacticAcidResult,The lactic acid result recorded for sepsis cases.
+reporting,IP_SepsisDetails,MilrinoneYN,The milrinone y n recorded for sepsis cases.
+reporting,IP_SepsisDetails,NorepinephrineYN,The norepinephrine y n recorded for sepsis cases.
+reporting,IP_SepsisDetails,OXYN,The o x y n recorded for sepsis cases.
+reporting,IP_SepsisDetails,OrderSetID,The order set i d recorded for sepsis cases.
+reporting,IP_SepsisDetails,OrderSetTime,The order set time recorded for sepsis cases.
+reporting,IP_SepsisDetails,PATENCENCID,The p a t e n c e n c i d recorded for sepsis cases.
+reporting,IP_SepsisDetails,PIVPlacementTime,The p i v placement time recorded for sepsis cases.
+reporting,IP_SepsisDetails,PositiveODScore,The positive o d score recorded for sepsis cases.
+reporting,IP_SepsisDetails,PressorYN,The pressor y n recorded for sepsis cases.
+reporting,IP_SepsisDetails,ProcalcitoninOrderTime,The procalcitonin order time recorded for sepsis cases.
+reporting,IP_SepsisDetails,ProcalcitoninResult,The procalcitonin result recorded for sepsis cases.
+reporting,IP_SepsisDetails,RefreshDate,The refresh date recorded for sepsis cases.
+reporting,IP_SepsisDetails,SepsisDate,Date when the patient fulfilled the criteria for non-severe sepsis.
+reporting,IP_SepsisDetails,UniqueRow,The unique row recorded for sepsis cases.
+reporting,IP_SepsisDetails,UnitOrder,The unit order recorded for sepsis cases.
+reporting,IP_SepsisEncounters,ADTArrivalTime,The date and time when this patient contact occurred.
+reporting,IP_SepsisEncounters,ADTDepartmentID,The ID number representing the department associated with the event record at the time it is effective.
+reporting,IP_SepsisEncounters,ADTDepartmentName,The name associated with the department.
+reporting,IP_SepsisEncounters,AgeMonths,The age months recorded for inpatient sepsis encounters that include demographic information.
+reporting,IP_SepsisEncounters,AgeYears,The age years recorded for inpatient sepsis encounters that include demographic information.
+reporting,IP_SepsisEncounters,AllEncDx,The all enc dx recorded for inpatient sepsis encounters that include demographic information.
+reporting,IP_SepsisEncounters,AllEncReasons,The all enc reasons recorded for inpatient sepsis encounters that include demographic information.
+reporting,IP_SepsisEncounters,BirthDate,The date of the patient's birth.
+reporting,IP_SepsisEncounters,Disposition,The disposition recorded for inpatient sepsis encounters that include demographic information.
+reporting,IP_SepsisEncounters,EDDepartureTime,The timestamp indicating when the patient exited the ED.
+reporting,IP_SepsisEncounters,ENCOUNTER_ID,"The unique identifier for this contact's encounter. This number is distinct for all patient encounters within the system. If IntraConnect is utilized, this corresponds to the Unique Contact Identifier."
+reporting,IP_SepsisEncounters,EthnicGroup,The ethnic group recorded for inpatient sepsis encounters that include demographic information.
+reporting,IP_SepsisEncounters,HospAdmsnTime,"The date and time when the patient was initially admitted to the facility, placed in a bed in the ED, or confirmed for an HOV during this contact, irrespective of the patient's base patient class."
+reporting,IP_SepsisEncounters,HospDischTime,The date and time of discharge from the hospital for this patient contact.
+reporting,IP_SepsisEncounters,INPATIENT_DATA_ID,"The column INPATIENT_DATA_ID in table CLINICAL_NOTES is deprecated and has been replaced by the column INPATIENT_DATA_ID in table PATIENT_ENCOUNTERS. To retrieve the value of the deprecated column after the EMR system upgrade, join CLINICAL_NOTES.ENCOUNTER_ID with PATIENT_ENCOUNTERS.ENCOUNTER_ID to obtain the INPATIENT_DATA_ID value."
+reporting,IP_SepsisEncounters,InDepartmentTime,The in department time recorded for inpatient sepsis encounters that include demographic information.
+reporting,IP_SepsisEncounters,InpAdmDate,The date-time of the inpatient admission indicates when the patient first received a base patient class of inpatient during their hospital stay. This may differ from the admission date if the patient was initially assigned an emergency or outpatient base patient class.
+reporting,IP_SepsisEncounters,InpatientDataID,"The column INPATIENT_DATA_ID in table CLINICAL_NOTES is deprecated and has been replaced by the column INPATIENT_DATA_ID in table PATIENT_ENCOUNTERS. To retrieve the value of the deprecated column after the EMR system upgrade, join CLINICAL_NOTES.ENCOUNTER_ID with PATIENT_ENCOUNTERS.ENCOUNTER_ID to obtain the INPATIENT_DATA_ID value."
+reporting,IP_SepsisEncounters,Location,The location recorded for inpatient sepsis encounters that include demographic information.
+reporting,IP_SepsisEncounters,LosHours,The los hours recorded for inpatient sepsis encounters that include demographic information.
+reporting,IP_SepsisEncounters,OutDepartmentTime,The out department time recorded for inpatient sepsis encounters that include demographic information.
+reporting,IP_SepsisEncounters,PATENCENCID,The p a t e n c e n c i d recorded for inpatient sepsis encounters that include demographic information.
+reporting,IP_SepsisEncounters,PATIENTMRN,"*** Deprecated *** This column is no longer in use because high patient volumes may lead to EMR database timeouts. Use HOSPITAL_ACCT_PATIENT_MRN.PATIENT_MRN instead. It represents the patient's medical record number for the location linked to this hospital account. If the account's location is undefined or lacks an ID type, the system will search up the facility structure to locate the most relevant MRN."
+reporting,IP_SepsisEncounters,PatientID,The ID of the patient associated with the event record at the specified effective time.
+reporting,IP_SepsisEncounters,PatientName,The name of the patient associated with the hospital account at the time of discharge.
+reporting,IP_SepsisEncounters,Race,The race recorded for inpatient sepsis encounters that include demographic information.
+reporting,IP_SepsisEncounters,RefreshDate,The refresh date recorded for inpatient sepsis encounters that include demographic information.
+reporting,IP_SepsisEncounters,UniqueRow,The unique row recorded for inpatient sepsis encounters that include demographic information.
+reporting,IP_SepsisEncountersWLocations,ADTArrivalTime,The date and time when this patient contact occurred.
+reporting,IP_SepsisEncountersWLocations,ADTDepartmentID,The ID number representing the department associated with the event record at the time it is effective.
+reporting,IP_SepsisEncountersWLocations,ADTDepartmentName,The name associated with the department.
+reporting,IP_SepsisEncountersWLocations,ADT_ARRIVAL_TIME,The date and time when this patient contact occurred.
+reporting,IP_SepsisEncountersWLocations,ADT_DEPARTMENT_ID,The ID number representing the department associated with the event record at the time it is effective.
+reporting,IP_SepsisEncountersWLocations,ADT_DEPARTMENT_NAME,The name associated with the department.
+reporting,IP_SepsisEncountersWLocations,AGE_MONTHS,The a g e m o n t h s recorded for sepsis encounters that include ADT location history.
+reporting,IP_SepsisEncountersWLocations,AGE_YEARS,The a g e y e a r s recorded for sepsis encounters that include ADT location history.
+reporting,IP_SepsisEncountersWLocations,AgeMonths,The age months recorded for sepsis encounters that include ADT location history.
+reporting,IP_SepsisEncountersWLocations,AgeYears,The age years recorded for sepsis encounters that include ADT location history.
+reporting,IP_SepsisEncountersWLocations,AllEncDx,The all enc dx recorded for sepsis encounters that include ADT location history.
+reporting,IP_SepsisEncountersWLocations,AllEncReasons,The all enc reasons recorded for sepsis encounters that include ADT location history.
+reporting,IP_SepsisEncountersWLocations,BIRTH_DATE,The date of the patient's birth.
+reporting,IP_SepsisEncountersWLocations,BirthDate,The date of the patient's birth.
+reporting,IP_SepsisEncountersWLocations,DEPARTMENT_ROLLUP,The d e p a r t m e n t r o l l u p recorded for sepsis encounters that include ADT location history.
+reporting,IP_SepsisEncountersWLocations,DepartmentRollup,The department rollup recorded for sepsis encounters that include ADT location history.
+reporting,IP_SepsisEncountersWLocations,Disposition,The disposition recorded for sepsis encounters that include ADT location history.
+reporting,IP_SepsisEncountersWLocations,EDDepartureTime,The timestamp indicating when the patient exited the ED.
+reporting,IP_SepsisEncountersWLocations,ED_DEPARTURE_TIME,The timestamp indicating when the patient exited the ED.
+reporting,IP_SepsisEncountersWLocations,ENCORDER,The e n c o r d e r recorded for sepsis encounters that include ADT location history.
+reporting,IP_SepsisEncountersWLocations,ENCOUNTER_ID,"The unique identifier for this contact's encounter. This number is distinct for all patient encounters within the system. If IntraConnect is utilized, this corresponds to the Unique Contact Identifier."
+reporting,IP_SepsisEncountersWLocations,ENC_ID,The e n c i d recorded for sepsis encounters that include ADT location history.
+reporting,IP_SepsisEncountersWLocations,Ethnic,The ethnic recorded for sepsis encounters that include ADT location history.
+reporting,IP_SepsisEncountersWLocations,EthnicGroup,The ethnic group recorded for sepsis encounters that include ADT location history.
+reporting,IP_SepsisEncountersWLocations,HOSP_ADMSN_TIME,"The date and time when the patient was initially admitted to the facility, placed in a bed in the ED, or confirmed for an HOV during this contact, irrespective of the patient's base patient class."
+reporting,IP_SepsisEncountersWLocations,HOSP_DISCH_TIME,The date and time of discharge from the hospital for this patient contact.
+reporting,IP_SepsisEncountersWLocations,HospAdmsnTime,"The date and time when the patient was initially admitted to the facility, placed in a bed in the ED, or confirmed for an HOV during this contact, irrespective of the patient's base patient class."
+reporting,IP_SepsisEncountersWLocations,HospDischTime,The date and time of discharge from the hospital for this patient contact.
+reporting,IP_SepsisEncountersWLocations,INPATIENT_DATA_ID,"The column INPATIENT_DATA_ID in table CLINICAL_NOTES is deprecated and has been replaced by the column INPATIENT_DATA_ID in table PATIENT_ENCOUNTERS. To retrieve the value of the deprecated column after the EMR system upgrade, join CLINICAL_NOTES.ENCOUNTER_ID with PATIENT_ENCOUNTERS.ENCOUNTER_ID to obtain the INPATIENT_DATA_ID value."
+reporting,IP_SepsisEncountersWLocations,INP_ADM_DATE,The date-time of the inpatient admission indicates when the patient first received a base patient class of inpatient during their hospital stay. This may differ from the admission date if the patient was initially assigned an emergency or outpatient base patient class.
+reporting,IP_SepsisEncountersWLocations,In,The in recorded for sepsis encounters that include ADT location history.
+reporting,IP_SepsisEncountersWLocations,InDepartmentTime,The in department time recorded for sepsis encounters that include ADT location history.
+reporting,IP_SepsisEncountersWLocations,In_DTTM,The moment the patient was transferred to the department/room/bed.
+reporting,IP_SepsisEncountersWLocations,InpAdmDate,The date-time of the inpatient admission indicates when the patient first received a base patient class of inpatient during their hospital stay. This may differ from the admission date if the patient was initially assigned an emergency or outpatient base patient class.
+reporting,IP_SepsisEncountersWLocations,InpatientDataID,"The column INPATIENT_DATA_ID in table CLINICAL_NOTES is deprecated and has been replaced by the column INPATIENT_DATA_ID in table PATIENT_ENCOUNTERS. To retrieve the value of the deprecated column after the EMR system upgrade, join CLINICAL_NOTES.ENCOUNTER_ID with PATIENT_ENCOUNTERS.ENCOUNTER_ID to obtain the INPATIENT_DATA_ID value."
+reporting,IP_SepsisEncountersWLocations,LOCATION_ABBR,The short name of the location.
+reporting,IP_SepsisEncountersWLocations,LOC_ID,The LOCATION stored in the HOSPITAL_ACCOUNT is recorded only when HOSPITAL_ACCOUNT_IDs are assigned based on location rather than service area.
+reporting,IP_SepsisEncountersWLocations,LOC_NAME,The designation of the revenue location.
+reporting,IP_SepsisEncountersWLocations,LOS_HRS,The l o s h r s recorded for sepsis encounters that include ADT location history.
+reporting,IP_SepsisEncountersWLocations,Location,The location recorded for sepsis encounters that include ADT location history.
+reporting,IP_SepsisEncountersWLocations,LosHours,The los hours recorded for sepsis encounters that include ADT location history.
+reporting,IP_SepsisEncountersWLocations,Out,The out recorded for sepsis encounters that include ADT location history.
+reporting,IP_SepsisEncountersWLocations,OutDepartmentTime,The out department time recorded for sepsis encounters that include ADT location history.
+reporting,IP_SepsisEncountersWLocations,Out_DTTM,"The column PATIENT_OUT_DTTM indicates the moment the patient was transferred out of the department/room/bed. If the patient remains in the department/room/bed, this column will not provide a value."
+reporting,IP_SepsisEncountersWLocations,PATENCENCID,The p a t e n c e n c i d recorded for sepsis encounters that include ADT location history.
+reporting,IP_SepsisEncountersWLocations,PATIENTMRN,"*** Deprecated *** This column is no longer in use because high patient volumes may lead to EMR database timeouts. Use HOSPITAL_ACCT_PATIENT_MRN.PATIENT_MRN instead. It represents the patient's medical record number for the location linked to this hospital account. If the account's location is undefined or lacks an ID type, the system will search up the facility structure to locate the most relevant MRN."
+reporting,IP_SepsisEncountersWLocations,PATIENT_ID,The ID of the patient associated with the event record at the specified effective time.
+reporting,IP_SepsisEncountersWLocations,PATIENT_MRN,"*** Deprecated *** This column is no longer in use because high patient volumes may lead to EMR database timeouts. Use HOSPITAL_ACCT_PATIENT_MRN.PATIENT_MRN instead. It represents the patient's medical record number for the location linked to this hospital account. If the account's location is undefined or lacks an ID type, the system will search up the facility structure to locate the most relevant MRN."
+reporting,IP_SepsisEncountersWLocations,PATIENT_NAME,The name of the patient associated with the hospital account at the time of discharge.
+reporting,IP_SepsisEncountersWLocations,POS_TYPE,"The category title for the type of service location, such as Office, Inpatient Hospital, or Emergency Room. This column will be removed in a future release and replaced by the column POS_TYPE_CODE in LOCATIONS."
+reporting,IP_SepsisEncountersWLocations,PatientID,The ID of the patient associated with the event record at the specified effective time.
+reporting,IP_SepsisEncountersWLocations,PatientName,The name of the patient associated with the hospital account at the time of discharge.
+reporting,IP_SepsisEncountersWLocations,Race,The race recorded for sepsis encounters that include ADT location history.
+reporting,IP_SepsisEncountersWLocations,RefreshDate,The refresh date recorded for sepsis encounters that include ADT location history.
+reporting,IP_SepsisEncountersWLocations,Sepsis,The sepsis recorded for sepsis encounters that include ADT location history.
+reporting,IP_SepsisEncountersWLocations,Service,The service recorded for sepsis encounters that include ADT location history.
+reporting,IP_SepsisEncountersWLocations,Shift,The shift recorded for sepsis encounters that include ADT location history.
+reporting,IP_SepsisEncountersWLocations,Unique,The unique recorded for sepsis encounters that include ADT location history.
+reporting,IP_SepsisEncountersWLocations,UniqueRow,The unique row recorded for sepsis encounters that include ADT location history.
+reporting,IP_SepsisEncountersWLocations,Unit,The unit recorded for sepsis encounters that include ADT location history.
+reporting,IP_SepsisPatientDates,ADTDepartmentID,The ID number representing the department associated with the event record at the time it is effective.
+reporting,IP_SepsisPatientDates,ADTDepartmentName,The name associated with the department.
+reporting,IP_SepsisPatientDates,AgeOnDateMonths,The age on date months recorded for sepsis patient encounters that includes aggregated department information for the purposes of trend analysis and compliance reporting.
+reporting,IP_SepsisPatientDates,AgeOnDateYears,The age on date years recorded for sepsis patient encounters that includes aggregated department information for the purposes of trend analysis and compliance reporting.
+reporting,IP_SepsisPatientDates,DepartmentRollup,The department rollup recorded for sepsis patient encounters that includes aggregated department information for the purposes of trend analysis and compliance reporting.
+reporting,IP_SepsisPatientDates,ENCORDER,The e n c o r d e r recorded for sepsis patient encounters that includes aggregated department information for the purposes of trend analysis and compliance reporting.
+reporting,IP_SepsisPatientDates,ENCOVERALLORDER,The e n c o v e r a l l o r d e r recorded for sepsis patient encounters that includes aggregated department information for the purposes of trend analysis and compliance reporting.
+reporting,IP_SepsisPatientDates,InDepartmentTime,The in department time recorded for sepsis patient encounters that includes aggregated department information for the purposes of trend analysis and compliance reporting.
+reporting,IP_SepsisPatientDates,InpatientDataID,"The column INPATIENT_DATA_ID in table CLINICAL_NOTES is deprecated and has been replaced by the column INPATIENT_DATA_ID in table PATIENT_ENCOUNTERS. To retrieve the value of the deprecated column after the EMR system upgrade, join CLINICAL_NOTES.ENCOUNTER_ID with PATIENT_ENCOUNTERS.ENCOUNTER_ID to obtain the INPATIENT_DATA_ID value."
+reporting,IP_SepsisPatientDates,OutDepartmentTime,The out department time recorded for sepsis patient encounters that includes aggregated department information for the purposes of trend analysis and compliance reporting.
+reporting,IP_SepsisPatientDates,PATENCENCID,The p a t e n c e n c i d recorded for sepsis patient encounters that includes aggregated department information for the purposes of trend analysis and compliance reporting.
+reporting,IP_SepsisPatientDates,PatientID,The ID of the patient associated with the event record at the specified effective time.
+reporting,IP_SepsisPatientDates,RefreshDate,The refresh date recorded for sepsis patient encounters that includes aggregated department information for the purposes of trend analysis and compliance reporting.
+reporting,IP_SepsisPatientDates,SepsisPatientDate,The sepsis patient date recorded for sepsis patient encounters that includes aggregated department information for the purposes of trend analysis and compliance reporting.
+reporting,IP_SepsisPatientDates,UniqueRow,The unique row recorded for sepsis patient encounters that includes aggregated department information for the purposes of trend analysis and compliance reporting.
+reporting,IP_SepsisPatientDates,UnitOrder,The unit order recorded for sepsis patient encounters that includes aggregated department information for the purposes of trend analysis and compliance reporting.
+reporting,IP_SepsisScreeningAudit,AddOrdersReceivedPlacedByMDPNP,The add orders received placed by m d p n p recorded for sepsis screening activities.
+reporting,IP_SepsisScreeningAudit,AlertActivatedComment,The alert activated comment recorded for sepsis screening activities.
+reporting,IP_SepsisScreeningAudit,AlertNotActivatedComment,The alert not activated comment recorded for sepsis screening activities.
+reporting,IP_SepsisScreeningAudit,AlertNotActivatedReason,The alert not activated reason recorded for sepsis screening activities.
+reporting,IP_SepsisScreeningAudit,BP,The b p recorded for sepsis screening activities.
+reporting,IP_SepsisScreeningAudit,BPBoysPercentile,The b p boys percentile recorded for sepsis screening activities.
+reporting,IP_SepsisScreeningAudit,BPGirlsPercentile,The b p girls percentile recorded for sepsis screening activities.
+reporting,IP_SepsisScreeningAudit,CapillaryRefill,The capillary refill recorded for sepsis screening activities.
+reporting,IP_SepsisScreeningAudit,CirculatoryDysfunction,The circulatory dysfunction recorded for sepsis screening activities.
+reporting,IP_SepsisScreeningAudit,ExternalCreatinine,The external creatinine recorded for sepsis screening activities.
+reporting,IP_SepsisScreeningAudit,ExternalLactateResult,The external lactate result recorded for sepsis screening activities.
+reporting,IP_SepsisScreeningAudit,ExternalPlatelets,The external platelets recorded for sepsis screening activities.
+reporting,IP_SepsisScreeningAudit,FifteenthOrEOM,The fifteenth or e o m recorded for sepsis screening activities.
+reporting,IP_SepsisScreeningAudit,HematologicDysfunction,The hematologic dysfunction recorded for sepsis screening activities.
+reporting,IP_SepsisScreeningAudit,HuddleDate,The huddle date recorded for sepsis screening activities.
+reporting,IP_SepsisScreeningAudit,HuddleTime,The huddle time recorded for sepsis screening activities.
+reporting,IP_SepsisScreeningAudit,InfectiousSymptoms,The infectious symptoms recorded for sepsis screening activities.
+reporting,IP_SepsisScreeningAudit,LBrachialPulse,The l brachial pulse recorded for sepsis screening activities.
+reporting,IP_SepsisScreeningAudit,LPedalPulse,The l pedal pulse recorded for sepsis screening activities.
+reporting,IP_SepsisScreeningAudit,LPosteriorTibialPulse,The l posterior tibial pulse recorded for sepsis screening activities.
+reporting,IP_SepsisScreeningAudit,LRadialPulse,The l radial pulse recorded for sepsis screening activities.
+reporting,IP_SepsisScreeningAudit,NeurologicalDysfunction,The neurological dysfunction recorded for sepsis screening activities.
+reporting,IP_SepsisScreeningAudit,NoteAuthor,The note author recorded for sepsis screening activities.
+reporting,IP_SepsisScreeningAudit,NoteCreatedTime,The note created time recorded for sepsis screening activities.
+reporting,IP_SepsisScreeningAudit,Notification,The notification recorded for sepsis screening activities.
+reporting,IP_SepsisScreeningAudit,ODScore,The o d score recorded for sepsis screening activities.
+reporting,IP_SepsisScreeningAudit,ODScoreIs2,The o d score is2 recorded for sepsis screening activities.
+reporting,IP_SepsisScreeningAudit,PATENCENCID,The p a t e n c e n c i d recorded for sepsis screening activities.
+reporting,IP_SepsisScreeningAudit,PatientAssessedByMDPNP,The patient assessed by m d p n p recorded for sepsis screening activities.
+reporting,IP_SepsisScreeningAudit,PerfusionWDL,The perfusion w d l recorded for sepsis screening activities.
+reporting,IP_SepsisScreeningAudit,PhysicianName,The physician name recorded for sepsis screening activities.
+reporting,IP_SepsisScreeningAudit,PosODScore,The pos o d score recorded for sepsis screening activities.
+reporting,IP_SepsisScreeningAudit,Predisposition,The predisposition recorded for sepsis screening activities.
+reporting,IP_SepsisScreeningAudit,Pulse,The PULSE measurement of the patient recorded during this encounter.
+reporting,IP_SepsisScreeningAudit,RBrachialPulse,The r brachial pulse recorded for sepsis screening activities.
+reporting,IP_SepsisScreeningAudit,RPedalPulse,The r pedal pulse recorded for sepsis screening activities.
+reporting,IP_SepsisScreeningAudit,RPosteriorTibialPulse,The r posterior tibial pulse recorded for sepsis screening activities.
+reporting,IP_SepsisScreeningAudit,RRadialPulse,The r radial pulse recorded for sepsis screening activities.
+reporting,IP_SepsisScreeningAudit,RefreshDate,The refresh date recorded for sepsis screening activities.
+reporting,IP_SepsisScreeningAudit,RenalDysfunction,The renal dysfunction recorded for sepsis screening activities.
+reporting,IP_SepsisScreeningAudit,Resp,The resp recorded for sepsis screening activities.
+reporting,IP_SepsisScreeningAudit,RespiratoryDysfunction,The respiratory dysfunction recorded for sepsis screening activities.
+reporting,IP_SepsisScreeningAudit,ScoreDate,The score date recorded for sepsis screening activities.
+reporting,IP_SepsisScreeningAudit,ScoreTime,The score time recorded for sepsis screening activities.
+reporting,IP_SepsisScreeningAudit,SepsisPatientHuddleorAlertWithMDPNP,The sepsis patient huddleor alert with m d p n p recorded for sepsis screening activities.
+reporting,IP_SepsisScreeningAudit,ShiftColorDisplay,The shift color display recorded for sepsis screening activities.
+reporting,IP_SepsisScreeningAudit,SkinColor,The skin color recorded for sepsis screening activities.
+reporting,IP_SepsisScreeningAudit,SkinConditionTemp,The skin condition temp recorded for sepsis screening activities.
+reporting,IP_SepsisScreeningAudit,UniqueRow,The unique row recorded for sepsis screening activities.
+reporting,IP_SepsisShiftCompliance,AMDenom,The a m denom recorded for sepsis screening compliance at the shift level.
+reporting,IP_SepsisShiftCompliance,AlertActivatedComment,The alert activated comment recorded for sepsis screening compliance at the shift level.
+reporting,IP_SepsisShiftCompliance,AlertNotActivatedComment,The alert not activated comment recorded for sepsis screening compliance at the shift level.
+reporting,IP_SepsisShiftCompliance,AlertNotActivatedReason,The alert not activated reason recorded for sepsis screening compliance at the shift level.
+reporting,IP_SepsisShiftCompliance,Denominator,The denominator recorded for sepsis screening compliance at the shift level.
+reporting,IP_SepsisShiftCompliance,ENCORDER,The e n c o r d e r recorded for sepsis screening compliance at the shift level.
+reporting,IP_SepsisShiftCompliance,ENCOVERALLORDER,The e n c o v e r a l l o r d e r recorded for sepsis screening compliance at the shift level.
+reporting,IP_SepsisShiftCompliance,FY,The f y recorded for sepsis screening compliance at the shift level.
+reporting,IP_SepsisShiftCompliance,FYDate,The f y date recorded for sepsis screening compliance at the shift level.
+reporting,IP_SepsisShiftCompliance,FYMonthName,The f y month name recorded for sepsis screening compliance at the shift level.
+reporting,IP_SepsisShiftCompliance,FYMonthNumber,The numerical representation of the month within the fiscal year.
+reporting,IP_SepsisShiftCompliance,FYMonthShortName,The f y month short name recorded for sepsis screening compliance at the shift level.
+reporting,IP_SepsisShiftCompliance,FYYear,The f y year recorded for sepsis screening compliance at the shift level.
+reporting,IP_SepsisShiftCompliance,FifteenthOrEOM,The fifteenth or e o m recorded for sepsis screening compliance at the shift level.
+reporting,IP_SepsisShiftCompliance,NoteAuthor,The note author recorded for sepsis screening compliance at the shift level.
+reporting,IP_SepsisShiftCompliance,NoteCreatedTime,The note created time recorded for sepsis screening compliance at the shift level.
+reporting,IP_SepsisShiftCompliance,ODScore,The o d score recorded for sepsis screening compliance at the shift level.
+reporting,IP_SepsisShiftCompliance,PATENCENCID,The p a t e n c e n c i d recorded for sepsis screening compliance at the shift level.
+reporting,IP_SepsisShiftCompliance,PMDenom,The p m denom recorded for sepsis screening compliance at the shift level.
+reporting,IP_SepsisShiftCompliance,PositiveODScore,The positive o d score recorded for sepsis screening compliance at the shift level.
+reporting,IP_SepsisShiftCompliance,RefreshDate,The refresh date recorded for sepsis screening compliance at the shift level.
+reporting,IP_SepsisShiftCompliance,ScoreTime,The score time recorded for sepsis screening compliance at the shift level.
+reporting,IP_SepsisShiftCompliance,Shift1Color,The shift1 color recorded for sepsis screening compliance at the shift level.
+reporting,IP_SepsisShiftCompliance,Shift1Compliance,The shift1 compliance recorded for sepsis screening compliance at the shift level.
+reporting,IP_SepsisShiftCompliance,Shift1ComplianceYN,The shift1 compliance y n recorded for sepsis screening compliance at the shift level.
+reporting,IP_SepsisShiftCompliance,Shift1NonCompliance,The shift1 non compliance recorded for sepsis screening compliance at the shift level.
+reporting,IP_SepsisShiftCompliance,Shift2Color,The shift2 color recorded for sepsis screening compliance at the shift level.
+reporting,IP_SepsisShiftCompliance,Shift2Compliance,The shift2 compliance recorded for sepsis screening compliance at the shift level.
+reporting,IP_SepsisShiftCompliance,Shift2ComplianceYN,The shift2 compliance y n recorded for sepsis screening compliance at the shift level.
+reporting,IP_SepsisShiftCompliance,Shift2NonCompliance,The shift2 non compliance recorded for sepsis screening compliance at the shift level.
+reporting,IP_SepsisShiftCompliance,ShiftAMPM,The shift a m p m recorded for sepsis screening compliance at the shift level.
+reporting,IP_SepsisShiftCompliance,ShiftCNs,The shift c ns recorded for sepsis screening compliance at the shift level.
+reporting,IP_SepsisShiftCompliance,ShiftColor,The shift color recorded for sepsis screening compliance at the shift level.
+reporting,IP_SepsisShiftCompliance,ShiftColorDisplay,The shift color display recorded for sepsis screening compliance at the shift level.
+reporting,IP_SepsisShiftCompliance,ShiftCompliance,The shift compliance recorded for sepsis screening compliance at the shift level.
+reporting,IP_SepsisShiftCompliance,ShiftComplianceFlag,The shift compliance flag recorded for sepsis screening compliance at the shift level.
+reporting,IP_SepsisShiftCompliance,ShiftDate,The shift date recorded for sepsis screening compliance at the shift level.
+reporting,IP_SepsisShiftCompliance,ShiftEnd,The shift end recorded for sepsis screening compliance at the shift level.
+reporting,IP_SepsisShiftCompliance,ShiftNonCompliance,The shift non compliance recorded for sepsis screening compliance at the shift level.
+reporting,IP_SepsisShiftCompliance,ShiftRNs,The shift r ns recorded for sepsis screening compliance at the shift level.
+reporting,IP_SepsisShiftCompliance,ShiftStart,The shift start recorded for sepsis screening compliance at the shift level.
+reporting,IP_SepsisShiftCompliance,UniqueRow,The unique row recorded for sepsis screening compliance at the shift level.
+reporting,IP_SepsisShiftCompliance,UnitOrder,The unit order recorded for sepsis screening compliance at the shift level.
+reporting,IP_SEPSIS,ABXYN,The a b x y n recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,AMDenom,The a m denom recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,AddOrdersReceivedPlacedByMDPNP,The add orders received placed by m d p n p recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,AgeMonths,The age months recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,AgeYears,The age years recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,AlertActivatedComment,The alert activated comment recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,AlertNotActivatedComment,The alert not activated comment recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,AlertNotActivatedReason,The alert not activated reason recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,BP,The b p recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,BloodCultureYN,The blood culture y n recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,BolusYN,The bolus y n recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,CSFYN,The c s f y n recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,CVLYN,The c v l y n recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,CVVHYN,The c v v h y n recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,CapillaryRefill,The capillary refill recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,Denominator,The denominator recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,Disposition,The disposition recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,DobutamineYN,The dobutamine y n recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,DopamineYN,The dopamine y n recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,DvtprophylaxisYN,The dvtprophylaxis y n recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,ECMOYN,The e c m o y n recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,EDLosHours,The e d los hours recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,ENCORDER,The e n c o r d e r recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,ENCOVERALLORDER,The e n c o v e r a l l o r d e r recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,ETTYN,The e t t y n recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,EncounterDiagnoses,The encounter diagnoses recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,EncounterWeight,The encounter weight recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,EpinephrineYN,The epinephrine y n recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,EthnicGroup,The ethnic group recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,ExternalCreatinine,The external creatinine recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,ExternalLactateResult,The external lactate result recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,ExternalPlatelets,The external platelets recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,FY,The f y recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,FYDate,The f y date recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,FYMonthName,The f y month name recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,FYMonthNumber,The numerical representation of the month within the fiscal year.
+reporting,IP_SEPSIS,FYMonthShortName,The f y month short name recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,FYYear,The f y year recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,FifteenthOrEOM,The fifteenth or e o m recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,FirstABXGivenInDeptYN,The first a b x given in dept y n recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,FirstABXName,The first a b x name recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,FirstABXTime,The first a b x time recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,FirstABXVolume,The first a b x volume recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,FirstBloodCultureInDeptYN,The first blood culture in dept y n recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,FirstBloodCultureOrderTime,The first blood culture order time recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,FirstBloodCultureProcedureOrdered,The first blood culture procedure ordered recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,FirstBloodCultureResult,The first blood culture result recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,FirstBolus,The first bolus recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,FirstBolusGivenInDeptYN,The first bolus given in dept y n recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,FirstBolusTime,The first bolus time recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,FirstBolusVolume,The first bolus volume recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,FirstCSFInDeptYN,The first c s f in dept y n recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,FirstCSFOrderTime,The first c s f order time recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,FirstCSFOrdered,The first c s f ordered recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,FirstCVLInDeptYN,The first c v l in dept y n recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,FirstCVLTime,The first c v l time recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,FirstETTInDeptYN,The first e t t in dept y n recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,FirstHypotensionTakenInDeptYN,The first hypotension taken in dept y n recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,FirstHypotensionTime,The first hypotension time recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,FirstHypotensionValue,The first hypotension value recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,FirstIntubationTime,The first intubation time recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,FirstLacticAcidOrderTime,The first lactic acid order time recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,FirstLacticAcidResult,The first lactic acid result recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,FirstLacticActidInDeptYN,The first lactic actid in dept y n recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,FirstOrderSetID,The first order set i d recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,FirstOrderSetInDeptYN,The first order set in dept y n recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,FirstOrderSetTime,The first order set time recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,FirstPIVAfterScreen,The first p i v after screen recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,FirstPIVInDeptYN,The first p i v in dept y n recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,FirstPositiveScoreInED,The first positive score in e d recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,FirstPositiveScoreTimeInED,The first positive score time in e d recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,FirstProcalcitoninInDeptYN,The first procalcitonin in dept y n recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,FirstProcalcitoninOrderTime,The first procalcitonin order time recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,FirstProcalcitoninResult,The first procalcitonin result recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,FirstSVO2InDeptYN,The first s v o2 in dept y n recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,FirstSVO2Time,The first s v o2 time recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,HematologicDysfunction,The hematologic dysfunction recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,HuddleDate,The huddle date recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,HuddleTime,The huddle time recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,IPSOSevereSepsisYN,The i p s o severe sepsis y n recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,InDepartmentTime,The in department time recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,InRecord,The in record recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,InfectiousSymptoms,The infectious symptoms recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,InpAdmDate,The date-time of the inpatient admission indicates when the patient first received a base patient class of inpatient during their hospital stay. This may differ from the admission date if the patient was initially assigned an emergency or outpatient base patient class.
+reporting,IP_SEPSIS,LBrachialPulse,The l brachial pulse recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,LPedalPulse,The l pedal pulse recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,LPosteriorTibialPulse,The l posterior tibial pulse recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,LRadialPulse,The l radial pulse recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,LacticAcidYN,The lactic acid y n recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,LastABXGivenInDeptYN,The last a b x given in dept y n recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,LastABXName,The last a b x name recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,LastABXTime,The last a b x time recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,LastABXToODScoreTime,The last a b x to o d score time recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,LastABXToODScoreVolume,The last a b x to o d score volume recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,LastBloodCultureInDeptYN,The last blood culture in dept y n recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,LastBloodCultureOrderTime,The last blood culture order time recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,LastBloodCultureProcedureOrdered,The last blood culture procedure ordered recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,LastBloodCultureResult,The last blood culture result recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,LastBolus,The last bolus recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,LastBolusGivenInDeptYN,The last bolus given in dept y n recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,LastBolusTime,The last bolus time recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,LastBolusToScreenTime,The last bolus to screen time recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,LastBolusVolume,The last bolus volume recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,LastCSFInDeptYN,The last c s f in dept y n recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,LastCSFOrderTime,The last c s f order time recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,LastCSFOrdered,The last c s f ordered recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,LastCVLInDeptYN,The last c v l in dept y n recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,LastCVLTime,The last c v l time recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,LastETTInDeptYN,The last e t t in dept y n recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,LastHypotensionTakenInDeptYN,The last hypotension taken in dept y n recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,LastHypotensionTime,The last hypotension time recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,LastHypotensionValue,The last hypotension value recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,LastIntubationTime,The last intubation time recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,LastLacticAcidInDeptYN,The last lactic acid in dept y n recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,LastLacticAcidOrderTime,The last lactic acid order time recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,LastLacticAcidResult,The last lactic acid result recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,LastOrderSetID,The last order set i d recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,LastOrderSetInDeptYN,The last order set in dept y n recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,LastOrderSetTime,The last order set time recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,LastPIVBeforeScreen,The last p i v before screen recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,LastPIVInDeptYN,The last p i v in dept y n recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,LastProcalcitoninInDeptYN,The last procalcitonin in dept y n recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,LastProcalcitoninOrderTime,The last procalcitonin order time recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,LastProcalcitoninResult,The last procalcitonin result recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,LastSVO2InDeptYN,The last s v o2 in dept y n recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,LastSVO2Time,The last s v o2 time recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,Location,The location recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,LosHours,The los hours recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,MilrinoneYN,The milrinone y n recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,NeurologicalDysfunction,The neurological dysfunction recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,NorepinephrineYN,The norepinephrine y n recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,NoteAuthor,The note author recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,NoteCreatedTime,The note created time recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,Notification,The notification recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,ODScoreToFirstABXTime,The o d score to first a b x time recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,OXYN,The o x y n recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,OutDepartmentTime,The out department time recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,OutRecord,The out record recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,PATENCENCID,The p a t e n c e n c i d recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,PIVYN,The p i v y n recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,PMDenom,The p m denom recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,PatientAssessedByMDPNP,The patient assessed by m d p n p recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,PerfusionWDL,The perfusion w d l recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,PhysicianName,The physician name recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,PositiveODScore,The positive o d score recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,Predisposition,The predisposition recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,PressorYN,The pressor y n recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,ProcalcitoninYN,The procalcitonin y n recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,Pulse,The PULSE measurement of the patient recorded during this encounter.
+reporting,IP_SEPSIS,RBrachialPulse,The r brachial pulse recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,RPedalPulse,The r pedal pulse recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,RPosteriorTibialPulse,The r posterior tibial pulse recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,RRadialPulse,The r radial pulse recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,Race,The race recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,RenalDysfunction,The renal dysfunction recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,Resp,The resp recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,RespiratoryDysfunction,The respiratory dysfunction recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,SVO2YN,The s v o2 y n recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,ScoreTime,The score time recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,ScreenTimeToFirstBolus,The screen time to first bolus recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,SepsisPatientHuddleorAlertWithMDPNP,The sepsis patient huddleor alert with m d p n p recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,ShiftAMPM,The shift a m p m recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,ShiftCNs,The shift c ns recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,ShiftColor,The shift color recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,ShiftColorDisplay,The shift color display recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,ShiftCompliance,The shift compliance recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,ShiftDate,The shift date recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,ShiftEnd,The shift end recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,ShiftRNs,The shift r ns recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,ShiftStart,The shift start recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,SkinColor,The skin color recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,SkinConditionTemp,The skin condition temp recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,UniqueRow,The unique row recorded for inpatient sepsis screening results.
+reporting,IP_SEPSIS,UnitOrder,The unit order recorded for inpatient sepsis screening results.

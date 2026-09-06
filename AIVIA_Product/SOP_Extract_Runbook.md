@@ -37,6 +37,14 @@ only your system's own data dictionary.*
    lists. Save the result as a CSV. *These columns won't have
    descriptions — that's expected; the intake report will show you
    which of them your reports actually depend on.*
+4c. **If your teams keep a data dictionary of their own** (a wiki,
+   a spreadsheet, extended properties on the tables), merge its
+   descriptions into Script 3's CSV before delivery — one
+   description column, same layout. Every description you supply
+   here becomes real meaning in your catalog; every one you skip
+   is counted as a documentation gap in the intake report, where
+   your stewards can work the list down over time. Either way,
+   nothing is silent.
 5. **Fill in the two manifest fields** in the provided manifest
    file: the source label (given in the source pack) and your name.
    Everything else in the manifest was captured by Script 1 —

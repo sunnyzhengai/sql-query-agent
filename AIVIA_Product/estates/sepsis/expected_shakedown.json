@@ -1,27 +1,29 @@
 {
-  "_comment": "AUTHORED conservation expectations for the sepsis estate (pinned 2026-09-06). Floors are deliberately NOT pinned here - they are round 2's HUMAN deliverable (gap_check_report.md, the ED-sepsis acceptance law); they pin after Sunny's verdict. This run landed the ADR 0025 posture: door 1 redacts contact shapes only, ids/names/dates count at intake and redact at egress - the sepsis corpus proved intake-redaction of config ids (FLO_MEAS_ID) destroys the logic's meaning and broke 8 parses. PACK 1.1 (2026-09-06): the 39 unresolved refs were ALL schema mismatches \u2014 the schema-less legacy dictionary + a dbo default; SCHEMA_OVERRIDES declared from the corpus's own consistent qualification; unresolved drops to 0 and the org tables join the working set. The remaining 164 unresolved are COLUMN refs into org-created tables and are TRUE upstream gaps, not engine defects: (a) org tables with zero/partial column metadata (IP_SepsisEncounters: 0 columns \u2014 Clarity's dictionary documents vendor tables, not org report tables); (b) renaming drift \u2014 the anonymization named dictionary columns (EncounterID/SepsisDate) differently from the SQL's (ENCOUNTER_ID/DATE_STAMP). Counted, never guessed; the DBA result tables diagnose each row. PACK 1.2 (2026-09-06): the \u00a73c org-catalog part (demo-side: stub DDL stands in for the database catalog \u2014 OUR data-prep repair, customers read sys.columns) closed 164 -> 9; ALL 9 survivors are the READER/WRITER DRIFT class \u2014 SQL reading columns (DATE_STAMP, HS_FY) that neither dictionary nor catalog carries: the silently-failing-report finding, kept counted forever. 242 undocumented org-catalog columns counted as documentation gaps. GRAMMAR v1.3.0 (finding 3): scopes_with_decisions 142 -> 182 \u2014 forty scopes' ONLY filters lived in INNER-join ON clauses and were invisible until the #BPA corpse recovered the class; 87 outer-join match conditions counted, never voiced as membership. PHASE A (ADR 0077, 2026-09-06): remainder_total 949 -> 998 \u2014 the 49 SELECT * elements were previously SKIPPED SILENTLY by the select walk; projection capture closed the hole and stars now COUNT as star_projection until star expansion is ruled. 3397 projection members captured (all named, 131 window functions) \u2014 the per-file census is phase_a_projection_report.md, Sunny's gap-check deliverable.",
+  "_comment": "AUTHORED conservation expectations for the sepsis estate (pinned 2026-09-06). Floors are deliberately NOT pinned here - they are round 2's HUMAN deliverable (gap_check_report.md, the ED-sepsis acceptance law); they pin after Sunny's verdict. This run landed the ADR 0025 posture: door 1 redacts contact shapes only, ids/names/dates count at intake and redact at egress - the sepsis corpus proved intake-redaction of config ids (FLO_MEAS_ID) destroys the logic's meaning and broke 8 parses. PACK 1.1 (2026-09-06): the 39 unresolved refs were ALL schema mismatches — the schema-less legacy dictionary + a dbo default; SCHEMA_OVERRIDES declared from the corpus's own consistent qualification; unresolved drops to 0 and the org tables join the working set. The remaining 164 unresolved are COLUMN refs into org-created tables and are TRUE upstream gaps, not engine defects: (a) org tables with zero/partial column metadata (IP_SepsisEncounters: 0 columns — Clarity's dictionary documents vendor tables, not org report tables); (b) renaming drift — the anonymization named dictionary columns (EncounterID/SepsisDate) differently from the SQL's (ENCOUNTER_ID/DATE_STAMP). Counted, never guessed; the DBA result tables diagnose each row. PACK 1.2 (2026-09-06): the §3c org-catalog part (demo-side: stub DDL stands in for the database catalog — OUR data-prep repair, customers read sys.columns) closed 164 -> 9; ALL 9 survivors are the READER/WRITER DRIFT class — SQL reading columns (DATE_STAMP, HS_FY) that neither dictionary nor catalog carries: the silently-failing-report finding, kept counted forever. 242 undocumented org-catalog columns counted as documentation gaps. GRAMMAR v1.3.0 (finding 3): scopes_with_decisions 142 -> 182 — forty scopes' ONLY filters lived in INNER-join ON clauses and were invisible until the #BPA corpse recovered the class; 87 outer-join match conditions counted, never voiced as membership. PHASE A (ADR 0077, 2026-09-06): remainder_total 949 -> 998 — the 49 SELECT * elements were previously SKIPPED SILENTLY by the select walk; projection capture closed the hole and stars now COUNT as star_projection until star expansion is ruled. 3397 projection members captured (all named, 131 window functions) — the per-file census is phase_a_projection_report.md, Sunny's gap-check deliverable. PHASE C (ADR 0077, 2026-09-06, Sunny's T-2/T-3 rulings): columns 4380 -> 4554 (242 org descriptions authored + 174 org-staging columns added to the demo catalog - OUR data-prep repair per the pack-1.2 pattern; customers merge their own dictionary per runbook step 4c). Unqualified-ref binding landed (single-source scopes bind safely; multi-source counted ambiguous): resolved 2255 -> 2767, unresolved 9 -> 27 - ALL 27 are the reader/writer drift class, now including vendor-table reads (ORGANISMS, GROUPER_MED_RECORDS) the old resolver never attempted; the drift surface GREW because visibility grew. Twin under translator 1.1.0: operational statements ruled out of debt (275), Gap B cross-scope resolution live (1058 temp/CTE columns resolve through defining projections), coverage gaps 3208 -> 1483. DATEPART FIX (Phase C build find): IdentifierLiteral (DATEADD/DATEPART unit tokens) was the entire 'unmapped expression construct' class - now a literal; remainder 998 -> 773.",
   "extract": {
     "tables": 90,
-    "columns": 4380,
+    "columns": 4554,
     "declared_joins": 68,
     "pending": 2
   },
   "estate": {
     "acquired": 28,
     "counted_excluded": 0,
-    "resolved_refs": 2255,
+    "resolved_refs": 2767,
     "same_tree_refs": 267,
-    "unresolved_refs": 9,
-    "remainder_total": 998
+    "unresolved_refs": 27,
+    "remainder_total": 773
   },
   "twin": {
     "_note": "PHASE B (ADR 0077, 2026-09-06): the meaning twin over the corpus — homomorphism asserted inside translate() every run (twin_nodes == parsed_nodes per file, no third bucket). gaps mirror the mapper's unmapped statements/expressions 1:1 by reason class. coverage_gaps = references translating by readable name for want of dictionary words (the 242 undocumented org-catalog columns + unresolved refs, counted never silent). values-map citations are 0 because the sepsis KG1 extract carries NO values maps — the mechanism is proven at unit grain (PB-5).",
     "twin_nodes": 14865,
-    "translated": 13993,
-    "gaps": 872,
+    "translated": 14493,
+    "gaps": 372,
     "degenerate": 24,
-    "coverage_gaps": 3208,
-    "stored_twins": 28
+    "coverage_gaps": 1483,
+    "stored_twins": 28,
+    "operational": 275,
+    "cross_scope_resolved": 1058
   },
   "lenses": {
     "scopes": 303,

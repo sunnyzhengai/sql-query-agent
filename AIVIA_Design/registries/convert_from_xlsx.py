@@ -53,11 +53,19 @@ SOURCES = {
 # statement nodes need kinds too. Caught at the Phase B build when
 # PB-1's "every meaning node carries a library kind" met the file
 # root (the F7 DistinctPredicate pattern: build-time catch, cited).
-STAMP_VERSION = "1.3.0"
+# v1.4.0 (2026-09-06): T-2 RULED (Sunny, Phase B gap-check):
+# OPERATIONAL statement kinds carry no analytic meaning BY RULING —
+# a closed list (Operational_Statement_Kinds), translated with
+# subkind operational and voiced never, NOT counted as gaps. The
+# degenerate pattern at statement grain; true debt shrinks to the
+# kinds that DO carry meaning (INSERT, WHILE, SET @var, unmapped
+# expressions).
+STAMP_VERSION = "1.4.0"
 RATIFIED = True
 DOC_STAMP = ("v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 twin-graph "
              "ruling ADR 0077; v1.2.0 Phase A metamodel bump; v1.3.0 "
-             "Phase B composite-kinds correction (all 2026-09-06)")
+             "Phase B composite-kinds correction; v1.4.0 T-2 "
+             "operational-statements ruling (all 2026-09-06)")
 CONVERTED_ON = "2026-09-05"
 
 
@@ -447,6 +455,33 @@ TWIN_SHEETS = {
              "statement the mapper counted unmapped twins as a gap",
              "Deciding example": "SELECT INTO -> composed from its "
              "selection; UPDATE (unmapped) -> gap(unmapped_statement)"},
+        ],
+        "Operational_Statement_Kinds": [
+            {"ScriptDom type": "_ruling", "Rationale": "T-2 RULED "
+             "(Sunny, 2026-09-06, Phase B gap-check): these statement "
+             "kinds carry NO analytic meaning — they tune the engine, "
+             "manage staging lifecycle, or declare plumbing; none "
+             "shapes what the data MEANS. Translated with subkind "
+             "'operational', voiced never — presence is the "
+             "homomorphism law, silence is policy (the degenerate "
+             "pattern at statement grain). The list is CLOSED: adding "
+             "a kind is a ruling, never a code default."},
+            {"ScriptDom type": "CreateIndexStatement",
+             "Rationale": "performance tuning; no data meaning"},
+            {"ScriptDom type": "DropIndexStatement",
+             "Rationale": "performance tuning; no data meaning"},
+            {"ScriptDom type": "DropTableStatement",
+             "Rationale": "staging lifecycle cleanup"},
+            {"ScriptDom type": "TruncateTableStatement",
+             "Rationale": "staging lifecycle cleanup"},
+            {"ScriptDom type": "PredicateSetStatement",
+             "Rationale": "session options (SET NOCOUNT ...)"},
+            {"ScriptDom type": "SetTransactionIsolationLevelStatement",
+             "Rationale": "session options"},
+            {"ScriptDom type": "DeclareVariableStatement",
+             "Rationale": "plumbing declaration; a variable's MEANING "
+             "arrives where it is assigned/used (SET @var stays DEBT "
+             "— assignments can carry logic)"},
         ],
     },
     "kg2_logic": {

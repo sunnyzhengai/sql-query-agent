@@ -27,9 +27,23 @@ import hashlib
 import json
 from typing import Any, Dict, List, Optional
 
+from aivia.graph import metamodel
 from aivia.graph.kg2_mapper import METAMODEL_VERSION
 
-TRANSLATOR_VERSION = "1.0.0"
+TRANSLATOR_VERSION = "1.1.0"
+# 1.1.0 (Phase C): the T-2 operational class (ruled list from the
+# registry) + Gap B cross-scope resolution (temp/CTE columns resolve
+# through the defining scope's projection member).
+
+# T-2 RULED (Sunny, 2026-09-06): operational statement kinds carry no
+# analytic meaning BY RULING — the closed list lives in the registry,
+# never in code opinion.
+OPERATIONAL_STATEMENTS = frozenset(
+    r["ScriptDom type"]
+    for r in metamodel.load("kg2_kind_library")
+    .sheets["Operational_Statement_Kinds"]
+    if r["ScriptDom type"] != "_ruling"
+)
 
 # roles in a predicate, keyed in THIS order (role identity, never
 # source position — a BETWEEN's bounds are lower/upper wherever the
@@ -52,14 +66,53 @@ def _readable(name: str) -> str:
     return re.sub(r"[_\W]+", " ", name).strip().lower()
 
 
+def _summarize_expr(expr: Dict[str, Any]) -> Dict[str, Any]:
+    """A light static summary of a defining expression (Gap B) —
+    NEVER creates twin nodes (the member's own nodes live in its
+    defining scope; double-counting would break the homomorphism)."""
+    kind = expr.get("kind")
+    if kind == "column_ref":
+        return {"copies": expr.get("ref")}
+    if kind == "literal":
+        return {"constant": expr.get("value")}
+    if kind == "function":
+        return {"operation": expr.get("name"),
+                "window": bool(expr.get("over"))}
+    return {"operation": kind}
+
+
+def _collect_scope_members(tree: Dict[str, Any]
+                           ) -> Dict[str, Dict[str, Any]]:
+    """Gap B material: folded scope name -> folded member name ->
+    projection member, over every NAMED scope (temps + CTEs)."""
+    members: Dict[str, Dict[str, Any]] = {}
+    def scopes(stmt):
+        yield from stmt.get("ctes", [])
+        if stmt.get("scope"):
+            yield stmt["scope"]
+    for stmt in tree.get("statements", []):
+        for scope in scopes(stmt):
+            name = scope.get("name")
+            if not name:
+                continue
+            table = members.setdefault(_fold(name), {})
+            for m in scope.get("projection", []):
+                if m.get("name"):
+                    table.setdefault(_fold(m["name"]), m)
+    return members
+
+
 class _Walk:
     """One pass over a parsed tree; accumulates the twin's nodes and
     the census. Total by construction: every branch of the tree shape
     either translates or gaps — an unrecognized shape is a gap with
     its own reason, never a skip."""
 
-    def __init__(self, columns: Dict[str, Dict[str, Any]]):
+    def __init__(self, columns: Dict[str, Dict[str, Any]],
+                 scope_members: Optional[Dict[str, Dict[str, Any]]] = None):
         self.columns = columns          # KG1 column identity -> props
+        self.scope_members = scope_members or {}  # Gap B material:
+        # folded scope name -> folded member name -> member dict
         self.nodes: List[Dict[str, Any]] = []
         self.coverage_gaps: List[str] = []
 
@@ -98,6 +151,37 @@ class _Walk:
                                "words_source": "readable_name"}
                     draws = [resolved]
                     self.coverage_gaps.append(resolved)
+            elif resolved and str(resolved).startswith("SAME-TREE"):
+                # Gap B (Phase C): a temp/CTE column's meaning lives in
+                # the defining scope's PROJECTION member — resolve
+                # through it instead of falling back to the raw name
+                colname = _fold(expr["ref"].rsplit(".", 1)[-1])
+                scope_key = str(resolved).replace("SAME-TREE scope ", "")
+                scope_name = scope_key.split("::")[-1]
+                # strip only a TRAILING dupe suffix (#2, #3 ...) — a
+                # temp table's LEADING # is its name (build find: the
+                # first cut stripped '#Base_Pop' to nothing)
+                head, _, tail = scope_name.rpartition("#")
+                if head and tail.isdigit():
+                    scope_name = head
+                member = self.scope_members.get(
+                    _fold(scope_name), {}).get(colname)
+                identity = f"{scope_key}.{colname}"
+                if member is not None:
+                    content = {
+                        "words": _readable(expr["ref"].rsplit(".", 1)[-1]),
+                        "words_source": "defining_projection",
+                        "derivation": _summarize_expr(
+                            member.get("expression", {}))}
+                    draws = [identity]
+                else:
+                    # star-projected or built by an unmapped statement:
+                    # the member is unknowable — counted, never guessed
+                    content = {"words": _readable(expr["ref"]
+                                                  .rsplit(".", 1)[-1]),
+                               "words_source": "readable_name"}
+                    draws = []
+                    self.coverage_gaps.append(expr["ref"])
             else:
                 content = {"words": _readable(expr["ref"]
                                               .rsplit(".", 1)[-1]),
@@ -268,6 +352,13 @@ class _Walk:
                 self.condition(stmt["predicate"], f"{path}/predicate")
                 ["content_key"])
         kind_label = stmt.get("statement_kind", "?")
+        if kind_label in OPERATIONAL_STATEMENTS:
+            # T-2 RULED: no analytic meaning BY RULING — translated
+            # (the homomorphism holds), silenced by policy, never debt
+            return self.add("statement", path,
+                            {"does": kind_label, "class": "operational"},
+                            [kind_label], subkind="operational",
+                            voiced="never")
         if not child_keys and kind_label not in ("SELECT", "SELECT INTO",
                                                  "IF"):
             # a statement the mapper counted as unmapped — its twin is
@@ -356,7 +447,7 @@ def translate(tree: Dict[str, Any],
     (identity -> properties with description/values); omit it and
     every reference translates by readable name with a counted
     coverage gap — grounded, never silent, never invented."""
-    walk = _Walk(columns or {})
+    walk = _Walk(columns or {}, _collect_scope_members(tree))
     walk.file(tree)
     gaps = [n for n in walk.nodes if n["kind"] == "gap"]
     twin = {
@@ -372,6 +463,12 @@ def translate(tree: Dict[str, Any],
             "parsed_nodes": parsed_census(tree),
             "degenerate": sum(1 for n in walk.nodes
                               if n.get("subkind") == "degenerate"),
+            "operational": sum(1 for n in walk.nodes
+                               if n.get("subkind") == "operational"),
+            "cross_scope_resolved": sum(
+                1 for n in walk.nodes
+                if n["content"].get("words_source")
+                == "defining_projection"),
             "coverage_gaps": len(walk.coverage_gaps),
         },
     }

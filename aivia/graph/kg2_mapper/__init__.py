@@ -84,6 +84,11 @@ def _map_expression(ctx, expr) -> Dict[str, Any]:
                      value=f"'{expr.Value}'")
     if t == "NullLiteral":
         return _node(ctx, "expression", "literal", expr, value="NULL")
+    if t == "IdentifierLiteral":
+        # a bare identifier used as a value token — DATEADD/DATEPART
+        # dateparts (HH, DD ...); Phase C build find: these were the
+        # whole 'unmapped expression construct' class in the corpus
+        return _node(ctx, "expression", "literal", expr, value=expr.Value)
     if t == "VariableReference":
         return _node(ctx, "expression", "parameter_ref", expr, ref=expr.Name)
     if t == "FunctionCall":
@@ -538,10 +543,48 @@ def resolve(tree: Dict[str, Any], store: Store, reg: Dict[str, Any],
             elif "." in name:
                 alias_to[name.rsplit(".", 1)[1]] = target
 
+        # Phase C (T-3 review): a SINGLE-SOURCE scope binds its
+        # unqualified column refs to that source safely — one table
+        # read, no ambiguity. Multi-source scopes keep unqualified
+        # refs COUNTED as ambiguous, never guessed.
+        sole = None
+        targets = [(k, t) for k, t in alias_to.items()]
+        if len({t for _, t in targets}) == 1 and targets:
+            sole = targets[0][1]
         for col in _column_refs_in([scope.get("where"),
                                     scope.get("join_on"),
                                     scope.get("select_refs")]):
             parts = col["ref"].split(".")
+            if len(parts) == 1 and sole is not None:
+                kind, target = sole
+                if kind == "derived":
+                    # sole source is an anonymous derived table — no
+                    # name to bind through; counted, never guessed
+                    census["ambiguous_unqualified"] = \
+                        census.get("ambiguous_unqualified", 0) + 1
+                    continue
+                if kind == "table":
+                    col_id = folded_columns.get(
+                        f"{target}|{_fold(parts[0])}")
+                    if col_id:
+                        col["resolves_to"] = col_id
+                        census["resolved_refs"] += 1
+                    else:
+                        col["resolves_to"] = None
+                        census["unresolved_refs"] += 1
+                        census["unresolved"].append(col["ref"])
+                        census.setdefault("unresolved_detail", []).append(
+                            {"ref": col["ref"], "kind": "column",
+                             "table": target})
+                elif kind == "scope":
+                    col["resolves_to"] = f"SAME-TREE scope {target}"
+                    census["same_tree_column_refs"] = \
+                        census.get("same_tree_column_refs", 0) + 1
+                continue
+            if len(parts) == 1:
+                census["ambiguous_unqualified"] = \
+                    census.get("ambiguous_unqualified", 0) + 1
+                continue
             if len(parts) == 2 and parts[0] in alias_to:
                 kind, target = alias_to[parts[0]]
                 if kind == "table":

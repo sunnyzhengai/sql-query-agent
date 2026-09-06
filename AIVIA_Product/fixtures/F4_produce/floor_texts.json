@@ -1,16 +1,17 @@
 {
-  "_comment": "The floor-grammar payload (companion to AIVIA_Design/Floor_Grammar.md, RATIFIED 2026-09-05): the EXACT deterministic floor text per F4 target. BINDING \u2014 F4 acceptance is byte-exact against these texts; the interim substring expectations are retired from service (kept as historical witnesses).",
-  "floor_grammar_version": "1.3.1",
-  "texts": {
-    "usp_diabetic_visits.sql::#Recent": "This is a selection of patient encounters.\n- The visit date is on or after the start date parameter (default '2026-01-01' when none is supplied).\n- The appointment status is 2 ('Completed').",
-    "usp_diabetic_visits.sql::delivery": "This is a selection of diagnoses on an encounter.\n- The diagnosis code starts with 'E11'.",
-    "vw_completed_visits.sql::delivery": "This is a selection of patient encounters.\n- The appointment status is one of the values 1 ('Scheduled'), 2 ('Completed').",
-    "usp_odd_join.sql::delivery": "This is a selection of patients.\n- No membership conditions are applied in this selection."
-  },
-  "_derivations": {
-    "usp_diabetic_visits.sql::#Recent": "R1 lead from ENCOUNTER.grain 'patient encounter' (last-word pluralization); R4 temporal GTE ('visit date' contains 'date'); R5 parameter w/ structural default + value 2 voiced with its map meaning",
-    "usp_diabetic_visits.sql::delivery": "R1 first grain-bearing FROM ref: #Recent carries no grain -> ENCOUNTER_DX 'diagnosis on an encounter' (head-noun pluralization before 'on'); R4 trailing-%% pattern -> starts with",
-    "vw_completed_visits.sql::delivery": "R6: the 1=1 contributes nothing (degenerate lens); R4 IN_LIST with both meanings from the values map, position order",
-    "usp_odd_join.sql::delivery": "R1 first grain-bearing: PATIENT 'patient'; R7 honest no-conditions (join key is structure, NOTE_TXT lives in gap-census, never prose)"
-  }
+ "_comment": "The floor-grammar payload (companion to AIVIA_Design/Floor_Grammar.md, RATIFIED 2026-09-05): the EXACT deterministic floor text per F4 target. BINDING — F4 acceptance is byte-exact against these texts; the interim substring expectations are retired from service (kept as historical witnesses).",
+ "floor_grammar_version": "1.3.1",
+ "texts": {
+  "usp_diabetic_visits.sql::#Recent": "This is a selection of patient encounters.\nDrawn from encounter records.\n- The visit date is on or after the start date parameter (default '2026-01-01' when none is supplied).\n- The appointment status is 2 ('Completed').",
+  "usp_diabetic_visits.sql::delivery": "This is a selection of diagnoses on an encounter.\nDrawn from the recent selection defined earlier in this procedure, restricted to records also present in encounter dx records.\n- The diagnosis code starts with 'E11'.",
+  "usp_odd_join.sql::delivery": "This is a selection of patients.\nDrawn from patient records, restricted to records also present in staging log records.\n- No membership conditions are applied in this selection.",
+  "vw_completed_visits.sql::delivery": "This is a selection of patient encounters.\nDrawn from encounter records, restricted to records also present in patient records, restricted to records also present in org readmit records.\n- The appointment status is one of the values 1 ('Scheduled'), 2 ('Completed')."
+ },
+ "_derivations": {
+  "usp_diabetic_visits.sql::#Recent": "R1 lead from ENCOUNTER.grain 'patient encounter' (last-word pluralization); R4 temporal GTE ('visit date' contains 'date'); R5 parameter w/ structural default + value 2 voiced with its map meaning",
+  "usp_diabetic_visits.sql::delivery": "R1 first grain-bearing FROM ref: #Recent carries no grain -> ENCOUNTER_DX 'diagnosis on an encounter' (head-noun pluralization before 'on'); R4 trailing-%% pattern -> starts with",
+  "vw_completed_visits.sql::delivery": "R6: the 1=1 contributes nothing (degenerate lens); R4 IN_LIST with both meanings from the values map, position order",
+  "usp_odd_join.sql::delivery": "R1 first grain-bearing: PATIENT 'patient'; R7 honest no-conditions (join key is structure, NOTE_TXT lives in gap-census, never prose)"
+ },
+ "_grammar": "2.0.0 (Phase C, ADR 0077): policy-walk major — composition sentences + DATEADD overlay + column-as-value steward words + truthful lead for temp-only readers. Regenerated from the F2 build; ratification = Sunny's Phase C gap-check verdict."
 }

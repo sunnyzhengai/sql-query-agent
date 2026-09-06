@@ -80,7 +80,7 @@ def test_run_event_matches_f4_accounting(produced):
     assert event.properties["accounting"]["terms"]["attempted"] == 0
     assert event.properties["author"] == "agent:produce"
     assert event.properties["outcome"] == "completed"
-    assert event.properties["basis"]["floor_grammar"] == "1.3.1"
+    assert event.properties["basis"]["floor_grammar"] == "2.0.0"
     assert set(event.properties["basis"]["worklist"]) == set(F4["targets"])
 
 

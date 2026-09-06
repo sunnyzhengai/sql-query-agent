@@ -24,7 +24,13 @@ from aivia.lenses import decisions, derivation
 
 ECON = json.loads((pathlib.Path(__file__).parent / "econ_params.json")
                   .read_text())
-FLOOR_GRAMMAR_VERSION = "1.3.1"
+# 2.0.0 (Phase C, ADR 0077): the POLICY-WALK major — the spine reads
+# the meaning twin (composition sentence from source nodes; the
+# voicing ledger); leaf voicings survive verbatim (ruling 4b). The
+# 24-hour-window bound gains the DATEADD phrase (ADR 0076's
+# evidence-ordered overlay: 12 estate uses ordered it) — the line-83
+# raw-token corpse from Sunny's gap-check dies here.
+FLOOR_GRAMMAR_VERSION = "2.0.0"
 _PREPOSITIONS = ("of", "on", "per", "for", "in", "at", "by", "with")
 
 
@@ -131,6 +137,28 @@ class _Voice:
             if note:
                 return f"{raw} (noted '{note}')"
             return raw
+        if kind == "column_ref":
+            # a column as a VALUE voices by its steward words too —
+            # raw identifiers never face the steward (R5; the line-83
+            # corpse: '[#base_pop].ed_departure_time' in prose)
+            return f"the {self.subject(expr)}"
+        if kind == "function" and expr.get("name", "").upper() == "DATEADD" \
+                and len(expr.get("args", [])) == 3:
+            # ADR 0076 evidence-ordered overlay: DATEADD earned its
+            # phrase (12 estate uses). Unit arg arrives as a column_ref
+            # token (HH) — read its raw name, never its resolution.
+            unit_words = {"HH": "hours", "HOUR": "hours", "DD": "days",
+                          "DAY": "days", "MI": "minutes",
+                          "MINUTE": "minutes", "SS": "seconds",
+                          "WK": "weeks", "MM": "months", "MONTH": "months",
+                          "YY": "years", "YEAR": "years"}
+            first = expr["args"][0]
+            unit = str(first.get("value") or first.get("ref", "")
+                       ).split(".")[-1].upper()
+            n = expr["args"][1].get("value")
+            base = self.value(expr["args"][2], expr["args"][2])
+            if unit in unit_words and n is not None:
+                return f"{n} {unit_words[unit]} after {base}"
         return decisions.render_expr(expr).lower()
 
     def forbidden_tokens(self, scope) -> List[str]:
@@ -207,6 +235,106 @@ def _voice_predicate(pred, voice: _Voice) -> str:
     return ""  # remainder predicates voice nothing; they are counted
 
 
+def _twin_selection(read: ReadApi, tree, scope):
+    """The scope's selection node in the stored meaning twin (KG2b) —
+    the spine the policy walk reads since grammar 2.0.0."""
+    want = scope.get("name") or scope.get("name_key")
+    for n in read.nodes("meaning_twin"):
+        twin = n.properties.get("twin", {})
+        if twin.get("file") != tree.get("name"):
+            continue
+        for node in twin["nodes"]:
+            if node["kind"] == "selection" \
+                    and node["content"].get("selection") == want:
+                return twin, node
+    return None, None
+
+
+def _source_phrase(name: str, resolved, depth2_counter: List[int]) -> str:
+    if resolved and str(resolved).startswith("SAME-TREE"):
+        words = re.sub(r"[_\W]+", " ", name.lstrip("#")).strip().lower()
+        return (f"the {words} selection defined earlier in this "
+                "procedure")
+    if name is None:  # an anonymous derived table — depth-1 inline
+        return "an inline selection"
+    words = re.sub(r"[_\W]+", " ", name.split(".")[-1]).strip().lower()
+    return f"{words} records"
+
+
+def _composition_sentence(read: ReadApi, tree, scope,
+                          ledger: Dict[str, int]) -> Optional[str]:
+    """The composition sentence (the finding-4 heir; ruling 4c): what
+    this selection READS and how the joins compose the population —
+    INNER voices as restriction; any OUTER present demotes the wording
+    to 'combined with' (voicing an optional match as a restriction
+    would lie the other way — the v1.3.0 posture)."""
+    refs = scope.get("from_refs", [])
+    if not refs:
+        return None
+    join_kinds = {str(on.get("join_type"))
+                  for on in scope.get("join_on", [])}
+    inner_only = join_kinds <= {"Inner"}
+    phrases = []
+    for ref in refs:
+        if "derived_scope" in ref:
+            phrases.append("an inline selection")
+            # depth-2 nesting: translated in full (the twin is total);
+            # PROSE inlines depth 1 only — deeper is counted with the
+            # revisit trigger (ruled 2026-09-06, the depth cap)
+            inner_refs = ref["derived_scope"].get("from_refs", [])
+            if any("derived_scope" in r for r in inner_refs):
+                ledger["deep_nesting_counted"] = \
+                    ledger.get("deep_nesting_counted", 0) + 1
+            continue
+        phrases.append(_source_phrase(ref.get("table_ref"),
+                                      ref.get("resolves_to"), []))
+    if not phrases:
+        return None
+    sentence = f"Drawn from {phrases[0]}"
+    connector = (", restricted to records also present in "
+                 if inner_only and len(join_kinds) > 0
+                 else ", combined with ")
+    for p in phrases[1:]:
+        sentence += connector + p
+    return sentence + "."
+
+
+def voicing_ledger(read: ReadApi, target: str) -> Dict[str, int]:
+    """THE VOICING LEDGER (ruling 4a; ADR 0044 clause 5 generalized):
+    every membership-grain decision in the scope is VOICED or COUNTED
+    — voiced + counted == total, disjoint, queryable. Silent omission
+    has no constructible path."""
+    tree, scope = None, None
+    for t in read.trees().values():
+        for s in decisions.named_scopes(t):
+            if s["name_key"] == target:
+                tree, scope = t, s
+    if scope is None:
+        raise KeyError(target)
+    voice = _Voice(read, tree)
+    voiced = counted = 0
+    detail: Dict[str, int] = {}
+    for pred in decisions.membership_predicates(scope):
+        if decisions.is_degenerate(pred):
+            counted += 1
+            detail["degenerate_policy_silent"] = \
+                detail.get("degenerate_policy_silent", 0) + 1
+        elif _voice_predicate(pred, voice):
+            voiced += 1
+        else:
+            counted += 1
+            detail["remainder_unvoiced"] = \
+                detail.get("remainder_unvoiced", 0) + 1
+    outer = sum(1 for on in scope.get("join_on", [])
+                if str(on.get("join_type")) != "Inner")
+    counted += outer
+    if outer:
+        detail["outer_match_conditions"] = outer
+    total = voiced + counted
+    return {"voiced": voiced, "counted": counted, "total": total,
+            "detail": detail}
+
+
 def compose_floor(read: ReadApi, target: str) -> str:
     """The ratified grammar, rule by rule, over the graph's facts."""
     tree, scope = None, None
@@ -226,13 +354,20 @@ def compose_floor(read: ReadApi, target: str) -> str:
             reads_tables = True
             if lead_grain is None and tables[rt].get("grain"):
                 lead_grain = tables[rt]["grain"]
-    if not reads_tables:
+    if not reads_tables and not scope.get("from_refs"):
         lines = ["This step produces derived values; no source records "
                  "are read."]
     elif lead_grain:
         lines = [f"This is a selection of {_pluralize(lead_grain)}."]
     else:
         lines = ["This is a selection of records."]
+    # Grammar 2.0.0 — the composition sentence (the finding-4 heir):
+    # sources + join composition, from the same facts the twin's
+    # source nodes hold; reference phrases, never raw temp names
+    ledger_counts: Dict[str, int] = {}
+    composition = _composition_sentence(read, tree, scope, ledger_counts)
+    if composition:
+        lines.append(composition)
     # R2 + R6 — one bullet per membership decision (dedup at PREDICATE
     # IDENTITY grain, v1.1.0 — the ED-sepsis two-alias corpse: two
     # predicates that render alike are still two decisions), degenerate

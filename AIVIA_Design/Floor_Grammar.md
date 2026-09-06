@@ -1,4 +1,23 @@
-# The Floor Grammar — v1.3.1 (RATIFIED, Sunny, 2026-09-05; amended 2026-09-06 ×4)
+# The Floor Grammar — v2.0.0 (the POLICY-WALK major, Phase C of the
+# twin-graph ruling, 2026-09-06; v1.3.1 RATIFIED Sunny 2026-09-05)
+
+*v2.0.0 (Phase C, ADR 0077 — awaiting Sunny's gap-check verdict):
+the grammar becomes the VOICING POLICY over the meaning twin
+(ruling piece 4). NEW: the COMPOSITION SENTENCE after the lead —
+sources + join composition ("Drawn from X, restricted to records
+also present in Y"; any OUTER join demotes to "combined with" —
+voicing an optional match as restriction would lie the other way);
+named scope refs voice as reference phrases, never raw temp names;
+anonymous derived tables inline at depth 1, deeper counted (the
+depth-cap ruling). THE VOICING LEDGER: voiced + counted == total
+per scope, queryable (produce.voicing_ledger). Leaf voicings
+survive verbatim (R3-R8 below) plus: a column-as-VALUE voices by
+steward words, and DATEADD earned its phrase (ADR 0076
+evidence-ordered overlay; 12 estate uses) — the line-83 raw-token
+corpse dies. R1 lead amendment: a scope reading ONLY earlier
+selections is still "a selection of records", never "derived
+values; no source records are read" (that lead now means literally
+no sources). Rules below stand as the ratified leaf record.*
 
 *v1.3.1 (phrasing only, no truth change — the R5 artifact corpses):
 the noun-phrase rendering gains meta-boilerplate stripping ('This

@@ -1,9 +1,9 @@
 {
  "registry": "kg2_kind_library",
  "stamp": {
-  "version": "1.3.0",
+  "version": "1.4.0",
   "doc_section": "Level 1 / KG Layer 2 — kind library (T-SQL predicates)",
-  "doc_stamp": "v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 twin-graph ruling ADR 0077; v1.2.0 Phase A metamodel bump; v1.3.0 Phase B composite-kinds correction (all 2026-09-06)",
+  "doc_stamp": "v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 twin-graph ruling ADR 0077; v1.2.0 Phase A metamodel bump; v1.3.0 Phase B composite-kinds correction; v1.4.0 T-2 operational-statements ruling (all 2026-09-06)",
   "ratified": true,
   "converted_on": "2026-09-05",
   "converted_from": "L1_KG2_Kind_Library_TSQL_Predicates_DRAFT.xlsx"
@@ -13,7 +13,8 @@
   "RG-1 ruling (2026-09-05)",
   "RG-1 ruling (2026-09-05): quantifier is a predicate property",
   "sheet Structure_Kinds_Phase_A added (twin-graph ruling (2026-09-06), ADR 0077)",
-  "sheet Meaning_Node_Kinds added (twin-graph ruling (2026-09-06), ADR 0077)"
+  "sheet Meaning_Node_Kinds added (twin-graph ruling (2026-09-06), ADR 0077)",
+  "sheet Operational_Statement_Kinds added (twin-graph ruling (2026-09-06), ADR 0077)"
  ],
  "_open": [],
  "sheets": {
@@ -431,6 +432,40 @@
     "Kind": "statement",
     "Definition": "COMPOSITE (Phase B correction, 2026-09-06): one executable command's meaning, composed from its scopes/predicates; a statement the mapper counted unmapped twins as a gap",
     "Deciding example": "SELECT INTO -> composed from its selection; UPDATE (unmapped) -> gap(unmapped_statement)"
+   }
+  ],
+  "Operational_Statement_Kinds": [
+   {
+    "ScriptDom type": "_ruling",
+    "Rationale": "T-2 RULED (Sunny, 2026-09-06, Phase B gap-check): these statement kinds carry NO analytic meaning — they tune the engine, manage staging lifecycle, or declare plumbing; none shapes what the data MEANS. Translated with subkind 'operational', voiced never — presence is the homomorphism law, silence is policy (the degenerate pattern at statement grain). The list is CLOSED: adding a kind is a ruling, never a code default."
+   },
+   {
+    "ScriptDom type": "CreateIndexStatement",
+    "Rationale": "performance tuning; no data meaning"
+   },
+   {
+    "ScriptDom type": "DropIndexStatement",
+    "Rationale": "performance tuning; no data meaning"
+   },
+   {
+    "ScriptDom type": "DropTableStatement",
+    "Rationale": "staging lifecycle cleanup"
+   },
+   {
+    "ScriptDom type": "TruncateTableStatement",
+    "Rationale": "staging lifecycle cleanup"
+   },
+   {
+    "ScriptDom type": "PredicateSetStatement",
+    "Rationale": "session options (SET NOCOUNT ...)"
+   },
+   {
+    "ScriptDom type": "SetTransactionIsolationLevelStatement",
+    "Rationale": "session options"
+   },
+   {
+    "ScriptDom type": "DeclareVariableStatement",
+    "Rationale": "plumbing declaration; a variable's MEANING arrives where it is assigned/used (SET @var stays DEBT — assignments can carry logic)"
    }
   ]
  }
