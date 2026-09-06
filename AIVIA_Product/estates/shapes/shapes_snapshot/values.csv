@@ -1,0 +1,15 @@
+table,code,meaning
+DIAGNOSIS_CODESET,E11.9,Type 2 diabetes mellitus (E11.9)
+DIAGNOSIS_CODESET,E11.65,Type 2 diabetes mellitus (E11.65)
+DIAGNOSIS_CODESET,E11.40,Type 2 diabetes mellitus (E11.40)
+DIAGNOSIS_CODESET,E11.22,Type 2 diabetes mellitus (E11.22)
+DIAGNOSIS_CODESET,E11.8,Type 2 diabetes mellitus (E11.8)
+DIAGNOSIS_CODESET,E11.80,Type 2 diabetes mellitus (E11.80)
+LAB_CODESET,HBA1C,Hemoglobin A1c percentage
+MED_CODESET,METFORMIN,Metformin order
+MED_CODESET,INSULIN GLARGINE,Insulin Glargine order
+CPT_CODESET,99213,"Office visit, established, low"
+CPT_CODESET,99214,"Office visit, established, moderate"
+CPT_CODESET,83036,Hemoglobin A1c test
+PROC_CODESET,0DB60ZZ,"Excision of stomach, open"
+PROC_CODESET,3E0G76Z,Introduction of nutritional substance

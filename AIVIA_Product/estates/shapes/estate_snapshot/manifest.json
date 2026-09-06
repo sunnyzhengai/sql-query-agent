@@ -1,0 +1,11 @@
+{
+ "source_kind": "estate",
+ "org": "shapes-demo",
+ "location": "repo://shapes-corpus/",
+ "declared_dialects": [
+  "tsql"
+ ],
+ "as_of": "2026-09-06T00:00:00Z",
+ "operator": "shapes.pack",
+ "default_schema": "dbo"
+}

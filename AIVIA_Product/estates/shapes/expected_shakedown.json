@@ -1,0 +1,28 @@
+{
+  "_comment": "AUTHORED shakedown expectations for the shapes estate (pinned 2026-09-06 from the first honest run, hand-sanity-checked). The corpus-of-record law: same corpus + same pack -> these exact counters. Three findings this run surfaced, on the record: (1) the PHI probe file forced the H6 quoting fix — a redacted literal must stay a valid literal; (2) A2's fold_upper matching landed in the resolver (three lowercase refs were honest casualties until the ruled model was code); (3) MED_CODE = MED_NAME is the corpus's deliberate join smell and the compliance lens caught it.",
+  "extract": {"tables": 22, "columns": 76, "declared_joins": 59,
+              "quarantined": 0, "illegal": 0, "pending": 0},
+  "estate": {
+    "acquired": 38, "counted_excluded": 0,
+    "resolved_refs": 242, "same_tree_refs": 50, "unresolved_refs": 0,
+    "phi_redactions": 2,
+    "remainder_total": 6,
+    "remainder_types": {"DeclareVariableStatement": 1,
+                        "ExecuteStatement": 1,
+                        "SearchedCaseExpression": 3,
+                        "BinaryQueryExpression": 1}
+  },
+  "lenses": {
+    "working_set_touched": 16, "working_set_total": 22,
+    "untouched": ["DM_REGISTRY", "LAB_CODESET", "LAB_ORDERS",
+                  "PATIENT_PCP_ASSIGNMENT", "PROCEDURE_ORDERS",
+                  "PROC_CODESET"],
+    "compliance_violations": 1,
+    "violation_practiced": "MEDICATION_ORDERS <-> MED_CODESET on MED_CODE = MED_NAME",
+    "compliance_compliant": 12, "compliance_not_judged": 6,
+    "scopes": 102, "scopes_with_decisions": 62, "degenerate": 0,
+    "grain_not_declared": 22
+  },
+  "produce_waves": [50, 50, 2, 0],
+  "_witness": "ECON v1 pacing visible end-to-end: batch 50 drains the 102-scope worklist in three waves, then the staleness lens goes quiet — no change, no production, no noise"
+}

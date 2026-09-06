@@ -1,0 +1,23 @@
+schema,table,description
+dbo,PATIENTS,Master patient index for the synthetic diabetic cohort.
+dbo,ENCOUNTERS,Clinical encounters (visits) for cohort patients.
+dbo,LAB_RESULTS,Laboratory results including HbA1c draws.
+dbo,DIAGNOSIS_CODES,Coded diagnoses assigned to patients.
+dbo,MEDICATION_ORDERS,Medication orders including diabetes therapies.
+dbo,PROBLEM_LIST,Active problem-list entries per patient.
+dbo,ENCOUNTER_DIAGNOSIS,Diagnoses coded on outpatient encounters (PCP lego).
+dbo,HOSPITAL_ENCOUNTERS,"Hospital encounters, ED and inpatient (ED/IP lego)."
+dbo,HOSPITAL_DIAGNOSIS,Diagnoses coded on hospital encounters.
+dbo,LAB_ORDERS,Laboratory orders placed during encounters.
+dbo,PROFESSIONAL_BILLING,Professional billing transactions (Finance lego).
+dbo,CPT_CODES,CPT rows attached to billing transactions.
+dbo,OR_CASES,Operating-room cases (surgical lego).
+dbo,PROCEDURE_ORDERS,Procedure orders linked to OR cases.
+dbo,APPOINTMENTS,Scheduled appointments with status (scheduling lego).
+dbo,PATIENT_PCP_ASSIGNMENT,Primary-care attribution per patient (attribution lego).
+dbo,DM_REGISTRY,Curated diabetes registry membership (Quality lego).
+dbo,DIAGNOSIS_CODESET,Foundation reference vocabulary: ICD-10 incl. E08-E13 and O24.4x (gestational).
+dbo,LAB_CODESET,Foundation reference vocabulary: lab tests incl. HbA1c and glucose.
+dbo,MED_CODESET,Foundation reference vocabulary: medications incl. insulin/orals (metformin caveat).
+dbo,CPT_CODESET,Foundation reference vocabulary: CPT procedure/billing codes.
+dbo,PROC_CODESET,Foundation reference vocabulary: procedure codes.

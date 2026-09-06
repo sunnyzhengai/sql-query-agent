@@ -290,8 +290,24 @@ def map_tree(file_name: str, text: str, dialect: str = "tsql"
     statements: List[Dict[str, Any]] = []
     parameters: Dict[str, Dict[str, Any]] = {}
     position = 0
+
+    def executable_statements(stmts):
+        """Wrapper statements NEST their bodies (registry: control-flow
+        blocks nest statements): CREATE PROCEDURE and BEGIN/END unwrap
+        to their executable children, in order."""
+        for stmt in stmts:
+            t = _type_name(stmt)
+            if t == "CreateProcedureStatement":
+                yield from executable_statements(
+                    stmt.StatementList.Statements)
+            elif t in ("BeginEndBlockStatement", "BeginEndBlock"):
+                yield from executable_statements(
+                    stmt.StatementList.Statements)
+            else:
+                yield stmt
+
     for batch in fragment.Batches:
-        for stmt in batch.Statements:
+        for stmt in executable_statements(batch.Statements):
             position += 1
             t = _type_name(stmt)
             entry: Dict[str, Any] = {"position": position,
@@ -357,11 +373,25 @@ def map_tree(file_name: str, text: str, dialect: str = "tsql"
 
 
 # ---- resolution (binds to KG1 identity, never version) ----
-def resolve(tree: Dict[str, Any], store: Store,
-            reg: Dict[str, Any]) -> Dict[str, Any]:
-    tables = {n.identity: n for n in store.current_nodes("table")}
+def _fold(name: str) -> str:
+    """A2's match function: fold_upper(strip_brackets_quotes(x)) —
+    SQL identifiers compare case-insensitively; identities keep their
+    declared casing."""
+    return name.strip("[]\"'").upper()
+
+
+def resolve(tree: Dict[str, Any], store: Store, reg: Dict[str, Any],
+            default_schema: Optional[str] = None) -> Dict[str, Any]:
+    tables = {_fold(n.identity.rsplit("|", 1)[-1]) + "|" +
+              "|".join(n.identity.split("|")[:2]): n.identity
+              for n in store.current_nodes("table")}
+
+    def table_identity(schema: str, table: str) -> Optional[str]:
+        source = reg["schema_sources"].get(schema)
+        return tables.get(f"{_fold(table)}|{source}|{schema}")
     columns = {n.identity for n in store.current_nodes("column")}
-    mapping = reg["schema_sources"]
+    folded_columns = {"|".join(c.split("|")[:3]) + "|" + _fold(
+        c.rsplit("|", 1)[-1]): c for c in columns}
     scope_keys = {}
     for stmt in tree["statements"]:
         for cte in stmt.get("ctes", []):
@@ -382,15 +412,23 @@ def resolve(tree: Dict[str, Any], store: Store,
                     alias_to[ref["alias"]] = ("derived", None)
                 continue
             name = ref["table_ref"]
-            if name in scope_keys:
-                ref["resolves_to"] = f"SAME-TREE scope {scope_keys[name]}"
+            folded_scopes = {_fold(k): v for k, v in scope_keys.items()}
+            if _fold(name) in folded_scopes:
+                key = folded_scopes[_fold(name)]
+                ref["resolves_to"] = f"SAME-TREE scope {key}"
                 census["same_tree_refs"] += 1
-                target = ("scope", scope_keys[name])
-            elif "." in name:
-                schema, table = name.rsplit(".", 1)
-                source = mapping.get(schema)
-                identity = f"{source}|{schema}|{table}"
-                if identity in tables:
+                target = ("scope", key)
+            else:
+                if "." in name:
+                    schema, table = name.rsplit(".", 1)
+                elif default_schema:
+                    # the estate's declared default schema (real estates
+                    # reference unqualified names constantly)
+                    schema, table = default_schema, name
+                else:
+                    schema, table = None, name
+                identity = table_identity(schema, table) if schema else None
+                if identity:
                     ref["resolves_to"] = identity
                     census["resolved_refs"] += 1
                     target = ("table", identity)
@@ -399,11 +437,6 @@ def resolve(tree: Dict[str, Any], store: Store,
                     census["unresolved_refs"] += 1
                     census["unresolved"].append(name)
                     target = ("unresolved", None)
-            else:
-                ref["resolves_to"] = None
-                census["unresolved_refs"] += 1
-                census["unresolved"].append(name)
-                target = ("unresolved", None)
             if ref.get("alias"):
                 alias_to[ref["alias"]] = target
             elif "." in name:
@@ -416,8 +449,9 @@ def resolve(tree: Dict[str, Any], store: Store,
             if len(parts) == 2 and parts[0] in alias_to:
                 kind, target = alias_to[parts[0]]
                 if kind == "table":
-                    col_id = f"{target}|{parts[1]}"
-                    if col_id in columns:
+                    col_id = folded_columns.get(
+                        f"{target}|{_fold(parts[1])}")
+                    if col_id:
                         col["resolves_to"] = col_id
                         census["resolved_refs"] += 1
                     else:
@@ -469,9 +503,11 @@ def record_exclusion(store: Store, file_name: str, reason: str,
 
 def apply_file(store: Store, reg: Dict[str, Any], file_id: str,
                file_name: str, text: str, as_of: str,
-               dialect: str = "tsql") -> Dict[str, Any]:
+               dialect: str = "tsql",
+               default_schema: Optional[str] = None) -> Dict[str, Any]:
     gate = phi_gate.door1_redact(text)
-    tree = resolve(map_tree(file_name, gate.text, dialect), store, reg)
+    tree = resolve(map_tree(file_name, gate.text, dialect), store, reg,
+                   default_schema=default_schema)
     tree["phi_redactions"] = gate.redaction_count
     current = [n for n in store.current_nodes("file")
                if n.identity == file_id]

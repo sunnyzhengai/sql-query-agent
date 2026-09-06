@@ -77,21 +77,33 @@ def receive_estate(store, reg: Dict[str, Any], estate_dir) -> EstateReport:
     manifest = json.loads((estate_dir / "manifest.json").read_text())
     location = manifest["location"]
     report = EstateReport()
-    for path in sorted(estate_dir.iterdir()):
-        if path.name == "manifest.json":
+    for path in sorted(estate_dir.rglob("*")):
+        if path.is_dir() or path.name == "manifest.json":
             continue
+        name = path.relative_to(estate_dir).as_posix()
         if path.suffix != ".sql":
             reason = (f"unsupported-dialect ({path.suffix.lstrip('.')} "
                       "placeholder)")
-            kg2_mapper.record_exclusion(store, path.name, reason,
+            kg2_mapper.record_exclusion(store, name, reason,
                                         manifest["as_of"])
-            report.counted_excluded.append({"file": path.name,
+            report.counted_excluded.append({"file": name,
                                             "reason": reason})
             continue
-        tree = kg2_mapper.apply_file(
-            store, reg, file_id=f"{location}{path.name}",
-            file_name=path.name, text=path.read_text(),
-            as_of=manifest["as_of"])
-        report.acquired.append(path.name)
-        report.trees[path.name] = tree
+        try:
+            tree = kg2_mapper.apply_file(
+                store, reg, file_id=f"{location}{name}",
+                file_name=name, text=path.read_text(),
+                as_of=manifest["as_of"],
+                default_schema=manifest.get("default_schema"))
+        except ValueError as err:
+            # conservation: a parse failure is a COUNTED exclusion with
+            # the parser's own message — never fatal, never silent
+            reason = f"parse-error: {err}"
+            kg2_mapper.record_exclusion(store, name, reason,
+                                        manifest["as_of"])
+            report.counted_excluded.append({"file": name,
+                                            "reason": reason})
+            continue
+        report.acquired.append(name)
+        report.trees[name] = tree
     return report

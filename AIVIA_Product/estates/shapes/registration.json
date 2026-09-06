@@ -1,0 +1,15 @@
+{
+ "_comment": "DBA prerequisite for the synthetic shapes source (A1): one source owns every schema.",
+ "db_name": "aivia_demo_src",
+ "server": "SHAPESERVER",
+ "dba_team": "role:shapes-dba",
+ "registered_sources": [
+  "shapes"
+ ],
+ "registered_at": "2026-09-06T00:00:00Z",
+ "schema_sources": {
+  "dbo": "shapes",
+  "reporting": "shapes",
+  "reports": "shapes"
+ }
+}

@@ -87,6 +87,13 @@ def _apply(text: str, redact_rules, count_rules) -> GateResult:
                 counted[rule] = counted.get(rule, 0) + 1
     out = text
     for start, end, placeholder in sorted(spans, reverse=True):
+        span = out[start:end]
+        # H6 seam (caught by the shapes PHI-probe file): a redaction
+        # inside SQL must leave a VALID literal behind — when the
+        # claimed span carries its own quotes, the placeholder goes
+        # INSIDE them, so the redacted text still parses.
+        if len(span) >= 2 and span[0] == span[-1] and span[0] in "'\"":
+            placeholder = span[0] + placeholder + span[0]
         out = out[:start] + placeholder + out[end:]
     return GateResult(out, len(spans), counted)
 
