@@ -1,67 +1,116 @@
-"""The spine's derived states — small arithmetic over chains and
+"""The spine's derived states — arithmetic over version chains and
 dispositions. No stored field exists to disagree with any of these
-(the ledger law): ownership, authorship, version, standing and
-current-outcome DERIVE; staleness derives the produce worklist.
+(the ledger law, CHECK-KG3-1): every layer-3 version is its own node;
+these lenses derive what other systems store.
 
-Until slice 4 lands the artifact layer these run total over an empty
-class set — a lens is total over its domain, and an empty domain is a
-domain (B3: the completeness declaration says so out loud).
+The A6 model (ruled 2026-09-05), verbatim as code:
+  current(A) := max(versions(A))                 if ownership = machine
+                max({v : human_authored(v) or accepted(v)})   otherwise
+ownership is one-way by construction: human iff any human-authored
+version OR an accepting disposition (F5's certification-without-edit
+branch). Disagreement: distinct rulers' latest rulings conflict ->
+a named state, no winner.
 """
-from typing import Any, Dict
+from typing import Any, Dict, List
 
-ARTIFACT_CLASSES = ("description", "term", "responsibility")
-EVENT_CLASSES = ("disposition", "usage", "proposal")
+STATE_CLASSES = ("description", "term", "responsibility")
 
 
-def _artifact_versions(read, kind):
-    return [n for n in read.nodes(kind)]
+def _artifacts(read) -> Dict[str, List]:
+    out: Dict[str, List] = {}
+    for kind in STATE_CLASSES:
+        for node in read.nodes(kind):
+            key = node.properties.get("artifact_id", node.identity)
+            out.setdefault(key, []).append(node)
+    return out
+
+
+def _dispositions_about(read, artifact_id, version_ids):
+    targets = {artifact_id} | set(version_ids)
+    return [d for d in read.nodes("disposition")
+            if d.properties["about"] in targets]
+
+
+def _is_machine(node) -> bool:
+    return str(node.properties.get("author", "")).startswith("agent:")
+
+
+def _ownership(read, artifact_id, versions) -> str:
+    if any(not _is_machine(v) for v in versions):
+        return "human"
+    rulings = _dispositions_about(read, artifact_id,
+                                  [v.identity for v in versions])
+    if any(d.properties["ruling"] == "accept" for d in rulings):
+        return "human"  # certification without edit still flips (F5)
+    return "machine"
 
 
 def lens_ownership(read, params) -> Dict[str, Any]:
-    out = {}
-    for kind in ARTIFACT_CLASSES:
-        for node in _artifact_versions(read, kind):
-            author = node.properties.get("author", "")
-            out[node.identity] = ("human" if not str(author).startswith(
-                "agent") else "machine")
-    return {"yield": out,
-            "completeness": "total over artifact classes",
+    out = {aid: _ownership(read, aid, versions)
+           for aid, versions in _artifacts(read).items()}
+    return {"yield": out, "completeness": "total over artifacts",
             "stamp": read.stamp()}
 
 
 def lens_authorship(read, params) -> Dict[str, Any]:
     out = {}
-    for kind in ARTIFACT_CLASSES + EVENT_CLASSES:
-        for node in _artifact_versions(read, kind):
-            author = str(node.properties.get("author", ""))
-            out[node.identity] = ("machine" if author.startswith("agent")
-                                 else "human")
+    for aid, versions in _artifacts(read).items():
+        for v in versions:
+            key = aid if len(versions) == 1 else v.identity
+            out[key] = "machine" if _is_machine(v) else "human"
     return {"yield": out, "completeness": "total over versions",
             "stamp": read.stamp()}
 
 
 def lens_version(read, params) -> Dict[str, Any]:
-    out = {}
-    for kind in ARTIFACT_CLASSES:
-        for node in read.nodes(kind):
-            versions, _ = read.read(node.identity, mode="all")
-            out[node.identity] = len(versions)  # chain depth, derived
-    return {"yield": out, "completeness": "total over versions",
-            "stamp": read.stamp()}
+    out = {aid: len(versions) for aid, versions in _artifacts(read).items()}
+    return {"yield": out, "completeness": "total over artifacts (chain "
+            "depth, derived)", "stamp": read.stamp()}
 
 
 def lens_standing(read, params) -> Dict[str, Any]:
-    dispositions = read.nodes("disposition")
-    by_target: Dict[str, str] = {}
-    for d in dispositions:
-        by_target[d.properties["about"]] = d.properties["ruling"]
     out = {}
-    for kind in ARTIFACT_CLASSES:
-        for node in read.nodes(kind):
-            ruling = by_target.get(node.identity)
-            out[node.identity] = {"accept": "accepted",
-                                  "reject": "rejected",
-                                  "revoke": "revoked"}.get(ruling, "pending")
+    for aid, versions in _artifacts(read).items():
+        rulings = _dispositions_about(read, aid,
+                                      [v.identity for v in versions])
+        if not rulings:
+            out[aid] = "pending"
+            continue
+        latest_by_author: Dict[str, str] = {}
+        for d in rulings:  # store order = ruling order
+            latest_by_author[d.properties["author"]] = d.properties["ruling"]
+        distinct = set(latest_by_author.values())
+        if len(distinct) > 1:
+            named = ", ".join(f"{a}: {r}" for a, r in
+                              sorted(latest_by_author.items()))
+            out[aid] = f"disagreement ({named}) — no winner; humans talk"
+        else:
+            ruling = rulings[-1].properties["ruling"]
+            out[aid] = {"accept": "accepted", "reject": "rejected",
+                        "revoke": "revoked"}.get(ruling, "pending")
+    return {"yield": out, "completeness": "total over artifacts",
+            "stamp": read.stamp()}
+
+
+def lens_current(read, params) -> Dict[str, Any]:
+    """A6, verbatim. Non-empty by construction: human ownership derives
+    from such a version existing."""
+    out = {}
+    for aid, versions in _artifacts(read).items():
+        if _ownership(read, aid, versions) == "machine":
+            chosen = versions[-1]
+        else:
+            accepted_ids = set()
+            for d in _dispositions_about(read, aid,
+                                         [v.identity for v in versions]):
+                if d.properties["ruling"] == "accept":
+                    accepted_ids.add(d.properties.get("accepted_version"))
+                    accepted_ids.add(d.properties["about"])
+            candidates = [v for v in versions
+                          if not _is_machine(v)
+                          or v.identity in accepted_ids]
+            chosen = candidates[-1]
+        out[aid] = {"version_id": chosen.identity, **chosen.properties}
     return {"yield": out, "completeness": "total over artifacts",
             "stamp": read.stamp()}
 
@@ -77,10 +126,10 @@ def lens_current_outcome(read, params) -> Dict[str, Any]:
 
 def lens_staleness(read, params) -> Dict[str, Any]:
     """PROD-2: the worklist IS this lens's output — every named scope
-    lacking a CURRENT description artifact about it."""
+    lacking a description artifact about it."""
     described = set()
     for d in read.nodes("description"):
-        described.add(d.properties.get("about"))
+        described.update(d.properties.get("about", []))
     stale = [n.identity for n in read.nodes("scope")
              if n.identity not in described]
     return {"yield": sorted(stale),

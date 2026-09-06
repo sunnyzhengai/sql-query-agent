@@ -133,7 +133,7 @@ def test_dba_responsibility_minted_from_prereq(built, expected):
     exp = expected["nodes"]["layer3_expected"][0]
     assert resp[0].properties["kind"] == exp["kind"]
     assert resp[0].properties["holder"] == exp["holder"]
-    assert resp[0].properties["about"] == "db:SIMDB"
+    assert resp[0].properties["about"] == ["db:SIMDB"]  # spine: >=1 target
 
 
 def test_change_reports_match_expectation(built):

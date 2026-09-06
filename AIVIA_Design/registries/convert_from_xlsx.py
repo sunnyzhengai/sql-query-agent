@@ -150,6 +150,15 @@ ADD_ROWS = [
       "ambiguous, human rules). DEFERRED from v1 (compares prior state)"},
      "register H7 (2026-09-05)"),
     ("lenses", "Catalog_v1",
+     {"Lens": "current",
+      "Reads": "version chains, dispositions (accepted_version pins)",
+      "Yields": "the current version per artifact (the A6 selection)",
+      "Completeness note": "total over artifacts; non-empty by "
+      "construction — RULING APPLIED at conversion: A6 model-first "
+      "ruling (2026-09-05) 'current is derived' lands as a catalog row; "
+      "the draft catalog predated it (caught at the slice-4 build)"},
+     "register A6 (2026-09-05)"),
+    ("lenses", "Catalog_v1",
      {"Lens": "demand",
       "Reads": "no-match asked events (redacted payloads)",
       "Yields": "unanswered-question themes + counts",
@@ -331,7 +340,7 @@ ADD_SHEETS = {
 # The v1 flag column — MVP scope as data (ruled 2026-09-05: the registry's
 # v1 flag is the authority; prose lens-counts retired from service).
 V1_LENSES = {"ownership", "authorship", "version", "standing",
-             "current-outcome", "staleness", "decisions(class)",
+             "current", "current-outcome", "staleness", "decisions(class)",
              "degenerate", "join-compliance", "relatedness",
              "working-set", "gap-census", "referenced-keys"}
 DEFER_WHY = {

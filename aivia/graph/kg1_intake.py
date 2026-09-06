@@ -98,9 +98,11 @@ def apply_registration(store: Store, reg: Dict[str, Any]) -> None:
         "minted_from": "registration prerequisite (DBA-completed)",
         "registered_at": as_of,
     }, as_of=as_of, extract_id="registration")
-    store.append_node("responsibility", f"responsibility:dba:{db_id}", {
-        "kind": "dba", "holder": reg["dba_team"], "about": db_id,
-    }, as_of=as_of, extract_id="registration")
+    from aivia.graph import kg3_artifacts
+    kg3_artifacts.append_responsibility(
+        store, artifact_id=f"responsibility:dba:{db_id}", kind="dba",
+        holder=reg["dba_team"], target=db_id, author=reg["dba_team"],
+        created_at=as_of)
 
 
 def validate_extract(reg: Dict[str, Any], snap: ExtractSnapshot,

@@ -63,7 +63,7 @@ def test_registry_is_frozen():
 def test_v1_lens_scope_readable_as_data():
     cat = metamodel.load("lenses").sheets["Catalog_v1"]
     v1 = [r["Lens"] for r in cat if r["v1"] == "yes"]
-    assert len(v1) == 13
-    assert "referenced-keys" in v1
+    assert len(v1) == 14  # +current, the A6 row landed at slice 4
+    assert "referenced-keys" in v1 and "current" in v1
     deferred = [r for r in cat if r["v1"].startswith("deferred (")]
     assert len(v1) + len(deferred) == len(cat)

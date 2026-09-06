@@ -16,6 +16,7 @@ V1_LENSES: Dict[str, Callable] = {
     "authorship": derivation.lens_authorship,
     "version": derivation.lens_version,
     "standing": derivation.lens_standing,
+    "current": derivation.lens_current,
     "current-outcome": derivation.lens_current_outcome,
     "staleness": derivation.lens_staleness,
     "decisions(class)": decisions.lens_decisions,

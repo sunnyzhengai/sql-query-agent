@@ -114,3 +114,36 @@ def validate_technical_layer(store) -> List[str]:
             problems.append(f"joins_to {edge.from_id} -> {edge.to_id}: "
                             "cardinality outside closed vocab")
     return problems
+
+
+def validate_artifact_layer(store) -> List[str]:
+    """CHECK-KG3-7: layer-3 spine + closed vocabularies. The registry's
+    Classes sheet is the authority; summaries (ownership, standing,
+    current) must NOT exist as stored fields (CHECK-KG3-1)."""
+    from aivia.graph import kg3_artifacts as kg3
+    problems = []
+    for node in store.current_nodes():
+        p = node.properties
+        if node.kind in kg3.STATE_CLASSES:
+            if not p.get("artifact_id"):
+                problems.append(f"{node.identity}: no artifact_id")
+            if not p.get("about"):
+                problems.append(f"{node.identity}: spine incomplete (about)")
+            author = str(p.get("author", ""))
+            if not author:
+                problems.append(f"{node.identity}: spine incomplete (author)")
+            if author.startswith("agent:") and not p.get("basis"):
+                problems.append(f"{node.identity}: machine version, no basis")
+            for banned in ("ownership", "standing", "current", "version"):
+                if banned in p:
+                    problems.append(f"{node.identity}: stored summary "
+                                    f"'{banned}' — the ledger law bans it")
+            if node.kind == "description" and author.startswith("agent:") \
+                    and p.get("status") not in kg3.DESCRIPTION_STATUS:
+                problems.append(f"{node.identity}: status outside vocab")
+        elif node.kind == "disposition":
+            if p.get("ruling") not in kg3.RULINGS:
+                problems.append(f"{node.identity}: ruling outside vocab")
+            if str(p.get("author", "")).startswith("agent:"):
+                problems.append(f"{node.identity}: agent disposition exists")
+    return problems

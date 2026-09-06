@@ -11,6 +11,7 @@
  "rulings_applied_at_conversion": [
   "register D12 (2026-09-05)",
   "register H7 (2026-09-05)",
+  "register A6 (2026-09-05)",
   "register H5 (2026-09-05)",
   "v1 flag column (ruled 2026-09-05: registry v1 flag is the authority; prose lens-counts retired)"
  ],
@@ -160,6 +161,13 @@
     "Yields": "corresponds|dispersed|merged|new per family",
     "Completeness note": "total over minted — RULING APPLIED at conversion: register H7 CLOSED 2026-09-05 (S4 overlap-maximal rule; ties -> ambiguous, human rules). DEFERRED from v1 (compares prior state)",
     "v1": "deferred (compares prior state; v1 is first contact)"
+   },
+   {
+    "Lens": "current",
+    "Reads": "version chains, dispositions (accepted_version pins)",
+    "Yields": "the current version per artifact (the A6 selection)",
+    "Completeness note": "total over artifacts; non-empty by construction — RULING APPLIED at conversion: A6 model-first ruling (2026-09-05) 'current is derived' lands as a catalog row; the draft catalog predated it (caught at the slice-4 build)",
+    "v1": "yes"
    },
    {
     "Lens": "demand",
