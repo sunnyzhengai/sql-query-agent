@@ -197,6 +197,32 @@ egress redaction at land like all outbound prose.
 
 ---
 
+## R9 — population composition (RETIRED 2026-09-06 — the
+## twin-graph ruling RATIFIED)
+
+*The twin-graph ruling ratified 2026-09-06 (see
+`Twin_Graph_KG_RULING.md`, piece 4): R9 retires — the composition
+sentence is the voicing-policy walk over SOURCE nodes of the
+meaning tree (ruling 4c), and the depth-1 ruling below carries
+forward as voicing policy. This grammar's next MAJOR version is
+the policy-walk port (ruling piece 4, phased per ruling 5d).*
+
+Discussion state (Sunny's ED-sepsis gap-check, finding 4 — the
+readmit corpse): each scope gains a composition sentence voicing what
+it reads — INNER joins as restriction, OUTER joins as optional match.
+Architecture: composition is a LENS yield (candidate: a fourth
+decisions yield beside membership|grain|value|path; registry entry
+pending); R9 only voices it. No metamodel change — table_ref already
+resolves to a KG1 table OR a same-tree scope. Named scope refs voice
+as REFERENCE PHRASES (readable name + grain, counted naming gap),
+never inlined summaries — candidate, unruled.
+
+RULED (Sunny, 2026-09-06): anonymous derived-table scopes render
+INLINE at depth 1 only; deeper nesting is COUNTED in gap-census with
+the revisit trigger declared (the v1.3.0 posture).
+
+---
+
 ## Ratification effects (the A13 flip)
 
 1. This file drops `_DRAFT`, gains `ratified: 2026-09-…`, and the

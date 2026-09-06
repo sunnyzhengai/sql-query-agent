@@ -1,6 +1,93 @@
 **** AIVIA Description Level 0
+(REWRITTEN 2026-09-06 — the twin-graph ruling, ratified; full
+ruling + change ledger: AIVIA_Design/Twin_Graph_KG_RULING.md.
+The body sections below predate this rewrite where they conflict,
+the ruling governs until the section-by-section amendment pass.)
 
-AIVIA is a knowledge graph of a customer's analytical logic — built from per-file semantic trees over a shared technical vocabulary, from which decisions are derived as lenses, holding all metadata and governance artifacts as citizens of the graph itself — and it serves two directions: outward, generating catalog metadata from the estate; inward, matching user inquiries to the estate logic that answers them — and generating new estate when none exists, which enters the graph the same way everything else does.
+AIVIA is a TWO-WAY ENGINE over a customer's analytical estate,
+built on one knowledge graph with three layers. Syntax is PARSED
+to the leaf; semantics is DERIVED to the leaf; the two are
+connected at every level — fused in KG1, pointed in KG2.
+
+- KG1 — the declared layer (the foundational databases: vendor
+  EMR + the org's own schemas): tables, columns, declared keys,
+  dictionary meanings, value maps — loaded from source metadata.
+  Syntax and semantics are FUSED here: one node carries what a
+  thing is and what it means, because declared meaning needs no
+  pointer to its source. Every object carries a content hash +
+  load stamp; the layer loads INCREMENTALLY — only changed source
+  objects touch the graph. KG1 grounds every translation.
+- KG2 — the derived layer (the org's reporting logic: procs,
+  views, metrics, reports), built as TWINS:
+  - KG2a, the parsed graph: one tree per file, built by the
+    dialect's NATIVE parser, every node carrying its verbatim
+    source fragment and location. Complete by conservation:
+    handled + counted == everything the AST holds, no third
+    bucket. Its ONLY outward pointers are resolution edges —
+    every table/column reference resolves to KG1 or is counted.
+    That narrowness is the choke point all lineage flows through.
+  - KG2b, the meaning graph: the homomorphic twin. Every meaning
+    node POINTS at the parsed node it translates and draws its
+    content from KG1 — derived meaning always cites its source.
+    Total by construction, never by enumeration: every parsed
+    node is translated or counted as a gap; even decides-nothing
+    predicates are translated. Meaning exists at EVERY grain the
+    parse has: leaf nodes translate through KG1; composite
+    nodes — scope, statement, file — translate by COMPOSING
+    their children's meanings, so a file's meaning is the
+    deterministic summary of everything inside it, never a
+    separate invention. Voicing is policy over this twin — what
+    prose prints is a choice; what meaning exists is not.
+- KG3 — the governance overlay: users and roles, usage events,
+  dispositions (certify, approve, reject), terms, minted
+  concepts. SPARSE by construction — citizens exist only where
+  someone acted — and NOT REGENERABLE: it holds human judgment
+  and gated machine output that exist nowhere else. Every citizen
+  anchors to MEANING identity (a KG2b content-key, or a KG1
+  node), never to syntax and never to a node instance — so
+  syntax-only churn costs no governance, and a changed meaning
+  visibly orphans its artifacts: drift detection falls out of the
+  anchoring rule.
+
+The graph is written ONLY by three BUILDERS — loader → KG1,
+parser → KG2a, translator → KG2b; governance has no builder, only
+human acts. Everything else that consumes the graph is a READING:
+named, versioned, deterministic — and it writes nothing.
+
+The engine runs both directions through the same layers:
+
+- OUTWARD (estate → catalog): parse into KG2a → twin into KG2b →
+  voice per policy → land stamped, regenerable catalog metadata;
+  human acts accrete in KG3.
+- INWARD (inquiry → estate): match the inquiry against KG2b, the
+  meaning graph → return the estate logic that answers it; when
+  none exists, generate new estate — which enters through the
+  same parser door as everything else: parsed, twinned, voiced,
+  governed.
+
+The lineage guarantee. The totality laws compose: every reference
+is captured or counted (conservation), resolved or counted
+(resolution), translated or counted (totality), and every
+governance act anchors to meaning. Therefore every ingested
+thing — an EMR column, a temp table, a metric — is reachable by
+graph traversal or present in a counted gap: NEVER SILENTLY
+ABSENT. Search a column and every table, sql block, metric, and
+user touching it is a traversal away (unresolved references stay
+findable by name). Lineage is not a feature built beside the
+graph; it is a query over edges the laws guarantee exist.
+
+```
+            ┌───────────────────── OUTWARD ─────────────────────────┐
+ estate ──► KG2a PARSED ══ points-at ══ KG2b MEANING ──policy──► catalog metadata
+   ▲        evidence · conservation     translation · total          stamped · regenerable
+   │            │ resolves_to               ▲   │  ▲
+   │            ▼                           │   │  └─ KG3 governance overlay
+   │        KG1 DECLARED (fused syntax+semantics, incremental)      (sparse · non-regenerable
+   │                                            │                    users · usage · decisions)
+   │                                            ▼
+   └──── generated estate ◄── (none exists) ◄─ match ◄── user inquiry
+            └───────────────────── INWARD ────────────────────────────┘
+```
 
 **** Content Descriptions — Levels 1-3 (restratified 2026-09-05)
 
