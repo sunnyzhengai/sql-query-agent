@@ -25,12 +25,12 @@
   },
   {
    "id": "PA-3-star-remainder",
-   "title": "SELECT * is a counted branch until ruled (no silent expansion)",
+   "title": "SELECT * carries meaning without enumeration (RULED 2026-09-06 at the plug-all-holes sweep; supersedes the counted-remainder interim posture)",
    "sql": "SELECT * FROM PATIENT",
    "expected": [
-    "star projection lands as a COUNTED remainder row with reason star_projection",
-    "no invented member nodes",
-    "conservation holds with the counted row"
+    "star lands as a projection member with star=true and NO name",
+    "its meaning is 'every column of the source at read time' - never an enumerated column list (drift-safe by construction)",
+    "no remainder row; conservation holds with the member"
    ]
   }
  ],

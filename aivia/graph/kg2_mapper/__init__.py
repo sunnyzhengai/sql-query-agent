@@ -106,11 +106,51 @@ def _map_expression(ctx, expr) -> Dict[str, Any]:
     if t == "UnaryExpression":
         return _node(ctx, "expression", "unary", expr,
                      args=[_map_expression(ctx, expr.Expression)])
-    if t in ("CastCall", "ConvertCall", "TryCastCall"):
+    if t in ("CastCall", "ConvertCall", "TryCastCall", "TryConvertCall"):
         return _node(ctx, "expression", "cast", expr,
                      args=[_map_expression(ctx, expr.Parameter)])
+    if t in ("SearchedCaseExpression", "SimpleCaseExpression"):
+        # the CASE kind (declared in Expression_Kinds since v1.0.0;
+        # 424 corpus instances were remainder until the 2026-09-06
+        # plug-all-holes sweep). Searched: WHEN <predicate> THEN
+        # <expr>; Simple: CASE <input> WHEN <expr> THEN <expr>.
+        whens = []
+        for w in expr.WhenClauses:
+            when_t = _type_name(w.WhenExpression)
+            when = (_map_predicate(ctx, w.WhenExpression)
+                    if when_t.startswith("Boolean")
+                    or when_t.endswith("Predicate")
+                    else _map_expression(ctx, w.WhenExpression))
+            whens.append({"when": when,
+                          "then": _map_expression(ctx, w.ThenExpression)})
+        return _node(ctx, "expression", "case", expr,
+                     input=(_map_expression(ctx, expr.InputExpression)
+                            if t == "SimpleCaseExpression" else None),
+                     whens=whens,
+                     else_result=(_map_expression(ctx, expr.ElseExpression)
+                                  if expr.ElseExpression else None))
+    if t == "CoalesceExpression":
+        return _node(ctx, "expression", "function", expr, name="COALESCE",
+                     args=[_map_expression(ctx, p)
+                           for p in expr.Expressions])
+    if t == "NullIfExpression":
+        return _node(ctx, "expression", "function", expr, name="NULLIF",
+                     args=[_map_expression(ctx, expr.FirstExpression),
+                           _map_expression(ctx, expr.SecondExpression)])
+    if t in ("LeftFunctionCall", "RightFunctionCall"):
+        return _node(ctx, "expression", "function", expr,
+                     name=t[:-12].upper(),
+                     args=[_map_expression(ctx, p)
+                           for p in expr.Parameters])
+    if t == "ParameterlessCall":
+        return _node(ctx, "expression", "function", expr,
+                     name=str(expr.ParameterlessCallType).upper(), args=[])
     if t == "ScalarSubquery":
-        return _node(ctx, "expression", "subquery_ref", expr)
+        # the interior maps as a full scope (plug-all-holes sweep:
+        # tables read ONLY inside subqueries were invisible to the
+        # working set — a lineage-truth hole)
+        return _node(ctx, "expression", "subquery_ref", expr,
+                     scope=_map_query(ctx, expr.QueryExpression))
     if t == "ParenthesisExpression":
         return _map_expression(ctx, expr.Expression)
     ctx.remainder.append({"type": t, **_evidence(ctx, expr),
@@ -163,8 +203,11 @@ def _map_predicate(ctx, cond) -> Dict[str, Any]:
         if cond.Subquery is not None:
             inner = _node(ctx, "predicate", "IN_SELECTION", cond,
                           subject=_map_expression(ctx, cond.Expression),
-                          selection=_node(ctx, "expression", "subquery_ref",
-                                          cond.Subquery))
+                          selection=_node(
+                              ctx, "expression", "subquery_ref",
+                              cond.Subquery,
+                              scope=_map_query(
+                                  ctx, cond.Subquery.QueryExpression)))
         else:
             members = [dict(_map_expression(ctx, v), position=i + 1)
                        for i, v in enumerate(cond.Values)]
@@ -185,15 +228,19 @@ def _map_predicate(ctx, cond) -> Dict[str, Any]:
         return _wrap_not(ctx, cond, inner, cond.IsNot)
     if t == "ExistsPredicate":
         return _node(ctx, "predicate", "EXISTS_SELECTION", cond,
-                     selection=_node(ctx, "expression", "subquery_ref",
-                                     cond.Subquery))
+                     selection=_node(
+                         ctx, "expression", "subquery_ref", cond.Subquery,
+                         scope=_map_query(ctx,
+                                          cond.Subquery.QueryExpression)))
     if t == "SubqueryComparisonPredicate":
         return _node(ctx, "predicate", "QUANTIFIED_COMPARE", cond,
                      subject=_map_expression(ctx, cond.Expression),
                      comparison_op=str(cond.ComparisonType),
                      quantifier=str(cond.SubqueryComparisonPredicateType),
-                     selection=_node(ctx, "expression", "subquery_ref",
-                                     cond.Subquery))
+                     selection=_node(
+                         ctx, "expression", "subquery_ref", cond.Subquery,
+                         scope=_map_query(ctx,
+                                          cond.Subquery.QueryExpression)))
     ctx.remainder.append({"type": t, **_evidence(ctx, cond),
                           "reason": "unmapped boolean construct — "
                           "deferred or new vendor syntax"})
@@ -230,6 +277,14 @@ def _collect_from(ctx, table_ref, refs, join_on):
             "derived_scope": _map_query(ctx, table_ref.QueryExpression),
             "alias": table_ref.Alias.Value if table_ref.Alias else None,
             "evidence": _evidence(ctx, table_ref)})
+    elif t == "PivotedTableReference":
+        # reads captured (the inner table joins from_refs and the
+        # working set); the pivot TRANSFORM's semantics stay counted —
+        # engine debt, honestly declared, never invisible reads
+        _collect_from(ctx, table_ref.TableReference, refs, join_on)
+        ctx.remainder.append({"type": t, **_evidence(ctx, table_ref),
+                              "reason": "pivot transform (reads "
+                              "captured; transform semantics counted)"})
     else:
         ctx.remainder.append({"type": t, **_evidence(ctx, table_ref),
                               "reason": "unmapped table reference"})
@@ -307,8 +362,22 @@ def _map_query(ctx, query) -> Dict[str, Any]:
                                "expression": expr,
                                "evidence": _evidence(ctx, el)})
         elif et == "SelectStarExpression":
-            ctx.remainder.append({"type": et, **_evidence(ctx, el),
-                                  "reason": "star_projection"})
+            # RESOLVED 2026-09-06 (plug-all-holes sweep): a star's
+            # MEANING is 'every column of the source at read time' —
+            # meaning without enumeration, drift-safe by construction
+            # (an enumerated expansion would freeze a column list the
+            # source can outgrow). No longer a counted gap.
+            qualifier = (".".join(i.Value for i in
+                                  el.Qualifier.Identifiers)
+                         if el.Qualifier else None)
+            projection.append({"node": "projection_member",
+                               "position": i + 1, "name": None,
+                               "star": True, "qualifier": qualifier,
+                               "expression": {"node": "expression",
+                                              "kind": "star",
+                                              "evidence":
+                                              _evidence(ctx, el)},
+                               "evidence": _evidence(ctx, el)})
         else:
             ctx.remainder.append({"type": et, **_evidence(ctx, el),
                                   "reason": "unmapped select element"})
@@ -379,41 +448,86 @@ def map_tree(file_name: str, text: str, dialect: str = "tsql"
             else:
                 yield stmt
 
+    def process(stmt):
+        nonlocal position
+        position += 1
+        t = _type_name(stmt)
+        entry: Dict[str, Any] = {"position": position,
+                                 "evidence": _evidence(ctx, stmt)}
+        if t == "IfStatement":
+            entry["statement_kind"] = "IF"
+            entry["predicate"] = _map_predicate(ctx, stmt.Predicate)
+            param = _param_default(ctx, stmt)
+            if param:
+                parameters[param["name"]] = param
+        elif t == "SelectStatement":
+            scope = _map_query(ctx, stmt.QueryExpression)
+            # CTEs: each mints a NAMED scope in the same tree
+            ctes = []
+            if stmt.WithCtesAndXmlNamespaces:
+                for cte in stmt.WithCtesAndXmlNamespaces.CommonTableExpressions:
+                    inner = _map_query(ctx, cte.QueryExpression)
+                    inner["name"] = cte.ExpressionName.Value
+                    ctes.append(inner)
+            if stmt.Into is not None:
+                scope["name"] = _table_name(stmt.Into)
+                entry["statement_kind"] = "SELECT INTO"
+            else:
+                entry["statement_kind"] = "SELECT"
+                entry["emits"] = True
+            entry["scope"] = scope
+            if ctes:
+                entry["ctes"] = ctes
+        elif t == "InsertStatement":
+            # plug-all-holes sweep (2026-09-06): INSERT is a
+            # population WRITE — its source selection maps as a scope
+            # NAMED for the write target (the SELECT INTO pattern), so
+            # downstream reads of the target resolve through it
+            spec = stmt.InsertSpecification
+            src = spec.InsertSource
+            if _type_name(src) == "SelectInsertSource":
+                scope = _map_query(ctx, src.Select)
+                scope["name"] = _table_name(spec.Target.SchemaObject)
+                names = [list(c.MultiPartIdentifier.Identifiers)[-1].Value
+                         for c in spec.Columns]
+                if names and len(names) == len(scope.get("projection",
+                                                         [])):
+                    # explicit column list names the TARGET columns —
+                    # they override the source expressions' names
+                    for member, name in zip(scope["projection"], names):
+                        member["name"] = name
+                entry["statement_kind"] = "INSERT"
+                entry["scope"] = scope
+            else:
+                entry["statement_kind"] = "INSERT"
+                ctx.remainder.append(
+                    {"type": f"InsertStatement:{_type_name(src)}",
+                     **_evidence(ctx, stmt),
+                     "reason": "unmapped insert source"})
+        elif t == "WhileStatement":
+            # control flow nests statements: the WHILE entry carries
+            # its predicate; the body's statements process in order
+            entry["statement_kind"] = "WHILE"
+            entry["predicate"] = _map_predicate(ctx, stmt.Predicate)
+            statements.append(entry)
+            for inner in executable_statements([stmt.Statement]):
+                process(inner)
+            return
+        elif t == "SetVariableStatement":
+            # value FLOW is meaning: @var carries logic into later
+            # filters; the assignment is captured, never dropped
+            entry["statement_kind"] = "SET"
+            entry["parameter"] = stmt.Variable.Name.lstrip("@")
+            entry["expression"] = _map_expression(ctx, stmt.Expression)
+        else:
+            entry["statement_kind"] = t
+            ctx.remainder.append({"type": t, **_evidence(ctx, stmt),
+                                  "reason": "unmapped statement kind"})
+        statements.append(entry)
+
     for batch in fragment.Batches:
         for stmt in executable_statements(batch.Statements):
-            position += 1
-            t = _type_name(stmt)
-            entry: Dict[str, Any] = {"position": position,
-                                     "evidence": _evidence(ctx, stmt)}
-            if t == "IfStatement":
-                entry["statement_kind"] = "IF"
-                entry["predicate"] = _map_predicate(ctx, stmt.Predicate)
-                param = _param_default(ctx, stmt)
-                if param:
-                    parameters[param["name"]] = param
-            elif t == "SelectStatement":
-                scope = _map_query(ctx, stmt.QueryExpression)
-                # CTEs: each mints a NAMED scope in the same tree
-                ctes = []
-                if stmt.WithCtesAndXmlNamespaces:
-                    for cte in stmt.WithCtesAndXmlNamespaces.CommonTableExpressions:
-                        inner = _map_query(ctx, cte.QueryExpression)
-                        inner["name"] = cte.ExpressionName.Value
-                        ctes.append(inner)
-                if stmt.Into is not None:
-                    scope["name"] = _table_name(stmt.Into)
-                    entry["statement_kind"] = "SELECT INTO"
-                else:
-                    entry["statement_kind"] = "SELECT"
-                    entry["emits"] = True
-                entry["scope"] = scope
-                if ctes:
-                    entry["ctes"] = ctes
-            else:
-                entry["statement_kind"] = t
-                ctx.remainder.append({"type": t, **_evidence(ctx, stmt),
-                                      "reason": "unmapped statement kind"})
-            statements.append(entry)
+            process(stmt)
 
     # R8 annotations (grammar v1.2.0): a TRAILING SAME-LINE comment is
     # the predicate's (or IN-member's) annotation — verbatim estate
@@ -529,13 +643,64 @@ def resolve(tree: Dict[str, Any], store: Store, reg: Dict[str, Any],
     census = {"resolved_refs": 0, "same_tree_refs": 0,
               "unresolved_refs": 0, "unresolved": []}
 
-    def resolve_scope(scope):
+    # named scopes' output columns (folded), for disambiguation and
+    # scope-member binding — combination scopes expose arm 1's shape
+    scope_projections: Dict[str, set] = {}
+    for stmt in tree["statements"]:
+        for s in (list(stmt.get("ctes", []))
+                  + ([stmt["scope"]] if stmt.get("scope") else [])):
+            if "name_key" not in s:
+                continue
+            arms = s.get("combination_arms")
+            proj = (arms[0].get("projection", []) if arms
+                    else s.get("projection", []))
+            scope_projections[s["name_key"]] = {
+                _fold(m["name"]) for m in proj if m.get("name")}
+
+    def _count_unresolved(ref, detail):
+        census["unresolved_refs"] += 1
+        census["unresolved"].append(ref)
+        census.setdefault("unresolved_detail", []).append(detail)
+
+    def _bind_column(col, kind, target, colname) -> None:
+        if kind == "table":
+            col_id = folded_columns.get(f"{target}|{_fold(colname)}")
+            if col_id:
+                col["resolves_to"] = col_id
+                census["resolved_refs"] += 1
+            else:
+                col["resolves_to"] = None
+                _count_unresolved(col["ref"],
+                                  {"ref": col["ref"], "kind": "column",
+                                   "table": target})
+        elif kind == "scope":
+            col["resolves_to"] = f"SAME-TREE scope {target}"
+            census["same_tree_column_refs"] = \
+                census.get("same_tree_column_refs", 0) + 1
+        else:
+            col["resolves_to"] = None
+            census["ambiguous_unqualified"] = \
+                census.get("ambiguous_unqualified", 0) + 1
+
+    def _subquery_scopes_in(node):
+        if isinstance(node, dict):
+            if node.get("kind") == "subquery_ref" and "scope" in node:
+                yield node["scope"]
+            else:
+                for v in node.values():
+                    yield from _subquery_scopes_in(v)
+        elif isinstance(node, list):
+            for v in node:
+                yield from _subquery_scopes_in(v)
+
+    def resolve_scope(scope, outer=()):
         for arm in scope.get("combination_arms", []):
-            resolve_scope(arm)
+            resolve_scope(arm, outer)
         alias_to = {}
         for ref in scope.get("from_refs", []):
             if "derived_scope" in ref:
-                resolve_scope(ref["derived_scope"])
+                resolve_scope(ref["derived_scope"],
+                              (alias_to,) + tuple(outer))
                 if ref.get("alias"):
                     alias_to[ref["alias"]] = ("derived", None)
                 continue
@@ -573,69 +738,74 @@ def resolve(tree: Dict[str, Any], store: Store, reg: Dict[str, Any],
             elif "." in name:
                 alias_to[name.rsplit(".", 1)[1]] = target
 
-        # Phase C (T-3 review): a SINGLE-SOURCE scope binds its
-        # unqualified column refs to that source safely — one table
-        # read, no ambiguity. Multi-source scopes keep unqualified
-        # refs COUNTED as ambiguous, never guessed.
-        sole = None
-        targets = [(k, t) for k, t in alias_to.items()]
-        if len({t for _, t in targets}) == 1 and targets:
-            sole = targets[0][1]
+        # subquery interiors resolve with THIS scope's aliases in
+        # reach (correlated refs — plug-all-holes sweep 2026-09-06)
+        for sub in _subquery_scopes_in([scope.get("where"),
+                                        scope.get("join_on"),
+                                        scope.get("select_refs")]):
+            resolve_scope(sub, (alias_to,) + tuple(outer))
+
+        def lookup_alias(alias):
+            for frame in (alias_to,) + tuple(outer):
+                if alias in frame:
+                    return frame[alias]
+            return None
+
+        # single-part refs: bind by SOLE source, else disambiguate by
+        # COLUMN MEMBERSHIP — if exactly one source declares the
+        # column, the binding is safe; 0 or 2+ stay counted
+        targets = list(dict.fromkeys(alias_to.values()))
         for col in _column_refs_in([scope.get("where"),
                                     scope.get("join_on"),
                                     scope.get("select_refs")]):
+            if col.get("resolves_to") is not None:
+                continue  # bound while resolving a subquery pass
             parts = col["ref"].split(".")
-            if len(parts) == 1 and sole is not None:
-                kind, target = sole
-                if kind == "derived":
-                    # sole source is an anonymous derived table — no
-                    # name to bind through; counted, never guessed
+            if len(parts) == 1:
+                colname = parts[0]
+                candidates = []
+                for kind, target in targets:
+                    if kind == "table" and folded_columns.get(
+                            f"{target}|{_fold(colname)}"):
+                        candidates.append((kind, target))
+                    elif kind == "scope" and _fold(colname) in \
+                            scope_projections.get(target, set()):
+                        candidates.append((kind, target))
+                if len(targets) == 1:
+                    kind, target = targets[0]
+                    if kind == "derived":
+                        census["ambiguous_unqualified"] = \
+                            census.get("ambiguous_unqualified", 0) + 1
+                        continue
+                    _bind_column(col, kind, target, colname)
+                elif len(candidates) == 1:
+                    kind, target = candidates[0]
+                    _bind_column(col, kind, target, colname)
+                elif not candidates and targets and all(
+                        k == "table" for k, _ in targets):
+                    # every source is a known table and NONE declares
+                    # the column — the drift class, counted
+                    col["resolves_to"] = None
+                    _count_unresolved(col["ref"],
+                                      {"ref": col["ref"],
+                                       "kind": "column",
+                                       "table": "(no source declares "
+                                       "it)"})
+                else:
                     census["ambiguous_unqualified"] = \
                         census.get("ambiguous_unqualified", 0) + 1
-                    continue
-                if kind == "table":
-                    col_id = folded_columns.get(
-                        f"{target}|{_fold(parts[0])}")
-                    if col_id:
-                        col["resolves_to"] = col_id
-                        census["resolved_refs"] += 1
-                    else:
-                        col["resolves_to"] = None
-                        census["unresolved_refs"] += 1
-                        census["unresolved"].append(col["ref"])
-                        census.setdefault("unresolved_detail", []).append(
-                            {"ref": col["ref"], "kind": "column",
-                             "table": target})
-                elif kind == "scope":
-                    col["resolves_to"] = f"SAME-TREE scope {target}"
-                    census["same_tree_column_refs"] = \
-                        census.get("same_tree_column_refs", 0) + 1
                 continue
-            if len(parts) == 1:
-                census["ambiguous_unqualified"] = \
-                    census.get("ambiguous_unqualified", 0) + 1
-                continue
-            if len(parts) == 2 and parts[0] in alias_to:
-                kind, target = alias_to[parts[0]]
-                if kind == "table":
-                    col_id = folded_columns.get(
-                        f"{target}|{_fold(parts[1])}")
-                    if col_id:
-                        col["resolves_to"] = col_id
-                        census["resolved_refs"] += 1
-                    else:
-                        col["resolves_to"] = None
-                        census["unresolved_refs"] += 1
-                        census["unresolved"].append(col["ref"])
-                        census.setdefault("unresolved_detail", []).append(
-                            {"ref": col["ref"], "kind": "column",
-                             "table": target})
-                elif kind == "scope":
-                    col["resolves_to"] = f"SAME-TREE scope {target}"
-                    census["same_tree_column_refs"] = \
-                        census.get("same_tree_column_refs", 0) + 1
+            if len(parts) == 2:
+                bound = lookup_alias(parts[0])
+                if bound is not None:
+                    kind, target = bound
+                    _bind_column(col, kind, target, parts[1])
                 else:
+                    # a qualifier naming no known source: counted,
+                    # never silently skipped (the old walk's hole)
                     col["resolves_to"] = None
+                    census["unbound_qualified"] = \
+                        census.get("unbound_qualified", 0) + 1
 
     def walk_params(node):
         if isinstance(node, dict):

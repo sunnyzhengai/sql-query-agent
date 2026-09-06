@@ -68,12 +68,20 @@ SOURCES = {
 # shrinks with builds) or estate (the customer's; the product's
 # findings). Gap_Classes is the closed assignment; a new counted
 # class must join it at birth.
-STAMP_VERSION = "1.5.0"
+# v1.6.0 (2026-09-06): the PLUG-ALL-HOLES sweep (Sunny: "we are
+# paying the price in the output") — CASE/COALESCE/LEFT/TryConvert
+# expressions, subquery INTERIORS (lineage truth), INSERT/WHILE/SET,
+# comma joins + APPLY, PIVOT reads, star RULED (meaning without
+# enumeration — supersedes the counted interim), correlated +
+# membership-disambiguated resolution; PrintStatement joins the
+# operational list (diagnostic text, no data meaning; surfaced when
+# WHILE bodies opened).
+STAMP_VERSION = "1.6.0"
 RATIFIED = True
 DOC_STAMP = ("v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 twin-graph "
              "ruling ADR 0077; v1.2.0 Phase A metamodel bump; v1.3.0 "
              "Phase B composite-kinds correction; v1.4.0 T-2 "
-             "operational-statements ruling; v1.5.0 the gap taxonomy "
+             "operational-statements ruling; v1.5.0 the gap taxonomy; v1.6.0 the plug-all-holes sweep "
              "(all 2026-09-06)")
 CONVERTED_ON = "2026-09-05"
 
@@ -489,8 +497,11 @@ TWIN_SHEETS = {
              "Rationale": "session options"},
             {"ScriptDom type": "DeclareVariableStatement",
              "Rationale": "plumbing declaration; a variable's MEANING "
-             "arrives where it is assigned/used (SET @var stays DEBT "
-             "— assignments can carry logic)"},
+             "arrives where it is assigned/used (SET @var MAPPED "
+             "2026-09-06 — assignments carry logic)"},
+            {"ScriptDom type": "PrintStatement",
+             "Rationale": "diagnostic text to the console; no data "
+             "meaning (surfaced when WHILE bodies opened, 2026-09-06)"},
         ],
         "Gap_Classes": [
             {"Counted class": "_ruling", "Kind": "-", "Owner": "-",
@@ -510,20 +521,21 @@ TWIN_SHEETS = {
              "Kind": "RULED-SILENT", "Owner": "-",
              "Meaning": "rows survive without a match — voicing as a "
              "filter would lie (v1.3.0); counted in the ledger"},
-            {"Counted class": "unmapped statement kinds "
-             "(INSERT, WHILE, SET @var)",
+            {"Counted class": "unmapped statement kinds",
              "Kind": "OPEN", "Owner": "engine",
-             "Meaning": "carry real meaning (population writes, loop "
-             "logic, value flow); map evidence-ordered as estate "
-             "demand shows them"},
+             "Meaning": "carry real meaning; map evidence-ordered. "
+             "INSERT/WHILE/SET MAPPED 2026-09-06 (plug-all-holes); "
+             "current residents: DELETE, GOTO (2 each)"},
             {"Counted class": "unmapped query shapes (UNION ...) and "
              "table references (PIVOT ...)",
              "Kind": "OPEN", "Owner": "engine",
              "Meaning": "the combination meaning kind awaits them"},
             {"Counted class": "star projection",
-             "Kind": "OPEN", "Owner": "engine",
-             "Meaning": "counted until star expansion is ruled (the "
-             "drift-interaction question)"},
+             "Kind": "RESOLVED", "Owner": "-",
+             "Meaning": "RULED 2026-09-06: a star translates as "
+             "'every column of the source at read time' — meaning "
+             "without enumeration, drift-safe by construction; it "
+             "left the gap ledger entirely"},
             {"Counted class": "ambiguous unqualified refs",
              "Kind": "OPEN", "Owner": "engine",
              "Meaning": "multi-source scopes; column-membership "

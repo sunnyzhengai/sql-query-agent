@@ -11,29 +11,27 @@
   "estate": {
     "acquired": 38,
     "counted_excluded": 0,
-    "resolved_refs": 245,
-    "same_tree_refs": 51,
+    "resolved_refs": 250,
+    "same_tree_refs": 54,
     "unresolved_refs": 0,
     "phi_redactions": 0,
-    "remainder_total": 42,
+    "remainder_total": 2,
     "remainder_types": {
       "DeclareVariableStatement": 1,
-      "ExecuteStatement": 1,
-      "SearchedCaseExpression": 3,
-      "SelectStarExpression": 37
+      "ExecuteStatement": 1
     },
     "_phase_a_note": "was 6 before the Phase A build (ADR 0077, 2026-09-06): SELECT * elements were previously SKIPPED SILENTLY by the select walk — projection capture closed the hole; 37 stars now COUNT as star_projection remainder until star expansion is ruled",
     "_phi_note": "was 2 before the ADR 0025 posture landed at the sepsis shakedown (2026-09-06): the probe's id/name literals now COUNT at door 1 and redact at egress; only context-free contact shapes redact at intake",
-    "_abx_note": "ABX-corpse build (2026-09-06): COMBINATION scopes map; BinaryQueryExpression leaves the remainder; arm refs resolve"
+    "_abx_note": "ABX-corpse build (2026-09-06): COMBINATION scopes map; BinaryQueryExpression leaves the remainder; arm refs resolve",
+    "_sweep_note": "plug-all-holes 2026-09-06: stars are projection members (ruled), CASE mapped, subquery interiors mapped; remainder 42 -> 2"
   },
   "lenses": {
-    "working_set_touched": 16,
+    "working_set_touched": 17,
     "working_set_total": 22,
     "untouched": [
       "DM_REGISTRY",
       "LAB_CODESET",
       "LAB_ORDERS",
-      "PATIENT_PCP_ASSIGNMENT",
       "PROCEDURE_ORDERS",
       "PROC_CODESET"
     ],

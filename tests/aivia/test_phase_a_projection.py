@@ -65,15 +65,20 @@ def test_pa2_select_into_single_member():
     assert "#Base_Pop_ED_Readmit" not in read
 
 
-def test_pa3_star_is_counted_never_expanded():
+def test_pa3_star_is_meaning_never_enumeration():
+    # RULED 2026-09-06 (plug-all-holes sweep): a star's meaning is
+    # 'every column of the source at read time' — total by reference,
+    # never an enumerated list (enumeration would freeze a column set
+    # the source can outgrow: the drift hazard the interim counted
+    # posture was waiting on)
     case = BY_ID["PA-3-star-remainder"]
     tree = map_tree("pa3.sql", case["sql"])
     scope = _scope(tree)
-    assert scope["projection"] == []
-    stars = [r for r in tree["remainder"]
-             if r["reason"] == "star_projection"]
-    assert len(stars) == 1
-    assert stars[0]["type"] == "SelectStarExpression"
+    assert len(scope["projection"]) == 1
+    star = scope["projection"][0]
+    assert star.get("star") is True and star["name"] is None
+    assert star["expression"]["kind"] == "star"
+    assert tree["remainder"] == []
 
 
 def test_every_select_element_is_member_or_counted():

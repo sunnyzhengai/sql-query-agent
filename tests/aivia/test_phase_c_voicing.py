@@ -92,6 +92,6 @@ def test_operational_statements_never_voice_but_exist(read):
     twins = {n.properties["twin"]["file"]: n.properties["twin"]
              for n in read.nodes("meaning_twin")}
     ops = sum(t["census"]["operational"] for t in twins.values())
-    assert ops == 275
+    assert ops == 277  # +2 PRINTs when WHILE bodies opened
     floor = produce.compose_floor(read, READMIT)
     assert "index" not in floor.lower()

@@ -224,10 +224,43 @@ class _Walk:
                             {"operation": salient,
                              "window": bool(expr.get("over"))},
                             [kind, salient, over], child_keys=child_keys)
+        if kind == "case":
+            child_keys = []
+            if expr.get("input") is not None:
+                child_keys.append(self.expression(
+                    expr["input"], f"{path}/input")["content_key"])
+            for i, w in enumerate(expr.get("whens", [])):
+                when = w["when"]
+                translator = (self.condition
+                              if when.get("node") in ("predicate",
+                                                      "structure")
+                              else self.expression)
+                child_keys.append(translator(
+                    when, f"{path}/whens/{i}/when")["content_key"])
+                child_keys.append(self.expression(
+                    w["then"], f"{path}/whens/{i}/then")["content_key"])
+            if expr.get("else_result") is not None:
+                child_keys.append(self.expression(
+                    expr["else_result"], f"{path}/else")["content_key"])
+            return self.add("reference", path,
+                            {"operation": "case",
+                             "branches": len(expr.get("whens", []))},
+                            ["case"], child_keys=child_keys)
+        if kind == "star":
+            # RESOLVED 2026-09-06: the star's meaning is total-by-
+            # reference — never an enumerated column list (drift-safe)
+            return self.add("reference", path,
+                            {"words": "every column of the source at "
+                             "read time"},
+                            ["star"])
         if kind == "subquery_ref":
+            child_keys = []
+            if "scope" in expr:
+                child_keys.append(self.scope(
+                    expr["scope"], f"{path}/scope")["content_key"])
             return self.add("reference", path,
                             {"selection": "separately defined"},
-                            ["subquery_ref"])
+                            ["subquery_ref"], child_keys=child_keys)
         if kind == "remainder_ref":
             return self.gap(path, "unmapped_expression")
         return self.gap(path, f"unrecognized_expression:{kind}")
@@ -389,7 +422,18 @@ class _Walk:
             child_keys.append(
                 self.condition(stmt["predicate"], f"{path}/predicate")
                 ["content_key"])
+        if stmt.get("expression") is not None:  # SET @var = <expr>
+            child_keys.append(
+                self.expression(stmt["expression"], f"{path}/expression")
+                ["content_key"])
         kind_label = stmt.get("statement_kind", "?")
+        if kind_label in ("INSERT", "WHILE", "SET") and child_keys:
+            return self.add("statement", path,
+                            {"does": kind_label,
+                             **({"parameter": stmt["parameter"]}
+                                if stmt.get("parameter") else {})},
+                            [kind_label, stmt.get("parameter", "")],
+                            child_keys=child_keys)
         if kind_label in OPERATIONAL_STATEMENTS:
             # T-2 RULED: no analytic meaning BY RULING — translated
             # (the homomorphism holds), silenced by policy, never debt
@@ -438,6 +482,16 @@ def parsed_census(tree: Dict[str, Any]) -> int:
         count += 1
         for a in e.get("args", []):
             expr(a)
+        if e.get("input") is not None:
+            expr(e["input"])
+        for w in e.get("whens", []):
+            (cond if w["when"].get("node") in ("predicate", "structure")
+             else expr)(w["when"])
+            expr(w["then"])
+        if e.get("else_result") is not None:
+            expr(e["else_result"])
+        if e.get("kind") == "subquery_ref" and "scope" in e:
+            scope(e["scope"])
 
     def cond(p):
         nonlocal count
@@ -476,6 +530,8 @@ def parsed_census(tree: Dict[str, Any]) -> int:
             scope(stmt["scope"])
         if stmt.get("predicate") is not None:
             cond(stmt["predicate"])
+        if stmt.get("expression") is not None:
+            expr(stmt["expression"])
     count += len(tree.get("parameters", []))
     return count
 

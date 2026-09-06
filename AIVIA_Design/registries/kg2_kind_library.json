@@ -1,9 +1,9 @@
 {
  "registry": "kg2_kind_library",
  "stamp": {
-  "version": "1.5.0",
+  "version": "1.6.0",
   "doc_section": "Level 1 / KG Layer 2 — kind library (T-SQL predicates)",
-  "doc_stamp": "v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 twin-graph ruling ADR 0077; v1.2.0 Phase A metamodel bump; v1.3.0 Phase B composite-kinds correction; v1.4.0 T-2 operational-statements ruling; v1.5.0 the gap taxonomy (all 2026-09-06)",
+  "doc_stamp": "v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 twin-graph ruling ADR 0077; v1.2.0 Phase A metamodel bump; v1.3.0 Phase B composite-kinds correction; v1.4.0 T-2 operational-statements ruling; v1.5.0 the gap taxonomy; v1.6.0 the plug-all-holes sweep (all 2026-09-06)",
   "ratified": true,
   "converted_on": "2026-09-05",
   "converted_from": "L1_KG2_Kind_Library_TSQL_Predicates_DRAFT.xlsx"
@@ -466,7 +466,11 @@
    },
    {
     "ScriptDom type": "DeclareVariableStatement",
-    "Rationale": "plumbing declaration; a variable's MEANING arrives where it is assigned/used (SET @var stays DEBT — assignments can carry logic)"
+    "Rationale": "plumbing declaration; a variable's MEANING arrives where it is assigned/used (SET @var MAPPED 2026-09-06 — assignments carry logic)"
+   },
+   {
+    "ScriptDom type": "PrintStatement",
+    "Rationale": "diagnostic text to the console; no data meaning (surfaced when WHILE bodies opened, 2026-09-06)"
    }
   ],
   "Gap_Classes": [
@@ -495,10 +499,10 @@
     "Meaning": "rows survive without a match — voicing as a filter would lie (v1.3.0); counted in the ledger"
    },
    {
-    "Counted class": "unmapped statement kinds (INSERT, WHILE, SET @var)",
+    "Counted class": "unmapped statement kinds",
     "Kind": "OPEN",
     "Owner": "engine",
-    "Meaning": "carry real meaning (population writes, loop logic, value flow); map evidence-ordered as estate demand shows them"
+    "Meaning": "carry real meaning; map evidence-ordered. INSERT/WHILE/SET MAPPED 2026-09-06 (plug-all-holes); current residents: DELETE, GOTO (2 each)"
    },
    {
     "Counted class": "unmapped query shapes (UNION ...) and table references (PIVOT ...)",
@@ -508,9 +512,9 @@
    },
    {
     "Counted class": "star projection",
-    "Kind": "OPEN",
-    "Owner": "engine",
-    "Meaning": "counted until star expansion is ruled (the drift-interaction question)"
+    "Kind": "RESOLVED",
+    "Owner": "-",
+    "Meaning": "RULED 2026-09-06: a star translates as 'every column of the source at read time' — meaning without enumeration, drift-safe by construction; it left the gap ledger entirely"
    },
    {
     "Counted class": "ambiguous unqualified refs",

@@ -149,6 +149,19 @@ class _Voice:
             # raw identifiers never face the steward (R5; the line-83
             # corpse: '[#base_pop].ed_departure_time' in prose)
             return f"the {self.subject(expr)}"
+        if kind == "case":
+            return "a value derived by rule"
+        if kind == "function" and expr.get("name", "").upper() \
+                == "COALESCE":
+            parts = [self.value(a, a) for a in expr.get("args", [])]
+            return "the first recorded of " + ", ".join(parts)
+        if kind == "function" and expr.get("name", "").upper() in \
+                ("LEFT", "RIGHT") and len(expr.get("args", [])) == 2:
+            side = ("first" if expr["name"].upper() == "LEFT"
+                    else "last")
+            n = expr["args"][1].get("value")
+            return (f"the {side} {n} characters of "
+                    f"{self.value(expr['args'][0], expr['args'][0])}")
         if kind == "function" and expr.get("name", "").upper() == "DATEADD" \
                 and len(expr.get("args", [])) == 3:
             # ADR 0076 evidence-ordered overlay: DATEADD earned its
