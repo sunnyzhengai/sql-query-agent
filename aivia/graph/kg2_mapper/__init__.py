@@ -218,6 +218,13 @@ def _collect_from(ctx, table_ref, refs, join_on):
         on_pred = _map_predicate(ctx, table_ref.SearchCondition)
         on_pred["join_type"] = str(table_ref.QualifiedJoinType)
         join_on.append(on_pred)
+    elif t == "UnqualifiedJoin":
+        # the comma join (FROM A, B) — Clarity-era style; 61 corpus
+        # reads were invisible to from_refs until the ABX sweep found
+        # the class (2026-09-06). No ON clause: the link lives in the
+        # WHERE as col=col keys, already structure by the v1.3.0 law.
+        _collect_from(ctx, table_ref.FirstTableReference, refs, join_on)
+        _collect_from(ctx, table_ref.SecondTableReference, refs, join_on)
     elif t == "QueryDerivedTable":
         refs.append({
             "derived_scope": _map_query(ctx, table_ref.QueryExpression),

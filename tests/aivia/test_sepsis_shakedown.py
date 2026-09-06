@@ -137,7 +137,9 @@ def test_bpa_corpse_on_clause_filter_is_membership(shaken):
                                    "reporting/USP_ED_SEPSIS.sql::#BPA")
     assert "'900130001'" in floor  # the recovered ON-clause filter
     gc = _census.lens_gap_census(ReadApi(store), None)
-    assert gc["outer_join_conditions_not_voiced"] == 87  # counted, declared
+    assert gc["outer_join_conditions_not_voiced"] == 118  # counted, declared
+    # 87 -> 118 at the ABX sweep (2026-09-06): UNION arms + comma-join
+    # branches carry outer joins the old walk never reached
 
 
 def test_r5_phrasing_corpses(shaken):

@@ -281,7 +281,13 @@ def _composition_sentence(read: ReadApi, tree, scope,
         return None
     join_kinds = {str(on.get("join_type"))
                   for on in scope.get("join_on", [])}
-    inner_only = join_kinds <= {"Inner"}
+    # restriction wording needs a LINK: an ON clause, or comma-join
+    # keys (col=col) in the WHERE; linkless multi-source = cartesian,
+    # voiced neutrally ("combined with") — never a false restriction
+    linked = bool(scope.get("join_on")) or any(
+        decisions.is_join_key(leaf)
+        for leaf in decisions.flatten_where(scope.get("where")))
+    inner_only = join_kinds <= {"Inner"} and linked
     phrases = []
     for ref in refs:
         if "derived_scope" in ref:
