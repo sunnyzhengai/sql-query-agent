@@ -51,6 +51,21 @@ customers, never in public/demo assets.
    INTEGRITY: every table in part 2 must have pk rows here —
    violation is a named refusal (INTAKE-10). pk is DECLARED DATA,
    never prose-derived.
+3c. **org-catalog columns** (added 2026-09-06, from the sepsis
+   shakedown finding; ratification Sunny's): the vendor's dictionary
+   NEVER documents the org's own tables (report/staging tables in
+   org schemas) — that gap is structural, every customer has it. The
+   extract therefore includes a catalog part: tables + columns for
+   the org-owned schemas read from the DATABASE CATALOG itself
+   (INFORMATION_SCHEMA / sys.columns) — declared metadata, not
+   parse-derived. Descriptions will mostly be ABSENT there; each
+   absence is a counted documentation gap (the ruled fallback
+   posture), and the working-set lens turns them into the Tier-1
+   finding: which undocumented org tables the estate's most-used
+   logic depends on. A reference that resolves to NOTHING even after
+   this part is a COVERAGE finding for the DBA: another database's
+   metadata needs loading, or the SQL drifted from a source that no
+   longer carries the column (the silently-failing-report class).
 4. **values** — (code, meaning) rows per value-carrying table,
    produced by the generated uniform dump; which tables to dump is
    read from the declared joins (a value table is a join

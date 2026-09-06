@@ -97,28 +97,58 @@ def write_intake_result_tables(out_dir, reg, extract_reports,
         ["estate: files excluded (counted)",
          str(len(estate_report.counted_excluded))]]
 
+    # The COVERAGE CHECK — every customer needs this: their SQL scanned
+    # against their delivered dictionary; what falls through names the
+    # next metadata to load, or a drift they are not aware of.
     unresolved: Dict[str, Dict[str, Any]] = {}
     for fname, tree in estate_report.trees.items():
-        for ref in tree["resolution_census"]["unresolved"]:
-            row = unresolved.setdefault(ref, {"n": 0, "files": set()})
+        for detail in tree["resolution_census"].get(
+                "unresolved_detail", []):
+            row = unresolved.setdefault(
+                detail["ref"], {"n": 0, "files": set(), **detail})
             row["n"] += 1
             row["files"].add(fname)
+    sources_to_load: Dict[str, Dict[str, Any]] = {}
     sheets["unresolved_references"] = [
-        ["reference", "occurrences", "diagnosis", "files"]]
+        ["reference", "kind", "occurrences", "diagnosis", "files"]]
     for ref in sorted(unresolved, key=lambda r: -unresolved[r]["n"]):
+        row = unresolved[ref]
         bare = ref.split(".")[-1].upper()
-        if bare in dict_tables:
+        if row["kind"] == "table" and bare in dict_tables:
             diagnosis = ("SCHEMA MISMATCH — table exists in the "
                          "dictionary under schema "
                          f"'{'/'.join(dict_tables[bare])}'; the SQL "
                          "qualifies it differently")
+        elif row["kind"] == "table":
+            schema = row.get("schema", "(unqualified)")
+            diagnosis = (f"TABLE NOT IN DELIVERED METADATA — schema "
+                         f"'{schema}' has no registered extract "
+                         "covering it; see sources_to_load")
+            agg = sources_to_load.setdefault(
+                schema, {"tables": set(), "refs": 0})
+            agg["tables"].add(bare)
+            agg["refs"] += row["n"]
         else:
-            diagnosis = ("NOT IN DICTIONARY — not delivered by any "
-                         "registered extract; likely an org-created or "
-                         "out-of-scope object")
+            table = row.get("table", "?")
+            diagnosis = (f"COLUMN NOT IN DELIVERED METADATA — table "
+                         f"'{table}' is delivered but carries no such "
+                         "column: dictionary metadata incomplete, OR "
+                         "the SQL drifted from the source (a report "
+                         "that may be failing silently)")
         sheets["unresolved_references"].append(
-            [ref, str(unresolved[ref]["n"]), diagnosis,
-             "; ".join(sorted(unresolved[ref]["files"]))])
+            [ref, row["kind"], str(row["n"]), diagnosis,
+             "; ".join(sorted(row["files"]))])
+    sheets["sources_to_load"] = [
+        ["schema / source", "missing tables", "references",
+         "recommendation"]]
+    for schema in sorted(sources_to_load,
+                         key=lambda s: -sources_to_load[s]["refs"]):
+        agg = sources_to_load[schema]
+        sheets["sources_to_load"].append(
+            [schema, ", ".join(sorted(agg["tables"])), str(agg["refs"]),
+             "register this schema's source and load its dictionary/"
+             "catalog metadata (contract §3c: org schemas come from the "
+             "database catalog when no vendor dictionary covers them)"])
 
     sheets["grain_gaps"] = [["table", "note"]]
     for rep in extract_reports:

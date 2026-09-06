@@ -103,6 +103,15 @@ PATCHES = [
       "per-table containment field) and the F1 answer key's schema nodes "
       "carry none. The draft row contradicted both ratified artifacts."},
      "CONTRACT_DATALOAD §3 + F1 answer key (CHECK-TL-4 catch)"),
+    ("kg1_technical", "Node_Types",
+     {"Node kind": "column", "Property": "description"},
+     {"Required": "when documented — absence is a COUNTED documentation "
+      "gap, never a refusal. CORRECTION APPLIED 2026-09-06 (sepsis "
+      "shakedown): org-catalog columns arrive undescribed by "
+      "construction — a vendor dictionary never documents the org's own "
+      "tables; the ruled fallback posture (readable name + counted "
+      "coverage gap) already acknowledged undocumented columns."},
+     "sepsis shakedown finding + the ruled fallback posture (2026-09-06)"),
     ("kg2_kind_library", "TSQL_Denominator",
      {"ScriptDom type": "BooleanIsDistinctFromExpression"},
      {"ScriptDom type": "DistinctPredicate",

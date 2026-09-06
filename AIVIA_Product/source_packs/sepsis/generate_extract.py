@@ -23,6 +23,7 @@ Deterministic: byte-identical regeneration. Usage: python3 generate_extract.py
 """
 import csv
 import json
+import re
 import shutil
 from pathlib import Path
 
@@ -30,7 +31,7 @@ ROOT = Path(__file__).resolve().parents[3]
 SRC = ROOT / "data" / "synthetic"
 OUT = ROOT / "AIVIA_Product" / "estates" / "sepsis"
 
-PACK_VERSION = "sepsis-pack-1.1"
+PACK_VERSION = "sepsis-pack-1.2"
 AS_OF = "2026-09-06T00:00:00Z"
 DB, SERVER, SOURCE = "aivia_demo_src", "SEPSISSERVER", "emr"
 
@@ -56,6 +57,34 @@ _SCHEMA_OF = {t.upper(): s for s, ts in SCHEMA_OVERRIDES.items()
 
 def schema_of(table: str) -> str:
     return _SCHEMA_OF.get(table.upper(), "dbo")
+
+
+# --- DEMO-DATA REPAIR (pack 1.2) — OUR problem, never the customer's.
+# Our legacy dictionary lost the org tables' column lists in the old
+# extraction/anonymization pipeline. A real customer's Script 1 reads
+# these from the DATABASE CATALOG (contract §3c) — the catalog always
+# exists. The demo database's catalog IS the stub DDL
+# (data/demo/seed_demo_tables*.sql), so we read it from there: the
+# same §3c part, sourced from the only catalog this synthetic estate
+# has. Descriptions are empty by construction -> counted documentation
+# gaps, exactly as a real org-catalog part behaves.
+STUB_DDL = ("data/demo/seed_demo_tables.sql",
+            "data/demo/seed_demo_tables_supplement.sql")
+_CREATE = re.compile(
+    r"CREATE TABLE \[(reporting|reports)\]\.\[(\w+)\]\s*\((.*?)\);",
+    re.S | re.I)
+_COL = re.compile(r"^\s*\[(\w+)\]", re.M)
+
+
+def org_catalog_columns() -> "dict[str, list[str]]":
+    """§3c for the demo source: org-schema columns from the stub DDL
+    (the demo database's catalog). {TABLE_UPPER: [columns]}."""
+    out = {}
+    for name in STUB_DDL:
+        for schema, table, body in _CREATE.findall(
+                (ROOT / name).read_text()):
+            out[table.upper()] = _COL.findall(body)
+    return out
 
 
 def main():
@@ -92,6 +121,7 @@ def main():
             w.writerow([schema_of(row["TABLE_NAME"]),
                         row["TABLE_NAME"], row["DESCRIPTION"]])
     cols_by_table = {}
+    catalog = org_catalog_columns()
     with open(snap / "columns.csv", "w", newline="") as f:
         w = csv.writer(f)
         w.writerow(["schema", "table", "column", "description"])
@@ -101,6 +131,16 @@ def main():
                         row["DESCRIPTION"]])
             cols_by_table.setdefault(row["TABLE_NAME"], []).append(
                 row["COLUMN_NAME"])
+        # §3c org-catalog part: columns the dictionary never carried,
+        # from the demo db's catalog (stub DDL); descriptions ABSENT
+        # by construction -> counted documentation gaps
+        for trow in tables:
+            name = trow["TABLE_NAME"]
+            have = {c.upper() for c in cols_by_table.get(name, [])}
+            for col in catalog.get(name.upper(), []):
+                if col.upper() not in have:
+                    w.writerow([schema_of(name), name, col, ""])
+                    cols_by_table.setdefault(name, []).append(col)
     with open(snap / "pk.csv", "w", newline="") as f:
         w = csv.writer(f)
         w.writerow(["schema", "table", "column", "ordinal"])

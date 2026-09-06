@@ -436,6 +436,9 @@ def resolve(tree: Dict[str, Any], store: Store, reg: Dict[str, Any],
                     ref["resolves_to"] = None
                     census["unresolved_refs"] += 1
                     census["unresolved"].append(name)
+                    census.setdefault("unresolved_detail", []).append(
+                        {"ref": name, "kind": "table",
+                         "schema": schema or "(unqualified)"})
                     target = ("unresolved", None)
             if ref.get("alias"):
                 alias_to[ref["alias"]] = target
@@ -458,6 +461,9 @@ def resolve(tree: Dict[str, Any], store: Store, reg: Dict[str, Any],
                         col["resolves_to"] = None
                         census["unresolved_refs"] += 1
                         census["unresolved"].append(col["ref"])
+                        census.setdefault("unresolved_detail", []).append(
+                            {"ref": col["ref"], "kind": "column",
+                             "table": target})
                 elif kind == "scope":
                     col["resolves_to"] = f"SAME-TREE scope {target}"
                     census["same_tree_column_refs"] = \

@@ -50,10 +50,14 @@ def lens_gap_census(read, params) -> Dict[str, Any]:
                     if n.properties.get("grain") is None)
     keyless = sum(1 for n in read.nodes("table")
                   if not n.properties.get("pk_columns"))
+    undocumented = sum(1 for n in read.nodes("column")
+                       if not (n.properties.get("description")
+                               or "").strip())
     excluded = sorted(n.identity for n in read.nodes("excluded_file"))
     return {"unresolved_refs": unresolved,
             "grain_not_declared": grain_gap,
             "keyless_tables": keyless,
+            "undocumented_columns": undocumented,
             "unmapped_remainder": unmapped,
             "unsupported_dialect_files": excluded,
             "completeness": "total", "stamp": read.stamp()}

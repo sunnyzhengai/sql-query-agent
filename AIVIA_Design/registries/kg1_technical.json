@@ -12,7 +12,8 @@
   "doc §KG1 grain (2026-09-04) + register D11",
   "doc edge-direction convention (2026-09-05) + register D13",
   "register A1 refined (2026-09-05)",
-  "CONTRACT_DATALOAD §3 + F1 answer key (CHECK-TL-4 catch)"
+  "CONTRACT_DATALOAD §3 + F1 answer key (CHECK-TL-4 catch)",
+  "sepsis shakedown finding + the ruled fallback posture (2026-09-06)"
  ],
  "_open": [],
  "sheets": {
@@ -93,7 +94,7 @@
    {
     "Node kind": "column",
     "Property": "description",
-    "Required": "yes",
+    "Required": "when documented — absence is a COUNTED documentation gap, never a refusal. CORRECTION APPLIED 2026-09-06 (sepsis shakedown): org-catalog columns arrive undescribed by construction — a vendor dictionary never documents the org's own tables; the ruled fallback posture (readable name + counted coverage gap) already acknowledged undocumented columns.",
     "Shape / allowed values": "text"
    },
    {
