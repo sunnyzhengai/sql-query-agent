@@ -25,7 +25,7 @@ def shaken():
     kg1_intake.apply_registration(store, reg)
     extract = inbound.receive_extract(
         store, reg, kg1_intake.load_snapshot(BASE / "sepsis_snapshot"),
-        known_packs={"sepsis-pack-1.0"})
+        known_packs={"sepsis-pack-1.1"})
     estate = inbound.receive_estate(store, reg, BASE / "estate_snapshot")
     return store, extract, estate
 

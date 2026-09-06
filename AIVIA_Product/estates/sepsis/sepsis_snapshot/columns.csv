@@ -429,9 +429,9 @@ dbo,CONFIG_GROUPER_CATEGORIES,GROUPER_ID,The unique ID for the GROUPE_RECORD.
 dbo,CONFIG_GROUPER_CATEGORIES,LINE,The LINE_NUMBER for the information linked to this record. This record can be associated with multiple pieces of information.
 dbo,CONFIG_GROUPER_CATEGORIES,LIST_CAT_ITEM,The item of a category value specified within a categories grouper. It can be utilized with GROUPER_ITEMS.CONTEXT_INI to provide context for the category value in LIST_CAT_VALUE_CODE.
 dbo,CONFIG_GROUPER_CATEGORIES,LIST_CAT_VALUE_CODE,The value of a category defined within a CATEGORIES_GROUPER. Use LIST_CAT_ITEM and GROUPER_ITEMS.CONTEXT_INI to provide context for this value.
-dbo,CONFIG_VALUE_SET,CODE,Code representing a value within the defined set.
-dbo,CONFIG_VALUE_SET,CODE_DESC,Description of the VALUE_CODE.
-dbo,CONFIG_VALUE_SET,VALUE_SET_ID,Unique identifier for the VALUE_SET.
+reports,CONFIG_VALUE_SET,CODE,Code representing a value within the defined set.
+reports,CONFIG_VALUE_SET,CODE_DESC,Description of the VALUE_CODE.
+reports,CONFIG_VALUE_SET,VALUE_SET_ID,Unique identifier for the VALUE_SET.
 dbo,DEPARTMENTS,ADT_PARENT_ID,The unique identifier for the location that acts as the parent in the ADT organizational structure of your facility.
 dbo,DEPARTMENTS,ADT_UNIT_TYPE_CODE,The unit type for this department in the ADT application.
 dbo,DEPARTMENTS,ALLOW_AUTO_FUT_FLAG,"This item indicates if future orders for encounters in this department can be automatically released by the ""Auto Release Future Orders"" End of Day process in the clinical system."
@@ -1157,12 +1157,12 @@ dbo,FLOWSHEET_RECORDS,RECORD_DATE,The date on which the flowsheet readings were 
 dbo,FLOWSHEET_RECORDS,REC_ARCHIVED_FLAG,Indicates if the Flowsheet record is archived at the individual record level.
 dbo,FLOWSHEET_RECORDS,UNVERIFIED_DAILY_NET,The daily net Intake/Output total for this date that has not been verified.
 dbo,FLOWSHEET_RECORDS,UPDATE_DATE,"The column UPDATE_DATE in the table FLOWSHEET_RECORDS is deprecated and should not be used for tracking updates. To capture row updates on FLOWSHEET_RECORDS, set ""Track row updates?"" to ""Yes"" in the Information Activity, utilizing ESP_CR_ALTERED_ROWS."
-dbo,FY_DATE_DIMENSION,CALENDAR_DT,A specific date represented in a calendar format.
-dbo,FY_DATE_DIMENSION,DAY_OF_MONTH,DAY_OF_MONTH refers to the specific day within a month.
-dbo,FY_DATE_DIMENSION,FISCAL_YEAR,The number representing the fiscal year.
-dbo,FY_DATE_DIMENSION,FY_MONTH_NUMBER,The numerical representation of the month within the fiscal year.
-dbo,FY_DATE_DIMENSION,MONTH_END_DT,The final day of the month.
-dbo,FY_DATE_DIMENSION,MONTH_NAME,Complete name of the month.
+reports,FY_DATE_DIMENSION,CALENDAR_DT,A specific date represented in a calendar format.
+reports,FY_DATE_DIMENSION,DAY_OF_MONTH,DAY_OF_MONTH refers to the specific day within a month.
+reports,FY_DATE_DIMENSION,FISCAL_YEAR,The number representing the fiscal year.
+reports,FY_DATE_DIMENSION,FY_MONTH_NUMBER,The numerical representation of the month within the fiscal year.
+reports,FY_DATE_DIMENSION,MONTH_END_DT,The final day of the month.
+reports,FY_DATE_DIMENSION,MONTH_NAME,Complete name of the month.
 dbo,GROUPER_COMPILED_LIST,BASE_GROUPER_ID,The unique identifier (VCG-.1) for the base record associated with the compiled record. This column should be used for joining when linking to this table.
 dbo,GROUPER_COMPILED_LIST,CM_LOG_OWNER_ID,The COMMUNITY_ID of the instance from which this record or line was obtained. This field is populated only when IntraConnect is utilized.
 dbo,GROUPER_COMPILED_LIST,CM_PHY_OWNER_ID,The COMMUNITY_ID of the instance that owns this record or line is populated only when IntraConnect is used.
@@ -1804,17 +1804,17 @@ dbo,HOSPITAL_TRANSACTIONS,USER_ID,This column contains the unique identifier for
 dbo,HOSPITAL_TRANSACTIONS,WORKSTATION_ID,The ID number of the workstation linked to a transaction.
 dbo,HOSPITAL_TRANSACTIONS,XFER_LIAB_ADJ_FLAG,Y/N flag indicating whether the transaction includes the transfer of the liability adjustment.
 dbo,HOSPITAL_TRANSACTIONS,_SURROGATEKEY,The SURROGATE_KEY is utilized to uniquely identify rows within this specific table on Cogito Cloud. It should not be assumed that the SURROGATE_KEY in this table will match the SURROGATE_KEY in any other table.
-dbo,IP_SEPSIS,ADTDepartmentName,Name of the ADT department at the time the screening was conducted.
-dbo,IP_SEPSIS,DepartmentRollup,Aggregated department classification for reporting purposes.
-dbo,IP_SEPSIS,EncounterID,A distinct identifier for each hospital encounter.
-dbo,IP_SEPSIS,HospAdmsnTime,The date and time when a patient is admitted to the hospital.
-dbo,IP_SEPSIS,HospDischTime,The date and time when a patient is officially discharged from the hospital.
-dbo,IP_SEPSIS,ODScore,Value of the organ dysfunction score.
-dbo,IP_SEPSIS,PatientID,Identifier for patients used within the internal system.
-dbo,IP_SEPSIS,PatientMRN,The unique identifier assigned to a patient's medical record.
-dbo,IP_SEPSIS,PatientName,FULL_NAME_OF_PATIENT
-dbo,IP_SEPSIS,RefreshDate,The date on which this record was last updated.
-dbo,IP_SEPSIS,ShiftComplianceFlag,Indicates if sepsis screening was conducted in accordance with compliance for this shift (Y/N).
+reporting,IP_SEPSIS,ADTDepartmentName,Name of the ADT department at the time the screening was conducted.
+reporting,IP_SEPSIS,DepartmentRollup,Aggregated department classification for reporting purposes.
+reporting,IP_SEPSIS,EncounterID,A distinct identifier for each hospital encounter.
+reporting,IP_SEPSIS,HospAdmsnTime,The date and time when a patient is admitted to the hospital.
+reporting,IP_SEPSIS,HospDischTime,The date and time when a patient is officially discharged from the hospital.
+reporting,IP_SEPSIS,ODScore,Value of the organ dysfunction score.
+reporting,IP_SEPSIS,PatientID,Identifier for patients used within the internal system.
+reporting,IP_SEPSIS,PatientMRN,The unique identifier assigned to a patient's medical record.
+reporting,IP_SEPSIS,PatientName,FULL_NAME_OF_PATIENT
+reporting,IP_SEPSIS,RefreshDate,The date on which this record was last updated.
+reporting,IP_SEPSIS,ShiftComplianceFlag,Indicates if sepsis screening was conducted in accordance with compliance for this shift (Y/N).
 dbo,LAB_COMPONENTS,ABBREVIATION,The shortened form of the component's name.
 dbo,LAB_COMPONENTS,ALLOW_DILUTION_FLAG,Specifies whether the value of this component is subject to dilution.
 dbo,LAB_COMPONENTS,ANTIBIOTIC_MED_ID,This field contains a link to a medication record and is applicable only for antibiotic components.
@@ -2531,9 +2531,9 @@ dbo,MED_MIX_COMPONENTS,RX_COMP_MED_MIXTURE_ADDTNID_CODE,"Holds extra identifiers
 dbo,MED_MIX_COMPONENTS,RX_USE_OVERFILL_FLAG,"Indicates whether the mixture component should be adjusted for pharmacy-added overfill or manufacturer overfill. By default, pharmacy-added overfill is applied to ingredients added by the pharmacy. Fixed-ratio mixture ingredients, volume-dosed ingredients (like mg/mL), and main ingredients will always have pharmacy-added overfill applied, regardless of this setting. For manufacturer overfill, bases default to Yes, while other ingredients are set to No. Manufacturer overfill is not applicable in cases where it is prohibited, such as for ingredients in a QS base mixture or fixed ratio mixture."
 dbo,MED_MIX_COMPONENTS,SELECTED_NAME,*** Deprecated *** This column has been superseded by column RX_MED_MIX_COMPON__SELECTED_NAME_C in table MED_MIX_COMPONENTS. It indicates the selection method for this component when the mixture is ordered.
 dbo,MED_MIX_COMPONENTS,TYPE_CODE,The category of the component.
-dbo,NON_SEVERE_SEPSIS_STAGING,EncounterID,A distinct identifier for each hospital encounter.
-dbo,NON_SEVERE_SEPSIS_STAGING,PatientID,Identifier for patients used within the internal system.
-dbo,NON_SEVERE_SEPSIS_STAGING,SepsisDate,Date when the patient fulfilled the criteria for non-severe sepsis.
+reports,NON_SEVERE_SEPSIS_STAGING,EncounterID,A distinct identifier for each hospital encounter.
+reports,NON_SEVERE_SEPSIS_STAGING,PatientID,Identifier for patients used within the internal system.
+reports,NON_SEVERE_SEPSIS_STAGING,SepsisDate,Date when the patient fulfilled the criteria for non-severe sepsis.
 dbo,NOTE_ENCOUNTER_INFO,ACTIVITY_DTTM,The date and time when the partial dictation or transcription activity occurred.
 dbo,NOTE_ENCOUNTER_INFO,AUTHOR_PRVD_TYPE_CODE,The type of provider associated with the author for a particular contact.
 dbo,NOTE_ENCOUNTER_INFO,AUTHOR_SERVICE_CODE,The clinical service provided by the author.
@@ -3645,9 +3645,9 @@ dbo,RX_VERIFY_TRACE,RX_VERIFY_INSTANT,The moment the order is confirmed in the p
 dbo,RX_VERIFY_TRACE,RX_VER_IS_CANCEL_FLAG,This item shows whether the verify action was canceled.
 dbo,RX_VERIFY_TRACE,RX_VER_USER_DEP_ID,"This item contains the login department of the user who is being verified, as recorded in the source item."
 dbo,RX_VERIFY_TRACE,RX_VER_USER_ID,This item records the user who performed an action on this item from the VERIFY_QUEUE.
-dbo,SEVERE_SEPSIS_STAGING,EncounterID,A distinct identifier for each hospital encounter.
-dbo,SEVERE_SEPSIS_STAGING,PatientID,Identifier for patients used within the internal system.
-dbo,SEVERE_SEPSIS_STAGING,SepsisDate,Date when the patient fulfilled the criteria for severe sepsis.
+reports,SEVERE_SEPSIS_STAGING,EncounterID,A distinct identifier for each hospital encounter.
+reports,SEVERE_SEPSIS_STAGING,PatientID,Identifier for patients used within the internal system.
+reports,SEVERE_SEPSIS_STAGING,SepsisDate,Date when the patient fulfilled the criteria for severe sepsis.
 dbo,TREATMENT_TEAMS,CM_CT_OWNER_ID,Identifier for the deployment owner associated with this contact.
 dbo,TREATMENT_TEAMS,ENCOUNTER_ID,"A unique serial number assigned to this encounter, which is distinct for all patients and encounters within the system."
 dbo,TREATMENT_TEAMS,LINE,The line number assigned to the treatment team member for the patient.

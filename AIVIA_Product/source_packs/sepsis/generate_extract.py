@@ -30,9 +30,32 @@ ROOT = Path(__file__).resolve().parents[3]
 SRC = ROOT / "data" / "synthetic"
 OUT = ROOT / "AIVIA_Product" / "estates" / "sepsis"
 
-PACK_VERSION = "sepsis-pack-1.0"
+PACK_VERSION = "sepsis-pack-1.1"
 AS_OF = "2026-09-06T00:00:00Z"
 DB, SERVER, SOURCE = "aivia_demo_src", "SEPSISSERVER", "emr"
+
+# FINDING (first shakedown, 2026-09-06): the anonymized dictionary
+# carries NO schema column — the original extraction predates the
+# contract's §3 ruling (containment is an explicit extract field) —
+# and pack-1.0's dbo default produced 39 unresolved refs, ALL of them
+# schema mismatches: the corpus qualifies these org-created tables to
+# reporting/reports, consistently, never dbo. Declared here per the
+# corpus's own testimony; the real fix upstream is re-extracting with
+# the schema column (contract §3).
+SCHEMA_OVERRIDES = {
+    "reports": ["CONFIG_VALUE_SET", "SEVERE_SEPSIS_STAGING",
+                "NON_SEVERE_SEPSIS_STAGING", "FY_DATE_DIMENSION"],
+    "reporting": ["IP_SEPSIS", "IP_SepsisEncounters",
+                  "IP_SepsisEncountersWLocations", "IP_SepsisPatientDates",
+                  "IP_SepsisShiftCompliance", "IP_SepsisDetails",
+                  "IP_SepsisScreeningAudit"],
+}
+_SCHEMA_OF = {t.upper(): s for s, ts in SCHEMA_OVERRIDES.items()
+              for t in ts}
+
+
+def schema_of(table: str) -> str:
+    return _SCHEMA_OF.get(table.upper(), "dbo")
 
 
 def main():
@@ -66,13 +89,15 @@ def main():
         w = csv.writer(f)
         w.writerow(["schema", "table", "description"])
         for row in tables:
-            w.writerow(["dbo", row["TABLE_NAME"], row["DESCRIPTION"]])
+            w.writerow([schema_of(row["TABLE_NAME"]),
+                        row["TABLE_NAME"], row["DESCRIPTION"]])
     cols_by_table = {}
     with open(snap / "columns.csv", "w", newline="") as f:
         w = csv.writer(f)
         w.writerow(["schema", "table", "column", "description"])
         for row in columns:
-            w.writerow(["dbo", row["TABLE_NAME"], row["COLUMN_NAME"],
+            w.writerow([schema_of(row["TABLE_NAME"]),
+                        row["TABLE_NAME"], row["COLUMN_NAME"],
                         row["DESCRIPTION"]])
             cols_by_table.setdefault(row["TABLE_NAME"], []).append(
                 row["COLUMN_NAME"])
@@ -82,16 +107,17 @@ def main():
         for row in tables:
             name = row["TABLE_NAME"]
             declared = cols_by_table.get(name, [f"{name}_ID"])[0]
-            w.writerow(["dbo", name, declared, 1])
+            w.writerow([schema_of(name), name, declared, 1])
     with open(snap / "joins.csv", "w", newline="") as f:
         w = csv.writer(f)
         w.writerow(["fk_num", "ordinal", "src_schema", "src_table",
                     "src_column", "dest_schema", "dest_table",
                     "dest_column"])
         for i, row in enumerate(rels, 1):
-            w.writerow([i, 1, "dbo", row["SOURCE_TABLE"],
-                        row["SOURCE_COLUMN"], "dbo", row["DEST_TABLE"],
-                        row["DEST_COLUMN"]])
+            w.writerow([i, 1, schema_of(row["SOURCE_TABLE"]),
+                        row["SOURCE_TABLE"], row["SOURCE_COLUMN"],
+                        schema_of(row["DEST_TABLE"]),
+                        row["DEST_TABLE"], row["DEST_COLUMN"]])
     with open(snap / "values.csv", "w", newline="") as f:
         csv.writer(f).writerow(["table", "code", "meaning"])
 

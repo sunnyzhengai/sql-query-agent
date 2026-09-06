@@ -65,6 +65,103 @@ def render_intake_report(reg: Dict[str, Any], extract_reports,
     return "\n".join(lines)
 
 
+def write_intake_result_tables(out_dir, reg, extract_reports,
+                               estate_report, read) -> List[str]:
+    """Contract §8: the intake report is DATA FIRST — result tables
+    beside the graph, from which renderings derive. One row per
+    distinct finding (a DBA troubleshoots a list, not prose): CSVs
+    always; an .xlsx workbook of the same sheets when openpyxl is
+    present. Returns the files written."""
+    import csv as _csv
+    out_dir = pathlib.Path(out_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    dict_tables = {}
+    for t in read.nodes("table"):
+        source, schema, table = t.identity.split("|")
+        dict_tables.setdefault(table.upper(), []).append(schema)
+
+    sheets: Dict[str, List[List[str]]] = {}
+    sheets["summary"] = [["item", "value"]]
+    for rep in extract_reports:
+        sheets["summary"] += [
+            [f"{rep.source}: checks", rep.check_outcomes.get(
+                "INTAKE-0..10", "?")],
+            [f"{rep.source}: quarantined join groups",
+             str(len(rep.quarantined_join_groups))],
+            [f"{rep.source}: refused declarations",
+             str(len(rep.illegal_declarations))],
+            [f"{rep.source}: pending references",
+             str(len(rep.pending_references))]]
+    sheets["summary"] += [
+        ["estate: files acquired", str(len(estate_report.acquired))],
+        ["estate: files excluded (counted)",
+         str(len(estate_report.counted_excluded))]]
+
+    unresolved: Dict[str, Dict[str, Any]] = {}
+    for fname, tree in estate_report.trees.items():
+        for ref in tree["resolution_census"]["unresolved"]:
+            row = unresolved.setdefault(ref, {"n": 0, "files": set()})
+            row["n"] += 1
+            row["files"].add(fname)
+    sheets["unresolved_references"] = [
+        ["reference", "occurrences", "diagnosis", "files"]]
+    for ref in sorted(unresolved, key=lambda r: -unresolved[r]["n"]):
+        bare = ref.split(".")[-1].upper()
+        if bare in dict_tables:
+            diagnosis = ("SCHEMA MISMATCH — table exists in the "
+                         "dictionary under schema "
+                         f"'{'/'.join(dict_tables[bare])}'; the SQL "
+                         "qualifies it differently")
+        else:
+            diagnosis = ("NOT IN DICTIONARY — not delivered by any "
+                         "registered extract; likely an org-created or "
+                         "out-of-scope object")
+        sheets["unresolved_references"].append(
+            [ref, str(unresolved[ref]["n"]), diagnosis,
+             "; ".join(sorted(unresolved[ref]["files"]))])
+
+    sheets["grain_gaps"] = [["table", "note"]]
+    for rep in extract_reports:
+        for table in rep.gap_lists.get("grain_not_declared", []):
+            sheets["grain_gaps"].append(
+                [table, "description carries no grain declaration"])
+    sheets["quarantines_and_alerts"] = [["source", "detail"]]
+    for rep in extract_reports:
+        for alert in rep.dba_alerts:
+            sheets["quarantines_and_alerts"].append([rep.source, alert])
+        for decl in rep.illegal_declarations:
+            sheets["quarantines_and_alerts"].append([rep.source, decl])
+    sheets["excluded_files"] = [["file", "reason"]]
+    for exc in estate_report.counted_excluded:
+        sheets["excluded_files"].append([exc["file"], exc["reason"]])
+
+    written = []
+    for name, rows in sheets.items():
+        path = out_dir / f"{name}.csv"
+        with open(path, "w", newline="") as f:
+            _csv.writer(f).writerows(rows)
+        written.append(str(path))
+    try:
+        import openpyxl
+        wb = openpyxl.Workbook()
+        wb.remove(wb.active)
+        for name, rows in sheets.items():
+            ws = wb.create_sheet(name[:31])
+            for row in rows:
+                ws.append(row)
+            for cell in ws[1]:
+                cell.font = openpyxl.styles.Font(bold=True)
+        xlsx = out_dir / "intake_report.xlsx"
+        wb.save(xlsx)
+        written.append(str(xlsx))
+    except ImportError:
+        pass  # CSVs are the data of record; the workbook is a rendering
+    (out_dir / "intake_report.txt").write_text(
+        render_intake_report(reg, extract_reports, estate_report, read))
+    written.append(str(out_dir / "intake_report.txt"))
+    return written
+
+
 @dataclass
 class EstateReport:
     acquired: List[str] = field(default_factory=list)
