@@ -109,7 +109,8 @@ def test_gr4_vectors_stamped_and_cached(tmp_path, world):
     cache = tmp_path / "emb.json"
     first = grounding.SemanticIndex(entries, fake_embed, "fake-64",
                                     cache_path=cache)
-    assert first.embedded_now == 20
+    # facet cards: 1-2 vectors per entry (name + speech when present)
+    assert 20 <= first.embedded_now <= 40
 
     def forbidden(texts):
         raise AssertionError("re-embedded an unchanged meaning")
@@ -186,9 +187,11 @@ def test_st1_ambiguity_clarifies_with_candidates(world):
 # ---- RM: remember ----------------------------------------------------
 def test_rm1_confirmed_interpretation_skips_the_model(world):
     store, semantic = world
-    q = "which procedures mention sepsis"
+    # a UNIQUE reference-set (the meaning-book would otherwise
+    # answer immediately for meanings other tests confirmed)
+    q = "which procedures mention the sepsis dates proc"
     interp = fake_interpreter(
-        {q: {"mentions": ["procedures", "sepsis"]}})
+        {q: {"mentions": ["procedures", "USP_IP_SepsisDates"]}})
     first = ask.ask(store, q, "person:test", T0,
                     interpret_fn=interp, semantic=semantic)
     assert first["status"] == "answer"
@@ -202,6 +205,30 @@ def test_rm1_confirmed_interpretation_skips_the_model(world):
                     interpret_fn=exploding, semantic=semantic)
     assert again["status"] == "answer"
     assert again["via"] == "ledger"
+
+
+def test_rm3_meaning_book_new_phrasing_same_meaning(world):
+    store, semantic = world
+    # L2-D1: confirmation attaches to the REFERENCE-SET — a new
+    # phrasing resolving to a confirmed meaning answers immediately,
+    # no model re-confirm (the phrasebook became a meaning-book)
+    q1 = "list procedures about the sepsis dates proc"
+    i1 = fake_interpreter(
+        {q1: {"mentions": ["procedures", "USP_IP_SepsisDates"]}})
+    r1 = ask.ask(store, q1, "person:test", T0,
+                 interpret_fn=i1, semantic=semantic)
+    assert r1["via"] in ("meaning-book", "model")
+    if r1.get("pending_confirmation"):
+        ask.confirm(store, q1, r1["interpretation"], "person:test",
+                    T0, semantic=semantic)
+    q2 = "show me procs concerning the sepsis dates procedure"
+    i2 = fake_interpreter(
+        {q2: {"mentions": ["procedures", "USP_IP_SepsisDates"]}})
+    r2 = ask.ask(store, q2, "person:test", T0,
+                 interpret_fn=i2, semantic=semantic)
+    assert r2["status"] == "answer"
+    assert r2["via"] == "meaning-book"
+    assert not r2.get("pending_confirmation")
 
 
 def test_rm_cage_rejects_bad_interpretations(world):

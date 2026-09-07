@@ -16,8 +16,7 @@ from aivia.flows import ask, grounding, speech
 from aivia.flows import censuses as census
 from aivia.graph.read_api import ReadApi
 
-from .test_ask_console import fake_embed, fake_interpreter, \
-    seed_vocabulary
+from .test_ask_console import fake_embed, fake_interpreter, seed_vocabulary
 
 FIX = pathlib.Path(__file__).resolve().parents[2] / "AIVIA_Product" / "fixtures"
 T0 = "2026-09-07T12:00:00Z"
@@ -196,10 +195,13 @@ def test_honest_zero_never_no_match_while_a_kind_grounded(world):
 def test_facet_rollup_with_provenance(world):
     store, _read, _index, semantic = world
     # CE-3: a query matching a CONDITION facet surfaces the owning
-    # file, with the facet named (rollup + provenance, never blend)
-    q = "what reports are about best practice alert"
-    interp = fake_interpreter({q: {"mentions":
-                                   ["reports", "best practice alert"]}})
+    # file, with the facet named (rollup + provenance, never blend).
+    # The query is drawn from a real condition's voiced words
+    # (USP_ED_SEPSIS #AllMeds c2) so the fake bag-of-words embedder
+    # has true overlap to find, not hash luck.
+    topic = "category number route of administration medication"
+    q = f"what reports are about {topic}"
+    interp = fake_interpreter({q: {"mentions": ["reports", topic]}})
     result = ask.ask(store, q, "person:test", T0,
                      interpret_fn=interp, semantic=semantic)
     if result.get("pending_confirmation"):
@@ -243,3 +245,12 @@ def test_expansions_are_searched_and_confirmation_lands_a_term(world):
     assert terms
     assert "emergency department" in \
         terms[0].properties["definition"].lower()
+
+
+def test_facet_cards_name_card_wins_for_name_shaped_queries(world):
+    _store, _read, _index, semantic = world
+    # THE FACET DECISION's deciding case: 'ED Sepsis' finds the file
+    # through its NAME card — the blend that buried it is dead
+    hits = semantic.search("ED Sepsis", top_k=3, kind="file")
+    assert hits[0]["name"] in ("USP_ED_SEPSIS", "USP_RPTS_ED_Sepsis")
+    assert hits[0]["via_card"] == "name"

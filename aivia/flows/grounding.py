@@ -39,9 +39,24 @@ TOP_K = 8
 
 
 def meaning_text(entry: Dict[str, Any]) -> str:
-    """What gets embedded: the entry's name in readable form plus its
-    steward words — meaning, never raw identifiers alone."""
+    """Kept for compatibility/audit: the blended text. Search no
+    longer uses it — THE FACET DECISION replaced the blend with
+    cards (see cards())."""
     return f"{_words(entry['name'])}. {entry.get('words') or ''}".strip()
+
+
+def cards(entry: Dict[str, Any]) -> List[tuple]:
+    """THE FACET DECISION (ruled 2026-09-07): one node = MANY
+    embedded cards, never one blended vector. A NAME card and a
+    SPEECH card per node (part-cards are already their own index
+    entries). Deciding evidence pinned in the chatbot doc: 'ED
+    Sepsis' scored 0.78 against the name card vs 0.40 against the
+    4,774-char blend."""
+    out = [("name", _words(entry["name"]))]
+    words = (entry.get("words") or "").strip()
+    if words and words != out[0][1]:
+        out.append(("speech", f"{_words(entry['name'])}. {words}"))
+    return out
 
 
 class SemanticIndex:
@@ -54,29 +69,32 @@ class SemanticIndex:
                  model_name: str,
                  cache_path: Optional[pathlib.Path] = None):
         self.entries = entries
-        self.vectors: List[Optional[List[float]]] = []
+        # THE FACET DECISION: per entry, a list of (card_name,
+        # vector) — score = MAX over cards, provenance names the
+        # card. Cache keys carry the card name.
+        self.cards: List[List[tuple]] = []
         cache: Dict[str, List[float]] = {}
         if cache_path and cache_path.is_file():
             cache = json.loads(cache_path.read_text())
         texts, missing = [], []
-        keys = []
         for i, e in enumerate(entries):
-            text = meaning_text(e)
-            key = (f"{e['identity']}|"
-                   f"{hashlib.sha256(text.encode()).hexdigest()[:12]}|"
-                   f"{model_name}")
-            keys.append(key)
-            if key in cache:
-                self.vectors.append(cache[key])
-            else:
-                self.vectors.append(None)
-                texts.append(text)
-                missing.append(i)
+            slots = []
+            for cname, text in cards(e):
+                key = (f"{e['identity']}|card:{cname}|"
+                       f"{hashlib.sha256(text.encode()).hexdigest()[:12]}|"
+                       f"{model_name}")
+                if key in cache:
+                    slots.append([cname, cache[key]])
+                else:
+                    slots.append([cname, None])
+                    texts.append(text)
+                    missing.append((i, len(slots) - 1, key))
+            self.cards.append(slots)
         if missing:
             fresh = embed_fn(texts)
-            for i, vec in zip(missing, fresh):
-                self.vectors[i] = vec
-                cache[keys[i]] = vec
+            for (i, j, key), vec in zip(missing, fresh):
+                self.cards[i][j][1] = vec
+                cache[key] = vec
             if cache_path:
                 cache_path.parent.mkdir(parents=True, exist_ok=True)
                 cache_path.write_text(json.dumps(cache))
@@ -85,21 +103,27 @@ class SemanticIndex:
 
     def search(self, text: str, top_k: int = TOP_K,
                kind: Optional[str] = None) -> List[Dict[str, Any]]:
-        """Scores over ALL entries (optionally restricted to one
-        kind BEFORE ranking — live find #5: pooling before the kind
-        filter let columns crowd files out of a truncated pool, a
-        silent cap distorting the set)."""
+        """Scores over ALL entries (kind-restricted BEFORE ranking —
+        live find #5). An entry's score = the MAX over its cards
+        (name / speech); the winning card rides as via_card — the
+        blend is dead, provenance lives."""
         query = self.embed_fn([text])[0]
         qn = math.sqrt(sum(v * v for v in query)) or 1.0
         scored = []
-        for entry, vec in zip(self.entries, self.vectors):
+        for entry, slots in zip(self.entries, self.cards):
             if kind is not None and entry["kind"] != kind:
                 continue
-            dot = sum(a * b for a, b in zip(query, vec))
-            vn = math.sqrt(sum(v * v for v in vec)) or 1.0
-            scored.append((dot / (qn * vn), entry))
-        scored.sort(key=lambda t: (-t[0], t[1]["identity"]))
-        return [{"score": round(s, 4), **e} for s, e in scored[:top_k]]
+            best, best_card = -1.0, None
+            for cname, vec in slots:
+                dot = sum(a * b for a, b in zip(query, vec))
+                vn = math.sqrt(sum(v * v for v in vec)) or 1.0
+                sc = dot / (qn * vn)
+                if sc > best:
+                    best, best_card = sc, cname
+            scored.append((best, best_card, entry))
+        scored.sort(key=lambda t: (-t[0], t[2]["identity"]))
+        return [{"score": round(s, 4), "via_card": c, **e}
+                for s, c, e in scored[:top_k]]
 
 
 def _segments(text: str) -> List[str]:

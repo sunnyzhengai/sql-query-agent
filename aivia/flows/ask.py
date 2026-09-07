@@ -81,10 +81,26 @@ def validate_interpretation(raw: Any) -> Optional[Dict[str, Any]]:
 
 
 # ---- REMEMBER --------------------------------------------------------
+def reference_set_key(groundings: List[Dict[str, Any]]) -> str:
+    """The MEANING of an interpretation = what it resolved to
+    (L2-D1): sorted references, phrasing-independent."""
+    parts = []
+    for g in groundings:
+        if g["outcome"] == "kind":
+            parts.append(f"kind:{g['kind']}")
+        elif g["outcome"] == "matched":
+            parts.append(f"id:{g['entity']['identity']}")
+        elif g["outcome"] == "set":
+            parts.append("set:context")
+        else:
+            parts.append(f"topic:{_fold(g['mention'])}")
+    return "|".join(sorted(parts))
+
+
 def ledger_interpretation(read, question: str):
     """A previously CONFIRMED interpretation for this folded question
-    — the interpretation is cached (WITH its context snapshot, Law
-    4/FU-4), never the answer."""
+    — the fast path of the MEANING-BOOK (L2-D1): the blessed object
+    is the reference-set; the folded text key only skips the model."""
     folded = _fold(" ".join(question.split()))
     hits = [u for u in read.nodes("usage")
             if u.properties.get("action") == "confirmed"
@@ -94,6 +110,18 @@ def ledger_interpretation(read, question: str):
         return None, None
     props = hits[-1].properties
     return props["interpretation"], props.get("context_snapshot")
+
+
+def confirmed_reference_sets(read) -> Dict[str, str]:
+    """reference-set key -> confirmed-at date (L2-D1): a NEW
+    phrasing that resolves to a confirmed set answers immediately."""
+    out = {}
+    for u in read.nodes("usage"):
+        if u.properties.get("action") == "confirmed" \
+                and u.properties.get("reference_set"):
+            out[u.properties["reference_set"]] = \
+                u.properties.get("occurred_at", "")
+    return out
 
 
 def record_confirmation(store, question: str,
@@ -109,6 +137,9 @@ def record_confirmation(store, question: str,
         " ".join(question.split()))
     event.properties["interpretation"] = dict(interpretation)
     event.properties["basis"] = basis
+    if interpretation.get("reference_set"):
+        event.properties["reference_set"] = \
+            interpretation["reference_set"]
     if context:  # Law 4: the snapshot rides — replay is deterministic
         event.properties["context_snapshot"] = list(context)
 
@@ -580,6 +611,33 @@ def _provisional(g: Dict[str, Any]) -> Dict[str, Any]:
     return g
 
 
+def _shape_clarify(candidates: List[Dict[str, Any]]
+                   ) -> Dict[str, Any]:
+    """L3-D2 clarify obligations: dedup at NAME grain (one row,
+    'in N places'), group by kind, cap visibly. Choosing between
+    meanings, never identifiers."""
+    by_name: Dict[tuple, Dict[str, Any]] = {}
+    for c in candidates:
+        key = (c["kind"], c["folded"])
+        if key in by_name:
+            by_name[key]["places"] += 1
+            continue
+        row = dict(c)
+        row["places"] = 1
+        by_name[key] = row
+    kind_rank = {k: i for i, k in enumerate(VALID_KINDS)}
+    rows = sorted(by_name.values(),
+                  key=lambda r: (kind_rank.get(r["kind"], 99),
+                                 -(r.get("score") or 0)))
+    cap = int(response_shapes()["CLARIFY_CAP"])
+    if len(rows) == 1 and rows[0]["places"] > 1:
+        # one NAME in many places (live find #1's class): the choice
+        # IS the place — expand back to the identities
+        rows = candidates
+    return {"rows": rows[:cap],
+            "more": max(0, len(rows) - cap)}
+
+
 def _trace(groundings: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     """The search trace (ADR 0080 rider): what was searched and how —
     rendered in every round, and the audit record either way."""
@@ -626,7 +684,18 @@ def ask(store, question: str, author: str, occurred_at: str,
         out += [i for i in listed if i not in out]
         return out[:100]
 
-    context_entities = _entities(context)
+    # L5-D1 THE STACKED TABLE: context may be a flat id-list (one
+    # round) or a stack of rounds (newest first). Bare anaphors
+    # resolve against the TOP; kind-qualified ones walk DOWN to the
+    # nearest matching pool.
+    if context and isinstance(context[0], list):
+        stack = [c for c in context if c]
+    elif context:
+        stack = [context]
+    else:
+        stack = []
+    stack_entities = [_entities(c) for c in stack]
+    context_entities = stack_entities[0] if stack_entities else None
 
     def _usage(outcome, about=None):
         kg3_artifacts.append_usage(
@@ -655,8 +724,11 @@ def ask(store, question: str, author: str, occurred_at: str,
                 "answer": whole["reason"], "reason": whole["reason"]}
     if whole["outcome"] == "candidates":
         _usage("ambiguous")
+        shaped = _shape_clarify(whole["candidates"])
         return {"status": "clarify", "mention": q,
-                "candidates": whole["candidates"]}
+                "candidates": shaped["rows"],
+                "more_candidates": shaped["more"],
+                "trace": _trace([whole])}
 
     stored_context = None
     interpretation = confirmed
@@ -704,8 +776,19 @@ def ask(store, question: str, author: str, occurred_at: str,
             return {"tier": "proposed-kind", "outcome": "kind",
                     "kind": mark, "mention": m}
         role = (interpretation.get("references") or {}).get(m)
-        g = grounding.ground(m, index, kind_words, semantic,
-                             context=context_entities, role=role)
+        if role is not None and len(stack_entities) > 1:
+            # walk the stack: top first; a kind-qualified anaphor
+            # that finds nothing on top reaches down (L5-D1)
+            g = None
+            for pool in stack_entities:
+                g = grounding.ground(m, index, kind_words, semantic,
+                                     context=pool, role=role)
+                if g["outcome"] == "matched" or (
+                        g["outcome"] == "set" and g["entities"]):
+                    break
+        else:
+            g = grounding.ground(m, index, kind_words, semantic,
+                                 context=context_entities, role=role)
         tried = []
         rank = {"matched": 3, "kind": 3, "set": 3, "candidates": 2}
         if g["outcome"] in ("unknown", "candidates"):
@@ -751,23 +834,54 @@ def ask(store, question: str, author: str, occurred_at: str,
             continue
         if g["outcome"] == "candidates":
             _usage("ambiguous")
+            shaped = _shape_clarify(g["candidates"])
             return {"status": "clarify", "mention": g["mention"],
-                    "candidates": g["candidates"],
+                    "candidates": shaped["rows"],
+                    "more_candidates": shaped["more"],
                     "interpretation": interpretation,
                     "trace": _trace(groundings)}
         if g["outcome"] == "unknown":
             _usage("no-match")
-            return {"status": "answer",
-                    "answer": f"NO MATCH for '{g['mention']}' — "
-                              "nothing in the graph carries that name "
-                              "or meaning."
-                              + ("\nNearest: " + ", ".join(
-                                  e["name"] for e in g["nearest"])
-                                 if g.get("nearest") else ""),
+            # L9-D4: an absence answer is a DOOR — the searched
+            # universe, the nearest true things, and the next act
+            door = (f"NO MATCH for '{g['mention']}' — nothing in "
+                    f"the graph carries that name or meaning "
+                    f"(searched all {len(index)} named things in "
+                    "this estate)."
+                    + ("\nNearest: " + ", ".join(
+                        e["name"] for e in g["nearest"])
+                       if g.get("nearest") else "")
+                    + "\nNext: rephrase, confirm a vocabulary "
+                    "expansion, or flag this to the steward — "
+                    "repeated asks for the same missing thing are "
+                    "demand signal.")
+            return {"status": "answer", "answer": door,
                     "groundings": groundings, "via": via,
                     "trace": _trace(groundings)}
 
     if via == "model":
+        # L2-D1 MEANING-BOOK: a new phrasing resolving to an
+        # already-confirmed reference-set answers as CONFIRMED —
+        # what was blessed was the meaning, not the words
+        ref_key = reference_set_key(groundings)
+        known = confirmed_reference_sets(read)
+        if ref_key in known:
+            answer, listed = execute(read, index, adj, groundings,
+                                     semantic)
+            about = None
+            matched = [g for g in groundings
+                       if g["outcome"] == "matched"]
+            if len(matched) == 1:
+                about = matched[0]["entity"]["identity"]
+            _usage("matched", about)
+            return {"status": "answer", "answer": answer,
+                    "groundings": groundings,
+                    "via": "meaning-book",
+                    "resolved_to_confirmed": known[ref_key],
+                    "context_set": _context_set(groundings, listed),
+                    "trace": _trace(groundings)}
+        interpretation = dict(interpretation)
+        interpretation["reference_set"] = ref_key
         # L7-D2 INLINE CONFIRMATION: every mention grounded -> the
         # provisional answer SHIPS with the confirm attached
         # (non-blocking); the interpretation enters the ledger only
@@ -795,9 +909,18 @@ def ask(store, question: str, author: str, occurred_at: str,
     if len(matched) == 1:
         about = matched[0]["entity"]["identity"]
     _usage("matched", about)
+    new_set = _context_set(groundings, listed)
+    if via == "ledger" and stored_context:
+        # L8-D4 THE CHANGE CAPTION: same confirmed question, moved
+        # truth — say so; the diff recomputes, never stores
+        old, new = set(stored_context), set(new_set)
+        added, gone = len(new - old), len(old - new)
+        if added or gone:
+            answer = (f"[changed since you confirmed this: "
+                      f"+{added} new, -{gone} gone]\n" + answer)
     return {"status": "answer", "answer": answer,
             "groundings": groundings, "via": via,
-            "context_set": _context_set(groundings, listed),
+            "context_set": new_set,
             "trace": _trace(groundings)}
 
 
