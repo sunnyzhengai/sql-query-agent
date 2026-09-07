@@ -68,6 +68,17 @@ def record_confirmation(store, question: str,
         event.properties["context_snapshot"] = list(context)
 
 
+def build_index(read) -> List[Dict[str, Any]]:
+    """The ask index, enriched with MEANING for files (R10 corollary,
+    live find #8 second layer): a file's words are its report floor's
+    delivery lead — files embed meaning, never bare names."""
+    index = ask_index.lens_ask_index(read, None)["yield"]
+    for e in index:
+        if e["kind"] == "file" and not e.get("words"):
+            e["words"] = produce.file_words(read, e["identity"])
+    return index
+
+
 # ---- SPEAK: deterministic renderers (display modes) ------------------
 def _one_line(read, identity: str, index_by_id) -> str:
     entry = index_by_id.get(identity)
@@ -91,15 +102,9 @@ def render_card(read, entity: Dict[str, Any]) -> str:
     elif kind == "scope":
         lines.append(produce.compose_floor(read, identity))
     elif kind == "file":
-        tree = next(t for k, t in read.trees().items()
-                    if k == identity or t["name"] == identity)
-        names = [s["name_key"].split("::")[-1]
-                 for stmt in tree["statements"]
-                 for s in ([stmt.get("scope")] if stmt.get("scope")
-                           else []) if "name_key" in (s or {})]
-        lines.append(f"A procedure of {len(tree['statements'])} "
-                     f"steps; named selections: "
-                     f"{', '.join(names[:12]) or '(none)'}.")
+        # R10 (grammar 2.3.0, live find #9): the report floor — the
+        # census placeholder is dead; the file speaks its meaning
+        lines.append(produce.compose_file_floor(read, identity))
     elif kind == "derived column":
         scope_key = identity.rsplit(".", 1)[0]
         lines.append(f"A computed output of {scope_key} — ask the "
@@ -384,7 +389,7 @@ def ask(store, question: str, author: str, occurred_at: str,
     next one as result["context_set"]."""
     from aivia.graph.read_api import ReadApi
     read = ReadApi(store)
-    index = ask_index.lens_ask_index(read, None)["yield"]
+    index = build_index(read)
     kind_words = _kind_vocabulary()
     adj = connect.build_adjacency(read)
     q = " ".join(question.split())

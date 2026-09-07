@@ -1,5 +1,32 @@
-# The Floor Grammar — v2.0.0 (the POLICY-WALK major, Phase C of the
-# twin-graph ruling, 2026-09-06; v1.3.1 RATIFIED Sunny 2026-09-05)
+# The Floor Grammar — v2.3.0 (the REPORT FLOOR, 2026-09-07;
+# v2.0.0 POLICY-WALK major 2026-09-06; v1.3.1 RATIFIED Sunny
+# 2026-09-05)
+
+*v2.3.0 (live find #9 — Sunny: "the answer is mechanical. i was
+looking for a meaning at the report level. do we not translate the
+report description based on the descriptions of the steps
+contained?"): R10 — THE REPORT FLOOR. The grammar composed floors
+at SCOPE grain only; the FILE card was a census placeholder ("A
+procedure of 67 steps; named selections: ..."). Same disease class
+as the flat-set finding: one level left mechanical while every
+level below it speaks. R10 composes the file's floor from its
+scopes — deliveries lead, the spine follows, intermediates are
+COUNTED, the census closes. Corollary (find #8's second layer): the
+report floor's lead becomes the file's ask-index words, so file
+embeddings embed MEANING, not name-noise. Phrasing rider (truth
+unchanged): a RUN of identical source phrases in the composition
+sentence aggregates with a visible count ("7 inline selections",
+"x records (2 reads)") — repetition is mechanics, the count is the
+fact.*
+
+*v2.2.0 (the ABX first leg, 2026-09-06 — note landed late, with
+v2.3.0): IN/EXISTS subselections voice their aggregate reads and
+restrictive-spine conditions (nested_membership/nested_sources);
+OUTER APPLY interiors and combination arms excluded.*
+
+*v2.1.0 (the ABX corpse, 2026-09-06 — note landed late, with
+v2.3.0): COMBINATION scopes (UNION ctes) voice per arm; a counted
+gap never launders into "no source records read".*
 
 *v2.0.0 (Phase C, ADR 0077 — awaiting Sunny's gap-check verdict):
 the grammar becomes the VOICING POLICY over the meaning twin
@@ -241,6 +268,32 @@ INLINE at depth 1 only; deeper nesting is COUNTED in gap-census with
 the revisit trigger declared (the v1.3.0 posture).
 
 ---
+
+## R10 — THE REPORT FLOOR (v2.3.0, file grain)
+
+A FILE's floor composes from its scopes — deterministic, no model:
+
+1. **The delivery lead.** Every emitting statement is a delivery
+   scope (`file::delivery`, mapper A11). The report floor leads with
+   what the report DELIVERS: each delivery scope's floor lead — its
+   grain sentence and composition sentence. Multiple deliveries
+   enumerate in statement order. A file with no delivery scope
+   (setup-only scripts) says so honestly.
+2. **The spine.** Walk each delivery's read chain (from_refs to
+   earlier named selections, transitively) back to the base
+   selections that read only real sources. Voice the base
+   selection(s) by name and restriction lead; COUNT the
+   intermediate steps: "built through N intermediate selections —
+   each speaks its own floor." Voiced ⊎ counted == total holds at
+   file grain: every named scope is either voiced (delivery, base)
+   or counted (intermediate) — the voicing ledger extends.
+3. **The census closes.** The step count and named-selection list
+   remain as the final line — honest mechanics, never the lead.
+
+Corollary (the ask index): a file's `words` = its report floor's
+delivery lead. Files embed MEANING; the name-noise ranking of live
+find #8 (a 0.05-band score spread with the true file last) becomes
+structurally impossible for described files.
 
 ## Ratification effects (the A13 flip)
 

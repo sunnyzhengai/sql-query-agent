@@ -29,6 +29,21 @@
    "expected": [
     "each stored vector carries (entry identity, text hash, model); an unchanged meaning never re-embeds across builds"
    ]
+  },
+  {
+   "id": "GR-5",
+   "title": "the path tier: decorated exact names never guess (live find #8)",
+   "expected": [
+    "'USP_ED_SEPSIS.sql', 'reporting/USP_ED_SEPSIS.sql' and the bare basename all ground to the file DETERMINISTICALLY (identity-suffix match) — no embed call",
+    "an ambiguous suffix (a basename shared by two files) -> candidates, never a pick"
+   ]
+  },
+  {
+   "id": "GR-6",
+   "title": "files embed meaning, not names (find #8 second layer)",
+   "expected": [
+    "a file's ask-index words are its report floor's delivery lead — never empty; the name-noise ranking (0.05-band spread, true file last) is structurally dead for described files"
+   ]
   }
  ],
  "connect": [
@@ -61,6 +76,14 @@
    "title": "caps are visible, never silent",
    "expected": [
     "any truncated listing prints shown-of-total"
+   ]
+  },
+  {
+   "id": "CN-5",
+   "title": "the report floor: a file speaks meaning (live find #9)",
+   "expected": [
+    "a file's card leads with what the report DELIVERS (delivery scopes' grain + composition), voices the base selection spine, COUNTS intermediates (voiced+counted==total at file grain), and closes with the census — never census-first",
+    "a file with no delivery scope says so honestly"
    ]
   }
  ],

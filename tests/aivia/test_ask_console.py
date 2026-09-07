@@ -406,3 +406,67 @@ def test_cs3_the_cage_holds_at_the_surface(surface):
     # the interpreter saw ONE question, verbatim — no prior answer
     # text, no transcript (the cage holds at the surface)
     assert calls == [q2]
+
+
+# ---- GR-5/6 + CN-5: the path tier and the report floor (finds #8/#9)
+def test_gr5_path_tier_decorated_names_never_guess(world):
+    store, _semantic = world
+    read = ReadApi(store)
+    index = ask.build_index(read)
+    kinds = ask._kind_vocabulary()
+    # semantic=None: if these fell past the deterministic tiers they
+    # would come back unknown — the .sql decoration never demotes an
+    # exact ask to the guessing tier (live find #8)
+    for mention in ("USP_ED_SEPSIS.sql",
+                    "reporting/USP_ED_SEPSIS.sql"):
+        g = grounding.ground(mention, index, kinds, None)
+        assert g["outcome"] == "matched", mention
+        assert g["tier"] == "path"
+        assert g["entity"]["identity"].endswith(
+            "reporting/USP_ED_SEPSIS.sql")
+
+
+def test_gr5_ambiguous_suffix_is_candidates_never_a_pick():
+    index = [
+        {"kind": "file", "identity": "repo://a/x/FOO.sql",
+         "name": "FOO", "folded": "FOO", "words": ""},
+        {"kind": "file", "identity": "repo://b/x/FOO.sql",
+         "name": "FOO", "folded": "FOO", "words": ""},
+    ]
+    g = grounding.ground("x/FOO.sql", index, {}, None)
+    assert g["tier"] == "path"
+    assert g["outcome"] == "candidates"
+    assert len(g["candidates"]) == 2
+
+
+def test_gr6_files_embed_meaning_not_names(world):
+    store, _semantic = world
+    read = ReadApi(store)
+    index = ask.build_index(read)
+    files = [e for e in index if e["kind"] == "file"]
+    assert files
+    target = next(e for e in files
+                  if e["identity"].endswith(
+                      "reporting/USP_ED_SEPSIS.sql"))
+    # the file's words are its report floor's delivery lead — never
+    # empty, never the bare name (find #8's 0.05-band noise dies)
+    assert target["words"]
+    assert "selection" in target["words"] or "record" in target["words"]
+
+
+def test_cn5_the_report_floor_speaks_meaning(world):
+    store, semantic = world
+    result = ask.ask(store, "reporting/USP_ED_SEPSIS.sql",
+                     "person:test", T0, semantic=semantic)
+    assert result["status"] == "answer"
+    answer = result["answer"]
+    # deliveries lead — never census-first
+    assert not answer.split("\n")[2].startswith("A procedure of")
+    low = answer.lower()
+    assert "deliver" in low
+    # the spine: base selections voiced, intermediates COUNTED
+    assert "selection" in low
+    assert "intermediate" in low
+    # the census closes (honest mechanics, last)
+    assert "67 steps" in answer
+    assert answer.index("deliver") < answer.index("67 steps")

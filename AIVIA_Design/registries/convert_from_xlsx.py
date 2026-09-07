@@ -125,7 +125,14 @@ SOURCES = {
 # clears and stays; context is CONVERSATION-scoped (client-held id),
 # never a global; transcript = DISPLAY memory, context set = MEANING
 # memory — prose history never reaches the model (the cage holds).
-STAMP_VERSION = "1.16.0"
+# v1.17.0 (2026-09-07): finds #8+#9 — the PATH TIER (mechanical
+# identity-suffix grounding between exact-name and semantic; ".sql"
+# never again demotes an exact ask to the guessing tier) and THE
+# REPORT FLOOR (grammar 2.3.0 R10: file floors compose from scopes —
+# deliveries lead, spine voiced, intermediates counted, census
+# closes; the file's ask-index words = the delivery lead, so file
+# embeddings embed meaning, never name-noise).
+STAMP_VERSION = "1.17.0"
 RATIFIED = True
 DOC_STAMP = ("v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 twin-graph "
              "ruling ADR 0077; v1.2.0 Phase A metamodel bump; v1.3.0 "
@@ -858,6 +865,28 @@ TWIN_SHEETS = {
              "concepts (honest empty until a human mints); practiced "
              "= delivery selections (what the report procs actually "
              "emit). Org words extend via KG3 terms, steward-blessed."},
+            {"Item": "grounding: the path tier", "Definition": "RULED "
+             "2026-09-07 (live find #8: 'how is reporting/"
+             "USP_ED_SEPSIS.sql defined' fell past both exact tiers "
+             "on one mechanical decoration and the true file ranked "
+             "LAST in a 0.05-band semantic pool): a deterministic "
+             "tier between exact-name and semantic — fold, strip "
+             "the extension, split identities on segment boundaries "
+             "(/ | ::); a mention equal to a whole trailing segment "
+             "sequence grounds exactly (unique -> matched, several "
+             "-> candidates). String mechanics, legal under "
+             "never-regex: no meaning is extracted from language."},
+            {"Item": "the report floor", "Definition": "RULED "
+             "2026-09-07 (live find #9: the file card was a census "
+             "placeholder — 'a procedure of 67 steps' — while Sunny "
+             "asked for MEANING at the report level): Floor Grammar "
+             "2.3.0 R10 — a file's floor composes from its scopes: "
+             "delivery scopes LEAD (grain + composition sentence), "
+             "the spine walks back to base selections (voiced), "
+             "intermediates are COUNTED (voiced-plus-counted == "
+             "total extends to file grain), the census closes. "
+             "Corollary: the file's ask-index words = the delivery "
+             "lead — files embed meaning, never bare names."},
             {"Item": "the conversation surface", "Definition": "RULED "
              "2026-09-07 (find #7 second leg — resolution shipped but "
              "the console stayed page-per-question, so follow-ups "

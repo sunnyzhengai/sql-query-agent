@@ -57,10 +57,22 @@ enumeration disease wearing types.
    validated against the index and the metamodel; a failed
    validation degrades to HITL, never to a guess.
 2. **GROUND** (deterministic tiers + embeddings): each mention
-   resolves exact-identity -> exact folded name -> SEMANTIC
-   (vector) -> HITL. The semantic index embeds each node's MEANING
-   TEXT (descriptions, steward words, floors) — possible only
-   because translation is total (ADR 0077). Every stored vector is
+   resolves anaphor (Law 4) -> exact-identity -> exact folded name
+   -> PATH (amended 2026-09-07, live find #8: "how is
+   reporting/USP_ED_SEPSIS.sql defined" fell to the semantic tier
+   and the exact file ranked LAST — one mechanical decoration, the
+   ".sql", pushed an exact ask into the guessing tier; the path
+   tier is mechanical suffix matching: fold, strip extension, split
+   identities on segment boundaries (/, |, ::), a mention equal to
+   a whole trailing segment sequence grounds exactly — string
+   mechanics, legal under never-regex, no meaning extracted from
+   language) -> SEMANTIC (vector) -> HITL. The semantic index
+   embeds each node's MEANING TEXT (descriptions, steward words,
+   floors) — possible only because translation is total (ADR 0077).
+   Corollary of the same find: FILE entries must carry meaning
+   words — a file embeds its REPORT FLOOR lead (grammar 2.3.0),
+   never its bare name; name-only vectors are ranking noise (the
+   0.05-band score spread that put the true file last). Every stored vector is
    stamped (content_key + embedding-model version): the change
    quanta extend for free — a meaning that did not change never
    re-embeds. Embedding endpoints live inside the customer boundary

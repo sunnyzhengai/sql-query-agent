@@ -37,7 +37,10 @@ ECON = json.loads((pathlib.Path(__file__).parent / "econ_params.json")
 # CTE floored as 'no source records are read': COMBINATION scopes now
 # map (arms in order, dedup flag), voice per arm, and an unmapped
 # query shape floors as its honest counted state, never a claim.
-FLOOR_GRAMMAR_VERSION = "2.2.0"
+# 2.3.0: R10 — THE REPORT FLOOR (live find #9): file floors compose
+# from scopes — deliveries lead, spine voiced, intermediates counted,
+# census closes; file ask-index words = the delivery lead.
+FLOOR_GRAMMAR_VERSION = "2.3.0"
 _PREPOSITIONS = ("of", "on", "per", "for", "in", "at", "by", "with")
 
 
@@ -364,6 +367,25 @@ def _composition_sentence(read: ReadApi, tree, scope,
                                       ref.get("resolves_to"), []))
     if not phrases:
         return None
+    # 2.3.0 phrasing (truth unchanged, count visible): a RUN of
+    # identical source phrases aggregates — "combined with an inline
+    # selection" seven times is mechanics, "7 inline selections" is
+    # the same fact spoken once
+    compressed = []
+    i = 0
+    while i < len(phrases):
+        j = i
+        while j < len(phrases) and phrases[j] == phrases[i]:
+            j += 1
+        n = j - i
+        if n == 1:
+            compressed.append(phrases[i])
+        elif phrases[i] == "an inline selection":
+            compressed.append(f"{n} inline selections")
+        else:
+            compressed.append(f"{phrases[i]} ({n} reads)")
+        i = j
+    phrases = compressed
     sentence = f"Drawn from {phrases[0]}"
     connector = (", restricted to records also present in "
                  if inner_only and len(join_kinds) > 0
@@ -528,6 +550,131 @@ def _compose_scope(read: ReadApi, tree, scope,
         bullets = ["- No membership conditions are applied in this "
                    "selection."]
     return "\n".join(lines + bullets)
+
+
+def _scope_lead(read: ReadApi, tree, scope) -> str:
+    """A scope's lead + composition sentence — the non-bullet head of
+    its floor (R10 voices scopes at file grain through this)."""
+    lead = []
+    for line in _compose_scope(read, tree, scope).split("\n"):
+        if line.startswith("- ") or line.endswith("alternative:"):
+            break
+        lead.append(line)
+        if len(lead) == 2:
+            break
+    return " ".join(lead)
+
+
+def compose_file_floor(read: ReadApi, target: str) -> str:
+    """R10 — THE REPORT FLOOR (grammar 2.3.0, live find #9): a file's
+    floor composes from its scopes. Deliveries LEAD, the spine walks
+    back to base selections (voiced), intermediates are COUNTED
+    (voiced + counted == total extends to file grain), the census
+    closes — honest mechanics, never the lead. Deterministic; the
+    model adds nothing."""
+    tree = None
+    for k, t in read.trees().items():
+        if k == target or t["name"] == target:
+            tree = t
+    if tree is None:
+        raise KeyError(f"no file {target} in the parsed estate")
+    scopes = {sc["name_key"]: sc
+              for sc in decisions.named_scopes(tree)}
+    deliveries = [st["scope"] for st in tree["statements"]
+                  if st.get("emits") and st.get("scope")
+                  and st["scope"].get("name_key")]
+
+    lines: List[str] = []
+    if not deliveries:
+        lines.append("This procedure emits no result set — a "
+                     "setup/maintenance script; nothing is delivered "
+                     "to a reader.")
+    for i, d in enumerate(deliveries):
+        prefix = ("This report delivers: " if len(deliveries) == 1
+                  else f"This report delivers ({i + 1} of "
+                       f"{len(deliveries)}): ")
+        lines.append(prefix + _scope_lead(read, tree, d))
+
+    # the spine: every named selection the deliveries draw from,
+    # transitively (arms and derived interiors included — a read is
+    # a read)
+    on_chain: List[str] = []
+
+    def walk(scope):
+        for ref in decisions.nested_sources(scope):
+            rt = str(ref.get("resolves_to") or "")
+            if rt.startswith("SAME-TREE scope "):
+                nk = rt.replace("SAME-TREE scope ", "")
+                if nk in scopes and nk not in on_chain:
+                    on_chain.append(nk)
+                    walk(scopes[nk])
+    for d in deliveries:
+        walk(d)
+
+    def is_base(scope) -> bool:
+        refs = decisions.nested_sources(scope)
+        return bool(refs) and not any(
+            str(r.get("resolves_to") or "").startswith("SAME-TREE")
+            for r in refs)
+    delivery_keys = {d["name_key"] for d in deliveries}
+    chain = [nk for nk in scopes if nk in on_chain]  # tree order
+    bases = [nk for nk in chain if is_base(scopes[nk])]
+    intermediates = [nk for nk in chain if nk not in bases]
+    off_chain = [nk for nk in scopes
+                 if nk not in on_chain and nk not in delivery_keys]
+
+    BASE_CAP = 5
+    if bases:
+        lines.append(f"Built from {len(bases)} base selection(s) "
+                     "reading source tables:")
+        for nk in bases[:BASE_CAP]:
+            name = nk.split("::")[-1]
+            lines.append(f"- {name}: "
+                         + _scope_lead(read, tree, scopes[nk]))
+        if len(bases) > BASE_CAP:
+            lines.append(f"- … and {len(bases) - BASE_CAP} more base "
+                         "selection(s) — each speaks its own floor.")
+    if intermediates:
+        lines.append(f"Refined through {len(intermediates)} "
+                     "intermediate selection(s) — each speaks its "
+                     "own floor.")
+    if off_chain:
+        lines.append(f"{len(off_chain)} named selection(s) sit "
+                     "outside the delivery chain (counted).")
+    voiced = len(delivery_keys) + min(len(bases), BASE_CAP)
+    counted = (len(intermediates) + len(off_chain)
+               + max(0, len(bases) - BASE_CAP))
+    lines.append(f"Voicing: {voiced} voiced, {counted} counted, of "
+                 f"{len(scopes)} named selections.")
+
+    # the census closes — honest mechanics, never the lead
+    names = [nk.split("::")[-1] for nk in scopes]
+    lines.append(f"A procedure of {len(tree['statements'])} steps; "
+                 f"named selections: "
+                 f"{', '.join(names[:12]) or '(none)'}"
+                 + (f" … ({len(names) - 12} more)"
+                    if len(names) > 12 else "") + ".")
+    return "\n".join(lines)
+
+
+def file_words(read: ReadApi, target: str) -> str:
+    """The file's ask-index words = its report floor's delivery lead
+    (R10 corollary, find #8 second layer): files embed MEANING —
+    name-only vectors are ranking noise. Total: never raises."""
+    tree = None
+    for k, t in read.trees().items():
+        if k == target or t["name"] == target:
+            tree = t
+    if tree is None:
+        return ""
+    deliveries = [st["scope"] for st in tree["statements"]
+                  if st.get("emits") and st.get("scope")
+                  and st["scope"].get("name_key")]
+    if not deliveries:
+        return ("emits no result set; a setup or maintenance "
+                "script")
+    return " ".join(_scope_lead(read, tree, d)
+                    for d in deliveries).lower()
 
 
 def _priority(read: ReadApi, worklist: List[str]) -> List[str]:

@@ -21,7 +21,6 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from aivia.flows import ask, connect, grounding, inbound
 from aivia.graph import kg1_intake
 from aivia.graph.read_api import ReadApi
-from aivia.lenses import ask_index
 
 INTERPRETER_MODEL = "gpt-4o-mini"
 EMBEDDING_MODEL = "text-embedding-3-small"
@@ -289,7 +288,7 @@ def make_handler(store, estate, interpret_fn, semantic, pending):
         mode = (params.get("mode") or [""])[0]
         read = ReadApi(store)
         if entity_id and mode in ask.DISPLAY_MODES:
-            index = ask_index.lens_ask_index(read, None)["yield"]
+            index = ask.build_index(read)
             entity = next((e for e in index
                            if e["identity"] == entity_id), None)
             adj = connect.build_adjacency(read)
@@ -364,7 +363,7 @@ def main() -> None:
     print(f"building the {estate} graph …")
     store, base = build_store(estate)
     read = ReadApi(store)
-    entries = ask_index.lens_ask_index(read, None)["yield"]
+    entries = ask.build_index(read)
     interpret_fn = make_interpreter(key) if key else None
     semantic = None
     if key:

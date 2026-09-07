@@ -85,6 +85,21 @@ class SemanticIndex:
         return [{"score": round(s, 4), **e} for s, e in scored[:top_k]]
 
 
+def _segments(text: str) -> List[str]:
+    """Folded identity segments: split on / | :: boundaries, strip a
+    .sql extension — the path tier's mechanical normal form."""
+    flat = (text.replace("::", "\x00").replace("/", "\x00")
+            .replace("|", "\x00"))
+    out = []
+    for chunk in flat.split("\x00"):
+        seg = _fold(chunk)
+        if seg.endswith(".SQL"):
+            seg = seg[:-4]
+        if seg:
+            out.append(seg)
+    return out
+
+
 def _anaphor_vocabulary() -> Dict[str, str]:
     """Word -> role, FROM THE REGISTRY (v1.15.0; Law 4): follow-up
     words are meaning-as-data. Roles: singular | set | ordinal:N."""
@@ -167,6 +182,24 @@ def ground(mention: str, index: List[Dict[str, Any]],
     if exact:
         return {"tier": "exact-name", "outcome": "candidates",
                 "candidates": exact[:TOP_K], "mention": mention}
+    # TIER — PATH (live find #8): a mention equal to a whole trailing
+    # segment sequence of an identity grounds DETERMINISTICALLY —
+    # 'reporting/USP_ED_SEPSIS.sql' and 'USP_ED_SEPSIS.sql' are the
+    # file, not a semantic guess. Mechanical string comparison (fold,
+    # strip the extension, split on segment boundaries / | ::) —
+    # legal under never-regex: no meaning extracted from language.
+    want_segs = _segments(mention.strip())
+    if want_segs and (len(want_segs) > 1 or want_segs[0] != wanted):
+        hits = [e for e in index
+                if _segments(e["identity"])[-len(want_segs):]
+                == want_segs]
+        hit_ids = {(e["kind"], e["identity"]) for e in hits}
+        if len(hit_ids) == 1:
+            return {"tier": "path", "outcome": "matched",
+                    "entity": hits[0], "mention": mention}
+        if hits:
+            return {"tier": "path", "outcome": "candidates",
+                    "candidates": hits[:TOP_K], "mention": mention}
     if semantic is not None:
         try:
             hits = semantic.search(mention)
