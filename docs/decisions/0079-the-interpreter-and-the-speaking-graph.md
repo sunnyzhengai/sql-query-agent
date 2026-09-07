@@ -225,10 +225,27 @@ modes and deterministic renderers.
 - Ranking-weight defaults: seeded by us, tuned by evidence,
   declared in the registry.
 
+## Amendment 2026-09-07 — GROUND rebuilt under ADR 0080
+
+The live-find series (#5/#8/#9/#10) traced to a generator this ADR
+did not close: GROUND was implemented over a flat ad-hoc sidecar
+(the ask index authoring its own "words") instead of the meaning
+tree, and grounding outcomes were cliffed (below-threshold ->
+"unknown") instead of carried as scored candidates. ADR 0080 (the
+center and the three censuses) governs the rebuild: speech declared
+per kind, facet matching with rollup + provenance, word-grain name
+tokens, thresholds-never-cliffs, the always-on search trace, and
+interpreter-proposed expansions landing as KG3 terms on
+confirmation. The find-#10 "topic law" patch proposal is DEAD —
+superseded by 0080's one build phase. This ADR's laws (never-regex,
+the cage, match-then-connect, buttons, the ledger, Laws 3-4) stand
+unchanged.
+
 ## Relations
 
 0077 (total translation makes NL-NL grounding and speaking-nodes
 possible) · 0078 (superseded in part) · 0076 (compose, never
-enumerate — now applied to questions) · 0001 (native parsers; the
+enumerate — now applied to questions) · 0080 (the center + three
+censuses; governs the GROUND rebuild) · 0001 (native parsers; the
 code-side of never-regex) · L0 inward flow (Tier B is its MATCH
 stage) · the tier lock (no open chat; artifacts land, chat doesn't).

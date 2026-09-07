@@ -16,6 +16,16 @@ piece 1 replaces L0 in "AIVIA Design Document.md" (Sunny's doc,
 his edit). Next build act: Phase A — metamodel bump + A12
 projection re-parse (5d).*
 
+*EXTENDED 2026-09-07 by Center_and_Censuses_RULING (ADR 0080): the
+composed-meaning amendment gains its enforcement — composition is
+the TRANSLATOR'S job and is STORED in the twin (a file's
+up-composed subject included); readings render or project
+verbatim, never author; the three censuses (reachable / speaks /
+searchable) make the lineage guarantee, the speech of every kind,
+and search-over-the-tree standing conservation tests. The
+2026-09-07 live finds proved the cost of searching a flattened
+sidecar instead of this twin.*
+
 ---
 
 ## Piece 1 — the L0 REWRITE (RESTATEMENT RATIFIED by Sunny

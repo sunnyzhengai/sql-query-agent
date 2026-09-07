@@ -204,5 +204,43 @@
     "the server never stores or forwards prose history; the interpreter receives ONE question, never prior answer text — conversation state is the typed context set alone"
    ]
   }
+ ],
+ "census": [
+  {
+   "id": "CE-1",
+   "title": "the file's stored speech carries its subject (cause-1 corpse)",
+   "expected": [
+    "'how is reporting/USP_ED_SEPSIS.sql defined' grounds deterministically AND the file's speech (stored in the twin by the translator, read verbatim by the index) carries emergency-department meaning — never the self-referential delivery slice"
+   ]
+  },
+  {
+   "id": "CE-2",
+   "title": "word-grain tokens; the trace displays",
+   "expected": [
+    "'what reports are about ED' finds the ED files by word-grain name tokens deterministically; BED_CONFIG never matches; the round shows the trace (mentions, expansions searched, tier/facet hit, score)"
+   ]
+  },
+  {
+   "id": "CE-3",
+   "title": "facet match with provenance (the 0.80-vs-0.57 probe)",
+   "expected": [
+    "'sepsis screening alerts' matches via the condition facet with provenance shown; one-blob blending is banned — a node's score is a rollup over its facets, never a blended-paragraph cosine"
+   ]
+  },
+  {
+   "id": "CE-4",
+   "title": "honest zero, never NO MATCH while a kind grounded",
+   "expected": [
+    "'what metrics are about ED' -> kind grounds, topic searches facets, an empty result answers as a counted zero; NO MATCH is legal only when NOTHING grounds; below-threshold semantic -> HITL candidates with scores, never 'unknown'"
+   ]
+  },
+  {
+   "id": "CE-5",
+   "title": "the three equations hold",
+   "expected": [
+    "on the sepsis estate: reachable+ruled-isolated==total nodes; speaks+counted-gap+ruled-mute==total; searchable+ruled-silent==everything that speaks — standing tests AND gap-check report buckets",
+    "verbatim-ness: every text the ask index carries equals a stored property or a versioned-grammar rendering; reading-side composition logic == 0"
+   ]
+  }
  ]
 }

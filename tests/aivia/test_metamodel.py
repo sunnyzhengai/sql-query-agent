@@ -38,10 +38,11 @@ def test_every_loaded_registry_is_ratified_v1():
     # 1.14.0 = follow-up context is data (live find 7, 09-07)
     # 1.15.0 = anaphor vocabulary as registry data (same day);
     # 1.16.0 = the conversation surface (find #7 second leg);
-    # 1.17.0 = the path tier + the report floor (finds #8/#9)
+    # 1.17.0 = the path tier + the report floor (finds #8/#9);
+    # 1.18.0 = the center + three censuses (ADR 0080)
     for reg in metamodel.load_all().values():
         assert reg.ratified is True
-        assert reg.version == "1.17.0"
+        assert reg.version == "1.18.0"
 
 
 def test_load_single_exposes_sheets_and_stamp():

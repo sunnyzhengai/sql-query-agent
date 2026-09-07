@@ -115,7 +115,7 @@ ARCHITECTURE_COMPONENTS = {
         # component — one system-model file, organized by the Sphere,
         # every section carrying a build status.
         "doc": "docs/architecture/ARCHITECTURE.md",
-        "current_through": "0079",
+        "current_through": "0080",
         "title": "The system model — the Sphere",
         # all six groups since ADR 0071 (user_flow absorbed): the one
         # system-model file legitimately spans the constitution.
@@ -739,6 +739,22 @@ TRACE_REGISTRY = {
                   "tests/test_term_hygiene.py", "tests/test_admin_graph.py",
                   "tests/test_companion.py"],
         "docs": ["docs/architecture/SPEC.md", "docs/architecture/TRACE_MAP.md"],
+    },
+    "0080": {
+        # ACCEPTED 2026-09-07: the center law (code = builder |
+        # reading | flow; readings never author) and the three
+        # censuses (reachable / speaks / searchable as conservation
+        # equations). Supersedes the find-#10 patch; governs the
+        # GROUND rebuild. Design record — build follows Sunny's
+        # order.
+        "title": "The center and the three censuses",
+        "category": "architecture",
+        "component": "architecture",
+        "axioms": [],
+        "modules": ["aivia/flows/grounding.py", "aivia/flows/ask.py"],
+        "tests": ["tests/aivia/test_ask_console.py"],
+        "docs": ["docs/decisions/"
+                 "0080-the-center-and-the-three-censuses.md"],
     },
     "0079": {
         # ACCEPTED 2026-09-06: never-regex; the graph's own

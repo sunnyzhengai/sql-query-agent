@@ -125,6 +125,16 @@ SOURCES = {
 # clears and stays; context is CONVERSATION-scoped (client-held id),
 # never a global; transcript = DISPLAY memory, context set = MEANING
 # memory — prose history never reaches the model (the cage holds).
+# v1.18.0 (2026-09-07): THE CENTER AND THE THREE CENSUSES (ADR
+# 0080, Center_and_Censuses_RULING ratified): the center law (code =
+# builder | reading | flow; readings render/cache verbatim, never
+# author; composition is the translator's, stored in the twin);
+# Speech_Sources sheet (every node kind declares which stored
+# property it speaks; kinds themselves speak and are searchable);
+# Censuses sheet (reachable / speaks / searchable as conservation
+# equations, standing tests + report buckets); riders: thresholds
+# never cliffs, the always-on search trace, expansions land as KG3
+# terms on confirmation. Supersedes the find-#10 "topic law" patch.
 # v1.17.0 (2026-09-07): finds #8+#9 — the PATH TIER (mechanical
 # identity-suffix grounding between exact-name and semantic; ".sql"
 # never again demotes an exact ask to the guessing tier) and THE
@@ -132,7 +142,7 @@ SOURCES = {
 # deliveries lead, spine voiced, intermediates counted, census
 # closes; the file's ask-index words = the delivery lead, so file
 # embeddings embed meaning, never name-noise).
-STAMP_VERSION = "1.17.0"
+STAMP_VERSION = "1.18.0"
 RATIFIED = True
 DOC_STAMP = ("v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 twin-graph "
              "ruling ADR 0077; v1.2.0 Phase A metamodel bump; v1.3.0 "
@@ -680,6 +690,77 @@ TWIN_SHEETS = {
         ],
     },
     "lenses": {
+        "Speech_Sources": [
+            {"Kind": "_ruling", "Speech": "-",
+             "Meaning": "ADR 0080 census 2 (2026-09-07): every node "
+             "kind declares WHICH STORED PROPERTY it speaks for "
+             "search and cards — one home per meaning; consumers "
+             "read, never re-derive. speaks + counted-gap + "
+             "ruled-mute == total. Closed: a new kind declares its "
+             "speech at birth or fails the census."},
+            {"Kind": "table", "Speech": "KG1 steward description",
+             "Meaning": "declared truth, as loaded"},
+            {"Kind": "column", "Speech": "KG1 steward description",
+             "Meaning": "declared truth, as loaded"},
+            {"Kind": "scope (selection)",
+             "Speech": "floor lead + composition (grammar render of "
+             "the twin)", "Meaning": "rendered, never authored"},
+            {"Kind": "file", "Speech": "composed meaning STORED in "
+             "the twin (translator): delivery lead + base "
+             "compositions + read-tables' steward words",
+             "Meaning": "the center-law corollary — composition is "
+             "building; the cause-1 corpse (self-referential "
+             "delivery slice) dies here"},
+            {"Kind": "condition (predicate)",
+             "Speech": "voiced phrase (grammar render, stored on "
+             "the twin node)", "Meaning": "the best-scoring facets "
+             "of the 2026-09-07 probe — 0.80 vs 0.57 blended"},
+            {"Kind": "parameter", "Speech": "voiced phrase",
+             "Meaning": "rendered"},
+            {"Kind": "term (KG3)", "Speech": "definition",
+             "Meaning": "human-authored"},
+            {"Kind": "drift name", "Speech": "the standing drift "
+             "sentence", "Meaning": "findable by name, the search "
+             "law"},
+            {"Kind": "kind (node type)", "Speech": "its registry "
+             "definition", "Meaning": "KINDS ARE SEARCHABLE NODES — "
+             "'reports'/'procs'/'dashboards' ground to kind:file by "
+             "meaning, never by a fixed word list alone"},
+            {"Kind": "operational statement", "Speech": "RULED-MUTE",
+             "Meaning": "no reader-facing meaning (the v1.4.0 "
+             "operational class)"},
+        ],
+        "Censuses": [
+            {"Census": "_ruling", "Equation": "-",
+             "Meaning": "ADR 0080 (2026-09-07): Sunny's three "
+             "questions as conservation laws, the voiced+counted=="
+             "total shape. Each census is a standing test AND a "
+             "gap-check report bucket."},
+            {"Census": "reachability",
+             "Equation": "reachable + ruled-isolated == total nodes",
+             "Meaning": "the L0 lineage guarantee given its census; "
+             "status at ratification: UNVERIFIED in aivia"},
+            {"Census": "speech",
+             "Equation": "speaks + counted-gap + ruled-mute == "
+             "total nodes",
+             "Meaning": "per Speech_Sources; empty speech is an "
+             "honest counted documentation gap"},
+            {"Census": "searchability",
+             "Equation": "searchable + ruled-silent == everything "
+             "that speaks",
+             "Meaning": "speech indexed VERBATIM + word-grain name "
+             "tokens; embeddings = content-keyed cache of speech; "
+             "search matches FACETS, scores roll UP the tree, "
+             "provenance kept; one-blob blending BANNED"},
+            {"Census": "riders", "Equation": "-",
+             "Meaning": "thresholds are registry data and never "
+             "cliffs (below-threshold -> HITL candidates w/ "
+             "scores); the search trace renders every round "
+             "(always-on; later suppression = toggle, never "
+             "removal); interpreter-proposed expansions are search "
+             "strings only until confirmed -> then KG3 terms / "
+             "vocabulary rows"},
+        ],
         "Builders_and_Readings": [
             {"Item": "_ruling", "Definition": _TG + " 3: the lens STRATUM "
              "retires into two contracts; this sheet + Reclassification "
@@ -691,8 +772,12 @@ TWIN_SHEETS = {
              "every node written; writes ONLY its own layer; total with "
              "counted gaps; version bump rebuilds everything it governs. "
              "Governance has NO builder."},
-            {"Item": "READING contract", "Definition": "named, versioned, "
-             "deterministic, writes nothing; kept for citability "
+            {"Item": "READING contract (amended 2026-09-07, ADR "
+             "0080)", "Definition": "named, versioned, "
+             "deterministic, writes nothing; renders via ratified "
+             "grammar; caches only as VERBATIM PROJECTION of stored "
+             "properties; NEVER AUTHORS (the ask-index corpse); "
+             "kept for citability "
              "(dispositions and concept bases quote reading output by "
              "version); most are versioned queries"},
             {"Item": "survival principle", "Definition": "a reading exists "

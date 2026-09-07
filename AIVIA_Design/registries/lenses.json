@@ -1,7 +1,7 @@
 {
  "registry": "lenses",
  "stamp": {
-  "version": "1.17.0",
+  "version": "1.18.0",
   "doc_section": "Level 2 — lenses",
   "doc_stamp": "v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 twin-graph ruling ADR 0077; v1.2.0 Phase A metamodel bump; v1.3.0 Phase B composite-kinds correction; v1.4.0 T-2 operational-statements ruling; v1.5.0 the gap taxonomy; v1.6.0 the plug-all-holes sweep; v1.7.0 ledger close; v1.8.0 the ask console ADR 0078; v1.9.0 the list op; v1.10.0 kind vocabulary; v1.11.0 ADR 0079 interpreter; v1.12.0 Tier A build data; v1.13.0 the seat-failure law; v1.14.0 follow-up context; v1.15.0 anaphor vocabulary (all 2026-09-06)",
   "ratified": true,
@@ -13,6 +13,8 @@
   "register H7 (2026-09-05)",
   "register A6 (2026-09-05)",
   "register H5 (2026-09-05)",
+  "sheet Speech_Sources added (twin-graph ruling (2026-09-06), ADR 0077)",
+  "sheet Censuses added (twin-graph ruling (2026-09-06), ADR 0077)",
   "sheet Builders_and_Readings added (twin-graph ruling (2026-09-06), ADR 0077)",
   "sheet Anaphor_Vocabulary added (twin-graph ruling (2026-09-06), ADR 0077)",
   "sheet Ranking_Weights added (twin-graph ruling (2026-09-06), ADR 0077)",
@@ -183,6 +185,90 @@
     "v1": "deferred (reads the deferred ask surface)"
    }
   ],
+  "Speech_Sources": [
+   {
+    "Kind": "_ruling",
+    "Speech": "-",
+    "Meaning": "ADR 0080 census 2 (2026-09-07): every node kind declares WHICH STORED PROPERTY it speaks for search and cards — one home per meaning; consumers read, never re-derive. speaks + counted-gap + ruled-mute == total. Closed: a new kind declares its speech at birth or fails the census."
+   },
+   {
+    "Kind": "table",
+    "Speech": "KG1 steward description",
+    "Meaning": "declared truth, as loaded"
+   },
+   {
+    "Kind": "column",
+    "Speech": "KG1 steward description",
+    "Meaning": "declared truth, as loaded"
+   },
+   {
+    "Kind": "scope (selection)",
+    "Speech": "floor lead + composition (grammar render of the twin)",
+    "Meaning": "rendered, never authored"
+   },
+   {
+    "Kind": "file",
+    "Speech": "composed meaning STORED in the twin (translator): delivery lead + base compositions + read-tables' steward words",
+    "Meaning": "the center-law corollary — composition is building; the cause-1 corpse (self-referential delivery slice) dies here"
+   },
+   {
+    "Kind": "condition (predicate)",
+    "Speech": "voiced phrase (grammar render, stored on the twin node)",
+    "Meaning": "the best-scoring facets of the 2026-09-07 probe — 0.80 vs 0.57 blended"
+   },
+   {
+    "Kind": "parameter",
+    "Speech": "voiced phrase",
+    "Meaning": "rendered"
+   },
+   {
+    "Kind": "term (KG3)",
+    "Speech": "definition",
+    "Meaning": "human-authored"
+   },
+   {
+    "Kind": "drift name",
+    "Speech": "the standing drift sentence",
+    "Meaning": "findable by name, the search law"
+   },
+   {
+    "Kind": "kind (node type)",
+    "Speech": "its registry definition",
+    "Meaning": "KINDS ARE SEARCHABLE NODES — 'reports'/'procs'/'dashboards' ground to kind:file by meaning, never by a fixed word list alone"
+   },
+   {
+    "Kind": "operational statement",
+    "Speech": "RULED-MUTE",
+    "Meaning": "no reader-facing meaning (the v1.4.0 operational class)"
+   }
+  ],
+  "Censuses": [
+   {
+    "Census": "_ruling",
+    "Equation": "-",
+    "Meaning": "ADR 0080 (2026-09-07): Sunny's three questions as conservation laws, the voiced+counted==total shape. Each census is a standing test AND a gap-check report bucket."
+   },
+   {
+    "Census": "reachability",
+    "Equation": "reachable + ruled-isolated == total nodes",
+    "Meaning": "the L0 lineage guarantee given its census; status at ratification: UNVERIFIED in aivia"
+   },
+   {
+    "Census": "speech",
+    "Equation": "speaks + counted-gap + ruled-mute == total nodes",
+    "Meaning": "per Speech_Sources; empty speech is an honest counted documentation gap"
+   },
+   {
+    "Census": "searchability",
+    "Equation": "searchable + ruled-silent == everything that speaks",
+    "Meaning": "speech indexed VERBATIM + word-grain name tokens; embeddings = content-keyed cache of speech; search matches FACETS, scores roll UP the tree, provenance kept; one-blob blending BANNED"
+   },
+   {
+    "Census": "riders",
+    "Equation": "-",
+    "Meaning": "thresholds are registry data and never cliffs (below-threshold -> HITL candidates w/ scores); the search trace renders every round (always-on; later suppression = toggle, never removal); interpreter-proposed expansions are search strings only until confirmed -> then KG3 terms / vocabulary rows"
+   }
+  ],
   "Builders_and_Readings": [
    {
     "Item": "_ruling",
@@ -193,8 +279,8 @@
     "Definition": "loader -> KG1 · parser -> KG2a · TRANSLATOR -> KG2b (the 'translation lens' renamed to what it is). Deterministic; versioned, stamps every node written; writes ONLY its own layer; total with counted gaps; version bump rebuilds everything it governs. Governance has NO builder."
    },
    {
-    "Item": "READING contract",
-    "Definition": "named, versioned, deterministic, writes nothing; kept for citability (dispositions and concept bases quote reading output by version); most are versioned queries"
+    "Item": "READING contract (amended 2026-09-07, ADR 0080)",
+    "Definition": "named, versioned, deterministic, writes nothing; renders via ratified grammar; caches only as VERBATIM PROJECTION of stored properties; NEVER AUTHORS (the ask-index corpse); kept for citability (dispositions and concept bases quote reading output by version); most are versioned queries"
    },
    {
     "Item": "survival principle",

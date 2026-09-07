@@ -55,6 +55,26 @@ parser → KG2a, translator → KG2b; governance has no builder, only
 human acts. Everything else that consumes the graph is a READING:
 named, versioned, deterministic — and it writes nothing.
 
+THE CENTER LAW (ratified 2026-09-07, Center_and_Censuses_RULING —
+the generator behind live finds #5/#8/#9/#10: code kept building
+ad-hoc side-structures instead of reading the graph): every line
+of code is a BUILDER, a READING, or a FLOW (sequences the other
+two, holds no meaning) — there is no fourth kind. The
+authoring/rendering line: AUTHORING (deciding what something
+means — writing a description, composing a summary, choosing a
+meaning slice) happens only in builders, into their own layer.
+RENDERING (applying a ratified, versioned grammar to stored
+facts) is what readings do; a reading may cache (an index, an
+adjacency, an embedding) only as a VERBATIM PROJECTION of stored
+properties — a cache of the graph, never a second source of it.
+Corollary: COMPOSITION IS THE TRANSLATOR'S JOB — a composite
+node's meaning (a file's up-composed subject) is built and STORED
+in the twin, never assembled at point of use; the change quanta
+then apply for free. Enforcement is a census per derived
+structure: every text a projection carries equals a stored
+property or a versioned-grammar rendering; composition logic in
+readings == 0.
+
 The engine runs both directions through the same layers:
 
 - OUTWARD (estate → catalog): parse into KG2a → twin into KG2b →
@@ -76,6 +96,36 @@ ABSENT. Search a column and every table, sql block, metric, and
 user touching it is a traversal away (unresolved references stay
 findable by name). Lineage is not a feature built beside the
 graph; it is a query over edges the laws guarantee exist.
+
+THE THREE CENSUSES (ratified 2026-09-07, Center_and_Censuses_
+RULING — Sunny's three questions as conservation laws, the shape
+of voiced ⊎ counted == total):
+1. REACHABILITY: reachable ⊎ ruled-isolated == total nodes — the
+   lineage guarantee finally given its standing census.
+2. SPEECH: every node KIND declares in the registry which stored
+   property it speaks (Speech_Sources); every node has non-empty
+   speech, or is a counted documentation gap, or is ruled-mute
+   with a reason: speaks ⊎ counted-gap ⊎ ruled-mute == total.
+   Kinds themselves speak (their registry definitions) and are
+   searchable nodes — "reports"/"procs"/"dashboards" ground to
+   kind:file by meaning, never by a fixed word list alone.
+3. SEARCHABILITY: everything that speaks is searchable with its
+   speech VERBATIM (plus word-grain name tokens); embeddings are
+   a content-keyed cache of speech; search matches FACETS — each
+   node's speech is its own facet, scores roll UP the tree with
+   provenance kept; one-blob-per-node blending is the flattening
+   disease and is banned: searchable ⊎ ruled-silent == everything
+   that speaks.
+Each census is a standing test AND a gap-check report bucket.
+Grounding thresholds are registry data and never cliffs:
+below-threshold yields HITL candidates with visible scores, never
+"unknown". The ask pipeline's search TRACE (mentions, expansions,
+facet hit, score) renders in every round — plan-confirm-execute-
+display applied to search; suppression later is a display toggle,
+never a removal. Expansion vocabulary (acronyms, kind synonyms)
+is proposed by the interpreter per-ask and lands as KG3 terms on
+confirmation — the LLM proposes, the human confirms, the ledger
+remembers.
 
 ```
             ┌───────────────────── OUTWARD ─────────────────────────┐
@@ -113,7 +163,7 @@ CONTAINMENT edges point parent → child. Both layers already obey
 this; it is now law, not accident.
 
 KG Layer 1 — source dictionaries technical layer      [ratified]
-      [registry stamp: kg1_technical v1.17.0]
+      [registry stamp: kg1_technical v1.18.0]
       L1 companions: Technical_Layer_Registry, CONTRACT_DATALOAD
       AMENDED 2026-09-06 (twin-graph ruling 2a, 5a): KG1 is the
       DECLARED layer — syntax and semantics FUSED on one node.
@@ -196,7 +246,7 @@ KG Layer 1 — source dictionaries technical layer      [ratified]
    -- source inheritance: a schema belongs to exactly one source; tables/columns inherit source from the containment chain; a mixed schema is the recorded trigger to push source down a level.
 
 KG Layer 2 — logic layer (one tree per SQL file)       [ratified]
-      [registry stamp: kg2_logic v1.17.0 · kg2_kind_library v1.17.0]
+      [registry stamp: kg2_logic v1.18.0 · kg2_kind_library v1.18.0]
       L1 companions: Logic_Layer_Registry (subsumes the mapper's
       seam contract), Kind_Library_TSQL_Predicates
       AMENDED 2026-09-06 (twin-graph ruling 2b-2e): this layer is
@@ -335,7 +385,7 @@ KG Layer 2 — logic layer (one tree per SQL file)       [ratified]
        and audit, not re-parsing) [axm:S1, axm:M5; = spec:G5 in
        the code record]
 KG Layer 3 — artifact layer                            [ratified]
-      [registry stamp: kg3_artifacts v1.17.0]
+      [registry stamp: kg3_artifacts v1.18.0]
       L1 companions: Artifact_Layer_Registry
       AMENDED 2026-09-06 (twin-graph ruling 2f): this layer and
       KG Layer 4 MERGE into KG3, THE GOVERNANCE OVERLAY — sparse
@@ -509,7 +559,7 @@ KG Layer 3 — artifact layer                            [ratified]
 - Forward note [axm:B4] — DELIVERED: the LAND stage carries the
   human-confirmation clause.
 KG Layer 4 — concept layer            [MERGED INTO KG3 2026-09-06]
-      [registry stamp: kg4_concepts v1.17.0]
+      [registry stamp: kg4_concepts v1.18.0]
       L1 companions: Concept_Layer_Registry (merging into
       Governance_Layer_Registry)
       SUPERSEDED AS A LAYER (twin-graph ruling 2f): concept is now
@@ -572,7 +622,14 @@ CONTRACTS:
   write nothing — kept for CITABILITY (dispositions and concept
   bases quote reading output by version). Survival principle: a
   reading exists iff its yield is ABOUT the graph — status,
-  aggregation, comparison — never meaning itself. Catalog
+  aggregation, comparison — never meaning itself. AMENDED
+  2026-09-07 (the center law): a reading may RENDER through a
+  ratified grammar and may CACHE as a verbatim projection, but
+  never AUTHORS — the ask-index corpse (a reading composing its
+  own "words" beside the twin; the file card and the search text
+  then drifted apart) is the standing violation this clause
+  kills. FLOWS are the third and last kind of code: they sequence
+  builders and readings and hold no meaning. Catalog
   migration: decisions(class) RETIRED into the translator ·
   degenerate RELOCATED as the condition subkind · concept-drift,
   divergence, gap-census, staleness, ownership/authorship/
@@ -584,7 +641,7 @@ The catalog below stands as the ratified record of each entry's
 rules; the contract text above governs where they differ.
 
 [historical header: read level 1, write nothing]
-      [registry stamp: lenses v1.17.0]
+      [registry stamp: lenses v1.18.0]
 
 Lenses                                                 [ratified]
       L2 companions: Lenses_Registry
@@ -672,7 +729,7 @@ AMENDED 2026-09-06 (twin-graph ruling 5):
   translator + stored KG2b + conservation green → C voicing-
   policy port + gap-check rerun → D governance merge + anchor
   migration; each phase gated by a real ED-sepsis gap-check.
-      [registry stamp: flows v1.17.0]
+      [registry stamp: flows v1.18.0]
 
 The flows                                              [ratified]
       L3 companions: Flows_Registry
