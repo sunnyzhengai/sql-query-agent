@@ -214,8 +214,38 @@ model-written text stored as truth.
 **Today.** Held at the surface (context sets, not transcripts).
 Violated historically whenever a reading authored words.
 
-**Dig questions.** Where exactly are the two boundaries in the UI?
-Is the confirm step the visible seam between them?
+**Dig outcomes (2026-09-07, Sunny's Law-2 pass — all ruled):**
+
+► RULED (D1): CONFIRMATION ATTACHES TO THE REFERENCE-SET, NOT THE
+PHRASING. The ledger was a phrasebook (folded-text keys: "what
+reports use ENCOUNTER_ID" confirmed ≠ "which reports use
+encounter_id" — same meaning, model re-called, re-confirmed); it
+becomes a MEANING-BOOK. The blessed object is the resolved
+reference-set; the folded-text key survives only as a model-
+skipping fast path. A new phrasing resolving to a confirmed
+reference-set answers immediately (trace: "resolved to your
+confirmed interpretation of <date>"); only fresh reference-sets
+confirm. Phrasings attach to meanings as earned evidence — "these
+4 phrasings mean this question" is flywheel vocabulary.
+
+► RULED (D2): CLAIM WORDS vs FRAME WORDS. Any sentence ABOUT the
+estate comes only from speech or the ratified grammar (claim).
+Labels, counts, section headers ("Connected:", "28 of them") are
+FRAME — mechanical presentation code may author. The review-time
+question for every new string: claim or frame?
+
+► RULED (D3): THE CONFIRM CARD IS THE INBOUND BOUNDARY, VISIBLE.
+It must display the COMPLETE boundary artifact — every mention →
+its reference, every expansion tried, the steering hint — and
+confirming blesses exactly that artifact, nothing hidden. With
+lines-are-nodes (Law 1) covering the outbound seam, the whole
+translation layer is inspectable.
+
+Corollary (restated as Law-2 law): the inbound boundary is the PHI
+boundary — raw text passes the phi-gate before any storage; the
+Interpreter runs inside the customer model boundary; once words
+become references, everything downstream (ledger, context, tree)
+holds references, never prose.
 
 ## Law 3 — Refusing to guess is expertise
 
