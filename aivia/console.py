@@ -16,7 +16,7 @@ import pathlib
 import sys
 import urllib.parse
 import urllib.request
-from http.server import BaseHTTPRequestHandler, HTTPServer
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 from aivia.flows import ask, connect, grounding, inbound
 from aivia.graph import kg1_intake
@@ -58,14 +58,27 @@ def _env_key() -> str:
     return os.environ.get("OPENAI_API_KEY", "").strip()
 
 
+SEAT_BUDGET_SECONDS = 20  # the declared time budget (seat-failure law)
+
+
 def _openai(path: str, payload: dict, key: str) -> dict:
+    """One bounded retry inside the budget; a second failure raises —
+    and the callers turn that into a seat_down OUTCOME, never a dead
+    page (ADR 0079 Law 3)."""
     req = urllib.request.Request(
         f"https://api.openai.com/v1/{path}",
         data=json.dumps(payload).encode(),
         headers={"Authorization": f"Bearer {key}",
                  "Content-Type": "application/json"})
-    with urllib.request.urlopen(req, timeout=60) as r:
-        return json.load(r)
+    last = None
+    for attempt in range(2):
+        try:
+            with urllib.request.urlopen(
+                    req, timeout=SEAT_BUDGET_SECONDS) as r:
+                return json.load(r)
+        except Exception as err:  # noqa: BLE001 — bounded retry, then
+            last = err            # the containment layer takes over
+    raise last
 
 
 def make_interpreter(key: str):
@@ -125,10 +138,20 @@ def _now() -> str:
 
 
 def make_handler(store, estate, interpret_fn, semantic, pending):
+    seat_failures = {"count": 0}  # the visible ops counter
+
     def render_result(q, result):
         parts = [f"<p class=meta>status: {result['status']}"
                  + (f" · via: {result['via']}"
                     if result.get("via") else "") + "</p>"]
+        if result.get("seat_down"):
+            seat_failures["count"] += 1
+            parts.append(
+                '<p style="background:#fff3cd;padding:.5rem">'
+                "⚠ interpreter seat unavailable "
+                f"(failure #{seat_failures['count']} this session) — "
+                "exact names, identities and kind words still "
+                "answer.</p>")
         if result["status"] == "answer":
             parts.append(f"<pre>{html.escape(result['answer'])}</pre>")
             matched = [g["entity"] for g in
@@ -245,16 +268,24 @@ def main() -> None:
     if key:
         print(f"grounding index: embedding {len(entries)} meanings "
               "(cached by content — only changed meanings re-embed) …")
-        semantic = grounding.SemanticIndex(
-            entries, make_embedder(key), EMBEDDING_MODEL,
-            cache_path=base / ".cache" / "embeddings.json")
-        print(f"  embedded now: {semantic.embedded_now}; "
-              f"cached: {len(entries) - semantic.embedded_now}")
+        try:
+            semantic = grounding.SemanticIndex(
+                entries, make_embedder(key), EMBEDDING_MODEL,
+                cache_path=base / ".cache" / "embeddings.json")
+            print(f"  embedded now: {semantic.embedded_now}; "
+                  f"cached: {len(entries) - semantic.embedded_now}")
+        except Exception as err:  # noqa: BLE001 — seat-failure law:
+            print(f"  EMBED SEAT DOWN at boot ({err}) — continuing "
+                  "with deterministic tiers only")
+            semantic = None
     else:
         print("no OPENAI_API_KEY — deterministic tiers only")
-    server = HTTPServer(("127.0.0.1", port),
-                        make_handler(store, estate, interpret_fn,
-                                     semantic, {}))
+    # concurrent serving (seat-failure law): a slow seat call never
+    # blocks deterministic asks
+    server = ThreadingHTTPServer(("127.0.0.1", port),
+                                 make_handler(store, estate,
+                                              interpret_fn, semantic,
+                                              {}))
     print(f"ask the graph: http://127.0.0.1:{port}/")
     server.serve_forever()
 

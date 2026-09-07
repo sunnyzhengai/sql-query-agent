@@ -211,3 +211,48 @@ def test_usage_events_h5_shapes(world):
                                                "no-match")
             if e.properties["outcome"] != "matched":
                 assert e.properties.get("about") is None
+
+
+# ---- SF: the seat-failure law (live find #6, ADR 0079 Law 3) --------
+def test_sf1_exploding_interpreter_is_an_outcome_not_a_crash(world):
+    store, semantic = world
+
+    def exploding(q):
+        raise RuntimeError("429 rate limit")
+    result = ask.ask(store, "zz some novel free text question zz",
+                     "person:test", T0, interpret_fn=exploding,
+                     semantic=semantic)
+    assert result["status"] == "form"       # degraded, never dead
+    assert result.get("seat_down") is True  # countable, bannerable
+    assert "unavailable" in result["answer"].lower()
+
+
+def test_sf2_exploding_embedder_degrades_semantic_tier_only(world):
+    store, _ = world
+    read = ReadApi(store)
+    entries = ask_index.lens_ask_index(read, None)["yield"]
+    built = grounding.SemanticIndex(entries, fake_embed, "fake-64",
+                                    cache_path=None)
+
+    def explode(texts):
+        raise RuntimeError("embed seat down")
+    built.embed_fn = explode  # the QUERY embed now fails
+    result = ask.ask(store, "zz nothing matches this zz",
+                     "person:test", T0, interpret_fn=None,
+                     semantic=built)
+    assert result["status"] in ("form", "answer")  # never an exception
+    # and a deterministic ask through the same broken index still works
+    ok = ask.ask(store, "THERA_CLASS_CODE", "person:test", T0,
+                 interpret_fn=None, semantic=built)
+    assert ok["status"] == "answer" and ok["via"] == "deterministic"
+
+
+def test_sf3_deterministic_asks_immune_to_model_weather(world):
+    store, _ = world
+
+    def explode_i(q):
+        raise RuntimeError("down")
+    result = ask.ask(store, "tables", "person:test", T0,
+                     interpret_fn=explode_i, semantic=None)
+    assert result["status"] == "answer"
+    assert result["answer"].startswith("90 table(s):")

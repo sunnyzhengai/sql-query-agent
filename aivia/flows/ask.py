@@ -257,15 +257,21 @@ def execute(read, index, adj, groundings: List[Dict[str, Any]],
                         or want_words in (e.get("words") or ""))]
             named_ids = {e["identity"] for e in by_name}
             by_meaning = []
+            meaning_note = ""
             if semantic is not None:
-                for h in semantic.search(want, top_k=40, kind=kind):
-                    if h["score"] >= grounding.MATCH_SCORE \
-                            and h["identity"] not in named_ids:
-                        by_meaning.append(h)
+                try:
+                    for h in semantic.search(want, top_k=40,
+                                             kind=kind):
+                        if h["score"] >= grounding.MATCH_SCORE \
+                                and h["identity"] not in named_ids:
+                            by_meaning.append(h)
+                except Exception:  # noqa: BLE001 — seat-failure law:
+                    meaning_note = (" [meaning tier unavailable — "
+                                    "name matches only]")
             matched = by_name + by_meaning
             header = (f"{len(matched)} {kind}(s) about '{want}' "
                       f"({len(by_name)} by name, {len(by_meaning)} "
-                      "more by meaning):")
+                      f"more by meaning){meaning_note}:")
             body = render_kind_list(read, index, kind, matched)
             return header + "\n" + body.split("\n", 1)[1] \
                 if "\n" in body else header
@@ -354,7 +360,20 @@ def ask(store, question: str, author: str, occurred_at: str,
                     "answer": "No interpreter is available and the "
                               "question grounds to nothing directly — "
                               "use the structured form."}
-        interpretation = validate_interpretation(interpret_fn(q))
+        try:
+            raw = interpret_fn(q)
+        except Exception:  # noqa: BLE001 — THE SEAT-FAILURE LAW (ADR
+            # 0079 Law 3, live find #6): a seat failure is an OUTCOME,
+            # never an exception — deterministic tiers stay alive, the
+            # degradation is bannered, the failure is countable
+            _usage("no-match")
+            return {"status": "form", "seat_down": True,
+                    "answer": "The interpreter seat is UNAVAILABLE "
+                              "right now — exact names, identities, "
+                              "and kind words still answer, and the "
+                              "structured form works. This failure "
+                              "is counted."}
+        interpretation = validate_interpretation(raw)
         if interpretation is None:
             _usage("no-match")
             return {"status": "form",

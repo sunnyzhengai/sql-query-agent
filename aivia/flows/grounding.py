@@ -110,7 +110,14 @@ def ground(mention: str, index: List[Dict[str, Any]],
         return {"tier": "exact-name", "outcome": "candidates",
                 "candidates": exact[:TOP_K], "mention": mention}
     if semantic is not None:
-        hits = semantic.search(mention)
+        try:
+            hits = semantic.search(mention)
+        except Exception:  # noqa: BLE001 — the seat-failure law: an
+            # embed failure downgrades the SEMANTIC tier only; the
+            # deterministic tiers above already had their chance
+            return {"tier": "none", "outcome": "unknown",
+                    "mention": mention, "seat_down": True,
+                    "nearest": []}
         strong = [h for h in hits if h["score"] >= MATCH_SCORE]
         if strong and (len(strong) == 1
                        or strong[0]["score"] - strong[1]["score"]
