@@ -110,12 +110,18 @@ SOURCES = {
 # limit killed the console): a model-seat failure is an OUTCOME
 # (seat_down), never an exception; declared time budgets; concurrent
 # serving; failures counted. The outage floor applied to the seats.
-STAMP_VERSION = "1.13.0"
+# v1.14.0 (2026-09-07): FOLLOW-UP CONTEXT IS DATA (live find #7 —
+# ADR 0079 Law 4): every answer yields a typed CONTEXT SET of graph
+# identities; anaphors ("those/it/the first one") resolve against it
+# deterministically (grounding tier 0); the ask event records its
+# context snapshot (replay holds); confirmed follow-ups store
+# RESOLVED identities. Not chat: a sliding window of grounded THINGS.
+STAMP_VERSION = "1.14.0"
 RATIFIED = True
 DOC_STAMP = ("v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 twin-graph "
              "ruling ADR 0077; v1.2.0 Phase A metamodel bump; v1.3.0 "
              "Phase B composite-kinds correction; v1.4.0 T-2 "
-             "operational-statements ruling; v1.5.0 the gap taxonomy; v1.6.0 the plug-all-holes sweep; v1.7.0 ledger close; v1.8.0 the ask console ADR 0078; v1.9.0 the list op; v1.10.0 kind vocabulary; v1.11.0 ADR 0079 interpreter; v1.12.0 Tier A build data; v1.13.0 the seat-failure law "
+             "operational-statements ruling; v1.5.0 the gap taxonomy; v1.6.0 the plug-all-holes sweep; v1.7.0 ledger close; v1.8.0 the ask console ADR 0078; v1.9.0 the list op; v1.10.0 kind vocabulary; v1.11.0 ADR 0079 interpreter; v1.12.0 Tier A build data; v1.13.0 the seat-failure law; v1.14.0 follow-up context "
              "(all 2026-09-06)")
 CONVERTED_ON = "2026-09-05"
 
@@ -792,6 +798,16 @@ TWIN_SHEETS = {
              "(candidates listed, human picks) | no-match (plain, "
              "counted, nearest names offered) — H5 usage event on "
              "every ask, about only on match, payload post phi-gate"},
+            {"Item": "follow-up context", "Definition": "RULED "
+             "2026-09-07 (live find #7): context is DATA, not chat — "
+             "each answer's grounded + listed entities form the "
+             "session's CONTEXT SET; the anaphor tier resolves "
+             "those/it/ordinals against it deterministically; the "
+             "usage event records the context snapshot (replay "
+             "holds); confirmed follow-ups store RESOLVED "
+             "identities, never the anaphor; answers render their "
+             "entities as links (the zero-typing follow-up). The "
+             "tier lock stands."},
             {"Item": "the seat-failure law", "Definition": "RULED "
              "2026-09-06 (live find #6): a model-seat failure is an "
              "OUTCOME, never an exception — declared time budgets, "

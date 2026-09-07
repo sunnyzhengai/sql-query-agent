@@ -121,5 +121,42 @@
     "exact-name and kind questions answer normally while both seats are down"
    ]
   }
+ ],
+ "followup": [
+  {
+   "id": "FU-1",
+   "title": "'those' resolves against the last answer's context set",
+   "expected": [
+    "ask ENCOUNTER_ID (answer lists citing scopes) -> ask 'which of those are in the ED report' -> the anaphor grounds to the listed scopes, filtered to the ED file, deterministically"
+   ]
+  },
+  {
+   "id": "FU-2",
+   "title": "'it' takes the single subject",
+   "expected": [
+    "after a single-entity answer, 'its filters' grounds 'it' to that entity"
+   ]
+  },
+  {
+   "id": "FU-3",
+   "title": "ordinals index the context set",
+   "expected": [
+    "'the first one' -> context_set[0]; out-of-range -> honest clarify, never a guess"
+   ]
+  },
+  {
+   "id": "FU-4",
+   "title": "replay determinism holds",
+   "expected": [
+    "the ask event records its context snapshot; confirmed follow-ups store RESOLVED identities, never the anaphor"
+   ]
+  },
+  {
+   "id": "FU-5",
+   "title": "no context -> honest",
+   "expected": [
+    "an anaphor with an empty context set -> clarify ('nothing to refer back to'), never no-match noise"
+   ]
+  }
  ]
 }

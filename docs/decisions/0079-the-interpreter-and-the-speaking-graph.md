@@ -123,6 +123,36 @@ This is the outage-floor law ("an outage costs polish, never
 truth") applied to the seats themselves — the understanding floor
 was stated at ratification; the seat floor is its missing half.
 
+## Law 4 — FOLLOW-UP CONTEXT IS DATA, NOT CHAT (amended 2026-09-07,
+## live find #7 — "I still can't continue to ask follow up
+## questions"; supersedes the mis-read of find #6, which fixed real
+## seat defects but not the asked-for thing)
+
+The pipeline was single-turn by design: the entities an answer just
+showed were unavailable to the next question, so every natural
+follow-up ("which of THOSE are in the ED report?", "show ITS
+filters") dead-ended. The old engine's open M2 anaphora residual,
+arriving on schedule. The law:
+
+- **Every answer produces a CONTEXT SET** — the grounded entities
+  plus the entities the answer LISTED. A typed list of graph
+  identities; never prose, never a transcript. The session carries
+  it; the ask's usage event RECORDS its context snapshot, so replay
+  determinism holds (same question + same recorded context = same
+  answer). The tier lock stands: this is a sliding window of
+  grounded THINGS, not chat memory.
+- **The anaphor tier** (grounding tier 0): the interpreter may mark
+  REFERENCE mentions ("those", "it", "the first one", "those
+  scopes"); they resolve DETERMINISTICALLY against the context set —
+  kind word filters it, ordinals index it, "it" takes the single
+  subject. Ambiguity goes to HITL like everything else. The model
+  never sees prior answer text — only the entity set is context.
+- **The ledger stays context-free**: a confirmed follow-up stores
+  the RESOLVED identities, never the anaphor — ledger hits replay
+  concrete forever.
+- **Answers are clickable**: entities named in an answer render as
+  links — the zero-typing follow-up.
+
 ## Tier B — the logic console (designed now, built after Tier A)
 
 Sunny's AST proposal, landed in the existing vocabulary: the
