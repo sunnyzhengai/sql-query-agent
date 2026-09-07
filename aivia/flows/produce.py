@@ -658,9 +658,9 @@ def compose_file_floor(read: ReadApi, target: str) -> str:
 
 
 def file_words(read: ReadApi, target: str) -> str:
-    """The file's ask-index words = its report floor's delivery lead
-    (R10 corollary, find #8 second layer): files embed MEANING —
-    name-only vectors are ranking noise. Total: never raises."""
+    """The file's delivery lead — a GRAMMAR RENDER (R10). Under ADR
+    0080 the composed subject is the TRANSLATOR'S stored work; this
+    render is only the delivery half. Total: never raises."""
     tree = None
     for k, t in read.trees().items():
         if k == target or t["name"] == target:

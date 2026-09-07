@@ -32,7 +32,23 @@ def validate_interpretation(raw: Any) -> Optional[Dict[str, Any]]:
              if isinstance(m, str) and m.strip()]
     if not clean or len(clean) > MAX_MENTIONS:
         return None
-    return {"mentions": clean[:MAX_MENTIONS]}
+    out = {"mentions": clean[:MAX_MENTIONS]}
+    # ADR 0080 rider: the interpreter may PROPOSE expansions
+    # (acronyms, synonyms) per mention — extra SEARCH STRINGS only,
+    # never facts; the graph validates, the human confirms, the
+    # ledger remembers (KG3 terms)
+    raw_exp = raw.get("expansions")
+    if isinstance(raw_exp, dict):
+        exp = {}
+        for m, alts in raw_exp.items():
+            if m in out["mentions"] and isinstance(alts, list):
+                good = [a.strip() for a in alts
+                        if isinstance(a, str) and a.strip()][:5]
+                if good:
+                    exp[m] = good
+        if exp:
+            out["expansions"] = exp
+    return out
 
 
 # ---- REMEMBER --------------------------------------------------------
@@ -69,14 +85,13 @@ def record_confirmation(store, question: str,
 
 
 def build_index(read) -> List[Dict[str, Any]]:
-    """The ask index, enriched with MEANING for files (R10 corollary,
-    live find #8 second layer): a file's words are its report floor's
-    delivery lead — files embed meaning, never bare names."""
-    index = ask_index.lens_ask_index(read, None)["yield"]
-    for e in index:
-        if e["kind"] == "file" and not e.get("words"):
-            e["words"] = produce.file_words(read, e["identity"])
-    return index
+    """The ask index = the VERBATIM projection of speech (ADR 0080,
+    the center law): every entry's words are its node's declared
+    stored property or grammar render — recomputable, never
+    authored here. Conditions, parameters, and kinds join the
+    surface (census 3)."""
+    from aivia.flows import speech
+    return speech.entries(read)
 
 
 # ---- SPEAK: deterministic renderers (display modes) ------------------
@@ -119,6 +134,12 @@ def render_card(read, entity: Dict[str, Any]) -> str:
         node = next(n for n in read.nodes("term")
                     if n.identity == identity)
         lines.append(node.properties.get("definition", ""))
+    elif kind in ("condition", "parameter", "kind"):
+        # speech IS the card for the part-kinds (census 2): the
+        # stored/rendered phrase, plus the owner chain
+        lines.append(entity.get("words") or "")
+        if entity.get("owner"):
+            lines.append(f"Belongs to: {entity['owner']}")
     return "\n".join(lines)
 
 
@@ -249,7 +270,9 @@ def execute(read, index, adj, groundings: List[Dict[str, Any]],
     entities = [g["entity"] for g in groundings
                 if g["outcome"] == "matched"]
     sets = [g for g in groundings if g["outcome"] == "set"]
-    topics = [g["mention"] for g in groundings
+    topics = [" ".join([g["mention"]]
+                       + g.get("expansions_tried", []))
+              for g in groundings
               if g["outcome"] not in ("kind", "matched", "set")]
 
     # Law 4: a SET anaphor — alone it lists; beside entities it
@@ -301,17 +324,38 @@ def execute(read, index, adj, groundings: List[Dict[str, Any]],
     if kinds:
         kind = kinds[0]["kind"]
         topic_texts = topics + [e["name"] for e in entities]
-        if topic_texts and kind != "metric":
+        if topic_texts:
             want = " ".join(topic_texts)
-            want_words = ask_index._words(want)
-            kind_entries = [e for e in index if e["kind"] == kind]
+            # ADR 0080: WORD-GRAIN containment — topic tokens must be
+            # whole name/speech tokens ('ED' finds 'usp ed sepsis',
+            # never 'bed config'; the substring corpse dies)
+            want_tokens = ask_index._tokens(want)
+            if kind == "metric":
+                # the practiced metrics ARE the delivery selections;
+                # a topic filters them like any other kind (the
+                # metric exclusion died with ADR 0080)
+                kind_entries = [e for e in index
+                                if e["kind"] == "scope"
+                                and "::delivery" in e["identity"]]
+            else:
+                kind_entries = [e for e in index
+                                if e["kind"] == kind]
+
+            def tokens_of(e):
+                # word-grain with CamelCase split (ask_index._tokens
+                # — the fold family's home; ask.py stays regex-free
+                # per the LW-1 census): find #5's '28 by name' law
+                # survives the word-grain move
+                return ask_index._tokens(
+                    f"{e['name']} {e.get('words') or ''}")
             by_name = [e for e in kind_entries
-                       if want_words and
-                       (want_words in ask_index._words(e["name"])
-                        or want_words in (e.get("words") or ""))]
+                       if want_tokens
+                       and want_tokens <= tokens_of(e)]
             named_ids = {e["identity"] for e in by_name}
             by_meaning = []
             meaning_note = ""
+            floor = grounding.thresholds()["CANDIDATE_FLOOR"]
+            facet_via: Dict[str, str] = {}
             if semantic is not None:
                 try:
                     for h in semantic.search(want, top_k=40,
@@ -319,17 +363,53 @@ def execute(read, index, adj, groundings: List[Dict[str, Any]],
                         if h["score"] >= grounding.MATCH_SCORE \
                                 and h["identity"] not in named_ids:
                             by_meaning.append(h)
+                    # FACET ROLLUP (census 3): a hit on a node's
+                    # PART (condition, scope, column) surfaces the
+                    # owning {kind} with the facet NAMED — scores
+                    # roll UP the tree, provenance kept, the blend
+                    # is dead
+                    for h in semantic.search(want, top_k=60):
+                        if h["score"] < floor or not h.get("owner"):
+                            continue
+                        owner_id, hops = h["owner"], 0
+                        while owner_id and hops < 4:
+                            owner = index_by_id.get(owner_id)
+                            if owner is None:
+                                break
+                            if owner["kind"] == kind or (
+                                    kind == "metric"
+                                    and owner["kind"] == "scope"):
+                                facet_via.setdefault(
+                                    owner["identity"],
+                                    f"{h['kind']}: "
+                                    f"{(h.get('words') or h['name'])[:70]}"
+                                    f" · {h['score']}")
+                                break
+                            owner_id = owner.get("owner")
+                            hops += 1
                 except Exception:  # noqa: BLE001 — seat-failure law:
                     meaning_note = (" [meaning tier unavailable — "
                                     "name matches only]")
-            matched = by_name + by_meaning
+            seen_ids = named_ids | {e["identity"] for e in by_meaning}
+            by_facet = [index_by_id[i] for i in facet_via
+                        if i in index_by_id and i not in seen_ids]
+            matched = by_name + by_meaning + by_facet
             header = (f"{len(matched)} {kind}(s) about '{want}' "
                       f"({len(by_name)} by name, {len(by_meaning)} "
-                      f"more by meaning){meaning_note}:")
-            body = render_kind_list(read, index, kind, matched)
-            text = (header + "\n" + body.split("\n", 1)[1]
-                    if "\n" in body else header)
-            return text, [e["identity"] for e in matched][:100]
+                      f"more by meaning, {len(by_facet)} via their "
+                      f"parts){meaning_note}:")
+            lines = [header]
+            for e in matched[:40]:
+                line = f"- {_one_line(read, e['identity'], index_by_id)}"
+                if e["identity"] in facet_via:
+                    line += f"  — via {facet_via[e['identity']]}"
+                lines.append(line)
+            if len(matched) > 40:
+                lines.append(f"… and {len(matched) - 40} more")
+            if not matched:
+                lines.append("- (none — an honest zero, counted)")
+            return ("\n".join(lines),
+                    [e["identity"] for e in matched][:100])
         return (render_kind_list(read, index, kind, None),
                 [e["identity"] for e in index
                  if e["kind"] == kind][:100])
@@ -373,6 +453,23 @@ def execute(read, index, adj, groundings: List[Dict[str, Any]],
 
     return ("Nothing grounded — the graph carries none of these "
             "names or meanings."), []
+
+
+def _trace(groundings: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """The search trace (ADR 0080 rider): what was searched and how —
+    rendered in every round, and the audit record either way."""
+    out = []
+    for g in groundings:
+        row = {"mention": g.get("mention"), "tier": g.get("tier"),
+               "outcome": g.get("outcome")}
+        if "score" in g:
+            row["score"] = g["score"]
+        if g.get("expansions_tried"):
+            row["expansions_tried"] = g["expansions_tried"]
+        if g.get("via_expansion"):
+            row["via_expansion"] = g["via_expansion"]
+        out.append(row)
+    return out
 
 
 # ---- the pipeline ----------------------------------------------------
@@ -424,7 +521,8 @@ def ask(store, question: str, author: str, occurred_at: str,
         _usage("matched", about)
         return {"status": "answer", "answer": answer,
                 "groundings": [whole], "via": "deterministic",
-                "context_set": _context_set([whole], listed)}
+                "context_set": _context_set([whole], listed),
+                "trace": _trace([whole])}
     if whole["outcome"] == "clarify-context":
         _usage("ambiguous")
         return {"status": "clarify", "mention": q, "candidates": [],
@@ -471,21 +569,58 @@ def ask(store, question: str, author: str, occurred_at: str,
                               "validation — use the structured form."}
         via = "model"
 
-    groundings = [grounding.ground(m, index, kind_words, semantic,
-                                   context=context_entities)
+    def _ground_with_vocab(m):
+        g = grounding.ground(m, index, kind_words, semantic,
+                             context=context_entities)
+        tried = []
+        rank = {"matched": 3, "kind": 3, "set": 3, "candidates": 2}
+        if g["outcome"] in ("unknown", "candidates"):
+            # the ledger's vocabulary is DATA: a KG3 term whose name
+            # folds to the mention lends its definition as an
+            # expansion — deterministic, no model (ADR 0080 rider)
+            term = next((e for e in index if e["kind"] == "term"
+                         and e["folded"] == _fold(m)
+                         and e["words"]), None)
+            if term:
+                tried.append(term["words"])
+        for exp in (interpretation.get("expansions") or {}).get(m, []):
+            if exp not in tried:
+                tried.append(exp)
+        for exp in tried:
+            if g["outcome"] in ("matched", "kind", "set"):
+                break
+            g2 = grounding.ground(exp, index, kind_words, semantic)
+            if rank.get(g2["outcome"], 1) > rank.get(g["outcome"], 1):
+                g2["mention"] = m
+                g2["via_expansion"] = exp
+                g = g2
+        if tried:
+            g["expansions_tried"] = tried
+        return g
+
+    groundings = [_ground_with_vocab(m)
                   for m in interpretation["mentions"]]
+    anchored = any(g["outcome"] in ("kind", "matched", "set")
+                   for g in groundings)
     for g in groundings:
         if g["outcome"] == "clarify-context":
             _usage("ambiguous")
             return {"status": "clarify", "mention": g["mention"],
                     "candidates": [], "answer": g["reason"],
                     "reason": g["reason"],
-                    "interpretation": interpretation}
+                    "interpretation": interpretation,
+                    "trace": _trace(groundings)}
+        if anchored:
+            # ADR 0080 / CE-4: while an anchor stands, an ungrounded
+            # mention is a TOPIC, never a dead end — emptiness will
+            # answer as an honest counted zero downstream
+            continue
         if g["outcome"] == "candidates":
             _usage("ambiguous")
             return {"status": "clarify", "mention": g["mention"],
                     "candidates": g["candidates"],
-                    "interpretation": interpretation}
+                    "interpretation": interpretation,
+                    "trace": _trace(groundings)}
         if g["outcome"] == "unknown":
             _usage("no-match")
             return {"status": "answer",
@@ -495,14 +630,16 @@ def ask(store, question: str, author: str, occurred_at: str,
                               + ("\nNearest: " + ", ".join(
                                   e["name"] for e in g["nearest"])
                                  if g.get("nearest") else ""),
-                    "groundings": groundings, "via": via}
+                    "groundings": groundings, "via": via,
+                    "trace": _trace(groundings)}
 
     if via == "model":
         # fresh model interpretation: the human confirms before it
         # enters the ledger (plan -> confirm -> execute -> display)
         _usage("ambiguous")
         return {"status": "confirm", "interpretation": interpretation,
-                "groundings": groundings}
+                "groundings": groundings,
+                "trace": _trace(groundings)}
 
     answer, listed = execute(read, index, adj, groundings, semantic)
     about = None
@@ -512,7 +649,8 @@ def ask(store, question: str, author: str, occurred_at: str,
     _usage("matched", about)
     return {"status": "answer", "answer": answer,
             "groundings": groundings, "via": via,
-            "context_set": _context_set(groundings, listed)}
+            "context_set": _context_set(groundings, listed),
+            "trace": _trace(groundings)}
 
 
 def confirm(store, question: str, interpretation: Dict[str, Any],
@@ -525,9 +663,20 @@ def confirm(store, question: str, interpretation: Dict[str, Any],
     interpretation."""
     record_confirmation(store, question, interpretation, author,
                         occurred_at, basis, context=context)
-    return ask(store, question, author, occurred_at,
-               interpret_fn=None, semantic=semantic,
-               confirmed=interpretation, context=context)
+    result = ask(store, question, author, occurred_at,
+                 interpret_fn=None, semantic=semantic,
+                 confirmed=interpretation, context=context)
+    # ADR 0080: confirming an interpretation BLESSES its expansions —
+    # they land as KG3 terms (vocabulary is data; the LLM proposed,
+    # the human confirmed, the ledger remembers)
+    for m, alts in (interpretation.get("expansions") or {}).items():
+        for alt in alts:
+            kg3_artifacts.append_term(
+                store, f"term::vocab/{_fold(m)}", m,
+                f"{m} — confirmed ask vocabulary for: {alt}",
+                author, occurred_at,
+                basis={"kind": "ask-expansion", "basis": basis})
+    return result
 
 
 def _kind_vocabulary() -> Dict[str, str]:

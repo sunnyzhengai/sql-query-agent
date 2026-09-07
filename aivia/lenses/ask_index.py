@@ -16,6 +16,15 @@ def _words(text: str) -> str:
     return re.sub(r"[_\W]+", " ", text or "").strip().lower()
 
 
+def _tokens(text: str) -> set:
+    """Word-grain tokens with CamelCase split first (ADR 0079's
+    blessed mechanical transform; ADR 0080 word-grain law):
+    SepsisDetails carries the sepsis token; BED_CONFIG never
+    carries ed."""
+    spread = re.sub(r"(?<=[a-z0-9])(?=[A-Z])", " ", text or "")
+    return set(_words(spread).split())
+
+
 def lens_ask_index(read, params) -> Dict[str, Any]:
     entries: List[Dict[str, Any]] = []
 

@@ -15,9 +15,26 @@ from typing import Any, Callable, Dict, List, Optional
 
 from aivia.lenses.ask_index import _fold, _words
 
-# semantic-tier thresholds — DECLARED here, tuned by evidence
-MATCH_SCORE = 0.50      # best hit at/above -> candidates worth showing
-UNIQUE_MARGIN = 0.10    # best beats runner-up by this -> auto-ground
+# semantic-tier thresholds — REGISTRY DATA (ADR 0080 rider:
+# declared, tunable, and NEVER CLIFFS — below MATCH_SCORE yields
+# HITL candidates with visible scores down to CANDIDATE_FLOOR;
+# "unknown" is legal only below the floor)
+_THRESHOLDS: dict = {}
+
+
+def thresholds() -> dict:
+    if not _THRESHOLDS:
+        from aivia.graph import metamodel
+        sheet = metamodel.load("lenses").sheets[
+            "Grounding_Thresholds"]
+        for r in sheet:
+            if r["Name"] != "_ruling":
+                _THRESHOLDS[r["Name"]] = float(r["Value"])
+    return _THRESHOLDS
+
+
+MATCH_SCORE = 0.50   # module-level mirrors kept for callers; the
+UNIQUE_MARGIN = 0.10  # registry is the authority (thresholds())
 TOP_K = 8
 
 
@@ -201,6 +218,7 @@ def ground(mention: str, index: List[Dict[str, Any]],
             return {"tier": "path", "outcome": "candidates",
                     "candidates": hits[:TOP_K], "mention": mention}
     if semantic is not None:
+        t = thresholds()
         try:
             hits = semantic.search(mention)
         except Exception:  # noqa: BLE001 — the seat-failure law: an
@@ -209,16 +227,30 @@ def ground(mention: str, index: List[Dict[str, Any]],
             return {"tier": "none", "outcome": "unknown",
                     "mention": mention, "seat_down": True,
                     "nearest": []}
-        strong = [h for h in hits if h["score"] >= MATCH_SCORE]
+        # ADR 0080: NEVER A CLIFF — everything above the floor is
+        # shown to the human with its score; the find-#10 corpse
+        # (ED files ranked #1-2 at 0.36, discarded by a 0.5 cliff)
+        # is the standing reason
+        floor_hits = [h for h in hits
+                      if h["score"] >= t["CANDIDATE_FLOOR"]]
+        strong = [h for h in floor_hits
+                  if h["score"] >= t["MATCH_SCORE"]]
         if strong and (len(strong) == 1
                        or strong[0]["score"] - strong[1]["score"]
-                       >= UNIQUE_MARGIN):
+                       >= t["UNIQUE_MARGIN"]):
+            top = strong[0]
+            if top.get("kind") == "kind":
+                # a node-type grounded by meaning (ADR 0080: kinds
+                # are searchable nodes)
+                return {"tier": "semantic", "outcome": "kind",
+                        "kind": top["name"], "mention": mention,
+                        "score": top["score"]}
             return {"tier": "semantic", "outcome": "matched",
-                    "entity": strong[0], "mention": mention,
-                    "score": strong[0]["score"]}
-        if strong:
+                    "entity": top, "mention": mention,
+                    "score": top["score"]}
+        if floor_hits:
             return {"tier": "semantic", "outcome": "candidates",
-                    "candidates": strong, "mention": mention}
+                    "candidates": floor_hits, "mention": mention}
     return {"tier": "none", "outcome": "unknown", "mention": mention,
             "nearest": [e for e in index
                         if wanted[:4] and wanted[:4] in e["folded"]][:6]}

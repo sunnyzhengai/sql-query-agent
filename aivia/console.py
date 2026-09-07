@@ -206,6 +206,22 @@ def make_handler(store, estate, interpret_fn, semantic, pending):
         parts = [f"<p class=meta>status: {result['status']}"
                  + (f" · via: {result['via']}"
                     if result.get("via") else "") + "</p>"]
+        # ADR 0080 rider: the TRACE renders in every round —
+        # plan-confirm-execute-display applied to search; always-on
+        # (later suppression is a toggle, never a removal)
+        if result.get("trace"):
+            rows = []
+            for t in result["trace"]:
+                bit = (f"'{t['mention']}' → {t['tier']}/"
+                       f"{t['outcome']}")
+                if t.get("score") is not None:
+                    bit += f" · {t['score']}"
+                if t.get("expansions_tried"):
+                    bit += (" · searched as: "
+                            + " | ".join(t["expansions_tried"]))
+                rows.append(html.escape(bit))
+            parts.append("<p class=meta>searched: "
+                         + " &nbsp;·&nbsp; ".join(rows) + "</p>")
         if result.get("seat_down"):
             seat_failures["count"] += 1
             parts.append(

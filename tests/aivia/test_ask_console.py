@@ -116,7 +116,10 @@ def test_cn2_kind_plus_topic_the_live_find_dies(world):
     # containment runs over the WHOLE kind, never a truncated pool,
     # and the answer states which tier found what
     assert "28 file(s) about" in final["answer"]
-    assert "(28 by name, 0 more by meaning)" in final["answer"]
+    # header extended by ADR 0080: the facet bucket joins the
+    # provenance (same truth, one more counted tier)
+    assert "(28 by name, 0 more by meaning, 0 via their parts)" \
+        in final["answer"]
     assert "USP_ED_SEPSIS" in final["answer"]
     assert "USP_IP_SepsisEncountersWLocations" in final["answer"]
     assert "USP_RPTS_NonSevere_Sepsis" in final["answer"]

@@ -39,10 +39,11 @@ def test_every_loaded_registry_is_ratified_v1():
     # 1.15.0 = anaphor vocabulary as registry data (same day);
     # 1.16.0 = the conversation surface (find #7 second leg);
     # 1.17.0 = the path tier + the report floor (finds #8/#9);
-    # 1.18.0 = the center + three censuses (ADR 0080)
+    # 1.18.0 = the center + three censuses (ADR 0080);
+    # 1.19.0 = Grounding_Thresholds (the 0080 build; cliffs die)
     for reg in metamodel.load_all().values():
         assert reg.ratified is True
-        assert reg.version == "1.18.0"
+        assert reg.version == "1.19.0"
 
 
 def test_load_single_exposes_sheets_and_stamp():

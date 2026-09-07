@@ -85,6 +85,11 @@ def render(read: ReadApi) -> str:
               f"{cls['open_estate']} documentation gaps + "
               f"{drift} drift refs (columns nowhere declared — "
               "silently-failing reports, kept counted forever)"]
+    # ADR 0080: the three censuses print their equations — the
+    # standing report bucket beside the standing tests
+    from aivia.flows import ask, censuses
+    index = ask.build_index(read)
+    lines += ["", censuses.report(read, index)]
     return "\n".join(lines + sections)
 
 

@@ -30,7 +30,15 @@ from typing import Any, Dict, List, Optional
 from aivia.graph import metamodel
 from aivia.graph.kg2_mapper import METAMODEL_VERSION
 
-TRANSLATOR_VERSION = "1.2.0"
+TRANSLATOR_VERSION = "1.3.0"
+# 1.3.0 (ADR 0080, the center law corollary): COMPOSITION IS THE
+# TRANSLATOR'S JOB — the twin stores the file's up-composed SUBJECT
+# (the steward words of every source table its scopes read, in
+# appearance order). The cause-1 corpse dies at the root: the file's
+# searchable meaning is BUILT and STORED, never assembled by a
+# reading at point of use. The subject rides beside the nodes (never
+# in a content_key): steward-word edits re-derive it without
+# orphaning governance anchors.
 # 1.1.0 (Phase C): the T-2 operational class (ruled list from the
 # registry) + Gap B cross-scope resolution (temp/CTE columns resolve
 # through the defining scope's projection member).
@@ -632,6 +640,7 @@ def translate(tree: Dict[str, Any],
     # mirrors the parse exactly — translated + gap == every parsed
     # node, no third bucket. A mismatch is a build failure, never a
     # warning (the conservation lineage, ADR 0044 -> ADR 0077).
+    twin["subject"] = _compose_subject(tree, walk.columns)
     census = twin["census"]
     if census["twin_nodes"] != census["parsed_nodes"]:
         raise AssertionError(
@@ -642,11 +651,51 @@ def translate(tree: Dict[str, Any],
 
 
 def column_material(store) -> Dict[str, Dict[str, Any]]:
-    """KG1 material for translation: column identity -> properties.
-    A read the builder performs against its own layer's inputs —
-    same posture as the mapper's resolve()."""
-    return {n.identity: n.properties
-            for n in store.current_nodes("column")}
+    """KG1 material for translation: column AND table identity ->
+    properties (tables joined in 1.3.0 — the composed subject reads
+    their steward words). A read the builder performs against its
+    own layer's inputs — same posture as the mapper's resolve()."""
+    material = {n.identity: n.properties
+                for n in store.current_nodes("column")}
+    material.update({n.identity: n.properties
+                     for n in store.current_nodes("table")})
+    return material
+
+
+def _compose_subject(tree: Dict[str, Any],
+                     material: Dict[str, Dict[str, Any]]) -> str:
+    """The file's up-composed subject (1.3.0): the first steward
+    sentence of every KG1 table its scopes read, appearance order,
+    deduped — the meaning the report is ABOUT, stored in the twin."""
+    sentences: List[str] = []
+    seen = set()
+
+    def scopes_of(container):
+        for stmt in container.get("statements", []):
+            for cte in stmt.get("ctes", []):
+                yield cte
+            if stmt.get("scope"):
+                yield stmt["scope"]
+
+    def walk_scope(scope):
+        for s in [scope] + scope.get("combination_arms", []):
+            for ref in s.get("from_refs", []):
+                if "derived_scope" in ref:
+                    walk_scope(ref["derived_scope"])
+                    continue
+                rt = str(ref.get("resolves_to") or "")
+                props = material.get(rt)
+                if props is None or rt in seen:
+                    continue
+                seen.add(rt)
+                desc = (props.get("description") or "").strip()
+                if desc:
+                    sentences.append(desc.split(". ")[0].rstrip(".")
+                                     + ".")
+
+    for scope in scopes_of(tree):
+        walk_scope(scope)
+    return " ".join(sentences)
 
 
 def apply_twin(store, file_id: str, tree: Dict[str, Any],

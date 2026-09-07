@@ -125,6 +125,12 @@ SOURCES = {
 # clears and stays; context is CONVERSATION-scoped (client-held id),
 # never a global; transcript = DISPLAY memory, context set = MEANING
 # memory — prose history never reaches the model (the cage holds).
+# v1.19.0 (2026-09-07): the 0080 build lands Grounding_Thresholds —
+# the riders' "thresholds are registry data and never cliffs" made
+# literal: MATCH (auto-ground), MARGIN (uniqueness), CANDIDATE_FLOOR
+# (below MATCH but above the floor -> HITL candidates WITH scores;
+# "unknown" is legal only below the floor). Tuning is a registry
+# edit, never a code edit.
 # v1.18.0 (2026-09-07): THE CENTER AND THE THREE CENSUSES (ADR
 # 0080, Center_and_Censuses_RULING ratified): the center law (code =
 # builder | reading | flow; readings render/cache verbatim, never
@@ -142,7 +148,7 @@ SOURCES = {
 # deliveries lead, spine voiced, intermediates counted, census
 # closes; the file's ask-index words = the delivery lead, so file
 # embeddings embed meaning, never name-noise).
-STAMP_VERSION = "1.18.0"
+STAMP_VERSION = "1.19.0"
 RATIFIED = True
 DOC_STAMP = ("v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 twin-graph "
              "ruling ADR 0077; v1.2.0 Phase A metamodel bump; v1.3.0 "
@@ -717,6 +723,9 @@ TWIN_SHEETS = {
              "of the 2026-09-07 probe — 0.80 vs 0.57 blended"},
             {"Kind": "parameter", "Speech": "voiced phrase",
              "Meaning": "rendered"},
+            {"Kind": "derived column", "Speech": "computed-output "
+             "phrase (grammar render: name words + the defining "
+             "selection)", "Meaning": "rendered"},
             {"Kind": "term (KG3)", "Speech": "definition",
              "Meaning": "human-authored"},
             {"Kind": "drift name", "Speech": "the standing drift "
@@ -729,6 +738,26 @@ TWIN_SHEETS = {
             {"Kind": "operational statement", "Speech": "RULED-MUTE",
              "Meaning": "no reader-facing meaning (the v1.4.0 "
              "operational class)"},
+        ],
+        "Grounding_Thresholds": [
+            {"Name": "_ruling", "Value": "-",
+             "Meaning": "ADR 0080 rider: thresholds are DECLARED "
+             "TUNABLE DATA and never cliffs — below MATCH yields "
+             "HITL candidates with visible scores down to "
+             "CANDIDATE_FLOOR; only below the floor is 'unknown' "
+             "legal. The live find-#10 corpse: ED files ranked "
+             "#1-2 at 0.36 and were discarded by a 0.5 cliff."},
+            {"Name": "MATCH_SCORE", "Value": "0.5",
+             "Meaning": "at/above: strong hit; auto-grounds only "
+             "with MARGIN over the runner-up"},
+            {"Name": "UNIQUE_MARGIN", "Value": "0.1",
+             "Meaning": "best-beats-runner-up margin for "
+             "auto-grounding"},
+            {"Name": "CANDIDATE_FLOOR", "Value": "0.25",
+             "Meaning": "at/above: the hit is shown to the human "
+             "with its score; below: noise, may be 'unknown'"},
+            {"Name": "TOP_K", "Value": "8",
+             "Meaning": "candidates shown per mention"},
         ],
         "Censuses": [
             {"Census": "_ruling", "Equation": "-",

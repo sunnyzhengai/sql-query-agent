@@ -7,7 +7,7 @@
 
 # Test Map — what every test proves
 
-154 modules, 1725 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
+155 modules, 1742 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
 
 ## By ADR
 
@@ -157,6 +157,7 @@
 
 - `tests/aivia/test_approve_land.py` (10): Slice 6 exit: the F5 script against the BUILT approve/land flows.
 - `tests/aivia/test_ask_console.py` (27): Tier A exit (ADR 0079): the F10 answer keys go RUNNABLE.
+- `tests/aivia/test_center_censuses.py` (17): ADR 0080 — the center and the three censuses, red-first.
 - `tests/aivia/test_design_validators.py` (4): Slice 0: the design validators run in CI — every push re-proves the
 - `tests/aivia/test_flows_change_quanta.py` (6): The flows' change quanta (CONTRACT_DATALOAD §13 + the flows
 - `tests/aivia/test_full_circle.py` (7): Slice 7: FULL CIRCLE — one run from empty, every family proven.
