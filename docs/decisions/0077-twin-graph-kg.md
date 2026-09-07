@@ -49,7 +49,7 @@ vocabulary (ENFORCED/PARTIAL/GATED/JUDGED) describes implemented
 behavior, and none of this is implemented. Each phase's ADR lands
 its axioms with real statuses and checks: Phase A (projection
 conservation), Phase B (homomorphism, content_key laws), Phase C
-(the voicing ledger), Phase D (the anchor rule). Phasing is ruled
+(the voicing ledger), Phase D (the anchor rule). LANDED at the ledger close (2026-09-06): Group W, axioms W1-W5, each with its check named (W1-W4 ENFORCED, W5 PARTIAL with the gap stated). Phasing is ruled
 in the ruling 5d and the flows registry; each phase gates on a real
 ED-sepsis gap-check.
 

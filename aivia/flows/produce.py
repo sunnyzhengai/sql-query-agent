@@ -468,7 +468,13 @@ def _compose_scope(read: ReadApi, tree, scope,
                 lead_grain = tables[rt]["grain"]
     if not include_lead:
         lines = []
-    elif not reads_tables and not scope.get("from_refs"):
+    elif scope.get("operation") == "delete":
+        # a DELETE shapes a population by REMOVAL — 'a selection'
+        # would misstate the act (ledger-close, 2026-09-06)
+        ref = scope["from_refs"][0]
+        phrase = _source_phrase(ref.get("table_ref"),
+                                ref.get("resolves_to"), [])
+        lines = [f"This step removes records from {phrase}."]
         lines = ["This step produces derived values; no source records "
                  "are read."]
     elif lead_grain:

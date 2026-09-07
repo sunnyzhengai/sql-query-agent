@@ -28,9 +28,10 @@ def test_every_loaded_registry_is_ratified_v1():
     # 1.4.0 = the T-2 operational-statements ruling (same day)
     # 1.5.0 = the gap taxonomy (Sunny: ruled-silent vs open, same day)
     # 1.6.0 = the plug-all-holes sweep (same day)
+    # 1.7.0 = the ledger close (same day)
     for reg in metamodel.load_all().values():
         assert reg.ratified is True
-        assert reg.version == "1.6.0"
+        assert reg.version == "1.7.0"
 
 
 def test_load_single_exposes_sheets_and_stamp():

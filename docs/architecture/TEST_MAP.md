@@ -7,7 +7,7 @@
 
 # Test Map — what every test proves
 
-151 modules, 1687 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
+152 modules, 1692 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
 
 ## By ADR
 
@@ -159,6 +159,7 @@
 - `tests/aivia/test_kg2_mapper.py` (8): Slice 2 exit: the F2 answer key against the BUILT trees.
 - `tests/aivia/test_kg3_artifacts.py` (18): Slice 4: the ledger — KG3 artifact layer lifecycle + derived states.
 - `tests/aivia/test_kind_library.py` (4): Slice 2: the kind-library case families (F7) — construct,
+- `tests/aivia/test_ledger_close.py` (5): The ledger close (Sunny's order, 2026-09-06): the last engine-debt
 - `tests/aivia/test_lenses.py` (11): Slice 3 exit: the F3 answer key against the BUILT lenses.
 - `tests/aivia/test_metamodel.py` (7): Slice 0: the registry loader — code consumes ratified registries only.
 - `tests/aivia/test_phase_a_projection.py` (6): Phase A exit (ADR 0077): the F8 phase-A answer keys go RUNNABLE.
@@ -237,3 +238,8 @@ tests/test_docs_consistency.py).
 | spec:T1 | 0065, 0074 | — | `tests/test_desc_0074.py`, `tests/test_gate_recut.py`, `tests/test_skeleton_composer.py`, `tests/test_tree_contract.py` |
 | spec:T2 | 0065 | — | `tests/test_tree_contract.py` |
 | spec:T3 | 0065 | — | `tests/test_tree_contract.py` |
+| spec:W1 | — | — | **(no recorded proof)** |
+| spec:W2 | — | — | **(no recorded proof)** |
+| spec:W3 | — | — | **(no recorded proof)** |
+| spec:W4 | — | — | **(no recorded proof)** |
+| spec:W5 | — | — | **(no recorded proof)** |

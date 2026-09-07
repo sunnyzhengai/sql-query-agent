@@ -17,19 +17,24 @@ spawns several spec axioms (axm:D2 becomes five mechanisms). The two
 id spaces collide on group letters B, D and R — always prefix
 (`axm:` vs `spec:`).
 
-**Scope:** the crosswalk maps SPEC's 50 NUMBERED axioms. SPEC's
+**Scope:** the crosswalk maps SPEC's 55 NUMBERED axioms. SPEC's
 remaining un-numbered normative prose is deliberately so: §3b (the
 design-review ritual — humans answer it at review) and §14d (testing
 strata — where axm:J3 lands). §13 was the exception and was promoted
 to Group T (ADR 0065); the two one-time gaps (axm:R2, axm:R4) were
 closed by Group L (ADR 0064).
 
-## Direction 1 — every numbered spec axiom traces up (50/50)
+## Direction 1 — every numbered spec axiom traces up (55/55)
 
-Groups: A=Identity · B=Soundness · C=Completeness · D=Derived structure · E=Ask-time determinism · F=The round trip · G=Mechanism uniqueness · H=Escalation · L=The ledger · P=The one-mind turn · Q=Graph topology · R=Ask-time interpretation + run boundary · T=The double-sided function
+Groups: A=Identity · B=Soundness · C=Completeness · D=Derived structure · E=Ask-time determinism · F=The round trip · G=Mechanism uniqueness · H=Escalation · L=The ledger · P=The one-mind turn · Q=Graph topology · R=Ask-time interpretation + run boundary · T=The double-sided function · W=The twin graph
 
 | Spec axiom | Title | Framework parent(s) | Why | Grounding ADR(s) |
 |---|---|---|---|---|
+| spec:W1 | the homomorphism law | axm:R1 | handled + fallout = total, at the meaning layer | — |
+| spec:W2 | meaning identity (content_key) | axm:D2 | one identity rule, one definition | — |
+| spec:W3 | the voicing ledger | axm:R1, axm:B2 | conservation of decisions + absence over fabrication | — |
+| spec:W4 | anchors ride meaning | axm:D3 | human judgment binds to exactly one owner-identity | — |
+| spec:W5 | the gap taxonomy is total | axm:R2 | the remainder aggregates to a human ruling | — |
 | spec:A1 | folding is idempotent | axm:D2 | one folding rule, one definition | 0016 |
 | spec:A2 | metric_id is a key | axm:D3 | identity -> exactly one owner per metric | 0015 |
 | spec:A3 | fold-collisions are rejected loudly | axm:D2 | one folding rule, one definition | 0016 |

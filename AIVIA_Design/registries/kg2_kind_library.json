@@ -1,9 +1,9 @@
 {
  "registry": "kg2_kind_library",
  "stamp": {
-  "version": "1.6.0",
+  "version": "1.7.0",
   "doc_section": "Level 1 / KG Layer 2 — kind library (T-SQL predicates)",
-  "doc_stamp": "v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 twin-graph ruling ADR 0077; v1.2.0 Phase A metamodel bump; v1.3.0 Phase B composite-kinds correction; v1.4.0 T-2 operational-statements ruling; v1.5.0 the gap taxonomy; v1.6.0 the plug-all-holes sweep (all 2026-09-06)",
+  "doc_stamp": "v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 twin-graph ruling ADR 0077; v1.2.0 Phase A metamodel bump; v1.3.0 Phase B composite-kinds correction; v1.4.0 T-2 operational-statements ruling; v1.5.0 the gap taxonomy; v1.6.0 the plug-all-holes sweep; v1.7.0 ledger close (all 2026-09-06)",
   "ratified": true,
   "converted_on": "2026-09-05",
   "converted_from": "L1_KG2_Kind_Library_TSQL_Predicates_DRAFT.xlsx"
@@ -471,6 +471,10 @@
    {
     "ScriptDom type": "PrintStatement",
     "Rationale": "diagnostic text to the console; no data meaning (surfaced when WHILE bodies opened, 2026-09-06)"
+   },
+   {
+    "ScriptDom type": "LabelStatement",
+    "Rationale": "a jump marker; the MEANING lives on the GOTO that targets it (ledger close, 2026-09-06)"
    }
   ],
   "Gap_Classes": [
@@ -502,13 +506,13 @@
     "Counted class": "unmapped statement kinds",
     "Kind": "OPEN",
     "Owner": "engine",
-    "Meaning": "carry real meaning; map evidence-ordered. INSERT/WHILE/SET MAPPED 2026-09-06 (plug-all-holes); current residents: DELETE, GOTO (2 each)"
+    "Meaning": "carry real meaning; map evidence-ordered. INSERT/WHILE/SET (plug-all-holes) then DELETE/GOTO (ledger close) ALL MAPPED 2026-09-06; the class is EMPTY — it remains for future estates' kinds"
    },
    {
-    "Counted class": "unmapped query shapes (UNION ...) and table references (PIVOT ...)",
+    "Counted class": "unmapped query shapes and table references",
     "Kind": "OPEN",
     "Owner": "engine",
-    "Meaning": "the combination meaning kind awaits them"
+    "Meaning": "UNION (ABX corpse) then PIVOT (ledger close) ALL MAPPED 2026-09-06; the class is EMPTY — it remains for future estates' shapes"
    },
    {
     "Counted class": "star projection",
@@ -520,7 +524,7 @@
     "Counted class": "ambiguous unqualified refs",
     "Kind": "OPEN",
     "Owner": "engine",
-    "Meaning": "multi-source scopes; column-membership disambiguation is buildable"
+    "Meaning": "ledger close 2026-09-06: star-through + derived-member + folded-alias binding shrank the class 1,275 -> 37 (sepsis); the residue is genuinely undecidable without running the SQL — counted forever"
    },
    {
     "Counted class": "refs into unmapped-statement scopes",

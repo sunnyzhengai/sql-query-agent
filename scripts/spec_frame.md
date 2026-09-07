@@ -485,6 +485,16 @@ left.
 
 {{AXIOMS:L1,L2,L3}}
 
+## 14i. Group W — the twin graph (v0.9, ADR 0077; ratified 2026-09-06)
+
+The AIVIA engine's meaning layer: KG2b, the stored homomorphic twin
+of the parsed graph (AIVIA_Design/Twin_Graph_KG_RULING.md is the
+ratified design record; these axioms are its enforced core, landed
+at the ledger close per the ADR 0073 discipline — each with its
+check named).
+
+{{AXIOMS:W1,W2,W3,W4,W5}}
+
 ## 15. Honest limits
 
 1. **C1 cannot force conception.** The inventory makes "sources we haven't

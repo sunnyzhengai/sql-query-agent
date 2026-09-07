@@ -147,7 +147,8 @@ class _Walk:
             resolved = expr.get("resolves_to")
             identity = (resolved if resolved
                         else _fold(expr["ref"].rsplit(".", 1)[-1]))
-            if resolved and not str(resolved).startswith("SAME-TREE"):
+            if resolved and not str(resolved).startswith(
+                    ("SAME-TREE", "DERIVED")):
                 props = self.columns.get(resolved, {})
                 words = (props.get("description") or "").split(". ")[0]
                 if words:
@@ -162,6 +163,13 @@ class _Walk:
                     self.coverage_gaps.append(
                         {"ref": resolved,
                          "cause": "no_dictionary_words"})
+            elif resolved and str(resolved).startswith("DERIVED"):
+                # bound into an anonymous derived table — known-local,
+                # never a coverage gap (the meaning lives one level in)
+                content = {"words": _readable(expr["ref"]
+                                              .rsplit(".", 1)[-1]),
+                           "words_source": "derived_member"}
+                draws = []
             elif resolved and str(resolved).startswith("SAME-TREE"):
                 # Gap B (Phase C): a temp/CTE column's meaning lives in
                 # the defining scope's PROJECTION member — resolve
@@ -333,18 +341,32 @@ class _Walk:
         if "derived_scope" in ref:
             inner = self.scope(ref["derived_scope"],
                                f"{path}/derived_scope")
-            return self.add("source", path,
-                            {"reads": "an inline selection"},
-                            ["derived"], child_keys=[inner["content_key"]])
+            content: Dict[str, Any] = {"reads": "an inline selection"}
+            parts = ["derived"]
+            pivot = ref.get("pivot")
+            if pivot:
+                content["pivot"] = {
+                    "aggregate": pivot.get("aggregate"),
+                    "into_columns": pivot.get("in_values")}
+                parts += ["pivot", str(pivot.get("aggregate")),
+                          *sorted(pivot.get("in_values", []))]
+            return self.add("source", path, content, parts,
+                            child_keys=[inner["content_key"]])
         target = ref.get("resolves_to") or _fold(ref.get("table_ref", ""))
         draws = ([ref["resolves_to"]]
                  if ref.get("resolves_to")
                  and not str(ref["resolves_to"]).startswith("SAME-TREE")
                  else [])
-        return self.add("source", path,
-                        {"reads": ref.get("table_ref"),
-                         "resolved": ref.get("resolves_to")},
-                        ["source", str(target)], draws)
+        content: Dict[str, Any] = {"reads": ref.get("table_ref"),
+                                   "resolved": ref.get("resolves_to")}
+        parts = ["source", str(target)]
+        pivot = ref.get("pivot")
+        if pivot:  # the transform is meaning: what pivots into what
+            content["pivot"] = {"aggregate": pivot.get("aggregate"),
+                                "into_columns": pivot.get("in_values")}
+            parts += ["pivot", str(pivot.get("aggregate")),
+                      *sorted(pivot.get("in_values", []))]
+        return self.add("source", path, content, parts, draws)
 
     def projection_member(self, member, path) -> Dict[str, Any]:
         expr = self.expression(member["expression"], f"{path}/expression")
@@ -429,7 +451,22 @@ class _Walk:
                 self.expression(stmt["expression"], f"{path}/expression")
                 ["content_key"])
         kind_label = stmt.get("statement_kind", "?")
-        if kind_label in ("INSERT", "WHILE", "SET") and child_keys:
+        if kind_label == "LABEL":
+            # a jump marker — plumbing (the operational pattern;
+            # registry row LabelStatement, ledger-close 2026-09-06)
+            return self.add("statement", path,
+                            {"does": "LABEL",
+                             "label": stmt.get("label")},
+                            ["LABEL", stmt.get("label", "")],
+                            subkind="operational", voiced="never")
+        if kind_label == "GOTO":
+            # control flow IS meaning: 'repeat from {label}' — the
+            # corpus uses GOTO+label as loops
+            return self.add("statement", path,
+                            {"does": "GOTO", "label": stmt.get("label")},
+                            ["GOTO", stmt.get("label", "")])
+        if kind_label in ("INSERT", "WHILE", "SET", "DELETE") \
+                and child_keys:
             return self.add("statement", path,
                             {"does": kind_label,
                              **({"parameter": stmt["parameter"]}

@@ -76,12 +76,20 @@ SOURCES = {
 # membership-disambiguated resolution; PrintStatement joins the
 # operational list (diagnostic text, no data meaning; surfaced when
 # WHILE bodies opened).
-STAMP_VERSION = "1.6.0"
+# v1.7.0 (2026-09-06): LEDGER CLOSE (Sunny: "close the debt ledger")
+# — DELETE (population removal, voiced as removal), GOTO/LABEL
+# (loop control captured; LABEL operational), PIVOT transform mapped
+# (aggregate + in-values), star-through resolution (the star ruling
+# applied at read time: unqualified and scope-star refs bind to the
+# UNDERLYING KG1 column, recomputed each run — drift-safe), derived-
+# member binding, folded alias + self-qualifier registration. Twin
+# gaps hit ZERO; ambiguous 1,275 -> 37; unbound 541 -> 32.
+STAMP_VERSION = "1.7.0"
 RATIFIED = True
 DOC_STAMP = ("v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 twin-graph "
              "ruling ADR 0077; v1.2.0 Phase A metamodel bump; v1.3.0 "
              "Phase B composite-kinds correction; v1.4.0 T-2 "
-             "operational-statements ruling; v1.5.0 the gap taxonomy; v1.6.0 the plug-all-holes sweep "
+             "operational-statements ruling; v1.5.0 the gap taxonomy; v1.6.0 the plug-all-holes sweep; v1.7.0 ledger close "
              "(all 2026-09-06)")
 CONVERTED_ON = "2026-09-05"
 
@@ -502,6 +510,9 @@ TWIN_SHEETS = {
             {"ScriptDom type": "PrintStatement",
              "Rationale": "diagnostic text to the console; no data "
              "meaning (surfaced when WHILE bodies opened, 2026-09-06)"},
+            {"ScriptDom type": "LabelStatement",
+             "Rationale": "a jump marker; the MEANING lives on the "
+             "GOTO that targets it (ledger close, 2026-09-06)"},
         ],
         "Gap_Classes": [
             {"Counted class": "_ruling", "Kind": "-", "Owner": "-",
@@ -524,12 +535,15 @@ TWIN_SHEETS = {
             {"Counted class": "unmapped statement kinds",
              "Kind": "OPEN", "Owner": "engine",
              "Meaning": "carry real meaning; map evidence-ordered. "
-             "INSERT/WHILE/SET MAPPED 2026-09-06 (plug-all-holes); "
-             "current residents: DELETE, GOTO (2 each)"},
-            {"Counted class": "unmapped query shapes (UNION ...) and "
-             "table references (PIVOT ...)",
+             "INSERT/WHILE/SET (plug-all-holes) then DELETE/GOTO "
+             "(ledger close) ALL MAPPED 2026-09-06; the class is "
+             "EMPTY — it remains for future estates' kinds"},
+            {"Counted class": "unmapped query shapes and table "
+             "references",
              "Kind": "OPEN", "Owner": "engine",
-             "Meaning": "the combination meaning kind awaits them"},
+             "Meaning": "UNION (ABX corpse) then PIVOT (ledger close) "
+             "ALL MAPPED 2026-09-06; the class is EMPTY — it remains "
+             "for future estates' shapes"},
             {"Counted class": "star projection",
              "Kind": "RESOLVED", "Owner": "-",
              "Meaning": "RULED 2026-09-06: a star translates as "
@@ -538,8 +552,10 @@ TWIN_SHEETS = {
              "left the gap ledger entirely"},
             {"Counted class": "ambiguous unqualified refs",
              "Kind": "OPEN", "Owner": "engine",
-             "Meaning": "multi-source scopes; column-membership "
-             "disambiguation is buildable"},
+             "Meaning": "ledger close 2026-09-06: star-through + "
+             "derived-member + folded-alias binding shrank the class "
+             "1,275 -> 37 (sepsis); the residue is genuinely "
+             "undecidable without running the SQL — counted forever"},
             {"Counted class": "refs into unmapped-statement scopes",
              "Kind": "OPEN", "Owner": "engine",
              "Meaning": "downstream of the unmapped kinds; close "

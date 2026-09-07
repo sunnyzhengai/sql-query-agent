@@ -1003,6 +1003,66 @@ left.
 **Status: ENFORCED** — (by citation — the 0059 Q3 precedent): the seven registry closure checks, the funnel, and reachability ARE the firing mechanisms; stated gap: a NEW declaration acquires its mechanism by review (section 3b), not yet by a mechanical check that one exists
 
 
+## 14i. Group W — the twin graph (v0.9, ADR 0077; ratified 2026-09-06)
+
+The AIVIA engine's meaning layer: KG2b, the stored homomorphic twin
+of the parsed graph (AIVIA_Design/Twin_Graph_KG_RULING.md is the
+ratified design record; these axioms are its enforced core, landed
+at the ledger close per the ADR 0073 discipline — each with its
+check named).
+
+**W1 — the homomorphism law.**
+
+    ∀n ∈ ParsedNodes(f).  ∃! m ∈ Twin(f).  points_at(m) = n
+    |translated(f)| + |gaps(f)| = |ParsedNodes(f)|
+
+*Gloss:* every parsed node has exactly one meaning node — translated or a reason-coded gap, no third bucket; asserted INSIDE translate() on every file, every run (a mismatch raises, never warns). ADR 0044 conservation, generalized from predicates to every grain.
+*Origin:* ADR 0077 (the twin-graph ruling), Phase B.
+*Grounds in the framework:* axm:R1 — handled + fallout = total, at the meaning layer.
+*Checks:* `tests/aivia/test_phase_b_translator.py`, `tests/aivia/test_sepsis_shakedown.py`
+**Status: ENFORCED** — runtime assertion + corpus pins (25,812 nodes, 0 gaps at the ledger close).
+
+**W2 — meaning identity (content_key).**
+
+    syntax-only(e) → key(t(e)) = key(t)   ∧   truth-change(e) → key(t(e)) ≠ key(t)
+
+*Gloss:* reformatting, alias renames, AND/join reorder and comments move NO key; any column, operator, literal, join-kind or structural change moves the key and everything above it. The law of when a certification survives (Sunny's T-4 blessing).
+*Origin:* ADR 0077 ruling 2e, Phase B; exercised Phase D.
+*Grounds in the framework:* axm:D2 — one identity rule, one definition.
+*Checks:* `tests/aivia/test_phase_b_translator.py`
+**Status: ENFORCED**
+
+**W3 — the voicing ledger.**
+
+    ∀scope.  voiced(scope) ⊎ counted(scope) = decisions(scope)
+
+*Gloss:* voicing SELECTS, never compresses: silence is always an itemized policy choice (degenerate, operational, outer match conditions) — silent omission has no constructible path, and "why isn't X mentioned" always has a citable answer.
+*Origin:* ADR 0077 ruling 4a (ADR 0044 clause 5 generalized), Phase C.
+*Grounds in the framework:* axm:R1, axm:B2 — conservation of decisions + absence over fabrication.
+*Checks:* `tests/aivia/test_phase_c_voicing.py`
+**Status: ENFORCED**
+
+**W4 — anchors ride meaning.**
+
+    about(artifact) = (scope, content_key) — never a syntax node, never a node instance
+
+*Gloss:* same key after regeneration -> the certification survives silently; changed key -> flagged orphan; deleted scope -> orphan with candidates found BY meaning (the rename case resolves itself). Re-attachment stays a human act.
+*Origin:* ADR 0077 ruling 2f, Phase D.
+*Grounds in the framework:* axm:D3 — human judgment binds to exactly one owner-identity.
+*Checks:* `tests/aivia/test_phase_d_anchors.py`
+**Status: ENFORCED**
+
+**W5 — the gap taxonomy is total.**
+
+    ∀c ∈ CountedClasses.  c ∈ RULED-SILENT ∪ OPEN(engine) ∪ OPEN(estate)
+
+*Gloss:* every counted class is ok-forever by ruling or open with an owner; the Gap_Classes registry sheet is the closed assignment and the gap-check report prints the rollup.
+*Origin:* Sunny's Phase-C review ruling (2026-09-06); registry v1.5.0+.
+*Grounds in the framework:* axm:R2 — the remainder aggregates to a human ruling.
+*Checks:* `tests/aivia/test_design_validators.py`
+**Status: PARTIAL** — the closed sheet exists and the report rolls up by class; "a new counted class joins the sheet at birth" is review discipline, not yet a mechanical check.
+
+
 ## 15. Honest limits
 
 1. **C1 cannot force conception.** The inventory makes "sources we haven't

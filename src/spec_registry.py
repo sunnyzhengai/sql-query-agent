@@ -40,9 +40,112 @@ GROUPS = {'A': 'Identity',
           'P': 'The one-mind turn',
           'Q': 'Graph topology',
           'R': 'Ask-time interpretation + run boundary',
-          'T': 'The double-sided function'}
+          'T': 'The double-sided function',
+          'W': 'The twin graph'}
 
 SPEC_REGISTRY = {
+    "W1": {
+        "title": 'the homomorphism law',
+        "law":
+            '    ∀n ∈ ParsedNodes(f).  ∃! m ∈ Twin(f).  points_at(m) = n\n'
+            '    |translated(f)| + |gaps(f)| = |ParsedNodes(f)|',
+        "gloss":
+            'every parsed node has exactly one meaning node — translated '
+            'or a reason-coded gap, no third bucket; asserted INSIDE '
+            'translate() on every file, every run (a mismatch raises, '
+            'never warns). ADR 0044 conservation, generalized from '
+            'predicates to every grain.',
+        "origin":
+            'ADR 0077 (the twin-graph ruling), Phase B.',
+        "parents": ['R1'],
+        "parent_note":
+            'handled + fallout = total, at the meaning layer',
+        "checks": ['tests/aivia/test_phase_b_translator.py',
+                   'tests/aivia/test_sepsis_shakedown.py'],
+        "status": 'ENFORCED',
+        "status_note":
+            'runtime assertion + corpus pins (25,812 nodes, 0 gaps at '
+            'the ledger close).',
+    },
+    "W2": {
+        "title": 'meaning identity (content_key)',
+        "law":
+            '    syntax-only(e) → key(t(e)) = key(t)   ∧   '
+            'truth-change(e) → key(t(e)) ≠ key(t)',
+        "gloss":
+            'reformatting, alias renames, AND/join reorder and comments '
+            'move NO key; any column, operator, literal, join-kind or '
+            'structural change moves the key and everything above it. '
+            'The law of when a certification survives (Sunny\'s T-4 '
+            'blessing).',
+        "origin":
+            'ADR 0077 ruling 2e, Phase B; exercised Phase D.',
+        "parents": ['D2'],
+        "parent_note":
+            'one identity rule, one definition',
+        "checks": ['tests/aivia/test_phase_b_translator.py'],
+        "status": 'ENFORCED',
+    },
+    "W3": {
+        "title": 'the voicing ledger',
+        "law":
+            '    ∀scope.  voiced(scope) ⊎ counted(scope) = '
+            'decisions(scope)',
+        "gloss":
+            'voicing SELECTS, never compresses: silence is always an '
+            'itemized policy choice (degenerate, operational, outer '
+            'match conditions) — silent omission has no constructible '
+            'path, and "why isn\'t X mentioned" always has a citable '
+            'answer.',
+        "origin":
+            'ADR 0077 ruling 4a (ADR 0044 clause 5 generalized), '
+            'Phase C.',
+        "parents": ['R1', 'B2'],
+        "parent_note":
+            'conservation of decisions + absence over fabrication',
+        "checks": ['tests/aivia/test_phase_c_voicing.py'],
+        "status": 'ENFORCED',
+    },
+    "W4": {
+        "title": 'anchors ride meaning',
+        "law":
+            '    about(artifact) = (scope, content_key) — never a '
+            'syntax node, never a node instance',
+        "gloss":
+            'same key after regeneration -> the certification survives '
+            'silently; changed key -> flagged orphan; deleted scope -> '
+            'orphan with candidates found BY meaning (the rename case '
+            'resolves itself). Re-attachment stays a human act.',
+        "origin":
+            'ADR 0077 ruling 2f, Phase D.',
+        "parents": ['D3'],
+        "parent_note":
+            'human judgment binds to exactly one owner-identity',
+        "checks": ['tests/aivia/test_phase_d_anchors.py'],
+        "status": 'ENFORCED',
+    },
+    "W5": {
+        "title": 'the gap taxonomy is total',
+        "law":
+            '    ∀c ∈ CountedClasses.  c ∈ RULED-SILENT ∪ '
+            'OPEN(engine) ∪ OPEN(estate)',
+        "gloss":
+            'every counted class is ok-forever by ruling or open with '
+            'an owner; the Gap_Classes registry sheet is the closed '
+            'assignment and the gap-check report prints the rollup.',
+        "origin":
+            'Sunny\'s Phase-C review ruling (2026-09-06); registry '
+            'v1.5.0+.',
+        "parents": ['R2'],
+        "parent_note":
+            'the remainder aggregates to a human ruling',
+        "checks": ['tests/aivia/test_design_validators.py'],
+        "status": 'PARTIAL',
+        "status_note":
+            'the closed sheet exists and the report rolls up by class; '
+            '"a new counted class joins the sheet at birth" is review '
+            'discipline, not yet a mechanical check.',
+    },
     "A1": {
         "title": 'folding is idempotent',
         "law":

@@ -11,7 +11,7 @@
   "estate": {
     "acquired": 38,
     "counted_excluded": 0,
-    "resolved_refs": 250,
+    "resolved_refs": 254,
     "same_tree_refs": 54,
     "unresolved_refs": 0,
     "phi_redactions": 0,

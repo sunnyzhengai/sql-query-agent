@@ -30,6 +30,7 @@ ALLOWLIST: "dict[str, str]" = {
     # the zone-gate collision found at the Phase A build).
     "src/zones.py": "governed-entries list must name tracked paths",
     "src/trace_registry.py": "ADR entries cite module/test paths",
+    "src/spec_registry.py": "axiom checks cite test paths (Group W)",
 }
 
 

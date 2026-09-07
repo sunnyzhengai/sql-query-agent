@@ -285,13 +285,24 @@ def _collect_from(ctx, table_ref, refs, join_on):
             "alias": table_ref.Alias.Value if table_ref.Alias else None,
             "evidence": _evidence(ctx, table_ref)})
     elif t == "PivotedTableReference":
-        # reads captured (the inner table joins from_refs and the
-        # working set); the pivot TRANSFORM's semantics stay counted —
-        # engine debt, honestly declared, never invisible reads
+        # ledger-close (2026-09-06): the pivot TRANSFORM maps — the
+        # aggregate, the pivot column, and the in-values (which become
+        # the output columns) are captured; reads recurse as before
+        before = len(refs)
         _collect_from(ctx, table_ref.TableReference, refs, join_on)
-        ctx.remainder.append({"type": t, **_evidence(ctx, table_ref),
-                              "reason": "pivot transform (reads "
-                              "captured; transform semantics counted)"})
+        pivot = {
+            "aggregate": (table_ref.AggregateFunctionIdentifier
+                          .Identifiers[0].Value
+                          if table_ref.AggregateFunctionIdentifier
+                          else None),
+            "pivot_column": (_map_expression(ctx, table_ref.PivotColumn)
+                             if table_ref.PivotColumn is not None
+                             else None),
+            "in_values": [i.Value for i in table_ref.InColumns],
+            "alias": (table_ref.Alias.Value if table_ref.Alias
+                      else None)}
+        for ref in refs[before:]:
+            ref["pivot"] = pivot
     else:
         ctx.remainder.append({"type": t, **_evidence(ctx, table_ref),
                               "reason": "unmapped table reference"})
@@ -520,6 +531,45 @@ def map_tree(file_name: str, text: str, dialect: str = "tsql"
             for inner in executable_statements([stmt.Statement]):
                 process(inner)
             return
+        elif t == "DeleteStatement":
+            # ledger-close (2026-09-06): DELETE shapes a population by
+            # REMOVAL — target read + conditions map as a scope with
+            # the operation marked; the grammar voices removal, never
+            # 'a selection'
+            spec = stmt.DeleteSpecification
+            if _type_name(spec.Target) == "NamedTableReference":
+                target_name = _table_name(spec.Target.SchemaObject)
+                scope = {"node": "scope", "operation": "delete",
+                         "name": target_name,
+                         "structures": ["FROM"]
+                         + (["WHERE"] if spec.WhereClause else []),
+                         "from_refs": [{
+                             "table_ref": target_name,
+                             "alias": None,
+                             "evidence": _evidence(ctx, spec.Target)}],
+                         "join_on": [],
+                         "where": (_map_predicate(
+                             ctx, spec.WhereClause.SearchCondition)
+                             if spec.WhereClause else None),
+                         "projection": [],
+                         "select_refs": [],
+                         "evidence": _evidence(ctx, stmt)}
+                entry["statement_kind"] = "DELETE"
+                entry["scope"] = scope
+            else:
+                entry["statement_kind"] = "DELETE"
+                ctx.remainder.append(
+                    {"type": f"DeleteStatement:{_type_name(spec.Target)}",
+                     **_evidence(ctx, stmt),
+                     "reason": "unmapped delete target"})
+        elif t == "GoToStatement":
+            # control flow: 'repeat from the label' — the loop meaning
+            # is the jump itself, captured with its target
+            entry["statement_kind"] = "GOTO"
+            entry["label"] = stmt.LabelName.Value.rstrip(":")
+        elif t == "LabelStatement":
+            entry["statement_kind"] = "LABEL"
+            entry["label"] = stmt.Value.rstrip(":")
         elif t == "SetVariableStatement":
             # value FLOW is meaning: @var carries logic into later
             # filters; the assignment is captured, never dropped
@@ -644,25 +694,62 @@ def resolve(tree: Dict[str, Any], store: Store, reg: Dict[str, Any],
         for cte in stmt.get("ctes", []):
             scope_keys[cte["name"]] = cte["name_key"]
         scope = stmt.get("scope")
-        if scope and "name" in scope:
+        if scope and "name" in scope \
+                and scope.get("operation") != "delete":
+            # a DELETE scope is named for its TARGET but produces no
+            # readable shape — registering it would hijack later
+            # reads of the real table (ledger-close find)
             scope_keys[scope["name"]] = scope["name_key"]
     params = {p["name"] for p in tree["parameters"]}
     census = {"resolved_refs": 0, "same_tree_refs": 0,
               "unresolved_refs": 0, "unresolved": []}
 
-    # named scopes' output columns (folded), for disambiguation and
-    # scope-member binding — combination scopes expose arm 1's shape
-    scope_projections: Dict[str, set] = {}
+    # named scopes' output shape (folded members + star sources), for
+    # disambiguation, scope-member binding, and STAR-THROUGH
+    # resolution (the star ruling: 'every column of the source at
+    # read time' — resolution IS read time, so looking through a star
+    # to the underlying table is lawful and drift-safe: recomputed
+    # each run, never frozen). Combination scopes expose arm 1.
+    scope_projections: Dict[str, Dict[str, Any]] = {}
     for stmt in tree["statements"]:
         for s in (list(stmt.get("ctes", []))
                   + ([stmt["scope"]] if stmt.get("scope") else [])):
             if "name_key" not in s:
                 continue
             arms = s.get("combination_arms")
-            proj = (arms[0].get("projection", []) if arms
-                    else s.get("projection", []))
+            shape = arms[0] if arms else s
+            proj = shape.get("projection", [])
             scope_projections[s["name_key"]] = {
-                _fold(m["name"]) for m in proj if m.get("name")}
+                "members": {_fold(m["name"]) for m in proj
+                            if m.get("name")},
+                "star_refs": ([r for r in shape.get("from_refs", [])]
+                              if any(m.get("star") for m in proj)
+                              else [])}
+
+    def scope_declares(name_key: str, colname: str,
+                       depth: int = 0) -> Optional[str]:
+        """Does the named scope output this column? Returns the
+        UNDERLYING KG1 column identity when a star lets us look
+        through to a resolved table, 'member' for an explicit member,
+        None otherwise. Depth-guarded; never guesses."""
+        info = scope_projections.get(name_key)
+        if info is None or depth > 4:
+            return None
+        if _fold(colname) in info["members"]:
+            return "member"
+        for ref in info["star_refs"]:
+            rt = ref.get("resolves_to")
+            if rt and not str(rt).startswith("SAME-TREE"):
+                col_id = folded_columns.get(f"{rt}|{_fold(colname)}")
+                if col_id:
+                    return col_id
+            elif rt:
+                inner = scope_declares(
+                    str(rt).replace("SAME-TREE scope ", ""),
+                    colname, depth + 1)
+                if inner:
+                    return inner
+        return None
 
     def _count_unresolved(ref, detail):
         census["unresolved_refs"] += 1
@@ -709,7 +796,10 @@ def resolve(tree: Dict[str, Any], store: Store, reg: Dict[str, Any],
                 resolve_scope(ref["derived_scope"],
                               (alias_to,) + tuple(outer))
                 if ref.get("alias"):
-                    alias_to[ref["alias"]] = ("derived", None)
+                    # carry the scope OBJECT: its projection answers
+                    # membership questions (ledger-close)
+                    alias_to[_fold(ref["alias"])] = \
+                        ("derived", ref["derived_scope"])
                 continue
             name = ref["table_ref"]
             folded_scopes = {_fold(k): v for k, v in scope_keys.items()}
@@ -741,9 +831,12 @@ def resolve(tree: Dict[str, Any], store: Store, reg: Dict[str, Any],
                          "schema": schema or "(unqualified)"})
                     target = ("unresolved", None)
             if ref.get("alias"):
-                alias_to[ref["alias"]] = target
-            elif "." in name:
-                alias_to[name.rsplit(".", 1)[1]] = target
+                alias_to[_fold(ref["alias"])] = target
+            else:
+                # no alias: the table's own name qualifies its columns
+                # (ledger-close find: 287 '[#Temp].COL' refs unbound
+                # because bare temp names were never registered)
+                alias_to[_fold(name.rsplit(".", 1)[-1])] = target
 
         # subquery interiors resolve with THIS scope's aliases in
         # reach (correlated refs — plug-all-holes sweep 2026-09-06)
@@ -753,15 +846,35 @@ def resolve(tree: Dict[str, Any], store: Store, reg: Dict[str, Any],
             resolve_scope(sub, (alias_to,) + tuple(outer))
 
         def lookup_alias(alias):
+            folded = _fold(alias)  # SQL aliases compare folded (A2)
             for frame in (alias_to,) + tuple(outer):
-                if alias in frame:
-                    return frame[alias]
+                if folded in frame:
+                    return frame[folded]
             return None
+
+        def derived_declares(scope_obj, colname) -> bool:
+            arms = scope_obj.get("combination_arms")
+            shape = arms[0] if arms else scope_obj
+            proj = shape.get("projection", [])
+            if any(_fold(m["name"]) == _fold(colname)
+                   for m in proj if m.get("name")):
+                return True
+            if any(m.get("star") for m in proj):
+                return True  # could carry it — wildcard, never certain
+            return False
 
         # single-part refs: bind by SOLE source, else disambiguate by
         # COLUMN MEMBERSHIP — if exactly one source declares the
         # column, the binding is safe; 0 or 2+ stay counted
-        targets = list(dict.fromkeys(alias_to.values()))
+        # dedup by identity where hashable; derived targets (scope
+        # dicts) dedup by object id
+        targets, seen_t = [], set()
+        for kt in alias_to.values():
+            marker = (kt[0], id(kt[1]) if isinstance(kt[1], dict)
+                      else kt[1])
+            if marker not in seen_t:
+                seen_t.add(marker)
+                targets.append(kt)
         for col in _column_refs_in([scope.get("where"),
                                     scope.get("join_on"),
                                     scope.get("select_refs")]):
@@ -770,28 +883,46 @@ def resolve(tree: Dict[str, Any], store: Store, reg: Dict[str, Any],
             parts = col["ref"].split(".")
             if len(parts) == 1:
                 colname = parts[0]
-                candidates = []
+                candidates, wildcards = [], 0
                 for kind, target in targets:
-                    if kind == "table" and folded_columns.get(
-                            f"{target}|{_fold(colname)}"):
-                        candidates.append((kind, target))
-                    elif kind == "scope" and _fold(colname) in \
-                            scope_projections.get(target, set()):
-                        candidates.append((kind, target))
-                if len(targets) == 1:
-                    kind, target = targets[0]
-                    if kind == "derived":
-                        census["ambiguous_unqualified"] = \
-                            census.get("ambiguous_unqualified", 0) + 1
-                        continue
-                    _bind_column(col, kind, target, colname)
-                elif len(candidates) == 1:
+                    if kind == "table":
+                        if folded_columns.get(
+                                f"{target}|{_fold(colname)}"):
+                            candidates.append(("table", target))
+                    elif kind == "scope":
+                        found = scope_declares(target, colname)
+                        if found == "member":
+                            candidates.append(("scope", target))
+                        elif found:  # star-through KG1 identity
+                            candidates.append(("column", found))
+                        elif (scope_projections.get(target) or
+                              {}).get("star_refs"):
+                            wildcards += 1
+                    elif kind == "derived":
+                        if target is not None \
+                                and derived_declares(target, colname):
+                            candidates.append(("derived", target))
+                        else:
+                            wildcards += 1
+                    else:  # unresolved table: members unknowable
+                        wildcards += 1
+                if len(candidates) == 1:
+                    # unique holder — sound even beside wildcards: a
+                    # second holder would make the estate's own SQL
+                    # error ('ambiguous column name'), and the estate
+                    # RUNS (the same assumption resolution stands on)
                     kind, target = candidates[0]
-                    _bind_column(col, kind, target, colname)
-                elif not candidates and targets and all(
-                        k == "table" for k, _ in targets):
-                    # every source is a known table and NONE declares
-                    # the column — the drift class, counted
+                    if kind == "column":
+                        col["resolves_to"] = target
+                        census["resolved_refs"] += 1
+                    elif kind == "derived":
+                        col["resolves_to"] = "DERIVED scope member"
+                        census["resolved_derived"] = \
+                            census.get("resolved_derived", 0) + 1
+                    else:
+                        _bind_column(col, kind, target, colname)
+                elif not candidates and not wildcards and targets:
+                    # every source known, NONE declares it — drift
                     col["resolves_to"] = None
                     _count_unresolved(col["ref"],
                                       {"ref": col["ref"],
@@ -799,6 +930,7 @@ def resolve(tree: Dict[str, Any], store: Store, reg: Dict[str, Any],
                                        "table": "(no source declares "
                                        "it)"})
                 else:
+                    col["resolves_to"] = None
                     census["ambiguous_unqualified"] = \
                         census.get("ambiguous_unqualified", 0) + 1
                 continue
@@ -806,6 +938,17 @@ def resolve(tree: Dict[str, Any], store: Store, reg: Dict[str, Any],
                 bound = lookup_alias(parts[0])
                 if bound is not None:
                     kind, target = bound
+                    if kind == "scope":
+                        found = scope_declares(target, parts[1])
+                        if found and found != "member":
+                            col["resolves_to"] = found  # star-through
+                            census["resolved_refs"] += 1
+                            continue
+                    if kind == "derived":
+                        col["resolves_to"] = "DERIVED scope member"
+                        census["resolved_derived"] = \
+                            census.get("resolved_derived", 0) + 1
+                        continue
                     _bind_column(col, kind, target, parts[1])
                 else:
                     # a qualifier naming no known source: counted,
