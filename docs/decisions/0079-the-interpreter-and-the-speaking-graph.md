@@ -122,8 +122,12 @@ modes and deterministic renderers.
 
 ## Open at ratification
 
-- The demo interpreter/embedding endpoint (Sunny's home setup;
-  production is governed by the customer-Azure-OpenAI ruling).
+- ~~The demo interpreter/embedding endpoint~~ RESOLVED 2026-09-06:
+  OPENAI_API_KEY in .env (Sunny's key), verified live — interpreter
+  = gpt-4o-mini, embeddings = text-embedding-3-small (1536 dims).
+  Demo-only: the estate is synthetic; production stays governed by
+  the customer-Azure-OpenAI ruling (a config swap — llm_client
+  already speaks both header styles).
 - The never-regex census check (mechanical enforcement) ships with
   the implementation.
 - Ranking-weight defaults: seeded by us, tuned by evidence,
