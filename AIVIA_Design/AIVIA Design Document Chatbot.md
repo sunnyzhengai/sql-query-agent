@@ -545,9 +545,35 @@ when the question was understood.
 surface of absence is uneven (the honest zero exists; "the store
 doesn't cover that AREA" does not).
 
-**Dig questions.** How does the user learn the BOUNDARY of the
-store ("we only know the sepsis estate") without asking? Should
-every answer carry its coverage statement?
+**Dig outcomes (2026-09-07, Sunny's Law-9 pass — all ruled; THE
+DIG IS COMPLETE, all nine laws). The dug law: THE SYSTEM KNOWS
+WHAT IT KNOWS, SAYS WHAT IT DOESN'T, AND TURNS EVERY ABSENCE INTO
+AN ADDRESS.**
+
+► RULED (D1): THE COVERAGE LINE — header always (ambient: "sepsis
+— 28 files · 90 tables · loaded Sep 5"), INLINE on absence answers
+("no report named X exists — searched all 28 files"): the zero
+cites its searched universe. All of it graph self-knowledge
+(receipts, censuses), never claims about the un-loaded world
+(Law-1 graph-is-reality).
+
+► RULED (D2): THE CENSUS IS THE FRONT DOOR. The empty-table state
+IS the estate card: what's here, the kinds, the biggest topics,
+and — honest before impressive — the gap numbers. "What can I ask
+you?" answers from self-description, day one.
+
+► RULED (D3): EVERY COUNTED THING IS ASKABLE. "What don't you
+know?" is a first-class question: census buckets queryable by
+name; counted ITEMS are nodes (drift already; parse exclusions
+join). The system's map of its own ignorance is queryable.
+
+► RULED (D4): ABSENCE ANSWERS ARE DOORS. Every honest zero ships:
+the searched universe + the nearest true things + the NEXT ACT
+(mint a term / flag to steward / load an extract, role-scoped).
+Repeated hits on one absence = demand data for the steward queue.
+Scope note: SEARCHABILITY IS ACCESS-SCOPED — personal trees
+owner-only, governance events steward-only; the searchability
+census gains a scope column.
 
 ---
 
