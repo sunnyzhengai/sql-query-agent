@@ -1037,3 +1037,15 @@ Two citation handles, because the axiom systems are distinct and their group let
   - `tests/aivia/test_ask_console.py`
 - **Summarized in:**
   - `docs/decisions/0078-ask-the-graph-console.md`
+
+## ADR 0079 — The interpreter and the speaking graph
+
+- **Category:** architecture
+- **Component:** `architecture` → `docs/architecture/ARCHITECTURE.md` → axm:D, axm:S, axm:J, axm:M, axm:B, axm:R
+- **Implemented by:**
+  - `aivia/flows/ask.py`
+  - `aivia/console.py`
+- **Enforced by:**
+  - `tests/aivia/test_ask_console.py`
+- **Summarized in:**
+  - `docs/decisions/0079-the-interpreter-and-the-speaking-graph.md`

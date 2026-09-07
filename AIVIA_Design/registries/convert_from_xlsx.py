@@ -97,12 +97,17 @@ SOURCES = {
 # concepts; practiced = the delivery selections of report procs.
 # Org-specific words extend via KG3 terms (steward-blessed), never
 # by editing code.
-STAMP_VERSION = "1.10.0"
+# v1.11.0 (2026-09-06): ADR 0079 — the interpreter and the speaking
+# graph: NEVER-REGEX law (w/ the blessed mechanical-tool boundary);
+# the op list retires as a language (ops survive as user-pressed
+# DISPLAY MODES); match-then-connect; ranking weights are declared
+# data; the interpretation ledger.
+STAMP_VERSION = "1.11.0"
 RATIFIED = True
 DOC_STAMP = ("v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 twin-graph "
              "ruling ADR 0077; v1.2.0 Phase A metamodel bump; v1.3.0 "
              "Phase B composite-kinds correction; v1.4.0 T-2 "
-             "operational-statements ruling; v1.5.0 the gap taxonomy; v1.6.0 the plug-all-holes sweep; v1.7.0 ledger close; v1.8.0 the ask console ADR 0078; v1.9.0 the list op; v1.10.0 kind vocabulary "
+             "operational-statements ruling; v1.5.0 the gap taxonomy; v1.6.0 the plug-all-holes sweep; v1.7.0 ledger close; v1.8.0 the ask console ADR 0078; v1.9.0 the list op; v1.10.0 kind vocabulary; v1.11.0 ADR 0079 interpreter "
              "(all 2026-09-06)")
 CONVERTED_ON = "2026-09-05"
 
@@ -716,6 +721,22 @@ TWIN_SHEETS = {
             {"Word": "concepts", "Kind": "metric", "Note": ""},
         ],
         "Ask_Console": [
+            {"Item": "_superseded_0079", "Definition": "ADR 0079 "
+             "(2026-09-06, Sunny's brainstorm rulings): the OP LIST "
+             "below RETIRES as the request language — question "
+             "understanding is the caged INTERPRETER (never-regex "
+             "law; the keyword grammar dies), grounding is exact->"
+             "semantic (embeddings over meaning text, content_key-"
+             "stamped, customer-boundary endpoints), answering is "
+             "MATCH-THEN-CONNECT (k-shortest connecting subgraphs, "
+             "caps visible, ranking weights = declared data), and "
+             "the graph SPEAKS via floors. Ops survive as DISPLAY "
+             "MODES the USER presses — never intents a model "
+             "classifies. Confirmed interpretations land in the "
+             "ledger (revocable; interpretation cached, never the "
+             "answer). Tier B (fragment matching against the twins) "
+             "= the inward MATCH stage, built after Tier A. Rows "
+             "below stand as the historical record."},
             {"Item": "_ruling", "Definition": "ADR 0078 (2026-09-06): "
              "the ask-the-graph console — free questions, TYPED paths "
              "(Group E: the path space is data, enumerable, "

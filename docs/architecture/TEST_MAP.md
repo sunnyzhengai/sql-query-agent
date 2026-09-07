@@ -80,6 +80,7 @@
 | 0076 | Compositional interpretation: capture once, interpret by grammar (spec:G5) | `tests/test_op_frontier.py` (8), `tests/test_skeleton_composer.py` (38) |
 | 0077 | The twin-graph KG: meaning is a stored homomorphic twin | `tests/aivia/test_design_validators.py` (4), `tests/aivia/test_metamodel.py` (7), `tests/aivia/test_phase_a_projection.py` (6) |
 | 0078 | The ask-the-graph console: free questions, typed paths, self-answering nodes | `tests/aivia/test_ask_console.py` (14) |
+| 0079 | The interpreter and the speaking graph | `tests/aivia/test_ask_console.py` (14) |
 
 ## By standing law
 

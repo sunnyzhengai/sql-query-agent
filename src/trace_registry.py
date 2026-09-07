@@ -115,7 +115,7 @@ ARCHITECTURE_COMPONENTS = {
         # component — one system-model file, organized by the Sphere,
         # every section carrying a build status.
         "doc": "docs/architecture/ARCHITECTURE.md",
-        "current_through": "0078",
+        "current_through": "0079",
         "title": "The system model — the Sphere",
         # all six groups since ADR 0071 (user_flow absorbed): the one
         # system-model file legitimately spans the constitution.
@@ -739,6 +739,20 @@ TRACE_REGISTRY = {
                   "tests/test_term_hygiene.py", "tests/test_admin_graph.py",
                   "tests/test_companion.py"],
         "docs": ["docs/architecture/SPEC.md", "docs/architecture/TRACE_MAP.md"],
+    },
+    "0079": {
+        # ACCEPTED 2026-09-06: never-regex; the graph's own
+        # vocabulary as the only language; match-then-connect; the
+        # interpretation ledger. Supersedes 0078's ask path; design
+        # record only — implementation follows Sunny's build order.
+        "title": "The interpreter and the speaking graph",
+        "category": "architecture",
+        "component": "architecture",
+        "axioms": [],
+        "modules": ["aivia/flows/ask.py", "aivia/console.py"],
+        "tests": ["tests/aivia/test_ask_console.py"],
+        "docs": ["docs/decisions/"
+                 "0079-the-interpreter-and-the-speaking-graph.md"],
     },
     "0078": {
         # ACCEPTED 2026-09-06: the ask-the-graph console — free

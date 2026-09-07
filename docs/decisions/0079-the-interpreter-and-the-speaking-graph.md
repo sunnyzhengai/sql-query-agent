@@ -1,0 +1,138 @@
+# ADR 0079 — The interpreter and the speaking graph: never-regex, match-then-connect, the graph's own vocabulary as the only language
+
+**Status:** ACCEPTED 2026-09-06 — designed in live brainstorm with
+Sunny after four console finds traced to one generator; every open
+point blessed explicitly. **Component:** architecture. **Supersedes**
+ADR 0078's ask path (the op list + keyword grammar); the console
+surface, H5 usage events, honest outcomes, and Kind_Vocabulary
+survive.
+
+## The generator this kills
+
+Four live asks failed in one evening — unpickable ambiguity, "what
+metrics are there," the vocabulary audit, "what reports are about
+sepsis" — and all four were ONE failure: question understanding was
+an enumerated pattern list (regex grammar, then a five-verb algebra
+proposal — smaller, same species). Enumeration over natural language
+is never total; every unenumerated phrasing arrives as a corpse.
+This is the same law that killed the flat decision yields this
+morning (ADR 0077). Sunny's ruling closes the class, not the
+instance.
+
+## Law 1 — NEVER-REGEX (ruled, with the blessed boundary)
+
+**Meaning is never extracted from human or code language by
+pattern.** Language is understood by a native parser (code — the
+standing ADR 0001 law) or a caged interpreter (natural language),
+both emitting typed, validated structures.
+
+The blessed boundary: regex remains legal as a MECHANICAL STRING
+TOOL where the pattern IS the complete specification of a
+deterministic transform (whitespace collapse, CamelCase splitting,
+bracket-stripping in fold(), the R5 boilerplate-stripper). The
+census distinction: regex applied to QUESTION TEXT or SQL TEXT to
+decide what it means = violation; regex as string utility = legal.
+Enforcement: a code census check (to build with the implementation;
+until then this ADR is the law's record). The console's keyword
+grammar RETIRES; the outage floor is an honest structured form
+(pick kind, pick entity, press a display mode) — never a fake
+parser, because "an outage costs polish, never truth" applies to
+understanding too.
+
+## Law 2 — the only language is the graph's own vocabulary
+
+No new request algebra, no op enumeration. The metamodel — kinds,
+edges, the meaning twin — is already ratified, closed, and TOTAL
+over meaning (the homomorphism law). Anything the graph can answer
+is expressible in the graph's own terms by construction. Sunny's
+skepticism of pre-defined operation sets is hereby standing law:
+inventing a second vocabulary beside the metamodel is the
+enumeration disease wearing types.
+
+## The ask pipeline (Tier A — the metadata console)
+
+1. **UNDERSTAND** (the interpreter, caged): free text -> typed
+   mentions {entity-ish phrases, topic phrases} + optional display
+   hint. The model PARSES, never generates (axm:M5); its output is
+   validated against the index and the metamodel; a failed
+   validation degrades to HITL, never to a guess.
+2. **GROUND** (deterministic tiers + embeddings): each mention
+   resolves exact-identity -> exact folded name -> SEMANTIC
+   (vector) -> HITL. The semantic index embeds each node's MEANING
+   TEXT (descriptions, steward words, floors) — possible only
+   because translation is total (ADR 0077). Every stored vector is
+   stamped (content_key + embedding-model version): the change
+   quanta extend for free — a meaning that did not change never
+   re-embeds. Embedding endpoints live inside the customer boundary
+   (the standing customer-Azure-OpenAI governance ruling); only
+   door-1-redacted text is ever embedded.
+3. **CONNECT** (graph algorithms, no intent enumeration): the
+   answer to a multi-mention question is the CONNECTING SUBGRAPH —
+   k-shortest paths / capped Steiner-style neighborhood between the
+   grounded nodes; single-mention questions get the node's
+   neighborhood. Caps and counts are VISIBLE ("showing 5 of 23
+   paths"), never silent truncation. Path RANKING inputs (edge-kind
+   weights, meaning similarity) are DECLARED, TUNABLE DATA in the
+   registry — never a hidden model judgment.
+4. **SPEAK** (the graph answers for itself): every node on a path
+   renders through the existing policy machinery — floors, steward
+   words, the gap taxonomy's named silences. Rendering a path is
+   walking it. No answer shapes, no answer generation.
+5. **STEER** (HITL; the blessed resolution of irreducible intent):
+   where intent is underdetermined, the console shows the connected
+   neighborhood and the human drills. DISPLAY MODES — list it,
+   floor it, trace it, census it — are BUTTONS THE USER PRESSES,
+   never intents a model classifies. Some questions get an
+   exploration answer rather than a direct one; that is the design,
+   not a limitation.
+6. **REMEMBER** (the interpretation ledger): every confirmed
+   interpretation lands as a governed event: (question text ->
+   grounded mentions + display), with author and model basis.
+   Repeat questions match confirmed interpretations by folded text
+   BEFORE any model call — instant, free, deterministic — and the
+   plan re-executes against the CURRENT graph (the interpretation
+   is cached, never the answer). Stewards can list and REVOKE
+   interpretations (dispositions). Default confirmation friction
+   (adjustable): confirm on first sighting and on low confidence;
+   silent on ledger hits.
+
+## Tier B — the logic console (designed now, built after Tier A)
+
+Sunny's AST proposal, landed in the existing vocabulary: the
+interpreter builds a QUESTION FRAGMENT — a partial meaning tree in
+the ratified kind library ("a selection of encounters · condition
+on a sepsis-ish code · RANGE within 30 days of discharge") — and
+answering is STRUCTURAL MATCHING of the fragment against the
+estate's twins (content_keys + subtree similarity). The answer:
+"this existing logic already computes what you describe" -> its
+floor. This IS the inward flow's MATCH stage from L0, no longer a
+parked mystery; it shares grounding, embeddings, and the ledger
+with Tier A. Sequencing blessed: Tier A ships and gets tested
+first; Tier B follows; GENERATION (new estate when nothing
+matches) remains deferred and gated by the tier lock.
+
+## What survives from ADR 0078
+
+The console surface and its honesty machinery: three outcomes,
+clickable ambiguity, H5 usage events (extended to carry the
+interpretation), Kind_Vocabulary as grounding data, the drift-
+findable-by-name search law, no open chat (the tier lock). The op
+list retires as a LANGUAGE; its useful members survive as display
+modes and deterministic renderers.
+
+## Open at ratification
+
+- The demo interpreter/embedding endpoint (Sunny's home setup;
+  production is governed by the customer-Azure-OpenAI ruling).
+- The never-regex census check (mechanical enforcement) ships with
+  the implementation.
+- Ranking-weight defaults: seeded by us, tuned by evidence,
+  declared in the registry.
+
+## Relations
+
+0077 (total translation makes NL-NL grounding and speaking-nodes
+possible) · 0078 (superseded in part) · 0076 (compose, never
+enumerate — now applied to questions) · 0001 (native parsers; the
+code-side of never-regex) · L0 inward flow (Tier B is its MATCH
+stage) · the tier lock (no open chat; artifacts land, chat doesn't).
