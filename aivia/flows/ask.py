@@ -246,7 +246,34 @@ def ask(store, question: str, author: str,
         about = (resolution["entity"]["identity"]
                  if outcome == "matched" and resolution.get("entity")
                  else None)
-        if outcome == "matched":
+        # NAME-LEVEL read-ops (Sunny's first live ask, 2026-09-06):
+        # 'filters on MEDICATION_ID' across six same-named columns IS
+        # the question — a read-op aggregates over the whole name,
+        # each section labeled by identity. Lookup/define keep
+        # ambiguity: there, WHICH one matters.
+        if outcome == "ambiguous" \
+                and op in ("filters_on", "lineage", "who_reads"):
+            cands = resolution["candidates"]
+            if len({c["folded"] for c in cands}) == 1 \
+                    and {c["kind"] for c in cands} \
+                    <= {"column", "derived column"}:
+                sections = [
+                    f"{len(cands)} columns carry the name "
+                    f"{cands[0]['name']} — answering across all of "
+                    "them:", ""]
+                for c in cands:
+                    sections.append(_render(
+                        read, op, {"outcome": "matched", "entity": c}))
+                    sections.append("")
+                outcome = "matched"
+                resolution = {"outcome": "matched", "entity": None,
+                              "aggregated": cands}
+                about = None  # H5: about names ONE node; a name-level
+                # answer spans many, so the event carries none
+                answer = "\n".join(sections).rstrip()
+        if outcome == "matched" and resolution.get("aggregated"):
+            pass
+        elif outcome == "matched":
             answer = _render(read, op, resolution)
         elif outcome == "ambiguous":
             answer = "AMBIGUOUS — pick one:\n" + "\n".join(

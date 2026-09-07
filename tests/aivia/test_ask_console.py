@@ -146,3 +146,23 @@ def test_llm_parse_hook_is_caged(store):
                      llm_parse=lambda q: ("write_me_a_poem", "x"))
     assert result["op"] == "lookup"
     assert result["outcome"] == "matched"
+
+
+def test_name_level_read_op_aggregates(store):
+    """Sunny's first live ask (2026-09-06): 'filters on MEDICATION_ID'
+    hit six same-named columns — for a READ-op the name IS the
+    question, so the answer aggregates across all of them, labeled
+    per identity. Lookup keeps ambiguity (there, WHICH one matters)."""
+    result = _ask(store, "filters on MEDICATION_ID")
+    assert result["outcome"] == "matched"
+    assert "columns carry the name MEDICATION_ID" in result["answer"]
+    assert "emr|dbo|MEDICATIONS|MEDICATION_ID" in result["answer"]
+    # the ABX value-set filter appears among the aggregated sections
+    assert "one of the values from a nested selection" in \
+        result["answer"]
+    events = [u for u in store.current_nodes("usage")
+              if u.properties.get("payload", "").endswith(
+                  "filters on MEDICATION_ID")]
+    assert events[-1].properties.get("about") is None  # spans many
+    lookup = _ask(store, "what is MEDICATION_ID")
+    assert lookup["outcome"] == "ambiguous"  # identity matters here

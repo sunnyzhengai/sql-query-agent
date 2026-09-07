@@ -75,6 +75,22 @@ def make_handler(store, estate: str):
                 answer = (f"<p class=meta>op: {result['op']} · "
                           f"outcome: {result['outcome']}</p>"
                           f"<pre>{html.escape(result['answer'])}</pre>")
+                if result["outcome"] == "ambiguous":
+                    # pick one BY CLICKING — the link re-asks with
+                    # the op preserved and the full identity
+                    links = []
+                    for c in result["resolution"]["candidates"]:
+                        next_q = f"{result['op']} {c['identity']}" \
+                            if result["op"] != "lookup" \
+                            else f"what is {c['identity']}"
+                        href = "/?q=" + urllib.parse.quote(next_q)
+                        links.append(
+                            f'<li><a href="{href}">'
+                            f"[{html.escape(c['kind'])}] "
+                            f"{html.escape(c['name'])} — "
+                            f"{html.escape(c['identity'])}</a></li>")
+                    answer += ("<p>Pick one:</p><ul>"
+                               + "".join(links) + "</ul>")
             body = _PAGE.format(estate=html.escape(estate),
                                 q=html.escape(q), answer=answer)
             data = body.encode()
