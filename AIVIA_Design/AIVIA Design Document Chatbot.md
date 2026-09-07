@@ -403,9 +403,40 @@ toggle, never a removal. The trace doubles as the audit record.
 one line — and does not yet show expansions-not-proposed, facets
 checked, or cut candidates.
 
-**Dig questions.** What does the FULL work-shown surface look like
-without drowning the answer? Progressive disclosure (caption →
-expandable work)?
+**Dig outcomes (2026-09-07, Sunny's Law-6 pass — all ruled). The
+dug law: EVERYTHING THAT SHAPED THE ANSWER IS REACHABLE FROM THE
+ANSWER — in human words, rendered from recorded facts.**
+
+► RULED (D1): THREE LAYERS — caption (the answer, always), work
+(the compact trace line, always, expandable), evidence (the full
+record: every candidate, every card, everything cut). NOTHING
+about how an answer was produced may exist only in a log.
+
+► RULED (D2): THE TRACE SPEAKS HUMAN, RENDERED FROM DATA. Plain
+process-language via fixed templates ("Looked for X by exact name —
+nothing. Searched by meaning — 8 close matches, best 0.63. No
+expansions were proposed."); scores stay visible; raw technical
+form one expansion deeper. Trace lines are the third word class —
+PROCESS WORDS: claims about what the system did, rendered ONLY
+from recorded trace data, never hand-narrated, never
+model-summarized.
+
+► RULED (D3): THE COMPLETENESS SPEC (closed). Per mention: tiers
+tried in order w/ outcomes; expansions proposed AND the explicit
+"no expansions proposed". The winner: match, score, WHICH CARD
+(facet provenance). The engine's choice: one line of display-set
+rationale ("showing conditions — you named the kind"). The cuts:
+below-floor counts, caps applied. The negative space: a kind
+answer carries the kind's counted exclusions when nonzero.
+Closing rule: anything the system did that shaped the answer
+appears; anything not in trace data may not be claimed about the
+process.
+
+► RULED (D4): THE TRACE IS DERIVABLE, NEVER STORED PROSE. The
+recorded facts are its INPUTS — the question, the Interpreter's
+raw proposal (already evidence), the context snapshot (already
+Law 5). Everything downstream is deterministic: any past round's
+full trace recomputes on demand, exactly, forever.
 
 ## Law 7 — Learning happens only through confirmation
 
