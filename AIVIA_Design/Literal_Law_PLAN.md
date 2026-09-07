@@ -26,6 +26,24 @@ legalizes a vocabulary list or a ruling in code. The only path is
 the converter (registry bump → doc stamps → Sunny's review chain).
 Smuggling becomes structurally impossible, not discouraged.
 
+## 1b. ► RULED (Sunny, 2026-09-07, the root-cause exchange)
+
+- **#3 exempt**: internal envelope labels (shape) are outside the
+  no-hardcoding rule.
+- **THE BUILDER'S CAGE**: Claude-the-builder is a model seat like
+  the Interpreter — its domain knowledge is a PROPOSAL, never an
+  author. Legal knowledge sources for the system: the graph (incl.
+  registry), the user's live input, confirmed memory. When none has
+  it, THE HONEST GAP SHIPS — a young system that asks questions is
+  correct, not embarrassing. Builder knowledge enters only through
+  design documents Sunny ratifies.
+- **THE THREE COUNTERS stand** (one per root cause of the
+  enumeration relapses): (1) the literal census as a standing test
+  — no marker class exists for vocabulary/rulings; (2) the step
+  discipline — each step's TEST SUITE is designed and shown to
+  Sunny BEFORE its code; (3) the builder's cage above, ratified in
+  writing.
+
 ## 2. The three locks (build order, on GO — after the review)
 
 1. **The literal census** — a standing test: an AST scanner over
