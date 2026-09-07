@@ -357,9 +357,38 @@ deterministic; the model never re-reads prior prose.
 The anaphor WORD LIST is still hand-authored — same species as the
 kind table; candidate for the same elimination.
 
-**Dig questions.** Should the LLM mark reference-mentions instead
-of a word list? Multi-answer context (the table holds results of
-several rounds) — how far back does "those" reach?
+**Dig outcomes (2026-09-07, Sunny's Law-5 pass — all ruled). The
+dug law: THE TABLE IS REAL — stacked, visible, and everything the
+user does lands on it.**
+
+► RULED (D1): THE STACKED TABLE. Context is a bounded stack of
+rounds (depth = registry data, ~5). Bare anaphors and ordinals
+resolve against the TOP, always (predictability beats reach);
+kind-qualified anaphors ("those scopes") search DOWN for the
+nearest matching pool; cross-round ambiguity clarifies WITH round
+provenance; beyond the bound, things fall off — durable recall is
+the tree (D4).
+
+► RULED (D2): SELECTIONS ARE ACTS. A click, a clarify-pick, a mode
+press lands on the table exactly like a typed answer. A
+clarify-pick is a LIGHTWEIGHT CONFIRMATION: phrase -> chosen
+reference accretes to the user's tree (feeds the Law-2
+meaning-book; the next ask leads with the pick as a provisional
+answer). Every clarify the user answers makes the next one
+unnecessary.
+
+► RULED (D3): THE TABLE IS VISIBLE. A persistent surface region
+shows what is on it (top expanded, older rounds collapsed), every
+item re-invocable; "CLEAR THE TABLE" is an explicit user act. Law
+6 applied to Law 5: if "those" resolves against state, the user
+sees the state before typing.
+
+► RULED (D4): SESSION TABLE vs USER TREE — two memories, never
+confused. Anaphors NEVER cross sessions ("those" tomorrow = an
+honest "nothing on the table yet"); durable recall is a TREE QUERY
+("the report I viewed yesterday" — acts accreted, deterministic).
+Confirmed rounds snapshot the pool they used; replays hold
+regardless of the table's later state.
 
 ## Law 6 — The work is shown
 
