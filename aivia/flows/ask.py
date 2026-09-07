@@ -239,20 +239,37 @@ def execute(read, index, adj, groundings: List[Dict[str, Any]],
               if g["outcome"] not in ("kind", "matched")]
 
     # kind (+ optional topic): the filtered enumeration — the class
-    # of Sunny's live finds #2 and #4
+    # of Sunny's live finds #2 and #4. Live find #5 (the missing 7
+    # sepsis reports): NAME CONTAINMENT is deterministic and runs
+    # over the ENTIRE kind first; the semantic tier ADDS meaning
+    # matches on top of it — never a truncated pool deciding the set,
+    # and the answer states which tier found what.
     if kinds:
         kind = kinds[0]["kind"]
-        topic_entries = None
         topic_texts = topics + [e["name"] for e in entities]
-        if topic_texts and semantic is not None and kind != "metric":
+        if topic_texts and kind != "metric":
             want = " ".join(topic_texts)
-            hits = semantic.search(want, top_k=200)
-            topic_entries = [
-                h for h in hits if h["kind"] == kind
-                and (h["score"] >= grounding.MATCH_SCORE
-                     or ask_index._words(want)
-                     in ask_index._words(h["name"]))]
-        return render_kind_list(read, index, kind, topic_entries)
+            want_words = ask_index._words(want)
+            kind_entries = [e for e in index if e["kind"] == kind]
+            by_name = [e for e in kind_entries
+                       if want_words and
+                       (want_words in ask_index._words(e["name"])
+                        or want_words in (e.get("words") or ""))]
+            named_ids = {e["identity"] for e in by_name}
+            by_meaning = []
+            if semantic is not None:
+                for h in semantic.search(want, top_k=40, kind=kind):
+                    if h["score"] >= grounding.MATCH_SCORE \
+                            and h["identity"] not in named_ids:
+                        by_meaning.append(h)
+            matched = by_name + by_meaning
+            header = (f"{len(matched)} {kind}(s) about '{want}' "
+                      f"({len(by_name)} by name, {len(by_meaning)} "
+                      "more by meaning):")
+            body = render_kind_list(read, index, kind, matched)
+            return header + "\n" + body.split("\n", 1)[1] \
+                if "\n" in body else header
+        return render_kind_list(read, index, kind, None)
 
     if len(entities) >= 2:
         weights = connect.edge_weights()

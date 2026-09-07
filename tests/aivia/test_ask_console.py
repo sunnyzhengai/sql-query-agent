@@ -111,8 +111,15 @@ def test_cn2_kind_plus_topic_the_live_find_dies(world):
                         result["interpretation"], "person:test", T0,
                         semantic=semantic)
     assert final["status"] == "answer"
-    assert "file(s):" in final["answer"]
+    # live find #5 (Sunny: "is 21 correct? I thought 28"): every one
+    # of the 28 corpus files carries Sepsis in its name — name
+    # containment runs over the WHOLE kind, never a truncated pool,
+    # and the answer states which tier found what
+    assert "28 file(s) about" in final["answer"]
+    assert "(28 by name, 0 more by meaning)" in final["answer"]
     assert "USP_ED_SEPSIS" in final["answer"]
+    assert "USP_IP_SepsisEncountersWLocations" in final["answer"]
+    assert "USP_RPTS_NonSevere_Sepsis" in final["answer"]
 
 
 def test_cn1_two_mentions_connect_and_speak(world):

@@ -66,12 +66,18 @@ class SemanticIndex:
         self.embed_fn = embed_fn
         self.embedded_now = len(missing)
 
-    def search(self, text: str, top_k: int = TOP_K
-               ) -> List[Dict[str, Any]]:
+    def search(self, text: str, top_k: int = TOP_K,
+               kind: Optional[str] = None) -> List[Dict[str, Any]]:
+        """Scores over ALL entries (optionally restricted to one
+        kind BEFORE ranking — live find #5: pooling before the kind
+        filter let columns crowd files out of a truncated pool, a
+        silent cap distorting the set)."""
         query = self.embed_fn([text])[0]
         qn = math.sqrt(sum(v * v for v in query)) or 1.0
         scored = []
         for entry, vec in zip(self.entries, self.vectors):
+            if kind is not None and entry["kind"] != kind:
+                continue
             dot = sum(a * b for a, b in zip(query, vec))
             vn = math.sqrt(sum(v * v for v in vec)) or 1.0
             scored.append((dot / (qn * vn), entry))
