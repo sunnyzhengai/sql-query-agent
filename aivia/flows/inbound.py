@@ -198,9 +198,11 @@ class EstateReport:
     counted_excluded: List[Dict[str, str]] = field(default_factory=list)
     trees: Dict[str, Dict[str, Any]] = field(default_factory=dict)
     twins: Dict[str, Dict[str, Any]] = field(default_factory=dict)
+    reused: List[str] = field(default_factory=list)
 
 
-def receive_estate(store, reg: Dict[str, Any], estate_dir) -> EstateReport:
+def receive_estate(store, reg: Dict[str, Any], estate_dir,
+                   kg1_changed=None) -> EstateReport:
     estate_dir = pathlib.Path(estate_dir)
     manifest = json.loads((estate_dir / "manifest.json").read_text())
     location = manifest["location"]
@@ -222,7 +224,8 @@ def receive_estate(store, reg: Dict[str, Any], estate_dir) -> EstateReport:
                 store, reg, file_id=f"{location}{name}",
                 file_name=name, text=path.read_text(),
                 as_of=manifest["as_of"],
-                default_schema=manifest.get("default_schema"))
+                default_schema=manifest.get("default_schema"),
+                kg1_changed=kg1_changed)
         except ValueError as err:
             # conservation: a parse failure is a COUNTED exclusion with
             # the parser's own message — never fatal, never silent
@@ -234,6 +237,16 @@ def receive_estate(store, reg: Dict[str, Any], estate_dir) -> EstateReport:
             continue
         report.acquired.append(name)
         report.trees[name] = tree
+        if tree.pop("_reused", False):
+            # unchanged file, no KG1 ripple: tree AND twin stand —
+            # the file quantum skips the whole chain (change quanta)
+            report.reused.append(name)
+            twin_node = next(
+                (n for n in store.current_nodes("meaning_twin")
+                 if n.identity == f"twin::{location}{name}"), None)
+            if twin_node is not None:
+                report.twins[name] = twin_node.properties["twin"]
+                continue
         # Phase B (ADR 0077): parse and translate in the SAME RUN,
         # atomic — the twin regenerates with its tree at the file
         # quantum; the homomorphism law is asserted inside translate()

@@ -64,6 +64,8 @@ class IntakeReport:
     illegal_declarations: List[str] = field(default_factory=list)
     pending_references: List[str] = field(default_factory=list)
     check_outcomes: Dict[str, str] = field(default_factory=dict)
+    changed_objects: List[str] = field(default_factory=list)
+    retired_objects: List[str] = field(default_factory=list)
 
 
 def load_snapshot(snap_dir) -> ExtractSnapshot:
@@ -266,10 +268,26 @@ def _desired_state(store, reg, snap, report):
     return nodes, contains, list(edges.values()), as_of
 
 
+def object_hash(kind: str, props: Dict[str, Any]) -> str:
+    """CONTRACT_DATALOAD §13: hash over the object's declared syntax
+    + semantics as loaded — the mechanical basis of incremental
+    intake and object-grain staleness. loaded_at/content_hash are
+    stamps, never content — excluded from their own computation."""
+    import hashlib
+    import json as _json
+    content = {k: v for k, v in props.items()
+               if k not in ("content_hash", "loaded_at")}
+    return hashlib.sha256(
+        _json.dumps([kind, content], sort_keys=True).encode()
+    ).hexdigest()[:16]
+
+
 def apply_extract(store: Store, reg: Dict[str, Any],
                   snap: ExtractSnapshot) -> IntakeReport:
     """Validate fully, then apply as a diff — atomic (LC-F5),
-    idempotent (LC-S3). Call via flows.inbound in production."""
+    idempotent at the HASH grain (INTAKE-13, §13: an unchanged
+    object writes nothing across extracts — the ledger-close of
+    full reload as the intake MODE). Call via flows.inbound."""
     report = IntakeReport(source=snap.source)
     report.gap_lists = {"grain_not_declared": [], "pk_missing": []}
     nodes, contains, join_edges, as_of = _desired_state(
@@ -277,16 +295,32 @@ def apply_extract(store: Store, reg: Dict[str, Any],
     extract_id = snap.extract_id
 
     current = {n.identity: n for n in store.current_nodes()}
+    report.changed_objects = []  # the object-grain staleness feed
     for identity, (kind, props) in nodes.items():
+        h = object_hash(kind, props)
         prior = current.get(identity)
-        if prior is not None and prior.properties == props \
-                and prior.as_of == as_of:
-            continue  # LC-S3: unchanged -> NO new version
+        if prior is not None \
+                and prior.properties.get("content_hash") == h:
+            continue  # INTAKE-13: unchanged hash -> NO new version
+        props = dict(props, content_hash=h, loaded_at=as_of)
         store.append_node(kind, identity, props, as_of, extract_id)
+        report.changed_objects.append(identity)
         if prior is None:
             report.change_report_kinds_created.add(kind)
             if kind in ("schema", "table"):
                 report.objects_created += 1
+
+    # §11 RETIRE: this source's objects absent from the new extract —
+    # marked, never removed; attached artifacts surface via the
+    # anchor census, references stay valid
+    report.retired_objects = []
+    desired = set(nodes)
+    for identity, node in current.items():
+        if node.kind in ("schema", "table", "column") \
+                and identity.startswith(f"{snap.source}|") \
+                and identity not in desired:
+            store.retire_node(identity, as_of)
+            report.retired_objects.append(identity)
 
     have_contains = {(e.from_id, e.to_id)
                      for e in store.current_edges("contains")}
@@ -303,4 +337,37 @@ def apply_extract(store: Store, reg: Dict[str, Any],
                           {"on": on, "cardinality": "many_to_one"},
                           as_of, extract_id)
     report.check_outcomes["INTAKE-0..10"] = "pass"
+    # INTAKE-11: every object at intake carries its content hash —
+    # structurally true by the write path above; declared as a check
+    report.check_outcomes["INTAKE-11"] = "pass"
+    report.check_outcomes["INTAKE-13"] = (
+        f"pass ({len(report.changed_objects)} written, unchanged "
+        "objects wrote nothing)")
     return report
+
+
+def audit_incremental(store: Store, reg: Dict[str, Any],
+                      snap: ExtractSnapshot) -> List[str]:
+    """INTAKE-12 (§13): the equivalence audit — a FULL parallel load
+    into a scratch store, compared against incremental state by
+    object hash. Any delta is a COUNTED finding naming the object
+    and the divergence — never silently reconciled. Mechanical,
+    never trusted (the 5-rule gate)."""
+    scratch = Store()
+    apply_registration(scratch, reg)
+    apply_extract(scratch, reg, snap)
+    fresh = {n.identity: n.properties.get("content_hash")
+             for n in scratch.current_nodes()
+             if n.kind in ("schema", "table", "column")}
+    live = {n.identity: n.properties.get("content_hash")
+            for n in store.current_nodes()
+            if n.kind in ("schema", "table", "column")
+            and n.identity.startswith(f"{snap.source}|")}
+    findings = []
+    for identity in sorted(set(fresh) | set(live)):
+        a, b = fresh.get(identity), live.get(identity)
+        if a != b:
+            findings.append(
+                f"INTAKE-12: {identity} — full-load hash {a} vs "
+                f"incremental {b}")
+    return findings

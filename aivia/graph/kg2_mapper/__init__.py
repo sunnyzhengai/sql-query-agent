@@ -996,17 +996,56 @@ def record_exclusion(store: Store, file_name: str, reason: str,
 def apply_file(store: Store, reg: Dict[str, Any], file_id: str,
                file_name: str, text: str, as_of: str,
                dialect: str = "tsql",
-               default_schema: Optional[str] = None) -> Dict[str, Any]:
-    gate = phi_gate.door1_redact(text)
-    tree = resolve(map_tree(file_name, gate.text, dialect), store, reg,
-                   default_schema=default_schema)
-    tree["phi_redactions"] = gate.redaction_count
+               default_schema: Optional[str] = None,
+               kg1_changed: Optional[set] = None) -> Dict[str, Any]:
+    import hashlib
+    text_hash = hashlib.sha256(text.encode()).hexdigest()[:16]
     current = [n for n in store.current_nodes("file")
                if n.identity == file_id]
-    if current and current[0].properties.get("tree") == tree:
-        return tree  # LC2-S3-style idempotence: unchanged, no new version
+    # THE CHANGE QUANTA (flows registry; ruled 2026-09-06): KG2's
+    # data quantum is the FILE — an unchanged file under an unchanged
+    # metamodel never re-parses. A KG1 ripple re-RESOLVES the stored
+    # tree (name binding reads current KG1) without re-parsing; only
+    # a text or metamodel change pays the parser.
+    if current \
+            and current[0].properties.get("text_hash") == text_hash \
+            and current[0].properties.get("tree", {}).get(
+                "metamodel_version") == METAMODEL_VERSION:
+        import copy
+        # deep-copy at the boundary: the in-memory store shares dict
+        # references, and resolve() mutates in place — re-resolving
+        # the stored object would compare it to itself
+        stored = copy.deepcopy(current[0].properties["tree"])
+        if not kg1_changed:
+            stored["_reused"] = True
+            return stored
+
+        def strip(node):  # name binding restarts clean — a partial
+            if isinstance(node, dict):   # re-resolve would skew census
+                node.pop("resolves_to", None)
+                for v in node.values():
+                    strip(v)
+            elif isinstance(node, list):
+                for v in node:
+                    strip(v)
+        strip(stored.get("statements"))
+        stored.pop("resolution_census", None)
+        tree = resolve(stored, store, reg,
+                       default_schema=default_schema)
+        if current[0].properties.get("tree") == tree:
+            tree["_reused"] = True
+            return tree
+    else:
+        gate = phi_gate.door1_redact(text)
+        tree = resolve(map_tree(file_name, gate.text, dialect), store,
+                       reg, default_schema=default_schema)
+        tree["phi_redactions"] = gate.redaction_count
+        if current and current[0].properties.get("tree") == tree:
+            return tree  # LC2-S3 idempotence: unchanged, no new version
+    tree.pop("_reused", None)
     store.append_node("file", file_id,
-                      {"tree": tree, "dialect": dialect}, as_of, file_id)
+                      {"tree": tree, "dialect": dialect,
+                       "text_hash": text_hash}, as_of, file_id)
     have = {n.identity for n in store.current_nodes("scope")}
     for stmt in tree["statements"]:
         scopes = list(stmt.get("ctes", []))
