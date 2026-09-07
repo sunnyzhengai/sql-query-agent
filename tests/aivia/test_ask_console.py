@@ -336,3 +336,73 @@ def test_fu4_confirmed_followups_store_context_snapshot(world):
                     interpret_fn=exploding, semantic=semantic,
                     context=None)
     assert again["status"] == "answer" and again["via"] == "ledger"
+
+
+# ---- CS: the conversation surface (find #7 second leg) --------------
+@pytest.fixture()
+def surface(world):
+    """The REAL console server on an ephemeral port, model-free —
+    the surface itself is what's under test."""
+    import threading
+    from http.server import ThreadingHTTPServer
+
+    from aivia import console
+    store, semantic = world
+    calls = []
+
+    def recording_interpreter(question):
+        calls.append(question)
+        return {"mentions": ["sepsis"]}
+
+    handler = console.make_handler(store, "sepsis",
+                                   recording_interpreter, semantic, {})
+    srv = ThreadingHTTPServer(("127.0.0.1", 0), handler)
+    threading.Thread(target=srv.serve_forever, daemon=True).start()
+    yield f"http://127.0.0.1:{srv.server_address[1]}", calls
+    srv.shutdown()
+
+
+def _round(base, **params):
+    import urllib.parse
+    import urllib.request
+    url = base + "/round?" + urllib.parse.urlencode(params)
+    with urllib.request.urlopen(url, timeout=10) as r:
+        return json.loads(r.read())
+
+
+def test_cs1_context_is_conversation_scoped(surface):
+    base, _calls = surface
+    first = _round(base, q="emr|dbo|ED_ENCOUNTERS_DM", c="conv-a")
+    assert first["status"] == "answer"
+    assert first["context_set"]
+    # conversation B never sees A's context
+    other = _round(base, q="it", c="conv-b")
+    assert other["status"] == "clarify"
+    # conversation A resolves its own anaphor
+    follow = _round(base, q="it", c="conv-a")
+    assert follow["status"] == "answer"
+    assert "ED_ENCOUNTERS_DM" in follow["html"]
+
+
+def test_cs2_rounds_are_data_page_is_a_shell(surface):
+    base, _calls = surface
+    import urllib.request
+    with urllib.request.urlopen(base + "/", timeout=10) as r:
+        shell = r.read().decode()
+    # the shell is a transcript surface: a log to append to, a form
+    # the client intercepts — never a server-rendered answer
+    assert 'id="log"' in shell or "id=log" in shell
+    assert "fetch(" in shell
+    result = _round(base, q="tables", c="conv-c")
+    assert set(result) >= {"status", "html", "context_set"}
+    assert result["status"] == "answer"
+
+
+def test_cs3_the_cage_holds_at_the_surface(surface):
+    base, calls = surface
+    _round(base, q="emr|dbo|ED_ENCOUNTERS_DM", c="conv-d")
+    q2 = "what sepsis things exist here"
+    _round(base, q=q2, c="conv-d")
+    # the interpreter saw ONE question, verbatim — no prior answer
+    # text, no transcript (the cage holds at the surface)
+    assert calls == [q2]

@@ -153,6 +153,29 @@ arriving on schedule. The law:
 - **Answers are clickable**: entities named in an answer render as
   links — the zero-typing follow-up.
 
+**THE CONVERSATION SURFACE (amended 2026-09-07, second leg of live
+find #7 — the resolution machinery shipped but the console stayed a
+page-per-question form, so the follow-up experience still did not
+exist; Echo-Law generator finding: "follow-up" was treated as an
+engine property when it is a PRODUCT SURFACE — the conversation is
+an operation, and operations are the product):**
+
+- **The console is a transcript, not a page**: rounds APPEND — the
+  previous question and answer stay on screen; the input CLEARS
+  after each send and stays at the bottom, focused. No full-page
+  reloads: the client submits by fetch and receives the round as
+  data. (This is the old workbench's proven surface shape,
+  src/webapp WORKBENCH_PAGE, adopted deliberately.)
+- **Context is CONVERSATION-scoped**: the client holds a
+  conversation id and sends it with every ask; the server keys the
+  Law-4 context set by it. Two conversations (tabs) never share
+  context. A global mutable is a defect, not a simplification.
+- **What we refuse from the old workbench**: it fed the prose
+  history to the model every turn (run_turn(conv.history, ...)).
+  That violates the cage. The split is law: the transcript is
+  DISPLAY memory; the typed context set is MEANING memory; the
+  interpreter sees one question at a time, never prior answer text.
+
 ## Tier B — the logic console (designed now, built after Tier A)
 
 Sunny's AST proposal, landed in the existing vocabulary: the

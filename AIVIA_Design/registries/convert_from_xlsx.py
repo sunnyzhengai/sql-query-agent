@@ -120,7 +120,12 @@ SOURCES = {
 # MEANING-AS-DATA (the v1.10.0 vocabulary law applied to Law 4);
 # resolution against the context set is deterministic; a new word is
 # a registry row, never a code edit.
-STAMP_VERSION = "1.15.0"
+# v1.16.0 (2026-09-07): THE CONVERSATION SURFACE (find #7 second leg)
+# — the console is a TRANSCRIPT, not a page: rounds append, the input
+# clears and stays; context is CONVERSATION-scoped (client-held id),
+# never a global; transcript = DISPLAY memory, context set = MEANING
+# memory — prose history never reaches the model (the cage holds).
+STAMP_VERSION = "1.16.0"
 RATIFIED = True
 DOC_STAMP = ("v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 twin-graph "
              "ruling ADR 0077; v1.2.0 Phase A metamodel bump; v1.3.0 "
@@ -853,6 +858,21 @@ TWIN_SHEETS = {
              "concepts (honest empty until a human mints); practiced "
              "= delivery selections (what the report procs actually "
              "emit). Org words extend via KG3 terms, steward-blessed."},
+            {"Item": "the conversation surface", "Definition": "RULED "
+             "2026-09-07 (find #7 second leg — resolution shipped but "
+             "the console stayed page-per-question, so follow-ups "
+             "still had no place to live; generator finding: follow-"
+             "up is a PRODUCT SURFACE, not an engine property): the "
+             "console is a TRANSCRIPT — rounds APPEND, prior Q&A stay "
+             "on screen, the input CLEARS after each send and stays "
+             "focused at the bottom; no full-page reloads (fetch, "
+             "rounds as data). Context is CONVERSATION-scoped: the "
+             "client holds a conversation id, the server keys the "
+             "context set by it — two conversations never share. The "
+             "refusal stands: transcript = DISPLAY memory, context "
+             "set = MEANING memory; prose history never reaches the "
+             "model (the old workbench fed run_turn(history) — that "
+             "pattern is banned here)."},
             {"Item": "parse seat", "Definition": "deterministic "
              "keyword grammar ships v1; an LLM parse hook may map "
              "text -> (op, entity) VALIDATED against the closed set — "

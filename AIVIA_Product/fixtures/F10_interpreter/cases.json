@@ -158,5 +158,28 @@
     "an anaphor with an empty context set -> clarify ('nothing to refer back to'), never no-match noise"
    ]
   }
+ ],
+ "surface": [
+  {
+   "id": "CS-1",
+   "title": "context is conversation-scoped, never global",
+   "expected": [
+    "two conversation ids ask through the same server; each answer updates ONLY its own conversation's context set; an anaphor in conversation B never resolves against conversation A's answer"
+   ]
+  },
+  {
+   "id": "CS-2",
+   "title": "a round is data; the transcript is client display",
+   "expected": [
+    "the ask endpoint returns the round as JSON (status, answer, context_set, links) so the client APPENDS it — no full-page reload; prior rounds stay on screen; the input clears"
+   ]
+  },
+  {
+   "id": "CS-3",
+   "title": "the cage holds at the surface",
+   "expected": [
+    "the server never stores or forwards prose history; the interpreter receives ONE question, never prior answer text — conversation state is the typed context set alone"
+   ]
+  }
  ]
 }

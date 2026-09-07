@@ -29,25 +29,85 @@ EMBEDDING_MODEL = "text-embedding-3-small"
 _PAGE = """<!doctype html><meta charset="utf-8">
 <title>AIVIA — ask the graph</title>
 <style>
- body {{ font: 15px/1.5 -apple-system, sans-serif; margin: 2rem auto;
-        max-width: 62rem; color: #222; }}
- input {{ width: 100%; font-size: 1.1rem; padding: .5rem; }}
- pre {{ background: #f6f6f6; padding: 1rem; white-space: pre-wrap; }}
- .meta {{ color: #777; font-size: .85rem; }}
- .modes a {{ margin-right: .8rem; }}
+ body { font: 15px/1.5 -apple-system, sans-serif; margin: 0 auto;
+        max-width: 62rem; color: #222; padding: 1rem 1rem 6rem; }
+ input { width: 100%; font-size: 1.1rem; padding: .5rem;
+         border: 1px solid #bbb; border-radius: 4px; }
+ pre { background: #f6f6f6; padding: 1rem; white-space: pre-wrap; }
+ .meta { color: #777; font-size: .85rem; }
+ .modes a { margin-right: .8rem; }
+ .round { border-top: 1px solid #e4e4e0; padding-top: .6rem;
+          margin-top: .8rem; }
+ .you { color: #2b5db9; font-weight: 600; }
+ #composer { position: fixed; bottom: 0; left: 0; right: 0;
+             background: #fffffff2; border-top: 1px solid #ddd;
+             padding: .7rem 1rem; }
+ #composer form { max-width: 62rem; margin: 0 auto; }
 </style>
-<h2>Ask the graph <span class=meta>({estate})</span></h2>
-<form method=get action=/>
- <input name=q value="{q}" placeholder="ask anything — the
- interpreter understands, the graph answers" autofocus>
-</form>
-{body}
-<p class=meta>UNDERSTAND (caged interpreter) · GROUND (meaning
+<h2>Ask the graph <span class=meta>(__ESTATE__)</span></h2>
+<p class=meta>The conversation surface: rounds append below; follow
+up with 'it', 'those', 'the first one' — they mean what the last
+answer showed. UNDERSTAND (caged interpreter) · GROUND (meaning
 embeddings) · CONNECT (the graph's own edges) · SPEAK (floors) ·
 STEER (buttons) · REMEMBER (confirmed interpretations skip the
 model). Ambiguity and no-match are honest outcomes.</p>
+<div id="log"></div>
+<div id="composer"><form id="ask">
+ <input id="q" placeholder="ask anything — the interpreter
+ understands, the graph answers" autofocus autocomplete="off">
+</form></div>
+<script>
+// One conversation per page load: the id scopes the context set
+// server-side (two tabs never share; ADR 0079 Law 4 surface).
+const conv = (crypto.randomUUID && crypto.randomUUID())
+  || String(Math.random()).slice(2);
+const log = document.getElementById('log');
+const q = document.getElementById('q');
+function esc(t) { const d = document.createElement('span');
+  d.textContent = t; return d.innerHTML; }
+function append(html) {
+  const d = document.createElement('div');
+  d.className = 'round'; d.innerHTML = html;
+  log.appendChild(d);
+  window.scrollTo(0, document.body.scrollHeight);
+}
+async function round(params) {
+  params.set('c', conv);
+  if (params.get('q'))
+    append('<p class="you">' + esc(params.get('q')) + '</p>');
+  try {
+    const r = await fetch('/round?' + params.toString());
+    const j = await r.json();
+    append(j.html);
+  } catch (err) {
+    append('<p class=meta>round failed (' + esc(String(err)) +
+           ') — the server may be restarting; ask again.</p>');
+  }
+}
+document.getElementById('ask').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const text = q.value.trim();
+  if (!text) return;
+  q.value = '';                       // the box clears and stays
+  round(new URLSearchParams({ q: text }));
+});
+// links inside rounds (candidates, Referenced, display modes,
+// confirm) stay IN the conversation: intercept and fetch
+log.addEventListener('click', (e) => {
+  const a = e.target.closest('a');
+  if (!a) return;
+  const u = new URL(a.href, location.origin);
+  const p = u.searchParams;
+  if (p.get('q') || p.get('entity')) {
+    e.preventDefault();
+    round(p);
+  }
+});
+// legacy deep links (/?q=...) enter the conversation as round one
+const boot = new URLSearchParams(location.search);
+if (boot.get('q')) round(new URLSearchParams({ q: boot.get('q') }));
+</script>
 """
-
 
 def _env_key() -> str:
     env = pathlib.Path(__file__).resolve().parents[1] / ".env"
@@ -139,10 +199,11 @@ def _now() -> str:
 
 def make_handler(store, estate, interpret_fn, semantic, pending):
     seat_failures = {"count": 0}  # the visible ops counter
-    session = {"context": []}     # Law 4: the last answer's CONTEXT
-    # SET — 'it', 'those', ordinals resolve against it
+    contexts = {}  # Law 4 surface: CONTEXT SET per conversation id —
+    # 'it', 'those', ordinals resolve against the conversation's own
+    # last answer; two conversations never share
 
-    def render_result(q, result):
+    def render_result(conv, q, result):
         parts = [f"<p class=meta>status: {result['status']}"
                  + (f" · via: {result['via']}"
                     if result.get("via") else "") + "</p>"]
@@ -167,7 +228,6 @@ def make_handler(store, estate, interpret_fn, semantic, pending):
                     f"{m}</a>" for m in ask.DISPLAY_MODES)
                 parts.append(f'<p class=modes>Display: {links}</p>')
             context = result.get("context_set") or []
-            session["context"] = context  # the follow-up affordance
             if context:
                 refs = " · ".join(
                     f'<a href="/?q={urllib.parse.quote(i)}">'
@@ -176,9 +236,7 @@ def make_handler(store, estate, interpret_fn, semantic, pending):
                 more = (f" … ({len(context) - 12} more in context)"
                         if len(context) > 12 else "")
                 parts.append(
-                    f"<p class=meta>Referenced: {refs}{more}<br>"
-                    "follow up with 'it', 'those', 'the first one' — "
-                    "they mean these.</p>")
+                    f"<p class=meta>Referenced: {refs}{more}</p>")
         elif result["status"] == "confirm":
             grounded = []
             for g in result["groundings"]:
@@ -186,16 +244,20 @@ def make_handler(store, estate, interpret_fn, semantic, pending):
                         if g.get("outcome") == "matched"
                         else f"kind:{g['kind']}"
                         if g.get("outcome") == "kind"
+                        else f"set:{len(g.get('entities', []))} from "
+                             "context"
+                        if g.get("outcome") == "set"
                         else f"topic:'{g['mention']}'")
                 grounded.append(f"{g['mention']} → {what}")
-            pending[ask._fold(" ".join(q.split()))] = (
-                result["interpretation"], list(session["context"]))
+            pending[(conv, ask._fold(" ".join(q.split())))] = (
+                result["interpretation"],
+                list(contexts.get(conv) or []))
             href = "/?q=" + urllib.parse.quote(q) + "&accept=1"
             parts.append(
                 "<p>I understood: <b>"
                 + html.escape("; ".join(grounded))
                 + f'</b></p><p><a href="{href}">Confirm — remember '
-                "this and answer</a> (or rephrase above)</p>")
+                "this and answer</a> (or rephrase below)</p>")
         elif result["status"] == "clarify" \
                 and not result.get("candidates"):
             # Law 4: a context clarify — the anaphor had nothing (or
@@ -218,62 +280,77 @@ def make_handler(store, estate, interpret_fn, semantic, pending):
             parts.append(f"<pre>{html.escape(result['answer'])}</pre>")
         return "".join(parts)
 
+    def run_round(params):
+        """One round -> the JSON the client appends (CS-2: the round
+        is DATA; the transcript is the client's display memory)."""
+        conv = (params.get("c") or [""])[0]
+        q = (params.get("q") or [""])[0]
+        entity_id = (params.get("entity") or [""])[0]
+        mode = (params.get("mode") or [""])[0]
+        read = ReadApi(store)
+        if entity_id and mode in ask.DISPLAY_MODES:
+            index = ask_index.lens_ask_index(read, None)["yield"]
+            entity = next((e for e in index
+                           if e["identity"] == entity_id), None)
+            adj = connect.build_adjacency(read)
+            if entity is None:
+                text = "gone"
+            elif mode == "card":
+                text = ask.render_card(read, entity)
+            elif mode == "lineage":
+                text = ask.render_lineage(read, adj, entity)
+            elif mode == "filters":
+                text = ask.render_filters(read, entity)
+            elif mode == "readers":
+                text = ask.render_readers(read, adj, entity)
+            else:
+                text = ask.render_census(read)
+            return {"status": "answer",
+                    "html": f"<pre>{html.escape(text)}</pre>",
+                    "context_set": contexts.get(conv) or []}
+        if not q.strip():
+            return {"status": "empty", "html": "", "context_set": []}
+        ctx = contexts.get(conv) or None
+        if (params.get("accept") or [""])[0] == "1":
+            held = pending.pop(
+                (conv, ask._fold(" ".join(q.split()))), None)
+            if held:
+                interp, snap = held
+                result = ask.confirm(
+                    store, q, interp, "person:console", _now(),
+                    semantic=semantic,
+                    basis=f"model:{INTERPRETER_MODEL}",
+                    context=snap or None)
+            else:
+                result = ask.ask(store, q, "person:console", _now(),
+                                 interpret_fn, semantic, context=ctx)
+        else:
+            result = ask.ask(store, q, "person:console", _now(),
+                             interpret_fn, semantic, context=ctx)
+        if result["status"] == "answer":
+            # the conversation's context advances ONLY on an answer
+            contexts[conv] = result.get("context_set") or []
+        return {"status": result["status"],
+                "html": render_result(conv, q, result),
+                "context_set": contexts.get(conv) or []}
+
     class Handler(BaseHTTPRequestHandler):
-        def do_GET(self):  # noqa: N802 — http.server's contract
-            params = urllib.parse.parse_qs(
-                urllib.parse.urlparse(self.path).query)
-            q = (params.get("q") or [""])[0]
-            entity_id = (params.get("entity") or [""])[0]
-            mode = (params.get("mode") or [""])[0]
-            body = ""
-            read = ReadApi(store)
-            if entity_id and mode in ask.DISPLAY_MODES:
-                index = ask_index.lens_ask_index(read, None)["yield"]
-                entity = next((e for e in index
-                               if e["identity"] == entity_id), None)
-                adj = connect.build_adjacency(read)
-                if entity is None:
-                    body = "<pre>gone</pre>"
-                elif mode == "card":
-                    body = f"<pre>{html.escape(ask.render_card(read, entity))}</pre>"
-                elif mode == "lineage":
-                    body = f"<pre>{html.escape(ask.render_lineage(read, adj, entity))}</pre>"
-                elif mode == "filters":
-                    body = f"<pre>{html.escape(ask.render_filters(read, entity))}</pre>"
-                elif mode == "readers":
-                    body = f"<pre>{html.escape(ask.render_readers(read, adj, entity))}</pre>"
-                elif mode == "census":
-                    body = f"<pre>{html.escape(ask.render_census(read))}</pre>"
-            elif q.strip():
-                ctx = session["context"] or None
-                if (params.get("accept") or [""])[0] == "1":
-                    held = pending.get(
-                        ask._fold(" ".join(q.split())))
-                    if held:
-                        interp, snap = held
-                        result = ask.confirm(
-                            store, q, interp, "person:console",
-                            _now(), semantic=semantic,
-                            basis=f"model:{INTERPRETER_MODEL}",
-                            context=snap or None)
-                    else:
-                        result = ask.ask(store, q, "person:console",
-                                         _now(), interpret_fn,
-                                         semantic, context=ctx)
-                else:
-                    result = ask.ask(store, q, "person:console",
-                                     _now(), interpret_fn, semantic,
-                                     context=ctx)
-                body = render_result(q, result)
-            page = _PAGE.format(estate=html.escape(estate),
-                                q=html.escape(q), body=body)
-            data = page.encode()
+        def _send(self, data, ctype):
             self.send_response(200)
-            self.send_header("Content-Type",
-                             "text/html; charset=utf-8")
+            self.send_header("Content-Type", ctype)
             self.send_header("Content-Length", str(len(data)))
             self.end_headers()
             self.wfile.write(data)
+
+        def do_GET(self):  # noqa: N802 — http.server's contract
+            parsed = urllib.parse.urlparse(self.path)
+            params = urllib.parse.parse_qs(parsed.query)
+            if parsed.path == "/round":
+                self._send(json.dumps(run_round(params)).encode(),
+                           "application/json; charset=utf-8")
+                return
+            page = _PAGE.replace("__ESTATE__", html.escape(estate))
+            self._send(page.encode(), "text/html; charset=utf-8")
 
         def log_message(self, *args):
             pass

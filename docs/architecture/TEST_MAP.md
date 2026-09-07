@@ -7,7 +7,7 @@
 
 # Test Map — what every test proves
 
-154 modules, 1718 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
+154 modules, 1721 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
 
 ## By ADR
 
@@ -79,8 +79,8 @@
 | 0075 | The check contract: checks are claims (spec:G4) | `tests/test_check_contract.py` (4) |
 | 0076 | Compositional interpretation: capture once, interpret by grammar (spec:G5) | `tests/test_op_frontier.py` (8), `tests/test_skeleton_composer.py` (38) |
 | 0077 | The twin-graph KG: meaning is a stored homomorphic twin | `tests/aivia/test_design_validators.py` (4), `tests/aivia/test_metamodel.py` (7), `tests/aivia/test_phase_a_projection.py` (6) |
-| 0078 | The ask-the-graph console: free questions, typed paths, self-answering nodes | `tests/aivia/test_ask_console.py` (20) |
-| 0079 | The interpreter and the speaking graph | `tests/aivia/test_ask_console.py` (20) |
+| 0078 | The ask-the-graph console: free questions, typed paths, self-answering nodes | `tests/aivia/test_ask_console.py` (23) |
+| 0079 | The interpreter and the speaking graph | `tests/aivia/test_ask_console.py` (23) |
 
 ## By standing law
 
@@ -155,7 +155,7 @@
 ### contract:aivia-design-to-code — aivia code and tests consume the ratified registries and fixture answer keys, never the doc's prose (Design-to-Code protocol, slices 0-8; claimed per-module 2026-09-06 when the suite-map gate reached the aivia suite)
 
 - `tests/aivia/test_approve_land.py` (10): Slice 6 exit: the F5 script against the BUILT approve/land flows.
-- `tests/aivia/test_ask_console.py` (20): Tier A exit (ADR 0079): the F10 answer keys go RUNNABLE.
+- `tests/aivia/test_ask_console.py` (23): Tier A exit (ADR 0079): the F10 answer keys go RUNNABLE.
 - `tests/aivia/test_design_validators.py` (4): Slice 0: the design validators run in CI — every push re-proves the
 - `tests/aivia/test_flows_change_quanta.py` (6): The flows' change quanta (CONTRACT_DATALOAD §13 + the flows
 - `tests/aivia/test_full_circle.py` (7): Slice 7: FULL CIRCLE — one run from empty, every family proven.
