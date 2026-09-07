@@ -139,6 +139,8 @@ def _now() -> str:
 
 def make_handler(store, estate, interpret_fn, semantic, pending):
     seat_failures = {"count": 0}  # the visible ops counter
+    session = {"context": []}     # Law 4: the last answer's CONTEXT
+    # SET — 'it', 'those', ordinals resolve against it
 
     def render_result(q, result):
         parts = [f"<p class=meta>status: {result['status']}"
@@ -164,8 +166,20 @@ def make_handler(store, estate, interpret_fn, semantic, pending):
                     f'{urllib.parse.quote(identity)}&mode={m}">'
                     f"{m}</a>" for m in ask.DISPLAY_MODES)
                 parts.append(f'<p class=modes>Display: {links}</p>')
+            context = result.get("context_set") or []
+            session["context"] = context  # the follow-up affordance
+            if context:
+                refs = " · ".join(
+                    f'<a href="/?q={urllib.parse.quote(i)}">'
+                    f"{html.escape(i.split('::')[-1].split('|')[-1])}"
+                    "</a>" for i in context[:12])
+                more = (f" … ({len(context) - 12} more in context)"
+                        if len(context) > 12 else "")
+                parts.append(
+                    f"<p class=meta>Referenced: {refs}{more}<br>"
+                    "follow up with 'it', 'those', 'the first one' — "
+                    "they mean these.</p>")
         elif result["status"] == "confirm":
-            mentions = result["interpretation"]["mentions"]
             grounded = []
             for g in result["groundings"]:
                 what = (g["entity"]["name"]
@@ -174,14 +188,21 @@ def make_handler(store, estate, interpret_fn, semantic, pending):
                         if g.get("outcome") == "kind"
                         else f"topic:'{g['mention']}'")
                 grounded.append(f"{g['mention']} → {what}")
-            pending[ask._fold(" ".join(q.split()))] = \
-                result["interpretation"]
+            pending[ask._fold(" ".join(q.split()))] = (
+                result["interpretation"], list(session["context"]))
             href = "/?q=" + urllib.parse.quote(q) + "&accept=1"
             parts.append(
                 "<p>I understood: <b>"
                 + html.escape("; ".join(grounded))
                 + f'</b></p><p><a href="{href}">Confirm — remember '
                 "this and answer</a> (or rephrase above)</p>")
+        elif result["status"] == "clarify" \
+                and not result.get("candidates"):
+            # Law 4: a context clarify — the anaphor had nothing (or
+            # not enough) to refer back to; honest, never a guess
+            parts.append(f"<p>'{html.escape(result['mention'])}' — "
+                         f"{html.escape(result.get('reason', ''))}"
+                         "</p>")
         elif result["status"] == "clarify":
             parts.append(f"<p>'{html.escape(result['mention'])}' is "
                          "ambiguous — pick one:</p><ul>")
@@ -224,21 +245,25 @@ def make_handler(store, estate, interpret_fn, semantic, pending):
                 elif mode == "census":
                     body = f"<pre>{html.escape(ask.render_census(read))}</pre>"
             elif q.strip():
+                ctx = session["context"] or None
                 if (params.get("accept") or [""])[0] == "1":
-                    interp = pending.get(
+                    held = pending.get(
                         ask._fold(" ".join(q.split())))
-                    if interp:
+                    if held:
+                        interp, snap = held
                         result = ask.confirm(
                             store, q, interp, "person:console",
                             _now(), semantic=semantic,
-                            basis=f"model:{INTERPRETER_MODEL}")
+                            basis=f"model:{INTERPRETER_MODEL}",
+                            context=snap or None)
                     else:
                         result = ask.ask(store, q, "person:console",
                                          _now(), interpret_fn,
-                                         semantic)
+                                         semantic, context=ctx)
                 else:
                     result = ask.ask(store, q, "person:console",
-                                     _now(), interpret_fn, semantic)
+                                     _now(), interpret_fn, semantic,
+                                     context=ctx)
                 body = render_result(q, result)
             page = _PAGE.format(estate=html.escape(estate),
                                 q=html.escape(q), body=body)

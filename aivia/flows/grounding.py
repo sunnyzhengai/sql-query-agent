@@ -85,14 +85,72 @@ class SemanticIndex:
         return [{"score": round(s, 4), **e} for s, e in scored[:top_k]]
 
 
+def _anaphor_vocabulary() -> Dict[str, str]:
+    """Word -> role, FROM THE REGISTRY (v1.15.0; Law 4): follow-up
+    words are meaning-as-data. Roles: singular | set | ordinal:N."""
+    from aivia.graph import metamodel
+    sheet = metamodel.load("lenses").sheets["Anaphor_Vocabulary"]
+    return {r["Word"].upper(): r["Role"] for r in sheet
+            if r["Word"] != "_ruling"}
+
+
 def ground(mention: str, index: List[Dict[str, Any]],
            kind_words: Dict[str, str],
-           semantic: Optional[SemanticIndex]) -> Dict[str, Any]:
+           semantic: Optional[SemanticIndex],
+           context: Optional[List[Dict[str, Any]]] = None
+           ) -> Dict[str, Any]:
     """One mention -> {tier, outcome, ...}. Outcomes: kind | matched |
-    candidates (HITL) | unknown. Deterministic tiers never touch a
-    model; the semantic tier reports scores and auto-grounds only on
-    a clear margin — otherwise the human picks."""
+    set | candidates (HITL) | clarify-context | unknown.
+    Deterministic tiers never touch a model; the semantic tier
+    reports scores and auto-grounds only on a clear margin —
+    otherwise the human picks."""
     wanted = _fold(mention.strip())
+    # TIER 0 — the anaphor tier (Law 4, live find #7): follow-up
+    # words resolve against the previous answer's CONTEXT SET,
+    # deterministically. It fires only when the WHOLE mention is
+    # anaphor-shaped (anaphor + kind + glue words) — a sentence
+    # merely containing 'those' still goes to the interpreter, whose
+    # mention 'those' lands back here. Empty context is an honest
+    # clarify.
+    glue = {"THE", "A", "AN", "OF", "ONE", "ONES"}
+    words = [_fold(w) for w in mention.split()]
+    vocab = _anaphor_vocabulary()
+    roles = [vocab[w] for w in words if w in vocab]
+    covered = all(w in vocab or w in kind_words or w in glue
+                  for w in words)
+    if roles and covered:
+        if not context:
+            return {"tier": "anaphor", "outcome": "clarify-context",
+                    "mention": mention,
+                    "reason": "nothing to refer back to — ask a "
+                              "direct question first"}
+        kind_in = next((kind_words[w] for w in words
+                        if w in kind_words), None)
+        pool = [e for e in context
+                if kind_in is None or e["kind"] == kind_in]
+        ordinal = next((int(r.split(":")[1]) for r in roles
+                        if r.startswith("ordinal:")), None)
+        if ordinal is not None:
+            if 1 <= ordinal <= len(pool):
+                return {"tier": "anaphor", "outcome": "matched",
+                        "entity": pool[ordinal - 1],
+                        "mention": mention}
+            return {"tier": "anaphor", "outcome": "clarify-context",
+                    "mention": mention,
+                    "reason": f"the context holds {len(pool)} "
+                              f"item(s); '{mention}' points past it"}
+        if "set" in roles:
+            return {"tier": "anaphor", "outcome": "set",
+                    "entities": pool, "mention": mention}
+        # singular: the HEAD of the ordered context set is the
+        # subject of the last answer — 'it' means that, always
+        if pool:
+            return {"tier": "anaphor", "outcome": "matched",
+                    "entity": pool[0], "mention": mention}
+        return {"tier": "anaphor", "outcome": "clarify-context",
+                "mention": mention,
+                "reason": "the context holds nothing to refer back "
+                          "to of that kind"}
     kind = kind_words.get(wanted)
     if kind:
         return {"tier": "kind", "outcome": "kind", "kind": kind,

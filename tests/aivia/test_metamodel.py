@@ -36,9 +36,10 @@ def test_every_loaded_registry_is_ratified_v1():
     # 1.12.0 = Tier A build data: ranking weights (same day)
     # 1.13.0 = the seat-failure law (live find 6, same day)
     # 1.14.0 = follow-up context is data (live find 7, 09-07)
+    # 1.15.0 = anaphor vocabulary as registry data (same day)
     for reg in metamodel.load_all().values():
         assert reg.ratified is True
-        assert reg.version == "1.14.0"
+        assert reg.version == "1.15.0"
 
 
 def test_load_single_exposes_sheets_and_stamp():

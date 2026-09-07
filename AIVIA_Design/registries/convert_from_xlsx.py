@@ -116,12 +116,16 @@ SOURCES = {
 # deterministically (grounding tier 0); the ask event records its
 # context snapshot (replay holds); confirmed follow-ups store
 # RESOLVED identities. Not chat: a sliding window of grounded THINGS.
-STAMP_VERSION = "1.14.0"
+# v1.15.0 (2026-09-07): Anaphor_Vocabulary — the follow-up words are
+# MEANING-AS-DATA (the v1.10.0 vocabulary law applied to Law 4);
+# resolution against the context set is deterministic; a new word is
+# a registry row, never a code edit.
+STAMP_VERSION = "1.15.0"
 RATIFIED = True
 DOC_STAMP = ("v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 twin-graph "
              "ruling ADR 0077; v1.2.0 Phase A metamodel bump; v1.3.0 "
              "Phase B composite-kinds correction; v1.4.0 T-2 "
-             "operational-statements ruling; v1.5.0 the gap taxonomy; v1.6.0 the plug-all-holes sweep; v1.7.0 ledger close; v1.8.0 the ask console ADR 0078; v1.9.0 the list op; v1.10.0 kind vocabulary; v1.11.0 ADR 0079 interpreter; v1.12.0 Tier A build data; v1.13.0 the seat-failure law; v1.14.0 follow-up context "
+             "operational-statements ruling; v1.5.0 the gap taxonomy; v1.6.0 the plug-all-holes sweep; v1.7.0 ledger close; v1.8.0 the ask console ADR 0078; v1.9.0 the list op; v1.10.0 kind vocabulary; v1.11.0 ADR 0079 interpreter; v1.12.0 Tier A build data; v1.13.0 the seat-failure law; v1.14.0 follow-up context; v1.15.0 anaphor vocabulary "
              "(all 2026-09-06)")
 CONVERTED_ON = "2026-09-05"
 
@@ -683,6 +687,32 @@ TWIN_SHEETS = {
              "iff its yield is ABOUT the graph for one consumer — status, "
              "aggregation, comparison — never meaning itself; the "
              "translator absorbed everything secretly computing meaning"},
+        ],
+        "Anaphor_Vocabulary": [
+            {"Word": "_ruling", "Role": "-", "Note": "Law 4 (live "
+             "find #7): these words refer BACK to the answer's "
+             "context set; resolution is deterministic (set words "
+             "take the whole set, ordinals index it, singulars take "
+             "the single subject); empty context -> honest clarify."},
+            {"Word": "it", "Role": "singular", "Note": ""},
+            {"Word": "its", "Role": "singular", "Note": ""},
+            {"Word": "this", "Role": "singular", "Note": ""},
+            {"Word": "that", "Role": "singular", "Note": ""},
+            {"Word": "those", "Role": "set", "Note": ""},
+            {"Word": "these", "Role": "set", "Note": ""},
+            {"Word": "them", "Role": "set", "Note": ""},
+            {"Word": "above", "Role": "set", "Note": ""},
+            {"Word": "previous", "Role": "set", "Note": ""},
+            {"Word": "first", "Role": "ordinal:1", "Note": ""},
+            {"Word": "second", "Role": "ordinal:2", "Note": ""},
+            {"Word": "third", "Role": "ordinal:3", "Note": ""},
+            {"Word": "fourth", "Role": "ordinal:4", "Note": ""},
+            {"Word": "fifth", "Role": "ordinal:5", "Note": ""},
+            {"Word": "sixth", "Role": "ordinal:6", "Note": ""},
+            {"Word": "seventh", "Role": "ordinal:7", "Note": ""},
+            {"Word": "eighth", "Role": "ordinal:8", "Note": ""},
+            {"Word": "ninth", "Role": "ordinal:9", "Note": ""},
+            {"Word": "tenth", "Role": "ordinal:10", "Note": ""},
         ],
         "Ranking_Weights": [
             {"Edge": "_ruling", "Weight": "-", "Note": "ADR 0079: "

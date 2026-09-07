@@ -6,7 +6,7 @@ Edge weights are DECLARED registry data (Ranking_Weights), never a
 hidden judgment; caps are visible wherever anything is truncated.
 """
 import heapq
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple
 
 
 def edge_weights() -> Dict[str, float]:

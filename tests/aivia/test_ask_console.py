@@ -256,3 +256,83 @@ def test_sf3_deterministic_asks_immune_to_model_weather(world):
                      interpret_fn=explode_i, semantic=None)
     assert result["status"] == "answer"
     assert result["answer"].startswith("90 table(s):")
+
+
+# ---- FU: follow-up context (Law 4, live find #7) --------------------
+def test_fu2_it_takes_the_single_subject(world):
+    store, semantic = world
+    first = ask.ask(store, "emr|dbo|ED_ENCOUNTERS_DM", "person:test",
+                    T0, semantic=semantic)
+    assert first["status"] == "answer"
+    assert first["context_set"]  # every answer yields its context
+    follow = ask.ask(store, "it", "person:test", T0,
+                     semantic=semantic,
+                     context=first["context_set"])
+    assert follow["status"] == "answer"
+    assert "ED_ENCOUNTERS_DM" in follow["answer"]
+
+
+def test_fu1_those_filters_by_connection(world):
+    store, semantic = world
+    first = ask.ask(store, "emr|dbo|ADT_EVENTS|ENCOUNTER_ID",
+                    "person:test", T0, semantic=semantic)
+    assert first["status"] == "answer"
+    context = first["context_set"]
+    assert any("::" in c for c in context)  # the citing scopes rode in
+    q = "which of those are in the ED sepsis report"
+    interp = fake_interpreter({q.lower(): {"mentions":
+        ["those", "reports/USP_RPTS_ED_Sepsis.sql"]}})
+    result = ask.ask(store, q, "person:test", T0,
+                     interpret_fn=interp, semantic=semantic,
+                     context=context)
+    assert result["status"] == "confirm"
+    final = ask.confirm(store, q, result["interpretation"],
+                        "person:test", T0, semantic=semantic,
+                        context=context)
+    assert final["status"] == "answer"
+    assert "USP_RPTS_ED_Sepsis" in final["answer"]
+    assert "USP_IP_SEPSIS.sql" not in final["answer"]  # filtered OUT
+
+
+def test_fu3_ordinals_index_the_context(world):
+    store, semantic = world
+    first = ask.ask(store, "emr|dbo|ADT_EVENTS|ENCOUNTER_ID",
+                    "person:test", T0, semantic=semantic)
+    context = first["context_set"]
+    follow = ask.ask(store, "the first one", "person:test", T0,
+                     semantic=semantic, context=context)
+    assert follow["status"] == "answer"
+    deep = ask.ask(store, "the tenth one", "person:test", T0,
+                   semantic=semantic, context=context[:3])
+    assert deep["status"] == "clarify"  # out of range -> honest
+
+
+def test_fu5_empty_context_is_honest(world):
+    store, semantic = world
+    result = ask.ask(store, "those", "person:test", T0,
+                     semantic=semantic, context=None)
+    assert result["status"] == "clarify"
+    assert "refer back" in str(result.get("answer", "")).lower() \
+        or "refer back" in str(result.get("mention", "")).lower() \
+        or result.get("reason") == "no-context"
+
+
+def test_fu4_confirmed_followups_store_context_snapshot(world):
+    store, semantic = world
+    first = ask.ask(store, "emr|dbo|ADT_EVENTS|ENCOUNTER_ID",
+                    "person:test", T0, semantic=semantic)
+    q = "show those again please"
+    interp = fake_interpreter({q: {"mentions": ["those"]}})
+    result = ask.ask(store, q, "person:test", T0,
+                     interpret_fn=interp, semantic=semantic,
+                     context=first["context_set"])
+    assert result["status"] == "confirm"
+    ask.confirm(store, q, result["interpretation"], "person:test",
+                T0, semantic=semantic, context=first["context_set"])
+    # the ledger replays WITHOUT live context: the snapshot rides
+    def exploding(qq):
+        raise AssertionError("model called on a ledger hit")
+    again = ask.ask(store, q, "person:test", T0,
+                    interpret_fn=exploding, semantic=semantic,
+                    context=None)
+    assert again["status"] == "answer" and again["via"] == "ledger"

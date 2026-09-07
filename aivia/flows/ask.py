@@ -36,20 +36,25 @@ def validate_interpretation(raw: Any) -> Optional[Dict[str, Any]]:
 
 
 # ---- REMEMBER --------------------------------------------------------
-def ledger_interpretation(read, question: str) -> Optional[Dict[str, Any]]:
+def ledger_interpretation(read, question: str):
     """A previously CONFIRMED interpretation for this folded question
-    — the interpretation is cached, never the answer."""
+    — the interpretation is cached (WITH its context snapshot, Law
+    4/FU-4), never the answer."""
     folded = _fold(" ".join(question.split()))
     hits = [u for u in read.nodes("usage")
             if u.properties.get("action") == "confirmed"
             and u.properties.get("question_folded") == folded
             and u.properties.get("interpretation")]
-    return hits[-1].properties["interpretation"] if hits else None
+    if not hits:
+        return None, None
+    props = hits[-1].properties
+    return props["interpretation"], props.get("context_snapshot")
 
 
 def record_confirmation(store, question: str,
                         interpretation: Dict[str, Any], author: str,
-                        occurred_at: str, basis: str) -> None:
+                        occurred_at: str, basis: str,
+                        context: Optional[List[str]] = None) -> None:
     kg3_artifacts.append_usage(
         store, action="confirmed", author=author,
         occurred_at=occurred_at,
@@ -59,6 +64,8 @@ def record_confirmation(store, question: str,
         " ".join(question.split()))
     event.properties["interpretation"] = dict(interpretation)
     event.properties["basis"] = basis
+    if context:  # Law 4: the snapshot rides — replay is deterministic
+        event.properties["context_snapshot"] = list(context)
 
 
 # ---- SPEAK: deterministic renderers (display modes) ------------------
@@ -112,7 +119,6 @@ def render_card(read, entity: Dict[str, Any]) -> str:
 
 def render_lineage(read, adj, entity) -> str:
     hood = connect.neighborhood(adj, entity["identity"])
-    readers = hood.get("reads", []) + hood.get("cites", [])
     lines = [f"Lineage of {entity['name']}:"]
     for label in sorted(hood):
         members = hood[label]
@@ -230,13 +236,56 @@ def render_kind_list(read, index, kind: str,
 
 # ---- CONNECT + SPEAK: execute a grounded interpretation --------------
 def execute(read, index, adj, groundings: List[Dict[str, Any]],
-            semantic: Optional[grounding.SemanticIndex]) -> str:
+            semantic: Optional[grounding.SemanticIndex]):
+    """-> (text, listed_ids). listed_ids feed the next CONTEXT SET
+    (Law 4): every answer knows what it showed."""
     index_by_id = {e["identity"]: e for e in index}
     kinds = [g for g in groundings if g["outcome"] == "kind"]
     entities = [g["entity"] for g in groundings
                 if g["outcome"] == "matched"]
+    sets = [g for g in groundings if g["outcome"] == "set"]
     topics = [g["mention"] for g in groundings
-              if g["outcome"] not in ("kind", "matched")]
+              if g["outcome"] not in ("kind", "matched", "set")]
+
+    # Law 4: a SET anaphor — alone it lists; beside entities it
+    # FILTERS by connection (direct edge or containment prefix)
+    if sets:
+        members = []
+        seen = set()
+        for g in sets:
+            for e in g["entities"]:
+                if e["identity"] not in seen:
+                    seen.add(e["identity"])
+                    members.append(e)
+        if kinds:
+            members = [m for m in members
+                       if m["kind"] == kinds[0]["kind"]]
+        if entities:
+            anchors = [e["identity"] for e in entities]
+
+            def connected(m):
+                # connection = a direct edge, or identity containment
+                # (a scope belongs to its file by name_key prefix)
+                nbrs = {n for n, _ in adj.get(m["identity"], [])}
+                mid = m["identity"]
+                for a in anchors:
+                    if (a in nbrs or mid.startswith(a)
+                            or a.startswith(mid)
+                            or mid.split("::")[0] in a
+                            or a.split("::")[0] in mid):
+                        return True
+                return False
+            members = [m for m in members if connected(m)]
+        names = ", ".join(e["name"] for e in entities) or "the context"
+        lines = [f"{len(members)} of them"
+                 + (f" connect to {names}:" if entities else ":")]
+        lines += [f"- {_one_line(read, m['identity'], index_by_id)}"
+                  f"  ({m['identity']})" for m in members[:40]]
+        if len(members) > 40:
+            lines.append(f"… and {len(members) - 40} more")
+        if not members:
+            lines.append("- (none)")
+        return "\n".join(lines), [m["identity"] for m in members]
 
     # kind (+ optional topic): the filtered enumeration — the class
     # of Sunny's live finds #2 and #4. Live find #5 (the missing 7
@@ -273,13 +322,17 @@ def execute(read, index, adj, groundings: List[Dict[str, Any]],
                       f"({len(by_name)} by name, {len(by_meaning)} "
                       f"more by meaning){meaning_note}:")
             body = render_kind_list(read, index, kind, matched)
-            return header + "\n" + body.split("\n", 1)[1] \
-                if "\n" in body else header
-        return render_kind_list(read, index, kind, None)
+            text = (header + "\n" + body.split("\n", 1)[1]
+                    if "\n" in body else header)
+            return text, [e["identity"] for e in matched][:100]
+        return (render_kind_list(read, index, kind, None),
+                [e["identity"] for e in index
+                 if e["kind"] == kind][:100])
 
     if len(entities) >= 2:
         weights = connect.edge_weights()
         lines = []
+        listed = [e["identity"] for e in entities]
         a = entities[0]
         for b in entities[1:]:
             path = connect.shortest_path(adj, weights,
@@ -294,39 +347,59 @@ def execute(read, index, adj, groundings: List[Dict[str, Any]],
                 arrow = f"  —{label}→ " if label else "• "
                 lines.append(arrow +
                              _one_line(read, node, index_by_id))
-        return "\n".join(lines)
+                if node not in listed:
+                    listed.append(node)
+        return "\n".join(lines), listed[:100]
 
     if len(entities) == 1:
         entity = entities[0]
         card = render_card(read, entity)
         hood = connect.neighborhood(adj, entity["identity"])
         extra = []
+        listed = [entity["identity"]]
         for label in sorted(hood):
             members = hood[label]
             extra.append(f"- {label}: " + ", ".join(members[:8])
                          + (f" … ({len(members) - 8} more)"
                             if len(members) > 8 else ""))
-        return card + ("\n\nConnected:\n" + "\n".join(extra)
-                       if extra else "")
+            listed += [m for m in members if m not in listed]
+        return (card + ("\n\nConnected:\n" + "\n".join(extra)
+                        if extra else ""), listed[:100])
 
     return ("Nothing grounded — the graph carries none of these "
-            "names or meanings.")
+            "names or meanings."), []
 
 
 # ---- the pipeline ----------------------------------------------------
 def ask(store, question: str, author: str, occurred_at: str,
         interpret_fn: Optional[Callable[[str], Any]] = None,
         semantic: Optional[grounding.SemanticIndex] = None,
-        confirmed: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+        confirmed: Optional[Dict[str, Any]] = None,
+        context: Optional[List[str]] = None) -> Dict[str, Any]:
     """One ask. Statuses: answer | confirm (fresh model interpretation
     awaiting the human) | clarify (a mention needs a pick) | form
-    (no interpreter available and nothing grounded)."""
+    (no interpreter available and nothing grounded). `context` is the
+    previous answer's CONTEXT SET (Law 4): identity strings, subject
+    first — anaphors resolve against it and every answer returns the
+    next one as result["context_set"]."""
     from aivia.graph.read_api import ReadApi
     read = ReadApi(store)
     index = ask_index.lens_ask_index(read, None)["yield"]
     kind_words = _kind_vocabulary()
     adj = connect.build_adjacency(read)
     q = " ".join(question.split())
+    index_by_id = {e["identity"]: e for e in index}
+
+    def _entities(ids):
+        return [index_by_id[i] for i in (ids or []) if i in index_by_id]
+
+    def _context_set(groundings, listed):
+        out = [g["entity"]["identity"] for g in groundings
+               if g["outcome"] == "matched"]
+        out += [i for i in listed if i not in out]
+        return out[:100]
+
+    context_entities = _entities(context)
 
     def _usage(outcome, about=None):
         kg3_artifacts.append_usage(
@@ -336,23 +409,35 @@ def ask(store, question: str, author: str, occurred_at: str,
             outcome=outcome, about=about)
 
     # deterministic pre-tier: the WHOLE question as one mention —
-    # bare-name asks never touch a model (GR-1)
-    whole = grounding.ground(q, index, kind_words, None)
-    if whole["outcome"] in ("matched", "kind"):
-        answer = execute(read, index, adj, [whole], semantic)
+    # bare-name and pure-anaphor asks never touch a model (GR-1, FU)
+    whole = grounding.ground(q, index, kind_words, None,
+                             context=context_entities)
+    if whole["outcome"] in ("matched", "kind", "set"):
+        answer, listed = execute(read, index, adj, [whole], semantic)
         about = (whole["entity"]["identity"]
                  if whole["outcome"] == "matched" else None)
         _usage("matched", about)
         return {"status": "answer", "answer": answer,
-                "groundings": [whole], "via": "deterministic"}
+                "groundings": [whole], "via": "deterministic",
+                "context_set": _context_set([whole], listed)}
+    if whole["outcome"] == "clarify-context":
+        _usage("ambiguous")
+        return {"status": "clarify", "mention": q, "candidates": [],
+                "answer": whole["reason"], "reason": whole["reason"]}
     if whole["outcome"] == "candidates":
         _usage("ambiguous")
         return {"status": "clarify", "mention": q,
                 "candidates": whole["candidates"]}
 
-    interpretation = confirmed or ledger_interpretation(read, q)
+    stored_context = None
+    interpretation = confirmed
+    if interpretation is None:
+        interpretation, stored_context = ledger_interpretation(read, q)
     via = ("confirmed" if confirmed
            else "ledger" if interpretation else None)
+    if via == "ledger" and context is None and stored_context:
+        # FU-4: the confirmed snapshot rides — replay is deterministic
+        context_entities = _entities(stored_context)
     if interpretation is None:
         if interpret_fn is None:
             _usage("no-match")
@@ -381,9 +466,16 @@ def ask(store, question: str, author: str, occurred_at: str,
                               "validation — use the structured form."}
         via = "model"
 
-    groundings = [grounding.ground(m, index, kind_words, semantic)
+    groundings = [grounding.ground(m, index, kind_words, semantic,
+                                   context=context_entities)
                   for m in interpretation["mentions"]]
     for g in groundings:
+        if g["outcome"] == "clarify-context":
+            _usage("ambiguous")
+            return {"status": "clarify", "mention": g["mention"],
+                    "candidates": [], "answer": g["reason"],
+                    "reason": g["reason"],
+                    "interpretation": interpretation}
         if g["outcome"] == "candidates":
             _usage("ambiguous")
             return {"status": "clarify", "mention": g["mention"],
@@ -407,27 +499,30 @@ def ask(store, question: str, author: str, occurred_at: str,
         return {"status": "confirm", "interpretation": interpretation,
                 "groundings": groundings}
 
-    answer = execute(read, index, adj, groundings, semantic)
+    answer, listed = execute(read, index, adj, groundings, semantic)
     about = None
     matched = [g for g in groundings if g["outcome"] == "matched"]
     if len(matched) == 1:
         about = matched[0]["entity"]["identity"]
     _usage("matched", about)
     return {"status": "answer", "answer": answer,
-            "groundings": groundings, "via": via}
+            "groundings": groundings, "via": via,
+            "context_set": _context_set(groundings, listed)}
 
 
 def confirm(store, question: str, interpretation: Dict[str, Any],
             author: str, occurred_at: str,
             semantic: Optional[grounding.SemanticIndex] = None,
-            basis: str = "model:unspecified") -> Dict[str, Any]:
-    """The human blessed a fresh interpretation: record it, then
-    execute it as a ledger interpretation."""
+            basis: str = "model:unspecified",
+            context: Optional[List[str]] = None) -> Dict[str, Any]:
+    """The human blessed a fresh interpretation: record it (with its
+    context snapshot, Law 4), then execute it as a ledger
+    interpretation."""
     record_confirmation(store, question, interpretation, author,
-                        occurred_at, basis)
+                        occurred_at, basis, context=context)
     return ask(store, question, author, occurred_at,
                interpret_fn=None, semantic=semantic,
-               confirmed=interpretation)
+               confirmed=interpretation, context=context)
 
 
 def _kind_vocabulary() -> Dict[str, str]:
