@@ -1,40 +1,125 @@
 {
  "_comment": "Tier A answer keys (ADR 0079), authored BEFORE the build. The interpreter/embedder are INJECTED in tests (CI never calls a model); the live console wires gpt-4o-mini + text-embedding-3-small. Families: ground (tiered resolution), connect (the subgraph speaks), steer (display modes are buttons), remember (the interpretation ledger), law (never-regex census).",
  "ground": [
-  {"id": "GR-1", "title": "exact tiers stay model-free",
-   "expected": ["a mention equal to a folded name or identity grounds WITHOUT any embed call (deterministic tiers first)"]},
-  {"id": "GR-2", "title": "semantic tier grounds by meaning",
-   "expected": ["mention 'blood infection reports' grounds to sepsis-named files via vector similarity over meaning text", "scores visible; below-threshold -> HITL candidates, never a guess"]},
-  {"id": "GR-3", "title": "kind words ground to kind-sets",
-   "expected": ["mention 'reports' grounds to the file KIND via Kind_Vocabulary (registry data), enabling kind+topic questions"]},
-  {"id": "GR-4", "title": "embeddings are stamped and cached",
-   "expected": ["each stored vector carries (entry identity, text hash, model); an unchanged meaning never re-embeds across builds"]}
+  {
+   "id": "GR-1",
+   "title": "exact tiers stay model-free",
+   "expected": [
+    "a mention equal to a folded name or identity grounds WITHOUT any embed call (deterministic tiers first)"
+   ]
+  },
+  {
+   "id": "GR-2",
+   "title": "semantic tier grounds by meaning",
+   "expected": [
+    "mention 'blood infection reports' grounds to sepsis-named files via vector similarity over meaning text",
+    "scores visible; below-threshold -> HITL candidates, never a guess"
+   ]
+  },
+  {
+   "id": "GR-3",
+   "title": "kind words ground to kind-sets",
+   "expected": [
+    "mention 'reports' grounds to the file KIND via Kind_Vocabulary (registry data), enabling kind+topic questions"
+   ]
+  },
+  {
+   "id": "GR-4",
+   "title": "embeddings are stamped and cached",
+   "expected": [
+    "each stored vector carries (entry identity, text hash, model); an unchanged meaning never re-embeds across builds"
+   ]
+  }
  ],
  "connect": [
-  {"id": "CN-1", "title": "two mentions -> the connecting path speaks",
+  {
+   "id": "CN-1",
+   "title": "two mentions -> the connecting path speaks",
    "question": "how does DATE_STAMP relate to USP_ED_SEPSIS",
-   "expected": ["a path from the drift/derived name to the file, each hop labeled, each node speaking one meaning line"]},
-  {"id": "CN-2", "title": "kind+topic -> the filtered set (live find #4 dies)",
+   "expected": [
+    "a path from the drift/derived name to the file, each hop labeled, each node speaking one meaning line"
+   ]
+  },
+  {
+   "id": "CN-2",
+   "title": "kind+topic -> the filtered set (live find #4 dies)",
    "question": "what reports are about sepsis",
-   "expected": ["files matching the topic listed with scores — the question that exposed the enumeration disease now answers"]},
-  {"id": "CN-3", "title": "single mention -> the neighborhood",
+   "expected": [
+    "files matching the topic listed with scores — the question that exposed the enumeration disease now answers"
+   ]
+  },
+  {
+   "id": "CN-3",
+   "title": "single mention -> the neighborhood",
    "question": "THERA_CLASS_CODE",
-   "expected": ["the node's card plus its typed neighborhood (its table; scopes citing it), caps visible"]},
-  {"id": "CN-4", "title": "caps are visible, never silent",
-   "expected": ["any truncated listing prints shown-of-total"]}
+   "expected": [
+    "the node's card plus its typed neighborhood (its table; scopes citing it), caps visible"
+   ]
+  },
+  {
+   "id": "CN-4",
+   "title": "caps are visible, never silent",
+   "expected": [
+    "any truncated listing prints shown-of-total"
+   ]
+  }
  ],
  "steer": [
-  {"id": "ST-1", "title": "display modes are buttons, not classified intents",
-   "expected": ["a grounded answer offers card/lineage/filters/readers re-renders; no model ever chooses among them"]}
+  {
+   "id": "ST-1",
+   "title": "display modes are buttons, not classified intents",
+   "expected": [
+    "a grounded answer offers card/lineage/filters/readers re-renders; no model ever chooses among them"
+   ]
+  }
  ],
  "remember": [
-  {"id": "RM-1", "title": "confirm -> ledger -> no model on repeat",
-   "expected": ["a confirmed interpretation lands as a 'confirmed' usage event with the interpretation payload and model basis", "the same folded question later NEVER calls the interpreter; the interpretation re-executes against the CURRENT graph"]},
-  {"id": "RM-2", "title": "interpretation cached, never the answer",
-   "expected": ["a graph change between asks changes the ANSWER of a ledger-hit question"]}
+  {
+   "id": "RM-1",
+   "title": "confirm -> ledger -> no model on repeat",
+   "expected": [
+    "a confirmed interpretation lands as a 'confirmed' usage event with the interpretation payload and model basis",
+    "the same folded question later NEVER calls the interpreter; the interpretation re-executes against the CURRENT graph"
+   ]
+  },
+  {
+   "id": "RM-2",
+   "title": "interpretation cached, never the answer",
+   "expected": [
+    "a graph change between asks changes the ANSWER of a ledger-hit question"
+   ]
+  }
  ],
  "law": [
-  {"id": "LW-1", "title": "never-regex census",
-   "expected": ["no regex is applied to question text anywhere in aivia/ (the grammar is DELETED, not bypassed); mechanical string-tool regex remains legal"]}
+  {
+   "id": "LW-1",
+   "title": "never-regex census",
+   "expected": [
+    "no regex is applied to question text anywhere in aivia/ (the grammar is DELETED, not bypassed); mechanical string-tool regex remains legal"
+   ]
+  }
+ ],
+ "seat": [
+  {
+   "id": "SF-1",
+   "title": "an exploding interpreter is an outcome, not a crash",
+   "expected": [
+    "interpret_fn raising ANY exception -> status seat_down-degraded answer path, deterministic tiers still answer, the failure counted"
+   ]
+  },
+  {
+   "id": "SF-2",
+   "title": "an exploding embedder degrades the semantic tier only",
+   "expected": [
+    "semantic.search failure -> grounding falls back to deterministic tiers + HITL, never a dead page"
+   ]
+  },
+  {
+   "id": "SF-3",
+   "title": "deterministic asks are immune to model weather",
+   "expected": [
+    "exact-name and kind questions answer normally while both seats are down"
+   ]
+  }
  ]
 }

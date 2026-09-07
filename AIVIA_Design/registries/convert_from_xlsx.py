@@ -106,12 +106,16 @@ SOURCES = {
 # connect engine's declared edge weights; ADR 0079: never a hidden
 # judgment) + the H5 extension note (confirmed usage events carry the
 # interpretation).
-STAMP_VERSION = "1.12.0"
+# v1.13.0 (2026-09-06): THE SEAT-FAILURE LAW (live find #6 — a rate
+# limit killed the console): a model-seat failure is an OUTCOME
+# (seat_down), never an exception; declared time budgets; concurrent
+# serving; failures counted. The outage floor applied to the seats.
+STAMP_VERSION = "1.13.0"
 RATIFIED = True
 DOC_STAMP = ("v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 twin-graph "
              "ruling ADR 0077; v1.2.0 Phase A metamodel bump; v1.3.0 "
              "Phase B composite-kinds correction; v1.4.0 T-2 "
-             "operational-statements ruling; v1.5.0 the gap taxonomy; v1.6.0 the plug-all-holes sweep; v1.7.0 ledger close; v1.8.0 the ask console ADR 0078; v1.9.0 the list op; v1.10.0 kind vocabulary; v1.11.0 ADR 0079 interpreter; v1.12.0 Tier A build data "
+             "operational-statements ruling; v1.5.0 the gap taxonomy; v1.6.0 the plug-all-holes sweep; v1.7.0 ledger close; v1.8.0 the ask console ADR 0078; v1.9.0 the list op; v1.10.0 kind vocabulary; v1.11.0 ADR 0079 interpreter; v1.12.0 Tier A build data; v1.13.0 the seat-failure law "
              "(all 2026-09-06)")
 CONVERTED_ON = "2026-09-05"
 
@@ -788,6 +792,13 @@ TWIN_SHEETS = {
              "(candidates listed, human picks) | no-match (plain, "
              "counted, nearest names offered) — H5 usage event on "
              "every ask, about only on match, payload post phi-gate"},
+            {"Item": "the seat-failure law", "Definition": "RULED "
+             "2026-09-06 (live find #6): a model-seat failure is an "
+             "OUTCOME, never an exception — declared time budgets, "
+             "one bounded retry, seat_down degrades to deterministic "
+             "tiers + the structured form with an honest banner; "
+             "failures COUNTED; the console serves concurrently so a "
+             "slow seat never blocks deterministic asks."},
             {"Item": "kind vocabulary", "Definition": "RULED "
              "2026-09-06 (Sunny's audit of the list op): word->kind "
              "mappings are MEANING and live HERE as law, loaded by "

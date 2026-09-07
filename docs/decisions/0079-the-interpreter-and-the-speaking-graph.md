@@ -96,6 +96,33 @@ enumeration disease wearing types.
    (adjustable): confirm on first sighting and on low confidence;
    silent on ledger hits.
 
+## Law 3 — THE SEAT-FAILURE LAW (amended 2026-09-06, live find #6:
+## "I can't continue to ask more questions")
+
+The first Tier A build caged the interpreter's OUTPUT but not its
+FAILURES: a rate limit or network blip raised straight through the
+pipeline and killed the page — and the single-threaded server let
+one hung seat call freeze every ask. Half a cage. The law:
+
+- **A seat failure is an OUTCOME, never an exception.** Every model
+  seat call (interpret, embed) is contained under a DECLARED time
+  budget; failure or budget-exceeded yields `seat_down` — the
+  deterministic tiers keep answering, the console banners the
+  degradation honestly ("interpreter unavailable — exact names,
+  kinds, and the structured form still work"), and the failure is
+  COUNTED (repeated seat failures are product signal, per the
+  error-contract philosophy).
+- **The console serves concurrently**: a slow seat call never
+  blocks other asks; deterministic questions stay instant
+  regardless of model weather.
+- **Bounded retry, visible state**: one retry within the budget,
+  then seat_down. No infinite spinners, no silent hangs, no
+  tracebacks as the only witness.
+
+This is the outage-floor law ("an outage costs polish, never
+truth") applied to the seats themselves — the understanding floor
+was stated at ratification; the seat floor is its missing half.
+
 ## Tier B — the logic console (designed now, built after Tier A)
 
 Sunny's AST proposal, landed in the existing vocabulary: the
