@@ -137,9 +137,70 @@ that can't be traced is discarded, not shown.
 **Today.** Mostly held (floors, the cage, honest no-match). The
 model's smoothing seat is designed but gated.
 
-**Dig questions.** Is per-claim provenance visible enough to the
-user, or only internally true? What does "it isn't there" look like
-when the store is INCOMPLETE vs when the thing doesn't exist?
+**Dig outcomes (2026-09-07, Sunny's Law-1 pass):**
+
+► RULED: THE GRAPH IS THE REALITY. Absence claims never speculate
+about the un-loaded world: "no <kind> named <x> exists" is the
+honest and complete answer when the graph holds nothing. The
+system claims nothing about what was never loaded. (What the graph
+DOES hold about its own intake — receipts, registrations — is
+graph truth and may speak like any other node; but there is no
+"outside coverage" speech.)
+
+► RULED: "what is sepsis" FINDS SEPSIS. A concept question is a
+SEARCH, not a dictionary lookup — the estate answers with what it
+knows: the files, tables, conditions, and codes that carry the
+word/meaning. The estate's conditions ARE its definition-in-
+practice (how sepsis is identified HERE: the codes, the alerts,
+the thresholds). "No definition stored" as a dead-end was wrong —
+absence of a minted term never blocks the search; the term-mint
+invitation rides at the END of a full answer, never instead of one.
+
+► DIRECTED: the model seats get DISTINCT NAMES and a RIGHTS
+CONTRACT — the conversation model and the description-writing
+model are different operations, different scopes, different I/O,
+and the graph's data contract must state which model may do what.
+(Names proposed below, awaiting Sunny's confirmation.)
+
+► RULED (Sunny, 2026-09-07): the seat names + rights table below
+stand. Clarifications from the same pass:
+- **The Interpreter and the user's tree**: the Interpreter still
+  writes NOTHING — the pen belongs to the human's CONFIRM act,
+  which writes the (proposal + resolution) into the user's tree as
+  a governed event. The ask flow records the raw proposal on the
+  usage event as EVIDENCE (auditable, expiring), never as truth.
+  Seats never write; flows record events; human acts create truth.
+- **Smoothed text is never in the user's tree**: the tree stores
+  THINGS and ACTS (what was viewed, what was confirmed), never
+  prose — stored prose goes stale the moment the graph moves.
+  Smoothed renderings may live in a regenerable shared CACHE keyed
+  by (floor content, smoother model) — the embeddings posture
+  exactly — recomputed freely, truth never.
+
+► RULED: D2 — EVERY RENDERED LINE IS A CLICKABLE NODE. The answer
+is a list of addressable facts, not a paragraph; each line links to
+the node that justifies it (per-claim provenance = the UI default;
+collapses into Law 5's context set).
+
+► RULED: the Smoother grounds by SLOT-SURVIVAL — load-bearing
+spans (column phrases, values, numbers, negations) are immutable
+slots that must survive VERBATIM, checked mechanically after the
+call; a failed check ships the floor. Presentation-only, visibly
+marked, floor one click away.
+
+**Seat names + rights (RULED):**
+
+| seat | operation | runs at | INPUT | OUTPUT | graph rights |
+|---|---|---|---|---|---|
+| THE SCRIBE | drafts descriptions/definitions | curation time | graph facts + source evidence | DRAFT text w/ basis stamp | write ONLY through gate + human approval (door 3); never at ask time |
+| THE INTERPRETER | parses questions | ask time | ONE question string | typed PROPOSAL (phrases, expansions, hint) | NONE — reads nothing, writes nothing |
+| THE RANKER | embeds text for matching | index/ask time | speech texts / query | vectors, scores | derived cache only; asserts nothing |
+| THE SMOOTHER | polishes rendered prose | presentation time | rendered floor | display text, facts unchanged | NONE — never stored; floor one click away |
+
+Open from this pass: D1 (three doors, refined statement) — implied
+accepted by the seat contract, awaiting explicit word; D2 (every
+line a clickable node) — explained, awaiting ruling; D5 grounding
+method for the smoother — slot-survival check proposed.
 
 ## Law 2 — Language is the interface, not the storage
 
