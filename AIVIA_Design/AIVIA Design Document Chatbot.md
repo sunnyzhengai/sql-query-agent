@@ -259,9 +259,36 @@ never collapsed into silence or a guess.
 (the ED-Sepsis pick-list buried the obvious file — ranking, dedup,
 and expansion failures make honest clarifies feel dumb).
 
-**Dig questions.** When is clarify the RIGHT experience vs a
-ranking failure wearing honesty? How many candidates is respect,
-how many is abdication?
+**Dig outcomes (2026-09-07, Sunny's Law-3 pass — all ruled). The
+dug law: NEVER GUESS SILENTLY, NEVER ASK LAZILY — refusal earns its
+honesty through the quality of the evidence and of the question
+asked back, and both are measurable.**
+
+► RULED (D1): THE THIRD RESPONSE SHAPE — the PROVISIONAL ANSWER.
+Evidence profile picks among three shapes: clear winner -> ANSWER
+with the assumption visibly stated + runners-up one click away
+("Answering for USP_ED_SEPSIS · also matched: ... — switch");
+close cluster -> CLARIFY; nothing above the floor -> honest
+absence. A disclosed, reversible assumption is not a guess — a
+guess is an UNDISCLOSED assumption. Margins are registry data.
+
+► RULED (D2): CLARIFY OBLIGATIONS. A lawful clarify: dedupes at
+name grain (one row, "in N tables"); groups by kind; caps visibly
+("… and 12 more — narrow?"); every candidate carries score + one
+line of speech (choosing between meanings, never identifiers).
+If the true referent was not IN the list, the clarify FAILED.
+
+► RULED (D3): THE CLARIFY-MISS COUNTER. The user's next action
+after a clarify is recorded on the usage event: picked (hit) /
+re-typed (miss) / abandoned. The clarify-miss rate is a standing
+census number — rising = ranking or speech failing = product
+signal (the error-contract philosophy applied to the questions we
+ask back).
+
+► RULED (D4): PARTIAL ANSWERS ARE LAW. Multi-mention questions are
+never all-or-nothing: what grounded answers, what did not is NAMED
+ungrounded in the same breath. (Ratifies the 0080 anchored-topic
+behavior as the Law-3 shape.)
 
 ## Law 4 — The user's words outrank the system's categories
 
