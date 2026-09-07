@@ -5,8 +5,8 @@ should not be alone — a term is deduced from a file's SQL; a usage
 event is connected to the user and the item it used… do we need to
 review the graph again, holistically?" His requirement: NOT a
 one-time script — a standing part of AIVIA's integrity testing and
-auditing. NO CODE, no doc amendments until Sunny ratifies this
-plan.)*
+auditing. RATIFIED by Sunny 2026-09-07 — the initial review (§4) executes;
+build steps follow the step discipline, test suites first.)*
 
 ## 1. The law this creates (for ratification)
 
