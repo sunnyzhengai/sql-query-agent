@@ -499,9 +499,37 @@ bounded, bannered, counted.
 
 **Today.** Built (ledger replay, seat-failure law, change quanta).
 
-**Dig questions.** Embedding-model version bumps change semantic
-rankings — is that "changed truth" (announce it?) or weather
-(pin the model?)?
+**Dig outcomes (2026-09-07, Sunny's Law-8 pass — all ruled). The
+dug law: EVERY SOURCE OF VARIATION IS EITHER DECLARED (a versioned
+rule), EARNED (a recorded act), OR NARRATED (a change caption) —
+nothing just happens.**
+
+► RULED (D1): THE EMBEDDING MODEL IS PART OF THE RANKING RULE —
+neither truth nor weather. Pinned as registry data (vectors
+already stamped); upgrading is a DELIBERATE RULE-CHANGE ACT:
+announced, versioned, total re-embed (the grammar-bump quantum).
+Migrations are validated by the clarify-miss rate — measured, not
+vibes.
+
+► RULED (D2): THE PROPOSAL CACHE. Interpreter proposals cache by
+(question text, model version) — derived, regenerable, never
+truth. One model call per distinct question per model version;
+determinism extends to UNCONFIRMED asks; an interpreter upgrade
+becomes a declared rule change, not drift.
+
+► RULED (D3): THE DEGRADATION LADDER, DECLARED AS DATA. Five
+levels, each bannered with WHAT STILL WORKS, each drop counted:
+all-up · Interpreter down (exact tiers + every CONFIRMED question
+still answers — the flywheel is the outage insurance) · Ranker
+down (deterministic only) · both down (names, clicks, buttons,
+the table) · store down (the honest outage).
+
+► RULED (D4): THE CHANGE CAPTION. Answers never cache — but when a
+confirmed/ledger question re-executes and differs from its
+recorded snapshot, the answer says so: "changed since you asked on
+<date>: 3 scopes added, 1 description changed," full diff
+recomputable on demand, never stored. Consistency's other half:
+accounting for every instability.
 
 ## Law 9 — Nothing is silently absent
 
