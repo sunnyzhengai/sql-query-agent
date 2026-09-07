@@ -102,12 +102,16 @@ SOURCES = {
 # the op list retires as a language (ops survive as user-pressed
 # DISPLAY MODES); match-then-connect; ranking weights are declared
 # data; the interpretation ledger.
-STAMP_VERSION = "1.11.0"
+# v1.12.0 (2026-09-06): Tier A BUILD data — Ranking_Weights (the
+# connect engine's declared edge weights; ADR 0079: never a hidden
+# judgment) + the H5 extension note (confirmed usage events carry the
+# interpretation).
+STAMP_VERSION = "1.12.0"
 RATIFIED = True
 DOC_STAMP = ("v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 twin-graph "
              "ruling ADR 0077; v1.2.0 Phase A metamodel bump; v1.3.0 "
              "Phase B composite-kinds correction; v1.4.0 T-2 "
-             "operational-statements ruling; v1.5.0 the gap taxonomy; v1.6.0 the plug-all-holes sweep; v1.7.0 ledger close; v1.8.0 the ask console ADR 0078; v1.9.0 the list op; v1.10.0 kind vocabulary; v1.11.0 ADR 0079 interpreter "
+             "operational-statements ruling; v1.5.0 the gap taxonomy; v1.6.0 the plug-all-holes sweep; v1.7.0 ledger close; v1.8.0 the ask console ADR 0078; v1.9.0 the list op; v1.10.0 kind vocabulary; v1.11.0 ADR 0079 interpreter; v1.12.0 Tier A build data "
              "(all 2026-09-06)")
 CONVERTED_ON = "2026-09-05"
 
@@ -669,6 +673,22 @@ TWIN_SHEETS = {
              "iff its yield is ABOUT the graph for one consumer — status, "
              "aggregation, comparison — never meaning itself; the "
              "translator absorbed everything secretly computing meaning"},
+        ],
+        "Ranking_Weights": [
+            {"Edge": "_ruling", "Weight": "-", "Note": "ADR 0079: "
+             "path-ranking inputs are DECLARED, TUNABLE data — never "
+             "a hidden model judgment. Seeded uniform; tuned by "
+             "evidence."},
+            {"Edge": "contains", "Weight": "1.0", "Note": "column-in-"
+             "table, scope-in-file"},
+            {"Edge": "reads", "Weight": "1.0", "Note": "scope reads "
+             "table/scope"},
+            {"Edge": "cites", "Weight": "1.0", "Note": "scope cites "
+             "column"},
+            {"Edge": "defines", "Weight": "1.0", "Note": "derived "
+             "column defined by scope"},
+            {"Edge": "sighted", "Weight": "1.0", "Note": "drift name "
+             "sighted in file"},
         ],
         "Kind_Vocabulary": [
             {"Word": "_ruling", "Kind": "-", "Note": "v1.10.0: the "

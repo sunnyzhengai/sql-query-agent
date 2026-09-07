@@ -1,191 +1,206 @@
-"""ADR 0078 exit: the F9 ask-console answer keys go RUNNABLE.
+"""Tier A exit (ADR 0079): the F10 answer keys go RUNNABLE.
 
-Index totality + drift-by-name (the search law) · the three honest
-outcomes with H5 usage events · every closed op over the sepsis
-corpus · replay determinism (Group E) · the no-shapes claim: a scope
-answers with its own FLOOR. Requires ScriptDom (ADR 0001).
+The interpreter and embedder are INJECTED fakes — CI never calls a
+model; the cage, the tiers, the connect engine, the ledger, and the
+never-regex law are what's proven. The live finds from Sunny's first
+testing session stand as corpses under the new pipeline.
 
 Proves: contract:aivia-design-to-code
 """
+import hashlib
 import json
 import pathlib
+import re
 
 import pytest
 
-from aivia.flows import ask
+from aivia.flows import ask, grounding
 from aivia.graph.read_api import ReadApi
 from aivia.lenses import ask_index
 
 FIX = pathlib.Path(__file__).resolve().parents[2] / "AIVIA_Product" / "fixtures"
-CASES = json.loads((FIX / "F9_ask" / "cases.json").read_text())
+CASES = json.loads((FIX / "F10_interpreter" / "cases.json").read_text())
 T0 = "2026-09-06T12:00:00Z"
 
 
+def fake_embed(texts):
+    """Deterministic bag-of-words hashing: shared words -> nearby
+    vectors — enough semantics to prove the tier, zero network."""
+    out = []
+    for text in texts:
+        vec = [0.0] * 64
+        for word in re.sub(r"[^a-z0-9 ]", " ", text.lower()).split():
+            vec[int(hashlib.sha256(word.encode()).hexdigest(), 16)
+                % 64] += 1.0
+        out.append(vec)
+    return out
+
+
+def fake_interpreter(mapping):
+    def interpret(question):
+        return mapping.get(" ".join(question.split()).lower(),
+                           {"mentions": [question]})
+    return interpret
+
+
 @pytest.fixture(scope="module")
-def store():
+def world():
     from aivia.console import build_store
-    return build_store("sepsis")
-
-
-def _ask(store, q):
-    return ask.ask(store, q, author="person:test", occurred_at=T0)
-
-
-def test_ix1_every_kg1_column_findable(store):
+    store, _base = build_store("sepsis")
     read = ReadApi(store)
-    index = ask_index.lens_ask_index(read, None)["yield"]
-    have = {e["identity"] for e in index if e["kind"] == "column"}
-    for n in read.nodes("column"):
-        assert n.identity in have
+    entries = ask_index.lens_ask_index(read, None)["yield"]
+    semantic = grounding.SemanticIndex(entries, fake_embed,
+                                       "fake-64", cache_path=None)
+    return store, semantic
 
 
-def test_ix2_drift_findable_by_name(store):
-    # DATE_STAMP is BOTH computed (a derived member in some scopes)
-    # AND drift (read where nothing declares it) — the ambiguous
-    # listing shows the whole story; picking the drift identity
-    # yields the finding (key corrected at build: richer than the
-    # single-outcome premise)
-    result = _ask(store, "what is DATE_STAMP")
-    assert result["outcome"] == "ambiguous"
-    kinds = {c["kind"] for c in result["resolution"]["candidates"]}
-    assert "drift" in kinds and "derived column" in kinds
-    drift_id = next(c["identity"] for c in
-                    result["resolution"]["candidates"]
-                    if c["kind"] == "drift")
-    picked = _ask(store, f"what is {drift_id}")
-    assert picked["outcome"] == "matched"
-    assert "READER/WRITER DRIFT" in picked["answer"]
-    assert "silently-failing" in picked["answer"]
+def _ask(world, q, interpret=None):
+    store, semantic = world
+    return ask.ask(store, q, "person:test", T0,
+                   interpret_fn=interpret, semantic=semantic)
 
 
-def test_ix3_scopes_findable_cross_file_ambiguity_honest(store):
-    # the readmit scope lives in TWO files — ambiguity is the truthful
-    # outcome; the full identity resolves it (key corrected at build)
-    r = _ask(store, "what is #Base_Pop_ED_Readmit")
-    assert r["outcome"] == "ambiguous"
-    assert len({c["identity"] for c in
-                r["resolution"]["candidates"]}) >= 2
-    full = _ask(store, "what is "
-                "reporting/USP_ED_SEPSIS.sql::#Base_Pop_ED_Readmit")
-    assert full["outcome"] == "matched"
-    assert _ask(store, "what is USP_ED_SEPSIS")["outcome"] == "matched"
+# ---- GR: grounding ---------------------------------------------------
+def test_gr1_exact_tier_is_model_free(world):
+    store, semantic = world
+    calls = []
 
-
-def test_oc1_matched_answer_and_usage_about(store):
-    result = _ask(store, "what is THERA_CLASS_CODE")
-    assert result["outcome"] == "matched"
-    events = [u for u in store.current_nodes("usage")
-              if u.properties.get("payload", "").endswith(
-                  "THERA_CLASS_CODE")]
-    assert events and events[-1].properties["outcome"] == "matched"
-    assert events[-1].properties.get("about")
-
-
-def test_oc2_ambiguous_candidates_no_about(store):
-    result = _ask(store, "what is TIME_LINE")
-    assert result["outcome"] == "ambiguous"
-    assert "pick one" in result["answer"]
-    events = [u for u in store.current_nodes("usage")
-              if u.properties.get("payload", "").endswith("TIME_LINE")]
-    assert events[-1].properties["outcome"] == "ambiguous"
-    assert events[-1].properties.get("about") is None
-
-
-def test_oc3_no_match_honest_counted(store):
-    result = _ask(store, "what is FLUX_CAPACITOR_ID")
-    assert result["outcome"] == "no-match"
-    assert "NO MATCH" in result["answer"]
-    events = [u for u in store.current_nodes("usage")
-              if "FLUX_CAPACITOR_ID" in u.properties.get("payload", "")]
-    assert events[-1].properties["outcome"] == "no-match"
-    assert events[-1].properties.get("about") is None
-
-
-def test_oc4_replay_determinism(store):
-    a = _ask(store, "lineage of ED_ENCOUNTERS_DM")["answer"]
-    b = _ask(store, "lineage of ED_ENCOUNTERS_DM")["answer"]
-    assert a == b
-
-
-def test_op2_filters_on_voices_the_grammar(store):
-    result = _ask(store, "filters on THERA_CLASS_CODE")
-    assert result["op"] == "filters_on"
-    # voiced through the DICTIONARY words (R5), not the raw name
-    assert "is 11 (annotated 'Antibiotics' in the source)" in \
-        result["answer"]
+    def exploding_interpreter(q):
+        calls.append(q)
+        raise AssertionError("model called for an exact name")
+    result = ask.ask(store, "THERA_CLASS_CODE", "person:test", T0,
+                     interpret_fn=exploding_interpreter,
+                     semantic=semantic)
+    assert result["status"] == "answer"
+    assert result["via"] == "deterministic"
+    assert calls == []
     assert "therapeutic class" in result["answer"]
 
 
-def test_op3_lineage_finds_the_readmit_scope(store):
-    result = _ask(store, "lineage of ED_ENCOUNTERS_DM")
-    assert result["outcome"] == "matched"
-    assert "#Base_Pop_ED_Readmit" in result["answer"]
+def test_gr3_kind_words_ground_to_kind_sets(world):
+    result = _ask(world, "tables")
+    assert result["status"] == "answer"
+    assert result["answer"].startswith("90 table(s):")
 
 
-def test_op5_gaps_prints_the_taxonomy(store):
-    result = _ask(store, "gaps")
-    assert "GAP TAXONOMY" in result["answer"]
-    assert "drift refs (estate findings)" in result["answer"]
+def test_gr4_vectors_stamped_and_cached(tmp_path, world):
+    store, _ = world
+    read = ReadApi(store)
+    entries = ask_index.lens_ask_index(read, None)["yield"][:20]
+    cache = tmp_path / "emb.json"
+    first = grounding.SemanticIndex(entries, fake_embed, "fake-64",
+                                    cache_path=cache)
+    assert first.embedded_now == 20
+
+    def forbidden(texts):
+        raise AssertionError("re-embedded an unchanged meaning")
+    second = grounding.SemanticIndex(entries, forbidden, "fake-64",
+                                     cache_path=cache)
+    assert second.embedded_now == 0  # unchanged -> never re-embeds
 
 
-def test_op6_scope_answers_with_its_own_floor_no_shapes(store):
-    result = _ask(store, "what is "
-                  "reporting/USP_ED_SEPSIS.sql::#Base_Pop_ED_Readmit")
-    assert "Drawn from the ed positivescores selection" in \
-        result["answer"]
-    assert "24 hours after" in result["answer"]
-    assert "The first time line is 1." in result["answer"]
+# ---- CN: connect -----------------------------------------------------
+def test_cn2_kind_plus_topic_the_live_find_dies(world):
+    store, semantic = world
+    interp = fake_interpreter({
+        "what reports are about sepsis":
+            {"mentions": ["reports", "sepsis"]}})
+    result = _ask(world, "what reports are about sepsis", interp)
+    assert result["status"] == "confirm"  # fresh model parse -> HITL
+    final = ask.confirm(store, "what reports are about sepsis",
+                        result["interpretation"], "person:test", T0,
+                        semantic=semantic)
+    assert final["status"] == "answer"
+    assert "file(s):" in final["answer"]
+    assert "USP_ED_SEPSIS" in final["answer"]
 
 
-def test_llm_parse_hook_is_caged(store):
-    # a model proposing an op OUTSIDE the closed set is refused and
-    # the deterministic parse stands — parse, never generate
-    result = ask.ask(store, "what is emr|dbo|PATIENTS",
-                     author="person:test",
-                     occurred_at=T0,
-                     llm_parse=lambda q: ("write_me_a_poem", "x"))
-    assert result["op"] == "lookup"
-    assert result["outcome"] == "matched"
+def test_cn1_two_mentions_connect_and_speak(world):
+    store, semantic = world
+    q = "how does THERA_CLASS_CODE relate to USP_ED_SEPSIS"
+    interp = fake_interpreter({
+        q.lower(): {"mentions": ["THERA_CLASS_CODE",
+                                 "reporting/USP_ED_SEPSIS.sql"]}})
+    first = _ask(world, q, interp)
+    assert first["status"] == "confirm"
+    final = ask.confirm(store, q, first["interpretation"],
+                        "person:test", T0, semantic=semantic)
+    assert final["status"] == "answer"
+    assert "connects to" in final["answer"]
+    assert "hop(s))" in final["answer"]
 
 
-def test_name_level_read_op_aggregates(store):
-    """Sunny's first live ask (2026-09-06): 'filters on MEDICATION_ID'
-    hit six same-named columns — for a READ-op the name IS the
-    question, so the answer aggregates across all of them, labeled
-    per identity. Lookup keeps ambiguity (there, WHICH one matters)."""
-    result = _ask(store, "filters on MEDICATION_ID")
-    assert result["outcome"] == "matched"
-    assert "columns carry the name MEDICATION_ID" in result["answer"]
-    assert "emr|dbo|MEDICATIONS|MEDICATION_ID" in result["answer"]
-    # the ABX value-set filter appears among the aggregated sections
-    assert "one of the values from a nested selection" in \
-        result["answer"]
-    events = [u for u in store.current_nodes("usage")
-              if u.properties.get("payload", "").endswith(
-                  "filters on MEDICATION_ID")]
-    assert events[-1].properties.get("about") is None  # spans many
-    lookup = _ask(store, "what is MEDICATION_ID")
-    assert lookup["outcome"] == "ambiguous"  # identity matters here
+def test_cn3_single_mention_neighborhood(world):
+    result = _ask(world, "emr|dbo|ED_ENCOUNTERS_DM")
+    assert result["status"] == "answer"
+    assert "Connected:" in result["answer"]
 
 
-def test_list_op_browse_questions(store):
-    """Sunny's live ask #2 (2026-09-06): 'what metrics are there' hit
-    no-match — browse questions are not lookups. The list op
-    enumerates kinds; 'metrics' answers HONESTLY (none until a human
-    mints one) and offers the nearest real kinds."""
-    result = _ask(store, "what metrics are there")
-    assert result["op"] == "list" and result["outcome"] == "matched"
-    # the practiced-vs-governed pair (registry v1.10.0, Sunny's
-    # audit: vocabulary is registry law, and 'metric' means BOTH
-    # layers — honest empty concepts + the delivery selections)
+def test_metric_two_layer_answer_survives(world):
+    result = _ask(world, "metrics")
     assert "GOVERNED metrics (minted concepts): 0" in result["answer"]
-    assert "HUMAN blesses" in result["answer"]
     assert "PRACTICED metrics" in result["answer"]
     assert "::delivery" in result["answer"]
-    tables = _ask(store, "list tables")
-    assert tables["outcome"] == "matched"
-    assert tables["answer"].startswith("90 tables:")
-    procs = _ask(store, "what procedures are there")
-    assert "28 procedures" in procs["answer"]
-    cols = _ask(store, "list columns")
-    assert "too many to list flatly" in cols["answer"]
+
+
+# ---- ST: steer -------------------------------------------------------
+def test_st1_ambiguity_clarifies_with_candidates(world):
+    result = _ask(world, "MEDICATION_ID")
+    assert result["status"] == "clarify"
+    assert len(result["candidates"]) >= 2
+    picked = _ask(world, result["candidates"][0]["identity"])
+    assert picked["status"] == "answer"
+
+
+# ---- RM: remember ----------------------------------------------------
+def test_rm1_confirmed_interpretation_skips_the_model(world):
+    store, semantic = world
+    q = "which procedures mention sepsis"
+    interp = fake_interpreter(
+        {q: {"mentions": ["procedures", "sepsis"]}})
+    first = ask.ask(store, q, "person:test", T0,
+                    interpret_fn=interp, semantic=semantic)
+    assert first["status"] == "confirm"
+    ask.confirm(store, q, first["interpretation"], "person:test", T0,
+                semantic=semantic)
+
+    def exploding(qq):
+        raise AssertionError("model called on a ledger hit")
+    again = ask.ask(store, q, "person:test", T0,
+                    interpret_fn=exploding, semantic=semantic)
+    assert again["status"] == "answer"
+    assert again["via"] == "ledger"
+
+
+def test_rm_cage_rejects_bad_interpretations(world):
+    store, semantic = world
+    for bad in ({"mentions": []}, {"answer": "42"},
+                {"mentions": ["a"] * 9}, "not a dict"):
+        result = ask.ask(store, "zzz unfindable question",
+                         "person:test", T0,
+                         interpret_fn=lambda q, b=bad: b,
+                         semantic=semantic)
+        assert result["status"] == "form"  # refused, never guessed
+
+
+# ---- LW: the never-regex census -------------------------------------
+def test_lw1_no_regex_touches_question_text():
+    """The law's census over the question-receiving module: the
+    grammar is DELETED, not hidden — ask.py contains no regex at
+    all; mechanical string-tool regex elsewhere stays legal."""
+    source = (pathlib.Path(__file__).resolve().parents[2]
+              / "aivia" / "flows" / "ask.py").read_text()
+    assert "import re" not in source
+    assert "_OP_GRAMMAR" not in source
+
+
+def test_usage_events_h5_shapes(world):
+    store, _ = world
+    events = store.current_nodes("usage")
+    assert events, "every ask lands an event"
+    for e in events:
+        if e.properties.get("action") == "asked":
+            assert e.properties["outcome"] in ("matched", "ambiguous",
+                                               "no-match")
+            if e.properties["outcome"] != "matched":
+                assert e.properties.get("about") is None

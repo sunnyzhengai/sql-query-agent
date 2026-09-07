@@ -33,9 +33,10 @@ def test_every_loaded_registry_is_ratified_v1():
     # 1.9.0 = the list op (Sunny live-ask ruling, same day)
     # 1.10.0 = kind vocabulary as registry law (same day)
     # 1.11.0 = ADR 0079 interpreter + speaking graph (same day)
+    # 1.12.0 = Tier A build data: ranking weights (same day)
     for reg in metamodel.load_all().values():
         assert reg.ratified is True
-        assert reg.version == "1.11.0"
+        assert reg.version == "1.12.0"
 
 
 def test_load_single_exposes_sheets_and_stamp():

@@ -1,5 +1,5 @@
 {
- "_comment": "Ask-console answer keys (ADR 0078), authored BEFORE the build. Families: index (totality + drift-by-name), outcomes (matched/ambiguous/no-match + H5 usage), ops (each closed op over the sepsis corpus). Runnable via tests/aivia/test_ask_console.py.",
+ "_comment": "SUPERSEDED by F10_interpreter (ADR 0079, 2026-09-06): the op-grammar these keys exercised is retired by the never-regex law. Kept as the historical record of the ADR-0078 console. Ask-console answer keys (ADR 0078), authored BEFORE the build. Families: index (totality + drift-by-name), outcomes (matched/ambiguous/no-match + H5 usage), ops (each closed op over the sepsis corpus). Runnable via tests/aivia/test_ask_console.py.",
  "index": [
   {
    "id": "IX-1",
