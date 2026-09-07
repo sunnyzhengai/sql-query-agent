@@ -90,12 +90,19 @@ SOURCES = {
 # is the usage ledger's single writer (H5).
 # v1.9.0 (2026-09-06): the LIST op joins the console's closed set
 # (ruled from Sunny's live ask — the browse question class).
-STAMP_VERSION = "1.9.0"
+# v1.10.0 (2026-09-06): KIND VOCABULARY as REGISTRY LAW (Sunny's
+# audit: the list op's word table was a patch wearing a dict —
+# vocabulary is meaning and lands as ruled data, never code).
+# 'metric' gets the practiced-vs-governed answer: governed = minted
+# concepts; practiced = the delivery selections of report procs.
+# Org-specific words extend via KG3 terms (steward-blessed), never
+# by editing code.
+STAMP_VERSION = "1.10.0"
 RATIFIED = True
 DOC_STAMP = ("v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 twin-graph "
              "ruling ADR 0077; v1.2.0 Phase A metamodel bump; v1.3.0 "
              "Phase B composite-kinds correction; v1.4.0 T-2 "
-             "operational-statements ruling; v1.5.0 the gap taxonomy; v1.6.0 the plug-all-holes sweep; v1.7.0 ledger close; v1.8.0 the ask console ADR 0078; v1.9.0 the list op "
+             "operational-statements ruling; v1.5.0 the gap taxonomy; v1.6.0 the plug-all-holes sweep; v1.7.0 ledger close; v1.8.0 the ask console ADR 0078; v1.9.0 the list op; v1.10.0 kind vocabulary "
              "(all 2026-09-06)")
 CONVERTED_ON = "2026-09-05"
 
@@ -658,6 +665,56 @@ TWIN_SHEETS = {
              "aggregation, comparison — never meaning itself; the "
              "translator absorbed everything secretly computing meaning"},
         ],
+        "Kind_Vocabulary": [
+            {"Word": "_ruling", "Kind": "-", "Note": "v1.10.0: the "
+             "console's word->kind law; a new word is a registry row, "
+             "never a code edit. Kinds: table column scope file term "
+             "drift derived-column concept delivery."},
+            {"Word": "table", "Kind": "table", "Note": ""},
+            {"Word": "tables", "Kind": "table", "Note": ""},
+            {"Word": "column", "Kind": "column", "Note": ""},
+            {"Word": "columns", "Kind": "column", "Note": ""},
+            {"Word": "field", "Kind": "column", "Note": ""},
+            {"Word": "fields", "Kind": "column", "Note": ""},
+            {"Word": "scope", "Kind": "scope", "Note": ""},
+            {"Word": "scopes", "Kind": "scope", "Note": ""},
+            {"Word": "selection", "Kind": "scope", "Note": ""},
+            {"Word": "selections", "Kind": "scope", "Note": ""},
+            {"Word": "temp table", "Kind": "scope", "Note": ""},
+            {"Word": "temp tables", "Kind": "scope", "Note": ""},
+            {"Word": "cte", "Kind": "scope", "Note": ""},
+            {"Word": "ctes", "Kind": "scope", "Note": ""},
+            {"Word": "file", "Kind": "file", "Note": ""},
+            {"Word": "files", "Kind": "file", "Note": ""},
+            {"Word": "proc", "Kind": "file", "Note": ""},
+            {"Word": "procs", "Kind": "file", "Note": ""},
+            {"Word": "procedure", "Kind": "file", "Note": ""},
+            {"Word": "procedures", "Kind": "file", "Note": ""},
+            {"Word": "report", "Kind": "file", "Note": ""},
+            {"Word": "reports", "Kind": "file", "Note": ""},
+            {"Word": "view", "Kind": "file", "Note": "views are "
+             "estate files like procs"},
+            {"Word": "views", "Kind": "file", "Note": ""},
+            {"Word": "term", "Kind": "term", "Note": ""},
+            {"Word": "terms", "Kind": "term", "Note": ""},
+            {"Word": "drift", "Kind": "drift", "Note": ""},
+            {"Word": "finding", "Kind": "drift", "Note": ""},
+            {"Word": "findings", "Kind": "drift", "Note": ""},
+            {"Word": "derived column", "Kind": "derived column",
+             "Note": ""},
+            {"Word": "derived columns", "Kind": "derived column",
+             "Note": ""},
+            {"Word": "metric", "Kind": "metric", "Note": "the "
+             "practiced-vs-governed pair (see kind vocabulary "
+             "ruling)"},
+            {"Word": "metrics", "Kind": "metric", "Note": ""},
+            {"Word": "measure", "Kind": "metric", "Note": ""},
+            {"Word": "measures", "Kind": "metric", "Note": ""},
+            {"Word": "kpi", "Kind": "metric", "Note": ""},
+            {"Word": "kpis", "Kind": "metric", "Note": ""},
+            {"Word": "concept", "Kind": "metric", "Note": ""},
+            {"Word": "concepts", "Kind": "metric", "Note": ""},
+        ],
         "Ask_Console": [
             {"Item": "_ruling", "Definition": "ADR 0078 (2026-09-06): "
              "the ask-the-graph console — free questions, TYPED paths "
@@ -690,6 +747,14 @@ TWIN_SHEETS = {
              "(candidates listed, human picks) | no-match (plain, "
              "counted, nearest names offered) — H5 usage event on "
              "every ask, about only on match, payload post phi-gate"},
+            {"Item": "kind vocabulary", "Definition": "RULED "
+             "2026-09-06 (Sunny's audit of the list op): word->kind "
+             "mappings are MEANING and live HERE as law, loaded by "
+             "the console, never hardcoded. 'metric/measure/kpi' -> "
+             "the practiced-vs-governed pair: governed = minted "
+             "concepts (honest empty until a human mints); practiced "
+             "= delivery selections (what the report procs actually "
+             "emit). Org words extend via KG3 terms, steward-blessed."},
             {"Item": "parse seat", "Definition": "deterministic "
              "keyword grammar ships v1; an LLM parse hook may map "
              "text -> (op, entity) VALIDATED against the closed set — "

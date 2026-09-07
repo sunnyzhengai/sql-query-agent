@@ -38,8 +38,12 @@ def lens_ask_index(read, params) -> Dict[str, Any]:
         for stmt in tree["statements"]:
             for s in (list(stmt.get("ctes", []))
                       + ([stmt["scope"]] if stmt.get("scope") else [])):
-                if "name_key" in s and "name" in s:
-                    add("scope", s["name_key"], s["name"])
+                if "name_key" in s:
+                    # delivery scopes carry a key but no NAME (the
+                    # unnamed emitters) — they are the estate's
+                    # PRACTICED metrics and must be askable
+                    add("scope", s["name_key"],
+                        s.get("name") or s["name_key"].split("::")[-1])
                     # derived columns are askable too — 'anything'
                     # includes what the estate computes (Gap B's
                     # output side)

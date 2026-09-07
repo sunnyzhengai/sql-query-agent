@@ -44,44 +44,44 @@ def parse(question: str) -> Tuple[str, str]:
     return "lookup", q.strip(" ?")
 
 
-# kind vocabulary for the list op — folded synonym -> index kind;
-# 'metric'/'concept' map to the HONEST empty until a human mints one
-_KIND_WORDS = {
-    "TABLE": "table", "TABLES": "table",
-    "COLUMN": "column", "COLUMNS": "column",
-    "SCOPE": "scope", "SCOPES": "scope", "SELECTION": "scope",
-    "SELECTIONS": "scope", "TEMP TABLE": "scope",
-    "TEMP TABLES": "scope", "CTE": "scope", "CTES": "scope",
-    "FILE": "file", "FILES": "file", "PROC": "file", "PROCS": "file",
-    "PROCEDURE": "file", "PROCEDURES": "file", "REPORT": "file",
-    "REPORTS": "file",
-    "TERM": "term", "TERMS": "term",
-    "DRIFT": "drift", "DRIFTS": "drift", "FINDING": "drift",
-    "FINDINGS": "drift",
-    "METRIC": "concept", "METRICS": "concept", "CONCEPT": "concept",
-    "CONCEPTS": "concept",
-    "DERIVED COLUMN": "derived column",
-    "DERIVED COLUMNS": "derived column",
-}
+def _kind_vocabulary() -> Dict[str, str]:
+    """Word -> kind, FROM THE REGISTRY (v1.10.0, Sunny's audit: the
+    word table was a patch wearing a dict — vocabulary is meaning and
+    lands as ruled data, never code). Org words extend via KG3 terms,
+    steward-blessed; a new product word is a registry row."""
+    from aivia.graph import metamodel
+    sheet = metamodel.load("lenses").sheets["Kind_Vocabulary"]
+    return {row["Word"].upper(): row["Kind"] for row in sheet
+            if row["Word"] != "_ruling"}
 
 
 def _render_list(read, index, kind_text: str) -> Optional[str]:
     from aivia.lenses.ask_index import _fold
-    kind = _KIND_WORDS.get(_fold(kind_text))
+    kind = _kind_vocabulary().get(_fold(kind_text))
     if kind is None:
         return None
-    if kind == "concept":
-        files = sorted({e["name"] for e in index
-                        if e["kind"] == "file"})
+    if kind == "metric":
+        # the practiced-vs-governed pair (registry ruling): governed
+        # metrics are minted concepts; practiced metrics are what the
+        # report procs actually EMIT — their delivery selections
         terms = [e for e in index if e["kind"] == "term"]
-        return ("No minted metrics or concepts exist yet — a concept "
-                "is born only when a HUMAN blesses a family (the "
-                "lens computes; a human touch mints). "
-                f"Accepted terms so far: {len(terms)}.\n"
-                "The nearest real things today are the estate's "
-                f"{len(files)} procedures and their delivery "
-                "selections — ask 'list procedures', or ask any "
-                "procedure by name for its steps.")
+        deliveries = sorted({e["identity"] for e in index
+                             if e["kind"] == "scope"
+                             and "::delivery" in e["identity"]})
+        lines = [
+            "GOVERNED metrics (minted concepts): 0 — a concept is "
+            "born only when a HUMAN blesses a family (the lens "
+            "computes; a human touch mints). Accepted terms so far: "
+            f"{len(terms)}.",
+            "",
+            f"PRACTICED metrics ({len(deliveries)} delivery "
+            "selections — what the report procedures actually emit):"]
+        lines += [f"- {d}" for d in deliveries[:40]]
+        if len(deliveries) > 40:
+            lines.append(f"… and {len(deliveries) - 40} more")
+        lines += ["", "Ask any of them by identity for its floor — "
+                  "the population, sources, and conditions it ships."]
+        return "\n".join(lines)
     entries = sorted({(e["name"], e["identity"]) for e in index
                       if e["kind"] == kind})
     lines = [f"{len(entries)} {kind_text.strip().lower()}:"]

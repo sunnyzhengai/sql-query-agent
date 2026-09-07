@@ -175,11 +175,13 @@ def test_list_op_browse_questions(store):
     mints one) and offers the nearest real kinds."""
     result = _ask(store, "what metrics are there")
     assert result["op"] == "list" and result["outcome"] == "matched"
-    assert "No minted metrics or concepts exist yet" in \
-        result["answer"]
-    assert "a human touch mints" in result["answer"].lower() or \
-        "HUMAN blesses" in result["answer"]
-    assert "procedures" in result["answer"]
+    # the practiced-vs-governed pair (registry v1.10.0, Sunny's
+    # audit: vocabulary is registry law, and 'metric' means BOTH
+    # layers — honest empty concepts + the delivery selections)
+    assert "GOVERNED metrics (minted concepts): 0" in result["answer"]
+    assert "HUMAN blesses" in result["answer"]
+    assert "PRACTICED metrics" in result["answer"]
+    assert "::delivery" in result["answer"]
     tables = _ask(store, "list tables")
     assert tables["outcome"] == "matched"
     assert tables["answer"].startswith("90 tables:")
