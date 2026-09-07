@@ -16,7 +16,8 @@ from aivia.flows import ask, grounding, speech
 from aivia.flows import censuses as census
 from aivia.graph.read_api import ReadApi
 
-from .test_ask_console import fake_embed, fake_interpreter
+from .test_ask_console import fake_embed, fake_interpreter, \
+    seed_vocabulary
 
 FIX = pathlib.Path(__file__).resolve().parents[2] / "AIVIA_Product" / "fixtures"
 T0 = "2026-09-07T12:00:00Z"
@@ -26,6 +27,7 @@ T0 = "2026-09-07T12:00:00Z"
 def world():
     from aivia.console import build_store
     store, _base = build_store("sepsis")
+    seed_vocabulary(store)
     read = ReadApi(store)
     index = ask.build_index(read)
     semantic = grounding.SemanticIndex(index, fake_embed,
@@ -140,7 +142,7 @@ def test_reachability_vacuity_detects_an_orphan(world):
 # ---- riders: no cliffs, word grain, honest zero ----------------------
 def test_no_cliffs_below_threshold_yields_scored_candidates(world):
     _store, _read, index, semantic = world
-    kinds = ask._kind_vocabulary()
+    kinds = ask._earned_vocabulary(_read)
     # 'encounter' shares meaning words with many entries: below
     # MATCH_SCORE it must surface as candidates WITH scores — never
     # 'unknown' while hits stand above the floor
@@ -167,7 +169,8 @@ def test_word_grain_ed_finds_reports_never_bed_config(world):
     interp = fake_interpreter({q: {"mentions": ["reports", "ED"]}})
     result = ask.ask(store, q, "person:test", T0,
                      interpret_fn=interp, semantic=semantic)
-    assert result["status"] == "confirm"
+    assert result["status"] == "answer"
+    assert result["pending_confirmation"]  # L7-D2: inline, non-blocking
     final = ask.confirm(store, q, result["interpretation"],
                         "person:test", T0, semantic=semantic)
     assert final["status"] == "answer"
@@ -182,7 +185,7 @@ def test_honest_zero_never_no_match_while_a_kind_grounded(world):
                                                 "xylophone"]}})
     result = ask.ask(store, q, "person:test", T0,
                      interpret_fn=interp, semantic=semantic)
-    if result["status"] == "confirm":
+    if result.get("pending_confirmation"):
         result = ask.confirm(store, q, result["interpretation"],
                              "person:test", T0, semantic=semantic)
     assert result["status"] == "answer"
@@ -199,7 +202,7 @@ def test_facet_rollup_with_provenance(world):
                                    ["reports", "best practice alert"]}})
     result = ask.ask(store, q, "person:test", T0,
                      interpret_fn=interp, semantic=semantic)
-    if result["status"] == "confirm":
+    if result.get("pending_confirmation"):
         result = ask.confirm(store, q, result["interpretation"],
                              "person:test", T0, semantic=semantic)
     assert result["status"] == "answer"
@@ -225,7 +228,8 @@ def test_expansions_are_searched_and_confirmation_lands_a_term(world):
         "expansions": {"emergency dept": ["emergency department"]}}})
     result = ask.ask(store, q, "person:test", T0,
                      interpret_fn=interp, semantic=semantic)
-    assert result["status"] == "confirm"
+    assert result["status"] == "answer"
+    assert result["pending_confirmation"]  # L7-D2: inline, non-blocking
     final = ask.confirm(store, q, result["interpretation"],
                         "person:test", T0, semantic=semantic)
     assert final["status"] == "answer"

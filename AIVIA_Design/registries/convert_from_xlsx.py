@@ -125,6 +125,15 @@ SOURCES = {
 # clears and stays; context is CONVERSATION-scoped (client-held id),
 # never a global; transcript = DISPLAY memory, context set = MEANING
 # memory — prose history never reaches the model (the cage holds).
+# v1.20.0 (2026-09-07): THE NINE-LAW DIG BUILD (chatbot doc, all
+# rulings). Kind_Vocabulary and Anaphor_Vocabulary DIE (no pre-made
+# mapping tables — Sunny's ruling; vocabulary is EARNED: LLM
+# proposes, human confirms, ledger remembers). Speech_Sources rows
+# gain self-description prose (the cold-start ground for type
+# words). NEW: Response_Shapes (provisional-answer margins, clarify
+# cap, table depth — L3/L5 as data) and Degradation_Ladder (L8-D3:
+# five levels, what-still-works speech). The build manifest
+# (Chatbot_Build_Manifest.md) is the claims ledger.
 # v1.19.0 (2026-09-07): the 0080 build lands Grounding_Thresholds —
 # the riders' "thresholds are registry data and never cliffs" made
 # literal: MATCH (auto-ground), MARGIN (uniqueness), CANDIDATE_FLOOR
@@ -148,7 +157,7 @@ SOURCES = {
 # deliveries lead, spine voiced, intermediates counted, census
 # closes; the file's ask-index words = the delivery lead, so file
 # embeddings embed meaning, never name-noise).
-STAMP_VERSION = "1.19.0"
+STAMP_VERSION = "1.20.0"
 RATIFIED = True
 DOC_STAMP = ("v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 twin-graph "
              "ruling ADR 0077; v1.2.0 Phase A metamodel bump; v1.3.0 "
@@ -731,10 +740,43 @@ TWIN_SHEETS = {
             {"Kind": "drift name", "Speech": "the standing drift "
              "sentence", "Meaning": "findable by name, the search "
              "law"},
-            {"Kind": "kind (node type)", "Speech": "its registry "
-             "definition", "Meaning": "KINDS ARE SEARCHABLE NODES — "
-             "'reports'/'procs'/'dashboards' ground to kind:file by "
-             "meaning, never by a fixed word list alone"},
+            {"Kind": "kind (node type)", "Speech": "its "
+             "self-description row (below)", "Meaning": "KINDS ARE "
+             "SEARCHABLE NODES — type words ground by meaning "
+             "against these descriptions (cold start), then by "
+             "earned vocabulary; never by a mapping table"},
+            {"Kind": "_self file", "Speech": "a sql file: a stored "
+             "procedure, report script, query, or view definition — "
+             "the reports and procedures readers consume",
+             "Meaning": "self-description; grounds "
+             "reports/procs/queries/views"},
+            {"Kind": "_self table", "Speech": "a database table "
+             "holding source records and fields",
+             "Meaning": "self-description"},
+            {"Kind": "_self column", "Speech": "a column or field "
+             "of a table", "Meaning": "self-description"},
+            {"Kind": "_self scope", "Speech": "a selection step "
+             "inside a procedure: a cte, temp table, or delivery "
+             "selection — the practiced metrics a report emits",
+             "Meaning": "self-description; grounds "
+             "selections/ctes/metrics(practiced)"},
+            {"Kind": "_self condition", "Speech": "a condition, "
+             "filter, rule, or business logic decision applied "
+             "inside a selection", "Meaning": "self-description; "
+             "grounds business-logic/filter/rule words"},
+            {"Kind": "_self derived column", "Speech": "a computed "
+             "or derived output column of a selection",
+             "Meaning": "self-description"},
+            {"Kind": "_self term", "Speech": "a governed business "
+             "term, concept, or definition minted by a steward — "
+             "governed metrics live here (honest empty until "
+             "minted)", "Meaning": "self-description; the "
+             "practiced/governed metric pair"},
+            {"Kind": "_self drift", "Speech": "a drift finding: a "
+             "name read by sql but declared nowhere",
+             "Meaning": "self-description"},
+            {"Kind": "_self parameter", "Speech": "a parameter of a "
+             "procedure", "Meaning": "self-description"},
             {"Kind": "operational statement", "Speech": "RULED-MUTE",
              "Meaning": "no reader-facing meaning (the v1.4.0 "
              "operational class)"},
@@ -758,6 +800,42 @@ TWIN_SHEETS = {
              "with its score; below: noise, may be 'unknown'"},
             {"Name": "TOP_K", "Value": "8",
              "Meaning": "candidates shown per mention"},
+        ],
+        "Response_Shapes": [
+            {"Name": "_ruling", "Value": "-", "Meaning": "L3-D1 + "
+             "L5-D1 as data: the evidence profile picks the shape — "
+             "clear winner -> PROVISIONAL ANSWER (assumption shown, "
+             "switch links); close cluster -> CLARIFY (obligations: "
+             "name-grain dedup, kind grouping, visible cap, "
+             "score+speech rows); nothing above floor -> ABSENCE "
+             "(a door: searched universe + nearest + next act)."},
+            {"Name": "PROVISIONAL_MARGIN", "Value": "0.08",
+             "Meaning": "top beats runner-up by this -> answer "
+             "provisionally instead of clarifying"},
+            {"Name": "CLARIFY_CAP", "Value": "6",
+             "Meaning": "candidate rows shown; remainder counted "
+             "visibly"},
+            {"Name": "TABLE_DEPTH", "Value": "5",
+             "Meaning": "rounds kept on the stacked table (L5-D1); "
+             "beyond it, durable recall is the user tree"},
+        ],
+        "Degradation_Ladder": [
+            {"Level": "_ruling", "Down": "-", "Still_works": "L8-D3: "
+             "five declared levels; every banner says what STILL "
+             "WORKS; every drop counted."},
+            {"Level": "1", "Down": "nothing",
+             "Still_works": "everything"},
+            {"Level": "2", "Down": "interpreter",
+             "Still_works": "exact names, identities, paths, "
+             "name-tokens, clicks, buttons — and every CONFIRMED "
+             "question (the flywheel is the outage insurance)"},
+            {"Level": "3", "Down": "ranker (embeddings)",
+             "Still_works": "all deterministic tiers + confirmed "
+             "questions; no semantic matching"},
+            {"Level": "4", "Down": "interpreter + ranker",
+             "Still_works": "names, clicks, buttons, the table"},
+            {"Level": "5", "Down": "the store",
+             "Still_works": "nothing — the honest outage"},
         ],
         "Censuses": [
             {"Census": "_ruling", "Equation": "-",
@@ -815,30 +893,14 @@ TWIN_SHEETS = {
              "translator absorbed everything secretly computing meaning"},
         ],
         "Anaphor_Vocabulary": [
-            {"Word": "_ruling", "Role": "-", "Note": "Law 4 (live "
-             "find #7): these words refer BACK to the answer's "
-             "context set; resolution is deterministic (set words "
-             "take the whole set, ordinals index it, singulars take "
-             "the single subject); empty context -> honest clarify."},
-            {"Word": "it", "Role": "singular", "Note": ""},
-            {"Word": "its", "Role": "singular", "Note": ""},
-            {"Word": "this", "Role": "singular", "Note": ""},
-            {"Word": "that", "Role": "singular", "Note": ""},
-            {"Word": "those", "Role": "set", "Note": ""},
-            {"Word": "these", "Role": "set", "Note": ""},
-            {"Word": "them", "Role": "set", "Note": ""},
-            {"Word": "above", "Role": "set", "Note": ""},
-            {"Word": "previous", "Role": "set", "Note": ""},
-            {"Word": "first", "Role": "ordinal:1", "Note": ""},
-            {"Word": "second", "Role": "ordinal:2", "Note": ""},
-            {"Word": "third", "Role": "ordinal:3", "Note": ""},
-            {"Word": "fourth", "Role": "ordinal:4", "Note": ""},
-            {"Word": "fifth", "Role": "ordinal:5", "Note": ""},
-            {"Word": "sixth", "Role": "ordinal:6", "Note": ""},
-            {"Word": "seventh", "Role": "ordinal:7", "Note": ""},
-            {"Word": "eighth", "Role": "ordinal:8", "Note": ""},
-            {"Word": "ninth", "Role": "ordinal:9", "Note": ""},
-            {"Word": "tenth", "Role": "ordinal:10", "Note": ""},
+            {"Word": "_superseded", "Role": "-", "Note": "TABLE "
+             "DIED 2026-09-07 (nine-law dig, L4-D3: no pre-made "
+             "mapping tables). Reference-words are marked by the "
+             "Interpreter in its proposal (roles: singular | set | "
+             "ordinal:N), validated by the cage, resolved "
+             "deterministically against the context set, and "
+             "CONFIRMED words accrete as earned vocabulary. This "
+             "tombstone is the historical record."},
         ],
         "Ranking_Weights": [
             {"Edge": "_ruling", "Weight": "-", "Note": "ADR 0079: "
@@ -857,54 +919,16 @@ TWIN_SHEETS = {
              "sighted in file"},
         ],
         "Kind_Vocabulary": [
-            {"Word": "_ruling", "Kind": "-", "Note": "v1.10.0: the "
-             "console's word->kind law; a new word is a registry row, "
-             "never a code edit. Kinds: table column scope file term "
-             "drift derived-column concept delivery."},
-            {"Word": "table", "Kind": "table", "Note": ""},
-            {"Word": "tables", "Kind": "table", "Note": ""},
-            {"Word": "column", "Kind": "column", "Note": ""},
-            {"Word": "columns", "Kind": "column", "Note": ""},
-            {"Word": "field", "Kind": "column", "Note": ""},
-            {"Word": "fields", "Kind": "column", "Note": ""},
-            {"Word": "scope", "Kind": "scope", "Note": ""},
-            {"Word": "scopes", "Kind": "scope", "Note": ""},
-            {"Word": "selection", "Kind": "scope", "Note": ""},
-            {"Word": "selections", "Kind": "scope", "Note": ""},
-            {"Word": "temp table", "Kind": "scope", "Note": ""},
-            {"Word": "temp tables", "Kind": "scope", "Note": ""},
-            {"Word": "cte", "Kind": "scope", "Note": ""},
-            {"Word": "ctes", "Kind": "scope", "Note": ""},
-            {"Word": "file", "Kind": "file", "Note": ""},
-            {"Word": "files", "Kind": "file", "Note": ""},
-            {"Word": "proc", "Kind": "file", "Note": ""},
-            {"Word": "procs", "Kind": "file", "Note": ""},
-            {"Word": "procedure", "Kind": "file", "Note": ""},
-            {"Word": "procedures", "Kind": "file", "Note": ""},
-            {"Word": "report", "Kind": "file", "Note": ""},
-            {"Word": "reports", "Kind": "file", "Note": ""},
-            {"Word": "view", "Kind": "file", "Note": "views are "
-             "estate files like procs"},
-            {"Word": "views", "Kind": "file", "Note": ""},
-            {"Word": "term", "Kind": "term", "Note": ""},
-            {"Word": "terms", "Kind": "term", "Note": ""},
-            {"Word": "drift", "Kind": "drift", "Note": ""},
-            {"Word": "finding", "Kind": "drift", "Note": ""},
-            {"Word": "findings", "Kind": "drift", "Note": ""},
-            {"Word": "derived column", "Kind": "derived column",
-             "Note": ""},
-            {"Word": "derived columns", "Kind": "derived column",
-             "Note": ""},
-            {"Word": "metric", "Kind": "metric", "Note": "the "
-             "practiced-vs-governed pair (see kind vocabulary "
-             "ruling)"},
-            {"Word": "metrics", "Kind": "metric", "Note": ""},
-            {"Word": "measure", "Kind": "metric", "Note": ""},
-            {"Word": "measures", "Kind": "metric", "Note": ""},
-            {"Word": "kpi", "Kind": "metric", "Note": ""},
-            {"Word": "kpis", "Kind": "metric", "Note": ""},
-            {"Word": "concept", "Kind": "metric", "Note": ""},
-            {"Word": "concepts", "Kind": "metric", "Note": ""},
+            {"Word": "_superseded", "Kind": "-", "Note": "TABLE "
+             "DIED 2026-09-07 (nine-law dig, Sunny's ruling: "
+             "everything searchable, no pre-made tables). Type "
+             "words ground by: earned vocabulary (confirmed terms) "
+             "-> the Interpreter's proposed kind-marks (validated "
+             "against the closed metamodel kind list = physics) -> "
+             "semantic match against kind nodes' self-description "
+             "(Speech_Sources prose). The practiced/governed metric "
+             "pair ruling carries forward in Speech_Sources. This "
+             "tombstone is the historical record."},
         ],
         "Ask_Console": [
             {"Item": "_superseded_0079", "Definition": "ADR 0079 "

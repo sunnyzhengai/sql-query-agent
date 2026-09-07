@@ -43,12 +43,31 @@ def fake_interpreter(mapping):
     return interpret
 
 
+VOCAB = {"tables": "table", "table": "table", "reports": "file",
+         "report": "file", "files": "file", "columns": "column",
+         "metrics": "metric", "selections": "scope",
+         "scopes": "scope", "terms": "term", "drift": "drift",
+         "procedures": "file"}
+
+
+def seed_vocabulary(store):
+    """The post-cold-start estate: kind words EARNED as confirmed
+    terms (parent kind::K) — the mapping table died (v1.20.0)."""
+    from aivia.graph import kg3_artifacts
+    for word, kind in VOCAB.items():
+        kg3_artifacts.append_term(
+            store, f"term::vocab/{word.upper()}", word,
+            f"a word for the {kind} kind of node",
+            "person:steward", T0, parent=f"kind::{kind}")
+
+
 @pytest.fixture(scope="module")
 def world():
     from aivia.console import build_store
     store, _base = build_store("sepsis")
+    seed_vocabulary(store)
     read = ReadApi(store)
-    entries = ask_index.lens_ask_index(read, None)["yield"]
+    entries = ask.build_index(read)
     semantic = grounding.SemanticIndex(entries, fake_embed,
                                        "fake-64", cache_path=None)
     return store, semantic
@@ -106,7 +125,8 @@ def test_cn2_kind_plus_topic_the_live_find_dies(world):
         "what reports are about sepsis":
             {"mentions": ["reports", "sepsis"]}})
     result = _ask(world, "what reports are about sepsis", interp)
-    assert result["status"] == "confirm"  # fresh model parse -> HITL
+    assert result["status"] == "answer"
+    assert result["pending_confirmation"]  # L7-D2: inline, non-blocking  # fresh model parse -> HITL
     final = ask.confirm(store, "what reports are about sepsis",
                         result["interpretation"], "person:test", T0,
                         semantic=semantic)
@@ -132,7 +152,8 @@ def test_cn1_two_mentions_connect_and_speak(world):
         q.lower(): {"mentions": ["THERA_CLASS_CODE",
                                  "reporting/USP_ED_SEPSIS.sql"]}})
     first = _ask(world, q, interp)
-    assert first["status"] == "confirm"
+    assert first["status"] == "answer"
+    assert first["pending_confirmation"]  # L7-D2: inline, non-blocking
     final = ask.confirm(store, q, first["interpretation"],
                         "person:test", T0, semantic=semantic)
     assert final["status"] == "answer"
@@ -170,7 +191,8 @@ def test_rm1_confirmed_interpretation_skips_the_model(world):
         {q: {"mentions": ["procedures", "sepsis"]}})
     first = ask.ask(store, q, "person:test", T0,
                     interpret_fn=interp, semantic=semantic)
-    assert first["status"] == "confirm"
+    assert first["status"] == "answer"
+    assert first["pending_confirmation"]  # L7-D2: inline, non-blocking
     ask.confirm(store, q, first["interpretation"], "person:test", T0,
                 semantic=semantic)
 
@@ -268,8 +290,10 @@ def test_fu2_it_takes_the_single_subject(world):
                     T0, semantic=semantic)
     assert first["status"] == "answer"
     assert first["context_set"]  # every answer yields its context
+    ref = fake_interpreter({"it": {"mentions": ["it"],
+                                   "references": {"it": "singular"}}})
     follow = ask.ask(store, "it", "person:test", T0,
-                     semantic=semantic,
+                     interpret_fn=ref, semantic=semantic,
                      context=first["context_set"])
     assert follow["status"] == "answer"
     assert "ED_ENCOUNTERS_DM" in follow["answer"]
@@ -284,11 +308,13 @@ def test_fu1_those_filters_by_connection(world):
     assert any("::" in c for c in context)  # the citing scopes rode in
     q = "which of those are in the ED sepsis report"
     interp = fake_interpreter({q.lower(): {"mentions":
-        ["those", "reports/USP_RPTS_ED_Sepsis.sql"]}})
+        ["those", "reports/USP_RPTS_ED_Sepsis.sql"],
+        "references": {"those": "set"}}})
     result = ask.ask(store, q, "person:test", T0,
                      interpret_fn=interp, semantic=semantic,
                      context=context)
-    assert result["status"] == "confirm"
+    assert result["status"] == "answer"
+    assert result["pending_confirmation"]  # L7-D2: inline, non-blocking
     final = ask.confirm(store, q, result["interpretation"],
                         "person:test", T0, semantic=semantic,
                         context=context)
@@ -302,18 +328,29 @@ def test_fu3_ordinals_index_the_context(world):
     first = ask.ask(store, "emr|dbo|ADT_EVENTS|ENCOUNTER_ID",
                     "person:test", T0, semantic=semantic)
     context = first["context_set"]
+    ref1 = fake_interpreter({"the first one": {
+        "mentions": ["the first one"],
+        "references": {"the first one": "ordinal:1"}}})
     follow = ask.ask(store, "the first one", "person:test", T0,
-                     semantic=semantic, context=context)
+                     interpret_fn=ref1, semantic=semantic,
+                     context=context)
     assert follow["status"] == "answer"
+    ref10 = fake_interpreter({"the tenth one": {
+        "mentions": ["the tenth one"],
+        "references": {"the tenth one": "ordinal:10"}}})
     deep = ask.ask(store, "the tenth one", "person:test", T0,
-                   semantic=semantic, context=context[:3])
+                   interpret_fn=ref10, semantic=semantic,
+                   context=context[:3])
     assert deep["status"] == "clarify"  # out of range -> honest
 
 
 def test_fu5_empty_context_is_honest(world):
     store, semantic = world
+    ref = fake_interpreter({"those": {
+        "mentions": ["those"], "references": {"those": "set"}}})
     result = ask.ask(store, "those", "person:test", T0,
-                     semantic=semantic, context=None)
+                     interpret_fn=ref, semantic=semantic,
+                     context=None)
     assert result["status"] == "clarify"
     assert "refer back" in str(result.get("answer", "")).lower() \
         or "refer back" in str(result.get("mention", "")).lower() \
@@ -325,11 +362,13 @@ def test_fu4_confirmed_followups_store_context_snapshot(world):
     first = ask.ask(store, "emr|dbo|ADT_EVENTS|ENCOUNTER_ID",
                     "person:test", T0, semantic=semantic)
     q = "show those again please"
-    interp = fake_interpreter({q: {"mentions": ["those"]}})
+    interp = fake_interpreter({q: {"mentions": ["those"],
+                                   "references": {"those": "set"}}})
     result = ask.ask(store, q, "person:test", T0,
                      interpret_fn=interp, semantic=semantic,
                      context=first["context_set"])
-    assert result["status"] == "confirm"
+    assert result["status"] == "answer"
+    assert result["pending_confirmation"]  # L7-D2: inline, non-blocking
     ask.confirm(store, q, result["interpretation"], "person:test",
                 T0, semantic=semantic, context=first["context_set"])
     # the ledger replays WITHOUT live context: the snapshot rides
@@ -355,6 +394,9 @@ def surface(world):
 
     def recording_interpreter(question):
         calls.append(question)
+        if question.strip().lower() == "it":
+            return {"mentions": ["it"],
+                    "references": {"it": "singular"}}
         return {"mentions": ["sepsis"]}
 
     handler = console.make_handler(store, "sepsis",
@@ -416,7 +458,7 @@ def test_gr5_path_tier_decorated_names_never_guess(world):
     store, _semantic = world
     read = ReadApi(store)
     index = ask.build_index(read)
-    kinds = ask._kind_vocabulary()
+    kinds = ask._earned_vocabulary(ReadApi(store))
     # semantic=None: if these fell past the deterministic tiers they
     # would come back unknown — the .sql decoration never demotes an
     # exact ask to the guessing tier (live find #8)

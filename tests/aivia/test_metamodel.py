@@ -40,10 +40,12 @@ def test_every_loaded_registry_is_ratified_v1():
     # 1.16.0 = the conversation surface (find #7 second leg);
     # 1.17.0 = the path tier + the report floor (finds #8/#9);
     # 1.18.0 = the center + three censuses (ADR 0080);
-    # 1.19.0 = Grounding_Thresholds (the 0080 build; cliffs die)
+    # 1.19.0 = Grounding_Thresholds (the 0080 build; cliffs die);
+    # 1.20.0 = the nine-law dig build (vocab tables die; shapes +
+    # ladder as data; kind self-descriptions)
     for reg in metamodel.load_all().values():
         assert reg.ratified is True
-        assert reg.version == "1.19.0"
+        assert reg.version == "1.20.0"
 
 
 def test_load_single_exposes_sheets_and_stamp():

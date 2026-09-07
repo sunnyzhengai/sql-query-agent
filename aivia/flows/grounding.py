@@ -13,7 +13,7 @@ import math
 import pathlib
 from typing import Any, Callable, Dict, List, Optional
 
-from aivia.lenses.ask_index import _fold, _words
+from aivia.lenses.ask_index import _fold, _tokens, _words
 
 # semantic-tier thresholds — REGISTRY DATA (ADR 0080 rider:
 # declared, tunable, and NEVER CLIFFS — below MATCH_SCORE yields
@@ -117,40 +117,27 @@ def _segments(text: str) -> List[str]:
     return out
 
 
-def _anaphor_vocabulary() -> Dict[str, str]:
-    """Word -> role, FROM THE REGISTRY (v1.15.0; Law 4): follow-up
-    words are meaning-as-data. Roles: singular | set | ordinal:N."""
-    from aivia.graph import metamodel
-    sheet = metamodel.load("lenses").sheets["Anaphor_Vocabulary"]
-    return {r["Word"].upper(): r["Role"] for r in sheet
-            if r["Word"] != "_ruling"}
-
-
 def ground(mention: str, index: List[Dict[str, Any]],
            kind_words: Dict[str, str],
            semantic: Optional[SemanticIndex],
-           context: Optional[List[Dict[str, Any]]] = None
-           ) -> Dict[str, Any]:
+           context: Optional[List[Dict[str, Any]]] = None,
+           role: Optional[str] = None) -> Dict[str, Any]:
     """One mention -> {tier, outcome, ...}. Outcomes: kind | matched |
     set | candidates (HITL) | clarify-context | unknown.
     Deterministic tiers never touch a model; the semantic tier
     reports scores and auto-grounds only on a clear margin —
-    otherwise the human picks."""
+    otherwise the human picks. `kind_words` is EARNED vocabulary +
+    the proposal's validated kind-marks (v1.20.0 — the mapping
+    table died); `role` is the Interpreter's reference-mark for
+    this mention (singular | set | ordinal:N) — the anaphor word
+    list died the same death (L4-D3)."""
     wanted = _fold(mention.strip())
-    # TIER 0 — the anaphor tier (Law 4, live find #7): follow-up
-    # words resolve against the previous answer's CONTEXT SET,
-    # deterministically. It fires only when the WHOLE mention is
-    # anaphor-shaped (anaphor + kind + glue words) — a sentence
-    # merely containing 'those' still goes to the interpreter, whose
-    # mention 'those' lands back here. Empty context is an honest
-    # clarify.
-    glue = {"THE", "A", "AN", "OF", "ONE", "ONES"}
-    words = [_fold(w) for w in mention.split()]
-    vocab = _anaphor_vocabulary()
-    roles = [vocab[w] for w in words if w in vocab]
-    covered = all(w in vocab or w in kind_words or w in glue
-                  for w in words)
-    if roles and covered:
+    # TIER 0 — the anaphor tier (Law 4 + L4-D3): the INTERPRETER
+    # marks reference-mentions; resolution against the context set
+    # stays fully deterministic. Empty context is an honest clarify.
+    if role is not None:
+        roles = [role]
+        words = [_fold(w) for w in mention.split()]
         if not context:
             return {"tier": "anaphor", "outcome": "clarify-context",
                     "mention": mention,
@@ -217,6 +204,27 @@ def ground(mention: str, index: List[Dict[str, Any]],
         if hits:
             return {"tier": "path", "outcome": "candidates",
                     "candidates": hits[:TOP_K], "mention": mention}
+    # TIER — NAME TOKENS (the dig's ratified walk: "ED Sepsis" ->
+    # the two files whose names carry both tokens, deterministically;
+    # scored by token coverage — |mention| / |name| — mechanical,
+    # never a model): word-grain with CamelCase split.
+    toks = _tokens(mention)
+    if toks:
+        hits = []
+        for e in index:
+            name_toks = _tokens(e["name"])
+            if name_toks and toks <= name_toks:
+                hits.append((round(len(toks) / len(name_toks), 4), e))
+        if hits:
+            hits.sort(key=lambda t: (-t[0], t[1]["identity"]))
+            scored = [{"score": sc, **e} for sc, e in hits[:TOP_K]]
+            ids = {(e["kind"], e["identity"]) for _, e in hits}
+            if len(ids) == 1:
+                return {"tier": "name-token", "outcome": "matched",
+                        "entity": scored[0], "mention": mention,
+                        "score": scored[0]["score"]}
+            return {"tier": "name-token", "outcome": "candidates",
+                    "candidates": scored, "mention": mention}
     if semantic is not None:
         t = thresholds()
         try:

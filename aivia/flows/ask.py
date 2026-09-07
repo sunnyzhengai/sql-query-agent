@@ -16,6 +16,11 @@ from aivia.lenses.ask_index import _fold
 
 DISPLAY_MODES = ("card", "lineage", "filters", "readers", "census")
 MAX_MENTIONS = 5
+# the closed kind list = the metamodel's searchable kinds (physics)
+# + 'metric' (the practiced/governed pair ruling)
+VALID_KINDS = ("file", "table", "column", "scope", "condition",
+               "derived column", "term", "drift", "parameter",
+               "metric", "kind")
 
 
 # ---- UNDERSTAND ------------------------------------------------------
@@ -33,10 +38,13 @@ def validate_interpretation(raw: Any) -> Optional[Dict[str, Any]]:
     if not clean or len(clean) > MAX_MENTIONS:
         return None
     out = {"mentions": clean[:MAX_MENTIONS]}
-    # ADR 0080 rider: the interpreter may PROPOSE expansions
-    # (acronyms, synonyms) per mention — extra SEARCH STRINGS only,
-    # never facts; the graph validates, the human confirms, the
-    # ledger remembers (KG3 terms)
+    # the proposal (nine-law dig): the Interpreter may also PROPOSE
+    # expansions (search strings), KIND-MARKS (word -> node type,
+    # validated against the closed metamodel list = physics),
+    # REFERENCE-ROLES (the anaphor word list died — L4-D3), and a
+    # DISPLAY HINT (preselects a view, visibly — L4-D4). All of it
+    # proposal, none of it action; confirmation is what makes any
+    # of it stick.
     raw_exp = raw.get("expansions")
     if isinstance(raw_exp, dict):
         exp = {}
@@ -48,6 +56,27 @@ def validate_interpretation(raw: Any) -> Optional[Dict[str, Any]]:
                     exp[m] = good
         if exp:
             out["expansions"] = exp
+    raw_kinds = raw.get("kinds")
+    if isinstance(raw_kinds, dict):
+        marks = {m: k for m, k in raw_kinds.items()
+                 if m in out["mentions"] and isinstance(k, str)
+                 and k in VALID_KINDS}
+        if marks:
+            out["kinds"] = marks
+    raw_refs = raw.get("references")
+    if isinstance(raw_refs, dict):
+        refs = {}
+        for m, r in raw_refs.items():
+            if m in out["mentions"] and isinstance(r, str) and (
+                    r in ("singular", "set")
+                    or (r.startswith("ordinal:")
+                        and r.split(":")[1].isdigit())):
+                refs[m] = r
+        if refs:
+            out["references"] = refs
+    hint = raw.get("hint")
+    if isinstance(hint, str) and hint in DISPLAY_MODES:
+        out["hint"] = hint
     return out
 
 
@@ -260,160 +289,225 @@ def render_kind_list(read, index, kind: str,
     return "\n".join(lines)
 
 
-# ---- CONNECT + SPEAK: execute a grounded interpretation --------------
+# ---- THE ONE ENGINE (L4-D1) ------------------------------------------
+# Every grounded mention is a SET of nodes; the engine CONNECTS the
+# sets; the DISPLAY SET is chosen by the user's own words (a named
+# kind is the answer shape). Nothing is ever classified — the old
+# branch dispatch died here (the dig's death warrant, executed).
+
+
+def _sets_from(groundings, index):
+    """grounding outcomes -> typed node-sets."""
+    sets = []
+    for g in groundings:
+        if g["outcome"] == "kind":
+            kind = g["kind"]
+            if kind == "metric":
+                members = [e for e in index if e["kind"] == "scope"
+                           and "::delivery" in e["identity"]]
+            elif kind == "kind":
+                members = [e for e in index if e["kind"] == "kind"]
+            else:
+                members = [e for e in index if e["kind"] == kind]
+            sets.append({"shape": "kindset", "kind": kind,
+                         "members": members, "g": g})
+        elif g["outcome"] == "matched":
+            sets.append({"shape": "one", "members": [g["entity"]],
+                         "g": g})
+        elif g["outcome"] == "set":
+            sets.append({"shape": "pool", "members": g["entities"],
+                         "g": g})
+        else:  # topic: an ungrounded mention riding an anchor
+            sets.append({"shape": "topic", "members": [],
+                         "text": " ".join(
+                             [g["mention"]]
+                             + g.get("expansions_tried", [])),
+                         "g": g})
+    # terms ARE vocabulary: beside a named kind, a matched term is
+    # the TOPIC (its name filters), never a graph anchor
+    if any(t["shape"] == "kindset" for t in sets):
+        for t in sets:
+            if t["shape"] == "one" \
+                    and t["members"][0].get("kind") == "term":
+                t["shape"] = "topic"
+                t["text"] = t["members"][0]["name"]
+                t["members"] = []
+    return sets
+
+
+def _connected(member, anchor_ids, adj):
+    """ONE connection test: a direct edge, or identity containment
+    (ownership chains are identity prefixes by construction)."""
+    nbrs = {n for n, _ in adj.get(member["identity"], [])}
+    mid = member["identity"]
+    owner = member.get("owner") or ""
+    for a in anchor_ids:
+        if (a in nbrs or mid.startswith(a) or a.startswith(mid)
+                or owner.startswith(a) or a.startswith(owner)
+                or mid.split("::")[0] in a
+                or a.split("::")[0] in mid):
+            return True
+    return False
+
+
+def _topic_filter(members, topic_text, kind, index, index_by_id,
+                  semantic):
+    """Connect a member-set to a TOPIC: word-grain name/speech
+    containment (whole tokens, CamelCase split) + semantic adds +
+    facet rollup with card provenance. Returns (by_name, by_meaning,
+    by_facet, facet_via, note)."""
+    want_tokens = ask_index._tokens(topic_text)
+
+    def tokens_of(e):
+        return ask_index._tokens(
+            f"{e['name']} {e.get('words') or ''}")
+    by_name = [e for e in members
+               if want_tokens and want_tokens <= tokens_of(e)]
+    named_ids = {e["identity"] for e in by_name}
+    by_meaning, facet_via, note = [], {}, ""
+    member_ids = {e["identity"] for e in members}
+    if semantic is not None:
+        floor = grounding.thresholds()["CANDIDATE_FLOOR"]
+        try:
+            for h in semantic.search(topic_text, top_k=40,
+                                     kind=None):
+                if h["identity"] in member_ids \
+                        and h["score"] >= grounding.MATCH_SCORE \
+                        and h["identity"] not in named_ids:
+                    by_meaning.append(h)
+            # facet rollup: a hit on a PART surfaces its owner in
+            # the member set, the card named (census 3)
+            for h in semantic.search(topic_text, top_k=60):
+                if h["score"] < floor or not h.get("owner"):
+                    continue
+                owner_id, hops = h["owner"], 0
+                while owner_id and hops < 4:
+                    owner = index_by_id.get(owner_id)
+                    if owner is None:
+                        break
+                    if owner["identity"] in member_ids:
+                        facet_via.setdefault(
+                            owner["identity"],
+                            f"{h['kind']}: "
+                            f"{(h.get('words') or h['name'])[:70]}"
+                            f" · {h['score']}")
+                        break
+                    owner_id = owner.get("owner")
+                    hops += 1
+        except Exception:  # noqa: BLE001 — seat-failure law
+            note = " [meaning tier unavailable — name matches only]"
+    seen = named_ids | {e["identity"] for e in by_meaning}
+    by_facet = [index_by_id[i] for i in facet_via
+                if i in index_by_id and i not in seen]
+    return by_name, by_meaning, by_facet, facet_via, note
+
+
 def execute(read, index, adj, groundings: List[Dict[str, Any]],
             semantic: Optional[grounding.SemanticIndex]):
-    """-> (text, listed_ids). listed_ids feed the next CONTEXT SET
-    (Law 4): every answer knows what it showed."""
+    """-> (text, listed_ids). ONE algorithm: sets -> connect ->
+    present; the display set is the user's own named shape."""
     index_by_id = {e["identity"]: e for e in index}
-    kinds = [g for g in groundings if g["outcome"] == "kind"]
-    entities = [g["entity"] for g in groundings
-                if g["outcome"] == "matched"]
-    sets = [g for g in groundings if g["outcome"] == "set"]
-    topics = [" ".join([g["mention"]]
-                       + g.get("expansions_tried", []))
-              for g in groundings
-              if g["outcome"] not in ("kind", "matched", "set")]
+    sets = _sets_from(groundings, index)
+    kindsets = [t for t in sets if t["shape"] == "kindset"]
+    ones = [t for t in sets if t["shape"] == "one"]
+    pools = [t for t in sets if t["shape"] == "pool"]
+    topics = [t for t in sets if t["shape"] == "topic"]
 
-    # Law 4: a SET anaphor — alone it lists; beside entities it
-    # FILTERS by connection (direct edge or containment prefix)
-    if sets:
-        members = []
+    # THE DISPLAY SET: the user's named kind wins; else a pool
+    # (anaphor); else the subject/path of the singletons
+    display = (kindsets[0] if kindsets
+               else pools[0] if pools
+               else None)
+
+    if display is not None:
+        members = display["members"]
         seen = set()
-        for g in sets:
-            for e in g["entities"]:
-                if e["identity"] not in seen:
-                    seen.add(e["identity"])
-                    members.append(e)
-        if kinds:
+        members = [m for m in members
+                   if not (m["identity"] in seen
+                           or seen.add(m["identity"]))]
+        kind_word = display.get("kind") or "item"
+        # ENTITY ANCHORS contribute BOTH connection candidates AND
+        # their names as topic text (the find-#5 truth and the
+        # ownership truth, one rule): buckets are disjoint in
+        # precedence order connected -> by name -> by meaning ->
+        # via parts; "connected" prints only when nonzero.
+        anchors = [t["members"][0] for t in ones]
+        pool = display["members"] if display["shape"] == "kindset" \
+            else members
+        connected = []
+        if anchors and (topics or display["shape"] == "kindset"):
+            anchor_ids = [a["identity"] for a in anchors]
+            connected = [m for m in members
+                         if _connected(m, anchor_ids, adj)]
+        elif anchors:
+            anchor_ids = [a["identity"] for a in anchors]
             members = [m for m in members
-                       if m["kind"] == kinds[0]["kind"]]
-        if entities:
-            anchors = [e["identity"] for e in entities]
-
-            def connected(m):
-                # connection = a direct edge, or identity containment
-                # (a scope belongs to its file by name_key prefix)
-                nbrs = {n for n, _ in adj.get(m["identity"], [])}
-                mid = m["identity"]
-                for a in anchors:
-                    if (a in nbrs or mid.startswith(a)
-                            or a.startswith(mid)
-                            or mid.split("::")[0] in a
-                            or a.split("::")[0] in mid):
-                        return True
-                return False
-            members = [m for m in members if connected(m)]
-        names = ", ".join(e["name"] for e in entities) or "the context"
-        lines = [f"{len(members)} of them"
-                 + (f" connect to {names}:" if entities else ":")]
-        lines += [f"- {_one_line(read, m['identity'], index_by_id)}"
-                  f"  ({m['identity']})" for m in members[:40]]
+                       if _connected(m, anchor_ids, adj)]
+        topic_texts = [t["text"] for t in topics] \
+            + [a["name"] for a in anchors
+               if display["shape"] == "kindset"]
+        facet_via, note = {}, ""
+        provenance = None
+        if topic_texts:
+            want_all = " ".join(topic_texts)
+            by_name, by_meaning, by_facet, fv, note = _topic_filter(
+                members, want_all, kind_word, index, index_by_id,
+                semantic)
+            facet_via.update(fv)
+            # bucket precedence for "about" evidence: NAME first
+            # (the find-#5 truth), structural connection as the
+            # remainder, then meaning, then parts
+            name_ids = {m["identity"] for m in by_name}
+            connected = [m for m in connected
+                         if m["identity"] not in name_ids]
+            members = by_name + connected + by_meaning + by_facet
+            provenance = (
+                f"({len(by_name)} by name, "
+                + (f"{len(connected)} more connected, "
+                   if connected else "")
+                + f"{len(by_meaning)} more by meaning, "
+                f"{len(by_facet)} via their parts)")
+        # PRESENT the display set
+        if display["shape"] == "pool":
+            names = ", ".join(a["name"] for a in anchors) \
+                or "the context"
+            lines = [f"{len(members)} of them"
+                     + (f" connect to {names}:" if anchors else ":")]
+            for m in members[:40]:
+                lines.append(
+                    f"- {_one_line(read, m['identity'], index_by_id)}"
+                    f"  ({m['identity']})")
+            if len(members) > 40:
+                lines.append(f"… and {len(members) - 40} more")
+            if not members:
+                lines.append("- (none)")
+            return ("\n".join(lines),
+                    [m["identity"] for m in members][:100])
+        if not topics and not anchors:
+            # the bare kind census — render_kind_list keeps its
+            # ruled forms (incl. the practiced/governed metric pair)
+            return (render_kind_list(read, index, display["kind"],
+                                     None),
+                    [e["identity"] for e in members][:100])
+        want = " · ".join(topic_texts) \
+            or " ".join(a["name"] for a in anchors)
+        header = (f"{len(members)} {kind_word}(s) about '{want}' "
+                  + (provenance or "(connected)") + f"{note}:")
+        lines = [header]
+        for m in members[:40]:
+            line = f"- {_one_line(read, m['identity'], index_by_id)}"
+            if m["identity"] in facet_via:
+                line += f"  — via {facet_via[m['identity']]}"
+            lines.append(line)
         if len(members) > 40:
             lines.append(f"… and {len(members) - 40} more")
         if not members:
-            lines.append("- (none)")
-        return "\n".join(lines), [m["identity"] for m in members]
+            lines.append("- (none — an honest zero, counted)")
+        return ("\n".join(lines),
+                [m["identity"] for m in members][:100])
 
-    # kind (+ optional topic): the filtered enumeration — the class
-    # of Sunny's live finds #2 and #4. Live find #5 (the missing 7
-    # sepsis reports): NAME CONTAINMENT is deterministic and runs
-    # over the ENTIRE kind first; the semantic tier ADDS meaning
-    # matches on top of it — never a truncated pool deciding the set,
-    # and the answer states which tier found what.
-    if kinds:
-        kind = kinds[0]["kind"]
-        topic_texts = topics + [e["name"] for e in entities]
-        if topic_texts:
-            want = " ".join(topic_texts)
-            # ADR 0080: WORD-GRAIN containment — topic tokens must be
-            # whole name/speech tokens ('ED' finds 'usp ed sepsis',
-            # never 'bed config'; the substring corpse dies)
-            want_tokens = ask_index._tokens(want)
-            if kind == "metric":
-                # the practiced metrics ARE the delivery selections;
-                # a topic filters them like any other kind (the
-                # metric exclusion died with ADR 0080)
-                kind_entries = [e for e in index
-                                if e["kind"] == "scope"
-                                and "::delivery" in e["identity"]]
-            else:
-                kind_entries = [e for e in index
-                                if e["kind"] == kind]
-
-            def tokens_of(e):
-                # word-grain with CamelCase split (ask_index._tokens
-                # — the fold family's home; ask.py stays regex-free
-                # per the LW-1 census): find #5's '28 by name' law
-                # survives the word-grain move
-                return ask_index._tokens(
-                    f"{e['name']} {e.get('words') or ''}")
-            by_name = [e for e in kind_entries
-                       if want_tokens
-                       and want_tokens <= tokens_of(e)]
-            named_ids = {e["identity"] for e in by_name}
-            by_meaning = []
-            meaning_note = ""
-            floor = grounding.thresholds()["CANDIDATE_FLOOR"]
-            facet_via: Dict[str, str] = {}
-            if semantic is not None:
-                try:
-                    for h in semantic.search(want, top_k=40,
-                                             kind=kind):
-                        if h["score"] >= grounding.MATCH_SCORE \
-                                and h["identity"] not in named_ids:
-                            by_meaning.append(h)
-                    # FACET ROLLUP (census 3): a hit on a node's
-                    # PART (condition, scope, column) surfaces the
-                    # owning {kind} with the facet NAMED — scores
-                    # roll UP the tree, provenance kept, the blend
-                    # is dead
-                    for h in semantic.search(want, top_k=60):
-                        if h["score"] < floor or not h.get("owner"):
-                            continue
-                        owner_id, hops = h["owner"], 0
-                        while owner_id and hops < 4:
-                            owner = index_by_id.get(owner_id)
-                            if owner is None:
-                                break
-                            if owner["kind"] == kind or (
-                                    kind == "metric"
-                                    and owner["kind"] == "scope"):
-                                facet_via.setdefault(
-                                    owner["identity"],
-                                    f"{h['kind']}: "
-                                    f"{(h.get('words') or h['name'])[:70]}"
-                                    f" · {h['score']}")
-                                break
-                            owner_id = owner.get("owner")
-                            hops += 1
-                except Exception:  # noqa: BLE001 — seat-failure law:
-                    meaning_note = (" [meaning tier unavailable — "
-                                    "name matches only]")
-            seen_ids = named_ids | {e["identity"] for e in by_meaning}
-            by_facet = [index_by_id[i] for i in facet_via
-                        if i in index_by_id and i not in seen_ids]
-            matched = by_name + by_meaning + by_facet
-            header = (f"{len(matched)} {kind}(s) about '{want}' "
-                      f"({len(by_name)} by name, {len(by_meaning)} "
-                      f"more by meaning, {len(by_facet)} via their "
-                      f"parts){meaning_note}:")
-            lines = [header]
-            for e in matched[:40]:
-                line = f"- {_one_line(read, e['identity'], index_by_id)}"
-                if e["identity"] in facet_via:
-                    line += f"  — via {facet_via[e['identity']]}"
-                lines.append(line)
-            if len(matched) > 40:
-                lines.append(f"… and {len(matched) - 40} more")
-            if not matched:
-                lines.append("- (none — an honest zero, counted)")
-            return ("\n".join(lines),
-                    [e["identity"] for e in matched][:100])
-        return (render_kind_list(read, index, kind, None),
-                [e["identity"] for e in index
-                 if e["kind"] == kind][:100])
-
+    # no display set: singletons connect as a PATH, or one speaks
+    entities = [t["members"][0] for t in ones]
     if len(entities) >= 2:
         weights = connect.edge_weights()
         lines = []
@@ -435,7 +529,6 @@ def execute(read, index, adj, groundings: List[Dict[str, Any]],
                 if node not in listed:
                     listed.append(node)
         return "\n".join(lines), listed[:100]
-
     if len(entities) == 1:
         entity = entities[0]
         card = render_card(read, entity)
@@ -450,9 +543,41 @@ def execute(read, index, adj, groundings: List[Dict[str, Any]],
             listed += [m for m in members if m not in listed]
         return (card + ("\n\nConnected:\n" + "\n".join(extra)
                         if extra else ""), listed[:100])
-
     return ("Nothing grounded — the graph carries none of these "
             "names or meanings."), []
+
+
+_SHAPES: Dict[str, float] = {}
+
+
+def response_shapes() -> Dict[str, float]:
+    """L3-D1/L5-D1 margins as registry data."""
+    if not _SHAPES:
+        from aivia.graph import metamodel
+        for r in metamodel.load("lenses").sheets["Response_Shapes"]:
+            if r["Name"] != "_ruling":
+                _SHAPES[r["Name"]] = float(r["Value"])
+    return _SHAPES
+
+
+def _provisional(g: Dict[str, Any]) -> Dict[str, Any]:
+    """L3-D1: a candidates outcome with a CLEAR winner becomes a
+    PROVISIONAL match — the assumption disclosed, runners-up kept.
+    A disclosed, reversible assumption is not a guess."""
+    if g.get("outcome") != "candidates":
+        return g
+    cands = g.get("candidates") or []
+    if len(cands) < 1 or "score" not in cands[0]:
+        return g
+    margin = response_shapes()["PROVISIONAL_MARGIN"]
+    if len(cands) == 1 or (cands[0]["score"]
+                           - cands[1]["score"]) >= margin:
+        return {"tier": g.get("tier"), "outcome": "matched",
+                "entity": cands[0], "mention": g["mention"],
+                "score": cands[0]["score"], "provisional": True,
+                "runners_up": cands[1:4],
+                "expansions_tried": g.get("expansions_tried", [])}
+    return g
 
 
 def _trace(groundings: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
@@ -487,7 +612,7 @@ def ask(store, question: str, author: str, occurred_at: str,
     from aivia.graph.read_api import ReadApi
     read = ReadApi(store)
     index = build_index(read)
-    kind_words = _kind_vocabulary()
+    kind_words = _earned_vocabulary(read)
     adj = connect.build_adjacency(read)
     q = " ".join(question.split())
     index_by_id = {e["identity"]: e for e in index}
@@ -512,8 +637,9 @@ def ask(store, question: str, author: str, occurred_at: str,
 
     # deterministic pre-tier: the WHOLE question as one mention —
     # bare-name and pure-anaphor asks never touch a model (GR-1, FU)
-    whole = grounding.ground(q, index, kind_words, None,
-                             context=context_entities)
+    whole = _provisional(
+        grounding.ground(q, index, kind_words, None,
+                         context=context_entities))
     if whole["outcome"] in ("matched", "kind", "set"):
         answer, listed = execute(read, index, adj, [whole], semantic)
         about = (whole["entity"]["identity"]
@@ -570,8 +696,16 @@ def ask(store, question: str, author: str, occurred_at: str,
         via = "model"
 
     def _ground_with_vocab(m):
+        # the proposal's kind-mark grounds the mention as a KIND
+        # (validated against the closed list; the mapping table
+        # died — the LLM proposes, the graph's physics validates)
+        mark = (interpretation.get("kinds") or {}).get(m)
+        if mark:
+            return {"tier": "proposed-kind", "outcome": "kind",
+                    "kind": mark, "mention": m}
+        role = (interpretation.get("references") or {}).get(m)
         g = grounding.ground(m, index, kind_words, semantic,
-                             context=context_entities)
+                             context=context_entities, role=role)
         tried = []
         rank = {"matched": 3, "kind": 3, "set": 3, "candidates": 2}
         if g["outcome"] in ("unknown", "candidates"):
@@ -598,7 +732,7 @@ def ask(store, question: str, author: str, occurred_at: str,
             g["expansions_tried"] = tried
         return g
 
-    groundings = [_ground_with_vocab(m)
+    groundings = [_provisional(_ground_with_vocab(m))
                   for m in interpretation["mentions"]]
     anchored = any(g["outcome"] in ("kind", "matched", "set")
                    for g in groundings)
@@ -634,11 +768,25 @@ def ask(store, question: str, author: str, occurred_at: str,
                     "trace": _trace(groundings)}
 
     if via == "model":
-        # fresh model interpretation: the human confirms before it
-        # enters the ledger (plan -> confirm -> execute -> display)
-        _usage("ambiguous")
-        return {"status": "confirm", "interpretation": interpretation,
-                "groundings": groundings,
+        # L7-D2 INLINE CONFIRMATION: every mention grounded -> the
+        # provisional answer SHIPS with the confirm attached
+        # (non-blocking); the interpretation enters the ledger only
+        # when the human clicks. Blocking confirms died with the
+        # dispatch — the engine is never "stuck" once all mentions
+        # ground.
+        answer, listed = execute(read, index, adj, groundings,
+                                 semantic)
+        about = None
+        matched = [g for g in groundings
+                   if g["outcome"] == "matched"]
+        if len(matched) == 1:
+            about = matched[0]["entity"]["identity"]
+        _usage("matched", about)
+        return {"status": "answer", "answer": answer,
+                "groundings": groundings, "via": via,
+                "pending_confirmation": True,
+                "interpretation": interpretation,
+                "context_set": _context_set(groundings, listed),
                 "trace": _trace(groundings)}
 
     answer, listed = execute(read, index, adj, groundings, semantic)
@@ -679,10 +827,15 @@ def confirm(store, question: str, interpretation: Dict[str, Any],
     return result
 
 
-def _kind_vocabulary() -> Dict[str, str]:
-    """Word -> kind, FROM THE REGISTRY (v1.10.0): vocabulary is
-    meaning and lands as ruled data, never code."""
-    from aivia.graph import metamodel
-    sheet = metamodel.load("lenses").sheets["Kind_Vocabulary"]
-    return {row["Word"].upper(): row["Kind"] for row in sheet
-            if row["Word"] != "_ruling"}
+def _earned_vocabulary(read) -> Dict[str, str]:
+    """Word -> kind, EARNED (v1.20.0 — the mapping table died):
+    confirmed kind-mappings live as KG3 terms with parent
+    'kind::<K>'. The LLM proposed, the human confirmed, the ledger
+    remembers — deterministic forever after."""
+    out: Dict[str, str] = {}
+    for n in read.nodes("term"):
+        parent = n.properties.get("parent") or ""
+        if parent.startswith("kind::"):
+            out[_fold(n.properties.get("name", ""))] = \
+                parent.removeprefix("kind::")
+    return out

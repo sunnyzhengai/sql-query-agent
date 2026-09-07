@@ -105,12 +105,14 @@ def speak(read, entry: Dict[str, Any]) -> str:
     if kind == "drift":
         return f"{_words(entry['name'])}. {DRIFT_SENTENCE}"
     if kind == "kind":
-        vocab = metamodel.load("lenses").sheets["Kind_Vocabulary"]
-        words = sorted({r["Word"].lower() for r in vocab
-                        if r["Word"] != "_ruling"
-                        and r["Kind"] == entry["name"]})
-        return (f"the {entry['name']} kind of node: "
-                + ", ".join(words))
+        # self-description (v1.20.0, the dig): the graph describes
+        # its own types in prose — cold-start grounding for type
+        # words, never a mapping table
+        sheet = metamodel.load("lenses").sheets["Speech_Sources"]
+        row = next((r for r in sheet
+                    if r["Kind"] == f"_self {entry['name']}"), None)
+        return (row["Speech"].lower() if row else
+                f"the {entry['name']} kind of node")
     return ""
 
 
@@ -152,13 +154,10 @@ def entries(read) -> List[Dict[str, Any]]:
         for p in tree.get("parameters", []):
             add("parameter", f"{key}::param/{p['name']}",
                 p["name"], key)
-    for kind_name in sorted({r["Kind"] for r in
-                             metamodel.load("lenses")
-                             .sheets["Kind_Vocabulary"]
-                             if r["Kind"] != "-"
-                             and r["Word"] != "_ruling"}):
-        if kind_name == "metric":
-            continue  # the practiced/governed pair, not a node kind
-        add("kind", f"kind::{kind_name}", kind_name, None)
+    sheet = metamodel.load("lenses").sheets["Speech_Sources"]
+    for row in sheet:
+        if row["Kind"].startswith("_self "):
+            add("kind", f"kind::{row['Kind'][6:]}",
+                row["Kind"][6:], None)
     return [e for e in out if e["words"] or e["kind"] not in
             ("condition",)]  # empty conditions never index
