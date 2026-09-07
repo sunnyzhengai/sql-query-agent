@@ -452,10 +452,40 @@ confirmed.
 the PROPOSER half is dark (the prompt never invites expansions —
 the unbuilt-build lesson, instance one).
 
-**Dig questions.** Confirmation fatigue — when does asking become
-noise? Do confirmations generalize (confirming "ED"="emergency
-department" once: does it apply estate-wide, per-user, per-team)?
-Who may revoke?
+**Dig outcomes (2026-09-07, Sunny's Law-7 pass — all ruled). The
+dug law: THE SYSTEM'S ENTIRE EDUCATION IS A LEDGER OF HUMAN ACTS —
+personal first, promoted by use, anchored to meaning, revocable
+with eyes open — and it never grades its own homework.**
+
+► RULED (D1): THE SCOPE LADDER. Every confirmation lands PERSONAL
+first (the user's tree; zero friction, zero blast radius). Usage
+aggregates into PROMOTION CANDIDATES (N users confirm the same
+mapping -> the steward's queue, usage-weighted). STEWARD BLESSING
+makes it estate-shared. Two tiers now; team scoping can slot later
+without changing the law. Nothing is born shared.
+
+► RULED (D2): INLINE BY DEFAULT. Confirmation blocks only when the
+engine is genuinely stuck (close cluster); otherwise the
+provisional answer ships WITH "I read it as X — confirm/correct"
+attached. USING AN ANSWER IS NOT CONFIRMING IT: clicks are
+affinity evidence (promotion candidacy), never silent blessing —
+consent is a click on the confirm, nothing softer.
+
+► RULED (D3): REVOCATION. Personal blessings: the user revokes;
+estate-shared: the steward. Revocation = a superseding EVENT,
+never deletion. Past answers STAND (they cite their basis); future
+asks stop using the mapping immediately; dependent ledger entries
+flag stale and re-interpret on next use. The BLAST RADIUS shows at
+revoke time ("affects 12 remembered questions") — no blind
+revokes.
+
+► RULED (D4): BLESSINGS ANCHOR TO MEANING IDENTITY (content keys —
+the Phase-D law applied to the ledger). Time never expires a
+blessing; a TRUTH CHANGE orphans it visibly and invites
+re-confirmation. And the sharpest edge: TELEMETRY PROPOSES, THE
+SYSTEM NEVER SELF-MODIFIES — the clarify-miss counter may put
+"floor 0.22?" in front of the admin; the registry change is a
+human act, always. Auto-tuning is drift wearing a dashboard.
 
 ## Law 8 — Consistency is part of honesty
 
