@@ -115,7 +115,7 @@ ARCHITECTURE_COMPONENTS = {
         # component — one system-model file, organized by the Sphere,
         # every section carrying a build status.
         "doc": "docs/architecture/ARCHITECTURE.md",
-        "current_through": "0071",
+        "current_through": "0078",
         "title": "The system model — the Sphere",
         # all six groups since ADR 0071 (user_flow absorbed): the one
         # system-model file legitimately spans the constitution.
@@ -739,6 +739,21 @@ TRACE_REGISTRY = {
                   "tests/test_term_hygiene.py", "tests/test_admin_graph.py",
                   "tests/test_companion.py"],
         "docs": ["docs/architecture/SPEC.md", "docs/architecture/TRACE_MAP.md"],
+    },
+    "0078": {
+        # ACCEPTED 2026-09-06: the ask-the-graph console — free
+        # questions, typed paths (Group E), self-answering nodes
+        # (ADR 0077 makes answer shapes unnecessary); H5 usage on
+        # every ask; NOT the deferred inward flow.
+        "title": "The ask-the-graph console: free questions, typed "
+                 "paths, self-answering nodes",
+        "category": "architecture",
+        "component": "architecture",
+        "axioms": [],
+        "modules": ["aivia/lenses/ask_index.py", "aivia/flows/ask.py",
+                    "aivia/console.py"],
+        "tests": ["tests/aivia/test_ask_console.py"],
+        "docs": ["docs/decisions/0078-ask-the-graph-console.md"],
     },
     "0077": {
         # ACCEPTED 2026-09-06: the twin-graph KG — meaning becomes a

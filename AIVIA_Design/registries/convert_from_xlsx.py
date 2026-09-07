@@ -84,12 +84,16 @@ SOURCES = {
 # UNDERLYING KG1 column, recomputed each run — drift-safe), derived-
 # member binding, folded alias + self-qualifier registration. Twin
 # gaps hit ZERO; ambiguous 1,275 -> 37; unbound 541 -> 32.
-STAMP_VERSION = "1.7.0"
+# v1.8.0 (2026-09-06): the ASK-THE-GRAPH CONSOLE (ADR 0078) —
+# Ask_Console sheet: the closed op set as law (Group E's enumerable
+# path space); the ask-index reading joins the catalog; the console
+# is the usage ledger's single writer (H5).
+STAMP_VERSION = "1.8.0"
 RATIFIED = True
 DOC_STAMP = ("v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 twin-graph "
              "ruling ADR 0077; v1.2.0 Phase A metamodel bump; v1.3.0 "
              "Phase B composite-kinds correction; v1.4.0 T-2 "
-             "operational-statements ruling; v1.5.0 the gap taxonomy; v1.6.0 the plug-all-holes sweep; v1.7.0 ledger close "
+             "operational-statements ruling; v1.5.0 the gap taxonomy; v1.6.0 the plug-all-holes sweep; v1.7.0 ledger close; v1.8.0 the ask console ADR 0078 "
              "(all 2026-09-06)")
 CONVERTED_ON = "2026-09-05"
 
@@ -651,6 +655,36 @@ TWIN_SHEETS = {
              "iff its yield is ABOUT the graph for one consumer — status, "
              "aggregation, comparison — never meaning itself; the "
              "translator absorbed everything secretly computing meaning"},
+        ],
+        "Ask_Console": [
+            {"Item": "_ruling", "Definition": "ADR 0078 (2026-09-06): "
+             "the ask-the-graph console — free questions, TYPED paths "
+             "(Group E: the path space is data, enumerable, "
+             "replayable), self-answering nodes (ADR 0077: translation "
+             "total -> no answer shapes). NOT the deferred inward "
+             "flow: no data-question matching, no generation, no open "
+             "chat (tier lock). The op set below is CLOSED: adding an "
+             "op is a ruling, never a code default."},
+            {"Item": "op: lookup", "Definition": "the entity's card — "
+             "steward words / floor text, kind, identity, anchors"},
+            {"Item": "op: lineage", "Definition": "what reads it, what "
+             "it reads — traversal over resolves_to + draws_from"},
+            {"Item": "op: filters_on", "Definition": "every condition "
+             "citing the column, voiced by the grammar"},
+            {"Item": "op: who_reads", "Definition": "scopes + files "
+             "reading the entity (usage events join when present)"},
+            {"Item": "op: define", "Definition": "terms and their "
+             "definitions; concepts via their accepted terms"},
+            {"Item": "op: gaps", "Definition": "the taxonomy census "
+             "for the entity or the estate — drift findable by name"},
+            {"Item": "outcomes", "Definition": "matched | ambiguous "
+             "(candidates listed, human picks) | no-match (plain, "
+             "counted, nearest names offered) — H5 usage event on "
+             "every ask, about only on match, payload post phi-gate"},
+            {"Item": "parse seat", "Definition": "deterministic "
+             "keyword grammar ships v1; an LLM parse hook may map "
+             "text -> (op, entity) VALIDATED against the closed set — "
+             "parse, never generate (axm:M5)"},
         ],
         "Reclassification_2026_09_06": [
             {"Entry": "decisions(class)", "Class": "RETIRED — subsumed by "

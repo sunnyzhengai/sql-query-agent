@@ -1024,3 +1024,16 @@ Two citation handles, because the axiom systems are distinct and their group let
 - **Summarized in:**
   - `docs/decisions/0077-twin-graph-kg.md`
   - `docs/architecture/SPEC.md`
+
+## ADR 0078 — The ask-the-graph console: free questions, typed paths, self-answering nodes
+
+- **Category:** architecture
+- **Component:** `architecture` → `docs/architecture/ARCHITECTURE.md` → axm:D, axm:S, axm:J, axm:M, axm:B, axm:R
+- **Implemented by:**
+  - `aivia/lenses/ask_index.py`
+  - `aivia/flows/ask.py`
+  - `aivia/console.py`
+- **Enforced by:**
+  - `tests/aivia/test_ask_console.py`
+- **Summarized in:**
+  - `docs/decisions/0078-ask-the-graph-console.md`

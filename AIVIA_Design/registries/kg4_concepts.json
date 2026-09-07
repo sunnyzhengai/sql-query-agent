@@ -1,9 +1,9 @@
 {
  "registry": "kg4_concepts",
  "stamp": {
-  "version": "1.7.0",
+  "version": "1.8.0",
   "doc_section": "Level 1 / KG Layer 4 — concept layer",
-  "doc_stamp": "v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 twin-graph ruling ADR 0077; v1.2.0 Phase A metamodel bump; v1.3.0 Phase B composite-kinds correction; v1.4.0 T-2 operational-statements ruling; v1.5.0 the gap taxonomy; v1.6.0 the plug-all-holes sweep; v1.7.0 ledger close (all 2026-09-06)",
+  "doc_stamp": "v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 twin-graph ruling ADR 0077; v1.2.0 Phase A metamodel bump; v1.3.0 Phase B composite-kinds correction; v1.4.0 T-2 operational-statements ruling; v1.5.0 the gap taxonomy; v1.6.0 the plug-all-holes sweep; v1.7.0 ledger close; v1.8.0 the ask console ADR 0078 (all 2026-09-06)",
   "ratified": true,
   "converted_on": "2026-09-05",
   "converted_from": "L1_KG4_Concept_Layer_Registry_DRAFT.xlsx"

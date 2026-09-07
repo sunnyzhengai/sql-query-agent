@@ -88,6 +88,13 @@ def load_snapshot(snap_dir) -> ExtractSnapshot:
         values=rows("values.csv"))
 
 
+def new_store() -> Store:
+    """The store is born HERE — a lifecycle module — so surfaces
+    (the console) never touch store primitives (the writer plank);
+    every write they cause flows through lifecycle APIs."""
+    return Store()
+
+
 def apply_registration(store: Store, reg: Dict[str, Any]) -> None:
     """Mint the db node and its layer-3 dba responsibility from the
     DBA-completed prerequisite — BEFORE any intake (A1 refined)."""

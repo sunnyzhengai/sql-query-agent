@@ -1,0 +1,120 @@
+{
+ "_comment": "Ask-console answer keys (ADR 0078), authored BEFORE the build. Families: index (totality + drift-by-name), outcomes (matched/ambiguous/no-match + H5 usage), ops (each closed op over the sepsis corpus). Runnable via tests/aivia/test_ask_console.py.",
+ "index": [
+  {
+   "id": "IX-1",
+   "title": "every KG1 column is findable",
+   "expected": [
+    "index entries >= KG1 column count; every column identity present"
+   ]
+  },
+  {
+   "id": "IX-2",
+   "title": "drift names findable (the search law); key corrected at build: DATE_STAMP is BOTH computed (derived member) and drift — ambiguity lists the whole story, the drift identity yields the finding",
+   "expected": [
+    "'DATE_STAMP' -> ambiguous with drift AND derived-column candidates",
+    "picking the drift identity -> the reader/writer drift finding, never silence"
+   ]
+  },
+  {
+   "id": "IX-3",
+   "title": "named scopes findable; CROSS-FILE same-name scopes are honestly ambiguous, resolvable by full identity (key corrected at build: #Base_Pop_ED_Readmit lives in TWO files)",
+   "expected": [
+    "'#Base_Pop_ED_Readmit' -> AMBIGUOUS with both files' scopes as candidates",
+    "the full identity 'reporting/USP_ED_SEPSIS.sql::#Base_Pop_ED_Readmit' -> matched",
+    "'USP_ED_SEPSIS' file -> matched"
+   ]
+  }
+ ],
+ "outcomes": [
+  {
+   "id": "OC-1",
+   "title": "matched -> answer + usage event with about",
+   "question": "what is THERA_CLASS_CODE",
+   "expected": [
+    "outcome matched",
+    "usage event action=asked outcome=matched with about set",
+    "answer text contains steward words, no raw-identifier-only response"
+   ]
+  },
+  {
+   "id": "OC-2",
+   "title": "ambiguous -> candidates, human picks",
+   "question": "what is TIME_LINE",
+   "expected": [
+    "outcome ambiguous (TIME_LINE is a DERIVED COLUMN defined in several scopes; derived columns joined the index at build)",
+    "candidates listed with kinds",
+    "usage event has NO about (H5)"
+   ]
+  },
+  {
+   "id": "OC-3",
+   "title": "no-match -> honest, counted, nearest offered",
+   "question": "what is FLUX_CAPACITOR_ID",
+   "expected": [
+    "outcome no-match",
+    "usage event outcome=no-match, no about",
+    "payload is phi-gated question text"
+   ]
+  },
+  {
+   "id": "OC-4",
+   "title": "replay determinism (Group E)",
+   "question": "lineage of ED_ENCOUNTERS_DM",
+   "expected": [
+    "same question twice -> byte-identical rendered answer"
+   ]
+  }
+ ],
+ "ops": [
+  {
+   "id": "OP-1",
+   "op": "lookup",
+   "question": "what is reporting.IP_SEPSIS",
+   "expected": [
+    "the table's description words",
+    "kind table"
+   ]
+  },
+  {
+   "id": "OP-2",
+   "op": "filters_on",
+   "question": "filters on THERA_CLASS_CODE",
+   "expected": [
+    "the antibiotics filter voiced through the DICTIONARY words (key corrected at build: the demo dictionary describes THERA_CLASS_CODE, so R5 renders its words, not the readable-name fallback): '... is 11 (annotated 'Antibiotics' in the source)'"
+   ]
+  },
+  {
+   "id": "OP-3",
+   "op": "lineage",
+   "question": "lineage of ED_ENCOUNTERS_DM",
+   "expected": [
+    "scopes reading the table listed (the readmit scope among them)"
+   ]
+  },
+  {
+   "id": "OP-4",
+   "op": "who_reads",
+   "question": "who reads PATIENTS",
+   "expected": [
+    "files reading it listed; empty usage honestly stated"
+   ]
+  },
+  {
+   "id": "OP-5",
+   "op": "gaps",
+   "question": "gaps",
+   "expected": [
+    "the taxonomy rollup: ruled-silent / engine / estate + drift count"
+   ]
+  },
+  {
+   "id": "OP-6",
+   "op": "lookup",
+   "question": "what is reporting/USP_ED_SEPSIS.sql::#Base_Pop_ED_Readmit",
+   "expected": [
+    "the scope's FLOOR text: composition sentence + both bullets — the node answers for itself, no answer shape"
+   ]
+  }
+ ]
+}
