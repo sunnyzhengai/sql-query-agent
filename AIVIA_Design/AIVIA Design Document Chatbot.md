@@ -305,9 +305,44 @@ the graph's matches decide; the human ratifies.
 combination cases). Both named for death in the 0080 diagnosis;
 the dispatch survived the build (the unbuilt-build lesson).
 
-**Dig questions.** What replaces the dispatch concretely — one
-set-filter-connect engine? What is the bootstrap experience before
-any vocabulary has been confirmed (day-one cold start)?
+**Dig outcomes (2026-09-07, Sunny's Law-4 pass — all ruled). The
+dug law: THE SYSTEM BRINGS SETS AND CONNECTIONS; THE USER'S OWN
+WORDS BRING THE SHAPE.**
+
+► RULED (D1): THE ONE ENGINE — the dispatch's death warrant. Every
+grounded mention is a SET of nodes (entity=singleton, kind=all of
+type, anaphor=context pool, topic=scored matches). The engine does
+ONE thing: CONNECT THE SETS — keep elements linking to the other
+sets by edges, ownership chains, or short paths (two singletons ->
+the path IS the answer; big set + singleton -> connected members;
+big set + scored set -> connected members ranked). THE DISPLAY SET
+IS CHOSEN BY THE USER'S OWN WORDS: a named kind is the answer
+shape ("business logic in ED Sepsis" -> the conditions, because
+the user said so); no kind named -> the subject's neighborhood or
+the path. Nothing is ever classified. execute()'s branches die
+into this at build.
+
+► RULED (D2): THE COLD START — the system is allowed to be young.
+Day one: exact tiers work; the graph's SELF-DESCRIPTION (kind
+nodes speaking metamodel definitions = physics, legitimately
+shipped) grounds type words via Interpreter proposal + confirm;
+every confirm is flywheel capital. Week one asks more questions —
+that is the feature (learning the org's dialect), never a defect.
+No shipped vocabulary.
+
+► RULED (D3): THE ANAPHOR TABLE DIES THE SAME DEATH. The
+Interpreter marks reference-roles in its proposal; resolution
+against the context set stays fully deterministic; confirmed
+reference-words accrete like all vocabulary. Day-one "those" costs
+one model call + confirm; free thereafter. Seat-down floor:
+clicking the Referenced links.
+
+► RULED (D4): VIEWS ARE NOT INTENTS. Display modes are VIEWS of a
+thing (chart types), never types of question — the user presses,
+the hint may PRESELECT visibly. Intent enumeration decides what a
+question MEANS (banned); a view decides how to LOOK at the answer
+the user already chose (STEER). The view set is closed product
+surface, changed only by ruling.
 
 ## Law 5 — What was shown becomes addressable
 
