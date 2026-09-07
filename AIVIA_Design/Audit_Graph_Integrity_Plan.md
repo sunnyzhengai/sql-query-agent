@@ -64,8 +64,8 @@ L0): every standing integrity equation, its home, its test — so
 6. searchability census (searchable ⊎ silent == speakers) — ADR 0080
 7. **connection census (birth-edged ⊎ counted ⊎ rooted == total)** — NEW, replaces reachability
 8. verbatim census (index words == recomputed speech) — center law
-9. literal census (every literal collection classified; no vocabulary/ruling class) — Literal_Law_PLAN
-10. mirror-checks (code copies == registry sheets) — Literal_Law_PLAN
+9. literal census (every literal collection classified; no vocabulary/ruling class) — Audit_Literal_Law_Plan
+10. mirror-checks (code copies == registry sheets) — Audit_Literal_Law_Plan
 11. the claims ledger (ruling clauses == evidence at every build) — process
 12. metamodel/fixture validators + shakedown suites — standing
 
@@ -92,14 +92,14 @@ conjures; per kind produce one verdict row:
   vocab term cites nothing); persons = missing kind; descriptions/
   dispositions = anchored-but-unwalkable (anchors are strings the
   adjacency ignores).
-- Output: **Graph_Integrity_Review.md** — the classified table =
+- Output: **Audit_Graph_Integrity_Review.md** — the classified table =
   the draft Connection Ledger, one verdict per row for Sunny.
 
 ## 5. Sequence (step discipline: each step's test suite shown first)
 
 1. This plan → Sunny ratifies/amends (incl. the battery catalog's
    placement in the design doc).
-2. The initial review runs (read-only) → Graph_Integrity_Review.md
+2. The initial review runs (read-only) → Audit_Graph_Integrity_Review.md
    → Sunny rules on every ledger row.
 3. BUILD, in Sunny-sized steps, each with its TEST SUITE designed
    and shown BEFORE code: (a) census-family test upgrade

@@ -1,7 +1,7 @@
 # The Literal Census Review — the complete offense inventory
 
 *(2026-09-07, read-only review per Sunny's order; method in
-Literal_Law_PLAN.md. Scope: aivia/ (163 scanner hits) + hand review
+Audit_Literal_Law_Plan.md. Scope: aivia/ (163 scanner hits) + hand review
 of prose the scanner cannot see. Verdicts: **OFFENSE** (banned
 class — must move to registry/graph), **MIRROR** (stays in code,
 gains citation + a mirror-check test asserting equality with its

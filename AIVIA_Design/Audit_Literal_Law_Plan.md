@@ -4,7 +4,7 @@
 no pre-built lists/tuples… make the process ironclad… then a
 complete code review." This document is the plan and the review's
 method. NO CODE until Sunny ratifies the plan and orders the build.
-Companion: Literal_Census_Review.md — the review's findings.)*
+Companion: Audit_Literal_Census_Review.md — the review's findings.)*
 
 ## 1. The law (for ratification)
 
@@ -80,13 +80,13 @@ code-declared rulings, no prompt-buried vocabularies.
 - Prompts and long prose strings reviewed by hand (the scanner is
   blind to them) — the interpreter prompt is already a known
   offense (kind enumeration + synonym hints in prose).
-- Output: Literal_Census_Review.md — the full inventory with
+- Output: Audit_Literal_Census_Review.md — the full inventory with
   verdicts; the offense list is the sweep's worklist.
 
 ## 4. The sequence (nothing starts without its GO)
 
 1. ~~Plan~~ (this document) → Sunny ratifies/amends the law.
-2. ~~Review~~ (Literal_Census_Review.md) → Sunny reads the verdicts,
+2. ~~Review~~ (Audit_Literal_Census_Review.md) → Sunny reads the verdicts,
    overrules any classification.
 3. BUILD (one phase, claims-ledger discipline): ADR for the law;
    registry gains the sheets the offenses move into (ruled-isolated
