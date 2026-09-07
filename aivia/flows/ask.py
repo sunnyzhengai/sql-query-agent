@@ -463,8 +463,6 @@ def execute(read, index, adj, groundings: List[Dict[str, Any]],
         # precedence order connected -> by name -> by meaning ->
         # via parts; "connected" prints only when nonzero.
         anchors = [t["members"][0] for t in ones]
-        pool = display["members"] if display["shape"] == "kindset" \
-            else members
         connected = []
         if anchors and (topics or display["shape"] == "kindset"):
             anchor_ids = [a["identity"] for a in anchors]
