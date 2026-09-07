@@ -166,3 +166,24 @@ def test_name_level_read_op_aggregates(store):
     assert events[-1].properties.get("about") is None  # spans many
     lookup = _ask(store, "what is MEDICATION_ID")
     assert lookup["outcome"] == "ambiguous"  # identity matters here
+
+
+def test_list_op_browse_questions(store):
+    """Sunny's live ask #2 (2026-09-06): 'what metrics are there' hit
+    no-match — browse questions are not lookups. The list op
+    enumerates kinds; 'metrics' answers HONESTLY (none until a human
+    mints one) and offers the nearest real kinds."""
+    result = _ask(store, "what metrics are there")
+    assert result["op"] == "list" and result["outcome"] == "matched"
+    assert "No minted metrics or concepts exist yet" in \
+        result["answer"]
+    assert "a human touch mints" in result["answer"].lower() or \
+        "HUMAN blesses" in result["answer"]
+    assert "procedures" in result["answer"]
+    tables = _ask(store, "list tables")
+    assert tables["outcome"] == "matched"
+    assert tables["answer"].startswith("90 tables:")
+    procs = _ask(store, "what procedures are there")
+    assert "28 procedures" in procs["answer"]
+    cols = _ask(store, "list columns")
+    assert "too many to list flatly" in cols["answer"]

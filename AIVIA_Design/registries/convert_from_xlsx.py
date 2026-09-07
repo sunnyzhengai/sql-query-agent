@@ -88,12 +88,14 @@ SOURCES = {
 # Ask_Console sheet: the closed op set as law (Group E's enumerable
 # path space); the ask-index reading joins the catalog; the console
 # is the usage ledger's single writer (H5).
-STAMP_VERSION = "1.8.0"
+# v1.9.0 (2026-09-06): the LIST op joins the console's closed set
+# (ruled from Sunny's live ask — the browse question class).
+STAMP_VERSION = "1.9.0"
 RATIFIED = True
 DOC_STAMP = ("v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 twin-graph "
              "ruling ADR 0077; v1.2.0 Phase A metamodel bump; v1.3.0 "
              "Phase B composite-kinds correction; v1.4.0 T-2 "
-             "operational-statements ruling; v1.5.0 the gap taxonomy; v1.6.0 the plug-all-holes sweep; v1.7.0 ledger close; v1.8.0 the ask console ADR 0078 "
+             "operational-statements ruling; v1.5.0 the gap taxonomy; v1.6.0 the plug-all-holes sweep; v1.7.0 ledger close; v1.8.0 the ask console ADR 0078; v1.9.0 the list op "
              "(all 2026-09-06)")
 CONVERTED_ON = "2026-09-05"
 
@@ -677,6 +679,13 @@ TWIN_SHEETS = {
              "definitions; concepts via their accepted terms"},
             {"Item": "op: gaps", "Definition": "the taxonomy census "
              "for the entity or the estate — drift findable by name"},
+            {"Item": "op: list", "Definition": "RULED 2026-09-06 from "
+             "Sunny's live ask ('what metrics are there' hit no-match "
+             "— a browse question is not a lookup): enumerate a KIND "
+             "(tables, columns, selections, procedures, terms, drift, "
+             "metrics/concepts). 'metrics' answers HONESTLY: none "
+             "exist until a human mints one; the nearest real kinds "
+             "are offered."},
             {"Item": "outcomes", "Definition": "matched | ambiguous "
              "(candidates listed, human picks) | no-match (plain, "
              "counted, nearest names offered) — H5 usage event on "

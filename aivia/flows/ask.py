@@ -15,9 +15,15 @@ from aivia.graph import kg3_artifacts, phi_gate
 from aivia.lenses import ask_index, decisions
 
 OPS = ("lookup", "lineage", "filters_on", "who_reads", "define",
-       "gaps")
+       "gaps", "list")
 
 _OP_GRAMMAR: List[Tuple[str, str]] = [
+    # browse/enumerate (op ruled 2026-09-06 from Sunny's live ask
+    # 'what metrics are there' — a browse question is not a lookup)
+    (r"^(?:list|show(?:\s+me)?(?:\s+the)?|browse)\s+(?:all\s+)?(.+?)"
+     r"\s*$", "list"),
+    (r"^what\s+(.+?)\s+(?:are\s+there|exist|do\s+we\s+have)\s*\??$",
+     "list"),
     (r"^(?:what\s+is|whats|describe|define)\s+(.+)$", "lookup"),
     (r"^lineage\s+(?:of\s+)?(.+)$", "lineage"),
     (r"^(?:filters?\s+on|what\s+filters\s+(?:on\s+)?)(.+)$",
@@ -36,6 +42,61 @@ def parse(question: str) -> Tuple[str, str]:
         if m:
             return op, m.group(1).strip(" ?")
     return "lookup", q.strip(" ?")
+
+
+# kind vocabulary for the list op — folded synonym -> index kind;
+# 'metric'/'concept' map to the HONEST empty until a human mints one
+_KIND_WORDS = {
+    "TABLE": "table", "TABLES": "table",
+    "COLUMN": "column", "COLUMNS": "column",
+    "SCOPE": "scope", "SCOPES": "scope", "SELECTION": "scope",
+    "SELECTIONS": "scope", "TEMP TABLE": "scope",
+    "TEMP TABLES": "scope", "CTE": "scope", "CTES": "scope",
+    "FILE": "file", "FILES": "file", "PROC": "file", "PROCS": "file",
+    "PROCEDURE": "file", "PROCEDURES": "file", "REPORT": "file",
+    "REPORTS": "file",
+    "TERM": "term", "TERMS": "term",
+    "DRIFT": "drift", "DRIFTS": "drift", "FINDING": "drift",
+    "FINDINGS": "drift",
+    "METRIC": "concept", "METRICS": "concept", "CONCEPT": "concept",
+    "CONCEPTS": "concept",
+    "DERIVED COLUMN": "derived column",
+    "DERIVED COLUMNS": "derived column",
+}
+
+
+def _render_list(read, index, kind_text: str) -> Optional[str]:
+    from aivia.lenses.ask_index import _fold
+    kind = _KIND_WORDS.get(_fold(kind_text))
+    if kind is None:
+        return None
+    if kind == "concept":
+        files = sorted({e["name"] for e in index
+                        if e["kind"] == "file"})
+        terms = [e for e in index if e["kind"] == "term"]
+        return ("No minted metrics or concepts exist yet — a concept "
+                "is born only when a HUMAN blesses a family (the "
+                "lens computes; a human touch mints). "
+                f"Accepted terms so far: {len(terms)}.\n"
+                "The nearest real things today are the estate's "
+                f"{len(files)} procedures and their delivery "
+                "selections — ask 'list procedures', or ask any "
+                "procedure by name for its steps.")
+    entries = sorted({(e["name"], e["identity"]) for e in index
+                      if e["kind"] == kind})
+    lines = [f"{len(entries)} {kind_text.strip().lower()}:"]
+    if kind == "column" and len(entries) > 60:
+        return (f"{len(entries)} columns — too many to list flatly. "
+                "Ask a table by name to see its shape, or ask "
+                "'filters on <column>' / 'lineage of <column>'.")
+    shown = [f"- {name}" + (f"  ({ident})" if kind in
+                            ("scope", "drift", "derived column")
+                            else "")
+             for name, ident in entries[:60]]
+    lines += shown
+    if len(entries) > 60:
+        lines.append(f"… and {len(entries) - 60} more")
+    return "\n".join(lines)
 
 
 def _twins(read) -> Dict[str, Dict[str, Any]]:
@@ -234,6 +295,19 @@ def ask(store, question: str, author: str,
         except Exception:  # noqa: BLE001 — a model failure NEVER
             pass           # breaks the ask; the deterministic parse stands
     index = ask_index.lens_ask_index(read, None)["yield"]
+    if op == "list":
+        listed = _render_list(read, index, entity_text)
+        if listed is not None:
+            kg3_artifacts.append_usage(
+                store, action="asked", author=author,
+                occurred_at=occurred_at,
+                payload=phi_gate.door1_redact(question).text,
+                outcome="matched", about=None)
+            return {"op": "list", "outcome": "matched",
+                    "answer": listed,
+                    "resolution": {"outcome": "matched",
+                                   "entity": None}}
+        op = "lookup"  # an unlistable word falls through to lookup
     if op == "gaps" and not entity_text:
         resolution: Dict[str, Any] = {"outcome": "matched",
                                       "entity": None}
