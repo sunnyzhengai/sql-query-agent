@@ -619,3 +619,113 @@ blessing (matches the standing personal+enterprise truth-layers
 philosophy and the usage-weighted flywheel). Session context sets
 snapshot INTO the user's tree on confirmation — so "what I looked at
 and blessed" is itself traversable, searchable meaning.
+
+---
+
+## THE DERIVED UI (2026-09-07, from the nine dug laws — for Sunny's pass)
+
+Nothing here is invented; every element cites the ruling that
+forces it. Three surfaces: THE CONVERSATION (everyone), THE TREE
+(mine), THE QUEUE (stewards/admins).
+
+### The conversation surface
+
+```
+┌──────────────────────────────────────────────────────┬───────────────┐
+│ AIVIA · sepsis — 28 files · 90 tables · loaded 09-05 │  THE TABLE    │
+│ ⚠ banner only when degraded: "interpreter down —     │  (L5-D3)      │
+│    names, clicks, and confirmed questions work"      │ ▼ this round  │
+├──────────────────────────────────────────────────────┤  · #Base_Pop  │
+│                                                      │  · 42 scopes… │
+│  ROUND N  (appends; prior rounds stay)               │ ▸ round N-1   │
+│  ┌────────────────────────────────────────────────┐  │ ▸ round N-2   │
+│  │ you: what business logic is in ED Sepsis       │  │  [clear the   │
+│  ├────────────────────────────────────────────────┤  │   table]      │
+│  │ Answering for USP_ED_SEPSIS · also matched:    │  ├───────────────┤
+│  │ USP_RPTS_ED_Sepsis — switch        (L3-D1)     │  │  MY TREE ▸    │
+│  │ ✓ I read "business logic" as conditions —      │  │  (L5-D4,      │
+│  │   confirm · correct                (L7-D2)     │  │   L7-D1)      │
+│  │                                                │  │               │
+│  │ 12 conditions in USP_ED_SEPSIS:                │  └───────────────┘
+│  │ · The BPA locator is 900130001 [→node] (L1-D2) │
+│  │ · The date arrived is between… [→node]         │
+│  │   … each line clickable = its node             │
+│  │                                                │
+│  │ changed since you asked Sep 5: +2   (L8-D4)    │
+│  │ views: card lineage filters readers  (L4-D4)   │
+│  ├────────────────────────────────────────────────┤
+│  │ searched: "ED Sepsis" — exact name: no ·       │
+│  │ by meaning: 2 files (best 0.78 via name card) ·│
+│  │ "business logic" → conditions (confirmed 09-07)│
+│  │ · no expansions proposed · showing conditions —│
+│  │ you named the kind        ▸ full evidence      │
+│  │ (L6-D1/D2/D3: caption above, work here,        │
+│  │  evidence one click deeper)                    │
+│  └────────────────────────────────────────────────┘
+│                                                      │
+├──────────────────────────────────────────────────────┤
+│ [ ask anything…                                    ] │  ← clears, stays
+└──────────────────────────────────────────────────────┘
+```
+
+**The empty state** is the ESTATE CARD (L9-D2): the census as a
+welcome — what's here, the kinds, top topics, honest gap numbers —
+plus three example asks drawn from the estate's own biggest topics.
+
+**The anatomy of a round** (top to bottom, laws cited):
+1. Your words, kept verbatim (display memory only — L2).
+2. The ASSUMPTION line when provisional (L3-D1): what was assumed,
+   runners-up one click away.
+3. The INLINE CONFIRM (L7-D2): non-blocking; confirming writes the
+   boundary artifact to my tree (L2-D3); ignoring costs nothing.
+4. The CAPTION: the answer as clickable fact-lines (L1-D2) — every
+   line is its node; clicking lands it on the table (L5-D2).
+5. The CHANGE CAPTION when a confirmed question moved (L8-D4).
+6. VIEWS as buttons (L4-D4) — pressed, never model-chosen; a hint
+   may preselect visibly.
+7. THE WORK line (L6): plain process words rendered from trace
+   data; expands to full evidence. Contains the display-set
+   rationale ("you named the kind" — L4-D1's user-words provenance).
+
+**The other round shapes:**
+- CLARIFY (L3-D2): deduped rows grouped by kind, score + one line
+  of speech each, capped visibly; my pick is recorded and accretes
+  (L5-D2). If my referent isn't listed, my next typing counts the
+  miss (L3-D3) — silently, no extra UI.
+- ABSENCE (L9-D4): the zero + searched universe ("searched all 28
+  files") + nearest true things + the NEXT ACT for my role (mint a
+  term / flag to steward / load an extract). A door, never a wall.
+- DEGRADED (L8-D3): the banner says what STILL WORKS; confirmed
+  questions keep answering without any model.
+
+**The table** (right rail, L5): stacked rounds, top expanded;
+every item re-invocable; kind-qualified anaphors reach down;
+[clear the table] is an explicit act. I can see what "those" will
+mean before I type it.
+
+### The tree surface (mine — L5-D4, L7)
+
+My accumulated relationship with the estate, owner-only (L9-D4
+scope): things I viewed (affinity), questions I confirmed (the
+meaning-book — phrasings attached to meanings, L2-D1), vocabulary
+I blessed. Each blessing shows its anchor state (intact/orphaned —
+L7-D4) and offers REVOKE with blast radius (L7-D3). "The report I
+was looking at yesterday" is a query here, not an anaphor.
+
+### The queue surface (stewards/admins — L7-D1, L9-D4)
+
+The promotion queue: mappings N users confirmed (usage-weighted),
+one blessing promotes to estate-shared. The demand ledger:
+repeated absence hits ("4 users asked for PBI reports"). The
+telemetry proposals: "clarify-miss rate suggests floor 0.22 —
+apply?" — a human act on registry data, never self-applied
+(L7-D4). Migration console: embedding/interpreter version bumps as
+announced rule changes validated by the miss rate (L8-D1/D2).
+
+### What the UI refuses to have (by law)
+
+No intent pickers or query builders (L4). No unmarked model prose
+(L1/L2). No spinners hiding seat failures (L8-D3). No dead-end
+"no results" (L9-D4). No invisible state — if it affects
+resolution, it is on screen (L5-D3, L6-D1). No settings that let
+the system tune itself (L7-D4).
