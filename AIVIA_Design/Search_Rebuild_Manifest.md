@@ -24,7 +24,7 @@ done.)*
 | 12 | clicks travel as questions (reroute ruled, unbuilt) | A | BUILT | step A: entity + label-group rounds; entity= links; interpreter never consulted by clicks |
 | 13 | user decisions die on restart (governance journal) | E | OPEN |
 | 14 | no revoke at the surface | E | OPEN |
-| 15 | clarify-actions LIVE BUG (typed input after a clarify errors) | E | OPEN |
+| 15 | clarify-actions LIVE BUG (typed input after a clarify errors) | E | BUILT: actions joined USAGE_ACTIONS by ruling; hermetic clarify→next-round pin (registry mirror lands in F) |
 | 16 | literal-census enforcement unbuilt | F | OPEN |
 | 17 | "delivery · delivery" labels (expected to dissolve in #10) | B | BUILT | dissolved into present_hits (names + identities per row) |
 
