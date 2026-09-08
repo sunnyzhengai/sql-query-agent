@@ -322,6 +322,47 @@ the user said so); no kind named -> the subject's neighborhood or
 the path. Nothing is ever classified. execute()'s branches die
 into this at build.
 
+► RULED (Sunny, 2026-09-07, the search walkthrough): THE SEARCH IS
+THE ANSWER — Sunny's envisioned pipeline verbatim, superseding the
+tier ladder and the outcome branching:
+
+1. The question hits the LLM DIRECTLY (no pre-anything, no string
+   tier — never-regex means NEVER; the "mechanical boundary"
+   carve-out is revoked from the search path).
+2. The LLM understands INTENTION: extracts the mentions ("reports",
+   "ED") and expands ("ED" -> emergency department, emergency room).
+3. VECTOR SEARCH runs against EVERYTHING in the graph — every
+   label (itself a vectorized entry, so "tables" can hit the group
+   "table"), every name, every description — all pre-vectorized
+   and cached. The search text is mention + expansions.
+4. RANKED HITS WITH SCORES return to the user — mixed labels
+   welcome (the PBI dashboard, the procs, a column), grouped by
+   label for readability, each with its score and which card
+   matched. The search result IS the answer; clarify and the
+   provisional answer are EMERGENT from the ranking (several
+   strong hits / one dominant hit), never coded branches.
+5. CLICKS ARE STEER: a click opens the entity round (floors,
+   views, lineage) and lands on the table. Relational questions
+   traverse on demand from found things.
+
+THE SUBSUMPTION FACT (measured): exact matching is the cosine≈1
+case of vector search — "encounter id" vs its name card scored
+1.0000; typos land 0.5-0.6 (honest "did you mean" candidates);
+paraphrases 0.5-0.7. One mechanism covers the whole spectrum; the
+string tiers were a redundant second implementation of its top.
+What survives beneath: the memory checks (ledger/meaning-book —
+Sunny's decisions replayed), the proposal cache, pinned model
+versions (Law 8), and cosine arithmetic itself.
+
+Labels are chosen at modeling time to BE the words users say
+("PBI Report") — naming the model well IS the vocabulary work.
+The graph's own label entries answer type words; org synonyms are
+earned. Thresholds become DISPLAY BANDS (how much of the list to
+show) — frame, not behavior.
+
+(The earlier pre-tier ruling below stands as the record of the
+first step of this arc.)
+
 ► RULED (Sunny, 2026-09-07, the step-by-step walkthrough): THE
 PRE-TIER DIES (option c). Typed input is LANGUAGE and language
 always goes through the Interpreter — the system never pre-guesses
