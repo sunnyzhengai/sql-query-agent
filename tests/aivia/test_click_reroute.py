@@ -89,3 +89,16 @@ def test_label_group_round_lists_the_members(surface):
     assert "90" in out["html"]
     assert "ADT_EVENTS" in out["html"]
     assert calls == before  # groups are steer too
+
+
+def test_typing_after_a_clarify_never_crashes(surface):
+    """THE LIVE BUG (literal review's critical find): the clarify
+    -miss recorder wrote actions outside kg3's closed set — the
+    first typed input after a clarify raised. Pinned hermetically:
+    clarify (anaphor, empty table) -> typed follow-up -> a real
+    round, and the miss event lands."""
+    base, _calls = surface
+    out1 = _round(base, q="it", c="bug-conv")
+    assert out1["status"] == "clarify"
+    out2 = _round(base, q="what tables are there", c="bug-conv")
+    assert out2["status"] in ("answer", "form")  # never a dead socket

@@ -27,7 +27,12 @@ EVENT_CLASSES = ("disposition", "usage", "proposal", "redaction",
 RUN_OUTCOMES = ("completed", "aborted")
 DESCRIPTION_STATUS = ("gate_passed", "skeleton_floor", "flagged")
 RULINGS = ("accept", "reject", "revoke", "acknowledge")
-USAGE_ACTIONS = ("asked", "ran", "confirmed")
+USAGE_ACTIONS = ("asked", "ran", "confirmed",
+                 "clarify-picked", "clarify-retyped")
+# clarify-picked/retyped joined BY RULING (L3-D3, the clarify-miss
+# counter; the literal review's critical find — the console wrote
+# them against a closed set). This tuple becomes a registry
+# mirror-check in the literal-census build (step F).
 ASKED_OUTCOMES = ("matched", "ambiguous", "no-match")
 OBSERVED_OUTCOMES = ("published", "denied", "edited", "missing")
 _IDENTITY = re.compile(r"^(person|role|agent):\S+$")
