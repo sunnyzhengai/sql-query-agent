@@ -65,7 +65,7 @@ def test_the_ed_proposal_now_finds_the_ed_files(world):
     files — never '0 term(s)'."""
     store, _read, _index, semantic = world
     q = "what reports are about ED"
-    interp = fake_interpreter({q: {
+    interp = fake_interpreter({q.lower(): {
         "mentions": ["Ed"],
         "kinds": {"Ed": "term"},  # dead field, ignored by the cage
         "expansions": {"Ed": ["emergency department",
