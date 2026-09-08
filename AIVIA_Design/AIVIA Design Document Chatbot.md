@@ -322,6 +322,25 @@ the user said so); no kind named -> the subject's neighborhood or
 the path. Nothing is ever classified. execute()'s branches die
 into this at build.
 
+► RULED (Sunny, 2026-09-07, the step-by-step walkthrough): THE
+PRE-TIER DIES (option c). Typed input is LANGUAGE and language
+always goes through the Interpreter — the system never pre-guesses
+that a typed string is a name (the "sepsis"-column hijack, caught
+live, is the deciding corpse). Two forced consequences, both
+ruled with it:
+- CLICKS ARE NOT QUESTIONS: a click on a rendered node is STEER,
+  not language — the surface routes it as a direct entity round
+  (the display-mode pattern), never through ask()'s language path.
+  Clicks stay instant and deterministic WITHOUT any pre-tier.
+- THE DEGRADATION LADDER AMENDS (level 2, interpreter down): what
+  still works = clicks, buttons, the table, ledger/meaning-book
+  hits, and proposal-cache hits — typed exact names NO LONGER
+  answer during an outage (the honest price of never guessing;
+  registry ladder row updates with the build).
+The memory lookups (folded-question ledger, meaning-book, proposal
+cache) are NOT guessing — they are earned determinism and stay
+ahead of the model.
+
 ► RULED (D2): THE COLD START — the system is allowed to be young.
 Day one: exact tiers work; the graph's SELF-DESCRIPTION (kind
 nodes speaking metamodel definitions = physics, legitimately
