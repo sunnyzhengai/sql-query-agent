@@ -1061,3 +1061,15 @@ Two citation handles, because the axiom systems are distinct and their group let
   - `tests/aivia/test_ask_console.py`
 - **Summarized in:**
   - `docs/decisions/0080-the-center-and-the-three-censuses.md`
+
+## ADR 0081 — The birth-edge law
+
+- **Category:** architecture
+- **Component:** `architecture` → `docs/architecture/ARCHITECTURE.md` → axm:D, axm:S, axm:J, axm:M, axm:B, axm:R
+- **Implemented by:**
+  - `aivia/flows/censuses.py`
+  - `aivia/flows/connect.py`
+- **Enforced by:**
+  - `tests/aivia/test_connection_census.py`
+- **Summarized in:**
+  - `docs/decisions/0081-the-birth-edge-law.md`

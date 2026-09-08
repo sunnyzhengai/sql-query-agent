@@ -82,6 +82,7 @@
 | 0078 | The ask-the-graph console: free questions, typed paths, self-answering nodes | `tests/aivia/test_ask_console.py` (28) |
 | 0079 | The interpreter and the speaking graph | `tests/aivia/test_ask_console.py` (28) |
 | 0080 | The center and the three censuses | `tests/aivia/test_ask_console.py` (28) |
+| 0081 | The birth-edge law | `tests/aivia/test_connection_census.py` (9) |
 
 ## By standing law
 

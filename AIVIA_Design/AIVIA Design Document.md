@@ -100,8 +100,14 @@ graph; it is a query over edges the laws guarantee exist.
 THE THREE CENSUSES (ratified 2026-09-07, Center_and_Censuses_
 RULING — Sunny's three questions as conservation laws, the shape
 of voiced ⊎ counted == total):
-1. REACHABILITY: reachable ⊎ ruled-isolated == total nodes — the
-   lineage guarantee finally given its standing census.
+1. REACHABILITY — SUCCEEDED same day by THE CONNECTION CENSUS
+   (ADR 0081, THE BIRTH-EDGE LAW: no node is alone — every node
+   answers "why do you exist" by a walkable edge; Sunny's
+   term-isolation overrule killed the exemption list):
+   birth-edged ⊎ counted-missing ⊎ rooted == total, per the
+   Connection_Ledger registry sheet (closed at birth; rooted ==
+   exactly the estate root; counted-missing = per-node honest
+   debt with its landing step named).
 2. SPEECH: every node KIND declares in the registry which stored
    property it speaks (Speech_Sources); every node has non-empty
    speech, or is a counted documentation gap, or is ruled-mute
@@ -117,6 +123,25 @@ of voiced ⊎ counted == total):
    disease and is banned: searchable ⊎ ruled-silent == everything
    that speaks.
 Each census is a standing test AND a gap-check report bucket.
+
+THE INTEGRITY BATTERY (ADR 0081 — every standing equation that
+continuously audits AIVIA, in one list):
+1. conservation (captured ⊎ counted == parsed) — the mapper,
+   asserted per parse
+2. homomorphism (translated ⊎ gap == parsed) — inside translate(),
+   every run
+3. resolution (resolved ⊎ counted) — the resolution census
+4. the voicing ledger (voiced ⊎ counted == total) — produce
+5. the speech census (speaks ⊎ gap ⊎ mute == total)
+6. the searchability census (searchable ⊎ silent == speakers)
+7. the connection census (birth-edged ⊎ counted ⊎ rooted == total)
+8. the verbatim census (index words == recomputed speech)
+9. the literal census (every literal collection classified; no
+   vocabulary/ruling class exists) — Audit_Literal_Law_Plan
+10. the mirror-checks (code copies == registry sheets)
+11. the claims ledger (ruling clauses == evidence, every build)
+12. the validators + shakedown suites (metamodel, fixtures,
+    estates)
 Grounding thresholds are registry data and never cliffs:
 below-threshold yields HITL candidates with visible scores, never
 "unknown". The ask pipeline's search TRACE (mentions, expansions,

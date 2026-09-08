@@ -95,7 +95,9 @@ conjures; per kind produce one verdict row:
 - Output: **Audit_Graph_Integrity_Review.md** — the classified table =
   the draft Connection Ledger, one verdict per row for Sunny.
 
-## 5. Sequence (step discipline: each step's test suite shown first)
+## 5. Sequence — COMPLETE (2026-09-07, all six steps landed;
+ADR 0081 is the record; registries 1.21.0→1.25.0; final numbers:
+5017 birth-edged + 0 counted-missing + 1 rooted == 5018)
 
 1. This plan → Sunny ratifies/amends (incl. the battery catalog's
    placement in the design doc).

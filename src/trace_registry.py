@@ -115,7 +115,7 @@ ARCHITECTURE_COMPONENTS = {
         # component — one system-model file, organized by the Sphere,
         # every section carrying a build status.
         "doc": "docs/architecture/ARCHITECTURE.md",
-        "current_through": "0080",
+        "current_through": "0081",
         "title": "The system model — the Sphere",
         # all six groups since ADR 0071 (user_flow absorbed): the one
         # system-model file legitimately spans the constitution.
@@ -739,6 +739,19 @@ TRACE_REGISTRY = {
                   "tests/test_term_hygiene.py", "tests/test_admin_graph.py",
                   "tests/test_companion.py"],
         "docs": ["docs/architecture/SPEC.md", "docs/architecture/TRACE_MAP.md"],
+    },
+    "0081": {
+        # ACCEPTED 2026-09-07: the birth-edge law — no node is
+        # alone; the connection census (census 1's successor) +
+        # the integrity battery catalog. Born from Sunny's
+        # term-isolation overrule; built in five reviewed steps.
+        "title": "The birth-edge law",
+        "category": "architecture",
+        "component": "architecture",
+        "axioms": [],
+        "modules": ["aivia/flows/censuses.py", "aivia/flows/connect.py"],
+        "tests": ["tests/aivia/test_connection_census.py"],
+        "docs": ["docs/decisions/0081-the-birth-edge-law.md"],
     },
     "0080": {
         # ACCEPTED 2026-09-07: the center law (code = builder |
