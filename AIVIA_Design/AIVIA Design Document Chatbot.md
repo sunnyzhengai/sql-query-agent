@@ -322,6 +322,50 @@ the user said so); no kind named -> the subject's neighborhood or
 the path. Nothing is ever classified. execute()'s branches die
 into this at build.
 
+► RULED (Sunny, 2026-09-08, the scoring walkthrough): THE
+TOTAL-SCORE LAW + THE ONE-VOCABULARY LAW.
+
+**THE TOTAL-SCORE LAW.** A node's cards: NAME · SPEECH · LABEL
+(the label word — every member node carries its label as a card;
+the label:: group entries DIE) · EXPANSION (its acronyms'
+expansions, when blessed). A node's score for a question = THE SUM
+of all its card hits across all mentions — each card counts once
+per mention; no max, no propagation, no "which card hit first."
+"reports"+"ED" both crediting the dashboard's cards is what ranks
+it first; the census emerges ("what tables are there" = every
+table's label card at ≈1). The LEXICAL scorer (hybrid search) is
+DEFERRED-CONDITIONAL: built only if columns still overcrowd the
+right labels after total-score + the PBI layer land — the trigger
+is observed overcrowding, recorded when seen.
+
+**THE ONE-VOCABULARY LAW.** Acronym expansions live as ACRONYM
+nodes (label: acronym) — NEVER in code, NEVER in prompts, and NOT
+as terms ("term" is reserved for the governed logic units:
+'diabetic patients', 'cancelled appointments'):
+  {name: "ED", expansions: ["emergency department", ...],
+   approved_by: person:..., approved_at: ...}
+Edges: —approved_by→ the person (direct; timestamp as data; no
+ceremony event) · —used_by→ every node whose name carries the
+token, DERIVED AT GRAPH BUILD (boot + after each intake): a newly
+loaded node gains the edge automatically — no re-approval, no
+manual step, and NEVER computed at question time. Both readers
+consume the same stored expansions verbatim: card building (the
+expansion card) and query building (mention token → expansions
+appended to the search text, deterministic) — supply and demand
+read one string, so their vectors meet at ≈1 by construction. The
+pre-vocabulary window (unblessed tokens) is the Interpreter's
+proposal space; every blessing shrinks it permanently. Pipeline:
+SCAN (mechanical: distinct name tokens) → SCRIBE (curation-time
+seat proposes expansions) → BLESS (human approves the batch) →
+acronym nodes.
+
+**LABEL, not kind — everywhere.** The node-type field and every
+surface says LABEL (the industry standard; Sunny's standing
+ruling). The rename is promoted ahead of the search rework. The
+TWIN's meaning-node taxonomy (the ratified kind library:
+COMPARE_EQ, selection, reference...) is a DIFFERENT concept and
+keeps its ratified name — documented here so the two never blur.
+
 ► RULED (Sunny, 2026-09-07, the search walkthrough): THE SEARCH IS
 THE ANSWER — Sunny's envisioned pipeline verbatim, superseding the
 tier ladder and the outcome branching:

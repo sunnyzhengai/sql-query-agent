@@ -28,7 +28,14 @@ done.)*
 | 16 | literal-census enforcement unbuilt | F | OPEN |
 | 17 | "delivery · delivery" labels (expected to dissolve in #10) | B | BUILT | dissolved into present_hits (names + identities per row) |
 
-Steps: **A** click reroute (the dependency) · **B** the search
-rebuild (1,4,5,6,7,10,11,17) · **C** prompt v3 + registry +
-versioned cache key (2,3) · **D** the label rename (8) · **E** bug
-+ persistence + revoke (13,14,15) · **F** the literal census (16).
+Steps: A,B,C + gap 15 LANDED (2026-09-07). Resequenced 2026-09-08
+(Sunny's scoring rulings): **D** label rename (PROMOTED — code is
+written in label terms before the rework) · **G** total-score
+search (label cards replace label:: nodes; card-sum ranking;
+lexical = deferred-conditional, trigger: observed label
+overcrowding) · **H** the PBI layer (pbi_snapshot intake, PBI
+Report label, executes edges, full-word names, short descriptions)
+· **I** acronym enrichment (scan → Scribe → bless → acronym nodes;
+used_by derived at graph build — the auto-connect sentence IS
+contract text) · **E** persistence journal + revoke (acronyms and
+the ledger both depend on it) · **F** the literal census.
