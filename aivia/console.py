@@ -115,7 +115,7 @@ log.addEventListener('click', (e) => {
   if (!a) return;
   const u = new URL(a.href, location.origin);
   const p = u.searchParams;
-  if (p.get('q') || p.get('entity')) {
+  if (p.get('q') || p.get('entity') || p.get('label')) {
     e.preventDefault();
     round(p);
   }
@@ -357,7 +357,8 @@ def make_handler(store, estate, interpret_fn, semantic, pending,
             context = result.get("context_set") or []
             if context:
                 refs = " · ".join(
-                    f'<a href="/?q={urllib.parse.quote(i)}">'
+                    f'<a href="/round?entity='
+                    f'{urllib.parse.quote(i)}">'
                     f"{html.escape(i.split('::')[-1].split('|')[-1])}"
                     "</a>" for i in context[:12])
                 more = (f" … ({len(context) - 12} more in context)"
@@ -396,7 +397,8 @@ def make_handler(store, estate, interpret_fn, semantic, pending,
             parts.append(f"<p>'{html.escape(result['mention'])}' is "
                          "ambiguous — pick one:</p><ul>")
             for c in result["candidates"]:
-                href = "/?q=" + urllib.parse.quote(c["identity"])
+                href = ("/round?entity="
+                        + urllib.parse.quote(c["identity"]))
                 score = (f" · {c['score']}" if "score" in c else "")
                 places = (f" (in {c['places']} places)"
                           if c.get("places", 1) > 1 else "")
@@ -445,6 +447,67 @@ def make_handler(store, estate, interpret_fn, semantic, pending,
                     "html": "<pre>" + html.escape("\n".join(lines))
                             + "</pre>",
                     "context_set": []}
+        label = (params.get("label") or [""])[0]
+        if label:
+            # STEP A: a label-group click is STEER — list the
+            # members directly, no model, no search
+            index = ask.build_index(read)
+            members = [e for e in index if e["kind"] == label]
+            lines = [f"{len(members)} {label}(s):"]
+            for e in sorted(members,
+                            key=lambda e: e["name"])[:60]:
+                lines.append(f"- {e['name']}  ({e['identity']})")
+            if len(members) > 60:
+                lines.append(f"… and {len(members) - 60} more")
+            ids = [e["identity"] for e in members][:100]
+            stack = contexts.get(conv) or []
+            stack.insert(0, ids)
+            contexts[conv] = stack[:TABLE_DEPTH]
+            refs = " · ".join(
+                f'<a href="/round?entity={urllib.parse.quote(i)}">'
+                f"{html.escape(i.split('::')[-1].split('|')[-1])}"
+                "</a>" for i in ids[:12])
+            return {"status": "answer",
+                    "html": "<pre>" + html.escape("\n".join(lines))
+                            + "</pre><p class=meta>Referenced: "
+                            + refs + "</p>",
+                    "context_set": ids,
+                    "table": contexts.get(conv) or []}
+        if entity_id and not mode:
+            # STEP A: an entity click is STEER — the card directly,
+            # no model; lands on the table
+            index = ask.build_index(read)
+            entity = next((e for e in index
+                           if e["identity"] == entity_id), None)
+            if entity is None:
+                return {"status": "answer",
+                        "html": "<pre>gone</pre>",
+                        "context_set": []}
+            adj = connect.build_adjacency(read)
+            card = ask.render_card(read, entity)
+            hood = connect.neighborhood(adj, entity["identity"])
+            listed = [entity["identity"]]
+            for members in hood.values():
+                listed += [m for m in members if m not in listed]
+            listed = listed[:100]
+            stack = contexts.get(conv) or []
+            stack.insert(0, listed)
+            contexts[conv] = stack[:TABLE_DEPTH]
+            links = " ".join(
+                f'<a href="/round?entity='
+                f'{urllib.parse.quote(entity_id)}&mode={m}">'
+                f"{m}</a>" for m in ask.DISPLAY_MODES)
+            refs = " · ".join(
+                f'<a href="/round?entity={urllib.parse.quote(i)}">'
+                f"{html.escape(i.split('::')[-1].split('|')[-1])}"
+                "</a>" for i in listed[:12])
+            return {"status": "answer",
+                    "html": "<pre>" + html.escape(card)
+                            + f"</pre><p class=modes>views: {links}"
+                            "</p><p class=meta>Referenced: "
+                            + refs + "</p>",
+                    "context_set": listed,
+                    "table": contexts.get(conv) or []}
         if entity_id and mode in ask.DISPLAY_MODES:
             index = ask.build_index(read)
             entity = next((e for e in index
