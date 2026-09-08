@@ -7,7 +7,7 @@
 
 # Test Map — what every test proves
 
-157 modules, 1759 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
+158 modules, 1766 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
 
 ## By ADR
 
@@ -169,6 +169,7 @@
 - `tests/aivia/test_ledger_close.py` (5): The ledger close (Sunny's order, 2026-09-06): the last engine-debt
 - `tests/aivia/test_lenses.py` (11): Slice 3 exit: the F3 answer key against the BUILT lenses.
 - `tests/aivia/test_metamodel.py` (7): Slice 0: the registry loader — code consumes ratified registries only.
+- `tests/aivia/test_person_nodes.py` (7): STEP 3 of the Connection Ledger build — PERSON NODES. The test
 - `tests/aivia/test_phase_a_projection.py` (6): Phase A exit (ADR 0077): the F8 phase-A answer keys go RUNNABLE.
 - `tests/aivia/test_phase_b_translator.py` (10): Phase B exit (ADR 0077): the F8 phase-B answer keys go RUNNABLE.
 - `tests/aivia/test_phase_c_voicing.py` (5): Phase C exit (ADR 0077): the F8 phase-C answer keys go RUNNABLE.

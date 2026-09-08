@@ -73,6 +73,12 @@ def build_adjacency(read) -> Dict[str, List[Tuple[str, str]]]:
         about = n.properties.get("about")
         for t in (about if isinstance(about, list) else []):
             link(n.identity, t, "about")
+    # STEP 3: every authored node walks —by→ its actor — one pass
+    # over ALL nodes, no kind list (the literal law)
+    for n in read.nodes(None):
+        author = n.properties.get("author")
+        if author and ":" in str(author):
+            link(n.identity, author, "by")
     for key, tree in read.trees().items():
         fname = key  # the index's file identity (the store's file id)
         for stmt in tree["statements"]:

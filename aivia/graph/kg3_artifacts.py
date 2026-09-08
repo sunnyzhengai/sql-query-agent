@@ -55,11 +55,25 @@ def _versions_of(store: Store, artifact_id: str) -> List[NodeVersion]:
             and n.properties.get("artifact_id") == artifact_id]
 
 
+def _mint_actor(store: Store, author: str, created_at: str) -> None:
+    """STEP 3 (the birth-edge law): actors are MINTED ON FIRST ACT —
+    the author string becomes a real node (person/agent/role by its
+    own prefix), idempotent. The acts' —by→ edges give the user tree
+    its trunk; the actor's own birth edge IS being acted-by."""
+    kind = author.split(":", 1)[0]
+    for n in store.current_nodes(kind):
+        if n.identity == author:
+            return
+    store.append_node(kind, author, {"identity": author},
+                      created_at, extract_id=f"kg3@{created_at}")
+
+
 def _append_version(store: Store, kind: str, artifact_id: str,
                     about: List[str], author: str, created_at: str,
                     basis: Optional[Dict[str, Any]],
                     payload: Dict[str, Any]) -> NodeVersion:
     _check_identity(author)
+    _mint_actor(store, author, created_at)
     if not about:
         raise RefusalKG3("KG3-7", "spine incomplete: about needs >=1 target")
     if is_machine(author) and not basis:
@@ -149,6 +163,7 @@ def append_disposition(store: Store, about: str, ruling: str, author: str,
                        occurred_at: str,
                        reason: Optional[str] = None) -> NodeVersion:
     _check_identity(author)
+    _mint_actor(store, author, occurred_at)
     if is_machine(author):
         raise RefusalKG3("LC3-C3", "dispositions are HUMAN-ONLY — machines "
                          "never rule; machine findings are lenses")
@@ -174,6 +189,7 @@ def append_usage(store: Store, action: str, author: str, occurred_at: str,
     if action not in USAGE_ACTIONS:
         raise RefusalKG3("KG3-7", f"action '{action}' outside "
                          f"{USAGE_ACTIONS}")
+    _mint_actor(store, author, occurred_at)
     props: Dict[str, Any] = {"action": action, "author": author,
                              "occurred_at": occurred_at}
     if action == "asked":
@@ -197,6 +213,7 @@ def append_proposal(store: Store, kind: str, about: str, author: str,
                     occurred_at: str, target_system: Optional[str] = None,
                     outcome: Optional[str] = None) -> NodeVersion:
     _check_identity(author)
+    _mint_actor(store, author, occurred_at)
     props: Dict[str, Any] = {"kind": kind, "about": about, "author": author,
                              "occurred_at": occurred_at}
     if kind == "sent":
@@ -223,6 +240,7 @@ def append_run_event(store: Store, author: str, basis: Dict[str, Any],
     bookkeeping. Author is the agent identity; basis is the witness
     chain (grammar/lens/metamodel versions + the worklist)."""
     _check_identity(author)
+    _mint_actor(store, author, occurred_at)
     if not is_machine(author):
         raise RefusalKG3("PROD-1", "the run event's author is the produce "
                          "pipeline's AGENT identity")

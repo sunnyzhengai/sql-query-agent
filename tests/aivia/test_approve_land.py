@@ -70,15 +70,18 @@ def test_derived_after_approve(approved):
 
 
 def test_approve_surface_writes_dispositions_only(approved):
-    """APPR-1 behaviorally: the rule() call added exactly one
-    disposition node and nothing else."""
+    """APPR-1 behaviorally: the rule() call adds the disposition and
+    NOTHING ELSE of content — plus, since step 3 (the birth-edge
+    law), the actor's own node on first act."""
     store = _produced_store()
     before = store.state_stamp()
     approve.rule(store, about=RECENT, ruling="accept",
                  author="person:maria", occurred_at=T0)
     after = store.state_stamp()
-    assert after[0] - before[0] == 1  # one write
+    assert after[0] - before[0] == 2  # disposition + minted actor
     assert len(store.current_nodes("disposition")) == 1
+    assert [n.identity for n in store.current_nodes("person")] \
+        == ["person:maria"]
 
 
 def test_agent_ruling_refused_through_the_surface():

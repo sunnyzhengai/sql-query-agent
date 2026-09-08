@@ -125,6 +125,9 @@ SOURCES = {
 # clears and stays; context is CONVERSATION-scoped (client-held id),
 # never a global; transcript = DISPLAY memory, context set = MEANING
 # memory — prose history never reaches the model (the cage holds).
+# v1.23.0 (2026-09-07): STEP 3 — PERSON NODES: actors minted on
+# first act (person/agent/role by prefix, idempotent); every
+# authored node walks -by-> its actor; the user tree has its trunk.
 # v1.22.0 (2026-09-07): STEP 2 — TERM ORIGINS: the term row flips
 # to edged (derived_from); append_term REFUSES origin-less births
 # (LC3-F6); blessed vocabulary cites its confirming event; legacy
@@ -167,7 +170,7 @@ SOURCES = {
 # deliveries lead, spine voiced, intermediates counted, census
 # closes; the file's ask-index words = the delivery lead, so file
 # embeddings embed meaning, never name-noise).
-STAMP_VERSION = "1.22.0"
+STAMP_VERSION = "1.23.0"
 RATIFIED = True
 DOC_STAMP = ("v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 twin-graph "
              "ruling ADR 0077; v1.2.0 Phase A metamodel bump; v1.3.0 "
@@ -495,6 +498,26 @@ DEFER_WHY = {
 # Sunny; ADR 0077; full ruling AIVIA_Design/Twin_Graph_KG_RULING.md).
 # Landing recorded verdicts only, per this file's charter.
 _TG = "twin-graph ruling (2026-09-06)"
+# Rows APPENDED to xlsx-born sheets by recorded ruling (the PATCHES
+# mechanism's sibling: patches amend cells, appends add rows).
+APPEND_ROWS = [
+    ("kg1_technical", "Node_Types", [
+        {"Node kind": "person", "Property": "identity",
+         "Required": "yes",
+         "Shape / allowed values": "person:<name>",
+         "Notes": "STEP 3 (v1.23.0, birth-edge law): actors minted "
+         "on first act; birth edge = being acted-by (>=1 act)"},
+        {"Node kind": "agent", "Property": "identity",
+         "Required": "yes",
+         "Shape / allowed values": "agent:<name>",
+         "Notes": "machine actors — own kind, never persons"},
+        {"Node kind": "role", "Property": "identity",
+         "Required": "yes",
+         "Shape / allowed values": "role:<name>",
+         "Notes": "role actors — same law"},
+    ], "Connection Ledger step 3 (2026-09-07)"),
+]
+
 TWIN_SHEETS = {
     "kg2_kind_library": {
         "Structure_Kinds_Phase_A": [
@@ -903,6 +926,15 @@ TWIN_SHEETS = {
             {"Kind": "concept", "Edge": "minted_by",
              "Status": "edged",
              "Meaning": "walks to its recorded minting act"},
+            {"Kind": "person", "Edge": "by", "Status": "edged",
+             "Meaning": "STEP 3: minted on first act; their birth "
+             "edge IS being acted-by (>=1 act points at them); a "
+             "hand-written actor with no acts counts missing"},
+            {"Kind": "agent", "Edge": "by", "Status": "edged",
+             "Meaning": "model/machine actors — same law, own kind "
+             "(never cross-minted as persons)"},
+            {"Kind": "role", "Edge": "by", "Status": "edged",
+             "Meaning": "role actors — same law"},
             {"Kind": "excluded_file", "Edge": "-",
              "Status": "missing-counted",
              "Meaning": "root link lands in STEP 5; counted until "
@@ -1272,6 +1304,13 @@ def convert():
             assert sheet not in sheets, f"{name}: sheet {sheet} exists"
             sheets[sheet] = [dict(r) for r in rows]
             applied.append(f"sheet {sheet} added ({_TG}, ADR 0077)")
+        for reg_name, sheet, rows, cite in APPEND_ROWS:
+            if reg_name != name:
+                continue
+            assert sheet in sheets, f"{name}: no sheet {sheet} to append"
+            sheets[sheet].extend(dict(r) for r in rows)
+            applied.append(f"{len(rows)} row(s) appended to {sheet} "
+                           f"({cite})")
         if name == "lenses":
             for row in sheets["Catalog_v1"]:
                 lens = row["Lens"]

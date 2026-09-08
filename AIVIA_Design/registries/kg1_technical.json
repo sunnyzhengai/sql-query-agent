@@ -1,7 +1,7 @@
 {
  "registry": "kg1_technical",
  "stamp": {
-  "version": "1.22.0",
+  "version": "1.23.0",
   "doc_section": "Level 1 / KG Layer 1 — source dictionaries technical layer",
   "doc_stamp": "v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 twin-graph ruling ADR 0077; v1.2.0 Phase A metamodel bump; v1.3.0 Phase B composite-kinds correction; v1.4.0 T-2 operational-statements ruling; v1.5.0 the gap taxonomy; v1.6.0 the plug-all-holes sweep; v1.7.0 ledger close; v1.8.0 the ask console ADR 0078; v1.9.0 the list op; v1.10.0 kind vocabulary; v1.11.0 ADR 0079 interpreter; v1.12.0 Tier A build data; v1.13.0 the seat-failure law; v1.14.0 follow-up context; v1.15.0 anaphor vocabulary (all 2026-09-06)",
   "ratified": true,
@@ -14,7 +14,8 @@
   "register A1 refined (2026-09-05)",
   "CONTRACT_DATALOAD §3 + F1 answer key (CHECK-TL-4 catch)",
   "sepsis shakedown finding + the ruled fallback posture (2026-09-06)",
-  "sheet Incremental_Intake added (twin-graph ruling (2026-09-06), ADR 0077)"
+  "sheet Incremental_Intake added (twin-graph ruling (2026-09-06), ADR 0077)",
+  "3 row(s) appended to Node_Types (Connection Ledger step 3 (2026-09-07))"
  ],
  "_open": [],
  "sheets": {
@@ -110,6 +111,27 @@
     "Required": "when documented",
     "Shape / allowed values": "STRUCTURED map {code: meaning} + as_of — never prose",
     "Notes": "dictionary-documented values only (ZC-style, org control_ tables); revisit trigger for value NODES = cross-column code identity"
+   },
+   {
+    "Node kind": "person",
+    "Property": "identity",
+    "Required": "yes",
+    "Shape / allowed values": "person:<name>",
+    "Notes": "STEP 3 (v1.23.0, birth-edge law): actors minted on first act; birth edge = being acted-by (>=1 act)"
+   },
+   {
+    "Node kind": "agent",
+    "Property": "identity",
+    "Required": "yes",
+    "Shape / allowed values": "agent:<name>",
+    "Notes": "machine actors — own kind, never persons"
+   },
+   {
+    "Node kind": "role",
+    "Property": "identity",
+    "Required": "yes",
+    "Shape / allowed values": "role:<name>",
+    "Notes": "role actors — same law"
    }
   ],
   "Edge_Types": [
