@@ -487,6 +487,7 @@ def ask(store, question: str, author: str, occurred_at: str,
     merged: Dict[str, Dict[str, Any]] = {}
     trace: List[Dict[str, Any]] = []
     pools: List[List[Dict[str, Any]]] = []
+    empty_table_marks = False
     floor = grounding.thresholds()["CANDIDATE_FLOOR"]
     expansions = interpretation.get("expansions") or {}
     references = interpretation.get("references") or {}
@@ -495,14 +496,17 @@ def ask(store, question: str, author: str, occurred_at: str,
         if role is not None:
             pool = stack_entities[0] if stack_entities else []
             if not pool:
-                _usage("ambiguous")
-                return {"status": "clarify", "mention": m,
-                        "candidates": [], "hits": [],
-                        "reason": "nothing to refer back to — ask "
-                                  "a direct question first",
-                        "answer": "nothing to refer back to — ask "
-                                  "a direct question first",
-                        "trace": trace}
+                # a role-mark is a PROPOSAL, never a veto (the live
+                # 22:27 corpse: an over-marked 'ED' killed 24 found
+                # hits). Empty table -> the mention is SEARCHED AS
+                # TEXT; the hard clarify happens below only if
+                # nothing anywhere answers.
+                role = None
+                references = dict(references)
+                references.pop(m, None)
+                empty_table_marks = True
+        if role is not None:
+            pool = stack_entities[0]
             if role.startswith("ordinal:"):
                 n = int(role.split(":")[1])
                 if not (1 <= n <= len(pool)):
@@ -535,6 +539,10 @@ def ask(store, question: str, author: str, occurred_at: str,
         searched_as = " ".join([m] + expansions.get(m, []))
         row = {"mention": m, "tier": "search",
                "searched_as": searched_as, "hits": 0}
+        if empty_table_marks and m not in references \
+                and (interpretation.get("references") or {}).get(m):
+            row["note"] = ("reference-marked but the table is "
+                           "empty — searched as text")
         if expansions.get(m):
             row["expansions_tried"] = expansions[m]
         if semantic is not None:
@@ -545,7 +553,15 @@ def ask(store, question: str, author: str, occurred_at: str,
                 row["seat_down"] = True
             kept = [h for h in found if h["score"] >= floor]
             row["hits"] = len(kept)
+            # ONE contribution per identity per mention (the index
+            # may carry duplicate entries; a mention never
+            # double-counts) — cross-mention sums remain the boost
+            best_of: Dict[str, Dict[str, Any]] = {}
             for h in kept:
+                b = best_of.get(h["identity"])
+                if b is None or h["score"] > b["score"]:
+                    best_of[h["identity"]] = h
+            for h in best_of.values():
                 cur = merged.setdefault(h["identity"], {
                     "identity": h["identity"], "label": h["kind"],
                     "name": h["name"], "score": 0.0,
@@ -576,6 +592,20 @@ def ask(store, question: str, author: str, occurred_at: str,
     for h in hits:
         h["score"] = round(h["score"], 4)
 
+    strong = any(h["score"] >= grounding.thresholds()["MATCH_SCORE"]
+                 for h in hits)
+    if empty_table_marks and not strong:
+        # every road ended: reference-marked mentions, no table,
+        # and the text search found nothing strong — THIS is the
+        # honest "nothing to refer back to"
+        _usage("ambiguous")
+        return {"status": "clarify", "mention": q,
+                "candidates": [], "hits": [],
+                "reason": "nothing to refer back to — ask a "
+                          "direct question first",
+                "answer": "nothing to refer back to — ask a "
+                          "direct question first",
+                "trace": trace}
     if not hits:
         answer = (f"Nothing found for '{q}' — searched all "
                   f"{len(index)} named and described things in "

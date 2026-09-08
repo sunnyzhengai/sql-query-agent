@@ -36,6 +36,7 @@ def fake_embed(texts):
             h = hashlib.sha256(word.encode()).hexdigest()
             vec[int(h[:12], 16) % 2048] += 1.0
             vec[int(h[12:24], 16) % 2048] += 1.0
+            vec[int(h[24:36], 16) % 2048] += 1.0
         out.append(vec)
     return out
 

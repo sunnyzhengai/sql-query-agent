@@ -143,3 +143,38 @@ def test_anaphors_still_resolve_from_the_table(world):
                  context=r1["context_set"])
     assert r2["status"] == "answer"
     assert r1["context_set"][0] in " ".join(r2["context_set"])
+
+
+def test_overmarked_reference_never_vetoes_the_search(world):
+    """Sunny's live corpse (2026-09-07 22:27): the model marked 'ED'
+    as a reference with nothing on the table, and the whole question
+    died in a clarify — discarding 24 report hits already found. A
+    role-mark is a PROPOSAL: empty table -> the mention is searched
+    as text; partial answers are law (L3-D4)."""
+    store, _read, _index, semantic = world
+    q = "what reports are about ED"
+    interp = fake_interpreter({q.lower(): {
+        "mentions": ["reports", "ED"],
+        "references": {"ED": "singular"},   # over-marked
+        "expansions": {"ED": ["emergency department"]}}})
+    result = ask.ask(store, q, "person:test", T0,
+                     interpret_fn=interp, semantic=semantic)
+    assert result["status"] == "answer"          # never the veto
+    assert len(result["hits"]) > 5
+    names = " ".join(h["name"] for h in result["hits"]).upper()
+    assert "ED" in names or "SEPSIS" in names
+    # the trace says what happened to the mark
+    ed_row = next(t for t in result["trace"]
+                  if t["mention"] == "ED")
+    assert "empty" in str(ed_row.get("note", "")) \
+        or ed_row.get("tier") == "search"
+
+
+def test_pure_anaphor_with_empty_table_still_clarifies(world):
+    store, _read, _index, semantic = world
+    interp = fake_interpreter({"it": {
+        "mentions": ["it"], "references": {"it": "singular"}}})
+    result = ask.ask(store, "it", "person:test", T0,
+                     interpret_fn=interp, semantic=semantic)
+    assert result["status"] == "clarify"
+    assert "refer back" in result["reason"]
