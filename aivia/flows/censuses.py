@@ -13,48 +13,56 @@ from typing import Any, Dict, List
 
 from aivia.flows import connect, speech
 
-# ruled isolation — kinds legitimately edge-less, with the reason
-# on record (ADR 0080 census 1; a new ruling is a row here + the
-# registry, never a silent skip)
-RULED_ISOLATED_KINDS = {
-    "term": "human vocabulary; findable by name, cited by "
-            "descriptions/dispositions when governance accretes",
-    "usage": "the event log — evidence, not topology",
-    "description": "anchored to meaning identity, not edged",
-    "disposition": "governance act — anchored, not edged",
-    "exclusion": "counted parse refusals — the census IS their edge",
-    "responsibility": "governance act — anchored, not edged",
-    "extract_receipt": "intake bookkeeping",
-    "registration": "the estate's birth record",
-    "meaning_twin": "KG2b container node; its interior nodes point "
-                    "at the parse (points_at), not the adjacency",
-}
+
+def connection_ledger() -> Dict[str, Dict[str, str]]:
+    """The per-kind birth-edge table, FROM THE REGISTRY (v1.21.0 —
+    the literal law: RULED_ISOLATED_KINDS is dead; a ruling never
+    lives in code). kind -> {edge, status}."""
+    from aivia.graph import metamodel
+    sheet = metamodel.load("lenses").sheets["Connection_Ledger"]
+    return {r["Kind"]: {"edge": r["Edge"], "status": r["Status"]}
+            for r in sheet if r["Kind"] != "_ruling"}
 
 
-def reachability_census(read) -> Dict[str, Any]:
-    """Census 1: every node has an edge in the connecting graph, or
-    its KIND is ruled isolated with a reason."""
+def connection_census(read) -> Dict[str, Any]:
+    """CENSUS 1's SUCCESSOR (the birth-edge law, Sunny's
+    term-isolation overrule): every node answers 'why do you exist'
+    by a walkable edge — birth_edged + counted_missing + rooted ==
+    total. missing-counted kinds are honest debt with their landing
+    step named in the ledger; an unledgered kind is a failure, not
+    a discovery (closed at birth)."""
     adj = connect.build_adjacency(read)
-    kinds_of: Dict[str, str] = {}
-    for kind in ("table", "column", "term", "usage", "description",
-                 "disposition", "exclusion", "responsibility",
-                 "extract_receipt", "registration", "meaning_twin"):
-        for n in read.nodes(kind):
-            kinds_of[n.identity] = kind
-    total_ids = set(adj) | set(kinds_of)
-    reachable = {i for i in total_ids if adj.get(i)}
-    ruled, isolated = [], []
-    for i in sorted(total_ids - reachable):
-        kind = kinds_of.get(i)
-        if kind in RULED_ISOLATED_KINDS:
-            ruled.append(i)
-        else:
-            isolated.append(i)
-    return {"total": len(total_ids), "reachable": len(reachable),
-            "ruled_isolated": len(ruled),
-            "ruled_isolated_kinds": sorted(
-                {kinds_of.get(i) for i in ruled if kinds_of.get(i)}),
-            "isolated": isolated}
+    ledger = connection_ledger()
+    birth_edged = counted = rooted = total = 0
+    missing_kinds = set()
+    unledgered = set()
+    for kind in sorted({n.kind for n in read.nodes(None)}):
+        nodes = read.nodes(kind)
+        row = ledger.get(kind)
+        if row is None:
+            unledgered.add(kind)
+            total += len(nodes)
+            continue
+        for n in nodes:
+            total += 1
+            if row["status"] == "rooted":
+                rooted += 1
+            elif row["status"] == "missing-counted":
+                counted += 1
+                missing_kinds.add(kind)
+            else:
+                labels = {lbl for _, lbl in adj.get(n.identity, [])}
+                ok = (bool(labels) if row["edge"] == "any"
+                      else row["edge"] in labels)
+                if ok:
+                    birth_edged += 1
+                else:
+                    counted += 1
+                    missing_kinds.add(kind)
+    return {"total": total, "birth_edged": birth_edged,
+            "counted_missing": counted, "rooted": rooted,
+            "counted_missing_kinds": sorted(missing_kinds),
+            "unledgered_kinds": sorted(unledgered)}
 
 
 def speech_census(read, index: List[Dict[str, Any]]) -> Dict[str, Any]:
@@ -89,14 +97,17 @@ def searchability_census(read,
 def report(read, index: List[Dict[str, Any]]) -> str:
     """The gap-check report bucket — the three equations with their
     numbers, for Sunny's read."""
-    r = reachability_census(read)
+    r = connection_census(read)
     s = speech_census(read, index)
     q = searchability_census(read, index)
     return "\n".join([
-        "## The three censuses (ADR 0080)",
-        f"- reachability: {r['reachable']} reachable + "
-        f"{r['ruled_isolated']} ruled-isolated == {r['total']} "
-        f"total; unruled orphans: {len(r['isolated'])}",
+        "## The three censuses (ADR 0080; census 1 succeeded by the "
+        "connection census, 2026-09-07)",
+        f"- connection: {r['birth_edged']} birth-edged + "
+        f"{r['counted_missing']} counted-missing + {r['rooted']} "
+        f"rooted == {r['total']} total; missing kinds: "
+        f"{r['counted_missing_kinds'] or 'none'}; unledgered: "
+        f"{r['unledgered_kinds'] or 'none'}",
         f"- speech: {s['speaks']} speak + {s['counted_gap']} "
         f"counted gaps + {s['ruled_mute']} ruled-mute == "
         f"{s['total']}; unassigned kinds: "

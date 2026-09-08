@@ -116,26 +116,28 @@ def test_searchability_equation(world):
 
 
 # ---- census 1: reachability ------------------------------------------
-def test_reachability_census(world):
+def test_connection_census_succeeds_reachability(world):
+    """Census 1's successor (the birth-edge law; the exemption list
+    died under Sunny's review — its first two rows were both
+    overruled)."""
     _store, read, _index, _semantic = world
-    c = census.reachability_census(read)
-    assert c["reachable"] + c["ruled_isolated"] == c["total"]
-    assert c["isolated"] == []  # unruled orphans are a failure
+    c = census.connection_census(read)
+    assert c["birth_edged"] + c["counted_missing"] + c["rooted"] \
+        == c["total"]
+    assert c["unledgered_kinds"] == []  # closed at birth
     assert c["total"] > 4000
 
 
-def test_reachability_vacuity_detects_an_orphan(world):
+def test_connection_vacuity_detects_a_new_node(world):
     store, read, _index, _semantic = world
     from aivia.graph import kg3_artifacts
     kg3_artifacts.append_term(store, "term::vacuity-probe",
                               "VACUITY_PROBE", "an orphan by design",
                               "person:test", T0)
-    c = census.reachability_census(ReadApi(store))
-    # the census SEES the new node — a census that can't move is
-    # decoration
+    c = census.connection_census(ReadApi(store))
     assert c["total"] >= 4001
-    assert "term" in c["ruled_isolated_kinds"] \
-        or "term::vacuity-probe" in c["isolated"]
+    # terms are honest step-2 debt, never ruled silent
+    assert "term" in c["counted_missing_kinds"]
 
 
 # ---- riders: no cliffs, word grain, honest zero ----------------------

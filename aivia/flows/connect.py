@@ -31,6 +31,42 @@ def build_adjacency(read) -> Dict[str, List[Tuple[str, str]]]:
 
     for n in read.nodes("column"):
         link(n.identity, n.identity.rsplit("|", 1)[0], "contains")
+    # THE BIRTH-EDGE UPGRADE (Connection Ledger step 1, 2026-09-07):
+    # the governance world's connections existed as PROPERTIES and
+    # were invisible to traversal — Sunny's overrule ("a usage event
+    # is connected to the user and the item it used"). Labels come
+    # from the ruled ledger, never a code dict.
+    from aivia.flows.censuses import connection_ledger
+    ledger = connection_ledger()
+    db_id = None
+    for n in read.nodes("db"):
+        db_id = n.identity
+    for n in read.nodes("schema"):
+        if db_id:
+            link(db_id, n.identity, "contains")
+    seen_schemas = {n.identity for n in read.nodes("schema")}
+    for n in read.nodes("table"):
+        schema_id = n.identity.rsplit("|", 1)[0]
+        if schema_id in seen_schemas:
+            link(schema_id, n.identity, "contains")
+    for n in read.nodes("meaning_twin"):
+        link(n.identity, n.identity.removeprefix("twin::"),
+             "translates")
+    for kind in ("usage", "description", "responsibility",
+                 "disposition", "proposal", "redaction"):
+        row = ledger.get(kind)
+        if not row or row["status"] != "edged":
+            continue
+        for n in read.nodes(kind):
+            about = n.properties.get("about")
+            targets = about if isinstance(about, list) else \
+                [about] if about else []
+            for t in targets:
+                link(n.identity, t, row["edge"])
+    for n in read.nodes("concept"):
+        act = n.properties.get("minting_act")
+        if act:
+            link(n.identity, act, "minted_by")
     for key, tree in read.trees().items():
         fname = key  # the index's file identity (the store's file id)
         for stmt in tree["statements"]:

@@ -125,6 +125,12 @@ SOURCES = {
 # clears and stays; context is CONVERSATION-scoped (client-held id),
 # never a global; transcript = DISPLAY memory, context set = MEANING
 # memory — prose history never reaches the model (the cage holds).
+# v1.21.0 (2026-09-07): THE CONNECTION LEDGER (Audit_Graph_
+# Integrity_Review ratified; Sunny's term-isolation overrule): the
+# birth-edge law — no node is alone; every node kind declares its
+# origin edge HERE (never a code dict — RULED_ISOLATED_KINDS dies).
+# Census 1's successor: birth-edged + counted-missing + rooted ==
+# total. missing-counted rows are honest debt with their step named.
 # v1.20.0 (2026-09-07): THE NINE-LAW DIG BUILD (chatbot doc, all
 # rulings). Kind_Vocabulary and Anaphor_Vocabulary DIE (no pre-made
 # mapping tables — Sunny's ruling; vocabulary is EARNED: LLM
@@ -157,7 +163,7 @@ SOURCES = {
 # deliveries lead, spine voiced, intermediates counted, census
 # closes; the file's ask-index words = the delivery lead, so file
 # embeddings embed meaning, never name-noise).
-STAMP_VERSION = "1.20.0"
+STAMP_VERSION = "1.21.0"
 RATIFIED = True
 DOC_STAMP = ("v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 twin-graph "
              "ruling ADR 0077; v1.2.0 Phase A metamodel bump; v1.3.0 "
@@ -837,16 +843,80 @@ TWIN_SHEETS = {
             {"Level": "5", "Down": "the store",
              "Still_works": "nothing — the honest outage"},
         ],
+        "Connection_Ledger": [
+            {"Kind": "_ruling", "Edge": "-", "Status": "-",
+             "Meaning": "THE BIRTH-EDGE LAW (2026-09-07, Sunny's "
+             "term-isolation overrule): no node is alone — every "
+             "node answers 'why do you exist' by a walkable edge. "
+             "Closed at birth: a new store kind declares its row "
+             "here before its first write or the connection census "
+             "fails. Status: edged (edge must be present per node) "
+             "| rooted (a legitimate origin) | missing-counted "
+             "(honest engine debt, its landing step named)."},
+            {"Kind": "db", "Edge": "-", "Status": "rooted",
+             "Meaning": "the estate root — carries the registration "
+             "trace (minted_from); everything intake-born chains "
+             "here"},
+            {"Kind": "schema", "Edge": "contains", "Status": "edged",
+             "Meaning": "db contains schema; schema contains tables"},
+            {"Kind": "table", "Edge": "any", "Status": "edged",
+             "Meaning": "conservation-governed (contains/reads)"},
+            {"Kind": "column", "Edge": "any", "Status": "edged",
+             "Meaning": "conservation-governed (contains/cites)"},
+            {"Kind": "file", "Edge": "any", "Status": "edged",
+             "Meaning": "intake-born; contains scopes, reads tables"},
+            {"Kind": "scope", "Edge": "any", "Status": "edged",
+             "Meaning": "parsed from its file (contains)"},
+            {"Kind": "meaning_twin", "Edge": "translates",
+             "Status": "edged",
+             "Meaning": "the twin walks to the file it translates"},
+            {"Kind": "description", "Edge": "describes",
+             "Status": "edged",
+             "Meaning": "walks to its about-targets; anchor "
+             "resolution stays the anchors lens's job"},
+            {"Kind": "responsibility", "Edge": "assigns",
+             "Status": "edged", "Meaning": "walks to its target"},
+            {"Kind": "disposition", "Edge": "rules_on",
+             "Status": "edged", "Meaning": "walks to the artifact "
+             "it rules"},
+            {"Kind": "usage", "Edge": "about", "Status": "edged",
+             "Meaning": "Sunny's ruling: a usage event connects to "
+             "the item it used (author->person lands in step 3)"},
+            {"Kind": "proposal", "Edge": "about", "Status": "edged",
+             "Meaning": "walks to what it proposes about"},
+            {"Kind": "redaction", "Edge": "about", "Status": "edged",
+             "Meaning": "walks to what it redacts"},
+            {"Kind": "run_event", "Edge": "-",
+             "Status": "missing-counted",
+             "Meaning": "no target stored today — origin edge is "
+             "counted debt (future step, Sunny's review)"},
+            {"Kind": "term", "Edge": "-",
+             "Status": "missing-counted",
+             "Meaning": "Sunny's overrule: a term is deduced from "
+             "SQL/acts — origins land in STEP 2; the junk "
+             "self-about is never walked; counted until then"},
+            {"Kind": "concept", "Edge": "minted_by",
+             "Status": "edged",
+             "Meaning": "walks to its recorded minting act"},
+            {"Kind": "excluded_file", "Edge": "-",
+             "Status": "missing-counted",
+             "Meaning": "root link lands in STEP 5; counted until "
+             "then"},
+        ],
         "Censuses": [
             {"Census": "_ruling", "Equation": "-",
              "Meaning": "ADR 0080 (2026-09-07): Sunny's three "
              "questions as conservation laws, the voiced+counted=="
              "total shape. Each census is a standing test AND a "
              "gap-check report bucket."},
-            {"Census": "reachability",
-             "Equation": "reachable + ruled-isolated == total nodes",
-             "Meaning": "the L0 lineage guarantee given its census; "
-             "status at ratification: UNVERIFIED in aivia"},
+            {"Census": "connection (succeeds reachability, "
+             "2026-09-07)",
+             "Equation": "birth-edged + counted-missing + rooted == "
+             "total nodes",
+             "Meaning": "THE BIRTH-EDGE LAW: every node answers "
+             "'why do you exist' by edge, per Connection_Ledger; "
+             "the reachability exemption list died under Sunny's "
+             "review (its first two rows were both overruled)"},
             {"Census": "speech",
              "Equation": "speaks + counted-gap + ruled-mute == "
              "total nodes",
