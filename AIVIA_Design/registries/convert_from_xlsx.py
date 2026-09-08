@@ -125,6 +125,10 @@ SOURCES = {
 # clears and stays; context is CONVERSATION-scoped (client-held id),
 # never a global; transcript = DISPLAY memory, context set = MEANING
 # memory — prose history never reaches the model (the cage holds).
+# v1.25.0 (2026-09-07): STEP 5 — ROOT EDGES: exclusions store the
+# estate root reference at write and walk excluded_from -> db; the
+# excluded_file row flips to edged; THE ROOT RULING checkable:
+# rooted == the one db.
 # v1.24.0 (2026-09-07): STEP 4 — PART EDGES: conditions/parameters
 # gain belongs_to edges (INDEX-ONLY dies); ALL pseudo-node citizens
 # (condition, parameter, derived column, drift) documented in the
@@ -175,7 +179,7 @@ SOURCES = {
 # deliveries lead, spine voiced, intermediates counted, census
 # closes; the file's ask-index words = the delivery lead, so file
 # embeddings embed meaning, never name-noise).
-STAMP_VERSION = "1.24.0"
+STAMP_VERSION = "1.25.0"
 RATIFIED = True
 DOC_STAMP = ("v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 twin-graph "
              "ruling ADR 0077; v1.2.0 Phase A metamodel bump; v1.3.0 "
@@ -956,10 +960,11 @@ TWIN_SHEETS = {
              "(never cross-minted as persons)"},
             {"Kind": "role", "Edge": "by", "Status": "edged",
              "Meaning": "role actors — same law"},
-            {"Kind": "excluded_file", "Edge": "-",
-             "Status": "missing-counted",
-             "Meaning": "root link lands in STEP 5; counted until "
-             "then"},
+            {"Kind": "excluded_file", "Edge": "excluded_from",
+             "Status": "edged",
+             "Meaning": "STEP 5 LANDED: deduced from the estate's "
+             "intake — chains to the root; legacy exclusions "
+             "without the reference count missing per node"},
         ],
         "Censuses": [
             {"Census": "_ruling", "Equation": "-",

@@ -989,7 +989,14 @@ def record_exclusion(store: Store, file_name: str, reason: str,
                if n.identity == file_name]
     if current and current[0].properties.get("reason") == reason:
         return
-    store.append_node("excluded_file", file_name, {"reason": reason},
+    # STEP 5 (the birth-edge law): an exclusion is deduced from the
+    # estate's intake — it chains to the root like everything
+    # intake-born
+    dbs = store.current_nodes("db")
+    props = {"reason": reason}
+    if dbs:
+        props["estate"] = dbs[0].identity
+    store.append_node("excluded_file", file_name, props,
                       as_of, f"estate@{as_of}")
 
 

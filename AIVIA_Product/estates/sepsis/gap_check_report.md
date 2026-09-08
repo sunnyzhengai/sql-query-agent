@@ -10,7 +10,7 @@ Every named scope's floor text, for Sunny's gap-check (the ED-sepsis acceptance 
 - OPEN, estate findings (the customer's): 0 documentation gaps + 132 drift refs (columns nowhere declared — silently-failing reports, kept counted forever)
 
 ## The three censuses (ADR 0080; census 1 succeeded by the connection census, 2026-09-07)
-- connection: 5016 birth-edged + 0 counted-missing + 1 rooted == 5017 total; missing kinds: none; unledgered: none
+- connection: 5017 birth-edged + 0 counted-missing + 1 rooted == 5018 total; missing kinds: none; unledgered: none
 - speech: 7779 speak + 0 counted gaps + 277 ruled-mute == 8056; unassigned kinds: none
 - searchability: 7779 searchable + 0 ruled-silent == 7779 speakers
 

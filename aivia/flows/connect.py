@@ -87,6 +87,11 @@ def build_adjacency(read) -> Dict[str, List[Tuple[str, str]]]:
                      scope["name_key"], "belongs_to")
         for prm in tree.get("parameters", []):
             link(f"{key}::param/{prm['name']}", key, "belongs_to")
+    # STEP 5: exclusions walk to the estate root
+    for n in read.nodes("excluded_file"):
+        root = n.properties.get("estate")
+        if root:
+            link(n.identity, root, "excluded_from")
     # STEP 3: every authored node walks —by→ its actor — one pass
     # over ALL nodes, no kind list (the literal law)
     for n in read.nodes(None):
