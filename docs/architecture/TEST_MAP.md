@@ -7,7 +7,7 @@
 
 # Test Map — what every test proves
 
-160 modules, 1774 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
+162 modules, 1777 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
 
 ## By ADR
 
@@ -79,9 +79,9 @@
 | 0075 | The check contract: checks are claims (spec:G4) | `tests/test_check_contract.py` (4) |
 | 0076 | Compositional interpretation: capture once, interpret by grammar (spec:G5) | `tests/test_op_frontier.py` (8), `tests/test_skeleton_composer.py` (38) |
 | 0077 | The twin-graph KG: meaning is a stored homomorphic twin | `tests/aivia/test_design_validators.py` (4), `tests/aivia/test_metamodel.py` (7), `tests/aivia/test_phase_a_projection.py` (6) |
-| 0078 | The ask-the-graph console: free questions, typed paths, self-answering nodes | `tests/aivia/test_ask_console.py` (28) |
-| 0079 | The interpreter and the speaking graph | `tests/aivia/test_ask_console.py` (28) |
-| 0080 | The center and the three censuses | `tests/aivia/test_ask_console.py` (28) |
+| 0078 | The ask-the-graph console: free questions, typed paths, self-answering nodes | `tests/aivia/test_ask_console.py` (21) |
+| 0079 | The interpreter and the speaking graph | `tests/aivia/test_ask_console.py` (21) |
+| 0080 | The center and the three censuses | `tests/aivia/test_ask_console.py` (21) |
 | 0081 | The birth-edge law | `tests/aivia/test_connection_census.py` (9) |
 
 ## By standing law
@@ -157,8 +157,9 @@
 ### contract:aivia-design-to-code — aivia code and tests consume the ratified registries and fixture answer keys, never the doc's prose (Design-to-Code protocol, slices 0-8; claimed per-module 2026-09-06 when the suite-map gate reached the aivia suite)
 
 - `tests/aivia/test_approve_land.py` (10): Slice 6 exit: the F5 script against the BUILT approve/land flows.
-- `tests/aivia/test_ask_console.py` (28): Tier A exit (ADR 0079): the F10 answer keys go RUNNABLE.
+- `tests/aivia/test_ask_console.py` (21): Tier A exit (ADR 0079): the F10 answer keys go RUNNABLE.
 - `tests/aivia/test_center_censuses.py` (18): ADR 0080 — the center and the three censuses, red-first.
+- `tests/aivia/test_click_reroute.py` (3): STEP A of the search rebuild — CLICKS ARE STEER (gap 12). Suite
 - `tests/aivia/test_connection_census.py` (9): STEP 1 of the Connection Ledger build — THE TEST SUITE, shown to
 - `tests/aivia/test_design_validators.py` (4): Slice 0: the design validators run in CI — every push re-proves the
 - `tests/aivia/test_flows_change_quanta.py` (6): The flows' change quanta (CONTRACT_DATALOAD §13 + the flows
@@ -181,6 +182,7 @@
 - `tests/aivia/test_produce.py` (10): Slice 5 exit: produce vs the RATIFIED floor grammar — F4 upgraded
 - `tests/aivia/test_refusals.py` (9): Slice 1: the F6 refusal set — every refusal NAMES its rule.
 - `tests/aivia/test_root_edges.py` (4): STEP 5 of the Connection Ledger build — ROOT EDGES. The test
+- `tests/aivia/test_search_is_the_answer.py` (7): STEP B — THE SEARCH IS THE ANSWER (Sunny's pipeline, ruled
 - `tests/aivia/test_sepsis_shakedown.py` (9): The sepsis shakedown (round 2) — conservation counters pinned;
 - `tests/aivia/test_shapes_shakedown.py` (4): The shapes shakedown — the engine over the 38-file ADR 0055 corpus,
 - `tests/aivia/test_store.py` (6): Slice 1: the append-only substrate — LC-F2/F3 as structure.

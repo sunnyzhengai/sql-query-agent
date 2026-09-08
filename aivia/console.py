@@ -292,23 +292,17 @@ def make_handler(store, estate, interpret_fn, semantic, pending,
         # plan-confirm-execute-display applied to search; always-on
         # (later suppression is a toggle, never a removal)
         if result.get("trace"):
-            TIERS = {"anaphor": "from the table",
-                     "kind": "as a type word",
-                     "proposed-kind": "as a type word (proposed)",
-                     "exact-identity": "by exact identity",
-                     "exact-name": "by exact name",
-                     "path": "by path", "name-token": "by name words",
-                     "semantic": "by meaning", "none": "nowhere"}
             rows = []
             for t in result["trace"]:
-                how = TIERS.get(t.get("tier"), t.get("tier"))
-                bit = f"'{t['mention']}' — {how}: {t['outcome']}"
-                if t.get("score") is not None:
-                    bit += f" ({t['score']})"
-                bit += (" · searched as: "
-                        + " | ".join(t["expansions_tried"])
-                        if t.get("expansions_tried")
-                        else " · no expansions proposed")
+                if t.get("tier") == "table":
+                    bit = (f"'{t['mention']}' — from the table: "
+                           f"{t.get('hits', 0)} thing(s)")
+                else:
+                    bit = (f"'{t['mention']}' — searched as: "
+                           f"{t.get('searched_as', t['mention'])} "
+                           f"→ {t.get('hits', 0)} hit(s)")
+                if t.get("seat_down"):
+                    bit += " · ranker seat down"
                 rows.append(html.escape(bit))
             parts.append("<p class=meta>searched: "
                          + " &nbsp;·&nbsp; ".join(rows) + "</p>")

@@ -30,7 +30,7 @@ def world():
     read = ReadApi(store)
     index = ask.build_index(read)
     semantic = grounding.SemanticIndex(index, fake_embed,
-                                       "fake-64", cache_path=None)
+                                       "fake-2k", cache_path=None)
     return store, read, index, semantic
 
 
@@ -93,12 +93,15 @@ def test_conditions_speak_and_carry_owners(world):
         assert any(f.endswith(owner_file) for f in files)
 
 
-def test_kinds_are_searchable_nodes(world):
+def test_labels_are_searchable_nodes(world):
+    """ADAPTED 2026-09-07 (the kinds removal + THE SEARCH IS THE
+    ANSWER): labels replaced kind nodes — derived from the live
+    store, speaking their own plural."""
     _store, _read, index, _semantic = world
-    kinds = [e for e in index if e["kind"] == "kind"]
-    assert kinds  # node types are part of the search (ADR 0080)
-    file_kind = next(e for e in kinds if e["name"] == "file")
-    assert file_kind["words"]  # its registry definition speaks
+    labels = [e for e in index if e["kind"] == "label"]
+    assert labels
+    file_label = next(e for e in labels if e["name"] == "file")
+    assert file_label["words"] == "files"
 
 
 def test_speech_census_equation(world):
@@ -168,19 +171,21 @@ def test_thresholds_come_from_the_registry():
     assert t["CANDIDATE_FLOOR"] == 0.25
 
 
-def test_word_grain_ed_finds_reports_never_bed_config(world):
+def test_ed_finds_reports_never_bed_config(world):
+    """ADAPTED (the ranked search): 'ED' + its expansion find the
+    ED files; BED_CONFIG never rides (whole-word vectors, not
+    substrings)."""
     store, _read, _index, semantic = world
     q = "what reports are about ED"
-    interp = fake_interpreter({q: {"mentions": ["reports", "ED"]}})
+    interp = fake_interpreter({q.lower(): {
+        "mentions": ["ED"],
+        "expansions": {"ED": ["emergency department"]}}})
     result = ask.ask(store, q, "person:test", T0,
                      interpret_fn=interp, semantic=semantic)
     assert result["status"] == "answer"
-    assert result["pending_confirmation"]  # L7-D2: inline, non-blocking
-    final = ask.confirm(store, q, result["interpretation"],
-                        "person:test", T0, semantic=semantic)
-    assert final["status"] == "answer"
-    assert "USP_ED_SEPSIS" in final["answer"]
-    assert "BED_CONFIG" not in final["answer"]
+    names = " ".join(h["name"] for h in result["hits"])
+    assert "ED" in names or "SEPSIS" in names.upper()
+    assert "BED_CONFIG" not in names
 
 
 def test_honest_zero_never_no_match_while_a_kind_grounded(world):
@@ -221,11 +226,15 @@ def test_facet_rollup_with_provenance(world):
 # ---- riders: the trace and expansions --------------------------------
 def test_trace_rides_every_answer(world):
     store, _read, _index, semantic = world
-    result = ask.ask(store, "emr|dbo|ED_ENCOUNTERS_DM",
-                     "person:test", T0, semantic=semantic)
+    q = "the ed encounters table"
+    interp = fake_interpreter(
+        {q: {"mentions": ["ED_ENCOUNTERS_DM"]}})
+    result = ask.ask(store, q, "person:test", T0,
+                     interpret_fn=interp, semantic=semantic)
     assert result["status"] == "answer"
     trace = result["trace"]
-    assert trace and trace[0]["tier"]  # what was searched, and how
+    assert trace and (trace[0].get("tier")
+                      or trace[0].get("searched_as"))
 
 
 def test_expansions_are_searched_and_confirmation_lands_a_term(world):

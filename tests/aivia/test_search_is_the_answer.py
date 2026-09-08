@@ -28,7 +28,7 @@ def world():
     read = ReadApi(store)
     index = ask.build_index(read)
     semantic = grounding.SemanticIndex(index, fake_embed,
-                                       "fake-64", cache_path=None)
+                                       "fake-2k", cache_path=None)
     return store, read, index, semantic
 
 
@@ -108,16 +108,21 @@ def test_expansions_are_the_search_text(world):
     assert any(t.get("searched_as") for t in result["trace"])
 
 
-def test_zero_hits_is_the_honest_door(world):
+def test_nonsense_shows_only_weakness(world):
+    """Corrected pin (embedder physics: cosines are never empty —
+    for the real model or the fake): honesty for nonsense is
+    VISIBLE WEAKNESS — no strong hits, every score shown below the
+    match line, or the empty door."""
     store, _read, _index, semantic = world
     q = "wibble wobble zorp"
     interp = fake_interpreter({q: {"mentions": ["zorpwibble"]}})
     result = ask.ask(store, q, "person:test", T0,
                      interpret_fn=interp, semantic=semantic)
     assert result["status"] == "answer"
-    assert result["hits"] == []
-    assert "search" in result["answer"].lower() \
-        or "no " in result["answer"].lower()
+    assert all(h["score"] < 0.5 for h in result["hits"])
+    if not result["hits"]:
+        assert "searched" in result["answer"].lower() \
+            or "nothing" in result["answer"].lower()
 
 
 # ---- follow-ups survive the rebuild ----------------------------------

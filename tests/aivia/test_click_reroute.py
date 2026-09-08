@@ -40,7 +40,7 @@ def surface():
     read = ReadApi(store)
     index = ask.build_index(read)
     semantic = grounding.SemanticIndex(index, fake_embed,
-                                       "fake-64", cache_path=None)
+                                       "fake-2k", cache_path=None)
     calls = []
 
     def recording_interpreter(question):

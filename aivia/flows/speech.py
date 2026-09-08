@@ -26,7 +26,7 @@ SHEET_KINDS = {
     "scope": "scope (selection)", "file": "file",
     "condition": "condition (predicate)", "parameter": "parameter",
     "derived column": "derived column", "term": "term (KG3)",
-    "drift": "drift name", "kind": "kind (node type)",
+    "drift": "drift name", "label": "kind (node type)",
 }
 
 
@@ -104,15 +104,15 @@ def speak(read, entry: Dict[str, Any]) -> str:
         return (node.properties.get("definition") or "").lower()
     if kind == "drift":
         return f"{_words(entry['name'])}. {DRIFT_SENTENCE}"
-    if kind == "kind":
-        # self-description (v1.20.0, the dig): the graph describes
-        # its own types in prose — cold-start grounding for type
-        # words, never a mapping table
-        sheet = metamodel.load("lenses").sheets["Speech_Sources"]
-        row = next((r for r in sheet
-                    if r["Kind"] == f"_self {entry['name']}"), None)
-        return (row["Speech"].lower() if row else
-                f"the {entry['name']} kind of node")
+    if kind == "label":
+        # THE SEARCH IS THE ANSWER (2026-09-07): a label is its own
+        # searchable entry — its speech is its name in singular and
+        # plural (R1, the ratified pluralizer), so type words hit
+        # the GROUP at cosine≈1. Derived from the live store, never
+        # a list.
+        # the plural only — the name card already carries the
+        # singular; together the two cards cover both word forms
+        return produce._pluralize(entry["name"])
     return ""
 
 
@@ -154,10 +154,9 @@ def entries(read) -> List[Dict[str, Any]]:
         for p in tree.get("parameters", []):
             add("parameter", f"{key}::param/{p['name']}",
                 p["name"], key)
-    sheet = metamodel.load("lenses").sheets["Speech_Sources"]
-    for row in sheet:
-        if row["Kind"].startswith("_self "):
-            add("kind", f"kind::{row['Kind'][6:]}",
-                row["Kind"][6:], None)
+    # labels as entries, DERIVED from what the index itself holds
+    # (the graph's live self-knowledge; no list anywhere)
+    for lb in sorted({e["kind"] for e in out}):
+        add("label", f"label::{lb}", lb, None)
     return [e for e in out if e["words"] or e["kind"] not in
             ("condition",)]  # empty conditions never index

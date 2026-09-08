@@ -25,13 +25,17 @@ T0 = "2026-09-06T12:00:00Z"
 
 def fake_embed(texts):
     """Deterministic bag-of-words hashing: shared words -> nearby
-    vectors — enough semantics to prove the tier, zero network."""
+    vectors — enough semantics to prove the pipeline, zero network.
+    2048 buckets x two positions per word: collisions between
+    unrelated words become negligible (the 64-bucket version
+    collided single-word name cards at cosine 1.0)."""
     out = []
     for text in texts:
-        vec = [0.0] * 64
+        vec = [0.0] * 2048
         for word in re.sub(r"[^a-z0-9 ]", " ", text.lower()).split():
-            vec[int(hashlib.sha256(word.encode()).hexdigest(), 16)
-                % 64] += 1.0
+            h = hashlib.sha256(word.encode()).hexdigest()
+            vec[int(h[:12], 16) % 2048] += 1.0
+            vec[int(h[12:24], 16) % 2048] += 1.0
         out.append(vec)
     return out
 
@@ -74,7 +78,7 @@ def world():
     read = ReadApi(store)
     entries = ask.build_index(read)
     semantic = grounding.SemanticIndex(entries, fake_embed,
-                                       "fake-64", cache_path=None)
+                                       "fake-2k", cache_path=None)
     return store, semantic
 
 
@@ -85,7 +89,9 @@ def _ask(world, q, interpret=None):
 
 
 # ---- GR: grounding ---------------------------------------------------
-def test_gr1_exact_tier_is_model_free(world):
+def _superseded_gr1(world):  # SUPERSEDED 2026-09-07 (THE SEARCH IS
+    # THE ANSWER): exact tiers died; exact matching is the cosine≈1
+    # case, pinned in test_search_is_the_answer
     store, semantic = world
     calls = []
 
@@ -101,7 +107,8 @@ def test_gr1_exact_tier_is_model_free(world):
     assert "therapeutic class" in result["answer"]
 
 
-def test_gr3_kind_words_ground_to_kind_sets(world):
+def _superseded_gr3(world):  # SUPERSEDED: kind words -> label
+    # entries by vector (test_search_is_the_answer)
     result = _ask(world, "tables")
     assert result["status"] == "answer"
     assert result["answer"].startswith("90 table(s):")
@@ -112,20 +119,23 @@ def test_gr4_vectors_stamped_and_cached(tmp_path, world):
     read = ReadApi(store)
     entries = ask_index.lens_ask_index(read, None)["yield"][:20]
     cache = tmp_path / "emb.json"
-    first = grounding.SemanticIndex(entries, fake_embed, "fake-64",
+    first = grounding.SemanticIndex(entries, fake_embed, "fake-2k",
                                     cache_path=cache)
     # facet cards: 1-2 vectors per entry (name + speech when present)
     assert 20 <= first.embedded_now <= 40
 
     def forbidden(texts):
         raise AssertionError("re-embedded an unchanged meaning")
-    second = grounding.SemanticIndex(entries, forbidden, "fake-64",
+    second = grounding.SemanticIndex(entries, forbidden, "fake-2k",
                                      cache_path=cache)
     assert second.embedded_now == 0  # unchanged -> never re-embeds
 
 
 # ---- CN: connect -----------------------------------------------------
-def test_cn2_kind_plus_topic_the_live_find_dies(world):
+def _superseded_cn2(world):  # SUPERSEDED: provenance buckets died
+    # with the branch engine; the ranked list carries scores+cards.
+    # Find #5's truth (all 28 findable, caps visible) lives in the
+    # ranked pins.
     store, semantic = world
     interp = fake_interpreter({
         "what reports are about sepsis":
@@ -151,7 +161,8 @@ def test_cn2_kind_plus_topic_the_live_find_dies(world):
     assert "USP_RPTS_NonSevere_Sepsis" in final["answer"]
 
 
-def test_cn1_two_mentions_connect_and_speak(world):
+def _superseded_cn1(world):  # SUPERSEDED: paths are traversal ON
+    # DEMAND from found things (steer), not an ask branch
     store, semantic = world
     q = "how does THERA_CLASS_CODE relate to USP_ED_SEPSIS"
     interp = fake_interpreter({
@@ -167,13 +178,16 @@ def test_cn1_two_mentions_connect_and_speak(world):
     assert "hop(s))" in final["answer"]
 
 
-def test_cn3_single_mention_neighborhood(world):
+def _superseded_cn3(world):  # SUPERSEDED: the neighborhood is the
+    # entity round (a click), pinned in test_click_reroute
     result = _ask(world, "emr|dbo|ED_ENCOUNTERS_DM")
     assert result["status"] == "answer"
     assert "Connected:" in result["answer"]
 
 
-def test_metric_two_layer_answer_survives(world):
+def _superseded_metric(world):  # SUPERSEDED: the metric pseudo-kind
+    # died; 'metrics' is ordinary earned vocabulary (Sunny's kinds
+    # removal ruling)
     result = _ask(world, "metrics")
     assert "GOVERNED metrics (minted concepts): 0" in result["answer"]
     assert "PRACTICED metrics" in result["answer"]
@@ -181,7 +195,8 @@ def test_metric_two_layer_answer_survives(world):
 
 
 # ---- ST: steer -------------------------------------------------------
-def test_st1_ambiguity_clarifies_with_candidates(world):
+def _superseded_st1(world):  # SUPERSEDED: candidate-clarifies died;
+    # ambiguity is EMERGENT in the ranked list (several strong hits)
     result = _ask(world, "MEDICATION_ID")
     assert result["status"] == "clarify"
     assert len(result["candidates"]) >= 2
@@ -284,11 +299,29 @@ def test_sf1_exploding_interpreter_is_an_outcome_not_a_crash(world):
     assert "unavailable" in result["answer"].lower()
 
 
-def test_sf2_exploding_embedder_degrades_semantic_tier_only(world):
+def test_sf2_exploding_embedder_degrades_honestly(world):
+    """ADAPTED: with the ranker down, the search returns no hits +
+    a seat flag in the trace — an honest answer, never a crash."""
+    store, semantic = world
+
+    class Exploding:
+        def search(self, *a, **k):
+            raise RuntimeError("embed seat down")
+    q = "anything about sepsis"
+    interp = fake_interpreter({q: {"mentions": ["sepsis things"]}})
+    result = ask.ask(store, q, "person:test", T0,
+                     interpret_fn=interp, semantic=Exploding())
+    assert result["status"] == "answer"
+    assert result["hits"] == []
+    assert any(t.get("seat_down") for t in result["trace"])
+    return
+
+
+def _old_sf2(world):
     store, _ = world
     read = ReadApi(store)
     entries = ask_index.lens_ask_index(read, None)["yield"]
-    built = grounding.SemanticIndex(entries, fake_embed, "fake-64",
+    built = grounding.SemanticIndex(entries, fake_embed, "fake-2k",
                                     cache_path=None)
 
     def explode(texts):
@@ -304,7 +337,34 @@ def test_sf2_exploding_embedder_degrades_semantic_tier_only(world):
     assert ok["status"] == "answer" and ok["via"] == "deterministic"
 
 
-def test_sf3_deterministic_asks_immune_to_model_weather(world):
+def test_sf3_earned_answers_survive_model_weather(world):
+    """ADAPTED to the amended ladder (pre-tier death, Sunny's
+    option c): typed names no longer answer during an outage — what
+    survives is the EARNED: confirmed questions replay via the
+    ledger with every seat down."""
+    store, semantic = world
+    q = "my confirmed weather question"
+    interp = fake_interpreter({q: {"mentions": ["ADT_EVENTS"]}})
+    r1 = ask.ask(store, q, "person:test", T0,
+                 interpret_fn=interp, semantic=semantic)
+    if r1.get("pending_confirmation"):
+        ask.confirm(store, q, r1["interpretation"], "person:test",
+                    T0, semantic=semantic)
+
+    def exploding(qq):
+        raise RuntimeError("interpreter down")
+
+    class ExplodingSem:
+        def search(self, *a, **k):
+            raise RuntimeError("ranker down")
+    again = ask.ask(store, q, "person:test", T0,
+                    interpret_fn=exploding, semantic=ExplodingSem())
+    assert again["status"] == "answer"
+    assert again["via"] == "ledger"
+    return
+
+
+def _old_sf3(world):
     store, _ = world
 
     def explode_i(q):
@@ -318,8 +378,10 @@ def test_sf3_deterministic_asks_immune_to_model_weather(world):
 # ---- FU: follow-up context (Law 4, live find #7) --------------------
 def test_fu2_it_takes_the_single_subject(world):
     store, semantic = world
-    first = ask.ask(store, "emr|dbo|ED_ENCOUNTERS_DM", "person:test",
-                    T0, semantic=semantic)
+    q0 = "the ed encounters dm table"
+    i0 = fake_interpreter({q0: {"mentions": ["ED_ENCOUNTERS_DM"]}})
+    first = ask.ask(store, q0, "person:test",
+                    T0, interpret_fn=i0, semantic=semantic)
     assert first["status"] == "answer"
     assert first["context_set"]  # every answer yields its context
     ref = fake_interpreter({"it": {"mentions": ["it"],
@@ -333,33 +395,34 @@ def test_fu2_it_takes_the_single_subject(world):
 
 def test_fu1_those_filters_by_connection(world):
     store, semantic = world
-    first = ask.ask(store, "emr|dbo|ADT_EVENTS|ENCOUNTER_ID",
-                    "person:test", T0, semantic=semantic)
-    assert first["status"] == "answer"
-    context = first["context_set"]
-    assert any("::" in c for c in context)  # the citing scopes rode in
+    # the table is seeded directly (context is data — Law 4): the
+    # citing scopes of ENCOUNTER_ID plus two files
+    context = ["reporting/USP_ED_SEPSIS.sql::#Base_Pop",
+               "reports/USP_RPTS_ED_Sepsis.sql::#Base_Pop",
+               "reporting/USP_IP_SEPSIS.sql::#Base_Pop"]
     q = "which of those are in the ED sepsis report"
     interp = fake_interpreter({q.lower(): {"mentions":
         ["those", "reports/USP_RPTS_ED_Sepsis.sql"],
         "references": {"those": "set"}}})
-    result = ask.ask(store, q, "person:test", T0,
+    final = ask.ask(store, q, "person:test", T0,
                      interpret_fn=interp, semantic=semantic,
                      context=context)
-    assert result["status"] == "answer"
-    assert result["pending_confirmation"]  # L7-D2: inline, non-blocking
-    final = ask.confirm(store, q, result["interpretation"],
-                        "person:test", T0, semantic=semantic,
-                        context=context)
     assert final["status"] == "answer"
-    assert "USP_RPTS_ED_Sepsis" in final["answer"]
-    assert "USP_IP_SEPSIS.sql" not in final["answer"]  # filtered OUT
+    # the POOL was filtered by connection: the RPTS scope stays,
+    # the IP scope is gone (weak vector hits on other files may
+    # ride the ranked list — the pool filter is the pin)
+    table_hits = [h["identity"] for h in final["hits"]
+                  if h.get("via_card") == "table"]
+    assert "reports/USP_RPTS_ED_Sepsis.sql::#Base_Pop" in table_hits
+    assert "reporting/USP_IP_SEPSIS.sql::#Base_Pop" \
+        not in table_hits
 
 
 def test_fu3_ordinals_index_the_context(world):
     store, semantic = world
-    first = ask.ask(store, "emr|dbo|ADT_EVENTS|ENCOUNTER_ID",
-                    "person:test", T0, semantic=semantic)
-    context = first["context_set"]
+    context = ["emr|dbo|ADT_EVENTS|ENCOUNTER_ID",
+               "reporting/USP_ED_SEPSIS.sql::#Base_Pop",
+               "emr|dbo|ADT_EVENTS"]
     ref1 = fake_interpreter({"the first one": {
         "mentions": ["the first one"],
         "references": {"the first one": "ordinal:1"}}})
@@ -391,18 +454,21 @@ def test_fu5_empty_context_is_honest(world):
 
 def test_fu4_confirmed_followups_store_context_snapshot(world):
     store, semantic = world
-    first = ask.ask(store, "emr|dbo|ADT_EVENTS|ENCOUNTER_ID",
-                    "person:test", T0, semantic=semantic)
+    q00 = "the adt events encounter id column"
+    i00 = fake_interpreter({q00: {"mentions": ["ENCOUNTER_ID"]}})
+    first = ask.ask(store, q00, "person:test", T0,
+                    interpret_fn=i00, semantic=semantic)
     q = "show those again please"
+    ctx = first["context_set"]
     interp = fake_interpreter({q: {"mentions": ["those"],
                                    "references": {"those": "set"}}})
     result = ask.ask(store, q, "person:test", T0,
                      interpret_fn=interp, semantic=semantic,
-                     context=first["context_set"])
+                     context=ctx)
     assert result["status"] == "answer"
     assert result["pending_confirmation"]  # L7-D2: inline, non-blocking
     ask.confirm(store, q, result["interpretation"], "person:test",
-                T0, semantic=semantic, context=first["context_set"])
+                T0, semantic=semantic, context=ctx)
     # the ledger replays WITHOUT live context: the snapshot rides
     def exploding(qq):
         raise AssertionError("model called on a ledger hit")
@@ -449,7 +515,8 @@ def _round(base, **params):
 
 def test_cs1_context_is_conversation_scoped(surface):
     base, _calls = surface
-    first = _round(base, q="emr|dbo|ED_ENCOUNTERS_DM", c="conv-a")
+    first = _round(base, entity="emr|dbo|ED_ENCOUNTERS_DM",
+                   c="conv-a")
     assert first["status"] == "answer"
     assert first["context_set"]
     # conversation B never sees A's context
@@ -477,7 +544,7 @@ def test_cs2_rounds_are_data_page_is_a_shell(surface):
 
 def test_cs3_the_cage_holds_at_the_surface(surface):
     base, calls = surface
-    _round(base, q="emr|dbo|ED_ENCOUNTERS_DM", c="conv-d")
+    _round(base, entity="emr|dbo|ED_ENCOUNTERS_DM", c="conv-d")
     q2 = "what sepsis things exist here"
     _round(base, q=q2, c="conv-d")
     # the interpreter saw ONE question, verbatim — no prior answer
@@ -532,6 +599,24 @@ def test_gr6_files_embed_meaning_not_names(world):
 
 
 def test_cn5_the_report_floor_speaks_meaning(world):
+    """ADAPTED 2026-09-07: the report floor lives in the ENTITY
+    round (clicks are steer) — pinned against render_card
+    directly; searching for the file is the ranked suite's job."""
+    store, semantic = world
+    read = ReadApi(store)
+    index = ask.build_index(read)
+    entity = next(e for e in index if e["kind"] == "file"
+                  and e["identity"].endswith(
+                      "reporting/USP_ED_SEPSIS.sql"))
+    answer = ask.render_card(read, entity)
+    low = answer.lower()
+    assert "deliver" in low and "intermediate" in low
+    assert "67 steps" in answer
+    assert answer.index("deliver") < answer.index("67 steps")
+    return
+
+
+def _old_cn5(world):
     store, semantic = world
     result = ask.ask(store, "reporting/USP_ED_SEPSIS.sql",
                      "person:test", T0, semantic=semantic)
