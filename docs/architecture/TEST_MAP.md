@@ -7,7 +7,7 @@
 
 # Test Map — what every test proves
 
-156 modules, 1753 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
+157 modules, 1759 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
 
 ## By ADR
 
@@ -180,6 +180,7 @@
 - `tests/aivia/test_sepsis_shakedown.py` (9): The sepsis shakedown (round 2) — conservation counters pinned;
 - `tests/aivia/test_shapes_shakedown.py` (4): The shapes shakedown — the engine over the 38-file ADR 0055 corpus,
 - `tests/aivia/test_store.py` (6): Slice 1: the append-only substrate — LC-F2/F3 as structure.
+- `tests/aivia/test_term_origins.py` (6): STEP 2 of the Connection Ledger build — TERM ORIGINS. The test
 
 ## By spec axiom
 

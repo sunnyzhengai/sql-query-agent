@@ -142,6 +142,7 @@ def record_confirmation(store, question: str,
             interpretation["reference_set"]
     if context:  # Law 4: the snapshot rides — replay is deterministic
         event.properties["context_snapshot"] = list(context)
+    return event
 
 
 def build_index(read) -> List[Dict[str, Any]]:
@@ -930,21 +931,27 @@ def confirm(store, question: str, interpretation: Dict[str, Any],
     """The human blessed a fresh interpretation: record it (with its
     context snapshot, Law 4), then execute it as a ledger
     interpretation."""
-    record_confirmation(store, question, interpretation, author,
-                        occurred_at, basis, context=context)
+    event = record_confirmation(store, question, interpretation,
+                                author, occurred_at, basis,
+                                context=context)
     result = ask(store, question, author, occurred_at,
                  interpret_fn=None, semantic=semantic,
                  confirmed=interpretation, context=context)
-    # ADR 0080: confirming an interpretation BLESSES its expansions —
-    # they land as KG3 terms (vocabulary is data; the LLM proposed,
-    # the human confirmed, the ledger remembers)
+    # ADR 0080 + step 2 (the birth-edge law): confirming BLESSES the
+    # expansions into KG3 terms, each citing the confirming event —
+    # the click becomes a walkable edge
+    grounded = [g["entity"]["identity"]
+                for g in result.get("groundings", [])
+                if g.get("outcome") == "matched"]
     for m, alts in (interpretation.get("expansions") or {}).items():
         for alt in alts:
             kg3_artifacts.append_term(
                 store, f"term::vocab/{_fold(m)}", m,
                 f"{m} — confirmed ask vocabulary for: {alt}",
                 author, occurred_at,
-                basis={"kind": "ask-expansion", "basis": basis})
+                basis={"kind": "ask-expansion", "basis": basis},
+                derived_from=[event.identity],
+                about=grounded[:8] or None)
     return result
 
 

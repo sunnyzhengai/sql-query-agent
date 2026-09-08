@@ -52,13 +52,18 @@ VOCAB = {"tables": "table", "table": "table", "reports": "file",
 
 def seed_vocabulary(store):
     """The post-cold-start estate: kind words EARNED as confirmed
-    terms (parent kind::K) — the mapping table died (v1.20.0)."""
+    terms (parent kind::K), each citing the steward's seeding act —
+    the birth-edge law holds even for fixtures (step 2)."""
     from aivia.graph import kg3_artifacts
+    kg3_artifacts.append_usage(store, "confirmed", "person:steward",
+                               T0, payload="vocabulary seeding act")
+    act = store.current_nodes("usage")[-1]
     for word, kind in VOCAB.items():
         kg3_artifacts.append_term(
             store, f"term::vocab/{word.upper()}", word,
             f"a word for the {kind} kind of node",
-            "person:steward", T0, parent=f"kind::{kind}")
+            "person:steward", T0, parent=f"kind::{kind}",
+            derived_from=[act.identity])
 
 
 @pytest.fixture(scope="module")

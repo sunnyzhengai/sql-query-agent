@@ -1,7 +1,7 @@
 {
  "registry": "lenses",
  "stamp": {
-  "version": "1.21.0",
+  "version": "1.22.0",
   "doc_section": "Level 2 — lenses",
   "doc_stamp": "v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 twin-graph ruling ADR 0077; v1.2.0 Phase A metamodel bump; v1.3.0 Phase B composite-kinds correction; v1.4.0 T-2 operational-statements ruling; v1.5.0 the gap taxonomy; v1.6.0 the plug-all-holes sweep; v1.7.0 ledger close; v1.8.0 the ask console ADR 0078; v1.9.0 the list op; v1.10.0 kind vocabulary; v1.11.0 ADR 0079 interpreter; v1.12.0 Tier A build data; v1.13.0 the seat-failure law; v1.14.0 follow-up context; v1.15.0 anaphor vocabulary (all 2026-09-06)",
   "ratified": true,
@@ -470,9 +470,9 @@
    },
    {
     "Kind": "term",
-    "Edge": "-",
-    "Status": "missing-counted",
-    "Meaning": "Sunny's overrule: a term is deduced from SQL/acts — origins land in STEP 2; the junk self-about is never walked; counted until then"
+    "Edge": "derived_from",
+    "Status": "edged",
+    "Meaning": "STEP 2 LANDED (2026-09-07): a term cites the act it was deduced from at birth (LC3-F6 refusal); blessed vocabulary cites its confirming event; legacy orphans count per node"
    },
    {
     "Kind": "concept",

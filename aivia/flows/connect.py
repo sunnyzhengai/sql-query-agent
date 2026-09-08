@@ -67,6 +67,12 @@ def build_adjacency(read) -> Dict[str, List[Tuple[str, str]]]:
         act = n.properties.get("minting_act")
         if act:
             link(n.identity, act, "minted_by")
+    for n in read.nodes("term"):
+        for origin in n.properties.get("derived_from") or []:
+            link(n.identity, origin, "derived_from")
+        about = n.properties.get("about")
+        for t in (about if isinstance(about, list) else []):
+            link(n.identity, t, "about")
     for key, tree in read.trees().items():
         fname = key  # the index's file identity (the store's file id)
         for stmt in tree["statements"]:

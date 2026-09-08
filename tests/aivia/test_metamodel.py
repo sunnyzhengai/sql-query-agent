@@ -44,10 +44,10 @@ def test_every_loaded_registry_is_ratified_v1():
     # 1.20.0 = the nine-law dig build (vocab tables die; shapes +
     # ladder as data; kind self-descriptions);
     # 1.21.0 = the Connection Ledger (birth-edge law; census 1's
-    # successor)
+    # successor); 1.22.0 = term origins (step 2)
     for reg in metamodel.load_all().values():
         assert reg.ratified is True
-        assert reg.version == "1.21.0"
+        assert reg.version == "1.22.0"
 
 
 def test_load_single_exposes_sheets_and_stamp():

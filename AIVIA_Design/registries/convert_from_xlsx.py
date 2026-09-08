@@ -125,6 +125,10 @@ SOURCES = {
 # clears and stays; context is CONVERSATION-scoped (client-held id),
 # never a global; transcript = DISPLAY memory, context set = MEANING
 # memory — prose history never reaches the model (the cage holds).
+# v1.22.0 (2026-09-07): STEP 2 — TERM ORIGINS: the term row flips
+# to edged (derived_from); append_term REFUSES origin-less births
+# (LC3-F6); blessed vocabulary cites its confirming event; legacy
+# orphans stay counted per node.
 # v1.21.0 (2026-09-07): THE CONNECTION LEDGER (Audit_Graph_
 # Integrity_Review ratified; Sunny's term-isolation overrule): the
 # birth-edge law — no node is alone; every node kind declares its
@@ -163,7 +167,7 @@ SOURCES = {
 # deliveries lead, spine voiced, intermediates counted, census
 # closes; the file's ask-index words = the delivery lead, so file
 # embeddings embed meaning, never name-noise).
-STAMP_VERSION = "1.21.0"
+STAMP_VERSION = "1.22.0"
 RATIFIED = True
 DOC_STAMP = ("v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 twin-graph "
              "ruling ADR 0077; v1.2.0 Phase A metamodel bump; v1.3.0 "
@@ -890,11 +894,12 @@ TWIN_SHEETS = {
              "Status": "missing-counted",
              "Meaning": "no target stored today — origin edge is "
              "counted debt (future step, Sunny's review)"},
-            {"Kind": "term", "Edge": "-",
-             "Status": "missing-counted",
-             "Meaning": "Sunny's overrule: a term is deduced from "
-             "SQL/acts — origins land in STEP 2; the junk "
-             "self-about is never walked; counted until then"},
+            {"Kind": "term", "Edge": "derived_from",
+             "Status": "edged",
+             "Meaning": "STEP 2 LANDED (2026-09-07): a term cites "
+             "the act it was deduced from at birth (LC3-F6 "
+             "refusal); blessed vocabulary cites its confirming "
+             "event; legacy orphans count per node"},
             {"Kind": "concept", "Edge": "minted_by",
              "Status": "edged",
              "Meaning": "walks to its recorded minting act"},

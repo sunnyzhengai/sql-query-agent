@@ -43,9 +43,11 @@ def accreted():
     kg3_artifacts.append_responsibility(
         store, "resp::probe", "steward", "person:probe",
         "emr|dbo|ADT_EVENTS", "person:probe", T0)
+    probe_event = store.current_nodes("usage")[-1]
     kg3_artifacts.append_term(
         store, "term::probe", "PROBE", "a probe term",
-        "person:probe", T0)
+        "person:probe", T0,
+        derived_from=[probe_event.identity])
     read = ReadApi(store)
     return store, read, connect.build_adjacency(read)
 
@@ -104,8 +106,8 @@ def test_expected_edges_come_from_the_registry():
     assert ledger["usage"]["edge"] == "about"
     assert ledger["meaning_twin"]["edge"] == "translates"
     assert ledger["db"]["status"] == "rooted"
-    # term is COUNTED-MISSING by ruling until step 2 lands origins
-    assert ledger["term"]["status"] == "missing-counted"
+    # step 2 LANDED: the term row flipped to edged (derived_from)
+    assert ledger["term"]["status"] == "edged"
     assert not hasattr(censuses, "RULED_ISOLATED_KINDS")
 
 
@@ -115,10 +117,9 @@ def test_connection_census_equation_holds(accreted):
     c = censuses.connection_census(read)
     assert c["birth_edged"] + c["counted_missing"] + c["rooted"] \
         == c["total"]
-    # the ten unwalkable rows are healed: usage, description,
-    # responsibility, twin, db/schema walk — so counted_missing is
-    # ONLY the ruled step-2+ debt (terms; nothing silent)
-    assert c["counted_missing_kinds"] == ["term"]
+    # the ten unwalkable rows are healed AND (step 2) terms are
+    # well-born here: nothing is missing in this store
+    assert c["counted_missing_kinds"] == []
     assert c["unledgered_kinds"] == []  # closed at birth
 
 

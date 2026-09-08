@@ -25,8 +25,7 @@ from aivia.flows import ask, censuses, connect, grounding
 from aivia.graph import kg3_artifacts
 from aivia.graph.read_api import ReadApi
 
-from .test_ask_console import fake_embed, fake_interpreter, \
-    seed_vocabulary
+from .test_ask_console import fake_embed, fake_interpreter, seed_vocabulary
 
 T0 = "2026-09-07T12:00:00Z"
 

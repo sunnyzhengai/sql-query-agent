@@ -130,13 +130,17 @@ def test_connection_census_succeeds_reachability(world):
 
 def test_connection_vacuity_detects_a_new_node(world):
     store, read, _index, _semantic = world
-    from aivia.graph import kg3_artifacts
-    kg3_artifacts.append_term(store, "term::vacuity-probe",
-                              "VACUITY_PROBE", "an orphan by design",
-                              "person:test", T0)
+    # an orphan by design: the lawful API now REFUSES origin-less
+    # terms (step 2), so the orphan enters as legacy data — a raw
+    # store write — and the census still SEES it
+    store.append_node("term", "term::vacuity-probe",
+                      {"artifact_id": "term::vacuity-probe",
+                       "name": "VACUITY_PROBE",
+                       "definition": "an orphan by design",
+                       "author": "person:test", "created_at": T0},
+                      T0, "probe")
     c = census.connection_census(ReadApi(store))
     assert c["total"] >= 4001
-    # terms are honest step-2 debt, never ruled silent
     assert "term" in c["counted_missing_kinds"]
 
 

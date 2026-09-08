@@ -112,13 +112,28 @@ def append_description(store: Store, artifact_id: str, about: List[str],
 def append_term(store: Store, artifact_id: str, name: str, definition: str,
                 author: str, created_at: str,
                 basis: Optional[Dict[str, Any]] = None,
-                parent: Optional[str] = None) -> NodeVersion:
+                parent: Optional[str] = None,
+                derived_from: Optional[List[str]] = None,
+                about: Optional[List[str]] = None) -> NodeVersion:
     if not (definition or "").strip():
         raise RefusalKG3("LC3-F5", "no empty shells")
-    payload = {"name": name, "definition": definition}
+    # THE BIRTH-EDGE LAW (step 2, Sunny's overrule): a term is
+    # DEDUCED from something — the act/event that deduced it is
+    # required at birth. The junk self-about died with this.
+    if not derived_from:
+        raise RefusalKG3("LC3-F6", "no node is alone — a term cites "
+                         "the act it was deduced from (derived_from)")
+    payload = {"name": name, "definition": definition,
+               "derived_from": list(derived_from)}
+    if about:
+        payload["about"] = list(about)
     if parent:
         payload["parent"] = parent
-    return _append_version(store, "term", artifact_id, [name], author,
+    # the KG3 spine (about >=1) is satisfied by REAL targets: the
+    # entities the term describes, else the origin act itself —
+    # never the term's own name (the dead junk)
+    return _append_version(store, "term", artifact_id,
+                           list(about or derived_from), author,
                            created_at, basis, payload)
 
 
