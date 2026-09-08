@@ -125,6 +125,13 @@ SOURCES = {
 # clears and stays; context is CONVERSATION-scoped (client-held id),
 # never a global; transcript = DISPLAY memory, context set = MEANING
 # memory — prose history never reaches the model (the cage holds).
+# v1.26.0 (2026-09-07): SEAT PROMPTS ARE REGISTRY DATA (the
+# literal law's third lock + search-rebuild step C): the
+# Interpreter's prompt lives HERE, versioned — a prompt edit is a
+# registry bump Sunny reviews; the proposal-cache key carries the
+# prompt version so a prompt fix reaches already-asked questions.
+# Prompt 3.0.0: mentions + expansions + references + hint ONLY —
+# no type menu, no synonym vocabulary, every referring word kept.
 # v1.25.0 (2026-09-07): STEP 5 — ROOT EDGES: exclusions store the
 # estate root reference at write and walk excluded_from -> db; the
 # excluded_file row flips to edged; THE ROOT RULING checkable:
@@ -179,7 +186,7 @@ SOURCES = {
 # deliveries lead, spine voiced, intermediates counted, census
 # closes; the file's ask-index words = the delivery lead, so file
 # embeddings embed meaning, never name-noise).
-STAMP_VERSION = "1.25.0"
+STAMP_VERSION = "1.26.0"
 RATIFIED = True
 DOC_STAMP = ("v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 twin-graph "
              "ruling ADR 0077; v1.2.0 Phase A metamodel bump; v1.3.0 "
@@ -878,6 +885,36 @@ TWIN_SHEETS = {
              "Still_works": "names, clicks, buttons, the table"},
             {"Level": "5", "Down": "the store",
              "Still_works": "nothing — the honest outage"},
+        ],
+        "Seat_Prompts": [
+            {"Seat": "_ruling", "Version": "-", "Prompt":
+             "THE SEARCH IS THE ANSWER (2026-09-07) + the literal "
+             "law lock 3: seat prompts are versioned registry law. "
+             "The Interpreter proposes SHAPES only (mentions, "
+             "expansions, reference-roles, a view hint) — never "
+             "type targets, never vocabulary. Editing a prompt = "
+             "bumping its Version here; the proposal cache keys on "
+             "it."},
+            {"Seat": "interpreter", "Version": "3.0.0", "Prompt":
+             "You translate a question about a data estate into a "
+             "PROPOSAL. Return ONLY JSON: {\"mentions\": "
+             "[\"...\"], \"expansions\": {mention: [alternate "
+             "phrasings]}, \"references\": {mention: role}, "
+             "\"hint\": mode}. RULES. Mentions: EVERY word or "
+             "phrase in the question that names or refers to "
+             "something is a mention — never drop one (in 'what "
+             "reports are about ED', both 'reports' and 'ED' are "
+             "mentions); keep names verbatim; 1-5 mentions. "
+             "Expansions: for acronyms, abbreviations, and jargon, "
+             "propose full forms and synonyms as extra search "
+             "strings (e.g. an acronym's spelled-out form). "
+             "References: when a mention refers back to the "
+             "previous answer (it, those, the first one), give its "
+             "role: singular | set | ordinal:N. Hint (optional): "
+             "card | lineage | filters | readers | census, only "
+             "when the question asks for that view. Never answer "
+             "the question; never invent names; never guess what "
+             "type of thing a word means — the graph decides."},
         ],
         "Connection_Ledger": [
             {"Kind": "_ruling", "Edge": "-", "Status": "-",

@@ -11,8 +11,8 @@ done.)*
 | # | gap | step | status |
 |---|---|---|---|
 | 1 | pre-tier still in code (ruled dead) | B | BUILT | pre-tier deleted; ask() runs memory→model→search |
-| 2 | prompt still has kind menu/synonyms; drops mentions | C | OPEN |
-| 3 | proposal-cache key ignores prompt version | C | OPEN |
+| 2 | prompt still has kind menu/synonyms; drops mentions | C | BUILT: prompt 3.0.0 in Seat_Prompts (registry 1.26.0) — shapes only, every referring word required |
+| 3 | proposal-cache key ignores prompt version | C | BUILT: key = question|model|prompt-version; stale proposals unreachable |
 | 4 | labels not searchable as entries (the group hit) | B | BUILT | label:: entries derived from the live store, singular+plural cards; group hits w/ member counts |
 | 5 | string-tier ladder runs before vectors | B | BUILT | tier ladder deleted from the search path; cosine≈1 subsumption pinned |
 | 6 | expansions not used as search text | B | BUILT | searched_as = mention + expansions; visible in the trace |

@@ -190,39 +190,30 @@ def _openai(path: str, payload: dict, key: str) -> dict:
     raise last
 
 
+def interpreter_prompt():
+    """The Interpreter's prompt IS registry law (Seat_Prompts,
+    v1.26.0) — versioned; editing it is a registry bump. Returns
+    (text, version)."""
+    from aivia.graph import metamodel
+    sheet = metamodel.load("lenses").sheets["Seat_Prompts"]
+    row = next(r for r in sheet if r["Seat"] == "interpreter")
+    return row["Prompt"], row["Version"]
+
+
 def make_interpreter(key: str, cache_path=None):
-    """THE INTERPRETER seat (nine-law rights table): reads nothing,
-    writes nothing — one question in, one typed PROPOSAL out. The
-    L8-D2 proposal cache rides here: keyed (question, model
-    version), derived and regenerable — one model call per distinct
-    question per model version, determinism extended to unconfirmed
-    asks."""
-    prompt = (
-        "You translate a question about a SQL estate into a "
-        "PROPOSAL. Return ONLY JSON: {\"mentions\": [\"...\"], "
-        "\"expansions\": {mention: [alternate phrasings]}, "
-        "\"kinds\": {mention: kind}, \"references\": "
-        "{mention: role}, \"hint\": mode}. Rules: 1-5 mentions; "
-        "keep column/table/procedure names verbatim; a topic (a "
-        "disease, a subject) is a mention. EXPANSIONS: for "
-        "acronyms/jargon, propose full forms and synonyms (e.g. ED "
-        "-> emergency department, emergency room) — search strings "
-        "only. KINDS: when a mention names a TYPE of thing, map it "
-        "— allowed kinds ONLY: file (reports/procs/queries/views), "
-        "table, column, scope (selections/ctes/temp tables), "
-        "condition (filters/rules/business logic), derived column, "
-        "term (definitions), drift, parameter, metric. REFERENCES: "
-        "when a mention refers back to the previous answer (it, "
-        "those, the first one), mark role: singular | set | "
-        "ordinal:N. HINT (optional): card | lineage | filters | "
-        "readers | census when the question asks for that view. "
-        "Never answer the question; never invent names.")
+    """THE INTERPRETER seat: reads nothing, writes nothing — one
+    question in, one typed PROPOSAL out. The proposal cache keys on
+    (question, model, PROMPT VERSION): a prompt fix reaches every
+    already-asked question (the change-quanta law — a prompt is a
+    rule)."""
+    prompt, prompt_version = interpreter_prompt()
     cache = {}
     if cache_path and cache_path.is_file():
         cache = json.loads(cache_path.read_text())
 
     def interpret(question: str):
-        ck = f"{' '.join(question.split()).lower()}|{INTERPRETER_MODEL}"
+        ck = (f"{' '.join(question.split()).lower()}|"
+              f"{INTERPRETER_MODEL}|{prompt_version}")
         if ck in cache:
             return cache[ck]
         out = _openai("chat/completions", {
