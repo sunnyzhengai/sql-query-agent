@@ -629,6 +629,17 @@ only authority that can make the output durable.
 | memory (the ledger / USER TREE) | confirmed proposals, usage | interpretations, vocabulary, affinity — deterministic on replay | — | HUMAN ACTS ONLY (confirm/revoke); usage events append | never edited — superseded by new events | the user (personal) / steward (shared) |
 | surface | envelope | transcript round, confirm affordance, buttons, clickable things, visible trace | — | nothing | — | the human presses; models never press |
 
+► RULED (Sunny, 2026-09-07, the ledger-miss walkthrough): ALL USER
+DECISIONS ARE STORED IN THE USER TREE — PERSISTENTLY. Confirmations,
+clarify-picks, blessings, revocations survive console restarts; the
+walkthrough exposed that KG3 events live in memory only (the 5:11pm
+confirmations died with that console). Design shape: an append-only
+GOVERNANCE JOURNAL per estate (human acts as events, supersede
+never delete — the KG3 posture on disk), replayed at boot; each
+user's TREE is a view over it rooted at their person node (step 3's
+trunk). The ledger's "deterministic forever" becomes literally
+forever. Build item: suite-first, queued with the find-package.
+
 **The user's own tree (Sunny's proposal, adopted into the draft):**
 memory is not a flat ledger — it is a TREE per user: user node →
 confirmed vocabulary → confirmed interpretations → reports/queries
