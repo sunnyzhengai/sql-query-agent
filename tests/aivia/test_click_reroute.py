@@ -45,6 +45,9 @@ def surface():
 
     def recording_interpreter(question):
         calls.append(question)
+        if question.strip().lower() == "it":
+            return {"mentions": ["it"],
+                    "references": {"it": "singular"}}
         return {"mentions": [question]}
 
     handler = console.make_handler(store, "sepsis",
