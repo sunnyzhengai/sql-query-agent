@@ -125,6 +125,11 @@ SOURCES = {
 # clears and stays; context is CONVERSATION-scoped (client-held id),
 # never a global; transcript = DISPLAY memory, context set = MEANING
 # memory — prose history never reaches the model (the cage holds).
+# v1.24.0 (2026-09-07): STEP 4 — PART EDGES: conditions/parameters
+# gain belongs_to edges (INDEX-ONLY dies); ALL pseudo-node citizens
+# (condition, parameter, derived column, drift) documented in the
+# ledger as edged-pseudo — tree-born adjacency citizens, outside
+# the store census by ruling, never undocumented.
 # v1.23.0 (2026-09-07): STEP 3 — PERSON NODES: actors minted on
 # first act (person/agent/role by prefix, idempotent); every
 # authored node walks -by-> its actor; the user tree has its trunk.
@@ -170,7 +175,7 @@ SOURCES = {
 # deliveries lead, spine voiced, intermediates counted, census
 # closes; the file's ask-index words = the delivery lead, so file
 # embeddings embed meaning, never name-noise).
-STAMP_VERSION = "1.23.0"
+STAMP_VERSION = "1.24.0"
 RATIFIED = True
 DOC_STAMP = ("v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 twin-graph "
              "ruling ADR 0077; v1.2.0 Phase A metamodel bump; v1.3.0 "
@@ -926,6 +931,22 @@ TWIN_SHEETS = {
             {"Kind": "concept", "Edge": "minted_by",
              "Status": "edged",
              "Meaning": "walks to its recorded minting act"},
+            {"Kind": "condition", "Edge": "belongs_to",
+             "Status": "edged-pseudo",
+             "Meaning": "STEP 4: tree-born adjacency citizen — "
+             "walks to its scope; outside the store census by "
+             "ruling (not a store node)"},
+            {"Kind": "parameter", "Edge": "belongs_to",
+             "Status": "edged-pseudo",
+             "Meaning": "STEP 4: walks to its file; tree-born"},
+            {"Kind": "derived column", "Edge": "defines",
+             "Status": "edged-pseudo",
+             "Meaning": "tree-born; its scope defines it "
+             "(pre-existing edge, now documented)"},
+            {"Kind": "drift", "Edge": "sighted",
+             "Status": "edged-pseudo",
+             "Meaning": "tree-born; sighted by the reading file "
+             "(pre-existing edge, now documented)"},
             {"Kind": "person", "Edge": "by", "Status": "edged",
              "Meaning": "STEP 3: minted on first act; their birth "
              "edge IS being acted-by (>=1 act points at them); a "

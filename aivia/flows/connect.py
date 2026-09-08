@@ -73,6 +73,20 @@ def build_adjacency(read) -> Dict[str, List[Tuple[str, str]]]:
         about = n.properties.get("about")
         for t in (about if isinstance(about, list) else []):
             link(n.identity, t, "about")
+    # STEP 4: the parts walk — conditions and parameters gain
+    # belongs_to edges (the INDEX-ONLY verdict dies; provenance is
+    # traversal, not owner-chain code)
+    from aivia.lenses import decisions
+    for key, tree in read.trees().items():
+        for scope in decisions.named_scopes(tree):
+            preds = [p for p in
+                     decisions.membership_predicates(scope)
+                     if not decisions.is_degenerate(p)]
+            for i in range(len(preds)):
+                link(f"{scope['name_key']}::c{i}",
+                     scope["name_key"], "belongs_to")
+        for prm in tree.get("parameters", []):
+            link(f"{key}::param/{prm['name']}", key, "belongs_to")
     # STEP 3: every authored node walks —by→ its actor — one pass
     # over ALL nodes, no kind list (the literal law)
     for n in read.nodes(None):

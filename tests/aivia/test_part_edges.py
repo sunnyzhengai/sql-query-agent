@@ -43,18 +43,31 @@ def test_conditions_walk_to_their_scopes(world):
     assert (cond, "belongs_to") in back
 
 
-def test_parameters_walk_to_their_files(world):
-    read, adj = world
-    # any file with parameters will do — find one from the trees
-    param_id = None
-    for key, tree in read.trees().items():
-        if tree.get("parameters"):
-            param_id = f"{key}::param/{tree['parameters'][0]['name']}"
-            file_key = key
-            break
-    assert param_id, "the sepsis estate declares parameters"
-    edges = {(n, lbl) for n, lbl in adj.get(param_id, [])}
-    assert (file_key, "belongs_to") in edges
+def test_parameters_walk_to_their_files():
+    """Corrected pin: the sepsis estate declares ZERO parameters at
+    tree grain (empirically probed — the corpus lacks the
+    IF-default pattern the mapper captures), so the edge is proven
+    on a synthetic tree that exercises it."""
+    from aivia.graph import kg2_mapper
+
+    class FakeRead:
+        def __init__(self, trees):
+            self._trees = trees
+
+        def trees(self):
+            return self._trees
+
+        def nodes(self, kind=None):
+            return []
+    tree = kg2_mapper.map_tree("p.sql", """
+IF @dStart IS NULL SET @dStart = '2026-01-01';
+SELECT ENCOUNTER_ID INTO #Out FROM dbo.T WHERE D >= @dStart;
+""")
+    assert tree["parameters"], "the synthetic exercises the pattern"
+    adj = connect.build_adjacency(FakeRead({"p.sql": tree}))
+    name = tree["parameters"][0]["name"]
+    edges = {(n, lbl) for n, lbl in adj.get(f"p.sql::param/{name}", [])}
+    assert ("p.sql", "belongs_to") in edges
 
 
 def test_a_condition_chains_to_its_file_by_traversal(world):
