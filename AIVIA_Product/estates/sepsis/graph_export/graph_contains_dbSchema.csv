@@ -1,0 +1,4 @@
+sourceId,targetId
+db:aivia_demo_src,emr|dbo
+db:aivia_demo_src,emr|reporting
+db:aivia_demo_src,emr|reports
