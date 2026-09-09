@@ -1,0 +1,212 @@
+[
+ {
+  "name": "ED Sepsis Screening Dashboard",
+  "description": "Power BI dashboard for emergency department sepsis screening: screening detail, ED sepsis summary, and inpatient sepsis.",
+  "executes": [
+   "reporting/USP_ED_SEPSIS.sql",
+   "reports/USP_RPTS_IP_SEPSIS.sql",
+   "reports/USP_RPTS_ED_Sepsis.sql"
+  ],
+  "source": "real-tmdl (ED Sepsis Screening Dashboard.SemanticModel; EXEC names mapped to the corpus files)"
+ },
+ {
+  "name": "Inpatient SEPSIS Report",
+  "description": "Power BI report over the inpatient sepsis results for clinical review.",
+  "executes": [
+   "reporting/USP_IP_SEPSIS.sql"
+  ],
+  "source": "synthetic-demo (authored shell; the proc mapping is real)"
+ },
+ {
+  "name": "Inpatient Sepsis Dates Report",
+  "description": "Power BI report over the inpatient sepsis dates results for clinical review.",
+  "executes": [
+   "reporting/USP_IP_SepsisDates.sql"
+  ],
+  "source": "synthetic-demo (authored shell; the proc mapping is real)"
+ },
+ {
+  "name": "Inpatient Sepsis Details Report",
+  "description": "Power BI report over the inpatient sepsis details results for clinical review.",
+  "executes": [
+   "reporting/USP_IP_SepsisDetails.sql"
+  ],
+  "source": "synthetic-demo (authored shell; the proc mapping is real)"
+ },
+ {
+  "name": "Inpatient Sepsis Details v1 Report",
+  "description": "Power BI report over the inpatient sepsis details v1 results for clinical review.",
+  "executes": [
+   "reporting/USP_IP_SepsisDetails_v1.sql"
+  ],
+  "source": "synthetic-demo (authored shell; the proc mapping is real)"
+ },
+ {
+  "name": "Inpatient Sepsis Encounters Report",
+  "description": "Power BI report over the inpatient sepsis encounters results for clinical review.",
+  "executes": [
+   "reporting/USP_IP_SepsisEncounters.sql"
+  ],
+  "source": "synthetic-demo (authored shell; the proc mapping is real)"
+ },
+ {
+  "name": "Inpatient Sepsis Encounters Details Report",
+  "description": "Power BI report over the inpatient sepsis encounters details results for clinical review.",
+  "executes": [
+   "reporting/USP_IP_SepsisEncountersDetails.sql"
+  ],
+  "source": "synthetic-demo (authored shell; the proc mapping is real)"
+ },
+ {
+  "name": "Inpatient Sepsis Encounters WLocations Report",
+  "description": "Power BI report over the inpatient sepsis encounters wlocations results for clinical review.",
+  "executes": [
+   "reporting/USP_IP_SepsisEncountersWLocations.sql"
+  ],
+  "source": "synthetic-demo (authored shell; the proc mapping is real)"
+ },
+ {
+  "name": "Inpatient Sepsis Encounters WLocations v1 Report",
+  "description": "Power BI report over the inpatient sepsis encounters wlocations v1 results for clinical review.",
+  "executes": [
+   "reporting/USP_IP_SepsisEncountersWLocations_v1.sql"
+  ],
+  "source": "synthetic-demo (authored shell; the proc mapping is real)"
+ },
+ {
+  "name": "Inpatient Sepsis Patient Dates Report",
+  "description": "Power BI report over the inpatient sepsis patient dates results for clinical review.",
+  "executes": [
+   "reporting/USP_IP_SepsisPatientDates.sql"
+  ],
+  "source": "synthetic-demo (authored shell; the proc mapping is real)"
+ },
+ {
+  "name": "Inpatient Sepsis Patient Dates v1 Report",
+  "description": "Power BI report over the inpatient sepsis patient dates v1 results for clinical review.",
+  "executes": [
+   "reporting/USP_IP_SepsisPatientDates_v1.sql"
+  ],
+  "source": "synthetic-demo (authored shell; the proc mapping is real)"
+ },
+ {
+  "name": "Inpatient Sepsis Screening Audit Report",
+  "description": "Power BI report over the inpatient sepsis screening audit results for clinical review.",
+  "executes": [
+   "reporting/USP_IP_SepsisScreeningAudit.sql"
+  ],
+  "source": "synthetic-demo (authored shell; the proc mapping is real)"
+ },
+ {
+  "name": "Inpatient Sepsis Screening Audit v1 Report",
+  "description": "Power BI report over the inpatient sepsis screening audit v1 results for clinical review.",
+  "executes": [
+   "reporting/USP_IP_SepsisScreeningAudit_v1.sql"
+  ],
+  "source": "synthetic-demo (authored shell; the proc mapping is real)"
+ },
+ {
+  "name": "Inpatient Sepsis Shift Compliance Report",
+  "description": "Power BI report over the inpatient sepsis shift compliance results for clinical review.",
+  "executes": [
+   "reporting/USP_IP_SepsisShiftCompliance.sql"
+  ],
+  "source": "synthetic-demo (authored shell; the proc mapping is real)"
+ },
+ {
+  "name": "Inpatient Sepsis Shift Compliance By Shift Report",
+  "description": "Power BI report over the inpatient sepsis shift compliance by shift results for clinical review.",
+  "executes": [
+   "reporting/USP_IP_SepsisShiftComplianceByShift.sql"
+  ],
+  "source": "synthetic-demo (authored shell; the proc mapping is real)"
+ },
+ {
+  "name": "Inpatient Sepsis Shift Compliance Metrics Report",
+  "description": "Power BI report over the inpatient sepsis shift compliance metrics results for clinical review.",
+  "executes": [
+   "reporting/USP_IP_SepsisShiftComplianceMetrics.sql"
+  ],
+  "source": "synthetic-demo (authored shell; the proc mapping is real)"
+ },
+ {
+  "name": "Inpatient Sepsis Compliance By Shift Report",
+  "description": "Power BI report over the inpatient sepsis compliance by shift results for clinical review.",
+  "executes": [
+   "reporting/USP_IP_Sepsis_ComplianceByShift.sql"
+  ],
+  "source": "synthetic-demo (authored shell; the proc mapping is real)"
+ },
+ {
+  "name": "Inpatient Sepsis Compliance Metrics Report",
+  "description": "Power BI report over the inpatient sepsis compliance metrics results for clinical review.",
+  "executes": [
+   "reporting/USP_IP_Sepsis_ComplianceMetrics.sql"
+  ],
+  "source": "synthetic-demo (authored shell; the proc mapping is real)"
+ },
+ {
+  "name": "Inpatient Sepsis Details Report",
+  "description": "Power BI report over the inpatient sepsis details results for clinical review.",
+  "executes": [
+   "reporting/USP_IP_Sepsis_Details.sql"
+  ],
+  "source": "synthetic-demo (authored shell; the proc mapping is real)"
+ },
+ {
+  "name": "Inpatient Sepsis Encounters Report",
+  "description": "Power BI report over the inpatient sepsis encounters results for clinical review.",
+  "executes": [
+   "reporting/USP_IP_Sepsis_Encounters.sql"
+  ],
+  "source": "synthetic-demo (authored shell; the proc mapping is real)"
+ },
+ {
+  "name": "Inpatient Sepsis Screening Tool Report",
+  "description": "Power BI report over the inpatient sepsis screening tool results for clinical review.",
+  "executes": [
+   "reporting/USP_IP_Sepsis_ScreeningTool.sql"
+  ],
+  "source": "synthetic-demo (authored shell; the proc mapping is real)"
+ },
+ {
+  "name": "Inpatient SEPSIS COMPLIANCE Report",
+  "description": "Power BI report over the inpatient sepsis compliance results for clinical review.",
+  "executes": [
+   "reports/USP_RPTS_IP_SEPSIS_COMPLIANCE.sql"
+  ],
+  "source": "synthetic-demo (authored shell; the proc mapping is real)"
+ },
+ {
+  "name": "Inpatient SEPSIS COMPLIANCE BY SHIFT NURSES Report",
+  "description": "Power BI report over the inpatient sepsis compliance by shift nurses results for clinical review.",
+  "executes": [
+   "reports/USP_RPTS_IP_SEPSIS_COMPLIANCE_BY_SHIFT_NURSES.sql"
+  ],
+  "source": "synthetic-demo (authored shell; the proc mapping is real)"
+ },
+ {
+  "name": "Inpatient SEPSIS REPORT Report",
+  "description": "Power BI report over the inpatient sepsis report results for clinical review.",
+  "executes": [
+   "reports/USP_RPTS_IP_SEPSIS_REPORT.sql"
+  ],
+  "source": "synthetic-demo (authored shell; the proc mapping is real)"
+ },
+ {
+  "name": "Non Severe Sepsis Report",
+  "description": "Power BI report over the non severe sepsis results for clinical review.",
+  "executes": [
+   "reports/USP_RPTS_NonSevere_Sepsis.sql"
+  ],
+  "source": "synthetic-demo (authored shell; the proc mapping is real)"
+ },
+ {
+  "name": "Severe Sepsis Report",
+  "description": "Power BI report over the severe sepsis results for clinical review.",
+  "executes": [
+   "reports/USP_RPTS_Severe_Sepsis.sql"
+  ],
+  "source": "synthetic-demo (authored shell; the proc mapping is real)"
+ }
+]
