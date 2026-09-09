@@ -68,7 +68,7 @@ _CONTAINS_DOMAIN = {("db", "schema"), ("schema", "table"),
 def _required_by_kind(reg: Registry) -> Dict[str, List[str]]:
     out: Dict[str, List[str]] = {}
     for row in reg.sheets["Node_Types"]:
-        kind = row["Node kind"]
+        kind = row["Node label"]
         out.setdefault(kind, [])  # every declared kind, even all-optional
         if row.get("Required", "").startswith("yes") \
                 and row["Property"] not in _STRUCTURAL:
@@ -85,14 +85,14 @@ def validate_technical_layer(store) -> List[str]:
     problems = []
     kind_of: Dict[str, str] = {}
     for node in store.current_nodes():
-        kind_of[node.identity] = node.kind
-        if node.kind == "responsibility":
+        kind_of[node.identity] = node.label
+        if node.label == "responsibility":
             continue  # layer 3; validated by its own registry (slice 4)
-        if node.kind not in required:
-            problems.append(f"unknown node kind '{node.kind}' "
+        if node.label not in required:
+            problems.append(f"unknown node kind '{node.label}' "
                             f"({node.identity})")
             continue
-        for prop in required[node.kind]:
+        for prop in required[node.label]:
             if node.properties.get(prop) in (None, "", []):
                 problems.append(
                     f"{node.identity}: required property '{prop}' absent")
@@ -124,7 +124,7 @@ def validate_artifact_layer(store) -> List[str]:
     problems = []
     for node in store.current_nodes():
         p = node.properties
-        if node.kind in kg3.STATE_CLASSES:
+        if node.label in kg3.STATE_CLASSES:
             if not p.get("artifact_id"):
                 problems.append(f"{node.identity}: no artifact_id")
             if not p.get("about"):
@@ -138,10 +138,10 @@ def validate_artifact_layer(store) -> List[str]:
                 if banned in p:
                     problems.append(f"{node.identity}: stored summary "
                                     f"'{banned}' — the ledger law bans it")
-            if node.kind == "description" and author.startswith("agent:") \
+            if node.label == "description" and author.startswith("agent:") \
                     and p.get("status") not in kg3.DESCRIPTION_STATUS:
                 problems.append(f"{node.identity}: status outside vocab")
-        elif node.kind == "disposition":
+        elif node.label == "disposition":
             if p.get("ruling") not in kg3.RULINGS:
                 problems.append(f"{node.identity}: ruling outside vocab")
             if str(p.get("author", "")).startswith("agent:"):

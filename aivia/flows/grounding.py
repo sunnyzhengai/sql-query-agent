@@ -111,7 +111,7 @@ class SemanticIndex:
         qn = math.sqrt(sum(v * v for v in query)) or 1.0
         scored = []
         for entry, slots in zip(self.entries, self.cards):
-            if kind is not None and entry["kind"] != kind:
+            if kind is not None and entry["label"] != kind:
                 continue
             best, best_card = -1.0, None
             for cname, vec in slots:
@@ -170,7 +170,7 @@ def ground(mention: str, index: List[Dict[str, Any]],
         kind_in = next((kind_words[w] for w in words
                         if w in kind_words), None)
         pool = [e for e in context
-                if kind_in is None or e["kind"] == kind_in]
+                if kind_in is None or e["label"] == kind_in]
         ordinal = next((int(r.split(":")[1]) for r in roles
                         if r.startswith("ordinal:")), None)
         if ordinal is not None:
@@ -196,14 +196,14 @@ def ground(mention: str, index: List[Dict[str, Any]],
                           "to of that kind"}
     kind = kind_words.get(wanted)
     if kind:
-        return {"tier": "kind", "outcome": "kind", "kind": kind,
+        return {"tier": "label", "outcome": "label", "label": kind,
                 "mention": mention}
     by_identity = [e for e in index if _fold(e["identity"]) == wanted]
     if by_identity:
         return {"tier": "exact-identity", "outcome": "matched",
                 "entity": by_identity[0], "mention": mention}
     exact = [e for e in index if e["folded"] == wanted]
-    identities = {(e["kind"], e["identity"]) for e in exact}
+    identities = {(e["label"], e["identity"]) for e in exact}
     if len(identities) == 1:
         return {"tier": "exact-name", "outcome": "matched",
                 "entity": exact[0], "mention": mention}
@@ -221,7 +221,7 @@ def ground(mention: str, index: List[Dict[str, Any]],
         hits = [e for e in index
                 if _segments(e["identity"])[-len(want_segs):]
                 == want_segs]
-        hit_ids = {(e["kind"], e["identity"]) for e in hits}
+        hit_ids = {(e["label"], e["identity"]) for e in hits}
         if len(hit_ids) == 1:
             return {"tier": "path", "outcome": "matched",
                     "entity": hits[0], "mention": mention}
@@ -242,7 +242,7 @@ def ground(mention: str, index: List[Dict[str, Any]],
         if hits:
             hits.sort(key=lambda t: (-t[0], t[1]["identity"]))
             scored = [{"score": sc, **e} for sc, e in hits[:TOP_K]]
-            ids = {(e["kind"], e["identity"]) for _, e in hits}
+            ids = {(e["label"], e["identity"]) for _, e in hits}
             if len(ids) == 1:
                 return {"tier": "name-token", "outcome": "matched",
                         "entity": scored[0], "mention": mention,
@@ -271,11 +271,11 @@ def ground(mention: str, index: List[Dict[str, Any]],
                        or strong[0]["score"] - strong[1]["score"]
                        >= t["UNIQUE_MARGIN"]):
             top = strong[0]
-            if top.get("kind") == "kind":
+            if top.get("label") == "label":
                 # a node-type grounded by meaning (ADR 0080: kinds
                 # are searchable nodes)
-                return {"tier": "semantic", "outcome": "kind",
-                        "kind": top["name"], "mention": mention,
+                return {"tier": "semantic", "outcome": "label",
+                        "label": top["name"], "mention": mention,
                         "score": top["score"]}
             return {"tier": "semantic", "outcome": "matched",
                     "entity": top, "mention": mention,

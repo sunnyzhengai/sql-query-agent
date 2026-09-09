@@ -192,107 +192,107 @@
   ],
   "Speech_Sources": [
    {
-    "Kind": "_ruling",
+    "Label": "_ruling",
     "Speech": "-",
     "Meaning": "ADR 0080 census 2 (2026-09-07): every node kind declares WHICH STORED PROPERTY it speaks for search and cards — one home per meaning; consumers read, never re-derive. speaks + counted-gap + ruled-mute == total. Closed: a new kind declares its speech at birth or fails the census."
    },
    {
-    "Kind": "table",
+    "Label": "table",
     "Speech": "KG1 steward description",
     "Meaning": "declared truth, as loaded"
    },
    {
-    "Kind": "column",
+    "Label": "column",
     "Speech": "KG1 steward description",
     "Meaning": "declared truth, as loaded"
    },
    {
-    "Kind": "scope (selection)",
+    "Label": "scope (selection)",
     "Speech": "floor lead + composition (grammar render of the twin)",
     "Meaning": "rendered, never authored"
    },
    {
-    "Kind": "file",
+    "Label": "file",
     "Speech": "composed meaning STORED in the twin (translator): delivery lead + base compositions + read-tables' steward words",
     "Meaning": "the center-law corollary — composition is building; the cause-1 corpse (self-referential delivery slice) dies here"
    },
    {
-    "Kind": "condition (predicate)",
+    "Label": "condition (predicate)",
     "Speech": "voiced phrase (grammar render, stored on the twin node)",
     "Meaning": "the best-scoring facets of the 2026-09-07 probe — 0.80 vs 0.57 blended"
    },
    {
-    "Kind": "parameter",
+    "Label": "parameter",
     "Speech": "voiced phrase",
     "Meaning": "rendered"
    },
    {
-    "Kind": "derived column",
+    "Label": "derived column",
     "Speech": "computed-output phrase (grammar render: name words + the defining selection)",
     "Meaning": "rendered"
    },
    {
-    "Kind": "term (KG3)",
+    "Label": "term (KG3)",
     "Speech": "definition",
     "Meaning": "human-authored"
    },
    {
-    "Kind": "drift name",
+    "Label": "drift name",
     "Speech": "the standing drift sentence",
     "Meaning": "findable by name, the search law"
    },
    {
-    "Kind": "kind (node type)",
+    "Label": "kind (node type)",
     "Speech": "its self-description row (below)",
     "Meaning": "KINDS ARE SEARCHABLE NODES — type words ground by meaning against these descriptions (cold start), then by earned vocabulary; never by a mapping table"
    },
    {
-    "Kind": "_self file",
+    "Label": "_self file",
     "Speech": "a sql file: a stored procedure, report script, query, or view definition — the reports and procedures readers consume",
     "Meaning": "self-description; grounds reports/procs/queries/views"
    },
    {
-    "Kind": "_self table",
+    "Label": "_self table",
     "Speech": "a database table holding source records and fields",
     "Meaning": "self-description"
    },
    {
-    "Kind": "_self column",
+    "Label": "_self column",
     "Speech": "a column or field of a table",
     "Meaning": "self-description"
    },
    {
-    "Kind": "_self scope",
+    "Label": "_self scope",
     "Speech": "a selection step inside a procedure: a cte, temp table, or delivery selection — the practiced metrics a report emits",
     "Meaning": "self-description; grounds selections/ctes/metrics(practiced)"
    },
    {
-    "Kind": "_self condition",
+    "Label": "_self condition",
     "Speech": "a condition, filter, rule, or business logic decision applied inside a selection",
     "Meaning": "self-description; grounds business-logic/filter/rule words"
    },
    {
-    "Kind": "_self derived column",
+    "Label": "_self derived column",
     "Speech": "a computed or derived output column of a selection",
     "Meaning": "self-description"
    },
    {
-    "Kind": "_self term",
+    "Label": "_self term",
     "Speech": "a governed business term, concept, or definition minted by a steward — governed metrics live here (honest empty until minted)",
     "Meaning": "self-description; the practiced/governed metric pair"
    },
    {
-    "Kind": "_self drift",
+    "Label": "_self drift",
     "Speech": "a drift finding: a name read by sql but declared nowhere",
     "Meaning": "self-description"
    },
    {
-    "Kind": "_self parameter",
+    "Label": "_self parameter",
     "Speech": "a parameter of a procedure",
     "Meaning": "self-description"
    },
    {
-    "Kind": "operational statement",
+    "Label": "operational statement",
     "Speech": "RULED-MUTE",
     "Meaning": "no reader-facing meaning (the v1.4.0 operational class)"
    }
@@ -392,151 +392,151 @@
   ],
   "Connection_Ledger": [
    {
-    "Kind": "_ruling",
+    "Label": "_ruling",
     "Edge": "-",
     "Status": "-",
     "Meaning": "THE BIRTH-EDGE LAW (2026-09-07, Sunny's term-isolation overrule): no node is alone — every node answers 'why do you exist' by a walkable edge. Closed at birth: a new store kind declares its row here before its first write or the connection census fails. Status: edged (edge must be present per node) | rooted (a legitimate origin) | missing-counted (honest engine debt, its landing step named)."
    },
    {
-    "Kind": "db",
+    "Label": "db",
     "Edge": "-",
     "Status": "rooted",
     "Meaning": "the estate root — carries the registration trace (minted_from); everything intake-born chains here"
    },
    {
-    "Kind": "schema",
+    "Label": "schema",
     "Edge": "contains",
     "Status": "edged",
     "Meaning": "db contains schema; schema contains tables"
    },
    {
-    "Kind": "table",
+    "Label": "table",
     "Edge": "any",
     "Status": "edged",
     "Meaning": "conservation-governed (contains/reads)"
    },
    {
-    "Kind": "column",
+    "Label": "column",
     "Edge": "any",
     "Status": "edged",
     "Meaning": "conservation-governed (contains/cites)"
    },
    {
-    "Kind": "file",
+    "Label": "file",
     "Edge": "any",
     "Status": "edged",
     "Meaning": "intake-born; contains scopes, reads tables"
    },
    {
-    "Kind": "scope",
+    "Label": "scope",
     "Edge": "any",
     "Status": "edged",
     "Meaning": "parsed from its file (contains)"
    },
    {
-    "Kind": "meaning_twin",
+    "Label": "meaning_twin",
     "Edge": "translates",
     "Status": "edged",
     "Meaning": "the twin walks to the file it translates"
    },
    {
-    "Kind": "description",
+    "Label": "description",
     "Edge": "describes",
     "Status": "edged",
     "Meaning": "walks to its about-targets; anchor resolution stays the anchors lens's job"
    },
    {
-    "Kind": "responsibility",
+    "Label": "responsibility",
     "Edge": "assigns",
     "Status": "edged",
     "Meaning": "walks to its target"
    },
    {
-    "Kind": "disposition",
+    "Label": "disposition",
     "Edge": "rules_on",
     "Status": "edged",
     "Meaning": "walks to the artifact it rules"
    },
    {
-    "Kind": "usage",
+    "Label": "usage",
     "Edge": "about",
     "Status": "edged",
     "Meaning": "Sunny's ruling: a usage event connects to the item it used (author->person lands in step 3)"
    },
    {
-    "Kind": "proposal",
+    "Label": "proposal",
     "Edge": "about",
     "Status": "edged",
     "Meaning": "walks to what it proposes about"
    },
    {
-    "Kind": "redaction",
+    "Label": "redaction",
     "Edge": "about",
     "Status": "edged",
     "Meaning": "walks to what it redacts"
    },
    {
-    "Kind": "run_event",
+    "Label": "run_event",
     "Edge": "-",
     "Status": "missing-counted",
     "Meaning": "no target stored today — origin edge is counted debt (future step, Sunny's review)"
    },
    {
-    "Kind": "term",
+    "Label": "term",
     "Edge": "derived_from",
     "Status": "edged",
     "Meaning": "STEP 2 LANDED (2026-09-07): a term cites the act it was deduced from at birth (LC3-F6 refusal); blessed vocabulary cites its confirming event; legacy orphans count per node"
    },
    {
-    "Kind": "concept",
+    "Label": "concept",
     "Edge": "minted_by",
     "Status": "edged",
     "Meaning": "walks to its recorded minting act"
    },
    {
-    "Kind": "condition",
+    "Label": "condition",
     "Edge": "belongs_to",
     "Status": "edged-pseudo",
     "Meaning": "STEP 4: tree-born adjacency citizen — walks to its scope; outside the store census by ruling (not a store node)"
    },
    {
-    "Kind": "parameter",
+    "Label": "parameter",
     "Edge": "belongs_to",
     "Status": "edged-pseudo",
     "Meaning": "STEP 4: walks to its file; tree-born"
    },
    {
-    "Kind": "derived column",
+    "Label": "derived column",
     "Edge": "defines",
     "Status": "edged-pseudo",
     "Meaning": "tree-born; its scope defines it (pre-existing edge, now documented)"
    },
    {
-    "Kind": "drift",
+    "Label": "drift",
     "Edge": "sighted",
     "Status": "edged-pseudo",
     "Meaning": "tree-born; sighted by the reading file (pre-existing edge, now documented)"
    },
    {
-    "Kind": "person",
+    "Label": "person",
     "Edge": "by",
     "Status": "edged",
     "Meaning": "STEP 3: minted on first act; their birth edge IS being acted-by (>=1 act points at them); a hand-written actor with no acts counts missing"
    },
    {
-    "Kind": "agent",
+    "Label": "agent",
     "Edge": "by",
     "Status": "edged",
     "Meaning": "model/machine actors — same law, own kind (never cross-minted as persons)"
    },
    {
-    "Kind": "role",
+    "Label": "role",
     "Edge": "by",
     "Status": "edged",
     "Meaning": "role actors — same law"
    },
    {
-    "Kind": "excluded_file",
+    "Label": "excluded_file",
     "Edge": "excluded_from",
     "Status": "edged",
     "Meaning": "STEP 5 LANDED: deduced from the estate's intake — chains to the root; legacy exclusions without the reference count missing per node"
@@ -629,7 +629,7 @@
   "Kind_Vocabulary": [
    {
     "Word": "_superseded",
-    "Kind": "-",
+    "Label": "-",
     "Note": "TABLE DIED 2026-09-07 (nine-law dig, Sunny's ruling: everything searchable, no pre-made tables). Type words ground by: earned vocabulary (confirmed terms) -> the Interpreter's proposed kind-marks (validated against the closed metamodel kind list = physics) -> semantic match against kind nodes' self-description (Speech_Sources prose). The practiced/governed metric pair ruling carries forward in Speech_Sources. This tombstone is the historical record."
    }
   ],

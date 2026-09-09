@@ -93,7 +93,7 @@ def test_section_11_retire_on_absence(loaded, tmp_path):
     current = {n.identity for n in store.current_nodes("table")}
     assert not any(name in i for i in current)   # marked, not current
     everything = {n.identity for n in store.current_nodes.__self__
-                  ._nodes if n.kind == "table"}
+                  ._nodes if n.label == "table"}
     assert any(name in i for i in everything)    # never removed
 
 

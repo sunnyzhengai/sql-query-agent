@@ -17,7 +17,7 @@ READ_MODES = ("current", "all")
 
 @dataclass
 class NodeVersion:
-    kind: str
+    label: str
     identity: str
     properties: Dict[str, Any]
     as_of: str
@@ -27,7 +27,7 @@ class NodeVersion:
 
 @dataclass
 class Edge:
-    kind: str
+    label: str
     from_id: str
     to_id: str
     properties: Dict[str, Any]
@@ -42,13 +42,13 @@ class Store:
     _edges: List[Edge] = field(default_factory=list)
     _seq: int = 0
 
-    def append_node(self, kind: str, identity: str,
+    def append_node(self, label: str, identity: str,
                     properties: Dict[str, Any], as_of: str,
                     extract_id: str) -> NodeVersion:
         for prior in self._nodes:
             if prior.identity == identity and prior.valid_to is None:
                 prior.valid_to = as_of  # supersede: retire, never remove
-        version = NodeVersion(kind, identity, dict(properties),
+        version = NodeVersion(label, identity, dict(properties),
                               as_of, extract_id)
         self._nodes.append(version)
         self._seq += 1
@@ -60,10 +60,10 @@ class Store:
                 version.valid_to = valid_to
                 self._seq += 1
 
-    def append_edge(self, kind: str, from_id: str, to_id: str,
+    def append_edge(self, label: str, from_id: str, to_id: str,
                     properties: Dict[str, Any], as_of: str,
                     extract_id: str) -> Edge:
-        edge = Edge(kind, from_id, to_id, dict(properties),
+        edge = Edge(label, from_id, to_id, dict(properties),
                     as_of, extract_id)
         self._edges.append(edge)
         self._seq += 1
@@ -84,13 +84,13 @@ class Store:
             return [v for v in versions if v.valid_to is None], "current"
         return versions, "including_retired"
 
-    def current_nodes(self, kind: Optional[str] = None) -> List[NodeVersion]:
+    def current_nodes(self, label: Optional[str] = None) -> List[NodeVersion]:
         return [v for v in self._nodes if v.valid_to is None
-                and (kind is None or v.kind == kind)]
+                and (label is None or v.label == label)]
 
-    def current_edges(self, kind: Optional[str] = None) -> List[Edge]:
+    def current_edges(self, label: Optional[str] = None) -> List[Edge]:
         return [e for e in self._edges if e.valid_to is None
-                and (kind is None or e.kind == kind)]
+                and (label is None or e.label == label)]
 
     def state_stamp(self) -> Tuple[int, int, int]:
         return (self._seq, len(self._nodes), len(self._edges))

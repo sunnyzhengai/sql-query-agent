@@ -355,8 +355,8 @@ def make_handler(store, estate, interpret_fn, semantic, pending,
             for g in result["groundings"]:
                 what = (g["entity"]["name"]
                         if g.get("outcome") == "matched"
-                        else f"kind:{g['kind']}"
-                        if g.get("outcome") == "kind"
+                        else f"kind:{g['label']}"
+                        if g.get("outcome") == "label"
                         else f"set:{len(g.get('entities', []))} from "
                              "context"
                         if g.get("outcome") == "set"
@@ -389,7 +389,7 @@ def make_handler(store, estate, interpret_fn, semantic, pending,
                           if c.get("places", 1) > 1 else "")
                 speech = (c.get("words") or "")[:70]
                 parts.append(
-                    f'<li><a href="{href}">[{html.escape(c["kind"])}] '
+                    f'<li><a href="{href}">[{html.escape(c["label"])}] '
                     f"{html.escape(c['name'])}{places}{score}</a>"
                     + (f" <span class=meta>{html.escape(speech)}"
                        "</span>" if speech else "") + "</li>")
@@ -420,7 +420,7 @@ def make_handler(store, estate, interpret_fn, semantic, pending,
             index = ask.build_index(read)
             kinds = {}
             for e in index:
-                kinds[e["kind"]] = kinds.get(e["kind"], 0) + 1
+                kinds[e["label"]] = kinds.get(e["label"], 0) + 1
             lines = [f"This estate ({estate}):"]
             for k in sorted(kinds, key=lambda k: -kinds[k]):
                 lines.append(f"- {kinds[k]} {k}(s)")
@@ -437,7 +437,7 @@ def make_handler(store, estate, interpret_fn, semantic, pending,
             # STEP A: a label-group click is STEER — list the
             # members directly, no model, no search
             index = ask.build_index(read)
-            members = [e for e in index if e["kind"] == label]
+            members = [e for e in index if e["label"] == label]
             lines = [f"{len(members)} {label}(s):"]
             for e in sorted(members,
                             key=lambda e: e["name"])[:60]:
@@ -613,7 +613,7 @@ def main() -> None:
     # blocks deterministic asks
     kinds_count = {}
     for e in entries:
-        kinds_count[e["kind"]] = kinds_count.get(e["kind"], 0) + 1
+        kinds_count[e["label"]] = kinds_count.get(e["label"], 0) + 1
     coverage = (f"{kinds_count.get('file', 0)} files · "
                 f"{kinds_count.get('table', 0)} tables · "
                 f"{kinds_count.get('column', 0)} columns")

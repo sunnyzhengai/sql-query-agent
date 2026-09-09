@@ -77,8 +77,8 @@ def reference_set_key(groundings: List[Dict[str, Any]]) -> str:
     (L2-D1): sorted references, phrasing-independent."""
     parts = []
     for g in groundings:
-        if g["outcome"] == "kind":
-            parts.append(f"kind:{g['kind']}")
+        if g["outcome"] == "label":
+            parts.append(f"kind:{g['label']}")
         elif g["outcome"] == "matched":
             parts.append(f"id:{g['entity']['identity']}")
         elif g["outcome"] == "set":
@@ -152,12 +152,12 @@ def _one_line(read, identity: str, index_by_id) -> str:
     if entry is None:
         return identity
     words = (entry.get("words") or "").split(". ")[0]
-    return (f"[{entry['kind']}] {entry['name']}"
+    return (f"[{entry['label']}] {entry['name']}"
             + (f" — {words}" if words else ""))
 
 
 def render_card(read, entity: Dict[str, Any]) -> str:
-    kind = entity["kind"]
+    kind = entity["label"]
     identity = entity["identity"]
     lines = [f"{kind.upper()}: {entity['name']}  [{identity}]", ""]
     if kind in ("table", "column"):
@@ -186,7 +186,7 @@ def render_card(read, entity: Dict[str, Any]) -> str:
         node = next(n for n in read.nodes("term")
                     if n.identity == identity)
         lines.append(node.properties.get("definition", ""))
-    elif kind in ("condition", "parameter", "kind"):
+    elif kind in ("condition", "parameter", "label"):
         # speech IS the card for the part-kinds (census 2): the
         # stored/rendered phrase, plus the owner chain
         lines.append(entity.get("words") or "")
@@ -277,9 +277,9 @@ def render_kind_list(read, index, kind: str,
                      topic_entries: Optional[List[Dict[str, Any]]]
                      = None) -> str:
     if kind == "metric":
-        terms = [e for e in index if e["kind"] == "term"]
+        terms = [e for e in index if e["label"] == "term"]
         deliveries = sorted({e["identity"] for e in index
-                             if e["kind"] == "scope"
+                             if e["label"] == "scope"
                              and "::delivery" in e["identity"]})
         lines = ["GOVERNED metrics (minted concepts): 0 — a concept "
                  "is born only when a HUMAN blesses a family (the "
@@ -293,7 +293,7 @@ def render_kind_list(read, index, kind: str,
             lines.append(f"… and {len(deliveries) - 40} more")
         return "\n".join(lines)
     entries = sorted({(e["name"], e["identity"]) for e in index
-                      if e["kind"] == kind})
+                      if e["label"] == kind})
     if topic_entries is not None:
         allowed = {e["identity"] for e in topic_entries}
         entries = [(n, i) for n, i in entries if i in allowed]
@@ -350,7 +350,7 @@ def present_hits(read, index_by_id, hits) -> str:
             extra = ""
             if h["identity"].startswith("label::"):
                 n = sum(1 for e in index_by_id.values()
-                        if e["kind"] == h["name"])
+                        if e["label"] == h["name"])
                 extra = f" — the group: {n} member(s)"
             lines.append(f"- {h['name']} — {h['score']:.2f}{via}"
                          f"{extra}  ({h['identity']})")
@@ -528,7 +528,7 @@ def ask(store, question: str, author: str, occurred_at: str,
                 chosen = [pool[0]]
             for e in chosen:
                 merged.setdefault(e["identity"], {
-                    "identity": e["identity"], "label": e["kind"],
+                    "identity": e["identity"], "label": e["label"],
                     "name": e["name"], "score": 0.0,
                     "via_card": "table"})
                 merged[e["identity"]]["score"] += 1.0
@@ -563,7 +563,7 @@ def ask(store, question: str, author: str, occurred_at: str,
                     best_of[h["identity"]] = h
             for h in best_of.values():
                 cur = merged.setdefault(h["identity"], {
-                    "identity": h["identity"], "label": h["kind"],
+                    "identity": h["identity"], "label": h["label"],
                     "name": h["name"], "score": 0.0,
                     "via_card": h.get("via_card")})
                 cur["score"] += h["score"]
@@ -675,7 +675,7 @@ def confirm(store, question: str, interpretation: Dict[str, Any],
                 store, f"term::vocab/{_fold(m)}", m,
                 f"{m} — confirmed ask vocabulary for: {alt}",
                 author, occurred_at,
-                basis={"kind": "ask-expansion", "basis": basis},
+                basis={"label": "ask-expansion", "basis": basis},
                 derived_from=[event.identity],
                 about=grounded[:8] or None)
     return result

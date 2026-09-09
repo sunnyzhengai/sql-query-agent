@@ -10,7 +10,6 @@ meaning-node taxonomy (the kind library: COMPARE_EQ, selection...)
 
 Proves: contract:aivia-design-to-code
 """
-import pytest
 
 from aivia.graph.kg1_intake import new_store
 from aivia.graph.read_api import ReadApi

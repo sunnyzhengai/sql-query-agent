@@ -73,7 +73,7 @@ def test_composition_stored_in_twin_carries_the_subject(world):
 
 def test_file_speech_reads_the_stored_subject(world):
     _store, _read, index, _semantic = world
-    target = next(e for e in index if e["kind"] == "file"
+    target = next(e for e in index if e["label"] == "file"
                   and e["identity"].endswith(
                       "reporting/USP_ED_SEPSIS.sql"))
     assert "emergency department" in target["words"].lower()
@@ -82,13 +82,13 @@ def test_file_speech_reads_the_stored_subject(world):
 # ---- census 2+3: speech and searchability ----------------------------
 def test_conditions_speak_and_carry_owners(world):
     _store, _read, index, _semantic = world
-    conditions = [e for e in index if e["kind"] == "condition"]
+    conditions = [e for e in index if e["label"] == "condition"]
     assert len(conditions) > 50  # the sepsis estate's voiced filters
     for c in conditions[:20]:
         assert c["words"]
         assert "::" in c["owner"]  # a scope key
         # the owner chain reaches a file
-        files = {e["identity"] for e in index if e["kind"] == "file"}
+        files = {e["identity"] for e in index if e["label"] == "file"}
         owner_file = c["owner"].split("::")[0]
         assert any(f.endswith(owner_file) for f in files)
 
@@ -98,7 +98,7 @@ def test_labels_are_searchable_nodes(world):
     ANSWER): labels replaced kind nodes — derived from the live
     store, speaking their own plural."""
     _store, _read, index, _semantic = world
-    labels = [e for e in index if e["kind"] == "label"]
+    labels = [e for e in index if e["label"] == "label"]
     assert labels
     file_label = next(e for e in labels if e["name"] == "file")
     assert file_label["words"] == "files"

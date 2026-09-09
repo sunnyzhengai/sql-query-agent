@@ -573,9 +573,9 @@ def test_gr5_path_tier_decorated_names_never_guess(world):
 
 def test_gr5_ambiguous_suffix_is_candidates_never_a_pick():
     index = [
-        {"kind": "file", "identity": "repo://a/x/FOO.sql",
+        {"label": "file", "identity": "repo://a/x/FOO.sql",
          "name": "FOO", "folded": "FOO", "words": ""},
-        {"kind": "file", "identity": "repo://b/x/FOO.sql",
+        {"label": "file", "identity": "repo://b/x/FOO.sql",
          "name": "FOO", "folded": "FOO", "words": ""},
     ]
     g = grounding.ground("x/FOO.sql", index, {}, None)
@@ -588,7 +588,7 @@ def test_gr6_files_embed_meaning_not_names(world):
     store, _semantic = world
     read = ReadApi(store)
     index = ask.build_index(read)
-    files = [e for e in index if e["kind"] == "file"]
+    files = [e for e in index if e["label"] == "file"]
     assert files
     target = next(e for e in files
                   if e["identity"].endswith(
@@ -606,7 +606,7 @@ def test_cn5_the_report_floor_speaks_meaning(world):
     store, semantic = world
     read = ReadApi(store)
     index = ask.build_index(read)
-    entity = next(e for e in index if e["kind"] == "file"
+    entity = next(e for e in index if e["label"] == "file"
                   and e["identity"].endswith(
                       "reporting/USP_ED_SEPSIS.sql"))
     answer = ask.render_card(read, entity)

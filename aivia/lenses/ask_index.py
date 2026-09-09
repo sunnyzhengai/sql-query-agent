@@ -29,7 +29,7 @@ def lens_ask_index(read, params) -> Dict[str, Any]:
     entries: List[Dict[str, Any]] = []
 
     def add(kind, identity, name, words=""):
-        entries.append({"kind": kind, "identity": identity,
+        entries.append({"label": kind, "identity": identity,
                         "name": name, "folded": _fold(name),
                         "words": words})
 
@@ -67,7 +67,7 @@ def lens_ask_index(read, params) -> Dict[str, Any]:
                         # distinct askable thing (staging copies
                         # would swamp every ask); computed or
                         # RENAMED members are
-                        if expr.get("kind") == "column_ref" and \
+                        if expr.get("label") == "column_ref" and \
                                 _fold(expr.get("ref", "")
                                       .rsplit(".", 1)[-1]) \
                                 == _fold(m["name"]):
@@ -114,10 +114,10 @@ def find(index: List[Dict[str, Any]], text: str) -> Dict[str, Any]:
         # one KIND with one identity is still unique (a column named
         # in several drift rows collapses); true cross-kind splits
         # stay ambiguous for the human
-        identities = {(e["kind"], e["identity"]) for e in exact}
+        identities = {(e["label"], e["identity"]) for e in exact}
         if len(identities) == 1:
             return {"outcome": "matched", "entity": exact[0]}
-        kinds = {e["kind"] for e in exact}
+        kinds = {e["label"] for e in exact}
         if kinds == {"drift"}:
             return {"outcome": "matched", "entity": exact[0],
                     "sightings": exact}

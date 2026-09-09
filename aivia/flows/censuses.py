@@ -20,8 +20,8 @@ def connection_ledger() -> Dict[str, Dict[str, str]]:
     lives in code). kind -> {edge, status}."""
     from aivia.graph import metamodel
     sheet = metamodel.load("lenses").sheets["Connection_Ledger"]
-    return {r["Kind"]: {"edge": r["Edge"], "status": r["Status"]}
-            for r in sheet if r["Kind"] != "_ruling"}
+    return {r["Label"]: {"edge": r["Edge"], "status": r["Status"]}
+            for r in sheet if r["Label"] != "_ruling"}
 
 
 def connection_census(read) -> Dict[str, Any]:
@@ -36,7 +36,7 @@ def connection_census(read) -> Dict[str, Any]:
     birth_edged = counted = rooted = total = 0
     missing_kinds = set()
     unledgered = set()
-    for kind in sorted({n.kind for n in read.nodes(None)}):
+    for kind in sorted({n.label for n in read.nodes(None)}):
         nodes = read.nodes(kind)
         row = ledger.get(kind)
         if row is None:
@@ -76,8 +76,8 @@ def speech_census(read, index: List[Dict[str, Any]]) -> Dict[str, Any]:
     for n in read.nodes("meaning_twin"):
         muted += n.properties["twin"]["census"].get("operational", 0)
     unassigned = sorted(
-        {e["kind"] for e in index
-         if speech.SHEET_KINDS.get(e["kind"]) not in declared})
+        {e["label"] for e in index
+         if speech.SHEET_KINDS.get(e["label"]) not in declared})
     return {"total": speaks + gaps + muted, "speaks": speaks,
             "counted_gap": gaps, "ruled_mute": muted,
             "unassigned_kinds": unassigned}

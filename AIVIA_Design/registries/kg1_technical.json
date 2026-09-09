@@ -35,99 +35,99 @@
   ],
   "Node_Types": [
    {
-    "Node kind": "db",
     "Property": "description",
     "Required": "no — RULING APPLIED at conversion (A1 refined 2026-09-05): the db is minted from the DBA registration prerequisite, never extract-derived; no extract description exists at minting. An org-supplied description may supersede later through the normal lifecycle.",
     "Shape / allowed values": "text",
-    "Notes": "from the registered extract"
+    "Notes": "from the registered extract",
+    "Node label": "db"
    },
    {
-    "Node kind": "db",
     "Property": "as_of",
     "Required": "yes",
     "Shape / allowed values": "date",
-    "Notes": "extract vintage"
+    "Notes": "extract vintage",
+    "Node label": "db"
    },
    {
-    "Node kind": "schema",
     "Property": "description",
     "Required": "no — CORRECTION APPLIED at conversion (caught by CHECK-TL-4 over the F1 build, 2026-09-05): the ratified contract has no schema-description extract part (§3: schema arrives as the per-table containment field) and the F1 answer key's schema nodes carry none. The draft row contradicted both ratified artifacts.",
-    "Shape / allowed values": "text"
+    "Shape / allowed values": "text",
+    "Node label": "schema"
    },
    {
-    "Node kind": "schema",
     "Property": "as_of",
     "Required": "yes",
-    "Shape / allowed values": "date"
+    "Shape / allowed values": "date",
+    "Node label": "schema"
    },
    {
-    "Node kind": "schema",
     "Property": "source",
     "Required": "yes",
     "Shape / allowed values": "registered source system; declared in the registration prereq's SCHEMA MAPPING, never extracted; since A2 the first component of identity — never stored as a second field",
-    "Notes": "one source per schema (source-inheritance rule); tables/columns inherit via containment"
+    "Notes": "one source per schema (source-inheritance rule); tables/columns inherit via containment",
+    "Node label": "schema"
    },
    {
-    "Node kind": "table",
     "Property": "description",
     "Required": "yes",
-    "Shape / allowed values": "text"
+    "Shape / allowed values": "text",
+    "Node label": "table"
    },
    {
-    "Node kind": "table",
     "Property": "as_of",
     "Required": "yes",
-    "Shape / allowed values": "date"
+    "Shape / allowed values": "date",
+    "Node label": "table"
    },
    {
-    "Node kind": "table",
     "Property": "pk_columns",
     "Required": "yes (INTAKE-10 guarantees)",
     "Shape / allowed values": "ORDERED list, loaded from the source's declared pk metadata",
-    "Notes": "Sunny's ruling 2026-09-05: declared data, never prose; the phrase rule + gap list retired; referential integrity at intake"
+    "Notes": "Sunny's ruling 2026-09-05: declared data, never prose; the phrase rule + gap list retired; referential integrity at intake",
+    "Node label": "table"
    },
    {
-    "Node kind": "table",
     "Property": "grain",
     "Required": "opportunistic — never required",
     "Shape / allowed values": "declared by grain phrase on core tables only; absent + gap-listed elsewhere, never guessed",
-    "Notes": "RULING APPLIED at conversion: doc ratified grain opportunistic (field-calibrated 2026-09-04); register D11 CLOSED 2026-09-05. Supersedes the xlsx OPEN/tbd row."
+    "Notes": "RULING APPLIED at conversion: doc ratified grain opportunistic (field-calibrated 2026-09-04); register D11 CLOSED 2026-09-05. Supersedes the xlsx OPEN/tbd row.",
+    "Node label": "table"
    },
    {
-    "Node kind": "column",
     "Property": "description",
     "Required": "when documented — absence is a COUNTED documentation gap, never a refusal. CORRECTION APPLIED 2026-09-06 (sepsis shakedown): org-catalog columns arrive undescribed by construction — a vendor dictionary never documents the org's own tables; the ruled fallback posture (readable name + counted coverage gap) already acknowledged undocumented columns.",
-    "Shape / allowed values": "text"
+    "Shape / allowed values": "text",
+    "Node label": "column"
    },
    {
-    "Node kind": "column",
     "Property": "as_of",
     "Required": "yes",
-    "Shape / allowed values": "date"
+    "Shape / allowed values": "date",
+    "Node label": "column"
    },
    {
-    "Node kind": "column",
     "Property": "values",
     "Required": "when documented",
     "Shape / allowed values": "STRUCTURED map {code: meaning} + as_of — never prose",
-    "Notes": "dictionary-documented values only (ZC-style, org control_ tables); revisit trigger for value NODES = cross-column code identity"
+    "Notes": "dictionary-documented values only (ZC-style, org control_ tables); revisit trigger for value NODES = cross-column code identity",
+    "Node label": "column"
    },
    {
-    "Node kind": "person",
+    "Node label": "person",
     "Property": "identity",
     "Required": "yes",
     "Shape / allowed values": "person:<name>",
     "Notes": "STEP 3 (v1.23.0, birth-edge law): actors minted on first act; birth edge = being acted-by (>=1 act)"
    },
    {
-    "Node kind": "agent",
+    "Node label": "agent",
     "Property": "identity",
     "Required": "yes",
     "Shape / allowed values": "agent:<name>",
     "Notes": "machine actors — own kind, never persons"
    },
    {
-    "Node kind": "role",
+    "Node label": "role",
     "Property": "identity",
     "Required": "yes",
     "Shape / allowed values": "role:<name>",

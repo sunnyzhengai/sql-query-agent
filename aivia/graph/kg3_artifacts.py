@@ -56,7 +56,7 @@ def _check_identity(author: str) -> None:
 
 def _versions_of(store: Store, artifact_id: str) -> List[NodeVersion]:
     return [n for n in store.current_nodes()
-            if n.kind in STATE_CLASSES
+            if n.label in STATE_CLASSES
             and n.properties.get("artifact_id") == artifact_id]
 
 
@@ -270,16 +270,16 @@ def supersede(store: Store, prior_version_id: str,
     if not versions:
         raise RefusalKG3("KG3-7", f"unknown version {prior_version_id}")
     prior = versions[-1]
-    if prior.kind not in STATE_CLASSES:
-        raise RefusalKG3("LC3-S3", f"{prior.kind} is an event — events "
+    if prior.label not in STATE_CLASSES:
+        raise RefusalKG3("LC3-S3", f"{prior.label} is an event — events "
                          "refuse supersede; the ledger only grows")
     props = dict(prior.properties)
     props.update(fields)
-    if prior.kind == "description":
+    if prior.label == "description":
         return append_description(
             store, props["artifact_id"], props["about"], props["text"],
             fields.get("status"), author, fields.get("basis"), created_at)
-    return _append_version(store, prior.kind, props["artifact_id"],
+    return _append_version(store, prior.label, props["artifact_id"],
                            props["about"], author, created_at,
                            fields.get("basis"),
                            {k: v for k, v in props.items()

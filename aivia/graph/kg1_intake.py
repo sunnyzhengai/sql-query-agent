@@ -323,7 +323,7 @@ def apply_extract(store: Store, reg: Dict[str, Any],
     report.retired_objects = []
     desired = set(nodes)
     for identity, node in current.items():
-        if node.kind in ("schema", "table", "column") \
+        if node.label in ("schema", "table", "column") \
                 and identity.startswith(f"{snap.source}|") \
                 and identity not in desired:
             store.retire_node(identity, as_of)
@@ -365,10 +365,10 @@ def audit_incremental(store: Store, reg: Dict[str, Any],
     apply_extract(scratch, reg, snap)
     fresh = {n.identity: n.properties.get("content_hash")
              for n in scratch.current_nodes()
-             if n.kind in ("schema", "table", "column")}
+             if n.label in ("schema", "table", "column")}
     live = {n.identity: n.properties.get("content_hash")
             for n in store.current_nodes()
-            if n.kind in ("schema", "table", "column")
+            if n.label in ("schema", "table", "column")
             and n.identity.startswith(f"{snap.source}|")}
     findings = []
     for identity in sorted(set(fresh) | set(live)):

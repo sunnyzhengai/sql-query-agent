@@ -33,8 +33,8 @@ SHEET_KINDS = {
 def sources() -> Dict[str, str]:
     """Kind -> declared speech source, from the registry."""
     sheet = metamodel.load("lenses").sheets["Speech_Sources"]
-    return {r["Kind"]: r["Speech"] for r in sheet
-            if r["Kind"] != "_ruling"}
+    return {r["Label"]: r["Speech"] for r in sheet
+            if r["Label"] != "_ruling"}
 
 
 def _tree_and_scope(read, scope_key: str):
@@ -73,7 +73,7 @@ def _file_speech(read, identity: str) -> str:
 def speak(read, entry: Dict[str, Any]) -> str:
     """Recompute an entry's speech from the store — the verbatim
     census contract. Total over SHEET_KINDS."""
-    kind, identity = entry["kind"], entry["identity"]
+    kind, identity = entry["label"], entry["identity"]
     if kind in ("table", "column"):
         node = next(n for n in read.nodes(kind)
                     if n.identity == identity)
@@ -127,16 +127,16 @@ def entries(read) -> List[Dict[str, Any]]:
         for scope in decisions.named_scopes(tree):
             scope_owner[scope["name_key"]] = key
     for e in out:
-        if e["kind"] == "scope":
+        if e["label"] == "scope":
             e["owner"] = scope_owner.get(e["identity"])
-        elif e["kind"] == "derived column":
+        elif e["label"] == "derived column":
             e["owner"] = e["identity"].rsplit(".", 1)[0]
-        elif e["kind"] == "drift":
+        elif e["label"] == "drift":
             e["owner"] = e["identity"].split("::")[0]
         e["words"] = speak(read, e)
 
     def add(kind, identity, name, owner):
-        entry = {"kind": kind, "identity": identity, "name": name,
+        entry = {"label": kind, "identity": identity, "name": name,
                  "folded": _fold(name), "owner": owner, "words": ""}
         entry["words"] = speak(read, entry)
         out.append(entry)
@@ -156,7 +156,7 @@ def entries(read) -> List[Dict[str, Any]]:
                 p["name"], key)
     # labels as entries, DERIVED from what the index itself holds
     # (the graph's live self-knowledge; no list anywhere)
-    for lb in sorted({e["kind"] for e in out}):
+    for lb in sorted({e["label"] for e in out}):
         add("label", f"label::{lb}", lb, None)
-    return [e for e in out if e["words"] or e["kind"] not in
+    return [e for e in out if e["words"] or e["label"] not in
             ("condition",)]  # empty conditions never index

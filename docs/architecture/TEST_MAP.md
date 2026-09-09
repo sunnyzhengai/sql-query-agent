@@ -7,7 +7,7 @@
 
 # Test Map — what every test proves
 
-162 modules, 1777 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
+164 modules, 1789 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
 
 ## By ADR
 
@@ -159,7 +159,7 @@
 - `tests/aivia/test_approve_land.py` (10): Slice 6 exit: the F5 script against the BUILT approve/land flows.
 - `tests/aivia/test_ask_console.py` (21): Tier A exit (ADR 0079): the F10 answer keys go RUNNABLE.
 - `tests/aivia/test_center_censuses.py` (18): ADR 0080 — the center and the three censuses, red-first.
-- `tests/aivia/test_click_reroute.py` (3): STEP A of the search rebuild — CLICKS ARE STEER (gap 12). Suite
+- `tests/aivia/test_click_reroute.py` (4): STEP A of the search rebuild — CLICKS ARE STEER (gap 12). Suite
 - `tests/aivia/test_connection_census.py` (9): STEP 1 of the Connection Ledger build — THE TEST SUITE, shown to
 - `tests/aivia/test_design_validators.py` (4): Slice 0: the design validators run in CI — every push re-proves the
 - `tests/aivia/test_flows_change_quanta.py` (6): The flows' change quanta (CONTRACT_DATALOAD §13 + the flows
@@ -168,6 +168,7 @@
 - `tests/aivia/test_kg2_mapper.py` (8): Slice 2 exit: the F2 answer key against the BUILT trees.
 - `tests/aivia/test_kg3_artifacts.py` (18): Slice 4: the ledger — KG3 artifact layer lifecycle + derived states.
 - `tests/aivia/test_kind_library.py` (4): Slice 2: the kind-library case families (F7) — construct,
+- `tests/aivia/test_label_rename.py` (5): STEP D (promoted) — LABEL, not kind. The industry-standard term
 - `tests/aivia/test_ledger_close.py` (5): The ledger close (Sunny's order, 2026-09-06): the last engine-debt
 - `tests/aivia/test_lenses.py` (11): Slice 3 exit: the F3 answer key against the BUILT lenses.
 - `tests/aivia/test_metamodel.py` (7): Slice 0: the registry loader — code consumes ratified registries only.
@@ -182,7 +183,8 @@
 - `tests/aivia/test_produce.py` (10): Slice 5 exit: produce vs the RATIFIED floor grammar — F4 upgraded
 - `tests/aivia/test_refusals.py` (9): Slice 1: the F6 refusal set — every refusal NAMES its rule.
 - `tests/aivia/test_root_edges.py` (4): STEP 5 of the Connection Ledger build — ROOT EDGES. The test
-- `tests/aivia/test_search_is_the_answer.py` (7): STEP B — THE SEARCH IS THE ANSWER (Sunny's pipeline, ruled
+- `tests/aivia/test_search_is_the_answer.py` (9): STEP B — THE SEARCH IS THE ANSWER (Sunny's pipeline, ruled
+- `tests/aivia/test_seat_prompts.py` (4): STEP C of the search rebuild — THE PROMPT IS REGISTRY DATA.
 - `tests/aivia/test_sepsis_shakedown.py` (9): The sepsis shakedown (round 2) — conservation counters pinned;
 - `tests/aivia/test_shapes_shakedown.py` (4): The shapes shakedown — the engine over the 38-file ADR 0055 corpus,
 - `tests/aivia/test_store.py` (6): Slice 1: the append-only substrate — LC-F2/F3 as structure.

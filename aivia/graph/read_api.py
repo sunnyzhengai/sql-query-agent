@@ -15,8 +15,8 @@ class ReadApi:
     def __init__(self, store: Store):
         self._store = store
 
-    def nodes(self, kind: Optional[str] = None) -> List[NodeVersion]:
-        return self._store.current_nodes(kind)
+    def nodes(self, label: Optional[str] = None) -> List[NodeVersion]:
+        return self._store.current_nodes(label)
 
     def edges(self, kind: Optional[str] = None) -> List[Edge]:
         return self._store.current_edges(kind)
