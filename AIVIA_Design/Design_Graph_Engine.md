@@ -152,6 +152,9 @@ continuously audits AIVIA, in one list):
 11. the claims ledger (ruling clauses == evidence, every build)
 12. the validators + shakedown suites (metamodel, fixtures,
     estates)
+13. THE SHAPE CENSUS (2026-09-09) — store labels/edges/description
+    coverage == the Shape_Ledger, both directions (Q1/Q2/Q3 as
+    failure gates; the blob corpse's permanent lock)
 Grounding thresholds are registry data and never cliffs:
 below-threshold yields HITL candidates with visible scores, never
 "unknown". The ask pipeline's search TRACE (mentions, expansions,
@@ -256,6 +259,60 @@ must crown the ED dashboard; "which files mention ED" must surface
 the ED files — remeasured on recomposed cards before any scoring-
 law amendment is considered.
 
+**** THE SHAPE CONTRACT & THE SHAPE CENSUS (ruled 2026-09-09 —
+the second believed-built corpse: the store held the parse as
+BLOBS while every surface spoke in nodes; found by Sunny's
+mind-image questions, provable by one query all along)
+
+THE SHAPE CONTRACT — the store's shape IS design, never an
+implementation choice:
+
+1. EVERY NODE KIND THE DESIGN NAMES IS A STORE LABEL. The ruled
+   node grains: db · schema · table · column (KG1) — file ·
+   statement · scope · condition · parameter · derived column
+   (KG2) — meaning_twin (KG2b record) — description · term ·
+   usage · disposition · proposal · acronym · person · agent ·
+   role (KG3) — PBI Report (consumption) — drift. A grain that
+   exists only inside a serialized property is NOT BUILT.
+2. EVERY NODE CARRIES A STORED plain-English `description`
+   PROPERTY, by source: dictionary-loaded (table, column) ·
+   Scribe-drafted, blessed (file) · grammar-rendered AT BUILD and
+   stored (statement, scope, condition, parameter, derived
+   column) · derived via executes (PBI Report) · authored (term).
+   Rendered-then-stored keeps the verbatim census: stored text
+   must equal what the grammar recomputes.
+3. EVERY RULED EDGE IS A STORED EDGE — contains (file→statement→
+   scope→condition/parameter), reads, resolves_to, translates,
+   executes, describes, cites — never a path string inside a
+   blob. Blobs (tree, twin) may remain as builder provenance;
+   the GRAPH TRUTH is the nodes and edges.
+4. THE SHAPE LEDGER (registry sheet Shape_Ledger) declares every
+   label and edge with its status: PRESENT or TARGET(landing
+   step named). Divergence from design is legal ONLY as a
+   declared, counted ledger row — silent divergence is the
+   corpse class this contract kills.
+
+THE SHAPE CENSUS — integrity battery #13. The three INVARIANT
+QUERIES, verbatim (GQL form; the census runs their store
+equivalents as a FAILURE GATE in CI):
+
+  Q1  MATCH (n) RETURN labels(n), count(*)
+      == the Shape_Ledger's PRESENT node rows, exactly: no
+      undeclared label, no declared-present label absent.
+  Q2  MATCH (n) WHERE n.description IS NOT NULL
+      RETURN labels(n), count(*)
+      == the ledger's description obligation per label (full /
+      counted-gap / target-with-landing-step / none-ruled).
+  Q3  MATCH ()-[r]->() RETURN type(r), count(*)
+      == the ledger's PRESENT edge rows, exactly.
+
+THE VERIFICATION LAW (Sunny, 2026-09-09: "mind images become
+queries"): every BUILT claim in Manifest_Build carries the query
+that proves it and the expected shape of its answer — accepting
+a claim is running a query, never trusting a sentence. Sunny's
+stated invariants are encoded as standing queries BEFORE code
+claims to satisfy them.
+
 **** The Graph (was: Level 1 — the knowledge graph) [stores]
 
 Edge direction convention (ratified 2026-09-05, closing the open
@@ -264,7 +321,7 @@ CONTAINMENT edges point parent → child. Both layers already obey
 this; it is now law, not accident.
 
 KG Layer 1 — source dictionaries technical layer      [ratified]
-      [registry stamp: kg1_technical v1.31.0]
+      [registry stamp: kg1_technical v1.32.0]
       L1 companions: Technical_Layer_Registry, CONTRACT_DATALOAD
       AMENDED 2026-09-06 (twin-graph ruling 2a, 5a): KG1 is the
       DECLARED layer — syntax and semantics FUSED on one node.
@@ -347,7 +404,7 @@ KG Layer 1 — source dictionaries technical layer      [ratified]
    -- source inheritance: a schema belongs to exactly one source; tables/columns inherit source from the containment chain; a mixed schema is the recorded trigger to push source down a level.
 
 KG Layer 2 — logic layer (one tree per SQL file)       [ratified]
-      [registry stamp: kg2_logic v1.31.0 · kg2_kind_library v1.31.0]
+      [registry stamp: kg2_logic v1.32.0 · kg2_kind_library v1.32.0]
       L1 companions: Logic_Layer_Registry (subsumes the mapper's
       seam contract), Kind_Library_TSQL_Predicates
       AMENDED 2026-09-06 (twin-graph ruling 2b-2e): this layer is
@@ -486,7 +543,7 @@ KG Layer 2 — logic layer (one tree per SQL file)       [ratified]
        and audit, not re-parsing) [axm:S1, axm:M5; = spec:G5 in
        the code record]
 KG Layer 3 — artifact layer                            [ratified]
-      [registry stamp: kg3_artifacts v1.31.0]
+      [registry stamp: kg3_artifacts v1.32.0]
       L1 companions: Artifact_Layer_Registry
       AMENDED 2026-09-06 (twin-graph ruling 2f): this layer and
       KG Layer 4 MERGE into KG3, THE GOVERNANCE OVERLAY — sparse
@@ -660,7 +717,7 @@ KG Layer 3 — artifact layer                            [ratified]
 - Forward note [axm:B4] — DELIVERED: the LAND stage carries the
   human-confirmation clause.
 KG Layer 4 — concept layer            [MERGED INTO KG3 2026-09-06]
-      [registry stamp: kg4_concepts v1.31.0]
+      [registry stamp: kg4_concepts v1.32.0]
       L1 companions: Concept_Layer_Registry (merging into
       Governance_Layer_Registry)
       SUPERSEDED AS A LAYER (twin-graph ruling 2f): concept is now
@@ -742,7 +799,7 @@ The catalog below stands as the ratified record of each entry's
 rules; the contract text above governs where they differ.
 
 [historical header: read level 1, write nothing]
-      [registry stamp: lenses v1.31.0]
+      [registry stamp: lenses v1.32.0]
 
 Lenses                                                 [ratified]
       L2 companions: Lenses_Registry
@@ -830,7 +887,7 @@ AMENDED 2026-09-06 (twin-graph ruling 5):
   translator + stored KG2b + conservation green → C voicing-
   policy port + gap-check rerun → D governance merge + anchor
   migration; each phase gated by a real ED-sepsis gap-check.
-      [registry stamp: flows v1.31.0]
+      [registry stamp: flows v1.32.0]
 
 The flows                                              [ratified]
       L3 companions: Flows_Registry

@@ -1,7 +1,7 @@
 {
  "registry": "lenses",
  "stamp": {
-  "version": "1.31.0",
+  "version": "1.32.0",
   "doc_section": "Level 2 — lenses",
   "doc_stamp": "v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 twin-graph ruling ADR 0077; v1.2.0 Phase A metamodel bump; v1.3.0 Phase B composite-kinds correction; v1.4.0 T-2 operational-statements ruling; v1.5.0 the gap taxonomy; v1.6.0 the plug-all-holes sweep; v1.7.0 ledger close; v1.8.0 the ask console ADR 0078; v1.9.0 the list op; v1.10.0 kind vocabulary; v1.11.0 ADR 0079 interpreter; v1.12.0 Tier A build data; v1.13.0 the seat-failure law; v1.14.0 follow-up context; v1.15.0 anaphor vocabulary (all 2026-09-06)",
   "ratified": true,
@@ -18,6 +18,7 @@
   "sheet Response_Shapes added (twin-graph ruling (2026-09-06), ADR 0077)",
   "sheet Degradation_Ladder added (twin-graph ruling (2026-09-06), ADR 0077)",
   "sheet Seat_Prompts added (twin-graph ruling (2026-09-06), ADR 0077)",
+  "sheet Shape_Ledger added (twin-graph ruling (2026-09-06), ADR 0077)",
   "sheet Closed_Sets added (twin-graph ruling (2026-09-06), ADR 0077)",
   "sheet Connection_Ledger added (twin-graph ruling (2026-09-06), ADR 0077)",
   "sheet Censuses added (twin-graph ruling (2026-09-06), ADR 0077)",
@@ -401,6 +402,274 @@
     "Seat": "scribe",
     "Version": "1.1.0",
     "Prompt": "You write ONE short aboutness phrase for a database object, from the structural evidence given. Return ONLY JSON: {\"description\": \"...\"}. RULES. Say what the object is ABOUT — the business meaning of what it selects or shows. Write a NOUN PHRASE naming the content, shaped like: <clinical or business topic>, <its key aspects>, for <purpose>. NEVER start with 'This' or any opener. NEVER use filler like 'provides insights into'. Never repeat the object's name. Never name its type (no 'procedure', 'report', 'dashboard', 'table', 'file', 'selection', 'power bi'). Never recite its source tables' documentation. Under 25 words. Plain words a business user would say. Never invent facts the evidence does not show. (v1.1.0: the v1.0.0 live run opened every draft with 'This <type> provides insights into' — both bans broken; the shape requirement is the fix.)"
+   }
+  ],
+  "Shape_Ledger": [
+   {
+    "Kind": "_ruling",
+    "Name": "-",
+    "Status": "-",
+    "Description obligation": "-",
+    "Notes": "THE SHAPE CONTRACT (Sunny, 2026-09-09): the store's shape IS design. Every label and edge is declared here with PRESENT or TARGET(landing step); the shape census (battery #13, Q1/Q2/Q3) FAILS on any divergence in either direction. Silent divergence — the blob corpse — is structurally impossible."
+   },
+   {
+    "Kind": "node",
+    "Name": "db",
+    "Status": "PRESENT",
+    "Description obligation": "none-ruled",
+    "Notes": "minted from registration"
+   },
+   {
+    "Kind": "node",
+    "Name": "schema",
+    "Status": "PRESENT",
+    "Description obligation": "none-ruled",
+    "Notes": ""
+   },
+   {
+    "Kind": "node",
+    "Name": "table",
+    "Status": "PRESENT",
+    "Description obligation": "stored — counted-gap allowed",
+    "Notes": "dictionary-loaded (§3c)"
+   },
+   {
+    "Kind": "node",
+    "Name": "column",
+    "Status": "PRESENT",
+    "Description obligation": "stored — counted-gap allowed",
+    "Notes": "dictionary-loaded"
+   },
+   {
+    "Kind": "node",
+    "Name": "file",
+    "Status": "PRESENT",
+    "Description obligation": "TARGET stored (Scribe-drafted, blessed) — today artifact-linked; landing: the materialization build",
+    "Notes": "tree blob remains builder provenance"
+   },
+   {
+    "Kind": "node",
+    "Name": "statement",
+    "Status": "TARGET — landing: the materialization build",
+    "Description obligation": "stored (grammar-rendered at build)",
+    "Notes": "today: rows inside the tree blob"
+   },
+   {
+    "Kind": "node",
+    "Name": "scope",
+    "Status": "PRESENT",
+    "Description obligation": "TARGET stored (grammar-rendered at build) — today rendered at read; landing: the materialization build",
+    "Notes": "today skeletal ({structures})"
+   },
+   {
+    "Kind": "node",
+    "Name": "condition",
+    "Status": "TARGET — landing: the materialization build",
+    "Description obligation": "stored (voiced phrase)",
+    "Notes": "today: twin-blob rows + read-time index"
+   },
+   {
+    "Kind": "node",
+    "Name": "parameter",
+    "Status": "TARGET — landing: the materialization build",
+    "Description obligation": "stored (voiced phrase)",
+    "Notes": "same"
+   },
+   {
+    "Kind": "node",
+    "Name": "derived column",
+    "Status": "TARGET — landing: the materialization build",
+    "Description obligation": "stored (voiced phrase)",
+    "Notes": "same"
+   },
+   {
+    "Kind": "node",
+    "Name": "meaning_twin",
+    "Status": "PRESENT",
+    "Description obligation": "none-ruled",
+    "Notes": "the translation record; twin blob = builder provenance under the contract"
+   },
+   {
+    "Kind": "node",
+    "Name": "description",
+    "Status": "PRESENT",
+    "Description obligation": "text (the artifact IS one)",
+    "Notes": "kg3"
+   },
+   {
+    "Kind": "node",
+    "Name": "term",
+    "Status": "PRESENT",
+    "Description obligation": "definition (authored)",
+    "Notes": "kg3; count may be 0 pre-confirmations"
+   },
+   {
+    "Kind": "node",
+    "Name": "usage",
+    "Status": "PRESENT",
+    "Description obligation": "none-ruled",
+    "Notes": "kg3 events; count may be 0 on a fresh boot"
+   },
+   {
+    "Kind": "node",
+    "Name": "acronym",
+    "Status": "PRESENT",
+    "Description obligation": "expansions (the ruled shape)",
+    "Notes": "journal-replayed; count may be 0 without the journal"
+   },
+   {
+    "Kind": "node",
+    "Name": "person",
+    "Status": "PRESENT",
+    "Description obligation": "none-ruled",
+    "Notes": "minted on first act; may be 0"
+   },
+   {
+    "Kind": "node",
+    "Name": "agent",
+    "Status": "PRESENT",
+    "Description obligation": "none-ruled",
+    "Notes": ""
+   },
+   {
+    "Kind": "node",
+    "Name": "role",
+    "Status": "PRESENT",
+    "Description obligation": "none-ruled",
+    "Notes": ""
+   },
+   {
+    "Kind": "node",
+    "Name": "responsibility",
+    "Status": "PRESENT",
+    "Description obligation": "none-ruled",
+    "Notes": "kg3"
+   },
+   {
+    "Kind": "node",
+    "Name": "disposition",
+    "Status": "PRESENT",
+    "Description obligation": "none-ruled",
+    "Notes": "kg3; may be 0"
+   },
+   {
+    "Kind": "node",
+    "Name": "proposal",
+    "Status": "PRESENT",
+    "Description obligation": "none-ruled",
+    "Notes": "kg3; may be 0"
+   },
+   {
+    "Kind": "node",
+    "Name": "PBI Report",
+    "Status": "PRESENT",
+    "Description obligation": "stored shell + speech DERIVED from procs (the derivation ruling)",
+    "Notes": "consumption layer"
+   },
+   {
+    "Kind": "edge",
+    "Name": "contains",
+    "Status": "PRESENT",
+    "Description obligation": "-",
+    "Notes": "db→schema→table→column spine; TARGET grows: file→statement→scope→condition/parameter at materialization"
+   },
+   {
+    "Kind": "edge",
+    "Name": "reads",
+    "Status": "PRESENT",
+    "Description obligation": "-",
+    "Notes": ""
+   },
+   {
+    "Kind": "edge",
+    "Name": "cites",
+    "Status": "PRESENT",
+    "Description obligation": "-",
+    "Notes": ""
+   },
+   {
+    "Kind": "edge",
+    "Name": "defines",
+    "Status": "PRESENT",
+    "Description obligation": "-",
+    "Notes": ""
+   },
+   {
+    "Kind": "edge",
+    "Name": "belongs_to",
+    "Status": "PRESENT",
+    "Description obligation": "-",
+    "Notes": ""
+   },
+   {
+    "Kind": "edge",
+    "Name": "sighted",
+    "Status": "PRESENT",
+    "Description obligation": "-",
+    "Notes": ""
+   },
+   {
+    "Kind": "edge",
+    "Name": "translates",
+    "Status": "PRESENT",
+    "Description obligation": "-",
+    "Notes": "file↔twin"
+   },
+   {
+    "Kind": "edge",
+    "Name": "executes",
+    "Status": "PRESENT",
+    "Description obligation": "-",
+    "Notes": "report→proc"
+   },
+   {
+    "Kind": "edge",
+    "Name": "describes",
+    "Status": "PRESENT",
+    "Description obligation": "-",
+    "Notes": "description→target"
+   },
+   {
+    "Kind": "edge",
+    "Name": "assigns",
+    "Status": "PRESENT",
+    "Description obligation": "-",
+    "Notes": "kg3"
+   },
+   {
+    "Kind": "edge",
+    "Name": "by",
+    "Status": "PRESENT",
+    "Description obligation": "-",
+    "Notes": "kg3 actor"
+   },
+   {
+    "Kind": "edge",
+    "Name": "approved_by",
+    "Status": "PRESENT",
+    "Description obligation": "-",
+    "Notes": "acronym→person; may be 0 without journal"
+   },
+   {
+    "Kind": "edge",
+    "Name": "used_by",
+    "Status": "PRESENT",
+    "Description obligation": "-",
+    "Notes": "acronym→carriers, derived; may be 0"
+   },
+   {
+    "Kind": "edge",
+    "Name": "resolves_to",
+    "Status": "TARGET — landing: the materialization build",
+    "Description obligation": "-",
+    "Notes": "today: paths inside the twin blob"
+   },
+   {
+    "Kind": "edge",
+    "Name": "supersedes",
+    "Status": "PRESENT",
+    "Description obligation": "-",
+    "Notes": "kg3 versioning; may be 0"
    }
   ],
   "Closed_Sets": [

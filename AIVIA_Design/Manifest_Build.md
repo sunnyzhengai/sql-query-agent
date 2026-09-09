@@ -8,6 +8,13 @@ artifact; anything else is DEFERRED with its reason or OPEN. "Done
 except X" is the only honest done. Statuses: BUILT · STANDS ·
 PARTIAL · DEFERRED · OPEN · SUPERSEDED.)*
 
+**THE VERIFICATION LAW (Sunny, 2026-09-09):** every BUILT claim
+carries the query that proves it and the expected shape of its
+answer — accepting a claim is running a query, never trusting a
+sentence. Sunny's mind-images are encoded as standing queries
+(the Shape_Ledger + battery #13) BEFORE code claims to satisfy
+them.
+
 **The seat-claim rule (ruled via the 09-09 audit):** every seat in
 the rights table (Design_Chatbot.md) MUST hold a claim row here —
 a named seat with no claim is an unbuilt-build waiting to be
@@ -144,6 +151,38 @@ Estate restructured to the ruled shape: 27 reports, 26 of them 1:1,
 the dashboard trimmed to 2 procs (DEMO-ADJUSTED note in its source
 field — the real TMDL lists 3), the freed proc gained its own
 shell. descriptions.json = 28 file drafts only.
+
+### E4 — THE SHAPE CONTRACT + THE SHAPE CENSUS (ruled + gate BUILT 2026-09-09)
+
+| claim | state | verification query / evidence |
+|---|---|---|
+| THE SHAPE CONTRACT in Design_Graph_Engine.md: every design-named grain is a store label; every node a stored description (by ruled source); every ruled edge a stored edge; divergence legal ONLY as a declared Shape_Ledger row | CONTRACTED | the contract section + Shape_Ledger (registry 1.32.0, 23 node rows + 16 edge rows) |
+| the shape census as FAILURE GATES (battery #13) | BUILT | test_shape_census.py — Q1 `MATCH (n) RETURN labels(n), count(*)` == PRESENT rows both directions; Q2 description obligations per label; Q3 `MATCH ()-[r]->() RETURN type(r), count(*)` == PRESENT edge rows; TARGET rows are visible counted debt that flips at landing; 4 pins green |
+| THE MATERIALIZATION BUILD | PLANNED as §E5 below (Sunny's batch ruling 2026-09-09) | small verifiable batches; Sunny's GQL on Fabric Graph gates every batch |
+
+## Section E5 — THE MATERIALIZATION PLAN (ruled 2026-09-09: no Neo4j
+— Microsoft Marketplace offering, Sunny's Fabric capacity; small
+batches; every batch ends with Sunny's OWN GQL verification on
+Fabric Graph plus the visualization page)
+
+**The batch law:** each batch = build → my tests green (suite +
+shape census + export-mirror) → I report DONE → Sunny runs the
+batch's GQL in Fabric Graph → the visualization artifact
+(regenerated FROM the export tables, same URL) → Sunny verifies
+there → the next batch opens. A batch never grows past one node
+family. Shape_Ledger rows flip in the same commit as their build.
+
+| # | batch | build content | my check | Sunny's GQL gate |
+|---|---|---|---|---|
+| M1 | the verification surface + the technical layer | the Fabric Graph export reading (store → camelCase node/edge tables, KG1 labels only: db, schema, table, column + contains; descriptions ride as properties) + the plain-numbered load runbook for Sunny's tenant + the viz page reads the SAME export | export counts == store counts (Q1/Q3 mirror test) | `MATCH (n) RETURN labels(n), count(*)` == 1 db / 3 schema / 90 table / 4554 column; spot-check a table's description property |
+| M2 | statements | statement nodes minted from the tree blob (one per statement, grammar-rendered description STORED) + file-contains->statement edges; Shape_Ledger statement row flips PRESENT | shape census green with the flip; verbatim law: stored text == grammar recompute | count(statement) == the trees' statement total; `MATCH (f:file)-[:contains]->(s:statement)` covers every statement; read 3 descriptions |
+| M3 | scope descriptions + spine | scope nodes gain stored description (rendered lead) + statement-contains->scope edges; ledger scope-description flips | census + verbatim green | every scope has description; `MATCH (st:statement)-[:contains]->(sc:scope)` total == 312 |
+| M4 | conditions + parameters | nodes minted from twin facts (voiced description stored) + scope-contains-> edges; ledger rows flip | census green; condition count == twin condition facts | counts match; descriptions read as plain English; orphan check: none without a contains parent |
+| M5 | derived columns | same pattern off the projections | same | same shape checks |
+| M6 | resolves_to edges | the twin's draws_from/resolved facts become real edges to KG1 (scope/condition/source grain -> table/column); ledger edge row flips | census green; edge count == resolvable twin facts, unresolved stay COUNTED | the lineage payoff: `MATCH (f:file)-[:contains*]->()-[:resolves_to]->(t:table)` walks proc->table lineage in pure GQL |
+| M7 | file descriptions on-node + governance layer in export | blessed/drafted Scribe text lands as the file node's description property (attribution kept in the artifact); export gains KG3 + consumption labels (description, PBI Report, acronym, person, usage...) | census green (file description obligation flips) | file 28/28 descriptions; `MATCH (r:\`PBI Report\`)-[:executes]->(f:file)` 1:1 shape + the single 2-proc dashboard |
+| M8 | close | all TARGET rows PRESENT; full suite + live tier; the viz page final; runbook stamped | everything green | Sunny's full Q1/Q2/Q3 == the ledger with zero TARGET rows |
+
 
 ## Section D — the open queue [ON HOLD — Sunny's ruling 2026-09-09: the engine gaps (§E) come first; this list resumes after]
 

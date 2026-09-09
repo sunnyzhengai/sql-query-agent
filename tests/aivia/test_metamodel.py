@@ -53,10 +53,12 @@ def test_every_loaded_registry_is_ratified_v1():
     # 'drafted' description status; 1.30.0 = the literal law locks
     # (Closed_Sets sheets, drift text as registry data, the
     # contract-era Speech_Sources rows); 1.31.0 = the derivation
-    # ruling (report speech derives from its procs' descriptions)
+    # ruling (report speech derives from its procs' descriptions);
+    # 1.32.0 = THE SHAPE CONTRACT: the Shape_Ledger sheet (battery
+    # #13 — Q1/Q2/Q3 as failure gates; the blob corpse's lock)
     for reg in metamodel.load_all().values():
         assert reg.ratified is True
-        assert reg.version == "1.31.0"
+        assert reg.version == "1.32.0"
 
 
 def test_load_single_exposes_sheets_and_stamp():
