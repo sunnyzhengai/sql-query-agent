@@ -261,12 +261,14 @@ def build_store(estate: str, journal_path=None):
     if (base / "pbi_snapshot").is_dir():
         inbound.receive_pbi(store, base / "pbi_snapshot")
     # PHASE E1: the governance journal replays LAST — decisions land
-    # on top of the freshly rebuilt truth
-    if journal_path is None:
-        journal_path = base / "governance" / "journal.jsonl"
-    journal_path.parent.mkdir(parents=True, exist_ok=True)
-    store.journal_path = journal_path
-    store.replay_journal()
+    # on top of the freshly rebuilt truth. OPT-IN by path: the live
+    # console (main) passes the estate's journal; tests pass tmp
+    # paths or none — a default-on journal contaminated the estate
+    # dir from test runs (caught by the suite).
+    if journal_path is not None:
+        journal_path.parent.mkdir(parents=True, exist_ok=True)
+        store.journal_path = journal_path
+        store.replay_journal()
     return store, base
 
 
@@ -596,7 +598,11 @@ def main() -> None:
     port = int(sys.argv[2]) if len(sys.argv) > 2 else 8377
     key = _env_key()
     print(f"building the {estate} graph …")
-    store, base = build_store(estate)
+    store, base = build_store(
+        estate, journal_path=(pathlib.Path(__file__).resolve()
+                              .parents[1] / "AIVIA_Product"
+                              / "estates" / estate / "governance"
+                              / "journal.jsonl"))
     read = ReadApi(store)
     entries = ask.build_index(read)
     interpret_fn = (make_interpreter(

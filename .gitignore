@@ -56,3 +56,4 @@ internal/private/
 
 # Vendor-derived material — never leaves this machine
 AIVIA_Protected/
+AIVIA_Product/estates/*/governance/
