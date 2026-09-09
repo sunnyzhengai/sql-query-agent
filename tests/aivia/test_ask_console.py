@@ -122,8 +122,8 @@ def test_gr4_vectors_stamped_and_cached(tmp_path, world):
     cache = tmp_path / "emb.json"
     first = grounding.SemanticIndex(entries, fake_embed, "fake-2k",
                                     cache_path=cache)
-    # facet cards: 1-2 vectors per entry (name + speech when present)
-    assert 20 <= first.embedded_now <= 40
+    # facet cards: 2-3 vectors per entry (name + label + speech)
+    assert 40 <= first.embedded_now <= 60
 
     def forbidden(texts):
         raise AssertionError("re-embedded an unchanged meaning")

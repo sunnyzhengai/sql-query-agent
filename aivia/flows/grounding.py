@@ -46,16 +46,24 @@ def meaning_text(entry: Dict[str, Any]) -> str:
 
 
 def cards(entry: Dict[str, Any]) -> List[tuple]:
-    """THE FACET DECISION (ruled 2026-09-07): one node = MANY
-    embedded cards, never one blended vector. A NAME card and a
-    SPEECH card per node (part-cards are already their own index
-    entries). Deciding evidence pinned in the chatbot doc: 'ED
-    Sepsis' scored 0.78 against the name card vs 0.40 against the
-    4,774-char blend."""
+    """THE FACET DECISION + THE TOTAL-SCORE LAW (2026-09-08): one
+    node = MANY embedded cards. NAME · SPEECH · LABEL (every member
+    carries its label as a card — the label:: group nodes died;
+    label credit lands on the node and SUMS with its other cards).
+    The expansion card joins when acronyms are blessed."""
     out = [("name", _words(entry["name"]))]
     words = (entry.get("words") or "").strip()
     if words and words != out[0][1]:
-        out.append(("speech", f"{_words(entry['name'])}. {words}"))
+        # the speech card carries the WORDS ONLY — the name lives in
+        # the name card; under the total-score law one piece of
+        # evidence contributes once (the old name-prefixed speech
+        # card double-paid every name match)
+        out.append(("speech", words))
+    label = entry.get("label")
+    if label:
+        from aivia.flows.produce import _pluralize
+        out.append(("label",
+                    f"{_words(label)} {_pluralize(_words(label))}"))
     return out
 
 
@@ -103,24 +111,27 @@ class SemanticIndex:
 
     def search(self, text: str, top_k: int = TOP_K,
                kind: Optional[str] = None) -> List[Dict[str, Any]]:
-        """Scores over ALL entries (kind-restricted BEFORE ranking —
-        live find #5). An entry's score = the MAX over its cards
-        (name / speech); the winning card rides as via_card — the
-        blend is dead, provenance lives."""
+        """THE TOTAL-SCORE LAW: an entry's score = the SUM of its
+        card hits (each card ≥ the candidate floor contributes its
+        cosine; each card once). via_card names every contributor
+        ("name+label") — provenance of the sum."""
+        floor = thresholds()["CANDIDATE_FLOOR"]
         query = self.embed_fn([text])[0]
         qn = math.sqrt(sum(v * v for v in query)) or 1.0
         scored = []
         for entry, slots in zip(self.entries, self.cards):
             if kind is not None and entry["label"] != kind:
                 continue
-            best, best_card = -1.0, None
+            total, via = 0.0, []
             for cname, vec in slots:
                 dot = sum(a * b for a, b in zip(query, vec))
                 vn = math.sqrt(sum(v * v for v in vec)) or 1.0
                 sc = dot / (qn * vn)
-                if sc > best:
-                    best, best_card = sc, cname
-            scored.append((best, best_card, entry))
+                if sc >= floor:
+                    total += sc
+                    via.append(cname)
+            if total > 0:
+                scored.append((total, "+".join(via), entry))
         scored.sort(key=lambda t: (-t[0], t[2]["identity"]))
         return [{"score": round(s, 4), "via_card": c, **e}
                 for s, c, e in scored[:top_k]]

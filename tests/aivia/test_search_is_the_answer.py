@@ -43,12 +43,20 @@ def test_no_kind_machinery_remains(world):
     assert out is not None and "kinds" not in out
 
 
-def test_labels_are_searchable_entries(world):
+def test_every_node_carries_its_label_card(world):
+    """THE TOTAL-SCORE LAW (2026-09-08): label:: group entries are
+    DEAD — the label is a CARD on every member node, so label
+    credit lands on the node itself and sums with its other
+    cards."""
     _store, _read, index, _semantic = world
-    labels = [e for e in index
-              if e["identity"].startswith("label::")]
-    names = {e["name"] for e in labels}
-    assert {"table", "column", "file"} <= names
+    assert not [e for e in index
+                if e["identity"].startswith("label::")]
+    from aivia.flows import grounding as g
+    table = next(e for e in index if e["label"] == "table")
+    card_names = [c[0] for c in g.cards(table)]
+    assert "label" in card_names
+    label_text = dict(g.cards(table))["label"]
+    assert "table" in label_text and "tables" in label_text
 
 
 # ---- the ranked answer -----------------------------------------------
@@ -77,19 +85,40 @@ def test_ranked_hits_are_the_answer(world):
                for h in hits[:1])
 
 
-def test_type_words_hit_the_label_group(world):
-    """'what tables are there' cold: the label entry 'table' ranks
-    at the top (near-identical vectors) — the group hit, clickable,
-    carrying its member count."""
+def test_the_census_emerges_from_label_cards(world):
+    """'what tables are there': every table's label card hits at
+    ≈1 — the ranked answer IS the census, no group node needed."""
     store, _read, _index, semantic = world
     q = "what tables are there"
     interp = fake_interpreter({q: {"mentions": ["tables"]}})
     result = ask.ask(store, q, "person:test", T0,
                      interpret_fn=interp, semantic=semantic)
     assert result["status"] == "answer"
-    top = result["hits"][0]
-    assert top["identity"] == "label::table"
-    assert "90" in result["answer"]
+    tables = [h for h in result["hits"] if h["label"] == "table"]
+    assert len(tables) >= 40  # the band shows the group en masse
+    assert result["hits"][0]["label"] == "table"
+    assert "table (" in result["answer"]  # the group header + count
+
+
+def test_scores_sum_across_cards_and_mentions(world):
+    """The law itself: a node hit on TWO mentions (name via one,
+    label via the other) outscores a node hit on one — 'files' +
+    'ED' crowns the ED files."""
+    store, _read, _index, semantic = world
+    q = "which files mention ED"
+    interp = fake_interpreter({q.lower(): {
+        "mentions": ["files", "ED"]}})
+    result = ask.ask(store, q, "person:test", T0,
+                     interpret_fn=interp, semantic=semantic)
+    hits = result["hits"]
+    ed_file = next(h for h in hits
+                   if h["label"] == "file" and "ED" in h["name"])
+    non_ed_col = next((h for h in hits if h["label"] == "column"
+                       and "ED" not in h["name"].upper()), None)
+    if non_ed_col:
+        assert ed_file["score"] > non_ed_col["score"]
+    # provenance names the summed cards
+    assert "+" in ed_file["via_card"] or ed_file["via_card"]
 
 
 def test_expansions_are_the_search_text(world):

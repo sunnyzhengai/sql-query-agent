@@ -95,24 +95,17 @@ def speak(read, entry: Dict[str, Any]) -> str:
         return f"parameter {_words(entry['name'])} of " \
                f"{_words(entry['owner'].rsplit('/', 1)[-1])}"
     if kind == "derived column":
+        # the entry's own name never rides in speech (one evidence,
+        # one card — the name card owns it; total-score law)
         scope_key = identity.rsplit(".", 1)[0]
-        return (f"{_words(entry['name'])}. a computed output of the "
+        return (f"a computed output of the "
                 f"{_words(scope_key.split('::')[-1])} selection")
     if kind == "term":
         node = next(n for n in read.nodes("term")
                     if n.identity == identity)
         return (node.properties.get("definition") or "").lower()
     if kind == "drift":
-        return f"{_words(entry['name'])}. {DRIFT_SENTENCE}"
-    if kind == "label":
-        # THE SEARCH IS THE ANSWER (2026-09-07): a label is its own
-        # searchable entry — its speech is its name in singular and
-        # plural (R1, the ratified pluralizer), so type words hit
-        # the GROUP at cosine≈1. Derived from the live store, never
-        # a list.
-        # the plural only — the name card already carries the
-        # singular; together the two cards cover both word forms
-        return produce._pluralize(entry["name"])
+        return DRIFT_SENTENCE
     return ""
 
 
@@ -154,9 +147,7 @@ def entries(read) -> List[Dict[str, Any]]:
         for p in tree.get("parameters", []):
             add("parameter", f"{key}::param/{p['name']}",
                 p["name"], key)
-    # labels as entries, DERIVED from what the index itself holds
-    # (the graph's live self-knowledge; no list anywhere)
-    for lb in sorted({e["label"] for e in out}):
-        add("label", f"label::{lb}", lb, None)
+    # THE TOTAL-SCORE LAW (2026-09-08): label:: group entries died —
+    # the label is a CARD on every member (grounding.cards)
     return [e for e in out if e["words"] or e["label"] not in
             ("condition",)]  # empty conditions never index

@@ -93,15 +93,15 @@ def test_conditions_speak_and_carry_owners(world):
         assert any(f.endswith(owner_file) for f in files)
 
 
-def test_labels_are_searchable_nodes(world):
-    """ADAPTED 2026-09-07 (the kinds removal + THE SEARCH IS THE
-    ANSWER): labels replaced kind nodes — derived from the live
-    store, speaking their own plural."""
+def test_labels_are_cards_on_every_node(world):
+    """RE-ADAPTED 2026-09-08 (the total-score law): label entries
+    died — the label is a CARD on every member node."""
     _store, _read, index, _semantic = world
-    labels = [e for e in index if e["label"] == "label"]
-    assert labels
-    file_label = next(e for e in labels if e["name"] == "file")
-    assert file_label["words"] == "files"
+    assert not [e for e in index if e["label"] == "label"]
+    from aivia.flows import grounding as g
+    f = next(e for e in index if e["label"] == "file")
+    label_card = dict(g.cards(f)).get("label", "")
+    assert "file" in label_card and "files" in label_card
 
 
 def test_speech_census_equation(world):
@@ -200,7 +200,12 @@ def test_honest_zero_never_no_match_while_a_kind_grounded(world):
                              "person:test", T0, semantic=semantic)
     assert result["status"] == "answer"
     assert "NO MATCH" not in result["answer"]
-    assert "0 " in result["answer"]  # the counted zero speaks
+    # ADAPTED to the total-score law: 'terms' ranks the term nodes
+    # (label cards); 'xylophone' contributes NOTHING — the honest
+    # zero lives in ITS trace row, visibly
+    xylo = next(t for t in result["trace"]
+                if t["mention"] == "xylophone")
+    assert xylo["strong"] == 0  # nothing real answers to it
 
 
 def test_facet_rollup_with_provenance(world):

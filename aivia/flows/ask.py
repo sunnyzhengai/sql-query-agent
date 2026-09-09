@@ -347,13 +347,8 @@ def present_hits(read, index_by_id, hits) -> str:
         for h in rows[:12]:
             via = f" · via {h['via_card']}" if h.get("via_card") \
                 else ""
-            extra = ""
-            if h["identity"].startswith("label::"):
-                n = sum(1 for e in index_by_id.values()
-                        if e["label"] == h["name"])
-                extra = f" — the group: {n} member(s)"
             lines.append(f"- {h['name']} — {h['score']:.2f}{via}"
-                         f"{extra}  ({h['identity']})")
+                         f"  ({h['identity']})")
         if len(rows) > 12:
             lines.append(f"  … and {len(rows) - 12} more")
     return "\n".join(lines)
@@ -547,12 +542,15 @@ def ask(store, question: str, author: str, occurred_at: str,
             row["expansions_tried"] = expansions[m]
         if semantic is not None:
             try:
-                found = semantic.search(searched_as, top_k=24)
+                found = semantic.search(searched_as, top_k=100)
             except Exception:  # noqa: BLE001 — seat-failure law
                 found = []
                 row["seat_down"] = True
             kept = [h for h in found if h["score"] >= floor]
             row["hits"] = len(kept)
+            row["strong"] = sum(
+                1 for h in kept if h["score"]
+                >= grounding.thresholds()["MATCH_SCORE"])
             # ONE contribution per identity per mention (the index
             # may carry duplicate entries; a mention never
             # double-counts) — cross-mention sums remain the boost
