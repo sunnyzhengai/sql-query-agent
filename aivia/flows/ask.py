@@ -11,7 +11,7 @@ from typing import Any, Callable, Dict, List, Optional
 
 from aivia.flows import connect, grounding, produce
 from aivia.graph import kg3_artifacts, phi_gate
-from aivia.lenses import decisions
+from aivia.lenses import ask_index, decisions
 from aivia.lenses.ask_index import _fold
 
 DISPLAY_MODES = ("card", "lineage", "filters", "readers", "census")
@@ -489,6 +489,11 @@ def ask(store, question: str, author: str, occurred_at: str,
     floor = grounding.thresholds()["CANDIDATE_FLOOR"]
     expansions = interpretation.get("expansions") or {}
     references = interpretation.get("references") or {}
+    # THE ONE-VOCABULARY LAW: blessed acronyms expand mentions
+    # DETERMINISTICALLY — the same stored words the cards carry
+    blessed = {n.properties["name"].lower():
+               n.properties["expansions"]
+               for n in read.nodes("acronym")}
     for m in interpretation["mentions"]:
         role = references.get(m)
         if role is not None:
@@ -534,7 +539,13 @@ def ask(store, question: str, author: str, occurred_at: str,
                           "outcome": "resolved",
                           "searched_as": m, "hits": len(chosen)})
             continue
-        searched_as = " ".join([m] + expansions.get(m, []))
+        vocab_exp = []
+        for tok in ask_index._tokens(m):
+            vocab_exp += [x for x in blessed.get(tok, [])
+                          if x.lower() not in m.lower()]
+        searched_as = " ".join([m] + vocab_exp
+                               + [x for x in expansions.get(m, [])
+                                  if x not in vocab_exp])
         row = {"mention": m, "tier": "search",
                "searched_as": searched_as, "hits": 0}
         if empty_table_marks and m not in references \

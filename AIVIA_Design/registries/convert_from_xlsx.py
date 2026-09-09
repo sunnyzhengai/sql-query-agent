@@ -125,6 +125,9 @@ SOURCES = {
 # clears and stays; context is CONVERSATION-scoped (client-held id),
 # never a global; transcript = DISPLAY memory, context set = MEANING
 # memory — prose history never reaches the model (the cage holds).
+# v1.28.0 (2026-09-08): ACRONYM ENRICHMENT (the one-vocabulary
+# law): acronym rows join the ledger (approved_by birth edge) and
+# the kg1 node catalog; used_by derives at build (contract text).
 # v1.27.0 (2026-09-08): THE PBI LAYER (Sunny's ruling: every proc
 # feeds a PBI report; labels are the users' words): PBI Report rows
 # join Speech_Sources + Connection_Ledger + the kg1 node catalog;
@@ -190,7 +193,7 @@ SOURCES = {
 # deliveries lead, spine voiced, intermediates counted, census
 # closes; the file's ask-index words = the delivery lead, so file
 # embeddings embed meaning, never name-noise).
-STAMP_VERSION = "1.27.0"
+STAMP_VERSION = "1.28.0"
 RATIFIED = True
 DOC_STAMP = ("v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 twin-graph "
              "ruling ADR 0077; v1.2.0 Phase A metamodel bump; v1.3.0 "
@@ -526,6 +529,10 @@ APPEND_ROWS = [
          "Required": "yes",
          "Shape / allowed values": "pbi://<estate>/<slug>",
          "Notes": "PHASE H (v1.27.0): the consumption layer"},
+        {"Node label": "acronym", "Property": "name",
+         "Required": "yes",
+         "Shape / allowed values": "acronym::<TOKEN>",
+         "Notes": "PHASE I (v1.28.0): the one-vocabulary law"},
         {"Node label": "person", "Property": "identity",
          "Required": "yes",
          "Shape / allowed values": "person:<name>",
@@ -1004,6 +1011,14 @@ TWIN_SHEETS = {
              "Status": "edged",
              "Meaning": "PHASE H: a report is deduced from the "
              "procs it runs — executes edges to its files"},
+            {"Label": "acronym", "Edge": "approved_by",
+             "Status": "edged",
+             "Meaning": "PHASE I: blessed vocabulary — approved_by "
+             "is the birth edge (direct to the person, timestamp "
+             "as data); used_by edges DERIVE AT GRAPH BUILD: a "
+             "newly loaded node whose name carries the token gains "
+             "the edge automatically — no re-approval, no manual "
+             "step, never computed at question time"},
             {"Label": "person", "Edge": "by", "Status": "edged",
              "Meaning": "STEP 3: minted on first act; their birth "
              "edge IS being acted-by (>=1 act points at them); a "

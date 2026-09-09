@@ -156,6 +156,26 @@ def append_term(store: Store, artifact_id: str, name: str, definition: str,
                            created_at, basis, payload)
 
 
+def append_acronym(store: Store, name: str, expansions: List[str],
+                   approved_by: str, approved_at: str) -> NodeVersion:
+    """THE ONE-VOCABULARY LAW (2026-09-08): a blessed acronym —
+    {name, expansions[], approved_by, approved_at}; the approver is
+    the birth edge (direct to the person, timestamp as data, no
+    ceremony event); used_by edges derive at graph build. Journals
+    (kg3@ family): blessings survive rebirth."""
+    _check_identity(approved_by)
+    if not expansions or not [e for e in expansions
+                              if (e or "").strip()]:
+        raise RefusalKG3("VOC-1", "an acronym carries at least one "
+                         "expansion — no empty shells")
+    _mint_actor(store, approved_by, approved_at)
+    return store.append_node(
+        "acronym", f"acronym::{name.strip().upper()}",
+        {"name": name, "expansions": [e.strip() for e in expansions],
+         "approved_by": approved_by, "approved_at": approved_at},
+        approved_at, extract_id=f"kg3@{approved_at}")
+
+
 def append_responsibility(store: Store, artifact_id: str, kind: str,
                           holder: str, target: str, author: str,
                           created_at: str) -> NodeVersion:

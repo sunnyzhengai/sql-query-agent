@@ -14,7 +14,7 @@ from typing import Any, Dict, List
 from aivia.flows import produce
 from aivia.graph import metamodel
 from aivia.lenses import ask_index, decisions
-from aivia.lenses.ask_index import _fold, _words
+from aivia.lenses.ask_index import _fold, _tokens, _words
 
 DRIFT_SENTENCE = ("read by the estate's sql but declared by no "
                   "dictionary and no catalog — reader/writer drift, "
@@ -127,7 +127,15 @@ def entries(read) -> List[Dict[str, Any]]:
     for key, tree in sorted(read.trees().items()):
         for scope in decisions.named_scopes(tree):
             scope_owner[scope["name_key"]] = key
+    acr = {n.properties["name"].lower():
+           " ".join(n.properties["expansions"])
+           for n in read.nodes("acronym")}
     for e in out:
+        if acr:
+            toks = _tokens(e["name"])
+            exps = [acr[t] for t in sorted(toks) if t in acr]
+            if exps:
+                e["expansions_text"] = " ".join(exps)
         if e["label"] == "scope":
             e["owner"] = scope_owner.get(e["identity"])
         elif e["label"] == "derived column":

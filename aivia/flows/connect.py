@@ -87,6 +87,24 @@ def build_adjacency(read) -> Dict[str, List[Tuple[str, str]]]:
                      scope["name_key"], "belongs_to")
         for prm in tree.get("parameters", []):
             link(f"{key}::param/{prm['name']}", key, "belongs_to")
+    # PHASE I: blessed acronyms walk to their approver and — DERIVED
+    # AT BUILD, per the contract — to every node whose name carries
+    # the token (new nodes connect automatically)
+    acronyms = list(read.nodes("acronym"))
+    if acronyms:
+        from aivia.lenses.ask_index import _tokens
+        carriers = []
+        for n in read.nodes(None):
+            nm = n.properties.get("name") or \
+                n.identity.rsplit("|", 1)[-1]
+            carriers.append((n.identity, _tokens(str(nm))))
+        for a in acronyms:
+            link(a.identity, a.properties["approved_by"],
+                 "approved_by")
+            tok = a.properties["name"].lower()
+            for ident, toks in carriers:
+                if tok in toks and ident != a.identity:
+                    link(a.identity, ident, "used_by")
     # PHASE H: the consumption layer walks to its procs
     for n in read.nodes("PBI Report"):
         for f in n.properties.get("executes") or []:

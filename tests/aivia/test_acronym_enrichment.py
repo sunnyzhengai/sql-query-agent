@@ -87,7 +87,7 @@ def test_carrier_nodes_gain_the_expansion_card(world):
 def test_queries_expand_deterministically(world):
     store, _read, _index, semantic = world
     q = "things about ED"
-    interp = fake_interpreter({q: {"mentions": ["ED"]}})  # no model
+    interp = fake_interpreter({q.lower(): {"mentions": ["ED"]}})
     # expansions proposed — the blessed vocabulary supplies them
     result = ask.ask(store, q, "person:test", T0,
                      interpret_fn=interp, semantic=semantic)

@@ -64,6 +64,10 @@ def cards(entry: Dict[str, Any]) -> List[tuple]:
         from aivia.flows.produce import _pluralize
         out.append(("label",
                     f"{_words(label)} {_pluralize(_words(label))}"))
+    if entry.get("expansions_text"):
+        # THE ONE-VOCABULARY LAW: the node side of a blessed
+        # acronym — same stored words the query side appends
+        out.append(("expansion", entry["expansions_text"]))
     return out
 
 
