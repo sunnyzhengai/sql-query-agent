@@ -7,7 +7,7 @@
 
 # Test Map — what every test proves
 
-164 modules, 1789 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
+165 modules, 1795 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
 
 ## By ADR
 
@@ -173,6 +173,7 @@
 - `tests/aivia/test_lenses.py` (11): Slice 3 exit: the F3 answer key against the BUILT lenses.
 - `tests/aivia/test_metamodel.py` (7): Slice 0: the registry loader — code consumes ratified registries only.
 - `tests/aivia/test_part_edges.py` (4): STEP 4 of the Connection Ledger build — PART EDGES. The test
+- `tests/aivia/test_pbi_layer.py` (5): PHASE H — THE PBI LAYER (Sunny's ruling 2026-09-08: every proc
 - `tests/aivia/test_person_nodes.py` (7): STEP 3 of the Connection Ledger build — PERSON NODES. The test
 - `tests/aivia/test_phase_a_projection.py` (6): Phase A exit (ADR 0077): the F8 phase-A answer keys go RUNNABLE.
 - `tests/aivia/test_phase_b_translator.py` (10): Phase B exit (ADR 0077): the F8 phase-B answer keys go RUNNABLE.
@@ -183,7 +184,7 @@
 - `tests/aivia/test_produce.py` (10): Slice 5 exit: produce vs the RATIFIED floor grammar — F4 upgraded
 - `tests/aivia/test_refusals.py` (9): Slice 1: the F6 refusal set — every refusal NAMES its rule.
 - `tests/aivia/test_root_edges.py` (4): STEP 5 of the Connection Ledger build — ROOT EDGES. The test
-- `tests/aivia/test_search_is_the_answer.py` (9): STEP B — THE SEARCH IS THE ANSWER (Sunny's pipeline, ruled
+- `tests/aivia/test_search_is_the_answer.py` (10): STEP B — THE SEARCH IS THE ANSWER (Sunny's pipeline, ruled
 - `tests/aivia/test_seat_prompts.py` (4): STEP C of the search rebuild — THE PROMPT IS REGISTRY DATA.
 - `tests/aivia/test_sepsis_shakedown.py` (9): The sepsis shakedown (round 2) — conservation counters pinned;
 - `tests/aivia/test_shapes_shakedown.py` (4): The shapes shakedown — the engine over the 38-file ADR 0055 corpus,

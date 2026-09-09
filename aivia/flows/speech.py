@@ -27,6 +27,7 @@ SHEET_KINDS = {
     "condition": "condition (predicate)", "parameter": "parameter",
     "derived column": "derived column", "term": "term (KG3)",
     "drift": "drift name", "label": "kind (node type)",
+    "PBI Report": "PBI Report",
 }
 
 
@@ -100,6 +101,13 @@ def speak(read, entry: Dict[str, Any]) -> str:
         scope_key = identity.rsplit(".", 1)[0]
         return (f"a computed output of the "
                 f"{_words(scope_key.split('::')[-1])} selection")
+    if kind == "PBI Report":
+        node = next(n for n in read.nodes("PBI Report")
+                    if n.identity == identity)
+        desc = (node.properties.get("description") or "").lower()
+        disp = node.properties.get("displays") or []
+        return (desc + (" displays: " + ", ".join(
+            _words(d) for d in disp) if disp else "")).strip()
     if kind == "term":
         node = next(n for n in read.nodes("term")
                     if n.identity == identity)

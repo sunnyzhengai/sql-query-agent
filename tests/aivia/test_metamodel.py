@@ -45,10 +45,11 @@ def test_every_loaded_registry_is_ratified_v1():
     # ladder as data; kind self-descriptions);
     # 1.21.0 = the Connection Ledger (birth-edge law; census 1's
     # successor); 1.22.0 = term origins (step 2); 1.23.0 = person
-    # nodes (step 3); 1.24.0 = part edges (step 4); 1.25.0 = root edges (step 5); 1.26.0 = seat prompts
+    # nodes (step 3); 1.24.0 = part edges (step 4); 1.25.0 = root
+    # edges (step 5); 1.26.0 = seat prompts; 1.27.0 = the PBI layer
     for reg in metamodel.load_all().values():
         assert reg.ratified is True
-        assert reg.version == "1.26.0"
+        assert reg.version == "1.27.0"
 
 
 def test_load_single_exposes_sheets_and_stamp():

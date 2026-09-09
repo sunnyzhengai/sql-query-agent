@@ -250,7 +250,7 @@ def build_store(estate: str):
     reg = json.loads((base / "registration.json").read_text())
     kg1_intake.apply_registration(store, reg)
     for snap in sorted(base.glob("*_snapshot")):
-        if snap.name == "estate_snapshot":
+        if snap.name in ("estate_snapshot", "pbi_snapshot"):
             continue
         pack = json.loads((snap / "manifest.json").read_text()) \
             .get("source_pack_version", "")
@@ -258,6 +258,8 @@ def build_store(estate: str):
                                 kg1_intake.load_snapshot(snap),
                                 known_packs={pack})
     inbound.receive_estate(store, reg, base / "estate_snapshot")
+    if (base / "pbi_snapshot").is_dir():
+        inbound.receive_pbi(store, base / "pbi_snapshot")
     return store, base
 
 

@@ -81,6 +81,8 @@ def lens_ask_index(read, params) -> Dict[str, Any]:
                 "unresolved", []):
             add("drift", f"{tree['name']}::{ref}",
                 ref.rsplit(".", 1)[-1])
+    for n in read.nodes("PBI Report"):
+        add("PBI Report", n.identity, n.properties.get("name", ""))
     seen_terms = {}
     for n in read.nodes("term"):
         seen_terms[n.properties["artifact_id"]] = n

@@ -253,3 +253,60 @@ def receive_estate(store, reg: Dict[str, Any], estate_dir,
         report.twins[name] = kg2_translator.apply_twin(
             store, f"{location}{name}", tree, manifest["as_of"])
     return report
+
+
+def receive_pbi(store, pbi_dir) -> int:
+    """THE CONSUMPTION LAYER (Sunny's ruling 2026-09-08: every proc
+    feeds a PBI report; the mapping is real even where the shell is
+    synthetic). Loads pbi_snapshot/reports.json as PBI Report nodes
+    — label chosen to BE the words users say — with executes
+    mappings; DISPLAYS are composed from the executed procs' twins
+    (delivery projection members: what the report actually shows,
+    derived, never invented)."""
+    import json as _json
+    import pathlib as _pl
+
+    from aivia.graph.read_api import ReadApi
+    pbi_dir = _pl.Path(pbi_dir)
+    if not (pbi_dir / "reports.json").is_file():
+        return 0
+    manifest = _json.loads((pbi_dir / "manifest.json").read_text())
+    rows = _json.loads((pbi_dir / "reports.json").read_text())
+    read = ReadApi(store)
+    trees = read.trees()
+    rel_to_key = {}
+    for key, tree in trees.items():
+        rel_to_key[tree.get("name", key)] = key
+
+    def displays_of(rel):
+        tree = trees.get(rel_to_key.get(rel, rel))
+        if not tree:
+            return []
+        out = []
+        for stmt in tree.get("statements", []):
+            if not stmt.get("emits") or not stmt.get("scope"):
+                continue
+            arms = stmt["scope"].get("combination_arms")
+            shape = arms[0] if arms else stmt["scope"]
+            for m in shape.get("projection", []):
+                if m.get("name"):
+                    out.append(m["name"])
+        return out[:8]
+
+    n = 0
+    for row in rows:
+        slug = row["name"].lower().replace(" ", "-")
+        displays = []
+        executes = []
+        for rel in row["executes"]:
+            executes.append(rel_to_key.get(rel, rel))
+            displays += displays_of(rel)
+        store.append_node(
+            "PBI Report", f"pbi://sepsis/{slug}",
+            {"name": row["name"],
+             "description": row["description"],
+             "displays": displays, "executes": executes,
+             "source": row["source"]},
+            manifest["as_of"], f"pbi@{manifest['as_of']}")
+        n += 1
+    return n

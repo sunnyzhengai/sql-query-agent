@@ -125,6 +125,10 @@ SOURCES = {
 # clears and stays; context is CONVERSATION-scoped (client-held id),
 # never a global; transcript = DISPLAY memory, context set = MEANING
 # memory — prose history never reaches the model (the cage holds).
+# v1.27.0 (2026-09-08): THE PBI LAYER (Sunny's ruling: every proc
+# feeds a PBI report; labels are the users' words): PBI Report rows
+# join Speech_Sources + Connection_Ledger + the kg1 node catalog;
+# executes edges; displays composed from the procs' twins.
 # v1.26.0 (2026-09-07): SEAT PROMPTS ARE REGISTRY DATA (the
 # literal law's third lock + search-rebuild step C): the
 # Interpreter's prompt lives HERE, versioned — a prompt edit is a
@@ -186,7 +190,7 @@ SOURCES = {
 # deliveries lead, spine voiced, intermediates counted, census
 # closes; the file's ask-index words = the delivery lead, so file
 # embeddings embed meaning, never name-noise).
-STAMP_VERSION = "1.26.0"
+STAMP_VERSION = "1.27.0"
 RATIFIED = True
 DOC_STAMP = ("v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 twin-graph "
              "ruling ADR 0077; v1.2.0 Phase A metamodel bump; v1.3.0 "
@@ -518,6 +522,10 @@ _TG = "twin-graph ruling (2026-09-06)"
 # mechanism's sibling: patches amend cells, appends add rows).
 APPEND_ROWS = [
     ("kg1_technical", "Node_Types", [
+        {"Node label": "PBI Report", "Property": "name",
+         "Required": "yes",
+         "Shape / allowed values": "pbi://<estate>/<slug>",
+         "Notes": "PHASE H (v1.27.0): the consumption layer"},
         {"Node label": "person", "Property": "identity",
          "Required": "yes",
          "Shape / allowed values": "person:<name>",
@@ -781,6 +789,10 @@ TWIN_SHEETS = {
              "of the 2026-09-07 probe — 0.80 vs 0.57 blended"},
             {"Label": "parameter", "Speech": "voiced phrase",
              "Meaning": "rendered"},
+            {"Label": "PBI Report", "Speech": "description + "
+             "displays (composed from the executed procs' twins)",
+             "Meaning": "the consumption layer — what end users "
+             "actually open; label = the users' word"},
             {"Label": "derived column", "Speech": "computed-output "
              "phrase (grammar render: name words + the defining "
              "selection)", "Meaning": "rendered"},
@@ -988,6 +1000,10 @@ TWIN_SHEETS = {
              "Status": "edged-pseudo",
              "Meaning": "tree-born; sighted by the reading file "
              "(pre-existing edge, now documented)"},
+            {"Label": "PBI Report", "Edge": "executes",
+             "Status": "edged",
+             "Meaning": "PHASE H: a report is deduced from the "
+             "procs it runs — executes edges to its files"},
             {"Label": "person", "Edge": "by", "Status": "edged",
              "Meaning": "STEP 3: minted on first act; their birth "
              "edge IS being acted-by (>=1 act points at them); a "

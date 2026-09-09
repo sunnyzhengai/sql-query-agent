@@ -87,6 +87,10 @@ def build_adjacency(read) -> Dict[str, List[Tuple[str, str]]]:
                      scope["name_key"], "belongs_to")
         for prm in tree.get("parameters", []):
             link(f"{key}::param/{prm['name']}", key, "belongs_to")
+    # PHASE H: the consumption layer walks to its procs
+    for n in read.nodes("PBI Report"):
+        for f in n.properties.get("executes") or []:
+            link(n.identity, f, "executes")
     # STEP 5: exclusions walk to the estate root
     for n in read.nodes("excluded_file"):
         root = n.properties.get("estate")

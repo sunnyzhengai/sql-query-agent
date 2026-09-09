@@ -146,7 +146,7 @@
   "source": "synthetic-demo (authored shell; the proc mapping is real)"
  },
  {
-  "name": "Inpatient Sepsis Details Report",
+  "name": "Inpatient Sepsis Details Report (USP_IP_Sepsis_Details)",
   "description": "Power BI report over the inpatient sepsis details results for clinical review.",
   "executes": [
    "reporting/USP_IP_Sepsis_Details.sql"
@@ -154,7 +154,7 @@
   "source": "synthetic-demo (authored shell; the proc mapping is real)"
  },
  {
-  "name": "Inpatient Sepsis Encounters Report",
+  "name": "Inpatient Sepsis Encounters Report (USP_IP_Sepsis_Encounters)",
   "description": "Power BI report over the inpatient sepsis encounters results for clinical review.",
   "executes": [
    "reporting/USP_IP_Sepsis_Encounters.sql"
