@@ -12,11 +12,11 @@ and ratified by restatement (the design-first-triage lesson).
 This ruling is the first-principles re-derivation of the meaning
 layer across ALL strata: Blueprint (L0), The Graph, The Flows
 (the lens stratum retired mid-review). Remaining transplant:
-piece 1 replaces L0 in "AIVIA Design Document.md" (Sunny's doc,
+piece 1 replaces L0 in "Design_Graph_Engine.md" (Sunny's doc,
 his edit). Next build act: Phase A — metamodel bump + A12
 projection re-parse (5d).*
 
-*EXTENDED 2026-09-07 by Center_and_Censuses_RULING (ADR 0080): the
+*EXTENDED 2026-09-07 by Ruling_Center_and_Censuses (ADR 0080): the
 composed-meaning amendment gains its enforcement — composition is
 the TRANSLATOR'S job and is STORED in the twin (a file's
 up-composed subject included); readings render or project
@@ -32,7 +32,7 @@ sidecar instead of this twin.*
 ## 2026-09-06: three layers, twin KG2, governance overlay, the
 ## lineage guarantee; blueprint form — a two-way engine, components
 ## + interactions — never a lyric summary)
-**Lands in: AIVIA Design Document, L0 — REPLACES the ratified
+**Lands in: Design_Graph_Engine.md, L0 — REPLACES the ratified
 sentence in full.**
 
 > AIVIA is a TWO-WAY ENGINE over a customer's analytical estate,
@@ -419,7 +419,7 @@ Graph references only itself and its sources.
 
 ### 6b — superseded on ratification
 decisions(class) flat yields (3a) · the degenerate standalone
-lens (3c) · R9 DRAFT as standalone rule (4c; Floor_Grammar.md
+lens (3c) · R9 DRAFT as standalone rule (4c; Grammar_Floor.md
 already marked superseded-pending) · the A12 projection deferral
 (2b) · KG4 as a separate layer (2f) · S1/S2 as rules (now
 corollaries, 2f) · "per-file semantic trees" as a name (Piece 1)

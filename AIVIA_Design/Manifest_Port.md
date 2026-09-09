@@ -1,4 +1,6 @@
-# Port Manifest — DRAFT v0.1 (for Sunny's ruling)
+# Manifest_Port — the port verdicts (new skeleton, ported organs)
+
+**STATUS: EXECUTED — verdicts ruled and the port completed with the 8-slice build, 2026-09-06. Kept as the record; superseding ledger: Manifest_Build.md.** (DRAFT header retired 2026-09-09, documentation audit.)
 
 *The comparison artifact named by the MVP v1 build approach (ratified
 2026-09-05: "new skeleton, ported organs"). Drawn from the 09-04/09-05

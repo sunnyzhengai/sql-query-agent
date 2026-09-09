@@ -1,9 +1,19 @@
-# AIVIA Design Document — Chatbot
+# Design — Chatbot
+
+**OWNERSHIP (the boundary, ruled 2026-09-09):** this doc owns
+everything that exists ONLY inside a conversation — the
+Interpreter, ask-time search and ranking, memory/ledger, the nine
+laws, the UI. Design_Graph_Engine.md owns everything that exists
+WITHOUT a conversation — stores, builders, readings, censuses,
+speech CONTENT (THE SPEECH CONTRACT) and the Scribe pipeline. The
+split test: would it exist with no chatbot at all? Cards and the
+semantic index are an engine READING; the ask flow that consumes
+them lives here.
 
 *(Born 2026-09-07 from Sunny's first-principles reset: "go back to
 first principles, design the user interface/search/chatbot from
 scratch." This is the chatbot's design document — companion to
-"AIVIA Design Document.md". Items marked ► RULED are Sunny-ratified
+"Design_Graph_Engine.md". Items marked ► RULED are Sunny-ratified
 decisions; unmarked sections are design-in-progress under the dig.
 Registry/ADR landings follow on Sunny's build order; CODE IS PAUSED
 until the dig completes.)*
@@ -27,9 +37,12 @@ The real dashboards (ED Sepsis, Diabetes) are the honest start.
 DECISION. One node = MANY embedded cards, never one blended vector:
 a NAME card, a SPEECH card, and its PART-cards (conditions,
 parameters — already separate nodes since ADR 0080). A node's
-search score = the MAX over its cards; the answer names WHICH card
-matched (provenance); a shared card (a source table's description)
-embeds ONCE and is pointed at, never copied. The deciding evidence
+search score = the MAX over its cards [SUPERSEDED 2026-09-08 by
+THE TOTAL-SCORE LAW below: the score is the SUM of card hits
+across all mentions — no max; this sentence stands as the facet
+decision's record, not the scoring rule]; the answer names WHICH
+card matched (provenance); a shared card (a source table's
+description) embeds ONCE and is pointed at, never copied. The deciding evidence
 (live probes, 2026-09-07, text-embedding-3-small):
 
 | "ED Sepsis" vs USP_ED_SEPSIS as… | score |
@@ -192,7 +205,7 @@ marked, floor one click away.
 
 | seat | operation | runs at | INPUT | OUTPUT | graph rights |
 |---|---|---|---|---|---|
-| THE SCRIBE | drafts descriptions/definitions | curation time | graph facts + source evidence | DRAFT text w/ basis stamp | write ONLY through gate + human approval (door 3); never at ask time |
+| THE SCRIBE | drafts descriptions/definitions | curation time | graph facts + source evidence | DRAFT text w/ basis stamp | write ONLY through gate + human approval (door 3); never at ask time. FULL DESIGN: THE SPEECH CONTRACT + Scribe pipeline, Design_Graph_Engine.md (09-09). Build status: OPEN — only the acronym proposer has ever run (Manifest_Build §C) |
 | THE INTERPRETER | parses questions | ask time | ONE question string | typed PROPOSAL (phrases, expansions, hint) | NONE — reads nothing, writes nothing |
 | THE RANKER | embeds text for matching | index/ask time | speech texts / query | vectors, scores | derived cache only; asserts nothing |
 | THE SMOOTHER | polishes rendered prose | presentation time | rendered floor | display text, facts unchanged | NONE — never stored; floor one click away |

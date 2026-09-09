@@ -1,14 +1,15 @@
 # Registries — code-consumed data (Design-to-Code step 2)
 
 The seven design registries as stamped JSON, converted 2026-09-05 from
-the `_DRAFT.xlsx` workbooks by `convert_from_xlsx.py` (deterministic —
+the `.xlsx` workbooks by `convert_from_xlsx.py` (deterministic —
 no hand-typed content; rerunning is byte-identical). These files are
 what `graph/metamodel.py` and the lens/flow registries load at build;
 code and tests consume THESE, never the doc's prose.
 
-**Status: converted, NOT yet ratified.** Every stamp says
-`ratified: false`. The ratification pass (Sunny) flips it per registry
-after reviewing the conversion log below.
+**Status: RATIFIED.** All seven registries carry `ratified: true`
+(Sunny's ratification pass, completed 2026-09-06; stale "not yet"
+wording corrected 2026-09-09 by the documentation audit). The
+conversion log below is the historical record of the pass.
 
 ## Conversion log
 

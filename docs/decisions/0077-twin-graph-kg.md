@@ -4,7 +4,7 @@
 paragraph-by-paragraph review ("all good, go with your
 recommendations"). **Component:** the knowledge graph (meaning
 layer). **Full ruling + change ledger:**
-`AIVIA_Design/Twin_Graph_KG_RULING.md` — this ADR is the decision
+`AIVIA_Design/Ruling_Twin_Graph_KG.md` — this ADR is the decision
 record's pointer per the doc hierarchy; rationale lives there.
 
 ## Decision (one paragraph)
@@ -31,10 +31,10 @@ grammar) from expression grain to the whole tree.
 
 ## Landed 2026-09-06 (documents and registries; NO code)
 
-- `AIVIA_Design/Twin_Graph_KG_RULING.md` — the ruling, ratified
-- `AIVIA_Design/AIVIA Design Document.md` — L0 rewritten as the
+- `AIVIA_Design/Ruling_Twin_Graph_KG.md` — the ruling, ratified
+- `AIVIA_Design/Design_Graph_Engine.md` — L0 rewritten as the
   blueprint; body sections carry dated AMENDED/SUPERSEDED blocks
-- `AIVIA_Design/Floor_Grammar.md` — R9 retired into voicing policy
+- `AIVIA_Design/Grammar_Floor.md` — R9 retired into voicing policy
 - Registries v1.1.0 (all seven; validator green): meaning-node
   kinds · Meaning_Twin sheet · Incremental_Intake ·
   lens Reclassification (builders/readings/queries) · governance
@@ -59,5 +59,5 @@ ED-sepsis gap-check.
 conservation law, generalized from predicates to all nodes) · 0074
 (the description architecture this supersedes in part: the skeleton
 composer's rules survive as voicing policy) · 0073 (the spec
-amendment rule this ADR schedules against) · Floor_Grammar
+amendment rule this ADR schedules against) · Grammar_Floor
 v1.0.0–v1.3.1 (the truth rulings, all carried forward).

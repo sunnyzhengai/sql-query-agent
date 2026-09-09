@@ -1,5 +1,5 @@
 {
- "_comment": "Twin-graph ruling answer keys (ADR 0077; ruling: AIVIA_Design/Twin_Graph_KG_RULING.md). Authored BEFORE any phase code — the tests-first entry obligation. Four families = the four ruled phases; every case: input (sql or scenario) + expected assertions the phase build's tests walk. Deciding examples reuse Sunny-ratified material from the ruling and Floor_Grammar v1.1-1.3; corpse cases cite their gap-check finding. Status until each phase builds: NOT-RUNNABLE by design.",
+ "_comment": "Twin-graph ruling answer keys (ADR 0077; ruling: AIVIA_Design/Ruling_Twin_Graph_KG.md). Authored BEFORE any phase code — the tests-first entry obligation. Four families = the four ruled phases; every case: input (sql or scenario) + expected assertions the phase build's tests walk. Deciding examples reuse Sunny-ratified material from the ruling and Grammar_Floor v1.1-1.3; corpse cases cite their gap-check finding. Status until each phase builds: NOT-RUNNABLE by design.",
  "phase_A_projection": [
   {
    "id": "PA-1-derived-column-corpse",

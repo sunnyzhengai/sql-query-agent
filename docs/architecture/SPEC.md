@@ -1006,7 +1006,7 @@ left.
 ## 14i. Group W — the twin graph (v0.9, ADR 0077; ratified 2026-09-06)
 
 The AIVIA engine's meaning layer: KG2b, the stored homomorphic twin
-of the parsed graph (AIVIA_Design/Twin_Graph_KG_RULING.md is the
+of the parsed graph (AIVIA_Design/Ruling_Twin_Graph_KG.md is the
 ratified design record; these axioms are its enforced core, landed
 at the ledger close per the ADR 0073 discipline — each with its
 check named).

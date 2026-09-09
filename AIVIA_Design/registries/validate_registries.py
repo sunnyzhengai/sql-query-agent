@@ -47,7 +47,7 @@ rule("RG-A1 stamp block complete",
 # mechanism a LIVE (ratification pass done 2026-09-05): every registry's
 # version must appear as a [registry stamp: ...] marker in the doc
 doc_text = open(os.path.join(os.path.dirname(BASE),
-                             "AIVIA Design Document.md")).read()
+                             "Design_Graph_Engine.md")).read()
 doc_stamps = {}
 for block in re.findall(r"\[registry stamps?: ([^\]]+)\]", doc_text):
     for part in block.split("·"):

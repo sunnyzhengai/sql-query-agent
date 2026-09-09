@@ -70,7 +70,7 @@ cited equality.
   outcome dicts, kg2 node dicts, API payload keys (console L228),
   intake contract fields (kg1_intake L19/21 — cites
   CONTRACT_DATALOAD), run/report shapes.
-- **grammar** (~12, each citing its Floor_Grammar rule): produce.py
+- **grammar** (~12, each citing its Grammar_Floor rule): produce.py
   prepositions L44 (R1 head-noun), id-tokens L52 (R5 token-head),
   pluralize endings L99 (R1), datepart map L176 (ADR 0076 overlay),
   ordinals L474/523 (R2 instance markers), the R4 voicing phrase

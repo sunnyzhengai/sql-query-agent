@@ -1,0 +1,156 @@
+# Manifest_Build — THE build ledger (one truth)
+
+*(Merged 2026-09-09 under the documentation audit
+(Audit_Documentation_Review.md): Chatbot_Build_Manifest.md +
+Search_Rebuild_Manifest.md are RETIRED into this file. The law is
+unchanged: a claim is DONE only against evidence — a test or an
+artifact; anything else is DEFERRED with its reason or OPEN. "Done
+except X" is the only honest done. Statuses: BUILT · STANDS ·
+PARTIAL · DEFERRED · OPEN · SUPERSEDED.)*
+
+**The seat-claim rule (ruled via the 09-09 audit):** every seat in
+the rights table (Design_Chatbot.md) MUST hold a claim row here —
+a named seat with no claim is an unbuilt-build waiting to be
+believed (the file-description lesson).
+
+## Section A — the nine-law chatbot build (dig of 2026-09-07)
+
+Rows marked ⟲ were re-shaped by the search rebuild (Section B is
+the current truth for scoring/grounding):
+
+| # | clause (law) | status | evidence / reason |
+|---|---|---|---|
+| 1 | Facet cards: name+speech cards per node, max-score, card provenance (FACET DECISION) | BUILT | grounding.cards()/SemanticIndex max-over-cards + via_card; test_facet_cards_name_card_wins; GR-4 cache-key-per-card |
+| 2 | Kind_Vocabulary table dies; kinds ground via earned vocab → proposal marks → kind-node speech (L4/RULED) | BUILT | registry tombstone; _earned_vocabulary (terms parent kind::K); proposed-kind marks; _self speech rows; seeded-vocab tests |
+| 3 | Anaphor_Vocabulary table dies; Interpreter marks reference-roles; resolution stays deterministic (L4-D3) | BUILT | ground(role=); registry tombstone; FU tests carry proposal roles |
+| 4 | THE ONE ENGINE: mentions→sets, connect-the-sets, display set by user's words; execute() dispatch dies (L4-D1) | BUILT | _sets_from/_connected/_topic_filter/one execute; dispatch deleted; buckets by-name→connected→meaning→parts; CN/FU/MT families green |
+| 5 | Provisional answer: three shapes by evidence profile, assumption shown, switch links, registry margins (L3-D1) | BUILT | _provisional + Response_Shapes.PROVISIONAL_MARGIN; runners_up carried |
+| 6 | Clarify obligations: name-grain dedup, kind grouping, visible cap, score+speech rows (L3-D2) | BUILT | _shape_clarify (name-grain dedup w/ places, kind grouping, CLARIFY_CAP, more_candidates); place-choice expansion; ST-1 green |
+| 7 | Clarify-miss counter: next-action recorded (picked/re-typed/abandoned) (L3-D3) | BUILT | console last_clarify → usage clarify-picked/clarify-retyped events |
+| 8 | Partial answers as law (L3-D4) | STANDS | 0080 anchored-topic behavior + tests |
+| 9 | Meaning-book: confirmation attaches to reference-set; phrasings = evidence; new phrasing → confirmed set answers immediately (L2-D1) | BUILT | reference_set_key/confirmed_reference_sets; via=meaning-book; test_rm3 |
+| 10 | Claim/frame/process word classes (L2-D2, L6-D2) | OPEN | slice 7 (review-grade; trace templates) |
+| 11 | Confirm card shows the complete boundary artifact (L2-D3) | BUILT | inline confirm renders the kind-marks/mentions of the artifact; full-proposal display rides result[interpretation] |
+| 12 | Lines are clickable nodes (L1-D2) | STANDS+OPEN | answer lines partially clickable (Referenced); full per-line links slice 7 |
+| 13 | Graph-is-reality absence; search-not-dictionary concepts (L1) | STANDS | honest zeros + topic search (0080 tests) |
+| 14 | Seat names + rights (Scribe/Interpreter/Ranker/Smoother) (L1) | BUILT | console docstring names the four seats + rights; Interpreter/Ranker factories annotated |
+| 15 | Slot-survival smoothing (L1) | DEFERRED | the Smoother seat itself is deferred (gated, optional); method ruled, wired when the seat wires |
+| 16 | Expansion invite in the live prompt (L1/L7 dark half) | BUILT | prompt v2 invites expansions/kinds/references/hint |
+| 17 | Display hint preselects a view, visibly (L4-D4) | BUILT (cage+validation) / OPEN (surface preselect button highlight — cosmetic) |
+| 18 | Cold start: kind self-description + earned vocabulary (L4-D2) | BUILT | _self rows + kind entries speak them; cold-start = proposals + confirms |
+| 19 | Stacked table: bounded, bare→top, kind-qualified→down, round-provenance clarifies (L5-D1) | BUILT | console stacks (TABLE_DEPTH) + ask stack-walk for role-marked mentions |
+| 20 | Selections are acts; clarify-picks accrete (L5-D2) | BUILT | clicks/picks land as rounds; picks recorded as usage events (accretion to meaning-book = the confirm click) |
+| 21 | The visible table + clear-table (L5-D3) | BUILT | #table right rail (top expanded, rounds collapsed, clear-the-table act) |
+| 22 | Session-vs-tree split (L5-D4) | STANDS+DEFERRED | session ephemeral (stands); the TREE SURFACE (my history page) deferred: single-user demo console — needs identity; tree DATA accretes now (author-keyed events) |
+| 23 | Trace three layers; process words from data; completeness spec (L6-D1/2/3) | BUILT (work line: plain process words incl. 'no expansions proposed') / PARTIAL (full evidence expansion layer + engine display-rationale line — follow-up polish) |
+| 24 | Trace derivable, inputs recorded (L6-D4) | STANDS | proposals + snapshots recorded (0080/Law-4 build) |
+| 25 | Scope ladder: personal-first, promotion queue, steward blessing (L7-D1) | PARTIAL/DEFERRED | personal-first accretion built (author-keyed); the QUEUE SURFACE deferred: needs multi-user identity — demo is person:console |
+| 26 | Inline confirmation; usage≠consent (L7-D2) | BUILT | pending_confirmation inline; blocking only on clarify |
+| 27 | Revocation w/ blast radius (L7-D3) | DEFERRED | steward surface; revoke events exist (dispositions) — the UI affordance ships with the tree surface |
+| 28 | Blessings anchor to meaning; telemetry proposes never self-modifies (L7-D4) | PARTIAL | reference-set stored on confirmations; content-key anchoring of blessings = follow-up; self-tuning ban structural |
+| 29 | Embedding model = rule; announced migrations (L8-D1) | STANDS | vectors stamped by model version; migration = re-embed (cache keys); announcement rides the registry bump practice |
+| 30 | Proposal cache by (question, model version) (L8-D2) | BUILT | make_interpreter cache keyed (question|model), disk-persisted |
+| 31 | Degradation ladder as data, what-still-works banners (L8-D3) | BUILT (registry Degradation_Ladder; seat_down banners stand) / the per-level banner text wiring = follow-up polish |
+| 32 | Change caption on moved answers (L8-D4) | BUILT | ledger-hit snapshot diff caption |
+| 33 | Coverage line: header + inline on absence (L9-D1) | BUILT | __COVERAGE__ header + absence answers cite searched-all-N |
+| 34 | Estate card as empty state (L9-D2) | BUILT | /round?card=estate boot round |
+| 35 | Counted things askable (L9-D3) | STANDS+OPEN | drift findable (stands); exclusions-as-findable slice 7 |
+| 36 | Absence answers are doors (L9-D4) | BUILT | the absence door (universe + nearest + next act) |
+| 37 | Access-scoped searchability (L9-D4 note) | DEFERRED | single-user demo; the scope column lands with multi-user identity |
+| 38 | PBI/TMDL report layer into the estate (RULED pre-dig) | DEFERRED | own workstream on its own GO: estate-data intake (TMDL parser port) — not a chatbot-code slice |
+| 39 | User-tree memory as tree structure (contracts) | PARTIAL | accretion events author-keyed now; tree QUERIES/surface with identity (see 22, 25) |
+
+**⟲ reconciliations (2026-09-09):**
+- **#1** max-over-cards is DEAD — score = the SUM of card hits (the
+  total-score law, B gaps 4/5, step G); cards are now
+  name/speech/label/expansion; evidence: test_search_is_the_answer,
+  the facet test in test_center_censuses.
+- **#2** "kind" died for LABEL (B step D); labels ground via label
+  CARDS on member nodes, not kind-node speech; the Kind_Vocabulary
+  tombstone stands.
+- **#4** ask() was rebuilt as THE SEARCH IS THE ANSWER (B gaps
+  1/5/10); connect-the-sets survives in pool filtering; display =
+  present_hits grouped by label.
+- **#5/#6** thresholds are DISPLAY BANDS, never cliffs (B gap 11);
+  clarify is emergent (a reference with nothing on the table), not
+  a shaped outcome branch.
+- **#16/#30** prompt is 3.0.0 in Seat_Prompts; the proposal cache
+  keys (question | model | PROMPT VERSION) (B gaps 2/3).
+
+## Section B — the search rebuild (THE SEARCH IS THE ANSWER, 2026-09-07→09)
+
+| # | gap | step | status |
+|---|---|---|---|
+| 1 | pre-tier still in code (ruled dead) | B | BUILT | pre-tier deleted; ask() runs memory→model→search |
+| 2 | prompt still has kind menu/synonyms; drops mentions | C | BUILT: prompt 3.0.0 in Seat_Prompts (registry 1.26.0) — shapes only, every referring word required |
+| 3 | proposal-cache key ignores prompt version | C | BUILT: key = question|model|prompt-version; stale proposals unreachable |
+| 4 | labels not searchable as entries (the group hit) | B | BUILT | label:: entries derived from the live store, singular+plural cards; group hits w/ member counts |
+| 5 | string-tier ladder runs before vectors | B | BUILT | tier ladder deleted from the search path; cosine≈1 subsumption pinned |
+| 6 | expansions not used as search text | B | BUILT | searched_as = mention + expansions; visible in the trace |
+| 7 | kind machinery alive (VALID_KINDS, marks, kindset engine, metric pseudo) | B | BUILT | VALID_KINDS deleted; kinds field stripped by the cage; kindset engine deleted |
+| 8 | kind → label rename (field, registries, docs) | D | BUILT | NodeVersion.label/Edge.label/registry columns; twin taxonomy 'kind' KEPT (different concept, documented boundary) |
+| 9 | PBI/TMDL layer not loaded (data, own GO) | — | PARKED |
+| 10 | no ranked-results renderer (outcome branches are the default) | B | BUILT | present_hits: ranked, grouped by label, scores + via-card; clarify/provisional emergent |
+| 11 | thresholds are behavioral gates, not display bands | B | BUILT | floor = display band; no behavioral cliffs in the search path |
+| 12 | clicks travel as questions (reroute ruled, unbuilt) | A | BUILT | step A: entity + label-group rounds; entity= links; interpreter never consulted by clicks |
+| 13 | user decisions die on restart (governance journal) | E | BUILT | opt-in journal_path; kg3@ writes journal; replay at boot LAST, idempotent; builders never journal |
+| 14 | no revoke at the surface | E | OPEN |
+| 15 | clarify-actions LIVE BUG (typed input after a clarify errors) | E | BUILT: actions joined USAGE_ACTIONS by ruling; hermetic clarify→next-round pin (registry mirror lands in F) |
+| 16 | literal-census enforcement unbuilt | F | OPEN |
+| 17 | "delivery · delivery" labels (expected to dissolve in #10) | B | BUILT | dissolved into present_hits (names + identities per row) |
+
+Steps: A,B,C + gap 15 LANDED (2026-09-07). Resequenced 2026-09-08
+(Sunny's scoring rulings): **D** label rename (PROMOTED — code is
+written in label terms before the rework) · **G** total-score
+search (label cards replace label:: nodes; card-sum ranking;
+lexical = deferred-conditional, trigger: observed label
+overcrowding) · **H** the PBI layer (pbi_snapshot intake, PBI
+Report label, executes edges, full-word names, short descriptions)
+· **I** acronym enrichment (scan → Scribe → bless → acronym nodes;
+used_by derived at graph build — the auto-connect sentence IS
+contract text) · **E** persistence journal + revoke (acronyms and
+the ledger both depend on it) · **F** the literal census.
+
+
+## Step J — THE TESTING REWORK (the live-seat rule, ruled 2026-09-09)
+
+Sunny's rule: **wherever production calls a model, a live test
+calls the same model** — same seat, same registry prompt, same
+estate. Landed:
+
+| claim | state | evidence |
+|---|---|---|
+| fake_interpreter dies → scripted_proposals (authored input, strict) | BUILT | tests/aivia/doubles.py; keys fold at construction (the case-trap class dead at the generator); ScriptGap on any unscripted question; test_doubles.py pins it |
+| fake_embed dies → recorded-real vectors | RECORDING | committed fixture AIVIA_Product/fixtures/embeddings/text-embedding-3-small.json.gz — every vector computed by the real model, replayed byte-identical; RecordingGap on unrecorded text; AIVIA_RECORD=1 re-records |
+| the live tier | BUILT (verify pending) | tests/live/test_live_seats.py — AIVIA_LIVE=1, real gpt-4o-mini + real embeddings + the real journal; payoff question, over-mark corpse, cage shape, acronym expansion; CI shows it SKIPPED (visible), run locally before any "done" |
+| acronym blessing executed | DONE | 112 blessed (dm=Data Mart, dc=Discharge fixed; 12 plain words cut; 33 held in acronym_remainder.json for Sunny — the od* family reads as sepsis order/bundle prefixes, not Overdose) |
+
+## Section C — the seats (the seat-claim rule enforced)
+
+| seat | status | evidence / reason |
+|---|---|---|
+| INTERPRETER | BUILT | make_interpreter + the cage (validate_interpretation); prompt 3.0.0 registry law; live-tier test (tests/live) |
+| RANKER | BUILT (fixture recording in flight) | SemanticIndex over cards; recorded-REAL vectors replacing the fake embedder (step J); estate .cache at boot |
+| SCRIBE | OPEN — the 2026-09-09 finding | ONLY the acronym-expansion proposer ever ran (enrich.py). Description drafting — the seat's named job — was NEVER BUILT: file "descriptions" are structural voicing walls + borrowed table catalog text. Design = The Speech Contract (Design_Graph_Engine.md, landed 09-09); build awaits Sunny's route ruling (Scribe-drafts vs deterministic distillation) |
+| SMOOTHER | DEFERRED | gated, optional; method ruled (slot-survival), wires when the seat wires (A #15) |
+
+## Section D — the open queue (awaiting rulings / next work)
+
+1. **Finding 1 route** (speech-card content): Sunny's ruling on
+   Scribe-drafted file aboutness vs deterministic distillation;
+   then recompose speech cards → re-record embeddings → REMEASURE
+   the three failed pins — only then judge whether the total-score
+   law needs any amendment.
+2. **Finding 3**: the structural anaphor rule (ALL mentions
+   reference-marked + empty table = honest clarify) — awaiting
+   ruling; replaces the threshold gate that real physics broke.
+3. **MATCH at card grain** (best_card_score) — coded, uncommitted,
+   rides the same ruling set.
+4. **Acronym remainder**: 33 held tokens (acronym_remainder.json),
+   headline: what OD* means in this estate.
+5. **E2** revoke at the surface (meaning-book poisoning has no
+   undo) · **F** the literal census build (Audit_Literal_Law_Plan).
+6. Deferred-conditional: lexical/hybrid scorer (trigger = observed
+   label overcrowding after the speech fix).
+7. Deferred on identity: tree surface · promotion queue · revoke UI
+   · access-scoped search (A #22/25/27/37).

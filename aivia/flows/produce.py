@@ -1,7 +1,7 @@
 """Outward stage 1: PRODUCE — graph -> layer-3 machine versions.
 
 The floor composer implements the RATIFIED Floor Grammar
-(AIVIA_Design/Floor_Grammar.md, FLOOR_GRAMMAR_VERSION) rule by rule; the grammar version
+(AIVIA_Design/Grammar_Floor.md, FLOOR_GRAMMAR_VERSION) rule by rule; the grammar version
 stamps into every run's basis. The staleness lens IS the worklist
 (PROD-2) — nobody hand-picks; ECON v1 (aivia/flows/econ_params.json,
 ruled 2026-09-05) paces it: batch, budget, usage-weighted priority

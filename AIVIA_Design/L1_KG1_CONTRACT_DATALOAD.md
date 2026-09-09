@@ -1,7 +1,7 @@
 # AIVIA Contract — Data Load (the registered extract)
 
 **Status:** DRAFT v0.1, authored by Claude 2026-09-04 at Sunny's
-request; ratification is Sunny's, in the AIVIA Design Document.
+request; ratification is Sunny's, in Design_Graph_Engine.md.
 **Level:** L2 (details the technical layer's input seam).
 **Vendor-neutral by rule:** nothing in this file names any vendor's
 objects. Vendor specifics live in SOURCE PACKS (see §2) —

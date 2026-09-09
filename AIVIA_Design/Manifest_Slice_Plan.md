@@ -1,4 +1,6 @@
-# Build Slice Plan — DRAFT v0.1 (for Sunny's ratification)
+# Manifest_Slice_Plan — the eight-slice build plan
+
+**STATUS: EXECUTED — all 8 slices shipped 2026-09-06 (+ both shakedowns). Kept as the record of the ruled route; superseding ledger: Manifest_Build.md.** (DRAFT header retired 2026-09-09, documentation audit.)
 
 *The ruled route through the build: eight slices in dependency order,
 each with entry obligations (what must be ruled/ratified before code),

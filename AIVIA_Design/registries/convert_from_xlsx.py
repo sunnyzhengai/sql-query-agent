@@ -25,24 +25,24 @@ DESIGN = os.path.dirname(BASE)
 
 # registry file -> (source xlsx, doc section it restates)
 SOURCES = {
-    "kg1_technical": ("L1_KG1_Technical_Layer_Registry_DRAFT.xlsx",
+    "kg1_technical": ("L1_KG1_Technical_Layer_Registry.xlsx",
                       "Level 1 / KG Layer 1 — source dictionaries technical layer"),
-    "kg2_kind_library": ("L1_KG2_Kind_Library_TSQL_Predicates_DRAFT.xlsx",
+    "kg2_kind_library": ("L1_KG2_Kind_Library_TSQL_Predicates.xlsx",
                          "Level 1 / KG Layer 2 — kind library (T-SQL predicates)"),
-    "kg2_logic": ("L1_KG2_Logic_Layer_Registry_DRAFT.xlsx",
+    "kg2_logic": ("L1_KG2_Logic_Layer_Registry.xlsx",
                   "Level 1 / KG Layer 2 — logic layer"),
-    "kg3_artifacts": ("L1_KG3_Artifact_Layer_Registry_DRAFT.xlsx",
+    "kg3_artifacts": ("L1_KG3_Artifact_Layer_Registry.xlsx",
                       "Level 1 / KG Layer 3 — artifact layer"),
-    "kg4_concepts": ("L1_KG4_Concept_Layer_Registry_DRAFT.xlsx",
+    "kg4_concepts": ("L1_KG4_Concept_Layer_Registry.xlsx",
                      "Level 1 / KG Layer 4 — concept layer"),
-    "lenses": ("L2_Lenses_Registry_DRAFT.xlsx", "Level 2 — lenses"),
-    "flows": ("L3_Flows_Registry_DRAFT.xlsx", "Level 3 — the flows"),
+    "lenses": ("L2_Lenses_Registry.xlsx", "Level 2 — lenses"),
+    "flows": ("L3_Flows_Registry.xlsx", "Level 3 — the flows"),
 }
 
 # Ratification pass DONE 2026-09-05 (Sunny): drafts 0.1/0.2 -> 1.0.0,
 # ratified flips true, doc headings stamped the same breath.
 # v1.1.0 (2026-09-06): the twin-graph ruling (ADR 0077,
-# AIVIA_Design/Twin_Graph_KG_RULING.md) lands as TWIN_SHEETS below —
+# AIVIA_Design/Ruling_Twin_Graph_KG.md) lands as TWIN_SHEETS below —
 # doc headings bumped the same breath (RG-A2).
 # v1.2.0 (2026-09-06): PHASE A METAMODEL BUMP — PROJECTION joins
 # Structure_Kinds (the A12 un-deferral built); the bump is what makes
@@ -169,7 +169,7 @@ SOURCES = {
 # words). NEW: Response_Shapes (provisional-answer margins, clarify
 # cap, table depth — L3/L5 as data) and Degradation_Ladder (L8-D3:
 # five levels, what-still-works speech). The build manifest
-# (Chatbot_Build_Manifest.md) is the claims ledger.
+# (Manifest_Build.md) is the claims ledger.
 # v1.19.0 (2026-09-07): the 0080 build lands Grounding_Thresholds —
 # the riders' "thresholds are registry data and never cliffs" made
 # literal: MATCH (auto-ground), MARGIN (uniqueness), CANDIDATE_FLOOR
@@ -177,7 +177,7 @@ SOURCES = {
 # "unknown" is legal only below the floor). Tuning is a registry
 # edit, never a code edit.
 # v1.18.0 (2026-09-07): THE CENTER AND THE THREE CENSUSES (ADR
-# 0080, Center_and_Censuses_RULING ratified): the center law (code =
+# 0080, Ruling_Center_and_Censuses ratified): the center law (code =
 # builder | reading | flow; readings render/cache verbatim, never
 # author; composition is the translator's, stored in the twin);
 # Speech_Sources sheet (every node kind declares which stored
@@ -518,7 +518,7 @@ DEFER_WHY = {
 }
 
 # Whole sheets added by the TWIN-GRAPH RULING (ratified 2026-09-06,
-# Sunny; ADR 0077; full ruling AIVIA_Design/Twin_Graph_KG_RULING.md).
+# Sunny; ADR 0077; full ruling AIVIA_Design/Ruling_Twin_Graph_KG.md).
 # Landing recorded verdicts only, per this file's charter.
 _TG = "twin-graph ruling (2026-09-06)"
 # Rows APPENDED to xlsx-born sheets by recorded ruling (the PATCHES

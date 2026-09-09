@@ -19,7 +19,7 @@ ANSWER. Six classes; two are banned from code entirely:
 | mechanical | what is this string transform? | code, marked | the never-regex blessed-boundary test: the literal IS the complete spec |
 | frame | what label does the UI print? | code, marked | claim/frame law (L2-D2): never a sentence about the estate |
 | schema-mirror | what does the metamodel/registry define? | code, marked + CITED | a MIRROR-CHECK test: code set == cited registry sheet, mechanically |
-| grammar | how does a ratified rule render? | code, marked + cites the rule ID (Floor_Grammar Rn) | the byte-exact fixture tests (F4) pin it |
+| grammar | how does a ratified rule render? | code, marked + cites the rule ID (Grammar_Floor Rn) | the byte-exact fixture tests (F4) pin it |
 
 The two banned classes HAVE NO MARKER — there is no comment that
 legalizes a vocabulary list or a ruling in code. The only path is

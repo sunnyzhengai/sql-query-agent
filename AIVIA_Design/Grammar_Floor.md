@@ -247,7 +247,7 @@ egress redaction at land like all outbound prose.
 ## twin-graph ruling RATIFIED)
 
 *The twin-graph ruling ratified 2026-09-06 (see
-`Twin_Graph_KG_RULING.md`, piece 4): R9 retires — the composition
+`Ruling_Twin_Graph_KG.md`, piece 4): R9 retires — the composition
 sentence is the voicing-policy walk over SOURCE nodes of the
 meaning tree (ruling 4c), and the depth-1 ruling below carries
 forward as voicing policy. This grammar's next MAJOR version is

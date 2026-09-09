@@ -1,6 +1,14 @@
 **** AIVIA Description Level 0
+
+**OWNERSHIP (the boundary, ruled 2026-09-09):** this doc owns
+everything that exists WITHOUT a conversation — stores, builders,
+readings, censuses, speech CONTENT (THE SPEECH CONTRACT), the
+Scribe pipeline. Design_Chatbot.md owns everything that exists only
+inside one — the Interpreter, ask-time search/ranking, memory, the
+nine laws, the UI. Cards and the semantic index are an engine
+READING; the ask flow that consumes them is the chatbot's.
 (REWRITTEN 2026-09-06 — the twin-graph ruling, ratified; full
-ruling + change ledger: AIVIA_Design/Twin_Graph_KG_RULING.md.
+ruling + change ledger: AIVIA_Design/Ruling_Twin_Graph_KG.md.
 Body sections carry dated AMENDED/SUPERSEDED blocks from the
 same-day amendment pass; where an unamended line conflicts with
 the ruling, the ruling governs.)
@@ -55,7 +63,7 @@ parser → KG2a, translator → KG2b; governance has no builder, only
 human acts. Everything else that consumes the graph is a READING:
 named, versioned, deterministic — and it writes nothing.
 
-THE CENTER LAW (ratified 2026-09-07, Center_and_Censuses_RULING —
+THE CENTER LAW (ratified 2026-09-07, Ruling_Center_and_Censuses —
 the generator behind live finds #5/#8/#9/#10: code kept building
 ad-hoc side-structures instead of reading the graph): every line
 of code is a BUILDER, a READING, or a FLOW (sequences the other
@@ -117,11 +125,13 @@ of voiced ⊎ counted == total):
    kind:file by meaning, never by a fixed word list alone.
 3. SEARCHABILITY: everything that speaks is searchable with its
    speech VERBATIM (plus word-grain name tokens); embeddings are
-   a content-keyed cache of speech; search matches FACETS — each
-   node's speech is its own facet, scores roll UP the tree with
-   provenance kept; one-blob-per-node blending is the flattening
-   disease and is banned: searchable ⊎ ruled-silent == everything
-   that speaks.
+   a content-keyed cache of speech; search matches CARDS [AMENDED
+   2026-09-09: "scores roll UP the tree" was never built as
+   written and is retired — the built law is per-node CARDS
+   (name · speech · label · expansion) scored by the total-score
+   law, Design_Chatbot.md; provenance = via-card]; one-blob-per-
+   node blending is the flattening disease and is banned:
+   searchable ⊎ ruled-silent == everything that speaks.
 Each census is a standing test AND a gap-check report bucket.
 
 THE INTEGRITY BATTERY (ADR 0081 — every standing equation that
@@ -179,6 +189,67 @@ through builders and read it only through readings; readings write
 nothing; The Graph references only itself and its sources — still
 plank-checkable. Section headers below keep their historical
 numbering as record; the strata names govern.
+
+**** THE SPEECH CONTRACT (landed 2026-09-09 — the file-description
+finding; design only, build OPEN in Manifest_Build §C/§D)
+
+The speech census (speaks ⊎ gap ⊎ mute == total) counts PRESENCE.
+This contract governs CONTENT — what the spoken property of a node
+must and must not be. The generator it kills: USP_ED_SEPSIS "spoke"
+a 4,600-character recitation of its 40 upstream tables' catalog
+descriptions; the census passed it, and search correctly scored the
+wall as being about nothing (cosine 0.312 vs "ED Sepsis" — real
+physics measured 2026-09-09). Non-empty is not meaningful.
+
+THE CONTRACT — a node's speech is ITS OWN ABOUTNESS:
+
+1. ONE NODE, ITS OWN MEANING. The speech text says what THIS node
+   is about. Borrowed text is banned:
+   - NOT its sources' descriptions (lineage lives in edges — the
+     drawn-from recitation was the wall);
+   - NOT its name (the name card carries it — ruled earlier, the
+     double-pay corpse);
+   - NOT its type words ("report", "dashboard", "table", "power
+     bi ..." — the LABEL card carries type; a speech text opening
+     "power bi report over..." pays type-shaped mentions twice,
+     measured on the Inpatient report 09-09).
+2. SHORT AND DENSE. Speech is a summary sentence or few — an
+   embedding of a wall points nowhere; dilution is a contract
+   violation even when every word is true.
+3. PROVENANCE ALWAYS. Every speech text carries its basis:
+   declared (KG1 catalog), composed (deterministic voicing of the
+   node's OWN parts — never its sources'), or drafted (Scribe,
+   with basis stamp + attribution per the R8 source-annotation
+   rules). Model-drafted text voices WITH attribution, never as
+   bare fact.
+4. THE STRUCTURAL VOICING LIVES ON — as the twin's floor text for
+   display, trace, and walk. It simply is not the SEARCH card. A
+   file's search speech is its aboutness; its floor voicing is its
+   anatomy.
+
+THE SCRIBE PIPELINE (the seat's design — its rights row in
+Design_Chatbot.md has pointed here since 09-09):
+
+- WHEN: curation time only, never ask time.
+- INPUT: the node's own parsed structure (KG2b meaning, its
+  selections, its filters) + KG1 declared meanings of what it
+  touches — evidence, not copy-source.
+- OUTPUT: a DRAFT aboutness sentence per node, basis-stamped
+  (model, prompt version, evidence cited).
+- LANDING: drafts are proposals (like acronym expansions); a
+  human blesses (or an explicit ruled policy auto-lands WITH
+  visible attribution — Sunny's call per estate); blessed
+  descriptions become the spoken property via kg3, journaled like
+  every governance act.
+- LIVE-SEAT RULE APPLIES: the Scribe's prod path gets a live test
+  with the same model + prompt.
+
+Acceptance for the build (already pinned by the 09-09 findings):
+the three real-physics corpses — "ED Sepsis" must crown
+USP_ED_SEPSIS through its name card; "what reports are about ED"
+must crown the ED dashboard; "which files mention ED" must surface
+the ED files — remeasured on recomposed cards before any scoring-
+law amendment is considered.
 
 **** The Graph (was: Level 1 — the knowledge graph) [stores]
 
