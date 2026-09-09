@@ -41,6 +41,12 @@ class Store:
     _nodes: List[NodeVersion] = field(default_factory=list)
     _edges: List[Edge] = field(default_factory=list)
     _seq: int = 0
+    # PHASE E1 (Sunny's ruling: all user decisions persist): the
+    # governance journal — writes whose extract_id belongs to the
+    # kg3@ family (human acts, minted actors, blessed vocabulary)
+    # append a line here; builders (sources) never journal.
+    journal_path: Optional[Any] = None
+    _replaying: bool = False
 
     def append_node(self, label: str, identity: str,
                     properties: Dict[str, Any], as_of: str,
@@ -51,6 +57,14 @@ class Store:
         version = NodeVersion(label, identity, dict(properties),
                               as_of, extract_id)
         self._nodes.append(version)
+        if (self.journal_path is not None and not self._replaying
+                and extract_id.startswith("kg3@")):
+            import json as _json
+            with open(self.journal_path, "a") as fh:
+                fh.write(_json.dumps(
+                    {"label": label, "identity": identity,
+                     "properties": properties, "as_of": as_of,
+                     "extract_id": extract_id}) + "\n")
         self._seq += 1
         return version
 
@@ -91,6 +105,32 @@ class Store:
     def current_edges(self, label: Optional[str] = None) -> List[Edge]:
         return [e for e in self._edges if e.valid_to is None
                 and (label is None or e.label == label)]
+
+    def replay_journal(self) -> int:
+        """Replay the governance journal into this store — the
+        rebirth of every human decision. Idempotent by supersession
+        (same identity re-appends supersede the prior)."""
+        if self.journal_path is None:
+            return 0
+        import json as _json
+        import pathlib as _pl
+        path = _pl.Path(self.journal_path)
+        if not path.is_file():
+            return 0
+        self._replaying = True
+        n = 0
+        try:
+            for line in path.read_text().splitlines():
+                if not line.strip():
+                    continue
+                row = _json.loads(line)
+                self.append_node(row["label"], row["identity"],
+                                 row["properties"], row["as_of"],
+                                 row["extract_id"])
+                n += 1
+        finally:
+            self._replaying = False
+        return n
 
     def state_stamp(self) -> Tuple[int, int, int]:
         return (self._seq, len(self._nodes), len(self._edges))

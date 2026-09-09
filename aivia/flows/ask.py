@@ -124,16 +124,19 @@ def record_confirmation(store, question: str,
         occurred_at=occurred_at,
         payload=phi_gate.door1_redact(question).text)
     event = store.current_nodes("usage")[-1]
-    event.properties["question_folded"] = _fold(
-        " ".join(question.split()))
-    event.properties["interpretation"] = dict(interpretation)
-    event.properties["basis"] = basis
+    props = dict(event.properties)
+    props["question_folded"] = _fold(" ".join(question.split()))
+    props["interpretation"] = dict(interpretation)
+    props["basis"] = basis
     if interpretation.get("reference_set"):
-        event.properties["reference_set"] = \
-            interpretation["reference_set"]
+        props["reference_set"] = interpretation["reference_set"]
     if context:  # Law 4: the snapshot rides — replay is deterministic
-        event.properties["context_snapshot"] = list(context)
-    return event
+        props["context_snapshot"] = list(context)
+    # supersede with the FULL properties — mutating after append
+    # would leave the governance journal holding the bare event
+    # (the E1 rebirth bug); one write, one journal line, whole
+    return store.append_node("usage", event.identity, props,
+                             occurred_at, f"kg3@{occurred_at}")
 
 
 def build_index(read) -> List[Dict[str, Any]]:

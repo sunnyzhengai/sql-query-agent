@@ -243,7 +243,7 @@ def make_embedder(key: str):
     return embed
 
 
-def build_store(estate: str):
+def build_store(estate: str, journal_path=None):
     base = (pathlib.Path(__file__).resolve().parents[1]
             / "AIVIA_Product" / "estates" / estate)
     store = kg1_intake.new_store()
@@ -260,6 +260,13 @@ def build_store(estate: str):
     inbound.receive_estate(store, reg, base / "estate_snapshot")
     if (base / "pbi_snapshot").is_dir():
         inbound.receive_pbi(store, base / "pbi_snapshot")
+    # PHASE E1: the governance journal replays LAST — decisions land
+    # on top of the freshly rebuilt truth
+    if journal_path is None:
+        journal_path = base / "governance" / "journal.jsonl"
+    journal_path.parent.mkdir(parents=True, exist_ok=True)
+    store.journal_path = journal_path
+    store.replay_journal()
     return store, base
 
 
