@@ -134,7 +134,7 @@ estate. Landed:
 | SCRIBE | OPEN — the 2026-09-09 finding | ONLY the acronym-expansion proposer ever ran (enrich.py). Description drafting — the seat's named job — was NEVER BUILT: file "descriptions" are structural voicing walls + borrowed table catalog text. Design = The Speech Contract (Design_Graph_Engine.md, landed 09-09); build awaits Sunny's route ruling (Scribe-drafts vs deterministic distillation) |
 | SMOOTHER | DEFERRED | gated, optional; method ruled (slot-survival), wires when the seat wires (A #15) |
 
-## Section D — the open queue (awaiting rulings / next work)
+## Section D — the open queue [ON HOLD — Sunny's ruling 2026-09-09: the engine gaps (§E) come first; this list resumes after]
 
 1. **Finding 1 route** (speech-card content): Sunny's ruling on
    Scribe-drafted file aboutness vs deterministic distillation;
@@ -154,3 +154,16 @@ estate. Landed:
    label overcrowding after the speech fix).
 7. Deferred on identity: tree surface · promotion queue · revoke UI
    · access-scoped search (A #22/25/27/37).
+
+
+## Section E — THE ENGINE GAPS (the active queue, opened 2026-09-09)
+
+Verified against code this day — each row cites evidence or its
+absence. Engine-first by Sunny's ruling; §D resumes after.
+
+| # | gap | status | evidence / entry obligation |
+|---|---|---|---|
+| E1 | THE SPEECH CONTRACT build: file speech cards violate the contract (lineage walls, borrowed catalog text, type words); Scribe description drafting never built | OPEN — blocked on ONE ruling | design landed (Design_Graph_Engine.md 09-09). Entry obligation: Sunny's route ruling — Scribe-drafted aboutness (recommended) vs deterministic distillation. Then: recompose cards → re-record embeddings → remeasure the three corpses (acceptance pinned in the contract) |
+| E2 | the verbatim census (battery #8: index words == recomputed speech) has NO code — grep finds no verbatim_census anywhere | OPEN — startable now | suite-first; no ruling needed (the equation is already ratified law) |
+| E3 | the literal census (battery #9) + the remaining mirror-checks (battery #10, USAGE_ACTIONS registry mirror) | OPEN — startable now | plan already ratified: Audit_Literal_Law_Plan (step F); moved here from §D because it is an ENGINE gap |
+| E✓ | verified PRESENT this day: conservation (mapper), homomorphism (translator), resolution census (tree), voicing ledger (produce), connection/speech/searchability censuses (censuses.py), incremental KG1 (audit_incremental, content hashes) | — | battery items 1-7 hold |
