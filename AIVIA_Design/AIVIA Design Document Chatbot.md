@@ -359,6 +359,18 @@ SCAN (mechanical: distinct name tokens) → SCRIBE (curation-time
 seat proposes expansions) → BLESS (human approves the batch) →
 acronym nodes.
 
+► RULED (Sunny, 2026-09-09): THE LIVE-SEAT RULE. Wherever
+production calls a model seat, a LIVE test calls the same seat —
+same registry prompt, same estate — so test and prod behavior are
+provably consistent. The live tier is run locally before any
+"done" claim (never by CI: keys, cost, and a red build must mean
+broken code) and is nightly-able. Deterministic tests remain the
+per-push safety net: REPLAYED REAL recordings (the content-keyed
+caches as fixtures — never synthetic physics; the fake embedder
+dies) and SCRIPTED proposals (authored test inputs, loud on miss).
+Deciding evidence: the 'ED → term' over-marking was invisible to
+every deterministic test and only surfaced live.
+
 **LABEL, not kind — everywhere.** The node-type field and every
 surface says LABEL (the industry standard; Sunny's standing
 ruling). The rename is promoted ahead of the search rework. The

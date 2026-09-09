@@ -1,0 +1,476 @@
+{
+ "aap": [
+  "American Academy of Pediatrics"
+ ],
+ "abn": [
+  "Advance Beneficiary Notice"
+ ],
+ "abx": [
+  "antibiotics"
+ ],
+ "acc": [
+  "accident",
+  "account"
+ ],
+ "accr": [
+  "accreditation"
+ ],
+ "adt": [
+  "Admission, Discharge, Transfer"
+ ],
+ "adv": [
+  "advisory"
+ ],
+ "afct": [
+  "affect"
+ ],
+ "allergy": [
+  "allergic reaction"
+ ],
+ "amt": [
+  "amount"
+ ],
+ "an": [
+  "anesthesia"
+ ],
+ "anes": [
+  "anesthesiology"
+ ],
+ "antibio": [
+  "antibiotic"
+ ],
+ "ap": [
+  "assessment and plan"
+ ],
+ "apgar": [
+  "Apgar score"
+ ],
+ "appt": [
+  "appointment"
+ ],
+ "arr": [
+  "arrival"
+ ],
+ "asmt": [
+  "assessment"
+ ],
+ "assn": [
+  "association"
+ ],
+ "auth": [
+  "authorization"
+ ],
+ "bcma": [
+  "Bar Code Medication Administration"
+ ],
+ "bmi": [
+  "Body Mass Index"
+ ],
+ "cbc": [
+  "Complete Blood Count"
+ ],
+ "cc": [
+  "chief complaint"
+ ],
+ "cd": [
+  "clinical documentation"
+ ],
+ "cms": [
+  "Centers for Medicare & Medicaid Services"
+ ],
+ "cns": [
+  "central nervous system"
+ ],
+ "comorbidity": [
+  "comorbid condition"
+ ],
+ "cpoe": [
+  "Computerized Physician Order Entry"
+ ],
+ "cpt": [
+  "Current Procedural Terminology"
+ ],
+ "csf": [
+  "Cerebrospinal Fluid"
+ ],
+ "ct": [
+  "Computed Tomography"
+ ],
+ "dba": [
+  "Doing Business As"
+ ],
+ "dc": [
+  "Doctor of Chiropractic",
+  "Discharge"
+ ],
+ "dea": [
+  "Drug Enforcement Administration"
+ ],
+ "dm": [
+  "Diabetes Mellitus",
+  "Disease Management"
+ ],
+ "dob": [
+  "Date of Birth"
+ ],
+ "drg": [
+  "Diagnosis-Related Group"
+ ],
+ "dvtprophylaxis": [
+  "Deep Vein Thrombosis Prophylaxis"
+ ],
+ "dx": [
+  "diagnosis"
+ ],
+ "ecg": [
+  "Electrocardiogram"
+ ],
+ "ed": [
+  "Emergency Department"
+ ],
+ "emr": [
+  "Electronic Medical Record"
+ ],
+ "enc": [
+  "Encounter"
+ ],
+ "eob": [
+  "Explanation of Benefits"
+ ],
+ "ep": [
+  "Emergency Physician"
+ ],
+ "er": [
+  "Emergency Room"
+ ],
+ "es": [
+  "Emergency Services"
+ ],
+ "fda": [
+  "Food and Drug Administration"
+ ],
+ "hcpcs": [
+  "Healthcare Common Procedure Coding System"
+ ],
+ "hr": [
+  "heart rate"
+ ],
+ "icd": [
+  "International Classification of Diseases"
+ ],
+ "icd10": [
+  "International Classification of Diseases, 10th Revision"
+ ],
+ "icd9": [
+  "International Classification of Diseases, 9th Revision"
+ ],
+ "icdo3": [
+  "International Classification of Diseases for Oncology, 3rd Edition"
+ ],
+ "icu": [
+  "Intensive Care Unit"
+ ],
+ "immun": [
+  "Immunization"
+ ],
+ "iv": [
+  "Intravenous"
+ ],
+ "lab": [
+  "laboratory"
+ ],
+ "loinc": [
+  "Logical Observation Identifiers Names and Codes"
+ ],
+ "med": [
+  "medication"
+ ],
+ "medadmin": [
+  "Medication Administration"
+ ],
+ "medicaid": [
+  "Medicaid"
+ ],
+ "medicare": [
+  "Medicare"
+ ],
+ "medispan": [
+  "Medispan"
+ ],
+ "medprob": [
+  "Medication Problem"
+ ],
+ "mrca": [
+  "Methicillin-Resistant Staphylococcus Aureus"
+ ],
+ "mri": [
+  "Magnetic Resonance Imaging"
+ ],
+ "msg": [
+  "Message"
+ ],
+ "msgsent": [
+  "Message Sent"
+ ],
+ "mu": [
+  "Meaningful Use"
+ ],
+ "npi": [
+  "National Provider Identifier"
+ ],
+ "ob": [
+  "Obstetrics"
+ ],
+ "obs": [
+  "Observation"
+ ],
+ "occurrence": [
+  "Occurrence"
+ ],
+ "od": [
+  "Overdose"
+ ],
+ "odabx": [
+  "Overdose Antibiotics"
+ ],
+ "odbc": [
+  "Open Database Connectivity"
+ ],
+ "odcsf": [
+  "Oligoclonal Bands in Cerebrospinal Fluid"
+ ],
+ "odcvl": [
+  "Overdose Cardiac Vascular"
+ ],
+ "odett": [
+  "Overdose Emergency Treatment"
+ ],
+ "odhypo": [
+  "Overdose Hypotension"
+ ],
+ "odla": [
+  "Overdose Laboratory Analysis"
+ ],
+ "odordset": [
+  "Overdose Order Set"
+ ],
+ "odpiv": [
+  "Overdose Peripheral Intravenous"
+ ],
+ "odpressor": [
+  "Overdose Pressor"
+ ],
+ "odprocal": [
+  "Overdose Procalcitonin"
+ ],
+ "odscore": [
+  "Overdose Score"
+ ],
+ "odscores": [
+  "Overdose Scores"
+ ],
+ "odsvo2": [
+  "Overdose Saturation of Oxygen"
+ ],
+ "op": [
+  "outpatient"
+ ],
+ "pcp": [
+  "Primary Care Physician"
+ ],
+ "pedi": [
+  "Pediatrics"
+ ],
+ "periop": [
+  "Perioperative"
+ ],
+ "perioperative": [
+  "Perioperative"
+ ],
+ "pharm": [
+  "Pharmacy"
+ ],
+ "pharmacist": [
+  "Pharmacist"
+ ],
+ "pharmacy": [
+  "Pharmacy"
+ ],
+ "physician": [
+  "Physician"
+ ],
+ "piv": [
+  "Peripheral Intravenous"
+ ],
+ "poc": [
+  "Point of Care"
+ ],
+ "pp": [
+  "Postpartum"
+ ],
+ "pr": [
+  "Patient Reported"
+ ],
+ "prn": [
+  "As Needed"
+ ],
+ "proc": [
+  "Procedure"
+ ],
+ "procalcitonin": [
+  "Procalcitonin"
+ ],
+ "prov": [
+  "provider"
+ ],
+ "ps": [
+  "psychosocial"
+ ],
+ "pt": [
+  "patient"
+ ],
+ "pta": [
+  "physical therapy assistant"
+ ],
+ "px": [
+  "procedure"
+ ],
+ "qc": [
+  "quality control"
+ ],
+ "qrs": [
+  "QRS complex"
+ ],
+ "qt": [
+  "QT interval"
+ ],
+ "qtc": [
+  "QTc interval"
+ ],
+ "r": [
+  "respiration"
+ ],
+ "rbc": [
+  "red blood cell"
+ ],
+ "rc": [
+  "respiratory care"
+ ],
+ "ref": [
+  "reference"
+ ],
+ "rehab": [
+  "rehabilitation"
+ ],
+ "rem": [
+  "removal"
+ ],
+ "renal": [
+  "renal"
+ ],
+ "rep": [
+  "representative"
+ ],
+ "req": [
+  "request"
+ ],
+ "resp": [
+  "respiratory"
+ ],
+ "rpt": [
+  "report"
+ ],
+ "rv": [
+  "relative value"
+ ],
+ "rx": [
+  "prescription"
+ ],
+ "sde": [
+  "system design engineer"
+ ],
+ "sec": [
+  "second"
+ ],
+ "ser": [
+  "serum"
+ ],
+ "serv": [
+  "service"
+ ],
+ "sql": [
+  "structured query language"
+ ],
+ "ss": [
+  "social security"
+ ],
+ "surg": [
+  "surgical"
+ ],
+ "svc": [
+  "service"
+ ],
+ "svr": [
+  "systemic vascular resistance"
+ ],
+ "sys": [
+  "system"
+ ],
+ "t": [
+  "temperature"
+ ],
+ "tbl": [
+  "Table"
+ ],
+ "tci": [
+  "Transcranial Magnetic Stimulation"
+ ],
+ "tp": [
+  "Transfer Protocol"
+ ],
+ "tpa": [
+  "Tissue Plasminogen Activator"
+ ],
+ "tpn": [
+  "Total Parenteral Nutrition"
+ ],
+ "trn": [
+  "Training"
+ ],
+ "ub": [
+  "Uniform Billing"
+ ],
+ "ub92": [
+  "Uniform Billing 1992"
+ ],
+ "us": [
+  "Ultrasound"
+ ],
+ "v": [
+  "vital signs"
+ ],
+ "vbac": [
+  "Vaginal Birth After Cesarean"
+ ],
+ "ver": [
+  "Verification"
+ ],
+ "vst": [
+  "Visit"
+ ],
+ "wdl": [
+  "Well-Done List"
+ ],
+ "wk": [
+  "Week"
+ ],
+ "wq": [
+  "Work Queue"
+ ],
+ "xfer": [
+  "Transfer"
+ ],
+ "xray": [
+  "X-Ray"
+ ]
+}
