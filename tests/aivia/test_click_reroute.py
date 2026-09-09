@@ -27,7 +27,7 @@ import pytest
 
 from aivia.graph.read_api import ReadApi
 
-from .test_ask_console import fake_embed
+from .doubles import fake_embed
 
 T0 = "2026-09-07T12:00:00Z"
 

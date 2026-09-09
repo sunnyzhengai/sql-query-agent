@@ -16,7 +16,7 @@ import pytest
 from aivia.flows import ask, grounding
 from aivia.graph.read_api import ReadApi
 
-from .test_ask_console import fake_embed, fake_interpreter
+from .doubles import fake_embed, scripted_proposals
 
 T0 = "2026-09-07T12:00:00Z"
 
@@ -66,7 +66,7 @@ def test_ranked_hits_are_the_answer(world):
     branch, never '0 term(s)'."""
     store, _read, _index, semantic = world
     q = "what reports are about ED"
-    interp = fake_interpreter({q.lower(): {
+    interp = scripted_proposals({q.lower(): {
         "mentions": ["Ed"],
         "kinds": {"Ed": "term"},  # dead field, stripped by the cage
         "expansions": {"Ed": ["emergency department",
@@ -90,7 +90,7 @@ def test_the_census_emerges_from_label_cards(world):
     ≈1 — the ranked answer IS the census, no group node needed."""
     store, _read, _index, semantic = world
     q = "what tables are there"
-    interp = fake_interpreter({q: {"mentions": ["tables"]}})
+    interp = scripted_proposals({q: {"mentions": ["tables"]}})
     result = ask.ask(store, q, "person:test", T0,
                      interpret_fn=interp, semantic=semantic)
     assert result["status"] == "answer"
@@ -106,7 +106,7 @@ def test_scores_sum_across_cards_and_mentions(world):
     'ED' crowns the ED files."""
     store, _read, _index, semantic = world
     q = "which files mention ED"
-    interp = fake_interpreter({q.lower(): {
+    interp = scripted_proposals({q.lower(): {
         "mentions": ["files", "ED"]}})
     result = ask.ask(store, q, "person:test", T0,
                      interpret_fn=interp, semantic=semantic)
@@ -126,7 +126,7 @@ def test_expansions_are_the_search_text(world):
     finds description-carrying nodes the bare acronym cannot."""
     store, _read, _index, semantic = world
     q = "things about the emergency dept"
-    interp = fake_interpreter({q: {
+    interp = scripted_proposals({q: {
         "mentions": ["emergency dept"],
         "expansions": {"emergency dept": ["emergency department"]}}})
     result = ask.ask(store, q, "person:test", T0,
@@ -144,7 +144,7 @@ def test_nonsense_shows_only_weakness(world):
     match line, or the empty door."""
     store, _read, _index, semantic = world
     q = "wibble wobble zorp"
-    interp = fake_interpreter({q: {"mentions": ["zorpwibble"]}})
+    interp = scripted_proposals({q: {"mentions": ["zorpwibble"]}})
     result = ask.ask(store, q, "person:test", T0,
                      interpret_fn=interp, semantic=semantic)
     assert result["status"] == "answer"
@@ -158,13 +158,13 @@ def test_nonsense_shows_only_weakness(world):
 def test_anaphors_still_resolve_from_the_table(world):
     store, _read, _index, semantic = world
     q1 = "what reports are about ED"
-    i1 = fake_interpreter({q1.lower(): {
+    i1 = scripted_proposals({q1.lower(): {
         "mentions": ["Ed"],
         "expansions": {"Ed": ["emergency department"]}}})
     r1 = ask.ask(store, q1, "person:test", T0,
                  interpret_fn=i1, semantic=semantic)
     assert r1["context_set"]
-    i2 = fake_interpreter({"the first one": {
+    i2 = scripted_proposals({"the first one": {
         "mentions": ["the first one"],
         "references": {"the first one": "ordinal:1"}}})
     r2 = ask.ask(store, "the first one", "person:test", T0,
@@ -182,7 +182,7 @@ def test_overmarked_reference_never_vetoes_the_search(world):
     as text; partial answers are law (L3-D4)."""
     store, _read, _index, semantic = world
     q = "what reports are about ED"
-    interp = fake_interpreter({q.lower(): {
+    interp = scripted_proposals({q.lower(): {
         "mentions": ["reports", "ED"],
         "references": {"ED": "singular"},   # over-marked
         "expansions": {"ED": ["emergency department"]}}})
@@ -201,7 +201,7 @@ def test_overmarked_reference_never_vetoes_the_search(world):
 
 def test_pure_anaphor_with_empty_table_still_clarifies(world):
     store, _read, _index, semantic = world
-    interp = fake_interpreter({"it": {
+    interp = scripted_proposals({"it": {
         "mentions": ["it"], "references": {"it": "singular"}}})
     result = ask.ask(store, "it", "person:test", T0,
                      interpret_fn=interp, semantic=semantic)

@@ -19,7 +19,7 @@ from aivia.flows import ask, censuses, connect, grounding
 from aivia.graph import kg3_artifacts
 from aivia.graph.read_api import ReadApi
 
-from .test_ask_console import fake_embed, fake_interpreter
+from .doubles import fake_embed, scripted_proposals
 
 T0 = "2026-09-08T12:00:00Z"
 
@@ -87,7 +87,7 @@ def test_carrier_nodes_gain_the_expansion_card(world):
 def test_queries_expand_deterministically(world):
     store, _read, _index, semantic = world
     q = "things about ED"
-    interp = fake_interpreter({q.lower(): {"mentions": ["ED"]}})
+    interp = scripted_proposals({q.lower(): {"mentions": ["ED"]}})
     # expansions proposed — the blessed vocabulary supplies them
     result = ask.ask(store, q, "person:test", T0,
                      interpret_fn=interp, semantic=semantic)
@@ -98,7 +98,7 @@ def test_queries_expand_deterministically(world):
 def test_the_expansion_card_answers_the_full_phrase(world):
     store, _read, _index, semantic = world
     q = "emergency department tables"
-    interp = fake_interpreter({q: {"mentions":
+    interp = scripted_proposals({q: {"mentions":
                                    ["emergency department",
                                     "tables"]}})
     result = ask.ask(store, q, "person:test", T0,

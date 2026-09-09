@@ -25,7 +25,8 @@ from aivia.flows import ask, censuses, connect, grounding
 from aivia.graph import kg3_artifacts
 from aivia.graph.read_api import ReadApi
 
-from .test_ask_console import fake_embed, fake_interpreter, seed_vocabulary
+from .doubles import fake_embed, scripted_proposals
+from .test_ask_console import seed_vocabulary
 
 T0 = "2026-09-07T12:00:00Z"
 
@@ -73,7 +74,7 @@ def test_a_new_term_without_an_origin_is_refused():
 def test_confirmed_expansions_cite_the_confirming_event(world):
     store, semantic = world
     q = "which reports cover the icu"
-    interp = fake_interpreter({q: {
+    interp = scripted_proposals({q: {
         "mentions": ["reports", "icu"],
         "kinds": {"reports": "file"},
         "expansions": {"icu": ["intensive care unit"]}}})

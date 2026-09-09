@@ -16,7 +16,8 @@ from aivia.flows import ask, grounding, speech
 from aivia.flows import censuses as census
 from aivia.graph.read_api import ReadApi
 
-from .test_ask_console import fake_embed, fake_interpreter, seed_vocabulary
+from .doubles import fake_embed, scripted_proposals
+from .test_ask_console import seed_vocabulary
 
 FIX = pathlib.Path(__file__).resolve().parents[2] / "AIVIA_Product" / "fixtures"
 T0 = "2026-09-07T12:00:00Z"
@@ -177,7 +178,7 @@ def test_ed_finds_reports_never_bed_config(world):
     substrings)."""
     store, _read, _index, semantic = world
     q = "what reports are about ED"
-    interp = fake_interpreter({q.lower(): {
+    interp = scripted_proposals({q.lower(): {
         "mentions": ["ED"],
         "expansions": {"ED": ["emergency department"]}}})
     result = ask.ask(store, q, "person:test", T0,
@@ -191,7 +192,7 @@ def test_ed_finds_reports_never_bed_config(world):
 def test_honest_zero_never_no_match_while_a_kind_grounded(world):
     store, _read, _index, semantic = world
     q = "what terms are about xylophone"
-    interp = fake_interpreter({q: {"mentions": ["terms",
+    interp = scripted_proposals({q: {"mentions": ["terms",
                                                 "xylophone"]}})
     result = ask.ask(store, q, "person:test", T0,
                      interpret_fn=interp, semantic=semantic)
@@ -217,7 +218,7 @@ def test_facet_rollup_with_provenance(world):
     # has true overlap to find, not hash luck.
     topic = "category number route of administration medication"
     q = f"what reports are about {topic}"
-    interp = fake_interpreter({q: {"mentions": ["reports", topic]}})
+    interp = scripted_proposals({q: {"mentions": ["reports", topic]}})
     result = ask.ask(store, q, "person:test", T0,
                      interpret_fn=interp, semantic=semantic)
     if result.get("pending_confirmation"):
@@ -232,7 +233,7 @@ def test_facet_rollup_with_provenance(world):
 def test_trace_rides_every_answer(world):
     store, _read, _index, semantic = world
     q = "the ed encounters table"
-    interp = fake_interpreter(
+    interp = scripted_proposals(
         {q: {"mentions": ["ED_ENCOUNTERS_DM"]}})
     result = ask.ask(store, q, "person:test", T0,
                      interpret_fn=interp, semantic=semantic)
@@ -245,7 +246,7 @@ def test_trace_rides_every_answer(world):
 def test_expansions_are_searched_and_confirmation_lands_a_term(world):
     store, _read, _index, semantic = world
     q = "which reports cover the emergency dept"
-    interp = fake_interpreter({q: {
+    interp = scripted_proposals({q: {
         "mentions": ["reports", "emergency dept"],
         "expansions": {"emergency dept": ["emergency department"]}}})
     result = ask.ask(store, q, "person:test", T0,

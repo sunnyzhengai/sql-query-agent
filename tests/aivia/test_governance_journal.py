@@ -25,7 +25,7 @@ import pytest
 from aivia.flows import ask, grounding
 from aivia.graph.read_api import ReadApi
 
-from .test_ask_console import fake_embed, fake_interpreter
+from .doubles import fake_embed, scripted_proposals
 
 T0 = "2026-09-08T12:00:00Z"
 
@@ -48,7 +48,7 @@ def test_confirmations_survive_rebirth(journal):
     sem = grounding.SemanticIndex(index, fake_embed, "fake-2k",
                                   cache_path=None)
     q = "which files mention the sepsis dates proc"
-    interp = fake_interpreter({q: {
+    interp = scripted_proposals({q: {
         "mentions": ["USP_IP_SepsisDates"]}})
     r = ask.ask(store1, q, "person:sunny", T0,
                 interpret_fn=interp, semantic=sem)

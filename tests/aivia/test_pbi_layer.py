@@ -22,7 +22,7 @@ import pytest
 from aivia.flows import ask, censuses, connect, grounding
 from aivia.graph.read_api import ReadApi
 
-from .test_ask_console import fake_embed, fake_interpreter
+from .doubles import fake_embed, scripted_proposals
 
 T0 = "2026-09-08T12:00:00Z"
 
@@ -80,7 +80,7 @@ def test_reports_speak_their_displays(world):
 def test_reports_about_ed_crowns_the_dashboard(world):
     store, _read, _index, semantic = world
     q = "what reports are about ED"
-    interp = fake_interpreter({q.lower(): {
+    interp = scripted_proposals({q.lower(): {
         "mentions": ["reports", "ED"],
         "expansions": {"ED": ["emergency department"]}}})
     result = ask.ask(store, q, "person:test", T0,

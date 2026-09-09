@@ -7,10 +7,8 @@ testing session stand as corpses under the new pipeline.
 
 Proves: contract:aivia-design-to-code
 """
-import hashlib
 import json
 import pathlib
-import re
 
 import pytest
 
@@ -18,34 +16,11 @@ from aivia.flows import ask, grounding
 from aivia.graph.read_api import ReadApi
 from aivia.lenses import ask_index
 
+from .doubles import fake_embed, scripted_proposals
+
 FIX = pathlib.Path(__file__).resolve().parents[2] / "AIVIA_Product" / "fixtures"
 CASES = json.loads((FIX / "F10_interpreter" / "cases.json").read_text())
 T0 = "2026-09-06T12:00:00Z"
-
-
-def fake_embed(texts):
-    """Deterministic bag-of-words hashing: shared words -> nearby
-    vectors — enough semantics to prove the pipeline, zero network.
-    2048 buckets x two positions per word: collisions between
-    unrelated words become negligible (the 64-bucket version
-    collided single-word name cards at cosine 1.0)."""
-    out = []
-    for text in texts:
-        vec = [0.0] * 2048
-        for word in re.sub(r"[^a-z0-9 ]", " ", text.lower()).split():
-            h = hashlib.sha256(word.encode()).hexdigest()
-            vec[int(h[:12], 16) % 2048] += 1.0
-            vec[int(h[12:24], 16) % 2048] += 1.0
-            vec[int(h[24:36], 16) % 2048] += 1.0
-        out.append(vec)
-    return out
-
-
-def fake_interpreter(mapping):
-    def interpret(question):
-        return mapping.get(" ".join(question.split()).lower(),
-                           {"mentions": [question]})
-    return interpret
 
 
 VOCAB = {"tables": "table", "table": "table", "reports": "file",
@@ -138,7 +113,7 @@ def _superseded_cn2(world):  # SUPERSEDED: provenance buckets died
     # Find #5's truth (all 28 findable, caps visible) lives in the
     # ranked pins.
     store, semantic = world
-    interp = fake_interpreter({
+    interp = scripted_proposals({
         "what reports are about sepsis":
             {"mentions": ["reports", "sepsis"]}})
     result = _ask(world, "what reports are about sepsis", interp)
@@ -166,7 +141,7 @@ def _superseded_cn1(world):  # SUPERSEDED: paths are traversal ON
     # DEMAND from found things (steer), not an ask branch
     store, semantic = world
     q = "how does THERA_CLASS_CODE relate to USP_ED_SEPSIS"
-    interp = fake_interpreter({
+    interp = scripted_proposals({
         q.lower(): {"mentions": ["THERA_CLASS_CODE",
                                  "reporting/USP_ED_SEPSIS.sql"]}})
     first = _ask(world, q, interp)
@@ -211,7 +186,7 @@ def test_rm1_confirmed_interpretation_skips_the_model(world):
     # a UNIQUE reference-set (the meaning-book would otherwise
     # answer immediately for meanings other tests confirmed)
     q = "which procedures mention the sepsis dates proc"
-    interp = fake_interpreter(
+    interp = scripted_proposals(
         {q: {"mentions": ["procedures", "USP_IP_SepsisDates"]}})
     first = ask.ask(store, q, "person:test", T0,
                     interpret_fn=interp, semantic=semantic)
@@ -234,7 +209,7 @@ def test_rm3_meaning_book_new_phrasing_same_meaning(world):
     # phrasing resolving to a confirmed meaning answers immediately,
     # no model re-confirm (the phrasebook became a meaning-book)
     q1 = "list procedures about the sepsis dates proc"
-    i1 = fake_interpreter(
+    i1 = scripted_proposals(
         {q1: {"mentions": ["procedures", "USP_IP_SepsisDates"]}})
     r1 = ask.ask(store, q1, "person:test", T0,
                  interpret_fn=i1, semantic=semantic)
@@ -243,7 +218,7 @@ def test_rm3_meaning_book_new_phrasing_same_meaning(world):
         ask.confirm(store, q1, r1["interpretation"], "person:test",
                     T0, semantic=semantic)
     q2 = "show me procs concerning the sepsis dates procedure"
-    i2 = fake_interpreter(
+    i2 = scripted_proposals(
         {q2: {"mentions": ["procedures", "USP_IP_SepsisDates"]}})
     r2 = ask.ask(store, q2, "person:test", T0,
                  interpret_fn=i2, semantic=semantic)
@@ -309,7 +284,7 @@ def test_sf2_exploding_embedder_degrades_honestly(world):
         def search(self, *a, **k):
             raise RuntimeError("embed seat down")
     q = "anything about sepsis"
-    interp = fake_interpreter({q: {"mentions": ["sepsis things"]}})
+    interp = scripted_proposals({q: {"mentions": ["sepsis things"]}})
     result = ask.ask(store, q, "person:test", T0,
                      interpret_fn=interp, semantic=Exploding())
     assert result["status"] == "answer"
@@ -345,7 +320,7 @@ def test_sf3_earned_answers_survive_model_weather(world):
     ledger with every seat down."""
     store, semantic = world
     q = "my confirmed weather question"
-    interp = fake_interpreter({q: {"mentions": ["ADT_EVENTS"]}})
+    interp = scripted_proposals({q: {"mentions": ["ADT_EVENTS"]}})
     r1 = ask.ask(store, q, "person:test", T0,
                  interpret_fn=interp, semantic=semantic)
     if r1.get("pending_confirmation"):
@@ -380,12 +355,12 @@ def _old_sf3(world):
 def test_fu2_it_takes_the_single_subject(world):
     store, semantic = world
     q0 = "the ed encounters dm table"
-    i0 = fake_interpreter({q0: {"mentions": ["ED_ENCOUNTERS_DM"]}})
+    i0 = scripted_proposals({q0: {"mentions": ["ED_ENCOUNTERS_DM"]}})
     first = ask.ask(store, q0, "person:test",
                     T0, interpret_fn=i0, semantic=semantic)
     assert first["status"] == "answer"
     assert first["context_set"]  # every answer yields its context
-    ref = fake_interpreter({"it": {"mentions": ["it"],
+    ref = scripted_proposals({"it": {"mentions": ["it"],
                                    "references": {"it": "singular"}}})
     follow = ask.ask(store, "it", "person:test", T0,
                      interpret_fn=ref, semantic=semantic,
@@ -402,7 +377,7 @@ def test_fu1_those_filters_by_connection(world):
                "reports/USP_RPTS_ED_Sepsis.sql::#Base_Pop",
                "reporting/USP_IP_SEPSIS.sql::#Base_Pop"]
     q = "which of those are in the ED sepsis report"
-    interp = fake_interpreter({q.lower(): {"mentions":
+    interp = scripted_proposals({q.lower(): {"mentions":
         ["those", "reports/USP_RPTS_ED_Sepsis.sql"],
         "references": {"those": "set"}}})
     final = ask.ask(store, q, "person:test", T0,
@@ -424,14 +399,14 @@ def test_fu3_ordinals_index_the_context(world):
     context = ["emr|dbo|ADT_EVENTS|ENCOUNTER_ID",
                "reporting/USP_ED_SEPSIS.sql::#Base_Pop",
                "emr|dbo|ADT_EVENTS"]
-    ref1 = fake_interpreter({"the first one": {
+    ref1 = scripted_proposals({"the first one": {
         "mentions": ["the first one"],
         "references": {"the first one": "ordinal:1"}}})
     follow = ask.ask(store, "the first one", "person:test", T0,
                      interpret_fn=ref1, semantic=semantic,
                      context=context)
     assert follow["status"] == "answer"
-    ref10 = fake_interpreter({"the tenth one": {
+    ref10 = scripted_proposals({"the tenth one": {
         "mentions": ["the tenth one"],
         "references": {"the tenth one": "ordinal:10"}}})
     deep = ask.ask(store, "the tenth one", "person:test", T0,
@@ -442,7 +417,7 @@ def test_fu3_ordinals_index_the_context(world):
 
 def test_fu5_empty_context_is_honest(world):
     store, semantic = world
-    ref = fake_interpreter({"those": {
+    ref = scripted_proposals({"those": {
         "mentions": ["those"], "references": {"those": "set"}}})
     result = ask.ask(store, "those", "person:test", T0,
                      interpret_fn=ref, semantic=semantic,
@@ -456,12 +431,12 @@ def test_fu5_empty_context_is_honest(world):
 def test_fu4_confirmed_followups_store_context_snapshot(world):
     store, semantic = world
     q00 = "the adt events encounter id column"
-    i00 = fake_interpreter({q00: {"mentions": ["ENCOUNTER_ID"]}})
+    i00 = scripted_proposals({q00: {"mentions": ["ENCOUNTER_ID"]}})
     first = ask.ask(store, q00, "person:test", T0,
                     interpret_fn=i00, semantic=semantic)
     q = "show those again please"
     ctx = first["context_set"]
-    interp = fake_interpreter({q: {"mentions": ["those"],
+    interp = scripted_proposals({q: {"mentions": ["those"],
                                    "references": {"those": "set"}}})
     result = ask.ask(store, q, "person:test", T0,
                      interpret_fn=interp, semantic=semantic,
