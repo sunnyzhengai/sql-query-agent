@@ -193,7 +193,7 @@ SOURCES = {
 # deliveries lead, spine voiced, intermediates counted, census
 # closes; the file's ask-index words = the delivery lead, so file
 # embeddings embed meaning, never name-noise).
-STAMP_VERSION = "1.30.0"
+STAMP_VERSION = "1.31.0"
 RATIFIED = True
 DOC_STAMP = ("v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 twin-graph "
              "ruling ADR 0077; v1.2.0 Phase A metamodel bump; v1.3.0 "
@@ -837,13 +837,15 @@ TWIN_SHEETS = {
              "of the 2026-09-07 probe — 0.80 vs 0.57 blended"},
             {"Label": "parameter", "Speech": "voiced phrase",
              "Meaning": "rendered"},
-            {"Label": "PBI Report", "Speech": "aboutness "
-             "(description artifact; shell description only as "
-             "fallback) + displays (composed from the executed "
-             "procs' twins)",
-             "Meaning": "the consumption layer; type words banned "
-             "from speech by the contract — the label card carries "
-             "them"},
+            {"Label": "PBI Report", "Speech": "DERIVED from the "
+             "executed procs' descriptions via the executes edge "
+             "(1:1 = the same words; the single multi-proc report "
+             "composes both; shell description only when no proc "
+             "speaks) + displays",
+             "Meaning": "THE DERIVATION RULING (Sunny 2026-09-09): "
+             "'the report users SHOULD see the logic' — a report "
+             "aboutness is never separately drafted; type words "
+             "stay banned (label card carries them)"},
             {"Label": "derived column", "Speech": "computed-output "
              "phrase (grammar render: name words + the defining "
              "selection)", "Meaning": "rendered"},

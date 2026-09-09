@@ -38,6 +38,8 @@ def described_world():
     store, _ = build_store("sepsis", descriptions=False)
     read = ReadApi(store)
     targets = describe.scan_undescribed(read)
+    IP_ENC = ("repo://sepsis-corpus/reporting/"
+              "USP_IP_SepsisEncounters.sql")
     def scripted_scribe(evidence_by_id):
         out = {}
         for ident in evidence_by_id:
@@ -45,10 +47,9 @@ def described_world():
                 out[ident] = ("severe and non-severe sepsis case "
                               "identification for emergency "
                               "department encounters")
-            elif ident == DASH:
-                out[ident] = ("emergency department sepsis "
-                              "screening: screening detail, ed "
-                              "summary, inpatient rollup")
+            elif ident == IP_ENC:
+                out[ident] = ("inpatient sepsis admissions and "
+                              "their movement history")
         return out
     drafts = describe.draft(read, targets, scripted_scribe)
     n = describe.land(store, drafts,
@@ -59,11 +60,15 @@ def described_world():
 
 
 # ---- the scan sees what lacks aboutness ------------------------------
-def test_scan_finds_files_and_reports_without_descriptions(bare_world):
+def test_scan_targets_files_only(bare_world):
+    # Sunny's ruling (2026-09-09): reports DERIVE their description
+    # from their procs through the executes edge — the Scribe never
+    # drafts for a report
     _store, read = bare_world
     targets = describe.scan_undescribed(read)
     assert ED_FILE in targets
-    assert DASH in targets
+    assert DASH not in targets
+    assert all(t.startswith("repo://") for t in targets)
 
 
 def test_evidence_is_the_nodes_own_anatomy(bare_world):
@@ -104,14 +109,36 @@ def test_undescribed_file_is_a_counted_gap_not_a_wall(bare_world):
     assert speech.speak(read, entry) == ""
 
 
-def test_description_overrides_pbi_type_words(described_world):
+def test_report_speech_derives_from_its_procs(described_world):
+    """Sunny's ruling: 'the report users SHOULD see the logic' — a
+    1:1 report speaks its proc's exact description; the (single)
+    multi-proc report composes both; no type words either way."""
     _store, read = described_world
     entry = {"label": "PBI Report", "identity": DASH,
              "name": "ED Sepsis Screening Dashboard"}
     text = speech.speak(read, entry)
-    assert "screening" in text
+    # the dashboard executes the ED proc — its drafted aboutness
+    # IS the report's speech (composed with its siblings')
+    assert "sepsis case identification" in text
     assert "power bi" not in text  # type words are the label card's
     assert "displays:" in text     # its own parts still speak
+
+
+def test_one_to_one_report_speaks_its_procs_exact_words(described_world):
+    store, read = described_world
+    # find any 1:1 report whose proc carries a description
+    for n in read.nodes("PBI Report"):
+        ex = n.properties.get("executes") or []
+        if len(ex) == 1:
+            proc_about = speech._aboutness(read, ex[0])
+            if proc_about:
+                entry = {"label": "PBI Report",
+                         "identity": n.identity,
+                         "name": n.properties["name"]}
+                text = speech.speak(read, entry)
+                assert text.startswith(proc_about)
+                return
+    raise AssertionError("no 1:1 report with a described proc")
 
 
 # ---- boot loads committed drafts as estate data ----------------------

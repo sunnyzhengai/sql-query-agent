@@ -52,10 +52,11 @@ def test_every_loaded_registry_is_ratified_v1():
     # requirement — the v1.0.0 live run broke both bans) + the
     # 'drafted' description status; 1.30.0 = the literal law locks
     # (Closed_Sets sheets, drift text as registry data, the
-    # contract-era Speech_Sources rows)
+    # contract-era Speech_Sources rows); 1.31.0 = the derivation
+    # ruling (report speech derives from its procs' descriptions)
     for reg in metamodel.load_all().values():
         assert reg.ratified is True
-        assert reg.version == "1.30.0"
+        assert reg.version == "1.31.0"
 
 
 def test_load_single_exposes_sheets_and_stamp():

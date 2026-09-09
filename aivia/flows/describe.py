@@ -14,7 +14,10 @@ from aivia.graph import kg3_artifacts
 from aivia.graph.read_api import ReadApi
 
 SCRIBE_AUTHOR = "agent:scribe"
-DESCRIBED_LABELS = ("file", "PBI Report")
+# Sunny's ruling (2026-09-09): reports DERIVE their description from
+# their procs through the executes edge — "the report users SHOULD
+# see the logic"; the Scribe drafts for the logic only
+DESCRIBED_LABELS = ("file",)
 
 
 def _described(read: ReadApi) -> set:
@@ -38,20 +41,13 @@ def scan_undescribed(read: ReadApi) -> List[str]:
 
 def evidence(read: ReadApi, identity: str) -> str:
     """The node's OWN anatomy, for the Scribe to distill — the
-    structural voicing (files) or the shell description + displays
-    (PBI). Evidence, never copy-source: the contract bans landing
-    it verbatim as speech."""
+    structural voicing. Evidence, never copy-source: the contract
+    bans landing it verbatim as speech."""
     from aivia.flows import speech as speech_mod
     node = next((n for n in read.nodes(None)
                  if n.identity == identity), None)
     if node is None:
         return ""
-    if node.label == "PBI Report":
-        return " ".join([
-            node.properties.get("name") or "",
-            node.properties.get("description") or "",
-            "displays: " + ", ".join(
-                node.properties.get("displays") or [])]).strip()
     name = node.properties.get("name") or identity
     return f"{name}. {speech_mod._file_voicing(read, identity)}"
 

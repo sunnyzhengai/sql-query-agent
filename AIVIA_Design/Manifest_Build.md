@@ -134,6 +134,17 @@ estate. Landed:
 | SCRIBE | OPEN — the 2026-09-09 finding | ONLY the acronym-expansion proposer ever ran (enrich.py). Description drafting — the seat's named job — was NEVER BUILT: file "descriptions" are structural voicing walls + borrowed table catalog text. Design = The Speech Contract (Design_Graph_Engine.md, landed 09-09); build awaits Sunny's route ruling (Scribe-drafts vs deterministic distillation) |
 | SMOOTHER | DEFERRED | gated, optional; method ruled (slot-survival), wires when the seat wires (A #15) |
 
+## Section E.1 — THE DERIVATION RULING (Sunny, 2026-09-09, post-E1)
+
+"The report users SHOULD see the logic": a PBI report's description
+DERIVES from its executed procs via the executes edge — 1:1 = the
+same words; the single multi-proc report composes both; the Scribe
+drafts for FILES only (registry 1.31.0, Speech_Sources PBI row).
+Estate restructured to the ruled shape: 27 reports, 26 of them 1:1,
+the dashboard trimmed to 2 procs (DEMO-ADJUSTED note in its source
+field — the real TMDL lists 3), the freed proc gained its own
+shell. descriptions.json = 28 file drafts only.
+
 ## Section D — the open queue [ON HOLD — Sunny's ruling 2026-09-09: the engine gaps (§E) come first; this list resumes after]
 
 1. **Finding 1 route** (speech-card content): Sunny's ruling on

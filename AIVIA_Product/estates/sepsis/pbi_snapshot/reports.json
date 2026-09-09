@@ -4,10 +4,9 @@
   "description": "Power BI dashboard for emergency department sepsis screening: screening detail, ED sepsis summary, and inpatient sepsis.",
   "executes": [
    "reporting/USP_ED_SEPSIS.sql",
-   "reports/USP_RPTS_IP_SEPSIS.sql",
    "reports/USP_RPTS_ED_Sepsis.sql"
   ],
-  "source": "real-tmdl (ED Sepsis Screening Dashboard.SemanticModel; EXEC names mapped to the corpus files)"
+  "source": "real-tmdl (ED Sepsis Screening Dashboard.SemanticModel; EXEC names mapped to the corpus files); DEMO-ADJUSTED 2026-09-09 (Sunny's 1:1 ruling): the real TMDL lists a third EXEC (USP_RPTS_IP_SEPSIS) \u2014 trimmed so exactly one report is multi-proc, at 2"
  },
  {
   "name": "Inpatient SEPSIS Report",
@@ -208,5 +207,13 @@
    "reports/USP_RPTS_Severe_Sepsis.sql"
   ],
   "source": "synthetic-demo (authored shell; the proc mapping is real)"
+ },
+ {
+  "name": "Inpatient Sepsis Summary Report",
+  "description": "power bi report over the inpatient sepsis results for clinical review.",
+  "executes": [
+   "reports/USP_RPTS_IP_SEPSIS.sql"
+  ],
+  "source": "synthetic-demo (authored shell; the proc mapping is real; born of the 2026-09-09 1:1 ruling \u2014 every proc feeds a report)"
  }
 ]

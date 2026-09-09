@@ -127,11 +127,18 @@ def speak(read, entry: Dict[str, Any]) -> str:
     if kind == "PBI Report":
         node = next(n for n in read.nodes("PBI Report")
                     if n.identity == identity)
-        # contract: the Scribe's aboutness overrides the shell
-        # description (which carries type words — "power bi report
-        # over..." paid type-shaped mentions twice, measured
-        # 2026-09-09); displays are the node's own parts and stay
-        desc = _aboutness(read, identity) \
+        # THE DERIVATION RULING (Sunny, 2026-09-09: "the report
+        # users SHOULD see the logic"): a report's aboutness IS its
+        # executed procs' descriptions, through the executes edge —
+        # 1:1 = the same words; the (single) multi-proc report
+        # composes both. Shell description only when no proc
+        # speaks; displays are the node's own parts and stay
+        parts = []
+        for ex in (node.properties.get("executes") or []):
+            about = _aboutness(read, ex)
+            if about and about not in parts:
+                parts.append(about)
+        desc = " ".join(parts) \
             or (node.properties.get("description") or "").lower()
         disp = node.properties.get("displays") or []
         return (desc + (" displays: " + ", ".join(

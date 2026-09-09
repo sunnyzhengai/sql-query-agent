@@ -42,7 +42,9 @@ def world():
 def test_pbi_reports_load_with_their_label(world):
     _store, read, _index, _semantic = world
     reports = read.nodes("PBI Report")
-    assert len(reports) == 26
+    # 27 since the 1:1 ruling (2026-09-09): the dashboard trimmed
+    # to 2 procs, the freed proc gained its own shell
+    assert len(reports) == 27
     names = {n.properties["name"] for n in reports}
     assert "ED Sepsis Screening Dashboard" in names  # the real one
 
