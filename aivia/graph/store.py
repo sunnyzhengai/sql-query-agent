@@ -62,6 +62,7 @@ class Store:
             import json as _json
             with open(self.journal_path, "a") as fh:
                 fh.write(_json.dumps(
+                    # literal: shape
                     {"label": label, "identity": identity,
                      "properties": properties, "as_of": as_of,
                      "extract_id": extract_id}) + "\n")

@@ -28,6 +28,7 @@ from aivia.graph.store import Store
 # idempotence check regenerates it; nothing improvises).
 METAMODEL_VERSION = metamodel.load("kg2_kind_library").version
 
+# literal: schema-mirror kg2_kind_library (values; keys ScriptDom)
 COMPARISON_KINDS = {
     "Equals": "COMPARE_EQ",
     "NotEqualToBrackets": "COMPARE_NEQ",
@@ -53,12 +54,14 @@ class MapContext:
 
 def _evidence(ctx: MapContext, frag) -> Dict[str, Any]:
     start = frag.StartOffset
+    # literal: shape
     return {"fragment": ctx.text[start:start + frag.FragmentLength],
             "offset": start, "line": frag.StartLine,
             "column": frag.StartColumn}
 
 
 def _node(ctx, kind_family, kind, frag, **props) -> Dict[str, Any]:
+    # literal: shape
     node = {"node": kind_family, "kind": kind,
             "evidence": _evidence(ctx, frag)}
     node.update({k: v for k, v in props.items() if v is not None})
@@ -76,6 +79,7 @@ def _map_expression(ctx, expr) -> Dict[str, Any]:
         parts = [i.Value for i in expr.MultiPartIdentifier.Identifiers]
         return _node(ctx, "expression", "column_ref", expr,
                      ref=".".join(parts))
+    # literal: mechanical ScriptDom API names
     if t in ("IntegerLiteral", "NumericLiteral", "MoneyLiteral",
              "RealLiteral"):
         return _node(ctx, "expression", "literal", expr, value=expr.Value)
@@ -106,6 +110,7 @@ def _map_expression(ctx, expr) -> Dict[str, Any]:
     if t == "UnaryExpression":
         return _node(ctx, "expression", "unary", expr,
                      args=[_map_expression(ctx, expr.Expression)])
+    # literal: mechanical ScriptDom API names
     if t in ("CastCall", "ConvertCall", "TryCastCall", "TryConvertCall"):
         return _node(ctx, "expression", "cast", expr,
                      args=[_map_expression(ctx, expr.Parameter)])
@@ -255,6 +260,7 @@ def _table_name(schema_object) -> str:
 def _collect_from(ctx, table_ref, refs, join_on):
     t = _type_name(table_ref)
     if t == "NamedTableReference":
+        # literal: shape
         refs.append({
             "table_ref": _table_name(table_ref.SchemaObject),
             "alias": table_ref.Alias.Value if table_ref.Alias else None,
@@ -280,6 +286,7 @@ def _collect_from(ctx, table_ref, refs, join_on):
             for ref in refs[before:]:
                 ref["outer_apply"] = True
     elif t == "QueryDerivedTable":
+        # literal: shape
         refs.append({
             "derived_scope": _map_query(ctx, table_ref.QueryExpression),
             "alias": table_ref.Alias.Value if table_ref.Alias else None,
@@ -290,6 +297,7 @@ def _collect_from(ctx, table_ref, refs, join_on):
         # the output columns) are captured; reads recurse as before
         before = len(refs)
         _collect_from(ctx, table_ref.TableReference, refs, join_on)
+        # literal: shape
         pivot = {
             "aggregate": (table_ref.AggregateFunctionIdentifier
                           .Identifiers[0].Value
@@ -343,6 +351,7 @@ def _map_query(ctx, query) -> Dict[str, Any]:
                 arms.extend(arm["combination_arms"])
             else:
                 arms.append(arm)
+        # literal: shape
         return {"node": "scope", "structures": ["COMBINATION"],
                 "combination": str(query.BinaryQueryExpressionType),
                 "combination_all": bool(query.All),
@@ -351,6 +360,7 @@ def _map_query(ctx, query) -> Dict[str, Any]:
     if t != "QuerySpecification":
         ctx.remainder.append({"type": t, **_evidence(ctx, query),
                               "reason": "unmapped query shape"})
+        # literal: shape
         return {"node": "scope", "structures": [], "unmapped_shape": t,
                 "evidence": _evidence(ctx, query)}
     refs, join_on = [], []
@@ -375,6 +385,7 @@ def _map_query(ctx, query) -> Dict[str, Any]:
                 name = expr["ref"].rsplit(".", 1)[-1]
             else:
                 name = None  # anonymous output column — legal T-SQL
+            # literal: shape
             projection.append({"node": "projection_member",
                                "position": i + 1, "name": name,
                                "expression": expr,
@@ -388,9 +399,11 @@ def _map_query(ctx, query) -> Dict[str, Any]:
             qualifier = (".".join(i.Value for i in
                                   el.Qualifier.Identifiers)
                          if el.Qualifier else None)
+            # literal: shape
             projection.append({"node": "projection_member",
                                "position": i + 1, "name": None,
                                "star": True, "qualifier": qualifier,
+                               # literal: shape
                                "expression": {"node": "expression",
                                               "kind": "star",
                                               "evidence":
@@ -415,6 +428,7 @@ def _map_query(ctx, query) -> Dict[str, Any]:
         structures.append("ORDER BY")
     if projection:
         structures.append("PROJECTION")
+    # literal: shape
     return {"node": "scope", "structures": structures, "from_refs": refs,
             "join_on": join_on, "where": where, "select_refs": select_refs,
             "projection": projection, "evidence": _evidence(ctx, query)}
@@ -539,10 +553,12 @@ def map_tree(file_name: str, text: str, dialect: str = "tsql"
             spec = stmt.DeleteSpecification
             if _type_name(spec.Target) == "NamedTableReference":
                 target_name = _table_name(spec.Target.SchemaObject)
+                # literal: shape
                 scope = {"node": "scope", "operation": "delete",
                          "name": target_name,
                          "structures": ["FROM"]
                          + (["WHERE"] if spec.WhereClause else []),
+                         # literal: shape
                          "from_refs": [{
                              "table_ref": target_name,
                              "alias": None,
@@ -660,6 +676,7 @@ def map_tree(file_name: str, text: str, dialect: str = "tsql"
             else:
                 n = emitters.index(stmt) + 1
                 scope["name_key"] = f"{file_name}::delivery_{n}"
+    # literal: shape
     return {"node": "file", "name": file_name, "dialect": dialect,
             "metamodel_version": METAMODEL_VERSION,
             "statements": statements,
@@ -701,6 +718,7 @@ def resolve(tree: Dict[str, Any], store: Store, reg: Dict[str, Any],
             # reads of the real table (ledger-close find)
             scope_keys[scope["name"]] = scope["name_key"]
     params = {p["name"] for p in tree["parameters"]}
+    # literal: shape
     census = {"resolved_refs": 0, "same_tree_refs": 0,
               "unresolved_refs": 0, "unresolved": []}
 
@@ -765,6 +783,7 @@ def resolve(tree: Dict[str, Any], store: Store, reg: Dict[str, Any],
             else:
                 col["resolves_to"] = None
                 _count_unresolved(col["ref"],
+                                  # literal: shape
                                   {"ref": col["ref"], "kind": "column",
                                    "table": target})
         elif kind == "scope":
@@ -827,6 +846,7 @@ def resolve(tree: Dict[str, Any], store: Store, reg: Dict[str, Any],
                     census["unresolved_refs"] += 1
                     census["unresolved"].append(name)
                     census.setdefault("unresolved_detail", []).append(
+                        # literal: shape
                         {"ref": name, "kind": "table",
                          "schema": schema or "(unqualified)"})
                     target = ("unresolved", None)
@@ -925,6 +945,7 @@ def resolve(tree: Dict[str, Any], store: Store, reg: Dict[str, Any],
                     # every source known, NONE declares it — drift
                     col["resolves_to"] = None
                     _count_unresolved(col["ref"],
+                                      # literal: shape
                                       {"ref": col["ref"],
                                        "kind": "column",
                                        "table": "(no source declares "
@@ -1051,6 +1072,7 @@ def apply_file(store: Store, reg: Dict[str, Any], file_id: str,
             return tree  # LC2-S3 idempotence: unchanged, no new version
     tree.pop("_reused", None)
     store.append_node("file", file_id,
+                      # literal: shape
                       {"tree": tree, "dialect": dialect,
                        "text_hash": text_hash}, as_of, file_id)
     have = {n.identity for n in store.current_nodes("scope")}

@@ -16,6 +16,7 @@ from typing import Any, Dict, List
 
 REGISTRY_DIR = (pathlib.Path(__file__).resolve().parents[2]
                 / "AIVIA_Design" / "registries")
+# literal: schema-mirror registries-on-disk
 REGISTRY_NAMES = ("kg1_technical", "kg2_kind_library", "kg2_logic",
                   "kg3_artifacts", "kg4_concepts", "lenses", "flows")
 
@@ -134,6 +135,7 @@ def validate_artifact_layer(store) -> List[str]:
                 problems.append(f"{node.identity}: spine incomplete (author)")
             if author.startswith("agent:") and not p.get("basis"):
                 problems.append(f"{node.identity}: machine version, no basis")
+            # literal: mechanical lens naming ban
             for banned in ("ownership", "standing", "current", "version"):
                 if banned in p:
                     problems.append(f"{node.identity}: stored summary "

@@ -216,6 +216,7 @@ def make_interpreter(key: str, cache_path=None):
               f"{INTERPRETER_MODEL}|{prompt_version}")
         if ck in cache:
             return cache[ck]
+        # literal: shape
         out = _openai("chat/completions", {
             "model": INTERPRETER_MODEL, "temperature": 0,
             "response_format": {"type": "json_object"},
@@ -243,7 +244,7 @@ def make_embedder(key: str):
     return embed
 
 
-def build_store(estate: str, journal_path=None):
+def build_store(estate: str, journal_path=None, descriptions=True):
     base = (pathlib.Path(__file__).resolve().parents[1]
             / "AIVIA_Product" / "estates" / estate)
     store = kg1_intake.new_store()
@@ -260,6 +261,10 @@ def build_store(estate: str, journal_path=None):
     inbound.receive_estate(store, reg, base / "estate_snapshot")
     if (base / "pbi_snapshot").is_dir():
         inbound.receive_pbi(store, base / "pbi_snapshot")
+    if descriptions:
+        # E1: the Scribe's committed aboutness drafts (the speech
+        # contract) — estate data, loads before the journal
+        inbound.receive_descriptions(store, base / "descriptions.json")
     # PHASE E1: the governance journal replays LAST — decisions land
     # on top of the freshly rebuilt truth. OPT-IN by path: the live
     # console (main) passes the estate's journal; tests pass tmp
@@ -423,6 +428,7 @@ def make_handler(store, estate, interpret_fn, semantic, pending,
         read = ReadApi(store)
         if (params.get("clear") or [""])[0] == "1":
             contexts.pop(conv, None)  # L5-D3: an explicit user act
+            # literal: shape
             return {"status": "cleared", "html":
                     "<p class=meta>the table is cleared.</p>",
                     "context_set": []}
@@ -439,6 +445,7 @@ def make_handler(store, estate, interpret_fn, semantic, pending,
                          "meaning; honest zeros and clarifies are "
                          "real answers. Follow up with 'it' / "
                          "'those' / 'the first one'.")
+            # literal: shape
             return {"status": "answer",
                     "html": "<pre>" + html.escape("\n".join(lines))
                             + "</pre>",
@@ -463,6 +470,7 @@ def make_handler(store, estate, interpret_fn, semantic, pending,
                 f'<a href="/round?entity={urllib.parse.quote(i)}">'
                 f"{html.escape(i.split('::')[-1].split('|')[-1])}"
                 "</a>" for i in ids[:12])
+            # literal: shape
             return {"status": "answer",
                     "html": "<pre>" + html.escape("\n".join(lines))
                             + "</pre><p class=meta>Referenced: "
@@ -476,6 +484,7 @@ def make_handler(store, estate, interpret_fn, semantic, pending,
             entity = next((e for e in index
                            if e["identity"] == entity_id), None)
             if entity is None:
+                # literal: shape
                 return {"status": "answer",
                         "html": "<pre>gone</pre>",
                         "context_set": []}
@@ -497,6 +506,7 @@ def make_handler(store, estate, interpret_fn, semantic, pending,
                 f'<a href="/round?entity={urllib.parse.quote(i)}">'
                 f"{html.escape(i.split('::')[-1].split('|')[-1])}"
                 "</a>" for i in listed[:12])
+            # literal: shape
             return {"status": "answer",
                     "html": "<pre>" + html.escape(card)
                             + f"</pre><p class=modes>views: {links}"
@@ -521,10 +531,12 @@ def make_handler(store, estate, interpret_fn, semantic, pending,
                 text = ask.render_readers(read, adj, entity)
             else:
                 text = ask.render_census(read)
+            # literal: shape
             return {"status": "answer",
                     "html": f"<pre>{html.escape(text)}</pre>",
                     "context_set": contexts.get(conv) or []}
         if not q.strip():
+            # literal: shape
             return {"status": "empty", "html": "", "context_set": []}
         # L3-D3 the clarify-miss counter: what happened after the
         # last clarify — picked one of its rows, or re-typed?
@@ -563,6 +575,7 @@ def make_handler(store, estate, interpret_fn, semantic, pending,
             last_clarify[conv] = {c["identity"] for c in
                                   result.get("candidates", [])}
         top = (contexts.get(conv) or [[]])[0]
+        # literal: shape
         return {"status": result["status"],
                 "html": render_result(conv, q, result),
                 "context_set": top,

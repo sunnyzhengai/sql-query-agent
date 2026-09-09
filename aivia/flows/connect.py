@@ -14,6 +14,7 @@ def edge_weights() -> Dict[str, float]:
     sheet = metamodel.load("lenses").sheets.get("Ranking_Weights", [])
     weights = {r["Edge"]: float(r["Weight"]) for r in sheet
                if r.get("Edge") and r["Edge"] != "_ruling"}
+    # literal: schema-mirror lenses.Ranking_Weights
     return weights or {"contains": 1.0, "reads": 1.0, "cites": 1.0,
                        "sighted": 1.0, "defines": 1.0}
 
@@ -52,6 +53,7 @@ def build_adjacency(read) -> Dict[str, List[Tuple[str, str]]]:
     for n in read.nodes("meaning_twin"):
         link(n.identity, n.identity.removeprefix("twin::"),
              "translates")
+    # literal: schema-mirror kg3_artifacts
     for kind in ("usage", "description", "responsibility",
                  "disposition", "proposal", "redaction"):
         row = ledger.get(kind)

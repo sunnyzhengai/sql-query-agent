@@ -193,7 +193,7 @@ SOURCES = {
 # deliveries lead, spine voiced, intermediates counted, census
 # closes; the file's ask-index words = the delivery lead, so file
 # embeddings embed meaning, never name-noise).
-STAMP_VERSION = "1.28.0"
+STAMP_VERSION = "1.30.0"
 RATIFIED = True
 DOC_STAMP = ("v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 twin-graph "
              "ruling ADR 0077; v1.2.0 Phase A metamodel bump; v1.3.0 "
@@ -227,6 +227,14 @@ def sheet_records(ws):
 # ---- PATCHES: recorded rulings the DRAFT xlsx predate. Each entry is
 # (registry, sheet, match: {col: value-prefix}, set: {col: new value}, citation)
 PATCHES = [
+    ("kg3_artifacts", "Classes",
+     {"Class": "description"},
+     {"Payload": "text; status: gate_passed | skeleton_floor | flagged | "
+      "drafted (machine) / authored implicit (human)",
+      "Notes": "RULING APPLIED 2026-09-09 (E1, the speech contract, Scribe "
+      "route): 'drafted' joins the machine status vocabulary — the Scribe's "
+      "aboutness sentences land as drafted descriptions pending blessing."},
+     "the speech contract (Design_Graph_Engine.md 2026-09-09) + E1"),
     ("kg1_technical", "Node_Types",
      {"Node kind": "table", "Property": "grain"},
      {"Required": "opportunistic — never required",
@@ -551,6 +559,36 @@ APPEND_ROWS = [
 
 TWIN_SHEETS = {
     "kg2_kind_library": {
+        "Closed_Sets": [
+            {"Set": "_ruling", "Members": "-",
+             "Cites": "THE LITERAL LAW lock 2: exact member lists "
+             "for kind-library sets the prose sheets describe."},
+            {"Set": "PRED_ROLES",
+             "Members": "subject|comparand|lower_bound|upper_bound|"
+             "pattern|escape|selection",
+             "Cites": "Roles sheet (prose rows)"},
+            {"Set": "DECISION_EXPR_ROLES",
+             "Members": "subject|comparand|pattern|lower_bound|"
+             "upper_bound",
+             "Cites": "Roles sheet — the decision lens's operand "
+             "walk order"},
+            {"Set": "COMPOSITE_EXPR_KINDS",
+             "Members": "function|arithmetic|unary|cast",
+             "Cites": "Expression_Kinds sheet (composite rows)"},
+            {"Set": "OPERATIONAL_KIND_LABELS",
+             "Members": "INSERT|WHILE|SET|DELETE",
+             "Cites": "Operational_Statement_Kinds (T-2 ruling)"},
+            {"Set": "NON_OPERATIONAL_KIND_LABELS",
+             "Members": "SELECT|SELECT INTO|IF",
+             "Cites": "Operational_Statement_Kinds (T-2 ruling)"},
+            {"Set": "COMPARATOR_ORDER_FAMILY",
+             "Members": "COMPARE_GTE|COMPARE_GT|COMPARE_LTE|"
+             "COMPARE_LT",
+             "Cites": "Predicate_Kinds sheet"},
+            {"Set": "SET_OPERATIONS",
+             "Members": "Union|Except|Intersect",
+             "Cites": "Structure_Kinds COMBINATION"},
+        ],
         "Structure_Kinds_Phase_A": [
             {"Kind": "PROJECTION",
              "Meaning": "the SELECT list — what the scope outputs; one "
@@ -784,22 +822,28 @@ TWIN_SHEETS = {
             {"Label": "scope (selection)",
              "Speech": "floor lead + composition (grammar render of "
              "the twin)", "Meaning": "rendered, never authored"},
-            {"Label": "file", "Speech": "composed meaning STORED in "
-             "the twin (translator): delivery lead + base "
-             "compositions + read-tables' steward words",
-             "Meaning": "the center-law corollary — composition is "
-             "building; the cause-1 corpse (self-referential "
-             "delivery slice) dies here"},
+            {"Label": "file", "Speech": "the node's OWN aboutness "
+             "— the Scribe-drafted description artifact (THE "
+             "SPEECH CONTRACT, 2026-09-09); undescribed = counted "
+             "gap, NEVER the structural wall (that text lives on "
+             "as _file_voicing: display + Scribe evidence only)",
+             "Meaning": "the contract's founding corpse: the old "
+             "composed speech was a 4,600-char recitation of 40 "
+             "upstream catalog descriptions — real physics scored "
+             "it 0.312 vs its own topic"},
             {"Label": "condition (predicate)",
              "Speech": "voiced phrase (grammar render, stored on "
              "the twin node)", "Meaning": "the best-scoring facets "
              "of the 2026-09-07 probe — 0.80 vs 0.57 blended"},
             {"Label": "parameter", "Speech": "voiced phrase",
              "Meaning": "rendered"},
-            {"Label": "PBI Report", "Speech": "description + "
-             "displays (composed from the executed procs' twins)",
-             "Meaning": "the consumption layer — what end users "
-             "actually open; label = the users' word"},
+            {"Label": "PBI Report", "Speech": "aboutness "
+             "(description artifact; shell description only as "
+             "fallback) + displays (composed from the executed "
+             "procs' twins)",
+             "Meaning": "the consumption layer; type words banned "
+             "from speech by the contract — the label card carries "
+             "them"},
             {"Label": "derived column", "Speech": "computed-output "
              "phrase (grammar render: name words + the defining "
              "selection)", "Meaning": "rendered"},
@@ -807,7 +851,15 @@ TWIN_SHEETS = {
              "Meaning": "human-authored"},
             {"Label": "drift name", "Speech": "the standing drift "
              "sentence", "Meaning": "findable by name, the search "
-             "law"},
+             "law",
+             "Text": "read by the estate's sql but declared by no "
+             "dictionary and no catalog — reader/writer drift, "
+             "counted forever",
+             "Card_Text": "READER/WRITER DRIFT: this name is read "
+             "by the estate's SQL but declared by no dictionary "
+             "and no catalog — a silently-failing report until a "
+             "human fixes the report or the dictionary. Counted "
+             "forever."},
             {"Label": "kind (node type)", "Speech": "its "
              "self-description row (below)", "Meaning": "KINDS ARE "
              "SEARCHABLE NODES — type words ground by meaning "
@@ -934,6 +986,44 @@ TWIN_SHEETS = {
              "when the question asks for that view. Never answer "
              "the question; never invent names; never guess what "
              "type of thing a word means — the graph decides."},
+            {"Seat": "scribe", "Version": "1.1.0", "Prompt":
+             "You write ONE short aboutness phrase for a "
+             "database object, from the structural evidence "
+             "given. Return ONLY JSON: {\"description\": "
+             "\"...\"}. RULES. Say what the object is ABOUT — "
+             "the business meaning of what it selects or shows. "
+             "Write a NOUN PHRASE naming the content, shaped "
+             "like: <clinical or business topic>, <its key "
+             "aspects>, for <purpose>. NEVER start with 'This' "
+             "or any opener. NEVER use filler like 'provides "
+             "insights into'. Never repeat the object's name. "
+             "Never name its type (no 'procedure', 'report', "
+             "'dashboard', 'table', 'file', 'selection', 'power "
+             "bi'). Never recite its source tables' "
+             "documentation. Under 25 words. Plain words a "
+             "business user would say. Never invent facts the "
+             "evidence does not show. (v1.1.0: the v1.0.0 live "
+             "run opened every draft with 'This <type> provides "
+             "insights into' — both bans broken; the shape "
+             "requirement is the fix.)"},
+        ],
+        "Closed_Sets": [
+            {"Set": "_ruling", "Members": "-",
+             "Cites": "THE LITERAL LAW lock 2 (ratified 2026-09-07, "
+             "built 2026-09-09): every ruled closed set in code is "
+             "a schema-mirror — cited here, asserted equal by "
+             "test_registry_mirrors. Extending a set = a ruling = "
+             "a registry bump, never a code edit alone (the "
+             "USAGE_ACTIONS clarify-bug is the standing reason)."},
+            {"Set": "ASK_VIEWS",
+             "Members": "card|lineage|filters|readers|census",
+             "Cites": "L4-D4 display hints; Ask_Console sheet"},
+            {"Set": "GAP_CENSUS_KEYS",
+             "Members": "unresolved_refs|grain_not_declared|"
+             "keyless_tables|undocumented_columns|unmapped_remainder|"
+             "outer_join_conditions_not_voiced|"
+             "unsupported_dialect_files",
+             "Cites": "kg2_kind_library.Gap_Classes (prose rows)"},
         ],
         "Connection_Ledger": [
             {"Label": "_ruling", "Edge": "-", "Status": "-",
@@ -1286,6 +1376,40 @@ TWIN_SHEETS = {
         ],
     },
     "kg3_artifacts": {
+        "Closed_Sets": [
+            {"Set": "_ruling", "Members": "-",
+             "Cites": "THE LITERAL LAW lock 2 (built 2026-09-09): "
+             "the kg3 ruled sets, machine-readable; code carries "
+             "schema-mirror markers and test_registry_mirrors "
+             "asserts equality. Extending a set = a ruling here "
+             "first (the clarify-actions live bug is the standing "
+             "reason)."},
+            {"Set": "STATE_CLASSES",
+             "Members": "description|term|responsibility",
+             "Cites": "Classes sheet (state rows)"},
+            {"Set": "EVENT_CLASSES",
+             "Members": "disposition|usage|proposal|redaction|"
+             "run_event",
+             "Cites": "Classes sheet (event rows)"},
+            {"Set": "DESCRIPTION_STATUS",
+             "Members": "gate_passed|skeleton_floor|flagged|drafted",
+             "Cites": "Classes description row; 'drafted' = E1 "
+             "Scribe ruling 2026-09-09"},
+            {"Set": "RULINGS",
+             "Members": "accept|reject|revoke|acknowledge",
+             "Cites": "Classes disposition row"},
+            {"Set": "USAGE_ACTIONS",
+             "Members": "asked|ran|confirmed|clarify-picked|"
+             "clarify-retyped",
+             "Cites": "L3-D3 ruling (clarify-miss counter joined "
+             "the closed set BY RULING, 2026-09-07)"},
+            {"Set": "ASKED_OUTCOMES",
+             "Members": "matched|ambiguous|no-match",
+             "Cites": "Classes usage row"},
+            {"Set": "OBSERVED_OUTCOMES",
+             "Members": "published|denied|edited|missing",
+             "Cites": "Classes usage row"},
+        ],
         "Governance_Overlay": [
             {"Item": "_ruling", "Definition": _TG + " 2f: kg3_artifacts + "
              "kg4_concepts merge into KG3, the governance overlay — one "

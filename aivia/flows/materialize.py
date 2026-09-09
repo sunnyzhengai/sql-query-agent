@@ -18,6 +18,7 @@ def run(store, read, lens_name: str, occurred_at: str,
         raise KeyError(f"'{lens_name}' is not a v1 catalog lens — "
                        "materialization follows the catalog, not code")
     result = fn(read, params)
+    # literal: shape
     surface = {"lens": lens_name, "result": result,
                "graph_stamp": list(read.stamp()),
                "occurred_at": occurred_at}

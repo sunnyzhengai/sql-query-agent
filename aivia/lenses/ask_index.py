@@ -29,6 +29,7 @@ def lens_ask_index(read, params) -> Dict[str, Any]:
     entries: List[Dict[str, Any]] = []
 
     def add(kind, identity, name, words=""):
+        # literal: shape
         entries.append({"label": kind, "identity": identity,
                         "name": name, "folded": _fold(name),
                         "words": words})
@@ -89,6 +90,7 @@ def lens_ask_index(read, params) -> Dict[str, Any]:
     for term in seen_terms.values():
         add("term", term.identity, term.properties.get("name", ""),
             (term.properties.get("definition") or "").lower())
+    # literal: shape
     return {"yield": entries,
             "completeness": "total over KG1 objects, named scopes, "
                             "files, terms, and unresolved names",
@@ -121,6 +123,7 @@ def find(index: List[Dict[str, Any]], text: str) -> Dict[str, Any]:
             return {"outcome": "matched", "entity": exact[0]}
         kinds = {e["label"] for e in exact}
         if kinds == {"drift"}:
+            # literal: shape
             return {"outcome": "matched", "entity": exact[0],
                     "sightings": exact}
         return {"outcome": "ambiguous", "candidates": exact[:12]}

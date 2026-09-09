@@ -59,6 +59,7 @@ def lens_join_compliance(read, params) -> Dict[str, Any]:
                                    else (c_table, s_table))
                         f_col, t_col = ((s_col, c_col) if frm == s_table
                                         else (c_col, s_col))
+                        # literal: shape
                         compliant.append({
                             "file": tree["name"],
                             "practiced": (f"{frm.rsplit('|', 1)[1]} <-> "
@@ -68,12 +69,14 @@ def lens_join_compliance(read, params) -> Dict[str, Any]:
                     else:
                         t1, t2 = sorted((s_table.rsplit("|", 1)[1],
                                          c_table.rsplit("|", 1)[1]))
+                        # literal: shape
                         violations.append({
                             "file": tree["name"],
                             "practiced": f"{t1} <-> {t2} on "
                                          f"{s_col} = {c_col}",
                             "declared_path": "NONE",
                             "finding": FINDING})
+    # literal: shape
     return {"violations": violations, "compliant_practiced": compliant,
             "not_judged": not_judged, "completeness": A12_COMPLETENESS,
             "stamp": read.stamp()}

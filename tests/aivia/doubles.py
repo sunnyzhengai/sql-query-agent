@@ -7,15 +7,35 @@ declare parser input. Strict by law: keys fold at construction
 (the lowercase-lookup trap class died here) and an unscripted
 question raises ScriptGap instead of improvising a default.
 
-The embedder double lives here too, en route to recorded-real
-vectors (the fake-physics embedder is sentenced; see the manifest).
+recorded_embed — REAL prod physics, replayed. Every vector is a
+genuine text-embedding-3-small embedding, recorded once against
+the live model (AIVIA_RECORD=1) into a committed fixture and
+replayed byte-identically ever after. Nothing is faked: the model
+computed every number; the fixture only removes the network. A
+text with no recording raises RecordingGap naming the remedy —
+never a silent fabrication (the hash-bucket fake embedder died
+under the never-fake ruling).
 """
+import base64
+import gzip
 import hashlib
-import re
+import json
+import os
+import pathlib
+import struct
+
+EMBED_MODEL = "text-embedding-3-small"
+FIXTURE = (pathlib.Path(__file__).resolve().parents[2]
+           / "AIVIA_Product" / "fixtures" / "embeddings"
+           / f"{EMBED_MODEL}.json.gz")
 
 
 class ScriptGap(AssertionError):
     """A test asked a question its script never authored."""
+
+
+class RecordingGap(AssertionError):
+    """A test embedded a text the fixture never recorded."""
 
 
 def _fold_key(text: str) -> str:
@@ -37,17 +57,53 @@ def scripted_proposals(mapping):
     return interpret
 
 
-def fake_embed(texts):
-    """Deterministic bag-of-words hashing — SENTENCED (never-fake
-    lean, 2026-09-09): dies when the recorded-real fixture lands.
-    2048 buckets x three positions per word."""
-    out = []
-    for text in texts:
-        vec = [0.0] * 2048
-        for word in re.sub(r"[^a-z0-9 ]", " ", text.lower()).split():
-            h = hashlib.sha256(word.encode()).hexdigest()
-            vec[int(h[:12], 16) % 2048] += 1.0
-            vec[int(h[12:24], 16) % 2048] += 1.0
-            vec[int(h[24:36], 16) % 2048] += 1.0
-        out.append(vec)
-    return out
+# ---- recorded-real embeddings ----------------------------------------
+_STORE = None
+
+
+def _text_key(text: str) -> str:
+    return hashlib.sha256(text.encode()).hexdigest()[:24]
+
+
+def _encode(vec):
+    return base64.b64encode(
+        struct.pack(f"<{len(vec)}e", *vec)).decode()
+
+
+def _decode(blob: str):
+    raw = base64.b64decode(blob)
+    return list(struct.unpack(f"<{len(raw) // 2}e", raw))
+
+
+def recorded_store() -> dict:
+    global _STORE
+    if _STORE is None:
+        if FIXTURE.is_file():
+            _STORE = json.loads(gzip.decompress(FIXTURE.read_bytes()))
+        else:
+            _STORE = {"model": EMBED_MODEL, "texts": {},
+                      "vectors": {}}
+    return _STORE
+
+
+def recorded_embed(texts):
+    store = recorded_store()
+    missing = [t for t in texts
+               if _text_key(t) not in store["vectors"]]
+    if missing:
+        if not os.environ.get("AIVIA_RECORD"):
+            raise RecordingGap(
+                f"{len(missing)} text(s) hold no recorded vector — "
+                f"first: {missing[0]!r}. Run AIVIA_RECORD=1 pytest "
+                f"to record against the real {EMBED_MODEL}, then "
+                f"commit {FIXTURE.name}")
+        from aivia.console import _env_key, make_embedder
+        fresh = make_embedder(_env_key())(missing)
+        for text, vec in zip(missing, fresh):
+            key = _text_key(text)
+            store["texts"][key] = text
+            store["vectors"][key] = _encode(vec)
+        FIXTURE.parent.mkdir(parents=True, exist_ok=True)
+        FIXTURE.write_bytes(gzip.compress(
+            json.dumps(store, sort_keys=True).encode()))
+    return [_decode(store["vectors"][_text_key(t)]) for t in texts]

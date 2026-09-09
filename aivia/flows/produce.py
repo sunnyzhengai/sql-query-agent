@@ -41,6 +41,7 @@ ECON = json.loads((pathlib.Path(__file__).parent / "econ_params.json")
 # from scopes — deliveries lead, spine voiced, intermediates counted,
 # census closes; file ask-index words = the delivery lead.
 FLOOR_GRAMMAR_VERSION = "2.3.0"
+# literal: grammar Grammar_Floor R1
 _PREPOSITIONS = ("of", "on", "per", "for", "in", "at", "by", "with")
 
 
@@ -49,6 +50,7 @@ _BOILERPLATE = re.compile(
     r"(?i)^this\s+(?:column|item|field|table)\s+"
     r"(?:holds|contains|stores|indicates|captures|is)"
     r"(?:\s+details|\s+information)?(?:\s+about)?\s+")
+# literal: grammar Grammar_Floor R5
 _TOKEN_HEADS = {"id", "code", "number", "identifier", "key", "nbr"}
 
 
@@ -96,6 +98,7 @@ def _pluralize(grain: str) -> str:
             head_idx = i - 1
             break
     head = words[head_idx]
+    # literal: grammar Grammar_Floor R1
     plural = head + ("es" if head.endswith(("s", "x", "ch", "sh"))
                      else "s")
     if head.endswith("sis"):
@@ -173,6 +176,7 @@ class _Voice:
             # ADR 0076 evidence-ordered overlay: DATEADD earned its
             # phrase (12 estate uses). Unit arg arrives as a column_ref
             # token (HH) — read its raw name, never its resolution.
+            # literal: grammar ADR-0076 datepart overlay
             unit_words = {"HH": "hour", "HOUR": "hour", "DD": "day",
                           "D": "day", "DAY": "day", "MI": "minute",
                           "MINUTE": "minute", "SS": "second",
@@ -195,6 +199,7 @@ class _Voice:
             if name:
                 tokens.append(name.split(".")[-1])
         for col in decisions.flatten_where(scope.get("where")):
+            # literal: schema-mirror kg2_kind_library
             for role in ("subject", "comparand", "pattern"):
                 e = col.get(role)
                 if e and e.get("kind") == "column_ref":
@@ -240,8 +245,10 @@ def _voice_predicate(pred, voice: _Voice) -> str:
     kind = pred["kind"]
     subj_expr = pred.get("subject", {})
     subj = voice.subject(subj_expr)
+    # literal: schema-mirror kg2_kind_library
     if kind in ("COMPARE_GTE", "COMPARE_GT", "COMPARE_LTE", "COMPARE_LT"):
         temporal = "date" in subj or "time" in subj
+        # literal: grammar Grammar_Floor R4 verbs
         verb = {"COMPARE_GTE": "is on or after" if temporal else "is at least",
                 "COMPARE_GT": "is after" if temporal else "exceeds",
                 "COMPARE_LTE": "is on or before" if temporal else "is at most",
@@ -428,6 +435,7 @@ def voicing_ledger(read: ReadApi, target: str) -> Dict[str, int]:
     if outer:
         detail["outer_match_conditions"] = outer
     total = voiced + counted
+    # literal: shape
     return {"voiced": voiced, "counted": counted, "total": total,
             "detail": detail}
 
@@ -461,6 +469,7 @@ def _compose_scope(read: ReadApi, tree, scope,
         arms = scope["combination_arms"]
         dupes = ("duplicates kept" if scope.get("combination_all")
                  else "duplicates removed")
+        # literal: schema-mirror kg2_kind_library
         kind_words = {"Union": "combination",
                       "Except": "difference",
                       "Intersect": "intersection"}
@@ -471,6 +480,7 @@ def _compose_scope(read: ReadApi, tree, scope,
         lines = [first_arm_lines[0],
                  f"This selection is the {word} of {len(arms)} "
                  f"alternative selections ({dupes})."]
+        # literal: grammar Grammar_Floor R2
         ordinals = ("first", "second", "third", "fourth", "fifth")
         for i, arm in enumerate(arms):
             marker = ordinals[i] if i < len(ordinals) else f"#{i + 1}"
@@ -520,6 +530,7 @@ def _compose_scope(read: ReadApi, tree, scope,
         rt = ref.get("resolves_to") or ""
         if rt in tables and ref.get("alias"):
             reads_per_table.setdefault(rt, []).append(ref["alias"])
+    # literal: grammar Grammar_Floor R2
     ordinals = ("first", "second", "third", "fourth", "fifth", "sixth")
     for rt, aliases in reads_per_table.items():
         if len(aliases) < 2:
@@ -698,6 +709,7 @@ def run(store, occurred_at: str,
                                            ECON["run_budget"])]
     run = run_events.open_run(
         author="agent:produce",
+        # literal: shape
         basis={"floor_grammar": FLOOR_GRAMMAR_VERSION,
                "econ": ECON["version"], "metamodel": "1.0.0",
                "worklist": list(batch)},
@@ -733,6 +745,7 @@ def run(store, occurred_at: str,
             shipped += 1
         except Exception as err:  # noqa: BLE001 — OPS-2: absence counted w/ reason, run continues
             absent.append({"target": target, "reason": str(err)})
+    # literal: shape
     run.accounting["descriptions"] = {
         "attempted": len(batch), "shipped": shipped,
         "absent": len(absent), "absent_detail": absent,

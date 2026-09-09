@@ -60,6 +60,7 @@ OPERATIONAL_STATEMENTS = frozenset(
 # roles in a predicate, keyed in THIS order (role identity, never
 # source position — a BETWEEN's bounds are lower/upper wherever the
 # parser met them)
+# literal: schema-mirror kg2_kind_library
 _PRED_ROLES = ("subject", "comparand", "lower_bound", "upper_bound",
                "pattern", "escape", "selection")
 _COMMUTATIVE = {"AND", "OR"}  # arm order is syntax, not meaning
@@ -138,6 +139,7 @@ class _Walk:
             child_keys: Optional[List[str]] = None,
             **extra) -> Dict[str, Any]:
         key = _h(kind, *key_parts, *(child_keys or []))
+        # literal: shape
         node = {"kind": kind, "points_at": path, "content": content,
                 "content_key": key,
                 "draws_from": sorted(draws_from or [])}
@@ -195,6 +197,7 @@ class _Walk:
                     _fold(scope_name), {}).get(colname)
                 identity = f"{scope_key}.{colname}"
                 if member is not None:
+                    # literal: shape
                     content = {
                         "words": _readable(expr["ref"].rsplit(".", 1)[-1]),
                         "words_source": "defining_projection",
@@ -229,6 +232,7 @@ class _Walk:
             return self.add("reference", path,
                             {"parameter": expr.get("ref")},
                             ["parameter", expr.get("ref", "")])
+        # literal: schema-mirror kg2_kind_library
         if kind in ("function", "arithmetic", "unary", "cast"):
             child_keys = []
             for i, a in enumerate(expr.get("args", [])):
@@ -394,6 +398,7 @@ class _Walk:
                 self.scope(arm, f"{path}/combination_arms/{i}")
                 ["content_key"]
                 for i, arm in enumerate(scope["combination_arms"])]
+            # literal: shape
             content = {"selection": scope.get("name")
                        or scope.get("name_key") or "(anonymous)",
                        "name_key": scope.get("name_key"),
@@ -433,6 +438,7 @@ class _Walk:
         # ordered (output column order is meaning)
         child_keys = (sorted(source_keys) + sorted(join_keys)
                       + where_key + member_keys)
+        # literal: shape
         content = {"selection": scope.get("name") or scope.get("name_key")
                    or "(anonymous)",
                    "name_key": scope.get("name_key"),
@@ -473,6 +479,7 @@ class _Walk:
             return self.add("statement", path,
                             {"does": "GOTO", "label": stmt.get("label")},
                             ["GOTO", stmt.get("label", "")])
+        # literal: schema-mirror kg2_kind_library Operational_Statement_Kinds
         if kind_label in ("INSERT", "WHILE", "SET", "DELETE") \
                 and child_keys:
             return self.add("statement", path,
@@ -488,6 +495,7 @@ class _Walk:
                             {"does": kind_label, "class": "operational"},
                             [kind_label], subkind="operational",
                             voiced="never")
+        # literal: schema-mirror kg2_kind_library Operational_Statement_Kinds
         if not child_keys and kind_label not in ("SELECT", "SELECT INTO",
                                                  "IF"):
             # a statement the mapper counted as unmapped — its twin is
@@ -593,11 +601,13 @@ def translate(tree: Dict[str, Any],
     walk = _Walk(columns or {}, _collect_scope_members(tree))
     walk.file(tree)
     gaps = [n for n in walk.nodes if n["kind"] == "gap"]
+    # literal: shape
     twin = {
         "file": tree.get("name"),
         "translator_version": TRANSLATOR_VERSION,
         "metamodel_version": METAMODEL_VERSION,
         "nodes": walk.nodes,
+        # literal: shape
         "census": {
             "twin_nodes": len(walk.nodes),
             "translated": len(walk.nodes) - len(gaps),
@@ -629,6 +639,7 @@ def translate(tree: Dict[str, Any],
     # there — the two grains sum in the gap-check report.
     census = twin["census"]
     cov = census["coverage_by_cause"]
+    # literal: shape
     census["by_class"] = {
         "ruled_silent": census["degenerate"] + census["operational"],
         "open_engine": census["gaps"]

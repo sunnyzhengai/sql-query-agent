@@ -27,6 +27,7 @@ from typing import Dict, List, Tuple
 ID_COLUMN = r"[\w\[\]]*(?:_ID|CSN|MRN|_NBR)[\w\[\]]*"
 NAME_COLUMN = r"[\w\[\]]*(?:NAME|PROVIDER|PHYSICIAN)[\w\[\]]*"
 
+# literal: schema-mirror kg3 phi classes
 PLACEHOLDER = {"contact_literal": "<CONTACT>", "id_literal": "<ID>",
                "name_literal": "<NAME>", "date_literal": "<DATE>"}
 

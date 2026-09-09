@@ -16,7 +16,7 @@ Proves: contract:aivia-design-to-code
 """
 import pytest
 
-from .doubles import ScriptGap, scripted_proposals
+from .doubles import RecordingGap, ScriptGap, recorded_embed, recorded_store, scripted_proposals
 
 
 def test_a_scripted_question_returns_its_authored_proposal():
@@ -44,3 +44,33 @@ def test_keys_fold_at_construction_killing_the_case_trap():
         "mentions": ["reports", "ED"]}
     assert interp("  What reports are ABOUT ed ") == {
         "mentions": ["reports", "ED"]}
+
+
+# ---- RECORDED-REAL EMBEDDINGS (the fake physics died) ----------------
+def test_an_unrecorded_text_raises_loudly_outside_record_mode(
+        monkeypatch):
+    monkeypatch.delenv("AIVIA_RECORD", raising=False)
+    junk = "a text nobody ever recorded zzz qqq"
+    with pytest.raises(RecordingGap) as err:
+        recorded_embed([junk])
+    assert "AIVIA_RECORD" in str(err.value)  # the remedy is named
+    assert "zzz" in str(err.value)           # so is the text
+
+
+def test_the_fixture_holds_real_prod_vectors():
+    # the committed recording IS prod physics: text-embedding-3-small,
+    # 1536 dimensions, unit-normalized (OpenAI ships unit vectors;
+    # float16 storage keeps the norm within rounding)
+    store = recorded_store()
+    assert store, "the committed embedding fixture is missing"
+    vec = recorded_embed(
+        [next(iter(store["texts"].values()))])[0]
+    assert len(vec) == 1536
+    norm = sum(v * v for v in vec) ** 0.5
+    assert abs(norm - 1.0) < 0.01
+
+
+def test_replay_is_deterministic():
+    store = recorded_store()
+    text = next(iter(store["texts"].values()))
+    assert recorded_embed([text]) == recorded_embed([text])

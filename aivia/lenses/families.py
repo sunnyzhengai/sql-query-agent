@@ -52,5 +52,6 @@ def lens_relatedness(read, params) -> Dict[str, Any]:
     for group in members.values():
         key = hashlib.sha1("|".join(sorted(group)).encode()).hexdigest()[:12]
         out[f"fam:{key}"] = sorted(group)
+    # literal: shape
     return {"yield": out, "completeness": "total over parsed estate",
             "stamp": read.stamp()}

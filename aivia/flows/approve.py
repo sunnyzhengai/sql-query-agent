@@ -18,6 +18,7 @@ def queue(read) -> Dict[str, Any]:
     standing = derivation.lens_standing(read, None)["yield"]
     current = derivation.lens_current(read, None)["yield"]
     ownership = derivation.lens_ownership(read, None)["yield"]
+    # literal: shape
     return {"pending": {aid: {"current": current[aid],
                               "ownership": ownership[aid]}
                         for aid, s in standing.items() if s == "pending"},

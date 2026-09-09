@@ -59,6 +59,7 @@ def connection_census(read) -> Dict[str, Any]:
                 else:
                     counted += 1
                     missing_kinds.add(kind)
+    # literal: shape
     return {"total": total, "birth_edged": birth_edged,
             "counted_missing": counted, "rooted": rooted,
             "counted_missing_kinds": sorted(missing_kinds),
@@ -78,6 +79,7 @@ def speech_census(read, index: List[Dict[str, Any]]) -> Dict[str, Any]:
     unassigned = sorted(
         {e["label"] for e in index
          if speech.SHEET_KINDS.get(e["label"]) not in declared})
+    # literal: shape
     return {"total": speaks + gaps + muted, "speaks": speaks,
             "counted_gap": gaps, "ruled_mute": muted,
             "unassigned_kinds": unassigned}
@@ -90,8 +92,28 @@ def searchability_census(read,
     of search (none today — the equation pins that fact)."""
     speaks = sum(1 for e in index if e["words"])
     searchable = sum(1 for e in index if e["words"])
+    # literal: shape
     return {"speaks": speaks, "searchable": searchable,
             "ruled_silent": speaks - searchable}
+
+
+def verbatim_census(read,
+                    index: List[Dict[str, Any]]) -> Dict[str, Any]:
+    """Census 8 (integrity battery; first implemented 2026-09-09 —
+    the documentation audit found the ratified equation had no
+    code): index words == recomputed speech, entry by entry.
+    matched ⊎ counted-mismatch == total; a stale or mutated index
+    is COUNTED with its identities, never silent."""
+    matched, mismatches = 0, []
+    for e in index:
+        if speech.speak(read, e) == e.get("words", ""):
+            matched += 1
+        else:
+            mismatches.append(e["identity"])
+    # literal: shape
+    return {"total": len(index), "matched": matched,
+            "mismatched": len(mismatches),
+            "mismatches": mismatches[:20]}
 
 
 def report(read, index: List[Dict[str, Any]]) -> str:
@@ -100,6 +122,7 @@ def report(read, index: List[Dict[str, Any]]) -> str:
     r = connection_census(read)
     s = speech_census(read, index)
     q = searchability_census(read, index)
+    v = verbatim_census(read, index)
     return "\n".join([
         "## The three censuses (ADR 0080; census 1 succeeded by the "
         "connection census, 2026-09-07)",
@@ -115,4 +138,6 @@ def report(read, index: List[Dict[str, Any]]) -> str:
         f"- searchability: {q['searchable']} searchable + "
         f"{q['ruled_silent']} ruled-silent == {q['speaks']} "
         "speakers",
-    ])
+        f"- verbatim: {v['matched']} matched + {v['mismatched']} "
+        f"counted mismatches == {v['total']}; drifted: "
+        f"{v['mismatches'] or 'none'}"])

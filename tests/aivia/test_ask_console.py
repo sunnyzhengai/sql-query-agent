@@ -1,9 +1,12 @@
 """Tier A exit (ADR 0079): the F10 answer keys go RUNNABLE.
 
-The interpreter and embedder are INJECTED fakes — CI never calls a
-model; the cage, the tiers, the connect engine, the ledger, and the
-never-regex law are what's proven. The live finds from Sunny's first
-testing session stand as corpses under the new pipeline.
+The interpreter is SCRIPTED (authored proposals, strict) and the
+embedder REPLAYS recorded real text-embedding-3-small vectors — CI
+never calls a model, yet nothing here is fake (the live-seat rule,
+2026-09-09); the cage, the tiers, the connect engine, the ledger,
+and the never-regex law are what's proven. The live finds from
+Sunny's first testing session stand as corpses under the new
+pipeline.
 
 Proves: contract:aivia-design-to-code
 """
@@ -16,7 +19,8 @@ from aivia.flows import ask, grounding
 from aivia.graph.read_api import ReadApi
 from aivia.lenses import ask_index
 
-from .doubles import fake_embed, scripted_proposals
+from . import doubles
+from .doubles import recorded_embed, scripted_proposals
 
 FIX = pathlib.Path(__file__).resolve().parents[2] / "AIVIA_Product" / "fixtures"
 CASES = json.loads((FIX / "F10_interpreter" / "cases.json").read_text())
@@ -53,8 +57,8 @@ def world():
     seed_vocabulary(store)
     read = ReadApi(store)
     entries = ask.build_index(read)
-    semantic = grounding.SemanticIndex(entries, fake_embed,
-                                       "fake-2k", cache_path=None)
+    semantic = grounding.SemanticIndex(entries, recorded_embed,
+                                       doubles.EMBED_MODEL, cache_path=None)
     return store, semantic
 
 
@@ -95,14 +99,14 @@ def test_gr4_vectors_stamped_and_cached(tmp_path, world):
     read = ReadApi(store)
     entries = ask_index.lens_ask_index(read, None)["yield"][:20]
     cache = tmp_path / "emb.json"
-    first = grounding.SemanticIndex(entries, fake_embed, "fake-2k",
+    first = grounding.SemanticIndex(entries, recorded_embed, doubles.EMBED_MODEL,
                                     cache_path=cache)
     # facet cards: 2-3 vectors per entry (name + label + speech)
     assert 40 <= first.embedded_now <= 60
 
     def forbidden(texts):
         raise AssertionError("re-embedded an unchanged meaning")
-    second = grounding.SemanticIndex(entries, forbidden, "fake-2k",
+    second = grounding.SemanticIndex(entries, forbidden, doubles.EMBED_MODEL,
                                      cache_path=cache)
     assert second.embedded_now == 0  # unchanged -> never re-embeds
 
@@ -297,7 +301,7 @@ def _old_sf2(world):
     store, _ = world
     read = ReadApi(store)
     entries = ask_index.lens_ask_index(read, None)["yield"]
-    built = grounding.SemanticIndex(entries, fake_embed, "fake-2k",
+    built = grounding.SemanticIndex(entries, recorded_embed, doubles.EMBED_MODEL,
                                     cache_path=None)
 
     def explode(texts):
@@ -568,10 +572,13 @@ def test_gr6_files_embed_meaning_not_names(world):
     target = next(e for e in files
                   if e["identity"].endswith(
                       "reporting/USP_ED_SEPSIS.sql"))
-    # the file's words are its report floor's delivery lead — never
-    # empty, never the bare name (find #8's 0.05-band noise dies)
+    # THE SPEECH CONTRACT (2026-09-09): the file's words are its
+    # OWN aboutness (Scribe-drafted description) — never the bare
+    # name, never the structural wall of upstream catalog text
     assert target["words"]
-    assert "selection" in target["words"] or "record" in target["words"]
+    assert "sepsis" in target["words"].lower()
+    assert "this is a selection of records" not in target["words"]
+    assert len(target["words"]) < 300
 
 
 def test_cn5_the_report_floor_speaks_meaning(world):

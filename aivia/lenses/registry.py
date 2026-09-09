@@ -11,6 +11,7 @@ from typing import Callable, Dict, List
 from aivia.graph.metamodel import load as load_registry
 from aivia.lenses import census, compliance, decisions, derivation, families
 
+# literal: schema-mirror lenses (readings)
 V1_LENSES: Dict[str, Callable] = {
     "ownership": derivation.lens_ownership,
     "authorship": derivation.lens_authorship,

@@ -46,6 +46,8 @@ def lens_anchor_census(read, params) -> Dict[str, Any]:
                 {"scope": scope,
                  "candidates": by_key.get(key, [])})  # same MEANING,
             # new name — the rename case resolves itself for the human
+    # literal: shape
+    # literal: shape
     return {"yield": {"intact": intact, "drift_orphans": drift,
                       "deleted_orphans": deleted,
                       "unanchored": unanchored},

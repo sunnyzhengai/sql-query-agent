@@ -16,7 +16,8 @@ from aivia.flows import ask, grounding, speech
 from aivia.flows import censuses as census
 from aivia.graph.read_api import ReadApi
 
-from .doubles import fake_embed, scripted_proposals
+from . import doubles
+from .doubles import recorded_embed, scripted_proposals
 from .test_ask_console import seed_vocabulary
 
 FIX = pathlib.Path(__file__).resolve().parents[2] / "AIVIA_Product" / "fixtures"
@@ -30,8 +31,8 @@ def world():
     seed_vocabulary(store)
     read = ReadApi(store)
     index = ask.build_index(read)
-    semantic = grounding.SemanticIndex(index, fake_embed,
-                                       "fake-2k", cache_path=None)
+    semantic = grounding.SemanticIndex(index, recorded_embed,
+                                       doubles.EMBED_MODEL, cache_path=None)
     return store, read, index, semantic
 
 
@@ -72,12 +73,21 @@ def test_composition_stored_in_twin_carries_the_subject(world):
     assert "emergency department" in subject.lower()
 
 
-def test_file_speech_reads_the_stored_subject(world):
-    _store, _read, index, _semantic = world
+def test_file_speech_is_aboutness_and_voicing_keeps_the_subject(world):
+    # SUPERSEDED PIN REWRITTEN (the speech contract, 2026-09-09):
+    # search speech = the file's own aboutness; the twin's stored
+    # subject (with its upstream steward words) lives on as the
+    # VOICING — display + Scribe evidence, never the card
+    from aivia.flows import speech as speech_mod
+    store, _read, index, _semantic = world
+    from aivia.graph.read_api import ReadApi
+    read = ReadApi(store)
     target = next(e for e in index if e["label"] == "file"
                   and e["identity"].endswith(
                       "reporting/USP_ED_SEPSIS.sql"))
-    assert "emergency department" in target["words"].lower()
+    assert "sepsis" in target["words"].lower()
+    voicing = speech_mod._file_voicing(read, target["identity"])
+    assert "emergency department" in voicing
 
 
 # ---- census 2+3: speech and searchability ----------------------------
@@ -274,4 +284,6 @@ def test_facet_cards_name_card_wins_for_name_shaped_queries(world):
     # through its NAME card — the blend that buried it is dead
     hits = semantic.search("ED Sepsis", top_k=3, kind="file")
     assert hits[0]["name"] in ("USP_ED_SEPSIS", "USP_RPTS_ED_Sepsis")
-    assert hits[0]["via_card"] == "name"
+    # provenance joins under the total-score law — the NAME card
+    # must be among the contributors (the facet decision's point)
+    assert "name" in hits[0]["via_card"].split("+")

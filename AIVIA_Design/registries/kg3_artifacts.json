@@ -1,7 +1,7 @@
 {
  "registry": "kg3_artifacts",
  "stamp": {
-  "version": "1.28.0",
+  "version": "1.30.0",
   "doc_section": "Level 1 / KG Layer 3 — artifact layer",
   "doc_stamp": "v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 twin-graph ruling ADR 0077; v1.2.0 Phase A metamodel bump; v1.3.0 Phase B composite-kinds correction; v1.4.0 T-2 operational-statements ruling; v1.5.0 the gap taxonomy; v1.6.0 the plug-all-holes sweep; v1.7.0 ledger close; v1.8.0 the ask console ADR 0078; v1.9.0 the list op; v1.10.0 kind vocabulary; v1.11.0 ADR 0079 interpreter; v1.12.0 Tier A build data; v1.13.0 the seat-failure law; v1.14.0 follow-up context; v1.15.0 anaphor vocabulary (all 2026-09-06)",
   "ratified": true,
@@ -9,7 +9,9 @@
   "converted_from": "L1_KG3_Artifact_Layer_Registry.xlsx"
  },
  "rulings_applied_at_conversion": [
+  "the speech contract (Design_Graph_Engine.md 2026-09-09) + E1",
   "register H5 (2026-09-05)",
+  "sheet Closed_Sets added (twin-graph ruling (2026-09-06), ADR 0077)",
   "sheet Governance_Overlay added (twin-graph ruling (2026-09-06), ADR 0077)"
  ],
  "_open": [],
@@ -75,8 +77,8 @@
    {
     "Class": "description",
     "Shape": "state",
-    "Payload": "text; status: gate_passed | skeleton_floor | flagged (machine) / authored implicit (human)",
-    "Notes": "kill accounting + absence rule live in the GENERATION-RUN EVENT"
+    "Payload": "text; status: gate_passed | skeleton_floor | flagged | drafted (machine) / authored implicit (human)",
+    "Notes": "RULING APPLIED 2026-09-09 (E1, the speech contract, Scribe route): 'drafted' joins the machine status vocabulary — the Scribe's aboutness sentences land as drafted descriptions pending blessing."
    },
    {
     "Class": "term",
@@ -207,6 +209,48 @@
     "Writer / trigger": "—",
     "Postconditions": "machine dispositions (LC3-F1) · pipeline current over human-owned (LC3-F2) · in-place edit (LC3-F3) · ANY deletion (LC3-F4 — absolute; PHI tension recorded as H6, SAFETY pass owes reconciliation) · empty shells (LC3-F5)",
     "Tests": "—"
+   }
+  ],
+  "Closed_Sets": [
+   {
+    "Set": "_ruling",
+    "Members": "-",
+    "Cites": "THE LITERAL LAW lock 2 (built 2026-09-09): the kg3 ruled sets, machine-readable; code carries schema-mirror markers and test_registry_mirrors asserts equality. Extending a set = a ruling here first (the clarify-actions live bug is the standing reason)."
+   },
+   {
+    "Set": "STATE_CLASSES",
+    "Members": "description|term|responsibility",
+    "Cites": "Classes sheet (state rows)"
+   },
+   {
+    "Set": "EVENT_CLASSES",
+    "Members": "disposition|usage|proposal|redaction|run_event",
+    "Cites": "Classes sheet (event rows)"
+   },
+   {
+    "Set": "DESCRIPTION_STATUS",
+    "Members": "gate_passed|skeleton_floor|flagged|drafted",
+    "Cites": "Classes description row; 'drafted' = E1 Scribe ruling 2026-09-09"
+   },
+   {
+    "Set": "RULINGS",
+    "Members": "accept|reject|revoke|acknowledge",
+    "Cites": "Classes disposition row"
+   },
+   {
+    "Set": "USAGE_ACTIONS",
+    "Members": "asked|ran|confirmed|clarify-picked|clarify-retyped",
+    "Cites": "L3-D3 ruling (clarify-miss counter joined the closed set BY RULING, 2026-09-07)"
+   },
+   {
+    "Set": "ASKED_OUTCOMES",
+    "Members": "matched|ambiguous|no-match",
+    "Cites": "Classes usage row"
+   },
+   {
+    "Set": "OBSERVED_OUTCOMES",
+    "Members": "published|denied|edited|missing",
+    "Cites": "Classes usage row"
    }
   ],
   "Governance_Overlay": [

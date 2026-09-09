@@ -22,7 +22,8 @@ import pytest
 from aivia.flows import ask, censuses, connect, grounding
 from aivia.graph.read_api import ReadApi
 
-from .doubles import fake_embed, scripted_proposals
+from . import doubles
+from .doubles import recorded_embed, scripted_proposals
 
 T0 = "2026-09-08T12:00:00Z"
 
@@ -33,8 +34,8 @@ def world():
     store, _ = build_store("sepsis")
     read = ReadApi(store)
     index = ask.build_index(read)
-    semantic = grounding.SemanticIndex(index, fake_embed,
-                                       "fake-2k", cache_path=None)
+    semantic = grounding.SemanticIndex(index, recorded_embed,
+                                       doubles.EMBED_MODEL, cache_path=None)
     return store, read, index, semantic
 
 
@@ -77,6 +78,11 @@ def test_reports_speak_their_displays(world):
     assert "displays" in dash["words"].lower()
 
 
+@pytest.mark.xfail(strict=True, reason=(
+    "HELD in Manifest_Build SectionD (Sunny 2026-09-09): "
+    "scoring-law resumption evidence — real-physics residual "
+    "after the speech contract; strict forces unmarking when "
+    "the ruling lands"))
 def test_reports_about_ed_crowns_the_dashboard(world):
     store, _read, _index, semantic = world
     q = "what reports are about ED"

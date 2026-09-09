@@ -49,6 +49,7 @@ def render(read, artifact_id: str, target_system: str) -> Dict[str, Any]:
         if d.properties["ruling"] == "accept"
         and d.properties["about"] in (artifact_id, current["version_id"])})
     row = dict(binding["constants"])
+    # literal: frame landing CSV contract
     row.update({"Name": scope_key.rsplit("::", 1)[-1],
                 "Full Name": scope_key,
                 "Description": text,

@@ -41,6 +41,7 @@ def mint(store: Store, family_snapshot: Dict[str, Any], minting_act: str,
         raise RefusalKG4("CHECK-KG4-2", f"{concept_id} already minted — "
                          "append-only, and the id is content-keyed")
     return store.append_node("concept", concept_id,
+                             # literal: shape
                              {"basis": dict(family_snapshot),
                               "minting_act": minting_act,
                               "created_at": created_at},

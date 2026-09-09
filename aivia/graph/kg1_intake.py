@@ -16,8 +16,10 @@ from typing import Any, Dict, List, Optional, Set, Tuple
 
 from aivia.graph.store import Store
 
+# literal: shape L1_KG1_CONTRACT_DATALOAD
 REQUIRED_FILES = ("manifest.json", "tables.csv", "columns.csv",
                   "pk.csv", "joins.csv")
+# literal: shape L1_KG1_CONTRACT_DATALOAD
 MANIFEST_FIELDS = ("source", "operator", "db_name", "server", "as_of",
                    "source_pack_version")
 # Phrase rule (source-pack data in production; one pack, one variant here):
@@ -102,6 +104,7 @@ def apply_registration(store: Store, reg: Dict[str, Any]) -> None:
     if any(n.identity == db_id for n in store.current_nodes("db")):
         return
     as_of = reg["registered_at"]
+    # literal: shape
     store.append_node("db", db_id, {
         "name": reg["db_name"],
         "minted_from": "registration prerequisite (DBA-completed)",
@@ -205,6 +208,7 @@ def _desired_state(store, reg, snap, report):
             report.gap_lists["grain_not_declared"].append(table_id)
         pk_cols = [c for _, c in
                    sorted(pk_by_table[(row["schema"], row["table"])])]
+        # literal: shape
         nodes[table_id] = ("table", {"description": row["description"],
                                      "grain": grain, "pk_columns": pk_cols})
         contains.add((schema_id, table_id))
@@ -323,6 +327,7 @@ def apply_extract(store: Store, reg: Dict[str, Any],
     report.retired_objects = []
     desired = set(nodes)
     for identity, node in current.items():
+        # literal: shape
         if node.label in ("schema", "table", "column") \
                 and identity.startswith(f"{snap.source}|") \
                 and identity not in desired:
@@ -365,9 +370,11 @@ def audit_incremental(store: Store, reg: Dict[str, Any],
     apply_extract(scratch, reg, snap)
     fresh = {n.identity: n.properties.get("content_hash")
              for n in scratch.current_nodes()
+             # literal: shape
              if n.label in ("schema", "table", "column")}
     live = {n.identity: n.properties.get("content_hash")
             for n in store.current_nodes()
+            # literal: shape
             if n.label in ("schema", "table", "column")
             and n.identity.startswith(f"{snap.source}|")}
     findings = []

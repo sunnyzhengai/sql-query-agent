@@ -47,10 +47,15 @@ def test_every_loaded_registry_is_ratified_v1():
     # successor); 1.22.0 = term origins (step 2); 1.23.0 = person
     # nodes (step 3); 1.24.0 = part edges (step 4); 1.25.0 = root
     # edges (step 5); 1.26.0 = seat prompts; 1.27.0 = the PBI layer;
-    # 1.28.0 = acronym enrichment
+    # 1.28.0 = acronym enrichment; 1.29.0 = the Scribe seat prompt
+    # (E1, the speech contract); 1.29.1 = prompt 1.1.0 (shape
+    # requirement — the v1.0.0 live run broke both bans) + the
+    # 'drafted' description status; 1.30.0 = the literal law locks
+    # (Closed_Sets sheets, drift text as registry data, the
+    # contract-era Speech_Sources rows)
     for reg in metamodel.load_all().values():
         assert reg.ratified is True
-        assert reg.version == "1.28.0"
+        assert reg.version == "1.30.0"
 
 
 def test_load_single_exposes_sheets_and_stamp():

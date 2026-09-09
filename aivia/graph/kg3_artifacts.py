@@ -21,19 +21,27 @@ from typing import Any, Dict, List, Optional
 from aivia.graph import phi_gate
 from aivia.graph.store import NodeVersion, Store
 
+# literal: schema-mirror kg3_artifacts.Classes
 STATE_CLASSES = ("description", "term", "responsibility")
+# literal: schema-mirror kg3_artifacts.Classes
 EVENT_CLASSES = ("disposition", "usage", "proposal", "redaction",
                  "run_event")
 RUN_OUTCOMES = ("completed", "aborted")
-DESCRIPTION_STATUS = ("gate_passed", "skeleton_floor", "flagged")
+# literal: schema-mirror kg3_artifacts.Classes description row
+DESCRIPTION_STATUS = ("gate_passed", "skeleton_floor", "flagged",
+                      "drafted")  # E1: Scribe aboutness pre-bless
+# literal: schema-mirror kg3_artifacts.Classes disposition row
 RULINGS = ("accept", "reject", "revoke", "acknowledge")
+# literal: schema-mirror kg3_artifacts.Usage_Actions
 USAGE_ACTIONS = ("asked", "ran", "confirmed",
                  "clarify-picked", "clarify-retyped")
 # clarify-picked/retyped joined BY RULING (L3-D3, the clarify-miss
 # counter; the literal review's critical find — the console wrote
 # them against a closed set). This tuple becomes a registry
 # mirror-check in the literal-census build (step F).
+# literal: schema-mirror kg3_artifacts.Usage_Actions outcomes
 ASKED_OUTCOMES = ("matched", "ambiguous", "no-match")
+# literal: schema-mirror kg3_artifacts.Usage_Actions outcomes
 OBSERVED_OUTCOMES = ("published", "denied", "edited", "missing")
 _IDENTITY = re.compile(r"^(person|role|agent):\S+$")
 
@@ -87,6 +95,7 @@ def _append_version(store: Store, kind: str, artifact_id: str,
     prior = _versions_of(store, artifact_id)
     seq = len(prior) + 1
     version_id = artifact_id if seq == 1 else f"{artifact_id}#v{seq}"
+    # literal: shape
     props = {"artifact_id": artifact_id, "about": list(about),
              "author": author, "created_at": created_at, **payload}
     if basis:
@@ -142,6 +151,7 @@ def append_term(store: Store, artifact_id: str, name: str, definition: str,
     if not derived_from:
         raise RefusalKG3("LC3-F6", "no node is alone — a term cites "
                          "the act it was deduced from (derived_from)")
+    # literal: shape
     payload = {"name": name, "definition": definition,
                "derived_from": list(derived_from)}
     if about:
@@ -171,6 +181,7 @@ def append_acronym(store: Store, name: str, expansions: List[str],
     _mint_actor(store, approved_by, approved_at)
     return store.append_node(
         "acronym", f"acronym::{name.strip().upper()}",
+        # literal: shape
         {"name": name, "expansions": [e.strip() for e in expansions],
          "approved_by": approved_by, "approved_at": approved_at},
         approved_at, extract_id=f"kg3@{approved_at}")
@@ -195,6 +206,7 @@ def append_disposition(store: Store, about: str, ruling: str, author: str,
     if ruling not in RULINGS:
         raise RefusalKG3("KG3-7", f"ruling '{ruling}' outside {RULINGS}")
     seq = len(store.current_nodes("disposition")) + 1
+    # literal: shape
     props: Dict[str, Any] = {"about": about, "ruling": ruling,
                              "author": author, "occurred_at": occurred_at,
                              "seq": seq}
@@ -215,6 +227,7 @@ def append_usage(store: Store, action: str, author: str, occurred_at: str,
         raise RefusalKG3("KG3-7", f"action '{action}' outside "
                          f"{USAGE_ACTIONS}")
     _mint_actor(store, author, occurred_at)
+    # literal: shape
     props: Dict[str, Any] = {"action": action, "author": author,
                              "occurred_at": occurred_at}
     if action == "asked":
@@ -239,6 +252,7 @@ def append_proposal(store: Store, kind: str, about: str, author: str,
                     outcome: Optional[str] = None) -> NodeVersion:
     _check_identity(author)
     _mint_actor(store, author, occurred_at)
+    # literal: shape
     props: Dict[str, Any] = {"kind": kind, "about": about, "author": author,
                              "occurred_at": occurred_at}
     if kind == "sent":
@@ -277,6 +291,7 @@ def append_run_event(store: Store, author: str, basis: Dict[str, Any],
     seq = len(store.current_nodes("run_event")) + 1
     return store.append_node(
         "run_event", f"run:{seq}",
+        # literal: shape
         {"author": author, "basis": dict(basis),
          "accounting": dict(accounting), "outcome": outcome,
          "occurred_at": occurred_at},
@@ -303,6 +318,7 @@ def supersede(store: Store, prior_version_id: str,
                            props["about"], author, created_at,
                            fields.get("basis"),
                            {k: v for k, v in props.items()
+                            # literal: shape
                             if k not in ("artifact_id", "about", "author",
                                          "created_at", "basis")})
 
@@ -323,6 +339,7 @@ def redaction_act(store: Store, version_id: str, field: str, why: str,
             version.properties[field] = "<REDACTED>"  # the tombstone
     seq = len(store.current_nodes("redaction")) + 1
     store.append_node("redaction", f"redaction:{seq}",
+                      # literal: shape
                       {"about": version_id, "field": field, "why": why,
                        "author": human_confirmation},
                       "redaction", f"kg3@redaction:{seq}")
@@ -351,6 +368,7 @@ def migrate_anchors(store: Store, selection_keys: Dict[str, str],
     latest: Dict[str, NodeVersion] = {}
     for v in store.current_nodes("description"):
         latest[v.properties["artifact_id"]] = v
+    # literal: shape
     report: Dict[str, Any] = {"candidates": 0, "migrated": 0,
                               "orphaned": [], "human_held": []}
     for artifact_id, version in sorted(latest.items()):
@@ -371,6 +389,7 @@ def migrate_anchors(store: Store, selection_keys: Dict[str, str],
             occurred_at,
             {"migration": "phase-d anchor (ADR 0077)",
              "from_version": version.identity},
+            # literal: shape
             {"text": version.properties["text"],
              "status": version.properties.get("status"),
              "anchor": {"scope": target, "content_key": key}})

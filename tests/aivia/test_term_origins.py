@@ -25,7 +25,8 @@ from aivia.flows import ask, censuses, connect, grounding
 from aivia.graph import kg3_artifacts
 from aivia.graph.read_api import ReadApi
 
-from .doubles import fake_embed, scripted_proposals
+from . import doubles
+from .doubles import recorded_embed, scripted_proposals
 from .test_ask_console import seed_vocabulary
 
 T0 = "2026-09-07T12:00:00Z"
@@ -38,8 +39,8 @@ def world():
     seed_vocabulary(store)
     read = ReadApi(store)
     index = ask.build_index(read)
-    semantic = grounding.SemanticIndex(index, fake_embed,
-                                       "fake-2k", cache_path=None)
+    semantic = grounding.SemanticIndex(index, recorded_embed,
+                                       doubles.EMBED_MODEL, cache_path=None)
     return store, semantic
 
 

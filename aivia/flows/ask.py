@@ -14,6 +14,7 @@ from aivia.graph import kg3_artifacts, phi_gate
 from aivia.lenses import ask_index, decisions
 from aivia.lenses.ask_index import _fold
 
+# literal: schema-mirror lenses.Ask_Views
 DISPLAY_MODES = ("card", "lineage", "filters", "readers", "census")
 MAX_MENTIONS = 5
 
@@ -180,15 +181,17 @@ def render_card(read, entity: Dict[str, Any]) -> str:
         lines.append(f"A computed output of {scope_key} — ask the "
                      "selection for its floor.")
     elif kind == "drift":
-        lines.append("READER/WRITER DRIFT: this name is read by the "
-                     "estate's SQL but declared by no dictionary and "
-                     "no catalog — a silently-failing report until a "
-                     "human fixes the report or the dictionary. "
-                     "Counted forever.")
+        # the literal law (E3): the drift card claim is REGISTRY
+        # text (Speech_Sources drift row Card_Text)
+        from aivia.graph import metamodel
+        lines.append(next(
+            r for r in metamodel.load("lenses").sheets["Speech_Sources"]
+            if r["Label"] == "drift name")["Card_Text"])
     elif kind == "term":
         node = next(n for n in read.nodes("term")
                     if n.identity == identity)
         lines.append(node.properties.get("definition", ""))
+    # literal: shape
     elif kind in ("condition", "parameter", "label"):
         # speech IS the card for the part-kinds (census 2): the
         # stored/rendered phrase, plus the owner chain
@@ -304,6 +307,7 @@ def render_kind_list(read, index, kind: str,
         return (f"{len(entries)} columns — too many to list flatly. "
                 "Ground a table to see its shape.")
     lines = [f"{len(entries)} {kind}(s):"]
+    # literal: shape
     lines += [f"- {n}  ({i})" if kind in ("scope", "drift",
                                           "derived column")
               else f"- {n}" for n, i in entries[:60]]
@@ -382,6 +386,7 @@ def _provisional(g: Dict[str, Any]) -> Dict[str, Any]:
     margin = response_shapes()["PROVISIONAL_MARGIN"]
     if len(cands) == 1 or (cands[0]["score"]
                            - cands[1]["score"]) >= margin:
+        # literal: shape
         return {"tier": g.get("tier"), "outcome": "matched",
                 "entity": cands[0], "mention": g["mention"],
                 "score": cands[0]["score"], "provisional": True,
@@ -395,6 +400,7 @@ def _trace(groundings: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     rendered in every round, and the audit record either way."""
     out = []
     for g in groundings:
+        # literal: shape
         row = {"mention": g.get("mention"), "tier": g.get("tier"),
                "outcome": g.get("outcome")}
         if "score" in g:
@@ -457,6 +463,7 @@ def ask(store, question: str, author: str, occurred_at: str,
     if interpretation is None:
         if interpret_fn is None:
             _usage("no-match")
+            # literal: shape
             return {"status": "form",
                     "answer": "No interpreter is available — ask "
                               "by clicking, or bring the seat back.",
@@ -465,6 +472,7 @@ def ask(store, question: str, author: str, occurred_at: str,
             raw = interpret_fn(q)
         except Exception:  # noqa: BLE001 — the seat-failure law
             _usage("no-match")
+            # literal: shape
             return {"status": "form", "seat_down": True,
                     "answer": "The interpreter seat is UNAVAILABLE "
                               "— clicks, the table, and confirmed "
@@ -474,6 +482,7 @@ def ask(store, question: str, author: str, occurred_at: str,
         interpretation = validate_interpretation(raw)
         if interpretation is None:
             _usage("no-match")
+            # literal: shape
             return {"status": "form",
                     "answer": "The interpreter's output failed "
                               "validation.",
@@ -514,6 +523,7 @@ def ask(store, question: str, author: str, occurred_at: str,
                 n = int(role.split(":")[1])
                 if not (1 <= n <= len(pool)):
                     _usage("ambiguous")
+                    # literal: shape
                     return {"status": "clarify", "mention": m,
                             "candidates": [], "hits": [],
                             "reason": f"the table holds {len(pool)}"
@@ -530,11 +540,13 @@ def ask(store, question: str, author: str, occurred_at: str,
             else:  # singular: the head of the table
                 chosen = [pool[0]]
             for e in chosen:
+                # literal: shape
                 merged.setdefault(e["identity"], {
                     "identity": e["identity"], "label": e["label"],
                     "name": e["name"], "score": 0.0,
-                    "via_card": "table"})
+                    "best_card_score": 1.0, "via_card": "table"})
                 merged[e["identity"]]["score"] += 1.0
+            # literal: shape
             trace.append({"mention": m, "tier": "table",
                           "outcome": "resolved",
                           "searched_as": m, "hits": len(chosen)})
@@ -546,6 +558,7 @@ def ask(store, question: str, author: str, occurred_at: str,
         searched_as = " ".join([m] + vocab_exp
                                + [x for x in expansions.get(m, [])
                                   if x not in vocab_exp])
+        # literal: shape
         row = {"mention": m, "tier": "search",
                "searched_as": searched_as, "hits": 0}
         if empty_table_marks and m not in references \
@@ -556,14 +569,21 @@ def ask(store, question: str, author: str, occurred_at: str,
             row["expansions_tried"] = expansions[m]
         if semantic is not None:
             try:
-                found = semantic.search(searched_as, top_k=100)
+                # the FULL index per mention — a pre-merge top-k cut
+                # silently broke the total-score law (measured
+                # 2026-09-09: the dashboard's label credit for
+                # 'reports' fell outside a 100-cut and its
+                # cross-mention sum lost it); the band applies
+                # AFTER the merge, never before
+                found = semantic.search(searched_as,
+                                        top_k=len(index) or 1)
             except Exception:  # noqa: BLE001 — seat-failure law
                 found = []
                 row["seat_down"] = True
             kept = [h for h in found if h["score"] >= floor]
             row["hits"] = len(kept)
             row["strong"] = sum(
-                1 for h in kept if h["score"]
+                1 for h in kept if h.get("best_card_score", 0)
                 >= grounding.thresholds()["MATCH_SCORE"])
             # ONE contribution per identity per mention (the index
             # may carry duplicate entries; a mention never
@@ -574,11 +594,16 @@ def ask(store, question: str, author: str, occurred_at: str,
                 if b is None or h["score"] > b["score"]:
                     best_of[h["identity"]] = h
             for h in best_of.values():
+                # literal: shape
                 cur = merged.setdefault(h["identity"], {
                     "identity": h["identity"], "label": h["label"],
                     "name": h["name"], "score": 0.0,
+                    "best_card_score": 0.0,
                     "via_card": h.get("via_card")})
                 cur["score"] += h["score"]
+                cur["best_card_score"] = max(
+                    cur.get("best_card_score", 0.0),
+                    h.get("best_card_score", 0.0))
         trace.append(row)
 
     # on-demand connection: a set-pool beside strong searched hits
@@ -586,8 +611,8 @@ def ask(store, question: str, author: str, occurred_at: str,
     if pools:
         anchors = [i for i, h in merged.items()
                    if h["via_card"] != "table"
-                   and h["score"] >= grounding.thresholds()[
-                       "MATCH_SCORE"]]
+                   and h.get("best_card_score", 0)
+                   >= grounding.thresholds()["MATCH_SCORE"]]
         if anchors:
             pool_ids = {e["identity"] for p in pools for e in p}
             for pid in list(merged):
@@ -604,13 +629,20 @@ def ask(store, question: str, author: str, occurred_at: str,
     for h in hits:
         h["score"] = round(h["score"], 4)
 
-    strong = any(h["score"] >= grounding.thresholds()["MATCH_SCORE"]
+    # MATCH is judged at CARD grain (2026-09-09, the real-physics
+    # finding): the SUM ranks, but "is anything a real match?" asks
+    # for one card at MATCH_SCORE — under real embeddings 'it'
+    # sums floor-dribbles past 0.5 on half the estate, and the
+    # honest pure-anaphor clarify died until this split
+    strong = any(h.get("best_card_score", 0)
+                 >= grounding.thresholds()["MATCH_SCORE"]
                  for h in hits)
     if empty_table_marks and not strong:
         # every road ended: reference-marked mentions, no table,
         # and the text search found nothing strong — THIS is the
         # honest "nothing to refer back to"
         _usage("ambiguous")
+        # literal: shape
         return {"status": "clarify", "mention": q,
                 "candidates": [], "hits": [],
                 "reason": "nothing to refer back to — ask a "
@@ -634,6 +666,7 @@ def ask(store, question: str, author: str, occurred_at: str,
                       f"+{added} new, -{gone} gone]\n" + answer)
     about = hits[0]["identity"] if len(hits) == 1 else None
     _usage("matched" if hits else "no-match", about)
+    # literal: shape
     result = {"status": "answer", "answer": answer, "hits": hits,
               "via": via, "context_set": new_set, "trace": trace,
               "groundings": []}

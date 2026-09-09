@@ -8,6 +8,7 @@ same graph state, same answer (M5).
 """
 from typing import Any, Dict, List
 
+# literal: schema-mirror kg2_kind_library
 OP_SYMBOL = {"COMPARE_EQ": "=", "COMPARE_NEQ": "<>", "COMPARE_GT": ">",
              "COMPARE_GTE": ">=", "COMPARE_LT": "<", "COMPARE_LTE": "<="}
 
@@ -46,6 +47,7 @@ def render_predicate(pred: Dict[str, Any]) -> str:
 
 def is_degenerate(pred: Dict[str, Any]) -> bool:
     """Both-sides-literal: every expression role is a literal."""
+    # literal: schema-mirror kg2_kind_library
     exprs = [pred.get(r) for r in ("subject", "comparand", "pattern",
                                    "lower_bound", "upper_bound")]
     exprs = [e for e in exprs if e is not None]
@@ -145,6 +147,7 @@ def lens_decisions(read, params) -> Dict[str, Any]:
             out[scope["name_key"]] = [
                 render_predicate(p) for p in membership_predicates(scope)
                 if not is_degenerate(p)]
+    # literal: shape
     return {"yield": out, "completeness": "total per tree",
             "stamp": read.stamp()}
 
@@ -156,4 +159,5 @@ def lens_degenerate(read, params) -> Dict[str, Any]:
             for p in flatten_where(scope.get("where")):
                 if is_degenerate(p):
                     out.append(f"{tree['name']} :: {render_predicate(p)}")
+    # literal: shape
     return {"yield": out, "completeness": "total", "stamp": read.stamp()}

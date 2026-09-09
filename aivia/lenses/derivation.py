@@ -13,6 +13,7 @@ a named state, no winner.
 """
 from typing import Any, Dict, List
 
+# literal: schema-mirror kg3_artifacts.Classes
 STATE_CLASSES = ("description", "term", "responsibility")
 
 
@@ -48,6 +49,7 @@ def _ownership(read, artifact_id, versions) -> str:
 def lens_ownership(read, params) -> Dict[str, Any]:
     out = {aid: _ownership(read, aid, versions)
            for aid, versions in _artifacts(read).items()}
+    # literal: shape
     return {"yield": out, "completeness": "total over artifacts",
             "stamp": read.stamp()}
 
@@ -58,12 +60,14 @@ def lens_authorship(read, params) -> Dict[str, Any]:
         for v in versions:
             key = aid if len(versions) == 1 else v.identity
             out[key] = "machine" if _is_machine(v) else "human"
+    # literal: shape
     return {"yield": out, "completeness": "total over versions",
             "stamp": read.stamp()}
 
 
 def lens_version(read, params) -> Dict[str, Any]:
     out = {aid: len(versions) for aid, versions in _artifacts(read).items()}
+    # literal: shape
     return {"yield": out, "completeness": "total over artifacts (chain "
             "depth, derived)", "stamp": read.stamp()}
 
@@ -86,8 +90,10 @@ def lens_standing(read, params) -> Dict[str, Any]:
             out[aid] = f"disagreement ({named}) — no winner; humans talk"
         else:
             ruling = rulings[-1].properties["ruling"]
+            # literal: schema-mirror kg3_artifacts.Classes ruling words
             out[aid] = {"accept": "accepted", "reject": "rejected",
                         "revoke": "revoked"}.get(ruling, "pending")
+    # literal: shape
     return {"yield": out, "completeness": "total over artifacts",
             "stamp": read.stamp()}
 
@@ -111,6 +117,7 @@ def lens_current(read, params) -> Dict[str, Any]:
                           or v.identity in accepted_ids]
             chosen = candidates[-1]
         out[aid] = {"version_id": chosen.identity, **chosen.properties}
+    # literal: shape
     return {"yield": out, "completeness": "total over artifacts",
             "stamp": read.stamp()}
 
@@ -120,6 +127,7 @@ def lens_current_outcome(read, params) -> Dict[str, Any]:
     for p in read.nodes("proposal"):
         if p.properties.get("kind") == "observed":
             out[p.properties["about"]] = p.properties["outcome"]
+    # literal: shape
     return {"yield": out, "completeness": "total over observations",
             "stamp": read.stamp()}
 
@@ -132,6 +140,7 @@ def lens_staleness(read, params) -> Dict[str, Any]:
         described.update(d.properties.get("about", []))
     stale = [n.identity for n in read.nodes("scope")
              if n.identity not in described]
+    # literal: shape
     return {"yield": sorted(stale),
             "completeness": "total over named scopes",
             "stamp": read.stamp()}

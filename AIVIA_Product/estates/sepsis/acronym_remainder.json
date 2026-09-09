@@ -1,0 +1,200 @@
+{
+ "afct": {
+  "proposed": [
+   "affect"
+  ],
+  "why_held": "'affect' is a guess"
+ },
+ "cd": {
+  "proposed": [
+   "clinical documentation"
+  ],
+  "why_held": "'clinical documentation' is a guess"
+ },
+ "dba": {
+  "proposed": [
+   "Doing Business As"
+  ],
+  "why_held": "proposed 'Doing Business As' \u2014 in a SQL estate, Database Administrator is likelier"
+ },
+ "medprob": {
+  "proposed": [
+   "Medication Problem"
+  ],
+  "why_held": "proposed 'Medication Problem' \u2014 'medical problem' is likelier"
+ },
+ "mrca": {
+  "proposed": [
+   "Methicillin-Resistant Staphylococcus Aureus"
+  ],
+  "why_held": "proposed 'Methicillin-Resistant Staphylococcus Aureus' \u2014 that is MRSA, not MRCA; unknown what MRCA is"
+ },
+ "od": {
+  "proposed": [
+   "Overdose"
+  ],
+  "why_held": "the Scribe guessed 'Overdose' \u2014 in this sepsis estate the OD-prefixed columns (ODABX, ODPRESSOR, ODPROCAL, ODSVO2...) look like sepsis ORDER/bundle elements, not overdoses; Sunny rules what OD means here"
+ },
+ "odabx": {
+  "proposed": [
+   "Overdose Antibiotics"
+  ],
+  "why_held": "see od"
+ },
+ "odcsf": {
+  "proposed": [
+   "Oligoclonal Bands in Cerebrospinal Fluid"
+  ],
+  "why_held": "see od"
+ },
+ "odcvl": {
+  "proposed": [
+   "Overdose Cardiac Vascular"
+  ],
+  "why_held": "see od"
+ },
+ "odett": {
+  "proposed": [
+   "Overdose Emergency Treatment"
+  ],
+  "why_held": "see od"
+ },
+ "odhypo": {
+  "proposed": [
+   "Overdose Hypotension"
+  ],
+  "why_held": "see od"
+ },
+ "odla": {
+  "proposed": [
+   "Overdose Laboratory Analysis"
+  ],
+  "why_held": "see od"
+ },
+ "odordset": {
+  "proposed": [
+   "Overdose Order Set"
+  ],
+  "why_held": "see od"
+ },
+ "odpiv": {
+  "proposed": [
+   "Overdose Peripheral Intravenous"
+  ],
+  "why_held": "see od"
+ },
+ "odpressor": {
+  "proposed": [
+   "Overdose Pressor"
+  ],
+  "why_held": "see od"
+ },
+ "odprocal": {
+  "proposed": [
+   "Overdose Procalcitonin"
+  ],
+  "why_held": "see od"
+ },
+ "odscore": {
+  "proposed": [
+   "Overdose Score"
+  ],
+  "why_held": "see od"
+ },
+ "odscores": {
+  "proposed": [
+   "Overdose Scores"
+  ],
+  "why_held": "see od"
+ },
+ "odsvo2": {
+  "proposed": [
+   "Overdose Saturation of Oxygen"
+  ],
+  "why_held": "see od"
+ },
+ "pr": {
+  "proposed": [
+   "Patient Reported"
+  ],
+  "why_held": "'Patient Reported' is a guess (pulse rate?)"
+ },
+ "ps": {
+  "proposed": [
+   "psychosocial"
+  ],
+  "why_held": "'psychosocial' is a guess"
+ },
+ "pta": {
+  "proposed": [
+   "physical therapy assistant"
+  ],
+  "why_held": "proposed 'physical therapy assistant' \u2014 in ED context, PTA is likely 'prior to arrival'"
+ },
+ "r": {
+  "proposed": [
+   "respiration"
+  ],
+  "why_held": "single letter \u2014 expansion cards on every R token would be noise; rule needed"
+ },
+ "rem": {
+  "proposed": [
+   "removal"
+  ],
+  "why_held": "'removal' is a guess"
+ },
+ "rv": {
+  "proposed": [
+   "relative value"
+  ],
+  "why_held": "'relative value' is weak alone"
+ },
+ "sde": {
+  "proposed": [
+   "system design engineer"
+  ],
+  "why_held": "proposed 'system design engineer' \u2014 in Epic, SDE is likely SmartData Element"
+ },
+ "ser": {
+  "proposed": [
+   "serum"
+  ],
+  "why_held": "'serum' vs 'series' \u2014 unclear"
+ },
+ "t": {
+  "proposed": [
+   "temperature"
+  ],
+  "why_held": "single letter \u2014 same noise risk"
+ },
+ "tci": {
+  "proposed": [
+   "Transcranial Magnetic Stimulation"
+  ],
+  "why_held": "proposed 'Transcranial Magnetic Stimulation' \u2014 that is TMS, not TCI"
+ },
+ "tp": {
+  "proposed": [
+   "Transfer Protocol"
+  ],
+  "why_held": "'Transfer Protocol' is a guess"
+ },
+ "trn": {
+  "proposed": [
+   "Training"
+  ],
+  "why_held": "'Training' \u2014 'transaction' is likelier in data"
+ },
+ "v": {
+  "proposed": [
+   "vital signs"
+  ],
+  "why_held": "single letter \u2014 same noise risk"
+ },
+ "wdl": {
+  "proposed": [
+   "Well-Done List"
+  ],
+  "why_held": "proposed 'Well-Done List' \u2014 clinically WDL is Within Defined Limits"
+ }
+}

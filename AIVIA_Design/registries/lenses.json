@@ -1,7 +1,7 @@
 {
  "registry": "lenses",
  "stamp": {
-  "version": "1.28.0",
+  "version": "1.30.0",
   "doc_section": "Level 2 — lenses",
   "doc_stamp": "v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 twin-graph ruling ADR 0077; v1.2.0 Phase A metamodel bump; v1.3.0 Phase B composite-kinds correction; v1.4.0 T-2 operational-statements ruling; v1.5.0 the gap taxonomy; v1.6.0 the plug-all-holes sweep; v1.7.0 ledger close; v1.8.0 the ask console ADR 0078; v1.9.0 the list op; v1.10.0 kind vocabulary; v1.11.0 ADR 0079 interpreter; v1.12.0 Tier A build data; v1.13.0 the seat-failure law; v1.14.0 follow-up context; v1.15.0 anaphor vocabulary (all 2026-09-06)",
   "ratified": true,
@@ -18,6 +18,7 @@
   "sheet Response_Shapes added (twin-graph ruling (2026-09-06), ADR 0077)",
   "sheet Degradation_Ladder added (twin-graph ruling (2026-09-06), ADR 0077)",
   "sheet Seat_Prompts added (twin-graph ruling (2026-09-06), ADR 0077)",
+  "sheet Closed_Sets added (twin-graph ruling (2026-09-06), ADR 0077)",
   "sheet Connection_Ledger added (twin-graph ruling (2026-09-06), ADR 0077)",
   "sheet Censuses added (twin-graph ruling (2026-09-06), ADR 0077)",
   "sheet Builders_and_Readings added (twin-graph ruling (2026-09-06), ADR 0077)",
@@ -213,8 +214,8 @@
    },
    {
     "Label": "file",
-    "Speech": "composed meaning STORED in the twin (translator): delivery lead + base compositions + read-tables' steward words",
-    "Meaning": "the center-law corollary — composition is building; the cause-1 corpse (self-referential delivery slice) dies here"
+    "Speech": "the node's OWN aboutness — the Scribe-drafted description artifact (THE SPEECH CONTRACT, 2026-09-09); undescribed = counted gap, NEVER the structural wall (that text lives on as _file_voicing: display + Scribe evidence only)",
+    "Meaning": "the contract's founding corpse: the old composed speech was a 4,600-char recitation of 40 upstream catalog descriptions — real physics scored it 0.312 vs its own topic"
    },
    {
     "Label": "condition (predicate)",
@@ -228,8 +229,8 @@
    },
    {
     "Label": "PBI Report",
-    "Speech": "description + displays (composed from the executed procs' twins)",
-    "Meaning": "the consumption layer — what end users actually open; label = the users' word"
+    "Speech": "aboutness (description artifact; shell description only as fallback) + displays (composed from the executed procs' twins)",
+    "Meaning": "the consumption layer; type words banned from speech by the contract — the label card carries them"
    },
    {
     "Label": "derived column",
@@ -244,7 +245,9 @@
    {
     "Label": "drift name",
     "Speech": "the standing drift sentence",
-    "Meaning": "findable by name, the search law"
+    "Meaning": "findable by name, the search law",
+    "Text": "read by the estate's sql but declared by no dictionary and no catalog — reader/writer drift, counted forever",
+    "Card_Text": "READER/WRITER DRIFT: this name is read by the estate's SQL but declared by no dictionary and no catalog — a silently-failing report until a human fixes the report or the dictionary. Counted forever."
    },
    {
     "Label": "kind (node type)",
@@ -393,6 +396,28 @@
     "Seat": "interpreter",
     "Version": "3.0.0",
     "Prompt": "You translate a question about a data estate into a PROPOSAL. Return ONLY JSON: {\"mentions\": [\"...\"], \"expansions\": {mention: [alternate phrasings]}, \"references\": {mention: role}, \"hint\": mode}. RULES. Mentions: EVERY word or phrase in the question that names or refers to something is a mention — never drop one (in 'what reports are about ED', both 'reports' and 'ED' are mentions); keep names verbatim; 1-5 mentions. Expansions: for acronyms, abbreviations, and jargon, propose full forms and synonyms as extra search strings (e.g. an acronym's spelled-out form). References: when a mention refers back to the previous answer (it, those, the first one), give its role: singular | set | ordinal:N. Hint (optional): card | lineage | filters | readers | census, only when the question asks for that view. Never answer the question; never invent names; never guess what type of thing a word means — the graph decides."
+   },
+   {
+    "Seat": "scribe",
+    "Version": "1.1.0",
+    "Prompt": "You write ONE short aboutness phrase for a database object, from the structural evidence given. Return ONLY JSON: {\"description\": \"...\"}. RULES. Say what the object is ABOUT — the business meaning of what it selects or shows. Write a NOUN PHRASE naming the content, shaped like: <clinical or business topic>, <its key aspects>, for <purpose>. NEVER start with 'This' or any opener. NEVER use filler like 'provides insights into'. Never repeat the object's name. Never name its type (no 'procedure', 'report', 'dashboard', 'table', 'file', 'selection', 'power bi'). Never recite its source tables' documentation. Under 25 words. Plain words a business user would say. Never invent facts the evidence does not show. (v1.1.0: the v1.0.0 live run opened every draft with 'This <type> provides insights into' — both bans broken; the shape requirement is the fix.)"
+   }
+  ],
+  "Closed_Sets": [
+   {
+    "Set": "_ruling",
+    "Members": "-",
+    "Cites": "THE LITERAL LAW lock 2 (ratified 2026-09-07, built 2026-09-09): every ruled closed set in code is a schema-mirror — cited here, asserted equal by test_registry_mirrors. Extending a set = a ruling = a registry bump, never a code edit alone (the USAGE_ACTIONS clarify-bug is the standing reason)."
+   },
+   {
+    "Set": "ASK_VIEWS",
+    "Members": "card|lineage|filters|readers|census",
+    "Cites": "L4-D4 display hints; Ask_Console sheet"
+   },
+   {
+    "Set": "GAP_CENSUS_KEYS",
+    "Members": "unresolved_refs|grain_not_declared|keyless_tables|undocumented_columns|unmapped_remainder|outer_join_conditions_not_voiced|unsupported_dialect_files",
+    "Cites": "kg2_kind_library.Gap_Classes (prose rows)"
    }
   ],
   "Connection_Ledger": [

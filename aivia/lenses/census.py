@@ -33,6 +33,7 @@ def _touched_tables(read) -> Set[str]:
 def lens_working_set(read, params) -> Dict[str, Any]:
     touched = _touched_tables(read)
     all_tables = {n.identity for n in read.nodes("table")}
+    # literal: shape
     return {"yield": sorted(touched),
             "not_touched": sorted(all_tables - touched),
             "completeness": "total over resolved refs",
@@ -65,6 +66,7 @@ def lens_gap_census(read, params) -> Dict[str, Any]:
                 outer_residues += sum(1 for leaf in flatten_where(jp)
                                       if not is_join_key(leaf))
     excluded = sorted(n.identity for n in read.nodes("excluded_file"))
+    # literal: schema-mirror lenses.Gap_Classes
     return {"unresolved_refs": unresolved,
             "grain_not_declared": grain_gap,
             "keyless_tables": keyless,
@@ -80,6 +82,7 @@ def lens_referenced_keys(read, params) -> Dict[str, Any]:
     for e in read.edges("joins_to"):
         dest_cols = tuple(pair[1] for pair in e.properties["on"])
         keys.setdefault(e.to_id, set()).add(dest_cols)
+    # literal: shape
     return {"yield": {t: sorted(v) for t, v in sorted(keys.items())},
             "completeness": "total over referenced tables",
             "stamp": read.stamp()}

@@ -27,7 +27,8 @@ import pytest
 
 from aivia.graph.read_api import ReadApi
 
-from .doubles import fake_embed
+from . import doubles
+from .doubles import recorded_embed
 
 T0 = "2026-09-07T12:00:00Z"
 
@@ -39,8 +40,8 @@ def surface():
     store, _ = console.build_store("sepsis")
     read = ReadApi(store)
     index = ask.build_index(read)
-    semantic = grounding.SemanticIndex(index, fake_embed,
-                                       "fake-2k", cache_path=None)
+    semantic = grounding.SemanticIndex(index, recorded_embed,
+                                       doubles.EMBED_MODEL, cache_path=None)
     calls = []
 
     def recording_interpreter(question):

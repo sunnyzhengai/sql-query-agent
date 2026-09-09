@@ -16,11 +16,18 @@ from aivia.graph import metamodel
 from aivia.lenses import ask_index, decisions
 from aivia.lenses.ask_index import _fold, _tokens, _words
 
-DRIFT_SENTENCE = ("read by the estate's sql but declared by no "
-                  "dictionary and no catalog — reader/writer drift, "
-                  "counted forever")
+
+def drift_sentence() -> str:
+    """The literal law (E3): the drift speech is REGISTRY text
+    (Speech_Sources drift row) — claim words never live in code."""
+    from aivia.graph import metamodel
+    row = next(r for r in metamodel.load("lenses")
+               .sheets["Speech_Sources"]
+               if r["Label"] == "drift name")
+    return row["Text"]
 
 # entry kind -> Speech_Sources sheet kind (the closed assignment)
+# literal: shape
 SHEET_KINDS = {
     "table": "table", "column": "column",
     "scope": "scope (selection)", "file": "file",
@@ -55,10 +62,13 @@ def _condition_phrase(read, tree, scope, i: int) -> str:
     return (produce._voice_predicate(preds[i], voice) or "").lower()
 
 
-def _file_speech(read, identity: str) -> str:
+def _file_voicing(read, identity: str) -> str:
     """Delivery lead (grammar render) + the twin's STORED subject —
-    the composed meaning the translator built (center-law corollary;
-    the cause-1 corpse dies here)."""
+    the node's structural ANATOMY. Since the speech contract
+    (2026-09-09) this is EVIDENCE for the Scribe and display text,
+    NEVER the search speech: a 4,600-char recitation of upstream
+    catalog text embeds as being about nothing (the ED-file
+    corpse)."""
     lead = produce.file_words(read, identity)
     subject = ""
     for n in read.nodes("meaning_twin"):
@@ -69,6 +79,15 @@ def _file_speech(read, identity: str) -> str:
             subject = twin.get("subject", "")
             break
     return f"{lead} {subject}".strip().lower()
+
+
+def _aboutness(read, identity: str) -> str:
+    """The node's own description artifact (kg3), when one exists —
+    THE speech under the contract."""
+    for n in read.nodes("description"):
+        if identity in (n.properties.get("about") or []):
+            return (n.properties.get("text") or "").strip().lower()
+    return ""
 
 
 def speak(read, entry: Dict[str, Any]) -> str:
@@ -85,7 +104,11 @@ def speak(read, entry: Dict[str, Any]) -> str:
             return ""
         return produce._scope_lead(read, tree, scope).lower()
     if kind == "file":
-        return _file_speech(read, identity)
+        # THE SPEECH CONTRACT: a file speaks its OWN aboutness (the
+        # Scribe-drafted description) or NOTHING — a counted gap,
+        # never the structural wall (that stays as _file_voicing
+        # for display/evidence)
+        return _aboutness(read, identity)
     if kind == "condition":
         scope_key, tag = identity.rsplit("::c", 1)
         tree, scope = _tree_and_scope(read, scope_key)
@@ -104,7 +127,12 @@ def speak(read, entry: Dict[str, Any]) -> str:
     if kind == "PBI Report":
         node = next(n for n in read.nodes("PBI Report")
                     if n.identity == identity)
-        desc = (node.properties.get("description") or "").lower()
+        # contract: the Scribe's aboutness overrides the shell
+        # description (which carries type words — "power bi report
+        # over..." paid type-shaped mentions twice, measured
+        # 2026-09-09); displays are the node's own parts and stay
+        desc = _aboutness(read, identity) \
+            or (node.properties.get("description") or "").lower()
         disp = node.properties.get("displays") or []
         return (desc + (" displays: " + ", ".join(
             _words(d) for d in disp) if disp else "")).strip()
@@ -113,7 +141,7 @@ def speak(read, entry: Dict[str, Any]) -> str:
                     if n.identity == identity)
         return (node.properties.get("definition") or "").lower()
     if kind == "drift":
-        return DRIFT_SENTENCE
+        return drift_sentence()
     return ""
 
 
@@ -145,6 +173,7 @@ def entries(read) -> List[Dict[str, Any]]:
         e["words"] = speak(read, e)
 
     def add(kind, identity, name, owner):
+        # literal: shape
         entry = {"label": kind, "identity": identity, "name": name,
                  "folded": _fold(name), "owner": owner, "words": ""}
         entry["words"] = speak(read, entry)

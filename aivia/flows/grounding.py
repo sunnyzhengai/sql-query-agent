@@ -126,19 +126,26 @@ class SemanticIndex:
         for entry, slots in zip(self.entries, self.cards):
             if kind is not None and entry["label"] != kind:
                 continue
-            total, via = 0.0, []
+            total, best, via = 0.0, 0.0, []
             for cname, vec in slots:
                 dot = sum(a * b for a, b in zip(query, vec))
                 vn = math.sqrt(sum(v * v for v in vec)) or 1.0
                 sc = dot / (qn * vn)
+                best = max(best, sc)
                 if sc >= floor:
                     total += sc
                     via.append(cname)
             if total > 0:
-                scored.append((total, "+".join(via), entry))
-        scored.sort(key=lambda t: (-t[0], t[2]["identity"]))
-        return [{"score": round(s, 4), "via_card": c, **e}
-                for s, c, e in scored[:top_k]]
+                scored.append((total, best, "+".join(via), entry))
+        scored.sort(key=lambda t: (-t[0], t[3]["identity"]))
+        # score = the SUM (ranking, the total-score law);
+        # best_card_score = the strongest SINGLE cosine — MATCH is
+        # judged at this grain (real physics: three floor-crossing
+        # dribbles are not one real match)
+        # literal: shape
+        return [{"score": round(s, 4),
+                 "best_card_score": round(b, 4), "via_card": c, **e}
+                for s, b, c, e in scored[:top_k]]
 
 
 def _segments(text: str) -> List[str]:
@@ -178,6 +185,7 @@ def ground(mention: str, index: List[Dict[str, Any]],
         roles = [role]
         words = [_fold(w) for w in mention.split()]
         if not context:
+            # literal: shape
             return {"tier": "anaphor", "outcome": "clarify-context",
                     "mention": mention,
                     "reason": "nothing to refer back to — ask a "
@@ -190,39 +198,48 @@ def ground(mention: str, index: List[Dict[str, Any]],
                         if r.startswith("ordinal:")), None)
         if ordinal is not None:
             if 1 <= ordinal <= len(pool):
+                # literal: shape
                 return {"tier": "anaphor", "outcome": "matched",
                         "entity": pool[ordinal - 1],
                         "mention": mention}
+            # literal: shape
             return {"tier": "anaphor", "outcome": "clarify-context",
                     "mention": mention,
                     "reason": f"the context holds {len(pool)} "
                               f"item(s); '{mention}' points past it"}
         if "set" in roles:
+            # literal: shape
             return {"tier": "anaphor", "outcome": "set",
                     "entities": pool, "mention": mention}
         # singular: the HEAD of the ordered context set is the
         # subject of the last answer — 'it' means that, always
         if pool:
+            # literal: shape
             return {"tier": "anaphor", "outcome": "matched",
                     "entity": pool[0], "mention": mention}
+        # literal: shape
         return {"tier": "anaphor", "outcome": "clarify-context",
                 "mention": mention,
                 "reason": "the context holds nothing to refer back "
                           "to of that kind"}
     kind = kind_words.get(wanted)
     if kind:
+        # literal: shape
         return {"tier": "label", "outcome": "label", "label": kind,
                 "mention": mention}
     by_identity = [e for e in index if _fold(e["identity"]) == wanted]
     if by_identity:
+        # literal: shape
         return {"tier": "exact-identity", "outcome": "matched",
                 "entity": by_identity[0], "mention": mention}
     exact = [e for e in index if e["folded"] == wanted]
     identities = {(e["label"], e["identity"]) for e in exact}
     if len(identities) == 1:
+        # literal: shape
         return {"tier": "exact-name", "outcome": "matched",
                 "entity": exact[0], "mention": mention}
     if exact:
+        # literal: shape
         return {"tier": "exact-name", "outcome": "candidates",
                 "candidates": exact[:TOP_K], "mention": mention}
     # TIER — PATH (live find #8): a mention equal to a whole trailing
@@ -238,9 +255,11 @@ def ground(mention: str, index: List[Dict[str, Any]],
                 == want_segs]
         hit_ids = {(e["label"], e["identity"]) for e in hits}
         if len(hit_ids) == 1:
+            # literal: shape
             return {"tier": "path", "outcome": "matched",
                     "entity": hits[0], "mention": mention}
         if hits:
+            # literal: shape
             return {"tier": "path", "outcome": "candidates",
                     "candidates": hits[:TOP_K], "mention": mention}
     # TIER — NAME TOKENS (the dig's ratified walk: "ED Sepsis" ->
@@ -259,9 +278,11 @@ def ground(mention: str, index: List[Dict[str, Any]],
             scored = [{"score": sc, **e} for sc, e in hits[:TOP_K]]
             ids = {(e["label"], e["identity"]) for _, e in hits}
             if len(ids) == 1:
+                # literal: shape
                 return {"tier": "name-token", "outcome": "matched",
                         "entity": scored[0], "mention": mention,
                         "score": scored[0]["score"]}
+            # literal: shape
             return {"tier": "name-token", "outcome": "candidates",
                     "candidates": scored, "mention": mention}
     if semantic is not None:
@@ -271,6 +292,7 @@ def ground(mention: str, index: List[Dict[str, Any]],
         except Exception:  # noqa: BLE001 — the seat-failure law: an
             # embed failure downgrades the SEMANTIC tier only; the
             # deterministic tiers above already had their chance
+            # literal: shape
             return {"tier": "none", "outcome": "unknown",
                     "mention": mention, "seat_down": True,
                     "nearest": []}
@@ -289,15 +311,19 @@ def ground(mention: str, index: List[Dict[str, Any]],
             if top.get("label") == "label":
                 # a node-type grounded by meaning (ADR 0080: kinds
                 # are searchable nodes)
+                # literal: shape
                 return {"tier": "semantic", "outcome": "label",
                         "label": top["name"], "mention": mention,
                         "score": top["score"]}
+            # literal: shape
             return {"tier": "semantic", "outcome": "matched",
                     "entity": top, "mention": mention,
                     "score": top["score"]}
         if floor_hits:
+            # literal: shape
             return {"tier": "semantic", "outcome": "candidates",
                     "candidates": floor_hits, "mention": mention}
+    # literal: shape
     return {"tier": "none", "outcome": "unknown", "mention": mention,
             "nearest": [e for e in index
                         if wanted[:4] and wanted[:4] in e["folded"]][:6]}

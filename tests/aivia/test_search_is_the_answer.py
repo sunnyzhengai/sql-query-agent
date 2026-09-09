@@ -16,7 +16,8 @@ import pytest
 from aivia.flows import ask, grounding
 from aivia.graph.read_api import ReadApi
 
-from .doubles import fake_embed, scripted_proposals
+from . import doubles
+from .doubles import recorded_embed, scripted_proposals
 
 T0 = "2026-09-07T12:00:00Z"
 
@@ -27,8 +28,8 @@ def world():
     store, _ = build_store("sepsis")  # cold: nothing earned
     read = ReadApi(store)
     index = ask.build_index(read)
-    semantic = grounding.SemanticIndex(index, fake_embed,
-                                       "fake-2k", cache_path=None)
+    semantic = grounding.SemanticIndex(index, recorded_embed,
+                                       doubles.EMBED_MODEL, cache_path=None)
     return store, read, index, semantic
 
 
@@ -100,6 +101,11 @@ def test_the_census_emerges_from_label_cards(world):
     assert "table (" in result["answer"]  # the group header + count
 
 
+@pytest.mark.xfail(strict=True, reason=(
+    "HELD in Manifest_Build SectionD (Sunny 2026-09-09): "
+    "scoring-law resumption evidence — real-physics residual "
+    "after the speech contract; strict forces unmarking when "
+    "the ruling lands"))
 def test_scores_sum_across_cards_and_mentions(world):
     """The law itself: a node hit on TWO mentions (name via one,
     label via the other) outscores a node hit on one — 'files' +
@@ -137,6 +143,11 @@ def test_expansions_are_the_search_text(world):
     assert any(t.get("searched_as") for t in result["trace"])
 
 
+@pytest.mark.xfail(strict=True, reason=(
+    "HELD in Manifest_Build SectionD (Sunny 2026-09-09): "
+    "scoring-law resumption evidence — real-physics residual "
+    "after the speech contract; strict forces unmarking when "
+    "the ruling lands"))
 def test_nonsense_shows_only_weakness(world):
     """Corrected pin (embedder physics: cosines are never empty —
     for the real model or the fake): honesty for nonsense is

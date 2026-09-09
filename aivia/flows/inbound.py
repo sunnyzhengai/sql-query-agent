@@ -110,6 +110,7 @@ def write_intake_result_tables(out_dir, reg, extract_reports,
             row["files"].add(fname)
     sources_to_load: Dict[str, Dict[str, Any]] = {}
     sheets["unresolved_references"] = [
+        # literal: frame
         ["reference", "kind", "occurrences", "diagnosis", "files"]]
     for ref in sorted(unresolved, key=lambda r: -unresolved[r]["n"]):
         row = unresolved[ref]
@@ -139,6 +140,7 @@ def write_intake_result_tables(out_dir, reg, extract_reports,
             [ref, row["kind"], str(row["n"]), diagnosis,
              "; ".join(sorted(row["files"]))])
     sheets["sources_to_load"] = [
+        # literal: frame
         ["schema / source", "missing tables", "references",
          "recommendation"]]
     for schema in sorted(sources_to_load,
@@ -303,6 +305,7 @@ def receive_pbi(store, pbi_dir) -> int:
             displays += displays_of(rel)
         store.append_node(
             "PBI Report", f"pbi://sepsis/{slug}",
+            # literal: shape
             {"name": row["name"],
              "description": row["description"],
              "displays": displays, "executes": executes,
@@ -310,3 +313,22 @@ def receive_pbi(store, pbi_dir) -> int:
             manifest["as_of"], f"pbi@{manifest['as_of']}")
         n += 1
     return n
+
+
+def receive_descriptions(store, path) -> int:
+    """E1 estate-data loading: the Scribe's committed drafts
+    (descriptions.json) land as kg3 description artifacts at boot —
+    machine-authored, 'drafted', basis-stamped. Estate data, not a
+    journal act: every boot (test or prod) speaks the same
+    aboutness; blessing is a later human act in the journal."""
+    import json as _json
+    import pathlib as _pl
+
+    from aivia.flows import describe as _describe
+    path = _pl.Path(path)
+    if not path.is_file():
+        return 0
+    data = _json.loads(path.read_text())
+    return _describe.land(store, data["descriptions"],
+                          basis=data["basis"],
+                          created_at=data["created_at"])
