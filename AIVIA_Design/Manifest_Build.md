@@ -160,29 +160,38 @@ shell. descriptions.json = 28 file drafts only.
 | the shape census as FAILURE GATES (battery #13) | BUILT | test_shape_census.py — Q1 `MATCH (n) RETURN labels(n), count(*)` == PRESENT rows both directions; Q2 description obligations per label; Q3 `MATCH ()-[r]->() RETURN type(r), count(*)` == PRESENT edge rows; TARGET rows are visible counted debt that flips at landing; 4 pins green |
 | THE MATERIALIZATION BUILD | PLANNED as §E5 below (Sunny's batch ruling 2026-09-09) | small verifiable batches; Sunny's GQL on Fabric Graph gates every batch |
 
-## Section E5 — THE MATERIALIZATION PLAN (ruled 2026-09-09: no Neo4j
-— Microsoft Marketplace offering, Sunny's Fabric capacity; small
-batches; every batch ends with Sunny's OWN GQL verification on
-Fabric Graph plus the visualization page)
+## Section E5 — THE MATERIALIZATION PLAN (re-laddered 2026-09-10,
+Sunny's top-down ruling: descriptions GENERATE bottom-up in the
+twin — the ratified composition law — and batches SHIP top-down so
+every layer attaches to a verified parent; the composition itself
+becomes a per-batch GQL check: a parent's stored description must
+contain its newly-arrived children's words)
 
-**The batch law:** each batch = build → my tests green (suite +
-shape census + export-mirror) → I report DONE → Sunny runs the
-batch's GQL in Fabric Graph → the visualization artifact
-(regenerated FROM the export tables, same URL) → Sunny verifies
-there → the next batch opens. A batch never grows past one node
-family. Shape_Ledger rows flip in the same commit as their build.
+**The batch law:** build → my tests green (suite + shape census +
+export-mirror) → I report DONE with the gate queries → Sunny loads
+(or grants a push) + ONE refresh → Sunny's GQL gate → the batch's
+closing COMMIT lands in this table. No Fabric operation without
+Sunny's explicit go (his capacity, his hand). No Neo4j — Fabric
+Graph on Sunny's capacity is the verification surface.
 
-| # | batch | build content | my check | Sunny's GQL gate |
+| batch | ships | ties into | status | commit |
 |---|---|---|---|---|
-| M1 | the verification surface + the technical layer | the Fabric Graph export reading (store → camelCase node/edge tables, KG1 labels only: db, schema, table, column + contains; descriptions ride as properties) + the plain-numbered load runbook for Sunny's tenant + the viz page reads the SAME export | export counts == store counts (Q1/Q3 mirror test) | `MATCH (n) RETURN labels(n), count(*)` == 1 db / 3 schema / 90 table / 4554 column; spot-check a table's description property |
-| M2 | statements | statement nodes minted from the tree blob (one per statement, grammar-rendered description STORED) + file-contains->statement edges; Shape_Ledger statement row flips PRESENT | shape census green with the flip; verbatim law: stored text == grammar recompute | count(statement) == the trees' statement total; `MATCH (f:file)-[:contains]->(s:statement)` covers every statement; read 3 descriptions |
-| M3 | scope descriptions + spine | scope nodes gain stored description (rendered lead) + statement-contains->scope edges; ledger scope-description flips | census + verbatim green | every scope has description; `MATCH (st:statement)-[:contains]->(sc:scope)` total == 312 |
-| M4 | conditions + parameters | nodes minted from twin facts (voiced description stored) + scope-contains-> edges; ledger rows flip | census green; condition count == twin condition facts | counts match; descriptions read as plain English; orphan check: none without a contains parent |
-| M5 | derived columns | same pattern off the projections | same | same shape checks |
-| M6 | resolves_to edges | the twin's draws_from/resolved facts become real edges to KG1 (scope/condition/source grain -> table/column); ledger edge row flips | census green; edge count == resolvable twin facts, unresolved stay COUNTED | the lineage payoff: `MATCH (f:file)-[:contains*]->()-[:resolves_to]->(t:table)` walks proc->table lineage in pure GQL |
-| M7 | file descriptions on-node + governance layer in export | blessed/drafted Scribe text lands as the file node's description property (attribution kept in the artifact); export gains KG3 + consumption labels (description, PBI Report, acronym, person, usage...) | census green (file description obligation flips) | file 28/28 descriptions; `MATCH (r:\`PBI Report\`)-[:executes]->(f:file)` 1:1 shape + the single 2-proc dashboard |
-| M8 | close | all TARGET rows PRESENT; full suite + live tier; the viz page final; runbook stamped | everything green | Sunny's full Q1/Q2/Q3 == the ledger with zero TARGET rows |
+| M1 | technical layer: db · db_schema · table · column + has_part ×3 (parquet export, loader, runbook, reserved-word gate) | — | **VERIFIED by Sunny's GQL 2026-09-10** (db 1 · db_schema 3 · table 90 · column 4554 · 4647 has_part · corpse quotes intact) | 1a2e212 → 6d6f4dc |
+| M2 | file ×28 + drafted descriptions (descriptionStatus: drafted — Sunny's gap-check surface) + reads→table | the verified technical layer | IN BUILD | — |
+| M3 | statement + stored grammar descriptions (R11) + file has_part spine | M2 | queued | — |
+| M4 | scope descriptions STORED + statement has_part spine | M3 | queued | — |
+| M5 | condition + param + stored voiced phrases + scope has_part | M4 | queued | — |
+| M6 | derived_column | M4 | queued | — |
+| M7 | resolves_to — lineage closes into column/table; proc→table walkable in pure GQL | M5 ↔ M1 | queued | — |
+| M8 | governance + consumption: pbi_report · description artifacts · acronym · person/agent · executes/describes/performed_by; blessing lands file descriptions ON the store node; zero TARGET rows; final viz | everything | queued | — |
 
+Decisions ruled 2026-09-10: statement identity = <file>::stmt/<position>;
+statement descriptions = Grammar_Floor R11 (suite-first, Sunny
+gap-checks phrasing); statements/scopes stay OUT of the chatbot
+search index until §D resumes (declared ruled-silent, landing
+noted — materialization never entangles the held scoring work);
+file descriptions ride the EXPORT as properties now, land on the
+STORE node at blessing (M8).
 
 ## Section D — the open queue [ON HOLD — Sunny's ruling 2026-09-09: the engine gaps (§E) come first; this list resumes after]
 

@@ -54,6 +54,44 @@ def _node_row(n) -> Dict[str, str]:
     return row
 
 
+def _file_tables(read: ReadApi,
+                 adj) -> Dict[str, List[Dict[str, str]]]:
+    """M2 (the top-down ruling): file nodes with their DRAFTED
+    aboutness as the description property (descriptionStatus keeps
+    the attribution visible until Sunny's blessing lands it on the
+    store node, M8) + file—reads→table derived from the scopes'
+    resolved reads (scope grain in the store; file grain here)."""
+    about, status = {}, {}
+    for n in read.nodes("description"):
+        for t in n.properties.get("about") or []:
+            about[t] = n.properties.get("description") or ""
+            status[t] = n.properties.get("status") or ""
+    rows = []
+    table_ids = {n.identity for n in read.nodes("table")}
+    reads_pairs = set()
+    for n in sorted(read.nodes("file"), key=lambda x: x.identity):
+        ident = n.identity
+        base = ident.rsplit("/", 1)[-1]
+            # literal: shape
+        rows.append({
+            "nodeId": ident,
+            "name": base[:-4] if base.endswith(".sql") else base,
+            "description": about.get(ident, ""),
+            "descriptionStatus": status.get(ident, ""),
+            "dialect": str(n.properties.get("dialect") or ""),
+            "textHash": str(n.properties.get("text_hash") or "")})
+        for scope, lbl in adj.get(ident, []):
+            if lbl != "has_part":
+                continue
+            for target, elbl in adj.get(scope, []):
+                if elbl == "reads" and target in table_ids:
+                    reads_pairs.add((ident, target))
+    return {"graph_file": rows,
+            "graph_reads_fileTable": [
+                {"sourceId": s_, "targetId": t_}
+                for s_, t_ in sorted(reads_pairs)]}
+
+
 def export_tables(read: ReadApi,
                   labels: Optional[Tuple[str, ...]] = None
                   ) -> Dict[str, List[Dict[str, str]]]:
@@ -78,6 +116,7 @@ def export_tables(read: ReadApi,
                 pairs.setdefault(f"graph_has_part_{pair}", []).append(
                     {"sourceId": src, "targetId": tgt})
     tables.update(pairs)
+    tables.update(_file_tables(read, adj))
     return tables
 
 

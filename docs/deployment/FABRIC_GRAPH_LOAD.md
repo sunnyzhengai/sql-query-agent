@@ -106,6 +106,38 @@ Source dropdowns, dead bindings, M1 lost a day to it). RULED: one
 namespace — everything targets `Tables/dbo/`; the loader now does.
 Root-level graph_* tables must never exist; delete on sight.
 
+## M2 — the file layer (top-down ruling, 2026-09-10)
+
+Two new tables: `graph_file` (28 rows — name, description = the
+Scribe's DRAFTED aboutness, descriptionStatus, dialect, textHash)
+and `graph_reads_fileTable` (243 edges, derived from the scopes'
+resolved reads at file grain).
+
+Load: upload both parquet → Load to Tables (New table, into dbo)
+→ in the graph model: Get data (add the two) → Add node `file` ←
+graph_file, key `nodeId`, all properties → Add edge `reads`,
+file → table, via graph_reads_fileTable (sourceId → targetId) →
+Save → ONE refresh.
+
+THE M2 GATE:
+```gql
+MATCH (f:file) RETURN count(f) AS cnt
+```
+Expected: 28.
+```gql
+MATCH (f:file)-[:reads]->(t:table) RETURN count(*) AS cnt
+```
+Expected: 243.
+```gql
+MATCH (f:file WHERE f.name = 'USP_ED_SEPSIS')-[:reads]->(t:table)
+RETURN t.name AS tableName ORDER BY tableName
+```
+Expected: the ED proc's read set, ED_ENCOUNTERS_DM among them.
+```gql
+MATCH (f:file) RETURN f.name AS proc, f.description AS aboutness, f.descriptionStatus AS st ORDER BY proc
+```
+The 28 drafted descriptions — Sunny's standing gap-check surface.
+
 ## Per-batch refresh (M2 and on)
 
 1. Pull the branch; re-run the export command (step 2).

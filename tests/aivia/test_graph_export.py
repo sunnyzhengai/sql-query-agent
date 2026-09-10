@@ -40,7 +40,8 @@ def test_camel_case_columns_and_node_id_key(world):
         assert rows, f"{name} is empty"
         for col in rows[0]:
             assert "_" not in col, f"{name}.{col} is not camelCase"
-        if not name.startswith("graph_has_part"):
+        if not (name.startswith("graph_has_part")
+                    or name.startswith("graph_reads")):
             assert "nodeId" in rows[0]
             ids = [r["nodeId"] for r in rows]
             assert len(ids) == len(set(ids)), f"{name}: dup nodeIds"
@@ -87,6 +88,36 @@ def test_parquet_write_is_deterministic_and_lossless(tmp_path, world):
     victim = next(r for r in cols
                   if r["name"] == "WRONG_MED_ALT_CNT")
     assert '"NDC Not Part of Order"' in victim["description"]
+
+
+# ---- M2: the file layer (top-down ruling, 2026-09-10) ---------------
+def test_file_rows_carry_drafted_aboutness(world):
+    read, tables = world
+    rows = tables["graph_file"]
+    assert len(rows) == len(read.nodes("file"))
+    for r in rows:
+        assert r["description"], f"{r['nodeId']}: empty description"
+        assert r["descriptionStatus"] == "drafted"
+        assert not r["name"].endswith(".sql")
+    names = {r["name"] for r in rows}
+    assert "USP_ED_SEPSIS" in names
+
+
+def test_file_reads_table_edges_derive_from_scopes(world):
+    read, tables = world
+    edges = tables["graph_reads_fileTable"]
+    files = {r["nodeId"] for r in tables["graph_file"]}
+    table_ids = {n.identity for n in read.nodes("table")}
+    assert edges
+    for e in edges:
+        assert e["sourceId"] in files
+        assert e["targetId"] in table_ids
+    # the deciding example: the ED proc reads the ED data mart
+    assert {"sourceId": "repo://sepsis-corpus/reporting/USP_ED_SEPSIS.sql",
+            "targetId": "emr|dbo|ED_ENCOUNTERS_DM"} in edges
+    # one edge per (file, table) — deduped
+    pairs = [(e["sourceId"], e["targetId"]) for e in edges]
+    assert len(pairs) == len(set(pairs))
 
 
 # ---- THE RESERVED-WORD GATE (Sunny 2026-09-09: 'let's replace
