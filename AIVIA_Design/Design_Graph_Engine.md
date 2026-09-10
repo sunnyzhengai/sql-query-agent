@@ -113,7 +113,9 @@ the vendored-list gate stands):
 
 - technical: `db · db_schema · table · column`
 - logic: `file · statement · scope · condition · param ·
-  derived_column`
+  derived_column · join` (join ADDED 2026-09-10, Sunny's
+  hand-drawn ruling; label gate-checked — JOIN is SQL-reserved,
+  not ISO-GQL-reserved)
 - consumption: `pbi_report`
 - governance: `description · term · usage · disposition ·
   proposal · acronym · person · agent · role` (+ `drift`)
@@ -123,17 +125,37 @@ the vendored-list gate stands):
 contentKey (meaning identity — the drift anchor) · label-specific
 properties.
 
-**Edge vocabulary:** containment `has_part` (db→db_schema→table→
-column; file→statement→scope→condition/param); `reads`
-(scope→table, true grain); `joins_to` (table→table, DECLARED —
-dictionary truth, with key columns); `resolves_to`
-(condition→column — OBSERVED logic; the declared-vs-observed diff
-is a pure GQL query and IS the documentation-drift product
-story); `cites` (scope→column outputs); `uses_param`;
-consumption `executes`; governance `describes / performed_by /
-approved_by / used_by / supersedes / assigns`. Clause provenance
-(`where` vs `join_on`) is a property on condition nodes — clause
-containers are syntax, not meaning, and are not nodes.
+**Edge vocabulary** (AMENDED 2026-09-10 — THE JOIN-NODE RULING,
+Sunny's hand-drawn graph): containment `has_part` (db→db_schema→
+table→column; file→statement→scope→condition/param/join;
+join→condition — the ON predicate's home); `reads` (scope→table,
+true grain); `joins_to` (table→table, DECLARED — dictionary
+truth, with key columns; NEVER written by observation — the
+observed side lives on join nodes, so the declared edge's
+integrity is preserved: one edge name, one authority);
+`left_side` / `right_side` (join→table-or-scope — the OBSERVED
+pair. Names ruled 2026-09-10: bare LEFT/RIGHT are ISO-GQL
+reserved, gate-checked. PAIR SEMANTICS ruled same day: the two
+targets are the tables the ON condition's columns RESOLVE to —
+the same grain as declared joins_to — with side assignment
+following the syntactic operand order so outer-join semantics
+survive; an ON touching 3+ tables is a counted case; a side may
+be a SCOPE — a CTE/#temp join, same target set as table_ref
+resolution); `resolves_to` (condition→column — OBSERVED logic);
+the declared-vs-observed diff is now DIRECT and pure GQL: every
+join node's (left_side, right_side) table pair carries a declared
+`joins_to` or is a compliance finding — the documentation-drift
+product story (scope-sided joins excluded by construction);
+`cites` (scope→column outputs); `uses_param`; consumption
+`executes`; governance `describes / performed_by / approved_by /
+used_by / supersedes / assigns`. Clause provenance as a STORED
+PROPERTY RETIRES (superseded 2026-09-10): parentage carries it —
+a condition under a join IS a join condition, under the scope a
+where condition; derivable is never stored. Clause CONTAINERS
+(WHERE, FROM as syntax boxes) remain non-nodes; the join is not a
+container — it is relational meaning: which pair combines, how
+(`joinType` property: inner | left_outer | right_outer |
+full_outer | cross), and by what predicate.
 
 **THE ENGLISH LADDER (amended by Sunny's readability challenge,
 2026-09-10):** every node ALWAYS keeps its deterministic render —
@@ -177,6 +199,14 @@ for this layer and re-derives its index from L3 at convergence.
 ---
 
 ## The laws carried forward from v1 (storage-independent, all kept)
+
+[registry stamps: kg1_technical v1.36.0 · kg2_logic v1.36.0 ·
+kg2_kind_library v1.36.0 · kg3_artifacts v1.36.0 ·
+kg4_concepts v1.36.0 · flows v1.36.0 · lenses v1.37.0]
+(stamp block restored 2026-09-10 — the ratification rename dropped
+v1's per-section stamps; RG-A2 caught it same day. One block here,
+the same-breath rule mechanical again; registries carry their own
+section provenance.)
 
 Conservation (handled ⊎ counted == everything) · meaning-identity
 anchoring (contentKeys → drift) · the voicing grammar (registry-
