@@ -19,11 +19,11 @@ the tables and re-run that batch's gate.)*
    **`AIVIA_GRAPH`**. (Dedicated — batch refreshes are
    drop-and-reload; nothing else lives here.)
 2. On your machine the export files are in
-   `AIVIA_Product/estates/sepsis/graph_export/` — 7 CSVs.
+   `AIVIA_Product/estates/sepsis/graph_export/` — 7 Parquet files.
    (Regenerate any time:
    `python3.11 -m aivia.flows.export_graph sepsis`)
 3. Open `AIVIA_GRAPH` → **Files** → **Upload files** → select all
-   7 CSVs.
+   7 Parquet files.
 4. For each of the 7 files: right-click → **Load to Tables** →
    **New table** → keep the file's name (`graph_db`,
    `graph_db_schema`, `graph_table`, `graph_column`,
@@ -43,6 +43,16 @@ the tables and re-run that batch's gate.)*
    - db_schema → table via graph_has_part_schemaTable
    - table → column via graph_has_part_tableColumn
 8. Save / build the model, open the **query** experience.
+
+## Why Parquet, never CSV (the missing-86 corpse, 2026-09-09)
+
+Fabric's Load-to-Tables mis-parsed standard CSV quote-escaping:
+every column whose steward description contained double-quotes
+("Y"/"N", "NDC Expired", ...) loaded as NULL — 3 nodes and ~86
+edges silently vanished at graph refresh. Sunny's per-table GQL
+diff against the export truth found them. Parquet has no parsing
+layer; the corpse row (WRONG_MED_ALT_CNT) is pinned round-trip
+byte-perfect in test_graph_export.
 
 ## Dialect rules (learned live 2026-09-09, Sunny's first run)
 

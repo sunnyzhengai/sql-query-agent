@@ -11,8 +11,6 @@ equalities Sunny will run in GQL are pinned here first.
 
 Proves: contract:aivia-design-to-code
 """
-import csv
-
 import pytest
 
 from aivia.flows import connect, export_graph
@@ -73,15 +71,22 @@ def test_contains_edges_split_per_pair_and_mirror_the_store(world):
     assert exported == store_contains
 
 
-def test_csv_write_is_deterministic(tmp_path, world):
+def test_parquet_write_is_deterministic_and_lossless(tmp_path, world):
+    """Parquet by corpse (2026-09-09): CSV quote-escaping broke
+    Fabric's loader — quote-bearing descriptions loaded NULL and
+    their nodes/edges vanished. Parquet round-trips VERBATIM."""
+    import pyarrow.parquet as pq
     _read, tables = world
     a, b = tmp_path / "a", tmp_path / "b"
-    export_graph.write_csvs(tables, a)
-    export_graph.write_csvs(tables, b)
+    export_graph.write_parquet(tables, a)
+    export_graph.write_parquet(tables, b)
     for f in sorted(a.iterdir()):
         assert f.read_bytes() == (b / f.name).read_bytes()
-        with open(f, newline="") as fh:
-            assert csv.reader(fh)  # parseable
+    # the corpse row survives byte-perfect, quotes and all
+    cols = pq.read_table(a / "graph_column.parquet").to_pylist()
+    victim = next(r for r in cols
+                  if r["name"] == "WRONG_MED_ALT_CNT")
+    assert '"NDC Not Part of Order"' in victim["description"]
 
 
 # ---- THE RESERVED-WORD GATE (Sunny 2026-09-09: 'let's replace

@@ -41,6 +41,12 @@ dev = [
     # Slice 0 (2026-09-05): tests/aivia rerun the registry converter to
     # prove determinism; the converter reads the design xlsx workbooks
     "openpyxl==3.1.5",
+    # M1 (2026-09-09): the graph export ships PARQUET — Fabric's
+    # Load-to-Tables mis-parsed standard CSV quote-escaping (the
+    # missing-86 corpse); pyarrow writes it. Dual pin: the CI
+    # matrix still tests the 3.9 Fabric floor.
+    "pyarrow==25.0.1; python_version >= '3.10'",
+    "pyarrow==17.0.0; python_version < '3.10'",
     "build==1.5.0; python_version >= '3.10'",
     "build==1.4.4; python_version < '3.10'",
     "requests>=2.31.0",  # tests/adapters imports the adapters; keep in sync with [adapters]

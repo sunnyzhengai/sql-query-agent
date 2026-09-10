@@ -10,10 +10,15 @@ export shape). The export mirrors the store AS-IS: absent grains
 stay absent, so Sunny's GQL sees the same truth the shape census
 declares.
 
+PARQUET, never CSV (ruled by corpse 2026-09-09: Fabric's
+Load-to-Tables mis-parsed standard CSV quote-escaping — every
+column whose description contained double-quotes loaded as NULL
+and its nodes/edges vanished at graph refresh; Sunny's per-table
+GQL diff found them. Parquet has no parsing layer.)
+
 Usage:  python3.11 -m aivia.flows.export_graph <estate>
-        (writes AIVIA_Product/estates/<estate>/graph_export/*.csv)
+        (writes AIVIA_Product/estates/<estate>/graph_export/*.parquet)
 """
-import csv
 import pathlib
 import sys
 from typing import Dict, List, Optional, Tuple
@@ -76,8 +81,10 @@ def export_tables(read: ReadApi,
     return tables
 
 
-def write_csvs(tables: Dict[str, List[Dict[str, str]]],
-               outdir) -> List[pathlib.Path]:
+def write_parquet(tables: Dict[str, List[Dict[str, str]]],
+                  outdir) -> List[pathlib.Path]:
+    import pyarrow as pa
+    import pyarrow.parquet as pq
     outdir = pathlib.Path(outdir)
     outdir.mkdir(parents=True, exist_ok=True)
     written = []
@@ -87,11 +94,10 @@ def write_csvs(tables: Dict[str, List[Dict[str, str]]],
                       key=lambda c: (c not in ("nodeId", "sourceId",
                                                "targetId", "name",
                                                "description"), c))
-        p = outdir / f"{name}.csv"
-        with open(p, "w", newline="") as fh:
-            w = csv.DictWriter(fh, fieldnames=cols, restval="")
-            w.writeheader()
-            w.writerows(rows)
+        table = pa.table({c: [r.get(c, "") for r in rows]
+                          for c in cols})
+        p = outdir / f"{name}.parquet"
+        pq.write_table(table, p)
         written.append(p)
     return written
 
@@ -100,10 +106,10 @@ def main(estate: str) -> None:
     from aivia.console import build_store
     store, base = build_store(estate)
     tables = export_tables(ReadApi(store))
-    files = write_csvs(tables, base / "graph_export")
+    files = write_parquet(tables, base / "graph_export")
+    import pyarrow.parquet as pq
     for p in files:
-        n = sum(1 for _ in open(p)) - 1
-        print(f"  {p.name:<32} {n:>6} rows")
+        print(f"  {p.name:<36} {pq.read_metadata(p).num_rows:>6} rows")
 
 
 if __name__ == "__main__":
