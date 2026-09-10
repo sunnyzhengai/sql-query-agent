@@ -233,3 +233,75 @@ absence. Engine-first by Sunny's ruling; §D resumes after.
 | E2 | the verbatim census (battery #8) | BUILT | censuses.verbatim_census + report line; 3 pins green incl. tamper-detection; side-validated E1: all 9,300 index entries recompute byte-identically |
 | E3 | the literal census + mirror-checks (batteries #9/#10) | BUILT | LOCK 1: AST census test — 160 collections classified (shape/mechanical/frame/schema-mirror/grammar), zero unmarked, banned classes have NO marker; LOCK 2: Closed_Sets sheets (kg3 ×7 sets, kind-library ×7, lenses ×2) + test_registry_mirrors (12 green) incl. the duplicate-key generator guard (the trap that ate the kg3 sheet on first landing); LOCK 3 stood (prompts already registry law); offense moves: drift sentence + drift card text now READ from Speech_Sources (registry 1.30.0); VALID_KINDS/prompt/RULED_ISOLATED_KINDS were already dead |
 | E✓ | verified PRESENT this day: conservation (mapper), homomorphism (translator), resolution census (tree), voicing ledger (produce), connection/speech/searchability censuses (censuses.py), incremental KG1 (audit_incremental, content hashes) | — | battery items 1-7 hold |
+
+## Section E6 — THE V2 LADDER (drafted 2026-09-10 against the v2
+migration section — convergence, not rewrite; GOVERNS since the
+same-day ratification)
+
+**Status: GOVERNING (v2 ratified by Sunny 2026-09-10; the v2
+content now IS Design_Graph_Engine.md).** §E5's table stays as
+record of M1–M2. The batch law of §E5 stands verbatim for every batch below
+(my tests green → Sunny loads + ONE refresh → Sunny's GQL gate →
+closing commit). The v1-vs-v2 delta this ladder implements: v1
+held one truth in six forms (raw SQL · AST blob · twin blob ·
+boot store · search index · Fabric export); v2 has ONE home of
+meaning — the graph — fed by evidence (L0/L1) and projected
+(L3). The twin dissolves into node columns.
+
+### Phase 1 — finish the ladder (M3–M7 as v2 specifies; nothing
+shipped is discarded)
+
+Same batches, same bottom-up order, each row now carrying its V2
+DELTA — the amendments the v2 design makes to the queued v1
+content:
+
+| batch | ships (v1 content) | V2 DELTA | ties DOWN into | status |
+|---|---|---|---|---|
+| M3 | condition + param — stored voiced phrases + scope has_part + condition—resolves_to→column | clause provenance (`where` vs `join_on`) is a PROPERTY on condition nodes — clause containers are syntax, never nodes; + `uses_param` (scope→param); ACCEPTANCE GAINS THE PRODUCT QUERY: the declared-vs-observed diff (M2's `joins_to` vs M3's `resolves_to`) runs as pure GQL — the documentation-drift story, live at this batch | scope + column | queued |
+| M4 | derived_column | + `cites` (scope→column outputs) | scope | queued |
+| M5 | statement — stored R11 descriptions + statement—has_part→scope | English-ladder placement: statement descriptions are the DETERMINISTIC RENDER itself (small composition — no LLM) | scope | queued |
+| M6 | file — drafted aboutness + file—has_part→statement; the COMPOSITION CHECK (parent description contains children's words) | the aboutness draft is an LLM COMPRESSION OF THE RENDER, never independent of it; the checkable law lands as a test: every concept in the compressed description exists in the anatomy (hallucination mechanically detectable); drafts anchor to meaning keys (contentKey) so upstream change visibly orphans them — the anchor ships NOW even though the drafts re-home to `derived.english_drafts` at M10 | statement | queued |
+| M7 | governance + consumption + blessing lands file descriptions ON the store node + zero TARGET rows + final viz | pbi_report descriptions DERIVE from executed procs via `executes` (the derivation ruling — same words for 1:1); + `drift` label per the v2 governance vocabulary; Shape_Ledger amended to the v2 node/edge census before this batch's gate | everything | queued |
+
+DISCREPANCY FLAGGED (Sunny's call at ratification): §E5's
+decisions line says file descriptions "land on the STORE node at
+blessing (M8)" while the M7 row says blessing lands them ON the
+store node. Draft resolution: blessing stays in M7 (the table
+governs); the decisions line's "M8" resolves into Phase 2's M10
+(drafts re-home to `derived.english_drafts`).
+
+### Phase 2 — the primacy flip (new batches; the six stores
+become one graph + evidence + projections)
+
+Order chosen so every batch demotes exactly one v1 store against
+an already-verified replacement — the same nothing-floats
+discipline as bottom-up M-batches:
+
+| batch | ships | retires / demotes | gate (verification law: the proving query ships with the claim) | status |
+|---|---|---|---|---|
+| M8 | L0 EVIDENCE: `evidence` schema Delta tables — sql modules (one row per object per captured version: objectId, schema, name, definitionText VERBATIM, contentHash, sourceModifyDate, capturedAt) · dictionaries (ONE normalized tabular contract: tables, columns, keys, declared joins, value sets, descriptions) · report definitions (TMDL rows). Hash-gated cadence: unchanged object writes nothing. ZERO interpretation at L0 | raw-SQL snapshot files as the parse source (they become one more capture, then history) | evidence rows ⊇ current corpus, every contentHash recomputes from definitionText; a re-capture of an unchanged estate writes 0 rows | queued — BLOCKED on Sunny ruling the landing contract per source + connector scope v1 (v2 open items 1–2) |
+| M9 | L1 PARSE RECORDS: `derived.parse_records` — one row per (contentHash, parserVersion), the full AST as JSON text; + `derived.derivation_runs` (run stamps, input versions, conservation counts). Parser reads L0 ROWS ONLY, never live sources. Graph rows gain provenance columns (evidenceRowId, parseRecordId, parsePath, contentHash) | tree + twin BLOBS retire (parse records inherit the AST's role; the twin's columns already live on graph nodes by M7) | THE HASH CHAIN walkable end to end: evidence contentHash → parse record → contentKey → graph provenance; every graph node's provenance resolves to an existing parse record; conservation counts in derivation_runs == mapper's | queued |
+| M10 | L1 ENGLISH DRAFTS: `derived.english_drafts` (meaningKey, model, promptVersion, text, status drafted→approved/rejected, approver, timestamps). Estate descriptions.json re-homes here; approvals anchor to contentKeys | descriptions.json as the draft store; the blessing path writes this table + the store node | the orphan demo: edit one proc → its approved description flags ORPHANED (drift by anchoring, not subsystem); approved text on nodes == approved rows, both directions | queued |
+| M11 | BOOT-STORE DEMOTION: the in-memory store becomes a BUILDER that writes the graph Delta tables; Fabric Graph serves the SAME rows (GQL-traversable, SQL-auditable) | the export-mirror as a separate artifact (the graph tables ARE the export); boot races die with the boot store's primacy | shape census (Q1/Q2/Q3) runs against THE DELTA TABLES and matches Sunny's GQL against Fabric Graph — one store, two readers, same counts; export-mirror check retires as a COUNTED retirement | queued |
+| M12 | L3 PROJECTIONS: one embedding per node description as a VECTOR COLUMN on the node's own row, hash-gated recompute; ONE ANN index, label-filterable | the standalone search index (re-derives from graph rows) | re-embed count == changed-description count on an incremental run; verbatim census holds over the column; every label reachable through the one index | queued — BLOCKED on Fabric Graph vector capability specifics (v2 open item 3) |
+
+### Phase 3 — the answering loop converges [TABLED by Sunny
+2026-09-10; untabled by his word only]
+
+The chatbot's index becomes the L3 projection; §D resumes on top
+(findings 1/3, the three xfail pins, MATCH at card grain). No
+batch is drafted here until untabled — Design_Chatbot.md governs.
+
+### Rulings needed from Sunny (the entry gates)
+
+1. **Ratify v2** — DONE 2026-09-10: ratified same day;
+   Design_Graph_Engine_v2.md renamed over Design_Graph_Engine.md
+   (prior content stands in git history); this section governs.
+2. **M2's GQL gate** — built (799cc68 + 7465be9), no closing
+   commit in the ladder; M3 attaches to scope and needs the
+   verified parent.
+3. **Landing contracts + connector scope** (blocks M8) · **vector
+   capability check** (blocks M12) · **inferred-vs-declared
+   confidence vocabulary** (blocks nothing in this ladder —
+   inference ships in no batch above; recorded so its absence is
+   ruled, not silent).

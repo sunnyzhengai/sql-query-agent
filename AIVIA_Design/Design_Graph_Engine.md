@@ -1,1424 +1,213 @@
-**** AIVIA Description Level 0
-
-**OWNERSHIP (the boundary, ruled 2026-09-09):** this doc owns
-everything that exists WITHOUT a conversation — stores, builders,
-readings, censuses, speech CONTENT (THE SPEECH CONTRACT), the
-Scribe pipeline. Design_Chatbot.md owns everything that exists only
-inside one — the Interpreter, ask-time search/ranking, memory, the
-nine laws, the UI. Cards and the semantic index are an engine
-READING; the ask flow that consumes them is the chatbot's.
-(REWRITTEN 2026-09-06 — the twin-graph ruling, ratified; full
-ruling + change ledger: AIVIA_Design/Ruling_Twin_Graph_KG.md.
-Body sections carry dated AMENDED/SUPERSEDED blocks from the
-same-day amendment pass; where an unamended line conflicts with
-the ruling, the ruling governs.)
-
-AIVIA is a TWO-WAY ENGINE over a customer's analytical estate,
-built on one knowledge graph with three layers. Syntax is PARSED
-to the leaf; semantics is DERIVED to the leaf; the two are
-connected at every level — fused in KG1, pointed in KG2.
-
-- KG1 — the declared layer (the foundational databases: vendor
-  EMR + the org's own schemas): tables, columns, declared keys,
-  dictionary meanings, value maps — loaded from source metadata.
-  Syntax and semantics are FUSED here: one node carries what a
-  thing is and what it means, because declared meaning needs no
-  pointer to its source. Every object carries a content hash +
-  load stamp; the layer loads INCREMENTALLY — only changed source
-  objects touch the graph. KG1 grounds every translation.
-- KG2 — the derived layer (the org's reporting logic: procs,
-  views, metrics, reports), built as TWINS:
-  - KG2a, the parsed graph: one tree per file, built by the
-    dialect's NATIVE parser, every node carrying its verbatim
-    source fragment and location. Complete by conservation:
-    handled + counted == everything the AST holds, no third
-    bucket. Its ONLY outward pointers are resolution edges —
-    every table/column reference resolves to KG1 or is counted.
-    That narrowness is the choke point all lineage flows through.
-  - KG2b, the meaning graph: the homomorphic twin. Every meaning
-    node POINTS at the parsed node it translates and draws its
-    content from KG1 — derived meaning always cites its source.
-    Total by construction, never by enumeration: every parsed
-    node is translated or counted as a gap; even decides-nothing
-    predicates are translated. Meaning exists at EVERY grain the
-    parse has: leaf nodes translate through KG1; composite
-    nodes — scope, statement, file — translate by COMPOSING
-    their children's meanings, so a file's meaning is the
-    deterministic summary of everything inside it, never a
-    separate invention. Voicing is policy over this twin — what
-    prose prints is a choice; what meaning exists is not.
-- KG3 — the governance overlay: users and roles, usage events,
-  dispositions (certify, approve, reject), terms, minted
-  concepts. SPARSE by construction — citizens exist only where
-  someone acted — and NOT REGENERABLE: it holds human judgment
-  and gated machine output that exist nowhere else. Every citizen
-  anchors to MEANING identity (a KG2b content-key, or a KG1
-  node), never to syntax and never to a node instance — so
-  syntax-only churn costs no governance, and a changed meaning
-  visibly orphans its artifacts: drift detection falls out of the
-  anchoring rule.
-
-The graph is written ONLY by three BUILDERS — loader → KG1,
-parser → KG2a, translator → KG2b; governance has no builder, only
-human acts. Everything else that consumes the graph is a READING:
-named, versioned, deterministic — and it writes nothing.
-
-THE CENTER LAW (ratified 2026-09-07, Ruling_Center_and_Censuses —
-the generator behind live finds #5/#8/#9/#10: code kept building
-ad-hoc side-structures instead of reading the graph): every line
-of code is a BUILDER, a READING, or a FLOW (sequences the other
-two, holds no meaning) — there is no fourth kind. The
-authoring/rendering line: AUTHORING (deciding what something
-means — writing a description, composing a summary, choosing a
-meaning slice) happens only in builders, into their own layer.
-RENDERING (applying a ratified, versioned grammar to stored
-facts) is what readings do; a reading may cache (an index, an
-adjacency, an embedding) only as a VERBATIM PROJECTION of stored
-properties — a cache of the graph, never a second source of it.
-Corollary: COMPOSITION IS THE TRANSLATOR'S JOB — a composite
-node's meaning (a file's up-composed subject) is built and STORED
-in the twin, never assembled at point of use; the change quanta
-then apply for free. Enforcement is a census per derived
-structure: every text a projection carries equals a stored
-property or a versioned-grammar rendering; composition logic in
-readings == 0.
-
-The engine runs both directions through the same layers:
-
-- OUTWARD (estate → catalog): parse into KG2a → twin into KG2b →
-  voice per policy → land stamped, regenerable catalog metadata;
-  human acts accrete in KG3.
-- INWARD (inquiry → estate): match the inquiry against KG2b, the
-  meaning graph → return the estate logic that answers it; when
-  none exists, generate new estate — which enters through the
-  same parser door as everything else: parsed, twinned, voiced,
-  governed.
-
-The lineage guarantee. The totality laws compose: every reference
-is captured or counted (conservation), resolved or counted
-(resolution), translated or counted (totality), and every
-governance act anchors to meaning. Therefore every ingested
-thing — an EMR column, a temp table, a metric — is reachable by
-graph traversal or present in a counted gap: NEVER SILENTLY
-ABSENT. Search a column and every table, sql block, metric, and
-user touching it is a traversal away (unresolved references stay
-findable by name). Lineage is not a feature built beside the
-graph; it is a query over edges the laws guarantee exist.
-
-THE THREE CENSUSES (ratified 2026-09-07, Center_and_Censuses_
-RULING — Sunny's three questions as conservation laws, the shape
-of voiced ⊎ counted == total):
-1. REACHABILITY — SUCCEEDED same day by THE CONNECTION CENSUS
-   (ADR 0081, THE BIRTH-EDGE LAW: no node is alone — every node
-   answers "why do you exist" by a walkable edge; Sunny's
-   term-isolation overrule killed the exemption list):
-   birth-edged ⊎ counted-missing ⊎ rooted == total, per the
-   Connection_Ledger registry sheet (closed at birth; rooted ==
-   exactly the estate root; counted-missing = per-node honest
-   debt with its landing step named).
-2. SPEECH: every node KIND declares in the registry which stored
-   property it speaks (Speech_Sources); every node has non-empty
-   speech, or is a counted documentation gap, or is ruled-mute
-   with a reason: speaks ⊎ counted-gap ⊎ ruled-mute == total.
-   Kinds themselves speak (their registry definitions) and are
-   searchable nodes — "reports"/"procs"/"dashboards" ground to
-   kind:file by meaning, never by a fixed word list alone.
-3. SEARCHABILITY: everything that speaks is searchable with its
-   speech VERBATIM (plus word-grain name tokens); embeddings are
-   a content-keyed cache of speech; search matches CARDS [AMENDED
-   2026-09-09: "scores roll UP the tree" was never built as
-   written and is retired — the built law is per-node CARDS
-   (name · speech · label · expansion) scored by the total-score
-   law, Design_Chatbot.md; provenance = via-card]; one-blob-per-
-   node blending is the flattening disease and is banned:
-   searchable ⊎ ruled-silent == everything that speaks.
-Each census is a standing test AND a gap-check report bucket.
-
-THE INTEGRITY BATTERY (ADR 0081 — every standing equation that
-continuously audits AIVIA, in one list):
-1. conservation (captured ⊎ counted == parsed) — the mapper,
-   asserted per parse
-2. homomorphism (translated ⊎ gap == parsed) — inside translate(),
-   every run
-3. resolution (resolved ⊎ counted) — the resolution census
-4. the voicing ledger (voiced ⊎ counted == total) — produce
-5. the speech census (speaks ⊎ gap ⊎ mute == total)
-6. the searchability census (searchable ⊎ silent == speakers)
-7. the connection census (birth-edged ⊎ counted ⊎ rooted == total)
-8. the verbatim census (index words == recomputed speech)
-9. the literal census (every literal collection classified; no
-   vocabulary/ruling class exists) — Audit_Literal_Law_Plan
-10. the mirror-checks (code copies == registry sheets)
-11. the claims ledger (ruling clauses == evidence, every build)
-12. the validators + shakedown suites (metamodel, fixtures,
-    estates)
-13. THE SHAPE CENSUS (2026-09-09) — store labels/edges/description
-    coverage == the Shape_Ledger, both directions (Q1/Q2/Q3 as
-    failure gates; the blob corpse's permanent lock)
-Grounding thresholds are registry data and never cliffs:
-below-threshold yields HITL candidates with visible scores, never
-"unknown". The ask pipeline's search TRACE (mentions, expansions,
-facet hit, score) renders in every round — plan-confirm-execute-
-display applied to search; suppression later is a display toggle,
-never a removal. Expansion vocabulary (acronyms, kind synonyms)
-is proposed by the interpreter per-ask and lands as KG3 terms on
-confirmation — the LLM proposes, the human confirms, the ledger
-remembers.
-
-```
-            ┌───────────────────── OUTWARD ─────────────────────────┐
- estate ──► KG2a PARSED ══ points-at ══ KG2b MEANING ──policy──► catalog metadata
-   ▲        evidence · conservation     translation · total          stamped · regenerable
-   │            │ resolves_to               ▲   │  ▲
-   │            ▼                           │   │  └─ KG3 governance overlay
-   │        KG1 DECLARED (fused syntax+semantics, incremental)      (sparse · non-regenerable
-   │                                            │                    users · usage · decisions)
-   │                                            ▼
-   └──── generated estate ◄── (none exists) ◄─ match ◄── user inquiry
-            └───────────────────── INWARD ────────────────────────────┘
-```
-
-**** Content Descriptions — the strata (renamed 2026-09-06, the
-twin-graph ruling 6a; restratified 2026-09-05)
-
-STRATA RENAMED (ruled 2026-09-06): the numbered levels retire —
-strata are **Blueprint · The Graph · The Flows**; digits are
-KG-exclusive (KG1/KG2a/KG2b/KG3). The LENS STRATUM RETIRED into
-two contracts (ruling piece 3): BUILDERS write the graph (loader →
-KG1, parser → KG2a, translator → KG2b; governance has no builder);
-READINGS consume it (named, versioned, deterministic, write
-nothing). The import law restates: The Flows write The Graph only
-through builders and read it only through readings; readings write
-nothing; The Graph references only itself and its sources — still
-plank-checkable. Section headers below keep their historical
-numbering as record; the strata names govern.
-
-**** THE SPEECH CONTRACT (landed 2026-09-09 — the file-description
-finding; design only, build OPEN in Manifest_Build §C/§D)
-
-The speech census (speaks ⊎ gap ⊎ mute == total) counts PRESENCE.
-This contract governs CONTENT — what the spoken property of a node
-must and must not be. The generator it kills: USP_ED_SEPSIS "spoke"
-a 4,600-character recitation of its 40 upstream tables' catalog
-descriptions; the census passed it, and search correctly scored the
-wall as being about nothing (cosine 0.312 vs "ED Sepsis" — real
-physics measured 2026-09-09). Non-empty is not meaningful.
-
-THE CONTRACT — a node's speech is ITS OWN ABOUTNESS:
-
-1. ONE NODE, ITS OWN MEANING. The speech text says what THIS node
-   is about. Borrowed text is banned:
-   - NOT its sources' descriptions (lineage lives in edges — the
-     drawn-from recitation was the wall);
-   - NOT its name (the name card carries it — ruled earlier, the
-     double-pay corpse);
-   - NOT its type words ("report", "dashboard", "table", "power
-     bi ..." — the LABEL card carries type; a speech text opening
-     "power bi report over..." pays type-shaped mentions twice,
-     measured on the Inpatient report 09-09).
-2. SHORT AND DENSE. Speech is a summary sentence or few — an
-   embedding of a wall points nowhere; dilution is a contract
-   violation even when every word is true.
-3. PROVENANCE ALWAYS. Every speech text carries its basis:
-   declared (KG1 catalog), composed (deterministic voicing of the
-   node's OWN parts — never its sources'), or drafted (Scribe,
-   with basis stamp + attribution per the R8 source-annotation
-   rules). Model-drafted text voices WITH attribution, never as
-   bare fact.
-4. THE STRUCTURAL VOICING LIVES ON — as the twin's floor text for
-   display, trace, and walk. It simply is not the SEARCH card. A
-   file's search speech is its aboutness; its floor voicing is its
-   anatomy.
-
-THE SCRIBE PIPELINE (the seat's design — its rights row in
-Design_Chatbot.md has pointed here since 09-09):
-
-- WHEN: curation time only, never ask time.
-- INPUT: the node's own parsed structure (KG2b meaning, its
-  selections, its filters) + KG1 declared meanings of what it
-  touches — evidence, not copy-source.
-- OUTPUT: a DRAFT aboutness sentence per node, basis-stamped
-  (model, prompt version, evidence cited).
-- SCOPE (ruled 2026-09-09): the Scribe drafts for FILES only —
-  a PBI report's description DERIVES from its executed procs
-  through the executes edge (1:1 = the same words, "the report
-  users SHOULD see the logic"; the single multi-proc report
-  composes both). One truth, no parallel drafting.
-- LANDING: drafts are proposals (like acronym expansions); a
-  human blesses (or an explicit ruled policy auto-lands WITH
-  visible attribution — Sunny's call per estate); blessed
-  descriptions become the spoken property via kg3, journaled like
-  every governance act.
-- LIVE-SEAT RULE APPLIES: the Scribe's prod path gets a live test
-  with the same model + prompt.
-
-Acceptance for the build (already pinned by the 09-09 findings):
-the three real-physics corpses — "ED Sepsis" must crown
-USP_ED_SEPSIS through its name card; "what reports are about ED"
-must crown the ED dashboard; "which files mention ED" must surface
-the ED files — remeasured on recomposed cards before any scoring-
-law amendment is considered.
-
-**** THE SHAPE CONTRACT & THE SHAPE CENSUS (ruled 2026-09-09 —
-the second believed-built corpse: the store held the parse as
-BLOBS while every surface spoke in nodes; found by Sunny's
-mind-image questions, provable by one query all along)
-
-THE SHAPE CONTRACT — the store's shape IS design, never an
-implementation choice:
-
-1. EVERY NODE KIND THE DESIGN NAMES IS A STORE LABEL. The ruled
-   node grains: db · schema · table · column (KG1) — file ·
-   statement · scope · condition · parameter · derived column
-   (KG2) — meaning_twin (KG2b record) — description · term ·
-   usage · disposition · proposal · acronym · person · agent ·
-   role (KG3) — PBI Report (consumption) — drift. A grain that
-   exists only inside a serialized property is NOT BUILT.
-2. EVERY NODE CARRIES A STORED plain-English `description`
-   PROPERTY, by source: dictionary-loaded (table, column) ·
-   Scribe-drafted, blessed (file) · grammar-rendered AT BUILD and
-   stored (statement, scope, condition, parameter, derived
-   column) · derived via executes (PBI Report) · authored (term).
-   Rendered-then-stored keeps the verbatim census: stored text
-   must equal what the grammar recomputes.
-3. EVERY RULED EDGE IS A STORED EDGE — contains (file→statement→
-   scope→condition/parameter), reads, resolves_to, translates,
-   executes, describes, cites — never a path string inside a
-   blob. Blobs (tree, twin) may remain as builder provenance;
-   the GRAPH TRUTH is the nodes and edges.
-4. THE SHAPE LEDGER (registry sheet Shape_Ledger) declares every
-   label and edge with its status: PRESENT or TARGET(landing
-   step named). Divergence from design is legal ONLY as a
-   declared, counted ledger row — silent divergence is the
-   corpse class this contract kills.
-
-THE SHAPE CENSUS — integrity battery #13. The three INVARIANT
-QUERIES, verbatim (GQL form; the census runs their store
-equivalents as a FAILURE GATE in CI):
-
-  Q1  MATCH (n) RETURN labels(n), count(*)
-      == the Shape_Ledger's PRESENT node rows, exactly: no
-      undeclared label, no declared-present label absent.
-  Q2  MATCH (n) WHERE n.description IS NOT NULL
-      RETURN labels(n), count(*)
-      == the ledger's description obligation per label (full /
-      counted-gap / target-with-landing-step / none-ruled).
-  Q3  MATCH ()-[r]->() RETURN type(r), count(*)
-      == the ledger's PRESENT edge rows, exactly.
-
-THE VERIFICATION LAW (Sunny, 2026-09-09: "mind images become
-queries"): every BUILT claim in Manifest_Build carries the query
-that proves it and the expected shape of its answer — accepting
-a claim is running a query, never trusting a sentence. Sunny's
-stated invariants are encoded as standing queries BEFORE code
-claims to satisfy them.
-
-**** The Graph (was: Level 1 — the knowledge graph) [stores]
-
-Edge direction convention (ratified 2026-09-05, closing the open
-question): REFERENCE edges point toward the more stable node;
-CONTAINMENT edges point parent → child. Both layers already obey
-this; it is now law, not accident.
-
-KG Layer 1 — source dictionaries technical layer      [ratified]
-      [registry stamp: kg1_technical v1.36.0]
-      L1 companions: Technical_Layer_Registry, CONTRACT_DATALOAD
-      AMENDED 2026-09-06 (twin-graph ruling 2a, 5a): KG1 is the
-      DECLARED layer — syntax and semantics FUSED on one node.
-      Every object (db/schema/table/column) gains content_hash
-      (over its declared syntax + semantics as loaded) +
-      load-stamp. Intake goes INCREMENTAL: hash-diff per object,
-      only changed objects write; equivalence to full reload is
-      MECHANICAL — a scheduled full parallel load compares against
-      incremental state, any delta is a counted finding.
-      Mechanics land in CONTRACT_DATALOAD. Object-grain hashes
-      are also the staleness basis: a changed KG1 object
-      retranslates only the KG2b meaning nodes drawing from it.
-- Node types: 
-    -- db
-        --- description
-        --- as_of
-    -- schema
-        --- description
-        --- as_of
-        --- source (DEFINED, ruled 2026-09-05: the registered
-            SOURCE SYSTEM that put this schema's tables there —
-            organizational knowledge SQL Server does not hold; no
-            system view records which vendor installed a table.
-            Declared by the DBA in the registration prerequisite's
-            SCHEMA MAPPING (dbo -> the EMR vendor; org_custom ->
-            org), never extracted. Since A2, source is the FIRST
-            COMPONENT OF IDENTITY — never stored as a second
-            field. Deciding example, Sunny's: in SSMS you see
-            SIMDB and its schemas; 'simemr' appears nowhere in
-            SSMS — it is what only the org knows, and registration
-            is where the org tells us)
-    -- table
-        --- description
-        --- as_of
-        --- pk_columns
-        --- grain (opportunistic — field-calibrated 2026-09-04:
-            declared by phrase on core tables only; absent +
-            gap-listed elsewhere, never guessed)
-    -- column
-        --- description
-        --- as_of
-        --- values
-- Edge types: 
-    -- db to schema: contains, as_of
-    -- schema to table: contains, as_of
-    -- table to column: contains, as_of
-    -- table to table: joins_to, as_of, on, cardinality
-        Normal join — one edge, one pair:
-
-        ENCOUNTER ──joins_to──▶ PATIENT
-           on: [[PATIENT_ID, PATIENT_ID]]
-           cardinality: many_to_one
-
-        Composite join — still one edge, two pairs:
-
-        DX_COMMENT ──joins_to──▶ ENCOUNTER_DX   (targets the composite
-           candidate key — which need NOT be the pk; fixed
-           2026-09-05 after Sunny's F1 correction exposed the
-           pk-equals-join-key conflation the old parenthetical
-           taught)
-           on: [[ENCOUNTER_ID, ENCOUNTER_ID], [DX_LINE, LINE]]
-           cardinality: many_to_one
-- Rules
-    -- single source of authority, per object: every node and edge derives
-   from the registered dictionary extract of the source system that
-   owns it; nothing enters this layer except through a registered
-   extract — nothing parse-derived, nothing hand-typed. The org's own
-   dictionary (control_ tables, join mappings) is a registered source
-   like any vendor's. 
-    -- regenerability: the layer rebuilds from extracts alone  
-    -- metamodel conformance: every node/edge matches the declared kinds and properties
-    -- property-vs-node: in the regenerable technical layer, prefer properties; promote to nodes only on demonstrated need — promotion is a re-extract, not a migration.
-    -- primary key (SUPERSEDED 2026-09-05, Sunny's ruling): pk_columns is DECLARED DATA, loaded from the source's pk metadata table — never prose-derived, never guessed. Referential integrity at intake: every table must have declared pk rows (INTAKE-10, named refusal). The prose phrase rule and the pk gap list retire. referenced_keys (each table's declared reference keys, from inbound FK groups) is DERIVED from joins_to edges — a lens, never a stored property (ruled 2026-09-05).
-    -- join legality: a joins_to edge is legal only if declared by the
-   dictionary of the source that owns its dependent (FK) side. Joins
-   between two vendor tables must be vendor-declared — never invented
-   by the org; joins from org tables into vendor tables are declared
-   by the org's dictionary. A practiced join violating this is a
-   compliance finding, not a graph edit.
-   -- source inheritance: a schema belongs to exactly one source; tables/columns inherit source from the containment chain; a mixed schema is the recorded trigger to push source down a level.
-
-KG Layer 2 — logic layer (one tree per SQL file)       [ratified]
-      [registry stamp: kg2_logic v1.36.0 · kg2_kind_library v1.36.0]
-      L1 companions: Logic_Layer_Registry (subsumes the mapper's
-      seam contract), Kind_Library_TSQL_Predicates
-      AMENDED 2026-09-06 (twin-graph ruling 2b-2e): this layer is
-      now the DERIVED layer, built as TWINS. The section below
-      describes KG2a, THE PARSED GRAPH (unchanged except the
-      projection un-deferral). Its twin:
-
-      KG2b — THE MEANING GRAPH (new, ruled 2026-09-06):
-      - one meaning node per KG2a node, carrying: kind (closed
-        library, nine kinds: selection · source · condition w/
-        degenerate subkind · projection · grouping · window ·
-        combination · reference · gap) · content (the translated
-        meaning) · points_at → exactly ONE KG2a node (the
-        homomorphism) · draws_from → every KG1 node consulted ·
-        content_key (meaning identity) · basis stamps (translator
-        + metamodel versions)
-      - HOMOMORPHISM LAW: translated + gap == every KG2a node, no
-        third bucket — the conservation equation generalized,
-        queryable. Composite nodes (scope, statement, file)
-        translate by COMPOSING children's meanings.
-      - content_key (the certification-survival law): hash over
-        (kind, operand identities resolved to KG1 ids or scope
-        paths, literal values, children's content_keys, join
-        kind). INVARIANT to formatting, aliases, AND/join order,
-        comments; SENSITIVE to any column, operator, value, join
-        kind, or structural change.
-      - built ONLY by the TRANSLATOR (the parser's twin — the
-        second builder); regenerates with KG2a at the FILE
-        quantum; version bump regenerates the whole layer.
-      - PROJECTION DEFERRAL LIFTED (was A12): the SELECT list
-        enters KG2a as a structure kind with one projection-member
-        node per output column — the meaning twin needs it (a
-        derived column's meaning resolves through the defining
-        scope's projection node).
-      - "decisions derived by lenses" SUPERSEDED: membership,
-        grain, value, path are meaning-node kinds now, not lens
-        yields (ruling 3a/3c).
-- The unit (ruled 2026-09-04): the whole FILE is one tree. All
-  logic is a natural result of walking the tree; no "smallest unit
-  of logic" is ever defined. A #temp table is internal structure of
-  its file's tree — a named intermediate scope, like a CTE — never
-  a technical-layer citizen.
-- Node types:
-    -- file (the tree's root)
-        --- physical name, source path
-        --- dialect
-        --- parsed_at, parser/metamodel versions
-    -- statement (children of file, in order — the staging chain;
-       a statement is what the dialect's parser says is one
-       executable command — never punctuation-defined; control-flow
-       blocks nest statements inside statements)
-    -- scope (a SELECT with its clauses; also: CTE, subquery,
-       temp-table scope — every place logic has its own boundary)
-        --- name (CTE/temp name where one exists)
-    -- structure (FROM, JOIN w/ type, WHERE, HAVING, GROUP BY,
-       ORDER BY/TOP, UNION w/ dedup flag, CASE, PROJECTION.
-       The A12 deferral LIFTED 2026-09-06 by the twin-graph
-       ruling 2b: PROJECTION enters via the planned recovery
-       path — metamodel bump + re-parse; one projection-member
-       node per output column, name + expression subtree)
-    -- predicate (one condition; kind from the metamodel's
-       closed set)
-    -- expression (column_ref | table_ref | literal | parameter_ref
-       | function | arithmetic | unary | case | cast | subquery_ref)
-    -- parameter (file-scope; declared name, default logic)
-- Every node carries: evidence (verbatim source fragment +
-  location) and the version stamps
-- Reference nodes (column_ref, table_ref) are the ONLY pointers
-  into KG layer 1, always via resolves_to; unresolved refs are
-  counted, never dropped (ruled 2026-09-04; supersedes the earlier
-  column_ref-only wording — a FROM clause references tables)
-- Not node types, on purpose: decisions (derived by lenses);
-  anything the technical layer owns; CTEs-as-statements (a CTE is
-  a scope INSIDE its one declaring statement — it cannot stand
-  alone; a #temp stage is its own statement — both become SCOPE
-  nodes, so downstream consumers never care which staging style
-  the author used)
-- Edge types (ruled 2026-09-04 — two families):
-    -- contains: parent → child through the whole tree
-       (file→statement, statement→statement for control-flow
-        blocks, statement→scope, scope→structure,
-        structure→predicate, predicate→expression,
-        expression→expression)
-        --- position: where sibling order carries meaning
-            (statements in the staging chain, function arguments,
-             CASE branches, IN-list members)
-        --- role: on predicate→expression children only —
-            subject | comparand | lower_bound | upper_bound |
-            pattern | escape | selection | quantifier
-    -- resolves_to: every *_ref node → the thing it names
-       (mention → meaning; points toward the more stable node)
-        --- column_ref  → KG1 column
-        --- table_ref   → KG1 table OR a scope in the SAME tree
-            (a CTE or #temp stage — the staging chain becomes
-             graph structure with no special machinery)
-        --- parameter_ref → the file's parameter node
-        --- subquery_ref  → its scope node
-        --- an unresolvable ref gets NO edge — counted, never
-            guessed
-- Rules (ratified 2026-09-04; each cites its axiom in
-  docs/AI_VIA_AXIOMS.md):
-    -- parser authority: tree structure comes from the dialect's
-       parser and nowhere else — never punctuation, never regex,
-       never text heuristics [axm:D2, axm:M5]
-    -- conservation: every construct in the source file maps into
-       the tree or lands in the counted remainder with reason and
-       location — handled ⊎ remainder = total, no third bucket;
-       unknown vendor constructs are a red build via the reflected
-       denominator; the remainder aggregates to a human ruling
-       [axm:R1, axm:R2, axm:R3]
-    -- evidence: every node carries its verbatim source fragment
-       and location — the tree is the witness chain for everything
-       downstream [axm:B1]
-    -- scope ownership: every predicate belongs to exactly one
-       scope; a nested scope's logic is its own, never the
-       parent's [axm:D3]
-    -- resolution honesty: a reference resolves via resolves_to or
-       carries no edge; unresolved references are counted, never
-       guessed; resolution results declare completeness
-       [axm:B3, axm:R1]
-    -- single writer, regenerable: only the mapper writes this
-       layer; trees are derived artifacts, rebuilt from source
-       files + KG layer 1 alone, never hand-edited. Rebuild
-       SUPERSEDES, never deletes (the one-law ruling, 2026-09-05):
-       a re-parse appends the new tree version and retires the
-       prior; current is derived; retired nodes remain valid
-       targets for layer-3 attachments and basis citations
-       [axm:D3, axm:S3, axm:R4]
-    -- metamodel conformance: every node and edge validates
-       against the versioned registry; kinds are closed; a new
-       kind goes doc -> registry -> code, never code-first
-       [axm:S2, axm:D4]
-    -- structure carried, never lowered: the tree is the ONLY
-       representation of a file's logic; downstream consumers read
-       the tree, never the source text (evidence is for display
-       and audit, not re-parsing) [axm:S1, axm:M5; = spec:G5 in
-       the code record]
-KG Layer 3 — artifact layer                            [ratified]
-      [registry stamp: kg3_artifacts v1.36.0]
-      L1 companions: Artifact_Layer_Registry
-      AMENDED 2026-09-06 (twin-graph ruling 2f): this layer and
-      KG Layer 4 MERGE into KG3, THE GOVERNANCE OVERLAY — sparse
-      (citizens exist only where someone acted), non-regenerable
-      (unchanged), with CONCEPT joining the citizen classes
-      keeping all four of its ratified rules. THE ANCHOR RULE
-      (new): about targets a MEANING IDENTITY — a KG2b
-      content_key at a scope path, or a KG1 object — never a
-      KG2a syntax node, never a node instance. Corollaries
-      (S1/S2 demoted from rules): same content_key after
-      regeneration → the artifact survives silently; changed →
-      flagged orphan (the drift finding); deleted scope →
-      orphaned with similarity candidates. Registries merge into
-      one Governance_Layer_Registry. Everything below not
-      contradicted by this block stands as written.
-- The defining property: NOT regenerable. Layers 1-2 rebuild from
-  sources; this layer holds human judgment and gated machine
-  output that exist nowhere else. Human-owned artifacts are never
-  overwritten by pipelines [axm:D3]; machine-owned artifacts
-  regenerate freely until a human edit or acceptance flips
-  ownership (derived — see the spine's ownership lens; the
-  2026-09-04 drift sweep retired the older prefix-drop wording).
-- Artifact classes (ruled 2026-09-04; one line each — the
-  PER-CLASS SECTION BELOW IS THE TRUTH):
-    state-shaped: description · term · responsibility
-    event-shaped (append-only; current state DERIVED) [axm:R4]:
-    disposition · usage event · proposal
-- Identity (ruled 2026-09-04): a NODE kind — person | role |
-  agent (the machine is an identity too: pipeline + model,
-  versioned). A thin local proxy for the directory entry, keyed by
-  the immutable Entra object ID; Entra stays the authority on who
-  people are. Note: the regenerable-layer property-vs-node
-  principle does NOT transfer here — this layer is not
-  regenerable, so promote-later would be a migration of
-  irreplaceable history.
-- The shared property spine (ruled 2026-09-04; every artifact
-  class carries it):
-    -- about: edge to >=1 target in any LOWER-OR-SAME layer — a
-       KG1/KG2 node, a layer-3 citizen, or a minted concept
-       (reworded 2026-09-05: the ratified edge sections already
-       target all three); artifacts point at what they describe,
-       never the reverse — layers 1-2 never know layer 3 exists
-    -- author: edge to an identity node
-    -- authorship (DERIVED, never stored — ruled 2026-09-04):
-       machine iff the author edge targets an agent identity;
-       human otherwise (killed as a stored field: it restated the
-       author's identity kind)
-    -- ownership (DERIVED, never stored — ruled 2026-09-04):
-       human iff any version has a human author OR an accepting
-       disposition targets the artifact; otherwise machine. Once
-       human, pipelines may only propose. The flip is one-way BY
-       CONSTRUCTION — append-only history cannot be un-happened,
-       so no rule needs enforcing. (Supersedes the earlier stored
-       owner field: authorship alone misses
-       certification-without-edit; a stored owner could drift
-       from the history it summarizes.)
-    -- status: OPTIONAL, machine versions only (amended
-       2026-09-04): declared per class only where it says
-       something authorship cannot; a class with nothing to say
-       declares none (a status restating authorship is drift
-       waiting to happen); an undeclared status value is a
-       conformance failure
-    -- created_at (events: occurred_at — when it happened, not
-       when recorded)
-    -- supersedes (ruled: NOTHING in this layer is ever edited in
-       place — an edit appends a new version with a supersedes
-       edge; "current" is derived. State-shaped = chains with a
-       derived current pointer; event-shaped = chains without
-       supersession. The layer is append-only because it is not
-       regenerable. Version NUMBER is DERIVED — chain depth,
-       never stored; ruled 2026-09-04) [axm:D3, axm:R4]
-    -- basis (machine-authored only): the version stamps of
-       everything the artifact derived from — tree version,
-       metamodel version, source-pack version, prompt/gate
-       version. The witness chain [axm:B1] AND the regeneration
-       trigger: any basis version moving marks the artifact
-       stale. Human-authored artifacts may carry a free-text
-       reason; nothing is demanded of humans.
-- Per-class properties (minimal by ruling — the spine does the
-  work; anything derivable is a lens, anything event-shaped lives
-  in events):
-    -- description: text
-       status vocabulary (machine versions only, per the amended
-       spine): gate_passed | skeleton_floor | flagged
-       (IOU CLOSED 2026-09-04: kill accounting + absence rule
-       landed in the layer rules AND the produce stage — the
-       generation-run event)
-    -- term: name, definition; one class-specific edge:
-       parent → term (hierarchy between term artifacts; can't
-       ride about, which points at the estate). NO status —
-       machine-nominated vs human-authored is the spine's
-       authorship; accepted/rejected are dispositions; current
-       standing is derived. Evidence (the name family, member
-       tree versions) rides basis; what the term governs rides
-       about.
-    -- responsibility: kind (closed set: steward | owner |
-       expert | dba | ...); holder → identity edge (the bearer —
-       distinct from author, who recorded the assignment). NO
-       status — usage-derived nominations are machine-authored
-       versions w/ evidence in basis; a human's accepting
-       disposition makes them real; ending/transfer = superseding
-       version or revoking disposition; "currently responsible"
-       is derived (and the identity node's own status feeds the
-       lens — the person-left-the-org case).
-    -- disposition: ruling (closed set: accept | reject | revoke
-       | acknowledge — 'certify' merged into 'accept' 2026-09-04:
-       one meaning, one verb — a human blessing machine output,
-       whatever the class) + optional reason text. RULE:
-       authorship is always HUMAN — machines never rule. Machine
-       "findings" (divergence, staleness, human text contradicted
-       by moved reality) need NO stored class: they are derived
-       states computed by lenses on read — the machine never
-       writes a judgment; it computes one when asked (completes
-       the retirement of stored "conflict" verdicts).
-    -- usage event: action (closed set: asked | ran | confirmed —
-       'relied_on' cut 2026-09-04: no concrete capture point yet;
-       enters by ratification when one exists); about = the node
-       touched, author = the user, occurred_at = when. Nothing
-       else — the flywheel is lenses over exactly this.
-    -- proposal: kind (sent | observed).
-       sent: target_system (closed set: purview | collibra | ...);
-       about → the artifact version proposed.
-       observed: outcome (closed set: published | denied | edited
-       | missing); about → the sent event it observes.
-       Current outcome is DERIVED (latest observation) — append-
-       only forces sends and sightings apart; each look is its
-       own fact.
-- Edge types (ratified 2026-09-04 — five, all pointing at things
-  that existed first; layers 1-2 never point up):
-    -- about: artifact/event → what it concerns — a KG1/KG2 node,
-       OR a layer-3 citizen (a disposition about a description; an
-       observation about its sent event)
-    -- author: any artifact/event → identity node
-    -- holder: responsibility → identity node (the bearer — the
-       governed node rides about; two different facts, two edges)
-    -- parent: term → term (the hierarchy)
-    -- supersedes: version → its predecessor
-- Rules (ratified 2026-09-04; axiom citations per the standing
-  practice):
-    -- the ledger law: nothing edited or deleted in place — change
-       is a superseding version, history is the truth; and
-       anything computable from accumulated facts is a LENS, never
-       a stored field (ownership, authorship, version, standing,
-       findings) [axm:R4, axm:D3, axm:S3]
-    -- human sovereignty: human-owned artifacts are never
-       overwritten by pipelines — machines only propose;
-       dispositions are human-only — machines never rule
-       [axm:D3, axm:M5]
-    -- witness: every machine-authored version carries basis (full
-       input version stamps); every machine claim traces to the
-       graph [axm:B1]
-    -- gate at the boundary, absence over fabrication: machine
-       text enters only through its class's gate with its closed
-       vocabulary; total failure produces NO artifact. Every
-       production run lands a GENERATION-RUN EVENT with
-       conservation accounting: shipped ⊎ absent = attempted,
-       killed-lines counted per shipped artifact (aligned
-       2026-09-05 to the produce stage — a kill drops a sentence
-       inside a shipped artifact, not the artifact)
-       [axm:B2, axm:R1]
-    -- durability: the layer is not regenerable — a backed-up
-       asset, retention forever by default; loss is unrecoverable
-       by definition [axm:S3]
-    -- single writer per class: descriptions from the generation
-       pipeline, dispositions from the human surface, usage from
-       the ask surface, proposals from the bridge — one producing
-       component each, writer-census checkable [axm:D3]
-    -- metamodel conformance: every node/edge validates against
-       the versioned registry; closed sets stay closed; identity
-       edges resolve to identity nodes [axm:S2, axm:D4]
-- Forward note [axm:B4] — DELIVERED: the LAND stage carries the
-  human-confirmation clause.
-KG Layer 4 — concept layer            [MERGED INTO KG3 2026-09-06]
-      [registry stamp: kg4_concepts v1.36.0]
-      L1 companions: Concept_Layer_Registry (merging into
-      Governance_Layer_Registry)
-      SUPERSEDED AS A LAYER (twin-graph ruling 2f): concept is now
-      a CITIZEN CLASS of the governance overlay. Every rule below
-      SURVIVES as a class rule (human-mint-only · append-only ·
-      nameless, the term carries the name · basis snapshot); a
-      concept's about-edges now target a SET of meaning anchors
-      (the family members, by content_key). Text kept as the
-      ratified record of those rules.
-- The founding ruling (Sunny, 2026-09-04, option c): THE LENS
-  COMPUTES; A HUMAN TOUCH MINTS. Relatedness (same-name families,
-  similar logic, shared targets) is a lens over layers 1-3 —
-  recomputed freely, never stored. A CONCEPT NODE is minted only
-  at the first human act on a family (a ruling, or accepting a
-  term nominated from it): identity + basis (the shape evidence
-  at minting time), nothing else. Future lens runs REPORT AGAINST
-  minted concepts ("this family gained two members"), never
-  replace them. The layer is sparse by design: its population is
-  every concept a human has engaged — not every cluster the math
-  can find. Minted nodes share layer 3's nature: non-regenerable,
-  because they exist exactly because a human touched them.
-- Node type (ratified 2026-09-04): concept — id (content-keyed at
-  minting) + basis (the family snapshot: member tree versions, the
-  lens version that computed it). NOTHING else — no name, no
-  description. The concept's human-facing identity IS its accepted
-  parent term (layer 3, about → concept); naming the concept twice
-  is the drift class. Before a term exists, the concept is known
-  by its evidence.
-- Edges (all point AT it; it points at nothing new):
-    -- term.about → concept (the ratified name-and-definition)
-    -- disposition.about → concept (rulings on the family)
-    -- lens reports reference it by id — reports are derived, not
-       edges
-- Membership is NEVER stored: the lens recomputes it each run
-  against current reality; basis holds what was seen at minting;
-  the difference between them is itself a derived finding ("two
-  definitions joined this family since the ruling").
-- Rules (ratified 2026-09-04):
-    -- human-mint-only: a concept node exists only as the anchor
-       of a human act — machines compute families, never mint
-       concepts [axm:M5, axm:D3]
-    -- append-only: minted concepts are never edited or deleted;
-       they share layer 3's non-regenerable nature [axm:R4]
-    -- metamodel conformance [axm:S2, axm:D4]
-**** Level 2 — lenses      [STRATUM RETIRED 2026-09-06 — ruling 3]
-
-RETIRED AS A STRATUM (twin-graph ruling piece 3): once KG2b is
-stored graph, "translation is a lens" contradicts the lens law
-itself (lenses write nothing), and most remaining lenses are
-queries over edges that now exist. The stratum dissolves into two
-CONTRACTS:
-- BUILDERS (write the graph): loader → KG1 · parser → KG2a ·
-  TRANSLATOR → KG2b (the parser's twin — the "translation lens"
-  renamed to what it is). Builder contract: deterministic (needs
-  a model → not a builder step) · versioned, stamps every node
-  written · writes ONLY its own layer · total with counted gaps ·
-  version bump rebuilds everything it governs. Governance has NO
-  builder.
-- READINGS (consume the graph): named, versioned, deterministic,
-  write nothing — kept for CITABILITY (dispositions and concept
-  bases quote reading output by version). Survival principle: a
-  reading exists iff its yield is ABOUT the graph — status,
-  aggregation, comparison — never meaning itself. AMENDED
-  2026-09-07 (the center law): a reading may RENDER through a
-  ratified grammar and may CACHE as a verbatim projection, but
-  never AUTHORS — the ask-index corpse (a reading composing its
-  own "words" beside the twin; the file card and the search text
-  then drifted apart) is the standing violation this clause
-  kills. FLOWS are the third and last kind of code: they sequence
-  builders and readings and hold no meaning. Catalog
-  migration: decisions(class) RETIRED into the translator ·
-  degenerate RELOCATED as the condition subkind · concept-drift,
-  divergence, gap-census, staleness, ownership/authorship/
-  version/standing/current-outcome, expertise, blast-radius,
-  working-set, referenced-keys → versioned QUERIES · relatedness
-  stays the one COMPUTED reading (over KG2b content_keys) ·
-  join-compliance a comparison query.
-The catalog below stands as the ratified record of each entry's
-rules; the contract text above governs where they differ.
-
-[historical header: read level 1, write nothing]
-      [registry stamp: lenses v1.36.0]
-
-Lenses                                                 [ratified]
-      L2 companions: Lenses_Registry
-- Definition: a lens is a named, versioned, DERIVED reading of the
-  graph — the graph stores what is; lenses say what it means for
-  one consumer; no consumer's lens constrains another's.
-- The determinism rule (ratified 2026-09-04): A LENS IS
-  DETERMINISTIC — same inputs, same graph state, same answer,
-  replayable. If it needs a model, it is not a lens: model-shaped
-  reading is MATCHING and belongs to the inward flow, with its own
-  honesty machinery. Derivation and interpretation stay separate
-  [axm:M5].
-- The lens contract (ratified 2026-09-04) — every lens declares:
-    -- name + version (results cite the lens version that computed
-       them)
-    -- reads: the node/edge classes consumed — declared, closed.
-       The registry's union of reads, held against all layer 2-4
-       classes (widened 2026-09-05: layer 4 exists and is read),
-       IS axm:D1's reachability accounting: every class read by
-       some lens or carrying a recorded exclusion (IOU closed by
-       mechanism)
-    -- yields: the output shape, declared before code [axm:D4]
-    -- completeness: whether the answer is total over what it
-       read; downstream quantified claims inherit it [axm:B3]
-    -- writes: NOTHING, ever — results return to consumers or land
-       in regenerable report surfaces; layers 1-4 are never
-       touched (the layer-4 mint is a HUMAN act citing lens
-       output; the lens never mints)
-- Catalog v1 (ratified 2026-09-04; each a registry entry under the
-  lens contract; reads/yields formalized in the registry at build):
-    -- ownership: version chains + dispositions → machine|human
-    -- authorship: author edges + identity kind → machine|human
-    -- version: supersedes chains → number per version
-    -- standing: artifacts + dispositions →
-       pending|accepted|rejected|revoked
-    -- current-outcome: proposal sent+observed → latest outcome
-    -- staleness: basis stamps vs current layer versions → stale set
-    -- decisions(class): L2 predicates by tree position →
-       membership|grain|value|path decision sets per scope
-    -- degenerate: both-sides-literal predicates → decides-nothing
-    -- join-compliance: L2 practiced vs L1 declared joins →
-       violation findings (computed, never stored)
-    -- divergence: human-owned artifacts vs moved reality →
-       steward flags
-    -- relatedness: names + tree content keys → families w/
-       content-keyed ids (feeds concept minting + nomination)
-    -- concept-drift: concept basis vs current relatedness →
-       membership changes since minting
-    -- expertise: usage events per node → de-facto experts
-    -- blast-radius: usage + graph edges → dependents (people +
-       consumers)
-    -- working-set: L2 resolves_to → tables the estate touches
-    -- gap-census: unresolved refs, keyless tables, unmapped
-       remainder → the counted-absence surfaces, queryable
-    -- referenced-keys: inbound joins_to groups per table → each
-       table's declared reference keys (added 2026-09-05, ruled
-       derived-not-stored — D12)
-  Completeness swept both directions: every derived-never-stored
-  ruling from layers 2-4 has its lens; no lens lacks a ratified
-  origin.
-**** The Flows (was: Level 3) [orchestrate: write The Graph only
-through builders, read it only through readings — restated
-2026-09-06, twin-graph ruling 6a]
-
-AMENDED 2026-09-06 (twin-graph ruling 5):
-- INBOUND gains the translate step: ingest → parse (KG2a) →
-  resolve → TRANSLATE (the translator builds KG2b), same run,
-  ATOMIC — a failed run leaves no readable half-state (stamp
-  check) → voice per policy → land artifacts.
-- THE CHANGE QUANTA: data changes are INCREMENTAL per layer
-  quantum (KG1: object hash-diff · KG2: file hash + the
-  draws_from dependency ripple · KG3: never regenerates, anchors
-  re-check by content_key). RULE changes stay TOTAL by design —
-  a version bump regenerates everything it governs; partial
-  regeneration under a new rule is the grandfathering hazard in
-  pipeline form.
-- VOICING is policy over KG2b (Floor Grammar next major = the
-  policy walk): SELECT-never-compress; the voicing ledger —
-  voiced ∪ counted == total, silent omission has no constructible
-  path; LLM caged to gated smoothing, never selection.
-- OUTWARD publishes from KG2b + KG3. INWARD matches against KG2b
-  (meaning, never syntax); generation re-enters the parser door:
-  parsed, twinned, voiced, governed.
-- PHASING (ruled): A metamodel bump + projection re-parse → B
-  translator + stored KG2b + conservation green → C voicing-
-  policy port + gap-check rerun → D governance merge + anchor
-  migration; each phase gated by a real ED-sepsis gap-check.
-      [registry stamp: flows v1.36.0]
-
-The flows                                              [ratified]
-      L3 companions: Flows_Registry
-- The map (ruled 2026-09-04): THREE flows — L0's "two directions"
-  are the two SERVICE flows; inbound is how the graph is built.
-  One already contracted.
-  Inbound (estate → graph) = CONTRACT_DATALOAD + layer 2's mapper
-  rules, complete. This section designs outward (graph → catalog)
-  and inward (inquiry → graph → estate, generating new estate when
-  none matches — which re-enters through the parser).
-
-- OUTWARD FLOW — three stages: produce → approve → land.
-
-  Stage 1: PRODUCE (ratified 2026-09-04) — graph → layer-3
-  machine versions:
-    -- deterministic composition (lenses + tree evidence) +
-       bounded model smoothing (linguistic seat only) + the class
-       gate; the model never adds a fact — the gate enforces it
-       [axm:B1, axm:M5/J2]; model failure degrades to the
-       deterministic floor — an outage costs polish, never truth
-    -- the trigger: the STALENESS LENS is the worklist (basis
-       moved, no artifact yet, or explicit human request). No
-       change, no production, no noise; nobody hand-picks; full
-       regeneration = a version bump making everything stale —
-       the same rule, not an exception
-    -- writes: layer-3 machine versions ONLY; against human-owned
-       artifacts it may APPEND a superseding version — rendered
-       "proposed" by the ownership lens, never current
-    -- every run lands the GENERATION-RUN EVENT: author = agent
-       identity; basis = model/prompt/lens/metamodel versions +
-       worklist; accounting shipped ⊎ absent = attempted, with
-       killed-lines counted per shipped artifact [axm:R1]. The
-       run event is the ONLY production ledger — quality numbers
-       are lenses over run events, never separate bookkeeping
-    -- replay floor: same graph + same versions → identical
-       skeletons and gate verdicts; prose may vary, truth may not
-       [axm:M5]
-    -- checks: PROD-1 conservation event per run · PROD-2
-       worklist = staleness-lens output · PROD-3 gate outcomes in
-       closed vocabularies · PROD-4 human-owned never overwritten
-       · PROD-5 replay determinism of the floor
-
-  Stage 2: APPROVE (ratified 2026-09-04) — fully covered by layer
-  3's machinery (dispositions human-only; standing/ownership
-  derived; the review queue is a lens). One stage rule: the
-  approval surface WRITES DISPOSITIONS ONLY — it renders lenses,
-  never touches artifacts, trees, or the technical layer
-  [axm:D3]. Check: APPR-1 writer census.
-
-  Stage 3: LAND (ratified 2026-09-04) — accepted artifacts → the
-  customer's catalog:
-    -- rendering: target-native forms only (file-first now, API
-       later — the ruled transport order); ZERO custom attributes
-       — native column sets held as data; attribution is the
-       prefix in text, never a schema footprint
-    -- the B4 clause (IOU due): a send is an outward, irreversible
-       act — it requires an accepting disposition on the artifact
-       AND a named human confirmation of the send itself; no
-       autonomy mode exempts it [axm:B4]
-    -- every send lands a proposal SENT event before transport;
-       every later look lands an OBSERVED event; current outcome
-       is the lens
-    -- anti-repeat: no send for logic whose current outcome is
-       denied unless a new version exists (standing rule R2, read
-       from the current-outcome lens)
-    -- look-before-write: at send time, read the ONE object about
-       to be touched — never the catalog at large (standing rule
-       R3); what was seen lands as an observed event
-    -- checks: LAND-1 no send without accepting disposition +
-       human confirmation · LAND-2 anti-repeat · LAND-3 sent
-       event precedes transport · LAND-4 zero custom attributes
-       in payloads · LAND-5 observations append-only
-  The outward flow adds no new node types and no new classes —
-  choreography over ratified contracts, nothing else.
-
-- INWARD FLOW — three stages: match → ground →
-  generate-when-missing. Adds no new layers or classes: match
-  reads, ground arranges and appends usage events, generate feeds
-  the existing inbound door.
-
-  Stage 1: MATCH (ratified 2026-09-04) — inquiry → candidate
-  graph objects + evidence:
-    -- the seat: interpretation is the model's [axm:J2]; ONE mind
-       composes freely over declared operations — lens reads,
-       graph traversals, enumeration primitives — with full
-       results in context; no question-shaped control flow
-       [axm:M2, axm:M3, axm:M4]
-    -- match proposes, evidence disposes: output is candidate
-       GRAPH OBJECTS (ids) + the evidence trail — never generated
-       text posing as fact; nothing model-said becomes a claim
-       downstream [axm:B1, axm:B2]
-    -- completeness declared on every result: top-K is never "all
-       that exists"; enumeration questions use enumeration
-       primitives that declare totality [axm:B3]
-    -- outcomes, closed set: matched | ambiguous | no-match.
-       Ambiguous goes to the HUMAN with candidates (intent
-       judgment is human's [axm:M5]; no silent pick among
-       near-ties). No-match is typed and counted — the honest
-       empty, and stage 3's trigger, never a shrug
-    -- writes: ONE thing — usage event `asked`, at inquiry
-       arrival (every inquiry is a fact, especially unanswerable
-       ones — the demand signal). Nothing else, ever
-    -- checks: MATCH-1 writer census (asked only) · MATCH-2
-       closed outcome set · MATCH-3 completeness on every result
-       · MATCH-4 candidates are ids + evidence, never text ·
-       MATCH-5 ambiguity reaches the human
-
-  Stage 2: GROUND (ratified 2026-09-04) — matched objects → the
-  answer:
-    -- the answer is ARRANGED EVIDENCE: the matched logic, its
-       tree, its artifacts, its lens readings — rendered; the
-       answer text is a CAPTION over them, composed by the mind
-       but adding no claim the evidence doesn't carry; headlines
-       and counts are rendered by code from result metadata,
-       never model-written [axm:B1, axm:B2 — the standing slogan
-       as contract: operations are the product, the answer is a
-       caption]
-    -- quantified claims inherit the match's declared
-       completeness — "all" and counts only over results declared
-       total [axm:B3]
-    -- execution (the Run act) is a CONSUMER of this stage, not
-       part of it: gated, human-confirmed [axm:B4], governed by
-       the ruled run machinery; result rows are DISPLAY-ONLY —
-       they never enter the graph or the mind's evidence for
-       claims. Data values and logic truth stay separate worlds
-    -- writes: usage events only — `confirmed` when the human
-       accepts an answer; `ran` when they execute. Nothing else
-    -- checks: GRND-1 writer census (confirmed | ran only) ·
-       GRND-2 caption gate — no ungrounded claim in answer text ·
-       GRND-3 quantifiers only over declared-complete results ·
-       GRND-4 headlines/counts rendered by code
-
-  Stage 3: GENERATE (ratified 2026-09-04) — no-match → new
-  estate, through the front door:
-    -- trigger: a no-match outcome AND an explicit human request —
-       generation is an act someone asks for, never an automatic
-       consolation
-    -- the builder's grounding — layer 1 is the whole vocabulary:
-       generated SQL composes only from declared reality —
-       existing tables/columns, joins along declared joins_to
-       paths (the legality rule pays forward: the builder WALKS
-       the join graph; an unjoinable pair is an honest refusal
-       naming the missing declared path), documented value sets
-       for category filters. The model drafts; a DETERMINISTIC
-       validator checks every reference and join against layer 1
-       before the draft reaches the human [axm:B1, axm:M5]
-    -- the draft is DISPLAY-ONLY: delivered through the answer
-       surface, writes nothing; a discarded draft leaves no
-       residue (demand was captured by asked + no-match)
-    -- the parser door (the L0 ruling): a draft becomes estate
-       ONLY by the human adopting it into their source and the
-       inbound flow parsing it like any customer file — zero
-       trust shortcuts; from then on descriptions, terms,
-       governance work on it with no special cases
-    -- adoption and execution are human-confirmed acts [axm:B4]
-    -- generated-file provenance (ruled 2026-09-04, option c):
-       unmarked in v1 — the org's repo history carries it;
-       revisit trigger: an adoption mechanism that can feed an
-       origin property structurally
-    -- checks: GEN-1 validator totality (references resolve,
-       joins declared; refusals name the missing path) · GEN-2 no
-       side channel — the inbound door is the only door · GEN-3
-       drafts write nothing · GEN-4 generation only on no-match +
-       human request
-
-**** Hardening passes (cross-level law)
-
-The CHANGE pass — what survives change            [ratified]
-- Method: scenario-driven (scenarios are the answer key of
-  architecture — authored expected outcomes, then the design is
-  walked against them). Scenarios blessed 2026-09-05:
-    S1 edited file: a certified description's scope gains a
-       predicate and the file re-parses → the description
-       survives, attached to the SAME scope; divergence flags it;
-       nothing dangles or silently re-attaches
-    S2 deleted scope: the scope is removed entirely → the
-       description neither vanishes nor dangles silently — a
-       counted orphan state a steward can see and rule on
-    S3 auditor's question: "why did Maria certify this?" a year
-       later → the basis chain produces the evidence she saw
-       (forces the retention ruling)
-    S4 drifted family: a minted concept's family changes → the
-       drift lens reports against the minted concept (forces the
-       correspondence rule)
-    S5 version bump: everything goes stale at once → regeneration
-       by declared priority within a budget; proposals at a pace
-       a steward survives
-- RULING (2026-09-05): Layer-2 node identity is NAME-KEYED for
-  the nodes artifacts attach to — file (source path) and scope
-  (file :: scope name) — so an attachment survives edits INSIDE
-  the named thing; content keys are DRIFT EVIDENCE, not identity.
-  S1's expected outcome (survives the edit, gets flagged) is
-  exactly name-keyed identity + content-drift detection.
-- RULING (2026-09-05, Sunny's call — the one law): NOTHING IN THE
-  GRAPH IS EVER PHYSICALLY DELETED. Change supersedes; current is
-  derived; retired nodes remain valid targets. A re-parse appends
-  the new tree version and retires the prior (valid_to); same for
-  extract succession (which already ruled this for layer 1). The
-  whole graph is append-and-supersede with derived current —
-  layers differ only in AUTHORITY (rebuildable from source vs
-  irreplaceable), never in mutation style. Industry basis: SCD
-  Type 2; catalog soft-delete (consumers hold references into
-  us); event-sourced projections. Known cost, accepted: storage
-  grows monotonically — trivial at metadata scale.
-  CONSEQUENCES: S2 CLOSED — no orphans exist; artifacts attached
-  to a retired node surface in the steward queue ("attached to
-  retired scope") with similarity candidates; re-attachment stays
-  a human disposition. S3 REDUCED to a retention line: retained
-  versions ARE the evidence basis cites; default retention
-  forever; pruning is a ruled act, never automatic.
-- RULING S4 (2026-09-05, correspondence): each recomputed family
-  corresponds to the minted concept whose basis members it
-  overlaps MOST, measured on name-keyed member ids (the one law
-  guarantees they still exist). Closed outcomes: corresponds
-  (drift lens reports against it) · dispersed (surfaced finding)
-  · merged (one family, two+ concepts — AMBIGUOUS, both named,
-  human rules, never auto-merged) · new territory. Ties →
-  ambiguous. The machine never re-anchors; correspondence is a
-  REPORT.
-- RULING S5 (2026-09-05, staleness economics): staleness is a
-  STATE; regeneration is a BUDGETED QUEUE — consumed in
-  usage-weighted priority order (blast-radius + expertise lenses
-  are the ranking); every produce run has a registered budget and
-  records consumed + remaining backlog ("stale but not
-  regenerated" is visible and counted, never silent, never a
-  stampede); proposals to human-owned artifacts pace at the
-  steward's pull. A version bump is an economic event with knobs,
-  not an emergency. Checks: ECON-1 worklist order =
-  priority-lens output · ECON-2 budget respected · ECON-3
-  backlog counted in the run event.
-- Node lifecycle contracts (ratified 2026-09-05, the
-  operation-grain complement to these scenarios): layer 1 in
-  CONTRACT_DATALOAD §11; layers 2-3 as Lifecycle sheets in their
-  registries; layer 4 inherits (human-mint CREATE only).
-- PASS CLOSED: S1-S5 all pass by construction against the
-  ratified rulings.
-
-The EDGES pass — the system's outer boundary       [ratified]
-- Scenarios blessed 2026-09-05:
-    E1 day one: the SQL estate arrives → a REGISTERED estate
-       source; every in-scope file acquired ⊎ counted-excluded;
-       nothing silently skipped
-    E2 nightly refresh: changed file → supersede; deleted file →
-       retire; cadence is a registered property
-    E3 the report: blast-radius must answer "what breaks?"
-       including reports — or narrow honestly (forces H4)
-    E4 the unanswerable question: demand captured; "top
-       unanswered questions" answerable later; inquiry shape
-       ruled here, PHI treatment deferred to the SAFETY pass
-       (recorded coupling)
-    E5 the non-SQL file: counted unsupported-dialect with its
-       placeholder named — conservation at estate grain
-- RULING (2026-09-05, H3 — the estate source contract, the
-  inbound door's twin): a registered estate source = (org, kind,
-  location/scope declaration, declared dialect(s), cadence),
-  producing SELF-CONTAINED SNAPSHOTS identified by (source,
-  as_of). File identity = stable source path (the name-key layer
-  2 already uses). Scope conservation: acquired ⊎ counted-
-  excluded (reason: out-of-scope | unsupported dialect |
-  unreadable). Succession per the one law: changed supersedes,
-  absent retires, the change report says so. Intake checks mirror
-  INTAKE-0..7. Deliberately the same shape as CONTRACT_DATALOAD —
-  the two inbound doors are the same door twice.
-- RULING (2026-09-05, H4 — consumption): NOT a new layer. Reports
-  are estate files in a placeholder dialect (TMDL), entering
-  through the registered estate source; consumption edges are
-  resolves_to from report trees — to L1 tables (DirectLake) or to
-  L2 FILE nodes (proc-backed datasets; a new resolves_to target,
-  ruled now so the mapper needs no design change later). UNTIL
-  the TMDL mapper is built: report files land as counted
-  unsupported-dialect (E5's law), and the blast-radius lens
-  DECLARES its completeness as people-only — honest narrowing,
-  visible in every result [axm:B3].
-- RULING (2026-09-05, H5 — no-match demand): the asked usage
-  event gains outcome (matched | ambiguous | no-match — the match
-  stage's own closed set) and, on matched/ambiguous, about → the
-  candidate node(s); on no-match, NO about edge — nothing was
-  touched, and the absence IS the fact. The inquiry TEXT rides
-  the asked event as payload (the only place demand content can
-  live); its PHI treatment is an explicit SAFETY-pass obligation
-  on this field. "Top unanswered questions" = the DEMAND lens
-  (catalog #18): no-match asked events → clustered themes +
-  counts, feeding generate offers and governance priority. Not an
-  inquiry class: demand IS usage — one ledger, never two.
-  Checks: MATCH-1 amended (asked carries outcome); DEMAND lens
-  declares completeness.
-- PASS CLOSED: E1-E5 pass by construction; H3, H4, H5 closed.
-
-The SAFETY pass — PHI and residency                [ratified]
-- Scenarios blessed 2026-09-05: SF1 the MRN in a WHERE clause ·
-  SF2 the patient name in a question · SF3 the late discovery.
-- RULING 1 (the PHI boundary): all inbound text — estate files at
-  acquisition, inquiry text at event landing — passes the PHI
-  scan/redact gate BEFORE entering any layer; redactions counted,
-  never silent; the layer-2 evidence law is amended one word:
-  verbatim-AFTER-REDACTION. PHI never stored is PHI never voiced.
-  Checks: SAFE-1 both doors gated · SAFE-2 redactions counted.
-- RULING 2 (the ONE exception to the one law, stated narrowly):
-  for late-discovered PHI or a legal obligation, a RULED
-  REDACTION ACT may destroy content in place — human-confirmed
-  [axm:B4], scoped to the offending field — and it appends a
-  permanent REDACTION EVENT (who, why, what shape was removed,
-  never the content). The content dies; the fact that it died is
-  forever. Boundary-first means this path should almost never
-  run; a design with no lawful path forces improvisation on the
-  worst day. Check: SAFE-3 — redaction acts are human-ruled,
-  tombstoned, and the ONLY destruction path in the codebase.
-- RULING 3 (tenancy, H11): one graph = one org, resident in the
-  customer's tenant; nothing crosses out except de-identified
-  aggregates, by explicit decision — the intake report's
-  residency clause generalized. Check: SAFE-4 egress census.
-- PASS CLOSED: SF1-SF3 pass by construction; H6, H11 closed.
-
-The SCALE/OPS pass — envelope and failure          [ratified]
-- Scenarios blessed 2026-09-05: SO1 the 39k-table estate · SO2
-  the run that dies at artifact 200 of 460 · SO3 the question
-  during the batch.
-- RULINGS (2026-09-05, H9 + H10):
-    -- the ENVELOPE is registry data, not vibes — calibration
-       targets (revalidated at first build measurements): estates
-       to ~50k tables / ~100k columns / low-thousands of files;
-       trees to ~10M nodes; interactive surfaces in seconds;
-       batch sweeps in minutes-to-hours, budgeted per S5
-    -- lens MATERIALIZATION MODE declared per lens: on-demand
-       (cheap derivations) | materialized (estate-scale sweeps —
-       relatedness, working-set, gap-census, demand); a
-       materialized result is a REGENERABLE report surface
-       stamped with lens version + graph state — a cache with a
-       birth certificate, never a second truth
-    -- run events carry outcome (completed | aborted + progress);
-       PER-ARTIFACT ATOMICITY (an artifact lands whole or not at
-       all); RESUME = the staleness worklist — landed artifacts
-       fall out of it, so no checkpoint machinery exists
-    -- readers never block on writers (append-only makes this
-       nearly free); a consistent read = a graph-state stamp
-  Checks: OPS-1 materialized surfaces regenerable + stamped ·
-  OPS-2 no partial artifacts · OPS-3 aborted + rerun = identical
-  end state to one completed run · OPS-4 envelope numbers in the
-  registry, cited by capacity tests.
-- PASS CLOSED: SO1-SO3 pass by construction; H9, H10 closed.
-
-ALL FOUR PASSES CLOSED (2026-09-05): the open register stands at
-15/15 drifts and 11/11 holes closed. The Level-1 design is
-hardened: every room ratified, every seam contracted, every
-lifecycle contracted, every hole ruled.
-
-The AMBIGUITY rulings (A1-A10, ruled 2026-09-05, model-first;
-witness examples abbreviated — full cases in the register)
-
-A1 containers (REFINED by Sunny 2026-09-05, from the F1
-   hand-check): the db is a PREREQUISITE, declared by the DBA at
-   registration — never derived from extract files. mint(db) :=
-   at registration, from the DBA-completed prereq (db name,
-   server, DBA team, registered sources, AND the schema->source
-   mapping — the second ruling from the same hand-check), BEFORE
-   any intake.
-   Extracts attach schemas downward into a pre-registered db
-   only; an extract naming an unregistered db is a NAMED REFUSAL.
-   The script's captured DB_NAME() becomes VERIFICATION: intake
-   checks declared-vs-captured agreement. Organizational
-   ownership = a layer-3 responsibility (dba, DBA-team role,
-   about the db), minted from the prereq. Witness: two sources
-   name one registered db -> one node; an unregistered db ->
-   refused by name.
-A2 identity: id_L1 := (source, schema, table[, column]); db is a
-   property. match(a,b) := fold_upper(strip_brackets_quotes(a)) =
-   fold_upper(strip_brackets_quotes(b)); values keys compare as
-   trimmed strings. Total over all references. Witness: db rename
-   -> zero identity changes; pat_enc -> PAT_ENC; 3 matches "3".
-A3 scope keys: key(scope_i) := file :: name        if i = 1st
-   occurrence of name in file order; file :: name#i otherwise.
-   Total over all scopes w/ names. Branch (explicit, counted):
-   removing occurrence 1 retires ALL keys of that name; survivors
-   re-mint; displaced attachments surface for re-attach. Witness:
-   two WITH Base -> Base, Base#2; edit elsewhere changes neither.
-A4 attachment domain: about-targets := named nodes only (file,
-   named scope, KG1 nodes, layer-3 citizens, concepts). Unnamed
-   nodes are outside the domain — not a branch, a domain bound.
-   Witness: subquery logic is described at its named ancestor.
-A5 asked edges: edges(outcome) := {matched -> about(the node),
-   ambiguous -> none, no-match -> none}. Total over the closed
-   outcome set. The pick lands as confirmed(about chosen).
-   Witness: 5 candidates + pick -> one expertise touch.
-A6 current: current(A) := max(versions(A))            if
-   ownership(A) = machine; max({v : human_authored(v) or
-   accepted(v)})                                       otherwise.
-   Non-empty by construction: human ownership derives from such a
-   v existing. Witness: m1,h2,m3 -> h2; accept(m3) -> m3.
-A7 retention: retained := every ACCEPTED snapshot, in the
-   customer-tenant store (durability's backed-up asset). rebuild
-   := from retained (byte-identical); a fresh extract is a NEW
-   SUPERSESSION, never called rebuild. Witness: year-2 rebuild
-   from 2026-08 snapshot reproduces the graph exactly.
-A8 pending references: legality(declared join) checks the
-   DECLARER's ownership only; target_exists ∈ {yes -> edge,
-   no -> counted pending set}; pending resolves on target
-   arrival. Total; no intake order exists. Witness: org-first ->
-   pending 1; epic arrives -> pending 0.
-A9 run accounting: accounting(run) := one conservation line PER
-   CLASS attempted; killed-lines exists only where the class's
-   gate drops sentences. Witness: 42 desc + 3 noms -> two lines.
-A10 send confirmation: confirm(send) requires author ∈ humans
-   (never agents) ∧ recorded on the sent event; role qualification
-   := the org's role model (their workflow owns promotion) — an
-   INTENT judgment, declared as such [clause pt 3]. Witness:
-   Maria accepts, admin confirms -> both identities forever;
-   agent-only send refused.
-
-**** MVP v1 scope (ratified 2026-09-05 — a ruled route through
-the map; every exclusion recorded)
-
-Goal: deliver a full X-Ray engagement on the new architecture —
-estate in, descriptions + findings out, file-first exports landed.
-
-IN v1: Level 1 entire (store, metamodel, phi_gate, kg1_intake,
-kg2_mapper, kg3_artifacts, kg4 mint, read_api — the graph is the
-product, not scopeable) · Level 2: the catalog rows flagged v1 in
-the Lenses_Registry — the spine derivations + decisions,
-degenerate, join-compliance, relatedness, working-set, gap-census,
-referenced-keys (ruled 2026-09-05: the registry's v1 flag is the
-authority; prose lens-counts retired — a count in a sentence
-drifts, a flag column is checkable) · Level 3: the outward
-flow whole (inbound, produce + gates, approve, land file-first,
-materialize, run_events) · dialect: T-SQL only.
-
-DEFERRED, with reasons: the inward flow entire (no ask surface in
-an X-Ray engagement; cleanest seam) · usage ledger + expertise/
-blast-radius/demand lenses (they read the deferred ask surface) ·
-divergence, concept-drift, correspondence (they compare against
-prior state; v1 engagements are first contact) · API transport
-(file-first is the ruled order) · TMDL/Snowflake (counted
-placeholders per E5). The import law makes every deferral
-checkable: nothing in v1 imports anything deferred.
-
-Build approach (ruled): new skeleton, ported organs — the graph
-packages grow fresh (the data model changed at the foundation);
-proven components port into their mapped addresses WITH their
-test suites as porting acceptance (parser adapter, IR extractor
-reworked to the kind library, text gates + injection fixtures,
-PHI scan, bridge exporters, produce machinery). The existing repo
-keeps running untouched (the demo path) while the new build grows
-— the port manifest (per module: port | rework | new) is the
-comparison artifact, drawn from the 09-04 audit.
-
-The Graph Validity Contract — GV (ratified 2026-09-05: "complete
-and correct" is DEFINED, not eyeballed)
-
-A graph is complete and correct iff all five families pass; every
-rule is a total predicate over (graph, inputs, metamodel) yielding
-pass | named violations.
-  GV-A SHAPE: node/edge kinds + properties validate; edge endpoint
-    kinds within each edge's declared domain->range pairs (a file
-    with no statements is a violation, not a style choice);
-    direction conventions hold.
-  GV-B STRUCTURE: the containment forest (one parent each, no
-    cycles, all reachable from declared roots db|file);
-    role-completeness per predicate kind (the kind library's roles
-    column IS the rule table); contiguous positions; <=1
-    resolves_to per ref.
-  GV-C CONSERVATION: bijective reconciliation per extract part
-    (both directions — nothing missing, nothing invented); KG2
-    conservation (handled ⊎ remainder; acquired ⊎ excluded;
-    resolved ⊎ counted); gap lists RECOMPUTED, never trusted.
-  GV-D CONSISTENCY: every derived value recomputes identically
-    from primitives; no banned stored summary exists; legality
-    invariants pointwise (join declarer owns dependent side;
-    single-source schemas; INTAKE-10).
-  GV-E EVIDENCE: every KG2 node's fragment locatable at its
-    recorded position; children's fragments TILE their statement
-    (cover it minus counted remainder) — text-level conservation.
-  BOUNDARY (honest): GV proves structure, conservation,
-  consistency, and textual fidelity. It cannot prove authored
-  MEANING — that is J1, ratified by Sunny once per answer key;
-  GV judges every graph thereafter.
-  Validator: AIVIA_Product/fixtures/validate_fixtures.py (the
-  embryo of the build-phase validator — likely the FIRST real
-  code of the build).
-
-**** Design-to-Code Protocol (Level 0 law)
-
-Six steps, in order, for every component; no step skipped:
-1. Doc section ratified here first — the doc is the design authority.
-2. Metamodel registry updated: the doc's node/edge/property
-   definitions restated as a machine-readable data file. Code and
-   tests consume the registry, never the prose; any doc change
-   updates the registry in the same breath.
-3. Every rule gets named checks, enumerated before code — a rule
-   with no check is a hope (the rule-to-check map).
-4. Fixtures authored: synthetic input + hand-authored expected
-   output (the answer key), written before any builder exists.
-5. Only then code — until the checks are green. Code never
-   introduces a concept the registry doesn't have.
-6. Discoveries flow backward: anything code reveals goes to the DOC
-   first, then registry, then code — never patched in place.
-
-Companion artifacts are indexed to this doc's levels and live
-beside it (L1_* files, named for the Level-1 section they attach
-to); the doc holds WHAT and the rules, the companions hold the
-machine-readable and test-facing detail.
-
-The Disambiguation clause (ratified 2026-09-05; AMENDED same day
-— models first, Sunny's totality ruling):
-1. MODEL FIRST: every rule is stated as a mathematical definition
-   — a TOTAL mapping over a declared domain: every input case
-   covered; partiality only as an explicit, counted branch, never
-   silence [axm:J2 — mathematical definition is MANDATORY for
-   computable judgments].
-2. EXAMPLES ARE WITNESSES, never definitions: one deciding example
-   per rule remains mandatory, but it TESTS the model (and becomes
-   a fixture at build). The model decides cases; the example
-   checks the model; a disagreement between them is the finding.
-3. THE TYPED EXCEPTION: linguistic/intent judgments [axm:J2 types]
-   admit no total model BY TYPE — there, examples + measurement
-   protocols + HITL carry the rule, and the rule DECLARES its
-   type. Misfiling in either direction is the violation.
-4. TWO-READINGS ESCALATION (the HITL law): two compliant readings
-   = a register row, never a choice. The ruling is Sunny's
-   [axm:R3 applied to design gaps].
-
-Binding mechanisms (ratified 2026-09-04 — what makes steps 2-3
-physics instead of discipline; all build deferred with the rest):
-a. Registries are code-consumed data, version-bound to the doc:
-   each doc section carries a version stamp, its registry declares
-   the same stamp, a CI check compares — the same-breath rule made
-   mechanical.
-b. The rule-to-check closure meta-test: every rule in every
-   registry must name at least one existing check — "a rule with
-   no check is a hope" enforced as arithmetic.
-c. Banned-construct planks: parser-authority and
-   structure-never-lowered get AST-level guards on the modules
-   they govern (the proven plank pattern, new scope).
-d. The metamodel version rides every stamp: stored trees and
-   derived artifacts carry the registry version they conform to;
-   a metamodel change regenerates everything it governs.
+# Design — Graph Engine (THE ONE GRAPH)
+
+**STATUS: RATIFIED by Sunny 2026-09-10.** Derived from the
+first-principles brainstorm of 2026-09-10; drafted as
+`Design_Graph_Engine_v2.md` and renamed over the prior
+`Design_Graph_Engine.md` at ratification (the prior content
+stands in git history as the ratified record it was). The build
+ladder implementing this design: Manifest_Build §E6.
+
+---
+
+## The four principles (Sunny, 2026-09-10 — the mission restated)
+
+1. Answer users' natural-language questions about a hospital's
+   knowledge.
+2. The hospital's knowledge is hidden in SQL.
+3. Extract that knowledge and give it English meanings.
+4. A question's intent searches the knowledge base, reaches the
+   SQL, and grounds the answer.
+
+## The verdict that makes this v2 (ruled 2026-09-10)
+
+The v1 engine held one truth in six forms: raw SQL, AST blob,
+twin blob, the in-memory boot store, the search index, and the
+Fabric export. Every major corpse of 2026-09-09/10 — the blob
+corpse, the dual-namespace corpse, export-mirror drift, boot
+races — was an artifact of that layering. v2 has ONE home of
+meaning: **the graph**. Everything else either feeds it
+(evidence) or derives from it (projections).
+
+**THE TWIN DISSOLVES.** Its condition fact becomes the condition
+node row; its content_key becomes a column (the drift anchor);
+its points_at becomes a provenance column; its voicings become
+the description ladder; its census becomes the run ledger. Sunny's
+original mind image — every grain a node with its description,
+edges between them — is the architecture.
+
+---
+
+## L0 — Evidence (what the sources SAID)
+
+Append-only Delta tables in an `evidence` schema of the
+customer's lakehouse. One table per source contract; every row
+hashed and as-of stamped. **Nothing is read without storing;
+nothing is ever edited** — upstream change = a new snapshot row,
+old rows stand forever (provenance stability, diffs,
+reproducibility, audit).
+
+| source | upstream form | landing |
+|---|---|---|
+| SQL logic | lives in the DB (`sys.sql_modules`) or a repo where one exists | one row per object per captured version: objectId, schema, name, **definitionText verbatim**, contentHash, sourceModifyDate, capturedAt |
+| dictionaries | vendor documentation (Epic Clarity docs), INFORMATION_SCHEMA + extended properties, glossaries | ONE normalized tabular contract: tables, columns, keys, declared joins, value sets — descriptions included (vendor/human-authored text, trusted as-is) |
+| report definitions | BI service artifacts (TMDL/XMLA, layout JSON; SSRS RDL) — extractable far more often than assumed | definition text rows, same discipline |
+
+Cadence: scheduled + change-triggered pulls, hash-gated — an
+unchanged object produces nothing. L0 contains **zero
+interpretation**: no facts, no edges, ever.
+
+Mappings that cannot be extracted may later be *inferred* (usage
+logs, naming) — those enter the graph flagged `inferred` vs
+`declared`: a queryable confidence class, never a silent guess.
+
+## L1 — Extraction (what the parser SAW + the gated sentence)
+
+**Input: L0 rows only. Never live sources.** Two workers, hard
+wall between them:
+
+- **The parser** (deterministic, the dialect's native parser —
+  no fallback, ADR 0001 law carried forward) does ALL structural
+  interpretation. Its output persists: **`derived.parse_records`**
+  — one row per (contentHash, parserVersion), the complete
+  structural record (the AST) as a JSON text column. Persisted
+  for provenance-address stability and cost; it is DERIVED
+  EVIDENCE — rebuildable by definition, hash-locked to its input.
+  Parser upgrade = new parserVersion; old records stand.
+- **The LLM** contributes prose compression ONLY (see the English
+  ladder) — drafted FROM the deterministic anatomy, never
+  independent of contents. Its output persists:
+  **`derived.english_drafts`** — (meaningKey, model,
+  promptVersion, text, status drafted→approved/rejected,
+  approver, timestamps). Not rebuildable; the governance
+  workbench lives here; approved text lands on graph nodes.
+  Drafts anchor to meaning keys, so upstream change visibly
+  orphans them.
+
+**Structural facts get NO L1 store** — they flow straight to
+graph rows carrying provenance columns (evidenceRowId,
+parseRecordId, parsePath, contentHash). Zero copies.
+
+Plus **`derived.derivation_runs`**: run stamps, input versions,
+parser/prompt versions, conservation counts (parsed / skipped /
+failed — all counted, nothing silent).
+
+**Dictionaries skip L1 storage entirely** — mechanical integrity
+checks in flight (bad rows refused + counted), then straight to
+graph citizens.
+
+**THE HASH CHAIN** (unbroken end to end): evidence contentHash →
+parse record (hash, parserVersion) → meaning keys → graph
+provenance → approved English anchored to keys. Change anywhere
+upstream cascades visibly, never silently.
+
+## L2 — THE GRAPH (what it MEANS — the single source of truth)
+
+A REAL graph database: **nodes and edges as Delta table rows**
+(properties as columns), served by Fabric Graph. The same rows
+are GQL-traversable, SQL-auditable, lakehouse-versioned. JSON
+lives only at L0/L1 — never here.
+
+**Node vocabulary** (the Shape_Ledger carries forward as the
+ruled census target; GQL-reserved words never used as names —
+the vendored-list gate stands):
+
+- technical: `db · db_schema · table · column`
+- logic: `file · statement · scope · condition · param ·
+  derived_column`
+- consumption: `pbi_report`
+- governance: `description · term · usage · disposition ·
+  proposal · acronym · person · agent · role` (+ `drift`)
+
+**Every node row carries:** name · **description** (its English)
+· descriptionStatus / curation state · provenance columns ·
+contentKey (meaning identity — the drift anchor) · label-specific
+properties.
+
+**Edge vocabulary:** containment `has_part` (db→db_schema→table→
+column; file→statement→scope→condition/param); `reads`
+(scope→table, true grain); `joins_to` (table→table, DECLARED —
+dictionary truth, with key columns); `resolves_to`
+(condition→column — OBSERVED logic; the declared-vs-observed diff
+is a pure GQL query and IS the documentation-drift product
+story); `cites` (scope→column outputs); `uses_param`;
+consumption `executes`; governance `describes / performed_by /
+approved_by / used_by / supersedes / assigns`. Clause provenance
+(`where` vs `join_on`) is a property on condition nodes — clause
+containers are syntax, not meaning, and are not nodes.
+
+**THE ENGLISH LADDER (amended by Sunny's readability challenge,
+2026-09-10):** every node ALWAYS keeps its deterministic render —
+the factual anatomy (audit, evidence, verbatim-checkable). The
+DESCRIPTION is: the render itself where composition is small
+(conditions, small scopes); an **LLM compression of the render**
+where composition is large (big scopes, procs, reports) — gated
+drafted→approved, attributed. Checkable law: a compressed
+description may only contain concepts present in its anatomy —
+hallucination detectable by comparison; the reviewer's question
+is mechanical.
+
+Sources of English, by grain: vendor documentation (table,
+column — trusted as-is) → grammar renders composed upward from
+those words (condition, scope leads — deterministic) → LLM
+compression at the top (proc, report aboutness — gated). Reports
+DERIVE their description from their executed procs (Sunny's
+derivation ruling: "the report users SHOULD see the logic").
+
+**Rebuild law:** the graph regenerates from evidence + parse
+records at any time; human approvals anchor to contentKeys and
+therefore SURVIVE unchanged meanings and VISIBLY ORPHAN changed
+ones (drift detection is the anchoring rule, not a subsystem).
+
+## L3 — Projections (derived, never authoritative)
+
+One embedding per node description, stored as a **vector column
+on the node's own row** — recomputed when the description changes
+(hash-gated), never re-embedded otherwise. ONE ANN index over the
+column, label-filterable: every grain findable by meaning because
+every grain HAS a meaning. Projections rebuild from the graph;
+never the reverse. Any lexical index follows the same law.
+
+## L4 — The answering loop
+
+TABLED (Sunny, 2026-09-10) pending the engine graph. The ratified
+chatbot design (`Design_Chatbot.md` — THE SEARCH IS THE ANSWER,
+the nine laws, the seats and cages) remains the governing design
+for this layer and re-derives its index from L3 at convergence.
+
+---
+
+## The laws carried forward from v1 (storage-independent, all kept)
+
+Conservation (handled ⊎ counted == everything) · meaning-identity
+anchoring (contentKeys → drift) · the voicing grammar (registry-
+versioned) · the verbatim law (stored == recomputed) · the LLM
+cage (structure never, prose only, gated) · the censuses incl.
+the SHAPE CENSUS (store == Shape_Ledger, both directions, reading
+THE STORE) · the literal law + mirror checks · the naming law +
+GQL-reserved gate · the live-seat rule · the verification law
+(mind images become standing queries; BUILT claims carry their
+proving query) · batch-verify discipline (small batches, Sunny's
+GQL gates, commit ids in the ledger) · capacity discipline (one
+refresh per batch, Sunny's hand or word).
+
+## Migration (convergence, not rewrite)
+
+- **Phase 1 — finish the ladder (in flight):** M3–M7 complete the
+  graph's layers exactly as this v2 specifies. Nothing already
+  shipped is discarded.
+- **Phase 2 — the primacy flip:** evidence and parse records
+  re-home from snapshot files/blobs into their Delta tables; the
+  boot store demotes to a BUILDER that writes the graph tables;
+  tree/twin blobs retire (parse records inherit the AST's role;
+  the twin's columns are already in the graph); the search index
+  re-derives from graph rows (embeddings move onto nodes).
+- **Phase 3 — the answering loop converges** (untabled by Sunny
+  when ready): the chatbot's index becomes the L3 projection;
+  scoring work (§D) resumes on top.
+
+## Open items
+
+- Connector scope v1 (agent jobs? SSIS? dbt? beyond modules)
+- Landing contract details per source
+- Fabric Graph vector capability specifics at implementation time
+- The inferred-mapping confidence classes (vocabulary)
