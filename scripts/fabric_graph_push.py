@@ -31,16 +31,27 @@ LAKEHOUSE_NAME = "AIVIA_GRAPH"
 FABRIC = "https://api.fabric.microsoft.com/v1"
 
 
+_TOKENS: dict = {}
+
+
 def az_token(resource: str) -> str:
-    return subprocess.run(
+    """Fresh-enough token: re-mint after 40min (az tokens run ~60;
+    the first live run died TokenExpired inside long backoffs)."""
+    cached = _TOKENS.get(resource)
+    if cached and time.time() - cached[1] < 2400:
+        return cached[0]
+    tok = subprocess.run(
         ["az", "account", "get-access-token", "--resource", resource,
          "--query", "accessToken", "-o", "tsv"],
         capture_output=True, text=True, check=True).stdout.strip()
+    _TOKENS[resource] = (tok, time.time())
+    return tok
 
 
-def fabric_call(token, method, path, payload=None, retries=8):
+def fabric_call(_token, method, path, payload=None, retries=8):
     url = FABRIC + path
     for attempt in range(retries):
+        token = az_token("https://api.fabric.microsoft.com")
         req = urllib.request.Request(
             url, method=method,
             data=json.dumps(payload).encode() if payload else None,
@@ -85,10 +96,13 @@ def push_tables(estate: str) -> None:
 
 def refresh_graph(token) -> None:
     # the graph model materializes via an on-demand item job
+    # the graph-model route, not the generic item-jobs route
+    # (jobType 'Refresh' is what LIST shows, but on-demand runs
+    # POST GraphModels/{id}/jobs/RefreshGraph/instances)
     status, body = fabric_call(
         token, "POST",
-        f"/workspaces/{WORKSPACE_ID}/items/{GRAPH_MODEL_ID}"
-        f"/jobs/instances?jobType=Refresh", payload={})
+        f"/workspaces/{WORKSPACE_ID}/GraphModels/{GRAPH_MODEL_ID}"
+        f"/jobs/RefreshGraph/instances", payload={})
     print(f"  refresh trigger: HTTP {status} "
           f"{json.dumps(body)[:200] if body else ''}")
 
@@ -145,8 +159,8 @@ def verify(estate: str, token) -> bool:
 
     data, st = gql(token, "MATCH ()-[c:has_part]->() "
                           "RETURN count(c) AS cnt")
-    if data is None:
-        print("  Q3 FAILED:", json.dumps(st)[:300])
+    if not data:
+        print("  Q3 FAILED or empty:", json.dumps(st)[:300])
         return False
     g = int(list(data[0].values())[0] if isinstance(data[0], dict)
             else data[0][0])
