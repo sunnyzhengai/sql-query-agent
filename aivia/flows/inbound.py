@@ -254,7 +254,32 @@ def receive_estate(store, reg: Dict[str, Any], estate_dir,
         # quantum; the homomorphism law is asserted inside translate()
         report.twins[name] = kg2_translator.apply_twin(
             store, f"{location}{name}", tree, manifest["as_of"])
+    _store_scope_descriptions(store, manifest["as_of"])
     return report
+
+
+def _store_scope_descriptions(store, as_of) -> None:
+    """THE SHAPE CONTRACT, M2 (Sunny's bottom-up ruling,
+    2026-09-10): every scope node carries its description STORED —
+    the lead render, composed from KG1 words. The verbatim law is a
+    standing test: stored == recomputed (test_scope_layer)."""
+    from aivia.flows import produce
+    from aivia.graph.read_api import ReadApi
+    from aivia.lenses import decisions
+    read = ReadApi(store)
+    by_id = {n.identity: n for n in read.nodes("scope")}
+    for key, tree in sorted(read.trees().items()):
+        for scope in decisions.named_scopes(tree):
+            node = by_id.get(scope["name_key"])
+            if node is None:
+                continue
+            lead = produce._scope_lead(read, tree, scope)
+            if node.properties.get("description") == lead:
+                continue
+            store.append_node(
+                "scope", node.identity,
+                {**node.properties, "description": lead},
+                as_of, node.extract_id)
 
 
 def receive_pbi(store, pbi_dir) -> int:

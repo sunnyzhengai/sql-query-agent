@@ -58,11 +58,12 @@ def test_every_loaded_registry_is_ratified_v1():
     # #13 — Q1/Q2/Q3 as failure gates; the blob corpse's lock);
     # 1.33.0 = the reserved-word renames (Sunny: contains->has_part,
     # by->performed_by, derived_column, pbi_report — GQL needs no
-    # backticks); 1.34.0 = round 2 from the OFFICIAL reserved list:
+    # backticks); 1.35.0 = M2 scope
+    # descriptions STORED (the shape contract lands on scopes); 1.34.0 = round 2 from the OFFICIAL reserved list:
     # schema->db_schema, parameter->param, kg3 text->description
     for reg in metamodel.load_all().values():
         assert reg.ratified is True
-        assert reg.version == "1.34.0"
+        assert reg.version == "1.35.0"
 
 
 def test_load_single_exposes_sheets_and_stamp():

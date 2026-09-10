@@ -90,32 +90,29 @@ def test_parquet_write_is_deterministic_and_lossless(tmp_path, world):
     assert '"NDC Not Part of Order"' in victim["description"]
 
 
-# ---- M2: the file layer (top-down ruling, 2026-09-10) ---------------
-def test_file_rows_carry_drafted_aboutness(world):
+# ---- M2: the scope layer (bottom-up re-ruling, 2026-09-10) ----------
+def test_scope_rows_carry_stored_descriptions(world):
     read, tables = world
-    rows = tables["graph_file"]
-    assert len(rows) == len(read.nodes("file"))
+    rows = tables["graph_scope"]
+    assert len(rows) == len(read.nodes("scope"))
     for r in rows:
         assert r["description"], f"{r['nodeId']}: empty description"
-        assert r["descriptionStatus"] == "drafted"
-        assert not r["name"].endswith(".sql")
     names = {r["name"] for r in rows}
-    assert "USP_ED_SEPSIS" in names
+    assert "#Base_Pop" in names
 
 
-def test_file_reads_table_edges_derive_from_scopes(world):
+def test_scope_reads_table_edges_at_true_grain(world):
     read, tables = world
-    edges = tables["graph_reads_fileTable"]
-    files = {r["nodeId"] for r in tables["graph_file"]}
+    edges = tables["graph_reads_scopeTable"]
+    scopes = {r["nodeId"] for r in tables["graph_scope"]}
     table_ids = {n.identity for n in read.nodes("table")}
     assert edges
     for e in edges:
-        assert e["sourceId"] in files
+        assert e["sourceId"] in scopes
         assert e["targetId"] in table_ids
-    # the deciding example: the ED proc reads the ED data mart
-    assert {"sourceId": "repo://sepsis-corpus/reporting/USP_ED_SEPSIS.sql",
-            "targetId": "emr|dbo|ED_ENCOUNTERS_DM"} in edges
-    # one edge per (file, table) — deduped
+    # the deciding example: the ED base population reads the fact
+    assert {"sourceId": "reporting/USP_ED_SEPSIS.sql::#Base_Pop",
+            "targetId": "emr|dbo|ED_ENCOUNTERS_FACT"} in edges
     pairs = [(e["sourceId"], e["targetId"]) for e in edges]
     assert len(pairs) == len(set(pairs))
 

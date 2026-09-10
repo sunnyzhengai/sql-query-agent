@@ -106,37 +106,47 @@ Source dropdowns, dead bindings, M1 lost a day to it). RULED: one
 namespace — everything targets `Tables/dbo/`; the loader now does.
 Root-level graph_* tables must never exist; delete on sight.
 
-## M2 — the file layer (top-down ruling, 2026-09-10)
+## M2 — the scope layer (bottom-up re-ruling, 2026-09-10)
 
-Two new tables: `graph_file` (28 rows — name, description = the
-Scribe's DRAFTED aboutness, descriptionStatus, dialect, textHash)
-and `graph_reads_fileTable` (243 edges, derived from the scopes'
-resolved reads at file grain).
+Ships the layer that touches the technical foundation directly:
+`graph_scope` (312 rows — name, description STORED on the store
+node and exported verbatim, structures) and
+`graph_reads_scopeTable` (451 edges, scope→table at TRUE grain).
+The earlier file-layer tables (graph_file / graph_reads_fileTable)
+are WITHDRAWN — files ship at M6, tied to statements; never load
+them.
 
-Load: upload both parquet → Load to Tables (New table, into dbo)
-→ in the graph model: Get data (add the two) → Add node `file` ←
-graph_file, key `nodeId`, all properties → Add edge `reads`,
-file → table, via graph_reads_fileTable (sourceId → targetId) →
+Load: upload both parquet → Load to Tables (New table, dbo) → in
+the graph model: Get data — keep ALL existing boxes checked, add
+the two new → Load → Add node `scope` ← graph_scope, key `nodeId`,
+properties name/description/structures → Add edge `reads`,
+scope → table, via graph_reads_scopeTable (sourceId → targetId) →
 Save → ONE refresh.
 
 THE M2 GATE:
 ```gql
-MATCH (f:file) RETURN count(f) AS cnt
+MATCH (s:scope) RETURN count(s) AS cnt
 ```
-Expected: 28.
+Expected: 312.
 ```gql
-MATCH (f:file)-[:reads]->(t:table) RETURN count(*) AS cnt
+MATCH (s:scope)-[:reads]->(t:table) RETURN count(*) AS cnt
 ```
-Expected: 243.
+Expected: 451.
 ```gql
-MATCH (f:file WHERE f.name = 'USP_ED_SEPSIS')-[:reads]->(t:table)
-RETURN t.name AS tableName ORDER BY tableName
+MATCH (s:scope WHERE s.name = '#Base_Pop')-[:reads]->(t:table)
+RETURN s.nodeId AS scopeId, t.name AS tableName ORDER BY scopeId, tableName
 ```
-Expected: the ED proc's read set, ED_ENCOUNTERS_DM among them.
+Expected: each file's #Base_Pop with its read tables —
+ED_ENCOUNTERS_FACT among the ED proc's.
 ```gql
-MATCH (f:file) RETURN f.name AS proc, f.description AS aboutness, f.descriptionStatus AS st ORDER BY proc
+MATCH (t:table WHERE t.name = 'ED_ENCOUNTERS_DM')<-[:reads]-(s:scope)
+RETURN count(s) AS cnt
 ```
-The 28 drafted descriptions — Sunny's standing gap-check surface.
+The reverse walk: which selections read the ED data mart.
+```gql
+MATCH (s:scope) RETURN s.name AS selection, s.description AS descr LIMIT 10
+```
+Stored descriptions, composed bottom-up from the dictionary words.
 
 ## Per-batch refresh (M2 and on)
 

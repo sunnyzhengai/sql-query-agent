@@ -193,7 +193,7 @@ SOURCES = {
 # deliveries lead, spine voiced, intermediates counted, census
 # closes; the file's ask-index words = the delivery lead, so file
 # embeddings embed meaning, never name-noise).
-STAMP_VERSION = "1.34.0"
+STAMP_VERSION = "1.35.0"
 RATIFIED = True
 DOC_STAMP = ("v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 twin-graph "
              "ruling ADR 0077; v1.2.0 Phase A metamodel bump; v1.3.0 "
@@ -1039,10 +1039,10 @@ TWIN_SHEETS = {
              "Description obligation": "stored (grammar-rendered at "
              "build)", "Notes": "today: rows inside the tree blob"},
             {"Kind": "node", "Name": "scope", "Status": "PRESENT",
-             "Description obligation": "TARGET stored (grammar-"
-             "rendered at build) — today rendered at read; landing: "
-             "the materialization build",
-             "Notes": "today skeletal ({structures})"},
+             "Description obligation": "stored — the lead render, "
+             "landed M2 (bottom-up ruling 2026-09-10); verbatim "
+             "law: stored == recomputed",
+             "Notes": "carries structures + description"},
             {"Kind": "node", "Name": "condition",
              "Status": "TARGET — landing: the materialization build",
              "Description obligation": "stored (voiced phrase)",

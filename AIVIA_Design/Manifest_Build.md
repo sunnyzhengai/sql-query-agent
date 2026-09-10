@@ -174,16 +174,23 @@ closing COMMIT lands in this table. No Fabric operation without
 Sunny's explicit go (his capacity, his hand). No Neo4j — Fabric
 Graph on Sunny's capacity is the verification surface.
 
-| batch | ships | ties into | status | commit |
+| batch | ships | ties DOWN into | status | commit |
 |---|---|---|---|---|
 | M1 | technical layer: db · db_schema · table · column + has_part ×3 (parquet export, loader, runbook, reserved-word gate) | — | **VERIFIED by Sunny's GQL 2026-09-10** (db 1 · db_schema 3 · table 90 · column 4554 · 4647 has_part · corpse quotes intact) | 1a2e212 → 6d6f4dc |
-| M2 | file ×28 + drafted descriptions (descriptionStatus: drafted — Sunny's gap-check surface) + reads→table | the verified technical layer | IN BUILD | — |
-| M3 | statement + stored grammar descriptions (R11) + file has_part spine | M2 | queued | — |
-| M4 | scope descriptions STORED + statement has_part spine | M3 | queued | — |
-| M5 | condition + param + stored voiced phrases + scope has_part | M4 | queued | — |
-| M6 | derived_column | M4 | queued | — |
-| M7 | resolves_to — lineage closes into column/table; proc→table walkable in pure GQL | M5 ↔ M1 | queued | — |
-| M8 | governance + consumption: pbi_report · description artifacts · acronym · person/agent · executes/describes/performed_by; blessing lands file descriptions ON the store node; zero TARGET rows; final viz | everything | queued | — |
+| M2 | scope ×312 — descriptions STORED on the node (lead render; verbatim law: stored == recomputed) + scope—reads→table (TRUE grain) | table | IN BUILD | — |
+| M3 | condition + param — stored voiced phrases + scope has_part + condition—resolves_to→column | scope + column | queued | — |
+| M4 | derived_column | scope | queued | — |
+| M5 | statement — stored R11 descriptions + statement—has_part→scope | scope | queued | — |
+| M6 | file — drafted aboutness + file—has_part→statement; the COMPOSITION CHECK (parent description contains children's words, per Sunny's summing law) | statement | queued | — |
+| M7 | governance + consumption + blessing lands file descriptions ON the store node + zero TARGET rows + final viz | everything | queued | — |
+
+RE-LADDERED 2026-09-10 (Sunny's second ruling, superseding
+top-down): batches ship BOTTOM-UP from the verified technical
+layer — every batch's birth-edges point DOWNWARD at already-
+verified nodes, so nothing floats and no rollup shortcuts are
+needed. The file—reads→table rollup (built in 4ed2ce1) is
+REMOVED: by M6 the true path file-[:has_part*]->scope-[:reads]->
+table is walkable and nothing derivable is stored.
 
 Decisions ruled 2026-09-10: statement identity = <file>::stmt/<position>;
 statement descriptions = Grammar_Floor R11 (suite-first, Sunny

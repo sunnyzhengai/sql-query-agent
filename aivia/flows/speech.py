@@ -99,10 +99,14 @@ def speak(read, entry: Dict[str, Any]) -> str:
                     if n.identity == identity)
         return (node.properties.get("description") or "").lower()
     if kind == "scope":
-        tree, scope = _tree_and_scope(read, identity)
-        if scope is None:
+        # the shape contract (M2): scopes STORE their description;
+        # speech reads the store, uniform with table/column — the
+        # verbatim law (stored == recomputed) is its own pin
+        node = next((n for n in read.nodes("scope")
+                     if n.identity == identity), None)
+        if node is None:
             return ""
-        return produce._scope_lead(read, tree, scope).lower()
+        return (node.properties.get("description") or "").lower()
     if kind == "file":
         # THE SPEECH CONTRACT: a file speaks its OWN aboutness (the
         # Scribe-drafted description) or NOTHING — a counted gap,
