@@ -32,9 +32,9 @@ SHEET_KINDS = {
     "table": "table", "column": "column",
     "scope": "scope (selection)", "file": "file",
     "condition": "condition (predicate)", "parameter": "parameter",
-    "derived column": "derived column", "term": "term (KG3)",
+    "derived_column": "derived_column", "term": "term (KG3)",
     "drift": "drift name", "label": "kind (node type)",
-    "PBI Report": "PBI Report",
+    "pbi_report": "pbi_report",
 }
 
 
@@ -118,14 +118,14 @@ def speak(read, entry: Dict[str, Any]) -> str:
     if kind == "parameter":
         return f"parameter {_words(entry['name'])} of " \
                f"{_words(entry['owner'].rsplit('/', 1)[-1])}"
-    if kind == "derived column":
+    if kind == "derived_column":
         # the entry's own name never rides in speech (one evidence,
         # one card — the name card owns it; total-score law)
         scope_key = identity.rsplit(".", 1)[0]
         return (f"a computed output of the "
                 f"{_words(scope_key.split('::')[-1])} selection")
-    if kind == "PBI Report":
-        node = next(n for n in read.nodes("PBI Report")
+    if kind == "pbi_report":
+        node = next(n for n in read.nodes("pbi_report")
                     if n.identity == identity)
         # THE DERIVATION RULING (Sunny, 2026-09-09: "the report
         # users SHOULD see the logic"): a report's aboutness IS its
@@ -173,7 +173,7 @@ def entries(read) -> List[Dict[str, Any]]:
                 e["expansions_text"] = " ".join(exps)
         if e["label"] == "scope":
             e["owner"] = scope_owner.get(e["identity"])
-        elif e["label"] == "derived column":
+        elif e["label"] == "derived_column":
             e["owner"] = e["identity"].rsplit(".", 1)[0]
         elif e["label"] == "drift":
             e["owner"] = e["identity"].split("::")[0]

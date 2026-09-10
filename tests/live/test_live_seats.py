@@ -67,7 +67,7 @@ def test_the_payoff_question_live(live_world):
     r = _ask(live_world, "what reports are about ED")
     assert r["status"] == "answer", r.get("answer") or r
     labels = {h["label"] for h in r["hits"]}
-    assert "PBI Report" in labels, sorted(labels)
+    assert "pbi_report" in labels, sorted(labels)
     names = " ".join(h["name"].lower() for h in r["hits"])
     assert "sepsis" in names and "dashboard" in names
 

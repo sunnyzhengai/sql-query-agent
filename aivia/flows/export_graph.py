@@ -37,6 +37,7 @@ def _camel(key: str) -> str:
 
 
 def _node_row(n) -> Dict[str, str]:
+    # literal: shape
     row = {"nodeId": n.identity,
            "name": str(n.properties.get("name")
                        or n.identity.rsplit("|", 1)[-1]),
@@ -64,12 +65,12 @@ def export_tables(read: ReadApi,
     pairs: Dict[str, List[Dict[str, str]]] = {}
     for src, edges in sorted(adj.items()):
         for tgt, elabel in sorted(edges):
-            if elabel != "contains":
+            if elabel != "has_part":
                 continue
             sl, tl = label_of.get(src), label_of.get(tgt)
             pair = _PAIR_NAMES.get((sl, tl))
             if pair:
-                pairs.setdefault(f"graph_contains_{pair}", []).append(
+                pairs.setdefault(f"graph_has_part_{pair}", []).append(
                     {"sourceId": src, "targetId": tgt})
     tables.update(pairs)
     return tables
@@ -82,6 +83,7 @@ def write_csvs(tables: Dict[str, List[Dict[str, str]]],
     written = []
     for name, rows in sorted(tables.items()):
         cols = sorted({c for r in rows for c in r},
+                      # literal: shape
                       key=lambda c: (c not in ("nodeId", "sourceId",
                                                "targetId", "name",
                                                "description"), c))

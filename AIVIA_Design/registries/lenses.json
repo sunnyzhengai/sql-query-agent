@@ -1,7 +1,7 @@
 {
  "registry": "lenses",
  "stamp": {
-  "version": "1.32.0",
+  "version": "1.33.0",
   "doc_section": "Level 2 — lenses",
   "doc_stamp": "v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 twin-graph ruling ADR 0077; v1.2.0 Phase A metamodel bump; v1.3.0 Phase B composite-kinds correction; v1.4.0 T-2 operational-statements ruling; v1.5.0 the gap taxonomy; v1.6.0 the plug-all-holes sweep; v1.7.0 ledger close; v1.8.0 the ask console ADR 0078; v1.9.0 the list op; v1.10.0 kind vocabulary; v1.11.0 ADR 0079 interpreter; v1.12.0 Tier A build data; v1.13.0 the seat-failure law; v1.14.0 follow-up context; v1.15.0 anaphor vocabulary (all 2026-09-06)",
   "ratified": true,
@@ -229,12 +229,12 @@
     "Meaning": "rendered"
    },
    {
-    "Label": "PBI Report",
+    "Label": "pbi_report",
     "Speech": "DERIVED from the executed procs' descriptions via the executes edge (1:1 = the same words; the single multi-proc report composes both; shell description only when no proc speaks) + displays",
     "Meaning": "THE DERIVATION RULING (Sunny 2026-09-09): 'the report users SHOULD see the logic' — a report aboutness is never separately drafted; type words stay banned (label card carries them)"
    },
    {
-    "Label": "derived column",
+    "Label": "derived_column",
     "Speech": "computed-output phrase (grammar render: name words + the defining selection)",
     "Meaning": "rendered"
    },
@@ -477,7 +477,7 @@
    },
    {
     "Kind": "node",
-    "Name": "derived column",
+    "Name": "derived_column",
     "Status": "TARGET — landing: the materialization build",
     "Description obligation": "stored (voiced phrase)",
     "Notes": "same"
@@ -561,14 +561,14 @@
    },
    {
     "Kind": "node",
-    "Name": "PBI Report",
+    "Name": "pbi_report",
     "Status": "PRESENT",
     "Description obligation": "stored shell + speech DERIVED from procs (the derivation ruling)",
     "Notes": "consumption layer"
    },
    {
     "Kind": "edge",
-    "Name": "contains",
+    "Name": "has_part",
     "Status": "PRESENT",
     "Description obligation": "-",
     "Notes": "db→schema→table→column spine; TARGET grows: file→statement→scope→condition/parameter at materialization"
@@ -638,7 +638,7 @@
    },
    {
     "Kind": "edge",
-    "Name": "by",
+    "Name": "performed_by",
     "Status": "PRESENT",
     "Description obligation": "-",
     "Notes": "kg3 actor"
@@ -704,7 +704,7 @@
    },
    {
     "Label": "schema",
-    "Edge": "contains",
+    "Edge": "has_part",
     "Status": "edged",
     "Meaning": "db contains schema; schema contains tables"
    },
@@ -805,7 +805,7 @@
     "Meaning": "STEP 4: walks to its file; tree-born"
    },
    {
-    "Label": "derived column",
+    "Label": "derived_column",
     "Edge": "defines",
     "Status": "edged-pseudo",
     "Meaning": "tree-born; its scope defines it (pre-existing edge, now documented)"
@@ -817,7 +817,7 @@
     "Meaning": "tree-born; sighted by the reading file (pre-existing edge, now documented)"
    },
    {
-    "Label": "PBI Report",
+    "Label": "pbi_report",
     "Edge": "executes",
     "Status": "edged",
     "Meaning": "PHASE H: a report is deduced from the procs it runs — executes edges to its files"
@@ -830,19 +830,19 @@
    },
    {
     "Label": "person",
-    "Edge": "by",
+    "Edge": "performed_by",
     "Status": "edged",
     "Meaning": "STEP 3: minted on first act; their birth edge IS being acted-by (>=1 act points at them); a hand-written actor with no acts counts missing"
    },
    {
     "Label": "agent",
-    "Edge": "by",
+    "Edge": "performed_by",
     "Status": "edged",
     "Meaning": "model/machine actors — same law, own kind (never cross-minted as persons)"
    },
    {
     "Label": "role",
-    "Edge": "by",
+    "Edge": "performed_by",
     "Status": "edged",
     "Meaning": "role actors — same law"
    },
@@ -912,7 +912,7 @@
     "Note": "ADR 0079: path-ranking inputs are DECLARED, TUNABLE data — never a hidden model judgment. Seeded uniform; tuned by evidence."
    },
    {
-    "Edge": "contains",
+    "Edge": "has_part",
     "Weight": "1.0",
     "Note": "column-in-table, scope-in-file"
    },

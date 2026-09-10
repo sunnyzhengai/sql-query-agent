@@ -304,7 +304,7 @@ def receive_pbi(store, pbi_dir) -> int:
             executes.append(rel_to_key.get(rel, rel))
             displays += displays_of(rel)
         store.append_node(
-            "PBI Report", f"pbi://sepsis/{slug}",
+            "pbi_report", f"pbi://sepsis/{slug}",
             # literal: shape
             {"name": row["name"],
              "description": row["description"],

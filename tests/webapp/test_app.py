@@ -1216,7 +1216,7 @@ class TestConsole5FoldBackWire:
         done = next(f for f in after["flags"]
                     if f["id"] == self.FID)
         assert done["console_state"]["state"] == "certified"
-        assert done["console_state"]["by"] == "local-dev"
+        assert done["console_state"]["performed_by"] == "local-dev"
         assert done["console_state"]["at"]
 
     def test_reopen_appends_and_reopens(self, tmp_path):

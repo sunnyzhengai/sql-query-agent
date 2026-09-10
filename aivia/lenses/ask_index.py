@@ -73,7 +73,7 @@ def lens_ask_index(read, params) -> Dict[str, Any]:
                                       .rsplit(".", 1)[-1]) \
                                 == _fold(m["name"]):
                             continue
-                        add("derived column",
+                        add("derived_column",
                             f"{s['name_key']}.{m['name']}",
                             m["name"])
         # the search law: unresolved names are findable — each is the
@@ -82,8 +82,8 @@ def lens_ask_index(read, params) -> Dict[str, Any]:
                 "unresolved", []):
             add("drift", f"{tree['name']}::{ref}",
                 ref.rsplit(".", 1)[-1])
-    for n in read.nodes("PBI Report"):
-        add("PBI Report", n.identity, n.properties.get("name", ""))
+    for n in read.nodes("pbi_report"):
+        add("pbi_report", n.identity, n.properties.get("name", ""))
     seen_terms = {}
     for n in read.nodes("term"):
         seen_terms[n.properties["artifact_id"]] = n

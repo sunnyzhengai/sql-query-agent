@@ -93,7 +93,7 @@ def test_builder_writes_never_journal(journal):
                  journal.read_text().splitlines()]
         assert not [ln for ln in lines
                     if ln["label"] in ("table", "column", "file",
-                                       "PBI Report")]
+                                       "pbi_report")]
     # a fresh estate build with no decisions writes no journal at
     # all, or only replayed-nothing
 

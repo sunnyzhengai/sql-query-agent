@@ -240,7 +240,7 @@ def test_fuzz_findings_2_flags_census_uses_canonical_name():
           "rows": [{"business_name": "Diabetic Patients",
                     "name": "USP_Diabetic_Patients"}]}])
     assert plan == [{"op": "census", "kind": "flag",
-                     "contains": "Diabetic Patients"}]
+                     "has_part": "Diabetic Patients"}]
 
 
 class TestFuzzFindings3DeterministicRelations:

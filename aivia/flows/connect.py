@@ -15,7 +15,7 @@ def edge_weights() -> Dict[str, float]:
     weights = {r["Edge"]: float(r["Weight"]) for r in sheet
                if r.get("Edge") and r["Edge"] != "_ruling"}
     # literal: schema-mirror lenses.Ranking_Weights
-    return weights or {"contains": 1.0, "reads": 1.0, "cites": 1.0,
+    return weights or {"has_part": 1.0, "reads": 1.0, "cites": 1.0,
                        "sighted": 1.0, "defines": 1.0}
 
 
@@ -31,7 +31,7 @@ def build_adjacency(read) -> Dict[str, List[Tuple[str, str]]]:
         adj.setdefault(b, []).append((a, label))
 
     for n in read.nodes("column"):
-        link(n.identity, n.identity.rsplit("|", 1)[0], "contains")
+        link(n.identity, n.identity.rsplit("|", 1)[0], "has_part")
     # THE BIRTH-EDGE UPGRADE (Connection Ledger step 1, 2026-09-07):
     # the governance world's connections existed as PROPERTIES and
     # were invisible to traversal — Sunny's overrule ("a usage event
@@ -44,12 +44,12 @@ def build_adjacency(read) -> Dict[str, List[Tuple[str, str]]]:
         db_id = n.identity
     for n in read.nodes("schema"):
         if db_id:
-            link(db_id, n.identity, "contains")
+            link(db_id, n.identity, "has_part")
     seen_schemas = {n.identity for n in read.nodes("schema")}
     for n in read.nodes("table"):
         schema_id = n.identity.rsplit("|", 1)[0]
         if schema_id in seen_schemas:
-            link(schema_id, n.identity, "contains")
+            link(schema_id, n.identity, "has_part")
     for n in read.nodes("meaning_twin"):
         link(n.identity, n.identity.removeprefix("twin::"),
              "translates")
@@ -108,7 +108,7 @@ def build_adjacency(read) -> Dict[str, List[Tuple[str, str]]]:
                 if tok in toks and ident != a.identity:
                     link(a.identity, ident, "used_by")
     # PHASE H: the consumption layer walks to its procs
-    for n in read.nodes("PBI Report"):
+    for n in read.nodes("pbi_report"):
         for f in n.properties.get("executes") or []:
             link(n.identity, f, "executes")
     # STEP 5: exclusions walk to the estate root
@@ -121,7 +121,7 @@ def build_adjacency(read) -> Dict[str, List[Tuple[str, str]]]:
     for n in read.nodes(None):
         author = n.properties.get("author")
         if author and ":" in str(author):
-            link(n.identity, author, "by")
+            link(n.identity, author, "performed_by")
     for key, tree in read.trees().items():
         fname = key  # the index's file identity (the store's file id)
         for stmt in tree["statements"]:
@@ -130,7 +130,7 @@ def build_adjacency(read) -> Dict[str, List[Tuple[str, str]]]:
                 if "name_key" not in s:
                     continue
                 nk = s["name_key"]
-                link(nk, fname, "contains")
+                link(nk, fname, "has_part")
                 seen_cols = set()
 
                 def walk(node, arms_ok=True):

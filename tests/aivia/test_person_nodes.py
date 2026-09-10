@@ -14,7 +14,7 @@ item it used") could only land its item half. Step 3:
   usage ruling's second half.
 - THE USER TREE WALKS: person → their acts → the items touched is
   pure traversal — "what did I look at" becomes a graph query.
-- The ledger gains person/agent/role rows (edge "by", edged);
+- The ledger gains person/agent/role rows (edge "performed_by", edged);
   registry 1.23.0. A hand-written actor with no acts counts
   missing — the census sees fakes.
 
@@ -74,9 +74,9 @@ def test_acts_walk_to_their_actors(store):
     usage = next(n for n in read.nodes("usage")
                  if n.properties.get("about") == "emr|dbo|ADT_EVENTS")
     edges = {(n, lbl) for n, lbl in adj.get(usage.identity, [])}
-    assert ("person:alice", "by") in edges
+    assert ("person:alice", "performed_by") in edges
     back = {(n, lbl) for n, lbl in adj.get("person:alice", [])}
-    assert (usage.identity, "by") in back
+    assert (usage.identity, "performed_by") in back
 
 
 def test_the_user_tree_walks(store):
@@ -84,7 +84,7 @@ def test_the_user_tree_walks(store):
     read = ReadApi(store)
     adj = connect.build_adjacency(read)
     acts = {n for n, lbl in adj.get("person:alice", [])
-            if lbl == "by"}
+            if lbl == "performed_by"}
     assert acts
     touched = set()
     for act in acts:
@@ -97,7 +97,7 @@ def test_the_user_tree_walks(store):
 def test_ledger_and_census_cover_actors(store):
     ledger = censuses.connection_ledger()
     for kind in ("person", "agent", "role"):
-        assert ledger[kind]["edge"] == "by"
+        assert ledger[kind]["edge"] == "performed_by"
         assert ledger[kind]["status"] == "edged"
     c = censuses.connection_census(ReadApi(store))
     assert c["unledgered_kinds"] == []

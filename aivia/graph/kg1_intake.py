@@ -335,9 +335,9 @@ def apply_extract(store: Store, reg: Dict[str, Any],
             report.retired_objects.append(identity)
 
     have_contains = {(e.from_id, e.to_id)
-                     for e in store.current_edges("contains")}
+                     for e in store.current_edges("has_part")}
     for frm, to in sorted(contains - have_contains):
-        store.append_edge("contains", frm, to, {}, as_of, extract_id)
+        store.append_edge("has_part", frm, to, {}, as_of, extract_id)
 
     have_joins = {(e.from_id, e.to_id,
                    tuple(map(tuple, e.properties["on"])))

@@ -176,7 +176,7 @@ def render_card(read, entity: Dict[str, Any]) -> str:
         # R10 (grammar 2.3.0, live find #9): the report floor — the
         # census placeholder is dead; the file speaks its meaning
         lines.append(produce.compose_file_floor(read, identity))
-    elif kind == "derived column":
+    elif kind == "derived_column":
         scope_key = identity.rsplit(".", 1)[0]
         lines.append(f"A computed output of {scope_key} — ask the "
                      "selection for its floor.")
@@ -309,7 +309,7 @@ def render_kind_list(read, index, kind: str,
     lines = [f"{len(entries)} {kind}(s):"]
     # literal: shape
     lines += [f"- {n}  ({i})" if kind in ("scope", "drift",
-                                          "derived column")
+                                          "derived_column")
               else f"- {n}" for n, i in entries[:60]]
     if len(entries) > 60:
         lines.append(f"… and {len(entries) - 60} more "
@@ -350,7 +350,10 @@ def present_hits(read, index_by_id, hits) -> str:
     for label in sorted(by_label,
                         key=lambda lb: -by_label[lb][0]["score"]):
         rows = by_label[label]
-        lines.append(f"{label} ({len(rows)}):")
+        # labels display as WORDS (the 2026-09-09 reserved-word
+        # renames made slugs like pbi_report; users see "pbi report")
+        from aivia.lenses.ask_index import _words as _lw
+        lines.append(f"{_lw(label)} ({len(rows)}):")
         for h in rows[:12]:
             via = f" · via {h['via_card']}" if h.get("via_card") \
                 else ""

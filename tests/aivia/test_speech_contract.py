@@ -114,7 +114,7 @@ def test_report_speech_derives_from_its_procs(described_world):
     1:1 report speaks its proc's exact description; the (single)
     multi-proc report composes both; no type words either way."""
     _store, read = described_world
-    entry = {"label": "PBI Report", "identity": DASH,
+    entry = {"label": "pbi_report", "identity": DASH,
              "name": "ED Sepsis Screening Dashboard"}
     text = speech.speak(read, entry)
     # the dashboard executes the ED proc — its drafted aboutness
@@ -127,12 +127,12 @@ def test_report_speech_derives_from_its_procs(described_world):
 def test_one_to_one_report_speaks_its_procs_exact_words(described_world):
     store, read = described_world
     # find any 1:1 report whose proc carries a description
-    for n in read.nodes("PBI Report"):
+    for n in read.nodes("pbi_report"):
         ex = n.properties.get("executes") or []
         if len(ex) == 1:
             proc_about = speech._aboutness(read, ex[0])
             if proc_about:
-                entry = {"label": "PBI Report",
+                entry = {"label": "pbi_report",
                          "identity": n.identity,
                          "name": n.properties["name"]}
                 text = speech.speak(read, entry)

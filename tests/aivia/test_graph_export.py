@@ -42,7 +42,7 @@ def test_camel_case_columns_and_node_id_key(world):
         assert rows, f"{name} is empty"
         for col in rows[0]:
             assert "_" not in col, f"{name}.{col} is not camelCase"
-        if not name.startswith("graph_contains"):
+        if not name.startswith("graph_has_part"):
             assert "nodeId" in rows[0]
             ids = [r["nodeId"] for r in rows]
             assert len(ids) == len(set(ids)), f"{name}: dup nodeIds"
@@ -64,11 +64,11 @@ def test_contains_edges_split_per_pair_and_mirror_the_store(world):
     ruled = {("db", "schema"), ("schema", "table"),
              ("table", "column")}  # containment points parent->child
     store_contains = {(s, t) for s, es in adj.items()
-                      for t, lbl in es if lbl == "contains"
+                      for t, lbl in es if lbl == "has_part"
                       and (label_of.get(s), label_of.get(t)) in ruled}
     exported = set()
     for pair in ("dbSchema", "schemaTable", "tableColumn"):
-        for r in tables[f"graph_contains_{pair}"]:
+        for r in tables[f"graph_has_part_{pair}"]:
             exported.add((r["sourceId"], r["targetId"]))
     assert exported == store_contains
 

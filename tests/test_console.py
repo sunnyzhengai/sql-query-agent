@@ -169,7 +169,7 @@ class TestConsole5FoldBack:
             "2026-08-31T10:15:00+00:00")])
         d = effective_dispositions(p)["cluster:a"]
         assert d["state"] == "certified"
-        assert d["by"] == "sunny@aivia"
+        assert d["performed_by"] == "sunny@aivia"
         assert d["at"].startswith("2026-08-31T10:15")
 
     def test_picked_targets_ride_the_decision(self, tmp_path):
@@ -207,5 +207,5 @@ class TestConsole5FoldBack:
         state = inbox_state(fake_kql, p, "steward")
         done = next(f for f in state["flags"] if f["id"] == fid)
         assert done["console_state"]["state"] == "certified"
-        assert done["console_state"]["by"] == "sunny@aivia"
+        assert done["console_state"]["performed_by"] == "sunny@aivia"
         assert done["console_state"]["at"].startswith("2026-08-31")

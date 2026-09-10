@@ -22,7 +22,7 @@ REPO = Path(__file__).resolve().parent.parent.parent
 # fails here before it fails live (the W12 class).
 OFFLINE_ARGS = {
     "search": {"phrase": "ed sepsis", "mode": "semantic"},
-    "census": {"kind": "metric", "contains": "ED"},
+    "census": {"kind": "metric", "has_part": "ED"},
     "retrieve": {"ids": [REF_A]},
     "lineage": {"table": "IP_SEPSIS"},
     "compare": {"refs": [REF_A, REF_B]},

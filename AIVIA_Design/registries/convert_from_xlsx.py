@@ -193,7 +193,7 @@ SOURCES = {
 # deliveries lead, spine voiced, intermediates counted, census
 # closes; the file's ask-index words = the delivery lead, so file
 # embeddings embed meaning, never name-noise).
-STAMP_VERSION = "1.32.0"
+STAMP_VERSION = "1.33.0"
 RATIFIED = True
 DOC_STAMP = ("v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 twin-graph "
              "ruling ADR 0077; v1.2.0 Phase A metamodel bump; v1.3.0 "
@@ -533,7 +533,7 @@ _TG = "twin-graph ruling (2026-09-06)"
 # mechanism's sibling: patches amend cells, appends add rows).
 APPEND_ROWS = [
     ("kg1_technical", "Node_Types", [
-        {"Node label": "PBI Report", "Property": "name",
+        {"Node label": "pbi_report", "Property": "name",
          "Required": "yes",
          "Shape / allowed values": "pbi://<estate>/<slug>",
          "Notes": "PHASE H (v1.27.0): the consumption layer"},
@@ -837,7 +837,7 @@ TWIN_SHEETS = {
              "of the 2026-09-07 probe — 0.80 vs 0.57 blended"},
             {"Label": "parameter", "Speech": "voiced phrase",
              "Meaning": "rendered"},
-            {"Label": "PBI Report", "Speech": "DERIVED from the "
+            {"Label": "pbi_report", "Speech": "DERIVED from the "
              "executed procs' descriptions via the executes edge "
              "(1:1 = the same words; the single multi-proc report "
              "composes both; shell description only when no proc "
@@ -846,7 +846,7 @@ TWIN_SHEETS = {
              "'the report users SHOULD see the logic' — a report "
              "aboutness is never separately drafted; type words "
              "stay banned (label card carries them)"},
-            {"Label": "derived column", "Speech": "computed-output "
+            {"Label": "derived_column", "Speech": "computed-output "
              "phrase (grammar render: name words + the defining "
              "selection)", "Meaning": "rendered"},
             {"Label": "term (KG3)", "Speech": "definition",
@@ -1051,7 +1051,7 @@ TWIN_SHEETS = {
              "Status": "TARGET — landing: the materialization build",
              "Description obligation": "stored (voiced phrase)",
              "Notes": "same"},
-            {"Kind": "node", "Name": "derived column",
+            {"Kind": "node", "Name": "derived_column",
              "Status": "TARGET — landing: the materialization build",
              "Description obligation": "stored (voiced phrase)",
              "Notes": "same"},
@@ -1089,11 +1089,11 @@ TWIN_SHEETS = {
             {"Kind": "node", "Name": "proposal", "Status": "PRESENT",
              "Description obligation": "none-ruled",
              "Notes": "kg3; may be 0"},
-            {"Kind": "node", "Name": "PBI Report", "Status": "PRESENT",
+            {"Kind": "node", "Name": "pbi_report", "Status": "PRESENT",
              "Description obligation": "stored shell + speech "
              "DERIVED from procs (the derivation ruling)",
              "Notes": "consumption layer"},
-            {"Kind": "edge", "Name": "contains", "Status": "PRESENT",
+            {"Kind": "edge", "Name": "has_part", "Status": "PRESENT",
              "Description obligation": "-",
              "Notes": "db→schema→table→column spine; TARGET grows: "
              "file→statement→scope→condition/parameter at "
@@ -1117,7 +1117,7 @@ TWIN_SHEETS = {
              "Notes": "description→target"},
             {"Kind": "edge", "Name": "assigns", "Status": "PRESENT",
              "Description obligation": "-", "Notes": "kg3"},
-            {"Kind": "edge", "Name": "by", "Status": "PRESENT",
+            {"Kind": "edge", "Name": "performed_by", "Status": "PRESENT",
              "Description obligation": "-", "Notes": "kg3 actor"},
             {"Kind": "edge", "Name": "approved_by", "Status": "PRESENT",
              "Description obligation": "-",
@@ -1165,7 +1165,7 @@ TWIN_SHEETS = {
              "Meaning": "the estate root — carries the registration "
              "trace (minted_from); everything intake-born chains "
              "here"},
-            {"Label": "schema", "Edge": "contains", "Status": "edged",
+            {"Label": "schema", "Edge": "has_part", "Status": "edged",
              "Meaning": "db contains schema; schema contains tables"},
             {"Label": "table", "Edge": "any", "Status": "edged",
              "Meaning": "conservation-governed (contains/reads)"},
@@ -1215,7 +1215,7 @@ TWIN_SHEETS = {
             {"Label": "parameter", "Edge": "belongs_to",
              "Status": "edged-pseudo",
              "Meaning": "STEP 4: walks to its file; tree-born"},
-            {"Label": "derived column", "Edge": "defines",
+            {"Label": "derived_column", "Edge": "defines",
              "Status": "edged-pseudo",
              "Meaning": "tree-born; its scope defines it "
              "(pre-existing edge, now documented)"},
@@ -1223,7 +1223,7 @@ TWIN_SHEETS = {
              "Status": "edged-pseudo",
              "Meaning": "tree-born; sighted by the reading file "
              "(pre-existing edge, now documented)"},
-            {"Label": "PBI Report", "Edge": "executes",
+            {"Label": "pbi_report", "Edge": "executes",
              "Status": "edged",
              "Meaning": "PHASE H: a report is deduced from the "
              "procs it runs — executes edges to its files"},
@@ -1235,14 +1235,14 @@ TWIN_SHEETS = {
              "newly loaded node whose name carries the token gains "
              "the edge automatically — no re-approval, no manual "
              "step, never computed at question time"},
-            {"Label": "person", "Edge": "by", "Status": "edged",
+            {"Label": "person", "Edge": "performed_by", "Status": "edged",
              "Meaning": "STEP 3: minted on first act; their birth "
              "edge IS being acted-by (>=1 act points at them); a "
              "hand-written actor with no acts counts missing"},
-            {"Label": "agent", "Edge": "by", "Status": "edged",
+            {"Label": "agent", "Edge": "performed_by", "Status": "edged",
              "Meaning": "model/machine actors — same law, own kind "
              "(never cross-minted as persons)"},
-            {"Label": "role", "Edge": "by", "Status": "edged",
+            {"Label": "role", "Edge": "performed_by", "Status": "edged",
              "Meaning": "role actors — same law"},
             {"Label": "excluded_file", "Edge": "excluded_from",
              "Status": "edged",
@@ -1324,7 +1324,7 @@ TWIN_SHEETS = {
              "path-ranking inputs are DECLARED, TUNABLE data — never "
              "a hidden model judgment. Seeded uniform; tuned by "
              "evidence."},
-            {"Edge": "contains", "Weight": "1.0", "Note": "column-in-"
+            {"Edge": "has_part", "Weight": "1.0", "Note": "column-in-"
              "table, scope-in-file"},
             {"Edge": "reads", "Weight": "1.0", "Note": "scope reads "
              "table/scope"},
@@ -1649,6 +1649,13 @@ def convert():
             sheets[sheet] = [dict(r) for r in rows]
             applied.append(f"sheet {sheet} added ({_TG}, ADR 0077)")
         if name == "kg1_technical":
+            # RESERVED-WORD RENAME (Sunny 2026-09-09): the
+            # containment edge is has_part in the graph — 'contains'
+            # is GQL-reserved; xlsx cells stay as authored, the
+            # loader speaks the ruled name
+            for row in sheets.get("Edge_Types", []):
+                if row.get("Edge") == "contains":
+                    row["Edge"] = "has_part"
             # LABEL, not kind (Sunny's standard ruling): the xlsx-born
             # column header renames at load — the metamodel speaks the
             # industry term

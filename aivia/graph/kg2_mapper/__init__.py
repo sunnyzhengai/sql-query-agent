@@ -1086,11 +1086,11 @@ def apply_file(store: Store, reg: Dict[str, Any], file_id: str,
                 store.append_node("scope", key,
                                   {"structures": scope["structures"]},
                                   as_of, file_id)
-                store.append_edge("contains", file_id, key, {}, as_of,
+                store.append_edge("has_part", file_id, key, {}, as_of,
                                   file_id)
     for param in tree["parameters"]:
         pid = f"{file_id}::@{param['name']}"
         if pid not in {n.identity for n in store.current_nodes("parameter")}:
             store.append_node("parameter", pid, dict(param), as_of, file_id)
-            store.append_edge("contains", file_id, pid, {}, as_of, file_id)
+            store.append_edge("has_part", file_id, pid, {}, as_of, file_id)
     return tree

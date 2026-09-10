@@ -55,10 +55,13 @@ def test_every_loaded_registry_is_ratified_v1():
     # contract-era Speech_Sources rows); 1.31.0 = the derivation
     # ruling (report speech derives from its procs' descriptions);
     # 1.32.0 = THE SHAPE CONTRACT: the Shape_Ledger sheet (battery
-    # #13 — Q1/Q2/Q3 as failure gates; the blob corpse's lock)
+    # #13 — Q1/Q2/Q3 as failure gates; the blob corpse's lock);
+    # 1.33.0 = the reserved-word renames (Sunny: contains->has_part,
+    # by->performed_by, derived_column, pbi_report — GQL needs no
+    # backticks)
     for reg in metamodel.load_all().values():
         assert reg.ratified is True
-        assert reg.version == "1.32.0"
+        assert reg.version == "1.33.0"
 
 
 def test_load_single_exposes_sheets_and_stamp():

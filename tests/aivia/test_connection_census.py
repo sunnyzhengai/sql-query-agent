@@ -90,10 +90,10 @@ def test_kg1_spine_is_walkable(accreted):
     _store, read, adj = accreted
     db = next(n for n in read.nodes("db"))
     schemas = {n for n, lbl in adj.get(db.identity, [])
-               if lbl == "contains"}
+               if lbl == "has_part"}
     assert schemas  # db contains its schemas
     schema = sorted(schemas)[0]
-    tables = {n for n, lbl in adj.get(schema, []) if lbl == "contains"}
+    tables = {n for n, lbl in adj.get(schema, []) if lbl == "has_part"}
     assert tables  # schema contains its tables
 
 

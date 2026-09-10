@@ -97,7 +97,7 @@ def validate_technical_layer(store) -> List[str]:
             if node.properties.get(prop) in (None, "", []):
                 problems.append(
                     f"{node.identity}: required property '{prop}' absent")
-    for edge in store.current_edges("contains"):
+    for edge in store.current_edges("has_part"):
         pair = (kind_of.get(edge.from_id), kind_of.get(edge.to_id))
         if pair not in _CONTAINS_DOMAIN:
             problems.append(f"contains {edge.from_id} -> {edge.to_id}: "

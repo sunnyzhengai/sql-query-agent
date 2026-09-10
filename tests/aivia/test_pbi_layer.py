@@ -5,7 +5,7 @@ this is the real mapping for words like 'reports'). Suite first.
 Pins:
 1. PBI Report nodes load from the estate's pbi_snapshot — the real
    dashboard by its real name + one synthetic shell per remaining
-   proc; label "PBI Report" (labels are user-facing names).
+   proc; label "pbi_report" (labels are user-facing names).
 2. executes edges walk both ways (report ↔ proc files); the
    Connection Ledger covers the label; the census stays whole.
 3. Reports SPEAK: description + the displays derived from their
@@ -41,7 +41,7 @@ def world():
 
 def test_pbi_reports_load_with_their_label(world):
     _store, read, _index, _semantic = world
-    reports = read.nodes("PBI Report")
+    reports = read.nodes("pbi_report")
     # 27 since the 1:1 ruling (2026-09-09): the dashboard trimmed
     # to 2 procs, the freed proc gained its own shell
     assert len(reports) == 27
@@ -52,7 +52,7 @@ def test_pbi_reports_load_with_their_label(world):
 def test_executes_edges_walk_both_ways(world):
     _store, read, _index, _semantic = world
     adj = connect.build_adjacency(read)
-    dash = next(n for n in read.nodes("PBI Report")
+    dash = next(n for n in read.nodes("pbi_report")
                 if n.properties["name"]
                 == "ED Sepsis Screening Dashboard")
     edges = {(t, lbl) for t, lbl in adj.get(dash.identity, [])}
@@ -65,16 +65,16 @@ def test_executes_edges_walk_both_ways(world):
 def test_ledger_covers_the_label_and_census_holds(world):
     _store, read, _index, _semantic = world
     ledger = censuses.connection_ledger()
-    assert ledger["PBI Report"]["edge"] == "executes"
-    assert ledger["PBI Report"]["status"] == "edged"
+    assert ledger["pbi_report"]["edge"] == "executes"
+    assert ledger["pbi_report"]["status"] == "edged"
     c = censuses.connection_census(read)
     assert c["unledgered_kinds"] == []
-    assert "PBI Report" not in c["counted_missing_kinds"]
+    assert "pbi_report" not in c["counted_missing_kinds"]
 
 
 def test_reports_speak_their_displays(world):
     _store, _read, index, _semantic = world
-    dash = next(e for e in index if e["label"] == "PBI Report"
+    dash = next(e for e in index if e["label"] == "pbi_report"
                 and e["name"] == "ED Sepsis Screening Dashboard")
     assert "sepsis" in dash["words"].lower()
     assert "displays" in dash["words"].lower()
@@ -95,7 +95,7 @@ def test_reports_about_ed_crowns_the_dashboard(world):
                      interpret_fn=interp, semantic=semantic)
     hits = result["hits"]
     first_pbi = next(i for i, h in enumerate(hits)
-                     if h["label"] == "PBI Report")
+                     if h["label"] == "pbi_report")
     first_col = next((i for i, h in enumerate(hits)
                       if h["label"] == "column"), len(hits))
     assert first_pbi < first_col  # both words vouched for the report

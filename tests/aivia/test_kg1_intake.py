@@ -108,7 +108,7 @@ def test_joins_to_edges_match_answer_key_exactly(built, expected):
 
 def test_containment_chain_complete(built):
     store, _ = built
-    contains = store.current_edges("contains")
+    contains = store.current_edges("has_part")
     kinds = {}
     for kind in ("db", "schema", "table", "column"):
         kinds.update({n.identity: kind for n in store.current_nodes(kind)})

@@ -79,7 +79,7 @@ def test_a_condition_chains_to_its_file_by_traversal(world):
     assert scopes
     files = set()
     for s in scopes:
-        files |= {n for n, lbl in adj.get(s, []) if lbl == "contains"}
+        files |= {n for n, lbl in adj.get(s, []) if lbl == "has_part"}
     assert any(str(f).endswith("reporting/USP_ED_SEPSIS.sql")
                for f in files)
 
@@ -94,7 +94,7 @@ def test_ledger_documents_the_pseudo_citizens(world):
     assert ledger["condition"]["status"] == "edged-pseudo"
     assert ledger["parameter"]["edge"] == "belongs_to"
     assert ledger["parameter"]["status"] == "edged-pseudo"
-    assert ledger["derived column"]["status"] == "edged-pseudo"
+    assert ledger["derived_column"]["status"] == "edged-pseudo"
     assert ledger["drift"]["status"] == "edged-pseudo"
     # the store census stays whole and clean
     c = censuses.connection_census(read)
