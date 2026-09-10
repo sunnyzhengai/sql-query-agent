@@ -90,6 +90,7 @@ def test_csv_write_is_deterministic(tmp_path, world):
 def test_no_name_collides_with_gql_reserved_words(world):
     import json
     import pathlib
+
     from aivia.graph.metamodel import REGISTRY_DIR
     reserved = set(json.loads(
         (pathlib.Path(REGISTRY_DIR).parent
