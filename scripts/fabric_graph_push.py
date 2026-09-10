@@ -83,9 +83,13 @@ def push_tables(estate: str) -> None:
     assert files, f"no export at {base} — run the export first"
     for f in files:
         table = pq.read_table(f)
+        # Tables/dbo/ — the schema the graph model reads. Writing
+        # to the Tables/ ROOT created a parallel namespace the
+        # model tooling couldn't bind (the 2026-09-10 dual-set
+        # corpse: empty Source dropdowns, dead bindings)
         dest = (f"abfss://{WORKSPACE_NAME}@onelake.dfs.fabric."
                 f"microsoft.com/{LAKEHOUSE_NAME}.Lakehouse/Tables/"
-                f"{f.stem}")
+                f"dbo/{f.stem}")
         write_deltalake(
             dest, table, mode="overwrite",
             schema_mode="overwrite",

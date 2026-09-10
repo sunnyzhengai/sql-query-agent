@@ -97,6 +97,15 @@ RETURN s.name AS schemaName, count(t) AS tables GROUP BY schemaName
 ```
 Expected: the three schemas with their table counts summing to 90.
 
+## One namespace: dbo (the dual-set corpse, 2026-09-10)
+
+The lakehouse is schema-enabled: UI loads land in `dbo`, while the
+API loader originally wrote to the Tables ROOT — two same-named
+sets, and the graph model could only bind one of them (empty
+Source dropdowns, dead bindings, M1 lost a day to it). RULED: one
+namespace — everything targets `Tables/dbo/`; the loader now does.
+Root-level graph_* tables must never exist; delete on sight.
+
 ## Per-batch refresh (M2 and on)
 
 1. Pull the branch; re-run the export command (step 2).
