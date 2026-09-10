@@ -193,7 +193,7 @@ SOURCES = {
 # deliveries lead, spine voiced, intermediates counted, census
 # closes; the file's ask-index words = the delivery lead, so file
 # embeddings embed meaning, never name-noise).
-STAMP_VERSION = "1.35.0"
+STAMP_VERSION = "1.36.0"
 RATIFIED = True
 DOC_STAMP = ("v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 twin-graph "
              "ruling ADR 0077; v1.2.0 Phase A metamodel bump; v1.3.0 "
@@ -1098,6 +1098,14 @@ TWIN_SHEETS = {
              "Notes": "db→schema→table→column spine; TARGET grows: "
              "file→statement→scope→condition/parameter at "
              "materialization"},
+            {"Kind": "edge", "Name": "joins_to", "Status": "PRESENT",
+             "Description obligation": "-",
+             "Notes": "DECLARED dictionary joins (Epic Clarity "
+             "joins.csv, KG1 intake) — table→table with key-column "
+             "pairs; found undeclared 2026-09-10 (the census read "
+             "adjacency, not the store); ships with M2. Observed "
+             "joins live in condition nodes (M3); their diff = "
+             "documentation drift, by query"},
             {"Kind": "edge", "Name": "reads", "Status": "PRESENT",
              "Description obligation": "-", "Notes": ""},
             {"Kind": "edge", "Name": "cites", "Status": "PRESENT",

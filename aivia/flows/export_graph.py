@@ -105,6 +105,15 @@ def export_tables(read: ReadApi,
                     {"sourceId": src, "targetId": tgt})
     tables.update(pairs)
     tables.update(_scope_tables(read, adj))
+    joins = []
+    for e in read._store.current_edges("joins_to"):
+        on = e.properties.get("on") or []
+        # literal: shape
+        joins.append({"sourceId": e.from_id, "targetId": e.to_id,
+                      "onColumns": "; ".join(
+                          f"{a} = {b}" for a, b in on)})
+    tables["graph_joins_to_tableTable"] = sorted(
+        joins, key=lambda r: (r["sourceId"], r["targetId"]))
     return tables
 
 

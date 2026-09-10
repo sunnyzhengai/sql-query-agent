@@ -123,6 +123,13 @@ properties name/description/structures → Add edge `reads`,
 scope → table, via graph_reads_scopeTable (sourceId → targetId) →
 Save → ONE refresh.
 
+M2 also ships `graph_joins_to_tableTable` (65 rows) — the DECLARED
+dictionary joins (Epic Clarity joins.csv, loaded at KG1 intake;
+they were in the store all along but M1's export missed them).
+Add edge `joins_to`, table → table, sourceId → targetId, property
+onColumns. Observed joins arrive as condition nodes at M3; their
+GQL diff against these = documentation drift.
+
 THE M2 GATE:
 ```gql
 MATCH (s:scope) RETURN count(s) AS cnt
@@ -147,6 +154,15 @@ The reverse walk: which selections read the ED data mart.
 MATCH (s:scope) RETURN s.name AS selection, s.description AS descr LIMIT 10
 ```
 Stored descriptions, composed bottom-up from the dictionary words.
+```gql
+MATCH ()-[j:joins_to]->() RETURN count(j) AS cnt
+```
+Expected: 65 — the dictionary's declared joins.
+```gql
+MATCH (a:table WHERE a.name = 'ADT_EVENTS')-[j:joins_to]->(b:table)
+RETURN b.name AS joinsTo, j.onColumns AS onCols
+```
+The declared neighbors of ADT_EVENTS with their keys.
 
 ## Per-batch refresh (M2 and on)
 

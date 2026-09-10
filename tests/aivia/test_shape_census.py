@@ -103,9 +103,14 @@ def test_q2_description_obligations_hold(world):
 
 # ---- Q3: type(r), count(*) == the ledger, both directions ------------
 def test_q3_every_edge_label_is_declared_and_vice_versa(world):
-    _read, adj = world
+    read, adj = world
     _, edges = _ledger()
+    # BOTH sources: the adjacency reading AND the store's own edge
+    # records — joins_to lived undeclared because this test read
+    # only the reading (found 2026-09-10; verify against the store)
     store_edges = {lbl for es in adj.values() for _t, lbl in es}
+    store_edges |= {e.label for e in
+                    read._store.current_edges(None)}
     undeclared = store_edges - set(edges)
     assert not undeclared, (
         f"UNDECLARED edge labels {sorted(undeclared)} — an edge "

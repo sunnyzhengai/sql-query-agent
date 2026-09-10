@@ -41,7 +41,8 @@ def test_camel_case_columns_and_node_id_key(world):
         for col in rows[0]:
             assert "_" not in col, f"{name}.{col} is not camelCase"
         if not (name.startswith("graph_has_part")
-                    or name.startswith("graph_reads")):
+                    or name.startswith("graph_reads")
+                    or name.startswith("graph_joins_to")):
             assert "nodeId" in rows[0]
             ids = [r["nodeId"] for r in rows]
             assert len(ids) == len(set(ids)), f"{name}: dup nodeIds"
@@ -115,6 +116,23 @@ def test_scope_reads_table_edges_at_true_grain(world):
             "targetId": "emr|dbo|ED_ENCOUNTERS_FACT"} in edges
     pairs = [(e["sourceId"], e["targetId"]) for e in edges]
     assert len(pairs) == len(set(pairs))
+
+
+def test_declared_dictionary_joins_ride_the_export(world):
+    read, tables = world
+    rows = tables["graph_joins_to_tableTable"]
+    assert len(rows) == len(list(
+        read._store.current_edges("joins_to")))
+    table_ids = {n.identity for n in read.nodes("table")}
+    for r in rows:
+        assert r["sourceId"] in table_ids
+        assert r["targetId"] in table_ids
+        assert r["onColumns"]
+    # the deciding example: ADT_EVENTS joins DEPARTMENTS by id
+    assert any(r["sourceId"].endswith("ADT_EVENTS")
+               and r["targetId"].endswith("|DEPARTMENTS")
+               and "DEPARTMENT_ID" in r["onColumns"]
+               for r in rows)
 
 
 # ---- THE RESERVED-WORD GATE (Sunny 2026-09-09: 'let's replace
