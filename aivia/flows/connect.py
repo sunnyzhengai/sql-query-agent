@@ -42,10 +42,10 @@ def build_adjacency(read) -> Dict[str, List[Tuple[str, str]]]:
     db_id = None
     for n in read.nodes("db"):
         db_id = n.identity
-    for n in read.nodes("schema"):
+    for n in read.nodes("db_schema"):
         if db_id:
             link(db_id, n.identity, "has_part")
-    seen_schemas = {n.identity for n in read.nodes("schema")}
+    seen_schemas = {n.identity for n in read.nodes("db_schema")}
     for n in read.nodes("table"):
         schema_id = n.identity.rsplit("|", 1)[0]
         if schema_id in seen_schemas:

@@ -55,7 +55,7 @@ def produced():
 def test_floor_texts_byte_exact(produced):
     """THE F4 upgrade: acceptance is byte-for-byte the ratified payload."""
     store, _ = produced
-    descs = {d.properties["about"][0]: d.properties["text"]
+    descs = {d.properties["about"][0]: d.properties["description"]
              for d in store.current_nodes("description")}
     assert descs == PAYLOAD["texts"]
 
@@ -108,7 +108,7 @@ def test_prod4_human_owned_never_overwritten(produced):
         created_at=T0)
     current = derivation.lens_current(ReadApi(store), None)["yield"][
         f"description:{target}"]
-    assert current["text"] == "Maria's own words."
+    assert current["description"] == "Maria's own words."
 
 
 def test_prod5_replay_two_fresh_builds_identical():
@@ -129,7 +129,7 @@ def test_smoothed_path_gate_passes_clean_rephrase():
              store.current_nodes("description")}
     odd = descs["usp_odd_join.sql::delivery"]
     assert odd.properties["status"] == "gate_passed"
-    assert odd.properties["text"].startswith("Selects patients.")
+    assert odd.properties["description"].startswith("Selects patients.")
 
 
 def test_smoothed_path_violation_ships_the_floor():
@@ -139,7 +139,7 @@ def test_smoothed_path_violation_ships_the_floor():
     event = produce.run(store, occurred_at=T0, smooth=smooth)
     for d in store.current_nodes("description"):
         assert d.properties["status"] == "skeleton_floor"
-        assert "Canceled" not in d.properties["text"]  # the floor shipped
+        assert "Canceled" not in d.properties["description"]  # the floor shipped
     killed = event.properties["accounting"]["descriptions"]["killed_lines"]
     assert killed > 0  # counted, never silent
 

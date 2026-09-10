@@ -1,7 +1,7 @@
 {
  "registry": "lenses",
  "stamp": {
-  "version": "1.33.0",
+  "version": "1.34.0",
   "doc_section": "Level 2 — lenses",
   "doc_stamp": "v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 twin-graph ruling ADR 0077; v1.2.0 Phase A metamodel bump; v1.3.0 Phase B composite-kinds correction; v1.4.0 T-2 operational-statements ruling; v1.5.0 the gap taxonomy; v1.6.0 the plug-all-holes sweep; v1.7.0 ledger close; v1.8.0 the ask console ADR 0078; v1.9.0 the list op; v1.10.0 kind vocabulary; v1.11.0 ADR 0079 interpreter; v1.12.0 Tier A build data; v1.13.0 the seat-failure law; v1.14.0 follow-up context; v1.15.0 anaphor vocabulary (all 2026-09-06)",
   "ratified": true,
@@ -421,7 +421,7 @@
    },
    {
     "Kind": "node",
-    "Name": "schema",
+    "Name": "db_schema",
     "Status": "PRESENT",
     "Description obligation": "none-ruled",
     "Notes": ""
@@ -470,7 +470,7 @@
    },
    {
     "Kind": "node",
-    "Name": "parameter",
+    "Name": "param",
     "Status": "TARGET — landing: the materialization build",
     "Description obligation": "stored (voiced phrase)",
     "Notes": "same"
@@ -493,7 +493,7 @@
     "Kind": "node",
     "Name": "description",
     "Status": "PRESENT",
-    "Description obligation": "text (the artifact IS one)",
+    "Description obligation": "stored — its description property IS the artifact (renamed from text, TEXT is GQL-reserved; Sunny 2026-09-09)",
     "Notes": "kg3"
    },
    {
@@ -703,7 +703,7 @@
     "Meaning": "the estate root — carries the registration trace (minted_from); everything intake-born chains here"
    },
    {
-    "Label": "schema",
+    "Label": "db_schema",
     "Edge": "has_part",
     "Status": "edged",
     "Meaning": "db contains schema; schema contains tables"
@@ -799,7 +799,7 @@
     "Meaning": "STEP 4: tree-born adjacency citizen — walks to its scope; outside the store census by ruling (not a store node)"
    },
    {
-    "Label": "parameter",
+    "Label": "param",
     "Edge": "belongs_to",
     "Status": "edged-pseudo",
     "Meaning": "STEP 4: walks to its file; tree-born"

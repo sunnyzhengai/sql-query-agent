@@ -31,7 +31,7 @@ def drift_sentence() -> str:
 SHEET_KINDS = {
     "table": "table", "column": "column",
     "scope": "scope (selection)", "file": "file",
-    "condition": "condition (predicate)", "parameter": "parameter",
+    "condition": "condition (predicate)", "param": "parameter",
     "derived_column": "derived_column", "term": "term (KG3)",
     "drift": "drift name", "label": "kind (node type)",
     "pbi_report": "pbi_report",
@@ -86,7 +86,7 @@ def _aboutness(read, identity: str) -> str:
     THE speech under the contract."""
     for n in read.nodes("description"):
         if identity in (n.properties.get("about") or []):
-            return (n.properties.get("text") or "").strip().lower()
+            return (n.properties.get("description") or "").strip().lower()
     return ""
 
 
@@ -115,7 +115,7 @@ def speak(read, entry: Dict[str, Any]) -> str:
         if scope is None:
             return ""
         return _condition_phrase(read, tree, scope, int(tag))
-    if kind == "parameter":
+    if kind == "param":
         return f"parameter {_words(entry['name'])} of " \
                f"{_words(entry['owner'].rsplit('/', 1)[-1])}"
     if kind == "derived_column":
@@ -197,7 +197,7 @@ def entries(read) -> List[Dict[str, Any]]:
                     f"{scope['name_key'].split('::')[-1]}",
                     scope["name_key"])
         for p in tree.get("parameters", []):
-            add("parameter", f"{key}::param/{p['name']}",
+            add("param", f"{key}::param/{p['name']}",
                 p["name"], key)
     # THE TOTAL-SCORE LAW (2026-09-08): label:: group entries died —
     # the label is a CARD on every member (grounding.cards)

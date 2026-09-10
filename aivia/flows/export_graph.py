@@ -24,10 +24,10 @@ from aivia.graph.read_api import ReadApi
 # batch M1: the technical layer; later batches append labels here
 # in their own commits (the Shape_Ledger names each landing)
 # literal: schema-mirror lenses.Shape_Ledger
-EXPORT_LABELS = ("db", "schema", "table", "column")
+EXPORT_LABELS = ("db", "db_schema", "table", "column")
 
-_PAIR_NAMES = {("db", "schema"): "dbSchema",
-               ("schema", "table"): "schemaTable",
+_PAIR_NAMES = {("db", "db_schema"): "dbSchema",
+               ("db_schema", "table"): "schemaTable",
                ("table", "column"): "tableColumn"}  # literal: shape
 
 

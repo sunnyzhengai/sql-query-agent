@@ -30,4 +30,5 @@ inside one. Split test: would it exist with no chatbot at all?
 | Audit_Literal_Law_Plan.md / Audit_Literal_Census_Review.md | Audit | Plan OPEN (step F) / Review EXECUTED | the literal-law class + census |
 | L1_KG1_CONTRACT_DATALOAD.md | L* contract | RATIFIED (§3c 2026-09-06) | the KG1 dataload contract |
 | L1_/L2_/L3_*.xlsx | L* sources | CONVERTED → registries/ | Sunny-authored registry workbooks (Code Structure Maps, layer registries, Open Register) |
+| Registry_GQL_Reserved_Words.json | data | VENDORED 2026-09-09 | the official Fabric GQL reserved-word list — the export gate's source of truth |
 | registries/ | data | RATIFIED, stamped | the seven converted JSON registries + converter + validators — what code consumes |

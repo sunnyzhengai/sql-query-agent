@@ -201,7 +201,7 @@ def _desired_state(store, reg, snap, report):
     for row in snap.tables:
         schema_id = f"{source}|{row['schema']}"
         table_id = f"{schema_id}|{row['table']}"
-        nodes.setdefault(schema_id, ("schema", {}))
+        nodes.setdefault(schema_id, ("db_schema", {}))
         contains.add((db_id, schema_id))
         grain = phrase_extract(row["description"])
         if grain is None:
@@ -318,7 +318,7 @@ def apply_extract(store: Store, reg: Dict[str, Any],
         report.changed_objects.append(identity)
         if prior is None:
             report.change_report_kinds_created.add(kind)
-            if kind in ("schema", "table"):
+            if kind in ("db_schema", "table"):
                 report.objects_created += 1
 
     # §11 RETIRE: this source's objects absent from the new extract —
@@ -328,7 +328,7 @@ def apply_extract(store: Store, reg: Dict[str, Any],
     desired = set(nodes)
     for identity, node in current.items():
         # literal: shape
-        if node.label in ("schema", "table", "column") \
+        if node.label in ("db_schema", "table", "column") \
                 and identity.startswith(f"{snap.source}|") \
                 and identity not in desired:
             store.retire_node(identity, as_of)
@@ -371,11 +371,11 @@ def audit_incremental(store: Store, reg: Dict[str, Any],
     fresh = {n.identity: n.properties.get("content_hash")
              for n in scratch.current_nodes()
              # literal: shape
-             if n.label in ("schema", "table", "column")}
+             if n.label in ("db_schema", "table", "column")}
     live = {n.identity: n.properties.get("content_hash")
             for n in store.current_nodes()
             # literal: shape
-            if n.label in ("schema", "table", "column")
+            if n.label in ("db_schema", "table", "column")
             and n.identity.startswith(f"{snap.source}|")}
     findings = []
     for identity in sorted(set(fresh) | set(live)):

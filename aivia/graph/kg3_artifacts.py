@@ -117,7 +117,7 @@ def append_description(store: Store, artifact_id: str, about: List[str],
     if not (text or "").strip():
         raise RefusalKG3("LC3-F5", "no empty shells — a description "
                          "version must carry text")
-    payload: Dict[str, Any] = {"text": text}
+    payload: Dict[str, Any] = {"description": text}
     if anchor:
         # THE ANCHOR RULE (twin-graph ruling 2f, Phase D): about
         # targets a MEANING IDENTITY — a KG2b content_key at a scope
@@ -312,7 +312,7 @@ def supersede(store: Store, prior_version_id: str,
     props.update(fields)
     if prior.label == "description":
         return append_description(
-            store, props["artifact_id"], props["about"], props["text"],
+            store, props["artifact_id"], props["about"], props["description"],
             fields.get("status"), author, fields.get("basis"), created_at)
     return _append_version(store, prior.label, props["artifact_id"],
                            props["about"], author, created_at,
@@ -390,7 +390,7 @@ def migrate_anchors(store: Store, selection_keys: Dict[str, str],
             {"migration": "phase-d anchor (ADR 0077)",
              "from_version": version.identity},
             # literal: shape
-            {"text": version.properties["text"],
+            {"description": version.properties["description"],
              "status": version.properties.get("status"),
              "anchor": {"scope": target, "content_key": key}})
         report["migrated"] += 1

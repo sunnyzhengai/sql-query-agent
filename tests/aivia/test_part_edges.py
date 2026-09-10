@@ -92,8 +92,8 @@ def test_ledger_documents_the_pseudo_citizens(world):
     ledger = censuses.connection_ledger()
     assert ledger["condition"]["edge"] == "belongs_to"
     assert ledger["condition"]["status"] == "edged-pseudo"
-    assert ledger["parameter"]["edge"] == "belongs_to"
-    assert ledger["parameter"]["status"] == "edged-pseudo"
+    assert ledger["param"]["edge"] == "belongs_to"
+    assert ledger["param"]["status"] == "edged-pseudo"
     assert ledger["derived_column"]["status"] == "edged-pseudo"
     assert ledger["drift"]["status"] == "edged-pseudo"
     # the store census stays whole and clean

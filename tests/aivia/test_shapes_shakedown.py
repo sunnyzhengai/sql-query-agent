@@ -110,5 +110,5 @@ def test_econ_pacing_drains_the_worklist(shaken):
     descs = store.current_nodes("description")
     assert len(descs) == EXPECTED["lenses"]["scopes"]
     for d in descs:  # every floor grounded, none empty, all statused
-        assert d.properties["text"].strip()
+        assert d.properties["description"].strip()
         assert d.properties["status"] == "skeleton_floor"

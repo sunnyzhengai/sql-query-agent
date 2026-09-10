@@ -193,7 +193,7 @@ SOURCES = {
 # deliveries lead, spine voiced, intermediates counted, census
 # closes; the file's ask-index words = the delivery lead, so file
 # embeddings embed meaning, never name-noise).
-STAMP_VERSION = "1.33.0"
+STAMP_VERSION = "1.34.0"
 RATIFIED = True
 DOC_STAMP = ("v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 twin-graph "
              "ruling ADR 0077; v1.2.0 Phase A metamodel bump; v1.3.0 "
@@ -1021,7 +1021,7 @@ TWIN_SHEETS = {
             {"Kind": "node", "Name": "db", "Status": "PRESENT",
              "Description obligation": "none-ruled",
              "Notes": "minted from registration"},
-            {"Kind": "node", "Name": "schema", "Status": "PRESENT",
+            {"Kind": "node", "Name": "db_schema", "Status": "PRESENT",
              "Description obligation": "none-ruled", "Notes": ""},
             {"Kind": "node", "Name": "table", "Status": "PRESENT",
              "Description obligation": "stored — counted-gap allowed",
@@ -1047,7 +1047,7 @@ TWIN_SHEETS = {
              "Status": "TARGET — landing: the materialization build",
              "Description obligation": "stored (voiced phrase)",
              "Notes": "today: twin-blob rows + read-time index"},
-            {"Kind": "node", "Name": "parameter",
+            {"Kind": "node", "Name": "param",
              "Status": "TARGET — landing: the materialization build",
              "Description obligation": "stored (voiced phrase)",
              "Notes": "same"},
@@ -1061,7 +1061,7 @@ TWIN_SHEETS = {
              "Notes": "the translation record; twin blob = builder "
              "provenance under the contract"},
             {"Kind": "node", "Name": "description", "Status": "PRESENT",
-             "Description obligation": "text (the artifact IS one)",
+             "Description obligation": "stored — its description property IS the artifact (renamed from text, TEXT is GQL-reserved; Sunny 2026-09-09)",
              "Notes": "kg3"},
             {"Kind": "node", "Name": "term", "Status": "PRESENT",
              "Description obligation": "definition (authored)",
@@ -1165,7 +1165,7 @@ TWIN_SHEETS = {
              "Meaning": "the estate root — carries the registration "
              "trace (minted_from); everything intake-born chains "
              "here"},
-            {"Label": "schema", "Edge": "has_part", "Status": "edged",
+            {"Label": "db_schema", "Edge": "has_part", "Status": "edged",
              "Meaning": "db contains schema; schema contains tables"},
             {"Label": "table", "Edge": "any", "Status": "edged",
              "Meaning": "conservation-governed (contains/reads)"},
@@ -1212,7 +1212,7 @@ TWIN_SHEETS = {
              "Meaning": "STEP 4: tree-born adjacency citizen — "
              "walks to its scope; outside the store census by "
              "ruling (not a store node)"},
-            {"Label": "parameter", "Edge": "belongs_to",
+            {"Label": "param", "Edge": "belongs_to",
              "Status": "edged-pseudo",
              "Meaning": "STEP 4: walks to its file; tree-born"},
             {"Label": "derived_column", "Edge": "defines",
@@ -1656,6 +1656,15 @@ def convert():
             for row in sheets.get("Edge_Types", []):
                 if row.get("Edge") == "contains":
                     row["Edge"] = "has_part"
+                for side in ("From", "To"):
+                    if row.get(side) == "schema":
+                        row[side] = "db_schema"
+            # SCHEMA is GQL-reserved (Sunny 2026-09-09): the label
+            # is db_schema; xlsx cells stay as authored
+            for row in sheets.get("Node_Types", []):
+                for k in ("Node label", "Node kind"):
+                    if row.get(k) == "schema":
+                        row[k] = "db_schema"
             # LABEL, not kind (Sunny's standard ruling): the xlsx-born
             # column header renames at load — the metamodel speaks the
             # industry term

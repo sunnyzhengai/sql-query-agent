@@ -62,7 +62,7 @@ def load_all() -> Dict[str, Registry]:
 # as_of rides every NodeVersion/Edge (the store's shape); source is the
 # identity's FIRST component (A2 — never stored as a second field).
 _STRUCTURAL = {"as_of", "source"}
-_CONTAINS_DOMAIN = {("db", "schema"), ("schema", "table"),
+_CONTAINS_DOMAIN = {("db", "db_schema"), ("db_schema", "table"),
                     ("table", "column")}
 
 

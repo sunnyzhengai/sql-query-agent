@@ -18,7 +18,7 @@ import pytest
 from aivia.flows import connect, export_graph
 from aivia.graph.read_api import ReadApi
 
-M1_LABELS = ("db", "schema", "table", "column")
+M1_LABELS = ("db", "db_schema", "table", "column")
 
 
 @pytest.fixture(scope="module")
@@ -61,7 +61,7 @@ def test_contains_edges_split_per_pair_and_mirror_the_store(world):
     adj = connect.build_adjacency(read)
     label_of = {n.identity: lbl for lbl in M1_LABELS
                 for n in read.nodes(lbl)}
-    ruled = {("db", "schema"), ("schema", "table"),
+    ruled = {("db", "db_schema"), ("db_schema", "table"),
              ("table", "column")}  # containment points parent->child
     store_contains = {(s, t) for s, es in adj.items()
                       for t, lbl in es if lbl == "has_part"
@@ -82,3 +82,37 @@ def test_csv_write_is_deterministic(tmp_path, world):
         assert f.read_bytes() == (b / f.name).read_bytes()
         with open(f, newline="") as fh:
             assert csv.reader(fh)  # parseable
+
+
+# ---- THE RESERVED-WORD GATE (Sunny 2026-09-09: 'let's replace
+# these key words' — checked against the vendored OFFICIAL list,
+# never discovered live in the query editor again) ----------------
+def test_no_name_collides_with_gql_reserved_words(world):
+    import json
+    import pathlib
+    from aivia.graph.metamodel import REGISTRY_DIR
+    reserved = set(json.loads(
+        (pathlib.Path(REGISTRY_DIR).parent
+         / "Registry_GQL_Reserved_Words.json")
+        .read_text())["reserved"])
+    _read, tables = world
+    offenders = []
+    ledger = metamodel_ledger()
+    for name, row in ledger:
+        if name.upper() in reserved:
+            offenders.append(f"ledger {row['Kind']} '{name}'")
+    for tname, rows in tables.items():
+        if tname.upper() in reserved:
+            offenders.append(f"table '{tname}'")
+        for col in (rows[0] if rows else {}):
+            if col.upper() in reserved:
+                offenders.append(f"{tname}.{col}")
+    assert not offenders, (
+        "GQL-reserved names in the export/ledger — rename by "
+        f"ruling before shipping: {offenders}")
+
+
+def metamodel_ledger():
+    from aivia.graph import metamodel
+    sheet = metamodel.load("lenses").sheets["Shape_Ledger"]
+    return [(r["Name"], r) for r in sheet if r["Name"] != "-"]

@@ -1,7 +1,7 @@
 {
  "registry": "kg1_technical",
  "stamp": {
-  "version": "1.33.0",
+  "version": "1.34.0",
   "doc_section": "Level 1 / KG Layer 1 — source dictionaries technical layer",
   "doc_stamp": "v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 twin-graph ruling ADR 0077; v1.2.0 Phase A metamodel bump; v1.3.0 Phase B composite-kinds correction; v1.4.0 T-2 operational-statements ruling; v1.5.0 the gap taxonomy; v1.6.0 the plug-all-holes sweep; v1.7.0 ledger close; v1.8.0 the ask console ADR 0078; v1.9.0 the list op; v1.10.0 kind vocabulary; v1.11.0 ADR 0079 interpreter; v1.12.0 Tier A build data; v1.13.0 the seat-failure law; v1.14.0 follow-up context; v1.15.0 anaphor vocabulary (all 2026-09-06)",
   "ratified": true,
@@ -52,20 +52,20 @@
     "Property": "description",
     "Required": "no — CORRECTION APPLIED at conversion (caught by CHECK-TL-4 over the F1 build, 2026-09-05): the ratified contract has no schema-description extract part (§3: schema arrives as the per-table containment field) and the F1 answer key's schema nodes carry none. The draft row contradicted both ratified artifacts.",
     "Shape / allowed values": "text",
-    "Node label": "schema"
+    "Node label": "db_schema"
    },
    {
     "Property": "as_of",
     "Required": "yes",
     "Shape / allowed values": "date",
-    "Node label": "schema"
+    "Node label": "db_schema"
    },
    {
     "Property": "source",
     "Required": "yes",
     "Shape / allowed values": "registered source system; declared in the registration prereq's SCHEMA MAPPING, never extracted; since A2 the first component of identity — never stored as a second field",
     "Notes": "one source per schema (source-inheritance rule); tables/columns inherit via containment",
-    "Node label": "schema"
+    "Node label": "db_schema"
    },
    {
     "Property": "description",
@@ -152,13 +152,13 @@
    {
     "Edge": "has_part",
     "From": "db",
-    "To": "schema",
+    "To": "db_schema",
     "Direction rationale": "parent->child per the ratified two-part convention: CONTAINMENT points parent->child; REFERENCE points toward the more stable node (doc edge-direction convention, ratified 2026-09-05; register D13 CLOSED). Supersedes the xlsx 'unresolved' note.",
     "Properties": "as_of"
    },
    {
     "Edge": "has_part",
-    "From": "schema",
+    "From": "db_schema",
     "To": "table",
     "Direction rationale": "same as above",
     "Properties": "as_of"

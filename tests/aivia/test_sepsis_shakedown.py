@@ -90,7 +90,7 @@ def test_lens_counters_and_produce_drains(shaken):
         shipped += event.properties["accounting"]["descriptions"]["shipped"]
     assert shipped == EXPECTED["produce_total"]
     for d in store.current_nodes("description"):
-        assert d.properties["text"].strip()
+        assert d.properties["description"].strip()
 
 
 def test_two_alias_corpse_voices_both_filters(shaken):

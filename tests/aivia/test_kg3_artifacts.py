@@ -56,7 +56,7 @@ def test_human_edit_flips_ownership_and_pins_current():
         == "human"
     # LC3-S2: the machine append renders PROPOSED, never current (A6)
     current = derivation.lens_current(read, None)["yield"]["desc:recent"]
-    assert "Human text." in current["text"]
+    assert "Human text." in current["description"]
     # ...until a human accepts the proposed version (A6 witness)
     kg3.append_disposition(store, about=m3.identity, ruling="accept",
                            author="person:maria", occurred_at=T0)
@@ -202,15 +202,15 @@ def test_current_outcome_is_the_latest_observation():
 def test_redaction_act_tombstones_and_logs():
     store = Store()
     v = _machine_desc(store)
-    kg3.redaction_act(store, version_id=v.identity, field="text",
+    kg3.redaction_act(store, version_id=v.identity, field="description",
                       why="PHI reached evidence",
                       human_confirmation="person:admin")
     versions, _ = store.read(v.identity, mode="all")
-    assert versions[-1].properties["text"] == "<REDACTED>"
+    assert versions[-1].properties["description"] == "<REDACTED>"
     events = store.current_nodes("redaction")
     assert len(events) == 1 and events[0].properties["why"]
     with pytest.raises(kg3.RefusalKG3):
-        kg3.redaction_act(store, version_id=v.identity, field="text",
+        kg3.redaction_act(store, version_id=v.identity, field="description",
                           why="no human", human_confirmation="agent:x")
 
 

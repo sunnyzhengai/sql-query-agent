@@ -192,7 +192,7 @@ def render_card(read, entity: Dict[str, Any]) -> str:
                     if n.identity == identity)
         lines.append(node.properties.get("definition", ""))
     # literal: shape
-    elif kind in ("condition", "parameter", "label"):
+    elif kind in ("condition", "param", "label"):
         # speech IS the card for the part-kinds (census 2): the
         # stored/rendered phrase, plus the owner chain
         lines.append(entity.get("words") or "")

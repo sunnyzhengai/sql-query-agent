@@ -1090,7 +1090,7 @@ def apply_file(store: Store, reg: Dict[str, Any], file_id: str,
                                   file_id)
     for param in tree["parameters"]:
         pid = f"{file_id}::@{param['name']}"
-        if pid not in {n.identity for n in store.current_nodes("parameter")}:
-            store.append_node("parameter", pid, dict(param), as_of, file_id)
+        if pid not in {n.identity for n in store.current_nodes("param")}:
+            store.append_node("param", pid, dict(param), as_of, file_id)
             store.append_edge("has_part", file_id, pid, {}, as_of, file_id)
     return tree

@@ -85,7 +85,6 @@ def test_q2_description_obligations_hold(world):
             continue
         has = sum(1 for n in pop
                   if (n.properties.get("description")
-                      or n.properties.get("text")
                       or n.properties.get("definition")
                       or n.properties.get("expansions")))
         if ob.startswith("stored"):

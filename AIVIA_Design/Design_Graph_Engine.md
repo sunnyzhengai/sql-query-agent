@@ -321,7 +321,7 @@ CONTAINMENT edges point parent → child. Both layers already obey
 this; it is now law, not accident.
 
 KG Layer 1 — source dictionaries technical layer      [ratified]
-      [registry stamp: kg1_technical v1.33.0]
+      [registry stamp: kg1_technical v1.34.0]
       L1 companions: Technical_Layer_Registry, CONTRACT_DATALOAD
       AMENDED 2026-09-06 (twin-graph ruling 2a, 5a): KG1 is the
       DECLARED layer — syntax and semantics FUSED on one node.
@@ -404,7 +404,7 @@ KG Layer 1 — source dictionaries technical layer      [ratified]
    -- source inheritance: a schema belongs to exactly one source; tables/columns inherit source from the containment chain; a mixed schema is the recorded trigger to push source down a level.
 
 KG Layer 2 — logic layer (one tree per SQL file)       [ratified]
-      [registry stamp: kg2_logic v1.33.0 · kg2_kind_library v1.33.0]
+      [registry stamp: kg2_logic v1.34.0 · kg2_kind_library v1.34.0]
       L1 companions: Logic_Layer_Registry (subsumes the mapper's
       seam contract), Kind_Library_TSQL_Predicates
       AMENDED 2026-09-06 (twin-graph ruling 2b-2e): this layer is
@@ -543,7 +543,7 @@ KG Layer 2 — logic layer (one tree per SQL file)       [ratified]
        and audit, not re-parsing) [axm:S1, axm:M5; = spec:G5 in
        the code record]
 KG Layer 3 — artifact layer                            [ratified]
-      [registry stamp: kg3_artifacts v1.33.0]
+      [registry stamp: kg3_artifacts v1.34.0]
       L1 companions: Artifact_Layer_Registry
       AMENDED 2026-09-06 (twin-graph ruling 2f): this layer and
       KG Layer 4 MERGE into KG3, THE GOVERNANCE OVERLAY — sparse
@@ -717,7 +717,7 @@ KG Layer 3 — artifact layer                            [ratified]
 - Forward note [axm:B4] — DELIVERED: the LAND stage carries the
   human-confirmation clause.
 KG Layer 4 — concept layer            [MERGED INTO KG3 2026-09-06]
-      [registry stamp: kg4_concepts v1.33.0]
+      [registry stamp: kg4_concepts v1.34.0]
       L1 companions: Concept_Layer_Registry (merging into
       Governance_Layer_Registry)
       SUPERSEDED AS A LAYER (twin-graph ruling 2f): concept is now
@@ -799,7 +799,7 @@ The catalog below stands as the ratified record of each entry's
 rules; the contract text above governs where they differ.
 
 [historical header: read level 1, write nothing]
-      [registry stamp: lenses v1.33.0]
+      [registry stamp: lenses v1.34.0]
 
 Lenses                                                 [ratified]
       L2 companions: Lenses_Registry
@@ -887,7 +887,7 @@ AMENDED 2026-09-06 (twin-graph ruling 5):
   translator + stored KG2b + conservation green → C voicing-
   policy port + gap-check rerun → D governance merge + anchor
   migration; each phase gated by a real ED-sepsis gap-check.
-      [registry stamp: flows v1.33.0]
+      [registry stamp: flows v1.34.0]
 
 The flows                                              [ratified]
       L3 companions: Flows_Registry

@@ -26,7 +26,7 @@ the tables and re-run that batch's gate.)*
    7 CSVs.
 4. For each of the 7 files: right-click → **Load to Tables** →
    **New table** → keep the file's name (`graph_db`,
-   `graph_schema`, `graph_table`, `graph_column`,
+   `graph_db_schema`, `graph_table`, `graph_column`,
    `graph_has_part_dbSchema`, `graph_has_part_schemaTable`,
    `graph_has_part_tableColumn`). Result: 7 Delta tables.
 5. In the workspace: **+ New item → Graph model (preview)**, name
@@ -34,13 +34,13 @@ the tables and re-run that batch's gate.)*
    add the 7 tables.
 6. Map **node types** — name them exactly like the store labels
    (lowercase), key column `nodeId` in each:
-   - `db` ← graph_db · `schema` ← graph_schema ·
+   - `db` ← graph_db · `db_schema` ← graph_db_schema ·
      `table` ← graph_table · `column` ← graph_column
    - properties (name, description, grain, pkColumns, …) map
      automatically from the remaining columns.
 7. Map **edge type `has_part`** three times, `sourceId → targetId`:
-   - db → schema via graph_has_part_dbSchema
-   - schema → table via graph_has_part_schemaTable
+   - db → db_schema via graph_has_part_dbSchema
+   - db_schema → table via graph_has_part_schemaTable
    - table → column via graph_has_part_tableColumn
 8. Save / build the model, open the **query** experience.
 
@@ -52,15 +52,19 @@ the tables and re-run that batch's gate.)*
 - Aggregation needs an explicit `GROUP BY` (no Cypher-style
   implicit grouping).
 - Comments are `//` (never SQL's `--`).
-- Reserved words in names force backticks — which is why the edge
-  is `has_part`, not `contains` (Sunny's rename ruling).
+- Reserved words in names force backticks — so NO graph name is
+  ever one: the vendored official list
+  (AIVIA_Design/Registry_GQL_Reserved_Words.json) gates every label, edge,
+  table, and column at test time (Sunny's rename rulings:
+  has_part, performed_by, db_schema, param, derived_column,
+  pbi_report; kg3 text -> description).
 
 ## The M1 gate (run these; expected answers stated)
 
 ```gql
 MATCH (n) RETURN labels(n) AS nodeType, count(*) AS cnt GROUP BY nodeType
 ```
-Expected exactly: `db 1 · schema 3 · table 90 · column 4554` —
+Expected exactly: `db 1 · db_schema 3 · table 90 · column 4554` —
 and NOTHING else (no statement, no scope: the Shape_Ledger's
 TARGET rows are honestly absent until their batches land).
 
@@ -78,7 +82,7 @@ Contains records of patients who meet the criteria for severe
 sepsis along with tracking for compliance with bundle elements."
 
 ```gql
-MATCH (s:schema)-[:has_part]->(t:table)
+MATCH (s:db_schema)-[:has_part]->(t:table)
 RETURN s.name AS schemaName, count(t) AS tables GROUP BY schemaName
 ```
 Expected: the three schemas with their table counts summing to 90.

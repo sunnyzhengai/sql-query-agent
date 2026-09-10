@@ -87,7 +87,7 @@ def test_every_fixture_family_holds_in_one_run(circle):
     # F4: byte-exact floors
     payload = json.loads((FIX / "F4_produce" / "floor_texts.json")
                          .read_text())["texts"]
-    descs = {d.properties["about"][0]: d.properties["text"]
+    descs = {d.properties["about"][0]: d.properties["description"]
              for d in store.current_nodes("description")}
     assert descs == payload
     # F5: derived states after the script

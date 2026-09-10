@@ -56,7 +56,7 @@ def test_db_minted_from_registration_not_extracts(built, expected):
 
 def test_schema_nodes_match_answer_key(built, expected):
     store, _ = built
-    schemas = _current(store, "schema")
+    schemas = _current(store, "db_schema")
     for exp in expected["nodes"]["schemas"]:
         assert exp["id"] in schemas
         assert schemas[exp["id"]].as_of == exp["as_of"]
@@ -110,7 +110,7 @@ def test_containment_chain_complete(built):
     store, _ = built
     contains = store.current_edges("has_part")
     kinds = {}
-    for kind in ("db", "schema", "table", "column"):
+    for kind in ("db", "db_schema", "table", "column"):
         kinds.update({n.identity: kind for n in store.current_nodes(kind)})
     children_with_parent = {e.to_id for e in contains}
     for identity, kind in kinds.items():
