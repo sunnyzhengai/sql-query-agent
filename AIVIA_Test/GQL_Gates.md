@@ -56,13 +56,25 @@ both estates, so nothing M1 verified is invalidated.
 
 Every gate below follows the census shape: label counts == the
 key's node rows, edge-type counts == the key's edge rows, plus
-the batch's special checks. Node/edge count queries are always:
+the batch's special checks.
+
+**DIALECT CORRECTION (2026-09-11, found live by Sunny): Fabric
+GQL has NO `type(r)` function** (that's openCypher; Fabric's
+graph functions are labels/nodes/edges/elements/path_length
+only). The edge census therefore runs as a PER-TYPE BATTERY plus
+a grand total — and the total closes the census: if the per-type
+counts SUM to the unfiltered total, no undeclared edge type
+exists. Node census stays `labels(n)`:
 
 ```gql
-MATCH (n) RETURN labels(n) AS lbl, count(*) AS cnt ORDER BY lbl
+MATCH (n) RETURN labels(n) AS nodeType, count(*) AS cnt GROUP BY nodeType
 ```
 ```gql
-MATCH ()-[r]->() RETURN type(r) AS rel, count(*) AS cnt ORDER BY rel
+MATCH ()-[r:has_part]->() RETURN count(r) AS cnt
+```
+(one per edge type, then:)
+```gql
+MATCH ()-[r]->() RETURN count(r) AS totalEdges
 ```
 
 ### M1 gate — technical layer + joins_to (re-homed here, Sunny's
@@ -130,14 +142,38 @@ MATCH (n) RETURN labels(n) AS nodeType, count(*) AS cnt GROUP BY nodeType
 Expected exactly: db 1 · db_schema 3 · table 90 · column 4554 ·
 scope 44 · join **95** — total 4787, nothing else.
 **Q1 GREEN — Sunny's GQL 2026-09-10** (the earlier failures were
-a missing GROUP BY, not capacity). Q3 below pending: the edge
-census walks ~5000 edges and hit capacity; re-run on fresh CUs.
+a missing GROUP BY, not capacity). The edge census's original
+`type(r)` form was NEVER runnable — my openCypher habit, not
+your capacity (corrected 2026-09-11); use the battery below.
+
+The edge battery (no `type(r)` in Fabric GQL — one count per
+type, then the total):
 
 ```gql
-MATCH ()-[r]->() RETURN type(r) AS rel, count(*) AS cnt GROUP BY rel
+MATCH ()-[r:has_part]->() RETURN count(r) AS cnt
 ```
-Expected exactly: has_part **4742** · joins_to 65 · left_side
-**95** · right_side **87** · reads **6** — total 4995.
+→ **4742**
+```gql
+MATCH ()-[r:joins_to]->() RETURN count(r) AS cnt
+```
+→ 65
+```gql
+MATCH ()-[r:left_side]->() RETURN count(r) AS cnt
+```
+→ **95**
+```gql
+MATCH ()-[r:right_side]->() RETURN count(r) AS cnt
+```
+→ **87**
+```gql
+MATCH ()-[r:reads]->() RETURN count(r) AS cnt
+```
+→ **6**
+```gql
+MATCH ()-[r]->() RETURN count(r) AS totalEdges
+```
+→ **4995** — and 4742+65+95+87+6 = 4995 proves no undeclared
+edge type exists (the census closes arithmetically).
 
 | expect | value |
 |---|---|
@@ -201,12 +237,17 @@ MATCH (n) RETURN labels(n) AS nodeType, count(*) AS cnt GROUP BY nodeType
 Expected exactly: db 1 · db_schema 3 · table 90 · column 4554 ·
 scope 44 · join 95 · condition **1141** · param **2** — total 5930.
 
+The edge battery (one count per type, then the total):
+has_part → **5883** · joins_to → 65 · left_side → 95 ·
+right_side → 87 · reads → 6 · resolves_to → **165** ·
+uses_param → **2** (each via
+`MATCH ()-[r:<type>]->() RETURN count(r) AS cnt`), then:
+
 ```gql
-MATCH ()-[r]->() RETURN type(r) AS rel, count(*) AS cnt GROUP BY rel
+MATCH ()-[r]->() RETURN count(r) AS totalEdges
 ```
-Expected exactly: has_part **5883** · joins_to 65 · left_side 95 ·
-right_side 87 · reads 6 · resolves_to **165** · uses_param **2** —
-total 6303.
+→ **6303** — the seven counts sum to 6303, closing the census
+with no undeclared type.
 
 THE PER-KIND CENSUS (one label, kind as property — an unlisted
 kind or moved count = failure):
