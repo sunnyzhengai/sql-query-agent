@@ -397,6 +397,30 @@ the fix: 7 passed + the 'alternatives' xfail turned **XPASS** —
 (score 1.586, via name+speech+expansion), the refuted
 'alternatives' phrasing #39. The question's wording still awaits
 Sunny's gap-check (the xfail marker stands until he re-drafts).
+**RE-DRAFTED same day (Sunny's ruling):** the question re-worded
+to '…wrong medication alerts?', xfail removed — THE BATTERY IS
+8/8 GREEN for the first time. **THE CACHES LEFT GIT (Sunny's
+ruling, same day):** 1.4 GB/estate embeddings blobs blocked
+GitHub pushes; untracked + gitignored (estates/*/.cache/),
+unpushed history rewritten (all hashes after 4b4bda7
+renumbered), .git 1.7 GB → 102 MB, dev PUSHED to origin.
+**THE LABEL CONSTRAINT WIRED (Sunny's ADT_EVENT round, same
+day):** hands-on use surfaced a ruling-vs-build gap — the five
+steps rule KIND → label constraint, but the build used kind
+matches as display only: 'what does the ADT_EVENT table mean'
+crowned the COLUMN ADT_EVENT_ID (1.603 — its speech speaks 'adt
+event' near-verbatim) over the table ADT_EVENTS (1.470) that the
+user's own word named. Built: a token grounding as a label now
+constrains the other tokens' instance anchoring to that label —
+PROPOSAL, NEVER A VETO (an empty constrained set relaxes +
+REPORTS, the planner's edge-kind law); the trace shows
+'anchoring constrained to label: …' and any relaxation. 3
+acceptance tests replay the round's REAL recorded ranking
+(scripted semantic seat — the deterministic-tier law). Live
+proof: the exact round now anchors ADT_EVENTS with
+`MATCH (a:table)…`; battery 8/8 after the change. Rider fix: the
+'[?] dbo' display corpse — neighborhood labels computed after
+the single-anchor branch.
 
 **THE M2 REDESIGN (Sunny's rulings 2026-09-10, from the
 hand-drawn structure):** (1) a scope reaches its tables THROUGH

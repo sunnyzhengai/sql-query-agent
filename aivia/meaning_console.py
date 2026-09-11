@@ -202,6 +202,23 @@ def _strong(mset: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     return None
 
 
+def _strong_in_labels(mset: Dict[str, Any],
+                      allowed: Set[str]) -> Optional[Dict[str, Any]]:
+    """THE LABEL CONSTRAINT's crown: the best INSTANCE match whose
+    label the user named. None = nothing among those labels clears
+    the bar — the caller relaxes and REPORTS (a constraint is a
+    proposal, never a veto)."""
+    ranked = [m for m in mset["matches"]
+              if m["class"] == "instance" and m["label"] in allowed]
+    if not ranked:
+        return None
+    top = ranked[0]
+    if mset["tier"] == "exact" or \
+            top["score"] >= grounding.thresholds()["MATCH_SCORE"]:
+        return top
+    return None
+
+
 # ---- step 4: the deterministic planner -------------------------------
 def plan_connection(anchors: List[Dict[str, Any]],
                     adj: Dict[str, List[Tuple[str, str]]],
@@ -280,7 +297,20 @@ def answer_question(question: str, interpret_fn,
     returned fact, never an invention."""
     tokens, seat = tokens_from(question, interpret_fn)
     msets = [match_token(t, entries, semantic) for t in tokens]
+    # THE LABEL CONSTRAINT (ruled in the five steps; wired
+    # 2026-09-11 from Sunny's ADT_EVENT round): a token that
+    # grounds as a label constrains the OTHER tokens' instance
+    # anchoring to that label — the user's own words pick the
+    # grain. Proposal, never a veto: an empty constrained set
+    # relaxes and REPORTS (the planner's edge-kind law, same
+    # honesty).
+    allowed_labels: Set[str] = set()
+    for mset in msets:
+        top = _strong(mset)
+        if top is not None and top["class"] == "kind":
+            allowed_labels.add(top["name"])
     anchors, kind_hits, edge_kinds, unmatched = [], [], set(), []
+    label_relaxed = []
     for mset in msets:
         top = _strong(mset)
         if top is None:
@@ -288,6 +318,13 @@ def answer_question(question: str, interpret_fn,
                 unmatched.append(mset["token"])
             continue
         if top["class"] == "instance":
+            if allowed_labels:
+                constrained = _strong_in_labels(mset, allowed_labels)
+                if constrained is None:
+                    label_relaxed.append(
+                        (mset["token"], sorted(allowed_labels)))
+                else:
+                    top = constrained
             if top["identity"] not in {a["identity"] for a in anchors}:
                 anchors.append(top)
         elif top["class"] == "kind":
@@ -295,24 +332,29 @@ def answer_question(question: str, interpret_fn,
         else:
             edge_kinds.add(top["identity"].removeprefix("edgekind::"))
     plan = plan_connection(anchors, adj, allowed=edge_kinds or None)
-    label_of = {}
-    # literal: mechanical — the technical spine's label walk
-    for lbl in ("db", "db_schema", "table", "column"):
-        for n in read.nodes(lbl):
-            if n.identity in plan["nodes"]:
-                label_of[n.identity] = lbl
-    gql = [write_gql(p, directed, label_of) for p in plan["paths"]]
-    if len(anchors) == 1 and not plan["paths"]:
+    single_anchor = len(anchors) == 1 and not plan["paths"]
+    if single_anchor:
         # a single anchor: its typed neighborhood is the subgraph
         a = anchors[0]["identity"]
         plan["nodes"] = [a] + [b for b, _ in adj.get(a, [])][:20]
         plan["edges"] = sorted({(a, b, lbl) if (a, b, lbl) in directed
                                 else (b, a, lbl)
                                 for b, lbl in adj.get(a, [])[:20]})
+    label_of = {}
+    # literal: mechanical — the technical spine's label walk (after
+    # the single-anchor branch, so neighborhood nodes carry their
+    # labels too — the '[?] dbo' display corpse, 2026-09-11)
+    for lbl in ("db", "db_schema", "table", "column"):
+        for n in read.nodes(lbl):
+            if n.identity in plan["nodes"]:
+                label_of[n.identity] = lbl
+    if single_anchor:
         lbl = anchors[0]["label"]
         name = anchors[0]["name"]
         gql = [f"MATCH (a:{lbl})-[e]-(b) FILTER a.name = '{name}' "
                "RETURN a.name, b.name"]
+    else:
+        gql = [write_gql(p, directed, label_of) for p in plan["paths"]]
     evidence = []
     described = {e["identity"]: e for e in entries}
     for ident in plan["nodes"]:
@@ -333,6 +375,8 @@ def answer_question(question: str, interpret_fn,
     return {"question": question, "seat": seat, "tokens": tokens,
             "match_sets": msets, "anchors": anchors,
             "kind_constraints": kind_lines,
+            "label_constraint": sorted(allowed_labels),
+            "label_relaxed": label_relaxed,
             "edge_constraints": sorted(edge_kinds),
             "gql": [g for g in gql if g],
             "evidence": evidence, "edge_lines": edge_lines,
@@ -435,6 +479,16 @@ def render_round(result: Dict[str, Any]) -> str:
                  + " &nbsp;·&nbsp; ".join(trace) + "</p>")
     for line in result["kind_constraints"]:
         parts.append(f"<p class=meta>{html.escape(line)}</p>")
+    if result.get("label_constraint"):
+        parts.append("<p class=meta>anchoring constrained to "
+                     "label: " + html.escape(
+                         ", ".join(result["label_constraint"]))
+                     + " (your word)</p>")
+    for tok, labels in result.get("label_relaxed", []):
+        parts.append("<p class=meta>note: nothing labeled "
+                     + html.escape("/".join(labels)) + " matched '"
+                     + html.escape(tok) + "' — the label "
+                     "constraint was relaxed.</p>")
     if result["edge_constraints"]:
         parts.append("<p class=meta>traversal constrained to: "
                      + html.escape(", ".join(

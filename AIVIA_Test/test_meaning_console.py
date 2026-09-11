@@ -200,6 +200,78 @@ def test_seed_cache_copies_once_and_never_overwrites(tmp_path):
                          tmp_path / "other.json") is False
 
 
+# ---- THE LABEL CONSTRAINT (Sunny's ADT_EVENT round, 2026-09-11:
+# 'what does the ADT_EVENT table mean' crowned the COLUMN
+# ADT_EVENT_ID over the table the user's own word named — the
+# ruled kind→label-constraint was display-only. These replay the
+# REAL recorded ranking of that round as the acceptance test.) ----
+class _ScriptedSemantic:
+    """A scripted vector seat: replays a recorded search ranking
+    (the deterministic-tier law — replayed recordings + scripted
+    inputs, never a live model)."""
+
+    def __init__(self, rankings):
+        self.rankings = rankings
+
+    def search(self, token, top_k=None, kind=None):
+        return [dict(h) for h in self.rankings.get(token, [])]
+
+
+def _scripted_tokens(mentions):
+    return lambda q: {"mentions": list(mentions)}
+
+
+def test_label_constraint_crowns_the_grain_the_user_named(world):
+    read, entries, _, adj, directed = world
+    by_id = {e["identity"]: e for e in entries}
+    col = dict(by_id["emr|dbo|ED_EVENT_INFO|ADT_EVENT_ID"])
+    tab = dict(by_id[ADT])
+    # the recorded 2026-09-11 ranking: the column edged the table
+    semantic = _ScriptedSemantic({"ADT_EVENT": [
+        {**col, "score": 1.603}, {**tab, "score": 1.470}]})
+    r = mc.answer_question("what does the ADT_EVENT table mean",
+                           _scripted_tokens(["ADT_EVENT", "table"]),
+                           entries, semantic, read, adj, directed)
+    assert r["label_constraint"] == ["table"]
+    assert r["label_relaxed"] == []
+    assert [a["identity"] for a in r["anchors"]] == [ADT]
+    assert r["gql"] and "(a:table)" in r["gql"][0] \
+        and "ADT_EVENTS" in r["gql"][0]
+
+
+def test_label_constraint_is_a_proposal_never_a_veto(world):
+    read, entries, _, adj, directed = world
+    by_id = {e["identity"]: e for e in entries}
+    col = dict(by_id["emr|dbo|ED_EVENT_INFO|ADT_EVENT_ID"])
+    # nothing labeled 'table' in the match set: the constraint
+    # RELAXES and reports — the best overall still anchors
+    semantic = _ScriptedSemantic(
+        {"ADT_EVENT": [{**col, "score": 1.603}]})
+    r = mc.answer_question("what does the ADT_EVENT table mean",
+                           _scripted_tokens(["ADT_EVENT", "table"]),
+                           entries, semantic, read, adj, directed)
+    assert r["label_relaxed"] == [("ADT_EVENT", ["table"])]
+    assert [a["identity"] for a in r["anchors"]] == \
+        ["emr|dbo|ED_EVENT_INFO|ADT_EVENT_ID"]
+    html_out = mc.render_round(r)
+    assert "constraint was relaxed" in html_out
+
+
+def test_no_label_word_leaves_anchoring_unconstrained(world):
+    read, entries, _, adj, directed = world
+    by_id = {e["identity"]: e for e in entries}
+    col = dict(by_id["emr|dbo|ED_EVENT_INFO|ADT_EVENT_ID"])
+    tab = dict(by_id[ADT])
+    semantic = _ScriptedSemantic({"ADT_EVENT": [
+        {**col, "score": 1.603}, {**tab, "score": 1.470}]})
+    r = mc.answer_question("ADT_EVENT",
+                           _scripted_tokens(["ADT_EVENT"]),
+                           entries, semantic, read, adj, directed)
+    assert r["label_constraint"] == []
+    assert [a["identity"] for a in r["anchors"]] == \
+        ["emr|dbo|ED_EVENT_INFO|ADT_EVENT_ID"]
+
+
 # ---- the glossary chain (the machinery lives in flows/glossary;
 # tests/aivia/test_glossary.py owns it — this proves the CONSOLE
 # INDEX carries the blessed expansions end-to-end) -------------------
