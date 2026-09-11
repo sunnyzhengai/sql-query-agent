@@ -275,11 +275,23 @@ function draw(){
 
 // ---- hit test / tooltip -------------------------------------
 function nodeAt(mx,my){
-  // distance to the circle EDGE, tight halo — a generous slop over
-  // 4554 tiny dots made empty space un-pannable
-  let best=null, bd=4;
+  // TWO PASSES, visible first: at overview zoom every table sits
+  // inside its ring of 1.2px columns — edge-distance alone handed
+  // near-table grabs to invisible dots (=> pan), which was the
+  // 'nothing is draggable' bug. What the eye can see wins the
+  // halo; sub-visible dots match only when nothing visible is near.
+  let best=null, bd=12;
   for(const n of nodes){
     if(!show[n.k==='schema'?'schema':n.k]) continue;
+    if(nr(n) < 2.5) continue;
+    const d = Math.hypot(sx(n)-mx, sy(n)-my) - nr(n);
+    if(d<bd){bd=d; best=n;}
+  }
+  if(best) return best;
+  bd = 6;
+  for(const n of nodes){
+    if(!show[n.k==='schema'?'schema':n.k]) continue;
+    if(nr(n) >= 2.5) continue;
     const d = Math.hypot(sx(n)-mx, sy(n)-my) - nr(n);
     if(d<bd){bd=d; best=n;}
   }

@@ -86,8 +86,8 @@ for it in range(900):
         k = sid.get(schema_of_table.get(row.nodeId), 0)
         ax = 1500 * math.cos(k * 2.1 + 1.0)
         ay = 1500 * math.sin(k * 2.1 + 1.0)
-        fx[i] += (ax - pos[i][0]) * 0.0012
-        fy[i] += (ay - pos[i][1]) * 0.0012
+        fx[i] += (ax - pos[i][0]) * 0.0007
+        fy[i] += (ay - pos[i][1]) * 0.0007
         step = min(28.0, 0.9 * (1 - it / 900) + 0.08) * 18
         mag = math.sqrt(fx[i] ** 2 + fy[i] ** 2) + 1e-9
         lim = min(mag, step)
@@ -104,7 +104,7 @@ for _ in range(400):
             dx = pos[j][0] - pos[i][0]
             dy = pos[j][1] - pos[i][1]
             d = math.sqrt(dx * dx + dy * dy) + 1e-9
-            need = rad[i] + rad[j] + 40
+            need = rad[i] + rad[j] + 180
             if d < need:
                 push = (need - d) / 2 + 0.5
                 pos[i][0] -= dx / d * push
@@ -117,7 +117,7 @@ for _ in range(400):
 worst = min(
     math.dist(pos[i], pos[j]) - rad[i] - rad[j]
     for i in range(N) for j in range(i + 1, N))
-assert worst >= 39, f"disc overlap remains: {worst:.1f}"
+assert worst >= 179, f"disc overlap remains: {worst:.1f}"
 print(f"collision pass: min inter-disc gap {worst:.1f} world units")
 
 # ---- emit nodes ----------------------------------------------
