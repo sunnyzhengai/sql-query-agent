@@ -1003,3 +1003,44 @@ law), keeping the loop: machine proposes → human chooses →
 deterministic planner executes → display. Generalized the same
 day as THE TURN DEFAULT (see the section after the nine laws):
 HITL after every turn is the DEFAULT for all chatbot surfaces.
+
+► RULED (Sunny, 2026-09-11, from the EVENT_ID round — THE
+MATCHED GRAPH; supersedes the crown rule): steps 3–5 re-derived.
+THE CROWN RULE IS DEAD — "one token, one winner" silently
+discarded ¾ of an exact truth (four EVENT_ID columns found, three
+dropped), a Law-9 violation dressed as a rule. The law: LET THE
+MATCHED GRAPH DRIVE THE QUERY AND THE DELIVERY.
+- **SET FORMATION**: a token's match is a SET — exact hits are
+  ALL equal citizens; semantic hits form THE BAND (≥ MATCH_SCORE
+  and within UNIQUE_MARGIN of the best — registry thresholds,
+  nothing new minted). The label constraint applies BEFORE
+  banding and stays a proposal, never a veto. A pin replaces the
+  token's whole set (the human act).
+- **THE KIND'S TWO FACES**: a kind token meets a set of its OWN
+  label as a CONSTRAINT (its job is picking the grain); it meets
+  a set of ANOTHER label as a CONNECTION — its full population
+  joins the projection ("tables" × the EVENT_ID columns).
+- **PROJECTION**: light the matched sets on the store; the edges
+  that ALREADY EXIST among lit nodes are the answer's skeleton.
+- **SHAPE → QUERY (deterministic ladder)**: sets connected in the
+  projection → ENUMERATE those connections (the answer predates
+  the question); ≥2 sets unconnected and the question connective
+  → the minimal connecting subgraph (pathfinding is the FALLBACK
+  for missing structure, never the default); one member →
+  neighborhood; one set, many members → the list; nothing →
+  the honest zero.
+- **DELIVERY BY RESULT SHAPE**: rows → a rendered table (visible
+  cap, counted remainder); one node → the card; a path → the path
+  told; and the CONSERVATION LINE rides along ("4 of 90 tables
+  connect; 86 do not") — Law 9 made visible in every enumeration.
+Acceptance: "show me all tables that use EVENT_ID" returns
+exactly the four carriers (ADT_EVENTS · ED_EVENT_INFO ·
+ED_PATIENT_INFO · V_PATIENT_LOCATION_HISTORY) as rows with the
+enumerating GQL. RULED same day — THE KIND-SUBSUMPTION RULE
+(from measured scores: 'tables' → kind 1.576 vs top
+table-instance 1.760, the gap entirely the instances' own label
+cards): same-labeled instances outscoring their kind is CIRCULAR
+credit — the kind speaks through its members. A kind entry
+≥ MATCH_SCORE whose name equals the top instance's label CLAIMS
+the token. Phrases stay safe by the same bar (measured: kind
+0.307 / rank 2026 for a real phrase — nowhere near).

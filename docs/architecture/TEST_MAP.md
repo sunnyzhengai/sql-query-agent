@@ -7,7 +7,7 @@
 
 # Test Map — what every test proves
 
-180 modules, 1910 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
+180 modules, 1915 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
 
 ## By ADR
 
@@ -158,7 +158,7 @@
 
 - `AIVIA_Test/test_ed_sepsis_dev_estate.py` (15): The one-proc dev estate + THE M-GATE ANSWER KEY (Sunny's
 - `AIVIA_Test/test_joins_to_lock.py` (6): THE JOINS_TO LOCK (Sunny's directive 2026-09-10, after the
-- `AIVIA_Test/test_meaning_console.py` (23): THE MEANING-TEST CONSOLE's own tests (Design_Chatbot.md ruling,
+- `AIVIA_Test/test_meaning_console.py` (28): THE MEANING-TEST CONSOLE's own tests (Design_Chatbot.md ruling,
 - `tests/aivia/test_acronym_enrichment.py` (7): PHASE I — ACRONYM ENRICHMENT (the one-vocabulary law, ruled
 - `tests/aivia/test_approve_land.py` (10): Slice 6 exit: the F5 script against the BUILT approve/land flows.
 - `tests/aivia/test_ask_console.py` (21): Tier A exit (ADR 0079): the F10 answer keys go RUNNABLE.

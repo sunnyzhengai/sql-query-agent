@@ -432,6 +432,28 @@ a vanished pick is an honest reported miss. 4 acceptance tests
 runners-up offered); served-page JS node-checked; battery 8/8
 after the change. Ruled into Design_Chatbot §THE MEANING-TEST
 CONSOLE (the two step-3 riders).
+**THE MATCHED GRAPH built (Sunny's ruling, 2026-09-11 — the
+crown rule is DEAD):** steps 3–5 rebuilt: SET FORMATION (exact
+hits all equal citizens; semantic band = MATCH_SCORE +
+UNIQUE_MARGIN — registry thresholds; label constraint before
+banding, proposal-never-veto; a pin replaces the set) · the
+kind's two faces (own label = constraint; other label = the
+population joins as a CONNECTION) · THE SHAPE LADDER
+(enumeration → connection → neighborhood → list → honest zero;
+pathfinding is the FALLBACK for missing structure) · DELIVERY BY
+RESULT SHAPE (rows render as a table, visible cap + counted
+remainder, the conservation line: "4 of 90 table(s) connect; 86
+do not"). THE KIND-SUBSUMPTION RULE ruled from measured scores
+(kind 1.576 vs same-label instance 1.760 — circular label-card
+credit; a kind ≥ MATCH_SCORE matching the top instance's label
+claims the token; phrases measured safe at 0.307/rank 2026).
+ACCEPTANCE (Sunny's EVENT_ID round) proven scripted AND live:
+'show me all tables that use EVENT_ID' → enumeration, exactly
+ADT_EVENTS · ED_EVENT_INFO · ED_PATIENT_INFO ·
+V_PATIENT_LOCATION_HISTORY, counts 4/90, GQL
+`MATCH (a:table)-[:has_part]->(b:column) FILTER b.name =
+'EVENT_ID' …`. 5 new deterministic tests; battery 8/8 after the
+rebuild.
 **THE TURN DEFAULT ruled (Sunny, 2026-09-11, same session):**
 HITL after EVERY turn is now the DEFAULT DESIGN for all chatbot
 surfaces — findings offered ranked with visible scores and a

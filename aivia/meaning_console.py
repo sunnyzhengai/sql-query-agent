@@ -202,21 +202,40 @@ def _strong(mset: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     return None
 
 
-def _strong_in_labels(mset: Dict[str, Any],
-                      allowed: Set[str]) -> Optional[Dict[str, Any]]:
-    """THE LABEL CONSTRAINT's crown: the best INSTANCE match whose
-    label the user named. None = nothing among those labels clears
-    the bar — the caller relaxes and REPORTS (a constraint is a
-    proposal, never a veto)."""
-    ranked = [m for m in mset["matches"]
-              if m["class"] == "instance" and m["label"] in allowed]
-    if not ranked:
-        return None
-    top = ranked[0]
-    if mset["tier"] == "exact" or \
-            top["score"] >= grounding.thresholds()["MATCH_SCORE"]:
-        return top
-    return None
+def _token_set(mset: Dict[str, Any],
+               allowed: Set[str]
+               ) -> Tuple[List[Dict[str, Any]], bool]:
+    """SET FORMATION (THE MATCHED-GRAPH RULING, 2026-09-11 — the
+    crown rule is dead): a token's match is a SET — exact hits are
+    ALL equal citizens; semantic hits form THE BAND (>= MATCH_SCORE
+    and within UNIQUE_MARGIN of the best; registry thresholds).
+    The label constraint applies BEFORE banding (the user's words
+    pick the grain) and is a proposal, never a veto: an empty
+    constrained set falls back to the unconstrained band, flagged
+    True for the caller's report."""
+    inst = [m for m in mset["matches"] if m["class"] == "instance"]
+
+    def band(cands):
+        if not cands:
+            return []
+        if mset["tier"] == "exact":
+            return list(cands)
+        t = grounding.thresholds()
+        strong = [m for m in cands
+                  if m["score"] >= t["MATCH_SCORE"]]
+        if not strong:
+            return []
+        best = strong[0]["score"]
+        return [m for m in strong
+                if m["score"] >= best - t["UNIQUE_MARGIN"]]
+
+    if allowed:
+        kept = band([m for m in inst if m["label"] in allowed])
+        if kept:
+            return kept, False
+        fallback = band(inst)
+        return fallback, bool(fallback)
+    return band(inst), False
 
 
 # ---- step 4: the deterministic planner -------------------------------
@@ -300,84 +319,167 @@ def answer_question(question: str, interpret_fn,
     pins = pins or {}
     tokens, seat = tokens_from(question, interpret_fn)
     msets = [match_token(t, entries, semantic) for t in tokens]
-    # THE CHOICE STEP (ruled by Sunny, 2026-09-11): a pin is the
-    # HUMAN ACT — the user chose a candidate from a token's match
-    # set; it IS that token's crown and outranks scores and
-    # constraints. A pin naming a candidate no longer in the set
-    # is an honest miss, never a silent fallback.
-    pinned, pin_misses = [], []
-    effective: Dict[str, Any] = {}
+    # THE CHOICE STEP (ruled 2026-09-11): a pin is the HUMAN ACT —
+    # it replaces the token's whole SET and outranks scores and
+    # constraints. A vanished pick is an honest miss.
+    pinned, pin_misses, pin_sets = [], [], {}
     for mset in msets:
-        top = _strong(mset)
         want = pins.get(mset["token"])
-        if want:
-            hit = next((m for m in mset["matches"]
-                        if m["identity"] == want), None)
-            if hit is not None:
-                top = hit
-                pinned.append((mset["token"], hit["name"]))
-            else:
-                pin_misses.append((mset["token"], want))
-                want = None
-        effective[mset["token"]] = (top, bool(want))
-    # THE LABEL CONSTRAINT (ruled in the five steps; wired
-    # 2026-09-11 from Sunny's ADT_EVENT round): a token that
-    # grounds as a label constrains the OTHER tokens' instance
-    # anchoring to that label — the user's own words pick the
-    # grain. Proposal, never a veto: an empty constrained set
-    # relaxes and REPORTS (the planner's edge-kind law, same
-    # honesty). A pin skips the constraint — the human already
-    # chose.
-    allowed_labels: Set[str] = set()
-    for top, _was_pinned in effective.values():
-        if top is not None and top["class"] == "kind":
-            allowed_labels.add(top["name"])
-    anchors, kind_hits, edge_kinds, unmatched = [], [], set(), []
-    label_relaxed = []
-    for mset in msets:
-        top, was_pinned = effective[mset["token"]]
-        if top is None:
-            if not mset["matches"]:
-                unmatched.append(mset["token"])
+        if not want:
             continue
-        if top["class"] == "instance":
-            if allowed_labels and not was_pinned:
-                constrained = _strong_in_labels(mset, allowed_labels)
-                if constrained is None:
-                    label_relaxed.append(
-                        (mset["token"], sorted(allowed_labels)))
-                else:
-                    top = constrained
-            if top["identity"] not in {a["identity"] for a in anchors}:
-                anchors.append(top)
-        elif top["class"] == "kind":
-            kind_hits.append(top)
+        hit = next((m for m in mset["matches"]
+                    if m["identity"] == want), None)
+        if hit is not None:
+            pin_sets[mset["token"]] = [hit]
+            pinned.append((mset["token"], hit["name"]))
         else:
+            pin_misses.append((mset["token"], want))
+    # kinds and edge-kinds ground from each token's crown — plus
+    # THE KIND-SUBSUMPTION RULE (ruled 2026-09-11, from measured
+    # scores: 'tables' -> kind 1.576 vs top table-instance 1.760,
+    # the gap entirely label-card credit): same-labeled instances
+    # outscoring their own kind is CIRCULAR credit — the kind
+    # speaks through its members. A kind >= MATCH_SCORE whose name
+    # equals the top instance's label CLAIMS the token.
+    allowed_labels: Set[str] = set()
+    kind_hits, edge_kinds = [], set()
+    claimed: Set[str] = set()
+    for mset in msets:
+        if mset["token"] in pin_sets:
+            continue
+        top = _strong(mset)
+        if top is None:
+            continue
+        kind_claim = None
+        if top["class"] == "kind":
+            kind_claim = top
+        elif top["class"] == "instance":
+            bar = grounding.thresholds()["MATCH_SCORE"]
+            kind_claim = next(
+                (m for m in mset["matches"]
+                 if m["class"] == "kind" and m["score"] >= bar
+                 and m["name"] == top["label"]), None)
+        if kind_claim is not None:
+            kind_hits.append(kind_claim)
+            allowed_labels.add(kind_claim["name"])
+            claimed.add(mset["token"])
+        elif top["class"] == "edge-kind":
             edge_kinds.add(top["identity"].removeprefix("edgekind::"))
-    plan = plan_connection(anchors, adj, allowed=edge_kinds or None)
-    single_anchor = len(anchors) == 1 and not plan["paths"]
-    if single_anchor:
-        # a single anchor: its typed neighborhood is the subgraph
+            claimed.add(mset["token"])
+    # SET FORMATION (THE MATCHED-GRAPH RULING — the crown rule is
+    # dead): every token contributes its full set; the label
+    # constraint shapes it, proposal-never-veto
+    inst_sets, label_relaxed, unmatched = [], [], []
+    for mset in msets:
+        if mset["token"] in pin_sets:
+            inst_sets.append((mset["token"], pin_sets[mset["token"]]))
+            continue
+        if mset["token"] in claimed:
+            continue
+        members, relaxed = _token_set(mset, allowed_labels)
+        if relaxed:
+            label_relaxed.append((mset["token"],
+                                  sorted(allowed_labels)))
+        if members:
+            inst_sets.append((mset["token"], members))
+        elif not mset["matches"]:
+            unmatched.append(mset["token"])
+    anchors, _seen = [], set()
+    for _tok, members in inst_sets:
+        for m in members:
+            if m["identity"] not in _seen:
+                _seen.add(m["identity"])
+                anchors.append(m)
+    # THE KIND'S TWO FACES: its own label = a constraint (job
+    # done); another label = a CONNECTION — the population joins
+    inst_labels = {m["label"] for _t, ms in inst_sets for m in ms}
+    enum_kinds = [k["name"] for k in kind_hits
+                  if k["name"] not in inst_labels]
+    # THE SHAPE LADDER: enumeration -> connection -> neighborhood
+    # -> list -> honest zero; the matched graph decides, the
+    # planner only fills MISSING structure
+    rows: List[Dict[str, str]] = []
+    counts: Dict[str, Any] = {}
+    # literal: shape
+    plan = {"paths": [], "nodes": [], "edges": [], "gaps": [],
+            "relaxed": []}
+    gql: List[str] = []
+    if enum_kinds and anchors:
+        mode = "enumeration"
+        kind_label = enum_kinds[0]
+        pop = {n.identity for n in read.nodes(kind_label)}
+        hit_pop = set()
+        for m in anchors:
+            for nbr, elbl in adj.get(m["identity"], []):
+                if edge_kinds and elbl not in edge_kinds:
+                    continue
+                if nbr in pop:
+                    hit_pop.add(nbr)
+                    # literal: shape
+                    rows.append({"a": nbr.rsplit("|", 1)[-1],
+                                 "edge": elbl, "b": m["name"],
+                                 "a_id": nbr,
+                                 "b_id": m["identity"]})
+        rows.sort(key=lambda r: (r["a"], r["b"]))
+        # literal: shape
+        counts = {"connected": len(hit_pop),
+                  "population": len(pop), "label": kind_label}
+        names = sorted({m["name"] for m in anchors})
+        flt = " OR ".join(f"b.name = '{n}'" for n in names[:8])
+        edge = sorted(edge_kinds)[0] if edge_kinds else "has_part"
+        gql = [f"MATCH (a:{kind_label})-[:{edge}]->"
+               f"(b:{anchors[0]['label']}) FILTER {flt} "
+               "RETURN a.name, b.name"]
+    elif enum_kinds:
+        mode = "list"
+        kind_label = enum_kinds[0]
+        members = sorted(n.identity for n in read.nodes(kind_label))
+        # literal: shape
+        rows = [{"a": i.rsplit("|", 1)[-1], "edge": "", "b": "",
+                 "a_id": i, "b_id": ""} for i in members]
+        # literal: shape
+        counts = {"connected": len(members),
+                  "population": len(members), "label": kind_label}
+        gql = [f"MATCH (a:{kind_label}) RETURN a.name"]
+    elif len(inst_sets) >= 2:
+        mode = "connection"
+        plan = plan_connection(anchors, adj,
+                               allowed=edge_kinds or None)
+    elif len(anchors) == 1:
+        mode = "neighborhood"
         a = anchors[0]["identity"]
         plan["nodes"] = [a] + [b for b, _ in adj.get(a, [])][:20]
         plan["edges"] = sorted({(a, b, lbl) if (a, b, lbl) in directed
                                 else (b, a, lbl)
                                 for b, lbl in adj.get(a, [])[:20]})
+        gql = [f"MATCH (a:{anchors[0]['label']})-[e]-(b) FILTER "
+               f"a.name = '{anchors[0]['name']}' "
+               "RETURN a.name, b.name"]
+    elif len(anchors) > 1:
+        # one token, many equal citizens: the set IS the answer
+        mode = "list"
+        # literal: shape
+        rows = [{"a": m["name"], "edge": "",
+                 "b": (m["identity"].rsplit("|", 2)[-2]
+                       if m["identity"].count("|") >= 2 else
+                       m["label"]),
+                 "a_id": m["identity"], "b_id": ""}
+                for m in anchors]
+        names = sorted({m["name"] for m in anchors})
+        flt = " OR ".join(f"a.name = '{n}'" for n in names[:8])
+        gql = [f"MATCH (a:{anchors[0]['label']}) FILTER {flt} "
+               "RETURN a.name"]
+    else:
+        mode = "zero"
     label_of = {}
-    # after the single-anchor branch, so neighborhood nodes carry
-    # their labels too (the '[?] dbo' display corpse, 2026-09-11)
     # literal: mechanical — the technical spine's label walk
     for lbl in ("db", "db_schema", "table", "column"):
         for n in read.nodes(lbl):
             if n.identity in plan["nodes"]:
                 label_of[n.identity] = lbl
-    if single_anchor:
-        lbl = anchors[0]["label"]
-        name = anchors[0]["name"]
-        gql = [f"MATCH (a:{lbl})-[e]-(b) FILTER a.name = '{name}' "
-               "RETURN a.name, b.name"]
-    else:
-        gql = [write_gql(p, directed, label_of) for p in plan["paths"]]
+    if mode == "connection":
+        gql = [write_gql(p, directed, label_of)
+               for p in plan["paths"]]
     evidence = []
     described = {e["identity"]: e for e in entries}
     for ident in plan["nodes"]:
@@ -397,6 +499,7 @@ def answer_question(question: str, interpret_fn,
     # literal: shape
     return {"question": question, "seat": seat, "tokens": tokens,
             "match_sets": msets, "anchors": anchors,
+            "mode": mode, "rows": rows, "counts": counts,
             "kind_constraints": kind_lines,
             "label_constraint": sorted(allowed_labels),
             "label_relaxed": label_relaxed,
@@ -440,6 +543,9 @@ _PAGE = """<!doctype html><meta charset="utf-8">
  .you { color: #2b5db9; font-weight: 600; }
  a.pick { color: #2b5db9; text-decoration: underline dotted;
           margin-right: .5rem; }
+ table.rows { border-collapse: collapse; margin: .4rem 0; }
+ table.rows td { border: 1px solid #ddd; padding: .25rem .6rem;
+                 font-family: monospace; font-size: .9rem; }
  #composer { position: fixed; bottom: 0; left: 0; right: 0;
              background: #fffffff2; border-top: 1px solid #ddd;
              padding: .7rem 1rem; }
@@ -570,9 +676,28 @@ def render_round(result: Dict[str, Any]) -> str:
                          result["edge_constraints"])) + "</p>")
     for g in result["gql"]:
         parts.append(f"<pre class=gql>{html.escape(g)}</pre>")
+    # DELIVERY BY RESULT SHAPE (the matched-graph ruling): rows
+    # render as a TABLE with a visible cap and counted remainder;
+    # the conservation line rides along
+    if result.get("rows"):
+        cap = result["rows"][:20]
+        cells = "".join(
+            "<tr><td>" + html.escape(r["a"]) + "</td><td>"
+            + html.escape(r["edge"]) + "</td><td>"
+            + html.escape(r["b"]) + "</td></tr>" for r in cap)
+        parts.append("<table class=rows>" + cells + "</table>")
+        if len(result["rows"]) > len(cap):
+            parts.append(f"<p class=meta>showing {len(cap)} of "
+                         f"{len(result['rows'])} rows</p>")
+    c = result.get("counts") or {}
+    if c and c.get("connected") != c.get("population"):
+        parts.append(f"<p class=meta>{c['connected']} of "
+                     f"{c['population']} {c['label']}(s) connect; "
+                     f"{c['population'] - c['connected']} do "
+                     "not.</p>")
     body = result["evidence"] + [""] + result["edge_lines"] \
         if result["edge_lines"] else result["evidence"]
-    if body:
+    if body and not result.get("rows"):
         parts.append("<pre>" + html.escape("\n".join(body)) + "</pre>")
     for a, b in result["relaxed"]:
         parts.append(f"<p class=meta>note: {html.escape(a)} and "

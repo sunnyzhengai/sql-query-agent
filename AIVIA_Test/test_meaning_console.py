@@ -337,6 +337,95 @@ def test_the_runners_up_are_offered_as_picks(world):
     assert "ADT_EVENTS (table, 1.47)" in out
 
 
+# ---- THE MATCHED GRAPH (ruled by Sunny 2026-09-11: the crown
+# rule is dead — let the matched graph drive the query and the
+# delivery; acceptance = the EVENT_ID round) ------------------------
+EVENT_ID_TABLES = ["ADT_EVENTS", "ED_EVENT_INFO", "ED_PATIENT_INFO",
+                   "V_PATIENT_LOCATION_HISTORY"]
+
+
+def test_matched_graph_enumerates_the_event_id_carriers(world):
+    # THE ACCEPTANCE ROUND: 'show me all tables that use EVENT_ID'
+    # — 'tables' grounds as the kind (scripted; kind-vs-instance
+    # crowning is a recorded open finding), EVENT_ID exact-matches
+    # ALL four carrier columns; the existing has_part edges ARE
+    # the answer: exactly the four tables, as rows, with counts.
+    read, entries, _, adj, directed = world
+    kind = next(e for e in entries if e["identity"] == "kind::table")
+    semantic = _ScriptedSemantic({"tables": [{**kind, "score": 1.2}]})
+    r = mc.answer_question("show me all tables that use EVENT_ID",
+                           _scripted_tokens(["tables", "EVENT_ID"]),
+                           entries, semantic, read, adj, directed)
+    assert r["mode"] == "enumeration"
+    assert sorted({row["a"] for row in r["rows"]}) == EVENT_ID_TABLES
+    assert all(row["edge"] == "has_part" and row["b"] == "EVENT_ID"
+               for row in r["rows"])
+    assert r["counts"]["connected"] == 4
+    assert r["counts"]["population"] == 90
+    assert r["counts"]["label"] == "table"
+    assert len(r["anchors"]) == 4          # nothing discarded
+    gql = r["gql"][0]
+    assert "(a:table)" in gql and "has_part" in gql \
+        and "EVENT_ID" in gql
+    out = mc.render_round(r)
+    assert "<table class=rows>" in out
+    assert "4 of 90 table(s) connect; 86 do not." in out
+
+
+def test_kind_subsumption_beats_circular_label_credit(world):
+    # measured live 2026-09-11: 'tables' scored table INSTANCES
+    # above the kind entry (their own label cards — circular
+    # credit); the ruled rule: a kind >= MATCH_SCORE whose name
+    # equals the top instance's label CLAIMS the token
+    read, entries, _, adj, directed = world
+    kind = next(e for e in entries if e["identity"] == "kind::table")
+    a_table = next(e for e in entries if e["label"] == "table")
+    semantic = _ScriptedSemantic({"tables": [
+        {**dict(a_table), "score": 1.760},
+        {**dict(kind), "score": 1.576}]})
+    r = mc.answer_question("show me all tables that use EVENT_ID",
+                           _scripted_tokens(["tables", "EVENT_ID"]),
+                           entries, semantic, read, adj, directed)
+    assert r["mode"] == "enumeration"
+    assert sorted({row["a"] for row in r["rows"]}) == EVENT_ID_TABLES
+
+
+def test_exact_set_keeps_all_equal_citizens(world):
+    # one token, four exact matches: the set IS the answer (list
+    # mode) — the old crown rule kept one and dropped three
+    read, entries, _, adj, directed = world
+    r = mc.answer_question("EVENT_ID", None, entries, None,
+                           read, adj, directed)
+    assert r["mode"] == "list"
+    assert sorted({row["b"] for row in r["rows"]}) == EVENT_ID_TABLES
+    assert len(r["anchors"]) == 4
+
+
+def test_kind_alone_lists_its_population(world):
+    read, entries, _, adj, directed = world
+    kind = next(e for e in entries if e["identity"] == "kind::table")
+    semantic = _ScriptedSemantic({"tables": [{**kind, "score": 1.2}]})
+    r = mc.answer_question("show me the tables",
+                           _scripted_tokens(["tables"]),
+                           entries, semantic, read, adj, directed)
+    assert r["mode"] == "list"
+    assert len(r["rows"]) == 90
+    assert "showing 20 of 90 rows" in mc.render_round(r)
+
+
+def test_semantic_band_stays_narrow_within_the_margin(world):
+    # the recorded ADT_EVENT ranking: 1.603 vs 1.470 — outside
+    # UNIQUE_MARGIN, so the band holds ONE member and behaves like
+    # the old single-anchor round (paths stay paths)
+    read, entries, _, adj, directed = world
+    semantic = _ScriptedSemantic(_adt_ranking(entries))
+    r = mc.answer_question("what does ADT_EVENT mean",
+                           _scripted_tokens(["ADT_EVENT"]),
+                           entries, semantic, read, adj, directed)
+    assert r["mode"] == "neighborhood"
+    assert len(r["anchors"]) == 1
+
+
 # ---- the glossary chain (the machinery lives in flows/glossary;
 # tests/aivia/test_glossary.py owns it — this proves the CONSOLE
 # INDEX carries the blessed expansions end-to-end) -------------------
