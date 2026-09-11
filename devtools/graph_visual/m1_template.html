@@ -115,6 +115,7 @@ let W, H, dpr = window.devicePixelRatio || 1;
 let scale = 0.14, ox = 0, oy = 0;   // world→screen: s = w*scale + o
 const show = {table:1, column:1, schema:1, db:1, haspart:1, joins:1};
 let hover = null, pinned = null, dragging = null, panning = false;
+let pending = null, down = false;      // gesture decided on first move
 let px = 0, py = 0, gx = 0, gy = 0;   // g = gesture start (click test)
 
 // ---- flatten nodes — ONE live object per node; edges, drags,
@@ -270,9 +271,9 @@ function draw(){
 
 // ---- hit test / tooltip -------------------------------------
 function nodeAt(mx,my){
-  // distance to the circle EDGE: you grab whatever the cursor is
-  // visually on, whichever grain it is
-  let best=null, bd=8;
+  // distance to the circle EDGE, tight halo — a generous slop over
+  // 4554 tiny dots made empty space un-pannable
+  let best=null, bd=4;
   for(const n of nodes){
     if(!show[n.k==='schema'?'schema':n.k]) continue;
     const d = Math.hypot(sx(n)-mx, sy(n)-my) - nr(n);
@@ -340,13 +341,21 @@ window.pin = function(n){
 };
 // ---- interactions -------------------------------------------
 CV.addEventListener('mousedown', e=>{
-  const n = nodeAt(e.clientX, e.clientY);
-  if(n){dragging=n;}
-  else {panning=true; CV.classList.add('drag');}
+  down = true; pending = nodeAt(e.clientX, e.clientY);
+  dragging = null; panning = false;
   px=gx=e.clientX; py=gy=e.clientY;
 });
 addEventListener('mousemove', e=>{
   const dx=e.clientX-px, dy=e.clientY-py;
+  if(down && !dragging && !panning &&
+     Math.hypot(e.clientX-gx, e.clientY-gy) > 4){
+    // decide the gesture on first real movement: dragging a dot
+    // too small to see (a sub-2.5px column) means the user wanted
+    // to PAN — that ambiguity killed all dragging at overview
+    if(pending && !(pending.k==='column' && nr(pending) < 2.5))
+      dragging = pending;
+    else { panning = true; CV.classList.add('drag'); }
+  }
   if(dragging){
     const wdx=dx/scale, wdy=dy/scale;
     dragging.x+=wdx; dragging.y+=wdy;
@@ -355,16 +364,18 @@ addEventListener('mousemove', e=>{
     px=e.clientX; py=e.clientY; draw(); return;
   }
   if(panning){ox+=dx; oy+=dy; px=e.clientX; py=e.clientY; draw(); return;}
+  px=e.clientX; py=e.clientY;
   const n = nodeAt(e.clientX, e.clientY);
   if(n!==hover){hover=n; draw();}
   showTip(n, e.clientX, e.clientY);
 });
 addEventListener('mouseup', e=>{
   const clicked = Math.hypot(e.clientX-gx, e.clientY-gy) < 4;
-  if(dragging && clicked &&
-     (dragging.k==='table'||dragging.k==='column')) pin(dragging);
-  else if(panning && clicked && !nodeAt(e.clientX,e.clientY)) pin(null);
-  dragging=null; panning=false; CV.classList.remove('drag');
+  if(clicked && pending &&
+     (pending.k==='table'||pending.k==='column')) pin(pending);
+  else if(clicked && !pending) pin(null);
+  down=false; pending=null; dragging=null; panning=false;
+  CV.classList.remove('drag');
 });
 CV.addEventListener('wheel', e=>{
   e.preventDefault();

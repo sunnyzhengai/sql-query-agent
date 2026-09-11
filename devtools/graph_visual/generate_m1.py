@@ -94,6 +94,32 @@ for it in range(900):
         pos[i][0] += fx[i] / mag * lim
         pos[i][1] += fy[i] / mag * lim
 
+# ---- hard collision resolution: NO two column discs intersect
+# (the force sim relaxes; this GUARANTEES — pushed pairs apart
+# until every gap >= 40 world units, verified before emit)
+for _ in range(400):
+    moved = False
+    for i in range(N):
+        for j in range(i + 1, N):
+            dx = pos[j][0] - pos[i][0]
+            dy = pos[j][1] - pos[i][1]
+            d = math.sqrt(dx * dx + dy * dy) + 1e-9
+            need = rad[i] + rad[j] + 40
+            if d < need:
+                push = (need - d) / 2 + 0.5
+                pos[i][0] -= dx / d * push
+                pos[i][1] -= dy / d * push
+                pos[j][0] += dx / d * push
+                pos[j][1] += dy / d * push
+                moved = True
+    if not moved:
+        break
+worst = min(
+    math.dist(pos[i], pos[j]) - rad[i] - rad[j]
+    for i in range(N) for j in range(i + 1, N))
+assert worst >= 39, f"disc overlap remains: {worst:.1f}"
+print(f"collision pass: min inter-disc gap {worst:.1f} world units")
+
 # ---- emit nodes ----------------------------------------------
 GA = 2.39996322972865332  # golden angle
 tnodes, cnodes = [], []
