@@ -296,7 +296,8 @@ role-tagged resolution) — evidence in AIVIA_Test/GQL_Gates.md.
 The batches are SEALED: their census rows and tests stand forever;
 changing an accepted grain now requires a design change first.
 
-**THE MEANING-TEST CONSOLE (ruled 2026-09-11, lands after M4/M5):**
+**THE MEANING-TEST CONSOLE (ruled 2026-09-11; Sunny moved the
+first target UP — built same day over the accepted M1–M3):**
 each accepted batch earns the ask console booted over the
 store-as-built — MEANING testing (readability, findability,
 grounding), never structural verification (gates own that; the
@@ -308,6 +309,26 @@ the sepsis cache (content-keyed — technical identities/texts are
 identical), one console boot with the key embeds the delta; M3's
 condition store-grains stay out of the index until §D resumes
 (standing decision); L3/M12 re-homes vectors onto node rows.
+**BUILT 2026-09-11 (first target, the technical layer):**
+`aivia/meaning_console.py` implements the ruled five steps
+(Design_Chatbot.md §THE MEANING-TEST CONSOLE): interpreter
+tokenizes (floor fallback) · exact + vector match sets with three
+classes (instance anchor / kind constraint / edge-kind traversal
+constraint) · deterministic planner = minimal connecting subgraph
+over the technical adjacency (has_part spine + joins_to) · the
+GQL artifact rendered per path (Fabric-legal, directed hops) ·
+local execution, exclusions counted in the coverage line; dev
+cache seeded from sepsis (content-keyed). Battery:
+AIVIA_Test/test_meaning_console.py — 14 deterministic tests +
+the 8-question live battery (AIVIA_LIVE=1), five families, RUN
+LIVE 2026-09-11: 21 passed, 1 expected-finding. **THE FIRST
+MEANING FINDING:** `WRONG_MED_ALT_CNT` cannot be found by meaning
+("which column counts wrong medication alternatives?" ranks it
+#25) — its name is abbreviation-speak (MED/ALT/CNT) and its
+description speaks NDC/CNR jargon; the dev estate has no blessed
+acronyms. The fix is governance (bless the acronyms) or richer
+speech — never a matcher hack. Battery awaits Sunny's gap-check
+and blessing.
 
 **THE M2 REDESIGN (Sunny's rulings 2026-09-10, from the
 hand-drawn structure):** (1) a scope reaches its tables THROUGH
