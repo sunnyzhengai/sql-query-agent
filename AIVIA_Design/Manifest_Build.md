@@ -329,6 +329,21 @@ description speaks NDC/CNR jargon; the dev estate has no blessed
 acronyms. The fix is governance (bless the acronyms) or richer
 speech — never a matcher hack. Battery awaits Sunny's gap-check
 and blessing.
+**THE BLESSING SEED (built 2026-09-11, the finding's remedy
+path):** the ruled `acronym_blessings.json` (Sunny's 2026-09-09
+curated blessing — 112 acronyms; 33 uncertain tokens held in
+`acronym_remainder.json`) now lives in the dev estate too; the
+meaning console boots journal-wired (`governance/journal.jsonl`)
+and `seed_blessings` births acronym nodes from the file through
+the real write path (`enrich.bless`) — the journal is BORN, never
+copied, and replays at every rebuild. DELTA BY NAME: a ruled
+addition to the blessings file blesses exactly the new names at
+the next boot (this is the alt/cnt path). The dev journal was
+born 2026-09-11: 113 lines (person:sunny + 112 acronyms). SCAN
+TRUTH: `alt` and `cnt` were IN the 2026-09-08 sepsis scan (the
+scan is total — 3 092 tokens) but the Scribe proposed neither and
+the remainder holds neither — unproposed tokens currently vanish
+with no ledger bucket; a standing gap awaiting a ruling.
 
 **THE M2 REDESIGN (Sunny's rulings 2026-09-10, from the
 hand-drawn structure):** (1) a scope reaches its tables THROUGH

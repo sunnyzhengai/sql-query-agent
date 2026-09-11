@@ -14,6 +14,7 @@ never verbatim model wording.
 
 Proves: contract:aivia-design-to-code
 """
+import json
 import os
 import pathlib
 
@@ -192,6 +193,79 @@ def test_seed_cache_copies_once_and_never_overwrites(tmp_path):
     assert dst.read_text() == '{"k": [1.0]}'
     assert mc.seed_cache(tmp_path / "absent.json",
                          tmp_path / "other.json") is False
+
+
+# ---- the blessing seed (file → journal, the real write path) --------
+def _blessings(acronyms):
+    return {"acronyms": acronyms, "approved_by": "person:sunny",
+            "approved_at": "2026-09-09T12:00:00Z"}
+
+
+def test_seed_blessings_births_the_journal_and_survives_rebirth(
+        tmp_path):
+    journal = tmp_path / "governance" / "journal.jsonl"
+    store, _ = build_store("ed_sepsis_dev", journal_path=journal)
+    read = ReadApi(store)
+    (tmp_path / "acronym_blessings.json").write_text(json.dumps(
+        _blessings({"med": ["medication"], "alt": ["alternative"]})))
+    assert mc.seed_blessings(store, read, tmp_path) == 2
+    rows = [json.loads(x) for x in
+            journal.read_text().splitlines()]
+    idents = [r["identity"] for r in rows]
+    assert "acronym::MED" in idents and "acronym::ALT" in idents
+    assert "person:sunny" in idents      # the approver is minted
+    # rebirth: a fresh build replays the journal — blessings survive
+    store2, _ = build_store("ed_sepsis_dev", journal_path=journal)
+    read2 = ReadApi(store2)
+    assert {n.properties["name"]
+            for n in read2.nodes("acronym")} == {"med", "alt"}
+    # idempotent: the same file blesses nothing at the next boot
+    assert mc.seed_blessings(store2, read2, tmp_path) == 0
+
+
+def test_seed_blessings_blesses_exactly_the_ruled_delta(tmp_path):
+    journal = tmp_path / "governance" / "journal.jsonl"
+    store, _ = build_store("ed_sepsis_dev", journal_path=journal)
+    read = ReadApi(store)
+    f = tmp_path / "acronym_blessings.json"
+    f.write_text(json.dumps(_blessings({"med": ["medication"]})))
+    assert mc.seed_blessings(store, read, tmp_path) == 1
+    # a ruled ADDITION to the file blesses ONLY the new names —
+    # the alt/cnt path: edit the file, reboot, the delta lands
+    f.write_text(json.dumps(_blessings(
+        {"med": ["medication"], "cnt": ["count"]})))
+    assert mc.seed_blessings(store, read, tmp_path) == 1
+    assert {n.properties["name"]
+            for n in read.nodes("acronym")} == {"med", "cnt"}
+    idents = [json.loads(x)["identity"]
+              for x in journal.read_text().splitlines()]
+    assert idents.count("acronym::MED") == 1   # never re-journaled
+
+
+def test_seed_blessings_without_a_file_is_a_quiet_zero(tmp_path):
+    store, _ = build_store("ed_sepsis_dev",
+                           journal_path=tmp_path / "j.jsonl")
+    read = ReadApi(store)
+    assert mc.seed_blessings(store, read, tmp_path) == 0
+
+
+def test_blessed_acronyms_join_the_console_index(tmp_path):
+    # the whole chain — seed → speech attaches the expansion text →
+    # the console's scoped entries carry it (the WRONG_MED_ALT_CNT
+    # remedy path: the expansion card embeds at boot)
+    journal = tmp_path / "governance" / "journal.jsonl"
+    store, _ = build_store("ed_sepsis_dev", journal_path=journal)
+    read = ReadApi(store)
+    (tmp_path / "acronym_blessings.json").write_text(json.dumps(
+        _blessings({"med": ["medication"], "alt": ["alternative"],
+                    "cnt": ["count"]})))
+    mc.seed_blessings(store, read, tmp_path)
+    entries, _ = mc.technical_scope(read)
+    crown = next(e for e in entries
+                 if e["name"] == "WRONG_MED_ALT_CNT")
+    assert "medication" in crown["expansions_text"]
+    assert "alternative" in crown["expansions_text"]
+    assert "count" in crown["expansions_text"]
 
 
 # ---- THE LIVE MEANING BATTERY (drafted for Sunny's blessing) --------
