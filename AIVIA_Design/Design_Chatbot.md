@@ -715,6 +715,45 @@ census gains a scope column.
 
 ---
 
+## THE TURN DEFAULT — HITL after every turn (► RULED, Sunny 2026-09-11)
+
+**Statement.** EVERY chatbot turn ends at a human choice point.
+The machine's findings are OFFERED — ranked candidates with their
+labels and scores, a visible cap with the remainder counted — and
+the human's pick (a click or new words) steers the next act. This
+is the DEFAULT for every chatbot surface AIVIA ships (the product
+Workbench/Resolution Console and the meaning-test console alike);
+a surface that omits the choice point needs a ruling naming why.
+
+**The shape (non-blocking).** The turn still ANSWERS — the crown
+proceeds by default so momentum survives — but the runners-up ride
+along as live choices. Choosing re-runs the act with the pick
+PINNED. Blocking clarify remains reserved for genuine ambiguity
+(the clarify obligations, L3-D2); the choice point is an offer,
+never a gate.
+
+**The pick's authority.** A pin is the HUMAN ACT: it becomes the
+crown for that mention and outranks scores, margins, and
+constraints (the user may overrule their own earlier words). A pin
+whose candidate has left the match set is an honest reported miss
+— never a silent fallback. Picks are steer and accrete as acts
+(clicks-are-steer; selections-are-acts, L5-D2).
+
+**Why this is the default, not a feature.** It closes the loop the
+whole design is built on — machine proposes → human chooses →
+deterministic execution → display (plan-confirm-execute-display;
+operations are the product). It is also the flywheel's mouth:
+every pick is usage evidence for the meaning-book without any
+self-tuning (Law 7 — learning only through confirmation). First
+implementation: the meaning-test console's choice step (step-3
+rider above, built 2026-09-11 with acceptance tests from Sunny's
+ADT_EVENT rounds).
+
+**The machine never chains past a choice point.** No autonomous
+multi-turn continuation: a turn's output is findings + offered
+choices, and only a human act (pick, confirmation, or a new
+question) starts the next turn.
+
 ## The elimination worklist (today's authored bridges, for the dig)
 
 | authored thing | species | replacement under the laws |
@@ -961,4 +1000,6 @@ that token's crown and outranks scores and constraints; a pin
 whose candidate left the match set is an honest miss, reported,
 never a silent fallback. Picks are steer (the clicks-are-steer
 law), keeping the loop: machine proposes → human chooses →
-deterministic planner executes → display.
+deterministic planner executes → display. Generalized the same
+day as THE TURN DEFAULT (see the section after the nine laws):
+HITL after every turn is the DEFAULT for all chatbot surfaces.

@@ -18,7 +18,7 @@ inside one. Split test: would it exist with no chatbot at all?
 | file | type | status | what it is |
 |---|---|---|---|
 | Design_Graph_Engine.md | Design | RATIFIED 2026-09-10 — THE ONE GRAPH (v2 renamed over the prior file at ratification; prior content in git history) | one home of meaning (the graph), the twin dissolves, L0 evidence / L1 extraction / L2 graph / L3 projections / L4 tabled, English ladder, carried laws, migration phases; ladder = Manifest_Build §E6 |
-| Design_Chatbot.md | Design | LIVING (Sunny ratifies) | the chatbot: nine laws + dig rulings, THE SEARCH IS THE ANSWER, total-score law, one-vocabulary law, seats, data contracts, derived UI |
+| Design_Chatbot.md | Design | LIVING (Sunny ratifies) | the chatbot: nine laws + dig rulings, THE TURN DEFAULT (HITL after every turn, ruled 2026-09-11), THE SEARCH IS THE ANSWER, total-score law, one-vocabulary law, seats, data contracts, derived UI |
 | Manifest_Build.md | Manifest | LIVING — THE ledger | the ONE build ledger: chatbot claims + search rebuild + seats + open queue; every claim needs evidence |
 | Manifest_Slice_Plan.md | Manifest | EXECUTED 2026-09-06 | the eight-slice build route (record) |
 | Manifest_Port.md | Manifest | EXECUTED 2026-09-06 | port verdicts: new skeleton, ported organs (record) |

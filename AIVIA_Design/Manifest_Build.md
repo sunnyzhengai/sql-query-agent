@@ -432,6 +432,16 @@ a vanished pick is an honest reported miss. 4 acceptance tests
 runners-up offered); served-page JS node-checked; battery 8/8
 after the change. Ruled into Design_Chatbot §THE MEANING-TEST
 CONSOLE (the two step-3 riders).
+**THE TURN DEFAULT ruled (Sunny, 2026-09-11, same session):**
+HITL after EVERY turn is now the DEFAULT DESIGN for all chatbot
+surfaces — findings offered ranked with visible scores and a
+counted cap; the pick pins and steers; non-blocking (the crown
+proceeds; blocking clarify stays reserved for true ambiguity);
+the machine never chains past a choice point. Landed as its own
+section in Design_Chatbot after the nine laws; a surface
+omitting the choice point needs a ruling naming why. The
+meaning console's choice step is the first implementation; the
+product Workbench inherits the default at build time.
 
 **THE M2 REDESIGN (Sunny's rulings 2026-09-10, from the
 hand-drawn structure):** (1) a scope reaches its tables THROUGH
