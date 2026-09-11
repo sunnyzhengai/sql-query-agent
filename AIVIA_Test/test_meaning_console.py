@@ -524,6 +524,28 @@ BATTERY = [
     ("absence-honesty",
      "which table stores billing invoice line items?",
      []),                       # law: nothing invented
+    # ---- SUNNY'S SIX (hand-tested on the web UI and PASSED,
+    # 2026-09-11 — blessed by use; pinned as regression guards
+    # across all engine modes) --------------------------------
+    ("meaning-readback",
+     "what does the ADT_EVENT table mean",
+     ["ADT_EVENTS"]),
+    ("meaning-readback",
+     "what does the column BED_STAY_ID mean",
+     ["BED_STAY_ID"]),
+    ("enumeration",
+     "which tables contain the column BED_ID",
+     ["BED_CONFIG", "HOSPITAL_ENCOUNTERS"]),
+    ("enumeration",
+     'show me all tables that contain "EVENT_ID"',
+     ["ED_PATIENT_INFO", "V_PATIENT_LOCATION_HISTORY"]),
+    ("relationship",
+     "how do tables ADT_EVENTS and ED_PATIENT_INFO join?",
+     ["ADT_EVENTS", "ED_PATIENT_INFO"]),
+    ("impact",
+     "IF i update the column ENCOUNTER_ID, which tables are "
+     "impacted?",
+     ["ED_ENCOUNTERS_FACT", "HOSPITAL_ENCOUNTERS"]),
 ]
 
 
@@ -556,6 +578,8 @@ def test_live_meaning_battery(live_world, family, question, crowns):
                            read, adj, directed)
     surfaced = "\n".join(
         r["evidence"]
+        + [row["a"] for row in r.get("rows", [])]
+        + [row["b"] for row in r.get("rows", [])]
         + [m["name"] for ms in r["match_sets"] for m in ms["matches"]])
     if crowns:
         assert any(c in surfaced for c in crowns), \

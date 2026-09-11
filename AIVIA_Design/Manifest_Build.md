@@ -454,6 +454,18 @@ column); same-named pick links OWNER-QUALIFY
 (ADT_EVENTS.BED_STAY_ID vs BED_CONFIG.BED_STAY_ID); the
 neighborhood cap is COUNTED, never silent ("showing 20 of N
 connections — the rest are counted, not lost").
+**SUNNY'S SIX PASS + PINNED (2026-09-11 evening):** Sunny
+hand-tested six questions on the web UI spanning every engine
+mode — ADT_EVENT table meaning (neighborhood w/ constraint) ·
+column BED_STAY_ID meaning (list w/ speech) · tables containing
+BED_ID (enumeration, 3) · tables containing EVENT_ID
+(enumeration, 4) · how ADT_EVENTS and ED_PATIENT_INFO join
+(connection) · ENCOUNTER_ID update impact (enumeration, 23
+carriers) — ALL PASSED. Pinned into the live battery as
+regression guards (battery now 14 questions, 14/14 live; the
+surfaced check reads rows too). The battery's gap-check
+blessing, previously open, is hereby EARNED BY USE for these
+shapes.
 ACCEPTANCE (Sunny's EVENT_ID round) proven scripted AND live:
 'show me all tables that use EVENT_ID' → enumeration, exactly
 ADT_EVENTS · ED_EVENT_INFO · ED_PATIENT_INFO ·
