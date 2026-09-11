@@ -115,15 +115,16 @@ let W, H, dpr = window.devicePixelRatio || 1;
 let scale = 0.14, ox = 0, oy = 0;   // world→screen: s = w*scale + o
 const show = {table:1, column:1, schema:1, db:1, haspart:1, joins:1};
 let hover = null, pinned = null, dragging = null, panning = false;
-let px = 0, py = 0;
+let px = 0, py = 0, gx = 0, gy = 0;   // g = gesture start (click test)
 
-// ---- flatten nodes ------------------------------------------
-const nodes = [];
-DATA.tables.forEach((n,i)=>nodes.push({k:'table', i, ...n, r:7}));
-DATA.cols.forEach((n,i)=>nodes.push({k:'column', i, ...n, r:2.6}));
-DATA.schemas.forEach((n,i)=>nodes.push({k:'schema', i, ...n, r:9}));
-nodes.push({k:'db', i:0, ...DATA.db, r:11});
-const T = nodes.filter(n=>n.k==='table');
+// ---- flatten nodes — ONE live object per node; edges, drags,
+// and dots all read the same objects (the stale-copy split was
+// the detached-schema / immovable-column bug)
+const T = DATA.tables.map((n,i)=>({k:'table', i, ...n, r:7}));
+const C = DATA.cols.map((n,i)=>({k:'column', i, ...n, r:2.6}));
+const S = DATA.schemas.map((n,i)=>({k:'schema', i, ...n, r:9}));
+const DB = {k:'db', i:0, ...DATA.db, r:11};
+const nodes = [...T, ...C, ...S, DB];
 const joinsOf = i => DATA.joins.filter(j=>j.a===i||j.b===i);
 
 document.getElementById('c-table').textContent = DATA.tables.length;
@@ -169,22 +170,22 @@ function draw(){
   CTX.lineWidth = 1;
   // has_part: db→schema, schema→table, table→column
   if(show.haspart){
-    CTX.strokeStyle = COLORS.haspart; CTX.globalAlpha = .35;
+    CTX.strokeStyle = COLORS.haspart; CTX.globalAlpha = .45;
     CTX.beginPath();
-    if(show.db && show.schema) DATA.schemas.forEach(s=>{
-      CTX.moveTo(sx(nodes[nodes.length-1]), sy(nodes[nodes.length-1]));
-      CTX.lineTo(s.x*scale+ox, s.y*scale+oy);});
-    if(show.schema && show.table) DATA.schemas.forEach(s=>
+    if(show.db && show.schema) S.forEach(s=>{
+      CTX.moveTo(sx(DB), sy(DB));
+      CTX.lineTo(sx(s), sy(s));});
+    if(show.schema && show.table) S.forEach(s=>
       s.tt.forEach(ti=>{const t=T[ti];
-        CTX.moveTo(s.x*scale+ox, s.y*scale+oy);
+        CTX.moveTo(sx(s), sy(s));
         CTX.lineTo(sx(t), sy(t));}));
     CTX.stroke();
     if(show.table && show.column && scale > .5){
       CTX.globalAlpha = .22; CTX.beginPath();
-      DATA.cols.forEach(c=>{const t=T[c.t];
+      C.forEach(c=>{const t=T[c.t];
         if(pinned && !(t===pinned||hi(t))) return;
         CTX.moveTo(sx(t), sy(t));
-        CTX.lineTo(c.x*scale+ox, c.y*scale+oy);});
+        CTX.lineTo(sx(c), sy(c));});
       CTX.stroke();
     }
     CTX.globalAlpha = 1;
@@ -316,7 +317,7 @@ CV.addEventListener('mousedown', e=>{
   const n = nodeAt(e.clientX, e.clientY);
   if(n && (n.k==='table'||n.k==='schema'||n.k==='db')){dragging=n;}
   else {panning=true; CV.classList.add('drag');}
-  px=e.clientX; py=e.clientY;
+  px=gx=e.clientX; py=gy=e.clientY;
 });
 addEventListener('mousemove', e=>{
   const dx=e.clientX-px, dy=e.clientY-py;
@@ -324,7 +325,7 @@ addEventListener('mousemove', e=>{
     const wdx=dx/scale, wdy=dy/scale;
     dragging.x+=wdx; dragging.y+=wdy;
     if(dragging.k==='table')
-      DATA.cols.forEach(c=>{if(T[c.t]===dragging){c.x+=wdx;c.y+=wdy;}});
+      C.forEach(c=>{if(c.t===dragging.i){c.x+=wdx;c.y+=wdy;}});
     px=e.clientX; py=e.clientY; draw(); return;
   }
   if(panning){ox+=dx; oy+=dy; px=e.clientX; py=e.clientY; draw(); return;}
@@ -333,10 +334,9 @@ addEventListener('mousemove', e=>{
   showTip(n, e.clientX, e.clientY);
 });
 addEventListener('mouseup', e=>{
-  if(dragging && Math.hypot(e.clientX-px,e.clientY-py)<3 &&
-     dragging.k==='table') pin(dragging);
-  else if(panning && Math.hypot(e.clientX-px,e.clientY-py)<3 &&
-     !nodeAt(e.clientX,e.clientY)) pin(null);
+  const clicked = Math.hypot(e.clientX-gx, e.clientY-gy) < 4;
+  if(dragging && clicked && dragging.k==='table') pin(dragging);
+  else if(panning && clicked && !nodeAt(e.clientX,e.clientY)) pin(null);
   dragging=null; panning=false; CV.classList.remove('drag');
 });
 CV.addEventListener('wheel', e=>{
