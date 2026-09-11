@@ -184,20 +184,30 @@ edge type exists (the census closes arithmetically).
 | joinType | CLOSED at M3 backfill — the tree carried join_type all along: Inner 39 · LeftOuter 56 |
 | spot | `#Base_Pop`'s join#4 description: "Joins REF_ED_DISPOSITION with HOSPITAL_ENCOUNTERS on REDI.ED_DISPOSITION_CODE = HE.ED_DISPOSITION_CODE." |
 
-THE DRIFT QUERY runs AT THIS GATE — it needs joins + joins_to
-only, no condition nodes (why joins are testable alone). Must
-return EXACTLY two rows:
+THE DRIFT QUERY — DIALECT NOTE (2026-09-11): Fabric GQL does not
+yet support pattern predicates in WHERE nor EXISTS-with-pattern
+("not supported yet"), so the single-statement form is COUNTED as
+a pending capability. The gate runs as TWO pure-GQL steps + a
+set difference, plus a per-finding absence proof:
 
 ```gql
-MATCH (j:join)-[:left_side]->(a:table),
-      (j)-[:right_side]->(b:table)
-WHERE NOT (a)-[:joins_to]-(b)
-RETURN DISTINCT a.name, b.name
+MATCH (j:join)-[:left_side]->(a:table), (j)-[:right_side]->(b:table)
+RETURN DISTINCT a.name AS a, b.name AS b ORDER BY a, b
 ```
-Expected: ENCOUNTER_VISIT_REASONS↔VISIT_REASONS and
-MEDICATIONS↔REF_GENERIC_MED — practiced in USP_ED_SEPSIS, never
-declared by the dictionary (verified against the parse
-2026-09-10, before any build).
+→ 28 observed table-pairs.
+```gql
+MATCH (x:table)-[:joins_to]->(y:table) RETURN DISTINCT x.name AS a, y.name AS b
+```
+→ 65 declared pairs. Observed − declared = EXACTLY:
+ENCOUNTER_VISIT_REASONS↔VISIT_REASONS and
+MEDICATIONS↔REF_GENERIC_MED. Absence proof per finding:
+
+```gql
+MATCH (x:table WHERE x.name = 'MEDICATIONS')-[:joins_to]-(y:table WHERE y.name = 'REF_GENERIC_MED')
+RETURN count(*) AS cnt
+```
+→ 0 (no declared edge exists).
+**VERIFIED LIVE on the served graph 2026-09-11.**
 
 THE COVERAGE INVARIANTS (superseding the side-reads invariant —
 reads is the remainder, never the union). Disjointness must
@@ -211,6 +221,14 @@ RETURN count(*) AS doubleConnected
 Expected: 0. Coverage (reads ∪ join-sides == the parse read-set,
 per scope) runs store-side in the census — the parse read-set is
 not itself in the graph.
+
+**GATE RESULTS 2026-09-11 (Sunny's refresh; the battery run live
+against the served graph):** M1+M2+M3 censuses GREEN (5930 nodes
+/ 8 labels · 6303 edges / 7 types, battery sum == unfiltered
+total) · per-kind census exact · join-rooted 95 · degenerate 25 ·
+joinType 39/56 · All_LDAs spot GREEN · DRIFT GREEN (2 findings +
+absence proofs). OUTSTANDING: the resolves_to `role` property
+(mapping fix + one refresh), then the roles query.
 
 ### M3 gate — THE CONDITION LAYER [BUILT 2026-09-10,
 store-verified; numbers MEASURED; your GQL on the dev estate
@@ -269,7 +287,10 @@ MATCH (j:join)-[:has_part]->(c:condition) RETURN count(c) AS cnt
 Expected: 95.
 
 Role-tagged resolution (subject 119 · comparand 44 · lower_bound
-1 · upper_bound 1):
+1 · upper_bound 1) — REQUIRES the `role` COLUMN mapped as a
+property on BOTH resolves_to mappings (found live 2026-09-11:
+unmapped property → "Property 'role' does not exist"); after
+mapping + refresh:
 
 ```gql
 MATCH (c:condition)-[r:resolves_to]->() RETURN r.role AS role, count(*) AS cnt GROUP BY role
@@ -285,10 +306,13 @@ MATCH (j:join) RETURN j.joinType AS jt, count(*) AS cnt GROUP BY jt
 ```
 Expected: Inner 39 · LeftOuter 56.
 
-The spot check (the All_LDAs conversation made real):
+The spot check (the All_LDAs conversation made real — note the
+HOP RANGE: the RANGE condition nests under the AND root, so
+direct has_part returns nothing):
 
 ```gql
-MATCH (s:scope WHERE s.name = 'All_LDAs')-[:has_part]->(c:condition WHERE c.kind = 'RANGE')
+MATCH (s:scope)-[:has_part]->{1,4}(c:condition)
+FILTER s.name = 'All_LDAs' AND c.kind = 'RANGE'
 RETURN c.description AS descr
 ```
 Expected: the ED-stay window voiced through dictionary words —
