@@ -272,6 +272,71 @@ def test_no_label_word_leaves_anchoring_unconstrained(world):
         ["emr|dbo|ED_EVENT_INFO|ADT_EVENT_ID"]
 
 
+# ---- THE CHOICE STEP (ruled by Sunny 2026-09-11: after tokens
+# match, the runners-up are OFFERED; a click pins a candidate and
+# re-runs the round — the pin is the HUMAN ACT, outranking scores
+# and constraints; a vanished pick is an honest miss) ---------------
+def _adt_ranking(entries):
+    by_id = {e["identity"]: e for e in entries}
+    col = dict(by_id["emr|dbo|ED_EVENT_INFO|ADT_EVENT_ID"])
+    tab = dict(by_id[ADT])
+    return {"ADT_EVENT": [{**col, "score": 1.603},
+                          {**tab, "score": 1.470}]}
+
+
+def test_pin_overrides_the_scored_crown(world):
+    read, entries, _, adj, directed = world
+    semantic = _ScriptedSemantic(_adt_ranking(entries))
+    r = mc.answer_question("what does ADT_EVENT mean",
+                           _scripted_tokens(["ADT_EVENT"]),
+                           entries, semantic, read, adj, directed,
+                           pins={"ADT_EVENT": ADT})
+    assert [a["identity"] for a in r["anchors"]] == [ADT]
+    assert r["pinned"] == [("ADT_EVENT", "ADT_EVENTS")]
+    assert "pinned by you" in mc.render_round(r)
+
+
+def test_pin_outranks_the_label_constraint(world):
+    read, entries, _, adj, directed = world
+    semantic = _ScriptedSemantic(_adt_ranking(entries))
+    col_id = "emr|dbo|ED_EVENT_INFO|ADT_EVENT_ID"
+    # the user said 'table' but PINNED the column — the human act
+    # wins; no relaxation is reported (nothing was relaxed FOR him)
+    r = mc.answer_question("what does the ADT_EVENT table mean",
+                           _scripted_tokens(["ADT_EVENT", "table"]),
+                           entries, semantic, read, adj, directed,
+                           pins={"ADT_EVENT": col_id})
+    assert [a["identity"] for a in r["anchors"]] == [col_id]
+    assert r["label_relaxed"] == []
+
+
+def test_a_vanished_pick_is_an_honest_miss(world):
+    read, entries, _, adj, directed = world
+    semantic = _ScriptedSemantic(_adt_ranking(entries))
+    r = mc.answer_question("what does ADT_EVENT mean",
+                           _scripted_tokens(["ADT_EVENT"]),
+                           entries, semantic, read, adj, directed,
+                           pins={"ADT_EVENT": "emr|dbo|GONE"})
+    assert r["pin_misses"] == [("ADT_EVENT", "emr|dbo|GONE")]
+    # the round proceeds unpinned on the scored crown
+    assert [a["identity"] for a in r["anchors"]] == \
+        ["emr|dbo|ED_EVENT_INFO|ADT_EVENT_ID"]
+    assert "no longer in the match set" in mc.render_round(r)
+
+
+def test_the_runners_up_are_offered_as_picks(world):
+    read, entries, _, adj, directed = world
+    semantic = _ScriptedSemantic(_adt_ranking(entries))
+    r = mc.answer_question("what does ADT_EVENT mean",
+                           _scripted_tokens(["ADT_EVENT"]),
+                           entries, semantic, read, adj, directed)
+    out = mc.render_round(r)
+    assert "choose for 'ADT_EVENT'" in out
+    assert 'class=pick' in out
+    assert 'data-ident="emr|dbo|ADT_EVENTS"' in out   # the runner-up
+    assert "ADT_EVENTS (table, 1.47)" in out
+
+
 # ---- the glossary chain (the machinery lives in flows/glossary;
 # tests/aivia/test_glossary.py owns it — this proves the CONSOLE
 # INDEX carries the blessed expansions end-to-end) -------------------

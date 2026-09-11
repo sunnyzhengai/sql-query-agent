@@ -291,34 +291,57 @@ def write_gql(path: List[Tuple[str, str]],
 def answer_question(question: str, interpret_fn,
                     entries: List[Dict[str, Any]],
                     semantic: Optional[grounding.SemanticIndex],
-                    read, adj, directed) -> Dict[str, Any]:
+                    read, adj, directed,
+                    pins: Optional[Dict[str, str]] = None
+                    ) -> Dict[str, Any]:
     """The whole ruled loop for one question — deterministic after
     tokenization; every outcome (no-match, gap, relaxation) is a
     returned fact, never an invention."""
+    pins = pins or {}
     tokens, seat = tokens_from(question, interpret_fn)
     msets = [match_token(t, entries, semantic) for t in tokens]
+    # THE CHOICE STEP (ruled by Sunny, 2026-09-11): a pin is the
+    # HUMAN ACT — the user chose a candidate from a token's match
+    # set; it IS that token's crown and outranks scores and
+    # constraints. A pin naming a candidate no longer in the set
+    # is an honest miss, never a silent fallback.
+    pinned, pin_misses = [], []
+    effective: Dict[str, Any] = {}
+    for mset in msets:
+        top = _strong(mset)
+        want = pins.get(mset["token"])
+        if want:
+            hit = next((m for m in mset["matches"]
+                        if m["identity"] == want), None)
+            if hit is not None:
+                top = hit
+                pinned.append((mset["token"], hit["name"]))
+            else:
+                pin_misses.append((mset["token"], want))
+                want = None
+        effective[mset["token"]] = (top, bool(want))
     # THE LABEL CONSTRAINT (ruled in the five steps; wired
     # 2026-09-11 from Sunny's ADT_EVENT round): a token that
     # grounds as a label constrains the OTHER tokens' instance
     # anchoring to that label — the user's own words pick the
     # grain. Proposal, never a veto: an empty constrained set
     # relaxes and REPORTS (the planner's edge-kind law, same
-    # honesty).
+    # honesty). A pin skips the constraint — the human already
+    # chose.
     allowed_labels: Set[str] = set()
-    for mset in msets:
-        top = _strong(mset)
+    for top, _was_pinned in effective.values():
         if top is not None and top["class"] == "kind":
             allowed_labels.add(top["name"])
     anchors, kind_hits, edge_kinds, unmatched = [], [], set(), []
     label_relaxed = []
     for mset in msets:
-        top = _strong(mset)
+        top, was_pinned = effective[mset["token"]]
         if top is None:
             if not mset["matches"]:
                 unmatched.append(mset["token"])
             continue
         if top["class"] == "instance":
-            if allowed_labels:
+            if allowed_labels and not was_pinned:
                 constrained = _strong_in_labels(mset, allowed_labels)
                 if constrained is None:
                     label_relaxed.append(
@@ -377,6 +400,7 @@ def answer_question(question: str, interpret_fn,
             "kind_constraints": kind_lines,
             "label_constraint": sorted(allowed_labels),
             "label_relaxed": label_relaxed,
+            "pinned": pinned, "pin_misses": pin_misses,
             "edge_constraints": sorted(edge_kinds),
             "gql": [g for g in gql if g],
             "evidence": evidence, "edge_lines": edge_lines,
@@ -414,6 +438,8 @@ _PAGE = """<!doctype html><meta charset="utf-8">
  .round { border-top: 1px solid #e4e4e0; padding-top: .6rem;
           margin-top: .8rem; }
  .you { color: #2b5db9; font-weight: 600; }
+ a.pick { color: #2b5db9; text-decoration: underline dotted;
+          margin-right: .5rem; }
  #composer { position: fixed; bottom: 0; left: 0; right: 0;
              background: #fffffff2; border-top: 1px solid #ddd;
              padding: .7rem 1rem; }
@@ -443,6 +469,22 @@ function append(html) {
   log.appendChild(d);
   window.scrollTo(0, document.body.scrollHeight);
 }
+log.addEventListener('click', async (e) => {
+  const a = e.target.closest('a.pick');
+  if (!a) return;
+  e.preventDefault();
+  const d = a.dataset;
+  append('<p class="you">' + esc('pick: ' + d.token + ' → '
+         + d.ident) + '</p>');
+  try {
+    const r = await fetch('/round?q=' + encodeURIComponent(d.q)
+      + '&pin=' + encodeURIComponent(d.token + ':::' + d.ident));
+    append((await r.json()).html);
+  } catch (err) {
+    append('<p class=meta>round failed (' + esc(String(err)) +
+           ')</p>');
+  }
+});
 document.getElementById('ask').addEventListener('submit',
   async (e) => {
     e.preventDefault();
@@ -477,6 +519,39 @@ def render_round(result: Dict[str, Any]) -> str:
         trace.append(html.escape(bit))
     parts.append("<p class=meta>matched: "
                  + " &nbsp;·&nbsp; ".join(trace) + "</p>")
+    # THE CHOICE STEP (ruled 2026-09-11): every token's runners-up
+    # are OFFERED — a click pins that candidate and re-runs the
+    # round; the pin is the human act and outranks the scores
+    q_attr = html.escape(result["question"], quote=True)
+    for mset in result["match_sets"]:
+        cands = [m for m in mset["matches"]
+                 if m["class"] == "instance"][:6]
+        if len(cands) < 2:
+            continue
+        links = []
+        for m in cands:
+            links.append(
+                f"<a href='#' class=pick data-q=\"{q_attr}\" "
+                f"data-token=\"{html.escape(mset['token'], quote=True)}\" "
+                f"data-ident=\"{html.escape(m['identity'], quote=True)}\">"
+                + html.escape(f"{m['name']} ({m['label']}, "
+                              f"{round(m['score'], 3)})") + "</a>")
+        n_all = sum(1 for m in mset["matches"]
+                    if m["class"] == "instance")
+        more = f" · showing {len(cands)} of {n_all}" \
+            if n_all > len(cands) else ""
+        parts.append("<p class=meta>choose for '"
+                     + html.escape(mset["token"]) + "': "
+                     + " ".join(links) + html.escape(more) + "</p>")
+    for tok, name in result.get("pinned", []):
+        parts.append("<p class=meta>pinned by you: '"
+                     + html.escape(tok) + "' → "
+                     + html.escape(name) + "</p>")
+    for tok, ident in result.get("pin_misses", []):
+        parts.append("<p class=meta>note: your pick '"
+                     + html.escape(ident) + "' is no longer in "
+                     "the match set for '" + html.escape(tok)
+                     + "' — the round ran unpinned.</p>")
     for line in result["kind_constraints"]:
         parts.append(f"<p class=meta>{html.escape(line)}</p>")
     if result.get("label_constraint"):
@@ -528,8 +603,13 @@ def make_handler(estate: str, coverage: str, ask_fn):
             params = urllib.parse.parse_qs(parsed.query)
             if parsed.path == "/round":
                 q = (params.get("q") or [""])[0]
-                out = {"html": render_round(ask_fn(q))} if q.strip() \
-                    else {"html": ""}
+                pins = {}
+                for p in params.get("pin", []):
+                    token, _, ident = p.partition(":::")
+                    if token and ident:
+                        pins[token] = ident
+                out = {"html": render_round(ask_fn(q, pins))} \
+                    if q.strip() else {"html": ""}
                 self._send(json.dumps(out).encode(),
                            "application/json; charset=utf-8")
                 return
@@ -601,9 +681,9 @@ def main() -> None:
     else:
         print("no OPENAI_API_KEY — exact tiers only")
 
-    def ask_fn(q: str) -> Dict[str, Any]:
+    def ask_fn(q: str, pins=None) -> Dict[str, Any]:
         return answer_question(q, interpret_fn, entries, semantic,
-                               read, adj, directed)
+                               read, adj, directed, pins=pins)
 
     coverage = coverage_line(entries, exclusions)
     server = ThreadingHTTPServer(

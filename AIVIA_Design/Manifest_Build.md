@@ -421,6 +421,17 @@ proof: the exact round now anchors ADT_EVENTS with
 `MATCH (a:table)…`; battery 8/8 after the change. Rider fix: the
 '[?] dbo' display corpse — neighborhood labels computed after
 the single-anchor branch.
+**THE CHOICE STEP built (Sunny's ruling, 2026-09-11):** HITL
+after matching — every token's instance runners-up are offered
+in the round (top 6, labels + scores, counted remainder); a
+click PINS the candidate and re-runs the round via
+`/round?q=…&pin=token:::identity`. A pin is the HUMAN ACT: it is
+that token's crown and outranks scores and the label constraint;
+a vanished pick is an honest reported miss. 4 acceptance tests
+(pin overrides crown · pin outranks constraint · vanished pick ·
+runners-up offered); served-page JS node-checked; battery 8/8
+after the change. Ruled into Design_Chatbot §THE MEANING-TEST
+CONSOLE (the two step-3 riders).
 
 **THE M2 REDESIGN (Sunny's rulings 2026-09-10, from the
 hand-drawn structure):** (1) a scope reaches its tables THROUGH

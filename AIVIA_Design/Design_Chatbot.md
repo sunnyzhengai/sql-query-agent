@@ -946,3 +946,19 @@ relationship grounding · absence honesty — each with an expected
 crown; deterministic pipeline parts tested keyless; the live
 seats under the live-seat rule. Sunny gap-checks and blesses the
 battery; regressions surface mechanically thereafter.
+
+► RULED (Sunny, 2026-09-11, from the ADT_EVENT rounds): TWO
+riders on step 3. (1) THE LABEL CONSTRAINT WIRED: a token that
+grounds as a label constrains the other tokens' instance
+anchoring to that label — the user's own words pick the grain; a
+constraint is a PROPOSAL, never a veto (an empty constrained set
+relaxes and reports, the planner's edge-kind law). (2) THE
+CHOICE STEP (HITL after matching): every token's runners-up are
+OFFERED in the round (top candidates with labels and scores,
+visible cap with the counted remainder); a click PINS that
+candidate and re-runs the round. A pin is the HUMAN ACT — it is
+that token's crown and outranks scores and constraints; a pin
+whose candidate left the match set is an honest miss, reported,
+never a silent fallback. Picks are steer (the clicks-are-steer
+law), keeping the loop: machine proposes → human chooses →
+deterministic planner executes → display.
