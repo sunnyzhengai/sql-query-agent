@@ -171,5 +171,9 @@ payload = json.dumps(data, separators=(",", ":"))
 print("payload bytes:", len(payload), "| counts:", counts)
 
 html = open(pathlib.Path(__file__).parent / "m1_template.html").read()
-OUT.write_text(html.replace("/*__DATA__*/{}", payload))
-print("wrote", OUT)
+html = html.replace("/*__DATA__*/{}", payload)
+import hashlib
+build = hashlib.sha256(html.encode()).hexdigest()[:8]
+html = html.replace("__BUILD__", build)
+OUT.write_text(html)
+print("wrote", OUT, "· build", build)

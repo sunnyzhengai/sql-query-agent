@@ -10,7 +10,7 @@
   html,body{height:100%;overflow:hidden}
   body{background:var(--bg);color:var(--ink);
     font:13px/1.45 ui-monospace,'SF Mono',Menlo,Consolas,monospace}
-  canvas{position:absolute;inset:0;cursor:grab}
+  canvas{position:absolute;inset:0;cursor:grab;touch-action:none}
   canvas.drag{cursor:grabbing}
   header{position:absolute;top:0;left:0;right:0;z-index:5;
     display:flex;align-items:baseline;gap:14px;padding:12px 18px;
@@ -71,7 +71,8 @@
 <header>
   <h1>AIVIA graph — M1</h1>
   <div class="sub">the technical layer, rendered from the store's export
-    parquets · hover for descriptions · click a table for its joins</div>
+    parquets · hover for descriptions · click a table for its joins ·
+    build <span id="build">?</span></div>
   <div class="chips" id="chips"></div>
 </header>
 <div id="panel">
@@ -107,6 +108,8 @@
 <canvas id="cv"></canvas>
 <script>
 const DATA = /*__DATA__*/{};
+const BUILD = '__BUILD__';
+document.getElementById('build').textContent = BUILD;
 const CV = document.getElementById('cv'), CTX = CV.getContext('2d');
 const COLORS = {table:'#d95926', column:'#199e70', schema:'#3987e5',
                 db:'#d55181', join:'#eda100', haspart:'#54554f'};
@@ -340,12 +343,17 @@ window.pin = function(n){
   card.style.display='block'; draw();
 };
 // ---- interactions -------------------------------------------
-CV.addEventListener('mousedown', e=>{
+// pointer events + capture: a drag released outside the artifact
+// iframe kept mouse listeners stuck mid-gesture — capture routes
+// every move and the release to the canvas regardless
+CV.addEventListener('pointerdown', e=>{
+  e.preventDefault();
+  CV.setPointerCapture(e.pointerId);
   down = true; pending = nodeAt(e.clientX, e.clientY);
   dragging = null; panning = false;
   px=gx=e.clientX; py=gy=e.clientY;
 });
-addEventListener('mousemove', e=>{
+CV.addEventListener('pointermove', e=>{
   const dx=e.clientX-px, dy=e.clientY-py;
   if(down && !dragging && !panning &&
      Math.hypot(e.clientX-gx, e.clientY-gy) > 4){
@@ -369,14 +377,16 @@ addEventListener('mousemove', e=>{
   if(n!==hover){hover=n; draw();}
   showTip(n, e.clientX, e.clientY);
 });
-addEventListener('mouseup', e=>{
+function endGesture(e){
   const clicked = Math.hypot(e.clientX-gx, e.clientY-gy) < 4;
   if(clicked && pending &&
      (pending.k==='table'||pending.k==='column')) pin(pending);
   else if(clicked && !pending) pin(null);
   down=false; pending=null; dragging=null; panning=false;
   CV.classList.remove('drag');
-});
+}
+CV.addEventListener('pointerup', endGesture);
+CV.addEventListener('pointercancel', endGesture);
 CV.addEventListener('wheel', e=>{
   e.preventDefault();
   const f = Math.exp(-e.deltaY*0.0012);
