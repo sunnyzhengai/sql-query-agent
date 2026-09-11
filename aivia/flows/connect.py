@@ -96,11 +96,15 @@ def build_adjacency(read) -> Dict[str, List[Tuple[str, str]]]:
     # REMAINDER truth and ride the export.)
     _store = getattr(read, "_store", None)
     if _store is not None:
-        for lbl in ("left_side", "right_side"):
+        # M2/M3 store-grain edges (joins, conditions, params)
+        # literal: schema-mirror lenses.Shape_Ledger
+        for lbl in ("left_side", "right_side", "resolves_to",
+                    "uses_param"):
             for e in _store.current_edges(lbl):
                 link(e.from_id, e.to_id, lbl)
         for e in _store.current_edges("has_part"):
-            if "::join#" in e.to_id:
+            if ("::join#" in e.to_id or "::cond#" in e.to_id
+                    or "::param/" in e.to_id):
                 link(e.from_id, e.to_id, "has_part")
     # PHASE I: blessed acronyms walk to their approver and — DERIVED
     # AT BUILD, per the contract — to every node whose name carries

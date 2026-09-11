@@ -193,7 +193,7 @@ SOURCES = {
 # deliveries lead, spine voiced, intermediates counted, census
 # closes; the file's ask-index words = the delivery lead, so file
 # embeddings embed meaning, never name-noise).
-STAMP_VERSION = "1.38.0"
+STAMP_VERSION = "1.39.0"
 RATIFIED = True
 DOC_STAMP = ("v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 twin-graph "
              "ruling ADR 0077; v1.2.0 Phase A metamodel bump; v1.3.0 "
@@ -207,7 +207,12 @@ DOC_STAMP = ("v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 twin-graph "
              "it); joins_to stays dictionary-only); v1.17.0 M2 THE "
              "JOIN LAYER BUILT (2026-09-10): join/left_side/"
              "right_side flip PRESENT, join rows in Connection_"
-             "Ledger + Speech_Sources; reads = the remainder")
+             "Ledger + Speech_Sources; reads = the remainder); "
+             "v1.18.0 M3 THE CONDITION LAYER BUILT (2026-09-10): "
+             "condition/param/resolves_to flip PRESENT, uses_param "
+             "ships, condition/param become store citizens (has_part"
+             "/uses_param birth edges); joinType closed (the tree "
+             "held it all along)")
 CONVERTED_ON = "2026-09-05"
 
 
@@ -1058,11 +1063,11 @@ TWIN_SHEETS = {
              "law: stored == recomputed",
              "Notes": "carries structures + description"},
             {"Kind": "node", "Name": "condition",
-             "Status": "TARGET — landing: the materialization build",
+             "Status": "PRESENT",
              "Description obligation": "stored (voiced phrase)",
              "Notes": "today: twin-blob rows + read-time index"},
             {"Kind": "node", "Name": "param",
-             "Status": "TARGET — landing: the materialization build",
+             "Status": "PRESENT",
              "Description obligation": "stored (voiced phrase)",
              "Notes": "same"},
             {"Kind": "node", "Name": "derived_column",
@@ -1168,9 +1173,15 @@ TWIN_SHEETS = {
              "Description obligation": "-",
              "Notes": "acronym→carriers, derived; may be 0"},
             {"Kind": "edge", "Name": "resolves_to",
-             "Status": "TARGET — landing: the materialization build",
+             "Status": "PRESENT",
              "Description obligation": "-",
              "Notes": "today: paths inside the twin blob"},
+            {"Kind": "edge", "Name": "uses_param",
+             "Status": "PRESENT",
+             "Description obligation": "-",
+             "Notes": "M3: scope→param — which selections consult "
+             "which parameters; role-tagged resolves_to carries the "
+             "per-predicate usage"},
             {"Kind": "edge", "Name": "supersedes", "Status": "PRESENT",
              "Description obligation": "-",
              "Notes": "kg3 versioning; may be 0"},
@@ -1254,14 +1265,16 @@ TWIN_SHEETS = {
              "Meaning": "M2 the join layer: born inside its scope "
              "(scope—has_part→join); sides walk down to "
              "tables/scopes"},
-            {"Label": "condition", "Edge": "belongs_to",
-             "Status": "edged-pseudo",
-             "Meaning": "STEP 4: tree-born adjacency citizen — "
-             "walks to its scope; outside the store census by "
-             "ruling (not a store node)"},
-            {"Label": "param", "Edge": "belongs_to",
-             "Status": "edged-pseudo",
-             "Meaning": "STEP 4: walks to its file; tree-born"},
+            {"Label": "condition", "Edge": "has_part",
+             "Status": "edged",
+             "Meaning": "M3 the condition layer: born inside its "
+             "parent (join/scope/condition —has_part→ condition); "
+             "resolves_to walks down to columns/params"},
+            {"Label": "param", "Edge": "uses_param",
+             "Status": "edged",
+             "Meaning": "M3: minted from references; born by the "
+             "scopes that consult it (scope —uses_param→ param); "
+             "file—has_part→param lands at M6"},
             {"Label": "derived_column", "Edge": "defines",
              "Status": "edged-pseudo",
              "Meaning": "tree-born; its scope defines it "

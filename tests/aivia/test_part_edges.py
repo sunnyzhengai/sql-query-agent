@@ -85,15 +85,17 @@ def test_a_condition_chains_to_its_file_by_traversal(world):
 
 
 def test_ledger_documents_the_pseudo_citizens(world):
-    """Every adjacency citizen born from trees (not the store) is
-    ruled in the ledger — status edged-pseudo, outside the store
-    census by ruling, never undocumented."""
+    """Adjacency citizens born from trees are ruled in the ledger.
+    M3 (2026-09-10) promoted condition and param to STORE citizens
+    — real nodes, real birth edges (has_part / uses_param); the
+    still-tree-born grains keep their edged-pseudo ruling until
+    their batches land."""
     read, _adj = world
     ledger = censuses.connection_ledger()
-    assert ledger["condition"]["edge"] == "belongs_to"
-    assert ledger["condition"]["status"] == "edged-pseudo"
-    assert ledger["param"]["edge"] == "belongs_to"
-    assert ledger["param"]["status"] == "edged-pseudo"
+    assert ledger["condition"]["edge"] == "has_part"
+    assert ledger["condition"]["status"] == "edged"
+    assert ledger["param"]["edge"] == "uses_param"
+    assert ledger["param"]["status"] == "edged"
     assert ledger["derived_column"]["status"] == "edged-pseudo"
     assert ledger["drift"]["status"] == "edged-pseudo"
     # the store census stays whole and clean

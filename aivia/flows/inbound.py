@@ -256,6 +256,8 @@ def receive_estate(store, reg: Dict[str, Any], estate_dir,
             store, f"{location}{name}", tree, manifest["as_of"])
     _store_scope_descriptions(store, manifest["as_of"])
     report.join_layer = _store_join_layer(store, manifest["as_of"])
+    report.condition_layer = _store_condition_layer(
+        store, manifest["as_of"])
     return report
 
 
@@ -393,7 +395,8 @@ def _store_join_layer(store, as_of) -> dict:
                     # literal: shape
                     {"name": f"join#{i}",
                      "description": join_render(sides, frag),
-                     "on": frag},
+                     "on": frag,
+                     "joinType": str(pred.get("join_type") or "")},
                     as_of, node.extract_id)
                 store.append_edge("has_part", node.identity, jid,
                                   {}, as_of, node.extract_id)
@@ -427,6 +430,183 @@ def _store_join_layer(store, as_of) -> dict:
                 store.append_edge("reads", node.identity, t,
                                   {}, as_of, node.extract_id)
                 counts["reads_remainder"] += 1
+    return counts
+
+
+# literal: schema-mirror kg2_kind_library roles
+ROLE_KEYS = ("subject", "comparand", "lower_bound", "upper_bound",
+             "pattern", "escape", "quantifier")
+
+
+def condition_render(pred, voice) -> str:
+    """The condition node's stored description — the ratified
+    grammar (_voice_predicate) for leaves; a short structural
+    sentence for AND/OR/NOT containers (their children carry the
+    detail); evidence-fragment fallback where the grammar has no
+    phrase. The verbatim law holds stored == this recompute."""
+    from aivia.flows import produce
+    kind = pred.get("kind", "")
+    kids = pred.get("children") or []
+    # literal: grammar
+    if kind in ("AND", "OR", "NOT"):
+        # literal: grammar
+        word = {"AND": f"All {len(kids)} of its parts hold.",
+                "OR": f"Any of its {len(kids)} parts holds.",
+                "NOT": "The inner condition does not hold."}
+        return word[kind]
+    try:
+        phrase = produce._voice_predicate(pred, voice)
+    except (KeyError, TypeError, AttributeError):
+        phrase = ""  # a kind the grammar has no phrase for
+    if phrase:
+        return phrase
+    frag = (pred.get("evidence") or {}).get("fragment", "")
+    return f"Condition: {frag}."
+
+
+def _condition_refs(pred):
+    """(role, target) pairs for THIS predicate's own expressions —
+    role-keyed subtrees walked through function args, stopping at
+    selection interiors (their conditions are their own roots) and
+    at child predicates (children carry their own refs)."""
+    out = []
+
+    def walk(d, role):
+        if isinstance(d, dict):
+            if "scope" in d:
+                return  # selection interior — its own world
+            k = d.get("kind")
+            if k == "column_ref" and isinstance(
+                    d.get("resolves_to"), str) \
+                    and d["resolves_to"].count("|") == 3:
+                out.append((role, d["resolves_to"]))
+            elif k == "parameter_ref" and d.get("ref"):
+                out.append((role, "@" + d["ref"].lstrip("@")))
+            for v in d.values():
+                walk(v, role)
+        elif isinstance(d, list):
+            for v in d:
+                walk(v, role)
+    for role in ROLE_KEYS:
+        if role in pred:
+            walk(pred[role], role)
+    for e in pred.get("comparand_list") or []:
+        walk(e, "comparand")
+    return out
+
+
+def _store_condition_layer(store, as_of) -> dict:
+    """THE CONDITION LAYER, M3: every predicate under a named scope
+    becomes a condition node with its stored voiced phrase — ON
+    roots parent to their JOIN, where/case roots to the scope,
+    nested predicates to their parent condition (kind is a
+    PROPERTY, never a label). resolves_to carries the ROLE;
+    parameters mint as param nodes with uses_param birth edges.
+    Conservation returned, never silent."""
+    from aivia.flows import produce
+    from aivia.graph.read_api import ReadApi
+    from aivia.lenses import decisions
+    read = ReadApi(store)
+    by_id = {n.identity: n for n in read.nodes("scope")}
+    # literal: shape
+    counts = {"conditions": 0, "roots_join": 0, "roots_scope": 0,
+              "nested": 0, "degenerate": 0, "resolves_column": 0,
+              "resolves_param": 0, "params": 0, "uses_param": 0,
+              "held_statement_rooted": 0}
+    for key, tree in sorted(read.trees().items()):
+        voice = produce._Voice(read, tree)
+        made_params = set()
+
+        def ensure_param(ref, extract_id):
+            pid = f"{key}::param/{ref}"
+            if pid in made_params or any(
+                    n.identity == pid
+                    for n in read.nodes("param")):
+                return pid
+            made_params.add(pid)
+            words = ref.lstrip("@")
+            store.append_node(
+                "param", pid,
+                # literal: shape
+                {"name": ref,
+                 "description": f"Parameter {ref} of this "
+                                f"procedure ({words})."},
+                as_of, extract_id)
+            counts["params"] += 1
+            return pid
+
+        for scope in decisions.named_scopes(tree):
+            node = by_id.get(scope["name_key"])
+            if node is None:
+                continue
+            prefix = node.identity + "::cond#"
+            if any(n.identity.startswith(prefix)
+                   for n in read.nodes("condition")):
+                continue  # already materialized this boot
+            seq = 0
+            scope_params = set()
+
+            def emit(pred, parent_id, is_root_kind):
+                nonlocal seq
+                seq += 1
+                cid = f"{node.identity}::cond#{seq}"
+                kind = pred.get("kind", "")
+                leaf = pred.get("node") == "predicate"
+                degen = bool(leaf and decisions.is_degenerate(pred))
+                if degen:
+                    counts["degenerate"] += 1
+                store.append_node(
+                    "condition", cid,
+                    # literal: shape
+                    {"name": f"cond#{seq}", "kind": kind,
+                     "degenerate": "true" if degen else "false",
+                     "description": condition_render(pred, voice),
+                     "fragment": (pred.get("evidence") or {})
+                     .get("fragment", "")},
+                    as_of, node.extract_id)
+                store.append_edge("has_part", parent_id, cid,
+                                  {}, as_of, node.extract_id)
+                counts["conditions"] += 1
+                counts[is_root_kind] += 1
+                for role, target in _condition_refs(pred):
+                    if target.startswith("@"):
+                        pid = ensure_param(target, node.extract_id)
+                        store.append_edge(
+                            "resolves_to", cid, pid,
+                            {"role": role}, as_of, node.extract_id)
+                        counts["resolves_param"] += 1
+                        scope_params.add(pid)
+                    else:
+                        store.append_edge(
+                            "resolves_to", cid, target,
+                            {"role": role}, as_of, node.extract_id)
+                        counts["resolves_column"] += 1
+                for child in pred.get("children") or []:
+                    emit(child, cid, "nested")
+
+            for i, pred in enumerate(_join_entries(scope), 1):
+                emit(pred, f"{node.identity}::join#{i}", "roots_join")
+            wheres, whens = [], []
+
+            def collect(d):
+                if isinstance(d, dict):
+                    if isinstance(d.get("where"), dict):
+                        wheres.append(d["where"])
+                    for w in d.get("whens") or []:
+                        if isinstance(w.get("when"), dict):
+                            whens.append(w["when"])
+                    for v in d.values():
+                        collect(v)
+                elif isinstance(d, list):
+                    for v in d:
+                        collect(v)
+            collect(scope)
+            for pred in wheres + whens:
+                emit(pred, node.identity, "roots_scope")
+            for pid in sorted(scope_params):
+                store.append_edge("uses_param", node.identity, pid,
+                                  {}, as_of, node.extract_id)
+                counts["uses_param"] += 1
     return counts
 
 

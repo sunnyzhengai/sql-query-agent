@@ -44,7 +44,9 @@ def test_camel_case_columns_and_node_id_key(world):
                     or name.startswith("graph_reads")
                     or name.startswith("graph_joins_to")
                     or name.startswith("graph_left_side")
-                    or name.startswith("graph_right_side")):
+                    or name.startswith("graph_right_side")
+                    or name.startswith("graph_resolves_to")
+                    or name.startswith("graph_uses_param")):
             assert "nodeId" in rows[0]
             ids = [r["nodeId"] for r in rows]
             assert len(ids) == len(set(ids)), f"{name}: dup nodeIds"

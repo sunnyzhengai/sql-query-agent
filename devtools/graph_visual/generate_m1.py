@@ -3,9 +3,11 @@ ed_sepsis_dev export parquets (the exact rows Fabric Graph
 serves), computes a deterministic layout, and emits a
 self-contained HTML page. Nothing hand-authored: every node,
 edge, and description is a parquet row."""
+import hashlib
 import json
 import math
 import pathlib
+import random
 
 import pandas as pd
 
@@ -171,7 +173,6 @@ for side in ("left_side", "right_side"):
 
 scopes_rows = list(sc.sort_values("nodeId").itertuples(index=False))
 scid = {r.nodeId: i for i, r in enumerate(scopes_rows)}
-import random
 rng = random.Random(7)
 scnodes = []
 for i, r in enumerate(scopes_rows):
@@ -228,7 +229,6 @@ print("payload bytes:", len(payload), "| counts:", counts)
 
 html = open(pathlib.Path(__file__).parent / "m1_template.html").read()
 html = html.replace("/*__DATA__*/{}", payload)
-import hashlib
 build = hashlib.sha256(html.encode()).hexdigest()[:8]
 html = html.replace("__BUILD__", build)
 OUT.write_text(html)

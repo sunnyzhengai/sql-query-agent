@@ -83,22 +83,26 @@ batch, cumulative:
 | after | Q1 nodes by label | total |
 |---|---|---|
 | M1 | db 1 · db_schema 3 · table 90 · column 4554 | **4648** |
-| M2 | + scope 44 · join 93 | **4785** |
-| M3 | + condition 748 · param 2 | **5535** |
-| M4 | + derived_column 156 | **5691** |
-| M5 | + statement 67 · condition→754 · param→4 | **5766** |
-| M6 | + file 1 | **5767** |
-| M7 | + pbi_report 1 · description 1 · agent 1 · role 1 · responsibility 1 | **5772** |
+| M2 ✅ | + scope 44 · join 95 | **4787** |
+| M3 ✅ | + condition 1141 · param 2 | **5930** |
+| M4 | + derived_column 156 (twin-authored) | **6086** |
+| M5 | + statement 67 · condition→1147 · param→4 (holdovers twin-authored) | **6161** |
+| M6 | + file 1 | **6162** |
+| M7 | + pbi_report 1 · description 1 · agent 1 · role 1 · responsibility 1 | **6167** |
 
 | after | Q3 edges by type | total |
 |---|---|---|
 | M1 | has_part 4647 · joins_to 65 | **4712** |
-| M2 | + left_side 93 · right_side 93 · has_part→4740 · reads ~6 (the REMAINDER — exact value pinned at build) | **4997** |
-| M3 | has_part 5488 · resolves_to 152 · uses_param 2 · rest same | **5899** |
-| M4 | has_part 5644 · + cites 100 | **6155** |
-| M5 | has_part 5694 · resolves_to 156 · uses_param 4 | **6211** |
-| M6 | has_part 5765 | **6282** |
-| M7 | + executes 1 · describes 1 | **6284** |
+| M2 ✅ | + left_side 95 · right_side 87 · has_part→4742 · reads 6 | **4995** |
+| M3 ✅ | has_part 5883 · resolves_to 165 · uses_param 2 · rest same | **6303** |
+| M4 | has_part 6039 · + cites 100 | **6559** |
+| M5 | has_part 6089 · resolves_to 169 · uses_param 4 | **6615** |
+| M6 | has_part 6160 | **6686** |
+| M7 | + executes 1 · describes 1 | **6688** |
+
+(✅ = measured from the built store; unmarked = twin-authored,
+reconciled against the tree at build — precedent: joins 93→95,
+conditions 748→1141.)
 
 Any label or edge type not in the row = a gate failure; any
 declared count off by one = a gate failure. The machine copy of
@@ -125,6 +129,9 @@ MATCH (n) RETURN labels(n) AS nodeType, count(*) AS cnt GROUP BY nodeType
 ```
 Expected exactly: db 1 · db_schema 3 · table 90 · column 4554 ·
 scope 44 · join **95** — total 4787, nothing else.
+**Q1 GREEN — Sunny's GQL 2026-09-10** (the earlier failures were
+a missing GROUP BY, not capacity). Q3 below pending: the edge
+census walks ~5000 edges and hit capacity; re-run on fresh CUs.
 
 ```gql
 MATCH ()-[r]->() RETURN type(r) AS rel, count(*) AS cnt GROUP BY rel
@@ -138,7 +145,7 @@ Expected exactly: has_part **4742** · joins_to 65 · left_side
 | join conservation | 95 = 87 two-sided + 8 one-sided (ON vs param/literal — left only, counted) + 0 no-sided |
 | side targets | →table 88 · →scope 94 |
 | reads coverage | remainder 6 + covered-by-sides 53 == read-set 59 |
-| deferred, counted | joinType (inner/left_outer/…) — the parse tree lacks the operator type |
+| joinType | CLOSED at M3 backfill — the tree carried join_type all along: Inner 39 · LeftOuter 56 |
 | spot | `#Base_Pop`'s join#4 description: "Joins REF_ED_DISPOSITION with HOSPITAL_ENCOUNTERS on REDI.ED_DISPOSITION_CODE = HE.ED_DISPOSITION_CODE." |
 
 THE DRIFT QUERY runs AT THIS GATE — it needs joins + joins_to
@@ -169,39 +176,83 @@ Expected: 0. Coverage (reads ∪ join-sides == the parse read-set,
 per scope) runs store-side in the census — the parse read-set is
 not itself in the graph.
 
-### M3 gate — THE CONDITION LAYER (condition + param; testable
-ALONE)
+### M3 gate — THE CONDITION LAYER [BUILT 2026-09-10,
+store-verified; numbers MEASURED; your GQL on the dev estate
+closes it. NOTE: the tree out-counts the twin — 1141 conditions,
+not the authored 748 (IS NOT NULL parses as a NOT+NULL_CHECK
+pair, etc.); same verdict as joins 95 vs 93]
 
-| expect | value |
-|---|---|
-| new nodes | condition 748 · param 2 (@dStartDate @dEndDate) |
-| new edges | has_part +748 (join→condition ON-roots 90 [3 pinned at build] · scope→condition 132 · condition→condition 526) · resolves_to 152 (→column 150 · →param 2, role-tagged) · uses_param 2 |
-| condition split | join_on 194 · where 167 · case_when 387; degenerate subkind 25 |
-| held for M5 | 6 statement-rooted conditions (IF predicates) + @StartDate/@EndDate — their parents are STATEMENTS, which don't exist until M5; shipping them now would float them (the birth-edge law) |
+Load: upload the new parquets (graph_condition, graph_param,
+graph_has_part_joinCondition / scopeCondition /
+conditionCondition, graph_resolves_to_conditionColumn /
+conditionParam, graph_uses_param_scopeParam) → Load to Tables
+(dbo) → graph model: add node `condition` (key nodeId; name,
+description, kind, degenerate, fragment) + node `param` (key
+nodeId; name, description) → add edges: has_part join→condition ·
+scope→condition · condition→condition · resolves_to
+condition→column + condition→param (property role) · uses_param
+scope→param → Save → ONE refresh.
 
-ONE LABEL, KIND AS PROPERTY (the kind-vs-label standard; ruled at
-the design level by the Shape Contract + the closed kind
-library): every predicate is a `condition` node whose `predicate`
-property comes from kg2_kind_library's closed set; composite
-AND/OR/NOT are condition nodes too (nested has_part). The
-per-predicate structure lives in ROLE-tagged resolves_to edges
-(Sunny's numbered-edge drawing: BETWEEN = subject + bounds).
-THE PER-KIND CENSUS is a gate query:
+The full census:
 
 ```gql
-MATCH (c:condition)
-RETURN coalesce(c.predicate, c.shape) AS kind, count(*) AS cnt
-ORDER BY cnt DESC
+MATCH (n) RETURN labels(n) AS nodeType, count(*) AS cnt GROUP BY nodeType
 ```
-Expected at M3 (sums to 748): COMPARE_EQ 210 · NULL_CHECK 170 ·
-AND 132 · NOT 123 · IN_LIST 33 · RANGE 22 · COMPARE_LTE 18 ·
-COMPARE_LT 15 · OR 9 · COMPARE_GT 6 · EXISTS_SELECTION 5 ·
-COMPARE_NEQ 2 · COMPARE_GTE 2 · IN_SELECTION 1. (M5 adds
-NULL_CHECK +2, COMPARE_EQ +2, OR +2 → 754.) An unlisted kind or a
-moved count = gate failure. Role property on resolves_to,
-expected: subject 104 · comparand 43 · selection 3 (this proc's
-RANGE bounds resolve to params/literals, so no bound-role column
-edges here — the roles vocabulary stays the ratified closed set).
+Expected exactly: db 1 · db_schema 3 · table 90 · column 4554 ·
+scope 44 · join 95 · condition **1141** · param **2** — total 5930.
+
+```gql
+MATCH ()-[r]->() RETURN type(r) AS rel, count(*) AS cnt GROUP BY rel
+```
+Expected exactly: has_part **5883** · joins_to 65 · left_side 95 ·
+right_side 87 · reads 6 · resolves_to **165** · uses_param **2** —
+total 6303.
+
+THE PER-KIND CENSUS (one label, kind as property — an unlisted
+kind or moved count = failure):
+
+```gql
+MATCH (c:condition) RETURN c.kind AS kind, count(*) AS cnt GROUP BY kind
+```
+Expected: NULL_CHECK 333 · NOT 238 · COMPARE_EQ 220 · AND 191 ·
+IN_LIST 47 · COMPARE_LTE 33 · COMPARE_LT 24 · RANGE 22 · OR 12 ·
+COMPARE_GT 8 · EXISTS_SELECTION 7 · COMPARE_GTE 3 ·
+COMPARE_NEQ 2 · IN_SELECTION 1.
+
+Conservation by parent (95 join-rooted + 229 scope-rooted + 817
+nested == 1141):
+
+```gql
+MATCH (j:join)-[:has_part]->(c:condition) RETURN count(c) AS cnt
+```
+Expected: 95.
+
+Role-tagged resolution (subject 119 · comparand 44 · lower_bound
+1 · upper_bound 1):
+
+```gql
+MATCH (c:condition)-[r:resolves_to]->() RETURN r.role AS role, count(*) AS cnt GROUP BY role
+```
+
+Degenerate census — `MATCH (c:condition) WHERE c.degenerate =
+'true' RETURN count(c) AS cnt` → 25.
+
+joinType — the M2 deferral CLOSED (the tree held it all along):
+
+```gql
+MATCH (j:join) RETURN j.joinType AS jt, count(*) AS cnt GROUP BY jt
+```
+Expected: Inner 39 · LeftOuter 56.
+
+The spot check (the All_LDAs conversation made real):
+
+```gql
+MATCH (s:scope WHERE s.name = 'All_LDAs')-[:has_part]->(c:condition WHERE c.kind = 'RANGE')
+RETURN c.description AS descr
+```
+Expected: the ED-stay window voiced through dictionary words —
+"…is between the adt arrival time and the ed departure time
+(inclusive)."
 
 ### M4 gate — derived_column
 

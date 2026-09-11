@@ -1,9 +1,9 @@
 {
  "registry": "lenses",
  "stamp": {
-  "version": "1.38.0",
+  "version": "1.39.0",
   "doc_section": "Level 2 — lenses",
-  "doc_stamp": "v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 twin-graph ruling ADR 0077; v1.2.0 Phase A metamodel bump; v1.3.0 Phase B composite-kinds correction; v1.4.0 T-2 operational-statements ruling; v1.5.0 the gap taxonomy; v1.6.0 the plug-all-holes sweep; v1.7.0 ledger close; v1.8.0 the ask console ADR 0078; v1.9.0 the list op; v1.10.0 kind vocabulary; v1.11.0 ADR 0079 interpreter; v1.12.0 Tier A build data; v1.13.0 the seat-failure law; v1.14.0 follow-up context; v1.15.0 anaphor vocabulary (all 2026-09-06); v1.16.0 THE JOIN-NODE RULING (Sunny 2026-09-10): logic gains the join node (left_side/right_side → table-or-scope, ON-resolved pair, syntactic side order; join has_part condition); clauseProvenance property retired (parentage carries it); joins_to stays dictionary-only); v1.17.0 M2 THE JOIN LAYER BUILT (2026-09-10): join/left_side/right_side flip PRESENT, join rows in Connection_Ledger + Speech_Sources; reads = the remainder",
+  "doc_stamp": "v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 twin-graph ruling ADR 0077; v1.2.0 Phase A metamodel bump; v1.3.0 Phase B composite-kinds correction; v1.4.0 T-2 operational-statements ruling; v1.5.0 the gap taxonomy; v1.6.0 the plug-all-holes sweep; v1.7.0 ledger close; v1.8.0 the ask console ADR 0078; v1.9.0 the list op; v1.10.0 kind vocabulary; v1.11.0 ADR 0079 interpreter; v1.12.0 Tier A build data; v1.13.0 the seat-failure law; v1.14.0 follow-up context; v1.15.0 anaphor vocabulary (all 2026-09-06); v1.16.0 THE JOIN-NODE RULING (Sunny 2026-09-10): logic gains the join node (left_side/right_side → table-or-scope, ON-resolved pair, syntactic side order; join has_part condition); clauseProvenance property retired (parentage carries it); joins_to stays dictionary-only); v1.17.0 M2 THE JOIN LAYER BUILT (2026-09-10): join/left_side/right_side flip PRESENT, join rows in Connection_Ledger + Speech_Sources; reads = the remainder); v1.18.0 M3 THE CONDITION LAYER BUILT (2026-09-10): condition/param/resolves_to flip PRESENT, uses_param ships, condition/param become store citizens (has_part/uses_param birth edges); joinType closed (the tree held it all along)",
   "ratified": true,
   "converted_on": "2026-09-05",
   "converted_from": "L2_Lenses_Registry.xlsx"
@@ -469,14 +469,14 @@
    {
     "Kind": "node",
     "Name": "condition",
-    "Status": "TARGET — landing: the materialization build",
+    "Status": "PRESENT",
     "Description obligation": "stored (voiced phrase)",
     "Notes": "today: twin-blob rows + read-time index"
    },
    {
     "Kind": "node",
     "Name": "param",
-    "Status": "TARGET — landing: the materialization build",
+    "Status": "PRESENT",
     "Description obligation": "stored (voiced phrase)",
     "Notes": "same"
    },
@@ -693,9 +693,16 @@
    {
     "Kind": "edge",
     "Name": "resolves_to",
-    "Status": "TARGET — landing: the materialization build",
+    "Status": "PRESENT",
     "Description obligation": "-",
     "Notes": "today: paths inside the twin blob"
+   },
+   {
+    "Kind": "edge",
+    "Name": "uses_param",
+    "Status": "PRESENT",
+    "Description obligation": "-",
+    "Notes": "M3: scope→param — which selections consult which parameters; role-tagged resolves_to carries the per-predicate usage"
    },
    {
     "Kind": "edge",
@@ -833,15 +840,15 @@
    },
    {
     "Label": "condition",
-    "Edge": "belongs_to",
-    "Status": "edged-pseudo",
-    "Meaning": "STEP 4: tree-born adjacency citizen — walks to its scope; outside the store census by ruling (not a store node)"
+    "Edge": "has_part",
+    "Status": "edged",
+    "Meaning": "M3 the condition layer: born inside its parent (join/scope/condition —has_part→ condition); resolves_to walks down to columns/params"
    },
    {
     "Label": "param",
-    "Edge": "belongs_to",
-    "Status": "edged-pseudo",
-    "Meaning": "STEP 4: walks to its file; tree-born"
+    "Edge": "uses_param",
+    "Status": "edged",
+    "Meaning": "M3: minted from references; born by the scopes that consult it (scope —uses_param→ param); file—has_part→param lands at M6"
    },
    {
     "Label": "derived_column",

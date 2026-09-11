@@ -3,18 +3,20 @@
   "_redesign": "M2 REDESIGNED (Sunny 2026-09-10): a scope reaches tables THROUGH its join nodes; direct reads = the REMAINDER only (tables no join side covers). joins_to re-homed to M1 (dictionary truth). Joins (M2) and conditions (M3) are SEPARATE batches, testable alone. The old M2 (scope + 45 reads) was superseded before its gate ran.",
   "_batch_law": "Bottom-up: a node ships only in the batch where its birth edges point DOWN at already-shipped nodes. 6 IF-statement conditions + @StartDate/@EndDate ship at M5 with their statements; 31 operational statements are DECLARED counted-missing debt at M5, closed by file->statement at M6.",
   "_pin_at_build": [
-    "RESOLVED AT M2 BUILD: reads remainder = 6 exactly; join count = 95 (the TREE's truth \u2014 the twin's 93 was two short; M3's twin-derived condition counts get the same tree reconciliation at their build)",
-    "M2 join nodes ship WITHOUT joinType (inner/left_outer/...) \u2014 the parse tree does not carry the operator type; lands with the parser/metamodel extension, counted here",
-    "M3 join->condition ON roots for 3 of 93 twin containers whose root is not a condition node \u2014 re-derived from the tree at M3 build",
-    "M1 EXPORT GAP (found 2026-09-10): _node_row drops LIST-valued properties, pk_columns never ships in graph_table \u2014 fix rides the export rework; counted, never silent"
+    "RESOLVED AT M2: reads remainder 6; join 95 (tree > twin's 93)",
+    "RESOLVED AT M3: joinType was IN THE TREE all along (join_type key on ON roots \u2014 Inner 39 \u00b7 LeftOuter 56); the M2 deferral closes with backfill",
+    "RESOLVED AT M3: condition count 1141 (tree truth; the twin's 748 under-counted \u2014 e.g., IS NOT NULL is a NOT+NULL_CHECK pair in the tree). Independent whole-tree count matches the builder exactly",
+    "M4/M5 numbers remain TWIN-authored (derived_column 156, statements 67, the 6 IF conditions) \u2014 the same tree reconciliation applies at their builds; key updates by measurement",
+    "M1 EXPORT GAP: _node_row drops LIST-valued properties (pk_columns) \u2014 fix rides the export rework; counted",
+    "GRAMMAR PHRASING: condition renders compose dictionary words correctly but read clunky in places ('The this item records...') \u2014 Grammar_Floor gap-check is Sunny's, per the ladder decision"
   ],
   "basis": {
     "estate": "ed_sepsis_dev",
     "file": "reporting/USP_ED_SEPSIS.sql",
     "translator_version": "1.3.0",
-    "metamodel_version": "1.38.0",
+    "metamodel_version": "1.39.0",
     "authored": "2026-09-10",
-    "_bump_record": "authored at metamodel 1.36.0; re-based 1.37.0 (join-node ruling) then 1.38.0 (M2 join layer lands: ledger flips PRESENT) \u2014 every derived count verified by the recompute tests at each bump"
+    "_bump_record": "authored at metamodel 1.36.0; re-based 1.37.0 (join-node ruling) then 1.38.0 (M2 join layer lands: ledger flips PRESENT) \u2014 every derived count verified by the recompute tests at each bump; re-based 1.39.0 (M3 condition layer lands)"
   },
   "census_after": {
     "_comment": "THE GATE TABLES: cumulative Fabric-surface censuses after each batch. Q1 = MATCH (n) RETURN labels(n), count(*); Q3 = MATCH ()-[r]->() RETURN type(r), count(*). Exact both directions. M2 numbers are MEASURED FROM THE BUILT STORE (2026-09-10).",
@@ -59,20 +61,20 @@
         "column": 4554,
         "scope": 44,
         "join": 95,
-        "condition": 748,
+        "condition": 1141,
         "param": 2
       },
-      "node_total": 5537,
+      "node_total": 5930,
       "edges": {
-        "has_part": 5490,
+        "has_part": 5883,
         "joins_to": 65,
         "left_side": 95,
         "right_side": 87,
         "reads": 6,
-        "resolves_to": 152,
+        "resolves_to": 165,
         "uses_param": 2
       },
-      "edge_total": 5897
+      "edge_total": 6303
     },
     "M4": {
       "nodes": {
@@ -82,22 +84,22 @@
         "column": 4554,
         "scope": 44,
         "join": 95,
-        "condition": 748,
+        "condition": 1141,
         "param": 2,
         "derived_column": 156
       },
-      "node_total": 5693,
+      "node_total": 6086,
       "edges": {
-        "has_part": 5646,
+        "has_part": 6039,
         "joins_to": 65,
         "left_side": 95,
         "right_side": 87,
         "reads": 6,
-        "resolves_to": 152,
+        "resolves_to": 165,
         "uses_param": 2,
         "cites": 100
       },
-      "edge_total": 6153
+      "edge_total": 6559
     },
     "M5": {
       "nodes": {
@@ -107,23 +109,23 @@
         "column": 4554,
         "scope": 44,
         "join": 95,
-        "condition": 754,
+        "condition": 1147,
         "param": 4,
         "derived_column": 156,
         "statement": 67
       },
-      "node_total": 5768,
+      "node_total": 6161,
       "edges": {
-        "has_part": 5696,
+        "has_part": 6089,
         "joins_to": 65,
         "left_side": 95,
         "right_side": 87,
         "reads": 6,
-        "resolves_to": 156,
+        "resolves_to": 169,
         "uses_param": 4,
         "cites": 100
       },
-      "edge_total": 6209
+      "edge_total": 6615
     },
     "M6": {
       "nodes": {
@@ -133,24 +135,24 @@
         "column": 4554,
         "scope": 44,
         "join": 95,
-        "condition": 754,
+        "condition": 1147,
         "param": 4,
         "derived_column": 156,
         "statement": 67,
         "file": 1
       },
-      "node_total": 5769,
+      "node_total": 6162,
       "edges": {
-        "has_part": 5767,
+        "has_part": 6160,
         "joins_to": 65,
         "left_side": 95,
         "right_side": 87,
         "reads": 6,
-        "resolves_to": 156,
+        "resolves_to": 169,
         "uses_param": 4,
         "cites": 100
       },
-      "edge_total": 6280
+      "edge_total": 6686
     },
     "M7": {
       "nodes": {
@@ -160,7 +162,7 @@
         "column": 4554,
         "scope": 44,
         "join": 95,
-        "condition": 754,
+        "condition": 1147,
         "param": 4,
         "derived_column": 156,
         "statement": 67,
@@ -171,20 +173,20 @@
         "role": 1,
         "responsibility": 1
       },
-      "node_total": 5774,
+      "node_total": 6167,
       "edges": {
-        "has_part": 5767,
+        "has_part": 6160,
         "joins_to": 65,
         "left_side": 95,
         "right_side": 87,
         "reads": 6,
-        "resolves_to": 156,
+        "resolves_to": 169,
         "uses_param": 4,
         "cites": 100,
         "executes": 1,
         "describes": 1
       },
-      "edge_total": 6282
+      "edge_total": 6688
     }
   },
   "description_coverage": {
@@ -250,54 +252,62 @@
       }
     },
     "M3": {
+      "status": "BUILT 2026-09-10 \u2014 store-verified; Sunny's GQL gate on the dev estate closes it",
       "new_nodes": {
-        "condition": 748,
+        "condition": 1141,
         "param": 2
       },
-      "condition_by_clause": {
-        "join_on": 194,
-        "where": 167,
-        "case_when": 387
-      },
-      "condition_by_kind": {
-        "COMPARE_EQ": 210,
-        "NULL_CHECK": 170,
-        "AND": 132,
-        "NOT": 123,
-        "IN_LIST": 33,
-        "RANGE": 22,
-        "COMPARE_LTE": 18,
-        "COMPARE_LT": 15,
-        "OR": 9,
-        "COMPARE_GT": 6,
-        "EXISTS_SELECTION": 5,
-        "COMPARE_NEQ": 2,
-        "COMPARE_GTE": 2,
-        "IN_SELECTION": 1
-      },
-      "condition_degenerate_subkind": 25,
-      "_condition_ruling": "ONE store label `condition` for every predicate \u2014 kind is a PROPERTY from the closed library (kind-vs-label standard); per-predicate structure lives in ROLE-tagged resolves_to edges; composite AND/OR/NOT are condition nodes (nested has_part).",
       "new_edges": {
-        "has_part_joinCondition_roots": 90,
-        "has_part_scopeCondition_roots": 132,
-        "has_part_conditionCondition": 526,
-        "resolves_to_conditionColumn": 150,
+        "has_part_joinCondition": 95,
+        "has_part_scopeCondition": 229,
+        "has_part_conditionCondition": 817,
+        "resolves_to_conditionColumn": 163,
         "resolves_to_conditionParam": 2,
         "uses_param_scopeParam": 2
       },
+      "condition_conservation": {
+        "conditions": 1141,
+        "roots_join": 95,
+        "roots_scope": 229,
+        "nested": 817
+      },
+      "condition_by_kind": {
+        "NULL_CHECK": 333,
+        "NOT": 238,
+        "COMPARE_EQ": 220,
+        "AND": 191,
+        "IN_LIST": 47,
+        "COMPARE_LTE": 33,
+        "COMPARE_LT": 24,
+        "RANGE": 22,
+        "OR": 12,
+        "COMPARE_GT": 8,
+        "EXISTS_SELECTION": 7,
+        "COMPARE_GTE": 3,
+        "COMPARE_NEQ": 2,
+        "IN_SELECTION": 1
+      },
+      "condition_degenerate": 25,
       "resolves_to_roles": {
-        "subject": 104,
-        "comparand": 43,
-        "selection": 3
+        "subject": 119,
+        "comparand": 44,
+        "lower_bound": 1,
+        "upper_bound": 1
       },
       "param_names": [
         "@dEndDate",
         "@dStartDate"
       ],
-      "checks": {
-        "held_for_M5": "6 statement-rooted conditions + @StartDate/@EndDate (parents are statements)"
+      "joinType_closed": {
+        "Inner": 39,
+        "LeftOuter": 56
       },
-      "_note": "condition/param counts remain TWIN-derived; the M2 build showed the tree carries slightly more grains than the twin (95 joins vs 93) \u2014 M3's builder derives from the tree and reconciles these numbers at build, key updated by measurement as always"
+      "checks": {
+        "descriptions_nonempty": "condition 1141/1141 \u00b7 param 2/2 (the ratified grammar voices leaves; containers get structural sentences; fragment fallback)",
+        "held_for_M5": "IF-statement predicates + @StartDate/@EndDate (parents are statements)",
+        "_condition_ruling": "ONE store label `condition` for every predicate \u2014 kind is a PROPERTY from the closed library (kind-vs-label standard); per-predicate structure lives in ROLE-tagged resolves_to edges; composite AND/OR/NOT are condition nodes (nested has_part).",
+        "spot": "All_LDAs RANGE condition voices the ED-stay window through dictionary words"
+      }
     },
     "M4": {
       "new_nodes": {
@@ -345,7 +355,8 @@
       "checks": {
         "r11_descriptions_nonempty": 67,
         "counted_missing_debt": "31 operational statements have NO downward edge \u2014 declared Connection_Ledger counted-missing, landing step M6"
-      }
+      },
+      "_note": "holdover numbers (+6 conditions, +2 params, resolves +4) remain TWIN-authored \u2014 the tree reconciliation at M5 build may move them (precedent: 748\u21921141)"
     },
     "M6": {
       "new_nodes": {

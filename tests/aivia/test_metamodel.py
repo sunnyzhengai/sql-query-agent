@@ -66,10 +66,11 @@ def test_every_loaded_registry_is_ratified_v1():
     # left_side/right_side in the Shape_Ledger, clauseProvenance
     # retired, joins_to dictionary-only; 1.38.0 = M2 THE JOIN LAYER
     # BUILT: join/left_side/right_side PRESENT, join census rows,
-    # reads = the remainder
+    # reads = the remainder; 1.39.0 = M3 THE CONDITION LAYER:
+    # condition/param/resolves_to PRESENT, uses_param, joinType closed
     for reg in metamodel.load_all().values():
         assert reg.ratified is True
-        assert reg.version == "1.38.0"
+        assert reg.version == "1.39.0"
 
 
 def test_load_single_exposes_sheets_and_stamp():

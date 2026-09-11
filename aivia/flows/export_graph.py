@@ -80,13 +80,64 @@ def _scope_tables(read: ReadApi,
             "nodeId": n.identity,
             "name": str(n.properties.get("name") or ""),
             "description": str(n.properties.get("description") or ""),
-            "onPredicate": str(n.properties.get("on") or "")})
+            "onPredicate": str(n.properties.get("on") or ""),
+            "joinType": str(n.properties.get("joinType") or "")})
+    cond_rows = []
+    for n in sorted(read.nodes("condition"), key=lambda x: x.identity):
+        # literal: shape
+        cond_rows.append({
+            "nodeId": n.identity,
+            "name": str(n.properties.get("name") or ""),
+            "description": str(n.properties.get("description") or ""),
+            "kind": str(n.properties.get("kind") or ""),
+            "degenerate": str(n.properties.get("degenerate") or ""),
+            "fragment": str(n.properties.get("fragment") or "")})
+    param_rows = []
+    for n in sorted(read.nodes("param"), key=lambda x: x.identity):
+        # literal: shape
+        param_rows.append({
+            "nodeId": n.identity,
+            "name": str(n.properties.get("name") or ""),
+            "description": str(n.properties.get("description") or "")})
+    # literal: shape
     tables: Dict[str, List[Dict[str, str]]] = {
-        "graph_scope": scope_rows, "graph_join": join_rows}
+        "graph_scope": scope_rows, "graph_join": join_rows,
+        "graph_condition": cond_rows, "graph_param": param_rows}
     tables["graph_has_part_scopeJoin"] = sorted(
         ({"sourceId": e.from_id, "targetId": e.to_id}
          for e in store.current_edges("has_part")
          if "::join#" in e.to_id),
+        key=lambda r: (r["sourceId"], r["targetId"]))
+    hp_jc, hp_sc, hp_cc = [], [], []
+    for e in store.current_edges("has_part"):
+        if "::cond#" not in e.to_id:
+            continue
+        # literal: shape
+        row = {"sourceId": e.from_id, "targetId": e.to_id}
+        if "::join#" in e.from_id:
+            hp_jc.append(row)
+        elif "::cond#" in e.from_id:
+            hp_cc.append(row)
+        else:
+            hp_sc.append(row)
+    for name, rows_ in (("joinCondition", hp_jc),
+                        ("scopeCondition", hp_sc),
+                        ("conditionCondition", hp_cc)):
+        tables[f"graph_has_part_{name}"] = sorted(
+            rows_, key=lambda r: (r["sourceId"], r["targetId"]))
+    rt_col, rt_par = [], []
+    for e in store.current_edges("resolves_to"):
+        # literal: shape
+        row = {"sourceId": e.from_id, "targetId": e.to_id,
+               "role": str(e.properties.get("role") or "")}
+        (rt_par if "::param/" in e.to_id else rt_col).append(row)
+    tables["graph_resolves_to_conditionColumn"] = sorted(
+        rt_col, key=lambda r: (r["sourceId"], r["targetId"], r["role"]))
+    tables["graph_resolves_to_conditionParam"] = sorted(
+        rt_par, key=lambda r: (r["sourceId"], r["targetId"], r["role"]))
+    tables["graph_uses_param_scopeParam"] = sorted(
+        ({"sourceId": e.from_id, "targetId": e.to_id}
+         for e in store.current_edges("uses_param")),
         key=lambda r: (r["sourceId"], r["targetId"]))
     for side in ("left_side", "right_side"):
         by_target: Dict[str, List[Dict[str, str]]] = {

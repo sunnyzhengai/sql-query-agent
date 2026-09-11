@@ -243,84 +243,86 @@ def test_m2_coverage_invariants(booted):
 
 
 # ---------------------------------------------------------------
-# M3 — THE CONDITION LAYER (authored ahead; testable alone)
+# M3 — THE CONDITION LAYER (BUILT 2026-09-10; the STORE is the
+# truth — the tree out-counts the twin, precedent joins 95 vs 93)
 # ---------------------------------------------------------------
 
-def test_m3_conditions_key_matches_twin(twin):
+def test_m3_store_matches_census(booted, exported):
+    want = CENSUS["M3"]
+    got_nodes = {"db": 1, "db_schema": 3,
+                 "table": len(exported["graph_table"]),
+                 "column": len(exported["graph_column"]),
+                 "scope": len(exported["graph_scope"]),
+                 "join": len(exported["graph_join"]),
+                 "condition": len(exported["graph_condition"]),
+                 "param": len(exported["graph_param"])}
+    assert got_nodes == want["nodes"]
+    has_part = sum(len(v) for k, v in exported.items()
+                   if k.startswith("graph_has_part"))
+    resolves = (len(exported["graph_resolves_to_conditionColumn"])
+                + len(exported["graph_resolves_to_conditionParam"]))
+    got_edges = {"has_part": has_part,
+                 "joins_to": len(exported["graph_joins_to_tableTable"]),
+                 "left_side": len(exported["graph_left_side_joinTable"])
+                 + len(exported["graph_left_side_joinScope"]),
+                 "right_side": len(exported["graph_right_side_joinTable"])
+                 + len(exported["graph_right_side_joinScope"]),
+                 "reads": len(exported["graph_reads_scopeTable"]),
+                 "resolves_to": resolves,
+                 "uses_param": len(exported["graph_uses_param_scopeParam"])}
+    assert got_edges == want["edges"]
+
+
+def test_m3_condition_conservation_and_kinds(booted):
     want = DELTA["M3"]
-    conds = [n for n in twin if n["kind"] == "condition"]
-    refs = [n for n in twin if n["kind"] == "reference"]
-    sc = [c for c in conds if _in_scope(c["points_at"])]
-    st = [c for c in conds if not _in_scope(c["points_at"])]
-    assert len(sc) == want["new_nodes"]["condition"]
-    assert len(st) == DELTA["M5"]["new_nodes"]["condition"]
+    conds = booted.current_nodes("condition")
+    assert len(conds) == want["new_nodes"]["condition"]
+    parents = {e.to_id: e.from_id
+               for e in booted.current_edges("has_part")
+               if "::cond#" in e.to_id}
+    roots_join = sum(1 for c in conds
+                     if "::join#" in parents.get(c.identity, ""))
+    nested = sum(1 for c in conds
+                 if "::cond#" in parents.get(c.identity, ""))
+    roots_scope = len(conds) - roots_join - nested
+    got = {"conditions": len(conds), "roots_join": roots_join,
+           "roots_scope": roots_scope, "nested": nested}
+    assert got == want["condition_conservation"]
+    kinds = Counter(c.properties["kind"] for c in conds)
+    assert dict(kinds) == want["condition_by_kind"]
+    assert sum(1 for c in conds
+               if c.properties["degenerate"] == "true") \
+        == want["condition_degenerate"]
+    # every condition has a parent, a kind, and a description
+    for c in conds:
+        assert c.identity in parents
+        assert c.properties["kind"]
+        assert c.properties["description"].strip()
 
-    def clause_of(p):
-        if "/join_on/" in p:
-            return "join_on"
-        if "/when" in p or "/else" in p:
-            return "case_when"
-        return "where"
-    assert dict(Counter(clause_of(c["points_at"]) for c in sc)) \
-        == want["condition_by_clause"]
-    assert sum(1 for c in conds if c.get("subkind") == "degenerate") \
-        == want["condition_degenerate_subkind"]
 
-    def kind_of(c):
-        return c["content"].get("predicate") or c["content"].get("shape")
-    assert dict(Counter(kind_of(c) for c in sc)) == want["condition_by_kind"]
-    assert dict(Counter(kind_of(c) for c in st)) \
-        == DELTA["M5"]["condition_by_kind_new"]
-
-    # parent split: ON roots parent to their JOIN; where/case roots
-    # to their scope; the rest nest under conditions
-    cpaths = {c["points_at"] for c in conds}
-    containers = set(_join_containers(twin))
-    roots = [c for c in sc
-             if not any(c["points_at"].startswith(q + "/") for q in cpaths)]
-    join_roots = [c for c in roots if c["points_at"] in containers]
-    assert len(join_roots) == want["new_edges"]["has_part_joinCondition_roots"]
-    assert len(roots) - len(join_roots) \
-        == want["new_edges"]["has_part_scopeCondition_roots"]
-    assert len(sc) - len(roots) \
-        == want["new_edges"]["has_part_conditionCondition"]
-
-    # params by user grain: scope-used ship at M3, statement-only at M5
-    grains = {}
-    for r in refs:
-        p = r.get("content", {}).get("parameter")
-        if p:
-            grains.setdefault(p, set()).add(
-                "scope" if _in_scope(r["points_at"]) else "statement")
-    assert sorted(p for p, g in grains.items() if "scope" in g) \
-        == want["param_names"]
-    assert sorted(p for p, g in grains.items() if "scope" not in g) \
-        == DELTA["M5"]["param_names_new"]
-
-    # resolves_to with roles: condition→column and condition→param
-    cond_paths = [c["points_at"] for c in conds]
-    def owner(p):
-        owners = [q for q in cond_paths if p.startswith(q + "/")]
-        return max(owners, key=len) if owners else None
-    cc, cp, roles = set(), set(), Counter()
-    for r in refs:
-        o = owner(r["points_at"])
-        if not o:
-            continue
-        for c in _columns(r.get("draws_from") or []):
-            if (o, c) not in cc:
-                roles[r["points_at"][len(o) + 1:].split("/")[0]] += 1
-            cc.add((o, c))
-        p = r.get("content", {}).get("parameter")
-        if p:
-            cp.add((o, p))
-    assert len(cc) == want["new_edges"]["resolves_to_conditionColumn"]
-    assert all(_in_scope(o) for o, _ in cc)
+def test_m3_resolves_roles_and_params(booted):
+    want = DELTA["M3"]
+    roles = Counter(e.properties.get("role")
+                    for e in booted.current_edges("resolves_to"))
     assert dict(roles) == want["resolves_to_roles"]
-    cp_m3 = {x for x in cp if _in_scope(x[0])}
-    assert len(cp_m3) == want["new_edges"]["resolves_to_conditionParam"]
-    assert len(cp) - len(cp_m3) \
-        == DELTA["M5"]["new_edges"]["resolves_to_conditionParam"]
+    cols = [e for e in booted.current_edges("resolves_to")
+            if "::param/" not in e.to_id]
+    pars = [e for e in booted.current_edges("resolves_to")
+            if "::param/" in e.to_id]
+    assert len(cols) == want["new_edges"]["resolves_to_conditionColumn"]
+    assert len(pars) == want["new_edges"]["resolves_to_conditionParam"]
+    params = sorted(n.properties["name"]
+                    for n in booted.current_nodes("param"))
+    assert params == want["param_names"]
+    assert len(booted.current_edges("uses_param")) \
+        == want["new_edges"]["uses_param_scopeParam"]
+
+
+def test_m3_join_type_closed(booted):
+    want = DELTA["M3"]["joinType_closed"]
+    got = Counter(n.properties.get("joinType")
+                  for n in booted.current_nodes("join"))
+    assert dict(got) == want
 
 
 # ---------------------------------------------------------------
