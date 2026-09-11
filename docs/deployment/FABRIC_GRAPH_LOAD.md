@@ -19,9 +19,13 @@ the tables and re-run that batch's gate.)*
    **`AIVIA_GRAPH`**. (Dedicated — batch refreshes are
    drop-and-reload; nothing else lives here.)
 2. On your machine the export files are in
-   `AIVIA_Product/estates/sepsis/graph_export/` — 7 Parquet files.
+   **`AIVIA_Product/estates/ed_sepsis_dev/graph_export/`** — the
+   dev estate is the RULED gate surface (25 Parquet files).
    (Regenerate any time:
-   `python3.11 -m aivia.flows.export_graph sepsis`)
+   `python3.11 -m aivia.flows.export_graph ed_sepsis_dev`.
+   The old sepsis graph_export was DELETED 2026-09-11 — Sunny
+   pulled stale superseded files from it; the sepsis export
+   regenerates at phase boundaries only.)
 3. Open `AIVIA_GRAPH` → **Files** → **Upload files** → select all
    7 Parquet files.
 4. For each of the 7 files: right-click → **Load to Tables** →
