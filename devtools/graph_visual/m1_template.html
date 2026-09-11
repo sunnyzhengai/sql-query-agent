@@ -273,6 +273,75 @@ function draw(){
   CTX.globalAlpha = 1;
 }
 
+// ---- LIVE FORCE SIMULATION (Sunny's 'let the columns go free'
+// — F2-style: nothing is precomputed into a pattern; springs +
+// repulsion settle in real time, drags reflow the neighborhood)
+nodes.forEach(n=>{n.vx=0; n.vy=0;});
+const colsByT = T.map(()=>[]);
+C.forEach(c=>colsByT[c.t].push(c));
+const CR = T.map(t=>70+6*Math.sqrt(t.nc||1));   // cluster radius
+const RL = T.map(t=>85+8*Math.sqrt(t.nc||1));   // column spring rest
+let heat = 600;
+function step(){
+  for(let i=0;i<T.length;i++){
+    const a=T[i];
+    for(let j=i+1;j<T.length;j++){
+      const b=T[j];
+      let dx=b.x-a.x, dy=b.y-a.y;
+      const d2=dx*dx+dy*dy+1, d=Math.sqrt(d2);
+      const mind=CR[i]+CR[j]+260;
+      const f=Math.min(380000/d2 + Math.max(0,mind-d)*0.4, 60);
+      dx/=d; dy/=d;
+      a.vx-=dx*f; a.vy-=dy*f; b.vx+=dx*f; b.vy+=dy*f;
+    }
+    a.vx-=a.x*0.0004; a.vy-=a.y*0.0004;   // weak centering
+  }
+  DATA.joins.forEach(j=>{
+    const a=T[j.a], b=T[j.b];
+    let dx=b.x-a.x, dy=b.y-a.y;
+    const d=Math.hypot(dx,dy)+0.01;
+    const f=(d-(CR[j.a]+CR[j.b]+320))*0.003;
+    dx/=d; dy/=d;
+    a.vx+=dx*f; a.vy+=dy*f; b.vx-=dx*f; b.vy-=dy*f;
+  });
+  for(let ti=0;ti<T.length;ti++){
+    const t=T[ti], cl=colsByT[ti], rl=RL[ti];
+    for(let i=0;i<cl.length;i++){
+      const c=cl[i];
+      let dx=t.x-c.x, dy=t.y-c.y;
+      const d=Math.hypot(dx,dy)+0.01;
+      const f=(d-rl)*0.012 - Math.max(0, 60-d)*0.5;  // spring + core shell
+      c.vx+=dx/d*f; c.vy+=dy/d*f;
+      t.vx-=dx/d*f*0.04; t.vy-=dy/d*f*0.04;
+      for(let j2=i+1;j2<cl.length;j2++){   // free-body separation
+        const o=cl[j2];
+        let ex=o.x-c.x, ey=o.y-c.y;
+        const e2=ex*ex+ey*ey;
+        if(e2>10000) continue;
+        const ed=Math.sqrt(e2)+0.01;
+        const rf=Math.min(2600/(e2+10), 10);
+        ex/=ed; ey/=ed;
+        c.vx-=ex*rf; c.vy-=ey*rf; o.vx+=ex*rf; o.vy+=ey*rf;
+      }
+    }
+  }
+  nodes.forEach(n=>{
+    if(n.k==='schema'||n.k==='db'||n===dragging){n.vx=0;n.vy=0;return;}
+    n.vx=Math.max(-40,Math.min(40,n.vx*0.82));
+    n.vy=Math.max(-40,Math.min(40,n.vy*0.82));
+    n.x+=n.vx; n.y+=n.vy;
+  });
+  S.forEach(s=>{                            // schemas trail their tables
+    if(s===dragging||!s.tt.length) return;
+    let cx=0,cy=0; s.tt.forEach(i=>{cx+=T[i].x; cy+=T[i].y;});
+    s.x+=(cx/s.tt.length-s.x)*0.08; s.y+=(cy/s.tt.length-s.y)*0.08;
+  });
+  if(DB!==dragging){
+    let cx=0,cy=0; S.forEach(s=>{cx+=s.x; cy+=s.y;});
+    DB.x+=(cx/S.length-DB.x)*0.08; DB.y+=(cy/S.length-DB.y)*0.08;
+  }
+  heat--;
+}
 // ---- hit test / tooltip -------------------------------------
 function nodeAt(mx,my){
   // FREE-BODY rule (Sunny's ruling): every node is a peer —
@@ -385,6 +454,7 @@ const onMove = e => {
     const wx = (e.clientX-ox)/scale + gox,
           wy = (e.clientY-oy)/scale + goy;
     dragging.x = wx; dragging.y = wy;
+    heat = Math.max(heat, 140);
     draw(); return;
   }
   if(panning){
@@ -424,7 +494,7 @@ CV.addEventListener('wheel', e=>{
 },{passive:false});
 document.querySelectorAll('#panel input[type=checkbox]').forEach(cb=>
   cb.addEventListener('change', ()=>{show[cb.dataset.l]=cb.checked?1:0;
-    draw();}));
+    heat = Math.max(heat, 200); draw();}));
 document.getElementById('search').addEventListener('keydown', e=>{
   if(e.key!=='Enter') return;
   const q = e.target.value.trim().toUpperCase();
@@ -433,8 +503,15 @@ document.getElementById('search').addEventListener('keydown', e=>{
   if(n){
     scale = Math.max(scale, 1.1);
     ox = W/2 - n.x*scale; oy = H/2 - n.y*scale;
+    heat = Math.max(heat, 120);
     pin(n);
   }
 });
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+if(reduced){ for(let i=0;i<600;i++) step(); heat=0; }
 draw();
+(function loop(){
+  if(heat>0 && !document.hidden){ step(); draw(); }
+  requestAnimationFrame(loop);
+})();
 </script>
