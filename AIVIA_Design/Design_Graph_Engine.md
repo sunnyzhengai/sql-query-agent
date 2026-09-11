@@ -236,7 +236,11 @@ chatbot-testing as such. The first target is the TECHNICAL LAYER
 (table/column names + dictionary descriptions — already index-
 carded; embeddings cache-seeded across estates by content key);
 later grains enter the index as §D resumes; L3 re-homes the
-vectors onto node rows at M12.
+vectors onto node rows at M12. THE ALGORITHM is ruled in
+Design_Chatbot.md §"THE MEANING-TEST CONSOLE" (Sunny's five
+steps, 2026-09-11: LLM tokenizes only · vector match sets ·
+deterministic planner writes a GRAPH query via one topology
+algorithm · evidence returned with the query as artifact).
 
 ---
 

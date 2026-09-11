@@ -869,3 +869,71 @@ No intent pickers or query builders (L4). No unmarked model prose
 "no results" (L9-D4). No invisible state — if it affects
 resolution, it is on screen (L5-D3, L6-D1). No settings that let
 the system tune itself (L7-D4).
+
+## THE MEANING-TEST CONSOLE — the ruled five-step algorithm
+(Sunny, 2026-09-11; the L4 ruling in Design_Graph_Engine.md names
+this section as its algorithm. Purpose: MEANING testing of each
+ACCEPTED ladder batch — readability, findability, grounding.
+Gates verify structure; this console tests meaning; it closes
+nothing. The Fabric Data Agent ban stands — it fabricated;
+chatbot-testing as such is ruled IN.)
+
+**The algorithm (Sunny's formulation, ruled):**
+
+1. **The user asks an NL question.**
+2. **The LLM interprets intention and tokenizes** — extracts
+   MEANING UNITS (multi-word phrases stay whole) plus the
+   intention shape. The LLM's ONLY seat: it proposes, visibly;
+   it never writes queries and never touches answers.
+3. **Token vectors search the graph's card index** — name card +
+   description card per node (the facet law). Output per token: a
+   MATCH SET with scores; thresholds are registry data
+   (Grounding_Thresholds); below-threshold = visible candidates,
+   never silent "unknown"; a no-match token is a returned fact.
+4. **The matches drive a DETERMINISTIC PLANNER that writes a
+   GRAPH query covering all matches** (graph, never SQL — SQL
+   cannot discover paths). Topology algorithms fit the scenario;
+   multiple may coexist; START WITH ONE: the minimal connecting
+   subgraph (union of shortest paths across match sets; fewer
+   intermediates preferred — the hub-explosion bound). The query
+   is an ARTIFACT: rendered in GQL, shown with the answer —
+   operations are the product.
+5. **Return all relevant results** — the connecting subgraph as
+   arranged evidence (nodes with descriptions, edges with keys),
+   completeness declared, absence honest (nearest neighbors,
+   never invention). Partial-answers law: disconnected match sets
+   return honestly with the gap named.
+
+**THE THREE MATCH CLASSES** (the label lesson honored — kinds
+ground by meaning, never by word lists):
+- INSTANCE match (node id) → an ANCHOR the traversal must touch;
+- KIND match (a label's self-description — the _self speech
+  rows) → a TYPE CONSTRAINT in the query, never an anchor;
+- EDGE-KIND match (joins_to / has_part meanings) → a TRAVERSAL
+  CONSTRAINT (which edge types the path may walk).
+
+**What embeds:** everything that SPEAKS in scope — instance
+cards (name + description) + kind self-descriptions + edge-kind
+meanings. NOT properties as such, NOT edge instances (topology is
+the planner's food, not the matcher's). Vectors are an L3
+PROJECTION: file cache now (content-keyed), node-row columns at
+M12 — the planner is location-blind because matches arrive as
+node identities.
+
+**Execution locality (ruled default):** the query EXECUTES
+locally over the store; the GQL text is displayed (paste-able
+into Fabric). The whole loop moves server-side only when M12
+lands vectors on node rows.
+
+**Scoping per ladder:** the console boots from the store-as-built
+and additionally scopes its INDEX to the accepted grains under
+test; exclusions are COUNTED in the coverage line, never silent.
+First target: THE TECHNICAL LAYER (table · column instances;
+db/db_schema/table/column kinds; joins_to/has_part edge kinds).
+
+**The pinned battery (test-first):** ~8 questions across five
+families — findability · meaning readback · column search ·
+relationship grounding · absence honesty — each with an expected
+crown; deterministic pipeline parts tested keyless; the live
+seats under the live-seat rule. Sunny gap-checks and blesses the
+battery; regressions surface mechanically thereafter.
