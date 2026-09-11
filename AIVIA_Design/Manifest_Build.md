@@ -476,6 +476,23 @@ V_PATIENT_LOCATION_HISTORY, counts 4/90, GQL
 `MATCH (a:table)-[:has_part]->(b:column) FILTER b.name =
 'EVENT_ID' …`. 5 new deterministic tests; battery 8/8 after the
 rebuild.
+**THE SECOND TARGET BUILT — the join layer (M2), ruled +
+built 2026-09-11 (design first, Sunny's order):** the console's
+scope extends per the batch-earns-the-console law. Scopes ×44
+join the index (floors as speech, verbatim; the `_self scope`
+kind card grounds "scopes/selections"); joins stay UNINDEXED
+connective structure (ON + joinType + description = evidence);
+THE PASS-THROUGH RULE ruled into Design_Chatbot (scope—join—
+table is ONE connection, the row cites the join's ON); adjacency
+gains scope→join + sides + the reads remainder; condition edges
+stay OUT until §D; join-layer edge-kind cards DEFERRED with the
+recorded reason (a 'read' constraint would veto side-paths).
+5 new deterministic tests incl. the pass-through acceptance
+('which scopes read ADT_EVENTS?' → #ADT the owner AND #Base_Pop
+the co-side — BOTH store-verified, #ADT::join#1 ON ENCOUNTER_ID)
++ 4 drafted join-family battery questions — LIVE 18/18 first
+try (the keyed boot embedded the 44 scope card sets). Await
+Sunny's hands-on pass to pin the family blessed-by-use.
 **THE TURN DEFAULT ruled (Sunny, 2026-09-11, same session):**
 HITL after EVERY turn is now the DEFAULT DESIGN for all chatbot
 surfaces — findings offered ranked with visible scores and a

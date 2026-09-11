@@ -41,11 +41,15 @@ from aivia.flows import ask, connect, glossary, grounding
 from aivia.graph.read_api import ReadApi
 from aivia.lenses.ask_index import _fold
 
-# the accepted scope of this console's first target — instances
-# that SPEAK (db/db_schema carry no speech source and are counted
-# exclusions, never silent ones)
-TECHNICAL_SPEAKING = ("table", "column")
-TECHNICAL_KINDS = ("table", "column")
+# the accepted scope of the console's targets — instances that
+# SPEAK (db/db_schema carry no speech source and are counted
+# exclusions, never silent ones). SECOND TARGET (the join layer,
+# ruled 2026-09-11): scopes join, their floors are the speech;
+# joins are connective structure, never indexed
+# literal: frame — the console's target-scope contract
+TECHNICAL_SPEAKING = ("table", "column", "scope")
+# literal: frame — the console's target-scope contract
+TECHNICAL_KINDS = ("table", "column", "scope")
 TECHNICAL_EDGE_KINDS = ("has_part", "joins_to")
 
 
@@ -92,10 +96,13 @@ def technical_scope(read) -> Tuple[List[Dict[str, Any]],
 
 def technical_adjacency(read) -> Tuple[
         Dict[str, List[Tuple[str, str]]], Set[Tuple[str, str, str]]]:
-    """The technical layer's own edges, both as an undirected walk
-    surface (for the planner) and the DIRECTED store truth (for the
-    GQL writer): db—has_part→db_schema—has_part→table—has_part→
-    column + table—joins_to→table."""
+    """The walk surface, both undirected (for the planner) and as
+    the DIRECTED store truth (for the GQL writer): the spine
+    (db—has_part→db_schema—has_part→table—has_part→column +
+    table—joins_to→table) plus THE JOIN LAYER (second target,
+    2026-09-11): scope—has_part→join +
+    join—left_side/right_side→table-or-scope + the reads
+    remainder. Condition edges stay OUT until §D (standing)."""
     adj: Dict[str, List[Tuple[str, str]]] = {}
     directed: Set[Tuple[str, str, str]] = set()
 
@@ -117,8 +124,16 @@ def technical_adjacency(read) -> Tuple[
         link(n.identity.rsplit("|", 1)[0], n.identity, "has_part")
     store = getattr(read, "_store", None)
     if store is not None:
+        joins = {n.identity for n in read.nodes("join")}
         for e in store.current_edges("joins_to"):
             link(e.from_id, e.to_id, "joins_to")
+        for e in store.current_edges("has_part"):
+            if e.to_id in joins:        # scope —has_part→ join
+                link(e.from_id, e.to_id, "has_part")
+        # literal: mechanical — the join layer's side + reads walk
+        for lbl in ("left_side", "right_side", "reads"):
+            for e in store.current_edges(lbl):
+                link(e.from_id, e.to_id, lbl)
     return adj, directed
 
 
@@ -411,6 +426,11 @@ def answer_question(question: str, interpret_fn,
     counts: Dict[str, Any] = {}
     capped: Optional[Tuple[int, int]] = None
     described = {e["identity"]: e for e in entries}
+    # THE PASS-THROUGH RULE (the join layer): joins are connective
+    # structure — two hops through one are ONE connection, cited
+    # by the join's ON meaning
+    joinsmap = {n.identity: n.properties
+                for n in read.nodes("join")}
 
     def _speech(ident: str) -> str:
         e = described.get(ident)
@@ -426,18 +446,33 @@ def answer_question(question: str, interpret_fn,
         kind_label = enum_kinds[0]
         pop = {n.identity for n in read.nodes(kind_label)}
         hit_pop = set()
+        seen_rows: Set[Tuple[str, str, str]] = set()
+
+        def _row(pop_id: str, via: str, m: Dict[str, Any]) -> None:
+            key = (pop_id, via, m["identity"])
+            if key in seen_rows:
+                return
+            seen_rows.add(key)
+            hit_pop.add(pop_id)
+            # literal: shape
+            rows.append({"a": pop_id.rsplit("|", 1)[-1].split("::")[-1],
+                         "edge": via, "b": m["name"],
+                         "words": _speech(pop_id),
+                         "a_id": pop_id, "b_id": m["identity"]})
+
         for m in anchors:
             for nbr, elbl in adj.get(m["identity"], []):
                 if edge_kinds and elbl not in edge_kinds:
                     continue
                 if nbr in pop:
-                    hit_pop.add(nbr)
-                    # literal: shape
-                    rows.append({"a": nbr.rsplit("|", 1)[-1],
-                                 "edge": elbl, "b": m["name"],
-                                 "words": _speech(nbr),
-                                 "a_id": nbr,
-                                 "b_id": m["identity"]})
+                    _row(nbr, elbl, m)
+                elif nbr in joinsmap:   # pass-through: one hop more
+                    j = joinsmap[nbr]
+                    via = (f"via {j.get('name', 'join')}: "
+                           f"{j.get('on', '')}").strip(": ")
+                    for nbr2, _lbl2 in adj.get(nbr, []):
+                        if nbr2 in pop and nbr2 != m["identity"]:
+                            _row(nbr2, via, m)
         rows.sort(key=lambda r: (r["a"], r["b"]))
         # literal: shape
         counts = {"connected": len(hit_pop),
@@ -453,7 +488,8 @@ def answer_question(question: str, interpret_fn,
         kind_label = enum_kinds[0]
         members = sorted(n.identity for n in read.nodes(kind_label))
         # literal: shape
-        rows = [{"a": i.rsplit("|", 1)[-1], "edge": "", "b": "",
+        rows = [{"a": i.rsplit("|", 1)[-1].split("::")[-1],
+                 "edge": "", "b": "",
                  "words": _speech(i), "a_id": i, "b_id": ""}
                 for i in members]
         # literal: shape
@@ -495,8 +531,9 @@ def answer_question(question: str, interpret_fn,
     else:
         mode = "zero"
     label_of = {}
-    # literal: mechanical — the technical spine's label walk
-    for lbl in ("db", "db_schema", "table", "column"):
+    # literal: mechanical — the walk-surface label lookup
+    for lbl in ("db", "db_schema", "table", "column", "scope",
+                "join"):
         for n in read.nodes(lbl):
             if n.identity in plan["nodes"]:
                 label_of[n.identity] = lbl
@@ -510,6 +547,12 @@ def answer_question(question: str, interpret_fn,
             words = (e.get("words") or "").split(". ")[0]
             evidence.append(f"[{e['label']}] {e['name']}"
                             + (f" — {words}" if words else ""))
+        elif ident in joinsmap:
+            j = joinsmap[ident]
+            evidence.append(
+                f"[join] {j.get('name', ident)} "
+                f"({j.get('joinType', '?')}) — "
+                f"{j.get('description') or j.get('on', '')}")
         else:
             evidence.append(f"[{label_of.get(ident, '?')}] "
                             f"{ident.rsplit('|', 1)[-1]}")

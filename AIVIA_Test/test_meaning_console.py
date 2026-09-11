@@ -54,8 +54,9 @@ def test_scope_carries_the_speaking_technical_grains(world):
         1 for e in full if e["label"] == "table")
     assert counts["column"] == sum(
         1 for e in full if e["label"] == "column")
+    assert counts["scope"] == 44          # the second target (M2)
     kinds = {e["name"] for e in entries if e["label"] == "label"}
-    assert kinds == {"table", "column"}
+    assert kinds == {"table", "column", "scope"}
     edge_kinds = {e["identity"] for e in entries
                   if e["label"] == "edge_kind"}
     assert edge_kinds == {"edgekind::has_part", "edgekind::joins_to"}
@@ -461,6 +462,69 @@ def test_semantic_band_stays_narrow_within_the_margin(world):
     assert len(r["anchors"]) == 1
 
 
+# ---- THE SECOND TARGET: the join layer (M2, ruled 2026-09-11 —
+# scopes speak, joins are connective structure, THE PASS-THROUGH
+# RULE makes scope—join—table ONE connection) -----------------------
+SCOPE_BASE_POP = "reporting/USP_ED_SEPSIS.sql::#Base_Pop"
+
+
+def test_scopes_speak_in_the_index(world):
+    _, entries, _, _, _ = world
+    sc = next(e for e in entries if e["identity"] == SCOPE_BASE_POP)
+    assert sc["label"] == "scope"
+    assert "selection of records" in sc["words"]
+
+
+def test_join_layer_adjacency_walks_scope_join_table(world):
+    read, _, _, adj, _directed = world
+    j1 = SCOPE_BASE_POP + "::join#1"
+    assert any(b == j1 and lbl == "has_part"
+               for b, lbl in adj[SCOPE_BASE_POP])
+    sides = {b for b, lbl in adj[j1]
+             if lbl in ("left_side", "right_side")}
+    assert sides & {"emr|dbo|ED_ENCOUNTERS_FACT",
+                    "emr|dbo|HOSPITAL_ENCOUNTERS"}
+
+
+def test_pass_through_enumerates_scopes_reading_a_table(world):
+    # 'which scopes read ADT_EVENTS?' — two hops through a join
+    # are ONE connection, cited by the join's ON meaning
+    read, entries, _, adj, directed = world
+    kind = next(e for e in entries if e["identity"] == "kind::scope")
+    semantic = _ScriptedSemantic(
+        {"scopes": [{**dict(kind), "score": 1.2}]})
+    r = mc.answer_question("which scopes read ADT_EVENTS?",
+                           _scripted_tokens(["scopes",
+                                             "ADT_EVENTS"]),
+                           entries, semantic, read, adj, directed)
+    assert r["mode"] == "enumeration"
+    # BOTH connections are store truth (verified 2026-09-11):
+    # #ADT owns the joins that use the table (has_part side) and
+    # #Base_Pop is joined AGAINST it (#ADT::join#1's other side,
+    # ON ENCOUNTER_ID) — the impact view wants both
+    assert {row["a"] for row in r["rows"]} == {"#ADT", "#Base_Pop"}
+    assert all(row["edge"].startswith("via ") for row in r["rows"])
+    assert r["counts"]["population"] == 44
+
+
+def test_scope_neighborhood_cites_join_evidence(world):
+    read, entries, _, adj, directed = world
+    r = mc.answer_question("#Base_Pop", None, entries, None,
+                           read, adj, directed)
+    assert r["mode"] == "neighborhood"
+    assert any(line.startswith("[join]") and "—" in line
+               for line in r["evidence"])
+
+
+def test_connection_walks_through_a_join(world):
+    read, entries, _, adj, directed = world
+    r = mc.answer_question("#Base_Pop ED_ENCOUNTERS_FACT", None,
+                           entries, None, read, adj, directed)
+    assert r["mode"] == "connection"
+    assert not r["gaps"]
+    assert r["gql"] and any(":join" in g for g in r["gql"])
+
+
 # ---- the glossary chain (the machinery lives in flows/glossary;
 # tests/aivia/test_glossary.py owns it — this proves the CONSOLE
 # INDEX carries the blessed expansions end-to-end) -------------------
@@ -546,6 +610,20 @@ BATTERY = [
      "IF i update the column ENCOUNTER_ID, which tables are "
      "impacted?",
      ["ED_ENCOUNTERS_FACT", "HOSPITAL_ENCOUNTERS"]),
+    # ---- THE JOIN-LAYER FAMILY (the second target — DRAFTED
+    # 2026-09-11 for Sunny's gap-check; his pass pins them) ----
+    ("scope-meaning",
+     "what does the #Base_Pop selection mean?",
+     ["#Base_Pop"]),
+    ("scope-enumeration",
+     "which scopes read ADT_EVENTS?",
+     ["#ADT"]),
+    ("scope-reads",
+     "which tables does the #AllMeds selection use?",
+     ["MEDICATION_ORDERS", "MED_ADMIN_RECORDS"]),
+    ("relationship",
+     "how do #AllMeds and MEDICATION_ORDERS connect?",
+     ["#AllMeds", "MEDICATION_ORDERS"]),
 ]
 
 

@@ -1047,7 +1047,37 @@ MATCHED GRAPH DRIVE THE QUERY AND THE DELIVERY.
 Acceptance: "show me all tables that use EVENT_ID" returns
 exactly the four carriers (ADT_EVENTS · ED_EVENT_INFO ·
 ED_PATIENT_INFO · V_PATIENT_LOCATION_HISTORY) as rows with the
-enumerating GQL. RULED same day — THE KIND-SUBSUMPTION RULE
+enumerating GQL.
+
+► RULED (Sunny, 2026-09-11 — THE SECOND TARGET: the join layer,
+M2, per the batch-earns-the-console law): the console's scope
+extends to M2's accepted grains.
+- **Scopes join the index**: all 44, their FLOORS are the speech
+  (verbatim law); the `_self scope` kind card joins so
+  "scopes/selections" ground as the kind.
+- **Joins are CONNECTIVE STRUCTURE, never indexed**: a join node
+  carries its ON text, joinType, and description as EVIDENCE for
+  the connections it makes — planner food, not search targets.
+- **THE PASS-THROUGH RULE**: a scope and a table are CONNECTED
+  when a join links them (scope —has_part→ join
+  —left_side/right_side→ table-or-scope). Enumeration and
+  pathfinding treat the two hops THROUGH a join as ONE
+  connection; the row cites the join's ON meaning ("via join#1:
+  EEF.ENCOUNTER_ID = HE.ENCOUNTER_ID"). The `reads` remainder
+  (6 edges) stays a direct connection.
+- **Conditions stay counted-out until §D** (the standing
+  decision holds; their index entries remain visible exclusions).
+- **Edge-kind cards for the join layer are DEFERRED with the
+  recorded reason** (the Echo-Law deferral form): a user's
+  "read" grounding as a `reads` traversal constraint would VETO
+  the side-path connections (only 6 of the ~180 scope-table
+  links are `reads` edges) — the constraint law must first learn
+  pass-through before these words may constrain. Until then
+  has_part/joins_to remain the only edge-kind cards.
+- **Battery**: a drafted join-layer family lands for Sunny's
+  gap-check; his pass pins them (the blessed-by-use path).
+
+RULED same day — THE KIND-SUBSUMPTION RULE
 (from measured scores: 'tables' → kind 1.576 vs top
 table-instance 1.760, the gap entirely the instances' own label
 cards): same-labeled instances outscoring their kind is CIRCULAR
