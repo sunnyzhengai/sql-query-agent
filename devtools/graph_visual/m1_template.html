@@ -421,15 +421,6 @@ window.pin = function(n){
 // worked in Sunny's shell — canvas-targeted listeners die there
 // (likely an injected overlay). Window listeners see everything;
 // the guard keeps panel/card/header interactions native.
-const EVC = {cv:0, win:0, dn:0, hit:'—'};
-const evline = document.createElement('div');
-evline.className = 'note';
-evline.style.cssText = 'padding-top:6px;color:#8b8a80;font-size:10px';
-document.getElementById('panel').appendChild(evline);
-const evshow = () => evline.textContent =
-  `diag — win:${EVC.win} cv:${EVC.cv} down:${EVC.dn} hit:${EVC.hit}`;
-evshow();
-CV.addEventListener('mousemove', ()=>{EVC.cv++;});
 const inUI = e => e.target && e.target.closest &&
   e.target.closest('#panel,#card,header,input');
 const onDown = e => {
@@ -443,7 +434,6 @@ const onDown = e => {
   px=gx=e.clientX; py=gy=e.clientY;
 };
 const onMove = e => {
-  EVC.win++;
   if(down && !dragging && !panning &&
      Math.hypot(e.clientX-gx, e.clientY-gy) > 4){
     // every node is a free body — columns drag at any zoom
@@ -462,16 +452,13 @@ const onMove = e => {
     px=e.clientX; py=e.clientY; draw(); return;
   }
   px=e.clientX; py=e.clientY;
-  if(inUI(e)){ if(hover){hover=null; draw();} showTip(null,0,0); evshow(); return; }
+  if(inUI(e)){ if(hover){hover=null; draw();} showTip(null,0,0); return; }
   const n = nodeAt(e.clientX, e.clientY);
-  EVC.hit = n ? n.k+':'+n.n.slice(0,14) : '—';
   if(n!==hover){hover=n; draw();}
   showTip(n, e.clientX, e.clientY);
-  evshow();
 };
 addEventListener('mousemove', onMove);
 addEventListener('mousedown', e=>{
-  EVC.dn++; evshow();
   if(inUI(e)) return;
   onDown(e);
 });
