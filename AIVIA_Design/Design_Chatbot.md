@@ -919,6 +919,13 @@ resolution, it is on screen (L5-D3, L6-D1). No settings that let
 the system tune itself (L7-D4).
 
 ## THE MEANING-TEST CONSOLE — the ruled five-step algorithm
+
+*(READ WITH THE ► RIDERS at this section's end — same-day rulings
+2026-09-11 superseded parts of the body below: THE MATCHED GRAPH
+killed the crown rule and made the minimal connecting subgraph
+the FALLBACK, not the default; the label constraint, kind
+subsumption, and THE CHOICE STEP were added to step 3. The body
+stands as the ruled starting point; the riders are current law.)*
 (Sunny, 2026-09-11; the L4 ruling in Design_Graph_Engine.md names
 this section as its algorithm. Purpose: MEANING testing of each
 ACCEPTED ladder batch — readability, findability, grounding.
@@ -979,12 +986,16 @@ test; exclusions are COUNTED in the coverage line, never silent.
 First target: THE TECHNICAL LAYER (table · column instances;
 db/db_schema/table/column kinds; joins_to/has_part edge kinds).
 
-**The pinned battery (test-first):** ~8 questions across five
-families — findability · meaning readback · column search ·
-relationship grounding · absence honesty — each with an expected
-crown; deterministic pipeline parts tested keyless; the live
-seats under the live-seat rule. Sunny gap-checks and blesses the
-battery; regressions surface mechanically thereafter.
+**The pinned battery (test-first):** questions with expected
+crowns across the families — findability · meaning readback ·
+column search · relationship grounding · absence honesty ·
+enumeration · impact — deterministic pipeline parts tested
+keyless; the live seats under the live-seat rule. Sunny
+gap-checks and blesses the battery; regressions surface
+mechanically thereafter. *(Status 2026-09-11: 14 questions —
+the 8 drafted + SUNNY'S SIX, hand-tested on the web UI and
+pinned; 14/14 live. The six are blessed by use; the drafted 8
+pass but still await his explicit word.)*
 
 ► RULED (Sunny, 2026-09-11, from the ADT_EVENT rounds): TWO
 riders on step 3. (1) THE LABEL CONSTRAINT WIRED: a token that

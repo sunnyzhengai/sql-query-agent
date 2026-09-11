@@ -328,7 +328,10 @@ MEANING FINDING:** `WRONG_MED_ALT_CNT` cannot be found by meaning
 description speaks NDC/CNR jargon; the dev estate has no blessed
 acronyms. The fix is governance (bless the acronyms) or richer
 speech — never a matcher hack. Battery awaits Sunny's gap-check
-and blessing.
+and blessing. *(SUPERSEDED same day: the crown-era planner died
+with THE MATCHED GRAPH ruling below; the finding closed —
+alt=ALERT blessed, question re-drafted, battery 8/8 then 14/14
+with Sunny's six pinned — the blessing EARNED BY USE.)*
 **THE BLESSING SEED (built 2026-09-11, the finding's remedy
 path):** the ruled `acronym_blessings.json` (Sunny's 2026-09-09
 curated blessing — 112 acronyms; 33 uncertain tokens held in

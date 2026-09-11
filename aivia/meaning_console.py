@@ -3,19 +3,28 @@
 per ACCEPTED ladder batch, over the store-as-built. First target:
 THE TECHNICAL LAYER (M1–M3 accepted 2026-09-11).
 
-The five ruled steps: (1) an NL question — (2) the LLM interprets
-and TOKENIZES, its only seat — (3) token vectors search the card
-index → match sets with visible scores — (4) the matches drive a
-DETERMINISTIC PLANNER that writes a GRAPH query (the minimal
-connecting subgraph: union of shortest paths; the LLM never writes
-queries) — (5) all relevant results return as arranged evidence,
-absence honest. The GQL text is a displayed ARTIFACT (paste-able
-into Fabric); execution is LOCAL over the store until M12 lands
-vectors on node rows.
+The loop (THE MATCHED GRAPH, ruled same day — the crown rule is
+dead): (1) an NL question — (2) the LLM interprets and TOKENIZES,
+its only seat — (3) SET FORMATION: each token's match is a SET
+(exact hits all equal citizens; semantic hits the band =
+MATCH_SCORE + UNIQUE_MARGIN), the label constraint shapes it
+before banding (proposal, never a veto), a kind claims its token
+by subsumption, a PIN (the human act) replaces the set — (4) THE
+SHAPE LADDER, deterministic: connected sets ENUMERATE their
+existing edges · disconnected sets pathfind (the minimal
+connecting subgraph is the FALLBACK for missing structure) · one
+member = neighborhood · one set many members = the list · nothing
+= the honest zero; the GQL is a displayed ARTIFACT (paste-able
+into Fabric), executed LOCALLY until M12 lands vectors on node
+rows — (5) DELIVERY BY RESULT SHAPE: rows render as a table
+(visible cap, counted remainder, the conservation line), plus THE
+TURN DEFAULT: every round OFFERS the runners-up; a click pins and
+re-runs.
 
-Three match classes: INSTANCE → anchor · KIND (the _self speech
-rows) → label constraint · EDGE-KIND (Shape_Ledger edge rows) →
-traversal constraint. Kinds ground by meaning, never word lists.
+Three match classes: INSTANCE → set member · KIND (the _self
+speech rows) → label constraint / population by subsumption ·
+EDGE-KIND (Shape_Ledger edge rows) → traversal constraint. Kinds
+ground by meaning, never word lists.
 
 Usage: python3.11 -m aivia.meaning_console [estate] [port]
 """
