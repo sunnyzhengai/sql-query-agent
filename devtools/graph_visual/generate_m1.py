@@ -66,7 +66,7 @@ for it in range(900):
             dy = pos[i][1] - pos[j][1]
             d2 = dx * dx + dy * dy + 0.01
             d = math.sqrt(d2)
-            mind = rad[i] + rad[j] + 130
+            mind = rad[i] + rad[j] + 700
             rep = 300000 / d2 + (max(0, mind - d) * 0.9)
             fx[i] += dx / d * rep
             fy[i] += dy / d * rep
@@ -76,7 +76,7 @@ for it in range(900):
         dx = pos[b][0] - pos[a][0]
         dy = pos[b][1] - pos[a][1]
         d = math.sqrt(dx * dx + dy * dy) + 0.01
-        rest = rad[a] + rad[b] + 220
+        rest = rad[a] + rad[b] + 700
         f = 0.012 * (d - rest)
         fx[a] += dx / d * f
         fy[a] += dy / d * f
@@ -84,10 +84,10 @@ for it in range(900):
         fy[b] -= dy / d * f
     for i, row in enumerate(tables):
         k = sid.get(schema_of_table.get(row.nodeId), 0)
-        ax = 1500 * math.cos(k * 2.1 + 1.0)
-        ay = 1500 * math.sin(k * 2.1 + 1.0)
-        fx[i] += (ax - pos[i][0]) * 0.0007
-        fy[i] += (ay - pos[i][1]) * 0.0007
+        ax = 3800 * math.cos(k * 2.1 + 1.0)
+        ay = 3800 * math.sin(k * 2.1 + 1.0)
+        fx[i] += (ax - pos[i][0]) * 0.0003
+        fy[i] += (ay - pos[i][1]) * 0.0003
         step = min(28.0, 0.9 * (1 - it / 900) + 0.08) * 18
         mag = math.sqrt(fx[i] ** 2 + fy[i] ** 2) + 1e-9
         lim = min(mag, step)
@@ -104,7 +104,7 @@ for _ in range(400):
             dx = pos[j][0] - pos[i][0]
             dy = pos[j][1] - pos[i][1]
             d = math.sqrt(dx * dx + dy * dy) + 1e-9
-            need = rad[i] + rad[j] + 180
+            need = rad[i] + rad[j] + 700
             if d < need:
                 push = (need - d) / 2 + 0.5
                 pos[i][0] -= dx / d * push
@@ -117,7 +117,7 @@ for _ in range(400):
 worst = min(
     math.dist(pos[i], pos[j]) - rad[i] - rad[j]
     for i in range(N) for j in range(i + 1, N))
-assert worst >= 179, f"disc overlap remains: {worst:.1f}"
+assert worst >= 699, f"disc overlap remains: {worst:.1f}"
 print(f"collision pass: min inter-disc gap {worst:.1f} world units")
 
 # ---- emit nodes ----------------------------------------------
