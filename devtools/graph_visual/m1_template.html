@@ -159,6 +159,8 @@ const sx = n => n.x*scale + ox, sy = n => n.y*scale + oy;
 const hi = n => {                      // highlight membership
   if(!pinned) return true;
   if(n===pinned) return true;
+  if(pinned.k==='column')
+    return n.k==='table' && n.i===pinned.t;
   if(n.k==='column' && T[n.t]===pinned) return true;
   if(n.k==='table'&&pinned.k==='table')
     return joinsOf(pinned.i).some(j=>j.a===n.i||j.b===n.i);
@@ -266,9 +268,11 @@ function nodeAt(mx,my){
   let best=null, bd=13;
   for(const n of nodes){
     if(!show[n.k==='schema'?'schema':n.k]) continue;
-    if(n.k==='column' && scale<.45) continue;
     const d = Math.hypot(sx(n)-mx, sy(n)-my);
-    if(d<bd){bd=d; best=n;}
+    // bigger grains win ties so a table stays clickable inside
+    // its column disc
+    const dd = n.k==='column' ? d : d-3;
+    if(dd<bd){bd=dd; best=n;}
   }
   return best;
 }
@@ -297,6 +301,24 @@ const card = document.getElementById('card'),
 window.pin = function(n){
   pinned = n;
   if(!n){card.style.display='none'; draw(); return;}
+  if(n.k==='column'){
+    const t = T[n.t];
+    const used = joinsOf(t.i).filter(j=>
+      j.on.split(/[=;]/).map(s=>s.trim()).includes(n.n));
+    const js = used.map(j=>{
+      const other = T[j.a===t.i ? j.b : j.a];
+      return `<div class="jrow"><b>${other.n}</b><br>
+        <span class="on">on ${j.on}</span></div>`;
+    }).join('') || `<div class="jrow">not part of a declared join key</div>`;
+    cardBody.innerHTML = `<div class="k">COLUMN</div>
+      <h3><span class="dot" style="background:${COLORS.column};width:9px;
+      height:9px;border-radius:50%;display:inline-block"></span>${n.n}</h3>
+      <div class="d">${n.d||'<i>no description</i>'}</div>
+      <div class="sec">IN TABLE (has_part)</div>
+      <div class="jrow"><b>${t.n}</b></div>
+      <div class="sec">DECLARED JOINS USING THIS COLUMN</div>${js}`;
+    card.style.display='block'; draw(); return;
+  }
   const js = joinsOf(n.i).map(j=>{
     const other = T[j.a===n.i ? j.b : j.a];
     const dir = j.a===n.i ? '→' : '←';
@@ -315,7 +337,7 @@ window.pin = function(n){
 // ---- interactions -------------------------------------------
 CV.addEventListener('mousedown', e=>{
   const n = nodeAt(e.clientX, e.clientY);
-  if(n && (n.k==='table'||n.k==='schema'||n.k==='db')){dragging=n;}
+  if(n){dragging=n;}
   else {panning=true; CV.classList.add('drag');}
   px=gx=e.clientX; py=gy=e.clientY;
 });
@@ -335,7 +357,8 @@ addEventListener('mousemove', e=>{
 });
 addEventListener('mouseup', e=>{
   const clicked = Math.hypot(e.clientX-gx, e.clientY-gy) < 4;
-  if(dragging && clicked && dragging.k==='table') pin(dragging);
+  if(dragging && clicked &&
+     (dragging.k==='table'||dragging.k==='column')) pin(dragging);
   else if(panning && clicked && !nodeAt(e.clientX,e.clientY)) pin(null);
   dragging=null; panning=false; CV.classList.remove('drag');
 });
