@@ -1,0 +1,365 @@
+<title>AIVIA Graph — M1 (technical layer)</title>
+<style>
+  :root{
+    --bg:#1a1a19; --panel:#222320; --panel2:#2a2b28; --line:#3a3b37;
+    --ink:#f2f1ea; --ink2:#c3c2b7; --ink3:#8b8a80;
+    --table:#d95926; --column:#199e70; --schema:#3987e5; --db:#d55181;
+    --join:#eda100; --haspart:#54554f;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;overflow:hidden}
+  body{background:var(--bg);color:var(--ink);
+    font:13px/1.45 ui-monospace,'SF Mono',Menlo,Consolas,monospace}
+  canvas{position:absolute;inset:0;cursor:grab}
+  canvas.drag{cursor:grabbing}
+  header{position:absolute;top:0;left:0;right:0;z-index:5;
+    display:flex;align-items:baseline;gap:14px;padding:12px 18px;
+    background:linear-gradient(var(--bg) 55%,transparent);pointer-events:none}
+  header h1{font-size:15px;font-weight:700;letter-spacing:.02em}
+  header .sub{color:var(--ink3);font-size:12px}
+  .chips{display:flex;gap:8px;margin-left:auto;pointer-events:auto}
+  .chip{background:var(--panel);border:1px solid var(--line);
+    border-radius:3px;padding:2px 8px;font-size:11px;color:var(--ink2);
+    font-variant-numeric:tabular-nums}
+  .chip b{color:var(--ink)}
+  #panel{position:absolute;top:56px;left:14px;z-index:5;width:238px;
+    background:var(--panel);border:1px solid var(--line);border-radius:4px;
+    padding:12px 14px;user-select:none}
+  #panel h2{font-size:10px;letter-spacing:.14em;color:var(--ink3);
+    margin-bottom:8px}
+  .lay{display:flex;align-items:center;gap:8px;padding:3px 0;
+    font-size:12px;color:var(--ink2);cursor:pointer}
+  .lay input{accent-color:var(--ink2)}
+  .dot{width:9px;height:9px;border-radius:50%;flex:none}
+  .dash{width:14px;height:0;border-top:2px solid var(--haspart);flex:none}
+  .dash.j{border-top:2px solid var(--join)}
+  .lay .cnt{margin-left:auto;color:var(--ink3);
+    font-variant-numeric:tabular-nums}
+  #panel .rule{border-top:1px solid var(--line);margin:10px -14px}
+  #panel .note{font-size:11px;color:var(--ink3);padding-top:9px;
+    line-height:1.5}
+  #search{width:100%;margin-top:9px;background:var(--panel2);
+    border:1px solid var(--line);border-radius:3px;color:var(--ink);
+    font:inherit;padding:5px 8px}
+  #search:focus{outline:1px solid var(--ink3)}
+  #tip{position:absolute;z-index:9;max-width:300px;pointer-events:none;
+    background:var(--panel2);border:1px solid var(--line);border-radius:4px;
+    padding:8px 10px;display:none;box-shadow:0 4px 18px #0007}
+  #tip .k{font-size:10px;letter-spacing:.12em;color:var(--ink3)}
+  #tip .n{font-weight:700;margin:1px 0 3px;display:flex;gap:7px;
+    align-items:center}
+  #tip .d{color:var(--ink2);font-size:12px}
+  #tip .m{color:var(--ink3);font-size:11px;margin-top:4px}
+  #card{position:absolute;top:56px;right:14px;z-index:5;width:295px;
+    max-height:calc(100% - 90px);overflow-y:auto;background:var(--panel);
+    border:1px solid var(--line);border-radius:4px;padding:13px 15px;
+    display:none}
+  #card .k{font-size:10px;letter-spacing:.14em;color:var(--ink3)}
+  #card h3{font-size:14px;margin:2px 0 6px;display:flex;gap:8px;
+    align-items:center}
+  #card .d{color:var(--ink2);font-size:12px;margin-bottom:9px}
+  #card .sec{font-size:10px;letter-spacing:.12em;color:var(--ink3);
+    margin:10px 0 4px}
+  #card .jrow{font-size:11.5px;color:var(--ink2);padding:2.5px 0;
+    border-bottom:1px dotted var(--line)}
+  #card .jrow b{color:var(--ink)}
+  #card .on{color:var(--join)}
+  #card .x{position:absolute;top:8px;right:11px;color:var(--ink3);
+    cursor:pointer;font-size:14px}
+  @media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+<header>
+  <h1>AIVIA graph — M1</h1>
+  <div class="sub">the technical layer, rendered from the store's export
+    parquets · hover for descriptions · click a table for its joins</div>
+  <div class="chips" id="chips"></div>
+</header>
+<div id="panel">
+  <h2>LAYERS</h2>
+  <label class="lay"><input type="checkbox" data-l="table" checked>
+    <span class="dot" style="background:var(--table)"></span>table
+    <span class="cnt" id="c-table"></span></label>
+  <label class="lay"><input type="checkbox" data-l="column" checked>
+    <span class="dot" style="background:var(--column)"></span>column
+    <span class="cnt" id="c-column"></span></label>
+  <label class="lay"><input type="checkbox" data-l="schema" checked>
+    <span class="dot" style="background:var(--schema)"></span>db_schema
+    <span class="cnt" id="c-schema"></span></label>
+  <label class="lay"><input type="checkbox" data-l="db" checked>
+    <span class="dot" style="background:var(--db)"></span>db
+    <span class="cnt">1</span></label>
+  <label class="lay"><input type="checkbox" data-l="haspart" checked>
+    <span class="dash"></span>has_part
+    <span class="cnt" id="c-haspart"></span></label>
+  <label class="lay"><input type="checkbox" data-l="joins" checked>
+    <span class="dash j"></span>joins_to
+    <span class="cnt" id="c-joins"></span></label>
+  <input id="search" placeholder="find a table… (Enter)">
+  <div class="rule"></div>
+  <div class="note">every node and edge is a store row — no
+    hand-authored data. joins_to is DICTIONARY-DECLARED (joins.csv →
+    KG1 intake), never derived from SQL. drag to pan · wheel to zoom ·
+    drag nodes to rearrange.</div>
+</div>
+<div id="tip"></div>
+<div id="card"><span class="x" onclick="pin(null)">✕</span>
+  <div id="cardBody"></div></div>
+<canvas id="cv"></canvas>
+<script>
+const DATA = /*__DATA__*/{};
+const CV = document.getElementById('cv'), CTX = CV.getContext('2d');
+const COLORS = {table:'#d95926', column:'#199e70', schema:'#3987e5',
+                db:'#d55181', join:'#eda100', haspart:'#54554f'};
+const INK = '#f2f1ea', INK2 = '#c3c2b7', INK3 = '#8b8a80';
+let W, H, dpr = window.devicePixelRatio || 1;
+let scale = 0.14, ox = 0, oy = 0;   // world→screen: s = w*scale + o
+const show = {table:1, column:1, schema:1, db:1, haspart:1, joins:1};
+let hover = null, pinned = null, dragging = null, panning = false;
+let px = 0, py = 0;
+
+// ---- flatten nodes ------------------------------------------
+const nodes = [];
+DATA.tables.forEach((n,i)=>nodes.push({k:'table', i, ...n, r:7}));
+DATA.cols.forEach((n,i)=>nodes.push({k:'column', i, ...n, r:2.6}));
+DATA.schemas.forEach((n,i)=>nodes.push({k:'schema', i, ...n, r:9}));
+nodes.push({k:'db', i:0, ...DATA.db, r:11});
+const T = nodes.filter(n=>n.k==='table');
+const joinsOf = i => DATA.joins.filter(j=>j.a===i||j.b===i);
+
+document.getElementById('c-table').textContent = DATA.tables.length;
+document.getElementById('c-column').textContent = DATA.cols.length;
+document.getElementById('c-schema').textContent = DATA.schemas.length;
+document.getElementById('c-haspart').textContent = DATA.counts.hasPart;
+document.getElementById('c-joins').textContent = DATA.counts.joins;
+document.getElementById('chips').innerHTML =
+  `<span class="chip"><b>${DATA.counts.nodes}</b> nodes</span>`+
+  `<span class="chip"><b>${DATA.counts.edges}</b> edges</span>`+
+  `<span class="chip"><b>${DATA.counts.joins}</b> joins_to</span>`+
+  `<span class="chip"><b>${DATA.counts.described}</b> described</span>`;
+
+function resize(){
+  W = innerWidth; H = innerHeight;
+  CV.width = W*dpr; CV.height = H*dpr;
+  CV.style.width = W+'px'; CV.style.height = H+'px';
+  CTX.setTransform(dpr,0,0,dpr,0,0);
+}
+addEventListener('resize', ()=>{resize(); draw();});
+resize();
+// fit world
+(function fit(){
+  let xs=nodes.map(n=>n.x), ys=nodes.map(n=>n.y);
+  const mx=Math.min(...xs), Mx=Math.max(...xs),
+        my=Math.min(...ys), My=Math.max(...ys);
+  scale = Math.min((W-320)/(Mx-mx+400), (H-120)/(My-my+400));
+  ox = W/2 - (mx+Mx)/2*scale + 60; oy = H/2 - (my+My)/2*scale + 20;
+})();
+
+const sx = n => n.x*scale + ox, sy = n => n.y*scale + oy;
+const hi = n => {                      // highlight membership
+  if(!pinned) return true;
+  if(n===pinned) return true;
+  if(n.k==='column' && T[n.t]===pinned) return true;
+  if(n.k==='table'&&pinned.k==='table')
+    return joinsOf(pinned.i).some(j=>j.a===n.i||j.b===n.i);
+  return false;
+};
+
+function draw(){
+  CTX.clearRect(0,0,W,H);
+  CTX.lineWidth = 1;
+  // has_part: db→schema, schema→table, table→column
+  if(show.haspart){
+    CTX.strokeStyle = COLORS.haspart; CTX.globalAlpha = .35;
+    CTX.beginPath();
+    if(show.db && show.schema) DATA.schemas.forEach(s=>{
+      CTX.moveTo(sx(nodes[nodes.length-1]), sy(nodes[nodes.length-1]));
+      CTX.lineTo(s.x*scale+ox, s.y*scale+oy);});
+    if(show.schema && show.table) DATA.schemas.forEach(s=>
+      s.tt.forEach(ti=>{const t=T[ti];
+        CTX.moveTo(s.x*scale+ox, s.y*scale+oy);
+        CTX.lineTo(sx(t), sy(t));}));
+    CTX.stroke();
+    if(show.table && show.column && scale > .5){
+      CTX.globalAlpha = .22; CTX.beginPath();
+      DATA.cols.forEach(c=>{const t=T[c.t];
+        if(pinned && !(t===pinned||hi(t))) return;
+        CTX.moveTo(sx(t), sy(t));
+        CTX.lineTo(c.x*scale+ox, c.y*scale+oy);});
+      CTX.stroke();
+    }
+    CTX.globalAlpha = 1;
+  }
+  // joins_to
+  if(show.joins && show.table){
+    DATA.joins.forEach(j=>{
+      const a=T[j.a], b=T[j.b];
+      const lit = !pinned || a===pinned || b===pinned;
+      CTX.strokeStyle = COLORS.join;
+      CTX.globalAlpha = lit ? (pinned? .9 : .5) : .08;
+      CTX.lineWidth = lit && pinned ? 2 : 1.2;
+      CTX.beginPath(); CTX.moveTo(sx(a),sy(a));
+      CTX.lineTo(sx(b),sy(b)); CTX.stroke();
+    });
+    CTX.globalAlpha = 1; CTX.lineWidth = 1;
+  }
+  // nodes
+  nodes.forEach(n=>{
+    if(!show[n.k==='schema'?'schema':n.k]) return;
+    const lit = hi(n);
+    CTX.globalAlpha = lit ? 1 : .13;
+    CTX.fillStyle = COLORS[n.k];
+    const r = n.k==='column' ? Math.max(1.4, n.r*Math.min(scale*2.2,1.6))
+                             : n.r;
+    CTX.beginPath();
+    CTX.arc(sx(n), sy(n), r, 0, 7); CTX.fill();
+    if(n===hover || n===pinned){
+      CTX.strokeStyle = INK; CTX.lineWidth = 1.5;
+      CTX.beginPath(); CTX.arc(sx(n),sy(n),r+2.5,0,7);
+      CTX.stroke(); CTX.lineWidth = 1;
+    }
+  });
+  // labels — greedy culling: forced labels first (db/schema/pin/
+  // hover/join-neighbors), then tables by column count; a label
+  // that would overlap an already-placed one is skipped
+  CTX.globalAlpha = 1; CTX.textBaseline = 'middle';
+  const placed = [];
+  const fits = (x,y,w)=>{
+    for(const r of placed)
+      if(x < r.x+r.w && x+w > r.x && Math.abs(y-r.y) < 13) return false;
+    placed.push({x,y,w}); return true;
+  };
+  const lbl = (n,size,bold,color,force)=>{
+    CTX.font = `${bold?'700 ':''}${size}px ui-monospace,Menlo,monospace`;
+    const w = CTX.measureText(n.n).width;
+    const x = sx(n)+n.r+5, y = sy(n);
+    if(x<-w||x>W||y<-8||y>H+8) return;
+    if(!force && !fits(x,y,w)) return;
+    if(force) placed.push({x,y,w});
+    CTX.fillStyle = color;
+    CTX.fillText(n.n, x, y);
+  };
+  nodes.forEach(n=>{
+    if(n.k==='db'&&show.db) lbl(n,12,true,INK,true);
+    if(n.k==='schema'&&show.schema) lbl(n,12,true,INK,true);
+  });
+  if(hover) lbl(hover, hover.k==='column'?10:11, hover.k==='table',
+                INK, true);
+  if(pinned && show.table)
+    T.forEach(n=>{ if(hi(n)) lbl(n,11,true,INK,true); });
+  if(show.table && !pinned)
+    [...T].sort((a,b)=>b.nc-a.nc).forEach(n=>{
+      if(n===hover) return;
+      lbl(n,11,true, INK2, false);
+    });
+  if(show.column && scale>2.0)
+    nodes.forEach(n=>{
+      if(n.k!=='column'||n===hover) return;
+      if(pinned && !hi(n)) return;
+      lbl(n,10,false,INK3,false);
+    });
+  CTX.globalAlpha = 1;
+}
+
+// ---- hit test / tooltip -------------------------------------
+function nodeAt(mx,my){
+  let best=null, bd=13;
+  for(const n of nodes){
+    if(!show[n.k==='schema'?'schema':n.k]) continue;
+    if(n.k==='column' && scale<.45) continue;
+    const d = Math.hypot(sx(n)-mx, sy(n)-my);
+    if(d<bd){bd=d; best=n;}
+  }
+  return best;
+}
+const tip = document.getElementById('tip');
+function showTip(n, mx, my){
+  if(!n){tip.style.display='none'; return;}
+  const kind = {table:'TABLE', column:'COLUMN', schema:'DB_SCHEMA',
+                db:'DB'}[n.k];
+  let meta = '';
+  if(n.k==='table') meta = `pk: ${n.pk||'—'} · ${n.nc} columns · `+
+    `${joinsOf(n.i).length} declared joins`;
+  if(n.k==='column') meta = `in ${T[n.t].n}`;
+  tip.innerHTML = `<div class="k">${kind}</div>
+    <div class="n"><span class="dot" style="background:${COLORS[n.k]};
+    width:8px;height:8px;border-radius:50%;display:inline-block"></span>
+    ${n.n}</div>
+    <div class="d">${n.d||'<i>no description (none-ruled)</i>'}</div>
+    ${meta?`<div class="m">${meta}</div>`:''}`;
+  tip.style.display='block';
+  tip.style.left = Math.min(mx+16, W-320)+'px';
+  tip.style.top = Math.min(my+14, H-140)+'px';
+}
+// ---- pin card -----------------------------------------------
+const card = document.getElementById('card'),
+      cardBody = document.getElementById('cardBody');
+window.pin = function(n){
+  pinned = n;
+  if(!n){card.style.display='none'; draw(); return;}
+  const js = joinsOf(n.i).map(j=>{
+    const other = T[j.a===n.i ? j.b : j.a];
+    const dir = j.a===n.i ? '→' : '←';
+    return `<div class="jrow">${dir} <b>${other.n}</b><br>
+      <span class="on">on ${j.on}</span></div>`;
+  }).join('') || `<div class="jrow">no declared joins</div>`;
+  cardBody.innerHTML = `<div class="k">TABLE</div>
+    <h3><span class="dot" style="background:${COLORS.table};width:9px;
+    height:9px;border-radius:50%;display:inline-block"></span>${n.n}</h3>
+    <div class="d">${n.d||''}</div>
+    <div class="sec">PK</div><div class="jrow">${n.pk||'—'}</div>
+    <div class="sec">COLUMNS</div><div class="jrow">${n.nc} (has_part)</div>
+    <div class="sec">JOINS_TO — dictionary-declared, with keys</div>${js}`;
+  card.style.display='block'; draw();
+};
+// ---- interactions -------------------------------------------
+CV.addEventListener('mousedown', e=>{
+  const n = nodeAt(e.clientX, e.clientY);
+  if(n && (n.k==='table'||n.k==='schema'||n.k==='db')){dragging=n;}
+  else {panning=true; CV.classList.add('drag');}
+  px=e.clientX; py=e.clientY;
+});
+addEventListener('mousemove', e=>{
+  const dx=e.clientX-px, dy=e.clientY-py;
+  if(dragging){
+    const wdx=dx/scale, wdy=dy/scale;
+    dragging.x+=wdx; dragging.y+=wdy;
+    if(dragging.k==='table')
+      DATA.cols.forEach(c=>{if(T[c.t]===dragging){c.x+=wdx;c.y+=wdy;}});
+    px=e.clientX; py=e.clientY; draw(); return;
+  }
+  if(panning){ox+=dx; oy+=dy; px=e.clientX; py=e.clientY; draw(); return;}
+  const n = nodeAt(e.clientX, e.clientY);
+  if(n!==hover){hover=n; draw();}
+  showTip(n, e.clientX, e.clientY);
+});
+addEventListener('mouseup', e=>{
+  if(dragging && Math.hypot(e.clientX-px,e.clientY-py)<3 &&
+     dragging.k==='table') pin(dragging);
+  else if(panning && Math.hypot(e.clientX-px,e.clientY-py)<3 &&
+     !nodeAt(e.clientX,e.clientY)) pin(null);
+  dragging=null; panning=false; CV.classList.remove('drag');
+});
+CV.addEventListener('wheel', e=>{
+  e.preventDefault();
+  const f = Math.exp(-e.deltaY*0.0012);
+  const wx=(e.clientX-ox)/scale, wy=(e.clientY-oy)/scale;
+  scale = Math.max(.03, Math.min(9, scale*f));
+  ox = e.clientX - wx*scale; oy = e.clientY - wy*scale;
+  draw();
+},{passive:false});
+document.querySelectorAll('#panel input[type=checkbox]').forEach(cb=>
+  cb.addEventListener('change', ()=>{show[cb.dataset.l]=cb.checked?1:0;
+    draw();}));
+document.getElementById('search').addEventListener('keydown', e=>{
+  if(e.key!=='Enter') return;
+  const q = e.target.value.trim().toUpperCase();
+  if(!q) {pin(null); return;}
+  const n = T.find(t=>t.n.toUpperCase().includes(q));
+  if(n){
+    scale = Math.max(scale, 1.1);
+    ox = W/2 - n.x*scale; oy = H/2 - n.y*scale;
+    pin(n);
+  }
+});
+draw();
+</script>

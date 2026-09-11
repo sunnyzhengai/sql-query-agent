@@ -308,6 +308,21 @@ Fabric. M4–M7 keep their contents and numbers.
 | M6 | file — drafted aboutness (LLM compression OF the render, meaning-key anchored) + file—has_part→statement/param + the COMPOSITION CHECK | closes the 31-statement debt | statement + param | queued |
 | M7 | governance + consumption + blessing lands file descriptions ON the store node + zero TARGET rows + final viz | pbi_report descriptions DERIVE via `executes`; + `drift` label; Shape_Ledger amended to the v2 census before this gate | everything | queued |
 
+**THE JOINS_TO LOCK (Sunny's directive 2026-09-10, after the
+third omission):** test_joins_to_lock.py — the dictionary ALONE
+(no estate, no parser) must carry all 65 edges with keys +
+cardinality; the 2 practiced-never-declared pairs must have NO
+edge (never derived from SQL); conservation 68 = 65 + 2 pending
++ 1 collapsed; the export must ship them with the technical
+layer. 6 pins green. **THE GRAPH VISUAL** ships from the store:
+devtools/graph_visual/generate_m1.py reads the export parquets
+(nothing hand-authored) → the M1 page (4648 nodes · 4712 edges ·
+hover descriptions · per-table join cards with keys), published
+as the M1 artifact. FOUND while building it: the export's
+_node_row drops LIST-valued properties — pk_columns never ships
+in graph_table; fix rides the M2 export rebuild (counted in the
+key's _pin_at_build).
+
 DISCREPANCY FLAGGED (Sunny's call at ratification): §E5's
 decisions line says file descriptions "land on the STORE node at
 blessing (M8)" while the M7 row says blessing lands them ON the
