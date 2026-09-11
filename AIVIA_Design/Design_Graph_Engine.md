@@ -221,6 +221,23 @@ chatbot design (`Design_Chatbot.md` — THE SEARCH IS THE ANSWER,
 the nine laws, the seats and cages) remains the governing design
 for this layer and re-derives its index from L3 at convergence.
 
+**THE MEANING-TEST CONSOLE (ruled by Sunny 2026-09-11):** each
+ACCEPTED ladder batch earns a conversational test surface — the
+ask console booted over the store as-built, which scopes it to
+exactly the accepted grains by construction. Its purpose is the
+check the GQL gates cannot make: MEANING QUALITY — are the
+descriptions readable, does NL search find the right node, does
+traversal ground the answer. The division is law: GATES verify
+STRUCTURE (deterministic, exact, they close batches); the console
+tests MEANING (probabilistic, human-judged, it closes nothing).
+Scope clarified same day: the standing ban is the FABRIC DATA
+AGENT specifically — it fabricated answers — never
+chatbot-testing as such. The first target is the TECHNICAL LAYER
+(table/column names + dictionary descriptions — already index-
+carded; embeddings cache-seeded across estates by content key);
+later grains enter the index as §D resumes; L3 re-homes the
+vectors onto node rows at M12.
+
 ---
 
 ## The laws carried forward from v1 (storage-independent, all kept)

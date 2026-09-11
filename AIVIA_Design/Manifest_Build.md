@@ -288,6 +288,27 @@ still-open M2 gate's surface — staged sepsis numbers (312/451) vs
 the dev estate's (44/45); runbook recommends switching to dev
 (the technical layer is identical, M1's verification survives).
 
+**M1–M3 ACCEPTED (Sunny, 2026-09-11):** the full gate sheet ran
+GREEN on the SERVED Fabric graph (censuses 5930/6303 with
+battery-sum closure · per-kind · conservation · degenerate ·
+joinType · spot checks · THE DRIFT QUERY with absence proofs ·
+role-tagged resolution) — evidence in AIVIA_Test/GQL_Gates.md.
+The batches are SEALED: their census rows and tests stand forever;
+changing an accepted grain now requires a design change first.
+
+**THE MEANING-TEST CONSOLE (ruled 2026-09-11, lands after M4/M5):**
+each accepted batch earns the ask console booted over the
+store-as-built — MEANING testing (readability, findability,
+grounding), never structural verification (gates own that; the
+Fabric Data Agent ban stands — it fabricated; chatbot-testing as
+such is ruled IN). EMBEDDING PLAN for the technical layer: the
+index already cards table/column names + dictionary descriptions
+(90 + 4554 entries, dev estate); seed dev's embeddings.json from
+the sepsis cache (content-keyed — technical identities/texts are
+identical), one console boot with the key embeds the delta; M3's
+condition store-grains stay out of the index until §D resumes
+(standing decision); L3/M12 re-homes vectors onto node rows.
+
 **THE M2 REDESIGN (Sunny's rulings 2026-09-10, from the
 hand-drawn structure):** (1) a scope reaches its tables THROUGH
 its join nodes — the direct `reads` edge survives ONLY where no
