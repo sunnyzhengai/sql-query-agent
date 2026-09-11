@@ -227,8 +227,9 @@ against the served graph):** M1+M2+M3 censuses GREEN (5930 nodes
 / 8 labels · 6303 edges / 7 types, battery sum == unfiltered
 total) · per-kind census exact · join-rooted 95 · degenerate 25 ·
 joinType 39/56 · All_LDAs spot GREEN · DRIFT GREEN (2 findings +
-absence proofs). OUTSTANDING: the resolves_to `role` property
-(mapping fix + one refresh), then the roles query.
+absence proofs). ROLES GREEN 2026-09-11 08:07 (Sunny mapped the role
+property on both resolves_to mappings + refresh): subject 119 ·
+comparand 44 · lower_bound 1 · upper_bound 1 — THE SHEET IS 100%.
 
 ### M3 gate — THE CONDITION LAYER [BUILT 2026-09-10,
 store-verified; numbers MEASURED; your GQL on the dev estate
