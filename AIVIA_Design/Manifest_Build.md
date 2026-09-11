@@ -447,6 +447,13 @@ do not"). THE KIND-SUBSUMPTION RULE ruled from measured scores
 (kind 1.576 vs same-label instance 1.760 — circular label-card
 credit; a kind ≥ MATCH_SCORE matching the top instance's label
 claims the token; phrases measured safe at 0.307/rank 2026).
+SUNNY'S WEB-UI GAP-CHECK (same day) surfaced three delivery
+gaps, fixed with tests: list rows now CARRY THE MEANING (a
+"what does X mean" list delivers each member's speech, 4th
+column); same-named pick links OWNER-QUALIFY
+(ADT_EVENTS.BED_STAY_ID vs BED_CONFIG.BED_STAY_ID); the
+neighborhood cap is COUNTED, never silent ("showing 20 of N
+connections — the rest are counted, not lost").
 ACCEPTANCE (Sunny's EVENT_ID round) proven scripted AND live:
 'show me all tables that use EVENT_ID' → enumeration, exactly
 ADT_EVENTS · ED_EVENT_INFO · ED_PATIENT_INFO ·

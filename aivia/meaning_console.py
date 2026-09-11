@@ -400,6 +400,14 @@ def answer_question(question: str, interpret_fn,
     # planner only fills MISSING structure
     rows: List[Dict[str, str]] = []
     counts: Dict[str, Any] = {}
+    capped: Optional[Tuple[int, int]] = None
+    described = {e["identity"]: e for e in entries}
+
+    def _speech(ident: str) -> str:
+        e = described.get(ident)
+        return ((e.get("words") or "").split(". ")[0]
+                if e else "")
+
     # literal: shape
     plan = {"paths": [], "nodes": [], "edges": [], "gaps": [],
             "relaxed": []}
@@ -418,6 +426,7 @@ def answer_question(question: str, interpret_fn,
                     # literal: shape
                     rows.append({"a": nbr.rsplit("|", 1)[-1],
                                  "edge": elbl, "b": m["name"],
+                                 "words": _speech(nbr),
                                  "a_id": nbr,
                                  "b_id": m["identity"]})
         rows.sort(key=lambda r: (r["a"], r["b"]))
@@ -436,7 +445,8 @@ def answer_question(question: str, interpret_fn,
         members = sorted(n.identity for n in read.nodes(kind_label))
         # literal: shape
         rows = [{"a": i.rsplit("|", 1)[-1], "edge": "", "b": "",
-                 "a_id": i, "b_id": ""} for i in members]
+                 "words": _speech(i), "a_id": i, "b_id": ""}
+                for i in members]
         # literal: shape
         counts = {"connected": len(members),
                   "population": len(members), "label": kind_label}
@@ -448,10 +458,13 @@ def answer_question(question: str, interpret_fn,
     elif len(anchors) == 1:
         mode = "neighborhood"
         a = anchors[0]["identity"]
-        plan["nodes"] = [a] + [b for b, _ in adj.get(a, [])][:20]
+        nbrs = adj.get(a, [])
+        if len(nbrs) > 20:      # the visible cap is COUNTED,
+            capped = (20, len(nbrs))  # never silent
+        plan["nodes"] = [a] + [b for b, _ in nbrs][:20]
         plan["edges"] = sorted({(a, b, lbl) if (a, b, lbl) in directed
                                 else (b, a, lbl)
-                                for b, lbl in adj.get(a, [])[:20]})
+                                for b, lbl in nbrs[:20]})
         gql = [f"MATCH (a:{anchors[0]['label']})-[e]-(b) FILTER "
                f"a.name = '{anchors[0]['name']}' "
                "RETURN a.name, b.name"]
@@ -463,6 +476,7 @@ def answer_question(question: str, interpret_fn,
                  "b": (m["identity"].rsplit("|", 2)[-2]
                        if m["identity"].count("|") >= 2 else
                        m["label"]),
+                 "words": (m.get("words") or "").split(". ")[0],
                  "a_id": m["identity"], "b_id": ""}
                 for m in anchors]
         names = sorted({m["name"] for m in anchors})
@@ -481,7 +495,6 @@ def answer_question(question: str, interpret_fn,
         gql = [write_gql(p, directed, label_of)
                for p in plan["paths"]]
     evidence = []
-    described = {e["identity"]: e for e in entries}
     for ident in plan["nodes"]:
         e = described.get(ident)
         if e:
@@ -500,6 +513,7 @@ def answer_question(question: str, interpret_fn,
     return {"question": question, "seat": seat, "tokens": tokens,
             "match_sets": msets, "anchors": anchors,
             "mode": mode, "rows": rows, "counts": counts,
+            "capped": capped,
             "kind_constraints": kind_lines,
             "label_constraint": sorted(allowed_labels),
             "label_relaxed": label_relaxed,
@@ -636,11 +650,17 @@ def render_round(result: Dict[str, Any]) -> str:
             continue
         links = []
         for m in cands:
+            # same-named candidates disambiguate by their owner
+            # (the BED_STAY_ID lesson, 2026-09-11)
+            shown = m["name"]
+            if m["label"] == "column" and m["identity"].count("|") >= 2:
+                shown = (m["identity"].rsplit("|", 2)[-2]
+                         + "." + m["name"])
             links.append(
                 f"<a href='#' class=pick data-q=\"{q_attr}\" "
                 f"data-token=\"{html.escape(mset['token'], quote=True)}\" "
                 f"data-ident=\"{html.escape(m['identity'], quote=True)}\">"
-                + html.escape(f"{m['name']} ({m['label']}, "
+                + html.escape(f"{shown} ({m['label']}, "
                               f"{round(m['score'], 3)})") + "</a>")
         n_all = sum(1 for m in mset["matches"]
                     if m["class"] == "instance")
@@ -681,14 +701,23 @@ def render_round(result: Dict[str, Any]) -> str:
     # the conservation line rides along
     if result.get("rows"):
         cap = result["rows"][:20]
+        with_words = any(r.get("words") for r in cap)
         cells = "".join(
             "<tr><td>" + html.escape(r["a"]) + "</td><td>"
             + html.escape(r["edge"]) + "</td><td>"
-            + html.escape(r["b"]) + "</td></tr>" for r in cap)
+            + html.escape(r["b"]) + "</td>"
+            + (("<td>" + html.escape(r.get("words") or "")
+                + "</td>") if with_words else "")
+            + "</tr>" for r in cap)
         parts.append("<table class=rows>" + cells + "</table>")
         if len(result["rows"]) > len(cap):
             parts.append(f"<p class=meta>showing {len(cap)} of "
                          f"{len(result['rows'])} rows</p>")
+    if result.get("capped"):
+        shown, total = result["capped"]
+        parts.append(f"<p class=meta>neighborhood showing {shown} "
+                     f"of {total} connections — the rest are "
+                     "counted, not lost.</p>")
     c = result.get("counts") or {}
     if c and c.get("connected") != c.get("population"):
         parts.append(f"<p class=meta>{c['connected']} of "

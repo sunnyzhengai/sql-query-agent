@@ -401,6 +401,41 @@ def test_exact_set_keeps_all_equal_citizens(world):
     assert len(r["anchors"]) == 4
 
 
+def test_list_rows_carry_the_meaning(world):
+    # Sunny's BED_STAY_ID round (2026-09-11): 'what does the
+    # column BED_STAY_ID mean' listed name+owner but dropped the
+    # DESCRIPTIONS — a meaning question must deliver the meaning
+    read, entries, _, adj, directed = world
+    r = mc.answer_question("BED_STAY_ID", None, entries, None,
+                           read, adj, directed)
+    assert r["mode"] == "list" and len(r["rows"]) == 2
+    assert all(row["words"] for row in r["rows"])
+    out = mc.render_round(r)
+    assert "serial_number" in out or "bed" in out.lower()
+
+
+def test_same_named_picks_are_owner_qualified(world):
+    read, entries, _, adj, directed = world
+    r = mc.answer_question("BED_STAY_ID", None, entries, None,
+                           read, adj, directed)
+    out = mc.render_round(r)
+    assert "ADT_EVENTS.BED_STAY_ID" in out
+    assert "BED_CONFIG.BED_STAY_ID" in out
+
+
+def test_neighborhood_cap_is_counted_never_silent(world):
+    # the ADT_EVENTS round showed 20 columns with no remainder —
+    # the visible cap must COUNT what it hides
+    read, entries, _, adj, directed = world
+    r = mc.answer_question("ADT_EVENTS", None, entries, None,
+                           read, adj, directed)
+    assert r["mode"] == "neighborhood"
+    shown, total = r["capped"]
+    assert shown == 20 and total > 20
+    assert f"showing 20 of {total} connections" in \
+        mc.render_round(r)
+
+
 def test_kind_alone_lists_its_population(world):
     read, entries, _, adj, directed = world
     kind = next(e for e in entries if e["identity"] == "kind::table")
