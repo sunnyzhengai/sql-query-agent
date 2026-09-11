@@ -120,11 +120,17 @@ let px = 0, py = 0, gx = 0, gy = 0;   // g = gesture start (click test)
 // ---- flatten nodes — ONE live object per node; edges, drags,
 // and dots all read the same objects (the stale-copy split was
 // the detached-schema / immovable-column bug)
-const T = DATA.tables.map((n,i)=>({k:'table', i, ...n, r:7}));
-const C = DATA.cols.map((n,i)=>({k:'column', i, ...n, r:2.6}));
-const S = DATA.schemas.map((n,i)=>({k:'schema', i, ...n, r:9}));
-const DB = {k:'db', i:0, ...DATA.db, r:11};
+const T = DATA.tables.map((n,i)=>({k:'table', i, ...n, r:26}));
+const C = DATA.cols.map((n,i)=>({k:'column', i, ...n, r:8}));
+const S = DATA.schemas.map((n,i)=>({k:'schema', i, ...n, r:34}));
+const DB = {k:'db', i:0, ...DATA.db, r:44};
 const nodes = [...T, ...C, ...S, DB];
+// radii live in WORLD units and scale with zoom (clamped) — fixed
+// pixel dots over world positions made columns collapse UNDER
+// their table at low zoom, which also ate their clicks
+const RMIN = {table:3.5, column:1.2, schema:5, db:6};
+const RMAX = {table:11, column:4.5, schema:13, db:15};
+const nr = n => Math.max(RMIN[n.k], Math.min(RMAX[n.k], n.r*scale));
 const joinsOf = i => DATA.joins.filter(j=>j.a===i||j.b===i);
 
 document.getElementById('c-table').textContent = DATA.tables.length;
@@ -211,8 +217,7 @@ function draw(){
     const lit = hi(n);
     CTX.globalAlpha = lit ? 1 : .13;
     CTX.fillStyle = COLORS[n.k];
-    const r = n.k==='column' ? Math.max(1.4, n.r*Math.min(scale*2.2,1.6))
-                             : n.r;
+    const r = nr(n);
     CTX.beginPath();
     CTX.arc(sx(n), sy(n), r, 0, 7); CTX.fill();
     if(n===hover || n===pinned){
@@ -234,7 +239,7 @@ function draw(){
   const lbl = (n,size,bold,color,force)=>{
     CTX.font = `${bold?'700 ':''}${size}px ui-monospace,Menlo,monospace`;
     const w = CTX.measureText(n.n).width;
-    const x = sx(n)+n.r+5, y = sy(n);
+    const x = sx(n)+nr(n)+5, y = sy(n);
     if(x<-w||x>W||y<-8||y>H+8) return;
     if(!force && !fits(x,y,w)) return;
     if(force) placed.push({x,y,w});
@@ -265,14 +270,13 @@ function draw(){
 
 // ---- hit test / tooltip -------------------------------------
 function nodeAt(mx,my){
-  let best=null, bd=13;
+  // distance to the circle EDGE: you grab whatever the cursor is
+  // visually on, whichever grain it is
+  let best=null, bd=8;
   for(const n of nodes){
     if(!show[n.k==='schema'?'schema':n.k]) continue;
-    const d = Math.hypot(sx(n)-mx, sy(n)-my);
-    // bigger grains win ties so a table stays clickable inside
-    // its column disc
-    const dd = n.k==='column' ? d : d-3;
-    if(dd<bd){bd=dd; best=n;}
+    const d = Math.hypot(sx(n)-mx, sy(n)-my) - nr(n);
+    if(d<bd){bd=d; best=n;}
   }
   return best;
 }

@@ -49,7 +49,7 @@ jpairs = [(tid[r.sourceId], tid[r.targetId], r.onColumns)
 # ---- layout: force sim over the 90 tables --------------------
 N = len(tables)
 ncols = [len(cols_by_table.get(row.nodeId, [])) for row in tables]
-rad = [24 + 3.4 * math.sqrt(max(n, 1)) for n in ncols]  # column disc radius
+rad = [55 + 5.0 * math.sqrt(max(n, 1)) for n in ncols]  # column disc radius
 pos = []
 for i, row in enumerate(tables):
     k = sid.get(schema_of_table.get(row.nodeId), 0)
@@ -107,7 +107,7 @@ for i, row in enumerate(tables):
             tuple(row.nodeId.split("|")[1:3]), [])),
         "nc": ncols[i]})
     for ci, colid in enumerate(sorted(cols_by_table.get(row.nodeId, []))):
-        rr = 16 + 3.4 * math.sqrt(ci + 1)
+        rr = 55 + 5.0 * math.sqrt(ci + 1)
         th = ci * GA
         m = cmeta[colid]
         cnodes.append({
