@@ -372,6 +372,15 @@ SCAN (mechanical: distinct name tokens) → SCRIBE (curation-time
 seat proposes expansions) → BLESS (human approves the batch) →
 acronym nodes.
 
+► RULED (Sunny, 2026-09-11): THE GLOSSARY PROCESS refines this
+pipeline into the five-phase evidence ladder — dictionary-first
+(vendor/org truth is a customer prereq; ours authored), guessing
+last, every scanned token conserved in ONE ledger file
+(`<estate>/glossary/acronym_ledger.json`), the Scribe fed
+evidence and allowed to abstain. Full ruling:
+Ruling_Glossary_Process.md. The acronym NODE shape above is
+unchanged; only the road to blessing changed.
+
 ► RULED (Sunny, 2026-09-09): THE LIVE-SEAT RULE. Wherever
 production calls a model seat, a LIVE test calls the same seat —
 same registry prompt, same estate — so test and prod behavior are

@@ -28,7 +28,7 @@ import urllib.parse
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from typing import Any, Dict, List, Optional, Set, Tuple
 
-from aivia.flows import ask, connect, enrich, grounding
+from aivia.flows import ask, connect, glossary, grounding
 from aivia.graph.read_api import ReadApi
 from aivia.lenses.ask_index import _fold
 
@@ -352,33 +352,6 @@ def seed_cache(src: pathlib.Path, dst: pathlib.Path) -> bool:
     return True
 
 
-# ---- the blessing seed (the ruled file → the governance journal) ----
-def seed_blessings(store, read, base: pathlib.Path) -> int:
-    """THE BLESSING SEED: the estate's acronym_blessings.json (the
-    ruled record — Sunny's curated blessing; uncertain tokens live
-    in acronym_remainder.json until ruled) births acronym nodes
-    through the real write path (enrich.bless), so a journal-wired
-    store writes each blessing as a governance-journal line — the
-    journal is BORN, never copied. Delta by name: acronyms already
-    in the store (a replayed journal) are skipped, so a ruled
-    addition to the file blesses exactly the new names at the next
-    boot."""
-    f = base / "acronym_blessings.json"
-    if not f.is_file():
-        return 0
-    ruled = json.loads(f.read_text())
-    have = {n.properties["name"].lower()
-            for n in read.nodes("acronym")}
-    delta = {name: exps
-             for name, exps in ruled["acronyms"].items()
-             if name.lower() not in have}
-    if not delta:
-        return 0
-    return enrich.bless(store, delta,
-                        approved_by=ruled["approved_by"],
-                        approved_at=ruled["approved_at"])
-
-
 # ---- the surface -----------------------------------------------------
 _PAGE = """<!doctype html><meta charset="utf-8">
 <title>AIVIA — the meaning-test console</title>
@@ -535,10 +508,16 @@ def main() -> None:
                               / estate / "governance"
                               / "journal.jsonl"))
     read = ReadApi(store)
-    blessed = seed_blessings(store, read, base)
+    # THE GLOSSARY PROCESS (Ruling_Glossary_Process.md): refresh
+    # the token ledger (machine facts only — ruled fields are
+    # untouchable), then birth the journal from its blessed slice
+    census = glossary.ledger_refresh(read, base / "glossary")
+    print("  glossary ledger: " + " · ".join(
+        f"{v} {k}" for k, v in sorted(census.items())))
+    blessed = glossary.seed_journal(store, read, base / "glossary")
     if blessed:
-        print(f"  {blessed} ruled acronym blessing(s) born into the "
-              "governance journal (from acronym_blessings.json)")
+        print(f"  {blessed} ruled blessing(s) born into the "
+              "governance journal (the ledger's blessed slice)")
     entries, exclusions = technical_scope(read)
     adj, directed = technical_adjacency(read)
     seeded = seed_cache(

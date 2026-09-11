@@ -23,6 +23,7 @@ inside one. Split test: would it exist with no chatbot at all?
 | Manifest_Slice_Plan.md | Manifest | EXECUTED 2026-09-06 | the eight-slice build route (record) |
 | Manifest_Port.md | Manifest | EXECUTED 2026-09-06 | port verdicts: new skeleton, ported organs (record) |
 | Ruling_Twin_Graph_KG.md | Ruling | RATIFIED 2026-09-06 | the twin-graph ruling: builders/readings, change quanta, voicing ledger |
+| Ruling_Glossary_Process.md | Ruling | RATIFIED 2026-09-11 | the glossary process: five-phase evidence ladder (dictionary-first, guessing last), the token ledger + conservation law, the field law, glossary/ folder per estate |
 | Ruling_Center_and_Censuses.md | Ruling | RATIFIED 2026-09-07 | the center law + the census battery |
 | Grammar_Floor.md | Grammar | RATIFIED v1.3.x | the deterministic floor-voicing grammar |
 | Audit_Documentation_Review.md | Audit | EXECUTED 2026-09-09 | this audit: design completeness, naming, ledger drift |

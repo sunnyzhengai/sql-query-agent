@@ -344,6 +344,27 @@ TRUTH: `alt` and `cnt` were IN the 2026-09-08 sepsis scan (the
 scan is total — 3 092 tokens) but the Scribe proposed neither and
 the remainder holds neither — unproposed tokens currently vanish
 with no ledger bucket; a standing gap awaiting a ruling.
+**THE GLOSSARY PROCESS (ruled + built same day, 2026-09-11 —
+Ruling_Glossary_Process.md; closes the gap above):** the
+five-phase evidence ladder (dictionary-first, guessing last) with
+the conservation law: every scanned token holds exactly one
+status in ONE ledger. Built: `aivia/flows/glossary.py` (scan with
+carriers/sample/position + governance-kind exclusion ·
+ledger_refresh = Phases 1+2 under THE FIELD LAW · seed_journal
+from the blessed slice, per-entry approvals · review_queue) + 11
+tests (tests/aivia/test_glossary.py). Per estate:
+`glossary/abbreviation_dictionary.json` (Phase 0 — authored Epic
+Clarity convention fixture, 36 entries, Sunny gap-check pending;
+a customer-prereq input in real deployments) +
+`glossary/acronym_ledger.json`. Both estates migrated and the old
+files RETIRED (acronym_blessings/remainder deleted; content
+folded with provenance). Both consoles boot refresh+seed.
+Dev census at migration: 112 blessed · 33 held · **20 matched by
+the dictionary** (id 1099 carriers, dttm 147, … cnt 7 — awaiting
+Sunny's bulk ratification) · 2861 unreviewed. `alt` sits honestly
+unreviewed (a true Scribe/ruling case). Standing gaps recorded in
+the ruling: plain-word source, evidence-packed Scribe (Phase 3
+rework), bulk-ratification surface.
 
 **THE M2 REDESIGN (Sunny's rulings 2026-09-10, from the
 hand-drawn structure):** (1) a scope reaches its tables THROUGH

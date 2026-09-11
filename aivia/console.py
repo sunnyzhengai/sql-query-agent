@@ -617,6 +617,14 @@ def main() -> None:
                               / "estates" / estate / "governance"
                               / "journal.jsonl"))
     read = ReadApi(store)
+    # THE GLOSSARY PROCESS (Ruling_Glossary_Process.md): refresh
+    # the token ledger (machine facts only), then birth/complete
+    # the journal from its blessed slice (fresh clones rebirth)
+    from aivia.flows import glossary
+    glossary.ledger_refresh(read, base / "glossary")
+    if glossary.seed_journal(store, read, base / "glossary"):
+        print("  the governance journal reborn from the glossary "
+              "ledger's blessed slice")
     entries = ask.build_index(read)
     interpret_fn = (make_interpreter(
         key, cache_path=base / ".cache" / "proposals.json")
