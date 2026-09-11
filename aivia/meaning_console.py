@@ -341,9 +341,9 @@ def answer_question(question: str, interpret_fn,
                                 else (b, a, lbl)
                                 for b, lbl in adj.get(a, [])[:20]})
     label_of = {}
-    # literal: mechanical — the technical spine's label walk (after
-    # the single-anchor branch, so neighborhood nodes carry their
-    # labels too — the '[?] dbo' display corpse, 2026-09-11)
+    # after the single-anchor branch, so neighborhood nodes carry
+    # their labels too (the '[?] dbo' display corpse, 2026-09-11)
+    # literal: mechanical — the technical spine's label walk
     for lbl in ("db", "db_schema", "table", "column"):
         for n in read.nodes(lbl):
             if n.identity in plan["nodes"]:
