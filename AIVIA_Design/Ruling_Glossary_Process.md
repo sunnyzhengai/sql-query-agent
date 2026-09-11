@@ -71,6 +71,38 @@ rule), applied to columns of one file.
   (blessings → `blessed` with provenance; remainder → `held` with
   `why_held` carried). Git history keeps the originals.
 
+## THE PREREQ ADDENDUM (ruled by Sunny, 2026-09-11 — the
+## vendor-vs-site partition)
+
+The estate's delivered dictionary mixes vendor-shipped and
+site-built objects indistinguishably; the intake can prove "this
+reference isn't in what you delivered" but not "this object isn't
+the vendor's, so your team owns its documentation." Ruled:
+
+- **The vendor's OWN object dictionary becomes a declared intake
+  input** (a customer prereq beside the abbreviation dictionary
+  and the data-dictionary descriptions).
+- At intake, delivered objects partition against it: covered =
+  vendor-documented; **not covered = presumptively site-built →
+  THE RESIDUE LIST**, emitted for the hospital's admin in the
+  same intake-report pattern the DBA loop already uses
+  (`intake_result_tables/` — the 164→9 unresolved-references
+  precedent).
+- The residue list carries two obligations: **descriptions** for
+  undescribed objects (feeding the existing documentation census)
+  and **name tokens** entering the glossary ladder at the
+  org-glossary/Scribe rung — no vendor dictionary will ever
+  expand a name the site invented.
+
+This completes the three-grain accounting, each grain with a
+named owner for its unmatched remainder:
+
+| grain | compared against | unmatched goes to | status |
+|---|---|---|---|
+| SQL reference | delivered dictionary | `unresolved_references.csv` → DBA | built (loop proven, 164→9) |
+| dictionary object | vendor's object dictionary | THE RESIDUE LIST → hospital admin | ruled here, NOT BUILT |
+| name token | abbreviation dictionary | `acronym_ledger.json` → Sunny's ruling queue | built 2026-09-11 |
+
 ## Standing gaps (recorded, awaiting build/ruling)
 
 1. **Phase 2 `plain` classification** needs a ruled word source
@@ -82,3 +114,7 @@ rule), applied to columns of one file.
    letters.
 3. **Bulk-ratification surface** (bless the `matched` slice in one
    act) — quality-of-life; hand-editing the ledger works today.
+4. **THE RESIDUE LIST** (the prereq addendum's build): vendor
+   object dictionary as intake input + the vendor-vs-site
+   partition + the emitted admin list — ruled above, not built;
+   slots into the intake-report machinery.
