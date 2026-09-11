@@ -133,7 +133,7 @@ const nodes = [...T, ...C, ...S, DB];
 // radii live in WORLD units and scale with zoom (clamped) — fixed
 // pixel dots over world positions made columns collapse UNDER
 // their table at low zoom, which also ate their clicks
-const RMIN = {table:3.5, column:1.2, schema:5, db:6};
+const RMIN = {table:3.5, column:2.0, schema:5, db:6};
 const RMAX = {table:11, column:4.5, schema:13, db:15};
 const nr = n => Math.max(RMIN[n.k], Math.min(RMAX[n.k], n.r*scale));
 const joinsOf = i => DATA.joins.filter(j=>j.a===i||j.b===i);
@@ -193,8 +193,8 @@ function draw(){
         CTX.moveTo(sx(s), sy(s));
         CTX.lineTo(sx(t), sy(t));}));
     CTX.stroke();
-    if(show.table && show.column && scale > .5){
-      CTX.globalAlpha = .22; CTX.beginPath();
+    if(show.table && show.column){
+      CTX.globalAlpha = scale > .5 ? .22 : .13; CTX.beginPath();
       C.forEach(c=>{const t=T[c.t];
         if(pinned && !(t===pinned||hi(t))) return;
         CTX.moveTo(sx(t), sy(t));
@@ -275,24 +275,15 @@ function draw(){
 
 // ---- hit test / tooltip -------------------------------------
 function nodeAt(mx,my){
-  // TWO PASSES, visible first: at overview zoom every table sits
-  // inside its ring of 1.2px columns — edge-distance alone handed
-  // near-table grabs to invisible dots (=> pan), which was the
-  // 'nothing is draggable' bug. What the eye can see wins the
-  // halo; sub-visible dots match only when nothing visible is near.
-  let best=null, bd=12;
+  // FREE-BODY rule (Sunny's ruling): every node is a peer —
+  // nearest circle edge wins, with a small bias toward bigger
+  // grains so a sloppy table grab isn't stolen by an orbit dot.
+  // The detached column orbit keeps this unambiguous.
+  let best=null, bd=8;
   for(const n of nodes){
     if(!show[n.k==='schema'?'schema':n.k]) continue;
-    if(nr(n) < 2.5) continue;
-    const d = Math.hypot(sx(n)-mx, sy(n)-my) - nr(n);
-    if(d<bd){bd=d; best=n;}
-  }
-  if(best) return best;
-  bd = 6;
-  for(const n of nodes){
-    if(!show[n.k==='schema'?'schema':n.k]) continue;
-    if(nr(n) >= 2.5) continue;
-    const d = Math.hypot(sx(n)-mx, sy(n)-my) - nr(n);
+    const d = Math.hypot(sx(n)-mx, sy(n)-my) - nr(n)
+              - (n.k==='column' ? 0 : 5);
     if(d<bd){bd=d; best=n;}
   }
   return best;
@@ -386,18 +377,14 @@ const onMove = e => {
   EVC.win++;
   if(down && !dragging && !panning &&
      Math.hypot(e.clientX-gx, e.clientY-gy) > 4){
-    // sub-visible column under the cursor => the user wanted to PAN
-    if(pending && !(pending.k==='column' && nr(pending) < 2.5))
-      dragging = pending;
+    // every node is a free body — columns drag at any zoom
+    if(pending) dragging = pending;
     else { panning = true; CV.classList.add('drag'); }
   }
   if(dragging){
     const wx = (e.clientX-ox)/scale + gox,
           wy = (e.clientY-oy)/scale + goy;
-    const wdx = wx - dragging.x, wdy = wy - dragging.y;
     dragging.x = wx; dragging.y = wy;
-    if(dragging.k==='table')
-      C.forEach(c=>{if(c.t===dragging.i){c.x+=wdx;c.y+=wdy;}});
     draw(); return;
   }
   if(panning){
