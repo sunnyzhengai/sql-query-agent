@@ -120,6 +120,7 @@ const show = {table:1, column:1, schema:1, db:1, haspart:1, joins:1};
 let hover = null, pinned = null, dragging = null, panning = false;
 let pending = null, down = false;      // gesture decided on first move
 let px = 0, py = 0, gx = 0, gy = 0;   // g = gesture start (click test)
+let gox = 0, goy = 0;                  // grab offset (world units)
 
 // ---- flatten nodes — ONE live object per node; edges, drags,
 // and dots all read the same objects (the stale-copy split was
@@ -343,50 +344,54 @@ window.pin = function(n){
   card.style.display='block'; draw();
 };
 // ---- interactions -------------------------------------------
-// pointer events + capture: a drag released outside the artifact
-// iframe kept mouse listeners stuck mid-gesture — capture routes
-// every move and the release to the canvas regardless
-CV.addEventListener('pointerdown', e=>{
-  e.preventDefault();
-  CV.setPointerCapture(e.pointerId);
+// interaction wired EXACTLY like the proven F2 artifact (plain
+// mouse events, property handlers, absolute drag positioning) —
+// that page demonstrably drags fine in the artifact shell
+CV.onmousedown = e => {
   down = true; pending = nodeAt(e.clientX, e.clientY);
   dragging = null; panning = false;
+  // remember the grab offset so the node doesn't jump to cursor
+  if(pending){
+    gox = pending.x - (e.clientX-ox)/scale;
+    goy = pending.y - (e.clientY-oy)/scale;
+  }
   px=gx=e.clientX; py=gy=e.clientY;
-});
-CV.addEventListener('pointermove', e=>{
-  const dx=e.clientX-px, dy=e.clientY-py;
+};
+CV.onmousemove = e => {
   if(down && !dragging && !panning &&
      Math.hypot(e.clientX-gx, e.clientY-gy) > 4){
-    // decide the gesture on first real movement: dragging a dot
-    // too small to see (a sub-2.5px column) means the user wanted
-    // to PAN — that ambiguity killed all dragging at overview
+    // sub-visible column under the cursor => the user wanted to PAN
     if(pending && !(pending.k==='column' && nr(pending) < 2.5))
       dragging = pending;
     else { panning = true; CV.classList.add('drag'); }
   }
   if(dragging){
-    const wdx=dx/scale, wdy=dy/scale;
-    dragging.x+=wdx; dragging.y+=wdy;
+    const wx = (e.clientX-ox)/scale + gox,
+          wy = (e.clientY-oy)/scale + goy;
+    const wdx = wx - dragging.x, wdy = wy - dragging.y;
+    dragging.x = wx; dragging.y = wy;
     if(dragging.k==='table')
       C.forEach(c=>{if(c.t===dragging.i){c.x+=wdx;c.y+=wdy;}});
+    draw(); return;
+  }
+  if(panning){
+    ox += e.clientX-px; oy += e.clientY-py;
     px=e.clientX; py=e.clientY; draw(); return;
   }
-  if(panning){ox+=dx; oy+=dy; px=e.clientX; py=e.clientY; draw(); return;}
   px=e.clientX; py=e.clientY;
   const n = nodeAt(e.clientX, e.clientY);
   if(n!==hover){hover=n; draw();}
   showTip(n, e.clientX, e.clientY);
-});
-function endGesture(e){
-  const clicked = Math.hypot(e.clientX-gx, e.clientY-gy) < 4;
+};
+addEventListener('mouseup', e=>{
+  const clicked = down &&
+    Math.hypot(e.clientX-gx, e.clientY-gy) < 4;
   if(clicked && pending &&
      (pending.k==='table'||pending.k==='column')) pin(pending);
   else if(clicked && !pending) pin(null);
   down=false; pending=null; dragging=null; panning=false;
   CV.classList.remove('drag');
-}
-CV.addEventListener('pointerup', endGesture);
-CV.addEventListener('pointercancel', endGesture);
+});
 CV.addEventListener('wheel', e=>{
   e.preventDefault();
   const f = Math.exp(-e.deltaY*0.0012);
