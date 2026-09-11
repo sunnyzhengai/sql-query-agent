@@ -31,8 +31,13 @@ BED = "emr|dbo|BED_CONFIG"
 
 @pytest.fixture(scope="module")
 def world():
+    from aivia.flows import glossary
     store, base = build_store("ed_sepsis_dev")
     read = ReadApi(store)
+    # the store-as-ruled: the glossary ledger's blessed slice loads
+    # as acronym nodes (journal_path is None here, so NOTHING is
+    # written — tests never touch estate files)
+    glossary.seed_journal(store, read, base / "glossary")
     entries, exclusions = mc.technical_scope(read)
     adj, directed = mc.technical_adjacency(read)
     return read, entries, exclusions, adj, directed
@@ -242,12 +247,15 @@ BATTERY = [
         ["WRONG_MED_ALT_CNT"],
         marks=pytest.mark.xfail(
             strict=False,
-            reason="THE FIRST MEANING FINDING (2026-09-11): the "
-            "crown's name is abbreviation-speak (MED/ALT/CNT) and "
-            "its description speaks NDC/CNR jargon — rank 25 even "
-            "with 'count' in the query. The dev estate has no "
-            "blessed acronyms; the fix is governance (bless "
-            "MED/ALT/CNT) or richer speech, never a matcher hack.")),
+            reason="THE FIRST MEANING FINDING, re-ruled 2026-09-11: "
+            "Sunny blessed alt=ALERT on evidence (the description "
+            "counts warnings; the crosswalk shows Epic ALT=alert) — "
+            "so THIS QUESTION embeds the refuted expansion "
+            "'alternatives' and rightly stays lost, while the "
+            "truthful phrasing '…wrong medication alerts?' ranks "
+            "the crown #8. The question's wording awaits Sunny's "
+            "gap-check; cnt sits matched-unratified in the ledger "
+            "(blessing it is the next findability lever).")),
     ("relationship",
      "how do ADT_EVENTS and DEPARTMENTS connect?",
      ["ADT_EVENTS", "DEPARTMENTS"]),

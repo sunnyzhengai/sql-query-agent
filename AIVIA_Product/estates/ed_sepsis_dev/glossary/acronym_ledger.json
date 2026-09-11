@@ -9360,8 +9360,13 @@
   "status": "unreviewed"
  },
  "alt": {
+  "approved_at": "2026-09-11T12:00:00Z",
+  "approved_by": "person:sunny",
   "carriers": 25,
   "evidence": "its column description counts WARNINGS (Epic warning types 35010/35012/35059); the corpus crosswalk shows Epic's ALT = ALERT (ALT_COM_ACTION->ALERT_ACTIONS, ALT_HISTORY->ALERT_HISTORY, ZC_ALT_ACTION_TAKE->REF_ALERT_ACTIONS) \u2014 'alternative' was the bare-token guess, refuted by evidence 2026-09-11",
+  "expansions": [
+   "alert"
+  ],
   "position": [
    "first",
    "mid"
@@ -9369,6 +9374,7 @@
   "proposed": [
    "alert"
   ],
+  "provenance": "evidence-based ruling 2026-09-11: description counts warnings; crosswalk shows Epic ALT=ALERT \u2014 the bare-token guess 'alternative' refuted",
   "sample": [
    "ALT_EVENT_TYPE_CODE",
    "ALT_ENCOUNTER_ID",
@@ -9376,7 +9382,8 @@
    "ALT_DATE_REAL",
    "ALT_GROUP_INFO"
   ],
-  "status": "proposed"
+  "scope": "estate",
+  "status": "blessed"
  },
  "alter": {
   "carriers": 1,

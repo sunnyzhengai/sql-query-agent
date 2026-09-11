@@ -365,6 +365,20 @@ Sunny's bulk ratification) · 2861 unreviewed. `alt` sits honestly
 unreviewed (a true Scribe/ruling case). Standing gaps recorded in
 the ruling: plain-word source, evidence-packed Scribe (Phase 3
 rework), bulk-ratification surface.
+**ALT BLESSED = ALERT (Sunny's evidence-based ruling,
+2026-09-11):** the bare-token guess 'alternative' was REFUTED by
+evidence — the column description counts WARNINGS (Epic types
+35010/35012/35059) and the corpus crosswalk shows Epic's ALT =
+ALERT (ALT_HISTORY→ALERT_HISTORY). Blessed in both ledgers;
+delta-seeded into both journals (one line each — the mechanism's
+first live delta). Battery RERUN 2026-09-11: 7 passed + 1 xfail —
+the 'alternatives' question rightly stays lost (it embeds the
+refuted expansion; wording awaits Sunny's gap-check) while the
+truthful phrasing '…wrong medication alerts?' ranks the crown #8
+(from sub-floor). Next findability lever: ratify the matched
+slice (cnt et al.). The battery world now boots the
+store-as-ruled (ledger's blessed slice seeded, journal untouched
+by tests).
 
 **THE M2 REDESIGN (Sunny's rulings 2026-09-10, from the
 hand-drawn structure):** (1) a scope reaches its tables THROUGH
