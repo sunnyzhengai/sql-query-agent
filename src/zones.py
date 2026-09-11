@@ -34,6 +34,7 @@ GOVERNED_ENTRIES = frozenset({
     # answer keys, and the clean-room engine package.
     "AIVIA_Design",
     "AIVIA_Product",
+    "AIVIA_Test",
     "aivia",
     ".github",
     ".gitignore",

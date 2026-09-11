@@ -1,10 +1,11 @@
-<title>AIVIA Graph — M1 (technical layer)</title>
+<title>AIVIA Graph — M1+M2 (technical + join layer)</title>
 <style>
   :root{
     --bg:#1a1a19; --panel:#222320; --panel2:#2a2b28; --line:#3a3b37;
     --ink:#f2f1ea; --ink2:#c3c2b7; --ink3:#8b8a80;
     --table:#d95926; --column:#199e70; --schema:#3987e5; --db:#d55181;
     --join:#eda100; --haspart:#54554f;
+    --scopec:#008300; --joinnode:#c98500;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html,body{height:100%;overflow:hidden}
@@ -69,9 +70,9 @@
   @media (prefers-reduced-motion: reduce){*{transition:none!important}}
 </style>
 <header>
-  <h1>AIVIA graph — M1</h1>
+  <h1>AIVIA graph — M1+M2</h1>
   <div class="sub">the technical layer, rendered from the store's export
-    parquets · hover for descriptions · click a table for its joins ·
+    parquets · hover for descriptions · click any node for its card ·
     build <span id="build">?</span></div>
   <div class="chips" id="chips"></div>
 </header>
@@ -89,6 +90,15 @@
   <label class="lay"><input type="checkbox" data-l="db" checked>
     <span class="dot" style="background:var(--db)"></span>db
     <span class="cnt">1</span></label>
+  <label class="lay"><input type="checkbox" data-l="scope" checked>
+    <span class="dot" style="background:var(--scopec)"></span>scope
+    <span class="cnt" id="c-scope"></span></label>
+  <label class="lay"><input type="checkbox" data-l="joinnode" checked>
+    <span class="dot" style="background:var(--joinnode);border-radius:2px;transform:rotate(45deg)"></span>join
+    <span class="cnt" id="c-joinnode"></span></label>
+  <label class="lay"><input type="checkbox" data-l="reads" checked>
+    <span class="dash" style="border-top:2px solid var(--scopec)"></span>reads
+    <span class="cnt" id="c-reads"></span></label>
   <label class="lay"><input type="checkbox" data-l="haspart" checked>
     <span class="dash"></span>has_part
     <span class="cnt" id="c-haspart"></span></label>
@@ -112,11 +122,13 @@ const BUILD = '__BUILD__';
 document.getElementById('build').textContent = BUILD;
 const CV = document.getElementById('cv'), CTX = CV.getContext('2d');
 const COLORS = {table:'#d95926', column:'#199e70', schema:'#3987e5',
-                db:'#d55181', join:'#eda100', haspart:'#54554f'};
+                db:'#d55181', join:'#eda100', haspart:'#54554f',
+                scope:'#008300', joinnode:'#c98500'};
 const INK = '#f2f1ea', INK2 = '#c3c2b7', INK3 = '#8b8a80';
 let W, H, dpr = window.devicePixelRatio || 1;
 let scale = 0.14, ox = 0, oy = 0;   // world→screen: s = w*scale + o
-const show = {table:1, column:1, schema:1, db:1, haspart:1, joins:1};
+const show = {table:1, column:1, schema:1, db:1, haspart:1, joins:1,
+              scope:1, joinnode:1, reads:1};
 let hover = null, pinned = null, dragging = null, panning = false;
 let pending = null, down = false;      // gesture decided on first move
 let px = 0, py = 0, gx = 0, gy = 0;   // g = gesture start (click test)
@@ -129,12 +141,18 @@ const T = DATA.tables.map((n,i)=>({k:'table', i, ...n, r:26}));
 const C = DATA.cols.map((n,i)=>({k:'column', i, ...n, r:8}));
 const S = DATA.schemas.map((n,i)=>({k:'schema', i, ...n, r:34}));
 const DB = {k:'db', i:0, ...DATA.db, r:44};
-const nodes = [...T, ...C, ...S, DB];
+// M2 THE JOIN LAYER: scopes and joins are store rows too
+const SC = DATA.scopes.map((n,i)=>({k:'scope', i, ...n, r:30}));
+const J = DATA.joinNodes.map((n,i)=>({k:'joinnode', i, ...n, r:10}));
+const REF = x => x ? (x.t==='T' ? T[x.i] : SC[x.i]) : null;
+const nodes = [...T, ...C, ...SC, ...J, ...S, DB];
 // radii live in WORLD units and scale with zoom (clamped) — fixed
 // pixel dots over world positions made columns collapse UNDER
 // their table at low zoom, which also ate their clicks
-const RMIN = {table:3.5, column:2.0, schema:5, db:6};
-const RMAX = {table:11, column:4.5, schema:13, db:15};
+const RMIN = {table:3.5, column:2.0, schema:5, db:6, scope:3.5,
+              joinnode:3.2};
+const RMAX = {table:11, column:4.5, schema:13, db:15, scope:11,
+              joinnode:7};
 const nr = n => Math.max(RMIN[n.k], Math.min(RMAX[n.k], n.r*scale));
 const joinsOf = i => DATA.joins.filter(j=>j.a===i||j.b===i);
 
@@ -143,6 +161,9 @@ document.getElementById('c-column').textContent = DATA.cols.length;
 document.getElementById('c-schema').textContent = DATA.schemas.length;
 document.getElementById('c-haspart').textContent = DATA.counts.hasPart;
 document.getElementById('c-joins').textContent = DATA.counts.joins;
+document.getElementById('c-scope').textContent = DATA.counts.scopes;
+document.getElementById('c-joinnode').textContent = DATA.counts.joinNodes;
+document.getElementById('c-reads').textContent = DATA.counts.reads;
 document.getElementById('chips').innerHTML =
   `<span class="chip"><b>${DATA.counts.nodes}</b> nodes</span>`+
   `<span class="chip"><b>${DATA.counts.edges}</b> edges</span>`+
@@ -172,6 +193,12 @@ const hi = n => {                      // highlight membership
   if(n===pinned) return true;
   if(pinned.k==='column')
     return n.k==='table' && n.i===pinned.t;
+  if(pinned.k==='joinnode')
+    return n===SC[pinned.s] || n===REF(pinned.ls) || n===REF(pinned.rs);
+  if(pinned.k==='scope')
+    return J.some(j=>j.s===pinned.i &&
+      (n===j || n===REF(j.ls) || n===REF(j.rs)));
+  if(n.k==='joinnode' && SC[n.s]===pinned) return true;
   if(n.k==='column' && T[n.t]===pinned) return true;
   if(n.k==='table'&&pinned.k==='table')
     return joinsOf(pinned.i).some(j=>j.a===n.i||j.b===n.i);
@@ -203,18 +230,50 @@ function draw(){
     }
     CTX.globalAlpha = 1;
   }
-  // joins_to
+  // joins_to — DECLARED dictionary joins render DASHED
   if(show.joins && show.table){
+    CTX.setLineDash([5,4]);
     DATA.joins.forEach(j=>{
       const a=T[j.a], b=T[j.b];
       const lit = !pinned || a===pinned || b===pinned;
       CTX.strokeStyle = COLORS.join;
-      CTX.globalAlpha = lit ? (pinned? .9 : .5) : .08;
+      CTX.globalAlpha = lit ? (pinned? .9 : .45) : .08;
       CTX.lineWidth = lit && pinned ? 2 : 1.2;
       CTX.beginPath(); CTX.moveTo(sx(a),sy(a));
       CTX.lineTo(sx(b),sy(b)); CTX.stroke();
     });
+    CTX.setLineDash([]); CTX.globalAlpha = 1; CTX.lineWidth = 1;
+  }
+  // M2: scope—has_part→join (faint) + join sides (solid, OBSERVED)
+  if(show.joinnode){
+    if(show.scope && show.haspart){
+      CTX.strokeStyle = COLORS.haspart; CTX.globalAlpha = .4;
+      CTX.beginPath();
+      J.forEach(j=>{const o=SC[j.s];
+        CTX.moveTo(sx(o),sy(o)); CTX.lineTo(sx(j),sy(j));});
+      CTX.stroke(); CTX.globalAlpha = 1;
+    }
+    J.forEach(j=>{
+      for(const t of [REF(j.ls), REF(j.rs)]){
+        if(!t || !show[t.k==='schema'?'schema':t.k]) continue;
+        const lit = !pinned || hi(j) || hi(t);
+        CTX.strokeStyle = COLORS.joinnode;
+        CTX.globalAlpha = lit ? .55 : .07;
+        CTX.lineWidth = 1.1;
+        CTX.beginPath(); CTX.moveTo(sx(j),sy(j));
+        CTX.lineTo(sx(t),sy(t)); CTX.stroke();
+      }
+    });
     CTX.globalAlpha = 1; CTX.lineWidth = 1;
+  }
+  // M2: reads — the REMAINDER only
+  if(show.reads && show.scope && show.table){
+    CTX.strokeStyle = COLORS.scope; CTX.globalAlpha = .6;
+    CTX.lineWidth = 1.4; CTX.beginPath();
+    DATA.reads.forEach(e=>{
+      CTX.moveTo(sx(SC[e.s]),sy(SC[e.s]));
+      CTX.lineTo(sx(T[e.t]),sy(T[e.t]));});
+    CTX.stroke(); CTX.globalAlpha = 1; CTX.lineWidth = 1;
   }
   // nodes
   nodes.forEach(n=>{
@@ -224,7 +283,13 @@ function draw(){
     CTX.fillStyle = COLORS[n.k];
     const r = nr(n);
     CTX.beginPath();
-    CTX.arc(sx(n), sy(n), r, 0, 7); CTX.fill();
+    if(n.k==='joinnode'){
+      const x=sx(n), y=sy(n);
+      CTX.moveTo(x, y-r-1); CTX.lineTo(x+r+1, y);
+      CTX.lineTo(x, y+r+1); CTX.lineTo(x-r-1, y);
+      CTX.closePath();
+    } else CTX.arc(sx(n), sy(n), r, 0, 7);
+    CTX.fill();
     if(n===hover || n===pinned){
       CTX.strokeStyle = INK; CTX.lineWidth = 1.5;
       CTX.beginPath(); CTX.arc(sx(n),sy(n),r+2.5,0,7);
@@ -264,6 +329,14 @@ function draw(){
       if(n===hover) return;
       lbl(n,11,true, INK2, false);
     });
+  if(show.scope && !pinned)
+    SC.forEach(n=>{ if(n!==hover) lbl(n,11,false,'#4fae52',false); });
+  if(show.joinnode && (scale>0.45 || pinned))
+    J.forEach(n=>{
+      if(n===hover) return;
+      if(pinned && !hi(n)) return;
+      lbl(n,10,false,INK3,false);
+    });
   if(show.column && scale>2.0)
     nodes.forEach(n=>{
       if(n.k!=='column'||n===hover) return;
@@ -281,21 +354,47 @@ const colsByT = T.map(()=>[]);
 C.forEach(c=>colsByT[c.t].push(c));
 const CR = T.map(t=>70+6*Math.sqrt(t.nc||1));   // cluster radius
 const RL = T.map(t=>85+8*Math.sqrt(t.nc||1));   // column spring rest
+const BODIES = [...T.map((t,i)=>({n:t, cr:CR[i]})),
+                ...SC.map(sc=>({n:sc, cr:170}))];
 let heat = 600;
 function step(){
-  for(let i=0;i<T.length;i++){
-    const a=T[i];
-    for(let j=i+1;j<T.length;j++){
-      const b=T[j];
+  for(let i=0;i<BODIES.length;i++){
+    const a=BODIES[i].n;
+    for(let j=i+1;j<BODIES.length;j++){
+      const b=BODIES[j].n;
       let dx=b.x-a.x, dy=b.y-a.y;
       const d2=dx*dx+dy*dy+1, d=Math.sqrt(d2);
-      const mind=CR[i]+CR[j]+260;
+      const mind=BODIES[i].cr+BODIES[j].cr+260;
       const f=Math.min(380000/d2 + Math.max(0,mind-d)*0.4, 60);
       dx/=d; dy/=d;
       a.vx-=dx*f; a.vy-=dy*f; b.vx+=dx*f; b.vy+=dy*f;
     }
     a.vx-=a.x*0.0004; a.vy-=a.y*0.0004;   // weak centering
   }
+  // M2: join nodes spring to their scope and to their side targets
+  J.forEach(j=>{
+    const anchors = [[SC[j.s], 210, 0.016],
+                     [REF(j.ls), 260, 0.010], [REF(j.rs), 260, 0.010]];
+    for(const [t, rest, k] of anchors){
+      if(!t) continue;
+      let dx=t.x-j.x, dy=t.y-j.y;
+      const d=Math.hypot(dx,dy)+0.01, f=(d-rest)*k;
+      j.vx+=dx/d*f; j.vy+=dy/d*f;
+      t.vx-=dx/d*f*0.15; t.vy-=dy/d*f*0.15;
+    }
+  });
+  // join-join repulsion is GLOBAL (a same-scope-only rule let
+  // diamonds of different scopes stack into an unreadable knot)
+  for(let i=0;i<J.length;i++)
+    for(let k2=i+1;k2<J.length;k2++){
+      let dx=J[k2].x-J[i].x, dy=J[k2].y-J[i].y;
+      const d2=dx*dx+dy*dy;
+      if(d2>25600) continue;               // 160 world cutoff
+      const d=Math.sqrt(d2)+0.01, f=Math.min(5200/(d2+10), 14);
+      dx/=d; dy/=d;
+      J[i].vx-=dx*f; J[i].vy-=dy*f;
+      J[k2].vx+=dx*f; J[k2].vy+=dy*f;
+    }
   DATA.joins.forEach(j=>{
     const a=T[j.a], b=T[j.b];
     let dx=b.x-a.x, dy=b.y-a.y;
@@ -331,6 +430,20 @@ function step(){
     n.vy=Math.max(-40,Math.min(40,n.vy*0.82));
     n.x+=n.vx; n.y+=n.vy;
   });
+  // HARD minimum separation for join diamonds — springs to
+  // co-located anchors beat soft repulsion; a constraint doesn't
+  // negotiate (2 relaxation iterations per step)
+  for(let it=0; it<2; it++)
+    for(let i=0;i<J.length;i++)
+      for(let k2=i+1;k2<J.length;k2++){
+        let dx=J[k2].x-J[i].x, dy=J[k2].y-J[i].y;
+        const d2=dx*dx+dy*dy;
+        if(d2>=170*170) continue;
+        const d=Math.sqrt(d2)+0.01, push=(170-d)/2;
+        dx/=d; dy/=d;
+        if(J[i]!==dragging){J[i].x-=dx*push; J[i].y-=dy*push;}
+        if(J[k2]!==dragging){J[k2].x+=dx*push; J[k2].y+=dy*push;}
+      }
   S.forEach(s=>{                            // schemas trail their tables
     if(s===dragging||!s.tt.length) return;
     let cx=0,cy=0; s.tt.forEach(i=>{cx+=T[i].x; cy+=T[i].y;});
@@ -361,11 +474,15 @@ const tip = document.getElementById('tip');
 function showTip(n, mx, my){
   if(!n){tip.style.display='none'; return;}
   const kind = {table:'TABLE', column:'COLUMN', schema:'DB_SCHEMA',
-                db:'DB'}[n.k];
+                db:'DB', scope:'SCOPE', joinnode:'JOIN (observed)'}[n.k];
   let meta = '';
   if(n.k==='table') meta = `pk: ${n.pk||'—'} · ${n.nc} columns · `+
     `${joinsOf(n.i).length} declared joins`;
   if(n.k==='column') meta = `in ${T[n.t].n}`;
+  if(n.k==='joinnode') meta = `in ${SC[n.s].n} · on ${n.on}`;
+  if(n.k==='scope')
+    meta = `${J.filter(j=>j.s===n.i).length} joins · `+
+      `${DATA.reads.filter(e=>e.s===n.i).length} direct reads`;
   tip.innerHTML = `<div class="k">${kind}</div>
     <div class="n"><span class="dot" style="background:${COLORS[n.k]};
     width:8px;height:8px;border-radius:50%;display:inline-block"></span>
@@ -382,6 +499,35 @@ const card = document.getElementById('card'),
 window.pin = function(n){
   pinned = n;
   if(!n){card.style.display='none'; draw(); return;}
+  if(n.k==='joinnode'){
+    const nm = t => t ? (t.n) : '(unresolved side)';
+    cardBody.innerHTML = `<div class="k">JOIN — observed</div>
+      <h3><span class="dot" style="background:${COLORS.joinnode};
+      width:9px;height:9px;display:inline-block;
+      transform:rotate(45deg)"></span>${SC[n.s].n} · ${n.n}</h3>
+      <div class="d">${n.d||''}</div>
+      <div class="sec">ON</div><div class="jrow"><span class="on">${n.on}</span></div>
+      <div class="sec">LEFT SIDE</div><div class="jrow"><b>${nm(REF(n.ls))}</b></div>
+      <div class="sec">RIGHT SIDE</div><div class="jrow"><b>${nm(REF(n.rs))}</b></div>`;
+    card.style.display='block'; draw(); return;
+  }
+  if(n.k==='scope'){
+    const mine = J.filter(j=>j.s===n.i);
+    const js = mine.map(j=>{
+      const l=REF(j.ls), r=REF(j.rs);
+      return `<div class="jrow"><b>${l?l.n:'?'} ⋈ ${r?r.n:'—'}</b><br>
+        <span class="on">on ${j.on}</span></div>`;
+    }).join('') || `<div class="jrow">no joins in this scope</div>`;
+    const rds = DATA.reads.filter(e=>e.s===n.i)
+      .map(e=>`<div class="jrow"><b>${T[e.t].n}</b> (direct read — no join covers it)</div>`).join('');
+    cardBody.innerHTML = `<div class="k">SCOPE</div>
+      <h3><span class="dot" style="background:${COLORS.scope};width:9px;
+      height:9px;border-radius:50%;display:inline-block"></span>${n.n}</h3>
+      <div class="d">${n.d||''}</div>
+      <div class="sec">JOINS (${mine.length}, observed)</div>${js}
+      ${rds?`<div class="sec">READS — the remainder</div>${rds}`:''}`;
+    card.style.display='block'; draw(); return;
+  }
   if(n.k==='column'){
     const t = T[n.t];
     const used = joinsOf(t.i).filter(j=>
@@ -465,8 +611,9 @@ addEventListener('mousedown', e=>{
 addEventListener('mouseup', e=>{
   const clicked = down &&
     Math.hypot(e.clientX-gx, e.clientY-gy) < 4;
-  if(clicked && pending &&
-     (pending.k==='table'||pending.k==='column')) pin(pending);
+  if(clicked && pending && (pending.k==='table'||
+     pending.k==='column'||pending.k==='scope'||
+     pending.k==='joinnode')) pin(pending);
   else if(clicked && !pending) pin(null);
   down=false; pending=null; dragging=null; panning=false;
   CV.classList.remove('drag');
@@ -486,7 +633,8 @@ document.getElementById('search').addEventListener('keydown', e=>{
   if(e.key!=='Enter') return;
   const q = e.target.value.trim().toUpperCase();
   if(!q) {pin(null); return;}
-  const n = T.find(t=>t.n.toUpperCase().includes(q));
+  const n = T.find(t=>t.n.toUpperCase().includes(q))
+    || SC.find(t=>t.n.toUpperCase().includes(q));
   if(n){
     scale = Math.max(scale, 1.1);
     ox = W/2 - n.x*scale; oy = H/2 - n.y*scale;

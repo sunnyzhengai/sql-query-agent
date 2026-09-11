@@ -56,28 +56,53 @@ def _node_row(n) -> Dict[str, str]:
 
 def _scope_tables(read: ReadApi,
                   adj) -> Dict[str, List[Dict[str, str]]]:
-    """M2 (the bottom-up re-ruling, 2026-09-10): scope nodes with
-    their STORED descriptions + scope—reads→table at TRUE grain —
-    ties straight down into the verified technical layer; the
-    file—reads→table rollup died with the top-down plan."""
+    """M2 THE JOIN LAYER (the redesign ruling, 2026-09-10): scope
+    nodes with STORED descriptions · join nodes (the observed
+    pairs) · scope—has_part→join · join—left_side/right_side→
+    table-or-scope · scope—reads→table as the REMAINDER ONLY —
+    every row a STORE row (one home of meaning), never an
+    adjacency recomputation."""
+    store = read._store
     table_ids = {n.identity for n in read.nodes("table")}
-    rows, reads_pairs = [], set()
+    scope_rows = []
     for n in sorted(read.nodes("scope"), key=lambda x: x.identity):
-        ident = n.identity
         # literal: shape
-        rows.append({
-            "nodeId": ident,
-            "name": ident.rsplit("::", 1)[-1],
+        scope_rows.append({
+            "nodeId": n.identity,
+            "name": n.identity.rsplit("::", 1)[-1],
             "description": str(n.properties.get("description") or ""),
             "structures": " ".join(n.properties.get("structures")
                                    or [])})
-        for target, elbl in adj.get(ident, []):
-            if elbl == "reads" and target in table_ids:
-                reads_pairs.add((ident, target))
-    return {"graph_scope": rows,
-            "graph_reads_scopeTable": [
-                {"sourceId": s_, "targetId": t_}
-                for s_, t_ in sorted(reads_pairs)]}
+    join_rows = []
+    for n in sorted(read.nodes("join"), key=lambda x: x.identity):
+        # literal: shape
+        join_rows.append({
+            "nodeId": n.identity,
+            "name": str(n.properties.get("name") or ""),
+            "description": str(n.properties.get("description") or ""),
+            "onPredicate": str(n.properties.get("on") or "")})
+    tables: Dict[str, List[Dict[str, str]]] = {
+        "graph_scope": scope_rows, "graph_join": join_rows}
+    tables["graph_has_part_scopeJoin"] = sorted(
+        ({"sourceId": e.from_id, "targetId": e.to_id}
+         for e in store.current_edges("has_part")
+         if "::join#" in e.to_id),
+        key=lambda r: (r["sourceId"], r["targetId"]))
+    for side in ("left_side", "right_side"):
+        by_target: Dict[str, List[Dict[str, str]]] = {
+            "Table": [], "Scope": []}
+        for e in store.current_edges(side):
+            kind = "Table" if e.to_id in table_ids else "Scope"
+            by_target[kind].append(
+                {"sourceId": e.from_id, "targetId": e.to_id})
+        for kind, rows_ in by_target.items():
+            tables[f"graph_{side}_join{kind}"] = sorted(
+                rows_, key=lambda r: (r["sourceId"], r["targetId"]))
+    tables["graph_reads_scopeTable"] = sorted(
+        ({"sourceId": e.from_id, "targetId": e.to_id}
+         for e in store.current_edges("reads")),
+        key=lambda r: (r["sourceId"], r["targetId"]))
+    return tables
 
 
 def export_tables(read: ReadApi,

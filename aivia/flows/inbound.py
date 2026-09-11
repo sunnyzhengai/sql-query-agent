@@ -255,6 +255,7 @@ def receive_estate(store, reg: Dict[str, Any], estate_dir,
         report.twins[name] = kg2_translator.apply_twin(
             store, f"{location}{name}", tree, manifest["as_of"])
     _store_scope_descriptions(store, manifest["as_of"])
+    report.join_layer = _store_join_layer(store, manifest["as_of"])
     return report
 
 
@@ -280,6 +281,153 @@ def _store_scope_descriptions(store, as_of) -> None:
                 "scope", node.identity,
                 {**node.properties, "description": lead},
                 as_of, node.extract_id)
+
+
+SAME_TREE = "SAME-TREE scope "
+
+
+def _join_targets(pred) -> list:
+    """Ordered unique side targets of one ON predicate: table ids
+    and same-tree scope keys, in walk order (subject before
+    comparand — the ruled syntactic side order)."""
+    out = []
+
+    def walk(d):
+        if isinstance(d, dict):
+            r = d.get("resolves_to")
+            if isinstance(r, str):
+                if r.count("|") == 3:
+                    t = r.rsplit("|", 1)[0]
+                    if t not in out:
+                        out.append(t)
+                elif r.startswith(SAME_TREE):
+                    s = r[len(SAME_TREE):]
+                    if s not in out:
+                        out.append(s)
+            for v in d.values():
+                walk(v)
+        elif isinstance(d, list):
+            for v in d:
+                walk(v)
+    walk(pred)
+    return out
+
+
+def _join_entries(scope) -> list:
+    """Every ON predicate under this named scope's own subtree
+    (anonymous descendants attach here per A4; nested NAMED scopes
+    are their own named_scopes entries and never nest in dicts)."""
+    out = []
+
+    def walk(d):
+        if isinstance(d, dict):
+            for e in (d.get("join_on") or []):
+                out.append(e)
+            for v in d.values():
+                walk(v)
+        elif isinstance(d, list):
+            for v in d:
+                walk(v)
+    walk(scope)
+    return out
+
+
+def _disp(target: str) -> str:
+    return target.rsplit("|", 1)[-1] if "|" in target \
+        else target.rsplit("::", 1)[-1]
+
+
+def join_render(targets, fragment) -> str:
+    """The join node's stored description — deterministic; the
+    verbatim law holds stored == this recompute."""
+    if len(targets) >= 2:
+        return (f"Joins {_disp(targets[0])} with "
+                f"{_disp(targets[1])} on {fragment}.")
+    if len(targets) == 1:
+        return f"Joins {_disp(targets[0])} on {fragment}."
+    return f"Join on {fragment}."
+
+
+def _store_join_layer(store, as_of) -> dict:
+    """THE JOIN LAYER, M2 (the redesign ruling 2026-09-10): a scope
+    reaches its tables THROUGH its join nodes — join—left_side/
+    right_side→table-or-scope carries the OBSERVED pair (never a
+    table→table edge; joins_to stays dictionary-only), and `reads`
+    survives only as the REMAINDER: tables no join side covers.
+    Conservation returned, never silent: joins ⊎ one_sided ⊎
+    no_sided == every ON entry; reads_remainder counted."""
+    from aivia.graph.read_api import ReadApi
+    from aivia.lenses import decisions
+    read = ReadApi(store)
+    by_id = {n.identity: n for n in read.nodes("scope")}
+    # literal: shape
+    counts = {"joins": 0, "two_sided": 0, "one_sided": 0,
+              "no_sided": 0, "overflow_3plus": 0,
+              "side_edges_table": 0, "side_edges_scope": 0,
+              "reads_remainder": 0, "reads_covered": 0}
+    for key, tree in sorted(read.trees().items()):
+        for scope in decisions.named_scopes(tree):
+            node = by_id.get(scope["name_key"])
+            if node is None:
+                continue
+            if any(e.from_id == node.identity
+                   for e in store.current_edges("has_part")
+                   if "::join#" in e.to_id) or \
+               any(e.from_id == node.identity
+                   for e in store.current_edges("reads")):
+                continue  # already materialized this boot
+            side_tables = set()
+            for i, pred in enumerate(_join_entries(scope), 1):
+                jid = f"{node.identity}::join#{i}"
+                frag = (pred.get("evidence") or {}).get("fragment", "")
+                targets = _join_targets(pred)
+                if len(targets) > 2:
+                    counts["overflow_3plus"] += 1
+                sides = targets[:2]
+                counts["joins"] += 1
+                counts[("two_sided" if len(sides) == 2 else
+                        "one_sided" if len(sides) == 1
+                        else "no_sided")] += 1
+                store.append_node(
+                    "join", jid,
+                    # literal: shape
+                    {"name": f"join#{i}",
+                     "description": join_render(sides, frag),
+                     "on": frag},
+                    as_of, node.extract_id)
+                store.append_edge("has_part", node.identity, jid,
+                                  {}, as_of, node.extract_id)
+                for side_label, target in zip(
+                        ("left_side", "right_side"), sides):
+                    store.append_edge(side_label, jid, target,
+                                      {}, as_of, node.extract_id)
+                    if "|" in target:
+                        counts["side_edges_table"] += 1
+                        side_tables.add(target)
+                    else:
+                        counts["side_edges_scope"] += 1
+            reads = []
+
+            def walk_reads(d):
+                if isinstance(d, dict):
+                    for fr in (d.get("from_refs") or []):
+                        r = fr.get("resolves_to")
+                        if isinstance(r, str) and r.count("|") == 2:
+                            reads.append(r)
+                    for v in d.values():
+                        walk_reads(v)
+                elif isinstance(d, list):
+                    for v in d:
+                        walk_reads(v)
+            walk_reads(scope)
+            for t in sorted(set(reads)):
+                if t in side_tables:
+                    counts["reads_covered"] += 1
+                    continue  # travels through a join side
+                store.append_edge("reads", node.identity, t,
+                                  {}, as_of, node.extract_id)
+                counts["reads_remainder"] += 1
+    return counts
 
 
 def receive_pbi(store, pbi_dir) -> int:

@@ -139,48 +139,107 @@ def test_scope_descriptions_stored(exported):
 
 
 # ---------------------------------------------------------------
-# M2 — THE JOIN LAYER (authored ahead; joins testable alone)
+# M2 — THE JOIN LAYER (BUILT 2026-09-10; the STORE is the truth
+# the key is held against — twin-derived authoring retired here)
 # ---------------------------------------------------------------
 
-def test_m2_joins_key_matches_twin(twin, booted):
-    want = DELTA["M2"]
-    refs = [n for n in twin if n["kind"] == "reference"]
-    joins = _join_containers(twin)
-    assert len(joins) == want["new_nodes"]["join"]
-    assert len(joins) == want["new_edges"]["has_part_scopeJoin"]
-    assert len(joins) == want["new_edges"]["left_side"]
-    assert len(joins) == want["new_edges"]["right_side"]
-    assert all(_in_scope(j) for j in joins)
+def test_m2_store_matches_census(booted, exported):
+    want = CENSUS["M2"]
+    got_nodes = {"db": 1, "db_schema": 3,
+                 "table": len(exported["graph_table"]),
+                 "column": len(exported["graph_column"]),
+                 "scope": len(exported["graph_scope"]),
+                 "join": len(exported["graph_join"])}
+    assert got_nodes == want["nodes"]
+    has_part = (len(exported["graph_has_part_dbSchema"])
+                + len(exported["graph_has_part_schemaTable"])
+                + len(exported["graph_has_part_tableColumn"])
+                + len(exported["graph_has_part_scopeJoin"]))
+    left = (len(exported["graph_left_side_joinTable"])
+            + len(exported["graph_left_side_joinScope"]))
+    right = (len(exported["graph_right_side_joinTable"])
+             + len(exported["graph_right_side_joinScope"]))
+    got_edges = {"has_part": has_part,
+                 "joins_to": len(exported["graph_joins_to_tableTable"]),
+                 "left_side": left, "right_side": right,
+                 "reads": len(exported["graph_reads_scopeTable"])}
+    assert got_edges == want["edges"]
+    d = DELTA["M2"]
+    assert d["side_targets"]["table"] == \
+        len(exported["graph_left_side_joinTable"]) \
+        + len(exported["graph_right_side_joinTable"])
+    assert d["side_targets"]["scope"] == \
+        len(exported["graph_left_side_joinScope"]) \
+        + len(exported["graph_right_side_joinScope"])
 
-    pair_tables = {}
+
+def test_m2_join_conservation_and_verbatim(booted):
+    from aivia.flows.inbound import join_render
+    want = DELTA["M2"]["join_conservation"]
+    joins = booted.current_nodes("join")
+    left = {e.from_id: e.to_id
+            for e in booted.current_edges("left_side")}
+    right = {e.from_id: e.to_id
+             for e in booted.current_edges("right_side")}
+    two = sum(1 for j in joins
+              if j.identity in left and j.identity in right)
+    one = sum(1 for j in joins
+              if j.identity in left and j.identity not in right)
+    none = len(joins) - two - one
+    assert {"joins": len(joins), "two_sided": two, "one_sided": one,
+            "no_sided": none, "overflow_3plus": 0} == want
+    # every join has a birth edge from its scope, a non-empty
+    # description, and — the verbatim law — stored == recomputed
+    parents = {e.to_id for e in booted.current_edges("has_part")
+               if "::join#" in e.to_id}
     for j in joins:
-        ts = set()
-        for r in refs:
-            if r["points_at"].startswith(j + "/") or r["points_at"] == j:
-                for c in _columns(r.get("draws_from") or []):
-                    ts.add(c.rsplit("|", 1)[0])
-        pair_tables[j] = ts
-    sizes = {"both_tables": 0, "one_table": 0, "no_table_scope_sided": 0}
-    for ts in pair_tables.values():
-        sizes[{2: "both_tables", 1: "one_table",
-               0: "no_table_scope_sided"}[len(ts)]] += 1
-    assert sizes == want["join_table_set_sizes"]
-    assert sizes["both_tables"] * 2 + sizes["one_table"] \
-        == want["side_targets"]["table"]
-    assert len(joins) * 2 - want["side_targets"]["table"] \
-        == want["side_targets"]["scope"]
+        assert j.identity in parents
+        sides = [s for s in (left.get(j.identity),
+                             right.get(j.identity)) if s]
+        assert j.properties["description"] == \
+            join_render(sides, j.properties["on"])
 
-    # THE DRIFT QUERY at parse level — needs joins + joins_to only,
-    # no condition nodes (why joins are testable alone)
+
+def test_m2_drift_query_on_store(booted):
+    """THE PRODUCT QUERY, live on the built store: practiced pairs
+    with no declared joins_to == exactly the two findings."""
+    tables = {n.identity for n in booted.current_nodes("table")}
+    left = {e.from_id: e.to_id
+            for e in booted.current_edges("left_side")}
+    right = {e.from_id: e.to_id
+             for e in booted.current_edges("right_side")}
     declared = set()
     for e in booted.current_edges("joins_to"):
         declared.add((e.from_id, e.to_id))
         declared.add((e.to_id, e.from_id))
-    pairs = {tuple(sorted(ts)) for ts in pair_tables.values()
-             if len(ts) == 2}
-    findings = sorted(p for p in pairs if p not in declared)
-    assert findings == [tuple(f) for f in
-                        want["checks"]["drift_findings_exact"]]
+    findings = set()
+    for j, a in left.items():
+        b = right.get(j)
+        if b and a in tables and b in tables and (a, b) not in declared:
+            findings.add(tuple(sorted((a, b))))
+    assert sorted(findings) == [
+        tuple(f) for f in DELTA["M2"]["checks"]["drift_findings_exact"]]
+
+
+def test_m2_coverage_invariants(booted):
+    """Disjoint: no table connected by BOTH a reads edge and a join
+    side of the same scope. Covering: remainder + covered == the
+    parse read-set (nothing silently unconnected)."""
+    tables = {n.identity for n in booted.current_nodes("table")}
+    side_tabs = {}
+    for lbl in ("left_side", "right_side"):
+        for e in booted.current_edges(lbl):
+            if e.to_id in tables:
+                scope = e.from_id.rsplit("::join#", 1)[0]
+                side_tabs.setdefault(scope, set()).add(e.to_id)
+    reads = booted.current_edges("reads")
+    assert all(e.to_id not in side_tabs.get(e.from_id, set())
+               for e in reads)
+    want = DELTA["M2"]["reads"]
+    assert len(reads) == want["remainder"]
+    # covering: the union equals the read-set measured at build
+    assert len(reads) + want["covered_by_join_sides"] \
+        == want["read_set"]
 
 
 # ---------------------------------------------------------------

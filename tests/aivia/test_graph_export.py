@@ -42,7 +42,9 @@ def test_camel_case_columns_and_node_id_key(world):
             assert "_" not in col, f"{name}.{col} is not camelCase"
         if not (name.startswith("graph_has_part")
                     or name.startswith("graph_reads")
-                    or name.startswith("graph_joins_to")):
+                    or name.startswith("graph_joins_to")
+                    or name.startswith("graph_left_side")
+                    or name.startswith("graph_right_side")):
             assert "nodeId" in rows[0]
             ids = [r["nodeId"] for r in rows]
             assert len(ids) == len(set(ids)), f"{name}: dup nodeIds"
@@ -102,7 +104,12 @@ def test_scope_rows_carry_stored_descriptions(world):
     assert "#Base_Pop" in names
 
 
-def test_scope_reads_table_edges_at_true_grain(world):
+def test_scope_reads_table_edges_at_remainder_grain(world):
+    """THE REMAINDER RULE (the M2 redesign, 2026-09-10): a scope
+    reaches its tables THROUGH its join nodes; a direct reads edge
+    survives only where no join side covers the table. The old
+    deciding example (#Base_Pop reads ED_ENCOUNTERS_FACT directly)
+    is SUPERSEDED — that pair travels a join side now."""
     read, tables = world
     edges = tables["graph_reads_scopeTable"]
     scopes = {r["nodeId"] for r in tables["graph_scope"]}
@@ -111,11 +118,21 @@ def test_scope_reads_table_edges_at_true_grain(world):
     for e in edges:
         assert e["sourceId"] in scopes
         assert e["targetId"] in table_ids
-    # the deciding example: the ED base population reads the fact
-    assert {"sourceId": "reporting/USP_ED_SEPSIS.sql::#Base_Pop",
-            "targetId": "emr|dbo|ED_ENCOUNTERS_FACT"} in edges
     pairs = [(e["sourceId"], e["targetId"]) for e in edges]
     assert len(pairs) == len(set(pairs))
+    # disjointness: no reads pair is also a join side of its scope
+    side_tabs = {}
+    for lbl in ("left_side", "right_side"):
+        for ed in read._store.current_edges(lbl):
+            if ed.to_id in table_ids:
+                side_tabs.setdefault(
+                    ed.from_id.rsplit("::join#", 1)[0],
+                    set()).add(ed.to_id)
+    for s_, t_ in pairs:
+        assert t_ not in side_tabs.get(s_, set()), (s_, t_)
+    # the superseded pair really does travel through a join now
+    assert "emr|dbo|ED_ENCOUNTERS_FACT" in side_tabs.get(
+        "reporting/USP_ED_SEPSIS.sql::#Base_Pop", set())
 
 
 def test_declared_dictionary_joins_ride_the_export(world):

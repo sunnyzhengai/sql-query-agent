@@ -89,6 +89,19 @@ def build_adjacency(read) -> Dict[str, List[Tuple[str, str]]]:
                      scope["name_key"], "belongs_to")
         for prm in tree.get("parameters", []):
             link(f"{key}::param/{prm['name']}", key, "belongs_to")
+    # M2 THE JOIN LAYER (redesign ruling 2026-09-10): store-grain
+    # edges walk — a join's birth edge is its scope's has_part;
+    # sides reach tables/scopes. (The tree-derived reads links
+    # above stay for the held ask surface; store reads are the
+    # REMAINDER truth and ride the export.)
+    _store = getattr(read, "_store", None)
+    if _store is not None:
+        for lbl in ("left_side", "right_side"):
+            for e in _store.current_edges(lbl):
+                link(e.from_id, e.to_id, lbl)
+        for e in _store.current_edges("has_part"):
+            if "::join#" in e.to_id:
+                link(e.from_id, e.to_id, "has_part")
     # PHASE I: blessed acronyms walk to their approver and — DERIVED
     # AT BUILD, per the contract — to every node whose name carries
     # the token (new nodes connect automatically)

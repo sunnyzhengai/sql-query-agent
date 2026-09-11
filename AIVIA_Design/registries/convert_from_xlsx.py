@@ -193,7 +193,7 @@ SOURCES = {
 # deliveries lead, spine voiced, intermediates counted, census
 # closes; the file's ask-index words = the delivery lead, so file
 # embeddings embed meaning, never name-noise).
-STAMP_VERSION = "1.37.0"
+STAMP_VERSION = "1.38.0"
 RATIFIED = True
 DOC_STAMP = ("v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 twin-graph "
              "ruling ADR 0077; v1.2.0 Phase A metamodel bump; v1.3.0 "
@@ -204,7 +204,10 @@ DOC_STAMP = ("v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 twin-graph "
              "(left_side/right_side → table-or-scope, ON-resolved "
              "pair, syntactic side order; join has_part condition); "
              "clauseProvenance property retired (parentage carries "
-             "it); joins_to stays dictionary-only")
+             "it); joins_to stays dictionary-only); v1.17.0 M2 THE "
+             "JOIN LAYER BUILT (2026-09-10): join/left_side/"
+             "right_side flip PRESENT, join rows in Connection_"
+             "Ledger + Speech_Sources; reads = the remainder")
 CONVERTED_ON = "2026-09-05"
 
 
@@ -851,6 +854,12 @@ TWIN_SHEETS = {
              "'the report users SHOULD see the logic' — a report "
              "aboutness is never separately drafted; type words "
              "stay banned (label card carries them)"},
+            {"Label": "join (ON predicate container)",
+             "Speech": "stored description (deterministic render)",
+             "Meaning": "which pair combines, on what predicate — "
+             "verbatim-law checked; out of the search index until "
+             "the scoring work resumes (ruled-silent with scopes/"
+             "statements)"},
             {"Label": "derived_column", "Speech": "computed-output "
              "phrase (grammar render: name words + the defining "
              "selection)", "Meaning": "rendered"},
@@ -1061,8 +1070,7 @@ TWIN_SHEETS = {
              "Description obligation": "stored (voiced phrase)",
              "Notes": "same"},
             {"Kind": "node", "Name": "join",
-             "Status": "TARGET — landing: M3 (the join-node ruling "
-             "2026-09-10)",
+             "Status": "PRESENT",
              "Description obligation": "stored (voiced phrase — the "
              "deterministic render)",
              "Notes": "observed relational meaning: joinType property "
@@ -1122,13 +1130,13 @@ TWIN_SHEETS = {
              "the join-node ruling 2026-09-10); the pair diff = "
              "documentation drift, direct by query"},
             {"Kind": "edge", "Name": "left_side",
-             "Status": "TARGET — landing: M3",
+             "Status": "PRESENT",
              "Description obligation": "-",
              "Notes": "join→table-or-scope; ON-resolved pair, side "
              "order syntactic; bare LEFT is GQL-reserved "
              "(gate-checked 2026-09-10)"},
             {"Kind": "edge", "Name": "right_side",
-             "Status": "TARGET — landing: M3",
+             "Status": "PRESENT",
              "Description obligation": "-",
              "Notes": "join→table-or-scope; same ruling; bare RIGHT "
              "is GQL-reserved"},
@@ -1241,6 +1249,11 @@ TWIN_SHEETS = {
             {"Label": "concept", "Edge": "minted_by",
              "Status": "edged",
              "Meaning": "walks to its recorded minting act"},
+            {"Label": "join", "Edge": "has_part",
+             "Status": "edged",
+             "Meaning": "M2 the join layer: born inside its scope "
+             "(scope—has_part→join); sides walk down to "
+             "tables/scopes"},
             {"Label": "condition", "Edge": "belongs_to",
              "Status": "edged-pseudo",
              "Meaning": "STEP 4: tree-born adjacency citizen — "

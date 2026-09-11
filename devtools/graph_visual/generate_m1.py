@@ -156,17 +156,73 @@ dnode = {"n": dbrow.name, "x": 0, "y": 0, "d": trunc(dbrow.description, 170)}
 
 jedges = [{"a": a, "b": b, "on": on} for a, b, on in jpairs]
 
+# ---- M2 THE JOIN LAYER (store rows: scope · join · sides · the
+# reads remainder) ---------------------------------------------
+sc = pd.read_parquet(EXP / "graph_scope.parquet")
+jn = pd.read_parquet(EXP / "graph_join.parquet")
+hp_sj = pd.read_parquet(EXP / "graph_has_part_scopeJoin.parquet")
+reads = pd.read_parquet(EXP / "graph_reads_scopeTable.parquet")
+sides = {}
+for side in ("left_side", "right_side"):
+    for kind in ("Table", "Scope"):
+        f = EXP / f"graph_{side}_join{kind}.parquet"
+        for r in pd.read_parquet(f).itertuples(index=False):
+            sides.setdefault(r.sourceId, {})[side] = r.targetId
+
+scopes_rows = list(sc.sort_values("nodeId").itertuples(index=False))
+scid = {r.nodeId: i for i, r in enumerate(scopes_rows)}
+import random
+rng = random.Random(7)
+scnodes = []
+for i, r in enumerate(scopes_rows):
+    th = i * GA + 0.7
+    rr = 2400 + 900 * rng.random()
+    scnodes.append({
+        "n": r.nodeId.rsplit("::", 1)[-1], "x": round(rr * math.cos(th), 1),
+        "y": round(rr * math.sin(th), 1), "d": trunc(r.description, 200)})
+
+def ref(target):
+    if target in tid:
+        return {"t": "T", "i": tid[target]}
+    if target in scid:
+        return {"t": "S", "i": scid[target]}
+    return None
+
+owner_of = {r.targetId: r.sourceId
+            for r in hp_sj.itertuples(index=False)}
+jnodes = []
+for r in jn.sort_values("nodeId").itertuples(index=False):
+    owner = scid.get(owner_of.get(r.nodeId, ""), 0)
+    sd = sides.get(r.nodeId, {})
+    o = scnodes[owner]
+    jnodes.append({
+        "n": r.name, "s": owner, "on": trunc(r.onPredicate, 120),
+        "d": trunc(r.description, 200),
+        "ls": ref(sd.get("left_side")), "rs": ref(sd.get("right_side")),
+        "x": round(o["x"] + 60 * math.cos(len(jnodes) * GA), 1),
+        "y": round(o["y"] + 60 * math.sin(len(jnodes) * GA), 1)})
+redges = [{"s": scid[r.sourceId], "t": tid[r.targetId]}
+          for r in reads.itertuples(index=False)]
+
+side_edges = sum(1 for j in jnodes for k in ("ls", "rs") if j[k])
 counts = {
-    "nodes": 1 + len(snodes) + len(tnodes) + len(cnodes),
-    "edges": len(hp_db_s) + len(hp_sc_t) + len(hp_t_c) + len(jedges),
-    "hasPart": len(hp_db_s) + len(hp_sc_t) + len(hp_t_c),
+    "nodes": 1 + len(snodes) + len(tnodes) + len(cnodes)
+    + len(scnodes) + len(jnodes),
+    "edges": len(hp_db_s) + len(hp_sc_t) + len(hp_t_c) + len(jedges)
+    + len(jnodes) + side_edges + len(redges),
+    "hasPart": len(hp_db_s) + len(hp_sc_t) + len(hp_t_c) + len(jnodes),
     "joins": len(jedges),
+    "scopes": len(scnodes), "joinNodes": len(jnodes),
+    "sideEdges": side_edges, "reads": len(redges),
     "described": sum(1 for n in tnodes if n["d"])
-    + sum(1 for n in cnodes if n["d"]),
+    + sum(1 for n in cnodes if n["d"])
+    + sum(1 for n in scnodes if n["d"])
+    + sum(1 for n in jnodes if n["d"]),
 }
 
 data = {"db": dnode, "schemas": snodes, "tables": tnodes,
-        "cols": cnodes, "joins": jedges, "counts": counts}
+        "cols": cnodes, "joins": jedges, "scopes": scnodes,
+        "joinNodes": jnodes, "reads": redges, "counts": counts}
 payload = json.dumps(data, separators=(",", ":"))
 print("payload bytes:", len(payload), "| counts:", counts)
 

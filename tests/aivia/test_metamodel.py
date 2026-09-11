@@ -64,10 +64,12 @@ def test_every_loaded_registry_is_ratified_v1():
     # schema->db_schema, parameter->param, kg3 text->description;
     # 1.37.0 = THE JOIN-NODE RULING (Sunny 2026-09-10): join label +
     # left_side/right_side in the Shape_Ledger, clauseProvenance
-    # retired, joins_to dictionary-only
+    # retired, joins_to dictionary-only; 1.38.0 = M2 THE JOIN LAYER
+    # BUILT: join/left_side/right_side PRESENT, join census rows,
+    # reads = the remainder
     for reg in metamodel.load_all().values():
         assert reg.ratified is True
-        assert reg.version == "1.37.0"
+        assert reg.version == "1.38.0"
 
 
 def test_load_single_exposes_sheets_and_stamp():

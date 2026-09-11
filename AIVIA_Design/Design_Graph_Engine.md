@@ -225,9 +225,9 @@ for this layer and re-derives its index from L3 at convergence.
 
 ## The laws carried forward from v1 (storage-independent, all kept)
 
-[registry stamps: kg1_technical v1.37.0 · kg2_logic v1.37.0 ·
-kg2_kind_library v1.37.0 · kg3_artifacts v1.37.0 ·
-kg4_concepts v1.37.0 · flows v1.37.0 · lenses v1.37.0]
+[registry stamps: kg1_technical v1.38.0 · kg2_logic v1.38.0 ·
+kg2_kind_library v1.38.0 · kg3_artifacts v1.38.0 ·
+kg4_concepts v1.38.0 · flows v1.38.0 · lenses v1.38.0]
 (stamp block restored 2026-09-10 — the ratification rename dropped
 v1's per-section stamps; RG-A2 caught it same day. One block here,
 the same-breath rule mechanical again; registries carry their own

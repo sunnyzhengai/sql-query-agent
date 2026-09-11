@@ -179,14 +179,10 @@ the parse, pinned by test_ed_sepsis_dev_estate.py BEFORE each
 batch builds. Export: `python3.11 -m aivia.flows.export_graph
 ed_sepsis_dev`.
 
-**Sunny's surface choice on the still-open M2 gate:** the staged
-M2 numbers above are the SEPSIS estate's (312 / 451). The
-technical layer is IDENTICAL in both estates (dictionary truth
-never narrows), so switching the Fabric tables to the dev
-estate's exports invalidates nothing M1 verified. Recommended:
-load ed_sepsis_dev from here on and gate M2 with the dev numbers
-below; the full sepsis estate re-loads at phase boundaries (M7,
-M12).
+**RULED (Sunny 2026-09-10): the gate runs on the DEV ESTATE.**
+Load ed_sepsis_dev's exports; the full sepsis estate re-loads at
+phase boundaries (M7, M12). The technical layer is identical in
+both estates, so nothing M1 verified is invalidated.
 
 Every gate below follows the census shape: label counts == the
 key's node rows, edge-type counts == the key's edge rows, plus
