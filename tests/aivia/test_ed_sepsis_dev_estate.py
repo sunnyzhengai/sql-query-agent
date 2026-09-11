@@ -1,20 +1,21 @@
 """The one-proc dev estate + THE M-GATE ANSWER KEY (Sunny's
-rulings 2026-09-10): batches build, test, and gate on
-ed_sepsis_dev (USP_ED_SEPSIS alone); every batch M2..M7 gates on
-the FULL CENSUS — every label counted, every edge type counted,
-exact both directions (the blob-corpse lesson: spot checks pass
-while the graph doesn't exist).
+rulings 2026-09-10, incl. the M2 REDESIGN): batches build, test,
+and gate on ed_sepsis_dev (USP_ED_SEPSIS alone); every batch
+gates on the FULL CENSUS — every label counted, every edge type
+counted, exact both directions (the blob-corpse lesson: spot
+checks pass while the graph doesn't exist).
+
+The redesigned ladder: M1 technical (+joins_to, re-homed) →
+M2 THE JOIN LAYER (scope + join + sides + the reads REMAINDER) →
+M3 THE CONDITION LAYER (condition + param) → M4 derived_column →
+M5 statement → M6 file → M7 governance. Joins and conditions are
+SEPARATE batches so each is testable alone (Sunny's ruling).
 
 The key (expected_m_gates.json) is AUTHORED AHEAD, derived from
 the twin. These tests recompute every derivable number from the
 twin each run and hold the key to them — the key cannot rot
 silently; a metamodel bump that moves a number fails here by
 name, and the key updates by hand with the bump recorded.
-
-The answer key is INDEPENDENT of the builders it will judge: the
-M2 numbers are the USP_ED_SEPSIS subset of the sepsis estate's
-verified M2 export; M3+ numbers come from the twin (the
-deterministic translator's output), one step from the parse.
 
 Proves: contract:aivia-design-to-code
 """
@@ -66,6 +67,12 @@ def _columns(ids):
     return [i for i in ids if i.count("|") == 3]
 
 
+def _join_containers(twin):
+    return sorted({m.group(1) for n in twin
+                   for m in [re.search(r"^(.*?/join_on/\d+)",
+                                       n["points_at"])] if m})
+
+
 # ---------------------------------------------------------------
 # the estate itself
 # ---------------------------------------------------------------
@@ -80,9 +87,8 @@ def test_one_file_full_dictionary(booted):
 
 
 # ---------------------------------------------------------------
-# the census tables are internally consistent (my table arithmetic
-# is itself checked — totals equal the sum of their parts, and
-# each batch's census equals the prior census plus its delta)
+# the census tables are internally consistent: totals equal the
+# sum of parts; each batch's census equals the prior plus its delta
 # ---------------------------------------------------------------
 
 def test_census_arithmetic():
@@ -91,7 +97,7 @@ def test_census_arithmetic():
             continue
         assert sum(c["nodes"].values()) == c["node_total"], m
         assert sum(c["edges"].values()) == c["edge_total"], m
-    order = ["M2", "M3", "M4", "M5", "M6", "M7"]
+    order = ["M1", "M2", "M3", "M4", "M5", "M6", "M7"]
     for prev, cur in zip(order, order[1:]):
         grew = {k: CENSUS[cur]["nodes"].get(k, 0)
                 - CENSUS[prev]["nodes"].get(k, 0)
@@ -104,93 +110,48 @@ def test_census_arithmetic():
 
 
 # ---------------------------------------------------------------
-# M2 — built; the export must match the census exactly
+# M1 — the technical layer + joins_to (re-homed): export matches
 # ---------------------------------------------------------------
 
-def test_m2_export_matches_census(exported):
-    want = CENSUS["M2"]
+def test_m1_export_matches_census(exported):
+    want = CENSUS["M1"]
     got_nodes = {"db": 1, "db_schema": 3,
                  "table": len(exported["graph_table"]),
-                 "column": len(exported["graph_column"]),
-                 "scope": len(exported["graph_scope"])}
+                 "column": len(exported["graph_column"])}
     assert got_nodes == want["nodes"]
     has_part = (len(exported["graph_has_part_dbSchema"])
                 + len(exported["graph_has_part_schemaTable"])
                 + len(exported["graph_has_part_tableColumn"]))
-    got_edges = {"has_part": has_part,
-                 "joins_to": len(exported["graph_joins_to_tableTable"]),
-                 "reads": len(exported["graph_reads_scopeTable"])}
-    assert got_edges == want["edges"]
-    empty = [r["nodeId"] for r in exported["graph_scope"]
-             if not r["description"].strip()]
-    assert empty == []
+    assert has_part == want["edges"]["has_part"]
+    assert len(exported["graph_joins_to_tableTable"]) \
+        == want["edges"]["joins_to"]
+
+
+def test_scope_descriptions_stored(exported):
+    # scopes carry stored descriptions (built; they ship in M2)
+    want = DELTA["M2"]["checks"]["scope_descriptions_nonempty"]
+    scopes = exported["graph_scope"]
+    assert len(scopes) == DELTA["M2"]["new_nodes"]["scope"]
+    assert sum(1 for r in scopes if r["description"].strip()) == want
+    # NOTE: the export's current reads table (45 true-grain edges) is
+    # SUPERSEDED by the remainder rule — the reworked M2 export ships
+    # join nodes + sides + ~6 remainder reads; pinned at build.
 
 
 # ---------------------------------------------------------------
-# M3 — authored ahead; the key must match the twin
+# M2 — THE JOIN LAYER (authored ahead; joins testable alone)
 # ---------------------------------------------------------------
 
-def test_m3_key_matches_twin(twin, booted):
-    want = DELTA["M3"]
-    conds = [n for n in twin if n["kind"] == "condition"]
+def test_m2_joins_key_matches_twin(twin, booted):
+    want = DELTA["M2"]
     refs = [n for n in twin if n["kind"] == "reference"]
-    sc = [c for c in conds if _in_scope(c["points_at"])]
-    st = [c for c in conds if not _in_scope(c["points_at"])]
-    assert len(sc) == want["new_nodes"]["condition"]
-    assert len(st) == DELTA["M5"]["new_nodes"]["condition"]
-
-    def clause_of(p):
-        if "/join_on/" in p:
-            return "join_on"
-        if "/when" in p or "/else" in p:
-            return "case_when"
-        if "/where" in p:
-            return "where"
-        return "statement_predicate"
-    assert dict(Counter(clause_of(c["points_at"]) for c in sc)) \
-        == want["condition_by_clause"]
-    assert sum(1 for c in conds if c.get("subkind") == "degenerate") \
-        == want["condition_degenerate_subkind"]
-
-    # the per-kind census: ONE condition label, predicate kind as a
-    # property from the closed library — counted per kind, per batch
-    def kind_of(c):
-        return c["content"].get("predicate") or c["content"].get("shape")
-    assert dict(Counter(kind_of(c) for c in sc)) == want["condition_by_kind"]
-    assert dict(Counter(kind_of(c) for c in st)) \
-        == DELTA["M5"]["condition_by_kind_new"]
-
-    # parent split: nested under a condition vs direct under scope
-    cpaths = {c["points_at"] for c in conds}
-    def nested(p):
-        return any(p.startswith(q + "/") for q in cpaths)
-    assert sum(1 for c in sc if not nested(c["points_at"])) \
-        == want["new_edges"]["has_part_scopeCondition"]
-    assert sum(1 for c in sc if nested(c["points_at"])) \
-        == want["new_edges"]["has_part_conditionCondition"]
-
-    joins = sorted({m.group(1) for n in twin
-                    for m in [re.search(r"^(.*?/join_on/\d+)",
-                                        n["points_at"])] if m})
+    joins = _join_containers(twin)
     assert len(joins) == want["new_nodes"]["join"]
-    assert all(_in_scope(j) for j in joins)
     assert len(joins) == want["new_edges"]["has_part_scopeJoin"]
     assert len(joins) == want["new_edges"]["left_side"]
     assert len(joins) == want["new_edges"]["right_side"]
+    assert all(_in_scope(j) for j in joins)
 
-    # params by user grain: scope-used ship at M3, statement-only at M5
-    grains = {}
-    for r in refs:
-        p = r.get("content", {}).get("parameter")
-        if p:
-            grains.setdefault(p, set()).add(
-                "scope" if _in_scope(r["points_at"]) else "statement")
-    m3_params = sorted(p for p, g in grains.items() if "scope" in g)
-    m5_params = sorted(p for p, g in grains.items() if "scope" not in g)
-    assert m3_params == want["param_names"]
-    assert m5_params == DELTA["M5"]["param_names_new"]
-
-    # ON-resolved table sets per join → sides, pairs, drift
     pair_tables = {}
     for j in joins:
         ts = set()
@@ -209,6 +170,8 @@ def test_m3_key_matches_twin(twin, booted):
     assert len(joins) * 2 - want["side_targets"]["table"] \
         == want["side_targets"]["scope"]
 
+    # THE DRIFT QUERY at parse level — needs joins + joins_to only,
+    # no condition nodes (why joins are testable alone)
     declared = set()
     for e in booted.current_edges("joins_to"):
         declared.add((e.from_id, e.to_id))
@@ -219,17 +182,63 @@ def test_m3_key_matches_twin(twin, booted):
     assert findings == [tuple(f) for f in
                         want["checks"]["drift_findings_exact"]]
 
-    # THE SIDE-READS INVARIANT at parse level: 0 violations
-    viol = 0
-    for j, ts in pair_tables.items():
-        stmt = j.split("/scope")[0].split("/ctes")[0]
-        scope_reads = {n["content"].get("resolved") for n in twin
-                       if n["kind"] == "source"
-                       and n["points_at"].startswith(stmt + "/")}
-        viol += sum(1 for t in ts if t not in scope_reads)
-    assert viol == want["checks"]["side_reads_invariant_violations"]
 
-    # resolves_to: condition→column and condition→param, by batch
+# ---------------------------------------------------------------
+# M3 — THE CONDITION LAYER (authored ahead; testable alone)
+# ---------------------------------------------------------------
+
+def test_m3_conditions_key_matches_twin(twin):
+    want = DELTA["M3"]
+    conds = [n for n in twin if n["kind"] == "condition"]
+    refs = [n for n in twin if n["kind"] == "reference"]
+    sc = [c for c in conds if _in_scope(c["points_at"])]
+    st = [c for c in conds if not _in_scope(c["points_at"])]
+    assert len(sc) == want["new_nodes"]["condition"]
+    assert len(st) == DELTA["M5"]["new_nodes"]["condition"]
+
+    def clause_of(p):
+        if "/join_on/" in p:
+            return "join_on"
+        if "/when" in p or "/else" in p:
+            return "case_when"
+        return "where"
+    assert dict(Counter(clause_of(c["points_at"]) for c in sc)) \
+        == want["condition_by_clause"]
+    assert sum(1 for c in conds if c.get("subkind") == "degenerate") \
+        == want["condition_degenerate_subkind"]
+
+    def kind_of(c):
+        return c["content"].get("predicate") or c["content"].get("shape")
+    assert dict(Counter(kind_of(c) for c in sc)) == want["condition_by_kind"]
+    assert dict(Counter(kind_of(c) for c in st)) \
+        == DELTA["M5"]["condition_by_kind_new"]
+
+    # parent split: ON roots parent to their JOIN; where/case roots
+    # to their scope; the rest nest under conditions
+    cpaths = {c["points_at"] for c in conds}
+    containers = set(_join_containers(twin))
+    roots = [c for c in sc
+             if not any(c["points_at"].startswith(q + "/") for q in cpaths)]
+    join_roots = [c for c in roots if c["points_at"] in containers]
+    assert len(join_roots) == want["new_edges"]["has_part_joinCondition_roots"]
+    assert len(roots) - len(join_roots) \
+        == want["new_edges"]["has_part_scopeCondition_roots"]
+    assert len(sc) - len(roots) \
+        == want["new_edges"]["has_part_conditionCondition"]
+
+    # params by user grain: scope-used ship at M3, statement-only at M5
+    grains = {}
+    for r in refs:
+        p = r.get("content", {}).get("parameter")
+        if p:
+            grains.setdefault(p, set()).add(
+                "scope" if _in_scope(r["points_at"]) else "statement")
+    assert sorted(p for p, g in grains.items() if "scope" in g) \
+        == want["param_names"]
+    assert sorted(p for p, g in grains.items() if "scope" not in g) \
+        == DELTA["M5"]["param_names_new"]
+
+    # resolves_to with roles: condition→column and condition→param
     cond_paths = [c["points_at"] for c in conds]
     def owner(p):
         owners = [q for q in cond_paths if p.startswith(q + "/")]
@@ -239,8 +248,7 @@ def test_m3_key_matches_twin(twin, booted):
         o = owner(r["points_at"])
         if not o:
             continue
-        cols = _columns(r.get("draws_from") or [])
-        for c in cols:
+        for c in _columns(r.get("draws_from") or []):
             if (o, c) not in cc:
                 roles[r["points_at"][len(o) + 1:].split("/")[0]] += 1
             cc.add((o, c))
@@ -248,8 +256,8 @@ def test_m3_key_matches_twin(twin, booted):
         if p:
             cp.add((o, p))
     assert len(cc) == want["new_edges"]["resolves_to_conditionColumn"]
-    assert dict(roles) == want["resolves_to_roles"]
     assert all(_in_scope(o) for o, _ in cc)
+    assert dict(roles) == want["resolves_to_roles"]
     cp_m3 = {x for x in cp if _in_scope(x[0])}
     assert len(cp_m3) == want["new_edges"]["resolves_to_conditionParam"]
     assert len(cp) - len(cp_m3) \
@@ -257,7 +265,7 @@ def test_m3_key_matches_twin(twin, booted):
 
 
 # ---------------------------------------------------------------
-# M4 — authored ahead
+# M4 — derived_column (authored ahead)
 # ---------------------------------------------------------------
 
 def test_m4_key_matches_twin(twin):
@@ -287,7 +295,7 @@ def test_m4_key_matches_twin(twin):
 
 
 # ---------------------------------------------------------------
-# M5 — authored ahead
+# M5 — statement + the M3 holdovers (authored ahead)
 # ---------------------------------------------------------------
 
 def test_m5_key_matches_twin(twin):
@@ -297,8 +305,6 @@ def test_m5_key_matches_twin(twin):
     assert sum(1 for s in sts if s.get("subkind") == "operational") \
         == want["statement_operational_subkind"]
 
-    # statement-rooted conditions: 2 roots (statement→condition),
-    # 4 nested (condition→condition)
     conds = [n for n in twin if n["kind"] == "condition"]
     cpaths = {c["points_at"] for c in conds}
     st = [c for c in conds if not _in_scope(c["points_at"])]
@@ -308,8 +314,7 @@ def test_m5_key_matches_twin(twin):
     assert len(st) - len(roots) \
         == want["new_edges"]["has_part_conditionCondition"]
 
-    # the counted-missing debt: statements with NO downward edge
-    # (no scope below, no condition below) until file→statement at M6
+    # counted-missing debt: statements with no downward edge until M6
     idx = sorted({int(m.group(1)) for n in twin
                   for m in [re.match(r"^/statements/(\d+)", n["points_at"])]
                   if m})
@@ -322,13 +327,11 @@ def test_m5_key_matches_twin(twin):
         for c in conds)}
     floaters = [i for i in idx if i not in has_scope and i not in has_cond]
     assert len(floaters) == 31  # the declared Connection_Ledger debt
-    # statement→scope: every named scope has exactly one declaring
-    # statement — the store's 44 scopes
     assert want["new_edges"]["has_part_statementScope"] == 44
 
 
 # ---------------------------------------------------------------
-# M6/M7 — authored ahead; store-checkable today
+# M6/M7 — file + governance (authored ahead; store-checkable)
 # ---------------------------------------------------------------
 
 def test_m6_m7_key_matches_store(booted):

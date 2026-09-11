@@ -288,17 +288,25 @@ still-open M2 gate's surface — staged sepsis numbers (312/451) vs
 the dev estate's (44/45); runbook recommends switching to dev
 (the technical layer is identical, M1's verification survives).
 
-Same batches, same bottom-up order, each row now carrying its V2
-DELTA — the amendments the v2 design makes to the queued v1
-content:
+**THE M2 REDESIGN (Sunny's rulings 2026-09-10, from the
+hand-drawn structure):** (1) a scope reaches its tables THROUGH
+its join nodes — the direct `reads` edge survives ONLY where no
+join side covers the table (the remainder rule; ~6 of ~50 pairs
+on the dev proc, 47 die into join-side travel); (2) `joins_to`
+re-homes to M1's row — dictionary truth, never logic-layer
+content; (3) JOINS AND CONDITIONS SPLIT into separate batches so
+each is testable alone. The old M2 (scope + 45 reads) is
+SUPERSEDED before its gate ever ran — nothing to unwind in
+Fabric. M4–M7 keep their contents and numbers.
 
-| batch | ships (v1 content) | V2 DELTA | ties DOWN into | status |
+| batch | ships | V2 / redesign notes | ties DOWN into | status |
 |---|---|---|---|---|
-| M3 | condition + param + **join** — stored voiced phrases + scope—has_part→condition/param/join + join—has_part→condition (the ON predicate's home) + condition—resolves_to→column + join—left_side/right_side→table-or-scope | THE JOIN-NODE RULING (Sunny 2026-09-10, hand-drawn graph): observed joins are JOIN NODES, never a second table→table edge — `joins_to` stays dictionary-only (integrity: one edge name, one authority); side names `left_side`/`right_side` (bare LEFT/RIGHT are GQL-reserved, gate-checked); pair = the tables the ON columns RESOLVE to, side order syntactic (outer-join semantics survive), 3+-table ONs counted, scope sides legal (CTE/#temp); clauseProvenance property RETIRED — parentage carries it; + `uses_param` (scope→param); ACCEPTANCE GAINS THE PRODUCT QUERY, now DIRECT: join pairs without a declared `joins_to` == compliance findings, pure GQL, live at this batch; + THE SIDE-READS INVARIANT (pinned by Sunny 2026-09-10) as a standing census line: every join side's table ∈ its scope's read-set — join ⊆ reads, divergence = builder bug | scope + column (+ scope for CTE sides) | queued |
-| M4 | derived_column | + `cites` (scope→column outputs) | scope | queued |
-| M5 | statement — stored R11 descriptions + statement—has_part→scope | English-ladder placement: statement descriptions are the DETERMINISTIC RENDER itself (small composition — no LLM) | scope | queued |
-| M6 | file — drafted aboutness + file—has_part→statement; the COMPOSITION CHECK (parent description contains children's words) | the aboutness draft is an LLM COMPRESSION OF THE RENDER, never independent of it; the checkable law lands as a test: every concept in the compressed description exists in the anatomy (hallucination mechanically detectable); drafts anchor to meaning keys (contentKey) so upstream change visibly orphans them — the anchor ships NOW even though the drafts re-home to `derived.english_drafts` at M10 | statement | queued |
-| M7 | governance + consumption + blessing lands file descriptions ON the store node + zero TARGET rows + final viz | pbi_report descriptions DERIVE from executed procs via `executes` (the derivation ruling — same words for 1:1); + `drift` label per the v2 governance vocabulary; Shape_Ledger amended to the v2 node/edge census before this batch's gate | everything | queued |
+| M2 | THE JOIN LAYER: scope ×44 (descriptions STORED, verbatim law) + join ×93 — scope—has_part→join + join—left_side/right_side→table-or-scope + `reads` REMAINDER ONLY (~6, pinned exactly at build) | joins testable ALONE: the DRIFT QUERY (join pairs without declared `joins_to` == the 2 findings) runs at this gate with no condition nodes needed; sides = ON-resolved pair, side order syntactic; scope sides legal; cross joins (no ON) counted at build; THE COVERAGE INVARIANTS replace side-reads: reads ∩ sides = ∅ AND reads ∪ sides = read-set, per scope | table (+ scope sides within batch) | queued — REDESIGNED, build pending |
+| M3 | THE CONDITION LAYER: condition ×748 + param ×2 (@dStartDate/@dEndDate) — join—has_part→condition (ON roots ×90, 3 pinned at build) + scope—has_part→condition (where/case roots ×132) + condition—has_part→condition (×526) + condition—resolves_to→column ×150 / →param ×2 (role-tagged) + uses_param ×2 | conditions testable ALONE: per-kind census (14 kinds), clause split (join_on 194 · where 167 · case_when 387), degenerate subkind 25, roles subject 104 · comparand 43 · selection 3; clauseProvenance property retired — parentage carries it; 6 IF-statement conditions + @StartDate/@EndDate HOLD for M5 (birth-edge law) | join + scope + column | queued |
+| M4 | derived_column ×156 + `cites` ×100 | unchanged | scope + column | queued |
+| M5 | statement ×67 (R11 renders; operational 31 = counted-missing debt until M6) + the M3 holdovers (+6 conditions, +2 params) | unchanged | scope + condition | queued |
+| M6 | file — drafted aboutness (LLM compression OF the render, meaning-key anchored) + file—has_part→statement/param + the COMPOSITION CHECK | closes the 31-statement debt | statement + param | queued |
+| M7 | governance + consumption + blessing lands file descriptions ON the store node + zero TARGET rows + final viz | pbi_report descriptions DERIVE via `executes`; + `drift` label; Shape_Ledger amended to the v2 census before this gate | everything | queued |
 
 DISCREPANCY FLAGGED (Sunny's call at ratification): §E5's
 decisions line says file descriptions "land on the STORE node at

@@ -7,7 +7,7 @@
 
 # Test Map — what every test proves
 
-177 modules, 1862 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
+177 modules, 1864 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
 
 ## By ADR
 
@@ -164,7 +164,7 @@
 - `tests/aivia/test_connection_census.py` (9): STEP 1 of the Connection Ledger build — THE TEST SUITE, shown to
 - `tests/aivia/test_design_validators.py` (4): Slice 0: the design validators run in CI — every push re-proves the
 - `tests/aivia/test_doubles.py` (6): THE SCRIPTED-PROPOSALS CONTRACT (Sunny's ruling, 2026-09-09:
-- `tests/aivia/test_ed_sepsis_dev_estate.py` (7): The one-proc dev estate + THE M-GATE ANSWER KEY (Sunny's
+- `tests/aivia/test_ed_sepsis_dev_estate.py` (9): The one-proc dev estate + THE M-GATE ANSWER KEY (Sunny's
 - `tests/aivia/test_flows_change_quanta.py` (6): The flows' change quanta (CONTRACT_DATALOAD §13 + the flows
 - `tests/aivia/test_full_circle.py` (7): Slice 7: FULL CIRCLE — one run from empty, every family proven.
 - `tests/aivia/test_governance_journal.py` (4): PHASE E1 — THE GOVERNANCE JOURNAL (Sunny's ruling: all user

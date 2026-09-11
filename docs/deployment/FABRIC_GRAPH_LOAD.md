@@ -106,7 +106,11 @@ Source dropdowns, dead bindings, M1 lost a day to it). RULED: one
 namespace — everything targets `Tables/dbo/`; the loader now does.
 Root-level graph_* tables must never exist; delete on sight.
 
-## M2 — the scope layer (bottom-up re-ruling, 2026-09-10)
+## M2 — the scope layer [SUPERSEDED 2026-09-10 by the M2
+REDESIGN before its gate ever ran — kept as record; the ruled
+gates are THE ONE-PROC LADDER GATES below. Do NOT load these
+tables: scope→table travels through JOIN NODES now (the
+remainder rule); joins_to re-homed to M1's content]
 
 Ships the layer that touches the technical foundation directly:
 `graph_scope` (312 rows — name, description STORED on the store
@@ -195,14 +199,14 @@ MATCH (n) RETURN labels(n) AS lbl, count(*) AS cnt ORDER BY lbl
 MATCH ()-[r]->() RETURN type(r) AS rel, count(*) AS cnt ORDER BY rel
 ```
 
-### M2 gate (dev estate)
+### M1 gate — technical layer + joins_to (re-homed here, Sunny's
+redesign ruling)
 
 | expect | value |
 |---|---|
-| nodes | db 1 · db_schema 3 · table 90 · column 4554 · scope 44 |
-| edges | has_part 4647 (3+90+4554) · joins_to 65 · reads 45 |
-| descriptions | 44/44 scopes non-empty (`WHERE s.description IS NOT NULL`) |
-| spot | #Base_Pop reads ED_ENCOUNTERS_FACT; ADT_EVENTS joins_to neighbors carry onColumns |
+| nodes | db 1 · db_schema 3 · table 90 · column 4554 |
+| edges | has_part 4647 (3+90+4554) · joins_to 65 (dictionary-declared, onColumns) |
+| spot | ADT_EVENTS joins_to neighbors carry onColumns |
 
 THE FULL-CENSUS TABLES (hardened 2026-09-10, Sunny's directive —
 the blob-corpse lesson: a spot check passes while the graph
@@ -212,8 +216,9 @@ batch, cumulative:
 
 | after | Q1 nodes by label | total |
 |---|---|---|
-| M2 | db 1 · db_schema 3 · table 90 · column 4554 · scope 44 | **4692** |
-| M3 | + condition 748 · join 93 · param 2 | **5535** |
+| M1 | db 1 · db_schema 3 · table 90 · column 4554 | **4648** |
+| M2 | + scope 44 · join 93 | **4785** |
+| M3 | + condition 748 · param 2 | **5535** |
 | M4 | + derived_column 156 | **5691** |
 | M5 | + statement 67 · condition→754 · param→4 | **5766** |
 | M6 | + file 1 | **5767** |
@@ -221,24 +226,69 @@ batch, cumulative:
 
 | after | Q3 edges by type | total |
 |---|---|---|
-| M2 | has_part 4647 · joins_to 65 · reads 45 | **4757** |
-| M3 | has_part 5488 · joins_to 65 · reads 45 · left_side 93 · right_side 93 · resolves_to 152 · uses_param 2 | **5938** |
-| M4 | has_part 5644 · … · cites 100 | **6194** |
-| M5 | has_part 5694 · resolves_to 156 · uses_param 4 · rest same | **6250** |
-| M6 | has_part 5765 · rest same | **6321** |
-| M7 | + executes 1 · describes 1 | **6323** |
+| M1 | has_part 4647 · joins_to 65 | **4712** |
+| M2 | + left_side 93 · right_side 93 · has_part→4740 · reads ~6 (the REMAINDER — exact value pinned at build) | **4997** |
+| M3 | has_part 5488 · resolves_to 152 · uses_param 2 · rest same | **5899** |
+| M4 | has_part 5644 · + cites 100 | **6155** |
+| M5 | has_part 5694 · resolves_to 156 · uses_param 4 | **6211** |
+| M6 | has_part 5765 | **6282** |
+| M7 | + executes 1 · describes 1 | **6284** |
 
 Any label or edge type not in the row = a gate failure; any
 declared count off by one = a gate failure. The machine copy of
 these tables (with every per-batch delta and its breakdown) is
 `expected_m_gates.json`.
 
-### M3 gate — condition + param + join
+### M2 gate — THE JOIN LAYER (scope + join; joins testable ALONE)
+
+Sunny's redesign ruling 2026-09-10: a scope reaches its tables
+THROUGH its join nodes; `reads` is the REMAINDER — only tables no
+join side covers (one-table-no-join scopes; single-table
+subqueries attaching to their named ancestor per A4). 47 of ~50
+old direct reads die into join-side travel.
 
 | expect | value |
 |---|---|
-| new nodes | condition 748 · join 93 · param 2 (@dStartDate @dEndDate) |
-| new edges | has_part +841 (scope→condition 222 · condition→condition 526 · scope→join 93) · resolves_to 152 (→column 150 · →param 2) · left_side 93 · right_side 93 (→table 85, →scope 101) · uses_param 2 |
+| new nodes | scope 44 (stored descriptions 44/44 non-empty) · join 93 |
+| new edges | has_part scope→join 93 · left_side 93 · right_side 93 (→table 85, →scope 101) · reads ~6 (REMAINDER — exact value pinned at build, test-derived) |
+| join anatomy | both-table 30 · one-table 25 · scope-sided 38; cross joins (no ON) counted at build |
+| spot | #Base_Pop's joins point at ED_ENCOUNTERS_FACT / HOSPITAL_ENCOUNTERS / PATIENTS |
+
+THE DRIFT QUERY runs AT THIS GATE — it needs joins + joins_to
+only, no condition nodes (why joins are testable alone). Must
+return EXACTLY two rows:
+
+```gql
+MATCH (j:join)-[:left_side]->(a:table),
+      (j)-[:right_side]->(b:table)
+WHERE NOT (a)-[:joins_to]-(b)
+RETURN DISTINCT a.name, b.name
+```
+Expected: ENCOUNTER_VISIT_REASONS↔VISIT_REASONS and
+MEDICATIONS↔REF_GENERIC_MED — practiced in USP_ED_SEPSIS, never
+declared by the dictionary (verified against the parse
+2026-09-10, before any build).
+
+THE COVERAGE INVARIANTS (superseding the side-reads invariant —
+reads is the remainder, never the union). Disjointness must
+return zero:
+
+```gql
+MATCH (s:scope)-[:reads]->(t:table),
+      (s)-[:has_part]->(:join)-[:left_side|:right_side]->(t)
+RETURN count(*) AS doubleConnected
+```
+Expected: 0. Coverage (reads ∪ join-sides == the parse read-set,
+per scope) runs store-side in the census — the parse read-set is
+not itself in the graph.
+
+### M3 gate — THE CONDITION LAYER (condition + param; testable
+ALONE)
+
+| expect | value |
+|---|---|
+| new nodes | condition 748 · param 2 (@dStartDate @dEndDate) |
+| new edges | has_part +748 (join→condition ON-roots 90 [3 pinned at build] · scope→condition 132 · condition→condition 526) · resolves_to 152 (→column 150 · →param 2, role-tagged) · uses_param 2 |
 | condition split | join_on 194 · where 167 · case_when 387; degenerate subkind 25 |
 | held for M5 | 6 statement-rooted conditions (IF predicates) + @StartDate/@EndDate — their parents are STATEMENTS, which don't exist until M5; shipping them now would float them (the birth-edge law) |
 
@@ -265,29 +315,6 @@ moved count = gate failure. Role property on resolves_to,
 expected: subject 104 · comparand 43 · selection 3 (this proc's
 RANGE bounds resolve to params/literals, so no bound-role column
 edges here — the roles vocabulary stays the ratified closed set).
-
-THE DRIFT QUERY (the product story, live at this batch) must
-return EXACTLY two rows:
-
-```gql
-MATCH (j:join)-[:left_side]->(a:table),
-      (j)-[:right_side]->(b:table)
-WHERE NOT (a)-[:joins_to]-(b)
-RETURN DISTINCT a.name, b.name
-```
-Expected: ENCOUNTER_VISIT_REASONS↔VISIT_REASONS and
-MEDICATIONS↔REF_GENERIC_MED — practiced in USP_ED_SEPSIS, never
-declared by the dictionary (verified against the parse
-2026-09-10, before any build).
-
-THE SIDE-READS INVARIANT must return zero:
-
-```gql
-MATCH (s:scope)-[:has_part]->(j:join)-[:left_side|right_side]->(t:table)
-WHERE NOT (s)-[:reads]->(t)
-RETURN count(*) AS violations
-```
-Expected: 0.
 
 ### M4 gate — derived_column
 

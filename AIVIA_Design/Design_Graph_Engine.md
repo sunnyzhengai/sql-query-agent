@@ -140,8 +140,14 @@ properties.
 **Edge vocabulary** (AMENDED 2026-09-10 — THE JOIN-NODE RULING,
 Sunny's hand-drawn graph): containment `has_part` (db→db_schema→
 table→column; file→statement→scope→condition/param/join;
-join→condition — the ON predicate's home); `reads` (scope→table,
-true grain); `joins_to` (table→table, DECLARED — dictionary
+join→condition — the ON predicate's home); `reads` (scope→table —
+THE REMAINDER RULE, Sunny's M2-redesign ruling 2026-09-10: a
+scope's tables are reached THROUGH ITS JOIN NODES; a direct reads
+edge exists ONLY for a table no join side covers — the
+one-table-no-join scope, and single-table subqueries attaching to
+their named ancestor per A4. The read-set is DERIVED: reads ∪
+join sides. Measured on USP_ED_SEPSIS: 47 of ~50 scope→table
+connections travel through joins; ~6 reads survive); `joins_to` (table→table, DECLARED — dictionary
 truth, with key columns; NEVER written by observation — the
 observed side lives on join nodes, so the declared edge's
 integrity is preserved: one edge name, one authority);
@@ -167,14 +173,14 @@ where condition; derivable is never stored. Clause CONTAINERS
 (WHERE, FROM as syntax boxes) remain non-nodes; the join is not a
 container — it is relational meaning: which pair combines, how
 (`joinType` property: inner | left_outer | right_outer |
-full_outer | cross), and by what predicate. THE SIDE-READS
-INVARIANT (pinned by Sunny 2026-09-10): `reads` and join sides
-are two projections of one parse — every join side's TABLE
-appears in its scope's read-set (join ⊆ reads; the converse
-never holds: 69 of 189 table-reading scopes in the sepsis estate
-read ONE table and have no join, which is why `reads` is not
-derivable and stays stored). Divergence is a builder bug; the
-check is a standing census line from M3 on.
+full_outer | cross), and by what predicate. THE COVERAGE INVARIANTS
+(SUPERSEDING the earlier side-reads invariant — Sunny's
+M2-redesign ruling, same day: reads is the REMAINDER, never the
+union): per scope, (1) DISJOINT — no table is connected both by
+a reads edge and a join side; (2) COVERING — reads ∪ join sides
+== the parse's read-set, so no table a scope touches is silently
+unconnected. Both are standing census lines from the join batch
+on; divergence is a builder bug.
 
 **THE ENGLISH LADDER (amended by Sunny's readability challenge,
 2026-09-10):** every node ALWAYS keeps its deterministic render —
