@@ -116,6 +116,18 @@ the vendored-list gate stands):
   derived_column · join` (join ADDED 2026-09-10, Sunny's
   hand-drawn ruling; label gate-checked — JOIN is SQL-reserved,
   not ISO-GQL-reserved)
+
+Labels are GRAINS, never kinds (clarified 2026-09-10, answering
+Sunny's per-predicate question; the kind-vs-label standard):
+`condition` is ONE label for every predicate — leaf (COMPARE_*,
+RANGE, IN_*, NULL_CHECK, EXISTS_* …) and composite (AND/OR/NOT,
+nested via has_part) — with the predicate kind as a PROPERTY from
+the registry's closed library. Per-predicate structure lives in
+ROLE-tagged `resolves_to` edges (subject · comparand ·
+lower_bound · upper_bound · pattern · escape · selection ·
+quantifier — the ratified role vocabulary); role-completeness per
+kind is GV-B's rule table. A new predicate kind is a registry
+row, never a new label.
 - consumption: `pbi_report`
 - governance: `description · term · usage · disposition ·
   proposal · acronym · person · agent · role` (+ `drift`)
@@ -155,7 +167,14 @@ where condition; derivable is never stored. Clause CONTAINERS
 (WHERE, FROM as syntax boxes) remain non-nodes; the join is not a
 container — it is relational meaning: which pair combines, how
 (`joinType` property: inner | left_outer | right_outer |
-full_outer | cross), and by what predicate.
+full_outer | cross), and by what predicate. THE SIDE-READS
+INVARIANT (pinned by Sunny 2026-09-10): `reads` and join sides
+are two projections of one parse — every join side's TABLE
+appears in its scope's read-set (join ⊆ reads; the converse
+never holds: 69 of 189 table-reading scopes in the sepsis estate
+read ONE table and have no join, which is why `reads` is not
+derivable and stays stored). Divergence is a builder bug; the
+check is a standing census line from M3 on.
 
 **THE ENGLISH LADDER (amended by Sunny's readability challenge,
 2026-09-10):** every node ALWAYS keeps its deterministic render —
@@ -200,13 +219,15 @@ for this layer and re-derives its index from L3 at convergence.
 
 ## The laws carried forward from v1 (storage-independent, all kept)
 
-[registry stamps: kg1_technical v1.36.0 · kg2_logic v1.36.0 ·
-kg2_kind_library v1.36.0 · kg3_artifacts v1.36.0 ·
-kg4_concepts v1.36.0 · flows v1.36.0 · lenses v1.37.0]
+[registry stamps: kg1_technical v1.37.0 · kg2_logic v1.37.0 ·
+kg2_kind_library v1.37.0 · kg3_artifacts v1.37.0 ·
+kg4_concepts v1.37.0 · flows v1.37.0 · lenses v1.37.0]
 (stamp block restored 2026-09-10 — the ratification rename dropped
 v1's per-section stamps; RG-A2 caught it same day. One block here,
 the same-breath rule mechanical again; registries carry their own
-section provenance.)
+section provenance. 1.37.0 = the join-node ruling, landed in the
+CONVERTER — registry JSONs are generated data, never hand-edited;
+the determinism test enforces it and caught the first attempt.)
 
 Conservation (handled ⊎ counted == everything) · meaning-identity
 anchoring (contentKeys → drift) · the voicing grammar (registry-

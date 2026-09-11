@@ -193,13 +193,18 @@ SOURCES = {
 # deliveries lead, spine voiced, intermediates counted, census
 # closes; the file's ask-index words = the delivery lead, so file
 # embeddings embed meaning, never name-noise).
-STAMP_VERSION = "1.36.0"
+STAMP_VERSION = "1.37.0"
 RATIFIED = True
 DOC_STAMP = ("v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 twin-graph "
              "ruling ADR 0077; v1.2.0 Phase A metamodel bump; v1.3.0 "
              "Phase B composite-kinds correction; v1.4.0 T-2 "
              "operational-statements ruling; v1.5.0 the gap taxonomy; v1.6.0 the plug-all-holes sweep; v1.7.0 ledger close; v1.8.0 the ask console ADR 0078; v1.9.0 the list op; v1.10.0 kind vocabulary; v1.11.0 ADR 0079 interpreter; v1.12.0 Tier A build data; v1.13.0 the seat-failure law; v1.14.0 follow-up context; v1.15.0 anaphor vocabulary "
-             "(all 2026-09-06)")
+             "(all 2026-09-06); v1.16.0 THE JOIN-NODE RULING (Sunny "
+             "2026-09-10): logic gains the join node "
+             "(left_side/right_side → table-or-scope, ON-resolved "
+             "pair, syntactic side order; join has_part condition); "
+             "clauseProvenance property retired (parentage carries "
+             "it); joins_to stays dictionary-only")
 CONVERTED_ON = "2026-09-05"
 
 
@@ -1055,6 +1060,15 @@ TWIN_SHEETS = {
              "Status": "TARGET — landing: the materialization build",
              "Description obligation": "stored (voiced phrase)",
              "Notes": "same"},
+            {"Kind": "node", "Name": "join",
+             "Status": "TARGET — landing: M3 (the join-node ruling "
+             "2026-09-10)",
+             "Description obligation": "stored (voiced phrase — the "
+             "deterministic render)",
+             "Notes": "observed relational meaning: joinType property "
+             "(inner|left_outer|right_outer|full_outer|cross); "
+             "has_part → its ON condition; label gate-checked (JOIN "
+             "is not ISO-GQL-reserved)"},
             {"Kind": "node", "Name": "meaning_twin",
              "Status": "PRESENT",
              "Description obligation": "none-ruled",
@@ -1104,8 +1118,20 @@ TWIN_SHEETS = {
              "joins.csv, KG1 intake) — table→table with key-column "
              "pairs; found undeclared 2026-09-10 (the census read "
              "adjacency, not the store); ships with M2. Observed "
-             "joins live in condition nodes (M3); their diff = "
-             "documentation drift, by query"},
+             "joins live on JOIN NODES (left_side/right_side, M3 — "
+             "the join-node ruling 2026-09-10); the pair diff = "
+             "documentation drift, direct by query"},
+            {"Kind": "edge", "Name": "left_side",
+             "Status": "TARGET — landing: M3",
+             "Description obligation": "-",
+             "Notes": "join→table-or-scope; ON-resolved pair, side "
+             "order syntactic; bare LEFT is GQL-reserved "
+             "(gate-checked 2026-09-10)"},
+            {"Kind": "edge", "Name": "right_side",
+             "Status": "TARGET — landing: M3",
+             "Description obligation": "-",
+             "Notes": "join→table-or-scope; same ruling; bare RIGHT "
+             "is GQL-reserved"},
             {"Kind": "edge", "Name": "reads", "Status": "PRESENT",
              "Description obligation": "-", "Notes": ""},
             {"Kind": "edge", "Name": "cites", "Status": "PRESENT",

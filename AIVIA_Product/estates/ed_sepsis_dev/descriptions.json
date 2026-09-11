@@ -1,0 +1,12 @@
+{
+ "author": "agent:scribe",
+ "basis": {
+  "evidence": "structural voicing / shell+displays",
+  "model": "gpt-4o-mini",
+  "prompt_version": "1.1.0"
+ },
+ "created_at": "2026-09-09T15:42:21.946776+00:00",
+ "descriptions": {
+  "repo://sepsis-corpus/reporting/USP_ED_SEPSIS.sql": "sepsis cases, their severity classification, for clinical reporting and analysis."
+ }
+}

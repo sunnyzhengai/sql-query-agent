@@ -1,0 +1,5 @@
+{
+ "as_of": "2026-09-08T00:00:00Z",
+ "layer": "pbi",
+ "note": "consumption layer: 1 real dashboard (TMDL) + synthetic shells, one per remaining proc (Sunny's ruling 2026-09-08: every proc feeds a PBI; reports may be fake, the mapping is real)"
+}

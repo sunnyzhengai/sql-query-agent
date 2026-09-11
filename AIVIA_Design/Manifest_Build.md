@@ -251,13 +251,50 @@ meaning — the graph — fed by evidence (L0/L1) and projected
 ### Phase 1 — finish the ladder (M3–M7 as v2 specifies; nothing
 shipped is discarded)
 
+**THE ONE-PROC ESTATE (ruled by Sunny 2026-09-10):** from M3 on,
+batches build, test, and GATE on `estates/ed_sepsis_dev` —
+USP_ED_SEPSIS alone (44 scopes, 45 reads, the deciding example
+of every gate so far) with the FULL dictionary (KG1 never narrows:
+90 tables · 4554 columns · 65 joins_to). Gate counts stay
+human-checkable; capacity cost per refresh shrinks. The full
+sepsis estate re-runs at PHASE BOUNDARIES (Phase-1 close = M7,
+Phase-2 close = M12) so estate-scale conservation stays proven.
+Pinned: test_ed_sepsis_dev_estate.py — the answer key is the
+USP_ED_SEPSIS subset of the sepsis estate's verified M2 export,
+reproduced exactly.
+
+**THE M-GATE ANSWER KEY (Sunny's directive 2026-09-10):** every
+batch M2–M7 has DEFINITIVE passing criteria — node counts by
+label, edge counts by type, per-batch checks — authored BEFORE
+the batches build, derived from the parse (the verification law).
+Key: `estates/ed_sepsis_dev/expected_m_gates.json` · GQL gates:
+FABRIC_GRAPH_LOAD.md "THE ONE-PROC LADDER GATES" · self-check:
+test_ed_sepsis_dev_estate.py recomputes every derivable number
+from the twin each run, so the key cannot rot silently.
+Highlights pinned ahead of M3: 754 conditions total — 748 ship at
+M3 (194 join_on · 167 where · 387 case_when), 6 IF-statement
+predicates + @StartDate/@EndDate HOLD for M5 (their parents are
+statements; shipping earlier would float them — the census
+discipline caught this in my own first draft) · 93 joins · 31
+operational statements = declared counted-missing debt at M5,
+closed by file→statement at M6 · the DRIFT QUERY already returns
+its two findings at parse level
+(ENCOUNTER_VISIT_REASONS↔VISIT_REASONS,
+MEDICATIONS↔REF_GENERIC_MED — practiced, never declared) · the
+side-reads invariant holds at 0 violations. Full cumulative
+Q1/Q3 census tables per batch: the runbook gates + the key's
+census_after block. OPEN for Sunny: the
+still-open M2 gate's surface — staged sepsis numbers (312/451) vs
+the dev estate's (44/45); runbook recommends switching to dev
+(the technical layer is identical, M1's verification survives).
+
 Same batches, same bottom-up order, each row now carrying its V2
 DELTA — the amendments the v2 design makes to the queued v1
 content:
 
 | batch | ships (v1 content) | V2 DELTA | ties DOWN into | status |
 |---|---|---|---|---|
-| M3 | condition + param + **join** — stored voiced phrases + scope—has_part→condition/param/join + join—has_part→condition (the ON predicate's home) + condition—resolves_to→column + join—left_side/right_side→table-or-scope | THE JOIN-NODE RULING (Sunny 2026-09-10, hand-drawn graph): observed joins are JOIN NODES, never a second table→table edge — `joins_to` stays dictionary-only (integrity: one edge name, one authority); side names `left_side`/`right_side` (bare LEFT/RIGHT are GQL-reserved, gate-checked); pair = the tables the ON columns RESOLVE to, side order syntactic (outer-join semantics survive), 3+-table ONs counted, scope sides legal (CTE/#temp); clauseProvenance property RETIRED — parentage carries it; + `uses_param` (scope→param); ACCEPTANCE GAINS THE PRODUCT QUERY, now DIRECT: join pairs without a declared `joins_to` == compliance findings, pure GQL, live at this batch | scope + column (+ scope for CTE sides) | queued |
+| M3 | condition + param + **join** — stored voiced phrases + scope—has_part→condition/param/join + join—has_part→condition (the ON predicate's home) + condition—resolves_to→column + join—left_side/right_side→table-or-scope | THE JOIN-NODE RULING (Sunny 2026-09-10, hand-drawn graph): observed joins are JOIN NODES, never a second table→table edge — `joins_to` stays dictionary-only (integrity: one edge name, one authority); side names `left_side`/`right_side` (bare LEFT/RIGHT are GQL-reserved, gate-checked); pair = the tables the ON columns RESOLVE to, side order syntactic (outer-join semantics survive), 3+-table ONs counted, scope sides legal (CTE/#temp); clauseProvenance property RETIRED — parentage carries it; + `uses_param` (scope→param); ACCEPTANCE GAINS THE PRODUCT QUERY, now DIRECT: join pairs without a declared `joins_to` == compliance findings, pure GQL, live at this batch; + THE SIDE-READS INVARIANT (pinned by Sunny 2026-09-10) as a standing census line: every join side's table ∈ its scope's read-set — join ⊆ reads, divergence = builder bug | scope + column (+ scope for CTE sides) | queued |
 | M4 | derived_column | + `cites` (scope→column outputs) | scope | queued |
 | M5 | statement — stored R11 descriptions + statement—has_part→scope | English-ladder placement: statement descriptions are the DETERMINISTIC RENDER itself (small composition — no LLM) | scope | queued |
 | M6 | file — drafted aboutness + file—has_part→statement; the COMPOSITION CHECK (parent description contains children's words) | the aboutness draft is an LLM COMPRESSION OF THE RENDER, never independent of it; the checkable law lands as a test: every concept in the compressed description exists in the anatomy (hallucination mechanically detectable); drafts anchor to meaning keys (contentKey) so upstream change visibly orphans them — the anchor ships NOW even though the drafts re-home to `derived.english_drafts` at M10 | statement | queued |

@@ -61,10 +61,13 @@ def test_every_loaded_registry_is_ratified_v1():
     # backticks); 1.35.0 = M2 scope
     # descriptions STORED (the shape contract lands on scopes);
     # 1.36.0 = joins_to declared (the census blind spot + M2 export); 1.34.0 = round 2 from the OFFICIAL reserved list:
-    # schema->db_schema, parameter->param, kg3 text->description
+    # schema->db_schema, parameter->param, kg3 text->description;
+    # 1.37.0 = THE JOIN-NODE RULING (Sunny 2026-09-10): join label +
+    # left_side/right_side in the Shape_Ledger, clauseProvenance
+    # retired, joins_to dictionary-only
     for reg in metamodel.load_all().values():
         assert reg.ratified is True
-        assert reg.version == "1.36.0"
+        assert reg.version == "1.37.0"
 
 
 def test_load_single_exposes_sheets_and_stamp():

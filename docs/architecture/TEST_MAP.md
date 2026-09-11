@@ -7,7 +7,7 @@
 
 # Test Map — what every test proves
 
-165 modules, 1795 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
+177 modules, 1862 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
 
 ## By ADR
 
@@ -156,14 +156,19 @@
 
 ### contract:aivia-design-to-code — aivia code and tests consume the ratified registries and fixture answer keys, never the doc's prose (Design-to-Code protocol, slices 0-8; claimed per-module 2026-09-06 when the suite-map gate reached the aivia suite)
 
+- `tests/aivia/test_acronym_enrichment.py` (7): PHASE I — ACRONYM ENRICHMENT (the one-vocabulary law, ruled
 - `tests/aivia/test_approve_land.py` (10): Slice 6 exit: the F5 script against the BUILT approve/land flows.
 - `tests/aivia/test_ask_console.py` (21): Tier A exit (ADR 0079): the F10 answer keys go RUNNABLE.
 - `tests/aivia/test_center_censuses.py` (18): ADR 0080 — the center and the three censuses, red-first.
 - `tests/aivia/test_click_reroute.py` (4): STEP A of the search rebuild — CLICKS ARE STEER (gap 12). Suite
 - `tests/aivia/test_connection_census.py` (9): STEP 1 of the Connection Ledger build — THE TEST SUITE, shown to
 - `tests/aivia/test_design_validators.py` (4): Slice 0: the design validators run in CI — every push re-proves the
+- `tests/aivia/test_doubles.py` (6): THE SCRIPTED-PROPOSALS CONTRACT (Sunny's ruling, 2026-09-09:
+- `tests/aivia/test_ed_sepsis_dev_estate.py` (7): The one-proc dev estate + THE M-GATE ANSWER KEY (Sunny's
 - `tests/aivia/test_flows_change_quanta.py` (6): The flows' change quanta (CONTRACT_DATALOAD §13 + the flows
 - `tests/aivia/test_full_circle.py` (7): Slice 7: FULL CIRCLE — one run from empty, every family proven.
+- `tests/aivia/test_governance_journal.py` (4): PHASE E1 — THE GOVERNANCE JOURNAL (Sunny's ruling: all user
+- `tests/aivia/test_graph_export.py` (9): M1 — THE FABRIC GRAPH EXPORT READING (the materialization plan,
 - `tests/aivia/test_kg1_intake.py` (12): Slice 1: KG1 intake vs the F1 answer key — the graph, node by node.
 - `tests/aivia/test_kg2_mapper.py` (8): Slice 2 exit: the F2 answer key against the BUILT trees.
 - `tests/aivia/test_kg3_artifacts.py` (18): Slice 4: the ledger — KG3 artifact layer lifecycle + derived states.
@@ -171,6 +176,7 @@
 - `tests/aivia/test_label_rename.py` (5): STEP D (promoted) — LABEL, not kind. The industry-standard term
 - `tests/aivia/test_ledger_close.py` (5): The ledger close (Sunny's order, 2026-09-06): the last engine-debt
 - `tests/aivia/test_lenses.py` (11): Slice 3 exit: the F3 answer key against the BUILT lenses.
+- `tests/aivia/test_literal_census.py` (1): E3 LOCK 1 — THE LITERAL CENSUS (the literal law, ratified
 - `tests/aivia/test_metamodel.py` (7): Slice 0: the registry loader — code consumes ratified registries only.
 - `tests/aivia/test_part_edges.py` (4): STEP 4 of the Connection Ledger build — PART EDGES. The test
 - `tests/aivia/test_pbi_layer.py` (5): PHASE H — THE PBI LAYER (Sunny's ruling 2026-09-08: every proc
@@ -183,13 +189,19 @@
 - `tests/aivia/test_planks.py` (6): Slice 0: the planks — the import law and banned constructs as physics.
 - `tests/aivia/test_produce.py` (10): Slice 5 exit: produce vs the RATIFIED floor grammar — F4 upgraded
 - `tests/aivia/test_refusals.py` (9): Slice 1: the F6 refusal set — every refusal NAMES its rule.
+- `tests/aivia/test_registry_mirrors.py` (11): E3 LOCK 2 — THE MIRROR-CHECKS (the literal law; the
 - `tests/aivia/test_root_edges.py` (4): STEP 5 of the Connection Ledger build — ROOT EDGES. The test
+- `tests/aivia/test_scope_layer.py` (3): M2 (bottom-up re-ruling, 2026-09-10) — THE SCOPE LAYER.
 - `tests/aivia/test_search_is_the_answer.py` (10): STEP B — THE SEARCH IS THE ANSWER (Sunny's pipeline, ruled
 - `tests/aivia/test_seat_prompts.py` (4): STEP C of the search rebuild — THE PROMPT IS REGISTRY DATA.
 - `tests/aivia/test_sepsis_shakedown.py` (9): The sepsis shakedown (round 2) — conservation counters pinned;
+- `tests/aivia/test_shape_census.py` (4): THE SHAPE CENSUS — integrity battery #13 (THE SHAPE CONTRACT,
 - `tests/aivia/test_shapes_shakedown.py` (4): The shapes shakedown — the engine over the 38-file ADR 0055 corpus,
+- `tests/aivia/test_speech_contract.py` (8): E1 — THE SPEECH CONTRACT build (ruled 2026-09-09, Scribe route).
 - `tests/aivia/test_store.py` (6): Slice 1: the append-only substrate — LC-F2/F3 as structure.
 - `tests/aivia/test_term_origins.py` (6): STEP 2 of the Connection Ledger build — TERM ORIGINS. The test
+- `tests/aivia/test_verbatim_census.py` (3): E2 — THE VERBATIM CENSUS (integrity battery #8, ratified in
+- `tests/live/test_live_seats.py` (4): THE LIVE TIER — the live-seat rule (Sunny's ruling, 2026-09-09):
 
 ## By spec axiom
 
