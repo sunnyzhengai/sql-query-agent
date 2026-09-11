@@ -76,7 +76,7 @@ include = ["src", "src.*"]
 exclude = ["tests", "tests.*", "scripts", "notebooks", "docs", "data", "build"]
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+testpaths = ["tests", "AIVIA_Test"]
 pythonpath = ["."]
 
 [tool.ruff]

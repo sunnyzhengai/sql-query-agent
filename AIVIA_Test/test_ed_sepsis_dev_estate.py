@@ -31,7 +31,7 @@ from aivia.flows.export_graph import export_tables
 from aivia.graph.read_api import ReadApi
 
 FILE_ID = "repo://sepsis-corpus/reporting/USP_ED_SEPSIS.sql"
-BASE = pathlib.Path(__file__).resolve().parents[2] / \
+BASE = pathlib.Path(__file__).resolve().parents[1] / \
     "AIVIA_Product" / "estates" / "ed_sepsis_dev"
 KEY = json.loads((BASE / "expected_m_gates.json").read_text())
 CENSUS = KEY["census_after"]

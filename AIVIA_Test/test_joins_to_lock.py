@@ -27,7 +27,7 @@ from aivia.flows.export_graph import export_tables
 from aivia.graph import kg1_intake
 from aivia.graph.read_api import ReadApi
 
-BASE = pathlib.Path(__file__).resolve().parents[2] / \
+BASE = pathlib.Path(__file__).resolve().parents[1] / \
     "AIVIA_Product" / "estates" / "ed_sepsis_dev"
 
 EXPECTED_EDGES = 65

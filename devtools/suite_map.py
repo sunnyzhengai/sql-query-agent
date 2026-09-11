@@ -80,7 +80,9 @@ def scan_suite(repo_root: Path) -> "list[dict]":
     """Every test module: path, docstring first line, Proves tags,
     test count (functions + methods named test_*)."""
     out = []
-    for p in sorted((repo_root / "tests").rglob("test_*.py")):
+    roots = [repo_root / "tests", repo_root / "AIVIA_Test"]
+    for p in sorted(q for r in roots if r.is_dir()
+                    for q in r.rglob("test_*.py")):
         tree = ast.parse(p.read_text())
         doc = ast.get_docstring(tree) or ""
         n = sum(1 for node in ast.walk(tree)
