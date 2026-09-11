@@ -379,6 +379,24 @@ truthful phrasing '…wrong medication alerts?' ranks the crown #8
 slice (cnt et al.). The battery world now boots the
 store-as-ruled (ledger's blessed slice seeded, journal untouched
 by tests).
+**THE MATCHED SLICE RATIFIED (Sunny's bulk blessing, 2026-09-11):**
+all 20 dictionary-matched tokens blessed in both ledgers (addr,
+avg, cnt, dept, desc, dt, dttm, id, line, loc, nm, num, pat, qty,
+seq, src, stat, tm, tot, yn) and delta-seeded into both journals
+(sepsis 138 · dev 134 lines). Estate vocabulary now 133 blessed.
+**THE CLIFF ECHO, CAUGHT AND KILLED:** the rerun first showed the
+crown FALLING (rank 8 → out of the window) — because
+`match_token` inherited semantic.search's TOP_K=8 cut, a cliff
+the console's own contract forbids ("every hit above the floor")
+and an echo of the 2026-09-09 pre-merge-cut corpse: the 20 new
+blessings raised competitors' summed card credit and pushed the
+true crown out of an 8-hit window. Fixed per the Echo Law
+(top_k=len(entries) — the floor decides, never k). Battery after
+the fix: 7 passed + the 'alternatives' xfail turned **XPASS** —
+'…wrong medication alerts?' ranks the crown #9 of 3 280 kept
+(score 1.586, via name+speech+expansion), the refuted
+'alternatives' phrasing #39. The question's wording still awaits
+Sunny's gap-check (the xfail marker stands until he re-drafts).
 
 **THE M2 REDESIGN (Sunny's rulings 2026-09-10, from the
 hand-drawn structure):** (1) a scope reaches its tables THROUGH

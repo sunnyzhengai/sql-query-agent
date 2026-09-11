@@ -173,7 +173,11 @@ def match_token(token: str, entries: List[Dict[str, Any]],
     if semantic is not None:
         t = grounding.thresholds()
         try:
-            hits = semantic.search(token)
+            # the whole index per token — a top-k window here is a
+            # CLIFF (the 2026-09-09 pre-merge-cut corpse echoed
+            # 2026-09-11: 20 bulk blessings pushed the true crown
+            # out of an 8-hit window); the floor decides, never k
+            hits = semantic.search(token, top_k=len(entries))
         except Exception:  # noqa: BLE001 — seat down ≠ dead round
             # literal: shape
             return {"token": token, "tier": "seat-down", "matches": []}

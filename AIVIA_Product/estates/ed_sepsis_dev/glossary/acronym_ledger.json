@@ -8761,15 +8761,18 @@
   "status": "unreviewed"
  },
  "addr": {
+  "approved_at": "2026-09-11T12:00:00Z",
+  "approved_by": "person:sunny",
   "carriers": 23,
   "evidence": "abbreviation_dictionary.json: addr",
+  "expansions": [
+   "address"
+  ],
   "position": [
    "first",
    "mid"
   ],
-  "proposed": [
-   "address"
-  ],
+  "provenance": "abbreviation_dictionary match, Sunny's bulk ratification 2026-09-11",
   "sample": [
    "ADDR_VERIF_ACCT_ID",
    "REC_MED_AUTH_ADDR_IDENT",
@@ -8777,7 +8780,8 @@
    "REC_PROC_AUTH_ADDR_IDENT",
    "GUAR_ADDR_1"
   ],
-  "status": "matched"
+  "scope": "estate",
+  "status": "blessed"
  },
  "address": {
   "carriers": 3,
@@ -10401,21 +10405,25 @@
   "status": "unreviewed"
  },
  "avg": {
+  "approved_at": "2026-09-11T12:00:00Z",
+  "approved_by": "person:sunny",
   "carriers": 3,
   "evidence": "abbreviation_dictionary.json: avg",
+  "expansions": [
+   "average"
+  ],
   "position": [
    "first",
    "mid"
   ],
-  "proposed": [
-   "average"
-  ],
+  "provenance": "abbreviation_dictionary match, Sunny's bulk ratification 2026-09-11",
   "sample": [
    "AVG_LEN_FOR_BILL",
    "USE_AVG_FROM_ID",
    "USE_TIME_AVG_FLAG"
   ],
-  "status": "matched"
+  "scope": "estate",
+  "status": "blessed"
  },
  "avs": {
   "carriers": 7,
@@ -12541,15 +12549,18 @@
   "status": "blessed"
  },
  "cnt": {
+  "approved_at": "2026-09-11T12:00:00Z",
+  "approved_by": "person:sunny",
   "carriers": 7,
   "evidence": "abbreviation_dictionary.json: cnt",
+  "expansions": [
+   "count"
+  ],
   "position": [
    "last",
    "mid"
   ],
-  "proposed": [
-   "count"
-  ],
+  "provenance": "abbreviation_dictionary match, Sunny's bulk ratification 2026-09-11",
   "sample": [
    "CHR_CNT_DTTM",
    "CHR_CNT_MET",
@@ -12557,7 +12568,8 @@
    "EXP_MED_ALT_CNT",
    "MANUAL_ASSOC_INGRED_CNT"
   ],
-  "status": "matched"
+  "scope": "estate",
+  "status": "blessed"
  },
  "cntct": {
   "carriers": 2,
@@ -14855,17 +14867,20 @@
   "status": "unreviewed"
  },
  "dept": {
+  "approved_at": "2026-09-11T12:00:00Z",
+  "approved_by": "person:sunny",
   "carriers": 57,
   "evidence": "abbreviation_dictionary.json: dept",
+  "expansions": [
+   "department"
+  ],
   "position": [
    "first",
    "last",
    "mid",
    "only"
   ],
-  "proposed": [
-   "department"
-  ],
+  "provenance": "abbreviation_dictionary match, Sunny's bulk ratification 2026-09-11",
   "sample": [
    "DEPT_MSG_DEPT_ID",
    "DEPT_MSG_STATUS_CODE",
@@ -14873,19 +14888,23 @@
    "DEPT_SPECIALTY_CODE",
    "DEPT_ABBREVIATION"
   ],
-  "status": "matched"
+  "scope": "estate",
+  "status": "blessed"
  },
  "desc": {
+  "approved_at": "2026-09-11T12:00:00Z",
+  "approved_by": "person:sunny",
   "carriers": 16,
   "evidence": "abbreviation_dictionary.json: desc",
+  "expansions": [
+   "description"
+  ],
   "position": [
    "first",
    "last",
    "mid"
   ],
-  "proposed": [
-   "description"
-  ],
+  "provenance": "abbreviation_dictionary match, Sunny's bulk ratification 2026-09-11",
   "sample": [
    "ALERT_DESC",
    "NOTE_DESC",
@@ -14893,7 +14912,8 @@
    "DX_OTHER_DESC",
    "DFLT_PROC_DESC"
   ],
-  "status": "matched"
+  "scope": "estate",
+  "status": "blessed"
  },
  "description": {
   "carriers": 4,
@@ -15959,15 +15979,18 @@
   "status": "unreviewed"
  },
  "dt": {
+  "approved_at": "2026-09-11T12:00:00Z",
+  "approved_by": "person:sunny",
   "carriers": 74,
   "evidence": "abbreviation_dictionary.json: dt",
+  "expansions": [
+   "date"
+  ],
   "position": [
    "last",
    "mid"
   ],
-  "proposed": [
-   "date"
-  ],
+  "provenance": "abbreviation_dictionary match, Sunny's bulk ratification 2026-09-11",
   "sample": [
    "CALENDAR_DT",
    "CALENDAR_DT_STR",
@@ -15975,7 +15998,8 @@
    "MONTH_BEGIN_DT",
    "MONTH_BEGIN_DT_STR"
   ],
-  "status": "matched"
+  "scope": "estate",
+  "status": "blessed"
  },
  "dte": {
   "carriers": 4,
@@ -16002,14 +16026,17 @@
   "status": "unreviewed"
  },
  "dttm": {
+  "approved_at": "2026-09-11T12:00:00Z",
+  "approved_by": "person:sunny",
   "carriers": 147,
   "evidence": "abbreviation_dictionary.json: dttm",
+  "expansions": [
+   "date and time"
+  ],
   "position": [
    "last"
   ],
-  "proposed": [
-   "date and time"
-  ],
+  "provenance": "abbreviation_dictionary match, Sunny's bulk ratification 2026-09-11",
   "sample": [
    "EFFECTIVE_UTC_DTTM",
    "REVIEW_DTTM",
@@ -16017,7 +16044,8 @@
    "ED_HOLD_EX_DTTM",
    "CLAIM_TEST_INS_DTTM"
   ],
-  "status": "matched"
+  "scope": "estate",
+  "status": "blessed"
  },
  "dual": {
   "carriers": 1,
@@ -19840,17 +19868,20 @@
   "status": "blessed"
  },
  "id": {
+  "approved_at": "2026-09-11T12:00:00Z",
+  "approved_by": "person:sunny",
   "carriers": 1099,
   "evidence": "abbreviation_dictionary.json: id",
+  "expansions": [
+   "identifier"
+  ],
   "position": [
    "first",
    "last",
    "mid",
    "only"
   ],
-  "proposed": [
-   "identifier"
-  ],
+  "provenance": "abbreviation_dictionary match, Sunny's bulk ratification 2026-09-11",
   "sample": [
    "ADM_EVENT_ID",
    "BED_ID",
@@ -19858,7 +19889,8 @@
    "CANC_EVENT_ID",
    "CM_LOG_OWNER_ID"
   ],
-  "status": "matched"
+  "scope": "estate",
+  "status": "blessed"
  },
  "ide": {
   "carriers": 1,
@@ -21628,17 +21660,20 @@
   "status": "unreviewed"
  },
  "line": {
+  "approved_at": "2026-09-11T12:00:00Z",
+  "approved_by": "person:sunny",
   "carriers": 50,
   "evidence": "abbreviation_dictionary.json: line",
+  "expansions": [
+   "line number"
+  ],
   "position": [
    "first",
    "last",
    "mid",
    "only"
   ],
-  "proposed": [
-   "line number"
-  ],
+  "provenance": "abbreviation_dictionary match, Sunny's bulk ratification 2026-09-11",
   "sample": [
    "LINE_DEVICE_AIRWAY",
    "LINE",
@@ -21646,7 +21681,8 @@
    "LOA_LINE",
    "PRIMARY_DX_LINE"
   ],
-  "status": "matched"
+  "scope": "estate",
+  "status": "blessed"
  },
  "line1": {
   "carriers": 2,
@@ -21836,15 +21872,18 @@
   "status": "unreviewed"
  },
  "loc": {
+  "approved_at": "2026-09-11T12:00:00Z",
+  "approved_by": "person:sunny",
   "carriers": 42,
   "evidence": "abbreviation_dictionary.json: loc",
+  "expansions": [
+   "location"
+  ],
   "position": [
    "first",
    "mid"
   ],
-  "proposed": [
-   "location"
-  ],
+  "provenance": "abbreviation_dictionary match, Sunny's bulk ratification 2026-09-11",
   "sample": [
    "SOURCE_LOC_EVNT_ID",
    "BOOK_CONFRM_LOC_ID",
@@ -21852,7 +21891,8 @@
    "REV_LOC_ID",
    "REC_PAT_LOC_ID"
   ],
-  "status": "matched"
+  "scope": "estate",
+  "status": "blessed"
  },
  "local": {
   "carriers": 6,
@@ -23741,15 +23781,18 @@
   "status": "unreviewed"
  },
  "nm": {
+  "approved_at": "2026-09-11T12:00:00Z",
+  "approved_by": "person:sunny",
   "carriers": 13,
   "evidence": "abbreviation_dictionary.json: nm",
+  "expansions": [
+   "name"
+  ],
   "position": [
    "last",
    "mid"
   ],
-  "proposed": [
-   "name"
-  ],
+  "provenance": "abbreviation_dictionary match, Sunny's bulk ratification 2026-09-11",
   "sample": [
    "CONF_SEC_CLS_NM",
    "PB_DEF_CLS_NM",
@@ -23757,7 +23800,8 @@
    "DISP_RND_METHOD_NM",
    "MED_RND_METHOD_NM"
   ],
-  "status": "matched"
+  "scope": "estate",
+  "status": "blessed"
  },
  "no": {
   "carriers": 10,
@@ -24029,16 +24073,19 @@
   "status": "unreviewed"
  },
  "num": {
+  "approved_at": "2026-09-11T12:00:00Z",
+  "approved_by": "person:sunny",
   "carriers": 82,
   "evidence": "abbreviation_dictionary.json: num",
+  "expansions": [
+   "number"
+  ],
   "position": [
    "first",
    "last",
    "mid"
   ],
-  "proposed": [
-   "number"
-  ],
+  "provenance": "abbreviation_dictionary match, Sunny's bulk ratification 2026-09-11",
   "sample": [
    "SEQ_NUM_IN_BED_MIN",
    "SEQ_NUM_IN_ENC",
@@ -24046,7 +24093,8 @@
    "IVCHEK_SOLUTION_NUM",
    "NUM_LETTER_PARTS"
   ],
-  "status": "matched"
+  "scope": "estate",
+  "status": "blessed"
  },
  "number": {
   "carriers": 24,
@@ -25294,14 +25342,17 @@
   "status": "unreviewed"
  },
  "pat": {
+  "approved_at": "2026-09-11T12:00:00Z",
+  "approved_by": "person:sunny",
   "carriers": 22,
   "evidence": "abbreviation_dictionary.json: pat",
+  "expansions": [
+   "patient"
+  ],
   "position": [
    "mid"
   ],
-  "proposed": [
-   "patient"
-  ],
+  "provenance": "abbreviation_dictionary match, Sunny's bulk ratification 2026-09-11",
   "sample": [
    "BASE_PAT_CLASS_CODE",
    "BPA_IS_PAT_FACING_FLAG",
@@ -25309,7 +25360,8 @@
    "ED_DISPOSITION_PAT_CONDITION_CODE",
    "REC_PAT_LOC_ID"
   ],
-  "status": "matched"
+  "scope": "estate",
+  "status": "blessed"
  },
  "patcls": {
   "carriers": 1,
@@ -27756,15 +27808,18 @@
   "status": "unreviewed"
  },
  "qty": {
+  "approved_at": "2026-09-11T12:00:00Z",
+  "approved_by": "person:sunny",
   "carriers": 5,
   "evidence": "abbreviation_dictionary.json: qty",
+  "expansions": [
+   "quantity"
+  ],
   "position": [
    "last",
    "mid"
   ],
-  "proposed": [
-   "quantity"
-  ],
+  "provenance": "abbreviation_dictionary match, Sunny's bulk ratification 2026-09-11",
   "sample": [
    "MED_DIS_DISP_QTY",
    "DISP_QTY_REM",
@@ -27772,7 +27827,8 @@
    "FILL_DISP_QTY",
    "FILL_INT_QTY"
   ],
-  "status": "matched"
+  "scope": "estate",
+  "status": "blessed"
  },
  "qtyunt": {
   "carriers": 2,
@@ -30262,21 +30318,25 @@
   "status": "unreviewed"
  },
  "seq": {
+  "approved_at": "2026-09-11T12:00:00Z",
+  "approved_by": "person:sunny",
   "carriers": 3,
   "evidence": "abbreviation_dictionary.json: seq",
+  "expansions": [
+   "sequence"
+  ],
   "position": [
    "first",
    "mid"
   ],
-  "proposed": [
-   "sequence"
-  ],
+  "provenance": "abbreviation_dictionary match, Sunny's bulk ratification 2026-09-11",
   "sample": [
    "SEQ_NUM_IN_BED_MIN",
    "SEQ_NUM_IN_ENC",
    "INV_NUM_SEQ_CTR"
   ],
-  "status": "matched"
+  "scope": "estate",
+  "status": "blessed"
  },
  "ser": {
   "carriers": 3,
@@ -31224,15 +31284,18 @@
   "status": "blessed"
  },
  "src": {
+  "approved_at": "2026-09-11T12:00:00Z",
+  "approved_by": "person:sunny",
   "carriers": 37,
   "evidence": "abbreviation_dictionary.json: src",
+  "expansions": [
+   "source"
+  ],
   "position": [
    "last",
    "mid"
   ],
-  "proposed": [
-   "source"
-  ],
+  "provenance": "abbreviation_dictionary match, Sunny's bulk ratification 2026-09-11",
   "sample": [
    "aivia_demo_src",
    "responsibility:dba:db:aivia_demo_src",
@@ -31240,7 +31303,8 @@
    "THRDPRTY_SRC_CODE",
    "ER_ADMIT_SRC_HA_CODE"
   ],
-  "status": "matched"
+  "scope": "estate",
+  "status": "blessed"
  },
  "srce": {
   "carriers": 3,
@@ -31432,16 +31496,19 @@
   "status": "unreviewed"
  },
  "stat": {
+  "approved_at": "2026-09-11T12:00:00Z",
+  "approved_by": "person:sunny",
   "carriers": 28,
   "evidence": "abbreviation_dictionary.json: stat",
+  "expansions": [
+   "status"
+  ],
   "position": [
    "first",
    "last",
    "mid"
   ],
-  "proposed": [
-   "status"
-  ],
+  "provenance": "abbreviation_dictionary match, Sunny's bulk ratification 2026-09-11",
   "sample": [
    "SENSITIVITY_STAT_CODE",
    "HAS_OPEN_CLAIM_STAT_FOL_UP_FLAG",
@@ -31449,7 +31516,8 @@
    "ADT_ATHCRT_STAT_CODE",
    "ADT_PATIENT_STAT_CODE"
   ],
-  "status": "matched"
+  "scope": "estate",
+  "status": "blessed"
  },
  "state": {
   "carriers": 22,
@@ -32689,15 +32757,18 @@
   "status": "unreviewed"
  },
  "tm": {
+  "approved_at": "2026-09-11T12:00:00Z",
+  "approved_by": "person:sunny",
   "carriers": 26,
   "evidence": "abbreviation_dictionary.json: tm",
+  "expansions": [
+   "time"
+  ],
   "position": [
    "last",
    "mid"
   ],
-  "proposed": [
-   "time"
-  ],
+  "provenance": "abbreviation_dictionary match, Sunny's bulk ratification 2026-09-11",
   "sample": [
    "BPA_ACK_LOCKOUT_TM",
    "COMPLETION_DT_TM",
@@ -32705,7 +32776,8 @@
    "OB_LD_LABOR_TM",
    "COMP_ANL_INST_TM"
   ],
-  "status": "matched"
+  "scope": "estate",
+  "status": "blessed"
  },
  "tmp": {
   "carriers": 11,
@@ -32779,15 +32851,18 @@
   "status": "unreviewed"
  },
  "tot": {
+  "approved_at": "2026-09-11T12:00:00Z",
+  "approved_by": "person:sunny",
   "carriers": 5,
   "evidence": "abbreviation_dictionary.json: tot",
+  "expansions": [
+   "total"
+  ],
   "position": [
    "first",
    "last"
   ],
-  "proposed": [
-   "total"
-  ],
+  "provenance": "abbreviation_dictionary match, Sunny's bulk ratification 2026-09-11",
   "sample": [
    "TOT_ACCT_BAL",
    "TOT_ADJ",
@@ -32795,7 +32870,8 @@
    "TOT_PMTS",
    "PED_MULT_BIRTH_TOT"
   ],
-  "status": "matched"
+  "scope": "estate",
+  "status": "blessed"
  },
  "total": {
   "carriers": 8,
@@ -35005,15 +35081,18 @@
   "status": "unreviewed"
  },
  "yn": {
+  "approved_at": "2026-09-11T12:00:00Z",
+  "approved_by": "person:sunny",
   "carriers": 51,
   "evidence": "abbreviation_dictionary.json: yn",
+  "expansions": [
+   "yes/no flag"
+  ],
   "position": [
    "last",
    "only"
   ],
-  "proposed": [
-   "yes/no flag"
-  ],
+  "provenance": "abbreviation_dictionary match, Sunny's bulk ratification 2026-09-11",
   "sample": [
    "HOM_RPT_FLG_YN",
    "CLINICAL_PAT_YN",
@@ -35021,7 +35100,8 @@
    "DobutamineYN",
    "DopamineYN"
   ],
-  "status": "matched"
+  "scope": "estate",
+  "status": "blessed"
  },
  "ynu": {
   "carriers": 9,
