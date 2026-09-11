@@ -241,21 +241,16 @@ BATTERY = [
     ("meaning-readback",
      "what does the ADT_EVENTS table hold?",
      ["ADT_EVENTS"]),
-    pytest.param(
-        "column-search",
-        "which column counts wrong medication alternatives?",
-        ["WRONG_MED_ALT_CNT"],
-        marks=pytest.mark.xfail(
-            strict=False,
-            reason="THE FIRST MEANING FINDING, re-ruled 2026-09-11: "
-            "Sunny blessed alt=ALERT on evidence (the description "
-            "counts warnings; the crosswalk shows Epic ALT=alert) — "
-            "so THIS QUESTION embeds the refuted expansion "
-            "'alternatives' and rightly stays lost, while the "
-            "truthful phrasing '…wrong medication alerts?' ranks "
-            "the crown #8. The question's wording awaits Sunny's "
-            "gap-check; cnt sits matched-unratified in the ledger "
-            "(blessing it is the next findability lever).")),
+    # THE FIRST MEANING FINDING, closed 2026-09-11: born as
+    # "...alternatives?" xfail (crown unfindable, rank 25, no
+    # blessed acronyms). Sunny ruled alt=ALERT on evidence (the
+    # description counts warnings; the crosswalk shows Epic
+    # ALT=alert), blessed the vocabulary, and re-drafted the
+    # question to the truthful wording — a normal battery member
+    # since.
+    ("column-search",
+     "which column counts wrong medication alerts?",
+     ["WRONG_MED_ALT_CNT"]),
     ("relationship",
      "how do ADT_EVENTS and DEPARTMENTS connect?",
      ["ADT_EVENTS", "DEPARTMENTS"]),
