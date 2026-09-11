@@ -103,6 +103,21 @@ named owner for its unmatched remainder:
 | dictionary object | vendor's object dictionary | THE RESIDUE LIST → hospital admin | ruled here, NOT BUILT |
 | name token | abbreviation dictionary | `acronym_ledger.json` → Sunny's ruling queue | built 2026-09-11 |
 
+**THE ACCEPTANCE TEST (ruled by Sunny, 2026-09-11):** the
+corpus's anonymization crosswalk
+(`data/synthetic/crosswalk.json`) already made the vendor-vs-org
+call by hand — `_emr_tables` vs `_org_specific_tables` (the 11
+org tables: the seven CCMC_IP_Sepsis* result tables, the two
+IPSO_* staging tables, COOK_FY_DATE_DIMENSION, CNTL_VALUE_SET;
+prefixes stripped at anonymization, which is why they LOOK
+vendor-shaped now). When the residue-list mechanism is built, its
+partition of this estate must reproduce exactly that 11-table
+org group **without ever reading the crosswalk** — the hand-made
+split is the answer key, the mechanism must earn it from the
+vendor dictionary alone. (The same episode is the standing proof
+that name-eyeballing cannot classify ownership: the domain
+expert read the stripped CCMC_ tables as vendor-shaped.)
+
 ## Standing gaps (recorded, awaiting build/ruling)
 
 1. **Phase 2 `plain` classification** needs a ruled word source
