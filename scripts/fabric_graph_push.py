@@ -118,7 +118,10 @@ def gql(token, query):
         f"/executeQuery?preview=true", payload={"query": query})
     if status != 200:
         return None, body
-    return body.get("data", []), body.get("status")
+    # rows live under result.data (found 2026-09-11: the top-level
+    # 'data' read parsed every count as 0 — GATE RED was a parsing
+    # artifact, never the graph)
+    return (body.get("result") or {}).get("data", []), body.get("status")
 
 
 def verify(estate: str, token) -> bool:
