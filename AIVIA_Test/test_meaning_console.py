@@ -514,6 +514,17 @@ def test_scope_neighborhood_cites_join_evidence(world):
     assert r["mode"] == "neighborhood"
     assert any(line.startswith("[join]") and "—" in line
                for line in r["evidence"])
+    # Sunny's round (2026-09-11): the ANCHOR speaks IN FULL — the
+    # floor's logic, not just its first sentence
+    anchor_line = next(line for line in r["evidence"]
+                       if line.startswith("[scope] #Base_Pop"))
+    assert "drawn from" in anchor_line
+    assert "locations records" in anchor_line   # the FULL list,
+    # not the first sentence; the WHERE conditions are condition
+    # grains — counted out until §D by the standing ruling
+    # same-named joins carry their owner
+    assert all("::join#" in line for line in r["evidence"]
+               if line.startswith("[join]"))
 
 
 def test_connection_walks_through_a_join(world):

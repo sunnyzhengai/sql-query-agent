@@ -468,7 +468,8 @@ def answer_question(question: str, interpret_fn,
                     _row(nbr, elbl, m)
                 elif nbr in joinsmap:   # pass-through: one hop more
                     j = joinsmap[nbr]
-                    via = (f"via {j.get('name', 'join')}: "
+                    owned = "::".join(nbr.split("::")[-2:])
+                    via = (f"via {owned}: "
                            f"{j.get('on', '')}").strip(": ")
                     for nbr2, _lbl2 in adj.get(nbr, []):
                         if nbr2 in pop and nbr2 != m["identity"]:
@@ -541,16 +542,25 @@ def answer_question(question: str, interpret_fn,
         gql = [write_gql(p, directed, label_of)
                for p in plan["paths"]]
     evidence = []
+    anchor_ids = {m["identity"] for m in anchors}
     for ident in plan["nodes"]:
         e = described.get(ident)
         if e:
-            words = (e.get("words") or "").split(". ")[0]
+            # the ANCHOR speaks IN FULL — its speech IS the answer
+            # (the #Base_Pop lesson, 2026-09-11: the first-sentence
+            # cut amputated the logic the user asked for);
+            # neighbors stay one-line
+            words = (e.get("words") or "").strip()
+            if ident not in anchor_ids:
+                words = words.split(". ")[0]
             evidence.append(f"[{e['label']}] {e['name']}"
                             + (f" — {words}" if words else ""))
         elif ident in joinsmap:
             j = joinsmap[ident]
+            # owner-qualified: three scopes may each have a join#1
+            owned = "::".join(ident.split("::")[-2:])
             evidence.append(
-                f"[join] {j.get('name', ident)} "
+                f"[join] {owned} "
                 f"({j.get('joinType', '?')}) — "
                 f"{j.get('description') or j.get('on', '')}")
         else:
