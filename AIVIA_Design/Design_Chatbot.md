@@ -1078,6 +1078,44 @@ extends to M2's accepted grains.
 - **Battery**: a drafted join-layer family lands for Sunny's
   gap-check; his pass pins them (the blessed-by-use path).
 
+► RULED (Sunny, 2026-09-11 night — THE THIRD TARGET: the
+condition layer, M3, per the batch-earns-the-console law; this
+rider IS the design change that supersedes the §D hold FOR THE
+CONSOLE — §D's scoring work itself stays where it was left):
+- **The SCOPE-ROOTED condition trees join the index** (the
+  WHERE/CASE membership logic): their VOICED phrases are the
+  speech — names are mechanical (cond#N), the meaning lives in
+  the grammar-voiced phrase. Degenerate conditions stay out,
+  COUNTED. The `_self condition` and `_self parameter` kind
+  cards join, so "conditions/filters/parameters" ground as
+  kinds.
+- **JOIN-ROOTED (ON) conditions stay UNINDEXED** — their
+  meaning already speaks through the join's evidence line
+  (measured: join-key equalities voice vacuously, "the unique
+  identifier is the unique identifier" — indexing them would be
+  noise wearing a grain's name). They remain connective
+  structure.
+- **The census-twin condition rows retire from the index as a
+  COUNTED exclusion** — the accepted store grains supersede the
+  tree-derived census entries (same predicates, older
+  representation).
+- **Params join the index** (they speak); `uses_param` walks.
+- **Adjacency gains**: scope—has_part→condition-root ·
+  condition—has_part→condition · condition—resolves_to→
+  column-or-param (role-tagged) · join—has_part→condition ·
+  uses_param.
+- **THE PASS-THROUGH RULE GENERALIZES**: the connective labels
+  are {join, condition} — a CHAIN of connective nodes is ONE
+  connection; the citation is the phrase of the connective
+  NEAREST THE ANCHOR (the leaf that resolves to the column — the
+  most specific true thing).
+- **New shapes**: "which scopes filter on the arrival date?"
+  (enumeration through condition chains) · "what conditions does
+  #Base_Pop apply?" (the WHERE bullets in the neighborhood) ·
+  "which scopes use @dStartDate?" (impact via uses_param).
+- **Battery**: a condition-family lands; blessing per the
+  standing path.
+
 RULED same day — THE KIND-SUBSUMPTION RULE
 (from measured scores: 'tables' → kind 1.576 vs top
 table-instance 1.760, the gap entirely the instances' own label

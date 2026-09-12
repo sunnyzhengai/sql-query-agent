@@ -56,8 +56,11 @@ def test_scope_carries_the_speaking_technical_grains(world):
     assert counts["column"] == sum(
         1 for e in full if e["label"] == "column")
     assert counts["scope"] == 44          # the second target (M2)
+    assert counts["condition"] > 300      # the third target (M3)
+    assert counts["param"] == 2
     kinds = {e["name"] for e in entries if e["label"] == "label"}
-    assert kinds == {"table", "column", "scope"}
+    assert kinds == {"table", "column", "scope", "condition",
+                     "parameter"}
     edge_kinds = {e["identity"] for e in entries
                   if e["label"] == "edge_kind"}
     assert edge_kinds == {"edgekind::has_part", "edgekind::joins_to"}
@@ -71,9 +74,18 @@ def test_every_exclusion_is_counted_never_silent(world):
     # the speechless technical grains are counted too
     assert exclusions["db"] == 1
     assert exclusions["db_schema"] == 3
-    spoken_exclusions = {k: v for k, v in exclusions.items()
-                         if k not in ("db", "db_schema")}
-    assert sum(spoken_exclusions.values()) == len(out_of_scope)
+    # full-index leftovers stay conserved (store-grain exclusion
+    # keys — condition_on/degenerate, join_structure — count
+    # STORE nodes, not index rows, so they sit outside this sum)
+    from_index = {k: v for k, v in exclusions.items()
+                  if k not in ("db", "db_schema", "condition_on",
+                               "condition_degenerate",
+                               "join_structure")}
+    assert sum(from_index.values()) == len(out_of_scope)
+    assert exclusions["condition_census"] == 69   # the twin retired
+    assert exclusions["join_structure"] == 95     # ruled unindexed
+    assert exclusions["condition_on"] > 0
+    assert exclusions["condition_degenerate"] > 0
     line = mc.coverage_line(entries, exclusions)
     assert "excluded (counted" in line and "db_schema 3" in line
 
@@ -360,8 +372,12 @@ def test_matched_graph_enumerates_the_event_id_carriers(world):
                            entries, semantic, read, adj, directed)
     assert r["mode"] == "enumeration"
     assert sorted({row["a"] for row in r["rows"]}) == EVENT_ID_TABLES
-    assert all(row["edge"] == "has_part" and row["b"] == "EVENT_ID"
-               for row in r["rows"])
+    # the 4 containment rows are all present; the third target
+    # adds TRUE extra rows (tables whose join/condition logic
+    # touches EVENT_ID, cited via the connective chain)
+    hp = {(row["a"], row["b"]) for row in r["rows"]
+          if row["edge"] == "has_part"}
+    assert hp == {(t, "EVENT_ID") for t in EVENT_ID_TABLES}
     assert r["counts"]["connected"] == 4
     assert r["counts"]["population"] == 90
     assert r["counts"]["label"] == "table"
@@ -538,6 +554,65 @@ def test_connection_walks_through_a_join(world):
     assert r["gql"] and any(":join" in g for g in r["gql"])
 
 
+# ---- THE THIRD TARGET: the condition layer (M3, ruled 2026-09-11
+# — scope-rooted conditions speak their voiced phrases; ON
+# conditions stay connective; the pass-through generalizes) --------
+def test_scope_rooted_conditions_speak_on_conditions_stay_out(
+        world):
+    _, entries, exclusions, _, _ = world
+    conds = [e for e in entries if e["label"] == "condition"]
+    assert conds and all("::cond#" in e["identity"] for e in conds)
+    arrival = next(e for e in conds if "arrived" in e["words"])
+    assert arrival["identity"].endswith("#Base_Pop::cond#12")
+    # the vacuous ON equalities are NOT searchable grains
+    assert exclusions["condition_on"] > 0
+
+
+def test_params_speak(world):
+    _, entries, _, _, _ = world
+    assert {e["name"] for e in entries if e["label"] == "param"} \
+        == {"@dStartDate", "@dEndDate"}
+
+
+def test_where_bullets_join_the_scope_neighborhood(world):
+    read, entries, _, adj, directed = world
+    r = mc.answer_question("#ADT", None, entries, None,
+                           read, adj, directed)
+    assert r["mode"] == "neighborhood"
+    assert any(line.startswith("[condition]")
+               for line in r["evidence"])
+
+
+def test_condition_pass_through_finds_the_filtering_scope(world):
+    # 'which scopes filter on ADT_ARRIVAL_DATE?' — the chain
+    # column ←resolves_to— cond#12 ←has_part— #Base_Pop is ONE
+    # connection, cited by the leaf's voiced phrase
+    read, entries, _, adj, directed = world
+    kind = next(e for e in entries if e["identity"] == "kind::scope")
+    semantic = _ScriptedSemantic(
+        {"scopes": [{**dict(kind), "score": 1.2}]})
+    r = mc.answer_question(
+        "which scopes filter on ADT_ARRIVAL_DATE?",
+        _scripted_tokens(["scopes", "ADT_ARRIVAL_DATE"]),
+        entries, semantic, read, adj, directed)
+    assert r["mode"] == "enumeration"
+    hits = [row for row in r["rows"] if row["a"] == "#Base_Pop"]
+    assert hits and any("arrived" in row["edge"] for row in hits)
+
+
+def test_param_impact_enumerates_the_using_scopes(world):
+    read, entries, _, adj, directed = world
+    kind = next(e for e in entries if e["identity"] == "kind::scope")
+    semantic = _ScriptedSemantic(
+        {"scopes": [{**dict(kind), "score": 1.2}]})
+    r = mc.answer_question("which scopes use @dStartDate?",
+                           _scripted_tokens(["scopes",
+                                             "@dStartDate"]),
+                           entries, semantic, read, adj, directed)
+    assert r["mode"] == "enumeration"
+    assert {row["a"] for row in r["rows"]} >= {"#Base_Pop"}
+
+
 # ---- the glossary chain (the machinery lives in flows/glossary;
 # tests/aivia/test_glossary.py owns it — this proves the CONSOLE
 # INDEX carries the blessed expansions end-to-end) -------------------
@@ -637,6 +712,17 @@ BATTERY = [
     ("relationship",
      "how do #AllMeds and MEDICATION_ORDERS connect?",
      ["#AllMeds", "MEDICATION_ORDERS"]),
+    # ---- THE CONDITION FAMILY (the third target — DRAFTED
+    # 2026-09-11 night; blessing per the standing path) --------
+    ("condition-meaning",
+     "what conditions does #Base_Pop apply?",
+     ["#Base_Pop"]),
+    ("condition-filter",
+     "which scopes filter on the patient arrival date?",
+     ["#Base_Pop"]),
+    ("param-impact",
+     "which scopes use the @dStartDate parameter?",
+     ["#Base_Pop"]),
 ]
 
 

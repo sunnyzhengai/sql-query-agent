@@ -493,6 +493,29 @@ the co-side — BOTH store-verified, #ADT::join#1 ON ENCOUNTER_ID)
 + 4 drafted join-family battery questions — LIVE 18/18 first
 try (the keyed boot embedded the 44 scope card sets). Await
 Sunny's hands-on pass to pin the family blessed-by-use.
+**THE THIRD TARGET BUILT — the condition layer (M3), ruled +
+built 2026-09-11 night (design first, Sunny's go):** the rider
+in Design_Chatbot supersedes the §D hold FOR THE CONSOLE.
+Scope-rooted, non-degenerate condition grains join the index
+(~1000, voiced phrases as speech) + both params; JOIN-ROOTED ON
+conditions stay connective (their voicings measured vacuous —
+"the unique identifier is the unique identifier"); the census
+twin (69) retires counted; degenerate counted; joins counted as
+ruled-unindexed structure. Adjacency gains the condition walk
+(scope/join→condition, condition→condition, resolves_to
+role-tagged, uses_param). THE PASS-THROUGH GENERALIZES:
+connective labels {join, condition}, citation = the connective
+NEAREST the anchor. The kind alias lands (registry 'parameter'
+→ store label 'param'). Acceptance store-verified: 'which
+scopes filter on ADT_ARRIVAL_DATE?' → #Base_Pop via cond#12's
+phrase; '@dStartDate' impact → #Base_Pop via uses_param. The
+EVENT_ID acceptance gained TRUE extra rows (tables whose logic
+touches the column) — containment rows asserted intact. 5 new
+deterministic tests (40 green) + 3 condition-family battery
+questions — LIVE 21/21 first try (the keyed boot embedded the
+condition cards). Sunny's answer to "did the description
+include the where clause?" is now YES — the scope neighborhood
+shows its [condition] bullets.
 **GRAMMAR 2.4.0 (Sunny's ruling, 2026-09-11 late: "this phrase
 'this is a selection of records' is useless"):** R1's no-grain
 fallback DIES — with zero declared grains estate-wide it opened

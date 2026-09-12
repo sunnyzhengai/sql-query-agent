@@ -46,11 +46,22 @@ from aivia.lenses.ask_index import _fold
 # exclusions, never silent ones). SECOND TARGET (the join layer,
 # ruled 2026-09-11): scopes join, their floors are the speech;
 # joins are connective structure, never indexed
+# literal: frame — the console's target-scope contract (the pull
+# from the full index; store-grain admissions ride separately —
+# THIRD TARGET: conditions + params come from the STORE, the
+# census twin retires counted)
 # literal: frame — the console's target-scope contract
 TECHNICAL_SPEAKING = ("table", "column", "scope")
 # literal: frame — the console's target-scope contract
-TECHNICAL_KINDS = ("table", "column", "scope")
+TECHNICAL_KINDS = ("table", "column", "scope", "condition",
+                   "parameter")
+# literal: frame — registry kind names -> store labels
+KIND_ALIAS = {"parameter": "param"}
 TECHNICAL_EDGE_KINDS = ("has_part", "joins_to")
+
+
+def _kind_label(kind_name: str) -> str:
+    return KIND_ALIAS.get(kind_name, kind_name)
 
 
 # ---- the index (step 3's search surface) -----------------------------
@@ -64,9 +75,65 @@ def technical_scope(read) -> Tuple[List[Dict[str, Any]],
     exclusions: Dict[str, int] = {}
     for e in full:
         if e["label"] not in TECHNICAL_SPEAKING:
-            exclusions[e["label"]] = exclusions.get(e["label"], 0) + 1
+            # THE THIRD TARGET: the census-twin condition rows
+            # retire, counted — the accepted store grains supersede
+            key = ("condition_census" if e["label"] == "condition"
+                   else e["label"])
+            exclusions[key] = exclusions.get(key, 0) + 1
     for lbl in ("db", "db_schema"):  # present, speechless — counted
         exclusions[lbl] = sum(1 for _ in read.nodes(lbl))
+    # THE THIRD TARGET (ruled 2026-09-11): the store's SCOPE-ROOTED
+    # non-degenerate condition grains join — voiced phrases as the
+    # speech; JOIN-ROOTED (ON) conditions stay connective structure
+    # (vacuous voicings measured); degenerate counted; params join
+    store = getattr(read, "_store", None)
+    joins = {n.identity for n in read.nodes("join")}
+    conds = {n.identity for n in read.nodes("condition")}
+    join_rooted: Set[str] = set()
+    if store is not None:
+        kids: Dict[str, List[str]] = {}
+        stack = []
+        for e in store.current_edges("has_part"):
+            if e.to_id in conds:
+                if e.from_id in joins:
+                    stack.append(e.to_id)
+                elif e.from_id in conds:
+                    kids.setdefault(e.from_id, []).append(e.to_id)
+        while stack:
+            cur = stack.pop()
+            if cur in join_rooted:
+                continue
+            join_rooted.add(cur)
+            stack.extend(kids.get(cur, []))
+    for n in read.nodes("condition"):
+        if n.identity in join_rooted:
+            exclusions["condition_on"] = \
+                exclusions.get("condition_on", 0) + 1
+            continue
+        if str(n.properties.get("degenerate")).lower() == "true":
+            exclusions["condition_degenerate"] = \
+                exclusions.get("condition_degenerate", 0) + 1
+            continue
+        nm = str(n.properties.get("name")
+                 or n.identity.rsplit("::", 1)[-1])
+        # literal: shape
+        entries.append({"label": "condition",
+                        "identity": n.identity, "name": nm,
+                        "folded": _fold(nm),
+                        "owner": n.identity.rsplit("::", 1)[0],
+                        "words": str(n.properties.get("description")
+                                     or "").lower()})
+    for n in read.nodes("param"):
+        nm = str(n.properties.get("name")
+                 or n.identity.rsplit("/", 1)[-1])
+        # literal: shape
+        entries.append({"label": "param", "identity": n.identity,
+                        "name": nm, "folded": _fold(nm),
+                        "owner": None,
+                        "words": str(n.properties.get("description")
+                                     or "").lower()})
+    # joins carry meaning but stay unindexed BY RULING — counted
+    exclusions["join_structure"] = len(joins)
     from aivia.graph import metamodel
     lens = metamodel.load("lenses")
     for r in lens.sheets["Speech_Sources"]:
@@ -99,10 +166,13 @@ def technical_adjacency(read) -> Tuple[
     """The walk surface, both undirected (for the planner) and as
     the DIRECTED store truth (for the GQL writer): the spine
     (db—has_part→db_schema—has_part→table—has_part→column +
-    table—joins_to→table) plus THE JOIN LAYER (second target,
-    2026-09-11): scope—has_part→join +
-    join—left_side/right_side→table-or-scope + the reads
-    remainder. Condition edges stay OUT until §D (standing)."""
+    table—joins_to→table) plus THE JOIN LAYER (second target):
+    scope—has_part→join + join—left_side/right_side→
+    table-or-scope + the reads remainder — plus THE CONDITION
+    LAYER (third target, 2026-09-11, superseding the §D hold for
+    the console): scope/join—has_part→condition,
+    condition—has_part→condition, condition—resolves_to→
+    column-or-param, uses_param."""
     adj: Dict[str, List[Tuple[str, str]]] = {}
     directed: Set[Tuple[str, str, str]] = set()
 
@@ -125,13 +195,17 @@ def technical_adjacency(read) -> Tuple[
     store = getattr(read, "_store", None)
     if store is not None:
         joins = {n.identity for n in read.nodes("join")}
+        conds = {n.identity for n in read.nodes("condition")}
         for e in store.current_edges("joins_to"):
             link(e.from_id, e.to_id, "joins_to")
         for e in store.current_edges("has_part"):
-            if e.to_id in joins:        # scope —has_part→ join
+            # scope—has_part→join · scope/join—has_part→condition
+            # · condition—has_part→condition
+            if e.to_id in joins or e.to_id in conds:
                 link(e.from_id, e.to_id, "has_part")
-        # literal: mechanical — the join layer's side + reads walk
-        for lbl in ("left_side", "right_side", "reads"):
+        # literal: mechanical — the join + condition layers' walk
+        for lbl in ("left_side", "right_side", "reads",
+                    "resolves_to", "uses_param"):
             for e in store.current_edges(lbl):
                 link(e.from_id, e.to_id, lbl)
     return adj, directed
@@ -382,10 +456,10 @@ def answer_question(question: str, interpret_fn,
             kind_claim = next(
                 (m for m in mset["matches"]
                  if m["class"] == "kind" and m["score"] >= bar
-                 and m["name"] == top["label"]), None)
+                 and _kind_label(m["name"]) == top["label"]), None)
         if kind_claim is not None:
             kind_hits.append(kind_claim)
-            allowed_labels.add(kind_claim["name"])
+            allowed_labels.add(_kind_label(kind_claim["name"]))
             claimed.add(mset["token"])
         elif top["class"] == "edge-kind":
             edge_kinds.add(top["identity"].removeprefix("edgekind::"))
@@ -417,8 +491,8 @@ def answer_question(question: str, interpret_fn,
     # THE KIND'S TWO FACES: its own label = a constraint (job
     # done); another label = a CONNECTION — the population joins
     inst_labels = {m["label"] for _t, ms in inst_sets for m in ms}
-    enum_kinds = [k["name"] for k in kind_hits
-                  if k["name"] not in inst_labels]
+    enum_kinds = [_kind_label(k["name"]) for k in kind_hits
+                  if _kind_label(k["name"]) not in inst_labels]
     # THE SHAPE LADDER: enumeration -> connection -> neighborhood
     # -> list -> honest zero; the matched graph decides, the
     # planner only fills MISSING structure
@@ -426,11 +500,22 @@ def answer_question(question: str, interpret_fn,
     counts: Dict[str, Any] = {}
     capped: Optional[Tuple[int, int]] = None
     described = {e["identity"]: e for e in entries}
-    # THE PASS-THROUGH RULE (the join layer): joins are connective
-    # structure — two hops through one are ONE connection, cited
-    # by the join's ON meaning
+    # THE PASS-THROUGH RULE (generalized, third target): the
+    # connective labels are {join, condition} — a CHAIN of
+    # connective nodes is ONE connection, cited by the phrase of
+    # the connective NEAREST THE ANCHOR (the most specific truth)
     joinsmap = {n.identity: n.properties
                 for n in read.nodes("join")}
+    condsmap = {n.identity: n.properties
+                for n in read.nodes("condition")}
+
+    def _cite(ident: str) -> str:
+        owned = "::".join(ident.split("::")[-2:])
+        if ident in joinsmap:
+            j = joinsmap[ident]
+            return (f"via {owned}: {j.get('on', '')}").strip(": ")
+        c = condsmap.get(ident, {})
+        return (f"via: {str(c.get('description') or owned)[:110]}")
 
     def _speech(ident: str) -> str:
         e = described.get(ident)
@@ -466,14 +551,24 @@ def answer_question(question: str, interpret_fn,
                     continue
                 if nbr in pop:
                     _row(nbr, elbl, m)
-                elif nbr in joinsmap:   # pass-through: one hop more
-                    j = joinsmap[nbr]
-                    owned = "::".join(nbr.split("::")[-2:])
-                    via = (f"via {owned}: "
-                           f"{j.get('on', '')}").strip(": ")
-                    for nbr2, _lbl2 in adj.get(nbr, []):
-                        if nbr2 in pop and nbr2 != m["identity"]:
-                            _row(nbr2, via, m)
+                elif nbr in joinsmap or nbr in condsmap:
+                    # pass-through: walk the connective CHAIN; the
+                    # citation is the connective nearest the anchor
+                    via = _cite(nbr)
+                    walked = {nbr}
+                    frontier = [nbr]
+                    while frontier:
+                        cur = frontier.pop()
+                        for nbr2, _lbl2 in adj.get(cur, []):
+                            if nbr2 == m["identity"]:
+                                continue
+                            if nbr2 in pop:
+                                _row(nbr2, via, m)
+                            elif (nbr2 in joinsmap
+                                  or nbr2 in condsmap) \
+                                    and nbr2 not in walked:
+                                walked.add(nbr2)
+                                frontier.append(nbr2)
         rows.sort(key=lambda r: (r["a"], r["b"]))
         # literal: shape
         counts = {"connected": len(hit_pop),
@@ -534,7 +629,7 @@ def answer_question(question: str, interpret_fn,
     label_of = {}
     # literal: mechanical — the walk-surface label lookup
     for lbl in ("db", "db_schema", "table", "column", "scope",
-                "join"):
+                "join", "condition", "param"):
         for n in read.nodes(lbl):
             if n.identity in plan["nodes"]:
                 label_of[n.identity] = lbl
@@ -563,6 +658,12 @@ def answer_question(question: str, interpret_fn,
                 f"[join] {owned} "
                 f"({j.get('joinType', '?')}) — "
                 f"{j.get('description') or j.get('on', '')}")
+        elif ident in condsmap:
+            c = condsmap[ident]
+            owned = "::".join(ident.split("::")[-2:])
+            evidence.append(
+                f"[condition] {owned} — "
+                f"{c.get('description') or c.get('fragment', '')}")
         else:
             evidence.append(f"[{label_of.get(ident, '?')}] "
                             f"{ident.rsplit('|', 1)[-1]}")
