@@ -124,7 +124,7 @@ print(f"collision pass: min inter-disc gap {worst:.1f} world units")
 
 # ---- emit nodes ----------------------------------------------
 GA = 2.39996322972865332  # golden angle
-tnodes, cnodes = [], []
+tnodes, cnodes, cids = [], [], []
 for i, row in enumerate(tables):
     d = dict(zip(t.columns, row))
     tnodes.append({
@@ -138,6 +138,7 @@ for i, row in enumerate(tables):
         rr = 95 + 6.5 * math.sqrt(ci + 1)
         th = ci * GA
         m = cmeta[colid]
+        cids.append(colid)
         cnodes.append({
             "n": colid.rsplit("|", 1)[-1], "t": i,
             "x": round(pos[i][0] + rr * math.cos(th), 1),
@@ -205,25 +206,84 @@ for r in jn.sort_values("nodeId").itertuples(index=False):
 redges = [{"s": scid[r.sourceId], "t": tid[r.targetId]}
           for r in reads.itertuples(index=False)]
 
+# ---- M3 THE CONDITION LAYER (store rows: condition · param ·
+# resolves_to role-tagged · uses_param) ------------------------
+cnd_df = pd.read_parquet(EXP / "graph_condition.parquet")
+par_df = pd.read_parquet(EXP / "graph_param.parquet")
+rt_cc = pd.read_parquet(EXP / "graph_resolves_to_conditionColumn.parquet")
+rt_cp = pd.read_parquet(EXP / "graph_resolves_to_conditionParam.parquet")
+up = pd.read_parquet(EXP / "graph_uses_param_scopeParam.parquet")
+
+cindex = {cid: i for i, cid in enumerate(cids)}
+cnd_rows = list(cnd_df.sort_values("nodeId").itertuples(index=False))
+cnid = {r.nodeId: i for i, r in enumerate(cnd_rows)}
+per_scope: dict = {}
+cndnodes = []
+for r in cnd_rows:
+    owner = scid.get(r.nodeId.rsplit("::", 1)[0], 0)
+    k = per_scope.get(owner, 0)
+    per_scope[owner] = k + 1
+    o = scnodes[owner]
+    rr = 130 + 9 * math.sqrt(k + 1)
+    th = k * GA + 1.3
+    cndnodes.append({
+        "n": r.nodeId.rsplit("::", 1)[-1], "s": owner,
+        "x": round(o["x"] + rr * math.cos(th), 1),
+        "y": round(o["y"] + rr * math.sin(th), 1),
+        "d": trunc(r.description, 170)})
+
+par_rows = list(par_df.sort_values("nodeId").itertuples(index=False))
+pid = {r.nodeId: i for i, r in enumerate(par_rows)}
+uedges = [{"s": scid[r.sourceId], "p": pid[r.targetId]}
+          for r in up.itertuples(index=False)]
+owner_scope_of_param = {e["p"]: e["s"] for e in uedges}
+pnodes = []
+for i, r in enumerate(par_rows):
+    o = scnodes[owner_scope_of_param.get(i, 0)]
+    pnodes.append({
+        "n": r.name, "s": owner_scope_of_param.get(i, 0),
+        "x": round(o["x"] + 320 * math.cos(i * 2.6 + .5), 1),
+        "y": round(o["y"] + 320 * math.sin(i * 2.6 + .5), 1),
+        "d": trunc(r.description, 170)})
+
+rc_edges = [{"c": cnid[r.sourceId], "t": cindex[r.targetId],
+             "role": getattr(r, "role", "")}
+            for r in rt_cc.itertuples(index=False)
+            if r.sourceId in cnid and r.targetId in cindex]
+rp_edges = [{"c": cnid[r.sourceId], "p": pid[r.targetId],
+             "role": getattr(r, "role", "")}
+            for r in rt_cp.itertuples(index=False)
+            if r.sourceId in cnid and r.targetId in pid]
+
 side_edges = sum(1 for j in jnodes for k in ("ls", "rs") if j[k])
 counts = {
     "nodes": 1 + len(snodes) + len(tnodes) + len(cnodes)
-    + len(scnodes) + len(jnodes),
+    + len(scnodes) + len(jnodes) + len(cndnodes) + len(pnodes),
     "edges": len(hp_db_s) + len(hp_sc_t) + len(hp_t_c) + len(jedges)
-    + len(jnodes) + side_edges + len(redges),
-    "hasPart": len(hp_db_s) + len(hp_sc_t) + len(hp_t_c) + len(jnodes),
+    + len(jnodes) + side_edges + len(redges)
+    + len(cndnodes) + len(rc_edges) + len(rp_edges) + len(uedges),
+    "hasPart": len(hp_db_s) + len(hp_sc_t) + len(hp_t_c) + len(jnodes)
+    + len(cndnodes),
     "joins": len(jedges),
     "scopes": len(scnodes), "joinNodes": len(jnodes),
     "sideEdges": side_edges, "reads": len(redges),
+    "conds": len(cndnodes), "params": len(pnodes),
+    "resolves": len(rc_edges) + len(rp_edges),
+    "usesParam": len(uedges),
     "described": sum(1 for n in tnodes if n["d"])
     + sum(1 for n in cnodes if n["d"])
     + sum(1 for n in scnodes if n["d"])
-    + sum(1 for n in jnodes if n["d"]),
+    + sum(1 for n in jnodes if n["d"])
+    + sum(1 for n in cndnodes if n["d"])
+    + sum(1 for n in pnodes if n["d"]),
 }
 
 data = {"db": dnode, "schemas": snodes, "tables": tnodes,
         "cols": cnodes, "joins": jedges, "scopes": scnodes,
-        "joinNodes": jnodes, "reads": redges, "counts": counts}
+        "joinNodes": jnodes, "reads": redges,
+        "conds": cndnodes, "params": pnodes,
+        "resolvesCol": rc_edges, "resolvesPar": rp_edges,
+        "usesParam": uedges, "counts": counts}
 payload = json.dumps(data, separators=(",", ":"))
 print("payload bytes:", len(payload), "| counts:", counts)
 

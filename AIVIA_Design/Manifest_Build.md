@@ -516,6 +516,16 @@ questions — LIVE 21/21 first try (the keyed boot embedded the
 condition cards). Sunny's answer to "did the description
 include the where clause?" is now YES — the scope neighborhood
 shows its [condition] bullets.
+**THE GRAPH VISUAL — M3 layer added + republished (Sunny's
+standing instruction, 2026-09-11: update the artifact as the
+ladder progresses):** generate_m1.py + the template now render
+the condition layer — condition satellites on their owner
+scopes (1141), params (2, diamonds), resolves_to role-tagged
+dashed edges (165), uses_param (2); condition/param/resolves
+layer toggles, cards, tooltips, cluster physics. Page census
+**5930 nodes · 6303 edges — equal to the gate sheet's censuses**
+(the conservation echo). Republished to the same artifact URL
+(build b22ce1e8).
 **GRAMMAR 2.4.0 (Sunny's ruling, 2026-09-11 late: "this phrase
 'this is a selection of records' is useless"):** R1's no-grain
 fallback DIES — with zero declared grains estate-wide it opened

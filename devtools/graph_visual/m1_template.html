@@ -1,4 +1,4 @@
-<title>AIVIA Graph — M1+M2 (technical + join layer)</title>
+<title>AIVIA Graph — the store, M1–M3 (technical · join · condition layers)</title>
 <style>
   :root{
     --bg:#1a1a19; --panel:#222320; --panel2:#2a2b28; --line:#3a3b37;
@@ -6,6 +6,7 @@
     --table:#d95926; --column:#199e70; --schema:#3987e5; --db:#d55181;
     --join:#eda100; --haspart:#54554f;
     --scopec:#008300; --joinnode:#c98500;
+    --cond:#8e6bd0; --param:#d550c8;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html,body{height:100%;overflow:hidden}
@@ -70,7 +71,7 @@
   @media (prefers-reduced-motion: reduce){*{transition:none!important}}
 </style>
 <header>
-  <h1>AIVIA graph — M1+M2</h1>
+  <h1>AIVIA graph — M1–M3</h1>
   <div class="sub">the technical layer, rendered from the store's export
     parquets · hover for descriptions · click any node for its card ·
     build <span id="build">?</span></div>
@@ -99,6 +100,15 @@
   <label class="lay"><input type="checkbox" data-l="reads" checked>
     <span class="dash" style="border-top:2px solid var(--scopec)"></span>reads
     <span class="cnt" id="c-reads"></span></label>
+  <label class="lay"><input type="checkbox" data-l="cond" checked>
+    <span class="dot" style="background:var(--cond)"></span>condition
+    <span class="cnt" id="c-cond"></span></label>
+  <label class="lay"><input type="checkbox" data-l="param" checked>
+    <span class="dot" style="background:var(--param)"></span>param
+    <span class="cnt" id="c-param"></span></label>
+  <label class="lay"><input type="checkbox" data-l="resolves" checked>
+    <span class="dash" style="border-top:2px dashed var(--cond)"></span>resolves_to
+    <span class="cnt" id="c-resolves"></span></label>
   <label class="lay"><input type="checkbox" data-l="haspart" checked>
     <span class="dash"></span>has_part
     <span class="cnt" id="c-haspart"></span></label>
@@ -123,12 +133,14 @@ document.getElementById('build').textContent = BUILD;
 const CV = document.getElementById('cv'), CTX = CV.getContext('2d');
 const COLORS = {table:'#d95926', column:'#199e70', schema:'#3987e5',
                 db:'#d55181', join:'#eda100', haspart:'#54554f',
-                scope:'#008300', joinnode:'#c98500'};
+                scope:'#008300', joinnode:'#c98500',
+                cond:'#8e6bd0', param:'#d550c8'};
 const INK = '#f2f1ea', INK2 = '#c3c2b7', INK3 = '#8b8a80';
 let W, H, dpr = window.devicePixelRatio || 1;
 let scale = 0.14, ox = 0, oy = 0;   // world→screen: s = w*scale + o
 const show = {table:1, column:1, schema:1, db:1, haspart:1, joins:1,
-              scope:1, joinnode:1, reads:1};
+              scope:1, joinnode:1, reads:1, cond:1, param:1,
+              resolves:1};
 let hover = null, pinned = null, dragging = null, panning = false;
 let pending = null, down = false;      // gesture decided on first move
 let px = 0, py = 0, gx = 0, gy = 0;   // g = gesture start (click test)
@@ -144,15 +156,18 @@ const DB = {k:'db', i:0, ...DATA.db, r:44};
 // M2 THE JOIN LAYER: scopes and joins are store rows too
 const SC = DATA.scopes.map((n,i)=>({k:'scope', i, ...n, r:30}));
 const J = DATA.joinNodes.map((n,i)=>({k:'joinnode', i, ...n, r:10}));
+// M3 THE CONDITION LAYER: conditions + params are store rows too
+const CD = DATA.conds.map((n,i)=>({k:'cond', i, ...n, r:7}));
+const P = DATA.params.map((n,i)=>({k:'param', i, ...n, r:18}));
 const REF = x => x ? (x.t==='T' ? T[x.i] : SC[x.i]) : null;
-const nodes = [...T, ...C, ...SC, ...J, ...S, DB];
+const nodes = [...T, ...C, ...SC, ...J, ...CD, ...P, ...S, DB];
 // radii live in WORLD units and scale with zoom (clamped) — fixed
 // pixel dots over world positions made columns collapse UNDER
 // their table at low zoom, which also ate their clicks
 const RMIN = {table:3.5, column:2.0, schema:5, db:6, scope:3.5,
-              joinnode:3.2};
+              joinnode:3.2, cond:1.8, param:4};
 const RMAX = {table:11, column:4.5, schema:13, db:15, scope:11,
-              joinnode:7};
+              joinnode:7, cond:4, param:10};
 const nr = n => Math.max(RMIN[n.k], Math.min(RMAX[n.k], n.r*scale));
 const joinsOf = i => DATA.joins.filter(j=>j.a===i||j.b===i);
 
@@ -164,6 +179,10 @@ document.getElementById('c-joins').textContent = DATA.counts.joins;
 document.getElementById('c-scope').textContent = DATA.counts.scopes;
 document.getElementById('c-joinnode').textContent = DATA.counts.joinNodes;
 document.getElementById('c-reads').textContent = DATA.counts.reads;
+document.getElementById('c-cond').textContent = DATA.counts.conds;
+document.getElementById('c-param').textContent = DATA.counts.params;
+document.getElementById('c-resolves').textContent =
+  DATA.counts.resolves + DATA.counts.usesParam;
 document.getElementById('chips').innerHTML =
   `<span class="chip"><b>${DATA.counts.nodes}</b> nodes</span>`+
   `<span class="chip"><b>${DATA.counts.edges}</b> edges</span>`+
@@ -198,6 +217,16 @@ const hi = n => {                      // highlight membership
   if(pinned.k==='scope')
     return J.some(j=>j.s===pinned.i &&
       (n===j || n===REF(j.ls) || n===REF(j.rs)));
+  if(pinned.k==='cond')
+    return n===SC[pinned.s] ||
+      DATA.resolvesCol.some(e=>e.c===pinned.i&&n.k==='column'&&n.i===e.t) ||
+      DATA.resolvesPar.some(e=>e.c===pinned.i&&n.k==='param'&&n.i===e.p);
+  if(pinned.k==='param')
+    return DATA.usesParam.some(e=>e.p===pinned.i&&n===SC[e.s]) ||
+      DATA.resolvesPar.some(e=>e.p===pinned.i&&n===CD[e.c]);
+  if(n.k==='cond' && SC[n.s]===pinned) return true;
+  if(n.k==='param' &&
+     DATA.usesParam.some(e=>e.p===n.i&&SC[e.s]===pinned)) return true;
   if(n.k==='joinnode' && SC[n.s]===pinned) return true;
   if(n.k==='column' && T[n.t]===pinned) return true;
   if(n.k==='table'&&pinned.k==='table')
@@ -275,6 +304,53 @@ function draw(){
       CTX.lineTo(sx(T[e.t]),sy(T[e.t]));});
     CTX.stroke(); CTX.globalAlpha = 1; CTX.lineWidth = 1;
   }
+  // M3: scope—has_part→condition satellites (faint spokes)
+  if(show.cond && show.scope && show.haspart){
+    CTX.strokeStyle = COLORS.haspart;
+    CTX.globalAlpha = scale > .5 ? .18 : .09;
+    CTX.beginPath();
+    CD.forEach(c=>{const o=SC[c.s];
+      if(pinned && !(o===pinned||hi(c))) return;
+      CTX.moveTo(sx(o),sy(o)); CTX.lineTo(sx(c),sy(c));});
+    CTX.stroke(); CTX.globalAlpha = 1;
+  }
+  // M3: resolves_to (condition→column/param, role-tagged) +
+  // uses_param — the logic layer's anchors, dashed
+  if(show.resolves){
+    CTX.setLineDash([3,4]);
+    if(show.cond && show.column){
+      CTX.strokeStyle = COLORS.cond;
+      DATA.resolvesCol.forEach(e=>{
+        const a=CD[e.c], b=C[e.t];
+        const lit = pinned &&
+          (a===pinned||b===pinned||SC[a.s]===pinned);
+        CTX.globalAlpha = lit ? .85 : (pinned ? .04 : .10);
+        CTX.beginPath(); CTX.moveTo(sx(a),sy(a));
+        CTX.lineTo(sx(b),sy(b)); CTX.stroke();
+      });
+    }
+    if(show.cond && show.param){
+      CTX.strokeStyle = COLORS.cond;
+      DATA.resolvesPar.forEach(e=>{
+        const a=CD[e.c], b=P[e.p];
+        const lit = pinned && (a===pinned||b===pinned);
+        CTX.globalAlpha = lit ? .85 : (pinned ? .05 : .25);
+        CTX.beginPath(); CTX.moveTo(sx(a),sy(a));
+        CTX.lineTo(sx(b),sy(b)); CTX.stroke();
+      });
+    }
+    if(show.param && show.scope){
+      CTX.strokeStyle = COLORS.param;
+      DATA.usesParam.forEach(e=>{
+        const a=SC[e.s], b=P[e.p];
+        CTX.globalAlpha = pinned && !(a===pinned||b===pinned)
+          ? .06 : .5;
+        CTX.beginPath(); CTX.moveTo(sx(a),sy(a));
+        CTX.lineTo(sx(b),sy(b)); CTX.stroke();
+      });
+    }
+    CTX.setLineDash([]); CTX.globalAlpha = 1;
+  }
   // nodes
   nodes.forEach(n=>{
     if(!show[n.k==='schema'?'schema':n.k]) return;
@@ -283,7 +359,7 @@ function draw(){
     CTX.fillStyle = COLORS[n.k];
     const r = nr(n);
     CTX.beginPath();
-    if(n.k==='joinnode'){
+    if(n.k==='joinnode'||n.k==='param'){
       const x=sx(n), y=sy(n);
       CTX.moveTo(x, y-r-1); CTX.lineTo(x+r+1, y);
       CTX.lineTo(x, y+r+1); CTX.lineTo(x-r-1, y);
@@ -343,6 +419,14 @@ function draw(){
       if(pinned && !hi(n)) return;
       lbl(n,10,false,INK3,false);
     });
+  if(show.param)
+    P.forEach(n=>{ if(n!==hover) lbl(n,11,true,'#e07bd8',false); });
+  if(show.cond && (scale>2.2 || pinned))
+    CD.forEach(n=>{
+      if(n===hover) return;
+      if(pinned && !hi(n)) return;
+      lbl(n,9,false,INK3,false);
+    });
   CTX.globalAlpha = 1;
 }
 
@@ -352,6 +436,9 @@ function draw(){
 nodes.forEach(n=>{n.vx=0; n.vy=0;});
 const colsByT = T.map(()=>[]);
 C.forEach(c=>colsByT[c.t].push(c));
+// M3: condition satellites cluster on their owner scope
+const cndByS = SC.map(()=>[]);
+CD.forEach(c=>cndByS[c.s].push(c));
 const CR = T.map(t=>70+6*Math.sqrt(t.nc||1));   // cluster radius
 const RL = T.map(t=>85+8*Math.sqrt(t.nc||1));   // column spring rest
 const BODIES = [...T.map((t,i)=>({n:t, cr:CR[i]})),
@@ -424,6 +511,36 @@ function step(){
       }
     }
   }
+  // M3: conditions spring to their scope (columns pattern), with
+  // local free-body separation inside each cluster
+  for(let si=0; si<SC.length; si++){
+    const s=SC[si], cl=cndByS[si];
+    if(!cl.length) continue;
+    const rl = 160 + 8*Math.sqrt(cl.length);
+    for(let i=0;i<cl.length;i++){
+      const c=cl[i];
+      let dx=s.x-c.x, dy=s.y-c.y;
+      const d=Math.hypot(dx,dy)+0.01;
+      const f=(d-rl)*0.012 - Math.max(0, 70-d)*0.5;
+      c.vx+=dx/d*f; c.vy+=dy/d*f;
+      for(let j2=i+1;j2<cl.length;j2++){
+        const o=cl[j2];
+        let ex=o.x-c.x, ey=o.y-c.y;
+        const e2=ex*ex+ey*ey;
+        if(e2>8100) continue;
+        const ed=Math.sqrt(e2)+0.01, rf=Math.min(2200/(e2+10), 9);
+        ex/=ed; ey/=ed;
+        c.vx-=ex*rf; c.vy-=ey*rf; o.vx+=ex*rf; o.vy+=ey*rf;
+      }
+    }
+  }
+  P.forEach(p=>{
+    if(p===dragging) return;
+    const s=SC[p.s];
+    let dx=s.x-p.x, dy=s.y-p.y;
+    const d=Math.hypot(dx,dy)+0.01, f=(d-360)*0.012;
+    p.vx+=dx/d*f; p.vy+=dy/d*f;
+  });
   nodes.forEach(n=>{
     if(n.k==='schema'||n.k==='db'||n===dragging){n.vx=0;n.vy=0;return;}
     n.vx=Math.max(-40,Math.min(40,n.vx*0.82));
@@ -474,7 +591,8 @@ const tip = document.getElementById('tip');
 function showTip(n, mx, my){
   if(!n){tip.style.display='none'; return;}
   const kind = {table:'TABLE', column:'COLUMN', schema:'DB_SCHEMA',
-                db:'DB', scope:'SCOPE', joinnode:'JOIN (observed)'}[n.k];
+                db:'DB', scope:'SCOPE', joinnode:'JOIN (observed)',
+                cond:'CONDITION', param:'PARAM'}[n.k];
   let meta = '';
   if(n.k==='table') meta = `pk: ${n.pk||'—'} · ${n.nc} columns · `+
     `${joinsOf(n.i).length} declared joins`;
@@ -482,7 +600,11 @@ function showTip(n, mx, my){
   if(n.k==='joinnode') meta = `in ${SC[n.s].n} · on ${n.on}`;
   if(n.k==='scope')
     meta = `${J.filter(j=>j.s===n.i).length} joins · `+
-      `${DATA.reads.filter(e=>e.s===n.i).length} direct reads`;
+      `${DATA.reads.filter(e=>e.s===n.i).length} direct reads · `+
+      `${CD.filter(c=>c.s===n.i).length} conditions`;
+  if(n.k==='cond') meta = `in ${SC[n.s].n}`;
+  if(n.k==='param') meta =
+    `${DATA.usesParam.filter(e=>e.p===n.i).length} using scope(s)`;
   tip.innerHTML = `<div class="k">${kind}</div>
     <div class="n"><span class="dot" style="background:${COLORS[n.k]};
     width:8px;height:8px;border-radius:50%;display:inline-block"></span>
@@ -526,6 +648,41 @@ window.pin = function(n){
       <div class="d">${n.d||''}</div>
       <div class="sec">JOINS (${mine.length}, observed)</div>${js}
       ${rds?`<div class="sec">READS — the remainder</div>${rds}`:''}`;
+    card.style.display='block'; draw(); return;
+  }
+  if(n.k==='cond'){
+    const rc = DATA.resolvesCol.filter(e=>e.c===n.i).map(e=>
+      `<div class="jrow"><b>${C[e.t].n}</b>` +
+      `${e.role?` <span class="on">${e.role}</span>`:''}<br>` +
+      `<span style="color:var(--ink3)">in ${T[C[e.t].t].n}</span></div>`
+    ).join('');
+    const rp = DATA.resolvesPar.filter(e=>e.c===n.i).map(e=>
+      `<div class="jrow"><b>${P[e.p].n}</b>` +
+      `${e.role?` <span class="on">${e.role}</span>`:''}</div>`
+    ).join('');
+    cardBody.innerHTML = `<div class="k">CONDITION</div>
+      <h3><span class="dot" style="background:${COLORS.cond};width:9px;
+      height:9px;border-radius:50%;display:inline-block"></span>
+      ${SC[n.s].n} · ${n.n}</h3>
+      <div class="d">${n.d||''}</div>
+      ${rc||rp?`<div class="sec">RESOLVES TO (role-tagged)</div>${rc}${rp}`
+        :`<div class="jrow">no resolved anchors</div>`}`;
+    card.style.display='block'; draw(); return;
+  }
+  if(n.k==='param'){
+    const us = DATA.usesParam.filter(e=>e.p===n.i).map(e=>
+      `<div class="jrow"><b>${SC[e.s].n}</b></div>`).join('');
+    const rp = DATA.resolvesPar.filter(e=>e.p===n.i).map(e=>
+      `<div class="jrow"><b>${SC[CD[e.c].s].n} · ${CD[e.c].n}</b><br>
+       <span class="on">${CD[e.c].d||''}</span></div>`).join('');
+    cardBody.innerHTML = `<div class="k">PARAM</div>
+      <h3><span class="dot" style="background:${COLORS.param};width:9px;
+      height:9px;display:inline-block;transform:rotate(45deg)"></span>
+      ${n.n}</h3>
+      <div class="d">${n.d||''}</div>
+      <div class="sec">USED BY (uses_param)</div>
+      ${us||'<div class="jrow">—</div>'}
+      ${rp?`<div class="sec">CONDITIONS RESOLVING HERE</div>${rp}`:''}`;
     card.style.display='block'; draw(); return;
   }
   if(n.k==='column'){
@@ -613,7 +770,8 @@ addEventListener('mouseup', e=>{
     Math.hypot(e.clientX-gx, e.clientY-gy) < 4;
   if(clicked && pending && (pending.k==='table'||
      pending.k==='column'||pending.k==='scope'||
-     pending.k==='joinnode')) pin(pending);
+     pending.k==='joinnode'||pending.k==='cond'||
+     pending.k==='param')) pin(pending);
   else if(clicked && !pending) pin(null);
   down=false; pending=null; dragging=null; panning=false;
   CV.classList.remove('drag');
