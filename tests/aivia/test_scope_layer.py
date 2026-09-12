@@ -59,4 +59,6 @@ def test_speech_reads_the_stored_property(world):
     node = next(n for n in read.nodes("scope")
                 if n.identity == ED_SCOPE)
     assert text == node.properties["description"].lower()
-    assert "selection of records" in text
+    # grammar 2.4.0: the composition sentence LEADS — the constant
+    # no-grain opener is dead (Sunny's ruling 2026-09-11)
+    assert text.startswith("drawn from")

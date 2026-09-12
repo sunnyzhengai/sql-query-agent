@@ -493,6 +493,26 @@ the co-side — BOTH store-verified, #ADT::join#1 ON ENCOUNTER_ID)
 + 4 drafted join-family battery questions — LIVE 18/18 first
 try (the keyed boot embedded the 44 scope card sets). Await
 Sunny's hands-on pass to pin the family blessed-by-use.
+**GRAMMAR 2.4.0 (Sunny's ruling, 2026-09-11 late: "this phrase
+'this is a selection of records' is useless"):** R1's no-grain
+fallback DIES — with zero declared grains estate-wide it opened
+ALL 310 sepsis + 44 dev floors identically, saying nothing and
+diluting every scope embedding with the same prefix. Now the
+COMPOSITION SENTENCE LEADS ("Drawn from ed encounters fact
+records, …"); grain-bearing and no-source leads survive; the
+minimal sentence remains only as the degenerate guard. PLUS THE
+RESTORATION: the ledger-close commit (e8dd8a9) had REPLACED the
+no-source `elif` with the DELETE branch — DELETE floors lied
+'derived values' and no-source floors fell to the fallback ever
+since; both branches restored, the regression named in the
+grammar doc. Corpus regenerated: the phrase count 310 → 0;
+gap_check.py fixed en route (it never skipped pbi_snapshot);
+the recorded-embedding fixture re-recorded (312 new floor
+texts). Suite 2023 green; battery 18/18 with the new floors.
+FINDING from Sunny's next round: scope descriptions carry the
+HEAD only — WHERE predicates are M3 condition grains, held out
+of the console until §D by his standing ruling; admitting them
+= THE THIRD TARGET, awaiting his word.
 **THE TURN DEFAULT ruled (Sunny, 2026-09-11, same session):**
 HITL after EVERY turn is now the DEFAULT DESIGN for all chatbot
 surfaces — findings offered ranked with visible scores and a

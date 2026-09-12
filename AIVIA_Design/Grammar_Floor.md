@@ -1,6 +1,27 @@
-# The Floor Grammar — v2.3.0 (the REPORT FLOOR, 2026-09-07;
-# v2.0.0 POLICY-WALK major 2026-09-06; v1.3.1 RATIFIED Sunny
-# 2026-09-05)
+# The Floor Grammar — v2.4.0 (the OPENER dies, 2026-09-11;
+# v2.3.0 REPORT FLOOR 2026-09-07; v2.0.0 POLICY-WALK major
+# 2026-09-06; v1.3.1 RATIFIED Sunny 2026-09-05)
+
+*v2.4.0 (Sunny's ruling, 2026-09-11 — "this phrase 'this is a
+selection of records' is useless"): R1's NO-GRAIN FALLBACK DIES.
+A sentence every scope says carries no meaning about any scope —
+and with zero declared grains estate-wide (the counted grain
+gap), the fallback fired on ALL 44 dev / 310 sepsis floors,
+opening every one identically and diluting every scope's speech
+embedding with the same prefix. Now: when tables are read but no
+grain carries, THE COMPOSITION SENTENCE IS THE LEAD ("Drawn from
+ed encounters fact records, combined with …"). The grain-bearing
+lead ("This is a selection of patient encounters.") and the
+no-source lead (the derived-values fact) SURVIVE — they say
+something. The degenerate guard: a scope with no composition and
+no other lead keeps the minimal sentence, there it is the whole
+content. PLUS THE RESTORATION: the ledger-close commit
+(e8dd8a9, 2026-09-06) added the DELETE lead by REPLACING the
+no-source `elif` — since then DELETE floors claimed "derived
+values; no source records are read" (a lie about a removal) and
+no-source floors fell to the fallback (the 'Constant' corpse
+resurrected). Both branches restored; the regression is named
+here so the class is searchable.*
 
 *v2.3.0 (live find #9 — Sunny: "the answer is mechanical. i was
 looking for a meaning at the report level. do we not translate the
@@ -102,12 +123,17 @@ SHIPS — an outage costs polish, never truth.
 ## R1 — the lead sentence
 
 lead(scope) :=
+  "This step removes records from {source}." if the scope's
+      operation is DELETE (removal is the act, never 'a selection') ·
   "This step produces derived values; no source records are read."
       if the scope reads no tables ·
   "This is a selection of {pluralize(grain(t))}." for t = the FIRST
       grain-bearing FROM ref in declaration order ·
-  "This is a selection of records." if tables are read but none
-      carries a grain (the grain gap is already counted in gap-census).
+  NO LEAD — the composition sentence opens the floor (v2.4.0) —
+      if tables are read but none carries a grain (the grain gap is
+      already counted in gap-census); the old constant fallback
+      ("This is a selection of records.") survives ONLY as the
+      degenerate guard when the floor would otherwise be empty.
 
 pluralize(phrase) := pluralize the HEAD NOUN — the word before the
 first preposition (of|on|per|for|in|at|by|with), else the last word.

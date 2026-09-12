@@ -26,7 +26,9 @@ def build(base: pathlib.Path) -> ReadApi:
     snapshots = sorted(base.glob("*_snapshot"))
     estate_dir = base / "estate_snapshot"
     for snap in snapshots:
-        if snap == estate_dir:
+        # skip the non-extract snapshots, same as build_store
+        # (pbi_snapshot carries TMDL, not extract parts)
+        if snap in (estate_dir, base / "pbi_snapshot"):
             continue
         pack = json.loads((snap / "manifest.json").read_text()) \
             .get("source_pack_version", "")

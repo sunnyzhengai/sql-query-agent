@@ -10,22 +10,21 @@ Every named scope's floor text, for Sunny's gap-check (the ED-sepsis acceptance 
 - OPEN, estate findings (the customer's): 0 documentation gaps + 132 drift refs (columns nowhere declared — silently-failing reports, kept counted forever)
 
 ## The three censuses (ADR 0080; census 1 succeeded by the connection census, 2026-09-07)
-- connection: 5017 birth-edged + 0 counted-missing + 1 rooted == 5018 total; missing kinds: none; unledgered: none
-- speech: 7779 speak + 0 counted gaps + 277 ruled-mute == 8056; unassigned kinds: none
-- searchability: 7779 searchable + 0 ruled-silent == 7779 speakers
+- connection: 11257 birth-edged + 0 counted-missing + 1 rooted == 11258 total; missing kinds: none; unledgered: none
+- speech: 9206 speak + 28 counted gaps + 277 ruled-mute == 9511; unassigned kinds: none
+- searchability: 9206 searchable + 0 ruled-silent == 9206 speakers
+- verbatim: 9234 matched + 0 counted mismatches == 9234; drifted: none
 
 ## reporting/USP_ED_SEPSIS.sql
 
 ### `reporting/USP_ED_SEPSIS.sql::#Base_Pop`
 ```
-This is a selection of records.
 Drawn from ed encounters fact records, combined with hospital encounters records, combined with ed encounters dm records, combined with patients records, combined with ref ed disposition records, combined with ref ethnic group records, combined with patient demographics race records, combined with ref patient race records, combined with departments records, combined with locations records.
 - The date when the patient arrived is between the d start date parameter and the d end date parameter (inclusive).
 ```
 
 ### `reporting/USP_ED_SEPSIS.sql::#AllMeds`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in medication orders records, restricted to records also present in medications records, restricted to records also present in med admin records records.
 - It is not the case that the time designated by the user when the action occurred has no recorded value.
 - The time designated by the user when the action occurred is before the ed departure time (annotated 'while in ED' in the source).
@@ -35,7 +34,7 @@ Drawn from the base pop selection defined earlier in this procedure, restricted 
 
 ### `reporting/USP_ED_SEPSIS.sql::ABX`
 ```
-This is a selection of records.
+Drawn from the allmeds selection defined earlier in this procedure.
 This selection is the combination of 2 alternative selections (duplicates removed).
 The first alternative:
 Drawn from the allmeds selection defined earlier in this procedure.
@@ -49,13 +48,11 @@ Drawn from the allmeds selection defined earlier in this procedure.
 
 ### `reporting/USP_ED_SEPSIS.sql::#BasePopABX`
 ```
-This is a selection of records.
 Drawn from the abx selection defined earlier in this procedure.
 ```
 
 ### `reporting/USP_ED_SEPSIS.sql::#BasePopBolus`
 ```
-This is a selection of records.
 Drawn from the allmeds selection defined earlier in this procedure.
 - The taken time is between the adt arrival time and the ed departure time (inclusive).
 - The hv discr freq id is '300902' (annotated 'EFQ .1 (frequency = once)' in the source).
@@ -65,7 +62,6 @@ Drawn from the allmeds selection defined earlier in this procedure.
 
 ### `reporting/USP_ED_SEPSIS.sql::#Pressors`
 ```
-This is a selection of records.
 Drawn from the allmeds selection defined earlier in this procedure, restricted to records also present in grouper med records records.
 - The taken time is between the adt arrival time and the ed departure time (inclusive).
 - The unique identifier for the base grouper record is vcg-.1 is one of the values '8000100' (noted 'HS RX EPINEPHRINE SEPSIS'), '8000101' (noted 'HS RX DOPAMINE SEPSIS'), '8000102' (noted 'HS RX DOBUTAMINE SEPSIS'), '8000103' (noted 'HS RX MILRINONE SEPSIS'), '8000104' (noted 'HS RX NOREPINEPHRINE SEPSIS').
@@ -73,7 +69,6 @@ Drawn from the allmeds selection defined earlier in this procedure, restricted t
 
 ### `reporting/USP_ED_SEPSIS.sql::#FirstABXAdminTimeDetails`
 ```
-This is a selection of records.
 Drawn from the basepopabx selection defined earlier in this procedure, combined with v pharmacy order records, combined with 2 inline selections, combined with v pharmacy dispense records, combined with 2 inline selections.
 - The time line is 1 (annotated 'LOOK FOR FIRST ANTIBIOTIC ADMINISTRATION ONLY' in the source).
 - The myline is 1.
@@ -83,7 +78,6 @@ Drawn from the basepopabx selection defined earlier in this procedure, combined 
 
 ### `reporting/USP_ED_SEPSIS.sql::#Flowsheets`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in flowsheet records records, restricted to records also present in flowsheet measurements records.
 - It is not the case that the exact moment when the reading was recorded has no recorded value.
 - It is not the case that the flowsheet reading real has no recorded value.
@@ -93,14 +87,12 @@ Drawn from the base pop selection defined earlier in this procedure, restricted 
 
 ### `reporting/USP_ED_SEPSIS.sql::#EncounterWeights`
 ```
-This is a selection of records.
 Drawn from the flowsheets selection defined earlier in this procedure.
 - The flo meas id is '94' (annotated 'Weight' in the source).
 ```
 
 ### `reporting/USP_ED_SEPSIS.sql::Systolic`
 ```
-This is a selection of records.
 Drawn from the flowsheets selection defined earlier in this procedure.
 - The flo meas id is '95' (annotated 'Blood pressure' in the source).
 - The recorded time is between the adt arrival time and the ed departure time (inclusive).
@@ -108,14 +100,12 @@ Drawn from the flowsheets selection defined earlier in this procedure.
 
 ### `reporting/USP_ED_SEPSIS.sql::#Hypotension`
 ```
-This is a selection of records.
 Drawn from the systolic selection defined earlier in this procedure.
 - The hypotension y is 'Y'.
 ```
 
 ### `reporting/USP_ED_SEPSIS.sql::#BloodPressure`
 ```
-This is a selection of records.
 Drawn from the flowsheets selection defined earlier in this procedure.
 - The recorded time is between the adt arrival time and the ed departure time (inclusive).
 - The flo meas id is one of the values '95' (noted 'Blood Pressure'), '9001140203' (noted 'R EDX GIRLS SYSTOLIC BP PERCENTILE'), '9001140205' (noted 'R EDX BOYS SYSTOLIC BP PERCENTILE').
@@ -123,7 +113,6 @@ Drawn from the flowsheets selection defined earlier in this procedure.
 
 ### `reporting/USP_ED_SEPSIS.sql::#SepsisAlertCancelled`
 ```
-This is a selection of records.
 Drawn from the flowsheets selection defined earlier in this procedure.
 - The flo meas id is '9001125002' (annotated 'R HS ED SEPSIS CLINICAL_ALERTS CANCELLED' in the source).
 - The recorded time is between the adt arrival time and the ed departure time (inclusive).
@@ -131,7 +120,6 @@ Drawn from the flowsheets selection defined earlier in this procedure.
 
 ### `reporting/USP_ED_SEPSIS.sql::#Base_Pop_Severe_ED_Scores`
 ```
-This is a selection of records.
 Drawn from the flowsheets selection defined earlier in this procedure.
 - The recorded time is between the adt arrival time and the ed departure time (inclusive).
 - The flo meas id is one of the values '9000161709' (noted 'SEPSIS SCREENING SCORE (RETIRED)'), '9000002613' (noted 'R HS IP SEPSIS SCORE 2019').
@@ -139,14 +127,12 @@ Drawn from the flowsheets selection defined earlier in this procedure.
 
 ### `reporting/USP_ED_SEPSIS.sql::#ED_PositiveScores`
 ```
-This is a selection of records.
 Drawn from the base pop severe ed scores selection defined earlier in this procedure.
 - The meas value exceeds 4.
 ```
 
 ### `reporting/USP_ED_SEPSIS.sql::#ED_NegativeScores`
 ```
-This is a selection of records.
 Drawn from the base pop severe ed scores selection defined earlier in this procedure.
 - The meas value is at most 4.
 - It is not the case that a matching record exists in a nested selection reading the ed positivescores selection defined earlier in this procedure.
@@ -154,13 +140,11 @@ Drawn from the base pop severe ed scores selection defined earlier in this proce
 
 ### `reporting/USP_ED_SEPSIS.sql::#Base_Pop_SepsisScores_ConCat`
 ```
-This is a selection of records.
 Drawn from the base pop severe ed scores selection defined earlier in this procedure.
 ```
 
 ### `reporting/USP_ED_SEPSIS.sql::All_LDAs`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, combined with line device airway records, combined with an inline selection.
 - It is not the case that the this item records the exact moment the record was placed has no recorded value.
 - The this item records the exact moment the record was placed is between the adt arrival time and the ed departure time (inclusive).
@@ -169,20 +153,17 @@ Drawn from the base pop selection defined earlier in this procedure, combined wi
 
 ### `reporting/USP_ED_SEPSIS.sql::TimeOrdered_LDAs`
 ```
-This is a selection of records.
 Drawn from the all ldas selection defined earlier in this procedure.
 ```
 
 ### `reporting/USP_ED_SEPSIS.sql::#LDA`
 ```
-This is a selection of records.
 Drawn from the timeordered ldas selection defined earlier in this procedure.
 - The time line is 1.
 ```
 
 ### `reporting/USP_ED_SEPSIS.sql::#Labs_and_Cultures`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in lab order results records, restricted to records also present in procedure orders records.
 - The date and time at which the procedure_order was submitted is between the adt arrival time and the ed departure time (inclusive).
 - The unique identifier for each result component associated with every result is one of the values 5000001861 (noted 'O2 SATURATION VENOUS, GEM CALC'), 5000000478 (noted 'O2 SATURATION VENOUS'), 5000000446 (noted 'LACTIC ACID ISTAT'), 5000000447 (noted 'LACTIC ACID, GEM RESPIRATORY'), 5000000449 (noted 'LACTIC ACID LEVEL'), 500001 (noted 'PROCALCITONIN') or The unique identifier for the procedure record associated is one of the values 600003 (noted 'BLOOD CULTURE'), 600004 (noted 'SEND BLOOD CULTURE IF TEMP'), 600011 (noted 'BLOOD CULTURE, QUEST'), 600012 (noted 'BLOOD CULTURE, LABCORP'), 600001 (noted 'URINE CULTURE'), 600007 (noted 'REFLEXIVE URINE CULTURE, QUEST'), 600008 (noted 'REFLEXIVE URINE CULTURE, QUEST'), 600009 (noted 'URINE CULTURE COMPREHENSIVE, LABCORP'), 600010 (noted 'HS POCT URINE CULTURE') or .
@@ -190,40 +171,35 @@ Drawn from the base pop selection defined earlier in this procedure, restricted 
 
 ### `reporting/USP_ED_SEPSIS.sql::TimeOrdered_Labs`
 ```
-This is a selection of records.
 Drawn from the labs and cultures selection defined earlier in this procedure.
 - It is not the case that the lab test type has no recorded value.
 ```
 
 ### `reporting/USP_ED_SEPSIS.sql::#Labs`
 ```
-This is a selection of records.
 Drawn from the timeordered labs selection defined earlier in this procedure.
 - The time line is 1.
 ```
 
 ### `reporting/USP_ED_SEPSIS.sql::AllCultures`
 ```
-This is a selection of records.
 Drawn from the labs and cultures selection defined earlier in this procedure, combined with organisms records.
 - It is not the case that the culture type has no recorded value.
 ```
 
 ### `reporting/USP_ED_SEPSIS.sql::PositiveCultures`
 ```
-This is a selection of records.
 Drawn from the allcultures selection defined earlier in this procedure.
 ```
 
 ### `reporting/USP_ED_SEPSIS.sql::NegativeCultures`
 ```
-This is a selection of records.
 Drawn from the allcultures selection defined earlier in this procedure.
 ```
 
 ### `reporting/USP_ED_SEPSIS.sql::#Cultures`
 ```
-This is a selection of records.
+Drawn from the positivecultures selection defined earlier in this procedure.
 This selection is the combination of 2 alternative selections (duplicates removed).
 The first alternative:
 Drawn from the positivecultures selection defined earlier in this procedure.
@@ -233,7 +209,6 @@ Drawn from the negativecultures selection defined earlier in this procedure.
 
 ### `reporting/USP_ED_SEPSIS.sql::#ADT`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in adt events records (2 reads), restricted to records also present in departments records.
 - For the first adt events record read: the category value that indicates the type of the event record is 4 (annotated 'TRANSFER OUT' in the source).
 - For the first adt events record read: the category value that indicates if the event record has been modified or removed is not 2 (annotated 'CANCELED' in the source).
@@ -245,28 +220,24 @@ Drawn from the base pop selection defined earlier in this procedure, restricted 
 
 ### `reporting/USP_ED_SEPSIS.sql::#ED2HEMONC`
 ```
-This is a selection of records.
 Drawn from the adt selection defined earlier in this procedure.
 - The dept group is 'HemOnc'.
 ```
 
 ### `reporting/USP_ED_SEPSIS.sql::#ED2ICU`
 ```
-This is a selection of records.
 Drawn from the adt selection defined earlier in this procedure.
 - The dept group is 'ICU'.
 ```
 
 ### `reporting/USP_ED_SEPSIS.sql::#ED2GEN`
 ```
-This is a selection of records.
 Drawn from the adt selection defined earlier in this procedure, combined with an inline selection.
 - The dept group is 'GenCare'.
 ```
 
 ### `reporting/USP_ED_SEPSIS.sql::#BPA`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, combined with clinical alerts records, combined with alert history records, combined with alert actions records, combined with ref alert actions records, combined with ref alert override reasons records, combined with ref alert status records, combined with ref shown place records, combined with employees records.
 - The locators that were activated is '900130001'.
 - The moment when the warning is dismissed following certain actions is between the adt arrival time and the ed departure time (inclusive).
@@ -274,21 +245,18 @@ Drawn from the base pop selection defined earlier in this procedure, combined wi
 
 ### `reporting/USP_ED_SEPSIS.sql::#BedEvents`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in ed patient info records, restricted to records also present in ed event info records, restricted to records also present in ed event templates records.
 - The this column represents the event template linked to the event record is one of the values '2600000347', '2600000346'.
 ```
 
 ### `reporting/USP_ED_SEPSIS.sql::#Base_Pop_ED_Readmit_All`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in ed encounters dm records.
 - The date and time when the patient arrives at the emergency department is between the ed departure time and 24 hours after the ed departure time (inclusive).
 ```
 
 ### `reporting/USP_ED_SEPSIS.sql::#Base_Pop_ED_Readmit`
 ```
-This is a selection of records.
 Drawn from the ed positivescores selection defined earlier in this procedure, restricted to records also present in the base pop selection defined earlier in this procedure, restricted to records also present in ed encounters dm records.
 - The date and time when the patient arrives at the emergency department is between the ed departure time and 24 hours after the ed departure time (inclusive).
 - The first time line is 1.
@@ -296,7 +264,6 @@ Drawn from the ed positivescores selection defined earlier in this procedure, re
 
 ### `reporting/USP_ED_SEPSIS.sql::#PatientLocation`
 ```
-This is a selection of records.
 Drawn from v patient location history records.
 - It is not the case that the id number representing the department associated with the event record at the time it is effective has no recorded value.
 - A matching record exists in a nested selection reading the base pop selection defined earlier in this procedure.
@@ -304,20 +271,17 @@ Drawn from v patient location history records.
 
 ### `reporting/USP_ED_SEPSIS.sql::#FirstPositiveOD_To_ABXAdminTime`
 ```
-This is a selection of records.
 Drawn from an inline selection.
 - The myline is 1.
 ```
 
 ### `reporting/USP_ED_SEPSIS.sql::#Base_Pop_ENC_Reason`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure.
 ```
 
 ### `reporting/USP_ED_SEPSIS.sql::#ED_BORDER`
 ```
-This is a selection of records.
 Drawn from ed patient info records, restricted to records also present in ed event info records.
 - A matching record exists in a nested selection reading the base pop selection defined earlier in this procedure.
 - The this column represents the event template linked to the event record is one of the values '2600000007' (annotated 'ED BOARDER PATIENTS' in the source).
@@ -325,14 +289,13 @@ Drawn from ed patient info records, restricted to records also present in ed eve
 
 ### `reporting/USP_ED_SEPSIS.sql::OrderMetricIDs`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in order tracking metrics records.
 - The date and time when the order was created is between the adt arrival time and the ed departure time (inclusive).
 ```
 
 ### `reporting/USP_ED_SEPSIS.sql::SSOrderSetOSQ_PRL`
 ```
-This is a selection of records.
+Drawn from the ordermetricids selection defined earlier in this procedure, restricted to records also present in medication orders ext records.
 This selection is the combination of 3 alternative selections (duplicates removed).
 The first alternative:
 Drawn from the ordermetricids selection defined earlier in this procedure, restricted to records also present in medication orders ext records.
@@ -347,20 +310,17 @@ Drawn from the ordermetricids selection defined earlier in this procedure.
 
 ### `reporting/USP_ED_SEPSIS.sql::#SSOrderSet`
 ```
-This is a selection of records.
 Drawn from the ssordersetosq prl selection defined earlier in this procedure.
 ```
 
 ### `reporting/USP_ED_SEPSIS.sql::#Final`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, combined with encounter visit reasons records, combined with visit reasons records, combined with severe sepsis staging records, combined with non severe sepsis staging records, combined with the base pop sepsisscores concat selection defined earlier in this procedure, combined with the base pop severe ed scores selection defined earlier in this procedure, combined with the ed positivescores selection defined earlier in this procedure, combined with the ed negativescores selection defined earlier in this procedure, combined with the basepopabx selection defined earlier in this procedure (2 reads), combined with the basepopbolus selection defined earlier in this procedure (3 reads), combined with the pressors selection defined earlier in this procedure, combined with the firstabxadmintimedetails selection defined earlier in this procedure, combined with the encounterweights selection defined earlier in this procedure, combined with the hypotension selection defined earlier in this procedure, combined with the lda selection defined earlier in this procedure (3 reads), combined with the labs selection defined earlier in this procedure (3 reads), combined with the cultures selection defined earlier in this procedure (3 reads), combined with the ed2hemonc selection defined earlier in this procedure, combined with the ed2icu selection defined earlier in this procedure, combined with the ed2gen selection defined earlier in this procedure, combined with the bpa selection defined earlier in this procedure, combined with the base pop ed readmit all selection defined earlier in this procedure, combined with the base pop ed readmit selection defined earlier in this procedure, combined with the base pop enc reason selection defined earlier in this procedure, combined with the firstpositiveod to abxadmintime selection defined earlier in this procedure, combined with the ssorderset selection defined earlier in this procedure, combined with the sepsisalertcancelled selection defined earlier in this procedure, combined with the bedevents selection defined earlier in this procedure (2 reads).
 - No membership conditions are applied in this selection.
 ```
 
 ### `reporting/USP_ED_SEPSIS.sql::delivery`
 ```
-This is a selection of records.
 Drawn from the final selection defined earlier in this procedure, combined with 7 inline selections.
 ```
 
@@ -369,14 +329,13 @@ Drawn from the final selection defined earlier in this procedure, combined with 
 
 ### `reporting/USP_IP_SEPSIS.sql::#MARActions`
 ```
-This is a selection of records.
 Drawn from config grouper categories records.
 - The groupe_record unique is one of the values '800007'.
 ```
 
 ### `reporting/USP_IP_SEPSIS.sql::#RouteExclusions`
 ```
-This is a selection of records.
+Drawn from config grouper categories records.
 This selection is the combination of 2 alternative selections (duplicates removed).
 The first alternative:
 Drawn from config grouper categories records.
@@ -386,7 +345,6 @@ The second alternative:
 
 ### `reporting/USP_IP_SEPSIS.sql::#BolusMeds`
 ```
-This is a selection of records.
 Drawn from grouper compiled list records.
 - The context (master file) for the records included in the compiled grouper is 'MEDS'.
 - The unique identifier (vcg-.1) for the base record associated with the compiled record is one of the values '800009'.
@@ -394,14 +352,12 @@ Drawn from grouper compiled list records.
 
 ### `reporting/USP_IP_SEPSIS.sql::#MedGroupers`
 ```
-This is a selection of records.
 Drawn from grouper groups records.
 - The grouper unique is one of the values '800011'.
 ```
 
 ### `reporting/USP_IP_SEPSIS.sql::#LacticAcidLRR`
 ```
-This is a selection of records.
 Drawn from grouper compiled list records.
 - The context (master file) for the records included in the compiled grouper is 'LRR'.
 - The unique identifier (vcg-.1) for the base record associated with the compiled record is one of the values '800012'.
@@ -409,7 +365,6 @@ Drawn from grouper compiled list records.
 
 ### `reporting/USP_IP_SEPSIS.sql::#BloodCultures`
 ```
-This is a selection of records.
 Drawn from grouper compiled list records.
 - The context (master file) for the records included in the compiled grouper is 'PCAT'.
 - The unique identifier (vcg-.1) for the base record associated with the compiled record is one of the values '800013'.
@@ -417,7 +372,6 @@ Drawn from grouper compiled list records.
 
 ### `reporting/USP_IP_SEPSIS.sql::#ProphylaxisFLO`
 ```
-This is a selection of records.
 Drawn from grouper compiled list records.
 - The context (master file) for the records included in the compiled grouper is 'FLO'.
 - The unique identifier (vcg-.1) for the base record associated with the compiled record is one of the values '800014'.
@@ -425,7 +379,6 @@ Drawn from grouper compiled list records.
 
 ### `reporting/USP_IP_SEPSIS.sql::#CerebralOxFLO`
 ```
-This is a selection of records.
 Drawn from grouper compiled list records.
 - The context (master file) for the records included in the compiled grouper is 'FLO'.
 - The unique identifier (vcg-.1) for the base record associated with the compiled record is one of the values '800015'.
@@ -433,7 +386,6 @@ Drawn from grouper compiled list records.
 
 ### `reporting/USP_IP_SEPSIS.sql::#ODScores`
 ```
-This is a selection of records.
 Drawn from grouper compiled list records.
 - The context (master file) for the records included in the compiled grouper is 'FLO'.
 - The unique identifier (vcg-.1) for the base record associated with the compiled record is one of the values '800006'.
@@ -441,7 +393,6 @@ Drawn from grouper compiled list records.
 
 ### `reporting/USP_IP_SEPSIS.sql::#MainAdmDetails`
 ```
-This is a selection of records.
 Drawn from hospital transactions records, combined with calendar dates records, combined with hospital encounters records, combined with patients records, combined with ref discharge disposition records, combined with ref ethnic group records, combined with patient demographics race records, combined with ref patient race records, combined with departments records, combined with locations records.
 - The date presented in standard date format is convert(date, htr.service_date).
 - It is not the case that the date-time of the inpatient admission indicates when the patient first received a base patient class of inpatient during their hospital stay has no recorded value.
@@ -450,14 +401,12 @@ Drawn from hospital transactions records, combined with calendar dates records, 
 
 ### `reporting/USP_IP_SEPSIS.sql::#Base_Pop_ENC_Reason`
 ```
-This is a selection of records.
 Drawn from the mainadmdetails selection defined earlier in this procedure, restricted to records also present in encounter diagnoses records, restricted to records also present in diagnoses records.
 - The line_number of the diagnosis within the encounter exceeds 1.
 ```
 
 ### `reporting/USP_IP_SEPSIS.sql::vaplh`
 ```
-This is a selection of records.
 Drawn from the mainadmdetails selection defined earlier in this procedure, combined with hospital encounters records, combined with adt events records (2 reads), combined with departments records.
 - For the first adt events record read: the category value that indicates the type of the event record is one of the values 1, 3, 99.
 - For the first adt events record read: the category value that indicates if the event record has been modified or removed is not 2.
@@ -465,7 +414,6 @@ Drawn from the mainadmdetails selection defined earlier in this procedure, combi
 
 ### `reporting/USP_IP_SEPSIS.sql::#Base_PopTemp`
 ```
-This is a selection of records.
 Drawn from the mainadmdetails selection defined earlier in this procedure, restricted to records also present in hospital encounters records, restricted to records also present in the vaplh selection defined earlier in this procedure, restricted to records also present in config value set records.
 - It is not the case that the adt department id has no recorded value.
 - The value_set unique is 3031.
@@ -473,7 +421,7 @@ Drawn from the mainadmdetails selection defined earlier in this procedure, restr
 
 ### `reporting/USP_IP_SEPSIS.sql::dateCTE`
 ```
-This is a selection of records.
+Drawn from the base poptemp selection defined earlier in this procedure.
 This selection is the combination of 2 alternative selections (duplicates kept).
 The first alternative:
 Drawn from the base poptemp selection defined earlier in this procedure.
@@ -486,26 +434,23 @@ Drawn from the datecte selection defined earlier in this procedure.
 
 ### `reporting/USP_IP_SEPSIS.sql::#Base_Pop`
 ```
-This is a selection of records.
 Drawn from an inline selection.
 ```
 
 ### `reporting/USP_IP_SEPSIS.sql::#FlwshtLstEncounterWts`
 ```
-This is a selection of records.
 Drawn from an inline selection.
 - The unit order row is 1.
 ```
 
 ### `reporting/USP_IP_SEPSIS.sql::#EncWeights`
 ```
-This is a selection of records.
 Drawn from an inline selection.
 ```
 
 ### `reporting/USP_IP_SEPSIS.sql::#EncounterWeights`
 ```
-This is a selection of records.
+Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in the encweights selection defined earlier in this procedure.
 This selection is the combination of 2 alternative selections (duplicates removed).
 The first alternative:
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in the encweights selection defined earlier in this procedure.
@@ -516,7 +461,6 @@ Drawn from the base pop selection defined earlier in this procedure, restricted 
 
 ### `reporting/USP_IP_SEPSIS.sql::#Base_Pop_Severe_ED_Scores`
 ```
-This is a selection of records.
 Drawn from the mainadmdetails selection defined earlier in this procedure, restricted to records also present in hospital encounters records, restricted to records also present in flowsheet records records, restricted to records also present in flowsheet measurements records.
 - The unique identifier for the flowsheet group or row linked is one of the values '9000161709', '9000002613'.
 - The exact moment when the reading was recorded is at most the ed departure time.
@@ -524,21 +468,18 @@ Drawn from the mainadmdetails selection defined earlier in this procedure, restr
 
 ### `reporting/USP_IP_SEPSIS.sql::#EDPosScore_EDLOS`
 ```
-This is a selection of records.
 Drawn from the base pop severe ed scores selection defined earlier in this procedure.
 - The meas value exceeds 4.
 ```
 
 ### `reporting/USP_IP_SEPSIS.sql::#FlwshtLst`
 ```
-This is a selection of records.
 Drawn from an inline selection.
 - The rownum is 1.
 ```
 
 ### `reporting/USP_IP_SEPSIS.sql::#FlwshtLstHuddleODScore`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in flowsheet records records, restricted to records also present in flowsheet measurements records.
 - The unique identifier for the flowsheet group or row linked is one of the values '9000002705', '9000002732', '9000002733', '9000002706', '9000002734', '9000002707'.
 - It is not the case that the flowsheet reading real has no recorded value.
@@ -547,27 +488,23 @@ Drawn from the base pop selection defined earlier in this procedure, restricted 
 
 ### `reporting/USP_IP_SEPSIS.sql::#FlwshtNoAlert`
 ```
-This is a selection of records.
 Drawn from an inline selection.
 ```
 
 ### `reporting/USP_IP_SEPSIS.sql::#FlwshtAlert`
 ```
-This is a selection of records.
 Drawn from an inline selection.
 - The rownum is 1.
 ```
 
 ### `reporting/USP_IP_SEPSIS.sql::#Base_Pop_OD_Scores`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, combined with hospital encounters records, combined with the flwshtlst selection defined earlier in this procedure, combined with the flwshtnoalert selection defined earlier in this procedure, combined with the flwshtalert selection defined earlier in this procedure, combined with an inline selection.
 - No membership conditions are applied in this selection.
 ```
 
 ### `reporting/USP_IP_SEPSIS.sql::#SepsisAuditTemp`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in the base pop od scores selection defined earlier in this procedure, restricted to records also present in flowsheet measurements records.
 - The unique identifier for the flowsheet group or row linked is one of the values '9000161701', '9000161702', '9000161710', '9000161708', '9000161704', '9000002611', '98', '99', '95', '9000800500', '900101', '900103', '900102', '900104', '900105', '900107', '900106', '900108', '9000002702', '900109', '900110', '9000311801', '9000311802', '9000311803', '9000003157'.
 - The exact moment when the reading was recorded is between the shift start and the shift end (inclusive).
@@ -577,14 +514,12 @@ Drawn from the base pop selection defined earlier in this procedure, restricted 
 
 ### `reporting/USP_IP_SEPSIS.sql::#FlwshtLstSepsisAudit`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, combined with hospital encounters records, combined with the flwshtlst selection defined earlier in this procedure, combined with an inline selection.
 - No membership conditions are applied in this selection.
 ```
 
 ### `reporting/USP_IP_SEPSIS.sql::#FlwShtHypo`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in flowsheet records records, restricted to records also present in flowsheet measurements records.
 - The unique identifier for the flowsheet group or row linked is '95'.
 - It is not the case that the flowsheet reading real has no recorded value.
@@ -593,19 +528,16 @@ Drawn from the base pop selection defined earlier in this procedure, restricted 
 
 ### `reporting/USP_IP_SEPSIS.sql::#Hypotension`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in the flwshthypo selection defined earlier in this procedure, restricted to records also present in 2 inline selections.
 ```
 
 ### `reporting/USP_IP_SEPSIS.sql::#ODHYPO`
 ```
-This is a selection of records.
 Drawn from the base pop od scores selection defined earlier in this procedure, combined with 2 inline selections.
 ```
 
 ### `reporting/USP_IP_SEPSIS.sql::#BasePopABX`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in medication orders records, restricted to records also present in medications records, restricted to records also present in med details ext records, restricted to records also present in med admin records records, restricted to records also present in calendar dates records.
 - The category linked to the therapeutic class that specifies the recognized use of the drug is 11.
 - The date presented in standard date format is cast(mar.taken_time as date).
@@ -616,13 +548,11 @@ Drawn from the base pop selection defined earlier in this procedure, restricted 
 
 ### `reporting/USP_IP_SEPSIS.sql::#ODABX`
 ```
-This is a selection of records.
 Drawn from the base pop od scores selection defined earlier in this procedure, combined with 2 inline selections.
 ```
 
 ### `reporting/USP_IP_SEPSIS.sql::#SSOrderSet`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in order tracking metrics records, restricted to records also present in calendar dates records.
 - The date presented in standard date format is cast(mo.order_dttm as date).
 - The order set utilized to place the order is one of the values 400001.
@@ -630,13 +560,11 @@ Drawn from the base pop selection defined earlier in this procedure, restricted 
 
 ### `reporting/USP_IP_SEPSIS.sql::#ODORDSET`
 ```
-This is a selection of records.
 Drawn from the base pop od scores selection defined earlier in this procedure, combined with 2 inline selections.
 ```
 
 ### `reporting/USP_IP_SEPSIS.sql::#BasePopBolus`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in medication orders records, restricted to records also present in medications records, restricted to records also present in med admin records records, restricted to records also present in calendar dates records.
 - The date presented in standard date format is cast(mar.taken_time as date).
 - It is not the case that the time designated by the user when the action occurred has no recorded value.
@@ -647,13 +575,11 @@ Drawn from the base pop selection defined earlier in this procedure, restricted 
 
 ### `reporting/USP_IP_SEPSIS.sql::#OdboL`
 ```
-This is a selection of records.
 Drawn from the base pop od scores selection defined earlier in this procedure, combined with 2 inline selections.
 ```
 
 ### `reporting/USP_IP_SEPSIS.sql::#ALLCVLTime`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in line device airway records, restricted to records also present in calendar dates records, restricted to records also present in config value set records.
 - The date presented in standard date format is cast(lda.placement_instant as date).
 - The value_set unique is 3022.
@@ -661,13 +587,11 @@ Drawn from the base pop selection defined earlier in this procedure, restricted 
 
 ### `reporting/USP_IP_SEPSIS.sql::#ODCVL`
 ```
-This is a selection of records.
 Drawn from the base pop od scores selection defined earlier in this procedure, combined with 2 inline selections.
 ```
 
 ### `reporting/USP_IP_SEPSIS.sql::#Pressors`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, combined with medication orders records, combined with medications records, combined with grouper med records records, combined with med admin records records, combined with calendar dates records, combined with hospital encounters records.
 - The unique identifier for the base grouper record is vcg-.1 is one of the values from a nested selection reading the medgroupers selection defined earlier in this procedure.
 - The mar_action_category_number linked is one of the values from a nested selection reading the maractions selection defined earlier in this procedure, where the cat id is not '99'.
@@ -676,32 +600,27 @@ Drawn from the base pop selection defined earlier in this procedure, combined wi
 
 ### `reporting/USP_IP_SEPSIS.sql::#ODPressorSummary`
 ```
-This is a selection of records.
 Drawn from the pressors selection defined earlier in this procedure.
 ```
 
 ### `reporting/USP_IP_SEPSIS.sql::#ODPressorPivot`
 ```
-This is a selection of records.
 Drawn from the odpressorsummary selection defined earlier in this procedure.
 ```
 
 ### `reporting/USP_IP_SEPSIS.sql::#SVO2`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in lab order results records, restricted to records also present in procedure orders records.
 - The unique identifier for each result component associated with every result is one of the values 5000001861, 5000000478.
 ```
 
 ### `reporting/USP_IP_SEPSIS.sql::#ODSVO2`
 ```
-This is a selection of records.
 Drawn from the base pop od scores selection defined earlier in this procedure, combined with 2 inline selections.
 ```
 
 ### `reporting/USP_IP_SEPSIS.sql::#LacticAcid`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in lab order results records, restricted to records also present in procedure orders records, restricted to records also present in calendar dates records.
 - The date presented in standard date format is cast(po.order_time as date).
 - The unique identifier for each result component associated with every result is one of the values from a nested selection reading the lacticacidlrr selection defined earlier in this procedure.
@@ -709,13 +628,11 @@ Drawn from the base pop selection defined earlier in this procedure, restricted 
 
 ### `reporting/USP_IP_SEPSIS.sql::#ODLA`
 ```
-This is a selection of records.
 Drawn from the base pop od scores selection defined earlier in this procedure, combined with 2 inline selections.
 ```
 
 ### `reporting/USP_IP_SEPSIS.sql::#Procalcitonin`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in lab order results records, restricted to records also present in procedure orders records, restricted to records also present in calendar dates records.
 - The date presented in standard date format is cast(po.order_time as date).
 - The unique identifier for each result component associated with every result is 500001.
@@ -723,13 +640,11 @@ Drawn from the base pop selection defined earlier in this procedure, restricted 
 
 ### `reporting/USP_IP_SEPSIS.sql::#ODPROCAL`
 ```
-This is a selection of records.
 Drawn from the base pop od scores selection defined earlier in this procedure, combined with 2 inline selections.
 ```
 
 ### `reporting/USP_IP_SEPSIS.sql::#BloodCultureValue`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in lab order results records, restricted to records also present in procedure orders records, restricted to records also present in procedures catalog records, restricted to records also present in calendar dates records.
 - The unique identifier for the procedure record associated is one of the values from a nested selection reading the bloodcultures selection defined earlier in this procedure.
 - The date presented in standard date format is cast(po.order_time as date).
@@ -737,13 +652,11 @@ Drawn from the base pop selection defined earlier in this procedure, restricted 
 
 ### `reporting/USP_IP_SEPSIS.sql::#ODBC`
 ```
-This is a selection of records.
 Drawn from the base pop od scores selection defined earlier in this procedure, combined with 2 inline selections.
 ```
 
 ### `reporting/USP_IP_SEPSIS.sql::#CSF`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in lab order results records, restricted to records also present in procedure orders records, restricted to records also present in calendar dates records, restricted to records also present in procedures catalog records.
 - The proc id is one of the values 600005, 600006.
 - The source category of the procedure order is 304.
@@ -752,13 +665,11 @@ Drawn from the base pop selection defined earlier in this procedure, restricted 
 
 ### `reporting/USP_IP_SEPSIS.sql::#ODCSF`
 ```
-This is a selection of records.
 Drawn from the base pop od scores selection defined earlier in this procedure, combined with 2 inline selections.
 ```
 
 ### `reporting/USP_IP_SEPSIS.sql::#ETT`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in line device airway records, restricted to records also present in calendar dates records.
 - The flowsheet id that specifies the structure is '900112'.
 - It is not the case that the this item records the exact moment the record was placed has no recorded value.
@@ -767,13 +678,11 @@ Drawn from the base pop selection defined earlier in this procedure, restricted 
 
 ### `reporting/USP_IP_SEPSIS.sql::#ODETT`
 ```
-This is a selection of records.
 Drawn from the base pop od scores selection defined earlier in this procedure, combined with 2 inline selections.
 ```
 
 ### `reporting/USP_IP_SEPSIS.sql::#PIV`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in line device airway records, restricted to records also present in calendar dates records.
 - The flowsheet id that specifies the structure is '900111'.
 - It is not the case that the this item records the exact moment the record was placed has no recorded value.
@@ -782,13 +691,11 @@ Drawn from the base pop selection defined earlier in this procedure, restricted 
 
 ### `reporting/USP_IP_SEPSIS.sql::#ODPIV`
 ```
-This is a selection of records.
 Drawn from the base pop od scores selection defined earlier in this procedure, combined with 2 inline selections.
 ```
 
 ### `reporting/USP_IP_SEPSIS.sql::FlwshtProp`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in flowsheet records records, restricted to records also present in flowsheet measurements records.
 - The unique identifier for the flowsheet group or row linked is one of the values '9000613042', '9000613043', '9000613044', '9000613045', '9000613047', '9000613048', '9000613050'.
 - It is not the case that the exact moment when the reading was recorded has no recorded value.
@@ -796,14 +703,12 @@ Drawn from the base pop selection defined earlier in this procedure, restricted 
 
 ### `reporting/USP_IP_SEPSIS.sql::#PROPHYLAXIS`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in flowsheet records records, restricted to records also present in the flwshtprop selection defined earlier in this procedure.
 - No membership conditions are applied in this selection.
 ```
 
 ### `reporting/USP_IP_SEPSIS.sql::#CVVH`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in flowsheet records records, restricted to records also present in flowsheet measurements records, restricted to records also present in calendar dates records.
 - The unique identifier for the flowsheet template (flt) utilized to input the data is '9000001359' (annotated 'ANY FLOWSHEET FROM THIS TEMPLATE IS A CANDIDATE' in the source).
 - The date presented in standard date format is cast(meas.recorded_time as date).
@@ -811,7 +716,6 @@ Drawn from the base pop selection defined earlier in this procedure, restricted 
 
 ### `reporting/USP_IP_SEPSIS.sql::#OX`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in flowsheet records records, restricted to records also present in flowsheet measurements records, restricted to records also present in calendar dates records.
 - The unique identifier for the flowsheet group or row linked is one of the values '900201', '900202', '900203', '9000001977'.
 - The date presented in standard date format is cast(meas.recorded_time as date).
@@ -819,7 +723,6 @@ Drawn from the base pop selection defined earlier in this procedure, restricted 
 
 ### `reporting/USP_IP_SEPSIS.sql::#ECMO`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in flowsheet records records, restricted to records also present in flowsheet measurements records, restricted to records also present in calendar dates records.
 - The unique identifier for the flowsheet group or row linked is '9000101014'.
 - The date presented in standard date format is cast(meas.recorded_time as date).
@@ -827,7 +730,6 @@ Drawn from the base pop selection defined earlier in this procedure, restricted 
 
 ### `reporting/USP_IP_SEPSIS.sql::reporting.IP_SEPSIS`
 ```
-This is a selection of records.
 Drawn from the mainadmdetails selection defined earlier in this procedure, combined with the base pop selection defined earlier in this procedure, combined with the base pop od scores selection defined earlier in this procedure, combined with fy date dimension records, combined with the base pop enc reason selection defined earlier in this procedure, combined with the encounterweights selection defined earlier in this procedure, combined with the odhypo selection defined earlier in this procedure, combined with the odabx selection defined earlier in this procedure, combined with the odbol selection defined earlier in this procedure, combined with the odla selection defined earlier in this procedure, combined with the odordset selection defined earlier in this procedure, combined with the odcvl selection defined earlier in this procedure, combined with the odpressorpivot selection defined earlier in this procedure, combined with the odsvo2 selection defined earlier in this procedure, combined with the odprocal selection defined earlier in this procedure, combined with the odbc selection defined earlier in this procedure, combined with the odcsf selection defined earlier in this procedure, combined with the odpiv selection defined earlier in this procedure, combined with the odett selection defined earlier in this procedure, combined with the prophylaxis selection defined earlier in this procedure, combined with the cvvh selection defined earlier in this procedure, combined with the ox selection defined earlier in this procedure, combined with the ecmo selection defined earlier in this procedure, combined with the edposscore edlos selection defined earlier in this procedure, combined with the flwshtlstsepsisaudit selection defined earlier in this procedure, combined with 3 inline selections, combined with severe sepsis staging records.
 - No membership conditions are applied in this selection.
 ```
@@ -837,7 +739,6 @@ Drawn from the mainadmdetails selection defined earlier in this procedure, combi
 
 ### `reporting/USP_IP_SepsisDates.sql::delivery`
 ```
-This is a selection of records.
 Drawn from fy date dimension records.
 - The specific date represented in a calendar format is between the d start date parameter and the d end date parameter (inclusive).
 ```
@@ -847,14 +748,13 @@ Drawn from fy date dimension records.
 
 ### `reporting/USP_IP_SepsisDetails.sql::#MARActions`
 ```
-This is a selection of records.
 Drawn from config grouper categories records.
 - The groupe_record unique is one of the values '800007'.
 ```
 
 ### `reporting/USP_IP_SepsisDetails.sql::#RouteExclusions`
 ```
-This is a selection of records.
+Drawn from config grouper categories records.
 This selection is the combination of 2 alternative selections (duplicates removed).
 The first alternative:
 Drawn from config grouper categories records.
@@ -864,7 +764,6 @@ The second alternative:
 
 ### `reporting/USP_IP_SepsisDetails.sql::#BolusMeds`
 ```
-This is a selection of records.
 Drawn from grouper compiled list records.
 - The context (master file) for the records included in the compiled grouper is 'MEDS'.
 - The unique identifier (vcg-.1) for the base record associated with the compiled record is one of the values '800009'.
@@ -872,14 +771,12 @@ Drawn from grouper compiled list records.
 
 ### `reporting/USP_IP_SepsisDetails.sql::#MedGroupers`
 ```
-This is a selection of records.
 Drawn from grouper groups records.
 - The grouper unique is one of the values '800011'.
 ```
 
 ### `reporting/USP_IP_SepsisDetails.sql::#LacticAcidLRR`
 ```
-This is a selection of records.
 Drawn from grouper compiled list records.
 - The context (master file) for the records included in the compiled grouper is 'LRR'.
 - The unique identifier (vcg-.1) for the base record associated with the compiled record is one of the values '800012'.
@@ -887,7 +784,6 @@ Drawn from grouper compiled list records.
 
 ### `reporting/USP_IP_SepsisDetails.sql::#BloodCultures`
 ```
-This is a selection of records.
 Drawn from grouper compiled list records.
 - The context (master file) for the records included in the compiled grouper is 'PCAT'.
 - The unique identifier (vcg-.1) for the base record associated with the compiled record is one of the values '800013'.
@@ -895,7 +791,6 @@ Drawn from grouper compiled list records.
 
 ### `reporting/USP_IP_SepsisDetails.sql::#CerebralOxFLO`
 ```
-This is a selection of records.
 Drawn from grouper compiled list records.
 - The context (master file) for the records included in the compiled grouper is 'FLO'.
 - The unique identifier (vcg-.1) for the base record associated with the compiled record is one of the values '800015'.
@@ -903,7 +798,6 @@ Drawn from grouper compiled list records.
 
 ### `reporting/USP_IP_SepsisDetails.sql::#ODScores`
 ```
-This is a selection of records.
 Drawn from grouper compiled list records.
 - The context (master file) for the records included in the compiled grouper is 'FLO'.
 - The unique identifier (vcg-.1) for the base record associated with the compiled record is one of the values '800006'.
@@ -911,34 +805,29 @@ Drawn from grouper compiled list records.
 
 ### `reporting/USP_IP_SepsisDetails.sql::#MainAdmDetails`
 ```
-This is a selection of records.
 Drawn from ip sepsisencounters records.
 - No membership conditions are applied in this selection.
 ```
 
 ### `reporting/USP_IP_SepsisDetails.sql::#Base_Pop`
 ```
-This is a selection of records.
 Drawn from ip sepsispatientdates records, restricted to records also present in ip sepsisencounters records.
 - The sepsis patient date recorded for sepsis patient encounters that includes aggregated department information for the purposes of trend analysis and compliance reporting is between the d start date parameter and the d end date parameter (inclusive).
 ```
 
 ### `reporting/USP_IP_SepsisDetails.sql::#FlwshtLstEncounterWts`
 ```
-This is a selection of records.
 Drawn from an inline selection.
 - The unit order row is 1.
 ```
 
 ### `reporting/USP_IP_SepsisDetails.sql::#Base_Pop_OD_Scores`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, combined with an inline selection.
 ```
 
 ### `reporting/USP_IP_SepsisDetails.sql::#FlwShtHypo`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, combined with flowsheet records records, combined with flowsheet measurements records (2 reads), combined with calendar dates records.
 - For the first flowsheet measurements record read: the unique identifier for the flowsheet group or row linked is '95'.
 - It is not the case that the flowsheet reading real has no recorded value.
@@ -950,14 +839,12 @@ Drawn from the base pop selection defined earlier in this procedure, combined wi
 
 ### `reporting/USP_IP_SepsisDetails.sql::#Hypotension`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in the flwshthypo selection defined earlier in this procedure, restricted to records also present in 2 inline selections.
 - It is not the case that the hypotension value has no recorded value.
 ```
 
 ### `reporting/USP_IP_SepsisDetails.sql::#BasePopABX`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in medication orders records, restricted to records also present in medications records, restricted to records also present in med details ext records, restricted to records also present in med admin records records, restricted to records also present in calendar dates records.
 - The category linked to the therapeutic class that specifies the recognized use of the drug is 11.
 - The date presented in standard date format is cast(mar.taken_time as date).
@@ -970,7 +857,6 @@ Drawn from the base pop selection defined earlier in this procedure, restricted 
 
 ### `reporting/USP_IP_SepsisDetails.sql::#SSOrderSet`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in order tracking metrics records, restricted to records also present in calendar dates records.
 - The date presented in standard date format is cast(mo.order_dttm as date).
 - The order set utilized to place the order is one of the values 400001.
@@ -980,7 +866,6 @@ Drawn from the base pop selection defined earlier in this procedure, restricted 
 
 ### `reporting/USP_IP_SepsisDetails.sql::#BasePopBolus`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in medication orders records, restricted to records also present in medications records, restricted to records also present in med admin records records, restricted to records also present in calendar dates records.
 - The date presented in standard date format is cast(mar.taken_time as date).
 - It is not the case that the time designated by the user when the action occurred has no recorded value.
@@ -993,7 +878,6 @@ Drawn from the base pop selection defined earlier in this procedure, restricted 
 
 ### `reporting/USP_IP_SepsisDetails.sql::#Pressors`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, combined with medication orders records, combined with medications records, combined with grouper med records records, combined with med admin records records, combined with calendar dates records, combined with hospital encounters records.
 - The unique identifier for the base grouper record is vcg-.1 is one of the values from a nested selection reading the medgroupers selection defined earlier in this procedure.
 - The mar_action_category_number linked is one of the values from a nested selection reading the maractions selection defined earlier in this procedure, where the cat id is not '99'.
@@ -1004,19 +888,16 @@ Drawn from the base pop selection defined earlier in this procedure, combined wi
 
 ### `reporting/USP_IP_SepsisDetails.sql::#ODPressorSummary`
 ```
-This is a selection of records.
 Drawn from the pressors selection defined earlier in this procedure.
 ```
 
 ### `reporting/USP_IP_SepsisDetails.sql::#ODPressorPivot`
 ```
-This is a selection of records.
 Drawn from the odpressorsummary selection defined earlier in this procedure.
 ```
 
 ### `reporting/USP_IP_SepsisDetails.sql::#LacticAcid`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in lab order results records, restricted to records also present in procedure orders records, restricted to records also present in calendar dates records.
 - The date presented in standard date format is cast(po.order_time as date).
 - The unique identifier for each result component associated with every result is one of the values from a nested selection reading the lacticacidlrr selection defined earlier in this procedure.
@@ -1026,7 +907,6 @@ Drawn from the base pop selection defined earlier in this procedure, restricted 
 
 ### `reporting/USP_IP_SepsisDetails.sql::#Procalcitonin`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in lab order results records, restricted to records also present in procedure orders records, restricted to records also present in calendar dates records.
 - The date presented in standard date format is cast(po.order_time as date).
 - The unique identifier for each result component associated with every result is 500001.
@@ -1036,7 +916,6 @@ Drawn from the base pop selection defined earlier in this procedure, restricted 
 
 ### `reporting/USP_IP_SepsisDetails.sql::#BloodCultureValue`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in lab order results records, restricted to records also present in procedure orders records, restricted to records also present in procedures catalog records, restricted to records also present in calendar dates records.
 - The unique identifier for the procedure record associated is one of the values from a nested selection reading the bloodcultures selection defined earlier in this procedure.
 - The date presented in standard date format is cast(po.order_time as date).
@@ -1046,7 +925,6 @@ Drawn from the base pop selection defined earlier in this procedure, restricted 
 
 ### `reporting/USP_IP_SepsisDetails.sql::#CSF`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in lab order results records, restricted to records also present in procedure orders records, restricted to records also present in calendar dates records, restricted to records also present in procedures catalog records.
 - The proc id is one of the values 600005, 600006.
 - The source category of the procedure order is 304.
@@ -1057,7 +935,6 @@ Drawn from the base pop selection defined earlier in this procedure, restricted 
 
 ### `reporting/USP_IP_SepsisDetails.sql::#ETT`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in line device airway records, restricted to records also present in calendar dates records.
 - The flowsheet id that specifies the structure is '900112'.
 - It is not the case that the this item records the exact moment the record was placed has no recorded value.
@@ -1068,7 +945,6 @@ Drawn from the base pop selection defined earlier in this procedure, restricted 
 
 ### `reporting/USP_IP_SepsisDetails.sql::#PIV`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in line device airway records, restricted to records also present in calendar dates records.
 - The flowsheet id that specifies the structure is '900111'.
 - It is not the case that the this item records the exact moment the record was placed has no recorded value.
@@ -1079,7 +955,6 @@ Drawn from the base pop selection defined earlier in this procedure, restricted 
 
 ### `reporting/USP_IP_SepsisDetails.sql::#CVVH`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in flowsheet records records, restricted to records also present in flowsheet measurements records, restricted to records also present in calendar dates records.
 - The unique identifier for the flowsheet template (flt) utilized to input the data is '9000001359' (annotated 'ANY FLOWSHEET FROM THIS TEMPLATE IS A CANDIDATE' in the source).
 - The date presented in standard date format is cast(meas.recorded_time as date).
@@ -1089,7 +964,6 @@ Drawn from the base pop selection defined earlier in this procedure, restricted 
 
 ### `reporting/USP_IP_SepsisDetails.sql::#OX`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in flowsheet records records, restricted to records also present in flowsheet measurements records, restricted to records also present in calendar dates records.
 - The unique identifier for the flowsheet group or row linked is one of the values '900201', '900202', '900203', '9000001977'.
 - The date presented in standard date format is cast(meas.recorded_time as date).
@@ -1099,7 +973,6 @@ Drawn from the base pop selection defined earlier in this procedure, restricted 
 
 ### `reporting/USP_IP_SepsisDetails.sql::#ECMO`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in flowsheet records records, restricted to records also present in flowsheet measurements records, restricted to records also present in calendar dates records.
 - The unique identifier for the flowsheet group or row linked is '9000101014'.
 - The date presented in standard date format is cast(meas.recorded_time as date).
@@ -1109,7 +982,6 @@ Drawn from the base pop selection defined earlier in this procedure, restricted 
 
 ### `reporting/USP_IP_SepsisDetails.sql::reporting.IP_SepsisDetails`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, combined with the mainadmdetails selection defined earlier in this procedure, combined with the base pop od scores selection defined earlier in this procedure, combined with fy date dimension records, combined with the flwshtlstencounterwts selection defined earlier in this procedure, combined with the hypotension selection defined earlier in this procedure, combined with the basepopabx selection defined earlier in this procedure, combined with the basepopbolus selection defined earlier in this procedure, combined with the lacticacid selection defined earlier in this procedure, combined with the ssorderset selection defined earlier in this procedure, combined with the odpressorpivot selection defined earlier in this procedure, combined with the procalcitonin selection defined earlier in this procedure, combined with the bloodculturevalue selection defined earlier in this procedure, combined with the csf selection defined earlier in this procedure, combined with the piv selection defined earlier in this procedure, combined with the ett selection defined earlier in this procedure, combined with the cvvh selection defined earlier in this procedure, combined with the ox selection defined earlier in this procedure, combined with the ecmo selection defined earlier in this procedure, combined with severe sepsis staging records.
 - The od score in dept is 'Y' or The unit order is 1 or The time line is 1 or The time line is 1 or The time line is 1 or The time line is 1 or The time line is 1 or It is not the case that the encounter id has no recorded value or The time line is 1 or The time line is 1 or The time line is 1 or The time line is 1 or The time line is 1 or It is not the case that the encounter id has no recorded value or It is not the case that the encounter id has no recorded value or It is not the case that the encounter id has no recorded value.
 ```
@@ -1119,7 +991,6 @@ Drawn from the base pop selection defined earlier in this procedure, combined wi
 
 ### `reporting/USP_IP_SepsisDetails_v1.sql::delivery`
 ```
-This is a selection of records.
 Drawn from ip sepsisdetails records.
 - No membership conditions are applied in this selection.
 ```
@@ -1129,7 +1000,6 @@ Drawn from ip sepsisdetails records.
 
 ### `reporting/USP_IP_SepsisEncounters.sql::#MainAdmDetails`
 ```
-This is a selection of records.
 Drawn from hospital transactions records, combined with calendar dates records, combined with hospital encounters records, combined with patients records, combined with ref discharge disposition records, combined with ref ethnic group records, combined with patient demographics race records, combined with ref patient race records, combined with departments records, combined with locations records.
 - The date presented in standard date format is convert(date, htr.service_date).
 - It is not the case that the date-time of the inpatient admission indicates when the patient first received a base patient class of inpatient during their hospital stay has no recorded value.
@@ -1139,14 +1009,12 @@ Drawn from hospital transactions records, combined with calendar dates records, 
 
 ### `reporting/USP_IP_SepsisEncounters.sql::#Base_Pop_ENC_Reason`
 ```
-This is a selection of records.
 Drawn from the mainadmdetails selection defined earlier in this procedure, restricted to records also present in encounter diagnoses records, restricted to records also present in diagnoses records.
 - The line_number of the diagnosis within the encounter is at least 1.
 ```
 
 ### `reporting/USP_IP_SepsisEncounters.sql::reporting.IP_SepsisEncounters`
 ```
-This is a selection of records.
 Drawn from the mainadmdetails selection defined earlier in this procedure, combined with the base pop enc reason selection defined earlier in this procedure.
 ```
 
@@ -1155,7 +1023,6 @@ Drawn from the mainadmdetails selection defined earlier in this procedure, combi
 
 ### `reporting/USP_IP_SepsisEncountersDetails.sql::delivery`
 ```
-This is a selection of records.
 Drawn from ip sepsisencounters records.
 - No membership conditions are applied in this selection.
 ```
@@ -1165,14 +1032,12 @@ Drawn from ip sepsisencounters records.
 
 ### `reporting/USP_IP_SepsisEncountersWLocations.sql::#MainAdmDetails`
 ```
-This is a selection of records.
 Drawn from ip sepsisencounters records.
 - No membership conditions are applied in this selection.
 ```
 
 ### `reporting/USP_IP_SepsisEncountersWLocations.sql::#Base_Pop`
 ```
-This is a selection of records.
 Drawn from the mainadmdetails selection defined earlier in this procedure, combined with adt events records (2 reads), combined with departments records, combined with config value set records.
 - The code representing a value within the defined set is convert(varchar(100), adtin.department_id).
 - The value_set unique is 3031.
@@ -1182,7 +1047,6 @@ Drawn from the mainadmdetails selection defined earlier in this procedure, combi
 
 ### `reporting/USP_IP_SepsisEncountersWLocations.sql::reporting.IP_SepsisEncountersWLocations`
 ```
-This is a selection of records.
 Drawn from the mainadmdetails selection defined earlier in this procedure, restricted to records also present in the base pop selection defined earlier in this procedure.
 ```
 
@@ -1191,7 +1055,6 @@ Drawn from the mainadmdetails selection defined earlier in this procedure, restr
 
 ### `reporting/USP_IP_SepsisEncountersWLocations_v1.sql::delivery`
 ```
-This is a selection of records.
 Drawn from ip sepsisencounters records, restricted to records also present in ip sepsisencounterswlocations records.
 - No membership conditions are applied in this selection.
 ```
@@ -1201,21 +1064,19 @@ Drawn from ip sepsisencounters records, restricted to records also present in ip
 
 ### `reporting/USP_IP_SepsisPatientDates.sql::#MainAdmDetails`
 ```
-This is a selection of records.
 Drawn from ip sepsisencounters records.
 - No membership conditions are applied in this selection.
 ```
 
 ### `reporting/USP_IP_SepsisPatientDates.sql::#Base_PopTemp`
 ```
-This is a selection of records.
 Drawn from ip sepsisencounterswlocations records, restricted to records also present in config value set records.
 - The value_set unique is 3031.
 ```
 
 ### `reporting/USP_IP_SepsisPatientDates.sql::dateCTE`
 ```
-This is a selection of records.
+Drawn from the base poptemp selection defined earlier in this procedure.
 This selection is the combination of 2 alternative selections (duplicates kept).
 The first alternative:
 Drawn from the base poptemp selection defined earlier in this procedure.
@@ -1227,13 +1088,11 @@ Drawn from the datecte selection defined earlier in this procedure.
 
 ### `reporting/USP_IP_SepsisPatientDates.sql::#Base_Pop`
 ```
-This is a selection of records.
 Drawn from an inline selection.
 ```
 
 ### `reporting/USP_IP_SepsisPatientDates.sql::reporting.IP_SepsisPatientDates`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure.
 ```
 
@@ -1242,7 +1101,6 @@ Drawn from the base pop selection defined earlier in this procedure.
 
 ### `reporting/USP_IP_SepsisPatientDates_v1.sql::delivery`
 ```
-This is a selection of records.
 Drawn from ip sepsispatientdates records.
 - No membership conditions are applied in this selection.
 ```
@@ -1252,7 +1110,6 @@ Drawn from ip sepsispatientdates records.
 
 ### `reporting/USP_IP_SepsisScreeningAudit.sql::#ODScores`
 ```
-This is a selection of records.
 Drawn from grouper compiled list records.
 - The context (master file) for the records included in the compiled grouper is 'FLO'.
 - The unique identifier (vcg-.1) for the base record associated with the compiled record is one of the values '800006'.
@@ -1260,21 +1117,18 @@ Drawn from grouper compiled list records.
 
 ### `reporting/USP_IP_SepsisScreeningAudit.sql::#MainAdmDetails`
 ```
-This is a selection of records.
 Drawn from ip sepsisencounters records.
 - No membership conditions are applied in this selection.
 ```
 
 ### `reporting/USP_IP_SepsisScreeningAudit.sql::#Base_Pop`
 ```
-This is a selection of records.
 Drawn from the mainadmdetails selection defined earlier in this procedure, restricted to records also present in ip sepsisencounterswlocations records.
 - No membership conditions are applied in this selection.
 ```
 
 ### `reporting/USP_IP_SepsisScreeningAudit.sql::#FlwshtLst`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in flowsheet records records, restricted to records also present in flowsheet measurements records.
 - The unique identifier for the flowsheet group or row linked is one of the values from a nested selection reading the odscores selection defined earlier in this procedure.
 - The exact moment when the reading was recorded is between the in dept date and the out dept date (inclusive).
@@ -1282,7 +1136,6 @@ Drawn from the base pop selection defined earlier in this procedure, restricted 
 
 ### `reporting/USP_IP_SepsisScreeningAudit.sql::#FlwshtLstHuddleODScore`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in flowsheet records records, restricted to records also present in flowsheet measurements records, restricted to records also present in an inline selection.
 - The unique identifier for the flowsheet group or row linked is one of the values '9000002705', '9000002732', '9000002733', '9000002706', '9000002734', '9000002707'.
 - It is not the case that the flowsheet reading real has no recorded value.
@@ -1291,27 +1144,23 @@ Drawn from the base pop selection defined earlier in this procedure, restricted 
 
 ### `reporting/USP_IP_SepsisScreeningAudit.sql::#FlwshtNoAlert`
 ```
-This is a selection of records.
 Drawn from an inline selection.
 ```
 
 ### `reporting/USP_IP_SepsisScreeningAudit.sql::#FlwshtAlert`
 ```
-This is a selection of records.
 Drawn from an inline selection.
 - The rownum is 1.
 ```
 
 ### `reporting/USP_IP_SepsisScreeningAudit.sql::#Base_Pop_OD_Scores`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, combined with hospital encounters records, combined with the flwshtlst selection defined earlier in this procedure, combined with the flwshtnoalert selection defined earlier in this procedure, combined with the flwshtalert selection defined earlier in this procedure, combined with an inline selection.
 - No membership conditions are applied in this selection.
 ```
 
 ### `reporting/USP_IP_SepsisScreeningAudit.sql::#SepsisAuditTemp`
 ```
-This is a selection of records.
 Drawn from the base pop od scores selection defined earlier in this procedure, restricted to records also present in flowsheet measurements records.
 - The unique identifier for the flowsheet group or row linked is one of the values '9000161701', '9000161702', '9000161710', '9000161708', '9000161704', '9000002611', '98', '99', '95', '9000800500', '900101', '900103', '900102', '900104', '900105', '900107', '900106', '900108', '9000002702', '900109', '900110', '9000311801', '9000311802', '9000311803', '9000003157', '9001140203', '9001140205', '9000012611'.
 - The exact moment when the reading was recorded is between the in dept date and the out dept date (inclusive).
@@ -1321,13 +1170,11 @@ Drawn from the base pop od scores selection defined earlier in this procedure, r
 
 ### `reporting/USP_IP_SepsisScreeningAudit.sql::#FlwshtLstSepsisAudit`
 ```
-This is a selection of records.
 Drawn from the flwshtlst selection defined earlier in this procedure, combined with an inline selection.
 ```
 
 ### `reporting/USP_IP_SepsisScreeningAudit.sql::reporting.IP_SepsisScreeningAudit`
 ```
-This is a selection of records.
 Drawn from the mainadmdetails selection defined earlier in this procedure, combined with the base pop selection defined earlier in this procedure, combined with the base pop od scores selection defined earlier in this procedure, combined with fy date dimension records, combined with the flwshtlstsepsisaudit selection defined earlier in this procedure, combined with an inline selection.
 - No membership conditions are applied in this selection.
 ```
@@ -1337,7 +1184,6 @@ Drawn from the mainadmdetails selection defined earlier in this procedure, combi
 
 ### `reporting/USP_IP_SepsisScreeningAudit_v1.sql::delivery`
 ```
-This is a selection of records.
 Drawn from ip sepsisscreeningaudit records.
 - No membership conditions are applied in this selection.
 ```
@@ -1347,7 +1193,6 @@ Drawn from ip sepsisscreeningaudit records.
 
 ### `reporting/USP_IP_SepsisShiftCompliance.sql::#ODScores`
 ```
-This is a selection of records.
 Drawn from grouper compiled list records.
 - The context (master file) for the records included in the compiled grouper is 'FLO'.
 - The unique identifier (vcg-.1) for the base record associated with the compiled record is one of the values '800006'.
@@ -1355,21 +1200,18 @@ Drawn from grouper compiled list records.
 
 ### `reporting/USP_IP_SepsisShiftCompliance.sql::#MainAdmDetails`
 ```
-This is a selection of records.
 Drawn from ip sepsisencounters records.
 - No membership conditions are applied in this selection.
 ```
 
 ### `reporting/USP_IP_SepsisShiftCompliance.sql::vaplh`
 ```
-This is a selection of records.
 Drawn from ip sepsisencounterswlocations records.
 - No membership conditions are applied in this selection.
 ```
 
 ### `reporting/USP_IP_SepsisShiftCompliance.sql::#Base_PopTemp`
 ```
-This is a selection of records.
 Drawn from the mainadmdetails selection defined earlier in this procedure, restricted to records also present in the vaplh selection defined earlier in this procedure, restricted to records also present in config value set records.
 - It is not the case that the adt department id has no recorded value.
 - The value_set unique is 3031.
@@ -1377,7 +1219,7 @@ Drawn from the mainadmdetails selection defined earlier in this procedure, restr
 
 ### `reporting/USP_IP_SepsisShiftCompliance.sql::dateCTE`
 ```
-This is a selection of records.
+Drawn from the base poptemp selection defined earlier in this procedure.
 This selection is the combination of 2 alternative selections (duplicates kept).
 The first alternative:
 Drawn from the base poptemp selection defined earlier in this procedure.
@@ -1390,20 +1232,17 @@ Drawn from the datecte selection defined earlier in this procedure.
 
 ### `reporting/USP_IP_SepsisShiftCompliance.sql::#Base_Pop`
 ```
-This is a selection of records.
 Drawn from an inline selection.
 ```
 
 ### `reporting/USP_IP_SepsisShiftCompliance.sql::#FlwshtLst`
 ```
-This is a selection of records.
 Drawn from an inline selection.
 - The rownum is 1.
 ```
 
 ### `reporting/USP_IP_SepsisShiftCompliance.sql::#FlwshtLstHuddleODScore`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in flowsheet records records, restricted to records also present in flowsheet measurements records.
 - The unique identifier for the flowsheet group or row linked is one of the values '9000002705', '9000002732', '9000002733', '9000002706', '9000002734', '9000002707'.
 - It is not the case that the flowsheet reading real has no recorded value.
@@ -1412,27 +1251,23 @@ Drawn from the base pop selection defined earlier in this procedure, restricted 
 
 ### `reporting/USP_IP_SepsisShiftCompliance.sql::#FlwshtNoAlert`
 ```
-This is a selection of records.
 Drawn from an inline selection.
 ```
 
 ### `reporting/USP_IP_SepsisShiftCompliance.sql::#FlwshtAlert`
 ```
-This is a selection of records.
 Drawn from an inline selection.
 - The rownum is 1.
 ```
 
 ### `reporting/USP_IP_SepsisShiftCompliance.sql::#Base_Pop_OD_Scores`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, combined with hospital encounters records, combined with the flwshtlst selection defined earlier in this procedure, combined with the flwshtnoalert selection defined earlier in this procedure, combined with the flwshtalert selection defined earlier in this procedure, combined with an inline selection.
 - No membership conditions are applied in this selection.
 ```
 
 ### `reporting/USP_IP_SepsisShiftCompliance.sql::reporting.IP_SepsisShiftCompliance`
 ```
-This is a selection of records.
 Drawn from the mainadmdetails selection defined earlier in this procedure, restricted to records also present in the base pop selection defined earlier in this procedure, restricted to records also present in the base pop od scores selection defined earlier in this procedure, restricted to records also present in fy date dimension records, restricted to records also present in 4 inline selections.
 - No membership conditions are applied in this selection.
 ```
@@ -1442,7 +1277,6 @@ Drawn from the mainadmdetails selection defined earlier in this procedure, restr
 
 ### `reporting/USP_IP_SepsisShiftComplianceByShift.sql::delivery`
 ```
-This is a selection of records.
 Drawn from ip sepsisshiftcompliance records.
 - No membership conditions are applied in this selection.
 ```
@@ -1452,7 +1286,6 @@ Drawn from ip sepsisshiftcompliance records.
 
 ### `reporting/USP_IP_SepsisShiftComplianceMetrics.sql::delivery`
 ```
-This is a selection of records.
 Drawn from ip sepsisshiftcompliance records.
 - No membership conditions are applied in this selection.
 ```
@@ -1462,7 +1295,6 @@ Drawn from ip sepsisshiftcompliance records.
 
 ### `reporting/USP_IP_Sepsis_ComplianceByShift.sql::delivery`
 ```
-This is a selection of records.
 Drawn from ip sepsis records.
 - No membership conditions are applied in this selection.
 ```
@@ -1472,7 +1304,6 @@ Drawn from ip sepsis records.
 
 ### `reporting/USP_IP_Sepsis_ComplianceMetrics.sql::delivery`
 ```
-This is a selection of records.
 Drawn from ip sepsis records.
 - No membership conditions are applied in this selection.
 ```
@@ -1482,7 +1313,6 @@ Drawn from ip sepsis records.
 
 ### `reporting/USP_IP_Sepsis_Details.sql::delivery`
 ```
-This is a selection of records.
 Drawn from ip sepsis records.
 - No membership conditions are applied in this selection.
 ```
@@ -1492,7 +1322,6 @@ Drawn from ip sepsis records.
 
 ### `reporting/USP_IP_Sepsis_Encounters.sql::delivery`
 ```
-This is a selection of records.
 Drawn from ip sepsis records.
 - No membership conditions are applied in this selection.
 ```
@@ -1502,7 +1331,6 @@ Drawn from ip sepsis records.
 
 ### `reporting/USP_IP_Sepsis_ScreeningTool.sql::delivery`
 ```
-This is a selection of records.
 Drawn from ip sepsis records.
 - No membership conditions are applied in this selection.
 ```
@@ -1512,14 +1340,13 @@ Drawn from ip sepsis records.
 
 ### `reports/USP_RPTS_ED_Sepsis.sql::#Base_Pop`
 ```
-This is a selection of records.
 Drawn from ed encounters fact records, combined with hospital encounters records, combined with ed encounters dm records, combined with patients records, combined with ref ed disposition records, combined with ref ethnic group records, combined with patient demographics race records, combined with ref patient race records, combined with departments records, combined with locations records.
 - The date when the patient arrived is between the d start date parameter and the d end date parameter (inclusive).
 ```
 
 ### `reports/USP_RPTS_ED_Sepsis.sql::ABX`
 ```
-This is a selection of records.
+Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in medication orders records, restricted to records also present in medications records, restricted to records also present in med admin records records.
 This selection is the combination of 2 alternative selections (duplicates removed).
 The first alternative:
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in medication orders records, restricted to records also present in medications records, restricted to records also present in med admin records records.
@@ -1539,19 +1366,17 @@ Drawn from the base pop selection defined earlier in this procedure, restricted 
 
 ### `reports/USP_RPTS_ED_Sepsis.sql::#BasePopABX`
 ```
-This is a selection of records.
 Drawn from the abx selection defined earlier in this procedure.
 ```
 
 ### `reports/USP_RPTS_ED_Sepsis.sql::#Base_Pop_ENC_Reason`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure.
 ```
 
 ### `reports/USP_RPTS_ED_Sepsis.sql::#SSOrderSetOSQ_PRL`
 ```
-This is a selection of records.
+Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in order tracking metrics records, restricted to records also present in medication orders ext records.
 This selection is the combination of 3 alternative selections (duplicates removed).
 The first alternative:
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in order tracking metrics records, restricted to records also present in medication orders ext records.
@@ -1569,13 +1394,11 @@ Drawn from the base pop selection defined earlier in this procedure, restricted 
 
 ### `reports/USP_RPTS_ED_Sepsis.sql::#SSOrderSet`
 ```
-This is a selection of records.
 Drawn from the ssordersetosq prl selection defined earlier in this procedure.
 ```
 
 ### `reports/USP_RPTS_ED_Sepsis.sql::#BasePopBolus`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in medication orders records, restricted to records also present in medications records, restricted to records also present in med admin records records.
 - It is not the case that the time designated by the user when the action occurred has no recorded value.
 - The time designated by the user when the action occurred is between the adt arrival time and the ed departure time (inclusive).
@@ -1586,14 +1409,12 @@ Drawn from the base pop selection defined earlier in this procedure, restricted 
 
 ### `reports/USP_RPTS_ED_Sepsis.sql::#EncounterWeights`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in flowsheet records records, restricted to records also present in flowsheet measurements records.
 - The unique identifier for the flowsheet group or row linked is '94'.
 ```
 
 ### `reports/USP_RPTS_ED_Sepsis.sql::#Hypotension`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in flowsheet records records, restricted to records also present in flowsheet measurements records.
 - The unique identifier for the flowsheet group or row linked is '95'.
 - It is not the case that the exact moment when the reading was recorded has no recorded value.
@@ -1603,7 +1424,6 @@ Drawn from the base pop selection defined earlier in this procedure, restricted 
 
 ### `reports/USP_RPTS_ED_Sepsis.sql::#SepsisAlertCancelled`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in flowsheet records records, restricted to records also present in flowsheet measurements records.
 - The unique identifier for the flowsheet group or row linked is '9001125002' (annotated 'R HS ED SEPSIS CLINICAL_ALERTS CANCELLED' in the source).
 - It is not the case that the exact moment when the reading was recorded has no recorded value.
@@ -1613,7 +1433,6 @@ Drawn from the base pop selection defined earlier in this procedure, restricted 
 
 ### `reports/USP_RPTS_ED_Sepsis.sql::#ALLCVLTime`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in line device airway records, restricted to records also present in config value set records.
 - The value_set unique is 3022 (annotated 'CVL CODES' in the source).
 - The this item records the exact moment the record was placed is between the adt arrival time and the ed departure time (inclusive).
@@ -1621,7 +1440,6 @@ Drawn from the base pop selection defined earlier in this procedure, restricted 
 
 ### `reports/USP_RPTS_ED_Sepsis.sql::#Pressors`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, combined with medication orders records, combined with medications records, combined with grouper med records records, combined with med admin records records, combined with hospital encounters records.
 - The unique identifier for the base grouper record is vcg-.1 is one of the values '8000100' (noted 'HS RX EPINEPHRINE SEPSIS'), '8000101' (noted 'HS RX DOPAMINE SEPSIS'), '8000102' (noted 'HS RX DOBUTAMINE SEPSIS'), '8000103' (noted 'HS RX MILRINONE SEPSIS'), '8000104' (noted 'HS RX NOREPINEPHRINE SEPSIS').
 - The mar_action_category_number linked is one of the values '1' (noted 'GIVEN'), '7' (noted 'RESTARTED'), '102' (noted 'GIVEN BY OTHER'), '105' (noted 'NEW CARTRIDGE'), '113' (noted 'GIVEN DURING DOWNTIME'), '114' (noted 'STARTED DURING DOWNTIME'), '115' (noted 'MEDICATION APPLIED'), '122' (noted 'CONTINUED FROM OR'), '124' (noted 'SELF ADMINISTERED VIA PUMP'), '132' (noted 'CONTINUED FROM PREVIOUS ORDER'), '143' (noted 'REDOSE'), '1604' (noted 'INFUSION GREATER THAN 15 MIN'), '1605' (noted 'INFUSION LESS THAN 15 MIN'), '1607' (noted 'NEW CARTRIDGE'), '6' (noted 'NEW BAG').
@@ -1631,7 +1449,6 @@ Drawn from the base pop selection defined earlier in this procedure, combined wi
 
 ### `reports/USP_RPTS_ED_Sepsis.sql::#SVO2`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in lab order results records, restricted to records also present in procedure orders records.
 - The unique identifier for each result component associated with every result is one of the values 5000001861, 5000000478.
 - The date and time at which the procedure_order was submitted is between the adt arrival time and the ed departure time (inclusive).
@@ -1639,7 +1456,6 @@ Drawn from the base pop selection defined earlier in this procedure, restricted 
 
 ### `reports/USP_RPTS_ED_Sepsis.sql::#LacticAcid`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in lab order results records, restricted to records also present in procedure orders records.
 - The unique identifier for each result component associated with every result is one of the values 5000000446, 5000000447, 5000000449.
 - The date and time at which the procedure_order was submitted is between the adt arrival time and the ed departure time (inclusive).
@@ -1647,7 +1463,6 @@ Drawn from the base pop selection defined earlier in this procedure, restricted 
 
 ### `reports/USP_RPTS_ED_Sepsis.sql::#Procalcitonin`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in lab order results records, restricted to records also present in procedure orders records.
 - The unique identifier for each result component associated with every result is 500001 (annotated ''LAB014'' in the source).
 - The date and time at which the procedure_order was submitted is between the adt arrival time and the ed departure time (inclusive).
@@ -1655,7 +1470,6 @@ Drawn from the base pop selection defined earlier in this procedure, restricted 
 
 ### `reports/USP_RPTS_ED_Sepsis.sql::BloodCultureResults`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, combined with lab order results records, combined with procedure orders records, combined with organisms records.
 - The unique identifier for the procedure record associated is one of the values 600003, 600004, 600011, 600012 (annotated ''LAB001', 'NUR001', 'LAB012', 'LAB011'' in the source).
 - The date and time at which the procedure_order was submitted is between the adt arrival time and the ed departure time (inclusive).
@@ -1663,19 +1477,17 @@ Drawn from the base pop selection defined earlier in this procedure, combined wi
 
 ### `reports/USP_RPTS_ED_Sepsis.sql::PositiveCultures`
 ```
-This is a selection of records.
 Drawn from the bloodcultureresults selection defined earlier in this procedure.
 ```
 
 ### `reports/USP_RPTS_ED_Sepsis.sql::NegativeCultures`
 ```
-This is a selection of records.
 Drawn from the bloodcultureresults selection defined earlier in this procedure.
 ```
 
 ### `reports/USP_RPTS_ED_Sepsis.sql::#BloodCultureValue`
 ```
-This is a selection of records.
+Drawn from the positivecultures selection defined earlier in this procedure.
 This selection is the combination of 2 alternative selections (duplicates removed).
 The first alternative:
 Drawn from the positivecultures selection defined earlier in this procedure.
@@ -1685,7 +1497,6 @@ Drawn from the negativecultures selection defined earlier in this procedure.
 
 ### `reports/USP_RPTS_ED_Sepsis.sql::UrineCultureResults`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, combined with lab order results records, combined with procedure orders records, combined with organisms records.
 - The unique identifier for the procedure record associated is one of the values 600001, 600007, 600008, 600009, 600010 (annotated ''LAB002', 'LAB008', 'LAB009', 'LAB010', 'POC001'' in the source).
 - The date and time at which the procedure_order was submitted is between the adt arrival time and the ed departure time (inclusive).
@@ -1693,19 +1504,17 @@ Drawn from the base pop selection defined earlier in this procedure, combined wi
 
 ### `reports/USP_RPTS_ED_Sepsis.sql::PositiveCultures#2`
 ```
-This is a selection of records.
 Drawn from the urinecultureresults selection defined earlier in this procedure.
 ```
 
 ### `reports/USP_RPTS_ED_Sepsis.sql::NegativeCultures#2`
 ```
-This is a selection of records.
 Drawn from the urinecultureresults selection defined earlier in this procedure.
 ```
 
 ### `reports/USP_RPTS_ED_Sepsis.sql::#UrineCultureValue`
 ```
-This is a selection of records.
+Drawn from the positivecultures selection defined earlier in this procedure.
 This selection is the combination of 2 alternative selections (duplicates removed).
 The first alternative:
 Drawn from the positivecultures selection defined earlier in this procedure.
@@ -1715,7 +1524,6 @@ Drawn from the negativecultures selection defined earlier in this procedure.
 
 ### `reports/USP_RPTS_ED_Sepsis.sql::CsfCultureResults`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, combined with lab order results records, combined with procedure orders records, combined with organisms records.
 - The unique identifier for the procedure record associated is one of the values 600005, 600006, 600002 (annotated ''LAB006', 'LAB007', 'LAB003'' in the source).
 - The source category of the procedure order is 304 (annotated 'Lumber puncture' in the source).
@@ -1724,19 +1532,17 @@ Drawn from the base pop selection defined earlier in this procedure, combined wi
 
 ### `reports/USP_RPTS_ED_Sepsis.sql::PositiveCultures#3`
 ```
-This is a selection of records.
 Drawn from the csfcultureresults selection defined earlier in this procedure.
 ```
 
 ### `reports/USP_RPTS_ED_Sepsis.sql::NegativeCultures#3`
 ```
-This is a selection of records.
 Drawn from the csfcultureresults selection defined earlier in this procedure.
 ```
 
 ### `reports/USP_RPTS_ED_Sepsis.sql::#CsfCultureValue`
 ```
-This is a selection of records.
+Drawn from the positivecultures selection defined earlier in this procedure.
 This selection is the combination of 2 alternative selections (duplicates removed).
 The first alternative:
 Drawn from the positivecultures selection defined earlier in this procedure.
@@ -1746,7 +1552,6 @@ Drawn from the negativecultures selection defined earlier in this procedure.
 
 ### `reports/USP_RPTS_ED_Sepsis.sql::#ETT`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in line device airway records.
 - The flowsheet id that specifies the structure is '900112'.
 - It is not the case that the this item records the exact moment the record was placed has no recorded value.
@@ -1755,7 +1560,6 @@ Drawn from the base pop selection defined earlier in this procedure, restricted 
 
 ### `reports/USP_RPTS_ED_Sepsis.sql::#IV`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in line device airway records.
 - The flowsheet id that specifies the structure is '900111'.
 - It is not the case that the this item records the exact moment the record was placed has no recorded value.
@@ -1764,7 +1568,6 @@ Drawn from the base pop selection defined earlier in this procedure, restricted 
 
 ### `reports/USP_RPTS_ED_Sepsis.sql::#ED2HEMONC`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in adt events records (2 reads), restricted to records also present in departments records.
 - For the first adt events record read: the unit associated with the event record at the time it became effective is one of the values 200108022.
 - For the first adt events record read: the category value that indicates the type of the event record is 4 (annotated 'TRANSFER OUT' in the source).
@@ -1776,7 +1579,6 @@ Drawn from the base pop selection defined earlier in this procedure, restricted 
 
 ### `reports/USP_RPTS_ED_Sepsis.sql::#ED2ICU`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in adt events records (2 reads), restricted to records also present in departments records.
 - For the first adt events record read: the unit associated with the event record at the time it became effective is one of the values 200108022.
 - For the first adt events record read: the category value that indicates the type of the event record is 4 (annotated 'TRANSFER OUT' in the source).
@@ -1788,7 +1590,6 @@ Drawn from the base pop selection defined earlier in this procedure, restricted 
 
 ### `reports/USP_RPTS_ED_Sepsis.sql::#ED2GEN`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in adt events records (2 reads), restricted to records also present in departments records, restricted to records also present in an inline selection.
 - For the first adt events record read: the unit associated with the event record at the time it became effective is one of the values 200108022.
 - For the first adt events record read: the category value that indicates the type of the event record is 4 (annotated 'TRANSFER OUT' in the source).
@@ -1800,7 +1601,6 @@ Drawn from the base pop selection defined earlier in this procedure, restricted 
 
 ### `reports/USP_RPTS_ED_Sepsis.sql::#BPA`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, combined with clinical alerts records, combined with alert history records, combined with alert actions records, combined with ref alert actions records, combined with ref alert override reasons records, combined with ref alert status records, combined with ref shown place records, combined with employees records.
 - The locators that were activated is '900130001'.
 - The moment when the warning is dismissed following certain actions is between the adt arrival time and the ed departure time (inclusive).
@@ -1808,7 +1608,6 @@ Drawn from the base pop selection defined earlier in this procedure, combined wi
 
 ### `reports/USP_RPTS_ED_Sepsis.sql::#Base_Pop_Severe_ED_Scores`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in hospital encounters records, restricted to records also present in flowsheet records records, restricted to records also present in flowsheet measurements records.
 - The unique identifier for the flowsheet group or row linked is one of the values '9000161709', '9000002613' (annotated 'SEPSIS SCORE--ADDED NEW ED SEPSIS SCORE 9000002613 ON 10.01.' in the source).
 - The exact moment when the reading was recorded is between the adt arrival time and the ed departure time (inclusive).
@@ -1816,27 +1615,23 @@ Drawn from the base pop selection defined earlier in this procedure, restricted 
 
 ### `reports/USP_RPTS_ED_Sepsis.sql::#ED_PositiveScores`
 ```
-This is a selection of records.
 Drawn from the base pop severe ed scores selection defined earlier in this procedure.
 - The meas value exceeds 4.
 ```
 
 ### `reports/USP_RPTS_ED_Sepsis.sql::#Base_Pop_SepsisScores_ConCat`
 ```
-This is a selection of records.
 Drawn from the base pop severe ed scores selection defined earlier in this procedure.
 ```
 
 ### `reports/USP_RPTS_ED_Sepsis.sql::#FirstPositiveOD_To_ABXAdminTime`
 ```
-This is a selection of records.
 Drawn from an inline selection.
 - The myline is 1.
 ```
 
 ### `reports/USP_RPTS_ED_Sepsis.sql::#FirstABXAdminTimeDetails`
 ```
-This is a selection of records.
 Drawn from the basepopabx selection defined earlier in this procedure, combined with v pharmacy order records, combined with 2 inline selections, combined with v pharmacy dispense records, combined with 2 inline selections.
 - The time line is 1 (annotated 'LOOK FOR FIRST ANTIBIOTIC ADMINISTRATION ONLY' in the source).
 - The myline is 1.
@@ -1846,21 +1641,18 @@ Drawn from the basepopabx selection defined earlier in this procedure, combined 
 
 ### `reports/USP_RPTS_ED_Sepsis.sql::#BedEvents`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in ed patient info records, restricted to records also present in ed event info records, restricted to records also present in ed event templates records.
 - The this column represents the event template linked to the event record is one of the values '2600000347', '2600000346'.
 ```
 
 ### `reports/USP_RPTS_ED_Sepsis.sql::#Base_Pop_ED_Readmit_All`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in ed encounters dm records.
 - The date and time when the patient arrives at the emergency department is between the ed departure time and 24 hours after the ed departure time (inclusive).
 ```
 
 ### `reports/USP_RPTS_ED_Sepsis.sql::#Base_Pop_ED_Readmit`
 ```
-This is a selection of records.
 Drawn from the ed positivescores selection defined earlier in this procedure, restricted to records also present in the base pop selection defined earlier in this procedure, restricted to records also present in ed encounters dm records.
 - The first time line is 1.
 - The date and time when the patient arrives at the emergency department is between the ed departure time and 24 hours after the ed departure time (inclusive).
@@ -1868,7 +1660,6 @@ Drawn from the ed positivescores selection defined earlier in this procedure, re
 
 ### `reports/USP_RPTS_ED_Sepsis.sql::delivery`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, combined with encounter visit reasons records, combined with visit reasons records, combined with severe sepsis staging records, combined with non severe sepsis staging records, combined with the base pop sepsisscores concat selection defined earlier in this procedure, combined with the base pop severe ed scores selection defined earlier in this procedure, combined with the ed positivescores selection defined earlier in this procedure, combined with the basepopabx selection defined earlier in this procedure (2 reads), combined with the ssorderset selection defined earlier in this procedure, combined with the basepopbolus selection defined earlier in this procedure (3 reads), combined with the encounterweights selection defined earlier in this procedure, combined with the hypotension selection defined earlier in this procedure, combined with the allcvltime selection defined earlier in this procedure, combined with the pressors selection defined earlier in this procedure, combined with the svo2 selection defined earlier in this procedure, combined with the lacticacid selection defined earlier in this procedure, combined with the procalcitonin selection defined earlier in this procedure, combined with the bloodculturevalue selection defined earlier in this procedure, combined with the urineculturevalue selection defined earlier in this procedure, combined with the csfculturevalue selection defined earlier in this procedure, combined with the ett selection defined earlier in this procedure, combined with the iv selection defined earlier in this procedure, combined with the ed2hemonc selection defined earlier in this procedure, combined with the ed2icu selection defined earlier in this procedure, combined with the ed2gen selection defined earlier in this procedure, combined with the bpa selection defined earlier in this procedure, combined with the bedevents selection defined earlier in this procedure (2 reads), combined with the base pop ed readmit all selection defined earlier in this procedure, combined with the base pop ed readmit selection defined earlier in this procedure, combined with the base pop enc reason selection defined earlier in this procedure, combined with the firstpositiveod to abxadmintime selection defined earlier in this procedure, combined with the firstabxadmintimedetails selection defined earlier in this procedure, combined with the sepsisalertcancelled selection defined earlier in this procedure, combined with 9 inline selections.
 - No membership conditions are applied in this selection.
 ```
@@ -1878,7 +1669,6 @@ Drawn from the base pop selection defined earlier in this procedure, combined wi
 
 ### `reports/USP_RPTS_IP_SEPSIS.sql::#Main`
 ```
-This is a selection of records.
 Drawn from v hospital transactions records, combined with hospital encounters records, combined with patients records, combined with ref discharge disposition records, combined with ref ethnic group records, combined with patient demographics race records, combined with ref patient race records, combined with ref ed disposition records.
 - It is not the case that the date-time of the inpatient admission indicates when the patient first received a base patient class of inpatient during their hospital stay has no recorded value.
 - The convert(date,htr.service_date) is between the d start date parameter and the d end date parameter (inclusive).
@@ -1886,28 +1676,24 @@ Drawn from v hospital transactions records, combined with hospital encounters re
 
 ### `reports/USP_RPTS_IP_SEPSIS.sql::#Base_Pop_ENC_Reason`
 ```
-This is a selection of records.
 Drawn from the main selection defined earlier in this procedure, restricted to records also present in encounter diagnoses records, restricted to records also present in diagnoses records.
 - The line_number of the diagnosis within the encounter exceeds 1.
 ```
 
 ### `reports/USP_RPTS_IP_SEPSIS.sql::#EncounterWeights`
 ```
-This is a selection of records.
 Drawn from the main selection defined earlier in this procedure, restricted to records also present in flowsheet records records, restricted to records also present in flowsheet measurements records.
 - The unique identifier for the flowsheet group or row linked is '94'.
 ```
 
 ### `reports/USP_RPTS_IP_SEPSIS.sql::#Base_Pop`
 ```
-This is a selection of records.
 Drawn from the main selection defined earlier in this procedure, restricted to records also present in patients records, restricted to records also present in an inline selection, restricted to records also present in config value set records.
 - The value_set unique is 3031 (annotated 'DEPARTMENT ROLL UP' in the source).
 ```
 
 ### `reports/USP_RPTS_IP_SEPSIS.sql::#Base_Pop_Severe_ED_Scores`
 ```
-This is a selection of records.
 Drawn from the main selection defined earlier in this procedure, restricted to records also present in hospital encounters records, restricted to records also present in flowsheet records records, restricted to records also present in flowsheet measurements records.
 - The unique identifier for the flowsheet group or row linked is one of the values '9000161709', '9000002613' (annotated 'SEPSIS SCORE--ADDED NEW ED SEPSIS SCORE 9000002613 ON 10.01.' in the source).
 - The exact moment when the reading was recorded is at most the ed departure time.
@@ -1915,14 +1701,12 @@ Drawn from the main selection defined earlier in this procedure, restricted to r
 
 ### `reports/USP_RPTS_IP_SEPSIS.sql::#EDPosScore_EDLOS`
 ```
-This is a selection of records.
 Drawn from the base pop severe ed scores selection defined earlier in this procedure.
 - The meas value exceeds 4.
 ```
 
 ### `reports/USP_RPTS_IP_SEPSIS.sql::#Base_Pop_OD_Scores`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, combined with hospital encounters records, combined with flowsheet records records, combined with flowsheet measurements records, combined with 3 inline selections.
 - The unique identifier for the flowsheet group or row linked is one of the values '9000161711', '9000002644' (annotated 'ORGAN DYSFUNCTION SCORE' in the source).
 - The exact moment when the reading was recorded is between the in dttm and the first recorded of the out dttm, getdate() (inclusive).
@@ -1930,20 +1714,17 @@ Drawn from the base pop selection defined earlier in this procedure, combined wi
 
 ### `reports/USP_RPTS_IP_SEPSIS.sql::#Hypotension`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in flowsheet records records, restricted to records also present in an inline selection.
 - No membership conditions are applied in this selection.
 ```
 
 ### `reports/USP_RPTS_IP_SEPSIS.sql::#ODHYPO`
 ```
-This is a selection of records.
 Drawn from the base pop od scores selection defined earlier in this procedure, combined with 2 inline selections.
 ```
 
 ### `reports/USP_RPTS_IP_SEPSIS.sql::#BasePopABX`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in medication orders records, restricted to records also present in medications records, restricted to records also present in med admin records records.
 - The category linked to the therapeutic class that specifies the recognized use of the drug is 11 (annotated 'Antibiotics' in the source).
 - It is not the case that the time designated by the user when the action occurred has no recorded value.
@@ -1953,26 +1734,22 @@ Drawn from the base pop selection defined earlier in this procedure, restricted 
 
 ### `reports/USP_RPTS_IP_SEPSIS.sql::#ODABX`
 ```
-This is a selection of records.
 Drawn from the base pop od scores selection defined earlier in this procedure, combined with 2 inline selections.
 ```
 
 ### `reports/USP_RPTS_IP_SEPSIS.sql::#SSOrderSet`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in order tracking metrics records.
 - The order set utilized to place the order is one of the values 400001 (annotated '(40400100, 40400058, 40400196, 40400153, 4058600002, 400001)' in the source).
 ```
 
 ### `reports/USP_RPTS_IP_SEPSIS.sql::#ODORDSET`
 ```
-This is a selection of records.
 Drawn from the base pop od scores selection defined earlier in this procedure, combined with 2 inline selections.
 ```
 
 ### `reports/USP_RPTS_IP_SEPSIS.sql::#BasePopBolus`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in medication orders records, restricted to records also present in medications records, restricted to records also present in med admin records records.
 - It is not the case that the time designated by the user when the action occurred has no recorded value.
 - The unique identifier for the medication record linked is one of the values 700001 (noted 'SODIUM CHLORIDE 0.99 % IV BOLUS'), 7000739 (noted 'LACTATED RINGERS IV BOLUS'), 700003 (noted 'ALBUMIN, HUMAN 95 % INTRAVENOUS SOLUTION'), 7006331 (noted 'ELECTROLYE-A IV Bolus (PLASMALYTE)'), 700002 (noted 'SODIUM CHLORIDE 0.99 % INJECTION SYRINGE') or .
@@ -1982,26 +1759,22 @@ Drawn from the base pop selection defined earlier in this procedure, restricted 
 
 ### `reports/USP_RPTS_IP_SEPSIS.sql::#OdboL`
 ```
-This is a selection of records.
 Drawn from the base pop od scores selection defined earlier in this procedure, combined with 2 inline selections.
 ```
 
 ### `reports/USP_RPTS_IP_SEPSIS.sql::#ALLCVLTime`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in line device airway records, restricted to records also present in config value set records.
 - The value_set unique is 3022 (annotated 'CVL CODES' in the source).
 ```
 
 ### `reports/USP_RPTS_IP_SEPSIS.sql::#ODCVL`
 ```
-This is a selection of records.
 Drawn from the base pop od scores selection defined earlier in this procedure, combined with 2 inline selections.
 ```
 
 ### `reports/USP_RPTS_IP_SEPSIS.sql::#Pressors`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, combined with medication orders records, combined with medications records, combined with grouper med records records, combined with med admin records records, combined with hospital encounters records.
 - The unique identifier for the base grouper record is vcg-.1 is one of the values '8000100' (noted 'HS RX EPINEPHRINE SEPSIS'), '8000101' (noted 'HS RX DOPAMINE SEPSIS'), '8000102' (noted 'HS RX DOBUTAMINE SEPSIS'), '8000103' (noted 'HS RX MILRINONE SEPSIS'), '8000104' (noted 'HS RX NOREPINEPHRINE SEPSIS').
 - The mar_action_category_number linked is one of the values '1' (noted 'GIVEN'), '7' (noted 'RESTARTED'), '102' (noted 'GIVEN BY OTHER'), '105' (noted 'NEW CARTRIDGE'), '113' (noted 'GIVEN DURING DOWNTIME'), '114' (noted 'STARTED DURING DOWNTIME'), '115' (noted 'MEDICATION APPLIED'), '122' (noted 'CONTINUED FROM OR'), '124' (noted 'SELF ADMINISTERED VIA PUMP'), '132' (noted 'CONTINUED FROM PREVIOUS ORDER'), '143' (noted 'REDOSE'), '1604' (noted 'INFUSION GREATER THAN 15 MIN'), '1605' (noted 'INFUSION LESS THAN 15 MIN'), '1607' (noted 'NEW CARTRIDGE'), '6' (noted 'NEW BAG').
@@ -2010,71 +1783,60 @@ Drawn from the base pop selection defined earlier in this procedure, combined wi
 
 ### `reports/USP_RPTS_IP_SEPSIS.sql::#ODPressorSummary`
 ```
-This is a selection of records.
 Drawn from the pressors selection defined earlier in this procedure.
 ```
 
 ### `reports/USP_RPTS_IP_SEPSIS.sql::#ODPressorPivot`
 ```
-This is a selection of records.
 Drawn from the odpressorsummary selection defined earlier in this procedure.
 ```
 
 ### `reports/USP_RPTS_IP_SEPSIS.sql::#SVO2`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in lab order results records, restricted to records also present in procedure orders records.
 - The unique identifier for each result component associated with every result is one of the values 5000001861, 5000000478.
 ```
 
 ### `reports/USP_RPTS_IP_SEPSIS.sql::#ODSVO2`
 ```
-This is a selection of records.
 Drawn from the base pop od scores selection defined earlier in this procedure, combined with 2 inline selections.
 ```
 
 ### `reports/USP_RPTS_IP_SEPSIS.sql::#LacticAcid`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in lab order results records, restricted to records also present in procedure orders records.
 - The unique identifier for each result component associated with every result is one of the values 5000000446, 5000000447, 5000000449.
 ```
 
 ### `reports/USP_RPTS_IP_SEPSIS.sql::#ODLA`
 ```
-This is a selection of records.
 Drawn from the base pop od scores selection defined earlier in this procedure, combined with 2 inline selections.
 ```
 
 ### `reports/USP_RPTS_IP_SEPSIS.sql::#Procalcitonin`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in lab order results records, restricted to records also present in procedure orders records.
 - The unique identifier for each result component associated with every result is 500001 (annotated 'COULD USE PROC CODE ALSO.... LAB014' in the source).
 ```
 
 ### `reports/USP_RPTS_IP_SEPSIS.sql::#ODPROCAL`
 ```
-This is a selection of records.
 Drawn from the base pop od scores selection defined earlier in this procedure, combined with 2 inline selections.
 ```
 
 ### `reports/USP_RPTS_IP_SEPSIS.sql::#BloodCultureValue`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in lab order results records, restricted to records also present in procedure orders records, restricted to records also present in procedures catalog records.
 - The unique identifier for the procedure record associated is one of the values 600003, 600004, 600011, 600012.
 ```
 
 ### `reports/USP_RPTS_IP_SEPSIS.sql::#ODBC`
 ```
-This is a selection of records.
 Drawn from the base pop od scores selection defined earlier in this procedure, combined with 2 inline selections.
 ```
 
 ### `reports/USP_RPTS_IP_SEPSIS.sql::#CSF`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in lab order results records, restricted to records also present in procedure orders records, restricted to records also present in procedures catalog records.
 - The proc id is one of the values 600005, 600006.
 - The source category of the procedure order is 304.
@@ -2082,13 +1844,11 @@ Drawn from the base pop selection defined earlier in this procedure, restricted 
 
 ### `reports/USP_RPTS_IP_SEPSIS.sql::#ODCSF`
 ```
-This is a selection of records.
 Drawn from the base pop od scores selection defined earlier in this procedure, combined with 2 inline selections.
 ```
 
 ### `reports/USP_RPTS_IP_SEPSIS.sql::#ETT`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in line device airway records.
 - The flowsheet id that specifies the structure is '900112'.
 - It is not the case that the this item records the exact moment the record was placed has no recorded value.
@@ -2096,13 +1856,11 @@ Drawn from the base pop selection defined earlier in this procedure, restricted 
 
 ### `reports/USP_RPTS_IP_SEPSIS.sql::#ODETT`
 ```
-This is a selection of records.
 Drawn from the base pop od scores selection defined earlier in this procedure, combined with 2 inline selections.
 ```
 
 ### `reports/USP_RPTS_IP_SEPSIS.sql::#PIV`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in line device airway records.
 - The flowsheet id that specifies the structure is '900111'.
 - It is not the case that the this item records the exact moment the record was placed has no recorded value.
@@ -2110,13 +1868,11 @@ Drawn from the base pop selection defined earlier in this procedure, restricted 
 
 ### `reports/USP_RPTS_IP_SEPSIS.sql::#ODPIV`
 ```
-This is a selection of records.
 Drawn from the base pop od scores selection defined earlier in this procedure, combined with 2 inline selections.
 ```
 
 ### `reports/USP_RPTS_IP_SEPSIS.sql::#PROPHYLAXIS`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in flowsheet records records, restricted to records also present in flowsheet measurements records.
 - It is not the case that the exact moment when the reading was recorded has no recorded value.
 - The unique identifier for the flowsheet group or row linked is one of the values '9000613042', '9000613043', '9000613044', '9000613045', '9000613047', '9000613048', '9000613050'.
@@ -2124,35 +1880,30 @@ Drawn from the base pop selection defined earlier in this procedure, restricted 
 
 ### `reports/USP_RPTS_IP_SEPSIS.sql::#CVVH`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in flowsheet records records, restricted to records also present in flowsheet measurements records.
 - The unique identifier for the flowsheet template (flt) utilized to input the data is '9000001359' (annotated 'ANY FLOWSHEET FROM THIS TEMPLATE IS A CANDIDATE' in the source).
 ```
 
 ### `reports/USP_RPTS_IP_SEPSIS.sql::#OX`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in flowsheet records records, restricted to records also present in flowsheet measurements records.
 - The unique identifier for the flowsheet group or row linked is one of the values '900201', '900202', '900203', '9000001977'.
 ```
 
 ### `reports/USP_RPTS_IP_SEPSIS.sql::#ECMO`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in flowsheet records records, restricted to records also present in flowsheet measurements records.
 - The unique identifier for the flowsheet group or row linked is '9000101014'.
 ```
 
 ### `reports/USP_RPTS_IP_SEPSIS.sql::#FINAL`
 ```
-This is a selection of records.
 Drawn from the main selection defined earlier in this procedure, combined with the base pop selection defined earlier in this procedure, combined with the base pop od scores selection defined earlier in this procedure, combined with the base pop enc reason selection defined earlier in this procedure, combined with the encounterweights selection defined earlier in this procedure, combined with the odhypo selection defined earlier in this procedure, combined with the odabx selection defined earlier in this procedure, combined with the odbol selection defined earlier in this procedure, combined with the odla selection defined earlier in this procedure, combined with the odordset selection defined earlier in this procedure, combined with the odcvl selection defined earlier in this procedure, combined with the odpressorpivot selection defined earlier in this procedure, combined with the odsvo2 selection defined earlier in this procedure, combined with the odprocal selection defined earlier in this procedure, combined with the odbc selection defined earlier in this procedure, combined with the odcsf selection defined earlier in this procedure, combined with the odpiv selection defined earlier in this procedure, combined with the odett selection defined earlier in this procedure, combined with the prophylaxis selection defined earlier in this procedure, combined with the cvvh selection defined earlier in this procedure, combined with the ox selection defined earlier in this procedure, combined with the ecmo selection defined earlier in this procedure, combined with the edposscore edlos selection defined earlier in this procedure, combined with severe sepsis staging records.
 - No membership conditions are applied in this selection.
 ```
 
 ### `reports/USP_RPTS_IP_SEPSIS.sql::delivery`
 ```
-This is a selection of records.
 Drawn from the final selection defined earlier in this procedure.
 ```
 
@@ -2161,7 +1912,6 @@ Drawn from the final selection defined earlier in this procedure.
 
 ### `reports/USP_RPTS_IP_SEPSIS_COMPLIANCE.sql::#Main`
 ```
-This is a selection of records.
 Drawn from v patient location history records, combined with hospital encounters records, combined with patients records, combined with calendar dates records, combined with departments records, combined with locations records.
 - The date presented in standard date format is between convert(date,plh.in_dttm) and convert(date,plh.out_dttm) (inclusive).
 - It is not the case that the id number representing the department associated with the event record at the time it is effective has no recorded value.
@@ -2171,20 +1921,17 @@ Drawn from v patient location history records, combined with hospital encounters
 
 ### `reports/USP_RPTS_IP_SEPSIS_COMPLIANCE.sql::#Base_Pop_OD_Scores`
 ```
-This is a selection of records.
 Drawn from the main selection defined earlier in this procedure, combined with an inline selection, combined with config value set records, combined with 3 inline selections.
 - No membership conditions are applied in this selection.
 ```
 
 ### `reports/USP_RPTS_IP_SEPSIS_COMPLIANCE.sql::#SepsisSummary`
 ```
-This is a selection of records.
 Drawn from an inline selection.
 ```
 
 ### `reports/USP_RPTS_IP_SEPSIS_COMPLIANCE.sql::delivery`
 ```
-This is a selection of records.
 Drawn from the base pop od scores selection defined earlier in this procedure, combined with an inline selection.
 - It is not the case that the department rollup is one of the values 'Rollup Not Available', 'ER'.
 ```
@@ -2194,7 +1941,6 @@ Drawn from the base pop od scores selection defined earlier in this procedure, c
 
 ### `reports/USP_RPTS_IP_SEPSIS_COMPLIANCE_BY_SHIFT_NURSES.sql::#Main`
 ```
-This is a selection of records.
 Drawn from v patient location history records, combined with hospital encounters records, combined with patients records, combined with calendar dates records, combined with departments records, combined with locations records.
 - The date presented in standard date format is between convert(date,plh.in_dttm) and convert(date,plh.out_dttm) (inclusive).
 - It is not the case that the id number representing the department associated with the event record at the time it is effective has no recorded value.
@@ -2205,14 +1951,12 @@ Drawn from v patient location history records, combined with hospital encounters
 
 ### `reports/USP_RPTS_IP_SEPSIS_COMPLIANCE_BY_SHIFT_NURSES.sql::#Base_Pop_OD_Scores`
 ```
-This is a selection of records.
 Drawn from the main selection defined earlier in this procedure, combined with fy date dimension records, combined with 2 inline selections, combined with config value set records, combined with 4 inline selections.
 - No membership conditions are applied in this selection.
 ```
 
 ### `reports/USP_RPTS_IP_SEPSIS_COMPLIANCE_BY_SHIFT_NURSES.sql::delivery`
 ```
-This is a selection of records.
 Drawn from the base pop od scores selection defined earlier in this procedure.
 - It is not the case that the adt department id is one of the values 200108002 (noted 'MAIN 2 NICU A'), 200108003 (noted 'MAIN 2 NICU B'), 200108004 (noted 'MAIN 2 NICU C'), 200108005 (noted 'MAIN 3 NICU D'), 200108006 (noted 'MAIN 3 NICU E'), 200108070 (noted 'MAIN 3 CICU'), 200108118 (noted 'MAIN CARDIOVASCULAR OR'), 200108049 (noted 'MAIN OR').
 ```
@@ -2222,7 +1966,6 @@ Drawn from the base pop od scores selection defined earlier in this procedure.
 
 ### `reports/USP_RPTS_IP_SEPSIS_REPORT.sql::#Main`
 ```
-This is a selection of records.
 Drawn from v hospital transactions records, combined with hospital encounters records, combined with patients records, combined with ref discharge disposition records, combined with ref ethnic group records, combined with patient demographics race records, combined with ref patient race records, combined with departments records, combined with locations records.
 - It is not the case that the date-time of the inpatient admission indicates when the patient first received a base patient class of inpatient during their hospital stay has no recorded value.
 - The convert(date,htr.service_date) is between the d start date parameter and the d end date parameter (inclusive).
@@ -2230,20 +1973,17 @@ Drawn from v hospital transactions records, combined with hospital encounters re
 
 ### `reports/USP_RPTS_IP_SEPSIS_REPORT.sql::#Base_Pop_ENC_Reason`
 ```
-This is a selection of records.
 Drawn from the main selection defined earlier in this procedure.
 ```
 
 ### `reports/USP_RPTS_IP_SEPSIS_REPORT.sql::#EncounterWeights`
 ```
-This is a selection of records.
 Drawn from the main selection defined earlier in this procedure, restricted to records also present in flowsheet records records, restricted to records also present in flowsheet measurements records.
 - The unique identifier for the flowsheet group or row linked is '94'.
 ```
 
 ### `reports/USP_RPTS_IP_SEPSIS_REPORT.sql::#Base_Pop`
 ```
-This is a selection of records.
 Drawn from the main selection defined earlier in this procedure, combined with hospital encounters records, combined with patients records, combined with v patient location history records, combined with config value set records, combined with ref ed disposition records.
 - It is not the case that the id number representing the department associated with the event record at the time it is effective has no recorded value.
 - The value_set unique is 3031 (annotated 'DEPARTMENT ROLL UP' in the source).
@@ -2251,7 +1991,6 @@ Drawn from the main selection defined earlier in this procedure, combined with h
 
 ### `reports/USP_RPTS_IP_SEPSIS_REPORT.sql::#Base_Pop_Severe_ED_Scores`
 ```
-This is a selection of records.
 Drawn from the main selection defined earlier in this procedure, restricted to records also present in hospital encounters records, restricted to records also present in flowsheet records records, restricted to records also present in flowsheet measurements records.
 - The unique identifier for the flowsheet group or row linked is one of the values '9000161709', '9000002613' (annotated 'SEPSIS SCORE--ADDED NEW ED SEPSIS SCORE 9000002613 ON 10.01.' in the source).
 - The exact moment when the reading was recorded is at most the ed departure time.
@@ -2259,14 +1998,12 @@ Drawn from the main selection defined earlier in this procedure, restricted to r
 
 ### `reports/USP_RPTS_IP_SEPSIS_REPORT.sql::#EDPosScore_EDLOS`
 ```
-This is a selection of records.
 Drawn from the base pop severe ed scores selection defined earlier in this procedure.
 - The meas value exceeds 4.
 ```
 
 ### `reports/USP_RPTS_IP_SEPSIS_REPORT.sql::#Base_Pop_OD_Scores`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, combined with hospital encounters records, combined with flowsheet records records, combined with flowsheet measurements records, combined with 3 inline selections.
 - The unique identifier for the flowsheet group or row linked is one of the values '9000161711', '9000002644' (annotated 'ORGAN DYSFUNCTION SCORE' in the source).
 - The exact moment when the reading was recorded is between the in dttm and the first recorded of the out dttm, getdate() (inclusive).
@@ -2274,7 +2011,6 @@ Drawn from the base pop selection defined earlier in this procedure, combined wi
 
 ### `reports/USP_RPTS_IP_SEPSIS_REPORT.sql::#Hypotension`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in flowsheet records records, restricted to records also present in flowsheet measurements records.
 - The unique identifier for the flowsheet group or row linked is '95'.
 - It is not the case that the exact moment when the reading was recorded has no recorded value.
@@ -2284,13 +2020,11 @@ Drawn from the base pop selection defined earlier in this procedure, restricted 
 
 ### `reports/USP_RPTS_IP_SEPSIS_REPORT.sql::#ODHYPO`
 ```
-This is a selection of records.
 Drawn from the base pop od scores selection defined earlier in this procedure, combined with 2 inline selections.
 ```
 
 ### `reports/USP_RPTS_IP_SEPSIS_REPORT.sql::#BasePopABX`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in medication orders records, restricted to records also present in medications records, restricted to records also present in med admin records records.
 - The category linked to the therapeutic class that specifies the recognized use of the drug is 11 (annotated 'Antibiotics' in the source).
 - It is not the case that the time designated by the user when the action occurred has no recorded value.
@@ -2301,13 +2035,11 @@ Drawn from the base pop selection defined earlier in this procedure, restricted 
 
 ### `reports/USP_RPTS_IP_SEPSIS_REPORT.sql::#ODABX`
 ```
-This is a selection of records.
 Drawn from the base pop od scores selection defined earlier in this procedure, combined with 2 inline selections.
 ```
 
 ### `reports/USP_RPTS_IP_SEPSIS_REPORT.sql::#SSOrderSet`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in order tracking metrics records.
 - The order set utilized to place the order is one of the values 400001 (annotated '(40400100, 40400058, 40400196, 40400153, 4058600002, 400001)' in the source).
 - The date and time when the order was created is between the d start date parameter and the d end date parameter (inclusive).
@@ -2315,13 +2047,11 @@ Drawn from the base pop selection defined earlier in this procedure, restricted 
 
 ### `reports/USP_RPTS_IP_SEPSIS_REPORT.sql::#ODORDSET`
 ```
-This is a selection of records.
 Drawn from the base pop od scores selection defined earlier in this procedure, combined with 2 inline selections.
 ```
 
 ### `reports/USP_RPTS_IP_SEPSIS_REPORT.sql::#BasePopBolus`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in medication orders records, restricted to records also present in medications records, restricted to records also present in med admin records records.
 - It is not the case that the time designated by the user when the action occurred has no recorded value.
 - The time designated by the user when the action occurred is between the d start date parameter and the d end date parameter (inclusive).
@@ -2332,13 +2062,11 @@ Drawn from the base pop selection defined earlier in this procedure, restricted 
 
 ### `reports/USP_RPTS_IP_SEPSIS_REPORT.sql::#OdboL`
 ```
-This is a selection of records.
 Drawn from the base pop od scores selection defined earlier in this procedure, combined with 2 inline selections.
 ```
 
 ### `reports/USP_RPTS_IP_SEPSIS_REPORT.sql::#ALLCVLTime`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in line device airway records, restricted to records also present in config value set records.
 - The value_set unique is 3022 (annotated 'CVL CODES' in the source).
 - The this item records the exact moment the record was placed is between the d start date parameter and the d end date parameter (inclusive).
@@ -2346,13 +2074,11 @@ Drawn from the base pop selection defined earlier in this procedure, restricted 
 
 ### `reports/USP_RPTS_IP_SEPSIS_REPORT.sql::#ODCVL`
 ```
-This is a selection of records.
 Drawn from the base pop od scores selection defined earlier in this procedure, combined with 2 inline selections.
 ```
 
 ### `reports/USP_RPTS_IP_SEPSIS_REPORT.sql::#Pressors`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, combined with medication orders records, combined with medications records, combined with grouper med records records, combined with med admin records records, combined with hospital encounters records.
 - The unique identifier for the base grouper record is vcg-.1 is one of the values '8000100' (noted 'HS RX EPINEPHRINE SEPSIS'), '8000101' (noted 'HS RX DOPAMINE SEPSIS'), '8000102' (noted 'HS RX DOBUTAMINE SEPSIS'), '8000103' (noted 'HS RX MILRINONE SEPSIS'), '8000104' (noted 'HS RX NOREPINEPHRINE SEPSIS').
 - The time designated by the user when the action occurred is between the d start date parameter and the d end date parameter (inclusive).
@@ -2362,19 +2088,16 @@ Drawn from the base pop selection defined earlier in this procedure, combined wi
 
 ### `reports/USP_RPTS_IP_SEPSIS_REPORT.sql::#ODPressorSummary`
 ```
-This is a selection of records.
 Drawn from the pressors selection defined earlier in this procedure.
 ```
 
 ### `reports/USP_RPTS_IP_SEPSIS_REPORT.sql::#ODPressorPivot`
 ```
-This is a selection of records.
 Drawn from the odpressorsummary selection defined earlier in this procedure.
 ```
 
 ### `reports/USP_RPTS_IP_SEPSIS_REPORT.sql::#SVO2`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in lab order results records, restricted to records also present in procedure orders records.
 - The unique identifier for each result component associated with every result is one of the values 5000001861, 5000000478.
 - The date and time at which the procedure_order was submitted is between the d start date parameter and the d end date parameter (inclusive).
@@ -2382,13 +2105,11 @@ Drawn from the base pop selection defined earlier in this procedure, restricted 
 
 ### `reports/USP_RPTS_IP_SEPSIS_REPORT.sql::#ODSVO2`
 ```
-This is a selection of records.
 Drawn from the base pop od scores selection defined earlier in this procedure, combined with 2 inline selections.
 ```
 
 ### `reports/USP_RPTS_IP_SEPSIS_REPORT.sql::#LacticAcid`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in lab order results records, restricted to records also present in procedure orders records.
 - The unique identifier for each result component associated with every result is one of the values 5000000446, 5000000447, 5000000449.
 - The date and time at which the procedure_order was submitted is between the d start date parameter and the d end date parameter (inclusive).
@@ -2396,13 +2117,11 @@ Drawn from the base pop selection defined earlier in this procedure, restricted 
 
 ### `reports/USP_RPTS_IP_SEPSIS_REPORT.sql::#ODLA`
 ```
-This is a selection of records.
 Drawn from the base pop od scores selection defined earlier in this procedure, combined with 2 inline selections.
 ```
 
 ### `reports/USP_RPTS_IP_SEPSIS_REPORT.sql::#Procalcitonin`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in lab order results records, restricted to records also present in procedure orders records.
 - The unique identifier for each result component associated with every result is 500001 (annotated 'COULD USE PROC CODE ALSO.... LAB014' in the source).
 - The date and time at which the procedure_order was submitted is between the d start date parameter and the d end date parameter (inclusive).
@@ -2410,13 +2129,11 @@ Drawn from the base pop selection defined earlier in this procedure, restricted 
 
 ### `reports/USP_RPTS_IP_SEPSIS_REPORT.sql::#ODPROCAL`
 ```
-This is a selection of records.
 Drawn from the base pop od scores selection defined earlier in this procedure, combined with 2 inline selections.
 ```
 
 ### `reports/USP_RPTS_IP_SEPSIS_REPORT.sql::#BloodCultureValue`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in lab order results records, restricted to records also present in procedure orders records, restricted to records also present in procedures catalog records.
 - The unique identifier for the procedure record associated is one of the values 600003, 600004, 600011, 600012.
 - The date and time at which the procedure_order was submitted is between the d start date parameter and the d end date parameter (inclusive).
@@ -2424,13 +2141,11 @@ Drawn from the base pop selection defined earlier in this procedure, restricted 
 
 ### `reports/USP_RPTS_IP_SEPSIS_REPORT.sql::#ODBC`
 ```
-This is a selection of records.
 Drawn from the base pop od scores selection defined earlier in this procedure, combined with 2 inline selections.
 ```
 
 ### `reports/USP_RPTS_IP_SEPSIS_REPORT.sql::#CSF`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in lab order results records, restricted to records also present in procedure orders records, restricted to records also present in procedures catalog records.
 - The proc id is one of the values 600005, 600006.
 - The source category of the procedure order is 304.
@@ -2439,13 +2154,11 @@ Drawn from the base pop selection defined earlier in this procedure, restricted 
 
 ### `reports/USP_RPTS_IP_SEPSIS_REPORT.sql::#ODCSF`
 ```
-This is a selection of records.
 Drawn from the base pop od scores selection defined earlier in this procedure, combined with 2 inline selections.
 ```
 
 ### `reports/USP_RPTS_IP_SEPSIS_REPORT.sql::#ETT`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in line device airway records.
 - The flowsheet id that specifies the structure is '900112'.
 - It is not the case that the this item records the exact moment the record was placed has no recorded value.
@@ -2454,13 +2167,11 @@ Drawn from the base pop selection defined earlier in this procedure, restricted 
 
 ### `reports/USP_RPTS_IP_SEPSIS_REPORT.sql::#ODETT`
 ```
-This is a selection of records.
 Drawn from the base pop od scores selection defined earlier in this procedure, combined with 2 inline selections.
 ```
 
 ### `reports/USP_RPTS_IP_SEPSIS_REPORT.sql::#PIV`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in line device airway records.
 - The flowsheet id that specifies the structure is '900111'.
 - It is not the case that the this item records the exact moment the record was placed has no recorded value.
@@ -2469,13 +2180,11 @@ Drawn from the base pop selection defined earlier in this procedure, restricted 
 
 ### `reports/USP_RPTS_IP_SEPSIS_REPORT.sql::#ODPIV`
 ```
-This is a selection of records.
 Drawn from the base pop od scores selection defined earlier in this procedure, combined with 2 inline selections.
 ```
 
 ### `reports/USP_RPTS_IP_SEPSIS_REPORT.sql::#PROPHYLAXIS`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in flowsheet records records, restricted to records also present in flowsheet measurements records.
 - It is not the case that the exact moment when the reading was recorded has no recorded value.
 - The unique identifier for the flowsheet group or row linked is one of the values '9000613042', '9000613043', '9000613044', '9000613045', '9000613047', '9000613048', '9000613050'.
@@ -2484,7 +2193,6 @@ Drawn from the base pop selection defined earlier in this procedure, restricted 
 
 ### `reports/USP_RPTS_IP_SEPSIS_REPORT.sql::#CVVH`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in flowsheet records records, restricted to records also present in flowsheet measurements records.
 - The unique identifier for the flowsheet template (flt) utilized to input the data is '9000001359' (annotated 'ANY FLOWSHEET FROM THIS TEMPLATE IS A CANDIDATE' in the source).
 - The exact moment when the reading was recorded is between the d start date parameter and the d end date parameter (inclusive).
@@ -2492,7 +2200,6 @@ Drawn from the base pop selection defined earlier in this procedure, restricted 
 
 ### `reports/USP_RPTS_IP_SEPSIS_REPORT.sql::#OX`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in flowsheet records records, restricted to records also present in flowsheet measurements records.
 - The unique identifier for the flowsheet group or row linked is one of the values '900201', '900202', '900203', '9000001977'.
 - The exact moment when the reading was recorded is between the d start date parameter and the d end date parameter (inclusive).
@@ -2500,7 +2207,6 @@ Drawn from the base pop selection defined earlier in this procedure, restricted 
 
 ### `reports/USP_RPTS_IP_SEPSIS_REPORT.sql::#ECMO`
 ```
-This is a selection of records.
 Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in flowsheet records records, restricted to records also present in flowsheet measurements records.
 - The unique identifier for the flowsheet group or row linked is '9000101014'.
 - The exact moment when the reading was recorded is between the d start date parameter and the d end date parameter (inclusive).
@@ -2508,7 +2214,6 @@ Drawn from the base pop selection defined earlier in this procedure, restricted 
 
 ### `reports/USP_RPTS_IP_SEPSIS_REPORT.sql::delivery`
 ```
-This is a selection of records.
 Drawn from the main selection defined earlier in this procedure, combined with the base pop selection defined earlier in this procedure, combined with the base pop od scores selection defined earlier in this procedure, combined with the base pop enc reason selection defined earlier in this procedure, combined with the encounterweights selection defined earlier in this procedure, combined with the odhypo selection defined earlier in this procedure, combined with the odabx selection defined earlier in this procedure, combined with the odbol selection defined earlier in this procedure, combined with the odla selection defined earlier in this procedure, combined with the odordset selection defined earlier in this procedure, combined with the odcvl selection defined earlier in this procedure, combined with the odpressorpivot selection defined earlier in this procedure, combined with the odsvo2 selection defined earlier in this procedure, combined with the odprocal selection defined earlier in this procedure, combined with the odbc selection defined earlier in this procedure, combined with the odcsf selection defined earlier in this procedure, combined with the odpiv selection defined earlier in this procedure, combined with the odett selection defined earlier in this procedure, combined with the prophylaxis selection defined earlier in this procedure, combined with the cvvh selection defined earlier in this procedure, combined with the ox selection defined earlier in this procedure, combined with the ecmo selection defined earlier in this procedure, combined with the edposscore edlos selection defined earlier in this procedure, combined with severe sepsis staging records.
 - No membership conditions are applied in this selection.
 ```
@@ -2518,7 +2223,7 @@ Drawn from the main selection defined earlier in this procedure, combined with t
 
 ### `reports/USP_RPTS_NonSevere_Sepsis.sql::reports.NON_SEVERE_SEPSIS_STAGING`
 ```
-This step produces derived values; no source records are read.
+This step removes records from non severe sepsis staging records.
 Drawn from non severe sepsis staging records.
 - The reviewed is 0.
 - The date stamp is datename(month, convert(date, @enddate)) + datename(year, convert(date, @enddate)).
@@ -2529,7 +2234,7 @@ Drawn from non severe sepsis staging records.
 
 ### `reports/USP_RPTS_Severe_Sepsis.sql::reports.SEVERE_SEPSIS_STAGING`
 ```
-This step produces derived values; no source records are read.
+This step removes records from severe sepsis staging records.
 Drawn from severe sepsis staging records.
 - The reviewed is 0.
 - The date stamp is datename(month, convert(date, @enddate)) + datename(year, convert(date, @enddate)).

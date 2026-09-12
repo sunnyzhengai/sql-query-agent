@@ -472,7 +472,8 @@ def test_scopes_speak_in_the_index(world):
     _, entries, _, _, _ = world
     sc = next(e for e in entries if e["identity"] == SCOPE_BASE_POP)
     assert sc["label"] == "scope"
-    assert "selection of records" in sc["words"]
+    # grammar 2.4.0: the floor opens with the composition sentence
+    assert sc["words"].startswith("drawn from")
 
 
 def test_join_layer_adjacency_walks_scope_join_table(world):

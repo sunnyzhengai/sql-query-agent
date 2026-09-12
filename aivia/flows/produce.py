@@ -507,12 +507,21 @@ def _compose_scope(read: ReadApi, tree, scope,
         phrase = _source_phrase(ref.get("table_ref"),
                                 ref.get("resolves_to"), [])
         lines = [f"This step removes records from {phrase}."]
+    elif not reads_tables and not scope.get("from_refs"):
+        # THE RESTORATION (grammar 2.4.0): this elif was REPLACED
+        # by the delete branch at the ledger-close (e8dd8a9) —
+        # DELETE floors lied 'derived values' and no-source floors
+        # fell to the fallback (the 'Constant' corpse) ever since
         lines = ["This step produces derived values; no source records "
                  "are read."]
     elif lead_grain:
         lines = [f"This is a selection of {_pluralize(lead_grain)}."]
     else:
-        lines = ["This is a selection of records."]
+        # Grammar 2.4.0 (Sunny's ruling 2026-09-11): the constant
+        # no-grain opener is DEAD — the composition sentence LEADS;
+        # the degenerate guard below keeps the minimal sentence
+        # only when the floor would otherwise be empty
+        lines = []
     # Grammar 2.0.0 — the composition sentence (the finding-4 heir):
     # sources + join composition, from the same facts the twin's
     # source nodes hold; reference phrases, never raw temp names
@@ -560,6 +569,11 @@ def _compose_scope(read: ReadApi, tree, scope,
     if not bullets and reads_tables:
         bullets = ["- No membership conditions are applied in this "
                    "selection."]
+    if include_lead and not lines:
+        # the degenerate guard (2.4.0): only when NO lead and NO
+        # composition exist does the minimal sentence survive — a
+        # floor never opens with a bare bullet
+        lines = ["This is a selection of records."]
     return "\n".join(lines + bullets)
 
 

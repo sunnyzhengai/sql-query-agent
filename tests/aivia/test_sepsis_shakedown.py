@@ -174,7 +174,10 @@ def test_abx_corpse_union_cte_voices_both_arms(shaken):
     assert "no source records are read" not in floor
     assert "combination of 2 alternative selections" in floor
     assert "duplicates removed" in floor
-    assert floor.count("allmeds selection defined earlier") == 2
+    # grammar 2.4.0: the composition sentence now LEADS (the dead
+    # opener's heir) — the outer scope's own "Drawn from the
+    # allmeds selection…" joins the two per-arm references
+    assert floor.count("allmeds selection defined earlier") == 3
     assert "The thera class code is 11 (annotated 'Antibiotics'" in floor
     assert "The taken time is before the ed departure time" in floor
     # grammar 2.2.0 (the first-leg find): the value-set pointer gained
