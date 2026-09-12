@@ -183,7 +183,7 @@ def effective_dispositions(events_path) -> "dict[str, dict]":
             out[str(tid)] = {          # decision, not the fold key
                 "verb": verb,
                 "state": _DISPOSITION_VERBS.get(verb, "approved"),
-                "by": str(ev.get("user_id") or ""),
+                "performed_by": str(ev.get("user_id") or ""),
                 "at": str(ev.get("event_at") or "")[:19],
                 "persona": str(d.get("persona") or ""),
                 "reason": str(d.get("reason") or ""),

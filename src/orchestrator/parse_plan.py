@@ -455,7 +455,7 @@ def compose_plan(parse: Parse,
                 # flags carry the machine verdicts (cluster layer)
                 plan.append({"op": "retrieve", "ids": ids})
                 plan.append({"op": "census", "kind": "flag",
-                             "contains": grounded[0]["entity"]})
+                             "has_part": grounded[0]["entity"]})
             else:
                 raise ParseRefusal(
                     "a sameness/grain question needs at least one "
@@ -466,7 +466,7 @@ def compose_plan(parse: Parse,
                     "a variants question needs a named item. "
                     + VOCABULARY_OFFER)
             plan.append({"op": "census", "kind": "flag",
-                         "contains": grounded[0]["entity"]})
+                         "has_part": grounded[0]["entity"]})
         elif prim == "reads_or_feeds":
             if grounded:
                 a = grounded[0]
@@ -495,7 +495,7 @@ def compose_plan(parse: Parse,
             # "diabetic individuals" grounded Diabetic Patients but
             # then filtered the flags by the raw words and got zero
             plan.append({"op": "census", "kind": "flag",
-                         "contains": (_anchor_name(grounded[0])
+                         "has_part": (_anchor_name(grounded[0])
                                       if grounded else None)})
         elif prim in ("defines", "owns", "count_rows"):
             # count_rows (B10): the PROPOSAL carries the data-policy
@@ -554,7 +554,7 @@ def execute_plan(plan: "list[dict]", run_kql,
         elif step["op"] == "census":
             results.append(op_census(
                 step["kind"], run_kql, session,
-                contains=step.get("contains")))
+                contains=step.get("has_part")))
         elif step["op"] == "lineage":
             results.append(op_lineage(step.get("table", ""),
                                       run_kql, session,

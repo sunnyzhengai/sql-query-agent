@@ -105,7 +105,7 @@ ENGINE_TOOLS = [
         "description": ("Complete enumeration of one catalog kind — "
                         "the ONLY operation whose results support an "
                         "exact count or an exhaustive statement about "
-                        "the catalog. Optional contains: filter the "
+                        "the catalog. Optional has_part: filter the "
                         "complete enumeration to items whose name, "
                         "business name, or description mentions the "
                         "text — the count stays exact. kind=flag: the "
@@ -116,7 +116,7 @@ ENGINE_TOOLS = [
             "kind": {"type": "string",
                      "enum": ["metric", "step", "term", "report",
                               "measure", "flag"]},
-            "contains": {"type": "string"}},
+            "has_part": {"type": "string"}},
             "required": ["kind"]}}},
     {"type": "function", "function": {
         "name": "retrieve",
@@ -209,8 +209,8 @@ def _run_op(name: str, args: dict, run_kql, ops: OpsSession):
                          str(args.get("mode", "")), run_kql, ops)
     if name == "census":
         return op_census(str(args.get("kind", "")), run_kql, ops,
-                         contains=(str(args["contains"])
-                                   if args.get("contains") else None))
+                         contains=(str(args["has_part"])
+                                   if args.get("has_part") else None))
     if name == "retrieve":
         return op_retrieve([str(i) for i in (args.get("ids") or [])],
                            run_kql, ops)

@@ -2407,7 +2407,7 @@ async function load() {
       ? '<span class="badge state">' + esc(cs.state) + '</span>'
       : '';
     const ruledLine = cs
-      ? '<div class="members">ruled by ' + esc(cs.by)
+      ? '<div class="members">ruled by ' + esc(cs.performed_by)
         + (cs.at ? ' on ' + esc(String(cs.at).slice(0, 10)) : '')
         + (cs.targets && cs.targets.length
            ? ' · target: ' + esc(cs.targets.join(', ')) : '')

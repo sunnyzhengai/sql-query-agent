@@ -465,8 +465,13 @@ def test_system_prompt_is_invariants_only_no_casebook():
 # SYSTEM_PROMPT gained invariant 3b — the fixed-wording policy
 # refusal for patient-data requests. A POLICY statement, not a
 # question shape (P4 holds; it joins rules 1-8 as boundary law).
-PINNED_PROMPT_SHA = ("d71a0b838ddde3abb7de90b957e06132"
-                     "f28176852bbb699e3aa2b9c52738da91")
+# Pin bumped CONSCIOUSLY 2026-09-12: the census tool's filter
+# param renamed contains -> has_part, completing the 2026-09-09
+# reserved-word ruling (1be0628) whose sweep renamed the tests
+# but not the engine. Property rename only, no question shapes;
+# SYSTEM_PROMPT unchanged.
+PINNED_PROMPT_SHA = ("8fc051dc09a1e3327cccfec469b92edf"
+                     "e0b96587010d31aa359352a123c17a36")
 
 
 class TestPGroup:
