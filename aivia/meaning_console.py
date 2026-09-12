@@ -37,6 +37,7 @@ import urllib.parse
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from typing import Any, Dict, List, Optional, Set, Tuple
 
+from aivia import fabric_wire
 from aivia.flows import ask, connect, glossary, grounding
 from aivia.graph.read_api import ReadApi
 from aivia.lenses.ask_index import _fold
@@ -714,6 +715,11 @@ _PAGE = """<!doctype html><meta charset="utf-8">
          border: 1px solid #bbb; border-radius: 4px; }
  pre { background: #f6f6f6; padding: .8rem; white-space: pre-wrap; }
  pre.gql { background: #eef3fb; }
+ .wire { border-left: 3px solid #2b7a4b; padding: .1rem .6rem;
+         margin: .3rem 0; background: #f4faf6; }
+ .wire table.rows th { border: 1px solid #ddd;
+         padding: .25rem .6rem; font-family: monospace;
+         font-size: .9rem; background: #e8f3ec; }
  .meta { color: #777; font-size: .85rem; }
  .round { border-top: 1px solid #e4e4e0; padding-top: .6rem;
           margin-top: .8rem; }
@@ -731,6 +737,7 @@ _PAGE = """<!doctype html><meta charset="utf-8">
 <h2>The meaning-test console
 <span class=meta>(__ESTATE__ · technical layer)</span></h2>
 <p class=meta>__COVERAGE__</p>
+<p class=meta id=wirebox></p>
 <p class=meta>Gates verified structure; this tests MEANING. The
 interpreter tokenizes (its only seat) · vectors match · a
 deterministic planner writes the GRAPH query (shown below every
@@ -744,6 +751,28 @@ answer. No-match and disconnection are honest results.</p>
 <script>
 const log = document.getElementById('log');
 const q = document.getElementById('q');
+const wirebox = document.getElementById('wirebox');
+function renderWire(w) {
+  if (w.reason) {
+    wirebox.textContent = 'live wire DISABLED — ' + w.reason;
+    return;
+  }
+  wirebox.innerHTML = 'live wire (the SERVED Fabric graph): '
+    + (w.on ? 'ON' : 'OFF')
+    + ' · <a href="#" id=wireflip>turn ' + (w.on ? 'off' : 'on')
+    + '</a> · ' + w.spent + ' capacity spend(s) this session'
+    + (w.on ? ' — every question now also queries Fabric' : '');
+  document.getElementById('wireflip').onclick = async (e) => {
+    e.preventDefault();
+    const r = await fetch('/wire?on=' + (w.on ? '0' : '1'));
+    renderWire(await r.json());
+  };
+}
+function refreshWire() {
+  fetch('/wire').then(r => r.json()).then(renderWire)
+    .catch(() => { wirebox.textContent = ''; });
+}
+refreshWire();
 function esc(t) { const d = document.createElement('span');
   d.textContent = t; return d.innerHTML; }
 function append(html) {
@@ -763,6 +792,7 @@ log.addEventListener('click', async (e) => {
     const r = await fetch('/round?q=' + encodeURIComponent(d.q)
       + '&pin=' + encodeURIComponent(d.token + ':::' + d.ident));
     append((await r.json()).html);
+    refreshWire();
   } catch (err) {
     append('<p class=meta>round failed (' + esc(String(err)) +
            ')</p>');
@@ -779,6 +809,7 @@ document.getElementById('ask').addEventListener('submit',
       const r = await fetch('/round?q=' +
         encodeURIComponent(text));
       append((await r.json()).html);
+      refreshWire();
     } catch (err) {
       append('<p class=meta>round failed (' + esc(String(err)) +
              ')</p>');
@@ -859,6 +890,46 @@ def render_round(result: Dict[str, Any]) -> str:
                          result["edge_constraints"])) + "</p>")
     for g in result["gql"]:
         parts.append(f"<pre class=gql>{html.escape(g)}</pre>")
+    # THE LIVE-WIRE TOGGLE (ruled 2026-09-12): the served graph's
+    # answer renders beside the local one — evidence, never the
+    # answer path; errors verbatim (the error-contract)
+    for w in result.get("wire") or []:
+        inner = []
+        if not w["ok"]:
+            inner.append("<p class=meta>wire error ["
+                         + html.escape(w["code"]) + "]: "
+                         + html.escape(w["description"]) + "</p>")
+        else:
+            cap = w["rows"][:20]
+            cols = w["columns"]
+            head = "".join("<th>" + html.escape(c) + "</th>"
+                           for c in cols)
+            cells = "".join(
+                "<tr>" + "".join(
+                    "<td>" + html.escape(str(r.get(c, "")))
+                    + "</td>" for c in cols) + "</tr>"
+                for r in cap)
+            inner.append("<table class=rows><tr>" + head + "</tr>"
+                         + cells + "</table>")
+            if w["row_count"] > len(cap):
+                inner.append(f"<p class=meta>showing {len(cap)} of "
+                             f"{w['row_count']} served rows</p>")
+            if "verdict" in w:
+                inner.append(f"<p class=meta>local "
+                             f"{w['local_count']} row(s) · served "
+                             f"{w['row_count']} row(s) — "
+                             f"{w['verdict']}</p>")
+            else:
+                inner.append(f"<p class=meta>served "
+                             f"{w['row_count']} row(s)</p>")
+        parts.append("<div class=wire><p class=meta>the SERVED "
+                     "graph answers (Fabric Graph):</p>"
+                     + "".join(inner) + "</div>")
+    if result.get("wire_spent") is not None and result.get("wire"):
+        parts.append(f"<p class=meta>capacity spends this session: "
+                     f"{result['wire_spent']} quer"
+                     f"{'y' if result['wire_spent'] == 1 else 'ies'}"
+                     "</p>")
     # DELIVERY BY RESULT SHAPE (the matched-graph ruling): rows
     # render as a TABLE with a visible cap and counted remainder;
     # the conservation line rides along
@@ -906,7 +977,13 @@ def render_round(result: Dict[str, Any]) -> str:
     return "".join(parts)
 
 
-def make_handler(estate: str, coverage: str, ask_fn):
+def make_handler(estate: str, coverage: str, ask_fn,
+                 wire=None, wire_reason: str = ""):
+    # THE LIVE-WIRE TOGGLE (ruled 2026-09-12): OFF at every boot —
+    # flipping it is Sunny's hand (the capacity law); every fired
+    # query is one counted spend
+    wire_state = {"on": False, "spent": 0}
+
     class Handler(BaseHTTPRequestHandler):
         def _send(self, data: bytes, ctype: str) -> None:
             self.send_response(200)
@@ -918,6 +995,22 @@ def make_handler(estate: str, coverage: str, ask_fn):
         def do_GET(self):  # noqa: N802 — http.server's contract
             parsed = urllib.parse.urlparse(self.path)
             params = urllib.parse.parse_qs(parsed.query)
+            if parsed.path == "/wire":
+                if wire is None:
+                    # literal: shape
+                    out = {"on": False, "spent": 0,
+                           "reason": wire_reason}
+                else:
+                    flip = (params.get("on") or [""])[0]
+                    if flip in ("0", "1"):
+                        wire_state["on"] = flip == "1"
+                    # literal: shape
+                    out = {"on": wire_state["on"],
+                           "spent": wire_state["spent"],
+                           "reason": ""}
+                self._send(json.dumps(out).encode(),
+                           "application/json; charset=utf-8")
+                return
             if parsed.path == "/round":
                 q = (params.get("q") or [""])[0]
                 pins = {}
@@ -925,8 +1018,16 @@ def make_handler(estate: str, coverage: str, ask_fn):
                     token, _, ident = p.partition(":::")
                     if token and ident:
                         pins[token] = ident
-                out = {"html": render_round(ask_fn(q, pins))} \
-                    if q.strip() else {"html": ""}
+                if q.strip():
+                    res = ask_fn(q, pins)
+                    if wire is not None and wire_state["on"]:
+                        blocks = fabric_wire.run_round(wire, res)
+                        wire_state["spent"] += len(blocks)
+                        res["wire"] = blocks
+                        res["wire_spent"] = wire_state["spent"]
+                    out = {"html": render_round(res)}
+                else:
+                    out = {"html": ""}
                 self._send(json.dumps(out).encode(),
                            "application/json; charset=utf-8")
                 return
@@ -1003,8 +1104,14 @@ def main() -> None:
                                read, adj, directed, pins=pins)
 
     coverage = coverage_line(entries, exclusions)
+    wire, wire_reason = fabric_wire.from_env()
+    print("live wire: configured (OFF until you flip it — every "
+          "fired query is one capacity spend)" if wire
+          else f"live wire: {wire_reason}")
     server = ThreadingHTTPServer(
-        ("127.0.0.1", port), make_handler(estate, coverage, ask_fn))
+        ("127.0.0.1", port),
+        make_handler(estate, coverage, ask_fn,
+                     wire=wire, wire_reason=wire_reason))
     print(f"the meaning-test console: http://127.0.0.1:{port}/")
     server.serve_forever()
 

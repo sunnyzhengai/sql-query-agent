@@ -1124,3 +1124,40 @@ credit — the kind speaks through its members. A kind entry
 ≥ MATCH_SCORE whose name equals the top instance's label CLAIMS
 the token. Phrases stay safe by the same bar (measured: kind
 0.307 / rank 2026 for a real phrase — nowhere near).
+
+► RULED (Sunny, 2026-09-12 — THE LIVE-WIRE TOGGLE, demo; from
+his question "where is the graph db? is it still faking it?"):
+the console's displayed GQL EXECUTES against the SERVED Fabric
+graph on demand — the graph answers for itself. The execution-
+locality default above STANDS: local execution remains the
+answer path until M11/M12; the wire is per-round EVIDENCE laid
+beside it, never a replacement.
+- **The toggle is Sunny's hand (the capacity law):** OFF at every
+  boot; flipped visibly in the UI for the session; every fired
+  query is one capacity spend, COUNTED on the round (a visible
+  spend line — no silent spends, ever). No default flips it.
+- **What fires is the ARTIFACT:** the exact GQL strings the round
+  already displays — nothing re-planned, nothing rewritten for
+  the wire. If the displayed query weren't the real query, the
+  wire would expose it; that is the point.
+- **Delivery = the comparison:** Fabric's rows render beside the
+  local rows with a per-round conservation line (local N rows ·
+  served N rows · MATCH / DIVERGE). A divergence is a FINDING,
+  reported never smoothed — the mirror's equality, until now
+  proven only at batch gates, becomes checkable per round.
+- **The wire is the documented contract** (GQL Query HTTP API,
+  public preview): POST /v1/workspaces/{ws}/GraphModels/{gm}/
+  executeQuery?preview=true · bearer token (resource
+  api.fabric.microsoft.com) · body {"query": …} · typed TABLE
+  back; success = status codes 00–03 prefixes, anything else
+  renders code + description VERBATIM (the error-contract).
+- **Config is Sunny's, never committed:** workspace id + graph
+  model id + token ride environment (token alternatively fetched
+  from `az account get-access-token` at need); the console NEVER
+  stores a token. Unconfigured or unreachable = the toggle shows
+  DISABLED with the reason — the seat-down banner law, never a
+  silent fallback to local-only.
+- **Tests:** deterministic with a scripted transport double (no
+  live HTTP in the suite — the doubles law); the live wire fires
+  only by Sunny's hand. This surface keeps THE TURN DEFAULT: the
+  wire adds evidence to the round, it steals no choice point.
