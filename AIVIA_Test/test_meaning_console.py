@@ -6,12 +6,14 @@ technical adjacency, exact-tier matching, the planner (minimal
 connecting subgraph), the GQL writer's Fabric legality, cache
 seeding, and the honest outcomes (gap · relaxation · zero).
 
-THE LIVE BATTERY (AIVIA_LIVE=1 + OPENAI_API_KEY): 18 questions —
+THE LIVE BATTERY (AIVIA_LIVE=1 + OPENAI_API_KEY): 21 questions —
 findability · meaning readback · column search · relationship ·
-absence honesty · enumeration · impact · the join-layer family —
-ALL BLESSED by Sunny ("bless them all", 2026-09-11: his six by
-use, the drafted rest by his word); assertions pin laws and
-expected crowns, never verbatim model wording.
+absence honesty · enumeration · impact · the join-layer family
+(18 BLESSED by Sunny, "bless them all" 2026-09-11: his six by
+use, the drafted rest by his word) + the condition family (3,
+drafted 2026-09-11 night, blessing per the standing path);
+assertions pin laws and expected crowns, never verbatim model
+wording.
 
 Proves: contract:aivia-design-to-code
 """

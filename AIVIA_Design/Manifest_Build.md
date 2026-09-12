@@ -103,7 +103,7 @@ the current truth for scoring/grounding):
 | 13 | user decisions die on restart (governance journal) | E | BUILT | opt-in journal_path; kg3@ writes journal; replay at boot LAST, idempotent; builders never journal |
 | 14 | no revoke at the surface | E | OPEN |
 | 15 | clarify-actions LIVE BUG (typed input after a clarify errors) | E | BUILT: actions joined USAGE_ACTIONS by ruling; hermetic clarify→next-round pin (registry mirror lands in F) |
-| 16 | literal-census enforcement unbuilt | F | OPEN |
+| 16 | literal-census enforcement unbuilt | F | BUILT as §E E3 (2026-09-09): AST census + Closed_Sets mirrors + registry-law prompts — row flipped 2026-09-12 (was left OPEN after E3 landed) |
 | 17 | "delivery · delivery" labels (expected to dissolve in #10) | B | BUILT | dissolved into present_hits (names + identities per row) |
 
 Steps: A,B,C + gap 15 LANDED (2026-09-07). Resequenced 2026-09-08
@@ -128,8 +128,8 @@ estate. Landed:
 | claim | state | evidence |
 |---|---|---|
 | fake_interpreter dies → scripted_proposals (authored input, strict) | BUILT | tests/aivia/doubles.py; keys fold at construction (the case-trap class dead at the generator); ScriptGap on any unscripted question; test_doubles.py pins it |
-| fake_embed dies → recorded-real vectors | RECORDING | committed fixture AIVIA_Product/fixtures/embeddings/text-embedding-3-small.json.gz — every vector computed by the real model, replayed byte-identical; RecordingGap on unrecorded text; AIVIA_RECORD=1 re-records |
-| the live tier | BUILT (verify pending) | tests/live/test_live_seats.py — AIVIA_LIVE=1, real gpt-4o-mini + real embeddings + the real journal; payoff question, over-mark corpse, cage shape, acronym expansion; CI shows it SKIPPED (visible), run locally before any "done" |
+| fake_embed dies → recorded-real vectors | BUILT (flipped 2026-09-12; was RECORDING) | committed fixture AIVIA_Product/fixtures/embeddings/text-embedding-3-small.json.gz — every vector computed by the real model, replayed byte-identical; RecordingGap on unrecorded text; AIVIA_RECORD=1 re-records; re-recorded at Grammar 2.4.0 (312 new floor texts) — the recording loop is routine, no longer in flight |
+| the live tier | BUILT + RUN (verify closed 2026-09-11) | tests/live/test_live_seats.py — AIVIA_LIVE=1, real gpt-4o-mini + real embeddings + the real journal; payoff question, over-mark corpse, cage shape, acronym expansion; CI shows it SKIPPED (visible); run live repeatedly through 2026-09-11 (meaning-console battery 21/21 rides the same tier) |
 | acronym blessing executed | DONE | 112 blessed (dm=Data Mart, dc=Discharge fixed; 12 plain words cut; 33 held in acronym_remainder.json for Sunny — the od* family reads as sepsis order/bundle prefixes, not Overdose) |
 
 ## Section C — the seats (the seat-claim rule enforced)
@@ -137,8 +137,8 @@ estate. Landed:
 | seat | status | evidence / reason |
 |---|---|---|
 | INTERPRETER | BUILT | make_interpreter + the cage (validate_interpretation); prompt 3.0.0 registry law; live-tier test (tests/live) |
-| RANKER | BUILT (fixture recording in flight) | SemanticIndex over cards; recorded-REAL vectors replacing the fake embedder (step J); estate .cache at boot |
-| SCRIBE | OPEN — the 2026-09-09 finding | ONLY the acronym-expansion proposer ever ran (enrich.py). Description drafting — the seat's named job — was NEVER BUILT: file "descriptions" are structural voicing walls + borrowed table catalog text. Design = The Speech Contract (Design_Graph_Engine.md, landed 09-09); build awaits Sunny's route ruling (Scribe-drafts vs deterministic distillation) |
+| RANKER | BUILT | SemanticIndex over cards; recorded-REAL vectors landed (step J fixture, committed + re-recorded routinely); estate .cache at boot |
+| SCRIBE | BUILT (row flipped 2026-09-12; the finding closed the day it landed) | the 2026-09-09 finding (only the acronym proposer had ever run) was closed by §E E1 THE SAME DAY: route RULED by Sunny (Scribe-drafts) → describe.py scan→draft→land, basis-stamped, prompt = registry law 1.1.0; drafts live in both estates' descriptions.json; test_speech_contract green. The glossary Phase-3 evidence-packed Scribe rework remains a recorded standing gap (Ruling_Glossary_Process.md) |
 | SMOOTHER | DEFERRED | gated, optional; method ruled (slot-survival), wires when the seat wires (A #15) |
 
 ## Section E.1 — THE DERIVATION RULING (Sunny, 2026-09-09, post-E1)
@@ -174,10 +174,16 @@ closing COMMIT lands in this table. No Fabric operation without
 Sunny's explicit go (his capacity, his hand). No Neo4j — Fabric
 Graph on Sunny's capacity is the verification surface.
 
+*(TABLE FROZEN AS RECORD 2026-09-12: statuses below stopped
+updating when §E6 re-laddered the batches on 2026-09-10 — the M2
+row's "IN BUILD" referred to the SUPERSEDED scope+reads design
+(the M2 redesign killed it before its gate ran). Current batch
+truth = §E6 Phase 1's table; M1 alone closed here.)*
+
 | batch | ships | ties DOWN into | status | commit |
 |---|---|---|---|---|
 | M1 | technical layer: db · db_schema · table · column + has_part ×3 (parquet export, loader, runbook, reserved-word gate) | — | **VERIFIED by Sunny's GQL 2026-09-10** (db 1 · db_schema 3 · table 90 · column 4554 · 4647 has_part · corpse quotes intact) | 1a2e212 → 6d6f4dc |
-| M2 | scope ×312 — descriptions STORED on the node (lead render; verbatim law: stored == recomputed) + scope—reads→table (TRUE grain) | table | IN BUILD | — |
+| M2 | scope ×312 — descriptions STORED on the node (lead render; verbatim law: stored == recomputed) + scope—reads→table (TRUE grain) | table | SUPERSEDED (see §E6 M2 redesign) | — |
 | M3 | condition + param — stored voiced phrases + scope has_part + condition—resolves_to→column | scope + column | queued | — |
 | M4 | derived_column | scope | queued | — |
 | M5 | statement — stored R11 descriptions + statement—has_part→scope | scope | queued | — |
@@ -212,10 +218,13 @@ STORE node at blessing (M8).
    ruling; replaces the threshold gate that real physics broke.
 3. **MATCH at card grain** (best_card_score) — coded, uncommitted,
    rides the same ruling set.
-4. **Acronym remainder**: 33 held tokens (acronym_remainder.json),
-   headline: what OD* means in this estate.
+4. **Acronym remainder**: 33 held tokens — now status 'held' in
+   glossary/acronym_ledger.json (acronym_remainder.json RETIRED
+   2026-09-11 into the glossary process); headline: what OD* means
+   in this estate.
 5. **E2** revoke at the surface (meaning-book poisoning has no
-   undo) · **F** the literal census build (Audit_Literal_Law_Plan).
+   undo). *(The F literal-census build, formerly listed here, was
+   BUILT as §E E3 on 2026-09-09 — pointer cleared 2026-09-12.)*
 6. Deferred-conditional: lexical/hybrid scorer (trigger = observed
    label overcrowding after the speech fix).
 7. Deferred on identity: tree surface · promotion queue · revoke UI
@@ -570,8 +579,8 @@ Fabric. M4–M7 keep their contents and numbers.
 
 | batch | ships | V2 / redesign notes | ties DOWN into | status |
 |---|---|---|---|---|
-| M2 | THE JOIN LAYER: scope ×44 (descriptions STORED, verbatim law) + join ×93 — scope—has_part→join + join—left_side/right_side→table-or-scope + `reads` REMAINDER ONLY (~6, pinned exactly at build) | joins testable ALONE: the DRIFT QUERY (join pairs without declared `joins_to` == the 2 findings) runs at this gate with no condition nodes needed; sides = ON-resolved pair, side order syntactic; scope sides legal; cross joins (no ON) counted at build; THE COVERAGE INVARIANTS replace side-reads: reads ∩ sides = ∅ AND reads ∪ sides = read-set, per scope | table (+ scope sides within batch) | **BUILT 2026-09-10** — store-verified (join 95 · sides 95/87 · reads remainder 6 · drift query = its 2 findings ON THE STORE · conservation 95=87+8+0); registry 1.38.0 (ledger PRESENT flips + join census rows); GATE RULED on the DEV ESTATE (Sunny) — his GQL closes it |
-| M3 | THE CONDITION LAYER: condition ×748 + param ×2 (@dStartDate/@dEndDate) — join—has_part→condition (ON roots ×90, 3 pinned at build) + scope—has_part→condition (where/case roots ×132) + condition—has_part→condition (×526) + condition—resolves_to→column ×150 / →param ×2 (role-tagged) + uses_param ×2 | conditions testable ALONE: per-kind census (14 kinds), clause split (join_on 194 · where 167 · case_when 387), degenerate subkind 25, roles subject 104 · comparand 43 · selection 3; clauseProvenance property retired — parentage carries it; 6 IF-statement conditions + @StartDate/@EndDate HOLD for M5 (birth-edge law) | join + scope + column | **BUILT 2026-09-10** — store-verified (condition 1141 — the TREE out-counts the authored twin 748, precedent 95v93 · param 2 · resolves_to 165 role-tagged · conservation 95+229+817=1141 · grammar-voiced descriptions 1141/1141) · joinType DEFERRAL CLOSED (the tree carried join_type: Inner 39 / LeftOuter 56) · registries 1.39.0 · gate: AIVIA_Test/GQL_Gates.md §M3, Sunny's GQL closes |
+| M2 | THE JOIN LAYER: scope ×44 (descriptions STORED, verbatim law) + join ×93 — scope—has_part→join + join—left_side/right_side→table-or-scope + `reads` REMAINDER ONLY (~6, pinned exactly at build) | joins testable ALONE: the DRIFT QUERY (join pairs without declared `joins_to` == the 2 findings) runs at this gate with no condition nodes needed; sides = ON-resolved pair, side order syntactic; scope sides legal; cross joins (no ON) counted at build; THE COVERAGE INVARIANTS replace side-reads: reads ∩ sides = ∅ AND reads ∪ sides = read-set, per scope | table (+ scope sides within batch) | **ACCEPTED (Sunny's GQL, 2026-09-11) — SEALED**; built 2026-09-10, store-verified (join 95 · sides 95/87 · reads remainder 6 · drift query = its 2 findings ON THE STORE · conservation 95=87+8+0); registry 1.38.0; gate sheet GREEN on the served graph (AIVIA_Test/GQL_Gates.md) |
+| M3 | THE CONDITION LAYER: condition ×748 + param ×2 (@dStartDate/@dEndDate) — join—has_part→condition (ON roots ×90, 3 pinned at build) + scope—has_part→condition (where/case roots ×132) + condition—has_part→condition (×526) + condition—resolves_to→column ×150 / →param ×2 (role-tagged) + uses_param ×2 | conditions testable ALONE: per-kind census (14 kinds), clause split (join_on 194 · where 167 · case_when 387), degenerate subkind 25, roles subject 104 · comparand 43 · selection 3; clauseProvenance property retired — parentage carries it; 6 IF-statement conditions + @StartDate/@EndDate HOLD for M5 (birth-edge law) | join + scope + column | **ACCEPTED (Sunny's GQL, 2026-09-11) — SEALED**; built 2026-09-10, store-verified (condition 1141 — the TREE out-counts the authored twin 748, precedent 95v93 · param 2 · resolves_to 165 role-tagged · conservation 95+229+817=1141 · grammar-voiced descriptions 1141/1141) · joinType DEFERRAL CLOSED (the tree carried join_type: Inner 39 / LeftOuter 56) · registries 1.39.0 · gate sheet GREEN incl. roles (AIVIA_Test/GQL_Gates.md §M3) |
 | M4 | derived_column ×156 + `cites` ×100 | unchanged | scope + column | queued |
 | M5 | statement ×67 (R11 renders; operational 31 = counted-missing debt until M6) + the M3 holdovers (+6 conditions, +2 params) | unchanged | scope + condition | queued |
 | M6 | file — drafted aboutness (LLM compression OF the render, meaning-key anchored) + file—has_part→statement/param + the COMPOSITION CHECK | closes the 31-statement debt | statement + param | queued |
@@ -626,11 +635,83 @@ batch is drafted here until untabled — Design_Chatbot.md governs.
 1. **Ratify v2** — DONE 2026-09-10: ratified same day;
    Design_Graph_Engine_v2.md renamed over Design_Graph_Engine.md
    (prior content stands in git history); this section governs.
-2. **M2's GQL gate** — built (799cc68 + 7465be9), no closing
-   commit in the ladder; M3 attaches to scope and needs the
-   verified parent.
+2. **M2's GQL gate** — DONE 2026-09-11: M1–M3 accepted in one
+   pass on the served graph (the gate sheet ran GREEN; batches
+   SEALED — see the M1–M3 ACCEPTED block above). M4 now holds
+   the next entry gate.
 3. **Landing contracts + connector scope** (blocks M8) · **vector
    capability check** (blocks M12) · **inferred-vs-declared
    confidence vocabulary** (blocks nothing in this ladder —
    inference ships in no batch above; recorded so its absence is
    ruled, not silent).
+
+## 2026-09-12 — the ledger audit + the sweep completed
+
+**THE LEDGER AUDIT (Sunny's ask):** the full deterministic suite
+ran against every claim above — 2028 passed and FIVE RED, all
+five one regression class: the 1be0628 reserved-word sweep
+(2026-09-09, by→performed_by · contains→has_part) renamed the
+TEST expectations but never the old Bridge implementations, and
+its gate ran the 341-test aivia subset, so the reds were never
+seen. An echo of the subset-gate class. Ten stale rows flipped
+in this file same day (each flip carries its date inline).
+
+**THE SWEEP COMPLETED (Sunny's ruling: apply the renames to the
+code):** src/console.py fold-back emits `performed_by` (+ the
+webapp JS reader); the census tool's filter param is `has_part`
+end to end (schema · dispatch · plan steps); op_census's internal
+Python kwarg and the `effective_contains` receipt key stay — they
+never reach GQL and green tests pin them; descriptions.py's
+"contains" is English prose (the restored-preposition principle).
+The P4 prompt-hash pin bumped CONSCIOUSLY (its own ledger
+records why). Evidence: tests/orchestrator + tests/test_console
++ tests/webapp 433/433; ruff clean; full suite CONFIRMED green
+same day — 2033 passed · 25 skipped · 8 xfailed · 0 failed.
+
+**THE LIVE-WIRE TOGGLE (ruled + built 2026-09-12 — Sunny's
+question "where is the graph db? is it still faking it?" became
+the design; the rider in Design_Chatbot §THE MEANING-TEST
+CONSOLE is the law):** the console's displayed GQL now EXECUTES
+against the SERVED Fabric graph on demand — aivia/fabric_wire.py
+speaks the documented GQL Query HTTP API (public preview;
+POST …/executeQuery?preview=true, bearer token, {"query": …} in,
+typed TABLE out); the served rows render BESIDE the local rows
+with the per-round conservation line (local N · served N ·
+MATCH/DIVERGE — claimed only where honest: one query beside a
+rows table). OFF at every boot; the flip is Sunny's hand (the
+capacity law); every fired query is one COUNTED spend, shown on
+the page. Config = AIVIA_FABRIC_WORKSPACE +
+AIVIA_FABRIC_GRAPH_MODEL (+ AIVIA_FABRIC_TOKEN or az CLI at
+need — the token is never stored); unconfigured = the toggle
+reports DISABLED with the reason (the seat-down banner law).
+Local execution REMAINS the answer path (the execution-locality
+default stands until M11/M12) — the wire is per-round evidence.
+Evidence: AIVIA_Test/test_fabric_wire.py — 15 deterministic
+tests (scripted transport, the doubles law; incl. OFF-at-boot +
+counted-spend over a real local server round); full suite 2047
+green (the literal census caught the new module's 12 unmarked
+collections — classified; TEST_MAP regenerated); ruff clean.
+**THE LIVE FIRST FIRE (same day, Sunny's hand):** capacity
+resumed by Sunny; smoke query through the wire returned
+nodeCount 5930 == the gate sheet's census; Sunny's live session
+(4 spends) ran the EVENT_ID round with the wire ON — and the
+wire EARNED ITS KEEP on round one: `local 9 · served 4 —
+DIVERGE`. THE FINDINGS (assessed, untouched — awaiting Sunny's
+rulings): (1) same-named anchor columns render bare (four
+EVENT_ID columns → visually identical repeat rows; the
+owner-qualify law never reached enumeration rows); (2) the
+pass-through citation renders the vacuous ON-condition phrase
+("the event record unique is the event record unique") — the
+nearest-connective rule fails for join chains where the join's
+concrete ON text is the informative truth; (3) the GQL artifact
+covers containment only while the delivery includes pass-through
+rows — the artifact under-describes the answer (against the
+ruled artifact law) and the DIVERGE verdict compares mismatched
+scopes. ROOT for the "too much answer" question: the
+interpreter DROPS RELATION WORDS ("contain" absent from the
+cached proposal's mentions) so the built edge-kind traversal
+constraint never fires — the candidate fix is prompt 3.1.0
+(relation words are referring words) + counted-remainder
+delivery for the unclaimed connections; §D-adjacent, Sunny's
+word gates it (note the join-layer edge-kind deferral: a 'read'
+constraint would veto side-paths — must land together).
