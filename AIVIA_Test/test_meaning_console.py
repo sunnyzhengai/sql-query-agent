@@ -6,11 +6,12 @@ technical adjacency, exact-tier matching, the planner (minimal
 connecting subgraph), the GQL writer's Fabric legality, cache
 seeding, and the honest outcomes (gap · relaxation · zero).
 
-THE LIVE BATTERY (AIVIA_LIVE=1 + OPENAI_API_KEY): ~8 questions in
-five families — findability · meaning readback · column search ·
-relationship grounding · absence honesty — DRAFTED for Sunny's
-gap-check and blessing; assertions pin laws and expected crowns,
-never verbatim model wording.
+THE LIVE BATTERY (AIVIA_LIVE=1 + OPENAI_API_KEY): 18 questions —
+findability · meaning readback · column search · relationship ·
+absence honesty · enumeration · impact · the join-layer family —
+ALL BLESSED by Sunny ("bless them all", 2026-09-11: his six by
+use, the drafted rest by his word); assertions pin laws and
+expected crowns, never verbatim model wording.
 
 Proves: contract:aivia-design-to-code
 """
@@ -559,7 +560,7 @@ def test_blessed_acronyms_join_the_console_index(tmp_path):
         assert word in crown["expansions_text"]
 
 
-# ---- THE LIVE MEANING BATTERY (drafted for Sunny's blessing) --------
+# ---- THE LIVE MEANING BATTERY (BLESSED in full, 2026-09-11) ---------
 live = pytest.mark.skipif(
     not os.environ.get("AIVIA_LIVE"),
     reason="the live battery runs with AIVIA_LIVE=1 (live-seat rule)")
@@ -622,8 +623,8 @@ BATTERY = [
      "IF i update the column ENCOUNTER_ID, which tables are "
      "impacted?",
      ["ED_ENCOUNTERS_FACT", "HOSPITAL_ENCOUNTERS"]),
-    # ---- THE JOIN-LAYER FAMILY (the second target — DRAFTED
-    # 2026-09-11 for Sunny's gap-check; his pass pins them) ----
+    # ---- THE JOIN-LAYER FAMILY (the second target — BLESSED
+    # with the rest, "bless them all" 2026-09-11) --------------
     ("scope-meaning",
      "what does the #Base_Pop selection mean?",
      ["#Base_Pop"]),

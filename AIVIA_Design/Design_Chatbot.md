@@ -992,10 +992,11 @@ column search · relationship grounding · absence honesty ·
 enumeration · impact — deterministic pipeline parts tested
 keyless; the live seats under the live-seat rule. Sunny
 gap-checks and blesses the battery; regressions surface
-mechanically thereafter. *(Status 2026-09-11: 14 questions —
-the 8 drafted + SUNNY'S SIX, hand-tested on the web UI and
-pinned; 14/14 live. The six are blessed by use; the drafted 8
-pass but still await his explicit word.)*
+mechanically thereafter. *(Status 2026-09-11 late: 18 questions
+— the original 8, SUNNY'S SIX, and the join-layer four — ALL
+BLESSED ("bless them all"): the six by use, the rest by his
+word; 18/18 live. The battery carries Sunny's authority in
+full.)*
 
 ► RULED (Sunny, 2026-09-11, from the ADT_EVENT rounds): TWO
 riders on step 3. (1) THE LABEL CONSTRAINT WIRED: a token that
