@@ -255,6 +255,33 @@ def test_label_constraint_crowns_the_grain_the_user_named(world):
         and "ADT_EVENTS" in r["gql"][0]
 
 
+def test_meaning_card_default_names_the_grain_gets_the_meaning(
+        world):
+    # law 4 THE MEANING CARD DEFAULT (Sunny, 2026-09-13: "the
+    # table question came back with too much information. can we
+    # make table answers like the column answers?"): naming the
+    # grain ("…table mean") delivers the anchor's OWN meaning row
+    # — the old neighborhood dump was a population-size accident
+    read, entries, _, adj, directed = world
+    by_id = {e["identity"]: e for e in entries}
+    col = dict(by_id["emr|dbo|ED_EVENT_INFO|ADT_EVENT_ID"])
+    tab = dict(by_id[ADT])
+    semantic = _ScriptedSemantic({"ADT_EVENT": [
+        {**col, "score": 1.603}, {**tab, "score": 1.470}]})
+    r = mc.answer_question("what does the ADT_EVENT table mean",
+                           _scripted_tokens(["ADT_EVENT", "table"]),
+                           entries, semantic, read, adj, directed)
+    assert r["mode"] == "list"
+    assert len(r["rows"]) == 1
+    assert r["rows"][0]["a"] == "ADT_EVENTS"
+    assert "repository" in r["rows"][0]["words"]  # its own aboutness
+    # the neighborhood stays ONE ASK away: the bare name keeps it
+    r2 = mc.answer_question("ADT_EVENTS",
+                            _scripted_tokens(["ADT_EVENTS"]),
+                            entries, None, read, adj, directed)
+    assert r2["mode"] == "neighborhood"
+
+
 def test_label_constraint_is_a_proposal_never_a_veto(world):
     read, entries, _, adj, directed = world
     by_id = {e["identity"]: e for e in entries}

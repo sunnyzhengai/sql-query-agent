@@ -857,7 +857,10 @@ def answer_question(question: str, interpret_fn,
         mode = "connection"
         plan = plan_connection(anchors, adj,
                                allowed=edge_kinds or None)
-    elif len(anchors) == 1:
+    elif len(anchors) == 1 and anchors[0]["label"] not in {
+            _kind_label(k["name"]) for k in kind_hits}:
+        # a BARE single anchor (no kind word named its grain)
+        # keeps the neighborhood card — law 4's one-ask-away view
         mode = "neighborhood"
         a = anchors[0]["identity"]
         nbrs = adj.get(a, [])
@@ -870,8 +873,13 @@ def answer_question(question: str, interpret_fn,
         gql = [f"MATCH (a:{anchors[0]['label']})-[e]-(b) FILTER "
                f"a.name = '{anchors[0]['name']}' "
                "RETURN a.name, b.name"]
-    elif len(anchors) > 1:
-        # one token, many equal citizens: the set IS the answer
+    elif anchors:
+        # one token's equal citizens — OR one anchor whose grain
+        # the question NAMED (law 4 THE MEANING CARD DEFAULT,
+        # Sunny 2026-09-13: "…table mean" answers like the column
+        # answer — the thing's OWN meaning row, never the
+        # neighborhood dump; the dump was a population-size
+        # accident). The set IS the answer.
         mode = "list"
         # literal: shape
         rows = [{"a": m["name"], "edge": "",

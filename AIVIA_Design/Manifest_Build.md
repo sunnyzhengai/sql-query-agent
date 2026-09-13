@@ -949,6 +949,25 @@ failed**. The type ladder is LIVE on ed_sepsis_dev; it earns
 its keep on the EVENT_INSTANT class (temporal truth with no
 temporal words) as future SQL reaches such columns.
 
+**THE MEANING CARD DEFAULT (Sunny's screenshots, 2026-09-13:
+"the table question came back with too much information. can we
+make table answers like the column answers?" → "ok go"):** ROOT
+found in the shape ladder — the difference was a
+POPULATION-SIZE ACCIDENT, never a ruling: BED_STAY_ID matched
+two same-named columns → the many-equal-citizens LIST (meaning
+rows); ADT_EVENTS matched one table → the single-anchor
+NEIGHBORHOOD (20 of 106 connections dumped). RULED + BUILT
+(Design_Chatbot §MEANING-TEST CONSOLE law 4): when the question
+NAMES the grain with a kind word ("…table mean") and one
+instance anchors under that label, the answer is the anchor's
+OWN meaning row — the column answer's shape; the bare-name
+question keeps its neighborhood card (the wide view ONE ASK
+away — the near-first law's sibling). Test:
+test_meaning_card_default_names_the_grain_gets_the_meaning
+(the exact screenshot round replayed: mode list, one row,
+"repository" in its own words; bare "ADT_EVENTS" still
+neighborhood).
+
 **THE PAUSED-CAPACITY FIND (Sunny's live test, 2026-09-13:
 wire ON, capacity PAUSED, two rounds "seem to work normally" —
 "how do i know if this live test page is really wired into
