@@ -564,7 +564,9 @@ def test_scope_rooted_conditions_speak_on_conditions_stay_out(
     _, entries, exclusions, _, _ = world
     conds = [e for e in entries if e["label"] == "condition"]
     assert conds and all("::cond#" in e["identity"] for e in conds)
-    arrival = next(e for e in conds if "arrived" in e["words"])
+    # R5.b blessed vocabulary (2026-09-13): ADT_ARRIVAL_DATE
+    # speaks its blessed name "arrival date"
+    arrival = next(e for e in conds if "arrival date" in e["words"])
     assert arrival["identity"].endswith("#Base_Pop::cond#12")
     # the vacuous ON equalities are NOT searchable grains
     assert exclusions["condition_on"] > 0
@@ -599,7 +601,8 @@ def test_condition_pass_through_finds_the_filtering_scope(world):
         entries, semantic, read, adj, directed)
     assert r["mode"] == "enumeration"
     hits = [row for row in r["rows"] if row["a"] == "#Base_Pop"]
-    assert hits and any("arrived" in row["edge"] for row in hits)
+    assert hits and any("arrival date" in row["edge"]
+                        for row in hits)  # blessed words (R5.b)
 
 
 def test_param_impact_enumerates_the_using_scopes(world):
@@ -782,9 +785,10 @@ def test_condition_tree_delivers_whole(world):
     assert by_tail["cond#8"]["words"] == ("the taken time is before "
                                           "the ed departure time "
                                           "(noted 'while in ed').")
-    assert by_tail["cond#9"]["words"] == ("the route of "
-                                          "administration for a "
-                                          "medication is 11 (noted "
+    # R5.b blessed vocabulary (Sunny's delegated curation,
+    # 2026-09-13): MED_ROUTE_CODE speaks "medication route"
+    assert by_tail["cond#9"]["words"] == ("the medication route is "
+                                          "11 (noted "
                                           "'intravenous').")
     assert "is one of the values" in by_tail["cond#10"]["words"]
     # the conjunction semantics FRAME the list

@@ -461,6 +461,53 @@ def test_namer_cache_spends_nothing_on_rerun(tmp_path):
     assert n3.calls == 0 and counts["kept"] == 2
 
 
+class _FlakyNamer:
+    """Raises on one identifier — the live batch-killer of
+    2026-09-13 (one network timeout took the whole run and every
+    spent call with it)."""
+
+    def __init__(self, script, fail_on):
+        self.inner = _FakeNamer(script)
+        self.fail_on = fail_on
+
+    def __call__(self, name, description):
+        if name == self.fail_on:
+            raise OSError("Operation timed out")
+        return self.inner(name, description)
+
+
+def test_seat_failure_is_contained_and_spends_survive(tmp_path):
+    # THE BATCH-KILLER FIX (Echo Law, first failure 2026-09-13):
+    # one seat failure counts and continues — every other target
+    # lands, the registry writes, and the cache holds every
+    # SUCCESSFUL pair so a re-run spends only the failed target
+    from aivia.flows import enrich
+    _, read = _wired_world()
+    cache = tmp_path / "names_cache.json"
+    flaky = _FlakyNamer({"MED_ADMIN_RECORDS":
+                         ["medication administration"]},
+                        fail_on="MAR_ACTION_CODE")
+    counts = enrich.propose_blessed_names(
+        read, tmp_path, flaky, model="m", prompt_version="1.0.0",
+        run_at=T0, cache_path=cache)
+    assert counts["seat_error"] == 1
+    assert counts["proposed"] == 1  # the healthy target landed
+    rows = glossary.load_blessed_subjects(tmp_path)
+    assert TBL in rows and COL not in rows
+    assert cache.is_file()  # the good pair survived the failure
+    # the re-run heals: cache serves the good pair (0 calls for
+    # it), only the failed target spends
+    healed = _FakeNamer({"MAR_ACTION_CODE":
+                         ["administration action"],
+                         "MED_ADMIN_RECORDS":
+                         ["medication administration"]})
+    counts2 = enrich.propose_blessed_names(
+        read, tmp_path, healed, model="m", prompt_version="1.0.0",
+        run_at=T0, cache_path=cache)
+    assert healed.calls == 2  # ONLY the failed target
+    assert counts2["proposed"] == 1 and counts2["kept"] == 1
+
+
 def test_field_law_blessed_rows_are_machine_untouchable(tmp_path):
     from aivia.flows import enrich
     _, read = _wired_world()

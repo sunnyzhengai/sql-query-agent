@@ -323,6 +323,14 @@ def build_store(estate: str, journal_path=None, descriptions=True):
         inbound.receive_extract(store, reg,
                                 kg1_intake.load_snapshot(snap),
                                 known_packs={pack})
+    # R5.b SEEDING ORDER (the 2026-09-13 find): blessed names must
+    # exist BEFORE the estate maps — condition_render reads them at
+    # materialization; seeding after build would leave every stored
+    # text unblessed while recompute saw the blessings (a verbatim-
+    # law breach). KG1 exists here; the estate hasn't voiced yet.
+    from aivia.flows import glossary
+    glossary.seed_blessed_names(store, ReadApi(store),
+                                base / "glossary")
     inbound.receive_estate(store, reg, base / "estate_snapshot")
     if (base / "pbi_snapshot").is_dir():
         inbound.receive_pbi(store, base / "pbi_snapshot")

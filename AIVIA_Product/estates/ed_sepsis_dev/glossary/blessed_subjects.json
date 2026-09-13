@@ -1,0 +1,1411 @@
+{
+ "emr|dbo|ADT_EVENTS|DEPARTMENT_ID": {
+  "status": "blessed",
+  "description_hash": "ee500d4d87b61d1a4abb921e394b9766221b23e1d837075b403e6c962ecc656c",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "unit",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|ADT_EVENTS|ENCOUNTER_ID": {
+  "status": "blessed",
+  "description_hash": "edd819d82b84dca79aa276d41b959332a358059ec0c7e7474712268d7e5c4310",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "encounter",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|ADT_EVENTS|EVENT_ID": {
+  "status": "blessed",
+  "description_hash": "31068c3f2f5dd5e846ff85db8598526accb01aeb46acaec2b7cf032fcf73cd00",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "event record",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|ADT_EVENTS|EVENT_SUBTYPE_CODE": {
+  "status": "blessed",
+  "description_hash": "cbbb4e35836ef48a41947fa4b3afb49309c2a5cb049b4465d2733a96118fa438",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "event category",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|ADT_EVENTS|EVENT_TYPE_CODE": {
+  "status": "blessed",
+  "description_hash": "b1a5abeeb1ed6f733c51a7e66268c11c15679f415c666a9cebdf28e693d164e8",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "event type",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|ADT_EVENTS|XFER_IN_EVENT_ID": {
+  "status": "blessed",
+  "description_hash": "adb296f6ae95ed68508f49de278475b219bef4b160d156eeb080b18b5fbb43cb",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "transfer record",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|ALERT_ACTIONS|ACTION_TAKEN_CODE": {
+  "status": "blessed",
+  "description_hash": "1b901ce6aa6b247c810c58ead8dfe6efb2e1cc8f9f726d2b1172fea3c11eb026",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "user action",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|ALERT_ACTIONS|ALT_ENCOUNTER_ID": {
+  "status": "blessed",
+  "description_hash": "efa0964ccc1e1f1b52acb8b29bbfd00cf4457a9613c3549e16cc79c21079fef3",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "alert encounter",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|ALERT_ACTIONS|LINE": {
+  "status": "blessed",
+  "description_hash": "7174a8a4c4706cb963ac8ab1e886ac2ae3f2e904bf079e269219c5f4b815270d",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "line count",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|ALERT_HISTORY|ALT_ACTION_INST": {
+  "status": "blessed",
+  "description_hash": "11fc24fa2988c2277d7bd899693e5a47ee61bf0c33278f945480ccdc1cb2f948",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "warning dismissal moment",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|ALERT_HISTORY|ALT_ENCOUNTER_ID": {
+  "status": "blessed",
+  "description_hash": "2f47959a2f51f80bacd9e6e698a64f5ab95159b9172d9f3985450f73c2176b99",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "warning contact",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|ALERT_HISTORY|ALT_ID": {
+  "status": "blessed",
+  "description_hash": "00d69aebf69a050bd9873b7389f0a9f526a474b090e0a909377099daa8880786",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "warning",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|ALERT_HISTORY|ALT_STATUS_CODE": {
+  "status": "blessed",
+  "description_hash": "e54ff20aa1cde35cc1578c31b956d53c9415c9513954cafa0d6195e49cc8a21f",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "warning status",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|ALERT_HISTORY|SHOWN_PLACE_CODE": {
+  "status": "blessed",
+  "description_hash": "808c6ffb8622d00b1052a50cb9dd1d9a0210071994d1227218edf9dff7425050",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "warning location",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|ALERT_HISTORY|SPEC_OVR_RSN_CODE": {
+  "status": "blessed",
+  "description_hash": "0a04958456462060d5154d91140fa4c2ee602906a08a1c8da6618db04959fc69",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "medication interaction reason",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|ALERT_HISTORY|USER_ID": {
+  "status": "blessed",
+  "description_hash": "f3a0ed6a186cb1b470c6135b84c57ccd37d74d6f640c46e9777b0bc43e5e2c87",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "user",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|CLINICAL_ALERTS|ALT_ID": {
+  "status": "blessed",
+  "description_hash": "9702d952878d02e04273f4a501cdc24047ac98bd27cf5f99aa9f341d68207a5a",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "alert",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|CLINICAL_ALERTS|BPA_LOCATOR_ID": {
+  "status": "blessed",
+  "description_hash": "57d2f64604ffacf9c01349bcee46e87662154da663b4e2af3bc1c0c71bf90883",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "alert locator",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|CLINICAL_ALERTS|VISIT_ID": {
+  "status": "blessed",
+  "description_hash": "68bbe6c60498eae8e0c1bf0903a85337d8f4d33c4d94dda56dbc0b6cd8d8a00a",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "encounter",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|DEPARTMENTS|DEPARTMENT_ID": {
+  "status": "blessed",
+  "description_hash": "69abe85898e7ff4ff16e25fe1b700edee40e41f9933b0b9cad8df675f8947f15",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "department",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|DEPARTMENTS|REV_LOC_ID": {
+  "status": "blessed",
+  "description_hash": "b6d2fd76f96fc4708e5652e77d3b8c4ccf05c743866cee3cb47f5d47ebc399b0",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "revenue location",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|ED_ENCOUNTERS_DM|ARRIVAL_DTTM": {
+  "status": "blessed",
+  "description_hash": "21ea7b69a6d9409fc5ae95ff26bc38d9ef00d660bdf552b476c0ff6ef68f0b9c",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "arrival time",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|ED_ENCOUNTERS_DM|ENCOUNTER_ID": {
+  "status": "blessed",
+  "description_hash": "0efd01ea8598860967c4d97190f9636680f13b7d7db4d254ea2abbe59a7cb8b9",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "encounter",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|ED_ENCOUNTERS_DM|PATIENT_ID": {
+  "status": "blessed",
+  "description_hash": "d9ce2df00cf515a7112b6d2bc092da0c60c19ee3f781a89eacca0a1d0967d889",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "patient",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|ED_ENCOUNTERS_FACT|ADT_ARRIVAL_DATE": {
+  "status": "blessed",
+  "description_hash": "d10172898f7d336ec35eb87c42c9d6479fde89107da14b5ca78fc30bdeda13e4",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "arrival date",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|ED_ENCOUNTERS_FACT|ENCOUNTER_ID": {
+  "status": "blessed",
+  "description_hash": "edd819d82b84dca79aa276d41b959332a358059ec0c7e7474712268d7e5c4310",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "encounter",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|ED_EVENT_INFO|EVENT_ID": {
+  "status": "blessed",
+  "description_hash": "59412afb82f1a1d5668d9d078296a0c23916f8efcf83cc26f97daa08d643bba6",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "unique event record",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|ED_EVENT_INFO|EVENT_TYPE": {
+  "status": "blessed",
+  "description_hash": "d210bb2956f6135a034d5252c9928abe816ae825cee44359a52d60d27c1a95c1",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "event template",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|ED_EVENT_TEMPLATES|RECORD_ID": {
+  "status": "blessed",
+  "description_hash": "3a7f81f8337840484c4132555d276532f8450dbbdab7d6eff13e56ac53a47ed5",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "event template record",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|ED_PATIENT_INFO|ENCOUNTER_ID": {
+  "status": "blessed",
+  "description_hash": "1264ce50aad3e764070e05745f2cad1e1cccc076ce78c28cdb9cc38b1b58d42e",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "encounter",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|ED_PATIENT_INFO|EVENT_ID": {
+  "status": "blessed",
+  "description_hash": "1995f29f4ec23c7972ede6da56ab992d1c9de82be563e72acc90443f2a18f4c0",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "event record",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|EMPLOYEES|USER_ID": {
+  "status": "blessed",
+  "description_hash": "649780c3a798b7490a7bffb0d00f0293ced2f767c35f86d22002dedee9dcbb58",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "user record",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|ENCOUNTER_VISIT_REASONS|ENCOUNTER_ID": {
+  "status": "blessed",
+  "description_hash": "931e875f1e74a4878caaf5badfe47f65229c638317540477bba34cdc92f2c422",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "encounter",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|ENCOUNTER_VISIT_REASONS|ENC_REASON_ID": {
+  "status": "blessed",
+  "description_hash": "b34425b3bb84f5da9e294ad87706396d3e66060bb9b17f76373b3929f4fdf0ea",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "visit reason",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|ENCOUNTER_VISIT_REASONS|LINE": {
+  "status": "blessed",
+  "description_hash": "e211f26be02afaa6f75dc5e7eeb1a9e5d6c7191421f3dc1eff3865ff0c9bf0ea",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "visit reason line",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|FLOWSHEET_MEASUREMENTS|FLO_MEAS_ID": {
+  "status": "blessed",
+  "description_hash": "8229aeb7b373ec6b5d8805b90d0f2909c8da9b629f42d0ba35173ec35946e522",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "flowsheet group",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|FLOWSHEET_MEASUREMENTS|FSD_ID": {
+  "status": "blessed",
+  "description_hash": "3a2ea96990b897cb66eab322460714d5c9a643e0baa173b5b2b1709e9db4cb7b",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "flowsheet data entry",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|FLOWSHEET_MEASUREMENTS|MEAS_VALUE": {
+  "status": "blessed",
+  "description_hash": "60ebe06b2880e73806fa9124855d77003a1a7f0428eeb909f20c056c23bc04d4",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "flowsheet reading",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|FLOWSHEET_MEASUREMENTS|RECORDED_TIME": {
+  "status": "blessed",
+  "description_hash": "b6fb367effef5b132b06c0bfa45de083bce06c1e0e98bca9f6a7963ce5a7e8df",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "recorded time",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|FLOWSHEET_RECORDS|FSD_ID": {
+  "status": "blessed",
+  "description_hash": "3a2ea96990b897cb66eab322460714d5c9a643e0baa173b5b2b1709e9db4cb7b",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "flowsheet data entry",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|FLOWSHEET_RECORDS|INPATIENT_DATA_ID": {
+  "status": "blessed",
+  "description_hash": "b2d5c0c59b69a60fa9cac693a8398be5070b6c7854b7ce80b061ba3444b29acb",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "inpatient record",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|GROUPER_MED_RECORDS|EXP_MEDS_LIST_ID": {
+  "status": "blessed",
+  "description_hash": "55ddb9457f9b3306f888bcfc876518cf45ec57ad71bad07a242261af0b425b12",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "medication record collection",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|GROUPER_MED_RECORDS|GROUPER_ID": {
+  "status": "blessed",
+  "description_hash": "3b1fea7c638a2b3f9859ecbfa9743d6db89da3332e02ba9c49d267c8907ecdf1",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "grouper record",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|HOSPITAL_ENCOUNTERS|DEPARTMENT_ID": {
+  "status": "blessed",
+  "description_hash": "c30e9fc077e497f1e41cd74fed5b4ef23fa6d30bdf4213952eaf9deac5ddb197",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "unit",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|HOSPITAL_ENCOUNTERS|ED_DISPOSITION_CODE": {
+  "status": "blessed",
+  "description_hash": "1e151931070d020e46e48a0a0b0a7a38c695ac74e752a23bf68f573bbeddba87",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "ed disposition",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|HOSPITAL_ENCOUNTERS|ENCOUNTER_ID": {
+  "status": "blessed",
+  "description_hash": "edd819d82b84dca79aa276d41b959332a358059ec0c7e7474712268d7e5c4310",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "encounter",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|HOSPITAL_ENCOUNTERS|PATIENT_ID": {
+  "status": "blessed",
+  "description_hash": "9d6d29bb1374873065a81f85454ef096d5ee530905a245871a200a3e8b649c35",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "patient",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|LAB_ORDER_RESULTS|COMPONENT_ID": {
+  "status": "blessed",
+  "description_hash": "6c8995dc7299f184d91a819d8f64c1530fe3b592e9d9c65549be23bd9b4f5226",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "result component",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|LAB_ORDER_RESULTS|ENCOUNTER_ID": {
+  "status": "blessed",
+  "description_hash": "58dc714137a534315b67b54b5b35ce53e171fe7220dcf790cebc2ecaff353689",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "encounter",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|LAB_ORDER_RESULTS|ORDER_PROC_ID": {
+  "status": "blessed",
+  "description_hash": "187e8e9e5bb84a9e96f0e18d130b1d18ccf92f47be5399983fb31e96988a9f8f",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "procedure order",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|LAB_ORDER_RESULTS|RESULT_FLAG_CODE": {
+  "status": "blessed",
+  "description_hash": "31da38d8754a3023c3497e3097126e8b35dd8e9ca5c3013bbeec287f29d2c51f",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "result flag",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|LINE_DEVICE_AIRWAY|ENCOUNTER_ID": {
+  "status": "blessed",
+  "description_hash": "377170014f6ce58644a924c2ffcaa76608c06b4577297b8753bc19a10c70cd91",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "encounter",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|LINE_DEVICE_AIRWAY|FLO_MEAS_ID": {
+  "status": "blessed",
+  "description_hash": "bac5788259e08f6656b5141dd85fa8128303039eed4e085eaf8277e30707d982",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "flowsheet group",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|LINE_DEVICE_AIRWAY|PLACEMENT_INSTANT": {
+  "status": "blessed",
+  "description_hash": "d5f27b46429e5d82a46dffef831b14486ee91b26d3d3458a54f3323f14ff37c3",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "placement moment",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|LOCATIONS|LOC_ID": {
+  "status": "blessed",
+  "description_hash": "5c8150b1a1ba911b7844b5b5dbe759ebd1c7de9ad8270bb1958daf6490a72b55",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "location",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|MEDICATIONS|MEDICATION_ID": {
+  "status": "blessed",
+  "description_hash": "489ea05d999ae05bfde6fa1617096135b47094954bf562c7d38b2b029269c82a",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "unique medication record",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|MEDICATIONS|SIMPLE_GENERIC_CODE": {
+  "status": "blessed",
+  "description_hash": "99ed32598afca2950905d7418f8804e85c838f6a2e4f98d69b805ab20a9b0b67",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "medication generic name",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|MEDICATION_ORDERS_EXT|ORDER_ID": {
+  "status": "blessed",
+  "description_hash": "5d7de8c7825725b07102d0c0f1c9b103d82c5b31188d014c5e57490f36d43f6c",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "order record",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|MEDICATION_ORDERS_EXT|ORD_OSQ_ID": {
+  "status": "blessed",
+  "description_hash": "15e3b91d28823bccaa56093f350aef43cd49accbabc22037005e2c2381a2b894",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "orderable osq",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|MEDICATION_ORDERS|ENCOUNTER_ID": {
+  "status": "blessed",
+  "description_hash": "a17feb63bb57c08e28decf0404522b91c5fbb40d5f78021754383c3185ce5e59",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "encounter",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|MEDICATION_ORDERS|MEDICATION_ID": {
+  "status": "blessed",
+  "description_hash": "eafef7b6ff38e5715ea9cc4f680174007abf0ec5e945d9ef4c64b58f990ef8b2",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "medication record",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|MEDICATION_ORDERS|MED_ROUTE_CODE": {
+  "status": "blessed",
+  "description_hash": "8d4f73da20e94cfe3d72fb4e4bff4c7fe34e8286c158cf277636e56b0e0d3090",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "medication route",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|MEDICATION_ORDERS|ORDER_MED_ID": {
+  "status": "blessed",
+  "description_hash": "d99ad122ed99aa2b62323dd6dcac64e8f95ada61e23205f789a1defc200df962",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "medication order",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|MED_ADMIN_RECORDS|MAR_ACTION_CODE": {
+  "status": "blessed",
+  "description_hash": "ceab5687e1e4b653cd00bbd529e9c1a2578f34bc459fd13ae83640b6a76ac96b",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "action category",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|MED_ADMIN_RECORDS|ORDER_MED_ID": {
+  "status": "blessed",
+  "description_hash": "32f1fbc79c77dd4b7839ad0baf21f8208f96e5ca859934cb3dc4aac492215f8f",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "medication order",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|MED_ADMIN_RECORDS|TAKEN_TIME": {
+  "status": "blessed",
+  "description_hash": "f6209e5e895afcdc27c9d8bd45a712c086f3220ef294777f06966e499340ff26",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "taken time",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|MED_MIX_COMPONENTS|DRUG_ID": {
+  "status": "blessed",
+  "description_hash": "04a02c246012e423cd76a5d089d40900966111263bf65b76a3e374dae38a8547",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "drug component",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|MED_MIX_COMPONENTS|MEDICATION_ID": {
+  "status": "blessed",
+  "description_hash": "2055324e6ac58003ecd735936f492a02848ccb05f2a981309ba1301e3669f94d",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "unique medication record",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|MED_MIX_COMPONENTS|TYPE_CODE": {
+  "status": "blessed",
+  "description_hash": "9a744ca8b1561d6b1880ac5e8b7e653282283dc31312bb6914bbcdde893f76d7",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "component category",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|ORDER_DISPENSE_INFO": {
+  "status": "blessed",
+  "description_hash": "ead6e610cb8df1ee0b7e4abcb763eb6b20a6cd074f75843f5b571fbed052c804",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "order dispensing",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|ORDER_DISPENSE_INFO|ORD_CNTCT_TYPE_CODE": {
+  "status": "blessed",
+  "description_hash": "1c91a37dc68218d69b9862a16f58fb128914f9edf57ec512c65b53ab8bc8b477",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "contact type",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|ORDER_TRACKING_METRICS|ENCOUNTER_ID": {
+  "status": "blessed",
+  "description_hash": "ebad018b7df0afed54f72eae514566239d8a513fe52bafe1af2b3b6e405e5140",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "encounter",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|ORDER_TRACKING_METRICS|ORDER_DTTM": {
+  "status": "blessed",
+  "description_hash": "945400df1cc245ed2ac595776a29165a61b2801c6dbf6ac9d12554918c433f46",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "order time",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|ORGANISMS|ORGANISM_ID": {
+  "status": "blessed",
+  "description_hash": "bd4071fb2d2c0bba472a1e1ed1782e3f8b9a58319af946003cfa255992a54636",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "unique organism record",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|PATIENTS|ETHNIC_GROUP_CODE": {
+  "status": "blessed",
+  "description_hash": "fa6f964e8c011898f9c71a816e07c4ffae49848ed6bd30b7a045a9f61bb188cc",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "ethnic background",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|PATIENTS|PATIENT_ID": {
+  "status": "blessed",
+  "description_hash": "9315b8beb34eca104cc853e3c2b1da5d180f44710900327d1b29b85945c12143",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "patient",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|PATIENT_DEMOGRAPHICS_RACE|LINE": {
+  "status": "blessed",
+  "description_hash": "c6ffc56ec33eabfea1f566fcd5634082de38dfefd1c77775b14d3bb13924ce4c",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "line number",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|PATIENT_DEMOGRAPHICS_RACE|PATIENT_ID": {
+  "status": "blessed",
+  "description_hash": "9d6d29bb1374873065a81f85454ef096d5ee530905a245871a200a3e8b649c35",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "patient",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|PATIENT_DEMOGRAPHICS_RACE|PATIENT_RACE_CODE": {
+  "status": "blessed",
+  "description_hash": "0151dda6a81ed622c1c69b27d478817ab65e504885e859dbe4198d2bcfde4acf",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "patient race",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|PROCEDURE_ORDERS_EXT|ORDER_ID": {
+  "status": "blessed",
+  "description_hash": "4d4eac0ad728d7c8614a18b84498181bd24600d32f0a00b53490945d4f94471b",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "order record",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|PROCEDURE_ORDERS_EXT|ORD_OSQ_ID": {
+  "status": "blessed",
+  "description_hash": "15e3b91d28823bccaa56093f350aef43cd49accbabc22037005e2c2381a2b894",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "orderable osq",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|PROCEDURE_ORDERS|ORDER_PROC_ID": {
+  "status": "blessed",
+  "description_hash": "db9a4cd21e3a74c250143f2815f4f8d2fd60e2cf8fc5b39d598774d225243ac8",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "procedure order",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|PROCEDURE_ORDERS|ORDER_TIME": {
+  "status": "blessed",
+  "description_hash": "71569d15dfc09791e8653f6415bdb7f19b970d8d3b30470081aacce880798be4",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "order time",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|PROCEDURE_ORDERS|PROC_ID": {
+  "status": "blessed",
+  "description_hash": "c5c12cb65888bbc38569e820bcb45527e507d3052e9d865dae0644fe306bbfaf",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "procedure record",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|PROCEDURE_ORDERS|SPECIMEN_SOURCE_CODE": {
+  "status": "blessed",
+  "description_hash": "7684e4c025dacbdaac6d3bbbd8aa120dc57739284cb99b59fb53281fb38acb49",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "specimen source",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|REF_ALERT_ACTIONS|ALT_ACTION_TAKEN_CODE": {
+  "status": "blessed",
+  "description_hash": "6074c264cb3eb1659398f33834ebf21bf92a6403d4196f0619f4c8f4ca083cc0",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "user action",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|REF_ALERT_OVERRIDE_REASONS|ALRT_SP_OVR_RSN_CODE": {
+  "status": "proposed",
+  "description_hash": "53b20fde51425bfbb25dbf5e8c105ed7480194af5d77447bd329138447a9704e",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "value"
+ },
+ "emr|dbo|REF_ALERT_STATUS|ALT_STATUS_CODE": {
+  "status": "blessed",
+  "description_hash": "a558a5c846ac4b133af302aa00d0209e2571e6212f8282107836836f97bb792c",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "alert status",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|REF_ED_DISPOSITION|ED_DISPOSITION_CODE": {
+  "status": "proposed",
+  "description_hash": "53b20fde51425bfbb25dbf5e8c105ed7480194af5d77447bd329138447a9704e",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "disposition code"
+ },
+ "emr|dbo|REF_ETHNIC_GROUP|ETHNIC_GROUP_CODE": {
+  "status": "proposed",
+  "description_hash": "53b20fde51425bfbb25dbf5e8c105ed7480194af5d77447bd329138447a9704e",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "value"
+ },
+ "emr|dbo|REF_GENERIC_MED|SIMPLE_GENERIC_CODE": {
+  "status": "blessed",
+  "description_hash": "04aac12e746a35b9b61274d208e8bae8d2086d43ca2ab40a6b2d0a8ce3f7ad30",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "medication generic name",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|REF_PATIENT_RACE|PATIENT_RACE_CODE": {
+  "status": "proposed",
+  "description_hash": "53b20fde51425bfbb25dbf5e8c105ed7480194af5d77447bd329138447a9704e",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "race code"
+ },
+ "emr|dbo|REF_SHOWN_PLACE|SHOWN_PLACE_CODE": {
+  "status": "blessed",
+  "description_hash": "933e08ddb71bed6b7ed172213cae53415085e5ca172c82e29a40016b141d2599",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "alert location",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|RX_VERIFY_TRACE|RX_VER_USER_ID": {
+  "status": "blessed",
+  "description_hash": "c24879bac991c9e80ff5c5ffa1f17bb9d491358889f265e5be94e93c94397eec",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "user",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|VISIT_REASONS|REASON_VISIT_ID": {
+  "status": "blessed",
+  "description_hash": "4e88f1ad1efe4e0093fcc17508e287e8582538ad7a06d2a0ff46d9452c39efa9",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "visit reason",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|V_PATIENT_LOCATION_HISTORY": {
+  "status": "blessed",
+  "description_hash": "d43214b8ece046bb7699a2fead9d0cd8b30d1ed4c6916ac54a92143bc08e1322",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "patient location history",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|V_PATIENT_LOCATION_HISTORY|ADT_DEPARTMENT_ID": {
+  "status": "blessed",
+  "description_hash": "1c10825083a923ee263517ad9f4172d5d75c8db493a1bc0ab1e1d3fe127c361b",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "department",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|V_PATIENT_LOCATION_HISTORY|ENCOUNTER_NUM": {
+  "status": "blessed",
+  "description_hash": "edd819d82b84dca79aa276d41b959332a358059ec0c7e7474712268d7e5c4310",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "encounter",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|V_PHARMACY_DISPENSE_ACTION": {
+  "status": "blessed",
+  "description_hash": "f437079f43b4acfa4749b3bab0afed07e7d9e066c231a33f90c1249a7211ddba",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "pharmacy dispense action",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|V_PHARMACY_DISPENSE_ACTION|ACTION_TYPE_CODE": {
+  "status": "blessed",
+  "description_hash": "e4af9e7c05c29a7317a0171e45ff21351b9662cc0f695632a0e82d560556de13",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "action type category",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|V_PHARMACY_DISPENSE|ACTION_ID": {
+  "status": "blessed",
+  "description_hash": "b8aae98f70683f2ff05f6589fdf114debc4312fb40c31f50194c058e8b0a6a89",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "order event action",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|V_PHARMACY_DISPENSE|CONTACT_DATE_REAL": {
+  "status": "blessed",
+  "description_hash": "bc71cd6530dd6d92d8bd6b19050485a760d72e69370edd63f8f3ca1b25bedc97",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "contact date",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|V_PHARMACY_DISPENSE|ORDER_MED_ID": {
+  "status": "blessed",
+  "description_hash": "32f1fbc79c77dd4b7839ad0baf21f8208f96e5ca859934cb3dc4aac492215f8f",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "medication order",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|dbo|V_PHARMACY_ORDER|ORDER_MED_ID": {
+  "status": "blessed",
+  "description_hash": "32f1fbc79c77dd4b7839ad0baf21f8208f96e5ca859934cb3dc4aac492215f8f",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "medication order",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|reports|CONFIG_VALUE_SET": {
+  "status": "blessed",
+  "description_hash": "70d5273cb11795d9a5c39e2c1783b9eebb4d56152af4354db9f9074e6734a888",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "configuration value set",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|reports|CONFIG_VALUE_SET|CODE": {
+  "status": "blessed",
+  "description_hash": "423977be948fdfc1cbbac28f8e4de2aa5c5bf12376549ddac28f0e96a423ecdf",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "value set code",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|reports|CONFIG_VALUE_SET|VALUE_SET_ID": {
+  "status": "blessed",
+  "description_hash": "28713c45a51c071f329517edea23243b9a7953bda607dfa3670ecb79842e00a2",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "value set",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|reports|NON_SEVERE_SEPSIS_STAGING": {
+  "status": "blessed",
+  "description_hash": "3c9c22d4eb62025c849f3d293f9b1aa54d39839ad98ad3b9529dbd7ca16d4cd3",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "non severe sepsis staging",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ },
+ "emr|reports|SEVERE_SEPSIS_STAGING": {
+  "status": "blessed",
+  "description_hash": "9a98fad9df04f3e9910be3e71abd00c90be7144cb8f9a8b506b2fc087bbefa2c",
+  "proposed_at": "2026-09-13T21:23:16Z",
+  "proposer": {
+   "model": "gpt-4o-mini",
+   "prompt_version": "1.0.0",
+   "runs": 2
+  },
+  "words": "severe sepsis staging",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-13T17:40:00Z"
+ }
+}

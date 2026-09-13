@@ -204,7 +204,13 @@ def append_blessed_name(store: Store, target: str, words: str,
     if not (words or "").strip():
         raise RefusalKG3("VOC-1", "a blessed name carries words — "
                          "no empty shells")
-    _mint_actor(store, approved_by, approved_at)
+    # NO actor mint here (the 2026-09-13 journal-containment find):
+    # blessed names seed PRE-journal (they must exist before the
+    # estate voices), and a pre-journal person mint swallowed the
+    # approver's line from the acronym seed's journaled act. The
+    # registry file is this act's durable record (approved_by rides
+    # as data); the person node first-mints at their first
+    # JOURNALED act, keeping the journal self-contained for replay.
     return store.append_node(
         "blessed_name", f"blessed_name::{target}",
         # literal: shape

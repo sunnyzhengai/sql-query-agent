@@ -1263,3 +1263,21 @@ each a filter speaking its phrase (taken time has a recorded
 value · is before the ED departure · route is 11 · MAR action
 one of 16 codes), framed by the AND, everything else counted
 (test_condition_tree_delivers_whole).
+
+**4. THE MEANING CARD DEFAULT (Sunny, 2026-09-13: "the table
+question came back with too much information. can we make
+table answers like the column answers?").** When the question
+NAMES the asked grain with a kind word ("what does the
+ADT_EVENT **table** mean") and one instance anchors under that
+label, the answer is the anchor's OWN meaning row — the same
+shape the column answer already had — never the neighborhood
+dump. The old behavior was a population-size ACCIDENT, not a
+ruling: BED_STAY_ID matched two same-named columns and fell
+into the many-equal-citizens list (meaning rows); ADT_EVENTS
+matched one table and fell into the single-anchor neighborhood
+(20 of 106 connections). The discriminator is the kind word's
+constraint face: your word named the grain, so the grain's own
+meaning IS the answer; the neighborhood stays ONE ASK AWAY
+(the bare-name question — "#ADT", "ADT_EVENTS" — keeps its
+neighborhood card, unchanged). Same law as near-first: the
+wide view is a choice, never the default.

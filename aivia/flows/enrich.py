@@ -109,7 +109,14 @@ def propose_blessed_names(read, glossary_dir, namer, model: str,
     # literal: shape — the batch report, counted never silent
     counts = {"proposed": 0, "disputed": 0, "rejected": 0,
               "kept": 0, "blessed_kept": 0, "nothing_to_select": 0,
-              "missing_target": 0, "model_calls": 0, "cache_hits": 0}
+              "missing_target": 0, "model_calls": 0,
+              "cache_hits": 0, "seat_error": 0}
+
+    def _save_cache():
+        if cache_path is not None:
+            cache_path.parent.mkdir(parents=True, exist_ok=True)
+            cache_path.write_text(json.dumps(cache))
+
     for target in name_worklist(read, scope):
         node = nodes.get(target)
         if node is None:
@@ -136,10 +143,18 @@ def propose_blessed_names(read, glossary_dir, namer, model: str,
             runs = cache[ck]
             counts["cache_hits"] += 1
         else:
-            runs = [" ".join(str(namer(name, desc)).split()).lower()
-                    for _ in range(2)]  # the double-run law
+            try:
+                runs = [" ".join(str(namer(name, desc)).split())
+                        .lower()
+                        for _ in range(2)]  # the double-run law
+            except Exception:  # noqa: BLE001 — the seat-down law:
+                # one dead call must never kill the batch (the
+                # 2026-09-13 timeout took a whole run + its spends)
+                counts["seat_error"] += 1
+                continue
             counts["model_calls"] += 2
             cache[ck] = runs
+            _save_cache()  # every successful pair survives a crash
         # literal: shape — the machine row; a human flips 'blessed'
         row = {"status": "", "description_hash": dhash,
                "proposed_at": run_at,
@@ -165,7 +180,5 @@ def propose_blessed_names(read, glossary_dir, namer, model: str,
                 counts["proposed"] += 1
         registry[target] = row
     glossary.save_blessed_subjects(glossary_dir, registry)
-    if cache_path is not None:
-        cache_path.parent.mkdir(parents=True, exist_ok=True)
-        cache_path.write_text(json.dumps(cache))
+    _save_cache()
     return counts
