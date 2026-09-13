@@ -152,3 +152,53 @@ RETURN b.name AS joinsTo, j.onColumns AS onCols
 ```
 The declared neighbors of ADT_EVENTS with their keys.
 
+## The live-wire 42000 bisect [RESOLVED BY EVIDENCE 2026-09-12
+evening — ZERO spends needed; kept as record]
+
+Sunny's live #AllMeds round served rows through a query
+containing the literal '#AllMeds' — the '#'-string suspect is
+DEAD. The breaker was the ARTIFACT itself: the pre-fix queries
+traversed has_part BACKWARDS (condition→scope) or named an edge
+that exists nowhere (column-[:has_part]->scope), and Fabric
+validates patterns against the graph model's declared edge
+endpoints — a schema-illegal hop reports as 42000 "syntax error
+or access rule violation". The artifact-direction fix WAS the
+wire fix. Lesson for the record: a 42000 from the wire can mean
+"this pattern contradicts the model's edge schema", not just
+bad grammar. The bisect below was authored before this evidence
+and never fired:
+
+Every condition-family console query errored on the wire
+(`wire error [42000]: syntax error or access rule violation`)
+during the 2026-09-12 test session, while the EVENT_ID
+containment query ran fine at first fire. What the accepted M3
+gates already prove working on the served graph: the `scope` and
+`condition` labels, `FILTER`, multi-hop patterns. The one element
+NO gate has ever fired: a `'#…'` string literal ('#Base_Pop' /
+'#AllMeds' appear in every failing query; 'EVENT_ID' in the
+working one). The console's artifact-direction bug is ruled out
+as the cause — a wrong-direction hop returns zero rows, never a
+syntax error.
+
+Fire these two in order (each is one counted spend; stop after
+the first divergence):
+
+1. Scope label + FILTER, no `#` in the literal (a real scope):
+```gql
+MATCH (s:scope) FILTER s.name = 'All_LDAs' RETURN s.name
+```
+Expected if labels/FILTER are innocent: one row, `All_LDAs`.
+
+2. The same query with only the `#` literal changed:
+```gql
+MATCH (s:scope) FILTER s.name = '#Base_Pop' RETURN s.name
+```
+
+Verdicts: (1) ok + (2) 42000 → the `#` literal is the breaker;
+the fix is wire-side escaping or a store naming decision — a
+ruling, not a matcher hack. (1) 42000 → the suspect list was
+wrong; capture the exact HTTP request/response body from
+`aivia/fabric_wire.py` for the next round. Both ok → re-fire one
+failing screenshot artifact verbatim as a third spend to isolate
+the composed form.
+

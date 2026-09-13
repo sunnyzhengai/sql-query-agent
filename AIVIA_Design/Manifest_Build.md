@@ -715,3 +715,236 @@ constraint never fires — the candidate fix is prompt 3.1.0
 delivery for the unclaimed connections; §D-adjacent, Sunny's
 word gates it (note the join-layer edge-kind deferral: a 'read'
 constraint would veto side-paths — must land together).
+
+**THE CONDITION-SESSION FIX SITTING (Sunny's screenshots +
+"fix the bugs first" go, 2026-09-12):** his condition/param test
+round reproduced findings (1) and (3) at condition grain and
+surfaced three new ones. The ruled-law slice BUILT same day;
+the ruling-gated slice recorded, untouched.
+
+| claim | state | evidence |
+|---|---|---|
+| THE ARTIFACT FIX (finding 3's mechanism found + killed): the enumeration artifact rendered every hop a→b regardless of the store (condition-[:has_part]->scope — backwards; column-[:has_part]->scope — an edge that EXISTS NOWHERE) and covered containment only. Now every WALKED SHAPE the delivery used becomes one MATCH — hops carry the STORE's directions, pass-through chains included (`_enum_gql` + shape recording in the walk) | BUILT | the EVENT_ID containment artifact is byte-identical (its pin stands); the #Base_Pop condition round emits 4 true shapes (direct + join-rooted + both sides); tests: test_enumeration_artifact_directions_are_store_truth · …covers_the_pass_through · test_column_enumeration_artifact_never_invents_an_edge |
+| OWNER-QUALIFY reaches enumeration rows (finding 1, second occurrence = the Echo Law's mandatory build): a display name colliding across identities gains owner segments until unique; unique names stay bare (`owner_qualify`) | BUILT | cond#1 ×12 → #Flowsheets::cond#1 et al.; cond#12 → #Base_Pop::cond#12 (#Final also owns one); ENCOUNTER_ID flood → TABLE.ENCOUNTER_ID; tests: test_enumeration_rows_owner_qualify_on_collision · test_owner_qualify_deepens_only_until_unique |
+| THE WIRE 42000 BISECT prepared (new finding: every condition-family query errored on the wire, all spends wasted): M3's accepted gates prove scope/condition labels + FILTER work SERVED; no gate ever fired a '#…' string literal — the prime suspect. Two queries authored, verdicts pre-ruled | **RESOLVED BY EVIDENCE same day, ZERO spends** — Sunny's live #AllMeds round served a '#AllMeds' literal fine; the breaker was the pre-fix artifact itself (schema-illegal edge direction — Fabric validates patterns against the model's declared endpoints and reports 42000); the artifact fix WAS the wire fix | FABRIC_GRAPH_LOAD.md §bisect (resolution stamped); the live round screenshot 2026-09-12 20:26 |
+| the DICTIONARY SENTINEL (new finding): "No value is present." is vendor text in the snapshot (columns.csv ×33, tables.csv ×5), voiced verbatim as column meaning and polluting those embeddings — a sentinel meaning EMPTY should land as a counted absence | OPEN — needs Sunny's intake ruling (sentinel closed set vs trust-as-is) | screenshot: ED_DISPOSITION_CODE's "meaning" |
+| vacuous citations ("All 5 of its parts hold." / bare `has_part` via) + the kind-claim gap ('filters'/'subquery' can't reach their kinds — the subsumption rule requires the kind to match the TOP INSTANCE's label, so noise columns block condition/scope; rider corpse: "constrained to label: column (your word)" misattributes) | the kind-claim gap CLOSED same day (the second sitting below); vacuous citations REMAIN OPEN (citation choice — awaiting ruling; the speech column carries the true meaning meanwhile) | Sunny's screenshots 2026-09-12 |
+
+**THE GROUNDING-GAP SITTING (Sunny's second go, 2026-09-12:
+"please fix these gaps", after the #AllMeds ground-truth
+gap-check — the go LIFTS the morning's prompt-3.1.0 park):**
+design riders landed in Design_Chatbot §THE MEANING-TEST CONSOLE
+(THE STRUCTURE-WORD CLAIM · THE RELATION-WORD SEAT · THE COUNTED
+REMAINDER); registries 1.40.0.
+
+| claim | state | evidence |
+|---|---|---|
+| THE STRUCTURE-WORD CLAIM: the label-agreement clause SUPERSEDED — in the semantic tier a token's TOP-SCORING kind/edge-kind entry ≥ MATCH_SCORE claims it BY ITS OWN score (the old clause picked the kind by the noise instance's label: kind `column` claimed 'filters' via REF_RANGE_TYPE while kind `condition` — whose speech says "filter" — stood cleared-but-ignored). Exact names still win; pin outranks all (THE TURN DEFAULT guards); the same-label circular-credit case is now a corollary | BUILT | test_structure_word_claims_over_noise_instances (the screenshot ranking replayed: label constraint = condition, never column); the founding kind-subsumption pin still green |
+| PROMPT 3.1.0 + THE RELATION-WORD SEAT: relation words are referring words, kept as mentions and marked in the caged `relations` field (the L4-D3 role precedent; the kinds-field ban stands); a relation-marked token grounds ONLY against structure entries — exact tier searches the structure pool (the 'In'-column collision found in build: an estate grain named like a relation word must not capture it); clearing nothing = COUNTED no-claim, steering nothing | BUILT | registry Seat_Prompts 3.1.0 (cache keys invalidate by version — stale proposals unreachable); cage validates relations ⊂ mentions (test_cage_validates_relations); test_relation_word_never_instance_anchors |
+| EDGE KINDS SPEAK: Speech_Sources gains `_edge has_part` / `_edge joins_to` self-speech rows (containment words reach has_part BY MEANING); Shape_Ledger Notes retired as speech; `_self scope` speech gains "subquery" (industry word, Use-Standards); the `reads` card stays DEFERRED with its recorded reason | BUILT | registries 1.40.0 regenerated via the converter; test_edge_kinds_speak_their_own_speech |
+| THE COUNTED REMAINDER: an edge-kind constraint narrows VISIBLY or not at all — the free walk counts what the constraint excluded, rendered on the round | BUILT | test_relation_word_constrains_traversal_and_counts (constrained_out ≥ 1; the #Pressors side-leak excluded AND counted) |
+| THE CONDITION TREE DELIVERS WHOLE: a delivered composite condition is ALSO connective — the walk descends through it (the #AllMeds lesson: the AND root without its four predicates answered nothing); citation wording for nested parts still rides the OPEN citation ruling — the speech column carries the leaf's own phrase meanwhile | BUILT | test_condition_tree_delivers_whole (cond#6–10 delivered with voiced phrases; join ON roots cite their joins) |
+| ACCEPTANCE — the gap-check question answers true: 'what filters are in the #AllMeds subquery?' → kind condition claimed over noise · 'in' → has_part constraint · #AllMeds' own tree only (3 join ONs cited as joins + the where root + its parts incl. the four real filters, each speaking its phrase) · 1 outside connection counted | BUILT | the _allmeds_filters_round fixture replays the screenshot ranking; 6 new pins green (51/51 deterministic console battery) |
+
+NOTE: the live battery (AIVIA_LIVE=1) needs a rerun at Sunny's
+hand — prompt 3.1.0 regenerates every proposal (keys roll), and
+the live scores for 'filters'/'in' against the new _edge/kind
+speech are the real measurement the scripted rankings stand in
+for.
+
+Suite after the sitting: **2058 passed · 25 skipped · 8 xfailed
+· 0 failed**; the 1.40.0 stamp propagated in the same breath
+(RG-A2 caught the Design_Graph_Engine stamp block on the first
+full run — the mechanism working; the metamodel version pin and
+the M-gate key basis re-based with ledger notes, the key's 13
+recompute pins green); TEST_MAP regenerated; ruff clean on the
+changed files.
+
+**THE MEANING-ROWS SITTING (Sunny's third go, 2026-09-12
+evening: "all 3, go" — from his table verdict "this is not
+meaningful" on the delivered #AllMeds anatomy):** ruled riders
+in Design_Chatbot §THE MEANING-TEST CONSOLE (THE MEANING ROWS,
+three laws); Grammar_Floor v2.5.0.
+
+| claim | state | evidence |
+|---|---|---|
+| STRUCTURE NEVER ROWS: condition enumerations deliver meanings — AND/OR frame the list (never row), NOT rows as one folded meaning (operand absorbed), degenerates counted, THROUGH-a-join = join structure (class order: a composite under a join is the join's, never a frame). Every exclusion counted on the round; the root cause recorded (nothing had ruled the grain-vs-row gap) | BUILT | test_condition_tree_delivers_whole pins Sunny's exact table: 4 rows · frame line · counted {3 join structure · 1 frame · 1 degenerate · 1 folded into NOT} |
+| THE NEAR-FIRST DEFAULT: owner anchor × owned-logic population answers from the anchor's OWN subtree (ownership edges has_part/uses_param/cites); the wider reach is counted, ONE CLICK away (reach=wide, a.wide link — the turn default, never a guess); relation words override explicitly; entity-anchored blessed rounds unchanged (EVENT_ID carriers · scopes-read-table green) | BUILT | test_near_first_default_owns_the_condition_answer (the 60-row #Base_Pop flood dead: its true answer is ONE row — cond#12, the arrival-window filter); test_wide_reach_keeps_the_laws |
+| COMPOSITES COMPOSE — Grammar 2.5.0: NOT folds into its child (_voice_negated, per-kind negations from the closed set: NULL_CHECK→positive fact, order comparisons FLIP, IN_LIST→"none of", selection/pattern kinds negate their clause, fallback = the honest wrapper); condition STORE nodes inherit the fold (condition_render); recorded-embedding fixture re-recorded (65 folded phrases, real model). BOOKKEEPING FIND closed: 2.4.0 had missed FLOOR_GRAMMAR_VERSION (constant said 2.3.0) | BUILT | cond#6 store-verified: "The time designated by the user when the action occurred has a recorded value."; grammar/verbatim/census slices green; Grammar_Floor v2.5.0 header records both |
+| SENTINEL LEAK (evidence for the OPEN intake ruling, found in this build): the dictionary sentinel doesn't just voice as column meaning — it enters GRAMMAR SUBJECTS: #Base_Pop::cond#4 voices "The **no value is present** is the status of the patient at the time of discharge…" (REDI.ED_DISPOSITION_CODE's sentinel description used as subject words) | OPEN — strengthens the sentinel ruling's case | store row quoted; the 38 sentinel rows counted this morning |
+| M3 EXPORT DEBT: the served Fabric graph's NOT-node descriptions are now stale vs the store (the fold changed stored voicings; censuses/counts unchanged) | COUNTED DEBT — the re-export rides Sunny's next load (batch law, his hand) | the fold touches description text only; conservation 1141 intact |
+
+**GRAMMAR 2.6.0 (Sunny's fourth go, 2026-09-12: "what's the best
+translation for MA.TAKEN_TIME IS NOT NULL" → the ladder answer →
+"go"):** RECORDEDNESS IDENTIFIES — the NULL_CHECK family speaks
+"is recorded" / "is not recorded" with a NAME-WORDS subject
+(`_ident_subject`): a recordedness predicate POINTS at its
+column; value predicates keep dictionary-word subjects (there
+the meaning IS the sentence). cond#6 store-verified: "The taken
+time is recorded." Two deferrals RECORDED with reasons
+(Grammar_Floor v2.6.0): the owner-possessive waits for blessed
+vocabulary to wire into the render; the business reading ("the
+dose was actually given") is inference — the blessing path owns
+it, never the floor. Riders: fixture re-recorded (the 2.6.0
+texts); the F4 basis pin bumped consciously — it had NEVER FIRED
+(the constant sat at 2.3.0 through the 2.4/2.5 doc bumps; the
+drift closed at 2.5.0 exposed it); ask_fn doubles in the wire
+tests updated to the reach contract (the 2-red catch from the
+meaning-rows full run). M3 export debt now covers the NULL_CHECK
+texts too (same counted row above).
+
+**GRAMMAR 2.7.0 (Sunny's fifth go, 2026-09-12 late: cond#8 and
+cond#9 "still not fixed" — the incumbent defense of cond#9 was
+WRONG and is withdrawn):** three rules in one breath, all
+store-verified on the #AllMeds four. (1) THE RELATION RULE:
+column-vs-column comparisons speak NAME WORDS both sides
+(`_compare_terms`) — cond#8: "The taken time is before the ed
+departure time (noted 'while in ED')."; the corpse was mixed
+register (definition subject + name comparand). (2) THE
+TOKEN-LINK REDUCTION: '<qualifier> <token> associated
+with|linked to|corresponding to <the thing>' speaks the thing —
+cond#9: "The route of administration for a medication is 11
+(noted 'intravenous')."; scoped to those verbs so the tuned
+of/for rule stands. (3) NOTED ANNOTATIONS reach the store
+phrase (R8 attribution): the mapper captured the SQL author's
+trailing comments all along — only floor bullets ever spoke
+them; the author's intent was in the evidence the whole time.
+Riders: fixture re-recorded; the F4 basis pin bumped 2.6.0 →
+2.7.0 with its note; the exact-text pins in
+test_condition_tree_delivers_whole strengthened to the full
+phrases. M3 export debt (same counted row) now covers compare
+texts too. GENERATOR NOTE (Sunny's one-by-one challenge, ruled
+direction pending his go): the phrase-corpus sweep + the
+meaning-smell census are the proposed generator-level moves —
+2.7.0 was still a per-round fix; the corpus sweep would have
+caught cond#8/9's classes in one sitting.
+
+**THE LIVE ROUND OF 20:26 (Sunny's hand, wire ON — the meaning
+rows' first served fire):** the wire ANSWERED (the 42000 class
+died with the artifact fix — see the resolved bisect row) and
+caught the next true gap in one spend: local 4 · served 5 —
+DIVERGE, the served rows including cond#5 (the 1=1 degenerate
+the delivery rightly excludes). Fixed same evening, both under
+the standing rulings: (1) STRUCTURE NEVER ROWS reaches the
+ARTIFACT — condition-population queries carry the class filters
+(a.kind <> 'AND'/'OR', a.degenerate <> 'true'); folded
+NOT-operands sit deeper than any rowed shape's hop count, so
+kind+degenerate restore row parity — the next fire should read
+MATCH; (2) the resurfaced vacuous via ("via: All 5 of its parts
+hold." on every filter row) died — frame-descent rows cite
+NOTHING; the frame line speaks for the list (Sunny's ruled
+table had no via column for the filters). Pins extended in
+test_condition_tree_delivers_whole + the two artifact pins;
+AIVIA_Test 87/87.
+
+Suite after the sitting: 2051 passed + 9 (suite-map rerun) · 25
+skipped · 8 xfailed · 0 failed; TEST_MAP regenerated; ruff clean
+on the changed files.
+
+**THE R5.b DRAFT (Sunny's ask, 2026-09-12: "draft the R5
+revision spec, design first — no code"; REWRITTEN same day to
+the ONE-FIELD shape at Sunny's "you are complicating this" —
+the two-register/two-field draft is dead, git holds it):** THE
+BLESSED NAME — one field per column: the LLM reads ONLY what
+the vendor wrote (description + name) and SELECTS a short human
+name from those words; the subset gate proves no new word
+entered (selection, never fabrication); Sunny blesses the
+batch; the grammar speaks that name in EVERY sentence about the
+column (the 2.6.0/2.7.0 register split collapses for blessed
+columns — it existed because heuristic phrases are long;
+blessed names are short). Nothing-to-select (empty/sentinel
+description + wordless name) = never proposed, counted naming
+gap. Unblessed columns voice exactly as v2.7.0; registry empty
+recomputes byte-identical (A1). Double-run disagreement =
+DISPUTED, never voiced; render stays deterministic, verbatim
+law untouched (registry = input data, hash-tied staleness).
+Closes the 2.6.0 blessed-vocabulary deferral at the
+vendor-portability finding (live corpse:
+"mar_action_category_number linked"). EXTENDED same day
+(Sunny: "use the same method to translate table names"): TWO
+GRAINS, ONE METHOD — the registry holds tables too (3-part
+key), same gate/proposer/blessing; table words today are pure
+name mechanics that never consult the vendor's table
+description (live corpse: "Drawn from med admin records
+records" while the vendor wrote "the active medication
+administration data" → blessed "medication administration");
+blessed table names reach the composition sentence + R2
+instance marking; named scope refs (#temp/CTE, author's own
+words) stay out; the owner-possessive deferral's prerequisite
+lands with the table grain. **RATIFIED v2.8.0 (Sunny,
+2026-09-12: "ratified — bump to 2.8.0 and land the ruling")** —
+ruled with it: (a) ONLY BLESSED VOICES, batch-blessed after
+spot-check; (b) v2.8.0 minor. Riders (c) R4 temporal keying +
+(d) proposer endpoint/redaction stay OPEN and GATE THE BUILD.
+DECLARED DEFERRAL: FLOOR_GRAMMAR_VERSION stays 2.7.0 in code
+until the build's first slice (empty registry = byte-identical
+text per A1; a bump now would stale every floor-derived
+artifact for a no-op) — the constant, the F4 basis pin, and the
+fixtures bump together at build. Spec: Grammar_Floor §R5.b.
+
+**THE FIRST SLICE BUILT (Sunny's "build the first slice",
+2026-09-12 — test-first, 15 tests before the code):**
+
+| claim | state | evidence |
+|---|---|---|
+| THE GATE-SUBJ FAMILY (gates.py — the produce-gate charter): subset law w/ the closed suffix table + closed function-word whitelist (selection, never fabrication), value/identifier/shape checks, every violation named | BUILT | A3 gate corpus in tests/aivia/test_blessings.py — one hand-authored kill per violation class ("delivery method" dies by name; "route 11" GATE-SUBJ-2; identifier shapes GATE-SUBJ-3; article/preposition/length GATE-SUBJ-4) |
+| BLESSED NAMES ARE JOURNAL TRUTH: kg3_artifacts.append_blessed_name (kg3@ family — blessings survive rebirth); machines REFUSED (LC3-C3: the proposer proposes, it never blesses); glossary.seed_blessed_names seeds blessed_subjects.json → blessed_name nodes, delta-by-target, gate RE-RUN at seed vs the node's CURRENT description, stale-hash/machine/missing rows counted never silent; blessed vocabulary excluded from the acronym scan | BUILT | test_seed_births_blessed_name_nodes… · test_seed_counts_never_silent (0 seeded from 5 bad rows, each class counted) · test_blessing_is_a_human_act |
+| THE RENDER WIRING: _Voice.blessed (ONE map, both grains) wins every position — column subjects, name-words register (recordedness + both relation sides via voice.name_words), table source phrases (_source_phrase blessed param) + R2 instance marking; named scope refs stay out; EXPORT_LABELS never ships blessed_name (LOCAL governance, Fabric untouched) | BUILT | test_blessed_name_speaks_in_value_predicates ("The administration action is 1.") · …both_relation_sides ("…before the ed exit time.") · …recordedness · …source_phrases ("medication administration records" vs the "med admin records records" stutter) |
+| THE VERSION TRIO — the declared deferral CLOSED on schedule: FLOOR_GRAMMAR_VERSION 2.7.0→2.8.0 (version note in produce.py), F4 basis pin fired CONSCIOUSLY, NO fixture re-record needed | BUILT — A1 HELD | floor_texts.json byte-exact unchanged (test_floor_texts_byte_exact green at 2.8.0); test_unblessed_stays_the_heuristic_fallback pins the corpse verbatim ("mar_action_category_number linked") |
+| the mechanisms caught the first pass (working as designed): malformed Proves tag, 4 unmarked literals, stale TEST_MAP — all fixed same sitting; interpreter trap re-confirmed (the /usr/bin/python3 run "failed" 24 legacy corpus tests; Homebrew 3.11 + DOTNET_ROOT is the law) | RECORDED | test_suite_map · test_literal_census green; TEST_MAP regenerated (183 modules) |
+| FULL SUITE + LINT | GREEN | **2074 passed · 25 skipped · 8 xfailed · 0 failed** (python3.11 + DOTNET_ROOT, 0:05:23); ruff clean across aivia/tests/AIVIA_Test |
+
+STILL GATED after slice 1: the proposer batch (riders c/d).
+
+**RIDERS RULED + THE PROPOSER SLICE BUILT (Sunny's "rule riders
+c and d, then build the proposer slice", 2026-09-12 → built
+into the night):**
+
+| claim | state | evidence |
+|---|---|---|
+| RIDER (c) RULED — THE TEMPORAL UNION: blessing only ADDS temporal evidence; a blessed subject tests blessed words ∪ the fallback tier's words (name words + dictionary phrase) against R4's date/time rule; unblessed = spoken words alone, byte-identical (A1) | BUILT (voice.temporal_evidence) | test_temporal_union_blessing_only_adds_evidence ("administration clock" stays "is before") · test_temporal_union_reaches_value_comparisons_too |
+| RIDER (d) RULED — THE NAMER SEAT: fourth seat on the enrich pattern (deterministic machinery, INJECTED model, proposals only); prompt = Seat_Prompts registry law "namer" 1.0.0 (abstract shape, no estate examples); endpoint = the SAME boundary as the existing seats; egress = identifier + door-1 dictionary text ONLY; cache content-keyed (target · hash · model · prompt version); runs at Sunny's hand ONLY | RULED + BUILT | Grammar_Floor §R5.b rider record; registries 1.41.0 regenerated via the converter (JSONs never hand-edited) |
+| THE PROPOSER MACHINERY: enrich.name_worklist (resolves_to columns + read tables; params OUT) + enrich.propose_blessed_names — double-run law (any disagreement = DISPUTED, both candidates recorded, never voices), gate before write (REJECTED carries named violations), nothing-to-select counted with NO row, THE FIELD LAW (a blessed row is machine-untouchable even stale), zero-spend cache | BUILT | test_name_worklist_is_what_actually_voices · …double_run_agree_lands_proposed (+ the seeder refuses machine rows: skipped_status 2) · …disagreement_is_disputed_never_voiced · …gate_kill_is_rejected… · …cache_spends_nothing_on_rerun (calls 4 → 0 → 0) · test_field_law_blessed_rows_are_machine_untouchable · …nothing_to_select_writes_no_row |
+| THE HAND ENTRY: console.namer_prompt/make_namer/run_name_proposals(estate) — no key = a polite refusal + the hand-authoring hint (the gate treats hand-authored and machine rows identically); prints the batch report + the review path | BUILT | runbook: `python3.11 -c "import aivia.console as c; c.run_name_proposals('ed_sepsis_dev')"` (Sunny's hand; spends counted in the report) |
+| STAMP PROPAGATION 1.41.0 (the RG-A2 same-breath rule): Design_Graph_Engine stamp block, metamodel pin (conscious bump note), M-gate key basis re-based with ledger note | DONE | test_metamodel + AIVIA_Test/test_ed_sepsis_dev_estate 22/22 (all recompute pins green) |
+| FULL SUITE + LINT | GREEN | **2083 passed · 25 skipped · 8 xfailed · 0 failed** (python3.11 + DOTNET_ROOT, 0:10:31); ruff clean; TEST_MAP regenerated |
+
+**THE TWO RIDER EXTENSIONS BUILT (Sunny's review of the rider
+walkthrough, 2026-09-13: "we can get the data type from the
+EMR's dictionary" + "why are we not running for the
+dictionary" → "yes, build both"):**
+
+| claim | state | evidence |
+|---|---|---|
+| RIDER (c) AMENDED — THE DECLARED TYPE LEADS: columns.csv MAY carry data_type (CONTRACT_DATALOAD §2b, opportunistic like the grain phrase — absent = absent, existing extracts byte-identical); R4's verb choice is a three-source ladder (voice.is_temporal): declared temporal type (closed set; T-SQL timestamp EXCLUDED — a version counter, not a moment) decides OUTRIGHT → blessed-word union → fallback words; a non-temporal type NEVER vetoes (VARCHAR dates are an EMR fact of life) | BUILT | test_declared_type_is_temporal_truth (DATETIME with zero time-words → "is before") · test_non_temporal_type_never_removes_evidence (VARCHAR(10) + spoken "time" → still "is before") · test_intake_carries_data_type_opportunistically (real F1 snapshot copy: typed row stored, short rows absent — no empty shells) |
+| RIDER (d) EXTENDED — THE DICTIONARY SWEEP: name_worklist scope='voiced' (default) \| 'dictionary' (ALL of KG1, columns first) — a blessed name is per-column truth, not per-file; threaded through propose_blessed_names + run_name_proposals(estate, scope=…); cache makes the sweep one-time, the field law + delta rule keep re-runs from touching blessed or unchanged rows | BUILT | test_name_worklist_dictionary_mode_covers_kg1 (the never-voiced column is IN; voiced ⊆ dictionary; columns-first order pinned) |
+| FULL SUITE + LINT | GREEN | **2087 passed · 25 skipped · 8 xfailed · 0 failed** (0:10:34); ruff clean; TEST_MAP regenerated |
+
+THE NEXT ACT IS SUNNY'S HAND: (1) set the key, run the namer
+batch (runbook above — voiced first: ~240 targets on ed_sepsis;
+`scope='dictionary'` for the full sweep when review pace
+allows); (2) review blessed_subjects.json, flip rows to
+blessed; (3) boot the console — the seeder births blessed_name
+nodes and every phrase they touch re-voices. A2 (delta-by-name,
+conservation 1141) is THAT act's acceptance. The registry is
+EMPTY until then — every stored text still byte-identical to
+v2.7.0.
+
+**THE DEV DICTIONARY TYPED (Sunny: "can we hand add the column
+to the CSVs?", 2026-09-13 — for the synthetic dev estate the
+snapshot IS the authored vendor truth):** sepsis_snapshot/
+columns.csv gains data_type — DATETIME stamped on 441 of 4554
+columns by the conservative suffix law (_TIME/_DATE/_DTTM/
+_INSTANT/_DATETIME/_DT; the 41 *_DATE_REAL columns EXCLUDED —
+Epic decimal dates are numeric; flags/codes/limits excluded by
+the $-anchor). VERIFIED AGAINST THE STORE, not expectations:
+all 1,185 stored condition/scope/file descriptions snapshotted
+before and after — **ZERO text deltas** (441 nodes typed; every
+order-comparison already carried temporal word-evidence — the
+evidence-only-adds law holding exactly as ruled: arming a
+stronger source cannot change a sentence that was already
+right). No fixture re-records, no export-debt widening. Full
+suite after: **2087 passed · 25 skipped · 8 xfailed · 0
+failed**. The type ladder is LIVE on ed_sepsis_dev; it earns
+its keep on the EVENT_INSTANT class (temporal truth with no
+temporal words) as future SQL reaches such columns.

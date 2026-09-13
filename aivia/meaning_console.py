@@ -59,6 +59,19 @@ TECHNICAL_KINDS = ("table", "column", "scope", "condition",
 # literal: frame — registry kind names -> store labels
 KIND_ALIAS = {"parameter": "param"}
 TECHNICAL_EDGE_KINDS = ("has_part", "joins_to")
+# THE NEAR-FIRST DEFAULT (ruled 2026-09-12, "all 3, go"): when an
+# OWNER grain anchors a question about its OWNED logic, the answer
+# is its own subtree; wider connections are counted, one click away
+# literal: frame — the ownership vocabulary
+OWNER_LABELS = ("scope", "file", "statement")
+# literal: frame — the owned-logic populations
+OWNED_POPS = ("condition", "join", "param", "derived_column")
+# literal: frame — the ownership edges (downward reach)
+NEAR_EDGES = ("has_part", "uses_param", "cites")
+# STRUCTURE NEVER ROWS (same ruling): composite condition kinds
+# frame the delivered list — they never row
+# literal: frame
+FRAME_KINDS = ("AND", "OR")
 
 
 def _kind_label(kind_name: str) -> str:
@@ -148,6 +161,13 @@ def technical_scope(read) -> Tuple[List[Dict[str, Any]],
                                 "name": kind, "folded": _fold(kind),
                                 "owner": None,
                                 "words": str(r["Speech"])})
+    # edge kinds speak their OWN speech (THE RELATION-WORD SEAT,
+    # 2026-09-12): Speech_Sources _edge rows — the Shape_Ledger's
+    # engineering Notes stop serving as speech
+    edge_speech = {
+        str(r["Label"]).removeprefix("_edge "): str(r["Speech"])
+        for r in lens.sheets["Speech_Sources"]
+        if str(r["Label"]).startswith("_edge ")}
     for r in lens.sheets["Shape_Ledger"]:
         if r.get("Kind") == "edge" and r.get("Name") in \
                 TECHNICAL_EDGE_KINDS:
@@ -158,7 +178,9 @@ def technical_scope(read) -> Tuple[List[Dict[str, Any]],
                             "folded": _fold(str(r["Name"])
                                             .replace("_", " ")),
                             "owner": None,
-                            "words": str(r.get("Notes") or "")})
+                            "words": edge_speech.get(
+                                str(r["Name"]),
+                                str(r.get("Notes") or ""))})
     return entries, exclusions
 
 
@@ -227,23 +249,29 @@ def fallback_tokens(question: str) -> List[str]:
     return out
 
 
-def tokens_from(question: str, interpret_fn) -> Tuple[List[str], str]:
-    """(tokens, seat) — the interpreter's mentions ARE the tokens
-    (multi-word phrases stay whole); any seat failure drops to the
-    mechanical floor, visibly."""
+def tokens_from(question: str, interpret_fn
+                ) -> Tuple[List[str], str, Set[str]]:
+    """(tokens, seat, relations) — the interpreter's mentions ARE
+    the tokens (multi-word phrases stay whole); relation-marked
+    mentions ride along (prompt 3.1.0, THE RELATION-WORD SEAT: a
+    role classification, validated to be mentions); any seat
+    failure drops to the mechanical floor, visibly."""
     if interpret_fn is None:
-        return fallback_tokens(question), "floor"
+        return fallback_tokens(question), "floor", set()
     try:
         proposal = interpret_fn(question)
         mentions = [m for m in (proposal.get("mentions") or [])
                     if str(m).strip()]
         if mentions:
-            return [str(m) for m in mentions], "interpreter"
+            toks = [str(m) for m in mentions]
+            rels = {str(m) for m in (proposal.get("relations")
+                                     or []) if str(m) in set(toks)}
+            return toks, "interpreter", rels
     except Exception:  # noqa: BLE001 — the seat-failure law: a
         # tokenizer failure is never a dead round; the mechanical
         # floor answers and the seat name says so
-        return fallback_tokens(question), "floor"
-    return fallback_tokens(question), "floor"
+        return fallback_tokens(question), "floor", set()
+    return fallback_tokens(question), "floor", set()
 
 
 # ---- step 3: match sets (deterministic tiers, then vectors) ----------
@@ -405,19 +433,88 @@ def write_gql(path: List[Tuple[str, str]],
             + " RETURN " + ", ".join(returns))
 
 
+def _enum_gql(anchor_label: str,
+              sig: Tuple[Tuple[str, str, str], ...],
+              anchors: List[Dict[str, Any]],
+              pop_filter: str = "") -> str:
+    """One WALKED SHAPE → one Fabric-legal MATCH (the artifact law:
+    the displayed query describes the walk that produced the rows).
+    The population var `a` opens the pattern, hops lead back to the
+    filtered anchor `b`, and every arrow is the STORE's direction —
+    the old single render pointed every hop a→b regardless of the
+    store and skipped pass-through walks entirely (Sunny's
+    condition-layer screenshots, 2026-09-12)."""
+    names = sorted({m["name"] for m in anchors
+                    if m["label"] == anchor_label})
+    flt = " OR ".join(f"b.name = '{n}'" for n in names[:8])
+    parts = [f"(a:{sig[-1][2]})"]
+    for back, (elbl, d, _lbl) in enumerate(reversed(sig)):
+        nxt = len(sig) - back - 2       # node index, walking back
+        var = "b" if nxt < 0 else f"c{nxt + 1}"
+        label = anchor_label if nxt < 0 else sig[nxt][2]
+        arrow = f"<-[:{elbl}]-" if d == "f" else f"-[:{elbl}]->"
+        parts.append(arrow + f"({var}:{label})")
+    return ("MATCH " + "".join(parts)
+            + f" FILTER ({flt}){pop_filter}"
+            + " RETURN a.name, b.name")
+
+
+def owner_qualify(rows: List[Dict[str, str]]) -> None:
+    """Same-named rows disambiguate by their owner — the
+    BED_STAY_ID law reaching enumeration rows (the Echo Law build,
+    2026-09-12: cond#1 rendered twelve times bare; four EVENT_ID
+    columns were visually identical repeat rows). A display name
+    colliding across DIFFERENT identities gains owner segments
+    until the collision dies; unique names stay bare."""
+    def segs(ident: str) -> Tuple[List[str], str]:
+        if "::" in ident:
+            return ident.split("::"), "::"
+        return ident.split("|"), "."
+    depth: Dict[int, int] = {}
+    for _ in range(4):      # deepest useful: file::scope::join::cond
+        owners: Dict[str, Set[str]] = {}
+        for r in rows:
+            owners.setdefault(r["a"], set()).add(r["a_id"])
+        clashing = {n for n, ids in owners.items() if len(ids) > 1}
+        if not clashing:
+            return
+        moved = False
+        for i, r in enumerate(rows):
+            if r["a"] not in clashing:
+                continue
+            s, sep = segs(r["a_id"])
+            d = depth.get(i, 1) + 1
+            if d <= len(s):
+                depth[i] = d
+                r["a"] = sep.join(s[-d:])
+                moved = True
+        if not moved:
+            return
+
+
 # ---- step 5: the answer --------------------------------------------
 def answer_question(question: str, interpret_fn,
                     entries: List[Dict[str, Any]],
                     semantic: Optional[grounding.SemanticIndex],
                     read, adj, directed,
-                    pins: Optional[Dict[str, str]] = None
-                    ) -> Dict[str, Any]:
+                    pins: Optional[Dict[str, str]] = None,
+                    reach: str = "near") -> Dict[str, Any]:
     """The whole ruled loop for one question — deterministic after
     tokenization; every outcome (no-match, gap, relaxation) is a
     returned fact, never an invention."""
     pins = pins or {}
-    tokens, seat = tokens_from(question, interpret_fn)
-    msets = [match_token(t, entries, semantic) for t in tokens]
+    tokens, seat, relation_words = tokens_from(question,
+                                               interpret_fn)
+    # a relation-marked token grounds ONLY against structure
+    # entries — its exact tier searches the structure pool, never
+    # instances (the 'In'-column collision: an estate grain named
+    # like a relation word must not capture it)
+    struct_pool = [e for e in entries
+                   if e["label"] in ("label", "edge_kind")]
+    msets = [match_token(t,
+                         struct_pool if t in relation_words
+                         else entries, semantic)
+             for t in tokens]
     # THE CHOICE STEP (ruled 2026-09-11): a pin is the HUMAN ACT —
     # it replaces the token's whole SET and outranks scores and
     # constraints. A vanished pick is an honest miss.
@@ -443,24 +540,41 @@ def answer_question(question: str, interpret_fn,
     allowed_labels: Set[str] = set()
     kind_hits, edge_kinds = [], set()
     claimed: Set[str] = set()
+    relation_unclaimed: List[str] = []
+    bar = grounding.thresholds()["MATCH_SCORE"]
     for mset in msets:
         if mset["token"] in pin_sets:
             continue
         top = _strong(mset)
+        # THE RELATION-WORD SEAT (2026-09-12): a relation-marked
+        # token grounds ONLY against structure entries — it never
+        # instance-anchors; clearing nothing = a COUNTED no-claim
+        if mset["token"] in relation_words:
+            top = next((m for m in mset["matches"]
+                        if m["class"] in ("kind", "edge-kind")
+                        and m["score"] >= bar), None)
+            if top is None:
+                relation_unclaimed.append(mset["token"])
+                claimed.add(mset["token"])
+                continue
         if top is None:
             continue
-        kind_claim = None
+        # THE STRUCTURE-WORD CLAIM (2026-09-12, superseding the
+        # label-agreement clause): the token's TOP-SCORING kind or
+        # edge-kind entry >= MATCH_SCORE claims it BY ITS OWN
+        # score — the old clause picked the kind by the noise
+        # instance's label ('filters' -> kind column via
+        # REF_RANGE_TYPE). Exact names still win; the pin still
+        # overrides everything (THE TURN DEFAULT is the guard).
+        if top["class"] == "instance" and mset["tier"] != "exact":
+            claim = next((m for m in mset["matches"]
+                          if m["class"] in ("kind", "edge-kind")
+                          and m["score"] >= bar), None)
+            if claim is not None:
+                top = claim
         if top["class"] == "kind":
-            kind_claim = top
-        elif top["class"] == "instance":
-            bar = grounding.thresholds()["MATCH_SCORE"]
-            kind_claim = next(
-                (m for m in mset["matches"]
-                 if m["class"] == "kind" and m["score"] >= bar
-                 and _kind_label(m["name"]) == top["label"]), None)
-        if kind_claim is not None:
-            kind_hits.append(kind_claim)
-            allowed_labels.add(_kind_label(kind_claim["name"]))
+            kind_hits.append(top)
+            allowed_labels.add(_kind_label(top["name"]))
             claimed.add(mset["token"])
         elif top["class"] == "edge-kind":
             edge_kinds.add(top["identity"].removeprefix("edgekind::"))
@@ -527,15 +641,91 @@ def answer_question(question: str, interpret_fn,
     plan = {"paths": [], "nodes": [], "edges": [], "gaps": [],
             "relaxed": []}
     gql: List[str] = []
+    constrained_out = 0
+    far_out = 0
+    counted_out: Dict[str, int] = {}
+    frames: List[str] = []
     if enum_kinds and anchors:
         mode = "enumeration"
         kind_label = enum_kinds[0]
         pop = {n.identity for n in read.nodes(kind_label)}
         hit_pop = set()
         seen_rows: Set[Tuple[str, str, str]] = set()
+        # THE ARTIFACT LAW (2026-09-12, Sunny's condition-layer
+        # screenshots): every WALKED SHAPE the delivery used is
+        # recorded — (anchor label, hops as (edge, store-direction,
+        # node label)) — and becomes one MATCH below
+        shapes: Set[Tuple[str,
+                          Tuple[Tuple[str, str, str], ...]]] = set()
 
-        def _row(pop_id: str, via: str, m: Dict[str, Any]) -> None:
-            key = (pop_id, via, m["identity"])
+        def _node_label(nid: str) -> str:
+            if nid in joinsmap:
+                return "join"
+            if nid in condsmap:
+                return "condition"
+            return kind_label
+
+        def _shape(m: Dict[str, Any],
+                   hops: List[Tuple[str, str]]) -> None:
+            prev, sig = m["identity"], []
+            for elbl, node in hops:
+                d = "f" if (prev, node, elbl) in directed else "r"
+                sig.append((elbl, d, _node_label(node)))
+                prev = node
+            shapes.add((m["label"], tuple(sig)))
+
+        # STRUCTURE NEVER ROWS (Sunny's ruling 2026-09-12): for a
+        # condition population, composites FRAME the list,
+        # degenerates and NOT-operands fold away, join-rooted ONs
+        # are join structure — every exclusion counted, never lost
+        not_operands: Set[str] = set()
+        if kind_label == "condition":
+            for a, b, lbl in directed:
+                if lbl == "has_part" and b in condsmap \
+                        and condsmap.get(a, {}).get("kind") == "NOT":
+                    not_operands.add(b)
+
+        def _row_class(nid: str,
+                       hops: List[Tuple[str, str]]) -> str:
+            if kind_label != "condition":
+                return "row"
+            # anything reached THROUGH a join is the join's own
+            # structure — composite or not (class order matters:
+            # an AND under a join is join structure, never frame)
+            if any(h in joinsmap for _e, h in hops):
+                return "join structure"
+            p = condsmap.get(nid, {})
+            if p.get("kind") in FRAME_KINDS:
+                return "frame"
+            if str(p.get("degenerate")).lower() == "true":
+                return "degenerate"
+            if nid in not_operands:
+                return "folded into NOT"
+            return "row"
+
+        out_sets: Dict[str, Set[str]] = {}
+        framed: Set[str] = set()
+
+        def _row(pop_id: str, via: str, m: Dict[str, Any],
+                 hops: List[Tuple[str, str]]) -> None:
+            cls = _row_class(pop_id, hops)
+            if cls != "row":
+                out_sets.setdefault(cls, set()).add(pop_id)
+                # the conjunction semantics become the FRAME of
+                # the delivered list, never a row among its parts
+                if cls == "frame" and pop_id not in framed \
+                        and len(hops) == 1:
+                    framed.add(pop_id)
+                    kindw = condsmap[pop_id].get("kind")
+                    owned = "::".join(pop_id.split("::")[-2:])
+                    frames.append(
+                        ("all of the delivered parts must hold "
+                         "together" if kindw == "AND" else
+                         "any one of the delivered parts suffices")
+                        + f" ({owned} joins them with {kindw})")
+                return
+            _shape(m, hops)     # the artifact covers ROWED walks
+            key = (pop_id, via, m["identity"])   # the row dedups
             if key in seen_rows:
                 return
             seen_rows.add(key)
@@ -546,40 +736,110 @@ def answer_question(question: str, interpret_fn,
                          "words": _speech(pop_id),
                          "a_id": pop_id, "b_id": m["identity"]})
 
-        for m in anchors:
+        # THE NEAR-FIRST DEFAULT (ruled 2026-09-12): an owner
+        # anchor asking about its owned logic answers from its OWN
+        # subtree; the wider reach is counted, one click away —
+        # an explicit relation word (edge_kinds) overrides
+        near_default = (not edge_kinds and reach != "wide"
+                        and kind_label in OWNED_POPS
+                        and all(m["label"] in OWNER_LABELS
+                                for m in anchors))
+        allowed: Optional[Set[str]] = (
+            set(edge_kinds) if edge_kinds
+            else set(NEAR_EDGES) if near_default else None)
+
+        def _walk_from(m: Dict[str, Any],
+                       allowed_edges: Optional[Set[str]],
+                       sink) -> None:
             for nbr, elbl in adj.get(m["identity"], []):
-                if edge_kinds and elbl not in edge_kinds:
+                if allowed_edges is not None \
+                        and elbl not in allowed_edges:
                     continue
+                start = None
                 if nbr in pop:
-                    _row(nbr, elbl, m)
+                    sink(nbr, elbl, m, [(elbl, nbr)])
+                    # THE CONDITION TREE DELIVERS WHOLE
+                    # (2026-09-12): a delivered composite is ALSO
+                    # connective — its parts are the meaning (the
+                    # #AllMeds lesson: the AND root without its
+                    # four predicates answered nothing)
+                    if nbr in condsmap:
+                        start = nbr
                 elif nbr in joinsmap or nbr in condsmap:
-                    # pass-through: walk the connective CHAIN; the
-                    # citation is the connective nearest the anchor
-                    via = _cite(nbr)
-                    walked = {nbr}
-                    frontier = [nbr]
-                    while frontier:
-                        cur = frontier.pop()
-                        for nbr2, _lbl2 in adj.get(cur, []):
-                            if nbr2 == m["identity"]:
-                                continue
-                            if nbr2 in pop:
-                                _row(nbr2, via, m)
-                            elif (nbr2 in joinsmap
-                                  or nbr2 in condsmap) \
-                                    and nbr2 not in walked:
+                    start = nbr
+                if start is None:
+                    continue
+                # pass-through: walk the connective CHAIN; the
+                # citation is the connective nearest the anchor —
+                # EXCEPT a frame (AND/OR): the frame LINE speaks
+                # for the list, and a vacuous arity sentence is
+                # not a citation (Sunny's live round, 2026-09-12
+                # evening: "via: All 5 of its parts hold." rode
+                # every filter row)
+                if start in condsmap and condsmap[start].get(
+                        "kind") in FRAME_KINDS:
+                    via = ""
+                else:
+                    via = _cite(start)
+                walked = {start}
+                frontier = [(start, [(elbl, start)])]
+                while frontier:
+                    cur, hops = frontier.pop()
+                    for nbr2, lbl2 in adj.get(cur, []):
+                        if nbr2 == m["identity"] \
+                                or nbr2 in walked:
+                            continue
+                        if nbr2 in pop:
+                            sink(nbr2, via, m,
+                                 hops + [(lbl2, nbr2)])
+                            if nbr2 in condsmap:
                                 walked.add(nbr2)
-                                frontier.append(nbr2)
+                                frontier.append(
+                                    (nbr2,
+                                     hops + [(lbl2, nbr2)]))
+                        elif nbr2 in joinsmap \
+                                or nbr2 in condsmap:
+                            walked.add(nbr2)
+                            frontier.append(
+                                (nbr2, hops + [(lbl2, nbr2)]))
+
+        for m in anchors:
+            _walk_from(m, allowed, _row)
+        # THE COUNTED REMAINDER (2026-09-12): a narrowed walk
+        # narrows VISIBLY or not at all — the free walk counts the
+        # rows the narrowing excluded (same class filter, so the
+        # count means answers, never structure)
+        if allowed is not None:
+            free: Set[str] = set()
+
+            def _free(p, v, m2, h):
+                if _row_class(p, h) == "row":
+                    free.add(p)
+            for m in anchors:
+                _walk_from(m, None, _free)
+            outside = len(free - hit_pop)
+            if edge_kinds:
+                constrained_out = outside
+            else:
+                far_out = outside
         rows.sort(key=lambda r: (r["a"], r["b"]))
+        owner_qualify(rows)
+        counted_out = {k: len(v) for k, v in out_sets.items()}
         # literal: shape
         counts = {"connected": len(hit_pop),
                   "population": len(pop), "label": kind_label}
-        names = sorted({m["name"] for m in anchors})
-        flt = " OR ".join(f"b.name = '{n}'" for n in names[:8])
-        edge = sorted(edge_kinds)[0] if edge_kinds else "has_part"
-        gql = [f"MATCH (a:{kind_label})-[:{edge}]->"
-               f"(b:{anchors[0]['label']}) FILTER {flt} "
-               "RETURN a.name, b.name"]
+        # STRUCTURE NEVER ROWS reaches the ARTIFACT (Sunny's live
+        # DIVERGE, 2026-09-12 evening: served 5 rows included the
+        # 1=1 degenerate the delivery rightly excluded — the
+        # displayed query must describe the delivered answer).
+        # Folded NOT-operands sit deeper than any rowed shape's
+        # hop count, so kind + degenerate filters restore parity.
+        pop_filter = (" AND a.kind <> 'AND' AND a.kind <> 'OR'"
+                      " AND a.degenerate <> 'true'"
+                      if kind_label == "condition" else "")
+        gql = [_enum_gql(alabel, sig, anchors, pop_filter)
+               for alabel, sig in sorted(
+                   shapes, key=lambda s: (len(s[1]), s))]
     elif enum_kinds:
         mode = "list"
         kind_label = enum_kinds[0]
@@ -683,6 +943,10 @@ def answer_question(question: str, interpret_fn,
             "label_relaxed": label_relaxed,
             "pinned": pinned, "pin_misses": pin_misses,
             "edge_constraints": sorted(edge_kinds),
+            "relation_unclaimed": relation_unclaimed,
+            "constrained_out": constrained_out,
+            "far_out": far_out, "counted_out": counted_out,
+            "frames": frames, "reach": reach,
             "gql": [g for g in gql if g],
             "evidence": evidence, "edge_lines": edge_lines,
             "gaps": [(a.rsplit('|', 1)[-1], b.rsplit('|', 1)[-1])
@@ -782,6 +1046,22 @@ function append(html) {
   window.scrollTo(0, document.body.scrollHeight);
 }
 log.addEventListener('click', async (e) => {
+  const w = e.target.closest('a.wide');
+  if (w) {
+    e.preventDefault();
+    append('<p class="you">' + esc('show the wider reach') +
+           '</p>');
+    try {
+      const r = await fetch('/round?q=' +
+        encodeURIComponent(w.dataset.q) + '&reach=wide');
+      append((await r.json()).html);
+      refreshWire();
+    } catch (err) {
+      append('<p class=meta>round failed (' + esc(String(err)) +
+             ')</p>');
+    }
+    return;
+  }
   const a = e.target.closest('a.pick');
   if (!a) return;
   e.preventDefault();
@@ -888,6 +1168,34 @@ def render_round(result: Dict[str, Any]) -> str:
         parts.append("<p class=meta>traversal constrained to: "
                      + html.escape(", ".join(
                          result["edge_constraints"])) + "</p>")
+    for t in result.get("relation_unclaimed", []):
+        parts.append("<p class=meta>relation word '"
+                     + html.escape(t) + "' matched no structure "
+                     "vocabulary — counted, steering nothing.</p>")
+    if result.get("constrained_out"):
+        lbl = (result.get("counts") or {}).get("label", "node")
+        parts.append(f"<p class=meta>{result['constrained_out']} "
+                     f"{html.escape(str(lbl))}(s) connect only "
+                     "outside the constrained edge kind(s) — "
+                     "counted, not lost.</p>")
+    # THE NEAR-FIRST DEFAULT: the wider reach is one click away
+    if result.get("far_out"):
+        lbl = (result.get("counts") or {}).get("label", "node")
+        parts.append(f"<p class=meta>{result['far_out']} more "
+                     f"{html.escape(str(lbl))}(s) connect beyond "
+                     "the anchor's own structure — counted; "
+                     f"<a href='#' class=wide data-q=\"{q_attr}\">"
+                     "show the wider reach</a>.</p>")
+    # STRUCTURE NEVER ROWS: the conjunction semantics FRAME the
+    # list; the exclusions are counted classes
+    for f in result.get("frames", []):
+        parts.append("<p class=meta>frame: " + html.escape(f)
+                     + "</p>")
+    co = result.get("counted_out") or {}
+    if co:
+        bits = " · ".join(f"{v} {k}" for k, v in sorted(co.items()))
+        parts.append("<p class=meta>not rows, counted: "
+                     + html.escape(bits) + ".</p>")
     for g in result["gql"]:
         parts.append(f"<pre class=gql>{html.escape(g)}</pre>")
     # THE LIVE-WIRE TOGGLE (ruled 2026-09-12): the served graph's
@@ -1018,8 +1326,9 @@ def make_handler(estate: str, coverage: str, ask_fn,
                     token, _, ident = p.partition(":::")
                     if token and ident:
                         pins[token] = ident
+                reach = (params.get("reach") or ["near"])[0]
                 if q.strip():
-                    res = ask_fn(q, pins)
+                    res = ask_fn(q, pins, reach)
                     if wire is not None and wire_state["on"]:
                         blocks = fabric_wire.run_round(wire, res)
                         wire_state["spent"] += len(blocks)
@@ -1074,6 +1383,13 @@ def main() -> None:
     if blessed:
         print(f"  {blessed} ruled blessing(s) born into the "
               "governance journal (the ledger's blessed slice)")
+    # R5.b THE BLESSED NAME (Grammar_Floor v2.8.0): registry rows
+    # become blessed_name nodes; counts never silent
+    names = glossary.seed_blessed_names(store, read,
+                                        base / "glossary")
+    if any(names.values()):
+        print("  blessed names: " + " · ".join(
+            f"{v} {k}" for k, v in sorted(names.items()) if v))
     entries, exclusions = technical_scope(read)
     adj, directed = technical_adjacency(read)
     seeded = seed_cache(
@@ -1099,9 +1415,11 @@ def main() -> None:
     else:
         print("no OPENAI_API_KEY — exact tiers only")
 
-    def ask_fn(q: str, pins=None) -> Dict[str, Any]:
+    def ask_fn(q: str, pins=None,
+               reach: str = "near") -> Dict[str, Any]:
         return answer_question(q, interpret_fn, entries, semantic,
-                               read, adj, directed, pins=pins)
+                               read, adj, directed, pins=pins,
+                               reach=reach)
 
     coverage = coverage_line(entries, exclusions)
     wire, wire_reason = fabric_wire.from_env()

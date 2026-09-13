@@ -67,10 +67,17 @@ def test_every_loaded_registry_is_ratified_v1():
     # retired, joins_to dictionary-only; 1.38.0 = M2 THE JOIN LAYER
     # BUILT: join/left_side/right_side PRESENT, join census rows,
     # reads = the remainder; 1.39.0 = M3 THE CONDITION LAYER:
-    # condition/param/resolves_to PRESENT, uses_param, joinType closed
+    # condition/param/resolves_to PRESENT, uses_param, joinType
+    # closed; 1.40.0 = THE STRUCTURE-WORD CLAIM + THE RELATION-WORD
+    # SEAT (Sunny's "fix these gaps" go, 2026-09-12): prompt 3.1.0,
+    # _edge self-speech rows, _self scope speaks "subquery" —
+    # prompts and speech only, twin structure untouched;
+    # 1.41.0 = THE NAMER SEAT (riders c/d ruled, Sunny's "rule
+    # riders c and d" 2026-09-12): Seat_Prompts gains namer 1.0.0
+    # — prompt row only, twin structure untouched
     for reg in metamodel.load_all().values():
         assert reg.ratified is True
-        assert reg.version == "1.39.0"
+        assert reg.version == "1.41.0"
 
 
 def test_load_single_exposes_sheets_and_stamp():

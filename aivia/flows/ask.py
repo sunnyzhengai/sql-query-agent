@@ -55,6 +55,19 @@ def validate_interpretation(raw: Any) -> Optional[Dict[str, Any]]:
     # a 'kinds' field is STRIPPED (THE SEARCH IS THE ANSWER: the
     # model never proposes type targets; type words hit the label
     # entries by vector like everything else)
+    # relation-marks (prompt 3.1.0, ruled 2026-09-12): the
+    # Interpreter flags which mentions are RELATION WORDS — a role
+    # classification like reference-roles (L4-D3), never a type
+    # target; only mentions qualify, anything else is refused
+    raw_rel = raw.get("relations")
+    if isinstance(raw_rel, list):
+        rel = []
+        for m in raw_rel:
+            if isinstance(m, str) and m in out["mentions"] \
+                    and m not in rel:
+                rel.append(m)
+        if rel:
+            out["relations"] = rel
     raw_refs = raw.get("references")
     if isinstance(raw_refs, dict):
         refs = {}

@@ -615,6 +615,263 @@ def test_param_impact_enumerates_the_using_scopes(world):
     assert {row["a"] for row in r["rows"]} >= {"#Base_Pop"}
 
 
+# ---- THE ARTIFACT LAW + OWNER-QUALIFY (fixes 2026-09-12, from
+# Sunny's condition & param screenshots: the artifact rendered
+# condition-[:has_part]->scope — backwards — and a fictional
+# column-[:has_part]->scope; cond#1 rendered twelve times bare) ----
+def _base_pop_condition_round(world):
+    read, entries, _, adj, directed = world
+    return mc.answer_question(
+        "what condition does #Base_Pop have?",
+        _scripted_tokens(["condition", "#Base_Pop"]),
+        entries, None, read, adj, directed)
+
+
+def test_enumeration_artifact_directions_are_store_truth(world):
+    # the screenshot corpse: MATCH (a:condition)-[:has_part]->
+    # (b:scope) — the store's edge runs scope—has_part→condition
+    r = _base_pop_condition_round(world)
+    assert r["mode"] == "enumeration" and r["rows"]
+    assert ("MATCH (a:condition)<-[:has_part]-(b:scope) FILTER "
+            "(b.name = '#Base_Pop') AND a.kind <> 'AND' AND "
+            "a.kind <> 'OR' AND a.degenerate <> 'true' "
+            "RETURN a.name, b.name") in r["gql"]
+    for g in r["gql"]:
+        assert "(a:condition)-[:has_part]->" not in g
+        assert g.startswith("MATCH ") and " FILTER " in g \
+            and " RETURN " in g and "type(" not in g
+
+
+def test_enumeration_artifact_covers_the_pass_through(world):
+    # the artifact describes the DELIVERED walk (the live-fire
+    # finding): condition rows now descend the tree, so the
+    # descent shapes appear; join-chain shapes live where joins
+    # still row the walk — the column population (see the column
+    # test) — because STRUCTURE NEVER ROWS killed them here
+    # #Base_Pop's own answer is ONE direct WHERE condition (the
+    # arrival-window RANGE) — one shape, exactly
+    r = _base_pop_condition_round(world)
+    assert r["gql"] == [
+        "MATCH (a:condition)<-[:has_part]-(b:scope) FILTER "
+        "(b.name = '#Base_Pop') AND a.kind <> 'AND' AND "
+        "a.kind <> 'OR' AND a.degenerate <> 'true' "
+        "RETURN a.name, b.name"]
+    # #AllMeds' filters sit under its AND root — the descent shape
+    ra = _allmeds_filters_round(world)
+    assert any("(c1:condition)<-[:has_part]-(b:scope)" in g
+               for g in ra["gql"])
+    assert not any(":join)" in g for g in ra["gql"])
+
+
+def test_near_first_default_owns_the_condition_answer(world):
+    # THE NEAR-FIRST DEFAULT (ruled "all 3, go"): an owner anchor
+    # asking about its owned logic answers from its OWN subtree —
+    # the 60-row flood of 2026-09-12's screenshots is dead; what
+    # the walk excludes is COUNTED by class, never lost
+    r = _base_pop_condition_round(world)
+    owners = {row["a_id"].rsplit("::", 2)[-2]
+              for row in r["rows"]}
+    assert owners == {"#Base_Pop"}
+    assert "join structure" in r["counted_out"]
+    # display names are bare when unique — no false qualification
+    seen = {}
+    for row in r["rows"]:
+        seen.setdefault(row["a"], set()).add(row["a_id"])
+    assert all(len(ids) == 1 for ids in seen.values())
+
+
+def test_column_enumeration_artifact_never_invents_an_edge(world):
+    # 'what filters are in the #Base_Pop subquery' emitted
+    # MATCH (a:column)-[:has_part]->(b:scope) — no such edge exists
+    # in the design; columns reach scopes through conditions/joins
+    read, entries, _, adj, directed = world
+    kind = next(e for e in entries
+                if e["identity"] == "kind::column")
+    semantic = _ScriptedSemantic(
+        {"filters": [{**dict(kind), "score": 1.2}]})
+    r = mc.answer_question(
+        "what filters are in the #Base_Pop subquery",
+        _scripted_tokens(["filters", "#Base_Pop"]),
+        entries, semantic, read, adj, directed)
+    assert r["mode"] == "enumeration" and r["rows"]
+    for g in r["gql"]:
+        assert "(a:column)-[:has_part]->(b:scope)" not in g
+    assert any(":resolves_to]" in g for g in r["gql"])
+    # the join-chain shapes live HERE (columns row through joins;
+    # condition enumerations count them as structure instead)
+    assert any(":join)" in g for g in r["gql"])
+    assert any("_side]->(b:scope)" in g for g in r["gql"])
+    # the ENCOUNTER_ID flood owner-qualifies (TABLE.COLUMN)
+    seen = {}
+    for row in r["rows"]:
+        seen.setdefault(row["a"], set()).add(row["a_id"])
+    assert all(len(ids) == 1 for ids in seen.values())
+    assert any(row["a"].endswith(".ENCOUNTER_ID")
+               for row in r["rows"])
+
+
+# ---- THE STRUCTURE-WORD CLAIM + THE RELATION-WORD SEAT (ruled
+# 2026-09-12, Sunny's "fix these gaps" after the #AllMeds
+# gap-check; prompt 3.1.0 unparked by the same word) + THE
+# MEANING ROWS (his "all 3, go": structure never rows ·
+# near-first default · composites compose) ------------------------
+def _allmeds_filters_round(world, kind_id="kind::condition",
+                           relations=(), reach="near"):
+    read, entries, _, adj, directed = world
+    by_id = {e["identity"]: e for e in entries}
+    kind = dict(by_id[kind_id])
+    hp = dict(by_id["edgekind::has_part"])
+    noise = dict(next(e for e in entries if e["label"] == "column"))
+    # the screenshot ranking shape: a noise column instance on top,
+    # the structure entries beneath — all above MATCH_SCORE
+    semantic = _ScriptedSemantic({
+        "filters": [{**noise, "score": 1.41},
+                    {**kind, "score": 1.35}],
+        "in": [{**noise, "score": 1.2}, {**hp, "score": 0.9}]})
+    mentions = ["filters", "#AllMeds"] + (["in"] if relations
+                                          else [])
+
+    def interp(q):
+        # literal: shape
+        return {"mentions": mentions, "relations": list(relations)}
+    return mc.answer_question(
+        "what filters are in the #AllMeds subquery?", interp,
+        entries, semantic, read, adj, directed, reach=reach)
+
+
+def test_structure_word_claims_over_noise_instances(world):
+    # the screenshot corpse: kind 'column' claimed 'filters' via
+    # the NOISE instance's label; the ruled law claims by the
+    # kind's OWN score — 'filters' reaches kind condition
+    r = _allmeds_filters_round(world)
+    assert r["label_constraint"] == ["condition"]
+    assert r["mode"] == "enumeration"
+    assert r["counts"]["label"] == "condition"
+
+
+def test_relation_word_constrains_traversal_and_counts(world):
+    # 'in' (relation-marked) grounds as the has_part edge kind on
+    # a COLUMN population: the walk keeps #AllMeds' own structure;
+    # columns reached only through other scopes' joins are
+    # EXCLUDED AND COUNTED
+    r = _allmeds_filters_round(world, kind_id="kind::column",
+                               relations=("in",))
+    assert r["edge_constraints"] == ["has_part"]
+    assert r["mode"] == "enumeration" and r["rows"]
+    assert r["constrained_out"] >= 1
+    out = mc.render_round(r)
+    assert "connect only outside the constrained edge kind(s)" \
+        in out
+
+
+def test_condition_tree_delivers_whole(world):
+    # THE MEANING ROWS (Sunny's ruled #AllMeds table, "all 3,
+    # go"): the answer IS the four filters, each speaking its
+    # phrase — structure frames, folds, and counts; it never rows
+    r = _allmeds_filters_round(world)
+    by_tail = {row["a_id"].rsplit("::", 1)[-1]: row
+               for row in r["rows"]}
+    assert set(by_tail) == {"cond#6", "cond#8", "cond#9",
+                            "cond#10"}
+    # NOT folded into its child — the positive fact spoken with
+    # the name-words subject (grammar 2.5.0 + 2.6.0: "The taken
+    # time is recorded.")
+    assert by_tail["cond#6"]["words"] == "the taken time is recorded."
+    # 2.7.0 THE RELATION RULE: name words BOTH sides + the SQL
+    # author's noted intent riding (Sunny's "still not fixed" round)
+    assert by_tail["cond#8"]["words"] == ("the taken time is before "
+                                          "the ed departure time "
+                                          "(noted 'while in ed').")
+    assert by_tail["cond#9"]["words"] == ("the route of "
+                                          "administration for a "
+                                          "medication is 11 (noted "
+                                          "'intravenous').")
+    assert "is one of the values" in by_tail["cond#10"]["words"]
+    # the conjunction semantics FRAME the list
+    assert r["frames"] and "AND" in r["frames"][0]
+    # the frame line speaks — frame-descent rows cite NOTHING
+    # (Sunny's live round: the vacuous arity via is dead)
+    assert all(row["edge"] == "" for row in r["rows"])
+    # the artifact carries the class exclusions (the live DIVERGE:
+    # served rows included the 1=1 degenerate)
+    assert all("a.kind <> 'AND'" in g
+               and "a.degenerate <> 'true'" in g
+               for g in r["gql"])
+    # literal: shape — Sunny's ruled exclusion classes, exact
+    assert r["counted_out"] == {"join structure": 3, "frame": 1,
+                                "degenerate": 1,
+                                "folded into NOT": 1}
+    out = mc.render_round(r)
+    assert "frame:" in out and "not rows, counted:" in out
+
+
+def test_wide_reach_keeps_the_laws(world):
+    # the wider reach is ONE CLICK AWAY (near-first default) —
+    # and structure still never rows there; display names stay
+    # unique per identity (the owner-qualify invariant)
+    near = _allmeds_filters_round(world)
+    wide = _allmeds_filters_round(world, reach="wide")
+    assert len(wide["rows"]) >= len(near["rows"])
+    assert wide["far_out"] == 0          # nothing hidden near
+    assert "frame" in wide["counted_out"]
+    seen = {}
+    for row in wide["rows"]:
+        seen.setdefault(row["a"], set()).add(row["a_id"])
+    assert all(len(ids) == 1 for ids in seen.values())
+
+
+def test_relation_word_never_instance_anchors(world):
+    # the estate holds a grain literally named 'In' — a
+    # relation-marked token must not be captured by it; with no
+    # structure entry clearing the bar it is a COUNTED no-claim
+    read, entries, _, adj, directed = world
+
+    def interp(q):
+        # literal: shape
+        return {"mentions": ["ADT_EVENTS", "in"],
+                "relations": ["in"]}
+    r = mc.answer_question("in ADT_EVENTS", interp, entries, None,
+                           read, adj, directed)
+    assert r["relation_unclaimed"] == ["in"]
+    assert all(m["name"] != "In" for m in r["anchors"])
+    assert "matched no structure vocabulary" in mc.render_round(r)
+
+
+def test_edge_kinds_speak_their_own_speech(world):
+    _, entries, _, _, _ = world
+    hp = next(e for e in entries
+              if e["identity"] == "edgekind::has_part")
+    assert "contains" in hp["words"]        # the _edge speech row
+    assert "spine" not in hp["words"]       # Notes retired as speech
+
+
+def test_cage_validates_relations():
+    from aivia.flows import ask
+    out = ask.validate_interpretation(
+        {"mentions": ["tables", "in", "X"],
+         "relations": ["in", "in", "ghost", 7]})
+    assert out["relations"] == ["in"]       # mentions only, deduped
+    out = ask.validate_interpretation(
+        {"mentions": ["X"], "relations": "in"})
+    assert "relations" not in out           # a non-list is refused
+
+
+def test_owner_qualify_deepens_only_until_unique():
+    # literal: shape — authored collision fixture
+    rows = [{"a": "ENCOUNTER_ID", "a_id": "emr|dbo|T1|ENCOUNTER_ID"},
+            {"a": "ENCOUNTER_ID", "a_id": "emr|dbo|T2|ENCOUNTER_ID"},
+            {"a": "LONELY_COL", "a_id": "emr|dbo|T1|LONELY_COL"},
+            {"a": "cond#1", "a_id": "f.sql::#A::join#1::cond#1"},
+            {"a": "cond#1", "a_id": "f.sql::#B::join#1::cond#1"}]
+    mc.owner_qualify(rows)
+    assert rows[0]["a"] == "T1.ENCOUNTER_ID"
+    assert rows[1]["a"] == "T2.ENCOUNTER_ID"
+    assert rows[2]["a"] == "LONELY_COL"          # unique stays bare
+    # depth 2 (join#1::cond#1) still collides → depth 3 resolves
+    assert rows[3]["a"] == "#A::join#1::cond#1"
+    assert rows[4]["a"] == "#B::join#1::cond#1"
+
+
 # ---- the glossary chain (the machinery lives in flows/glossary;
 # tests/aivia/test_glossary.py owns it — this proves the CONSOLE
 # INDEX carries the blessed expansions end-to-end) -------------------

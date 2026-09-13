@@ -187,6 +187,33 @@ def append_acronym(store: Store, name: str, expansions: List[str],
         approved_at, extract_id=f"kg3@{approved_at}")
 
 
+def append_blessed_name(store: Store, target: str, words: str,
+                        description_hash: str, approved_by: str,
+                        approved_at: str) -> NodeVersion:
+    """R5.b THE BLESSED NAME (Grammar_Floor v2.8.0): a column's or
+    table's short human name, SELECTED from the vendor's own words
+    and blessed by a human — {target: KG1 identity, words,
+    description_hash (ties the words to the dictionary text they
+    were selected from), approved_by, approved_at}. Journals (kg3@
+    family): blessings survive rebirth. Never exported (the
+    EXPORT_LABELS allowlist)."""
+    _check_identity(approved_by)
+    if is_machine(approved_by):
+        raise RefusalKG3("LC3-C3", "blessings are HUMAN acts — the "
+                         "proposer proposes, it never blesses")
+    if not (words or "").strip():
+        raise RefusalKG3("VOC-1", "a blessed name carries words — "
+                         "no empty shells")
+    _mint_actor(store, approved_by, approved_at)
+    return store.append_node(
+        "blessed_name", f"blessed_name::{target}",
+        # literal: shape
+        {"target": target, "words": words.strip(),
+         "description_hash": description_hash,
+         "approved_by": approved_by, "approved_at": approved_at},
+        approved_at, extract_id=f"kg3@{approved_at}")
+
+
 def append_responsibility(store: Store, artifact_id: str, kind: str,
                           holder: str, target: str, author: str,
                           created_at: str) -> NodeVersion:

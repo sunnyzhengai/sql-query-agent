@@ -15,19 +15,22 @@ proposed/evidence while unruled) refresh mechanically; ruled fields
 (status once blessed/held/plain, expansions, scope, why_held,
 approvals) are human-only — refresh may NEVER touch them.
 """
+import hashlib
 import json
 import pathlib
 from typing import Dict, List, Tuple
 
-from aivia.flows import enrich
+from aivia.flows import enrich, gates
 from aivia.lenses.ask_index import _tokens
 
 DICTIONARY = "abbreviation_dictionary.json"
 LEDGER = "acronym_ledger.json"
+BLESSED_SUBJECTS = "blessed_subjects.json"
 # the scan sweeps the ESTATE's names — governance/vocabulary kinds
 # are not estate names (blessed vocabulary must not carry itself)
 # literal: mechanical — the scan's governance-kind exclusion
-SCAN_EXCLUDED = ("acronym", "person", "agent", "role")
+SCAN_EXCLUDED = ("acronym", "person", "agent", "role",
+                 "blessed_name")
 # literal: frame — the ledger's status contract (machine vs ruled)
 MACHINE_STATUSES = ("unreviewed", "matched")
 # literal: frame — human/Scribe-owned statuses; refresh never writes
@@ -167,6 +170,78 @@ def seed_journal(store, read, glossary_dir: pathlib.Path) -> int:
             approved_by=row["approved_by"],
             approved_at=row["approved_at"])
     return made
+
+
+def description_hash(text: str) -> str:
+    """R5.b staleness tie: the words were selected from THIS
+    dictionary text — the text changes, the row goes stale."""
+    return hashlib.sha256((text or "").encode("utf-8")).hexdigest()
+
+
+def load_blessed_subjects(glossary_dir: pathlib.Path
+                          ) -> Dict[str, Dict]:
+    f = glossary_dir / BLESSED_SUBJECTS
+    if not f.is_file():
+        return {}
+    return json.loads(f.read_text())
+
+
+def save_blessed_subjects(glossary_dir: pathlib.Path,
+                          rows: Dict[str, Dict]) -> None:
+    """Sorted, indented — the registry is Sunny's ruling surface;
+    he edits status to 'blessed' by hand (the field law)."""
+    (glossary_dir / BLESSED_SUBJECTS).write_text(
+        json.dumps({k: rows[k] for k in sorted(rows)}, indent=1))
+
+
+def seed_blessed_names(store, read,
+                       glossary_dir: pathlib.Path) -> Dict[str, int]:
+    """R5.b THE BLESSED NAME (Grammar_Floor v2.8.0), the seed:
+    BLESSED registry rows become blessed_name nodes (kg3@ family —
+    blessings survive rebirth), delta by target. The gate re-runs
+    HERE against the node's CURRENT description — a hand-edited
+    row cannot bypass it — and a stale hash means the dictionary
+    text moved since the words were selected: the row is COUNTED,
+    the fallback voices, nothing guesses. Machines never bless."""
+    from aivia.graph import kg3_artifacts
+    rows = load_blessed_subjects(glossary_dir)
+    have = {n.properties["target"]
+            for n in read.nodes("blessed_name")}
+    nodes = {n.identity: n for n in read.nodes("column")}
+    nodes.update({n.identity: n for n in read.nodes("table")})
+    # literal: shape — the conservation counts, never silent
+    counts = {"seeded": 0, "already": 0, "skipped_status": 0,
+              "stale": 0, "rejected": 0, "missing_target": 0}
+    for target in sorted(rows):
+        row = rows[target]
+        if row.get("status") != "blessed":
+            counts["skipped_status"] += 1
+            continue
+        if target in have:
+            counts["already"] += 1
+            continue
+        node = nodes.get(target)
+        if node is None:
+            counts["missing_target"] += 1
+            continue
+        desc = node.properties.get("description", "")
+        if row.get("description_hash") != description_hash(desc):
+            counts["stale"] += 1
+            continue
+        name = target.rsplit("|", 1)[-1]
+        blessed_by = row.get("blessed_by", "")
+        if gates.check_blessed_words(row.get("words", ""), desc,
+                                     name) \
+                or kg3_artifacts.is_machine(blessed_by):
+            counts["rejected"] += 1
+            continue
+        kg3_artifacts.append_blessed_name(
+            store, target=target, words=row["words"],
+            description_hash=row["description_hash"],
+            approved_by=blessed_by,
+            approved_at=row.get("blessed_at", ""))
+        counts["seeded"] += 1
+    return counts
 
 
 def review_queue(glossary_dir: pathlib.Path

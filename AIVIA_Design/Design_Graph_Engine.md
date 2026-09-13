@@ -246,15 +246,22 @@ algorithm · evidence returned with the query as artifact).
 
 ## The laws carried forward from v1 (storage-independent, all kept)
 
-[registry stamps: kg1_technical v1.39.0 · kg2_logic v1.39.0 ·
-kg2_kind_library v1.39.0 · kg3_artifacts v1.39.0 ·
-kg4_concepts v1.39.0 · flows v1.39.0 · lenses v1.39.0]
+[registry stamps: kg1_technical v1.41.0 · kg2_logic v1.41.0 ·
+kg2_kind_library v1.41.0 · kg3_artifacts v1.41.0 ·
+kg4_concepts v1.41.0 · flows v1.41.0 · lenses v1.41.0]
 (stamp block restored 2026-09-10 — the ratification rename dropped
 v1's per-section stamps; RG-A2 caught it same day. One block here,
 the same-breath rule mechanical again; registries carry their own
 section provenance. 1.37.0 = the join-node ruling, landed in the
 CONVERTER — registry JSONs are generated data, never hand-edited;
-the determinism test enforces it and caught the first attempt.)
+the determinism test enforces it and caught the first attempt.
+1.40.0 = THE STRUCTURE-WORD CLAIM + THE RELATION-WORD SEAT,
+Sunny's "fix these gaps" go 2026-09-12: prompt 3.1.0, _edge
+self-speech rows, _self scope speaks "subquery" — prompts and
+speech only, the twin's structure untouched. 1.41.0 = THE NAMER
+SEAT, Sunny's "rule riders c and d" 2026-09-12: Seat_Prompts
+gains the namer row 1.0.0 (Grammar_Floor §R5.b's proposer) —
+one prompt row, the twin's structure untouched.)
 
 Conservation (handled ⊎ counted == everything) · meaning-identity
 anchoring (contentKeys → drift) · the voicing grammar (registry-

@@ -51,6 +51,17 @@ customers, never in public/demo assets.
    explicit extract field — the manifest's captured db plus the
    per-table schema close the db -> schema -> table chain; a
    single-schema source still states it).
+2b. **column data_type** (added 2026-09-13, Sunny's find during
+   the R5.b rider-(c) review: "we can get the data type from the
+   EMR's dictionary"): columns.csv MAY carry a `data_type` field —
+   the source's declared type, verbatim. OPPORTUNISTIC like the
+   grain phrase: absent = absent, no refusal, no guess; present =
+   stored on the column node. Consumer: the floor grammar's R4
+   temporal-verb ladder (Grammar_Floor §R5.b rider (c) amended —
+   a declared temporal type decides the verb outright; a
+   non-temporal type never vetoes word evidence, VARCHAR dates
+   being an EMR fact of life). Existing extracts without the
+   field load byte-identically.
 3. **joins** — declared column-pair rows with group identifiers
    and ordinal positions, as the source's own metadata states them.
 3b. **primary keys** (added 2026-09-05, Sunny's ruling — the

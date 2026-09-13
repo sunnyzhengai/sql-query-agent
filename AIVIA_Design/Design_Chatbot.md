@@ -1161,3 +1161,105 @@ beside it, never a replacement.
   live HTTP in the suite — the doubles law); the live wire fires
   only by Sunny's hand. This surface keeps THE TURN DEFAULT: the
   wire adds evidence to the round, it steals no choice point.
+
+► RULED (Sunny, 2026-09-12 — "please fix these gaps", after the
+#AllMeds gap-check) — THE STRUCTURE-WORD CLAIM, superseding the
+kind-subsumption rule's label-agreement clause:
+
+In the semantic tier, the STRUCTURE VOCABULARY claims first: a
+token whose top-scoring kind or edge-kind entry clears
+MATCH_SCORE is claimed by that entry, by ITS OWN score. The old
+clause required the kind's name to equal the top instance's
+label — which picked the kind by the NOISE instance's label:
+'filters' top-matched the column REF_RANGE_TYPE, so kind
+`column` claimed the token while kind `condition` (whose
+self-speech literally says "filter") stood cleared-but-ignored;
+the round then said "constrained to label: column (your word)"
+— a word the user never said. The guards, unchanged: exact-name
+instance hits outrank every claim (a user who types a name
+means the thing); the choice step still offers the instance
+runners-up; a pin outranks any claim (THE TURN DEFAULT). The
+same-label circular-credit case ('tables' vs table instances,
+the rule's founding measurement) falls out as a corollary — the
+kind clears the bar and claims regardless of who supplied the
+label credit.
+
+► RULED (same breath — THE RELATION-WORD SEAT, prompt 3.1.0;
+the 2026-09-12 morning park is LIFTED by the same word):
+
+Relation words are referring words. The Interpreter keeps them
+as mentions and marks them in a caged `relations` field — a
+ROLE classification exactly like reference-roles (L4-D3), never
+a type target (the kinds-field ban stands). A relation-marked
+token grounds ONLY against structure entries (edge-kinds, then
+kinds): it never instance-anchors and never joins anchor sets —
+a relation word whose structure entries clear nothing is a
+COUNTED no-claim, reported on the round, steering nothing.
+Containment words reach `has_part` BY MEANING: edge kinds gain
+honest self-speech (Speech_Sources `_edge` rows — Shape_Ledger
+engineering Notes stop serving as speech). The `reads`
+edge-kind card stays DEFERRED with its recorded reason (a
+'read' constraint would veto join-side travel); the traversal
+vocabulary is has_part + joins_to until that deferral is
+re-ruled.
+
+THE COUNTED REMAINDER rides along (the landing condition from
+the live-fire root-cause note): when an edge-kind constraint
+confines an enumeration, the walk also counts what the
+constraint excluded — "N <label>(s) connect only outside the
+constrained edge kind(s) — counted, not lost." A constraint
+narrows visibly or not at all.
+
+► RULED (Sunny, 2026-09-12 evening — "all 3, go", from his
+#AllMeds table verdict "this is not meaningful") — THE MEANING
+ROWS, three laws in one breath:
+
+**1. STRUCTURE NEVER ROWS.** A condition enumeration delivers
+MEANINGS, not tree anatomy. By the `kind` property already on
+every node: composite kinds (AND/OR) never row — their
+conjunction semantics voice as the FRAME of the delivered list
+("all of the delivered parts must hold together (…::cond#4
+joins them with AND)"); a NOT rows as ONE folded meaning and
+its operand never rows separately; degenerates (1=1) never row;
+anything reached THROUGH a join — composite or not — is the
+join's own structure, never a filter row (the ON ruling carried
+to delivery; class order matters). Every excluded class is
+COUNTED on the round ("not rows, counted: 3 join structure · 1
+frame · 1 degenerate · 1 folded into NOT"). The store keeps
+every grain — the gates still see anatomy; only the ANSWER
+speaks meanings. Why cond#4 ever rowed is recorded plainly: the
+delivery equated "condition node" with "answer row"; nothing
+had ever ruled the gap between a grain in the store and a row
+in an answer.
+
+**2. THE NEAR-FIRST DEFAULT.** When an OWNER grain (scope ·
+file · statement) anchors a question about its OWNED logic
+(condition · join · param · derived_column), the default reach
+is the anchor's own subtree (the ownership edges: has_part ·
+uses_param · cites); connections beyond it are COUNTED with the
+wider reach ONE CLICK AWAY (reach=wide — a choice point, THE
+TURN DEFAULT, never a guess). An explicit relation word
+overrides the default in either direction. Entity anchors and
+entity populations keep the blessed pass-through unchanged
+(scopes-read-table, the EVENT_ID carriers — Sunny's pinned
+six stand). This is not intelligence, it is a precedence rule:
+near answers first, far reach counted, deterministic.
+
+**3. COMPOSITES COMPOSE (Grammar 2.5.0).** NOT folds into its
+child — one meaning, one phrase, per-kind negations from the
+closed set (NULL_CHECK speaks the positive fact; order
+comparisons flip to their opposites; membership/pattern kinds
+negate their verb; no ruled negation = the honest wrapper
+sentence, never a guess). The condition STORE nodes inherit the
+fold. AND/OR keep their structural sentence BECAUSE they frame
+and never row. The LLM stays where the English ladder put it —
+compression where composition is LARGE; a four-part WHERE is
+render territory. (Grammar_Floor v2.5.0 records the rules and
+the caught 2.4.0 version-constant drift.)
+
+The acceptance for all three is Sunny's own table: "what
+filters are in the #AllMeds subquery?" → exactly four rows,
+each a filter speaking its phrase (taken time has a recorded
+value · is before the ED departure · route is 11 · MAR action
+one of 16 codes), framed by the AND, everything else counted
+(test_condition_tree_delivers_whole).

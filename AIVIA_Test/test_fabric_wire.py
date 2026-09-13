@@ -184,7 +184,7 @@ def test_the_toggle_is_off_at_boot_and_the_flip_counts_spends():
 
     w, seen = _wire([(200, _ok_body(["a"], [{"a": 1}]))])
     handler = mc.make_handler(
-        "test", "coverage", lambda q, pins=None: _result(
+        "test", "coverage", lambda q, pins=None, reach="near": _result(
             gql=["MATCH …"],
             rows=[{"a": "T1", "edge": "has_part", "b": "C1"}]),
         wire=w, wire_reason="")
@@ -216,7 +216,7 @@ def test_an_unconfigured_wire_reports_disabled_over_the_endpoint():
     import urllib.request
     from http.server import ThreadingHTTPServer
     handler = mc.make_handler(
-        "test", "coverage", lambda q, pins=None: _result(),
+        "test", "coverage", lambda q, pins=None, reach="near": _result(),
         wire=None, wire_reason="live wire disabled: set X")
     server = ThreadingHTTPServer(("127.0.0.1", 0), handler)
     import threading

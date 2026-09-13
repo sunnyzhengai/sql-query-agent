@@ -1,6 +1,86 @@
-# The Floor Grammar — v2.4.0 (the OPENER dies, 2026-09-11;
-# v2.3.0 REPORT FLOOR 2026-09-07; v2.0.0 POLICY-WALK major
-# 2026-09-06; v1.3.1 RATIFIED Sunny 2026-09-05)
+# The Floor Grammar — v2.8.0 (THE BLESSED NAME ratified
+# 2026-09-12; v2.7.0 the relation rule + v2.6.0 recordedness
+# identifies + v2.5.0 NOT folds same day; v2.4.0 the OPENER
+# dies 2026-09-11; v2.3.0 REPORT FLOOR 2026-09-07; v2.0.0
+# POLICY-WALK major 2026-09-06; v1.3.1 RATIFIED Sunny
+# 2026-09-05)
+
+*v2.8.0 (Sunny's ratification, 2026-09-12 — the sixth go of the
+day, closing the dig that began at "how does condition get
+translated?"): R5.b THE BLESSED NAME — one field, two grains
+(columns + tables): the LLM reads ONLY what the vendor wrote
+(description + name), SELECTS a short human name from those
+words, the subset gate proves no new word entered, Sunny
+blesses the batch, the grammar speaks that name everywhere the
+column or table is voiced. Ruled with the ratification: (a)
+ONLY BLESSED VOICES, blessed by batch after spot-check — the
+gate kills fabrication, a steward's eye kills mis-selection;
+(b) this version. Riders (c) and (d) RULED same day at Sunny's
+"rule riders c and d": THE TEMPORAL UNION + THE NAMER SEAT
+(see §R5.b's rider record); the proposer slice built behind
+them. DECLARED DEFERRAL
+(the 2.4.0/2.5.0 drift lesson, handled by declaration this
+time): FLOOR_GRAMMAR_VERSION stays 2.7.0 in code until the
+R5.b build ships — with an empty registry the text is
+byte-identical (A1), and bumping the constant now would stale
+every floor-derived artifact for a no-op; the constant, the F4
+basis pin, and the fixtures bump together in the build's first
+slice. Full spec: §R5.b below.*
+
+*v2.7.0 (Sunny, 2026-09-12 late — cond#8/cond#9 "still not
+fixed"): THREE RULES IN ONE BREATH. (1) THE RELATION RULE: a
+comparison BETWEEN TWO COLUMNS is a relation between two named
+things — both sides speak NAME WORDS ("The taken time is before
+the ed departure time."); against a VALUE the subject keeps its
+dictionary definition, because there the meaning IS the
+sentence. The corpse was MIXED REGISTER: an 11-word definition
+subject bolted to a 4-word name comparand. (2) THE TOKEN-LINK
+REDUCTION: '<qualifier> <token> associated with|linked to|
+corresponding to <the thing>' speaks THE THING ("category
+number associated with the route of administration" → "route
+of administration"); scoped to those linking verbs so the tuned
+of/for rule stands untouched. (3) NOTED ANNOTATIONS REACH THE
+STORE PHRASE: the SQL author's trailing comment — captured by
+the mapper all along, spoken only by floor bullets — now rides
+the condition node per R8 attribution: "is 11 (noted
+'intravenous')", "is before the ed departure time (noted 'while
+in ED')". The author's intent was in the evidence the whole
+time; the phrase just never carried it.*
+
+*v2.6.0 (Sunny's go, 2026-09-12 — "what is the best translation
+for MA.TAKEN_TIME IS NOT NULL"): RECORDEDNESS IDENTIFIES. The
+NULL_CHECK family speaks "is recorded" / "is not recorded" with
+a NAME-WORDS subject ("The taken time is recorded.") — a
+recordedness predicate needs to POINT at its column, not to
+teach its meaning; value predicates (compare/range/membership)
+keep dictionary-word subjects because there the meaning IS the
+sentence. Two recorded deferrals, each with its reason: the
+owner-possessive form ("the administration's taken time") waits
+for blessed vocabulary to wire into the render — owner words
+today are raw table names, and premature wiring bakes jargon
+into every phrase; the business reading ("the dose was actually
+given") is INFERENCE, not anatomy — it belongs to the blessing
+path (a steward's or the Scribe's gated line anchored to the
+condition's meaning key), never the floor.*
+
+*v2.5.0 (Sunny's ruling, 2026-09-12 — the #AllMeds table: "the
+inner condition does not hold" is not meaningful): NOT FOLDS
+INTO ITS CHILD — one meaning, one phrase. The negations are a
+closed per-kind table (`_voice_negated`): NULL_CHECK speaks the
+positive fact ("has a recorded value"); order comparisons FLIP
+to their opposites (NOT ≥ IS <, with the temporal verbs riding
+along); IN_LIST → "is none of the values"; IN/EXISTS_SELECTION
+negate their clause; PATTERN_MATCH negates its verb; a kind
+with no ruled negation keeps the honest wrapper sentence ("It
+is not the case that …") — never a guess. The condition STORE
+nodes inherit the fold (`condition_render`): a NOT node's
+stored description is the folded phrase; its operand never
+speaks separately in delivery (STRUCTURE NEVER ROWS, ruled the
+same day — AND/OR keep their structural arity sentence because
+they FRAME the delivered list and never row). Recorded-embedding
+fixture re-recorded (65 folded phrases). BOOKKEEPING FIND: the
+2.4.0 bump had missed FLOOR_GRAMMAR_VERSION (constant said
+2.3.0 while this header said 2.4.0) — closed in this breath.*
 
 *v2.4.0 (Sunny's ruling, 2026-09-11 — "this phrase 'this is a
 selection of records' is useless"): R1's NO-GRAIN FALLBACK DIES.
@@ -331,3 +411,247 @@ structurally impossible for described files.
 3. Any future grammar change is a VERSION change — a bump makes every
    floor-derived artifact stale (the standing staleness mechanism,
    H8's budgeted queue pacing the regeneration).
+
+---
+
+## R5.b — THE BLESSED NAME (RATIFIED v2.8.0, Sunny 2026-09-12;
+## drafted, simplified to one field, extended to tables, and
+## ratified the same day; the MAJOR stays the policy-walk
+## port's, per R9)
+
+**The finding (the vendor-portability review, 2026-09-12):**
+R5's noun-phrase rendering is a closed heuristic chain tuned on
+THIS estate's dictionary style — one boilerplate regex family,
+six token heads, three linking verbs, the comma cut. On any
+other style it degrades grounded-but-awkward (live corpse, this
+estate: MAR_ACTION_CODE's description "The
+MAR_ACTION_CATEGORY_NUMBER linked to this administration."
+renders the subject "mar_action_category_number linked" — the
+regex wanted "linked to THE", the vendor wrote "linked to
+THIS"). And name words only work when names are readable —
+TAKEN_TIME speaks, TKN_TM would not; we can't count on vendor
+naming. Every new dictionary style costs a corpse-hunt and a
+regex. v2.6.0 already recorded the deferral this closes:
+blessed vocabulary wiring into the render.
+
+**The whole design in one breath:** the LLM reads what the
+vendor wrote about a column — its DESCRIPTION and its NAME,
+nothing else — and SELECTS a short human name for it from those
+words alone; a deterministic gate proves no new word entered;
+Sunny blesses the batch; the grammar speaks that name in every
+sentence about that column. One field. One name per column.
+
+- "The **route of administration** is 11 ('Intravenous')."
+- "The **taken time** is recorded."
+- "The **taken time** is before the **ed departure time**."
+
+Blessed words serve EVERY position a column is voiced —
+dictionary-word subjects, recordedness subjects, both relation
+sides, column-as-value. The v2.6.0/v2.7.0 register split
+(definition words vs name words) exists because HEURISTIC
+dictionary phrases are long; a blessed name is short by
+construction, so one name serves every template and the
+mixed-register corpse cannot occur. For UNBLESSED columns
+nothing changes: v2.7.0 behavior verbatim — heuristic
+dictionary phrase for value-predicate subjects, name words for
+recordedness and relation sides, readable-name fallback + the
+counted coverage gap. Registry empty → every phrase recomputes
+byte-identical to today (acceptance A1).
+
+**TWO GRAINS, ONE METHOD (Sunny's extension, 2026-09-12):**
+TABLES bless the same way. Today table words are defined only
+by the composition sentence (the v2.0.0 block: "Drawn from X…")
+and R2's instance marking ("For the first {table words} record
+read:"), and the rendering is pure name mechanics
+(`_source_phrase`: last segment, underscores → spaces,
+lowercase, + "records") — the vendor's TABLE description,
+loaded on the KG1 table node all along, is never consulted;
+tables never even got the column-grade distillation. Live
+corpse, this estate: dbo.MED_ADMIN_RECORDS → "Drawn from med
+admin records records" — a stutter of raw jargon, while the
+vendor's own sentence says "the active medication
+administration data." Blessed table name: "medication
+administration" (every word in the description) → "Drawn from
+medication administration records"; instance marking "For the
+first medication administration record read:". The registry
+holds BOTH grains — a row keys by KG1 identity, 4-part =
+column, 3-part = table; one `words` field, the same gate
+(source set = the table's description words ∪ table-name
+words), the same proposer, the same blessing. The grammar's
+template mechanics stay the grammar's ("records" suffix,
+pluralization, instance ordinals — never blessed, always
+computed). NAMED SCOPE REFS STAY OUT: #temp/CTE names are the
+SQL author's artifacts with no vendor dictionary row — they
+keep voicing as "the {name words} selection defined earlier in
+this procedure" (their words are the author's own, already
+grounded). Unblessed tables voice exactly as today; A1 covers
+both grains.
+
+### The registry (data, not code)
+
+- Home: `estates/<estate>/glossary/blessed_subjects.json` — the
+  glossary folder per Ruling_Glossary_Process.
+- Row: KG1 identity (4-part = column, 3-part = table) →
+  { words, description_hash, proposer {model, prompt_version,
+  runs}, gate_verdict, status, blessed_by, blessed_at }.
+- Status ladder: PROPOSED (gate-passed, unreviewed) → BLESSED
+  (Sunny's / a steward's word) → RETIRED. REJECTED (gate kill,
+  violations named) and DISPUTED (double-run disagreement) are
+  steward-worklist rows; neither ever voices. Only BLESSED
+  voices (recommended — open question (a)).
+- Staleness: description_hash ties the words to the dictionary
+  text they were selected from; the text changes → the row
+  flips STALE (counted), the fallback voices until re-proposed.
+  THE VERBATIM LAW IS UNTOUCHED: the registry is input data
+  exactly like KG1 descriptions — stored == recomputed holds
+  because recompute reads the same registry state. The model
+  never enters the render path.
+
+### The gate (deterministic; the produce-gate contract — a
+### violation names itself, the fallback ships)
+
+- GATE-SUBJ-1, the subset law (fabrication becomes mechanically
+  impossible): every content word of the candidate appears in
+  the source set = description words ∪ column-name words,
+  matched by a CLOSED suffix table (s/es/ed/ing/ion/al strips,
+  spelled in the validator spec — no library); the
+  function-word whitelist is closed: of, the, a, an, for, per,
+  in, on, at, by, to, with, and. The model may select, drop,
+  reorder — never introduce. "route of administration" passes
+  on MED_ROUTE_CODE's description; "delivery method" dies by
+  name — right idea, wrong words, not the vendor's.
+- GATE-SUBJ-2: no digit and no quoted string unless present in
+  the source (GATE-VALUE-2's law at word grain).
+- GATE-SUBJ-3: no raw identifier verbatim (GATE-VOICE-1 reused —
+  case-sensitive whole-token).
+- GATE-SUBJ-4, shape: 1–4 words, lowercase, no leading article,
+  no trailing preposition, non-empty.
+- NOTHING TO SELECT FROM = NOTHING PROPOSED: a column whose
+  description is empty or sentinel ("No value is present.") and
+  whose name carries no words gives the model no legal source —
+  it is never proposed, voices as today, and counts as a naming
+  gap for a human. The model never guesses past missing vendor
+  truth.
+- No gate consults a model. Violation → REJECTED with named
+  violations, counted, the fallback voices.
+
+### The proposer protocol (offline, batch — never in render)
+
+- Runs at Sunny's hand (the batch law); endpoint = the estate's
+  own model boundary (customer Azure OpenAI at launch);
+  description text rides door-1 redaction like all egress prose
+  (H6).
+- Input per column: the description + the column name — the two
+  legal word sources, and the name doubles as the selection
+  hint when a description enumerates several nouns. The prompt
+  illustrates the task shape ABSTRACTLY — no estate examples in
+  the prompt (prompt examples are data); the prompt text
+  versions in the registry folder and stamps every row.
+- THE DOUBLE-RUN LAW (R8's disagreement pattern at word grain):
+  two independent runs; identical → PROPOSED; different →
+  DISPUTED with both candidates recorded, neither voicing. The
+  model never breaks a tie with itself.
+- Worklist: what actually voices first — resolves_to target
+  columns (~150 at M3) and the read tables (90); the full
+  dictionary as backfill batches; ECON pacing, worklist order
+  on an empty ledger. BUILT AS TWO SCOPES (Sunny's "why are we
+  not running for the dictionary", 2026-09-13 — a blessed name
+  is per-column truth, not per-file): scope='voiced' (default)
+  and scope='dictionary' = ALL of KG1; the cache makes the sweep
+  one-time, the review load is the real cost and it is Sunny's
+  to pace.
+
+### What R5.b does NOT touch
+
+- The R5 heuristic text and the v2.6.0/v2.7.0 rules: unchanged,
+  now the unblessed fallback.
+- The owner-possessive deferral does NOT close here — but note
+  it moves: a blessed TABLE name is exactly the owner words that
+  deferral was waiting for ("the medication administration's
+  taken time" becomes possible). Wiring the possessive into the
+  render is still its own change quantum, separately ruled.
+- The blessing path for CONDITION meanings (the business
+  reading, v2.6.0's second deferral) — that is inference at
+  predicate grain; this registry holds column names only.
+
+### Conservation + acceptance (design gates, pre-code)
+
+- Census: BLESSED + PROPOSED + DISPUTED + REJECTED + STALE +
+  unblessed + nothing-to-select == the column census AND the
+  table census, each grain closing separately; each produce run
+  counts blessed-vs-fallback attribution.
+- A1 (the fallback proof): registry empty → every stored phrase
+  recomputes byte-identical to v2.7.0 output.
+- A2 (delta-by-name): bless N rows → exactly the conditions
+  resolving to those columns change and nothing else;
+  conservation 1141 intact on the ED-sepsis estate.
+- A3 (the gate corpus): hand-authored candidates per violation
+  class, each killed by its named gate — the injection-case
+  pattern from the first gate build.
+
+### The questions — ruled at ratification / riding the build
+
+(a) RULED (with the ratification): ONLY BLESSED VOICES, blessed
+    BY BATCH after spot-check — the subset gate kills
+    fabrication but cannot see MIS-SELECTION ("department"
+    passes on an enumerating description as legally as
+    "arrival"); the name hint and the double-run narrow it, a
+    steward's eye closes it.
+(b) RULED: v2.8.0 minor — this version; the MAJOR stays the
+    policy-walk port's.
+(c) RULED (Sunny's "rule riders c and d", 2026-09-12): THE
+    TEMPORAL UNION — blessing may only ADD temporal evidence,
+    never remove it. Under a blessed subject, R4's temporal
+    test ("date"/"time") runs over the blessed words ∪ the
+    words the fallback tier would have spoken (the phrase the
+    column speaks unblessed). A blessed "administration clock"
+    on TAKEN_TIME stays temporal (the name words carry "time");
+    a blessed "arrival date" on a column whose fallback words
+    were numeric FLIPS it temporal (the blessing carries the
+    evidence). Unblessed paths byte-identical — A1 untouched.
+    AMENDED (Sunny, 2026-09-13: "we can get the data type from
+    the EMR's dictionary"): THE DECLARED TYPE LEADS THE LADDER —
+    columns.csv MAY carry data_type (CONTRACT_DATALOAD
+    amendment, opportunistic like the grain phrase: absent =
+    absent, never a guess); a declared temporal type (the closed
+    set date/datetime/datetime2/smalldatetime/datetimeoffset/
+    time — T-SQL timestamp is a version counter, NOT here)
+    decides the temporal verb OUTRIGHT, no word test; a
+    NON-temporal type never decides the other way (VARCHAR dates
+    are an EMR fact of life) — it falls through to the word
+    union. Evidence only adds, now from three sources: declared
+    type → blessed words → fallback words (`is_temporal`).
+(d) RULED (same breath): THE NAMER SEAT — the fourth seat
+    beside interpreter/scribe/embedder, built on the enrich
+    pattern (deterministic machinery around an INJECTED model;
+    proposals only). Its prompt is Seat_Prompts registry law
+    (Seat "namer", versioned; abstract shape, no estate
+    examples — prompt examples are data). Endpoint = the SAME
+    model boundary the existing seats already use (_env_key /
+    _openai — the customer's own endpoint at launch; no new
+    egress class is created). The egress payload is the
+    identifier + the door-1 dictionary text ALREADY in the
+    store (H6 posture carried; metadata only — never estate
+    rows, never SQL). The candidate cache is content-keyed
+    (target · description_hash · model · prompt version) — a
+    re-run spends nothing. The batch runs ONLY at Sunny's hand
+    (never boot, never render); it writes proposed / disputed /
+    rejected rows ONLY — THE FIELD LAW: blessed is a ruled
+    status, machine-untouchable even when stale (the seeder
+    counts stale; a human re-blesses).
+
+### The build deferral (declared 2026-09-12; CLOSED same day —
+### the first slice shipped on Sunny's "build the first slice")
+
+FLOOR_GRAMMAR_VERSION stayed 2.7.0 in code between the
+ratification and the build's first slice (reason as declared:
+with an empty registry the floor text is byte-identical per A1,
+and a bump without behavior would stale every floor-derived
+artifact for a no-op). The slice landed the same evening:
+constant 2.8.0 + the F4 basis pin fired consciously; no fixture
+re-record was needed — A1 held, floor_texts byte-exact
+unchanged. Riders (c) and (d) ruled the same day (the temporal
+union + the namer seat) and the proposer slice built behind
+them; the ed_sepsis registry stays empty until Sunny fires the
+first namer batch and blesses. The 2.4.0/2.5.0 doc-vs-constant
+drift class: handled by declaration, closed on schedule.

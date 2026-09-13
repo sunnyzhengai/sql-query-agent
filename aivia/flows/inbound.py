@@ -448,6 +448,20 @@ def condition_render(pred, voice) -> str:
     kind = pred.get("kind", "")
     kids = pred.get("children") or []
     # literal: grammar
+    if kind == "NOT" and kids:
+        # GRAMMAR 2.5.0 (Sunny's ruling 2026-09-12): NOT FOLDS
+        # INTO ITS CHILD — the store node speaks ONE meaning
+        try:
+            phrase = produce._voice_predicate(pred, voice)
+        except (KeyError, TypeError, AttributeError):
+            phrase = ""
+        if phrase:
+            return phrase
+        return "The inner condition does not hold."
+    # AND/OR keep the structural sentence — STRUCTURE NEVER ROWS
+    # (same ruling): they frame delivery, their children carry
+    # the detail
+    # literal: grammar
     if kind in ("AND", "OR", "NOT"):
         # literal: grammar
         word = {"AND": f"All {len(kids)} of its parts hold.",
@@ -459,6 +473,12 @@ def condition_render(pred, voice) -> str:
     except (KeyError, TypeError, AttributeError):
         phrase = ""  # a kind the grammar has no phrase for
     if phrase:
+        # 2.7.0: the SQL author's trailing note reaches the store
+        # phrase (R8 attribution — 'MED_ROUTE_CODE = 11
+        # -- intravenous' was voicing a bare magic number)
+        note = pred.get("annotation")
+        if note and note.lower() not in phrase.lower():
+            phrase = phrase.rstrip(".") + f" (noted '{note}')."
         return phrase
     frag = (pred.get("evidence") or {}).get("fragment", "")
     return f"Condition: {frag}."

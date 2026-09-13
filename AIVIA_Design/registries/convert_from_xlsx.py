@@ -193,7 +193,7 @@ SOURCES = {
 # deliveries lead, spine voiced, intermediates counted, census
 # closes; the file's ask-index words = the delivery lead, so file
 # embeddings embed meaning, never name-noise).
-STAMP_VERSION = "1.39.0"
+STAMP_VERSION = "1.41.0"
 RATIFIED = True
 DOC_STAMP = ("v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 twin-graph "
              "ruling ADR 0077; v1.2.0 Phase A metamodel bump; v1.3.0 "
@@ -212,7 +212,20 @@ DOC_STAMP = ("v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 twin-graph "
              "condition/param/resolves_to flip PRESENT, uses_param "
              "ships, condition/param become store citizens (has_part"
              "/uses_param birth edges); joinType closed (the tree "
-             "held it all along)")
+             "held it all along); v1.40.0 THE STRUCTURE-WORD CLAIM "
+             "+ THE RELATION-WORD SEAT (Sunny's 'fix these gaps' "
+             "go, 2026-09-12): interpreter prompt 3.1.0 (relation "
+             "words are referring words, marked in the caged "
+             "relations field — the L4-D3 role precedent); edge "
+             "kinds gain _edge self-speech rows (Notes stop "
+             "serving as speech); _self scope speech names the "
+             "subquery word (industry-standard for the grain); "
+             "v1.41.0 THE NAMER SEAT (Grammar_Floor §R5.b riders "
+             "c/d ruled, Sunny's 'rule riders c and d' 2026-09-12): "
+             "Seat_Prompts gains the namer row 1.0.0 — the blessed-"
+             "name proposer's prompt is registry law; selection "
+             "from vendor words only, the GATE-SUBJ family stands "
+             "behind it")
 CONVERTED_ON = "2026-09-05"
 
 
@@ -897,10 +910,13 @@ TWIN_SHEETS = {
             {"Label": "_self column", "Speech": "a column or field "
              "of a table", "Meaning": "self-description"},
             {"Label": "_self scope", "Speech": "a selection step "
-             "inside a procedure: a cte, temp table, or delivery "
-             "selection — the practiced metrics a report emits",
-             "Meaning": "self-description; grounds "
-             "selections/ctes/metrics(practiced)"},
+             "inside a procedure: a cte, subquery, temp table, or "
+             "delivery selection — the practiced metrics a report "
+             "emits",
+             "Meaning": "self-description; grounds selections/"
+             "ctes/subqueries/metrics(practiced) — 'subquery' "
+             "added v1.40.0 (industry word for the grain; the "
+             "#AllMeds gap-check)"},
             {"Label": "_self condition", "Speech": "a condition, "
              "filter, rule, or business logic decision applied "
              "inside a selection", "Meaning": "self-description; "
@@ -918,6 +934,23 @@ TWIN_SHEETS = {
              "Meaning": "self-description"},
             {"Label": "_self parameter", "Speech": "a parameter of a "
              "procedure", "Meaning": "self-description"},
+            {"Label": "_edge has_part", "Speech": "contains, is "
+             "inside, is part of: one thing holds another — a "
+             "table contains its columns, a selection contains "
+             "its conditions and joins, a procedure contains its "
+             "selections",
+             "Meaning": "edge-kind self-speech (v1.40.0, THE "
+             "RELATION-WORD SEAT): containment words ground here "
+             "by meaning; Shape_Ledger Notes stop serving as "
+             "speech"},
+            {"Label": "_edge joins_to", "Speech": "joins to, "
+             "relates to: the declared join relationship between "
+             "two tables in the data dictionary, with its key "
+             "columns",
+             "Meaning": "edge-kind self-speech (v1.40.0); the "
+             "'reads' card stays DEFERRED — a 'read' constraint "
+             "would veto join-side travel (recorded reason "
+             "stands)"},
             {"Label": "operational statement", "Speech": "RULED-MUTE",
              "Meaning": "no reader-facing meaning (the v1.4.0 "
              "operational class)"},
@@ -983,30 +1016,52 @@ TWIN_SHEETS = {
              "THE SEARCH IS THE ANSWER (2026-09-07) + the literal "
              "law lock 3: seat prompts are versioned registry law. "
              "The Interpreter proposes SHAPES only (mentions, "
-             "expansions, reference-roles, a view hint) — never "
-             "type targets, never vocabulary. Editing a prompt = "
-             "bumping its Version here; the proposal cache keys on "
-             "it."},
-            {"Seat": "interpreter", "Version": "3.0.0", "Prompt":
+             "expansions, reference-roles, relation-marks, a view "
+             "hint) — never type targets, never vocabulary. "
+             "Editing a prompt = bumping its Version here; the "
+             "proposal cache keys on it. (3.1.0 ruled 2026-09-12: "
+             "relation words are referring words, marked in the "
+             "relations field — the L4-D3 role precedent; the "
+             "morning park lifted by Sunny's 'fix these gaps'.)"},
+            {"Seat": "interpreter", "Version": "3.1.0", "Prompt":
              "You translate a question about a data estate into a "
              "PROPOSAL. Return ONLY JSON: {\"mentions\": "
              "[\"...\"], \"expansions\": {mention: [alternate "
              "phrasings]}, \"references\": {mention: role}, "
-             "\"hint\": mode}. RULES. Mentions: EVERY word or "
-             "phrase in the question that names or refers to "
-             "something is a mention — never drop one (in 'what "
-             "reports are about ED', both 'reports' and 'ED' are "
-             "mentions); keep names verbatim; 1-5 mentions. "
-             "Expansions: for acronyms, abbreviations, and jargon, "
-             "propose full forms and synonyms as extra search "
-             "strings (e.g. an acronym's spelled-out form). "
-             "References: when a mention refers back to the "
-             "previous answer (it, those, the first one), give its "
-             "role: singular | set | ordinal:N. Hint (optional): "
-             "card | lineage | filters | readers | census, only "
-             "when the question asks for that view. Never answer "
-             "the question; never invent names; never guess what "
-             "type of thing a word means — the graph decides."},
+             "\"relations\": [\"...\"], \"hint\": mode}. RULES. "
+             "Mentions: EVERY word or phrase in the question that "
+             "names or refers to something is a mention — never "
+             "drop one (in 'what reports are about ED', both "
+             "'reports' and 'ED' are mentions); keep names "
+             "verbatim; 1-5 mentions. A word naming how one thing "
+             "relates to another (containment, membership, usage, "
+             "joining) is a REFERRING WORD too — keep it as a "
+             "mention AND list it in relations. Expansions: for "
+             "acronyms, abbreviations, and jargon, propose full "
+             "forms and synonyms as extra search strings (e.g. an "
+             "acronym's spelled-out form). References: when a "
+             "mention refers back to the previous answer (it, "
+             "those, the first one), give its role: singular | "
+             "set | ordinal:N. Hint (optional): card | lineage | "
+             "filters | readers | census, only when the question "
+             "asks for that view. Never answer the question; "
+             "never invent names; never guess what type of thing "
+             "a word means — the graph decides."},
+            {"Seat": "namer", "Version": "1.0.0", "Prompt":
+             "You name ONE database column or table for business "
+             "users. You are given its identifier and the vendor's "
+             "dictionary description. Return ONLY JSON: "
+             "{\"words\": \"...\"}. RULES. Select 1-4 lowercase "
+             "words that name THE THING the object is about. Every "
+             "word you output MUST already appear in the "
+             "description or the identifier — you SELECT words, "
+             "you never invent one; no synonyms, no substitutes, "
+             "even better ones. Prefer the description's own noun "
+             "for the thing over token words (id, code, number, "
+             "key, flag). Never output the identifier itself, an "
+             "underscore token, a digit, a leading article, or a "
+             "trailing preposition. If the object is a date or "
+             "time, keep its temporal noun among the words."},
             {"Seat": "scribe", "Version": "1.1.0", "Prompt":
              "You write ONE short aboutness phrase for a "
              "database object, from the structural evidence "

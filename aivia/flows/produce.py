@@ -15,7 +15,7 @@ one append or a counted absence, never a half-write.
 import json
 import pathlib
 import re
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional, Tuple
 
 from aivia.flows import gates, run_events
 from aivia.graph import kg3_artifacts
@@ -40,9 +40,44 @@ ECON = json.loads((pathlib.Path(__file__).parent / "econ_params.json")
 # 2.3.0: R10 — THE REPORT FLOOR (live find #9): file floors compose
 # from scopes — deliveries lead, spine voiced, intermediates counted,
 # census closes; file ask-index words = the delivery lead.
-FLOOR_GRAMMAR_VERSION = "2.3.0"
+# 2.5.0: NOT FOLDS INTO ITS CHILD (Sunny's ruling 2026-09-12) —
+# per-kind negations from the closed set (_voice_negated); the
+# condition store nodes inherit the fold at condition_render.
+# (The 2.4.0 doc bump had missed this constant — 2.3.0 while the
+# doc said 2.4.0; caught and closed in the same 2.5.0 breath.)
+# 2.6.0: RECORDEDNESS IDENTIFIES (Sunny's go, same day, from "what
+# is the best translation for MA.TAKEN_TIME IS NOT NULL"): the
+# NULL_CHECK family speaks "is recorded"/"is not recorded" with a
+# NAME-WORDS subject (_ident_subject) — identification, never
+# definition; the owner-possessive and the business reading are
+# recorded deferrals (blessed-vocabulary wiring · the blessing
+# path).
+# 2.7.0: THE RELATION RULE + the token-link reduction + noted
+# annotations (Sunny, same day: cond#8/cond#9 "still not fixed"):
+# column-vs-column comparisons speak name words BOTH sides
+# (_compare_terms — the mixed-register corpse); '<qualifier>
+# <token> associated with <the thing>' subjects speak the thing;
+# a predicate's trailing SQL note reaches the store phrase
+# ("is 11 (noted 'intravenous')").
+# 2.8.0: R5.b THE BLESSED NAME (ratified 2026-09-12, built same
+# day — the declared constant deferral closes here, in the
+# build's first slice as ruled): blessed_name nodes (kg3@, seeded
+# from glossary/blessed_subjects.json, GATE-SUBJ gated, human-
+# blessed) win EVERY voicing position for their target — column
+# subjects (_Voice.subject), name-words register (name_words:
+# recordedness + relation sides), table source phrases
+# (_source_phrase) + R2 instance marking. Unblessed = 2.7.0
+# verbatim (A1); the proposer batch waits on riders (c)/(d).
+FLOOR_GRAMMAR_VERSION = "2.8.0"
 # literal: grammar Grammar_Floor R1
 _PREPOSITIONS = ("of", "on", "per", "for", "in", "at", "by", "with")
+# rider (c) amended (Sunny 2026-09-13): the dictionary's declared
+# type is temporal truth. T-SQL timestamp/rowversion is NOT here —
+# it is a version counter, not a moment.
+# literal: grammar Grammar_Floor R5.b rider (c)
+_TEMPORAL_TYPES = frozenset(("date", "datetime", "datetime2",
+                             "smalldatetime", "datetimeoffset",
+                             "time"))
 
 
 # ---- R5: steward words, graph-sourced (v1.3.1 rendering) ----
@@ -82,6 +117,16 @@ def _noun_phrase(description: str, column: str) -> str:
             phrase = y  # the token names the column; Y names the thing
         elif len(x.split()) <= 3 and len(y.split()) <= 3:
             phrase = f"{y} {head}"
+    # 2.7.0: '<qualifier> <token> associated with <the thing>' —
+    # dictionary boilerplate shaped around a code/number token
+    # speaks THE THING ("category number associated with the route
+    # of administration" -> "route of administration"); scoped to
+    # these linking verbs so the tuned of/for rule stands untouched
+    m = re.match(r"(?i)^(.{0,40}?)\s+(?:associated with|linked to|"
+                 r"corresponding to)\s+(?:the|a|an)\s+(.+)$", phrase)
+    if m and m.group(1).split() \
+            and m.group(1).split()[-1].lower() in _TOKEN_HEADS:
+        phrase = m.group(2)
     cut = re.search(r"\s+this\s+", phrase)
     if cut and cut.start() > 0:
         phrase = phrase[:cut.start()]
@@ -116,17 +161,63 @@ class _Voice:
         self._tables = {n.identity: n.properties
                         for n in read.nodes("table")}
         self._params = {p["name"]: p for p in tree.get("parameters", [])}
+        # R5.b (v2.8.0): blessed names — one map, both grains
+        # (4-part = column, 3-part = table); a blessed name wins
+        # EVERY position its target is voiced; absent = fallback
+        self.blessed = {n.properties["target"]: n.properties["words"]
+                        for n in read.nodes("blessed_name")}
         self.disagreements: List[str] = []  # declared vs annotation (R8)
 
     def subject(self, expr) -> str:
         if expr.get("kind") == "column_ref":
             col_id = expr.get("resolves_to") or ""
+            if col_id in self.blessed:  # R5.b tier 1
+                return self.blessed[col_id]
             desc = self._columns.get(col_id, {}).get("description", "")
             return _noun_phrase(desc, expr["ref"].split(".")[-1])
         # a computed subject voices through the value path (DATEADD
         # overlay, steward words) — raw tokens never face the steward
         phrase = self.value(expr, expr)
         return phrase[4:] if phrase.startswith("the ") else phrase
+
+    def name_words(self, expr) -> str:
+        """The name-words register (v2.6.0/v2.7.0 subjects), R5.b
+        tier ladder: blessed name → readable identifier form. No
+        heuristic middle tier exists for names."""
+        target = expr.get("resolves_to") or ""
+        return self.blessed.get(target) or _name_words(expr)
+
+    def temporal_evidence(self, expr, spoken: str) -> str:
+        """Rider (c) RULED — THE TEMPORAL UNION: blessing may only
+        ADD temporal evidence, never remove it. When a blessed
+        name spoke, the words the fallback tiers would have spoken
+        (name words + the dictionary phrase) join the R4 test;
+        unblessed subjects test their spoken words alone —
+        byte-identical to v2.7.0 (A1)."""
+        target = (expr.get("resolves_to") or "") \
+            if expr.get("kind") == "column_ref" else ""
+        if not target or target not in self.blessed:
+            return spoken
+        desc = self._columns.get(target, {}).get("description", "")
+        return " ".join((spoken, _name_words(expr),
+                         _noun_phrase(desc,
+                                      expr["ref"].split(".")[-1])))
+
+    def is_temporal(self, expr, spoken: str) -> bool:
+        """R4 verb choice — EVIDENCE ONLY ADDS, three sources in
+        a ladder: (1) the DECLARED data_type (rider (c) amended,
+        Sunny 2026-09-13: the EMR dictionary carries types) — a
+        temporal type decides YES outright; a non-temporal type
+        never decides NO (VARCHAR dates are an EMR fact of life)
+        — it falls through to (2)+(3), the temporal union of
+        blessed words and the fallback tier's words."""
+        target = (expr.get("resolves_to") or "") \
+            if expr.get("kind") == "column_ref" else ""
+        declared = self._columns.get(target, {}).get("data_type", "")
+        if declared.split("(")[0].strip().lower() in _TEMPORAL_TYPES:
+            return True
+        ev = self.temporal_evidence(expr, spoken)
+        return "date" in ev or "time" in ev
 
     def value(self, expr, subject_expr) -> str:
         kind = expr.get("kind")
@@ -223,7 +314,8 @@ def _nested_selection_phrase(selection, voice: "_Voice") -> str:
     phrases = []
     for ref in sources:
         p = _source_phrase(ref.get("table_ref"),
-                           ref.get("resolves_to"), [])
+                           ref.get("resolves_to"), [],
+                           blessed=voice.blessed)
         if p not in phrases:
             phrases.append(p)
     conds = []
@@ -241,26 +333,52 @@ def _nested_selection_phrase(selection, voice: "_Voice") -> str:
     return out
 
 
+def _name_words(expr) -> str:
+    return _noun_phrase("", str(expr.get("ref", "")).split(".")[-1])
+
+
+def _compare_terms(pred, voice: _Voice) -> Tuple[str, str]:
+    """GRAMMAR 2.7.0 — THE RELATION RULE (Sunny, 2026-09-12: the
+    mixed-register corpse 'the time designated by the user when
+    the action occurred is before the ed departure time'): a
+    comparison BETWEEN TWO COLUMNS is a relation between two named
+    things — both sides speak NAME WORDS; a comparison against a
+    VALUE keeps the dictionary-definition subject, because there
+    the meaning IS the sentence."""
+    subj_expr = pred.get("subject", {})
+    comp_expr = pred.get("comparand")
+    if subj_expr.get("kind") == "column_ref" \
+            and isinstance(comp_expr, dict) \
+            and comp_expr.get("kind") == "column_ref":
+        return (voice.name_words(subj_expr),
+                "the " + voice.name_words(comp_expr))
+    return (voice.subject(subj_expr),
+            voice.value(comp_expr, subj_expr))
+
+
 def _voice_predicate(pred, voice: _Voice) -> str:
     kind = pred["kind"]
     subj_expr = pred.get("subject", {})
     subj = voice.subject(subj_expr)
     # literal: schema-mirror kg2_kind_library
     if kind in ("COMPARE_GTE", "COMPARE_GT", "COMPARE_LTE", "COMPARE_LT"):
-        temporal = "date" in subj or "time" in subj
+        subj, comp = _compare_terms(pred, voice)
+        # rider (c): declared type first, then the temporal union
+        # — evidence only adds; unblessed untyped columns test
+        # their spoken words alone (A1)
+        temporal = voice.is_temporal(subj_expr, subj)
         # literal: grammar Grammar_Floor R4 verbs
         verb = {"COMPARE_GTE": "is on or after" if temporal else "is at least",
                 "COMPARE_GT": "is after" if temporal else "exceeds",
                 "COMPARE_LTE": "is on or before" if temporal else "is at most",
                 "COMPARE_LT": "is before" if temporal else "is below"}[kind]
-        return (f"The {subj} {verb} "
-                f"{voice.value(pred['comparand'], subj_expr)}.")
+        return f"The {subj} {verb} {comp}."
     if kind == "COMPARE_EQ":
-        return (f"The {subj} is "
-                f"{voice.value(pred['comparand'], subj_expr)}.")
+        subj, comp = _compare_terms(pred, voice)
+        return f"The {subj} is {comp}."
     if kind == "COMPARE_NEQ":
-        return (f"The {subj} is not "
-                f"{voice.value(pred['comparand'], subj_expr)}.")
+        subj, comp = _compare_terms(pred, voice)
+        return f"The {subj} is not {comp}."
     if kind == "PATTERN_MATCH":
         pattern = str(pred["pattern"].get("value", "")).strip("'")
         if pattern.endswith("%") and "%" not in pattern[:-1] \
@@ -282,7 +400,10 @@ def _voice_predicate(pred, voice: _Voice) -> str:
                 f"{voice.value(pred['lower_bound'], subj_expr)} and "
                 f"{voice.value(pred['upper_bound'], subj_expr)} (inclusive).")
     if kind == "NULL_CHECK":
-        return f"The {subj} has no recorded value."
+        # GRAMMAR 2.6.0 (Sunny's go, 2026-09-12): recordedness
+        # predicates IDENTIFY their subject — name words point,
+        # dictionary words teach; "is recorded" needs pointing only
+        return f"The {_ident_subject(pred, voice)} is not recorded."
     if kind == "EXISTS_SELECTION":
         detail = _nested_selection_phrase(pred.get("selection"), voice)
         if detail:
@@ -308,9 +429,89 @@ def _voice_predicate(pred, voice: _Voice) -> str:
                 for c in pred["children"]]
         return " or ".join(arms) + "."
     if kind == "NOT":
-        inner = _voice_predicate(pred["children"][0], voice).rstrip(".")
-        return f"It is not the case that {inner[0].lower()}{inner[1:]}."
+        # GRAMMAR 2.5.0 (Sunny's ruling 2026-09-12): NOT FOLDS INTO
+        # ITS CHILD — one meaning, one phrase, per-kind negation
+        # from the closed set; the wrapper sentence is the fallback
+        return _voice_negated(pred["children"][0], voice)
     return ""  # remainder predicates voice nothing; they are counted
+
+
+# NOT's comparison flips (2.5.0): the negation of an order
+# comparison IS the opposite comparison
+# literal: grammar
+_NEGATED_COMPARE = {"COMPARE_GTE": "COMPARE_LT",
+                    "COMPARE_GT": "COMPARE_LTE",
+                    "COMPARE_LTE": "COMPARE_GT",
+                    "COMPARE_LT": "COMPARE_GTE",
+                    "COMPARE_EQ": "COMPARE_NEQ",
+                    "COMPARE_NEQ": "COMPARE_EQ"}
+
+
+def _ident_subject(pred, voice: _Voice) -> str:
+    """GRAMMAR 2.6.0 — recordedness predicates IDENTIFY their
+    subject (the column's name words) where value predicates
+    DEFINE it (dictionary words): 'the taken time is recorded'
+    needs to point at the column, not to teach its meaning. The
+    owner-possessive form ('the administration's taken time') is
+    DEFERRED: owner words are raw table names until blessed
+    vocabulary wires into the render — premature wiring bakes
+    jargon into every phrase."""
+    expr = pred.get("subject", {})
+    if expr.get("kind") == "column_ref" and expr.get("ref"):
+        return voice.name_words(expr)
+    return voice.subject(expr)
+
+
+def _voice_negated(pred, voice: _Voice) -> str:
+    """GRAMMAR 2.5.0 — the negated voice of a leaf predicate (the
+    closed kind set, R4 family): NOT(NULL_CHECK) speaks the
+    positive fact; order comparisons flip to their opposites;
+    membership and pattern kinds negate their verb; anything
+    without a ruled negation keeps the honest wrapper sentence."""
+    kind = pred.get("kind", "")
+    if kind == "NULL_CHECK":
+        # 2.6.0: the positive recordedness fact, name-words subject
+        return f"The {_ident_subject(pred, voice)} is recorded."
+    if kind in _NEGATED_COMPARE:
+        return _voice_predicate({**pred, "kind":
+                                 _NEGATED_COMPARE[kind]}, voice)
+    if kind == "IN_LIST":
+        subj_expr = pred.get("subject", {})
+        subj = voice.subject(subj_expr)
+        members = ", ".join(voice.value(m, subj_expr)
+                            for m in pred["comparand_list"])
+        return f"The {subj} is none of the values {members}."
+    if kind == "IN_SELECTION":
+        subj = voice.subject(pred.get("subject", {}))
+        detail = _nested_selection_phrase(pred.get("selection"),
+                                          voice)
+        if detail:
+            return (f"The {subj} is not one of the values from "
+                    f"{detail}.")
+        return (f"The {subj} is not one of the values defined by "
+                "another selection.")
+    if kind == "EXISTS_SELECTION":
+        detail = _nested_selection_phrase(pred.get("selection"),
+                                          voice)
+        if detail:
+            return f"No matching record exists in {detail}."
+        return ("No matching record exists in a separately "
+                "defined selection.")
+    if kind == "PATTERN_MATCH":
+        positive = _voice_predicate(pred, voice)
+        # literal: grammar — the R4 pattern verbs and their negations
+        negated_verb = {"starts with": "does not start with",
+                        "ends with": "does not end with",
+                        "contains": "does not contain",
+                        "matches the pattern":
+                        "does not match the pattern"}
+        for verb, neg in negated_verb.items():
+            if f" {verb} " in positive:
+                return positive.replace(f" {verb} ", f" {neg} ", 1)
+    inner = _voice_predicate(pred, voice).rstrip(".")
+    if not inner:
+        return "The inner condition does not hold."
+    return f"It is not the case that {inner[0].lower()}{inner[1:]}."
 
 
 def _twin_selection(read: ReadApi, tree, scope):
@@ -328,19 +529,25 @@ def _twin_selection(read: ReadApi, tree, scope):
     return None, None
 
 
-def _source_phrase(name: str, resolved, depth2_counter: List[int]) -> str:
+def _source_phrase(name: str, resolved, depth2_counter: List[int],
+                   blessed=None) -> str:
     if resolved and str(resolved).startswith("SAME-TREE"):
+        # named scope refs stay OUT of R5.b — the author's own
+        # words, no vendor dictionary row
         words = re.sub(r"[_\W]+", " ", name.lstrip("#")).strip().lower()
         return (f"the {words} selection defined earlier in this "
                 "procedure")
     if name is None:  # an anonymous derived table — depth-1 inline
         return "an inline selection"
+    if blessed and resolved in blessed:  # R5.b tier 1, table grain
+        return f"{blessed[resolved]} records"
     words = re.sub(r"[_\W]+", " ", name.split(".")[-1]).strip().lower()
     return f"{words} records"
 
 
 def _composition_sentence(read: ReadApi, tree, scope,
-                          ledger: Dict[str, int]) -> Optional[str]:
+                          ledger: Dict[str, int],
+                          blessed=None) -> Optional[str]:
     """The composition sentence (the finding-4 heir; ruling 4c): what
     this selection READS and how the joins compose the population —
     INNER voices as restriction; any OUTER present demotes the wording
@@ -371,7 +578,8 @@ def _composition_sentence(read: ReadApi, tree, scope,
                     ledger.get("deep_nesting_counted", 0) + 1
             continue
         phrases.append(_source_phrase(ref.get("table_ref"),
-                                      ref.get("resolves_to"), []))
+                                      ref.get("resolves_to"), [],
+                                      blessed=blessed))
     if not phrases:
         return None
     # 2.3.0 phrasing (truth unchanged, count visible): a RUN of
@@ -505,7 +713,8 @@ def _compose_scope(read: ReadApi, tree, scope,
         # would misstate the act (ledger-close, 2026-09-06)
         ref = scope["from_refs"][0]
         phrase = _source_phrase(ref.get("table_ref"),
-                                ref.get("resolves_to"), [])
+                                ref.get("resolves_to"), [],
+                                blessed=voice.blessed)
         lines = [f"This step removes records from {phrase}."]
     elif not reads_tables and not scope.get("from_refs"):
         # THE RESTORATION (grammar 2.4.0): this elif was REPLACED
@@ -526,7 +735,8 @@ def _compose_scope(read: ReadApi, tree, scope,
     # sources + join composition, from the same facts the twin's
     # source nodes hold; reference phrases, never raw temp names
     ledger_counts: Dict[str, int] = {}
-    composition = _composition_sentence(read, tree, scope, ledger_counts)
+    composition = _composition_sentence(read, tree, scope, ledger_counts,
+                                        blessed=voice.blessed)
     if composition:
         lines.append(composition)
     # R2 + R6 — one bullet per membership decision (dedup at PREDICATE
@@ -544,7 +754,8 @@ def _compose_scope(read: ReadApi, tree, scope,
     for rt, aliases in reads_per_table.items():
         if len(aliases) < 2:
             continue
-        words = re.sub(r"[_\W]+", " ", rt.rsplit("|", 1)[-1]).strip().lower()
+        words = voice.blessed.get(rt) or re.sub(
+            r"[_\W]+", " ", rt.rsplit("|", 1)[-1]).strip().lower()
         for i, alias in enumerate(aliases):
             marker = ordinals[i] if i < len(ordinals) else f"#{i + 1}"
             alias_instance[alias] = f"For the {marker} {words} record read: "

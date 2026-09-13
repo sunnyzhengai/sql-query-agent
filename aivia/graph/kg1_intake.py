@@ -215,7 +215,16 @@ def _desired_state(store, reg, snap, report):
     for row in snap.columns:
         table_id = f"{source}|{row['schema']}|{row['table']}"
         col_id = f"{table_id}|{row['column']}"
-        nodes[col_id] = ("column", {"description": row["description"]})
+        props = {"description": row["description"]}
+        # CONTRACT_DATALOAD amendment (rider (c) amended,
+        # 2026-09-13): columns.csv MAY carry data_type — the
+        # vendor's declared type is temporal truth for the R4
+        # verbs. Opportunistic like the grain phrase: absent =
+        # absent, never a guess or an empty shell.
+        declared = (row.get("data_type") or "").strip()
+        if declared:
+            props["data_type"] = declared
+        nodes[col_id] = ("column", props)
         contains.add((table_id, col_id))
 
     # joins -> edges; INTAKE-6 legality on the dependent (src) side;

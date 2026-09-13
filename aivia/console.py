@@ -232,6 +232,71 @@ def make_interpreter(key: str, cache_path=None):
     return interpret
 
 
+def namer_prompt():
+    """The Namer's prompt IS registry law (Seat_Prompts 'namer' —
+    rider (d) ruled 2026-09-12). Returns (text, version)."""
+    from aivia.graph import metamodel
+    sheet = metamodel.load("lenses").sheets["Seat_Prompts"]
+    row = next(r for r in sheet if r["Seat"] == "namer")
+    return row["Prompt"], row["Version"]
+
+
+def make_namer(key: str):
+    """THE NAMER SEAT (Grammar_Floor §R5.b): identifier +
+    dictionary description in, candidate words out — the SAME
+    model boundary as every other seat; the caller (enrich)
+    owns the double-run, the gate, and the cache."""
+    prompt, _version = namer_prompt()
+
+    def name(identifier: str, description: str) -> str:
+        # literal: shape
+        out = _openai("chat/completions", {
+            "model": INTERPRETER_MODEL, "temperature": 0,
+            "response_format": {"type": "json_object"},
+            "messages": [{"role": "system", "content": prompt},
+                         {"role": "user", "content":
+                          f"identifier: {identifier}\n"
+                          f"description: {description}"}],
+            "max_tokens": 40}, key)
+        raw = json.loads(out["choices"][0]["message"]["content"])
+        return str(raw.get("words", ""))
+    return name
+
+
+def run_name_proposals(estate: str, scope: str = "voiced") -> None:
+    """The namer batch, at Sunny's hand ONLY (rider d): proposes
+    blessed names; writes proposed/disputed/rejected registry
+    rows — a human flips 'blessed'. scope='voiced' (default) =
+    what speaks today; scope='dictionary' = ALL of KG1, the
+    backfill sweep (cache makes re-runs free; the review load is
+    the real cost). Runbook: python3.11 -c
+    \"import aivia.console as c; c.run_name_proposals('<estate>')\"
+    (add , scope='dictionary' for the sweep)"""
+    from aivia.flows import enrich
+    key = _env_key()
+    if not key:
+        print("no model key in the environment — the namer seat "
+              "cannot sit (set the key, or author registry rows "
+              "by hand; the gate treats both identically)")
+        return
+    store, base = build_store(estate)
+    read = ReadApi(store)
+    _prompt, version = namer_prompt()
+    counts = enrich.propose_blessed_names(
+        read, base / "glossary", make_namer(key),
+        model=INTERPRETER_MODEL, prompt_version=version,
+        run_at=datetime.datetime.now(datetime.timezone.utc)
+        .strftime("%Y-%m-%dT%H:%M:%SZ"),
+        cache_path=base / ".cache" / "blessed_names.json",
+        scope=scope)
+    print(f"namer batch ({scope}): " + " · ".join(
+        f"{v} {k}" for k, v in sorted(counts.items())))
+    print(f"review + bless by hand: "
+          f"{base / 'glossary' / 'blessed_subjects.json'} "
+          "(flip status to 'blessed', add blessed_by/blessed_at; "
+          "the next console boot seeds them)")
+
+
 def make_embedder(key: str):
     def embed(texts):
         vectors = []
