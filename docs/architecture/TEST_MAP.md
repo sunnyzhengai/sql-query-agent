@@ -7,7 +7,7 @@
 
 # Test Map — what every test proves
 
-182 modules, 1982 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
+182 modules, 1983 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
 
 ## By ADR
 
@@ -157,7 +157,7 @@
 ### contract:aivia-design-to-code — aivia code and tests consume the ratified registries and fixture answer keys, never the doc's prose (Design-to-Code protocol, slices 0-8; claimed per-module 2026-09-06 when the suite-map gate reached the aivia suite)
 
 - `AIVIA_Test/test_ed_sepsis_dev_estate.py` (15): The one-proc dev estate + THE M-GATE ANSWER KEY (Sunny's
-- `AIVIA_Test/test_fabric_wire.py` (14): THE LIVE-WIRE TOGGLE's tests (Design_Chatbot.md rider, ruled
+- `AIVIA_Test/test_fabric_wire.py` (15): THE LIVE-WIRE TOGGLE's tests (Design_Chatbot.md rider, ruled
 - `AIVIA_Test/test_joins_to_lock.py` (6): THE JOINS_TO LOCK (Sunny's directive 2026-09-10, after the
 - `AIVIA_Test/test_meaning_console.py` (53): THE MEANING-TEST CONSOLE's own tests (Design_Chatbot.md ruling,
 - `tests/aivia/test_acronym_enrichment.py` (7): PHASE I — ACRONYM ENRICHMENT (the one-vocabulary law, ruled

@@ -212,6 +212,40 @@ def test_the_toggle_is_off_at_boot_and_the_flip_counts_spends():
         server.shutdown()
 
 
+def test_wire_on_with_no_artifact_names_its_own_silence():
+    # SUNNY'S PAUSED-CAPACITY FIND (2026-09-13: "how do i know if
+    # this live test page is really wired into Fabric?"): toggle
+    # ON + a round with NO GQL artifact fired nothing and rendered
+    # nothing — a silence indistinguishable from success. Absence
+    # names itself now: the no-artifact line + the 0-spends line.
+    import threading
+    import urllib.request
+    from http.server import ThreadingHTTPServer
+
+    w, seen = _wire([(200, _ok_body(["a"], [{"a": 1}]))])
+    handler = mc.make_handler(
+        "test", "coverage",
+        lambda q, pins=None, reach="near": _result(gql=[]),
+        wire=w, wire_reason="")
+    server = ThreadingHTTPServer(("127.0.0.1", 0), handler)
+    threading.Thread(target=server.serve_forever,
+                     daemon=True).start()
+    base = f"http://127.0.0.1:{server.server_address[1]}"
+
+    def get(path):
+        with urllib.request.urlopen(base + path, timeout=10) as r:
+            return json.loads(r.read())
+    try:
+        assert get("/wire?on=1")["on"] is True
+        out = get("/round?q=hello")["html"]
+        assert "no GQL artifact" in out
+        assert "nothing fired" in out
+        assert "capacity spends this session: 0" in out
+        assert seen == []  # truly nothing left the building
+    finally:
+        server.shutdown()
+
+
 def test_an_unconfigured_wire_reports_disabled_over_the_endpoint():
     import urllib.request
     from http.server import ThreadingHTTPServer

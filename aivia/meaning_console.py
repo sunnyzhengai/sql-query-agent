@@ -1233,7 +1233,15 @@ def render_round(result: Dict[str, Any]) -> str:
         parts.append("<div class=wire><p class=meta>the SERVED "
                      "graph answers (Fabric Graph):</p>"
                      + "".join(inner) + "</div>")
-    if result.get("wire_spent") is not None and result.get("wire"):
+    if result.get("wire_note"):
+        # the paused-capacity find: ON + no artifact renders its
+        # own absence, never a page indistinguishable from success
+        parts.append("<div class=wire><p class=meta>"
+                     + html.escape(result["wire_note"])
+                     + "</p></div>")
+    if result.get("wire_spent") is not None:
+        # the spends line renders whenever the wire is ON — a 0 is
+        # evidence too
         parts.append(f"<p class=meta>capacity spends this session: "
                      f"{result['wire_spent']} quer"
                      f"{'y' if result['wire_spent'] == 1 else 'ies'}"
@@ -1334,6 +1342,15 @@ def make_handler(estate: str, coverage: str, ask_fn,
                         wire_state["spent"] += len(blocks)
                         res["wire"] = blocks
                         res["wire_spent"] = wire_state["spent"]
+                        if not blocks:
+                            # SUNNY'S PAUSED-CAPACITY FIND
+                            # (2026-09-13): silence names itself —
+                            # ON + no artifact must never look
+                            # like a served success
+                            res["wire_note"] = (
+                                "live wire ON — this round "
+                                "carried no GQL artifact; "
+                                "nothing fired")
                     out = {"html": render_round(res)}
                 else:
                     out = {"html": ""}

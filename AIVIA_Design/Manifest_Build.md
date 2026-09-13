@@ -948,3 +948,47 @@ suite after: **2087 passed · 25 skipped · 8 xfailed · 0
 failed**. The type ladder is LIVE on ed_sepsis_dev; it earns
 its keep on the EVENT_INSTANT class (temporal truth with no
 temporal words) as future SQL reaches such columns.
+
+**THE PAUSED-CAPACITY FIND (Sunny's live test, 2026-09-13:
+wire ON, capacity PAUSED, two rounds "seem to work normally" —
+"how do i know if this live test page is really wired into
+Fabric?"):** DIAGNOSIS from the code, no spends: the wire
+cannot fake success (no result cache; failures render "wire
+error [code]" verbatim; a served table + verdict + spends line
+requires real HTTP 200s) — but run_round fires only the round's
+GQL ARTIFACTS, and a round with NO artifact fired nothing and
+rendered NO wire section at all: toggle ON + silence,
+indistinguishable from success. His two rounds most likely
+carried no artifact — nothing ever left for Fabric to refuse.
+THE FIX (Echo Law, mechanism at the first failure): ON + no
+artifact now renders "live wire ON — this round carried no GQL
+artifact; nothing fired", and the spends line renders whenever
+the wire is ON (a 0 is evidence too). Test:
+test_wire_on_with_no_artifact_names_its_own_silence (transport
+asserted EMPTY — nothing left the building). VERIFICATION
+RUNBOOK for Sunny (his spends): (1) capacity PAUSED, ask the
+#AllMeds filters round → expect a visible "wire error
+[http …]" — the negative control proving the wire is real;
+(2) resume capacity, re-ask → served table + MATCH + the
+counter increments.
+
+**NEGATIVE CONTROL PASSED (Sunny's hand, 2026-09-13 16:12,
+screenshots):** wire error [http 404] rendered with FABRIC'S
+OWN fingerprints — requestId 8070c1bb-…, errorCode
+CapacityNotActive, the paused capacity's GUID e56ca7af-… named
+in the message; "capacity spends this session: 1 query"; the
+LOCAL rows table rendered beneath AS RULED (local is the answer
+path, the wire is evidence — an outage costs the comparison,
+never the answer). The earlier "seems to work normally"
+decoded: the local table read as success while the wire
+evidence sat above it (or, on no-artifact rounds, was silently
+absent — the honesty fix closes that class). **POSITIVE CONTROL
+PASSED same day (Sunny's hand):** resumed → re-asked →
+"local 4 · served 4 — MATCH". THE WIRE IS PROVEN BOTH
+DIRECTIONS. Live lesson recorded (FABRIC_GRAPH_LOAD.md
+§CapacityNotActive-after-resume): the first try after resume
+returned the SAME CapacityNotActive — resume propagation lag,
+the portal shows Active before the backend serves; nothing
+ours replays it (no result cache) — wait a minute, re-ask.
+Served TEXTS stay stale until his next load (the counted M3
+export debt, not a finding).

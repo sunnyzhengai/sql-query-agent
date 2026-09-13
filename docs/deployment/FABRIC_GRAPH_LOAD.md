@@ -152,6 +152,21 @@ RETURN b.name AS joinsTo, j.onColumns AS onCols
 ```
 The declared neighbors of ADT_EVENTS with their keys.
 
+## CapacityNotActive after a resume (learned live 2026-09-13,
+## Sunny's wire verification)
+
+A paused capacity refuses queries with `wire error [http 404]:
+… errorCode CapacityNotActive … <capacity GUID> is not active` —
+that error carrying Fabric's requestId and the capacity's GUID
+is the PROOF the wire is real (the negative control). After
+RESUMING the capacity, expect the SAME error for a short window:
+the portal shows Active before the backend accepts workloads,
+and Fabric's `"isRetriable":false` flag is misleading there.
+Nothing on our side replays it (no result cache; every round
+fires fresh) — wait a minute and re-ask. Sunny's live sequence
+2026-09-13: paused → error-by-name · resumed → same error on the
+first try · ~a minute later → `local 4 · served 4 — MATCH`.
+
 ## The live-wire 42000 bisect [RESOLVED BY EVIDENCE 2026-09-12
 evening — ZERO spends needed; kept as record]
 
