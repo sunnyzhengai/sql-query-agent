@@ -511,6 +511,28 @@ def answer_question(question: str, interpret_fn,
     # like a relation word must not capture it)
     struct_pool = [e for e in entries
                    if e["label"] in ("label", "edge_kind")]
+    # LAW 5 — THE MECHANICAL NET (ruled 2026-09-13, the dropped
+    # 'contain' screenshot round): the seat PROPOSES, the closed
+    # vocabulary GUARANTEES — every question word the seat dropped
+    # sweeps against the structure pool; a word clearing the bar
+    # against an EDGE KIND's speech IS a relation word, no model
+    # attention required. Words no edge kind can speak stay
+    # unclaimed — the graph honestly has no such relation.
+    bar = grounding.thresholds()["MATCH_SCORE"]
+    net_caught: List[str] = []
+    _have = {_fold(t) for t in tokens}
+    for w in fallback_tokens(question):
+        if " " in w or _fold(w) in _have:
+            continue  # the whole-question token / already proposed
+        top = next((m for m in match_token(w, struct_pool,
+                                           semantic)["matches"]
+                    if m["class"] == "edge-kind"
+                    and m["score"] >= bar), None)
+        if top is not None:
+            tokens.append(w)
+            relation_words.add(w)
+            net_caught.append(w)
+            _have.add(_fold(w))
     msets = [match_token(t,
                          struct_pool if t in relation_words
                          else entries, semantic)
@@ -541,7 +563,6 @@ def answer_question(question: str, interpret_fn,
     kind_hits, edge_kinds = [], set()
     claimed: Set[str] = set()
     relation_unclaimed: List[str] = []
-    bar = grounding.thresholds()["MATCH_SCORE"]
     for mset in msets:
         if mset["token"] in pin_sets:
             continue
@@ -650,7 +671,8 @@ def answer_question(question: str, interpret_fn,
         kind_label = enum_kinds[0]
         pop = {n.identity for n in read.nodes(kind_label)}
         hit_pop = set()
-        seen_rows: Set[Tuple[str, str, str]] = set()
+        seen_rows: Set[Tuple[str, str]] = set()
+        extra_routes = [0]  # law 7: farther routes counted
         # THE ARTIFACT LAW (2026-09-12, Sunny's condition-layer
         # screenshots): every WALKED SHAPE the delivery used is
         # recorded — (anchor label, hops as (edge, store-direction,
@@ -725,8 +747,15 @@ def answer_question(question: str, interpret_fn,
                         + f" ({owned} joins them with {kindw})")
                 return
             _shape(m, hops)     # the artifact covers ROWED walks
-            key = (pop_id, via, m["identity"])   # the row dedups
+            # LAW 7 — MEMBER GRAIN (ruled 2026-09-13, the
+            # nine-rows-for-four-tables screenshot): a set
+            # question's answer grain is the MEMBER — one row per
+            # (member, anchor); the NEAREST route wins the via
+            # (directs sink first), farther routes are COUNTED,
+            # never rowed and never lost
+            key = (pop_id, m["identity"])
             if key in seen_rows:
+                extra_routes[0] += 1
                 return
             seen_rows.add(key)
             hit_pop.add(pop_id)
@@ -744,20 +773,34 @@ def answer_question(question: str, interpret_fn,
                         and kind_label in OWNED_POPS
                         and all(m["label"] in OWNER_LABELS
                                 for m in anchors))
+        # LAW 6 — THE OWNERSHIP DEFAULT (ruled 2026-09-13): no
+        # steering word = the OWNERSHIP relation answers (has_part
+        # family — the birth-grade, nearest truth); farther
+        # connective routes are COUNTED, one click away (reach=
+        # wide). A precedence rule, never a guess — and never a
+        # veto: an empty ownership harvest falls through to the
+        # free walk below.
+        ownership_default = (not edge_kinds and not near_default
+                             and reach != "wide")
         allowed: Optional[Set[str]] = (
             set(edge_kinds) if edge_kinds
-            else set(NEAR_EDGES) if near_default else None)
+            else set(NEAR_EDGES) if (near_default
+                                     or ownership_default)
+            else None)
 
         def _walk_from(m: Dict[str, Any],
                        allowed_edges: Optional[Set[str]],
                        sink) -> None:
-            for nbr, elbl in adj.get(m["identity"], []):
-                if allowed_edges is not None \
-                        and elbl not in allowed_edges:
-                    continue
-                start = None
+            nbrs = [(n, e) for n, e in adj.get(m["identity"], [])
+                    if allowed_edges is None or e in allowed_edges]
+            # law 7 rider: DIRECT edges sink before any chain —
+            # the nearest route must own the (member, anchor) row
+            for nbr, elbl in nbrs:
                 if nbr in pop:
                     sink(nbr, elbl, m, [(elbl, nbr)])
+            for nbr, elbl in nbrs:
+                start = None
+                if nbr in pop:
                     # THE CONDITION TREE DELIVERS WHOLE
                     # (2026-09-12): a delivered composite is ALSO
                     # connective — its parts are the meaning (the
@@ -805,6 +848,13 @@ def answer_question(question: str, interpret_fn,
 
         for m in anchors:
             _walk_from(m, allowed, _row)
+        if ownership_default and not rows:
+            # nothing OWNS the anchor — the connective routes ARE
+            # the honest answer; the default never vetoes (law 6)
+            ownership_default = False
+            allowed = None
+            for m in anchors:
+                _walk_from(m, allowed, _row)
         # THE COUNTED REMAINDER (2026-09-12): a narrowed walk
         # narrows VISIBLY or not at all — the free walk counts the
         # rows the narrowing excluded (same class filter, so the
@@ -828,6 +878,8 @@ def answer_question(question: str, interpret_fn,
         # literal: shape
         counts = {"connected": len(hit_pop),
                   "population": len(pop), "label": kind_label}
+        if extra_routes[0]:
+            counts["extra_routes"] = extra_routes[0]  # law 7
         # STRUCTURE NEVER ROWS reaches the ARTIFACT (Sunny's live
         # DIVERGE, 2026-09-12 evening: served 5 rows included the
         # 1=1 degenerate the delivery rightly excluded — the
@@ -951,6 +1003,7 @@ def answer_question(question: str, interpret_fn,
             "label_relaxed": label_relaxed,
             "pinned": pinned, "pin_misses": pin_misses,
             "edge_constraints": sorted(edge_kinds),
+            "net_caught": net_caught,
             "relation_unclaimed": relation_unclaimed,
             "constrained_out": constrained_out,
             "far_out": far_out, "counted_out": counted_out,
@@ -1160,6 +1213,20 @@ def render_round(result: Dict[str, Any]) -> str:
                      + html.escape(ident) + "' is no longer in "
                      "the match set for '" + html.escape(tok)
                      + "' — the round ran unpinned.</p>")
+    if result.get("net_caught"):
+        # law 5: the seat dropped a steering word; the closed
+        # vocabulary held — say so, never silently
+        parts.append("<p class=meta>caught by the net: "
+                     + html.escape(", ".join(
+                         f"'{w}'" for w in result["net_caught"]))
+                     + " — a steering word the interpreter "
+                     "dropped; the closed edge-kind vocabulary "
+                     "claimed it</p>")
+    if result.get("counts", {}).get("extra_routes"):
+        parts.append(f"<p class=meta>{result['counts']['extra_routes']} "
+                     "farther route(s) folded into their member "
+                     "rows — counted, not lost (one row per "
+                     "member; the nearest route cites)</p>")
     for line in result["kind_constraints"]:
         parts.append(f"<p class=meta>{html.escape(line)}</p>")
     if result.get("label_constraint"):

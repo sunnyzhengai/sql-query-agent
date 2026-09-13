@@ -408,6 +408,62 @@ def test_matched_graph_enumerates_the_event_id_carriers(world):
           if row["edge"] == "has_part"}
     assert hp == {(t, "EVENT_ID") for t in EVENT_ID_TABLES}
     assert r["counts"]["connected"] == 4
+
+
+def test_mechanical_net_catches_the_dropped_steering_word(world):
+    # LAW 5 — THE MECHANICAL NET (Sunny's screenshot round,
+    # 2026-09-13: the interpreter tokenized 'tables' · 'EVENT_ID'
+    # and DROPPED 'contain'): the seat proposes, the closed
+    # vocabulary guarantees — the question's own words sweep the
+    # structure pool, no model attention required
+    read, entries, _, adj, directed = world
+    kind = next(e for e in entries if e["identity"] == "kind::table")
+    hp = next(e for e in entries
+              if e["identity"] == "edgekind::has_part")
+    semantic = _ScriptedSemantic({
+        "tables": [{**kind, "score": 1.2}],
+        "contain": [{**hp, "score": 1.1}]})
+    r = mc.answer_question(
+        'show me all tables that contain "EVENT_ID"',
+        _scripted_tokens(["tables", "EVENT_ID"]),  # seat drops it
+        entries, semantic, read, adj, directed)
+    assert r["net_caught"] == ["contain"]
+    assert r["edge_constraints"] == ["has_part"]
+    got = {(row["a"], row["edge"], row["b"]) for row in r["rows"]}
+    assert got == {(t, "has_part", "EVENT_ID")
+                   for t in EVENT_ID_TABLES}  # 4 rows, no dupes
+
+
+def test_ownership_default_when_no_steering_word(world):
+    # LAW 6 — THE OWNERSHIP DEFAULT: silence defaults to the
+    # ownership relation; the connective routes never row here
+    read, entries, _, adj, directed = world
+    kind = next(e for e in entries if e["identity"] == "kind::table")
+    semantic = _ScriptedSemantic({"tables": [{**kind, "score": 1.2}]})
+    r = mc.answer_question(
+        "show me all tables with EVENT_ID",
+        _scripted_tokens(["tables", "EVENT_ID"]),
+        entries, semantic, read, adj, directed)
+    assert r["edge_constraints"] == []  # nothing steered
+    assert all(row["edge"] == "has_part" for row in r["rows"])
+    assert sorted({row["a"] for row in r["rows"]}) == EVENT_ID_TABLES
+    assert len(r["rows"]) == 4  # one row per member, ownership only
+
+
+def test_member_grain_holds_even_on_the_wide_reach(world):
+    # LAW 7 — MEMBER GRAIN: reach=wide delivers the connective
+    # routes too, but never two rows for one (member, anchor) —
+    # farther routes are counted, the nearest cites
+    read, entries, _, adj, directed = world
+    kind = next(e for e in entries if e["identity"] == "kind::table")
+    semantic = _ScriptedSemantic({"tables": [{**kind, "score": 1.2}]})
+    r = mc.answer_question(
+        "show me all tables with EVENT_ID",
+        _scripted_tokens(["tables", "EVENT_ID"]),
+        entries, semantic, read, adj, directed, reach="wide")
+    keys = [(row["a_id"], row["b_id"]) for row in r["rows"]]
+    assert len(keys) == len(set(keys))  # one row per member-anchor
+    assert r["counts"].get("extra_routes", 0) >= 1  # routes counted
     assert r["counts"]["population"] == 90
     assert r["counts"]["label"] == "table"
     assert len(r["anchors"]) == 4          # nothing discarded
@@ -719,10 +775,13 @@ def test_column_enumeration_artifact_never_invents_an_edge(world):
                 if e["identity"] == "kind::column")
     semantic = _ScriptedSemantic(
         {"filters": [{**dict(kind), "score": 1.2}]})
+    # reach=wide since law 6 (2026-09-13): the ownership default
+    # counts the join-side routes instead of rowing them — the
+    # side shapes this test pins only DELIVER on the wide reach
     r = mc.answer_question(
         "what filters are in the #Base_Pop subquery",
         _scripted_tokens(["filters", "#Base_Pop"]),
-        entries, semantic, read, adj, directed)
+        entries, semantic, read, adj, directed, reach="wide")
     assert r["mode"] == "enumeration" and r["rows"]
     for g in r["gql"]:
         assert "(a:column)-[:has_part]->(b:scope)" not in g

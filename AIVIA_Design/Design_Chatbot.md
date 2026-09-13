@@ -1281,3 +1281,37 @@ meaning IS the answer; the neighborhood stays ONE ASK AWAY
 (the bare-name question — "#ADT", "ADT_EVENTS" — keeps its
 neighborhood card, unchanged). Same law as near-first: the
 wide view is a choice, never the default.
+
+**5. THE MECHANICAL NET (Sunny, 2026-09-13: "is it possible for
+us to catch all steering words?" → "rule all three and build
+them").** The graph's relations are a CLOSED set with blessed
+speech (the _edge rows, registries 1.40.0) — so catching
+steering words never depends on the model's attention. The seat
+PROPOSES; the net GUARANTEES: every question word the
+interpreter dropped sweeps deterministically against the
+structure pool, and a word clearing MATCH_SCORE against an edge
+kind's speech IS a relation word ("contain" → has_part) — added
+to the round, marked, and NAMED on the page ("caught by the
+net: 'contain' — a steering word the interpreter dropped").
+Words no edge kind can speak stay unclaimed: the graph honestly
+has no such relation. The founding corpse: the interpreter
+tokenized 'tables' · 'EVENT_ID' and dropped 'contain' — prompt
+3.1.0 asked for compliance; the net enforces mechanically.
+
+**6. THE OWNERSHIP DEFAULT (same ruling).** When no steering
+word survives, the metamodel's own precedence answers — never a
+guess: the OWNERSHIP relation (has_part · uses_param · cites,
+the birth-grade nearest truth) delivers the rows; the farther
+connective routes (join sides, condition chains) are COUNTED,
+one click away (reach=wide). Never a veto: an anchor nothing
+owns falls through to the free walk, unchanged. This is the
+near-first default generalized from owner-anchors to every
+silent set question.
+
+**7. MEMBER GRAIN (same ruling — the nine-rows-for-four-tables
+corpse).** A set question's answer grain is the MEMBER: one row
+per (member, anchor), the NEAREST route wins the citation
+(direct edges sink before chains), and every farther route is
+COUNTED on the round ("N farther route(s) folded into their
+member rows"), never rowed and never lost. Structure-never-rows
+one level up: routes are evidence, members are answers.

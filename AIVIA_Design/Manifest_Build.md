@@ -968,6 +968,29 @@ test_meaning_card_default_names_the_grain_gets_the_meaning
 "repository" in its own words; bare "ADT_EVENTS" still
 neighborhood).
 
+**THE THREE SET-QUESTION LAWS (Sunny's EVENT_ID screenshots,
+2026-09-13: root-caused as the dropped steering word + the
+row-per-connection grain → "rule all three and build them"):**
+laws 5-7 in Design_Chatbot §MEANING-TEST CONSOLE, built same
+sitting. (5) THE MECHANICAL NET — the closed edge-kind
+vocabulary catches steering words the seat drops
+(deterministic sweep of question words vs structure speech;
+'contain' → has_part; named on the page, never silent). (6)
+THE OWNERSHIP DEFAULT — silence answers with the ownership
+relation (NEAR_EDGES), farther connective routes counted one
+click away (reach=wide); never a veto (empty harvest falls
+through free). (7) MEMBER GRAIN — one row per (member,
+anchor), directs sink before chains so the nearest route
+cites, farther routes counted ("N folded into their member
+rows"). The screenshot round replayed: 4 rows for 4 tables,
+has_part vias, no dupes. Tests:
+test_mechanical_net_catches_the_dropped_steering_word ·
+test_ownership_default_when_no_steering_word ·
+test_member_grain_holds_even_on_the_wide_reach; one conscious
+pin move (the #Base_Pop artifact side-shapes now assert on
+reach=wide, where they still deliver); the pinned carriers +
+blessed rounds green unchanged.
+
 **THE PAUSED-CAPACITY FIND (Sunny's live test, 2026-09-13:
 wire ON, capacity PAUSED, two rounds "seem to work normally" —
 "how do i know if this live test page is really wired into
