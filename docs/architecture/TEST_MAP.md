@@ -7,7 +7,7 @@
 
 # Test Map — what every test proves
 
-182 modules, 1988 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
+184 modules, 2009 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
 
 ## By ADR
 
@@ -97,6 +97,7 @@
 - `tests/orchestrator/test_walk_continuation.py` (20): Walk 1562 continuation (steps 3–6, 2026-08-23) — L0 for the P0/P1
 - `tests/test_console.py` (20): CONSOLE-1 (0063 §3 — the Resolution Console / the Inbox):
 - `tests/test_de_typing.py` (4): TESTPLAN_0062 section A — the de-typing proof (the ruling's
+- `tests/test_paraphrase_null_markers.py` (3): The NULL-marker law: serialized database NULLs are absence, not content.
 - `tests/webapp/test_page_dom.py` (2): RW-19 — the page-JS gate's RUNTIME leg (TESTPLAN_0062 D).
 
 ### law:brand-separation — the product name is a seam; the core stays brand-neutral
@@ -182,6 +183,7 @@
 - `tests/aivia/test_ledger_close.py` (5): The ledger close (Sunny's order, 2026-09-06): the last engine-debt
 - `tests/aivia/test_lenses.py` (11): Slice 3 exit: the F3 answer key against the BUILT lenses.
 - `tests/aivia/test_literal_census.py` (1): E3 LOCK 1 — THE LITERAL CENSUS (the literal law, ratified
+- `tests/aivia/test_meaning_smells.py` (18): THE MEANING-SMELL CENSUS + THE PHRASE-CORPUS SWEEP (Sunny's go,
 - `tests/aivia/test_metamodel.py` (7): Slice 0: the registry loader — code consumes ratified registries only.
 - `tests/aivia/test_part_edges.py` (4): STEP 4 of the Connection Ledger build — PART EDGES. The test
 - `tests/aivia/test_pbi_layer.py` (5): PHASE H — THE PBI LAYER (Sunny's ruling 2026-09-08: every proc

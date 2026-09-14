@@ -196,3 +196,48 @@ The finds of 2026-09-07 become the standing corpses:
 - R-5: Sequencing — this ruling's build replaces the pending
   find-#10 patch (the "topic law" is superseded by facet search +
   censuses); confirm the patch is dead and the build is one phase?
+
+---
+
+## Piece 6 — THE MEANING-SMELL CENSUS + THE PHRASE-CORPUS SWEEP
+*(RULED 2026-09-14 — Sunny's "go on both" on the 09-12 GENERATOR
+NOTE; the generator-level answer to per-round phrasing fixes.
+BUILT same sitting.)*
+
+**The law.** The floor's spoken output is swept WHOLESALE, never
+retail:
+
+1. **The phrase corpus** — every stored voicing (condition + scope
+   grains, the floor's whole spoken output) renders into ONE
+   artifact, deduplicated by phrasing class (label · kind · shape
+   template over the closed STRUCTURE_WORDS masking vocabulary).
+   One exemplar per class with its count and member list; a class
+   with smells exemplifies with a SMELLED member (the sweep must
+   see the evidence). Every class renders — no silent caps.
+   Sunny sweeps the artifact in one sitting; each bad exemplar
+   becomes a ruled grammar law with the class's members as its
+   acceptance tests.
+2. **The meaning-smell census** — the FOURTH conservation
+   equation: clean ⊎ smelled == total voicings. The smell set is
+   closed and mechanical (no model, no threshold): empty ·
+   placeholder (the sentinel class) · identifier (raw fragments
+   in prose) · tautology ("The X is the X") · stutter (doubled
+   word) · echo (repeated content bigram — the near-tautology).
+   A smell is a FLAG for the sweep, never a verdict: a lawful
+   render can smell (the 2.8.0 name-words join render is ruled
+   AND echo-smelled). The census rides the standing report — a
+   new phrasing class announces itself before a live round
+   stumbles over it.
+
+**Landing:** aivia/flows/smells.py (detectors · template · corpus
+· census · render) — censuses.report() carries the fourth line —
+console.render_phrase_corpus(estate) writes
+glossary/phrase_corpus.md — tests/aivia/test_meaning_smells.py
+(the founding corpses are the acceptance tests).
+
+**First census (ed_sepsis_dev, 2026-09-14):** 1185 voicings in 73
+classes; 993 clean + 192 smelled == 1185; tautology 88 · echo 76 ·
+identifier 38 · stutter 13. The corpus artifact awaits Sunny's
+first sweep; the 115-member join-tautology class ("The encounter
+is the encounter.") and the 38 identifier-leak expressions are the
+visible heads.

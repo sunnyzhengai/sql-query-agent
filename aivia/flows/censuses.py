@@ -119,10 +119,12 @@ def verbatim_census(read,
 def report(read, index: List[Dict[str, Any]]) -> str:
     """The gap-check report bucket — the three equations with their
     numbers, for Sunny's read."""
+    from aivia.flows import smells
     r = connection_census(read)
     s = speech_census(read, index)
     q = searchability_census(read, index)
     v = verbatim_census(read, index)
+    m = smells.smell_census(read)
     return "\n".join([
         "## The three censuses (ADR 0080; census 1 succeeded by the "
         "connection census, 2026-09-07)",
@@ -140,4 +142,8 @@ def report(read, index: List[Dict[str, Any]]) -> str:
         "speakers",
         f"- verbatim: {v['matched']} matched + {v['mismatched']} "
         f"counted mismatches == {v['total']}; drifted: "
-        f"{v['mismatches'] or 'none'}"])
+        f"{v['mismatches'] or 'none'}",
+        f"- meaning-smell: {m['clean']} clean + {m['smelled']} "
+        f"smelled == {m['total']} voicings; smells: "
+        f"{m['by_smell'] or 'none'} (the fourth equation, "
+        "Sunny's go 2026-09-14)"])

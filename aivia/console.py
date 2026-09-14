@@ -297,6 +297,29 @@ def run_name_proposals(estate: str, scope: str = "voiced") -> None:
           "the next console boot seeds them)")
 
 
+def render_phrase_corpus(estate: str) -> None:
+    """THE PHRASE-CORPUS SWEEP (Sunny's go, 2026-09-14): render
+    every stored voicing into one class-deduplicated artifact for
+    the one-sitting sweep, with the meaning-smell census on top.
+    Zero spends — no model anywhere in the path. Runbook:
+    python3.11 -c \"import aivia.console as c;
+    c.render_phrase_corpus('<estate>')\" then read
+    glossary/phrase_corpus.md; each bad exemplar becomes a ruled
+    grammar law with its members as acceptance tests."""
+    from aivia.flows import smells
+    store, base = build_store(estate)
+    read = ReadApi(store)
+    rows = smells.phrase_corpus(read)
+    out = base / "glossary" / "phrase_corpus.md"
+    out.write_text(smells.render_corpus(rows))
+    c = smells.smell_census(read)
+    print(f"phrase corpus: {c['total']} voicings in "
+          f"{c['classes']} classes -> {out}")
+    print(f"meaning-smell census: {c['clean']} clean + "
+          f"{c['smelled']} smelled == {c['total']}; "
+          f"smells: {c['by_smell'] or 'none'}")
+
+
 def make_embedder(key: str):
     def embed(texts):
         vectors = []
