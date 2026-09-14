@@ -1118,15 +1118,17 @@
   "blessed_at": "2026-09-13T17:40:00Z"
  },
  "emr|dbo|REF_ALERT_OVERRIDE_REASONS|ALRT_SP_OVR_RSN_CODE": {
-  "status": "proposed",
-  "description_hash": "53b20fde51425bfbb25dbf5e8c105ed7480194af5d77447bd329138447a9704e",
-  "proposed_at": "2026-09-13T21:23:16Z",
+  "status": "blessed",
+  "description_hash": "44886c78d410ea0a9d41b748be71ba9790d33dd858cf38ea11b3807647a18db9",
+  "proposed_at": "2026-09-14T23:09:33Z",
   "proposer": {
    "model": "gpt-4o-mini",
    "prompt_version": "1.0.0",
    "runs": 2
   },
-  "words": "value"
+  "words": "category reason alert",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-14T23:09:33Z"
  },
  "emr|dbo|REF_ALERT_STATUS|ALT_STATUS_CODE": {
   "status": "blessed",
@@ -1142,26 +1144,30 @@
   "blessed_at": "2026-09-13T17:40:00Z"
  },
  "emr|dbo|REF_ED_DISPOSITION|ED_DISPOSITION_CODE": {
-  "status": "proposed",
-  "description_hash": "53b20fde51425bfbb25dbf5e8c105ed7480194af5d77447bd329138447a9704e",
-  "proposed_at": "2026-09-13T21:23:16Z",
+  "status": "blessed",
+  "description_hash": "8b2e6921a310548dd9c9dced0a193e3f3732eadfb71d2975845476a28eddf26a",
+  "proposed_at": "2026-09-14T23:09:33Z",
   "proposer": {
    "model": "gpt-4o-mini",
    "prompt_version": "1.0.0",
    "runs": 2
   },
-  "words": "disposition code"
+  "words": "ed disposition",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-14T23:09:33Z"
  },
  "emr|dbo|REF_ETHNIC_GROUP|ETHNIC_GROUP_CODE": {
-  "status": "proposed",
-  "description_hash": "53b20fde51425bfbb25dbf5e8c105ed7480194af5d77447bd329138447a9704e",
-  "proposed_at": "2026-09-13T21:23:16Z",
+  "status": "blessed",
+  "description_hash": "bf207f86d03e5a80751b2a505e77dcc8731c39a0741108084b6c3b6d38d69355",
+  "proposed_at": "2026-09-14T23:09:33Z",
   "proposer": {
    "model": "gpt-4o-mini",
    "prompt_version": "1.0.0",
    "runs": 2
   },
-  "words": "value"
+  "words": "ethnic group",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-14T23:09:33Z"
  },
  "emr|dbo|REF_GENERIC_MED|SIMPLE_GENERIC_CODE": {
   "status": "blessed",
@@ -1177,15 +1183,17 @@
   "blessed_at": "2026-09-13T17:40:00Z"
  },
  "emr|dbo|REF_PATIENT_RACE|PATIENT_RACE_CODE": {
-  "status": "proposed",
-  "description_hash": "53b20fde51425bfbb25dbf5e8c105ed7480194af5d77447bd329138447a9704e",
-  "proposed_at": "2026-09-13T21:23:16Z",
+  "status": "blessed",
+  "description_hash": "3cb24f5de82e87a8f913a15945cf064670e619dd1d1911f0469edbefc31a885f",
+  "proposed_at": "2026-09-14T23:09:33Z",
   "proposer": {
    "model": "gpt-4o-mini",
    "prompt_version": "1.0.0",
    "runs": 2
   },
-  "words": "race code"
+  "words": "category patient race",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-14T23:09:33Z"
  },
  "emr|dbo|REF_SHOWN_PLACE|SHOWN_PLACE_CODE": {
   "status": "blessed",

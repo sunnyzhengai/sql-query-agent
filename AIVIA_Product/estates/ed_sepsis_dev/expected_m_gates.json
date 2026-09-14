@@ -16,7 +16,7 @@
     "translator_version": "1.3.0",
     "metamodel_version": "1.41.0",
     "authored": "2026-09-10",
-    "_bump_record": "authored at metamodel 1.36.0; re-based 1.37.0 (join-node ruling) then 1.38.0 (M2 join layer lands: ledger flips PRESENT) \u2014 every derived count verified by the recompute tests at each bump; re-based 1.39.0 (M3 condition layer lands); re-based 1.40.0 (structure-word claim + relation-word seat, 2026-09-12: prompts and speech rows only \u2014 zero twin-structure effect, every derived count re-verified by the recompute tests); re-based 1.41.0 (the namer seat, 2026-09-12: one Seat_Prompts row only \u2014 zero twin-structure effect, every derived count re-verified by the recompute tests); re-based at THE BLESSING (2026-09-13, Sunny's delegated curation): +105 blessed_name kg3 nodes (NO person mint \u2014 the registry is the act's record; journal self-containment) \u2014 governance truth in the STORE census, never in the Fabric export (EXPORT_LABELS); condition census 1141 and all structural counts unchanged, A2 delta = 130 description texts"
+    "_bump_record": "authored at metamodel 1.36.0; re-based 1.37.0 (join-node ruling) then 1.38.0 (M2 join layer lands: ledger flips PRESENT) \u2014 every derived count verified by the recompute tests at each bump; re-based 1.39.0 (M3 condition layer lands); re-based 1.40.0 (structure-word claim + relation-word seat, 2026-09-12: prompts and speech rows only \u2014 zero twin-structure effect, every derived count re-verified by the recompute tests); re-based 1.41.0 (the namer seat, 2026-09-12: one Seat_Prompts row only \u2014 zero twin-structure effect, every derived count re-verified by the recompute tests); re-based at THE BLESSING (2026-09-13, Sunny's delegated curation): +105 blessed_name kg3 nodes (NO person mint \u2014 the registry is the act's record; journal self-containment) \u2014 governance truth in the STORE census, never in the Fabric export (EXPORT_LABELS); condition census 1141 and all structural counts unchanged, A2 delta = 130 description texts; re-based at THE SECOND BLESSING (2026-09-14, Sunny's hand): +4 blessed_name — the REF_* held rows re-proposed off the AUTHORED descriptions after the sentinel-origin fix and blessed same night (109 total, node_total 6276); zero edge effect, every structural count unchanged"
   },
   "census_after": {
     "_comment": "THE GATE TABLES: cumulative Fabric-surface censuses after each batch. Q1 = MATCH (n) RETURN labels(n), count(*); Q3 = MATCH ()-[r]->() RETURN type(r), count(*). Exact both directions. M2 numbers are MEASURED FROM THE BUILT STORE (2026-09-10).",
@@ -173,9 +173,9 @@
         "role": 1,
         "responsibility": 1,
         "person": 0,
-        "blessed_name": 105
+        "blessed_name": 109
       },
-      "node_total": 6272,
+      "node_total": 6276,
       "edges": {
         "has_part": 6160,
         "joins_to": 65,
@@ -386,7 +386,7 @@
         "person": 0,
         "term": 0,
         "usage": 0,
-        "blessed_name": 105
+        "blessed_name": 109
       },
       "new_edges": {
         "executes": 1,
