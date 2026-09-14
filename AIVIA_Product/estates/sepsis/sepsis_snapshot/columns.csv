@@ -3581,51 +3581,51 @@ dbo,REF_ALERT_ACTIONS,ALT_ACTION_TAKEN_CODE,Values representing different catego
 dbo,REF_ALERT_ACTIONS,INTERNAL_ID,The internal ID of the CATEGORY_VALUE. This value is as it is represented in the source system.
 dbo,REF_ALERT_ACTIONS,NAME,The name associated with the category value.
 dbo,REF_ALERT_ACTIONS,TITLE,The shortened form of the category value.
-dbo,REF_ALERT_OVERRIDE_REASONS,ABBR,No value is present.
-dbo,REF_ALERT_OVERRIDE_REASONS,ALRT_SP_OVR_RSN_CODE,No value is present.
-dbo,REF_ALERT_OVERRIDE_REASONS,INTERNAL_ID,No value is present.
-dbo,REF_ALERT_OVERRIDE_REASONS,NAME,No value is present.
-dbo,REF_ALERT_OVERRIDE_REASONS,TITLE,No value is present.
+dbo,REF_ALERT_OVERRIDE_REASONS,ABBR,The abbreviation for the alert override reason.
+dbo,REF_ALERT_OVERRIDE_REASONS,ALRT_SP_OVR_RSN_CODE,The category value that identifies the reason given for overriding the alert.
+dbo,REF_ALERT_OVERRIDE_REASONS,INTERNAL_ID,The internal category value for the alert override reason.
+dbo,REF_ALERT_OVERRIDE_REASONS,NAME,The name of the alert override reason.
+dbo,REF_ALERT_OVERRIDE_REASONS,TITLE,The title of the alert override reason.
 dbo,REF_ALERT_STATUS,ABBR,"The abbreviation for ALERT_STATUS, ITEM the source item."
 dbo,REF_ALERT_STATUS,ALT_STATUS_CODE,The category value representing the alert status of the source item.
 dbo,REF_ALERT_STATUS,INTERNAL_ID,"The unique internal identifier for the alert status, associated with the source item."
 dbo,REF_ALERT_STATUS,NAME,"The designation for the alert status, referring to the source item."
 dbo,REF_ALERT_STATUS,TITLE,"The title for ALERT_STATUS, which refers to the source item."
-dbo,REF_DISCHARGE_DISPOSITION,ABBR,No value is present.
-dbo,REF_DISCHARGE_DISPOSITION,DISCH_DISP_CODE,No value is present.
-dbo,REF_DISCHARGE_DISPOSITION,INTERNAL_ID,No value is present.
-dbo,REF_DISCHARGE_DISPOSITION,NAME,No value is present.
-dbo,REF_DISCHARGE_DISPOSITION,TITLE,No value is present.
-dbo,REF_ED_DISPOSITION,ABBR,No value is present.
-dbo,REF_ED_DISPOSITION,ED_DISPOSITION_CODE,No value is present.
-dbo,REF_ED_DISPOSITION,INTERNAL_ID,No value is present.
-dbo,REF_ED_DISPOSITION,NAME,No value is present.
-dbo,REF_ED_DISPOSITION,TITLE,No value is present.
-dbo,REF_ETHNIC_GROUP,ABBR,No value is present.
-dbo,REF_ETHNIC_GROUP,ETHNIC_GROUP_CODE,No value is present.
-dbo,REF_ETHNIC_GROUP,INTERNAL_ID,No value is present.
-dbo,REF_ETHNIC_GROUP,NAME,No value is present.
-dbo,REF_ETHNIC_GROUP,TITLE,No value is present.
-dbo,REF_GENERIC_MED,ABBR,No value is present.
+dbo,REF_DISCHARGE_DISPOSITION,ABBR,The abbreviation for the discharge disposition.
+dbo,REF_DISCHARGE_DISPOSITION,DISCH_DISP_CODE,The category value that identifies the patient's discharge disposition.
+dbo,REF_DISCHARGE_DISPOSITION,INTERNAL_ID,The internal category value for the discharge disposition.
+dbo,REF_DISCHARGE_DISPOSITION,NAME,The name of the discharge disposition.
+dbo,REF_DISCHARGE_DISPOSITION,TITLE,The title of the discharge disposition.
+dbo,REF_ED_DISPOSITION,ABBR,The abbreviation for the emergency department disposition.
+dbo,REF_ED_DISPOSITION,ED_DISPOSITION_CODE,The category value that identifies the disposition of the patient's emergency department visit.
+dbo,REF_ED_DISPOSITION,INTERNAL_ID,The internal category value for the emergency department disposition.
+dbo,REF_ED_DISPOSITION,NAME,The name of the emergency department disposition.
+dbo,REF_ED_DISPOSITION,TITLE,The title of the emergency department disposition.
+dbo,REF_ETHNIC_GROUP,ABBR,The abbreviation for the ethnic group.
+dbo,REF_ETHNIC_GROUP,ETHNIC_GROUP_CODE,The category value that identifies the patient's ethnic group.
+dbo,REF_ETHNIC_GROUP,INTERNAL_ID,The internal category value for the ethnic group.
+dbo,REF_ETHNIC_GROUP,NAME,The name of the ethnic group.
+dbo,REF_ETHNIC_GROUP,TITLE,The title of the ethnic group.
+dbo,REF_GENERIC_MED,ABBR,The abbreviation for the generic medication.
 dbo,REF_GENERIC_MED,INTERNAL_ID,The internal ID of the CATEGORY_VALUE. This value is as it is represented in the source system.
-dbo,REF_GENERIC_MED,NAME,No value is present.
+dbo,REF_GENERIC_MED,NAME,The name of the generic medication.
 dbo,REF_GENERIC_MED,SIMPLE_GENERIC_CODE,This column contains the basic generic name of a medication.
-dbo,REF_GENERIC_MED,TITLE,No value is present.
+dbo,REF_GENERIC_MED,TITLE,The title of the generic medication.
 dbo,REF_PATIENT_CLASS,ABBR,The shortened form of the category value.
 dbo,REF_PATIENT_CLASS,ADT_PATIENT_CLASS_CODE,"The CATEGORY_NUMBER for the patient class during the hospital encounter, typically matching the internal ID. If using IntraConnect, this corresponds to the COMMUNITY_ID."
 dbo,REF_PATIENT_CLASS,INTERNAL_ID,The internal ID of the CATEGORY_VALUE. This value is as it is represented in the source system.
 dbo,REF_PATIENT_CLASS,NAME,The name associated with the category value.
 dbo,REF_PATIENT_CLASS,TITLE,"The title of the category value, presented in uppercase letters."
-dbo,REF_PATIENT_RACE,ABBR,No value is present.
-dbo,REF_PATIENT_RACE,INTERNAL_ID,No value is present.
-dbo,REF_PATIENT_RACE,NAME,No value is present.
-dbo,REF_PATIENT_RACE,PATIENT_RACE_CODE,No value is present.
-dbo,REF_PATIENT_RACE,TITLE,No value is present.
-dbo,REF_SEX,ABBR,No value is present.
-dbo,REF_SEX,INTERNAL_ID,No value is present.
-dbo,REF_SEX,NAME,No value is present.
-dbo,REF_SEX,RCPT_MEM_SEX_CODE,No value is present.
-dbo,REF_SEX,TITLE,No value is present.
+dbo,REF_PATIENT_RACE,ABBR,The abbreviation for the patient race category.
+dbo,REF_PATIENT_RACE,INTERNAL_ID,The internal category value for the patient race.
+dbo,REF_PATIENT_RACE,NAME,The name of the patient race category.
+dbo,REF_PATIENT_RACE,PATIENT_RACE_CODE,The category value that identifies the patient's race.
+dbo,REF_PATIENT_RACE,TITLE,The title of the patient race category.
+dbo,REF_SEX,ABBR,The abbreviation for the sex category value.
+dbo,REF_SEX,INTERNAL_ID,The internal category value for the sex entry.
+dbo,REF_SEX,NAME,The name of the sex category value.
+dbo,REF_SEX,RCPT_MEM_SEX_CODE,The category value that identifies the patient's sex.
+dbo,REF_SEX,TITLE,The title of the sex category value.
 dbo,REF_SHOWN_PLACE,ABBR,"The abbreviation for the location where the alerts were displayed, item ECT 9015."
 dbo,REF_SHOWN_PLACE,INTERNAL_ID,"The unique internal identifier for the location where the alerts were displayed, item ECT 9015."
 dbo,REF_SHOWN_PLACE,NAME,"The identifier for the location where the alerts were displayed, item ECT 9015."

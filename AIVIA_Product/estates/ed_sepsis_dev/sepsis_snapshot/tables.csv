@@ -62,15 +62,15 @@ dbo,PROCEDURE_ORDERS,"The PROCEDURE_ORDERS table allows for reporting on the pro
 dbo,PROCEDURE_ORDERS_EXT,The PROCEDURE_ORDERS_EXT table allows for reporting on procedures ordered within the clinical system. It shares a similar structure with PROCEDURE_ORDERS and was established as a third table to avoid increasing the size of ORDER_PROC_2.
 dbo,PROVIDERS,"The PROVIDERS table holds essential details regarding your provider records, which can include caregivers, resources, classes, devices, and modalities."
 dbo,REF_ALERT_ACTIONS,This table holds the values representing the actions that a user can perform in response to alerts.
-dbo,REF_ALERT_OVERRIDE_REASONS,No value is present.
+dbo,REF_ALERT_OVERRIDE_REASONS,Reference table of category values for the reasons a user may select when overriding a clinical alert.
 dbo,REF_ALERT_STATUS,"This table contains the categories for alert status. The alert status describes the outcome of an interaction alert after it has been viewed by an end user, with possible statuses including OVERRIDDEN, REMOVED, FILTERED, or CANCELLED."
-dbo,REF_DISCHARGE_DISPOSITION,No value is present.
-dbo,REF_ED_DISPOSITION,No value is present.
+dbo,REF_DISCHARGE_DISPOSITION,"Reference table of category values for patient discharge dispositions, where or how the patient left the facility at the end of the encounter."
+dbo,REF_ED_DISPOSITION,"Reference table of category values for emergency department dispositions, the outcome of the patient's emergency department visit, such as admitted, discharged, or transferred."
 dbo,REF_ETHNIC_GROUP,This table holds the category details for patient ethnic groups.
-dbo,REF_GENERIC_MED,No value is present.
+dbo,REF_GENERIC_MED,"Reference table of generic medication records, linking medication orders to their generic drug identity."
 dbo,REF_PATIENT_CLASS,This table holds the category details for the patient classes associated with the hospital encounter.
 dbo,REF_PATIENT_RACE,This table holds the category details related to patient race.
-dbo,REF_SEX,No value is present.
+dbo,REF_SEX,Reference table of category values for patient sex.
 dbo,REF_SHOWN_PLACE,This table contains the categories for the various locations where alerts may be displayed in the clinical application.
 dbo,RX_VERIFY_TRACE,This table records medication orders that are in the pharmacy verification queue.
 reports,SEVERE_SEPSIS_STAGING,ETL staging table for identifying severe sepsis cases. Contains records of patients who meet the criteria for severe sepsis along with tracking for compliance with bundle elements.

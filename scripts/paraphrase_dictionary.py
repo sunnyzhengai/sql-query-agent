@@ -47,6 +47,16 @@ SYSTEM = (
     "add information that is not in the original."
 )
 
+# A database NULL serialized into the DESCRIPTION field is absence, not
+# content — it must never reach the paraphraser, which would dutifully
+# prose-ify it (the "NULL" -> "No value is present." incident: 38 rows,
+# 2026-09-14). Closed set, full-field match only.
+NULL_MARKERS = {"", "null", "none", "n/a", "na"}
+
+
+def is_null_marker(text: str) -> bool:
+    return text.strip().lower() in NULL_MARKERS
+
 
 def _load_llm_config():
     import yaml
@@ -96,6 +106,9 @@ def paraphrase_all(limit: "int | None" = None, workers: int = 12) -> int:
             reader = csv.DictReader(f)
             fieldnames = reader.fieldnames
             rows = list(reader)
+        for r in rows:
+            if is_null_marker(r["DESCRIPTION"]):
+                r["DESCRIPTION"] = ""  # absence lands as absence
         todo = [r for r in rows if r["DESCRIPTION"].strip()]
         if limit:
             todo = todo[:limit]

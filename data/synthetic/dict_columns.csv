@@ -3581,51 +3581,51 @@ REF_ALERT_ACTIONS,ALT_ACTION_TAKEN_CODE,Values representing different categories
 REF_ALERT_ACTIONS,INTERNAL_ID,The internal ID of the CATEGORY_VALUE. This value is as it is represented in the source system.,INTEGER
 REF_ALERT_ACTIONS,NAME,The name associated with the category value.,VARCHAR
 REF_ALERT_ACTIONS,TITLE,The shortened form of the category value.,VARCHAR
-REF_ALERT_OVERRIDE_REASONS,ABBR,No value is present.,VARCHAR
-REF_ALERT_OVERRIDE_REASONS,ALRT_SP_OVR_RSN_CODE,No value is present.,INTEGER
-REF_ALERT_OVERRIDE_REASONS,INTERNAL_ID,No value is present.,INTEGER
-REF_ALERT_OVERRIDE_REASONS,NAME,No value is present.,VARCHAR
-REF_ALERT_OVERRIDE_REASONS,TITLE,No value is present.,VARCHAR
+REF_ALERT_OVERRIDE_REASONS,ABBR,The abbreviation for the alert override reason.,VARCHAR
+REF_ALERT_OVERRIDE_REASONS,ALRT_SP_OVR_RSN_CODE,The category value that identifies the reason given for overriding the alert.,INTEGER
+REF_ALERT_OVERRIDE_REASONS,INTERNAL_ID,The internal category value for the alert override reason.,INTEGER
+REF_ALERT_OVERRIDE_REASONS,NAME,The name of the alert override reason.,VARCHAR
+REF_ALERT_OVERRIDE_REASONS,TITLE,The title of the alert override reason.,VARCHAR
 REF_ALERT_STATUS,ABBR,"The abbreviation for ALERT_STATUS, ITEM the source item.",VARCHAR
 REF_ALERT_STATUS,ALT_STATUS_CODE,The category value representing the alert status of the source item.,INTEGER
 REF_ALERT_STATUS,INTERNAL_ID,"The unique internal identifier for the alert status, associated with the source item.",INTEGER
 REF_ALERT_STATUS,NAME,"The designation for the alert status, referring to the source item.",VARCHAR
 REF_ALERT_STATUS,TITLE,"The title for ALERT_STATUS, which refers to the source item.",VARCHAR
-REF_DISCHARGE_DISPOSITION,ABBR,No value is present.,VARCHAR
-REF_DISCHARGE_DISPOSITION,DISCH_DISP_CODE,No value is present.,VARCHAR
-REF_DISCHARGE_DISPOSITION,INTERNAL_ID,No value is present.,VARCHAR
-REF_DISCHARGE_DISPOSITION,NAME,No value is present.,VARCHAR
-REF_DISCHARGE_DISPOSITION,TITLE,No value is present.,VARCHAR
-REF_ED_DISPOSITION,ABBR,No value is present.,VARCHAR
-REF_ED_DISPOSITION,ED_DISPOSITION_CODE,No value is present.,VARCHAR
-REF_ED_DISPOSITION,INTERNAL_ID,No value is present.,VARCHAR
-REF_ED_DISPOSITION,NAME,No value is present.,VARCHAR
-REF_ED_DISPOSITION,TITLE,No value is present.,VARCHAR
-REF_ETHNIC_GROUP,ABBR,No value is present.,VARCHAR
-REF_ETHNIC_GROUP,ETHNIC_GROUP_CODE,No value is present.,INTEGER
-REF_ETHNIC_GROUP,INTERNAL_ID,No value is present.,INTEGER
-REF_ETHNIC_GROUP,NAME,No value is present.,VARCHAR
-REF_ETHNIC_GROUP,TITLE,No value is present.,VARCHAR
-REF_GENERIC_MED,ABBR,No value is present.,VARCHAR
+REF_DISCHARGE_DISPOSITION,ABBR,The abbreviation for the discharge disposition.,VARCHAR
+REF_DISCHARGE_DISPOSITION,DISCH_DISP_CODE,The category value that identifies the patient's discharge disposition.,VARCHAR
+REF_DISCHARGE_DISPOSITION,INTERNAL_ID,The internal category value for the discharge disposition.,VARCHAR
+REF_DISCHARGE_DISPOSITION,NAME,The name of the discharge disposition.,VARCHAR
+REF_DISCHARGE_DISPOSITION,TITLE,The title of the discharge disposition.,VARCHAR
+REF_ED_DISPOSITION,ABBR,The abbreviation for the emergency department disposition.,VARCHAR
+REF_ED_DISPOSITION,ED_DISPOSITION_CODE,The category value that identifies the disposition of the patient's emergency department visit.,VARCHAR
+REF_ED_DISPOSITION,INTERNAL_ID,The internal category value for the emergency department disposition.,VARCHAR
+REF_ED_DISPOSITION,NAME,The name of the emergency department disposition.,VARCHAR
+REF_ED_DISPOSITION,TITLE,The title of the emergency department disposition.,VARCHAR
+REF_ETHNIC_GROUP,ABBR,The abbreviation for the ethnic group.,VARCHAR
+REF_ETHNIC_GROUP,ETHNIC_GROUP_CODE,The category value that identifies the patient's ethnic group.,INTEGER
+REF_ETHNIC_GROUP,INTERNAL_ID,The internal category value for the ethnic group.,INTEGER
+REF_ETHNIC_GROUP,NAME,The name of the ethnic group.,VARCHAR
+REF_ETHNIC_GROUP,TITLE,The title of the ethnic group.,VARCHAR
+REF_GENERIC_MED,ABBR,The abbreviation for the generic medication.,VARCHAR
 REF_GENERIC_MED,INTERNAL_ID,The internal ID of the CATEGORY_VALUE. This value is as it is represented in the source system.,VARCHAR
-REF_GENERIC_MED,NAME,No value is present.,VARCHAR
+REF_GENERIC_MED,NAME,The name of the generic medication.,VARCHAR
 REF_GENERIC_MED,SIMPLE_GENERIC_CODE,This column contains the basic generic name of a medication.,VARCHAR
-REF_GENERIC_MED,TITLE,No value is present.,VARCHAR
+REF_GENERIC_MED,TITLE,The title of the generic medication.,VARCHAR
 REF_PATIENT_CLASS,ABBR,The shortened form of the category value.,VARCHAR
 REF_PATIENT_CLASS,ADT_PATIENT_CLASS_CODE,"The CATEGORY_NUMBER for the patient class during the hospital encounter, typically matching the internal ID. If using IntraConnect, this corresponds to the COMMUNITY_ID.",VARCHAR
 REF_PATIENT_CLASS,INTERNAL_ID,The internal ID of the CATEGORY_VALUE. This value is as it is represented in the source system.,VARCHAR
 REF_PATIENT_CLASS,NAME,The name associated with the category value.,VARCHAR
 REF_PATIENT_CLASS,TITLE,"The title of the category value, presented in uppercase letters.",VARCHAR
-REF_PATIENT_RACE,ABBR,No value is present.,VARCHAR
-REF_PATIENT_RACE,INTERNAL_ID,No value is present.,INTEGER
-REF_PATIENT_RACE,NAME,No value is present.,VARCHAR
-REF_PATIENT_RACE,PATIENT_RACE_CODE,No value is present.,INTEGER
-REF_PATIENT_RACE,TITLE,No value is present.,VARCHAR
-REF_SEX,ABBR,No value is present.,VARCHAR
-REF_SEX,INTERNAL_ID,No value is present.,VARCHAR
-REF_SEX,NAME,No value is present.,VARCHAR
-REF_SEX,RCPT_MEM_SEX_CODE,No value is present.,VARCHAR
-REF_SEX,TITLE,No value is present.,VARCHAR
+REF_PATIENT_RACE,ABBR,The abbreviation for the patient race category.,VARCHAR
+REF_PATIENT_RACE,INTERNAL_ID,The internal category value for the patient race.,INTEGER
+REF_PATIENT_RACE,NAME,The name of the patient race category.,VARCHAR
+REF_PATIENT_RACE,PATIENT_RACE_CODE,The category value that identifies the patient's race.,INTEGER
+REF_PATIENT_RACE,TITLE,The title of the patient race category.,VARCHAR
+REF_SEX,ABBR,The abbreviation for the sex category value.,VARCHAR
+REF_SEX,INTERNAL_ID,The internal category value for the sex entry.,VARCHAR
+REF_SEX,NAME,The name of the sex category value.,VARCHAR
+REF_SEX,RCPT_MEM_SEX_CODE,The category value that identifies the patient's sex.,VARCHAR
+REF_SEX,TITLE,The title of the sex category value.,VARCHAR
 REF_SHOWN_PLACE,ABBR,"The abbreviation for the location where the alerts were displayed, item ECT 9015.",VARCHAR
 REF_SHOWN_PLACE,INTERNAL_ID,"The unique internal identifier for the location where the alerts were displayed, item ECT 9015.",INTEGER
 REF_SHOWN_PLACE,NAME,"The identifier for the location where the alerts were displayed, item ECT 9015.",VARCHAR
