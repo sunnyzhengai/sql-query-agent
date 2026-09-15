@@ -125,6 +125,18 @@ re-ingests the old rows. Load-to-Tables into an EXISTING table
 can APPEND (the dual-set corpse's cousin): drop-and-reload,
 never load-into-existing.
 
+**The no-op trap (proven live 2026-09-14, Monitor evidence):**
+Get data → Load → Save with an UNCHANGED table selection submits
+NO job — the editor sees "no mapping delta" and silently skips
+re-ingestion; repeated clicks change nothing and the stale
+"Last loaded" stamp is telling the truth. For a texts-only
+reload the real re-ingest is the **item-level "Refresh now"** on
+the Graph model in the WORKSPACE ITEM LIST ("…" context menu),
+one click = one capacity spend. The proof a load fired is a new
+`Graph model` row in **Monitor** — never the editor's buttons.
+Verification chain: Monitor job Succeeded → GQL text flip on a
+known-changed row.
+
 M2 also ships `graph_joins_to_tableTable` (65 rows) — the DECLARED
 dictionary joins (Epic Clarity joins.csv, loaded at KG1 intake;
 they were in the store all along but M1's export missed them).
