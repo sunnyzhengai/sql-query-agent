@@ -655,3 +655,95 @@ union + the namer seat) and the proposer slice built behind
 them; the ed_sepsis registry stays empty until Sunny fires the
 first namer batch and blesses. The 2.4.0/2.5.0 doc-vs-constant
 drift class: handled by declaration, closed on schedule.
+
+## R5.c — THE OWNER-POSSESSIVE (PROPOSED 2026-09-14; UNRULED —
+## the questions below are Sunny's)
+
+The v2.6.0 deferral, third act. The chain: RECORDEDNESS
+IDENTIFIES (v2.6.0) gave recordedness predicates a NAME-WORDS
+subject and DEFERRED the owner-possessive form ("the
+administration's taken time") because owner words were raw
+table names — premature wiring bakes jargon into every phrase.
+R5.b's table grain (v2.8.0) landed the prerequisite: a blessed
+TABLE name is exactly the owner vocabulary the deferral waited
+for. This section is the wiring — its own change quantum, NOT
+ruled with R5.b (recorded there under "What R5.b does NOT
+touch").
+
+### The register, measured (ed_sepsis_dev phrase corpus,
+### 2026-09-14)
+
+- 560 recordedness sentences (328 "is not recorded" + 232
+  folded "is recorded") — every one an identification whose
+  ENTIRE content is the pointer. "The taken time is not
+  recorded." points at one of many taken times.
+- The pointing failure is live, not hypothetical: "The
+  recorded time is recorded." (10 instances, smelled tautology)
+  and "The recorded time is before the abx admin time." — two
+  clocks, no owner spoken.
+- Blessed owners exist for 6 tables today (order dispensing ·
+  patient location history · pharmacy dispense action ·
+  configuration value set · the two sepsis stagings); the
+  medication administration table of the canonical example is
+  NOT yet blessed — the wiring is only-blessed-voices, so the
+  register grows table by table at Sunny's blessing pace.
+
+### The questions — each needs a ruling before code
+
+(1) POSITIONS. (a) recordedness subjects only (_ident_subject,
+    both polarities) — the deferral's own example, the smallest
+    step; or (b) every name-words position (recordedness + the
+    relation rule's two sides). Recommendation: (a) —
+    recordedness is where the pointer IS the sentence; relation
+    sentences carry two anchors already, and (b) doubles the
+    possessive per sentence ("the pharmacy dispense action's
+    recorded time is before the medication administration's
+    taken time"). (b) stays available as its own later quantum
+    if the two-clock corpse still bites after (a).
+(2) FIRING. (i) always when the owner table is blessed; or
+    (ii) only on collision (two same-name-words subjects in one
+    scope). Recommendation: (i) — under (ii) a phrase's text
+    depends on its NEIGHBORS, so adding a read re-words an
+    existing sentence and delta-by-name conservation (A2)
+    breaks; under (i) text stays a pure function of the node +
+    the registry.
+(3) FORM. "The <owner words>'s <name words> is recorded." vs
+    the of-form ("the <name words> of the <owner words>").
+    Recommendation: the 's possessive — closed mechanical rule,
+    matches the deferral's own phrasing; heads ending in s take
+    's unchanged (one rule, no exceptions to memorize).
+(4) THE STUTTER DOOR. A blessed owner can collide with the
+    column's words ("the severe sepsis staging's severe sepsis
+    flag"). (α) no mechanical guard — the smell census (stutter/
+    echo) FLAGS it and the steward re-blesses the words; or
+    (β) suppress the possessive when the name words open with
+    the owner words. Recommendation: (α) — a smell flags, never
+    verdicts; (β) is silent text suppression keyed on word
+    comparison, a guess in mechanism's clothing.
+
+### Conservation + acceptance (design gates, pre-code)
+
+- A1: owner table unblessed → byte-identical to 2.8.0 output —
+  which today means EVERY floor is byte-identical until a
+  recordedness column's owner is among the 6 (to pin from the
+  store at build, never assumed).
+- A2: bless one table → exactly the recordedness phrases of its
+  columns change, nothing else; conservation 1141 intact.
+- A3: the live corpse dies on record — "The recorded time is
+  recorded." gains its owner and leaves the tautology class;
+  the smell census re-runs and the class count DROPS (no new
+  smelled classes born from the wiring).
+- Version: v2.9.0 minor (additive register change; unblessed =
+  A1); constant + F4 basis pin + fixtures bump together at
+  build, per the 2.8.0 precedent; M3 export debt rides the
+  batch law.
+
+### What R5.c does NOT touch
+
+- Value-predicate subjects (dictionary words) — there the
+  meaning is the sentence; the owner is anatomy and stays out.
+- Named scope refs (#temp/CTE) — the author's own words, no
+  KG1 owner, no possessive (same line R5.b drew).
+- The business reading ("the dose was actually given") — still
+  the blessing path's, never the floor's (v2.6.0's second
+  deferral, untouched).
