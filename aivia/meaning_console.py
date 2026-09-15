@@ -58,7 +58,17 @@ TECHNICAL_KINDS = ("table", "column", "scope", "condition",
                    "parameter")
 # literal: frame — registry kind names -> store labels
 KIND_ALIAS = {"parameter": "param"}
-TECHNICAL_EDGE_KINDS = ("has_part", "joins_to")
+# literal: frame — the closed relation vocabulary (reads joined 2026-09-14)
+TECHNICAL_EDGE_KINDS = ("has_part", "joins_to", "reads")
+# THE READS COMPOUND (2026-09-14, Sunny's live round — the console
+# rowed a co-side as a reader): 'reads' as a QUESTION relation is
+# the M2 ruled definition, not the bare remainder edge — a scope
+# reads through the joins it OWNS (has_part) to the tables on
+# their sides, plus the declared reads remainder. The walk needs
+# the join layer's edges to travel it; _reads_legal (below) keeps
+# every join crossing owner-to-side.
+# literal: frame — the ruled compound expansion
+READS_COMPOUND = ("reads", "has_part", "left_side", "right_side")
 # THE NEAR-FIRST DEFAULT (ruled 2026-09-12, "all 3, go"): when an
 # OWNER grain anchors a question about its OWNED logic, the answer
 # is its own subtree; wider connections are counted, one click away
@@ -171,16 +181,23 @@ def technical_scope(read) -> Tuple[List[Dict[str, Any]],
     for r in lens.sheets["Shape_Ledger"]:
         if r.get("Kind") == "edge" and r.get("Name") in \
                 TECHNICAL_EDGE_KINDS:
+            words = edge_speech.get(str(r["Name"]),
+                                    str(r.get("Notes") or ""))
+            # THE DECLARED SYNONYM HEAD (2026-09-14, the dropped
+            # 'read' round): an _edge speech row's head — the
+            # comma list before the colon — is closed vocabulary;
+            # each phrase grounds its edge kind EXACTLY, no model
+            aliases = tuple(_fold(a.strip()) for a in
+                            words.split(":")[0].split(",")
+                            if a.strip()) if ":" in words else ()
             # literal: shape
             entries.append({"label": "edge_kind",
                             "identity": f"edgekind::{r['Name']}",
                             "name": str(r["Name"]).replace("_", " "),
                             "folded": _fold(str(r["Name"])
                                             .replace("_", " ")),
-                            "owner": None,
-                            "words": edge_speech.get(
-                                str(r["Name"]),
-                                str(r.get("Notes") or ""))})
+                            "owner": None, "aliases": aliases,
+                            "words": words})
     return entries, exclusions
 
 
@@ -291,7 +308,8 @@ def match_token(token: str, entries: List[Dict[str, Any]],
     above the floor with its score (never a cliff)."""
     wanted = _fold(token.strip())
     exact = [e for e in entries
-             if e["folded"] == wanted or _fold(e["identity"]) == wanted]
+             if e["folded"] == wanted or _fold(e["identity"]) == wanted
+             or wanted in e.get("aliases", ())]
     if exact:
         # literal: shape
         return {"token": token, "tier": "exact",
@@ -730,6 +748,14 @@ def answer_question(question: str, interpret_fn,
 
         def _row(pop_id: str, via: str, m: Dict[str, Any],
                  hops: List[Tuple[str, str]]) -> None:
+            # the reads relation excludes co-sides — counted by
+            # name, never silently (the 2026-09-14 live corpse:
+            # #Base_Pop rowed as a reader of ADT_EVENTS)
+            if reads_mode and not _reads_legal(hops):
+                out_sets.setdefault(
+                    "joined against (read by, never a reader)",
+                    set()).add(pop_id)
+                return
             cls = _row_class(pop_id, hops)
             if cls != "row":
                 out_sets.setdefault(cls, set()).add(pop_id)
@@ -782,11 +808,36 @@ def answer_question(question: str, interpret_fn,
         # free walk below.
         ownership_default = (not edge_kinds and not near_default
                              and reach != "wide")
+        # THE READS COMPOUND: the question relation 'reads' expands
+        # to the M2 ruled walk (owner's joins + sides + remainder)
+        reads_mode = "reads" in edge_kinds
+        walk_kinds = set(edge_kinds)
+        if reads_mode:
+            walk_kinds |= set(READS_COMPOUND)
         allowed: Optional[Set[str]] = (
-            set(edge_kinds) if edge_kinds
+            walk_kinds if edge_kinds
             else set(NEAR_EDGES) if (near_default
                                      or ownership_default)
             else None)
+
+        def _reads_legal(hops: List[Tuple[str, str]]) -> bool:
+            """M2 (the redesign, ruled 2026-09-10): the READER owns
+            the join (has_part); the join's sides are the READ
+            things. A walk crossing a join must pair one has_part
+            hop with one side hop — side-to-side is the co-side
+            pattern (joined against, read BY the owner), never a
+            reading."""
+            labels = [e for e, _n in hops]
+            for i, (_e, node) in enumerate(hops):
+                if node not in joinsmap:
+                    continue
+                into = labels[i]
+                out = labels[i + 1] if i + 1 < len(labels) else None
+                pair = {into, out}
+                if "has_part" not in pair or not \
+                        pair & {"left_side", "right_side"}:
+                    return False
+            return True
 
         def _walk_from(m: Dict[str, Any],
                        allowed_edges: Optional[Set[str]],

@@ -246,9 +246,9 @@ algorithm · evidence returned with the query as artifact).
 
 ## The laws carried forward from v1 (storage-independent, all kept)
 
-[registry stamps: kg1_technical v1.41.0 · kg2_logic v1.41.0 ·
-kg2_kind_library v1.41.0 · kg3_artifacts v1.41.0 ·
-kg4_concepts v1.41.0 · flows v1.41.0 · lenses v1.41.0]
+[registry stamps: kg1_technical v1.42.0 · kg2_logic v1.42.0 ·
+kg2_kind_library v1.42.0 · kg3_artifacts v1.42.0 ·
+kg4_concepts v1.42.0 · flows v1.42.0 · lenses v1.42.0]
 (stamp block restored 2026-09-10 — the ratification rename dropped
 v1's per-section stamps; RG-A2 caught it same day. One block here,
 the same-breath rule mechanical again; registries carry their own
@@ -261,7 +261,15 @@ self-speech rows, _self scope speaks "subquery" — prompts and
 speech only, the twin's structure untouched. 1.41.0 = THE NAMER
 SEAT, Sunny's "rule riders c and d" 2026-09-12: Seat_Prompts
 gains the namer row 1.0.0 (Grammar_Floor §R5.b's proposer) —
-one prompt row, the twin's structure untouched.)
+one prompt row, the twin's structure untouched. 1.42.0 = THE
+READS RELATION SPEAKS, Sunny's "fix all three gaps" go
+2026-09-14: Speech_Sources gains the _edge reads row and the
+v1.40.0 'reads'-card deferral closes — its recorded reason (a
+'read' constraint would veto join-side travel) dissolved by the
+READS COMPOUND in the console; one speech row, the twin's
+structure untouched. The determinism test caught the hand-edit
+attempt AGAIN this round — second catch of the class, the
+converter-first law holds.)
 
 Conservation (handled ⊎ counted == everything) · meaning-identity
 anchoring (contentKeys → drift) · the voicing grammar (registry-

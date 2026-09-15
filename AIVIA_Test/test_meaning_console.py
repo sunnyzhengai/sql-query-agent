@@ -65,7 +65,9 @@ def test_scope_carries_the_speaking_technical_grains(world):
                      "parameter"}
     edge_kinds = {e["identity"] for e in entries
                   if e["label"] == "edge_kind"}
-    assert edge_kinds == {"edgekind::has_part", "edgekind::joins_to"}
+    # reads joined the closed set 2026-09-14 (THE READS COMPOUND)
+    assert edge_kinds == {"edgekind::has_part", "edgekind::joins_to",
+                          "edgekind::reads"}
 
 
 def test_every_exclusion_is_counted_never_silent(world):
@@ -233,8 +235,9 @@ class _ScriptedSemantic:
         return [dict(h) for h in self.rankings.get(token, [])]
 
 
-def _scripted_tokens(mentions):
-    return lambda q: {"mentions": list(mentions)}
+def _scripted_tokens(mentions, relations=()):
+    return lambda q: {"mentions": list(mentions),
+                      "relations": list(relations)}
 
 
 def test_label_constraint_crowns_the_grain_the_user_named(world):
@@ -589,25 +592,83 @@ def test_join_layer_adjacency_walks_scope_join_table(world):
                     "emr|dbo|HOSPITAL_ENCOUNTERS"}
 
 
-def test_pass_through_enumerates_scopes_reading_a_table(world):
-    # 'which scopes read ADT_EVENTS?' — two hops through a join
-    # are ONE connection, cited by the join's ON meaning
+def test_connection_without_a_relation_word_keeps_both(world):
+    # the 2026-09-11 impact view, RE-HOMED (2026-09-14): a question
+    # naming NO relation asks CONNECTION, and the co-side
+    # connection is store truth worth showing — #ADT owns the
+    # joins, #Base_Pop is joined AGAINST the table in #ADT's join
     read, entries, _, adj, directed = world
     kind = next(e for e in entries if e["identity"] == "kind::scope")
     semantic = _ScriptedSemantic(
         {"scopes": [{**dict(kind), "score": 1.2}]})
-    r = mc.answer_question("which scopes read ADT_EVENTS?",
+    r = mc.answer_question("which scopes touch ADT_EVENTS?",
                            _scripted_tokens(["scopes",
                                              "ADT_EVENTS"]),
                            entries, semantic, read, adj, directed)
     assert r["mode"] == "enumeration"
-    # BOTH connections are store truth (verified 2026-09-11):
-    # #ADT owns the joins that use the table (has_part side) and
-    # #Base_Pop is joined AGAINST it (#ADT::join#1's other side,
-    # ON ENCOUNTER_ID) — the impact view wants both
     assert {row["a"] for row in r["rows"]} == {"#ADT", "#Base_Pop"}
     assert all(row["edge"].startswith("via ") for row in r["rows"])
     assert r["counts"]["population"] == 44
+
+
+def test_read_word_grounds_by_declared_edge_speech(world):
+    # THE READS VOCABULARY (Sunny's live round, 2026-09-14: 'read'
+    # had no entry to ground against, so the question fell to the
+    # free connection walk): the reads edge kind now speaks, and
+    # its declared synonym head grounds 'read' EXACTLY — no model
+    _, entries, _, _, _ = world
+    assert any(e["identity"] == "edgekind::reads" for e in entries)
+    m = mc.match_token("read", entries, None)
+    assert m["tier"] == "exact"
+    assert m["matches"][0]["identity"] == "edgekind::reads"
+
+
+def test_reads_relation_rows_the_owner_never_the_co_side(world):
+    # THE M2 SEMANTICS REACH THE ASK (2026-09-14, superseding the
+    # 2026-09-11 both-scopes pin for READ-worded questions): the
+    # reader is the join's OWNER; a scope on the join's other side
+    # is being READ, not reading — excluded AND counted. The live
+    # corpse: #Base_Pop rowed as a reader of ADT_EVENTS while its
+    # own composition sentence never mentions adt events.
+    read, entries, _, adj, directed = world
+    kind = next(e for e in entries if e["identity"] == "kind::scope")
+    semantic = _ScriptedSemantic(
+        {"scopes": [{**dict(kind), "score": 1.2}]})
+    r = mc.answer_question(
+        "which scopes read ADT_EVENTS?",
+        _scripted_tokens(["scopes", "read", "ADT_EVENTS"],
+                         relations=["read"]),
+        entries, semantic, read, adj, directed)
+    assert r["mode"] == "enumeration"
+    assert "reads" in r["edge_constraints"]
+    assert {row["a"] for row in r["rows"]} == {"#ADT"}
+    assert r["counts"]["connected"] == 1
+    assert r["counted_out"].get(
+        "joined against (read by, never a reader)") == 1
+    # the artifact renders only walks that rowed — never a
+    # side-to-side (co-side) shape
+    assert r["gql"]
+    assert not any("left_side" in g and "right_side" in g
+                   for g in r["gql"])
+
+
+def test_reads_relation_includes_the_declared_remainder(world):
+    # the M2 remainder rule: the surviving direct reads edges ARE
+    # readings — a reads-worded question must include them
+    read, entries, _, adj, directed = world
+    store = read._store
+    edge = next(iter(store.current_edges("reads")))
+    table_name = edge.to_id.rsplit("|", 1)[-1]
+    scope_name = edge.from_id.rsplit("|", 1)[-1].split("::")[-1]
+    kind = next(e for e in entries if e["identity"] == "kind::scope")
+    semantic = _ScriptedSemantic(
+        {"scopes": [{**dict(kind), "score": 1.2}]})
+    r = mc.answer_question(
+        f"which scopes read {table_name}?",
+        _scripted_tokens(["scopes", "read", table_name],
+                         relations=["read"]),
+        entries, semantic, read, adj, directed)
+    assert scope_name in {row["a"] for row in r["rows"]}
 
 
 def test_scope_neighborhood_cites_join_evidence(world):

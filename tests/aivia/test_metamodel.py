@@ -74,10 +74,13 @@ def test_every_loaded_registry_is_ratified_v1():
     # prompts and speech only, twin structure untouched;
     # 1.41.0 = THE NAMER SEAT (riders c/d ruled, Sunny's "rule
     # riders c and d" 2026-09-12): Seat_Prompts gains namer 1.0.0
-    # — prompt row only, twin structure untouched
+    # — prompt row only, twin structure untouched;
+    # 1.42.0 = THE READS RELATION SPEAKS (Sunny's "fix all three
+    # gaps" go, 2026-09-14): Speech_Sources gains _edge reads —
+    # speech row only, twin structure untouched
     for reg in metamodel.load_all().values():
         assert reg.ratified is True
-        assert reg.version == "1.41.0"
+        assert reg.version == "1.42.0"
 
 
 def test_load_single_exposes_sheets_and_stamp():

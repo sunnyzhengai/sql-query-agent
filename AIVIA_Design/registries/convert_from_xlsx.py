@@ -193,7 +193,7 @@ SOURCES = {
 # deliveries lead, spine voiced, intermediates counted, census
 # closes; the file's ask-index words = the delivery lead, so file
 # embeddings embed meaning, never name-noise).
-STAMP_VERSION = "1.41.0"
+STAMP_VERSION = "1.42.0"
 RATIFIED = True
 DOC_STAMP = ("v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 twin-graph "
              "ruling ADR 0077; v1.2.0 Phase A metamodel bump; v1.3.0 "
@@ -225,7 +225,16 @@ DOC_STAMP = ("v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 twin-graph "
              "Seat_Prompts gains the namer row 1.0.0 — the blessed-"
              "name proposer's prompt is registry law; selection "
              "from vendor words only, the GATE-SUBJ family stands "
-             "behind it")
+             "behind it; v1.42.0 = THE READS RELATION SPEAKS "
+             "(Sunny's 'fix all three gaps' go, 2026-09-14, from "
+             "the live ADT_EVENTS round): Speech_Sources gains the "
+             "_edge reads row — the v1.40.0 deferral CLOSES: its "
+             "recorded reason (a 'read' constraint would veto "
+             "join-side travel) is dissolved by the READS COMPOUND "
+             "(the question relation expands to owner-to-side join "
+             "travel + the declared reads remainder; a scope on a "
+             "join's other side is being read, not reading) — "
+             "speech row only, twin structure untouched")
 CONVERTED_ON = "2026-09-05"
 
 
@@ -948,9 +957,20 @@ TWIN_SHEETS = {
              "two tables in the data dictionary, with its key "
              "columns",
              "Meaning": "edge-kind self-speech (v1.40.0); the "
-             "'reads' card stays DEFERRED — a 'read' constraint "
-             "would veto join-side travel (recorded reason "
-             "stands)"},
+             "'reads' deferral recorded here CLOSED at v1.42.0 — "
+             "the compound removed its reason"},
+            {"Label": "_edge reads", "Speech": "reads, read, "
+             "reads from, draws from: which selections read a "
+             "table — the M2 ruled meaning: a selection reads "
+             "through the joins it owns (their sides are the "
+             "tables and selections it draws from), plus the few "
+             "declared direct reads no join covers",
+             "Meaning": "edge-kind self-speech (v1.42.0, THE READS "
+             "COMPOUND — the v1.40.0 deferral closes): read-words "
+             "ground here and expand to the owner-to-side walk + "
+             "the reads remainder; a scope appearing as a join "
+             "side is being READ, not reading — the console "
+             "counts it out by name, never rows it as a reader"},
             {"Label": "operational statement", "Speech": "RULED-MUTE",
              "Meaning": "no reader-facing meaning (the v1.4.0 "
              "operational class)"},

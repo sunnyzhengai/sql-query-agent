@@ -1,405 +1,405 @@
 {
-  "_ruling": "THE M-GATE ANSWER KEY (Sunny's directives 2026-09-10, incl. the M2 REDESIGN): every batch gates on the FULL CENSUS \u2014 every node label counted, every edge type counted, totals exact both directions (the blob-corpse lesson: spot checks pass while the graph doesn't exist). Numbers are DERIVED FROM THE PARSE (the twin of USP_ED_SEPSIS at the stamped versions), authored BEFORE the batches build. test_ed_sepsis_dev_estate.py recomputes every derivable number from the twin each run \u2014 the key cannot rot silently.",
-  "_redesign": "M2 REDESIGNED (Sunny 2026-09-10): a scope reaches tables THROUGH its join nodes; direct reads = the REMAINDER only (tables no join side covers). joins_to re-homed to M1 (dictionary truth). Joins (M2) and conditions (M3) are SEPARATE batches, testable alone. The old M2 (scope + 45 reads) was superseded before its gate ran.",
-  "_batch_law": "Bottom-up: a node ships only in the batch where its birth edges point DOWN at already-shipped nodes. 6 IF-statement conditions + @StartDate/@EndDate ship at M5 with their statements; 31 operational statements are DECLARED counted-missing debt at M5, closed by file->statement at M6.",
-  "_pin_at_build": [
-    "RESOLVED AT M2: reads remainder 6; join 95 (tree > twin's 93)",
-    "RESOLVED AT M3: joinType was IN THE TREE all along (join_type key on ON roots \u2014 Inner 39 \u00b7 LeftOuter 56); the M2 deferral closes with backfill",
-    "RESOLVED AT M3: condition count 1141 (tree truth; the twin's 748 under-counted \u2014 e.g., IS NOT NULL is a NOT+NULL_CHECK pair in the tree). Independent whole-tree count matches the builder exactly",
-    "M4/M5 numbers remain TWIN-authored (derived_column 156, statements 67, the 6 IF conditions) \u2014 the same tree reconciliation applies at their builds; key updates by measurement",
-    "M1 EXPORT GAP: _node_row drops LIST-valued properties (pk_columns) \u2014 fix rides the export rework; counted",
-    "GRAMMAR PHRASING: condition renders compose dictionary words correctly but read clunky in places ('The this item records...') \u2014 Grammar_Floor gap-check is Sunny's, per the ladder decision"
-  ],
-  "basis": {
-    "estate": "ed_sepsis_dev",
-    "file": "reporting/USP_ED_SEPSIS.sql",
-    "translator_version": "1.3.0",
-    "metamodel_version": "1.41.0",
-    "authored": "2026-09-10",
-    "_bump_record": "authored at metamodel 1.36.0; re-based 1.37.0 (join-node ruling) then 1.38.0 (M2 join layer lands: ledger flips PRESENT) \u2014 every derived count verified by the recompute tests at each bump; re-based 1.39.0 (M3 condition layer lands); re-based 1.40.0 (structure-word claim + relation-word seat, 2026-09-12: prompts and speech rows only \u2014 zero twin-structure effect, every derived count re-verified by the recompute tests); re-based 1.41.0 (the namer seat, 2026-09-12: one Seat_Prompts row only \u2014 zero twin-structure effect, every derived count re-verified by the recompute tests); re-based at THE BLESSING (2026-09-13, Sunny's delegated curation): +105 blessed_name kg3 nodes (NO person mint \u2014 the registry is the act's record; journal self-containment) \u2014 governance truth in the STORE census, never in the Fabric export (EXPORT_LABELS); condition census 1141 and all structural counts unchanged, A2 delta = 130 description texts; re-based at THE SECOND BLESSING (2026-09-14, Sunny's hand): +4 blessed_name — the REF_* held rows re-proposed off the AUTHORED descriptions after the sentinel-origin fix and blessed same night (109 total, node_total 6276); zero edge effect, every structural count unchanged"
+ "_ruling": "THE M-GATE ANSWER KEY (Sunny's directives 2026-09-10, incl. the M2 REDESIGN): every batch gates on the FULL CENSUS — every node label counted, every edge type counted, totals exact both directions (the blob-corpse lesson: spot checks pass while the graph doesn't exist). Numbers are DERIVED FROM THE PARSE (the twin of USP_ED_SEPSIS at the stamped versions), authored BEFORE the batches build. test_ed_sepsis_dev_estate.py recomputes every derivable number from the twin each run — the key cannot rot silently.",
+ "_redesign": "M2 REDESIGNED (Sunny 2026-09-10): a scope reaches tables THROUGH its join nodes; direct reads = the REMAINDER only (tables no join side covers). joins_to re-homed to M1 (dictionary truth). Joins (M2) and conditions (M3) are SEPARATE batches, testable alone. The old M2 (scope + 45 reads) was superseded before its gate ran.",
+ "_batch_law": "Bottom-up: a node ships only in the batch where its birth edges point DOWN at already-shipped nodes. 6 IF-statement conditions + @StartDate/@EndDate ship at M5 with their statements; 31 operational statements are DECLARED counted-missing debt at M5, closed by file->statement at M6.",
+ "_pin_at_build": [
+  "RESOLVED AT M2: reads remainder 6; join 95 (tree > twin's 93)",
+  "RESOLVED AT M3: joinType was IN THE TREE all along (join_type key on ON roots — Inner 39 · LeftOuter 56); the M2 deferral closes with backfill",
+  "RESOLVED AT M3: condition count 1141 (tree truth; the twin's 748 under-counted — e.g., IS NOT NULL is a NOT+NULL_CHECK pair in the tree). Independent whole-tree count matches the builder exactly",
+  "M4/M5 numbers remain TWIN-authored (derived_column 156, statements 67, the 6 IF conditions) — the same tree reconciliation applies at their builds; key updates by measurement",
+  "M1 EXPORT GAP: _node_row drops LIST-valued properties (pk_columns) — fix rides the export rework; counted",
+  "GRAMMAR PHRASING: condition renders compose dictionary words correctly but read clunky in places ('The this item records...') — Grammar_Floor gap-check is Sunny's, per the ladder decision"
+ ],
+ "basis": {
+  "estate": "ed_sepsis_dev",
+  "file": "reporting/USP_ED_SEPSIS.sql",
+  "translator_version": "1.3.0",
+  "metamodel_version": "1.42.0",
+  "authored": "2026-09-10",
+  "_bump_record": "authored at metamodel 1.36.0; re-based 1.37.0 (join-node ruling) then 1.38.0 (M2 join layer lands: ledger flips PRESENT) — every derived count verified by the recompute tests at each bump; re-based 1.39.0 (M3 condition layer lands); re-based 1.40.0 (structure-word claim + relation-word seat, 2026-09-12: prompts and speech rows only — zero twin-structure effect, every derived count re-verified by the recompute tests); re-based 1.41.0 (the namer seat, 2026-09-12: one Seat_Prompts row only — zero twin-structure effect, every derived count re-verified by the recompute tests); re-based at THE BLESSING (2026-09-13, Sunny's delegated curation): +105 blessed_name kg3 nodes (NO person mint — the registry is the act's record; journal self-containment) — governance truth in the STORE census, never in the Fabric export (EXPORT_LABELS); condition census 1141 and all structural counts unchanged, A2 delta = 130 description texts; re-based at THE SECOND BLESSING (2026-09-14, Sunny's hand): +4 blessed_name — the REF_* held rows re-proposed off the AUTHORED descriptions after the sentinel-origin fix and blessed same night (109 total, node_total 6276); zero edge effect, every structural count unchanged; re-based 1.42.0 (the reads relation speaks, 2026-09-14: one Speech_Sources _edge reads row only — zero twin-structure effect, every derived count re-verified by the recompute tests)"
+ },
+ "census_after": {
+  "_comment": "THE GATE TABLES: cumulative Fabric-surface censuses after each batch. Q1 = MATCH (n) RETURN labels(n), count(*); Q3 = MATCH ()-[r]->() RETURN type(r), count(*). Exact both directions. M2 numbers are MEASURED FROM THE BUILT STORE (2026-09-10).",
+  "M1": {
+   "nodes": {
+    "db": 1,
+    "db_schema": 3,
+    "table": 90,
+    "column": 4554
+   },
+   "node_total": 4648,
+   "edges": {
+    "has_part": 4647,
+    "joins_to": 65
+   },
+   "edge_total": 4712
   },
-  "census_after": {
-    "_comment": "THE GATE TABLES: cumulative Fabric-surface censuses after each batch. Q1 = MATCH (n) RETURN labels(n), count(*); Q3 = MATCH ()-[r]->() RETURN type(r), count(*). Exact both directions. M2 numbers are MEASURED FROM THE BUILT STORE (2026-09-10).",
-    "M1": {
-      "nodes": {
-        "db": 1,
-        "db_schema": 3,
-        "table": 90,
-        "column": 4554
-      },
-      "node_total": 4648,
-      "edges": {
-        "has_part": 4647,
-        "joins_to": 65
-      },
-      "edge_total": 4712
-    },
-    "M2": {
-      "nodes": {
-        "db": 1,
-        "db_schema": 3,
-        "table": 90,
-        "column": 4554,
-        "scope": 44,
-        "join": 95
-      },
-      "node_total": 4787,
-      "edges": {
-        "has_part": 4742,
-        "joins_to": 65,
-        "left_side": 95,
-        "right_side": 87,
-        "reads": 6
-      },
-      "edge_total": 4995
-    },
-    "M3": {
-      "nodes": {
-        "db": 1,
-        "db_schema": 3,
-        "table": 90,
-        "column": 4554,
-        "scope": 44,
-        "join": 95,
-        "condition": 1141,
-        "param": 2
-      },
-      "node_total": 5930,
-      "edges": {
-        "has_part": 5883,
-        "joins_to": 65,
-        "left_side": 95,
-        "right_side": 87,
-        "reads": 6,
-        "resolves_to": 165,
-        "uses_param": 2
-      },
-      "edge_total": 6303
-    },
-    "M4": {
-      "nodes": {
-        "db": 1,
-        "db_schema": 3,
-        "table": 90,
-        "column": 4554,
-        "scope": 44,
-        "join": 95,
-        "condition": 1141,
-        "param": 2,
-        "derived_column": 156
-      },
-      "node_total": 6086,
-      "edges": {
-        "has_part": 6039,
-        "joins_to": 65,
-        "left_side": 95,
-        "right_side": 87,
-        "reads": 6,
-        "resolves_to": 165,
-        "uses_param": 2,
-        "cites": 100
-      },
-      "edge_total": 6559
-    },
-    "M5": {
-      "nodes": {
-        "db": 1,
-        "db_schema": 3,
-        "table": 90,
-        "column": 4554,
-        "scope": 44,
-        "join": 95,
-        "condition": 1147,
-        "param": 4,
-        "derived_column": 156,
-        "statement": 67
-      },
-      "node_total": 6161,
-      "edges": {
-        "has_part": 6089,
-        "joins_to": 65,
-        "left_side": 95,
-        "right_side": 87,
-        "reads": 6,
-        "resolves_to": 169,
-        "uses_param": 4,
-        "cites": 100
-      },
-      "edge_total": 6615
-    },
-    "M6": {
-      "nodes": {
-        "db": 1,
-        "db_schema": 3,
-        "table": 90,
-        "column": 4554,
-        "scope": 44,
-        "join": 95,
-        "condition": 1147,
-        "param": 4,
-        "derived_column": 156,
-        "statement": 67,
-        "file": 1
-      },
-      "node_total": 6162,
-      "edges": {
-        "has_part": 6160,
-        "joins_to": 65,
-        "left_side": 95,
-        "right_side": 87,
-        "reads": 6,
-        "resolves_to": 169,
-        "uses_param": 4,
-        "cites": 100
-      },
-      "edge_total": 6686
-    },
-    "M7": {
-      "nodes": {
-        "db": 1,
-        "db_schema": 3,
-        "table": 90,
-        "column": 4554,
-        "scope": 44,
-        "join": 95,
-        "condition": 1147,
-        "param": 4,
-        "derived_column": 156,
-        "statement": 67,
-        "file": 1,
-        "pbi_report": 1,
-        "description": 1,
-        "agent": 1,
-        "role": 1,
-        "responsibility": 1,
-        "person": 0,
-        "blessed_name": 109
-      },
-      "node_total": 6276,
-      "edges": {
-        "has_part": 6160,
-        "joins_to": 65,
-        "left_side": 95,
-        "right_side": 87,
-        "reads": 6,
-        "resolves_to": 169,
-        "uses_param": 4,
-        "cites": 100,
-        "executes": 1,
-        "describes": 1
-      },
-      "edge_total": 6688
-    }
+  "M2": {
+   "nodes": {
+    "db": 1,
+    "db_schema": 3,
+    "table": 90,
+    "column": 4554,
+    "scope": 44,
+    "join": 95
+   },
+   "node_total": 4787,
+   "edges": {
+    "has_part": 4742,
+    "joins_to": 65,
+    "left_side": 95,
+    "right_side": 87,
+    "reads": 6
+   },
+   "edge_total": 4995
   },
-  "description_coverage": {
-    "_comment": "Q2 = MATCH (n) WHERE n.description IS NOT NULL RETURN labels(n), count(*). db/db_schema are none-ruled (0 legal, measured 0); everything else full at its landing batch.",
-    "db": "0/1 none-ruled",
-    "db_schema": "0/3 none-ruled",
-    "table": "90/90",
-    "column": "4554/4554",
-    "scope": "44/44",
-    "join": "95/95",
-    "condition": "748/748 at M3, 754/754 at M5",
-    "param": "2/2 at M3, 4/4 at M5",
-    "derived_column": "156/156",
-    "statement": "67/67",
-    "file": "1/1",
-    "pbi_report": "1/1"
+  "M3": {
+   "nodes": {
+    "db": 1,
+    "db_schema": 3,
+    "table": 90,
+    "column": 4554,
+    "scope": 44,
+    "join": 95,
+    "condition": 1141,
+    "param": 2
+   },
+   "node_total": 5930,
+   "edges": {
+    "has_part": 5883,
+    "joins_to": 65,
+    "left_side": 95,
+    "right_side": 87,
+    "reads": 6,
+    "resolves_to": 165,
+    "uses_param": 2
+   },
+   "edge_total": 6303
   },
-  "batch_deltas": {
-    "M2": {
-      "status": "BUILT 2026-09-10 \u2014 store-verified; Sunny's GQL gate on the DEV ESTATE (his ruling) is the closing step",
-      "new_nodes": {
-        "scope": 44,
-        "join": 95
-      },
-      "new_edges": {
-        "has_part_scopeJoin": 95,
-        "left_side": 95,
-        "right_side": 87,
-        "reads_remainder": 6
-      },
-      "join_conservation": {
-        "joins": 95,
-        "two_sided": 87,
-        "one_sided": 8,
-        "no_sided": 0,
-        "overflow_3plus": 0
-      },
-      "side_targets": {
-        "table": 88,
-        "scope": 94
-      },
-      "reads": {
-        "remainder": 6,
-        "covered_by_join_sides": 53,
-        "read_set": 59
-      },
-      "checks": {
-        "scope_descriptions_nonempty": 44,
-        "join_descriptions_nonempty": 95,
-        "drift_findings_exact": [
-          [
-            "emr|dbo|ENCOUNTER_VISIT_REASONS",
-            "emr|dbo|VISIT_REASONS"
-          ],
-          [
-            "emr|dbo|MEDICATIONS",
-            "emr|dbo|REF_GENERIC_MED"
-          ]
-        ],
-        "coverage_invariants": "MEASURED: disjoint (0 double-connected) AND covering (remainder 6 + covered 53 == read-set 59)",
-        "one_sided_joins": "8 ONs reference only one resolvable side (table-vs-param/literal) \u2014 left_side only, counted",
-        "joinType": "DEFERRED, counted (the tree lacks the operator type)"
-      }
-    },
-    "M3": {
-      "status": "BUILT 2026-09-10 \u2014 store-verified; Sunny's GQL gate on the dev estate closes it",
-      "new_nodes": {
-        "condition": 1141,
-        "param": 2
-      },
-      "new_edges": {
-        "has_part_joinCondition": 95,
-        "has_part_scopeCondition": 229,
-        "has_part_conditionCondition": 817,
-        "resolves_to_conditionColumn": 163,
-        "resolves_to_conditionParam": 2,
-        "uses_param_scopeParam": 2
-      },
-      "condition_conservation": {
-        "conditions": 1141,
-        "roots_join": 95,
-        "roots_scope": 229,
-        "nested": 817
-      },
-      "condition_by_kind": {
-        "NULL_CHECK": 333,
-        "NOT": 238,
-        "COMPARE_EQ": 220,
-        "AND": 191,
-        "IN_LIST": 47,
-        "COMPARE_LTE": 33,
-        "COMPARE_LT": 24,
-        "RANGE": 22,
-        "OR": 12,
-        "COMPARE_GT": 8,
-        "EXISTS_SELECTION": 7,
-        "COMPARE_GTE": 3,
-        "COMPARE_NEQ": 2,
-        "IN_SELECTION": 1
-      },
-      "condition_degenerate": 25,
-      "resolves_to_roles": {
-        "subject": 119,
-        "comparand": 44,
-        "lower_bound": 1,
-        "upper_bound": 1
-      },
-      "param_names": [
-        "@dEndDate",
-        "@dStartDate"
-      ],
-      "joinType_closed": {
-        "Inner": 39,
-        "LeftOuter": 56
-      },
-      "checks": {
-        "descriptions_nonempty": "condition 1141/1141 \u00b7 param 2/2 (the ratified grammar voices leaves; containers get structural sentences; fragment fallback)",
-        "held_for_M5": "IF-statement predicates + @StartDate/@EndDate (parents are statements)",
-        "_condition_ruling": "ONE store label `condition` for every predicate \u2014 kind is a PROPERTY from the closed library (kind-vs-label standard); per-predicate structure lives in ROLE-tagged resolves_to edges; composite AND/OR/NOT are condition nodes (nested has_part).",
-        "spot": "All_LDAs RANGE condition voices the ED-stay window through dictionary words"
-      }
-    },
-    "M4": {
-      "new_nodes": {
-        "derived_column": 156
-      },
-      "derived_column_by_derivation": {
-        "operation": 154,
-        "named_literal": 2
-      },
-      "not_derived_columns": {
-        "passthrough_projections": 312,
-        "anonymous_exists_select": 5
-      },
-      "new_edges": {
-        "has_part_scopeDerivedColumn": 156,
-        "cites_scopeColumn": 100
-      },
-      "checks": {
-        "scope_ownership": "case_when conditions stay parented to scope/condition \u2014 never re-parented to derived_column"
-      }
-    },
-    "M5": {
-      "new_nodes": {
-        "statement": 67,
-        "condition": 6,
-        "param": 2
-      },
-      "condition_by_kind_new": {
-        "NULL_CHECK": 2,
-        "COMPARE_EQ": 2,
-        "OR": 2
-      },
-      "statement_operational_subkind": 31,
-      "new_edges": {
-        "has_part_statementScope": 44,
-        "has_part_statementCondition": 2,
-        "has_part_conditionCondition": 4,
-        "resolves_to_conditionParam": 4,
-        "uses_param_statementParam": 2
-      },
-      "param_names_new": [
-        "@EndDate",
-        "@StartDate"
-      ],
-      "checks": {
-        "r11_descriptions_nonempty": 67,
-        "counted_missing_debt": "31 operational statements have NO downward edge \u2014 declared Connection_Ledger counted-missing, landing step M6"
-      },
-      "_note": "holdover numbers (+6 conditions, +2 params, resolves +4) remain TWIN-authored \u2014 the tree reconciliation at M5 build may move them (precedent: 748\u21921141)"
-    },
-    "M6": {
-      "new_nodes": {
-        "file": 1
-      },
-      "new_edges": {
-        "has_part_fileStatement": 67,
-        "has_part_fileParam": 4
-      },
-      "checks": {
-        "debt_closed": "the 31 counted-missing statements birth-edge via file->statement",
-        "aboutness_stored_and_meaning_key_anchored": 1,
-        "composition_check": "parent description contains children's words",
-        "reads_fileTable_rollup_absent": 0,
-        "walk": "file-[:has_part*]->scope-[:left_side|right_side|reads]->table complete"
-      }
-    },
-    "M7": {
-      "new_nodes": {
-        "pbi_report": 1,
-        "description": 1,
-        "agent": 1,
-        "role": 1,
-        "responsibility": 1,
-        "person": 0,
-        "term": 0,
-        "usage": 0,
-        "blessed_name": 109
-      },
-      "new_edges": {
-        "executes": 1,
-        "describes": 1
-      },
-      "checks": {
-        "executes_counted_unresolved": [
-          "reports/USP_RPTS_ED_Sepsis.sql"
-        ],
-        "pbi_description_derived_via_executes": true,
-        "shape_ledger_target_rows": 0,
-        "phase_boundary": "full sepsis estate re-run against its own key"
-      }
-    }
+  "M4": {
+   "nodes": {
+    "db": 1,
+    "db_schema": 3,
+    "table": 90,
+    "column": 4554,
+    "scope": 44,
+    "join": 95,
+    "condition": 1141,
+    "param": 2,
+    "derived_column": 156
+   },
+   "node_total": 6086,
+   "edges": {
+    "has_part": 6039,
+    "joins_to": 65,
+    "left_side": 95,
+    "right_side": 87,
+    "reads": 6,
+    "resolves_to": 165,
+    "uses_param": 2,
+    "cites": 100
+   },
+   "edge_total": 6559
+  },
+  "M5": {
+   "nodes": {
+    "db": 1,
+    "db_schema": 3,
+    "table": 90,
+    "column": 4554,
+    "scope": 44,
+    "join": 95,
+    "condition": 1147,
+    "param": 4,
+    "derived_column": 156,
+    "statement": 67
+   },
+   "node_total": 6161,
+   "edges": {
+    "has_part": 6089,
+    "joins_to": 65,
+    "left_side": 95,
+    "right_side": 87,
+    "reads": 6,
+    "resolves_to": 169,
+    "uses_param": 4,
+    "cites": 100
+   },
+   "edge_total": 6615
+  },
+  "M6": {
+   "nodes": {
+    "db": 1,
+    "db_schema": 3,
+    "table": 90,
+    "column": 4554,
+    "scope": 44,
+    "join": 95,
+    "condition": 1147,
+    "param": 4,
+    "derived_column": 156,
+    "statement": 67,
+    "file": 1
+   },
+   "node_total": 6162,
+   "edges": {
+    "has_part": 6160,
+    "joins_to": 65,
+    "left_side": 95,
+    "right_side": 87,
+    "reads": 6,
+    "resolves_to": 169,
+    "uses_param": 4,
+    "cites": 100
+   },
+   "edge_total": 6686
+  },
+  "M7": {
+   "nodes": {
+    "db": 1,
+    "db_schema": 3,
+    "table": 90,
+    "column": 4554,
+    "scope": 44,
+    "join": 95,
+    "condition": 1147,
+    "param": 4,
+    "derived_column": 156,
+    "statement": 67,
+    "file": 1,
+    "pbi_report": 1,
+    "description": 1,
+    "agent": 1,
+    "role": 1,
+    "responsibility": 1,
+    "person": 0,
+    "blessed_name": 109
+   },
+   "node_total": 6276,
+   "edges": {
+    "has_part": 6160,
+    "joins_to": 65,
+    "left_side": 95,
+    "right_side": 87,
+    "reads": 6,
+    "resolves_to": 169,
+    "uses_param": 4,
+    "cites": 100,
+    "executes": 1,
+    "describes": 1
+   },
+   "edge_total": 6688
   }
+ },
+ "description_coverage": {
+  "_comment": "Q2 = MATCH (n) WHERE n.description IS NOT NULL RETURN labels(n), count(*). db/db_schema are none-ruled (0 legal, measured 0); everything else full at its landing batch.",
+  "db": "0/1 none-ruled",
+  "db_schema": "0/3 none-ruled",
+  "table": "90/90",
+  "column": "4554/4554",
+  "scope": "44/44",
+  "join": "95/95",
+  "condition": "748/748 at M3, 754/754 at M5",
+  "param": "2/2 at M3, 4/4 at M5",
+  "derived_column": "156/156",
+  "statement": "67/67",
+  "file": "1/1",
+  "pbi_report": "1/1"
+ },
+ "batch_deltas": {
+  "M2": {
+   "status": "BUILT 2026-09-10 — store-verified; Sunny's GQL gate on the DEV ESTATE (his ruling) is the closing step",
+   "new_nodes": {
+    "scope": 44,
+    "join": 95
+   },
+   "new_edges": {
+    "has_part_scopeJoin": 95,
+    "left_side": 95,
+    "right_side": 87,
+    "reads_remainder": 6
+   },
+   "join_conservation": {
+    "joins": 95,
+    "two_sided": 87,
+    "one_sided": 8,
+    "no_sided": 0,
+    "overflow_3plus": 0
+   },
+   "side_targets": {
+    "table": 88,
+    "scope": 94
+   },
+   "reads": {
+    "remainder": 6,
+    "covered_by_join_sides": 53,
+    "read_set": 59
+   },
+   "checks": {
+    "scope_descriptions_nonempty": 44,
+    "join_descriptions_nonempty": 95,
+    "drift_findings_exact": [
+     [
+      "emr|dbo|ENCOUNTER_VISIT_REASONS",
+      "emr|dbo|VISIT_REASONS"
+     ],
+     [
+      "emr|dbo|MEDICATIONS",
+      "emr|dbo|REF_GENERIC_MED"
+     ]
+    ],
+    "coverage_invariants": "MEASURED: disjoint (0 double-connected) AND covering (remainder 6 + covered 53 == read-set 59)",
+    "one_sided_joins": "8 ONs reference only one resolvable side (table-vs-param/literal) — left_side only, counted",
+    "joinType": "DEFERRED, counted (the tree lacks the operator type)"
+   }
+  },
+  "M3": {
+   "status": "BUILT 2026-09-10 — store-verified; Sunny's GQL gate on the dev estate closes it",
+   "new_nodes": {
+    "condition": 1141,
+    "param": 2
+   },
+   "new_edges": {
+    "has_part_joinCondition": 95,
+    "has_part_scopeCondition": 229,
+    "has_part_conditionCondition": 817,
+    "resolves_to_conditionColumn": 163,
+    "resolves_to_conditionParam": 2,
+    "uses_param_scopeParam": 2
+   },
+   "condition_conservation": {
+    "conditions": 1141,
+    "roots_join": 95,
+    "roots_scope": 229,
+    "nested": 817
+   },
+   "condition_by_kind": {
+    "NULL_CHECK": 333,
+    "NOT": 238,
+    "COMPARE_EQ": 220,
+    "AND": 191,
+    "IN_LIST": 47,
+    "COMPARE_LTE": 33,
+    "COMPARE_LT": 24,
+    "RANGE": 22,
+    "OR": 12,
+    "COMPARE_GT": 8,
+    "EXISTS_SELECTION": 7,
+    "COMPARE_GTE": 3,
+    "COMPARE_NEQ": 2,
+    "IN_SELECTION": 1
+   },
+   "condition_degenerate": 25,
+   "resolves_to_roles": {
+    "subject": 119,
+    "comparand": 44,
+    "lower_bound": 1,
+    "upper_bound": 1
+   },
+   "param_names": [
+    "@dEndDate",
+    "@dStartDate"
+   ],
+   "joinType_closed": {
+    "Inner": 39,
+    "LeftOuter": 56
+   },
+   "checks": {
+    "descriptions_nonempty": "condition 1141/1141 · param 2/2 (the ratified grammar voices leaves; containers get structural sentences; fragment fallback)",
+    "held_for_M5": "IF-statement predicates + @StartDate/@EndDate (parents are statements)",
+    "_condition_ruling": "ONE store label `condition` for every predicate — kind is a PROPERTY from the closed library (kind-vs-label standard); per-predicate structure lives in ROLE-tagged resolves_to edges; composite AND/OR/NOT are condition nodes (nested has_part).",
+    "spot": "All_LDAs RANGE condition voices the ED-stay window through dictionary words"
+   }
+  },
+  "M4": {
+   "new_nodes": {
+    "derived_column": 156
+   },
+   "derived_column_by_derivation": {
+    "operation": 154,
+    "named_literal": 2
+   },
+   "not_derived_columns": {
+    "passthrough_projections": 312,
+    "anonymous_exists_select": 5
+   },
+   "new_edges": {
+    "has_part_scopeDerivedColumn": 156,
+    "cites_scopeColumn": 100
+   },
+   "checks": {
+    "scope_ownership": "case_when conditions stay parented to scope/condition — never re-parented to derived_column"
+   }
+  },
+  "M5": {
+   "new_nodes": {
+    "statement": 67,
+    "condition": 6,
+    "param": 2
+   },
+   "condition_by_kind_new": {
+    "NULL_CHECK": 2,
+    "COMPARE_EQ": 2,
+    "OR": 2
+   },
+   "statement_operational_subkind": 31,
+   "new_edges": {
+    "has_part_statementScope": 44,
+    "has_part_statementCondition": 2,
+    "has_part_conditionCondition": 4,
+    "resolves_to_conditionParam": 4,
+    "uses_param_statementParam": 2
+   },
+   "param_names_new": [
+    "@EndDate",
+    "@StartDate"
+   ],
+   "checks": {
+    "r11_descriptions_nonempty": 67,
+    "counted_missing_debt": "31 operational statements have NO downward edge — declared Connection_Ledger counted-missing, landing step M6"
+   },
+   "_note": "holdover numbers (+6 conditions, +2 params, resolves +4) remain TWIN-authored — the tree reconciliation at M5 build may move them (precedent: 748→1141)"
+  },
+  "M6": {
+   "new_nodes": {
+    "file": 1
+   },
+   "new_edges": {
+    "has_part_fileStatement": 67,
+    "has_part_fileParam": 4
+   },
+   "checks": {
+    "debt_closed": "the 31 counted-missing statements birth-edge via file->statement",
+    "aboutness_stored_and_meaning_key_anchored": 1,
+    "composition_check": "parent description contains children's words",
+    "reads_fileTable_rollup_absent": 0,
+    "walk": "file-[:has_part*]->scope-[:left_side|right_side|reads]->table complete"
+   }
+  },
+  "M7": {
+   "new_nodes": {
+    "pbi_report": 1,
+    "description": 1,
+    "agent": 1,
+    "role": 1,
+    "responsibility": 1,
+    "person": 0,
+    "term": 0,
+    "usage": 0,
+    "blessed_name": 109
+   },
+   "new_edges": {
+    "executes": 1,
+    "describes": 1
+   },
+   "checks": {
+    "executes_counted_unresolved": [
+     "reports/USP_RPTS_ED_Sepsis.sql"
+    ],
+    "pbi_description_derived_via_executes": true,
+    "shape_ledger_target_rows": 0,
+    "phase_boundary": "full sepsis estate re-run against its own key"
+   }
+  }
+ }
 }

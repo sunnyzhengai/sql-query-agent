@@ -1096,3 +1096,26 @@ ruled and built the same sitting; Grammar_Floor v2.9.0):**
 | THE WIRE: _Voice.owner_words (blessed 3-part lookup, EMPTY when unblessed — a possessive NEVER speaks a raw table name, the v2.6.0 deferral's whole reason) + _ident_subject speaks "the <owner>'s <name words>"; constant 2.9.0 + F4 basis pin bumped consciously (A1 held — no blessed nodes in the F4 worlds, floor texts byte-exact) | BUILT (test-first: 7 tests before the wire) | test_possessive_speaks_when_owner_table_blessed (both polarities) · _composes_with_blessed_column_words · _never_speaks_raw_table_names (A1) · _delta_is_per_owner_table (A2 grain) · _stays_out_of_relations_and_values · _s_ending_head_takes_plain_apostrophe_s · _stutter_is_spoken_not_suppressed |
 | THE ESTATE LEG rides Sunny's hand (the R5.b seed law): 6 tables blessed today; the A3 corpse ("The recorded time is recorded.", 10 smelled instances) dies when its owner table gets blessed and the next console boot re-voices; M3 export debt rides the batch law; smell census re-render at the next sweep | HELD — Sunny's pace | blessed_subjects.json (6 table-grain rows) |
 | FULL SUITE + LINT | GREEN | **2123 passed · 25 skipped · 8 xfailed · 0 failed** (0:11:52); changed files ruff-clean; TEST_MAP regenerated (2018 tests) |
+
+**THE READS RELATION FIXED IN THE ASK CONSOLE (Sunny's live
+ADT_EVENTS round + "go trace the templates and fix all three
+gaps", 2026-09-14):** the trace found NO templates — the console
+walks the graph and renders each walked shape as its MATCH
+artifact; the asymmetric-query "gap" dissolved (walks are
+inherently symmetric). The real defect sat one layer up: the
+relation VOCABULARY predated M2 (TECHNICAL_EDGE_KINDS held only
+has_part + joins_to), so 'read' could ground to nothing, the
+question fell to the free CONNECTION walk, and a co-side rowed
+as a reader (#Base_Pop "reading" ADT_EVENTS while its own
+composition sentence never mentions adt events). The 2026-09-11
+both-scopes test pin had verified that conflation as "the impact
+view wants both" — superseded for READ-worded questions by the
+M2 design layer (the owner reads; a side is read), re-homed as
+the connection-view pin for relation-less questions.
+
+| claim | state | evidence |
+|---|---|---|
+| THE READS VOCABULARY: edge kind `reads` joins the closed set; Speech_Sources gains the `_edge reads` row (registries 1.42.0, lockstep; speech row only, twin structure untouched); THE DECLARED SYNONYM HEAD — an _edge speech row's pre-colon comma list is closed vocabulary, each phrase grounds its edge kind at the EXACT tier, no model ('read' → edgekind::reads deterministically) | BUILT | test_read_word_grounds_by_declared_edge_speech · test_metamodel pin 1.42.0 · registry doc_stamp v1.42.0 note |
+| THE READS COMPOUND: the question relation 'reads' expands to the M2 ruled walk — {reads, has_part, left_side, right_side} — and _reads_legal keeps every join crossing OWNER-TO-SIDE: a walk entering and leaving a join by two side edges is the co-side pattern (joined against, read BY the owner) — excluded and COUNTED BY NAME ("joined against (read by, never a reader)"), never rowed, never silent; the declared reads remainder rows as a direct edge | BUILT | test_reads_relation_rows_the_owner_never_the_co_side (the live corpse: #ADT alone, co-side counted 1, no side-to-side shape in the artifact) · test_reads_relation_includes_the_declared_remainder |
+| THE CONNECTION VIEW SURVIVES: a question naming no relation still answers connectivity — both #ADT and #Base_Pop row, honestly, under the free walk | HELD (re-homed pin) | test_connection_without_a_relation_word_keeps_both |
+| THE DETERMINISM TEST CAUGHT THE HAND-EDIT (second catch of the class — the stamp block's 1.37.0 note records the first): the registry JSONs were first edited directly; test_conversion_is_deterministic regenerated them mid-suite and wiped the row (the shifting red sets across runs 1-2). CORRECTED to the ruled path: the _edge reads row + 1.42.0 stamp AUTHORED IN convert_from_xlsx.py (the single writer, where the joins_to row's v1.40.0 'reads'-card deferral note now reads CLOSED), Design_Graph_Engine stamp block bumped the same breath (RG-A2), the M-gate answer key re-based per its own _bump_record precedent (zero twin-structure effect, recompute tests green), literal-census tags added to the two new tuples | CORRECTED + BUILT | validators green (RG all-ok, VIOLATIONS: none) · determinism test green · estate battery 15/15 |
