@@ -2,11 +2,11 @@
 
 Every stored voicing, one row per phrasing class (Sunny's go, 2026-09-14: kill classes in one sitting, not per-round). A smell is a flag, never a verdict.
 
-- census: 993 clean + 192 smelled == 1185 voicings
-- smells: {'echo': 76, 'identifier': 38, 'stutter': 13, 'tautology': 88}
-- 73 classes; every class renders below — no silent caps
+- census: 994 clean + 191 smelled == 1185 voicings
+- smells: {'echo': 76, 'identifier': 38, 'stutter': 10, 'tautology': 88}
+- 75 classes; every class renders below — no silent caps
 
-## condition (53 classes)
+## condition (55 classes)
 
 | count | kind | smells | template | exemplar |
 |---|---|---|---|---|
@@ -35,8 +35,8 @@ Every stored voicing, one row per phrasing class (Sunny's go, 2026-09-14: kill c
 | 1 | IN_LIST | identifier, echo | the ⟨…⟩ is one of the ⟨…⟩ ⟨q⟩ noted ⟨q⟩ ⟨q⟩ noted ⟨q⟩ ⟨q⟩ noted ⟨q⟩ ⟨q⟩ noted ⟨q⟩ ⟨q⟩ noted ⟨q⟩ ⟨q⟩ noted ⟨q⟩ ⟨q⟩ noted ⟨q⟩ | The flowsheet group is one of the values '94' (noted 'Weight'), '95' (noted 'Blood pressure'), '9001140203' (noted 'R EDX GIRLS SYSTOLIC BP PERCENTILE'), '9001140205' (noted 'R EDX BOYS SYSTOLIC BP PERCENTILE'), '9001125002' (noted 'R HS ED SEPSIS CLINICAL_ALERTS CANCELLED'), '9000161709' (noted 'SEPSIS SCREENING SCORE (RETIRED)'), '9000002613' (noted 'R HS IP SEPSIS SCORE 2019'). |
 | 1 | IN_LIST | echo | the ⟨…⟩ is one of the ⟨…⟩ ⟨q⟩ noted ⟨q⟩ ⟨q⟩ noted ⟨q⟩ ⟨q⟩ noted ⟨q⟩ ⟨q⟩ noted ⟨q⟩ ⟨q⟩ noted ⟨q⟩ ⟨q⟩ noted ⟨q⟩ ⟨q⟩ noted ⟨q⟩ ⟨q⟩ noted ⟨q⟩ ⟨q⟩ noted ⟨q⟩ ⟨q⟩ noted ⟨q⟩ ⟨q⟩ noted ⟨q⟩ ⟨q⟩ noted ⟨q⟩ ⟨q⟩ noted ⟨q⟩ ⟨q⟩ noted ⟨q⟩ ⟨q⟩ noted ⟨q⟩ ⟨q⟩ noted ⟨q⟩ | The action category is one of the values '1' (noted 'GIVEN'), '7' (noted 'RESTARTED'), '102' (noted 'GIVEN BY OTHER'), '105' (noted 'NEW CARTRIDGE'), '113' (noted 'GIVEN DURING DOWNTIME'), '114' (noted 'STARTED DURING DOWNTIME'), '115' (noted 'MEDICATION APPLIED'), '122' (noted 'CONTINUED FROM OR'), '124' (noted 'SELF ADMINISTERED VIA PUMP'), '132' (noted 'CONTINUED FROM PREVIOUS ORDER'), '143' (noted 'REDOSE'), '1604' (noted 'INFUSION GREATER THAN 15 MIN'), '1605' (noted 'INFUSION LESS THAN 15 MIN'), '1607' (noted 'NEW CARTRIDGE'), '6' (noted 'NEW BAG'), '99' (noted 'RATE CHANGE'). |
 | 1 | IN_SELECTION | echo | the ⟨…⟩ is one of the ⟨…⟩ from a ⟨…⟩ the ⟨…⟩ is ⟨…⟩ and the ⟨…⟩ is the ⟨…⟩ recorded of the ⟨…⟩ the ⟨…⟩ and the ⟨…⟩ is ⟨…⟩ | The medication id is one of the values from a nested selection reading medications records, med mix components records, ref generic med records, configuration value set records, where the agent order is 1; and the medication generic name is the first recorded of the medication generic name, the simple generic code; and the value set is 3016. |
-| 328 | NULL_CHECK | — | the ⟨…⟩ is not recorded | The taken time is not recorded. |
-| 232 | NOT | — | the ⟨…⟩ is recorded | The taken time is recorded. |
+| 328 | NULL_CHECK | — | the ⟨…⟩ is not recorded | The medication administration's taken time is not recorded. |
+| 232 | NOT | — | the ⟨…⟩ is recorded | The medication administration's taken time is recorded. |
 | 191 | AND | — | all ⟨…⟩ of its ⟨…⟩ | All 2 of its parts hold. |
 | 24 | IN_LIST | — | the ⟨…⟩ is one of the ⟨…⟩ | The medication id is one of the values 700001, 700002. |
 | 23 | COMPARE_EQ | — | the ⟨…⟩ is ⟨q⟩ | The hypotension y is 'Y'. |
@@ -44,11 +44,11 @@ Every stored voicing, one row per phrasing class (Sunny's go, 2026-09-14: kill c
 | 6 | COMPARE_GT | — | the ⟨…⟩ | The convert(numeric, sig) exceeds 95.0. |
 | 6 | COMPARE_LT | — | the ⟨…⟩ is ⟨…⟩ | The age months is below 2. |
 | 5 | EXISTS_SELECTION | — | a ⟨…⟩ in a ⟨…⟩ the ⟨…⟩ in this ⟨…⟩ | A matching record exists in a nested selection reading the ed positivescores selection defined earlier in this procedure. |
-| 5 | NOT | — | the recorded ⟨…⟩ is recorded | The recorded time is recorded. |
-| 5 | NULL_CHECK | — | the recorded ⟨…⟩ is not recorded | The recorded time is not recorded. |
 | 4 | COMPARE_LTE | — | the ⟨…⟩ in ⟨…⟩ is at most ⟨…⟩ | The age in days is at most 21. |
 | 4 | IN_LIST | — | the ⟨…⟩ is one of the ⟨…⟩ noted ⟨q⟩ | The result flag is one of the values 2, 218 (noted 'Abnormal or Critical'). |
 | 4 | IN_LIST | — | the ⟨…⟩ is one of the ⟨…⟩ ⟨q⟩ | The flowsheet group is one of the values '900112'. |
+| 4 | NOT | — | the recorded ⟨…⟩ is recorded | The recorded time is recorded. |
+| 4 | NULL_CHECK | — | the recorded ⟨…⟩ is not recorded | The recorded time is not recorded. |
 | 4 | RANGE | — | the recorded ⟨…⟩ is between the ⟨…⟩ and the ⟨…⟩ | The recorded time is between the adt arrival time and the ed departure time (inclusive). |
 | 3 | COMPARE_LTE | — | the ⟨…⟩ is at most ⟨…⟩ | The age years is at most 13. |
 | 3 | COMPARE_LT | — | the ⟨…⟩ is before the ⟨…⟩ noted ⟨q⟩ | The taken time is before the ed departure time (noted 'while in ED'). |
@@ -63,14 +63,15 @@ Every stored voicing, one row per phrasing class (Sunny's go, 2026-09-14: kill c
 | 1 | IN_LIST | — | the ⟨…⟩ is one of the ⟨…⟩ ⟨q⟩ noted ⟨q⟩ | The event template is one of the values '2600000007' (noted 'ED BOARDER PATIENTS'). |
 | 1 | IN_LIST | — | the ⟨…⟩ is one of the ⟨…⟩ ⟨q⟩ ⟨q⟩ | The event template is one of the values '2600000347', '2600000346'. |
 | 1 | NOT | — | no ⟨…⟩ in a ⟨…⟩ the ⟨…⟩ in this ⟨…⟩ | No matching record exists in a nested selection reading the ed positivescores selection defined earlier in this procedure. |
+| 1 | NOT | — | the ⟨…⟩ recorded ⟨…⟩ is recorded | The flowsheet measurements's recorded time is recorded. |
+| 1 | NULL_CHECK | — | the ⟨…⟩ recorded ⟨…⟩ is not recorded | The flowsheet measurements's recorded time is not recorded. |
 
 ## scope (20 classes)
 
 | count | kind | smells | template | exemplar |
 |---|---|---|---|---|
-| 3 | - | stutter | drawn from the ⟨…⟩ in this ⟨…⟩ to ⟨…⟩ in ⟨…⟩ | Drawn from the allmeds selection defined earlier in this procedure, restricted to records also present in grouper med records records. |
-| 3 | - | stutter, echo | drawn from the ⟨…⟩ in this ⟨…⟩ to ⟨…⟩ in ⟨…⟩ to ⟨…⟩ in ⟨…⟩ | Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in flowsheet records records, restricted to records also present in flowsheet measurements records. |
-| 2 | - | stutter, echo | drawn from the ⟨…⟩ in this ⟨…⟩ to ⟨…⟩ in ⟨…⟩ to ⟨…⟩ in ⟨…⟩ to ⟨…⟩ in ⟨…⟩ | Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in medication orders records, restricted to records also present in medications records, restricted to records also present in med admin records records. |
+| 3 | - | echo | drawn from the ⟨…⟩ in this ⟨…⟩ to ⟨…⟩ in ⟨…⟩ to ⟨…⟩ in ⟨…⟩ | Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in flowsheet records, restricted to records also present in flowsheet measurements records. |
+| 2 | - | echo | drawn from the ⟨…⟩ in this ⟨…⟩ to ⟨…⟩ in ⟨…⟩ to ⟨…⟩ in ⟨…⟩ to ⟨…⟩ in ⟨…⟩ | Drawn from the base pop selection defined earlier in this procedure, restricted to records also present in medication orders records, restricted to records also present in medications records, restricted to records also present in medication administration records. |
 | 1 | - | echo | drawn from the ⟨…⟩ in this ⟨…⟩ combined with ⟨…⟩ combined with ⟨…⟩ combined with ⟨…⟩ combined with ⟨…⟩ | Drawn from the basepopabx selection defined earlier in this procedure, combined with v pharmacy order records, combined with 2 inline selections, combined with v pharmacy dispense records, combined with 2 inline selections. |
 | 1 | - | echo | drawn from the ⟨…⟩ in this ⟨…⟩ combined with ⟨…⟩ combined with ⟨…⟩ combined with ⟨…⟩ combined with ⟨…⟩ combined with the ⟨…⟩ in this ⟨…⟩ combined with the ⟨…⟩ in this ⟨…⟩ combined with the ⟨…⟩ in this ⟨…⟩ combined with the ⟨…⟩ in this ⟨…⟩ combined with the ⟨…⟩ in this ⟨…⟩ combined with the ⟨…⟩ in this ⟨…⟩ combined with the ⟨…⟩ in this ⟨…⟩ combined with the ⟨…⟩ in this ⟨…⟩ combined with the ⟨…⟩ in this ⟨…⟩ combined with the ⟨…⟩ in this ⟨…⟩ combined with the ⟨…⟩ in this ⟨…⟩ combined with the ⟨…⟩ in this ⟨…⟩ combined with the ⟨…⟩ in this ⟨…⟩ combined with the ⟨…⟩ in this ⟨…⟩ combined with the ⟨…⟩ in this ⟨…⟩ combined with the ⟨…⟩ in this ⟨…⟩ combined with the ⟨…⟩ in this ⟨…⟩ combined with the ⟨…⟩ all ⟨…⟩ in this ⟨…⟩ combined with the ⟨…⟩ in this ⟨…⟩ combined with the ⟨…⟩ in this ⟨…⟩ combined with the ⟨…⟩ to ⟨…⟩ in this ⟨…⟩ combined with the ⟨…⟩ in this ⟨…⟩ combined with the ⟨…⟩ in this ⟨…⟩ combined with the ⟨…⟩ in this ⟨…⟩ | Drawn from the base pop selection defined earlier in this procedure, combined with encounter visit reasons records, combined with visit reasons records, combined with severe sepsis staging records, combined with non severe sepsis staging records, combined with the base pop sepsisscores concat selection defined earlier in this procedure, combined with the base pop severe ed scores selection defined earlier in this procedure, combined with the ed positivescores selection defined earlier in this procedure, combined with the ed negativescores selection defined earlier in this procedure, combined with the basepopabx selection defined earlier in this procedure (2 reads), combined with the basepopbolus selection defined earlier in this procedure (3 reads), combined with the pressors selection defined earlier in this procedure, combined with the firstabxadmintimedetails selection defined earlier in this procedure, combined with the encounterweights selection defined earlier in this procedure, combined with the hypotension selection defined earlier in this procedure, combined with the lda selection defined earlier in this procedure (3 reads), combined with the labs selection defined earlier in this procedure (3 reads), combined with the cultures selection defined earlier in this procedure (3 reads), combined with the ed2hemonc selection defined earlier in this procedure, combined with the ed2icu selection defined earlier in this procedure, combined with the ed2gen selection defined earlier in this procedure, combined with the bpa selection defined earlier in this procedure, combined with the base pop ed readmit all selection defined earlier in this procedure, combined with the base pop ed readmit selection defined earlier in this procedure, combined with the base pop enc reason selection defined earlier in this procedure, combined with the firstpositiveod to abxadmintime selection defined earlier in this procedure, combined with the ssorderset selection defined earlier in this procedure, combined with the sepsisalertcancelled selection defined earlier in this procedure, combined with the bedevents selection defined earlier in this procedure (2 reads). |
 | 1 | - | echo | drawn from the ⟨…⟩ in this ⟨…⟩ combined with ⟨…⟩ combined with ⟨…⟩ combined with ⟨…⟩ combined with ⟨…⟩ combined with ⟨…⟩ combined with ⟨…⟩ combined with ⟨…⟩ combined with ⟨…⟩ | Drawn from the base pop selection defined earlier in this procedure, combined with clinical alerts records, combined with alert history records, combined with alert actions records, combined with ref alert actions records, combined with ref alert override reasons records, combined with ref alert status records, combined with ref shown place records, combined with employees records. |
@@ -78,6 +79,7 @@ Every stored voicing, one row per phrasing class (Sunny's go, 2026-09-14: kill c
 | 1 | - | echo | drawn from ⟨…⟩ combined with ⟨…⟩ combined with ⟨…⟩ combined with ⟨…⟩ combined with ⟨…⟩ combined with ⟨…⟩ combined with ⟨…⟩ combined with ⟨…⟩ combined with ⟨…⟩ combined with ⟨…⟩ | Drawn from ed encounters fact records, combined with hospital encounters records, combined with ed encounters dm records, combined with patients records, combined with ref ed disposition records, combined with ref ethnic group records, combined with patient demographics race records, combined with ref patient race records, combined with departments records, combined with locations records. |
 | 1 | - | echo | drawn from ⟨…⟩ to ⟨…⟩ in ⟨…⟩ | Drawn from ed patient info records, restricted to records also present in ed event info records. |
 | 19 | - | — | drawn from the ⟨…⟩ in this ⟨…⟩ | Drawn from the abx selection defined earlier in this procedure. |
+| 3 | - | — | drawn from the ⟨…⟩ in this ⟨…⟩ to ⟨…⟩ in ⟨…⟩ | Drawn from the allmeds selection defined earlier in this procedure, restricted to records also present in grouper medication records. |
 | 2 | - | — | drawn from the ⟨…⟩ in this ⟨…⟩ this ⟨…⟩ is the ⟨…⟩ of ⟨…⟩ | Drawn from the allmeds selection defined earlier in this procedure. This selection is the combination of 2 alternative selections (duplicates removed). |
 | 1 | - | — | drawn from an ⟨…⟩ | Drawn from an inline selection. |
 | 1 | - | — | drawn from the all ⟨…⟩ in this ⟨…⟩ | Drawn from the all ldas selection defined earlier in this procedure. |

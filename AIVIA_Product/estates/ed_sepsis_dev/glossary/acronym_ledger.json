@@ -1,6 +1,6 @@
 {
  "1": {
-  "carriers": 64,
+  "carriers": 68,
   "position": [
    "last",
    "mid"
@@ -1125,7 +1125,7 @@
   "status": "unreviewed"
  },
  "2": {
-  "carriers": 49,
+  "carriers": 51,
   "position": [
    "last"
   ],
@@ -28098,12 +28098,15 @@
   "status": "unreviewed"
  },
  "read": {
-  "carriers": 1,
+  "carriers": 7,
   "position": [
+   "first",
    "mid"
   ],
   "sample": [
-   "IS_EXT_READ_FLAG"
+   "IS_EXT_READ_FLAG",
+   "read#1",
+   "read#2"
   ],
   "status": "unreviewed"
  },

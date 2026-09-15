@@ -12819,7 +12819,7 @@
   "words": "surrogate key"
  },
  "emr|dbo|FLOWSHEET_MEASUREMENTS": {
-  "status": "proposed",
+  "status": "blessed",
   "description_hash": "0ee9e8c5a127a8674524ead17ec40fae41aaca6be893bd898902e913fcdbe7e5",
   "proposed_at": "2026-09-15T00:44:30Z",
   "proposer": {
@@ -12827,7 +12827,9 @@
    "prompt_version": "1.0.0",
    "runs": 2
   },
-  "words": "measurements patients flowsheets"
+  "words": "flowsheet measurements",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-15T21:20:50Z"
  },
  "emr|dbo|FLOWSHEET_MEASUREMENTS|ABNORMAL_CODE": {
   "status": "proposed",
@@ -13342,7 +13344,7 @@
   "words": "surrogate key"
  },
  "emr|dbo|FLOWSHEET_RECORDS": {
-  "status": "proposed",
+  "status": "blessed",
   "description_hash": "1564f65d885f64b3065e150bd3598532934b8a55d26f282187691d6f486a2f24",
   "proposed_at": "2026-09-15T00:44:30Z",
   "proposer": {
@@ -13350,7 +13352,9 @@
    "prompt_version": "1.0.0",
    "runs": 2
   },
-  "words": "flowsheet records"
+  "words": "flowsheet",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-15T21:33:48Z"
  },
  "emr|dbo|FLOWSHEET_RECORDS|CM_LOG_OWNER_ID": {
   "status": "proposed",
@@ -13649,7 +13653,7 @@
   "words": "number lines item"
  },
  "emr|dbo|GROUPER_MED_RECORDS": {
-  "status": "proposed",
+  "status": "blessed",
   "description_hash": "ce15c4b8eb4dd06fecd7d9c52029a29bc15ab898d872ac39293704210c64cc1b",
   "proposed_at": "2026-09-15T00:44:30Z",
   "proposer": {
@@ -13657,7 +13661,9 @@
    "prompt_version": "1.0.0",
    "runs": 2
   },
-  "words": "medication records"
+  "words": "grouper medication",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-15T21:33:48Z"
  },
  "emr|dbo|GROUPER_MED_RECORDS|CM_LOG_OWNER_ID": {
   "status": "proposed",
@@ -26614,7 +26620,7 @@
   "words": "surrogate key"
  },
  "emr|dbo|MED_ADMIN_RECORDS": {
-  "status": "disputed",
+  "status": "blessed",
   "description_hash": "318a6cab63d7c03433e1c8260b83e81c82567dbe5ec8122029d22b8b40bfa3c1",
   "proposed_at": "2026-09-15T00:44:30Z",
   "proposer": {
@@ -26625,7 +26631,10 @@
   "candidates": [
    "medication administration records",
    "medication administration data"
-  ]
+  ],
+  "words": "medication administration",
+  "blessed_by": "person:sunny",
+  "blessed_at": "2026-09-15T21:33:48Z"
  },
  "emr|dbo|MED_ADMIN_RECORDS|AN_BCMA_MED_SCANCOMP_CODE": {
   "status": "proposed",
