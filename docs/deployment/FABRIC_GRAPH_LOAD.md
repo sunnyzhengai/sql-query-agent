@@ -111,6 +111,20 @@ properties name/description/structures → Add edge `reads`,
 scope → table, via graph_reads_scopeTable (sourceId → targetId) →
 Save → ONE refresh.
 
+**"Refresh" decoded (Sunny's UI, 2026-09-14):** the graph-model
+editor has NO standalone refresh button — re-ingestion IS the
+**Get data → Load → Save** flow, and the status bar's
+**"Last loaded"** timestamp advancing is the completion evidence
+(that load is the capacity spend — one per batch). For a
+texts-only reload (no new tables, no mapping changes): drop the
+changed Delta tables in the lakehouse → upload the new parquet →
+Load to Tables (New table, same names) → in the model, Get data
+with ALL boxes unchanged → Load → Save → confirm "Last loaded"
+advanced. Lakehouse half FIRST, model load second — the reverse
+re-ingests the old rows. Load-to-Tables into an EXISTING table
+can APPEND (the dual-set corpse's cousin): drop-and-reload,
+never load-into-existing.
+
 M2 also ships `graph_joins_to_tableTable` (65 rows) — the DECLARED
 dictionary joins (Epic Clarity joins.csv, loaded at KG1 intake;
 they were in the store all along but M1's export missed them).
