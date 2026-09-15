@@ -168,7 +168,9 @@ MATCH ()-[r:right_side]->() RETURN count(r) AS cnt
 ```gql
 MATCH ()-[r:reads]->() RETURN count(r) AS cnt
 ```
-→ **6**
+→ **6** — HISTORICAL: `reads` RETIRED at ERA 3 (registries
+1.43.0); after the 1.43.0 load the type is unmapped. See the
+ERA 3 gate below.
 ```gql
 MATCH ()-[r]->() RETURN count(r) AS totalEdges
 ```
@@ -221,6 +223,9 @@ RETURN count(*) AS doubleConnected
 Expected: 0. Coverage (reads ∪ join-sides == the parse read-set,
 per scope) runs store-side in the census — the parse read-set is
 not itself in the graph.
+HISTORICAL: at ERA 3 the DISJOINT half goes VACUOUS (`reads` is
+gone — one mechanism left) and the two invariants collapse into
+ONE COVERING check; see the ERA 3 gate's uniform walk below.
 
 **GATE RESULTS 2026-09-11 (Sunny's refresh; the battery run live
 against the served graph):** M1+M2+M3 censuses GREEN (5930 nodes
@@ -319,6 +324,121 @@ RETURN c.description AS descr
 Expected: the ED-stay window voiced through dictionary words —
 "…is between the adt arrival time and the ed departure time
 (inclusive)."
+
+### ERA 3 gate — THE FROM-STRUCTURE FAMILY [BUILT 2026-09-14,
+registries 1.43.0, a1 as the ruled default; rides Sunny's next
+load per the batch law. TWO ACTS AT ONE CAPACITY WINDOW, PROBE
+FIRST: the probe runs against the CURRENT served graph (the
+5930-node M3 shape, BEFORE any reload) and settles a1/a2; the
+load fires only after a1 confirms. Every expected number below
+is verified against the export truth 2026-09-15.]
+
+**Act 1 — the probe rerun (3 spends, pre-reload).** The
+2026-09-14 attempt returned 429 CapacityLimitExceeded on all
+three before touching the question. Right after a capacity
+resume expect CapacityNotActive for ~a minute — wait and re-ask
+(FABRIC_GRAPH_LOAD.md).
+
+Probe 1, sanity single-label:
+
+```gql
+MATCH (j:join) RETURN count(j) AS cnt
+```
+→ 95.
+
+Probe 2, edge alternation:
+
+```gql
+MATCH (j:join)-[r:left_side|:right_side]->(t:table) RETURN count(r) AS cnt
+```
+→ **88**.
+
+Probe 3, unlabeled middle node:
+
+```gql
+MATCH (s:scope)-[:has_part]->()-[:left_side]->(t:table) RETURN count(*) AS cnt
+```
+→ **51**.
+
+DECISION RULE (the recorded contingency, Design_Graph_Engine
+ERA 3): a pass = the stated count. If EITHER probe 2 or probe 3
+passes, **a1 stands** — proceed to Act 2. Only if the engine
+REFUSES BOTH (a "not supported" rejection, not a number) does
+the **a2 contingency fire**: STOP, no load — the merged
+table-reference label rebuilds first (M2 reseals) and this gate
+sheet re-bases again. A wrong COUNT from a supported query is
+neither: that is a drift finding, investigate before loading.
+
+**Act 2 — the 1.43.0 load (a1 confirmed; ONE refresh).**
+Lakehouse half FIRST, model second; drop-and-reload, never
+load-into-existing. The changed set:
+
+- NEW parquets (already in graph_export/): `graph_direct_read` ·
+  `graph_has_part_scopeDirectRead` ·
+  `graph_left_side_directReadTable` → upload to Files, Load to
+  Tables into `Tables/dbo/`.
+- RETIRED: `graph_reads_scopeTable` — DROP the dbo table AND
+  remove the `reads` edge mapping from the graph model.
+- Model deltas: add node `direct_read` (key nodeId; name,
+  description) · add has_part mapping scope→direct_read
+  (graph_has_part_scopeDirectRead) · add left_side mapping
+  direct_read→table (graph_left_side_directReadTable) → Save →
+  the load (the one spend). Proof a load fired: a new Graph
+  model row in Monitor, Succeeded — never the editor's buttons.
+
+**Act 3 — the re-based gate.**
+
+The node census:
+
+```gql
+MATCH (n) RETURN labels(n) AS nodeType, count(*) AS cnt GROUP BY nodeType
+```
+Expected exactly: db 1 · db_schema 3 · table 90 · column 4554 ·
+scope 44 · join 95 · direct_read **6** · condition 1141 ·
+param 2 — total **5936**, nothing else (and NO reads-shaped
+label).
+
+The edge battery (one count per type via
+`MATCH ()-[r:<type>]->() RETURN count(r) AS cnt`):
+has_part → **5889** · joins_to → 65 · left_side → **101** ·
+right_side → 87 · resolves_to → 165 · uses_param → 2 · `reads`
+→ GONE (unmapped type — its 6 edges retired into the 6
+direct_read nodes). Then:
+
+```gql
+MATCH ()-[r]->() RETURN count(r) AS totalEdges
+```
+→ **6309** — the six counts sum to 6309, closing the census
+with no undeclared type.
+
+THE ONE INVARIANT (COVERING alone — DISJOINT vacuous, one
+mechanism left). The uniform walk, every FROM shape through the
+same two hops:
+
+```gql
+MATCH (s:scope)-[:has_part]->()-[r:left_side|:right_side]->(t:table)
+RETURN count(r) AS cnt
+```
+→ **94** (51 join-left + 37 join-right + 6 direct). Then the
+read-set itself:
+
+```gql
+MATCH (s:scope)-[:has_part]->()-[:left_side|:right_side]->(t:table)
+RETURN DISTINCT s.name AS scopeName, t.name AS tableName ORDER BY scopeName, tableName
+```
+→ **59 rows** — the acceptance gate: same rows as the local
+walk (6 direct + 53 join-covered == read-set 59). If probe 2
+was the refused one (a1 via unlabeled-middle only), split each
+query into a `left_side` and a `right_side` statement (counts
+57 + 37; distinct-union the pair lists by hand).
+
+The spot check:
+
+```gql
+MATCH (d:direct_read) RETURN d.name AS readName, d.description AS descr ORDER BY readName
+```
+→ 6 rows; read#1 (scope #Final) reads
+"Reads NON_SEVERE_SEPSIS_STAGING."
 
 ### M4 gate — derived_column
 
