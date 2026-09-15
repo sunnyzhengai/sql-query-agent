@@ -349,9 +349,14 @@ MATCH (j:join) RETURN count(j) AS cnt
 Probe 2, edge alternation:
 
 ```gql
-MATCH (j:join)-[r:left_side|:right_side]->(t:table) RETURN count(r) AS cnt
+MATCH (j:join)-[r:left_side|right_side]->(t:table) RETURN count(r) AS cnt
 ```
-→ **88**.
+→ **88**. DIALECT FINDING (Sunny's run, 2026-09-15): the
+Cypher-style spelling `|:right_side` is a SYNTAX error
+(42000/22000, offending token the second ':') — Fabric GQL
+takes ISO alternation, ONE colon: `[r:left_side|right_side]`.
+A syntax error is NOT the refusal the contingency names — only
+a "not supported" rejection of the corrected form counts.
 
 Probe 3, unlabeled middle node:
 
@@ -416,14 +421,14 @@ mechanism left). The uniform walk, every FROM shape through the
 same two hops:
 
 ```gql
-MATCH (s:scope)-[:has_part]->()-[r:left_side|:right_side]->(t:table)
+MATCH (s:scope)-[:has_part]->()-[r:left_side|right_side]->(t:table)
 RETURN count(r) AS cnt
 ```
 → **94** (51 join-left + 37 join-right + 6 direct). Then the
 read-set itself:
 
 ```gql
-MATCH (s:scope)-[:has_part]->()-[:left_side|:right_side]->(t:table)
+MATCH (s:scope)-[:has_part]->()-[:left_side|right_side]->(t:table)
 RETURN DISTINCT s.name AS scopeName, t.name AS tableName ORDER BY scopeName, tableName
 ```
 → **59 rows** — the acceptance gate: same rows as the local
