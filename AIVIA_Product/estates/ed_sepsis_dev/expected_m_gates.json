@@ -404,7 +404,7 @@
    }
   },
   "ERA3_FROM_STRUCTURE": {
-   "status": "RATIFIED + BUILT 2026-09-14 (Sunny: 'ratified — build era 3, a1 if the probe passes'); PROBE GREEN 2026-09-15 (95/88/51, all exact) — a1 CONFIRMED, the a2 contingency DEAD; GQL gate on the served graph rides the load, Sunny's hand",
+   "status": "RATIFIED + BUILT 2026-09-14 (Sunny: 'ratified — build era 3, a1 if the probe passes'); PROBE GREEN 2026-09-15 (95/88/51, all exact) — a1 CONFIRMED, the a2 contingency DEAD; GQL GATE GREEN 2026-09-15 on the served graph (census 5936/6309 exact, uniform walk 94, read-set 59 rows, spot 6/6) — ERA 3 CLOSED",
    "new_nodes": {
     "direct_read": 6
    },

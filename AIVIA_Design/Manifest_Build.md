@@ -1150,3 +1150,23 @@ a2 relabel as the RECORDED CONTINGENCY):**
 | REGISTRIES 1.43.0 (converter-first): Shape_Ledger direct_read PRESENT + reads edge RETIRED-with-note; doc stamps same breath (RG-A2); the M-gate answer key re-based with its FIRST STRUCTURAL delta (+6 nodes · +12 edges · −6 reads; M2 delta amended, the ERA3_FROM_STRUCTURE entry carries the act) | BUILT | validators green · test_metamodel 1.43.0 · test_census_arithmetic green both directions |
 | LIVE CONFIRMATION at the export regen: exactly TWO stored texts moved — #PatientLocation cond#3/#4 gaining the R5.c owner-possessive ("The patient location history's department is (not) recorded."), the standing query verified against the store; the served-graph GQL gate + Fabric reload ride Sunny's next load (batch law + capacity) | VERIFIED | graph_condition.parquet diff = exactly those 2 rows |
 | FULL SUITE + LINT | GREEN | **2130 passed · 25 skipped · 8 xfailed · 0 failed** (exit 0, 0:10:49); suite-5's 11 reds all closed at their layer (Connection_Ledger direct_read row · build_adjacency walks the birth edge · blessings fixture era-3 shape · literal tag placement); changed files ruff-clean (the 2 converter E501s pre-exist); TEST_MAP regenerated; the graph visual REPUBLISHED (same URL, label era3-direct-read: direct_read in the join family, census 5936/6309 reconciling both directions) |
+
+**ERA 3 CLOSES ON THE SERVED GRAPH (Sunny's hand, 2026-09-15 —
+the batch law runs to its last clause):** the probe rerun landed
+GREEN (95 / 88 / 51, all exact) — **a1 CONFIRMED, the a2
+contingency DEAD**; dialect finding en route: Fabric GQL rejects
+Cypher's `|:type` at parse, ISO single-colon alternation is the
+accepted form (probe-2's first run erred on my spelling, not the
+engine — corrected in the gate sheet, commit 6d7fa09). The
+1.43.0 load landed at Sunny's hand (ONE refresh: 3 new parquets
++ graph_condition/graph_scope re-voiced texts from the
+records-records sitting riding the same spend ·
+graph_reads_scopeTable DROPPED · direct_read + 2 mappings added
+· Monitor Succeeded), and the FULL Act 3 battery ran GREEN:
+census 5936/6309 exact both directions, direct_read 6, no reads
+label, uniform walk 94, read-set 59 rows == the local walk
+(the acceptance gate), spot check 6/6. Arc commits: fb9c592
+(gate queries authored) · 0d295e0 (the records-records sitting,
+4 blessings) · 6d7fa09 (the second colon dies) · 897fe1f
+(a1 confirmed + answer-key re-base to blessed_name 113) · the
+commit carrying THIS ROW is the batch's closing commit.**

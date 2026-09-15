@@ -376,8 +376,13 @@ Dialect finding en route: Fabric GQL rejects Cypher's `|:type`
 alternation at parse; ISO single-colon `[r:left_side|right_side]`
 is the accepted form (recorded in GQL_Gates.md). Both uniform-
 query mechanisms exist — alternation AND the unlabeled middle;
-the a1 shape needs no relabel, ever. The served-graph load +
-Act 3 gate remain the batch's close.
+the a1 shape needs no relabel, ever.
+CLOSED (same day): Sunny's load landed (one refresh, reads
+table dropped, direct_read mapped) and the full Act 3 battery
+ran GREEN — census 5936/6309 exact, uniform walk 94, read-set
+59 rows, spot check 6/6. The served graph now walks every FROM
+clause through the one sided shape; era 3 is DONE on the
+verification surface.
 
 **Blast radius (declared, the a1 costing):** kg2 mapper births
 direct_read at translate; store +6 nodes +12 edges −6 reads;

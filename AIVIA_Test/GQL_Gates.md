@@ -379,6 +379,16 @@ three exact. BOTH capabilities exist (alternation in ISO
 spelling AND the unlabeled middle) — a1 CONFIRMED, the a2
 contingency is DEAD. Act 2 unlocked.**
 
+**GATE RESULTS 2026-09-15 (Sunny's load + battery, ALL GREEN):**
+the 1.43.0 load landed (5 parquets incl. the records-records
+re-voiced texts, graph_reads_scopeTable dropped, direct_read
+node + 2 mappings added, ONE refresh) · node census 5936 exact
+with direct_read 6 and no reads label · edge battery six types
+sum 6309 · uniform walk 94 · read-set 59 rows (6 direct + 53
+join-covered) · direct_read spot check 6/6. ERA 3 IS CLOSED —
+the served graph and the local walk answer the reads question
+identically through one shape.
+
 **Act 2 — the 1.43.0 load (a1 confirmed; ONE refresh).**
 Lakehouse half FIRST, model second; drop-and-reload, never
 load-into-existing. The changed set:
