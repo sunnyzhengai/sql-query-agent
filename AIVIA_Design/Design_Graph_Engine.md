@@ -304,3 +304,90 @@ refresh per batch, Sunny's hand or word).
 - Landing contract details per source
 - Fabric Graph vector capability specifics at implementation time
 - The inferred-mapping confidence classes (vocabulary)
+
+## PROPOSED — THE FROM-STRUCTURE NODE FAMILY (era 3; drafted
+## 2026-09-14 from Sunny's uniform-edge clarification; UNRULED —
+## the questions below are Sunny's)
+
+**Origin.** Sunny's step-back on the reads inventory: "I wanted
+all scopes to use the same joins node with left and right edges;
+when there is only 1 table, the right edge is null or a keyword."
+The ruled re-derivation keeps the goal and moves the absence: a
+property graph has no null endpoints, and a one-sided node named
+JOIN would claim a combining fact the parse never said — so the
+absence lives in the KIND, never in a null.
+
+**The shape.** One FROM-structure node family with two kinds:
+
+- kind `join` — today's node, byte-for-byte: left_side +
+  right_side, ON meaning, join type, ON-root conditions.
+- kind `direct_read` — the single-table FROM: ONE side edge, no
+  ON, no type. This is the null-right case expressed honestly:
+  the kind that has no right edge. It twins a REAL parse node —
+  ScriptDom's NamedTableReference — where a null-sided join
+  would twin nothing (ADR 0001: the twin claims parse facts
+  only).
+
+Every FROM clause then walks the same two hops:
+scope —has_part→ (node) —left_side/right_side→ table-or-scope.
+The era-2 `reads` remainder edge RETIRES from the store: its 6
+edges migrate into 6 direct_read nodes (+ has_part + left_side).
+The two M2 invariants collapse into one: per scope,
+side-targets == read-set (COVERING, with DISJOINT now vacuous —
+there is no second mechanism left to overlap).
+
+**Two sub-variants — the live-wire probe decides:**
+
+- (a1) NEW LABEL beside the sealed batch: direct_read is its own
+  node label; the 95 join nodes and every M2 census stand
+  untouched. Uniform queries then need either an UNLABELED
+  middle node — MATCH (a:scope)-[:has_part]->()-[:left_side]->
+  (b:table) — or node-label alternation. GATED on the probe.
+- (a2) ONE MERGED LABEL (the SQL standard's own name for the
+  family is TABLE REFERENCE — a joined table IS a <table
+  reference> in the grammar) with kind as a property. No
+  alternation needed anywhere, but the 95 sealed join nodes
+  relabel: M2 reseals. The heavier quantum; take it only if the
+  engine refuses unlabeled nodes and alternation both.
+
+PROBE RECORD (3 counted spends, Sunny's word, 2026-09-14): all
+three probes — sanity single-label, edge alternation
+[:left_side|:right_side], unlabeled middle node — returned
+http 429 CapacityLimitExceeded (retriable) before touching the
+question. RERUN AT CAPACITY RESUME, Sunny's hand; the variant
+choice waits on it.
+
+**Blast radius (declared, the a1 costing):** kg2 mapper births
+direct_read at translate; store +6 nodes +12 edges −6 reads;
+Shape_Ledger reads row flips RETIRED-INTO-direct_read (converter
+first — the law this week's determinism catch re-proved);
+export ships the new node/edge parquets and drops the reads
+parquet; the M-gate answer key re-bases WITH structural delta
+(+6/+12/−6, its first non-zero re-base — the recompute tests
+are the check); gate sheet re-runs at the next served load; the
+console adjacency swaps reads-edge links for the new walk and
+THE READS COMPOUND simplifies (the owner-to-side legality rule
+covers direct_read unchanged: enter has_part, exit side);
+Ranking_Weights' stale "reads … table/scope" row retires in the
+same registry breath. The floor grammar does NOT move: single-
+source scopes already voice "Drawn from X records" without a
+join — every stored text byte-identical is an acceptance gate.
+
+**Acceptance gates (pre-code):** node census join 95 +
+direct_read 6 · per-scope side-targets == read-set (the one
+invariant) · all 1,185 stored voicings byte-identical · answer-
+key recompute green at the re-base · the served-graph uniform
+query returns the same rows as the local walk on the live wire
+(one spend, Sunny's hand).
+
+**What this does NOT rule:** the derived read_set edge (the
+export shortcut) stays unbuilt unless separately ruled; the
+question-word grounding (v1.42.0 THE READS COMPOUND) stands
+under every variant — it simply gets simpler when the store
+becomes uniform.
+
+**The questions for Sunny:** (1) a1 vs a2 — after the probe
+rerun; (2) the family/kind NAMES (direct_read is the draft's
+word; the standard offers "table reference" for the a2 label);
+(3) whether this rides the M-ladder as its own batch before or
+after M4 (derived_column, currently next).

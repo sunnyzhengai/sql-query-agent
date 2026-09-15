@@ -1119,3 +1119,21 @@ the connection-view pin for relation-less questions.
 | THE READS COMPOUND: the question relation 'reads' expands to the M2 ruled walk — {reads, has_part, left_side, right_side} — and _reads_legal keeps every join crossing OWNER-TO-SIDE: a walk entering and leaving a join by two side edges is the co-side pattern (joined against, read BY the owner) — excluded and COUNTED BY NAME ("joined against (read by, never a reader)"), never rowed, never silent; the declared reads remainder rows as a direct edge | BUILT | test_reads_relation_rows_the_owner_never_the_co_side (the live corpse: #ADT alone, co-side counted 1, no side-to-side shape in the artifact) · test_reads_relation_includes_the_declared_remainder |
 | THE CONNECTION VIEW SURVIVES: a question naming no relation still answers connectivity — both #ADT and #Base_Pop row, honestly, under the free walk | HELD (re-homed pin) | test_connection_without_a_relation_word_keeps_both |
 | THE DETERMINISM TEST CAUGHT THE HAND-EDIT (second catch of the class — the stamp block's 1.37.0 note records the first): the registry JSONs were first edited directly; test_conversion_is_deterministic regenerated them mid-suite and wiped the row (the shifting red sets across runs 1-2). CORRECTED to the ruled path: the _edge reads row + 1.42.0 stamp AUTHORED IN convert_from_xlsx.py (the single writer, where the joins_to row's v1.40.0 'reads'-card deferral note now reads CLOSED), Design_Graph_Engine stamp block bumped the same breath (RG-A2), the M-gate answer key re-based per its own _bump_record precedent (zero twin-structure effect, recompute tests green), literal-census tags added to the two new tuples | CORRECTED + BUILT | validators green (RG all-ok, VIOLATIONS: none) · determinism test green · estate battery 15/15 |
+
+**THE FROM-STRUCTURE PROPOSAL + THE BLOCKED PROBE (Sunny's
+clarification + "run the probe, then draft option a",
+2026-09-14):** Sunny's uniform-edge intent restated — not a flat
+scope→table shortcut, ALL FROM clauses through the same
+sided-node shape, single-table as the one-sided case. Drafted as
+era 3 in Design_Graph_Engine.md (PROPOSED, unruled): kind
+`direct_read` beside kind `join` — absence lives in the KIND,
+never a null endpoint; the node twins ScriptDom's
+NamedTableReference (a real parse fact); the reads remainder
+retires into it; COVERING collapses to side-targets == read-set.
+Sub-variants a1 (new label, sealed M2 untouched — needs
+unlabeled-node or edge-alternation GQL) vs a2 (one merged
+label, M2 reseals). THE PROBE (3 counted spends, Sunny's word):
+all three returned http 429 CapacityLimitExceeded before
+touching the question — RERUN AT CAPACITY RESUME, Sunny's hand;
+the a1/a2 choice waits on it. The derived read_set edge (option
+b) stays unbuilt unless separately ruled.
