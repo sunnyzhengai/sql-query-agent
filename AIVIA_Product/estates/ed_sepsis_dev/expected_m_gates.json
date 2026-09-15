@@ -16,7 +16,7 @@
   "translator_version": "1.3.0",
   "metamodel_version": "1.43.0",
   "authored": "2026-09-10",
-  "_bump_record": "authored at metamodel 1.36.0; re-based 1.37.0 (join-node ruling) then 1.38.0 (M2 join layer lands: ledger flips PRESENT) — every derived count verified by the recompute tests at each bump; re-based 1.39.0 (M3 condition layer lands); re-based 1.40.0 (structure-word claim + relation-word seat, 2026-09-12: prompts and speech rows only — zero twin-structure effect, every derived count re-verified by the recompute tests); re-based 1.41.0 (the namer seat, 2026-09-12: one Seat_Prompts row only — zero twin-structure effect, every derived count re-verified by the recompute tests); re-based at THE BLESSING (2026-09-13, Sunny's delegated curation): +105 blessed_name kg3 nodes (NO person mint — the registry is the act's record; journal self-containment) — governance truth in the STORE census, never in the Fabric export (EXPORT_LABELS); condition census 1141 and all structural counts unchanged, A2 delta = 130 description texts; re-based at THE SECOND BLESSING (2026-09-14, Sunny's hand): +4 blessed_name — the REF_* held rows re-proposed off the AUTHORED descriptions after the sentinel-origin fix and blessed same night (109 total, node_total 6276); zero edge effect, every structural count unchanged; re-based 1.42.0 (the reads relation speaks, 2026-09-14: one Speech_Sources _edge reads row only — zero twin-structure effect, every derived count re-verified by the recompute tests); re-based 1.43.0 at ERA 3 THE FROM-STRUCTURE FAMILY (2026-09-14, ratified): the reads remainder RETIRES into 6 direct_read nodes — the first STRUCTURAL re-base (+6 nodes, +12 edges, -6 reads; every census gate updated both directions); recompute tests verify"
+  "_bump_record": "authored at metamodel 1.36.0; re-based 1.37.0 (join-node ruling) then 1.38.0 (M2 join layer lands: ledger flips PRESENT) — every derived count verified by the recompute tests at each bump; re-based 1.39.0 (M3 condition layer lands); re-based 1.40.0 (structure-word claim + relation-word seat, 2026-09-12: prompts and speech rows only — zero twin-structure effect, every derived count re-verified by the recompute tests); re-based 1.41.0 (the namer seat, 2026-09-12: one Seat_Prompts row only — zero twin-structure effect, every derived count re-verified by the recompute tests); re-based at THE BLESSING (2026-09-13, Sunny's delegated curation): +105 blessed_name kg3 nodes (NO person mint — the registry is the act's record; journal self-containment) — governance truth in the STORE census, never in the Fabric export (EXPORT_LABELS); condition census 1141 and all structural counts unchanged, A2 delta = 130 description texts; re-based at THE SECOND BLESSING (2026-09-14, Sunny's hand): +4 blessed_name — the REF_* held rows re-proposed off the AUTHORED descriptions after the sentinel-origin fix and blessed same night (109 total, node_total 6276); zero edge effect, every structural count unchanged; re-based 1.42.0 (the reads relation speaks, 2026-09-14: one Speech_Sources _edge reads row only — zero twin-structure effect, every derived count re-verified by the recompute tests); re-based 1.43.0 at ERA 3 THE FROM-STRUCTURE FAMILY (2026-09-14, ratified): the reads remainder RETIRES into 6 direct_read nodes — the first STRUCTURAL re-base (+6 nodes, +12 edges, -6 reads; every census gate updated both directions); recompute tests verify; re-based at THE RECORDS-RECORDS SITTING (2026-09-15, Sunny's hand): +4 blessed_name (MED_ADMIN_RECORDS, FLOWSHEET_MEASUREMENTS, FLOWSHEET_RECORDS, GROUPER_MED_RECORDS — 113 total, M7 node_total 6286); zero edge effect, structural counts unchanged, texts moved in graph_condition + graph_scope only"
  },
  "census_after": {
   "_comment": "THE GATE TABLES: cumulative Fabric-surface censuses after each batch. Q1 = MATCH (n) RETURN labels(n), count(*); Q3 = MATCH ()-[r]->() RETURN type(r), count(*). Exact both directions. M2 numbers are MEASURED FROM THE BUILT STORE (2026-09-10).",
@@ -173,10 +173,10 @@
     "role": 1,
     "responsibility": 1,
     "person": 0,
-    "blessed_name": 109,
+    "blessed_name": 113,
     "direct_read": 6
    },
-   "node_total": 6282,
+   "node_total": 6286,
    "edges": {
     "has_part": 6166,
     "joins_to": 65,
@@ -388,7 +388,7 @@
     "person": 0,
     "term": 0,
     "usage": 0,
-    "blessed_name": 109
+    "blessed_name": 113
    },
    "new_edges": {
     "executes": 1,
@@ -404,7 +404,7 @@
    }
   },
   "ERA3_FROM_STRUCTURE": {
-   "status": "RATIFIED + BUILT 2026-09-14 (Sunny: 'ratified — build era 3, a1 if the probe passes'; a1 built as the ruled default, the probe blocked on capacity — the a2 relabel is the recorded contingency); GQL gate on the served graph rides the next load, Sunny's hand",
+   "status": "RATIFIED + BUILT 2026-09-14 (Sunny: 'ratified — build era 3, a1 if the probe passes'); PROBE GREEN 2026-09-15 (95/88/51, all exact) — a1 CONFIRMED, the a2 contingency DEAD; GQL gate on the served graph rides the load, Sunny's hand",
    "new_nodes": {
     "direct_read": 6
    },

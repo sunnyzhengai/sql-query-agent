@@ -374,6 +374,11 @@ table-reference label rebuilds first (M2 reseals) and this gate
 sheet re-bases again. A wrong COUNT from a supported query is
 neither: that is a drift finding, investigate before loading.
 
+**PROBE GREEN — Sunny's run, 2026-09-15: 95 / 88 / 51, all
+three exact. BOTH capabilities exist (alternation in ISO
+spelling AND the unlabeled middle) — a1 CONFIRMED, the a2
+contingency is DEAD. Act 2 unlocked.**
+
 **Act 2 — the 1.43.0 load (a1 confirmed; ONE refresh).**
 Lakehouse half FIRST, model second; drop-and-reload, never
 load-into-existing. The changed set:

@@ -370,6 +370,14 @@ three probes — sanity single-label, edge alternation
 http 429 CapacityLimitExceeded (retriable) before touching the
 question. RERUN AT CAPACITY RESUME, Sunny's hand; the variant
 choice waits on it.
+PROBE GREEN (Sunny's rerun, 2026-09-15): 95 / 88 / 51, all
+three exact — **a1 CONFIRMED, the a2 contingency is DEAD**.
+Dialect finding en route: Fabric GQL rejects Cypher's `|:type`
+alternation at parse; ISO single-colon `[r:left_side|right_side]`
+is the accepted form (recorded in GQL_Gates.md). Both uniform-
+query mechanisms exist — alternation AND the unlabeled middle;
+the a1 shape needs no relabel, ever. The served-graph load +
+Act 3 gate remain the batch's close.
 
 **Blast radius (declared, the a1 costing):** kg2 mapper births
 direct_read at translate; store +6 nodes +12 edges −6 reads;
