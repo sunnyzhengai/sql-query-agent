@@ -750,7 +750,11 @@ NOTE: the live battery (AIVIA_LIVE=1) needs a rerun at Sunny's
 hand — prompt 3.1.0 regenerates every proposal (keys roll), and
 the live scores for 'filters'/'in' against the new _edge/kind
 speech are the real measurement the scripted rankings stand in
-for.
+for. **RERUN AT SUNNY'S WORD 2026-09-14: 4/4 PASSED in 110s**
+(payoff question · over-mark corpse stays dead · interpreter
+contract shape · blessed acronyms expand) — the 3.1.0-keyed
+proposals measured live against the real model; the standing
+debt clears.
 
 Suite after the sitting: **2058 passed · 25 skipped · 8 xfailed
 · 0 failed**; the 1.40.0 stamp propagated in the same breath
