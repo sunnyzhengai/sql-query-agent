@@ -39,7 +39,7 @@ def read():
     kg1_intake.apply_registration(store, reg)
     inbound.receive_extract(
         store, reg, kg1_intake.load_snapshot(BASE / "sepsis_snapshot"),
-        known_packs={"sepsis-pack-1.2"})
+        known_packs={"sepsis-pack-1.3"})
     inbound.receive_estate(store, reg, BASE / "estate_snapshot")
     return ReadApi(store)
 

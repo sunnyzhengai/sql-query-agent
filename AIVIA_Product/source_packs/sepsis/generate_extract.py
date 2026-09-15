@@ -18,6 +18,12 @@ DECLARED CAVEATS (on the record, per pack law):
   written down, never inferred silently.
 - no values dump exists (no ZC-style source): values.csv is empty and
   the coverage gap is the honest state.
+- pack 1.3: columns.csv carries data_type (contract §2b) — the
+  vendor dictionary's declared type verbatim; §3c rows take the demo
+  catalog's DDL type where declared, else stay untyped. The §3c org
+  columns + authored descriptions (Phase C ruling T-3) are pack data
+  in org_dictionary.csv — the runbook's step-4c merged CSV — so
+  regeneration reproduces the authored truth instead of wiping it.
 
 Deterministic: byte-identical regeneration. Usage: python3 generate_extract.py
 """
@@ -31,7 +37,7 @@ ROOT = Path(__file__).resolve().parents[3]
 SRC = ROOT / "data" / "synthetic"
 OUT = ROOT / "AIVIA_Product" / "estates" / "sepsis"
 
-PACK_VERSION = "sepsis-pack-1.2"
+PACK_VERSION = "sepsis-pack-1.3"
 AS_OF = "2026-09-06T00:00:00Z"
 DB, SERVER, SOURCE = "aivia_demo_src", "SEPSISSERVER", "emr"
 
@@ -73,12 +79,13 @@ STUB_DDL = ("data/demo/seed_demo_tables.sql",
 _CREATE = re.compile(
     r"CREATE TABLE \[(reporting|reports)\]\.\[(\w+)\]\s*\((.*?)\);",
     re.S | re.I)
-_COL = re.compile(r"^\s*\[(\w+)\]", re.M)
+_COL = re.compile(r"^\s*\[(\w+)\]\s+([A-Z][A-Z0-9]*(?:\([^)]*\))?)", re.M)
 
 
-def org_catalog_columns() -> "dict[str, list[str]]":
+def org_catalog_columns() -> "dict[str, list[tuple]]":
     """§3c for the demo source: org-schema columns from the stub DDL
-    (the demo database's catalog). {TABLE_UPPER: [columns]}."""
+    (the demo database's catalog). {TABLE_UPPER: [(column, type)]} —
+    the type is the catalog's declared type, verbatim (§2b)."""
     out = {}
     for name in STUB_DDL:
         for schema, table, body in _CREATE.findall(
@@ -122,25 +129,46 @@ def main():
                         row["TABLE_NAME"], row["DESCRIPTION"]])
     cols_by_table = {}
     catalog = org_catalog_columns()
+    org_dict = list(csv.DictReader(
+        open(Path(__file__).resolve().parent / "org_dictionary.csv")))
     with open(snap / "columns.csv", "w", newline="") as f:
         w = csv.writer(f)
-        w.writerow(["schema", "table", "column", "description"])
+        # pack 1.3: data_type emitted per contract §2b — the source's
+        # declared type, verbatim; dictionary rows carry the vendor's
+        # DATA_TYPE, §3c rows carry the catalog's DDL type
+        w.writerow(["schema", "table", "column", "description",
+                    "data_type"])
         for row in columns:
             w.writerow([schema_of(row["TABLE_NAME"]),
                         row["TABLE_NAME"], row["COLUMN_NAME"],
-                        row["DESCRIPTION"]])
+                        row["DESCRIPTION"], row["DATA_TYPE"]])
             cols_by_table.setdefault(row["TABLE_NAME"], []).append(
                 row["COLUMN_NAME"])
-        # §3c org-catalog part: columns the dictionary never carried,
-        # from the demo db's catalog (stub DDL); descriptions ABSENT
-        # by construction -> counted documentation gaps
-        for trow in tables:
-            name = trow["TABLE_NAME"]
-            have = {c.upper() for c in cols_by_table.get(name, [])}
-            for col in catalog.get(name.upper(), []):
-                if col.upper() not in have:
-                    w.writerow([schema_of(name), name, col, ""])
-                    cols_by_table.setdefault(name, []).append(col)
+        # §3c org-catalog part, as the runbook's step-4c MERGED CSV:
+        # the org columns + their authored descriptions are pack data
+        # (org_dictionary.csv — the Phase C T-3 repair, moved out of
+        # the snapshot so regeneration reproduces it instead of
+        # wiping it); the stub DDL (the demo db's catalog) supplies
+        # the declared type where it has one — a column the catalog
+        # never declared stays untyped, never guessed
+        type_of = {(t, c.upper()): dtype
+                   for t, cols in catalog.items()
+                   for c, dtype in cols}
+        seen = {(r["TABLE_NAME"].upper(), r["COLUMN_NAME"].upper())
+                for r in columns}
+        for row in org_dict:
+            name, col = row["table"], row["column"]
+            if (name.upper(), col.upper()) in seen:
+                continue
+            w.writerow([row["schema"], name, col, row["description"],
+                        type_of.get((name.upper(), col.upper()), "")])
+            cols_by_table.setdefault(name, []).append(col)
+            seen.add((name.upper(), col.upper()))
+        uncovered = [(t, c) for t, cols in catalog.items()
+                     for c, _ in cols if (t, c.upper()) not in seen]
+        assert not uncovered, (
+            "demo catalog columns missing from the merged org "
+            f"dictionary — extend org_dictionary.csv: {uncovered}")
     with open(snap / "pk.csv", "w", newline="") as f:
         w = csv.writer(f)
         w.writerow(["schema", "table", "column", "ordinal"])

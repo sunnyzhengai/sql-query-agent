@@ -27,7 +27,7 @@ def shaken():
     kg1_intake.apply_registration(store, reg)
     extract = inbound.receive_extract(
         store, reg, kg1_intake.load_snapshot(BASE / "sepsis_snapshot"),
-        known_packs={"sepsis-pack-1.2"})
+        known_packs={"sepsis-pack-1.3"})
     estate = inbound.receive_estate(store, reg, BASE / "estate_snapshot")
     return store, extract, estate
 
@@ -38,6 +38,18 @@ def test_extract_counters(shaken):
     assert len(store.current_nodes("table")) == want["tables"]
     assert len(store.current_nodes("column")) == want["columns"]
     assert len(extract.pending_references) == want["pending"]
+
+
+def test_data_type_rides_the_extract(shaken):
+    """Pack 1.3 (contract §2b): the declared type is on the column
+    nodes — 4138 vendor-dictionary + 242 demo-catalog columns typed;
+    the 174 org-staging columns the catalog never declared stay
+    ABSENT (opportunistic — no empty shells, no guesses)."""
+    store, _, _ = shaken
+    cols = store.current_nodes("column")
+    typed = [c for c in cols if "data_type" in c.properties]
+    assert len(typed) == 4380
+    assert all(c.properties["data_type"].strip() for c in typed)
 
 
 def test_estate_conservation(shaken):

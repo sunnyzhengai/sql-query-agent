@@ -30,7 +30,7 @@ SEED = (ROOT / "data/shapes/generated/seed/01_schema_and_data.sql")
 SQL_DIR = ROOT / "data/shapes/generated/sql"
 OUT = ROOT / "AIVIA_Product/estates/shapes"
 
-PACK_VERSION = "shapes-pack-1.0"
+PACK_VERSION = "shapes-pack-1.1"
 AS_OF = "2026-09-06T00:00:00Z"
 DB, SERVER, SOURCE = "aivia_demo_src", "SHAPESERVER", "shapes"
 
@@ -51,6 +51,21 @@ PK_OVERRIDES = {
 JOIN_EXTRAS = [
     ("DIAGNOSIS_CODES", "ICD_CODE", "DIAGNOSIS_CODESET", "DX_CODE"),
 ]
+
+# pack 1.1: data_type per contract §2b — this synthetic vendor's only
+# catalog is the seed DDL, so the declared type is read from its
+# CREATE TABLE lines, verbatim; opportunistic (a column the seed
+# doesn't declare stays absent, never guessed)
+_SEED_CREATE = re.compile(r"CREATE TABLE dbo\.\[(\w+)\] \((.*?)\);",
+                          re.S)
+_SEED_COL = re.compile(r"\[(\w+)\] ([A-Z][A-Z0-9]*(?:\([^)]*\))?)")
+
+
+def declared_types(seed_text: str) -> "dict[tuple, str]":
+    """{(table, column): declared type} from the seed DDL."""
+    return {(tbl, col): dtype
+            for tbl, body in _SEED_CREATE.findall(seed_text)
+            for col, dtype in _SEED_COL.findall(body)}
 
 
 def declared_pk(table: str, columns: dict) -> list:
@@ -92,12 +107,16 @@ def main():
         w.writerow(["schema", "table", "description"])
         for name, spec in tables.items():
             w.writerow(["dbo", name, spec["description"]])
+    seed_text = SEED.read_text()
+    types = declared_types(seed_text)
     with open(snap / "columns.csv", "w", newline="") as f:
         w = csv.writer(f)
-        w.writerow(["schema", "table", "column", "description"])
+        w.writerow(["schema", "table", "column", "description",
+                    "data_type"])
         for name, spec in tables.items():
             for col, desc in spec["columns"].items():
-                w.writerow(["dbo", name, col, desc])
+                w.writerow(["dbo", name, col, desc,
+                            types.get((name, col), "")])
     with open(snap / "pk.csv", "w", newline="") as f:
         w = csv.writer(f)
         w.writerow(["schema", "table", "column", "ordinal"])
@@ -128,7 +147,6 @@ def main():
 
     # Script 2: the values dump — codeset (code, meaning) rows from the
     # deterministic seed INSERTs
-    seed_text = SEED.read_text()
     with open(snap / "values.csv", "w", newline="") as f:
         w = csv.writer(f)
         w.writerow(["table", "code", "meaning"])

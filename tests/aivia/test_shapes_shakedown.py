@@ -33,7 +33,7 @@ def shaken():
     kg1_intake.apply_registration(store, reg)
     extract = inbound.receive_extract(
         store, reg, kg1_intake.load_snapshot(BASE / "shapes_snapshot"),
-        known_packs={"shapes-pack-1.0"})
+        known_packs={"shapes-pack-1.1"})
     estate = inbound.receive_estate(store, reg, BASE / "estate_snapshot")
     return store, extract, estate
 
@@ -46,6 +46,16 @@ def test_extract_counters(shaken):
     assert len(extract.quarantined_join_groups) == want["quarantined"]
     assert len(extract.illegal_declarations) == want["illegal"]
     assert len(extract.pending_references) == want["pending"]
+
+
+def test_data_type_rides_the_extract(shaken):
+    """Pack 1.1 (contract §2b): the synthetic vendor's seed DDL
+    declares every palette column, so every column node carries its
+    declared type — verbatim, none empty."""
+    store, _, _ = shaken
+    cols = store.current_nodes("column")
+    assert cols and all(
+        c.properties.get("data_type", "").strip() for c in cols)
 
 
 def test_estate_conservation_counters(shaken):

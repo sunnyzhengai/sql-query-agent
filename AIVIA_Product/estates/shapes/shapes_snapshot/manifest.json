@@ -4,6 +4,6 @@
  "db_name": "aivia_demo_src",
  "server": "SHAPESERVER",
  "as_of": "2026-09-06T00:00:00Z",
- "source_pack_version": "shapes-pack-1.0",
+ "source_pack_version": "shapes-pack-1.1",
  "default_schema": "dbo"
 }

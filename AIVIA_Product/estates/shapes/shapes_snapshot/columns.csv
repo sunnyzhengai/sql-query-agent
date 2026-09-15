@@ -1,77 +1,77 @@
-schema,table,column,description
-dbo,PATIENTS,PATIENT_ID,Unique patient identifier.
-dbo,PATIENTS,PATIENT_NAME,Patient display name (synthetic).
-dbo,PATIENTS,BIRTH_DATE,Patient date of birth.
-dbo,PATIENTS,ACTIVE_FLAG,1 when the patient is active in the panel.
-dbo,PATIENTS,PRIMARY_LANGUAGE,Preferred language for outreach.
-dbo,ENCOUNTERS,ENCOUNTER_ID,Unique encounter identifier.
-dbo,ENCOUNTERS,PATIENT_ID,Patient seen in this encounter.
-dbo,ENCOUNTERS,ENCOUNTER_DATE,Date of the encounter.
-dbo,ENCOUNTERS,DEPARTMENT,Department where the encounter occurred.
-dbo,LAB_RESULTS,LAB_ID,Unique lab result identifier.
-dbo,LAB_RESULTS,PATIENT_ID,Patient the result belongs to.
-dbo,LAB_RESULTS,LAB_CODE,Laboratory test code.
-dbo,LAB_RESULTS,HBA1C_VALUE,Hemoglobin A1c percentage result.
-dbo,LAB_RESULTS,RESULT_DATE,Date the result was finalized.
-dbo,DIAGNOSIS_CODES,DX_ID,Unique diagnosis row identifier.
-dbo,DIAGNOSIS_CODES,PATIENT_ID,Diagnosed patient.
-dbo,DIAGNOSIS_CODES,ICD_CODE,ICD-10 diagnosis code.
-dbo,DIAGNOSIS_CODES,DX_DATE,Date the diagnosis was recorded.
-dbo,MEDICATION_ORDERS,ORDER_ID,Unique medication order identifier.
-dbo,MEDICATION_ORDERS,PATIENT_ID,Patient the order was placed for.
-dbo,MEDICATION_ORDERS,MED_NAME,Ordered medication name.
-dbo,MEDICATION_ORDERS,ORDER_DATE,Date the order was placed.
-dbo,PROBLEM_LIST,PROBLEM_ID,Unique problem-list entry identifier.
-dbo,PROBLEM_LIST,PATIENT_ID,Patient the problem belongs to.
-dbo,PROBLEM_LIST,PROBLEM_CODE,Coded problem entry.
-dbo,PROBLEM_LIST,NOTED_DATE,Date the problem was noted.
-dbo,ENCOUNTER_DIAGNOSIS,ENC_DX_ID,Unique encounter-diagnosis row identifier.
-dbo,ENCOUNTER_DIAGNOSIS,ENCOUNTER_ID,Encounter the diagnosis was coded on.
-dbo,ENCOUNTER_DIAGNOSIS,PATIENT_ID,Diagnosed patient.
-dbo,ENCOUNTER_DIAGNOSIS,DX_CODE,ICD-10 code assigned on the encounter.
-dbo,HOSPITAL_ENCOUNTERS,HOSP_ENC_ID,Unique hospital encounter identifier.
-dbo,HOSPITAL_ENCOUNTERS,PATIENT_ID,Patient seen.
-dbo,HOSPITAL_ENCOUNTERS,ENCOUNTER_TYPE,ED or IP.
-dbo,HOSPITAL_ENCOUNTERS,ADMIT_DATE,Admission or arrival date.
-dbo,HOSPITAL_DIAGNOSIS,HOSP_DX_ID,Unique hospital-diagnosis row identifier.
-dbo,HOSPITAL_DIAGNOSIS,HOSP_ENC_ID,Hospital encounter the diagnosis belongs to.
-dbo,HOSPITAL_DIAGNOSIS,PATIENT_ID,Diagnosed patient.
-dbo,HOSPITAL_DIAGNOSIS,DX_CODE,ICD-10 code assigned in hospital.
-dbo,LAB_ORDERS,LAB_ORDER_ID,Unique lab order identifier.
-dbo,LAB_ORDERS,HOSP_ENC_ID,Hospital encounter the order belongs to.
-dbo,LAB_ORDERS,PATIENT_ID,Ordered-for patient.
-dbo,LAB_ORDERS,ORDERED_DATE,Date the order was placed.
-dbo,PROFESSIONAL_BILLING,BILLING_ID,Unique billing transaction identifier.
-dbo,PROFESSIONAL_BILLING,PATIENT_ID,Billed patient.
-dbo,PROFESSIONAL_BILLING,CPT_ROW_ID,Billed CPT row reference.
-dbo,PROFESSIONAL_BILLING,SERVICE_DATE,Date of service billed.
-dbo,CPT_CODES,CPT_ROW_ID,Unique CPT row identifier.
-dbo,CPT_CODES,CPT_CODE,Billed CPT code.
-dbo,CPT_CODES,PATIENT_ID,Patient the code was billed for.
-dbo,OR_CASES,CASE_ID,Unique OR case identifier.
-dbo,OR_CASES,PATIENT_ID,Surgical patient.
-dbo,OR_CASES,CASE_DATE,Scheduled case date.
-dbo,PROCEDURE_ORDERS,PROC_ORDER_ID,Unique procedure order identifier.
-dbo,PROCEDURE_ORDERS,CASE_ID,OR case the order belongs to.
-dbo,PROCEDURE_ORDERS,PATIENT_ID,Patient the procedure is for.
-dbo,PROCEDURE_ORDERS,PROC_CODE,Ordered procedure code.
-dbo,APPOINTMENTS,APPT_ID,Unique appointment identifier.
-dbo,APPOINTMENTS,PATIENT_ID,Scheduled patient.
-dbo,APPOINTMENTS,APPT_STATUS,"completed, cancelled, or no-show."
-dbo,APPOINTMENTS,APPT_DATE,Appointment date.
-dbo,PATIENT_PCP_ASSIGNMENT,ASSIGN_ID,Unique assignment row identifier.
-dbo,PATIENT_PCP_ASSIGNMENT,PATIENT_ID,Attributed patient.
-dbo,PATIENT_PCP_ASSIGNMENT,PCP_NAME,Assigned primary-care provider.
-dbo,DM_REGISTRY,REGISTRY_ID,Unique registry row identifier.
-dbo,DM_REGISTRY,PATIENT_ID,Registry member patient.
-dbo,DM_REGISTRY,ENROLLED_DATE,Registry enrollment date.
-dbo,DIAGNOSIS_CODESET,DX_CODE,ICD-10 code.
-dbo,DIAGNOSIS_CODESET,DX_DESCRIPTION,Code description.
-dbo,LAB_CODESET,LAB_CODE,Lab test code.
-dbo,LAB_CODESET,LAB_DESCRIPTION,Test description.
-dbo,MED_CODESET,MED_CODE,Medication code.
-dbo,MED_CODESET,MED_DESCRIPTION,Medication description.
-dbo,CPT_CODESET,CPT_CODE,CPT code.
-dbo,CPT_CODESET,CPT_DESCRIPTION,Code description.
-dbo,PROC_CODESET,PROC_CODE,Procedure code.
-dbo,PROC_CODESET,PROC_DESCRIPTION,Code description.
+schema,table,column,description,data_type
+dbo,PATIENTS,PATIENT_ID,Unique patient identifier.,INT
+dbo,PATIENTS,PATIENT_NAME,Patient display name (synthetic).,NVARCHAR(200)
+dbo,PATIENTS,BIRTH_DATE,Patient date of birth.,DATE
+dbo,PATIENTS,ACTIVE_FLAG,1 when the patient is active in the panel.,CHAR(1)
+dbo,PATIENTS,PRIMARY_LANGUAGE,Preferred language for outreach.,NVARCHAR(200)
+dbo,ENCOUNTERS,ENCOUNTER_ID,Unique encounter identifier.,INT
+dbo,ENCOUNTERS,PATIENT_ID,Patient seen in this encounter.,INT
+dbo,ENCOUNTERS,ENCOUNTER_DATE,Date of the encounter.,DATE
+dbo,ENCOUNTERS,DEPARTMENT,Department where the encounter occurred.,NVARCHAR(200)
+dbo,LAB_RESULTS,LAB_ID,Unique lab result identifier.,INT
+dbo,LAB_RESULTS,PATIENT_ID,Patient the result belongs to.,INT
+dbo,LAB_RESULTS,LAB_CODE,Laboratory test code.,NVARCHAR(200)
+dbo,LAB_RESULTS,HBA1C_VALUE,Hemoglobin A1c percentage result.,"DECIMAL(4,1)"
+dbo,LAB_RESULTS,RESULT_DATE,Date the result was finalized.,DATE
+dbo,DIAGNOSIS_CODES,DX_ID,Unique diagnosis row identifier.,INT
+dbo,DIAGNOSIS_CODES,PATIENT_ID,Diagnosed patient.,INT
+dbo,DIAGNOSIS_CODES,ICD_CODE,ICD-10 diagnosis code.,NVARCHAR(200)
+dbo,DIAGNOSIS_CODES,DX_DATE,Date the diagnosis was recorded.,DATE
+dbo,MEDICATION_ORDERS,ORDER_ID,Unique medication order identifier.,INT
+dbo,MEDICATION_ORDERS,PATIENT_ID,Patient the order was placed for.,INT
+dbo,MEDICATION_ORDERS,MED_NAME,Ordered medication name.,NVARCHAR(200)
+dbo,MEDICATION_ORDERS,ORDER_DATE,Date the order was placed.,DATE
+dbo,PROBLEM_LIST,PROBLEM_ID,Unique problem-list entry identifier.,INT
+dbo,PROBLEM_LIST,PATIENT_ID,Patient the problem belongs to.,INT
+dbo,PROBLEM_LIST,PROBLEM_CODE,Coded problem entry.,NVARCHAR(200)
+dbo,PROBLEM_LIST,NOTED_DATE,Date the problem was noted.,DATE
+dbo,ENCOUNTER_DIAGNOSIS,ENC_DX_ID,Unique encounter-diagnosis row identifier.,INT
+dbo,ENCOUNTER_DIAGNOSIS,ENCOUNTER_ID,Encounter the diagnosis was coded on.,INT
+dbo,ENCOUNTER_DIAGNOSIS,PATIENT_ID,Diagnosed patient.,INT
+dbo,ENCOUNTER_DIAGNOSIS,DX_CODE,ICD-10 code assigned on the encounter.,NVARCHAR(200)
+dbo,HOSPITAL_ENCOUNTERS,HOSP_ENC_ID,Unique hospital encounter identifier.,INT
+dbo,HOSPITAL_ENCOUNTERS,PATIENT_ID,Patient seen.,INT
+dbo,HOSPITAL_ENCOUNTERS,ENCOUNTER_TYPE,ED or IP.,NVARCHAR(200)
+dbo,HOSPITAL_ENCOUNTERS,ADMIT_DATE,Admission or arrival date.,DATE
+dbo,HOSPITAL_DIAGNOSIS,HOSP_DX_ID,Unique hospital-diagnosis row identifier.,INT
+dbo,HOSPITAL_DIAGNOSIS,HOSP_ENC_ID,Hospital encounter the diagnosis belongs to.,INT
+dbo,HOSPITAL_DIAGNOSIS,PATIENT_ID,Diagnosed patient.,INT
+dbo,HOSPITAL_DIAGNOSIS,DX_CODE,ICD-10 code assigned in hospital.,NVARCHAR(200)
+dbo,LAB_ORDERS,LAB_ORDER_ID,Unique lab order identifier.,INT
+dbo,LAB_ORDERS,HOSP_ENC_ID,Hospital encounter the order belongs to.,INT
+dbo,LAB_ORDERS,PATIENT_ID,Ordered-for patient.,INT
+dbo,LAB_ORDERS,ORDERED_DATE,Date the order was placed.,DATE
+dbo,PROFESSIONAL_BILLING,BILLING_ID,Unique billing transaction identifier.,INT
+dbo,PROFESSIONAL_BILLING,PATIENT_ID,Billed patient.,INT
+dbo,PROFESSIONAL_BILLING,CPT_ROW_ID,Billed CPT row reference.,INT
+dbo,PROFESSIONAL_BILLING,SERVICE_DATE,Date of service billed.,DATE
+dbo,CPT_CODES,CPT_ROW_ID,Unique CPT row identifier.,INT
+dbo,CPT_CODES,CPT_CODE,Billed CPT code.,NVARCHAR(200)
+dbo,CPT_CODES,PATIENT_ID,Patient the code was billed for.,INT
+dbo,OR_CASES,CASE_ID,Unique OR case identifier.,INT
+dbo,OR_CASES,PATIENT_ID,Surgical patient.,INT
+dbo,OR_CASES,CASE_DATE,Scheduled case date.,DATE
+dbo,PROCEDURE_ORDERS,PROC_ORDER_ID,Unique procedure order identifier.,INT
+dbo,PROCEDURE_ORDERS,CASE_ID,OR case the order belongs to.,INT
+dbo,PROCEDURE_ORDERS,PATIENT_ID,Patient the procedure is for.,INT
+dbo,PROCEDURE_ORDERS,PROC_CODE,Ordered procedure code.,NVARCHAR(200)
+dbo,APPOINTMENTS,APPT_ID,Unique appointment identifier.,INT
+dbo,APPOINTMENTS,PATIENT_ID,Scheduled patient.,INT
+dbo,APPOINTMENTS,APPT_STATUS,"completed, cancelled, or no-show.",NVARCHAR(200)
+dbo,APPOINTMENTS,APPT_DATE,Appointment date.,DATE
+dbo,PATIENT_PCP_ASSIGNMENT,ASSIGN_ID,Unique assignment row identifier.,INT
+dbo,PATIENT_PCP_ASSIGNMENT,PATIENT_ID,Attributed patient.,INT
+dbo,PATIENT_PCP_ASSIGNMENT,PCP_NAME,Assigned primary-care provider.,NVARCHAR(200)
+dbo,DM_REGISTRY,REGISTRY_ID,Unique registry row identifier.,INT
+dbo,DM_REGISTRY,PATIENT_ID,Registry member patient.,INT
+dbo,DM_REGISTRY,ENROLLED_DATE,Registry enrollment date.,DATE
+dbo,DIAGNOSIS_CODESET,DX_CODE,ICD-10 code.,NVARCHAR(200)
+dbo,DIAGNOSIS_CODESET,DX_DESCRIPTION,Code description.,NVARCHAR(200)
+dbo,LAB_CODESET,LAB_CODE,Lab test code.,NVARCHAR(200)
+dbo,LAB_CODESET,LAB_DESCRIPTION,Test description.,NVARCHAR(200)
+dbo,MED_CODESET,MED_CODE,Medication code.,NVARCHAR(200)
+dbo,MED_CODESET,MED_DESCRIPTION,Medication description.,NVARCHAR(200)
+dbo,CPT_CODESET,CPT_CODE,CPT code.,NVARCHAR(200)
+dbo,CPT_CODESET,CPT_DESCRIPTION,Code description.,NVARCHAR(200)
+dbo,PROC_CODESET,PROC_CODE,Procedure code.,NVARCHAR(200)
+dbo,PROC_CODESET,PROC_DESCRIPTION,Code description.,NVARCHAR(200)
