@@ -216,6 +216,124 @@ def test_blessed_name_speaks_in_recordedness():
         == "The medication time is not recorded."
 
 
+def test_possessive_speaks_when_owner_table_blessed():
+    # R5.c (v2.9.0, Sunny's "go with your recommendations",
+    # 2026-09-14): the v2.6.0 deferral closes — a blessed TABLE
+    # name is the owner vocabulary, and recordedness identification
+    # gains its missing half
+    store, read = _world()
+    _bless(store, TBL, "medication administration", TBL_DESC)
+    voice = produce._Voice(read, {})
+    pred = {"kind": "NULL_CHECK", "node": "predicate",
+            "subject": _ref(TAKEN, "MA.TAKEN_TIME")}
+    assert produce._voice_predicate(pred, voice) \
+        == ("The medication administration's taken time "
+            "is not recorded.")
+    # the folded positive (2.5.0 NOT + 2.6.0) carries it too
+    neg = {"kind": "NOT", "node": "predicate", "children": [pred]}
+    assert produce._voice_predicate(neg, voice) \
+        == "The medication administration's taken time is recorded."
+
+
+def test_possessive_composes_with_blessed_column_words():
+    # both grains blessed: the owner possessive wraps the blessed
+    # column words — one ladder, two registries entries
+    store, read = _world()
+    _bless(store, TBL, "medication administration", TBL_DESC)
+    _bless(store, TAKEN, "medication time", TAKEN_DESC)
+    voice = produce._Voice(read, {})
+    pred = {"kind": "NULL_CHECK", "node": "predicate",
+            "subject": _ref(TAKEN, "MA.TAKEN_TIME")}
+    assert produce._voice_predicate(pred, voice) \
+        == ("The medication administration's medication time "
+            "is not recorded.")
+
+
+def test_possessive_never_speaks_raw_table_names():
+    # A1, the deferral's whole reason: unblessed owner = 2.8.0
+    # verbatim — never "the med admin records's"
+    store, read = _world()
+    voice = produce._Voice(read, {})
+    pred = {"kind": "NULL_CHECK", "node": "predicate",
+            "subject": _ref(TAKEN, "MA.TAKEN_TIME")}
+    assert produce._voice_predicate(pred, voice) \
+        == "The taken time is not recorded."
+
+
+def test_possessive_delta_is_per_owner_table():
+    # A2 shape: blessing ONE table changes ITS columns'
+    # recordedness phrases and nobody else's
+    store, read = _world()
+    _bless(store, TBL, "medication administration", TBL_DESC)
+    voice = produce._Voice(read, {})
+    other = {"kind": "NULL_CHECK", "node": "predicate",
+             "subject": _ref(DEPART, "B.ED_DEPARTURE_TIME")}
+    assert produce._voice_predicate(other, voice) \
+        == "The ed departure time is not recorded."
+
+
+def test_possessive_stays_out_of_relations_and_values():
+    # ruled position (1)(a): recordedness only — relation sentences
+    # already carry two anchors; value predicates DEFINE, and the
+    # owner is anatomy there
+    store, read = _world()
+    _bless(store, TBL, "medication administration", TBL_DESC)
+    voice = produce._Voice(read, {})
+    rel = {"kind": "COMPARE_LT", "node": "predicate",
+           "subject": _ref(TAKEN, "MA.TAKEN_TIME"),
+           "comparand": _ref(DEPART, "B.ED_DEPARTURE_TIME")}
+    assert produce._voice_predicate(rel, voice) \
+        == "The taken time is before the ed departure time."
+    val = {"kind": "COMPARE_EQ", "node": "predicate",
+           "subject": _ref(COL, "MA.MAR_ACTION_CODE"),
+           "comparand": {"kind": "literal", "value": "1"}}
+    assert "'s" not in produce._voice_predicate(val, voice)
+
+
+def test_possessive_s_ending_head_takes_plain_apostrophe_s():
+    # ruled form (3): 's unchanged on s-ending heads — one closed
+    # rule, no exceptions to memorize
+    store, read = _world()
+    dx_tbl = "SIMEMR|dbo|ENCOUNTER_DX"
+    dx_col = dx_tbl + "|DX_TIME"
+    store.append_node("table", dx_tbl,
+                      {"description": "The encounter diagnosis "
+                                      "records."}, T0, "test")
+    store.append_node("column", dx_col,
+                      {"description": "The time of the diagnosis."},
+                      T0, "test")
+    _bless(store, dx_tbl, "encounter diagnosis",
+           "The encounter diagnosis records.")
+    voice = produce._Voice(ReadApi(store), {})
+    pred = {"kind": "NULL_CHECK", "node": "predicate",
+            "subject": _ref(dx_col, "DX.DX_TIME")}
+    assert produce._voice_predicate(pred, voice) \
+        == "The encounter diagnosis's dx time is not recorded."
+
+
+def test_possessive_stutter_is_spoken_not_suppressed():
+    # ruled door (4)(α): no mechanical guard — the render speaks
+    # what the registries hold; the smell census is the eye and
+    # the steward's re-blessing is the cure
+    store, read = _world()
+    st_tbl = "SIMEMR|reports|SEVERE_SEPSIS_STAGING"
+    st_col = st_tbl + "|SEVERE_SEPSIS_FLAG"
+    store.append_node("table", st_tbl,
+                      {"description": "Staging rows for severe "
+                                      "sepsis review."}, T0, "test")
+    store.append_node("column", st_col,
+                      {"description": "Flags severe sepsis."},
+                      T0, "test")
+    _bless(store, st_tbl, "severe sepsis staging",
+           "Staging rows for severe sepsis review.")
+    voice = produce._Voice(ReadApi(store), {})
+    pred = {"kind": "NULL_CHECK", "node": "predicate",
+            "subject": _ref(st_col, "S.SEVERE_SEPSIS_FLAG")}
+    assert produce._voice_predicate(pred, voice) \
+        == ("The severe sepsis staging's severe sepsis flag "
+            "is not recorded.")
+
+
 def test_temporal_union_blessing_only_adds_evidence():
     # rider (c) RULED: a blessed name without a temporal noun must
     # not flip the verb numeric — the fallback words join the test

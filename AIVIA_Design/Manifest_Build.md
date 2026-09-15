@@ -1085,3 +1085,14 @@ packs EMIT):**
 | PROTECTED SCRIPT 1 (Epic Clarity): the columns query gains the declared-type select — candidate construct DATA_TYPE_C -> ZC_DATA_TYPE.NAME, marked CONFIRM LIVE in the script; the historical extract's vocabulary (VARCHAR/INTEGER/NUMERIC/DATETIME/FLOAT/BIGINT/DATE) is the acceptance signature | DRAFTED — OPEN CONFIRM on a live estate (gitignored folder, ships via engagement channel only) | AIVIA_Protected/Vendor Metadata Extraction.sql + pack NOTES entry |
 | ed_sepsis_dev UNTOUCHED by design: the dev estate stays at pack 1.2 with its 441 hand-stamped DATETIMEs (its consumers read the pack version from the manifest, so nothing pins it) | HELD | manifest.json still sepsis-pack-1.2 |
 | FULL SUITE + LINT | GREEN | **2116 passed · 25 skipped · 8 xfailed · 0 failed** (0:11:03, Homebrew 3.11 + DOTNET_ROOT); changed files ruff-clean; TEST_MAP regenerated (2011 tests); both packs re-run BYTE-IDENTICAL |
+
+**R5.c THE OWNER-POSSESSIVE RULED + BUILT (Sunny's "go with your
+recommendations" on the item-9 brief, 2026-09-14 — proposed,
+ruled and built the same sitting; Grammar_Floor v2.9.0):**
+
+| claim | state | evidence |
+|---|---|---|
+| THE FOUR RULINGS (= the brief's recommendations, now law): (1) recordedness positions ONLY — relation sides and value subjects stay possessive-free; (2) ALWAYS-when-blessed — only-on-collision would make a phrase's text depend on its neighbors and break delta-by-name; (3) the 's form on every head, s-ending unchanged; (4) NO stutter guard — a smell flags, never verdicts | RULED (Grammar_Floor §R5.c + the v2.9.0 header note) | the four question blocks, each marked with its ruling |
+| THE WIRE: _Voice.owner_words (blessed 3-part lookup, EMPTY when unblessed — a possessive NEVER speaks a raw table name, the v2.6.0 deferral's whole reason) + _ident_subject speaks "the <owner>'s <name words>"; constant 2.9.0 + F4 basis pin bumped consciously (A1 held — no blessed nodes in the F4 worlds, floor texts byte-exact) | BUILT (test-first: 7 tests before the wire) | test_possessive_speaks_when_owner_table_blessed (both polarities) · _composes_with_blessed_column_words · _never_speaks_raw_table_names (A1) · _delta_is_per_owner_table (A2 grain) · _stays_out_of_relations_and_values · _s_ending_head_takes_plain_apostrophe_s · _stutter_is_spoken_not_suppressed |
+| THE ESTATE LEG rides Sunny's hand (the R5.b seed law): 6 tables blessed today; the A3 corpse ("The recorded time is recorded.", 10 smelled instances) dies when its owner table gets blessed and the next console boot re-voices; M3 export debt rides the batch law; smell census re-render at the next sweep | HELD — Sunny's pace | blessed_subjects.json (6 table-grain rows) |
+| FULL SUITE + LINT | GREEN | **2123 passed · 25 skipped · 8 xfailed · 0 failed** (0:11:52); changed files ruff-clean; TEST_MAP regenerated (2018 tests) |

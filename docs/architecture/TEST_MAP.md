@@ -7,7 +7,7 @@
 
 # Test Map — what every test proves
 
-184 modules, 2011 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
+184 modules, 2018 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
 
 ## By ADR
 
@@ -164,7 +164,7 @@
 - `tests/aivia/test_acronym_enrichment.py` (7): PHASE I — ACRONYM ENRICHMENT (the one-vocabulary law, ruled
 - `tests/aivia/test_approve_land.py` (10): Slice 6 exit: the F5 script against the BUILT approve/land flows.
 - `tests/aivia/test_ask_console.py` (21): Tier A exit (ADR 0079): the F10 answer keys go RUNNABLE.
-- `tests/aivia/test_blessings.py` (29): R5.b THE BLESSED NAME, slice 1 (Grammar_Floor v2.8.0, ratified
+- `tests/aivia/test_blessings.py` (36): R5.b THE BLESSED NAME, slice 1 (Grammar_Floor v2.8.0, ratified
 - `tests/aivia/test_center_censuses.py` (18): ADR 0080 — the center and the three censuses, red-first.
 - `tests/aivia/test_click_reroute.py` (4): STEP A of the search rebuild — CLICKS ARE STEER (gap 12). Suite
 - `tests/aivia/test_connection_census.py` (9): STEP 1 of the Connection Ledger build — THE TEST SUITE, shown to

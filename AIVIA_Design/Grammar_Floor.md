@@ -1,9 +1,25 @@
-# The Floor Grammar — v2.8.0 (THE BLESSED NAME ratified
-# 2026-09-12; v2.7.0 the relation rule + v2.6.0 recordedness
-# identifies + v2.5.0 NOT folds same day; v2.4.0 the OPENER
-# dies 2026-09-11; v2.3.0 REPORT FLOOR 2026-09-07; v2.0.0
-# POLICY-WALK major 2026-09-06; v1.3.1 RATIFIED Sunny
-# 2026-09-05)
+# The Floor Grammar — v2.9.0 (THE OWNER-POSSESSIVE ratified
+# 2026-09-14; v2.8.0 THE BLESSED NAME 2026-09-12; v2.7.0 the
+# relation rule + v2.6.0 recordedness identifies + v2.5.0 NOT
+# folds same day; v2.4.0 the OPENER dies 2026-09-11; v2.3.0
+# REPORT FLOOR 2026-09-07; v2.0.0 POLICY-WALK major 2026-09-06;
+# v1.3.1 RATIFIED Sunny 2026-09-05)
+
+*v2.9.0 (Sunny's ruling, 2026-09-14 — "go with your
+recommendations" on the R5.c brief): THE OWNER-POSSESSIVE — the
+v2.6.0 deferral closes on its prerequisite (R5.b's blessed table
+grain). Recordedness subjects speak the blessed OWNER table
+possessively ("The medication administration's taken time is
+not recorded."): identification points, and the owner is the
+pointer's missing half. Ruled with it: recordedness positions
+ONLY (relation sentences carry two anchors; value predicates
+define, the owner is anatomy there); ALWAYS-when-blessed (text
+stays a pure function of node + registry — delta-by-name holds);
+the 's form on every head (s-ending unchanged); NO stutter guard
+(a smell flags, never verdicts — the census is the eye, the
+steward's re-blessing the cure). Unblessed owner = 2.8.0
+verbatim (A1): the possessive never speaks a raw table name —
+that was the deferral's whole reason. Full spec: §R5.c below.*
 
 *v2.8.0 (Sunny's ratification, 2026-09-12 — the sixth go of the
 day, closing the dig that began at "how does condition get
@@ -656,8 +672,9 @@ them; the ed_sepsis registry stays empty until Sunny fires the
 first namer batch and blesses. The 2.4.0/2.5.0 doc-vs-constant
 drift class: handled by declaration, closed on schedule.
 
-## R5.c — THE OWNER-POSSESSIVE (PROPOSED 2026-09-14; UNRULED —
-## the questions below are Sunny's)
+## R5.c — THE OWNER-POSSESSIVE (RATIFIED v2.9.0, Sunny
+## 2026-09-14: "go with your recommendations" — proposed,
+## ruled and built the same day)
 
 The v2.6.0 deferral, third act. The chain: RECORDEDNESS
 IDENTIFIES (v2.6.0) gave recordedness predicates a NAME-WORDS
@@ -688,7 +705,8 @@ touch").
   NOT yet blessed — the wiring is only-blessed-voices, so the
   register grows table by table at Sunny's blessing pace.
 
-### The questions — each needs a ruling before code
+### The questions — ALL RULED 2026-09-14 (Sunny: "go with your
+### recommendations" = each recommendation below is the ruling)
 
 (1) POSITIONS. (a) recordedness subjects only (_ident_subject,
     both polarities) — the deferral's own example, the smallest
@@ -747,3 +765,19 @@ touch").
 - The business reading ("the dose was actually given") — still
   the blessing path's, never the floor's (v2.6.0's second
   deferral, untouched).
+
+### The build (same day, test-first — 7 tests before the wire)
+
+_Voice.owner_words (blessed 3-part lookup, EMPTY when unblessed
+— the possessive never speaks a raw table name) + the
+_ident_subject wire; constant 2.9.0 + the F4 basis pin bumped
+consciously (A1 held: no blessed nodes in the F4 worlds, floor
+texts byte-exact). Gates as they landed: A1 pinned
+(test_possessive_never_speaks_raw_table_names + the standing
+column-only recordedness test); A2 pinned at mechanism grain
+(test_possessive_delta_is_per_owner_table); A3's estate corpse
+("The recorded time is recorded.") dies WHEN its owner table is
+blessed — the mechanism is pinned (stutter spoken-not-
+suppressed, s-ending 's, both-grains composition), the estate
+text changes ride Sunny's blessing pace + next console boot,
+per the R5.b seed law; M3 export debt rides the batch law.

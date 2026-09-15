@@ -68,7 +68,14 @@ ECON = json.loads((pathlib.Path(__file__).parent / "econ_params.json")
 # recordedness + relation sides), table source phrases
 # (_source_phrase) + R2 instance marking. Unblessed = 2.7.0
 # verbatim (A1); the proposer batch waits on riders (c)/(d).
-FLOOR_GRAMMAR_VERSION = "2.8.0"
+# 2.9.0: R5.c THE OWNER-POSSESSIVE (Sunny's "go with your
+# recommendations", 2026-09-14 — the v2.6.0 deferral closes):
+# recordedness subjects speak the blessed OWNER table
+# possessively ("the medication administration's taken time") —
+# recordedness only, always-when-blessed, 's on every head, no
+# stutter guard (the smell census is the eye). Unblessed owner =
+# 2.8.0 verbatim (A1).
+FLOOR_GRAMMAR_VERSION = "2.9.0"
 # literal: grammar Grammar_Floor R1
 _PREPOSITIONS = ("of", "on", "per", "for", "in", "at", "by", "with")
 # rider (c) amended (Sunny 2026-09-13): the dictionary's declared
@@ -186,6 +193,17 @@ class _Voice:
         heuristic middle tier exists for names."""
         target = expr.get("resolves_to") or ""
         return self.blessed.get(target) or _name_words(expr)
+
+    def owner_words(self, expr) -> str:
+        """R5.c (v2.9.0): the blessed OWNER name for a column_ref's
+        table — EMPTY when the table is unblessed. The possessive
+        never speaks raw table names; that was the v2.6.0
+        deferral's whole reason (premature wiring bakes jargon
+        into every phrase)."""
+        col_id = expr.get("resolves_to") or ""
+        if col_id.count("|") < 3:
+            return ""
+        return self.blessed.get(col_id.rsplit("|", 1)[0], "")
 
     def temporal_evidence(self, expr, spoken: str) -> str:
         """Rider (c) RULED — THE TEMPORAL UNION: blessing may only
@@ -451,14 +469,20 @@ def _ident_subject(pred, voice: _Voice) -> str:
     """GRAMMAR 2.6.0 — recordedness predicates IDENTIFY their
     subject (the column's name words) where value predicates
     DEFINE it (dictionary words): 'the taken time is recorded'
-    needs to point at the column, not to teach its meaning. The
-    owner-possessive form ('the administration's taken time') is
-    DEFERRED: owner words are raw table names until blessed
-    vocabulary wires into the render — premature wiring bakes
-    jargon into every phrase."""
+    needs to point at the column, not to teach its meaning.
+    GRAMMAR 2.9.0 (R5.c, ruled 2026-09-14) — the v2.6.0 deferral
+    closes: when the OWNER table has a blessed name, the pointer
+    gains its missing half ('the medication administration's
+    taken time'). Recordedness positions ONLY; always-when-
+    blessed (text stays a pure function of node + registry, so
+    delta-by-name holds); 's unchanged on s-ending heads; a
+    stutter is the smell census's to flag, never suppressed
+    here."""
     expr = pred.get("subject", {})
     if expr.get("kind") == "column_ref" and expr.get("ref"):
-        return voice.name_words(expr)
+        words = voice.name_words(expr)
+        owner = voice.owner_words(expr)
+        return f"{owner}'s {words}" if owner else words
     return voice.subject(expr)
 
 
