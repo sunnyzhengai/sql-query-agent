@@ -474,7 +474,14 @@ def _wired_world():
                       {"role": "subject"}, T0, "test")
     store.append_edge("resolves_to", "f::#s::cond#1", "f::param/@d",
                       {"role": "comparand"}, T0, "test")
-    store.append_edge("reads", "f::#s", TBL, {}, T0, "test")
+    # era 3 (2026-09-14): the no-join read is a direct_read node,
+    # never a reads edge
+    store.append_node("direct_read", "f::#s::read#1",
+                      {"name": "read#1"}, T0, "test")
+    store.append_edge("has_part", "f::#s", "f::#s::read#1",
+                      {}, T0, "test")
+    store.append_edge("left_side", "f::#s::read#1", TBL,
+                      {}, T0, "test")
     return store, read
 
 

@@ -149,20 +149,22 @@ def test_m2_store_matches_census(booted, exported):
                  "table": len(exported["graph_table"]),
                  "column": len(exported["graph_column"]),
                  "scope": len(exported["graph_scope"]),
-                 "join": len(exported["graph_join"])}
+                 "join": len(exported["graph_join"]),
+                 "direct_read": len(exported["graph_direct_read"])}
     assert got_nodes == want["nodes"]
     has_part = (len(exported["graph_has_part_dbSchema"])
                 + len(exported["graph_has_part_schemaTable"])
                 + len(exported["graph_has_part_tableColumn"])
-                + len(exported["graph_has_part_scopeJoin"]))
+                + len(exported["graph_has_part_scopeJoin"])
+                + len(exported["graph_has_part_scopeDirectRead"]))
     left = (len(exported["graph_left_side_joinTable"])
-            + len(exported["graph_left_side_joinScope"]))
+            + len(exported["graph_left_side_joinScope"])
+            + len(exported["graph_left_side_directReadTable"]))
     right = (len(exported["graph_right_side_joinTable"])
              + len(exported["graph_right_side_joinScope"]))
     got_edges = {"has_part": has_part,
                  "joins_to": len(exported["graph_joins_to_tableTable"]),
-                 "left_side": left, "right_side": right,
-                 "reads": len(exported["graph_reads_scopeTable"])}
+                 "left_side": left, "right_side": right}
     assert got_edges == want["edges"]
     d = DELTA["M2"]
     assert d["side_targets"]["table"] == \
@@ -222,23 +224,32 @@ def test_m2_drift_query_on_store(booted):
 
 
 def test_m2_coverage_invariants(booted):
-    """Disjoint: no table connected by BOTH a reads edge and a join
-    side of the same scope. Covering: remainder + covered == the
-    parse read-set (nothing silently unconnected)."""
+    """ERA 3 (ratified 2026-09-14): ONE invariant — per scope,
+    side-targets == read-set. The reads edge is retired; the
+    no-join FROM is a direct_read node with one left_side, so
+    DISJOINT is vacuous (one mechanism). The build-measured
+    numbers stand: 6 direct + 53 join-covered == 59 read-set."""
+    assert not list(booted.current_edges("reads"))  # retired
     tables = {n.identity for n in booted.current_nodes("table")}
-    side_tabs = {}
+    join_tabs, dr_tabs = {}, {}
     for lbl in ("left_side", "right_side"):
         for e in booted.current_edges(lbl):
-            if e.to_id in tables:
+            if e.to_id not in tables:
+                continue
+            if "::read#" in e.from_id:
+                scope = e.from_id.rsplit("::read#", 1)[0]
+                dr_tabs.setdefault(scope, set()).add(e.to_id)
+            else:
                 scope = e.from_id.rsplit("::join#", 1)[0]
-                side_tabs.setdefault(scope, set()).add(e.to_id)
-    reads = booted.current_edges("reads")
-    assert all(e.to_id not in side_tabs.get(e.from_id, set())
-               for e in reads)
+                join_tabs.setdefault(scope, set()).add(e.to_id)
+    # sanity (the old DISJOINT): a direct_read target is never
+    # also a join side of its own scope
+    for scope, tabs in dr_tabs.items():
+        assert not tabs & join_tabs.get(scope, set())
     want = DELTA["M2"]["reads"]
-    assert len(reads) == want["remainder"]
-    # covering: the union equals the read-set measured at build
-    assert len(reads) + want["covered_by_join_sides"] \
+    drs = booted.current_nodes("direct_read")
+    assert len(drs) == want["remainder"]
+    assert len(drs) + want["covered_by_join_sides"] \
         == want["read_set"]
 
 
@@ -254,6 +265,7 @@ def test_m3_store_matches_census(booted, exported):
                  "column": len(exported["graph_column"]),
                  "scope": len(exported["graph_scope"]),
                  "join": len(exported["graph_join"]),
+                 "direct_read": len(exported["graph_direct_read"]),
                  "condition": len(exported["graph_condition"]),
                  "param": len(exported["graph_param"])}
     assert got_nodes == want["nodes"]
@@ -264,10 +276,10 @@ def test_m3_store_matches_census(booted, exported):
     got_edges = {"has_part": has_part,
                  "joins_to": len(exported["graph_joins_to_tableTable"]),
                  "left_side": len(exported["graph_left_side_joinTable"])
-                 + len(exported["graph_left_side_joinScope"]),
+                 + len(exported["graph_left_side_joinScope"])
+                 + len(exported["graph_left_side_directReadTable"]),
                  "right_side": len(exported["graph_right_side_joinTable"])
                  + len(exported["graph_right_side_joinScope"]),
-                 "reads": len(exported["graph_reads_scopeTable"]),
                  "resolves_to": resolves,
                  "uses_param": len(exported["graph_uses_param_scopeParam"])}
     assert got_edges == want["edges"]

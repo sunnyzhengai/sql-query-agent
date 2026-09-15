@@ -1137,3 +1137,16 @@ all three returned http 429 CapacityLimitExceeded before
 touching the question — RERUN AT CAPACITY RESUME, Sunny's hand;
 the a1/a2 choice waits on it. The derived read_set edge (option
 b) stays unbuilt unless separately ruled.
+
+**ERA 3 THE FROM-STRUCTURE FAMILY BUILT (Sunny's "ratified —
+build era 3, a1 if the probe passes", 2026-09-14; the probe
+stayed 429-blocked so a1 went in as the ruled default with the
+a2 relabel as the RECORDED CONTINGENCY):**
+
+| claim | state | evidence |
+|---|---|---|
+| THE SHAPE: every FROM clause walks scope—has_part→(join \| direct_read)—left_side/right_side→table-or-scope; direct_read = the single-table FROM (ONE left_side, no ON, no type — absence in the KIND, never a null endpoint; twins ScriptDom's NamedTableReference); the reads EDGE retires (the NAME survives as the question relation); ONE invariant: per scope, side-targets == read-set | BUILT (test-first: tests/aivia/test_from_structure.py, 4 pins) | test_reads_edges_are_retired_from_the_store · test_direct_read_nodes_carry_one_side_no_on · test_the_one_invariant_side_targets_equal_read_set (recomputed from the TREES, never the checked edges) · test_uniform_walk_answers_the_reads_question |
+| THE SURFACE: inbound births direct_read at materialization (read_render) · console walks it as connective structure (adjacency, chain, citation, owner-to-side legality — unchanged rule covers it) + direct_read_structure counted in exclusions · export ships graph_direct_read + has_part_scopeDirectRead + left_side_directReadTable, RETIRES graph_reads_scopeTable · enrich worklist reads the same tables through the new shape · the M1/M2 visual generator re-sourced | BUILT | test_direct_read_nodes_ride_the_export_reads_retired (export grain) · console exclusion pin 6 · battery 15/15 |
+| REGISTRIES 1.43.0 (converter-first): Shape_Ledger direct_read PRESENT + reads edge RETIRED-with-note; doc stamps same breath (RG-A2); the M-gate answer key re-based with its FIRST STRUCTURAL delta (+6 nodes · +12 edges · −6 reads; M2 delta amended, the ERA3_FROM_STRUCTURE entry carries the act) | BUILT | validators green · test_metamodel 1.43.0 · test_census_arithmetic green both directions |
+| LIVE CONFIRMATION at the export regen: exactly TWO stored texts moved — #PatientLocation cond#3/#4 gaining the R5.c owner-possessive ("The patient location history's department is (not) recorded."), the standing query verified against the store; the served-graph GQL gate + Fabric reload ride Sunny's next load (batch law + capacity) | VERIFIED | graph_condition.parquet diff = exactly those 2 rows |
+| FULL SUITE + LINT | GREEN | **2130 passed · 25 skipped · 8 xfailed · 0 failed** (exit 0, 0:10:49); suite-5's 11 reds all closed at their layer (Connection_Ledger direct_read row · build_adjacency walks the birth edge · blessings fixture era-3 shape · literal tag placement); changed files ruff-clean (the 2 converter E501s pre-exist); TEST_MAP regenerated; the graph visual REPUBLISHED (same URL, label era3-direct-read: direct_read in the join family, census 5936/6309 reconciling both directions) |

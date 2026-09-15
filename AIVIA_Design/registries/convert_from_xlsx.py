@@ -193,7 +193,7 @@ SOURCES = {
 # deliveries lead, spine voiced, intermediates counted, census
 # closes; the file's ask-index words = the delivery lead, so file
 # embeddings embed meaning, never name-noise).
-STAMP_VERSION = "1.42.0"
+STAMP_VERSION = "1.43.0"
 RATIFIED = True
 DOC_STAMP = ("v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 twin-graph "
              "ruling ADR 0077; v1.2.0 Phase A metamodel bump; v1.3.0 "
@@ -234,7 +234,18 @@ DOC_STAMP = ("v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 twin-graph "
              "(the question relation expands to owner-to-side join "
              "travel + the declared reads remainder; a scope on a "
              "join's other side is being read, not reading) — "
-             "speech row only, twin structure untouched")
+             "speech row only, twin structure untouched; "
+             "v1.43.0 = ERA 3 THE FROM-STRUCTURE FAMILY (Sunny's "
+             "ratification 2026-09-14: 'ratified — build era 3, a1 "
+             "if the probe passes'; a1 built as the ruled default, "
+             "the probe blocked on capacity — the a2 relabel is the "
+             "recorded contingency): every FROM clause walks the "
+             "same sided shape — the direct_read node kind (one "
+             "left_side, no ON, no type; twins ScriptDom's "
+             "NamedTableReference) joins the ledger PRESENT and the "
+             "reads edge RETIRES into it; absence lives in the "
+             "KIND, never a null endpoint; one invariant stands: "
+             "per scope, side-targets == read-set")
 CONVERTED_ON = "2026-09-05"
 
 
@@ -1157,6 +1168,15 @@ TWIN_SHEETS = {
              "(inner|left_outer|right_outer|full_outer|cross); "
              "has_part → its ON condition; label gate-checked (JOIN "
              "is not ISO-GQL-reserved)"},
+            {"Kind": "node", "Name": "direct_read",
+             "Status": "PRESENT (era 3, ratified 2026-09-14)",
+             "Description obligation": "stored (deterministic "
+             "render: 'Reads <table> records.')",
+             "Notes": "the single-table FROM's sided node — ONE "
+             "left_side, no ON, no joinType: absence lives in the "
+             "KIND, never a null endpoint; twins ScriptDom's "
+             "NamedTableReference; scope—has_part→direct_read; "
+             "connective structure like join, unindexed + counted"},
             {"Kind": "node", "Name": "meaning_twin",
              "Status": "PRESENT",
              "Description obligation": "none-ruled",
@@ -1220,8 +1240,13 @@ TWIN_SHEETS = {
              "Description obligation": "-",
              "Notes": "join→table-or-scope; same ruling; bare RIGHT "
              "is GQL-reserved"},
-            {"Kind": "edge", "Name": "reads", "Status": "PRESENT",
-             "Description obligation": "-", "Notes": ""},
+            {"Kind": "edge", "Name": "reads",
+             "Status": "RETIRED (era 3, 2026-09-14 — into the "
+             "direct_read node kind; every read travels a side now)",
+             "Description obligation": "-",
+             "Notes": "the name SURVIVES as the question relation "
+             "(the v1.42.0 speech row + THE READS COMPOUND); only "
+             "the store edge retired"},
             {"Kind": "edge", "Name": "cites", "Status": "PRESENT",
              "Description obligation": "-", "Notes": ""},
             {"Kind": "edge", "Name": "defines", "Status": "PRESENT",
@@ -1340,6 +1365,12 @@ TWIN_SHEETS = {
              "Meaning": "M2 the join layer: born inside its scope "
              "(scope—has_part→join); sides walk down to "
              "tables/scopes"},
+            {"Label": "direct_read", "Edge": "has_part",
+             "Status": "edged",
+             "Meaning": "era 3 (ratified 2026-09-14): the "
+             "single-table FROM's sided node, born inside its "
+             "scope (scope—has_part→direct_read); its one "
+             "left_side walks down to the table"},
             {"Label": "condition", "Edge": "has_part",
              "Status": "edged",
              "Meaning": "M3 the condition layer: born inside its "

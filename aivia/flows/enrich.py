@@ -71,8 +71,10 @@ def name_worklist(read, scope: str = "voiced") -> List[str]:
     for e in read.edges("resolves_to"):
         if e.to_id.count("|") == 3:
             cols.add(e.to_id)
-    for e in read.edges("reads"):
-        if e.to_id.count("|") == 2:
+    # era 3: the reads edge retired — the same remainder tables
+    # now sit behind direct_read nodes' left_side edges
+    for e in read.edges("left_side"):
+        if "::read#" in e.from_id and e.to_id.count("|") == 2:
             tbls.add(e.to_id)
     return sorted(cols) + sorted(tbls)
 

@@ -14,9 +14,9 @@
   "estate": "ed_sepsis_dev",
   "file": "reporting/USP_ED_SEPSIS.sql",
   "translator_version": "1.3.0",
-  "metamodel_version": "1.42.0",
+  "metamodel_version": "1.43.0",
   "authored": "2026-09-10",
-  "_bump_record": "authored at metamodel 1.36.0; re-based 1.37.0 (join-node ruling) then 1.38.0 (M2 join layer lands: ledger flips PRESENT) — every derived count verified by the recompute tests at each bump; re-based 1.39.0 (M3 condition layer lands); re-based 1.40.0 (structure-word claim + relation-word seat, 2026-09-12: prompts and speech rows only — zero twin-structure effect, every derived count re-verified by the recompute tests); re-based 1.41.0 (the namer seat, 2026-09-12: one Seat_Prompts row only — zero twin-structure effect, every derived count re-verified by the recompute tests); re-based at THE BLESSING (2026-09-13, Sunny's delegated curation): +105 blessed_name kg3 nodes (NO person mint — the registry is the act's record; journal self-containment) — governance truth in the STORE census, never in the Fabric export (EXPORT_LABELS); condition census 1141 and all structural counts unchanged, A2 delta = 130 description texts; re-based at THE SECOND BLESSING (2026-09-14, Sunny's hand): +4 blessed_name — the REF_* held rows re-proposed off the AUTHORED descriptions after the sentinel-origin fix and blessed same night (109 total, node_total 6276); zero edge effect, every structural count unchanged; re-based 1.42.0 (the reads relation speaks, 2026-09-14: one Speech_Sources _edge reads row only — zero twin-structure effect, every derived count re-verified by the recompute tests)"
+  "_bump_record": "authored at metamodel 1.36.0; re-based 1.37.0 (join-node ruling) then 1.38.0 (M2 join layer lands: ledger flips PRESENT) — every derived count verified by the recompute tests at each bump; re-based 1.39.0 (M3 condition layer lands); re-based 1.40.0 (structure-word claim + relation-word seat, 2026-09-12: prompts and speech rows only — zero twin-structure effect, every derived count re-verified by the recompute tests); re-based 1.41.0 (the namer seat, 2026-09-12: one Seat_Prompts row only — zero twin-structure effect, every derived count re-verified by the recompute tests); re-based at THE BLESSING (2026-09-13, Sunny's delegated curation): +105 blessed_name kg3 nodes (NO person mint — the registry is the act's record; journal self-containment) — governance truth in the STORE census, never in the Fabric export (EXPORT_LABELS); condition census 1141 and all structural counts unchanged, A2 delta = 130 description texts; re-based at THE SECOND BLESSING (2026-09-14, Sunny's hand): +4 blessed_name — the REF_* held rows re-proposed off the AUTHORED descriptions after the sentinel-origin fix and blessed same night (109 total, node_total 6276); zero edge effect, every structural count unchanged; re-based 1.42.0 (the reads relation speaks, 2026-09-14: one Speech_Sources _edge reads row only — zero twin-structure effect, every derived count re-verified by the recompute tests); re-based 1.43.0 at ERA 3 THE FROM-STRUCTURE FAMILY (2026-09-14, ratified): the reads remainder RETIRES into 6 direct_read nodes — the first STRUCTURAL re-base (+6 nodes, +12 edges, -6 reads; every census gate updated both directions); recompute tests verify"
  },
  "census_after": {
   "_comment": "THE GATE TABLES: cumulative Fabric-surface censuses after each batch. Q1 = MATCH (n) RETURN labels(n), count(*); Q3 = MATCH ()-[r]->() RETURN type(r), count(*). Exact both directions. M2 numbers are MEASURED FROM THE BUILT STORE (2026-09-10).",
@@ -41,17 +41,17 @@
     "table": 90,
     "column": 4554,
     "scope": 44,
-    "join": 95
+    "join": 95,
+    "direct_read": 6
    },
-   "node_total": 4787,
+   "node_total": 4793,
    "edges": {
-    "has_part": 4742,
+    "has_part": 4748,
     "joins_to": 65,
-    "left_side": 95,
-    "right_side": 87,
-    "reads": 6
+    "left_side": 101,
+    "right_side": 87
    },
-   "edge_total": 4995
+   "edge_total": 5001
   },
   "M3": {
    "nodes": {
@@ -62,19 +62,19 @@
     "scope": 44,
     "join": 95,
     "condition": 1141,
-    "param": 2
+    "param": 2,
+    "direct_read": 6
    },
-   "node_total": 5930,
+   "node_total": 5936,
    "edges": {
-    "has_part": 5883,
+    "has_part": 5889,
     "joins_to": 65,
-    "left_side": 95,
+    "left_side": 101,
     "right_side": 87,
-    "reads": 6,
     "resolves_to": 165,
     "uses_param": 2
    },
-   "edge_total": 6303
+   "edge_total": 6309
   },
   "M4": {
    "nodes": {
@@ -86,20 +86,20 @@
     "join": 95,
     "condition": 1141,
     "param": 2,
-    "derived_column": 156
+    "derived_column": 156,
+    "direct_read": 6
    },
-   "node_total": 6086,
+   "node_total": 6092,
    "edges": {
-    "has_part": 6039,
+    "has_part": 6045,
     "joins_to": 65,
-    "left_side": 95,
+    "left_side": 101,
     "right_side": 87,
-    "reads": 6,
     "resolves_to": 165,
     "uses_param": 2,
     "cites": 100
    },
-   "edge_total": 6559
+   "edge_total": 6565
   },
   "M5": {
    "nodes": {
@@ -112,20 +112,20 @@
     "condition": 1147,
     "param": 4,
     "derived_column": 156,
-    "statement": 67
+    "statement": 67,
+    "direct_read": 6
    },
-   "node_total": 6161,
+   "node_total": 6167,
    "edges": {
-    "has_part": 6089,
+    "has_part": 6095,
     "joins_to": 65,
-    "left_side": 95,
+    "left_side": 101,
     "right_side": 87,
-    "reads": 6,
     "resolves_to": 169,
     "uses_param": 4,
     "cites": 100
    },
-   "edge_total": 6615
+   "edge_total": 6621
   },
   "M6": {
    "nodes": {
@@ -139,20 +139,20 @@
     "param": 4,
     "derived_column": 156,
     "statement": 67,
-    "file": 1
+    "file": 1,
+    "direct_read": 6
    },
-   "node_total": 6162,
+   "node_total": 6168,
    "edges": {
-    "has_part": 6160,
+    "has_part": 6166,
     "joins_to": 65,
-    "left_side": 95,
+    "left_side": 101,
     "right_side": 87,
-    "reads": 6,
     "resolves_to": 169,
     "uses_param": 4,
     "cites": 100
    },
-   "edge_total": 6686
+   "edge_total": 6692
   },
   "M7": {
    "nodes": {
@@ -173,22 +173,22 @@
     "role": 1,
     "responsibility": 1,
     "person": 0,
-    "blessed_name": 109
+    "blessed_name": 109,
+    "direct_read": 6
    },
-   "node_total": 6276,
+   "node_total": 6282,
    "edges": {
-    "has_part": 6160,
+    "has_part": 6166,
     "joins_to": 65,
-    "left_side": 95,
+    "left_side": 101,
     "right_side": 87,
-    "reads": 6,
     "resolves_to": 169,
     "uses_param": 4,
     "cites": 100,
     "executes": 1,
     "describes": 1
    },
-   "edge_total": 6688
+   "edge_total": 6694
   }
  },
  "description_coverage": {
@@ -208,16 +208,18 @@
  },
  "batch_deltas": {
   "M2": {
-   "status": "BUILT 2026-09-10 — store-verified; Sunny's GQL gate on the DEV ESTATE (his ruling) is the closing step",
+   "status": "BUILT 2026-09-10 — store-verified; Sunny's GQL gate on the DEV ESTATE (his ruling) is the closing step; AMENDED at ERA 3 (2026-09-14, ratified): the reads remainder retired into direct_read nodes — see the ERA3_FROM_STRUCTURE entry for the act",
    "new_nodes": {
     "scope": 44,
-    "join": 95
+    "join": 95,
+    "direct_read": 6
    },
    "new_edges": {
     "has_part_scopeJoin": 95,
     "left_side": 95,
     "right_side": 87,
-    "reads_remainder": 6
+    "has_part_scopeDirectRead": 6,
+    "left_side_directReadTable": 6
    },
    "join_conservation": {
     "joins": 95,
@@ -400,6 +402,20 @@
     "shape_ledger_target_rows": 0,
     "phase_boundary": "full sepsis estate re-run against its own key"
    }
+  },
+  "ERA3_FROM_STRUCTURE": {
+   "status": "RATIFIED + BUILT 2026-09-14 (Sunny: 'ratified — build era 3, a1 if the probe passes'; a1 built as the ruled default, the probe blocked on capacity — the a2 relabel is the recorded contingency); GQL gate on the served graph rides the next load, Sunny's hand",
+   "new_nodes": {
+    "direct_read": 6
+   },
+   "new_edges": {
+    "has_part_scopeDirectRead": 6,
+    "left_side_directReadTable": 6
+   },
+   "retired_edges": {
+    "reads": 6
+   },
+   "invariant": "per scope: side-targets == read-set (COVERING alone; DISJOINT vacuous — one mechanism); numbers unchanged: 6 direct + 53 join-covered == 59 read-set"
   }
  }
 }

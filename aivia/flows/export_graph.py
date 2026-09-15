@@ -82,6 +82,17 @@ def _scope_tables(read: ReadApi,
             "description": str(n.properties.get("description") or ""),
             "onPredicate": str(n.properties.get("on") or ""),
             "joinType": str(n.properties.get("joinType") or "")})
+    # era 3 (ratified 2026-09-14): the single-table FROM's sided
+    # node — no ON, no type, BY KIND
+    dr_rows = []
+    for n in sorted(read.nodes("direct_read"),
+                    key=lambda x: x.identity):
+        # literal: shape
+        dr_rows.append({
+            "nodeId": n.identity,
+            "name": str(n.properties.get("name") or ""),
+            "description": str(n.properties.get("description")
+                               or "")})
     cond_rows = []
     for n in sorted(read.nodes("condition"), key=lambda x: x.identity):
         # literal: shape
@@ -102,11 +113,17 @@ def _scope_tables(read: ReadApi,
     # literal: shape
     tables: Dict[str, List[Dict[str, str]]] = {
         "graph_scope": scope_rows, "graph_join": join_rows,
+        "graph_direct_read": dr_rows,
         "graph_condition": cond_rows, "graph_param": param_rows}
     tables["graph_has_part_scopeJoin"] = sorted(
         ({"sourceId": e.from_id, "targetId": e.to_id}
          for e in store.current_edges("has_part")
          if "::join#" in e.to_id),
+        key=lambda r: (r["sourceId"], r["targetId"]))
+    tables["graph_has_part_scopeDirectRead"] = sorted(
+        ({"sourceId": e.from_id, "targetId": e.to_id}
+         for e in store.current_edges("has_part")
+         if "::read#" in e.to_id),
         key=lambda r: (r["sourceId"], r["targetId"]))
     hp_jc, hp_sc, hp_cc = [], [], []
     for e in store.current_edges("has_part"):
@@ -142,17 +159,23 @@ def _scope_tables(read: ReadApi,
     for side in ("left_side", "right_side"):
         by_target: Dict[str, List[Dict[str, str]]] = {
             "Table": [], "Scope": []}
+        dr_side: List[Dict[str, str]] = []
         for e in store.current_edges(side):
+            row = {"sourceId": e.from_id, "targetId": e.to_id}
+            if "::read#" in e.from_id:
+                dr_side.append(row)   # era 3: direct_read's side
+                continue
             kind = "Table" if e.to_id in table_ids else "Scope"
-            by_target[kind].append(
-                {"sourceId": e.from_id, "targetId": e.to_id})
+            by_target[kind].append(row)
         for kind, rows_ in by_target.items():
             tables[f"graph_{side}_join{kind}"] = sorted(
                 rows_, key=lambda r: (r["sourceId"], r["targetId"]))
-    tables["graph_reads_scopeTable"] = sorted(
-        ({"sourceId": e.from_id, "targetId": e.to_id}
-         for e in store.current_edges("reads")),
-        key=lambda r: (r["sourceId"], r["targetId"]))
+        if side == "left_side":
+            tables["graph_left_side_directReadTable"] = sorted(
+                dr_side,
+                key=lambda r: (r["sourceId"], r["targetId"]))
+    # era 3: graph_reads_scopeTable RETIRED — the reads edge is
+    # gone from the store; every read travels a side
     return tables
 
 

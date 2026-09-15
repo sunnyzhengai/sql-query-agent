@@ -7,7 +7,7 @@
 
 # Test Map — what every test proves
 
-184 modules, 2021 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
+185 modules, 2025 tests, every module accounted: claimed by an ADR in the trace registry or declaring a law/contract in its docstring (`Proves:` line).
 
 ## By ADR
 
@@ -171,6 +171,7 @@
 - `tests/aivia/test_design_validators.py` (4): Slice 0: the design validators run in CI — every push re-proves the
 - `tests/aivia/test_doubles.py` (6): THE SCRIPTED-PROPOSALS CONTRACT (Sunny's ruling, 2026-09-09:
 - `tests/aivia/test_flows_change_quanta.py` (6): The flows' change quanta (CONTRACT_DATALOAD §13 + the flows
+- `tests/aivia/test_from_structure.py` (4): ERA 3 — THE FROM-STRUCTURE NODE FAMILY (Design_Graph_Engine,
 - `tests/aivia/test_full_circle.py` (7): Slice 7: FULL CIRCLE — one run from empty, every family proven.
 - `tests/aivia/test_glossary.py` (11): THE GLOSSARY PROCESS (Ruling_Glossary_Process.md, ruled
 - `tests/aivia/test_governance_journal.py` (4): PHASE E1 — THE GOVERNANCE JOURNAL (Sunny's ruling: all user

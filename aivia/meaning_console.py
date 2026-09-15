@@ -156,8 +156,11 @@ def technical_scope(read) -> Tuple[List[Dict[str, Any]],
                         "owner": None,
                         "words": str(n.properties.get("description")
                                      or "").lower()})
-    # joins carry meaning but stay unindexed BY RULING — counted
+    # joins carry meaning but stay unindexed BY RULING — counted;
+    # direct_read nodes (era 3) are the same connective class
     exclusions["join_structure"] = len(joins)
+    exclusions["direct_read_structure"] = \
+        sum(1 for _ in read.nodes("direct_read"))
     from aivia.graph import metamodel
     lens = metamodel.load("lenses")
     for r in lens.sheets["Speech_Sources"]:
@@ -236,15 +239,20 @@ def technical_adjacency(read) -> Tuple[
     if store is not None:
         joins = {n.identity for n in read.nodes("join")}
         conds = {n.identity for n in read.nodes("condition")}
+        drs = {n.identity for n in read.nodes("direct_read")}
         for e in store.current_edges("joins_to"):
             link(e.from_id, e.to_id, "joins_to")
         for e in store.current_edges("has_part"):
-            # scope—has_part→join · scope/join—has_part→condition
-            # · condition—has_part→condition
-            if e.to_id in joins or e.to_id in conds:
+            # scope—has_part→join/direct_read (era 3) ·
+            # scope/join—has_part→condition ·
+            # condition—has_part→condition
+            if e.to_id in joins or e.to_id in conds \
+                    or e.to_id in drs:
                 link(e.from_id, e.to_id, "has_part")
-        # literal: mechanical — the join + condition layers' walk
-        for lbl in ("left_side", "right_side", "reads",
+        # era 3: the reads edge is retired; every read travels a
+        # side — the from-structure + condition layers' walk
+        # literal: mechanical
+        for lbl in ("left_side", "right_side",
                     "resolves_to", "uses_param"):
             for e in store.current_edges(lbl):
                 link(e.from_id, e.to_id, lbl)
@@ -662,12 +670,20 @@ def answer_question(question: str, interpret_fn,
                 for n in read.nodes("join")}
     condsmap = {n.identity: n.properties
                 for n in read.nodes("condition")}
+    # era 3: direct_read nodes are connective structure exactly
+    # like joins — the single-table FROM's sided node
+    drmap = {n.identity: n.properties
+             for n in read.nodes("direct_read")}
 
     def _cite(ident: str) -> str:
         owned = "::".join(ident.split("::")[-2:])
         if ident in joinsmap:
             j = joinsmap[ident]
             return (f"via {owned}: {j.get('on', '')}").strip(": ")
+        if ident in drmap:
+            return (f"via {owned}: "
+                    f"{drmap[ident].get('description', '')}"
+                    ).strip(": ")
         c = condsmap.get(ident, {})
         return (f"via: {str(c.get('description') or owned)[:110]}")
 
@@ -701,6 +717,8 @@ def answer_question(question: str, interpret_fn,
         def _node_label(nid: str) -> str:
             if nid in joinsmap:
                 return "join"
+            if nid in drmap:
+                return "direct_read"
             if nid in condsmap:
                 return "condition"
             return kind_label
@@ -829,7 +847,7 @@ def answer_question(question: str, interpret_fn,
             reading."""
             labels = [e for e, _n in hops]
             for i, (_e, node) in enumerate(hops):
-                if node not in joinsmap:
+                if node not in joinsmap and node not in drmap:
                     continue
                 into = labels[i]
                 out = labels[i + 1] if i + 1 < len(labels) else None
@@ -859,7 +877,8 @@ def answer_question(question: str, interpret_fn,
                     # four predicates answered nothing)
                     if nbr in condsmap:
                         start = nbr
-                elif nbr in joinsmap or nbr in condsmap:
+                elif nbr in joinsmap or nbr in condsmap \
+                        or nbr in drmap:
                     start = nbr
                 if start is None:
                     continue
@@ -891,8 +910,8 @@ def answer_question(question: str, interpret_fn,
                                 frontier.append(
                                     (nbr2,
                                      hops + [(lbl2, nbr2)]))
-                        elif nbr2 in joinsmap \
-                                or nbr2 in condsmap:
+                        elif nbr2 in joinsmap or nbr2 in condsmap \
+                                or nbr2 in drmap:
                             walked.add(nbr2)
                             frontier.append(
                                 (nbr2, hops + [(lbl2, nbr2)]))

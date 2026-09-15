@@ -350,14 +350,25 @@ def join_render(targets, fragment) -> str:
     return f"Join on {fragment}."
 
 
+def read_render(target) -> str:
+    """The direct_read node's stored description — deterministic;
+    the verbatim law holds stored == this recompute."""
+    return f"Reads {_disp(target)}."
+
+
 def _store_join_layer(store, as_of) -> dict:
-    """THE JOIN LAYER, M2 (the redesign ruling 2026-09-10): a scope
-    reaches its tables THROUGH its join nodes — join—left_side/
-    right_side→table-or-scope carries the OBSERVED pair (never a
-    table→table edge; joins_to stays dictionary-only), and `reads`
-    survives only as the REMAINDER: tables no join side covers.
-    Conservation returned, never silent: joins ⊎ one_sided ⊎
-    no_sided == every ON entry; reads_remainder counted."""
+    """THE FROM-STRUCTURE FAMILY, era 3 (Design_Graph_Engine,
+    ratified 2026-09-14, superseding the M2 remainder rule): every
+    FROM clause walks the same sided shape — scope—has_part→
+    (join | direct_read)—left_side/right_side→table-or-scope. A
+    join carries the OBSERVED pair + ON meaning (never a
+    table→table edge; joins_to stays dictionary-only); a
+    direct_read is the single-table FROM — ONE left_side, no ON,
+    no type: absence lives in the KIND, never a null endpoint (it
+    twins ScriptDom's NamedTableReference). The era-2 `reads`
+    edge is RETIRED. Conservation returned, never silent: joins ⊎
+    one_sided ⊎ no_sided == every ON entry; direct_reads counted;
+    the one invariant: per scope, side-targets == read-set."""
     from aivia.graph.read_api import ReadApi
     from aivia.lenses import decisions
     read = ReadApi(store)
@@ -366,7 +377,7 @@ def _store_join_layer(store, as_of) -> dict:
     counts = {"joins": 0, "two_sided": 0, "one_sided": 0,
               "no_sided": 0, "overflow_3plus": 0,
               "side_edges_table": 0, "side_edges_scope": 0,
-              "reads_remainder": 0, "reads_covered": 0}
+              "direct_reads": 0, "reads_covered": 0}
     for key, tree in sorted(read.trees().items()):
         for scope in decisions.named_scopes(tree):
             node = by_id.get(scope["name_key"])
@@ -374,9 +385,7 @@ def _store_join_layer(store, as_of) -> dict:
                 continue
             if any(e.from_id == node.identity
                    for e in store.current_edges("has_part")
-                   if "::join#" in e.to_id) or \
-               any(e.from_id == node.identity
-                   for e in store.current_edges("reads")):
+                   if "::join#" in e.to_id or "::read#" in e.to_id):
                 continue  # already materialized this boot
             side_tables = set()
             for i, pred in enumerate(_join_entries(scope), 1):
@@ -423,13 +432,24 @@ def _store_join_layer(store, as_of) -> dict:
                     for v in d:
                         walk_reads(v)
             walk_reads(scope)
+            nth = 0
             for t in sorted(set(reads)):
                 if t in side_tables:
                     counts["reads_covered"] += 1
                     continue  # travels through a join side
-                store.append_edge("reads", node.identity, t,
+                counts["direct_reads"] += 1
+                nth += 1
+                rid = f"{node.identity}::read#{nth}"
+                store.append_node(
+                    "direct_read", rid,
+                    # literal: shape
+                    {"name": f"read#{nth}",
+                     "description": read_render(t)},
+                    as_of, node.extract_id)
+                store.append_edge("has_part", node.identity, rid,
                                   {}, as_of, node.extract_id)
-                counts["reads_remainder"] += 1
+                store.append_edge("left_side", rid, t,
+                                  {}, as_of, node.extract_id)
     return counts
 
 

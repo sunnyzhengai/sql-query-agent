@@ -84,10 +84,12 @@ def test_every_exclusion_is_counted_never_silent(world):
     from_index = {k: v for k, v in exclusions.items()
                   if k not in ("db", "db_schema", "condition_on",
                                "condition_degenerate",
-                               "join_structure")}
+                               "join_structure",
+                               "direct_read_structure")}
     assert sum(from_index.values()) == len(out_of_scope)
     assert exclusions["condition_census"] == 69   # the twin retired
     assert exclusions["join_structure"] == 95     # ruled unindexed
+    assert exclusions["direct_read_structure"] == 6  # era 3, counted
     assert exclusions["condition_on"] > 0
     assert exclusions["condition_degenerate"] > 0
     line = mc.coverage_line(entries, exclusions)
@@ -652,14 +654,17 @@ def test_reads_relation_rows_the_owner_never_the_co_side(world):
                    for g in r["gql"])
 
 
-def test_reads_relation_includes_the_declared_remainder(world):
-    # the M2 remainder rule: the surviving direct reads edges ARE
-    # readings — a reads-worded question must include them
+def test_reads_relation_includes_the_direct_reads(world):
+    # era 3 (2026-09-14): the no-join FROM is a direct_read node —
+    # a reads-worded question must include its owner as a reader
     read, entries, _, adj, directed = world
     store = read._store
-    edge = next(iter(store.current_edges("reads")))
+    dr = read.nodes("direct_read")[0]
+    edge = next(e for e in store.current_edges("left_side")
+                if e.from_id == dr.identity)
     table_name = edge.to_id.rsplit("|", 1)[-1]
-    scope_name = edge.from_id.rsplit("|", 1)[-1].split("::")[-1]
+    scope_name = dr.identity.rsplit(
+        "::read#", 1)[0].split("::")[-1]
     kind = next(e for e in entries if e["identity"] == "kind::scope")
     semantic = _ScriptedSemantic(
         {"scopes": [{**dict(kind), "score": 1.2}]})

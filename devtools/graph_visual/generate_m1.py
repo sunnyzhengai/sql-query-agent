@@ -164,7 +164,16 @@ jedges = [{"a": a, "b": b, "on": on} for a, b, on in jpairs]
 sc = pd.read_parquet(EXP / "graph_scope.parquet")
 jn = pd.read_parquet(EXP / "graph_join.parquet")
 hp_sj = pd.read_parquet(EXP / "graph_has_part_scopeJoin.parquet")
-reads = pd.read_parquet(EXP / "graph_reads_scopeTable.parquet")
+# era 3 (2026-09-14): the reads parquet retired — the no-join
+# read is a direct_read node (scope—has_part→·—left_side→table)
+# and renders like a join node with one side and no ON
+dr_df = pd.read_parquet(EXP / "graph_direct_read.parquet")
+dr_owner = {r.targetId: r.sourceId for r in pd.read_parquet(
+    EXP / "graph_has_part_scopeDirectRead.parquet"
+    ).itertuples(index=False)}
+dr_side = {r.sourceId: r.targetId for r in pd.read_parquet(
+    EXP / "graph_left_side_directReadTable.parquet"
+    ).itertuples(index=False)}
 sides = {}
 for side in ("left_side", "right_side"):
     for kind in ("Table", "Scope"):
@@ -203,8 +212,19 @@ for r in jn.sort_values("nodeId").itertuples(index=False):
         "ls": ref(sd.get("left_side")), "rs": ref(sd.get("right_side")),
         "x": round(o["x"] + 60 * math.cos(len(jnodes) * GA), 1),
         "y": round(o["y"] + 60 * math.sin(len(jnodes) * GA), 1)})
-redges = [{"s": scid[r.sourceId], "t": tid[r.targetId]}
-          for r in reads.itertuples(index=False)]
+# era 3: direct_read joins the same node family — one ls, no rs
+for r in dr_df.sort_values("nodeId").itertuples(index=False):
+    owner = scid.get(dr_owner.get(r.nodeId, ""), 0)
+    o = scnodes[owner]
+    jnodes.append({
+        "n": r.name, "s": owner, "on": "",
+        "d": trunc(r.description, 200),
+        "ls": ref(dr_side.get(r.nodeId)), "rs": None,
+        "x": round(o["x"] + 60 * math.cos(len(jnodes) * GA), 1),
+        "y": round(o["y"] + 60 * math.sin(len(jnodes) * GA), 1)})
+# era 3: no scope→table reads lines — the direct_read node above
+# carries the connection; its count reports as "reads" still
+redges = []
 
 # ---- M3 THE CONDITION LAYER (store rows: condition · param ·
 # resolves_to role-tagged · uses_param) ------------------------
@@ -266,7 +286,7 @@ counts = {
     + len(cndnodes),
     "joins": len(jedges),
     "scopes": len(scnodes), "joinNodes": len(jnodes),
-    "sideEdges": side_edges, "reads": len(redges),
+    "sideEdges": side_edges, "reads": len(dr_df),
     "conds": len(cndnodes), "params": len(pnodes),
     "resolves": len(rc_edges) + len(rp_edges),
     "usesParam": len(uedges),

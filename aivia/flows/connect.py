@@ -103,7 +103,9 @@ def build_adjacency(read) -> Dict[str, List[Tuple[str, str]]]:
             for e in _store.current_edges(lbl):
                 link(e.from_id, e.to_id, lbl)
         for e in _store.current_edges("has_part"):
-            if ("::join#" in e.to_id or "::cond#" in e.to_id
+            # ::read# = era 3's direct_read (its birth edge)
+            if ("::join#" in e.to_id or "::read#" in e.to_id
+                    or "::cond#" in e.to_id
                     or "::param/" in e.to_id):
                 link(e.from_id, e.to_id, "has_part")
     # PHASE I: blessed acronyms walk to their approver and — DERIVED

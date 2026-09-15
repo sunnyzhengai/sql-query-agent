@@ -77,10 +77,14 @@ def test_every_loaded_registry_is_ratified_v1():
     # — prompt row only, twin structure untouched;
     # 1.42.0 = THE READS RELATION SPEAKS (Sunny's "fix all three
     # gaps" go, 2026-09-14): Speech_Sources gains _edge reads —
-    # speech row only, twin structure untouched
+    # speech row only, twin structure untouched;
+    # 1.43.0 = ERA 3 THE FROM-STRUCTURE FAMILY (ratified
+    # 2026-09-14): direct_read PRESENT, the reads edge RETIRED —
+    # the twin's structure moves; answer key re-based with the
+    # structural delta
     for reg in metamodel.load_all().values():
         assert reg.ratified is True
-        assert reg.version == "1.42.0"
+        assert reg.version == "1.43.0"
 
 
 def test_load_single_exposes_sheets_and_stamp():

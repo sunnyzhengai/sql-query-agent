@@ -113,9 +113,11 @@ the vendored-list gate stands):
 
 - technical: `db · db_schema · table · column`
 - logic: `file · statement · scope · condition · param ·
-  derived_column · join` (join ADDED 2026-09-10, Sunny's
-  hand-drawn ruling; label gate-checked — JOIN is SQL-reserved,
-  not ISO-GQL-reserved)
+  derived_column · join · direct_read` (join ADDED 2026-09-10,
+  Sunny's hand-drawn ruling; label gate-checked — JOIN is
+  SQL-reserved, not ISO-GQL-reserved; direct_read ADDED at ERA 3,
+  ratified 2026-09-14 — the single-table FROM's sided node, see
+  the era-3 section)
 
 Labels are GRAINS, never kinds (clarified 2026-09-10, answering
 Sunny's per-predicate question; the kind-vs-label standard):
@@ -147,7 +149,12 @@ edge exists ONLY for a table no join side covers — the
 one-table-no-join scope, and single-table subqueries attaching to
 their named ancestor per A4. The read-set is DERIVED: reads ∪
 join sides. Measured on USP_ED_SEPSIS: 47 of ~50 scope→table
-connections travel through joins; ~6 reads survive); `joins_to` (table→table, DECLARED — dictionary
+connections travel through joins; ~6 reads survive. **RETIRED
+AT ERA 3 (ratified 2026-09-14, see the era-3 section): the
+remainder now travels scope—has_part→direct_read—left_side→
+table — one sided mechanism for every FROM clause; the one
+invariant: per scope, side-targets == read-set. The reads NAME
+survives as the question relation only**); `joins_to` (table→table, DECLARED — dictionary
 truth, with key columns; NEVER written by observation — the
 observed side lives on join nodes, so the declared edge's
 integrity is preserved: one edge name, one authority);
@@ -246,9 +253,9 @@ algorithm · evidence returned with the query as artifact).
 
 ## The laws carried forward from v1 (storage-independent, all kept)
 
-[registry stamps: kg1_technical v1.42.0 · kg2_logic v1.42.0 ·
-kg2_kind_library v1.42.0 · kg3_artifacts v1.42.0 ·
-kg4_concepts v1.42.0 · flows v1.42.0 · lenses v1.42.0]
+[registry stamps: kg1_technical v1.43.0 · kg2_logic v1.43.0 ·
+kg2_kind_library v1.43.0 · kg3_artifacts v1.43.0 ·
+kg4_concepts v1.43.0 · flows v1.43.0 · lenses v1.43.0]
 (stamp block restored 2026-09-10 — the ratification rename dropped
 v1's per-section stamps; RG-A2 caught it same day. One block here,
 the same-breath rule mechanical again; registries carry their own
@@ -269,7 +276,11 @@ v1.40.0 'reads'-card deferral closes — its recorded reason (a
 READS COMPOUND in the console; one speech row, the twin's
 structure untouched. The determinism test caught the hand-edit
 attempt AGAIN this round — second catch of the class, the
-converter-first law holds.)
+converter-first law holds. 1.43.0 = ERA 3 THE FROM-STRUCTURE
+FAMILY, Sunny's ratification 2026-09-14: direct_read joins the
+ledger PRESENT, the reads edge RETIRES into it — the twin's
+structure moves for the first time since M3; the answer key
+re-based with the structural delta.)
 
 Conservation (handled ⊎ counted == everything) · meaning-identity
 anchoring (contentKeys → drift) · the voicing grammar (registry-
@@ -305,9 +316,12 @@ refresh per batch, Sunny's hand or word).
 - Fabric Graph vector capability specifics at implementation time
 - The inferred-mapping confidence classes (vocabulary)
 
-## PROPOSED — THE FROM-STRUCTURE NODE FAMILY (era 3; drafted
-## 2026-09-14 from Sunny's uniform-edge clarification; UNRULED —
-## the questions below are Sunny's)
+## ERA 3 — THE FROM-STRUCTURE NODE FAMILY (RATIFIED by Sunny
+## 2026-09-14: "ratified — build era 3, a1 if the probe passes";
+## BUILT same day, a1 as the ruled default — the probe stayed
+## capacity-blocked, so the a2 relabel is the RECORDED
+## CONTINGENCY: it fires only if the probe, at capacity resume,
+## refuses BOTH unlabeled middle nodes and edge alternation)
 
 **Origin.** Sunny's step-back on the reads inventory: "I wanted
 all scopes to use the same joins node with left and right edges;
@@ -386,8 +400,23 @@ question-word grounding (v1.42.0 THE READS COMPOUND) stands
 under every variant — it simply gets simpler when the store
 becomes uniform.
 
-**The questions for Sunny:** (1) a1 vs a2 — after the probe
-rerun; (2) the family/kind NAMES (direct_read is the draft's
-word; the standard offers "table reference" for the a2 label);
-(3) whether this rides the M-ladder as its own batch before or
-after M4 (derived_column, currently next).
+**The questions — answered at the build (2026-09-14):**
+(1) a1 built (the ruled default; the probe rerun at capacity
+resume either confirms it or fires the a2 contingency);
+(2) the label is `direct_read` (the draft's word stood);
+(3) it landed as its own act BEFORE M4, amending the M2 layer —
+the answer key's M2 delta carries the amendment, the
+ERA3_FROM_STRUCTURE entry carries the act, registries 1.43.0.
+BUILT: inbound births direct_read at the join-layer
+materialization (read_render: "Reads <table> records."); the
+console walks it as connective structure (the owner-to-side
+legality covers it unchanged); the export ships
+graph_direct_read + has_part_scopeDirectRead +
+left_side_directReadTable and RETIRES graph_reads_scopeTable;
+enrich's worklist reads the same tables through the new shape.
+LIVE CONFIRMATION at the export regen: exactly two stored
+condition texts moved — #PatientLocation cond#3/#4 gaining the
+R5.c owner-possessive ("The patient location history's
+department is (not) recorded.") — the standing query verified
+against the store. The served-graph GQL gate rides Sunny's next
+load (batch law).

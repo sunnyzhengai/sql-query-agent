@@ -106,33 +106,42 @@ def test_scope_rows_carry_stored_descriptions(world):
     assert "#Base_Pop" in names
 
 
-def test_scope_reads_table_edges_at_remainder_grain(world):
-    """THE REMAINDER RULE (the M2 redesign, 2026-09-10): a scope
-    reaches its tables THROUGH its join nodes; a direct reads edge
-    survives only where no join side covers the table. The old
-    deciding example (#Base_Pop reads ED_ENCOUNTERS_FACT directly)
-    is SUPERSEDED — that pair travels a join side now."""
+def test_direct_read_nodes_ride_the_export_reads_retired(world):
+    """ERA 3 (ratified 2026-09-14, superseding the M2 remainder
+    rule): the no-join FROM ships as a direct_read node + one
+    left_side edge — same sided shape as joins; the
+    graph_reads_scopeTable parquet is RETIRED. The M2 deciding
+    example (#Base_Pop × ED_ENCOUNTERS_FACT through a join side)
+    still stands."""
     read, tables = world
-    edges = tables["graph_reads_scopeTable"]
+    assert "graph_reads_scopeTable" not in tables
+    nodes = tables["graph_direct_read"]
+    assert nodes
     scopes = {r["nodeId"] for r in tables["graph_scope"]}
     table_ids = {n.identity for n in read.nodes("table")}
-    assert edges
-    for e in edges:
-        assert e["sourceId"] in scopes
-        assert e["targetId"] in table_ids
-    pairs = [(e["sourceId"], e["targetId"]) for e in edges]
-    assert len(pairs) == len(set(pairs))
-    # disjointness: no reads pair is also a join side of its scope
+    owners = {r["targetId"]: r["sourceId"]
+              for r in tables["graph_has_part_scopeDirectRead"]}
+    sides = tables["graph_left_side_directReadTable"]
+    by_dr = {r["sourceId"]: r["targetId"] for r in sides}
+    assert len(sides) == len(nodes) == len(owners)
+    for n in nodes:
+        assert "::read#" in n["nodeId"]
+        assert n["description"].startswith("Reads ")
+        assert owners[n["nodeId"]] in scopes
+        assert by_dr[n["nodeId"]] in table_ids
+    # one mechanism now: a direct_read target is never ALSO a join
+    # side of the same scope (the old DISJOINT, kept as a sanity)
     side_tabs = {}
     for lbl in ("left_side", "right_side"):
         for ed in read._store.current_edges(lbl):
-            if ed.to_id in table_ids:
+            if ed.to_id in table_ids and "::join#" in ed.from_id:
                 side_tabs.setdefault(
                     ed.from_id.rsplit("::join#", 1)[0],
                     set()).add(ed.to_id)
-    for s_, t_ in pairs:
-        assert t_ not in side_tabs.get(s_, set()), (s_, t_)
-    # the superseded pair really does travel through a join now
+    for dr, t_ in by_dr.items():
+        assert t_ not in side_tabs.get(
+            dr.rsplit("::read#", 1)[0], set()), (dr, t_)
+    # the M2 deciding example still travels through a join
     assert "emr|dbo|ED_ENCOUNTERS_FACT" in side_tabs.get(
         "reporting/USP_ED_SEPSIS.sql::#Base_Pop", set())
 
