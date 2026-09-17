@@ -253,9 +253,9 @@ algorithm · evidence returned with the query as artifact).
 
 ## The laws carried forward from v1 (storage-independent, all kept)
 
-[registry stamps: kg1_technical v1.43.0 · kg2_logic v1.43.0 ·
-kg2_kind_library v1.43.0 · kg3_artifacts v1.43.0 ·
-kg4_concepts v1.43.0 · flows v1.43.0 · lenses v1.43.0]
+[registry stamps: kg1_technical v1.45.0 · kg2_logic v1.45.0 ·
+kg2_kind_library v1.45.0 · kg3_artifacts v1.45.0 ·
+kg4_concepts v1.45.0 · flows v1.45.0 · lenses v1.45.0]
 (stamp block restored 2026-09-10 — the ratification rename dropped
 v1's per-section stamps; RG-A2 caught it same day. One block here,
 the same-breath rule mechanical again; registries carry their own
@@ -280,7 +280,23 @@ converter-first law holds. 1.43.0 = ERA 3 THE FROM-STRUCTURE
 FAMILY, Sunny's ratification 2026-09-14: direct_read joins the
 ledger PRESENT, the reads edge RETIRES into it — the twin's
 structure moves for the first time since M3; the answer key
-re-based with the structural delta.)
+re-based with the structural delta. 1.44.0 = THE FUNCTION-
+VOICING LIBRARY, Sunny's ruling 2026-09-16 at M4 planning:
+kg2_kind_library gains the Function_Voicings sheet — operation
+voicings a CLOSED set (14 named functions, the MEASURED
+ed_sepsis_dev census; composite kinds voice by rule), "a new
+function is a registry row, never silent"; the ADR 0076 code
+overlays absorb as rows, their hardcodes retire at the M4
+build; Grammar_Floor §R12 (PROPOSED, awaiting ratification) is
+the speaking rule — registry rows only, the twin's structure
+untouched. Landed in the CONVERTER, first try this round.
+1.45.0 = M4 THE DERIVED-COLUMN LAYER BUILT, Sunny's "ratified —
+go on M4" 2026-09-16: derived_column PRESENT (::dcol# grain,
+STAY FLAT — one node per computed output, expression trees at
+L1), scope—has_part→derived_column + scope—cites→column at
+store grain (cites 100→97 by measurement); grammar constant
+2.10.0 closes the declared deferral; the mapper's
+arithmetic/unary operator property lands — twin untouched.)
 
 Conservation (handled ⊎ counted == everything) · meaning-identity
 anchoring (contentKeys → drift) · the voicing grammar (registry-

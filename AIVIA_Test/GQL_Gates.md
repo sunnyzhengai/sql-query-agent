@@ -92,29 +92,33 @@ doesn't exist; the gate is EVERY label and EVERY edge type,
 totals exact, both directions). Q1/Q3 expected results after each
 batch, cumulative:
 
+*(Tables RE-BASED 2026-09-16 to the key at 1.45.0 — they now
+carry ERA 3's direct_read/reads-retirement and M4's measured
+numbers; the pre-era-3 rows stand in git history.)*
+
 | after | Q1 nodes by label | total |
 |---|---|---|
 | M1 | db 1 · db_schema 3 · table 90 · column 4554 | **4648** |
-| M2 ✅ | + scope 44 · join 95 | **4787** |
-| M3 ✅ | + condition 1141 · param 2 | **5930** |
-| M4 | + derived_column 156 (twin-authored) | **6086** |
-| M5 | + statement 67 · condition→1147 · param→4 (holdovers twin-authored) | **6161** |
-| M6 | + file 1 | **6162** |
-| M7 | + pbi_report 1 · description 1 · agent 1 · role 1 · responsibility 1 | **6167** |
+| M2 ✅ | + scope 44 · join 95 (+ direct_read 6 at ERA 3) | **4793** |
+| M3 ✅ | + condition 1141 · param 2 | **5936** |
+| M4 ✅ | + derived_column 156 (measured at build) | **6092** |
+| M5 | + statement 67 · condition→1147 · param→4 (holdovers twin-authored) | **6167** |
+| M6 | + file 1 | **6168** |
+| M7 | + pbi_report 1 · description 1 · agent 1 · role 1 · responsibility 1 · blessed_name 113 | **6286** |
 
 | after | Q3 edges by type | total |
 |---|---|---|
 | M1 | has_part 4647 · joins_to 65 | **4712** |
-| M2 ✅ | + left_side 95 · right_side 87 · has_part→4742 · reads 6 | **4995** |
-| M3 ✅ | has_part 5883 · resolves_to 165 · uses_param 2 · rest same | **6303** |
-| M4 | has_part 6039 · + cites 100 | **6559** |
-| M5 | has_part 6089 · resolves_to 169 · uses_param 4 | **6615** |
-| M6 | has_part 6160 | **6686** |
-| M7 | + executes 1 · describes 1 | **6688** |
+| M2 ✅ | + left_side 101 · right_side 87 · has_part→4748 (ERA 3: reads RETIRED, direct_read sided) | **5001** |
+| M3 ✅ | has_part 5889 · resolves_to 165 · uses_param 2 · rest same | **6309** |
+| M4 ✅ | has_part 6045 · + cites 97 (measured at build — 100→97 store grain) | **6562** |
+| M5 | has_part 6095 · resolves_to 169 · uses_param 4 | **6618** |
+| M6 | has_part 6166 | **6689** |
+| M7 | + executes 1 · describes 1 | **6691** |
 
 (✅ = measured from the built store; unmarked = twin-authored,
 reconciled against the tree at build — precedent: joins 93→95,
-conditions 748→1141.)
+conditions 748→1141, cites 100→97.)
 
 Any label or edge type not in the row = a gate failure; any
 declared count off by one = a gate failure. The machine copy of
@@ -460,12 +464,82 @@ MATCH (d:direct_read) RETURN d.name AS readName, d.description AS descr ORDER BY
 → 6 rows; read#1 (scope #Final) reads
 "Reads NON_SEVERE_SEPSIS_STAGING."
 
-### M4 gate — derived_column
+### M4 gate — derived_column [BUILT 2026-09-16, store-verified;
+### Sunny's "ratified — go on M4"; the numbers below are MEASURED
+### from the built store — cites RE-BASED 100→97 at build (store
+### grain: three twin-path heads collapse into named scopes — the
+### joins-93→95 precedent)]
 
 | expect | value |
 |---|---|
-| new nodes | derived_column 156 (154 expression + 2 named literal; 312 passthrough projections and 5 anonymous EXISTS-SELECTs are NOT nodes) |
-| new edges | has_part +156 · cites 100 (scope→column outputs) |
+| new nodes | derived_column 156 (154 operation + 2 named_literal; 312 passthrough projections and 5 anonymous EXISTS-SELECTs are NOT nodes — counted at build, never minted) |
+| new edges | has_part +156 (scope→derived_column, ::dcol# grain) · cites 97 (scope→column at STORE grain) |
+| descriptions | 156/156 R12-voiced (Grammar v2.10.0, THE FUNCTION-VOICING LIBRARY), stored == recomputed (verbatim law) |
+| special check | case_when conditions STAY parented to scope/condition (condition census 1141 unchanged; no condition under a derived_column) — the stay-flat ruling |
+| remainder | function_remainders {} — every practiced operation has its library row |
+
+The node census (full, both directions):
+
+```gql
+MATCH (n) RETURN labels(n) AS nodeType, count(*) AS cnt GROUP BY nodeType
+```
+→ db 1 · db_schema 3 · table 90 · column 4554 · scope 44 ·
+join 95 · direct_read 6 · condition 1141 · param 2 ·
+derived_column **156** — total **6092**, nothing else.
+
+The edge battery (one count per type, then the closing total):
+
+```gql
+MATCH ()-[r:has_part]->() RETURN count(r) AS cnt
+```
+→ **6045** (5889 + 156)
+```gql
+MATCH ()-[r:cites]->() RETURN count(r) AS cnt
+```
+→ **97**
+(joins_to 65 · left_side 101 · right_side 87 · resolves_to 165 ·
+uses_param 2 — unchanged), then:
+```gql
+MATCH ()-[r]->() RETURN count(r) AS totalEdges
+```
+→ **6562** — the eight counts sum exactly, closing the census.
+
+The by-derivation split:
+
+```gql
+MATCH (d:derived_column) RETURN d.derivation AS kind, count(*) AS cnt GROUP BY kind
+```
+→ operation **154** · named_literal **2**.
+
+The spot check (the AGE_IN_DAYS walkthrough made real):
+
+```gql
+MATCH (s:scope)-[:has_part]->(d:derived_column) WHERE d.name = 'AGE_IN_DAYS' RETURN d.description AS descr
+```
+→ the STORED text, verbatim (measured 2026-09-16): "Age in days:
+the number of days between the patient's birth date and the date
+and time when, rounded down to a whole number." — the dangling
+"the date and time when" is ADT_ARRIVAL_TIME's UNBLESSED
+dictionary noun phrase (the known R5 vendor-words class, pinned
+at M3's build too); blessing that column re-voices it as "the
+arrival time" everywhere, per the R5.b delta-by-name law — a
+steward act, never a code fix.
+
+**The load (Sunny's hand, batch law — ONE refresh):**
+
+- NEW parquets (already in graph_export/): `graph_derived_column`
+  · `graph_has_part_scopeDerivedColumn` · `graph_cites_scopeColumn`
+  — every one of the 26 pre-existing parquets is BYTE-IDENTICAL
+  (checksummed at export regen; structure and texts never moved).
+- Upload the 3 new files → Load to Tables (new tables only).
+- Model deltas: add node `derived_column` (key nodeId; name,
+  description, derivation, operation, position, fragment) ·
+  add has_part mapping scope→derived_column
+  (graph_has_part_scopeDerivedColumn) · add edge `cites` with
+  mapping scope→column (graph_cites_scopeColumn) → Save →
+  item-level Refresh now (ONE).
+- Run the gate queries above (answer key: expected_m_gates.json,
+  re-based 1.45.0).
 
 ### M5 gate — statement (+ the M3 holdovers)
 

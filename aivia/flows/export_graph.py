@@ -110,11 +110,25 @@ def _scope_tables(read: ReadApi,
             "nodeId": n.identity,
             "name": str(n.properties.get("name") or ""),
             "description": str(n.properties.get("description") or "")})
+    # M4 (2026-09-16): one node per computed output — STAY FLAT
+    dcol_rows = []
+    for n in sorted(read.nodes("derived_column"),
+                    key=lambda x: x.identity):
+        # literal: shape
+        dcol_rows.append({
+            "nodeId": n.identity,
+            "name": str(n.properties.get("name") or ""),
+            "description": str(n.properties.get("description") or ""),
+            "derivation": str(n.properties.get("derivation") or ""),
+            "operation": str(n.properties.get("operation") or ""),
+            "position": str(n.properties.get("position") or ""),
+            "fragment": str(n.properties.get("fragment") or "")})
     # literal: shape
     tables: Dict[str, List[Dict[str, str]]] = {
         "graph_scope": scope_rows, "graph_join": join_rows,
         "graph_direct_read": dr_rows,
-        "graph_condition": cond_rows, "graph_param": param_rows}
+        "graph_condition": cond_rows, "graph_param": param_rows,
+        "graph_derived_column": dcol_rows}
     tables["graph_has_part_scopeJoin"] = sorted(
         ({"sourceId": e.from_id, "targetId": e.to_id}
          for e in store.current_edges("has_part")
@@ -124,6 +138,15 @@ def _scope_tables(read: ReadApi,
         ({"sourceId": e.from_id, "targetId": e.to_id}
          for e in store.current_edges("has_part")
          if "::read#" in e.to_id),
+        key=lambda r: (r["sourceId"], r["targetId"]))
+    tables["graph_has_part_scopeDerivedColumn"] = sorted(
+        ({"sourceId": e.from_id, "targetId": e.to_id}
+         for e in store.current_edges("has_part")
+         if "::dcol#" in e.to_id),
+        key=lambda r: (r["sourceId"], r["targetId"]))
+    tables["graph_cites_scopeColumn"] = sorted(
+        ({"sourceId": e.from_id, "targetId": e.to_id}
+         for e in store.current_edges("cites")),
         key=lambda r: (r["sourceId"], r["targetId"]))
     hp_jc, hp_sc, hp_cc = [], [], []
     for e in store.current_edges("has_part"):

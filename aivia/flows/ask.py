@@ -190,9 +190,13 @@ def render_card(read, entity: Dict[str, Any]) -> str:
         # census placeholder is dead; the file speaks its meaning
         lines.append(produce.compose_file_floor(read, identity))
     elif kind == "derived_column":
-        scope_key = identity.rsplit(".", 1)[0]
-        lines.append(f"A computed output of {scope_key} — ask the "
-                     "selection for its floor.")
+        # M4 store grain: the card speaks the stored R12 description
+        node = next((n for n in read.nodes("derived_column")
+                     if n.identity == identity), None)
+        desc = ((node.properties.get("description") or "").strip()
+                if node else "")
+        lines.append(desc or "No description is recorded — a "
+                     "counted documentation gap.")
     elif kind == "drift":
         # the literal law (E3): the drift card claim is REGISTRY
         # text (Speech_Sources drift row Card_Text)

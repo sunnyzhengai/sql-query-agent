@@ -269,8 +269,11 @@ def test_m3_store_matches_census(booted, exported):
                  "condition": len(exported["graph_condition"]),
                  "param": len(exported["graph_param"])}
     assert got_nodes == want["nodes"]
+    # the M3-era census: the M4 birth-edge table is excluded
+    # (this row froze at M3; M4's own test asserts the full sum)
     has_part = sum(len(v) for k, v in exported.items()
-                   if k.startswith("graph_has_part"))
+                   if k.startswith("graph_has_part")
+                   and k != "graph_has_part_scopeDerivedColumn")
     resolves = (len(exported["graph_resolves_to_conditionColumn"])
                 + len(exported["graph_resolves_to_conditionParam"]))
     got_edges = {"has_part": has_part,
@@ -358,13 +361,144 @@ def test_m4_key_matches_twin(twin):
     assert len(words) == want["not_derived_columns"]["passthrough_projections"]
     assert len(anon) == want["not_derived_columns"]["anonymous_exists_select"]
 
+    assert len(op) + len(named_lit) \
+        == want["new_edges"]["has_part_scopeDerivedColumn"]
+
+
+def test_m4_cites_recompute_at_store_grain(booted):
+    """RECONCILED AT THE M4 BUILD (2026-09-16): the twin-authored
+    100 counted (head, column) pairs at TWIN-PATH grain — subquery
+    and combination-arm heads. The ruled edge is scope—cites→column
+    at STORE grain, so heads collapse to their owning NAMED scope:
+    three pairs merge, the measured count is 97, and the key
+    re-based by measurement (the joins-93→95 precedent)."""
+    from aivia.flows.inbound import _derived_members, _member_cites
+    from aivia.lenses import decisions
+    read = ReadApi(booted)
+    want = DELTA["M4"]
     cites = set()
-    for r in (n for n in twin if n["kind"] == "reference"):
-        if "/projection/" in r["points_at"]:
-            head = r["points_at"].split("/projection/")[0]
-            for c in _columns(r.get("draws_from") or []):
-                cites.add((head, c))
+    for key, tree in sorted(read.trees().items()):
+        for scope in decisions.named_scopes(tree):
+            for m in _derived_members(scope):
+                for col in _member_cites(m):
+                    cites.add((scope["name_key"], col))
     assert len(cites) == want["new_edges"]["cites_scopeColumn"]
+
+
+def test_m4_store_matches_key(booted):
+    """The M4 census ON THE BOOTED STORE == the answer key — the
+    same equality Sunny's GQL gate asserts on the served graph."""
+    want = DELTA["M4"]
+    nodes = booted.current_nodes("derived_column")
+    assert len(nodes) == want["new_nodes"]["derived_column"]
+    kinds = Counter(n.properties["derivation"] for n in nodes)
+    assert dict(kinds) == want["derived_column_by_derivation"]
+    ids = {n.identity for n in nodes}
+    scope_ids = {n.identity for n in booted.current_nodes("scope")}
+    births = [e for e in booted.current_edges("has_part")
+              if e.to_id in ids]
+    assert len(births) == want["new_edges"]["has_part_scopeDerivedColumn"]
+    assert all(e.from_id in scope_ids for e in births)
+    cites = booted.current_edges("cites")
+    assert len(cites) == want["new_edges"]["cites_scopeColumn"]
+    col_ids = {n.identity for n in booted.current_nodes("column")}
+    assert all(e.from_id in scope_ids and e.to_id in col_ids
+               for e in cites)
+
+
+def test_m4_descriptions_stored_and_verbatim(booted):
+    """156/156 voiced (the description_coverage row) and the
+    verbatim law: stored == the R12 recompute."""
+    from aivia.flows import produce
+    from aivia.flows.inbound import _derived_members, _is_derived_node
+    from aivia.lenses import decisions
+    read = ReadApi(booted)
+    nodes = {n.identity: n
+             for n in booted.current_nodes("derived_column")}
+    assert all(n.properties.get("description")
+               for n in nodes.values())
+    recomputed = {}
+    for key, tree in sorted(read.trees().items()):
+        voice = produce._Voice(read, tree)
+        for scope in decisions.named_scopes(tree):
+            seq = 0
+            for m in _derived_members(scope):
+                if _is_derived_node(m):
+                    seq += 1
+                    cid = f"{scope['name_key']}::dcol#{seq}"
+                    recomputed[cid] = produce.derived_phrase(m, voice)
+    assert set(recomputed) == set(nodes)
+    for cid, text in recomputed.items():
+        assert nodes[cid].properties["description"] == text
+
+
+def test_m4_export_matches_census(exported):
+    """The FULL M4 census against the export tables — the same
+    numbers Sunny's GQL gate asserts after his load + ONE refresh
+    (census_after.M4 in the key)."""
+    want = CENSUS["M4"]
+    got_nodes = {"db": 1, "db_schema": 3,
+                 "table": len(exported["graph_table"]),
+                 "column": len(exported["graph_column"]),
+                 "scope": len(exported["graph_scope"]),
+                 "join": len(exported["graph_join"]),
+                 "direct_read": len(exported["graph_direct_read"]),
+                 "condition": len(exported["graph_condition"]),
+                 "param": len(exported["graph_param"]),
+                 "derived_column":
+                     len(exported["graph_derived_column"])}
+    assert got_nodes == want["nodes"]
+    has_part = (len(exported["graph_has_part_dbSchema"])
+                + len(exported["graph_has_part_schemaTable"])
+                + len(exported["graph_has_part_tableColumn"])
+                + len(exported["graph_has_part_scopeJoin"])
+                + len(exported["graph_has_part_scopeDirectRead"])
+                + len(exported["graph_has_part_joinCondition"])
+                + len(exported["graph_has_part_scopeCondition"])
+                + len(exported["graph_has_part_conditionCondition"])
+                + len(exported["graph_has_part_scopeDerivedColumn"]))
+    left = (len(exported["graph_left_side_joinTable"])
+            + len(exported["graph_left_side_joinScope"])
+            + len(exported["graph_left_side_directReadTable"]))
+    right = (len(exported["graph_right_side_joinTable"])
+             + len(exported["graph_right_side_joinScope"]))
+    resolves = (len(exported["graph_resolves_to_conditionColumn"])
+                + len(exported["graph_resolves_to_conditionParam"]))
+    got_edges = {
+        "has_part": has_part,
+        "joins_to": len(exported["graph_joins_to_tableTable"]),
+        "left_side": left, "right_side": right,
+        "resolves_to": resolves,
+        "uses_param": len(exported["graph_uses_param_scopeParam"]),
+        "cites": len(exported["graph_cites_scopeColumn"])}
+    assert got_edges == want["edges"]
+    assert sum(got_nodes.values()) == want["node_total"]
+    assert sum(got_edges.values()) == want["edge_total"]
+
+
+def test_m4_derived_rows_ride_the_export_verbatim(booted, exported):
+    stored = {n.identity: n.properties
+              for n in booted.current_nodes("derived_column")}
+    rows = exported["graph_derived_column"]
+    assert {r["nodeId"] for r in rows} == set(stored)
+    for r in rows:
+        assert r["description"] == \
+            stored[r["nodeId"]]["description"]
+        assert r["derivation"] in ("operation", "named_literal")
+
+
+def test_m4_case_conditions_stay_parented_to_scope(booted):
+    """The sealed check: case_when predicates shipped at M3 keep
+    their scope/condition parentage — never re-parented under
+    derived_column (stay-flat, Sunny 2026-09-16)."""
+    conds = booted.current_nodes("condition")
+    assert len(conds) == CENSUS["M3"]["nodes"]["condition"]
+    dcol_ids = {n.identity
+                for n in booted.current_nodes("derived_column")}
+    cond_ids = {n.identity for n in conds}
+    for e in booted.current_edges("has_part"):
+        if e.to_id in cond_ids:
+            assert e.from_id not in dcol_ids
 
 
 # ---------------------------------------------------------------

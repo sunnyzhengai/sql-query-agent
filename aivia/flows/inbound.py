@@ -258,6 +258,8 @@ def receive_estate(store, reg: Dict[str, Any], estate_dir,
     report.join_layer = _store_join_layer(store, manifest["as_of"])
     report.condition_layer = _store_condition_layer(
         store, manifest["as_of"])
+    report.derived_layer = _store_derived_column_layer(
+        store, manifest["as_of"])
     return report
 
 
@@ -647,6 +649,165 @@ def _store_condition_layer(store, as_of) -> dict:
                 store.append_edge("uses_param", node.identity, pid,
                                   {}, as_of, node.extract_id)
                 counts["uses_param"] += 1
+    return counts
+
+
+# The kinds whose projection members ARE derived_column nodes
+# (M4's census law): the composite expression kinds + case
+# (Expression_Kinds' value-branching row).
+_DERIVED_OP_KINDS = frozenset(
+    # literal: schema-mirror kg2_kind_library COMPOSITE_EXPR_KINDS
+    ("function", "arithmetic", "unary", "cast", "case"))
+
+
+def _derived_members(scope):
+    """Projection members under one named scope, path-ordered —
+    nested subquery projections included (they live inside this
+    scope's dict; named scopes are never nested in each other).
+    The mapper's `select_refs` key is SKIPPED: it aliases the same
+    member expressions (documented at the mapper), and walking it
+    double-counts — the 4 phantom members the M4 pre-build
+    measurement caught."""
+    out = []
+
+    def walk(d):
+        if isinstance(d, dict):
+            if d.get("node") == "projection_member":
+                out.append(d)
+            for k, v in d.items():
+                if k == "select_refs":
+                    continue
+                walk(v)
+        elif isinstance(d, list):
+            for v in d:
+                walk(v)
+    walk(scope)
+    return out
+
+
+def _is_derived_node(member) -> bool:
+    """The sealed M4 census law: a member is a NODE when its
+    defining expression is a computed kind, or it is a NAMED
+    literal. Passthroughs (column_ref/star) and anonymous
+    EXISTS-SELECT literals are counted, never minted."""
+    kind = (member.get("expression") or {}).get("kind")
+    if kind in _DERIVED_OP_KINDS:
+        return True
+    return kind == "literal" and bool(member.get("name"))
+
+
+def _member_cites(member):
+    """4-part dictionary columns referenced anywhere under this
+    member's defining expression (subquery interiors included —
+    the output draws on them)."""
+    out = []
+
+    def walk(d):
+        if isinstance(d, dict):
+            if d.get("kind") == "column_ref" and isinstance(
+                    d.get("resolves_to"), str) \
+                    and d["resolves_to"].count("|") == 3:
+                out.append(d["resolves_to"])
+            for v in d.values():
+                walk(v)
+        elif isinstance(d, list):
+            for v in d:
+                walk(v)
+    walk(member.get("expression") or {})
+    return out
+
+
+def _store_derived_column_layer(store, as_of) -> dict:
+    """THE DERIVED-COLUMN LAYER, M4 (Sunny's go 2026-09-16): every
+    computed output under a named scope becomes a derived_column
+    node with its stored R12 phrase — scope—has_part→derived_column
+    birth edges (STAY FLAT: one node per output, the expression
+    tree stays at L1) + scope—cites→column for every dictionary
+    column the scope's outputs draw on (distinct pairs, store
+    grain). Conservation returned, never silent."""
+    from aivia.flows import produce
+    from aivia.graph.read_api import ReadApi
+    from aivia.lenses import decisions
+    read = ReadApi(store)
+    by_id = {n.identity: n for n in read.nodes("scope")}
+    # literal: shape
+    counts = {"derived_columns": 0, "operations": 0,
+              "named_literals": 0, "passthrough_skipped": 0,
+              "passthrough_renamed": 0,
+              "anonymous_skipped": 0, "cites": 0,
+              "function_remainders": {}}
+    for key, tree in sorted(read.trees().items()):
+        voice = produce._Voice(read, tree)
+        for scope in decisions.named_scopes(tree):
+            node = by_id.get(scope["name_key"])
+            if node is None:
+                continue
+            prefix = node.identity + "::dcol#"
+            already = any(n.identity.startswith(prefix)
+                          for n in read.nodes("derived_column"))
+            seq = 0
+            cited = {e.to_id for e in read.edges("cites")
+                     if e.from_id == node.identity}
+            for member in _derived_members(scope):
+                for col in _member_cites(member):
+                    if col not in cited:
+                        cited.add(col)
+                        store.append_edge("cites", node.identity,
+                                          col, {}, as_of,
+                                          node.extract_id)
+                        counts["cites"] += 1
+                if not _is_derived_node(member):
+                    expr = member.get("expression") or {}
+                    expr_kind = expr.get("kind")
+                    if expr_kind in ("column_ref", "star"):
+                        counts["passthrough_skipped"] += 1
+                        # the (c) trade-off, COUNTED (Sunny
+                        # accepted 2026-09-16): a RENAMED
+                        # passthrough (author's alias, no
+                        # computation) is not a node and not an
+                        # ask card — visible here, never silent
+                        ref_tail = (expr.get("ref") or ""
+                                    ).rsplit(".", 1)[-1]
+                        if (expr_kind == "column_ref"
+                                and member.get("name")
+                                and ref_tail.lower()
+                                != str(member["name"]).lower()):
+                            counts["passthrough_renamed"] += 1
+                    else:
+                        counts["anonymous_skipped"] += 1
+                    continue
+                seq += 1
+                if already:
+                    continue  # this scope materialized a prior boot
+                cid = f"{node.identity}::dcol#{seq}"
+                expr = member.get("expression") or {}
+                operation = ((expr.get("name") or "").upper()
+                             if expr.get("kind") == "function"
+                             else expr.get("kind", ""))
+                derivation = ("named_literal"
+                              if expr.get("kind") == "literal"
+                              else "operation")
+                counts["derived_columns"] += 1
+                counts["operations" if derivation == "operation"
+                       else "named_literals"] += 1
+                # literal: shape
+                props = {"name": member.get("name") or f"dcol#{seq}",
+                         "derivation": derivation,
+                         "operation": operation,
+                         "description": produce.derived_phrase(
+                             member, voice),
+                         "fragment": (member.get("evidence") or {})
+                         .get("fragment", "")}
+                if member.get("position") is not None:
+                    props["position"] = member["position"]
+                store.append_node("derived_column", cid, props,
+                                  as_of, node.extract_id)
+                store.append_edge("has_part", node.identity, cid,
+                                  {}, as_of, node.extract_id)
+        # the remainder census rides the receipt (R12's counted law)
+        for op_name, n in sorted(voice.function_remainders.items()):
+            counts["function_remainders"][op_name] = \
+                counts["function_remainders"].get(op_name, 0) + n
     return counts
 
 

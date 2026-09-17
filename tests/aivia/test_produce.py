@@ -83,7 +83,7 @@ def test_run_event_matches_f4_accounting(produced):
     # 2.9.0 = R5.c THE OWNER-POSSESSIVE (ruled + built 2026-09-14;
     # conscious bump — A1 holds: no blessed_name nodes in this
     # world, so floor_texts stays byte-exact at the 2.7.0 payload)
-    assert event.properties["basis"]["floor_grammar"] == "2.9.0"
+    assert event.properties["basis"]["floor_grammar"] == "2.10.0"
     assert set(event.properties["basis"]["worklist"]) == set(F4["targets"])
 
 

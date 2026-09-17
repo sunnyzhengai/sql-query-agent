@@ -75,7 +75,19 @@ ECON = json.loads((pathlib.Path(__file__).parent / "econ_params.json")
 # recordedness only, always-when-blessed, 's on every head, no
 # stutter guard (the smell census is the eye). Unblessed owner =
 # 2.8.0 verbatim (A1).
-FLOOR_GRAMMAR_VERSION = "2.9.0"
+# 2.10.0: R12 THE COMPUTED OUTPUT (ratified Sunny 2026-09-16,
+# "ratified — go on M4"; the declared constant deferral closes
+# here, the M4 build's first slice as ruled): derived_column
+# descriptions = name words + the defining phrase, voiced
+# inside-out through THE FUNCTION-VOICING LIBRARY
+# (kg2_kind_library Function_Voicings — FN_SKELETONS is the
+# code mirror, test-locked). Composite kinds by rule: case
+# standing phrase · cast TRANSPARENT · unary sign-fold ·
+# arithmetic operator words. Unlisted operation = safe fallback
+# + counted remainder (voice.function_remainders). The ADR 0076
+# value() overlays (COALESCE/LEFT/RIGHT/DATEADD) absorb into
+# _fill_overlay — condition-context phrases BYTE-IDENTICAL (A1).
+FLOOR_GRAMMAR_VERSION = "2.10.0"
 # literal: grammar Grammar_Floor R1
 _PREPOSITIONS = ("of", "on", "per", "for", "in", "at", "by", "with")
 # rider (c) amended (Sunny 2026-09-13): the dictionary's declared
@@ -159,6 +171,227 @@ def _pluralize(grain: str) -> str:
     return " ".join(words)
 
 
+# ---- R12: THE FUNCTION-VOICING LIBRARY (v2.10.0) ----
+# The datepart words (ADR 0076's overlay map, re-homed verbatim —
+# byte parity guards the M3 stored texts; keys stay EXACTLY the
+# overlay's set).
+# literal: grammar ADR-0076 datepart overlay
+_UNIT_WORDS = {"HH": "hour", "HOUR": "hour", "DD": "day",
+               "D": "day", "DAY": "day", "MI": "minute",
+               "MINUTE": "minute", "SS": "second",
+               "WK": "week", "MM": "month", "MONTH": "month",
+               "YY": "year", "YEAR": "year"}
+# The phrase skeletons — the CODE MIRROR of the registry's
+# Function_Voicings sheet (the sheet is the authority;
+# test_derived_render's mirror pin holds these equal).
+# literal: schema-mirror kg2_kind_library Function_Voicings
+FN_SKELETONS = {
+    "DATEDIFF": "the number of <unit>s between <from> and <to>",
+    "ROW_NUMBER": "the record's position in its ordered sequence",
+    "DATEADD": "<n> <unit>s after <base>",
+    "CHARINDEX": "the position of <find> within <in>",
+    "LEFT": "the first <n> characters of <s>",
+    "RIGHT": "the last <n> characters of <s>",
+    "MIN": "the smallest <arg>",
+    "FLOOR": "<arg>, rounded down to a whole number",
+    "COALESCE": "the first recorded of <args>",
+    "DATENAME": "the name of the <part> of <d>",
+    "DATEPART": "the <part> of <d>",
+    "STUFF": "<s> with a segment replaced by <r>",
+    "ISNULL": "<a>, or <b> when <a> is not recorded",
+    "ROUND": "<a> rounded to <n> decimal places",
+    "STRING_AGG": "every <a> joined into one list",
+    "STUFF + FOR XML PATH('')": "every <a> joined into one list",
+}
+# literal: grammar Grammar_Floor R12 (arithmetic operator words)
+_ARITH_WORDS = {"Add": "plus", "Subtract": "minus",
+                "Multiply": "times", "Divide": "divided by",
+                "Modulo": "modulo"}
+
+
+def _readable_name(name: str) -> str:
+    """Output-name words: the author's own identifier folded to
+    readable words (AGE_IN_DAYS / EncWeight -> 'age in days' /
+    'enc weight') — the R5.b line for author-named things: the
+    author's words, no blessing gate, no raw identifier spoken."""
+    s = (name or "").replace("_", " ")
+    s = re.sub(r"(?<=[a-z0-9])(?=[A-Z])", " ", s)
+    return " ".join(s.split()).lower()
+
+
+def _bare(phrase: str) -> str:
+    return phrase[4:] if phrase.startswith("the ") else phrase
+
+
+def _fill_overlay(name, args, sub) -> Optional[str]:
+    """COALESCE / LEFT / RIGHT / DATEADD — the absorbed ADR 0076
+    overlays, one fill for both contexts (value() operands + R12
+    defining phrases). Guards identical to the overlays so the M3
+    condition texts stay byte-exact (A1)."""
+    if name == "COALESCE":
+        return FN_SKELETONS["COALESCE"].replace(
+            "<args>", ", ".join(sub(a) for a in args))
+    if name in ("LEFT", "RIGHT") and len(args) == 2:
+        n = args[1].get("value")
+        return (FN_SKELETONS[name]
+                .replace("<n>", str(n) if n is not None
+                         else sub(args[1]))
+                .replace("<s>", sub(args[0])))
+    if name == "DATEADD" and len(args) == 3:
+        first = args[0]
+        unit = str(first.get("value") or first.get("ref", "")
+                   ).split(".")[-1].upper()
+        n = args[1].get("value")
+        if unit in _UNIT_WORDS and n is not None:
+            word = _UNIT_WORDS[unit] + ("" if str(n) == "1" else "s")
+            return (FN_SKELETONS["DATEADD"]
+                    .replace("<n>", str(n))
+                    .replace("<unit>s", word)
+                    .replace("<base>", sub(args[2])))
+    return None
+
+
+def _part_word(expr) -> str:
+    token = str(expr.get("value") or expr.get("ref", "")
+                ).split(".")[-1]
+    return _UNIT_WORDS.get(token.upper(), token.lower())
+
+
+def _fill_library(name, args, voice, sub) -> Optional[str]:
+    """The named-function rows beyond the absorbed overlays. None =
+    no row or a guard failed — the caller counts the remainder."""
+    skel = FN_SKELETONS.get(name)
+    if skel is None:
+        return None
+    if name == "DATEDIFF" and len(args) == 3:
+        return (skel.replace("<unit>", _part_word(args[0]))
+                .replace("<from>", sub(args[1]))
+                .replace("<to>", sub(args[2])))
+    if name == "ROW_NUMBER":
+        # partition/order slots DEFERRED with the recorded reason
+        # (registry row): the mapper's `over` is a flag, not
+        # contents — capture is a twin-structure act
+        return skel
+    if name == "MIN" and args:
+        phrase = sub(args[0])
+        if voice.is_temporal(args[0], phrase):
+            # literal: grammar Grammar_Floor R12 (MIN temporal,
+            # Sunny 2026-09-16: "yes, say earliest for dates")
+            return f"the earliest {_bare(phrase)}"
+        return skel.replace("<arg>", _bare(phrase))
+    if name == "CHARINDEX" and len(args) >= 2:
+        return (skel.replace("<find>", sub(args[0]))
+                .replace("<in>", sub(args[1])))
+    if name == "FLOOR" and args:
+        return skel.replace("<arg>", sub(args[0]))
+    if name in ("DATENAME", "DATEPART") and len(args) == 2:
+        return (skel.replace("<part>", _part_word(args[0]))
+                .replace("<d>", sub(args[1])))
+    if name == "ISNULL" and len(args) == 2:
+        return (skel.replace("<a>", sub(args[0]))
+                .replace("<b>", sub(args[1])))
+    if name == "ROUND" and len(args) >= 2:
+        n = args[1].get("value")
+        return (skel.replace("<a>", sub(args[0]))
+                .replace("<n>", str(n) if n is not None
+                         else sub(args[1])))
+    if name == "STRING_AGG" and args:
+        return skel.replace("<a>", _bare(sub(args[0])))
+    if name == "STUFF" and len(args) == 4:
+        r = args[3].get("value")
+        return (skel.replace("<s>", sub(args[0]))
+                .replace("<r>", str(r) if r is not None
+                         else sub(args[3])))
+    return None
+
+
+def _stuff_idiom(subq, voice) -> str:
+    """THE STUFF LIST IDIOM (Sunny 2026-09-16, 'rule the idiom'):
+    STUFF over a FOR-XML subquery is the pre-2017 list-join —
+    voiced as STRING_AGG's meaning; the separator literal is
+    stripped (the STUFF only trims it). The <order> slot is
+    DEFERRED with ROW_NUMBER's recorded reason (ORDER BY contents
+    are a structure flag, not contents)."""
+    members = (subq.get("scope") or {}).get("projection") or []
+    expr = (members[0].get("expression") or {}) if members else {}
+    if expr.get("kind") == "arithmetic":
+        args = expr.get("args") or []
+        non_lit = [a for a in args if a.get("kind") != "literal"]
+        if len(non_lit) == 1:
+            expr = non_lit[0]
+    inner = _defining_phrase(expr, voice) if expr \
+        else "the selected value"
+    return FN_SKELETONS["STUFF + FOR XML PATH('')"].replace(
+        "<a>", _bare(inner))
+
+
+def _defining_phrase(expr, voice) -> str:
+    """R12's recursive walk: nesting voices inside-out; a
+    composite's slot words are its children's finished phrases."""
+    kind = expr.get("kind")
+    if kind == "function":
+        name = (expr.get("name") or "").upper()
+        args = expr.get("args") or []
+        if name == "STUFF" and args \
+                and args[0].get("kind") == "subquery_ref":
+            return _stuff_idiom(args[0], voice)
+
+        def sub(a):
+            return _defining_phrase(a, voice)
+        got = _fill_overlay(name, args, sub)
+        if got is None:
+            got = _fill_library(name, args, voice, sub)
+        if got is not None:
+            return got
+        voice.function_remainders[name] = \
+            voice.function_remainders.get(name, 0) + 1
+        parts = [sub(a) for a in args]
+        # literal: grammar Grammar_Floor R12 (the counted fallback)
+        return "a value computed from " + \
+            (", ".join(parts) if parts else "its inputs")
+    if kind == "cast":
+        # TRANSPARENT: representation change, not meaning change
+        args = expr.get("args") or []
+        return (_defining_phrase(args[0], voice) if args
+                else "a recast value")
+    if kind == "case":
+        # literal: grammar Grammar_Floor R12 (the standing phrase)
+        return "a value derived by rule"
+    if kind == "unary":
+        args = expr.get("args") or []
+        inner = _defining_phrase(args[0], voice) if args else "a value"
+        return ("negative " + inner
+                if expr.get("op") == "Negative" else inner)
+    if kind == "arithmetic":
+        args = expr.get("args") or []
+        if len(args) == 2:
+            word = _ARITH_WORDS.get(expr.get("op"), "combined with")
+            return (f"{_defining_phrase(args[0], voice)} {word} "
+                    f"{_defining_phrase(args[1], voice)}")
+        return "a computed combination"
+    if kind == "subquery_ref":
+        # literal: grammar Grammar_Floor R12
+        return "a value from a nested selection"
+    return voice.value(expr, expr)
+
+
+def derived_phrase(member, voice) -> str:
+    """The derived_column node's stored description — R12's phrase
+    shape: name words + the defining phrase; a nameless member
+    speaks the phrase alone. The verbatim law holds stored == this
+    recompute."""
+    expr = member.get("expression") or {}
+    if expr.get("kind") == "literal":
+        # literal: grammar Grammar_Floor R12 (the named constant)
+        phrase = f"the constant {expr.get('value')}"
+    else:
+        phrase = _defining_phrase(expr, voice)
+    words = _readable_name(member.get("name") or "")
+    if words:
+        return f"{words[0].upper()}{words[1:]}: {phrase}."
+    return f"{phrase[:1].upper()}{phrase[1:]}."
+
+
 class _Voice:
     """Graph-backed voicing context for one scope."""
 
@@ -174,6 +407,8 @@ class _Voice:
         self.blessed = {n.properties["target"]: n.properties["words"]
                         for n in read.nodes("blessed_name")}
         self.disagreements: List[str] = []  # declared vs annotation (R8)
+        # R12: unlisted operations land here — the counted remainder
+        self.function_remainders: Dict[str, int] = {}
 
     def subject(self, expr) -> str:
         if expr.get("kind") == "column_ref":
@@ -269,36 +504,14 @@ class _Voice:
             return f"the {self.subject(expr)}"
         if kind == "case":
             return "a value derived by rule"
-        if kind == "function" and expr.get("name", "").upper() \
-                == "COALESCE":
-            parts = [self.value(a, a) for a in expr.get("args", [])]
-            return "the first recorded of " + ", ".join(parts)
-        if kind == "function" and expr.get("name", "").upper() in \
-                ("LEFT", "RIGHT") and len(expr.get("args", [])) == 2:
-            side = ("first" if expr["name"].upper() == "LEFT"
-                    else "last")
-            n = expr["args"][1].get("value")
-            return (f"the {side} {n} characters of "
-                    f"{self.value(expr['args'][0], expr['args'][0])}")
-        if kind == "function" and expr.get("name", "").upper() == "DATEADD" \
-                and len(expr.get("args", [])) == 3:
-            # ADR 0076 evidence-ordered overlay: DATEADD earned its
-            # phrase (12 estate uses). Unit arg arrives as a column_ref
-            # token (HH) — read its raw name, never its resolution.
-            # literal: grammar ADR-0076 datepart overlay
-            unit_words = {"HH": "hour", "HOUR": "hour", "DD": "day",
-                          "D": "day", "DAY": "day", "MI": "minute",
-                          "MINUTE": "minute", "SS": "second",
-                          "WK": "week", "MM": "month", "MONTH": "month",
-                          "YY": "year", "YEAR": "year"}
-            first = expr["args"][0]
-            unit = str(first.get("value") or first.get("ref", "")
-                       ).split(".")[-1].upper()
-            n = expr["args"][1].get("value")
-            base = self.value(expr["args"][2], expr["args"][2])
-            if unit in unit_words and n is not None:
-                word = unit_words[unit] + ("" if str(n) == "1" else "s")
-                return f"{n} {word} after {base}"
+        if kind == "function":
+            # the ADR 0076 overlays, ABSORBED into the shared fills
+            # (R12 v2.10.0) — guards identical, phrases byte-exact
+            got = _fill_overlay((expr.get("name") or "").upper(),
+                                expr.get("args") or [],
+                                lambda a: self.value(a, a))
+            if got is not None:
+                return got
         return decisions.render_expr(expr).lower()
 
     def forbidden_tokens(self, scope) -> List[str]:

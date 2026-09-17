@@ -193,7 +193,7 @@ SOURCES = {
 # deliveries lead, spine voiced, intermediates counted, census
 # closes; the file's ask-index words = the delivery lead, so file
 # embeddings embed meaning, never name-noise).
-STAMP_VERSION = "1.43.0"
+STAMP_VERSION = "1.45.0"
 RATIFIED = True
 DOC_STAMP = ("v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 twin-graph "
              "ruling ADR 0077; v1.2.0 Phase A metamodel bump; v1.3.0 "
@@ -245,7 +245,57 @@ DOC_STAMP = ("v1.0.0 (ratified 2026-09-05, Sunny); v1.1.0 twin-graph "
              "NamedTableReference) joins the ledger PRESENT and the "
              "reads edge RETIRES into it; absence lives in the "
              "KIND, never a null endpoint; one invariant stands: "
-             "per scope, side-targets == read-set")
+             "per scope, side-targets == read-set; "
+             "v1.44.0 = THE FUNCTION-VOICING LIBRARY (Sunny's "
+             "ruling 2026-09-16 at M4 planning, taking the "
+             "recommendation; authored at his 'author the grammar "
+             "rule + function library'): kg2_kind_library gains the "
+             "Function_Voicings sheet — operation voicings are a "
+             "CLOSED registry set (14 named functions, seed = the "
+             "MEASURED ed_sepsis_dev twin census, conservation "
+             "exact: top-level 154 = case 71 + DATEDIFF 41 + "
+             "ROW_NUMBER 26 + MIN 4 + FLOOR 3 + arithmetic 3 + "
+             "cast 3 + STUFF 2 + COALESCE 1; the 4 composite kinds "
+             "voice by rule — case standing phrase, cast "
+             "TRANSPARENT, unary sign-fold, arithmetic operator "
+             "words), the kind-vs-label posture for functions: a "
+             "new function is a registry row, never silent; the "
+             "ADR 0076 code overlays (COALESCE, LEFT/RIGHT, "
+             "DATEADD) absorb as rows VERBATIM, their produce.py "
+             "hardcodes retire at the M4 build slice; an unlisted "
+             "operation renders the safe fallback + a COUNTED "
+             "REMAINDER row; Grammar_Floor §R12 THE COMPUTED "
+             "OUTPUT (RATIFIED v2.10.0, Sunny 2026-09-16 "
+             "'ratified — go on M4') is "
+             "the speaking rule — registry rows only, twin "
+             "structure untouched; both flagged drafts RULED same "
+             "day at Sunny's word: MIN temporal args read "
+             "'earliest' ('yes, say earliest for dates') + THE "
+             "STUFF LIST IDIOM ('rule the idiom': the compound "
+             "row STUFF over FOR XML PATH('') voices as "
+             "list-joining — STRING_AGG's meaning, matched before "
+             "the literal row; meaning over syntax, the "
+             "token-link-reduction precedent); "
+             "v1.45.0 = M4 THE DERIVED-COLUMN LAYER BUILT "
+             "(Sunny's 'ratified — go on M4', 2026-09-16): "
+             "derived_column flips PRESENT (::dcol# grain, one "
+             "node per computed output — STAY FLAT ruled same "
+             "day, expression trees stay at L1) with scope—"
+             "has_part→derived_column birth edges + scope—cites→"
+             "column at STORE grain (cites re-based 100→97 by "
+             "measurement: three twin-path heads collapse into "
+             "named scopes — the joins-93→95 precedent); "
+             "Connection_Ledger derived_column re-homes to "
+             "has_part 'edged' (the defines pseudo stays for the "
+             "ask surface, the M2 reads precedent); Speech_Sources "
+             "derived_column speaks the STORED R12 phrase; grammar "
+             "constant 2.10.0 (the declared deferral closes in "
+             "this build's first slice); the mapper gains the "
+             "arithmetic/unary operator property (twin untouched "
+             "— the translator reads kind/name/args only); "
+             "ROW_NUMBER partition/order + list-idiom <order> "
+             "slots DEFERRED with recorded reasons (over/ORDER BY "
+             "are structure flags, not contents)")
 CONVERTED_ON = "2026-09-05"
 
 
@@ -634,6 +684,155 @@ TWIN_SHEETS = {
             {"Set": "SET_OPERATIONS",
              "Members": "Union|Except|Intersect",
              "Cites": "Structure_Kinds COMBINATION"},
+            {"Set": "FUNCTION_VOICING_OPS",
+             "Members": "DATEDIFF|ROW_NUMBER|DATEADD|CHARINDEX|"
+             "LEFT|MIN|FLOOR|COALESCE|DATENAME|DATEPART|STUFF|"
+             "ISNULL|ROUND|STRING_AGG|RIGHT",
+             "Cites": "Function_Voicings sheet (v1.44.0; the "
+             "closed named-function set — composite kinds voice "
+             "by rule, Grammar_Floor §R12)"},
+        ],
+        "Function_Voicings": [
+            {"Operation": "_ruling", "Kind": "-", "Slots": "-",
+             "Voicing template (DRAFT — Sunny gap-checks phrasing)":
+             "THE FUNCTION-VOICING LIBRARY (Sunny 2026-09-16, M4 "
+             "planning): operation voicings are a CLOSED set — a "
+             "new function is a registry row, never silent (the "
+             "kind-vs-label posture, R4's total-voicing "
+             "precedent). Named functions voice by their row; "
+             "composite kinds (case/cast/unary/arithmetic) voice "
+             "by rule in Grammar_Floor §R12; an unlisted "
+             "operation renders 'a value computed from <operand "
+             "words>' + a COUNTED REMAINDER row. Slots voice "
+             "inside-out (children's finished phrases). Estate "
+             "counts measured 2026-09-16 from the ed_sepsis_dev "
+             "twin (projection subtrees + condition operands). "
+             "UDFs join as schema-qualified rows when an estate "
+             "practices them.",
+             "Source": "Sunny's ruling 2026-09-16; Grammar_Floor "
+             "§R12 (RATIFIED v2.10.0 same day)",
+             "Estate count (measured 2026-09-16)": "-"},
+            {"Operation": "DATEDIFF", "Kind": "function",
+             "Slots": "unit, from, to",
+             "Voicing template (DRAFT — Sunny gap-checks phrasing)":
+             "the number of <unit>s between <from> and <to>",
+             "Source": "authored 2026-09-16",
+             "Estate count (measured 2026-09-16)": "56"},
+            {"Operation": "ROW_NUMBER", "Kind": "function (window)",
+             "Slots": "(none — see deferral)",
+             "Voicing template (DRAFT — Sunny gap-checks phrasing)":
+             "the record's position in its ordered sequence — "
+             "partition/order slots DEFERRED with a recorded "
+             "reason (Echo Law): the mapper captures `over` as a "
+             "FLAG, not contents; capture is a twin-structure "
+             "act beyond M4's sealed scope. An echo (a future "
+             "estate where these renders matter) makes the build "
+             "mandatory",
+             "Source": "authored 2026-09-16; slots deferral "
+             "recorded at the M4 build",
+             "Estate count (measured 2026-09-16)": "26"},
+            {"Operation": "DATEADD", "Kind": "function",
+             "Slots": "unit, n, base",
+             "Voicing template (DRAFT — Sunny gap-checks phrasing)":
+             "<n> <unit>s after <base>",
+             "Source": "ADR 0076 overlay ABSORBED verbatim",
+             "Estate count (measured 2026-09-16)": "13"},
+            {"Operation": "CHARINDEX", "Kind": "function",
+             "Slots": "find, in",
+             "Voicing template (DRAFT — Sunny gap-checks phrasing)":
+             "the position of <find> within <in>",
+             "Source": "authored 2026-09-16",
+             "Estate count (measured 2026-09-16)": "6"},
+            {"Operation": "LEFT", "Kind": "function",
+             "Slots": "s, n",
+             "Voicing template (DRAFT — Sunny gap-checks phrasing)":
+             "the first <n> characters of <s>",
+             "Source": "ADR 0076 overlay ABSORBED verbatim",
+             "Estate count (measured 2026-09-16)": "6"},
+            {"Operation": "MIN", "Kind": "function (aggregate)",
+             "Slots": "arg",
+             "Voicing template (DRAFT — Sunny gap-checks phrasing)":
+             "the smallest <arg>; when <arg> is temporal (date/"
+             "time data type from the dictionary), the earliest "
+             "<arg>",
+             "Source": "authored 2026-09-16; temporal variant "
+             "RULED (Sunny 2026-09-16: 'yes, say earliest for "
+             "dates')",
+             "Estate count (measured 2026-09-16)": "4"},
+            {"Operation": "FLOOR", "Kind": "function",
+             "Slots": "arg",
+             "Voicing template (DRAFT — Sunny gap-checks phrasing)":
+             "<arg>, rounded down to a whole number",
+             "Source": "authored 2026-09-16",
+             "Estate count (measured 2026-09-16)": "3"},
+            {"Operation": "COALESCE", "Kind": "function",
+             "Slots": "args…",
+             "Voicing template (DRAFT — Sunny gap-checks phrasing)":
+             "the first recorded of <args>",
+             "Source": "ADR 0076 overlay ABSORBED verbatim",
+             "Estate count (measured 2026-09-16)": "3"},
+            {"Operation": "DATENAME", "Kind": "function",
+             "Slots": "part, d",
+             "Voicing template (DRAFT — Sunny gap-checks phrasing)":
+             "the name of the <part> of <d>",
+             "Source": "authored 2026-09-16",
+             "Estate count (measured 2026-09-16)": "2"},
+            {"Operation": "DATEPART", "Kind": "function",
+             "Slots": "part, d",
+             "Voicing template (DRAFT — Sunny gap-checks phrasing)":
+             "the <part> of <d>",
+             "Source": "authored 2026-09-16",
+             "Estate count (measured 2026-09-16)": "2"},
+            {"Operation": "STUFF + FOR XML PATH('')",
+             "Kind": "compound idiom (matched FIRST, before the "
+             "literal STUFF row)",
+             "Slots": "a (the inner selected value), order "
+             "(optional, from the inner ORDER BY)",
+             "Voicing template (DRAFT — Sunny gap-checks phrasing)":
+             "every <a> joined into one list — STRING_AGG's "
+             "meaning: the pre-2017 spelling of the same "
+             "list-join; the STUFF is only trimming the leading "
+             "separator. The <order> slot shares ROW_NUMBER's "
+             "recorded deferral (ORDER BY is a structure flag, "
+             "not contents)",
+             "Source": "THE STUFF LIST IDIOM RULED (Sunny "
+             "2026-09-16: 'rule the idiom') — meaning over "
+             "syntax, the token-link-reduction precedent",
+             "Estate count (measured 2026-09-16)": "2 (both "
+             "estate STUFF uses are this pattern)"},
+            {"Operation": "STUFF", "Kind": "function",
+             "Slots": "s, start, len, r",
+             "Voicing template (DRAFT — Sunny gap-checks phrasing)":
+             "<s> with a segment replaced by <r>",
+             "Source": "authored 2026-09-16; stays for non-idiom "
+             "uses (0 in this estate — the idiom row above rules "
+             "its pattern first)",
+             "Estate count (measured 2026-09-16)": "0"},
+            {"Operation": "ISNULL", "Kind": "function",
+             "Slots": "a, b",
+             "Voicing template (DRAFT — Sunny gap-checks phrasing)":
+             "<a>, or <b> when <a> is not recorded",
+             "Source": "authored 2026-09-16",
+             "Estate count (measured 2026-09-16)": "1"},
+            {"Operation": "ROUND", "Kind": "function",
+             "Slots": "a, n",
+             "Voicing template (DRAFT — Sunny gap-checks phrasing)":
+             "<a> rounded to <n> decimal places",
+             "Source": "authored 2026-09-16",
+             "Estate count (measured 2026-09-16)": "1"},
+            {"Operation": "STRING_AGG", "Kind": "function (aggregate)",
+             "Slots": "a, sep",
+             "Voicing template (DRAFT — Sunny gap-checks phrasing)":
+             "every <a> joined into one list",
+             "Source": "authored 2026-09-16",
+             "Estate count (measured 2026-09-16)": "1"},
+            {"Operation": "RIGHT", "Kind": "function",
+             "Slots": "s, n",
+             "Voicing template (DRAFT — Sunny gap-checks phrasing)":
+             "the last <n> characters of <s>",
+             "Source": "ADR 0076 overlay ABSORBED verbatim (rides "
+             "its LEFT pair)",
+             "Estate count (measured 2026-09-16)": "0"},
         ],
         "Structure_Kinds_Phase_A": [
             {"Kind": "PROJECTION",
@@ -898,9 +1097,17 @@ TWIN_SHEETS = {
              "verbatim-law checked; out of the search index until "
              "the scoring work resumes (ruled-silent with scopes/"
              "statements)"},
-            {"Label": "derived_column", "Speech": "computed-output "
-             "phrase (grammar render: name words + the defining "
-             "selection)", "Meaning": "rendered"},
+            {"Label": "derived_column", "Speech": "stored "
+             "description (the M4 node's R12 computed-output "
+             "phrase) — ONE voice, store grain, uniform with "
+             "table/column/scope",
+             "Meaning": "re-homed at Sunny's 'fix (c)' "
+             "(2026-09-16, same day the TWO-VOICES divergence "
+             "was declared and closed): the pre-M4 placeholder "
+             "('a computed output of the … selection') and its "
+             "name-grain entries RETIRED; THE SPEECH PARITY GATE "
+             "(test_speech_parity) is the standing tripwire — "
+             "the placeholder law's first enforcement"},
             {"Label": "term (KG3)", "Speech": "definition",
              "Meaning": "human-authored"},
             {"Label": "drift name", "Speech": "the standing drift "
@@ -1157,9 +1364,14 @@ TWIN_SHEETS = {
              "Description obligation": "stored (voiced phrase)",
              "Notes": "same"},
             {"Kind": "node", "Name": "derived_column",
-             "Status": "TARGET — landing: the materialization build",
-             "Description obligation": "stored (voiced phrase)",
-             "Notes": "same"},
+             "Status": "PRESENT",
+             "Description obligation": "stored (voiced phrase — "
+             "the R12 computed-output render)",
+             "Notes": "M4 BUILT 2026-09-16 (Sunny's 'ratified — "
+             "go on M4'): one node per computed output (STAY "
+             "FLAT — expression trees live at L1); ::dcol# grain, "
+             "scope—has_part→derived_column birth + scope—cites→"
+             "column at store grain"},
             {"Kind": "node", "Name": "join",
              "Status": "PRESENT",
              "Description obligation": "stored (voiced phrase — the "
@@ -1381,10 +1593,17 @@ TWIN_SHEETS = {
              "Meaning": "M3: minted from references; born by the "
              "scopes that consult it (scope —uses_param→ param); "
              "file—has_part→param lands at M6"},
-            {"Label": "derived_column", "Edge": "defines",
-             "Status": "edged-pseudo",
-             "Meaning": "tree-born; its scope defines it "
-             "(pre-existing edge, now documented)"},
+            {"Label": "derived_column", "Edge": "has_part",
+             "Status": "edged",
+             "Meaning": "M4 (2026-09-16): born by its scope "
+             "(scope —has_part→ derived_column, ::dcol# grain); "
+             "the scope's outputs cite their dictionary columns "
+             "(scope —cites→ column, store grain). The ask "
+             "surface re-homed to the store nodes at Sunny's "
+             "'fix (c)' (2026-09-16); the name-addressable "
+             "defines PSEUDO survives ONLY as boot-adjacency "
+             "links (walk connectivity), no longer as ask "
+             "cards"},
             {"Label": "drift", "Edge": "sighted",
              "Status": "edged-pseudo",
              "Meaning": "tree-born; sighted by the reading file "

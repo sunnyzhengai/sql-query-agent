@@ -132,5 +132,7 @@ def test_the_shape_report_prints_the_three_answers(world):
     targets = [n for n, r in nodes.items()
                if str(r["Status"]).startswith("TARGET")]
     # the declared debt is VISIBLE — the report names every TARGET
-    assert "statement" in targets and "derived_column" in targets
+    # (derived_column left the list at M4, 2026-09-16)
+    assert "statement" in targets
+    assert "derived_column" not in targets
     assert q1 and q3  # the answers exist to print

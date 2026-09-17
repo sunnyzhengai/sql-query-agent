@@ -929,9 +929,14 @@ def test_condition_tree_delivers_whole(world):
     assert set(by_tail) == {"cond#6", "cond#8", "cond#9",
                             "cond#10"}
     # NOT folded into its child — the positive fact spoken with
-    # the name-words subject (grammar 2.5.0 + 2.6.0: "The taken
-    # time is recorded.")
-    assert by_tail["cond#6"]["words"] == "the taken time is recorded."
+    # the name-words subject (grammar 2.5.0 + 2.6.0), and since
+    # the records-records sitting blessed MED_ADMIN_RECORDS
+    # (2026-09-15), R5.c's owner-possessive speaks: "the
+    # medication administration's taken time". (This pin went
+    # stale at that blessing — the sitting ran the estate battery,
+    # not the console round; caught at the M4 full-suite gate.)
+    assert by_tail["cond#6"]["words"] == \
+        "the medication administration's taken time is recorded."
     # 2.7.0 THE RELATION RULE: name words BOTH sides + the SQL
     # author's noted intent riding (Sunny's "still not fixed" round)
     assert by_tail["cond#8"]["words"] == ("the taken time is before "

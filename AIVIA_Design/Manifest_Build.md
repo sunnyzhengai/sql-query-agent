@@ -1170,3 +1170,101 @@ label, uniform walk 94, read-set 59 rows == the local walk
 4 blessings) · 6d7fa09 (the second colon dies) · 897fe1f
 (a1 confirmed + answer-key re-base to blessed_name 113) · the
 commit carrying THIS ROW is the batch's closing commit.**
+
+## 2026-09-16 — M4 PLANNING (the entry-gate session; no code)
+
+**THE FUNCTION-VOICING LIBRARY RULED (Sunny, 2026-09-16, taking
+the recommendation):** the M4 grammar rule (derived_column's
+"computed-output phrase") ships WITH a function-voicing library
+as a registry sheet — operation kinds are a CLOSED registry set,
+never free text, the same kind-vs-label posture as the predicate
+library ("a new function is a registry row, never silent"). Seed
+= the MEASURED operation census of the estate (grep-level
+estimate on USP_ED_SEPSIS: ~18 distinct — DATEDIFF 56 ·
+ROW_NUMBER 30 · DATEADD 13 · CONVERT 12 · CHARINDEX 8 · LEFT ·
+MIN · FLOOR · COALESCE · STUFF · DATEPART · DATENAME ·
+TRY_CONVERT · SUBSTRING · STRING_AGG · ROUND · ISNULL · CAST —
+real numbers land via the recompute test at build); anything
+outside the sheet renders a safe fallback and lands as a COUNTED
+REMAINDER row, never a failure. UDFs are estate-enumerable
+registry rows of the same sheet. Why: R4's precedent — total
+voicing is only possible over a closed set; the rule's
+ratification implicitly creates the library, the registry makes
+it honest. **STILL OPEN at the entry gate:** the rule's wording +
+number (R11 is informally reserved for statements), Sunny's
+ratification, and the `::dcol#` identity naming. **CLARIFIED
+same session (the AGE_IN_DAYS walkthrough):** M4's sealed shape
+is ONE node per computed output — the defining expression's
+nesting stays at L1 (twin content keys); `FLOOR` rides the node
+as the salient-operation property (registry-gated per this
+ruling); no expression trees materialize in the store.
+Expression-tree materialization was ANALYZED, then RULED same
+session — **STAY FLAT (Sunny, 2026-09-16: "stay flat for M4")**:
+the sealed one-node-per-output shape stands; predicates are
+meaning, expression shells are syntax, syntax stays at L1. The
+recorded escalation path if lineage grain is ever needed: cites
+at derived_column grain first (zero new nodes), full trees only
+on a fresh ruling.
+
+**THE AUTHORING LANDED (same session, Sunny's "author the
+grammar rule + function library"):**
+
+| claim | state | evidence |
+|---|---|---|
+| §R12 THE COMPUTED OUTPUT authored in Grammar_Floor — name words + the defining phrase, library-voiced inside-out, counted remainder fallback, ADR 0076 overlays absorbed; v2.10.0 block PROPOSED (constant stays 2.9.0 — the R5.b declared-deferral precedent: the rule renders nothing until derived_column nodes exist; constant + F4 pin + fixtures bump at the M4 build's first slice) | **RATIFIED (Sunny 2026-09-16, "ratified — go on M4")** — the deferral closes with the build below | Grammar_Floor.md §R12 + the v2.10.0 header block |
+| THE MEASURED CENSUS replaced the grep estimate: 473 projection members = 312 passthrough + 154 operation + 2 named_literal + 5 anon (conservation exact); top-level operations 154 = case 71 + DATEDIFF 41 + ROW_NUMBER 26 + MIN 4 + FLOOR 3 + arithmetic 3 + cast 3 + STUFF 2 + COALESCE 1; library seed = 14 named functions + 4 composite kinds; grep-level CONVERT/TRY_CONVERT sightings proved to be the cast KIND | MEASURED from the twin (verification law) | the census run 2026-09-16; counts mirrored in the Function_Voicings sheet rows |
+| REGISTRIES 1.44.0 (converter-first — the hand-edit was caught and reverted BEFORE the determinism test could, the law held): kg2_kind_library gains Function_Voicings (16 rows: _ruling + 14 named + RIGHT riding its LEFT pair at count 0) + Closed_Sets FUNCTION_VOICING_OPS; doc stamp block bumped same breath (RG-A2); answer key basis re-based (zero twin-structure effect); test_metamodel pin 1.44.0 | LANDED | convert_from_xlsx.py diff · validate_registries green · Design_Graph_Engine.md stamp block |
+| TWO DRAFTS FLAGGED OPEN for Sunny's gap-check: MIN over temporal args ("smallest" vs "earliest") · STUFF's estate uses are the FOR-XML list idiom (compound idiom row = candidate ruling) | **BOTH RULED same day, Sunny's word** — MIN: "yes, say earliest for dates" (temporal args voice 'the earliest', dictionary data type decides) · STUFF: "rule the idiom" (compound row STUFF+FOR XML PATH('') voices as list-joining, STRING_AGG's meaning, matched before the literal row — taught from the proc's own AllSepsis_Scores code first, ruled after) | Function_Voicings rows (MIN · the idiom row · literal STUFF at count 0) + Grammar_Floor §R12 build section; validators + determinism + mirrors green after each landing |
+
+**M4 THE DERIVED-COLUMN LAYER BUILT (same day — Sunny's
+"ratified — go on M4"; test-first through five slices):**
+
+| claim | state | evidence |
+|---|---|---|
+| §R12 RATIFIED + the constant deferral CLOSED in the build's first slice as ruled: FLOOR_GRAMMAR_VERSION 2.10.0, F4 basis pin flipped, 19 byte-exact fixture pins authored BEFORE the renderer (tests/aivia/test_derived_render.py incl. the registry-mirror lock: code skeletons == the Function_Voicings sheet); the ADR 0076 value() overlays ABSORBED into shared fills — condition-context phrases byte-identical (A1, suite-verified) | BUILT | test_derived_render 19 green first run · test_produce F4 byte-exact green · verbatim suites green |
+| THE MINTING (inbound `_store_derived_column_layer`, riding the condition layer's exact pattern): derived_column ×156 (154 operation + 2 named_literal) at `::dcol#` grain, scope—has_part→derived_column ×156, scope—cites→column ×97 at STORE grain; passthroughs 312 + anonymous 5 COUNTED, never minted; function_remainders {} — every practiced operation has its row; idempotent re-boot pinned | BUILT | AIVIA_Test estate battery: store-vs-key census · by-derivation split · descriptions 156/156 stored==recomputed (verbatim law) · case-parentage pin (condition 1141 unchanged, none under a dcol) · F2 negative pins (zero nodes on an all-passthrough estate) |
+| THE PRE-BUILD MEASUREMENT caught two would-be corpses: (a) the raw walk's `select_refs` ALIAS key double-counts 4 phantom members — skipped by law in `_derived_members`; (b) cites RE-BASED 100→97: the twin-authored count was TWIN-PATH grain, the ruled edge is store grain — three subquery/arm heads collapse into their named scopes (the joins-93→95 precedent, key updated by measurement) | RECORDED | expected_m_gates.json `_pin_at_build` + the store-grain recompute test |
+| REGISTRIES 1.45.0 (converter-first): Shape_Ledger derived_column TARGET→PRESENT · Connection_Ledger re-homed to has_part "edged" (the defines pseudo stays for the ask surface — the M2 reads precedent) · Speech_Sources speaks the STORED R12 phrase · doc stamp block same breath · answer key basis re-based · the mapper gains the arithmetic/unary `op` property (twin untouched — translator reads kind/name/args only); ROW_NUMBER partition/order + list-idiom `<order>` slots DEFERRED with recorded reasons (over/ORDER BY are structure flags, not contents — an echo makes the capture mandatory) | BUILT | validators 8/8 · determinism · metamodel 1.45.0 · shape census green vs the FULL sepsis estate (Q1/Q2/Q3 — the PRESENT flip held everywhere, not just the dev proc) |
+| THE EXPORT: 3 new parquets (graph_derived_column · graph_has_part_scopeDerivedColumn · graph_cites_scopeColumn) — every one of the 26 pre-existing parquets BYTE-IDENTICAL at regen (checksummed: structure and texts never moved); connect.py walks `::dcol#` birth edges (store-grain family); THE GRAPH VISUAL republished same URL (M1–M4 title, derived_column layer + cites toggle + pin cards; payload census 6092/6562/156/97 == the key exactly) | BUILT | export checksum diff = exactly the 3 new files · estate export-census test green · artifact build 3a81d962 |
+| SPOT-CHECK FIND (the steward's queue, not a bug): AGE_IN_DAYS speaks "…the date and time when…" — ADT_ARRIVAL_TIME is UNBLESSED, so its dictionary noun phrase dangles (the known R5 vendor-words class, pinned at M3 too); blessing that column re-voices every position by delta-by-name. The gate sheet's spot check speaks the MEASURED text verbatim (verification law) | RECORDED — rides Sunny's blessing pace | GQL_Gates.md §M4 spot check |
+| THE GATE SHEET: §M4 authored with measured numbers (census 6092 · edges 6562 closing the 8-type battery · by-derivation 154/2 · spot check) + the load steps (3 new parquets, model deltas: node derived_column · has_part mapping · cites edge, ONE refresh); cumulative Q1/Q3 tables RE-BASED to the 1.45.0 key (they now carry ERA 3 + M4; pre-era-3 rows in git history) | AUTHORED | AIVIA_Test/GQL_Gates.md §M4 |
+| FULL SUITE + LINT + TEST_MAP | first pass 2156 green / THREE RED, all closed same hour: (1) literal-census tag placement on the new _DERIVED_OP_KINDS frozenset (the scanner wants the tag adjacent to the tuple) — moved; (2) test_part_edges' pseudo-citizens pin — the flip its own docstring anticipated ("until their batches land"): derived_column now asserts edged/has_part; (3) test_meaning_console cond#6 — **PRE-EXISTING RED ON CLEAN HEAD (verified by stash-run)**: the 09-15 records-records blessing re-voiced "the medication administration's taken time is recorded." and the console pin was never re-run — AN ECHO of the subset-gate class (the sitting ran the estate battery, not the console round; the 09-12 ledger audit named this class at 1be0628). Pin corrected to the store truth. **MECHANISM QUESTION FOR SUNNY (Echo Law, 2nd occurrence):** should blessing batches run the FULL suite as their gate, not the estate battery? | **CLOSING STAMP: 2159 passed · 25 skipped · 8 xfailed · 0 failed (0:11:36, exit 0)**; ruff clean (only the 2 pre-existing converter E501s); TEST_MAP + generated docs regenerated |
+| THE CONSOLE FIND (Sunny's live test, same evening — "can't find AGE_IN_DAYS"): the ask index HAS the card (exact name, 1 entry) but THREE mechanisms bury it. (1) **RANKING vs MATCHING**: the total-score law RANKS by the SUM of card cosines while MATCH is judged at best-single-card grain (the code's own physics note: "three floor-crossing dribbles are not one real match") — every displayed hit summed ≥1.35 across 2-3 cards, so a pure exact-name match (~0.9, one card) can never make the cut; the search path has NO deterministic exact-fold tier before the vectors. (2) **ANAPHOR OVER-MARK with a non-empty table**: "how is AGE_IN_DAYS defined" got the mention reference-marked and silently resolved to the TABLE HEAD (CALENDAR_DT) — the "proposal never veto" guard covers only the EMPTY table (the 22:27 corpse's sibling). (3) **THE INDEX PRE-DATES M4**: its 403 derived_column cards are the old tree-grain pseudos ({scope}.{NAME}) speaking "a computed output of the … selection" — the store's 156 R12 descriptions are never consulted; AND the passthrough filter is DEAD CODE (reads expr["label"], the mapper writes "kind" — always False, so same-named staging copies swamp the count, the exact swamping its comment feared) | **DESIGN QUESTIONS — Sunny's ruling, not patches** (design-first triage): (a) exact-fold name tier before the vector search, or rank by (best_card, sum)? (b) a role-mark that exact-folds to an index name loses to the name? (c) the index's derived_column cards re-home to the M4 STORE nodes (156, R12 speech) — the pseudo grain + dead filter retire together? | the probe run 2026-09-16 (index entry present, ask('AGE_IN_DAYS') at the deterministic tier finds it; the buried ranking reproduced from the round's own trace numbers) |
+
+**REMAINING for the batch to CLOSE (the batch law's last clause,
+Sunny's hand):** load the 3 new parquets + model deltas + ONE
+refresh → run the §M4 gate queries → the closing commit lands in
+this table. No Fabric operation without Sunny's go.
+
+## 2026-09-16 (late) — THE PLACEHOLDER LAW (Sunny's ruling, from
+## the AGE_IN_DAYS search find)
+
+**RULED (Sunny, 2026-09-16: "bake into our development protocol
+that when we put a placeholder, we need to place a trigger/test
+gate/reminder that ties to the build"):** a placeholder — any
+text or value shipped in place of a real source that does not
+exist yet — may never ship NAKED. Every placeholder lands with a
+mechanical tripwire tied to the build that will replace it: a
+test that FAILS the moment the real source exists (so the
+placeholder cannot outlive its reason), or a counted ledger row
+naming the landing step (the Connection_Ledger counted-missing
+pattern). The deciding case: the ask index's derived_column
+placeholder ("a computed output of the … selection") was written
+when computed columns had no stored descriptions anywhere — an
+honest fallback at birth — but carried NO tripwire, so when M4
+landed the real descriptions the same day-old placeholder kept
+speaking and only Sunny's live test caught it. First enforcement:
+THE SPEECH PARITY GATE (ruled same breath — every Speech_Sources
+row gets a mechanical verifier; a declaration with no check is a
+hope, the RG-B1 principle applied to speech).
+
+**THE PARITY GATE + FIX (c) BUILT (same night, test-first —
+Sunny's "yes" on the gate + "fix (c)"):**
+
+| claim | state | evidence |
+|---|---|---|
+| THE SPEECH PARITY GATE: AIVIA_Test/test_speech_parity.py — closure both ways (every Speech_Sources row has a verifier · every index label has a row) + the STORED check (index words == the store node's description, lowercased, per entry) + absent-label check (join/statement stay out) + render-nonempty check. AUTHORED FAILING (the derived_column placeholder tripped it — proof the tripwire works), green after the (c) build | BUILT | 5 pins; the red-then-green run recorded this session |
+| FIX (c): the ask index's derived_column entries RE-HOMED to the M4 store nodes — one entry per node (156, ::dcol# grain), speech = the stored R12 description lowercased (speak()), the card speaks the same; the pre-M4 pseudo entries ({scope}.{NAME}, the placeholder "a computed output of the … selection") and their DEAD passthrough filter (read expr["label"], mapper writes "kind" — never fired) DELETED, not fixed; the defines pseudo survives only as boot-adjacency links | BUILT | test_speech_parity green · AGE_IN_DAYS index words now "age in days: the number of days between the patient's birth date and …" (verbatim probe) · index-touching suites 103 green |
+| THE COUNTED TRADE-OFF (Sunny accepted): RENAMED passthroughs (author's alias, no computation) lose their ask cards — now COUNTED in the derived-layer receipt (`passthrough_renamed`), never silent; revisit on evidence | BUILT | inbound counts split |
+| Speech_Sources derived_column row flipped to the ONE-VOICE truth (the TWO-VOICES divergence declared and closed the same day); Connection_Ledger row corrected (defines pseudo = adjacency only) — registry rows only, same 1.45.0 (uncommitted bump amended) | LANDED | validators 8/8 · converter regen |
+| CASCADE, counted: the recorded-embedding fixture (tests/fixtures/recorded/text-embedding-3-small.json.gz) lacks vectors for the changed speech — MEASURED: 436 distinct new sentences (423 derived_column R12 descriptions + 13 new name texts; the error's "982" counts per-use slots before dedup). Full-suite state: **2102 passed · 62 red, ALL 62 the ONE RecordingGap class** (61 ERROR + 1 "FAILED" that is the same gap firing inside a test body — verified singly). Unblock = Sunny's key, one run: `AIVIA_RECORD=1 /opt/homebrew/bin/python3.11 -m pytest tests AIVIA_Test -q` (sub-cent spend, his hand per the capacity law), then the suite is fully offline again; his next keyed console boot re-embeds the same sentences into the live cache by content key | **CLEARED — Sunny's hand, same night: the recording run landed and the FULL SUITE went green — 2164 passed · 25 skipped · 8 xfailed · 0 failed (0:11:06) — exactly 2102 + the 62 recording-blocked; the fixture (text-embedding-3-small.json.gz) carries the 436 new sentences and the suite is offline again** | the classification re-run + the count-by-type probe + Sunny's green run 2026-09-16 |

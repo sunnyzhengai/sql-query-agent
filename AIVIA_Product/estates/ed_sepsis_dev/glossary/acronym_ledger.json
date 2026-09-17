@@ -1,6 +1,17 @@
 {
+ "01": {
+  "carriers": 2,
+  "position": [
+   "last"
+  ],
+  "sample": [
+   "CRITICAL_VALUE_01",
+   "Screened Positive 01"
+  ],
+  "status": "unreviewed"
+ },
  "1": {
-  "carriers": 68,
+  "carriers": 70,
   "position": [
    "last",
    "mid"
@@ -1125,9 +1136,10 @@
   "status": "unreviewed"
  },
  "2": {
-  "carriers": 51,
+  "carriers": 55,
   "position": [
-   "last"
+   "last",
+   "mid"
   ],
   "sample": [
    "GUAR_ADDR_2",
@@ -1583,13 +1595,16 @@
   "status": "unreviewed"
  },
  "24": {
-  "carriers": 6,
+  "carriers": 8,
   "position": [
+   "first",
    "last"
   ],
   "sample": [
    "join#24",
-   "cond#24"
+   "cond#24",
+   "Sepsis Pos ED Readmit in 24Hrs",
+   "ED Readmit in 24Hrs"
   ],
   "status": "unreviewed"
  },
@@ -2249,13 +2264,15 @@
   "status": "unreviewed"
  },
  "3": {
-  "carriers": 37,
+  "carriers": 38,
   "position": [
-   "last"
+   "last",
+   "mid"
   ],
   "sample": [
    "join#3",
-   "cond#3"
+   "cond#3",
+   "Bolus 3 Administered"
   ],
   "status": "unreviewed"
  },
@@ -8246,20 +8263,23 @@
  "abx": {
   "approved_at": "2026-09-09T12:00:00Z",
   "approved_by": "person:sunny",
-  "carriers": 3,
+  "carriers": 22,
   "expansions": [
    "antibiotics"
   ],
   "position": [
    "first",
    "last",
-   "mid"
+   "mid",
+   "only"
   ],
   "provenance": "Scribe live run 2026-09-08 + Sunny curation 2026-09-09 (migrated from acronym_blessings.json 2026-09-11)",
   "sample": [
    "FIRST_ABX_GIVEN_DTTM",
    "reporting/USP_ED_SEPSIS.sql::ABX",
-   "reporting/USP_ED_SEPSIS.sql::#BasePopABX"
+   "reporting/USP_ED_SEPSIS.sql::#BasePopABX",
+   "POSOD2ABX",
+   "Arrival To First ABX Admin Time"
   ],
   "scope": "estate",
   "status": "blessed"
@@ -8489,8 +8509,9 @@
   "status": "unreviewed"
  },
  "acid": {
-  "carriers": 8,
+  "carriers": 10,
   "position": [
+   "mid",
    "only"
   ],
   "sample": [
@@ -8851,7 +8872,7 @@
   "status": "unreviewed"
  },
  "admin": {
-  "carriers": 19,
+  "carriers": 22,
   "position": [
    "first",
    "mid"
@@ -8862,6 +8883,20 @@
    "HIM_ADMIN_ACCESS_FLAG",
    "ME_ADMIN_FLAG_FLAG",
    "MR_ADMIN_VIEW_ONLY"
+  ],
+  "status": "unreviewed"
+ },
+ "administered": {
+  "carriers": 27,
+  "position": [
+   "last"
+  ],
+  "sample": [
+   "Bolus 1 Administered",
+   "Bolus 2 Administered",
+   "Bolus 3 Administered",
+   "Positive Sepsis and Abx Administered",
+   "Positive Sepsis and Abx NOT Administered"
   ],
   "status": "unreviewed"
  },
@@ -9116,7 +9151,7 @@
   "status": "unreviewed"
  },
  "age": {
-  "carriers": 19,
+  "carriers": 24,
   "position": [
    "first",
    "last",
@@ -9143,6 +9178,16 @@
    "BAD_DEBT_AGENCY_ID",
    "AGENCY_ASSIGNMENT_TYPE_CODE",
    "COLLECTION_AGENCY"
+  ],
+  "status": "unreviewed"
+ },
+ "agent": {
+  "carriers": 1,
+  "position": [
+   "first"
+  ],
+  "sample": [
+   "AGENT_ORDER"
   ],
   "status": "unreviewed"
  },
@@ -9189,7 +9234,7 @@
   "status": "unreviewed"
  },
  "alert": {
-  "carriers": 36,
+  "carriers": 38,
   "position": [
    "first",
    "mid",
@@ -9225,7 +9270,7 @@
   "status": "unreviewed"
  },
  "all": {
-  "carriers": 9,
+  "carriers": 11,
   "position": [
    "first",
    "last",
@@ -9399,6 +9444,16 @@
   ],
   "status": "unreviewed"
  },
+ "am": {
+  "carriers": 1,
+  "position": [
+   "mid"
+  ],
+  "sample": [
+   "First Positive Score AM/PM"
+  ],
+  "status": "unreviewed"
+ },
  "amb": {
   "carriers": 15,
   "position": [
@@ -9513,13 +9568,16 @@
   "status": "blessed"
  },
  "and": {
-  "carriers": 2,
+  "carriers": 50,
   "position": [
    "mid"
   ],
   "sample": [
    "COMP_AND_RPKG_CODE",
-   "reporting/USP_ED_SEPSIS.sql::#Labs_and_Cultures"
+   "reporting/USP_ED_SEPSIS.sql::#Labs_and_Cultures",
+   "Positive Sepsis and OrderSet Placed",
+   "Positive Sepsis and OrderSet NOT Placed",
+   "Positive Sepsis and Abx Administered"
   ],
   "status": "unreviewed"
  },
@@ -9621,12 +9679,14 @@
   "status": "unreviewed"
  },
  "any": {
-  "carriers": 1,
+  "carriers": 2,
   "position": [
+   "first",
    "mid"
   ],
   "sample": [
-   "MDRO_ANY_ORGANISM_FLAG"
+   "MDRO_ANY_ORGANISM_FLAG",
+   "Any BP During ED Stay?"
   ],
   "status": "unreviewed"
  },
@@ -9857,7 +9917,7 @@
   "status": "blessed"
  },
  "arrival": {
-  "carriers": 12,
+  "carriers": 25,
   "position": [
    "first",
    "mid"
@@ -9994,12 +10054,13 @@
   "status": "unreviewed"
  },
  "assigned": {
-  "carriers": 1,
+  "carriers": 2,
   "position": [
    "mid"
   ],
   "sample": [
-   "BED_ASSIGNED_DTTM"
+   "BED_ASSIGNED_DTTM",
+   "Bed Request to Bed Assigned Time"
   ],
   "status": "unreviewed"
  },
@@ -10658,7 +10719,7 @@
   "status": "unreviewed"
  },
  "bed": {
-  "carriers": 22,
+  "carriers": 24,
   "position": [
    "first",
    "mid"
@@ -10951,7 +11012,7 @@
   "status": "unreviewed"
  },
  "blood": {
-  "carriers": 20,
+  "carriers": 34,
   "position": [
    "first",
    "mid",
@@ -11014,9 +11075,10 @@
   "status": "unreviewed"
  },
  "bolus": {
-  "carriers": 15,
+  "carriers": 38,
   "position": [
    "first",
+   "mid",
    "only"
   ],
   "sample": [
@@ -11055,17 +11117,19 @@
   "status": "unreviewed"
  },
  "border": {
-  "carriers": 1,
+  "carriers": 2,
   "position": [
-   "last"
+   "last",
+   "mid"
   ],
   "sample": [
-   "reporting/USP_ED_SEPSIS.sql::#ED_BORDER"
+   "reporting/USP_ED_SEPSIS.sql::#ED_BORDER",
+   "ED Border PATIENTS"
   ],
   "status": "unreviewed"
  },
  "bp": {
-  "carriers": 9,
+  "carriers": 15,
   "position": [
    "first",
    "last",
@@ -11392,7 +11456,7 @@
   "status": "unreviewed"
  },
  "canc": {
-  "carriers": 9,
+  "carriers": 11,
   "position": [
    "first",
    "mid"
@@ -12417,6 +12481,17 @@
   ],
   "status": "unreviewed"
  },
+ "clv": {
+  "carriers": 2,
+  "position": [
+   "mid"
+  ],
+  "sample": [
+   "Arrival To CLV Placement Time",
+   "Triage To CLV Placement Time"
+  ],
+  "status": "unreviewed"
+ },
  "cm": {
   "carriers": 100,
   "position": [
@@ -12733,12 +12808,14 @@
   "status": "unreviewed"
  },
  "collection": {
-  "carriers": 2,
+  "carriers": 4,
   "position": [
-   "first"
+   "first",
+   "only"
   ],
   "sample": [
-   "COLLECTION_AGENCY"
+   "COLLECTION_AGENCY",
+   "CollectionTime"
   ],
   "status": "unreviewed"
  },
@@ -13000,9 +13077,10 @@
   "status": "unreviewed"
  },
  "compliance": {
-  "carriers": 12,
+  "carriers": 13,
   "position": [
    "first",
+   "last",
    "only"
   ],
   "sample": [
@@ -13528,7 +13606,7 @@
   "status": "unreviewed"
  },
  "count": {
-  "carriers": 8,
+  "carriers": 9,
   "position": [
    "last",
    "mid"
@@ -13809,6 +13887,27 @@
   ],
   "status": "unreviewed"
  },
+ "criteria": {
+  "carriers": 2,
+  "position": [
+   "mid"
+  ],
+  "sample": [
+   "SSS Severe Sepsis Criteria Met",
+   "SSS Non Severe Sepsis Criteria Met"
+  ],
+  "status": "unreviewed"
+ },
+ "critical": {
+  "carriers": 1,
+  "position": [
+   "first"
+  ],
+  "sample": [
+   "CRITICAL_VALUE_01"
+  ],
+  "status": "unreviewed"
+ },
  "crna": {
   "carriers": 1,
   "position": [
@@ -13857,10 +13956,18 @@
  "csf": {
   "approved_at": "2026-09-09T12:00:00Z",
   "approved_by": "person:sunny",
+  "carriers": 2,
   "expansions": [
    "Cerebrospinal Fluid"
   ],
+  "position": [
+   "mid"
+  ],
   "provenance": "Scribe live run 2026-09-08 + Sunny curation 2026-09-09 (migrated from acronym_blessings.json 2026-09-11)",
+  "sample": [
+   "Arrival To CSF Order Time",
+   "Triage To CSF Order Time"
+  ],
   "scope": "estate",
   "status": "blessed"
  },
@@ -14037,8 +14144,10 @@
   "status": "unreviewed"
  },
  "culture": {
-  "carriers": 12,
+  "carriers": 29,
   "position": [
+   "first",
+   "mid",
    "only"
   ],
   "sample": [
@@ -14279,7 +14388,7 @@
   "status": "unreviewed"
  },
  "date": {
-  "carriers": 210,
+  "carriers": 212,
   "position": [
    "first",
    "last",
@@ -14371,7 +14480,7 @@
   "status": "unreviewed"
  },
  "days": {
-  "carriers": 13,
+  "carriers": 16,
   "position": [
    "first",
    "last",
@@ -14450,6 +14559,16 @@
   ],
   "scope": "estate",
   "status": "blessed"
+ },
+ "dcol": {
+  "carriers": 2,
+  "position": [
+   "first"
+  ],
+  "sample": [
+   "dcol#2"
+  ],
+  "status": "unreviewed"
  },
  "ddd": {
   "carriers": 1,
@@ -14869,7 +14988,7 @@
  "dept": {
   "approved_at": "2026-09-11T12:00:00Z",
   "approved_by": "person:sunny",
-  "carriers": 57,
+  "carriers": 58,
   "evidence": "abbreviation_dictionary.json: dept",
   "expansions": [
    "department"
@@ -16130,6 +16249,16 @@
   ],
   "status": "unreviewed"
  },
+ "during": {
+  "carriers": 1,
+  "position": [
+   "mid"
+  ],
+  "sample": [
+   "Any BP During ED Stay?"
+  ],
+  "status": "unreviewed"
+ },
  "dvtprophylaxis": {
   "approved_at": "2026-09-09T12:00:00Z",
   "approved_by": "person:sunny",
@@ -16325,7 +16454,7 @@
  "ed": {
   "approved_at": "2026-09-09T12:00:00Z",
   "approved_by": "person:sunny",
-  "carriers": 107,
+  "carriers": 112,
   "expansions": [
    "Emergency Department"
   ],
@@ -16747,7 +16876,7 @@
  "enc": {
   "approved_at": "2026-09-09T12:00:00Z",
   "approved_by": "person:sunny",
-  "carriers": 101,
+  "carriers": 103,
   "expansions": [
    "Encounter"
   ],
@@ -18009,7 +18138,7 @@
   "status": "unreviewed"
  },
  "first": {
-  "carriers": 103,
+  "carriers": 125,
   "position": [
    "first",
    "mid",
@@ -18058,7 +18187,7 @@
   "status": "unreviewed"
  },
  "flag": {
-  "carriers": 451,
+  "carriers": 453,
   "position": [
    "last",
    "mid",
@@ -18371,6 +18500,16 @@
   ],
   "sample": [
    "RPT_GRP_FOURTY_CODE"
+  ],
+  "status": "unreviewed"
+ },
+ "fps": {
+  "carriers": 1,
+  "position": [
+   "first"
+  ],
+  "sample": [
+   "FPS Bolus ABX ReScreen Compliance"
   ],
   "status": "unreviewed"
  },
@@ -18847,7 +18986,7 @@
   "status": "unreviewed"
  },
  "group": {
-  "carriers": 20,
+  "carriers": 21,
   "position": [
    "first",
    "last",
@@ -19604,12 +19743,15 @@
   "status": "unreviewed"
  },
  "hrs": {
-  "carriers": 1,
+  "carriers": 3,
   "position": [
+   "first",
    "last"
   ],
   "sample": [
-   "LOS_HRS"
+   "LOS_HRS",
+   "Sepsis Pos ED Readmit in 24Hrs",
+   "ED Readmit in 24Hrs"
   ],
   "status": "unreviewed"
  },
@@ -19719,9 +19861,11 @@
   "status": "unreviewed"
  },
  "hypotension": {
-  "carriers": 9,
+  "carriers": 12,
   "position": [
+   "first",
    "last",
+   "mid",
    "only"
   ],
   "sample": [
@@ -19730,6 +19874,16 @@
    "FirstHypotensionTakenInDeptYN",
    "FirstHypotensionTime",
    "FirstHypotensionValue"
+  ],
+  "status": "unreviewed"
+ },
+ "hypotensive": {
+  "carriers": 1,
+  "position": [
+   "first"
+  ],
+  "sample": [
+   "HYPOTENSIVE_SYSTOLIC_BP"
   ],
   "status": "unreviewed"
  },
@@ -20110,7 +20264,7 @@
   "status": "unreviewed"
  },
  "in": {
-  "carriers": 61,
+  "carriers": 66,
   "position": [
    "first",
    "mid",
@@ -20262,7 +20416,7 @@
   "status": "unreviewed"
  },
  "indicator": {
-  "carriers": 7,
+  "carriers": 8,
   "position": [
    "last",
    "mid"
@@ -20879,7 +21033,7 @@
   "status": "unreviewed"
  },
  "ip": {
-  "carriers": 25,
+  "carriers": 26,
   "position": [
    "first",
    "mid"
@@ -21104,7 +21258,7 @@
  "lab": {
   "approved_at": "2026-09-09T12:00:00Z",
   "approved_by": "person:sunny",
-  "carriers": 35,
+  "carriers": 36,
   "expansions": [
    "laboratory"
   ],
@@ -21210,8 +21364,9 @@
   "status": "unreviewed"
  },
  "lactic": {
-  "carriers": 9,
+  "carriers": 11,
   "position": [
+   "mid",
    "only"
   ],
   "sample": [
@@ -21267,7 +21422,7 @@
   "status": "unreviewed"
  },
  "last": {
-  "carriers": 72,
+  "carriers": 76,
   "position": [
    "first",
    "mid",
@@ -21358,7 +21513,7 @@
   "status": "unreviewed"
  },
  "lda": {
-  "carriers": 4,
+  "carriers": 5,
   "position": [
    "first",
    "last",
@@ -21368,7 +21523,8 @@
    "ED_LDA_REMOVAL_DOC_FLAG",
    "IP_LDA_ID",
    "LDA_GROUP_CDR",
-   "reporting/USP_ED_SEPSIS.sql::#LDA"
+   "reporting/USP_ED_SEPSIS.sql::#LDA",
+   "LDA_PLACEMENT_TYPE"
   ],
   "status": "unreviewed"
  },
@@ -21662,7 +21818,7 @@
  "line": {
   "approved_at": "2026-09-11T12:00:00Z",
   "approved_by": "person:sunny",
-  "carriers": 50,
+  "carriers": 70,
   "evidence": "abbreviation_dictionary.json: line",
   "expansions": [
    "line number"
@@ -21736,11 +21892,12 @@
   "status": "unreviewed"
  },
  "list": {
-  "carriers": 19,
+  "carriers": 21,
   "position": [
    "first",
    "last",
-   "mid"
+   "mid",
+   "only"
   ],
   "sample": [
    "GROUPER_COMPILED_LIST",
@@ -22407,6 +22564,16 @@
   ],
   "status": "unreviewed"
  },
+ "mborder": {
+  "carriers": 2,
+  "position": [
+   "only"
+  ],
+  "sample": [
+   "MBOrderTime"
+  ],
+  "status": "unreviewed"
+ },
  "mc": {
   "carriers": 2,
   "position": [
@@ -22623,10 +22790,11 @@
   "status": "unreviewed"
  },
  "medication": {
-  "carriers": 13,
+  "carriers": 14,
   "position": [
    "first",
-   "mid"
+   "mid",
+   "only"
   ],
   "sample": [
    "MEDICATION_ORDERS",
@@ -22729,14 +22897,16 @@
   "status": "unreviewed"
  },
  "met": {
-  "carriers": 2,
+  "carriers": 4,
   "position": [
    "last",
    "mid"
   ],
   "sample": [
    "CHR_CNT_MET",
-   "INSTANT_MET_DTTM"
+   "INSTANT_MET_DTTM",
+   "SSS Severe Sepsis Criteria Met",
+   "SSS Non Severe Sepsis Criteria Met"
   ],
   "status": "unreviewed"
  },
@@ -23158,7 +23328,7 @@
   "status": "unreviewed"
  },
  "months": {
-  "carriers": 7,
+  "carriers": 8,
   "position": [
    "last",
    "only"
@@ -23476,6 +23646,16 @@
   ],
   "status": "unreviewed"
  },
+ "myline": {
+  "carriers": 5,
+  "position": [
+   "only"
+  ],
+  "sample": [
+   "MYLINE"
+  ],
+  "status": "unreviewed"
+ },
  "mypt": {
   "carriers": 1,
   "position": [
@@ -23648,7 +23828,7 @@
   "status": "unreviewed"
  },
  "negative": {
-  "carriers": 3,
+  "carriers": 29,
   "position": [
    "first",
    "mid"
@@ -23656,7 +23836,9 @@
   "sample": [
    "HRA_BAL_NEGATIVE_FLAG",
    "reporting/USP_ED_SEPSIS.sql::#ED_NegativeScores",
-   "reporting/USP_ED_SEPSIS.sql::NegativeCultures"
+   "reporting/USP_ED_SEPSIS.sql::NegativeCultures",
+   "Negative Sepsis and OrderSet Placed",
+   "Negative Sepsis and OrderSet NOT Placed"
   ],
   "status": "unreviewed"
  },
@@ -23841,9 +24023,10 @@
   "status": "unreviewed"
  },
  "non": {
-  "carriers": 10,
+  "carriers": 27,
   "position": [
    "first",
+   "mid",
    "only"
   ],
   "sample": [
@@ -23938,7 +24121,7 @@
   "status": "unreviewed"
  },
  "not": {
-  "carriers": 13,
+  "carriers": 37,
   "position": [
    "first",
    "mid",
@@ -24653,7 +24836,7 @@
   "status": "unreviewed"
  },
  "order": {
-  "carriers": 99,
+  "carriers": 126,
   "position": [
    "first",
    "last",
@@ -24682,9 +24865,10 @@
   "status": "unreviewed"
  },
  "ordered": {
-  "carriers": 10,
+  "carriers": 22,
   "position": [
    "first",
+   "last",
    "mid",
    "only"
   ],
@@ -24782,10 +24966,11 @@
   "status": "unreviewed"
  },
  "organism": {
-  "carriers": 8,
+  "carriers": 10,
   "position": [
    "first",
-   "mid"
+   "mid",
+   "only"
   ],
   "sample": [
    "ORGANISM_QUANTITY",
@@ -25431,12 +25616,14 @@
   "status": "unreviewed"
  },
  "patients": {
-  "carriers": 1,
+  "carriers": 2,
   "position": [
+   "last",
    "only"
   ],
   "sample": [
-   "PATIENTS"
+   "PATIENTS",
+   "ED Border PATIENTS"
   ],
   "status": "unreviewed"
  },
@@ -26062,6 +26249,16 @@
   ],
   "status": "unreviewed"
  },
+ "picu": {
+  "carriers": 1,
+  "position": [
+   "mid"
+  ],
+  "sample": [
+   "IP Bed Request to PICU Transfer Time"
+  ],
+  "status": "unreviewed"
+ },
  "pin": {
   "carriers": 1,
   "position": [
@@ -26075,10 +26272,17 @@
  "piv": {
   "approved_at": "2026-09-09T12:00:00Z",
   "approved_by": "person:sunny",
+  "carriers": 1,
   "expansions": [
    "Peripheral Intravenous"
   ],
+  "position": [
+   "mid"
+  ],
   "provenance": "Scribe live run 2026-09-08 + Sunny curation 2026-09-09 (migrated from acronym_blessings.json 2026-09-11)",
+  "sample": [
+   "First Positive Screen To First PIV Placement"
+  ],
   "scope": "estate",
   "status": "blessed"
  },
@@ -26170,22 +26374,33 @@
   "status": "unreviewed"
  },
  "placed": {
-  "carriers": 2,
+  "carriers": 14,
   "position": [
+   "last",
    "only"
   ],
   "sample": [
-   "AddOrdersReceivedPlacedByMDPNP"
+   "AddOrdersReceivedPlacedByMDPNP",
+   "Positive Sepsis and OrderSet Placed",
+   "Positive Sepsis and OrderSet NOT Placed",
+   "Negative Sepsis and OrderSet Placed",
+   "Negative Sepsis and OrderSet NOT Placed"
   ],
   "status": "unreviewed"
  },
  "placement": {
-  "carriers": 1,
+  "carriers": 5,
   "position": [
-   "first"
+   "first",
+   "last",
+   "mid"
   ],
   "sample": [
-   "PLACEMENT_INSTANT"
+   "PLACEMENT_INSTANT",
+   "LDA_PLACEMENT_TYPE",
+   "Arrival To CLV Placement Time",
+   "Triage To CLV Placement Time",
+   "First Positive Screen To First PIV Placement"
   ],
   "status": "unreviewed"
  },
@@ -26231,6 +26446,16 @@
   ],
   "sample": [
    "MEDICATION_PLL_IDENT"
+  ],
+  "status": "unreviewed"
+ },
+ "pm": {
+  "carriers": 1,
+  "position": [
+   "last"
+  ],
+  "sample": [
+   "First Positive Score AM/PM"
   ],
   "status": "unreviewed"
  },
@@ -26417,7 +26642,7 @@
   "status": "unreviewed"
  },
  "pos": {
-  "carriers": 14,
+  "carriers": 15,
   "position": [
    "first",
    "mid",
@@ -26433,9 +26658,10 @@
   "status": "unreviewed"
  },
  "positive": {
-  "carriers": 10,
+  "carriers": 45,
   "position": [
    "first",
+   "mid",
    "only"
   ],
   "sample": [
@@ -26444,6 +26670,16 @@
    "PositiveODScore",
    "reporting/USP_ED_SEPSIS.sql::#ED_PositiveScores",
    "reporting/USP_ED_SEPSIS.sql::PositiveCultures"
+  ],
+  "status": "unreviewed"
+ },
+ "posod2": {
+  "carriers": 1,
+  "position": [
+   "only"
+  ],
+  "sample": [
+   "POSOD2ABX"
   ],
   "status": "unreviewed"
  },
@@ -27134,6 +27370,17 @@
   ],
   "sample": [
    "MAR_LABEL_PRNTR_ID"
+  ],
+  "status": "unreviewed"
+ },
+ "pro": {
+  "carriers": 2,
+  "position": [
+   "mid"
+  ],
+  "sample": [
+   "Arrival To PRO Order Time",
+   "Triage To PRO Order Time"
   ],
   "status": "unreviewed"
  },
@@ -28088,12 +28335,14 @@
   "status": "unreviewed"
  },
  "re": {
-  "carriers": 1,
+  "carriers": 2,
   "position": [
+   "first",
    "mid"
   ],
   "sample": [
-   "DISP_CVG_FAST_RE_FLAG"
+   "DISP_CVG_FAST_RE_FLAG",
+   "FPS Bolus ABX ReScreen Compliance"
   ],
   "status": "unreviewed"
  },
@@ -28121,14 +28370,16 @@
   "status": "unreviewed"
  },
  "readmit": {
-  "carriers": 2,
+  "carriers": 4,
   "position": [
    "last",
    "mid"
   ],
   "sample": [
    "reporting/USP_ED_SEPSIS.sql::#Base_Pop_ED_Readmit_All",
-   "reporting/USP_ED_SEPSIS.sql::#Base_Pop_ED_Readmit"
+   "reporting/USP_ED_SEPSIS.sql::#Base_Pop_ED_Readmit",
+   "Sepsis Pos ED Readmit in 24Hrs",
+   "ED Readmit in 24Hrs"
   ],
   "status": "unreviewed"
  },
@@ -28188,7 +28439,7 @@
   "status": "unreviewed"
  },
  "reasons": {
-  "carriers": 5,
+  "carriers": 6,
   "position": [
    "last",
    "only"
@@ -28948,7 +29199,7 @@
  "req": {
   "approved_at": "2026-09-09T12:00:00Z",
   "approved_by": "person:sunny",
-  "carriers": 15,
+  "carriers": 16,
   "expansions": [
    "request"
   ],
@@ -28979,14 +29230,16 @@
   "status": "unreviewed"
  },
  "request": {
-  "carriers": 3,
+  "carriers": 5,
   "position": [
    "mid"
   ],
   "sample": [
    "RX_REQUEST_PHARMACY_ID",
    "RX_REQUEST_TYPE_CODE",
-   "RX_REQUEST_VIEWED_FLAG"
+   "RX_REQUEST_VIEWED_FLAG",
+   "Bed Request to Bed Assigned Time",
+   "IP Bed Request to PICU Transfer Time"
   ],
   "status": "unreviewed"
  },
@@ -30063,9 +30316,10 @@
   "status": "unreviewed"
  },
  "score": {
-  "carriers": 9,
+  "carriers": 14,
   "position": [
    "last",
+   "mid",
    "only"
   ],
   "sample": [
@@ -30078,7 +30332,7 @@
   "status": "unreviewed"
  },
  "scores": {
-  "carriers": 4,
+  "carriers": 5,
   "position": [
    "first",
    "last"
@@ -30087,13 +30341,15 @@
    "reporting/USP_ED_SEPSIS.sql::#Base_Pop_Severe_ED_Scores",
    "reporting/USP_ED_SEPSIS.sql::#ED_PositiveScores",
    "reporting/USP_ED_SEPSIS.sql::#ED_NegativeScores",
-   "reporting/USP_ED_SEPSIS.sql::#Base_Pop_SepsisScores_ConCat"
+   "reporting/USP_ED_SEPSIS.sql::#Base_Pop_SepsisScores_ConCat",
+   "AllSepsis_Scores"
   ],
   "status": "unreviewed"
  },
  "screen": {
-  "carriers": 5,
+  "carriers": 13,
   "position": [
+   "first",
    "mid",
    "only"
   ],
@@ -30103,6 +30359,16 @@
    "LastBolusToScreenTime",
    "LastPIVBeforeScreen",
    "ScreenTimeToFirstBolus"
+  ],
+  "status": "unreviewed"
+ },
+ "screened": {
+  "carriers": 1,
+  "position": [
+   "first"
+  ],
+  "sample": [
+   "Screened Positive 01"
   ],
   "status": "unreviewed"
  },
@@ -30169,12 +30435,17 @@
   "status": "blessed"
  },
  "second": {
-  "carriers": 1,
+  "carriers": 6,
   "position": [
+   "first",
    "mid"
   ],
   "sample": [
-   "MAR_PEND_SECOND_USER_ID"
+   "MAR_PEND_SECOND_USER_ID",
+   "First ABX To Second ABX Admin Time",
+   "First Positive Screen To Second ABX Time",
+   "First Positive Screen To Second Bolus Time",
+   "First Bolus To Second Bolus Time"
   ],
   "status": "unreviewed"
  },
@@ -30304,7 +30575,7 @@
   "status": "unreviewed"
  },
  "sepsis": {
-  "carriers": 66,
+  "carriers": 120,
   "position": [
    "first",
    "last",
@@ -30317,6 +30588,16 @@
    "IP_SepsisEncounters",
    "IP_SepsisEncountersWLocations",
    "IP_SepsisPatientDates"
+  ],
+  "status": "unreviewed"
+ },
+ "septic": {
+  "carriers": 1,
+  "position": [
+   "first"
+  ],
+  "sample": [
+   "Septic Shock"
   ],
   "status": "unreviewed"
  },
@@ -30491,7 +30772,7 @@
   "status": "unreviewed"
  },
  "set": {
-  "carriers": 14,
+  "carriers": 28,
   "position": [
    "first",
    "last",
@@ -30555,7 +30836,7 @@
   "status": "unreviewed"
  },
  "severe": {
-  "carriers": 3,
+  "carriers": 37,
   "position": [
    "first",
    "mid"
@@ -30563,7 +30844,9 @@
   "sample": [
    "NON_SEVERE_SEPSIS_STAGING",
    "SEVERE_SEPSIS_STAGING",
-   "reporting/USP_ED_SEPSIS.sql::#Base_Pop_Severe_ED_Scores"
+   "reporting/USP_ED_SEPSIS.sql::#Base_Pop_Severe_ED_Scores",
+   "SSS Severe Sepsis Criteria Met",
+   "SSS Non Severe Sepsis Criteria Met"
   ],
   "status": "unreviewed"
  },
@@ -30696,6 +30979,16 @@
    "Shift2Compliance",
    "Shift2ComplianceYN",
    "Shift2NonCompliance"
+  ],
+  "status": "unreviewed"
+ },
+ "shock": {
+  "carriers": 1,
+  "position": [
+   "last"
+  ],
+  "sample": [
+   "Septic Shock"
   ],
   "status": "unreviewed"
  },
@@ -31375,6 +31668,20 @@
   ],
   "status": "unreviewed"
  },
+ "sss": {
+  "carriers": 34,
+  "position": [
+   "first"
+  ],
+  "sample": [
+   "SSS Severe Sepsis Criteria Met",
+   "SSS Non Severe Sepsis Criteria Met",
+   "SSS SEVERE and Positive Sepsis and OrderSet Placed",
+   "SSS SEVERE and Positive Sepsis and OrderSet NOT Placed",
+   "SSS SEVERE and Positive Sepsis and Abx Administered"
+  ],
+  "status": "unreviewed"
+ },
  "st": {
   "carriers": 3,
   "position": [
@@ -31452,6 +31759,16 @@
   "sample": [
    "NON_SEVERE_SEPSIS_STAGING",
    "SEVERE_SEPSIS_STAGING"
+  ],
+  "status": "unreviewed"
+ },
+ "stamp": {
+  "carriers": 1,
+  "position": [
+   "last"
+  ],
+  "sample": [
+   "DATE_STAMP"
   ],
   "status": "unreviewed"
  },
@@ -31565,7 +31882,7 @@
   "status": "unreviewed"
  },
  "stay": {
-  "carriers": 6,
+  "carriers": 7,
   "position": [
    "last",
    "mid"
@@ -32072,8 +32389,9 @@
   "status": "unreviewed"
  },
  "svo2": {
-  "carriers": 5,
+  "carriers": 7,
   "position": [
+   "mid",
    "only"
   ],
   "sample": [
@@ -32180,7 +32498,7 @@
   "status": "unreviewed"
  },
  "systolic": {
-  "carriers": 4,
+  "carriers": 5,
   "position": [
    "last",
    "mid"
@@ -32188,7 +32506,8 @@
   "sample": [
    "ECG_SYSTOLIC_BP",
    "BP_SYSTOLIC",
-   "reporting/USP_ED_SEPSIS.sql::Systolic"
+   "reporting/USP_ED_SEPSIS.sql::Systolic",
+   "HYPOTENSIVE_SYSTOLIC_BP"
   ],
   "status": "unreviewed"
  },
@@ -32505,7 +32824,7 @@
   "status": "unreviewed"
  },
  "test": {
-  "carriers": 3,
+  "carriers": 4,
   "position": [
    "first",
    "mid"
@@ -32513,7 +32832,8 @@
   "sample": [
    "IV_TEST_RESULT_CODE",
    "CLAIM_TEST_INS_DTTM",
-   "TEST_ID"
+   "TEST_ID",
+   "LAB_TEST_TYPE"
   ],
   "status": "unreviewed"
  },
@@ -32571,6 +32891,17 @@
   ],
   "sample": [
    "THERAPY_UP_POOL_ID"
+  ],
+  "status": "unreviewed"
+ },
+ "third": {
+  "carriers": 2,
+  "position": [
+   "mid"
+  ],
+  "sample": [
+   "First Positive Screen To Third Bolus Time",
+   "Second Bolus To Third Bolus Time"
   ],
   "status": "unreviewed"
  },
@@ -32707,7 +33038,7 @@
   "status": "unreviewed"
  },
  "time": {
-  "carriers": 162,
+  "carriers": 224,
   "position": [
    "first",
    "last",
@@ -32797,7 +33128,7 @@
   "status": "unreviewed"
  },
  "to": {
-  "carriers": 36,
+  "carriers": 76,
   "position": [
    "first",
    "last",
@@ -33058,7 +33389,7 @@
   "status": "unreviewed"
  },
  "transfer": {
-  "carriers": 7,
+  "carriers": 8,
   "position": [
    "first",
    "mid"
@@ -33161,7 +33492,7 @@
   "status": "unreviewed"
  },
  "triage": {
-  "carriers": 6,
+  "carriers": 18,
   "position": [
    "first"
   ],
@@ -33605,7 +33936,7 @@
   "status": "unreviewed"
  },
  "type": {
-  "carriers": 152,
+  "carriers": 155,
   "position": [
    "first",
    "last",
@@ -33981,6 +34312,17 @@
   ],
   "status": "unreviewed"
  },
+ "urine": {
+  "carriers": 2,
+  "position": [
+   "mid"
+  ],
+  "sample": [
+   "Arrival To Urine Culture Order Time",
+   "Triage To Urine Culture Order Time"
+  ],
+  "status": "unreviewed"
+ },
  "us": {
   "approved_at": "2026-09-09T12:00:00Z",
   "approved_by": "person:sunny",
@@ -34010,6 +34352,17 @@
    "USA_FISCAL_YEAR_BEGIN_DT",
    "USA_FISCAL_YEAR_END_DT",
    "MILLIMAN_USA_UNAME"
+  ],
+  "status": "unreviewed"
+ },
+ "usage": {
+  "carriers": 2,
+  "position": [
+   "first"
+  ],
+  "sample": [
+   "usage:1",
+   "usage:2"
   ],
   "status": "unreviewed"
  },
@@ -34199,7 +34552,7 @@
   "status": "unreviewed"
  },
  "value": {
-  "carriers": 16,
+  "carriers": 17,
   "position": [
    "first",
    "last",
@@ -34232,6 +34585,18 @@
   ],
   "sample": [
    "GROUPER_RECORDS_VARCHAR_ID"
+  ],
+  "status": "unreviewed"
+ },
+ "vasopressor": {
+  "carriers": 3,
+  "position": [
+   "mid"
+  ],
+  "sample": [
+   "Arrival To Vasopressor Time",
+   "Triage To Vasopressor Time",
+   "First Positive Screen To Vasopressor Time"
   ],
   "status": "unreviewed"
  },
@@ -34702,7 +35067,7 @@
   "status": "unreviewed"
  },
  "weight": {
-  "carriers": 15,
+  "carriers": 16,
   "position": [
    "first",
    "last",
@@ -35043,12 +35408,14 @@
   "status": "blessed"
  },
  "y": {
-  "carriers": 1,
+  "carriers": 2,
   "position": [
+   "last",
    "mid"
   ],
   "sample": [
-   "AVATAR_Y_COORDINATE"
+   "AVATAR_Y_COORDINATE",
+   "HYPOTENSION_Y"
   ],
   "status": "unreviewed"
  },
@@ -35070,7 +35437,7 @@
   "status": "unreviewed"
  },
  "years": {
-  "carriers": 6,
+  "carriers": 7,
   "position": [
    "last",
    "only"

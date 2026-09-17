@@ -1,9 +1,29 @@
-# The Floor Grammar — v2.9.0 (THE OWNER-POSSESSIVE ratified
-# 2026-09-14; v2.8.0 THE BLESSED NAME 2026-09-12; v2.7.0 the
-# relation rule + v2.6.0 recordedness identifies + v2.5.0 NOT
-# folds same day; v2.4.0 the OPENER dies 2026-09-11; v2.3.0
-# REPORT FLOOR 2026-09-07; v2.0.0 POLICY-WALK major 2026-09-06;
-# v1.3.1 RATIFIED Sunny 2026-09-05)
+# The Floor Grammar — v2.10.0 (THE COMPUTED OUTPUT ratified
+# 2026-09-16; v2.9.0 THE OWNER-POSSESSIVE 2026-09-14; v2.8.0 THE
+# BLESSED NAME 2026-09-12; v2.7.0 the relation rule + v2.6.0
+# recordedness identifies + v2.5.0 NOT folds same day; v2.4.0
+# the OPENER dies 2026-09-11; v2.3.0 REPORT FLOOR 2026-09-07;
+# v2.0.0 POLICY-WALK major 2026-09-06; v1.3.1 RATIFIED Sunny
+# 2026-09-05)
+
+*v2.10.0 (RATIFIED Sunny 2026-09-16, "ratified — go on M4";
+authored same day at his "author the grammar rule + function
+library", the M4 planning session; both flagged drafts ruled at
+his word before ratification — MIN temporal "earliest" + THE
+STUFF LIST IDIOM): §R12 THE COMPUTED OUTPUT — the derived_column grain's
+voicing rule + THE FUNCTION-VOICING LIBRARY (kg2_kind_library
+Function_Voicings sheet, registries 1.44.0, ruled same session:
+operation voicings are a CLOSED registry set, "a new function is
+a registry row, never silent"). Numbering: R11 stays reserved
+for statement renders (the 2026-09-10 ladder decision), so the
+computed output takes R12. DECLARED DEFERRAL (the R5.b
+precedent, declared not drifted): FLOOR_GRAMMAR_VERSION stays
+2.9.0 in code until the M4 build's first slice — the rule
+renders nothing until derived_column nodes exist (A1: every
+floor text byte-identical), and bumping now would stale every
+floor-derived artifact for a no-op; the constant, the F4 basis
+pin, and the fixtures bump together at that slice. Full spec:
+§R12 below.*
 
 *v2.9.0 (Sunny's ruling, 2026-09-14 — "go with your
 recommendations" on the R5.c brief): THE OWNER-POSSESSIVE — the
@@ -781,3 +801,125 @@ blessed — the mechanism is pinned (stutter spoken-not-
 suppressed, s-ending 's, both-grains composition), the estate
 text changes ride Sunny's blessing pace + next console boot,
 per the R5.b seed law; M3 export debt rides the batch law.
+
+## R12 — THE COMPUTED OUTPUT (RATIFIED v2.10.0, Sunny 2026-09-16
+## "ratified — go on M4"; authored same day at his "author the
+## grammar rule + function library")
+
+The derived_column grain's voicing (M4). A computed output is
+the author's NAMED result of a defining expression — the lenses
+row promised its speech as "computed-output phrase (grammar
+render: name words + the defining selection)"; this section is
+that promise made law.
+
+### The phrase shape
+
+**name words + the defining phrase**, stored as the node's
+description:
+
+> Age in days: the number of days between the patient's birth
+> date and the arrival time.
+
+- **Name words** = the output name through the readable-name
+  fold (AGE_IN_DAYS → "age in days"). An output name is the SQL
+  author's own word choice — the same standing R5.b drew for
+  named scopes: the author's words, no blessing gate, no raw
+  identifier ever spoken.
+- **The defining phrase** = the expression voiced inside-out
+  through THE FUNCTION-VOICING LIBRARY (below). Operand columns
+  speak by the standing operand ladder (R5/R5.b: blessed →
+  dictionary → readable words); operand literals and parameters
+  speak by their standing rules (R8 annotations ride along).
+- One node, one phrase: M4's sealed flat shape (ruled
+  2026-09-16, "stay flat") — the nesting lives at L1; the
+  DESCRIPTION carries the composed English, never a tree.
+
+### THE FUNCTION-VOICING LIBRARY (the closed set — Sunny's
+### ruling 2026-09-16, taking the recommendation)
+
+Registry: `kg2_kind_library` sheet **Function_Voicings**
+(registries 1.44.0). The kind-vs-label posture applied to
+functions: **a new function is a registry row, never silent** —
+total voicing is only possible over a closed set (R4's
+precedent), and the registry makes the closure honest.
+
+- **Named functions** voice by their sheet row's template. Seed
+  = the MEASURED operation census of ed_sepsis_dev (14 named
+  functions, counts in the sheet; measured 2026-09-16 from the
+  twin, conservation exact: top-level 154 = case 71 + DATEDIFF
+  41 + ROW_NUMBER 26 + MIN 4 + FLOOR 3 + arithmetic 3 + cast 3
+  + STUFF 2 + COALESCE 1).
+- **Composite kinds** voice by rule, not by row:
+  - `case` → "a value derived by rule" (the standing phrase);
+    its WHEN predicates already speak as M3 conditions — the
+    case phrase never re-voices them.
+  - `cast` → TRANSPARENT: voices as its inner expression
+    ("representation change, not meaning change" — the
+    Expression_Kinds meaning, now a voicing law). CAST/CONVERT/
+    TRY_CONVERT all arrive as this kind; the census proved the
+    grep-level CONVERT sightings were casts all along.
+  - `unary` → the sign folds into the value words.
+  - `arithmetic` → operator words: plus · minus · times ·
+    divided by.
+- **ABSORPTION (the generator-level fix, Echo Law):** the ADR
+  0076 code overlays — COALESCE ("the first recorded of …"),
+  LEFT/RIGHT ("the first/last n characters of …"), DATEADD
+  ("n units after …") — become sheet rows VERBATIM; the
+  produce.py hardcodes retire at the M4 build slice. Function
+  English stops accreting in code.
+- **THE COUNTED REMAINDER:** an operation with no sheet row
+  renders the safe fallback — "a value computed from
+  <operand words>" — and lands a counted remainder row
+  (operation, count) in the render receipt. Never a failure,
+  never a raw token in prose. The remainder census is the
+  library's growth signal: a future estate's new function
+  arrives counted, its row gets authored, the fallback dies.
+- **UDFs** are estate-enumerable rows of the same sheet
+  (schema-qualified names) — arguably the highest-value rows,
+  since no vendor doc explains them.
+
+### Recursion
+
+Nesting voices inside-out; a composite's slot words are its
+children's finished phrases. FLOOR over DATEDIFF:
+
+> the number of days between the birth date and the arrival
+> time, rounded down to a whole number
+
+### What R12 does NOT touch
+
+- Condition renders (R1–R7 stand untouched). The library COULD
+  later serve produce.py's value() operands too — recorded as a
+  CANDIDATE, not ruled; today value() keeps its path, minus the
+  three absorbed hardcodes.
+- Passthrough projections (312 measured) and anonymous
+  EXISTS-SELECT members (5) — NOT nodes (the sealed M4 census),
+  so no phrase; their columns reach the graph through `cites`.
+- Statement renders — R11's reserved seat (M5).
+- Window OVER internals beyond the ROW_NUMBER template —
+  partition/order slots are drafted in the sheet; further window
+  functions arrive as rows when an estate practices them.
+
+### The build (rides M4, test-first — NOT this authoring)
+
+Constant 2.9.0 → 2.10.0 + F4 basis pin + byte-exact fixtures
+bump together at the M4 build's first slice (the declared
+deferral in this version's header block). Draft phrasings in the
+sheet are suite-first; **Sunny gap-checks phrasing** (the M5
+precedent). The two drafts flagged OPEN at authoring were BOTH
+RULED same day at Sunny's word:
+
+- **MIN temporal (Sunny 2026-09-16, "yes, say earliest for
+  dates"):** MIN over a temporal argument (date/time data type
+  from the dictionary) voices "the earliest <arg>"; all other
+  arguments keep "the smallest <arg>".
+- **THE STUFF LIST IDIOM (Sunny 2026-09-16, "rule the idiom"):**
+  the compound pattern — STUFF wrapping a FOR XML PATH('')
+  subquery — voices as LIST-JOINING ("every <a> joined into one
+  list, in <order> order"), STRING_AGG's meaning: the pattern is
+  the pre-2017 spelling of the same join, and the STUFF is only
+  trimming the leading separator. The compound row matches FIRST;
+  the literal STUFF row ("<s> with a segment replaced by <r>")
+  stays for non-idiom uses (0 in this estate). Meaning over
+  syntax — the same principle that made cast transparent and
+  ruled the token-link reduction.

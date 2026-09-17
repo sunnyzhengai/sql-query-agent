@@ -275,27 +275,58 @@ rp_edges = [{"c": cnid[r.sourceId], "p": pid[r.targetId],
             for r in rt_cp.itertuples(index=False)
             if r.sourceId in cnid and r.targetId in pid]
 
+# ---- M4 THE DERIVED-COLUMN LAYER (store rows: derived_column ·
+# scope—has_part→derived_column · scope—cites→column) ----------
+dc_df = pd.read_parquet(EXP / "graph_derived_column.parquet")
+hp_sd = pd.read_parquet(
+    EXP / "graph_has_part_scopeDerivedColumn.parquet")
+ct = pd.read_parquet(EXP / "graph_cites_scopeColumn.parquet")
+owner_of_dc = {r.targetId: r.sourceId
+               for r in hp_sd.itertuples(index=False)}
+per_scope_dc: dict = {}
+dcnodes = []
+for r in sorted(dc_df.itertuples(index=False),
+                key=lambda x: x.nodeId):
+    owner = scid.get(owner_of_dc.get(r.nodeId, ""), 0)
+    k = per_scope_dc.get(owner, 0)
+    per_scope_dc[owner] = k + 1
+    o = scnodes[owner]
+    rr = 210 + 9 * math.sqrt(k + 1)
+    th = k * GA + 2.6
+    dcnodes.append({
+        "n": r.name, "s": owner,
+        "x": round(o["x"] + rr * math.cos(th), 1),
+        "y": round(o["y"] + rr * math.sin(th), 1),
+        "d": trunc(r.description, 170)})
+cite_edges = [{"s": scid[r.sourceId], "t": cindex[r.targetId]}
+              for r in ct.itertuples(index=False)
+              if r.sourceId in scid and r.targetId in cindex]
+
 side_edges = sum(1 for j in jnodes for k in ("ls", "rs") if j[k])
 counts = {
     "nodes": 1 + len(snodes) + len(tnodes) + len(cnodes)
-    + len(scnodes) + len(jnodes) + len(cndnodes) + len(pnodes),
+    + len(scnodes) + len(jnodes) + len(cndnodes) + len(pnodes)
+    + len(dcnodes),
     "edges": len(hp_db_s) + len(hp_sc_t) + len(hp_t_c) + len(jedges)
     + len(jnodes) + side_edges + len(redges)
-    + len(cndnodes) + len(rc_edges) + len(rp_edges) + len(uedges),
+    + len(cndnodes) + len(rc_edges) + len(rp_edges) + len(uedges)
+    + len(dcnodes) + len(cite_edges),
     "hasPart": len(hp_db_s) + len(hp_sc_t) + len(hp_t_c) + len(jnodes)
-    + len(cndnodes),
+    + len(cndnodes) + len(dcnodes),
     "joins": len(jedges),
     "scopes": len(scnodes), "joinNodes": len(jnodes),
     "sideEdges": side_edges, "reads": len(dr_df),
     "conds": len(cndnodes), "params": len(pnodes),
     "resolves": len(rc_edges) + len(rp_edges),
     "usesParam": len(uedges),
+    "dcols": len(dcnodes), "cites": len(cite_edges),
     "described": sum(1 for n in tnodes if n["d"])
     + sum(1 for n in cnodes if n["d"])
     + sum(1 for n in scnodes if n["d"])
     + sum(1 for n in jnodes if n["d"])
     + sum(1 for n in cndnodes if n["d"])
-    + sum(1 for n in pnodes if n["d"]),
+    + sum(1 for n in pnodes if n["d"])
+    + sum(1 for n in dcnodes if n["d"]),
 }
 
 data = {"db": dnode, "schemas": snodes, "tables": tnodes,
@@ -303,7 +334,8 @@ data = {"db": dnode, "schemas": snodes, "tables": tnodes,
         "joinNodes": jnodes, "reads": redges,
         "conds": cndnodes, "params": pnodes,
         "resolvesCol": rc_edges, "resolvesPar": rp_edges,
-        "usesParam": uedges, "counts": counts}
+        "usesParam": uedges,
+        "dcols": dcnodes, "cites": cite_edges, "counts": counts}
 payload = json.dumps(data, separators=(",", ":"))
 print("payload bytes:", len(payload), "| counts:", counts)
 

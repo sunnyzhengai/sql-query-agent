@@ -81,10 +81,20 @@ def test_every_loaded_registry_is_ratified_v1():
     # 1.43.0 = ERA 3 THE FROM-STRUCTURE FAMILY (ratified
     # 2026-09-14): direct_read PRESENT, the reads edge RETIRED —
     # the twin's structure moves; answer key re-based with the
-    # structural delta
+    # structural delta;
+    # 1.44.0 = THE FUNCTION-VOICING LIBRARY (Sunny's ruling
+    # 2026-09-16, M4 planning): Function_Voicings sheet — closed
+    # operation set, measured census seed, ADR 0076 overlays
+    # absorbed as rows; Grammar_Floor §R12 PROPOSED — registry
+    # rows only, twin structure untouched;
+    # 1.45.0 = M4 THE DERIVED-COLUMN LAYER BUILT (Sunny's
+    # "ratified — go on M4", 2026-09-16): derived_column PRESENT
+    # (::dcol#, STAY FLAT), has_part birth + cites at store grain
+    # (100→97 by measurement); grammar constant 2.10.0; the
+    # mapper's arithmetic/unary op property (twin untouched)
     for reg in metamodel.load_all().values():
         assert reg.ratified is True
-        assert reg.version == "1.43.0"
+        assert reg.version == "1.45.0"
 
 
 def test_load_single_exposes_sheets_and_stamp():

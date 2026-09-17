@@ -8,15 +8,16 @@
   "RESOLVED AT M3: condition count 1141 (tree truth; the twin's 748 under-counted — e.g., IS NOT NULL is a NOT+NULL_CHECK pair in the tree). Independent whole-tree count matches the builder exactly",
   "M4/M5 numbers remain TWIN-authored (derived_column 156, statements 67, the 6 IF conditions) — the same tree reconciliation applies at their builds; key updates by measurement",
   "M1 EXPORT GAP: _node_row drops LIST-valued properties (pk_columns) — fix rides the export rework; counted",
-  "GRAMMAR PHRASING: condition renders compose dictionary words correctly but read clunky in places ('The this item records...') — Grammar_Floor gap-check is Sunny's, per the ladder decision"
+  "GRAMMAR PHRASING: condition renders compose dictionary words correctly but read clunky in places ('The this item records...') — Grammar_Floor gap-check is Sunny's, per the ladder decision",
+  "RESOLVED AT M4: cites 97 (store grain - three twin-path heads collapse into named scopes); derived_column 156 exact (154 operation + 2 named_literal, twin confirmed); the raw-walk select_refs ALIAS key is skipped (4 phantom members were the alias double-count, caught pre-build)"
  ],
  "basis": {
   "estate": "ed_sepsis_dev",
   "file": "reporting/USP_ED_SEPSIS.sql",
   "translator_version": "1.3.0",
-  "metamodel_version": "1.43.0",
+  "metamodel_version": "1.45.0",
   "authored": "2026-09-10",
-  "_bump_record": "authored at metamodel 1.36.0; re-based 1.37.0 (join-node ruling) then 1.38.0 (M2 join layer lands: ledger flips PRESENT) — every derived count verified by the recompute tests at each bump; re-based 1.39.0 (M3 condition layer lands); re-based 1.40.0 (structure-word claim + relation-word seat, 2026-09-12: prompts and speech rows only — zero twin-structure effect, every derived count re-verified by the recompute tests); re-based 1.41.0 (the namer seat, 2026-09-12: one Seat_Prompts row only — zero twin-structure effect, every derived count re-verified by the recompute tests); re-based at THE BLESSING (2026-09-13, Sunny's delegated curation): +105 blessed_name kg3 nodes (NO person mint — the registry is the act's record; journal self-containment) — governance truth in the STORE census, never in the Fabric export (EXPORT_LABELS); condition census 1141 and all structural counts unchanged, A2 delta = 130 description texts; re-based at THE SECOND BLESSING (2026-09-14, Sunny's hand): +4 blessed_name — the REF_* held rows re-proposed off the AUTHORED descriptions after the sentinel-origin fix and blessed same night (109 total, node_total 6276); zero edge effect, every structural count unchanged; re-based 1.42.0 (the reads relation speaks, 2026-09-14: one Speech_Sources _edge reads row only — zero twin-structure effect, every derived count re-verified by the recompute tests); re-based 1.43.0 at ERA 3 THE FROM-STRUCTURE FAMILY (2026-09-14, ratified): the reads remainder RETIRES into 6 direct_read nodes — the first STRUCTURAL re-base (+6 nodes, +12 edges, -6 reads; every census gate updated both directions); recompute tests verify; re-based at THE RECORDS-RECORDS SITTING (2026-09-15, Sunny's hand): +4 blessed_name (MED_ADMIN_RECORDS, FLOWSHEET_MEASUREMENTS, FLOWSHEET_RECORDS, GROUPER_MED_RECORDS — 113 total, M7 node_total 6286); zero edge effect, structural counts unchanged, texts moved in graph_condition + graph_scope only"
+  "_bump_record": "authored at metamodel 1.36.0; re-based 1.37.0 (join-node ruling) then 1.38.0 (M2 join layer lands: ledger flips PRESENT) — every derived count verified by the recompute tests at each bump; re-based 1.39.0 (M3 condition layer lands); re-based 1.40.0 (structure-word claim + relation-word seat, 2026-09-12: prompts and speech rows only — zero twin-structure effect, every derived count re-verified by the recompute tests); re-based 1.41.0 (the namer seat, 2026-09-12: one Seat_Prompts row only — zero twin-structure effect, every derived count re-verified by the recompute tests); re-based at THE BLESSING (2026-09-13, Sunny's delegated curation): +105 blessed_name kg3 nodes (NO person mint — the registry is the act's record; journal self-containment) — governance truth in the STORE census, never in the Fabric export (EXPORT_LABELS); condition census 1141 and all structural counts unchanged, A2 delta = 130 description texts; re-based at THE SECOND BLESSING (2026-09-14, Sunny's hand): +4 blessed_name — the REF_* held rows re-proposed off the AUTHORED descriptions after the sentinel-origin fix and blessed same night (109 total, node_total 6276); zero edge effect, every structural count unchanged; re-based 1.42.0 (the reads relation speaks, 2026-09-14: one Speech_Sources _edge reads row only — zero twin-structure effect, every derived count re-verified by the recompute tests); re-based 1.43.0 at ERA 3 THE FROM-STRUCTURE FAMILY (2026-09-14, ratified): the reads remainder RETIRES into 6 direct_read nodes — the first STRUCTURAL re-base (+6 nodes, +12 edges, -6 reads; every census gate updated both directions); recompute tests verify; re-based at THE RECORDS-RECORDS SITTING (2026-09-15, Sunny's hand): +4 blessed_name (MED_ADMIN_RECORDS, FLOWSHEET_MEASUREMENTS, FLOWSHEET_RECORDS, GROUPER_MED_RECORDS — 113 total, M7 node_total 6286); zero edge effect, structural counts unchanged, texts moved in graph_condition + graph_scope only; re-based 1.44.0 (THE FUNCTION-VOICING LIBRARY, Sunny 2026-09-16: Function_Voicings sheet + Closed_Sets row only — zero twin-structure effect, every derived count re-verified by the recompute tests); re-based 1.45.0 (M4 THE DERIVED-COLUMN LAYER BUILT, 2026-09-16: derived_column PRESENT, cites 100->97 by measurement at store grain, grammar 2.10.0, mapper op property - every derived count re-verified by the recompute tests + the new store-vs-key battery)"
  },
  "census_after": {
   "_comment": "THE GATE TABLES: cumulative Fabric-surface censuses after each batch. Q1 = MATCH (n) RETURN labels(n), count(*); Q3 = MATCH ()-[r]->() RETURN type(r), count(*). Exact both directions. M2 numbers are MEASURED FROM THE BUILT STORE (2026-09-10).",
@@ -97,9 +98,9 @@
     "right_side": 87,
     "resolves_to": 165,
     "uses_param": 2,
-    "cites": 100
+    "cites": 97
    },
-   "edge_total": 6565
+   "edge_total": 6562
   },
   "M5": {
    "nodes": {
@@ -123,9 +124,9 @@
     "right_side": 87,
     "resolves_to": 169,
     "uses_param": 4,
-    "cites": 100
+    "cites": 97
    },
-   "edge_total": 6621
+   "edge_total": 6618
   },
   "M6": {
    "nodes": {
@@ -150,9 +151,9 @@
     "right_side": 87,
     "resolves_to": 169,
     "uses_param": 4,
-    "cites": 100
+    "cites": 97
    },
-   "edge_total": 6692
+   "edge_total": 6689
   },
   "M7": {
    "nodes": {
@@ -184,11 +185,11 @@
     "right_side": 87,
     "resolves_to": 169,
     "uses_param": 4,
-    "cites": 100,
+    "cites": 97,
     "executes": 1,
     "describes": 1
    },
-   "edge_total": 6694
+   "edge_total": 6691
   }
  },
  "description_coverage": {
@@ -327,10 +328,11 @@
    },
    "new_edges": {
     "has_part_scopeDerivedColumn": 156,
-    "cites_scopeColumn": 100
+    "cites_scopeColumn": 97
    },
    "checks": {
-    "scope_ownership": "case_when conditions stay parented to scope/condition — never re-parented to derived_column"
+    "scope_ownership": "case_when conditions stay parented to scope/condition — never re-parented to derived_column",
+    "cites_grain": "RECONCILED AT BUILD (2026-09-16): twin-authored 100 counted (head, column) pairs at TWIN-PATH grain; the ruled edge is scope->column at STORE grain - three subquery/arm heads collapse into their owning named scope, measured 97 (the joins-93->95 precedent: key updates by measurement)"
    }
   },
   "M5": {

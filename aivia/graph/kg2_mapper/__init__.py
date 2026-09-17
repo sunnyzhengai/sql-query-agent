@@ -104,11 +104,16 @@ def _map_expression(ctx, expr) -> Dict[str, Any]:
                      # Expression_Kinds set stays closed; RG-C3)
                      over=(True if expr.OverClause is not None else None))
     if t == "BinaryExpression":
+        # R12 (v2.10.0): the operator is meaning — a property, not
+        # a new kind (Expression_Kinds stays closed; RG-C3). The
+        # translator reads kind/name/args only: twin untouched.
         return _node(ctx, "expression", "arithmetic", expr,
+                     op=str(expr.BinaryExpressionType),
                      args=[_map_expression(ctx, expr.FirstExpression),
                            _map_expression(ctx, expr.SecondExpression)])
     if t == "UnaryExpression":
         return _node(ctx, "expression", "unary", expr,
+                     op=str(expr.UnaryExpressionType),
                      args=[_map_expression(ctx, expr.Expression)])
     # literal: mechanical ScriptDom API names
     if t in ("CastCall", "ConvertCall", "TryCastCall", "TryConvertCall"):

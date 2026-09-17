@@ -96,7 +96,11 @@ def test_ledger_documents_the_pseudo_citizens(world):
     assert ledger["condition"]["status"] == "edged"
     assert ledger["param"]["edge"] == "uses_param"
     assert ledger["param"]["status"] == "edged"
-    assert ledger["derived_column"]["status"] == "edged-pseudo"
+    # M4 (2026-09-16) promoted derived_column to a STORE citizen —
+    # real nodes, has_part birth edges (the defines pseudo stays
+    # for the ask surface)
+    assert ledger["derived_column"]["edge"] == "has_part"
+    assert ledger["derived_column"]["status"] == "edged"
     assert ledger["drift"]["status"] == "edged-pseudo"
     # the store census stays whole and clean
     c = censuses.connection_census(read)

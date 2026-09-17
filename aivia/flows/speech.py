@@ -123,11 +123,16 @@ def speak(read, entry: Dict[str, Any]) -> str:
         return f"parameter {_words(entry['name'])} of " \
                f"{_words(entry['owner'].rsplit('/', 1)[-1])}"
     if kind == "derived_column":
-        # the entry's own name never rides in speech (one evidence,
-        # one card — the name card owns it; total-score law)
-        scope_key = identity.rsplit(".", 1)[0]
-        return (f"a computed output of the "
-                f"{_words(scope_key.split('::')[-1])} selection")
+        # THE (c) RE-HOME (2026-09-16): the M4 store node's R12
+        # description IS the speech — uniform with table/column/
+        # scope (the center law). The pre-M4 placeholder ("a
+        # computed output of the … selection") retired here; the
+        # speech parity gate is its tripwire.
+        node = next((n for n in read.nodes("derived_column")
+                     if n.identity == identity), None)
+        if node is None:
+            return ""
+        return (node.properties.get("description") or "").lower()
     if kind == "pbi_report":
         node = next(n for n in read.nodes("pbi_report")
                     if n.identity == identity)
@@ -178,7 +183,8 @@ def entries(read) -> List[Dict[str, Any]]:
         if e["label"] == "scope":
             e["owner"] = scope_owner.get(e["identity"])
         elif e["label"] == "derived_column":
-            e["owner"] = e["identity"].rsplit(".", 1)[0]
+            # ::dcol# grain (M4): the owner is the birth scope
+            e["owner"] = e["identity"].rsplit("::", 1)[0]
         elif e["label"] == "drift":
             e["owner"] = e["identity"].split("::")[0]
         e["words"] = speak(read, e)

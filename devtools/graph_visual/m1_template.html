@@ -1,4 +1,4 @@
-<title>AIVIA Graph — the store, M1–M3 (technical · join · condition layers)</title>
+<title>AIVIA Graph — the store, M1–M4 (technical · join · condition · derived-column layers)</title>
 <style>
   :root{
     --bg:#1a1a19; --panel:#222320; --panel2:#2a2b28; --line:#3a3b37;
@@ -6,7 +6,7 @@
     --table:#d95926; --column:#199e70; --schema:#3987e5; --db:#d55181;
     --join:#eda100; --haspart:#54554f;
     --scopec:#008300; --joinnode:#c98500;
-    --cond:#8e6bd0; --param:#d550c8;
+    --cond:#8e6bd0; --param:#d550c8; --dcol:#2fa8a0;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html,body{height:100%;overflow:hidden}
@@ -71,7 +71,7 @@
   @media (prefers-reduced-motion: reduce){*{transition:none!important}}
 </style>
 <header>
-  <h1>AIVIA graph — M1–M3</h1>
+  <h1>AIVIA graph — M1–M4</h1>
   <div class="sub">the technical layer, rendered from the store's export
     parquets · hover for descriptions · click any node for its card ·
     build <span id="build">?</span></div>
@@ -106,6 +106,12 @@
   <label class="lay"><input type="checkbox" data-l="param" checked>
     <span class="dot" style="background:var(--param)"></span>param
     <span class="cnt" id="c-param"></span></label>
+  <label class="lay"><input type="checkbox" data-l="dcol" checked>
+    <span class="dot" style="background:var(--dcol)"></span>derived_column
+    <span class="cnt" id="c-dcol"></span></label>
+  <label class="lay"><input type="checkbox" data-l="cites" checked>
+    <span class="dash" style="border-top:2px dashed var(--dcol)"></span>cites
+    <span class="cnt" id="c-cites"></span></label>
   <label class="lay"><input type="checkbox" data-l="resolves" checked>
     <span class="dash" style="border-top:2px dashed var(--cond)"></span>resolves_to
     <span class="cnt" id="c-resolves"></span></label>
@@ -134,13 +140,13 @@ const CV = document.getElementById('cv'), CTX = CV.getContext('2d');
 const COLORS = {table:'#d95926', column:'#199e70', schema:'#3987e5',
                 db:'#d55181', join:'#eda100', haspart:'#54554f',
                 scope:'#008300', joinnode:'#c98500',
-                cond:'#8e6bd0', param:'#d550c8'};
+                cond:'#8e6bd0', param:'#d550c8', dcol:'#2fa8a0'};
 const INK = '#f2f1ea', INK2 = '#c3c2b7', INK3 = '#8b8a80';
 let W, H, dpr = window.devicePixelRatio || 1;
 let scale = 0.14, ox = 0, oy = 0;   // world→screen: s = w*scale + o
 const show = {table:1, column:1, schema:1, db:1, haspart:1, joins:1,
               scope:1, joinnode:1, reads:1, cond:1, param:1,
-              resolves:1};
+              resolves:1, dcol:1, cites:1};
 let hover = null, pinned = null, dragging = null, panning = false;
 let pending = null, down = false;      // gesture decided on first move
 let px = 0, py = 0, gx = 0, gy = 0;   // g = gesture start (click test)
@@ -159,15 +165,17 @@ const J = DATA.joinNodes.map((n,i)=>({k:'joinnode', i, ...n, r:10}));
 // M3 THE CONDITION LAYER: conditions + params are store rows too
 const CD = DATA.conds.map((n,i)=>({k:'cond', i, ...n, r:7}));
 const P = DATA.params.map((n,i)=>({k:'param', i, ...n, r:18}));
+// M4 THE DERIVED-COLUMN LAYER: computed outputs, one node each
+const DC = DATA.dcols.map((n,i)=>({k:'dcol', i, ...n, r:8}));
 const REF = x => x ? (x.t==='T' ? T[x.i] : SC[x.i]) : null;
-const nodes = [...T, ...C, ...SC, ...J, ...CD, ...P, ...S, DB];
+const nodes = [...T, ...C, ...SC, ...J, ...CD, ...P, ...DC, ...S, DB];
 // radii live in WORLD units and scale with zoom (clamped) — fixed
 // pixel dots over world positions made columns collapse UNDER
 // their table at low zoom, which also ate their clicks
 const RMIN = {table:3.5, column:2.0, schema:5, db:6, scope:3.5,
-              joinnode:3.2, cond:1.8, param:4};
+              joinnode:3.2, cond:1.8, param:4, dcol:2.2};
 const RMAX = {table:11, column:4.5, schema:13, db:15, scope:11,
-              joinnode:7, cond:4, param:10};
+              joinnode:7, cond:4, param:10, dcol:5};
 const nr = n => Math.max(RMIN[n.k], Math.min(RMAX[n.k], n.r*scale));
 const joinsOf = i => DATA.joins.filter(j=>j.a===i||j.b===i);
 
@@ -183,6 +191,8 @@ document.getElementById('c-cond').textContent = DATA.counts.conds;
 document.getElementById('c-param').textContent = DATA.counts.params;
 document.getElementById('c-resolves').textContent =
   DATA.counts.resolves + DATA.counts.usesParam;
+document.getElementById('c-dcol').textContent = DATA.counts.dcols;
+document.getElementById('c-cites').textContent = DATA.counts.cites;
 document.getElementById('chips').innerHTML =
   `<span class="chip"><b>${DATA.counts.nodes}</b> nodes</span>`+
   `<span class="chip"><b>${DATA.counts.edges}</b> edges</span>`+
@@ -224,7 +234,12 @@ const hi = n => {                      // highlight membership
   if(pinned.k==='param')
     return DATA.usesParam.some(e=>e.p===pinned.i&&n===SC[e.s]) ||
       DATA.resolvesPar.some(e=>e.p===pinned.i&&n===CD[e.c]);
+  if(pinned.k==='dcol')
+    return n===SC[pinned.s] ||
+      (n.k==='column' &&
+       DATA.cites.some(e=>e.s===pinned.s&&e.t===n.i));
   if(n.k==='cond' && SC[n.s]===pinned) return true;
+  if(n.k==='dcol' && SC[n.s]===pinned) return true;
   if(n.k==='param' &&
      DATA.usesParam.some(e=>e.p===n.i&&SC[e.s]===pinned)) return true;
   if(n.k==='joinnode' && SC[n.s]===pinned) return true;
@@ -313,6 +328,29 @@ function draw(){
       if(pinned && !(o===pinned||hi(c))) return;
       CTX.moveTo(sx(o),sy(o)); CTX.lineTo(sx(c),sy(c));});
     CTX.stroke(); CTX.globalAlpha = 1;
+  }
+  // M4: scope—has_part→derived_column satellites (faint spokes)
+  if(show.dcol && show.scope && show.haspart){
+    CTX.strokeStyle = COLORS.haspart;
+    CTX.globalAlpha = scale > .5 ? .18 : .09;
+    CTX.beginPath();
+    DC.forEach(c=>{const o=SC[c.s];
+      if(pinned && !(o===pinned||hi(c))) return;
+      CTX.moveTo(sx(o),sy(o)); CTX.lineTo(sx(c),sy(c));});
+    CTX.stroke(); CTX.globalAlpha = 1;
+  }
+  // M4: cites (scope→column — the outputs' source columns), dashed
+  if(show.cites && show.scope && show.column){
+    CTX.setLineDash([3,4]);
+    CTX.strokeStyle = COLORS.dcol;
+    DATA.cites.forEach(e=>{
+      const a=SC[e.s], b=C[e.t];
+      const lit = pinned && (a===pinned||b===pinned);
+      CTX.globalAlpha = lit ? .85 : (pinned ? .03 : .08);
+      CTX.beginPath(); CTX.moveTo(sx(a),sy(a));
+      CTX.lineTo(sx(b),sy(b)); CTX.stroke();
+    });
+    CTX.setLineDash([]); CTX.globalAlpha = 1;
   }
   // M3: resolves_to (condition→column/param, role-tagged) +
   // uses_param — the logic layer's anchors, dashed
@@ -592,7 +630,8 @@ function showTip(n, mx, my){
   if(!n){tip.style.display='none'; return;}
   const kind = {table:'TABLE', column:'COLUMN', schema:'DB_SCHEMA',
                 db:'DB', scope:'SCOPE', joinnode:'JOIN (observed)',
-                cond:'CONDITION', param:'PARAM'}[n.k];
+                cond:'CONDITION', param:'PARAM',
+                dcol:'DERIVED COLUMN'}[n.k];
   let meta = '';
   if(n.k==='table') meta = `pk: ${n.pk||'—'} · ${n.nc} columns · `+
     `${joinsOf(n.i).length} declared joins`;
@@ -603,6 +642,7 @@ function showTip(n, mx, my){
       `${DATA.reads.filter(e=>e.s===n.i).length} direct reads · `+
       `${CD.filter(c=>c.s===n.i).length} conditions`;
   if(n.k==='cond') meta = `in ${SC[n.s].n}`;
+  if(n.k==='dcol') meta = `computed output of ${SC[n.s].n}`;
   if(n.k==='param') meta =
     `${DATA.usesParam.filter(e=>e.p===n.i).length} using scope(s)`;
   tip.innerHTML = `<div class="k">${kind}</div>
@@ -667,6 +707,20 @@ window.pin = function(n){
       <div class="d">${n.d||''}</div>
       ${rc||rp?`<div class="sec">RESOLVES TO (role-tagged)</div>${rc}${rp}`
         :`<div class="jrow">no resolved anchors</div>`}`;
+    card.style.display='block'; draw(); return;
+  }
+  if(n.k==='dcol'){
+    const srcs = DATA.cites.filter(e=>e.s===n.s).map(e=>
+      `<div class="jrow"><b>${C[e.t].n}</b><br>
+       <span style="color:var(--ink3)">in ${T[C[e.t].t].n}</span></div>`
+    ).join('');
+    cardBody.innerHTML = `<div class="k">DERIVED COLUMN — M4</div>
+      <h3><span class="dot" style="background:${COLORS.dcol};width:9px;
+      height:9px;border-radius:50%;display:inline-block"></span>
+      ${SC[n.s].n} · ${n.n}</h3>
+      <div class="d">${n.d||''}</div>
+      ${srcs?`<div class="sec">ITS SCOPE'S CITED COLUMNS</div>${srcs}`
+        :`<div class="jrow">no cited dictionary columns</div>`}`;
     card.style.display='block'; draw(); return;
   }
   if(n.k==='param'){

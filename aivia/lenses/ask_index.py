@@ -54,34 +54,23 @@ def lens_ask_index(read, params) -> Dict[str, Any]:
                     # PRACTICED metrics and must be askable
                     add("scope", s["name_key"],
                         s.get("name") or s["name_key"].split("::")[-1])
-                    # derived columns are askable too — 'anything'
-                    # includes what the estate computes (Gap B's
-                    # output side)
-                    arms = s.get("combination_arms")
-                    shape = arms[0] if arms else s
-                    for m in shape.get("projection", []):
-                        if not m.get("name"):
-                            continue
-                        expr = m.get("expression", {})
-                        # PASSTHROUGH RULE: a member that merely
-                        # copies a same-named column is not a
-                        # distinct askable thing (staging copies
-                        # would swamp every ask); computed or
-                        # RENAMED members are
-                        if expr.get("label") == "column_ref" and \
-                                _fold(expr.get("ref", "")
-                                      .rsplit(".", 1)[-1]) \
-                                == _fold(m["name"]):
-                            continue
-                        add("derived_column",
-                            f"{s['name_key']}.{m['name']}",
-                            m["name"])
         # the search law: unresolved names are findable — each is the
         # reader/writer drift finding wearing its own name
         for ref in tree.get("resolution_census", {}).get(
                 "unresolved", []):
             add("drift", f"{tree['name']}::{ref}",
                 ref.rsplit(".", 1)[-1])
+    # THE (c) RE-HOME (Sunny's "fix (c)" 2026-09-16, closing his
+    # AGE_IN_DAYS find): derived columns are the M4 STORE NODES —
+    # one entry per node, the node's own name; the words become the
+    # stored R12 description in speak() (the center law: the index
+    # is a verbatim projection of stored speech). The old tree-grain
+    # pseudo entries ({scope}.{NAME}) and their dead passthrough
+    # filter retired here; renamed passthroughs are a COUNTED
+    # exclusion (the derived-layer receipt splits them out).
+    for n in read.nodes("derived_column"):
+        add("derived_column", n.identity,
+            n.properties.get("name", ""))
     for n in read.nodes("pbi_report"):
         add("pbi_report", n.identity, n.properties.get("name", ""))
     seen_terms = {}
