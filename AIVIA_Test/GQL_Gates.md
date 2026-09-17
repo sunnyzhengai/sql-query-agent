@@ -544,7 +544,12 @@ steward act, never a code fix.
 - Run the gate queries above (answer key: expected_m_gates.json,
   re-based 1.45.0).
 
-### M5 gate — statement (+ the M3 holdovers)
+### M5 gate — statement (+ the M3 holdovers) [BUILT + LOADED +
+### GATED GREEN 2026-09-17 — Sunny's load ("loaded."), the six
+### queries Q1–Q6 run on the served graph, his verdict verbatim:
+### "ALL GOOD" — statement 67 · 36/31 · 6167/6618 · the two IF
+### sentences byte-identical served; the visual republished to
+### the standing URL (M1–M5), FS1 counts test green first]
 
 | expect | value |
 |---|---|
@@ -553,6 +558,68 @@ steward act, never a code fix.
 | descriptions | **36 R11-rendered non-empty + 31 EMPTY-BY-RULE (the (b) ruling, Sunny "b" 2026-09-17: operational statements store NOTHING — a fixed phrase would restate the kind field); the split is the check, corrected from the pre-ruling 67/67 draft** |
 | counted debt | 31 operational statements have NO downward edge — DECLARED Connection_Ledger counted-missing, landing step named M6 (file→statement). Not silent, not a failure: a counted row |
 | census after | nodes 6167 (statement 67) · edges 6618 (has_part 6095 · resolves_to 169 · uses_param 4) — census_after.M5 in the key |
+
+**The M5 gate queries (paste one at a time; the expected value
+follows each):**
+
+Q1 — the full node census (every label counted, exact):
+
+```
+MATCH (n) RETURN labels(n) AS nodeType, count(*) AS cnt GROUP BY nodeType
+```
+
+→ statement 67 · condition 1147 · param 4 · scope 44 · join 95 ·
+direct_read 6 · derived_column 156 · table 90 · column 4554 ·
+db_schema 3 · db 1 (+ file/meaning_twin per the standing census);
+the ladder labels sum to 6167.
+
+Q2 — the edge battery (run per type):
+
+```
+MATCH ()-[r:has_part]->() RETURN count(r) AS cnt
+```
+
+→ 6095. Then `uses_param` → 4 · `resolves_to` → 169; the total:
+
+```
+MATCH ()-[r]->() RETURN count(r) AS totalEdges
+```
+
+→ 6618.
+
+Q3 — the subkind split (the (b) ruling as a served query):
+
+```
+MATCH (s:statement) RETURN s.subkind AS subkind, count(*) AS cnt GROUP BY subkind
+```
+
+→ operational 31; the rest (empty subkind) 36.
+
+Q4 — the description split (36 speak, 31 empty BY RULE):
+
+```
+MATCH (s:statement) WHERE s.description <> '' RETURN count(s) AS voiced
+```
+
+→ 36.
+
+Q5 — the birth edges point down (statement→scope):
+
+```
+MATCH (s:statement)-[:has_part]->(sc:scope) RETURN count(*) AS cnt
+```
+
+→ 44.
+
+Q6 — the spot check (the served graph SPEAKS the stored R11 text):
+
+```
+MATCH (s:statement) WHERE s.does = 'IF' RETURN s.name AS step, s.description AS descr
+```
+
+→ exactly two rows: "A decision step, taken when the start date
+parameter is not recorded or the start date parameter is ''."
+and the end-date twin — byte-identical to the ratified 36.
 
 **M5 load steps (Sunny's hand, after the build commit):**
 

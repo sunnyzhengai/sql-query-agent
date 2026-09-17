@@ -1,6 +1,6 @@
 # Brief_M5_Statement_Layer — the statement layer + R11, with the F2+F4 export fix and the FS1 visual counts test riding
 
-**Status: BUILT** (full suite 2196 passed / 0 failed, 12:06, 2026-09-17; R11 RATIFIED v2.11.0 at the mid-build checkpoint; CLOSED follows Sunny's load + the served §M5 gates + the visual republish)
+**Status: CLOSED** (2026-09-17 — the first batch to run its ENTIRE arc inside the ratified process and under THE HARD GATE, in one day: brief → four rulings one at a time → tests-first build → the 36-sentence checkpoint ("ratified") → full suite 2196/0 → Sunny's load ("loaded.") → six served gates GREEN ("ALL GOOD") → the visual republished to the standing URL (M1–M5) → this close)
 
 | field | content |
 |---|---|
@@ -10,7 +10,7 @@
 | ambiguities | M5-1 · M5-2 · M5-4 RULED, M5-3 RESOLVED by investigation (2026-09-17, one at a time, Sunny's words quoted below) — ZERO OPEN |
 | debt declared | the 31 operational statements ship with NO downward edge — DECLARED counted-missing (Connection_Ledger row), landing step M6 (file→statement) — the placeholder law satisfied by the counted row + named landing step, standing since the batch plan |
 | Sunny's approval | **"approved"** — 2026-09-17, after ruling M5-1/2/4 one at a time, the M5-3 investigation, and re-affirming ruled-silent ("let's leave as is, no searchable statement descriptions for now") |
-| closing check | (filled at CLOSED) |
+| closing check | **BALANCED** — 23 declared files == the changed set across the build + closing commits, plus exactly the three exempt classes: regenerated registry JSONs (converter output, enumerated in the diffs), design-doc same-breath stamps (contracts · INDEX · ledger · Grammar_Floor · this brief), and the export parquets (5 changed + 4 new, declared in impacts; all else byte-identical incl. graph_column). THE GATE'S LEDGER: five under-declarations caught live (statement_layer test · speech.py — verification then DISPROVED the need · shape_census · the version-pin pair · the visual template title), every amendment by Sunny's word, ZERO undeclared edits landed. Served verdict verbatim: "ALL GOOD" (Q1–Q6, 2026-09-17) |
 
 ## The ambiguities — Sunny rules each
 
@@ -45,6 +45,7 @@
     docs/architecture/TEST_MAP.md
     tests/aivia/test_derived_render.py
     tests/aivia/test_produce.py
+    devtools/graph_visual/m1_template.html
     tests/aivia/test_graph_export.py
     tests/aivia/test_visual_counts.py
     devtools/graph_visual/generate_m1.py

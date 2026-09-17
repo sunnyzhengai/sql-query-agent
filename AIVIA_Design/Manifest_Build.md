@@ -1665,3 +1665,27 @@ gates, the visual republish — then the brief CLOSES with the
 declared-vs-actual diff. NOTE for his console boot: +2 param
 index sentences (the M5 params) embed at his next keyed boot —
 sub-cent, automatic, by content key.
+
+**M5 CLOSES ON THE SERVED GRAPH (Sunny's hand, 2026-09-17 — the
+FIRST whole batch arc inside the ratified process AND under THE
+HARD GATE, one day, matching M4's one-day record with the full
+governance machinery now running):** the load landed ("loaded.":
+5 changed + 4 new parquets, the statement node + three edge
+mappings, ONE refresh) and the SIX §M5 gate queries ran GREEN on
+the served graph — his verdict verbatim: **"ALL GOOD"** —
+statement 67 · subkind split 31/36 · descriptions voiced 36 ·
+statement→scope 44 · totals 6167 nodes / 6618 edges · the two IF
+sentences served byte-identical to the ratified 36. The visual
+republished to the STANDING URL, title M1–M5 (the template title
+bump = the gate's fifth catch, declared at his "yes"; statement
+nodes are COUNTED by the FS1 gate but not yet DRAWN as page
+elements — a display slot for a future brief if he wants them).
+Brief_M5_Statement_Layer CLOSED, closing check BALANCED (23
+declared == changed; five gate catches, zero undeclared edits
+landed). THE COMMIT CARRYING THIS ROW IS THE BATCH'S CLOSING
+COMMIT (build commit 2004b6f). M6 (file → statement — the edge
+that retires the 31 counted-missing) now holds the next entry
+gate; the queue behind it: the CI-B program (17 rows, its own
+sitting) · FL1 THE COMPUTED-READ EDGE (sequenced after M5, now
+unblocked, enters via its own brief) · the §D / ask-console
+convergence decision (statements' un-silencing waits there).
