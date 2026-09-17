@@ -1231,10 +1231,19 @@ grammar rule + function library"):**
 | FULL SUITE + LINT + TEST_MAP | first pass 2156 green / THREE RED, all closed same hour: (1) literal-census tag placement on the new _DERIVED_OP_KINDS frozenset (the scanner wants the tag adjacent to the tuple) — moved; (2) test_part_edges' pseudo-citizens pin — the flip its own docstring anticipated ("until their batches land"): derived_column now asserts edged/has_part; (3) test_meaning_console cond#6 — **PRE-EXISTING RED ON CLEAN HEAD (verified by stash-run)**: the 09-15 records-records blessing re-voiced "the medication administration's taken time is recorded." and the console pin was never re-run — AN ECHO of the subset-gate class (the sitting ran the estate battery, not the console round; the 09-12 ledger audit named this class at 1be0628). Pin corrected to the store truth. **MECHANISM QUESTION FOR SUNNY (Echo Law, 2nd occurrence):** should blessing batches run the FULL suite as their gate, not the estate battery? | **CLOSING STAMP: 2159 passed · 25 skipped · 8 xfailed · 0 failed (0:11:36, exit 0)**; ruff clean (only the 2 pre-existing converter E501s); TEST_MAP + generated docs regenerated |
 | THE CONSOLE FIND (Sunny's live test, same evening — "can't find AGE_IN_DAYS"): the ask index HAS the card (exact name, 1 entry) but THREE mechanisms bury it. (1) **RANKING vs MATCHING**: the total-score law RANKS by the SUM of card cosines while MATCH is judged at best-single-card grain (the code's own physics note: "three floor-crossing dribbles are not one real match") — every displayed hit summed ≥1.35 across 2-3 cards, so a pure exact-name match (~0.9, one card) can never make the cut; the search path has NO deterministic exact-fold tier before the vectors. (2) **ANAPHOR OVER-MARK with a non-empty table**: "how is AGE_IN_DAYS defined" got the mention reference-marked and silently resolved to the TABLE HEAD (CALENDAR_DT) — the "proposal never veto" guard covers only the EMPTY table (the 22:27 corpse's sibling). (3) **THE INDEX PRE-DATES M4**: its 403 derived_column cards are the old tree-grain pseudos ({scope}.{NAME}) speaking "a computed output of the … selection" — the store's 156 R12 descriptions are never consulted; AND the passthrough filter is DEAD CODE (reads expr["label"], the mapper writes "kind" — always False, so same-named staging copies swamp the count, the exact swamping its comment feared) | **DESIGN QUESTIONS — Sunny's ruling, not patches** (design-first triage): (a) exact-fold name tier before the vector search, or rank by (best_card, sum)? (b) a role-mark that exact-folds to an index name loses to the name? (c) the index's derived_column cards re-home to the M4 STORE nodes (156, R12 speech) — the pseudo grain + dead filter retire together? | the probe run 2026-09-16 (index entry present, ask('AGE_IN_DAYS') at the deterministic tier finds it; the buried ranking reproduced from the round's own trace numbers) |
 
-**REMAINING for the batch to CLOSE (the batch law's last clause,
-Sunny's hand):** load the 3 new parquets + model deltas + ONE
-refresh → run the §M4 gate queries → the closing commit lands in
-this table. No Fabric operation without Sunny's go.
+**M4 CLOSES ON THE SERVED GRAPH (Sunny's hand, 2026-09-16 — the
+batch law runs to its last clause, and for the first time the
+WHOLE ARC fit in ONE DAY: planning → rulings → grammar → build →
+export → load → gate):** the load landed (3 new parquets · model
+deltas: node derived_column + has_part mapping + cites edge ·
+ONE refresh) and the full §M4 battery ran on the served graph —
+**"all passed"** (a pass = the stated count, the gate sheet's own
+law: node census 6092 exact with derived_column 156 · the
+eight-type edge battery summing 6562 with cites 97 · by-derivation
+154/2 · the spot check speaking the stored R12 text). Build
+commit d6b01e2; the commit carrying THIS ROW is the batch's
+closing commit. M5 (statement ×67 + the M3 holdovers; R11 to
+author) now holds the next entry gate.
 
 ## 2026-09-16 (late) — THE PLACEHOLDER LAW (Sunny's ruling, from
 ## the AGE_IN_DAYS search find)

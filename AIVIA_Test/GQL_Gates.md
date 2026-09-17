@@ -101,7 +101,7 @@ numbers; the pre-era-3 rows stand in git history.)*
 | M1 | db 1 · db_schema 3 · table 90 · column 4554 | **4648** |
 | M2 ✅ | + scope 44 · join 95 (+ direct_read 6 at ERA 3) | **4793** |
 | M3 ✅ | + condition 1141 · param 2 | **5936** |
-| M4 ✅ | + derived_column 156 (measured at build) | **6092** |
+| M4 ✅✅ | + derived_column 156 (measured at build; SERVED gate passed 2026-09-16) | **6092** |
 | M5 | + statement 67 · condition→1147 · param→4 (holdovers twin-authored) | **6167** |
 | M6 | + file 1 | **6168** |
 | M7 | + pbi_report 1 · description 1 · agent 1 · role 1 · responsibility 1 · blessed_name 113 | **6286** |
@@ -111,7 +111,7 @@ numbers; the pre-era-3 rows stand in git history.)*
 | M1 | has_part 4647 · joins_to 65 | **4712** |
 | M2 ✅ | + left_side 101 · right_side 87 · has_part→4748 (ERA 3: reads RETIRED, direct_read sided) | **5001** |
 | M3 ✅ | has_part 5889 · resolves_to 165 · uses_param 2 · rest same | **6309** |
-| M4 ✅ | has_part 6045 · + cites 97 (measured at build — 100→97 store grain) | **6562** |
+| M4 ✅✅ | has_part 6045 · + cites 97 (measured at build — 100→97 store grain; SERVED gate passed 2026-09-16) | **6562** |
 | M5 | has_part 6095 · resolves_to 169 · uses_param 4 | **6618** |
 | M6 | has_part 6166 | **6689** |
 | M7 | + executes 1 · describes 1 | **6691** |
@@ -464,10 +464,13 @@ MATCH (d:direct_read) RETURN d.name AS readName, d.description AS descr ORDER BY
 → 6 rows; read#1 (scope #Final) reads
 "Reads NON_SEVERE_SEPSIS_STAGING."
 
-### M4 gate — derived_column [BUILT 2026-09-16, store-verified;
-### Sunny's "ratified — go on M4"; the numbers below are MEASURED
-### from the built store — cites RE-BASED 100→97 at build (store
-### grain: three twin-path heads collapse into named scopes — the
+### M4 gate — derived_column [CLOSED ON THE SERVED GRAPH —
+### Sunny's hand, 2026-09-16: load + ONE refresh + the full
+### battery below, "all passed" (a pass = the stated count, by
+### this sheet's own law: node census 6092 · edge battery summing
+### 6562 · by-derivation 154/2 · the spot check). BUILT same day,
+### store-verified; cites RE-BASED 100→97 at build (store grain:
+### three twin-path heads collapse into named scopes — the
 ### joins-93→95 precedent)]
 
 | expect | value |
