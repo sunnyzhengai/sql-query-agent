@@ -1267,6 +1267,56 @@ THE SPEECH PARITY GATE (ruled same breath — every Speech_Sources
 row gets a mechanical verifier; a declaration with no check is a
 hope, the RG-B1 principle applied to speech).
 
+**THE CONTRACT SYSTEM RATIFIED (Sunny, 2026-09-16 late — the
+process dig that followed the AGE_IN_DAYS find):** the
+INTERACTIONS of design, data, and registries become keyed,
+joinable tables (his correction recorded: documents keep their
+form; the TABLES model the relationships) — DATA_CONTRACTS (one
+row per data TYPE, never per instance) · CONTRACT_FIELDS ·
+CONSUMERS · SURFACE_CONTRACTS · DESIGN_SECTIONS · GOVERNS (the
+design→data/surface join, many-to-many; his find: without it
+"what design touches what data" was unanswerable) · TESTS.
+Integrity = foreign-key checks; ungoverned data and unruled
+surfaces are standing visible debt; a plan's impact list is
+COMPUTED by walking the joins and presented before code. Layer
+docs MODULAR and independent (his readability ruling): new doc
+type `Contract_`, one per graph layer + Contract_Surfaces; an
+edge's rows live with its WRITER's layer. FIRST DOC LANDED:
+Contract_Technical_Layer.md (DRAFT, awaiting his gap-check) —
+populating it produced 3 findings same hour: F1 db/db_schema
+none-ruled made visible (closed — the row is the proof) · F2
+pk_columns never reaches Fabric (the known list-valued export
+drop, resurfaced as a red consumer row — OPEN) · F3 the
+Collibra/Purview publishers are ungoverned surfaces with no
+re-verify (OPEN). Also from the same dig, RULED: state-vs-ledger
+document split (design docs describe NOW, rewritten in place;
+history lives in git + this ledger) — consolidation of existing
+docs rides Sunny's pace, section by section under his eye.
+
+**THE CHANGE PROCESS DRAFTED (same night, at Sunny's "do we need
+to solidify a process document"):** Ruling_Change_Process.md —
+PROPOSED, five steps (classify → query the contract tables →
+brief → Sunny rules every ambiguity → build in fixed order),
+binding the pause rule, placeholder law, one-home, same-breath,
+and the closing declared-vs-actual check; briefs get a home
+(AIVIA_Design/briefs/). Open on Sunny: P1 ratify · P2 the
+pre-code hook (hard gate vs discipline+closing-check) · P3 the
+lightweight FIX lane. The worked example that produced it:
+"add a field to column nodes" walked end to end — the impact
+query read straight off Contract_Technical_Layer.md.
+SAME SITTING, Sunny's "create the process doc. create the next
+graph layer's contracts": the briefs home landed
+(briefs/Brief_TEMPLATE.md) and Contract_Logic_Layer.md landed
+(DRAFT) — 9 node types (statement TARGET) + 6 edge families,
+FIVE findings: FL1 references to computed/temp columns carry NO
+store edge — "which scope reads derived_column X" is not
+graph-walkable (the AGE_IN_DAYS correct-behavior find, now a
+contract row) · FL2 the M5 slot visible · FL3 the twin's planned
+M9 retirement as a declared one-home tension · FL4 ruled-silent
+index rows made visible (closed) · FL5 the unblessed-vendor-words
+phrase class spanning condition AND derived_column descriptions
+(steward queue).
+
 **THE PARITY GATE + FIX (c) BUILT (same night, test-first —
 Sunny's "yes" on the gate + "fix (c)"):**
 
