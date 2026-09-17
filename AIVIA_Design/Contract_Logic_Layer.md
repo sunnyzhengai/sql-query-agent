@@ -1,7 +1,7 @@
 # Contract_Logic_Layer — the logic graph's data contracts
 
-**Status: DRAFT — populated 2026-09-16 from the live system;
-awaiting Sunny's gap-check.** Second document of the contract
+**Status: RATIFIED (Sunny's gap-check passed, 2026-09-16 — "two
+contracts passed"); populated same day from the live system.** Second document of the contract
 system (conventions in Contract_Technical_Layer.md; process in
 Ruling_Change_Process.md). This layer is what the SQL MEANS: the
 structures born from parsing the estate's files.
@@ -100,7 +100,7 @@ structures born from parsing the estate's files.
 
 | id | finding | kind | status |
 |---|---|---|---|
-| FL1 | a reference to a COMPUTED or temp-table column carries NO store edge (dc.resolves_to reaches dictionary columns only) → "which scope reads derived_column X" is not graph-walkable; meaning resolves through the defining projection (Gap B) but no edge lands | missing edge class — surfaced in the AGE_IN_DAYS "correct behavior" discussion | OPEN — candidate future batch (Sunny) |
+| FL1 | a reference to a COMPUTED or temp-table column carries NO store edge (dc.resolves_to reaches dictionary columns only) → "which scope reads derived_column X" is not graph-walkable; meaning resolves through the defining projection (Gap B) but no edge lands | missing edge class — surfaced in the AGE_IN_DAYS "correct behavior" discussion | RULED (Sunny "yes", 2026-09-16): a declared OPEN SLOT — **THE COMPUTED-READ EDGE**, sequenced AFTER M5; enters via its own brief carrying its design questions (edge name · extend resolves_to with a role vs a new edge · exact grain — Sunny's rulings, never builder picks); pairs with the ask-console convergence decision |
 | FL2 | dc.statement is TARGET: M5 planned (67; operational 31 = counted-missing debt until M6); R11 unwritten | planned OPEN slot | OPEN by design — the M5 entry gate |
 | FL3 | dc.meaning_twin duplicates meaning beside the graph (one-home tension) with retirement PLANNED at M9 (parse records) | declared, dated tension | OPEN — rides the Phase-2 ladder |
 | FL4 | joins/direct_reads/statements are ruled-silent in the ask index — deliberate, now visible as consumer rows reading NOTHING | deliberate fact made visible | CLOSED — the rows are the proof |

@@ -1304,6 +1304,18 @@ pre-code hook (hard gate vs discipline+closing-check) · P3 the
 lightweight FIX lane. The worked example that produced it:
 "add a field to column nodes" walked end to end — the impact
 query read straight off Contract_Technical_Layer.md.
+**BOTH CONTRACT DOCS RATIFIED (Sunny's gap-check, 2026-09-16:
+"two contracts passed")** — Contract_Technical_Layer +
+Contract_Logic_Layer flip DRAFT→RATIFIED. **THE THREE OPEN
+FINDINGS RULED same sitting (his "yes" on the recommendations):**
+F2 pk_columns export fix = class FIX, rides the M5 batch (its
+brief, its load, one refresh) · F3 Collibra/Purview publishers =
+DORMANT (marketplace assets, not live; revival re-enters via the
+change process) · FL1 = a declared OPEN SLOT, THE COMPUTED-READ
+EDGE, sequenced after M5, enters via its own brief (edge name /
+resolves_to-extension vs new edge / grain = Sunny's rulings);
+pairs with the ask-console convergence decision. Nothing new
+starts now — the M5 brief inherits F2, the queue holds FL1.
 SAME SITTING, Sunny's "create the process doc. create the next
 graph layer's contracts": the briefs home landed
 (briefs/Brief_TEMPLATE.md) and Contract_Logic_Layer.md landed

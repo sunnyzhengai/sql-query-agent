@@ -1,7 +1,7 @@
 # Contract_Technical_Layer — the technical graph's data contracts
 
-**Status: DRAFT — populated 2026-09-16 from the live system;
-awaiting Sunny's gap-check.** First document of the contract
+**Status: RATIFIED (Sunny's gap-check passed, 2026-09-16 — "two
+contracts passed"); populated same day from the live system.** First document of the contract
 system (Sunny's ruling 2026-09-16: model the INTERACTIONS of
 design, data, and registries as keyed joinable tables; one
 document per graph layer, modular and independent; contracts are
@@ -95,5 +95,5 @@ never silently.
 | id | finding | kind | status |
 |---|---|---|---|
 | F1 | db/db_schema descriptions none-ruled — zero is legal by ds.m1_batch | deliberate fact, made visible | CLOSED — the row is the proof |
-| F2 | dc.table.pk_columns never reaches Fabric: the export drops LIST-valued fields (counted since the graph-visual build) | consumer gap | OPEN — Sunny rules when the export fix lands |
-| F3 | sc.collibra_publish / sc.purview_publish consume this layer with NO governing ds row and NO re-verify test | ungoverned surfaces | OPEN — contract them or mark dormant |
+| F2 | dc.table.pk_columns never reaches Fabric: the export drops LIST-valued fields (counted since the graph-visual build) | consumer gap | RULED (Sunny "yes", 2026-09-16): class FIX — the export carries list fields as joined text; RIDES THE M5 BATCH (its brief + its load, one refresh) |
+| F3 | sc.collibra_publish / sc.purview_publish consume this layer with NO governing ds row and NO re-verify test | ungoverned surfaces | RULED (Sunny "yes", 2026-09-16): **DORMANT** — kept as marketplace assets, NOT LIVE, no runs against current estates; revival re-enters via the change process (ruling → contract → tests) |
