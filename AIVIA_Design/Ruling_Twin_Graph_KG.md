@@ -1,5 +1,8 @@
 # The Twin-Graph KG — RATIFIED (Sunny, 2026-09-06)
 
+**Status: RATIFIED 2026-09-06.** (Header line added 2026-09-17,
+audit CI-C3.)
+
 *RATIFIED 2026-09-06: Sunny reviewed paragraph by paragraph the
 same night — amendments landed in place during the review
 (composed-meaning sentence · the change quanta · lens-stratum

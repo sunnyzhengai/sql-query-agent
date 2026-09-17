@@ -109,9 +109,17 @@ lives only at L0/L1 — never here.
 
 **Node vocabulary** (the Shape_Ledger carries forward as the
 ruled census target; GQL-reserved words never used as names —
-the vendored-list gate stands):
+the vendored-list gate stands; `db_schema` is the gate's
+enforcement scar: `schema` itself is GQL-reserved):
 
 - technical: `db · db_schema · table · column`
+
+  Description obligations (re-homed from the M1 ledger row,
+  2026-09-17, audit CI-A2 — gap-checked by Sunny, "pass"): table
+  and column descriptions are dictionary-verbatim and REQUIRED
+  (census Q2 both directions); db and db_schema descriptions are
+  **NONE-RULED — zero is legal**, the census counts them (the
+  precedent the 2026-09-17 statement ruling (b) cites).
 - logic: `file · statement · scope · condition · param ·
   derived_column · join · direct_read` (join ADDED 2026-09-10,
   Sunny's hand-drawn ruling; label gate-checked — JOIN is
@@ -171,7 +179,9 @@ the declared-vs-observed diff is now DIRECT and pure GQL: every
 join node's (left_side, right_side) table pair carries a declared
 `joins_to` or is a compliance finding — the documentation-drift
 product story (scope-sided joins excluded by construction);
-`cites` (scope→column outputs); `uses_param`; consumption
+`cites` (scope→column — the outputs' draw-set at STORE grain:
+one edge per **distinct (scope, dictionary column)** its outputs
+draw on, ruled 2026-09-16, measured 100→97); `uses_param`; consumption
 `executes`; governance `describes / performed_by / approved_by /
 used_by / supersedes / assigns`. Clause provenance as a STORED
 PROPERTY RETIRES (superseded 2026-09-10): parentage carries it —
@@ -180,14 +190,30 @@ where condition; derivable is never stored. Clause CONTAINERS
 (WHERE, FROM as syntax boxes) remain non-nodes; the join is not a
 container — it is relational meaning: which pair combines, how
 (`joinType` property: inner | left_outer | right_outer |
-full_outer | cross), and by what predicate. THE COVERAGE INVARIANTS
-(SUPERSEDING the earlier side-reads invariant — Sunny's
-M2-redesign ruling, same day: reads is the REMAINDER, never the
-union): per scope, (1) DISJOINT — no table is connected both by
-a reads edge and a join side; (2) COVERING — reads ∪ join sides
-== the parse's read-set, so no table a scope touches is silently
-unconnected. Both are standing census lines from the join batch
-on; divergence is a builder bug.
+full_outer | cross), and by what predicate. THE COVERAGE INVARIANT
+(the era-3 form, ratified 2026-09-14 — AMENDED here 2026-09-17
+per audit CI-C1, gap-checked by Sunny, "pass"; the earlier TWO-invariant form (DISJOINT +
+COVERING over the reads remainder, Sunny's M2-redesign ruling)
+collapsed when the reads edge retired: with one sided mechanism
+for every FROM there is no second mechanism left to overlap, so
+DISJOINT is vacuous): per scope, **side-targets == the parse's
+read-set** — no table a scope touches is silently unconnected.
+A standing census line; divergence is a builder bug.
+
+**SCOPE IDENTITY (re-homed 2026-09-17, audit CI-A1, from the
+ratified Scope_Identity sheet — kg2_logic, all eight flags RULED
+by Sunny 2026-09-05; the sheet's "Doc is authority" now points
+HERE; transcription gap-checked by Sunny 2026-09-17 — "pass"):** the name key (A3): `key(scope_i) := file::name` for
+the FIRST occurrence of the name in file order, `file::name#i`
+otherwise — total over all named scopes; removing occurrence 1
+retires ALL keys of that name, survivors re-mint, displaced
+attachments surface for re-attach. Delivery scopes (A11): the
+file's final emitter scope mints `file::delivery`; plural
+emitters mint `file::delivery_1..n` in statement order AND
+surface on the DBA list. The attachment domain (A4):
+about-targets are NAMED nodes only — unnamed nodes are outside
+the domain (a domain bound, not a branch; subquery logic is
+described at its named ancestor).
 
 **THE ENGLISH LADDER (amended by Sunny's readability challenge,
 2026-09-10):** every node ALWAYS keeps its deterministic render —
@@ -311,6 +337,14 @@ GQL gates, commit ids in the ledger) · capacity discipline (one
 refresh per batch, Sunny's hand or word).
 
 ## Migration (convergence, not rewrite)
+
+**THE BATCH LAW (re-homed from the ledger, 2026-09-17, audit
+CI-A3 — gap-checked by Sunny, "pass"):** batches ship BOTTOM-UP from
+the verified technical layer — every batch's birth edges point
+DOWNWARD at already-verified nodes, so nothing floats; a NEW node
+kind must declare its birth edge before it ships (the
+Audit_Graph_Integrity_Plan form). One refresh per batch, Sunny's
+hand or word (capacity discipline, carried above).
 
 - **Phase 1 — finish the ladder (in flight):** M3–M7 complete the
   graph's layers exactly as this v2 specifies. Nothing already

@@ -6,6 +6,9 @@
 # v2.0.0 POLICY-WALK major 2026-09-06; v1.3.1 RATIFIED Sunny
 # 2026-09-05)
 
+**Status: RATIFIED v2.10.0 (THE COMPUTED OUTPUT, 2026-09-16).**
+(Header line added 2026-09-17, audit CI-C3.)
+
 *v2.10.0 (RATIFIED Sunny 2026-09-16, "ratified — go on M4";
 authored same day at his "author the grammar rule + function
 library", the M4 planning session; both flagged drafts ruled at

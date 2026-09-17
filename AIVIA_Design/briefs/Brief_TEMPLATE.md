@@ -11,3 +11,12 @@
 | debt declared | deferrals with recorded reason + landing step; placeholders WITH their tripwire test |
 | Sunny's approval | his words, quoted, with date |
 | closing check | files changed == files declared (filled at CLOSED) |
+
+## Files declared
+
+    <one exact repo-relative path per line, NO wildcards — H5,
+    Brief_Hard_Gate_Hook. THE HARD GATE reads this section: a code
+    edit passes only while this brief is APPROVED or BUILT and the
+    path is listed here. Amending this list after approval needs
+    Sunny's word. Replace this note with the paths.>
+

@@ -39,6 +39,7 @@ GOVERNED_ENTRIES = frozenset({
     ".github",
     ".gitignore",
     "CHANGELOG.md",
+    "CLAUDE.md",
     "LICENSE",
     "README.md",
     "pyproject.toml",

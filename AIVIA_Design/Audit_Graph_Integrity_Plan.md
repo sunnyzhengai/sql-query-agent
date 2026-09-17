@@ -1,5 +1,9 @@
 # THE CONNECTION CENSUS + THE INTEGRITY BATTERY — plan (PLAN ONLY)
 
+**Status: EXECUTED (plan RATIFIED 2026-09-07; the battery ran —
+see Audit_Graph_Integrity_Review.md).** (Header line added
+2026-09-17, audit CI-C3.)
+
 *(2026-09-07. Born from Sunny's term-isolation overrule: "a term
 should not be alone — a term is deduced from a file's SQL; a usage
 event is connected to the user and the item it used… do we need to

@@ -1,5 +1,8 @@
 # The Literal Census Review — the complete offense inventory
 
+**Status: EXECUTED 2026-09-07.** (Header line added 2026-09-17,
+audit CI-C3.)
+
 *(2026-09-07, read-only review per Sunny's order; method in
 Audit_Literal_Law_Plan.md. Scope: aivia/ (163 scanner hits) + hand review
 of prose the scanner cannot see. Verdicts: **OFFENSE** (banned

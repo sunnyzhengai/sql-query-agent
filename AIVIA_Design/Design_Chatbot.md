@@ -1,5 +1,9 @@
 # Design — Chatbot
 
+**Status: LIVING — Sunny ratifies section by section.** (Header
+line added 2026-09-17, audit CI-C3 — the stamp INDEX already
+carried, now verifiable here.)
+
 **OWNERSHIP (the boundary, ruled 2026-09-09):** this doc owns
 everything that exists ONLY inside a conversation — the
 Interpreter, ask-time search and ranking, memory/ledger, the nine
@@ -1059,6 +1063,15 @@ extends to M2's accepted grains.
 - **Joins are CONNECTIVE STRUCTURE, never indexed**: a join node
   carries its ON text, joinType, and description as EVIDENCE for
   the connections it makes — planner food, not search targets.
+- **THE RULED-SILENT LIST (consolidated here 2026-09-17, audit
+  CI-A5 — gap-checked by Sunny, "pass"):** joins · direct_reads ·
+  statements stay OUT of the ask index — joins and direct_reads
+  as connective structure (a direct_read walks exactly as a
+  join's side-path does; its exclusion is counted), statements
+  until §D resumes (Sunny's 2026-09-10 ruling). **Scopes are
+  IN** (all 44, the bullet above) — the ledger's 2026-09-10 line
+  ruling scopes silent is HISTORY, superseded by the index
+  rebuild; the state law lives in THIS list.
 - **THE PASS-THROUGH RULE**: a scope and a table are CONNECTED
   when a join links them (scope —has_part→ join
   —left_side/right_side→ table-or-scope). Enumeration and

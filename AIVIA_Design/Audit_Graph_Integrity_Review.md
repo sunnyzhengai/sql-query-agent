@@ -1,5 +1,8 @@
 # Audit — Graph Integrity Review: the Connection Ledger draft
 
+**Status: EXECUTED 2026-09-07.** (Header line added 2026-09-17,
+audit CI-C3.)
+
 *(2026-09-07, executed per the ratified Audit_Graph_Integrity_Plan
 §4. Read-only; verified against the LIVE sepsis store plus code
 reads. One row per node kind, four answers, a verdict, and the

@@ -1,7 +1,8 @@
 # Ruling_Change_Process — how any change moves from idea to build
 
-**Status: PROPOSED — drafted 2026-09-16 at Sunny's "do we need to
-solidify a process document"; awaiting his ratification.** Born
+**Status: RATIFIED (Sunny, 2026-09-16 late: P1 "yes" · P2 "hard
+gate" · P3 "keep the step 3 skip"); drafted the same night at his
+"do we need to solidify a process document".** Born
 from the AGE_IN_DAYS dig: placeholders without tripwires, a
 ruling that never faced the surface it bypassed, and patches
 proposed before the design was consulted. This document is the
@@ -14,7 +15,7 @@ queries.
 |---|---|---|---|---|
 | 1 | CLASSIFY the change | builder | one of the four classes below | never |
 | 2 | QUERY the contract tables | builder (mechanical) | the computed impact list | never |
-| 3 | BRIEF presented to Sunny | builder → Sunny | class + claims + impacts + ambiguities | only class FIX with zero ambiguities and zero contract changes |
+| 3 | BRIEF presented to Sunny | builder → Sunny | class + claims + impacts + ambiguities | never (the FIX skip was retired by H2(c), same night — see the decisions table) |
 | 4 | SUNNY RULES every ambiguity | Sunny | his words, quoted in the brief → APPROVED | never — an OPEN ambiguity blocks code |
 | 5 | BUILD in the fixed order | builder | registry/contract rows → tests first → code → full suite + integrity → export regen → Sunny's load if served data changed → close | never |
 
@@ -70,12 +71,12 @@ Fits none cleanly → that IS an ambiguity → step 4 before anything.
 | the contract tables | AIVIA_Design/Contract_<Layer>.md + Contract_Surfaces.md |
 | briefs | AIVIA_Design/briefs/ (one file per change; status DRAFT → PRESENTED → APPROVED → BUILT → CLOSED) |
 | the chronological record | Manifest_Build.md (the ledger — history, never current law) |
-| mechanical enforcement | integrity checks in the test suite; optionally the pre-code hook (.claude/settings.json) that refuses edits not covered by an APPROVED brief — Sunny's call, not yet ruled |
+| mechanical enforcement | integrity checks in the test suite + THE HARD GATE (ruled P2): a pre-code hook (.claude/settings.json) refuses code edits not covered by an APPROVED brief; the hook's own build enters via its own brief — the first change under this ratified process |
 
-## Open decisions (Sunny)
+## Decisions (all ruled by Sunny, 2026-09-16)
 
-| # | decision |
-|---|---|
-| P1 | ratify this process document |
-| P2 | the pre-code hook: hard gate on every code edit, or briefs-by-discipline with the closing check as the net? |
-| P3 | the lightweight FIX lane (step 3 skip) — keep or remove? |
+| # | decision | ruling |
+|---|---|---|
+| P1 | ratify this process document | **RATIFIED** — "yes" |
+| P2 | the pre-code hook: hard gate or discipline + closing check? | **HARD GATE** — "hard gate"; the hook refuses code edits not covered by an APPROVED brief; its build enters via its own brief |
+| P3 | the lightweight FIX lane (step 3 skip) — keep or remove? | **KEEP** — "keep the step 3 skip" — **SUPERSEDED the same night by H2(c) ("c", Brief_Hard_Gate_Hook): with the hard gate live, every class including FIX needs an APPROVED brief; the skip is retired** |

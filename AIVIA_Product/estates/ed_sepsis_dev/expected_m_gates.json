@@ -200,7 +200,7 @@
   "column": "4554/4554",
   "scope": "44/44",
   "join": "95/95",
-  "condition": "748/748 at M3, 754/754 at M5",
+  "condition": "1141/1141 at M3, 1147/1147 at M5",
   "param": "2/2 at M3, 4/4 at M5",
   "derived_column": "156/156",
   "statement": "67/67",
@@ -359,7 +359,8 @@
     "@StartDate"
    ],
    "checks": {
-    "r11_descriptions_nonempty": 67,
+    "r11_descriptions_nonempty": 36,
+    "statement_operational_empty_by_rule": 31,
     "counted_missing_debt": "31 operational statements have NO downward edge — declared Connection_Ledger counted-missing, landing step M6"
    },
    "_note": "holdover numbers (+6 conditions, +2 params, resolves +4) remain TWIN-authored — the tree reconciliation at M5 build may move them (precedent: 748→1141)"

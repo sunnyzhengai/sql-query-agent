@@ -1,5 +1,10 @@
 # THE LITERAL LAW — enforcement plan (PLAN ONLY, 2026-09-07)
 
+**Status: OPEN — plan only.** (Header line added 2026-09-17,
+audit CI-C3. INDEX's "step F" stamp could not be verified against
+this file's text — the open-step claim needs Sunny's confirmation
+or an INDEX correction.)
+
 *(Sunny's order: "how can we enforce no hardcoding, no enumeration,
 no pre-built lists/tuples… make the process ironclad… then a
 complete code review." This document is the plan and the review's

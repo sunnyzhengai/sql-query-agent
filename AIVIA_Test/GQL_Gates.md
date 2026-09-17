@@ -548,7 +548,7 @@ steward act, never a code fix.
 
 | expect | value |
 |---|---|
-| new nodes | statement 67 (operational subkind 31, voiced never) · condition +6 (the IF predicates: total→754) · param +2 (@StartDate @EndDate: total→4) |
+| new nodes | statement 67 (operational subkind 31, voiced never) · condition +6 (the IF predicates: total→1147, the measured M3 re-base 1141 + 6) · param +2 (@StartDate @EndDate: total→4) |
 | new edges | has_part +50 (statement→scope 44 · statement→condition 2 · condition→condition 4) · resolves_to +4 (→param: total 156) · uses_param +2 (total 4) |
 | descriptions | 67/67 R11-rendered non-empty |
 | counted debt | 31 operational statements have NO downward edge — DECLARED Connection_Ledger counted-missing, landing step named M6 (file→statement). Not silent, not a failure: a counted row |

@@ -10,16 +10,16 @@ structures born from parsing the estate's files.
 
 | ds_id | says (short) | status | home doc |
 |---|---|---|---|
-| ds.scope_identity | scope name keys = file::name / file::name#i; delivery emitters get keys | RULED | kg2_logic Scope_Identity |
+| ds.scope_identity | scope name keys = file::name / file::name#i; delivery emitters mint file::delivery (plural: delivery_1..n + the DBA list) | RULED | Design_Graph_Engine — SCOPE IDENTITY (re-homed 2026-09-17, CI-A1; the registry sheet transcribes it) |
 | ds.m2_join_redesign | a scope reaches its tables THROUGH its join nodes; joins and conditions are separate batches; sides = the ON-resolved pair, syntactic order | RULED 09-10, batch CLOSED | Design_Graph_Engine |
 | ds.kind_vs_label | condition is ONE label; the predicate kind is a PROPERTY from the closed registry set; a new kind is a registry row, never a label | RULED | Design_Graph_Engine |
-| ds.m3_condition_layer | condition trees materialize (parentage carries clause; clauseProvenance retired); resolves_to role-tagged | RULED 09-10, batch CLOSED | Manifest_Build |
+| ds.m3_condition_layer | condition trees materialize (parentage carries clause; clauseProvenance retired); resolves_to role-tagged | RULED 09-10, batch CLOSED | Design_Graph_Engine (the retirement sentence + role vocabulary; pointer fixed 2026-09-17, CI-A4) |
 | ds.era3_from_structure | every FROM walks scope—has_part→(join \| direct_read)—sides; the reads EDGE retired; ONE invariant: side-targets == read-set | RULED 09-14, CLOSED 09-15 | Design_Graph_Engine era-3 |
-| ds.m4_stay_flat | one derived_column node per computed output; expression trees stay at L1 | RULED 09-16, batch CLOSED | Manifest_Build |
-| ds.cites_store_grain | cites = distinct (scope, dictionary column) its outputs draw on | RULED 09-16 (measured re-base) | Manifest_Build |
-| ds.birth_edge_law | a node ships only in the batch where its birth edge points DOWN at verified nodes | RULED | Manifest_Build batch law |
-| ds.ruled_silent_index | joins, direct_reads, statements stay OUT of the ask index (connective structure / until §D) | RULED | Design_Chatbot riders |
-| R1–R7 · R12 · (R11 reserved) | the voicing grammar per grain | RULED (R11 unwritten — M5) | Grammar_Floor |
+| ds.m4_stay_flat | one derived_column node per computed output; expression trees stay at L1 | RULED 09-16, batch CLOSED | Design_Graph_Engine registries stamp 1.45.0 (pointer fixed 2026-09-17, CI-A4) |
+| ds.cites_store_grain | cites = distinct (scope, dictionary column) its outputs draw on | RULED 09-16 (measured re-base) | Design_Graph_Engine edge vocabulary — cites (the tuple definition landed 2026-09-17, CI-A4) |
+| ds.birth_edge_law | a node ships only in the batch where its birth edge points DOWN at verified nodes | RULED | Design_Graph_Engine — Migration, THE BATCH LAW (re-homed 2026-09-17, CI-A3) |
+| ds.ruled_silent_index | joins, direct_reads, statements stay OUT of the ask index (connective structure / until §D); scopes are IN | RULED | Design_Chatbot riders — THE RULED-SILENT LIST (consolidated 2026-09-17, CI-A5) |
+| R1–R7 · R10 · R12 · (R11 reserved) | the voicing grammar per grain (R10 = the file/report floor) | RULED (R11 unwritten — M5) | Grammar_Floor |
 
 ## DATA_CONTRACTS
 
@@ -46,7 +46,7 @@ structures born from parsing the estate's files.
 |---|---|---|---|---|
 | dc.file | description (speech) | kg3 description artifact via the Scribe, gated drafted→approved — NOT a node property | R10 file floor · LLM cage | produce gates + F4 |
 | dc.scope | description | grammar renderer (scope lead) | inv.verbatim | test_scope_layer |
-| dc.scope | structures | parse, machine fact | inv.derivable_never_authored | mapper tests |
+| dc.scope | structures | parse, machine fact | inv.derivable_never_stored | mapper tests |
 | dc.join | description · onPredicate · joinType | join renderer + tree | inv.verbatim; joinType from tree | estate M2 battery |
 | dc.direct_read | description | read_render | inv.verbatim | era-3 battery |
 | dc.condition | description | grammar renderer (R1–R7 + annotations R8) | inv.verbatim · library words | verbatim suite |
@@ -55,7 +55,7 @@ structures born from parsing the estate's files.
 | dc.derived_column | description | R12 renderer + function library | inv.verbatim · library words | verbatim + parity gate |
 | dc.derived_column | derivation · operation · position · fragment | parse, machine facts | ds.m4_stay_flat | estate M4 battery |
 | dc.resolves_to | role | parse (closed role vocabulary) | ds.kind_vs_label (roles) | role census |
-| dc.statement | (planned) description | R11 renderer — **R11 UNWRITTEN** | operational subkind voiced NEVER | (M5 tests) |
+| dc.statement | (planned) description | R11 renderer — **R11 UNWRITTEN** | operational subkind voiced NEVER — **RULED (b) (Sunny "b", 2026-09-17): the 36 data-producing statements get R11 descriptions; the 31 operational store NOTHING (none-ruled, zero is legal — the db/db_schema precedent), the emptiness COUNTED never silent; a fixed phrase would restate the node's own kind field (derivable is never stored). Gate check re-pins 67→36 nonempty + 31 empty-by-rule** | (M5 tests) |
 
 ## CONSUMERS
 
@@ -66,8 +66,8 @@ structures born from parsing the estate's files.
 | all LIVE types | sc.meaning_console | descriptions + structure walks | console battery (18 blessed) |
 | all LIVE types + edges | sc.fabric_export | per-type graph_* parquets | export census tests |
 | all LIVE types | sc.graph_visual | name · description · edges | visual counts vs key |
-| dc.condition trees | grammar renderers (floors) | predicates for scope/file floors | verbatim suites |
-| dc.meaning_twin | translator/renderers (internal) | the twin blob | homomorphism law tests |
+| dc.condition trees | sc.grammar_render (floors) | predicates for scope/file floors | verbatim suites |
+| dc.meaning_twin | sc.translator | the twin blob | homomorphism law tests |
 
 ## GOVERNS
 
@@ -105,3 +105,6 @@ structures born from parsing the estate's files.
 | FL3 | dc.meaning_twin duplicates meaning beside the graph (one-home tension) with retirement PLANNED at M9 (parse records) | declared, dated tension | OPEN — rides the Phase-2 ladder |
 | FL4 | joins/direct_reads/statements are ruled-silent in the ask index — deliberate, now visible as consumer rows reading NOTHING | deliberate fact made visible | CLOSED — the rows are the proof |
 | FL5 | description quality: unblessed vendor words produce dangling phrases ("the date and time when") across condition AND derived_column descriptions — the R5 steward class | steward queue, not a code defect | OPEN — rides Sunny's blessing pace |
+| FL6 | invariant id split: line 49 said inv.derivable_never_authored, line 85 says inv.derivable_never_stored — two names for one law breaks the join; and inv.* ids had NO home table in any contract doc (referenced, never defined) | contract-integrity, review query 2026-09-16 | RULED (Sunny "a", 2026-09-17) + CLOSED same breath: the ONE name is inv.derivable_never_stored (the CLAUDE.md wording); the INVARIANTS table lives in Contract_Technical_Layer beside the conventions (home of all layers' inv rows); the stray spelling corrected above |
+| FL7 | the M5 gate disagrees with itself: expected_m_gates.json census_after.M5.condition = 1147 (store truth, the 1141 re-base) but description_coverage says "754/754 at M5" (the old twin count 748+6); same split inside GQL_Gates.md (line 549 "total→754" vs line 105 "condition→1147") — the M3 measurement re-base never reached the coverage strings | gate-sheet drift, review query 2026-09-16 | RULED (Sunny "yes", 2026-09-17): the two stale lines correct to the MEASURED numbers — coverage "1141/1141 at M3, 1147/1147 at M5", GQL_Gates "total→1147" — finishing the M3 re-base; via Brief_Gate_Number_Rebase |
+| FL8 | inbound.py:557 declares "held_statement_rooted": 0 and nothing ever increments it — the condition walker (decisions.named_scopes) never visits a statement's own predicate subtree, so the counter reads 0 for the wrong reason; the 6 IF predicates + @StartDate/@EndDate are not "held", they are out of reach. Also: the estate test asserts twin subkind == "operational" but kg2_mapper writes no subkind field — the writer must be located before the M5 build | placeholder-law class (a counter that cannot fire), review query 2026-09-16 | OPEN — the M5 brief carries both: give the counter a real value or retire it; name subkind's one writer |

@@ -1,4 +1,8 @@
 # THE CENTER AND THE THREE CENSUSES — RATIFIED
+
+**Status: RATIFIED 2026-09-07.** (Header line added 2026-09-17,
+audit CI-C3.)
+
 *(Drafted 2026-09-07 from the live-find series #5/#8/#9/#10 and the
 generator finding behind them; RATIFIED 2026-09-07 — Sunny ordered
 the landing pass ("update the design doc, and then the other

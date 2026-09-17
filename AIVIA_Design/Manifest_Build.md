@@ -1,5 +1,8 @@
 # Manifest_Build — THE build ledger (one truth)
 
+**Status: LIVING — THE ledger; history, never current law.**
+(Header line added 2026-09-17, audit CI-C3.)
+
 *(Merged 2026-09-09 under the documentation audit
 (Audit_Documentation_Review.md): Chatbot_Build_Manifest.md +
 Search_Rebuild_Manifest.md are RETIRED into this file. The law is
@@ -1339,3 +1342,238 @@ Sunny's "yes" on the gate + "fix (c)"):**
 | THE COUNTED TRADE-OFF (Sunny accepted): RENAMED passthroughs (author's alias, no computation) lose their ask cards — now COUNTED in the derived-layer receipt (`passthrough_renamed`), never silent; revisit on evidence | BUILT | inbound counts split |
 | Speech_Sources derived_column row flipped to the ONE-VOICE truth (the TWO-VOICES divergence declared and closed the same day); Connection_Ledger row corrected (defines pseudo = adjacency only) — registry rows only, same 1.45.0 (uncommitted bump amended) | LANDED | validators 8/8 · converter regen |
 | CASCADE, counted: the recorded-embedding fixture (tests/fixtures/recorded/text-embedding-3-small.json.gz) lacks vectors for the changed speech — MEASURED: 436 distinct new sentences (423 derived_column R12 descriptions + 13 new name texts; the error's "982" counts per-use slots before dedup). Full-suite state: **2102 passed · 62 red, ALL 62 the ONE RecordingGap class** (61 ERROR + 1 "FAILED" that is the same gap firing inside a test body — verified singly). Unblock = Sunny's key, one run: `AIVIA_RECORD=1 /opt/homebrew/bin/python3.11 -m pytest tests AIVIA_Test -q` (sub-cent spend, his hand per the capacity law), then the suite is fully offline again; his next keyed console boot re-embeds the same sentences into the live cache by content key | **CLEARED — Sunny's hand, same night: the recording run landed and the FULL SUITE went green — 2164 passed · 25 skipped · 8 xfailed · 0 failed (0:11:06) — exactly 2102 + the 62 recording-blocked; the fixture (text-embedding-3-small.json.gz) carries the 436 new sentences and the suite is offline again** | the classification re-run + the count-by-type probe + Sunny's green run 2026-09-16 |
+
+**THE PROCESS RATIFIED — P1/P2/P3 RULED (Sunny, 2026-09-16 late:
+"yes" · "hard gate" · "keep the step 3 skip"):**
+Ruling_Change_Process.md flips PROPOSED→RATIFIED. P2 = THE HARD
+GATE: a pre-code hook (.claude/settings.json) refuses code edits
+not covered by an APPROVED brief — the hook's own build enters
+via its own brief, the first change under the ratified process.
+P3 = the FIX lane stays: a fix with zero ambiguities and zero
+contract changes may skip the brief. Stamps in the process doc
+(decisions table carries his quoted words) + INDEX, same breath.
+
+SAME SITTING, THE FIRST REVIEW QUERY OF THE RATIFIED CONTRACTS
+(Sunny's "review the new documents… will new graph-engine changes
+follow the change process") — five findings landed as rows, all
+OPEN on Sunny: **F4** dc.column.values (dict code→meaning) is
+eaten by the SAME export filter as F2 (export_graph.py:50-53
+skips dicts AND lists; graph_column.parquet has no values column;
+the CONSUMERS "all fields" row overclaimed — why the population
+pass missed it) — proposed to ride the F2 fix in the M5 brief,
+dict serialization + the one separator = Sunny's rulings · **F5**
+TESTS-table drift (the reserved-word test is a function inside
+test_graph_export.py, not a file; test_metamodel.py enforces
+ds.naming_gql_reserved with no row) · **FL6** invariant id split
+(derivable_never_authored vs derivable_never_stored) + no home
+table for inv.* ids · **FL7** the M5 gate disagrees with itself
+(census_after.M5.condition 1147 vs description_coverage "754/754"
+— the M3 748→1141 re-base never reached the coverage strings;
+same split in GQL_Gates.md) — must resolve IN the M5 brief before
+the gate runs · **FL8** inbound.py:557 "held_statement_rooted": 0
+can never fire (the condition walker never reaches a statement's
+own predicates — placeholder-law class) + the twin's "operational"
+subkind has no located writer. Verification also PASSED: every
+test id both contracts name exists with exact pin counts
+(6/4/19); F2's mechanism confirmed at export_graph.py:51;
+joins_to.onColumns and scope.structures survive by hand-joins.
+The M5 brief now inherits F2 + F4 + FL7 + FL8 and carries the
+R11 numbers question (gate demands 67 nonempty descriptions vs
+the contract's "operational voiced NEVER" — 36 vs 67) + builder
+ordering (statement layer before conditions, or a second pass).
+
+**THE HARD-GATE BRIEF PRESENTED + H2 RULED (same night):**
+Brief_Hard_Gate_Hook.md landed PRESENTED — the first change under
+the ratified process (class: planned addition, fills the P2 slot;
+no graph data, no registries, no served data). Six ambiguities
+H1–H6. **H2 RULED (Sunny: "c")**: lane-fixes need APPROVED briefs
+like everything else — **P3's step-3 skip is RETIRED**, superseded
+the same night it was kept; the supersession recorded IN the P3
+row (one home), the five-steps table now reads "may skip: never",
+INDEX amended same breath. The hook gets ONE rule, no fix lane.
+H1 · H3–H6 remain OPEN and block the build.
+
+**H1 · H3–H6 RULED (same sitting, one at a time, Sunny's words
+quoted in the brief):** H1 paths — the proposal PLUS
+AIVIA_Product/ covered ("covered": estate data + answer keys —
+the FL7 drift class now gated); AIVIA_Design/ + *.md exempt so
+verdicts always land · H3 ("yes") APPROVED and BUILT unlock,
+DRAFT/PRESENTED/CLOSED do not — no permanent keys · H4 ("yes")
+the gate guards its own files (settings.json + the hook script);
+settings.local.json exempt · H5 ("yes") `## Files declared`, one
+exact path per line, NO wildcards; amending an APPROVED brief's
+list needs Sunny's word · H6 ("yes") devtools/change_gate.py,
+/opt/homebrew/bin/python3.11 absolute, stdlib only, FAILS CLOSED.
+All six ambiguities of Brief_Hard_Gate_Hook now RULED; the brief
+awaits Sunny's approval word to flip PRESENTED→APPROVED, then the
+build runs tests-first.
+
+**THE HARD GATE BUILT + CLOSED (Sunny's "approve" then "yes",
+2026-09-16 late → 2026-09-17 just past midnight — the first full
+brief arc under the ratified process, PRESENTED→APPROVED→BUILT→
+CLOSED in one sitting):** tests FIRST (tests/aivia/
+test_change_gate.py, 9 pins authored failing — the allow-pins
+red; a missing script already fails closed) → the hook
+(devtools/change_gate.py: stdlib-only python3.11, reads
+`## Files declared` from APPROVED/BUILT briefs only, exact paths
+no wildcards, AIVIA_Design/+*.md exempt so verdicts always land,
+guards its own two files, FAILS CLOSED) → the wiring
+(.claude/settings.json PreToolUse on Edit|Write|NotebookEdit —
+live from the next session) → Brief_TEMPLATE gains the
+`## Files declared` section. Live-fired: aivia/flows/inbound.py
+BLOCKED with the process message; the declared hook file ALLOWED.
+THE FIRST FULL RUN TRIPPED THREE TRIPWIRES, all resolved through
+the process itself: the Proves-tag grammar caught the new test
+file (fixed in-brief) → TEST_MAP.md regen rode the brief by
+Sunny's H5 amendment word ("yes") · CLAUDE.md had landed 0ce7de0
+unclassified — the zone gate caught it on the first full suite
+since; fixed via its OWN brief (Brief_Zone_CLAUDE_md, class fix,
+one line in src/zones.py GOVERNED_ENTRIES, the 2 red pins = the
+acceptance test) because H2(c) retired the fix lane — the ruling
+enforced on its first night. FULL SUITE GREEN: 2173 passed · 25
+skipped · 8 xfailed · 0 failed (0:11:02). Both closing checks
+BALANCED (declared == changed). Recorded limit: the hook gates
+Edit/Write/NotebookEdit — shell writes bypass it; discipline +
+the closing check remain that net. Commit awaits Sunny's word.
+
+**FL7 RULED + BUILT + CLOSED (Sunny "yes" then "approve",
+2026-09-17):** the two stale condition-coverage lines finish the
+M3 measurement re-base — expected_m_gates.json description_
+coverage "748/748 at M3, 754/754 at M5" → "1141/1141 at M3,
+1147/1147 at M5"; GQL_Gates.md M5 row "total→754" → "total→1147
+(1141+6)". Via Brief_Gate_Number_Rebase (class fix, zero
+ambiguities, its own brief per H2(c)); no test read the strings;
+estate battery 21/21 green after. FL7 row in Contract_Logic_Layer
+stamped RULED. The M5 gate sheet now agrees with itself.
+
+**THE R11 NUMBERS RULED (b) (Sunny "b", 2026-09-17):** the 36
+data-producing statements get stored R11 descriptions; the 31
+operational statements store NOTHING — none-ruled, zero is legal
+(the db/db_schema precedent), the emptiness COUNTED never silent.
+The rejected (a) would have stored 31 fixed phrases restating the
+node's own kind field — derivable is never stored. "Voiced never"
+stands as index law (all statements stay out of the ask index,
+ds.ruled_silent_index). Contract row stamped; the gate check
+re-pins 67→36 nonempty + 31 empty-by-rule via Brief_R11_Gate_Check
+(PRESENTED, class update).
+
+**Brief_R11_Gate_Check BUILT + CLOSED (Sunny "approve",
+2026-09-17):** expected_m_gates.json M5 checks now carry
+"r11_descriptions_nonempty": 36 + "statement_operational_
+empty_by_rule": 31 — the (b) ruling as counted arithmetic. JSON
+valid, estate battery 21/21 green, closing check BALANCED.
+
+**F4 RULED — THE ONE SEPARATOR (Sunny "yes" to all three parts,
+2026-09-17):** dc.column.values rides the F2 export fix (same M5
+brief, same load, one refresh — one filter, one class, one pass);
+dict pairs export as `code = meaning` joined by `"; "` (the
+joins_to house form); plain lists join `"; "` (pk_columns →
+`PAT_ID; CONTACT_DATE`). scope.structures keeps its served
+space-join — no served-data churn for zero gain. F4 row stamped
+RULED in Contract_Technical_Layer. Build lands with the M5 batch;
+the M5 brief now carries F2+F4 with the serialization forms
+already ruled, no builder picks left in the export fix.
+
+**THE THREE DOC RULINGS LANDED (Sunny, 2026-09-17, one at a
+time):** F5 ("yes") — the TESTS table reworded (the reserved-word
+pin lives INSIDE test_graph_export) + test_metamodel row added;
+CLOSED same breath. FL6 ("a") — the ONE invariant name is
+inv.derivable_never_stored (the CLAUDE.md wording; _authored
+retired, the stray line corrected) and THE INVARIANTS TABLE born
+in Contract_Technical_Layer beside the conventions — four laws
+defined, home of ALL layers' inv rows; CLOSED same breath.
+SURFACES ("yes" to both parts) — Contract_Surfaces.md DRAFTED
+from the live system (6 surfaces + 2 internal consumers, kind
+column, GOVERNS, FINDINGS) awaiting Sunny's gap-check; every
+prose consumer row in both layer contracts re-keyed
+(sc.grammar_render · sc.translator) — step 2's fourth question
+now answers from rows. NEW FINDING FS1 from the populating pass:
+sc.graph_visual is the only LIVE surface with NO automated
+re-verify (counts checked by eye at each republish) — OPEN,
+Sunny's call. INDEX carries the new doc + the template's Files-
+declared note, same breath.
+
+**Contract_Surfaces RATIFIED (Sunny's gap-check, 2026-09-17:
+"ratified")** — the third contract doc flips DRAFT→RATIFIED same
+sitting as its birth; INDEX stamped same breath. The contract
+system now holds three ratified layer docs + the ratified process.
+FS1 (the graph visual's eye-only re-verify) remains the one OPEN
+row, presented for Sunny's ruling next.
+
+**FS1 RULED (a) (Sunny "a", 2026-09-17):** the graph visual gets
+an automated counts-vs-key re-verify — the test runs the visual
+generator's counting step against the answer key, riding the M5
+batch (lands via the M5 brief, BEFORE that batch's republish).
+The F2 failure class (a consumer silently dropping data, no test
+watching) closes on its last uncovered surface. The eye keeps
+what eyes are for: layout, readability, the stored text on cards.
+Row stamped in Contract_Surfaces. THE M5 BRIEF now carries:
+statement layer + R11 (numbers ruled 36/31) + F2+F4 export fix
+(separator ruled) + FS1 visual counts test + the FL8 counter/
+subkind questions + builder-ordering ambiguity.
+
+**THE FIRST CONTRACT-INTEGRITY AUDIT EXECUTED (Sunny's "can we
+review its integrity? can we rewrite it as contract not prose",
+2026-09-17):** three parallel sweeps (forward ds-resolution ·
+reverse coverage · consistency) landed as Audit_Contract_
+Integrity.md — 28 finding rows. Headlines: of 15 distinct ds ids
+SIX lack a state-doc home (ds.m1_batch + ds.birth_edge_law
+ledger-only; m3/m4/cites misrouted with real homes standing;
+ds.scope_identity points at a GENERATED sheet deferring to a doc
+that exists only in git history) · ONE live contradiction
+(CI-A5: a ledger line rules scopes silent, the live design and
+the built index have all 44 IN) · SEVENTEEN ruled prose sections
+govern data/surfaces with no contract row — the largest being
+the whole L0/L1 evidence layer (no Contract_Evidence_Layer;
+FL3's M9 retirement already points into it), the English ladder
+(the writer law under every description field), and the
+one-vocabulary law (acronym nodes + build-time edges = graph
+data, no dc row) · the COVERAGE INVARIANTS paragraph still
+speaks the retired reads edge as current law · INDEX drift ×4 ·
+NINE docs have no Status header line (INDEX is their only
+status — unverifiable). Verdict recorded IN the audit: the prose
+docs are load-bearing, in places the ONLY home of law; the
+failure mode is missing homes/rows/anchors, not prose itself.
+All dispositions OPEN on Sunny.
+
+**THE MECHANICAL INTEGRITY PASS LANDED (Sunny's "continue when
+done", 2026-09-17):** CI-A1–A6 + C1–C3 built, doc-only. Re-homed
+into Design_Graph_Engine (each marked gap-check-pending): SCOPE
+IDENTITY (A3/A11/A4 transcribed from the ratified kg2_logic
+sheet — its "Doc is authority" now has a doc again) · the M1
+description obligations (none-ruled clause finally written as
+law) · THE BATCH LAW (birth edges point down; new kind declares
+its birth edge). Landed in Design_Chatbot: THE RULED-SILENT LIST
+(joins · direct_reads · statements OUT, scopes IN — the CI-A5
+contradiction dissolves under the state-vs-ledger split; the
+2026-09-10 ledger line is history). Amended: the COVERAGE
+paragraph to the one-invariant era-3 form (the retired reads
+edge no longer speaks as current law). Pointer fixes: m1/m3/m4/
+cites/birth_edge/ruled_silent home cells now name state docs;
+R10 joins the grammar row; the scar rationale + R8 COUNTED
+clause + cites tuple definition landed. INDEX: Grammar v2.10.0 ·
+a2 contingency DEAD · FL1–FL8 · L1_KG1 back to DRAFT (§3c the
+one ratified section). TEN docs gain Status header lines
+(CI-C3) — INDEX is no longer the only holder of any status;
+Audit_Literal_Law_Plan's "step F" stamp flagged unverifiable.
+REMAINS OPEN ON SUNNY: five gap-check passages (listed in the
+audit header) · CI-C4 (briefs in INDEX) · the CI-B program
+(17 rows, tiers 1–3 — the evidence-layer contract, the English
+ladder ds id, the missing consumption/governance docs, the
+new invariants).
+
+**THE FIVE GAP-CHECKS PASSED (Sunny, 2026-09-17, one at a time —
+"pass" ×5):** SCOPE IDENTITY · the M1 description obligations ·
+THE BATCH LAW · THE RULED-SILENT LIST · the one-invariant
+COVERAGE amendment. All pending markers cleared in place;
+CI-A1–A6 + C1–C3 CLOSED. The forward half of the integrity audit
+is fully resolved — every ds id now points at gap-checked state
+law. Remaining from the audit: CI-C4 (briefs in INDEX, his
+choice) + the CI-B program (17 rows, tiers 1–3).
+
+**CI-C4 RULED (a) (Sunny "a", 2026-09-17):** briefs index as ONE
+folder line carrying count + freshness ("4 briefs: 4 CLOSED · 0
+open — latest ..."), updated same breath as any brief lands or
+moves status; per-brief INDEX lines never — the naming law's
+intent applied at the briefs' grain (high-volume by design).
+INDEX line converted same breath. Audit row stamped.

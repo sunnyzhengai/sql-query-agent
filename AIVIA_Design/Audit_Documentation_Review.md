@@ -1,5 +1,8 @@
 # Audit — Documentation Review (2026-09-09)
 
+**Status: EXECUTED 2026-09-09.** (Header line added 2026-09-17,
+audit CI-C3.)
+
 *(Executed 2026-09-09: naming ruled, fixes 1-6 landed — file names below are the BEFORE state this audit found.)*
 
 *Sunny's charge: (1) is the graph-engine design complete? (2) is the
